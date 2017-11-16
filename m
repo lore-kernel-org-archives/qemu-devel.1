@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59991)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60026)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <crosa@redhat.com>) id 1eFO7t-0007op-W6
-	for qemu-devel@nongnu.org; Thu, 16 Nov 2017 12:39:07 -0500
+	(envelope-from <crosa@redhat.com>) id 1eFO7x-0007sG-LL
+	for qemu-devel@nongnu.org; Thu, 16 Nov 2017 12:39:10 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <crosa@redhat.com>) id 1eFO7o-0003v0-22
-	for qemu-devel@nongnu.org; Thu, 16 Nov 2017 12:38:58 -0500
+	(envelope-from <crosa@redhat.com>) id 1eFO7o-0003vd-8K
+	for qemu-devel@nongnu.org; Thu, 16 Nov 2017 12:39:01 -0500
 From: Cleber Rosa <crosa@redhat.com>
-Date: Thu, 16 Nov 2017 12:38:09 -0500
-Message-Id: <20171116173810.16457-10-crosa@redhat.com>
+Date: Thu, 16 Nov 2017 12:38:05 -0500
+Message-Id: <20171116173810.16457-6-crosa@redhat.com>
 In-Reply-To: <20171116173810.16457-1-crosa@redhat.com>
 References: <20171116173810.16457-1-crosa@redhat.com>
-Subject: [Qemu-devel] [PATCH 09/10] qemu-iotests: remove unused "here"
- variable
+Subject: [Qemu-devel] [PATCH 05/10] qemu-iotests: define functions used in
+ _cleanup() before its use
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,2053 +23,3786 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org, Cleber Rosa <crosa@redhat.com>
 
-Another legacy variable that did not convince me it has any
-purpose whatsoever.
+The functions used in _cleanup() come from common.rc, which currently
+gets sourced after _cleanup() is defined and registered as a signal
+handler.  When _cleanup() is executed, it has no valid references to
+those functions, as BASH won't resolve the reference at that time.
+
+While at it, also fix some tabs versus spaces indentation in
+_cleanup() in a few tests.
 
 Signed-off-by: Cleber Rosa <crosa@redhat.com>
 ---
- tests/qemu-iotests/001 | 1 -
- tests/qemu-iotests/002 | 1 -
- tests/qemu-iotests/003 | 1 -
- tests/qemu-iotests/004 | 1 -
- tests/qemu-iotests/005 | 1 -
- tests/qemu-iotests/007 | 1 -
- tests/qemu-iotests/008 | 1 -
- tests/qemu-iotests/009 | 1 -
- tests/qemu-iotests/010 | 1 -
- tests/qemu-iotests/011 | 1 -
- tests/qemu-iotests/012 | 1 -
- tests/qemu-iotests/013 | 1 -
- tests/qemu-iotests/014 | 1 -
- tests/qemu-iotests/015 | 1 -
- tests/qemu-iotests/017 | 1 -
- tests/qemu-iotests/018 | 1 -
- tests/qemu-iotests/019 | 1 -
- tests/qemu-iotests/020 | 1 -
- tests/qemu-iotests/021 | 1 -
- tests/qemu-iotests/022 | 1 -
- tests/qemu-iotests/023 | 1 -
- tests/qemu-iotests/024 | 1 -
- tests/qemu-iotests/025 | 1 -
- tests/qemu-iotests/026 | 1 -
- tests/qemu-iotests/027 | 1 -
- tests/qemu-iotests/028 | 1 -
- tests/qemu-iotests/029 | 1 -
- tests/qemu-iotests/031 | 1 -
- tests/qemu-iotests/032 | 1 -
- tests/qemu-iotests/033 | 1 -
- tests/qemu-iotests/034 | 1 -
- tests/qemu-iotests/035 | 1 -
- tests/qemu-iotests/036 | 1 -
- tests/qemu-iotests/037 | 1 -
- tests/qemu-iotests/038 | 1 -
- tests/qemu-iotests/039 | 1 -
- tests/qemu-iotests/042 | 1 -
- tests/qemu-iotests/043 | 1 -
- tests/qemu-iotests/046 | 1 -
- tests/qemu-iotests/047 | 1 -
- tests/qemu-iotests/049 | 1 -
- tests/qemu-iotests/050 | 1 -
- tests/qemu-iotests/051 | 1 -
- tests/qemu-iotests/052 | 1 -
- tests/qemu-iotests/053 | 1 -
- tests/qemu-iotests/054 | 1 -
- tests/qemu-iotests/058 | 1 -
- tests/qemu-iotests/059 | 1 -
- tests/qemu-iotests/060 | 1 -
- tests/qemu-iotests/061 | 1 -
- tests/qemu-iotests/062 | 1 -
- tests/qemu-iotests/063 | 1 -
- tests/qemu-iotests/064 | 1 -
- tests/qemu-iotests/066 | 1 -
- tests/qemu-iotests/067 | 1 -
- tests/qemu-iotests/068 | 1 -
- tests/qemu-iotests/069 | 1 -
- tests/qemu-iotests/070 | 1 -
- tests/qemu-iotests/071 | 1 -
- tests/qemu-iotests/072 | 1 -
- tests/qemu-iotests/073 | 1 -
- tests/qemu-iotests/075 | 1 -
- tests/qemu-iotests/076 | 1 -
- tests/qemu-iotests/077 | 1 -
- tests/qemu-iotests/078 | 1 -
- tests/qemu-iotests/079 | 1 -
- tests/qemu-iotests/080 | 1 -
- tests/qemu-iotests/081 | 1 -
- tests/qemu-iotests/082 | 1 -
- tests/qemu-iotests/083 | 1 -
- tests/qemu-iotests/084 | 1 -
- tests/qemu-iotests/085 | 1 -
- tests/qemu-iotests/086 | 1 -
- tests/qemu-iotests/087 | 1 -
- tests/qemu-iotests/088 | 1 -
- tests/qemu-iotests/089 | 1 -
- tests/qemu-iotests/090 | 1 -
- tests/qemu-iotests/091 | 1 -
- tests/qemu-iotests/092 | 1 -
- tests/qemu-iotests/094 | 1 -
- tests/qemu-iotests/095 | 1 -
- tests/qemu-iotests/097 | 1 -
- tests/qemu-iotests/098 | 1 -
- tests/qemu-iotests/099 | 1 -
- tests/qemu-iotests/101 | 1 -
- tests/qemu-iotests/102 | 1 -
- tests/qemu-iotests/103 | 1 -
- tests/qemu-iotests/104 | 1 -
- tests/qemu-iotests/105 | 1 -
- tests/qemu-iotests/106 | 1 -
- tests/qemu-iotests/107 | 1 -
- tests/qemu-iotests/108 | 1 -
- tests/qemu-iotests/109 | 1 -
- tests/qemu-iotests/110 | 1 -
- tests/qemu-iotests/111 | 1 -
- tests/qemu-iotests/112 | 1 -
- tests/qemu-iotests/113 | 1 -
- tests/qemu-iotests/114 | 1 -
- tests/qemu-iotests/115 | 1 -
- tests/qemu-iotests/116 | 1 -
- tests/qemu-iotests/117 | 1 -
- tests/qemu-iotests/119 | 1 -
- tests/qemu-iotests/120 | 1 -
- tests/qemu-iotests/121 | 1 -
- tests/qemu-iotests/122 | 1 -
- tests/qemu-iotests/123 | 1 -
- tests/qemu-iotests/125 | 1 -
- tests/qemu-iotests/126 | 1 -
- tests/qemu-iotests/127 | 1 -
- tests/qemu-iotests/128 | 1 -
- tests/qemu-iotests/130 | 1 -
- tests/qemu-iotests/131 | 1 -
- tests/qemu-iotests/133 | 1 -
- tests/qemu-iotests/134 | 1 -
- tests/qemu-iotests/135 | 1 -
- tests/qemu-iotests/137 | 1 -
- tests/qemu-iotests/138 | 1 -
- tests/qemu-iotests/140 | 1 -
- tests/qemu-iotests/141 | 1 -
- tests/qemu-iotests/142 | 1 -
- tests/qemu-iotests/143 | 1 -
- tests/qemu-iotests/144 | 1 -
- tests/qemu-iotests/145 | 1 -
- tests/qemu-iotests/146 | 1 -
- tests/qemu-iotests/150 | 1 -
- tests/qemu-iotests/153 | 1 -
- tests/qemu-iotests/154 | 1 -
- tests/qemu-iotests/156 | 1 -
- tests/qemu-iotests/157 | 1 -
- tests/qemu-iotests/158 | 1 -
- tests/qemu-iotests/159 | 1 -
- tests/qemu-iotests/160 | 1 -
- tests/qemu-iotests/162 | 1 -
- tests/qemu-iotests/170 | 1 -
- tests/qemu-iotests/171 | 1 -
- tests/qemu-iotests/172 | 1 -
- tests/qemu-iotests/173 | 1 -
- tests/qemu-iotests/174 | 1 -
- tests/qemu-iotests/175 | 1 -
- tests/qemu-iotests/176 | 1 -
- tests/qemu-iotests/177 | 1 -
- tests/qemu-iotests/178 | 1 -
- tests/qemu-iotests/179 | 1 -
- tests/qemu-iotests/181 | 1 -
- tests/qemu-iotests/182 | 1 -
- tests/qemu-iotests/183 | 1 -
- tests/qemu-iotests/184 | 1 -
- tests/qemu-iotests/185 | 1 -
- tests/qemu-iotests/186 | 1 -
- tests/qemu-iotests/187 | 1 -
- tests/qemu-iotests/188 | 1 -
- tests/qemu-iotests/189 | 1 -
- tests/qemu-iotests/190 | 1 -
- tests/qemu-iotests/191 | 1 -
- tests/qemu-iotests/192 | 1 -
- tests/qemu-iotests/195 | 1 -
- tests/qemu-iotests/197 | 1 -
- 157 files changed, 157 deletions(-)
+ tests/qemu-iotests/001 |  6 +++---
+ tests/qemu-iotests/002 |  6 +++---
+ tests/qemu-iotests/003 |  6 +++---
+ tests/qemu-iotests/004 |  6 +++---
+ tests/qemu-iotests/005 |  6 +++---
+ tests/qemu-iotests/007 |  6 +++---
+ tests/qemu-iotests/008 |  6 +++---
+ tests/qemu-iotests/009 |  6 +++---
+ tests/qemu-iotests/010 |  6 +++---
+ tests/qemu-iotests/011 |  6 +++---
+ tests/qemu-iotests/012 |  6 +++---
+ tests/qemu-iotests/013 |  8 ++++----
+ tests/qemu-iotests/014 |  8 ++++----
+ tests/qemu-iotests/015 |  6 +++---
+ tests/qemu-iotests/017 |  8 ++++----
+ tests/qemu-iotests/018 |  8 ++++----
+ tests/qemu-iotests/019 |  8 ++++----
+ tests/qemu-iotests/020 |  8 ++++----
+ tests/qemu-iotests/021 |  6 +++---
+ tests/qemu-iotests/022 |  8 ++++----
+ tests/qemu-iotests/023 |  8 ++++----
+ tests/qemu-iotests/024 |  8 ++++----
+ tests/qemu-iotests/025 |  8 ++++----
+ tests/qemu-iotests/026 |  8 ++++----
+ tests/qemu-iotests/027 |  6 +++---
+ tests/qemu-iotests/028 | 10 +++++-----
+ tests/qemu-iotests/029 |  8 ++++----
+ tests/qemu-iotests/031 |  8 ++++----
+ tests/qemu-iotests/032 |  8 ++++----
+ tests/qemu-iotests/033 |  6 +++---
+ tests/qemu-iotests/034 |  6 +++---
+ tests/qemu-iotests/035 |  6 +++---
+ tests/qemu-iotests/036 |  8 ++++----
+ tests/qemu-iotests/037 |  6 +++---
+ tests/qemu-iotests/038 |  6 +++---
+ tests/qemu-iotests/039 |  6 +++---
+ tests/qemu-iotests/042 |  6 +++---
+ tests/qemu-iotests/043 |  6 +++---
+ tests/qemu-iotests/046 |  6 +++---
+ tests/qemu-iotests/047 |  6 +++---
+ tests/qemu-iotests/048 |  8 ++++----
+ tests/qemu-iotests/049 |  6 +++---
+ tests/qemu-iotests/050 |  6 +++---
+ tests/qemu-iotests/051 |  6 +++---
+ tests/qemu-iotests/052 |  6 +++---
+ tests/qemu-iotests/053 |  6 +++---
+ tests/qemu-iotests/054 |  6 +++---
+ tests/qemu-iotests/058 |  8 ++++----
+ tests/qemu-iotests/059 |  6 +++---
+ tests/qemu-iotests/060 |  6 +++---
+ tests/qemu-iotests/061 |  6 +++---
+ tests/qemu-iotests/062 |  6 +++---
+ tests/qemu-iotests/063 |  8 ++++----
+ tests/qemu-iotests/064 |  6 +++---
+ tests/qemu-iotests/066 |  6 +++---
+ tests/qemu-iotests/068 |  6 +++---
+ tests/qemu-iotests/069 |  6 +++---
+ tests/qemu-iotests/070 |  6 +++---
+ tests/qemu-iotests/071 |  6 +++---
+ tests/qemu-iotests/072 |  6 +++---
+ tests/qemu-iotests/073 |  6 +++---
+ tests/qemu-iotests/074 |  8 ++++----
+ tests/qemu-iotests/075 |  6 +++---
+ tests/qemu-iotests/076 |  6 +++---
+ tests/qemu-iotests/077 |  6 +++---
+ tests/qemu-iotests/078 |  6 +++---
+ tests/qemu-iotests/079 |  6 +++---
+ tests/qemu-iotests/080 |  6 +++---
+ tests/qemu-iotests/082 |  6 +++---
+ tests/qemu-iotests/084 |  6 +++---
+ tests/qemu-iotests/085 |  8 ++++----
+ tests/qemu-iotests/086 |  6 +++---
+ tests/qemu-iotests/088 |  6 +++---
+ tests/qemu-iotests/089 |  6 +++---
+ tests/qemu-iotests/090 |  6 +++---
+ tests/qemu-iotests/091 |  8 ++++----
+ tests/qemu-iotests/092 |  6 +++---
+ tests/qemu-iotests/094 |  9 ++++-----
+ tests/qemu-iotests/095 |  8 ++++----
+ tests/qemu-iotests/097 |  8 ++++----
+ tests/qemu-iotests/098 |  8 ++++----
+ tests/qemu-iotests/099 |  6 +++---
+ tests/qemu-iotests/101 |  6 +++---
+ tests/qemu-iotests/102 |  8 ++++----
+ tests/qemu-iotests/103 |  6 +++---
+ tests/qemu-iotests/105 |  6 +++---
+ tests/qemu-iotests/106 |  6 +++---
+ tests/qemu-iotests/107 |  6 +++---
+ tests/qemu-iotests/108 |  6 +++---
+ tests/qemu-iotests/109 |  8 ++++----
+ tests/qemu-iotests/110 |  6 +++---
+ tests/qemu-iotests/111 |  6 +++---
+ tests/qemu-iotests/112 |  6 +++---
+ tests/qemu-iotests/113 |  6 +++---
+ tests/qemu-iotests/114 |  6 +++---
+ tests/qemu-iotests/115 |  6 +++---
+ tests/qemu-iotests/116 |  6 +++---
+ tests/qemu-iotests/117 | 10 +++++-----
+ tests/qemu-iotests/119 |  6 +++---
+ tests/qemu-iotests/120 |  6 +++---
+ tests/qemu-iotests/121 |  6 +++---
+ tests/qemu-iotests/122 |  6 +++---
+ tests/qemu-iotests/123 |  6 +++---
+ tests/qemu-iotests/125 |  6 +++---
+ tests/qemu-iotests/127 |  8 ++++----
+ tests/qemu-iotests/130 |  8 ++++----
+ tests/qemu-iotests/131 |  6 +++---
+ tests/qemu-iotests/133 |  6 +++---
+ tests/qemu-iotests/134 |  8 ++++----
+ tests/qemu-iotests/135 |  6 +++---
+ tests/qemu-iotests/137 |  8 ++++----
+ tests/qemu-iotests/138 |  6 +++---
+ tests/qemu-iotests/140 |  8 ++++----
+ tests/qemu-iotests/141 |  8 ++++----
+ tests/qemu-iotests/142 |  6 +++---
+ tests/qemu-iotests/143 |  8 ++++----
+ tests/qemu-iotests/144 |  8 ++++----
+ tests/qemu-iotests/145 |  6 +++---
+ tests/qemu-iotests/146 |  8 ++++----
+ tests/qemu-iotests/150 |  6 +++---
+ tests/qemu-iotests/153 |  8 ++++----
+ tests/qemu-iotests/154 |  6 +++---
+ tests/qemu-iotests/156 |  8 ++++----
+ tests/qemu-iotests/157 |  6 +++---
+ tests/qemu-iotests/158 |  6 +++---
+ tests/qemu-iotests/159 |  6 +++---
+ tests/qemu-iotests/160 |  6 +++---
+ tests/qemu-iotests/170 |  6 +++---
+ tests/qemu-iotests/171 |  6 +++---
+ tests/qemu-iotests/172 |  8 ++++----
+ tests/qemu-iotests/173 |  8 ++++----
+ tests/qemu-iotests/174 |  6 +++---
+ tests/qemu-iotests/175 |  6 +++---
+ tests/qemu-iotests/176 |  8 ++++----
+ tests/qemu-iotests/177 |  6 +++---
+ tests/qemu-iotests/178 |  8 ++++----
+ tests/qemu-iotests/179 |  8 ++++----
+ tests/qemu-iotests/181 | 10 +++++-----
+ tests/qemu-iotests/182 |  8 ++++----
+ tests/qemu-iotests/183 |  8 ++++----
+ tests/qemu-iotests/184 |  6 +++---
+ tests/qemu-iotests/185 |  8 ++++----
+ tests/qemu-iotests/186 |  6 +++---
+ tests/qemu-iotests/187 |  8 ++++----
+ tests/qemu-iotests/188 |  6 +++---
+ tests/qemu-iotests/189 |  6 +++---
+ tests/qemu-iotests/190 |  8 ++++----
+ tests/qemu-iotests/191 |  8 ++++----
+ tests/qemu-iotests/192 |  8 ++++----
+ tests/qemu-iotests/195 |  6 +++---
+ 150 files changed, 506 insertions(+), 507 deletions(-)
 
 diff --git a/tests/qemu-iotests/001 b/tests/qemu-iotests/001
-index 5830f68ba0..ce671e50e7 100755
+index f93298a0e1..22d82e4be8 100755
 --- a/tests/qemu-iotests/001
 +++ b/tests/qemu-iotests/001
-@@ -23,7 +23,6 @@
- seq=`basename $0`
- echo "QA output created by $seq"
- 
--here=`pwd`
+@@ -27,15 +27,15 @@ echo "QA output created by $seq"
+ here=`pwd`
  status=1	# failure is the default!
  
- # get standard environment, filters and checks
++# get standard environment, filters and checks
++. ./common.rc
++
+ _cleanup()
+ {
+ 	_cleanup_test_img
+ }
+ trap "_cleanup; exit \$status" 0 1 2 3 15
+ 
+-# get standard environment, filters and checks
+-. ./common.rc
+-
+ _supported_fmt generic
+ _supported_proto generic
+ _supported_os Linux
 diff --git a/tests/qemu-iotests/002 b/tests/qemu-iotests/002
-index 7dd1774464..8f57a41953 100755
+index 750d8d6498..6fd7183974 100755
 --- a/tests/qemu-iotests/002
 +++ b/tests/qemu-iotests/002
-@@ -23,7 +23,6 @@
- seq=`basename $0`
- echo "QA output created by $seq"
- 
--here=`pwd`
+@@ -27,15 +27,15 @@ echo "QA output created by $seq"
+ here=`pwd`
  status=1	# failure is the default!
  
- # get standard environment, filters and checks
++# get standard environment, filters and checks
++. ./common.rc
++
+ _cleanup()
+ {
+ 	_cleanup_test_img
+ }
+ trap "_cleanup; exit \$status" 0 1 2 3 15
+ 
+-# get standard environment, filters and checks
+-. ./common.rc
+-
+ _supported_fmt generic
+ _supported_proto generic
+ _supported_os Linux
 diff --git a/tests/qemu-iotests/003 b/tests/qemu-iotests/003
-index 13cc8041a3..102ff9cab9 100755
+index 29618f040c..acad5a2a4d 100755
 --- a/tests/qemu-iotests/003
 +++ b/tests/qemu-iotests/003
-@@ -23,7 +23,6 @@
- seq=`basename $0`
- echo "QA output created by $seq"
- 
--here=`pwd`
+@@ -27,15 +27,15 @@ echo "QA output created by $seq"
+ here=`pwd`
  status=1	# failure is the default!
  
- # get standard environment, filters and checks
++# get standard environment, filters and checks
++. ./common.rc
++
+ _cleanup()
+ {
+ 	_cleanup_test_img
+ }
+ trap "_cleanup; exit \$status" 0 1 2 3 15
+ 
+-# get standard environment, filters and checks
+-. ./common.rc
+-
+ _supported_fmt generic
+ _supported_proto generic
+ _supported_os Linux
 diff --git a/tests/qemu-iotests/004 b/tests/qemu-iotests/004
-index 710148c2bb..8ddae7fea4 100755
+index a8b98b5464..954a46ef7b 100755
 --- a/tests/qemu-iotests/004
 +++ b/tests/qemu-iotests/004
-@@ -23,7 +23,6 @@
- seq=`basename $0`
- echo "QA output created by $seq"
- 
--here=`pwd`
+@@ -27,15 +27,15 @@ echo "QA output created by $seq"
+ here=`pwd`
  status=1	# failure is the default!
  
- # get standard environment, filters and checks
++# get standard environment, filters and checks
++. ./common.rc
++
+ _cleanup()
+ {
+ 	_cleanup_test_img
+ }
+ trap "_cleanup; exit \$status" 0 1 2 3 15
+ 
+-# get standard environment, filters and checks
+-. ./common.rc
+-
+ _supported_fmt raw qcow qcow2 qed vdi vmdk vhdx luks
+ _supported_proto generic
+ _supported_os Linux
 diff --git a/tests/qemu-iotests/005 b/tests/qemu-iotests/005
-index d2c6575992..6caf5b0241 100755
+index f514ac8979..f77caab3eb 100755
 --- a/tests/qemu-iotests/005
 +++ b/tests/qemu-iotests/005
-@@ -26,7 +26,6 @@
- seq=`basename $0`
- echo "QA output created by $seq"
- 
--here=`pwd`
+@@ -30,15 +30,15 @@ echo "QA output created by $seq"
+ here=`pwd`
  status=1	# failure is the default!
  
- # get standard environment, filters and checks
++# get standard environment, filters and checks
++. ./common.rc
++
+ _cleanup()
+ {
+ 	_cleanup_test_img
+ }
+ trap "_cleanup; exit \$status" 0 1 2 3 15
+ 
+-# get standard environment, filters and checks
+-. ./common.rc
+-
+ _supported_fmt generic
+ _supported_proto generic
+ _supported_os Linux
 diff --git a/tests/qemu-iotests/007 b/tests/qemu-iotests/007
-index 3fe2fe5dad..fc4458e11d 100755
+index 1e1dff6cef..b0bd1e1520 100755
 --- a/tests/qemu-iotests/007
 +++ b/tests/qemu-iotests/007
-@@ -23,7 +23,6 @@
- seq=`basename $0`
- echo "QA output created by $seq"
- 
--here=`pwd`
+@@ -27,6 +27,9 @@ echo "QA output created by $seq"
+ here=`pwd`
  status=1	# failure is the default!
  
- # get standard environment, filters and checks
++# get standard environment, filters and checks
++. ./common.rc
++
+ _cleanup()
+ {
+ 	_cleanup_test_img
+@@ -34,9 +37,6 @@ _cleanup()
+ }
+ trap "_cleanup; exit \$status" 0 1 2 3 15
+ 
+-# get standard environment, filters and checks
+-. ./common.rc
+-
+ # currently only qcow2 allows for consistency checks using qemu-img
+ _supported_fmt qcow2
+ _supported_proto generic
 diff --git a/tests/qemu-iotests/008 b/tests/qemu-iotests/008
-index f021b8ea3a..7b891629db 100755
+index dce57adc3a..7ab1a403f1 100755
 --- a/tests/qemu-iotests/008
 +++ b/tests/qemu-iotests/008
-@@ -23,7 +23,6 @@
- seq=`basename $0`
- echo "QA output created by $seq"
- 
--here=`pwd`
+@@ -27,15 +27,15 @@ echo "QA output created by $seq"
+ here=`pwd`
  status=1	# failure is the default!
  
- # get standard environment, filters and checks
++# get standard environment, filters and checks
++. ./common.rc
++
+ _cleanup()
+ {
+ 	_cleanup_test_img
+ }
+ trap "_cleanup; exit \$status" 0 1 2 3 15
+ 
+-# get standard environment, filters and checks
+-. ./common.rc
+-
+ _supported_fmt generic
+ _supported_proto generic
+ _supported_os Linux
 diff --git a/tests/qemu-iotests/009 b/tests/qemu-iotests/009
-index 8d56673bc6..6a2498f4ab 100755
+index 8ae55ec3f5..aeaed1d782 100755
 --- a/tests/qemu-iotests/009
 +++ b/tests/qemu-iotests/009
-@@ -23,7 +23,6 @@
- seq=`basename $0`
- echo "QA output created by $seq"
- 
--here=`pwd`
+@@ -27,15 +27,15 @@ echo "QA output created by $seq"
+ here=`pwd`
  status=1	# failure is the default!
  
- # get standard environment, filters and checks
++# get standard environment, filters and checks
++. ./common.rc
++
+ _cleanup()
+ {
+ 	_cleanup_test_img
+ }
+ trap "_cleanup; exit \$status" 0 1 2 3 15
+ 
+-# get standard environment, filters and checks
+-. ./common.rc
+-
+ _supported_fmt generic
+ _supported_proto generic
+ _supported_os Linux
 diff --git a/tests/qemu-iotests/010 b/tests/qemu-iotests/010
-index 3f91224795..447914da1a 100755
+index b74d96dfcd..ce3e939796 100755
 --- a/tests/qemu-iotests/010
 +++ b/tests/qemu-iotests/010
-@@ -23,7 +23,6 @@
- seq=`basename $0`
- echo "QA output created by $seq"
- 
--here=`pwd`
+@@ -27,15 +27,15 @@ echo "QA output created by $seq"
+ here=`pwd`
  status=1	# failure is the default!
  
- # get standard environment, filters and checks
++# get standard environment, filters and checks
++. ./common.rc
++
+ _cleanup()
+ {
+ 	_cleanup_test_img
+ }
+ trap "_cleanup; exit \$status" 0 1 2 3 15
+ 
+-# get standard environment, filters and checks
+-. ./common.rc
+-
+ _supported_fmt generic
+ _supported_proto generic
+ _supported_os Linux
 diff --git a/tests/qemu-iotests/011 b/tests/qemu-iotests/011
-index 921f43c03d..d758d7a577 100755
+index 3a87df8cf0..8c98c9510e 100755
 --- a/tests/qemu-iotests/011
 +++ b/tests/qemu-iotests/011
-@@ -23,7 +23,6 @@
- seq=`basename $0`
- echo "QA output created by $seq"
- 
--here=`pwd`
+@@ -27,15 +27,15 @@ echo "QA output created by $seq"
+ here=`pwd`
  status=1	# failure is the default!
  
- # get standard environment, filters and checks
++# get standard environment, filters and checks
++. ./common.rc
++
+ _cleanup()
+ {
+ 	_cleanup_test_img
+ }
+ trap "_cleanup; exit \$status" 0 1 2 3 15
+ 
+-# get standard environment, filters and checks
+-. ./common.rc
+-
+ _supported_fmt generic
+ _supported_proto generic
+ _supported_os Linux
 diff --git a/tests/qemu-iotests/012 b/tests/qemu-iotests/012
-index 3121f947f6..a4a7303a9a 100755
+index d646d0dec5..484b47a9d3 100755
 --- a/tests/qemu-iotests/012
 +++ b/tests/qemu-iotests/012
-@@ -25,7 +25,6 @@
- seq=`basename $0`
- echo "QA output created by $seq"
- 
--here=`pwd`
+@@ -29,15 +29,15 @@ echo "QA output created by $seq"
+ here=`pwd`
  status=1	# failure is the default!
  
- # get standard environment, filters and checks
++# get standard environment, filters and checks
++. ./common.rc
++
+ _cleanup()
+ {
+ 	_cleanup_test_img
+ }
+ trap "_cleanup; exit \$status" 0 1 2 3 15
+ 
+-# get standard environment, filters and checks
+-. ./common.rc
+-
+ _supported_fmt generic
+ _supported_proto file
+ _supported_os Linux
 diff --git a/tests/qemu-iotests/013 b/tests/qemu-iotests/013
-index 095c2a0cd6..1db4649541 100755
+index b46493358e..afc4c5a2b0 100755
 --- a/tests/qemu-iotests/013
 +++ b/tests/qemu-iotests/013
-@@ -23,7 +23,6 @@
- seq=`basename $0`
- echo "QA output created by $seq"
- 
--here=`pwd`
+@@ -27,16 +27,16 @@ echo "QA output created by $seq"
+ here=`pwd`
  status=1	# failure is the default!
  
- # get standard environment, filters and checks
++# get standard environment, filters and checks
++. ./common.rc
++. ./common.pattern
++
+ _cleanup()
+ {
+ 	_cleanup_test_img
+ }
+ trap "_cleanup; exit \$status" 0 1 2 3 15
+ 
+-# get standard environment, filters and checks
+-. ./common.rc
+-. ./common.pattern
+-
+ # much of this could be generic for any format supporting compression.
+ _supported_fmt qcow qcow2
+ _supported_proto file
 diff --git a/tests/qemu-iotests/014 b/tests/qemu-iotests/014
-index c28970732b..b679750ba6 100755
+index a7c912e913..7307e10015 100755
 --- a/tests/qemu-iotests/014
 +++ b/tests/qemu-iotests/014
-@@ -25,7 +25,6 @@
- seq=`basename $0`
- echo "QA output created by $seq"
- 
--here=`pwd`
+@@ -29,16 +29,16 @@ echo "QA output created by $seq"
+ here=`pwd`
  status=1	# failure is the default!
  
- # get standard environment, filters and checks
++# get standard environment, filters and checks
++. ./common.rc
++. ./common.pattern
++
+ _cleanup()
+ {
+ 	_cleanup_test_img
+ }
+ trap "_cleanup; exit \$status" 0 1 2 3 15
+ 
+-# get standard environment, filters and checks
+-. ./common.rc
+-. ./common.pattern
+-
+ # much of this could be generic for any format supporting snapshots
+ _supported_fmt qcow2
+ _supported_proto file
 diff --git a/tests/qemu-iotests/015 b/tests/qemu-iotests/015
-index a5cda4742c..3ea0e5472d 100755
+index 1a685ec927..735f597dac 100755
 --- a/tests/qemu-iotests/015
 +++ b/tests/qemu-iotests/015
-@@ -23,7 +23,6 @@
- seq=`basename $0`
- echo "QA output created by $seq"
- 
--here=`pwd`
+@@ -27,6 +27,9 @@ echo "QA output created by $seq"
+ here=`pwd`
  status=1	# failure is the default!
  
- # get standard environment, filters and checks
++# get standard environment, filters and checks
++. ./common.rc
++
+ _cleanup()
+ {
+ 	_cleanup_test_img
+@@ -34,9 +37,6 @@ _cleanup()
+ }
+ trap "_cleanup; exit \$status" 0 1 2 3 15
+ 
+-# get standard environment, filters and checks
+-. ./common.rc
+-
+ # actually any format that supports snapshots
+ _supported_fmt qcow2
+ _supported_proto generic
 diff --git a/tests/qemu-iotests/017 b/tests/qemu-iotests/017
-index 2398fc2bf1..fb4974cd87 100755
+index 0ef6b9a04e..765dee9157 100755
 --- a/tests/qemu-iotests/017
 +++ b/tests/qemu-iotests/017
-@@ -23,7 +23,6 @@
- seq=`basename $0`
- echo "QA output created by $seq"
- 
--here=`pwd`
+@@ -27,16 +27,16 @@ echo "QA output created by $seq"
+ here=`pwd`
  status=1	# failure is the default!
  
- # get standard environment, filters and checks
++# get standard environment, filters and checks
++. ./common.rc
++. ./common.pattern
++
+ _cleanup()
+ {
+ 	_cleanup_test_img
+ }
+ trap "_cleanup; exit \$status" 0 1 2 3 15
+ 
+-# get standard environment, filters and checks
+-. ./common.rc
+-. ./common.pattern
+-
+ # Any format supporting backing files
+ _supported_fmt qcow qcow2 vmdk qed
+ _supported_proto generic
 diff --git a/tests/qemu-iotests/018 b/tests/qemu-iotests/018
-index 8d4ccda85e..06139efa64 100755
+index 315aad6663..ae7907c1e9 100755
 --- a/tests/qemu-iotests/018
 +++ b/tests/qemu-iotests/018
-@@ -23,7 +23,6 @@
- seq=`basename $0`
- echo "QA output created by $seq"
- 
--here=`pwd`
+@@ -27,16 +27,16 @@ echo "QA output created by $seq"
+ here=`pwd`
  status=1	# failure is the default!
  
- # get standard environment, filters and checks
++# get standard environment, filters and checks
++. ./common.rc
++. ./common.pattern
++
+ _cleanup()
+ {
+ 	_cleanup_test_img
+ }
+ trap "_cleanup; exit \$status" 0 1 2 3 15
+ 
+-# get standard environment, filters and checks
+-. ./common.rc
+-. ./common.pattern
+-
+ # Any format supporting backing files
+ _supported_fmt qcow qcow2 vmdk qed
+ _supported_proto file
 diff --git a/tests/qemu-iotests/019 b/tests/qemu-iotests/019
-index b06ef93976..ddf5f7f7f3 100755
+index e25fa6309f..3b0e97feb9 100755
 --- a/tests/qemu-iotests/019
 +++ b/tests/qemu-iotests/019
-@@ -25,7 +25,6 @@
- seq=`basename $0`
- echo "QA output created by $seq"
- 
--here=`pwd`
+@@ -29,6 +29,10 @@ echo "QA output created by $seq"
+ here=`pwd`
  status=1	# failure is the default!
  
- # get standard environment, filters and checks
++# get standard environment, filters and checks
++. ./common.rc
++. ./common.pattern
++
+ _cleanup()
+ {
+ 	_cleanup_test_img
+@@ -37,10 +41,6 @@ _cleanup()
+ }
+ trap "_cleanup; exit \$status" 0 1 2 3 15
+ 
+-# get standard environment, filters and checks
+-. ./common.rc
+-. ./common.pattern
+-
+ # Any format supporting backing files
+ _supported_fmt qcow qcow2 vmdk qed
+ _supported_proto file
 diff --git a/tests/qemu-iotests/020 b/tests/qemu-iotests/020
-index b34cfc16e1..d26ef8df86 100755
+index 18bc6fc48d..a2bad2f04e 100755
 --- a/tests/qemu-iotests/020
 +++ b/tests/qemu-iotests/020
-@@ -23,7 +23,6 @@
- seq=`basename $0`
- echo "QA output created by $seq"
- 
--here=`pwd`
+@@ -27,6 +27,10 @@ echo "QA output created by $seq"
+ here=`pwd`
  status=1	# failure is the default!
  
- # get standard environment, filters and checks
++# get standard environment, filters and checks
++. ./common.rc
++. ./common.pattern
++
+ _cleanup()
+ {
+ 	_cleanup_test_img
+@@ -35,10 +39,6 @@ _cleanup()
+ }
+ trap "_cleanup; exit \$status" 0 1 2 3 15
+ 
+-# get standard environment, filters and checks
+-. ./common.rc
+-. ./common.pattern
+-
+ # Any format supporting backing files
+ _supported_fmt qcow qcow2 vmdk qed
+ _supported_proto generic
 diff --git a/tests/qemu-iotests/021 b/tests/qemu-iotests/021
-index 97e27d6cf3..1b6dfe0fc1 100755
+index 391afccea5..e34d50be52 100755
 --- a/tests/qemu-iotests/021
 +++ b/tests/qemu-iotests/021
-@@ -23,7 +23,6 @@
- seq=`basename $0`
- echo "QA output created by $seq"
- 
--here=`pwd`
+@@ -27,15 +27,15 @@ echo "QA output created by $seq"
+ here=`pwd`
  status=1	# failure is the default!
  
- # get standard environment, filters and checks
++# get standard environment, filters and checks
++. ./common.rc
++
+ _cleanup()
+ {
+ 	_cleanup_test_img
+ }
+ trap "_cleanup; exit \$status" 0 1 2 3 15
+ 
+-# get standard environment, filters and checks
+-. ./common.rc
+-
+ _supported_fmt generic
+ _supported_proto generic
+ _supported_os Linux
 diff --git a/tests/qemu-iotests/022 b/tests/qemu-iotests/022
-index bc9186c0fa..77a7516be2 100755
+index c165f1aa2c..13c13e3e3e 100755
 --- a/tests/qemu-iotests/022
 +++ b/tests/qemu-iotests/022
-@@ -25,7 +25,6 @@
- seq=`basename $0`
- echo "QA output created by $seq"
- 
--here=`pwd`
+@@ -29,16 +29,16 @@ echo "QA output created by $seq"
+ here=`pwd`
  status=1	# failure is the default!
  
- # get standard environment, filters and checks
++# get standard environment, filters and checks
++. ./common.rc
++. ./common.pattern
++
+ _cleanup()
+ {
+ 	_cleanup_test_img
+ }
+ trap "_cleanup; exit \$status" 0 1 2 3 15
+ 
+-# get standard environment, filters and checks
+-. ./common.rc
+-. ./common.pattern
+-
+ # Any format that supports snapshots
+ _supported_fmt qcow2
+ _supported_proto generic
 diff --git a/tests/qemu-iotests/023 b/tests/qemu-iotests/023
-index 99fda1ff14..eaa73ac866 100755
+index 54713838c1..c7d64cf026 100755
 --- a/tests/qemu-iotests/023
 +++ b/tests/qemu-iotests/023
-@@ -23,7 +23,6 @@
- seq=`basename $0`
- echo "QA output created by $seq"
- 
--here=`pwd`
+@@ -27,16 +27,16 @@ echo "QA output created by $seq"
+ here=`pwd`
  status=1	# failure is the default!
  
- # get standard environment, filters and checks
++# get standard environment, filters and checks
++. ./common.rc
++. ./common.pattern
++
+ _cleanup()
+ {
+ 	_cleanup_test_img
+ }
+ trap "_cleanup; exit \$status" 0 1 2 3 15
+ 
+-# get standard environment, filters and checks
+-. ./common.rc
+-. ./common.pattern
+-
+ # much of this could be generic for any format supporting compression.
+ _supported_fmt qcow qcow2
+ _supported_proto file
 diff --git a/tests/qemu-iotests/024 b/tests/qemu-iotests/024
-index b3cabe1fb5..ce661cc5a3 100755
+index 63a50322dc..d2efc27aae 100755
 --- a/tests/qemu-iotests/024
 +++ b/tests/qemu-iotests/024
-@@ -23,7 +23,6 @@
- seq=`basename $0`
- echo "QA output created by $seq"
- 
--here=`pwd`
+@@ -27,6 +27,10 @@ echo "QA output created by $seq"
+ here=`pwd`
  status=1	# failure is the default!
  
- # get standard environment, filters and checks
++# get standard environment, filters and checks
++. ./common.rc
++. ./common.pattern
++
+ _cleanup()
+ {
+ 	_cleanup_test_img
+@@ -35,10 +39,6 @@ _cleanup()
+ }
+ trap "_cleanup; exit \$status" 0 1 2 3 15
+ 
+-# get standard environment, filters and checks
+-. ./common.rc
+-. ./common.pattern
+-
+ # Currently only qcow2 and qed support rebasing
+ _supported_fmt qcow2 qed
+ _supported_proto file
 diff --git a/tests/qemu-iotests/025 b/tests/qemu-iotests/025
-index a781632b09..93814d5931 100755
+index f0d57aff94..afb5cf0ae0 100755
 --- a/tests/qemu-iotests/025
 +++ b/tests/qemu-iotests/025
-@@ -23,7 +23,6 @@
- seq=`basename $0`
- echo "QA output created by $seq"
- 
--here=`pwd`
+@@ -27,16 +27,16 @@ echo "QA output created by $seq"
+ here=`pwd`
  status=1	# failure is the default!
  
- # get standard environment, filters and checks
++# get standard environment, filters and checks
++. ./common.rc
++. ./common.pattern
++
+ _cleanup()
+ {
+ 	_cleanup_test_img
+ }
+ trap "_cleanup; exit \$status" 0 1 2 3 15
+ 
+-# get standard environment, filters and checks
+-. ./common.rc
+-. ./common.pattern
+-
+ _supported_fmt raw qcow2 qed
+ _supported_proto file sheepdog rbd nfs
+ _supported_os Linux
 diff --git a/tests/qemu-iotests/026 b/tests/qemu-iotests/026
-index 166c8267f7..7d8c07b240 100755
+index 5a97803f0c..a3be017ccb 100755
 --- a/tests/qemu-iotests/026
 +++ b/tests/qemu-iotests/026
-@@ -23,7 +23,6 @@
- seq=`basename $0`
- echo "QA output created by $seq"
- 
--here=`pwd`
+@@ -27,6 +27,10 @@ echo "QA output created by $seq"
+ here=`pwd`
  status=1	# failure is the default!
  
- # get standard environment, filters and checks
++# get standard environment, filters and checks
++. ./common.rc
++. ./common.pattern
++
+ _cleanup()
+ {
+ 	_cleanup_test_img
+@@ -34,10 +38,6 @@ _cleanup()
+ }
+ trap "_cleanup; exit \$status" 0 1 2 3 15
+ 
+-# get standard environment, filters and checks
+-. ./common.rc
+-. ./common.pattern
+-
+ # Currently only qcow2 supports rebasing
+ _supported_fmt qcow2
+ _supported_proto file
 diff --git a/tests/qemu-iotests/027 b/tests/qemu-iotests/027
-index c9416c719f..a7349c178b 100755
+index d6d47ab6b4..ea950e09d1 100755
 --- a/tests/qemu-iotests/027
 +++ b/tests/qemu-iotests/027
-@@ -23,7 +23,6 @@
- seq=`basename $0`
- echo "QA output created by $seq"
- 
--here=`pwd`
+@@ -27,15 +27,15 @@ echo "QA output created by $seq"
+ here=`pwd`
  status=1	# failure is the default!
  
- # get standard environment, filters and checks
++# get standard environment, filters and checks
++. ./common.rc
++
+ _cleanup()
+ {
+ 	_cleanup_test_img
+ }
+ trap "_cleanup; exit \$status" 0 1 2 3 15
+ 
+-# get standard environment, filters and checks
+-. ./common.rc
+-
+ _supported_fmt vmdk qcow qcow2 qed
+ _supported_proto generic
+ _supported_os Linux
 diff --git a/tests/qemu-iotests/028 b/tests/qemu-iotests/028
-index f2991a28aa..85deaf2dad 100755
+index ee3adf64c1..0192004d84 100755
 --- a/tests/qemu-iotests/028
 +++ b/tests/qemu-iotests/028
-@@ -26,7 +26,6 @@
- seq=`basename $0`
- echo "QA output created by $seq"
- 
--here=`pwd`
+@@ -30,6 +30,11 @@ echo "QA output created by $seq"
+ here=`pwd`
  status=1	# failure is the default!
  
- # get standard environment, filters and checks
++# get standard environment, filters and checks
++. ./common.rc
++. ./common.pattern
++. ./common.qemu
++
+ _cleanup()
+ {
+     _cleanup_qemu
+@@ -38,11 +43,6 @@ _cleanup()
+ }
+ trap "_cleanup; exit \$status" 0 1 2 3 15
+ 
+-# get standard environment, filters and checks
+-. ./common.rc
+-. ./common.pattern
+-. ./common.qemu
+-
+ # Any format supporting backing files except vmdk and qcow which do not support
+ # smaller backing files.
+ _supported_fmt qcow2 qed
 diff --git a/tests/qemu-iotests/029 b/tests/qemu-iotests/029
-index fee694f305..07df4b2959 100755
+index 7f47b50dc6..d18d004e18 100755
 --- a/tests/qemu-iotests/029
 +++ b/tests/qemu-iotests/029
-@@ -23,7 +23,6 @@
- seq=`basename $0`
- echo "QA output created by $seq"
- 
--here=`pwd`
+@@ -27,6 +27,10 @@ echo "QA output created by $seq"
+ here=`pwd`
  status=1	# failure is the default!
  
- # get standard environment, filters and checks
++# get standard environment, filters and checks
++. ./common.rc
++. ./common.pattern
++
+ _cleanup()
+ {
+     rm -f $TEST_IMG.snap
+@@ -34,10 +38,6 @@ _cleanup()
+ }
+ trap "_cleanup; exit \$status" 0 1 2 3 15
+ 
+-# get standard environment, filters and checks
+-. ./common.rc
+-. ./common.pattern
+-
+ # Any format supporting intenal snapshots
+ _supported_fmt qcow2
+ _supported_proto generic
 diff --git a/tests/qemu-iotests/031 b/tests/qemu-iotests/031
-index da44539b0f..21f8eae2a7 100755
+index 03a1699d2d..b2aa016e00 100755
 --- a/tests/qemu-iotests/031
 +++ b/tests/qemu-iotests/031
-@@ -23,7 +23,6 @@
- seq=`basename $0`
- echo "QA output created by $seq"
- 
--here=`pwd`
+@@ -27,16 +27,16 @@ echo "QA output created by $seq"
+ here=`pwd`
  status=1	# failure is the default!
  
- # get standard environment, filters and checks
++# get standard environment, filters and checks
++. ./common.rc
++. ./common.pattern
++
+ _cleanup()
+ {
+ 	_cleanup_test_img
+ }
+ trap "_cleanup; exit \$status" 0 1 2 3 15
+ 
+-# get standard environment, filters and checks
+-. ./common.rc
+-. ./common.pattern
+-
+ # This tests qcow2-specific low-level functionality
+ _supported_fmt qcow2
+ _supported_proto file
 diff --git a/tests/qemu-iotests/032 b/tests/qemu-iotests/032
-index 15a0ff6298..e4b62e6deb 100755
+index f2339e8a75..97404db0da 100755
 --- a/tests/qemu-iotests/032
 +++ b/tests/qemu-iotests/032
-@@ -25,7 +25,6 @@
- seq=`basename $0`
- echo "QA output created by $seq"
- 
--here=`pwd`
+@@ -29,16 +29,16 @@ echo "QA output created by $seq"
+ here=`pwd`
  status=1	# failure is the default!
  
- # get standard environment, filters and checks
++# get standard environment, filters and checks
++. ./common.rc
++. ./common.pattern
++
+ _cleanup()
+ {
+ 	_cleanup_test_img
+ }
+ trap "_cleanup; exit \$status" 0 1 2 3 15
+ 
+-# get standard environment, filters and checks
+-. ./common.rc
+-. ./common.pattern
+-
+ # This works for any image format (though unlikely to segfault for raw)
+ _supported_fmt generic
+ _supported_proto generic
 diff --git a/tests/qemu-iotests/033 b/tests/qemu-iotests/033
-index d4beecc9c0..2eca619837 100755
+index 3bf5325630..1b9c3ba37a 100755
 --- a/tests/qemu-iotests/033
 +++ b/tests/qemu-iotests/033
-@@ -23,7 +23,6 @@
- seq=`basename $0`
- echo "QA output created by $seq"
- 
--here=`pwd`
+@@ -27,15 +27,15 @@ echo "QA output created by $seq"
+ here=`pwd`
  status=1	# failure is the default!
  
- # get standard environment, filters and checks
++# get standard environment, filters and checks
++. ./common.rc
++
+ _cleanup()
+ {
+ 	_cleanup_test_img
+ }
+ trap "_cleanup; exit \$status" 0 1 2 3 15
+ 
+-# get standard environment, filters and checks
+-. ./common.rc
+-
+ _supported_fmt generic
+ _supported_proto generic
+ _supported_os Linux
 diff --git a/tests/qemu-iotests/034 b/tests/qemu-iotests/034
-index c0eb87b40a..90b49c2cde 100755
+index 1459ff5b9d..8c9db83134 100755
 --- a/tests/qemu-iotests/034
 +++ b/tests/qemu-iotests/034
-@@ -23,7 +23,6 @@
- seq=`basename $0`
- echo "QA output created by $seq"
- 
--here=`pwd`
+@@ -27,15 +27,15 @@ echo "QA output created by $seq"
+ here=`pwd`
  status=1	# failure is the default!
  
- # get standard environment, filters and checks
++# get standard environment, filters and checks
++. ./common.rc
++
+ _cleanup()
+ {
+ 	_cleanup_test_img
+ }
+ trap "_cleanup; exit \$status" 0 1 2 3 15
+ 
+-# get standard environment, filters and checks
+-. ./common.rc
+-
+ _supported_fmt qcow qcow2 vmdk qed
+ _supported_proto file
+ _supported_os Linux
 diff --git a/tests/qemu-iotests/035 b/tests/qemu-iotests/035
-index 04c4cf0f58..d174ae3c51 100755
+index 53f0f3fe6a..cead994725 100755
 --- a/tests/qemu-iotests/035
 +++ b/tests/qemu-iotests/035
-@@ -24,7 +24,6 @@
- seq=`basename $0`
- echo "QA output created by $seq"
- 
--here=`pwd`
+@@ -28,15 +28,15 @@ echo "QA output created by $seq"
+ here=`pwd`
  status=1	# failure is the default!
  
- # get standard environment, filters and checks
++# get standard environment, filters and checks
++. ./common.rc
++
+ _cleanup()
+ {
+ 	_cleanup_test_img
+ }
+ trap "_cleanup; exit \$status" 0 1 2 3 15
+ 
+-# get standard environment, filters and checks
+-. ./common.rc
+-
+ _supported_fmt qcow2
+ _supported_proto generic
+ _supported_os Linux
 diff --git a/tests/qemu-iotests/036 b/tests/qemu-iotests/036
-index 990b9d82b6..858caa889a 100755
+index f9560e9771..07f3d30f77 100755
 --- a/tests/qemu-iotests/036
 +++ b/tests/qemu-iotests/036
-@@ -26,7 +26,6 @@
- seq=`basename $0`
- echo "QA output created by $seq"
- 
--here=`pwd`
+@@ -30,16 +30,16 @@ echo "QA output created by $seq"
+ here=`pwd`
  status=1	# failure is the default!
  
- # get standard environment, filters and checks
++# get standard environment, filters and checks
++. ./common.rc
++. ./common.pattern
++
+ _cleanup()
+ {
+ 	_cleanup_test_img
+ }
+ trap "_cleanup; exit \$status" 0 1 2 3 15
+ 
+-# get standard environment, filters and checks
+-. ./common.rc
+-. ./common.pattern
+-
+ # This tests qcow2-specific low-level functionality
+ _supported_fmt qcow2
+ _supported_proto file
 diff --git a/tests/qemu-iotests/037 b/tests/qemu-iotests/037
-index c4d55babe2..ed57e5a2ed 100755
+index 383e770d57..510d113990 100755
 --- a/tests/qemu-iotests/037
 +++ b/tests/qemu-iotests/037
-@@ -23,7 +23,6 @@
- seq=`basename $0`
- echo "QA output created by $seq"
- 
--here=`pwd`
+@@ -27,15 +27,15 @@ echo "QA output created by $seq"
+ here=`pwd`
  status=1	# failure is the default!
  
- # get standard environment, filters and checks
++# get standard environment, filters and checks
++. ./common.rc
++
+ _cleanup()
+ {
+ 	_cleanup_test_img
+ }
+ trap "_cleanup; exit \$status" 0 1 2 3 15
+ 
+-# get standard environment, filters and checks
+-. ./common.rc
+-
+ _supported_fmt qcow qcow2 vmdk qed
+ _supported_proto file
+ _supported_os Linux
 diff --git a/tests/qemu-iotests/038 b/tests/qemu-iotests/038
-index b35c30fa17..9266fbbb57 100755
+index b0d4510cdf..2286c081d6 100755
 --- a/tests/qemu-iotests/038
 +++ b/tests/qemu-iotests/038
-@@ -23,7 +23,6 @@
- seq=`basename $0`
- echo "QA output created by $seq"
- 
--here=`pwd`
+@@ -27,15 +27,15 @@ echo "QA output created by $seq"
+ here=`pwd`
  status=1	# failure is the default!
  
- # get standard environment, filters and checks
++# get standard environment, filters and checks
++. ./common.rc
++
+ _cleanup()
+ {
+ 	_cleanup_test_img
+ }
+ trap "_cleanup; exit \$status" 0 1 2 3 15
+ 
+-# get standard environment, filters and checks
+-. ./common.rc
+-
+ _supported_fmt qcow2 qed
+ _supported_proto file
+ _supported_os Linux
 diff --git a/tests/qemu-iotests/039 b/tests/qemu-iotests/039
-index 99a33df803..f57d931b5b 100755
+index d5e6205528..cc1e7d74db 100755
 --- a/tests/qemu-iotests/039
 +++ b/tests/qemu-iotests/039
-@@ -26,7 +26,6 @@
- seq=`basename $0`
- echo "QA output created by $seq"
- 
--here=`pwd`
+@@ -30,15 +30,15 @@ echo "QA output created by $seq"
+ here=`pwd`
  status=1	# failure is the default!
  
- # get standard environment, filters and checks
++# get standard environment, filters and checks
++. ./common.rc
++
+ _cleanup()
+ {
+ 	_cleanup_test_img
+ }
+ trap "_cleanup; exit \$status" 0 1 2 3 15
+ 
+-# get standard environment, filters and checks
+-. ./common.rc
+-
+ _supported_fmt qcow2
+ _supported_proto file
+ _supported_os Linux
 diff --git a/tests/qemu-iotests/042 b/tests/qemu-iotests/042
-index 7fafb6a436..24b9c20749 100755
+index bccc01f8ed..45d533b7d9 100755
 --- a/tests/qemu-iotests/042
 +++ b/tests/qemu-iotests/042
-@@ -23,7 +23,6 @@
- seq=`basename $0`
- echo "QA output created by $seq"
- 
--here=`pwd`
+@@ -27,15 +27,15 @@ echo "QA output created by $seq"
+ here=`pwd`
  status=1	# failure is the default!
  
- # get standard environment, filters and checks
++# get standard environment, filters and checks
++. ./common.rc
++
+ _cleanup()
+ {
+ 	_cleanup_test_img
+ }
+ trap "_cleanup; exit \$status" 0 1 2 3 15
+ 
+-# get standard environment, filters and checks
+-. ./common.rc
+-
+ _supported_fmt qcow2 qed
+ _supported_proto file
+ _supported_os Linux
 diff --git a/tests/qemu-iotests/043 b/tests/qemu-iotests/043
-index 0ce07adfd0..fee664cbfd 100755
+index c650054328..b63073db37 100755
 --- a/tests/qemu-iotests/043
 +++ b/tests/qemu-iotests/043
-@@ -23,7 +23,6 @@
- seq=`basename $0`
- echo "QA output created by $seq"
- 
--here=`pwd`
+@@ -27,6 +27,9 @@ echo "QA output created by $seq"
+ here=`pwd`
  status=1	# failure is the default!
  
- # get standard environment, filters and checks
++# get standard environment, filters and checks
++. ./common.rc
++
+ _cleanup()
+ {
+     _cleanup_test_img
+@@ -34,9 +37,6 @@ _cleanup()
+ }
+ trap "_cleanup; exit \$status" 0 1 2 3 15
+ 
+-# get standard environment, filters and checks
+-. ./common.rc
+-
+ # Any format supporting backing files
+ _supported_fmt qcow2 qed
+ _supported_proto file
 diff --git a/tests/qemu-iotests/046 b/tests/qemu-iotests/046
-index c3c16ebd3d..9f7e4df3af 100755
+index e4c3c5364c..09192b25de 100755
 --- a/tests/qemu-iotests/046
 +++ b/tests/qemu-iotests/046
-@@ -23,7 +23,6 @@
- seq=`basename $0`
- echo "QA output created by $seq"
- 
--here=`pwd`
+@@ -27,15 +27,15 @@ echo "QA output created by $seq"
+ here=`pwd`
  status=1	# failure is the default!
  
- # get standard environment, filters and checks
++# get standard environment, filters and checks
++. ./common.rc
++
+ _cleanup()
+ {
+ 	_cleanup_test_img
+ }
+ trap "_cleanup; exit \$status" 0 1 2 3 15
+ 
+-# get standard environment, filters and checks
+-. ./common.rc
+-
+ _supported_fmt qcow2
+ _supported_proto file
+ _supported_os Linux
 diff --git a/tests/qemu-iotests/047 b/tests/qemu-iotests/047
-index ebbb36c349..e8ca27e3c8 100755
+index e941a6f110..a11d212d44 100755
 --- a/tests/qemu-iotests/047
 +++ b/tests/qemu-iotests/047
-@@ -24,7 +24,6 @@
- seq=`basename $0`
- echo "QA output created by $seq"
- 
--here=`pwd`
+@@ -28,15 +28,15 @@ echo "QA output created by $seq"
+ here=`pwd`
  status=1	# failure is the default!
  
- # get standard environment, filters and checks
++# get standard environment, filters and checks
++. ./common.rc
++
+ _cleanup()
+ {
+ 	_cleanup_test_img
+ }
+ trap "_cleanup; exit \$status" 0 1 2 3 15
+ 
+-# get standard environment, filters and checks
+-. ./common.rc
+-
+ _supported_fmt qcow2
+ _supported_proto generic
+ _supported_os Linux
+diff --git a/tests/qemu-iotests/048 b/tests/qemu-iotests/048
+index 5b77c195b8..f75cb4926e 100755
+--- a/tests/qemu-iotests/048
++++ b/tests/qemu-iotests/048
+@@ -27,6 +27,10 @@ echo "QA output created by $seq"
+ 
+ status=1        # failure is the default!
+ 
++# get standard environment, filters and checks
++. ./common.rc
++. ./common.pattern
++
+ _cleanup()
+ {
+     echo "Cleanup"
+@@ -41,10 +45,6 @@ _compare()
+     echo $?
+ }
+ 
+-# get standard environment, filters and checks
+-. ./common.rc
+-. ./common.pattern
+-
+ _supported_fmt raw qcow2 qed luks
+ _supported_proto file
+ _supported_os Linux
 diff --git a/tests/qemu-iotests/049 b/tests/qemu-iotests/049
-index 984652cd97..8b235cec7f 100755
+index 70f02d3f41..20207a7023 100755
 --- a/tests/qemu-iotests/049
 +++ b/tests/qemu-iotests/049
-@@ -23,7 +23,6 @@
- seq=`basename $0`
- echo "QA output created by $seq"
- 
--here=`pwd`
+@@ -27,15 +27,15 @@ echo "QA output created by $seq"
+ here=`pwd`
  status=1	# failure is the default!
  
- # get standard environment, filters and checks
++# get standard environment, filters and checks
++. ./common.rc
++
+ _cleanup()
+ {
+ 	_cleanup_test_img
+ }
+ trap "_cleanup; exit \$status" 0 1 2 3 15
+ 
+-# get standard environment, filters and checks
+-. ./common.rc
+-
+ _supported_fmt qcow2
+ _supported_proto file
+ _supported_os Linux
 diff --git a/tests/qemu-iotests/050 b/tests/qemu-iotests/050
-index f290c68498..6131cc816a 100755
+index c7a2858cea..9d22200910 100755
 --- a/tests/qemu-iotests/050
 +++ b/tests/qemu-iotests/050
-@@ -23,7 +23,6 @@
- seq=`basename $0`
- echo "QA output created by $seq"
- 
--here=`pwd`
+@@ -27,6 +27,9 @@ echo "QA output created by $seq"
+ here=`pwd`
  status=1	# failure is the default!
  
- # get standard environment, filters and checks
++# get standard environment, filters and checks
++. ./common.rc
++
+ _cleanup()
+ {
+     _cleanup_test_img
+@@ -35,9 +38,6 @@ _cleanup()
+ }
+ trap "_cleanup; exit \$status" 0 1 2 3 15
+ 
+-# get standard environment, filters and checks
+-. ./common.rc
+-
+ _supported_fmt qcow2 qed
+ _supported_proto file
+ _supported_os Linux
 diff --git a/tests/qemu-iotests/051 b/tests/qemu-iotests/051
-index b6903d13c4..b5f1b34579 100755
+index 2f3eca42ec..0ad210c560 100755
 --- a/tests/qemu-iotests/051
 +++ b/tests/qemu-iotests/051
-@@ -23,7 +23,6 @@
- seq=`basename $0`
- echo "QA output created by $seq"
- 
--here=`pwd`
+@@ -27,15 +27,15 @@ echo "QA output created by $seq"
+ here=`pwd`
  status=1	# failure is the default!
  
- # get standard environment, filters and checks
++# get standard environment, filters and checks
++. ./common.rc
++
+ _cleanup()
+ {
+ 	_cleanup_test_img
+ }
+ trap "_cleanup; exit \$status" 0 1 2 3 15
+ 
+-# get standard environment, filters and checks
+-. ./common.rc
+-
+ _supported_fmt qcow2
+ _supported_proto file
+ _supported_os Linux
 diff --git a/tests/qemu-iotests/052 b/tests/qemu-iotests/052
-index 33c3e55713..2c423d7d34 100755
+index 612dff2d8d..3355094e3e 100755
 --- a/tests/qemu-iotests/052
 +++ b/tests/qemu-iotests/052
-@@ -23,7 +23,6 @@
- seq=`basename $0`
- echo "QA output created by $seq"
- 
--here=`pwd`
+@@ -27,15 +27,15 @@ echo "QA output created by $seq"
+ here=`pwd`
  status=1	# failure is the default!
  
- # get standard environment, filters and checks
++# get standard environment, filters and checks
++. ./common.rc
++
+ _cleanup()
+ {
+ 	_cleanup_test_img
+ }
+ trap "_cleanup; exit \$status" 0 1 2 3 15
+ 
+-# get standard environment, filters and checks
+-. ./common.rc
+-
+ _supported_fmt generic
+ _supported_proto file
+ _supported_os Linux
 diff --git a/tests/qemu-iotests/053 b/tests/qemu-iotests/053
-index a84dde31e0..32c75472ae 100755
+index 6f7667bfd9..09e6a4f8bb 100755
 --- a/tests/qemu-iotests/053
 +++ b/tests/qemu-iotests/053
-@@ -23,7 +23,6 @@
- seq=`basename $0`
- echo "QA output created by $seq"
- 
--here=`pwd`
+@@ -27,6 +27,9 @@ echo "QA output created by $seq"
+ here=`pwd`
  status=1	# failure is the default!
  
- # get standard environment, filters and checks
++# get standard environment, filters and checks
++. ./common.rc
++
+ _cleanup()
+ {
+ 	rm -f "$TEST_IMG.orig"
+@@ -34,9 +37,6 @@ _cleanup()
+ }
+ trap "_cleanup; exit \$status" 0 1 2 3 15
+ 
+-# get standard environment, filters and checks
+-. ./common.rc
+-
+ _supported_fmt qcow2 qcow
+ _supported_proto file
+ _supported_os Linux
 diff --git a/tests/qemu-iotests/054 b/tests/qemu-iotests/054
-index 0fc2a8faa6..d3b7f6a727 100755
+index a2c7632158..46d0714881 100755
 --- a/tests/qemu-iotests/054
 +++ b/tests/qemu-iotests/054
-@@ -23,7 +23,6 @@
- seq=`basename $0`
- echo "QA output created by $seq"
- 
--here=`pwd`
+@@ -27,15 +27,15 @@ echo "QA output created by $seq"
+ here=`pwd`
  status=1	# failure is the default!
  
- # get standard environment, filters and checks
++# get standard environment, filters and checks
++. ./common.rc
++
+ _cleanup()
+ {
+ 	_cleanup_test_img
+ }
+ trap "_cleanup; exit \$status" 0 1 2 3 15
+ 
+-# get standard environment, filters and checks
+-. ./common.rc
+-
+ _supported_fmt qcow2
+ _supported_proto file
+ _supported_os Linux
 diff --git a/tests/qemu-iotests/058 b/tests/qemu-iotests/058
-index 74118b93d3..01a47c6a9e 100755
+index 08f8bd5d6b..34dcd10a58 100755
 --- a/tests/qemu-iotests/058
 +++ b/tests/qemu-iotests/058
-@@ -25,7 +25,6 @@
- seq=`basename $0`
- echo "QA output created by $seq"
- 
--here=`pwd`
+@@ -29,6 +29,10 @@ echo "QA output created by $seq"
+ here=`pwd`
  status=1	# failure is the default!
  
- # get standard environment, filters and checks
++# get standard environment, filters and checks
++. ./common.rc
++. ./common.pattern
++
+ nbd_unix_socket=$TEST_DIR/test_qemu_nbd_socket
+ nbd_snapshot_img="nbd:unix:$nbd_unix_socket"
+ rm -f "${TEST_DIR}/qemu-nbd.pid"
+@@ -83,10 +87,6 @@ _cleanup()
+ }
+ trap "_cleanup; exit \$status" 0 1 2 3 15
+ 
+-# get standard environment, filters and checks
+-. ./common.rc
+-. ./common.pattern
+-
+ _supported_fmt qcow2
+ _supported_proto file
+ _supported_os Linux
 diff --git a/tests/qemu-iotests/059 b/tests/qemu-iotests/059
-index fe16e9442d..2aa0a9eb83 100755
+index 19f09eca35..96883b78b9 100755
 --- a/tests/qemu-iotests/059
 +++ b/tests/qemu-iotests/059
-@@ -23,7 +23,6 @@
- seq=`basename $0`
- echo "QA output created by $seq"
- 
--here=`pwd`
+@@ -27,6 +27,9 @@ echo "QA output created by $seq"
+ here=`pwd`
  status=1	# failure is the default!
  
- # get standard environment, filters and checks
++# get standard environment, filters and checks
++. ./common.rc
++
+ _cleanup()
+ {
+     _cleanup_test_img
+@@ -34,9 +37,6 @@ _cleanup()
+ }
+ trap "_cleanup; exit \$status" 0 1 2 3 15
+ 
+-# get standard environment, filters and checks
+-. ./common.rc
+-
+ # This tests vmdk-specific low-level functionality
+ _supported_fmt vmdk
+ _supported_proto file
 diff --git a/tests/qemu-iotests/060 b/tests/qemu-iotests/060
-index 98a946f99c..bcfa33db38 100755
+index ab25c85019..5775ec2871 100755
 --- a/tests/qemu-iotests/060
 +++ b/tests/qemu-iotests/060
-@@ -23,7 +23,6 @@
- seq="$(basename $0)"
- echo "QA output created by $seq"
- 
--here="$PWD"
+@@ -27,15 +27,15 @@ echo "QA output created by $seq"
+ here="$PWD"
  status=1	# failure is the default!
  
- # get standard environment, filters and checks
++# get standard environment, filters and checks
++. ./common.rc
++
+ _cleanup()
+ {
+ 	_cleanup_test_img
+ }
+ trap "_cleanup; exit \$status" 0 1 2 3 15
+ 
+-# get standard environment, filters and checks
+-. ./common.rc
+-
+ # This tests qocw2-specific low-level functionality
+ _supported_fmt qcow2
+ _supported_proto file
 diff --git a/tests/qemu-iotests/061 b/tests/qemu-iotests/061
-index 2c6da49646..03d1e5f435 100755
+index 266e0515d7..2097d64fe4 100755
 --- a/tests/qemu-iotests/061
 +++ b/tests/qemu-iotests/061
-@@ -23,7 +23,6 @@
- seq=`basename $0`
- echo "QA output created by $seq"
- 
--here=`pwd`
+@@ -27,15 +27,15 @@ echo "QA output created by $seq"
+ here=`pwd`
  status=1	# failure is the default!
  
- # get standard environment, filters and checks
++# get standard environment, filters and checks
++. ./common.rc
++
+ _cleanup()
+ {
+ 	_cleanup_test_img
+ }
+ trap "_cleanup; exit \$status" 0 1 2 3 15
+ 
+-# get standard environment, filters and checks
+-. ./common.rc
+-
+ # This tests qocw2-specific low-level functionality
+ _supported_fmt qcow2
+ _supported_proto file
 diff --git a/tests/qemu-iotests/062 b/tests/qemu-iotests/062
-index 3f97c7d6da..8ef0b9d923 100755
+index 1eaafdff0f..6116453e30 100755
 --- a/tests/qemu-iotests/062
 +++ b/tests/qemu-iotests/062
-@@ -24,7 +24,6 @@
- seq=`basename $0`
- echo "QA output created by $seq"
- 
--here=`pwd`
+@@ -28,15 +28,15 @@ echo "QA output created by $seq"
+ here=`pwd`
  status=1	# failure is the default!
  
- # get standard environment, filters and checks
++# get standard environment, filters and checks
++. ./common.rc
++
+ _cleanup()
+ {
+ 	_cleanup_test_img
+ }
+ trap "_cleanup; exit \$status" 0 1 2 3 15
+ 
+-# get standard environment, filters and checks
+-. ./common.rc
+-
+ # This tests qocw2-specific low-level functionality
+ _supported_fmt qcow2
+ _supported_proto generic
 diff --git a/tests/qemu-iotests/063 b/tests/qemu-iotests/063
-index 9b8660e021..aeb247f3a7 100755
+index 968b624be5..fbffd6d9e7 100755
 --- a/tests/qemu-iotests/063
 +++ b/tests/qemu-iotests/063
-@@ -24,7 +24,6 @@
- seq=`basename $0`
- echo "QA output created by $seq"
- 
--here=`pwd`
+@@ -28,6 +28,10 @@ echo "QA output created by $seq"
+ here=`pwd`
  status=1	# failure is the default!
  
- # get standard environment, filters and checks
++# get standard environment, filters and checks
++. ./common.rc
++. ./common.pattern
++
+ _cleanup()
+ {
+ 	_cleanup_test_img
+@@ -35,10 +39,6 @@ _cleanup()
+ }
+ trap "_cleanup; exit \$status" 0 1 2 3 15
+ 
+-# get standard environment, filters and checks
+-. ./common.rc
+-. ./common.pattern
+-
+ _supported_fmt qcow qcow2 vmdk qed raw
+ _supported_proto file
+ _supported_os Linux
 diff --git a/tests/qemu-iotests/064 b/tests/qemu-iotests/064
-index 40954b36d7..50214bb2c5 100755
+index 9d62b0bf94..3bfb46146a 100755
 --- a/tests/qemu-iotests/064
 +++ b/tests/qemu-iotests/064
-@@ -23,7 +23,6 @@
- seq=`basename $0`
- echo "QA output created by $seq"
- 
--here=`pwd`
+@@ -27,15 +27,15 @@ echo "QA output created by $seq"
+ here=`pwd`
  status=1	# failure is the default!
  
- # get standard environment, filters and checks
++# get standard environment, filters and checks
++. ./common.rc
++
+ _cleanup()
+ {
+     _cleanup_test_img
+ }
+ trap "_cleanup; exit \$status" 0 1 2 3 15
+ 
+-# get standard environment, filters and checks
+-. ./common.rc
+-
+ _supported_fmt vhdx
+ _supported_proto generic
+ _supported_os Linux
 diff --git a/tests/qemu-iotests/066 b/tests/qemu-iotests/066
-index 556b42bfe6..557a39f357 100755
+index 8841354cd8..f29fcc7eae 100755
 --- a/tests/qemu-iotests/066
 +++ b/tests/qemu-iotests/066
-@@ -23,7 +23,6 @@
- seq="$(basename $0)"
- echo "QA output created by $seq"
- 
--here="$PWD"
+@@ -27,15 +27,15 @@ echo "QA output created by $seq"
+ here="$PWD"
  status=1	# failure is the default!
  
- # get standard environment, filters and checks
-diff --git a/tests/qemu-iotests/067 b/tests/qemu-iotests/067
-index b7a6ef2097..4a0f16c5bd 100755
---- a/tests/qemu-iotests/067
-+++ b/tests/qemu-iotests/067
-@@ -23,7 +23,6 @@
- seq=`basename $0`
- echo "QA output created by $seq"
++# get standard environment, filters and checks
++. ./common.rc
++
+ _cleanup()
+ {
+ 	_cleanup_test_img
+ }
+ trap "_cleanup; exit \$status" 0 1 2 3 15
  
--here=`pwd`
- status=1	# failure is the default!
- 
- # get standard environment, filters and checks
+-# get standard environment, filters and checks
+-. ./common.rc
+-
+ # This tests qocw2-specific low-level functionality
+ _supported_fmt qcow2
+ _supported_proto generic
 diff --git a/tests/qemu-iotests/068 b/tests/qemu-iotests/068
-index 162cd26005..9f9fc4cb48 100755
+index ce33795dda..a0df34898e 100755
 --- a/tests/qemu-iotests/068
 +++ b/tests/qemu-iotests/068
-@@ -23,7 +23,6 @@
- seq="$(basename $0)"
- echo "QA output created by $seq"
- 
--here="$PWD"
+@@ -27,15 +27,15 @@ echo "QA output created by $seq"
+ here="$PWD"
  status=1	# failure is the default!
  
- # get standard environment, filters and checks
++# get standard environment, filters and checks
++. ./common.rc
++
+ _cleanup()
+ {
+ 	_cleanup_test_img
+ }
+ trap "_cleanup; exit \$status" 0 1 2 3 15
+ 
+-# get standard environment, filters and checks
+-. ./common.rc
+-
+ # This tests qocw2-specific low-level functionality
+ _supported_fmt qcow2
+ _supported_proto generic
 diff --git a/tests/qemu-iotests/069 b/tests/qemu-iotests/069
-index 1f3baeea13..df3e2b0ae0 100755
+index 5cdf0c1e47..e01cbc98f4 100755
 --- a/tests/qemu-iotests/069
 +++ b/tests/qemu-iotests/069
-@@ -23,7 +23,6 @@
- seq="$(basename $0)"
- echo "QA output created by $seq"
- 
--here="$PWD"
+@@ -27,15 +27,15 @@ echo "QA output created by $seq"
+ here="$PWD"
  status=1	# failure is the default!
  
- # get standard environment, filters and checks
++# get standard environment, filters and checks
++. ./common.rc
++
+ _cleanup()
+ {
+ 	_cleanup_test_img
+ }
+ trap "_cleanup; exit \$status" 0 1 2 3 15
+ 
+-# get standard environment, filters and checks
+-. ./common.rc
+-
+ _supported_fmt qed qcow qcow2 vmdk
+ _supported_proto file
+ _supported_os Linux
 diff --git a/tests/qemu-iotests/070 b/tests/qemu-iotests/070
-index 684742893c..915c02ecba 100755
+index 60c4b74a5e..6cbe62e1a0 100755
 --- a/tests/qemu-iotests/070
 +++ b/tests/qemu-iotests/070
-@@ -24,7 +24,6 @@
- seq=`basename $0`
- echo "QA output created by $seq"
- 
--here=`pwd`
+@@ -28,15 +28,15 @@ echo "QA output created by $seq"
+ here=`pwd`
  status=1	# failure is the default!
  
- # get standard environment, filters and checks
++# get standard environment, filters and checks
++. ./common.rc
++
+ _cleanup()
+ {
+     _cleanup_test_img
+ }
+ trap "_cleanup; exit \$status" 0 1 2 3 15
+ 
+-# get standard environment, filters and checks
+-. ./common.rc
+-
+ _supported_fmt vhdx
+ _supported_proto generic
+ _supported_os Linux
 diff --git a/tests/qemu-iotests/071 b/tests/qemu-iotests/071
-index 7b1fdf7989..865930d7b3 100755
+index 802b2b9da2..66806e3a8c 100755
 --- a/tests/qemu-iotests/071
 +++ b/tests/qemu-iotests/071
-@@ -23,7 +23,6 @@
- seq="$(basename $0)"
- echo "QA output created by $seq"
- 
--here="$PWD"
+@@ -27,15 +27,15 @@ echo "QA output created by $seq"
+ here="$PWD"
  status=1	# failure is the default!
  
- # get standard environment, filters and checks
++# get standard environment, filters and checks
++. ./common.rc
++
+ _cleanup()
+ {
+ 	_cleanup_test_img
+ }
+ trap "_cleanup; exit \$status" 0 1 2 3 15
+ 
+-# get standard environment, filters and checks
+-. ./common.rc
+-
+ _supported_fmt qcow2
+ _supported_proto file
+ _supported_os Linux
 diff --git a/tests/qemu-iotests/072 b/tests/qemu-iotests/072
-index 5d4e8becac..43cbeaf526 100755
+index 0851a72239..2d28db91d5 100755
 --- a/tests/qemu-iotests/072
 +++ b/tests/qemu-iotests/072
-@@ -23,7 +23,6 @@
- seq="$(basename $0)"
- echo "QA output created by $seq"
- 
--here="$PWD"
+@@ -27,15 +27,15 @@ echo "QA output created by $seq"
+ here="$PWD"
  status=1	# failure is the default!
  
- # get standard environment, filters and checks
++# get standard environment, filters and checks
++. ./common.rc
++
+ _cleanup()
+ {
+ 	_cleanup_test_img
+ }
+ trap "_cleanup; exit \$status" 0 1 2 3 15
+ 
+-# get standard environment, filters and checks
+-. ./common.rc
+-
+ _supported_fmt vpc vmdk vhdx vdi qed qcow2 qcow
+ _supported_proto file
+ _supported_os Linux
 diff --git a/tests/qemu-iotests/073 b/tests/qemu-iotests/073
-index f5be7347d1..d9819b6aa5 100755
+index e1982454b0..2738010eb3 100755
 --- a/tests/qemu-iotests/073
 +++ b/tests/qemu-iotests/073
-@@ -23,7 +23,6 @@
- seq=`basename $0`
- echo "QA output created by $seq"
- 
--here=`pwd`
+@@ -27,15 +27,15 @@ echo "QA output created by $seq"
+ here=`pwd`
  status=1	# failure is the default!
  
- # get standard environment, filters and checks
++# get standard environment, filters and checks
++. ./common.rc
++
+ _cleanup()
+ {
+     _cleanup_test_img
+ }
+ trap "_cleanup; exit \$status" 0 1 2 3 15
+ 
+-# get standard environment, filters and checks
+-. ./common.rc
+-
+ _supported_fmt qcow2
+ _supported_proto generic
+ _unsupported_proto vxhs
+diff --git a/tests/qemu-iotests/074 b/tests/qemu-iotests/074
+index 4ba59ba1d7..0dcbe946da 100755
+--- a/tests/qemu-iotests/074
++++ b/tests/qemu-iotests/074
+@@ -27,6 +27,10 @@ echo "QA output created by $seq"
+ 
+ status=1        # failure is the default!
+ 
++# get standard environment, filters and checks
++. ./common.rc
++. ./common.pattern
++
+ _cleanup()
+ {
+     echo "Cleanup"
+@@ -42,10 +46,6 @@ _compare()
+     echo $?
+ }
+ 
+-# get standard environment, filters and checks
+-. ./common.rc
+-. ./common.pattern
+-
+ _supported_fmt qcow2
+ _supported_proto file
+ _supported_os Linux
 diff --git a/tests/qemu-iotests/075 b/tests/qemu-iotests/075
-index b924d7a5f7..5d211b6eb3 100755
+index 8d6179f847..2e819c2a5a 100755
 --- a/tests/qemu-iotests/075
 +++ b/tests/qemu-iotests/075
-@@ -23,7 +23,6 @@
- seq=`basename $0`
- echo "QA output created by $seq"
- 
--here=`pwd`
+@@ -27,15 +27,15 @@ echo "QA output created by $seq"
+ here=`pwd`
  status=1	# failure is the default!
  
- # get standard environment, filters and checks
++# get standard environment, filters and checks
++. ./common.rc
++
+ _cleanup()
+ {
+ 	_cleanup_test_img
+ }
+ trap "_cleanup; exit \$status" 0 1 2 3 15
+ 
+-# get standard environment, filters and checks
+-. ./common.rc
+-
+ _supported_fmt cloop
+ _supported_proto file
+ _supported_os Linux
 diff --git a/tests/qemu-iotests/076 b/tests/qemu-iotests/076
-index 64b935ad02..ddf3cf0a64 100755
+index fb5da1fd17..d7406739a1 100755
 --- a/tests/qemu-iotests/076
 +++ b/tests/qemu-iotests/076
-@@ -23,7 +23,6 @@
- seq=`basename $0`
- echo "QA output created by $seq"
- 
--here=`pwd`
+@@ -27,15 +27,15 @@ echo "QA output created by $seq"
+ here=`pwd`
  status=1	# failure is the default!
  
- # get standard environment, filters and checks
++# get standard environment, filters and checks
++. ./common.rc
++
+ _cleanup()
+ {
+ 	_cleanup_test_img
+ }
+ trap "_cleanup; exit \$status" 0 1 2 3 15
+ 
+-# get standard environment, filters and checks
+-. ./common.rc
+-
+ _supported_fmt parallels
+ _supported_proto file
+ _supported_os Linux
 diff --git a/tests/qemu-iotests/077 b/tests/qemu-iotests/077
-index 897afb688d..375872deed 100755
+index ec30895982..eb6a189bdf 100755
 --- a/tests/qemu-iotests/077
 +++ b/tests/qemu-iotests/077
-@@ -23,7 +23,6 @@
- seq=`basename $0`
- echo "QA output created by $seq"
- 
--here=`pwd`
+@@ -27,15 +27,15 @@ echo "QA output created by $seq"
+ here=`pwd`
  status=1	# failure is the default!
  
- # get standard environment, filters and checks
++# get standard environment, filters and checks
++. ./common.rc
++
+ _cleanup()
+ {
+ 	_cleanup_test_img
+ }
+ trap "_cleanup; exit \$status" 0 1 2 3 15
+ 
+-# get standard environment, filters and checks
+-. ./common.rc
+-
+ _supported_fmt raw
+ _supported_proto generic
+ _supported_os Linux
 diff --git a/tests/qemu-iotests/078 b/tests/qemu-iotests/078
-index 36490ec94c..f9f53772d0 100755
+index 74ab4ee259..1664c9c74c 100755
 --- a/tests/qemu-iotests/078
 +++ b/tests/qemu-iotests/078
-@@ -23,7 +23,6 @@
- seq=`basename $0`
- echo "QA output created by $seq"
- 
--here=`pwd`
+@@ -27,15 +27,15 @@ echo "QA output created by $seq"
+ here=`pwd`
  status=1	# failure is the default!
  
- # get standard environment, filters and checks
++# get standard environment, filters and checks
++. ./common.rc
++
+ _cleanup()
+ {
+ 	_cleanup_test_img
+ }
+ trap "_cleanup; exit \$status" 0 1 2 3 15
+ 
+-# get standard environment, filters and checks
+-. ./common.rc
+-
+ _supported_fmt bochs
+ _supported_proto file
+ _supported_os Linux
 diff --git a/tests/qemu-iotests/079 b/tests/qemu-iotests/079
-index d8a2a17e71..35bfab1ad7 100755
+index 9c368991d1..fc9de46cc7 100755
 --- a/tests/qemu-iotests/079
 +++ b/tests/qemu-iotests/079
-@@ -23,7 +23,6 @@
- seq=`basename $0`
- echo "QA output created by $seq"
- 
--here=`pwd`
+@@ -27,15 +27,15 @@ echo "QA output created by $seq"
+ here=`pwd`
  status=1	# failure is the default!
  
- # get standard environment, filters and checks
++# get standard environment, filters and checks
++. ./common.rc
++
+ _cleanup()
+ {
+ 	_cleanup_test_img
+ }
+ trap "_cleanup; exit \$status" 0 1 2 3 15
+ 
+-# get standard environment, filters and checks
+-. ./common.rc
+-
+ _supported_fmt qcow2
+ _supported_proto file nfs
+ _supported_os Linux
 diff --git a/tests/qemu-iotests/080 b/tests/qemu-iotests/080
-index aa7b13776a..67998b6073 100755
+index 4667ca229b..0947ed0559 100755
 --- a/tests/qemu-iotests/080
 +++ b/tests/qemu-iotests/080
-@@ -23,7 +23,6 @@
- seq=`basename $0`
- echo "QA output created by $seq"
- 
--here=`pwd`
+@@ -27,6 +27,9 @@ echo "QA output created by $seq"
+ here=`pwd`
  status=1	# failure is the default!
  
- # get standard environment, filters and checks
-diff --git a/tests/qemu-iotests/081 b/tests/qemu-iotests/081
-index d840841b0d..9ee474d0a7 100755
---- a/tests/qemu-iotests/081
-+++ b/tests/qemu-iotests/081
-@@ -23,7 +23,6 @@
- seq=`basename $0`
- echo "QA output created by $seq"
- 
--here=`pwd`
- status=1	# failure is the default!
- 
++# get standard environment, filters and checks
++. ./common.rc
++
  _cleanup()
+ {
+     rm -f $TEST_IMG.snap
+@@ -34,9 +37,6 @@ _cleanup()
+ }
+ trap "_cleanup; exit \$status" 0 1 2 3 15
+ 
+-# get standard environment, filters and checks
+-. ./common.rc
+-
+ _supported_fmt qcow2
+ _supported_proto file
+ _supported_os Linux
 diff --git a/tests/qemu-iotests/082 b/tests/qemu-iotests/082
-index 4f1c03b882..e0f05fe236 100755
+index 7167632e67..64075693f3 100755
 --- a/tests/qemu-iotests/082
 +++ b/tests/qemu-iotests/082
-@@ -23,7 +23,6 @@
- seq=`basename $0`
- echo "QA output created by $seq"
- 
--here=`pwd`
+@@ -27,15 +27,15 @@ echo "QA output created by $seq"
+ here=`pwd`
  status=1	# failure is the default!
  
- # get standard environment, filters and checks
-diff --git a/tests/qemu-iotests/083 b/tests/qemu-iotests/083
-index 39162b36ef..b2d6462526 100755
---- a/tests/qemu-iotests/083
-+++ b/tests/qemu-iotests/083
-@@ -23,7 +23,6 @@
- seq=`basename $0`
- echo "QA output created by $seq"
- 
--here=`pwd`
- status=1	# failure is the default!
- 
++# get standard environment, filters and checks
++. ./common.rc
++
  _cleanup()
+ {
+ 	_cleanup_test_img
+ }
+ trap "_cleanup; exit \$status" 0 1 2 3 15
+ 
+-# get standard environment, filters and checks
+-. ./common.rc
+-
+ _supported_fmt qcow2
+ _supported_proto file nfs
+ _supported_os Linux
 diff --git a/tests/qemu-iotests/084 b/tests/qemu-iotests/084
-index 3daf41615b..9b85dda50c 100755
+index 9bfa2e57e6..1a610e1ad4 100755
 --- a/tests/qemu-iotests/084
 +++ b/tests/qemu-iotests/084
-@@ -24,7 +24,6 @@
- seq=`basename $0`
- echo "QA output created by $seq"
- 
--here=`pwd`
+@@ -28,15 +28,15 @@ echo "QA output created by $seq"
+ here=`pwd`
  status=1	# failure is the default!
  
- # get standard environment, filters and checks
++# get standard environment, filters and checks
++. ./common.rc
++
+ _cleanup()
+ {
+ 	_cleanup_test_img
+ }
+ trap "_cleanup; exit \$status" 0 1 2 3 15
+ 
+-# get standard environment, filters and checks
+-. ./common.rc
+-
+ # This tests vdi-specific header fields
+ _supported_fmt vdi
+ _supported_proto file
 diff --git a/tests/qemu-iotests/085 b/tests/qemu-iotests/085
-index 375a51e07a..adea26a781 100755
+index 1b330c28ca..12df84d6bc 100755
 --- a/tests/qemu-iotests/085
 +++ b/tests/qemu-iotests/085
-@@ -28,7 +28,6 @@
- seq=`basename $0`
- echo "QA output created by $seq"
+@@ -37,6 +37,10 @@ snapshot_virt1="snapshot-v1.qcow2"
  
--here=`pwd`
- status=1	# failure is the default!
+ SNAPSHOTS=10
  
- snapshot_virt0="snapshot-v0.qcow2"
++# get standard environment, filters and checks
++. ./common.rc
++. ./common.qemu
++
+ _cleanup()
+ {
+     _cleanup_qemu
+@@ -50,10 +54,6 @@ _cleanup()
+ }
+ trap "_cleanup; exit \$status" 0 1 2 3 15
+ 
+-# get standard environment, filters and checks
+-. ./common.rc
+-. ./common.qemu
+-
+ _supported_fmt qcow2
+ _supported_proto file
+ _supported_os Linux
 diff --git a/tests/qemu-iotests/086 b/tests/qemu-iotests/086
-index 1224e068b7..dda1bc9d07 100755
+index 859e80a291..9329e14b62 100755
 --- a/tests/qemu-iotests/086
 +++ b/tests/qemu-iotests/086
-@@ -23,7 +23,6 @@
- seq=`basename $0`
- echo "QA output created by $seq"
- 
--here=`pwd`
+@@ -27,15 +27,15 @@ echo "QA output created by $seq"
+ here=`pwd`
  status=1	# failure is the default!
  
- # get standard environment, filters and checks
-diff --git a/tests/qemu-iotests/087 b/tests/qemu-iotests/087
-index fb572dc5b8..1ee9b429c1 100755
---- a/tests/qemu-iotests/087
-+++ b/tests/qemu-iotests/087
-@@ -23,7 +23,6 @@
- seq=`basename $0`
- echo "QA output created by $seq"
++# get standard environment, filters and checks
++. ./common.rc
++
+ _cleanup()
+ {
+ 	_cleanup_test_img
+ }
+ trap "_cleanup; exit \$status" 0 1 2 3 15
  
--here=`pwd`
- status=1	# failure is the default!
- 
- # get standard environment, filters and checks
+-# get standard environment, filters and checks
+-. ./common.rc
+-
+ _supported_fmt qcow2 raw
+ _supported_proto file nfs
+ _supported_os Linux
 diff --git a/tests/qemu-iotests/088 b/tests/qemu-iotests/088
-index 75e6ba9908..4bbcf47495 100755
+index 2a51616be8..dcde4813d2 100755
 --- a/tests/qemu-iotests/088
 +++ b/tests/qemu-iotests/088
-@@ -23,7 +23,6 @@
- seq=`basename $0`
- echo "QA output created by $seq"
- 
--here=`pwd`
+@@ -27,6 +27,9 @@ echo "QA output created by $seq"
+ here=`pwd`
  status=1	# failure is the default!
  
- # get standard environment, filters and checks
++# get standard environment, filters and checks
++. ./common.rc
++
+ _cleanup()
+ {
+     rm -f $TEST_IMG.snap
+@@ -34,9 +37,6 @@ _cleanup()
+ }
+ trap "_cleanup; exit \$status" 0 1 2 3 15
+ 
+-# get standard environment, filters and checks
+-. ./common.rc
+-
+ _supported_fmt vpc
+ _supported_proto file
+ _supported_os Linux
 diff --git a/tests/qemu-iotests/089 b/tests/qemu-iotests/089
-index dad9fcb69f..455e923440 100755
+index 70aef90ca7..e1093f73c3 100755
 --- a/tests/qemu-iotests/089
 +++ b/tests/qemu-iotests/089
-@@ -23,7 +23,6 @@
- seq="$(basename $0)"
- echo "QA output created by $seq"
- 
--here="$PWD"
+@@ -27,15 +27,15 @@ echo "QA output created by $seq"
+ here="$PWD"
  status=1	# failure is the default!
  
- # get standard environment, filters and checks
++# get standard environment, filters and checks
++. ./common.rc
++
+ _cleanup()
+ {
+ 	_cleanup_test_img
+ }
+ trap "_cleanup; exit \$status" 0 1 2 3 15
+ 
+-# get standard environment, filters and checks
+-. ./common.rc
+-
+ _supported_fmt qcow2
+ _supported_proto file
+ _supported_os Linux
 diff --git a/tests/qemu-iotests/090 b/tests/qemu-iotests/090
-index 74e14e9f00..959ed64083 100755
+index 8b141e1043..f88b3a7992 100755
 --- a/tests/qemu-iotests/090
 +++ b/tests/qemu-iotests/090
-@@ -23,7 +23,6 @@
- seq="$(basename $0)"
- echo "QA output created by $seq"
- 
--here="$PWD"
+@@ -27,15 +27,15 @@ echo "QA output created by $seq"
+ here="$PWD"
  status=1	# failure is the default!
  
- # get standard environment, filters and checks
++# get standard environment, filters and checks
++. ./common.rc
++
+ _cleanup()
+ {
+ 	_cleanup_test_img
+ }
+ trap "_cleanup; exit \$status" 0 1 2 3 15
+ 
+-# get standard environment, filters and checks
+-. ./common.rc
+-
+ _supported_fmt qcow2
+ _supported_proto file nfs
+ _supported_os Linux
 diff --git a/tests/qemu-iotests/091 b/tests/qemu-iotests/091
-index bb32f681bb..d6dd52fe52 100755
+index 447514af51..b1c5988c8a 100755
 --- a/tests/qemu-iotests/091
 +++ b/tests/qemu-iotests/091
-@@ -25,7 +25,6 @@
- seq=`basename $0`
- echo "QA output created by $seq"
- 
--here=`pwd`
- status=1    # failure is the default!
+@@ -31,6 +31,10 @@ status=1    # failure is the default!
  
  MIG_FIFO="${TEST_DIR}/migrate"
+ 
++# get standard environment, filters and checks
++. ./common.rc
++. ./common.qemu
++
+ _cleanup()
+ {
+     rm -f "${MIG_FIFO}"
+@@ -39,10 +43,6 @@ _cleanup()
+ }
+ trap "_cleanup; exit \$status" 0 1 2 3 15
+ 
+-# get standard environment, filters and checks
+-. ./common.rc
+-. ./common.qemu
+-
+ _supported_fmt qcow2
+ _supported_proto file
+ _supported_os Linux
 diff --git a/tests/qemu-iotests/092 b/tests/qemu-iotests/092
-index 041d888984..2bf3c69a5f 100755
+index f11b6747b3..eb6064daeb 100755
 --- a/tests/qemu-iotests/092
 +++ b/tests/qemu-iotests/092
-@@ -23,7 +23,6 @@
- seq=`basename $0`
- echo "QA output created by $seq"
- 
--here=`pwd`
+@@ -27,6 +27,9 @@ echo "QA output created by $seq"
+ here=`pwd`
  status=1	# failure is the default!
  
- # get standard environment, filters and checks
++# get standard environment, filters and checks
++. ./common.rc
++
+ _cleanup()
+ {
+     rm -f $TEST_IMG.snap
+@@ -34,9 +37,6 @@ _cleanup()
+ }
+ trap "_cleanup; exit \$status" 0 1 2 3 15
+ 
+-# get standard environment, filters and checks
+-. ./common.rc
+-
+ _supported_fmt qcow
+ _supported_proto file
+ _supported_os Linux
 diff --git a/tests/qemu-iotests/094 b/tests/qemu-iotests/094
-index 47ff00651f..2869c26bd9 100755
+index ba14a11ade..e8a07c195b 100755
 --- a/tests/qemu-iotests/094
 +++ b/tests/qemu-iotests/094
-@@ -23,7 +23,6 @@
- seq="$(basename $0)"
- echo "QA output created by $seq"
- 
--here="$PWD"
+@@ -27,19 +27,18 @@ echo "QA output created by $seq"
+ here="$PWD"
  status=1	# failure is the default!
  
- # get standard environment, filters and checks
++# get standard environment, filters and checks
++. ./common.rc
++. ./common.qemu
++
+ _cleanup()
+ {
+     _cleanup_qemu
+     _cleanup_test_img
+     rm -f "$TEST_DIR/source.$IMGFMT"
+ }
+-
+ trap "_cleanup; exit \$status" 0 1 2 3 15
+ 
+-# get standard environment, filters and checks
+-. ./common.rc
+-. ./common.qemu
+-
+ _supported_fmt generic
+ _supported_proto nbd
+ _supported_os Linux
 diff --git a/tests/qemu-iotests/095 b/tests/qemu-iotests/095
-index bc80c019ed..41d24f9e5b 100755
+index c35dc42cd6..da0cc9fed2 100755
 --- a/tests/qemu-iotests/095
 +++ b/tests/qemu-iotests/095
-@@ -27,7 +27,6 @@
- seq=`basename $0`
- echo "QA output created by $seq"
- 
--here=`pwd`
+@@ -30,6 +30,10 @@ echo "QA output created by $seq"
+ here=`pwd`
  status=1	# failure is the default!
  
- # get standard environment, filters and checks
++# get standard environment, filters and checks
++. ./common.rc
++. ./common.qemu
++
+ _cleanup()
+ {
+     _cleanup_qemu
+@@ -38,10 +42,6 @@ _cleanup()
+ }
+ trap "_cleanup; exit \$status" 0 1 2 3 15
+ 
+-# get standard environment, filters and checks
+-. ./common.rc
+-. ./common.qemu
+-
+ _supported_fmt qcow2
+ _supported_proto file
+ _supported_os Linux
 diff --git a/tests/qemu-iotests/097 b/tests/qemu-iotests/097
-index 2a68a08358..8fce38e2ef 100755
+index 788393e0c6..10aa13a0ce 100755
 --- a/tests/qemu-iotests/097
 +++ b/tests/qemu-iotests/097
-@@ -24,7 +24,6 @@
- seq="$(basename $0)"
- echo "QA output created by $seq"
- 
--here="$PWD"
+@@ -28,6 +28,10 @@ echo "QA output created by $seq"
+ here="$PWD"
  status=1	# failure is the default!
  
- # get standard environment, filters and checks
++# get standard environment, filters and checks
++. ./common.rc
++. ./common.pattern
++
+ _cleanup()
+ {
+     _cleanup_test_img
+@@ -35,10 +39,6 @@ _cleanup()
+ }
+ trap "_cleanup; exit \$status" 0 1 2 3 15
+ 
+-# get standard environment, filters and checks
+-. ./common.rc
+-. ./common.pattern
+-
+ # Any format supporting backing files and bdrv_make_empty
+ _supported_fmt qcow qcow2
+ _supported_proto file
 diff --git a/tests/qemu-iotests/098 b/tests/qemu-iotests/098
-index afe5b72c87..14164dc83f 100755
+index 92b1e75817..61c27f1f46 100755
 --- a/tests/qemu-iotests/098
 +++ b/tests/qemu-iotests/098
-@@ -23,7 +23,6 @@
- seq="$(basename $0)"
- echo "QA output created by $seq"
- 
--here="$PWD"
+@@ -27,6 +27,10 @@ echo "QA output created by $seq"
+ here="$PWD"
  status=1	# failure is the default!
  
- # get standard environment, filters and checks
++# get standard environment, filters and checks
++. ./common.rc
++. ./common.pattern
++
+ _cleanup()
+ {
+     _cleanup_test_img
+@@ -34,10 +38,6 @@ _cleanup()
+ }
+ trap "_cleanup; exit \$status" 0 1 2 3 15
+ 
+-# get standard environment, filters and checks
+-. ./common.rc
+-. ./common.pattern
+-
+ _supported_fmt qcow2
+ _supported_proto file
+ _supported_os Linux
 diff --git a/tests/qemu-iotests/099 b/tests/qemu-iotests/099
-index ac94ca7f21..a36fe154da 100755
+index d103e53ea0..90924c2ad2 100755
 --- a/tests/qemu-iotests/099
 +++ b/tests/qemu-iotests/099
-@@ -24,7 +24,6 @@
- seq="$(basename $0)"
- echo "QA output created by $seq"
- 
--here="$PWD"
+@@ -28,15 +28,15 @@ echo "QA output created by $seq"
+ here="$PWD"
  status=1	# failure is the default!
  
- # get standard environment, filters and checks
++# get standard environment, filters and checks
++. ./common.rc
++
+ _cleanup()
+ {
+ 	_cleanup_test_img
+ }
+ trap "_cleanup; exit \$status" 0 1 2 3 15
+ 
+-# get standard environment, filters and checks
+-. ./common.rc
+-
+ # Basically all formats, but "raw" has issues with _filter_imgfmt regarding the
+ # raw comparison image for blkverify; also, all images have to support creation
+ _supported_fmt qcow qcow2 qed vdi vhdx vmdk vpc
 diff --git a/tests/qemu-iotests/101 b/tests/qemu-iotests/101
-index cc57078727..8520c771af 100755
+index 806da17830..663038378b 100755
 --- a/tests/qemu-iotests/101
 +++ b/tests/qemu-iotests/101
-@@ -23,7 +23,6 @@
- seq=`basename $0`
- echo "QA output created by $seq"
- 
--here=`pwd`
+@@ -27,15 +27,15 @@ echo "QA output created by $seq"
+ here=`pwd`
  status=1	# failure is the default!
  
- # get standard environment, filters and checks
++# get standard environment, filters and checks
++. ./common.rc
++
+ _cleanup()
+ {
+ 	_cleanup_test_img
+ }
+ trap "_cleanup; exit \$status" 0 1 2 3 15
+ 
+-# get standard environment, filters and checks
+-. ./common.rc
+-
+ _supported_fmt raw
+ _supported_proto file
+ _supported_os Linux
 diff --git a/tests/qemu-iotests/102 b/tests/qemu-iotests/102
-index 9acc2772c7..9676ce5529 100755
+index cdf714412a..4ed1f77542 100755
 --- a/tests/qemu-iotests/102
 +++ b/tests/qemu-iotests/102
-@@ -23,7 +23,6 @@
- seq=$(basename $0)
- echo "QA output created by $seq"
- 
--here=$PWD
+@@ -27,6 +27,10 @@ echo "QA output created by $seq"
+ here=$PWD
  status=1    # failure is the default!
  
- # get standard environment, filters and qemu instance handling
++# get standard environment, filters and qemu instance handling
++. ./common.rc
++. ./common.qemu
++
+ _cleanup()
+ {
+     _cleanup_qemu
+@@ -34,10 +38,6 @@ _cleanup()
+ }
+ trap "_cleanup; exit \$status" 0 1 2 3 15
+ 
+-# get standard environment, filters and qemu instance handling
+-. ./common.rc
+-. ./common.qemu
+-
+ _supported_fmt qcow2
+ _supported_proto file
+ _supported_os Linux
 diff --git a/tests/qemu-iotests/103 b/tests/qemu-iotests/103
-index eaab111b5a..dbff3800b7 100755
+index 5326c6e338..0185cc73b2 100755
 --- a/tests/qemu-iotests/103
 +++ b/tests/qemu-iotests/103
-@@ -23,7 +23,6 @@
- seq=$(basename $0)
- echo "QA output created by $seq"
- 
--here=$PWD
+@@ -27,15 +27,15 @@ echo "QA output created by $seq"
+ here=$PWD
  status=1	# failure is the default!
  
- # get standard environment, filters and checks
-diff --git a/tests/qemu-iotests/104 b/tests/qemu-iotests/104
-index 5818b449da..f0a09daf46 100755
---- a/tests/qemu-iotests/104
-+++ b/tests/qemu-iotests/104
-@@ -23,7 +23,6 @@
- seq=`basename $0`
- echo "QA output created by $seq"
++# get standard environment, filters and checks
++. ./common.rc
++
+ _cleanup()
+ {
+ 	_cleanup_test_img
+ }
+ trap "_cleanup; exit \$status" 0 1 2 3 15
  
--here=`pwd`
- status=1	# failure is the default!
- 
- trap "exit \$status" 0 1 2 3 15
+-# get standard environment, filters and checks
+-. ./common.rc
+-
+ _supported_fmt qcow2
+ _supported_proto file nfs
+ _supported_os Linux
 diff --git a/tests/qemu-iotests/105 b/tests/qemu-iotests/105
-index e975f2930e..ef9ad60acf 100755
+index 6436a275da..0f1c73eacd 100755
 --- a/tests/qemu-iotests/105
 +++ b/tests/qemu-iotests/105
-@@ -23,7 +23,6 @@
- seq=`basename $0`
- echo "QA output created by $seq"
- 
--here=`pwd`
+@@ -27,15 +27,15 @@ echo "QA output created by $seq"
+ here=`pwd`
  status=1	# failure is the default!
  
- # get standard environment, filters and checks
++# get standard environment, filters and checks
++. ./common.rc
++
+ _cleanup()
+ {
+ 	_cleanup_test_img
+ }
+ trap "_cleanup; exit \$status" 0 1 2 3 15
+ 
+-# get standard environment, filters and checks
+-. ./common.rc
+-
+ _supported_fmt qcow2 vmdk vhdx qed
+ _supported_proto generic
+ _supported_os Linux
 diff --git a/tests/qemu-iotests/106 b/tests/qemu-iotests/106
-index ee81af19da..9aef55962a 100755
+index 0a7b803e12..4adf5b8e74 100755
 --- a/tests/qemu-iotests/106
 +++ b/tests/qemu-iotests/106
-@@ -23,7 +23,6 @@
- seq=$(basename $0)
- echo "QA output created by $seq"
- 
--here=$PWD
+@@ -27,15 +27,15 @@ echo "QA output created by $seq"
+ here=$PWD
  status=1	# failure is the default!
  
- # get standard environment and filters
++# get standard environment and filters
++. ./common.rc
++
+ _cleanup()
+ {
+ 	_cleanup_test_img
+ }
+ trap "_cleanup; exit \$status" 0 1 2 3 15
+ 
+-# get standard environment and filters
+-. ./common.rc
+-
+ _supported_fmt raw
+ _supported_proto file
+ _supported_os Linux
 diff --git a/tests/qemu-iotests/107 b/tests/qemu-iotests/107
-index 87e2a22cec..baddfa9d3d 100755
+index f111c3c6fc..92c5854a80 100755
 --- a/tests/qemu-iotests/107
 +++ b/tests/qemu-iotests/107
-@@ -23,7 +23,6 @@
- seq="$(basename $0)"
- echo "QA output created by $seq"
- 
--here="$PWD"
+@@ -27,15 +27,15 @@ echo "QA output created by $seq"
+ here="$PWD"
  status=1	# failure is the default!
  
- # get standard environment, filters and checks
++# get standard environment, filters and checks
++. ./common.rc
++
+ _cleanup()
+ {
+ 	_cleanup_test_img
+ }
+ trap "_cleanup; exit \$status" 0 1 2 3 15
+ 
+-# get standard environment, filters and checks
+-. ./common.rc
+-
+ _supported_fmt qcow2
+ _supported_proto file nfs
+ _supported_os Linux
 diff --git a/tests/qemu-iotests/108 b/tests/qemu-iotests/108
-index 31ea282f20..c5bad010c1 100755
+index 95bb252fd2..d44fc8ae17 100755
 --- a/tests/qemu-iotests/108
 +++ b/tests/qemu-iotests/108
-@@ -24,7 +24,6 @@
- seq="$(basename $0)"
- echo "QA output created by $seq"
- 
--here="$PWD"
+@@ -28,15 +28,15 @@ echo "QA output created by $seq"
+ here="$PWD"
  status=1	# failure is the default!
  
- # get standard environment, filters and checks
++# get standard environment, filters and checks
++. ./common.rc
++
+ _cleanup()
+ {
+ 	_cleanup_test_img
+ }
+ trap "_cleanup; exit \$status" 0 1 2 3 15
+ 
+-# get standard environment, filters and checks
+-. ./common.rc
+-
+ # This tests qocw2-specific low-level functionality
+ _supported_fmt qcow2
+ _supported_proto file
 diff --git a/tests/qemu-iotests/109 b/tests/qemu-iotests/109
-index e011ad86c3..b96be288c0 100755
+index d9b1a344df..6bf5deb664 100755
 --- a/tests/qemu-iotests/109
 +++ b/tests/qemu-iotests/109
-@@ -23,7 +23,6 @@
- seq="$(basename $0)"
- echo "QA output created by $seq"
- 
--here="$PWD"
+@@ -27,6 +27,10 @@ echo "QA output created by $seq"
+ here="$PWD"
  status=1	# failure is the default!
  
- # get standard environment, filters and checks
++# get standard environment, filters and checks
++. ./common.rc
++. ./common.qemu
++
+ _cleanup()
+ {
+     _cleanup_qemu
+@@ -35,10 +39,6 @@ _cleanup()
+ }
+ trap "_cleanup; exit \$status" 0 1 2 3 15
+ 
+-# get standard environment, filters and checks
+-. ./common.rc
+-. ./common.qemu
+-
+ _supported_fmt raw
+ _supported_proto file
+ _supported_os Linux
 diff --git a/tests/qemu-iotests/110 b/tests/qemu-iotests/110
-index e596efddb5..211b7a40eb 100755
+index 4de36a4d6d..ea8eecb3e7 100755
 --- a/tests/qemu-iotests/110
 +++ b/tests/qemu-iotests/110
-@@ -23,7 +23,6 @@
- seq="$(basename $0)"
- echo "QA output created by $seq"
- 
--here="$PWD"
+@@ -27,15 +27,15 @@ echo "QA output created by $seq"
+ here="$PWD"
  status=1	# failure is the default!
  
- # get standard environment, filters and checks
++# get standard environment, filters and checks
++. ./common.rc
++
+ _cleanup()
+ {
+ 	_cleanup_test_img
+ }
+ trap "_cleanup; exit \$status" 0 1 2 3 15
+ 
+-# get standard environment, filters and checks
+-. ./common.rc
+-
+ # Any format supporting backing files
+ _supported_fmt qed qcow qcow2 vmdk
+ _supported_proto file
 diff --git a/tests/qemu-iotests/111 b/tests/qemu-iotests/111
-index 37223d93d7..2da9ba57cf 100755
+index d41dacd948..73396468d4 100755
 --- a/tests/qemu-iotests/111
 +++ b/tests/qemu-iotests/111
-@@ -24,7 +24,6 @@
- seq="$(basename $0)"
- echo "QA output created by $seq"
- 
--here="$PWD"
+@@ -28,15 +28,15 @@ echo "QA output created by $seq"
+ here="$PWD"
  status=1	# failure is the default!
  
- # get standard environment, filters and checks
++# get standard environment, filters and checks
++. ./common.rc
++
+ _cleanup()
+ {
+ 	_cleanup_test_img
+ }
+ trap "_cleanup; exit \$status" 0 1 2 3 15
+ 
+-# get standard environment, filters and checks
+-. ./common.rc
+-
+ _supported_fmt qed qcow qcow2 vmdk
+ _supported_proto file
+ _supported_os Linux
 diff --git a/tests/qemu-iotests/112 b/tests/qemu-iotests/112
-index 221892fbd1..72e35b3803 100755
+index f8a6a1b888..ac5745a559 100755
 --- a/tests/qemu-iotests/112
 +++ b/tests/qemu-iotests/112
-@@ -23,7 +23,6 @@
- seq="$(basename $0)"
- echo "QA output created by $seq"
- 
--here="$PWD"
+@@ -27,15 +27,15 @@ echo "QA output created by $seq"
+ here="$PWD"
  status=1	# failure is the default!
  
- # get standard environment, filters and checks
++# get standard environment, filters and checks
++. ./common.rc
++
+ _cleanup()
+ {
+ 	_cleanup_test_img
+ }
+ trap "_cleanup; exit \$status" 0 1 2 3 15
+ 
+-# get standard environment, filters and checks
+-. ./common.rc
+-
+ # This tests qcow2-specific low-level functionality
+ _supported_fmt qcow2
+ _supported_proto file
 diff --git a/tests/qemu-iotests/113 b/tests/qemu-iotests/113
-index 9d48020b94..2567ba4596 100755
+index c4a176fcf1..69c2dab1bc 100755
 --- a/tests/qemu-iotests/113
 +++ b/tests/qemu-iotests/113
-@@ -24,7 +24,6 @@
- seq="$(basename $0)"
- echo "QA output created by $seq"
- 
--here="$PWD"
+@@ -28,15 +28,15 @@ echo "QA output created by $seq"
+ here="$PWD"
  status=1	# failure is the default!
  
- # get standard environment, filters and checks
++# get standard environment, filters and checks
++. ./common.rc
++
+ _cleanup()
+ {
+ 	_cleanup_test_img
+ }
+ trap "_cleanup; exit \$status" 0 1 2 3 15
+ 
+-# get standard environment, filters and checks
+-. ./common.rc
+-
+ # We can only test one format here because we need its sample file
+ _supported_fmt bochs
+ _supported_proto nbd
 diff --git a/tests/qemu-iotests/114 b/tests/qemu-iotests/114
-index 44ef79a87f..a1cb2ec2c8 100755
+index c9fd36ec54..a35f2baa61 100755
 --- a/tests/qemu-iotests/114
 +++ b/tests/qemu-iotests/114
-@@ -23,7 +23,6 @@
- seq="$(basename $0)"
- echo "QA output created by $seq"
- 
--here="$PWD"
+@@ -27,15 +27,15 @@ echo "QA output created by $seq"
+ here="$PWD"
  status=1	# failure is the default!
  
- # get standard environment, filters and checks
++# get standard environment, filters and checks
++. ./common.rc
++
+ _cleanup()
+ {
+ 	_cleanup_test_img
+ }
+ trap "_cleanup; exit \$status" 0 1 2 3 15
+ 
+-# get standard environment, filters and checks
+-. ./common.rc
+-
+ _supported_fmt qcow2
+ _supported_proto generic
+ _unsupported_proto vxhs
 diff --git a/tests/qemu-iotests/115 b/tests/qemu-iotests/115
-index f2ec8fbd44..54c657a424 100755
+index 26f550c661..cdd095bde2 100755
 --- a/tests/qemu-iotests/115
 +++ b/tests/qemu-iotests/115
-@@ -23,7 +23,6 @@
- seq="$(basename $0)"
- echo "QA output created by $seq"
- 
--here="$PWD"
+@@ -27,15 +27,15 @@ echo "QA output created by $seq"
+ here="$PWD"
  status=1	# failure is the default!
  
- # get standard environment, filters and checks
++# get standard environment, filters and checks
++. ./common.rc
++
+ _cleanup()
+ {
+ 	_cleanup_test_img
+ }
+ trap "_cleanup; exit \$status" 0 1 2 3 15
+ 
+-# get standard environment, filters and checks
+-. ./common.rc
+-
+ _supported_fmt qcow2
+ _supported_proto file
+ _supported_os Linux
 diff --git a/tests/qemu-iotests/116 b/tests/qemu-iotests/116
-index 715a44200f..8d13d2443e 100755
+index 1995906cc8..b5e962130b 100755
 --- a/tests/qemu-iotests/116
 +++ b/tests/qemu-iotests/116
-@@ -26,7 +26,6 @@
- seq=`basename $0`
- echo "QA output created by $seq"
- 
--here=`pwd`
+@@ -30,15 +30,15 @@ echo "QA output created by $seq"
+ here=`pwd`
  status=1	# failure is the default!
  
- # get standard environment, filters and checks
++# get standard environment, filters and checks
++. ./common.rc
++
+ _cleanup()
+ {
+ 	_cleanup_test_img
+ }
+ trap "_cleanup; exit \$status" 0 1 2 3 15
+ 
+-# get standard environment, filters and checks
+-. ./common.rc
+-
+ _supported_fmt qed
+ _supported_proto generic
+ _supported_os Linux
 diff --git a/tests/qemu-iotests/117 b/tests/qemu-iotests/117
-index 07aca0eba1..c725b1d710 100755
+index 205e8842a0..147d19053b 100755
 --- a/tests/qemu-iotests/117
 +++ b/tests/qemu-iotests/117
-@@ -23,7 +23,6 @@
- seq="$(basename $0)"
- echo "QA output created by $seq"
- 
--here="$PWD"
+@@ -27,17 +27,17 @@ echo "QA output created by $seq"
+ here="$PWD"
  status=1	# failure is the default!
  
- # get standard environment, filters and checks
++# get standard environment, filters and checks
++. ./common.rc
++. ./common.qemu
++
+ _cleanup()
+ {
+     _cleanup_qemu
+-	_cleanup_test_img
++    _cleanup_test_img
+ }
+ trap "_cleanup; exit \$status" 0 1 2 3 15
+ 
+-# get standard environment, filters and checks
+-. ./common.rc
+-. ./common.qemu
+-
+ _supported_fmt qcow2
+ _supported_proto file
+ _supported_os Linux
 diff --git a/tests/qemu-iotests/119 b/tests/qemu-iotests/119
-index dbc7350458..3a0120872c 100755
+index bdbdfe0f33..d2342ff0bd 100755
 --- a/tests/qemu-iotests/119
 +++ b/tests/qemu-iotests/119
-@@ -24,7 +24,6 @@
- seq="$(basename $0)"
- echo "QA output created by $seq"
- 
--here="$PWD"
+@@ -28,15 +28,15 @@ echo "QA output created by $seq"
+ here="$PWD"
  status=1	# failure is the default!
  
- # get standard environment, filters and checks
++# get standard environment, filters and checks
++. ./common.rc
++
+ _cleanup()
+ {
+ 	_cleanup_test_img
+ }
+ trap "_cleanup; exit \$status" 0 1 2 3 15
+ 
+-# get standard environment, filters and checks
+-. ./common.rc
+-
+ _supported_fmt raw
+ _supported_proto nbd
+ _supported_os Linux
 diff --git a/tests/qemu-iotests/120 b/tests/qemu-iotests/120
-index 3816260951..70efb29a2c 100755
+index 5227278899..83bc551d16 100755
 --- a/tests/qemu-iotests/120
 +++ b/tests/qemu-iotests/120
-@@ -24,7 +24,6 @@
- seq="$(basename $0)"
- echo "QA output created by $seq"
- 
--here="$PWD"
+@@ -28,15 +28,15 @@ echo "QA output created by $seq"
+ here="$PWD"
  status=1	# failure is the default!
  
- # get standard environment, filters and checks
++# get standard environment, filters and checks
++. ./common.rc
++
+ _cleanup()
+ {
+ 	_cleanup_test_img
+ }
+ trap "_cleanup; exit \$status" 0 1 2 3 15
+ 
+-# get standard environment, filters and checks
+-. ./common.rc
+-
+ _supported_fmt generic
+ _supported_proto file
+ _supported_os Linux
 diff --git a/tests/qemu-iotests/121 b/tests/qemu-iotests/121
-index 04b38c9de8..103c5170ca 100755
+index 1b50dc858c..6c69c2beee 100755
 --- a/tests/qemu-iotests/121
 +++ b/tests/qemu-iotests/121
-@@ -23,7 +23,6 @@
- seq="$(basename $0)"
- echo "QA output created by $seq"
- 
--here="$PWD"
+@@ -27,15 +27,15 @@ echo "QA output created by $seq"
+ here="$PWD"
  status=1	# failure is the default!
  
- # get standard environment, filters and checks
++# get standard environment, filters and checks
++. ./common.rc
++
+ _cleanup()
+ {
+ 	_cleanup_test_img
+ }
+ trap "_cleanup; exit \$status" 0 1 2 3 15
+ 
+-# get standard environment, filters and checks
+-. ./common.rc
+-
+ _supported_fmt qcow2
+ _supported_proto file
+ _supported_os Linux
 diff --git a/tests/qemu-iotests/122 b/tests/qemu-iotests/122
-index ea4ba0f098..27f5cc0977 100755
+index b583d44952..10104ea49a 100755
 --- a/tests/qemu-iotests/122
 +++ b/tests/qemu-iotests/122
-@@ -23,7 +23,6 @@
- seq="$(basename $0)"
- echo "QA output created by $seq"
- 
--here="$PWD"
+@@ -27,6 +27,9 @@ echo "QA output created by $seq"
+ here="$PWD"
  status=1	# failure is the default!
  
- # get standard environment, filters and checks
++# get standard environment, filters and checks
++. ./common.rc
++
+ _cleanup()
+ {
+     rm -f "$TEST_IMG".[123]
+@@ -34,9 +37,6 @@ _cleanup()
+ }
+ trap "_cleanup; exit \$status" 0 1 2 3 15
+ 
+-# get standard environment, filters and checks
+-. ./common.rc
+-
+ _supported_fmt qcow2
+ _supported_proto file
+ _supported_os Linux
 diff --git a/tests/qemu-iotests/123 b/tests/qemu-iotests/123
-index 6701c7ab54..1755300a12 100755
+index d2e170666e..8f68a76ee4 100755
 --- a/tests/qemu-iotests/123
 +++ b/tests/qemu-iotests/123
-@@ -23,7 +23,6 @@
- seq="$(basename $0)"
- echo "QA output created by $seq"
- 
--here="$PWD"
+@@ -27,6 +27,9 @@ echo "QA output created by $seq"
+ here="$PWD"
  status=1	# failure is the default!
  
- # get standard environment, filters and checks
++# get standard environment, filters and checks
++. ./common.rc
++
+ _cleanup()
+ {
+     _cleanup_test_img
+@@ -34,9 +37,6 @@ _cleanup()
+ }
+ trap "_cleanup; exit \$status" 0 1 2 3 15
+ 
+-# get standard environment, filters and checks
+-. ./common.rc
+-
+ _supported_fmt raw
+ _supported_proto nbd
+ _supported_os Linux
 diff --git a/tests/qemu-iotests/125 b/tests/qemu-iotests/125
-index 6a0504ba0a..45b0b109e0 100755
+index 03ff104639..62a6d7fb1f 100755
 --- a/tests/qemu-iotests/125
 +++ b/tests/qemu-iotests/125
-@@ -23,7 +23,6 @@
- seq=$(basename $0)
- echo "QA output created by $seq"
- 
--here=$PWD
+@@ -27,6 +27,9 @@ echo "QA output created by $seq"
+ here=$PWD
  status=1	# failure is the default!
  
- # get standard environment and filters
-diff --git a/tests/qemu-iotests/126 b/tests/qemu-iotests/126
-index 882ace0191..497a8f1d8f 100755
---- a/tests/qemu-iotests/126
-+++ b/tests/qemu-iotests/126
-@@ -24,7 +24,6 @@
- seq="$(basename $0)"
- echo "QA output created by $seq"
++# get standard environment and filters
++. ./common.rc
++
+ _cleanup()
+ {
+ 	_cleanup_test_img
+@@ -39,9 +42,6 @@ get_image_size_on_host()
+         | sed -e 's/^[^0-9]*\([0-9]\+\).*$/\1/'
+ }
  
--here="$PWD"
- status=1	# failure is the default!
- 
- # get standard environment, filters and checks
+-# get standard environment and filters
+-. ./common.rc
+-
+ _supported_fmt qcow2
+ _supported_proto file
+ _supported_os Linux
 diff --git a/tests/qemu-iotests/127 b/tests/qemu-iotests/127
-index e84f0d80f6..d9366d37b1 100755
+index ea2679e969..34e1eddc57 100755
 --- a/tests/qemu-iotests/127
 +++ b/tests/qemu-iotests/127
-@@ -23,7 +23,6 @@
- seq=$(basename $0)
- echo "QA output created by $seq"
- 
--here=$PWD
+@@ -27,6 +27,10 @@ echo "QA output created by $seq"
+ here=$PWD
  status=1    # failure is the default!
  
- # get standard environment, filters and qemu instance handling
-diff --git a/tests/qemu-iotests/128 b/tests/qemu-iotests/128
-index 51009f18f6..9529df3dfd 100755
---- a/tests/qemu-iotests/128
-+++ b/tests/qemu-iotests/128
-@@ -23,7 +23,6 @@
- seq=`basename $0`
- echo "QA output created by $seq"
++# get standard environment, filters and qemu instance handling
++. ./common.rc
++. ./common.qemu
++
+ _cleanup()
+ {
+     _cleanup_qemu
+@@ -36,10 +40,6 @@ _cleanup()
+ }
+ trap "_cleanup; exit \$status" 0 1 2 3 15
  
--here=`pwd`
- status=1	# failure is the default!
- 
- devname="eiodev$$"
+-# get standard environment, filters and qemu instance handling
+-. ./common.rc
+-. ./common.qemu
+-
+ _supported_fmt qcow2
+ _supported_proto file
+ _supported_os Linux
 diff --git a/tests/qemu-iotests/130 b/tests/qemu-iotests/130
-index ed234c3b6d..f507a7ed7f 100755
+index c0f5782003..4906019543 100755
 --- a/tests/qemu-iotests/130
 +++ b/tests/qemu-iotests/130
-@@ -25,7 +25,6 @@
- seq="$(basename $0)"
- echo "QA output created by $seq"
- 
--here="$PWD"
+@@ -29,6 +29,10 @@ echo "QA output created by $seq"
+ here="$PWD"
  status=1	# failure is the default!
  
- # get standard environment, filters and checks
++# get standard environment, filters and checks
++. ./common.rc
++. ./common.qemu
++
+ _cleanup()
+ {
+     _cleanup_qemu
+@@ -36,10 +40,6 @@ _cleanup()
+ }
+ trap "_cleanup; exit \$status" 0 1 2 3 15
+ 
+-# get standard environment, filters and checks
+-. ./common.rc
+-. ./common.qemu
+-
+ _supported_fmt qcow2
+ _supported_proto generic
+ _unsupported_proto vxhs
 diff --git a/tests/qemu-iotests/131 b/tests/qemu-iotests/131
-index 9c12d6c7f9..c809d3f8aa 100755
+index 142b908981..fb771fed95 100755
 --- a/tests/qemu-iotests/131
 +++ b/tests/qemu-iotests/131
-@@ -23,7 +23,6 @@
- seq=`basename $0`
- echo "QA output created by $seq"
- 
--here=`pwd`
+@@ -27,15 +27,15 @@ echo "QA output created by $seq"
+ here=`pwd`
  status=1	# failure is the default!
  
- # get standard environment, filters and checks
++# get standard environment, filters and checks
++. ./common.rc
++
+ _cleanup()
+ {
+     _cleanup_test_img
+ }
+ trap "_cleanup; exit \$status" 0 1 2 3 15
+ 
+-# get standard environment, filters and checks
+-. ./common.rc
+-
+ _supported_fmt parallels
+ _supported_proto file
+ _supported_os Linux
 diff --git a/tests/qemu-iotests/133 b/tests/qemu-iotests/133
-index 61adc4374b..0f1dd4e5b3 100755
+index 467c31e58d..1daf5895c1 100755
 --- a/tests/qemu-iotests/133
 +++ b/tests/qemu-iotests/133
-@@ -23,7 +23,6 @@
- seq=`basename $0`
- echo "QA output created by $seq"
- 
--here=`pwd`
+@@ -27,15 +27,15 @@ echo "QA output created by $seq"
+ here=`pwd`
  status=1	# failure is the default!
  
- # get standard environment, filters and checks
++# get standard environment, filters and checks
++. ./common.rc
++
+ _cleanup()
+ {
+     _cleanup_test_img
+ }
+ trap "_cleanup; exit \$status" 0 1 2 3 15
+ 
+-# get standard environment, filters and checks
+-. ./common.rc
+-
+ _supported_fmt qcow2
+ _supported_proto file
+ _supported_os Linux
 diff --git a/tests/qemu-iotests/134 b/tests/qemu-iotests/134
-index c1c45c66d6..57c5fdbab1 100755
+index 99144151b8..5d476e1b16 100755
 --- a/tests/qemu-iotests/134
 +++ b/tests/qemu-iotests/134
-@@ -23,7 +23,6 @@
- seq=`basename $0`
- echo "QA output created by $seq"
- 
--here=`pwd`
+@@ -27,16 +27,16 @@ echo "QA output created by $seq"
+ here=`pwd`
  status=1	# failure is the default!
  
- # get standard environment, filters and checks
++# get standard environment, filters and checks
++. ./common.rc
++. ./common.filter
++
+ _cleanup()
+ {
+ 	_cleanup_test_img
+ }
+ trap "_cleanup; exit \$status" 0 1 2 3 15
+ 
+-# get standard environment, filters and checks
+-. ./common.rc
+-. ./common.filter
+-
+ _supported_fmt qcow qcow2
+ _supported_proto generic
+ _unsupported_proto vxhs
 diff --git a/tests/qemu-iotests/135 b/tests/qemu-iotests/135
-index 5c41718490..86f8aefa2a 100755
+index 5f77ad5885..676e2a2c70 100755
 --- a/tests/qemu-iotests/135
 +++ b/tests/qemu-iotests/135
-@@ -23,7 +23,6 @@
- seq=`basename $0`
- echo "QA output created by $seq"
- 
--here=`pwd`
+@@ -27,15 +27,15 @@ echo "QA output created by $seq"
+ here=`pwd`
  status=1	# failure is the default!
  
- # get standard environment, filters and checks
++# get standard environment, filters and checks
++. ./common.rc
++
+ _cleanup()
+ {
+     _cleanup_test_img
+ }
+ trap "_cleanup; exit \$status" 0 1 2 3 15
+ 
+-# get standard environment, filters and checks
+-. ./common.rc
+-
+ _supported_fmt vpc
+ _supported_proto generic
+ _supported_os Linux
 diff --git a/tests/qemu-iotests/137 b/tests/qemu-iotests/137
-index 1e6c6afcca..93f5c7ebaf 100755
+index 1e12b140ae..66ea0e9d1a 100755
 --- a/tests/qemu-iotests/137
 +++ b/tests/qemu-iotests/137
-@@ -23,7 +23,6 @@
- seq="$(basename $0)"
- echo "QA output created by $seq"
- 
--here="$PWD"
+@@ -27,16 +27,16 @@ echo "QA output created by $seq"
+ here="$PWD"
  status=1	# failure is the default!
  
- # get standard environment, filters and checks
++# get standard environment, filters and checks
++. ./common.rc
++. ./common.qemu
++
+ _cleanup()
+ {
+     _cleanup_test_img
+ }
+ trap "_cleanup; exit \$status" 0 1 2 3 15
+ 
+-# get standard environment, filters and checks
+-. ./common.rc
+-. ./common.qemu
+-
+ _supported_fmt qcow2
+ _supported_proto file
+ _supported_os Linux
 diff --git a/tests/qemu-iotests/138 b/tests/qemu-iotests/138
-index cb98fc34b9..c5a0c85e94 100755
+index 33570ad20d..5624ef11db 100755
 --- a/tests/qemu-iotests/138
 +++ b/tests/qemu-iotests/138
-@@ -23,7 +23,6 @@
- seq="$(basename $0)"
- echo "QA output created by $seq"
- 
--here="$PWD"
+@@ -27,15 +27,15 @@ echo "QA output created by $seq"
+ here="$PWD"
  status=1	# failure is the default!
  
- # get standard environment, filters and checks
++# get standard environment, filters and checks
++. ./common.rc
++
+ _cleanup()
+ {
+ 	_cleanup_test_img
+ }
+ trap "_cleanup; exit \$status" 0 1 2 3 15
+ 
+-# get standard environment, filters and checks
+-. ./common.rc
+-
+ # This tests qocw2-specific low-level functionality
+ _supported_fmt qcow2
+ _supported_proto file
 diff --git a/tests/qemu-iotests/140 b/tests/qemu-iotests/140
-index 63390fd896..55969e80f9 100755
+index 32af253b41..a0d255ee5f 100755
 --- a/tests/qemu-iotests/140
 +++ b/tests/qemu-iotests/140
-@@ -27,7 +27,6 @@
- seq="$(basename $0)"
- echo "QA output created by $seq"
- 
--here="$PWD"
+@@ -31,6 +31,10 @@ echo "QA output created by $seq"
+ here="$PWD"
  status=1	# failure is the default!
  
- # get standard environment, filters and checks
++# get standard environment, filters and checks
++. ./common.rc
++. ./common.qemu
++
+ _cleanup()
+ {
+     _cleanup_qemu
+@@ -39,10 +43,6 @@ _cleanup()
+ }
+ trap "_cleanup; exit \$status" 0 1 2 3 15
+ 
+-# get standard environment, filters and checks
+-. ./common.rc
+-. ./common.qemu
+-
+ _supported_fmt generic
+ _supported_proto file
+ _supported_os Linux
 diff --git a/tests/qemu-iotests/141 b/tests/qemu-iotests/141
-index 996bf16963..db79f457a7 100755
+index f9914a91da..0bee4f8cde 100755
 --- a/tests/qemu-iotests/141
 +++ b/tests/qemu-iotests/141
-@@ -23,7 +23,6 @@
- seq="$(basename $0)"
- echo "QA output created by $seq"
- 
--here="$PWD"
+@@ -27,6 +27,10 @@ echo "QA output created by $seq"
+ here="$PWD"
  status=1	# failure is the default!
  
- # get standard environment, filters and checks
++# get standard environment, filters and checks
++. ./common.rc
++. ./common.qemu
++
+ _cleanup()
+ {
+     _cleanup_qemu
+@@ -35,10 +39,6 @@ _cleanup()
+ }
+ trap "_cleanup; exit \$status" 0 1 2 3 15
+ 
+-# get standard environment, filters and checks
+-. ./common.rc
+-. ./common.qemu
+-
+ # Needs backing file and backing format support
+ _supported_fmt qcow2 qed
+ _supported_proto file
 diff --git a/tests/qemu-iotests/142 b/tests/qemu-iotests/142
-index 6cb73bc6fa..93fd649a14 100755
+index 030269b951..dca66f8675 100755
 --- a/tests/qemu-iotests/142
 +++ b/tests/qemu-iotests/142
-@@ -23,7 +23,6 @@
- seq=`basename $0`
- echo "QA output created by $seq"
- 
--here=`pwd`
+@@ -27,6 +27,9 @@ echo "QA output created by $seq"
+ here=`pwd`
  status=1	# failure is the default!
  
- # get standard environment, filters and checks
++# get standard environment, filters and checks
++. ./common.rc
++
+ _cleanup()
+ {
+     _cleanup_test_img
+@@ -34,9 +37,6 @@ _cleanup()
+ }
+ trap "_cleanup; exit \$status" 0 1 2 3 15
+ 
+-# get standard environment, filters and checks
+-. ./common.rc
+-
+ _supported_fmt qcow2
+ _supported_proto file
+ _supported_os Linux
 diff --git a/tests/qemu-iotests/143 b/tests/qemu-iotests/143
-index 1ae5296607..727c703182 100755
+index 2e4acfa580..2a8a1f044f 100755
 --- a/tests/qemu-iotests/143
 +++ b/tests/qemu-iotests/143
-@@ -23,7 +23,6 @@
- seq="$(basename $0)"
- echo "QA output created by $seq"
- 
--here="$PWD"
+@@ -27,6 +27,10 @@ echo "QA output created by $seq"
+ here="$PWD"
  status=1	# failure is the default!
  
- # get standard environment, filters and checks
++# get standard environment, filters and checks
++. ./common.rc
++. ./common.qemu
++
+ _cleanup()
+ {
+     _cleanup_qemu
+@@ -34,10 +38,6 @@ _cleanup()
+ }
+ trap "_cleanup; exit \$status" 0 1 2 3 15
+ 
+-# get standard environment, filters and checks
+-. ./common.rc
+-. ./common.qemu
+-
+ _supported_fmt generic
+ _supported_proto generic
+ _supported_os Linux
 diff --git a/tests/qemu-iotests/144 b/tests/qemu-iotests/144
-index d6015ce0eb..fc3e044012 100755
+index 5879fd86a1..c12441a632 100755
 --- a/tests/qemu-iotests/144
 +++ b/tests/qemu-iotests/144
-@@ -25,7 +25,6 @@
- seq=`basename $0`
- echo "QA output created by $seq"
- 
--here=`pwd`
- status=1	# failure is the default!
- 
+@@ -32,6 +32,10 @@ status=1	# failure is the default!
  TMP_SNAP1=${TEST_DIR}/tmp.qcow2
+ TMP_SNAP2=${TEST_DIR}/tmp2.qcow2
+ 
++# get standard environment, filters and checks
++. ./common.rc
++. ./common.qemu
++
+ _cleanup()
+ {
+     _cleanup_qemu
+@@ -40,10 +44,6 @@ _cleanup()
+ 
+ trap "_cleanup; exit \$status" 0 1 2 3 15
+ 
+-# get standard environment, filters and checks
+-. ./common.rc
+-. ./common.qemu
+-
+ _supported_fmt qcow2
+ _supported_proto file
+ _supported_os Linux
 diff --git a/tests/qemu-iotests/145 b/tests/qemu-iotests/145
-index c81bbb8a20..3806f0e6be 100755
+index 6e6181c858..cd02edd3a8 100755
 --- a/tests/qemu-iotests/145
 +++ b/tests/qemu-iotests/145
-@@ -23,7 +23,6 @@
- seq=`basename $0`
- echo "QA output created by $seq"
- 
--here=`pwd`
+@@ -27,6 +27,9 @@ echo "QA output created by $seq"
+ here=`pwd`
  status=1	# failure is the default!
  
- # get standard environment, filters and checks
++# get standard environment, filters and checks
++. ./common.rc
++
+ _cleanup()
+ {
+ 	_cleanup_test_img
+@@ -34,9 +37,6 @@ _cleanup()
+ }
+ trap "_cleanup; exit \$status" 0 1 2 3 15
+ 
+-# get standard environment, filters and checks
+-. ./common.rc
+-
+ _supported_fmt generic
+ _supported_proto generic
+ _supported_os Linux
 diff --git a/tests/qemu-iotests/146 b/tests/qemu-iotests/146
-index 238658d642..5276a31cc3 100755
+index bdc875d143..30fe5e07bc 100755
 --- a/tests/qemu-iotests/146
 +++ b/tests/qemu-iotests/146
-@@ -23,7 +23,6 @@
- seq=`basename $0`
- echo "QA output created by $seq"
- 
--here=`pwd`
+@@ -27,6 +27,10 @@ echo "QA output created by $seq"
+ here=`pwd`
  status=1    # failure is the default!
  
- # get standard environment, filters and checks
++# get standard environment, filters and checks
++. ./common.rc
++. ./common.qemu
++
+ _cleanup()
+ {
+     _cleanup_qemu
+@@ -34,10 +38,6 @@ _cleanup()
+ }
+ trap "_cleanup; exit \$status" 0 1 2 3 15
+ 
+-# get standard environment, filters and checks
+-. ./common.rc
+-. ./common.qemu
+-
+ _supported_fmt vpc
+ _supported_proto file
+ _supported_os Linux
 diff --git a/tests/qemu-iotests/150 b/tests/qemu-iotests/150
-index 6c5d54228b..65c32cf73b 100755
+index 182cf41597..6e77566d78 100755
 --- a/tests/qemu-iotests/150
 +++ b/tests/qemu-iotests/150
-@@ -23,7 +23,6 @@
- seq="$(basename $0)"
- echo "QA output created by $seq"
- 
--here="$PWD"
+@@ -27,15 +27,15 @@ echo "QA output created by $seq"
+ here="$PWD"
  status=1	# failure is the default!
  
- # get standard environment, filters and checks
++# get standard environment, filters and checks
++. ./common.rc
++
+ _cleanup()
+ {
+     _cleanup_test_img
+ }
+ trap "_cleanup; exit \$status" 0 1 2 3 15
+ 
+-# get standard environment, filters and checks
+-. ./common.rc
+-
+ _supported_fmt raw qcow2
+ _supported_proto file
+ _supported_os Linux
 diff --git a/tests/qemu-iotests/153 b/tests/qemu-iotests/153
-index 54f3ad8c79..2a7bdad8c5 100755
+index 6d93726108..6947b017f0 100755
 --- a/tests/qemu-iotests/153
 +++ b/tests/qemu-iotests/153
-@@ -23,7 +23,6 @@
- seq="$(basename $0)"
- echo "QA output created by $seq"
- 
--here="$PWD"
+@@ -28,6 +28,10 @@ here="$PWD"
  tmp=/tmp/$$
  status=1	# failure is the default!
  
++# get standard environment, filters and checks
++. ./common.rc
++. ./common.qemu
++
+ _cleanup()
+ {
+     _cleanup_test_img
+@@ -40,10 +44,6 @@ _cleanup()
+ }
+ trap "_cleanup; exit \$status" 0 1 2 3 15
+ 
+-# get standard environment, filters and checks
+-. ./common.rc
+-. ./common.qemu
+-
+ size=32M
+ 
+ _check_ofd()
 diff --git a/tests/qemu-iotests/154 b/tests/qemu-iotests/154
-index 7b56d60339..b536c49887 100755
+index 2dcbed329d..d8f07422ca 100755
 --- a/tests/qemu-iotests/154
 +++ b/tests/qemu-iotests/154
-@@ -23,7 +23,6 @@
- seq=`basename $0`
- echo "QA output created by $seq"
- 
--here=`pwd`
+@@ -27,15 +27,15 @@ echo "QA output created by $seq"
+ here=`pwd`
  status=1	# failure is the default!
  
- # get standard environment, filters and checks
++# get standard environment, filters and checks
++. ./common.rc
++
+ _cleanup()
+ {
+ 	_cleanup_test_img
+ }
+ trap "_cleanup; exit \$status" 0 1 2 3 15
+ 
+-# get standard environment, filters and checks
+-. ./common.rc
+-
+ _supported_fmt qcow2
+ _supported_proto file
+ _supported_os Linux
 diff --git a/tests/qemu-iotests/156 b/tests/qemu-iotests/156
-index 618060180c..1fc4eab021 100755
+index 02c52c7ec6..907d5f4e42 100755
 --- a/tests/qemu-iotests/156
 +++ b/tests/qemu-iotests/156
-@@ -31,7 +31,6 @@
- seq="$(basename $0)"
- echo "QA output created by $seq"
- 
--here="$PWD"
+@@ -35,6 +35,10 @@ echo "QA output created by $seq"
+ here="$PWD"
  status=1	# failure is the default!
  
- # get standard environment, filters and checks
++# get standard environment, filters and checks
++. ./common.rc
++. ./common.qemu
++
+ _cleanup()
+ {
+     _cleanup_qemu
+@@ -42,10 +46,6 @@ _cleanup()
+ }
+ trap "_cleanup; exit \$status" 0 1 2 3 15
+ 
+-# get standard environment, filters and checks
+-. ./common.rc
+-. ./common.qemu
+-
+ _supported_fmt qcow2 qed
+ _supported_proto generic
+ _unsupported_proto vxhs
 diff --git a/tests/qemu-iotests/157 b/tests/qemu-iotests/157
-index c44edd65e7..cdc96e9746 100755
+index 1f273856fd..4f2e299008 100755
 --- a/tests/qemu-iotests/157
 +++ b/tests/qemu-iotests/157
-@@ -23,7 +23,6 @@
- seq="$(basename $0)"
- echo "QA output created by $seq"
- 
--here="$PWD"
+@@ -27,15 +27,15 @@ echo "QA output created by $seq"
+ here="$PWD"
  status=1	# failure is the default!
  
- # get standard environment, filters and checks
++# get standard environment, filters and checks
++. ./common.rc
++
+ _cleanup()
+ {
+ 	_cleanup_test_img
+ }
+ trap "_cleanup; exit \$status" 0 1 2 3 15
+ 
+-# get standard environment, filters and checks
+-. ./common.rc
+-
+ _supported_fmt generic
+ _supported_proto file
+ _supported_os Linux
 diff --git a/tests/qemu-iotests/158 b/tests/qemu-iotests/158
-index abf79f3cc2..08db8c95c0 100755
+index 22a17f92cb..51c46dd259 100755
 --- a/tests/qemu-iotests/158
 +++ b/tests/qemu-iotests/158
-@@ -23,7 +23,6 @@
- seq=`basename $0`
- echo "QA output created by $seq"
- 
--here=`pwd`
+@@ -27,15 +27,15 @@ echo "QA output created by $seq"
+ here=`pwd`
  status=1	# failure is the default!
  
- # get standard environment, filters and checks
++# get standard environment, filters and checks
++. ./common.rc
++
+ _cleanup()
+ {
+ 	_cleanup_test_img
+ }
+ trap "_cleanup; exit \$status" 0 1 2 3 15
+ 
+-# get standard environment, filters and checks
+-. ./common.rc
+-
+ _supported_fmt qcow qcow2
+ _supported_proto generic
+ _unsupported_proto vxhs
 diff --git a/tests/qemu-iotests/159 b/tests/qemu-iotests/159
-index 799ff57040..d6fb17da2e 100755
+index 250905c264..463228de96 100755
 --- a/tests/qemu-iotests/159
 +++ b/tests/qemu-iotests/159
-@@ -23,7 +23,6 @@
- seq="$(basename $0)"
- echo "QA output created by $seq"
- 
--here="$PWD"
+@@ -26,6 +26,9 @@ echo "QA output created by $seq"
+ here="$PWD"
  status=1
  
- . ./common.rc
++. ./common.rc
++. ./common.pattern
++
+ _cleanup()
+ {
+     _cleanup_test_img
+@@ -33,9 +36,6 @@ _cleanup()
+ }
+ trap "_cleanup; exit \$status" 0 1 2 3 15
+ 
+-. ./common.rc
+-. ./common.pattern
+-
+ _supported_fmt generic
+ _supported_proto file
+ _supported_os Linux
 diff --git a/tests/qemu-iotests/160 b/tests/qemu-iotests/160
-index 41ffad5774..4a16bfb0bb 100755
+index 7ec68d712e..ae6f799c9f 100755
 --- a/tests/qemu-iotests/160
 +++ b/tests/qemu-iotests/160
-@@ -23,7 +23,6 @@
- seq="$(basename $0)"
- echo "QA output created by $seq"
- 
--here="$PWD"
+@@ -26,6 +26,9 @@ echo "QA output created by $seq"
+ here="$PWD"
  status=1
  
- . ./common.rc
-diff --git a/tests/qemu-iotests/162 b/tests/qemu-iotests/162
-index c601c13525..b435024c70 100755
---- a/tests/qemu-iotests/162
-+++ b/tests/qemu-iotests/162
-@@ -24,7 +24,6 @@
- seq="$(basename $0)"
- echo "QA output created by $seq"
- 
--here="$PWD"
- status=1	# failure is the default!
- 
++. ./common.rc
++. ./common.pattern
++
  _cleanup()
+ {
+     _cleanup_test_img
+@@ -33,9 +36,6 @@ _cleanup()
+ }
+ trap "_cleanup; exit \$status" 0 1 2 3 15
+ 
+-. ./common.rc
+-. ./common.pattern
+-
+ _supported_fmt raw
+ _supported_proto file
+ _supported_os Linux
 diff --git a/tests/qemu-iotests/170 b/tests/qemu-iotests/170
-index 736c61f8e9..b76473f3b9 100755
+index 2f76d43101..9454485e52 100755
 --- a/tests/qemu-iotests/170
 +++ b/tests/qemu-iotests/170
-@@ -23,7 +23,6 @@
- seq="$(basename $0)"
- echo "QA output created by $seq"
- 
--here="$PWD"
+@@ -26,6 +26,9 @@ echo "QA output created by $seq"
+ here="$PWD"
  status=1
  
- . ./common.rc
++. ./common.rc
++. ./common.pattern
++
+ _cleanup()
+ {
+     _cleanup_test_img
+@@ -33,9 +36,6 @@ _cleanup()
+ }
+ trap "_cleanup; exit \$status" 0 1 2 3 15
+ 
+-. ./common.rc
+-. ./common.pattern
+-
+ _supported_fmt generic
+ _supported_proto file
+ _supported_os Linux
 diff --git a/tests/qemu-iotests/171 b/tests/qemu-iotests/171
-index 93b119939d..e5c83af2e6 100755
+index d703cae210..2c6d6e4995 100755
 --- a/tests/qemu-iotests/171
 +++ b/tests/qemu-iotests/171
-@@ -24,7 +24,6 @@
- seq=`basename $0`
- echo "QA output created by $seq"
- 
--here=`pwd`
+@@ -28,15 +28,15 @@ echo "QA output created by $seq"
+ here=`pwd`
  status=1	# failure is the default!
  
- # get standard environment, filters and checks
++# get standard environment, filters and checks
++. ./common.rc
++
+ _cleanup()
+ {
+     _cleanup_test_img
+ }
+ trap "_cleanup; exit \$status" 0 1 2 3 15
+ 
+-# get standard environment, filters and checks
+-. ./common.rc
+-
+ _supported_fmt raw
+ _supported_proto file
+ _supported_os Linux
 diff --git a/tests/qemu-iotests/172 b/tests/qemu-iotests/172
-index 56376f0f37..0133691f9b 100755
+index 9da3d60146..0b63d0b116 100755
 --- a/tests/qemu-iotests/172
 +++ b/tests/qemu-iotests/172
-@@ -23,7 +23,6 @@
- seq=`basename $0`
- echo "QA output created by $seq"
- 
--here=`pwd`
+@@ -27,17 +27,17 @@ echo "QA output created by $seq"
+ here=`pwd`
  status=1	# failure is the default!
  
- # get standard environment, filters and checks
++# get standard environment, filters and checks
++. ./common.rc
++
+ _cleanup()
+ {
+-	_cleanup_test_img
++    _cleanup_test_img
+     rm -f "$TEST_IMG.2"
+     rm -f "$TEST_IMG.3"
+ }
+ trap "_cleanup; exit \$status" 0 1 2 3 15
+ 
+-# get standard environment, filters and checks
+-. ./common.rc
+-
+ _supported_fmt qcow2
+ _supported_proto file
+ _supported_os Linux
 diff --git a/tests/qemu-iotests/173 b/tests/qemu-iotests/173
-index f5185a1945..8214b3b999 100755
+index ef1ed9cdd1..f08f4d93d1 100755
 --- a/tests/qemu-iotests/173
 +++ b/tests/qemu-iotests/173
-@@ -24,7 +24,6 @@
- seq=`basename $0`
- echo "QA output created by $seq"
- 
--here=`pwd`
+@@ -27,6 +27,10 @@ echo "QA output created by $seq"
+ here=`pwd`
  status=1    # failure is the default!
  
- # get standard environment, filters and checks
++# get standard environment, filters and checks
++. ./common.rc
++. ./common.qemu
++
+ _cleanup()
+ {
+     _cleanup_qemu
+@@ -35,10 +39,6 @@ _cleanup()
+ }
+ trap "_cleanup; exit \$status" 0 1 2 3 15
+ 
+-# get standard environment, filters and checks
+-. ./common.rc
+-. ./common.qemu
+-
+ _supported_fmt qcow2
+ _supported_proto nfs
+ _supported_os Linux
 diff --git a/tests/qemu-iotests/174 b/tests/qemu-iotests/174
-index b1527583c7..504efe318b 100755
+index a5a4ef65fb..46f557402f 100755
 --- a/tests/qemu-iotests/174
 +++ b/tests/qemu-iotests/174
-@@ -23,7 +23,6 @@
- seq=`basename $0`
- echo "QA output created by $seq"
- 
--here=`pwd`
+@@ -27,15 +27,15 @@ echo "QA output created by $seq"
+ here=`pwd`
  status=1	# failure is the default!
  
- # get standard environment, filters and checks
++# get standard environment, filters and checks
++. ./common.rc
++
+ _cleanup()
+ {
+ 	_cleanup_test_img
+ }
+ trap "_cleanup; exit \$status" 0 1 2 3 15
+ 
+-# get standard environment, filters and checks
+-. ./common.rc
+-
+ _unsupported_fmt raw
+ 
+ 
 diff --git a/tests/qemu-iotests/175 b/tests/qemu-iotests/175
-index b9703dd99c..298cc6465a 100755
+index 4e270ce41e..d96ac79b04 100755
 --- a/tests/qemu-iotests/175
 +++ b/tests/qemu-iotests/175
-@@ -23,7 +23,6 @@
- seq=`basename $0`
- echo "QA output created by $seq"
- 
--here=`pwd`
+@@ -27,15 +27,15 @@ echo "QA output created by $seq"
+ here=`pwd`
  status=1	# failure is the default!
  
- # get standard environment, filters and checks
++# get standard environment, filters and checks
++. ./common.rc
++
+ _cleanup()
+ {
+ 	_cleanup_test_img
+ }
+ trap "_cleanup; exit \$status" 0 1 2 3 15
+ 
+-# get standard environment, filters and checks
+-. ./common.rc
+-
+ _supported_fmt raw
+ _supported_proto file
+ _supported_os Linux
 diff --git a/tests/qemu-iotests/176 b/tests/qemu-iotests/176
-index 9f4a5db86a..273ed2c12f 100755
+index d2f53acb1d..b0f87e4bf4 100755
 --- a/tests/qemu-iotests/176
 +++ b/tests/qemu-iotests/176
-@@ -27,7 +27,6 @@
- seq="$(basename $0)"
- echo "QA output created by $seq"
- 
--here="$PWD"
+@@ -31,6 +31,10 @@ echo "QA output created by $seq"
+ here="$PWD"
  status=1	# failure is the default!
  
- # get standard environment, filters and checks
++# get standard environment, filters and checks
++. ./common.rc
++. ./common.pattern
++
+ _cleanup()
+ {
+     _cleanup_test_img
+@@ -38,10 +42,6 @@ _cleanup()
+ }
+ trap "_cleanup; exit \$status" 0 1 2 3 15
+ 
+-# get standard environment, filters and checks
+-. ./common.rc
+-. ./common.pattern
+-
+ # Any format supporting backing files and bdrv_make_empty
+ _supported_fmt qcow2
+ _supported_proto file
 diff --git a/tests/qemu-iotests/177 b/tests/qemu-iotests/177
-index 2c0c70ec6d..d3216cd5fb 100755
+index b3ef552103..3afad516da 100755
 --- a/tests/qemu-iotests/177
 +++ b/tests/qemu-iotests/177
-@@ -23,7 +23,6 @@
- seq=`basename $0`
- echo "QA output created by $seq"
- 
--here=`pwd`
+@@ -27,15 +27,15 @@ echo "QA output created by $seq"
+ here=`pwd`
  status=1	# failure is the default!
  
- # get standard environment, filters and checks
++# get standard environment, filters and checks
++. ./common.rc
++
+ _cleanup()
+ {
+ 	_cleanup_test_img
+ }
+ trap "_cleanup; exit \$status" 0 1 2 3 15
+ 
+-# get standard environment, filters and checks
+-. ./common.rc
+-
+ _supported_fmt qcow2
+ _supported_proto file
+ 
 diff --git a/tests/qemu-iotests/178 b/tests/qemu-iotests/178
-index 4eba90243d..3dbb15fd77 100755
+index b5df4f5cc2..875b4e002b 100755
 --- a/tests/qemu-iotests/178
 +++ b/tests/qemu-iotests/178
-@@ -23,7 +23,6 @@
- seq=`basename $0`
- echo "QA output created by $seq"
- 
--here=`pwd`
+@@ -27,6 +27,10 @@ echo "QA output created by $seq"
+ here=`pwd`
  status=1    # failure is the default!
  
- # get standard environment, filters and checks
++# get standard environment, filters and checks
++. ./common.rc
++. ./common.pattern
++
+ _cleanup()
+ {
+     _cleanup_test_img
+@@ -34,10 +38,6 @@ _cleanup()
+ }
+ trap "_cleanup; exit \$status" 0 1 2 3 15
+ 
+-# get standard environment, filters and checks
+-. ./common.rc
+-. ./common.pattern
+-
+ _supported_fmt raw qcow2
+ _supported_proto file
+ _supported_os Linux
 diff --git a/tests/qemu-iotests/179 b/tests/qemu-iotests/179
-index ccede3bc04..50d1c35380 100755
+index 7a68986536..45f82a1a2d 100755
 --- a/tests/qemu-iotests/179
 +++ b/tests/qemu-iotests/179
-@@ -23,7 +23,6 @@
- seq="$(basename $0)"
- echo "QA output created by $seq"
- 
--here="$PWD"
+@@ -27,16 +27,16 @@ echo "QA output created by $seq"
+ here="$PWD"
  status=1	# failure is the default!
  
- # get standard environment, filters and checks
++# get standard environment, filters and checks
++. ./common.rc
++
+ _cleanup()
+ {
+-	_cleanup_test_img
++    _cleanup_test_img
+     rm -f "$TEST_DIR/blkdebug.conf"
+ }
+ trap "_cleanup; exit \$status" 0 1 2 3 15
+ 
+-# get standard environment, filters and checks
+-. ./common.rc
+-
+ _supported_fmt qcow2
+ _supported_proto file
+ _supported_os Linux
 diff --git a/tests/qemu-iotests/181 b/tests/qemu-iotests/181
-index cd90eb98c5..e8f19ac868 100755
+index 51b597fc13..c0254623b1 100755
 --- a/tests/qemu-iotests/181
 +++ b/tests/qemu-iotests/181
-@@ -23,7 +23,6 @@
- seq=`basename $0`
- echo "QA output created by $seq"
- 
--here=`pwd`
- status=1	# failure is the default!
+@@ -29,18 +29,18 @@ status=1	# failure is the default!
  
  MIG_SOCKET="${TEST_DIR}/migrate"
+ 
++# get standard environment, filters and checks
++. ./common.rc
++. ./common.qemu
++
+ _cleanup()
+ {
+     rm -f "${MIG_SOCKET}"
+-	_cleanup_test_img
++    _cleanup_test_img
+     _cleanup_qemu
+ }
+ trap "_cleanup; exit \$status" 0 1 2 3 15
+ 
+-# get standard environment, filters and checks
+-. ./common.rc
+-. ./common.qemu
+-
+ _supported_fmt generic
+ # Formats that do not support live migration
+ _unsupported_fmt qcow vdi vhdx vmdk vpc vvfat
 diff --git a/tests/qemu-iotests/182 b/tests/qemu-iotests/182
-index f7705b36f7..17396c0816 100755
+index 7293d50bcb..4fbc1d95f9 100755
 --- a/tests/qemu-iotests/182
 +++ b/tests/qemu-iotests/182
-@@ -23,7 +23,6 @@
- seq="$(basename $0)"
- echo "QA output created by $seq"
- 
--here="$PWD"
+@@ -28,16 +28,16 @@ here="$PWD"
  tmp=/tmp/$$
  status=1	# failure is the default!
  
++# get standard environment, filters and checks
++. ./common.rc
++. ./common.qemu
++
+ _cleanup()
+ {
+     _cleanup_test_img
+ }
+ trap "_cleanup; exit \$status" 0 1 2 3 15
+ 
+-# get standard environment, filters and checks
+-. ./common.rc
+-. ./common.qemu
+-
+ _supported_fmt qcow2
+ _supported_proto file
+ _supported_os Linux
 diff --git a/tests/qemu-iotests/183 b/tests/qemu-iotests/183
-index ced0df4a76..bb7c5b7093 100755
+index ead98f3a4f..320d03e6f6 100755
 --- a/tests/qemu-iotests/183
 +++ b/tests/qemu-iotests/183
-@@ -23,7 +23,6 @@
- seq=`basename $0`
- echo "QA output created by $seq"
- 
--here=`pwd`
- status=1 # failure is the default!
+@@ -29,6 +29,10 @@ status=1 # failure is the default!
  
  MIG_SOCKET="${TEST_DIR}/migrate"
+ 
++# get standard environment, filters and checks
++. ./common.rc
++. ./common.qemu
++
+ _cleanup()
+ {
+     rm -f "${MIG_SOCKET}"
+@@ -38,10 +42,6 @@ _cleanup()
+ }
+ trap "_cleanup; exit \$status" 0 1 2 3 15
+ 
+-# get standard environment, filters and checks
+-. ./common.rc
+-. ./common.qemu
+-
+ _supported_fmt qcow2 raw qed dmg quorum
+ _supported_proto file
+ _supported_os Linux
 diff --git a/tests/qemu-iotests/184 b/tests/qemu-iotests/184
-index c5d0226a67..93f19df963 100755
+index 487e854272..e2af0660c7 100755
 --- a/tests/qemu-iotests/184
 +++ b/tests/qemu-iotests/184
-@@ -23,7 +23,6 @@
- seq=`basename $0`
- echo "QA output created by $seq"
- 
--here=`pwd`
+@@ -27,15 +27,15 @@ echo "QA output created by $seq"
+ here=`pwd`
  status=1	# failure is the default!
  
- # get standard environment, filters and checks
++# get standard environment, filters and checks
++. ./common.rc
++
+ _cleanup()
+ {
+     _cleanup_test_img
+ }
+ trap "_cleanup; exit \$status" 0 1 2 3 15
+ 
+-# get standard environment, filters and checks
+-. ./common.rc
+-
+ _supported_fmt qcow2
+ _supported_proto file
+ _supported_os Linux
 diff --git a/tests/qemu-iotests/185 b/tests/qemu-iotests/185
-index 09ebe6b659..2ebca91503 100755
+index fab1d54af0..7ba20c9eb7 100755
 --- a/tests/qemu-iotests/185
 +++ b/tests/qemu-iotests/185
-@@ -23,7 +23,6 @@
- seq=`basename $0`
- echo "QA output created by $seq"
- 
--here=`pwd`
- status=1 # failure is the default!
+@@ -29,6 +29,10 @@ status=1 # failure is the default!
  
  MIG_SOCKET="${TEST_DIR}/migrate"
+ 
++# get standard environment, filters and checks
++. ./common.rc
++. ./common.qemu
++
+ _cleanup()
+ {
+     rm -f "${TEST_IMG}.mid"
+@@ -38,10 +42,6 @@ _cleanup()
+ }
+ trap "_cleanup; exit \$status" 0 1 2 3 15
+ 
+-# get standard environment, filters and checks
+-. ./common.rc
+-. ./common.qemu
+-
+ _supported_fmt qcow2
+ _supported_proto file
+ _supported_os Linux
 diff --git a/tests/qemu-iotests/186 b/tests/qemu-iotests/186
-index a87a7f81ff..f25548b9bf 100755
+index fcf9204801..c7e28d4435 100755
 --- a/tests/qemu-iotests/186
 +++ b/tests/qemu-iotests/186
-@@ -23,7 +23,6 @@
- seq=`basename $0`
- echo "QA output created by $seq"
- 
--here=`pwd`
+@@ -27,15 +27,15 @@ echo "QA output created by $seq"
+ here=`pwd`
  status=1	# failure is the default!
  
- # get standard environment, filters and checks
++# get standard environment, filters and checks
++. ./common.rc
++
+ _cleanup()
+ {
+ 	_cleanup_test_img
+ }
+ trap "_cleanup; exit \$status" 0 1 2 3 15
+ 
+-# get standard environment, filters and checks
+-. ./common.rc
+-
+ _supported_fmt qcow2
+ _supported_proto file
+ _supported_os Linux
 diff --git a/tests/qemu-iotests/187 b/tests/qemu-iotests/187
-index 4d304f91ca..158f650f7c 100755
+index dfd1da9469..a53d2637e0 100755
 --- a/tests/qemu-iotests/187
 +++ b/tests/qemu-iotests/187
-@@ -23,7 +23,6 @@
- seq=`basename $0`
- echo "QA output created by $seq"
- 
--here=`pwd`
+@@ -27,17 +27,17 @@ echo "QA output created by $seq"
+ here=`pwd`
  status=1	# failure is the default!
  
- # get standard environment, filters and checks
++# get standard environment, filters and checks
++. ./common.rc
++
+ _cleanup()
+ {
+-	_cleanup_test_img
++    _cleanup_test_img
+     rm -f "$TEST_IMG.2"
+     rm -f "$TEST_IMG.3"
+ }
+ trap "_cleanup; exit \$status" 0 1 2 3 15
+ 
+-# get standard environment, filters and checks
+-. ./common.rc
+-
+ _supported_fmt qcow2
+ _supported_proto file
+ _supported_os Linux
 diff --git a/tests/qemu-iotests/188 b/tests/qemu-iotests/188
-index 6e945ccf38..ddcbecadc0 100755
+index 481e77dc17..ba523e0b50 100755
 --- a/tests/qemu-iotests/188
 +++ b/tests/qemu-iotests/188
-@@ -23,7 +23,6 @@
- seq=`basename $0`
- echo "QA output created by $seq"
- 
--here=`pwd`
+@@ -27,15 +27,15 @@ echo "QA output created by $seq"
+ here=`pwd`
  status=1	# failure is the default!
  
- # get standard environment, filters and checks
++# get standard environment, filters and checks
++. ./common.rc
++
+ _cleanup()
+ {
+ 	_cleanup_test_img
+ }
+ trap "_cleanup; exit \$status" 0 1 2 3 15
+ 
+-# get standard environment, filters and checks
+-. ./common.rc
+-
+ _supported_fmt qcow2
+ _supported_proto generic
+ _supported_os Linux
 diff --git a/tests/qemu-iotests/189 b/tests/qemu-iotests/189
-index 5213057b14..cefa774818 100755
+index 6ab55b618a..a2f62fc520 100755
 --- a/tests/qemu-iotests/189
 +++ b/tests/qemu-iotests/189
-@@ -23,7 +23,6 @@
- seq=`basename $0`
- echo "QA output created by $seq"
- 
--here=`pwd`
+@@ -27,15 +27,15 @@ echo "QA output created by $seq"
+ here=`pwd`
  status=1	# failure is the default!
  
- # get standard environment, filters and checks
++# get standard environment, filters and checks
++. ./common.rc
++
+ _cleanup()
+ {
+ 	_cleanup_test_img
+ }
+ trap "_cleanup; exit \$status" 0 1 2 3 15
+ 
+-# get standard environment, filters and checks
+-. ./common.rc
+-
+ _supported_fmt qcow2
+ _supported_proto generic
+ _supported_os Linux
 diff --git a/tests/qemu-iotests/190 b/tests/qemu-iotests/190
-index 577bbb70f7..4f0b6711a2 100755
+index 179949bd3b..0a848a6c94 100755
 --- a/tests/qemu-iotests/190
 +++ b/tests/qemu-iotests/190
-@@ -23,7 +23,6 @@
- seq=`basename $0`
- echo "QA output created by $seq"
- 
--here=`pwd`
+@@ -27,6 +27,10 @@ echo "QA output created by $seq"
+ here=`pwd`
  status=1    # failure is the default!
  
- # get standard environment, filters and checks
++# get standard environment, filters and checks
++. ./common.rc
++. ./common.pattern
++
+ _cleanup()
+ {
+     _cleanup_test_img
+@@ -34,10 +38,6 @@ _cleanup()
+ }
+ trap "_cleanup; exit \$status" 0 1 2 3 15
+ 
+-# get standard environment, filters and checks
+-. ./common.rc
+-. ./common.pattern
+-
+ # See 178 for more extensive tests across more formats
+ _supported_fmt qcow2
+ _supported_proto file
 diff --git a/tests/qemu-iotests/191 b/tests/qemu-iotests/191
-index 0f740f7b38..0337bedd00 100755
+index ce6284a05e..b29822c9c3 100755
 --- a/tests/qemu-iotests/191
 +++ b/tests/qemu-iotests/191
-@@ -23,7 +23,6 @@
- seq=`basename $0`
- echo "QA output created by $seq"
- 
--here=`pwd`
- status=1 # failure is the default!
+@@ -29,6 +29,10 @@ status=1 # failure is the default!
  
  MIG_SOCKET="${TEST_DIR}/migrate"
+ 
++# get standard environment, filters and checks
++. ./common.rc
++. ./common.qemu
++
+ _cleanup()
+ {
+     rm -f "${TEST_IMG}.mid"
+@@ -39,10 +43,6 @@ _cleanup()
+ }
+ trap "_cleanup; exit \$status" 0 1 2 3 15
+ 
+-# get standard environment, filters and checks
+-. ./common.rc
+-. ./common.qemu
+-
+ _supported_fmt qcow2
+ _unsupported_imgopts compat=0.10
+ _supported_proto file
 diff --git a/tests/qemu-iotests/192 b/tests/qemu-iotests/192
-index 5d0af35816..d6209c9d92 100755
+index 4d0776432a..4bf2ea2757 100755
 --- a/tests/qemu-iotests/192
 +++ b/tests/qemu-iotests/192
-@@ -24,7 +24,6 @@
- seq=`basename $0`
- echo "QA output created by $seq"
- 
--here=`pwd`
+@@ -28,16 +28,16 @@ echo "QA output created by $seq"
+ here=`pwd`
  status=1	# failure is the default!
  
- # get standard environment, filters and checks
++# get standard environment, filters and checks
++. ./common.rc
++. ./common.qemu
++
+ _cleanup()
+ {
+ 	_cleanup_test_img
+ }
+ trap "_cleanup; exit \$status" 0 1 2 3 15
+ 
+-# get standard environment, filters and checks
+-. ./common.rc
+-. ./common.qemu
+-
+ _supported_fmt generic
+ _supported_proto file
+ _supported_os Linux
 diff --git a/tests/qemu-iotests/195 b/tests/qemu-iotests/195
-index ff6b1fde9d..fe88617eed 100755
+index 810054a085..31135ac290 100755
 --- a/tests/qemu-iotests/195
 +++ b/tests/qemu-iotests/195
-@@ -23,7 +23,6 @@
- seq=`basename $0`
- echo "QA output created by $seq"
- 
--here=`pwd`
+@@ -27,6 +27,9 @@ echo "QA output created by $seq"
+ here=`pwd`
  status=1 # failure is the default!
  
- # get standard environment, filters and checks
-diff --git a/tests/qemu-iotests/197 b/tests/qemu-iotests/197
-index 9fb4a694a1..9e7c6cf339 100755
---- a/tests/qemu-iotests/197
-+++ b/tests/qemu-iotests/197
-@@ -23,7 +23,6 @@
- seq="$(basename $0)"
- echo "QA output created by $seq"
++# get standard environment, filters and checks
++. ./common.rc
++
+ _cleanup()
+ {
+     _cleanup_test_img
+@@ -34,9 +37,6 @@ _cleanup()
+ }
+ trap "_cleanup; exit \$status" 0 1 2 3 15
  
--here="$PWD"
- status=1 # failure is the default!
- 
- # get standard environment, filters and checks
+-# get standard environment, filters and checks
+-. ./common.rc
+-
+ _supported_fmt qcow2
+ _supported_proto file
+ _supported_os Linux
 -- 
 2.13.6
