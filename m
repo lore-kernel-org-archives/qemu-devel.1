@@ -1,21 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38388)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38430)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1eFJt5-0008HM-O5
-	for qemu-devel@nongnu.org; Thu, 16 Nov 2017 08:07:24 -0500
+	(envelope-from <peterx@redhat.com>) id 1eFJt8-0008Lv-Lh
+	for qemu-devel@nongnu.org; Thu, 16 Nov 2017 08:07:30 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1eFJsz-000768-Mb
-	for qemu-devel@nongnu.org; Thu, 16 Nov 2017 08:07:23 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:49482)
+	(envelope-from <peterx@redhat.com>) id 1eFJt7-0007Cc-KT
+	for qemu-devel@nongnu.org; Thu, 16 Nov 2017 08:07:26 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:54438)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1eFJsz-00075g-Gb
-	for qemu-devel@nongnu.org; Thu, 16 Nov 2017 08:07:17 -0500
+	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1eFJt7-0007Bf-Br
+	for qemu-devel@nongnu.org; Thu, 16 Nov 2017 08:07:25 -0500
 From: Peter Xu <peterx@redhat.com>
-Date: Thu, 16 Nov 2017 21:05:52 +0800
-Message-Id: <20171116130610.23582-10-peterx@redhat.com>
+Date: Thu, 16 Nov 2017 21:05:54 +0800
+Message-Id: <20171116130610.23582-12-peterx@redhat.com>
 In-Reply-To: <20171116130610.23582-1-peterx@redhat.com>
 References: <20171116130610.23582-1-peterx@redhat.com>
-Subject: [Qemu-devel] [RFC v4 09/27] monitor: create monitor dedicate
- iothread
+Subject: [Qemu-devel] [RFC v4 11/27] qmp: introduce QMPCapability
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,87 +26,106 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Stefan Hajnoczi <shajnocz@redhat.com>, "Daniel P . Berrange" <berrange@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Fam Zheng <famz@redhat.com>, Juan Quintela <quintela@redhat.com>, mdroth@linux.vnet.ibm.com, peterx@redhat.com, Eric Blake <eblake@redhat.com>, Laurent Vivier <lvivier@redhat.com>, Markus Armbruster <armbru@redhat.com>, marcandre.lureau@redhat.com, "Dr . David Alan Gilbert" <dgilbert@redhat.com>
 
-Create one IOThread for the monitors, prepared to handle all the
-input/output IOs using existing iothread framework.
+There was no QMP capabilities defined.  Define the first "oob" as
+capability to allow out-of-band messages.
+
+Also, touch up qmp-test.c to test the new bits.
 
 Signed-off-by: Peter Xu <peterx@redhat.com>
 ---
- monitor.c | 29 +++++++++++++++++++++++++++++
- 1 file changed, 29 insertions(+)
+ monitor.c        | 15 +++++++++++++--
+ qapi-schema.json | 13 +++++++++++++
+ tests/qmp-test.c | 10 +++++++++-
+ 3 files changed, 35 insertions(+), 3 deletions(-)
 
 diff --git a/monitor.c b/monitor.c
-index a70ab5606b..4ce9828fab 100644
+index 685938b9f2..468303b472 100644
 --- a/monitor.c
 +++ b/monitor.c
-@@ -76,6 +76,7 @@
- #include "qmp-introspect.h"
- #include "sysemu/qtest.h"
- #include "sysemu/cpus.h"
-+#include "sysemu/iothread.h"
- #include "qemu/cutils.h"
- #include "qapi/qmp/dispatch.h"
+@@ -3944,12 +3944,23 @@ void monitor_resume(Monitor *mon)
  
-@@ -208,6 +209,12 @@ struct Monitor {
-     QTAILQ_ENTRY(Monitor) entry;
- };
- 
-+struct MonitorGlobal {
-+    IOThread *mon_iothread;
-+};
-+
-+static struct MonitorGlobal mon_global;
-+
- /* QMP checker flags */
- #define QMP_ACCEPT_UNKNOWNS 1
- 
-@@ -4034,12 +4041,24 @@ static void sortcmdlist(void)
-     qsort((void *)info_cmds, array_num, elem_size, compare_mon_cmd);
- }
- 
-+static GMainContext *monitor_io_context_get(void)
-+{
-+    return iothread_get_g_main_context(mon_global.mon_iothread);
-+}
-+
-+static void monitor_iothread_init(void)
-+{
-+    mon_global.mon_iothread = iothread_create("monitor_iothread",
-+                                              &error_abort);
-+}
-+
- void monitor_init_globals(void)
+ static QObject *get_qmp_greeting(void)
  {
-     monitor_init_qmp_commands();
-     monitor_qapi_event_init();
-     sortcmdlist();
-     qemu_mutex_init(&monitor_lock);
-+    monitor_iothread_init();
++    QDict *result = qdict_new(), *qmp = qdict_new();
++    QList *cap_list = qlist_new();
+     QObject *ver = NULL;
++    QMPCapability cap;
++
++    qdict_put(result, "QMP", qmp);
+ 
+     qmp_marshal_query_version(NULL, &ver, NULL);
++    qdict_put_obj(qmp, "version", ver);
++
++    for (cap = 0; cap < QMP_CAPABILITY__MAX; cap++) {
++        qlist_append(cap_list, qstring_from_str(
++                         QMPCapability_str(cap)));
++    }
++    qdict_put(qmp, "capabilities", cap_list);
+ 
+-    return qobject_from_jsonf("{'QMP': {'version': %p, 'capabilities': []}}",
+-                              ver);
++    return QOBJECT(result);
  }
  
- /* These functions just adapt the readline interface in a typesafe way.  We
-@@ -4117,6 +4136,13 @@ void monitor_cleanup(void)
+ static void monitor_qmp_event(void *opaque, int event)
+diff --git a/qapi-schema.json b/qapi-schema.json
+index 18457954a8..03201578b4 100644
+--- a/qapi-schema.json
++++ b/qapi-schema.json
+@@ -119,6 +119,19 @@
+ { 'command': 'qmp_capabilities' }
+ 
+ ##
++# @QMPCapability:
++#
++# QMP supported capabilities to be broadcasted to the clients.
++#
++# @oob:   QMP ability to support Out-Of-Band requests.
++#
++# Since: 2.12
++#
++##
++{ 'enum': 'QMPCapability',
++  'data': [ 'oob' ] }
++
++##
+ # @VersionTriple:
+ #
+ # A three-part version number.
+diff --git a/tests/qmp-test.c b/tests/qmp-test.c
+index c5a5c10b41..292c5f135a 100644
+--- a/tests/qmp-test.c
++++ b/tests/qmp-test.c
+@@ -17,6 +17,7 @@
+ #include "qapi/qobject-input-visitor.h"
+ #include "qapi/util.h"
+ #include "qapi/visitor.h"
++#include "qapi/qmp/qstring.h"
+ 
+ const char common_args[] = "-nodefaults -machine none";
+ 
+@@ -75,6 +76,8 @@ static void test_qmp_protocol(void)
  {
-     Monitor *mon, *next;
+     QDict *resp, *q, *ret;
+     QList *capabilities;
++    const QListEntry *entry;
++    QString *qstr;
  
-+    /*
-+     * We need to explicitly stop the iothread (but not destroy it),
-+     * cleanup the monitor resources, then destroy the iothread.  See
-+     * again on the glib bug mentioned in 2b316774f6 for a reason.
-+     */
-+    iothread_stop(mon_global.mon_iothread);
-+
-     qemu_mutex_lock(&monitor_lock);
-     QTAILQ_FOREACH_SAFE(mon, &mon_list, entry, next) {
-         QTAILQ_REMOVE(&mon_list, mon, entry);
-@@ -4124,6 +4150,9 @@ void monitor_cleanup(void)
-         g_free(mon);
-     }
-     qemu_mutex_unlock(&monitor_lock);
-+
-+    iothread_destroy(mon_global.mon_iothread);
-+    mon_global.mon_iothread = NULL;
- }
+     global_qtest = qtest_init_without_qmp_handshake(common_args);
  
- QemuOptsList qemu_mon_opts = {
+@@ -84,7 +87,12 @@ static void test_qmp_protocol(void)
+     g_assert(q);
+     test_version(qdict_get(q, "version"));
+     capabilities = qdict_get_qlist(q, "capabilities");
+-    g_assert(capabilities && qlist_empty(capabilities));
++    g_assert(capabilities);
++    entry = qlist_first(capabilities);
++    g_assert(entry);
++    qstr = qobject_to_qstring(entry->value);
++    g_assert(qstr);
++    g_assert_cmpstr(qstring_get_str(qstr), ==, "oob");
+     QDECREF(resp);
+ 
+     /* Test valid command before handshake */
 -- 
 2.13.6
