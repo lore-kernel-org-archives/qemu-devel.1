@@ -1,24 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41897)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51280)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kchamart@redhat.com>) id 1eFGFT-0002Vh-T6
-	for qemu-devel@nongnu.org; Thu, 16 Nov 2017 04:14:19 -0500
+	(envelope-from <longpeng2@huawei.com>) id 1eFGY4-0007Fd-Vs
+	for qemu-devel@nongnu.org; Thu, 16 Nov 2017 04:33:29 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kchamart@redhat.com>) id 1eFGFO-0001tH-Us
-	for qemu-devel@nongnu.org; Thu, 16 Nov 2017 04:14:15 -0500
-Date: Thu, 16 Nov 2017 10:14:05 +0100
-From: Kashyap Chamarthy <kchamart@redhat.com>
-Message-ID: <20171116091405.pleud7qrqzu5nzhb@eukaryote>
-References: <20171115090947.29883-1-kchamart@redhat.com>
-	<0b29e074-6548-d42e-12ab-67419342773e@redhat.com>
-	<20171115215433.fpihpl645mlholgo@eukaryote>
-	<6ac3e1b3-d3b0-afe4-4d87-e8c421084d7f@redhat.com>
+	(envelope-from <longpeng2@huawei.com>) id 1eFGY1-0008Kc-2W
+	for qemu-devel@nongnu.org; Thu, 16 Nov 2017 04:33:29 -0500
+Received: from szxga04-in.huawei.com ([45.249.212.190]:2356)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_ARCFOUR_SHA1:16) (Exim 4.71)
+	(envelope-from <longpeng2@huawei.com>) id 1eFGY0-0008Ft-GE
+	for qemu-devel@nongnu.org; Thu, 16 Nov 2017 04:33:25 -0500
+Message-ID: <5A0D5B1B.3080708@huawei.com>
+Date: Thu, 16 Nov 2017 17:32:11 +0800
+From: "Longpeng (Mike)" <longpeng2@huawei.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <6ac3e1b3-d3b0-afe4-4d87-e8c421084d7f@redhat.com>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [Qemu-block] [PATCH v2] qapi: block-core: Clarify
- events emitted by 'block-job-cancel'
+References: <CACnE9pzALCNV62Jmo4SUawD=pQiPFENWR_BwK3=+yY7V1U54Ag@mail.gmail.com>
+	<cd39d029-48f9-20d6-cc19-ff87a45240ab@redhat.com>
+	<CACnE9pzm5zabq=nJhqB4LHzSXk2vDGiAN5SbJco3ZfGkfRbW-g@mail.gmail.com>
+	<5A0D27D8.6050506@huawei.com>
+	<2e0ddd76-3903-d715-9a86-73f1286322e7@redhat.com>
+	<33183CC9F5247A488A2544077AF19020DA46E2A6@DGGEMA505-MBS.china.huawei.com>
+	<6aaaca2b-81ef-a1c1-4745-830d008b3770@redhat.com>
+In-Reply-To: <6aaaca2b-81ef-a1c1-4745-830d008b3770@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [Question] why need to start all queues in
+ vhost_net_start
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,46 +33,69 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: John Snow <jsnow@redhat.com>
-Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, armbru@redhat.com, mreitz@redhat.com
+To: Jason Wang <jasowang@redhat.com>
+Cc: "Gonglei (Arei)" <arei.gonglei@huawei.com>, "mst@redhat.com" <mst@redhat.com>, "Longpeng(Mike)" <longpeng.mike@gmail.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "Wangjing (King, Euler)" <king.wang@huawei.com>, "Huangweidong (C)" <weidong.huang@huawei.com>, "stefanha@redhat.com" <stefanha@redhat.com>
 
-On Wed, Nov 15, 2017 at 04:56:13PM -0500, John Snow wrote:
->=20
->=20
-> On 11/15/2017 04:54 PM, Kashyap Chamarthy wrote:
-> > On Wed, Nov 15, 2017 at 02:15:57PM -0500, John Snow wrote:
+Hi Jason,
 
-[...]
+On 2017/11/16 17:13, Jason Wang wrote:
 
-> >> is it covered sufficiently in live-block-operations.rst ?
-> >=20
-> > I looked in there[2] too.  Short answer: no.  Long: In the "Live disk
-> > synchronization =E2=80=94 drive-mirror and blockdev-mirror" section, =
-I simply
-> > seemed to declare:=20
-> >=20
-> >     "Issuing the command ``block-job-cancel`` after it emits the even=
-t
-> >     ``BLOCK_JOB_CANCELLED``"
-> >=20
-> > As if that's the *only* event it emits, which is clearly not the case=
-.
-> > So while at it, wonder if should I also update it
-> > ('live-block-operations.rst') too.
-> >=20
->=20
-> It's an interesting gotcha that I wasn't really acutely aware of myself=
-,
-> so having it in the doc format for API programmers who aren't
-> necessarily digging through our source sounds like a pleasant courtesy.
+> 
+> 
+> On 2017年11月16日 17:01, Gonglei (Arei) wrote:
+>> No, Windows guest + vhost-user/DPDK.
+>>
+>> BTW pls see virtio spec in :
+>>
+>> "If VIRTIO_NET_F_MQ is negotiated, each of receiveq1. . .receiveqN that will
+>> be used SHOULD be populated
+>> with receive buffers."
+>>
+>> It is not mandatory that all queues must be initialized.
+> 
+> I think not, since it said we should fill receive buffers for each queue which
+> means we should initialize all queues. May Michael can clarify on this.
+> 
 
-Indeed, will do.  (Just for my own clarity, did you imply: don't update
-it in block-core.json?  FWIW, my first instinct is to check the QAPI
-documentation for such things, that's why I wrote there first :-))
 
-Thanks for looking.
+I think this doesn't matter, but QEMU should consider this scenario...
 
-[...]
+For example, if one queues isn't initialized (Windows guest), the vring.avail=0,
+so vq->desc_phys=0, then vq->desc='a avail HVA'(which is the start addr of pc.ram).
 
---=20
-/kashyap
+    vq->desc_size = s = l = virtio_queue_get_desc_size(vdev, idx);
+    vq->desc_phys = a = virtio_queue_get_desc_addr(vdev, idx);
+    vq->desc = vhost_memory_map(dev, a, &l, 0);
+    if (!vq->desc || l != s) {
+        r = -ENOMEM;
+        goto fail_alloc_desc;
+    }
+    .....
+    r = vhost_virtqueue_set_addr(dev, vq, vhost_vq_index, dev->log_enabled);
+    if (r < 0) {
+        r = -errno;
+        goto fail_alloc;
+    }
+
+Then the HVA is send to the vhost-user.
+
+I think this is wrong, because the '0' here means guest driver doesn't init this
+queues, it should not be used to calculate the HVA for this vq.
+
+> Thanks
+> 
+>>
+>> Thanks,
+>> -Gonglei
+>>
+> 
+> 
+> 
+> 
+> .
+> 
+
+
+-- 
+Regards,
+Longpeng(Mike)
