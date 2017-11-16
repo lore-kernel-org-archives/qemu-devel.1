@@ -1,22 +1,38 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46621)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48039)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1eFMZe-00031L-1p
-	for qemu-devel@nongnu.org; Thu, 16 Nov 2017 10:59:31 -0500
+	(envelope-from <borntraeger@de.ibm.com>) id 1eFMcv-0004tf-2X
+	for qemu-devel@nongnu.org; Thu, 16 Nov 2017 11:02:59 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1eFMZa-0002Dm-4S
-	for qemu-devel@nongnu.org; Thu, 16 Nov 2017 10:59:30 -0500
-Date: Thu, 16 Nov 2017 17:59:17 +0200
-From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <20171116175713-mutt-send-email-mst@kernel.org>
-References: <20171116132339.4facb858@bahia.lab.toulouse-stg.fr.ibm.com>
-	<20171116172602-mutt-send-email-mst@kernel.org>
-	<20171116085345.7b02ecdd@t450s.home>
+	(envelope-from <borntraeger@de.ibm.com>) id 1eFMcp-0005Rx-A3
+	for qemu-devel@nongnu.org; Thu, 16 Nov 2017 11:02:53 -0500
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:42814
+	helo=mx0a-001b2d01.pphosted.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <borntraeger@de.ibm.com>)
+	id 1eFMcp-0005RR-47
+	for qemu-devel@nongnu.org; Thu, 16 Nov 2017 11:02:47 -0500
+Received: from pps.filterd (m0098417.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
+	vAGG1JkT096247
+	for <qemu-devel@nongnu.org>; Thu, 16 Nov 2017 11:02:41 -0500
+Received: from e06smtp15.uk.ibm.com (e06smtp15.uk.ibm.com [195.75.94.111])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2e9bwhy5g7-1
+	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Thu, 16 Nov 2017 11:02:34 -0500
+Received: from localhost
+	by e06smtp15.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	Only! Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <borntraeger@de.ibm.com>;
+	Thu, 16 Nov 2017 16:02:29 -0000
+From: Christian Borntraeger <borntraeger@de.ibm.com>
+Date: Thu, 16 Nov 2017 17:02:25 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20171116085345.7b02ecdd@t450s.home>
-Subject: Re: [Qemu-devel] QEMU terminates during reboot after memory unplug
- with vhost=on
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Message-Id: <c5a52fe7-b256-105b-df88-0c7c5e105207@de.ibm.com>
+Subject: [Qemu-devel] 2 bytes of memory leaking due to MigrationParameters
+ unshadowing
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,100 +41,42 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alex Williamson <alex.williamson@redhat.com>
-Cc: Greg Kurz <groug@kaod.org>, imammedo@redhat.com, bharata@linux.vnet.ibm.com, qemu-ppc@nongnu.org, qemu-devel@nongnu.org, david@gibson.dropbear.id.au
+To: Markus Armbruster <armbru@redhat.com>
+Cc: qemu-devel <qemu-devel@nongnu.org>, Juan Quintela <quintela@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>
 
-On Thu, Nov 16, 2017 at 08:53:45AM -0700, Alex Williamson wrote:
-> On Thu, 16 Nov 2017 17:28:44 +0200
-> "Michael S. Tsirkin" <mst@redhat.com> wrote:
-> 
-> > On Thu, Nov 16, 2017 at 01:23:39PM +0100, Greg Kurz wrote:
-> > > Hi,
-> > > 
-> > > I'm resurrecting a thread about a QEMU crash we're still hitting on ppc64. It
-> > > was reported to the list by Bharata 2 months ago:
-> > > 
-> > > https://lists.gnu.org/archive/html/qemu-devel/2017-09/msg03685.html
-> > > 
-> > > "Hi,
-> > > 
-> > > QEMU hits the below assert
-> > > 
-> > > qemu-system-ppc64: used ring relocated for ring 2
-> > > qemu-system-ppc64: qemu/hw/virtio/vhost.c:649: vhost_commit: Assertion `r >= 0' failed.
-> > > 
-> > > in the following scenario:
-> > > 
-> > > 1. Boot guest with vhost=on
-> > >   -netdev tap,id=mynet0,script=qemu-ifup,downscript=qemu-ifdown,vhost=on -device virtio-net-pci,netdev=mynet0
-> > > 2. Hot add a DIMM device 
-> > > 3. Reboot
-> > >    When the guest reboots, we can see
-> > >    vhost_virtqueue_start:vq->used_phys getting assigned an address that
-> > >    falls in the hotplugged memory range.
-> > > 4. Remove the DIMM device
-> > >    Guest refuses the removal as the hotplugged memory is under use.
-> > > 5. Reboot
-> > >    QEMU forces the removal of the DIMM device during reset and that's
-> > >    when we hit the above assert.
-> > > 
-> > > Any pointers on why we are hitting this assert ? Shouldn't vhost be
-> > > done with using the hotplugged memory when we hit reset ?
-> > > 
-> > > Regards,
-> > > Bharata."
-> > > 
-> > > #0  0x00007ffff760eff0 in raise () from /lib64/libc.so.6
-> > > #1  0x00007ffff761136c in abort () from /lib64/libc.so.6
-> > > #2  0x00007ffff7604c44 in __assert_fail_base () from /lib64/libc.so.6
-> > > #3  0x00007ffff7604d34 in __assert_fail () from /lib64/libc.so.6
-> > > #4  0x0000000010161138 in vhost_commit (listener=0x11469e88) at /home/greg/Work/qemu/qemu-spapr/hw/virtio/vhost.c:650
-> > > #5  0x00000000100917fc in memory_region_transaction_commit () at /home/greg/Work/qemu/qemu-spapr/memory.c:1094
-> > > #6  0x0000000010096748 in memory_region_del_subregion (mr=0x1143eed0, subregion=0x116f1920) at /home/greg/Work/qemu/qemu-spapr/memory.c:2337
-> > > #7  0x00000000104a9aec in pc_dimm_memory_unplug (dev=0x11445c50, hpms=0x1143eec0, mr=0x116f1920) at /home/greg/Work/qemu/qemu-spapr/hw/mem/pc-dimm.c:126
-> > > #8  0x0000000010180454 in spapr_lmb_release (dev=0x11445c50) at /home/greg/Work/qemu/qemu-spapr/hw/ppc/spapr.c:3151
-> > > #9  0x00000000101a397c in spapr_drc_release (drc=0x116b9cc0) at /home/greg/Work/qemu/qemu-spapr/hw/ppc/spapr_drc.c:401
-> > > #10 0x00000000101a3ba0 in spapr_drc_reset (drc=0x116b9cc0) at /home/greg/Work/qemu/qemu-spapr/hw/ppc/spapr_drc.c:439
-> > > #11 0x00000000101a3c88 in drc_reset (opaque=0x116b9cc0) at /home/greg/Work/qemu/qemu-spapr/hw/ppc/spapr_drc.c:460
-> > > #12 0x0000000010447380 in qemu_devices_reset () at /home/greg/Work/qemu/qemu-spapr/hw/core/reset.c:69
-> > > #13 0x000000001017ae80 in ppc_spapr_reset () at /home/greg/Work/qemu/qemu-spapr/hw/ppc/spapr.c:1445
-> > > #14 0x0000000010377c60 in qemu_system_reset (reason=SHUTDOWN_CAUSE_HOST_QMP) at /home/greg/Work/qemu/qemu-spapr/vl.c:1788
-> > > #15 0x00000000103785ac in main_loop_should_exit () at /home/greg/Work/qemu/qemu-spapr/vl.c:1962
-> > > #16 0x0000000010378708 in main_loop () at /home/greg/Work/qemu/qemu-spapr/vl.c:1999
-> > > #17 0x0000000010382c54 in main (argc=21, argv=0x7ffffffff098, envp=0x7ffffffff148) at /home/greg/Work/qemu/qemu-spapr/vl.c:4897
-> > > 
-> > > 
-> > > This basically happens because on pseries, like x86, we usually wait
-> > > for the guest to eject the DIMM before actually removing it, BUT,
-> > > unlike x86, we force the removal on reset. This is handled by a DRC
-> > > object which registers a handler with qemu_register_reset().
-> > > 
-> > > At reset time, the machine calls qemu_devices_reset() but unfortunately,
-> > > the DRC reset handler gets called BEFORE the VirtIONet device one. The
-> > > vhost device is still active and it doesn't like the ring addresses to
-> > > change while in this state.
-> > > 
-> > > Michael,
-> > > 
-> > > The assert() has been around since the beginning, at a time I believe there was
-> > > no such thing as memory hot-unplug. Now that memory can go away at reset time,
-> > > is it really legitimate to crash QEMU if vhost detects a ring address change ?  
-> > 
-> > It's just a symptom of a problem though. If memory is going away
-> > while vhost backend is running, things are not going to
-> > end well. Less scary for a network device, more scary for a block
-> > device. VFIO probably has the same issue, it just does not
-> > have an assert.
-> 
-> Hmm, why?  We don't have data structures living in guest RAM with
-> vfio.  Guest RAM is just a mapping through the IOMMU.  So long as the
-> MemoryListener is correctly doing its job, that range will be unmapped
-> and vfio shouldn't care about it.  Thanks,
-> 
-> Alex
+Markus,
 
-Range is unmapped by listener but device has not been reset yet,
-so it will get errors when attempting to access guest RAM.
+valgrind complains about the following two 1 byte memory leaks during migration:
 
--- 
-MST
+
+==40773== 1 bytes in 1 blocks are definitely lost in loss record 3 of 2,127
+==40773==    at 0x4834E60: malloc (vg_replace_malloc.c:299)
+==40773==    by 0x18B1A177: g_malloc (in /usr/lib64/libglib-2.0.so.0.5000.3)
+==40773==    by 0x18B376E1: g_strdup (in /usr/lib64/libglib-2.0.so.0.5000.3)
+==40773==    by 0x11B0B9B: migrate_params_test_apply (migration.c:864)
+==40773==    by 0x11B0B9B: qmp_migrate_set_parameters (migration.c:989)
+==40773==    by 0x11312D7: qmp_marshal_migrate_set_parameters (qmp-marshal.c:2032)
+==40773==    by 0x12EA891: do_qmp_dispatch (qmp-dispatch.c:104)
+==40773==    by 0x12EA891: qmp_dispatch (qmp-dispatch.c:131)
+==40773==    by 0x106256F: handle_qmp_command (monitor.c:3840)
+==40773==    by 0x12F0863: json_message_process_token (json-streamer.c:105)
+==40773== 
+==40773== 1 bytes in 1 blocks are definitely lost in loss record 4 of 2,127
+==40773==    at 0x4834E60: malloc (vg_replace_malloc.c:299)
+==40773==    by 0x18B1A177: g_malloc (in /usr/lib64/libglib-2.0.so.0.5000.3)
+==40773==    by 0x18B376E1: g_strdup (in /usr/lib64/libglib-2.0.so.0.5000.3)
+==40773==    by 0x11B0BC5: migrate_params_test_apply (migration.c:869)
+==40773==    by 0x11B0BC5: qmp_migrate_set_parameters (migration.c:989)
+==40773==    by 0x11312D7: qmp_marshal_migrate_set_parameters (qmp-marshal.c:2032)
+==40773==    by 0x12EA891: do_qmp_dispatch (qmp-dispatch.c:104)
+==40773==    by 0x12EA891: qmp_dispatch (qmp-dispatch.c:131)
+==40773==    by 0x106256F: handle_qmp_command (monitor.c:3840)
+==40773==    by 0x12F0863: json_message_process_token (json-streamer.c:105)
+
+
+Looks like that commit 1bda8b3c6950f74482ba19e8529db72b511ba977 ("migration: Unshare 
+MigrationParameters struct for now") created the _g_strdup leak.
+
+It certainly is not important at all, but I wanted to report it nevertheless.
+
+Christian
