@@ -1,24 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33822)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33881)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1eFIpW-0001i9-Vv
-	for qemu-devel@nongnu.org; Thu, 16 Nov 2017 06:59:42 -0500
+	(envelope-from <pbonzini@redhat.com>) id 1eFIpd-0001on-Gi
+	for qemu-devel@nongnu.org; Thu, 16 Nov 2017 06:59:46 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1eFIpW-0000BM-AD
-	for qemu-devel@nongnu.org; Thu, 16 Nov 2017 06:59:39 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:37002)
+	(envelope-from <pbonzini@redhat.com>) id 1eFIpc-0000HM-KH
+	for qemu-devel@nongnu.org; Thu, 16 Nov 2017 06:59:45 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:11112)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1eFIpW-0000AW-3X
-	for qemu-devel@nongnu.org; Thu, 16 Nov 2017 06:59:38 -0500
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1eFIpc-0000Gk-DE
+	for qemu-devel@nongnu.org; Thu, 16 Nov 2017 06:59:44 -0500
 From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Thu, 16 Nov 2017 12:59:20 +0100
-Message-Id: <20171116115926.16627-6-pbonzini@redhat.com>
+Date: Thu, 16 Nov 2017 12:59:22 +0100
+Message-Id: <20171116115926.16627-8-pbonzini@redhat.com>
 In-Reply-To: <20171116115926.16627-1-pbonzini@redhat.com>
 References: <20171116115926.16627-1-pbonzini@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 05/11] target-i386: adds PV_TLB_FLUSH CPUID
- feature bit
+Subject: [Qemu-devel] [PULL 07/11] cpu-exec: don't overwrite exception_index
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,37 +24,35 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Wanpeng Li <wanpeng.li@hotmail.com>, =?UTF-8?q?Radim=20Kr=C3=84m=C3=83=C2=A1=C3=85=E2=84=A2?= <rkrcmar@redhat.com>, Richard Henderson <rth@twiddle.net>, Eduardo Habkost <ehabkost@redhat.com>
+Cc: Pavel Dovgalyuk <Pavel.Dovgaluk@ispras.ru>, Pavel Dovgalyuk <pavel.dovgaluk@ispras.ru>
 
-From: Wanpeng Li <wanpeng.li@hotmail.com>
+From: Pavel Dovgalyuk <Pavel.Dovgaluk@ispras.ru>
 
-Adds PV_TLB_FLUSH CPUID feature bit.
+This patch adds a condition before overwriting exception_index fiels.
+It is needed when exception_index is already set to some meaningful value.
 
-Cc: Paolo Bonzini <pbonzini@redhat.com>
-Cc: Radim Kr=C3=84m=C3=83=C2=A1=C3=85=E2=84=A2 <rkrcmar@redhat.com>
-Cc: Richard Henderson <rth@twiddle.net>
-Cc: Eduardo Habkost <ehabkost@redhat.com>
-Signed-off-by: Wanpeng Li <wanpeng.li@hotmail.com>
-Message-Id: <1510299947-11287-1-git-send-email-wanpeng.li@hotmail.com>
+Signed-off-by: Pavel Dovgalyuk <pavel.dovgaluk@ispras.ru>
+
+Message-Id: <20171114081812.27640.26372.stgit@pasha-VirtualBox>
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- target/i386/cpu.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ accel/tcg/cpu-exec.c | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
 
-diff --git a/target/i386/cpu.c b/target/i386/cpu.c
-index 6f21a5e518..ecebc5a70a 100644
---- a/target/i386/cpu.c
-+++ b/target/i386/cpu.c
-@@ -347,7 +347,7 @@ static FeatureWordInfo feature_word_info[FEATURE_WORD=
-S] =3D {
-         .feat_names =3D {
-             "kvmclock", "kvm-nopiodelay", "kvm-mmu", "kvmclock",
-             "kvm-asyncpf", "kvm-steal-time", "kvm-pv-eoi", "kvm-pv-unhal=
-t",
--            NULL, NULL, NULL, NULL,
-+            NULL, "kvm-pv-tlb-flush", NULL, NULL,
-             NULL, NULL, NULL, NULL,
-             NULL, NULL, NULL, NULL,
-             NULL, NULL, NULL, NULL,
---=20
+diff --git a/accel/tcg/cpu-exec.c b/accel/tcg/cpu-exec.c
+index 61297f8f4a..0473055a08 100644
+--- a/accel/tcg/cpu-exec.c
++++ b/accel/tcg/cpu-exec.c
+@@ -594,7 +594,9 @@ static inline bool cpu_handle_interrupt(CPUState *cpu,
+     if (unlikely(atomic_read(&cpu->exit_request)
+         || (use_icount && cpu->icount_decr.u16.low + cpu->icount_extra == 0))) {
+         atomic_set(&cpu->exit_request, 0);
+-        cpu->exception_index = EXCP_INTERRUPT;
++        if (cpu->exception_index == -1) {
++            cpu->exception_index = EXCP_INTERRUPT;
++        }
+         return true;
+     }
+ 
+-- 
 2.14.3
