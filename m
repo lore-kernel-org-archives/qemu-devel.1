@@ -1,28 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59582)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59683)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1eFO6z-0007Dm-BE
-	for qemu-devel@nongnu.org; Thu, 16 Nov 2017 12:38:02 -0500
+	(envelope-from <crosa@redhat.com>) id 1eFO7Q-0007Q2-6E
+	for qemu-devel@nongnu.org; Thu, 16 Nov 2017 12:38:29 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1eFO6v-0001Q4-C6
-	for qemu-devel@nongnu.org; Thu, 16 Nov 2017 12:38:01 -0500
-Received: from mail-wr0-x243.google.com ([2a00:1450:400c:c0c::243]:51815)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1eFO6v-0001NN-5r
-	for qemu-devel@nongnu.org; Thu, 16 Nov 2017 12:37:57 -0500
-Received: by mail-wr0-x243.google.com with SMTP id z14so4759375wrb.8
-	for <qemu-devel@nongnu.org>; Thu, 16 Nov 2017 09:37:56 -0800 (PST)
-References: <20171116170526.12643-1-david@redhat.com>
-	<20171116170526.12643-3-david@redhat.com>
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-In-reply-to: <20171116170526.12643-3-david@redhat.com>
-Date: Thu, 16 Nov 2017 17:37:54 +0000
-Message-ID: <87375e15vx.fsf@linaro.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v1 for-2.11 2/3] s390x/tcg: fix DIAG 308
- with > 1 VCPU (single threaded TCG)
+	(envelope-from <crosa@redhat.com>) id 1eFO7P-0002sn-Gl
+	for qemu-devel@nongnu.org; Thu, 16 Nov 2017 12:38:28 -0500
+From: Cleber Rosa <crosa@redhat.com>
+Date: Thu, 16 Nov 2017 12:38:02 -0500
+Message-Id: <20171116173810.16457-3-crosa@redhat.com>
+In-Reply-To: <20171116173810.16457-1-crosa@redhat.com>
+References: <20171116173810.16457-1-crosa@redhat.com>
+Subject: [Qemu-devel] [PATCH 02/10] qemu-iotests: fix filename containing
+ checks
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,75 +20,36 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Hildenbrand <david@redhat.com>
-Cc: qemu-s390x@nongnu.org, qemu-devel@nongnu.org, Christian Borntraeger <borntraeger@de.ibm.com>, Cornelia Huck <cohuck@redhat.com>, Alexander Graf <agraf@suse.de>, Richard Henderson <rth@twiddle.net>
+To: qemu-devel@nongnu.org
+Cc: Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org, Cleber Rosa <crosa@redhat.com>
 
+Commit cce293a2945 moved some functions from common.config to
+common.rc, but the error messages still reference the old file
+location.
 
-David Hildenbrand <david@redhat.com> writes:
+Signed-off-by: Cleber Rosa <crosa@redhat.com>
+---
+ tests/qemu-iotests/common.rc | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-> Currently, single threaded TCG with > 1 VCPU gets stuck during IPL, when
-> the bios tries to switch to the loaded kernel via DIAG 308.
->
-> pause_all_vcpus()/resume_all_vcpus() should not be called from a VCPU.
->
-> And there is also no need for it. run_on_cpu() will make sure that the
-> CPUs exit KVM/TCG, where they get stopped. Once stopped, they will no
-> longer run.
->
-> Signed-off-by: David Hildenbrand <david@redhat.com>
-> ---
->  target/s390x/diag.c | 4 ----
->  1 file changed, 4 deletions(-)
->
-> diff --git a/target/s390x/diag.c b/target/s390x/diag.c
-> index dbbb9e886f..52bc348808 100644
-> --- a/target/s390x/diag.c
-> +++ b/target/s390x/diag.c
-> @@ -27,7 +27,6 @@ static int modified_clear_reset(S390CPU *cpu)
->      S390CPUClass *scc =3D S390_CPU_GET_CLASS(cpu);
->      CPUState *t;
->
-> -    pause_all_vcpus();
->      cpu_synchronize_all_states();
->      CPU_FOREACH(t) {
->          run_on_cpu(t, s390_do_cpu_full_reset, RUN_ON_CPU_NULL);
-
-I think you also need to fix the run_on_cpu to be a async_run_on_cpu as
-you would otherwise hang waiting for run_on_cpu to finish on a
-single-threaded TCG run (as you are in the only vCPU context).
-
-If it is important that the source vCPU doesn't continue you can
-schedule it's work afterwards with a async_safe_run_on_cpu which will
-complete after all other vCPUs have executed their work.
-
-
-> @@ -37,7 +36,6 @@ static int modified_clear_reset(S390CPU *cpu)
->      s390_crypto_reset();
->      scc->load_normal(CPU(cpu));
->      cpu_synchronize_all_post_reset();
-> -    resume_all_vcpus();
->      return 0;
->  }
->
-> @@ -53,7 +51,6 @@ static int load_normal_reset(S390CPU *cpu)
->      S390CPUClass *scc =3D S390_CPU_GET_CLASS(cpu);
->      CPUState *t;
->
-> -    pause_all_vcpus();
->      cpu_synchronize_all_states();
->      CPU_FOREACH(t) {
->          run_on_cpu(t, s390_do_cpu_reset, RUN_ON_CPU_NULL);
-> @@ -63,7 +60,6 @@ static int load_normal_reset(S390CPU *cpu)
->      scc->initial_cpu_reset(CPU(cpu));
->      scc->load_normal(CPU(cpu));
->      cpu_synchronize_all_post_reset();
-> -    resume_all_vcpus();
->      return 0;
->  }
->
-> --
-> 2.13.6
-
-
---
-Alex Benn=C3=A9e
+diff --git a/tests/qemu-iotests/common.rc b/tests/qemu-iotests/common.rc
+index dbae7d74ba..dcabe4c7cc 100644
+--- a/tests/qemu-iotests/common.rc
++++ b/tests/qemu-iotests/common.rc
+@@ -169,12 +169,12 @@ if [ ! -e "$TEST_DIR" ]; then
+ fi
+ 
+ if [ ! -d "$TEST_DIR" ]; then
+-    echo "common.config: Error: \$TEST_DIR ($TEST_DIR) is not a directory"
++    echo "common.rc: Error: \$TEST_DIR ($TEST_DIR) is not a directory"
+     exit 1
+ fi
+ 
+ if [ ! -d "$SAMPLE_IMG_DIR" ]; then
+-    echo "common.config: Error: \$SAMPLE_IMG_DIR ($SAMPLE_IMG_DIR) is not a directory"
++    echo "common.rc: Error: \$SAMPLE_IMG_DIR ($SAMPLE_IMG_DIR) is not a directory"
+     exit 1
+ fi
+ 
+-- 
+2.13.6
