@@ -1,23 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33218)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34992)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1eFFxz-0002jq-JX
-	for qemu-devel@nongnu.org; Thu, 16 Nov 2017 03:56:12 -0500
+	(envelope-from <jasowang@redhat.com>) id 1eFG1D-0004Ek-2O
+	for qemu-devel@nongnu.org; Thu, 16 Nov 2017 03:59:32 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1eFFxw-0007E9-HC
-	for qemu-devel@nongnu.org; Thu, 16 Nov 2017 03:56:11 -0500
-References: <20171030163309.75770-1-vsementsov@virtuozzo.com>
-	<20171030163309.75770-3-vsementsov@virtuozzo.com>
-	<5027d8bb-fdec-a6ce-8150-96730d3a5ce4@redhat.com>
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Message-ID: <6299c687-9c73-f498-524c-e70709ca8a3b@virtuozzo.com>
-Date: Thu, 16 Nov 2017 11:56:01 +0300
+	(envelope-from <jasowang@redhat.com>) id 1eFG19-0000TE-VA
+	for qemu-devel@nongnu.org; Thu, 16 Nov 2017 03:59:31 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:52058)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <jasowang@redhat.com>) id 1eFG19-0000K8-MO
+	for qemu-devel@nongnu.org; Thu, 16 Nov 2017 03:59:27 -0500
+References: <20171106203520.7880-1-michael.nawrocki@gtri.gatech.edu>
+	<20171106203520.7880-3-michael.nawrocki@gtri.gatech.edu>
+	<ce62c001-2273-c850-88f8-592fc58766c9@weilnetz.de>
+	<7bb60d60-28d4-3c37-2740-fd16d7c6856a@gtri.gatech.edu>
+	<2e6d4835-e277-fd46-12bc-612c7e57a6f4@weilnetz.de>
+From: Jason Wang <jasowang@redhat.com>
+Message-ID: <2462ccd8-176c-16d3-d995-7a90c0feea23@redhat.com>
+Date: Thu, 16 Nov 2017 16:59:15 +0800
 MIME-Version: 1.0
-In-Reply-To: <5027d8bb-fdec-a6ce-8150-96730d3a5ce4@redhat.com>
+In-Reply-To: <2e6d4835-e277-fd46-12bc-612c7e57a6f4@weilnetz.de>
 Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
 Content-Language: en-US
-Subject: Re: [Qemu-devel] [PATCH v8 02/14] block/dirty-bitmap: add locked
- version of bdrv_release_dirty_bitmap
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v2 2/2] Add new PCI ID for i82559a
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,109 +31,55 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: John Snow <jsnow@redhat.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org
-Cc: kwolf@redhat.com, peter.maydell@linaro.org, famz@redhat.com, lirans@il.ibm.com, quintela@redhat.com, armbru@redhat.com, mreitz@redhat.com, stefanha@redhat.com, den@openvz.org, amit.shah@redhat.com, pbonzini@redhat.com, dgilbert@redhat.com
+To: Stefan Weil <sw@weilnetz.de>, Michael Nawrocki <michael.nawrocki@gtri.gatech.edu>, qemu-devel@nongnu.org
+Cc: marcel@redhat.com, Peter Maydell <peter.maydell@linaro.org>, mst@redhat.com
 
-11.11.2017 01:52, John Snow wrote:
->
-> On 10/30/2017 12:32 PM, Vladimir Sementsov-Ogievskiy wrote:
->> It is needed to realize bdrv_dirty_bitmap_release_successor in
->> the following patch.
+
+
+On 2017=E5=B9=B411=E6=9C=8816=E6=97=A5 14:40, Stefan Weil wrote:
+> Am 15.11.2017 um 14:09 schrieb Michael Nawrocki:
+>> Hi Stefan,
 >>
-> OK, but...
->
->> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
->> ---
->>   block/dirty-bitmap.c | 25 ++++++++++++++++++++-----
->>   1 file changed, 20 insertions(+), 5 deletions(-)
+>> I've got a VxWorks driver binary that explicitly looks for device ID
+>> 0x1030 (which is admittedly not ideal). It seems like the "82559
+>> InBusiness 10/100" hardware uses this, though I've had trouble finding
+>> an official source. The following documents reference that ID:
 >>
->> diff --git a/block/dirty-bitmap.c b/block/dirty-bitmap.c
->> index 81adbeb6d4..981f99d362 100644
->> --- a/block/dirty-bitmap.c
->> +++ b/block/dirty-bitmap.c
->> @@ -326,13 +326,13 @@ static bool bdrv_dirty_bitmap_has_name(BdrvDirtyBitmap *bitmap)
->>       return !!bdrv_dirty_bitmap_name(bitmap);
->>   }
->>   
->> -/* Called with BQL taken.  */
->> -static void bdrv_do_release_matching_dirty_bitmap(
->> +/* Called within bdrv_dirty_bitmap_lock..unlock */
-> ...Add this so it will compile:
->
-> __attribute__((__unused__))
-
-ok
-
->> +static void bdrv_do_release_matching_dirty_bitmap_locked(
->>       BlockDriverState *bs, BdrvDirtyBitmap *bitmap,
->>       bool (*cond)(BdrvDirtyBitmap *bitmap))
->>   {
->>       BdrvDirtyBitmap *bm, *next;
->> -    bdrv_dirty_bitmaps_lock(bs);
->> +
->>       QLIST_FOREACH_SAFE(bm, &bs->dirty_bitmaps, list, next) {
->>           if ((!bitmap || bm == bitmap) && (!cond || cond(bm))) {
->>               assert(!bm->active_iterators);
->> @@ -344,18 +344,33 @@ static void bdrv_do_release_matching_dirty_bitmap(
->>               g_free(bm);
->>   
->>               if (bitmap) {
->> -                goto out;
->> +                return;
->>               }
->>           }
->>       }
->> +
->>       if (bitmap) {
->>           abort();
->>       }
-> Do we have any style guide rules on using abort() instead of assert()?
-> The rest of this function uses assert, and it'd be less lines to simply
-> write:
->
-> assert(!bitmap);
->
-> which I think might also carry better semantic information for coverity
-> beyond an actual runtime conditional branch.
->
-> (I think. Please correct me if I am wrong, I'm a little hazy on this.)
-
-agree, but it is a preexisting code, so I'll fix it with an additional 
-patch.
-
->
->> +}
->>   
->> -out:
->> +/* Called with BQL taken.  */
->> +static void bdrv_do_release_matching_dirty_bitmap(
->> +    BlockDriverState *bs, BdrvDirtyBitmap *bitmap,
->> +    bool (*cond)(BdrvDirtyBitmap *bitmap))
->> +{
->> +    bdrv_dirty_bitmaps_lock(bs);
->> +    bdrv_do_release_matching_dirty_bitmap_locked(bs, bitmap, cond);
->>       bdrv_dirty_bitmaps_unlock(bs);
->>   }
->>   
->> +/* Called within bdrv_dirty_bitmap_lock..unlock */
->> +static void bdrv_release_dirty_bitmap_locked(BlockDriverState *bs,
->> +                                             BdrvDirtyBitmap *bitmap)
->> +{
->> +    bdrv_do_release_matching_dirty_bitmap_locked(bs, bitmap, NULL);
->> +}
->> +
->>   /* Called with BQL taken.  */
->>   void bdrv_release_dirty_bitmap(BlockDriverState *bs, BdrvDirtyBitmap *bitmap)
->>   {
+>> https://pci-ids.ucw.cz/read/PC/8086/1030
+>> http://ks.pams.ncsu.edu/pub/ncsuscyld/i386/misc/src/trees/hdstg2/modul=
+es/pcitable
 >>
-> If you agree with those two changes, you may add:
-
-ok
-
+>> https://cateee.net/lkddb/web-lkddb/E100.html
+>>
+>> And I found a similar post on a different mailing list that might shed
+>> some light:
+>> http://www.beowulf.org/pipermail/eepro100/2000-January/000760.html
+>>
+>> It looks like the 8255x series of devices have a number of potential
+>> IDs; maybe a property to set a specific PCI device ID would work?
+>>
+>> Thanks,
+>> Mike
+> Yes, that might be a very general solution which could be applied to al=
+l
+> PCI devices.
+> It could even be extended to include the vendor ID or any PCI
+> configuration value
+> as well.
 >
-> Reviewed-by: John Snow <jsnow@redhat.com>
+> Nevertheless the technically correct solution would be a full emulation
+> of the
+> EEPROM. Then we could provide an EEPROM for the 82559 InBusiness 10/100=
+",
+> and the data from that EEPROM would set the right PCI device ID.
+>
+> Jason, until we get a better solution, the last commit should be
+> reverted before
+> the new QEMU version is made. That commit also added a wrong help text.
+>
+> Regards
+> Stefan
 
+Let me post a patch soon.
 
--- 
-Best regards,
-Vladimir
+Thanks
