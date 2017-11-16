@@ -1,22 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35785)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37912)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1eFOGi-0007We-Be
-	for qemu-devel@nongnu.org; Thu, 16 Nov 2017 12:48:05 -0500
+	(envelope-from <pmorel@linux.vnet.ibm.com>) id 1eFOKg-0001iT-VX
+	for qemu-devel@nongnu.org; Thu, 16 Nov 2017 12:52:11 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1eFOGh-000822-5c
-	for qemu-devel@nongnu.org; Thu, 16 Nov 2017 12:48:04 -0500
-References: <20171116170526.12643-1-david@redhat.com>
-	<20171116170526.12643-3-david@redhat.com>
-From: David Hildenbrand <david@redhat.com>
-Message-ID: <8403a827-2212-0128-581b-149892335916@redhat.com>
-Date: Thu, 16 Nov 2017 18:47:59 +0100
-MIME-Version: 1.0
-In-Reply-To: <20171116170526.12643-3-david@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v1 for-2.11 2/3] s390x/tcg: fix DIAG 308
- with > 1 VCPU (single threaded TCG)
+	(envelope-from <pmorel@linux.vnet.ibm.com>) id 1eFOKd-00039q-6I
+	for qemu-devel@nongnu.org; Thu, 16 Nov 2017 12:52:11 -0500
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:60270
+	helo=mx0a-001b2d01.pphosted.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pmorel@linux.vnet.ibm.com>)
+	id 1eFOKd-00039Z-0C
+	for qemu-devel@nongnu.org; Thu, 16 Nov 2017 12:52:07 -0500
+Received: from pps.filterd (m0098419.ppops.net [127.0.0.1])
+	by mx0b-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
+	vAGHnKH4136146
+	for <qemu-devel@nongnu.org>; Thu, 16 Nov 2017 12:52:01 -0500
+Received: from e06smtp10.uk.ibm.com (e06smtp10.uk.ibm.com [195.75.94.106])
+	by mx0b-001b2d01.pphosted.com with ESMTP id 2e9etu283e-1
+	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Thu, 16 Nov 2017 12:52:00 -0500
+Received: from localhost
+	by e06smtp10.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	Only! Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <pmorel@linux.vnet.ibm.com>;
+	Thu, 16 Nov 2017 17:51:59 -0000
+From: Pierre Morel <pmorel@linux.vnet.ibm.com>
+Date: Thu, 16 Nov 2017 18:51:48 +0100
+Message-Id: <1510854715-7081-1-git-send-email-pmorel@linux.vnet.ibm.com>
+Subject: [Qemu-devel] [PATCH v2 0/7] s390x/pci: Improve zPCI to cover more
+ cases
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,161 +37,57 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-s390x@nongnu.org, qemu-devel@nongnu.org
-Cc: Christian Borntraeger <borntraeger@de.ibm.com>, Cornelia Huck <cohuck@redhat.com>, Richard Henderson <rth@twiddle.net>, Alexander Graf <agraf@suse.de>
+To: qemu-devel@nongnu.org
+Cc: cohuck@redhat.com, agraf@suse.de, borntraeger@de.ibm.com, zyimin@linux.vnet.ibm.com, pasic@linux.vnet.ibm.com
 
-On 16.11.2017 18:05, David Hildenbrand wrote:
-> Currently, single threaded TCG with > 1 VCPU gets stuck during IPL, whe=
-n
-> the bios tries to switch to the loaded kernel via DIAG 308.
->=20
-> pause_all_vcpus()/resume_all_vcpus() should not be called from a VCPU.
->=20
-> And there is also no need for it. run_on_cpu() will make sure that the
-> CPUs exit KVM/TCG, where they get stopped. Once stopped, they will no
-> longer run.
->=20
-> Signed-off-by: David Hildenbrand <david@redhat.com>
-> ---
->  target/s390x/diag.c | 4 ----
->  1 file changed, 4 deletions(-)
->=20
-> diff --git a/target/s390x/diag.c b/target/s390x/diag.c
-> index dbbb9e886f..52bc348808 100644
-> --- a/target/s390x/diag.c
-> +++ b/target/s390x/diag.c
-> @@ -27,7 +27,6 @@ static int modified_clear_reset(S390CPU *cpu)
->      S390CPUClass *scc =3D S390_CPU_GET_CLASS(cpu);
->      CPUState *t;
-> =20
-> -    pause_all_vcpus();
->      cpu_synchronize_all_states();
+This patch fixes the following BUG:
+Even a guest is able to detect virtio_pci device, the init function
+the Linux virtio_pci driver will hang because zPCI does not support
+the subregions used by virtio_pci.
 
-Hmm, thinking about this whole synchronization thingy, I guess it could
-happen that a VCPU starts running again after the
-cpu_synchronize_all_states() but before the reset. So we should do that
-in one shot. Resulting in something like the following. Comments?
+It follows that right now the PCI support is very limited
+(e.g. pass through of a host vfio device)
+To enable features like virtio-pci several modifications needs to be
+done.
+
+As already stated above, Virtio-PCI uses subregions, which may eventually
+be discontinuous inside bars instead of a single flat region often used
+by real devices.
+The address offset being formerly calculated from the BAR base address
+must be adapted to the subregions instead of to the single region.
+
+This patch provides the new calculation for the three kind of BAR
+access, zPCI STORE, zPCI LOAD and zPCI STORE BLOCK done by zPCI.
+
+We use the opportunity to
+ - enhance the fault detection for zPCI STORE and LOAD,
+ - enhance the fault detection and to provide the maximum STORE BLOCK
+   block size, maxstbl, for zPCI STORE BLOCK
+ - factor out part of the code used to calculate the offset and
+   access the BARs,
+ - factor out the code for endianess conversion.
 
 
+Pierre Morel (7):
+  s390x/pci: factor out endianess conversion
+  s390x/pci: rework PCI STORE
+  s390x/pci: rework PCI LOAD
+  s390x/pci: rework PCI STORE BLOCK
+  s390x/pci: move the memory region read from pcilg
+  s390x/pci: move the memory region write from pcistg
+  s390x/pci: search for subregion inside the BARs
 
->From 14440f775e65bb88c1a95705fc9b438f4022f332 Mon Sep 17 00:00:00 2001
-From: David Hildenbrand <david@redhat.com>
-Date: Wed, 15 Nov 2017 17:30:02 +0100
-Subject: [PATCH v1] s390x/tcg: fix DIAG 308 with > 1 VCPU (single threade=
-d
- TCG)
+ hw/s390x/s390-pci-bus.h  |   1 +
+ hw/s390x/s390-pci-inst.c | 247 ++++++++++++++++++++++++++++-------------------
+ hw/s390x/s390-pci-inst.h |   2 +-
+ 3 files changed, 150 insertions(+), 100 deletions(-)
 
-Currently, single threaded TCG with > 1 VCPU gets stuck during IPL, when
-the bios tries to switch to the loaded kernel via DIAG 308.
+-- 
+2.7.4
 
-pause_all_vcpus()/resume_all_vcpus() should not be called from a VCPU.
+Changelog:
 
-And there is also no need for it. run_on_cpu() will make sure that the
-CPUs exits KVM/TCG, where they get stopped. Once stopped, they will no
-longer run. As we have to proper synchronize before and after the reset,
-and have to hinder the VCPU from going back into TCG/KVM execution
-after the sync, let's do the synchronization in the same shot.
-
-Optimize so we don't do one additional round of synchronization on the
-running CPU.
-
-Signed-off-by: David Hildenbrand <david@redhat.com>
----
- target/s390x/diag.c | 42 ++++++++++++++++++++++++++++--------------
- 1 file changed, 28 insertions(+), 14 deletions(-)
-
-diff --git a/target/s390x/diag.c b/target/s390x/diag.c
-index dbbb9e886f..8396124a5f 100644
---- a/target/s390x/diag.c
-+++ b/target/s390x/diag.c
-@@ -19,51 +19,65 @@
- #include "exec/exec-all.h"
- #include "hw/watchdog/wdt_diag288.h"
- #include "sysemu/cpus.h"
-+#include "sysemu/hw_accel.h"
- #include "hw/s390x/ipl.h"
- #include "hw/s390x/s390-virtio-ccw.h"
-
-+static void s390_do_sync_cpu_full_reset(CPUState *cs, run_on_cpu_data ar=
-g)
-+{
-+    cpu_synchronize_state(cs);
-+    cpu_reset(cs);
-+    cpu_synchronize_post_reset(cs);
-+}
-+
- static int modified_clear_reset(S390CPU *cpu)
- {
-     S390CPUClass *scc =3D S390_CPU_GET_CLASS(cpu);
-+    CPUState *cs =3D CPU(cpu);
-     CPUState *t;
-
--    pause_all_vcpus();
--    cpu_synchronize_all_states();
-     CPU_FOREACH(t) {
--        run_on_cpu(t, s390_do_cpu_full_reset, RUN_ON_CPU_NULL);
-+        if (t !=3D cs) {
-+            run_on_cpu(t, s390_do_sync_cpu_full_reset, RUN_ON_CPU_NULL);
-+        }
-     }
-     s390_cmma_reset();
-     subsystem_reset();
-     s390_crypto_reset();
--    scc->load_normal(CPU(cpu));
--    cpu_synchronize_all_post_reset();
--    resume_all_vcpus();
-+    cpu_synchronize_state(cs);
-+    cpu_reset(cs);
-+    scc->load_normal(cs);
-+    cpu_synchronize_post_reset(cs);
-     return 0;
- }
-
--static inline void s390_do_cpu_reset(CPUState *cs, run_on_cpu_data arg)
-+static void s390_do_sync_cpu_reset(CPUState *cs, run_on_cpu_data arg)
- {
-     S390CPUClass *scc =3D S390_CPU_GET_CLASS(cs);
-
-+    cpu_synchronize_state(cs);
-     scc->cpu_reset(cs);
-+    cpu_synchronize_post_reset(cs);
- }
-
- static int load_normal_reset(S390CPU *cpu)
- {
-     S390CPUClass *scc =3D S390_CPU_GET_CLASS(cpu);
-+    CPUState *cs =3D CPU(cpu);
-     CPUState *t;
-
--    pause_all_vcpus();
--    cpu_synchronize_all_states();
-     CPU_FOREACH(t) {
--        run_on_cpu(t, s390_do_cpu_reset, RUN_ON_CPU_NULL);
-+        if (t !=3D cs) {
-+            run_on_cpu(t, s390_do_sync_cpu_reset, RUN_ON_CPU_NULL);
-+        }
-     }
-     s390_cmma_reset();
-     subsystem_reset();
--    scc->initial_cpu_reset(CPU(cpu));
--    scc->load_normal(CPU(cpu));
--    cpu_synchronize_all_post_reset();
--    resume_all_vcpus();
-+    cpu_synchronize_state(cs);
-+    /* scc->initital_cpu_reset() is a superset of scc->cpu_reset() */
-+    scc->initial_cpu_reset(cs);
-+    scc->load_normal(cs);
-+    cpu_synchronize_post_reset(cs);
-     return 0;
- }
-
---=20
-2.13.6
-
-
-
---=20
-
-Thanks,
-
-David / dhildenb
+- suppress fallthrough to PCI_ROM_SLOT to handle it in the default case.
+- reword most of the patch commit messages
+- add comments to the endianness conversion
+- reword somme comments inside the patches
