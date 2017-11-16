@@ -1,33 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46532)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46621)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1eFMZK-0002oT-Lr
-	for qemu-devel@nongnu.org; Thu, 16 Nov 2017 10:59:11 -0500
+	(envelope-from <mst@redhat.com>) id 1eFMZe-00031L-1p
+	for qemu-devel@nongnu.org; Thu, 16 Nov 2017 10:59:31 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1eFMZG-0001n5-Mk
-	for qemu-devel@nongnu.org; Thu, 16 Nov 2017 10:59:10 -0500
-Received: from 8.mo68.mail-out.ovh.net ([46.105.74.219]:50422)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1eFMZG-0001jq-FM
-	for qemu-devel@nongnu.org; Thu, 16 Nov 2017 10:59:06 -0500
-Received: from player750.ha.ovh.net (b6.ovh.net [213.186.33.56])
-	by mo68.mail-out.ovh.net (Postfix) with ESMTP id 439899D3EA
-	for <qemu-devel@nongnu.org>; Thu, 16 Nov 2017 16:59:03 +0100 (CET)
-References: <20170911171235.29331-1-clg@kaod.org>
-	<20170911171235.29331-2-clg@kaod.org> <20170919022719.GH27153@umbus>
-	<d3ee87a7-208e-a172-094b-6aeedf8c5840@kaod.org>
-	<20170922110040.GP4998@umbus.fritz.box>
-	<fc6b85f6-fa5b-7ed2-2635-72aceda74305@kaod.org>
-	<20170926035423.GH12504@umbus>
-From: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
-Message-ID: <be891296-6179-ad69-8c3b-a36b5908ca0e@kaod.org>
-Date: Thu, 16 Nov 2017 16:58:53 +0100
+	(envelope-from <mst@redhat.com>) id 1eFMZa-0002Dm-4S
+	for qemu-devel@nongnu.org; Thu, 16 Nov 2017 10:59:30 -0500
+Date: Thu, 16 Nov 2017 17:59:17 +0200
+From: "Michael S. Tsirkin" <mst@redhat.com>
+Message-ID: <20171116175713-mutt-send-email-mst@kernel.org>
+References: <20171116132339.4facb858@bahia.lab.toulouse-stg.fr.ibm.com>
+	<20171116172602-mutt-send-email-mst@kernel.org>
+	<20171116085345.7b02ecdd@t450s.home>
 MIME-Version: 1.0
-In-Reply-To: <20170926035423.GH12504@umbus>
-Content-Type: text/plain; charset=windows-1252
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [RFC PATCH v2 01/21] ppc/xive: introduce a
- skeleton for the sPAPR XIVE interrupt controller
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20171116085345.7b02ecdd@t450s.home>
+Subject: Re: [Qemu-devel] QEMU terminates during reboot after memory unplug
+ with vhost=on
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,121 +25,100 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Gibson <david@gibson.dropbear.id.au>
-Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, Benjamin Herrenschmidt <benh@kernel.crashing.org>, Alexey Kardashevskiy <aik@ozlabs.ru>, Alexander Graf <agraf@suse.de>
+To: Alex Williamson <alex.williamson@redhat.com>
+Cc: Greg Kurz <groug@kaod.org>, imammedo@redhat.com, bharata@linux.vnet.ibm.com, qemu-ppc@nongnu.org, qemu-devel@nongnu.org, david@gibson.dropbear.id.au
 
-On 09/26/2017 05:54 AM, David Gibson wrote:
-> On Fri, Sep 22, 2017 at 02:42:07PM +0200, C=E9dric Le Goater wrote:
->> On 09/22/2017 01:00 PM, David Gibson wrote:
->>> On Tue, Sep 19, 2017 at 03:15:44PM +0200, C=E9dric Le Goater wrote:
->>>> On 09/19/2017 04:27 AM, David Gibson wrote:
->>>>> On Mon, Sep 11, 2017 at 07:12:15PM +0200, C=E9dric Le Goater wrote:
->>>>>> Start with a couple of attributes for the XIVE sPAPR controller
->>>>>> model. The number of provisionned IRQ is necessary to size the
->>>>>> different internal XIVE tables, the number of CPUs is also.
->>>>>>
->>>>>> Signed-off-by: C=E9dric Le Goater <clg@kaod.org>
->>>>>
->>>>> [snip]
->>>>>
->>>>>> +static void spapr_xive_realize(DeviceState *dev, Error **errp)
->>>>>> +{
->>>>>> +    sPAPRXive *xive =3D SPAPR_XIVE(dev);
->>>>>> +
->>>>>> +    if (!xive->nr_targets) {
->>>>>> +        error_setg(errp, "Number of interrupt targets needs to be=
- greater 0");
->>>>>> +        return;
->>>>>> +    }
->>>>>> +    /* We need to be able to allocate at least the IPIs */
->>>>>> +    if (!xive->nr_irqs || xive->nr_irqs < xive->nr_targets) {
->>>>>> +        error_setg(errp, "Number of interrupts too small");
->>>>>> +        return;
->>>>>> +    }
->>>>>> +}
->>>>>> +
->>>>>> +static Property spapr_xive_properties[] =3D {
->>>>>> +    DEFINE_PROP_UINT32("nr-irqs", sPAPRXive, nr_irqs, 0),
->>>>>> +    DEFINE_PROP_UINT32("nr-targets", sPAPRXive, nr_targets, 0),
->>>>>
->>>>> I'm a bit uneasy about the number of targets having to be set in
->>>>> advance: this can make life awkward when CPUs are hotplugged.  I kn=
-ow
->>>>> there's something similar in xics, but it has caused some hassles, =
-and
->>>>> we're starting to move away from it.
->>>>>
->>>>> Do you really need this?
->>>>>
->>>>
->>>> Some of the internal table size depend on the number of cpus=20
->>>> defined for the machine.
->>>
->>> Which ones?  My impression was that there needed to be at least #cpus
->>> * #priority-levels EQs, but there could be more than that,=20
->>
->> euh no, not in spapr mode at least. There are 8 queues per cpu.
->=20
-> Ok.
->=20
->>> so it was no longer as tightly bound to the number if "interrupt serv=
-ers"> as xics.
->>
->> ah. I think I see what you mean, that we could allocate them on the=20
->> fly when needed by some hcalls ?
->=20
-> Not at hcall time, no, but at cpu hot(un)plug time I was wondering if w=
-e
-> could (de)allocate them then.
+On Thu, Nov 16, 2017 at 08:53:45AM -0700, Alex Williamson wrote:
+> On Thu, 16 Nov 2017 17:28:44 +0200
+> "Michael S. Tsirkin" <mst@redhat.com> wrote:
+> 
+> > On Thu, Nov 16, 2017 at 01:23:39PM +0100, Greg Kurz wrote:
+> > > Hi,
+> > > 
+> > > I'm resurrecting a thread about a QEMU crash we're still hitting on ppc64. It
+> > > was reported to the list by Bharata 2 months ago:
+> > > 
+> > > https://lists.gnu.org/archive/html/qemu-devel/2017-09/msg03685.html
+> > > 
+> > > "Hi,
+> > > 
+> > > QEMU hits the below assert
+> > > 
+> > > qemu-system-ppc64: used ring relocated for ring 2
+> > > qemu-system-ppc64: qemu/hw/virtio/vhost.c:649: vhost_commit: Assertion `r >= 0' failed.
+> > > 
+> > > in the following scenario:
+> > > 
+> > > 1. Boot guest with vhost=on
+> > >   -netdev tap,id=mynet0,script=qemu-ifup,downscript=qemu-ifdown,vhost=on -device virtio-net-pci,netdev=mynet0
+> > > 2. Hot add a DIMM device 
+> > > 3. Reboot
+> > >    When the guest reboots, we can see
+> > >    vhost_virtqueue_start:vq->used_phys getting assigned an address that
+> > >    falls in the hotplugged memory range.
+> > > 4. Remove the DIMM device
+> > >    Guest refuses the removal as the hotplugged memory is under use.
+> > > 5. Reboot
+> > >    QEMU forces the removal of the DIMM device during reset and that's
+> > >    when we hit the above assert.
+> > > 
+> > > Any pointers on why we are hitting this assert ? Shouldn't vhost be
+> > > done with using the hotplugged memory when we hit reset ?
+> > > 
+> > > Regards,
+> > > Bharata."
+> > > 
+> > > #0  0x00007ffff760eff0 in raise () from /lib64/libc.so.6
+> > > #1  0x00007ffff761136c in abort () from /lib64/libc.so.6
+> > > #2  0x00007ffff7604c44 in __assert_fail_base () from /lib64/libc.so.6
+> > > #3  0x00007ffff7604d34 in __assert_fail () from /lib64/libc.so.6
+> > > #4  0x0000000010161138 in vhost_commit (listener=0x11469e88) at /home/greg/Work/qemu/qemu-spapr/hw/virtio/vhost.c:650
+> > > #5  0x00000000100917fc in memory_region_transaction_commit () at /home/greg/Work/qemu/qemu-spapr/memory.c:1094
+> > > #6  0x0000000010096748 in memory_region_del_subregion (mr=0x1143eed0, subregion=0x116f1920) at /home/greg/Work/qemu/qemu-spapr/memory.c:2337
+> > > #7  0x00000000104a9aec in pc_dimm_memory_unplug (dev=0x11445c50, hpms=0x1143eec0, mr=0x116f1920) at /home/greg/Work/qemu/qemu-spapr/hw/mem/pc-dimm.c:126
+> > > #8  0x0000000010180454 in spapr_lmb_release (dev=0x11445c50) at /home/greg/Work/qemu/qemu-spapr/hw/ppc/spapr.c:3151
+> > > #9  0x00000000101a397c in spapr_drc_release (drc=0x116b9cc0) at /home/greg/Work/qemu/qemu-spapr/hw/ppc/spapr_drc.c:401
+> > > #10 0x00000000101a3ba0 in spapr_drc_reset (drc=0x116b9cc0) at /home/greg/Work/qemu/qemu-spapr/hw/ppc/spapr_drc.c:439
+> > > #11 0x00000000101a3c88 in drc_reset (opaque=0x116b9cc0) at /home/greg/Work/qemu/qemu-spapr/hw/ppc/spapr_drc.c:460
+> > > #12 0x0000000010447380 in qemu_devices_reset () at /home/greg/Work/qemu/qemu-spapr/hw/core/reset.c:69
+> > > #13 0x000000001017ae80 in ppc_spapr_reset () at /home/greg/Work/qemu/qemu-spapr/hw/ppc/spapr.c:1445
+> > > #14 0x0000000010377c60 in qemu_system_reset (reason=SHUTDOWN_CAUSE_HOST_QMP) at /home/greg/Work/qemu/qemu-spapr/vl.c:1788
+> > > #15 0x00000000103785ac in main_loop_should_exit () at /home/greg/Work/qemu/qemu-spapr/vl.c:1962
+> > > #16 0x0000000010378708 in main_loop () at /home/greg/Work/qemu/qemu-spapr/vl.c:1999
+> > > #17 0x0000000010382c54 in main (argc=21, argv=0x7ffffffff098, envp=0x7ffffffff148) at /home/greg/Work/qemu/qemu-spapr/vl.c:4897
+> > > 
+> > > 
+> > > This basically happens because on pseries, like x86, we usually wait
+> > > for the guest to eject the DIMM before actually removing it, BUT,
+> > > unlike x86, we force the removal on reset. This is handled by a DRC
+> > > object which registers a handler with qemu_register_reset().
+> > > 
+> > > At reset time, the machine calls qemu_devices_reset() but unfortunately,
+> > > the DRC reset handler gets called BEFORE the VirtIONet device one. The
+> > > vhost device is still active and it doesn't like the ring addresses to
+> > > change while in this state.
+> > > 
+> > > Michael,
+> > > 
+> > > The assert() has been around since the beginning, at a time I believe there was
+> > > no such thing as memory hot-unplug. Now that memory can go away at reset time,
+> > > is it really legitimate to crash QEMU if vhost detects a ring address change ?  
+> > 
+> > It's just a symptom of a problem though. If memory is going away
+> > while vhost backend is running, things are not going to
+> > end well. Less scary for a network device, more scary for a block
+> > device. VFIO probably has the same issue, it just does not
+> > have an assert.
+> 
+> Hmm, why?  We don't have data structures living in guest RAM with
+> vfio.  Guest RAM is just a mapping through the IOMMU.  So long as the
+> MemoryListener is correctly doing its job, that range will be unmapped
+> and vfio shouldn't care about it.  Thanks,
+> 
+> Alex
 
-Yes. I am currently reshuffling the ppc/xive patchset on top of the=20
-sPAPR allocator, also trying to take into account your comments and=20
-Ben's. And I think we can do that.=20
+Range is unmapped by listener but device has not been reset yet,
+so it will get errors when attempting to access guest RAM.
 
-I have introduced a specific XiveICPState (stored under the ->intc
-pointer of the CPUState) but I think we can go a little further and
-also store the XiveEQ array there. So that all the state related to=20
-a CPU would be allocated at init time or hot(un)plug time hot time.
-
-We could call the resulting compound object (ICP + EQs) a sPAPRXiveCore=20
-or something like that. And we won't need to keep 'nr_targets' around=20
-the sPAPR Xive object anymore *if* we do one more thing. See below.=20
-
->> The other place where I use the nr_targets is to provision the=20
->> IRQ numbers for the IPIs but that could probably be done in some=20
->> other way, specially it there is a IRQ allocator at the machine
->> level.
->=20
-> Hm, ok.
-
-The sPAPRXiveCore object above could also allocate the IPI for XIVE=20
-when it is created. But, the resulting IRQ number should be in a range=20
-not overlapping with the other devices' IRQs.=20
-
-That means that we should probably introduce the BUID concept in the=20
-IRQ allocator. This concept was left out from the original design of=20
-XICS as it was using a single ICS but it would be useful to define=20
-ranges for devices now. for PHBs for instance.
-
-We could start with 2K or 4K ranges. The first one would be for IPIs.
-
-Dave, could you please take a quick look at the allocator patchset=20
-when you have some time. I don't think there is much to do in the API=20
-to introduce ranges. It is just a question of defining a 'start' value=20
-when looking for an empty slot. =20
-
-Thanks,
-
-C.=20
-
->>
->> C. =20
->>>> When the sPAPRXive object is instantiated,=20
->>>> we use xics_max_server_number() to get the max number of cpus
->>>> provisioned.
->>>>
->>>> C.
->>>>
->>>
->>
->=20
+-- 
+MST
