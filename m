@@ -1,21 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33776)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33820)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1eFIpT-0001fA-Lh
-	for qemu-devel@nongnu.org; Thu, 16 Nov 2017 06:59:36 -0500
+	(envelope-from <pbonzini@redhat.com>) id 1eFIpW-0001i7-VB
+	for qemu-devel@nongnu.org; Thu, 16 Nov 2017 06:59:42 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1eFIpT-00006n-0B
-	for qemu-devel@nongnu.org; Thu, 16 Nov 2017 06:59:35 -0500
-Date: Thu, 16 Nov 2017 12:59:27 +0100
-From: Kevin Wolf <kwolf@redhat.com>
-Message-ID: <20171116115927.GB4062@localhost.localdomain>
-References: <20171106165500.30278-1-kwolf@redhat.com>
-	<CAFEAcA9dJAhVzA6Ez6sBjH1LPsNpJCTvM4ez14gQ+k1aesO7UA@mail.gmail.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CAFEAcA9dJAhVzA6Ez6sBjH1LPsNpJCTvM4ez14gQ+k1aesO7UA@mail.gmail.com>
-Subject: Re: [Qemu-devel] [PATCH] block: Fix error path in
- bdrv_backing_update_filename()
+	(envelope-from <pbonzini@redhat.com>) id 1eFIpR-0008W1-6L
+	for qemu-devel@nongnu.org; Thu, 16 Nov 2017 06:59:39 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:48224)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1eFIpQ-0008V3-Uq
+	for qemu-devel@nongnu.org; Thu, 16 Nov 2017 06:59:33 -0500
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+	[10.5.11.12])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 071C04A6EA
+	for <qemu-devel@nongnu.org>; Thu, 16 Nov 2017 11:59:32 +0000 (UTC)
+From: Paolo Bonzini <pbonzini@redhat.com>
+Date: Thu, 16 Nov 2017 12:59:17 +0100
+Message-Id: <20171116115926.16627-3-pbonzini@redhat.com>
+In-Reply-To: <20171116115926.16627-1-pbonzini@redhat.com>
+References: <20171116115926.16627-1-pbonzini@redhat.com>
+Subject: [Qemu-devel] [PULL 02/11] ioapic/tracing: Remove last DPRINTFs
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,39 +29,99 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: Qemu-block <qemu-block@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>
+To: qemu-devel@nongnu.org
+Cc: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
 
-Am 15.11.2017 um 20:41 hat Peter Maydell geschrieben:
-> On 6 November 2017 at 16:55, Kevin Wolf <kwolf@redhat.com> wrote:
-> > error_setg_errno() takes a positive errno code.
-> >
-> > Signed-off-by: Kevin Wolf <kwolf@redhat.com>
-> > ---
-> >  block.c | 2 +-
-> >  1 file changed, 1 insertion(+), 1 deletion(-)
-> >
-> > diff --git a/block.c b/block.c
-> > index 684cb018da..f6415547fe 100644
-> > --- a/block.c
-> > +++ b/block.c
-> > @@ -998,7 +998,7 @@ static int bdrv_backing_update_filename(BdrvChild *c, BlockDriverState *base,
-> >      ret = bdrv_change_backing_file(parent, filename,
-> >                                     base->drv ? base->drv->format_name : "");
-> >      if (ret < 0) {
-> > -        error_setg_errno(errp, ret, "Could not update backing file link");
-> > +        error_setg_errno(errp, -ret, "Could not update backing file link");
-> >      }
-> >
-> >      if (!(orig_flags & BDRV_O_RDWR)) {
-> > --
-> > 2.13.6
-> 
-> Just noticed going through coverity warnings that this didn't
-> make it into rc1 -- could we get it in for rc2, please?
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
 
-Yes. I was sick at the start of the week and Max didn't include my queue
-in his pull request, so all the patches I had queued missed -rc1 and
-will be sent for -rc2 instead.
+Remove the last few DPRINTFs from hw/intc/ioapic.c and turn
+them into tracing.  In one case it's a new trace, in the others
+it's just adding a parameter to the existing traces.
 
-Kevin
+Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+Message-Id: <20171102180310.24760-1-dgilbert@redhat.com>
+Reviewed-by: Peter Xu <peterx@redhat.com>
+Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
+Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+---
+ hw/intc/ioapic.c     | 17 +++--------------
+ hw/intc/trace-events |  5 +++--
+ 2 files changed, 6 insertions(+), 16 deletions(-)
+
+diff --git a/hw/intc/ioapic.c b/hw/intc/ioapic.c
+index 37c4386ae3..36139a4db6 100644
+--- a/hw/intc/ioapic.c
++++ b/hw/intc/ioapic.c
+@@ -35,15 +35,6 @@
+ #include "hw/i386/x86-iommu.h"
+ #include "trace.h"
+ 
+-//#define DEBUG_IOAPIC
+-
+-#ifdef DEBUG_IOAPIC
+-#define DPRINTF(fmt, ...)                                       \
+-    do { printf("ioapic: " fmt , ## __VA_ARGS__); } while (0)
+-#else
+-#define DPRINTF(fmt, ...)
+-#endif
+-
+ #define APIC_DELIVERY_MODE_SHIFT 8
+ #define APIC_POLARITY_SHIFT 14
+ #define APIC_TRIG_MODE_SHIFT 15
+@@ -157,7 +148,7 @@ static void ioapic_set_irq(void *opaque, int vector, int level)
+      * to GSI 2.  GSI maps to ioapic 1-1.  This is not
+      * the cleanest way of doing it but it should work. */
+ 
+-    DPRINTF("%s: %s vec %x\n", __func__, level ? "raise" : "lower", vector);
++    trace_ioapic_set_irq(vector, level);
+     if (vector == 0) {
+         vector = 2;
+     }
+@@ -290,11 +281,10 @@ ioapic_mem_read(void *opaque, hwaddr addr, unsigned int size)
+                 }
+             }
+         }
+-        DPRINTF("read: %08x = %08x\n", s->ioregsel, val);
+         break;
+     }
+ 
+-    trace_ioapic_mem_read(addr, size, val);
++    trace_ioapic_mem_read(addr, s->ioregsel, size, val);
+ 
+     return val;
+ }
+@@ -335,7 +325,7 @@ ioapic_mem_write(void *opaque, hwaddr addr, uint64_t val,
+     int index;
+ 
+     addr &= 0xff;
+-    trace_ioapic_mem_write(addr, size, val);
++    trace_ioapic_mem_write(addr, s->ioregsel, size, val);
+ 
+     switch (addr) {
+     case IOAPIC_IOREGSEL:
+@@ -345,7 +335,6 @@ ioapic_mem_write(void *opaque, hwaddr addr, uint64_t val,
+         if (size != 4) {
+             break;
+         }
+-        DPRINTF("write: %08x = %08" PRIx64 "\n", s->ioregsel, val);
+         switch (s->ioregsel) {
+         case IOAPIC_REG_ID:
+             s->id = (val >> IOAPIC_ID_SHIFT) & IOAPIC_ID_MASK;
+diff --git a/hw/intc/trace-events b/hw/intc/trace-events
+index b86f242b0f..b298fac7c6 100644
+--- a/hw/intc/trace-events
++++ b/hw/intc/trace-events
+@@ -18,8 +18,9 @@ apic_mem_writel(uint64_t addr, uint32_t val) "0x%"PRIx64" = 0x%08x"
+ ioapic_set_remote_irr(int n) "set remote irr for pin %d"
+ ioapic_clear_remote_irr(int n, int vector) "clear remote irr for pin %d vector %d"
+ ioapic_eoi_broadcast(int vector) "EOI broadcast for vector %d"
+-ioapic_mem_read(uint8_t addr, uint8_t size, uint32_t val) "ioapic mem read addr 0x%"PRIx8" size 0x%"PRIx8" retval 0x%"PRIx32
+-ioapic_mem_write(uint8_t addr, uint8_t size, uint32_t val) "ioapic mem write addr 0x%"PRIx8" size 0x%"PRIx8" val 0x%"PRIx32
++ioapic_mem_read(uint8_t addr, uint8_t regsel, uint8_t size, uint32_t val) "ioapic mem read addr 0x%"PRIx8" regsel: 0x%"PRIx8" size 0x%"PRIx8" retval 0x%"PRIx32
++ioapic_mem_write(uint8_t addr, uint8_t regsel, uint8_t size, uint32_t val) "ioapic mem write addr 0x%"PRIx8" regsel: 0x%"PRIx8" size 0x%"PRIx8" val 0x%"PRIx32
++ioapic_set_irq(int vector, int level) "vector: %d level: %d"
+ 
+ # hw/intc/slavio_intctl.c
+ slavio_intctl_mem_readl(uint32_t cpu, uint64_t addr, uint32_t ret) "read cpu %d reg 0x%"PRIx64" = 0x%x"
+-- 
+2.14.3
