@@ -1,29 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39566)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39571)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <rjones@redhat.com>) id 1eFJue-0001AP-3z
-	for qemu-devel@nongnu.org; Thu, 16 Nov 2017 08:09:00 -0500
+	(envelope-from <peterx@redhat.com>) id 1eFJue-0001Ai-DF
+	for qemu-devel@nongnu.org; Thu, 16 Nov 2017 08:09:01 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <rjones@redhat.com>) id 1eFJud-0001ei-7C
+	(envelope-from <peterx@redhat.com>) id 1eFJud-0001fh-HW
 	for qemu-devel@nongnu.org; Thu, 16 Nov 2017 08:09:00 -0500
-Date: Thu, 16 Nov 2017 13:08:51 +0000
-From: "Richard W.M. Jones" <rjones@redhat.com>
-Message-ID: <20171116130851.GU2787@redhat.com>
-References: <c2ecae32-f999-9f1e-46a6-37cdab2a62e3@redhat.com>
-	<CAJH6TXhBAaBE9gBSxksWZqNywWmencRaGyeY-oN3jbKdgUettQ@mail.gmail.com>
-	<0e6cc220-814a-17fd-4fd7-7b0665d34e81@redhat.com>
-	<CAJH6TXh2v-F=yqxQbUUawk_Ctq-sgFefGp1XvMsC=syX_5jEqA@mail.gmail.com>
-	<30b54865-2255-d13d-a054-afcf5bbd06b2@redhat.com>
-	<20171115202440.GJ19514@redhat.com>
-	<7b11bb2b-b93d-e8ff-f396-703c93549d0d@redhat.com>
-	<20171115202938.GN2787@redhat.com>
-	<CAJH6TXiPuLu62-+o2+PrUGpstrks_5pLotFEe1bAOmsbn20otw@mail.gmail.com>
-	<20171116135616.63dab444@fiorina>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20171116135616.63dab444@fiorina>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [Libguestfs]  [qemu-img] support for XVA
+Received: from mx1.redhat.com ([209.132.183.28]:52459)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1eFJud-0001dt-Bg
+	for qemu-devel@nongnu.org; Thu, 16 Nov 2017 08:08:59 -0500
+From: Peter Xu <peterx@redhat.com>
+Date: Thu, 16 Nov 2017 21:06:09 +0800
+Message-Id: <20171116130610.23582-27-peterx@redhat.com>
+In-Reply-To: <20171116130610.23582-1-peterx@redhat.com>
+References: <20171116130610.23582-1-peterx@redhat.com>
+Subject: [Qemu-devel] [RFC v4 26/27] tests: qmp-test: verify command batching
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,24 +23,53 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?utf-8?B?VG9tw6HFoSBHb2xlbWJpb3Zza8O9?= <tgolembi@redhat.com>
-Cc: Gandalf Corvotempesta <gandalf.corvotempesta@gmail.com>, libguestfs <libguestfs@redhat.com>, qemu-devel@nongnu.org, Qemu-block <qemu-block@nongnu.org>, Max Reitz <mreitz@redhat.com>
+To: qemu-devel@nongnu.org
+Cc: Stefan Hajnoczi <shajnocz@redhat.com>, "Daniel P . Berrange" <berrange@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Fam Zheng <famz@redhat.com>, Juan Quintela <quintela@redhat.com>, mdroth@linux.vnet.ibm.com, peterx@redhat.com, Eric Blake <eblake@redhat.com>, Laurent Vivier <lvivier@redhat.com>, Markus Armbruster <armbru@redhat.com>, marcandre.lureau@redhat.com, "Dr . David Alan Gilbert" <dgilbert@redhat.com>
 
-I think it's even possible to modify that shell script to pipe into
-nbdkit and from there to =E2=80=98qemu-img convert=E2=80=99.  I'm too laz=
-y to actually
-do that right now, but the basic idea is here:
+OOB introduced DROP event for flow control.  This should not affect old
+QMP clients.  Add a command batching check to make sure of it.
 
-  https://rwmj.wordpress.com/2014/10/14/streaming-nbd-server/
+Signed-off-by: Peter Xu <peterx@redhat.com>
+---
+ tests/qmp-test.c | 19 +++++++++++++++++++
+ 1 file changed, 19 insertions(+)
 
-You'll probably have to add =E2=80=98-m 1=E2=80=99 to the qemu-img conver=
-t command line.
-
-Rich.
-
---=20
-Richard Jones, Virtualization Group, Red Hat http://people.redhat.com/~rj=
-ones
-Read my programming and virtualization blog: http://rwmj.wordpress.com
-libguestfs lets you edit virtual machines.  Supports shell scripting,
-bindings from many languages.  http://libguestfs.org
+diff --git a/tests/qmp-test.c b/tests/qmp-test.c
+index 292c5f135a..729ec59b0a 100644
+--- a/tests/qmp-test.c
++++ b/tests/qmp-test.c
+@@ -78,6 +78,7 @@ static void test_qmp_protocol(void)
+     QList *capabilities;
+     const QListEntry *entry;
+     QString *qstr;
++    int i;
+ 
+     global_qtest = qtest_init_without_qmp_handshake(common_args);
+ 
+@@ -135,6 +136,24 @@ static void test_qmp_protocol(void)
+     g_assert_cmpint(qdict_get_int(resp, "id"), ==, 2);
+     QDECREF(resp);
+ 
++    /*
++     * Test command batching.  In current test OOB is not enabled, we
++     * should be able to run as many commands in batch as we like.
++     * Using 16 (>8, which is OOB queue length) to make sure OOB
++     * won't break existing clients.
++     */
++    for (i = 0; i < 16; i++) {
++        qmp_async("{ 'execute': 'query-version' }");
++    }
++    /* Verify the replies to make sure no command is dropped. */
++    for (i = 0; i < 16; i++) {
++        resp = qmp_receive();
++        /* It should never be dropped.  Each of them should be a reply. */
++        g_assert(qdict_haskey(resp, "return"));
++        g_assert(!qdict_haskey(resp, "event"));
++        QDECREF(resp);
++    }
++
+     qtest_end();
+ }
+ 
+-- 
+2.13.6
