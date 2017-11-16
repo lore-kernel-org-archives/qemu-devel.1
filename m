@@ -1,25 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37895)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38818)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ppandit@redhat.com>) id 1eFEzR-0005lK-W5
-	for qemu-devel@nongnu.org; Thu, 16 Nov 2017 02:53:38 -0500
+	(envelope-from <vsementsov@virtuozzo.com>) id 1eFF2D-0006VP-Dn
+	for qemu-devel@nongnu.org; Thu, 16 Nov 2017 02:56:30 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ppandit@redhat.com>) id 1eFEzP-0007EY-UF
-	for qemu-devel@nongnu.org; Thu, 16 Nov 2017 02:53:38 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:51430)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ppandit@redhat.com>) id 1eFEzP-0007Dw-Ou
-	for qemu-devel@nongnu.org; Thu, 16 Nov 2017 02:53:35 -0500
-Date: Thu, 16 Nov 2017 13:23:16 +0530 (IST)
-From: P J P <ppandit@redhat.com>
-In-Reply-To: <20171115133034.GB4418@work-vm>
-Message-ID: <nycvar.YSQ.7.76.1711161322260.21870@wniryva>
-References: <20171115124602.12501-1-ppandit@redhat.com>
-	<20171115125151.GG20349@redhat.com>
-	<f569ccce-4aa5-423a-25b2-baf69e8e6b43@redhat.com>
-	<20171115133034.GB4418@work-vm>
+	(envelope-from <vsementsov@virtuozzo.com>) id 1eFF2C-0001jn-II
+	for qemu-devel@nongnu.org; Thu, 16 Nov 2017 02:56:29 -0500
+References: <20171113162053.58795-1-vsementsov@virtuozzo.com>
+	<20171113162053.58795-2-vsementsov@virtuozzo.com>
+	<12463b01-41eb-4d17-65c0-a94de499e753@redhat.com>
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Message-ID: <d4ecc132-da33-53de-011b-57f30c0ccfdd@virtuozzo.com>
+Date: Thu, 16 Nov 2017 10:56:15 +0300
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Subject: Re: [Qemu-devel] [PATCH] ps2: fix PS2Queue counter field type
+In-Reply-To: <12463b01-41eb-4d17-65c0-a94de499e753@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: quoted-printable
+Content-Language: en-US
+Subject: Re: [Qemu-devel] [PATCH 1/4 for-2.11?] block/dirty-bitmap: add lock
+ to bdrv_enable/disable_dirty_bitmap
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,18 +26,67 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, "Daniel P. Berrange" <berrange@redhat.com>, Cyrille Chatras <cyrille.chatras@orange.com>, Gerd Hoffmann <kraxel@redhat.com>, Qemu Developers <qemu-devel@nongnu.org>
+To: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org
+Cc: mreitz@redhat.com, kwolf@redhat.com, jsnow@redhat.com, famz@redhat.com, stefanha@redhat.com, armbru@redhat.com, pbonzini@redhat.com, den@openvz.org, nshirokovskiy@virtuozzo.com, mnestratov@virtuozzo.com
 
-+-- On Wed, 15 Nov 2017, Dr. David Alan Gilbert wrote --+
-| * Paolo Bonzini (pbonzini@redhat.com) wrote:
-| > However, PJP's patch breaks migration by changing a 4-byte field to
-| > 1-byte.  The correct fix is to range-check the fields in
-| > ps2_common_post_load.
-| 
-| Agreed.
+13.11.2017 20:50, Eric Blake wrote:
+> On 11/13/2017 10:20 AM, Vladimir Sementsov-Ogievskiy wrote:
+>> Like other setters here these functions should take a lock.
+>>
+>> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+>> ---
+>>   block/dirty-bitmap.c | 4 ++++
+>>   1 file changed, 4 insertions(+)
+> Should this patch be in 2.11?
+>
+>> diff --git a/block/dirty-bitmap.c b/block/dirty-bitmap.c
+>> index bd04e991b1..2a0bcd9e51 100644
+>> --- a/block/dirty-bitmap.c
+>> +++ b/block/dirty-bitmap.c
+>> @@ -397,15 +397,19 @@ void bdrv_remove_persistent_dirty_bitmap(BlockDriv=
+erState *bs,
+>>   /* Called with BQL taken.  */
+>>   void bdrv_disable_dirty_bitmap(BdrvDirtyBitmap *bitmap)
+>>   {
+>> +    bdrv_dirty_bitmap_lock(bitmap);
+>>       assert(!bdrv_dirty_bitmap_frozen(bitmap));
+>>       bitmap->disabled =3D true;
+>> +    bdrv_dirty_bitmap_unlock(bitmap);
+> Why do we need this lock in addition to BQL?
 
-Sent revised patch v1. Thank you.
---
-Prasad J Pandit / Red Hat Product Security Team
-47AF CE69 3A90 54AA 9045 1053 DD13 3D32 FE5B 041F
+in fact, comment about BQL should be dropped.
+
+block_int.h:
+
+ =C2=A0=C2=A0=C2=A0 /* Writing to the list requires the BQL _and_ the dirty=
+_bitmap_mutex.
+ =C2=A0=C2=A0=C2=A0=C2=A0 * Reading from the list can be done with either t=
+he BQL or the
+ =C2=A0=C2=A0=C2=A0=C2=A0 * dirty_bitmap_mutex.=C2=A0 Modifying a bitmap on=
+ly requires
+ =C2=A0=C2=A0=C2=A0=C2=A0 * dirty_bitmap_mutex.=C2=A0 */
+ =C2=A0=C2=A0=C2=A0 QemuMutex dirty_bitmap_mutex;
+
+>
+>>   }
+>>  =20
+>>   /* Called with BQL taken.  */
+>>   void bdrv_enable_dirty_bitmap(BdrvDirtyBitmap *bitmap)
+>>   {
+>> +    bdrv_dirty_bitmap_lock(bitmap);
+>>       assert(!bdrv_dirty_bitmap_frozen(bitmap));
+>>       bitmap->disabled =3D false;
+>> +    bdrv_dirty_bitmap_unlock(bitmap);
+> Again, why do we need this in addition to BQL?
+
+and here.
+
+>
+> The commit message needs more details about a scenario where our
+> existing BQL lock is insufficient to prevent misuse of bitmap->disabled.
+>
+
+
+--=20
+Best regards,
+Vladimir
