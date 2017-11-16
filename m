@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60026)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60029)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <crosa@redhat.com>) id 1eFO7x-0007sG-LL
+	(envelope-from <crosa@redhat.com>) id 1eFO7x-0007sK-O4
 	for qemu-devel@nongnu.org; Thu, 16 Nov 2017 12:39:10 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <crosa@redhat.com>) id 1eFO7o-0003vd-8K
+	(envelope-from <crosa@redhat.com>) id 1eFO7p-0003xG-6i
 	for qemu-devel@nongnu.org; Thu, 16 Nov 2017 12:39:01 -0500
 From: Cleber Rosa <crosa@redhat.com>
-Date: Thu, 16 Nov 2017 12:38:05 -0500
-Message-Id: <20171116173810.16457-6-crosa@redhat.com>
+Date: Thu, 16 Nov 2017 12:38:06 -0500
+Message-Id: <20171116173810.16457-7-crosa@redhat.com>
 In-Reply-To: <20171116173810.16457-1-crosa@redhat.com>
 References: <20171116173810.16457-1-crosa@redhat.com>
-Subject: [Qemu-devel] [PATCH 05/10] qemu-iotests: define functions used in
- _cleanup() before its use
+Subject: [Qemu-devel] [PATCH 06/10] qemu-iotests: turn owner variable into a
+ comment
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,3786 +23,2723 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org, Cleber Rosa <crosa@redhat.com>
 
-The functions used in _cleanup() come from common.rc, which currently
-gets sourced after _cleanup() is defined and registered as a signal
-handler.  When _cleanup() is executed, it has no valid references to
-those functions, as BASH won't resolve the reference at that time.
+This variables has no real use.  To avoid pretending it does, while
+still keeping the information, let's turn it into a comment.
 
-While at it, also fix some tabs versus spaces indentation in
-_cleanup() in a few tests.
+The format chosen is the one already being used on tests 149 and 194.
 
 Signed-off-by: Cleber Rosa <crosa@redhat.com>
 ---
- tests/qemu-iotests/001 |  6 +++---
- tests/qemu-iotests/002 |  6 +++---
- tests/qemu-iotests/003 |  6 +++---
- tests/qemu-iotests/004 |  6 +++---
- tests/qemu-iotests/005 |  6 +++---
- tests/qemu-iotests/007 |  6 +++---
- tests/qemu-iotests/008 |  6 +++---
- tests/qemu-iotests/009 |  6 +++---
- tests/qemu-iotests/010 |  6 +++---
- tests/qemu-iotests/011 |  6 +++---
- tests/qemu-iotests/012 |  6 +++---
- tests/qemu-iotests/013 |  8 ++++----
- tests/qemu-iotests/014 |  8 ++++----
- tests/qemu-iotests/015 |  6 +++---
- tests/qemu-iotests/017 |  8 ++++----
- tests/qemu-iotests/018 |  8 ++++----
- tests/qemu-iotests/019 |  8 ++++----
- tests/qemu-iotests/020 |  8 ++++----
- tests/qemu-iotests/021 |  6 +++---
- tests/qemu-iotests/022 |  8 ++++----
- tests/qemu-iotests/023 |  8 ++++----
- tests/qemu-iotests/024 |  8 ++++----
- tests/qemu-iotests/025 |  8 ++++----
- tests/qemu-iotests/026 |  8 ++++----
- tests/qemu-iotests/027 |  6 +++---
- tests/qemu-iotests/028 | 10 +++++-----
- tests/qemu-iotests/029 |  8 ++++----
- tests/qemu-iotests/031 |  8 ++++----
- tests/qemu-iotests/032 |  8 ++++----
- tests/qemu-iotests/033 |  6 +++---
- tests/qemu-iotests/034 |  6 +++---
- tests/qemu-iotests/035 |  6 +++---
- tests/qemu-iotests/036 |  8 ++++----
- tests/qemu-iotests/037 |  6 +++---
- tests/qemu-iotests/038 |  6 +++---
- tests/qemu-iotests/039 |  6 +++---
- tests/qemu-iotests/042 |  6 +++---
- tests/qemu-iotests/043 |  6 +++---
- tests/qemu-iotests/046 |  6 +++---
- tests/qemu-iotests/047 |  6 +++---
- tests/qemu-iotests/048 |  8 ++++----
- tests/qemu-iotests/049 |  6 +++---
- tests/qemu-iotests/050 |  6 +++---
- tests/qemu-iotests/051 |  6 +++---
- tests/qemu-iotests/052 |  6 +++---
- tests/qemu-iotests/053 |  6 +++---
- tests/qemu-iotests/054 |  6 +++---
- tests/qemu-iotests/058 |  8 ++++----
- tests/qemu-iotests/059 |  6 +++---
- tests/qemu-iotests/060 |  6 +++---
- tests/qemu-iotests/061 |  6 +++---
- tests/qemu-iotests/062 |  6 +++---
- tests/qemu-iotests/063 |  8 ++++----
- tests/qemu-iotests/064 |  6 +++---
- tests/qemu-iotests/066 |  6 +++---
- tests/qemu-iotests/068 |  6 +++---
- tests/qemu-iotests/069 |  6 +++---
- tests/qemu-iotests/070 |  6 +++---
- tests/qemu-iotests/071 |  6 +++---
- tests/qemu-iotests/072 |  6 +++---
- tests/qemu-iotests/073 |  6 +++---
- tests/qemu-iotests/074 |  8 ++++----
- tests/qemu-iotests/075 |  6 +++---
- tests/qemu-iotests/076 |  6 +++---
- tests/qemu-iotests/077 |  6 +++---
- tests/qemu-iotests/078 |  6 +++---
- tests/qemu-iotests/079 |  6 +++---
- tests/qemu-iotests/080 |  6 +++---
- tests/qemu-iotests/082 |  6 +++---
- tests/qemu-iotests/084 |  6 +++---
- tests/qemu-iotests/085 |  8 ++++----
- tests/qemu-iotests/086 |  6 +++---
- tests/qemu-iotests/088 |  6 +++---
- tests/qemu-iotests/089 |  6 +++---
- tests/qemu-iotests/090 |  6 +++---
- tests/qemu-iotests/091 |  8 ++++----
- tests/qemu-iotests/092 |  6 +++---
- tests/qemu-iotests/094 |  9 ++++-----
- tests/qemu-iotests/095 |  8 ++++----
- tests/qemu-iotests/097 |  8 ++++----
- tests/qemu-iotests/098 |  8 ++++----
- tests/qemu-iotests/099 |  6 +++---
- tests/qemu-iotests/101 |  6 +++---
- tests/qemu-iotests/102 |  8 ++++----
- tests/qemu-iotests/103 |  6 +++---
- tests/qemu-iotests/105 |  6 +++---
- tests/qemu-iotests/106 |  6 +++---
- tests/qemu-iotests/107 |  6 +++---
- tests/qemu-iotests/108 |  6 +++---
- tests/qemu-iotests/109 |  8 ++++----
- tests/qemu-iotests/110 |  6 +++---
- tests/qemu-iotests/111 |  6 +++---
- tests/qemu-iotests/112 |  6 +++---
- tests/qemu-iotests/113 |  6 +++---
- tests/qemu-iotests/114 |  6 +++---
- tests/qemu-iotests/115 |  6 +++---
- tests/qemu-iotests/116 |  6 +++---
- tests/qemu-iotests/117 | 10 +++++-----
- tests/qemu-iotests/119 |  6 +++---
- tests/qemu-iotests/120 |  6 +++---
- tests/qemu-iotests/121 |  6 +++---
- tests/qemu-iotests/122 |  6 +++---
- tests/qemu-iotests/123 |  6 +++---
- tests/qemu-iotests/125 |  6 +++---
- tests/qemu-iotests/127 |  8 ++++----
- tests/qemu-iotests/130 |  8 ++++----
- tests/qemu-iotests/131 |  6 +++---
- tests/qemu-iotests/133 |  6 +++---
- tests/qemu-iotests/134 |  8 ++++----
- tests/qemu-iotests/135 |  6 +++---
- tests/qemu-iotests/137 |  8 ++++----
- tests/qemu-iotests/138 |  6 +++---
- tests/qemu-iotests/140 |  8 ++++----
- tests/qemu-iotests/141 |  8 ++++----
- tests/qemu-iotests/142 |  6 +++---
- tests/qemu-iotests/143 |  8 ++++----
- tests/qemu-iotests/144 |  8 ++++----
- tests/qemu-iotests/145 |  6 +++---
- tests/qemu-iotests/146 |  8 ++++----
- tests/qemu-iotests/150 |  6 +++---
- tests/qemu-iotests/153 |  8 ++++----
- tests/qemu-iotests/154 |  6 +++---
- tests/qemu-iotests/156 |  8 ++++----
- tests/qemu-iotests/157 |  6 +++---
- tests/qemu-iotests/158 |  6 +++---
- tests/qemu-iotests/159 |  6 +++---
- tests/qemu-iotests/160 |  6 +++---
- tests/qemu-iotests/170 |  6 +++---
- tests/qemu-iotests/171 |  6 +++---
- tests/qemu-iotests/172 |  8 ++++----
- tests/qemu-iotests/173 |  8 ++++----
- tests/qemu-iotests/174 |  6 +++---
- tests/qemu-iotests/175 |  6 +++---
- tests/qemu-iotests/176 |  8 ++++----
- tests/qemu-iotests/177 |  6 +++---
- tests/qemu-iotests/178 |  8 ++++----
- tests/qemu-iotests/179 |  8 ++++----
- tests/qemu-iotests/181 | 10 +++++-----
- tests/qemu-iotests/182 |  8 ++++----
- tests/qemu-iotests/183 |  8 ++++----
- tests/qemu-iotests/184 |  6 +++---
- tests/qemu-iotests/185 |  8 ++++----
- tests/qemu-iotests/186 |  6 +++---
- tests/qemu-iotests/187 |  8 ++++----
- tests/qemu-iotests/188 |  6 +++---
- tests/qemu-iotests/189 |  6 +++---
- tests/qemu-iotests/190 |  8 ++++----
- tests/qemu-iotests/191 |  8 ++++----
- tests/qemu-iotests/192 |  8 ++++----
- tests/qemu-iotests/195 |  6 +++---
- 150 files changed, 506 insertions(+), 507 deletions(-)
+ tests/qemu-iotests/001 | 5 ++---
+ tests/qemu-iotests/002 | 5 ++---
+ tests/qemu-iotests/003 | 5 ++---
+ tests/qemu-iotests/004 | 5 ++---
+ tests/qemu-iotests/005 | 5 ++---
+ tests/qemu-iotests/007 | 5 ++---
+ tests/qemu-iotests/008 | 5 ++---
+ tests/qemu-iotests/009 | 5 ++---
+ tests/qemu-iotests/010 | 5 ++---
+ tests/qemu-iotests/011 | 5 ++---
+ tests/qemu-iotests/012 | 5 ++---
+ tests/qemu-iotests/013 | 5 ++---
+ tests/qemu-iotests/014 | 5 ++---
+ tests/qemu-iotests/015 | 5 ++---
+ tests/qemu-iotests/017 | 5 ++---
+ tests/qemu-iotests/018 | 5 ++---
+ tests/qemu-iotests/019 | 5 ++---
+ tests/qemu-iotests/020 | 5 ++---
+ tests/qemu-iotests/021 | 5 ++---
+ tests/qemu-iotests/022 | 5 ++---
+ tests/qemu-iotests/023 | 5 ++---
+ tests/qemu-iotests/024 | 5 ++---
+ tests/qemu-iotests/025 | 5 ++---
+ tests/qemu-iotests/026 | 5 ++---
+ tests/qemu-iotests/027 | 5 ++---
+ tests/qemu-iotests/028 | 5 ++---
+ tests/qemu-iotests/029 | 5 ++---
+ tests/qemu-iotests/031 | 5 ++---
+ tests/qemu-iotests/032 | 5 ++---
+ tests/qemu-iotests/033 | 5 ++---
+ tests/qemu-iotests/034 | 5 ++---
+ tests/qemu-iotests/035 | 5 ++---
+ tests/qemu-iotests/036 | 5 ++---
+ tests/qemu-iotests/037 | 5 ++---
+ tests/qemu-iotests/038 | 5 ++---
+ tests/qemu-iotests/039 | 5 ++---
+ tests/qemu-iotests/040 | 1 +
+ tests/qemu-iotests/042 | 5 ++---
+ tests/qemu-iotests/043 | 5 ++---
+ tests/qemu-iotests/046 | 5 ++---
+ tests/qemu-iotests/047 | 5 ++---
+ tests/qemu-iotests/048 | 4 ++--
+ tests/qemu-iotests/049 | 5 ++---
+ tests/qemu-iotests/050 | 5 ++---
+ tests/qemu-iotests/051 | 5 ++---
+ tests/qemu-iotests/052 | 5 ++---
+ tests/qemu-iotests/053 | 5 ++---
+ tests/qemu-iotests/054 | 5 ++---
+ tests/qemu-iotests/058 | 5 ++---
+ tests/qemu-iotests/059 | 5 ++---
+ tests/qemu-iotests/060 | 5 ++---
+ tests/qemu-iotests/061 | 5 ++---
+ tests/qemu-iotests/062 | 5 ++---
+ tests/qemu-iotests/063 | 5 ++---
+ tests/qemu-iotests/064 | 5 ++---
+ tests/qemu-iotests/066 | 5 ++---
+ tests/qemu-iotests/067 | 5 ++---
+ tests/qemu-iotests/068 | 5 ++---
+ tests/qemu-iotests/069 | 5 ++---
+ tests/qemu-iotests/070 | 5 ++---
+ tests/qemu-iotests/071 | 5 ++---
+ tests/qemu-iotests/072 | 5 ++---
+ tests/qemu-iotests/073 | 5 ++---
+ tests/qemu-iotests/074 | 3 +--
+ tests/qemu-iotests/075 | 5 ++---
+ tests/qemu-iotests/076 | 5 ++---
+ tests/qemu-iotests/077 | 5 ++---
+ tests/qemu-iotests/078 | 5 ++---
+ tests/qemu-iotests/079 | 5 ++---
+ tests/qemu-iotests/080 | 5 ++---
+ tests/qemu-iotests/081 | 5 ++---
+ tests/qemu-iotests/082 | 5 ++---
+ tests/qemu-iotests/083 | 5 ++---
+ tests/qemu-iotests/084 | 5 ++---
+ tests/qemu-iotests/085 | 5 ++---
+ tests/qemu-iotests/086 | 5 ++---
+ tests/qemu-iotests/087 | 5 ++---
+ tests/qemu-iotests/088 | 5 ++---
+ tests/qemu-iotests/089 | 5 ++---
+ tests/qemu-iotests/090 | 5 ++---
+ tests/qemu-iotests/091 | 5 ++---
+ tests/qemu-iotests/092 | 5 ++---
+ tests/qemu-iotests/094 | 5 ++---
+ tests/qemu-iotests/095 | 4 ++--
+ tests/qemu-iotests/097 | 5 ++---
+ tests/qemu-iotests/098 | 5 ++---
+ tests/qemu-iotests/099 | 5 ++---
+ tests/qemu-iotests/101 | 5 ++---
+ tests/qemu-iotests/102 | 5 ++---
+ tests/qemu-iotests/103 | 5 ++---
+ tests/qemu-iotests/104 | 5 ++---
+ tests/qemu-iotests/105 | 5 ++---
+ tests/qemu-iotests/106 | 5 ++---
+ tests/qemu-iotests/107 | 5 ++---
+ tests/qemu-iotests/108 | 5 ++---
+ tests/qemu-iotests/109 | 5 ++---
+ tests/qemu-iotests/110 | 5 ++---
+ tests/qemu-iotests/111 | 5 ++---
+ tests/qemu-iotests/112 | 5 ++---
+ tests/qemu-iotests/113 | 5 ++---
+ tests/qemu-iotests/114 | 5 ++---
+ tests/qemu-iotests/115 | 5 ++---
+ tests/qemu-iotests/116 | 5 ++---
+ tests/qemu-iotests/117 | 5 ++---
+ tests/qemu-iotests/119 | 5 ++---
+ tests/qemu-iotests/120 | 5 ++---
+ tests/qemu-iotests/121 | 5 ++---
+ tests/qemu-iotests/122 | 5 ++---
+ tests/qemu-iotests/123 | 5 ++---
+ tests/qemu-iotests/125 | 5 ++---
+ tests/qemu-iotests/126 | 5 ++---
+ tests/qemu-iotests/127 | 5 ++---
+ tests/qemu-iotests/128 | 5 ++---
+ tests/qemu-iotests/130 | 5 ++---
+ tests/qemu-iotests/131 | 5 ++---
+ tests/qemu-iotests/133 | 5 ++---
+ tests/qemu-iotests/134 | 5 ++---
+ tests/qemu-iotests/135 | 5 ++---
+ tests/qemu-iotests/137 | 5 ++---
+ tests/qemu-iotests/138 | 5 ++---
+ tests/qemu-iotests/140 | 5 ++---
+ tests/qemu-iotests/141 | 5 ++---
+ tests/qemu-iotests/142 | 5 ++---
+ tests/qemu-iotests/143 | 5 ++---
+ tests/qemu-iotests/144 | 5 ++---
+ tests/qemu-iotests/145 | 5 ++---
+ tests/qemu-iotests/146 | 5 ++---
+ tests/qemu-iotests/150 | 5 ++---
+ tests/qemu-iotests/153 | 5 ++---
+ tests/qemu-iotests/154 | 5 ++---
+ tests/qemu-iotests/156 | 5 ++---
+ tests/qemu-iotests/157 | 5 ++---
+ tests/qemu-iotests/158 | 5 ++---
+ tests/qemu-iotests/159 | 4 ++--
+ tests/qemu-iotests/160 | 4 ++--
+ tests/qemu-iotests/162 | 5 ++---
+ tests/qemu-iotests/170 | 4 ++--
+ tests/qemu-iotests/171 | 5 ++---
+ tests/qemu-iotests/172 | 5 ++---
+ tests/qemu-iotests/173 | 4 ++--
+ tests/qemu-iotests/174 | 5 ++---
+ tests/qemu-iotests/175 | 5 ++---
+ tests/qemu-iotests/176 | 5 ++---
+ tests/qemu-iotests/177 | 5 ++---
+ tests/qemu-iotests/178 | 5 ++---
+ tests/qemu-iotests/179 | 5 ++---
+ tests/qemu-iotests/181 | 5 ++---
+ tests/qemu-iotests/182 | 5 ++---
+ tests/qemu-iotests/183 | 5 ++---
+ tests/qemu-iotests/184 | 5 ++---
+ tests/qemu-iotests/185 | 5 ++---
+ tests/qemu-iotests/186 | 5 ++---
+ tests/qemu-iotests/187 | 5 ++---
+ tests/qemu-iotests/188 | 5 ++---
+ tests/qemu-iotests/189 | 5 ++---
+ tests/qemu-iotests/190 | 5 ++---
+ tests/qemu-iotests/191 | 5 ++---
+ tests/qemu-iotests/192 | 5 ++---
+ tests/qemu-iotests/195 | 5 ++---
+ tests/qemu-iotests/197 | 5 ++---
+ 160 files changed, 318 insertions(+), 470 deletions(-)
 
 diff --git a/tests/qemu-iotests/001 b/tests/qemu-iotests/001
-index f93298a0e1..22d82e4be8 100755
+index 22d82e4be8..b38fb0c73d 100755
 --- a/tests/qemu-iotests/001
 +++ b/tests/qemu-iotests/001
-@@ -27,15 +27,15 @@ echo "QA output created by $seq"
- here=`pwd`
- status=1	# failure is the default!
- 
-+# get standard environment, filters and checks
-+. ./common.rc
-+
- _cleanup()
- {
- 	_cleanup_test_img
- }
- trap "_cleanup; exit \$status" 0 1 2 3 15
- 
--# get standard environment, filters and checks
--. ./common.rc
+@@ -17,9 +17,8 @@
+ # You should have received a copy of the GNU General Public License
+ # along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ #
 -
- _supported_fmt generic
- _supported_proto generic
- _supported_os Linux
+-# creator
+-owner=hch@lst.de
++# Creator/Owner: hch@lst.de
++#
+ 
+ seq=`basename $0`
+ echo "QA output created by $seq"
 diff --git a/tests/qemu-iotests/002 b/tests/qemu-iotests/002
-index 750d8d6498..6fd7183974 100755
+index 6fd7183974..608d62652a 100755
 --- a/tests/qemu-iotests/002
 +++ b/tests/qemu-iotests/002
-@@ -27,15 +27,15 @@ echo "QA output created by $seq"
- here=`pwd`
- status=1	# failure is the default!
- 
-+# get standard environment, filters and checks
-+. ./common.rc
-+
- _cleanup()
- {
- 	_cleanup_test_img
- }
- trap "_cleanup; exit \$status" 0 1 2 3 15
- 
--# get standard environment, filters and checks
--. ./common.rc
+@@ -17,9 +17,8 @@
+ # You should have received a copy of the GNU General Public License
+ # along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ #
 -
- _supported_fmt generic
- _supported_proto generic
- _supported_os Linux
+-# creator
+-owner=hch@lst.de
++# Creator/Owner: hch@lst.de
++#
+ 
+ seq=`basename $0`
+ echo "QA output created by $seq"
 diff --git a/tests/qemu-iotests/003 b/tests/qemu-iotests/003
-index 29618f040c..acad5a2a4d 100755
+index acad5a2a4d..68beb32aea 100755
 --- a/tests/qemu-iotests/003
 +++ b/tests/qemu-iotests/003
-@@ -27,15 +27,15 @@ echo "QA output created by $seq"
- here=`pwd`
- status=1	# failure is the default!
- 
-+# get standard environment, filters and checks
-+. ./common.rc
-+
- _cleanup()
- {
- 	_cleanup_test_img
- }
- trap "_cleanup; exit \$status" 0 1 2 3 15
- 
--# get standard environment, filters and checks
--. ./common.rc
+@@ -17,9 +17,8 @@
+ # You should have received a copy of the GNU General Public License
+ # along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ #
 -
- _supported_fmt generic
- _supported_proto generic
- _supported_os Linux
+-# creator
+-owner=hch@lst.de
++# Creator/Owner: hch@lst.de
++#
+ 
+ seq=`basename $0`
+ echo "QA output created by $seq"
 diff --git a/tests/qemu-iotests/004 b/tests/qemu-iotests/004
-index a8b98b5464..954a46ef7b 100755
+index 954a46ef7b..5afb23c9fd 100755
 --- a/tests/qemu-iotests/004
 +++ b/tests/qemu-iotests/004
-@@ -27,15 +27,15 @@ echo "QA output created by $seq"
- here=`pwd`
- status=1	# failure is the default!
- 
-+# get standard environment, filters and checks
-+. ./common.rc
-+
- _cleanup()
- {
- 	_cleanup_test_img
- }
- trap "_cleanup; exit \$status" 0 1 2 3 15
- 
--# get standard environment, filters and checks
--. ./common.rc
+@@ -17,9 +17,8 @@
+ # You should have received a copy of the GNU General Public License
+ # along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ #
 -
- _supported_fmt raw qcow qcow2 qed vdi vmdk vhdx luks
- _supported_proto generic
- _supported_os Linux
+-# creator
+-owner=hch@lst.de
++# Creator/Owner: hch@lst.de
++#
+ 
+ seq=`basename $0`
+ echo "QA output created by $seq"
 diff --git a/tests/qemu-iotests/005 b/tests/qemu-iotests/005
-index f514ac8979..f77caab3eb 100755
+index f77caab3eb..a860062847 100755
 --- a/tests/qemu-iotests/005
 +++ b/tests/qemu-iotests/005
-@@ -30,15 +30,15 @@ echo "QA output created by $seq"
- here=`pwd`
- status=1	# failure is the default!
- 
-+# get standard environment, filters and checks
-+. ./common.rc
-+
- _cleanup()
- {
- 	_cleanup_test_img
- }
- trap "_cleanup; exit \$status" 0 1 2 3 15
- 
--# get standard environment, filters and checks
--. ./common.rc
+@@ -20,9 +20,8 @@
+ # You should have received a copy of the GNU General Public License
+ # along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ #
 -
- _supported_fmt generic
- _supported_proto generic
- _supported_os Linux
+-# creator
+-owner=hch@lst.de
++# Creator/Owner: hch@lst.de
++#
+ 
+ seq=`basename $0`
+ echo "QA output created by $seq"
 diff --git a/tests/qemu-iotests/007 b/tests/qemu-iotests/007
-index 1e1dff6cef..b0bd1e1520 100755
+index b0bd1e1520..f9048f9a7a 100755
 --- a/tests/qemu-iotests/007
 +++ b/tests/qemu-iotests/007
-@@ -27,6 +27,9 @@ echo "QA output created by $seq"
- here=`pwd`
- status=1	# failure is the default!
- 
-+# get standard environment, filters and checks
-+. ./common.rc
-+
- _cleanup()
- {
- 	_cleanup_test_img
-@@ -34,9 +37,6 @@ _cleanup()
- }
- trap "_cleanup; exit \$status" 0 1 2 3 15
- 
--# get standard environment, filters and checks
--. ./common.rc
+@@ -17,9 +17,8 @@
+ # You should have received a copy of the GNU General Public License
+ # along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ #
 -
- # currently only qcow2 allows for consistency checks using qemu-img
- _supported_fmt qcow2
- _supported_proto generic
+-# creator
+-owner=kwolf@redhat.com
++# Creator/Owner: kwolf@redhat.com
++#
+ 
+ seq=`basename $0`
+ echo "QA output created by $seq"
 diff --git a/tests/qemu-iotests/008 b/tests/qemu-iotests/008
-index dce57adc3a..7ab1a403f1 100755
+index 7ab1a403f1..7755c00a43 100755
 --- a/tests/qemu-iotests/008
 +++ b/tests/qemu-iotests/008
-@@ -27,15 +27,15 @@ echo "QA output created by $seq"
- here=`pwd`
- status=1	# failure is the default!
- 
-+# get standard environment, filters and checks
-+. ./common.rc
-+
- _cleanup()
- {
- 	_cleanup_test_img
- }
- trap "_cleanup; exit \$status" 0 1 2 3 15
- 
--# get standard environment, filters and checks
--. ./common.rc
+@@ -17,9 +17,8 @@
+ # You should have received a copy of the GNU General Public License
+ # along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ #
 -
- _supported_fmt generic
- _supported_proto generic
- _supported_os Linux
+-# creator
+-owner=hch@lst.de
++# Creator/Owner: hch@lst.de
++#
+ 
+ seq=`basename $0`
+ echo "QA output created by $seq"
 diff --git a/tests/qemu-iotests/009 b/tests/qemu-iotests/009
-index 8ae55ec3f5..aeaed1d782 100755
+index aeaed1d782..418c0a56f7 100755
 --- a/tests/qemu-iotests/009
 +++ b/tests/qemu-iotests/009
-@@ -27,15 +27,15 @@ echo "QA output created by $seq"
- here=`pwd`
- status=1	# failure is the default!
- 
-+# get standard environment, filters and checks
-+. ./common.rc
-+
- _cleanup()
- {
- 	_cleanup_test_img
- }
- trap "_cleanup; exit \$status" 0 1 2 3 15
- 
--# get standard environment, filters and checks
--. ./common.rc
+@@ -17,9 +17,8 @@
+ # You should have received a copy of the GNU General Public License
+ # along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ #
 -
- _supported_fmt generic
- _supported_proto generic
- _supported_os Linux
+-# creator
+-owner=kwolf@redhat.com
++# Creator/Owner: kwolf@redhat.com
++#
+ 
+ seq=`basename $0`
+ echo "QA output created by $seq"
 diff --git a/tests/qemu-iotests/010 b/tests/qemu-iotests/010
-index b74d96dfcd..ce3e939796 100755
+index ce3e939796..6e9beb953d 100755
 --- a/tests/qemu-iotests/010
 +++ b/tests/qemu-iotests/010
-@@ -27,15 +27,15 @@ echo "QA output created by $seq"
- here=`pwd`
- status=1	# failure is the default!
- 
-+# get standard environment, filters and checks
-+. ./common.rc
-+
- _cleanup()
- {
- 	_cleanup_test_img
- }
- trap "_cleanup; exit \$status" 0 1 2 3 15
- 
--# get standard environment, filters and checks
--. ./common.rc
+@@ -17,9 +17,8 @@
+ # You should have received a copy of the GNU General Public License
+ # along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ #
 -
- _supported_fmt generic
- _supported_proto generic
- _supported_os Linux
+-# creator
+-owner=kwolf@redhat.com
++# Creator/Owner: kwolf@redhat.com
++#
+ 
+ seq=`basename $0`
+ echo "QA output created by $seq"
 diff --git a/tests/qemu-iotests/011 b/tests/qemu-iotests/011
-index 3a87df8cf0..8c98c9510e 100755
+index 8c98c9510e..275b0cc29c 100755
 --- a/tests/qemu-iotests/011
 +++ b/tests/qemu-iotests/011
-@@ -27,15 +27,15 @@ echo "QA output created by $seq"
- here=`pwd`
- status=1	# failure is the default!
- 
-+# get standard environment, filters and checks
-+. ./common.rc
-+
- _cleanup()
- {
- 	_cleanup_test_img
- }
- trap "_cleanup; exit \$status" 0 1 2 3 15
- 
--# get standard environment, filters and checks
--. ./common.rc
+@@ -17,9 +17,8 @@
+ # You should have received a copy of the GNU General Public License
+ # along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ #
 -
- _supported_fmt generic
- _supported_proto generic
- _supported_os Linux
+-# creator
+-owner=kwolf@redhat.com
++# Creator/Owner: kwolf@redhat.com
++#
+ 
+ seq=`basename $0`
+ echo "QA output created by $seq"
 diff --git a/tests/qemu-iotests/012 b/tests/qemu-iotests/012
-index d646d0dec5..484b47a9d3 100755
+index 484b47a9d3..59cac183e2 100755
 --- a/tests/qemu-iotests/012
 +++ b/tests/qemu-iotests/012
-@@ -29,15 +29,15 @@ echo "QA output created by $seq"
- here=`pwd`
- status=1	# failure is the default!
- 
-+# get standard environment, filters and checks
-+. ./common.rc
-+
- _cleanup()
- {
- 	_cleanup_test_img
- }
- trap "_cleanup; exit \$status" 0 1 2 3 15
- 
--# get standard environment, filters and checks
--. ./common.rc
+@@ -19,9 +19,8 @@
+ # You should have received a copy of the GNU General Public License
+ # along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ #
 -
- _supported_fmt generic
- _supported_proto file
- _supported_os Linux
+-# creator
+-owner=hch@lst.de
++# Creator/Owner: hch@lst.de
++#
+ 
+ seq=`basename $0`
+ echo "QA output created by $seq"
 diff --git a/tests/qemu-iotests/013 b/tests/qemu-iotests/013
-index b46493358e..afc4c5a2b0 100755
+index afc4c5a2b0..d33969be6a 100755
 --- a/tests/qemu-iotests/013
 +++ b/tests/qemu-iotests/013
-@@ -27,16 +27,16 @@ echo "QA output created by $seq"
- here=`pwd`
- status=1	# failure is the default!
- 
-+# get standard environment, filters and checks
-+. ./common.rc
-+. ./common.pattern
-+
- _cleanup()
- {
- 	_cleanup_test_img
- }
- trap "_cleanup; exit \$status" 0 1 2 3 15
- 
--# get standard environment, filters and checks
--. ./common.rc
--. ./common.pattern
+@@ -17,9 +17,8 @@
+ # You should have received a copy of the GNU General Public License
+ # along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ #
 -
- # much of this could be generic for any format supporting compression.
- _supported_fmt qcow qcow2
- _supported_proto file
+-# creator
+-owner=kwolf@redhat.com
++# Creator/Owner: kwolf@redhat.com
++#
+ 
+ seq=`basename $0`
+ echo "QA output created by $seq"
 diff --git a/tests/qemu-iotests/014 b/tests/qemu-iotests/014
-index a7c912e913..7307e10015 100755
+index 7307e10015..360379f2b3 100755
 --- a/tests/qemu-iotests/014
 +++ b/tests/qemu-iotests/014
-@@ -29,16 +29,16 @@ echo "QA output created by $seq"
- here=`pwd`
- status=1	# failure is the default!
- 
-+# get standard environment, filters and checks
-+. ./common.rc
-+. ./common.pattern
-+
- _cleanup()
- {
- 	_cleanup_test_img
- }
- trap "_cleanup; exit \$status" 0 1 2 3 15
- 
--# get standard environment, filters and checks
--. ./common.rc
--. ./common.pattern
+@@ -19,9 +19,8 @@
+ # You should have received a copy of the GNU General Public License
+ # along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ #
 -
- # much of this could be generic for any format supporting snapshots
- _supported_fmt qcow2
- _supported_proto file
+-# creator
+-owner=kwolf@redhat.com
++# Creator/Owner: kwolf@redhat.com
++#
+ 
+ seq=`basename $0`
+ echo "QA output created by $seq"
 diff --git a/tests/qemu-iotests/015 b/tests/qemu-iotests/015
-index 1a685ec927..735f597dac 100755
+index 735f597dac..c1b920fd56 100755
 --- a/tests/qemu-iotests/015
 +++ b/tests/qemu-iotests/015
-@@ -27,6 +27,9 @@ echo "QA output created by $seq"
- here=`pwd`
- status=1	# failure is the default!
- 
-+# get standard environment, filters and checks
-+. ./common.rc
-+
- _cleanup()
- {
- 	_cleanup_test_img
-@@ -34,9 +37,6 @@ _cleanup()
- }
- trap "_cleanup; exit \$status" 0 1 2 3 15
- 
--# get standard environment, filters and checks
--. ./common.rc
+@@ -17,9 +17,8 @@
+ # You should have received a copy of the GNU General Public License
+ # along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ #
 -
- # actually any format that supports snapshots
- _supported_fmt qcow2
- _supported_proto generic
+-# creator
+-owner=kwolf@redhat.com
++# Creator/Owner: kwolf@redhat.com
++#
+ 
+ seq=`basename $0`
+ echo "QA output created by $seq"
 diff --git a/tests/qemu-iotests/017 b/tests/qemu-iotests/017
-index 0ef6b9a04e..765dee9157 100755
+index 765dee9157..b2a95c5166 100755
 --- a/tests/qemu-iotests/017
 +++ b/tests/qemu-iotests/017
-@@ -27,16 +27,16 @@ echo "QA output created by $seq"
- here=`pwd`
- status=1	# failure is the default!
- 
-+# get standard environment, filters and checks
-+. ./common.rc
-+. ./common.pattern
-+
- _cleanup()
- {
- 	_cleanup_test_img
- }
- trap "_cleanup; exit \$status" 0 1 2 3 15
- 
--# get standard environment, filters and checks
--. ./common.rc
--. ./common.pattern
+@@ -17,9 +17,8 @@
+ # You should have received a copy of the GNU General Public License
+ # along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ #
 -
- # Any format supporting backing files
- _supported_fmt qcow qcow2 vmdk qed
- _supported_proto generic
+-# creator
+-owner=kwolf@redhat.com
++# Creator/Owner: kwolf@redhat.com
++#
+ 
+ seq=`basename $0`
+ echo "QA output created by $seq"
 diff --git a/tests/qemu-iotests/018 b/tests/qemu-iotests/018
-index 315aad6663..ae7907c1e9 100755
+index ae7907c1e9..5375eae206 100755
 --- a/tests/qemu-iotests/018
 +++ b/tests/qemu-iotests/018
-@@ -27,16 +27,16 @@ echo "QA output created by $seq"
- here=`pwd`
- status=1	# failure is the default!
- 
-+# get standard environment, filters and checks
-+. ./common.rc
-+. ./common.pattern
-+
- _cleanup()
- {
- 	_cleanup_test_img
- }
- trap "_cleanup; exit \$status" 0 1 2 3 15
- 
--# get standard environment, filters and checks
--. ./common.rc
--. ./common.pattern
+@@ -17,9 +17,8 @@
+ # You should have received a copy of the GNU General Public License
+ # along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ #
 -
- # Any format supporting backing files
- _supported_fmt qcow qcow2 vmdk qed
- _supported_proto file
+-# creator
+-owner=kwolf@redhat.com
++# Creator/Owner: kwolf@redhat.com
++#
+ 
+ seq=`basename $0`
+ echo "QA output created by $seq"
 diff --git a/tests/qemu-iotests/019 b/tests/qemu-iotests/019
-index e25fa6309f..3b0e97feb9 100755
+index 3b0e97feb9..c2af8a0236 100755
 --- a/tests/qemu-iotests/019
 +++ b/tests/qemu-iotests/019
-@@ -29,6 +29,10 @@ echo "QA output created by $seq"
- here=`pwd`
- status=1	# failure is the default!
- 
-+# get standard environment, filters and checks
-+. ./common.rc
-+. ./common.pattern
-+
- _cleanup()
- {
- 	_cleanup_test_img
-@@ -37,10 +41,6 @@ _cleanup()
- }
- trap "_cleanup; exit \$status" 0 1 2 3 15
- 
--# get standard environment, filters and checks
--. ./common.rc
--. ./common.pattern
+@@ -19,9 +19,8 @@
+ # You should have received a copy of the GNU General Public License
+ # along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ #
 -
- # Any format supporting backing files
- _supported_fmt qcow qcow2 vmdk qed
- _supported_proto file
+-# creator
+-owner=kwolf@redhat.com
++# Creator/Owner: kwolf@redhat.com
++#
+ 
+ seq=`basename $0`
+ echo "QA output created by $seq"
 diff --git a/tests/qemu-iotests/020 b/tests/qemu-iotests/020
-index 18bc6fc48d..a2bad2f04e 100755
+index a2bad2f04e..0361809a6d 100755
 --- a/tests/qemu-iotests/020
 +++ b/tests/qemu-iotests/020
-@@ -27,6 +27,10 @@ echo "QA output created by $seq"
- here=`pwd`
- status=1	# failure is the default!
- 
-+# get standard environment, filters and checks
-+. ./common.rc
-+. ./common.pattern
-+
- _cleanup()
- {
- 	_cleanup_test_img
-@@ -35,10 +39,6 @@ _cleanup()
- }
- trap "_cleanup; exit \$status" 0 1 2 3 15
- 
--# get standard environment, filters and checks
--. ./common.rc
--. ./common.pattern
+@@ -17,9 +17,8 @@
+ # You should have received a copy of the GNU General Public License
+ # along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ #
 -
- # Any format supporting backing files
- _supported_fmt qcow qcow2 vmdk qed
- _supported_proto generic
+-# creator
+-owner=kwolf@redhat.com
++# Creator/Owner: kwolf@redhat.com
++#
+ 
+ seq=`basename $0`
+ echo "QA output created by $seq"
 diff --git a/tests/qemu-iotests/021 b/tests/qemu-iotests/021
-index 391afccea5..e34d50be52 100755
+index e34d50be52..2ea6b1d161 100755
 --- a/tests/qemu-iotests/021
 +++ b/tests/qemu-iotests/021
-@@ -27,15 +27,15 @@ echo "QA output created by $seq"
- here=`pwd`
- status=1	# failure is the default!
- 
-+# get standard environment, filters and checks
-+. ./common.rc
-+
- _cleanup()
- {
- 	_cleanup_test_img
- }
- trap "_cleanup; exit \$status" 0 1 2 3 15
- 
--# get standard environment, filters and checks
--. ./common.rc
+@@ -17,9 +17,8 @@
+ # You should have received a copy of the GNU General Public License
+ # along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ #
 -
- _supported_fmt generic
- _supported_proto generic
- _supported_os Linux
+-# creator
+-owner=hch@lst.de
++# Creator/Owner: hch@lst.de
++#
+ 
+ seq=`basename $0`
+ echo "QA output created by $seq"
 diff --git a/tests/qemu-iotests/022 b/tests/qemu-iotests/022
-index c165f1aa2c..13c13e3e3e 100755
+index 13c13e3e3e..f577278db9 100755
 --- a/tests/qemu-iotests/022
 +++ b/tests/qemu-iotests/022
-@@ -29,16 +29,16 @@ echo "QA output created by $seq"
- here=`pwd`
- status=1	# failure is the default!
- 
-+# get standard environment, filters and checks
-+. ./common.rc
-+. ./common.pattern
-+
- _cleanup()
- {
- 	_cleanup_test_img
- }
- trap "_cleanup; exit \$status" 0 1 2 3 15
- 
--# get standard environment, filters and checks
--. ./common.rc
--. ./common.pattern
+@@ -19,9 +19,8 @@
+ # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
+ # USA
+ #
 -
- # Any format that supports snapshots
- _supported_fmt qcow2
- _supported_proto generic
+-# creator
+-owner=kwolf@redhat.com
++# Creator/Owner: kwolf@redhat.com
++#
+ 
+ seq=`basename $0`
+ echo "QA output created by $seq"
 diff --git a/tests/qemu-iotests/023 b/tests/qemu-iotests/023
-index 54713838c1..c7d64cf026 100755
+index c7d64cf026..ca8440ad83 100755
 --- a/tests/qemu-iotests/023
 +++ b/tests/qemu-iotests/023
-@@ -27,16 +27,16 @@ echo "QA output created by $seq"
- here=`pwd`
- status=1	# failure is the default!
- 
-+# get standard environment, filters and checks
-+. ./common.rc
-+. ./common.pattern
-+
- _cleanup()
- {
- 	_cleanup_test_img
- }
- trap "_cleanup; exit \$status" 0 1 2 3 15
- 
--# get standard environment, filters and checks
--. ./common.rc
--. ./common.pattern
+@@ -17,9 +17,8 @@
+ # You should have received a copy of the GNU General Public License
+ # along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ #
 -
- # much of this could be generic for any format supporting compression.
- _supported_fmt qcow qcow2
- _supported_proto file
+-# creator
+-owner=kwolf@redhat.com
++# Creator/Owner: kwolf@redhat.com
++#
+ 
+ seq=`basename $0`
+ echo "QA output created by $seq"
 diff --git a/tests/qemu-iotests/024 b/tests/qemu-iotests/024
-index 63a50322dc..d2efc27aae 100755
+index d2efc27aae..189d5c3fc1 100755
 --- a/tests/qemu-iotests/024
 +++ b/tests/qemu-iotests/024
-@@ -27,6 +27,10 @@ echo "QA output created by $seq"
- here=`pwd`
- status=1	# failure is the default!
- 
-+# get standard environment, filters and checks
-+. ./common.rc
-+. ./common.pattern
-+
- _cleanup()
- {
- 	_cleanup_test_img
-@@ -35,10 +39,6 @@ _cleanup()
- }
- trap "_cleanup; exit \$status" 0 1 2 3 15
- 
--# get standard environment, filters and checks
--. ./common.rc
--. ./common.pattern
+@@ -17,9 +17,8 @@
+ # You should have received a copy of the GNU General Public License
+ # along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ #
 -
- # Currently only qcow2 and qed support rebasing
- _supported_fmt qcow2 qed
- _supported_proto file
+-# creator
+-owner=kwolf@redhat.com
++# Creator/Owner: kwolf@redhat.com
++#
+ 
+ seq=`basename $0`
+ echo "QA output created by $seq"
 diff --git a/tests/qemu-iotests/025 b/tests/qemu-iotests/025
-index f0d57aff94..afb5cf0ae0 100755
+index afb5cf0ae0..eb12d1c7d6 100755
 --- a/tests/qemu-iotests/025
 +++ b/tests/qemu-iotests/025
-@@ -27,16 +27,16 @@ echo "QA output created by $seq"
- here=`pwd`
- status=1	# failure is the default!
- 
-+# get standard environment, filters and checks
-+. ./common.rc
-+. ./common.pattern
-+
- _cleanup()
- {
- 	_cleanup_test_img
- }
- trap "_cleanup; exit \$status" 0 1 2 3 15
- 
--# get standard environment, filters and checks
--. ./common.rc
--. ./common.pattern
+@@ -17,9 +17,8 @@
+ # You should have received a copy of the GNU General Public License
+ # along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ #
 -
- _supported_fmt raw qcow2 qed
- _supported_proto file sheepdog rbd nfs
- _supported_os Linux
+-# creator
+-owner=stefanha@linux.vnet.ibm.com
++# Creator/Owner: stefanha@linux.vnet.ibm.com
++#
+ 
+ seq=`basename $0`
+ echo "QA output created by $seq"
 diff --git a/tests/qemu-iotests/026 b/tests/qemu-iotests/026
-index 5a97803f0c..a3be017ccb 100755
+index a3be017ccb..3fb915f289 100755
 --- a/tests/qemu-iotests/026
 +++ b/tests/qemu-iotests/026
-@@ -27,6 +27,10 @@ echo "QA output created by $seq"
- here=`pwd`
- status=1	# failure is the default!
- 
-+# get standard environment, filters and checks
-+. ./common.rc
-+. ./common.pattern
-+
- _cleanup()
- {
- 	_cleanup_test_img
-@@ -34,10 +38,6 @@ _cleanup()
- }
- trap "_cleanup; exit \$status" 0 1 2 3 15
- 
--# get standard environment, filters and checks
--. ./common.rc
--. ./common.pattern
+@@ -17,9 +17,8 @@
+ # You should have received a copy of the GNU General Public License
+ # along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ #
 -
- # Currently only qcow2 supports rebasing
- _supported_fmt qcow2
- _supported_proto file
+-# creator
+-owner=kwolf@redhat.com
++# Creator/Owner: kwolf@redhat.com
++#
+ 
+ seq=`basename $0`
+ echo "QA output created by $seq"
 diff --git a/tests/qemu-iotests/027 b/tests/qemu-iotests/027
-index d6d47ab6b4..ea950e09d1 100755
+index ea950e09d1..9a25a63c28 100755
 --- a/tests/qemu-iotests/027
 +++ b/tests/qemu-iotests/027
-@@ -27,15 +27,15 @@ echo "QA output created by $seq"
- here=`pwd`
- status=1	# failure is the default!
- 
-+# get standard environment, filters and checks
-+. ./common.rc
-+
- _cleanup()
- {
- 	_cleanup_test_img
- }
- trap "_cleanup; exit \$status" 0 1 2 3 15
- 
--# get standard environment, filters and checks
--. ./common.rc
+@@ -17,9 +17,8 @@
+ # You should have received a copy of the GNU General Public License
+ # along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ #
 -
- _supported_fmt vmdk qcow qcow2 qed
- _supported_proto generic
- _supported_os Linux
+-# creator
+-owner=stefanha@linux.vnet.ibm.com
++# Creator/Owner: stefanha@linux.vnet.ibm.com
++#
+ 
+ seq=`basename $0`
+ echo "QA output created by $seq"
 diff --git a/tests/qemu-iotests/028 b/tests/qemu-iotests/028
-index ee3adf64c1..0192004d84 100755
+index 0192004d84..e75611bab3 100755
 --- a/tests/qemu-iotests/028
 +++ b/tests/qemu-iotests/028
-@@ -30,6 +30,11 @@ echo "QA output created by $seq"
- here=`pwd`
- status=1	# failure is the default!
- 
-+# get standard environment, filters and checks
-+. ./common.rc
-+. ./common.pattern
-+. ./common.qemu
-+
- _cleanup()
- {
-     _cleanup_qemu
-@@ -38,11 +43,6 @@ _cleanup()
- }
- trap "_cleanup; exit \$status" 0 1 2 3 15
- 
--# get standard environment, filters and checks
--. ./common.rc
--. ./common.pattern
--. ./common.qemu
+@@ -20,9 +20,8 @@
+ # You should have received a copy of the GNU General Public License
+ # along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ #
 -
- # Any format supporting backing files except vmdk and qcow which do not support
- # smaller backing files.
- _supported_fmt qcow2 qed
+-# creator
+-owner=stefanha@linux.vnet.ibm.com
++# Creator/Owner: stefanha@linux.vnet.ibm.com
++#
+ 
+ seq=`basename $0`
+ echo "QA output created by $seq"
 diff --git a/tests/qemu-iotests/029 b/tests/qemu-iotests/029
-index 7f47b50dc6..d18d004e18 100755
+index d18d004e18..01ed075402 100755
 --- a/tests/qemu-iotests/029
 +++ b/tests/qemu-iotests/029
-@@ -27,6 +27,10 @@ echo "QA output created by $seq"
- here=`pwd`
- status=1	# failure is the default!
- 
-+# get standard environment, filters and checks
-+. ./common.rc
-+. ./common.pattern
-+
- _cleanup()
- {
-     rm -f $TEST_IMG.snap
-@@ -34,10 +38,6 @@ _cleanup()
- }
- trap "_cleanup; exit \$status" 0 1 2 3 15
- 
--# get standard environment, filters and checks
--. ./common.rc
--. ./common.pattern
+@@ -17,9 +17,8 @@
+ # You should have received a copy of the GNU General Public License
+ # along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ #
 -
- # Any format supporting intenal snapshots
- _supported_fmt qcow2
- _supported_proto generic
+-# creator
+-owner=kwolf@redhat.com
++# Creator/Owner: kwolf@redhat.com
++#
+ 
+ seq=`basename $0`
+ echo "QA output created by $seq"
 diff --git a/tests/qemu-iotests/031 b/tests/qemu-iotests/031
-index 03a1699d2d..b2aa016e00 100755
+index b2aa016e00..1ac200f191 100755
 --- a/tests/qemu-iotests/031
 +++ b/tests/qemu-iotests/031
-@@ -27,16 +27,16 @@ echo "QA output created by $seq"
- here=`pwd`
- status=1	# failure is the default!
- 
-+# get standard environment, filters and checks
-+. ./common.rc
-+. ./common.pattern
-+
- _cleanup()
- {
- 	_cleanup_test_img
- }
- trap "_cleanup; exit \$status" 0 1 2 3 15
- 
--# get standard environment, filters and checks
--. ./common.rc
--. ./common.pattern
+@@ -17,9 +17,8 @@
+ # You should have received a copy of the GNU General Public License
+ # along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ #
 -
- # This tests qcow2-specific low-level functionality
- _supported_fmt qcow2
- _supported_proto file
+-# creator
+-owner=kwolf@redhat.com
++# Creator/Owner: kwolf@redhat.com
++#
+ 
+ seq=`basename $0`
+ echo "QA output created by $seq"
 diff --git a/tests/qemu-iotests/032 b/tests/qemu-iotests/032
-index f2339e8a75..97404db0da 100755
+index 97404db0da..c9f9cf5439 100755
 --- a/tests/qemu-iotests/032
 +++ b/tests/qemu-iotests/032
-@@ -29,16 +29,16 @@ echo "QA output created by $seq"
- here=`pwd`
- status=1	# failure is the default!
- 
-+# get standard environment, filters and checks
-+. ./common.rc
-+. ./common.pattern
-+
- _cleanup()
- {
- 	_cleanup_test_img
- }
- trap "_cleanup; exit \$status" 0 1 2 3 15
- 
--# get standard environment, filters and checks
--. ./common.rc
--. ./common.pattern
+@@ -19,9 +19,8 @@
+ # You should have received a copy of the GNU General Public License
+ # along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ #
 -
- # This works for any image format (though unlikely to segfault for raw)
- _supported_fmt generic
- _supported_proto generic
+-# creator
+-owner=kwolf@redhat.com
++# Creator/Owner: kwolf@redhat.com
++#
+ 
+ seq=`basename $0`
+ echo "QA output created by $seq"
 diff --git a/tests/qemu-iotests/033 b/tests/qemu-iotests/033
-index 3bf5325630..1b9c3ba37a 100755
+index 1b9c3ba37a..dd8fc32ea8 100755
 --- a/tests/qemu-iotests/033
 +++ b/tests/qemu-iotests/033
-@@ -27,15 +27,15 @@ echo "QA output created by $seq"
- here=`pwd`
- status=1	# failure is the default!
- 
-+# get standard environment, filters and checks
-+. ./common.rc
-+
- _cleanup()
- {
- 	_cleanup_test_img
- }
- trap "_cleanup; exit \$status" 0 1 2 3 15
- 
--# get standard environment, filters and checks
--. ./common.rc
+@@ -17,9 +17,8 @@
+ # You should have received a copy of the GNU General Public License
+ # along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ #
 -
- _supported_fmt generic
- _supported_proto generic
- _supported_os Linux
+-# creator
+-owner=pbonzini@redhat.com
++# Creator/Owner: pbonzini@redhat.com
++#
+ 
+ seq=`basename $0`
+ echo "QA output created by $seq"
 diff --git a/tests/qemu-iotests/034 b/tests/qemu-iotests/034
-index 1459ff5b9d..8c9db83134 100755
+index 8c9db83134..1bdd7f2e04 100755
 --- a/tests/qemu-iotests/034
 +++ b/tests/qemu-iotests/034
-@@ -27,15 +27,15 @@ echo "QA output created by $seq"
- here=`pwd`
- status=1	# failure is the default!
- 
-+# get standard environment, filters and checks
-+. ./common.rc
-+
- _cleanup()
- {
- 	_cleanup_test_img
- }
- trap "_cleanup; exit \$status" 0 1 2 3 15
- 
--# get standard environment, filters and checks
--. ./common.rc
+@@ -17,9 +17,8 @@
+ # You should have received a copy of the GNU General Public License
+ # along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ #
 -
- _supported_fmt qcow qcow2 vmdk qed
- _supported_proto file
- _supported_os Linux
+-# creator
+-owner=kwolf@redhat.com
++# Creator/Owner: kwolf@redhat.com
++#
+ 
+ seq=`basename $0`
+ echo "QA output created by $seq"
 diff --git a/tests/qemu-iotests/035 b/tests/qemu-iotests/035
-index 53f0f3fe6a..cead994725 100755
+index cead994725..1cd2475ba6 100755
 --- a/tests/qemu-iotests/035
 +++ b/tests/qemu-iotests/035
-@@ -28,15 +28,15 @@ echo "QA output created by $seq"
- here=`pwd`
- status=1	# failure is the default!
- 
-+# get standard environment, filters and checks
-+. ./common.rc
-+
- _cleanup()
- {
- 	_cleanup_test_img
- }
- trap "_cleanup; exit \$status" 0 1 2 3 15
- 
--# get standard environment, filters and checks
--. ./common.rc
+@@ -18,9 +18,8 @@
+ # You should have received a copy of the GNU General Public License
+ # along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ #
 -
- _supported_fmt qcow2
- _supported_proto generic
- _supported_os Linux
+-# creator
+-owner=kwolf@redhat.com
++# Creator/Owner: kwolf@redhat.com
++#
+ 
+ seq=`basename $0`
+ echo "QA output created by $seq"
 diff --git a/tests/qemu-iotests/036 b/tests/qemu-iotests/036
-index f9560e9771..07f3d30f77 100755
+index 07f3d30f77..e49e4a7f85 100755
 --- a/tests/qemu-iotests/036
 +++ b/tests/qemu-iotests/036
-@@ -30,16 +30,16 @@ echo "QA output created by $seq"
- here=`pwd`
- status=1	# failure is the default!
- 
-+# get standard environment, filters and checks
-+. ./common.rc
-+. ./common.pattern
-+
- _cleanup()
- {
- 	_cleanup_test_img
- }
- trap "_cleanup; exit \$status" 0 1 2 3 15
- 
--# get standard environment, filters and checks
--. ./common.rc
--. ./common.pattern
+@@ -20,9 +20,8 @@
+ # You should have received a copy of the GNU General Public License
+ # along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ #
 -
- # This tests qcow2-specific low-level functionality
- _supported_fmt qcow2
- _supported_proto file
+-# creator
+-owner=stefanha@linux.vnet.ibm.com
++# Creator/Owner: stefanha@linux.vnet.ibm.com
++#
+ 
+ seq=`basename $0`
+ echo "QA output created by $seq"
 diff --git a/tests/qemu-iotests/037 b/tests/qemu-iotests/037
-index 383e770d57..510d113990 100755
+index 510d113990..06ba02a9f9 100755
 --- a/tests/qemu-iotests/037
 +++ b/tests/qemu-iotests/037
-@@ -27,15 +27,15 @@ echo "QA output created by $seq"
- here=`pwd`
- status=1	# failure is the default!
- 
-+# get standard environment, filters and checks
-+. ./common.rc
-+
- _cleanup()
- {
- 	_cleanup_test_img
- }
- trap "_cleanup; exit \$status" 0 1 2 3 15
- 
--# get standard environment, filters and checks
--. ./common.rc
+@@ -17,9 +17,8 @@
+ # You should have received a copy of the GNU General Public License
+ # along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ #
 -
- _supported_fmt qcow qcow2 vmdk qed
- _supported_proto file
- _supported_os Linux
+-# creator
+-owner=kwolf@redhat.com
++# Creator/Owner: kwolf@redhat.com
++#
+ 
+ seq=`basename $0`
+ echo "QA output created by $seq"
 diff --git a/tests/qemu-iotests/038 b/tests/qemu-iotests/038
-index b0d4510cdf..2286c081d6 100755
+index 2286c081d6..1ad0efd1a3 100755
 --- a/tests/qemu-iotests/038
 +++ b/tests/qemu-iotests/038
-@@ -27,15 +27,15 @@ echo "QA output created by $seq"
- here=`pwd`
- status=1	# failure is the default!
- 
-+# get standard environment, filters and checks
-+. ./common.rc
-+
- _cleanup()
- {
- 	_cleanup_test_img
- }
- trap "_cleanup; exit \$status" 0 1 2 3 15
- 
--# get standard environment, filters and checks
--. ./common.rc
+@@ -17,9 +17,8 @@
+ # You should have received a copy of the GNU General Public License
+ # along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ #
 -
- _supported_fmt qcow2 qed
- _supported_proto file
- _supported_os Linux
+-# creator
+-owner=kwolf@redhat.com
++# Creator/Owner: kwolf@redhat.com
++#
+ 
+ seq=`basename $0`
+ echo "QA output created by $seq"
 diff --git a/tests/qemu-iotests/039 b/tests/qemu-iotests/039
-index d5e6205528..cc1e7d74db 100755
+index cc1e7d74db..cf83895f23 100755
 --- a/tests/qemu-iotests/039
 +++ b/tests/qemu-iotests/039
-@@ -30,15 +30,15 @@ echo "QA output created by $seq"
- here=`pwd`
- status=1	# failure is the default!
- 
-+# get standard environment, filters and checks
-+. ./common.rc
-+
- _cleanup()
- {
- 	_cleanup_test_img
- }
- trap "_cleanup; exit \$status" 0 1 2 3 15
- 
--# get standard environment, filters and checks
--. ./common.rc
+@@ -20,9 +20,8 @@
+ # You should have received a copy of the GNU General Public License
+ # along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ #
 -
- _supported_fmt qcow2
- _supported_proto file
- _supported_os Linux
+-# creator
+-owner=stefanha@linux.vnet.ibm.com
++# Creator/Owner: stefanha@linux.vnet.ibm.com
++#
+ 
+ seq=`basename $0`
+ echo "QA output created by $seq"
+diff --git a/tests/qemu-iotests/040 b/tests/qemu-iotests/040
+index 90b5b4f2ad..4466811195 100755
+--- a/tests/qemu-iotests/040
++++ b/tests/qemu-iotests/040
+@@ -20,6 +20,7 @@
+ #
+ # Test for live block commit
+ # Derived from Image Streaming Test 030
++#
+ 
+ import time
+ import os
 diff --git a/tests/qemu-iotests/042 b/tests/qemu-iotests/042
-index bccc01f8ed..45d533b7d9 100755
+index 45d533b7d9..db66fc8434 100755
 --- a/tests/qemu-iotests/042
 +++ b/tests/qemu-iotests/042
-@@ -27,15 +27,15 @@ echo "QA output created by $seq"
- here=`pwd`
- status=1	# failure is the default!
- 
-+# get standard environment, filters and checks
-+. ./common.rc
-+
- _cleanup()
- {
- 	_cleanup_test_img
- }
- trap "_cleanup; exit \$status" 0 1 2 3 15
- 
--# get standard environment, filters and checks
--. ./common.rc
+@@ -17,9 +17,8 @@
+ # You should have received a copy of the GNU General Public License
+ # along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ #
 -
- _supported_fmt qcow2 qed
- _supported_proto file
- _supported_os Linux
+-# creator
+-owner=kwolf@redhat.com
++# Creator/Owner: kwolf@redhat.com
++#
+ 
+ seq=`basename $0`
+ echo "QA output created by $seq"
 diff --git a/tests/qemu-iotests/043 b/tests/qemu-iotests/043
-index c650054328..b63073db37 100755
+index b63073db37..7d106ddb3b 100755
 --- a/tests/qemu-iotests/043
 +++ b/tests/qemu-iotests/043
-@@ -27,6 +27,9 @@ echo "QA output created by $seq"
- here=`pwd`
- status=1	# failure is the default!
- 
-+# get standard environment, filters and checks
-+. ./common.rc
-+
- _cleanup()
- {
-     _cleanup_test_img
-@@ -34,9 +37,6 @@ _cleanup()
- }
- trap "_cleanup; exit \$status" 0 1 2 3 15
- 
--# get standard environment, filters and checks
--. ./common.rc
+@@ -17,9 +17,8 @@
+ # You should have received a copy of the GNU General Public License
+ # along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ #
 -
- # Any format supporting backing files
- _supported_fmt qcow2 qed
- _supported_proto file
+-# creator
+-owner=stefanha@redhat.com
++# Creator/Owner: stefanha@redhat.com
++#
+ 
+ seq=`basename $0`
+ echo "QA output created by $seq"
 diff --git a/tests/qemu-iotests/046 b/tests/qemu-iotests/046
-index e4c3c5364c..09192b25de 100755
+index 09192b25de..f6914ccd1e 100755
 --- a/tests/qemu-iotests/046
 +++ b/tests/qemu-iotests/046
-@@ -27,15 +27,15 @@ echo "QA output created by $seq"
- here=`pwd`
- status=1	# failure is the default!
- 
-+# get standard environment, filters and checks
-+. ./common.rc
-+
- _cleanup()
- {
- 	_cleanup_test_img
- }
- trap "_cleanup; exit \$status" 0 1 2 3 15
- 
--# get standard environment, filters and checks
--. ./common.rc
+@@ -17,9 +17,8 @@
+ # You should have received a copy of the GNU General Public License
+ # along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ #
 -
- _supported_fmt qcow2
- _supported_proto file
- _supported_os Linux
+-# creator
+-owner=kwolf@redhat.com
++# Creator/Owner: kwolf@redhat.com
++#
+ 
+ seq=`basename $0`
+ echo "QA output created by $seq"
 diff --git a/tests/qemu-iotests/047 b/tests/qemu-iotests/047
-index e941a6f110..a11d212d44 100755
+index a11d212d44..474c5cb47d 100755
 --- a/tests/qemu-iotests/047
 +++ b/tests/qemu-iotests/047
-@@ -28,15 +28,15 @@ echo "QA output created by $seq"
- here=`pwd`
- status=1	# failure is the default!
- 
-+# get standard environment, filters and checks
-+. ./common.rc
-+
- _cleanup()
- {
- 	_cleanup_test_img
- }
- trap "_cleanup; exit \$status" 0 1 2 3 15
- 
--# get standard environment, filters and checks
--. ./common.rc
+@@ -18,9 +18,8 @@
+ # You should have received a copy of the GNU General Public License
+ # along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ #
 -
- _supported_fmt qcow2
- _supported_proto generic
- _supported_os Linux
+-# creator
+-owner=kwolf@redhat.com
++# Creator/Owner: kwolf@redhat.com
++#
+ 
+ seq=`basename $0`
+ echo "QA output created by $seq"
 diff --git a/tests/qemu-iotests/048 b/tests/qemu-iotests/048
-index 5b77c195b8..f75cb4926e 100755
+index f75cb4926e..531bed217c 100755
 --- a/tests/qemu-iotests/048
 +++ b/tests/qemu-iotests/048
-@@ -27,6 +27,10 @@ echo "QA output created by $seq"
+@@ -19,8 +19,8 @@
+ ## along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ ##
+ #
+-# creator
+-owner=mrezanin@redhat.com
++# Creator/Owner: mrezanin@redhat.com
++#
  
- status=1        # failure is the default!
- 
-+# get standard environment, filters and checks
-+. ./common.rc
-+. ./common.pattern
-+
- _cleanup()
- {
-     echo "Cleanup"
-@@ -41,10 +45,6 @@ _compare()
-     echo $?
- }
- 
--# get standard environment, filters and checks
--. ./common.rc
--. ./common.pattern
--
- _supported_fmt raw qcow2 qed luks
- _supported_proto file
- _supported_os Linux
+ seq=`basename $0`
+ echo "QA output created by $seq"
 diff --git a/tests/qemu-iotests/049 b/tests/qemu-iotests/049
-index 70f02d3f41..20207a7023 100755
+index 20207a7023..2f4d8ab932 100755
 --- a/tests/qemu-iotests/049
 +++ b/tests/qemu-iotests/049
-@@ -27,15 +27,15 @@ echo "QA output created by $seq"
- here=`pwd`
- status=1	# failure is the default!
- 
-+# get standard environment, filters and checks
-+. ./common.rc
-+
- _cleanup()
- {
- 	_cleanup_test_img
- }
- trap "_cleanup; exit \$status" 0 1 2 3 15
- 
--# get standard environment, filters and checks
--. ./common.rc
+@@ -17,9 +17,8 @@
+ # You should have received a copy of the GNU General Public License
+ # along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ #
 -
- _supported_fmt qcow2
- _supported_proto file
- _supported_os Linux
+-# creator
+-owner=kwolf@redhat.com
++# Creator/Owner: kwolf@redhat.com
++#
+ 
+ seq=`basename $0`
+ echo "QA output created by $seq"
 diff --git a/tests/qemu-iotests/050 b/tests/qemu-iotests/050
-index c7a2858cea..9d22200910 100755
+index 9d22200910..7096fa535c 100755
 --- a/tests/qemu-iotests/050
 +++ b/tests/qemu-iotests/050
-@@ -27,6 +27,9 @@ echo "QA output created by $seq"
- here=`pwd`
- status=1	# failure is the default!
- 
-+# get standard environment, filters and checks
-+. ./common.rc
-+
- _cleanup()
- {
-     _cleanup_test_img
-@@ -35,9 +38,6 @@ _cleanup()
- }
- trap "_cleanup; exit \$status" 0 1 2 3 15
- 
--# get standard environment, filters and checks
--. ./common.rc
+@@ -17,9 +17,8 @@
+ # You should have received a copy of the GNU General Public License
+ # along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ #
 -
- _supported_fmt qcow2 qed
- _supported_proto file
- _supported_os Linux
+-# creator
+-owner=pbonzini@redhat.com
++# Creator/Owner: pbonzini@redhat.com
++#
+ 
+ seq=`basename $0`
+ echo "QA output created by $seq"
 diff --git a/tests/qemu-iotests/051 b/tests/qemu-iotests/051
-index 2f3eca42ec..0ad210c560 100755
+index 0ad210c560..e726df6e01 100755
 --- a/tests/qemu-iotests/051
 +++ b/tests/qemu-iotests/051
-@@ -27,15 +27,15 @@ echo "QA output created by $seq"
- here=`pwd`
- status=1	# failure is the default!
- 
-+# get standard environment, filters and checks
-+. ./common.rc
-+
- _cleanup()
- {
- 	_cleanup_test_img
- }
- trap "_cleanup; exit \$status" 0 1 2 3 15
- 
--# get standard environment, filters and checks
--. ./common.rc
+@@ -17,9 +17,8 @@
+ # You should have received a copy of the GNU General Public License
+ # along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ #
 -
- _supported_fmt qcow2
- _supported_proto file
- _supported_os Linux
+-# creator
+-owner=kwolf@redhat.com
++# Creator/Owner: kwolf@redhat.com
++#
+ 
+ seq=`basename $0`
+ echo "QA output created by $seq"
 diff --git a/tests/qemu-iotests/052 b/tests/qemu-iotests/052
-index 612dff2d8d..3355094e3e 100755
+index 3355094e3e..c521a6fc36 100755
 --- a/tests/qemu-iotests/052
 +++ b/tests/qemu-iotests/052
-@@ -27,15 +27,15 @@ echo "QA output created by $seq"
- here=`pwd`
- status=1	# failure is the default!
- 
-+# get standard environment, filters and checks
-+. ./common.rc
-+
- _cleanup()
- {
- 	_cleanup_test_img
- }
- trap "_cleanup; exit \$status" 0 1 2 3 15
- 
--# get standard environment, filters and checks
--. ./common.rc
+@@ -17,9 +17,8 @@
+ # You should have received a copy of the GNU General Public License
+ # along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ #
 -
- _supported_fmt generic
- _supported_proto file
- _supported_os Linux
+-# creator
+-owner=stefanha@redhat.com
++# Creator/Owner: stefanha@redhat.com
++#
+ 
+ seq=`basename $0`
+ echo "QA output created by $seq"
 diff --git a/tests/qemu-iotests/053 b/tests/qemu-iotests/053
-index 6f7667bfd9..09e6a4f8bb 100755
+index 09e6a4f8bb..c8fda86672 100755
 --- a/tests/qemu-iotests/053
 +++ b/tests/qemu-iotests/053
-@@ -27,6 +27,9 @@ echo "QA output created by $seq"
- here=`pwd`
- status=1	# failure is the default!
- 
-+# get standard environment, filters and checks
-+. ./common.rc
-+
- _cleanup()
- {
- 	rm -f "$TEST_IMG.orig"
-@@ -34,9 +37,6 @@ _cleanup()
- }
- trap "_cleanup; exit \$status" 0 1 2 3 15
- 
--# get standard environment, filters and checks
--. ./common.rc
+@@ -17,9 +17,8 @@
+ # You should have received a copy of the GNU General Public License
+ # along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ #
 -
- _supported_fmt qcow2 qcow
- _supported_proto file
- _supported_os Linux
+-# creator
+-owner=stefanha@redhat.com
++# Creator/Owner: stefanha@redhat.com
++#
+ 
+ seq=`basename $0`
+ echo "QA output created by $seq"
 diff --git a/tests/qemu-iotests/054 b/tests/qemu-iotests/054
-index a2c7632158..46d0714881 100755
+index 46d0714881..bcea34ef86 100755
 --- a/tests/qemu-iotests/054
 +++ b/tests/qemu-iotests/054
-@@ -27,15 +27,15 @@ echo "QA output created by $seq"
- here=`pwd`
- status=1	# failure is the default!
- 
-+# get standard environment, filters and checks
-+. ./common.rc
-+
- _cleanup()
- {
- 	_cleanup_test_img
- }
- trap "_cleanup; exit \$status" 0 1 2 3 15
- 
--# get standard environment, filters and checks
--. ./common.rc
+@@ -17,9 +17,8 @@
+ # You should have received a copy of the GNU General Public License
+ # along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ #
 -
- _supported_fmt qcow2
- _supported_proto file
- _supported_os Linux
+-# creator
+-owner=kwolf@redhat.com
++# Creator/Owner: kwolf@redhat.com
++#
+ 
+ seq=`basename $0`
+ echo "QA output created by $seq"
 diff --git a/tests/qemu-iotests/058 b/tests/qemu-iotests/058
-index 08f8bd5d6b..34dcd10a58 100755
+index 34dcd10a58..17970357cd 100755
 --- a/tests/qemu-iotests/058
 +++ b/tests/qemu-iotests/058
-@@ -29,6 +29,10 @@ echo "QA output created by $seq"
- here=`pwd`
- status=1	# failure is the default!
- 
-+# get standard environment, filters and checks
-+. ./common.rc
-+. ./common.pattern
-+
- nbd_unix_socket=$TEST_DIR/test_qemu_nbd_socket
- nbd_snapshot_img="nbd:unix:$nbd_unix_socket"
- rm -f "${TEST_DIR}/qemu-nbd.pid"
-@@ -83,10 +87,6 @@ _cleanup()
- }
- trap "_cleanup; exit \$status" 0 1 2 3 15
- 
--# get standard environment, filters and checks
--. ./common.rc
--. ./common.pattern
+@@ -19,9 +19,8 @@
+ # You should have received a copy of the GNU General Public License
+ # along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ #
 -
- _supported_fmt qcow2
- _supported_proto file
- _supported_os Linux
+-# creator
+-owner=xiawenc@linux.vnet.ibm.com
++# Creator/Owner: xiawenc@linux.vnet.ibm.com
++#
+ 
+ seq=`basename $0`
+ echo "QA output created by $seq"
 diff --git a/tests/qemu-iotests/059 b/tests/qemu-iotests/059
-index 19f09eca35..96883b78b9 100755
+index 96883b78b9..6af6c6fada 100755
 --- a/tests/qemu-iotests/059
 +++ b/tests/qemu-iotests/059
-@@ -27,6 +27,9 @@ echo "QA output created by $seq"
- here=`pwd`
- status=1	# failure is the default!
- 
-+# get standard environment, filters and checks
-+. ./common.rc
-+
- _cleanup()
- {
-     _cleanup_test_img
-@@ -34,9 +37,6 @@ _cleanup()
- }
- trap "_cleanup; exit \$status" 0 1 2 3 15
- 
--# get standard environment, filters and checks
--. ./common.rc
+@@ -17,9 +17,8 @@
+ # You should have received a copy of the GNU General Public License
+ # along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ #
 -
- # This tests vmdk-specific low-level functionality
- _supported_fmt vmdk
- _supported_proto file
+-# creator
+-owner=famz@redhat.com
++# Creator/Owner: famz@redhat.com
++#
+ 
+ seq=`basename $0`
+ echo "QA output created by $seq"
 diff --git a/tests/qemu-iotests/060 b/tests/qemu-iotests/060
-index ab25c85019..5775ec2871 100755
+index 5775ec2871..d562b2c967 100755
 --- a/tests/qemu-iotests/060
 +++ b/tests/qemu-iotests/060
-@@ -27,15 +27,15 @@ echo "QA output created by $seq"
- here="$PWD"
- status=1	# failure is the default!
- 
-+# get standard environment, filters and checks
-+. ./common.rc
-+
- _cleanup()
- {
- 	_cleanup_test_img
- }
- trap "_cleanup; exit \$status" 0 1 2 3 15
- 
--# get standard environment, filters and checks
--. ./common.rc
+@@ -17,9 +17,8 @@
+ # You should have received a copy of the GNU General Public License
+ # along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ #
 -
- # This tests qocw2-specific low-level functionality
- _supported_fmt qcow2
- _supported_proto file
+-# creator
+-owner=mreitz@redhat.com
++# Creator/Owner: mreitz@redhat.com
++#
+ 
+ seq="$(basename $0)"
+ echo "QA output created by $seq"
 diff --git a/tests/qemu-iotests/061 b/tests/qemu-iotests/061
-index 266e0515d7..2097d64fe4 100755
+index 2097d64fe4..ffc27213a5 100755
 --- a/tests/qemu-iotests/061
 +++ b/tests/qemu-iotests/061
-@@ -27,15 +27,15 @@ echo "QA output created by $seq"
- here=`pwd`
- status=1	# failure is the default!
- 
-+# get standard environment, filters and checks
-+. ./common.rc
-+
- _cleanup()
- {
- 	_cleanup_test_img
- }
- trap "_cleanup; exit \$status" 0 1 2 3 15
- 
--# get standard environment, filters and checks
--. ./common.rc
+@@ -17,9 +17,8 @@
+ # You should have received a copy of the GNU General Public License
+ # along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ #
 -
- # This tests qocw2-specific low-level functionality
- _supported_fmt qcow2
- _supported_proto file
+-# creator
+-owner=mreitz@redhat.com
++# Creator/Owner: mreitz@redhat.com
++#
+ 
+ seq=`basename $0`
+ echo "QA output created by $seq"
 diff --git a/tests/qemu-iotests/062 b/tests/qemu-iotests/062
-index 1eaafdff0f..6116453e30 100755
+index 6116453e30..4c6c3d70f4 100755
 --- a/tests/qemu-iotests/062
 +++ b/tests/qemu-iotests/062
-@@ -28,15 +28,15 @@ echo "QA output created by $seq"
- here=`pwd`
- status=1	# failure is the default!
- 
-+# get standard environment, filters and checks
-+. ./common.rc
-+
- _cleanup()
- {
- 	_cleanup_test_img
- }
- trap "_cleanup; exit \$status" 0 1 2 3 15
- 
--# get standard environment, filters and checks
--. ./common.rc
+@@ -18,9 +18,8 @@
+ # You should have received a copy of the GNU General Public License
+ # along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ #
 -
- # This tests qocw2-specific low-level functionality
- _supported_fmt qcow2
- _supported_proto generic
+-# creator
+-owner=mreitz@redhat.com
++# Creator/Owner: mreitz@redhat.com
++#
+ 
+ seq=`basename $0`
+ echo "QA output created by $seq"
 diff --git a/tests/qemu-iotests/063 b/tests/qemu-iotests/063
-index 968b624be5..fbffd6d9e7 100755
+index fbffd6d9e7..29acdf3a8b 100755
 --- a/tests/qemu-iotests/063
 +++ b/tests/qemu-iotests/063
-@@ -28,6 +28,10 @@ echo "QA output created by $seq"
- here=`pwd`
- status=1	# failure is the default!
- 
-+# get standard environment, filters and checks
-+. ./common.rc
-+. ./common.pattern
-+
- _cleanup()
- {
- 	_cleanup_test_img
-@@ -35,10 +39,6 @@ _cleanup()
- }
- trap "_cleanup; exit \$status" 0 1 2 3 15
- 
--# get standard environment, filters and checks
--. ./common.rc
--. ./common.pattern
+@@ -18,9 +18,8 @@
+ # You should have received a copy of the GNU General Public License
+ # along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ #
 -
- _supported_fmt qcow qcow2 vmdk qed raw
- _supported_proto file
- _supported_os Linux
+-# creator
+-owner=alex@alex.org.uk
++# Creator/Owner: alex@alex.org.uk
++#
+ 
+ seq=`basename $0`
+ echo "QA output created by $seq"
 diff --git a/tests/qemu-iotests/064 b/tests/qemu-iotests/064
-index 9d62b0bf94..3bfb46146a 100755
+index 3bfb46146a..0f220282c7 100755
 --- a/tests/qemu-iotests/064
 +++ b/tests/qemu-iotests/064
-@@ -27,15 +27,15 @@ echo "QA output created by $seq"
- here=`pwd`
- status=1	# failure is the default!
- 
-+# get standard environment, filters and checks
-+. ./common.rc
-+
- _cleanup()
- {
-     _cleanup_test_img
- }
- trap "_cleanup; exit \$status" 0 1 2 3 15
- 
--# get standard environment, filters and checks
--. ./common.rc
+@@ -17,9 +17,8 @@
+ # You should have received a copy of the GNU General Public License
+ # along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ #
 -
- _supported_fmt vhdx
- _supported_proto generic
- _supported_os Linux
+-# creator
+-owner=jcody@redhat.com
++# Creator/Owner: jcody@redhat.com
++#
+ 
+ seq=`basename $0`
+ echo "QA output created by $seq"
 diff --git a/tests/qemu-iotests/066 b/tests/qemu-iotests/066
-index 8841354cd8..f29fcc7eae 100755
+index f29fcc7eae..c8b0bee3be 100755
 --- a/tests/qemu-iotests/066
 +++ b/tests/qemu-iotests/066
-@@ -27,15 +27,15 @@ echo "QA output created by $seq"
- here="$PWD"
- status=1	# failure is the default!
- 
-+# get standard environment, filters and checks
-+. ./common.rc
-+
- _cleanup()
- {
- 	_cleanup_test_img
- }
- trap "_cleanup; exit \$status" 0 1 2 3 15
- 
--# get standard environment, filters and checks
--. ./common.rc
+@@ -17,9 +17,8 @@
+ # You should have received a copy of the GNU General Public License
+ # along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ #
 -
- # This tests qocw2-specific low-level functionality
- _supported_fmt qcow2
- _supported_proto generic
+-# creator
+-owner=mreitz@redhat.com
++# Creator/Owner: mreitz@redhat.com
++#
+ 
+ seq="$(basename $0)"
+ echo "QA output created by $seq"
+diff --git a/tests/qemu-iotests/067 b/tests/qemu-iotests/067
+index cbc3180af0..976822b34c 100755
+--- a/tests/qemu-iotests/067
++++ b/tests/qemu-iotests/067
+@@ -17,9 +17,8 @@
+ # You should have received a copy of the GNU General Public License
+ # along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ #
+-
+-# creator
+-owner=kwolf@redhat.com
++# Creator/Owner: kwolf@redhat.com
++#
+ 
+ seq=`basename $0`
+ echo "QA output created by $seq"
 diff --git a/tests/qemu-iotests/068 b/tests/qemu-iotests/068
-index ce33795dda..a0df34898e 100755
+index a0df34898e..dc00ee1c2d 100755
 --- a/tests/qemu-iotests/068
 +++ b/tests/qemu-iotests/068
-@@ -27,15 +27,15 @@ echo "QA output created by $seq"
- here="$PWD"
- status=1	# failure is the default!
- 
-+# get standard environment, filters and checks
-+. ./common.rc
-+
- _cleanup()
- {
- 	_cleanup_test_img
- }
- trap "_cleanup; exit \$status" 0 1 2 3 15
- 
--# get standard environment, filters and checks
--. ./common.rc
+@@ -17,9 +17,8 @@
+ # You should have received a copy of the GNU General Public License
+ # along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ #
 -
- # This tests qocw2-specific low-level functionality
- _supported_fmt qcow2
- _supported_proto generic
+-# creator
+-owner=mreitz@redhat.com
++# Creator/Owner: mreitz@redhat.com
++#
+ 
+ seq="$(basename $0)"
+ echo "QA output created by $seq"
 diff --git a/tests/qemu-iotests/069 b/tests/qemu-iotests/069
-index 5cdf0c1e47..e01cbc98f4 100755
+index e01cbc98f4..1d44ef37a1 100755
 --- a/tests/qemu-iotests/069
 +++ b/tests/qemu-iotests/069
-@@ -27,15 +27,15 @@ echo "QA output created by $seq"
- here="$PWD"
- status=1	# failure is the default!
- 
-+# get standard environment, filters and checks
-+. ./common.rc
-+
- _cleanup()
- {
- 	_cleanup_test_img
- }
- trap "_cleanup; exit \$status" 0 1 2 3 15
- 
--# get standard environment, filters and checks
--. ./common.rc
+@@ -17,9 +17,8 @@
+ # You should have received a copy of the GNU General Public License
+ # along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ #
 -
- _supported_fmt qed qcow qcow2 vmdk
- _supported_proto file
- _supported_os Linux
+-# creator
+-owner=mreitz@redhat.com
++# Creator/Owner: mreitz@redhat.com
++#
+ 
+ seq="$(basename $0)"
+ echo "QA output created by $seq"
 diff --git a/tests/qemu-iotests/070 b/tests/qemu-iotests/070
-index 60c4b74a5e..6cbe62e1a0 100755
+index 6cbe62e1a0..d52a85f624 100755
 --- a/tests/qemu-iotests/070
 +++ b/tests/qemu-iotests/070
-@@ -28,15 +28,15 @@ echo "QA output created by $seq"
- here=`pwd`
- status=1	# failure is the default!
- 
-+# get standard environment, filters and checks
-+. ./common.rc
-+
- _cleanup()
- {
-     _cleanup_test_img
- }
- trap "_cleanup; exit \$status" 0 1 2 3 15
- 
--# get standard environment, filters and checks
--. ./common.rc
+@@ -18,9 +18,8 @@
+ # You should have received a copy of the GNU General Public License
+ # along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ #
 -
- _supported_fmt vhdx
- _supported_proto generic
- _supported_os Linux
+-# creator
+-owner=jcody@redhat.com
++# Creator/Owner: jcody@redhat.com
++#
+ 
+ seq=`basename $0`
+ echo "QA output created by $seq"
 diff --git a/tests/qemu-iotests/071 b/tests/qemu-iotests/071
-index 802b2b9da2..66806e3a8c 100755
+index 66806e3a8c..fd74238312 100755
 --- a/tests/qemu-iotests/071
 +++ b/tests/qemu-iotests/071
-@@ -27,15 +27,15 @@ echo "QA output created by $seq"
- here="$PWD"
- status=1	# failure is the default!
- 
-+# get standard environment, filters and checks
-+. ./common.rc
-+
- _cleanup()
- {
- 	_cleanup_test_img
- }
- trap "_cleanup; exit \$status" 0 1 2 3 15
- 
--# get standard environment, filters and checks
--. ./common.rc
+@@ -17,9 +17,8 @@
+ # You should have received a copy of the GNU General Public License
+ # along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ #
 -
- _supported_fmt qcow2
- _supported_proto file
- _supported_os Linux
+-# creator
+-owner=mreitz@redhat.com
++# Creator/Owner: mreitz@redhat.com
++#
+ 
+ seq="$(basename $0)"
+ echo "QA output created by $seq"
 diff --git a/tests/qemu-iotests/072 b/tests/qemu-iotests/072
-index 0851a72239..2d28db91d5 100755
+index 2d28db91d5..568f8774d8 100755
 --- a/tests/qemu-iotests/072
 +++ b/tests/qemu-iotests/072
-@@ -27,15 +27,15 @@ echo "QA output created by $seq"
- here="$PWD"
- status=1	# failure is the default!
- 
-+# get standard environment, filters and checks
-+. ./common.rc
-+
- _cleanup()
- {
- 	_cleanup_test_img
- }
- trap "_cleanup; exit \$status" 0 1 2 3 15
- 
--# get standard environment, filters and checks
--. ./common.rc
+@@ -17,9 +17,8 @@
+ # You should have received a copy of the GNU General Public License
+ # along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ #
 -
- _supported_fmt vpc vmdk vhdx vdi qed qcow2 qcow
- _supported_proto file
- _supported_os Linux
+-# creator
+-owner=mreitz@redhat.com
++# Creator/Owner: mreitz@redhat.com
++#
+ 
+ seq="$(basename $0)"
+ echo "QA output created by $seq"
 diff --git a/tests/qemu-iotests/073 b/tests/qemu-iotests/073
-index e1982454b0..2738010eb3 100755
+index 2738010eb3..37e68263b4 100755
 --- a/tests/qemu-iotests/073
 +++ b/tests/qemu-iotests/073
-@@ -27,15 +27,15 @@ echo "QA output created by $seq"
- here=`pwd`
- status=1	# failure is the default!
- 
-+# get standard environment, filters and checks
-+. ./common.rc
-+
- _cleanup()
- {
-     _cleanup_test_img
- }
- trap "_cleanup; exit \$status" 0 1 2 3 15
- 
--# get standard environment, filters and checks
--. ./common.rc
+@@ -17,9 +17,8 @@
+ # You should have received a copy of the GNU General Public License
+ # along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ #
 -
- _supported_fmt qcow2
- _supported_proto generic
- _unsupported_proto vxhs
+-# creator
+-owner=kwolf@redhat.com
++# Creator/Owner: kwolf@redhat.com
++#
+ 
+ seq=`basename $0`
+ echo "QA output created by $seq"
 diff --git a/tests/qemu-iotests/074 b/tests/qemu-iotests/074
-index 4ba59ba1d7..0dcbe946da 100755
+index 0dcbe946da..d454580067 100755
 --- a/tests/qemu-iotests/074
 +++ b/tests/qemu-iotests/074
-@@ -27,6 +27,10 @@ echo "QA output created by $seq"
+@@ -18,9 +18,8 @@
+ ## You should have received a copy of the GNU General Public License
+ ## along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ ##
++## Creator/Owner: famz@redhat.com
+ #
+-# creator
+-owner=famz@redhat.com
  
- status=1        # failure is the default!
- 
-+# get standard environment, filters and checks
-+. ./common.rc
-+. ./common.pattern
-+
- _cleanup()
- {
-     echo "Cleanup"
-@@ -42,10 +46,6 @@ _compare()
-     echo $?
- }
- 
--# get standard environment, filters and checks
--. ./common.rc
--. ./common.pattern
--
- _supported_fmt qcow2
- _supported_proto file
- _supported_os Linux
+ seq=`basename $0`
+ echo "QA output created by $seq"
 diff --git a/tests/qemu-iotests/075 b/tests/qemu-iotests/075
-index 8d6179f847..2e819c2a5a 100755
+index 2e819c2a5a..3e7ab6de95 100755
 --- a/tests/qemu-iotests/075
 +++ b/tests/qemu-iotests/075
-@@ -27,15 +27,15 @@ echo "QA output created by $seq"
- here=`pwd`
- status=1	# failure is the default!
- 
-+# get standard environment, filters and checks
-+. ./common.rc
-+
- _cleanup()
- {
- 	_cleanup_test_img
- }
- trap "_cleanup; exit \$status" 0 1 2 3 15
- 
--# get standard environment, filters and checks
--. ./common.rc
+@@ -17,9 +17,8 @@
+ # You should have received a copy of the GNU General Public License
+ # along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ #
 -
- _supported_fmt cloop
- _supported_proto file
- _supported_os Linux
+-# creator
+-owner=stefanha@redhat.com
++# Creator/Owner: stefanha@redhat.com
++#
+ 
+ seq=`basename $0`
+ echo "QA output created by $seq"
 diff --git a/tests/qemu-iotests/076 b/tests/qemu-iotests/076
-index fb5da1fd17..d7406739a1 100755
+index d7406739a1..df4a1614fb 100755
 --- a/tests/qemu-iotests/076
 +++ b/tests/qemu-iotests/076
-@@ -27,15 +27,15 @@ echo "QA output created by $seq"
- here=`pwd`
- status=1	# failure is the default!
- 
-+# get standard environment, filters and checks
-+. ./common.rc
-+
- _cleanup()
- {
- 	_cleanup_test_img
- }
- trap "_cleanup; exit \$status" 0 1 2 3 15
- 
--# get standard environment, filters and checks
--. ./common.rc
+@@ -17,9 +17,8 @@
+ # You should have received a copy of the GNU General Public License
+ # along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ #
 -
- _supported_fmt parallels
- _supported_proto file
- _supported_os Linux
+-# creator
+-owner=kwolf@redhat.com
++# Creator/Owner: kwolf@redhat.com
++#
+ 
+ seq=`basename $0`
+ echo "QA output created by $seq"
 diff --git a/tests/qemu-iotests/077 b/tests/qemu-iotests/077
-index ec30895982..eb6a189bdf 100755
+index eb6a189bdf..8d4be8c1e8 100755
 --- a/tests/qemu-iotests/077
 +++ b/tests/qemu-iotests/077
-@@ -27,15 +27,15 @@ echo "QA output created by $seq"
- here=`pwd`
- status=1	# failure is the default!
- 
-+# get standard environment, filters and checks
-+. ./common.rc
-+
- _cleanup()
- {
- 	_cleanup_test_img
- }
- trap "_cleanup; exit \$status" 0 1 2 3 15
- 
--# get standard environment, filters and checks
--. ./common.rc
+@@ -17,9 +17,8 @@
+ # You should have received a copy of the GNU General Public License
+ # along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ #
 -
- _supported_fmt raw
- _supported_proto generic
- _supported_os Linux
+-# creator
+-owner=kwolf@redhat.com
++# Creator/Owner: kwolf@redhat.com
++#
+ 
+ seq=`basename $0`
+ echo "QA output created by $seq"
 diff --git a/tests/qemu-iotests/078 b/tests/qemu-iotests/078
-index 74ab4ee259..1664c9c74c 100755
+index 1664c9c74c..b5f7c3a44a 100755
 --- a/tests/qemu-iotests/078
 +++ b/tests/qemu-iotests/078
-@@ -27,15 +27,15 @@ echo "QA output created by $seq"
- here=`pwd`
- status=1	# failure is the default!
- 
-+# get standard environment, filters and checks
-+. ./common.rc
-+
- _cleanup()
- {
- 	_cleanup_test_img
- }
- trap "_cleanup; exit \$status" 0 1 2 3 15
- 
--# get standard environment, filters and checks
--. ./common.rc
+@@ -17,9 +17,8 @@
+ # You should have received a copy of the GNU General Public License
+ # along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ #
 -
- _supported_fmt bochs
- _supported_proto file
- _supported_os Linux
+-# creator
+-owner=kwolf@redhat.com
++# Creator/Owner: kwolf@redhat.com
++#
+ 
+ seq=`basename $0`
+ echo "QA output created by $seq"
 diff --git a/tests/qemu-iotests/079 b/tests/qemu-iotests/079
-index 9c368991d1..fc9de46cc7 100755
+index fc9de46cc7..3363e43146 100755
 --- a/tests/qemu-iotests/079
 +++ b/tests/qemu-iotests/079
-@@ -27,15 +27,15 @@ echo "QA output created by $seq"
- here=`pwd`
- status=1	# failure is the default!
- 
-+# get standard environment, filters and checks
-+. ./common.rc
-+
- _cleanup()
- {
- 	_cleanup_test_img
- }
- trap "_cleanup; exit \$status" 0 1 2 3 15
- 
--# get standard environment, filters and checks
--. ./common.rc
+@@ -17,9 +17,8 @@
+ # You should have received a copy of the GNU General Public License
+ # along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ #
 -
- _supported_fmt qcow2
- _supported_proto file nfs
- _supported_os Linux
+-# creator
+-owner=hutao@cn.fujitsu.com
++# Creator/Owner: hutao@cn.fujitsu.com
++#
+ 
+ seq=`basename $0`
+ echo "QA output created by $seq"
 diff --git a/tests/qemu-iotests/080 b/tests/qemu-iotests/080
-index 4667ca229b..0947ed0559 100755
+index 0947ed0559..e7e7caf00d 100755
 --- a/tests/qemu-iotests/080
 +++ b/tests/qemu-iotests/080
-@@ -27,6 +27,9 @@ echo "QA output created by $seq"
- here=`pwd`
- status=1	# failure is the default!
- 
-+# get standard environment, filters and checks
-+. ./common.rc
-+
- _cleanup()
- {
-     rm -f $TEST_IMG.snap
-@@ -34,9 +37,6 @@ _cleanup()
- }
- trap "_cleanup; exit \$status" 0 1 2 3 15
- 
--# get standard environment, filters and checks
--. ./common.rc
+@@ -17,9 +17,8 @@
+ # You should have received a copy of the GNU General Public License
+ # along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ #
 -
- _supported_fmt qcow2
- _supported_proto file
- _supported_os Linux
+-# creator
+-owner=kwolf@redhat.com
++# Creator/Owner: kwolf@redhat.com
++#
+ 
+ seq=`basename $0`
+ echo "QA output created by $seq"
+diff --git a/tests/qemu-iotests/081 b/tests/qemu-iotests/081
+index b067348fb2..33b18106c1 100755
+--- a/tests/qemu-iotests/081
++++ b/tests/qemu-iotests/081
+@@ -17,9 +17,8 @@
+ # You should have received a copy of the GNU General Public License
+ # along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ #
+-
+-# creator
+-owner=benoit@irqsave.net
++# Creator/Owner: benoit@irqsave.net
++#
+ 
+ seq=`basename $0`
+ echo "QA output created by $seq"
 diff --git a/tests/qemu-iotests/082 b/tests/qemu-iotests/082
-index 7167632e67..64075693f3 100755
+index 64075693f3..fd904d69f8 100755
 --- a/tests/qemu-iotests/082
 +++ b/tests/qemu-iotests/082
-@@ -27,15 +27,15 @@ echo "QA output created by $seq"
- here=`pwd`
- status=1	# failure is the default!
- 
-+# get standard environment, filters and checks
-+. ./common.rc
-+
- _cleanup()
- {
- 	_cleanup_test_img
- }
- trap "_cleanup; exit \$status" 0 1 2 3 15
- 
--# get standard environment, filters and checks
--. ./common.rc
+@@ -17,9 +17,8 @@
+ # You should have received a copy of the GNU General Public License
+ # along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ #
 -
- _supported_fmt qcow2
- _supported_proto file nfs
- _supported_os Linux
+-# creator
+-owner=kwolf@redhat.com
++# Creator/Owner: kwolf@redhat.com
++#
+ 
+ seq=`basename $0`
+ echo "QA output created by $seq"
+diff --git a/tests/qemu-iotests/083 b/tests/qemu-iotests/083
+index b724b6bf14..51fd8825b4 100755
+--- a/tests/qemu-iotests/083
++++ b/tests/qemu-iotests/083
+@@ -17,9 +17,8 @@
+ # You should have received a copy of the GNU General Public License
+ # along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ #
+-
+-# creator
+-owner=stefanha@redhat.com
++# Creator/Owner: stefanha@redhat.com
++#
+ 
+ seq=`basename $0`
+ echo "QA output created by $seq"
 diff --git a/tests/qemu-iotests/084 b/tests/qemu-iotests/084
-index 9bfa2e57e6..1a610e1ad4 100755
+index 1a610e1ad4..333488a949 100755
 --- a/tests/qemu-iotests/084
 +++ b/tests/qemu-iotests/084
-@@ -28,15 +28,15 @@ echo "QA output created by $seq"
- here=`pwd`
- status=1	# failure is the default!
- 
-+# get standard environment, filters and checks
-+. ./common.rc
-+
- _cleanup()
- {
- 	_cleanup_test_img
- }
- trap "_cleanup; exit \$status" 0 1 2 3 15
- 
--# get standard environment, filters and checks
--. ./common.rc
+@@ -18,9 +18,8 @@
+ # You should have received a copy of the GNU General Public License
+ # along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ #
 -
- # This tests vdi-specific header fields
- _supported_fmt vdi
- _supported_proto file
+-# creator
+-owner=jcody@redhat.com
++# Creator/Owner: jcody@redhat.com
++#
+ 
+ seq=`basename $0`
+ echo "QA output created by $seq"
 diff --git a/tests/qemu-iotests/085 b/tests/qemu-iotests/085
-index 1b330c28ca..12df84d6bc 100755
+index 12df84d6bc..da481225d6 100755
 --- a/tests/qemu-iotests/085
 +++ b/tests/qemu-iotests/085
-@@ -37,6 +37,10 @@ snapshot_virt1="snapshot-v1.qcow2"
- 
- SNAPSHOTS=10
- 
-+# get standard environment, filters and checks
-+. ./common.rc
-+. ./common.qemu
-+
- _cleanup()
- {
-     _cleanup_qemu
-@@ -50,10 +54,6 @@ _cleanup()
- }
- trap "_cleanup; exit \$status" 0 1 2 3 15
- 
--# get standard environment, filters and checks
--. ./common.rc
--. ./common.qemu
+@@ -22,9 +22,8 @@
+ # You should have received a copy of the GNU General Public License
+ # along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ #
 -
- _supported_fmt qcow2
- _supported_proto file
- _supported_os Linux
+-# creator
+-owner=jcody@redhat.com
++# Creator/Owner: jcody@redhat.com
++#
+ 
+ seq=`basename $0`
+ echo "QA output created by $seq"
 diff --git a/tests/qemu-iotests/086 b/tests/qemu-iotests/086
-index 859e80a291..9329e14b62 100755
+index 9329e14b62..8611514049 100755
 --- a/tests/qemu-iotests/086
 +++ b/tests/qemu-iotests/086
-@@ -27,15 +27,15 @@ echo "QA output created by $seq"
- here=`pwd`
- status=1	# failure is the default!
- 
-+# get standard environment, filters and checks
-+. ./common.rc
-+
- _cleanup()
- {
- 	_cleanup_test_img
- }
- trap "_cleanup; exit \$status" 0 1 2 3 15
- 
--# get standard environment, filters and checks
--. ./common.rc
+@@ -17,9 +17,8 @@
+ # You should have received a copy of the GNU General Public License
+ # along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ #
 -
- _supported_fmt qcow2 raw
- _supported_proto file nfs
- _supported_os Linux
+-# creator
+-owner=kwolf@redhat.com
++# Creator/Owner: kwolf@redhat.com
++#
+ 
+ seq=`basename $0`
+ echo "QA output created by $seq"
+diff --git a/tests/qemu-iotests/087 b/tests/qemu-iotests/087
+index 3e29e5f9fe..dd6e5976ca 100755
+--- a/tests/qemu-iotests/087
++++ b/tests/qemu-iotests/087
+@@ -17,9 +17,8 @@
+ # You should have received a copy of the GNU General Public License
+ # along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ #
+-
+-# creator
+-owner=kwolf@redhat.com
++# Creator/Owner: kwolf@redhat.com
++#
+ 
+ seq=`basename $0`
+ echo "QA output created by $seq"
 diff --git a/tests/qemu-iotests/088 b/tests/qemu-iotests/088
-index 2a51616be8..dcde4813d2 100755
+index dcde4813d2..f6e1848ce9 100755
 --- a/tests/qemu-iotests/088
 +++ b/tests/qemu-iotests/088
-@@ -27,6 +27,9 @@ echo "QA output created by $seq"
- here=`pwd`
- status=1	# failure is the default!
- 
-+# get standard environment, filters and checks
-+. ./common.rc
-+
- _cleanup()
- {
-     rm -f $TEST_IMG.snap
-@@ -34,9 +37,6 @@ _cleanup()
- }
- trap "_cleanup; exit \$status" 0 1 2 3 15
- 
--# get standard environment, filters and checks
--. ./common.rc
+@@ -17,9 +17,8 @@
+ # You should have received a copy of the GNU General Public License
+ # along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ #
 -
- _supported_fmt vpc
- _supported_proto file
- _supported_os Linux
+-# creator
+-owner=kwolf@redhat.com
++# Creator/Owner: kwolf@redhat.com
++#
+ 
+ seq=`basename $0`
+ echo "QA output created by $seq"
 diff --git a/tests/qemu-iotests/089 b/tests/qemu-iotests/089
-index 70aef90ca7..e1093f73c3 100755
+index e1093f73c3..f925f5f245 100755
 --- a/tests/qemu-iotests/089
 +++ b/tests/qemu-iotests/089
-@@ -27,15 +27,15 @@ echo "QA output created by $seq"
- here="$PWD"
- status=1	# failure is the default!
- 
-+# get standard environment, filters and checks
-+. ./common.rc
-+
- _cleanup()
- {
- 	_cleanup_test_img
- }
- trap "_cleanup; exit \$status" 0 1 2 3 15
- 
--# get standard environment, filters and checks
--. ./common.rc
+@@ -17,9 +17,8 @@
+ # You should have received a copy of the GNU General Public License
+ # along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ #
 -
- _supported_fmt qcow2
- _supported_proto file
- _supported_os Linux
+-# creator
+-owner=mreitz@redhat.com
++# Creator/Owner: mreitz@redhat.com
++#
+ 
+ seq="$(basename $0)"
+ echo "QA output created by $seq"
 diff --git a/tests/qemu-iotests/090 b/tests/qemu-iotests/090
-index 8b141e1043..f88b3a7992 100755
+index f88b3a7992..2ae70f7d79 100755
 --- a/tests/qemu-iotests/090
 +++ b/tests/qemu-iotests/090
-@@ -27,15 +27,15 @@ echo "QA output created by $seq"
- here="$PWD"
- status=1	# failure is the default!
- 
-+# get standard environment, filters and checks
-+. ./common.rc
-+
- _cleanup()
- {
- 	_cleanup_test_img
- }
- trap "_cleanup; exit \$status" 0 1 2 3 15
- 
--# get standard environment, filters and checks
--. ./common.rc
+@@ -17,9 +17,8 @@
+ # You should have received a copy of the GNU General Public License
+ # along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ #
 -
- _supported_fmt qcow2
- _supported_proto file nfs
- _supported_os Linux
+-# creator
+-owner=mreitz@redhat.com
++# Creator/Owner: mreitz@redhat.com
++#
+ 
+ seq="$(basename $0)"
+ echo "QA output created by $seq"
 diff --git a/tests/qemu-iotests/091 b/tests/qemu-iotests/091
-index 447514af51..b1c5988c8a 100755
+index b1c5988c8a..48cf18d312 100755
 --- a/tests/qemu-iotests/091
 +++ b/tests/qemu-iotests/091
-@@ -31,6 +31,10 @@ status=1    # failure is the default!
- 
- MIG_FIFO="${TEST_DIR}/migrate"
- 
-+# get standard environment, filters and checks
-+. ./common.rc
-+. ./common.qemu
-+
- _cleanup()
- {
-     rm -f "${MIG_FIFO}"
-@@ -39,10 +43,6 @@ _cleanup()
- }
- trap "_cleanup; exit \$status" 0 1 2 3 15
- 
--# get standard environment, filters and checks
--. ./common.rc
--. ./common.qemu
+@@ -19,9 +19,8 @@
+ # You should have received a copy of the GNU General Public License
+ # along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ #
 -
- _supported_fmt qcow2
- _supported_proto file
- _supported_os Linux
+-# creator
+-owner=jcody@redhat.com
++# Creator/Owner: jcody@redhat.com
++#
+ 
+ seq=`basename $0`
+ echo "QA output created by $seq"
 diff --git a/tests/qemu-iotests/092 b/tests/qemu-iotests/092
-index f11b6747b3..eb6064daeb 100755
+index eb6064daeb..eeb039c7bd 100755
 --- a/tests/qemu-iotests/092
 +++ b/tests/qemu-iotests/092
-@@ -27,6 +27,9 @@ echo "QA output created by $seq"
- here=`pwd`
- status=1	# failure is the default!
- 
-+# get standard environment, filters and checks
-+. ./common.rc
-+
- _cleanup()
- {
-     rm -f $TEST_IMG.snap
-@@ -34,9 +37,6 @@ _cleanup()
- }
- trap "_cleanup; exit \$status" 0 1 2 3 15
- 
--# get standard environment, filters and checks
--. ./common.rc
+@@ -17,9 +17,8 @@
+ # You should have received a copy of the GNU General Public License
+ # along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ #
 -
- _supported_fmt qcow
- _supported_proto file
- _supported_os Linux
+-# creator
+-owner=kwolf@redhat.com
++# Creator/Owner: kwolf@redhat.com
++#
+ 
+ seq=`basename $0`
+ echo "QA output created by $seq"
 diff --git a/tests/qemu-iotests/094 b/tests/qemu-iotests/094
-index ba14a11ade..e8a07c195b 100755
+index e8a07c195b..aa5faff5de 100755
 --- a/tests/qemu-iotests/094
 +++ b/tests/qemu-iotests/094
-@@ -27,19 +27,18 @@ echo "QA output created by $seq"
- here="$PWD"
- status=1	# failure is the default!
- 
-+# get standard environment, filters and checks
-+. ./common.rc
-+. ./common.qemu
-+
- _cleanup()
- {
-     _cleanup_qemu
-     _cleanup_test_img
-     rm -f "$TEST_DIR/source.$IMGFMT"
- }
+@@ -17,9 +17,8 @@
+ # You should have received a copy of the GNU General Public License
+ # along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ #
 -
- trap "_cleanup; exit \$status" 0 1 2 3 15
+-# creator
+-owner=mreitz@redhat.com
++# Creator/Owner: mreitz@redhat.com
++#
  
--# get standard environment, filters and checks
--. ./common.rc
--. ./common.qemu
--
- _supported_fmt generic
- _supported_proto nbd
- _supported_os Linux
+ seq="$(basename $0)"
+ echo "QA output created by $seq"
 diff --git a/tests/qemu-iotests/095 b/tests/qemu-iotests/095
-index c35dc42cd6..da0cc9fed2 100755
+index da0cc9fed2..fa17640c2c 100755
 --- a/tests/qemu-iotests/095
 +++ b/tests/qemu-iotests/095
-@@ -30,6 +30,10 @@ echo "QA output created by $seq"
- here=`pwd`
- status=1	# failure is the default!
+@@ -21,8 +21,8 @@
+ # You should have received a copy of the GNU General Public License
+ # along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ #
+-# creator
+-owner=jcody@redhat.com
++# Creator/Owner: jcody@redhat.com
++#
  
-+# get standard environment, filters and checks
-+. ./common.rc
-+. ./common.qemu
-+
- _cleanup()
- {
-     _cleanup_qemu
-@@ -38,10 +42,6 @@ _cleanup()
- }
- trap "_cleanup; exit \$status" 0 1 2 3 15
- 
--# get standard environment, filters and checks
--. ./common.rc
--. ./common.qemu
--
- _supported_fmt qcow2
- _supported_proto file
- _supported_os Linux
+ seq=`basename $0`
+ echo "QA output created by $seq"
 diff --git a/tests/qemu-iotests/097 b/tests/qemu-iotests/097
-index 788393e0c6..10aa13a0ce 100755
+index 10aa13a0ce..2914da2da3 100755
 --- a/tests/qemu-iotests/097
 +++ b/tests/qemu-iotests/097
-@@ -28,6 +28,10 @@ echo "QA output created by $seq"
- here="$PWD"
- status=1	# failure is the default!
- 
-+# get standard environment, filters and checks
-+. ./common.rc
-+. ./common.pattern
-+
- _cleanup()
- {
-     _cleanup_test_img
-@@ -35,10 +39,6 @@ _cleanup()
- }
- trap "_cleanup; exit \$status" 0 1 2 3 15
- 
--# get standard environment, filters and checks
--. ./common.rc
--. ./common.pattern
+@@ -18,9 +18,8 @@
+ # You should have received a copy of the GNU General Public License
+ # along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ #
 -
- # Any format supporting backing files and bdrv_make_empty
- _supported_fmt qcow qcow2
- _supported_proto file
+-# creator
+-owner=mreitz@redhat.com
++# Creator/Owner: mreitz@redhat.com
++#
+ 
+ seq="$(basename $0)"
+ echo "QA output created by $seq"
 diff --git a/tests/qemu-iotests/098 b/tests/qemu-iotests/098
-index 92b1e75817..61c27f1f46 100755
+index 61c27f1f46..97f890dcf7 100755
 --- a/tests/qemu-iotests/098
 +++ b/tests/qemu-iotests/098
-@@ -27,6 +27,10 @@ echo "QA output created by $seq"
- here="$PWD"
- status=1	# failure is the default!
- 
-+# get standard environment, filters and checks
-+. ./common.rc
-+. ./common.pattern
-+
- _cleanup()
- {
-     _cleanup_test_img
-@@ -34,10 +38,6 @@ _cleanup()
- }
- trap "_cleanup; exit \$status" 0 1 2 3 15
- 
--# get standard environment, filters and checks
--. ./common.rc
--. ./common.pattern
+@@ -17,9 +17,8 @@
+ # You should have received a copy of the GNU General Public License
+ # along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ #
 -
- _supported_fmt qcow2
- _supported_proto file
- _supported_os Linux
+-# creator
+-owner=mreitz@redhat.com
++# Creator/Owner: mreitz@redhat.com
++#
+ 
+ seq="$(basename $0)"
+ echo "QA output created by $seq"
 diff --git a/tests/qemu-iotests/099 b/tests/qemu-iotests/099
-index d103e53ea0..90924c2ad2 100755
+index 90924c2ad2..8e8306d1e3 100755
 --- a/tests/qemu-iotests/099
 +++ b/tests/qemu-iotests/099
-@@ -28,15 +28,15 @@ echo "QA output created by $seq"
- here="$PWD"
- status=1	# failure is the default!
- 
-+# get standard environment, filters and checks
-+. ./common.rc
-+
- _cleanup()
- {
- 	_cleanup_test_img
- }
- trap "_cleanup; exit \$status" 0 1 2 3 15
- 
--# get standard environment, filters and checks
--. ./common.rc
+@@ -18,9 +18,8 @@
+ # You should have received a copy of the GNU General Public License
+ # along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ #
 -
- # Basically all formats, but "raw" has issues with _filter_imgfmt regarding the
- # raw comparison image for blkverify; also, all images have to support creation
- _supported_fmt qcow qcow2 qed vdi vhdx vmdk vpc
+-# creator
+-owner=mreitz@redhat.com
++# Creator/Owner: mreitz@redhat.com
++#
+ 
+ seq="$(basename $0)"
+ echo "QA output created by $seq"
 diff --git a/tests/qemu-iotests/101 b/tests/qemu-iotests/101
-index 806da17830..663038378b 100755
+index 663038378b..38dace6aec 100755
 --- a/tests/qemu-iotests/101
 +++ b/tests/qemu-iotests/101
-@@ -27,15 +27,15 @@ echo "QA output created by $seq"
- here=`pwd`
- status=1	# failure is the default!
- 
-+# get standard environment, filters and checks
-+. ./common.rc
-+
- _cleanup()
- {
- 	_cleanup_test_img
- }
- trap "_cleanup; exit \$status" 0 1 2 3 15
- 
--# get standard environment, filters and checks
--. ./common.rc
+@@ -17,9 +17,8 @@
+ # You should have received a copy of the GNU General Public License
+ # along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ #
 -
- _supported_fmt raw
- _supported_proto file
- _supported_os Linux
+-# creator
+-owner=stefanha@redhat.com
++# Creator/Owner: stefanha@redhat.com
++#
+ 
+ seq=`basename $0`
+ echo "QA output created by $seq"
 diff --git a/tests/qemu-iotests/102 b/tests/qemu-iotests/102
-index cdf714412a..4ed1f77542 100755
+index 4ed1f77542..0fac4555b2 100755
 --- a/tests/qemu-iotests/102
 +++ b/tests/qemu-iotests/102
-@@ -27,6 +27,10 @@ echo "QA output created by $seq"
- here=$PWD
- status=1    # failure is the default!
- 
-+# get standard environment, filters and qemu instance handling
-+. ./common.rc
-+. ./common.qemu
-+
- _cleanup()
- {
-     _cleanup_qemu
-@@ -34,10 +38,6 @@ _cleanup()
- }
- trap "_cleanup; exit \$status" 0 1 2 3 15
- 
--# get standard environment, filters and qemu instance handling
--. ./common.rc
--. ./common.qemu
+@@ -17,9 +17,8 @@
+ # You should have received a copy of the GNU General Public License
+ # along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ #
 -
- _supported_fmt qcow2
- _supported_proto file
- _supported_os Linux
+-# creator
+-owner=mreitz@redhat.com
++# Creator/Owner: mreitz@redhat.com
++#
+ 
+ seq=$(basename $0)
+ echo "QA output created by $seq"
 diff --git a/tests/qemu-iotests/103 b/tests/qemu-iotests/103
-index 5326c6e338..0185cc73b2 100755
+index 0185cc73b2..55df533835 100755
 --- a/tests/qemu-iotests/103
 +++ b/tests/qemu-iotests/103
-@@ -27,15 +27,15 @@ echo "QA output created by $seq"
- here=$PWD
- status=1	# failure is the default!
- 
-+# get standard environment, filters and checks
-+. ./common.rc
-+
- _cleanup()
- {
- 	_cleanup_test_img
- }
- trap "_cleanup; exit \$status" 0 1 2 3 15
- 
--# get standard environment, filters and checks
--. ./common.rc
+@@ -17,9 +17,8 @@
+ # You should have received a copy of the GNU General Public License
+ # along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ #
 -
- _supported_fmt qcow2
- _supported_proto file nfs
- _supported_os Linux
+-# creator
+-owner=mreitz@redhat.com
++# Creator/Owner: mreitz@redhat.com
++#
+ 
+ seq=$(basename $0)
+ echo "QA output created by $seq"
+diff --git a/tests/qemu-iotests/104 b/tests/qemu-iotests/104
+index 869f6c5c09..903471346f 100755
+--- a/tests/qemu-iotests/104
++++ b/tests/qemu-iotests/104
+@@ -17,9 +17,8 @@
+ # You should have received a copy of the GNU General Public License
+ # along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ #
+-
+-# creator
+-owner=hutao@cn.fujitsu.com
++# Creator/Owner: hutao@cn.fujitsu.com
++#
+ 
+ seq=`basename $0`
+ echo "QA output created by $seq"
 diff --git a/tests/qemu-iotests/105 b/tests/qemu-iotests/105
-index 6436a275da..0f1c73eacd 100755
+index 0f1c73eacd..68c6b732c2 100755
 --- a/tests/qemu-iotests/105
 +++ b/tests/qemu-iotests/105
-@@ -27,15 +27,15 @@ echo "QA output created by $seq"
- here=`pwd`
- status=1	# failure is the default!
- 
-+# get standard environment, filters and checks
-+. ./common.rc
-+
- _cleanup()
- {
- 	_cleanup_test_img
- }
- trap "_cleanup; exit \$status" 0 1 2 3 15
- 
--# get standard environment, filters and checks
--. ./common.rc
+@@ -17,9 +17,8 @@
+ # You should have received a copy of the GNU General Public License
+ # along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ #
 -
- _supported_fmt qcow2 vmdk vhdx qed
- _supported_proto generic
- _supported_os Linux
+-# creator
+-owner=famz@redhat.com
++# Creator/Owner: famz@redhat.com
++#
+ 
+ seq=`basename $0`
+ echo "QA output created by $seq"
 diff --git a/tests/qemu-iotests/106 b/tests/qemu-iotests/106
-index 0a7b803e12..4adf5b8e74 100755
+index 4adf5b8e74..9771198d70 100755
 --- a/tests/qemu-iotests/106
 +++ b/tests/qemu-iotests/106
-@@ -27,15 +27,15 @@ echo "QA output created by $seq"
- here=$PWD
- status=1	# failure is the default!
- 
-+# get standard environment and filters
-+. ./common.rc
-+
- _cleanup()
- {
- 	_cleanup_test_img
- }
- trap "_cleanup; exit \$status" 0 1 2 3 15
- 
--# get standard environment and filters
--. ./common.rc
+@@ -17,9 +17,8 @@
+ # You should have received a copy of the GNU General Public License
+ # along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ #
 -
- _supported_fmt raw
- _supported_proto file
- _supported_os Linux
+-# creator
+-owner=mreitz@redhat.com
++# Creator/Owner: mreitz@redhat.com
++#
+ 
+ seq=$(basename $0)
+ echo "QA output created by $seq"
 diff --git a/tests/qemu-iotests/107 b/tests/qemu-iotests/107
-index f111c3c6fc..92c5854a80 100755
+index 92c5854a80..7ddb27fbc9 100755
 --- a/tests/qemu-iotests/107
 +++ b/tests/qemu-iotests/107
-@@ -27,15 +27,15 @@ echo "QA output created by $seq"
- here="$PWD"
- status=1	# failure is the default!
- 
-+# get standard environment, filters and checks
-+. ./common.rc
-+
- _cleanup()
- {
- 	_cleanup_test_img
- }
- trap "_cleanup; exit \$status" 0 1 2 3 15
- 
--# get standard environment, filters and checks
--. ./common.rc
+@@ -17,9 +17,8 @@
+ # You should have received a copy of the GNU General Public License
+ # along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ #
 -
- _supported_fmt qcow2
- _supported_proto file nfs
- _supported_os Linux
+-# creator
+-owner=mreitz@redhat.com
++# Creator/Owner: mreitz@redhat.com
++#
+ 
+ seq="$(basename $0)"
+ echo "QA output created by $seq"
 diff --git a/tests/qemu-iotests/108 b/tests/qemu-iotests/108
-index 95bb252fd2..d44fc8ae17 100755
+index d44fc8ae17..1284fc98d1 100755
 --- a/tests/qemu-iotests/108
 +++ b/tests/qemu-iotests/108
-@@ -28,15 +28,15 @@ echo "QA output created by $seq"
- here="$PWD"
- status=1	# failure is the default!
- 
-+# get standard environment, filters and checks
-+. ./common.rc
-+
- _cleanup()
- {
- 	_cleanup_test_img
- }
- trap "_cleanup; exit \$status" 0 1 2 3 15
- 
--# get standard environment, filters and checks
--. ./common.rc
+@@ -18,9 +18,8 @@
+ # You should have received a copy of the GNU General Public License
+ # along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ #
 -
- # This tests qocw2-specific low-level functionality
- _supported_fmt qcow2
- _supported_proto file
+-# creator
+-owner=mreitz@redhat.com
++# Creator/Owner: mreitz@redhat.com
++#
+ 
+ seq="$(basename $0)"
+ echo "QA output created by $seq"
 diff --git a/tests/qemu-iotests/109 b/tests/qemu-iotests/109
-index d9b1a344df..6bf5deb664 100755
+index 6bf5deb664..87985f66fb 100755
 --- a/tests/qemu-iotests/109
 +++ b/tests/qemu-iotests/109
-@@ -27,6 +27,10 @@ echo "QA output created by $seq"
- here="$PWD"
- status=1	# failure is the default!
- 
-+# get standard environment, filters and checks
-+. ./common.rc
-+. ./common.qemu
-+
- _cleanup()
- {
-     _cleanup_qemu
-@@ -35,10 +39,6 @@ _cleanup()
- }
- trap "_cleanup; exit \$status" 0 1 2 3 15
- 
--# get standard environment, filters and checks
--. ./common.rc
--. ./common.qemu
+@@ -17,9 +17,8 @@
+ # You should have received a copy of the GNU General Public License
+ # along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ #
 -
- _supported_fmt raw
- _supported_proto file
- _supported_os Linux
+-# creator
+-owner=kwolf@redhat.com
++# Creator/Owner: kwolf@redhat.com
++#
+ 
+ seq="$(basename $0)"
+ echo "QA output created by $seq"
 diff --git a/tests/qemu-iotests/110 b/tests/qemu-iotests/110
-index 4de36a4d6d..ea8eecb3e7 100755
+index ea8eecb3e7..0f62778f15 100755
 --- a/tests/qemu-iotests/110
 +++ b/tests/qemu-iotests/110
-@@ -27,15 +27,15 @@ echo "QA output created by $seq"
- here="$PWD"
- status=1	# failure is the default!
- 
-+# get standard environment, filters and checks
-+. ./common.rc
-+
- _cleanup()
- {
- 	_cleanup_test_img
- }
- trap "_cleanup; exit \$status" 0 1 2 3 15
- 
--# get standard environment, filters and checks
--. ./common.rc
+@@ -17,9 +17,8 @@
+ # You should have received a copy of the GNU General Public License
+ # along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ #
 -
- # Any format supporting backing files
- _supported_fmt qed qcow qcow2 vmdk
- _supported_proto file
+-# creator
+-owner=mreitz@redhat.com
++# Creator/Owner: mreitz@redhat.com
++#
+ 
+ seq="$(basename $0)"
+ echo "QA output created by $seq"
 diff --git a/tests/qemu-iotests/111 b/tests/qemu-iotests/111
-index d41dacd948..73396468d4 100755
+index 73396468d4..85b6dd1746 100755
 --- a/tests/qemu-iotests/111
 +++ b/tests/qemu-iotests/111
-@@ -28,15 +28,15 @@ echo "QA output created by $seq"
- here="$PWD"
- status=1	# failure is the default!
- 
-+# get standard environment, filters and checks
-+. ./common.rc
-+
- _cleanup()
- {
- 	_cleanup_test_img
- }
- trap "_cleanup; exit \$status" 0 1 2 3 15
- 
--# get standard environment, filters and checks
--. ./common.rc
+@@ -18,9 +18,8 @@
+ # You should have received a copy of the GNU General Public License
+ # along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ #
 -
- _supported_fmt qed qcow qcow2 vmdk
- _supported_proto file
- _supported_os Linux
+-# creator
+-owner=mreitz@redhat.com
++# Creator/Owner: mreitz@redhat.com
++#
+ 
+ seq="$(basename $0)"
+ echo "QA output created by $seq"
 diff --git a/tests/qemu-iotests/112 b/tests/qemu-iotests/112
-index f8a6a1b888..ac5745a559 100755
+index ac5745a559..5c4ecfeb4c 100755
 --- a/tests/qemu-iotests/112
 +++ b/tests/qemu-iotests/112
-@@ -27,15 +27,15 @@ echo "QA output created by $seq"
- here="$PWD"
- status=1	# failure is the default!
- 
-+# get standard environment, filters and checks
-+. ./common.rc
-+
- _cleanup()
- {
- 	_cleanup_test_img
- }
- trap "_cleanup; exit \$status" 0 1 2 3 15
- 
--# get standard environment, filters and checks
--. ./common.rc
+@@ -17,9 +17,8 @@
+ # You should have received a copy of the GNU General Public License
+ # along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ #
 -
- # This tests qcow2-specific low-level functionality
- _supported_fmt qcow2
- _supported_proto file
+-# creator
+-owner=mreitz@redhat.com
++# Creator/Owner: mreitz@redhat.com
++#
+ 
+ seq="$(basename $0)"
+ echo "QA output created by $seq"
 diff --git a/tests/qemu-iotests/113 b/tests/qemu-iotests/113
-index c4a176fcf1..69c2dab1bc 100755
+index 69c2dab1bc..91af75d687 100755
 --- a/tests/qemu-iotests/113
 +++ b/tests/qemu-iotests/113
-@@ -28,15 +28,15 @@ echo "QA output created by $seq"
- here="$PWD"
- status=1	# failure is the default!
- 
-+# get standard environment, filters and checks
-+. ./common.rc
-+
- _cleanup()
- {
- 	_cleanup_test_img
- }
- trap "_cleanup; exit \$status" 0 1 2 3 15
- 
--# get standard environment, filters and checks
--. ./common.rc
+@@ -18,9 +18,8 @@
+ # You should have received a copy of the GNU General Public License
+ # along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ #
 -
- # We can only test one format here because we need its sample file
- _supported_fmt bochs
- _supported_proto nbd
+-# creator
+-owner=mreitz@redhat.com
++# Creator/Owner: mreitz@redhat.com
++#
+ 
+ seq="$(basename $0)"
+ echo "QA output created by $seq"
 diff --git a/tests/qemu-iotests/114 b/tests/qemu-iotests/114
-index c9fd36ec54..a35f2baa61 100755
+index a35f2baa61..66313cae91 100755
 --- a/tests/qemu-iotests/114
 +++ b/tests/qemu-iotests/114
-@@ -27,15 +27,15 @@ echo "QA output created by $seq"
- here="$PWD"
- status=1	# failure is the default!
- 
-+# get standard environment, filters and checks
-+. ./common.rc
-+
- _cleanup()
- {
- 	_cleanup_test_img
- }
- trap "_cleanup; exit \$status" 0 1 2 3 15
- 
--# get standard environment, filters and checks
--. ./common.rc
+@@ -17,9 +17,8 @@
+ # You should have received a copy of the GNU General Public License
+ # along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ #
 -
- _supported_fmt qcow2
- _supported_proto generic
- _unsupported_proto vxhs
+-# creator
+-owner=kwolf@redhat.com
++# Creator/Owner: kwolf@redhat.com
++#
+ 
+ seq="$(basename $0)"
+ echo "QA output created by $seq"
 diff --git a/tests/qemu-iotests/115 b/tests/qemu-iotests/115
-index 26f550c661..cdd095bde2 100755
+index cdd095bde2..2f06622e36 100755
 --- a/tests/qemu-iotests/115
 +++ b/tests/qemu-iotests/115
-@@ -27,15 +27,15 @@ echo "QA output created by $seq"
- here="$PWD"
- status=1	# failure is the default!
- 
-+# get standard environment, filters and checks
-+. ./common.rc
-+
- _cleanup()
- {
- 	_cleanup_test_img
- }
- trap "_cleanup; exit \$status" 0 1 2 3 15
- 
--# get standard environment, filters and checks
--. ./common.rc
+@@ -17,9 +17,8 @@
+ # You should have received a copy of the GNU General Public License
+ # along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ #
 -
- _supported_fmt qcow2
- _supported_proto file
- _supported_os Linux
+-# creator
+-owner=mreitz@redhat.com
++# Creator/Owner: mreitz@redhat.com
++#
+ 
+ seq="$(basename $0)"
+ echo "QA output created by $seq"
 diff --git a/tests/qemu-iotests/116 b/tests/qemu-iotests/116
-index 1995906cc8..b5e962130b 100755
+index b5e962130b..7378c34bd6 100755
 --- a/tests/qemu-iotests/116
 +++ b/tests/qemu-iotests/116
-@@ -30,15 +30,15 @@ echo "QA output created by $seq"
- here=`pwd`
- status=1	# failure is the default!
- 
-+# get standard environment, filters and checks
-+. ./common.rc
-+
- _cleanup()
- {
- 	_cleanup_test_img
- }
- trap "_cleanup; exit \$status" 0 1 2 3 15
- 
--# get standard environment, filters and checks
--. ./common.rc
+@@ -20,9 +20,8 @@
+ # You should have received a copy of the GNU General Public License
+ # along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ #
 -
- _supported_fmt qed
- _supported_proto generic
- _supported_os Linux
+-# creator
+-owner=stefanha@redhat.com
++# Creator/Owner: stefanha@redhat.com
++#
+ 
+ seq=`basename $0`
+ echo "QA output created by $seq"
 diff --git a/tests/qemu-iotests/117 b/tests/qemu-iotests/117
-index 205e8842a0..147d19053b 100755
+index 147d19053b..2ace2c9f89 100755
 --- a/tests/qemu-iotests/117
 +++ b/tests/qemu-iotests/117
-@@ -27,17 +27,17 @@ echo "QA output created by $seq"
- here="$PWD"
- status=1	# failure is the default!
- 
-+# get standard environment, filters and checks
-+. ./common.rc
-+. ./common.qemu
-+
- _cleanup()
- {
-     _cleanup_qemu
--	_cleanup_test_img
-+    _cleanup_test_img
- }
- trap "_cleanup; exit \$status" 0 1 2 3 15
- 
--# get standard environment, filters and checks
--. ./common.rc
--. ./common.qemu
+@@ -17,9 +17,8 @@
+ # You should have received a copy of the GNU General Public License
+ # along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ #
 -
- _supported_fmt qcow2
- _supported_proto file
- _supported_os Linux
+-# creator
+-owner=mreitz@redhat.com
++# Creator/Owner: mreitz@redhat.com
++#
+ 
+ seq="$(basename $0)"
+ echo "QA output created by $seq"
 diff --git a/tests/qemu-iotests/119 b/tests/qemu-iotests/119
-index bdbdfe0f33..d2342ff0bd 100755
+index d2342ff0bd..3df227748a 100755
 --- a/tests/qemu-iotests/119
 +++ b/tests/qemu-iotests/119
-@@ -28,15 +28,15 @@ echo "QA output created by $seq"
- here="$PWD"
- status=1	# failure is the default!
- 
-+# get standard environment, filters and checks
-+. ./common.rc
-+
- _cleanup()
- {
- 	_cleanup_test_img
- }
- trap "_cleanup; exit \$status" 0 1 2 3 15
- 
--# get standard environment, filters and checks
--. ./common.rc
+@@ -18,9 +18,8 @@
+ # You should have received a copy of the GNU General Public License
+ # along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ #
 -
- _supported_fmt raw
- _supported_proto nbd
- _supported_os Linux
+-# creator
+-owner=mreitz@redhat.com
++# Creator/Owner: mreitz@redhat.com
++#
+ 
+ seq="$(basename $0)"
+ echo "QA output created by $seq"
 diff --git a/tests/qemu-iotests/120 b/tests/qemu-iotests/120
-index 5227278899..83bc551d16 100755
+index 83bc551d16..0ce0a2c9cd 100755
 --- a/tests/qemu-iotests/120
 +++ b/tests/qemu-iotests/120
-@@ -28,15 +28,15 @@ echo "QA output created by $seq"
- here="$PWD"
- status=1	# failure is the default!
- 
-+# get standard environment, filters and checks
-+. ./common.rc
-+
- _cleanup()
- {
- 	_cleanup_test_img
- }
- trap "_cleanup; exit \$status" 0 1 2 3 15
- 
--# get standard environment, filters and checks
--. ./common.rc
+@@ -18,9 +18,8 @@
+ # You should have received a copy of the GNU General Public License
+ # along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ #
 -
- _supported_fmt generic
- _supported_proto file
- _supported_os Linux
+-# creator
+-owner=mreitz@redhat.com
++# Creator/Owner: mreitz@redhat.com
++#
+ 
+ seq="$(basename $0)"
+ echo "QA output created by $seq"
 diff --git a/tests/qemu-iotests/121 b/tests/qemu-iotests/121
-index 1b50dc858c..6c69c2beee 100755
+index 6c69c2beee..c6ce9e782a 100755
 --- a/tests/qemu-iotests/121
 +++ b/tests/qemu-iotests/121
-@@ -27,15 +27,15 @@ echo "QA output created by $seq"
- here="$PWD"
- status=1	# failure is the default!
- 
-+# get standard environment, filters and checks
-+. ./common.rc
-+
- _cleanup()
- {
- 	_cleanup_test_img
- }
- trap "_cleanup; exit \$status" 0 1 2 3 15
- 
--# get standard environment, filters and checks
--. ./common.rc
+@@ -17,9 +17,8 @@
+ # You should have received a copy of the GNU General Public License
+ # along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ #
 -
- _supported_fmt qcow2
- _supported_proto file
- _supported_os Linux
+-# creator
+-owner=mreitz@redhat.com
++# Creator/Owner: mreitz@redhat.com
++#
+ 
+ seq="$(basename $0)"
+ echo "QA output created by $seq"
 diff --git a/tests/qemu-iotests/122 b/tests/qemu-iotests/122
-index b583d44952..10104ea49a 100755
+index 10104ea49a..e513b6abbf 100755
 --- a/tests/qemu-iotests/122
 +++ b/tests/qemu-iotests/122
-@@ -27,6 +27,9 @@ echo "QA output created by $seq"
- here="$PWD"
- status=1	# failure is the default!
- 
-+# get standard environment, filters and checks
-+. ./common.rc
-+
- _cleanup()
- {
-     rm -f "$TEST_IMG".[123]
-@@ -34,9 +37,6 @@ _cleanup()
- }
- trap "_cleanup; exit \$status" 0 1 2 3 15
- 
--# get standard environment, filters and checks
--. ./common.rc
+@@ -17,9 +17,8 @@
+ # You should have received a copy of the GNU General Public License
+ # along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ #
 -
- _supported_fmt qcow2
- _supported_proto file
- _supported_os Linux
+-# creator
+-owner=kwolf@redhat.com
++# Creator/Owner: kwolf@redhat.com
++#
+ 
+ seq="$(basename $0)"
+ echo "QA output created by $seq"
 diff --git a/tests/qemu-iotests/123 b/tests/qemu-iotests/123
-index d2e170666e..8f68a76ee4 100755
+index 8f68a76ee4..9edcc4c8d2 100755
 --- a/tests/qemu-iotests/123
 +++ b/tests/qemu-iotests/123
-@@ -27,6 +27,9 @@ echo "QA output created by $seq"
- here="$PWD"
- status=1	# failure is the default!
- 
-+# get standard environment, filters and checks
-+. ./common.rc
-+
- _cleanup()
- {
-     _cleanup_test_img
-@@ -34,9 +37,6 @@ _cleanup()
- }
- trap "_cleanup; exit \$status" 0 1 2 3 15
- 
--# get standard environment, filters and checks
--. ./common.rc
+@@ -17,9 +17,8 @@
+ # You should have received a copy of the GNU General Public License
+ # along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ #
 -
- _supported_fmt raw
- _supported_proto nbd
- _supported_os Linux
+-# creator
+-owner=mreitz@redhat.com
++# Creator/Owner: mreitz@redhat.com
++#
+ 
+ seq="$(basename $0)"
+ echo "QA output created by $seq"
 diff --git a/tests/qemu-iotests/125 b/tests/qemu-iotests/125
-index 03ff104639..62a6d7fb1f 100755
+index 62a6d7fb1f..1a11496024 100755
 --- a/tests/qemu-iotests/125
 +++ b/tests/qemu-iotests/125
-@@ -27,6 +27,9 @@ echo "QA output created by $seq"
- here=$PWD
- status=1	# failure is the default!
- 
-+# get standard environment and filters
-+. ./common.rc
-+
- _cleanup()
- {
- 	_cleanup_test_img
-@@ -39,9 +42,6 @@ get_image_size_on_host()
-         | sed -e 's/^[^0-9]*\([0-9]\+\).*$/\1/'
- }
- 
--# get standard environment and filters
--. ./common.rc
+@@ -17,9 +17,8 @@
+ # You should have received a copy of the GNU General Public License
+ # along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ #
 -
- _supported_fmt qcow2
- _supported_proto file
- _supported_os Linux
+-# creator
+-owner=mreitz@redhat.com
++# Creator/Owner: mreitz@redhat.com
++#
+ 
+ seq=$(basename $0)
+ echo "QA output created by $seq"
+diff --git a/tests/qemu-iotests/126 b/tests/qemu-iotests/126
+index f3058e046a..73ed16a9af 100755
+--- a/tests/qemu-iotests/126
++++ b/tests/qemu-iotests/126
+@@ -18,9 +18,8 @@
+ # You should have received a copy of the GNU General Public License
+ # along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ #
+-
+-# creator
+-owner=mreitz@redhat.com
++# Creator/Owner: mreitz@redhat.com
++#
+ 
+ seq="$(basename $0)"
+ echo "QA output created by $seq"
 diff --git a/tests/qemu-iotests/127 b/tests/qemu-iotests/127
-index ea2679e969..34e1eddc57 100755
+index 34e1eddc57..ee7e3d365d 100755
 --- a/tests/qemu-iotests/127
 +++ b/tests/qemu-iotests/127
-@@ -27,6 +27,10 @@ echo "QA output created by $seq"
- here=$PWD
- status=1    # failure is the default!
- 
-+# get standard environment, filters and qemu instance handling
-+. ./common.rc
-+. ./common.qemu
-+
- _cleanup()
- {
-     _cleanup_qemu
-@@ -36,10 +40,6 @@ _cleanup()
- }
- trap "_cleanup; exit \$status" 0 1 2 3 15
- 
--# get standard environment, filters and qemu instance handling
--. ./common.rc
--. ./common.qemu
+@@ -17,9 +17,8 @@
+ # You should have received a copy of the GNU General Public License
+ # along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ #
 -
- _supported_fmt qcow2
- _supported_proto file
- _supported_os Linux
+-# creator
+-owner=mreitz@redhat.com
++# Creator/Owner: mreitz@redhat.com
++#
+ 
+ seq=$(basename $0)
+ echo "QA output created by $seq"
+diff --git a/tests/qemu-iotests/128 b/tests/qemu-iotests/128
+index 934b6e7e33..412d4f86ca 100755
+--- a/tests/qemu-iotests/128
++++ b/tests/qemu-iotests/128
+@@ -17,9 +17,8 @@
+ # You should have received a copy of the GNU General Public License
+ # along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ #
+-
+-# creator
+-owner=stefanha@redhat.com
++# Creator/Owner: stefanha@redhat.com
++#
+ 
+ seq=`basename $0`
+ echo "QA output created by $seq"
 diff --git a/tests/qemu-iotests/130 b/tests/qemu-iotests/130
-index c0f5782003..4906019543 100755
+index 4906019543..e5986d59bb 100755
 --- a/tests/qemu-iotests/130
 +++ b/tests/qemu-iotests/130
-@@ -29,6 +29,10 @@ echo "QA output created by $seq"
- here="$PWD"
- status=1	# failure is the default!
- 
-+# get standard environment, filters and checks
-+. ./common.rc
-+. ./common.qemu
-+
- _cleanup()
- {
-     _cleanup_qemu
-@@ -36,10 +40,6 @@ _cleanup()
- }
- trap "_cleanup; exit \$status" 0 1 2 3 15
- 
--# get standard environment, filters and checks
--. ./common.rc
--. ./common.qemu
+@@ -19,9 +19,8 @@
+ # You should have received a copy of the GNU General Public License
+ # along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ #
 -
- _supported_fmt qcow2
- _supported_proto generic
- _unsupported_proto vxhs
+-# creator
+-owner=kwolf@redhat.com
++# Creator/Owner: kwolf@redhat.com
++#
+ 
+ seq="$(basename $0)"
+ echo "QA output created by $seq"
 diff --git a/tests/qemu-iotests/131 b/tests/qemu-iotests/131
-index 142b908981..fb771fed95 100755
+index fb771fed95..930a80e02f 100755
 --- a/tests/qemu-iotests/131
 +++ b/tests/qemu-iotests/131
-@@ -27,15 +27,15 @@ echo "QA output created by $seq"
- here=`pwd`
- status=1	# failure is the default!
- 
-+# get standard environment, filters and checks
-+. ./common.rc
-+
- _cleanup()
- {
-     _cleanup_test_img
- }
- trap "_cleanup; exit \$status" 0 1 2 3 15
- 
--# get standard environment, filters and checks
--. ./common.rc
+@@ -17,9 +17,8 @@
+ # You should have received a copy of the GNU General Public License
+ # along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ #
 -
- _supported_fmt parallels
- _supported_proto file
- _supported_os Linux
+-# creator
+-owner=den@openvz.org
++# Creator/Owner: den@openvz.org
++#
+ 
+ seq=`basename $0`
+ echo "QA output created by $seq"
 diff --git a/tests/qemu-iotests/133 b/tests/qemu-iotests/133
-index 467c31e58d..1daf5895c1 100755
+index 1daf5895c1..61af222c9e 100755
 --- a/tests/qemu-iotests/133
 +++ b/tests/qemu-iotests/133
-@@ -27,15 +27,15 @@ echo "QA output created by $seq"
- here=`pwd`
- status=1	# failure is the default!
- 
-+# get standard environment, filters and checks
-+. ./common.rc
-+
- _cleanup()
- {
-     _cleanup_test_img
- }
- trap "_cleanup; exit \$status" 0 1 2 3 15
- 
--# get standard environment, filters and checks
--. ./common.rc
+@@ -17,9 +17,8 @@
+ # You should have received a copy of the GNU General Public License
+ # along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ #
 -
- _supported_fmt qcow2
- _supported_proto file
- _supported_os Linux
+-# creator
+-owner=kwolf@redhat.com
++# Creator/Owner: kwolf@redhat.com
++#
+ 
+ seq=`basename $0`
+ echo "QA output created by $seq"
 diff --git a/tests/qemu-iotests/134 b/tests/qemu-iotests/134
-index 99144151b8..5d476e1b16 100755
+index 5d476e1b16..59f2662614 100755
 --- a/tests/qemu-iotests/134
 +++ b/tests/qemu-iotests/134
-@@ -27,16 +27,16 @@ echo "QA output created by $seq"
- here=`pwd`
- status=1	# failure is the default!
- 
-+# get standard environment, filters and checks
-+. ./common.rc
-+. ./common.filter
-+
- _cleanup()
- {
- 	_cleanup_test_img
- }
- trap "_cleanup; exit \$status" 0 1 2 3 15
- 
--# get standard environment, filters and checks
--. ./common.rc
--. ./common.filter
+@@ -17,9 +17,8 @@
+ # You should have received a copy of the GNU General Public License
+ # along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ #
 -
- _supported_fmt qcow qcow2
- _supported_proto generic
- _unsupported_proto vxhs
+-# creator
+-owner=berrange@redhat.com
++# Creator/Owner: berrange@redhat.com
++#
+ 
+ seq=`basename $0`
+ echo "QA output created by $seq"
 diff --git a/tests/qemu-iotests/135 b/tests/qemu-iotests/135
-index 5f77ad5885..676e2a2c70 100755
+index 676e2a2c70..a6d35c147a 100755
 --- a/tests/qemu-iotests/135
 +++ b/tests/qemu-iotests/135
-@@ -27,15 +27,15 @@ echo "QA output created by $seq"
- here=`pwd`
- status=1	# failure is the default!
- 
-+# get standard environment, filters and checks
-+. ./common.rc
-+
- _cleanup()
- {
-     _cleanup_test_img
- }
- trap "_cleanup; exit \$status" 0 1 2 3 15
- 
--# get standard environment, filters and checks
--. ./common.rc
+@@ -17,9 +17,8 @@
+ # You should have received a copy of the GNU General Public License
+ # along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ #
 -
- _supported_fmt vpc
- _supported_proto generic
- _supported_os Linux
+-# creator
+-owner=jcody@redhat.com
++# Creator/Owner: jcody@redhat.com
++#
+ 
+ seq=`basename $0`
+ echo "QA output created by $seq"
 diff --git a/tests/qemu-iotests/137 b/tests/qemu-iotests/137
-index 1e12b140ae..66ea0e9d1a 100755
+index 66ea0e9d1a..1c3981c982 100755
 --- a/tests/qemu-iotests/137
 +++ b/tests/qemu-iotests/137
-@@ -27,16 +27,16 @@ echo "QA output created by $seq"
- here="$PWD"
- status=1	# failure is the default!
- 
-+# get standard environment, filters and checks
-+. ./common.rc
-+. ./common.qemu
-+
- _cleanup()
- {
-     _cleanup_test_img
- }
- trap "_cleanup; exit \$status" 0 1 2 3 15
- 
--# get standard environment, filters and checks
--. ./common.rc
--. ./common.qemu
+@@ -17,9 +17,8 @@
+ # You should have received a copy of the GNU General Public License
+ # along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ #
 -
- _supported_fmt qcow2
- _supported_proto file
- _supported_os Linux
+-# creator
+-owner=kwolf@redhat.com
++# Creator/Owner: kwolf@redhat.com
++#
+ 
+ seq="$(basename $0)"
+ echo "QA output created by $seq"
 diff --git a/tests/qemu-iotests/138 b/tests/qemu-iotests/138
-index 33570ad20d..5624ef11db 100755
+index 5624ef11db..4b21217038 100755
 --- a/tests/qemu-iotests/138
 +++ b/tests/qemu-iotests/138
-@@ -27,15 +27,15 @@ echo "QA output created by $seq"
- here="$PWD"
- status=1	# failure is the default!
- 
-+# get standard environment, filters and checks
-+. ./common.rc
-+
- _cleanup()
- {
- 	_cleanup_test_img
- }
- trap "_cleanup; exit \$status" 0 1 2 3 15
- 
--# get standard environment, filters and checks
--. ./common.rc
+@@ -17,9 +17,8 @@
+ # You should have received a copy of the GNU General Public License
+ # along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ #
 -
- # This tests qocw2-specific low-level functionality
- _supported_fmt qcow2
- _supported_proto file
+-# creator
+-owner=mreitz@redhat.com
++# Creator/Owner: mreitz@redhat.com
++#
+ 
+ seq="$(basename $0)"
+ echo "QA output created by $seq"
 diff --git a/tests/qemu-iotests/140 b/tests/qemu-iotests/140
-index 32af253b41..a0d255ee5f 100755
+index a0d255ee5f..bdc1e08027 100755
 --- a/tests/qemu-iotests/140
 +++ b/tests/qemu-iotests/140
-@@ -31,6 +31,10 @@ echo "QA output created by $seq"
- here="$PWD"
- status=1	# failure is the default!
- 
-+# get standard environment, filters and checks
-+. ./common.rc
-+. ./common.qemu
-+
- _cleanup()
- {
-     _cleanup_qemu
-@@ -39,10 +43,6 @@ _cleanup()
- }
- trap "_cleanup; exit \$status" 0 1 2 3 15
- 
--# get standard environment, filters and checks
--. ./common.rc
--. ./common.qemu
+@@ -21,9 +21,8 @@
+ # You should have received a copy of the GNU General Public License
+ # along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ #
 -
- _supported_fmt generic
- _supported_proto file
- _supported_os Linux
+-# creator
+-owner=mreitz@redhat.com
++# Creator/Owner: mreitz@redhat.com
++#
+ 
+ seq="$(basename $0)"
+ echo "QA output created by $seq"
 diff --git a/tests/qemu-iotests/141 b/tests/qemu-iotests/141
-index f9914a91da..0bee4f8cde 100755
+index 0bee4f8cde..c5e3981530 100755
 --- a/tests/qemu-iotests/141
 +++ b/tests/qemu-iotests/141
-@@ -27,6 +27,10 @@ echo "QA output created by $seq"
- here="$PWD"
- status=1	# failure is the default!
- 
-+# get standard environment, filters and checks
-+. ./common.rc
-+. ./common.qemu
-+
- _cleanup()
- {
-     _cleanup_qemu
-@@ -35,10 +39,6 @@ _cleanup()
- }
- trap "_cleanup; exit \$status" 0 1 2 3 15
- 
--# get standard environment, filters and checks
--. ./common.rc
--. ./common.qemu
+@@ -17,9 +17,8 @@
+ # You should have received a copy of the GNU General Public License
+ # along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ #
 -
- # Needs backing file and backing format support
- _supported_fmt qcow2 qed
- _supported_proto file
+-# creator
+-owner=mreitz@redhat.com
++# Creator/Owner: mreitz@redhat.com
++#
+ 
+ seq="$(basename $0)"
+ echo "QA output created by $seq"
 diff --git a/tests/qemu-iotests/142 b/tests/qemu-iotests/142
-index 030269b951..dca66f8675 100755
+index dca66f8675..6a8d6d8daa 100755
 --- a/tests/qemu-iotests/142
 +++ b/tests/qemu-iotests/142
-@@ -27,6 +27,9 @@ echo "QA output created by $seq"
- here=`pwd`
- status=1	# failure is the default!
- 
-+# get standard environment, filters and checks
-+. ./common.rc
-+
- _cleanup()
- {
-     _cleanup_test_img
-@@ -34,9 +37,6 @@ _cleanup()
- }
- trap "_cleanup; exit \$status" 0 1 2 3 15
- 
--# get standard environment, filters and checks
--. ./common.rc
+@@ -17,9 +17,8 @@
+ # You should have received a copy of the GNU General Public License
+ # along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ #
 -
- _supported_fmt qcow2
- _supported_proto file
- _supported_os Linux
+-# creator
+-owner=kwolf@redhat.com
++# Creator/Owner: kwolf@redhat.com
++#
+ 
+ seq=`basename $0`
+ echo "QA output created by $seq"
 diff --git a/tests/qemu-iotests/143 b/tests/qemu-iotests/143
-index 2e4acfa580..2a8a1f044f 100755
+index 2a8a1f044f..100d225e24 100755
 --- a/tests/qemu-iotests/143
 +++ b/tests/qemu-iotests/143
-@@ -27,6 +27,10 @@ echo "QA output created by $seq"
- here="$PWD"
- status=1	# failure is the default!
- 
-+# get standard environment, filters and checks
-+. ./common.rc
-+. ./common.qemu
-+
- _cleanup()
- {
-     _cleanup_qemu
-@@ -34,10 +38,6 @@ _cleanup()
- }
- trap "_cleanup; exit \$status" 0 1 2 3 15
- 
--# get standard environment, filters and checks
--. ./common.rc
--. ./common.qemu
+@@ -17,9 +17,8 @@
+ # You should have received a copy of the GNU General Public License
+ # along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ #
 -
- _supported_fmt generic
- _supported_proto generic
- _supported_os Linux
+-# creator
+-owner=mreitz@redhat.com
++# Creator/Owner: mreitz@redhat.com
++#
+ 
+ seq="$(basename $0)"
+ echo "QA output created by $seq"
 diff --git a/tests/qemu-iotests/144 b/tests/qemu-iotests/144
-index 5879fd86a1..c12441a632 100755
+index c12441a632..65fcfb77a6 100755
 --- a/tests/qemu-iotests/144
 +++ b/tests/qemu-iotests/144
-@@ -32,6 +32,10 @@ status=1	# failure is the default!
- TMP_SNAP1=${TEST_DIR}/tmp.qcow2
- TMP_SNAP2=${TEST_DIR}/tmp2.qcow2
- 
-+# get standard environment, filters and checks
-+. ./common.rc
-+. ./common.qemu
-+
- _cleanup()
- {
-     _cleanup_qemu
-@@ -40,10 +44,6 @@ _cleanup()
- 
- trap "_cleanup; exit \$status" 0 1 2 3 15
- 
--# get standard environment, filters and checks
--. ./common.rc
--. ./common.qemu
+@@ -19,9 +19,8 @@
+ # You should have received a copy of the GNU General Public License
+ # along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ #
 -
- _supported_fmt qcow2
- _supported_proto file
- _supported_os Linux
+-# creator
+-owner=jcody@redhat.com
++# Creator/Owner: jcody@redhat.com
++#
+ 
+ seq=`basename $0`
+ echo "QA output created by $seq"
 diff --git a/tests/qemu-iotests/145 b/tests/qemu-iotests/145
-index 6e6181c858..cd02edd3a8 100755
+index cd02edd3a8..3fa205a07d 100755
 --- a/tests/qemu-iotests/145
 +++ b/tests/qemu-iotests/145
-@@ -27,6 +27,9 @@ echo "QA output created by $seq"
- here=`pwd`
- status=1	# failure is the default!
- 
-+# get standard environment, filters and checks
-+. ./common.rc
-+
- _cleanup()
- {
- 	_cleanup_test_img
-@@ -34,9 +37,6 @@ _cleanup()
- }
- trap "_cleanup; exit \$status" 0 1 2 3 15
- 
--# get standard environment, filters and checks
--. ./common.rc
+@@ -17,9 +17,8 @@
+ # You should have received a copy of the GNU General Public License
+ # along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ #
 -
- _supported_fmt generic
- _supported_proto generic
- _supported_os Linux
+-# creator
+-owner=kwolf@redhat.com
++# Creator/Owner: kwolf@redhat.com
++#
+ 
+ seq=`basename $0`
+ echo "QA output created by $seq"
 diff --git a/tests/qemu-iotests/146 b/tests/qemu-iotests/146
-index bdc875d143..30fe5e07bc 100755
+index 30fe5e07bc..6b418c60f7 100755
 --- a/tests/qemu-iotests/146
 +++ b/tests/qemu-iotests/146
-@@ -27,6 +27,10 @@ echo "QA output created by $seq"
- here=`pwd`
- status=1    # failure is the default!
- 
-+# get standard environment, filters and checks
-+. ./common.rc
-+. ./common.qemu
-+
- _cleanup()
- {
-     _cleanup_qemu
-@@ -34,10 +38,6 @@ _cleanup()
- }
- trap "_cleanup; exit \$status" 0 1 2 3 15
- 
--# get standard environment, filters and checks
--. ./common.rc
--. ./common.qemu
+@@ -17,9 +17,8 @@
+ # You should have received a copy of the GNU General Public License
+ # along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ #
 -
- _supported_fmt vpc
- _supported_proto file
- _supported_os Linux
+-# creator
+-owner=jcody@redhat.com
++# Creator/Owner: jcody@redhat.com
++#
+ 
+ seq=`basename $0`
+ echo "QA output created by $seq"
 diff --git a/tests/qemu-iotests/150 b/tests/qemu-iotests/150
-index 182cf41597..6e77566d78 100755
+index 6e77566d78..51e4e124cd 100755
 --- a/tests/qemu-iotests/150
 +++ b/tests/qemu-iotests/150
-@@ -27,15 +27,15 @@ echo "QA output created by $seq"
- here="$PWD"
- status=1	# failure is the default!
- 
-+# get standard environment, filters and checks
-+. ./common.rc
-+
- _cleanup()
- {
-     _cleanup_test_img
- }
- trap "_cleanup; exit \$status" 0 1 2 3 15
- 
--# get standard environment, filters and checks
--. ./common.rc
+@@ -17,9 +17,8 @@
+ # You should have received a copy of the GNU General Public License
+ # along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ #
 -
- _supported_fmt raw qcow2
- _supported_proto file
- _supported_os Linux
+-# creator
+-owner=mreitz@redhat.com
++# Creator/Owner: mreitz@redhat.com
++#
+ 
+ seq="$(basename $0)"
+ echo "QA output created by $seq"
 diff --git a/tests/qemu-iotests/153 b/tests/qemu-iotests/153
-index 6d93726108..6947b017f0 100755
+index 6947b017f0..ae9158fa91 100755
 --- a/tests/qemu-iotests/153
 +++ b/tests/qemu-iotests/153
-@@ -28,6 +28,10 @@ here="$PWD"
- tmp=/tmp/$$
- status=1	# failure is the default!
- 
-+# get standard environment, filters and checks
-+. ./common.rc
-+. ./common.qemu
-+
- _cleanup()
- {
-     _cleanup_test_img
-@@ -40,10 +44,6 @@ _cleanup()
- }
- trap "_cleanup; exit \$status" 0 1 2 3 15
- 
--# get standard environment, filters and checks
--. ./common.rc
--. ./common.qemu
+@@ -17,9 +17,8 @@
+ # You should have received a copy of the GNU General Public License
+ # along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ #
 -
- size=32M
+-# creator
+-owner=famz@redhat.com
++# Creator/Owner: famz@redhat.com
++#
  
- _check_ofd()
+ seq="$(basename $0)"
+ echo "QA output created by $seq"
 diff --git a/tests/qemu-iotests/154 b/tests/qemu-iotests/154
-index 2dcbed329d..d8f07422ca 100755
+index d8f07422ca..7bf0c2e91e 100755
 --- a/tests/qemu-iotests/154
 +++ b/tests/qemu-iotests/154
-@@ -27,15 +27,15 @@ echo "QA output created by $seq"
- here=`pwd`
- status=1	# failure is the default!
- 
-+# get standard environment, filters and checks
-+. ./common.rc
-+
- _cleanup()
- {
- 	_cleanup_test_img
- }
- trap "_cleanup; exit \$status" 0 1 2 3 15
- 
--# get standard environment, filters and checks
--. ./common.rc
+@@ -17,9 +17,8 @@
+ # You should have received a copy of the GNU General Public License
+ # along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ #
 -
- _supported_fmt qcow2
- _supported_proto file
- _supported_os Linux
+-# creator
+-owner=kwolf@redhat.com
++# Creator/Owner: kwolf@redhat.com
++#
+ 
+ seq=`basename $0`
+ echo "QA output created by $seq"
 diff --git a/tests/qemu-iotests/156 b/tests/qemu-iotests/156
-index 02c52c7ec6..907d5f4e42 100755
+index 907d5f4e42..62100fff7a 100755
 --- a/tests/qemu-iotests/156
 +++ b/tests/qemu-iotests/156
-@@ -35,6 +35,10 @@ echo "QA output created by $seq"
- here="$PWD"
- status=1	# failure is the default!
- 
-+# get standard environment, filters and checks
-+. ./common.rc
-+. ./common.qemu
-+
- _cleanup()
- {
-     _cleanup_qemu
-@@ -42,10 +46,6 @@ _cleanup()
- }
- trap "_cleanup; exit \$status" 0 1 2 3 15
- 
--# get standard environment, filters and checks
--. ./common.rc
--. ./common.qemu
+@@ -25,9 +25,8 @@
+ # You should have received a copy of the GNU General Public License
+ # along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ #
 -
- _supported_fmt qcow2 qed
- _supported_proto generic
- _unsupported_proto vxhs
+-# creator
+-owner=mreitz@redhat.com
++# Creator/Owner: mreitz@redhat.com
++#
+ 
+ seq="$(basename $0)"
+ echo "QA output created by $seq"
 diff --git a/tests/qemu-iotests/157 b/tests/qemu-iotests/157
-index 1f273856fd..4f2e299008 100755
+index 4f2e299008..2b2b886e99 100755
 --- a/tests/qemu-iotests/157
 +++ b/tests/qemu-iotests/157
-@@ -27,15 +27,15 @@ echo "QA output created by $seq"
- here="$PWD"
- status=1	# failure is the default!
- 
-+# get standard environment, filters and checks
-+. ./common.rc
-+
- _cleanup()
- {
- 	_cleanup_test_img
- }
- trap "_cleanup; exit \$status" 0 1 2 3 15
- 
--# get standard environment, filters and checks
--. ./common.rc
+@@ -17,9 +17,8 @@
+ # You should have received a copy of the GNU General Public License
+ # along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ #
 -
- _supported_fmt generic
- _supported_proto file
- _supported_os Linux
+-# creator
+-owner=kwolf@redhat.com
++# Creator/Owner: kwolf@redhat.com
++#
+ 
+ seq="$(basename $0)"
+ echo "QA output created by $seq"
 diff --git a/tests/qemu-iotests/158 b/tests/qemu-iotests/158
-index 22a17f92cb..51c46dd259 100755
+index 51c46dd259..fe3318bbe2 100755
 --- a/tests/qemu-iotests/158
 +++ b/tests/qemu-iotests/158
-@@ -27,15 +27,15 @@ echo "QA output created by $seq"
- here=`pwd`
- status=1	# failure is the default!
- 
-+# get standard environment, filters and checks
-+. ./common.rc
-+
- _cleanup()
- {
- 	_cleanup_test_img
- }
- trap "_cleanup; exit \$status" 0 1 2 3 15
- 
--# get standard environment, filters and checks
--. ./common.rc
+@@ -17,9 +17,8 @@
+ # You should have received a copy of the GNU General Public License
+ # along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ #
 -
- _supported_fmt qcow qcow2
- _supported_proto generic
- _unsupported_proto vxhs
+-# creator
+-owner=berrange@redhat.com
++# Creator/Owner: berrange@redhat.com
++#
+ 
+ seq=`basename $0`
+ echo "QA output created by $seq"
 diff --git a/tests/qemu-iotests/159 b/tests/qemu-iotests/159
-index 250905c264..463228de96 100755
+index 463228de96..799ff57040 100755
 --- a/tests/qemu-iotests/159
 +++ b/tests/qemu-iotests/159
-@@ -26,6 +26,9 @@ echo "QA output created by $seq"
- here="$PWD"
- status=1
- 
-+. ./common.rc
-+. ./common.pattern
-+
- _cleanup()
- {
-     _cleanup_test_img
-@@ -33,9 +36,6 @@ _cleanup()
- }
- trap "_cleanup; exit \$status" 0 1 2 3 15
- 
--. ./common.rc
--. ./common.pattern
+@@ -17,8 +17,8 @@
+ # You should have received a copy of the GNU General Public License
+ # along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ #
 -
- _supported_fmt generic
- _supported_proto file
- _supported_os Linux
+-owner=fullmanet@gmail.com
++# Creator/Owner: fullmanet@gmail.com
++#
+ 
+ seq="$(basename $0)"
+ echo "QA output created by $seq"
 diff --git a/tests/qemu-iotests/160 b/tests/qemu-iotests/160
-index 7ec68d712e..ae6f799c9f 100755
+index ae6f799c9f..41ffad5774 100755
 --- a/tests/qemu-iotests/160
 +++ b/tests/qemu-iotests/160
-@@ -26,6 +26,9 @@ echo "QA output created by $seq"
- here="$PWD"
- status=1
- 
-+. ./common.rc
-+. ./common.pattern
-+
- _cleanup()
- {
-     _cleanup_test_img
-@@ -33,9 +36,6 @@ _cleanup()
- }
- trap "_cleanup; exit \$status" 0 1 2 3 15
- 
--. ./common.rc
--. ./common.pattern
+@@ -17,8 +17,8 @@
+ # You should have received a copy of the GNU General Public License
+ # along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ #
 -
- _supported_fmt raw
- _supported_proto file
- _supported_os Linux
+-owner=fullmanet@gmail.com
++# Creator/Owner: fullmanet@gmail.com
++#
+ 
+ seq="$(basename $0)"
+ echo "QA output created by $seq"
+diff --git a/tests/qemu-iotests/162 b/tests/qemu-iotests/162
+index 0572e91c9a..6cadc0c75b 100755
+--- a/tests/qemu-iotests/162
++++ b/tests/qemu-iotests/162
+@@ -18,9 +18,8 @@
+ # You should have received a copy of the GNU General Public License
+ # along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ #
+-
+-# creator
+-owner=mreitz@redhat.com
++# Creator/Owner: mreitz@redhat.com
++#
+ 
+ seq="$(basename $0)"
+ echo "QA output created by $seq"
 diff --git a/tests/qemu-iotests/170 b/tests/qemu-iotests/170
-index 2f76d43101..9454485e52 100755
+index 9454485e52..736c61f8e9 100755
 --- a/tests/qemu-iotests/170
 +++ b/tests/qemu-iotests/170
-@@ -26,6 +26,9 @@ echo "QA output created by $seq"
- here="$PWD"
- status=1
- 
-+. ./common.rc
-+. ./common.pattern
-+
- _cleanup()
- {
-     _cleanup_test_img
-@@ -33,9 +36,6 @@ _cleanup()
- }
- trap "_cleanup; exit \$status" 0 1 2 3 15
- 
--. ./common.rc
--. ./common.pattern
+@@ -17,8 +17,8 @@
+ # You should have received a copy of the GNU General Public License
+ # along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ #
 -
- _supported_fmt generic
- _supported_proto file
- _supported_os Linux
+-owner=fullmanet@gmail.com
++# Creator/Owner: fullmanet@gmail.com
++#
+ 
+ seq="$(basename $0)"
+ echo "QA output created by $seq"
 diff --git a/tests/qemu-iotests/171 b/tests/qemu-iotests/171
-index d703cae210..2c6d6e4995 100755
+index 2c6d6e4995..3ea97f46b6 100755
 --- a/tests/qemu-iotests/171
 +++ b/tests/qemu-iotests/171
-@@ -28,15 +28,15 @@ echo "QA output created by $seq"
- here=`pwd`
- status=1	# failure is the default!
- 
-+# get standard environment, filters and checks
-+. ./common.rc
-+
- _cleanup()
- {
-     _cleanup_test_img
- }
- trap "_cleanup; exit \$status" 0 1 2 3 15
- 
--# get standard environment, filters and checks
--. ./common.rc
+@@ -18,9 +18,8 @@
+ # You should have received a copy of the GNU General Public License
+ # along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ #
 -
- _supported_fmt raw
- _supported_proto file
- _supported_os Linux
+-# creator
+-owner=tgolembi@redhat.com
++# Creator/Owner: tgolembi@redhat.com
++#
+ 
+ seq=`basename $0`
+ echo "QA output created by $seq"
 diff --git a/tests/qemu-iotests/172 b/tests/qemu-iotests/172
-index 9da3d60146..0b63d0b116 100755
+index 0b63d0b116..2fd80c7844 100755
 --- a/tests/qemu-iotests/172
 +++ b/tests/qemu-iotests/172
-@@ -27,17 +27,17 @@ echo "QA output created by $seq"
- here=`pwd`
- status=1	# failure is the default!
- 
-+# get standard environment, filters and checks
-+. ./common.rc
-+
- _cleanup()
- {
--	_cleanup_test_img
-+    _cleanup_test_img
-     rm -f "$TEST_IMG.2"
-     rm -f "$TEST_IMG.3"
- }
- trap "_cleanup; exit \$status" 0 1 2 3 15
- 
--# get standard environment, filters and checks
--. ./common.rc
+@@ -17,9 +17,8 @@
+ # You should have received a copy of the GNU General Public License
+ # along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ #
 -
- _supported_fmt qcow2
- _supported_proto file
- _supported_os Linux
+-# creator
+-owner=kwolf@redhat.com
++# Creator/Owner: kwolf@redhat.com
++#
+ 
+ seq=`basename $0`
+ echo "QA output created by $seq"
 diff --git a/tests/qemu-iotests/173 b/tests/qemu-iotests/173
-index ef1ed9cdd1..f08f4d93d1 100755
+index f08f4d93d1..0df1865199 100755
 --- a/tests/qemu-iotests/173
 +++ b/tests/qemu-iotests/173
-@@ -27,6 +27,10 @@ echo "QA output created by $seq"
- here=`pwd`
- status=1    # failure is the default!
+@@ -18,8 +18,8 @@
+ # You should have received a copy of the GNU General Public License
+ # along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ #
+-# creator
+-owner=jcody@redhat.com
++# Creator/Owner: jcody@redhat.com
++#
  
-+# get standard environment, filters and checks
-+. ./common.rc
-+. ./common.qemu
-+
- _cleanup()
- {
-     _cleanup_qemu
-@@ -35,10 +39,6 @@ _cleanup()
- }
- trap "_cleanup; exit \$status" 0 1 2 3 15
- 
--# get standard environment, filters and checks
--. ./common.rc
--. ./common.qemu
--
- _supported_fmt qcow2
- _supported_proto nfs
- _supported_os Linux
+ seq=`basename $0`
+ echo "QA output created by $seq"
 diff --git a/tests/qemu-iotests/174 b/tests/qemu-iotests/174
-index a5a4ef65fb..46f557402f 100755
+index 46f557402f..2c530a1e64 100755
 --- a/tests/qemu-iotests/174
 +++ b/tests/qemu-iotests/174
-@@ -27,15 +27,15 @@ echo "QA output created by $seq"
- here=`pwd`
- status=1	# failure is the default!
- 
-+# get standard environment, filters and checks
-+. ./common.rc
-+
- _cleanup()
- {
- 	_cleanup_test_img
- }
- trap "_cleanup; exit \$status" 0 1 2 3 15
- 
--# get standard environment, filters and checks
--. ./common.rc
+@@ -17,9 +17,8 @@
+ # You should have received a copy of the GNU General Public License
+ # along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ #
 -
- _unsupported_fmt raw
+-# creator
+-owner=nirsof@gmail.com
++# Creator/Owner: nirsof@gmail.com
++#
  
- 
+ seq=`basename $0`
+ echo "QA output created by $seq"
 diff --git a/tests/qemu-iotests/175 b/tests/qemu-iotests/175
-index 4e270ce41e..d96ac79b04 100755
+index d96ac79b04..a000405737 100755
 --- a/tests/qemu-iotests/175
 +++ b/tests/qemu-iotests/175
-@@ -27,15 +27,15 @@ echo "QA output created by $seq"
- here=`pwd`
- status=1	# failure is the default!
- 
-+# get standard environment, filters and checks
-+. ./common.rc
-+
- _cleanup()
- {
- 	_cleanup_test_img
- }
- trap "_cleanup; exit \$status" 0 1 2 3 15
- 
--# get standard environment, filters and checks
--. ./common.rc
+@@ -17,9 +17,8 @@
+ # You should have received a copy of the GNU General Public License
+ # along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ #
 -
- _supported_fmt raw
- _supported_proto file
- _supported_os Linux
+-# creator
+-owner=nirsof@gmail.com
++# Creator/Owner: nirsof@gmail.com
++#
+ 
+ seq=`basename $0`
+ echo "QA output created by $seq"
 diff --git a/tests/qemu-iotests/176 b/tests/qemu-iotests/176
-index d2f53acb1d..b0f87e4bf4 100755
+index b0f87e4bf4..9928833137 100755
 --- a/tests/qemu-iotests/176
 +++ b/tests/qemu-iotests/176
-@@ -31,6 +31,10 @@ echo "QA output created by $seq"
- here="$PWD"
- status=1	# failure is the default!
- 
-+# get standard environment, filters and checks
-+. ./common.rc
-+. ./common.pattern
-+
- _cleanup()
- {
-     _cleanup_test_img
-@@ -38,10 +42,6 @@ _cleanup()
- }
- trap "_cleanup; exit \$status" 0 1 2 3 15
- 
--# get standard environment, filters and checks
--. ./common.rc
--. ./common.pattern
+@@ -21,9 +21,8 @@
+ # You should have received a copy of the GNU General Public License
+ # along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ #
 -
- # Any format supporting backing files and bdrv_make_empty
- _supported_fmt qcow2
- _supported_proto file
+-# creator
+-owner=mreitz@redhat.com
++# Creator/Owner: mreitz@redhat.com
++#
+ 
+ seq="$(basename $0)"
+ echo "QA output created by $seq"
 diff --git a/tests/qemu-iotests/177 b/tests/qemu-iotests/177
-index b3ef552103..3afad516da 100755
+index 3afad516da..2c0c70ec6d 100755
 --- a/tests/qemu-iotests/177
 +++ b/tests/qemu-iotests/177
-@@ -27,15 +27,15 @@ echo "QA output created by $seq"
- here=`pwd`
- status=1	# failure is the default!
- 
-+# get standard environment, filters and checks
-+. ./common.rc
-+
- _cleanup()
- {
- 	_cleanup_test_img
- }
- trap "_cleanup; exit \$status" 0 1 2 3 15
- 
--# get standard environment, filters and checks
--. ./common.rc
+@@ -17,9 +17,8 @@
+ # You should have received a copy of the GNU General Public License
+ # along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ #
 -
- _supported_fmt qcow2
- _supported_proto file
+-# creator
+-owner=eblake@redhat.com
++# Creator/Owner: eblake@redhat.com
++#
  
+ seq=`basename $0`
+ echo "QA output created by $seq"
 diff --git a/tests/qemu-iotests/178 b/tests/qemu-iotests/178
-index b5df4f5cc2..875b4e002b 100755
+index 875b4e002b..ffa3d3148b 100755
 --- a/tests/qemu-iotests/178
 +++ b/tests/qemu-iotests/178
-@@ -27,6 +27,10 @@ echo "QA output created by $seq"
- here=`pwd`
- status=1    # failure is the default!
- 
-+# get standard environment, filters and checks
-+. ./common.rc
-+. ./common.pattern
-+
- _cleanup()
- {
-     _cleanup_test_img
-@@ -34,10 +38,6 @@ _cleanup()
- }
- trap "_cleanup; exit \$status" 0 1 2 3 15
- 
--# get standard environment, filters and checks
--. ./common.rc
--. ./common.pattern
+@@ -17,9 +17,8 @@
+ # You should have received a copy of the GNU General Public License
+ # along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ #
 -
- _supported_fmt raw qcow2
- _supported_proto file
- _supported_os Linux
+-# creator
+-owner=stefanha@redhat.com
++# Creator/Owner: stefanha@redhat.com
++#
+ 
+ seq=`basename $0`
+ echo "QA output created by $seq"
 diff --git a/tests/qemu-iotests/179 b/tests/qemu-iotests/179
-index 7a68986536..45f82a1a2d 100755
+index 45f82a1a2d..ccede3bc04 100755
 --- a/tests/qemu-iotests/179
 +++ b/tests/qemu-iotests/179
-@@ -27,16 +27,16 @@ echo "QA output created by $seq"
- here="$PWD"
- status=1	# failure is the default!
- 
-+# get standard environment, filters and checks
-+. ./common.rc
-+
- _cleanup()
- {
--	_cleanup_test_img
-+    _cleanup_test_img
-     rm -f "$TEST_DIR/blkdebug.conf"
- }
- trap "_cleanup; exit \$status" 0 1 2 3 15
- 
--# get standard environment, filters and checks
--. ./common.rc
+@@ -17,9 +17,8 @@
+ # You should have received a copy of the GNU General Public License
+ # along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ #
 -
- _supported_fmt qcow2
- _supported_proto file
- _supported_os Linux
+-# creator
+-owner=eblake@redhat.com
++# Creator/Owner: eblake@redhat.com
++#
+ 
+ seq="$(basename $0)"
+ echo "QA output created by $seq"
 diff --git a/tests/qemu-iotests/181 b/tests/qemu-iotests/181
-index 51b597fc13..c0254623b1 100755
+index c0254623b1..b308c8194f 100755
 --- a/tests/qemu-iotests/181
 +++ b/tests/qemu-iotests/181
-@@ -29,18 +29,18 @@ status=1	# failure is the default!
- 
- MIG_SOCKET="${TEST_DIR}/migrate"
- 
-+# get standard environment, filters and checks
-+. ./common.rc
-+. ./common.qemu
-+
- _cleanup()
- {
-     rm -f "${MIG_SOCKET}"
--	_cleanup_test_img
-+    _cleanup_test_img
-     _cleanup_qemu
- }
- trap "_cleanup; exit \$status" 0 1 2 3 15
- 
--# get standard environment, filters and checks
--. ./common.rc
--. ./common.qemu
+@@ -17,9 +17,8 @@
+ # You should have received a copy of the GNU General Public License
+ # along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ #
 -
- _supported_fmt generic
- # Formats that do not support live migration
- _unsupported_fmt qcow vdi vhdx vmdk vpc vvfat
+-# creator
+-owner=kwolf@redhat.com
++# Creator/Owner: kwolf@redhat.com
++#
+ 
+ seq=`basename $0`
+ echo "QA output created by $seq"
 diff --git a/tests/qemu-iotests/182 b/tests/qemu-iotests/182
-index 7293d50bcb..4fbc1d95f9 100755
+index 4fbc1d95f9..c7cd4ff678 100755
 --- a/tests/qemu-iotests/182
 +++ b/tests/qemu-iotests/182
-@@ -28,16 +28,16 @@ here="$PWD"
- tmp=/tmp/$$
- status=1	# failure is the default!
- 
-+# get standard environment, filters and checks
-+. ./common.rc
-+. ./common.qemu
-+
- _cleanup()
- {
-     _cleanup_test_img
- }
- trap "_cleanup; exit \$status" 0 1 2 3 15
- 
--# get standard environment, filters and checks
--. ./common.rc
--. ./common.qemu
+@@ -17,9 +17,8 @@
+ # You should have received a copy of the GNU General Public License
+ # along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ #
 -
- _supported_fmt qcow2
- _supported_proto file
- _supported_os Linux
+-# creator
+-owner=famz@redhat.com
++# Creator/Owner: famz@redhat.com
++#
+ 
+ seq="$(basename $0)"
+ echo "QA output created by $seq"
 diff --git a/tests/qemu-iotests/183 b/tests/qemu-iotests/183
-index ead98f3a4f..320d03e6f6 100755
+index 320d03e6f6..764632c16b 100755
 --- a/tests/qemu-iotests/183
 +++ b/tests/qemu-iotests/183
-@@ -29,6 +29,10 @@ status=1 # failure is the default!
- 
- MIG_SOCKET="${TEST_DIR}/migrate"
- 
-+# get standard environment, filters and checks
-+. ./common.rc
-+. ./common.qemu
-+
- _cleanup()
- {
-     rm -f "${MIG_SOCKET}"
-@@ -38,10 +42,6 @@ _cleanup()
- }
- trap "_cleanup; exit \$status" 0 1 2 3 15
- 
--# get standard environment, filters and checks
--. ./common.rc
--. ./common.qemu
+@@ -17,9 +17,8 @@
+ # You should have received a copy of the GNU General Public License
+ # along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ #
 -
- _supported_fmt qcow2 raw qed dmg quorum
- _supported_proto file
- _supported_os Linux
+-# creator
+-owner=kwolf@redhat.com
++# Creator/Owner: kwolf@redhat.com
++#
+ 
+ seq=`basename $0`
+ echo "QA output created by $seq"
 diff --git a/tests/qemu-iotests/184 b/tests/qemu-iotests/184
-index 487e854272..e2af0660c7 100755
+index e2af0660c7..1b2859de5a 100755
 --- a/tests/qemu-iotests/184
 +++ b/tests/qemu-iotests/184
-@@ -27,15 +27,15 @@ echo "QA output created by $seq"
- here=`pwd`
- status=1	# failure is the default!
- 
-+# get standard environment, filters and checks
-+. ./common.rc
-+
- _cleanup()
- {
-     _cleanup_test_img
- }
- trap "_cleanup; exit \$status" 0 1 2 3 15
- 
--# get standard environment, filters and checks
--. ./common.rc
+@@ -17,9 +17,8 @@
+ # You should have received a copy of the GNU General Public License
+ # along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ #
 -
- _supported_fmt qcow2
- _supported_proto file
- _supported_os Linux
+-# creator
+-owner="Manos Pitsidianakis"
++# Creator/Owner: Manos Pitsidianakis
++#
+ 
+ seq=`basename $0`
+ echo "QA output created by $seq"
 diff --git a/tests/qemu-iotests/185 b/tests/qemu-iotests/185
-index fab1d54af0..7ba20c9eb7 100755
+index 7ba20c9eb7..563ae366fd 100755
 --- a/tests/qemu-iotests/185
 +++ b/tests/qemu-iotests/185
-@@ -29,6 +29,10 @@ status=1 # failure is the default!
- 
- MIG_SOCKET="${TEST_DIR}/migrate"
- 
-+# get standard environment, filters and checks
-+. ./common.rc
-+. ./common.qemu
-+
- _cleanup()
- {
-     rm -f "${TEST_IMG}.mid"
-@@ -38,10 +42,6 @@ _cleanup()
- }
- trap "_cleanup; exit \$status" 0 1 2 3 15
- 
--# get standard environment, filters and checks
--. ./common.rc
--. ./common.qemu
+@@ -17,9 +17,8 @@
+ # You should have received a copy of the GNU General Public License
+ # along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ #
 -
- _supported_fmt qcow2
- _supported_proto file
- _supported_os Linux
+-# creator
+-owner=kwolf@redhat.com
++# Creator/Owner: kwolf@redhat.com
++#
+ 
+ seq=`basename $0`
+ echo "QA output created by $seq"
 diff --git a/tests/qemu-iotests/186 b/tests/qemu-iotests/186
-index fcf9204801..c7e28d4435 100755
+index c7e28d4435..3d52508452 100755
 --- a/tests/qemu-iotests/186
 +++ b/tests/qemu-iotests/186
-@@ -27,15 +27,15 @@ echo "QA output created by $seq"
- here=`pwd`
- status=1	# failure is the default!
- 
-+# get standard environment, filters and checks
-+. ./common.rc
-+
- _cleanup()
- {
- 	_cleanup_test_img
- }
- trap "_cleanup; exit \$status" 0 1 2 3 15
- 
--# get standard environment, filters and checks
--. ./common.rc
+@@ -17,9 +17,8 @@
+ # You should have received a copy of the GNU General Public License
+ # along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ #
 -
- _supported_fmt qcow2
- _supported_proto file
- _supported_os Linux
+-# creator
+-owner=kwolf@redhat.com
++# Creator/Owner: kwolf@redhat.com
++#
+ 
+ seq=`basename $0`
+ echo "QA output created by $seq"
 diff --git a/tests/qemu-iotests/187 b/tests/qemu-iotests/187
-index dfd1da9469..a53d2637e0 100755
+index a53d2637e0..4351702784 100755
 --- a/tests/qemu-iotests/187
 +++ b/tests/qemu-iotests/187
-@@ -27,17 +27,17 @@ echo "QA output created by $seq"
- here=`pwd`
- status=1	# failure is the default!
- 
-+# get standard environment, filters and checks
-+. ./common.rc
-+
- _cleanup()
- {
--	_cleanup_test_img
-+    _cleanup_test_img
-     rm -f "$TEST_IMG.2"
-     rm -f "$TEST_IMG.3"
- }
- trap "_cleanup; exit \$status" 0 1 2 3 15
- 
--# get standard environment, filters and checks
--. ./common.rc
+@@ -17,9 +17,8 @@
+ # You should have received a copy of the GNU General Public License
+ # along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ #
 -
- _supported_fmt qcow2
- _supported_proto file
- _supported_os Linux
+-# creator
+-owner=kwolf@redhat.com
++# Creator/Owner: kwolf@redhat.com
++#
+ 
+ seq=`basename $0`
+ echo "QA output created by $seq"
 diff --git a/tests/qemu-iotests/188 b/tests/qemu-iotests/188
-index 481e77dc17..ba523e0b50 100755
+index ba523e0b50..042bf96178 100755
 --- a/tests/qemu-iotests/188
 +++ b/tests/qemu-iotests/188
-@@ -27,15 +27,15 @@ echo "QA output created by $seq"
- here=`pwd`
- status=1	# failure is the default!
- 
-+# get standard environment, filters and checks
-+. ./common.rc
-+
- _cleanup()
- {
- 	_cleanup_test_img
- }
- trap "_cleanup; exit \$status" 0 1 2 3 15
- 
--# get standard environment, filters and checks
--. ./common.rc
+@@ -17,9 +17,8 @@
+ # You should have received a copy of the GNU General Public License
+ # along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ #
 -
- _supported_fmt qcow2
- _supported_proto generic
- _supported_os Linux
+-# creator
+-owner=berrange@redhat.com
++# Creator/Owner: berrange@redhat.com
++#
+ 
+ seq=`basename $0`
+ echo "QA output created by $seq"
 diff --git a/tests/qemu-iotests/189 b/tests/qemu-iotests/189
-index 6ab55b618a..a2f62fc520 100755
+index a2f62fc520..9108495d99 100755
 --- a/tests/qemu-iotests/189
 +++ b/tests/qemu-iotests/189
-@@ -27,15 +27,15 @@ echo "QA output created by $seq"
- here=`pwd`
- status=1	# failure is the default!
- 
-+# get standard environment, filters and checks
-+. ./common.rc
-+
- _cleanup()
- {
- 	_cleanup_test_img
- }
- trap "_cleanup; exit \$status" 0 1 2 3 15
- 
--# get standard environment, filters and checks
--. ./common.rc
+@@ -17,9 +17,8 @@
+ # You should have received a copy of the GNU General Public License
+ # along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ #
 -
- _supported_fmt qcow2
- _supported_proto generic
- _supported_os Linux
+-# creator
+-owner=berrange@redhat.com
++# Creator/Owner: berrange@redhat.com
++#
+ 
+ seq=`basename $0`
+ echo "QA output created by $seq"
 diff --git a/tests/qemu-iotests/190 b/tests/qemu-iotests/190
-index 179949bd3b..0a848a6c94 100755
+index 0a848a6c94..aceba63b49 100755
 --- a/tests/qemu-iotests/190
 +++ b/tests/qemu-iotests/190
-@@ -27,6 +27,10 @@ echo "QA output created by $seq"
- here=`pwd`
- status=1    # failure is the default!
- 
-+# get standard environment, filters and checks
-+. ./common.rc
-+. ./common.pattern
-+
- _cleanup()
- {
-     _cleanup_test_img
-@@ -34,10 +38,6 @@ _cleanup()
- }
- trap "_cleanup; exit \$status" 0 1 2 3 15
- 
--# get standard environment, filters and checks
--. ./common.rc
--. ./common.pattern
+@@ -17,9 +17,8 @@
+ # You should have received a copy of the GNU General Public License
+ # along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ #
 -
- # See 178 for more extensive tests across more formats
- _supported_fmt qcow2
- _supported_proto file
+-# creator
+-owner=eblake@redhat.com
++# Creator/Owner: eblake@redhat.com
++#
+ 
+ seq=`basename $0`
+ echo "QA output created by $seq"
 diff --git a/tests/qemu-iotests/191 b/tests/qemu-iotests/191
-index ce6284a05e..b29822c9c3 100755
+index b29822c9c3..25d94211d9 100755
 --- a/tests/qemu-iotests/191
 +++ b/tests/qemu-iotests/191
-@@ -29,6 +29,10 @@ status=1 # failure is the default!
- 
- MIG_SOCKET="${TEST_DIR}/migrate"
- 
-+# get standard environment, filters and checks
-+. ./common.rc
-+. ./common.qemu
-+
- _cleanup()
- {
-     rm -f "${TEST_IMG}.mid"
-@@ -39,10 +43,6 @@ _cleanup()
- }
- trap "_cleanup; exit \$status" 0 1 2 3 15
- 
--# get standard environment, filters and checks
--. ./common.rc
--. ./common.qemu
+@@ -17,9 +17,8 @@
+ # You should have received a copy of the GNU General Public License
+ # along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ #
 -
- _supported_fmt qcow2
- _unsupported_imgopts compat=0.10
- _supported_proto file
+-# creator
+-owner=kwolf@redhat.com
++# Creator/Owner: kwolf@redhat.com
++#
+ 
+ seq=`basename $0`
+ echo "QA output created by $seq"
 diff --git a/tests/qemu-iotests/192 b/tests/qemu-iotests/192
-index 4d0776432a..4bf2ea2757 100755
+index 4bf2ea2757..37fbb71cd0 100755
 --- a/tests/qemu-iotests/192
 +++ b/tests/qemu-iotests/192
-@@ -28,16 +28,16 @@ echo "QA output created by $seq"
- here=`pwd`
- status=1	# failure is the default!
- 
-+# get standard environment, filters and checks
-+. ./common.rc
-+. ./common.qemu
-+
- _cleanup()
- {
- 	_cleanup_test_img
- }
- trap "_cleanup; exit \$status" 0 1 2 3 15
- 
--# get standard environment, filters and checks
--. ./common.rc
--. ./common.qemu
+@@ -18,9 +18,8 @@
+ # You should have received a copy of the GNU General Public License
+ # along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ #
 -
- _supported_fmt generic
- _supported_proto file
- _supported_os Linux
+-# creator
+-owner=famz@redhat.com
++# Creator/Owner: famz@redhat.com
++#
+ 
+ seq=`basename $0`
+ echo "QA output created by $seq"
 diff --git a/tests/qemu-iotests/195 b/tests/qemu-iotests/195
-index 810054a085..31135ac290 100755
+index 31135ac290..248cf90f53 100755
 --- a/tests/qemu-iotests/195
 +++ b/tests/qemu-iotests/195
-@@ -27,6 +27,9 @@ echo "QA output created by $seq"
- here=`pwd`
- status=1 # failure is the default!
- 
-+# get standard environment, filters and checks
-+. ./common.rc
-+
- _cleanup()
- {
-     _cleanup_test_img
-@@ -34,9 +37,6 @@ _cleanup()
- }
- trap "_cleanup; exit \$status" 0 1 2 3 15
- 
--# get standard environment, filters and checks
--. ./common.rc
+@@ -17,9 +17,8 @@
+ # You should have received a copy of the GNU General Public License
+ # along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ #
 -
- _supported_fmt qcow2
- _supported_proto file
- _supported_os Linux
+-# creator
+-owner=kwolf@redhat.com
++# Creator/Owner: kwolf@redhat.com
++#
+ 
+ seq=`basename $0`
+ echo "QA output created by $seq"
+diff --git a/tests/qemu-iotests/197 b/tests/qemu-iotests/197
+index 0f7361611f..9fb4a694a1 100755
+--- a/tests/qemu-iotests/197
++++ b/tests/qemu-iotests/197
+@@ -17,9 +17,8 @@
+ # You should have received a copy of the GNU General Public License
+ # along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ #
+-
+-# creator
+-owner=eblake@redhat.com
++# Creator/Owner: eblake@redhat.com
++#
+ 
+ seq="$(basename $0)"
+ echo "QA output created by $seq"
 -- 
 2.13.6
