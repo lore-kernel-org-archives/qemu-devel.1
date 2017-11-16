@@ -1,31 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45627)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47012)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <Michael.Nawrocki@gtri.gatech.edu>)
-	id 1eFObB-0003vl-T4
-	for qemu-devel@nongnu.org; Thu, 16 Nov 2017 13:09:15 -0500
+	(envelope-from <alex.bennee@linaro.org>) id 1eFOeS-0005Yu-RR
+	for qemu-devel@nongnu.org; Thu, 16 Nov 2017 13:12:37 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <Michael.Nawrocki@gtri.gatech.edu>)
-	id 1eFOb9-00005t-7G
-	for qemu-devel@nongnu.org; Thu, 16 Nov 2017 13:09:13 -0500
-Received: from relay2.gtri.gatech.edu ([130.207.199.168]:49229)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <Michael.Nawrocki@gtri.gatech.edu>)
-	id 1eFOb9-0008WR-0a
-	for qemu-devel@nongnu.org; Thu, 16 Nov 2017 13:09:11 -0500
-References: <20171106203520.7880-1-michael.nawrocki@gtri.gatech.edu>
-	<20171106203520.7880-2-michael.nawrocki@gtri.gatech.edu>
-	<41891d99-8cb7-79a6-9aa7-0bfe3d192f41@redhat.com>
-	<59e0dcbc-ed53-8fc5-4a0f-3830056f2145@redhat.com>
-From: Michael Nawrocki <michael.nawrocki@gtri.gatech.edu>
-Message-ID: <428e44cb-5f51-d47c-f8ff-f0ce504ab976@gtri.gatech.edu>
-Date: Thu, 16 Nov 2017 13:09:08 -0500
+	(envelope-from <alex.bennee@linaro.org>) id 1eFOeP-0003Ak-NI
+	for qemu-devel@nongnu.org; Thu, 16 Nov 2017 13:12:36 -0500
+Received: from mail-wm0-x244.google.com ([2a00:1450:400c:c09::244]:42843)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+	id 1eFOeP-0003A5-HN
+	for qemu-devel@nongnu.org; Thu, 16 Nov 2017 13:12:33 -0500
+Received: by mail-wm0-x244.google.com with SMTP id 5so755232wmk.1
+	for <qemu-devel@nongnu.org>; Thu, 16 Nov 2017 10:12:33 -0800 (PST)
+References: <20171116170526.12643-1-david@redhat.com>
+	<20171116170526.12643-3-david@redhat.com>
+	<87375e15vx.fsf@linaro.org>
+	<f0fc452d-8229-6eb3-b5d2-1d55b9ba0ee3@redhat.com>
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+In-reply-to: <f0fc452d-8229-6eb3-b5d2-1d55b9ba0ee3@redhat.com>
+Date: Thu, 16 Nov 2017 18:12:30 +0000
+Message-ID: <871sky14a9.fsf@linaro.org>
 MIME-Version: 1.0
-In-Reply-To: <59e0dcbc-ed53-8fc5-4a0f-3830056f2145@redhat.com>
-Content-Type: text/plain; charset="utf-8"; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v2 1/2] Fix eepro100 simple transmission
- mode
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v1 for-2.11 2/3] s390x/tcg: fix DIAG 308
+ with > 1 VCPU (single threaded TCG)
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,91 +33,97 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org
-Cc: marcel@redhat.com, Peter Maydell <peter.maydell@linaro.org>, Jason Wang <jasowang@redhat.com>, qemu-s390x@nongnu.org, mst@redhat.com
+To: David Hildenbrand <david@redhat.com>
+Cc: qemu-s390x@nongnu.org, qemu-devel@nongnu.org, Christian Borntraeger <borntraeger@de.ibm.com>, Cornelia Huck <cohuck@redhat.com>, Alexander Graf <agraf@suse.de>, Richard Henderson <rth@twiddle.net>
 
-On 11/16/2017 12:43 PM, Thomas Huth wrote:
-> On 16.11.2017 17:59, Thomas Huth wrote:
->> On 06.11.2017 21:35, Mike Nawrocki wrote:
->>> The simple transmission mode was treating the area immediately after the
->>> transmit command block (TCB) as if it were a transmit buffer descriptor,
->>> when in reality it is simply the packet data. This change simply copies
->>> the data following the TCB into the packet buffer.
+
+David Hildenbrand <david@redhat.com> writes:
+
+> On 16.11.2017 18:37, Alex Benn=C3=A9e wrote:
+>>
+>> David Hildenbrand <david@redhat.com> writes:
+>>
+>>> Currently, single threaded TCG with > 1 VCPU gets stuck during IPL, when
+>>> the bios tries to switch to the loaded kernel via DIAG 308.
 >>>
->>> Signed-off-by: Mike Nawrocki <michael.nawrocki@gtri.gatech.edu>
+>>> pause_all_vcpus()/resume_all_vcpus() should not be called from a VCPU.
+>>>
+>>> And there is also no need for it. run_on_cpu() will make sure that the
+>>> CPUs exit KVM/TCG, where they get stopped. Once stopped, they will no
+>>> longer run.
+>>>
+>>> Signed-off-by: David Hildenbrand <david@redhat.com>
 >>> ---
->>>   hw/net/eepro100.c | 18 +++---------------
->>>   1 file changed, 3 insertions(+), 15 deletions(-)
+>>>  target/s390x/diag.c | 4 ----
+>>>  1 file changed, 4 deletions(-)
 >>>
->>> diff --git a/hw/net/eepro100.c b/hw/net/eepro100.c
->>> index 80b8f47c4b..91dd058010 100644
->>> --- a/hw/net/eepro100.c
->>> +++ b/hw/net/eepro100.c
->>> @@ -774,23 +774,11 @@ static void tx_command(EEPRO100State *s)
->>>       }
->>>       assert(tcb_bytes <= sizeof(buf));
->>>       while (size < tcb_bytes) {
->>> -        uint32_t tx_buffer_address = ldl_le_pci_dma(&s->dev, tbd_address);
->>> -        uint16_t tx_buffer_size = lduw_le_pci_dma(&s->dev, tbd_address + 4);
->>> -#if 0
->>> -        uint16_t tx_buffer_el = lduw_le_pci_dma(&s->dev, tbd_address + 6);
->>> -#endif
->>> -        if (tx_buffer_size == 0) {
->>> -            /* Prevent an endless loop. */
->>> -            logout("loop in %s:%u\n", __FILE__, __LINE__);
->>> -            break;
->>> -        }
->>> -        tbd_address += 8;
->>>           TRACE(RXTX, logout
->>>               ("TBD (simplified mode): buffer address 0x%08x, size 0x%04x\n",
->>> -             tx_buffer_address, tx_buffer_size));
->>> -        tx_buffer_size = MIN(tx_buffer_size, sizeof(buf) - size);
->>> -        pci_dma_read(&s->dev, tx_buffer_address, &buf[size], tx_buffer_size);
->>> -        size += tx_buffer_size;
->>> +             tbd_address, tcb_bytes));
->>> +        pci_dma_read(&s->dev, tbd_address, &buf[size], tcb_bytes);
->>> +        size += tcb_bytes;
->>>       }
->>>       if (tbd_array == 0xffffffff) {
->>>           /* Simplified mode. Was already handled by code above. */
+>>> diff --git a/target/s390x/diag.c b/target/s390x/diag.c
+>>> index dbbb9e886f..52bc348808 100644
+>>> --- a/target/s390x/diag.c
+>>> +++ b/target/s390x/diag.c
+>>> @@ -27,7 +27,6 @@ static int modified_clear_reset(S390CPU *cpu)
+>>>      S390CPUClass *scc =3D S390_CPU_GET_CLASS(cpu);
+>>>      CPUState *t;
 >>>
+>>> -    pause_all_vcpus();
+>>>      cpu_synchronize_all_states();
+>>>      CPU_FOREACH(t) {
+>>>          run_on_cpu(t, s390_do_cpu_full_reset, RUN_ON_CPU_NULL);
 >>
->>   Hi,
+>> I think you also need to fix the run_on_cpu to be a async_run_on_cpu as
+>> you would otherwise hang waiting for run_on_cpu to finish on a
+>> single-threaded TCG run (as you are in the only vCPU context).
+>
+> No, it works just fine for single threaded TCG. run_on_cpu() can deal
+> with single threaded TCG just fine. (otherwise e.g. SIGP code also
+> wouldn't work)
+>
+> In do_run_on_cpu, the following code always directly triggers for single
+> threaded tcg:
+>
+>     if (qemu_cpu_is_self(cpu)) {
+>
+>         func(cpu, data);
+>
+>         return;
+>
+>     }
+
+For -smp 1 it's fine, but have you tested --accel thread=3Dsingle -smp 2?
+
+>
 >>
->> I've got no clue why, but apparently this patch introduced a regression
->> in rc1: The tests/pxe-test is now failing on a big endian (s390x) host
->> when testing the i82550 device.
->> It's working fine with commit 8fa5ad6dfb66b6c695aa6a6b54b7031c (and
->> 2.11-rc0), and it's broken starting with commit
->> 1865e288a823c764cd4344d704e33344 ... do you have any clue what might be
->> wrong here now?
-> 
-> This patch seems to fix the issue for me:
-> 
-> diff --git a/hw/net/eepro100.c b/hw/net/eepro100.c
-> index a63ed2c..03e00f7 100644
-> --- a/hw/net/eepro100.c
-> +++ b/hw/net/eepro100.c
-> @@ -756,8 +756,8 @@ static void read_cb(EEPRO100State *s)
->   
->   static void tx_command(EEPRO100State *s)
->   {
-> -    uint32_t tbd_array = le32_to_cpu(s->tx.tbd_array_addr);
-> -    uint16_t tcb_bytes = (le16_to_cpu(s->tx.tcb_bytes) & 0x3fff);
-> +    uint32_t tbd_array = s->tx.tbd_array_addr;
-> +    uint16_t tcb_bytes = s->tx.tcb_bytes & 0x3fff;
->       /* Sends larger than MAX_ETH_FRAME_SIZE are allowed, up to 2600 bytes. */
->       uint8_t buf[2600];
->       uint16_t size = 0;
-> 
-> Does that make sense? I think the fields are already swapped in
-> read_cb(), so no need to swap them in tx_command() again?
-> 
->   Thomas
-> 
+>> If it is important that the source vCPU doesn't continue you can
+>> schedule it's work afterwards with a async_safe_run_on_cpu which will
+>> complete after all other vCPUs have executed their work.
+>>
+>
+> It is important. Introducing async helpers at a point where sync is
+> needed sounds strange.
 
-That makes sense to me. Not entirely sure why my patch caused the 
-regression, but your patch seems like the correct behavior here.
+Well the helper that schedulules the final async helper also needs to
+exit the run loop at that point, otherwise you are right it would
+attempt to execute a few more instructions in the block.
 
-Thanks,
-Mike
+>
+> Thanks!
+>
+>>>
+>>> --
+>>> 2.13.6
+>>
+>>
+>> --
+>> Alex Benn=C3=A9e
+>>
+>
+>
+> --
+>
+> Thanks,
+>
+> David / dhildenb
+
+
+--
+Alex Benn=C3=A9e
