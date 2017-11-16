@@ -1,26 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42326)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43030)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1eFMMM-0004jO-Ua
-	for qemu-devel@nongnu.org; Thu, 16 Nov 2017 10:45:48 -0500
+	(envelope-from <mst@redhat.com>) id 1eFMPW-0005sz-3a
+	for qemu-devel@nongnu.org; Thu, 16 Nov 2017 10:49:07 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1eFMMI-0006Ma-Vd
-	for qemu-devel@nongnu.org; Thu, 16 Nov 2017 10:45:46 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:45766)
+	(envelope-from <mst@redhat.com>) id 1eFMPR-0000TY-7g
+	for qemu-devel@nongnu.org; Thu, 16 Nov 2017 10:49:02 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:49268)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1eFMMI-0006Kv-MM
-	for qemu-devel@nongnu.org; Thu, 16 Nov 2017 10:45:42 -0500
-Date: Thu, 16 Nov 2017 15:45:34 +0000
-From: "Daniel P. Berrange" <berrange@redhat.com>
-Message-ID: <20171116154534.GR16461@redhat.com>
-Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
-References: <1510769835-31902-1-git-send-email-mst@redhat.com>
-	<CAFEAcA_f_Pxd8aX606KBamm4sKvodr1xt9o4_hbONnqx1uTBBQ@mail.gmail.com>
-	<20171116173033-mutt-send-email-mst@kernel.org>
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1eFMPR-0000SO-0x
+	for qemu-devel@nongnu.org; Thu, 16 Nov 2017 10:48:57 -0500
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+	[10.5.11.15])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 168F85BDC3
+	for <qemu-devel@nongnu.org>; Thu, 16 Nov 2017 15:48:56 +0000 (UTC)
+Date: Thu, 16 Nov 2017 17:48:55 +0200
+From: "Michael S. Tsirkin" <mst@redhat.com>
+Message-ID: <20171116174731-mutt-send-email-mst@kernel.org>
+References: <20171018131529.19453-1-berrange@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20171116173033-mutt-send-email-mst@kernel.org>
-Subject: Re: [Qemu-devel] [PULL 00/10] pc, pci, virtio: fixes for rc1
+In-Reply-To: <20171018131529.19453-1-berrange@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH] tests: report errors when iasl exits with
+ non-zero status
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,174 +33,73 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: Peter Maydell <peter.maydell@linaro.org>, QEMU Developers <qemu-devel@nongnu.org>
+To: "Daniel P. Berrange" <berrange@redhat.com>
+Cc: qemu-devel@nongnu.org, Igor Mammedov <imammedo@redhat.com>
 
-On Thu, Nov 16, 2017 at 05:38:18PM +0200, Michael S. Tsirkin wrote:
-> On Thu, Nov 16, 2017 at 02:41:09PM +0000, Peter Maydell wrote:
-> > On 15 November 2017 at 18:17, Michael S. Tsirkin <mst@redhat.com> wrote:
-> > > The following changes since commit 1fa0f627d03cd0d0755924247cafeb42969016bf:
-> > >
-> > >   Update version for v2.11.0-rc1 release (2017-11-14 18:37:49 +0000)
-> > >
-> > > are available in the git repository at:
-> > >
-> > >   git://git.kernel.org/pub/scm/virt/kvm/mst/qemu.git tags/for_upstream
-> > >
-> > > for you to fetch changes up to 6ed0c1c3ab0925009d15cffb944d9ccb04718846:
-> > >
-> > >   build-sys: restrict vmcoreinfo to fw_cfg+dma capable targets (2017-11-15 20:13:13 +0200)
-> > >
-> > > ----------------------------------------------------------------
-> > > pc, pci, virtio: fixes for rc1
-> > >
-> > > A bunch of fixes all over the place.
-> > >
-> > > Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
-> > 
-> > Hi. This failed tests on a couple of machines:
-> > 
-> > s390x:
-> > 
-> > TEST: tests/bios-tables-test... (pid=58925)
-> >   /i386/acpi/piix4:
-> > Looking for expected file 'tests/acpi-test-data/pc/DSDT'
-> > 
-> > Using expected file 'tests/acpi-test-data/pc/DSDT'
-> > 
-> > Looking for expected file 'tests/acpi-test-data/pc/APIC'
-> > 
-> > Using expected file 'tests/acpi-test-data/pc/APIC'
-> > 
-> > Looking for expected file 'tests/acpi-test-data/pc/HPET'
-> > 
-> > Using expected file 'tests/acpi-test-data/pc/HPET'
-> > 'iasl -p /tmp/asl-CHIM9Y.dsl -d tests/acpi-test-data/pc/DSDT' exited
-> > with status 65280
-> > Intel ACPI Component Architecture
-> > ASL+ Optimizing Compiler version 20160108-64
-> > Copyright (c) 2000 - 2016 Intel Corporation
-> > 
-> > Could not get ACPI tables from tests/acpi-test-data/pc/DSDT, AE_BAD_HEADER
-> > Input file tests/acpi-test-data/pc/DSDT, Length 0x1418 (5144) bytes
-> > Table [DSDT] is too long for file - needs: 0x18140000, remaining in file: 0x1418
-> > **
-> > ERROR:/home/linux1/qemu/tests/bios-tables-test.c:461:test_acpi_asl:
-> > assertion failed: (!err && !exp_err)
-> > FAIL
-> > GTester: last random seed: R02S7430f83941b25a926c586492b2745d2c
-> > (pid=58933)
-> >   /i386/acpi/q35:
+On Wed, Oct 18, 2017 at 02:15:28PM +0100, Daniel P. Berrange wrote:
+> If iasl exits with non-zero status, the test unhelpfully just reports
+> that the AML did not match, because the data files it thought iasl
+> generated do not exist. This adds an explicit check for the exit status
+> of iasl and prints stderr if it was non-zero. Thus gives us a fighting
+> chance of diagnosing why iasl failed.
 > 
-> 
-> 
-> > Looking for expected file 'tests/acpi-test-data/q35/DSDT'
-> > 
-> > Using expected file 'tests/acpi-test-data/q35/DSDT'
-> > 
-> > Looking for expected file 'tests/acpi-test-data/q35/APIC'
-> > 
-> > Using expected file 'tests/acpi-test-data/q35/APIC'
-> > 
-> > Looking for expected file 'tests/acpi-test-data/q35/HPET'
-> > 
-> > Using expected file 'tests/acpi-test-data/q35/HPET'
-> > 
-> > Looking for expected file 'tests/acpi-test-data/q35/MCFG'
-> > 
-> > Using expected file 'tests/acpi-test-data/q35/MCFG'
-> > 'iasl -p /tmp/asl-NRWT9Y.dsl -d tests/acpi-test-data/q35/DSDT' exited
-> > with status 65280
-> > Intel ACPI Component Architecture
-> > ASL+ Optimizing Compiler version 20160108-64
-> > Copyright (c) 2000 - 2016 Intel Corporation
-> > 
-> > Could not get ACPI tables from tests/acpi-test-data/q35/DSDT, AE_BAD_HEADER
-> > Input file tests/acpi-test-data/q35/DSDT, Length 0x1E94 (7828) bytes
-> > Table [DSDT] is too long for file - needs: 0x941E0000, remaining in file: 0x1E94
-> > **
-> > ERROR:/home/linux1/qemu/tests/bios-tables-test.c:461:test_acpi_asl:
-> > assertion failed: (!err && !exp_err)
-> > FAIL
-> > 
-> > & similarly for a bunch of other tests. Looks like an
-> > endianness issue.
-> > 
-> > and on 32-bit arm:
-> > 
-> > TEST: tests/bios-tables-test... (pid=30809)
-> >   /i386/acpi/piix4:
-> > Looking for expected file 'tests/acpi-test-data/pc/DSDT'
-> > 
-> > Using expected file 'tests/acpi-test-data/pc/DSDT'
-> > 
-> > Looking for expected file 'tests/acpi-test-data/pc/APIC'
-> > 
-> > Using expected file 'tests/acpi-test-data/pc/APIC'
-> > 
-> > Looking for expected file 'tests/acpi-test-data/pc/HPET'
-> > 
-> > Using expected file 'tests/acpi-test-data/pc/HPET'
-> > 'iasl -p /tmp/asl-6T2N9Y.dsl -e /tmp/aml-TV2N9Y -d /tmp/aml-TV2N9Y'
-> > exited with status 11Input file /tmp/aml-TV2N9Y, Length 0x1418 (5144)
-> > bytes
-> > ACPI: DSDT 0x0000000000000000 001418 (v01 BOCHS  BXPCDSDT 00000001
-> > BXPC 00000001)
-> > Pass 1 parse of [DSDT]
-> > Pass 2 parse of [DSDT]
-> > Parsing Deferred Opcodes (Methods/Buffers/Packages/Regions)
-> > 
-> > Parsing completed
-> > 'iasl -p /tmp/asl-PKDO9Y.dsl -e tests/acpi-test-data/pc/DSDT -d
-> > tests/acpi-test-data/pc/DSDT' exited with status 11Input file
-> > tests/acpi-test-data/pc/DSDT, Length 0x1418 (5144) bytes
-> > ACPI: DSDT 0x0000000000000000 001418 (v01 BOCHS  BXPCDSDT 00000001
-> > BXPC 00000001)
-> > Pass 1 parse of [DSDT]
-> > Pass 2 parse of [DSDT]
-> > Parsing Deferred Opcodes (Methods/Buffers/Packages/Regions)
-> > 
-> > Parsing completed
-> > **
-> > ERROR:/home/peter.maydell/qemu/tests/bios-tables-test.c:461:test_acpi_asl:
-> > assertion failed: (!err && !exp_err)
-> > FAIL
-> > GTester: last random seed: R02S5d06952865b5a6ffb8443ae4d324e880
-> > (pid=30816)
-> >   /i386/acpi/q35:
-> > Looking for expected file 'tests/acpi-test-data/q35/DSDT'
-> > 
-> > Using expected file 'tests/acpi-test-data/q35/DSDT'
-> > 
-> > Looking for expected file 'tests/acpi-test-data/q35/APIC'
-> > 
-> > Using expected file 'tests/acpi-test-data/q35/APIC'
-> > 
-> > Looking for expected file 'tests/acpi-test-data/q35/HPET'
-> > 
-> > Using expected file 'tests/acpi-test-data/q35/HPET'
-> > 
-> > Looking for expected file 'tests/acpi-test-data/q35/MCFG'
-> > 
-> > Using expected file 'tests/acpi-test-data/q35/MCFG'
-> > OK
-> > 
-> > (and similar fails in other tests)
-> > 
-> > 
-> > thanks
-> > -- PMM
-> 
-> I think it's     test: fix detection of errors from iasl
-> I'll drop it for now.
+> Signed-off-by: Daniel P. Berrange <berrange@redhat.com>
 
-I think that patch is merely exposing a failure that has always
-happened, but which we've never noticed before. So dropping that
-patch just hides the error again, doesn't fix the error.
+Given the state of iasl, I'm not sure this will not
+give false positives where iasl returns an error status
+but does produce a valid input.
 
-Regards,
-Daniel
--- 
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
+I propose this is reworked to just add a warning about the
+bad status, but still attempt to process the file.
+
+
+> ---
+>  tests/bios-tables-test.c | 24 ++++++++++++++++++------
+>  1 file changed, 18 insertions(+), 6 deletions(-)
+> 
+> diff --git a/tests/bios-tables-test.c b/tests/bios-tables-test.c
+> index 564da45f65..ee441f1e17 100644
+> --- a/tests/bios-tables-test.c
+> +++ b/tests/bios-tables-test.c
+> @@ -304,6 +304,7 @@ static bool load_asl(GArray *sdts, AcpiSdtTable *sdt)
+>      gchar *out, *out_err;
+>      gboolean ret;
+>      int i;
+> +    int status;
+>  
+>      fd = g_file_open_tmp("asl-XXXXXX.dsl", &sdt->asl_file, &error);
+>      g_assert_no_error(error);
+> @@ -324,14 +325,25 @@ static bool load_asl(GArray *sdts, AcpiSdtTable *sdt)
+>      g_string_append_printf(command_line, "-d %s", sdt->aml_file);
+>  
+>      /* pass 'out' and 'out_err' in order to be redirected */
+> -    ret = g_spawn_command_line_sync(command_line->str, &out, &out_err, NULL, &error);
+> +    ret = g_spawn_command_line_sync(command_line->str, &out, &out_err, &status, &error);
+>      g_assert_no_error(error);
+>      if (ret) {
+> -        ret = g_file_get_contents(sdt->asl_file, (gchar **)&sdt->asl,
+> -                                  &sdt->asl_len, &error);
+> -        g_assert(ret);
+> -        g_assert_no_error(error);
+> -        ret = (sdt->asl_len > 0);
+> +        if (status != 0) {
+> +            g_printerr("'%s' exited with status %d", command_line->str, status);
+> +            if (!g_str_equal(out, "")) {
+> +                g_printerr("%s", out);
+> +            }
+> +            if (!g_str_equal(out_err, "")) {
+> +                g_printerr("%s", out_err);
+> +            }
+> +            ret = FALSE;
+> +        } else {
+> +            ret = g_file_get_contents(sdt->asl_file, (gchar **)&sdt->asl,
+> +                                      &sdt->asl_len, &error);
+> +            g_assert(ret);
+> +            g_assert_no_error(error);
+> +            ret = (sdt->asl_len > 0);
+> +        }
+>      }
+>  
+>      g_free(out);
+> -- 
+> 2.13.6
