@@ -1,23 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50556)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59650)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1eFFWM-0004qD-Sh
-	for qemu-devel@nongnu.org; Thu, 16 Nov 2017 03:27:40 -0500
+	(envelope-from <vsementsov@virtuozzo.com>) id 1eFFuB-0000x8-Av
+	for qemu-devel@nongnu.org; Thu, 16 Nov 2017 03:52:16 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1eFFWJ-0000xo-Mp
-	for qemu-devel@nongnu.org; Thu, 16 Nov 2017 03:27:38 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:52450)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <famz@redhat.com>) id 1eFFWJ-0000x1-GZ
-	for qemu-devel@nongnu.org; Thu, 16 Nov 2017 03:27:35 -0500
-Date: Thu, 16 Nov 2017 16:27:29 +0800
-From: Fam Zheng <famz@redhat.com>
-Message-ID: <20171116082729.GE14771@lemon>
-References: <CACaajQsXUMwo-bLF4q+pRjjUDn=Eo9xQ=SB9ucDX8cuP9VQzNQ@mail.gmail.com>
+	(envelope-from <vsementsov@virtuozzo.com>) id 1eFFu9-0005z4-Qj
+	for qemu-devel@nongnu.org; Thu, 16 Nov 2017 03:52:15 -0500
+References: <20171115213557.3548-1-eblake@redhat.com>
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Message-ID: <d4ddb01f-dab0-9b5f-f2ec-78cbd975ffbe@virtuozzo.com>
+Date: Thu, 16 Nov 2017 11:52:00 +0300
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CACaajQsXUMwo-bLF4q+pRjjUDn=Eo9xQ=SB9ucDX8cuP9VQzNQ@mail.gmail.com>
-Subject: Re: [Qemu-devel] sheepdog block driver and read write error policy
+In-Reply-To: <20171115213557.3548-1-eblake@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
+Content-Language: en-US
+Subject: Re: [Qemu-devel] [PATCH v2 for-2.11] nbd/server: Fix error
+ reporting for bad requests
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,60 +24,130 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Vasiliy Tolstov <v.tolstov@selfip.ru>
-Cc: qemu-devel <qemu-devel@nongnu.org>
+To: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org
+Cc: qemu-block@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>
 
-On Thu, 11/16 11:11, Vasiliy Tolstov wrote:
-> Hi. I'm try to write own sheepdog compatible daemon and test it with qemu.
-> Sometimes ago in qemu added read write error policy to allow to stop
-> domain or continue or something else. As i see in case of sheepdog
-> this policy is ignored and qemu try to reconnect to sheepdog daemon.
-> If nobody wants i can try to fix this, and if policy is not specified
-> work like now.
-> Where i need to start to easy understand how this works in case of file raw ?
+16.11.2017 00:35, Eric Blake wrote:
+> The NBD spec says an attempt to NBD_CMD_TRIM on a read-only
+> export should fail with EPERM, as a trim has the potential
+> to change disk contents, but we were relying on the block
+> layer to catch that for us, which might not always give the
+> right error (and even if it does, it does not let us pass
+> back a sane message for structured replies).
+>
+> The NBD spec says an attempt to NBD_CMD_WRITE_ZEROES out of
+> bounds should fail with ENOSPC, not EINVAL.
+>
+> Our check for u64 offset + u32 length wraparound up front is
+> pointless; nothing uses offset until after the second round
+> of sanity checks, and we can just as easily ensure there is
+> no wraparound by checking whether offset is in bounds (since
+> a disk size cannot exceed off_t which is 63 bits, adding a
+> 32-bit number for a valid offset can't overflow).
 
-The driver callbacks (sd_co_readv/sd_co_writev) should simply return error
-instead of retrying.
+looks like here is another problem which you've fixed:
+with old code connection would be lost if this check fails in case of
+CMD_WRITE, as req->complete would be false.
 
-> 
-> Also i'm fedora user with virt-preview repo and see, that if sheepdog
-> daemon is unavailable 2 or more minutes and started after that qemu
-> crashed. Does i need to retest with latest qemu version?
-> b2587932582333197c88bf663785b19f441989d7
-> f1af3251f885f3b8adf73ba078500f2eeefbedae
-> 5eceb01adfbe513c0309528293b0b86e32a6e27d
-> 
-> 
-> qemu-system-x86_64 -machine q35 -accel kvm -m 512M -vnc 0.0.0.0:1
-> -device virtio-scsi-pci,id=scsi0 -drive
-> aio=native,rerror=stop,werror=stop,if=none,format=raw,id=drive-scsi-disk0,cache=none,file=sheepdog:test,discard=unmap,detect-zeroes=off
->  -device scsi-hd,bus=scsi0.0,drive=drive-scsi-disk0,id=device-scsi-disk0
-> qemu-system-x86_64: failed to get the header, Invalid argument
-> qemu-system-x86_64: Failed to connect socket: Connection refused
-> qemu-system-x86_64: Failed to connect socket: Connection refused
-> qemu-system-x86_64: Failed to connect socket: Connection refused
-> qemu-system-x86_64: failed to send a req, Bad file descriptor
-> qemu-system-x86_64: Failed to connect socket: Connection refused
-> qemu-system-x86_64: Failed to connect socket: Connection refused
-> qemu-system-x86_64: Failed to connect socket: Connection refused
-> qemu-system-x86_64: Failed to connect socket: Connection refused
-> qemu-system-x86_64: Failed to connect socket: Connection refused
-> qemu-system-x86_64: Failed to connect socket: Connection refused
-> qemu-system-x86_64: Failed to connect socket: Connection refused
-> qemu-system-x86_64: Failed to connect socket: Connection refused
-> 
-> 
-> 
-> qemu-system-x86_64: /builddir/build/BUILD/qemu-2.9.0/util/iov.c:167:
-> iov_send_recv: Assertion `niov < iov_cnt' failed.
-> Makefile:5: recipe for target 'test' failed
-> make: *** [test] Aborted (core dumped)
-> 
-> And if someone from fedora/redhat team is present - when new qemu
-> version available in virt preview repo for fedora 25 or it EOL?
+>
+> Solve all of these issues by some code motion and improved
+> request validation.
+>
+> Signed-off-by: Eric Blake <eblake@redhat.com>
+> ---
+> v2: actually commit the compiler-error fixes before submitting...
+>
+>   nbd/server.c | 36 ++++++++++++------------------------
+>   1 file changed, 12 insertions(+), 24 deletions(-)
+>
+> diff --git a/nbd/server.c b/nbd/server.c
+> index df771fd42f..7d6801b427 100644
+> --- a/nbd/server.c
+> +++ b/nbd/server.c
+> @@ -1366,15 +1366,6 @@ static int nbd_co_receive_request(NBDRequestData *req, NBDRequest *request,
+>           return -EIO;
+>       }
+>
+> -    /* Check for sanity in the parameters, part 1.  Defer as many
+> -     * checks as possible until after reading any NBD_CMD_WRITE
+> -     * payload, so we can try and keep the connection alive.  */
 
-It's recommended to use qemu.git if you want to develop new features for QEMU:
+I don't understand the comment. Opposite: to keep connection alive we 
+must read the payload, even in case of sanity check fail.
 
-http://wiki.qemu.org/Contribute
+> -    if ((request->from + request->len) < request->from) {
+> -        error_setg(errp,
+> -                   "integer overflow detected, you're probably being attacked");
+> -        return -EINVAL;
+> -    }
+> -
+>       if (request->type == NBD_CMD_READ || request->type == NBD_CMD_WRITE) {
+>           if (request->len > NBD_MAX_BUFFER_SIZE) {
+>               error_setg(errp, "len (%" PRIu32" ) is larger than max len (%u)",
 
-Fam
+related idea here: if request->len > NBD_MAX_BUFFER_SIZE or if we failed 
+to allocate buffer in following if,
+we can call nbd_drop to read CMD_WRITE payload and set req->complete = 
+true;, to keep connection in this
+cases.
+
+However, it may be done later.
+
+> @@ -1399,12 +1390,21 @@ static int nbd_co_receive_request(NBDRequestData *req, NBDRequest *request,
+>                                                         request->len);
+>       }
+>
+> -    /* Sanity checks, part 2. */
+> -    if (request->from + request->len > client->exp->size) {
+> +    /* Sanity checks. */
+> +    if (client->exp->nbdflags & NBD_FLAG_READ_ONLY &&
+> +        (request->type == NBD_CMD_WRITE ||
+> +         request->type == NBD_CMD_WRITE_ZEROES ||
+> +         request->type == NBD_CMD_TRIM)) {
+> +        error_setg(errp, "Export is read-only");
+> +        return -EROFS;
+> +    }
+> +    if (request->from > client->exp->size ||
+> +        request->from + request->len > client->exp->size) {
+>           error_setg(errp, "operation past EOF; From: %" PRIu64 ", Len: %" PRIu32
+>                      ", Size: %" PRIu64, request->from, request->len,
+>                      (uint64_t)client->exp->size);
+> -        return request->type == NBD_CMD_WRITE ? -ENOSPC : -EINVAL;
+> +        return (request->type == NBD_CMD_WRITE ||
+> +                request->type == NBD_CMD_WRITE_ZEROES) ? -ENOSPC : -EINVAL;
+>       }
+>       valid_flags = NBD_CMD_FLAG_FUA;
+>       if (request->type == NBD_CMD_READ && client->structured_reply) {
+> @@ -1482,12 +1482,6 @@ static coroutine_fn void nbd_trip(void *opaque)
+>
+>           break;
+>       case NBD_CMD_WRITE:
+> -        if (exp->nbdflags & NBD_FLAG_READ_ONLY) {
+> -            error_setg(&local_err, "Export is read-only");
+> -            ret = -EROFS;
+> -            break;
+> -        }
+> -
+>           flags = 0;
+>           if (request.flags & NBD_CMD_FLAG_FUA) {
+>               flags |= BDRV_REQ_FUA;
+> @@ -1500,12 +1494,6 @@ static coroutine_fn void nbd_trip(void *opaque)
+>
+>           break;
+>       case NBD_CMD_WRITE_ZEROES:
+> -        if (exp->nbdflags & NBD_FLAG_READ_ONLY) {
+> -            error_setg(&local_err, "Export is read-only");
+> -            ret = -EROFS;
+> -            break;
+> -        }
+> -
+>           flags = 0;
+>           if (request.flags & NBD_CMD_FLAG_FUA) {
+>               flags |= BDRV_REQ_FUA;
+
+
+Reviewed-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+
+-- 
+Best regards,
+Vladimir
