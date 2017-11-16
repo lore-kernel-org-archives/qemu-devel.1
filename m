@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33803)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33901)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1eFNDa-00060e-Jv
-	for qemu-devel@nongnu.org; Thu, 16 Nov 2017 11:40:47 -0500
+	(envelope-from <mst@redhat.com>) id 1eFNDl-0006Ac-3i
+	for qemu-devel@nongnu.org; Thu, 16 Nov 2017 11:40:59 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1eFNDZ-0000b3-3z
-	for qemu-devel@nongnu.org; Thu, 16 Nov 2017 11:40:46 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:34467)
+	(envelope-from <mst@redhat.com>) id 1eFNDg-0000g0-JM
+	for qemu-devel@nongnu.org; Thu, 16 Nov 2017 11:40:57 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:62242)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1eFNDY-0000aE-Tp
-	for qemu-devel@nongnu.org; Thu, 16 Nov 2017 11:40:45 -0500
-Date: Thu, 16 Nov 2017 18:40:28 +0200
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1eFNDg-0000fa-D0
+	for qemu-devel@nongnu.org; Thu, 16 Nov 2017 11:40:52 -0500
+Date: Thu, 16 Nov 2017 18:40:49 +0200
 From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <1510850407-17266-3-git-send-email-mst@redhat.com>
+Message-ID: <1510850407-17266-5-git-send-email-mst@redhat.com>
 References: <1510850407-17266-1-git-send-email-mst@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
 In-Reply-To: <1510850407-17266-1-git-send-email-mst@redhat.com>
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 2/9] pci: Initialize pci_dev->name before use
+Subject: [Qemu-devel] [PULL 4/9] hw/pcie-pci-bridge: restrict to X86 and ARM
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,44 +28,41 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Peter Maydell <peter.maydell@linaro.org>, Alexey Kardashevskiy <aik@ozlabs.ru>, Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, Peter Xu <peterx@redhat.com>, Marcel Apfelbaum <marcel@redhat.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>, Marcel Apfelbaum <marcel@redhat.com>, Thomas Huth <thuth@redhat.com>, Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, Cornelia Huck <cohuck@redhat.com>, Yongbok Kim <yongbok.kim@mips.com>
 
-From: Alexey Kardashevskiy <aik@ozlabs.ru>
+From: Marcel Apfelbaum <marcel@redhat.com>
 
-This moves pci_dev->name initialization earlier so
-pci_dev->bus_master_as could get a name instead of an empty string.
+The PCIE-PCI bridge is specific to "pure" PCIe systems
+(on QEMU we have X86 and ARM), it does not make sense to
+have it in other archs.
 
+Reported-by: Thomas Huth <thuth@redhat.com>
+Signed-off-by: Marcel Apfelbaum <marcel@redhat.com>
+Reviewed-by: Thomas Huth <thuth@redhat.com>
 Reviewed-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
-Reviewed-by: Peter Xu <peterx@redhat.com>
-Signed-off-by: Alexey Kardashevskiy <aik@ozlabs.ru>
+Tested-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
+Reviewed-by: Cornelia Huck <cohuck@redhat.com>
 Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
 Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
+Tested-by: Yongbok Kim <yongbok.kim@mips.com>
 ---
- hw/pci/pci.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ hw/pci-bridge/Makefile.objs | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/hw/pci/pci.c b/hw/pci/pci.c
-index 5ed3c8d..b2d139b 100644
---- a/hw/pci/pci.c
-+++ b/hw/pci/pci.c
-@@ -1030,6 +1030,7 @@ static PCIDevice *do_pci_register_device(PCIDevice =
-*pci_dev, PCIBus *bus,
-=20
-     pci_dev->devfn =3D devfn;
-     pci_dev->requester_id_cache =3D pci_req_id_cache_get(pci_dev);
-+    pstrcpy(pci_dev->name, sizeof(pci_dev->name), name);
-=20
-     memory_region_init(&pci_dev->bus_master_container_region, OBJECT(pci=
-_dev),
-                        "bus master container", UINT64_MAX);
-@@ -1039,7 +1040,6 @@ static PCIDevice *do_pci_register_device(PCIDevice =
-*pci_dev, PCIBus *bus,
-     if (qdev_hotplug) {
-         pci_init_bus_master(pci_dev);
-     }
--    pstrcpy(pci_dev->name, sizeof(pci_dev->name), name);
-     pci_dev->irq_state =3D 0;
-     pci_config_alloc(pci_dev);
-=20
+diff --git a/hw/pci-bridge/Makefile.objs b/hw/pci-bridge/Makefile.objs
+index 666db37..1b05023 100644
+--- a/hw/pci-bridge/Makefile.objs
++++ b/hw/pci-bridge/Makefile.objs
+@@ -1,5 +1,5 @@
+-common-obj-y +=3D pci_bridge_dev.o pcie_pci_bridge.o
+-common-obj-$(CONFIG_PCIE_PORT) +=3D pcie_root_port.o gen_pcie_root_port.=
+o
++common-obj-y +=3D pci_bridge_dev.o
++common-obj-$(CONFIG_PCIE_PORT) +=3D pcie_root_port.o gen_pcie_root_port.=
+o pcie_pci_bridge.o
+ common-obj-$(CONFIG_PXB) +=3D pci_expander_bridge.o
+ common-obj-$(CONFIG_XIO3130) +=3D xio3130_upstream.o xio3130_downstream.=
+o
+ common-obj-$(CONFIG_IOH3420) +=3D ioh3420.o
 --=20
 MST
