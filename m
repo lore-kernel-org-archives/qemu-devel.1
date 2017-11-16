@@ -1,36 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37974)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37987)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pmorel@linux.vnet.ibm.com>) id 1eFOKl-0001lX-CQ
-	for qemu-devel@nongnu.org; Thu, 16 Nov 2017 12:52:16 -0500
+	(envelope-from <pmorel@linux.vnet.ibm.com>) id 1eFOKl-0001ls-S0
+	for qemu-devel@nongnu.org; Thu, 16 Nov 2017 12:52:19 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pmorel@linux.vnet.ibm.com>) id 1eFOKh-0003FC-Vb
+	(envelope-from <pmorel@linux.vnet.ibm.com>) id 1eFOKi-0003Fj-Dm
 	for qemu-devel@nongnu.org; Thu, 16 Nov 2017 12:52:15 -0500
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:53138
-	helo=mx0a-001b2d01.pphosted.com)
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:59044)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <pmorel@linux.vnet.ibm.com>)
-	id 1eFOKh-0003E3-O3
-	for qemu-devel@nongnu.org; Thu, 16 Nov 2017 12:52:11 -0500
-Received: from pps.filterd (m0098414.ppops.net [127.0.0.1])
-	by mx0b-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
-	vAGHnQJX117518
-	for <qemu-devel@nongnu.org>; Thu, 16 Nov 2017 12:52:10 -0500
-Received: from e06smtp11.uk.ibm.com (e06smtp11.uk.ibm.com [195.75.94.107])
-	by mx0b-001b2d01.pphosted.com with ESMTP id 2e9de96txm-1
+	id 1eFOKi-0003Dg-1M
+	for qemu-devel@nongnu.org; Thu, 16 Nov 2017 12:52:12 -0500
+Received: from pps.filterd (m0098394.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
+	vAGHnMWt103676
+	for <qemu-devel@nongnu.org>; Thu, 16 Nov 2017 12:52:06 -0500
+Received: from e06smtp12.uk.ibm.com (e06smtp12.uk.ibm.com [195.75.94.108])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2e9f4fh4c8-1
 	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Thu, 16 Nov 2017 12:52:10 -0500
+	for <qemu-devel@nongnu.org>; Thu, 16 Nov 2017 12:52:05 -0500
 Received: from localhost
-	by e06smtp11.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	by e06smtp12.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
 	Only! Violators will be prosecuted
 	for <qemu-devel@nongnu.org> from <pmorel@linux.vnet.ibm.com>;
-	Thu, 16 Nov 2017 17:52:08 -0000
+	Thu, 16 Nov 2017 17:52:02 -0000
 From: Pierre Morel <pmorel@linux.vnet.ibm.com>
-Date: Thu, 16 Nov 2017 18:51:55 +0100
+Date: Thu, 16 Nov 2017 18:51:51 +0100
 In-Reply-To: <1510854715-7081-1-git-send-email-pmorel@linux.vnet.ibm.com>
 References: <1510854715-7081-1-git-send-email-pmorel@linux.vnet.ibm.com>
-Message-Id: <1510854715-7081-8-git-send-email-pmorel@linux.vnet.ibm.com>
-Subject: [Qemu-devel] [PATCH v2 7/7] s390x/pci: search for subregion inside
- the BARs
+Message-Id: <1510854715-7081-4-git-send-email-pmorel@linux.vnet.ibm.com>
+Subject: [Qemu-devel] [PATCH v2 3/7] s390x/pci: rework PCI LOAD
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -42,104 +40,79 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: cohuck@redhat.com, agraf@suse.de, borntraeger@de.ibm.com, zyimin@linux.vnet.ibm.com, pasic@linux.vnet.ibm.com
 
-When dispatching memory access to PCI BAR region, we must
-look for possible subregions, used by the PCI device to map
-different memory areas inside the same PCI BAR.
-
-Since the data offset we received is calculated starting at the
-region start address we need to adjust the offset for the subregion.
-
-The data offset inside the subregion is calculated by substracting
-the subregion's starting address from the data offset in the region.
-
-The access to the MSIX region is now handled in a generic way,
-we do not need the specific trap_msix() function anymore.
+Enhance the fault detection, correction of the fault reporting.
 
 Signed-off-by: Pierre Morel <pmorel@linux.vnet.ibm.com>
 Reviewed-by: Yi Min Zhao <zyimin@linux.vnet.ibm.com>
+Signed-off-by: Pierre Morel <pmorel@linux.vnet.ibm.com>
 ---
- hw/s390x/s390-pci-inst.c | 44 +++++++++++++++++++++++++-------------------
- 1 file changed, 25 insertions(+), 19 deletions(-)
+ hw/s390x/s390-pci-inst.c | 25 ++++++++++++++-----------
+ 1 file changed, 14 insertions(+), 11 deletions(-)
 
 diff --git a/hw/s390x/s390-pci-inst.c b/hw/s390x/s390-pci-inst.c
-index eef3b89..33d08c6 100644
+index df0c8f0..cbc6421 100644
 --- a/hw/s390x/s390-pci-inst.c
 +++ b/hw/s390x/s390-pci-inst.c
-@@ -345,12 +345,31 @@ static int zpci_endian_swap(uint64_t *ptr, uint8_t len)
-     return 0;
- }
+@@ -373,6 +373,11 @@ int pcilg_service_call(S390CPU *cpu, uint8_t r1, uint8_t r2)
+     len = env->regs[r2] & 0xf;
+     offset = env->regs[r2 + 1];
  
-+static MemoryRegion *s390_get_subregion(MemoryRegion *mr, uint64_t offset,
-+                                        uint8_t len)
-+{
-+    MemoryRegion *other;
-+    uint64_t subregion_size;
-+
-+    QTAILQ_FOREACH(other, &mr->subregions, subregions_link) {
-+        subregion_size = int128_get64(other->size);
-+        if ((offset >= other->addr) &&
-+            (offset + len) <= (other->addr + subregion_size)) {
-+            mr = other;
-+            break;
-+        }
++    if (!(fh & FH_MASK_ENABLE)) {
++        setcc(cpu, ZPCI_PCI_LS_INVAL_HANDLE);
++        return 0;
 +    }
-+    return mr;
-+}
 +
- static MemTxResult zpci_read_bar(S390PCIBusDevice *pbdev, uint8_t pcias,
-                                  uint64_t offset, uint64_t *data, uint8_t len)
- {
-     MemoryRegion *mr;
- 
-     mr = pbdev->pdev->io_regions[pcias].memory;
-+    mr = s390_get_subregion(mr, offset, len);
-+    offset -= mr->addr;
-     return memory_region_dispatch_read(mr, offset, data, len,
-                                        MEMTXATTRS_UNSPECIFIED);
- }
-@@ -442,30 +461,14 @@ int pcilg_service_call(S390CPU *cpu, uint8_t r1, uint8_t r2)
-     return 0;
- }
- 
--static int trap_msix(S390PCIBusDevice *pbdev, uint64_t offset, uint8_t pcias)
--{
--    if (pbdev->msix.available && pbdev->msix.table_bar == pcias &&
--        offset >= pbdev->msix.table_offset &&
--        offset < (pbdev->msix.table_offset +
--                  pbdev->msix.entries * PCI_MSIX_ENTRY_SIZE)) {
--        return 1;
--    } else {
--        return 0;
--    }
--}
--
- static MemTxResult zpci_write_bar(S390PCIBusDevice *pbdev, uint8_t pcias,
-                                   uint64_t offset, uint64_t data, uint8_t len)
- {
-     MemoryRegion *mr;
- 
--    if (trap_msix(pbdev, offset, pcias)) {
--        offset = offset - pbdev->msix.table_offset;
--        mr = &pbdev->pdev->msix_table_mmio;
--    } else {
--        mr = pbdev->pdev->io_regions[pcias].memory;
--    }
--
-+    mr = pbdev->pdev->io_regions[pcias].memory;
-+    mr = s390_get_subregion(mr, offset, len);
-+    offset -= mr->addr;
-     return memory_region_dispatch_write(mr, offset, data, len,
-                                         MEMTXATTRS_UNSPECIFIED);
- }
-@@ -725,6 +728,9 @@ int pcistb_service_call(S390CPU *cpu, uint8_t r1, uint8_t r3, uint64_t gaddr,
+     pbdev = s390_pci_find_dev_by_fh(s390_get_phb(), fh);
+     if (!pbdev) {
+         DPRINTF("pcilg no pci dev\n");
+@@ -381,12 +386,7 @@ int pcilg_service_call(S390CPU *cpu, uint8_t r1, uint8_t r2)
      }
  
-     mr = pbdev->pdev->io_regions[pcias].memory;
-+    mr = s390_get_subregion(mr, offset, len);
-+    offset -= mr->addr;
-+
-     if (!memory_region_access_valid(mr, offset, len, true)) {
-         program_interrupt(env, PGM_OPERAND, 6);
+     switch (pbdev->state) {
+-    case ZPCI_FS_RESERVED:
+-    case ZPCI_FS_STANDBY:
+-    case ZPCI_FS_DISABLED:
+     case ZPCI_FS_PERMANENT_ERROR:
+-        setcc(cpu, ZPCI_PCI_LS_INVAL_HANDLE);
+-        return 0;
+     case ZPCI_FS_ERROR:
+         setcc(cpu, ZPCI_PCI_LS_ERR);
+         s390_set_status_code(env, r2, ZPCI_PCI_ST_BLOCKED);
+@@ -395,8 +395,9 @@ int pcilg_service_call(S390CPU *cpu, uint8_t r1, uint8_t r2)
+         break;
+     }
+ 
+-    if (pcias < 6) {
+-        if ((8 - (offset & 0x7)) < len) {
++    switch (pcias) {
++    case 0 ... 5:
++        if (!len || (len > (8 - (offset & 0x7)))) {
+             program_interrupt(env, PGM_OPERAND, 4);
+             return 0;
+         }
+@@ -407,8 +408,9 @@ int pcilg_service_call(S390CPU *cpu, uint8_t r1, uint8_t r2)
+             program_interrupt(env, PGM_OPERAND, 4);
+             return 0;
+         }
+-    } else if (pcias == 15) {
+-        if ((4 - (offset & 0x3)) < len) {
++        break;
++    case 15:
++        if (!len || (len > (4 - (offset & 0x3))) || len == 3) {
+             program_interrupt(env, PGM_OPERAND, 4);
+             return 0;
+         }
+@@ -419,8 +421,9 @@ int pcilg_service_call(S390CPU *cpu, uint8_t r1, uint8_t r2)
+             program_interrupt(env, PGM_OPERAND, 4);
+             return 0;
+         }
+-    } else {
+-        DPRINTF("invalid space\n");
++        break;
++    default:
++        DPRINTF("pcilg invalid space\n");
+         setcc(cpu, ZPCI_PCI_LS_ERR);
+         s390_set_status_code(env, r2, ZPCI_PCI_ST_INVAL_AS);
          return 0;
 -- 
 2.7.4
