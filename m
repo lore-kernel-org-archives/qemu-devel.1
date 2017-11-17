@@ -1,23 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58213)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58226)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1eFgyM-0003Qb-2V
-	for qemu-devel@nongnu.org; Fri, 17 Nov 2017 08:46:23 -0500
+	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1eFgyM-0003RH-R8
+	for qemu-devel@nongnu.org; Fri, 17 Nov 2017 08:46:24 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1eFgyK-0005FY-Je
+	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1eFgyL-0005HC-MY
 	for qemu-devel@nongnu.org; Fri, 17 Nov 2017 08:46:22 -0500
-Received: from chuckie.co.uk ([82.165.15.123]:59140
+Received: from chuckie.co.uk ([82.165.15.123]:59142
 	helo=s16892447.onlinehome-server.info)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <mark.cave-ayland@ilande.co.uk>)
-	id 1eFgyK-0005EE-Cl
-	for qemu-devel@nongnu.org; Fri, 17 Nov 2017 08:46:20 -0500
+	id 1eFgyL-0005Fj-Fd
+	for qemu-devel@nongnu.org; Fri, 17 Nov 2017 08:46:21 -0500
 From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-Date: Fri, 17 Nov 2017 13:42:43 +0000
-Message-Id: <1510926167-23326-12-git-send-email-mark.cave-ayland@ilande.co.uk>
+Date: Fri, 17 Nov 2017 13:42:44 +0000
+Message-Id: <1510926167-23326-13-git-send-email-mark.cave-ayland@ilande.co.uk>
 In-Reply-To: <1510926167-23326-1-git-send-email-mark.cave-ayland@ilande.co.uk>
 References: <1510926167-23326-1-git-send-email-mark.cave-ayland@ilande.co.uk>
-Subject: [Qemu-devel] [PATCH 11/15] apb: split pci_pbm_map_irq() into
- separate functions for bus A and bus B
+Subject: [Qemu-devel] [PATCH 12/15] ebus: wire up OBIO interrupts to APB pbm
+ via qdev GPIOs
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,131 +28,148 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org, atar4qemu@gmail.com
 
-After the previous refactoring it is now possible to use separate functions
-to improve clarity of the interrupt paths. Similarly by checking the PCI
-devnfn to identify busA during apb_pci_bridge_realize() it becomes possible
-to completely remove the busA property from the PBMPCIBridge state.
+This enables us to remove the static array mapping in the ISA IRQ
+handler (and the embedded reference to the APB device) by formalising
+the interrupt wiring via the qdev GPIO API.
+
+For more clarity we replace the APB OBIO interrupt numbers with constants
+designating the interrupt source, and rename isa_irq_handler() to
+ebus_isa_irq_handler().
 
 Signed-off-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
 ---
- hw/pci-host/apb.c         |   54 ++++++++++++++++++---------------------------
- include/hw/pci-host/apb.h |    3 ---
- 2 files changed, 21 insertions(+), 36 deletions(-)
+ hw/pci-host/apb.c         |    2 +-
+ hw/sparc64/sun4u.c        |   48 ++++++++++++++++++++++-----------------------
+ include/hw/pci-host/apb.h |    8 +++++++-
+ 3 files changed, 32 insertions(+), 26 deletions(-)
 
 diff --git a/hw/pci-host/apb.c b/hw/pci-host/apb.c
-index 6c20285..268100e 100644
+index 268100e..f092780c 100644
 --- a/hw/pci-host/apb.c
 +++ b/hw/pci-host/apb.c
-@@ -517,32 +517,27 @@ static int pci_apb_map_irq(PCIDevice *pci_dev, int irq_num)
-     return irq_num;
- }
+@@ -700,7 +700,7 @@ static void pci_pbm_init(Object *obj)
+     for (i = 0; i < 32; i++) {
+         s->obio_irq_map[i] = ((0x1f << 6) | 0x20) + i;
+     }
+-    s->pbm_irqs = qemu_allocate_irqs(pci_apb_set_irq, s, MAX_IVEC);
++    qdev_init_gpio_in_named(DEVICE(s), pci_apb_set_irq, "pbm-irq", MAX_IVEC);
+     qdev_init_gpio_out_named(DEVICE(s), s->ivec_irqs, "ivec-irq", MAX_IVEC);
+     s->irq_request = NO_IRQ_REQUEST;
+     s->pci_irq_in = 0ULL;
+diff --git a/hw/sparc64/sun4u.c b/hw/sparc64/sun4u.c
+index 0a30fb8..da386d3 100644
+--- a/hw/sparc64/sun4u.c
++++ b/hw/sparc64/sun4u.c
+@@ -86,6 +86,7 @@ typedef struct EbusState {
+     PCIDevice parent_obj;
  
--static int pci_pbm_map_irq(PCIDevice *pci_dev, int irq_num)
-+static int pci_pbmA_map_irq(PCIDevice *pci_dev, int irq_num)
+     ISABus *isa_bus;
++    qemu_irq isa_bus_irqs[16];
+     uint64_t console_serial_base;
+     MemoryRegion bar0;
+     MemoryRegion bar1;
+@@ -211,23 +212,15 @@ typedef struct ResetData {
+     uint64_t prom_addr;
+ } ResetData;
+ 
+-static void isa_irq_handler(void *opaque, int n, int level)
++static void ebus_isa_irq_handler(void *opaque, int n, int level)
  {
--    PBMPCIBridge *br = PBM_PCI_BRIDGE(pci_bridge_get_device(
--                           PCI_BUS(qdev_get_parent_bus(DEVICE(pci_dev)))));
+-    static const int isa_irq_to_ivec[16] = {
+-        [1] = 0x29, /* keyboard */
+-        [4] = 0x2b, /* serial */
+-        [6] = 0x27, /* floppy */
+-        [7] = 0x22, /* parallel */
+-        [12] = 0x2a, /* mouse */
+-    };
+-    qemu_irq *irqs = opaque;
+-    int ivec;
 -
--    int bus_offset;
--    if (br->busA) {
--        bus_offset = 0x0;
-+    /* The on-board devices have fixed (legacy) OBIO intnos */
-+    switch (PCI_SLOT(pci_dev->devfn)) {
-+    case 1:
-+        /* Onboard NIC */
-+        return 0x21;
-+    case 3:
-+        /* Onboard IDE */
-+        return 0x20;
-+    default:
-+        /* Normal intno, fall through */
-+        break;
-+    }
- 
--        /* The on-board devices have fixed (legacy) OBIO intnos */
--        switch (PCI_SLOT(pci_dev->devfn)) {
--        case 1:
--            /* Onboard NIC */
--            return 0x21;
--        case 3:
--            /* Onboard IDE */
--            return 0x20;
-+    return ((PCI_SLOT(pci_dev->devfn) << 2) + irq_num) & 0x1f;
-+}
- 
--        default:
--            /* Normal intno, fall through */
--            break;
--        }
--    } else {
--        bus_offset = 0x10;
--    }
--    return (bus_offset + (PCI_SLOT(pci_dev->devfn) << 2) + irq_num) & 0x1f;
-+static int pci_pbmB_map_irq(PCIDevice *pci_dev, int irq_num)
-+{
-+    return (0x10 + (PCI_SLOT(pci_dev->devfn) << 2) + irq_num) & 0x1f;
+-    assert(n < ARRAY_SIZE(isa_irq_to_ivec));
+-    ivec = isa_irq_to_ivec[n];
+-    EBUS_DPRINTF("Set ISA IRQ %d level %d -> ivec 0x%x\n", n, level, ivec);
+-    if (ivec) {
+-        qemu_set_irq(irqs[ivec], level);
++    EbusState *s = EBUS(opaque);
++    qemu_irq irq = s->isa_bus_irqs[n];
++
++    /* Pass ISA bus IRQs onto their gpio equivalent */
++    EBUS_DPRINTF("Set ISA IRQ %d level %d\n", n, level);
++    if (irq) {
++        qemu_set_irq(irq, level);
+     }
  }
  
- static void pci_apb_set_irq(void *opaque, int irq_num, int level)
-@@ -593,7 +588,7 @@ static void apb_pci_bridge_realize(PCIDevice *dev, Error **errp)
- 
-     /* If initialising busA, ensure that we allow IO transactions so that
-        we get the early serial console until OpenBIOS configures the bridge */
--    if (br->busA) {
-+    if (dev->devfn == PCI_DEVFN(1, 1)) {
-         cmd |= PCI_COMMAND_IO;
+@@ -235,7 +228,6 @@ static void isa_irq_handler(void *opaque, int n, int level)
+ static void ebus_realize(PCIDevice *pci_dev, Error **errp)
+ {
+     EbusState *s = EBUS(pci_dev);
+-    APBState *apb;
+     DeviceState *dev;
+     qemu_irq *isa_irq;
+     DriveInfo *fd[MAX_FD];
+@@ -248,14 +240,10 @@ static void ebus_realize(PCIDevice *pci_dev, Error **errp)
+         return;
      }
  
-@@ -673,14 +668,13 @@ static void pci_pbm_realize(DeviceState *dev, Error **errp)
-     pci_dev = pci_create_multifunction(phb->bus, PCI_DEVFN(1, 0), true,
-                                    TYPE_PBM_PCI_BRIDGE);
-     s->bridgeB = PCI_BRIDGE(pci_dev);
--    pci_bridge_map_irq(s->bridgeB, "pciB", pci_pbm_map_irq);
-+    pci_bridge_map_irq(s->bridgeB, "pciB", pci_pbmB_map_irq);
-     qdev_init_nofail(&pci_dev->qdev);
- 
-     pci_dev = pci_create_multifunction(phb->bus, PCI_DEVFN(1, 1), true,
-                                    TYPE_PBM_PCI_BRIDGE);
-     s->bridgeA = PCI_BRIDGE(pci_dev);
--    pci_bridge_map_irq(s->bridgeA, "pciA", pci_pbm_map_irq);
--    qdev_prop_set_bit(DEVICE(pci_dev), "busA", true);
-+    pci_bridge_map_irq(s->bridgeA, "pciA", pci_pbmA_map_irq);
-     qdev_init_nofail(&pci_dev->qdev);
- }
- 
-@@ -789,11 +783,6 @@ static const TypeInfo pbm_host_info = {
-     .class_init    = pbm_host_class_init,
- };
- 
--static Property pbm_pci_properties[] = {
--    DEFINE_PROP_BOOL("busA", PBMPCIBridge, busA, false),
--    DEFINE_PROP_END_OF_LIST(),
--};
+-    apb = APB_DEVICE(object_resolve_path_type("", TYPE_APB, NULL));
+-    if (!apb) {
+-        error_setg(errp, "unable to locate APB PCI host bridge");
+-        return;
+-    }
 -
- static void pbm_pci_bridge_class_init(ObjectClass *klass, void *data)
- {
-     DeviceClass *dc = DEVICE_CLASS(klass);
-@@ -809,7 +798,6 @@ static void pbm_pci_bridge_class_init(ObjectClass *klass, void *data)
-     set_bit(DEVICE_CATEGORY_BRIDGE, dc->categories);
-     dc->reset = pci_bridge_reset;
-     dc->vmsd = &vmstate_pci_device;
--    dc->props = pbm_pci_properties;
- }
+-    isa_irq = qemu_allocate_irqs(isa_irq_handler, apb->pbm_irqs, 16);
++    /* ISA bus */
++    isa_irq = qemu_allocate_irqs(ebus_isa_irq_handler, s, 16);
+     isa_bus_irqs(s->isa_bus, isa_irq);
++    qdev_init_gpio_out_named(DEVICE(s), s->isa_bus_irqs, "isa-irq", 16);
  
- static const TypeInfo pbm_pci_bridge_info = {
+     /* Serial ports */
+     i = 0;
+@@ -530,6 +518,18 @@ static void sun4uv_init(MemoryRegion *address_space_mem,
+                          hwdef->console_serial_base);
+     qdev_init_nofail(DEVICE(ebus));
+ 
++    /* Wire up "well-known" ISA IRQs to APB legacy obio IRQs */
++    qdev_connect_gpio_out_named(DEVICE(ebus), "isa-irq", 7,
++        qdev_get_gpio_in_named(DEVICE(apb), "pbm-irq", OBIO_LPT_IRQ));
++    qdev_connect_gpio_out_named(DEVICE(ebus), "isa-irq", 6,
++        qdev_get_gpio_in_named(DEVICE(apb), "pbm-irq", OBIO_FDD_IRQ));
++    qdev_connect_gpio_out_named(DEVICE(ebus), "isa-irq", 1,
++        qdev_get_gpio_in_named(DEVICE(apb), "pbm-irq", OBIO_KBD_IRQ));
++    qdev_connect_gpio_out_named(DEVICE(ebus), "isa-irq", 12,
++        qdev_get_gpio_in_named(DEVICE(apb), "pbm-irq", OBIO_MSE_IRQ));
++    qdev_connect_gpio_out_named(DEVICE(ebus), "isa-irq", 4,
++        qdev_get_gpio_in_named(DEVICE(apb), "pbm-irq", OBIO_SER_IRQ));
++
+     pci_dev = pci_create_simple(pci_busA, PCI_DEVFN(2, 0), "VGA");
+ 
+     memset(&macaddr, 0, sizeof(MACAddr));
 diff --git a/include/hw/pci-host/apb.h b/include/hw/pci-host/apb.h
-index f0074f7..dd49437 100644
+index dd49437..09ebd53 100644
 --- a/include/hw/pci-host/apb.h
 +++ b/include/hw/pci-host/apb.h
-@@ -86,9 +86,6 @@ typedef struct APBState {
- typedef struct PBMPCIBridge {
-     /*< private >*/
-     PCIBridge parent_obj;
--
--    /* Is this busA with in-built devices (ebus)? */
--    bool busA;
- } PBMPCIBridge;
+@@ -52,6 +52,13 @@ typedef struct IOMMUState {
  
- #define TYPE_PBM_PCI_BRIDGE "pbm-bridge"
+ #define MAX_IVEC 0x40
+ 
++/* OBIO IVEC IRQs */
++#define OBIO_LPT_IRQ         0x22
++#define OBIO_FDD_IRQ         0x27
++#define OBIO_KBD_IRQ         0x29
++#define OBIO_MSE_IRQ         0x2a
++#define OBIO_SER_IRQ         0x2b
++
+ #define TYPE_APB "pbm"
+ 
+ #define APB_DEVICE(obj) \
+@@ -76,7 +83,6 @@ typedef struct APBState {
+     uint32_t pci_irq_map[8];
+     uint32_t pci_err_irq_map[4];
+     uint32_t obio_irq_map[32];
+-    qemu_irq *pbm_irqs;
+     qemu_irq ivec_irqs[MAX_IVEC];
+     unsigned int irq_request;
+     uint32_t reset_control;
 -- 
 1.7.10.4
