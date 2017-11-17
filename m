@@ -1,26 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50596)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50801)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <atar4qemu@gmail.com>) id 1eFhku-0005yE-AD
-	for qemu-devel@nongnu.org; Fri, 17 Nov 2017 09:36:33 -0500
+	(envelope-from <kwolf@redhat.com>) id 1eFhlc-0006UQ-0l
+	for qemu-devel@nongnu.org; Fri, 17 Nov 2017 09:37:16 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <atar4qemu@gmail.com>) id 1eFhkt-0005ou-84
-	for qemu-devel@nongnu.org; Fri, 17 Nov 2017 09:36:32 -0500
-Received: from mail-it0-x244.google.com ([2607:f8b0:4001:c0b::244]:36731)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <atar4qemu@gmail.com>) id 1eFhkt-0005oG-2V
-	for qemu-devel@nongnu.org; Fri, 17 Nov 2017 09:36:31 -0500
-Received: by mail-it0-x244.google.com with SMTP id 187so2094181iti.1
-	for <qemu-devel@nongnu.org>; Fri, 17 Nov 2017 06:36:30 -0800 (PST)
+	(envelope-from <kwolf@redhat.com>) id 1eFhlb-0007FT-6N
+	for qemu-devel@nongnu.org; Fri, 17 Nov 2017 09:37:16 -0500
+Date: Fri, 17 Nov 2017 15:37:08 +0100
+From: Kevin Wolf <kwolf@redhat.com>
+Message-ID: <20171117143708.GG4795@localhost.localdomain>
+References: <20171117112913.21875-1-berrange@redhat.com>
+	<9f180831-1ecd-7326-7659-19f79170439e@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <1510926167-23326-15-git-send-email-mark.cave-ayland@ilande.co.uk>
-References: <1510926167-23326-1-git-send-email-mark.cave-ayland@ilande.co.uk>
-	<1510926167-23326-15-git-send-email-mark.cave-ayland@ilande.co.uk>
-From: Artyom Tarasenko <atar4qemu@gmail.com>
-Date: Fri, 17 Nov 2017 15:36:10 +0100
-Message-ID: <CACXAS8Ds+1KBZ2ji03R64iMvZUVOa3U2dUpRTNbcTfrk-hcO8g@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH 14/15] sparc64: introduce trace-events for
- hw/sparc64
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="azLHFNyN32YCQGCU"
+Content-Disposition: inline
+In-Reply-To: <9f180831-1ecd-7326-7659-19f79170439e@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v2 (for-2.11)] qcow2: fix image corruption
+ after committing qcow2 image into base
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,51 +25,62 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-Cc: qemu-devel <qemu-devel@nongnu.org>
-
-On Fri, Nov 17, 2017 at 2:42 PM, Mark Cave-Ayland
-<mark.cave-ayland@ilande.co.uk> wrote:
-> This is in preparation for switching code in hw/sparc64 from DPRINTF over to
-> trace events.
->
-> Signed-off-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-
-Reviewed-by: Artyom Tarasenko <atar4qemu@gmail.com>
-
-> ---
->  Makefile.objs           |    1 +
->  hw/sparc64/trace-events |    1 +
->  2 files changed, 2 insertions(+)
->  create mode 100644 hw/sparc64/trace-events
->
-> diff --git a/Makefile.objs b/Makefile.objs
-> index 285c6f3..c8b1bba 100644
-> --- a/Makefile.objs
-> +++ b/Makefile.objs
-> @@ -140,6 +140,7 @@ trace-events-subdirs += hw/input
->  trace-events-subdirs += hw/timer
->  trace-events-subdirs += hw/dma
->  trace-events-subdirs += hw/sparc
-> +trace-events-subdirs += hw/sparc64
->  trace-events-subdirs += hw/sd
->  trace-events-subdirs += hw/isa
->  trace-events-subdirs += hw/mem
-> diff --git a/hw/sparc64/trace-events b/hw/sparc64/trace-events
-> new file mode 100644
-> index 0000000..9284b1f
-> --- /dev/null
-> +++ b/hw/sparc64/trace-events
-> @@ -0,0 +1 @@
-> +# See docs/devel/tracing.txt for syntax documentation.
-> --
-> 1.7.10.4
->
+To: Eric Blake <eblake@redhat.com>
+Cc: "Daniel P. Berrange" <berrange@redhat.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>, Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 
 
+--azLHFNyN32YCQGCU
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
--- 
-Regards,
-Artyom Tarasenko
+Am 17.11.2017 um 15:32 hat Eric Blake geschrieben:
+> On 11/17/2017 05:29 AM, Daniel P. Berrange wrote:
+> > After committing the qcow2 image contents into the base image, qemu-img
+> > will call bdrv_make_empty to drop the payload in the layered image.
+> >=20
+> > When this is done for qcow2 images, it blows away the LUKS encryption
+> > header, making the resulting image unusable. There are two codepaths
+> > for emptying a qcow2 image, and the second (slower) codepath leaves
+> > the LUKS header intact, so force use of that codepath.
+> >=20
+> > Reviewed-by: Eric Blake <eblake@redhat.com>
+> > Signed-off-by: Daniel P. Berrange <berrange@redhat.com>
+> > ---
+>=20
+> > =20
+> >      if (s->qcow_version >=3D 3 && !s->snapshots &&
+> > -        3 + l1_clusters <=3D s->refcount_block_size) {
+> > +        3 + l1_clusters <=3D s->refcount_block_size &&
+> > +        s->crypt_method_header !=3D QCOW_CRYPT_LUKS) {
+>=20
+> Missing the check for s->nb_bitmaps =3D=3D 0 that Vladimir mentioned on v=
+1.
+> Either we can add that in this patch, or I can post the obvious followup
+> that also needs queuing.
 
-SPARC and PPC PReP under qemu blog: http://tyom.blogspot.com/search/label/qemu
+I've already queued this, so please just send a follow-up patch.
+
+Kevin
+
+--azLHFNyN32YCQGCU
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIcBAEBAgAGBQJaDvQUAAoJEH8JsnLIjy/WWbsQAKC2fn37mEzbnwG0koBqi9/v
+pUyvTiNzznsjbdqgwhiMJNks6Vr+B4Kxwmf5If9xLMDhEEP91H9HDqydCezhGRnb
+DvMcOMYQ6OE2a/GmG0REUemZC9eo57uffDt4rCOic9Sgo2VeeF2FuKAdLt3xpPrA
+zTtOiUIsXqBV043Vckzwccd7RW82Kw1rqGNAqZrfqLnAnObZIH7YsWQVpvkRuo2Y
+/ZYSskDsKebYcx0+T5gk9Sd2kArOAcghmEqhCsr8ygXVUU1YzX7tqe0JFOZNjQic
+nM12Z+JMM5ugBcrkcS3HS8xhikSyFc/k3iCzal2gmLOA8tHDPnzPzJe4OMBOeHnV
+E7RL5zLa59bXvRB+q6T1ltolLn2223n27SZ2mTXJJG1HdvJc+Eiy6uHuFQ8jhX7O
+2GLbSd0LrfNXb3e+fGXrMsxuPewEOByLAt4+wZx14u1deal5BBjkRxO7X1atiMBH
+2ilNbfhCrAoEr5zAjPnnq82ohyQPnInP27Kip3EmOBFcQggLP8b4pvBG0iZrrDVX
+ZxV+S1a2zjzE7gM3Jr4pYv5EdQWVe790L+uByTPvmR/JEvW+5nqk9xFO6xY5DLND
+OV067ahpLH0vdV/G1mo4BZYaZT5WNKtQ3xNDbonRzWmzJADC9OtDvYhuRHCdEp9d
+gKL3Mp+8UDAyqIoGx7/+
+=V/Nt
+-----END PGP SIGNATURE-----
+
+--azLHFNyN32YCQGCU--
