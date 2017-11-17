@@ -1,25 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57518)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60175)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jasowang@redhat.com>) id 1eFXq8-0007pg-TY
-	for qemu-devel@nongnu.org; Thu, 16 Nov 2017 23:01:17 -0500
+	(envelope-from <mst@redhat.com>) id 1eFY3M-0001iB-Ez
+	for qemu-devel@nongnu.org; Thu, 16 Nov 2017 23:14:57 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jasowang@redhat.com>) id 1eFXq5-0001O1-T7
-	for qemu-devel@nongnu.org; Thu, 16 Nov 2017 23:01:17 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:49970)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <jasowang@redhat.com>) id 1eFXq5-0001LB-Md
-	for qemu-devel@nongnu.org; Thu, 16 Nov 2017 23:01:13 -0500
-References: <20171116184835.28556-1-maxime.coquelin@redhat.com>
-From: Jason Wang <jasowang@redhat.com>
-Message-ID: <61cc035d-9e50-e96c-bc37-5511c6a7dab7@redhat.com>
-Date: Fri, 17 Nov 2017 12:01:01 +0800
+	(envelope-from <mst@redhat.com>) id 1eFY3J-0001mD-AW
+	for qemu-devel@nongnu.org; Thu, 16 Nov 2017 23:14:56 -0500
+Date: Fri, 17 Nov 2017 06:14:48 +0200
+From: "Michael S. Tsirkin" <mst@redhat.com>
+Message-ID: <20171117061341-mutt-send-email-mst@kernel.org>
+References: <1510867014-13423-1-git-send-email-thuth@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20171116184835.28556-1-maxime.coquelin@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 0/2] virtio-net: Fix TX data discard on
- backend disconnection
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1510867014-13423-1-git-send-email-thuth@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH for-2.11] hw/net/eepro100: Fix endianness
+ problem on big endian hosts
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,33 +23,46 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Maxime Coquelin <maxime.coquelin@redhat.com>, mst@redhat.com, yuri.benditovich@daynix.com, yvugenfi@redhat.com, qemu-devel@nongnu.org
+To: Thomas Huth <thuth@redhat.com>
+Cc: qemu-devel@nongnu.org, Jason Wang <jasowang@redhat.com>, Stefan Weil <sw@weilnetz.de>, Michael Nawrocki <michael.nawrocki@gtri.gatech.edu>, qemu-s390x@nongnu.org
+
+On Thu, Nov 16, 2017 at 10:16:54PM +0100, Thomas Huth wrote:
+> Since commit 1865e288a823c764cd4344d ("Fix eepro100 simple transmission
+> mode"), the test/pxe-test is broken for the eepro100 device on big
+> endian hosts. However, it seems like that commit did not introduce the
+> problem, but just uncovered it: The EEPRO100State->tx.tbd_array_addr and
+> EEPRO100State->tx.tcb_bytes fields are already in host byte order, since
+> they have already been byte-swapped in the read_cb() function.
+> Thus byte-swapping them in tx_command() again results in the wrong
+> endianness. Removing the byte-swapping here fixes the pxe-test.
+> 
+> Signed-off-by: Thomas Huth <thuth@redhat.com>
 
 
+Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
 
-On 2017=E5=B9=B411=E6=9C=8817=E6=97=A5 02:48, Maxime Coquelin wrote:
-> This series fixes TX data discard when backend disconnects.
->
-> On backend disconnection, QEMU cannot retrieve its internal
-> avail index, which makes the virtio queue internal state
-> inconsistent (last_avail_idx will always be 0, whereas used_idx
-> is correct).
->
-> It results in discarding TX data to corrupt the vring state, by
-> completing descriptors already completed by the backend.
->
-> This series fixes this by restoring last_avail_idx to the vring
-> used idx, as some backends used to do on reconnection.
->
-> Maxime Coquelin (2):
->    virtio: Add queue interface to restore avail index from vring used
->      index
->    vhost: restore avail index from vring used index on disconnection
->
->   hw/virtio/vhost.c          |  4 ++++
->   hw/virtio/virtio.c         | 10 ++++++++++
->   include/hw/virtio/virtio.h |  1 +
->   3 files changed, 15 insertions(+)
->
+Thomas, how about adding sparse endian-ness annotations
+a la le32 in Linux? We could then use static checkers to
+catch these bugs at build time.
 
-Reviewed-by: Jason Wang <jasowang@redhat.com>
+> ---
+>  hw/net/eepro100.c | 4 ++--
+>  1 file changed, 2 insertions(+), 2 deletions(-)
+> 
+> diff --git a/hw/net/eepro100.c b/hw/net/eepro100.c
+> index a63ed2c..03e00f7 100644
+> --- a/hw/net/eepro100.c
+> +++ b/hw/net/eepro100.c
+> @@ -756,8 +756,8 @@ static void read_cb(EEPRO100State *s)
+>  
+>  static void tx_command(EEPRO100State *s)
+>  {
+> -    uint32_t tbd_array = le32_to_cpu(s->tx.tbd_array_addr);
+> -    uint16_t tcb_bytes = (le16_to_cpu(s->tx.tcb_bytes) & 0x3fff);
+> +    uint32_t tbd_array = s->tx.tbd_array_addr;
+> +    uint16_t tcb_bytes = s->tx.tcb_bytes & 0x3fff;
+>      /* Sends larger than MAX_ETH_FRAME_SIZE are allowed, up to 2600 bytes. */
+>      uint8_t buf[2600];
+>      uint16_t size = 0;
+> -- 
+> 1.8.3.1
