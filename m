@@ -1,25 +1,15 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37405)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40798)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <lersek@redhat.com>) id 1eFjf4-00019g-T5
-	for qemu-devel@nongnu.org; Fri, 17 Nov 2017 11:38:40 -0500
+	(envelope-from <eblake@redhat.com>) id 1eFjoA-0004J8-DC
+	for qemu-devel@nongnu.org; Fri, 17 Nov 2017 11:48:04 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <lersek@redhat.com>) id 1eFjf0-0002nA-R2
-	for qemu-devel@nongnu.org; Fri, 17 Nov 2017 11:38:38 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:48722)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <lersek@redhat.com>) id 1eFjf0-0002mP-I5
-	for qemu-devel@nongnu.org; Fri, 17 Nov 2017 11:38:34 -0500
-References: <20171117120454.13507-1-kraxel@redhat.com>
-From: Laszlo Ersek <lersek@redhat.com>
-Message-ID: <4ea6f197-0aee-50d6-e53c-f98a6a8f999a@redhat.com>
-Date: Fri, 17 Nov 2017 17:38:21 +0100
-MIME-Version: 1.0
-In-Reply-To: <20171117120454.13507-1-kraxel@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 0/4] ramfb: simple boot framebuffer,
- no legacy vga
+	(envelope-from <eblake@redhat.com>) id 1eFjo7-0002eo-T2
+	for qemu-devel@nongnu.org; Fri, 17 Nov 2017 11:48:02 -0500
+From: Eric Blake <eblake@redhat.com>
+Date: Fri, 17 Nov 2017 10:47:47 -0600
+Message-Id: <20171117164747.11525-1-eblake@redhat.com>
+Subject: [Qemu-devel] [PATCH for-2.11] qcow2: fix image corruption on commit
+ with persistent snapshot
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,156 +18,425 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Gerd Hoffmann <kraxel@redhat.com>
-Cc: qemu-devel@nongnu.org, Alex Williamson <alex.williamson@redhat.com>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Drew Jones <drjones@redhat.com>
+To: qemu-devel@nongnu.org
+Cc: qemu-block@nongnu.org, kwolf@redhat.com, vsementsov@virtuozzo.com, Max Reitz <mreitz@redhat.com>
 
-CC Ard & Drew
+If an image contains persistent snapshots, we cannot use the
+fast path of bdrv_make_empty() to clear the image during
+qemu-img commit, because that will lose the clusters related
+to the bitmaps.
 
-Hi,
+Also leave a comment in qcow2_read_extensions to remind future
+feature additions to think about fast-path removal, since we
+just barely fixed the same bug for LUKS encryption.
 
-On 11/17/17 13:04, Gerd Hoffmann wrote:
->   Hi,
->=20
-> Ok folks, here is a experimental patch series for a legacy free boot
-> framebuffer.  If you want play with it I recommend getting the bits fro=
-m
->=20
-> 	https://www.kraxel.org/cgit/qemu/log/?h=3Dsirius/ramfb
->=20
-> because they come with an updated seabios and a new vgabios rom.
->=20
-> The boot framebuffer is expected to be configured by the firmware, so i=
-t
-> uses fw_cfg as interface.  Initialization goes as follows:
->=20
->   (1) Check whenever etc/ramfb is present.
->   (2) Allocate framebuffer from RAM.
->   (3) Fill struct RAMFBCfg, write it to etc/ramfb.
+It's a pain that qemu-img has not yet been taught to manipulate,
+or even at a very minimum display, information about persistent
+bitmaps; instead, we have to use QMP commands.  It's also a
+pain that only qeury-block and x-debug-block-dirty-bitmap-sha256
+will allow bitmap introspection; but the former requires the
+node to be hooked to a block device, and the latter is experimental.
 
-Please add documentation on the "fourcc" (pixel format?) and "flags"
-fields. Also please document the endianness of the integer fields.
+Signed-off-by: Eric Blake <eblake@redhat.com>
+---
 
->=20
-> Done.  You can write stuff to the framebuffer now, and it should appear
-> automagically on the screen.
->=20
-> Note that this isn't very efficient because it does a full display
-> update on each refresh.  No dirty tracking.  Dirty tracking would have
-> to be active for the whole ram slot, so that wouldn't be very efficient
-> either.  So it is *really* intended to be only active for a short time
-> at boot, before the guest loaded the drivers for the real display
-> hardware.
->=20
-> seavgabios is able to emulate vga text mode on top of a framebuffer, fo=
-r
-> coreboot native graphics initialialization.  Which works fine for
-> everything which writes text using the vgabios interface (basically
-> everyhing which works with sgabios).
->=20
-> So I hacked that up to work with ramfb.  Right now it's proof-of-concep=
-t
-> code with too much cut+paste, so it will clearly need a bunch of
-> cleanups if this approach turns out to be workable.  Look here:
-> 	https://www.kraxe.org/cgit/seabios/log/?h=3Dramfb
->=20
-> So, how to play?
->=20
-> There is ramfb-testdev.  Standalone device, for testing purposes.  Also
-> listens on vga ports and logs any access, so we can see the bad boys ;)
-> Use "qemu -vga none -device ramfb-testdev".
->=20
-> There is virtio-ramfb.  Simlar to virtio-vga, but using ramfb instead o=
-f
-> adding vga compatibility.  Shows how you can wire up ramfb support to
-> some display device.  Unlike virtio-vga it should work fine on arm.  Us=
-e
-> "qemu -vga none -device virtio-ramfb" for this one.
+As promised, based on Dan's similar patch for LUKS encryption
 
-(Side note: <https://bugzilla.tianocore.org/show_bug.cgi?id=3D785>.)
+ block/qcow2.c              |  17 ++--
+ tests/qemu-iotests/176     |  55 ++++++++++--
+ tests/qemu-iotests/176.out | 216 ++++++++++++++++++++++++++++++++++++++++++++-
+ 3 files changed, 270 insertions(+), 18 deletions(-)
 
-We should make sure that any device model that combines ramfb with
-another PCI display device is not matched by the OVMF driver for that
-PCI display device. IOW, we should use separate PCI IDs or subsystem IDs
-(I don't recall the details off-hand). I'd like to avoid messing with
-the current device probing code in OVMF. It just wouldn't be nice if two
-independent drivers (e.g. VirtioGpuDxe and a supposed "RamFbDxe") bound
-the two interfaces at the same time.
+diff --git a/block/qcow2.c b/block/qcow2.c
+index e9a86b7443..f2731a7cb5 100644
+--- a/block/qcow2.c
++++ b/block/qcow2.c
+@@ -376,6 +376,8 @@ static int qcow2_read_extensions(BlockDriverState *bs, uint64_t start_offset,
 
-This device will take a DXE driver or UEFI driver that does not follow
-the UEFI driver model because there's no "controller handle" to bind.
-(The thing to probe is an fw_cfg file.)
+         default:
+             /* unknown magic - save it in case we need to rewrite the header */
++            /* If you add a new feature, make sure to also update the fast
++             * path of qcow2_make_empty() to deal with it. */
+             {
+                 Qcow2UnknownHeaderExtension *uext;
 
->=20
-> What works?
->=20
-> Boot loaders all use vgabios calls for text mode, so they show up just
-> fine.  Also ipxe, seabios itself of course.  So you can boot up your
-> linux guest.  vesafb works too.
->=20
-> What doesn't work?
->=20
-> vgacon (direct vga hardware access).
->=20
-> Windows (bios mode).  Boot logo shows up just fine.  But at some point
-> windows does lots of vga register accesses (even though it sets the
-> video mode via vesa bios interface) and appears to be unhappy that
-> things don't work as expected because there is no actual vga hardware.
->=20
-> Future plans:
->=20
-> Try use that as vgpu boot display.  Requires solving that windows issue
-> somehow, otherwise it's going to be a non-starter.
->=20
-> Trick L=C3=A1szl=C3=B3 into writing a UEFI driver for that.
+@@ -3600,15 +3602,16 @@ static int qcow2_make_empty(BlockDriverState *bs)
 
-I cannot imagine when I'll get to this. :(
+     l1_clusters = DIV_ROUND_UP(s->l1_size, s->cluster_size / sizeof(uint64_t));
 
-Feel free to file a BZ somewhere (TianoCore or RH Bugzilla) and/or poke
-me occasionally. My TODO list is full of things than are *all* more
-urgenterer than all the other things on the list.
+-    if (s->qcow_version >= 3 && !s->snapshots &&
++    if (s->qcow_version >= 3 && !s->snapshots && !s->nb_bitmaps &&
+         3 + l1_clusters <= s->refcount_block_size &&
+         s->crypt_method_header != QCOW_CRYPT_LUKS) {
+-        /* The following function only works for qcow2 v3 images (it requires
+-         * the dirty flag) and only as long as there are no snapshots (because
+-         * it completely empties the image). Furthermore, the L1 table and three
+-         * additional clusters (image header, refcount table, one refcount
+-         * block) have to fit inside one refcount block. It cannot be used
+-         * for LUKS (yet) as it throws away the LUKS header cluster(s) */
++        /* The following function only works for qcow2 v3 images (it
++         * requires the dirty flag) and only as long as there are no
++         * features that reserve extra clusters (such as snapshots,
++         * LUKS header, or persistent bitmaps), because it completely
++         * empties the image.  Furthermore, the L1 table and three
++         * additional clusters (image header, refcount table, one
++         * refcount block) have to fit inside one refcount block. */
+         return make_completely_empty(bs);
+     }
 
-I'm nearing TODO list bankruptcy (IRL too).
+diff --git a/tests/qemu-iotests/176 b/tests/qemu-iotests/176
+index 950b28720e..0f31a20294 100755
+--- a/tests/qemu-iotests/176
++++ b/tests/qemu-iotests/176
+@@ -3,10 +3,11 @@
+ # Commit changes into backing chains and empty the top image if the
+ # backing image is not explicitly specified.
+ #
+-# Variant of 097, which includes snapshots to test different codepath
+-# in qcow2
++# Variant of 097, which includes snapshots and persistent bitmaps, to
++# tickle the slow codepath in qcow2. See also 198, for another feature
++# that tickles the slow codepath.
+ #
+-# Copyright (C) 2014 Red Hat, Inc.
++# Copyright (C) 2014, 2017 Red Hat, Inc.
+ #
+ # This program is free software; you can redistribute it and/or modify
+ # it under the terms of the GNU General Public License as published by
+@@ -43,11 +44,18 @@ trap "_cleanup; exit \$status" 0 1 2 3 15
+ . ./common.filter
+ . ./common.pattern
 
-> Linux will use efifb
-> not vgacon then, and hopefully Windows doesn't try access vga registers
-> either.
->=20
-> Comments?
-> Hints on the windows issue anyone?
+-# Any format supporting backing files and bdrv_make_empty
++# This test is specific to qcow2
+ _supported_fmt qcow2
+ _supported_proto file
+ _supported_os Linux
 
-We looked into those when we worked on the Int10h VBE shim in OVMF. We
-decided the VGA register accesses were way too complicated and so we did
-the shim for BOCHS VGA and QXL only. IIRC. (I could be conflating things.=
-)
++function run_qemu()
++{
++    $QEMU -nographic -qmp stdio -serial none "$@" 2>&1 \
++	| _filter_testdir | _filter_qmp | _filter_qemu
++}
++
++for reason in snapshot bitmap; do
 
-This looks like a great job, honestly; I'm sorry I can't say more
-positive things about a GOP driver for it right now.
+ # Four passes:
+ #  0: Two-layer backing chain, commit to upper backing file (implicitly)
+@@ -66,14 +74,29 @@ _supported_os Linux
+ for i in 0 1 2 3; do
 
-Thanks,
-Laszlo
+ echo
+-echo "=== Test pass $i ==="
++echo "=== Test pass $reason.$i ==="
+ echo
 
->=20
-> enjoy,
->   Gerd
->=20
-> Gerd Hoffmann (4):
->   [testing] update bios, add vgabios-ramfb
->   ramfb: simple boot framebuffer living in guest ram
->   add virtio-ramfb
->   add ramfb-testdev
->=20
->  include/hw/display/ramfb.h |   8 +++
->  hw/display/ramfb-testdev.c |  87 ++++++++++++++++++++++++++
->  hw/display/ramfb.c         |  94 ++++++++++++++++++++++++++++
->  hw/display/virtio-ramfb.c  | 149 +++++++++++++++++++++++++++++++++++++=
-++++++++
->  hw/display/Makefile.objs   |   5 +-
->  pc-bios/bios-256k.bin      | Bin 262144 -> 262144 bytes
->  pc-bios/vgabios-ramfb.bin  | Bin 0 -> 28160 bytes
->  7 files changed, 342 insertions(+), 1 deletion(-)
->  create mode 100644 include/hw/display/ramfb.h
->  create mode 100644 hw/display/ramfb-testdev.c
->  create mode 100644 hw/display/ramfb.c
->  create mode 100644 hw/display/virtio-ramfb.c
->  create mode 100644 pc-bios/vgabios-ramfb.bin
->=20
+ len=$((2100 * 1024 * 1024 + 512)) # larger than 2G, and not cluster aligned
+ TEST_IMG="$TEST_IMG.base" _make_test_img $len
+ TEST_IMG="$TEST_IMG.itmd" _make_test_img -b "$TEST_IMG.base" $len
+ _make_test_img -b "$TEST_IMG.itmd" $len
+-$QEMU_IMG snapshot -c snap "$TEST_IMG"
++# Update the top image to use a feature that is incompatible with fast path
++case $reason in
++    snapshot) $QEMU_IMG snapshot -c snap "$TEST_IMG" ;;
++    bitmap)
++	run_qemu <<EOF
++{ "execute": "qmp_capabilities" }
++{ "execute": "blockdev-add",
++  "arguments": { "driver": "qcow2", "node-name": "drive0",
++     "file": { "driver": "file", "filename": "$TEST_IMG" } } }
++{ "execute": "block-dirty-bitmap-add",
++  "arguments": { "node": "drive0", "name": "bitmap0",
++     "persistent": true, "autoload": true } }
++{ "execute": "quit" }
++EOF
++	;;
++esac
+
+ $QEMU_IO -c "write -P 1 0x7ffd0000 192k" "$TEST_IMG.base" | _filter_qemu_io
+ $QEMU_IO -c "write -P 2 0x7ffe0000 128k" "$TEST_IMG.itmd" | _filter_qemu_io
+@@ -122,8 +145,26 @@ $QEMU_IMG map "$TEST_IMG.base" | _filter_qemu_img_map
+ $QEMU_IMG map "$TEST_IMG.itmd" | _filter_qemu_img_map
+ $QEMU_IMG map "$TEST_IMG" | _filter_qemu_img_map
+
+-done
++# Check that the reason for slow path is still present, as appropriate
++case $reason in
++    snapshot)
++	$QEMU_IMG snapshot -l "$TEST_IMG" |
++	    sed 's/^\(.\{20\}\).*/\1/; s/ *$//' ;;
++    bitmap)
++	run_qemu <<EOF
++{ "execute": "qmp_capabilities" }
++{ "execute": "blockdev-add",
++  "arguments": { "driver": "qcow2", "node-name": "drive0",
++     "file": { "driver": "file", "filename": "$TEST_IMG" } } }
++{ "execute": "x-debug-block-dirty-bitmap-sha256",
++  "arguments": { "node": "drive0", "name": "bitmap0" } }
++{ "execute": "quit" }
++EOF
++	;;
++esac
+
++done
++done
+
+ # success, all done
+ echo "*** done"
+diff --git a/tests/qemu-iotests/176.out b/tests/qemu-iotests/176.out
+index 6271fa7d6f..e62085cd0a 100644
+--- a/tests/qemu-iotests/176.out
++++ b/tests/qemu-iotests/176.out
+@@ -1,6 +1,6 @@
+ QA output created by 176
+
+-=== Test pass 0 ===
++=== Test pass snapshot.0 ===
+
+ Formatting 'TEST_DIR/t.IMGFMT.base', fmt=IMGFMT size=2202010112
+ Formatting 'TEST_DIR/t.IMGFMT.itmd', fmt=IMGFMT size=2202010112 backing_file=TEST_DIR/t.IMGFMT.base
+@@ -36,8 +36,11 @@ Offset          Length          File
+ 0x7ffd0000      0x10000         TEST_DIR/t.IMGFMT.base
+ 0x7ffe0000      0x20000         TEST_DIR/t.IMGFMT.itmd
+ 0x83400000      0x200           TEST_DIR/t.IMGFMT.itmd
++Snapshot list:
++ID        TAG
++1         snap
+
+-=== Test pass 1 ===
++=== Test pass snapshot.1 ===
+
+ Formatting 'TEST_DIR/t.IMGFMT.base', fmt=IMGFMT size=2202010112
+ Formatting 'TEST_DIR/t.IMGFMT.itmd', fmt=IMGFMT size=2202010112 backing_file=TEST_DIR/t.IMGFMT.base
+@@ -74,8 +77,11 @@ Offset          Length          File
+ 0x7ffe0000      0x10000         TEST_DIR/t.IMGFMT.itmd
+ 0x7fff0000      0x10000         TEST_DIR/t.IMGFMT
+ 0x83400000      0x200           TEST_DIR/t.IMGFMT
++Snapshot list:
++ID        TAG
++1         snap
+
+-=== Test pass 2 ===
++=== Test pass snapshot.2 ===
+
+ Formatting 'TEST_DIR/t.IMGFMT.base', fmt=IMGFMT size=2202010112
+ Formatting 'TEST_DIR/t.IMGFMT.itmd', fmt=IMGFMT size=2202010112 backing_file=TEST_DIR/t.IMGFMT.base
+@@ -112,8 +118,11 @@ Offset          Length          File
+ 0x7ffe0000      0x10000         TEST_DIR/t.IMGFMT.itmd
+ 0x7fff0000      0x10000         TEST_DIR/t.IMGFMT
+ 0x83400000      0x200           TEST_DIR/t.IMGFMT
++Snapshot list:
++ID        TAG
++1         snap
+
+-=== Test pass 3 ===
++=== Test pass snapshot.3 ===
+
+ Formatting 'TEST_DIR/t.IMGFMT.base', fmt=IMGFMT size=2202010112
+ Formatting 'TEST_DIR/t.IMGFMT.itmd', fmt=IMGFMT size=2202010112 backing_file=TEST_DIR/t.IMGFMT.base
+@@ -147,4 +156,203 @@ Offset          Length          File
+ 0x7ffe0000      0x10000         TEST_DIR/t.IMGFMT.itmd
+ 0x7fff0000      0x10000         TEST_DIR/t.IMGFMT
+ 0x83400000      0x200           TEST_DIR/t.IMGFMT
++Snapshot list:
++ID        TAG
++1         snap
++
++=== Test pass bitmap.0 ===
++
++Formatting 'TEST_DIR/t.IMGFMT.base', fmt=IMGFMT size=2202010112
++Formatting 'TEST_DIR/t.IMGFMT.itmd', fmt=IMGFMT size=2202010112 backing_file=TEST_DIR/t.IMGFMT.base
++Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=2202010112 backing_file=TEST_DIR/t.IMGFMT.itmd
++QMP_VERSION
++{"return": {}}
++{"return": {}}
++{"return": {}}
++{"return": {}}
++{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "SHUTDOWN", "data": {"guest": false}}
++wrote 196608/196608 bytes at offset 2147287040
++192 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
++wrote 131072/131072 bytes at offset 2147352576
++128 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
++wrote 65536/65536 bytes at offset 2147418112
++64 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
++wrote 512/512 bytes at offset 2202009600
++512 bytes, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
++Image committed.
++read 196608/196608 bytes at offset 2147287040
++192 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
++read 512/512 bytes at offset 2202009600
++512 bytes, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
++read 65536/65536 bytes at offset 2147287040
++64 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
++read 65536/65536 bytes at offset 2147352576
++64 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
++read 65536/65536 bytes at offset 2147418112
++64 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
++read 512/512 bytes at offset 2202009600
++512 bytes, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
++Offset          Length          File
++0x7ffd0000      0x30000         TEST_DIR/t.IMGFMT.base
++Offset          Length          File
++0x7ffd0000      0x10000         TEST_DIR/t.IMGFMT.base
++0x7ffe0000      0x20000         TEST_DIR/t.IMGFMT.itmd
++0x83400000      0x200           TEST_DIR/t.IMGFMT.itmd
++Offset          Length          File
++0x7ffd0000      0x10000         TEST_DIR/t.IMGFMT.base
++0x7ffe0000      0x20000         TEST_DIR/t.IMGFMT.itmd
++0x83400000      0x200           TEST_DIR/t.IMGFMT.itmd
++QMP_VERSION
++{"return": {}}
++{"return": {}}
++{"return": {"sha256": "e12600978d86b5a453861ae5c17d275204673fef3874b7c3c5433c6153d84706"}}
++{"return": {}}
++{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "SHUTDOWN", "data": {"guest": false}}
++
++=== Test pass bitmap.1 ===
++
++Formatting 'TEST_DIR/t.IMGFMT.base', fmt=IMGFMT size=2202010112
++Formatting 'TEST_DIR/t.IMGFMT.itmd', fmt=IMGFMT size=2202010112 backing_file=TEST_DIR/t.IMGFMT.base
++Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=2202010112 backing_file=TEST_DIR/t.IMGFMT.itmd
++QMP_VERSION
++{"return": {}}
++{"return": {}}
++{"return": {}}
++{"return": {}}
++{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "SHUTDOWN", "data": {"guest": false}}
++wrote 196608/196608 bytes at offset 2147287040
++192 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
++wrote 131072/131072 bytes at offset 2147352576
++128 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
++wrote 65536/65536 bytes at offset 2147418112
++64 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
++wrote 512/512 bytes at offset 2202009600
++512 bytes, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
++Image committed.
++read 196608/196608 bytes at offset 2147287040
++192 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
++read 512/512 bytes at offset 2202009600
++512 bytes, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
++read 65536/65536 bytes at offset 2147287040
++64 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
++read 65536/65536 bytes at offset 2147352576
++64 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
++read 65536/65536 bytes at offset 2147418112
++64 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
++read 512/512 bytes at offset 2202009600
++512 bytes, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
++Offset          Length          File
++0x7ffd0000      0x30000         TEST_DIR/t.IMGFMT.base
++Offset          Length          File
++0x7ffd0000      0x10000         TEST_DIR/t.IMGFMT.base
++0x7ffe0000      0x20000         TEST_DIR/t.IMGFMT.itmd
++0x83400000      0x200           TEST_DIR/t.IMGFMT.itmd
++Offset          Length          File
++0x7ffd0000      0x10000         TEST_DIR/t.IMGFMT.base
++0x7ffe0000      0x10000         TEST_DIR/t.IMGFMT.itmd
++0x7fff0000      0x10000         TEST_DIR/t.IMGFMT
++0x83400000      0x200           TEST_DIR/t.IMGFMT
++QMP_VERSION
++{"return": {}}
++{"return": {}}
++{"return": {"sha256": "e12600978d86b5a453861ae5c17d275204673fef3874b7c3c5433c6153d84706"}}
++{"return": {}}
++{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "SHUTDOWN", "data": {"guest": false}}
++
++=== Test pass bitmap.2 ===
++
++Formatting 'TEST_DIR/t.IMGFMT.base', fmt=IMGFMT size=2202010112
++Formatting 'TEST_DIR/t.IMGFMT.itmd', fmt=IMGFMT size=2202010112 backing_file=TEST_DIR/t.IMGFMT.base
++Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=2202010112 backing_file=TEST_DIR/t.IMGFMT.itmd
++QMP_VERSION
++{"return": {}}
++{"return": {}}
++{"return": {}}
++{"return": {}}
++{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "SHUTDOWN", "data": {"guest": false}}
++wrote 196608/196608 bytes at offset 2147287040
++192 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
++wrote 131072/131072 bytes at offset 2147352576
++128 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
++wrote 65536/65536 bytes at offset 2147418112
++64 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
++wrote 512/512 bytes at offset 2202009600
++512 bytes, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
++Image committed.
++read 196608/196608 bytes at offset 2147287040
++192 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
++read 512/512 bytes at offset 2202009600
++512 bytes, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
++read 65536/65536 bytes at offset 2147287040
++64 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
++read 65536/65536 bytes at offset 2147352576
++64 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
++read 65536/65536 bytes at offset 2147418112
++64 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
++read 512/512 bytes at offset 2202009600
++512 bytes, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
++Offset          Length          File
++0x7ffd0000      0x30000         TEST_DIR/t.IMGFMT.base
++Offset          Length          File
++0x7ffd0000      0x10000         TEST_DIR/t.IMGFMT.base
++0x7ffe0000      0x20000         TEST_DIR/t.IMGFMT.itmd
++0x83400000      0x200           TEST_DIR/t.IMGFMT.itmd
++Offset          Length          File
++0x7ffd0000      0x10000         TEST_DIR/t.IMGFMT.base
++0x7ffe0000      0x10000         TEST_DIR/t.IMGFMT.itmd
++0x7fff0000      0x10000         TEST_DIR/t.IMGFMT
++0x83400000      0x200           TEST_DIR/t.IMGFMT
++QMP_VERSION
++{"return": {}}
++{"return": {}}
++{"return": {"sha256": "e12600978d86b5a453861ae5c17d275204673fef3874b7c3c5433c6153d84706"}}
++{"return": {}}
++{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "SHUTDOWN", "data": {"guest": false}}
++
++=== Test pass bitmap.3 ===
++
++Formatting 'TEST_DIR/t.IMGFMT.base', fmt=IMGFMT size=2202010112
++Formatting 'TEST_DIR/t.IMGFMT.itmd', fmt=IMGFMT size=2202010112 backing_file=TEST_DIR/t.IMGFMT.base
++Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=2202010112 backing_file=TEST_DIR/t.IMGFMT.itmd
++QMP_VERSION
++{"return": {}}
++{"return": {}}
++{"return": {}}
++{"return": {}}
++{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "SHUTDOWN", "data": {"guest": false}}
++wrote 196608/196608 bytes at offset 2147287040
++192 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
++wrote 131072/131072 bytes at offset 2147352576
++128 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
++wrote 65536/65536 bytes at offset 2147418112
++64 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
++wrote 512/512 bytes at offset 2202009600
++512 bytes, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
++Image committed.
++read 65536/65536 bytes at offset 2147287040
++64 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
++read 65536/65536 bytes at offset 2147352576
++64 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
++read 65536/65536 bytes at offset 2147418112
++64 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
++read 512/512 bytes at offset 2202009600
++512 bytes, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
++Offset          Length          File
++0x7ffd0000      0x30000         TEST_DIR/t.IMGFMT.base
++0x83400000      0x200           TEST_DIR/t.IMGFMT.base
++Offset          Length          File
++0x7ffd0000      0x10000         TEST_DIR/t.IMGFMT.base
++0x7ffe0000      0x20000         TEST_DIR/t.IMGFMT.itmd
++0x83400000      0x200           TEST_DIR/t.IMGFMT.base
++Offset          Length          File
++0x7ffd0000      0x10000         TEST_DIR/t.IMGFMT.base
++0x7ffe0000      0x10000         TEST_DIR/t.IMGFMT.itmd
++0x7fff0000      0x10000         TEST_DIR/t.IMGFMT
++0x83400000      0x200           TEST_DIR/t.IMGFMT
++QMP_VERSION
++{"return": {}}
++{"return": {}}
++{"return": {"sha256": "e12600978d86b5a453861ae5c17d275204673fef3874b7c3c5433c6153d84706"}}
++{"return": {}}
++{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "SHUTDOWN", "data": {"guest": false}}
+ *** done
+-- 
+2.13.6
