@@ -1,24 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34855)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35878)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1eFfxa-0006VW-2A
-	for qemu-devel@nongnu.org; Fri, 17 Nov 2017 07:41:34 -0500
+	(envelope-from <mst@redhat.com>) id 1eFg10-0007Ni-Ux
+	for qemu-devel@nongnu.org; Fri, 17 Nov 2017 07:45:04 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1eFfxZ-0001Qu-2Y
-	for qemu-devel@nongnu.org; Fri, 17 Nov 2017 07:41:30 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:54314)
+	(envelope-from <mst@redhat.com>) id 1eFg0w-0004vg-72
+	for qemu-devel@nongnu.org; Fri, 17 Nov 2017 07:45:03 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:56088)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <kwolf@redhat.com>) id 1eFfxY-0001QX-St
-	for qemu-devel@nongnu.org; Fri, 17 Nov 2017 07:41:29 -0500
-Date: Fri, 17 Nov 2017 13:41:23 +0100
-From: Kevin Wolf <kwolf@redhat.com>
-Message-ID: <20171117124123.GD4795@localhost.localdomain>
-References: <20171116151419.694-1-anthony.perard@citrix.com>
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1eFg0v-0004vF-Uy
+	for qemu-devel@nongnu.org; Fri, 17 Nov 2017 07:44:58 -0500
+Date: Fri, 17 Nov 2017 14:44:48 +0200
+From: "Michael S. Tsirkin" <mst@redhat.com>
+Message-ID: <20171117144253-mutt-send-email-mst@kernel.org>
+References: <1509696786-1597-1-git-send-email-wei.w.wang@intel.com>
+	<1509696786-1597-7-git-send-email-wei.w.wang@intel.com>
+	<20171115220743-mutt-send-email-mst@kernel.org>
+	<5A0D923C.4020807@intel.com> <5A0EC967.5090407@intel.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20171116151419.694-1-anthony.perard@citrix.com>
-Subject: Re: [Qemu-devel] [PATCH v2 for-2.11] migration,
- xen: Fix block image lock issue on live migration
+In-Reply-To: <5A0EC967.5090407@intel.com>
+Subject: Re: [Qemu-devel] [virtio-dev] Re: [PATCH v17 6/6] virtio-balloon:
+ VIRTIO_BALLOON_F_FREE_PAGE_VQ
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,32 +30,113 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Anthony PERARD <anthony.perard@citrix.com>
-Cc: qemu-devel@nongnu.org, Stefano Stabellini <sstabellini@kernel.org>, Ian Jackson <ian.jackson@eu.citrix.com>, Wei Liu <wei.liu2@citrix.com>, Juan Quintela <quintela@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Eric Blake <eblake@redhat.com>, Markus Armbruster <armbru@redhat.com>
+To: Wei Wang <wei.w.wang@intel.com>
+Cc: aarcange@redhat.com, virtio-dev@lists.oasis-open.org, kvm@vger.kernel.org, mawilcox@microsoft.com, qemu-devel@nongnu.org, amit.shah@redhat.com, penguin-kernel@I-love.SAKURA.ne.jp, linux-kernel@vger.kernel.org, willy@infradead.org, virtualization@lists.linux-foundation.org, linux-mm@kvack.org, yang.zhang.wz@gmail.com, quan.xu@aliyun.com, cornelia.huck@de.ibm.com, pbonzini@redhat.com, akpm@linux-foundation.org, mhocko@kernel.org, mgorman@techsingularity.net, liliang.opensource@gmail.com
 
-Am 16.11.2017 um 16:14 hat Anthony PERARD geschrieben:
-> When doing a live migration of a Xen guest with libxl, the images for
-> block devices are locked by the original QEMU process, and this prevent
-> the QEMU at the destination to take the lock and the migration fail.
+On Fri, Nov 17, 2017 at 07:35:03PM +0800, Wei Wang wrote:
+> On 11/16/2017 09:27 PM, Wei Wang wrote:
+> > On 11/16/2017 04:32 AM, Michael S. Tsirkin wrote:
+> > > On Fri, Nov 03, 2017 at 04:13:06PM +0800, Wei Wang wrote:
+> > > > Negotiation of the VIRTIO_BALLOON_F_FREE_PAGE_VQ feature indicates the
+> > > > support of reporting hints of guest free pages to the host via
+> > > > virtio-balloon. The host requests the guest to report the free pages by
+> > > > sending commands via the virtio-balloon configuration registers.
+> > > > 
+> > > > When the guest starts to report, the first element added to the
+> > > > free page
+> > > > vq is a sequence id of the start reporting command. The id is given by
+> > > > the host, and it indicates whether the following free pages correspond
+> > > > to the command. For example, the host may stop the report and
+> > > > start again
+> > > > with a new command id. The obsolete pages for the previous start
+> > > > command
+> > > > can be detected by the id dismatching on the host. The id is
+> > > > added to the
+> > > > vq using an output buffer, and the free pages are added to the vq using
+> > > > input buffer.
+> > > > 
+> > > > Here are some explainations about the added configuration registers:
+> > > > - host2guest_cmd: a register used by the host to send commands to the
+> > > > guest.
+> > > > - guest2host_cmd: written by the guest to ACK to the host about the
+> > > > commands that have been received. The host will clear the corresponding
+> > > > bits on the host2guest_cmd register. The guest also uses this register
+> > > > to send commands to the host (e.g. when finish free page reporting).
+> > > > - free_page_cmd_id: the sequence id of the free page report command
+> > > > given by the host.
+> > > > 
+> > > > Signed-off-by: Wei Wang <wei.w.wang@intel.com>
+> > > > Signed-off-by: Liang Li <liang.z.li@intel.com>
+> > > > Cc: Michael S. Tsirkin <mst@redhat.com>
+> > > > Cc: Michal Hocko <mhocko@kernel.org>
+> > > > ---
+> > > > 
+> > > > +
+> > > > +static void report_free_page(struct work_struct *work)
+> > > > +{
+> > > > +    struct virtio_balloon *vb;
+> > > > +
+> > > > +    vb = container_of(work, struct virtio_balloon,
+> > > > report_free_page_work);
+> > > > +    report_free_page_cmd_id(vb);
+> > > > +    walk_free_mem_block(vb, 0, &virtio_balloon_send_free_pages);
+> > > > +    /*
+> > > > +     * The last few free page blocks that were added may not reach the
+> > > > +     * batch size, but need a kick to notify the device to
+> > > > handle them.
+> > > > +     */
+> > > > +    virtqueue_kick(vb->free_page_vq);
+> > > > +    report_free_page_end(vb);
+> > > > +}
+> > > > +
+> > > I think there's an issue here: if pages are poisoned and hypervisor
+> > > subsequently drops them, testing them after allocation will
+> > > trigger a false positive.
+> > > 
+> > > The specific configuration:
+> > > 
+> > > PAGE_POISONING on
+> > > PAGE_POISONING_NO_SANITY off
+> > > PAGE_POISONING_ZERO off
+> > > 
+> > > 
+> > > Solutions:
+> > > 1. disable the feature in that configuration
+> > >     suggested as an initial step
+> > 
+> > Thanks for the finding.
+> > Similar to this option: I'm thinking could we make walk_free_mem_block()
+> > simply return if that option is on?
+> > That is, at the beginning of the function:
+> >     if (!page_poisoning_enabled())
+> >                 return;
+> > 
 > 
-> From QEMU point of view, once the RAM of a domain is migrated, there is
-> two QMP commands, "stop" then "xen-save-devices-state", at which point a
-> new QEMU is spawned at the destination.
 > 
-> Release locks in "xen-save-devices-state" so the destination can takes
-> them, if it's a live migration.
+> Thought about it more, I think it would be better to put this logic to
+> virtio_balloon:
 > 
-> This patch add the "live" parameter to "xen-save-devices-state" which
-> default to true so older version of libxenlight can work with newer
-> version of QEMU.
+>         send_free_page_cmd_id(vb, &vb->start_cmd_id);
+>         if (page_poisoning_enabled() &&
+>             !IS_ENABLED(CONFIG_PAGE_POISONING_NO_SANITY))
+>                 walk_free_mem_block(vb, 0, &virtio_balloon_send_free_pages);
+>         send_free_page_cmd_id(vb, &vb->stop_cmd_id);
 > 
-> Signed-off-by: Anthony PERARD <anthony.perard@citrix.com>
-> ---
-> Changes in V2:
-> - add the live parameter
 > 
-> CC: Kevin Wolf <kwolf@redhat.com>
+> walk_free_mem_block() should be a more generic API, and this potential page
+> poisoning issue is specific to live migration which is only one use case of
+> this function, so I think it is better to handle it in the special use case
+> itself.
+> 
+> Best,
+> Wei
+> 
 
-Makes sense to me.
+It's a quick work-around but it doesn't make me very happy.
 
-Kevin
+AFAIK e.g. RHEL has a debug kernel with poisoning enabled.
+If this never uses free page hinting at all, it will
+be much less useful for debugging guests.
+
+-- 
+MST
