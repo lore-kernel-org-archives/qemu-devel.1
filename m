@@ -1,25 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37991)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38892)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1eFebM-0005GH-Qa
-	for qemu-devel@nongnu.org; Fri, 17 Nov 2017 06:14:34 -0500
+	(envelope-from <kchamart@redhat.com>) id 1eFefC-0006c8-Nl
+	for qemu-devel@nongnu.org; Fri, 17 Nov 2017 06:18:28 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1eFebJ-0007lV-K7
-	for qemu-devel@nongnu.org; Fri, 17 Nov 2017 06:14:28 -0500
-Resent-Message-Id: <E1eFebJ-0007lV-K7@eggs.gnu.org>
-Received: from sender-of-o52.zoho.com ([135.84.80.217]:21433)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
-	id 1eFebJ-0007iI-Dg
-	for qemu-devel@nongnu.org; Fri, 17 Nov 2017 06:14:25 -0500
-Reply-To: <qemu-devel@nongnu.org>
-Message-ID: <151091632192.438.3101813470415878481@bafd83ae6430>
-In-Reply-To: <20171117103046.15943-1-kraxel@redhat.com>
+	(envelope-from <kchamart@redhat.com>) id 1eFefB-0002jt-RR
+	for qemu-devel@nongnu.org; Fri, 17 Nov 2017 06:18:26 -0500
+Date: Fri, 17 Nov 2017 12:18:13 +0100
+From: Kashyap Chamarthy <kchamart@redhat.com>
+Message-ID: <20171117111813.acjwkxmfkqm6sz4b@eukaryote>
+References: <20171115090947.29883-1-kchamart@redhat.com>
+	<0b29e074-6548-d42e-12ab-67419342773e@redhat.com>
+	<20171115215433.fpihpl645mlholgo@eukaryote>
+	<6ac3e1b3-d3b0-afe4-4d87-e8c421084d7f@redhat.com>
+	<20171116091405.pleud7qrqzu5nzhb@eukaryote>
+	<20171117104905.GA4795@localhost.localdomain>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Fri, 17 Nov 2017 02:58:42 -0800 (PST)
-Subject: Re: [Qemu-devel] [PATCH 00/24] RfC: rework display initialization
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20171117104905.GA4795@localhost.localdomain>
+Subject: Re: [Qemu-devel] [Qemu-block] [PATCH v2] qapi: block-core: Clarify
+ events emitted by 'block-job-cancel'
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,81 +28,28 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: kraxel@redhat.com
-Cc: famz@redhat.com, qemu-devel@nongnu.org, armbru@redhat.com
+To: Kevin Wolf <kwolf@redhat.com>
+Cc: John Snow <jsnow@redhat.com>, mreitz@redhat.com, qemu-devel@nongnu.org, qemu-block@nongnu.org, armbru@redhat.com
 
-SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
-LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKU3ViamVjdDogW1FlbXUt
-ZGV2ZWxdIFtQQVRDSCAwMC8yNF0gUmZDOiByZXdvcmsgZGlzcGxheSBpbml0aWFsaXphdGlvbgpU
-eXBlOiBzZXJpZXMKTWVzc2FnZS1pZDogMjAxNzExMTcxMDMwNDYuMTU5NDMtMS1rcmF4ZWxAcmVk
-aGF0LmNvbQoKPT09IFRFU1QgU0NSSVBUIEJFR0lOID09PQojIS9iaW4vYmFzaAoKQkFTRT1iYXNl
-Cm49MQp0b3RhbD0kKGdpdCBsb2cgLS1vbmVsaW5lICRCQVNFLi4gfCB3YyAtbCkKZmFpbGVkPTAK
-CmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLnJlbmFtZWxpbWl0IDAKZ2l0IGNvbmZpZyAtLWxvY2Fs
-IGRpZmYucmVuYW1lcyBUcnVlCgpjb21taXRzPSIkKGdpdCBsb2cgLS1mb3JtYXQ9JUggLS1yZXZl
-cnNlICRCQVNFLi4pIgpmb3IgYyBpbiAkY29tbWl0czsgZG8KICAgIGVjaG8gIkNoZWNraW5nIFBB
-VENIICRuLyR0b3RhbDogJChnaXQgbG9nIC1uIDEgLS1mb3JtYXQ9JXMgJGMpLi4uIgogICAgaWYg
-ISBnaXQgc2hvdyAkYyAtLWZvcm1hdD1lbWFpbCB8IC4vc2NyaXB0cy9jaGVja3BhdGNoLnBsIC0t
-bWFpbGJhY2sgLTsgdGhlbgogICAgICAgIGZhaWxlZD0xCiAgICAgICAgZWNobwogICAgZmkKICAg
-IG49JCgobisxKSkKZG9uZQoKZXhpdCAkZmFpbGVkCj09PSBURVNUIFNDUklQVCBFTkQgPT09CgpV
-cGRhdGluZyAzYzhjZjVhOWMyMWZmODc4MjE2NGQxZGVmN2Y0NGJkODg4NzEzMzg0CkZyb20gaHR0
-cHM6Ly9naXRodWIuY29tL3BhdGNoZXctcHJvamVjdC9xZW11CiAqIFtuZXcgdGFnXSAgICAgICAg
-ICAgICAgIHBhdGNoZXcvMjAxNzExMTcxMDMwNDYuMTU5NDMtMS1rcmF4ZWxAcmVkaGF0LmNvbSAt
-PiBwYXRjaGV3LzIwMTcxMTE3MTAzMDQ2LjE1OTQzLTEta3JheGVsQHJlZGhhdC5jb20KU3dpdGNo
-ZWQgdG8gYSBuZXcgYnJhbmNoICd0ZXN0Jwo4YWQ4YTNhNDlmIGJ1aWxkOiBvcGVuZ2wgc2hvdWxk
-IG5vdCBuZWVkIFgxMQo2ZjMyNjg5OGJlIGN1cnNlczogYnVpbGQgYXMgbW9kdWxlCmYyOGNiZTBj
-NzEgZ3RrOiBidWlsZCBhcyBtb2R1bGUKYjQwYThhYjgzMSBzZGw6IGJ1aWxkIGFzIG1vZHVsZQpi
-MmZmMzU1MzBjIGNvbnNvbGU6IGFkZCB1aSBtb2R1bGUgbG9hZGluZyBzdXBwb3J0CjYwODU0MWVj
-ZjEgY29uc29sZTogYWRkIGFuZCB1c2UgcWVtdV9kaXNwbGF5X2ZpbmRfZGVmYXVsdApjOWVhNWM4
-Zjk4IGVnbC1oZWFkbGVzczogaG9vayB1cCB0byBkaXNwbGF5IHJlZ2lzdHJ5CmU0MDI3NjExZDYg
-Y3Vyc2VzOiBob29rIHVwIHRvIGRpc3BsYXkgcmVnaXN0cnkKZTgwNzM4YTJlNCBjb2NvYTogaG9v
-ayB1cCB0byBkaXNwbGF5IHJlZ2lzdHJ5CmQ0ZTE0MGJjMGQgc2RsOiBob29rIHVwIHRvIGRpc3Bs
-YXkgcmVnaXN0cnkKNTI3MTQ2YmJhZiBjb25zb2xlOiBhZGQgcWVtdSBkaXNwbGF5IHJlZ2lzdHJ5
-LCBhZGQgZ3RrCjMzODc4Y2E5Mzggdmw6IGRyb3AgcmVxdWVzdF9vcGVuZ2wgdmFyaWFibGUKZDc4
-OGM3YjAyYiB2bDogZHJvcCBkaXNwbGF5X3R5cGUgdmFyaWFibGUKNzk4NjRiZjVhOCB2bDogZHJv
-cCBmdWxsX3NjcmVlbiB2YXJpYWJsZQo4NjkyMGU4MDBmIGNvY29hOiB1c2UgRGlzcGxheU9wdGlv
-bnMKYzQ1MmE2ZTI0MyBjdXJzZXM6IHVzZSBEaXNwbGF5T3B0aW9ucwoyYzgyOTUwZjFjIGVnbC1o
-ZWFkbGVzczogdXNlIERpc3BsYXlPcHRpb25zCmIxNDRhOTVkM2Qgdmw6IGRyb3Agbm9fcXVpdCB2
-YXJpYWJsZQo2NDBiNTliNzUyIHNkbDogdXNlIERpc3BsYXlPcHRpb25zCjJhMzA4MWQzNWIgZ3Rr
-OiBhZGQgYW5kIHVzZSBEaXNwbGF5T3B0aW9ucyArIERpc3BsYXlHVEsKNzU2ODI0ZDBjZiB2bDog
-cmVuYW1lIERpc3BsYXlUeXBlIHRvIExlZ2FjeURpc3BsYXlUeXBlCmE3YTZmMGMwYjIgc2RsOiB1
-c2UgY3RybC1hbHQtZyBhcyBncmFiIGhvdGtleQplNGRkZTM0MzhmIHNkbDogcmVtb3ZlIC1hbHQt
-Z3JhYiBhbmQgLWN0cmwtZ3JhYiBzdXBwb3J0CjFjMzJkZDYyNGYgc2RsOiByZW1vdmUgLW5vLWZy
-YW1lIHN1cHBvcnQKCj09PSBPVVRQVVQgQkVHSU4gPT09CkNoZWNraW5nIFBBVENIIDEvMjQ6IHNk
-bDogcmVtb3ZlIC1uby1mcmFtZSBzdXBwb3J0Li4uCkNoZWNraW5nIFBBVENIIDIvMjQ6IHNkbDog
-cmVtb3ZlIC1hbHQtZ3JhYiBhbmQgLWN0cmwtZ3JhYiBzdXBwb3J0Li4uCkVSUk9SOiBzcGFjZSBw
-cm9oaWJpdGVkIGFmdGVyIHRoYXQgJyYnIChjdHg6V3hXKQojNDg6IEZJTEU6IHVpL3NkbC5jOjU1
-NDoKKyAgICBtb2Rfc3RhdGUgPSAoU0RMX0dldE1vZFN0YXRlKCkgJiBndWlfZ3JhYl9jb2RlKSA9
-PSBndWlfZ3JhYl9jb2RlOwogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBeCgpF
-UlJPUjogc3BhY2UgcHJvaGliaXRlZCBhZnRlciB0aGF0ICcmJyAoY3R4Old4VykKIzk2OiBGSUxF
-OiB1aS9zZGwyLmM6MzMzOgorICAgIG1vZF9zdGF0ZSA9IChTRExfR2V0TW9kU3RhdGUoKSAmIGd1
-aV9ncmFiX2NvZGUpID09IGd1aV9ncmFiX2NvZGU7CiAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgIF4KCnRvdGFsOiAyIGVycm9ycywgMCB3YXJuaW5ncywgMTM1IGxpbmVzIGNoZWNr
-ZWQKCllvdXIgcGF0Y2ggaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55
-IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBt
-YWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KCkNoZWNraW5nIFBBVENI
-IDMvMjQ6IHNkbDogdXNlIGN0cmwtYWx0LWcgYXMgZ3JhYiBob3RrZXkuLi4KQ2hlY2tpbmcgUEFU
-Q0ggNC8yNDogdmw6IHJlbmFtZSBEaXNwbGF5VHlwZSB0byBMZWdhY3lEaXNwbGF5VHlwZS4uLgpD
-aGVja2luZyBQQVRDSCA1LzI0OiBndGs6IGFkZCBhbmQgdXNlIERpc3BsYXlPcHRpb25zICsgRGlz
-cGxheUdUSy4uLgpDaGVja2luZyBQQVRDSCA2LzI0OiBzZGw6IHVzZSBEaXNwbGF5T3B0aW9ucy4u
-LgpDaGVja2luZyBQQVRDSCA3LzI0OiB2bDogZHJvcCBub19xdWl0IHZhcmlhYmxlLi4uCkNoZWNr
-aW5nIFBBVENIIDgvMjQ6IGVnbC1oZWFkbGVzczogdXNlIERpc3BsYXlPcHRpb25zLi4uCkNoZWNr
-aW5nIFBBVENIIDkvMjQ6IGN1cnNlczogdXNlIERpc3BsYXlPcHRpb25zLi4uCkNoZWNraW5nIFBB
-VENIIDEwLzI0OiBjb2NvYTogdXNlIERpc3BsYXlPcHRpb25zLi4uCkNoZWNraW5nIFBBVENIIDEx
-LzI0OiB2bDogZHJvcCBmdWxsX3NjcmVlbiB2YXJpYWJsZS4uLgpDaGVja2luZyBQQVRDSCAxMi8y
-NDogdmw6IGRyb3AgZGlzcGxheV90eXBlIHZhcmlhYmxlLi4uCkNoZWNraW5nIFBBVENIIDEzLzI0
-OiB2bDogZHJvcCByZXF1ZXN0X29wZW5nbCB2YXJpYWJsZS4uLgpDaGVja2luZyBQQVRDSCAxNC8y
-NDogY29uc29sZTogYWRkIHFlbXUgZGlzcGxheSByZWdpc3RyeSwgYWRkIGd0ay4uLgpDaGVja2lu
-ZyBQQVRDSCAxNS8yNDogc2RsOiBob29rIHVwIHRvIGRpc3BsYXkgcmVnaXN0cnkuLi4KQ2hlY2tp
-bmcgUEFUQ0ggMTYvMjQ6IGNvY29hOiBob29rIHVwIHRvIGRpc3BsYXkgcmVnaXN0cnkuLi4KQ2hl
-Y2tpbmcgUEFUQ0ggMTcvMjQ6IGN1cnNlczogaG9vayB1cCB0byBkaXNwbGF5IHJlZ2lzdHJ5Li4u
-CkNoZWNraW5nIFBBVENIIDE4LzI0OiBlZ2wtaGVhZGxlc3M6IGhvb2sgdXAgdG8gZGlzcGxheSBy
-ZWdpc3RyeS4uLgpDaGVja2luZyBQQVRDSCAxOS8yNDogY29uc29sZTogYWRkIGFuZCB1c2UgcWVt
-dV9kaXNwbGF5X2ZpbmRfZGVmYXVsdC4uLgpDaGVja2luZyBQQVRDSCAyMC8yNDogY29uc29sZTog
-YWRkIHVpIG1vZHVsZSBsb2FkaW5nIHN1cHBvcnQuLi4KQ2hlY2tpbmcgUEFUQ0ggMjEvMjQ6IHNk
-bDogYnVpbGQgYXMgbW9kdWxlLi4uCkNoZWNraW5nIFBBVENIIDIyLzI0OiBndGs6IGJ1aWxkIGFz
-IG1vZHVsZS4uLgpDaGVja2luZyBQQVRDSCAyMy8yNDogY3Vyc2VzOiBidWlsZCBhcyBtb2R1bGUu
-Li4KQ2hlY2tpbmcgUEFUQ0ggMjQvMjQ6IGJ1aWxkOiBvcGVuZ2wgc2hvdWxkIG5vdCBuZWVkIFgx
-MS4uLgo9PT0gT1VUUFVUIEVORCA9PT0KClRlc3QgY29tbWFuZCBleGl0ZWQgd2l0aCBjb2RlOiAx
-CgoKLS0tCkVtYWlsIGdlbmVyYXRlZCBhdXRvbWF0aWNhbGx5IGJ5IFBhdGNoZXcgW2h0dHA6Ly9w
-YXRjaGV3Lm9yZy9dLgpQbGVhc2Ugc2VuZCB5b3VyIGZlZWRiYWNrIHRvIHBhdGNoZXctZGV2ZWxA
-ZnJlZWxpc3RzLm9yZw==
+On Fri, Nov 17, 2017 at 11:49:05AM +0100, Kevin Wolf wrote:
+> Am 16.11.2017 um 10:14 hat Kashyap Chamarthy geschrieben:
+> > On Wed, Nov 15, 2017 at 04:56:13PM -0500, John Snow wrote:
+
+[...]
+
+> > > It's an interesting gotcha that I wasn't really acutely aware of myself,
+> > > so having it in the doc format for API programmers who aren't
+> > > necessarily digging through our source sounds like a pleasant courtesy.
+> > 
+> > Indeed, will do.  (Just for my own clarity, did you imply: don't update
+> > it in block-core.json?  FWIW, my first instinct is to check the QAPI
+> > documentation for such things, that's why I wrote there first :-))
+> 
+> Will that be a separate patch or do you intend to send a v3?
+
+I can send a separate one if you prefer, but I was intending to send a
+v3 with both files fixed as it's just a related trivial change.  Is that
+okay?
+
+-- 
+/kashyap
