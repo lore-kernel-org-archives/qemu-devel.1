@@ -1,21 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53811)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54926)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1eFkNH-000279-Cr
-	for qemu-devel@nongnu.org; Fri, 17 Nov 2017 12:24:20 -0500
+	(envelope-from <kchamart@redhat.com>) id 1eFkQ2-0003Gh-PQ
+	for qemu-devel@nongnu.org; Fri, 17 Nov 2017 12:27:11 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1eFkNG-0007Ib-CV
-	for qemu-devel@nongnu.org; Fri, 17 Nov 2017 12:24:19 -0500
-Date: Fri, 17 Nov 2017 18:24:04 +0100
-From: Kevin Wolf <kwolf@redhat.com>
-Message-ID: <20171117172404.GJ4795@localhost.localdomain>
-References: <20171117164747.11525-1-eblake@redhat.com>
-	<600d87a3-93a9-5d5d-7a9f-a31ba213348b@virtuozzo.com>
+	(envelope-from <kchamart@redhat.com>) id 1eFkQ0-00028H-5o
+	for qemu-devel@nongnu.org; Fri, 17 Nov 2017 12:27:10 -0500
+Date: Fri, 17 Nov 2017 18:26:54 +0100
+From: Kashyap Chamarthy <kchamart@redhat.com>
+Message-ID: <20171117172654.ucimuik2ixcu2qfw@eukaryote>
+References: <20171117162536.23225-1-kchamart@redhat.com>
+	<78f4339b-bbe5-18d1-6555-b2c3196a6f7c@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <600d87a3-93a9-5d5d-7a9f-a31ba213348b@virtuozzo.com>
-Subject: Re: [Qemu-devel] [PATCH for-2.11] qcow2: fix image corruption on
- commit with persistent snapshot
+In-Reply-To: <78f4339b-bbe5-18d1-6555-b2c3196a6f7c@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v3 for-2.11] QAPI & interop: Clarify events
+ emitted by 'block-job-cancel'
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,39 +24,64 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Cc: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>
+To: Eric Blake <eblake@redhat.com>
+Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, mreitz@redhat.com, armbru@redhat.com, jsnow@redhat.com
 
-Am 17.11.2017 um 18:07 hat Vladimir Sementsov-Ogievskiy geschrieben:
-> 17.11.2017 19:47, Eric Blake wrote:
-> > If an image contains persistent snapshots, we cannot use the
-> 
-> bitmaps
-> 
-> > fast path of bdrv_make_empty() to clear the image during
-> > qemu-img commit, because that will lose the clusters related
-> > to the bitmaps.
-> > 
-> > Also leave a comment in qcow2_read_extensions to remind future
-> > feature additions to think about fast-path removal, since we
-> > just barely fixed the same bug for LUKS encryption.
-> > 
-> > It's a pain that qemu-img has not yet been taught to manipulate,
-> > or even at a very minimum display, information about persistent
-> > bitmaps; instead, we have to use QMP commands.  It's also a
-> > pain that only qeury-block and x-debug-block-dirty-bitmap-sha256
-> > will allow bitmap introspection; but the former requires the
-> > node to be hooked to a block device, and the latter is experimental.
-> 
-> sorry for that pain =(.
-> 
-> Honestly, I don't understand why such a simple and obvious fix needs an
-> additional test.
+On Fri, Nov 17, 2017 at 11:07:41AM -0600, Eric Blake wrote:
+> On 11/17/2017 10:25 AM, Kashyap Chamarthy wrote:
 
-Because we could otherwise accidentally break it again in the future.
+[...]
 
-If there is a feature that you care about, make sure to have a test for
-everything in it, and that you add a regression test for every bug that
-you fix.
+> Sorry for not wordsmithing on earlier versions:
 
-Kevin
+That's fine.  Always appreciate your wordsmithing :-)
+
+> > +    'mirror' job *after* it has indicated (by emitting the event
+> > +    ``BLOCK_JOB_READY``) that the source and target now remain
+> > +    synchronized, then ``block-job-cancel`` will emit the event
+> 
+> Might read slightly nicer as:
+> 
+> the source and target have reached synchronization,
+
+Ah, that sounds nicer indeed.  Will fix.
+
+[...]
+
+> > +# Note that the 'block-job-cancel' command will emit the event
+> > +# BLOCK_JOB_COMPLETED if you issue it ('block-job-cancel') after 'drive-mirror'
+> > +# has indicated (by emitting the event BLOCK_JOB_READY) that the source and
+> > +# destination remain synchronized.  In this case, the BLOCK_JOB_COMPLETED
+> > +# event indicates that synchronization (from 'drive-mirror') has successfully
+> > +# ended and the destination now has a point-in-time copy, which is at the time
+> > +# of cancel.
+> 
+> 
+> Accurate, but a bit hard to follow the flow of the sentence.
+
+Yeah, I wasn't satisfied with my phrasing too.  I sat on it for nearly
+half an hour, and still it came out super clunky.
+
+> Might read nicer as:
+> 
+> Note that if you issue 'block-job-cancel' after 'drive-mirror' has
+> indicated (via the event BLOCK_JOB_READY) that the source and
+> destination are synchronized, then the event triggered by this command
+> changes to BLOCK_JOB_COMPLETED, to indicate that the mirroring has
+> ended and the destination now has a point-in-time copy tied to the
+> time of the cancellation.
+
+Thanks, yours reads much nicer.
+
+> Documentation is worth of inclusion in 2.11.  Whether you keep your
+> wording, or incorporate mine in a v4, you can add:
+> Reviewed-by: Eric Blake <eblake@redhat.com>
+
+I'll definitely incorporate in v4.  
+
+I'll also make similar wording adjustment in live-block-operations.rst.
+
+Thanks for the quick review.
+
+-- 
+/kashyap
