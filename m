@@ -1,17 +1,40 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43384)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44661)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1eFlCp-0001aa-Sa
-	for qemu-devel@nongnu.org; Fri, 17 Nov 2017 13:17:37 -0500
+	(envelope-from <mdroth@linux.vnet.ibm.com>) id 1eFlF6-0003jE-JR
+	for qemu-devel@nongnu.org; Fri, 17 Nov 2017 13:19:57 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1eFlCo-0002fy-Ht
-	for qemu-devel@nongnu.org; Fri, 17 Nov 2017 13:17:35 -0500
-From: Kevin Wolf <kwolf@redhat.com>
-Date: Fri, 17 Nov 2017 19:16:52 +0100
-Message-Id: <20171117181653.20651-25-kwolf@redhat.com>
-In-Reply-To: <20171117181653.20651-1-kwolf@redhat.com>
-References: <20171117181653.20651-1-kwolf@redhat.com>
-Subject: [Qemu-devel] [PULL 24/25] block: Make bdrv_next() keep strong
- references
+	(envelope-from <mdroth@linux.vnet.ibm.com>) id 1eFlF2-0005Tk-GT
+	for qemu-devel@nongnu.org; Fri, 17 Nov 2017 13:19:56 -0500
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:40490
+	helo=mx0a-001b2d01.pphosted.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <mdroth@linux.vnet.ibm.com>)
+	id 1eFlF2-0005Sf-BK
+	for qemu-devel@nongnu.org; Fri, 17 Nov 2017 13:19:52 -0500
+Received: from pps.filterd (m0098419.ppops.net [127.0.0.1])
+	by mx0b-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
+	vAHIA7r4142824
+	for <qemu-devel@nongnu.org>; Fri, 17 Nov 2017 13:19:46 -0500
+Received: from e12.ny.us.ibm.com (e12.ny.us.ibm.com [129.33.205.202])
+	by mx0b-001b2d01.pphosted.com with ESMTP id 2ea2rm6ah8-1
+	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Fri, 17 Nov 2017 13:19:45 -0500
+Received: from localhost
+	by e12.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <mdroth@linux.vnet.ibm.com>;
+	Fri, 17 Nov 2017 13:19:45 -0500
+Content-Type: text/plain; charset="utf-8"
+MIME-Version: 1.0
+Content-Transfer-Encoding: quoted-printable
+From: Michael Roth <mdroth@linux.vnet.ibm.com>
+In-Reply-To: <48df4371-5966-a428-f5df-37c014c1ab94@linux.vnet.ibm.com>
+References: <151092340873.11818.16813698420232981002.stgit@bahia>
+	<48df4371-5966-a428-f5df-37c014c1ab94@linux.vnet.ibm.com>
+Date: Fri, 17 Nov 2017 12:19:34 -0600
+Message-Id: <151094277418.31225.11006663740924379616@sif>
+Subject: Re: [Qemu-devel] [Qemu-ppc] [PATCH for-2.11] spapr: reset DRCs
+ after devices
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -20,240 +43,174 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-block@nongnu.org
-Cc: kwolf@redhat.com, qemu-devel@nongnu.org
+To: Daniel Henrique Barboza <danielhb@linux.vnet.ibm.com>, Greg Kurz <groug@kaod.org>, qemu-devel@nongnu.org
+Cc: qemu-stable@nongnu.org, qemu-ppc@nongnu.org, David Gibson <david@gibson.dropbear.id.au>
 
-From: Max Reitz <mreitz@redhat.com>
+Quoting Daniel Henrique Barboza (2017-11-17 10:21:27)
+> =
 
-On one hand, it is a good idea for bdrv_next() to return a strong
-reference because ideally nearly every pointer should be refcounted.
-This fixes intermittent failure of iotest 194.
+> =
 
-On the other, it is absolutely necessary for bdrv_next() itself to keep
-a strong reference to both the BB (in its first phase) and the BDS (at
-least in the second phase) because when called the next time, it will
-dereference those objects to get a link to the next one.  Therefore, it
-needs these objects to stay around until then.  Just storing the pointer
-to the next in the iterator is not really viable because that pointer
-might become invalid as well.
+> On 11/17/2017 10:56 AM, Greg Kurz wrote:
+> > A DRC with a pending unplug request releases its associated device at
+> > machine reset time.
+> >
+> > In the case of LMB, when all DRCs for a DIMM device have been reset,
+> > the DIMM gets unplugged, causing guest memory to disappear. This may
+> > be very confusing for anything still using this memory.
+> >
+> > This is exactly what happens with vhost backends, and QEMU aborts
+> > with:
+> >
+> > qemu-system-ppc64: used ring relocated for ring 2
+> > qemu-system-ppc64: qemu/hw/virtio/vhost.c:649: vhost_commit: Assertion
+> >   `r >=3D 0' failed.
+> >
+> > The issue is that each DRC registers a QEMU reset handler, and we
+> > don't control the order in which these handlers are called (ie,
+> > a LMB DRC will unplug a DIMM before the virtio device using the
+> > memory on this DIMM could stop its vhost backend).
+> >
+> > To avoid such situations, let's reset DRCs after all devices
+> > have been reset.
+> >
+> > Reported-by: Mallesh N. Koti <mallesh@linux.vnet.ibm.com>
+> > Signed-off-by: Greg Kurz <groug@kaod.org>
+> > ---
+> I believe this has to do with the problem discussed at the memory
+> unplug reboot with vhost=3Don, right?
+> =
 
-Both arguments taken together means we should probably just invoke
-bdrv_ref() and blk_ref() in bdrv_next().  This means we have to assert
-that bdrv_next() is always called from the main loop, but that was
-probably necessary already before this patch and judging from the
-callers, it also looks to actually be the case.
+> I don't see any problem with this patch and it's probably the best soluti=
+on
+> short-term for the problem (and potentially other related LMB release
+> problems), but that said, how hard it is to forbid LMB unplug at all if t=
+he
+> memory is being used in vhost?
+> =
 
-Keeping these strong references means however that callers need to give
-them up if they decide to abort the iteration early.  They can do so
-through the new bdrv_next_cleanup() function.
+> The way I see it, the root problem is that a device unplug failed at the =
 
-Suggested-by: Kevin Wolf <kwolf@redhat.com>
-Signed-off-by: Max Reitz <mreitz@redhat.com>
-Message-id: 20171110172545.32609-1-mreitz@redhat.com
-Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
-Signed-off-by: Max Reitz <mreitz@redhat.com>
----
- include/block/block.h |  1 +
- block.c               |  3 +++
- block/block-backend.c | 48 ++++++++++++++++++++++++++++++++++++++++++++++--
- block/snapshot.c      |  6 ++++++
- migration/block.c     |  1 +
- 5 files changed, 57 insertions(+), 2 deletions(-)
+> guest
+> side and we don't know about it, leaving drc->unplug_requested flags set
+> around the code when it shouldn't. Reading that thread I see a comment fr=
+om
 
-diff --git a/include/block/block.h b/include/block/block.h
-index fbc21daf62..c05cac57e5 100644
---- a/include/block/block.h
-+++ b/include/block/block.h
-@@ -461,6 +461,7 @@ typedef struct BdrvNextIterator {
- 
- BlockDriverState *bdrv_first(BdrvNextIterator *it);
- BlockDriverState *bdrv_next(BdrvNextIterator *it);
-+void bdrv_next_cleanup(BdrvNextIterator *it);
- 
- BlockDriverState *bdrv_next_monitor_owned(BlockDriverState *bs);
- bool bdrv_is_encrypted(BlockDriverState *bs);
-diff --git a/block.c b/block.c
-index 996778cfa0..6c8ef98dfa 100644
---- a/block.c
-+++ b/block.c
-@@ -4255,6 +4255,7 @@ void bdrv_invalidate_cache_all(Error **errp)
-         aio_context_release(aio_context);
-         if (local_err) {
-             error_propagate(errp, local_err);
-+            bdrv_next_cleanup(&it);
-             return;
-         }
-     }
-@@ -4330,6 +4331,7 @@ int bdrv_inactivate_all(void)
-         for (bs = bdrv_first(&it); bs; bs = bdrv_next(&it)) {
-             ret = bdrv_inactivate_recurse(bs, pass);
-             if (ret < 0) {
-+                bdrv_next_cleanup(&it);
-                 goto out;
-             }
-         }
-@@ -4864,6 +4866,7 @@ bool bdrv_is_first_non_filter(BlockDriverState *candidate)
- 
-         /* candidate is the first non filter */
-         if (perm) {
-+            bdrv_next_cleanup(&it);
-             return true;
-         }
-     }
-diff --git a/block/block-backend.c b/block/block-backend.c
-index f10b1db612..5836cb3087 100644
---- a/block/block-backend.c
-+++ b/block/block-backend.c
-@@ -442,21 +442,37 @@ BlockBackend *blk_next(BlockBackend *blk)
-  * the monitor or attached to a BlockBackend */
- BlockDriverState *bdrv_next(BdrvNextIterator *it)
- {
--    BlockDriverState *bs;
-+    BlockDriverState *bs, *old_bs;
-+
-+    /* Must be called from the main loop */
-+    assert(qemu_get_current_aio_context() == qemu_get_aio_context());
- 
-     /* First, return all root nodes of BlockBackends. In order to avoid
-      * returning a BDS twice when multiple BBs refer to it, we only return it
-      * if the BB is the first one in the parent list of the BDS. */
-     if (it->phase == BDRV_NEXT_BACKEND_ROOTS) {
-+        BlockBackend *old_blk = it->blk;
-+
-+        old_bs = old_blk ? blk_bs(old_blk) : NULL;
-+
-         do {
-             it->blk = blk_all_next(it->blk);
-             bs = it->blk ? blk_bs(it->blk) : NULL;
-         } while (it->blk && (bs == NULL || bdrv_first_blk(bs) != it->blk));
- 
-+        if (it->blk) {
-+            blk_ref(it->blk);
-+        }
-+        blk_unref(old_blk);
-+
-         if (bs) {
-+            bdrv_ref(bs);
-+            bdrv_unref(old_bs);
-             return bs;
-         }
-         it->phase = BDRV_NEXT_MONITOR_OWNED;
-+    } else {
-+        old_bs = it->bs;
-     }
- 
-     /* Then return the monitor-owned BDSes without a BB attached. Ignore all
-@@ -467,18 +483,46 @@ BlockDriverState *bdrv_next(BdrvNextIterator *it)
-         bs = it->bs;
-     } while (bs && bdrv_has_blk(bs));
- 
-+    if (bs) {
-+        bdrv_ref(bs);
-+    }
-+    bdrv_unref(old_bs);
-+
-     return bs;
- }
- 
--BlockDriverState *bdrv_first(BdrvNextIterator *it)
-+static void bdrv_next_reset(BdrvNextIterator *it)
- {
-     *it = (BdrvNextIterator) {
-         .phase = BDRV_NEXT_BACKEND_ROOTS,
-     };
-+}
- 
-+BlockDriverState *bdrv_first(BdrvNextIterator *it)
-+{
-+    bdrv_next_reset(it);
-     return bdrv_next(it);
- }
- 
-+/* Must be called when aborting a bdrv_next() iteration before
-+ * bdrv_next() returns NULL */
-+void bdrv_next_cleanup(BdrvNextIterator *it)
-+{
-+    /* Must be called from the main loop */
-+    assert(qemu_get_current_aio_context() == qemu_get_aio_context());
-+
-+    if (it->phase == BDRV_NEXT_BACKEND_ROOTS) {
-+        if (it->blk) {
-+            bdrv_unref(blk_bs(it->blk));
-+            blk_unref(it->blk);
-+        }
-+    } else {
-+        bdrv_unref(it->bs);
-+    }
-+
-+    bdrv_next_reset(it);
-+}
-+
- /*
-  * Add a BlockBackend into the list of backends referenced by the monitor, with
-  * the given @name acting as the handle for the monitor.
-diff --git a/block/snapshot.c b/block/snapshot.c
-index 1d5ab5f90f..be0743abac 100644
---- a/block/snapshot.c
-+++ b/block/snapshot.c
-@@ -417,6 +417,7 @@ bool bdrv_all_can_snapshot(BlockDriverState **first_bad_bs)
-         }
-         aio_context_release(ctx);
-         if (!ok) {
-+            bdrv_next_cleanup(&it);
-             goto fail;
-         }
-     }
-@@ -444,6 +445,7 @@ int bdrv_all_delete_snapshot(const char *name, BlockDriverState **first_bad_bs,
-         }
-         aio_context_release(ctx);
-         if (ret < 0) {
-+            bdrv_next_cleanup(&it);
-             goto fail;
-         }
-     }
-@@ -469,6 +471,7 @@ int bdrv_all_goto_snapshot(const char *name, BlockDriverState **first_bad_bs)
-         }
-         aio_context_release(ctx);
-         if (err < 0) {
-+            bdrv_next_cleanup(&it);
-             goto fail;
-         }
-     }
-@@ -494,6 +497,7 @@ int bdrv_all_find_snapshot(const char *name, BlockDriverState **first_bad_bs)
-         }
-         aio_context_release(ctx);
-         if (err < 0) {
-+            bdrv_next_cleanup(&it);
-             goto fail;
-         }
-     }
-@@ -525,6 +529,7 @@ int bdrv_all_create_snapshot(QEMUSnapshotInfo *sn,
-         }
-         aio_context_release(ctx);
-         if (err < 0) {
-+            bdrv_next_cleanup(&it);
-             goto fail;
-         }
-     }
-@@ -548,6 +553,7 @@ BlockDriverState *bdrv_all_find_vmstate_bs(void)
-         aio_context_release(ctx);
- 
-         if (found) {
-+            bdrv_next_cleanup(&it);
-             break;
-         }
-     }
-diff --git a/migration/block.c b/migration/block.c
-index 3282809583..7147171bb7 100644
---- a/migration/block.c
-+++ b/migration/block.c
-@@ -415,6 +415,7 @@ static int init_blk_migration(QEMUFile *f)
-         sectors = bdrv_nb_sectors(bs);
-         if (sectors <= 0) {
-             ret = sectors;
-+            bdrv_next_cleanup(&it);
-             goto out;
-         }
- 
--- 
-2.13.6
+I'm not sure we want to go down the road of preemptively aborting
+specific cases where we think unplug will fail in the guest. We already
+need to deal with the cases where we don't know whether they'll fail
+ahead of time, so it seems like more of a headache to add special cases
+on top of that that management would need to deal with.
+
+And in this particular case we'd never be able to unplug the DIMM if
+the guest happens to use it for the vring each boot (unless maybe the
+unplug request occured during early boot), even though there's no
+technical reason we shouldn't be able to at least handle it on the
+next reset.
+
+> Michael S. Tsirkin saying that this bug is somewhat expected, that vhost =
+
+> backend will
+> not behave well if memory is going away. Unlike other LMB unplug =
+
+> failures from
+> the guest side that might happen for any other reason, this one sees =
+
+> predicable
+> and we can avoid it.
+> =
+
+> I think this is something worth considering. But for now,
+> =
+
+> =
+
+> Reviewed-by: Daniel Henrique Barboza <danielhb@linux.vnet.ibm.com>
+> =
+
+> >   hw/ppc/spapr.c     |   21 +++++++++++++++++++++
+> >   hw/ppc/spapr_drc.c |    7 -------
+> >   2 files changed, 21 insertions(+), 7 deletions(-)
+> >
+> > diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
+> > index 6841bd294b3c..6285f7211f9a 100644
+> > --- a/hw/ppc/spapr.c
+> > +++ b/hw/ppc/spapr.c
+> > @@ -1411,6 +1411,19 @@ static void find_unknown_sysbus_device(SysBusDev=
+ice *sbdev, void *opaque)
+> >       }
+> >   }
+> >
+> > +static int spapr_reset_drcs(Object *child, void *opaque)
+> > +{
+> > +    sPAPRDRConnector *drc =3D
+> > +        (sPAPRDRConnector *) object_dynamic_cast(child,
+> > +                                                 TYPE_SPAPR_DR_CONNECT=
+OR);
+> > +
+> > +    if (drc) {
+> > +        spapr_drc_reset(drc);
+> > +    }
+> > +
+> > +    return 0;
+> > +}
+> > +
+> >   static void ppc_spapr_reset(void)
+> >   {
+> >       MachineState *machine =3D MACHINE(qdev_get_machine());
+> > @@ -1434,6 +1447,14 @@ static void ppc_spapr_reset(void)
+> >       }
+> >
+> >       qemu_devices_reset();
+> > +
+> > +    /* DRC reset may cause a device to be unplugged. This will cause t=
+roubles
+> > +     * if this device is used by another device (eg, a running vhost b=
+ackend
+> > +     * will crash QEMU if the DIMM holding the vring goes away). To av=
+oid such
+> > +     * situations, we reset DRCs after all devices have been reset.
+> > +     */
+> > +    object_child_foreach_recursive(object_get_root(), spapr_reset_drcs=
+, NULL);
+> > +
+> >       spapr_clear_pending_events(spapr);
+> >
+> >       /*
+> > diff --git a/hw/ppc/spapr_drc.c b/hw/ppc/spapr_drc.c
+> > index 915e9b51c40c..e3b122968e89 100644
+> > --- a/hw/ppc/spapr_drc.c
+> > +++ b/hw/ppc/spapr_drc.c
+> > @@ -455,11 +455,6 @@ void spapr_drc_reset(sPAPRDRConnector *drc)
+> >       }
+> >   }
+> >
+> > -static void drc_reset(void *opaque)
+> > -{
+> > -    spapr_drc_reset(SPAPR_DR_CONNECTOR(opaque));
+> > -}
+> > -
+> >   bool spapr_drc_needed(void *opaque)
+> >   {
+> >       sPAPRDRConnector *drc =3D (sPAPRDRConnector *)opaque;
+> > @@ -518,7 +513,6 @@ static void realize(DeviceState *d, Error **errp)
+> >       }
+> >       vmstate_register(DEVICE(drc), spapr_drc_index(drc), &vmstate_spap=
+r_drc,
+> >                        drc);
+> > -    qemu_register_reset(drc_reset, drc);
+> >       trace_spapr_drc_realize_complete(spapr_drc_index(drc));
+> >   }
+> >
+> > @@ -529,7 +523,6 @@ static void unrealize(DeviceState *d, Error **errp)
+> >       gchar *name;
+> >
+> >       trace_spapr_drc_unrealize(spapr_drc_index(drc));
+> > -    qemu_unregister_reset(drc_reset, drc);
+> >       vmstate_unregister(DEVICE(drc), &vmstate_spapr_drc, drc);
+> >       root_container =3D container_get(object_get_root(), DRC_CONTAINER=
+_PATH);
+> >       name =3D g_strdup_printf("%x", spapr_drc_index(drc));
+> >
+> >
+>=20
