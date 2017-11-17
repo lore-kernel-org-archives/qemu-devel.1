@@ -1,32 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56020)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57305)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1eFhzk-0007AG-80
-	for qemu-devel@nongnu.org; Fri, 17 Nov 2017 09:51:53 -0500
+	(envelope-from <atar4qemu@gmail.com>) id 1eFi25-0008In-MD
+	for qemu-devel@nongnu.org; Fri, 17 Nov 2017 09:54:18 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1eFhzg-0002HF-4G
-	for qemu-devel@nongnu.org; Fri, 17 Nov 2017 09:51:52 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:53797)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1eFhzf-0002Fh-Su
-	for qemu-devel@nongnu.org; Fri, 17 Nov 2017 09:51:48 -0500
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
-	[10.5.11.12])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id F2F03FC7AA
-	for <qemu-devel@nongnu.org>; Fri, 17 Nov 2017 14:51:46 +0000 (UTC)
-Date: Fri, 17 Nov 2017 15:51:43 +0100
-From: Gerd Hoffmann <kraxel@redhat.com>
-Message-ID: <20171117145143.rygyj447k6xzvhkj@sirius.home.kraxel.org>
-References: <20171117103046.15943-1-kraxel@redhat.com>
-	<20171117103046.15943-3-kraxel@redhat.com>
-	<20171117142222.GV25830@redhat.com>
+	(envelope-from <atar4qemu@gmail.com>) id 1eFi24-00064g-Aq
+	for qemu-devel@nongnu.org; Fri, 17 Nov 2017 09:54:17 -0500
+Received: from mail-it0-x244.google.com ([2607:f8b0:4001:c0b::244]:46659)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <atar4qemu@gmail.com>) id 1eFi24-00063v-6q
+	for qemu-devel@nongnu.org; Fri, 17 Nov 2017 09:54:16 -0500
+Received: by mail-it0-x244.google.com with SMTP id r127so4312229itb.5
+	for <qemu-devel@nongnu.org>; Fri, 17 Nov 2017 06:54:16 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20171117142222.GV25830@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH 02/24] sdl: remove -alt-grab and -ctrl-grab
- support
+In-Reply-To: <1510926167-23326-4-git-send-email-mark.cave-ayland@ilande.co.uk>
+References: <1510926167-23326-1-git-send-email-mark.cave-ayland@ilande.co.uk>
+	<1510926167-23326-4-git-send-email-mark.cave-ayland@ilande.co.uk>
+From: Artyom Tarasenko <atar4qemu@gmail.com>
+Date: Fri, 17 Nov 2017 15:53:54 +0100
+Message-ID: <CACXAS8DL4TPp+Re3KZdOtQk-96apxXoxp_CuXd6w9ZqyqTKJBg@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH 03/15] sun4u: move ISABus inside of
+ EBusState
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,23 +29,58 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Daniel P. Berrange" <berrange@redhat.com>
-Cc: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Markus Armbruster <armbru@redhat.com>
+To: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+Cc: qemu-devel <qemu-devel@nongnu.org>
 
-On Fri, Nov 17, 2017 at 02:22:22PM +0000, Daniel P. Berrange wrote:
-> On Fri, Nov 17, 2017 at 11:30:24AM +0100, Gerd Hoffmann wrote:
-> > With absolute pointer devices such as usb-tablet being widely used
-> > mouse grabs (for relative pointing devices) should be rarely needed
-> > these days.  So the benefit of the options to configure the hotkey
-> > modifiers for grab (and other actions) seems questionable.  Which
-> > is expecially true for the -ctrl-grab which isn't handled in the
-> > handle_keyup() code.
-> > 
-> > Drop the code, print a notice when the option is still used.
-> 
-> These need to go through the proper deprecation process too.
+On Fri, Nov 17, 2017 at 2:42 PM, Mark Cave-Ayland
+<mark.cave-ayland@ilande.co.uk> wrote:
+> Since the EBus is effectively a PCI-ISA bridge then the underlying ISA bus
+> should be contained within the PCI bridge itself.
 
-Ok, will do.
+While it's like that on the Sabre chipset, the Spitfire chipset (which
+I hope to add at some point) has the EBus, but no PCI, so maybe it's
+better to model it separately.
+On the other hand, the Spitfire has different EBus devices
+(particularly different type of the serial ports), so I'm not sure.
 
-cheers,
-  Gerd
+> Signed-off-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+> ---
+>  hw/sparc64/sun4u.c |    7 +++++--
+>  1 file changed, 5 insertions(+), 2 deletions(-)
+>
+> diff --git a/hw/sparc64/sun4u.c b/hw/sparc64/sun4u.c
+> index 394b7d6..63b4aaa 100644
+> --- a/hw/sparc64/sun4u.c
+> +++ b/hw/sparc64/sun4u.c
+> @@ -84,6 +84,7 @@ typedef struct EbusState {
+>      /*< private >*/
+>      PCIDevice parent_obj;
+>
+> +    ISABus *isa_bus;
+>      MemoryRegion bar0;
+>      MemoryRegion bar1;
+>  } EbusState;
+> @@ -245,8 +246,10 @@ static void ebus_realize(PCIDevice *pci_dev, Error **errp)
+>  {
+>      EbusState *s = EBUS(pci_dev);
+>
+> -    if (!isa_bus_new(DEVICE(pci_dev), get_system_memory(),
+> -                     pci_address_space_io(pci_dev), errp)) {
+> +    s->isa_bus = isa_bus_new(DEVICE(pci_dev), get_system_memory(),
+> +                             pci_address_space_io(pci_dev), errp);
+> +    if (!s->isa_bus) {
+> +        error_setg(errp, "unable to instantiate EBUS ISA bus");
+>          return;
+>      }
+>
+> --
+> 1.7.10.4
+>
+
+
+
+-- 
+Regards,
+Artyom Tarasenko
+
+SPARC and PPC PReP under qemu blog: http://tyom.blogspot.com/search/label/qemu
