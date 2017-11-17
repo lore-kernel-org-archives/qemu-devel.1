@@ -1,22 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49418)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49595)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1eFizT-0006C8-RS
-	for qemu-devel@nongnu.org; Fri, 17 Nov 2017 10:55:40 -0500
+	(envelope-from <darren.kenny@oracle.com>) id 1eFizs-0006Ni-1e
+	for qemu-devel@nongnu.org; Fri, 17 Nov 2017 10:56:05 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1eFizT-00024h-0p
-	for qemu-devel@nongnu.org; Fri, 17 Nov 2017 10:55:39 -0500
-References: <20171117154739.32565-1-kwolf@redhat.com>
-	<20171117154739.32565-2-kwolf@redhat.com>
-From: Max Reitz <mreitz@redhat.com>
-Message-ID: <3332fed1-d975-b5af-39f1-900702ecab0e@redhat.com>
-Date: Fri, 17 Nov 2017 16:55:27 +0100
+	(envelope-from <darren.kenny@oracle.com>) id 1eFizn-0002P8-6u
+	for qemu-devel@nongnu.org; Fri, 17 Nov 2017 10:56:04 -0500
+Received: from userp1040.oracle.com ([156.151.31.81]:18752)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <darren.kenny@oracle.com>)
+	id 1eFizm-0002NX-TM
+	for qemu-devel@nongnu.org; Fri, 17 Nov 2017 10:55:59 -0500
+Date: Fri, 17 Nov 2017 15:55:50 +0000
+From: Darren Kenny <darren.kenny@oracle.com>
+Message-ID: <20171117155550.buxjpgumxx4cu3du@starbug-vm.ie.oracle.com>
+References: <20171117103046.15943-1-kraxel@redhat.com>
+	<20171117103046.15943-20-kraxel@redhat.com>
+	<20171117125535.dhyvy5qwnh6d6e7d@starbug-vm.ie.oracle.com>
+	<20171117132454.33pngiqu7vcdbmm5@sirius.home.kraxel.org>
+	<20171117141650.bhvfbzbibo7trmv4@starbug-vm.ie.oracle.com>
+	<20171117150328.dfqke3kb3axdg2n2@sirius.home.kraxel.org>
 MIME-Version: 1.0
-In-Reply-To: <20171117154739.32565-2-kwolf@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="RbM7O7hG5BJKKXLhqQ8o2Js5uTWMG0gqO"
-Subject: Re: [Qemu-devel] [PATCH for-2.11 1/2] block: Fix permissions in
- image activation
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Disposition: inline
+In-Reply-To: <20171117150328.dfqke3kb3axdg2n2@sirius.home.kraxel.org>
+Subject: Re: [Qemu-devel] [PATCH 19/24] console: add and use
+ qemu_display_find_default
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,57 +33,60 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
-Cc: eblake@redhat.com, vsementsov@virtuozzo.com, den@openvz.org, qemu-devel@nongnu.org
+To: Gerd Hoffmann <kraxel@redhat.com>
+Cc: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Markus Armbruster <armbru@redhat.com>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---RbM7O7hG5BJKKXLhqQ8o2Js5uTWMG0gqO
-From: Max Reitz <mreitz@redhat.com>
-To: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
-Cc: eblake@redhat.com, vsementsov@virtuozzo.com, den@openvz.org,
- qemu-devel@nongnu.org
-Message-ID: <3332fed1-d975-b5af-39f1-900702ecab0e@redhat.com>
-Subject: Re: [PATCH for-2.11 1/2] block: Fix permissions in image activation
-References: <20171117154739.32565-1-kwolf@redhat.com>
- <20171117154739.32565-2-kwolf@redhat.com>
-In-Reply-To: <20171117154739.32565-2-kwolf@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+On Fri, Nov 17, 2017 at 04:03:28PM +0100, Gerd Hoffmann wrote:
+>  Hi,
+>
+>> OK, so the odd thing then is the check for !remote_display earlier
+>> on in the function (missing from the quote above) which seems to end
+>> up initializing VNC (albeit with localhost) when CONFIG_VNC is
+>> defined, but no other local display type has been selected.
+>
+>remote_display is set in case either -vnc or -spice was given on the
+>command line, and qemu will not start a local user display in that case
+>(unless you explicitly ask for it via -display).
 
-On 2017-11-17 16:47, Kevin Wolf wrote:
-> Inactive images generally request less permissions for their image file=
-s
-> than they would if they were active (in particular, write permissions).=
+Makes sense.
 
-> Activating the image involves extending the permissions, therefore.
->=20
-> drv->bdrv_invalidate_cache() can already require write access to the
-> image file, so we have to update the permissions earlier than that.
-> The current code does it only later, so we have to move up this part.
->=20
-> Signed-off-by: Kevin Wolf <kwolf@redhat.com>
-> ---
->  block.c | 32 ++++++++++++++++++++++----------
->  1 file changed, 22 insertions(+), 10 deletions(-)
+>
+>> OK, so neither SPICE or VNC really fit into this patchset because
+>> they are seen as additional to the display type, not the actual
+>> display type - SPICE is even more special too given the dependency
+>> on a guest VM driver to really function correctly.
+>
+>Hmm?  spice works just fine with any display.
 
-Reviewed-by: Max Reitz <mreitz@redhat.com>
+Sorry, mixed that up with EGL I think.
 
+>
+>> I wonder should there be a, similar, qemu_display_find_remote_default()
+>> which would be used when no local display is defined. And that would
+>> use a similar mechanism to permit selecting VNC or SPICE via
+>> registration mechanisms over rather than the #ifdef style for remote
+>> displays that will remain ever after this patchset (certainly could
+>> be another patchset beyond this one).
+>
+>Well, historically qemu tried to do alot of stuff (like picking a
+>display to use) automatically for the user.  And we did stick to that
+>for backward compatibility reasons.  But this automagic causes quite
+>some headache now and then, when changing things and the autmagic logic
+>gets into the way.  So I don't feel like adding more of this.  Also vnc
 
---RbM7O7hG5BJKKXLhqQ8o2Js5uTWMG0gqO
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
+Agree, there are times when automagic works - but unfortunately for
+more consistent usage, you are better being explicit.
 
------BEGIN PGP SIGNATURE-----
+>is in pretty much any qemu build, because it is enabled by default and
+>doesn't need any external dependencies, so falling back to spice would
+>be quite rare ...
 
-iQFGBAEBCAAwFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAloPBnASHG1yZWl0ekBy
-ZWRoYXQuY29tAAoJEPQH2wBh1c9AvZoH/3hmfowSeQA5dnRFhYrRTzxpXSyNyKT4
-uqugg2/Edq/4FeVTQ8nsRdbelEvpyAbpmLvfGPgf7oI8e/xd5g0c2QgmyGWQEoeK
-rj2nJej8/Q1abv2pBmeB2GP25TCsWXrexlHkmEMyRAX9ebxr+5ZEKBUgoQORmOrx
-EQ+z/b4cN0kuNyUoPHApv0dwemTnbUXWl1aaAwc0qKZqK1nZ6O10HHcAS1g4qPwf
-6Vz6sy+JZBq3dB3J9BNPvIU5weNv90HGlwdWqX3tOL8Zro64QCaiZ3hWl9oGwErO
-4NLeWJBnmuCUD3OTmAHOjLyoMDV3mNYRrDR2XryByVQy6MG7cktjThk=
-=gb46
------END PGP SIGNATURE-----
+Understood - definitely VNC is a pretty good fall-back for most
+people.
 
---RbM7O7hG5BJKKXLhqQ8o2Js5uTWMG0gqO--
+Thanks for outlining your thoughts on this, very helpful in
+understanding the UI code and why somethings are how they are.
+
+Thanks,
+
+Darren.
