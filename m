@@ -1,24 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37605)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39252)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jasowang@redhat.com>) id 1eFWW9-0000Uh-6o
-	for qemu-devel@nongnu.org; Thu, 16 Nov 2017 21:36:34 -0500
+	(envelope-from <jasowang@redhat.com>) id 1eFWeO-0002Wj-5z
+	for qemu-devel@nongnu.org; Thu, 16 Nov 2017 21:45:05 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jasowang@redhat.com>) id 1eFWW6-0000Dc-1P
-	for qemu-devel@nongnu.org; Thu, 16 Nov 2017 21:36:33 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:55742)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <jasowang@redhat.com>) id 1eFWW5-0000Ci-OQ
-	for qemu-devel@nongnu.org; Thu, 16 Nov 2017 21:36:29 -0500
-References: <1510834806-25666-1-git-send-email-jasowang@redhat.com>
+	(envelope-from <jasowang@redhat.com>) id 1eFWeJ-0007DI-9s
+	for qemu-devel@nongnu.org; Thu, 16 Nov 2017 21:45:04 -0500
+References: <1510867014-13423-1-git-send-email-thuth@redhat.com>
 From: Jason Wang <jasowang@redhat.com>
-Message-ID: <f21fa42d-f410-05f8-3a08-fa0093ef898b@redhat.com>
-Date: Fri, 17 Nov 2017 10:36:16 +0800
+Message-ID: <03577b95-7387-6fc6-edfd-16aa78ecbd36@redhat.com>
+Date: Fri, 17 Nov 2017 10:44:51 +0800
 MIME-Version: 1.0
-In-Reply-To: <1510834806-25666-1-git-send-email-jasowang@redhat.com>
+In-Reply-To: <1510867014-13423-1-git-send-email-thuth@redhat.com>
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH] Revert "Add new PCI ID for i82559a"
+Subject: Re: [Qemu-devel] [PATCH for-2.11] hw/net/eepro100: Fix endianness
+ problem on big endian hosts
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,130 +24,45 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: mst@redhat.com, marcel@redhat.com, qemu-devel@nongnu.org
-Cc: Stefan Weil <sw@weilnetz.de>, Michael Nawrocki <michael.nawrocki@gtri.gatech.edu>, Peter Maydell <peter.maydell@linaro.org>
+To: Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org
+Cc: Stefan Weil <sw@weilnetz.de>, Michael Nawrocki <michael.nawrocki@gtri.gatech.edu>, mst@redhat.com, qemu-s390x@nongnu.org
 
 
 
-On 2017=E5=B9=B411=E6=9C=8816=E6=97=A5 20:20, Jason Wang wrote:
-> This reverts commit 5e89dc01133f8f5e621f6b66b356c6f37d31dafb since:
+On 2017=E5=B9=B411=E6=9C=8817=E6=97=A5 05:16, Thomas Huth wrote:
+> Since commit 1865e288a823c764cd4344d ("Fix eepro100 simple transmission
+> mode"), the test/pxe-test is broken for the eepro100 device on big
+> endian hosts. However, it seems like that commit did not introduce the
+> problem, but just uncovered it: The EEPRO100State->tx.tbd_array_addr an=
+d
+> EEPRO100State->tx.tcb_bytes fields are already in host byte order, sinc=
+e
+> they have already been byte-swapped in the read_cb() function.
+> Thus byte-swapping them in tx_command() again results in the wrong
+> endianness. Removing the byte-swapping here fixes the pxe-test.
 >
-> - we should use ID in the spec instead the one used by OEM
-> - in the future, we should allow changing id through either property
->    or EEPROM file.
->
-> Cc: Stefan Weil <sw@weilnetz.de>
-> Cc: Michael Nawrocki <michael.nawrocki@gtri.gatech.edu>
-> Cc: Peter Maydell <peter.maydell@linaro.org>
-> Cc: Michael S. Tsirkin <mst@redhat.com>
-> Signed-off-by: Jason Wang <jasowang@redhat.com>
+> Signed-off-by: Thomas Huth <thuth@redhat.com>
 > ---
->   hw/net/eepro100.c    | 13 -------------
->   include/hw/compat.h  |  4 ----
->   include/hw/pci/pci.h |  1 -
->   qemu-options.hx      |  2 +-
->   4 files changed, 1 insertion(+), 19 deletions(-)
+>   hw/net/eepro100.c | 4 ++--
+>   1 file changed, 2 insertions(+), 2 deletions(-)
 >
 > diff --git a/hw/net/eepro100.c b/hw/net/eepro100.c
-> index a63ed2c..91dd058 100644
+> index a63ed2c..03e00f7 100644
 > --- a/hw/net/eepro100.c
 > +++ b/hw/net/eepro100.c
-> @@ -132,7 +132,6 @@ typedef struct {
->       const char *name;
->       const char *desc;
->       uint16_t device_id;
-> -    uint16_t alt_device_id;
->       uint8_t revision;
->       uint16_t subsystem_vendor_id;
->       uint16_t subsystem_id;
-> @@ -277,7 +276,6 @@ typedef struct {
->       /* Quasi static device properties (no need to save them). */
->       uint16_t stats_size;
->       bool has_extended_tcb_support;
-> -    bool use_alt_device_id;
->   } EEPRO100State;
+> @@ -756,8 +756,8 @@ static void read_cb(EEPRO100State *s)
 >  =20
->   /* Word indices in EEPROM. */
-> @@ -1857,14 +1855,6 @@ static void e100_nic_realize(PCIDevice *pci_dev,=
- Error **errp)
->  =20
->       TRACE(OTHER, logout("\n"));
->  =20
-> -    /* By default, the i82559a adapter uses the legacy PCI ID (for the
-> -     * i82557). This allows the PCI ID to be changed to the alternate
-> -     * i82559 ID if needed.
-> -     */
-> -    if (s->use_alt_device_id && strcmp(info->name, "i82559a") =3D=3D 0=
-) {
-> -        pci_config_set_device_id(s->dev.config, info->alt_device_id);
-> -    }
-> -
->       s->device =3D info->device;
->  =20
->       e100_pci_reset(s, &local_err);
-> @@ -1984,7 +1974,6 @@ static E100PCIDeviceInfo e100_devices[] =3D {
->           .desc =3D "Intel i82559A Ethernet",
->           .device =3D i82559A,
->           .device_id =3D PCI_DEVICE_ID_INTEL_82557,
-> -        .alt_device_id =3D PCI_DEVICE_ID_INTEL_82559,
->           .revision =3D 0x06,
->           .stats_size =3D 80,
->           .has_extended_tcb_support =3D true,
-> @@ -2078,8 +2067,6 @@ static E100PCIDeviceInfo *eepro100_get_class(EEPR=
-O100State *s)
->  =20
->   static Property e100_properties[] =3D {
->       DEFINE_NIC_PROPERTIES(EEPRO100State, conf),
-> -    DEFINE_PROP_BOOL("x-use-alt-device-id", EEPRO100State, use_alt_dev=
-ice_id,
-> -                     true),
->       DEFINE_PROP_END_OF_LIST(),
->   };
->  =20
-> diff --git a/include/hw/compat.h b/include/hw/compat.h
-> index f96212c..cf389b4 100644
-> --- a/include/hw/compat.h
-> +++ b/include/hw/compat.h
-> @@ -10,10 +10,6 @@
->           .driver   =3D "virtio-tablet-device",\
->           .property =3D "wheel-axis",\
->           .value    =3D "false",\
-> -    },{\
-> -        .driver   =3D "i82559a",\
-> -        .property =3D "x-use-alt-device-id",\
-> -        .value    =3D "false",\
->       },
->  =20
->   #define HW_COMPAT_2_9 \
-> diff --git a/include/hw/pci/pci.h b/include/hw/pci/pci.h
-> index f30e2cf..8d02a0a 100644
-> --- a/include/hw/pci/pci.h
-> +++ b/include/hw/pci/pci.h
-> @@ -70,7 +70,6 @@ extern bool pci_available;
->   /* Intel (0x8086) */
->   #define PCI_DEVICE_ID_INTEL_82551IT      0x1209
->   #define PCI_DEVICE_ID_INTEL_82557        0x1229
-> -#define PCI_DEVICE_ID_INTEL_82559        0x1030
->   #define PCI_DEVICE_ID_INTEL_82801IR      0x2922
->  =20
->   /* Red Hat / Qumranet (for QEMU) -- see pci-ids.txt */
-> diff --git a/qemu-options.hx b/qemu-options.hx
-> index a39c7e4..3728e9b 100644
-> --- a/qemu-options.hx
-> +++ b/qemu-options.hx
-> @@ -2047,7 +2047,7 @@ that the card should have; this option currently =
-only affects virtio cards; set
->   @var{v} =3D 0 to disable MSI-X. If no @option{-net} option is specifi=
-ed, a single
->   NIC is created.  QEMU can emulate several different models of network=
- card.
->   Valid values for @var{type} are
-> -@code{virtio}, @code{i82551}, @code{i82557b}, @code{i82559a}, @code{i8=
-2559er},
-> +@code{virtio}, @code{i82551}, @code{i82557b}, @code{i82559er},
->   @code{ne2k_pci}, @code{ne2k_isa}, @code{pcnet}, @code{rtl8139},
->   @code{e1000}, @code{smc91c111}, @code{lance} and @code{mcf_fec}.
->   Not all devices are supported on all targets.  Use @code{-net nic,mod=
-el=3Dhelp}
+>   static void tx_command(EEPRO100State *s)
+>   {
+> -    uint32_t tbd_array =3D le32_to_cpu(s->tx.tbd_array_addr);
+> -    uint16_t tcb_bytes =3D (le16_to_cpu(s->tx.tcb_bytes) & 0x3fff);
+> +    uint32_t tbd_array =3D s->tx.tbd_array_addr;
+> +    uint16_t tcb_bytes =3D s->tx.tcb_bytes & 0x3fff;
+>       /* Sends larger than MAX_ETH_FRAME_SIZE are allowed, up to 2600 b=
+ytes. */
+>       uint8_t buf[2600];
+>       uint16_t size =3D 0;
 
-Applied, thanks.
+Applied.
+
+Thanks
