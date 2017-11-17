@@ -1,17 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46645)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49418)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1eFis2-0003HX-Ia
-	for qemu-devel@nongnu.org; Fri, 17 Nov 2017 10:48:02 -0500
+	(envelope-from <mreitz@redhat.com>) id 1eFizT-0006C8-RS
+	for qemu-devel@nongnu.org; Fri, 17 Nov 2017 10:55:40 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1eFis1-0008CK-DB
-	for qemu-devel@nongnu.org; Fri, 17 Nov 2017 10:47:58 -0500
-From: Kevin Wolf <kwolf@redhat.com>
-Date: Fri, 17 Nov 2017 16:47:39 +0100
-Message-Id: <20171117154739.32565-3-kwolf@redhat.com>
-In-Reply-To: <20171117154739.32565-1-kwolf@redhat.com>
+	(envelope-from <mreitz@redhat.com>) id 1eFizT-00024h-0p
+	for qemu-devel@nongnu.org; Fri, 17 Nov 2017 10:55:39 -0500
 References: <20171117154739.32565-1-kwolf@redhat.com>
-Subject: [Qemu-devel] [PATCH for-2.11 2/2] iotests: test clearing unknown
- autoclear_features by qcow2
+	<20171117154739.32565-2-kwolf@redhat.com>
+From: Max Reitz <mreitz@redhat.com>
+Message-ID: <3332fed1-d975-b5af-39f1-900702ecab0e@redhat.com>
+Date: Fri, 17 Nov 2017 16:55:27 +0100
+MIME-Version: 1.0
+In-Reply-To: <20171117154739.32565-2-kwolf@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="RbM7O7hG5BJKKXLhqQ8o2Js5uTWMG0gqO"
+Subject: Re: [Qemu-devel] [PATCH for-2.11 1/2] block: Fix permissions in
+ image activation
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -20,119 +25,57 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-block@nongnu.org
-Cc: kwolf@redhat.com, mreitz@redhat.com, eblake@redhat.com, vsementsov@virtuozzo.com, den@openvz.org, qemu-devel@nongnu.org
+To: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
+Cc: eblake@redhat.com, vsementsov@virtuozzo.com, den@openvz.org, qemu-devel@nongnu.org
 
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--RbM7O7hG5BJKKXLhqQ8o2Js5uTWMG0gqO
+From: Max Reitz <mreitz@redhat.com>
+To: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
+Cc: eblake@redhat.com, vsementsov@virtuozzo.com, den@openvz.org,
+ qemu-devel@nongnu.org
+Message-ID: <3332fed1-d975-b5af-39f1-900702ecab0e@redhat.com>
+Subject: Re: [PATCH for-2.11 1/2] block: Fix permissions in image activation
+References: <20171117154739.32565-1-kwolf@redhat.com>
+ <20171117154739.32565-2-kwolf@redhat.com>
+In-Reply-To: <20171117154739.32565-2-kwolf@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-Test clearing unknown autoclear_features by qcow2 on incoming
-migration.
+On 2017-11-17 16:47, Kevin Wolf wrote:
+> Inactive images generally request less permissions for their image file=
+s
+> than they would if they were active (in particular, write permissions).=
 
-[ kwolf: Fixed wait for destination VM startup ]
+> Activating the image involves extending the permissions, therefore.
+>=20
+> drv->bdrv_invalidate_cache() can already require write access to the
+> image file, so we have to update the permissions earlier than that.
+> The current code does it only later, so we have to move up this part.
+>=20
+> Signed-off-by: Kevin Wolf <kwolf@redhat.com>
+> ---
+>  block.c | 32 ++++++++++++++++++++++----------
+>  1 file changed, 22 insertions(+), 10 deletions(-)
 
-Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Signed-off-by: Kevin Wolf <kwolf@redhat.com>
----
- tests/qemu-iotests/196     | 66 ++++++++++++++++++++++++++++++++++++++++++++++
- tests/qemu-iotests/196.out |  5 ++++
- tests/qemu-iotests/group   |  1 +
- 3 files changed, 72 insertions(+)
- create mode 100755 tests/qemu-iotests/196
- create mode 100644 tests/qemu-iotests/196.out
+Reviewed-by: Max Reitz <mreitz@redhat.com>
 
-diff --git a/tests/qemu-iotests/196 b/tests/qemu-iotests/196
-new file mode 100755
-index 0000000000..4116ebc92b
---- /dev/null
-+++ b/tests/qemu-iotests/196
-@@ -0,0 +1,66 @@
-+#!/usr/bin/env python
-+#
-+# Test clearing unknown autoclear_features flag by qcow2 after
-+# migration. This test mimics migration to older qemu.
-+#
-+# Copyright (c) 2017 Parallels International GmbH
-+#
-+# This program is free software; you can redistribute it and/or modify
-+# it under the terms of the GNU General Public License as published by
-+# the Free Software Foundation; either version 2 of the License, or
-+# (at your option) any later version.
-+#
-+# This program is distributed in the hope that it will be useful,
-+# but WITHOUT ANY WARRANTY; without even the implied warranty of
-+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+# GNU General Public License for more details.
-+#
-+# You should have received a copy of the GNU General Public License
-+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
-+#
-+
-+import os
-+import iotests
-+from iotests import qemu_img
-+
-+disk = os.path.join(iotests.test_dir, 'disk')
-+migfile = os.path.join(iotests.test_dir, 'migfile')
-+
-+class TestInvalidateAutoclear(iotests.QMPTestCase):
-+
-+    def tearDown(self):
-+        self.vm_a.shutdown()
-+        self.vm_b.shutdown()
-+        os.remove(disk)
-+        os.remove(migfile)
-+
-+    def setUp(self):
-+        qemu_img('create', '-f', iotests.imgfmt, disk, '1M')
-+
-+        self.vm_a = iotests.VM(path_suffix='a').add_drive(disk)
-+        self.vm_a.launch()
-+
-+        self.vm_b = iotests.VM(path_suffix='b').add_drive(disk)
-+        self.vm_b.add_incoming("exec: cat '" + migfile + "'")
-+
-+    def test_migration(self):
-+        result = self.vm_a.qmp('migrate', uri='exec:cat>' + migfile)
-+        self.assert_qmp(result, 'return', {});
-+        self.assertNotEqual(self.vm_a.event_wait("STOP"), None)
-+
-+        with open(disk, 'r+b') as f:
-+            f.seek(88) # first byte of autoclear_features field
-+            f.write(b'\xff')
-+
-+        self.vm_b.launch()
-+        while True:
-+            result = self.vm_b.qmp('query-status')
-+            if result['return']['status'] == 'running':
-+                break
-+
-+        with open(disk, 'rb') as f:
-+            f.seek(88)
-+            self.assertEqual(f.read(1), b'\x00')
-+
-+if __name__ == '__main__':
-+    iotests.main(supported_fmts=['qcow2'])
-diff --git a/tests/qemu-iotests/196.out b/tests/qemu-iotests/196.out
-new file mode 100644
-index 0000000000..ae1213e6f8
---- /dev/null
-+++ b/tests/qemu-iotests/196.out
-@@ -0,0 +1,5 @@
-+.
-+----------------------------------------------------------------------
-+Ran 1 tests
-+
-+OK
-diff --git a/tests/qemu-iotests/group b/tests/qemu-iotests/group
-index 83b839bbe3..1fad602152 100644
---- a/tests/qemu-iotests/group
-+++ b/tests/qemu-iotests/group
-@@ -193,5 +193,6 @@
- 192 rw auto quick
- 194 rw auto migration quick
- 195 rw auto quick
-+196 rw auto quick
- 197 rw auto quick
- 198 rw auto
--- 
-2.13.6
+
+--RbM7O7hG5BJKKXLhqQ8o2Js5uTWMG0gqO
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQFGBAEBCAAwFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAloPBnASHG1yZWl0ekBy
+ZWRoYXQuY29tAAoJEPQH2wBh1c9AvZoH/3hmfowSeQA5dnRFhYrRTzxpXSyNyKT4
+uqugg2/Edq/4FeVTQ8nsRdbelEvpyAbpmLvfGPgf7oI8e/xd5g0c2QgmyGWQEoeK
+rj2nJej8/Q1abv2pBmeB2GP25TCsWXrexlHkmEMyRAX9ebxr+5ZEKBUgoQORmOrx
+EQ+z/b4cN0kuNyUoPHApv0dwemTnbUXWl1aaAwc0qKZqK1nZ6O10HHcAS1g4qPwf
+6Vz6sy+JZBq3dB3J9BNPvIU5weNv90HGlwdWqX3tOL8Zro64QCaiZ3hWl9oGwErO
+4NLeWJBnmuCUD3OTmAHOjLyoMDV3mNYRrDR2XryByVQy6MG7cktjThk=
+=gb46
+-----END PGP SIGNATURE-----
+
+--RbM7O7hG5BJKKXLhqQ8o2Js5uTWMG0gqO--
