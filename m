@@ -1,26 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46845)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51725)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <wei.w.wang@intel.com>) id 1eFf6I-0008Jn-Vp
-	for qemu-devel@nongnu.org; Fri, 17 Nov 2017 06:46:28 -0500
+	(envelope-from <kraxel@redhat.com>) id 1eFfOJ-00046K-Cv
+	for qemu-devel@nongnu.org; Fri, 17 Nov 2017 07:05:09 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <wei.w.wang@intel.com>) id 1eFf6F-0006sR-OG
-	for qemu-devel@nongnu.org; Fri, 17 Nov 2017 06:46:27 -0500
-Received: from mga05.intel.com ([192.55.52.43]:1298)
+	(envelope-from <kraxel@redhat.com>) id 1eFfOH-0006Xc-Us
+	for qemu-devel@nongnu.org; Fri, 17 Nov 2017 07:05:03 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:45436)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <wei.w.wang@intel.com>)
-	id 1eFf6F-0006qu-Ee
-	for qemu-devel@nongnu.org; Fri, 17 Nov 2017 06:46:23 -0500
-Message-ID: <5A0ECC95.7070300@intel.com>
-Date: Fri, 17 Nov 2017 19:48:37 +0800
-From: Wei Wang <wei.w.wang@intel.com>
-MIME-Version: 1.0
-References: <1509696786-1597-1-git-send-email-wei.w.wang@intel.com>	<1509696786-1597-7-git-send-email-wei.w.wang@intel.com>	<20171115220743-mutt-send-email-mst@kernel.org>
-	<5A0D923C.4020807@intel.com> <5A0EC967.5090407@intel.com>
-In-Reply-To: <5A0EC967.5090407@intel.com>
-Content-Type: text/plain; charset=windows-1252; format=flowed
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [virtio-dev] Re: [PATCH v17 6/6] virtio-balloon:
- VIRTIO_BALLOON_F_FREE_PAGE_VQ
+	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1eFfOH-0006Wt-N3
+	for qemu-devel@nongnu.org; Fri, 17 Nov 2017 07:05:01 -0500
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+	[10.5.11.15])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id E4437C04AC5D
+	for <qemu-devel@nongnu.org>; Fri, 17 Nov 2017 12:05:00 +0000 (UTC)
+From: Gerd Hoffmann <kraxel@redhat.com>
+Date: Fri, 17 Nov 2017 13:04:52 +0100
+Message-Id: <20171117120454.13507-3-kraxel@redhat.com>
+In-Reply-To: <20171117120454.13507-1-kraxel@redhat.com>
+References: <20171117120454.13507-1-kraxel@redhat.com>
+Subject: [Qemu-devel] [PATCH 2/4] ramfb: simple boot framebuffer living in
+ guest ram
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,105 +30,140 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: aarcange@redhat.com, virtio-dev@lists.oasis-open.org, kvm@vger.kernel.org, mawilcox@microsoft.com, qemu-devel@nongnu.org, amit.shah@redhat.com, penguin-kernel@I-love.SAKURA.ne.jp, linux-kernel@vger.kernel.org, willy@infradead.org, virtualization@lists.linux-foundation.org, linux-mm@kvack.org, yang.zhang.wz@gmail.com, quan.xu@aliyun.com, cornelia.huck@de.ibm.com, pbonzini@redhat.com, akpm@linux-foundation.org, mhocko@kernel.org, mgorman@techsingularity.net, liliang.opensource@gmail.com
+To: qemu-devel@nongnu.org
+Cc: =?UTF-8?q?L=C3=A1szl=C3=B3=20=C3=89rsek?= <lersek@redhat.com>, Alex Williamson <alex.williamson@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>
 
-On 11/17/2017 07:35 PM, Wei Wang wrote:
-> On 11/16/2017 09:27 PM, Wei Wang wrote:
->> On 11/16/2017 04:32 AM, Michael S. Tsirkin wrote:
->>> On Fri, Nov 03, 2017 at 04:13:06PM +0800, Wei Wang wrote:
->>>> Negotiation of the VIRTIO_BALLOON_F_FREE_PAGE_VQ feature indicates the
->>>> support of reporting hints of guest free pages to the host via
->>>> virtio-balloon. The host requests the guest to report the free 
->>>> pages by
->>>> sending commands via the virtio-balloon configuration registers.
->>>>
->>>> When the guest starts to report, the first element added to the 
->>>> free page
->>>> vq is a sequence id of the start reporting command. The id is given by
->>>> the host, and it indicates whether the following free pages correspond
->>>> to the command. For example, the host may stop the report and start 
->>>> again
->>>> with a new command id. The obsolete pages for the previous start 
->>>> command
->>>> can be detected by the id dismatching on the host. The id is added 
->>>> to the
->>>> vq using an output buffer, and the free pages are added to the vq 
->>>> using
->>>> input buffer.
->>>>
->>>> Here are some explainations about the added configuration registers:
->>>> - host2guest_cmd: a register used by the host to send commands to the
->>>> guest.
->>>> - guest2host_cmd: written by the guest to ACK to the host about the
->>>> commands that have been received. The host will clear the 
->>>> corresponding
->>>> bits on the host2guest_cmd register. The guest also uses this register
->>>> to send commands to the host (e.g. when finish free page reporting).
->>>> - free_page_cmd_id: the sequence id of the free page report command
->>>> given by the host.
->>>>
->>>> Signed-off-by: Wei Wang <wei.w.wang@intel.com>
->>>> Signed-off-by: Liang Li <liang.z.li@intel.com>
->>>> Cc: Michael S. Tsirkin <mst@redhat.com>
->>>> Cc: Michal Hocko <mhocko@kernel.org>
->>>> ---
->>>>
->>>> +
->>>> +static void report_free_page(struct work_struct *work)
->>>> +{
->>>> +    struct virtio_balloon *vb;
->>>> +
->>>> +    vb = container_of(work, struct virtio_balloon, 
->>>> report_free_page_work);
->>>> +    report_free_page_cmd_id(vb);
->>>> +    walk_free_mem_block(vb, 0, &virtio_balloon_send_free_pages);
->>>> +    /*
->>>> +     * The last few free page blocks that were added may not reach 
->>>> the
->>>> +     * batch size, but need a kick to notify the device to handle 
->>>> them.
->>>> +     */
->>>> +    virtqueue_kick(vb->free_page_vq);
->>>> +    report_free_page_end(vb);
->>>> +}
->>>> +
->>> I think there's an issue here: if pages are poisoned and hypervisor
->>> subsequently drops them, testing them after allocation will
->>> trigger a false positive.
->>>
->>> The specific configuration:
->>>
->>> PAGE_POISONING on
->>> PAGE_POISONING_NO_SANITY off
->>> PAGE_POISONING_ZERO off
->>>
->>>
->>> Solutions:
->>> 1. disable the feature in that configuration
->>>     suggested as an initial step
->>
->> Thanks for the finding.
->> Similar to this option: I'm thinking could we make 
->> walk_free_mem_block() simply return if that option is on?
->> That is, at the beginning of the function:
->>     if (!page_poisoning_enabled())
->>                 return;
->>
->
->
-> Thought about it more, I think it would be better to put this logic to 
-> virtio_balloon:
->
->         send_free_page_cmd_id(vb, &vb->start_cmd_id);
->         if (page_poisoning_enabled() &&
->             !IS_ENABLED(CONFIG_PAGE_POISONING_NO_SANITY))
->                 walk_free_mem_block(vb, 0, 
-> &virtio_balloon_send_free_pages);
+---
+ include/hw/display/ramfb.h |  8 ++++
+ hw/display/ramfb.c         | 94 ++++++++++++++++++++++++++++++++++++++++++++++
+ hw/display/Makefile.objs   |  2 +
+ 3 files changed, 104 insertions(+)
+ create mode 100644 include/hw/display/ramfb.h
+ create mode 100644 hw/display/ramfb.c
 
-logic should be inverse:
-     if (!(page_poisoning_enabled() &&
-             !IS_ENABLED(CONFIG_PAGE_POISONING_NO_SANITY)))
-
-Best,
-Wei
+diff --git a/include/hw/display/ramfb.h b/include/hw/display/ramfb.h
+new file mode 100644
+index 0000000000..f3a772e99e
+--- /dev/null
++++ b/include/hw/display/ramfb.h
+@@ -0,0 +1,8 @@
++#ifndef RAMFB_H
++#define RAMFB_H
++
++typedef struct RAMFBState RAMFBState;
++void ramfb_display_update(QemuConsole *con, RAMFBState *s);
++RAMFBState *ramfb_setup(Error **errp);
++
++#endif /* RAMFB_H */
+diff --git a/hw/display/ramfb.c b/hw/display/ramfb.c
+new file mode 100644
+index 0000000000..bed5964ed8
+--- /dev/null
++++ b/hw/display/ramfb.c
+@@ -0,0 +1,94 @@
++/*
++ * early boot framebuffer in guest ram
++ * configured using fw_cfg
++ *
++ * Copyright Red Hat, Inc. 2017
++ *
++ * Author:
++ *     Gerd Hoffmann <kraxel@redhat.com>
++ *
++ * This work is licensed under the terms of the GNU GPL, version 2 or later.
++ * See the COPYING file in the top-level directory.
++ */
++#include "qemu/osdep.h"
++#include "qapi/error.h"
++#include "hw/loader.h"
++#include "hw/display/ramfb.h"
++#include "ui/console.h"
++#include "sysemu/sysemu.h"
++
++struct RAMFBCfg {
++    uint64_t addr;
++    uint32_t fourcc;
++    uint32_t flags;
++    uint32_t width;
++    uint32_t height;
++    uint32_t stride;
++};
++
++struct RAMFBState {
++    DisplaySurface *ds;
++    uint32_t width, height;
++    struct RAMFBCfg cfg;
++};
++
++static void ramfb_fw_cfg_write(void *dev, off_t offset, size_t len)
++{
++    RAMFBState *s = dev;
++    void *framebuffer;
++    uint32_t stride;
++    hwaddr addr, length;
++
++    s->width  = be32_to_cpu(s->cfg.width);
++    s->height = be32_to_cpu(s->cfg.height);
++    stride    = be32_to_cpu(s->cfg.stride);
++    addr      = be64_to_cpu(s->cfg.addr);
++    length    = stride * s->height;
++
++    fprintf(stderr, "%s: %dx%d @ 0x%" PRIx64 "\n", __func__,
++            s->width, s->height, addr);
++    framebuffer = address_space_map(&address_space_memory,
++                                    addr, &length, false);
++    if (!framebuffer || length < stride * s->height) {
++        s->width = 0;
++        s->height = 0;
++        return;
++    }
++    s->ds = qemu_create_displaysurface_from(s->width, s->height,
++                                            PIXMAN_x8r8g8b8 /* FIXME */,
++                                            stride, framebuffer);
++}
++
++void ramfb_display_update(QemuConsole *con, RAMFBState *s)
++{
++    if (!s->width || !s->height) {
++        return;
++    }
++
++    if (s->ds) {
++        dpy_gfx_replace_surface(con, s->ds);
++        s->ds = NULL;
++    }
++
++    /* simple full screen update */
++    dpy_gfx_update(con, 0, 0, s->width, s->height);
++}
++
++RAMFBState *ramfb_setup(Error **errp)
++{
++    FWCfgState *fw_cfg = fw_cfg_find();
++    RAMFBState *s;
++
++    if (!fw_cfg || !fw_cfg->dma_enabled) {
++        error_setg(errp, "ramfb device requires fw_cfg with DMA");
++        return NULL;
++    }
++
++    s = g_new0(RAMFBState, 1);
++
++    rom_add_vga("vgabios-ramfb.bin");
++    fw_cfg_add_file_callback(fw_cfg, "etc/ramfb",
++                             NULL, ramfb_fw_cfg_write, s,
++                             &s->cfg, sizeof(s->cfg), false);
++    return s;
++}
+diff --git a/hw/display/Makefile.objs b/hw/display/Makefile.objs
+index 551c050a6a..4e8ff48b55 100644
+--- a/hw/display/Makefile.objs
++++ b/hw/display/Makefile.objs
+@@ -1,3 +1,5 @@
++common-obj-y += ramfb.o
++
+ common-obj-$(CONFIG_ADS7846) += ads7846.o
+ common-obj-$(CONFIG_VGA_CIRRUS) += cirrus_vga.o
+ common-obj-$(CONFIG_G364FB) += g364fb.o
+-- 
+2.9.3
