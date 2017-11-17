@@ -1,22 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52384)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52733)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1eFj81-0000z9-50
-	for qemu-devel@nongnu.org; Fri, 17 Nov 2017 11:04:30 -0500
+	(envelope-from <eblake@redhat.com>) id 1eFj92-0001ep-Jj
+	for qemu-devel@nongnu.org; Fri, 17 Nov 2017 11:05:35 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1eFj7z-00041K-Qq
-	for qemu-devel@nongnu.org; Fri, 17 Nov 2017 11:04:29 -0500
-References: <20171117154739.32565-1-kwolf@redhat.com>
-	<20171117154739.32565-3-kwolf@redhat.com>
-From: Max Reitz <mreitz@redhat.com>
-Message-ID: <813f3819-077a-b433-70fc-6582a23eb11f@redhat.com>
-Date: Fri, 17 Nov 2017 17:04:14 +0100
+	(envelope-from <eblake@redhat.com>) id 1eFj8y-0005Ey-JJ
+	for qemu-devel@nongnu.org; Fri, 17 Nov 2017 11:05:32 -0500
+References: <20170628120530.31251-1-vsementsov@virtuozzo.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <fb5c092b-9db5-c5bf-3f61-9317a6371168@redhat.com>
+Date: Fri, 17 Nov 2017 10:04:56 -0600
 MIME-Version: 1.0
-In-Reply-To: <20171117154739.32565-3-kwolf@redhat.com>
+In-Reply-To: <20170628120530.31251-1-vsementsov@virtuozzo.com>
 Content-Type: multipart/signed; micalg=pgp-sha256;
 	protocol="application/pgp-signature";
-	boundary="qGM7oSA3MG3la4oGJvFBWQ2gG3wlEtanE"
-Subject: Re: [Qemu-devel] [PATCH for-2.11 2/2] iotests: test clearing
- unknown autoclear_features by qcow2
+	boundary="NNltnbLu9wsrxn05TilM6Cmg1fWjsx0HH"
+Subject: Re: [Qemu-devel] [PATCH v22 00/30] qcow2: persistent dirty bitmaps
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,167 +23,103 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
-Cc: eblake@redhat.com, vsementsov@virtuozzo.com, den@openvz.org, qemu-devel@nongnu.org
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org
+Cc: kwolf@redhat.com, mreitz@redhat.com, armbru@redhat.com, jsnow@redhat.com, famz@redhat.com, den@openvz.org, stefanha@redhat.com, pbonzini@redhat.com
 
 This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---qGM7oSA3MG3la4oGJvFBWQ2gG3wlEtanE
-From: Max Reitz <mreitz@redhat.com>
-To: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
-Cc: eblake@redhat.com, vsementsov@virtuozzo.com, den@openvz.org,
- qemu-devel@nongnu.org
-Message-ID: <813f3819-077a-b433-70fc-6582a23eb11f@redhat.com>
-Subject: Re: [PATCH for-2.11 2/2] iotests: test clearing unknown
- autoclear_features by qcow2
-References: <20171117154739.32565-1-kwolf@redhat.com>
- <20171117154739.32565-3-kwolf@redhat.com>
-In-Reply-To: <20171117154739.32565-3-kwolf@redhat.com>
+--NNltnbLu9wsrxn05TilM6Cmg1fWjsx0HH
+From: Eric Blake <eblake@redhat.com>
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+ qemu-block@nongnu.org, qemu-devel@nongnu.org
+Cc: kwolf@redhat.com, mreitz@redhat.com, armbru@redhat.com, jsnow@redhat.com,
+ famz@redhat.com, den@openvz.org, stefanha@redhat.com, pbonzini@redhat.com
+Message-ID: <fb5c092b-9db5-c5bf-3f61-9317a6371168@redhat.com>
+Subject: Re: [PATCH v22 00/30] qcow2: persistent dirty bitmaps
+References: <20170628120530.31251-1-vsementsov@virtuozzo.com>
+In-Reply-To: <20170628120530.31251-1-vsementsov@virtuozzo.com>
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
 
-On 2017-11-17 16:47, Kevin Wolf wrote:
-> From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Revisiting an old series:
+
+On 06/28/2017 07:05 AM, Vladimir Sementsov-Ogievskiy wrote:
+> Hi all!
 >=20
-> Test clearing unknown autoclear_features by qcow2 on incoming
-> migration.
+> There is a new update of qcow2-bitmap series - v22.
 >=20
-> [ kwolf: Fixed wait for destination VM startup ]
+> web: https://src.openvz.org/users/vsementsov/repos/qemu/browse?at=3Dqco=
+w2-bitmap-v22
+> git: https://src.openvz.org/scm/~vsementsov/qemu.git (tag qcow2-bitmap-=
+v22)
 >=20
-> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-> Signed-off-by: Kevin Wolf <kwolf@redhat.com>
-> ---
->  tests/qemu-iotests/196     | 66 ++++++++++++++++++++++++++++++++++++++=
+> v22:
+>=20
+> Rebase on master, so changes, mostly related to new dirty bitmaps mutex=
+:
+>=20
+
+>   qcow2: add persistent dirty bitmaps support
+
+>=20
+>  block.c                      |   65 +-
+>  block/Makefile.objs          |    2 +-
+>  block/dirty-bitmap.c         |  154 ++++-
+>  block/io.c                   |    8 +
+>  block/qcow2-bitmap.c         | 1481 ++++++++++++++++++++++++++++++++++=
 ++++++++
->  tests/qemu-iotests/196.out |  5 ++++
->  tests/qemu-iotests/group   |  1 +
->  3 files changed, 72 insertions(+)
->  create mode 100755 tests/qemu-iotests/196
->  create mode 100644 tests/qemu-iotests/196.out
->=20
-> diff --git a/tests/qemu-iotests/196 b/tests/qemu-iotests/196
-> new file mode 100755
-> index 0000000000..4116ebc92b
-> --- /dev/null
-> +++ b/tests/qemu-iotests/196
-> @@ -0,0 +1,66 @@
-> +#!/usr/bin/env python
-> +#
-> +# Test clearing unknown autoclear_features flag by qcow2 after
-> +# migration. This test mimics migration to older qemu.
-> +#
-> +# Copyright (c) 2017 Parallels International GmbH
-> +#
-> +# This program is free software; you can redistribute it and/or modify=
+>  block/qcow2-refcount.c       |   59 +-
+>  block/qcow2.c                |  155 ++++-
+>  block/qcow2.h                |   43 ++
+>  blockdev.c                   |   73 ++-
+>  docs/interop/qcow2.txt       |    8 +-
+>  include/block/block.h        |    3 +
+>  include/block/block_int.h    |   14 +
+>  include/block/dirty-bitmap.h |   22 +-
+>  include/qemu/hbitmap.h       |   49 +-
+>  qapi/block-core.json         |   42 +-
+>  tests/Makefile.include       |    2 +-
+>  tests/qemu-iotests/165       |  105 +++
+>  tests/qemu-iotests/165.out   |    5 +
+>  tests/qemu-iotests/group     |    1 +
+>  tests/test-hbitmap.c         |   19 +
+>  util/hbitmap.c               |   51 +-
+>  21 files changed, 2280 insertions(+), 81 deletions(-)
 
-> +# it under the terms of the GNU General Public License as published by=
+Nothing in this series touched qemu-img.  At the very minimum, it would
+be nice if 'qemu-img info' were to display a summary of all bitmaps in
+the qcow2 file; the QMP type ImageInfoSpecificQCow2 should be updated to
+mention this information, and qemu-img updated to output it.  Being able
+to create and remove persistent bitmaps from an at-rest qcow2 file
+without having to fire up qemu to issue QMP commands to do so would also
+be nice.
 
-> +# the Free Software Foundation; either version 2 of the License, or
-> +# (at your option) any later version.
-> +#
-> +# This program is distributed in the hope that it will be useful,
-> +# but WITHOUT ANY WARRANTY; without even the implied warranty of
-> +# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-> +# GNU General Public License for more details.
-> +#
-> +# You should have received a copy of the GNU General Public License
-> +# along with this program.  If not, see <http://www.gnu.org/licenses/>=
-=2E
-> +#
-> +
-> +import os
-> +import iotests
-> +from iotests import qemu_img
-> +
-> +disk =3D os.path.join(iotests.test_dir, 'disk')
-> +migfile =3D os.path.join(iotests.test_dir, 'migfile')
-> +
-> +class TestInvalidateAutoclear(iotests.QMPTestCase):
-> +
-> +    def tearDown(self):
-> +        self.vm_a.shutdown()
-> +        self.vm_b.shutdown()
-> +        os.remove(disk)
-> +        os.remove(migfile)
-> +
-> +    def setUp(self):
-> +        qemu_img('create', '-f', iotests.imgfmt, disk, '1M')
-> +
-> +        self.vm_a =3D iotests.VM(path_suffix=3D'a').add_drive(disk)
-> +        self.vm_a.launch()
-> +
-> +        self.vm_b =3D iotests.VM(path_suffix=3D'b').add_drive(disk)
-> +        self.vm_b.add_incoming("exec: cat '" + migfile + "'")
-> +
-> +    def test_migration(self):
-> +        result =3D self.vm_a.qmp('migrate', uri=3D'exec:cat>' + migfil=
-e)
-> +        self.assert_qmp(result, 'return', {});
-> +        self.assertNotEqual(self.vm_a.event_wait("STOP"), None)
-> +
-> +        with open(disk, 'r+b') as f:
-> +            f.seek(88) # first byte of autoclear_features field
-> +            f.write(b'\xff')
-> +
-> +        self.vm_b.launch()
-> +        while True:
-> +            result =3D self.vm_b.qmp('query-status')
-> +            if result['return']['status'] =3D=3D 'running':
-> +                break
-> +
-> +        with open(disk, 'rb') as f:
-> +            f.seek(88)
-> +            self.assertEqual(f.read(1), b'\x00')
+It's a bit late for getting this request into 2.12, but had it been
+available, it would make my work at testing that 'qemu-img commit'
+doesn't corrupt persistent bitmaps.
 
-I guess I'd rather shutdown the VM first and do the check then, but
-since the header is updated on-disk when opening the qcow2 file...
-
-Reviewed-by: Max Reitz <mreitz@redhat.com>
-
-> +
-> +if __name__ =3D=3D '__main__':
-> +    iotests.main(supported_fmts=3D['qcow2'])
-> diff --git a/tests/qemu-iotests/196.out b/tests/qemu-iotests/196.out
-> new file mode 100644
-> index 0000000000..ae1213e6f8
-> --- /dev/null
-> +++ b/tests/qemu-iotests/196.out
-> @@ -0,0 +1,5 @@
-> +.
-> +----------------------------------------------------------------------=
-
-> +Ran 1 tests
-> +
-> +OK
-> diff --git a/tests/qemu-iotests/group b/tests/qemu-iotests/group
-> index 83b839bbe3..1fad602152 100644
-> --- a/tests/qemu-iotests/group
-> +++ b/tests/qemu-iotests/group
-> @@ -193,5 +193,6 @@
->  192 rw auto quick
->  194 rw auto migration quick
->  195 rw auto quick
-> +196 rw auto quick
->  197 rw auto quick
->  198 rw auto
->=20
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
 
 
-
---qGM7oSA3MG3la4oGJvFBWQ2gG3wlEtanE
+--NNltnbLu9wsrxn05TilM6Cmg1fWjsx0HH
 Content-Type: application/pgp-signature; name="signature.asc"
 Content-Description: OpenPGP digital signature
 Content-Disposition: attachment; filename="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
 
-iQFGBAEBCAAwFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAloPCH4SHG1yZWl0ekBy
-ZWRoYXQuY29tAAoJEPQH2wBh1c9AaEQH/ivmzBgzK6XYJ5wUfFrJAGKYStPDky4J
-8ZJwNiFG0HGe4tKmh3jaqfcAb2h25PVTLbo8o7+kwo7FB0cp/YjVayFPeTR2omJI
-Wj5B2jcUqaVDQ6UDm/tLo0UGN9BiZI5YgDZ19LHqIaKWKEST+ZTS9gMLNHN104VP
-KM5q8lwMHoLdEPoPA+6gWi74MKZQPka5gp/pusRMKUckMuKju6KNIwjEK+wYWYQo
-4+zfFIaXuc8f2EXX+7gLjNm/nsDuIcsUQIr8nMZXZL4KBnRJn/g6RnE+pfvuvXBQ
-CXBmYlsKkXpkhxhdQCLKQwTxZHXuvzQrDVUNPumIqyjgP1X/MvNfaEg=
-=oNSz
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAloPCKkACgkQp6FrSiUn
+Q2olJggAoiSz9LR6xuaydwzMolp7KkxnWUpE2Ebacvq5yAjiRYc/gUHiPJbtnKmL
+uaNFLav2gzR5Agi+DdNzvidIO96AWMVLTSOU17X9rDmBJzl384IPmA46JIkQyJoT
+LBnGpNLB+x/1lo+tNYyCDmlwN/DLDnNwkvw3DX+7yT6Q5ekZhaokT+FVwYtOTopl
+usJVRKjTArf9tJeBhptrnYvnmot+FbQ3eXzJWI041fmJYznQP58PrJDfQBj7Wfsa
+ZSmaekkFQfPnFWZVBu9ESa8go7D36CDjoqMlIXXRsctO1BDrV51XgJnabqwfu0gv
+Ihc/2qd3Mai7M1QUvd86yev1o0Jgkw==
+=oHnI
 -----END PGP SIGNATURE-----
 
---qGM7oSA3MG3la4oGJvFBWQ2gG3wlEtanE--
+--NNltnbLu9wsrxn05TilM6Cmg1fWjsx0HH--
