@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42856)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42980)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1eFlCU-0001Ad-2h
-	for qemu-devel@nongnu.org; Fri, 17 Nov 2017 13:17:16 -0500
+	(envelope-from <kwolf@redhat.com>) id 1eFlCY-0001Ht-86
+	for qemu-devel@nongnu.org; Fri, 17 Nov 2017 13:17:19 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1eFlCP-0002Fw-PV
-	for qemu-devel@nongnu.org; Fri, 17 Nov 2017 13:17:13 -0500
+	(envelope-from <kwolf@redhat.com>) id 1eFlCW-0002Ow-Rt
+	for qemu-devel@nongnu.org; Fri, 17 Nov 2017 13:17:18 -0500
 From: Kevin Wolf <kwolf@redhat.com>
-Date: Fri, 17 Nov 2017 19:16:34 +0100
-Message-Id: <20171117181653.20651-7-kwolf@redhat.com>
+Date: Fri, 17 Nov 2017 19:16:41 +0100
+Message-Id: <20171117181653.20651-14-kwolf@redhat.com>
 In-Reply-To: <20171117181653.20651-1-kwolf@redhat.com>
 References: <20171117181653.20651-1-kwolf@redhat.com>
-Subject: [Qemu-devel] [PULL 06/25] qcow2: fix image corruption after
- committing qcow2 image into base
+Subject: [Qemu-devel] [PULL 13/25] block: qobject_is_equal() in
+ bdrv_reopen_prepare()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,315 +23,69 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org
 Cc: kwolf@redhat.com, qemu-devel@nongnu.org
 
-From: "Daniel P. Berrange" <berrange@redhat.com>
+From: Max Reitz <mreitz@redhat.com>
 
-After committing the qcow2 image contents into the base image, qemu-img
-will call bdrv_make_empty to drop the payload in the layered image.
+Currently, bdrv_reopen_prepare() assumes that all BDS options are
+strings. However, this is not the case if the BDS has been created
+through the json: pseudo-protocol or blockdev-add.
 
-When this is done for qcow2 images, it blows away the LUKS encryption
-header, making the resulting image unusable. There are two codepaths
-for emptying a qcow2 image, and the second (slower) codepath leaves
-the LUKS header intact, so force use of that codepath.
+Note that the user-invokable reopen command is an HMP command, so you
+can only specify strings there. Therefore, specifying a non-string
+option with the "same" value as it was when originally created will now
+return an error because the values are supposedly similar (and there is
+no way for the user to circumvent this but to just not specify the
+option again -- however, this is still strictly better than just
+crashing).
 
+Signed-off-by: Max Reitz <mreitz@redhat.com>
 Reviewed-by: Eric Blake <eblake@redhat.com>
-Signed-off-by: Daniel P. Berrange <berrange@redhat.com>
-Signed-off-by: Kevin Wolf <kwolf@redhat.com>
+Message-id: 20171114180128.17076-5-mreitz@redhat.com
+Signed-off-by: Max Reitz <mreitz@redhat.com>
 ---
- block/qcow2.c                    |   6 +-
- tests/qemu-iotests/198           | 104 ++++++++++++++++++++++++++++++++
- tests/qemu-iotests/198.out       | 126 +++++++++++++++++++++++++++++++++++++++
- tests/qemu-iotests/common.filter |   4 +-
- tests/qemu-iotests/group         |   1 +
- 5 files changed, 238 insertions(+), 3 deletions(-)
- create mode 100755 tests/qemu-iotests/198
- create mode 100644 tests/qemu-iotests/198.out
+ block.c | 29 ++++++++++++++++++-----------
+ 1 file changed, 18 insertions(+), 11 deletions(-)
 
-diff --git a/block/qcow2.c b/block/qcow2.c
-index 92e5d548e3..e9a86b7443 100644
---- a/block/qcow2.c
-+++ b/block/qcow2.c
-@@ -3601,12 +3601,14 @@ static int qcow2_make_empty(BlockDriverState *bs)
-     l1_clusters = DIV_ROUND_UP(s->l1_size, s->cluster_size / sizeof(uint64_t));
+diff --git a/block.c b/block.c
+index 752fe6192b..70c6d7cf94 100644
+--- a/block.c
++++ b/block.c
+@@ -3074,19 +3074,26 @@ int bdrv_reopen_prepare(BDRVReopenState *reopen_state, BlockReopenQueue *queue,
+         const QDictEntry *entry = qdict_first(reopen_state->options);
  
-     if (s->qcow_version >= 3 && !s->snapshots &&
--        3 + l1_clusters <= s->refcount_block_size) {
-+        3 + l1_clusters <= s->refcount_block_size &&
-+        s->crypt_method_header != QCOW_CRYPT_LUKS) {
-         /* The following function only works for qcow2 v3 images (it requires
-          * the dirty flag) and only as long as there are no snapshots (because
-          * it completely empties the image). Furthermore, the L1 table and three
-          * additional clusters (image header, refcount table, one refcount
--         * block) have to fit inside one refcount block. */
-+         * block) have to fit inside one refcount block. It cannot be used
-+         * for LUKS (yet) as it throws away the LUKS header cluster(s) */
-         return make_completely_empty(bs);
-     }
- 
-diff --git a/tests/qemu-iotests/198 b/tests/qemu-iotests/198
-new file mode 100755
-index 0000000000..34ef666381
---- /dev/null
-+++ b/tests/qemu-iotests/198
-@@ -0,0 +1,104 @@
-+#!/bin/bash
-+#
-+# Test commit of encrypted qcow2 files
-+#
-+# Copyright (C) 2017 Red Hat, Inc.
-+#
-+# This program is free software; you can redistribute it and/or modify
-+# it under the terms of the GNU General Public License as published by
-+# the Free Software Foundation; either version 2 of the License, or
-+# (at your option) any later version.
-+#
-+# This program is distributed in the hope that it will be useful,
-+# but WITHOUT ANY WARRANTY; without even the implied warranty of
-+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+# GNU General Public License for more details.
-+#
-+# You should have received a copy of the GNU General Public License
-+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
-+#
+         do {
+-            QString *new_obj = qobject_to_qstring(entry->value);
+-            const char *new = qstring_get_str(new_obj);
++            QObject *new = entry->value;
++            QObject *old = qdict_get(reopen_state->bs->options, entry->key);
 +
-+# creator
-+owner=berrange@redhat.com
-+
-+seq=`basename $0`
-+echo "QA output created by $seq"
-+
-+here=`pwd`
-+status=1	# failure is the default!
-+
-+_cleanup()
-+{
-+	_cleanup_test_img
-+}
-+trap "_cleanup; exit \$status" 0 1 2 3 15
-+
-+# get standard environment, filters and checks
-+. ./common.rc
-+. ./common.filter
-+
-+_supported_fmt qcow2
-+_supported_proto generic
-+_supported_os Linux
-+
-+
-+size=16M
-+TEST_IMG_BASE=$TEST_IMG.base
-+SECRET0="secret,id=sec0,data=astrochicken"
-+SECRET1="secret,id=sec1,data=furby"
-+
-+TEST_IMG_SAVE=$TEST_IMG
-+TEST_IMG=$TEST_IMG_BASE
-+echo "== create base =="
-+_make_test_img --object $SECRET0 -o "encrypt.format=luks,encrypt.key-secret=sec0,encrypt.iter-time=10" $size
-+TEST_IMG=$TEST_IMG_SAVE
-+
-+IMGSPECBASE="driver=$IMGFMT,file.filename=$TEST_IMG_BASE,encrypt.key-secret=sec0"
-+IMGSPECLAYER="driver=$IMGFMT,file.filename=$TEST_IMG,encrypt.key-secret=sec1"
-+IMGSPEC="$IMGSPECLAYER,backing.driver=$IMGFMT,backing.file.filename=$TEST_IMG_BASE,backing.encrypt.key-secret=sec0"
-+QEMU_IO_OPTIONS=$QEMU_IO_OPTIONS_NO_FMT
-+
-+echo
-+echo "== writing whole image base =="
-+$QEMU_IO --object $SECRET0 -c "write -P 0xa 0 $size" --image-opts $IMGSPECBASE | _filter_qemu_io | _filter_testdir
-+
-+echo "== create overlay =="
-+_make_test_img --object $SECRET1 -o "encrypt.format=luks,encrypt.key-secret=sec1,encrypt.iter-time=10" -u -b "$TEST_IMG_BASE" $size
-+
-+echo
-+echo "== writing whole image layer =="
-+$QEMU_IO --object $SECRET0 --object $SECRET1 -c "write -P 0x9 0 $size" --image-opts $IMGSPEC | _filter_qemu_io | _filter_testdir
-+
-+echo
-+echo "== verify pattern base =="
-+$QEMU_IO --object $SECRET0 -c "read -P 0xa 0 $size" --image-opts $IMGSPECBASE | _filter_qemu_io | _filter_testdir
-+
-+echo
-+echo "== verify pattern layer =="
-+$QEMU_IO --object $SECRET0 --object $SECRET1 -c "read -P 0x9 0 $size" --image-opts $IMGSPEC | _filter_qemu_io | _filter_testdir
-+
-+echo
-+echo "== committing layer into base =="
-+$QEMU_IMG commit --object $SECRET0 --object $SECRET1 --image-opts $IMGSPEC | _filter_testdir
-+
-+echo
-+echo "== verify pattern base =="
-+$QEMU_IO --object $SECRET0 -c "read -P 0x9 0 $size" --image-opts $IMGSPECBASE | _filter_qemu_io | _filter_testdir
-+
-+echo
-+echo "== verify pattern layer =="
-+$QEMU_IO --object $SECRET0 --object $SECRET1 -c "read -P 0x9 0 $size" --image-opts $IMGSPEC | _filter_qemu_io | _filter_testdir
-+
-+echo
-+echo "== checking image base =="
-+$QEMU_IMG info --image-opts $IMGSPECBASE | _filter_img_info | _filter_testdir | sed -e "/^disk size:/ D"
-+
-+echo
-+echo "== checking image layer =="
-+$QEMU_IMG info --image-opts $IMGSPECLAYER | _filter_img_info | _filter_testdir | sed -e "/^disk size:/ D"
-+
-+
-+# success, all done
-+echo "*** done"
-+rm -f $seq.full
-+status=0
-diff --git a/tests/qemu-iotests/198.out b/tests/qemu-iotests/198.out
-new file mode 100644
-index 0000000000..2db565e16b
---- /dev/null
-+++ b/tests/qemu-iotests/198.out
-@@ -0,0 +1,126 @@
-+QA output created by 198
-+== create base ==
-+Formatting 'TEST_DIR/t.IMGFMT.base', fmt=IMGFMT size=16777216 encrypt.format=luks encrypt.key-secret=sec0 encrypt.iter-time=10
-+
-+== writing whole image base ==
-+wrote 16777216/16777216 bytes at offset 0
-+16 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+== create overlay ==
-+Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=16777216 backing_file=TEST_DIR/t.IMGFMT.base encrypt.format=luks encrypt.key-secret=sec1 encrypt.iter-time=10
-+
-+== writing whole image layer ==
-+wrote 16777216/16777216 bytes at offset 0
-+16 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+
-+== verify pattern base ==
-+read 16777216/16777216 bytes at offset 0
-+16 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+
-+== verify pattern layer ==
-+read 16777216/16777216 bytes at offset 0
-+16 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+
-+== committing layer into base ==
-+Image committed.
-+
-+== verify pattern base ==
-+read 16777216/16777216 bytes at offset 0
-+16 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+
-+== verify pattern layer ==
-+read 16777216/16777216 bytes at offset 0
-+16 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+
-+== checking image base ==
-+image: json:{"encrypt.key-secret": "sec0", "driver": "IMGFMT", "file": {"driver": "file", "filename": "TEST_DIR/t.IMGFMT.base"}}
-+file format: IMGFMT
-+virtual size: 16M (16777216 bytes)
-+Format specific information:
-+    compat: 1.1
-+    lazy refcounts: false
-+    refcount bits: 16
-+    encrypt:
-+        ivgen alg: plain64
-+        hash alg: sha256
-+        cipher alg: aes-256
-+        uuid: 00000000-0000-0000-0000-000000000000
-+        format: luks
-+        cipher mode: xts
-+        slots:
-+            [0]:
-+                active: true
-+                iters: 1024
-+                key offset: 4096
-+                stripes: 4000
-+            [1]:
-+                active: false
-+                key offset: 262144
-+            [2]:
-+                active: false
-+                key offset: 520192
-+            [3]:
-+                active: false
-+                key offset: 778240
-+            [4]:
-+                active: false
-+                key offset: 1036288
-+            [5]:
-+                active: false
-+                key offset: 1294336
-+            [6]:
-+                active: false
-+                key offset: 1552384
-+            [7]:
-+                active: false
-+                key offset: 1810432
-+        payload offset: 2068480
-+        master key iters: 1024
-+    corrupt: false
-+
-+== checking image layer ==
-+image: json:{"encrypt.key-secret": "sec1", "driver": "IMGFMT", "file": {"driver": "file", "filename": "TEST_DIR/t.IMGFMT"}}
-+file format: IMGFMT
-+virtual size: 16M (16777216 bytes)
-+backing file: TEST_DIR/t.IMGFMT.base
-+Format specific information:
-+    compat: 1.1
-+    lazy refcounts: false
-+    refcount bits: 16
-+    encrypt:
-+        ivgen alg: plain64
-+        hash alg: sha256
-+        cipher alg: aes-256
-+        uuid: 00000000-0000-0000-0000-000000000000
-+        format: luks
-+        cipher mode: xts
-+        slots:
-+            [0]:
-+                active: true
-+                iters: 1024
-+                key offset: 4096
-+                stripes: 4000
-+            [1]:
-+                active: false
-+                key offset: 262144
-+            [2]:
-+                active: false
-+                key offset: 520192
-+            [3]:
-+                active: false
-+                key offset: 778240
-+            [4]:
-+                active: false
-+                key offset: 1036288
-+            [5]:
-+                active: false
-+                key offset: 1294336
-+            [6]:
-+                active: false
-+                key offset: 1552384
-+            [7]:
-+                active: false
-+                key offset: 1810432
-+        payload offset: 2068480
-+        master key iters: 1024
-+    corrupt: false
-+*** done
-diff --git a/tests/qemu-iotests/common.filter b/tests/qemu-iotests/common.filter
-index 873ca6b104..d9237799e9 100644
---- a/tests/qemu-iotests/common.filter
-+++ b/tests/qemu-iotests/common.filter
-@@ -157,7 +157,9 @@ _filter_img_info()
-         -e "/lazy_refcounts: \\(on\\|off\\)/d" \
-         -e "/block_size: [0-9]\\+/d" \
-         -e "/block_state_zero: \\(on\\|off\\)/d" \
--        -e "/log_size: [0-9]\\+/d"
-+        -e "/log_size: [0-9]\\+/d" \
-+        -e "s/iters: [0-9]\\+/iters: 1024/" \
-+        -e "s/uuid: [-a-f0-9]\\+/uuid: 00000000-0000-0000-0000-000000000000/"
- }
- 
- # filter out offsets and file names from qemu-img map; good for both
-diff --git a/tests/qemu-iotests/group b/tests/qemu-iotests/group
-index 24e5ad1b79..83b839bbe3 100644
---- a/tests/qemu-iotests/group
-+++ b/tests/qemu-iotests/group
-@@ -194,3 +194,4 @@
- 194 rw auto migration quick
- 195 rw auto quick
- 197 rw auto quick
-+198 rw auto
+             /*
+-             * Caution: while qdict_get_try_str() is fine, getting
+-             * non-string types would require more care.  When
+-             * bs->options come from -blockdev or blockdev_add, its
+-             * members are typed according to the QAPI schema, but
+-             * when they come from -drive, they're all QString.
++             * TODO: When using -drive to specify blockdev options, all values
++             * will be strings; however, when using -blockdev, blockdev-add or
++             * filenames using the json:{} pseudo-protocol, they will be
++             * correctly typed.
++             * In contrast, reopening options are (currently) always strings
++             * (because you can only specify them through qemu-io; all other
++             * callers do not specify any options).
++             * Therefore, when using anything other than -drive to create a BDS,
++             * this cannot detect non-string options as unchanged, because
++             * qobject_is_equal() always returns false for objects of different
++             * type.  In the future, this should be remedied by correctly typing
++             * all options.  For now, this is not too big of an issue because
++             * the user can simply omit options which cannot be changed anyway,
++             * so they will stay unchanged.
+              */
+-            const char *old = qdict_get_try_str(reopen_state->bs->options,
+-                                                entry->key);
+-
+-            if (!old || strcmp(new, old)) {
++            if (!qobject_is_equal(new, old)) {
+                 error_setg(errp, "Cannot change the option '%s'", entry->key);
+                 ret = -EINVAL;
+                 goto error;
 -- 
 2.13.6
