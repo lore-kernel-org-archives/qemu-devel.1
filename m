@@ -1,15 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48497)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49682)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <sjitindarsingh@gmail.com>) id 1eFZMz-0000qc-QK
-	for qemu-devel@nongnu.org; Fri, 17 Nov 2017 00:39:19 -0500
+	(envelope-from <longpeng2@huawei.com>) id 1eFZRj-00025g-CJ
+	for qemu-devel@nongnu.org; Fri, 17 Nov 2017 00:44:12 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <sjitindarsingh@gmail.com>) id 1eFZMy-0000zj-J5
-	for qemu-devel@nongnu.org; Fri, 17 Nov 2017 00:39:17 -0500
-From: Suraj Jitindar Singh <sjitindarsingh@gmail.com>
-Date: Fri, 17 Nov 2017 16:39:00 +1100
-Message-Id: <20171117053900.2536-1-sjitindarsingh@gmail.com>
-Subject: [Qemu-devel] [QEMU-PPC] [PATCH V3] target/ppc: Update setting of
- cpu features to account for compat modes
+	(envelope-from <longpeng2@huawei.com>) id 1eFZRe-0005rW-GY
+	for qemu-devel@nongnu.org; Fri, 17 Nov 2017 00:44:11 -0500
+Received: from szxga05-in.huawei.com ([45.249.212.191]:2731)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_ARCFOUR_SHA1:16) (Exim 4.71)
+	(envelope-from <longpeng2@huawei.com>) id 1eFZRd-0005pR-Mr
+	for qemu-devel@nongnu.org; Fri, 17 Nov 2017 00:44:06 -0500
+Message-ID: <5A0E76F3.9060100@huawei.com>
+Date: Fri, 17 Nov 2017 13:43:15 +0800
+From: "Longpeng (Mike)" <longpeng2@huawei.com>
+MIME-Version: 1.0
+References: <CACnE9pzALCNV62Jmo4SUawD=pQiPFENWR_BwK3=+yY7V1U54Ag@mail.gmail.com>
+	<cd39d029-48f9-20d6-cc19-ff87a45240ab@redhat.com>
+	<CACnE9pzm5zabq=nJhqB4LHzSXk2vDGiAN5SbJco3ZfGkfRbW-g@mail.gmail.com>
+	<5A0D27D8.6050506@huawei.com>
+	<2e0ddd76-3903-d715-9a86-73f1286322e7@redhat.com>
+	<33183CC9F5247A488A2544077AF19020DA46E2A6@DGGEMA505-MBS.china.huawei.com>
+	<6aaaca2b-81ef-a1c1-4745-830d008b3770@redhat.com>
+	<5A0D5B1B.3080708@huawei.com>
+	<55f2edb1-1fe3-d03f-7f4f-418a3b15997a@redhat.com>
+	<20171117063024-mutt-send-email-mst@kernel.org>
+In-Reply-To: <20171117063024-mutt-send-email-mst@kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [Question] why need to start all queues in
+ vhost_net_start
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -18,162 +36,142 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-ppc@nongnu.org
-Cc: qemu-devel@nongnu.org, david@gibson.dropbear.id.au, groug@kaod.org, sjitindarsingh@gmail.com
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: Jason Wang <jasowang@redhat.com>, "Huangweidong (C)" <weidong.huang@huawei.com>, "stefanha@redhat.com" <stefanha@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "Wangjing (King, Euler)" <king.wang@huawei.com>, "Gonglei (Arei)" <arei.gonglei@huawei.com>, "Longpeng(Mike)" <longpeng.mike@gmail.com>, yvugenfi@redhat.com
 
-The device tree nodes ibm,arch-vec-5-platform-support and ibm,pa-features
-are used to communicate features of the cpu to the guest operating
-system. The properties of each of these are determined based on the
-selected cpu model and the availability of hypervisor features.
-Currently the compatibility mode of the cpu is not taken into account.
 
-The ibm,arch-vec-5-platform-support node is used to communicate the
-level of support for various ISAv3 processor features to the guest
-before CAS to inform the guests' request. The available mmu mode should
-only be hash unless the cpu is a POWER9 which is not in a prePOWER9
-compat mode, in which case the available modes depend on the
-accelerator and the hypervisor capabilities.
 
-The ibm,pa-featues node is used to communicate the level of cpu support
-for various features to the guest os. This should only contain features
-relevant to the operating mode of the processor, that is the selected
-cpu model taking into account any compat mode. This means that the
-compat mode should be taken into account when choosing the properties of
-ibm,pa-features and they should match the compat mode selected, or the
-cpu model selected if no compat mode.
+On 2017/11/17 12:32, Michael S. Tsirkin wrote:
 
-Update the setting of these cpu features in the device tree as described
-above to properly take into account any compat mode. We use the
-ppc_check_compat function which takes into account the current processor
-model and the cpu compat mode.
+> On Thu, Nov 16, 2017 at 08:04:34PM +0800, Jason Wang wrote:
+>>
+>>
+>> On 2017年11月16日 17:32, Longpeng (Mike) wrote:
+>>> Hi Jason,
+>>>
+>>> On 2017/11/16 17:13, Jason Wang wrote:
+>>>
+>>>>
+>>>> On 2017年11月16日 17:01, Gonglei (Arei) wrote:
+>>>>> No, Windows guest + vhost-user/DPDK.
+>>>>>
+>>>>> BTW pls see virtio spec in :
+>>>>>
+>>>>> "If VIRTIO_NET_F_MQ is negotiated, each of receiveq1. . .receiveqN that will
+>>>>> be used SHOULD be populated
+>>>>> with receive buffers."
+>>>>>
+>>>>> It is not mandatory that all queues must be initialized.
+>>>> I think not, since it said we should fill receive buffers for each queue which
+>>>> means we should initialize all queues. May Michael can clarify on this.
+>>>>
+>>>
+>>> I think this doesn't matter, but QEMU should consider this scenario...
+>>>
+>>> For example, if one queues isn't initialized (Windows guest), the vring.avail=0,
+>>> so vq->desc_phys=0, then vq->desc='a avail HVA'(which is the start addr of pc.ram).
+>>>
+>>>      vq->desc_size = s = l = virtio_queue_get_desc_size(vdev, idx);
+>>>      vq->desc_phys = a = virtio_queue_get_desc_addr(vdev, idx);
+>>>      vq->desc = vhost_memory_map(dev, a, &l, 0);
+>>>      if (!vq->desc || l != s) {
+>>>          r = -ENOMEM;
+>>>          goto fail_alloc_desc;
+>>>      }
+>>>      .....
+>>>      r = vhost_virtqueue_set_addr(dev, vq, vhost_vq_index, dev->log_enabled);
+>>>      if (r < 0) {
+>>>          r = -errno;
+>>>          goto fail_alloc;
+>>>      }
+>>>
+>>> Then the HVA is send to the vhost-user.
+>>>
+>>> I think this is wrong, because the '0' here means guest driver doesn't init this
+>>> queues, it should not be used to calculate the HVA for this vq.
+>>
+>> Yes, workaround is not hard if windows driver won't use the left 3 queues
+>> any more. But we should have a complete solution. The main problem is when
+>> vhost need to be started. For legacy device, there's no easy way to detect
+>> whether or not a specific virtqueue is ready to be used. For modern device,
+>> we can probably do this through queue_enable (but this is not implemented in
+>> current code).
+>>
+>> Thanks
+> 
+> What isn't implemented?
+> 
+> Spec is quite explicit:
+> 
+> 
+> Client must only process each ring when it is started.
+> 
+> Client must only pass data between the ring and the
+> backend, when the ring is enabled.
+> 
+> and later:
+> 
+> 
+> Client must start ring upon receiving a kick (that is, detecting that file
+> descriptor is readable) on the descriptor specified by
+> VHOST_USER_SET_VRING_KICK, and stop ring upon receiving
+> VHOST_USER_GET_VRING_BASE.
+> 
+> 
+> Does someone kick unused rings? What entity does this?
+> 
 
-Signed-off-by: Suraj Jitindar Singh <sjitindarsingh@gmail.com>
 
----
+Hi Michael,
 
-V1 -> V2:
-- Pass cpu pointer to spapr_populate_pa_features to avoid extracting it
-  back out from env
-- Slight reword of spapr_dt_ov5_platform_support logic to avoid
-  duplicate case
-V2 -> V3:
-- Use ppc_check_compat() to avoid having to check both the cpu model
-  and the compat mode separately since it does it for us
----
- hw/ppc/spapr.c | 43 +++++++++++++++++++++----------------------
- 1 file changed, 21 insertions(+), 22 deletions(-)
+Maybe you don't get our point, so let me be clear. :)
 
-diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-index d682f01..6841bd2 100644
---- a/hw/ppc/spapr.c
-+++ b/hw/ppc/spapr.c
-@@ -44,6 +44,7 @@
- #include "migration/register.h"
- #include "mmu-hash64.h"
- #include "mmu-book3s-v3.h"
-+#include "cpu-models.h"
- #include "qom/cpu.h"
- 
- #include "hw/boards.h"
-@@ -252,9 +253,10 @@ static int spapr_fixup_cpu_numa_dt(void *fdt, int offset, PowerPCCPU *cpu)
- }
- 
- /* Populate the "ibm,pa-features" property */
--static void spapr_populate_pa_features(CPUPPCState *env, void *fdt, int offset,
--                                      bool legacy_guest)
-+static void spapr_populate_pa_features(PowerPCCPU *cpu, void *fdt, int offset,
-+                                       bool legacy_guest)
- {
-+    CPUPPCState *env = &cpu->env;
-     uint8_t pa_features_206[] = { 6, 0,
-         0xf6, 0x1f, 0xc7, 0x00, 0x80, 0xc0 };
-     uint8_t pa_features_207[] = { 24, 0,
-@@ -287,23 +289,22 @@ static void spapr_populate_pa_features(CPUPPCState *env, void *fdt, int offset,
-         /* 60: NM atomic, 62: RNG */
-         0x80, 0x00, 0x80, 0x00, 0x00, 0x00, /* 60 - 65 */
-     };
--    uint8_t *pa_features;
-+    uint8_t *pa_features = NULL;
-     size_t pa_size;
- 
--    switch (POWERPC_MMU_VER(env->mmu_model)) {
--    case POWERPC_MMU_VER_2_06:
-+    if (ppc_check_compat(cpu, CPU_POWERPC_LOGICAL_2_06, 0, cpu->compat_pvr)) {
-         pa_features = pa_features_206;
-         pa_size = sizeof(pa_features_206);
--        break;
--    case POWERPC_MMU_VER_2_07:
-+    }
-+    if (ppc_check_compat(cpu, CPU_POWERPC_LOGICAL_2_07, 0, cpu->compat_pvr)) {
-         pa_features = pa_features_207;
-         pa_size = sizeof(pa_features_207);
--        break;
--    case POWERPC_MMU_VER_3_00:
-+    }
-+    if (ppc_check_compat(cpu, CPU_POWERPC_LOGICAL_3_00, 0, cpu->compat_pvr)) {
-         pa_features = pa_features_300;
-         pa_size = sizeof(pa_features_300);
--        break;
--    default:
-+    }
-+    if (!pa_features) {
-         return;
-     }
- 
-@@ -340,7 +341,6 @@ static int spapr_fixup_cpu_dt(void *fdt, sPAPRMachineState *spapr)
- 
-     CPU_FOREACH(cs) {
-         PowerPCCPU *cpu = POWERPC_CPU(cs);
--        CPUPPCState *env = &cpu->env;
-         DeviceClass *dc = DEVICE_GET_CLASS(cs);
-         int index = spapr_vcpu_id(cpu);
-         int compat_smt = MIN(smp_threads, ppc_compat_max_threads(cpu));
-@@ -384,7 +384,7 @@ static int spapr_fixup_cpu_dt(void *fdt, sPAPRMachineState *spapr)
-             return ret;
-         }
- 
--        spapr_populate_pa_features(env, fdt, offset,
-+        spapr_populate_pa_features(cpu, fdt, offset,
-                                          spapr->cas_legacy_guest_workaround);
-     }
-     return ret;
-@@ -579,7 +579,7 @@ static void spapr_populate_cpu_dt(CPUState *cs, void *fdt, int offset,
-                           page_sizes_prop, page_sizes_prop_size)));
-     }
- 
--    spapr_populate_pa_features(env, fdt, offset, false);
-+    spapr_populate_pa_features(cpu, fdt, offset, false);
- 
-     _FDT((fdt_setprop_cell(fdt, offset, "ibm,chip-id",
-                            cs->cpu_index / vcpus_per_socket)));
-@@ -949,7 +949,11 @@ static void spapr_dt_ov5_platform_support(void *fdt, int chosen)
-         26, 0x40, /* Radix options: GTSE == yes. */
-     };
- 
--    if (kvm_enabled()) {
-+    if (!ppc_check_compat(first_ppc_cpu, CPU_POWERPC_LOGICAL_3_00, 0,
-+                          first_ppc_cpu->compat_pvr)) {
-+        /* If we're in a pre POWER9 compat mode then the guest should do hash */
-+        val[3] = 0x00; /* Hash */
-+    } else if (kvm_enabled()) {
-         if (kvmppc_has_cap_mmu_radix() && kvmppc_has_cap_mmu_hash_v3()) {
-             val[3] = 0x80; /* OV5_MMU_BOTH */
-         } else if (kvmppc_has_cap_mmu_radix()) {
-@@ -958,13 +962,8 @@ static void spapr_dt_ov5_platform_support(void *fdt, int chosen)
-             val[3] = 0x00; /* Hash */
-         }
-     } else {
--        if (first_ppc_cpu->env.mmu_model & POWERPC_MMU_V3) {
--            /* V3 MMU supports both hash and radix (with dynamic switching) */
--            val[3] = 0xC0;
--        } else {
--            /* Otherwise we can only do hash */
--            val[3] = 0x00;
--        }
-+        /* V3 MMU supports both hash and radix in tcg (with dynamic switching) */
-+        val[3] = 0xC0;
-     }
-     _FDT(fdt_setprop(fdt, chosen, "ibm,arch-vec-5-platform-support",
-                      val, sizeof(val)));
+Suppose there is a VM with 4 vcpus and 7 queues (vhost-user backend), the
+Windows guest will only initialize the first 4 queues, so in QEMU the addresses
+of the desc/avail/used tables of last 3 queues are all ZERO (initial value).
+
+However QEMU will start all 7 queues, please look at the codes below:
+'''
+vhost_net_start
+  for (i = 0; i < total_queues; i++) // start all 7 queues
+    vhost_net_start_one
+      vhost_dev_start
+        vhost_virtqueue_start
+'''
+
+In vhost_virtqueue_start(), it will use the ZERO to calculate a corresponding
+HVA for the last 3 queues and then send to the backend ( by
+vhost_virtqueue_set_addr() ).
+
+So our issue here is: the ZERO here means guest doesn't initialize the last 3
+queues, so it needn't to calculate the HVA for them and send to then backend.
+
+But, there is no issue on Linux guest, because Linux driver will initialize the
+desc/avail/used tables for all 7 queues (even if it only uses the first 4 queues).
+
+Jason has already get our point, now we need to obtain more information about
+Windows virtio-net driver from Yan.
+
+> 
+> 
+> 
+>>>
+>>>> Thanks
+>>>>
+>>>>> Thanks,
+>>>>> -Gonglei
+>>>>>
+>>>>
+>>>>
+>>>>
+>>>> .
+>>>>
+>>>
+> 
+> .
+> 
+
+
 -- 
-2.9.5
+Regards,
+Longpeng(Mike)
