@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42980)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42891)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1eFlCY-0001Ht-86
-	for qemu-devel@nongnu.org; Fri, 17 Nov 2017 13:17:19 -0500
+	(envelope-from <kwolf@redhat.com>) id 1eFlCV-0001ES-HO
+	for qemu-devel@nongnu.org; Fri, 17 Nov 2017 13:17:17 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1eFlCW-0002Ow-Rt
-	for qemu-devel@nongnu.org; Fri, 17 Nov 2017 13:17:18 -0500
+	(envelope-from <kwolf@redhat.com>) id 1eFlCT-0002KV-V7
+	for qemu-devel@nongnu.org; Fri, 17 Nov 2017 13:17:15 -0500
 From: Kevin Wolf <kwolf@redhat.com>
-Date: Fri, 17 Nov 2017 19:16:41 +0100
-Message-Id: <20171117181653.20651-14-kwolf@redhat.com>
+Date: Fri, 17 Nov 2017 19:16:36 +0100
+Message-Id: <20171117181653.20651-9-kwolf@redhat.com>
 In-Reply-To: <20171117181653.20651-1-kwolf@redhat.com>
 References: <20171117181653.20651-1-kwolf@redhat.com>
-Subject: [Qemu-devel] [PULL 13/25] block: qobject_is_equal() in
- bdrv_reopen_prepare()
+Subject: [Qemu-devel] [PULL 08/25] iotests: test clearing unknown
+ autoclear_features by qcow2
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,69 +23,117 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org
 Cc: kwolf@redhat.com, qemu-devel@nongnu.org
 
-From: Max Reitz <mreitz@redhat.com>
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 
-Currently, bdrv_reopen_prepare() assumes that all BDS options are
-strings. However, this is not the case if the BDS has been created
-through the json: pseudo-protocol or blockdev-add.
+Test clearing unknown autoclear_features by qcow2 on incoming
+migration.
 
-Note that the user-invokable reopen command is an HMP command, so you
-can only specify strings there. Therefore, specifying a non-string
-option with the "same" value as it was when originally created will now
-return an error because the values are supposedly similar (and there is
-no way for the user to circumvent this but to just not specify the
-option again -- however, this is still strictly better than just
-crashing).
+[ kwolf: Fixed wait for destination VM startup ]
 
-Signed-off-by: Max Reitz <mreitz@redhat.com>
-Reviewed-by: Eric Blake <eblake@redhat.com>
-Message-id: 20171114180128.17076-5-mreitz@redhat.com
-Signed-off-by: Max Reitz <mreitz@redhat.com>
+Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Signed-off-by: Kevin Wolf <kwolf@redhat.com>
+Reviewed-by: Max Reitz <mreitz@redhat.com>
 ---
- block.c | 29 ++++++++++++++++++-----------
- 1 file changed, 18 insertions(+), 11 deletions(-)
+ tests/qemu-iotests/196     | 66 ++++++++++++++++++++++++++++++++++++++++++++++
+ tests/qemu-iotests/196.out |  5 ++++
+ tests/qemu-iotests/group   |  1 +
+ 3 files changed, 72 insertions(+)
+ create mode 100755 tests/qemu-iotests/196
+ create mode 100644 tests/qemu-iotests/196.out
 
-diff --git a/block.c b/block.c
-index 752fe6192b..70c6d7cf94 100644
---- a/block.c
-+++ b/block.c
-@@ -3074,19 +3074,26 @@ int bdrv_reopen_prepare(BDRVReopenState *reopen_state, BlockReopenQueue *queue,
-         const QDictEntry *entry = qdict_first(reopen_state->options);
- 
-         do {
--            QString *new_obj = qobject_to_qstring(entry->value);
--            const char *new = qstring_get_str(new_obj);
-+            QObject *new = entry->value;
-+            QObject *old = qdict_get(reopen_state->bs->options, entry->key);
+diff --git a/tests/qemu-iotests/196 b/tests/qemu-iotests/196
+new file mode 100755
+index 0000000000..4116ebc92b
+--- /dev/null
++++ b/tests/qemu-iotests/196
+@@ -0,0 +1,66 @@
++#!/usr/bin/env python
++#
++# Test clearing unknown autoclear_features flag by qcow2 after
++# migration. This test mimics migration to older qemu.
++#
++# Copyright (c) 2017 Parallels International GmbH
++#
++# This program is free software; you can redistribute it and/or modify
++# it under the terms of the GNU General Public License as published by
++# the Free Software Foundation; either version 2 of the License, or
++# (at your option) any later version.
++#
++# This program is distributed in the hope that it will be useful,
++# but WITHOUT ANY WARRANTY; without even the implied warranty of
++# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++# GNU General Public License for more details.
++#
++# You should have received a copy of the GNU General Public License
++# along with this program.  If not, see <http://www.gnu.org/licenses/>.
++#
 +
-             /*
--             * Caution: while qdict_get_try_str() is fine, getting
--             * non-string types would require more care.  When
--             * bs->options come from -blockdev or blockdev_add, its
--             * members are typed according to the QAPI schema, but
--             * when they come from -drive, they're all QString.
-+             * TODO: When using -drive to specify blockdev options, all values
-+             * will be strings; however, when using -blockdev, blockdev-add or
-+             * filenames using the json:{} pseudo-protocol, they will be
-+             * correctly typed.
-+             * In contrast, reopening options are (currently) always strings
-+             * (because you can only specify them through qemu-io; all other
-+             * callers do not specify any options).
-+             * Therefore, when using anything other than -drive to create a BDS,
-+             * this cannot detect non-string options as unchanged, because
-+             * qobject_is_equal() always returns false for objects of different
-+             * type.  In the future, this should be remedied by correctly typing
-+             * all options.  For now, this is not too big of an issue because
-+             * the user can simply omit options which cannot be changed anyway,
-+             * so they will stay unchanged.
-              */
--            const char *old = qdict_get_try_str(reopen_state->bs->options,
--                                                entry->key);
--
--            if (!old || strcmp(new, old)) {
-+            if (!qobject_is_equal(new, old)) {
-                 error_setg(errp, "Cannot change the option '%s'", entry->key);
-                 ret = -EINVAL;
-                 goto error;
++import os
++import iotests
++from iotests import qemu_img
++
++disk = os.path.join(iotests.test_dir, 'disk')
++migfile = os.path.join(iotests.test_dir, 'migfile')
++
++class TestInvalidateAutoclear(iotests.QMPTestCase):
++
++    def tearDown(self):
++        self.vm_a.shutdown()
++        self.vm_b.shutdown()
++        os.remove(disk)
++        os.remove(migfile)
++
++    def setUp(self):
++        qemu_img('create', '-f', iotests.imgfmt, disk, '1M')
++
++        self.vm_a = iotests.VM(path_suffix='a').add_drive(disk)
++        self.vm_a.launch()
++
++        self.vm_b = iotests.VM(path_suffix='b').add_drive(disk)
++        self.vm_b.add_incoming("exec: cat '" + migfile + "'")
++
++    def test_migration(self):
++        result = self.vm_a.qmp('migrate', uri='exec:cat>' + migfile)
++        self.assert_qmp(result, 'return', {});
++        self.assertNotEqual(self.vm_a.event_wait("STOP"), None)
++
++        with open(disk, 'r+b') as f:
++            f.seek(88) # first byte of autoclear_features field
++            f.write(b'\xff')
++
++        self.vm_b.launch()
++        while True:
++            result = self.vm_b.qmp('query-status')
++            if result['return']['status'] == 'running':
++                break
++
++        with open(disk, 'rb') as f:
++            f.seek(88)
++            self.assertEqual(f.read(1), b'\x00')
++
++if __name__ == '__main__':
++    iotests.main(supported_fmts=['qcow2'])
+diff --git a/tests/qemu-iotests/196.out b/tests/qemu-iotests/196.out
+new file mode 100644
+index 0000000000..ae1213e6f8
+--- /dev/null
++++ b/tests/qemu-iotests/196.out
+@@ -0,0 +1,5 @@
++.
++----------------------------------------------------------------------
++Ran 1 tests
++
++OK
+diff --git a/tests/qemu-iotests/group b/tests/qemu-iotests/group
+index 83b839bbe3..1fad602152 100644
+--- a/tests/qemu-iotests/group
++++ b/tests/qemu-iotests/group
+@@ -193,5 +193,6 @@
+ 192 rw auto quick
+ 194 rw auto migration quick
+ 195 rw auto quick
++196 rw auto quick
+ 197 rw auto quick
+ 198 rw auto
 -- 
 2.13.6
