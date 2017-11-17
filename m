@@ -1,41 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55978)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56472)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <danielhb@linux.vnet.ibm.com>) id 1eFgtm-0008Bl-14
-	for qemu-devel@nongnu.org; Fri, 17 Nov 2017 08:41:39 -0500
+	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1eFgvD-0000nc-Mm
+	for qemu-devel@nongnu.org; Fri, 17 Nov 2017 08:43:08 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <danielhb@linux.vnet.ibm.com>) id 1eFgti-0005yP-Ou
-	for qemu-devel@nongnu.org; Fri, 17 Nov 2017 08:41:38 -0500
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:50842)
+	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1eFgvA-0008P2-Ty
+	for qemu-devel@nongnu.org; Fri, 17 Nov 2017 08:43:07 -0500
+Received: from chuckie.co.uk ([82.165.15.123]:59102
+	helo=s16892447.onlinehome-server.info)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <danielhb@linux.vnet.ibm.com>)
-	id 1eFgti-0005wQ-Ff
-	for qemu-devel@nongnu.org; Fri, 17 Nov 2017 08:41:34 -0500
-Received: from pps.filterd (m0098399.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
-	vAHDcoJU012203
-	for <qemu-devel@nongnu.org>; Fri, 17 Nov 2017 08:41:29 -0500
-Received: from e13.ny.us.ibm.com (e13.ny.us.ibm.com [129.33.205.203])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2e9xuhdqqp-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Fri, 17 Nov 2017 08:41:28 -0500
-Received: from localhost
-	by e13.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
-	Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <danielhb@linux.vnet.ibm.com>;
-	Fri, 17 Nov 2017 08:41:27 -0500
-References: <20171116223527.4499-1-danielhb@linux.vnet.ibm.com>
-	<20171116223527.4499-3-danielhb@linux.vnet.ibm.com>
-	<4ab78f2c-7088-81b4-2c5c-13a88bd8e75c@redhat.com>
-From: Daniel Henrique Barboza <danielhb@linux.vnet.ibm.com>
-Date: Fri, 17 Nov 2017 11:41:21 -0200
-MIME-Version: 1.0
-In-Reply-To: <4ab78f2c-7088-81b4-2c5c-13a88bd8e75c@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
-Content-Language: en-US
-Message-Id: <08120201-7700-92d3-cfe2-8ece56dee166@linux.vnet.ibm.com>
-Subject: Re: [Qemu-devel] [PATCH v3 2/2] tests/qemu-iotests: adding
- savevm/loadvm with postcopy flag test
+	(Exim 4.71) (envelope-from <mark.cave-ayland@ilande.co.uk>)
+	id 1eFgvA-0008NE-Md
+	for qemu-devel@nongnu.org; Fri, 17 Nov 2017 08:43:04 -0500
+From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+Date: Fri, 17 Nov 2017 13:42:36 +0000
+Message-Id: <1510926167-23326-5-git-send-email-mark.cave-ayland@ilande.co.uk>
+In-Reply-To: <1510926167-23326-1-git-send-email-mark.cave-ayland@ilande.co.uk>
+References: <1510926167-23326-1-git-send-email-mark.cave-ayland@ilande.co.uk>
+Subject: [Qemu-devel] [PATCH 04/15] sun4u: remove pci_ebus_init() function
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -44,204 +25,124 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Cleber Rosa <crosa@redhat.com>, qemu-devel@nongnu.org
-Cc: Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>
+To: qemu-devel@nongnu.org, atar4qemu@gmail.com
 
+This is initialisation that should really take place in the ebus realize
+function. As part of this we also rework the ebus IRQ mapping so that
+instead of having to pass in the array of pbm_irqs, we obtain a reference
+to them by looking up the APB device during ebus realize.
 
+Signed-off-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+---
+ hw/pci-host/apb.c         |    4 +---
+ hw/sparc64/sun4u.c        |   29 ++++++++++++++---------------
+ include/hw/pci-host/apb.h |    3 +--
+ 3 files changed, 16 insertions(+), 20 deletions(-)
 
-On 11/17/2017 11:24 AM, Cleber Rosa wrote:
->
-> On 11/16/2017 05:35 PM, Daniel Henrique Barboza wrote:
->> This patch implements a test case for the scenario that was failing
->> prior to the patch "migration/ram.c: do not set 'postcopy_running' in
->> POSTCOPY_INCOMING_END".
->>
->> This new test file 198 was derived from the test file 181 authored
->> by Kevin Wolf.
->>
->> CC: Kevin Wolf <kwolf@redhat.com>
->> CC: Max Reitz <mreitz@redhat.com>
->> CC: Cleber Rosa <crosa@redhat.com>
->> Signed-off-by: Daniel Henrique Barboza <danielhb@linux.vnet.ibm.com>
->>
->> ---
->> I CCed Cleber Rosa because this patch was developed at the same
->> time his patch series "[PATCH 00/10] I/O tests cleanups" hit the
->> mailing list. Most of the cleanups/fixes he made in the series was
->> done in this new test as well.
->>
-> Your test looks like a positive review/validation of (some of) the
-> changes proposed in the "[PATCH 00/10] I/O tests cleanups" indeed.
->
-> Thanks for noticing that and for the CC.
-
-No problem!
-
-And unless I missed something, the only proposed change that wasn't
-applied here is the one from " [PATCH 04/10] qemu-iotests: include (source)
-filters from common.rc" because it relies on changes in
-tests/qemu-iotests/common.rc.
-
-
-Daniel
-> - Cleber.
->
->>   tests/qemu-iotests/198     | 110 +++++++++++++++++++++++++++++++++++++++++++++
->>   tests/qemu-iotests/198.out |  20 +++++++++
->>   tests/qemu-iotests/group   |   1 +
->>   3 files changed, 131 insertions(+)
->>   create mode 100755 tests/qemu-iotests/198
->>   create mode 100644 tests/qemu-iotests/198.out
->>
->> diff --git a/tests/qemu-iotests/198 b/tests/qemu-iotests/198
->> new file mode 100755
->> index 0000000000..786e37fc95
->> --- /dev/null
->> +++ b/tests/qemu-iotests/198
->> @@ -0,0 +1,110 @@
->> +#!/bin/bash
->> +#
->> +# Test savevm and loadvm after live migration with postcopy flag
->> +#
->> +# Copyright (C) 2017, IBM Corporation.
->> +#
->> +# This file is derived from tests/qemu-iotests/181 by Kevin Wolf
->> +#
->> +# This program is free software; you can redistribute it and/or modify
->> +# it under the terms of the GNU General Public License as published by
->> +# the Free Software Foundation; either version 2 of the License, or
->> +# (at your option) any later version.
->> +#
->> +# This program is distributed in the hope that it will be useful,
->> +# but WITHOUT ANY WARRANTY; without even the implied warranty of
->> +# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
->> +# GNU General Public License for more details.
->> +#
->> +# You should have received a copy of the GNU General Public License
->> +# along with this program.  If not, see <http://www.gnu.org/licenses/>.
->> +#
->> +# Creator/Owner : danielhb@linux.vnet.ibm.com
->> +
->> +seq=`basename $0`
->> +echo "QA output created by $seq"
->> +
->> +status=1	# failure is the default!
->> +
->> +MIG_SOCKET="${TEST_DIR}/migrate"
->> +
->> +# get standard environment, filters and checks
->> +. ./common.rc
->> +. ./common.filter
->> +. ./common.qemu
->> +
->> +_cleanup()
->> +{
->> +    rm -f "${MIG_SOCKET}"
->> +    _cleanup_test_img
->> +    _cleanup_qemu
->> +}
->> +trap "_cleanup; exit \$status" 0 1 2 3 15
->> +
->> +_supported_fmt qcow2
->> +_supported_proto generic
->> +_supported_os Linux
->> +
->> +size=64M
->> +_make_test_img $size
->> +
->> +echo
->> +echo === Starting VMs ===
->> +echo
->> +
->> +qemu_comm_method="monitor"
->> +
->> +if [ "$IMGOPTSSYNTAX" = "true" ]; then
->> +    _launch_qemu \
->> +        -drive "${TEST_IMG}",cache=${CACHEMODE},id=disk
->> +else
->> +    _launch_qemu \
->> +        -drive file="${TEST_IMG}",cache=${CACHEMODE},driver=$IMGFMT,id=disk
->> +fi
->> +src=$QEMU_HANDLE
->> +
->> +if [ "$IMGOPTSSYNTAX" = "true" ]; then
->> +    _launch_qemu \
->> +        -drive "${TEST_IMG}",cache=${CACHEMODE},id=disk \
->> +        -incoming "unix:${MIG_SOCKET}"
->> +else
->> +    _launch_qemu \
->> +        -drive file="${TEST_IMG}",cache=${CACHEMODE},driver=$IMGFMT,id=disk \
->> +        -incoming "unix:${MIG_SOCKET}"
->> +fi
->> +dest=$QEMU_HANDLE
->> +
->> +echo
->> +echo === Set \'migrate_set_capability postcopy-ram on\' and migrate ===
->> +echo
->> +
->> +silent=yes
->> +_send_qemu_cmd $dest 'migrate_set_capability postcopy-ram on' "(qemu)"
->> +_send_qemu_cmd $src 'migrate_set_capability postcopy-ram on' "(qemu)"
->> +_send_qemu_cmd $src "migrate -d unix:${MIG_SOCKET}" "(qemu)"
->> +
->> +QEMU_COMM_TIMEOUT=1 qemu_cmd_repeat=10 silent=yes \
->> +    _send_qemu_cmd $src "info migrate" "completed\|failed"
->> +silent=yes _send_qemu_cmd $src "" "(qemu)"
->> +
->> +echo
->> +echo === On destination, execute savevm and loadvm ===
->> +echo
->> +
->> +silent=
->> +_send_qemu_cmd $dest 'savevm state1"' "(qemu)"
->> +_send_qemu_cmd $dest 'loadvm state1"' "(qemu)"
->> +
->> +echo
->> +echo === Shut down and check image ===
->> +echo
->> +
->> +_send_qemu_cmd $src 'quit' ""
->> +_send_qemu_cmd $dest 'quit' ""
->> +wait=1 _cleanup_qemu
->> +
->> +_check_test_img
->> +
->> +# success, all done
->> +echo "*** done"
->> +status=0
->> diff --git a/tests/qemu-iotests/198.out b/tests/qemu-iotests/198.out
->> new file mode 100644
->> index 0000000000..6c27303857
->> --- /dev/null
->> +++ b/tests/qemu-iotests/198.out
->> @@ -0,0 +1,20 @@
->> +QA output created by 198
->> +Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=67108864
->> +
->> +=== Starting VMs ===
->> +
->> +
->> +=== Set 'migrate_set_capability postcopy-ram on' and migrate ===
->> +
->> +
->> +=== On destination, execute savevm and loadvm ===
->> +
->> +(qemu) savevm state1"
->> +(qemu) loadvm state1"
->> +
->> +=== Shut down and check image ===
->> +
->> +(qemu) quit
->> +(qemu) quit
->> +No errors were found on the image.
->> +*** done
->> diff --git a/tests/qemu-iotests/group b/tests/qemu-iotests/group
->> index 24e5ad1b79..84d082bc38 100644
->> --- a/tests/qemu-iotests/group
->> +++ b/tests/qemu-iotests/group
->> @@ -194,3 +194,4 @@
->>   194 rw auto migration quick
->>   195 rw auto quick
->>   197 rw auto quick
->> +198 rw auto migration
->>
+diff --git a/hw/pci-host/apb.c b/hw/pci-host/apb.c
+index f743a4e..b0f80f6 100644
+--- a/hw/pci-host/apb.c
++++ b/hw/pci-host/apb.c
+@@ -614,8 +614,7 @@ static void apb_pci_bridge_realize(PCIDevice *dev, Error **errp)
+ 
+ PCIBus *pci_apb_init(hwaddr special_base,
+                      hwaddr mem_base,
+-                     qemu_irq *ivec_irqs, PCIBus **busA, PCIBus **busB,
+-                     qemu_irq **pbm_irqs)
++                     qemu_irq *ivec_irqs, PCIBus **busA, PCIBus **busB)
+ {
+     DeviceState *dev;
+     SysBusDevice *s;
+@@ -646,7 +645,6 @@ PCIBus *pci_apb_init(hwaddr special_base,
+     memory_region_init(&d->pci_mmio, OBJECT(s), "pci-mmio", 0x100000000ULL);
+     memory_region_add_subregion(get_system_memory(), mem_base, &d->pci_mmio);
+ 
+-    *pbm_irqs = d->pbm_irqs;
+     d->ivec_irqs = ivec_irqs;
+ 
+     pci_create_simple(phb->bus, 0, "pbm-pci");
+diff --git a/hw/sparc64/sun4u.c b/hw/sparc64/sun4u.c
+index 63b4aaa..f3203ea 100644
+--- a/hw/sparc64/sun4u.c
++++ b/hw/sparc64/sun4u.c
+@@ -230,21 +230,11 @@ static void isa_irq_handler(void *opaque, int n, int level)
+ }
+ 
+ /* EBUS (Eight bit bus) bridge */
+-static ISABus *
+-pci_ebus_init(PCIDevice *pci_dev, qemu_irq *irqs)
+-{
+-    qemu_irq *isa_irq;
+-    ISABus *isa_bus;
+-
+-    isa_bus = ISA_BUS(qdev_get_child_bus(DEVICE(pci_dev), "isa.0"));
+-    isa_irq = qemu_allocate_irqs(isa_irq_handler, irqs, 16);
+-    isa_bus_irqs(isa_bus, isa_irq);
+-    return isa_bus;
+-}
+-
+ static void ebus_realize(PCIDevice *pci_dev, Error **errp)
+ {
+     EbusState *s = EBUS(pci_dev);
++    APBState *apb;
++    qemu_irq *isa_irq;
+ 
+     s->isa_bus = isa_bus_new(DEVICE(pci_dev), get_system_memory(),
+                              pci_address_space_io(pci_dev), errp);
+@@ -253,6 +243,15 @@ static void ebus_realize(PCIDevice *pci_dev, Error **errp)
+         return;
+     }
+ 
++    apb = APB_DEVICE(object_resolve_path_type("", TYPE_APB, NULL));
++    if (!apb) {
++        error_setg(errp, "unable to locate APB PCI host bridge");
++        return;
++    }
++
++    isa_irq = qemu_allocate_irqs(isa_irq_handler, apb->pbm_irqs, 16);
++    isa_bus_irqs(s->isa_bus, isa_irq);
++
+     pci_dev->config[0x04] = 0x06; // command = bus master, pci mem
+     pci_dev->config[0x05] = 0x00;
+     pci_dev->config[0x06] = 0xa0; // status = fast back-to-back, 66MHz, no error
+@@ -443,7 +442,7 @@ static void sun4uv_init(MemoryRegion *address_space_mem,
+     PCIDevice *ebus, *pci_dev;
+     ISABus *isa_bus;
+     SysBusDevice *s;
+-    qemu_irq *ivec_irqs, *pbm_irqs;
++    qemu_irq *ivec_irqs;
+     DriveInfo *hd[MAX_IDE_BUS * MAX_IDE_DEVS];
+     DriveInfo *fd[MAX_FD];
+     DeviceState *dev;
+@@ -462,7 +461,7 @@ static void sun4uv_init(MemoryRegion *address_space_mem,
+ 
+     ivec_irqs = qemu_allocate_irqs(sparc64_cpu_set_ivec_irq, cpu, IVEC_MAX);
+     pci_bus = pci_apb_init(APB_SPECIAL_BASE, APB_MEM_BASE, ivec_irqs, &pci_busA,
+-                           &pci_busB, &pbm_irqs);
++                           &pci_busB);
+ 
+     /* Only in-built Simba PBMs can exist on the root bus, slot 0 on busA is
+        reserved (leaving no slots free after on-board devices) however slots
+@@ -474,7 +473,7 @@ static void sun4uv_init(MemoryRegion *address_space_mem,
+     ebus = pci_create_multifunction(pci_busA, PCI_DEVFN(1, 0), true, TYPE_EBUS);
+     qdev_init_nofail(DEVICE(ebus));
+ 
+-    isa_bus = pci_ebus_init(ebus, pbm_irqs);
++    isa_bus = EBUS(ebus)->isa_bus;
+ 
+     i = 0;
+     if (hwdef->console_serial_base) {
+diff --git a/include/hw/pci-host/apb.h b/include/hw/pci-host/apb.h
+index 5d39c03..35d7d5a 100644
+--- a/include/hw/pci-host/apb.h
++++ b/include/hw/pci-host/apb.h
+@@ -91,6 +91,5 @@ typedef struct PBMPCIBridge {
+ 
+ PCIBus *pci_apb_init(hwaddr special_base,
+                      hwaddr mem_base,
+-                     qemu_irq *ivec_irqs, PCIBus **bus2, PCIBus **bus3,
+-                     qemu_irq **pbm_irqs);
++                     qemu_irq *ivec_irqs, PCIBus **bus2, PCIBus **bus3);
+ #endif
+-- 
+1.7.10.4
