@@ -1,30 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37230)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37685)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1eFatY-0006c0-2h
-	for qemu-devel@nongnu.org; Fri, 17 Nov 2017 02:17:01 -0500
+	(envelope-from <clg@kaod.org>) id 1eFaw7-0007lQ-DM
+	for qemu-devel@nongnu.org; Fri, 17 Nov 2017 02:19:40 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1eFatU-0008TX-1O
-	for qemu-devel@nongnu.org; Fri, 17 Nov 2017 02:17:00 -0500
-Received: from 7.mo68.mail-out.ovh.net ([46.105.63.230]:57166)
+	(envelope-from <clg@kaod.org>) id 1eFaw3-0002Gy-7e
+	for qemu-devel@nongnu.org; Fri, 17 Nov 2017 02:19:39 -0500
+Received: from 8.mo68.mail-out.ovh.net ([46.105.74.219]:37155)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1eFatT-0008R2-S5
-	for qemu-devel@nongnu.org; Fri, 17 Nov 2017 02:16:55 -0500
+	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1eFaw2-0002GE-Uh
+	for qemu-devel@nongnu.org; Fri, 17 Nov 2017 02:19:35 -0500
 Received: from player750.ha.ovh.net (b6.ovh.net [213.186.33.56])
-	by mo68.mail-out.ovh.net (Postfix) with ESMTP id 481A79DB80
-	for <qemu-devel@nongnu.org>; Fri, 17 Nov 2017 08:16:54 +0100 (CET)
+	by mo68.mail-out.ovh.net (Postfix) with ESMTP id 603129DC83
+	for <qemu-devel@nongnu.org>; Fri, 17 Nov 2017 08:19:33 +0100 (CET)
 References: <20171110152017.24324-1-clg@kaod.org>
-	<20171110152017.24324-4-clg@kaod.org>
-	<20171117044825.GA26448@umbus.fritz.box>
+	<20171110152017.24324-6-clg@kaod.org>
+	<20171114104224.63ed5e87@bahia.lan>
+	<20171117045053.GB26448@umbus.fritz.box>
 From: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
-Message-ID: <ef798010-c69f-2a7c-c083-7f6d227e4836@kaod.org>
-Date: Fri, 17 Nov 2017 08:16:47 +0100
+Message-ID: <41544cd8-4b95-4ae1-2edf-9e34cc5b0700@kaod.org>
+Date: Fri, 17 Nov 2017 08:19:23 +0100
 MIME-Version: 1.0
-In-Reply-To: <20171117044825.GA26448@umbus.fritz.box>
+In-Reply-To: <20171117045053.GB26448@umbus.fritz.box>
 Content-Type: text/plain; charset=windows-1252
 Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH for-2.12 v3 03/11] spapr: introduce new
- XICSFabric operations for an IRQ allocator
+Subject: Re: [Qemu-devel] [PATCH for-2.12 v3 05/11] spapr: introduce an IRQ
+ allocator using a bitmap
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,108 +34,237 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Gibson <david@gibson.dropbear.id.au>
-Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, Greg Kurz <groug@kaod.org>, Benjamin Herrenschmidt <benh@kernel.crashing.org>
+To: David Gibson <david@gibson.dropbear.id.au>, Greg Kurz <groug@kaod.org>
+Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, Benjamin Herrenschmidt <benh@kernel.crashing.org>
 
-On 11/17/2017 05:48 AM, David Gibson wrote:
-> On Fri, Nov 10, 2017 at 03:20:09PM +0000, C=E9dric Le Goater wrote:
->> Currently, the ICSState 'ics' object of the sPAPR machine acts as the
->> global interrupt source handler and also as the IRQ number allocator
->> for the machine. Some IRQ numbers are allocated very early in the
->> machine initialization sequence to populate the device tree, and this
->> is a problem to introduce the new POWER XIVE interrupt model, as it
->> needs to share the IRQ numbers with the older model.
+On 11/17/2017 05:50 AM, David Gibson wrote:
+> On Tue, Nov 14, 2017 at 10:42:24AM +0100, Greg Kurz wrote:
+>> On Fri, 10 Nov 2017 15:20:11 +0000
+>> C=E9dric Le Goater <clg@kaod.org> wrote:
 >>
->> To prepare ground for XIVE, here is a set of new XICSFabric operations
->> to let the machine handle directly the IRQ number allocation and to
->> decorrelate the allocation from the interrupt source object :
+>>> Let's define a new set of XICSFabric IRQ operations for the latest
+>>> pseries machine. These simply use a a bitmap 'irq_map' as a IRQ numbe=
+r
+>>> allocator.
+>>>
+>>> The previous pseries machines keep the old set of IRQ operations usin=
+g
+>>> the ICSIRQState array.
+>>>
+>>> Signed-off-by: C=E9dric Le Goater <clg@kaod.org>
+>>> ---
+>>>
+>>>  Changes since v2 :
+>>>
+>>>  - introduced a second set of XICSFabric IRQ operations for older
+>>>    pseries machines
+>>>
+>>>  hw/ppc/spapr.c         | 76 ++++++++++++++++++++++++++++++++++++++++=
+++++++----
+>>>  include/hw/ppc/spapr.h |  3 ++
+>>>  2 files changed, 74 insertions(+), 5 deletions(-)
+>>>
+>>> diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
+>>> index 4bdceb45a14f..4ef0b73559ca 100644
+>>> --- a/hw/ppc/spapr.c
+>>> +++ b/hw/ppc/spapr.c
+>>> @@ -1681,6 +1681,22 @@ static const VMStateDescription vmstate_spapr_=
+patb_entry =3D {
+>>>      },
+>>>  };
+>>> =20
+>>> +static bool spapr_irq_map_needed(void *opaque)
+>>> +{
+>>> +    return true;
 >>
->>     bool (*irq_test)(XICSFabric *xi, int irq);
->>     int (*irq_alloc_block)(XICSFabric *xi, int count, int align);
->>     void (*irq_free_block)(XICSFabric *xi, int irq, int num);
->>
->> In these prototypes, the 'irq' parameter refers to a number in the
->> global IRQ number space. Indexes for arrays storing different state
->> informations on the interrupts, like the ICSIRQState, are usually
->> named 'srcno'.
->>
->> Signed-off-by: C=E9dric Le Goater <clg@kaod.org>
+>> I see that the next patch adds some code to avoid sending the
+>> bitmap if it doesn't contain state, but I guess you should also
+>> explicitly have this function to return false for older machine
+>> types (see remark below).
 >=20
-> This doesn't seem sensible to me.  When I said you should move irq
-> allocation to the machine, I mean actually move the code.  The only
-> user of irq allocation should be in the machine, so we shouldn't need
-> to indirect via the XICSFabric interface to do that.
+> I don't see that you should need to migrate this at all.  The machine
+> needs to reliably allocate the same interrupts each time, and that
+> means source and dest should have the same allocations without
+> migrating data.
 
-OK. so we can probably do the same with machine class handlers because=20
-we do need an indirection to handle the way older pseries machines=20
-allocate IRQs that will change with newer machines  supporting XIVE.
-
-> And, we shouldn't be using XICSFabric things for XIVE.
-
-ok. The spapr machine should be enough.=20
-
-Thanks,
+ok. so we need to make sure that hot plugging devices or CPUs does
+not break that scheme. This is not the case today if you don't follow
+the exact same order on the monitor.
 
 C.
-=20
->> ---
->>  hw/ppc/spapr.c        | 19 +++++++++++++++++++
->>  include/hw/ppc/xics.h |  4 ++++
->>  2 files changed, 23 insertions(+)
+
 >>
->> diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
->> index a2dcbee07214..84d68f2fdbae 100644
->> --- a/hw/ppc/spapr.c
->> +++ b/hw/ppc/spapr.c
->> @@ -3536,6 +3536,21 @@ static ICPState *spapr_icp_get(XICSFabric *xi, =
-int vcpu_id)
->>      return cpu ? ICP(cpu->intc) : NULL;
->>  }
->> =20
->> +static bool spapr_irq_test(XICSFabric *xi, int irq)
->> +{
->> +    return false;
->> +}
->> +
->> +static int spapr_irq_alloc_block(XICSFabric *xi, int count, int align=
-)
->> +{
->> +    return -1;
->> +}
->> +
->> +static void spapr_irq_free_block(XICSFabric *xi, int irq, int num)
->> +{
->> +    ;
->> +}
->> +
->>  static void spapr_pic_print_info(InterruptStatsProvider *obj,
->>                                   Monitor *mon)
->>  {
->> @@ -3630,6 +3645,10 @@ static void spapr_machine_class_init(ObjectClas=
-s *oc, void *data)
->>      xic->ics_get =3D spapr_ics_get;
->>      xic->ics_resend =3D spapr_ics_resend;
->>      xic->icp_get =3D spapr_icp_get;
->> +    xic->irq_test =3D spapr_irq_test;
->> +    xic->irq_alloc_block =3D spapr_irq_alloc_block;
->> +    xic->irq_free_block =3D spapr_irq_free_block;
->> +
->>      ispc->print_info =3D spapr_pic_print_info;
->>      /* Force NUMA node memory size to be a multiple of
->>       * SPAPR_MEMORY_BLOCK_SIZE (256M) since that's the granularity
->> diff --git a/include/hw/ppc/xics.h b/include/hw/ppc/xics.h
->> index 28d248abad61..30e7f2e0a7dd 100644
->> --- a/include/hw/ppc/xics.h
->> +++ b/include/hw/ppc/xics.h
->> @@ -175,6 +175,10 @@ typedef struct XICSFabricClass {
->>      ICSState *(*ics_get)(XICSFabric *xi, int irq);
->>      void (*ics_resend)(XICSFabric *xi);
->>      ICPState *(*icp_get)(XICSFabric *xi, int server);
->> +    /* IRQ allocator helpers */
->> +    bool (*irq_test)(XICSFabric *xi, int irq);
->> +    int (*irq_alloc_block)(XICSFabric *xi, int count, int align);
->> +    void (*irq_free_block)(XICSFabric *xi, int irq, int num);
->>  } XICSFabricClass;
->> =20
->>  #define XICS_IRQS_SPAPR               1024
+>>> +}
+>>> +
+>>> +static const VMStateDescription vmstate_spapr_irq_map =3D {
+>>> +    .name =3D "spapr_irq_map",
+>>> +    .version_id =3D 0,
+>>> +    .minimum_version_id =3D 0,
+>>> +    .needed =3D spapr_irq_map_needed,
+>>> +    .fields =3D (VMStateField[]) {
+>>> +        VMSTATE_BITMAP(irq_map, sPAPRMachineState, 0, nr_irqs),
+>>> +        VMSTATE_END_OF_LIST()
+>>> +    },
+>>> +};
+>>> +
+>>>  static const VMStateDescription vmstate_spapr =3D {
+>>>      .name =3D "spapr",
+>>>      .version_id =3D 3,
+>>> @@ -1700,6 +1716,7 @@ static const VMStateDescription vmstate_spapr =3D=
+ {
+>>>          &vmstate_spapr_ov5_cas,
+>>>          &vmstate_spapr_patb_entry,
+>>>          &vmstate_spapr_pending_events,
+>>> +        &vmstate_spapr_irq_map,
+>>>          NULL
+>>>      }
+>>>  };
+>>> @@ -2337,8 +2354,12 @@ static void ppc_spapr_init(MachineState *machi=
+ne)
+>>>      /* Setup a load limit for the ramdisk leaving room for SLOF and =
+FDT */
+>>>      load_limit =3D MIN(spapr->rma_size, RTAS_MAX_ADDR) - FW_OVERHEAD=
+;
+>>> =20
+>>> +    /* Initialize the IRQ allocator */
+>>> +    spapr->nr_irqs  =3D XICS_IRQS_SPAPR;
+>>> +    spapr->irq_map  =3D bitmap_new(spapr->nr_irqs);
+>>> +
+>>
+>> I think you should introduce a sPAPRMachineClass::has_irq_bitmap boole=
+an
+>> so that the bitmap is only allocated for newer machine types. And you =
+should
+>> then use this flag in spapr_irq_map_needed() above.
+>>
+>> Apart from that, the rest of the patch looks good.
+>>
+>>>      /* Set up Interrupt Controller before we create the VCPUs */
+>>> -    xics_system_init(machine, XICS_IRQS_SPAPR, &error_fatal);
+>>> +    xics_system_init(machine, spapr->nr_irqs, &error_fatal);
+>>> =20
+>>>      /* Set up containers for ibm,client-architecture-support negotia=
+ted options
+>>>       */
+>>> @@ -3560,7 +3581,7 @@ static int ics_find_free_block(ICSState *ics, i=
+nt num, int alignnum)
+>>>      return -1;
+>>>  }
+>>> =20
+>>> -static bool spapr_irq_test(XICSFabric *xi, int irq)
+>>> +static bool spapr_irq_test_2_11(XICSFabric *xi, int irq)
+>>>  {
+>>>      sPAPRMachineState *spapr =3D SPAPR_MACHINE(xi);
+>>>      ICSState *ics =3D spapr->ics;
+>>> @@ -3569,7 +3590,7 @@ static bool spapr_irq_test(XICSFabric *xi, int =
+irq)
+>>>      return !ICS_IRQ_FREE(ics, srcno);
+>>>  }
+>>> =20
+>>> -static int spapr_irq_alloc_block(XICSFabric *xi, int count, int alig=
+n)
+>>> +static int spapr_irq_alloc_block_2_11(XICSFabric *xi, int count, int=
+ align)
+>>>  {
+>>>      sPAPRMachineState *spapr =3D SPAPR_MACHINE(xi);
+>>>      ICSState *ics =3D spapr->ics;
+>>> @@ -3583,7 +3604,7 @@ static int spapr_irq_alloc_block(XICSFabric *xi=
+, int count, int align)
+>>>      return srcno + ics->offset;
+>>>  }
+>>> =20
+>>> -static void spapr_irq_free_block(XICSFabric *xi, int irq, int num)
+>>> +static void spapr_irq_free_block_2_11(XICSFabric *xi, int irq, int n=
+um)
+>>>  {
+>>>      sPAPRMachineState *spapr =3D SPAPR_MACHINE(xi);
+>>>      ICSState *ics =3D spapr->ics;
+>>> @@ -3601,6 +3622,46 @@ static void spapr_irq_free_block(XICSFabric *x=
+i, int irq, int num)
+>>>      }
+>>>  }
+>>> =20
+>>> +static bool spapr_irq_test(XICSFabric *xi, int irq)
+>>> +{
+>>> +    sPAPRMachineState *spapr =3D SPAPR_MACHINE(xi);
+>>> +    int srcno =3D irq - spapr->ics->offset;
+>>> +
+>>> +    return test_bit(srcno, spapr->irq_map);
+>>> +}
+>>> +
+>>> +static int spapr_irq_alloc_block(XICSFabric *xi, int count, int alig=
+n)
+>>> +{
+>>> +    sPAPRMachineState *spapr =3D SPAPR_MACHINE(xi);
+>>> +    int start =3D 0;
+>>> +    int srcno;
+>>> +
+>>> +    /*
+>>> +     * The 'align_mask' parameter of bitmap_find_next_zero_area()
+>>> +     * should be one less than a power of 2; 0 means no
+>>> +     * alignment. Adapt the 'align' value of the former allocator to
+>>> +     * fit the requirements of bitmap_find_next_zero_area()
+>>> +     */
+>>> +    align -=3D 1;
+>>> +
+>>> +    srcno =3D bitmap_find_next_zero_area(spapr->irq_map, spapr->nr_i=
+rqs, start,
+>>> +                                       count, align);
+>>> +    if (srcno =3D=3D spapr->nr_irqs) {
+>>> +        return -1;
+>>> +    }
+>>> +
+>>> +    bitmap_set(spapr->irq_map, srcno, count);
+>>> +    return srcno + spapr->ics->offset;
+>>> +}
+>>> +
+>>> +static void spapr_irq_free_block(XICSFabric *xi, int irq, int num)
+>>> +{
+>>> +    sPAPRMachineState *spapr =3D SPAPR_MACHINE(xi);
+>>> +    int srcno =3D irq - spapr->ics->offset;
+>>> +
+>>> +    bitmap_clear(spapr->irq_map, srcno, num);
+>>> +}
+>>> +
+>>>  static void spapr_pic_print_info(InterruptStatsProvider *obj,
+>>>                                   Monitor *mon)
+>>>  {
+>>> @@ -3778,7 +3839,12 @@ static void spapr_machine_2_11_instance_option=
+s(MachineState *machine)
+>>> =20
+>>>  static void spapr_machine_2_11_class_options(MachineClass *mc)
+>>>  {
+>>> -    /* Defaults for the latest behaviour inherited from the base cla=
+ss */
+>>> +    XICSFabricClass *xic =3D XICS_FABRIC_CLASS(mc);
+>>> +
+>>> +    spapr_machine_2_12_class_options(mc);
+>>> +    xic->irq_test =3D spapr_irq_test_2_11;
+>>> +    xic->irq_alloc_block =3D spapr_irq_alloc_block_2_11;
+>>> +    xic->irq_free_block =3D spapr_irq_free_block_2_11;
+>>>  }
+>>> =20
+>>>  DEFINE_SPAPR_MACHINE(2_11, "2.11", false);
+>>> diff --git a/include/hw/ppc/spapr.h b/include/hw/ppc/spapr.h
+>>> index 9d21ca9bde3a..5835c694caff 100644
+>>> --- a/include/hw/ppc/spapr.h
+>>> +++ b/include/hw/ppc/spapr.h
+>>> @@ -7,6 +7,7 @@
+>>>  #include "hw/ppc/spapr_drc.h"
+>>>  #include "hw/mem/pc-dimm.h"
+>>>  #include "hw/ppc/spapr_ovec.h"
+>>> +#include "qemu/bitmap.h"
+>>> =20
+>>>  struct VIOsPAPRBus;
+>>>  struct sPAPRPHBState;
+>>> @@ -78,6 +79,8 @@ struct sPAPRMachineState {
+>>>      struct VIOsPAPRBus *vio_bus;
+>>>      QLIST_HEAD(, sPAPRPHBState) phbs;
+>>>      struct sPAPRNVRAM *nvram;
+>>> +    int32_t nr_irqs;
+>>> +    unsigned long *irq_map;
+>>>      ICSState *ics;
+>>>      sPAPRRTCState rtc;
+>>> =20
+>>
 >=20
