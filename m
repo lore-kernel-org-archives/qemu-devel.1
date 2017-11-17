@@ -1,27 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:32891)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:32937)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1eFiDW-0004L8-K7
-	for qemu-devel@nongnu.org; Fri, 17 Nov 2017 10:06:07 -0500
+	(envelope-from <eblake@redhat.com>) id 1eFiDZ-0004M8-Ma
+	for qemu-devel@nongnu.org; Fri, 17 Nov 2017 10:06:12 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1eFiDQ-0000Y2-Nh
-	for qemu-devel@nongnu.org; Fri, 17 Nov 2017 10:06:06 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:39268)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1eFiDQ-0000XE-I2
-	for qemu-devel@nongnu.org; Fri, 17 Nov 2017 10:06:00 -0500
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
-	[10.5.11.11])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id A7F1B51150
-	for <qemu-devel@nongnu.org>; Fri, 17 Nov 2017 15:05:59 +0000 (UTC)
-Received: from red.redhat.com (ovpn-123-34.rdu2.redhat.com [10.10.123.34])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id 3B34D7BCF1
-	for <qemu-devel@nongnu.org>; Fri, 17 Nov 2017 15:05:59 +0000 (UTC)
+	(envelope-from <eblake@redhat.com>) id 1eFiDY-0000o6-Lg
+	for qemu-devel@nongnu.org; Fri, 17 Nov 2017 10:06:09 -0500
 From: Eric Blake <eblake@redhat.com>
-Date: Fri, 17 Nov 2017 09:05:52 -0600
-Message-Id: <20171117150556.16947-1-eblake@redhat.com>
-Subject: [Qemu-devel] [PULL 0/4] NBD patches for 2.11-rc2
+Date: Fri, 17 Nov 2017 09:05:55 -0600
+Message-Id: <20171117150556.16947-4-eblake@redhat.com>
+In-Reply-To: <20171117150556.16947-1-eblake@redhat.com>
+References: <20171117150556.16947-1-eblake@redhat.com>
+Subject: [Qemu-devel] [PULL 3/4] nbd/client: Don't hard-disconnect on
+ ESHUTDOWN from server
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,38 +21,57 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
+Cc: qemu-stable@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, "open list:Network Block Dev..." <qemu-block@nongnu.org>
 
-The following changes since commit fec035a53fa15c4c8c4e62bfef56a35df4161e38:
+The NBD spec says that a server may fail any transmission request
+with ESHUTDOWN when it is apparent that no further request from
+the client can be successfully honored.  The client is supposed
+to then initiate a soft shutdown (wait for all remaining in-flight
+requests to be answered, then send NBD_CMD_DISC).  However, since
+qemu's server never uses ESHUTDOWN errors, this code was mostly
+untested since its introduction in commit b6f5d3b5.
 
-  Merge remote-tracking branch 'remotes/kraxel/tags/ui-20171117-pull-request' into staging (2017-11-17 10:18:41 +0000)
+More recently, I learned that nbdkit as the NBD server is able to
+send ESHUTDOWN errors, so I finally tested this code, and noticed
+that our client was special-casing ESHUTDOWN to cause a hard
+shutdown (immediate disconnect, with no NBD_CMD_DISC), but only
+if the server sends this error as a simple reply.  Further
+investigation found that commit d2febedb introduced a regression
+where structured replies behave differently than simple replies -
+but that the structured reply behavior is more in line with the
+spec (even if we still lack code in nbd-client.c to properly quit
+sending further requests).  So this patch reverts the portion of
+b6f5d3b5 that introduced an improper hard-disconnect special-case
+at the lower level, and leaves the future enhancement of a nicer
+soft-disconnect at the higher level for another day.
 
-are available in the git repository at:
+CC: qemu-stable@nongnu.org
+Signed-off-by: Eric Blake <eblake@redhat.com>
+Message-Id: <20171113194857.13933-1-eblake@redhat.com>
+Reviewed-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+---
+ nbd/client.c | 6 ------
+ 1 file changed, 6 deletions(-)
 
-  git://repo.or.cz/qemu/ericb.git tags/pull-nbd-2017-11-17
-
-for you to fetch changes up to fed5f8f82056c9f222433c41aeb9fca50c89f297:
-
-  nbd/server: Fix error reporting for bad requests (2017-11-17 08:38:38 -0600)
-
-----------------------------------------------------------------
-nbd patches for 2017-11-17
-
-Eric Blake - nbd: Don't crash when server reports NBD_CMD_READ failure
-Eric Blake - nbd/client: Use error_prepend() correctly
-Eric Blake - nbd/client: Don't hard-disconnect on ESHUTDOWN from server
-Eric Blake - nbd/server: Fix error reporting for bad requests
-
-----------------------------------------------------------------
-Eric Blake (4):
-      nbd: Don't crash when server reports NBD_CMD_READ failure
-      nbd/client: Use error_prepend() correctly
-      nbd/client: Don't hard-disconnect on ESHUTDOWN from server
-      nbd/server: Fix error reporting for bad requests
-
- block/nbd-client.c |  4 ++--
- nbd/client.c       | 56 +++++++++++++++++++++++++-----------------------------
- nbd/server.c       | 36 ++++++++++++-----------------------
- 3 files changed, 40 insertions(+), 56 deletions(-)
-
+diff --git a/nbd/client.c b/nbd/client.c
+index 4e15fc484d..eea236ca06 100644
+--- a/nbd/client.c
++++ b/nbd/client.c
+@@ -996,15 +996,9 @@ int nbd_receive_reply(QIOChannel *ioc, NBDReply *reply, Error **errp)
+         if (ret < 0) {
+             break;
+         }
+-
+         trace_nbd_receive_simple_reply(reply->simple.error,
+                                        nbd_err_lookup(reply->simple.error),
+                                        reply->handle);
+-        if (reply->simple.error == NBD_ESHUTDOWN) {
+-            /* This works even on mingw which lacks a native ESHUTDOWN */
+-            error_setg(errp, "server shutting down");
+-            return -EINVAL;
+-        }
+         break;
+     case NBD_STRUCTURED_REPLY_MAGIC:
+         ret = nbd_receive_structured_reply_chunk(ioc, &reply->structured, errp);
 -- 
 2.13.6
