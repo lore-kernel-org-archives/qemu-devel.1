@@ -1,22 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44610)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47230)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1eFjwP-0006UO-DK
-	for qemu-devel@nongnu.org; Fri, 17 Nov 2017 11:56:34 -0500
+	(envelope-from <kwolf@redhat.com>) id 1eFk3m-0002dA-De
+	for qemu-devel@nongnu.org; Fri, 17 Nov 2017 12:04:11 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1eFjwO-0006iG-EI
-	for qemu-devel@nongnu.org; Fri, 17 Nov 2017 11:56:33 -0500
-References: <20170628120530.31251-1-vsementsov@virtuozzo.com>
-	<fb5c092b-9db5-c5bf-3f61-9317a6371168@redhat.com>
-	<bb7ce518-8542-f3ab-ac42-7d1106f52b69@virtuozzo.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <e1882eba-b363-1864-f08c-5204bff6249b@redhat.com>
-Date: Fri, 17 Nov 2017 10:56:13 -0600
+	(envelope-from <kwolf@redhat.com>) id 1eFk3g-0005aF-TA
+	for qemu-devel@nongnu.org; Fri, 17 Nov 2017 12:04:08 -0500
+Date: Fri, 17 Nov 2017 18:03:50 +0100
+From: Kevin Wolf <kwolf@redhat.com>
+Message-ID: <20171117170350.GH4795@localhost.localdomain>
+References: <20171106145345.12038-1-berto@igalia.com>
+	<e30a779a-df6d-b929-f39b-ee4b3a580443@redhat.com>
+	<w51po8glvya.fsf@maestria.local.igalia.com>
 MIME-Version: 1.0
-In-Reply-To: <bb7ce518-8542-f3ab-ac42-7d1106f52b69@virtuozzo.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="2WgIL08eodS5fEHFB4r4ECHuGRd9c6w5i"
-Subject: Re: [Qemu-devel] [PATCH v22 00/30] qcow2: persistent dirty bitmaps
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <w51po8glvya.fsf@maestria.local.igalia.com>
+Subject: Re: [Qemu-devel] [PATCH] block: Close a BlockDriverState completely
+ even when bs->drv is NULL
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,77 +25,46 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org
-Cc: kwolf@redhat.com, mreitz@redhat.com, armbru@redhat.com, jsnow@redhat.com, famz@redhat.com, den@openvz.org, stefanha@redhat.com, pbonzini@redhat.com
+To: Alberto Garcia <berto@igalia.com>
+Cc: Max Reitz <mreitz@redhat.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---2WgIL08eodS5fEHFB4r4ECHuGRd9c6w5i
-From: Eric Blake <eblake@redhat.com>
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
- qemu-block@nongnu.org, qemu-devel@nongnu.org
-Cc: kwolf@redhat.com, mreitz@redhat.com, armbru@redhat.com, jsnow@redhat.com,
- famz@redhat.com, den@openvz.org, stefanha@redhat.com, pbonzini@redhat.com
-Message-ID: <e1882eba-b363-1864-f08c-5204bff6249b@redhat.com>
-Subject: Re: [PATCH v22 00/30] qcow2: persistent dirty bitmaps
-References: <20170628120530.31251-1-vsementsov@virtuozzo.com>
- <fb5c092b-9db5-c5bf-3f61-9317a6371168@redhat.com>
- <bb7ce518-8542-f3ab-ac42-7d1106f52b69@virtuozzo.com>
-In-Reply-To: <bb7ce518-8542-f3ab-ac42-7d1106f52b69@virtuozzo.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+Am 17.11.2017 um 17:19 hat Alberto Garcia geschrieben:
+> On Fri 17 Nov 2017 05:14:08 PM CET, Max Reitz wrote:
+> > On 2017-11-06 15:53, Alberto Garcia wrote:
+> >> bdrv_close() skips much of its logic when bs->drv is NULL. This is
+> >> fine when we're closing a BlockDriverState that has just been created
+> >> (because e.g the initialization process failed), but it's not enough
+> >> in other cases.
+> >> 
+> >> For example, when a valid qcow2 image is found to be corrupted then
+> >> QEMU marks it as such in the file header and then sets bs->drv to
+> >> NULL in order to make the BlockDriverState unusable. When that BDS is
+> >> later closed then many of its data structures are not freed (leaking
+> >> their memory) and none of its children are detached. This results in
+> >> bdrv_close_all() failing to close all BDSs and making this assertion
+> >> fail when QEMU is being shut down:
+> >> 
+> >>    bdrv_close_all: Assertion `QTAILQ_EMPTY(&all_bdrv_states)' failed.
+> >> 
+> >> This patch makes bdrv_close() do the full uninitialization process
+> >> in all cases. This fixes the problem with corrupted images and still
+> >> works fine with freshly created BDSs.
+> >> 
+> >> Signed-off-by: Alberto Garcia <berto@igalia.com>
+> >> ---
+> >>  block.c                    | 57 +++++++++++++++++++++++-----------------------
+> >>  tests/qemu-iotests/060     | 13 +++++++++++
+> >>  tests/qemu-iotests/060.out | 12 ++++++++++
+> >>  3 files changed, 53 insertions(+), 29 deletions(-)
+> >
+> > Sooo...  What's the exact status of this patch? :-)
+> 
+> I can resend it rebased on top of your block branch, but I'm fine if you
+> merge the iotest manually (it's a trivial merge).
+> 
+> I'm not sure about Kevin's comments though, it wasn't clear to me if
+> he's fine if we apply this patch or not.
 
-On 11/17/2017 10:17 AM, Vladimir Sementsov-Ogievskiy wrote:
+I'm not sure if it's enough, but I think the patch is good anyway.
 
->> Nothing in this series touched qemu-img.=C2=A0 At the very minimum, it=
- would
->> be nice if 'qemu-img info' were to display a summary of all bitmaps in=
-
->> the qcow2 file; the QMP type ImageInfoSpecificQCow2 should be updated =
-to
->> mention this information, and qemu-img updated to output it.=C2=A0 Bei=
-ng able
->> to create and remove persistent bitmaps from an at-rest qcow2 file
->> without having to fire up qemu to issue QMP commands to do so would al=
-so
->> be nice.
->>
->> It's a bit late for getting this request into 2.12, but had it been
-
-Make that "too late for 2.11"
-
->> available, it would make my work at testing that 'qemu-img commit'
->> doesn't corrupt persistent bitmaps.
->>
->=20
-> You are right, this is needed, but I can't promise something for the
-> nearest future..
-
-And as we both agree it is work for 2.12 or later, it is not needed
-right away; so we have a couple of months.
-
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
-
-
---2WgIL08eodS5fEHFB4r4ECHuGRd9c6w5i
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
-
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAloPFK0ACgkQp6FrSiUn
-Q2oPYAf/YMUS41RdkEF7MP0BMMANt+422Avrei1ZBaTNuO3B27ldigcWWrj1vDEZ
-yOv0w9jdKQz/xc+9UUpSTptQYYjdFbprpCovT2i6KK/BbR5DwYh+JMPFiDFf9Wqe
-zQW4vK8ZneI96+KnnLFYNdoR6IAalI+bkcRHVtvx6AUZNebEJCti3vDh6kUe0iDo
-j58MbP3cyFOw6Ct8mOFgkWaSK6FSPg5nkDNSGhKFODjC4BG4gTV6ocmEIY7uYXQ0
-61kpyIp885k63Abjnx74BhZNfQS5f560T/cVDK+Kvzq4Ch68WOOn6GGMRgYSziJX
-wUEwx258PGMkTKQpCRcoVscoeusYJw==
-=j0Pe
------END PGP SIGNATURE-----
-
---2WgIL08eodS5fEHFB4r4ECHuGRd9c6w5i--
+Kevin
