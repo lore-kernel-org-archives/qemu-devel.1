@@ -1,16 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:32980)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33038)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1eFiDe-0004Q4-CI
-	for qemu-devel@nongnu.org; Fri, 17 Nov 2017 10:06:22 -0500
+	(envelope-from <eblake@redhat.com>) id 1eFiDr-0004YT-4r
+	for qemu-devel@nongnu.org; Fri, 17 Nov 2017 10:06:28 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1eFiDX-0000mm-Ob
-	for qemu-devel@nongnu.org; Fri, 17 Nov 2017 10:06:14 -0500
+	(envelope-from <eblake@redhat.com>) id 1eFiDn-00017i-2g
+	for qemu-devel@nongnu.org; Fri, 17 Nov 2017 10:06:27 -0500
 From: Eric Blake <eblake@redhat.com>
-Date: Fri, 17 Nov 2017 09:05:54 -0600
-Message-Id: <20171117150556.16947-3-eblake@redhat.com>
+Date: Fri, 17 Nov 2017 09:05:56 -0600
+Message-Id: <20171117150556.16947-5-eblake@redhat.com>
 In-Reply-To: <20171117150556.16947-1-eblake@redhat.com>
 References: <20171117150556.16947-1-eblake@redhat.com>
-Subject: [Qemu-devel] [PULL 2/4] nbd/client: Use error_prepend() correctly
+Subject: [Qemu-devel] [PULL 4/4] nbd/server: Fix error reporting for bad
+ requests
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -20,242 +21,111 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: qemu-stable@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, "open list:Network Block Dev..." <qemu-block@nongnu.org>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, "open list:Network Block Dev..." <qemu-block@nongnu.org>
 
-When using error prepend(), it is necessary to end with a space
-in the format string; otherwise, messages come out incorrectly,
-such as when connecting to a socket that hangs up immediately:
+The NBD spec says an attempt to NBD_CMD_TRIM on a read-only
+export should fail with EPERM, as a trim has the potential
+to change disk contents, but we were relying on the block
+layer to catch that for us, which might not always give the
+right error (and even if it does, it does not let us pass
+back a sane message for structured replies).
 
-can't open device nbd://localhost:10809/: Failed to read dataUnexpected end-of-file before all bytes were read
+The NBD spec says an attempt to NBD_CMD_WRITE_ZEROES out of
+bounds should fail with ENOSPC, not EINVAL.
 
-Originally botched in commit e44ed99d, then several more instances
-added in the meantime.
+Our check for u64 offset + u32 length wraparound up front is
+pointless; nothing uses offset until after the second round
+of sanity checks, and we can just as easily ensure there is
+no wraparound by checking whether offset is in bounds (since
+a disk size cannot exceed off_t which is 63 bits, adding a
+32-bit number for a valid offset can't overflow).  Bonus:
+dropping the up-front check lets us keep the connection alive
+after NBD_CMD_WRITE, whereas before we would drop the
+connection (of course, any client sending a packet that would
+trigger the failure is already buggy, so it's also okay to
+drop the connection, but better quality-of-implementation
+never hurts).
 
-Pre-existing and not fixed here: we are inconsistent on capitalization;
-some of our messages start with lower case, and others start with upper,
-although the use of error_prepend() is much nicer to read when all
-fragments consistently start with lower.
+Solve all of these issues by some code motion and improved
+request validation.
 
-CC: qemu-stable@nongnu.org
 Signed-off-by: Eric Blake <eblake@redhat.com>
-Message-Id: <20171113152424.25381-1-eblake@redhat.com>
+Message-Id: <20171115213557.3548-1-eblake@redhat.com>
 Reviewed-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Reviewed-by: Markus Armbruster <armbru@redhat.com>
 ---
- nbd/client.c | 50 ++++++++++++++++++++++++++------------------------
- 1 file changed, 26 insertions(+), 24 deletions(-)
+ nbd/server.c | 36 ++++++++++++------------------------
+ 1 file changed, 12 insertions(+), 24 deletions(-)
 
-diff --git a/nbd/client.c b/nbd/client.c
-index 1880103d2a..4e15fc484d 100644
---- a/nbd/client.c
-+++ b/nbd/client.c
-@@ -79,12 +79,12 @@ static int nbd_send_option_request(QIOChannel *ioc, uint32_t opt,
-     stl_be_p(&req.length, len);
-
-     if (nbd_write(ioc, &req, sizeof(req), errp) < 0) {
--        error_prepend(errp, "Failed to send option request header");
-+        error_prepend(errp, "Failed to send option request header: ");
-         return -1;
+diff --git a/nbd/server.c b/nbd/server.c
+index df771fd42f..7d6801b427 100644
+--- a/nbd/server.c
++++ b/nbd/server.c
+@@ -1366,15 +1366,6 @@ static int nbd_co_receive_request(NBDRequestData *req, NBDRequest *request,
+         return -EIO;
      }
 
-     if (len && nbd_write(ioc, (char *) data, len, errp) < 0) {
--        error_prepend(errp, "Failed to send option request data");
-+        error_prepend(errp, "Failed to send option request data: ");
-         return -1;
+-    /* Check for sanity in the parameters, part 1.  Defer as many
+-     * checks as possible until after reading any NBD_CMD_WRITE
+-     * payload, so we can try and keep the connection alive.  */
+-    if ((request->from + request->len) < request->from) {
+-        error_setg(errp,
+-                   "integer overflow detected, you're probably being attacked");
+-        return -EINVAL;
+-    }
+-
+     if (request->type == NBD_CMD_READ || request->type == NBD_CMD_WRITE) {
+         if (request->len > NBD_MAX_BUFFER_SIZE) {
+             error_setg(errp, "len (%" PRIu32" ) is larger than max len (%u)",
+@@ -1399,12 +1390,21 @@ static int nbd_co_receive_request(NBDRequestData *req, NBDRequest *request,
+                                                       request->len);
      }
 
-@@ -113,7 +113,7 @@ static int nbd_receive_option_reply(QIOChannel *ioc, uint32_t opt,
- {
-     QEMU_BUILD_BUG_ON(sizeof(*reply) != 20);
-     if (nbd_read(ioc, reply, sizeof(*reply), errp) < 0) {
--        error_prepend(errp, "failed to read option reply");
-+        error_prepend(errp, "failed to read option reply: ");
-         nbd_send_opt_abort(ioc);
-         return -1;
+-    /* Sanity checks, part 2. */
+-    if (request->from + request->len > client->exp->size) {
++    /* Sanity checks. */
++    if (client->exp->nbdflags & NBD_FLAG_READ_ONLY &&
++        (request->type == NBD_CMD_WRITE ||
++         request->type == NBD_CMD_WRITE_ZEROES ||
++         request->type == NBD_CMD_TRIM)) {
++        error_setg(errp, "Export is read-only");
++        return -EROFS;
++    }
++    if (request->from > client->exp->size ||
++        request->from + request->len > client->exp->size) {
+         error_setg(errp, "operation past EOF; From: %" PRIu64 ", Len: %" PRIu32
+                    ", Size: %" PRIu64, request->from, request->len,
+                    (uint64_t)client->exp->size);
+-        return request->type == NBD_CMD_WRITE ? -ENOSPC : -EINVAL;
++        return (request->type == NBD_CMD_WRITE ||
++                request->type == NBD_CMD_WRITE_ZEROES) ? -ENOSPC : -EINVAL;
      }
-@@ -166,7 +166,7 @@ static int nbd_handle_reply_err(QIOChannel *ioc, nbd_opt_reply *reply,
-         msg = g_malloc(reply->length + 1);
-         if (nbd_read(ioc, msg, reply->length, errp) < 0) {
-             error_prepend(errp, "failed to read option error 0x%" PRIx32
--                          " (%s) message",
-+                          " (%s) message: ",
-                           reply->type, nbd_rep_lookup(reply->type));
-             goto cleanup;
-         }
-@@ -277,7 +277,7 @@ static int nbd_receive_list(QIOChannel *ioc, const char *want, bool *match,
-         return -1;
-     }
-     if (nbd_read(ioc, &namelen, sizeof(namelen), errp) < 0) {
--        error_prepend(errp, "failed to read option name length");
-+        error_prepend(errp, "failed to read option name length: ");
-         nbd_send_opt_abort(ioc);
-         return -1;
-     }
-@@ -290,7 +290,8 @@ static int nbd_receive_list(QIOChannel *ioc, const char *want, bool *match,
-     }
-     if (namelen != strlen(want)) {
-         if (nbd_drop(ioc, len, errp) < 0) {
--            error_prepend(errp, "failed to skip export name with wrong length");
-+            error_prepend(errp,
-+                          "failed to skip export name with wrong length: ");
-             nbd_send_opt_abort(ioc);
-             return -1;
-         }
-@@ -299,14 +300,14 @@ static int nbd_receive_list(QIOChannel *ioc, const char *want, bool *match,
+     valid_flags = NBD_CMD_FLAG_FUA;
+     if (request->type == NBD_CMD_READ && client->structured_reply) {
+@@ -1482,12 +1482,6 @@ static coroutine_fn void nbd_trip(void *opaque)
 
-     assert(namelen < sizeof(name));
-     if (nbd_read(ioc, name, namelen, errp) < 0) {
--        error_prepend(errp, "failed to read export name");
-+        error_prepend(errp, "failed to read export name: ");
-         nbd_send_opt_abort(ioc);
-         return -1;
-     }
-     name[namelen] = '\0';
-     len -= namelen;
-     if (nbd_drop(ioc, len, errp) < 0) {
--        error_prepend(errp, "failed to read export description");
-+        error_prepend(errp, "failed to read export description: ");
-         nbd_send_opt_abort(ioc);
-         return -1;
-     }
-@@ -390,7 +391,7 @@ static int nbd_opt_go(QIOChannel *ioc, const char *wantname,
-             return -1;
-         }
-         if (nbd_read(ioc, &type, sizeof(type), errp) < 0) {
--            error_prepend(errp, "failed to read info type");
-+            error_prepend(errp, "failed to read info type: ");
-             nbd_send_opt_abort(ioc);
-             return -1;
-         }
-@@ -405,13 +406,13 @@ static int nbd_opt_go(QIOChannel *ioc, const char *wantname,
-                 return -1;
-             }
-             if (nbd_read(ioc, &info->size, sizeof(info->size), errp) < 0) {
--                error_prepend(errp, "failed to read info size");
-+                error_prepend(errp, "failed to read info size: ");
-                 nbd_send_opt_abort(ioc);
-                 return -1;
-             }
-             be64_to_cpus(&info->size);
-             if (nbd_read(ioc, &info->flags, sizeof(info->flags), errp) < 0) {
--                error_prepend(errp, "failed to read info flags");
-+                error_prepend(errp, "failed to read info flags: ");
-                 nbd_send_opt_abort(ioc);
-                 return -1;
-             }
-@@ -428,7 +429,7 @@ static int nbd_opt_go(QIOChannel *ioc, const char *wantname,
-             }
-             if (nbd_read(ioc, &info->min_block, sizeof(info->min_block),
-                          errp) < 0) {
--                error_prepend(errp, "failed to read info minimum block size");
-+                error_prepend(errp, "failed to read info minimum block size: ");
-                 nbd_send_opt_abort(ioc);
-                 return -1;
-             }
-@@ -441,7 +442,8 @@ static int nbd_opt_go(QIOChannel *ioc, const char *wantname,
-             }
-             if (nbd_read(ioc, &info->opt_block, sizeof(info->opt_block),
-                          errp) < 0) {
--                error_prepend(errp, "failed to read info preferred block size");
-+                error_prepend(errp,
-+                              "failed to read info preferred block size: ");
-                 nbd_send_opt_abort(ioc);
-                 return -1;
-             }
-@@ -455,7 +457,7 @@ static int nbd_opt_go(QIOChannel *ioc, const char *wantname,
-             }
-             if (nbd_read(ioc, &info->max_block, sizeof(info->max_block),
-                          errp) < 0) {
--                error_prepend(errp, "failed to read info maximum block size");
-+                error_prepend(errp, "failed to read info maximum block size: ");
-                 nbd_send_opt_abort(ioc);
-                 return -1;
-             }
-@@ -467,7 +469,7 @@ static int nbd_opt_go(QIOChannel *ioc, const char *wantname,
-         default:
-             trace_nbd_opt_go_info_unknown(type, nbd_info_lookup(type));
-             if (nbd_drop(ioc, len, errp) < 0) {
--                error_prepend(errp, "Failed to read info payload");
-+                error_prepend(errp, "Failed to read info payload: ");
-                 nbd_send_opt_abort(ioc);
-                 return -1;
-             }
-@@ -618,7 +620,7 @@ int nbd_receive_negotiate(QIOChannel *ioc, const char *name,
-     }
+         break;
+     case NBD_CMD_WRITE:
+-        if (exp->nbdflags & NBD_FLAG_READ_ONLY) {
+-            error_setg(&local_err, "Export is read-only");
+-            ret = -EROFS;
+-            break;
+-        }
+-
+         flags = 0;
+         if (request.flags & NBD_CMD_FLAG_FUA) {
+             flags |= BDRV_REQ_FUA;
+@@ -1500,12 +1494,6 @@ static coroutine_fn void nbd_trip(void *opaque)
 
-     if (nbd_read(ioc, buf, 8, errp) < 0) {
--        error_prepend(errp, "Failed to read data");
-+        error_prepend(errp, "Failed to read data: ");
-         goto fail;
-     }
-
-@@ -637,7 +639,7 @@ int nbd_receive_negotiate(QIOChannel *ioc, const char *name,
-     }
-
-     if (nbd_read(ioc, &magic, sizeof(magic), errp) < 0) {
--        error_prepend(errp, "Failed to read magic");
-+        error_prepend(errp, "Failed to read magic: ");
-         goto fail;
-     }
-     magic = be64_to_cpu(magic);
-@@ -649,7 +651,7 @@ int nbd_receive_negotiate(QIOChannel *ioc, const char *name,
-         bool fixedNewStyle = false;
-
-         if (nbd_read(ioc, &globalflags, sizeof(globalflags), errp) < 0) {
--            error_prepend(errp, "Failed to read server flags");
-+            error_prepend(errp, "Failed to read server flags: ");
-             goto fail;
-         }
-         globalflags = be16_to_cpu(globalflags);
-@@ -665,7 +667,7 @@ int nbd_receive_negotiate(QIOChannel *ioc, const char *name,
-         /* client requested flags */
-         clientflags = cpu_to_be32(clientflags);
-         if (nbd_write(ioc, &clientflags, sizeof(clientflags), errp) < 0) {
--            error_prepend(errp, "Failed to send clientflags field");
-+            error_prepend(errp, "Failed to send clientflags field: ");
-             goto fail;
-         }
-         if (tlscreds) {
-@@ -727,13 +729,13 @@ int nbd_receive_negotiate(QIOChannel *ioc, const char *name,
-
-         /* Read the response */
-         if (nbd_read(ioc, &info->size, sizeof(info->size), errp) < 0) {
--            error_prepend(errp, "Failed to read export length");
-+            error_prepend(errp, "Failed to read export length: ");
-             goto fail;
-         }
-         be64_to_cpus(&info->size);
-
-         if (nbd_read(ioc, &info->flags, sizeof(info->flags), errp) < 0) {
--            error_prepend(errp, "Failed to read export flags");
-+            error_prepend(errp, "Failed to read export flags: ");
-             goto fail;
-         }
-         be16_to_cpus(&info->flags);
-@@ -750,13 +752,13 @@ int nbd_receive_negotiate(QIOChannel *ioc, const char *name,
-         }
-
-         if (nbd_read(ioc, &info->size, sizeof(info->size), errp) < 0) {
--            error_prepend(errp, "Failed to read export length");
-+            error_prepend(errp, "Failed to read export length: ");
-             goto fail;
-         }
-         be64_to_cpus(&info->size);
-
-         if (nbd_read(ioc, &oldflags, sizeof(oldflags), errp) < 0) {
--            error_prepend(errp, "Failed to read export flags");
-+            error_prepend(errp, "Failed to read export flags: ");
-             goto fail;
-         }
-         be32_to_cpus(&oldflags);
-@@ -772,7 +774,7 @@ int nbd_receive_negotiate(QIOChannel *ioc, const char *name,
-
-     trace_nbd_receive_negotiate_size_flags(info->size, info->flags);
-     if (zeroes && nbd_drop(ioc, 124, errp) < 0) {
--        error_prepend(errp, "Failed to read reserved block");
-+        error_prepend(errp, "Failed to read reserved block: ");
-         goto fail;
-     }
-     rc = 0;
+         break;
+     case NBD_CMD_WRITE_ZEROES:
+-        if (exp->nbdflags & NBD_FLAG_READ_ONLY) {
+-            error_setg(&local_err, "Export is read-only");
+-            ret = -EROFS;
+-            break;
+-        }
+-
+         flags = 0;
+         if (request.flags & NBD_CMD_FLAG_FUA) {
+             flags |= BDRV_REQ_FUA;
 -- 
 2.13.6
