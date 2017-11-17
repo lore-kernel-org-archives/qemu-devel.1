@@ -1,22 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44549)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53948)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1eFX3Y-0008SE-6O
-	for qemu-devel@nongnu.org; Thu, 16 Nov 2017 22:11:05 -0500
+	(envelope-from <jasowang@redhat.com>) id 1eFXc9-0005SL-Bz
+	for qemu-devel@nongnu.org; Thu, 16 Nov 2017 22:46:50 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1eFX3X-0001SG-5x
-	for qemu-devel@nongnu.org; Thu, 16 Nov 2017 22:11:04 -0500
-References: <20171113162053.58795-1-vsementsov@virtuozzo.com>
-	<01108daa-fed3-c142-bbd6-0ecc4c8b795d@redhat.com>
-	<cd0a2e5e-f788-0e5a-dec7-f428479f3b89@virtuozzo.com>
-From: John Snow <jsnow@redhat.com>
-Message-ID: <8c61f43c-5f56-8c1b-a2fe-f954d34dc687@redhat.com>
-Date: Thu, 16 Nov 2017 22:10:48 -0500
+	(envelope-from <jasowang@redhat.com>) id 1eFXc6-0004de-8V
+	for qemu-devel@nongnu.org; Thu, 16 Nov 2017 22:46:49 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:57738)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <jasowang@redhat.com>) id 1eFXc6-0004cK-0A
+	for qemu-devel@nongnu.org; Thu, 16 Nov 2017 22:46:46 -0500
+References: <CACnE9pzALCNV62Jmo4SUawD=pQiPFENWR_BwK3=+yY7V1U54Ag@mail.gmail.com>
+	<cd39d029-48f9-20d6-cc19-ff87a45240ab@redhat.com>
+	<CACnE9pzm5zabq=nJhqB4LHzSXk2vDGiAN5SbJco3ZfGkfRbW-g@mail.gmail.com>
+	<5A0D27D8.6050506@huawei.com>
+	<2e0ddd76-3903-d715-9a86-73f1286322e7@redhat.com>
+	<33183CC9F5247A488A2544077AF19020DA46E2A6@DGGEMA505-MBS.china.huawei.com>
+	<6aaaca2b-81ef-a1c1-4745-830d008b3770@redhat.com>
+	<5A0D5B1B.3080708@huawei.com>
+	<55f2edb1-1fe3-d03f-7f4f-418a3b15997a@redhat.com>
+	<5A0E4310.2060803@huawei.com>
+From: Jason Wang <jasowang@redhat.com>
+Message-ID: <62e5cafb-8e8f-f978-fdb0-3a7edc9a9167@redhat.com>
+Date: Fri, 17 Nov 2017 11:46:32 +0800
 MIME-Version: 1.0
-In-Reply-To: <cd0a2e5e-f788-0e5a-dec7-f428479f3b89@virtuozzo.com>
-Content-Type: text/plain; charset=utf-8
+In-Reply-To: <5A0E4310.2060803@huawei.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH for-2.12 0/4] qmp dirty bitmap API
+Subject: Re: [Qemu-devel] [Question] why need to start all queues in
+ vhost_net_start
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,93 +37,93 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org
-Cc: kwolf@redhat.com, famz@redhat.com, armbru@redhat.com, mnestratov@virtuozzo.com, mreitz@redhat.com, nshirokovskiy@virtuozzo.com, stefanha@redhat.com, den@openvz.org, pbonzini@redhat.com
+To: "Longpeng (Mike)" <longpeng2@huawei.com>
+Cc: "Huangweidong (C)" <weidong.huang@huawei.com>, "Longpeng(Mike)" <longpeng.mike@gmail.com>, "mst@redhat.com" <mst@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "Wangjing (King, Euler)" <king.wang@huawei.com>, "Gonglei (Arei)" <arei.gonglei@huawei.com>, "stefanha@redhat.com" <stefanha@redhat.com>
 
 
 
-On 11/16/2017 03:17 AM, Vladimir Sementsov-Ogievskiy wrote:
-> 16.11.2017 00:20, John Snow wrote:
->>
->> On 11/13/2017 11:20 AM, Vladimir Sementsov-Ogievskiy wrote:
->>> Hi all.
+On 2017=E5=B9=B411=E6=9C=8817=E6=97=A5 10:01, Longpeng (Mike) wrote:
+> On 2017/11/16 20:04, Jason Wang wrote:
+>
+>> On 2017=E5=B9=B411=E6=9C=8816=E6=97=A5 17:32, Longpeng (Mike) wrote:
+>>> Hi Jason,
 >>>
->>> There are three qmp commands, needed to implement external backup API=
+>>> On 2017/11/16 17:13, Jason Wang wrote:
+>>>
+>>>> On 2017=E5=B9=B411=E6=9C=8816=E6=97=A5 17:01, Gonglei (Arei) wrote:
+>>>>> No, Windows guest + vhost-user/DPDK.
+>>>>>
+>>>>> BTW pls see virtio spec in :
+>>>>>
+>>>>> "If VIRTIO_NET_F_MQ is negotiated, each of receiveq1. . .receiveqN =
+that will
+>>>>> be used SHOULD be populated
+>>>>> with receive buffers."
+>>>>>
+>>>>> It is not mandatory that all queues must be initialized.
+>>>> I think not, since it said we should fill receive buffers for each q=
+ueue which
+>>>> means we should initialize all queues. May Michael can clarify on th=
+is.
+>>>>
+>>> I think this doesn't matter, but QEMU should consider this scenario..=
 .
 >>>
->>> Using these three commands, client may do all needed bitmap
->>> management by
->>> hand:
+>>> For example, if one queues isn't initialized (Windows guest), the vri=
+ng.avail=3D0,
+>>> so vq->desc_phys=3D0, then vq->desc=3D'a avail HVA'(which is the star=
+t addr of
+>>> pc.ram).
 >>>
->>> on backup start we need to do a transaction:
->>> =C2=A0 {disable old bitmap, create new bitmap}
+>>>       vq->desc_size =3D s =3D l =3D virtio_queue_get_desc_size(vdev, =
+idx);
+>>>       vq->desc_phys =3D a =3D virtio_queue_get_desc_addr(vdev, idx);
+>>>       vq->desc =3D vhost_memory_map(dev, a, &l, 0);
+>>>       if (!vq->desc || l !=3D s) {
+>>>           r =3D -ENOMEM;
+>>>           goto fail_alloc_desc;
+>>>       }
+>>>       .....
+>>>       r =3D vhost_virtqueue_set_addr(dev, vq, vhost_vq_index, dev->lo=
+g_enabled);
+>>>       if (r < 0) {
+>>>           r =3D -errno;
+>>>           goto fail_alloc;
+>>>       }
 >>>
->>> on backup success:
->>> =C2=A0 drop old bitmap
+>>> Then the HVA is send to the vhost-user.
 >>>
->>> on backup fail:
->>> =C2=A0 enable old bitmap
->>> =C2=A0 merge new bitmap to old bitmap
->>> =C2=A0 drop new bitmap
->>>
->> Can you give me an example of how you expect these commands to be used=
-,
->> and why they're required?
+>>> I think this is wrong, because the '0' here means guest driver doesn'=
+t init this
+>>> queues, it should not be used to calculate the HVA for this vq.
+>> Yes, workaround is not hard if windows driver won't use the left 3 que=
+ues any
+>> more. But we should have a complete solution. The main problem is when=
+ vhost
+>> need to be started. For legacy device, there's no easy way to detect w=
+hether or
+>> not a specific virtqueue is ready to be used. For modern device, we ca=
+n probably
+>> do this through queue_enable (but this is not implemented in current c=
+ode).
 >>
->> I'm a little weary about how error-prone these commands might be and t=
-he
->> potential for incorrect usage seems... high. Why do we require them?
->=20
-> It is needed for incremental backup. It looks like bad idea to export
-> abdicate/reclaim functionality, it is simpler
-> and clearer to allow user to merge/enable/disable bitmaps by hand.
->=20
-> usage is like this:
->=20
-> 1. we have dirty bitmap bitmap0 for incremental backup.
->=20
-> 2. prepare image fleecing (create temporary image with backing=3Dour_di=
-sk)
-> 3. in qmp transaction:
-> =C2=A0=C2=A0=C2=A0 - disable bitmap0
-> =C2=A0=C2=A0=C2=A0 - create bitmap1
-> =C2=A0=C2=A0=C2=A0 - start image fleecing (backup sync=3Dnone our_disk =
--> temp_disk)
+> Can we initialize the vring.desc/vring.avail/vring.used to -1, then we =
+can
+> detect whether or not a specific vq is ready to be used by check the ad=
+dr of its
+> tables is -1 or not ?
+>
+> Initialize to 0 is not suitable, because we don't know whether the gues=
+t set GPA
+> 0 or the guest not initialize this vq.
+>
 
-This could probably just be its own command, though:
+Unfortunately, it's too late to do this in spec for legacy device. (If=20
+you look at the spec, legacy MMIO transport treat 0x0 as an illegal=20
+value.) For modern device, we could detect this through queue_enable.
 
-block-job-fleece node=3Dfoobar bitmap=3Dbitmap0 etc=3Detera etc=3Detera
+Let's wait for Yan to reply whether or not windows driver can use the=20
+left three queues. If not, I will try to post a fix(workaround) for this=20
+and let's consider a complete solution.
 
-Could handle forking the bitmap. I'm not sure what the arguments would
-look like, but we could name the NBD export here, too. (Assuming the
-server is already started and we just need to create the share.)
-
-Then, we can basically do what mirror does:
-
-(1) Cancel
-(2) Complete
-
-Cancel would instruct QEMU to keep the bitmap changes (i.e. roll back),
-and Complete would instruct QEMU to discard the changes.
-
-This way we don't need to expose commands like split or merge that will
-almost always be dangerous to use over QMP.
-
-In fact, a fleecing job would be really convenient even without a
-bitmap, because it'd still be nice to have a convenience command for it.
-Using an existing infrastructure and understood paradigm is just a bonus.
-
-> 4. export temp_disk (it looks like a snapshot) and bitmap0 through NBD
->=20
-> =3D=3D=3D external tool can get bitmap0 and then copy some clusters thr=
-ough
-> NBD =3D=3D=3D
->=20
-> on successful backup external tool can drop bitmap0. or can save it and
-> reuse somehow
->=20
-> on failed backup external tool can do the following:
-> =C2=A0 =C2=A0 - enable bitmap0
-> =C2=A0 =C2=A0 - merge bitmap1 to bitmap0
-> =C2=A0 =C2=A0 - drop bitmap1
->=20
+Thanks
