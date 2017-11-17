@@ -1,33 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35798)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38431)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1eFYKy-0005Jk-3P
-	for qemu-devel@nongnu.org; Thu, 16 Nov 2017 23:33:09 -0500
+	(envelope-from <dgibson@ozlabs.org>) id 1eFYa5-0007w5-E0
+	for qemu-devel@nongnu.org; Thu, 16 Nov 2017 23:48:47 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1eFYKu-0001JI-Vp
-	for qemu-devel@nongnu.org; Thu, 16 Nov 2017 23:33:08 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:56892)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1eFYKu-0001Gp-Lk
-	for qemu-devel@nongnu.org; Thu, 16 Nov 2017 23:33:04 -0500
-Date: Fri, 17 Nov 2017 06:32:58 +0200
-From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <20171117063024-mutt-send-email-mst@kernel.org>
-References: <CACnE9pzALCNV62Jmo4SUawD=pQiPFENWR_BwK3=+yY7V1U54Ag@mail.gmail.com>
-	<cd39d029-48f9-20d6-cc19-ff87a45240ab@redhat.com>
-	<CACnE9pzm5zabq=nJhqB4LHzSXk2vDGiAN5SbJco3ZfGkfRbW-g@mail.gmail.com>
-	<5A0D27D8.6050506@huawei.com>
-	<2e0ddd76-3903-d715-9a86-73f1286322e7@redhat.com>
-	<33183CC9F5247A488A2544077AF19020DA46E2A6@DGGEMA505-MBS.china.huawei.com>
-	<6aaaca2b-81ef-a1c1-4745-830d008b3770@redhat.com>
-	<5A0D5B1B.3080708@huawei.com>
-	<55f2edb1-1fe3-d03f-7f4f-418a3b15997a@redhat.com>
+	(envelope-from <dgibson@ozlabs.org>) id 1eFYa2-0007pU-NS
+	for qemu-devel@nongnu.org; Thu, 16 Nov 2017 23:48:45 -0500
+Date: Fri, 17 Nov 2017 15:48:25 +1100
+From: David Gibson <david@gibson.dropbear.id.au>
+Message-ID: <20171117044825.GA26448@umbus.fritz.box>
+References: <20171110152017.24324-1-clg@kaod.org>
+	<20171110152017.24324-4-clg@kaod.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature"; boundary="tKW2IUtsqtDRztdT"
 Content-Disposition: inline
-In-Reply-To: <55f2edb1-1fe3-d03f-7f4f-418a3b15997a@redhat.com>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [Question] why need to start all queues in
- vhost_net_start
+In-Reply-To: <20171110152017.24324-4-clg@kaod.org>
+Subject: Re: [Qemu-devel] [PATCH for-2.12 v3 03/11] spapr: introduce new
+ XICSFabric operations for an IRQ allocator
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,113 +25,129 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Jason Wang <jasowang@redhat.com>
-Cc: "Longpeng (Mike)" <longpeng2@huawei.com>, "Huangweidong (C)" <weidong.huang@huawei.com>, "stefanha@redhat.com" <stefanha@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "Wangjing (King, Euler)" <king.wang@huawei.com>, "Gonglei (Arei)" <arei.gonglei@huawei.com>, "Longpeng(Mike)" <longpeng.mike@gmail.com>
+To: =?iso-8859-1?Q?C=E9dric?= Le Goater <clg@kaod.org>
+Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, Greg Kurz <groug@kaod.org>, Benjamin Herrenschmidt <benh@kernel.crashing.org>
 
-On Thu, Nov 16, 2017 at 08:04:34PM +0800, Jason Wang wrote:
+
+--tKW2IUtsqtDRztdT
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
+
+On Fri, Nov 10, 2017 at 03:20:09PM +0000, C=E9dric Le Goater wrote:
+> Currently, the ICSState 'ics' object of the sPAPR machine acts as the
+> global interrupt source handler and also as the IRQ number allocator
+> for the machine. Some IRQ numbers are allocated very early in the
+> machine initialization sequence to populate the device tree, and this
+> is a problem to introduce the new POWER XIVE interrupt model, as it
+> needs to share the IRQ numbers with the older model.
 >=20
+> To prepare ground for XIVE, here is a set of new XICSFabric operations
+> to let the machine handle directly the IRQ number allocation and to
+> decorrelate the allocation from the interrupt source object :
 >=20
-> On 2017=E5=B9=B411=E6=9C=8816=E6=97=A5 17:32, Longpeng (Mike) wrote:
-> > Hi Jason,
-> >=20
-> > On 2017/11/16 17:13, Jason Wang wrote:
-> >=20
-> > >=20
-> > > On 2017=E5=B9=B411=E6=9C=8816=E6=97=A5 17:01, Gonglei (Arei) wrote:
-> > > > No, Windows guest + vhost-user/DPDK.
-> > > >=20
-> > > > BTW pls see virtio spec in :
-> > > >=20
-> > > > "If VIRTIO_NET_F_MQ is negotiated, each of receiveq1. . .receiveq=
-N that will
-> > > > be used SHOULD be populated
-> > > > with receive buffers."
-> > > >=20
-> > > > It is not mandatory that all queues must be initialized.
-> > > I think not, since it said we should fill receive buffers for each =
-queue which
-> > > means we should initialize all queues. May Michael can clarify on t=
-his.
-> > >=20
-> >=20
-> > I think this doesn't matter, but QEMU should consider this scenario..=
-.
-> >=20
-> > For example, if one queues isn't initialized (Windows guest), the vri=
-ng.avail=3D0,
-> > so vq->desc_phys=3D0, then vq->desc=3D'a avail HVA'(which is the star=
-t addr of pc.ram).
-> >=20
-> >      vq->desc_size =3D s =3D l =3D virtio_queue_get_desc_size(vdev, i=
-dx);
-> >      vq->desc_phys =3D a =3D virtio_queue_get_desc_addr(vdev, idx);
-> >      vq->desc =3D vhost_memory_map(dev, a, &l, 0);
-> >      if (!vq->desc || l !=3D s) {
-> >          r =3D -ENOMEM;
-> >          goto fail_alloc_desc;
-> >      }
-> >      .....
-> >      r =3D vhost_virtqueue_set_addr(dev, vq, vhost_vq_index, dev->log=
-_enabled);
-> >      if (r < 0) {
-> >          r =3D -errno;
-> >          goto fail_alloc;
-> >      }
-> >=20
-> > Then the HVA is send to the vhost-user.
-> >=20
-> > I think this is wrong, because the '0' here means guest driver doesn'=
-t init this
-> > queues, it should not be used to calculate the HVA for this vq.
+>     bool (*irq_test)(XICSFabric *xi, int irq);
+>     int (*irq_alloc_block)(XICSFabric *xi, int count, int align);
+>     void (*irq_free_block)(XICSFabric *xi, int irq, int num);
 >=20
-> Yes, workaround is not hard if windows driver won't use the left 3 queu=
-es
-> any more. But we should have a complete solution. The main problem is w=
-hen
-> vhost need to be started. For legacy device, there's no easy way to det=
-ect
-> whether or not a specific virtqueue is ready to be used. For modern dev=
-ice,
-> we can probably do this through queue_enable (but this is not implement=
-ed in
-> current code).
+> In these prototypes, the 'irq' parameter refers to a number in the
+> global IRQ number space. Indexes for arrays storing different state
+> informations on the interrupts, like the ICSIRQState, are usually
+> named 'srcno'.
 >=20
-> Thanks
+> Signed-off-by: C=E9dric Le Goater <clg@kaod.org>
 
-What isn't implemented?
+This doesn't seem sensible to me.  When I said you should move irq
+allocation to the machine, I mean actually move the code.  The only
+user of irq allocation should be in the machine, so we shouldn't need
+to indirect via the XICSFabric interface to do that.
 
-Spec is quite explicit:
+And, we shouldn't be using XICSFabric things for XIVE.
 
+> ---
+>  hw/ppc/spapr.c        | 19 +++++++++++++++++++
+>  include/hw/ppc/xics.h |  4 ++++
+>  2 files changed, 23 insertions(+)
+>=20
+> diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
+> index a2dcbee07214..84d68f2fdbae 100644
+> --- a/hw/ppc/spapr.c
+> +++ b/hw/ppc/spapr.c
+> @@ -3536,6 +3536,21 @@ static ICPState *spapr_icp_get(XICSFabric *xi, int=
+ vcpu_id)
+>      return cpu ? ICP(cpu->intc) : NULL;
+>  }
+> =20
+> +static bool spapr_irq_test(XICSFabric *xi, int irq)
+> +{
+> +    return false;
+> +}
+> +
+> +static int spapr_irq_alloc_block(XICSFabric *xi, int count, int align)
+> +{
+> +    return -1;
+> +}
+> +
+> +static void spapr_irq_free_block(XICSFabric *xi, int irq, int num)
+> +{
+> +    ;
+> +}
+> +
+>  static void spapr_pic_print_info(InterruptStatsProvider *obj,
+>                                   Monitor *mon)
+>  {
+> @@ -3630,6 +3645,10 @@ static void spapr_machine_class_init(ObjectClass *=
+oc, void *data)
+>      xic->ics_get =3D spapr_ics_get;
+>      xic->ics_resend =3D spapr_ics_resend;
+>      xic->icp_get =3D spapr_icp_get;
+> +    xic->irq_test =3D spapr_irq_test;
+> +    xic->irq_alloc_block =3D spapr_irq_alloc_block;
+> +    xic->irq_free_block =3D spapr_irq_free_block;
+> +
+>      ispc->print_info =3D spapr_pic_print_info;
+>      /* Force NUMA node memory size to be a multiple of
+>       * SPAPR_MEMORY_BLOCK_SIZE (256M) since that's the granularity
+> diff --git a/include/hw/ppc/xics.h b/include/hw/ppc/xics.h
+> index 28d248abad61..30e7f2e0a7dd 100644
+> --- a/include/hw/ppc/xics.h
+> +++ b/include/hw/ppc/xics.h
+> @@ -175,6 +175,10 @@ typedef struct XICSFabricClass {
+>      ICSState *(*ics_get)(XICSFabric *xi, int irq);
+>      void (*ics_resend)(XICSFabric *xi);
+>      ICPState *(*icp_get)(XICSFabric *xi, int server);
+> +    /* IRQ allocator helpers */
+> +    bool (*irq_test)(XICSFabric *xi, int irq);
+> +    int (*irq_alloc_block)(XICSFabric *xi, int count, int align);
+> +    void (*irq_free_block)(XICSFabric *xi, int irq, int num);
+>  } XICSFabricClass;
+> =20
+>  #define XICS_IRQS_SPAPR               1024
 
-Client must only process each ring when it is started.
+--=20
+David Gibson			| I'll have my music baroque, and my code
+david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
+				| _way_ _around_!
+http://www.ozlabs.org/~dgibson
 
-Client must only pass data between the ring and the
-backend, when the ring is enabled.
+--tKW2IUtsqtDRztdT
+Content-Type: application/pgp-signature; name="signature.asc"
 
-and later:
+-----BEGIN PGP SIGNATURE-----
 
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAloOahkACgkQbDjKyiDZ
+s5LlMg/9GyLBybq1TKVGoVOc9oS54elwxq19aU+WVNPlsaXpcOA6XHd8z//Nl7Ko
+O8OHHb5LvtbNuTufuAschCR6IRx7/e+RW8/RGvGev4hbt+y4LFUg+8jZNnlneJw9
+yGKuvIzmyR+Ho3N98XeR4LtCjb+ddGsUdKHR1mIGqwgTARjK8bWnZiTvf1ccaBrk
+H/cBED0WTmQ5wJNT4mLsHKPWO60mY3l41N8hE+BwM477uls0CNWQliGsA9uLG35Y
+X0Jhn4HegPyK2qYICsl9ZcHcD+F8KSR/V+7OUDG7FNZkJsQj3Iu7d+BF4k2SnuIG
+sQYlbs1Isqb19H2Sn1IRyIcbZ2uzumQ++uT1FWZa6PlQLp8Ts96lGQL4QyPpOLlj
+Tqci+29ykbuUeuu4qMiAO6pdzsEIgYUH9NYNw7MpbkuFJSsdBIPDUdfcNjTqHft0
+lFFYElm1zE880uPIInAYw7glD99kYdYFBI2NwwuhfzGddBeT4k5S3Cy5IDazsGQc
+qHtgMji6y5gLYt1Xr/+JN3VeMpL/jq+6D6qtlZOet5I/51ttzgguE/DfO/O4uCP0
+/Bm3e3AgFUF3Nf8nRAfVa2mP9AwAVM+ApyfMN//EcJe6+S0jWlR/1YpTvdhMJVTf
+EYFk6ZJihKFiLzbDjunVVHRDgGlMuPJFwsBIfLhJJq+5DFdjjrU=
+=9THJ
+-----END PGP SIGNATURE-----
 
-Client must start ring upon receiving a kick (that is, detecting that fil=
-e
-descriptor is readable) on the descriptor specified by
-VHOST_USER_SET_VRING_KICK, and stop ring upon receiving
-VHOST_USER_GET_VRING_BASE.
-
-
-Does someone kick unused rings? What entity does this?
-
-
-
-
-> >=20
-> > > Thanks
-> > >=20
-> > > > Thanks,
-> > > > -Gonglei
-> > > >=20
-> > >=20
-> > >=20
-> > >=20
-> > > .
-> > >=20
-> >=20
+--tKW2IUtsqtDRztdT--
