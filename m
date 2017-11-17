@@ -1,26 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51019)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51552)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <atar4qemu@gmail.com>) id 1eFhmB-0006rQ-O2
-	for qemu-devel@nongnu.org; Fri, 17 Nov 2017 09:37:53 -0500
+	(envelope-from <atar4qemu@gmail.com>) id 1eFhnG-0007vs-TY
+	for qemu-devel@nongnu.org; Fri, 17 Nov 2017 09:39:00 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <atar4qemu@gmail.com>) id 1eFhmA-0008GC-2V
-	for qemu-devel@nongnu.org; Fri, 17 Nov 2017 09:37:51 -0500
-Received: from mail-io0-x242.google.com ([2607:f8b0:4001:c06::242]:44375)
+	(envelope-from <atar4qemu@gmail.com>) id 1eFhnF-0001fN-ID
+	for qemu-devel@nongnu.org; Fri, 17 Nov 2017 09:38:58 -0500
+Received: from mail-it0-x242.google.com ([2607:f8b0:4001:c0b::242]:33992)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <atar4qemu@gmail.com>) id 1eFhm9-0008Ez-SV
-	for qemu-devel@nongnu.org; Fri, 17 Nov 2017 09:37:49 -0500
-Received: by mail-io0-x242.google.com with SMTP id w127so8927131iow.11
-	for <qemu-devel@nongnu.org>; Fri, 17 Nov 2017 06:37:49 -0800 (PST)
+	(Exim 4.71) (envelope-from <atar4qemu@gmail.com>) id 1eFhnF-0001eV-CP
+	for qemu-devel@nongnu.org; Fri, 17 Nov 2017 09:38:57 -0500
+Received: by mail-it0-x242.google.com with SMTP id m11so2574478iti.1
+	for <qemu-devel@nongnu.org>; Fri, 17 Nov 2017 06:38:57 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <1510926167-23326-11-git-send-email-mark.cave-ayland@ilande.co.uk>
+In-Reply-To: <1510926167-23326-5-git-send-email-mark.cave-ayland@ilande.co.uk>
 References: <1510926167-23326-1-git-send-email-mark.cave-ayland@ilande.co.uk>
-	<1510926167-23326-11-git-send-email-mark.cave-ayland@ilande.co.uk>
+	<1510926167-23326-5-git-send-email-mark.cave-ayland@ilande.co.uk>
 From: Artyom Tarasenko <atar4qemu@gmail.com>
-Date: Fri, 17 Nov 2017 15:37:28 +0100
-Message-ID: <CACXAS8ACQSUj0avXhfspJirT4tpGmvPRzS2XzQ+BtCJVHYLHtQ@mail.gmail.com>
+Date: Fri, 17 Nov 2017 15:38:36 +0100
+Message-ID: <CACXAS8AuunBiKzZwr-+hUfKeCnG0ea2h47XN6y3dQSgW2AtCdg@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH 10/15] apb: remove pci_apb_init() and
- instantiate APB device using qdev
+Subject: Re: [Qemu-devel] [PATCH 04/15] sun4u: remove pci_ebus_init()
+ function
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,250 +34,125 @@ Cc: qemu-devel <qemu-devel@nongnu.org>
 
 On Fri, Nov 17, 2017 at 2:42 PM, Mark Cave-Ayland
 <mark.cave-ayland@ilande.co.uk> wrote:
-> By making the special_base and mem_base values qdev properties, we can move
-> the remaining parts of pci_apb_init() into the pbm init() and realize()
-> functions.
->
-> This finally allows us to instantiate the APB directly using standard qdev
-> create/init functions in sun4u.c.
-
-Nice!
+> This is initialisation that should really take place in the ebus realize
+> function. As part of this we also rework the ebus IRQ mapping so that
+> instead of having to pass in the array of pbm_irqs, we obtain a reference
+> to them by looking up the APB device during ebus realize.
 >
 > Signed-off-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
 
 Reviewed-by: Artyom Tarasenko <atar4qemu@gmail.com>
 
 > ---
->  hw/pci-host/apb.c         |  123 ++++++++++++++++++++++-----------------------
->  hw/sparc64/sun4u.c        |    6 ++-
->  include/hw/pci-host/apb.h |    4 +-
->  3 files changed, 68 insertions(+), 65 deletions(-)
+>  hw/pci-host/apb.c         |    4 +---
+>  hw/sparc64/sun4u.c        |   29 ++++++++++++++---------------
+>  include/hw/pci-host/apb.h |    3 +--
+>  3 files changed, 16 insertions(+), 20 deletions(-)
 >
 > diff --git a/hw/pci-host/apb.c b/hw/pci-host/apb.c
-> index 823661a..6c20285 100644
+> index f743a4e..b0f80f6 100644
 > --- a/hw/pci-host/apb.c
 > +++ b/hw/pci-host/apb.c
-> @@ -611,41 +611,56 @@ static void apb_pci_bridge_realize(PCIDevice *dev, Error **errp)
->      pci_bridge_update_mappings(PCI_BRIDGE(br));
->  }
+> @@ -614,8 +614,7 @@ static void apb_pci_bridge_realize(PCIDevice *dev, Error **errp)
 >
-> -APBState *pci_apb_init(hwaddr special_base,
-> -                       hwaddr mem_base)
-> +static void pci_pbm_reset(DeviceState *d)
+>  PCIBus *pci_apb_init(hwaddr special_base,
+>                       hwaddr mem_base,
+> -                     qemu_irq *ivec_irqs, PCIBus **busA, PCIBus **busB,
+> -                     qemu_irq **pbm_irqs)
+> +                     qemu_irq *ivec_irqs, PCIBus **busA, PCIBus **busB)
 >  {
-> -    DeviceState *dev;
-> -    SysBusDevice *s;
-> -    PCIHostState *phb;
-> -    APBState *d;
-> -    IOMMUState *is;
-> +    unsigned int i;
-> +    APBState *s = APB_DEVICE(d);
-> +
-> +    for (i = 0; i < 8; i++) {
-> +        s->pci_irq_map[i] &= PBM_PCI_IMR_MASK;
-> +    }
-> +    for (i = 0; i < 32; i++) {
-> +        s->obio_irq_map[i] &= PBM_PCI_IMR_MASK;
-> +    }
-> +
-> +    s->irq_request = NO_IRQ_REQUEST;
-> +    s->pci_irq_in = 0ULL;
-> +
-> +    if (s->nr_resets++ == 0) {
-> +        /* Power on reset */
-> +        s->reset_control = POR;
-> +    }
-> +}
-> +
-> +static const MemoryRegionOps pci_config_ops = {
-> +    .read = apb_pci_config_read,
-> +    .write = apb_pci_config_write,
-> +    .endianness = DEVICE_LITTLE_ENDIAN,
-> +};
-> +
-> +static void pci_pbm_realize(DeviceState *dev, Error **errp)
-> +{
-> +    APBState *s = APB_DEVICE(dev);
-> +    PCIHostState *phb = PCI_HOST_BRIDGE(dev);
-> +    SysBusDevice *sbd = SYS_BUS_DEVICE(s);
->      PCIDevice *pci_dev;
-> +    IOMMUState *is;
+>      DeviceState *dev;
+>      SysBusDevice *s;
+> @@ -646,7 +645,6 @@ PCIBus *pci_apb_init(hwaddr special_base,
+>      memory_region_init(&d->pci_mmio, OBJECT(s), "pci-mmio", 0x100000000ULL);
+>      memory_region_add_subregion(get_system_memory(), mem_base, &d->pci_mmio);
 >
-> -    /* Ultrasparc PBM main bus */
-> -    dev = qdev_create(NULL, TYPE_APB);
-> -    d = APB_DEVICE(dev);
-> -    phb = PCI_HOST_BRIDGE(dev);
-> -    phb->bus = pci_register_bus(DEVICE(phb), "pci",
-> -                                pci_apb_set_irq, pci_apb_map_irq, d,
-> -                                &d->pci_mmio,
-> -                                &d->pci_ioport,
-> -                                0, 32, TYPE_PCI_BUS);
-> -    qdev_init_nofail(dev);
-> -    s = SYS_BUS_DEVICE(dev);
->      /* apb_config */
-> -    sysbus_mmio_map(s, 0, special_base);
-> +    sysbus_mmio_map(sbd, 0, s->special_base);
->      /* PCI configuration space */
-> -    sysbus_mmio_map(s, 1, special_base + 0x1000000ULL);
-> +    sysbus_mmio_map(sbd, 1, s->special_base + 0x1000000ULL);
->      /* pci_ioport */
-> -    sysbus_mmio_map(s, 2, special_base + 0x2000000ULL);
-> +    sysbus_mmio_map(sbd, 2, s->special_base + 0x2000000ULL);
->
-> -    memory_region_init(&d->pci_mmio, OBJECT(s), "pci-mmio", 0x100000000ULL);
-> -    memory_region_add_subregion(get_system_memory(), mem_base, &d->pci_mmio);
-> +    memory_region_init(&s->pci_mmio, OBJECT(s), "pci-mmio", 0x100000000ULL);
-> +    memory_region_add_subregion(get_system_memory(), s->mem_base,
-> +                                &s->pci_mmio);
+> -    *pbm_irqs = d->pbm_irqs;
+>      d->ivec_irqs = ivec_irqs;
 >
 >      pci_create_simple(phb->bus, 0, "pbm-pci");
->
->      /* APB IOMMU */
-> -    is = &d->iommu;
-> +    is = &s->iommu;
->      memset(is, 0, sizeof(IOMMUState));
->
->      memory_region_init_iommu(&is->iommu, sizeof(is->iommu),
-> @@ -657,52 +672,30 @@ APBState *pci_apb_init(hwaddr special_base,
->      /* APB secondary busses */
->      pci_dev = pci_create_multifunction(phb->bus, PCI_DEVFN(1, 0), true,
->                                     TYPE_PBM_PCI_BRIDGE);
-> -    d->bridgeB = PCI_BRIDGE(pci_dev);
-> -    pci_bridge_map_irq(d->bridgeB, "pciB", pci_pbm_map_irq);
-> +    s->bridgeB = PCI_BRIDGE(pci_dev);
-> +    pci_bridge_map_irq(s->bridgeB, "pciB", pci_pbm_map_irq);
->      qdev_init_nofail(&pci_dev->qdev);
->
->      pci_dev = pci_create_multifunction(phb->bus, PCI_DEVFN(1, 1), true,
->                                     TYPE_PBM_PCI_BRIDGE);
-> -    d->bridgeA = PCI_BRIDGE(pci_dev);
-> -    pci_bridge_map_irq(d->bridgeA, "pciA", pci_pbm_map_irq);
-> +    s->bridgeA = PCI_BRIDGE(pci_dev);
-> +    pci_bridge_map_irq(s->bridgeA, "pciA", pci_pbm_map_irq);
->      qdev_prop_set_bit(DEVICE(pci_dev), "busA", true);
->      qdev_init_nofail(&pci_dev->qdev);
-> -
-> -    return d;
->  }
->
-> -static void pci_pbm_reset(DeviceState *d)
-> +static void pci_pbm_init(Object *obj)
->  {
-> +    APBState *s = APB_DEVICE(obj);
-> +    PCIHostState *phb = PCI_HOST_BRIDGE(obj);
-> +    SysBusDevice *sbd = SYS_BUS_DEVICE(obj);
->      unsigned int i;
-> -    APBState *s = APB_DEVICE(d);
-> -
-> -    for (i = 0; i < 8; i++) {
-> -        s->pci_irq_map[i] &= PBM_PCI_IMR_MASK;
-> -    }
-> -    for (i = 0; i < 32; i++) {
-> -        s->obio_irq_map[i] &= PBM_PCI_IMR_MASK;
-> -    }
-> -
-> -    s->irq_request = NO_IRQ_REQUEST;
-> -    s->pci_irq_in = 0ULL;
-> -
-> -    if (s->nr_resets++ == 0) {
-> -        /* Power on reset */
-> -        s->reset_control = POR;
-> -    }
-> -}
->
-> -static const MemoryRegionOps pci_config_ops = {
-> -    .read = apb_pci_config_read,
-> -    .write = apb_pci_config_write,
-> -    .endianness = DEVICE_LITTLE_ENDIAN,
-> -};
-> -
-> -static int pci_pbm_init_device(DeviceState *dev)
-> -{
-> -    APBState *s = APB_DEVICE(dev);
-> -    SysBusDevice *sbd = SYS_BUS_DEVICE(s);
-> -    unsigned int i;
-> +    phb->bus = pci_register_bus(DEVICE(phb), "pci",
-> +                                pci_apb_set_irq, pci_apb_map_irq, s,
-> +                                &s->pci_mmio,
-> +                                &s->pci_ioport,
-> +                                0, 32, TYPE_PCI_BUS);
->
->      for (i = 0; i < 8; i++) {
->          s->pci_irq_map[i] = (0x1f << 6) | (i << 2);
-> @@ -734,8 +727,6 @@ static int pci_pbm_init_device(DeviceState *dev)
->
->      /* at region 2 */
->      sysbus_init_mmio(sbd, &s->pci_ioport);
-> -
-> -    return 0;
->  }
->
->  static void pbm_pci_host_realize(PCIDevice *d, Error **errp)
-> @@ -774,12 +765,19 @@ static const TypeInfo pbm_pci_host_info = {
->      },
->  };
->
-> +static Property pbm_pci_host_properties[] = {
-> +    DEFINE_PROP_UINT64("special-base", APBState, special_base, 0),
-> +    DEFINE_PROP_UINT64("mem-base", APBState, mem_base, 0),
-> +    DEFINE_PROP_END_OF_LIST(),
-> +};
-> +
->  static void pbm_host_class_init(ObjectClass *klass, void *data)
->  {
->      DeviceClass *dc = DEVICE_CLASS(klass);
->
-> -    dc->init = pci_pbm_init_device;
-> +    dc->realize = pci_pbm_realize;
->      dc->reset = pci_pbm_reset;
-> +    dc->props = pbm_pci_host_properties;
->      set_bit(DEVICE_CATEGORY_BRIDGE, dc->categories);
->  }
->
-> @@ -787,6 +785,7 @@ static const TypeInfo pbm_host_info = {
->      .name          = TYPE_APB,
->      .parent        = TYPE_PCI_HOST_BRIDGE,
->      .instance_size = sizeof(APBState),
-> +    .instance_init = pci_pbm_init,
->      .class_init    = pbm_host_class_init,
->  };
->
 > diff --git a/hw/sparc64/sun4u.c b/hw/sparc64/sun4u.c
-> index 47952be..0a30fb8 100644
+> index 63b4aaa..f3203ea 100644
 > --- a/hw/sparc64/sun4u.c
 > +++ b/hw/sparc64/sun4u.c
-> @@ -502,7 +502,11 @@ static void sun4uv_init(MemoryRegion *address_space_mem,
+> @@ -230,21 +230,11 @@ static void isa_irq_handler(void *opaque, int n, int level)
+>  }
 >
->      prom_init(hwdef->prom_addr, bios_name);
+>  /* EBUS (Eight bit bus) bridge */
+> -static ISABus *
+> -pci_ebus_init(PCIDevice *pci_dev, qemu_irq *irqs)
+> -{
+> -    qemu_irq *isa_irq;
+> -    ISABus *isa_bus;
+> -
+> -    isa_bus = ISA_BUS(qdev_get_child_bus(DEVICE(pci_dev), "isa.0"));
+> -    isa_irq = qemu_allocate_irqs(isa_irq_handler, irqs, 16);
+> -    isa_bus_irqs(isa_bus, isa_irq);
+> -    return isa_bus;
+> -}
+> -
+>  static void ebus_realize(PCIDevice *pci_dev, Error **errp)
+>  {
+>      EbusState *s = EBUS(pci_dev);
+> +    APBState *apb;
+> +    qemu_irq *isa_irq;
 >
-> -    apb = pci_apb_init(APB_SPECIAL_BASE, APB_MEM_BASE);
-> +    /* Init APB (PCI host bridge) */
-> +    apb = APB_DEVICE(qdev_create(NULL, TYPE_APB));
-> +    qdev_prop_set_uint64(DEVICE(apb), "special-base", APB_SPECIAL_BASE);
-> +    qdev_prop_set_uint64(DEVICE(apb), "mem-base", APB_MEM_BASE);
-> +    qdev_init_nofail(DEVICE(apb));
+>      s->isa_bus = isa_bus_new(DEVICE(pci_dev), get_system_memory(),
+>                               pci_address_space_io(pci_dev), errp);
+> @@ -253,6 +243,15 @@ static void ebus_realize(PCIDevice *pci_dev, Error **errp)
+>          return;
+>      }
 >
->      /* Wire up PCI interrupts to CPU */
->      for (i = 0; i < IVEC_MAX; i++) {
+> +    apb = APB_DEVICE(object_resolve_path_type("", TYPE_APB, NULL));
+> +    if (!apb) {
+> +        error_setg(errp, "unable to locate APB PCI host bridge");
+> +        return;
+> +    }
+> +
+> +    isa_irq = qemu_allocate_irqs(isa_irq_handler, apb->pbm_irqs, 16);
+> +    isa_bus_irqs(s->isa_bus, isa_irq);
+> +
+>      pci_dev->config[0x04] = 0x06; // command = bus master, pci mem
+>      pci_dev->config[0x05] = 0x00;
+>      pci_dev->config[0x06] = 0xa0; // status = fast back-to-back, 66MHz, no error
+> @@ -443,7 +442,7 @@ static void sun4uv_init(MemoryRegion *address_space_mem,
+>      PCIDevice *ebus, *pci_dev;
+>      ISABus *isa_bus;
+>      SysBusDevice *s;
+> -    qemu_irq *ivec_irqs, *pbm_irqs;
+> +    qemu_irq *ivec_irqs;
+>      DriveInfo *hd[MAX_IDE_BUS * MAX_IDE_DEVS];
+>      DriveInfo *fd[MAX_FD];
+>      DeviceState *dev;
+> @@ -462,7 +461,7 @@ static void sun4uv_init(MemoryRegion *address_space_mem,
+>
+>      ivec_irqs = qemu_allocate_irqs(sparc64_cpu_set_ivec_irq, cpu, IVEC_MAX);
+>      pci_bus = pci_apb_init(APB_SPECIAL_BASE, APB_MEM_BASE, ivec_irqs, &pci_busA,
+> -                           &pci_busB, &pbm_irqs);
+> +                           &pci_busB);
+>
+>      /* Only in-built Simba PBMs can exist on the root bus, slot 0 on busA is
+>         reserved (leaving no slots free after on-board devices) however slots
+> @@ -474,7 +473,7 @@ static void sun4uv_init(MemoryRegion *address_space_mem,
+>      ebus = pci_create_multifunction(pci_busA, PCI_DEVFN(1, 0), true, TYPE_EBUS);
+>      qdev_init_nofail(DEVICE(ebus));
+>
+> -    isa_bus = pci_ebus_init(ebus, pbm_irqs);
+> +    isa_bus = EBUS(ebus)->isa_bus;
+>
+>      i = 0;
+>      if (hwdef->console_serial_base) {
 > diff --git a/include/hw/pci-host/apb.h b/include/hw/pci-host/apb.h
-> index ae15d8c..f0074f7 100644
+> index 5d39c03..35d7d5a 100644
 > --- a/include/hw/pci-host/apb.h
 > +++ b/include/hw/pci-host/apb.h
-> @@ -62,6 +62,8 @@ typedef struct IOMMUState {
->  typedef struct APBState {
->      PCIHostState parent_obj;
+> @@ -91,6 +91,5 @@ typedef struct PBMPCIBridge {
 >
-> +    hwaddr special_base;
-> +    hwaddr mem_base;
->      MemoryRegion apb_config;
->      MemoryRegion pci_config;
->      MemoryRegion pci_mmio;
-> @@ -93,6 +95,4 @@ typedef struct PBMPCIBridge {
->  #define PBM_PCI_BRIDGE(obj) \
->      OBJECT_CHECK(PBMPCIBridge, (obj), TYPE_PBM_PCI_BRIDGE)
->
-> -APBState *pci_apb_init(hwaddr special_base,
-> -                       hwaddr mem_base);
+>  PCIBus *pci_apb_init(hwaddr special_base,
+>                       hwaddr mem_base,
+> -                     qemu_irq *ivec_irqs, PCIBus **bus2, PCIBus **bus3,
+> -                     qemu_irq **pbm_irqs);
+> +                     qemu_irq *ivec_irqs, PCIBus **bus2, PCIBus **bus3);
 >  #endif
 > --
 > 1.7.10.4
