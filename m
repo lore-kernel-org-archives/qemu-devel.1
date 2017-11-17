@@ -1,15 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33070)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36826)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kchamart@redhat.com>) id 1eFjSj-00052s-71
-	for qemu-devel@nongnu.org; Fri, 17 Nov 2017 11:25:54 -0500
+	(envelope-from <groug@kaod.org>) id 1eFjdZ-0000DC-PN
+	for qemu-devel@nongnu.org; Fri, 17 Nov 2017 11:37:07 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kchamart@redhat.com>) id 1eFjSh-0008Ew-Rw
-	for qemu-devel@nongnu.org; Fri, 17 Nov 2017 11:25:53 -0500
-From: Kashyap Chamarthy <kchamart@redhat.com>
-Date: Fri, 17 Nov 2017 17:25:36 +0100
-Message-Id: <20171117162536.23225-1-kchamart@redhat.com>
-Subject: [Qemu-devel] [PATCH v3] QAPI & interop: Clarify events emitted by
- 'block-job-cancel'
+	(envelope-from <groug@kaod.org>) id 1eFjdU-0001uh-Oz
+	for qemu-devel@nongnu.org; Fri, 17 Nov 2017 11:37:05 -0500
+Received: from 3.mo6.mail-out.ovh.net ([178.33.253.26]:35002)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1eFjdU-0001t4-Ed
+	for qemu-devel@nongnu.org; Fri, 17 Nov 2017 11:37:00 -0500
+Received: from player761.ha.ovh.net (b9.ovh.net [213.186.33.59])
+	by mo6.mail-out.ovh.net (Postfix) with ESMTP id C3B3E120609
+	for <qemu-devel@nongnu.org>; Fri, 17 Nov 2017 17:36:57 +0100 (CET)
+Date: Fri, 17 Nov 2017 17:36:43 +0100
+From: Greg Kurz <groug@kaod.org>
+Message-ID: <20171117173643.59814f7a@bahia.lab.toulouse-stg.fr.ibm.com>
+In-Reply-To: <48df4371-5966-a428-f5df-37c014c1ab94@linux.vnet.ibm.com>
+References: <151092340873.11818.16813698420232981002.stgit@bahia>
+	<48df4371-5966-a428-f5df-37c014c1ab94@linux.vnet.ibm.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [Qemu-ppc] [PATCH for-2.11] spapr: reset DRCs
+ after devices
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -18,149 +31,144 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org, qemu-block@nongnu.org
-Cc: mreitz@redhat.com, armbru@redhat.com, jsnow@redhat.com, eblake@redhat.com, Kashyap Chamarthy <kchamart@redhat.com>
+To: Daniel Henrique Barboza <danielhb@linux.vnet.ibm.com>
+Cc: qemu-devel@nongnu.org, qemu-stable@nongnu.org, qemu-ppc@nongnu.org, Michael Roth <mdroth@linux.vnet.ibm.com>, David Gibson <david@gibson.dropbear.id.au>
 
-When you cancel an in-progress live block operation with QMP
-`block-job-cancel`, it emits the event: BLOCK_JOB_CANCELLED.  However,
-when `block-job-cancel` is issued after `drive-mirror` has indicated (by
-emitting the event BLOCK_JOB_READY) that the source and destination
-remain synchronized:
+On Fri, 17 Nov 2017 14:21:27 -0200
+Daniel Henrique Barboza <danielhb@linux.vnet.ibm.com> wrote:
 
-    [...] # Snip `drive-mirror` invocation & outputs
-    {
-      "execute":"block-job-cancel",
-      "arguments":{
-        "device":"virtio0"
-      }
-    }
+> On 11/17/2017 10:56 AM, Greg Kurz wrote:
+> > A DRC with a pending unplug request releases its associated device at
+> > machine reset time.
+> >
+> > In the case of LMB, when all DRCs for a DIMM device have been reset,
+> > the DIMM gets unplugged, causing guest memory to disappear. This may
+> > be very confusing for anything still using this memory.
+> >
+> > This is exactly what happens with vhost backends, and QEMU aborts
+> > with:
+> >
+> > qemu-system-ppc64: used ring relocated for ring 2
+> > qemu-system-ppc64: qemu/hw/virtio/vhost.c:649: vhost_commit: Assertion
+> >   `r >= 0' failed.
+> >
+> > The issue is that each DRC registers a QEMU reset handler, and we
+> > don't control the order in which these handlers are called (ie,
+> > a LMB DRC will unplug a DIMM before the virtio device using the
+> > memory on this DIMM could stop its vhost backend).
+> >
+> > To avoid such situations, let's reset DRCs after all devices
+> > have been reset.
+> >
+> > Reported-by: Mallesh N. Koti <mallesh@linux.vnet.ibm.com>
+> > Signed-off-by: Greg Kurz <groug@kaod.org>
+> > ---  
+> I believe this has to do with the problem discussed at the memory
+> unplug reboot with vhost=on, right?
+> 
+> I don't see any problem with this patch and it's probably the best solution
+> short-term for the problem (and potentially other related LMB release
+> problems), but that said, how hard it is to forbid LMB unplug at all if the
+> memory is being used in vhost?
+> 
 
-    {"return": {}}
+I don't know yet but I'll dig some more.
 
-It (`block-job-cancel`) will counterintuitively emit the event
-'BLOCK_JOB_COMPLETED':
+> The way I see it, the root problem is that a device unplug failed at the 
+> guest
+> side and we don't know about it, leaving drc->unplug_requested flags set
+> around the code when it shouldn't. Reading that thread I see a comment from
+> Michael S. Tsirkin saying that this bug is somewhat expected, that vhost 
+> backend will
+> not behave well if memory is going away. Unlike other LMB unplug 
+> failures from
+> the guest side that might happen for any other reason, this one sees 
+> predicable
+> and we can avoid it.
+> 
+> I think this is something worth considering. But for now,
+> 
+> 
+> Reviewed-by: Daniel Henrique Barboza <danielhb@linux.vnet.ibm.com>
+> 
 
-    {
-      "timestamp":{
-        "seconds":1510678024,
-        "microseconds":526240
-      },
-      "event":"BLOCK_JOB_COMPLETED",
-      "data":{
-        "device":"virtio0",
-        "len":41126400,
-        "offset":41126400,
-        "speed":0,
-        "type":"mirror"
-      }
-    }
+Thanks!
 
-But this is expected behaviour, where the _COMPLETED event indicates
-that synchronization has successfully ended (and the destination has a
-point-in-time copy, which is at the time of cancel).
-
-So add a small note to this effect in 'block-core.json'.  While at it,
-also update the "Live disk synchronization -- drive-mirror and
-blockdev-mirror" section in 'live-block-operations.rst'.
-
-(Thanks: Max Reitz for reminding me of this caveat on IRC.)
-
-Signed-off-by: Kashyap Chamarthy <kchamart@redhat.com>
----
-Changes in v3:
- - Fix / rewrite the section "Live disk synchronization -- drive-mirror
-   and blockdev-mirror" to note this gotcha [John Snow]
-
-Changes in v2:
- - "Note:" seems to be a special construct in Patchew, my usage caused a
-    build failure.  So do: s/Note:/Note that/
- - Add the missing 'Signed-off-by'
----
- docs/interop/live-block-operations.rst | 50 ++++++++++++++++++++++------------
- qapi/block-core.json                   |  8 ++++++
- 2 files changed, 40 insertions(+), 18 deletions(-)
-
-diff --git a/docs/interop/live-block-operations.rst b/docs/interop/live-block-operations.rst
-index 5f01797..3cb64f6 100644
---- a/docs/interop/live-block-operations.rst
-+++ b/docs/interop/live-block-operations.rst
-@@ -506,26 +506,40 @@ Again, given our familiar disk image chain::
- 
-     [A] <-- [B] <-- [C] <-- [D]
- 
--The ``drive-mirror`` (and its newer equivalent ``blockdev-mirror``) allows
--you to copy data from the entire chain into a single target image (which
--can be located on a different host).
--
--Once a 'mirror' job has started, there are two possible actions while a
--``drive-mirror`` job is active:
--
--(1) Issuing the command ``block-job-cancel`` after it emits the event
--    ``BLOCK_JOB_CANCELLED``: will (after completing synchronization of
--    the content from the disk image chain to the target image, [E])
--    create a point-in-time (which is at the time of *triggering* the
--    cancel command) copy, contained in image [E], of the the entire disk
-+The ``drive-mirror`` (and its newer equivalent ``blockdev-mirror``)
-+allows you to copy data from the entire chain into a single target image
-+(which can be located on a different host), [E].
-+
-+.. note::
-+
-+    When you cancel an in-progress 'mirror' job *before* the source and
-+    target are synchronized, ``block-job-cancel`` will emit the event
-+    ``BLOCK_JOB_CANCELLED``.  However, note that if you cancel a
-+    'mirror' job *after* it has indicated (by emitting the event
-+    ``BLOCK_JOB_READY``) that the source and target now remain
-+    synchronized, then ``block-job-cancel`` will emit the event
-+    ``BLOCK_JOB_COMPLETED``.
-+
-+    Besides the 'mirror' job, the "active ``block-commit``" is the only
-+    other block device job that emits the event ``BLOCK_JOB_READY``.
-+    The rest of the block device jobs ('stream', "non-active
-+    ``block-commit``", and 'backup') end automatically.
-+
-+So there are two possible actions, after a 'mirror' job has
-+emitted the event ``BLOCK_JOB_READY``, indicating that source and target
-+now remain synchronized:
-+
-+(1) Issuing the command ``block-job-cancel`` (after it emits the event
-+    ``BLOCK_JOB_COMPLETED``) will create a point-in-time (which is at
-+    the time of *triggering* the cancel command) copy of the entire disk
-     image chain (or only the top-most image, depending on the ``sync``
--    mode).
-+    mode), contained in the target image [E].
- 
--(2) Issuing the command ``block-job-complete`` after it emits the event
--    ``BLOCK_JOB_COMPLETED``: will, after completing synchronization of
--    the content, adjust the guest device (i.e. live QEMU) to point to
--    the target image, and, causing all the new writes from this point on
--    to happen there.  One use case for this is live storage migration.
-+(2) Issuing the command ``block-job-complete`` (after it emits the event
-+    ``BLOCK_JOB_COMPLETED``) will adjust the guest device (i.e. live
-+    QEMU) to point to the target image, [E], causing all the new writes
-+    from this point on to happen there.  One use case for this is live
-+    storage migration.
- 
- About synchronization modes: The synchronization mode determines
- *which* part of the disk image chain will be copied to the target.
-diff --git a/qapi/block-core.json b/qapi/block-core.json
-index ab96e34..4ecfd1f 100644
---- a/qapi/block-core.json
-+++ b/qapi/block-core.json
-@@ -2065,6 +2065,14 @@
- # BLOCK_JOB_CANCELLED event.  Before that happens the job is still visible when
- # enumerated using query-block-jobs.
- #
-+# Note that the 'block-job-cancel' command will emit the event
-+# BLOCK_JOB_COMPLETED if you issue it ('block-job-cancel') after 'drive-mirror'
-+# has indicated (by emitting the event BLOCK_JOB_READY) that the source and
-+# destination remain synchronized.  In this case, the BLOCK_JOB_COMPLETED
-+# event indicates that synchronization (from 'drive-mirror') has successfully
-+# ended and the destination now has a point-in-time copy, which is at the time
-+# of cancel.
-+#
- # For streaming, the image file retains its backing file unless the streaming
- # operation happens to complete just as it is being cancelled.  A new streaming
- # operation can be started at a later time to finish copying all data from the
--- 
-2.9.5
+> >   hw/ppc/spapr.c     |   21 +++++++++++++++++++++
+> >   hw/ppc/spapr_drc.c |    7 -------
+> >   2 files changed, 21 insertions(+), 7 deletions(-)
+> >
+> > diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
+> > index 6841bd294b3c..6285f7211f9a 100644
+> > --- a/hw/ppc/spapr.c
+> > +++ b/hw/ppc/spapr.c
+> > @@ -1411,6 +1411,19 @@ static void find_unknown_sysbus_device(SysBusDevice *sbdev, void *opaque)
+> >       }
+> >   }
+> >
+> > +static int spapr_reset_drcs(Object *child, void *opaque)
+> > +{
+> > +    sPAPRDRConnector *drc =
+> > +        (sPAPRDRConnector *) object_dynamic_cast(child,
+> > +                                                 TYPE_SPAPR_DR_CONNECTOR);
+> > +
+> > +    if (drc) {
+> > +        spapr_drc_reset(drc);
+> > +    }
+> > +
+> > +    return 0;
+> > +}
+> > +
+> >   static void ppc_spapr_reset(void)
+> >   {
+> >       MachineState *machine = MACHINE(qdev_get_machine());
+> > @@ -1434,6 +1447,14 @@ static void ppc_spapr_reset(void)
+> >       }
+> >
+> >       qemu_devices_reset();
+> > +
+> > +    /* DRC reset may cause a device to be unplugged. This will cause troubles
+> > +     * if this device is used by another device (eg, a running vhost backend
+> > +     * will crash QEMU if the DIMM holding the vring goes away). To avoid such
+> > +     * situations, we reset DRCs after all devices have been reset.
+> > +     */
+> > +    object_child_foreach_recursive(object_get_root(), spapr_reset_drcs, NULL);
+> > +
+> >       spapr_clear_pending_events(spapr);
+> >
+> >       /*
+> > diff --git a/hw/ppc/spapr_drc.c b/hw/ppc/spapr_drc.c
+> > index 915e9b51c40c..e3b122968e89 100644
+> > --- a/hw/ppc/spapr_drc.c
+> > +++ b/hw/ppc/spapr_drc.c
+> > @@ -455,11 +455,6 @@ void spapr_drc_reset(sPAPRDRConnector *drc)
+> >       }
+> >   }
+> >
+> > -static void drc_reset(void *opaque)
+> > -{
+> > -    spapr_drc_reset(SPAPR_DR_CONNECTOR(opaque));
+> > -}
+> > -
+> >   bool spapr_drc_needed(void *opaque)
+> >   {
+> >       sPAPRDRConnector *drc = (sPAPRDRConnector *)opaque;
+> > @@ -518,7 +513,6 @@ static void realize(DeviceState *d, Error **errp)
+> >       }
+> >       vmstate_register(DEVICE(drc), spapr_drc_index(drc), &vmstate_spapr_drc,
+> >                        drc);
+> > -    qemu_register_reset(drc_reset, drc);
+> >       trace_spapr_drc_realize_complete(spapr_drc_index(drc));
+> >   }
+> >
+> > @@ -529,7 +523,6 @@ static void unrealize(DeviceState *d, Error **errp)
+> >       gchar *name;
+> >
+> >       trace_spapr_drc_unrealize(spapr_drc_index(drc));
+> > -    qemu_unregister_reset(drc_reset, drc);
+> >       vmstate_unregister(DEVICE(drc), &vmstate_spapr_drc, drc);
+> >       root_container = container_get(object_get_root(), DRC_CONTAINER_PATH);
+> >       name = g_strdup_printf("%x", spapr_drc_index(drc));
+> >
+> >  
+> 
