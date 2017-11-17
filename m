@@ -1,17 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43043)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43040)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1eFlCZ-0001Jk-SA
+	(envelope-from <kwolf@redhat.com>) id 1eFlCZ-0001Jb-Qo
 	for qemu-devel@nongnu.org; Fri, 17 Nov 2017 13:17:24 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1eFlCX-0002PT-CO
+	(envelope-from <kwolf@redhat.com>) id 1eFlCX-0002Pj-Fr
 	for qemu-devel@nongnu.org; Fri, 17 Nov 2017 13:17:19 -0500
 From: Kevin Wolf <kwolf@redhat.com>
-Date: Fri, 17 Nov 2017 19:16:37 +0100
-Message-Id: <20171117181653.20651-10-kwolf@redhat.com>
+Date: Fri, 17 Nov 2017 19:16:40 +0100
+Message-Id: <20171117181653.20651-13-kwolf@redhat.com>
 In-Reply-To: <20171117181653.20651-1-kwolf@redhat.com>
 References: <20171117181653.20651-1-kwolf@redhat.com>
-Subject: [Qemu-devel] [PULL 09/25] qcow2: fix image corruption on commit
- with persistent bitmap
+Subject: [Qemu-devel] [PULL 12/25] qapi: Add qobject_is_equal()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,422 +22,365 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org
 Cc: kwolf@redhat.com, qemu-devel@nongnu.org
 
-From: Eric Blake <eblake@redhat.com>
+From: Max Reitz <mreitz@redhat.com>
 
-If an image contains persistent bitmaps, we cannot use the
-fast path of bdrv_make_empty() to clear the image during
-qemu-img commit, because that will lose the clusters related
-to the bitmaps.
+This generic function (along with its implementations for different
+types) determines whether two QObjects are equal.
 
-Also leave a comment in qcow2_read_extensions to remind future
-feature additions to think about fast-path removal, since we
-just barely fixed the same bug for LUKS encryption.
-
-It's a pain that qemu-img has not yet been taught to manipulate,
-or even at a very minimum display, information about persistent
-bitmaps; instead, we have to use QMP commands.  It's also a
-pain that only qeury-block and x-debug-block-dirty-bitmap-sha256
-will allow bitmap introspection; but the former requires the
-node to be hooked to a block device, and the latter is experimental.
-
-Signed-off-by: Eric Blake <eblake@redhat.com>
-Signed-off-by: Kevin Wolf <kwolf@redhat.com>
+Signed-off-by: Max Reitz <mreitz@redhat.com>
+Reviewed-by: Eric Blake <eblake@redhat.com>
+Reviewed-by: Alberto Garcia <berto@igalia.com>
+Reviewed-by: Markus Armbruster <armbru@redhat.com>
+Message-id: 20171114180128.17076-4-mreitz@redhat.com
+Signed-off-by: Max Reitz <mreitz@redhat.com>
 ---
- block/qcow2.c              |  17 ++--
- tests/qemu-iotests/176     |  55 ++++++++++--
- tests/qemu-iotests/176.out | 216 ++++++++++++++++++++++++++++++++++++++++++++-
- 3 files changed, 270 insertions(+), 18 deletions(-)
+ include/qapi/qmp/qbool.h   |  1 +
+ include/qapi/qmp/qdict.h   |  1 +
+ include/qapi/qmp/qlist.h   |  1 +
+ include/qapi/qmp/qnull.h   |  2 ++
+ include/qapi/qmp/qnum.h    |  1 +
+ include/qapi/qmp/qobject.h |  9 ++++++++
+ include/qapi/qmp/qstring.h |  1 +
+ qobject/qbool.c            |  8 +++++++
+ qobject/qdict.c            | 29 +++++++++++++++++++++++++
+ qobject/qlist.c            | 32 +++++++++++++++++++++++++++
+ qobject/qnull.c            |  9 ++++++++
+ qobject/qnum.c             | 54 ++++++++++++++++++++++++++++++++++++++++++++++
+ qobject/qobject.c          | 29 +++++++++++++++++++++++++
+ qobject/qstring.c          |  9 ++++++++
+ 14 files changed, 186 insertions(+)
 
-diff --git a/block/qcow2.c b/block/qcow2.c
-index e9a86b7443..f2731a7cb5 100644
---- a/block/qcow2.c
-+++ b/block/qcow2.c
-@@ -376,6 +376,8 @@ static int qcow2_read_extensions(BlockDriverState *bs, uint64_t start_offset,
+diff --git a/include/qapi/qmp/qbool.h b/include/qapi/qmp/qbool.h
+index a41111c309..f77ea86c4e 100644
+--- a/include/qapi/qmp/qbool.h
++++ b/include/qapi/qmp/qbool.h
+@@ -24,6 +24,7 @@ typedef struct QBool {
+ QBool *qbool_from_bool(bool value);
+ bool qbool_get_bool(const QBool *qb);
+ QBool *qobject_to_qbool(const QObject *obj);
++bool qbool_is_equal(const QObject *x, const QObject *y);
+ void qbool_destroy_obj(QObject *obj);
  
-         default:
-             /* unknown magic - save it in case we need to rewrite the header */
-+            /* If you add a new feature, make sure to also update the fast
-+             * path of qcow2_make_empty() to deal with it. */
-             {
-                 Qcow2UnknownHeaderExtension *uext;
+ #endif /* QBOOL_H */
+diff --git a/include/qapi/qmp/qdict.h b/include/qapi/qmp/qdict.h
+index 7ea5120c4a..fc218e7be6 100644
+--- a/include/qapi/qmp/qdict.h
++++ b/include/qapi/qmp/qdict.h
+@@ -43,6 +43,7 @@ void qdict_del(QDict *qdict, const char *key);
+ int qdict_haskey(const QDict *qdict, const char *key);
+ QObject *qdict_get(const QDict *qdict, const char *key);
+ QDict *qobject_to_qdict(const QObject *obj);
++bool qdict_is_equal(const QObject *x, const QObject *y);
+ void qdict_iter(const QDict *qdict,
+                 void (*iter)(const char *key, QObject *obj, void *opaque),
+                 void *opaque);
+diff --git a/include/qapi/qmp/qlist.h b/include/qapi/qmp/qlist.h
+index 59d209bbae..ec3fcc1a4c 100644
+--- a/include/qapi/qmp/qlist.h
++++ b/include/qapi/qmp/qlist.h
+@@ -61,6 +61,7 @@ QObject *qlist_peek(QList *qlist);
+ int qlist_empty(const QList *qlist);
+ size_t qlist_size(const QList *qlist);
+ QList *qobject_to_qlist(const QObject *obj);
++bool qlist_is_equal(const QObject *x, const QObject *y);
+ void qlist_destroy_obj(QObject *obj);
  
-@@ -3600,15 +3602,16 @@ static int qcow2_make_empty(BlockDriverState *bs)
+ static inline const QListEntry *qlist_first(const QList *qlist)
+diff --git a/include/qapi/qmp/qnull.h b/include/qapi/qmp/qnull.h
+index d075549283..c992ee2ae1 100644
+--- a/include/qapi/qmp/qnull.h
++++ b/include/qapi/qmp/qnull.h
+@@ -27,4 +27,6 @@ static inline QNull *qnull(void)
+     return &qnull_;
+ }
  
-     l1_clusters = DIV_ROUND_UP(s->l1_size, s->cluster_size / sizeof(uint64_t));
++bool qnull_is_equal(const QObject *x, const QObject *y);
++
+ #endif /* QNULL_H */
+diff --git a/include/qapi/qmp/qnum.h b/include/qapi/qmp/qnum.h
+index d6b0791139..c3d86794bb 100644
+--- a/include/qapi/qmp/qnum.h
++++ b/include/qapi/qmp/qnum.h
+@@ -69,6 +69,7 @@ double qnum_get_double(QNum *qn);
+ char *qnum_to_string(QNum *qn);
  
--    if (s->qcow_version >= 3 && !s->snapshots &&
-+    if (s->qcow_version >= 3 && !s->snapshots && !s->nb_bitmaps &&
-         3 + l1_clusters <= s->refcount_block_size &&
-         s->crypt_method_header != QCOW_CRYPT_LUKS) {
--        /* The following function only works for qcow2 v3 images (it requires
--         * the dirty flag) and only as long as there are no snapshots (because
--         * it completely empties the image). Furthermore, the L1 table and three
--         * additional clusters (image header, refcount table, one refcount
--         * block) have to fit inside one refcount block. It cannot be used
--         * for LUKS (yet) as it throws away the LUKS header cluster(s) */
-+        /* The following function only works for qcow2 v3 images (it
-+         * requires the dirty flag) and only as long as there are no
-+         * features that reserve extra clusters (such as snapshots,
-+         * LUKS header, or persistent bitmaps), because it completely
-+         * empties the image.  Furthermore, the L1 table and three
-+         * additional clusters (image header, refcount table, one
-+         * refcount block) have to fit inside one refcount block. */
-         return make_completely_empty(bs);
-     }
+ QNum *qobject_to_qnum(const QObject *obj);
++bool qnum_is_equal(const QObject *x, const QObject *y);
+ void qnum_destroy_obj(QObject *obj);
  
-diff --git a/tests/qemu-iotests/176 b/tests/qemu-iotests/176
-index 950b28720e..0f31a20294 100755
---- a/tests/qemu-iotests/176
-+++ b/tests/qemu-iotests/176
-@@ -3,10 +3,11 @@
- # Commit changes into backing chains and empty the top image if the
- # backing image is not explicitly specified.
- #
--# Variant of 097, which includes snapshots to test different codepath
--# in qcow2
-+# Variant of 097, which includes snapshots and persistent bitmaps, to
-+# tickle the slow codepath in qcow2. See also 198, for another feature
-+# that tickles the slow codepath.
- #
--# Copyright (C) 2014 Red Hat, Inc.
-+# Copyright (C) 2014, 2017 Red Hat, Inc.
- #
- # This program is free software; you can redistribute it and/or modify
- # it under the terms of the GNU General Public License as published by
-@@ -43,11 +44,18 @@ trap "_cleanup; exit \$status" 0 1 2 3 15
- . ./common.filter
- . ./common.pattern
+ #endif /* QNUM_H */
+diff --git a/include/qapi/qmp/qobject.h b/include/qapi/qmp/qobject.h
+index ef1d1a9237..38ac68845c 100644
+--- a/include/qapi/qmp/qobject.h
++++ b/include/qapi/qmp/qobject.h
+@@ -68,6 +68,15 @@ static inline void qobject_incref(QObject *obj)
+ }
  
--# Any format supporting backing files and bdrv_make_empty
-+# This test is specific to qcow2
- _supported_fmt qcow2
- _supported_proto file
- _supported_os Linux
+ /**
++ * qobject_is_equal(): Return whether the two objects are equal.
++ *
++ * Any of the pointers may be NULL; return true if both are.  Always
++ * return false if only one is (therefore a QNull object is not
++ * considered equal to a NULL pointer).
++ */
++bool qobject_is_equal(const QObject *x, const QObject *y);
++
++/**
+  * qobject_destroy(): Free resources used by the object
+  */
+ void qobject_destroy(QObject *obj);
+diff --git a/include/qapi/qmp/qstring.h b/include/qapi/qmp/qstring.h
+index 10076b7c8c..65c05a9be5 100644
+--- a/include/qapi/qmp/qstring.h
++++ b/include/qapi/qmp/qstring.h
+@@ -31,6 +31,7 @@ void qstring_append_int(QString *qstring, int64_t value);
+ void qstring_append(QString *qstring, const char *str);
+ void qstring_append_chr(QString *qstring, int c);
+ QString *qobject_to_qstring(const QObject *obj);
++bool qstring_is_equal(const QObject *x, const QObject *y);
+ void qstring_destroy_obj(QObject *obj);
  
-+function run_qemu()
+ #endif /* QSTRING_H */
+diff --git a/qobject/qbool.c b/qobject/qbool.c
+index 0606bbd2a3..ac825fc5a2 100644
+--- a/qobject/qbool.c
++++ b/qobject/qbool.c
+@@ -52,6 +52,14 @@ QBool *qobject_to_qbool(const QObject *obj)
+ }
+ 
+ /**
++ * qbool_is_equal(): Test whether the two QBools are equal
++ */
++bool qbool_is_equal(const QObject *x, const QObject *y)
 +{
-+    $QEMU -nographic -qmp stdio -serial none "$@" 2>&1 \
-+	| _filter_testdir | _filter_qmp | _filter_qemu
++    return qobject_to_qbool(x)->value == qobject_to_qbool(y)->value;
 +}
 +
-+for reason in snapshot bitmap; do
++/**
+  * qbool_destroy_obj(): Free all memory allocated by a
+  * QBool object
+  */
+diff --git a/qobject/qdict.c b/qobject/qdict.c
+index 576018e531..e8f15f1132 100644
+--- a/qobject/qdict.c
++++ b/qobject/qdict.c
+@@ -403,6 +403,35 @@ void qdict_del(QDict *qdict, const char *key)
+ }
  
- # Four passes:
- #  0: Two-layer backing chain, commit to upper backing file (implicitly)
-@@ -66,14 +74,29 @@ _supported_os Linux
- for i in 0 1 2 3; do
- 
- echo
--echo "=== Test pass $i ==="
-+echo "=== Test pass $reason.$i ==="
- echo
- 
- len=$((2100 * 1024 * 1024 + 512)) # larger than 2G, and not cluster aligned
- TEST_IMG="$TEST_IMG.base" _make_test_img $len
- TEST_IMG="$TEST_IMG.itmd" _make_test_img -b "$TEST_IMG.base" $len
- _make_test_img -b "$TEST_IMG.itmd" $len
--$QEMU_IMG snapshot -c snap "$TEST_IMG"
-+# Update the top image to use a feature that is incompatible with fast path
-+case $reason in
-+    snapshot) $QEMU_IMG snapshot -c snap "$TEST_IMG" ;;
-+    bitmap)
-+	run_qemu <<EOF
-+{ "execute": "qmp_capabilities" }
-+{ "execute": "blockdev-add",
-+  "arguments": { "driver": "qcow2", "node-name": "drive0",
-+     "file": { "driver": "file", "filename": "$TEST_IMG" } } }
-+{ "execute": "block-dirty-bitmap-add",
-+  "arguments": { "node": "drive0", "name": "bitmap0",
-+     "persistent": true, "autoload": true } }
-+{ "execute": "quit" }
-+EOF
-+	;;
-+esac
- 
- $QEMU_IO -c "write -P 1 0x7ffd0000 192k" "$TEST_IMG.base" | _filter_qemu_io
- $QEMU_IO -c "write -P 2 0x7ffe0000 128k" "$TEST_IMG.itmd" | _filter_qemu_io
-@@ -122,8 +145,26 @@ $QEMU_IMG map "$TEST_IMG.base" | _filter_qemu_img_map
- $QEMU_IMG map "$TEST_IMG.itmd" | _filter_qemu_img_map
- $QEMU_IMG map "$TEST_IMG" | _filter_qemu_img_map
- 
--done
-+# Check that the reason for slow path is still present, as appropriate
-+case $reason in
-+    snapshot)
-+	$QEMU_IMG snapshot -l "$TEST_IMG" |
-+	    sed 's/^\(.\{20\}\).*/\1/; s/ *$//' ;;
-+    bitmap)
-+	run_qemu <<EOF
-+{ "execute": "qmp_capabilities" }
-+{ "execute": "blockdev-add",
-+  "arguments": { "driver": "qcow2", "node-name": "drive0",
-+     "file": { "driver": "file", "filename": "$TEST_IMG" } } }
-+{ "execute": "x-debug-block-dirty-bitmap-sha256",
-+  "arguments": { "node": "drive0", "name": "bitmap0" } }
-+{ "execute": "quit" }
-+EOF
-+	;;
-+esac
- 
-+done
-+done
- 
- # success, all done
- echo "*** done"
-diff --git a/tests/qemu-iotests/176.out b/tests/qemu-iotests/176.out
-index 6271fa7d6f..e62085cd0a 100644
---- a/tests/qemu-iotests/176.out
-+++ b/tests/qemu-iotests/176.out
-@@ -1,6 +1,6 @@
- QA output created by 176
- 
--=== Test pass 0 ===
-+=== Test pass snapshot.0 ===
- 
- Formatting 'TEST_DIR/t.IMGFMT.base', fmt=IMGFMT size=2202010112
- Formatting 'TEST_DIR/t.IMGFMT.itmd', fmt=IMGFMT size=2202010112 backing_file=TEST_DIR/t.IMGFMT.base
-@@ -36,8 +36,11 @@ Offset          Length          File
- 0x7ffd0000      0x10000         TEST_DIR/t.IMGFMT.base
- 0x7ffe0000      0x20000         TEST_DIR/t.IMGFMT.itmd
- 0x83400000      0x200           TEST_DIR/t.IMGFMT.itmd
-+Snapshot list:
-+ID        TAG
-+1         snap
- 
--=== Test pass 1 ===
-+=== Test pass snapshot.1 ===
- 
- Formatting 'TEST_DIR/t.IMGFMT.base', fmt=IMGFMT size=2202010112
- Formatting 'TEST_DIR/t.IMGFMT.itmd', fmt=IMGFMT size=2202010112 backing_file=TEST_DIR/t.IMGFMT.base
-@@ -74,8 +77,11 @@ Offset          Length          File
- 0x7ffe0000      0x10000         TEST_DIR/t.IMGFMT.itmd
- 0x7fff0000      0x10000         TEST_DIR/t.IMGFMT
- 0x83400000      0x200           TEST_DIR/t.IMGFMT
-+Snapshot list:
-+ID        TAG
-+1         snap
- 
--=== Test pass 2 ===
-+=== Test pass snapshot.2 ===
- 
- Formatting 'TEST_DIR/t.IMGFMT.base', fmt=IMGFMT size=2202010112
- Formatting 'TEST_DIR/t.IMGFMT.itmd', fmt=IMGFMT size=2202010112 backing_file=TEST_DIR/t.IMGFMT.base
-@@ -112,8 +118,11 @@ Offset          Length          File
- 0x7ffe0000      0x10000         TEST_DIR/t.IMGFMT.itmd
- 0x7fff0000      0x10000         TEST_DIR/t.IMGFMT
- 0x83400000      0x200           TEST_DIR/t.IMGFMT
-+Snapshot list:
-+ID        TAG
-+1         snap
- 
--=== Test pass 3 ===
-+=== Test pass snapshot.3 ===
- 
- Formatting 'TEST_DIR/t.IMGFMT.base', fmt=IMGFMT size=2202010112
- Formatting 'TEST_DIR/t.IMGFMT.itmd', fmt=IMGFMT size=2202010112 backing_file=TEST_DIR/t.IMGFMT.base
-@@ -147,4 +156,203 @@ Offset          Length          File
- 0x7ffe0000      0x10000         TEST_DIR/t.IMGFMT.itmd
- 0x7fff0000      0x10000         TEST_DIR/t.IMGFMT
- 0x83400000      0x200           TEST_DIR/t.IMGFMT
-+Snapshot list:
-+ID        TAG
-+1         snap
+ /**
++ * qdict_is_equal(): Test whether the two QDicts are equal
++ *
++ * Here, equality means whether they contain the same keys and whether
++ * the respective values are in turn equal (i.e. invoking
++ * qobject_is_equal() on them yields true).
++ */
++bool qdict_is_equal(const QObject *x, const QObject *y)
++{
++    const QDict *dict_x = qobject_to_qdict(x);
++    const QDict *dict_y = qobject_to_qdict(y);
++    const QDictEntry *e;
 +
-+=== Test pass bitmap.0 ===
++    if (qdict_size(dict_x) != qdict_size(dict_y)) {
++        return false;
++    }
 +
-+Formatting 'TEST_DIR/t.IMGFMT.base', fmt=IMGFMT size=2202010112
-+Formatting 'TEST_DIR/t.IMGFMT.itmd', fmt=IMGFMT size=2202010112 backing_file=TEST_DIR/t.IMGFMT.base
-+Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=2202010112 backing_file=TEST_DIR/t.IMGFMT.itmd
-+QMP_VERSION
-+{"return": {}}
-+{"return": {}}
-+{"return": {}}
-+{"return": {}}
-+{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "SHUTDOWN", "data": {"guest": false}}
-+wrote 196608/196608 bytes at offset 2147287040
-+192 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+wrote 131072/131072 bytes at offset 2147352576
-+128 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+wrote 65536/65536 bytes at offset 2147418112
-+64 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+wrote 512/512 bytes at offset 2202009600
-+512 bytes, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+Image committed.
-+read 196608/196608 bytes at offset 2147287040
-+192 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+read 512/512 bytes at offset 2202009600
-+512 bytes, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+read 65536/65536 bytes at offset 2147287040
-+64 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+read 65536/65536 bytes at offset 2147352576
-+64 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+read 65536/65536 bytes at offset 2147418112
-+64 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+read 512/512 bytes at offset 2202009600
-+512 bytes, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+Offset          Length          File
-+0x7ffd0000      0x30000         TEST_DIR/t.IMGFMT.base
-+Offset          Length          File
-+0x7ffd0000      0x10000         TEST_DIR/t.IMGFMT.base
-+0x7ffe0000      0x20000         TEST_DIR/t.IMGFMT.itmd
-+0x83400000      0x200           TEST_DIR/t.IMGFMT.itmd
-+Offset          Length          File
-+0x7ffd0000      0x10000         TEST_DIR/t.IMGFMT.base
-+0x7ffe0000      0x20000         TEST_DIR/t.IMGFMT.itmd
-+0x83400000      0x200           TEST_DIR/t.IMGFMT.itmd
-+QMP_VERSION
-+{"return": {}}
-+{"return": {}}
-+{"return": {"sha256": "e12600978d86b5a453861ae5c17d275204673fef3874b7c3c5433c6153d84706"}}
-+{"return": {}}
-+{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "SHUTDOWN", "data": {"guest": false}}
++    for (e = qdict_first(dict_x); e; e = qdict_next(dict_x, e)) {
++        const QObject *obj_x = qdict_entry_value(e);
++        const QObject *obj_y = qdict_get(dict_y, qdict_entry_key(e));
 +
-+=== Test pass bitmap.1 ===
++        if (!qobject_is_equal(obj_x, obj_y)) {
++            return false;
++        }
++    }
 +
-+Formatting 'TEST_DIR/t.IMGFMT.base', fmt=IMGFMT size=2202010112
-+Formatting 'TEST_DIR/t.IMGFMT.itmd', fmt=IMGFMT size=2202010112 backing_file=TEST_DIR/t.IMGFMT.base
-+Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=2202010112 backing_file=TEST_DIR/t.IMGFMT.itmd
-+QMP_VERSION
-+{"return": {}}
-+{"return": {}}
-+{"return": {}}
-+{"return": {}}
-+{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "SHUTDOWN", "data": {"guest": false}}
-+wrote 196608/196608 bytes at offset 2147287040
-+192 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+wrote 131072/131072 bytes at offset 2147352576
-+128 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+wrote 65536/65536 bytes at offset 2147418112
-+64 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+wrote 512/512 bytes at offset 2202009600
-+512 bytes, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+Image committed.
-+read 196608/196608 bytes at offset 2147287040
-+192 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+read 512/512 bytes at offset 2202009600
-+512 bytes, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+read 65536/65536 bytes at offset 2147287040
-+64 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+read 65536/65536 bytes at offset 2147352576
-+64 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+read 65536/65536 bytes at offset 2147418112
-+64 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+read 512/512 bytes at offset 2202009600
-+512 bytes, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+Offset          Length          File
-+0x7ffd0000      0x30000         TEST_DIR/t.IMGFMT.base
-+Offset          Length          File
-+0x7ffd0000      0x10000         TEST_DIR/t.IMGFMT.base
-+0x7ffe0000      0x20000         TEST_DIR/t.IMGFMT.itmd
-+0x83400000      0x200           TEST_DIR/t.IMGFMT.itmd
-+Offset          Length          File
-+0x7ffd0000      0x10000         TEST_DIR/t.IMGFMT.base
-+0x7ffe0000      0x10000         TEST_DIR/t.IMGFMT.itmd
-+0x7fff0000      0x10000         TEST_DIR/t.IMGFMT
-+0x83400000      0x200           TEST_DIR/t.IMGFMT
-+QMP_VERSION
-+{"return": {}}
-+{"return": {}}
-+{"return": {"sha256": "e12600978d86b5a453861ae5c17d275204673fef3874b7c3c5433c6153d84706"}}
-+{"return": {}}
-+{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "SHUTDOWN", "data": {"guest": false}}
++    return true;
++}
 +
-+=== Test pass bitmap.2 ===
++/**
+  * qdict_destroy_obj(): Free all the memory allocated by a QDict
+  */
+ void qdict_destroy_obj(QObject *obj)
+diff --git a/qobject/qlist.c b/qobject/qlist.c
+index 86b60cb88c..3ef57d31d1 100644
+--- a/qobject/qlist.c
++++ b/qobject/qlist.c
+@@ -140,6 +140,38 @@ QList *qobject_to_qlist(const QObject *obj)
+ }
+ 
+ /**
++ * qlist_is_equal(): Test whether the two QLists are equal
++ *
++ * In order to be considered equal, the respective two objects at each
++ * index of the two lists have to compare equal (regarding
++ * qobject_is_equal()), and both lists have to have the same number of
++ * elements.
++ * That means both lists have to contain equal objects in equal order.
++ */
++bool qlist_is_equal(const QObject *x, const QObject *y)
++{
++    const QList *list_x = qobject_to_qlist(x);
++    const QList *list_y = qobject_to_qlist(y);
++    const QListEntry *entry_x, *entry_y;
 +
-+Formatting 'TEST_DIR/t.IMGFMT.base', fmt=IMGFMT size=2202010112
-+Formatting 'TEST_DIR/t.IMGFMT.itmd', fmt=IMGFMT size=2202010112 backing_file=TEST_DIR/t.IMGFMT.base
-+Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=2202010112 backing_file=TEST_DIR/t.IMGFMT.itmd
-+QMP_VERSION
-+{"return": {}}
-+{"return": {}}
-+{"return": {}}
-+{"return": {}}
-+{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "SHUTDOWN", "data": {"guest": false}}
-+wrote 196608/196608 bytes at offset 2147287040
-+192 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+wrote 131072/131072 bytes at offset 2147352576
-+128 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+wrote 65536/65536 bytes at offset 2147418112
-+64 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+wrote 512/512 bytes at offset 2202009600
-+512 bytes, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+Image committed.
-+read 196608/196608 bytes at offset 2147287040
-+192 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+read 512/512 bytes at offset 2202009600
-+512 bytes, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+read 65536/65536 bytes at offset 2147287040
-+64 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+read 65536/65536 bytes at offset 2147352576
-+64 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+read 65536/65536 bytes at offset 2147418112
-+64 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+read 512/512 bytes at offset 2202009600
-+512 bytes, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+Offset          Length          File
-+0x7ffd0000      0x30000         TEST_DIR/t.IMGFMT.base
-+Offset          Length          File
-+0x7ffd0000      0x10000         TEST_DIR/t.IMGFMT.base
-+0x7ffe0000      0x20000         TEST_DIR/t.IMGFMT.itmd
-+0x83400000      0x200           TEST_DIR/t.IMGFMT.itmd
-+Offset          Length          File
-+0x7ffd0000      0x10000         TEST_DIR/t.IMGFMT.base
-+0x7ffe0000      0x10000         TEST_DIR/t.IMGFMT.itmd
-+0x7fff0000      0x10000         TEST_DIR/t.IMGFMT
-+0x83400000      0x200           TEST_DIR/t.IMGFMT
-+QMP_VERSION
-+{"return": {}}
-+{"return": {}}
-+{"return": {"sha256": "e12600978d86b5a453861ae5c17d275204673fef3874b7c3c5433c6153d84706"}}
-+{"return": {}}
-+{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "SHUTDOWN", "data": {"guest": false}}
++    entry_x = qlist_first(list_x);
++    entry_y = qlist_first(list_y);
 +
-+=== Test pass bitmap.3 ===
++    while (entry_x && entry_y) {
++        if (!qobject_is_equal(qlist_entry_obj(entry_x),
++                              qlist_entry_obj(entry_y)))
++        {
++            return false;
++        }
 +
-+Formatting 'TEST_DIR/t.IMGFMT.base', fmt=IMGFMT size=2202010112
-+Formatting 'TEST_DIR/t.IMGFMT.itmd', fmt=IMGFMT size=2202010112 backing_file=TEST_DIR/t.IMGFMT.base
-+Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=2202010112 backing_file=TEST_DIR/t.IMGFMT.itmd
-+QMP_VERSION
-+{"return": {}}
-+{"return": {}}
-+{"return": {}}
-+{"return": {}}
-+{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "SHUTDOWN", "data": {"guest": false}}
-+wrote 196608/196608 bytes at offset 2147287040
-+192 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+wrote 131072/131072 bytes at offset 2147352576
-+128 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+wrote 65536/65536 bytes at offset 2147418112
-+64 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+wrote 512/512 bytes at offset 2202009600
-+512 bytes, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+Image committed.
-+read 65536/65536 bytes at offset 2147287040
-+64 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+read 65536/65536 bytes at offset 2147352576
-+64 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+read 65536/65536 bytes at offset 2147418112
-+64 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+read 512/512 bytes at offset 2202009600
-+512 bytes, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+Offset          Length          File
-+0x7ffd0000      0x30000         TEST_DIR/t.IMGFMT.base
-+0x83400000      0x200           TEST_DIR/t.IMGFMT.base
-+Offset          Length          File
-+0x7ffd0000      0x10000         TEST_DIR/t.IMGFMT.base
-+0x7ffe0000      0x20000         TEST_DIR/t.IMGFMT.itmd
-+0x83400000      0x200           TEST_DIR/t.IMGFMT.base
-+Offset          Length          File
-+0x7ffd0000      0x10000         TEST_DIR/t.IMGFMT.base
-+0x7ffe0000      0x10000         TEST_DIR/t.IMGFMT.itmd
-+0x7fff0000      0x10000         TEST_DIR/t.IMGFMT
-+0x83400000      0x200           TEST_DIR/t.IMGFMT
-+QMP_VERSION
-+{"return": {}}
-+{"return": {}}
-+{"return": {"sha256": "e12600978d86b5a453861ae5c17d275204673fef3874b7c3c5433c6153d84706"}}
-+{"return": {}}
-+{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "SHUTDOWN", "data": {"guest": false}}
- *** done
++        entry_x = qlist_next(entry_x);
++        entry_y = qlist_next(entry_y);
++    }
++
++    return !entry_x && !entry_y;
++}
++
++/**
+  * qlist_destroy_obj(): Free all the memory allocated by a QList
+  */
+ void qlist_destroy_obj(QObject *obj)
+diff --git a/qobject/qnull.c b/qobject/qnull.c
+index bc9fd31626..f6f55f11ea 100644
+--- a/qobject/qnull.c
++++ b/qobject/qnull.c
+@@ -20,3 +20,12 @@ QNull qnull_ = {
+         .refcnt = 1,
+     },
+ };
++
++/**
++ * qnull_is_equal(): Always return true because any two QNull objects
++ * are equal.
++ */
++bool qnull_is_equal(const QObject *x, const QObject *y)
++{
++    return true;
++}
+diff --git a/qobject/qnum.c b/qobject/qnum.c
+index 476e81c93b..410686a611 100644
+--- a/qobject/qnum.c
++++ b/qobject/qnum.c
+@@ -213,6 +213,60 @@ QNum *qobject_to_qnum(const QObject *obj)
+ }
+ 
+ /**
++ * qnum_is_equal(): Test whether the two QNums are equal
++ *
++ * Negative integers are never considered equal to unsigned integers,
++ * but positive integers in the range [0, INT64_MAX] are considered
++ * equal independently of whether the QNum's kind is i64 or u64.
++ *
++ * Doubles are never considered equal to integers.
++ */
++bool qnum_is_equal(const QObject *x, const QObject *y)
++{
++    QNum *num_x = qobject_to_qnum(x);
++    QNum *num_y = qobject_to_qnum(y);
++
++    switch (num_x->kind) {
++    case QNUM_I64:
++        switch (num_y->kind) {
++        case QNUM_I64:
++            /* Comparison in native int64_t type */
++            return num_x->u.i64 == num_y->u.i64;
++        case QNUM_U64:
++            /* Implicit conversion of x to uin64_t, so we have to
++             * check its sign before */
++            return num_x->u.i64 >= 0 && num_x->u.i64 == num_y->u.u64;
++        case QNUM_DOUBLE:
++            return false;
++        }
++        abort();
++    case QNUM_U64:
++        switch (num_y->kind) {
++        case QNUM_I64:
++            return qnum_is_equal(y, x);
++        case QNUM_U64:
++            /* Comparison in native uint64_t type */
++            return num_x->u.u64 == num_y->u.u64;
++        case QNUM_DOUBLE:
++            return false;
++        }
++        abort();
++    case QNUM_DOUBLE:
++        switch (num_y->kind) {
++        case QNUM_I64:
++        case QNUM_U64:
++            return false;
++        case QNUM_DOUBLE:
++            /* Comparison in native double type */
++            return num_x->u.dbl == num_y->u.dbl;
++        }
++        abort();
++    }
++
++    abort();
++}
++
++/**
+  * qnum_destroy_obj(): Free all memory allocated by a
+  * QNum object
+  */
+diff --git a/qobject/qobject.c b/qobject/qobject.c
+index b0cafb66f1..b2a536041d 100644
+--- a/qobject/qobject.c
++++ b/qobject/qobject.c
+@@ -27,3 +27,32 @@ void qobject_destroy(QObject *obj)
+     assert(QTYPE_QNULL < obj->type && obj->type < QTYPE__MAX);
+     qdestroy[obj->type](obj);
+ }
++
++
++static bool (*qis_equal[QTYPE__MAX])(const QObject *, const QObject *) = {
++    [QTYPE_NONE] = NULL,               /* No such object exists */
++    [QTYPE_QNULL] = qnull_is_equal,
++    [QTYPE_QNUM] = qnum_is_equal,
++    [QTYPE_QSTRING] = qstring_is_equal,
++    [QTYPE_QDICT] = qdict_is_equal,
++    [QTYPE_QLIST] = qlist_is_equal,
++    [QTYPE_QBOOL] = qbool_is_equal,
++};
++
++bool qobject_is_equal(const QObject *x, const QObject *y)
++{
++    /* We cannot test x == y because an object does not need to be
++     * equal to itself (e.g. NaN floats are not). */
++
++    if (!x && !y) {
++        return true;
++    }
++
++    if (!x || !y || x->type != y->type) {
++        return false;
++    }
++
++    assert(QTYPE_NONE < x->type && x->type < QTYPE__MAX);
++
++    return qis_equal[x->type](x, y);
++}
+diff --git a/qobject/qstring.c b/qobject/qstring.c
+index 5da7b5f37c..74182a1c02 100644
+--- a/qobject/qstring.c
++++ b/qobject/qstring.c
+@@ -129,6 +129,15 @@ const char *qstring_get_str(const QString *qstring)
+ }
+ 
+ /**
++ * qstring_is_equal(): Test whether the two QStrings are equal
++ */
++bool qstring_is_equal(const QObject *x, const QObject *y)
++{
++    return !strcmp(qobject_to_qstring(x)->string,
++                   qobject_to_qstring(y)->string);
++}
++
++/**
+  * qstring_destroy_obj(): Free all memory allocated by a QString
+  * object
+  */
 -- 
 2.13.6
