@@ -1,20 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52733)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52964)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1eFj92-0001ep-Jj
-	for qemu-devel@nongnu.org; Fri, 17 Nov 2017 11:05:35 -0500
+	(envelope-from <programmingkidx@gmail.com>) id 1eFj9n-0002E5-3i
+	for qemu-devel@nongnu.org; Fri, 17 Nov 2017 11:06:22 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1eFj8y-0005Ey-JJ
-	for qemu-devel@nongnu.org; Fri, 17 Nov 2017 11:05:32 -0500
-References: <20170628120530.31251-1-vsementsov@virtuozzo.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <fb5c092b-9db5-c5bf-3f61-9317a6371168@redhat.com>
-Date: Fri, 17 Nov 2017 10:04:56 -0600
-MIME-Version: 1.0
-In-Reply-To: <20170628120530.31251-1-vsementsov@virtuozzo.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="NNltnbLu9wsrxn05TilM6Cmg1fWjsx0HH"
-Subject: Re: [Qemu-devel] [PATCH v22 00/30] qcow2: persistent dirty bitmaps
+	(envelope-from <programmingkidx@gmail.com>) id 1eFj9j-00067f-5h
+	for qemu-devel@nongnu.org; Fri, 17 Nov 2017 11:06:19 -0500
+Received: from mail-io0-x22a.google.com ([2607:f8b0:4001:c06::22a]:46992)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <programmingkidx@gmail.com>)
+	id 1eFj9j-00066s-0O
+	for qemu-devel@nongnu.org; Fri, 17 Nov 2017 11:06:15 -0500
+Received: by mail-io0-x22a.google.com with SMTP id t11so9197150iof.13
+	for <qemu-devel@nongnu.org>; Fri, 17 Nov 2017 08:06:14 -0800 (PST)
+Content-Type: text/plain; charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 10.3 \(3273\))
+From: Programmingkid <programmingkidx@gmail.com>
+In-Reply-To: <mailman.8273.1510914667.27993.qemu-devel@nongnu.org>
+Date: Fri, 17 Nov 2017 11:06:12 -0500
+Content-Transfer-Encoding: quoted-printable
+Message-Id: <50461419-2FB0-4A94-A6E6-4EFB459FF39D@gmail.com>
+References: <mailman.8273.1510914667.27993.qemu-devel@nongnu.org>
+Subject: Re: [Qemu-devel] [PATCH 02/24] sdl: remove -alt-grab and -ctrl-grab
+ support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,103 +30,16 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org
-Cc: kwolf@redhat.com, mreitz@redhat.com, armbru@redhat.com, jsnow@redhat.com, famz@redhat.com, den@openvz.org, stefanha@redhat.com, pbonzini@redhat.com
-
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---NNltnbLu9wsrxn05TilM6Cmg1fWjsx0HH
-From: Eric Blake <eblake@redhat.com>
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
- qemu-block@nongnu.org, qemu-devel@nongnu.org
-Cc: kwolf@redhat.com, mreitz@redhat.com, armbru@redhat.com, jsnow@redhat.com,
- famz@redhat.com, den@openvz.org, stefanha@redhat.com, pbonzini@redhat.com
-Message-ID: <fb5c092b-9db5-c5bf-3f61-9317a6371168@redhat.com>
-Subject: Re: [PATCH v22 00/30] qcow2: persistent dirty bitmaps
-References: <20170628120530.31251-1-vsementsov@virtuozzo.com>
-In-Reply-To: <20170628120530.31251-1-vsementsov@virtuozzo.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-
-Revisiting an old series:
-
-On 06/28/2017 07:05 AM, Vladimir Sementsov-Ogievskiy wrote:
-> Hi all!
->=20
-> There is a new update of qcow2-bitmap series - v22.
->=20
-> web: https://src.openvz.org/users/vsementsov/repos/qemu/browse?at=3Dqco=
-w2-bitmap-v22
-> git: https://src.openvz.org/scm/~vsementsov/qemu.git (tag qcow2-bitmap-=
-v22)
->=20
-> v22:
->=20
-> Rebase on master, so changes, mostly related to new dirty bitmaps mutex=
-:
->=20
-
->   qcow2: add persistent dirty bitmaps support
-
->=20
->  block.c                      |   65 +-
->  block/Makefile.objs          |    2 +-
->  block/dirty-bitmap.c         |  154 ++++-
->  block/io.c                   |    8 +
->  block/qcow2-bitmap.c         | 1481 ++++++++++++++++++++++++++++++++++=
-++++++++
->  block/qcow2-refcount.c       |   59 +-
->  block/qcow2.c                |  155 ++++-
->  block/qcow2.h                |   43 ++
->  blockdev.c                   |   73 ++-
->  docs/interop/qcow2.txt       |    8 +-
->  include/block/block.h        |    3 +
->  include/block/block_int.h    |   14 +
->  include/block/dirty-bitmap.h |   22 +-
->  include/qemu/hbitmap.h       |   49 +-
->  qapi/block-core.json         |   42 +-
->  tests/Makefile.include       |    2 +-
->  tests/qemu-iotests/165       |  105 +++
->  tests/qemu-iotests/165.out   |    5 +
->  tests/qemu-iotests/group     |    1 +
->  tests/test-hbitmap.c         |   19 +
->  util/hbitmap.c               |   51 +-
->  21 files changed, 2280 insertions(+), 81 deletions(-)
-
-Nothing in this series touched qemu-img.  At the very minimum, it would
-be nice if 'qemu-img info' were to display a summary of all bitmaps in
-the qcow2 file; the QMP type ImageInfoSpecificQCow2 should be updated to
-mention this information, and qemu-img updated to output it.  Being able
-to create and remove persistent bitmaps from an at-rest qcow2 file
-without having to fire up qemu to issue QMP commands to do so would also
-be nice.
-
-It's a bit late for getting this request into 2.12, but had it been
-available, it would make my work at testing that 'qemu-img commit'
-doesn't corrupt persistent bitmaps.
-
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
+To: Gerd Hoffmann <kraxel@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>
+Cc: Markus Armbruster <armbru@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
 
 
---NNltnbLu9wsrxn05TilM6Cmg1fWjsx0HH
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
+> With absolute pointer devices such as usb-tablet being widely used
+> mouse grabs (for relative pointing devices) should be rarely needed
+> these days.  So the benefit of the options to configure the hotkey
+> modifiers for grab (and other actions) seems questionable.  Which
+> is expecially true for the -ctrl-grab which isn't handled in the
+> handle_keyup() code.
 
------BEGIN PGP SIGNATURE-----
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
-
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAloPCKkACgkQp6FrSiUn
-Q2olJggAoiSz9LR6xuaydwzMolp7KkxnWUpE2Ebacvq5yAjiRYc/gUHiPJbtnKmL
-uaNFLav2gzR5Agi+DdNzvidIO96AWMVLTSOU17X9rDmBJzl384IPmA46JIkQyJoT
-LBnGpNLB+x/1lo+tNYyCDmlwN/DLDnNwkvw3DX+7yT6Q5ekZhaokT+FVwYtOTopl
-usJVRKjTArf9tJeBhptrnYvnmot+FbQ3eXzJWI041fmJYznQP58PrJDfQBj7Wfsa
-ZSmaekkFQfPnFWZVBu9ESa8go7D36CDjoqMlIXXRsctO1BDrV51XgJnabqwfu0gv
-Ihc/2qd3Mai7M1QUvd86yev1o0Jgkw==
-=oHnI
------END PGP SIGNATURE-----
-
---NNltnbLu9wsrxn05TilM6Cmg1fWjsx0HH--
+So does this mean you are against a patch that would allow the user to =
+chose a key to act as a mouse ungrab key?=
