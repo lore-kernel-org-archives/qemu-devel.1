@@ -1,32 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50579)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50627)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1eFgdg-0003I2-GS
-	for qemu-devel@nongnu.org; Fri, 17 Nov 2017 08:25:01 -0500
+	(envelope-from <crosa@redhat.com>) id 1eFgdl-0003Ky-9c
+	for qemu-devel@nongnu.org; Fri, 17 Nov 2017 08:25:06 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1eFgdc-000434-F3
-	for qemu-devel@nongnu.org; Fri, 17 Nov 2017 08:25:00 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:49696)
+	(envelope-from <crosa@redhat.com>) id 1eFgdj-0004BT-Ne
+	for qemu-devel@nongnu.org; Fri, 17 Nov 2017 08:25:05 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:49728)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1eFgdc-00041U-8A
-	for qemu-devel@nongnu.org; Fri, 17 Nov 2017 08:24:56 -0500
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
-	[10.5.11.15])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 78C7C6A7DC
-	for <qemu-devel@nongnu.org>; Fri, 17 Nov 2017 13:24:55 +0000 (UTC)
-Date: Fri, 17 Nov 2017 14:24:54 +0100
-From: Gerd Hoffmann <kraxel@redhat.com>
-Message-ID: <20171117132454.33pngiqu7vcdbmm5@sirius.home.kraxel.org>
-References: <20171117103046.15943-1-kraxel@redhat.com>
-	<20171117103046.15943-20-kraxel@redhat.com>
-	<20171117125535.dhyvy5qwnh6d6e7d@starbug-vm.ie.oracle.com>
+	(Exim 4.71) (envelope-from <crosa@redhat.com>) id 1eFgdj-0004At-DW
+	for qemu-devel@nongnu.org; Fri, 17 Nov 2017 08:25:03 -0500
+References: <20171116223527.4499-1-danielhb@linux.vnet.ibm.com>
+	<20171116223527.4499-3-danielhb@linux.vnet.ibm.com>
+From: Cleber Rosa <crosa@redhat.com>
+Message-ID: <4ab78f2c-7088-81b4-2c5c-13a88bd8e75c@redhat.com>
+Date: Fri, 17 Nov 2017 08:24:58 -0500
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20171117125535.dhyvy5qwnh6d6e7d@starbug-vm.ie.oracle.com>
-Subject: Re: [Qemu-devel] [PATCH 19/24] console: add and use
- qemu_display_find_default
+In-Reply-To: <20171116223527.4499-3-danielhb@linux.vnet.ibm.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="Ua7FNqaojBt9xUi2ewiVHlSRU5ghuKqjG"
+Subject: Re: [Qemu-devel] [PATCH v3 2/2] tests/qemu-iotests: adding
+ savevm/loadvm with postcopy flag test
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,51 +29,243 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Markus Armbruster <armbru@redhat.com>
+To: Daniel Henrique Barboza <danielhb@linux.vnet.ibm.com>, qemu-devel@nongnu.org
+Cc: Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>
 
-  Hi,
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--Ua7FNqaojBt9xUi2ewiVHlSRU5ghuKqjG
+From: Cleber Rosa <crosa@redhat.com>
+To: Daniel Henrique Barboza <danielhb@linux.vnet.ibm.com>,
+ qemu-devel@nongnu.org
+Cc: Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>
+Message-ID: <4ab78f2c-7088-81b4-2c5c-13a88bd8e75c@redhat.com>
+Subject: Re: [PATCH v3 2/2] tests/qemu-iotests: adding savevm/loadvm with
+ postcopy flag test
+References: <20171116223527.4499-1-danielhb@linux.vnet.ibm.com>
+ <20171116223527.4499-3-danielhb@linux.vnet.ibm.com>
+In-Reply-To: <20171116223527.4499-3-danielhb@linux.vnet.ibm.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-> > -        dpy.type = DISPLAY_TYPE_NONE;
-> > +        if (!qemu_display_find_default(&dpy)) {
-> > +            dpy.type = DISPLAY_TYPE_NONE;
-> > +#if defined(CONFIG_VNC)
-> > +            vnc_parse("localhost:0,to=99,id=default", &error_abort);
-> > #endif
-> 
-> Mostly some questions on this:
-> 
-> - I'm curious, why is VNC not just one of the ones searched for in
->  qemu_display_find_default()?
 
-vnc is a bit different.  It's a remote display protocol, not a (local)
-user interface.  There is no DISPLAY_TYPE_VNC for that reason (without
-this series too).  And IMO it was a bad idea to add -display vnc=$config
-(same as -vnc $config) in the first place.
 
-There can be only one user interface instance, i.e. you can't have gtk
-and sdl at the same time.  With vnc (and spice) that works though, i.e.
-you can start qemu with some local user interface and enable vnc or
-spice (even both) remote access at the same time.
+On 11/16/2017 05:35 PM, Daniel Henrique Barboza wrote:
+> This patch implements a test case for the scenario that was failing
+> prior to the patch "migration/ram.c: do not set 'postcopy_running' in
+> POSTCOPY_INCOMING_END".
+>=20
+> This new test file 198 was derived from the test file 181 authored
+> by Kevin Wolf.
+>=20
+> CC: Kevin Wolf <kwolf@redhat.com>
+> CC: Max Reitz <mreitz@redhat.com>
+> CC: Cleber Rosa <crosa@redhat.com>
+> Signed-off-by: Daniel Henrique Barboza <danielhb@linux.vnet.ibm.com>
+>=20
+> ---
+> I CCed Cleber Rosa because this patch was developed at the same
+> time his patch series "[PATCH 00/10] I/O tests cleanups" hit the
+> mailing list. Most of the cleanups/fixes he made in the series was
+> done in this new test as well.
+>=20
 
-> - What if there is another display type added? Would it be added to
->  qemu_display_find_default() or in this if statement?
+Your test looks like a positive review/validation of (some of) the
+changes proposed in the "[PATCH 00/10] I/O tests cleanups" indeed.
 
-qemu_display_find_default() most likely,
-but depends on what exactly it is.
+Thanks for noticing that and for the CC.
 
-> - Is there a reason that VNC doesn't follow the same registration
->  mechanism you're proposing here (as in you've no changes to that
->  module in this patch set).
+- Cleber.
 
-See above ;)
+>  tests/qemu-iotests/198     | 110 +++++++++++++++++++++++++++++++++++++=
+++++++++
+>  tests/qemu-iotests/198.out |  20 +++++++++
+>  tests/qemu-iotests/group   |   1 +
+>  3 files changed, 131 insertions(+)
+>  create mode 100755 tests/qemu-iotests/198
+>  create mode 100644 tests/qemu-iotests/198.out
+>=20
+> diff --git a/tests/qemu-iotests/198 b/tests/qemu-iotests/198
+> new file mode 100755
+> index 0000000000..786e37fc95
+> --- /dev/null
+> +++ b/tests/qemu-iotests/198
+> @@ -0,0 +1,110 @@
+> +#!/bin/bash
+> +#
+> +# Test savevm and loadvm after live migration with postcopy flag
+> +#
+> +# Copyright (C) 2017, IBM Corporation.
+> +#
+> +# This file is derived from tests/qemu-iotests/181 by Kevin Wolf
+> +#
+> +# This program is free software; you can redistribute it and/or modify=
 
-> - In the spirit of encapsulation, would it not make sense for the
->  vnc_parse() to be in the VNC code itself as a fall back if no
->  specific options are given to the -vnc option?
+> +# it under the terms of the GNU General Public License as published by=
 
-It's not that simple.  The default vnc server is started only in case
-no (graphical) local user interface is available, so it's not something
-the vnc code can figure purely on its own.
+> +# the Free Software Foundation; either version 2 of the License, or
+> +# (at your option) any later version.
+> +#
+> +# This program is distributed in the hope that it will be useful,
+> +# but WITHOUT ANY WARRANTY; without even the implied warranty of
+> +# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+> +# GNU General Public License for more details.
+> +#
+> +# You should have received a copy of the GNU General Public License
+> +# along with this program.  If not, see <http://www.gnu.org/licenses/>=
+=2E
+> +#
+> +# Creator/Owner : danielhb@linux.vnet.ibm.com
+> +
+> +seq=3D`basename $0`
+> +echo "QA output created by $seq"
+> +
+> +status=3D1	# failure is the default!
+> +
+> +MIG_SOCKET=3D"${TEST_DIR}/migrate"
+> +
+> +# get standard environment, filters and checks
+> +. ./common.rc
+> +. ./common.filter
+> +. ./common.qemu
+> +
+> +_cleanup()
+> +{
+> +    rm -f "${MIG_SOCKET}"
+> +    _cleanup_test_img
+> +    _cleanup_qemu
+> +}
+> +trap "_cleanup; exit \$status" 0 1 2 3 15
+> +
+> +_supported_fmt qcow2
+> +_supported_proto generic
+> +_supported_os Linux
+> +
+> +size=3D64M
+> +_make_test_img $size
+> +
+> +echo
+> +echo =3D=3D=3D Starting VMs =3D=3D=3D
+> +echo
+> +
+> +qemu_comm_method=3D"monitor"
+> +
+> +if [ "$IMGOPTSSYNTAX" =3D "true" ]; then
+> +    _launch_qemu \
+> +        -drive "${TEST_IMG}",cache=3D${CACHEMODE},id=3Ddisk
+> +else
+> +    _launch_qemu \
+> +        -drive file=3D"${TEST_IMG}",cache=3D${CACHEMODE},driver=3D$IMG=
+FMT,id=3Ddisk
+> +fi
+> +src=3D$QEMU_HANDLE
+> +
+> +if [ "$IMGOPTSSYNTAX" =3D "true" ]; then
+> +    _launch_qemu \
+> +        -drive "${TEST_IMG}",cache=3D${CACHEMODE},id=3Ddisk \
+> +        -incoming "unix:${MIG_SOCKET}"
+> +else
+> +    _launch_qemu \
+> +        -drive file=3D"${TEST_IMG}",cache=3D${CACHEMODE},driver=3D$IMG=
+FMT,id=3Ddisk \
+> +        -incoming "unix:${MIG_SOCKET}"
+> +fi
+> +dest=3D$QEMU_HANDLE
+> +
+> +echo
+> +echo =3D=3D=3D Set \'migrate_set_capability postcopy-ram on\' and migr=
+ate =3D=3D=3D
+> +echo
+> +
+> +silent=3Dyes
+> +_send_qemu_cmd $dest 'migrate_set_capability postcopy-ram on' "(qemu)"=
 
-cheers,
-  Gerd
+> +_send_qemu_cmd $src 'migrate_set_capability postcopy-ram on' "(qemu)"
+> +_send_qemu_cmd $src "migrate -d unix:${MIG_SOCKET}" "(qemu)"
+> +
+> +QEMU_COMM_TIMEOUT=3D1 qemu_cmd_repeat=3D10 silent=3Dyes \
+> +    _send_qemu_cmd $src "info migrate" "completed\|failed"
+> +silent=3Dyes _send_qemu_cmd $src "" "(qemu)"
+> +
+> +echo
+> +echo =3D=3D=3D On destination, execute savevm and loadvm =3D=3D=3D
+> +echo
+> +
+> +silent=3D
+> +_send_qemu_cmd $dest 'savevm state1"' "(qemu)"
+> +_send_qemu_cmd $dest 'loadvm state1"' "(qemu)"
+> +
+> +echo
+> +echo =3D=3D=3D Shut down and check image =3D=3D=3D
+> +echo
+> +
+> +_send_qemu_cmd $src 'quit' ""
+> +_send_qemu_cmd $dest 'quit' ""
+> +wait=3D1 _cleanup_qemu
+> +
+> +_check_test_img
+> +
+> +# success, all done
+> +echo "*** done"
+> +status=3D0
+> diff --git a/tests/qemu-iotests/198.out b/tests/qemu-iotests/198.out
+> new file mode 100644
+> index 0000000000..6c27303857
+> --- /dev/null
+> +++ b/tests/qemu-iotests/198.out
+> @@ -0,0 +1,20 @@
+> +QA output created by 198
+> +Formatting 'TEST_DIR/t.IMGFMT', fmt=3DIMGFMT size=3D67108864
+> +
+> +=3D=3D=3D Starting VMs =3D=3D=3D
+> +
+> +
+> +=3D=3D=3D Set 'migrate_set_capability postcopy-ram on' and migrate =3D=
+=3D=3D
+> +
+> +
+> +=3D=3D=3D On destination, execute savevm and loadvm =3D=3D=3D
+> +
+> +(qemu) savevm state1"
+> +(qemu) loadvm state1"
+> +
+> +=3D=3D=3D Shut down and check image =3D=3D=3D
+> +
+> +(qemu) quit
+> +(qemu) quit
+> +No errors were found on the image.
+> +*** done
+> diff --git a/tests/qemu-iotests/group b/tests/qemu-iotests/group
+> index 24e5ad1b79..84d082bc38 100644
+> --- a/tests/qemu-iotests/group
+> +++ b/tests/qemu-iotests/group
+> @@ -194,3 +194,4 @@
+>  194 rw auto migration quick
+>  195 rw auto quick
+>  197 rw auto quick
+> +198 rw auto migration
+>=20
+
+
+--Ua7FNqaojBt9xUi2ewiVHlSRU5ghuKqjG
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCAAdFiEEeruW64tGuU1eD+m7ZX6NM6XyCfMFAloO4yoACgkQZX6NM6Xy
+CfOccRAAh8SCL1oYJLukiFO05Pq094+7Qav95itFH6nsA2CEKJYwAYAkrnr1H5b4
+A/fMQXBRblSi+H9Gq1J4RphqiWpzIxsznJTUgZRCPoyuiH/nhTlDEawceCWeRG2J
+lUcJlLt8Jk1Vi6NPL9eDYsL1vyUiSPICXMFsGcMg+/Hoijq1oQzICAMeC7TWWzHH
+aB51kIHCTKiJ7J/TzfIzaGcMxbdphXbLfWPHzXmXNIy1Gc/ld/JBR3gu5sZxkvhx
+fse54DZ1khqcZkA2Y/SlzNcApClApviTyCmKETUMu/vKwVkzWVxzCNs9nezRxtrw
+bjNaQF8oeYKbbNHU3EH/dpjHfVYqRcNhlAB9TIKiKnnN1RoSgsfZ8g428SaVWizg
+JgsdNCZveuhX93fEbqK8LnwD7iGgX2ELH+/++WwdeuucDQELoHJijgRHmIvkQYC5
+Cx95bJOyFd9+5KJtPIK+IhvdnOxIxkJteG9/zLWl9IFF8EJ3MysPuzmQ3OQwFyOM
+6upVSk+xxW18tLfKa5B3YWhS+9WfAbjpJ5/A7ZYH7+i4dYr0NjZZm3rhlOjqef5C
+91H9IrowcdbvNtTCZwhBsxGEULkS+ekU06TkDTMH2enLY4JJXdApZmMWkfNdlPI9
+aG/929j+V8KL83QBbFk7DJSANsth86OXsMIDHW0YI7shgvvIhIQ=
+=tG3Q
+-----END PGP SIGNATURE-----
+
+--Ua7FNqaojBt9xUi2ewiVHlSRU5ghuKqjG--
