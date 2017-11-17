@@ -1,24 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36543)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37800)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1eFkvF-0002Rp-Jp
-	for qemu-devel@nongnu.org; Fri, 17 Nov 2017 12:59:26 -0500
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1eFkyK-0003RW-Q4
+	for qemu-devel@nongnu.org; Fri, 17 Nov 2017 13:02:37 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1eFkvE-0004Dj-Rn
-	for qemu-devel@nongnu.org; Fri, 17 Nov 2017 12:59:25 -0500
-References: <20171116173810.16457-1-crosa@redhat.com>
-	<20171116173810.16457-7-crosa@redhat.com>
-	<ab332f27-f2ab-c321-b2a2-2132b2acf366@redhat.com>
-	<e50344ef-cdef-2733-210b-9fc3631f6cea@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <36a42ee2-b292-a86a-dde2-76ad45c63b7e@redhat.com>
-Date: Fri, 17 Nov 2017 11:59:16 -0600
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1eFkyH-00079I-No
+	for qemu-devel@nongnu.org; Fri, 17 Nov 2017 13:02:36 -0500
+Received: from mail-qt0-x241.google.com ([2607:f8b0:400d:c0d::241]:43428)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1eFkyH-00078E-JQ
+	for qemu-devel@nongnu.org; Fri, 17 Nov 2017 13:02:33 -0500
+Received: by mail-qt0-x241.google.com with SMTP id n61so7793738qte.10
+	for <qemu-devel@nongnu.org>; Fri, 17 Nov 2017 10:02:33 -0800 (PST)
+Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
+	<philippe.mathieu.daude@gmail.com>
+References: <1510926167-23326-1-git-send-email-mark.cave-ayland@ilande.co.uk>
+	<1510926167-23326-3-git-send-email-mark.cave-ayland@ilande.co.uk>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Message-ID: <eee15df0-41c5-7a8c-64f7-ee7178a9d5dd@amsat.org>
+Date: Fri, 17 Nov 2017 15:02:21 -0300
 MIME-Version: 1.0
-In-Reply-To: <e50344ef-cdef-2733-210b-9fc3631f6cea@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="WDL16T6DgKnOU20LHdoplQmh6HDV5Vh4A"
-Subject: Re: [Qemu-devel] [Qemu-block] [PATCH 06/10] qemu-iotests: turn
- owner variable into a comment
+In-Reply-To: <1510926167-23326-3-git-send-email-mark.cave-ayland@ilande.co.uk>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH 02/15] sun4u: ebus QOMify tidy-up
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,72 +35,88 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Cleber Rosa <crosa@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org
-Cc: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>
+To: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, atar4qemu@gmail.com
+Cc: qemu-devel@nongnu.org
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---WDL16T6DgKnOU20LHdoplQmh6HDV5Vh4A
-From: Eric Blake <eblake@redhat.com>
-To: Cleber Rosa <crosa@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
- qemu-devel@nongnu.org
-Cc: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org,
- Max Reitz <mreitz@redhat.com>
-Message-ID: <36a42ee2-b292-a86a-dde2-76ad45c63b7e@redhat.com>
-Subject: Re: [Qemu-devel] [Qemu-block] [PATCH 06/10] qemu-iotests: turn owner
- variable into a comment
-References: <20171116173810.16457-1-crosa@redhat.com>
- <20171116173810.16457-7-crosa@redhat.com>
- <ab332f27-f2ab-c321-b2a2-2132b2acf366@redhat.com>
- <e50344ef-cdef-2733-210b-9fc3631f6cea@redhat.com>
-In-Reply-To: <e50344ef-cdef-2733-210b-9fc3631f6cea@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+On 11/17/2017 10:42 AM, Mark Cave-Ayland wrote:
+> The main change here is to introduce the proper TYPE_EBUS/EBUS QOM macros
+> and remove the use of DO_UPCAST.
+> 
+> Alongside this there are some a couple of minor cosmetic changes and a rename
+> of pci_ebus_realize() to ebus_realize() since the ebus device is always what
+> is effectively a PCI-ISA bridge.
+> 
+> Signed-off-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
 
-On 11/17/2017 07:18 AM, Cleber Rosa wrote:
->=20
->=20
-> On 11/17/2017 02:19 AM, Paolo Bonzini wrote:
->> On 16/11/2017 18:38, Cleber Rosa wrote:
->>> This variables has no real use.  To avoid pretending it does, while
->>> still keeping the information, let's turn it into a comment.
->>>
->>> The format chosen is the one already being used on tests 149 and 194.=
+Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 
->>
->> I would just delete it...
->>
->> Paolo
->>
->=20
-> I'm fine with both, but I feel this is like putting info on ChangeLogs
-> in the days of GIT.  Unless other people object, I'll remove them in v2=
-=2E
-
-I'm also in the 'please delete it; git history is good enough' camp.
-
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
-
-
---WDL16T6DgKnOU20LHdoplQmh6HDV5Vh4A
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
-
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAloPI3QACgkQp6FrSiUn
-Q2pzOwf/fRkR0G5xWh0J+IspNdywlgsX/EQUEUYl5SGHab+BUAxvYJ3/CaxWNxCl
-xOi2uw3cLfm5J6oTkyyyF+EgVHPtcUKrXd0ZL1SmpRSYqevWELkrQdbSTjl6/sSS
-goU7bHVo+Em+eWHIqW9GPQHW/x8ct+T/2BKEwa3oa7pRnStEZq0QHyV2DU62sDBV
-khdGXEfHBmnFgHaG41h/haKfzSBCsE0Sh1i+65H5wwvC78Cw7QSqEcheTBRnWta0
-eiHR22O5EVurfs8mKjYRh647Pg6ywYGhtgekAD+ICBaIzU6EITF3zEfI7SOs63kw
-bJ5ZhCxuI+jty0vlhIf+t4eoG2SqrQ==
-=r5w+
------END PGP SIGNATURE-----
-
---WDL16T6DgKnOU20LHdoplQmh6HDV5Vh4A--
+> ---
+>  hw/sparc64/sun4u.c |   19 ++++++++++++-------
+>  1 file changed, 12 insertions(+), 7 deletions(-)
+> 
+> diff --git a/hw/sparc64/sun4u.c b/hw/sparc64/sun4u.c
+> index 1672f25..394b7d6 100644
+> --- a/hw/sparc64/sun4u.c
+> +++ b/hw/sparc64/sun4u.c
+> @@ -81,11 +81,16 @@ struct hwdef {
+>  };
+>  
+>  typedef struct EbusState {
+> -    PCIDevice pci_dev;
+> +    /*< private >*/
+> +    PCIDevice parent_obj;
+> +
+>      MemoryRegion bar0;
+>      MemoryRegion bar1;
+>  } EbusState;
+>  
+> +#define TYPE_EBUS "ebus"
+> +#define EBUS(obj) OBJECT_CHECK(EbusState, (obj), TYPE_EBUS)
+> +
+>  void DMA_init(ISABus *bus, int high_page_enable)
+>  {
+>  }
+> @@ -236,9 +241,9 @@ pci_ebus_init(PCIDevice *pci_dev, qemu_irq *irqs)
+>      return isa_bus;
+>  }
+>  
+> -static void pci_ebus_realize(PCIDevice *pci_dev, Error **errp)
+> +static void ebus_realize(PCIDevice *pci_dev, Error **errp)
+>  {
+> -    EbusState *s = DO_UPCAST(EbusState, pci_dev, pci_dev);
+> +    EbusState *s = EBUS(pci_dev);
+>  
+>      if (!isa_bus_new(DEVICE(pci_dev), get_system_memory(),
+>                       pci_address_space_io(pci_dev), errp)) {
+> @@ -264,7 +269,7 @@ static void ebus_class_init(ObjectClass *klass, void *data)
+>  {
+>      PCIDeviceClass *k = PCI_DEVICE_CLASS(klass);
+>  
+> -    k->realize = pci_ebus_realize;
+> +    k->realize = ebus_realize;
+>      k->vendor_id = PCI_VENDOR_ID_SUN;
+>      k->device_id = PCI_DEVICE_ID_SUN_EBUS;
+>      k->revision = 0x01;
+> @@ -272,10 +277,10 @@ static void ebus_class_init(ObjectClass *klass, void *data)
+>  }
+>  
+>  static const TypeInfo ebus_info = {
+> -    .name          = "ebus",
+> +    .name          = TYPE_EBUS,
+>      .parent        = TYPE_PCI_DEVICE,
+> -    .instance_size = sizeof(EbusState),
+>      .class_init    = ebus_class_init,
+> +    .instance_size = sizeof(EbusState),
+>      .interfaces = (InterfaceInfo[]) {
+>          { INTERFACE_CONVENTIONAL_PCI_DEVICE },
+>          { },
+> @@ -463,7 +468,7 @@ static void sun4uv_init(MemoryRegion *address_space_mem,
+>      pci_busA->slot_reserved_mask = 0xfffffff1;
+>      pci_busB->slot_reserved_mask = 0xfffffff0;
+>  
+> -    ebus = pci_create_multifunction(pci_busA, PCI_DEVFN(1, 0), true, "ebus");
+> +    ebus = pci_create_multifunction(pci_busA, PCI_DEVFN(1, 0), true, TYPE_EBUS);
+>      qdev_init_nofail(DEVICE(ebus));
+>  
+>      isa_bus = pci_ebus_init(ebus, pbm_irqs);
+> 
