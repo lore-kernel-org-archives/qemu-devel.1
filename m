@@ -1,22 +1,15 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38064)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40554)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1eFkz4-0003q2-QZ
-	for qemu-devel@nongnu.org; Fri, 17 Nov 2017 13:03:23 -0500
+	(envelope-from <thuth@redhat.com>) id 1eFl64-0006nz-Hj
+	for qemu-devel@nongnu.org; Fri, 17 Nov 2017 13:10:37 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1eFkz3-0007q3-Ue
-	for qemu-devel@nongnu.org; Fri, 17 Nov 2017 13:03:22 -0500
-References: <20171116173810.16457-1-crosa@redhat.com>
-	<20171116173810.16457-10-crosa@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <0f3ed740-9d05-37f5-5437-0fb564464127@redhat.com>
-Date: Fri, 17 Nov 2017 12:03:11 -0600
-MIME-Version: 1.0
-In-Reply-To: <20171116173810.16457-10-crosa@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="EFSojEknumQenbpEVGP5ENjq9ue0og95O"
-Subject: Re: [Qemu-devel] [PATCH 09/10] qemu-iotests: remove unused "here"
- variable
+	(envelope-from <thuth@redhat.com>) id 1eFl61-00055p-Bu
+	for qemu-devel@nongnu.org; Fri, 17 Nov 2017 13:10:36 -0500
+From: Thomas Huth <thuth@redhat.com>
+Date: Fri, 17 Nov 2017 19:10:28 +0100
+Message-Id: <1510942228-22822-1-git-send-email-thuth@redhat.com>
+Subject: [Qemu-devel] [PATCH for-2.11] pc-bios/s390-ccw: Fix problem with
+ invalid virtio-scsi LUN when rebooting
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,77 +18,42 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Cleber Rosa <crosa@redhat.com>, qemu-devel@nongnu.org
-Cc: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>
+To: qemu-s390x@nongnu.org, Cornelia Huck <cohuck@redhat.com>, Christian Borntraeger <borntraeger@de.ibm.com>
+Cc: qemu-devel@nongnu.org
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---EFSojEknumQenbpEVGP5ENjq9ue0og95O
-From: Eric Blake <eblake@redhat.com>
-To: Cleber Rosa <crosa@redhat.com>, qemu-devel@nongnu.org
-Cc: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org,
- Max Reitz <mreitz@redhat.com>
-Message-ID: <0f3ed740-9d05-37f5-5437-0fb564464127@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH 09/10] qemu-iotests: remove unused "here"
- variable
-References: <20171116173810.16457-1-crosa@redhat.com>
- <20171116173810.16457-10-crosa@redhat.com>
-In-Reply-To: <20171116173810.16457-10-crosa@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+When rebooting a guest that has a virtio-scsi disk, the s390-ccw
+bios sometimes bails out with an error message like this:
 
-On 11/16/2017 11:38 AM, Cleber Rosa wrote:
-> Another legacy variable that did not convince me it has any
-> purpose whatsoever.
->=20
-> Signed-off-by: Cleber Rosa <crosa@redhat.com>
-> ---
+! SCSI cannot report LUNs: STATUS=02 RSPN=70 KEY=05 CODE=25 QLFR=00, sure !
 
-> +++ b/tests/qemu-iotests/001
-> @@ -23,7 +23,6 @@
->  seq=3D`basename $0`
->  echo "QA output created by $seq"
-> =20
-> -here=3D`pwd`
+Enabling the scsi_req* tracing in QEMU shows that the ccw bios is
+trying to execute the REPORT LUNS SCSI command with a LUN != 0, and
+this causes the SCSI command to fail.
+Looks like we neither clear the BSS of the s390-ccw bios during reboot,
+nor do we explicitly set the default_scsi_device.lun value to 0, so
+this variable can contain random values from the OS after the reboot.
+By setting this variable explicitly to 0, the problem is fixed and
+the reboots always succeed.
 
-Good riddance.  And in the majority of the tests, it was a needless
-fork(), compared to my preference (which is also guaranteed by POSIX and
-by /bin/bash):
+Buglink: https://bugzilla.redhat.com/show_bug.cgi?id=1514352
+Signed-off-by: Thomas Huth <thuth@redhat.com>
+---
+ pc-bios/s390-ccw/virtio-scsi.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
-> +++ b/tests/qemu-iotests/176
-> @@ -27,7 +27,6 @@
->  seq=3D"$(basename $0)"
->  echo "QA output created by $seq"
-> =20
-> -here=3D"$PWD"
-
-since $PWD and `pwd` should always produce the same thing, if we even
-had a reason to use it. ;)
-
-Reviewed-by: Eric Blake <eblake@redhat.com>
-
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
-
-
---EFSojEknumQenbpEVGP5ENjq9ue0og95O
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
-
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAloPJF8ACgkQp6FrSiUn
-Q2rgBwf+Kt8G1BxNxMNXImMhkR+rLvOVop9rFjgmgEajTIcPXeggzpr66VAU4lIV
-HHIgMPugmXr4QABJqQuTqPHQIo6zyd6KYpraIBESuV4v1pUi6Ol5iZ6V/JD2/1Qe
-YLFmiF/d9txV/FpLZEzLCdWLwpimJi48FFqut8N8P5zxir7yqFyywk6KEu3IOVz7
-LhGPx9bgNJc5sbYP17T0C2RWXZh0p1iYQW60MQ/9U9n7ZtcYJ0Qki5p3f6mKchKD
-5uYWnALHDHkxBefP+xnDN9iD5en/UvjrRGtzR/zQgdPqvpy5/1CRo0hH8diWCaty
-ODTPy8+N9bVhokku4SsdiMfFsLXKRA==
-=FbwT
------END PGP SIGNATURE-----
-
---EFSojEknumQenbpEVGP5ENjq9ue0og95O--
+diff --git a/pc-bios/s390-ccw/virtio-scsi.c b/pc-bios/s390-ccw/virtio-scsi.c
+index c92f5d3..4fe4b9d 100644
+--- a/pc-bios/s390-ccw/virtio-scsi.c
++++ b/pc-bios/s390-ccw/virtio-scsi.c
+@@ -223,7 +223,8 @@ static void virtio_scsi_locate_device(VDev *vdev)
+ 
+     for (target = 0; target <= vdev->config.scsi.max_target; target++) {
+         sdev->channel = channel;
+-        sdev->target = target; /* sdev->lun will be 0 here */
++        sdev->target = target;
++        sdev->lun = 0;          /* LUN has to be 0 for REPORT LUNS */
+         if (!scsi_report_luns(vdev, data, sizeof(data))) {
+             if (resp.response == VIRTIO_SCSI_S_BAD_TARGET) {
+                 continue;
+-- 
+1.8.3.1
