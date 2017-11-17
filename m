@@ -1,23 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42167)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42700)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1eFlAl-0008NZ-09
-	for qemu-devel@nongnu.org; Fri, 17 Nov 2017 13:15:27 -0500
+	(envelope-from <kwolf@redhat.com>) id 1eFlCL-0000k2-PY
+	for qemu-devel@nongnu.org; Fri, 17 Nov 2017 13:17:06 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1eFlAk-00014M-5F
-	for qemu-devel@nongnu.org; Fri, 17 Nov 2017 13:15:26 -0500
-References: <20171023092945.54532-1-vsementsov@virtuozzo.com>
-	<20171117123059.GB4795@localhost.localdomain>
-	<b95aaa97-39d0-fdc1-21a1-2e0ea7acac17@redhat.com>
-From: John Snow <jsnow@redhat.com>
-Message-ID: <79f2607f-d4f9-8f92-76df-c99ae48b9936@redhat.com>
-Date: Fri, 17 Nov 2017 13:15:11 -0500
-MIME-Version: 1.0
-In-Reply-To: <b95aaa97-39d0-fdc1-21a1-2e0ea7acac17@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] block/snapshot: dirty all dirty bitmaps on
- snapshot-switch
+	(envelope-from <kwolf@redhat.com>) id 1eFlCK-00029a-PZ
+	for qemu-devel@nongnu.org; Fri, 17 Nov 2017 13:17:05 -0500
+From: Kevin Wolf <kwolf@redhat.com>
+Date: Fri, 17 Nov 2017 19:16:30 +0100
+Message-Id: <20171117181653.20651-3-kwolf@redhat.com>
+In-Reply-To: <20171117181653.20651-1-kwolf@redhat.com>
+References: <20171117181653.20651-1-kwolf@redhat.com>
+Subject: [Qemu-devel] [PULL 02/25] qemu-iotests: Use -nographic in 182
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,49 +19,33 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Max Reitz <mreitz@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Cc: qemu-block@nongnu.org, qemu-devel@nongnu.org, eblake@redhat.com, famz@redhat.com, den@openvz.org, stefanha@redhat.com
+To: qemu-block@nongnu.org
+Cc: kwolf@redhat.com, qemu-devel@nongnu.org
 
+This avoids that random UI frontend error messages end up in the output.
+In particular, we were seeing this line in CI error logs:
 
++Unable to init server: Could not connect: Connection refused
 
-On 11/17/2017 10:01 AM, Max Reitz wrote:
-> On 2017-11-17 13:30, Kevin Wolf wrote:
->> Am 23.10.2017 um 11:29 hat Vladimir Sementsov-Ogievskiy geschrieben:
->>> Snapshot-switch actually changes active state of disk so it should
->>> reflect on dirty bitmaps. Otherwise next incremental backup using
->>> these bitmaps will be invalid.
->>>
->>> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
->>
->> We discussed this quite a while ago, and I'm still not convinced that
->> this approach makes sense.
-> 
-> I think it at least makes more sense than not handling this case at all.
-> 
->> Can you give just one example of a use case where dirtying the whole
->> bitmap while loading a snapshot is the desired behaviour?
->>
->> I think the most useful behaviour would be something where the bitmaps
->> themselves are snapshotted, too.
-> 
-> Agreed.
-> 
->>                                  But for the time being, the easiest and
->> safest solution might just be to error out in any snapshot operations
->> if any bitmaps are in use.
-> 
-> Sounds OK, too.  I personally don't have an opinion either way.
-> 
-> But in any case, what we did before this patch was definitely wrong so I
-> consider it an improvement.
-> 
+Signed-off-by: Kevin Wolf <kwolf@redhat.com>
+Reviewed-by: Kashyap Chamarthy <kchamart@redhat.com>
+Reviewed-by: Jeff Cody <jcody@redhat.com>
+---
+ tests/qemu-iotests/182 | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-This is how I feel about it too. Erroring out entirely is an option, but
-code-wise just dirtying everything is at least verifiably not-wrong and
-pretty simple to implement.
-
-It's an improvement... Don't do it, but at least you won't get something
-wrong after, just something heinously unoptimal.
-
-> Max
-> 
+diff --git a/tests/qemu-iotests/182 b/tests/qemu-iotests/182
+index 2e078ceed8..4b31592fb8 100755
+--- a/tests/qemu-iotests/182
++++ b/tests/qemu-iotests/182
+@@ -62,7 +62,7 @@ _launch_qemu -drive file=$TEST_IMG,if=none,id=drive0,file.locking=on \
+ 
+ echo
+ echo "Starting a second QEMU using the same image should fail"
+-echo 'quit' | $QEMU -monitor stdio \
++echo 'quit' | $QEMU -nographic -monitor stdio \
+     -drive file=$TEST_IMG,if=none,id=drive0,file.locking=on \
+     -device $virtioblk,drive=drive0 2>&1 | _filter_testdir 2>&1 |
+     _filter_qemu |
+-- 
+2.13.6
