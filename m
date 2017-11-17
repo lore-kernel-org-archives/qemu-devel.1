@@ -1,25 +1,41 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38036)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39100)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1eFnRB-0003CF-H8
-	for qemu-devel@nongnu.org; Fri, 17 Nov 2017 15:40:34 -0500
+	(envelope-from <danielhb@linux.vnet.ibm.com>) id 1eFnTJ-0004m1-Md
+	for qemu-devel@nongnu.org; Fri, 17 Nov 2017 15:42:47 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1eFnRA-0002sm-Ip
-	for qemu-devel@nongnu.org; Fri, 17 Nov 2017 15:40:33 -0500
-References: <20171023092945.54532-1-vsementsov@virtuozzo.com>
-	<20171117123059.GB4795@localhost.localdomain>
-	<b95aaa97-39d0-fdc1-21a1-2e0ea7acac17@redhat.com>
-	<79f2607f-d4f9-8f92-76df-c99ae48b9936@redhat.com>
-	<20171117182526.GK4795@localhost.localdomain>
-From: John Snow <jsnow@redhat.com>
-Message-ID: <fa7cd556-c784-2105-6777-bae1c5814c76@redhat.com>
-Date: Fri, 17 Nov 2017 15:40:16 -0500
+	(envelope-from <danielhb@linux.vnet.ibm.com>) id 1eFnTF-00065E-HR
+	for qemu-devel@nongnu.org; Fri, 17 Nov 2017 15:42:45 -0500
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:41202)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <danielhb@linux.vnet.ibm.com>)
+	id 1eFnTF-00063p-8U
+	for qemu-devel@nongnu.org; Fri, 17 Nov 2017 15:42:41 -0500
+Received: from pps.filterd (m0098396.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
+	vAHKdMfU093472
+	for <qemu-devel@nongnu.org>; Fri, 17 Nov 2017 15:42:32 -0500
+Received: from e38.co.us.ibm.com (e38.co.us.ibm.com [32.97.110.159])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2ea4fuy2u6-1
+	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Fri, 17 Nov 2017 15:42:32 -0500
+Received: from localhost
+	by e38.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <danielhb@linux.vnet.ibm.com>;
+	Fri, 17 Nov 2017 13:42:31 -0700
+References: <151092340873.11818.16813698420232981002.stgit@bahia>
+	<48df4371-5966-a428-f5df-37c014c1ab94@linux.vnet.ibm.com>
+	<151094277418.31225.11006663740924379616@sif>
+From: Daniel Henrique Barboza <danielhb@linux.vnet.ibm.com>
+Date: Fri, 17 Nov 2017 18:42:25 -0200
 MIME-Version: 1.0
-In-Reply-To: <20171117182526.GK4795@localhost.localdomain>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
+In-Reply-To: <151094277418.31225.11006663740924379616@sif>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] block/snapshot: dirty all dirty bitmaps on
- snapshot-switch
+Content-Language: en-US
+Message-Id: <02367603-093e-3c09-e026-d78928a3f291@linux.vnet.ibm.com>
+Subject: Re: [Qemu-devel] [Qemu-ppc] [PATCH for-2.11] spapr: reset DRCs
+ after devices
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,77 +44,173 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Kevin Wolf <kwolf@redhat.com>
-Cc: Max Reitz <mreitz@redhat.com>, Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org, eblake@redhat.com, famz@redhat.com, den@openvz.org, stefanha@redhat.com
+To: Michael Roth <mdroth@linux.vnet.ibm.com>, Greg Kurz <groug@kaod.org>, qemu-devel@nongnu.org
+Cc: qemu-stable@nongnu.org, qemu-ppc@nongnu.org, David Gibson <david@gibson.dropbear.id.au>
 
 
 
-On 11/17/2017 01:25 PM, Kevin Wolf wrote:
-> Am 17.11.2017 um 19:15 hat John Snow geschrieben:
+On 11/17/2017 04:19 PM, Michael Roth wrote:
+> Quoting Daniel Henrique Barboza (2017-11-17 10:21:27)
+>>
+>> On 11/17/2017 10:56 AM, Greg Kurz wrote:
+>>> A DRC with a pending unplug request releases its associated device at
+>>> machine reset time.
+>>>
+>>> In the case of LMB, when all DRCs for a DIMM device have been reset,
+>>> the DIMM gets unplugged, causing guest memory to disappear. This may
+>>> be very confusing for anything still using this memory.
+>>>
+>>> This is exactly what happens with vhost backends, and QEMU aborts
+>>> with:
+>>>
+>>> qemu-system-ppc64: used ring relocated for ring 2
+>>> qemu-system-ppc64: qemu/hw/virtio/vhost.c:649: vhost_commit: Assertion
+>>>    `r >= 0' failed.
+>>>
+>>> The issue is that each DRC registers a QEMU reset handler, and we
+>>> don't control the order in which these handlers are called (ie,
+>>> a LMB DRC will unplug a DIMM before the virtio device using the
+>>> memory on this DIMM could stop its vhost backend).
+>>>
+>>> To avoid such situations, let's reset DRCs after all devices
+>>> have been reset.
+>>>
+>>> Reported-by: Mallesh N. Koti <mallesh@linux.vnet.ibm.com>
+>>> Signed-off-by: Greg Kurz <groug@kaod.org>
+>>> ---
+>> I believe this has to do with the problem discussed at the memory
+>> unplug reboot with vhost=on, right?
+>>
+>> I don't see any problem with this patch and it's probably the best solution
+>> short-term for the problem (and potentially other related LMB release
+>> problems), but that said, how hard it is to forbid LMB unplug at all if the
+>> memory is being used in vhost?
+>>
+>> The way I see it, the root problem is that a device unplug failed at the
+>> guest
+>> side and we don't know about it, leaving drc->unplug_requested flags set
+>> around the code when it shouldn't. Reading that thread I see a comment from
+> I'm not sure we want to go down the road of preemptively aborting
+> specific cases where we think unplug will fail in the guest. We already
+> need to deal with the cases where we don't know whether they'll fail
+> ahead of time, so it seems like more of a headache to add special cases
+> on top of that that management would need to deal with.
+
+Just to be clear, I only advocate this kind of constraint if the LMB unplug,
+at this specific scenario, has a 100% chance of fail. Otherwise we're
+better of rolling the dice.
+
+
+>
+> And in this particular case we'd never be able to unplug the DIMM if
+> the guest happens to use it for the vring each boot (unless maybe the
+> unplug request occured during early boot), even though there's no
+> technical reason we shouldn't be able to at least handle it on the
+> next reset.
+
+I am ok going this route if we have our bases covered. Does this
+behavior of unplugging the LMBs pending unplug at reset documented
+in the PAPR specs? If not, we would need to document it somewhere else
+(or ask for a PAPR revision to add it).
+
+Otherwise, I am not sure if management will be OK with LMBs being
+"inadvertently" hot unplugged in a reset due to a failed LMB hot unplug that
+might have occurred days ago and the user doesn't even remember it
+anymore :)
+
+
+Thanks,
+
+
+Daniel
+>
+>> Michael S. Tsirkin saying that this bug is somewhat expected, that vhost
+>> backend will
+>> not behave well if memory is going away. Unlike other LMB unplug
+>> failures from
+>> the guest side that might happen for any other reason, this one sees
+>> predicable
+>> and we can avoid it.
+>>
+>> I think this is something worth considering. But for now,
 >>
 >>
->> On 11/17/2017 10:01 AM, Max Reitz wrote:
->>> On 2017-11-17 13:30, Kevin Wolf wrote:
->>>> Am 23.10.2017 um 11:29 hat Vladimir Sementsov-Ogievskiy geschrieben:
->>>>> Snapshot-switch actually changes active state of disk so it should
->>>>> reflect on dirty bitmaps. Otherwise next incremental backup using
->>>>> these bitmaps will be invalid.
->>>>>
->>>>> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
->>>>
->>>> We discussed this quite a while ago, and I'm still not convinced that
->>>> this approach makes sense.
->>>
->>> I think it at least makes more sense than not handling this case at all.
->>>
->>>> Can you give just one example of a use case where dirtying the whole
->>>> bitmap while loading a snapshot is the desired behaviour?
->>>>
->>>> I think the most useful behaviour would be something where the bitmaps
->>>> themselves are snapshotted, too.
->>>
->>> Agreed.
->>>
->>>>                                  But for the time being, the easiest and
->>>> safest solution might just be to error out in any snapshot operations
->>>> if any bitmaps are in use.
->>>
->>> Sounds OK, too.  I personally don't have an opinion either way.
->>>
->>> But in any case, what we did before this patch was definitely wrong so I
->>> consider it an improvement.
->>>
+>> Reviewed-by: Daniel Henrique Barboza <danielhb@linux.vnet.ibm.com>
 >>
->> This is how I feel about it too. Erroring out entirely is an option, but
->> code-wise just dirtying everything is at least verifiably not-wrong and
->> pretty simple to implement.
-> 
-> But that's exactly the problem: If something is just plain wrong, you
-> can always replace it with something that makes sense. If it errors out,
-> you can still remove that error later. But if you have something that
-> doesn't make a whole lot of sense, but kinda sorta works (like after
-> this patch), it's ABI and you can't implement something more useful
-> later any more.
-> 
->> It's an improvement... Don't do it, but at least you won't get
->> something wrong after, just something heinously unoptimal.
-> 
-> It's a short-term improvement that may become a long-term burden.
-> 
-> Kevin
-> 
-
-I see your point.
-
-If we enable it now, we always have to.
-If we disable it now, we *can* later if we wish.
-
-...however, I think it's been the case that we haven't prohibited it
-before, but also it's a pretty good case that nobody has been using this
-feature in production because they're not yet persistent and migratable.
-
-An error message asking the user to delete bitmaps (which will very
-obviously invalidate them) would be fine, too. I was erring on the side
-of "just let things work," but you have a point that making sure the
-user knows that what they're trying to accomplish is not a good idea is
-probably better than silently doing the very stupid thing.
+>>>    hw/ppc/spapr.c     |   21 +++++++++++++++++++++
+>>>    hw/ppc/spapr_drc.c |    7 -------
+>>>    2 files changed, 21 insertions(+), 7 deletions(-)
+>>>
+>>> diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
+>>> index 6841bd294b3c..6285f7211f9a 100644
+>>> --- a/hw/ppc/spapr.c
+>>> +++ b/hw/ppc/spapr.c
+>>> @@ -1411,6 +1411,19 @@ static void find_unknown_sysbus_device(SysBusDevice *sbdev, void *opaque)
+>>>        }
+>>>    }
+>>>
+>>> +static int spapr_reset_drcs(Object *child, void *opaque)
+>>> +{
+>>> +    sPAPRDRConnector *drc =
+>>> +        (sPAPRDRConnector *) object_dynamic_cast(child,
+>>> +                                                 TYPE_SPAPR_DR_CONNECTOR);
+>>> +
+>>> +    if (drc) {
+>>> +        spapr_drc_reset(drc);
+>>> +    }
+>>> +
+>>> +    return 0;
+>>> +}
+>>> +
+>>>    static void ppc_spapr_reset(void)
+>>>    {
+>>>        MachineState *machine = MACHINE(qdev_get_machine());
+>>> @@ -1434,6 +1447,14 @@ static void ppc_spapr_reset(void)
+>>>        }
+>>>
+>>>        qemu_devices_reset();
+>>> +
+>>> +    /* DRC reset may cause a device to be unplugged. This will cause troubles
+>>> +     * if this device is used by another device (eg, a running vhost backend
+>>> +     * will crash QEMU if the DIMM holding the vring goes away). To avoid such
+>>> +     * situations, we reset DRCs after all devices have been reset.
+>>> +     */
+>>> +    object_child_foreach_recursive(object_get_root(), spapr_reset_drcs, NULL);
+>>> +
+>>>        spapr_clear_pending_events(spapr);
+>>>
+>>>        /*
+>>> diff --git a/hw/ppc/spapr_drc.c b/hw/ppc/spapr_drc.c
+>>> index 915e9b51c40c..e3b122968e89 100644
+>>> --- a/hw/ppc/spapr_drc.c
+>>> +++ b/hw/ppc/spapr_drc.c
+>>> @@ -455,11 +455,6 @@ void spapr_drc_reset(sPAPRDRConnector *drc)
+>>>        }
+>>>    }
+>>>
+>>> -static void drc_reset(void *opaque)
+>>> -{
+>>> -    spapr_drc_reset(SPAPR_DR_CONNECTOR(opaque));
+>>> -}
+>>> -
+>>>    bool spapr_drc_needed(void *opaque)
+>>>    {
+>>>        sPAPRDRConnector *drc = (sPAPRDRConnector *)opaque;
+>>> @@ -518,7 +513,6 @@ static void realize(DeviceState *d, Error **errp)
+>>>        }
+>>>        vmstate_register(DEVICE(drc), spapr_drc_index(drc), &vmstate_spapr_drc,
+>>>                         drc);
+>>> -    qemu_register_reset(drc_reset, drc);
+>>>        trace_spapr_drc_realize_complete(spapr_drc_index(drc));
+>>>    }
+>>>
+>>> @@ -529,7 +523,6 @@ static void unrealize(DeviceState *d, Error **errp)
+>>>        gchar *name;
+>>>
+>>>        trace_spapr_drc_unrealize(spapr_drc_index(drc));
+>>> -    qemu_unregister_reset(drc_reset, drc);
+>>>        vmstate_unregister(DEVICE(drc), &vmstate_spapr_drc, drc);
+>>>        root_container = container_get(object_get_root(), DRC_CONTAINER_PATH);
+>>>        name = g_strdup_printf("%x", spapr_drc_index(drc));
+>>>
+>>>
