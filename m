@@ -1,31 +1,42 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51540)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52382)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <yu.ning@linux.intel.com>) id 1eFc6O-0005fY-FC
-	for qemu-devel@nongnu.org; Fri, 17 Nov 2017 03:34:21 -0500
+	(envelope-from <borntraeger@de.ibm.com>) id 1eFcB2-0006zM-UO
+	for qemu-devel@nongnu.org; Fri, 17 Nov 2017 03:39:09 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <yu.ning@linux.intel.com>) id 1eFc6L-0001RM-Df
-	for qemu-devel@nongnu.org; Fri, 17 Nov 2017 03:34:20 -0500
-Received: from mga07.intel.com ([134.134.136.100]:60450)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <yu.ning@linux.intel.com>)
-	id 1eFc6L-0001Q3-4H
-	for qemu-devel@nongnu.org; Fri, 17 Nov 2017 03:34:17 -0500
-References: <e1e3a1d3-da53-e46a-ce9b-7d1707e3a493@linux.intel.com>
-	<81495d39-0026-dba2-10b9-86d7df5babd3@tuxfamily.org>
-	<4a983bfc-442c-c55f-e3eb-9cb58a0d9ba8@redhat.com>
-	<aac92ba4-337c-df4f-c8f5-03b9fef1e2f0@linux.intel.com>
-	<cdd6e0a4-93cd-66ca-5e69-7a834f0b10d0@redhat.com>
-	<a1648b4d-946f-49c4-93c5-5990baa0bce8@linux.intel.com>
-	<3cc5c809-001e-bb14-52fd-7a66ed00b38c@redhat.com>
-From: Yu Ning <yu.ning@linux.intel.com>
-Message-ID: <541c82ef-9798-377a-8c79-f3aa0387324c@linux.intel.com>
-Date: Fri, 17 Nov 2017 16:34:08 +0800
+	(envelope-from <borntraeger@de.ibm.com>) id 1eFcAz-0000hO-RS
+	for qemu-devel@nongnu.org; Fri, 17 Nov 2017 03:39:08 -0500
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:51972
+	helo=mx0a-001b2d01.pphosted.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <borntraeger@de.ibm.com>)
+	id 1eFcAz-0000gp-Li
+	for qemu-devel@nongnu.org; Fri, 17 Nov 2017 03:39:05 -0500
+Received: from pps.filterd (m0098420.ppops.net [127.0.0.1])
+	by mx0b-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
+	vAH8clMH133663
+	for <qemu-devel@nongnu.org>; Fri, 17 Nov 2017 03:38:58 -0500
+Received: from e06smtp13.uk.ibm.com (e06smtp13.uk.ibm.com [195.75.94.109])
+	by mx0b-001b2d01.pphosted.com with ESMTP id 2e9tf5csek-1
+	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Fri, 17 Nov 2017 03:38:58 -0500
+Received: from localhost
+	by e06smtp13.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	Only! Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <borntraeger@de.ibm.com>;
+	Fri, 17 Nov 2017 08:38:57 -0000
+References: <20171116170526.12643-1-david@redhat.com>
+	<20171116182335.7168a489.cohuck@redhat.com>
+	<20171117091049.4c584ea5.cohuck@redhat.com>
+From: Christian Borntraeger <borntraeger@de.ibm.com>
+Date: Fri, 17 Nov 2017 09:38:53 +0100
 MIME-Version: 1.0
-In-Reply-To: <3cc5c809-001e-bb14-52fd-7a66ed00b38c@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
+In-Reply-To: <20171117091049.4c584ea5.cohuck@redhat.com>
+Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Subject: Re: [Qemu-devel] HAXM is now open source
+Content-Transfer-Encoding: 7bit
+Message-Id: <981d9276-2e8d-46e4-ba6c-821cc120fb35@de.ibm.com>
+Subject: Re: [Qemu-devel] [PATCH v1 for-2.11 0/3] s390x: fixes for SIGP and
+ DIAG 308
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,26 +45,39 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Thomas Huth <huth@tuxfamily.org>, qemu-devel <qemu-devel@nongnu.org>, Stefan Weil <sw@weilnetz.de>
-Cc: John Snow <jsnow@redhat.com>, Vincent Palatin <vpalatin@chromium.org>
+To: Cornelia Huck <cohuck@redhat.com>, David Hildenbrand <david@redhat.com>
+Cc: qemu-s390x@nongnu.org, qemu-devel@nongnu.org, Richard Henderson <rth@twiddle.net>, Alexander Graf <agraf@suse.de>
 
 
 
-On 11/17/2017 16:30, Thomas Huth wrote:
-> On 17.11.2017 09:17, Yu Ning wrote:
-> [...]
->> Is there a preferred document format for the QEMU blog, e.g. Markdown?
-> Yes, we're using markdown of Jekyll (https://jekyllrb.com/docs/posts/).
-> Please clone the qemu-web repository (see
-> https://git.qemu.org/?p=qemu-web.git), and have a look in the "_posts"
-> directory to see how the files should look like.
->
->> I'll get the content ready by early next week, and then I'll need
->> someone to help me post it.
-> Sure, Paolo and I should be able to help. The preferred way is to create
-> a patch against the qemu-web repository and send that patch to
-> qemu-devel, with CC: to Paolo and myself. We then can give feedback, do
-> sanity checking (in case you don't want to install Jekyll on your HD),
-> and push the patch to the website if everything is fine.
+On 11/17/2017 09:10 AM, Cornelia Huck wrote:
+> On Thu, 16 Nov 2017 18:23:35 +0100
+> Cornelia Huck <cohuck@redhat.com> wrote:
+> 
+>> On Thu, 16 Nov 2017 18:05:23 +0100
+>> David Hildenbrand <david@redhat.com> wrote:
+>>
+>>> First one also applies to KVM SIGP handling. The other two only
+>>> apply to TCG (allowing to IPL from disk with more than 1 VCPU- I
+>>> never tested that before).
+>>>
+>>> David Hildenbrand (3):
+>>>   s390x: fix storing CPU status (again)
+>>>   s390x/tcg: fix DIAG 308 with > 1 VCPU (single threaded TCG)
+>>>   s390x/tcg: fix DIAG 308 with > 1 VCPU (MTTCG)
+>>>
+>>>  target/s390x/diag.c        | 4 ----
+>>>  target/s390x/helper.c      | 2 +-
+>>>  target/s390x/misc_helper.c | 2 ++
+>>>  3 files changed, 3 insertions(+), 5 deletions(-)
+>>>   
+>>
+>> Thanks, queued to s390-fixes.
+> 
+> Patch 2 still needs discussion, I think. I'll dequeue it again and
+> leave 1 + 3.
 
-Got it, thanks!
+Yes.
+Patch1 is certainly good and relevant for 2.11.
+Patch2 needs more time as it has potential for adding regression
+No opinion on Patch3
