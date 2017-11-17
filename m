@@ -1,21 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48603)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48636)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1eFk7C-0005Ps-Vg
-	for qemu-devel@nongnu.org; Fri, 17 Nov 2017 12:07:47 -0500
+	(envelope-from <eblake@redhat.com>) id 1eFk7N-0005UV-OK
+	for qemu-devel@nongnu.org; Fri, 17 Nov 2017 12:07:54 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1eFk79-0000Wi-37
-	for qemu-devel@nongnu.org; Fri, 17 Nov 2017 12:07:42 -0500
-References: <20171117164747.11525-1-eblake@redhat.com>
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Message-ID: <600d87a3-93a9-5d5d-7a9f-a31ba213348b@virtuozzo.com>
-Date: Fri, 17 Nov 2017 20:07:20 +0300
+	(envelope-from <eblake@redhat.com>) id 1eFk7M-0000ee-Ix
+	for qemu-devel@nongnu.org; Fri, 17 Nov 2017 12:07:53 -0500
+References: <20171117162536.23225-1-kchamart@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <78f4339b-bbe5-18d1-6555-b2c3196a6f7c@redhat.com>
+Date: Fri, 17 Nov 2017 11:07:41 -0600
 MIME-Version: 1.0
-In-Reply-To: <20171117164747.11525-1-eblake@redhat.com>
-Content-Language: en-US
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH for-2.11] qcow2: fix image corruption on
- commit with persistent snapshot
+In-Reply-To: <20171117162536.23225-1-kchamart@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="UA1g4NXDVdOkNUs48SxB5uDDJCpBQP7LK"
+Subject: Re: [Qemu-devel] [PATCH v3 for-2.11] QAPI & interop: Clarify events
+ emitted by 'block-job-cancel'
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,438 +24,120 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org
-Cc: qemu-block@nongnu.org, kwolf@redhat.com, Max Reitz <mreitz@redhat.com>
+To: Kashyap Chamarthy <kchamart@redhat.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org
+Cc: mreitz@redhat.com, armbru@redhat.com, jsnow@redhat.com
 
-17.11.2017 19:47, Eric Blake wrote:
-> If an image contains persistent snapshots, we cannot use the
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--UA1g4NXDVdOkNUs48SxB5uDDJCpBQP7LK
+From: Eric Blake <eblake@redhat.com>
+To: Kashyap Chamarthy <kchamart@redhat.com>, qemu-devel@nongnu.org,
+ qemu-block@nongnu.org
+Cc: mreitz@redhat.com, armbru@redhat.com, jsnow@redhat.com
+Message-ID: <78f4339b-bbe5-18d1-6555-b2c3196a6f7c@redhat.com>
+Subject: Re: [PATCH v3 for-2.11] QAPI & interop: Clarify events emitted by
+ 'block-job-cancel'
+References: <20171117162536.23225-1-kchamart@redhat.com>
+In-Reply-To: <20171117162536.23225-1-kchamart@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-bitmaps
+On 11/17/2017 10:25 AM, Kashyap Chamarthy wrote:
+> When you cancel an in-progress live block operation with QMP
+> `block-job-cancel`, it emits the event: BLOCK_JOB_CANCELLED.  However,
+> when `block-job-cancel` is issued after `drive-mirror` has indicated (b=
+y
+> emitting the event BLOCK_JOB_READY) that the source and destination
+> remain synchronized:
+>=20
 
-> fast path of bdrv_make_empty() to clear the image during
-> qemu-img commit, because that will lose the clusters related
-> to the bitmaps.
->
-> Also leave a comment in qcow2_read_extensions to remind future
-> feature additions to think about fast-path removal, since we
-> just barely fixed the same bug for LUKS encryption.
->
-> It's a pain that qemu-img has not yet been taught to manipulate,
-> or even at a very minimum display, information about persistent
-> bitmaps; instead, we have to use QMP commands.  It's also a
-> pain that only qeury-block and x-debug-block-dirty-bitmap-sha256
-> will allow bitmap introspection; but the former requires the
-> node to be hooked to a block device, and the latter is experimental.
+> But this is expected behaviour, where the _COMPLETED event indicates
+> that synchronization has successfully ended (and the destination has a
+> point-in-time copy, which is at the time of cancel).
+>=20
+> So add a small note to this effect in 'block-core.json'.  While at it,
+> also update the "Live disk synchronization -- drive-mirror and
+> blockdev-mirror" section in 'live-block-operations.rst'.
+>=20
+> (Thanks: Max Reitz for reminding me of this caveat on IRC.)
 
-sorry for that pain =(.
+Sorry for not wordsmithing on earlier versions:
 
-Honestly, I don't understand why such a simple and obvious fix needs an 
-additional test.
-
->
-> Signed-off-by: Eric Blake <eblake@redhat.com>
+>=20
+> Signed-off-by: Kashyap Chamarthy <kchamart@redhat.com>
 > ---
->
-> As promised, based on Dan's similar patch for LUKS encryption
->
->   block/qcow2.c              |  17 ++--
->   tests/qemu-iotests/176     |  55 ++++++++++--
->   tests/qemu-iotests/176.out | 216 ++++++++++++++++++++++++++++++++++++++++++++-
->   3 files changed, 270 insertions(+), 18 deletions(-)
->
-> diff --git a/block/qcow2.c b/block/qcow2.c
-> index e9a86b7443..f2731a7cb5 100644
-> --- a/block/qcow2.c
-> +++ b/block/qcow2.c
-> @@ -376,6 +376,8 @@ static int qcow2_read_extensions(BlockDriverState *bs, uint64_t start_offset,
->
->           default:
->               /* unknown magic - save it in case we need to rewrite the header */
-> +            /* If you add a new feature, make sure to also update the fast
-> +             * path of qcow2_make_empty() to deal with it. */
->               {
->                   Qcow2UnknownHeaderExtension *uext;
->
-> @@ -3600,15 +3602,16 @@ static int qcow2_make_empty(BlockDriverState *bs)
->
->       l1_clusters = DIV_ROUND_UP(s->l1_size, s->cluster_size / sizeof(uint64_t));
->
-> -    if (s->qcow_version >= 3 && !s->snapshots &&
-> +    if (s->qcow_version >= 3 && !s->snapshots && !s->nb_bitmaps &&
->           3 + l1_clusters <= s->refcount_block_size &&
->           s->crypt_method_header != QCOW_CRYPT_LUKS) {
-> -        /* The following function only works for qcow2 v3 images (it requires
-> -         * the dirty flag) and only as long as there are no snapshots (because
-> -         * it completely empties the image). Furthermore, the L1 table and three
-> -         * additional clusters (image header, refcount table, one refcount
-> -         * block) have to fit inside one refcount block. It cannot be used
-> -         * for LUKS (yet) as it throws away the LUKS header cluster(s) */
-> +        /* The following function only works for qcow2 v3 images (it
-> +         * requires the dirty flag) and only as long as there are no
-> +         * features that reserve extra clusters (such as snapshots,
-> +         * LUKS header, or persistent bitmaps), because it completely
-> +         * empties the image.  Furthermore, the L1 table and three
-> +         * additional clusters (image header, refcount table, one
-> +         * refcount block) have to fit inside one refcount block. */
->           return make_completely_empty(bs);
->       }
->
-> diff --git a/tests/qemu-iotests/176 b/tests/qemu-iotests/176
-> index 950b28720e..0f31a20294 100755
-> --- a/tests/qemu-iotests/176
-> +++ b/tests/qemu-iotests/176
-> @@ -3,10 +3,11 @@
->   # Commit changes into backing chains and empty the top image if the
->   # backing image is not explicitly specified.
->   #
-> -# Variant of 097, which includes snapshots to test different codepath
-> -# in qcow2
-> +# Variant of 097, which includes snapshots and persistent bitmaps, to
-> +# tickle the slow codepath in qcow2. See also 198, for another feature
-> +# that tickles the slow codepath.
->   #
-> -# Copyright (C) 2014 Red Hat, Inc.
-> +# Copyright (C) 2014, 2017 Red Hat, Inc.
->   #
->   # This program is free software; you can redistribute it and/or modify
->   # it under the terms of the GNU General Public License as published by
-> @@ -43,11 +44,18 @@ trap "_cleanup; exit \$status" 0 1 2 3 15
->   . ./common.filter
->   . ./common.pattern
->
-> -# Any format supporting backing files and bdrv_make_empty
-> +# This test is specific to qcow2
->   _supported_fmt qcow2
->   _supported_proto file
->   _supported_os Linux
->
-> +function run_qemu()
-> +{
-> +    $QEMU -nographic -qmp stdio -serial none "$@" 2>&1 \
-> +	| _filter_testdir | _filter_qmp | _filter_qemu
-> +}
+
+> +.. note::
 > +
-> +for reason in snapshot bitmap; do
->
->   # Four passes:
->   #  0: Two-layer backing chain, commit to upper backing file (implicitly)
-> @@ -66,14 +74,29 @@ _supported_os Linux
->   for i in 0 1 2 3; do
->
->   echo
-> -echo "=== Test pass $i ==="
-> +echo "=== Test pass $reason.$i ==="
->   echo
->
->   len=$((2100 * 1024 * 1024 + 512)) # larger than 2G, and not cluster aligned
->   TEST_IMG="$TEST_IMG.base" _make_test_img $len
->   TEST_IMG="$TEST_IMG.itmd" _make_test_img -b "$TEST_IMG.base" $len
->   _make_test_img -b "$TEST_IMG.itmd" $len
-> -$QEMU_IMG snapshot -c snap "$TEST_IMG"
-> +# Update the top image to use a feature that is incompatible with fast path
-> +case $reason in
-> +    snapshot) $QEMU_IMG snapshot -c snap "$TEST_IMG" ;;
-> +    bitmap)
-> +	run_qemu <<EOF
-> +{ "execute": "qmp_capabilities" }
-> +{ "execute": "blockdev-add",
-> +  "arguments": { "driver": "qcow2", "node-name": "drive0",
-> +     "file": { "driver": "file", "filename": "$TEST_IMG" } } }
-> +{ "execute": "block-dirty-bitmap-add",
-> +  "arguments": { "node": "drive0", "name": "bitmap0",
-> +     "persistent": true, "autoload": true } }
-> +{ "execute": "quit" }
-> +EOF
-> +	;;
-> +esac
->
->   $QEMU_IO -c "write -P 1 0x7ffd0000 192k" "$TEST_IMG.base" | _filter_qemu_io
->   $QEMU_IO -c "write -P 2 0x7ffe0000 128k" "$TEST_IMG.itmd" | _filter_qemu_io
-> @@ -122,8 +145,26 @@ $QEMU_IMG map "$TEST_IMG.base" | _filter_qemu_img_map
->   $QEMU_IMG map "$TEST_IMG.itmd" | _filter_qemu_img_map
->   $QEMU_IMG map "$TEST_IMG" | _filter_qemu_img_map
->
-> -done
-> +# Check that the reason for slow path is still present, as appropriate
-> +case $reason in
-> +    snapshot)
-> +	$QEMU_IMG snapshot -l "$TEST_IMG" |
-> +	    sed 's/^\(.\{20\}\).*/\1/; s/ *$//' ;;
-> +    bitmap)
-> +	run_qemu <<EOF
-> +{ "execute": "qmp_capabilities" }
-> +{ "execute": "blockdev-add",
-> +  "arguments": { "driver": "qcow2", "node-name": "drive0",
-> +     "file": { "driver": "file", "filename": "$TEST_IMG" } } }
-> +{ "execute": "x-debug-block-dirty-bitmap-sha256",
-> +  "arguments": { "node": "drive0", "name": "bitmap0" } }
-> +{ "execute": "quit" }
-> +EOF
-> +	;;
-> +esac
->
-> +done
-> +done
->
->   # success, all done
->   echo "*** done"
-> diff --git a/tests/qemu-iotests/176.out b/tests/qemu-iotests/176.out
-> index 6271fa7d6f..e62085cd0a 100644
-> --- a/tests/qemu-iotests/176.out
-> +++ b/tests/qemu-iotests/176.out
-> @@ -1,6 +1,6 @@
->   QA output created by 176
->
-> -=== Test pass 0 ===
-> +=== Test pass snapshot.0 ===
->
->   Formatting 'TEST_DIR/t.IMGFMT.base', fmt=IMGFMT size=2202010112
->   Formatting 'TEST_DIR/t.IMGFMT.itmd', fmt=IMGFMT size=2202010112 backing_file=TEST_DIR/t.IMGFMT.base
-> @@ -36,8 +36,11 @@ Offset          Length          File
->   0x7ffd0000      0x10000         TEST_DIR/t.IMGFMT.base
->   0x7ffe0000      0x20000         TEST_DIR/t.IMGFMT.itmd
->   0x83400000      0x200           TEST_DIR/t.IMGFMT.itmd
-> +Snapshot list:
-> +ID        TAG
-> +1         snap
->
-> -=== Test pass 1 ===
-> +=== Test pass snapshot.1 ===
->
->   Formatting 'TEST_DIR/t.IMGFMT.base', fmt=IMGFMT size=2202010112
->   Formatting 'TEST_DIR/t.IMGFMT.itmd', fmt=IMGFMT size=2202010112 backing_file=TEST_DIR/t.IMGFMT.base
-> @@ -74,8 +77,11 @@ Offset          Length          File
->   0x7ffe0000      0x10000         TEST_DIR/t.IMGFMT.itmd
->   0x7fff0000      0x10000         TEST_DIR/t.IMGFMT
->   0x83400000      0x200           TEST_DIR/t.IMGFMT
-> +Snapshot list:
-> +ID        TAG
-> +1         snap
->
-> -=== Test pass 2 ===
-> +=== Test pass snapshot.2 ===
->
->   Formatting 'TEST_DIR/t.IMGFMT.base', fmt=IMGFMT size=2202010112
->   Formatting 'TEST_DIR/t.IMGFMT.itmd', fmt=IMGFMT size=2202010112 backing_file=TEST_DIR/t.IMGFMT.base
-> @@ -112,8 +118,11 @@ Offset          Length          File
->   0x7ffe0000      0x10000         TEST_DIR/t.IMGFMT.itmd
->   0x7fff0000      0x10000         TEST_DIR/t.IMGFMT
->   0x83400000      0x200           TEST_DIR/t.IMGFMT
-> +Snapshot list:
-> +ID        TAG
-> +1         snap
->
-> -=== Test pass 3 ===
-> +=== Test pass snapshot.3 ===
->
->   Formatting 'TEST_DIR/t.IMGFMT.base', fmt=IMGFMT size=2202010112
->   Formatting 'TEST_DIR/t.IMGFMT.itmd', fmt=IMGFMT size=2202010112 backing_file=TEST_DIR/t.IMGFMT.base
-> @@ -147,4 +156,203 @@ Offset          Length          File
->   0x7ffe0000      0x10000         TEST_DIR/t.IMGFMT.itmd
->   0x7fff0000      0x10000         TEST_DIR/t.IMGFMT
->   0x83400000      0x200           TEST_DIR/t.IMGFMT
-> +Snapshot list:
-> +ID        TAG
-> +1         snap
-> +
-> +=== Test pass bitmap.0 ===
-> +
-> +Formatting 'TEST_DIR/t.IMGFMT.base', fmt=IMGFMT size=2202010112
-> +Formatting 'TEST_DIR/t.IMGFMT.itmd', fmt=IMGFMT size=2202010112 backing_file=TEST_DIR/t.IMGFMT.base
-> +Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=2202010112 backing_file=TEST_DIR/t.IMGFMT.itmd
-> +QMP_VERSION
-> +{"return": {}}
-> +{"return": {}}
-> +{"return": {}}
-> +{"return": {}}
-> +{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "SHUTDOWN", "data": {"guest": false}}
-> +wrote 196608/196608 bytes at offset 2147287040
-> +192 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-> +wrote 131072/131072 bytes at offset 2147352576
-> +128 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-> +wrote 65536/65536 bytes at offset 2147418112
-> +64 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-> +wrote 512/512 bytes at offset 2202009600
-> +512 bytes, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-> +Image committed.
-> +read 196608/196608 bytes at offset 2147287040
-> +192 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-> +read 512/512 bytes at offset 2202009600
-> +512 bytes, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-> +read 65536/65536 bytes at offset 2147287040
-> +64 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-> +read 65536/65536 bytes at offset 2147352576
-> +64 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-> +read 65536/65536 bytes at offset 2147418112
-> +64 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-> +read 512/512 bytes at offset 2202009600
-> +512 bytes, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-> +Offset          Length          File
-> +0x7ffd0000      0x30000         TEST_DIR/t.IMGFMT.base
-> +Offset          Length          File
-> +0x7ffd0000      0x10000         TEST_DIR/t.IMGFMT.base
-> +0x7ffe0000      0x20000         TEST_DIR/t.IMGFMT.itmd
-> +0x83400000      0x200           TEST_DIR/t.IMGFMT.itmd
-> +Offset          Length          File
-> +0x7ffd0000      0x10000         TEST_DIR/t.IMGFMT.base
-> +0x7ffe0000      0x20000         TEST_DIR/t.IMGFMT.itmd
-> +0x83400000      0x200           TEST_DIR/t.IMGFMT.itmd
-> +QMP_VERSION
-> +{"return": {}}
-> +{"return": {}}
-> +{"return": {"sha256": "e12600978d86b5a453861ae5c17d275204673fef3874b7c3c5433c6153d84706"}}
-> +{"return": {}}
-> +{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "SHUTDOWN", "data": {"guest": false}}
-> +
-> +=== Test pass bitmap.1 ===
-> +
-> +Formatting 'TEST_DIR/t.IMGFMT.base', fmt=IMGFMT size=2202010112
-> +Formatting 'TEST_DIR/t.IMGFMT.itmd', fmt=IMGFMT size=2202010112 backing_file=TEST_DIR/t.IMGFMT.base
-> +Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=2202010112 backing_file=TEST_DIR/t.IMGFMT.itmd
-> +QMP_VERSION
-> +{"return": {}}
-> +{"return": {}}
-> +{"return": {}}
-> +{"return": {}}
-> +{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "SHUTDOWN", "data": {"guest": false}}
-> +wrote 196608/196608 bytes at offset 2147287040
-> +192 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-> +wrote 131072/131072 bytes at offset 2147352576
-> +128 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-> +wrote 65536/65536 bytes at offset 2147418112
-> +64 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-> +wrote 512/512 bytes at offset 2202009600
-> +512 bytes, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-> +Image committed.
-> +read 196608/196608 bytes at offset 2147287040
-> +192 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-> +read 512/512 bytes at offset 2202009600
-> +512 bytes, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-> +read 65536/65536 bytes at offset 2147287040
-> +64 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-> +read 65536/65536 bytes at offset 2147352576
-> +64 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-> +read 65536/65536 bytes at offset 2147418112
-> +64 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-> +read 512/512 bytes at offset 2202009600
-> +512 bytes, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-> +Offset          Length          File
-> +0x7ffd0000      0x30000         TEST_DIR/t.IMGFMT.base
-> +Offset          Length          File
-> +0x7ffd0000      0x10000         TEST_DIR/t.IMGFMT.base
-> +0x7ffe0000      0x20000         TEST_DIR/t.IMGFMT.itmd
-> +0x83400000      0x200           TEST_DIR/t.IMGFMT.itmd
-> +Offset          Length          File
-> +0x7ffd0000      0x10000         TEST_DIR/t.IMGFMT.base
-> +0x7ffe0000      0x10000         TEST_DIR/t.IMGFMT.itmd
-> +0x7fff0000      0x10000         TEST_DIR/t.IMGFMT
-> +0x83400000      0x200           TEST_DIR/t.IMGFMT
-> +QMP_VERSION
-> +{"return": {}}
-> +{"return": {}}
-> +{"return": {"sha256": "e12600978d86b5a453861ae5c17d275204673fef3874b7c3c5433c6153d84706"}}
-> +{"return": {}}
-> +{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "SHUTDOWN", "data": {"guest": false}}
-> +
-> +=== Test pass bitmap.2 ===
-> +
-> +Formatting 'TEST_DIR/t.IMGFMT.base', fmt=IMGFMT size=2202010112
-> +Formatting 'TEST_DIR/t.IMGFMT.itmd', fmt=IMGFMT size=2202010112 backing_file=TEST_DIR/t.IMGFMT.base
-> +Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=2202010112 backing_file=TEST_DIR/t.IMGFMT.itmd
-> +QMP_VERSION
-> +{"return": {}}
-> +{"return": {}}
-> +{"return": {}}
-> +{"return": {}}
-> +{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "SHUTDOWN", "data": {"guest": false}}
-> +wrote 196608/196608 bytes at offset 2147287040
-> +192 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-> +wrote 131072/131072 bytes at offset 2147352576
-> +128 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-> +wrote 65536/65536 bytes at offset 2147418112
-> +64 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-> +wrote 512/512 bytes at offset 2202009600
-> +512 bytes, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-> +Image committed.
-> +read 196608/196608 bytes at offset 2147287040
-> +192 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-> +read 512/512 bytes at offset 2202009600
-> +512 bytes, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-> +read 65536/65536 bytes at offset 2147287040
-> +64 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-> +read 65536/65536 bytes at offset 2147352576
-> +64 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-> +read 65536/65536 bytes at offset 2147418112
-> +64 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-> +read 512/512 bytes at offset 2202009600
-> +512 bytes, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-> +Offset          Length          File
-> +0x7ffd0000      0x30000         TEST_DIR/t.IMGFMT.base
-> +Offset          Length          File
-> +0x7ffd0000      0x10000         TEST_DIR/t.IMGFMT.base
-> +0x7ffe0000      0x20000         TEST_DIR/t.IMGFMT.itmd
-> +0x83400000      0x200           TEST_DIR/t.IMGFMT.itmd
-> +Offset          Length          File
-> +0x7ffd0000      0x10000         TEST_DIR/t.IMGFMT.base
-> +0x7ffe0000      0x10000         TEST_DIR/t.IMGFMT.itmd
-> +0x7fff0000      0x10000         TEST_DIR/t.IMGFMT
-> +0x83400000      0x200           TEST_DIR/t.IMGFMT
-> +QMP_VERSION
-> +{"return": {}}
-> +{"return": {}}
-> +{"return": {"sha256": "e12600978d86b5a453861ae5c17d275204673fef3874b7c3c5433c6153d84706"}}
-> +{"return": {}}
-> +{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "SHUTDOWN", "data": {"guest": false}}
-> +
-> +=== Test pass bitmap.3 ===
-> +
-> +Formatting 'TEST_DIR/t.IMGFMT.base', fmt=IMGFMT size=2202010112
-> +Formatting 'TEST_DIR/t.IMGFMT.itmd', fmt=IMGFMT size=2202010112 backing_file=TEST_DIR/t.IMGFMT.base
-> +Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=2202010112 backing_file=TEST_DIR/t.IMGFMT.itmd
-> +QMP_VERSION
-> +{"return": {}}
-> +{"return": {}}
-> +{"return": {}}
-> +{"return": {}}
-> +{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "SHUTDOWN", "data": {"guest": false}}
-> +wrote 196608/196608 bytes at offset 2147287040
-> +192 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-> +wrote 131072/131072 bytes at offset 2147352576
-> +128 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-> +wrote 65536/65536 bytes at offset 2147418112
-> +64 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-> +wrote 512/512 bytes at offset 2202009600
-> +512 bytes, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-> +Image committed.
-> +read 65536/65536 bytes at offset 2147287040
-> +64 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-> +read 65536/65536 bytes at offset 2147352576
-> +64 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-> +read 65536/65536 bytes at offset 2147418112
-> +64 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-> +read 512/512 bytes at offset 2202009600
-> +512 bytes, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-> +Offset          Length          File
-> +0x7ffd0000      0x30000         TEST_DIR/t.IMGFMT.base
-> +0x83400000      0x200           TEST_DIR/t.IMGFMT.base
-> +Offset          Length          File
-> +0x7ffd0000      0x10000         TEST_DIR/t.IMGFMT.base
-> +0x7ffe0000      0x20000         TEST_DIR/t.IMGFMT.itmd
-> +0x83400000      0x200           TEST_DIR/t.IMGFMT.base
-> +Offset          Length          File
-> +0x7ffd0000      0x10000         TEST_DIR/t.IMGFMT.base
-> +0x7ffe0000      0x10000         TEST_DIR/t.IMGFMT.itmd
-> +0x7fff0000      0x10000         TEST_DIR/t.IMGFMT
-> +0x83400000      0x200           TEST_DIR/t.IMGFMT
-> +QMP_VERSION
-> +{"return": {}}
-> +{"return": {}}
-> +{"return": {"sha256": "e12600978d86b5a453861ae5c17d275204673fef3874b7c3c5433c6153d84706"}}
-> +{"return": {}}
-> +{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "SHUTDOWN", "data": {"guest": false}}
->   *** done
+> +    When you cancel an in-progress 'mirror' job *before* the source an=
+d
+> +    target are synchronized, ``block-job-cancel`` will emit the event
+> +    ``BLOCK_JOB_CANCELLED``.  However, note that if you cancel a
+> +    'mirror' job *after* it has indicated (by emitting the event
+> +    ``BLOCK_JOB_READY``) that the source and target now remain
+> +    synchronized, then ``block-job-cancel`` will emit the event
+
+Might read slightly nicer as:
+
+the source and target have reached synchronization,
 
 
--- 
-Best regards,
-Vladimir
+> +++ b/qapi/block-core.json
+> @@ -2065,6 +2065,14 @@
+>  # BLOCK_JOB_CANCELLED event.  Before that happens the job is still vis=
+ible when
+>  # enumerated using query-block-jobs.
+>  #
+> +# Note that the 'block-job-cancel' command will emit the event
+> +# BLOCK_JOB_COMPLETED if you issue it ('block-job-cancel') after 'driv=
+e-mirror'
+> +# has indicated (by emitting the event BLOCK_JOB_READY) that the sourc=
+e and
+> +# destination remain synchronized.  In this case, the BLOCK_JOB_COMPLE=
+TED
+> +# event indicates that synchronization (from 'drive-mirror') has succe=
+ssfully
+> +# ended and the destination now has a point-in-time copy, which is at =
+the time
+> +# of cancel.
+
+
+Accurate, but a bit hard to follow the flow of the sentence.  Might read
+nicer as:
+
+Note that if you issue 'block-job-cancel' after 'drive-mirror' has
+indicated (via the event BLOCK_JOB_READY) that the source and
+destination are synchronized, then the event triggered by this command
+changes to BLOCK_JOB_COMPLETED, to indicate that the mirroring has ended
+and the destination now has a point-in-time copy tied to the time of the
+cancellation.
+
+Documentation is worth of inclusion in 2.11.  Whether you keep your
+wording, or incorporate mine in a v4, you can add:
+Reviewed-by: Eric Blake <eblake@redhat.com>
+
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
+
+
+--UA1g4NXDVdOkNUs48SxB5uDDJCpBQP7LK
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAloPF10ACgkQp6FrSiUn
+Q2pMsAgAno0hkHw4qcYylEr4ZOy1Qq6m+a7fK2wYpEoRxGNL4ALa6YFpebrMmQnR
+Pb09DS8tLvylbdbRwFXFaBMTaQ79m0ya2s03WlZYLNKb/ZFjVUmFwyHrMitDaIvr
+XjODnF4+kedQt4KqqU4671uFAxenhIPHB5Ri8+v710RUNfjYIK3tTPyGiC9wXAtE
+RHlO7/cMZnuRkBl8T2yHI+Y4hhB+0JEsHL82o/zKtSdUtawHhMRzao6+pHLkQJdV
+liC0UdWLq+zBNg83PpbOHzgrj0BUtuZqagpWw1vB1QyvqDD9jqDCq1DuXABvYaPt
+zQCboV0nivdKWx4JXz5YNc7/G2NY/A==
+=/S9k
+-----END PGP SIGNATURE-----
+
+--UA1g4NXDVdOkNUs48SxB5uDDJCpBQP7LK--
