@@ -1,25 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56059)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36543)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1eFkSy-0004UM-Uo
-	for qemu-devel@nongnu.org; Fri, 17 Nov 2017 12:30:14 -0500
+	(envelope-from <eblake@redhat.com>) id 1eFkvF-0002Rp-Jp
+	for qemu-devel@nongnu.org; Fri, 17 Nov 2017 12:59:26 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1eFkSw-0006NU-98
-	for qemu-devel@nongnu.org; Fri, 17 Nov 2017 12:30:12 -0500
-References: <20171030163309.75770-1-vsementsov@virtuozzo.com>
-	<20171030163309.75770-5-vsementsov@virtuozzo.com>
-	<a593e984-5d1e-a95c-9b80-dbe82227b8f9@redhat.com>
-	<fac1abb3-f783-ec93-3a60-13dbd666d26e@virtuozzo.com>
-	<d27739c1-9cbe-ea30-d711-bf067013918f@redhat.com>
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Message-ID: <8a02c94e-b323-1e45-0c05-e8fddc6285e2@virtuozzo.com>
-Date: Fri, 17 Nov 2017 20:30:02 +0300
+	(envelope-from <eblake@redhat.com>) id 1eFkvE-0004Dj-Rn
+	for qemu-devel@nongnu.org; Fri, 17 Nov 2017 12:59:25 -0500
+References: <20171116173810.16457-1-crosa@redhat.com>
+	<20171116173810.16457-7-crosa@redhat.com>
+	<ab332f27-f2ab-c321-b2a2-2132b2acf366@redhat.com>
+	<e50344ef-cdef-2733-210b-9fc3631f6cea@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <36a42ee2-b292-a86a-dde2-76ad45c63b7e@redhat.com>
+Date: Fri, 17 Nov 2017 11:59:16 -0600
 MIME-Version: 1.0
-In-Reply-To: <d27739c1-9cbe-ea30-d711-bf067013918f@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: quoted-printable
-Content-Language: en-US
-Subject: Re: [Qemu-devel] [PATCH v8 04/14] block/dirty-bitmap: add
- bdrv_dirty_bitmap_set_frozen
+In-Reply-To: <e50344ef-cdef-2733-210b-9fc3631f6cea@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="WDL16T6DgKnOU20LHdoplQmh6HDV5Vh4A"
+Subject: Re: [Qemu-devel] [Qemu-block] [PATCH 06/10] qemu-iotests: turn
+ owner variable into a comment
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,105 +27,72 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: John Snow <jsnow@redhat.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org, famz@redhat.com
-Cc: kwolf@redhat.com, peter.maydell@linaro.org, lirans@il.ibm.com, quintela@redhat.com, armbru@redhat.com, mreitz@redhat.com, stefanha@redhat.com, den@openvz.org, amit.shah@redhat.com, pbonzini@redhat.com, dgilbert@redhat.com
+To: Cleber Rosa <crosa@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org
+Cc: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>
 
-17.11.2017 20:20, John Snow wrote:
->
-> On 11/17/2017 09:46 AM, Vladimir Sementsov-Ogievskiy wrote:
->> 14.11.2017 02:32, John Snow wrote:
->>> On 10/30/2017 12:32 PM, Vladimir Sementsov-Ogievskiy wrote:
->>>> Make it possible to set bitmap 'frozen' without a successor.
->>>> This is needed to protect the bitmap during outgoing bitmap postcopy
->>>> migration.
->>>>
->>>> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
->>>> ---
->>>>  =C2=A0 include/block/dirty-bitmap.h |=C2=A0 1 +
->>>>  =C2=A0 block/dirty-bitmap.c=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0 | 22 ++++++++++++++++++++--
->>>>  =C2=A0 2 files changed, 21 insertions(+), 2 deletions(-)
->>>>
->>>> diff --git a/include/block/dirty-bitmap.h b/include/block/dirty-bitmap=
-.h
->>>> index a9e2a92e4f..ae6d697850 100644
->>>> --- a/include/block/dirty-bitmap.h
->>>> +++ b/include/block/dirty-bitmap.h
->>>> @@ -39,6 +39,7 @@ uint32_t
->>>> bdrv_get_default_bitmap_granularity(BlockDriverState *bs);
->>>>  =C2=A0 uint32_t bdrv_dirty_bitmap_granularity(const BdrvDirtyBitmap *=
-bitmap);
->>>>  =C2=A0 bool bdrv_dirty_bitmap_enabled(BdrvDirtyBitmap *bitmap);
->>>>  =C2=A0 bool bdrv_dirty_bitmap_frozen(BdrvDirtyBitmap *bitmap);
->>>> +void bdrv_dirty_bitmap_set_frozen(BdrvDirtyBitmap *bitmap, bool
->>>> frozen);
->>>>  =C2=A0 const char *bdrv_dirty_bitmap_name(const BdrvDirtyBitmap *bitm=
-ap);
->>>>  =C2=A0 int64_t bdrv_dirty_bitmap_size(const BdrvDirtyBitmap *bitmap);
->>>>  =C2=A0 DirtyBitmapStatus bdrv_dirty_bitmap_status(BdrvDirtyBitmap *bi=
-tmap);
->>>> diff --git a/block/dirty-bitmap.c b/block/dirty-bitmap.c
->>>> index 7578863aa1..67fc6bd6e0 100644
->>>> --- a/block/dirty-bitmap.c
->>>> +++ b/block/dirty-bitmap.c
->>>> @@ -40,6 +40,8 @@ struct BdrvDirtyBitmap {
->>>>  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 QemuMutex *mutex;
->>>>  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 HBitmap *bitmap;=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 /* Dirty bitmap implementatio=
-n */
->>>>  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 HBitmap *meta;=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 /* Meta dirty bitmap=
- */
->>>> +=C2=A0=C2=A0=C2=A0 bool frozen;=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 /* Bitmap is frozen,=
- it can't be
->>>> modified
->>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 through QMP */
->>> I hesitate, because this now means that we have two independent bits of
->>> state we need to update and maintain consistency with.
->> it was your proposal)))
->>
->> https://lists.gnu.org/archive/html/qemu-devel/2017-07/msg01172.html
->>
->> "
->> Your new use case here sounds like Frozen to me, but it simply does not
->> have an anonymous successor to force it to be recognized as "frozen." We
->> can add a `bool protected` or `bool frozen` field to force recognition
->> of this status and adjust the json documentation accordingly.
->>
->> I think then we'd have four recognized states:
->>
->> FROZEN: Cannot be reset/deleted. Bitmap is in-use by a block job or
->> other internal process. Bitmap is otherwise ACTIVE.
->> DISABLED: Not recording any writes (by choice.)
->> READONLY: Not able to record any writes (by necessity.)
->> ACTIVE: Normal bitmap status.
->>
->> Sound right?
->> "
->>
->>
-> I was afraid you'd say that :(
->
-> It's okay, anyway. I shouldn't let myself go so long between reviews
-> like this, because you catch me changing my mind. Anyway, please go
-> ahead with it. I don't want to delay you on something that works because
-> I can't make up *my* mind.
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--WDL16T6DgKnOU20LHdoplQmh6HDV5Vh4A
+From: Eric Blake <eblake@redhat.com>
+To: Cleber Rosa <crosa@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
+ qemu-devel@nongnu.org
+Cc: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org,
+ Max Reitz <mreitz@redhat.com>
+Message-ID: <36a42ee2-b292-a86a-dde2-76ad45c63b7e@redhat.com>
+Subject: Re: [Qemu-devel] [Qemu-block] [PATCH 06/10] qemu-iotests: turn owner
+ variable into a comment
+References: <20171116173810.16457-1-crosa@redhat.com>
+ <20171116173810.16457-7-crosa@redhat.com>
+ <ab332f27-f2ab-c321-b2a2-2132b2acf366@redhat.com>
+ <e50344ef-cdef-2733-210b-9fc3631f6cea@redhat.com>
+In-Reply-To: <e50344ef-cdef-2733-210b-9fc3631f6cea@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-Hm, if you remember, reusing "frozen" state was strange for me too. And=20
-it's not
-late to move to
-1. make a new state: MIGRATION, which disallows qmp operations on bitmap
-2. or just make them unnamed, so they can't be touched by qmp
+On 11/17/2017 07:18 AM, Cleber Rosa wrote:
+>=20
+>=20
+> On 11/17/2017 02:19 AM, Paolo Bonzini wrote:
+>> On 16/11/2017 18:38, Cleber Rosa wrote:
+>>> This variables has no real use.  To avoid pretending it does, while
+>>> still keeping the information, let's turn it into a comment.
+>>>
+>>> The format chosen is the one already being used on tests 149 and 194.=
 
-anything is ok for me as well as leaving it as is. It's all little=20
-things, the core is patch 10.
+>>
+>> I would just delete it...
+>>
+>> Paolo
+>>
+>=20
+> I'm fine with both, but I feel this is like putting info on ChangeLogs
+> in the days of GIT.  Unless other people object, I'll remove them in v2=
+=2E
 
-"frozen" sounds like unchanged, but user will see dirty-count changing=20
-in query-block.
+I'm also in the 'please delete it; git history is good enough' camp.
 
 --=20
-Best regards,
-Vladimir
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
+
+
+--WDL16T6DgKnOU20LHdoplQmh6HDV5Vh4A
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAloPI3QACgkQp6FrSiUn
+Q2pzOwf/fRkR0G5xWh0J+IspNdywlgsX/EQUEUYl5SGHab+BUAxvYJ3/CaxWNxCl
+xOi2uw3cLfm5J6oTkyyyF+EgVHPtcUKrXd0ZL1SmpRSYqevWELkrQdbSTjl6/sSS
+goU7bHVo+Em+eWHIqW9GPQHW/x8ct+T/2BKEwa3oa7pRnStEZq0QHyV2DU62sDBV
+khdGXEfHBmnFgHaG41h/haKfzSBCsE0Sh1i+65H5wwvC78Cw7QSqEcheTBRnWta0
+eiHR22O5EVurfs8mKjYRh647Pg6ywYGhtgekAD+ICBaIzU6EITF3zEfI7SOs63kw
+bJ5ZhCxuI+jty0vlhIf+t4eoG2SqrQ==
+=r5w+
+-----END PGP SIGNATURE-----
+
+--WDL16T6DgKnOU20LHdoplQmh6HDV5Vh4A--
