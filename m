@@ -1,16 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42922)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42943)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1eFlCW-0001Fd-HS
-	for qemu-devel@nongnu.org; Fri, 17 Nov 2017 13:17:17 -0500
+	(envelope-from <kwolf@redhat.com>) id 1eFlCX-0001GE-16
+	for qemu-devel@nongnu.org; Fri, 17 Nov 2017 13:17:18 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1eFlCV-0002Mr-Ep
+	(envelope-from <kwolf@redhat.com>) id 1eFlCV-0002NH-Mh
 	for qemu-devel@nongnu.org; Fri, 17 Nov 2017 13:17:16 -0500
 From: Kevin Wolf <kwolf@redhat.com>
-Date: Fri, 17 Nov 2017 19:16:39 +0100
-Message-Id: <20171117181653.20651-12-kwolf@redhat.com>
+Date: Fri, 17 Nov 2017 19:16:38 +0100
+Message-Id: <20171117181653.20651-11-kwolf@redhat.com>
 In-Reply-To: <20171117181653.20651-1-kwolf@redhat.com>
 References: <20171117181653.20651-1-kwolf@redhat.com>
-Subject: [Qemu-devel] [PULL 11/25] qapi/qlist: Add qlist_append_null() macro
+Subject: [Qemu-devel] [PULL 10/25] qapi/qnull: Add own header
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,51 +24,153 @@ Cc: kwolf@redhat.com, qemu-devel@nongnu.org
 
 From: Max Reitz <mreitz@redhat.com>
 
-Besides the macro itself, this patch also adds a corresponding
-Coccinelle rule.
-
 Signed-off-by: Max Reitz <mreitz@redhat.com>
 Reviewed-by: Eric Blake <eblake@redhat.com>
 Reviewed-by: Alberto Garcia <berto@igalia.com>
-Message-id: 20171114180128.17076-3-mreitz@redhat.com
+Reviewed-by: Markus Armbruster <armbru@redhat.com>
+Message-id: 20171114180128.17076-2-mreitz@redhat.com
 Signed-off-by: Max Reitz <mreitz@redhat.com>
 ---
- include/qapi/qmp/qlist.h         | 3 +++
- scripts/coccinelle/qobject.cocci | 3 +++
- 2 files changed, 6 insertions(+)
+ include/qapi/qmp/qdict.h    |  1 +
+ include/qapi/qmp/qnull.h    | 30 ++++++++++++++++++++++++++++++
+ include/qapi/qmp/qobject.h  | 12 ------------
+ include/qapi/qmp/types.h    |  1 +
+ qapi/qapi-clone-visitor.c   |  1 +
+ qapi/string-input-visitor.c |  1 +
+ qobject/qnull.c             |  2 +-
+ tests/check-qnull.c         |  2 +-
+ 8 files changed, 36 insertions(+), 14 deletions(-)
+ create mode 100644 include/qapi/qmp/qnull.h
 
-diff --git a/include/qapi/qmp/qlist.h b/include/qapi/qmp/qlist.h
-index c4b5fdad9b..59d209bbae 100644
---- a/include/qapi/qmp/qlist.h
-+++ b/include/qapi/qmp/qlist.h
+diff --git a/include/qapi/qmp/qdict.h b/include/qapi/qmp/qdict.h
+index 6588c7f0c8..7ea5120c4a 100644
+--- a/include/qapi/qmp/qdict.h
++++ b/include/qapi/qmp/qdict.h
 @@ -15,6 +15,7 @@
  
  #include "qapi/qmp/qobject.h"
- #include "qapi/qmp/qnum.h"
+ #include "qapi/qmp/qlist.h"
 +#include "qapi/qmp/qnull.h"
+ #include "qapi/qmp/qnum.h"
  #include "qemu/queue.h"
  
- typedef struct QListEntry {
-@@ -37,6 +38,8 @@ typedef struct QList {
-         qlist_append(qlist, qbool_from_bool(value))
- #define qlist_append_str(qlist, value) \
-         qlist_append(qlist, qstring_from_str(value))
-+#define qlist_append_null(qlist) \
-+        qlist_append(qlist, qnull())
+diff --git a/include/qapi/qmp/qnull.h b/include/qapi/qmp/qnull.h
+new file mode 100644
+index 0000000000..d075549283
+--- /dev/null
++++ b/include/qapi/qmp/qnull.h
+@@ -0,0 +1,30 @@
++/*
++ * QNull
++ *
++ * Copyright (C) 2015 Red Hat, Inc.
++ *
++ * Authors:
++ *  Markus Armbruster <armbru@redhat.com>
++ *
++ * This work is licensed under the terms of the GNU LGPL, version 2.1
++ * or later.  See the COPYING.LIB file in the top-level directory.
++ */
++
++#ifndef QNULL_H
++#define QNULL_H
++
++#include "qapi/qmp/qobject.h"
++
++struct QNull {
++    QObject base;
++};
++
++extern QNull qnull_;
++
++static inline QNull *qnull(void)
++{
++    QINCREF(&qnull_);
++    return &qnull_;
++}
++
++#endif /* QNULL_H */
+diff --git a/include/qapi/qmp/qobject.h b/include/qapi/qmp/qobject.h
+index eab29edd12..ef1d1a9237 100644
+--- a/include/qapi/qmp/qobject.h
++++ b/include/qapi/qmp/qobject.h
+@@ -93,16 +93,4 @@ static inline QType qobject_type(const QObject *obj)
+     return obj->type;
+ }
  
- #define QLIST_FOREACH_ENTRY(qlist, var)             \
-         for ((var) = ((qlist)->head.tqh_first);     \
-diff --git a/scripts/coccinelle/qobject.cocci b/scripts/coccinelle/qobject.cocci
-index 1120eb1a42..47bcafe9a9 100644
---- a/scripts/coccinelle/qobject.cocci
-+++ b/scripts/coccinelle/qobject.cocci
-@@ -41,4 +41,7 @@ expression Obj, E;
- |
- - qlist_append(Obj, qstring_from_str(E));
- + qlist_append_str(Obj, E);
-+|
-+- qlist_append(Obj, qnull());
-++ qlist_append_null(Obj);
- )
+-struct QNull {
+-    QObject base;
+-};
+-
+-extern QNull qnull_;
+-
+-static inline QNull *qnull(void)
+-{
+-    QINCREF(&qnull_);
+-    return &qnull_;
+-}
+-
+ #endif /* QOBJECT_H */
+diff --git a/include/qapi/qmp/types.h b/include/qapi/qmp/types.h
+index a4bc662bfb..749ac44dcb 100644
+--- a/include/qapi/qmp/types.h
++++ b/include/qapi/qmp/types.h
+@@ -19,5 +19,6 @@
+ #include "qapi/qmp/qstring.h"
+ #include "qapi/qmp/qdict.h"
+ #include "qapi/qmp/qlist.h"
++#include "qapi/qmp/qnull.h"
+ 
+ #endif /* QAPI_QMP_TYPES_H */
+diff --git a/qapi/qapi-clone-visitor.c b/qapi/qapi-clone-visitor.c
+index d8b62792bc..daab6819b4 100644
+--- a/qapi/qapi-clone-visitor.c
++++ b/qapi/qapi-clone-visitor.c
+@@ -12,6 +12,7 @@
+ #include "qapi/clone-visitor.h"
+ #include "qapi/visitor-impl.h"
+ #include "qapi/error.h"
++#include "qapi/qmp/qnull.h"
+ 
+ struct QapiCloneVisitor {
+     Visitor visitor;
+diff --git a/qapi/string-input-visitor.c b/qapi/string-input-visitor.c
+index 67a0a4a58b..b3fdd0827d 100644
+--- a/qapi/string-input-visitor.c
++++ b/qapi/string-input-visitor.c
+@@ -16,6 +16,7 @@
+ #include "qapi/string-input-visitor.h"
+ #include "qapi/visitor-impl.h"
+ #include "qapi/qmp/qerror.h"
++#include "qapi/qmp/qnull.h"
+ #include "qemu/option.h"
+ #include "qemu/queue.h"
+ #include "qemu/range.h"
+diff --git a/qobject/qnull.c b/qobject/qnull.c
+index 69a21d1059..bc9fd31626 100644
+--- a/qobject/qnull.c
++++ b/qobject/qnull.c
+@@ -12,7 +12,7 @@
+ 
+ #include "qemu/osdep.h"
+ #include "qemu-common.h"
+-#include "qapi/qmp/qobject.h"
++#include "qapi/qmp/qnull.h"
+ 
+ QNull qnull_ = {
+     .base = {
+diff --git a/tests/check-qnull.c b/tests/check-qnull.c
+index 5c6eb0adc8..afa4400da1 100644
+--- a/tests/check-qnull.c
++++ b/tests/check-qnull.c
+@@ -8,7 +8,7 @@
+  */
+ #include "qemu/osdep.h"
+ 
+-#include "qapi/qmp/qobject.h"
++#include "qapi/qmp/qnull.h"
+ #include "qemu-common.h"
+ #include "qapi/qobject-input-visitor.h"
+ #include "qapi/qobject-output-visitor.h"
 -- 
 2.13.6
