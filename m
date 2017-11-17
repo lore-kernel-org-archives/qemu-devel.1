@@ -1,32 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37800)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38064)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1eFkyK-0003RW-Q4
-	for qemu-devel@nongnu.org; Fri, 17 Nov 2017 13:02:37 -0500
+	(envelope-from <eblake@redhat.com>) id 1eFkz4-0003q2-QZ
+	for qemu-devel@nongnu.org; Fri, 17 Nov 2017 13:03:23 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1eFkyH-00079I-No
-	for qemu-devel@nongnu.org; Fri, 17 Nov 2017 13:02:36 -0500
-Received: from mail-qt0-x241.google.com ([2607:f8b0:400d:c0d::241]:43428)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1eFkyH-00078E-JQ
-	for qemu-devel@nongnu.org; Fri, 17 Nov 2017 13:02:33 -0500
-Received: by mail-qt0-x241.google.com with SMTP id n61so7793738qte.10
-	for <qemu-devel@nongnu.org>; Fri, 17 Nov 2017 10:02:33 -0800 (PST)
-Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
-	<philippe.mathieu.daude@gmail.com>
-References: <1510926167-23326-1-git-send-email-mark.cave-ayland@ilande.co.uk>
-	<1510926167-23326-3-git-send-email-mark.cave-ayland@ilande.co.uk>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <eee15df0-41c5-7a8c-64f7-ee7178a9d5dd@amsat.org>
-Date: Fri, 17 Nov 2017 15:02:21 -0300
+	(envelope-from <eblake@redhat.com>) id 1eFkz3-0007q3-Ue
+	for qemu-devel@nongnu.org; Fri, 17 Nov 2017 13:03:22 -0500
+References: <20171116173810.16457-1-crosa@redhat.com>
+	<20171116173810.16457-10-crosa@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <0f3ed740-9d05-37f5-5437-0fb564464127@redhat.com>
+Date: Fri, 17 Nov 2017 12:03:11 -0600
 MIME-Version: 1.0
-In-Reply-To: <1510926167-23326-3-git-send-email-mark.cave-ayland@ilande.co.uk>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH 02/15] sun4u: ebus QOMify tidy-up
+In-Reply-To: <20171116173810.16457-10-crosa@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="EFSojEknumQenbpEVGP5ENjq9ue0og95O"
+Subject: Re: [Qemu-devel] [PATCH 09/10] qemu-iotests: remove unused "here"
+ variable
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,88 +25,77 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, atar4qemu@gmail.com
-Cc: qemu-devel@nongnu.org
+To: Cleber Rosa <crosa@redhat.com>, qemu-devel@nongnu.org
+Cc: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>
 
-On 11/17/2017 10:42 AM, Mark Cave-Ayland wrote:
-> The main change here is to introduce the proper TYPE_EBUS/EBUS QOM macros
-> and remove the use of DO_UPCAST.
-> 
-> Alongside this there are some a couple of minor cosmetic changes and a rename
-> of pci_ebus_realize() to ebus_realize() since the ebus device is always what
-> is effectively a PCI-ISA bridge.
-> 
-> Signed-off-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--EFSojEknumQenbpEVGP5ENjq9ue0og95O
+From: Eric Blake <eblake@redhat.com>
+To: Cleber Rosa <crosa@redhat.com>, qemu-devel@nongnu.org
+Cc: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org,
+ Max Reitz <mreitz@redhat.com>
+Message-ID: <0f3ed740-9d05-37f5-5437-0fb564464127@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH 09/10] qemu-iotests: remove unused "here"
+ variable
+References: <20171116173810.16457-1-crosa@redhat.com>
+ <20171116173810.16457-10-crosa@redhat.com>
+In-Reply-To: <20171116173810.16457-10-crosa@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
-
+On 11/16/2017 11:38 AM, Cleber Rosa wrote:
+> Another legacy variable that did not convince me it has any
+> purpose whatsoever.
+>=20
+> Signed-off-by: Cleber Rosa <crosa@redhat.com>
 > ---
->  hw/sparc64/sun4u.c |   19 ++++++++++++-------
->  1 file changed, 12 insertions(+), 7 deletions(-)
-> 
-> diff --git a/hw/sparc64/sun4u.c b/hw/sparc64/sun4u.c
-> index 1672f25..394b7d6 100644
-> --- a/hw/sparc64/sun4u.c
-> +++ b/hw/sparc64/sun4u.c
-> @@ -81,11 +81,16 @@ struct hwdef {
->  };
->  
->  typedef struct EbusState {
-> -    PCIDevice pci_dev;
-> +    /*< private >*/
-> +    PCIDevice parent_obj;
-> +
->      MemoryRegion bar0;
->      MemoryRegion bar1;
->  } EbusState;
->  
-> +#define TYPE_EBUS "ebus"
-> +#define EBUS(obj) OBJECT_CHECK(EbusState, (obj), TYPE_EBUS)
-> +
->  void DMA_init(ISABus *bus, int high_page_enable)
->  {
->  }
-> @@ -236,9 +241,9 @@ pci_ebus_init(PCIDevice *pci_dev, qemu_irq *irqs)
->      return isa_bus;
->  }
->  
-> -static void pci_ebus_realize(PCIDevice *pci_dev, Error **errp)
-> +static void ebus_realize(PCIDevice *pci_dev, Error **errp)
->  {
-> -    EbusState *s = DO_UPCAST(EbusState, pci_dev, pci_dev);
-> +    EbusState *s = EBUS(pci_dev);
->  
->      if (!isa_bus_new(DEVICE(pci_dev), get_system_memory(),
->                       pci_address_space_io(pci_dev), errp)) {
-> @@ -264,7 +269,7 @@ static void ebus_class_init(ObjectClass *klass, void *data)
->  {
->      PCIDeviceClass *k = PCI_DEVICE_CLASS(klass);
->  
-> -    k->realize = pci_ebus_realize;
-> +    k->realize = ebus_realize;
->      k->vendor_id = PCI_VENDOR_ID_SUN;
->      k->device_id = PCI_DEVICE_ID_SUN_EBUS;
->      k->revision = 0x01;
-> @@ -272,10 +277,10 @@ static void ebus_class_init(ObjectClass *klass, void *data)
->  }
->  
->  static const TypeInfo ebus_info = {
-> -    .name          = "ebus",
-> +    .name          = TYPE_EBUS,
->      .parent        = TYPE_PCI_DEVICE,
-> -    .instance_size = sizeof(EbusState),
->      .class_init    = ebus_class_init,
-> +    .instance_size = sizeof(EbusState),
->      .interfaces = (InterfaceInfo[]) {
->          { INTERFACE_CONVENTIONAL_PCI_DEVICE },
->          { },
-> @@ -463,7 +468,7 @@ static void sun4uv_init(MemoryRegion *address_space_mem,
->      pci_busA->slot_reserved_mask = 0xfffffff1;
->      pci_busB->slot_reserved_mask = 0xfffffff0;
->  
-> -    ebus = pci_create_multifunction(pci_busA, PCI_DEVFN(1, 0), true, "ebus");
-> +    ebus = pci_create_multifunction(pci_busA, PCI_DEVFN(1, 0), true, TYPE_EBUS);
->      qdev_init_nofail(DEVICE(ebus));
->  
->      isa_bus = pci_ebus_init(ebus, pbm_irqs);
-> 
+
+> +++ b/tests/qemu-iotests/001
+> @@ -23,7 +23,6 @@
+>  seq=3D`basename $0`
+>  echo "QA output created by $seq"
+> =20
+> -here=3D`pwd`
+
+Good riddance.  And in the majority of the tests, it was a needless
+fork(), compared to my preference (which is also guaranteed by POSIX and
+by /bin/bash):
+
+> +++ b/tests/qemu-iotests/176
+> @@ -27,7 +27,6 @@
+>  seq=3D"$(basename $0)"
+>  echo "QA output created by $seq"
+> =20
+> -here=3D"$PWD"
+
+since $PWD and `pwd` should always produce the same thing, if we even
+had a reason to use it. ;)
+
+Reviewed-by: Eric Blake <eblake@redhat.com>
+
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
+
+
+--EFSojEknumQenbpEVGP5ENjq9ue0og95O
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAloPJF8ACgkQp6FrSiUn
+Q2rgBwf+Kt8G1BxNxMNXImMhkR+rLvOVop9rFjgmgEajTIcPXeggzpr66VAU4lIV
+HHIgMPugmXr4QABJqQuTqPHQIo6zyd6KYpraIBESuV4v1pUi6Ol5iZ6V/JD2/1Qe
+YLFmiF/d9txV/FpLZEzLCdWLwpimJi48FFqut8N8P5zxir7yqFyywk6KEu3IOVz7
+LhGPx9bgNJc5sbYP17T0C2RWXZh0p1iYQW60MQ/9U9n7ZtcYJ0Qki5p3f6mKchKD
+5uYWnALHDHkxBefP+xnDN9iD5en/UvjrRGtzR/zQgdPqvpy5/1CRo0hH8diWCaty
+ODTPy8+N9bVhokku4SsdiMfFsLXKRA==
+=FbwT
+-----END PGP SIGNATURE-----
+
+--EFSojEknumQenbpEVGP5ENjq9ue0og95O--
