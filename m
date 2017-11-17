@@ -1,26 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39491)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39853)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <darren.kenny@oracle.com>) id 1eFgBQ-0001js-60
-	for qemu-devel@nongnu.org; Fri, 17 Nov 2017 07:55:49 -0500
+	(envelope-from <groug@kaod.org>) id 1eFgCh-0002mF-QY
+	for qemu-devel@nongnu.org; Fri, 17 Nov 2017 07:57:09 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <darren.kenny@oracle.com>) id 1eFgBN-0001tt-23
-	for qemu-devel@nongnu.org; Fri, 17 Nov 2017 07:55:48 -0500
-Received: from aserp1040.oracle.com ([141.146.126.69]:28578)
+	(envelope-from <groug@kaod.org>) id 1eFgCe-0003lf-M5
+	for qemu-devel@nongnu.org; Fri, 17 Nov 2017 07:57:07 -0500
+Received: from 18.mo1.mail-out.ovh.net ([46.105.35.72]:44165)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <darren.kenny@oracle.com>)
-	id 1eFgBM-0001rZ-Qg
-	for qemu-devel@nongnu.org; Fri, 17 Nov 2017 07:55:44 -0500
-Date: Fri, 17 Nov 2017 12:55:35 +0000
-From: Darren Kenny <darren.kenny@oracle.com>
-Message-ID: <20171117125535.dhyvy5qwnh6d6e7d@starbug-vm.ie.oracle.com>
-References: <20171117103046.15943-1-kraxel@redhat.com>
-	<20171117103046.15943-20-kraxel@redhat.com>
+	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1eFgCe-0003kN-EI
+	for qemu-devel@nongnu.org; Fri, 17 Nov 2017 07:57:04 -0500
+Received: from player730.ha.ovh.net (b6.ovh.net [213.186.33.56])
+	by mo1.mail-out.ovh.net (Postfix) with ESMTP id 8AB22A8F87
+	for <qemu-devel@nongnu.org>; Fri, 17 Nov 2017 13:57:01 +0100 (CET)
+From: Greg Kurz <groug@kaod.org>
+Date: Fri, 17 Nov 2017 13:56:48 +0100
+Message-ID: <151092340873.11818.16813698420232981002.stgit@bahia>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Disposition: inline
-In-Reply-To: <20171117103046.15943-20-kraxel@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH 19/24] console: add and use
- qemu_display_find_default
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+Subject: [Qemu-devel] [PATCH for-2.11] spapr: reset DRCs after devices
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,101 +27,106 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Gerd Hoffmann <kraxel@redhat.com>
-Cc: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Markus Armbruster <armbru@redhat.com>
+To: qemu-devel@nongnu.org
+Cc: qemu-ppc@nongnu.org, David Gibson <david@gibson.dropbear.id.au>, Michael Roth <mdroth@linux.vnet.ibm.com>, qemu-stable@nongnu.org
 
-On Fri, Nov 17, 2017 at 11:30:41AM +0100, Gerd Hoffmann wrote:
->Using the new registry instead of #ifdefs in vl.c.
->
->Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
->---
-> include/ui/console.h |  1 +
-> ui/console.c         | 19 +++++++++++++++++++
-> vl.c                 | 15 +++++----------
-> 3 files changed, 25 insertions(+), 10 deletions(-)
->
->diff --git a/include/ui/console.h b/include/ui/console.h
->index 6c89599355..7c9e40cc9a 100644
->--- a/include/ui/console.h
->+++ b/include/ui/console.h
->@@ -442,6 +442,7 @@ struct QemuDisplay {
-> };
->
-> void qemu_display_register(QemuDisplay *ui);
->+bool qemu_display_find_default(DisplayOptions *opts);
-> void qemu_display_early_init(DisplayOptions *opts);
-> void qemu_display_init(DisplayState *ds, DisplayOptions *opts);
->
->diff --git a/ui/console.c b/ui/console.c
->index aa8afbfe26..4c9ac8b21a 100644
->--- a/ui/console.c
->+++ b/ui/console.c
->@@ -2176,6 +2176,25 @@ void qemu_display_register(QemuDisplay *ui)
->     dpys[ui->type] = ui;
-> }
->
->+bool qemu_display_find_default(DisplayOptions *opts)
->+{
->+    static DisplayType prio[] = {
->+        DISPLAY_TYPE_GTK,
->+        DISPLAY_TYPE_SDL,
->+        DISPLAY_TYPE_COCOA
->+    };
->+    int i;
->+
->+    for (i = 0; i < ARRAY_SIZE(prio); i++) {
->+        if (dpys[prio[i]] == NULL) {
->+            continue;
->+        }
->+        opts->type = prio[i];
->+        return true;
->+    }
->+    return false;
->+}
->+
-> void qemu_display_early_init(DisplayOptions *opts)
-> {
->     assert(opts->type < DISPLAY_TYPE__MAX);
->diff --git a/vl.c b/vl.c
->index df0c10398d..f861562bb2 100644
->--- a/vl.c
->+++ b/vl.c
->@@ -4406,17 +4406,12 @@ int main(int argc, char **argv, char **envp)
->     }
-> #endif
->     if (dpy.type == DISPLAY_TYPE_DEFAULT && !display_remote) {
->-#if defined(CONFIG_GTK)
->-        dpy.type = DISPLAY_TYPE_GTK;
->-#elif defined(CONFIG_SDL)
->-        dpy.type = DISPLAY_TYPE_SDL;
->-#elif defined(CONFIG_COCOA)
->-        dpy.type = DISPLAY_TYPE_COCOA;
->-#elif defined(CONFIG_VNC)
->-        vnc_parse("localhost:0,to=99,id=default", &error_abort);
->-#else
->-        dpy.type = DISPLAY_TYPE_NONE;
->+        if (!qemu_display_find_default(&dpy)) {
->+            dpy.type = DISPLAY_TYPE_NONE;
->+#if defined(CONFIG_VNC)
->+            vnc_parse("localhost:0,to=99,id=default", &error_abort);
-> #endif
+A DRC with a pending unplug request releases its associated device at
+machine reset time.
 
-Mostly some questions on this:
+In the case of LMB, when all DRCs for a DIMM device have been reset,
+the DIMM gets unplugged, causing guest memory to disappear. This may
+be very confusing for anything still using this memory.
 
-- I'm curious, why is VNC not just one of the ones searched for in
-  qemu_display_find_default()? 
+This is exactly what happens with vhost backends, and QEMU aborts
+with:
 
-- What if there is another display type added? Would it be added to
-  qemu_display_find_default() or in this if statement?
+qemu-system-ppc64: used ring relocated for ring 2
+qemu-system-ppc64: qemu/hw/virtio/vhost.c:649: vhost_commit: Assertion
+ `r >= 0' failed.
 
-- Is there a reason that VNC doesn't follow the same registration
-  mechanism you're proposing here (as in you've no changes to that
-  module in this patch set).
+The issue is that each DRC registers a QEMU reset handler, and we
+don't control the order in which these handlers are called (ie,
+a LMB DRC will unplug a DIMM before the virtio device using the
+memory on this DIMM could stop its vhost backend).
 
-- In the spirit of encapsulation, would it not make sense for the
-  vnc_parse() to be in the VNC code itself as a fall back if no
-  specific options are given to the -vnc option?
+To avoid such situations, let's reset DRCs after all devices
+have been reset.
 
-Thanks,
+Reported-by: Mallesh N. Koti <mallesh@linux.vnet.ibm.com>
+Signed-off-by: Greg Kurz <groug@kaod.org>
+---
+ hw/ppc/spapr.c     |   21 +++++++++++++++++++++
+ hw/ppc/spapr_drc.c |    7 -------
+ 2 files changed, 21 insertions(+), 7 deletions(-)
 
-Darren.
+diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
+index 6841bd294b3c..6285f7211f9a 100644
+--- a/hw/ppc/spapr.c
++++ b/hw/ppc/spapr.c
+@@ -1411,6 +1411,19 @@ static void find_unknown_sysbus_device(SysBusDevice *sbdev, void *opaque)
+     }
+ }
+ 
++static int spapr_reset_drcs(Object *child, void *opaque)
++{
++    sPAPRDRConnector *drc =
++        (sPAPRDRConnector *) object_dynamic_cast(child,
++                                                 TYPE_SPAPR_DR_CONNECTOR);
++
++    if (drc) {
++        spapr_drc_reset(drc);
++    }
++
++    return 0;
++}
++
+ static void ppc_spapr_reset(void)
+ {
+     MachineState *machine = MACHINE(qdev_get_machine());
+@@ -1434,6 +1447,14 @@ static void ppc_spapr_reset(void)
+     }
+ 
+     qemu_devices_reset();
++
++    /* DRC reset may cause a device to be unplugged. This will cause troubles
++     * if this device is used by another device (eg, a running vhost backend
++     * will crash QEMU if the DIMM holding the vring goes away). To avoid such
++     * situations, we reset DRCs after all devices have been reset.
++     */
++    object_child_foreach_recursive(object_get_root(), spapr_reset_drcs, NULL);
++
+     spapr_clear_pending_events(spapr);
+ 
+     /*
+diff --git a/hw/ppc/spapr_drc.c b/hw/ppc/spapr_drc.c
+index 915e9b51c40c..e3b122968e89 100644
+--- a/hw/ppc/spapr_drc.c
++++ b/hw/ppc/spapr_drc.c
+@@ -455,11 +455,6 @@ void spapr_drc_reset(sPAPRDRConnector *drc)
+     }
+ }
+ 
+-static void drc_reset(void *opaque)
+-{
+-    spapr_drc_reset(SPAPR_DR_CONNECTOR(opaque));
+-}
+-
+ bool spapr_drc_needed(void *opaque)
+ {
+     sPAPRDRConnector *drc = (sPAPRDRConnector *)opaque;
+@@ -518,7 +513,6 @@ static void realize(DeviceState *d, Error **errp)
+     }
+     vmstate_register(DEVICE(drc), spapr_drc_index(drc), &vmstate_spapr_drc,
+                      drc);
+-    qemu_register_reset(drc_reset, drc);
+     trace_spapr_drc_realize_complete(spapr_drc_index(drc));
+ }
+ 
+@@ -529,7 +523,6 @@ static void unrealize(DeviceState *d, Error **errp)
+     gchar *name;
+ 
+     trace_spapr_drc_unrealize(spapr_drc_index(drc));
+-    qemu_unregister_reset(drc_reset, drc);
+     vmstate_unregister(DEVICE(drc), &vmstate_spapr_drc, drc);
+     root_container = container_get(object_get_root(), DRC_CONTAINER_PATH);
+     name = g_strdup_printf("%x", spapr_drc_index(drc));
