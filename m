@@ -1,26 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46059)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46820)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <atar4qemu@gmail.com>) id 1eFhbR-0000lx-Lg
-	for qemu-devel@nongnu.org; Fri, 17 Nov 2017 09:26:46 -0500
+	(envelope-from <atar4qemu@gmail.com>) id 1eFhdm-0002GI-6j
+	for qemu-devel@nongnu.org; Fri, 17 Nov 2017 09:29:11 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <atar4qemu@gmail.com>) id 1eFhbQ-0006EN-Pt
-	for qemu-devel@nongnu.org; Fri, 17 Nov 2017 09:26:45 -0500
-Received: from mail-io0-x243.google.com ([2607:f8b0:4001:c06::243]:35025)
+	(envelope-from <atar4qemu@gmail.com>) id 1eFhdk-0000ar-V4
+	for qemu-devel@nongnu.org; Fri, 17 Nov 2017 09:29:10 -0500
+Received: from mail-it0-x242.google.com ([2607:f8b0:4001:c0b::242]:38207)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <atar4qemu@gmail.com>) id 1eFhbQ-0006Dm-Kq
-	for qemu-devel@nongnu.org; Fri, 17 Nov 2017 09:26:44 -0500
-Received: by mail-io0-x243.google.com with SMTP id i38so8918376iod.2
-	for <qemu-devel@nongnu.org>; Fri, 17 Nov 2017 06:26:44 -0800 (PST)
+	(Exim 4.71) (envelope-from <atar4qemu@gmail.com>) id 1eFhdk-0000Zn-PT
+	for qemu-devel@nongnu.org; Fri, 17 Nov 2017 09:29:08 -0500
+Received: by mail-it0-x242.google.com with SMTP id n134so4241437itg.3
+	for <qemu-devel@nongnu.org>; Fri, 17 Nov 2017 06:29:08 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <1510926167-23326-14-git-send-email-mark.cave-ayland@ilande.co.uk>
+In-Reply-To: <1510926167-23326-13-git-send-email-mark.cave-ayland@ilande.co.uk>
 References: <1510926167-23326-1-git-send-email-mark.cave-ayland@ilande.co.uk>
-	<1510926167-23326-14-git-send-email-mark.cave-ayland@ilande.co.uk>
+	<1510926167-23326-13-git-send-email-mark.cave-ayland@ilande.co.uk>
 From: Artyom Tarasenko <atar4qemu@gmail.com>
-Date: Fri, 17 Nov 2017 15:26:23 +0100
-Message-ID: <CACXAS8DzoZO=zi_GRkXKbidMjLBLz855aUbUQO3vJOHhzGfucQ@mail.gmail.com>
+Date: Fri, 17 Nov 2017 15:28:47 +0100
+Message-ID: <CACXAS8A2wXknQApvRhKD=-wDAPURn5AT5A6X4jLZWdgZLUBBaQ@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH 13/15] apb: replace OBIO interrupt numbers
- in pci_pbmA_map_irq() with constants
+Subject: Re: [Qemu-devel] [PATCH 12/15] ebus: wire up OBIO interrupts to APB
+ pbm via qdev GPIOs
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,48 +34,152 @@ Cc: qemu-devel <qemu-devel@nongnu.org>
 
 On Fri, Nov 17, 2017 at 2:42 PM, Mark Cave-Ayland
 <mark.cave-ayland@ilande.co.uk> wrote:
-> Following on from the previous commit, we can also do the same with
-> with legacy OBIO interrupts in pci_pbmA_map_irq().
+> This enables us to remove the static array mapping in the ISA IRQ
+> handler (and the embedded reference to the APB device) by formalising
+> the interrupt wiring via the qdev GPIO API.
+>
+> For more clarity we replace the APB OBIO interrupt numbers with constants
+> designating the interrupt source, and rename isa_irq_handler() to
+> ebus_isa_irq_handler().
 >
 > Signed-off-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
 
 Reviewed-by: Artyom Tarasenko <atar4qemu@gmail.com>
 
 > ---
->  hw/pci-host/apb.c         |    4 ++--
->  include/hw/pci-host/apb.h |    2 ++
->  2 files changed, 4 insertions(+), 2 deletions(-)
+>  hw/pci-host/apb.c         |    2 +-
+>  hw/sparc64/sun4u.c        |   48 ++++++++++++++++++++++-----------------------
+>  include/hw/pci-host/apb.h |    8 +++++++-
+>  3 files changed, 32 insertions(+), 26 deletions(-)
 >
 > diff --git a/hw/pci-host/apb.c b/hw/pci-host/apb.c
-> index f092780c..31eb675 100644
+> index 268100e..f092780c 100644
 > --- a/hw/pci-host/apb.c
 > +++ b/hw/pci-host/apb.c
-> @@ -523,10 +523,10 @@ static int pci_pbmA_map_irq(PCIDevice *pci_dev, int irq_num)
->      switch (PCI_SLOT(pci_dev->devfn)) {
->      case 1:
->          /* Onboard NIC */
-> -        return 0x21;
-> +        return OBIO_NIC_IRQ;
->      case 3:
->          /* Onboard IDE */
-> -        return 0x20;
-> +        return OBIO_HDD_IRQ;
->      default:
->          /* Normal intno, fall through */
->          break;
+> @@ -700,7 +700,7 @@ static void pci_pbm_init(Object *obj)
+>      for (i = 0; i < 32; i++) {
+>          s->obio_irq_map[i] = ((0x1f << 6) | 0x20) + i;
+>      }
+> -    s->pbm_irqs = qemu_allocate_irqs(pci_apb_set_irq, s, MAX_IVEC);
+> +    qdev_init_gpio_in_named(DEVICE(s), pci_apb_set_irq, "pbm-irq", MAX_IVEC);
+>      qdev_init_gpio_out_named(DEVICE(s), s->ivec_irqs, "ivec-irq", MAX_IVEC);
+>      s->irq_request = NO_IRQ_REQUEST;
+>      s->pci_irq_in = 0ULL;
+> diff --git a/hw/sparc64/sun4u.c b/hw/sparc64/sun4u.c
+> index 0a30fb8..da386d3 100644
+> --- a/hw/sparc64/sun4u.c
+> +++ b/hw/sparc64/sun4u.c
+> @@ -86,6 +86,7 @@ typedef struct EbusState {
+>      PCIDevice parent_obj;
+>
+>      ISABus *isa_bus;
+> +    qemu_irq isa_bus_irqs[16];
+>      uint64_t console_serial_base;
+>      MemoryRegion bar0;
+>      MemoryRegion bar1;
+> @@ -211,23 +212,15 @@ typedef struct ResetData {
+>      uint64_t prom_addr;
+>  } ResetData;
+>
+> -static void isa_irq_handler(void *opaque, int n, int level)
+> +static void ebus_isa_irq_handler(void *opaque, int n, int level)
+>  {
+> -    static const int isa_irq_to_ivec[16] = {
+> -        [1] = 0x29, /* keyboard */
+> -        [4] = 0x2b, /* serial */
+> -        [6] = 0x27, /* floppy */
+> -        [7] = 0x22, /* parallel */
+> -        [12] = 0x2a, /* mouse */
+> -    };
+> -    qemu_irq *irqs = opaque;
+> -    int ivec;
+> -
+> -    assert(n < ARRAY_SIZE(isa_irq_to_ivec));
+> -    ivec = isa_irq_to_ivec[n];
+> -    EBUS_DPRINTF("Set ISA IRQ %d level %d -> ivec 0x%x\n", n, level, ivec);
+> -    if (ivec) {
+> -        qemu_set_irq(irqs[ivec], level);
+> +    EbusState *s = EBUS(opaque);
+> +    qemu_irq irq = s->isa_bus_irqs[n];
+> +
+> +    /* Pass ISA bus IRQs onto their gpio equivalent */
+> +    EBUS_DPRINTF("Set ISA IRQ %d level %d\n", n, level);
+> +    if (irq) {
+> +        qemu_set_irq(irq, level);
+>      }
+>  }
+>
+> @@ -235,7 +228,6 @@ static void isa_irq_handler(void *opaque, int n, int level)
+>  static void ebus_realize(PCIDevice *pci_dev, Error **errp)
+>  {
+>      EbusState *s = EBUS(pci_dev);
+> -    APBState *apb;
+>      DeviceState *dev;
+>      qemu_irq *isa_irq;
+>      DriveInfo *fd[MAX_FD];
+> @@ -248,14 +240,10 @@ static void ebus_realize(PCIDevice *pci_dev, Error **errp)
+>          return;
+>      }
+>
+> -    apb = APB_DEVICE(object_resolve_path_type("", TYPE_APB, NULL));
+> -    if (!apb) {
+> -        error_setg(errp, "unable to locate APB PCI host bridge");
+> -        return;
+> -    }
+> -
+> -    isa_irq = qemu_allocate_irqs(isa_irq_handler, apb->pbm_irqs, 16);
+> +    /* ISA bus */
+> +    isa_irq = qemu_allocate_irqs(ebus_isa_irq_handler, s, 16);
+>      isa_bus_irqs(s->isa_bus, isa_irq);
+> +    qdev_init_gpio_out_named(DEVICE(s), s->isa_bus_irqs, "isa-irq", 16);
+>
+>      /* Serial ports */
+>      i = 0;
+> @@ -530,6 +518,18 @@ static void sun4uv_init(MemoryRegion *address_space_mem,
+>                           hwdef->console_serial_base);
+>      qdev_init_nofail(DEVICE(ebus));
+>
+> +    /* Wire up "well-known" ISA IRQs to APB legacy obio IRQs */
+> +    qdev_connect_gpio_out_named(DEVICE(ebus), "isa-irq", 7,
+> +        qdev_get_gpio_in_named(DEVICE(apb), "pbm-irq", OBIO_LPT_IRQ));
+> +    qdev_connect_gpio_out_named(DEVICE(ebus), "isa-irq", 6,
+> +        qdev_get_gpio_in_named(DEVICE(apb), "pbm-irq", OBIO_FDD_IRQ));
+> +    qdev_connect_gpio_out_named(DEVICE(ebus), "isa-irq", 1,
+> +        qdev_get_gpio_in_named(DEVICE(apb), "pbm-irq", OBIO_KBD_IRQ));
+> +    qdev_connect_gpio_out_named(DEVICE(ebus), "isa-irq", 12,
+> +        qdev_get_gpio_in_named(DEVICE(apb), "pbm-irq", OBIO_MSE_IRQ));
+> +    qdev_connect_gpio_out_named(DEVICE(ebus), "isa-irq", 4,
+> +        qdev_get_gpio_in_named(DEVICE(apb), "pbm-irq", OBIO_SER_IRQ));
+> +
+>      pci_dev = pci_create_simple(pci_busA, PCI_DEVFN(2, 0), "VGA");
+>
+>      memset(&macaddr, 0, sizeof(MACAddr));
 > diff --git a/include/hw/pci-host/apb.h b/include/hw/pci-host/apb.h
-> index 09ebd53..6194c8c 100644
+> index dd49437..09ebd53 100644
 > --- a/include/hw/pci-host/apb.h
 > +++ b/include/hw/pci-host/apb.h
-> @@ -53,6 +53,8 @@ typedef struct IOMMUState {
+> @@ -52,6 +52,13 @@ typedef struct IOMMUState {
+>
 >  #define MAX_IVEC 0x40
 >
->  /* OBIO IVEC IRQs */
-> +#define OBIO_HDD_IRQ         0x20
-> +#define OBIO_NIC_IRQ         0x21
->  #define OBIO_LPT_IRQ         0x22
->  #define OBIO_FDD_IRQ         0x27
->  #define OBIO_KBD_IRQ         0x29
+> +/* OBIO IVEC IRQs */
+> +#define OBIO_LPT_IRQ         0x22
+> +#define OBIO_FDD_IRQ         0x27
+> +#define OBIO_KBD_IRQ         0x29
+> +#define OBIO_MSE_IRQ         0x2a
+> +#define OBIO_SER_IRQ         0x2b
+> +
+>  #define TYPE_APB "pbm"
+>
+>  #define APB_DEVICE(obj) \
+> @@ -76,7 +83,6 @@ typedef struct APBState {
+>      uint32_t pci_irq_map[8];
+>      uint32_t pci_err_irq_map[4];
+>      uint32_t obio_irq_map[32];
+> -    qemu_irq *pbm_irqs;
+>      qemu_irq ivec_irqs[MAX_IVEC];
+>      unsigned int irq_request;
+>      uint32_t reset_control;
 > --
 > 1.7.10.4
 >
