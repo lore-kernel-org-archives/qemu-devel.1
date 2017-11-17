@@ -1,22 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56520)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56574)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1eFgvF-0000of-3U
-	for qemu-devel@nongnu.org; Fri, 17 Nov 2017 08:43:10 -0500
+	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1eFgvG-0000q4-Mg
+	for qemu-devel@nongnu.org; Fri, 17 Nov 2017 08:43:11 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1eFgvD-0008VB-PT
-	for qemu-devel@nongnu.org; Fri, 17 Nov 2017 08:43:09 -0500
-Received: from chuckie.co.uk ([82.165.15.123]:59109
+	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1eFgvF-000091-Ft
+	for qemu-devel@nongnu.org; Fri, 17 Nov 2017 08:43:10 -0500
+Received: from chuckie.co.uk ([82.165.15.123]:59112
 	helo=s16892447.onlinehome-server.info)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <mark.cave-ayland@ilande.co.uk>)
-	id 1eFgvD-0008T1-H2
-	for qemu-devel@nongnu.org; Fri, 17 Nov 2017 08:43:07 -0500
+	id 1eFgvF-000061-9Z
+	for qemu-devel@nongnu.org; Fri, 17 Nov 2017 08:43:09 -0500
 From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-Date: Fri, 17 Nov 2017 13:42:38 +0000
-Message-Id: <1510926167-23326-7-git-send-email-mark.cave-ayland@ilande.co.uk>
+Date: Fri, 17 Nov 2017 13:42:39 +0000
+Message-Id: <1510926167-23326-8-git-send-email-mark.cave-ayland@ilande.co.uk>
 In-Reply-To: <1510926167-23326-1-git-send-email-mark.cave-ayland@ilande.co.uk>
 References: <1510926167-23326-1-git-send-email-mark.cave-ayland@ilande.co.uk>
-Subject: [Qemu-devel] [PATCH 06/15] apb: APB QOMify tidy-up
+Subject: [Qemu-devel] [PATCH 07/15] apb: return APBState from pci_apb_init()
+ rather then PCIBus
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,69 +28,79 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org, atar4qemu@gmail.com
 
-Use DeviceClass rather than SysBusDeviceClass in pbm_host_class_init() and
-adjust pci_pbm_init_device() accordingly.
+This is a first step towards removing pci_apb_init() completely.
 
 Signed-off-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
 ---
- hw/pci-host/apb.c |   17 ++++++++---------
- 1 file changed, 8 insertions(+), 9 deletions(-)
+ hw/pci-host/apb.c         |    8 ++++----
+ hw/sparc64/sun4u.c        |    6 ++++--
+ include/hw/pci-host/apb.h |    6 +++---
+ 3 files changed, 11 insertions(+), 9 deletions(-)
 
 diff --git a/hw/pci-host/apb.c b/hw/pci-host/apb.c
-index b0f80f6..c7837ef 100644
+index c7837ef..0c70999 100644
 --- a/hw/pci-host/apb.c
 +++ b/hw/pci-host/apb.c
-@@ -705,12 +705,12 @@ static const MemoryRegionOps pci_config_ops = {
-     .endianness = DEVICE_LITTLE_ENDIAN,
- };
+@@ -612,9 +612,9 @@ static void apb_pci_bridge_realize(PCIDevice *dev, Error **errp)
+     pci_bridge_update_mappings(PCI_BRIDGE(br));
+ }
  
--static int pci_pbm_init_device(SysBusDevice *dev)
-+static int pci_pbm_init_device(DeviceState *dev)
+-PCIBus *pci_apb_init(hwaddr special_base,
+-                     hwaddr mem_base,
+-                     qemu_irq *ivec_irqs, PCIBus **busA, PCIBus **busB)
++APBState *pci_apb_init(hwaddr special_base,
++                       hwaddr mem_base,
++                       qemu_irq *ivec_irqs, PCIBus **busA, PCIBus **busB)
  {
--    APBState *s;
-+    APBState *s = APB_DEVICE(dev);
-+    SysBusDevice *sbd = SYS_BUS_DEVICE(s);
+     DeviceState *dev;
+     SysBusDevice *s;
+@@ -675,7 +675,7 @@ PCIBus *pci_apb_init(hwaddr special_base,
+     qdev_init_nofail(&pci_dev->qdev);
+     *busA = pci_bridge_get_sec_bus(br);
+ 
+-    return phb->bus;
++    return d;
+ }
+ 
+ static void pci_pbm_reset(DeviceState *d)
+diff --git a/hw/sparc64/sun4u.c b/hw/sparc64/sun4u.c
+index b441f1e..a64ddc5 100644
+--- a/hw/sparc64/sun4u.c
++++ b/hw/sparc64/sun4u.c
+@@ -482,6 +482,7 @@ static void sun4uv_init(MemoryRegion *address_space_mem,
+     Nvram *nvram;
      unsigned int i;
+     uint64_t initrd_addr, initrd_size, kernel_addr, kernel_size, kernel_entry;
++    APBState *apb;
+     PCIBus *pci_bus, *pci_busA, *pci_busB;
+     PCIDevice *ebus, *pci_dev;
+     SysBusDevice *s;
+@@ -502,8 +503,9 @@ static void sun4uv_init(MemoryRegion *address_space_mem,
+     prom_init(hwdef->prom_addr, bios_name);
  
--    s = APB_DEVICE(dev);
-     for (i = 0; i < 8; i++) {
-         s->pci_irq_map[i] = (0x1f << 6) | (i << 2);
-     }
-@@ -728,18 +728,18 @@ static int pci_pbm_init_device(SysBusDevice *dev)
-     memory_region_init_io(&s->apb_config, OBJECT(s), &apb_config_ops, s,
-                           "apb-config", 0x10000);
-     /* at region 0 */
--    sysbus_init_mmio(dev, &s->apb_config);
-+    sysbus_init_mmio(sbd, &s->apb_config);
+     ivec_irqs = qemu_allocate_irqs(sparc64_cpu_set_ivec_irq, cpu, IVEC_MAX);
+-    pci_bus = pci_apb_init(APB_SPECIAL_BASE, APB_MEM_BASE, ivec_irqs, &pci_busA,
+-                           &pci_busB);
++    apb = pci_apb_init(APB_SPECIAL_BASE, APB_MEM_BASE, ivec_irqs, &pci_busA,
++                       &pci_busB);
++    pci_bus = PCI_HOST_BRIDGE(apb)->bus;
  
-     memory_region_init_io(&s->pci_config, OBJECT(s), &pci_config_ops, s,
-                           "apb-pci-config", 0x1000000);
-     /* at region 1 */
--    sysbus_init_mmio(dev, &s->pci_config);
-+    sysbus_init_mmio(sbd, &s->pci_config);
+     /* Only in-built Simba PBMs can exist on the root bus, slot 0 on busA is
+        reserved (leaving no slots free after on-board devices) however slots
+diff --git a/include/hw/pci-host/apb.h b/include/hw/pci-host/apb.h
+index 35d7d5a..a4ef51a 100644
+--- a/include/hw/pci-host/apb.h
++++ b/include/hw/pci-host/apb.h
+@@ -89,7 +89,7 @@ typedef struct PBMPCIBridge {
+ #define PBM_PCI_BRIDGE(obj) \
+     OBJECT_CHECK(PBMPCIBridge, (obj), TYPE_PBM_PCI_BRIDGE)
  
-     /* pci_ioport */
-     memory_region_init(&s->pci_ioport, OBJECT(s), "apb-pci-ioport", 0x1000000);
- 
-     /* at region 2 */
--    sysbus_init_mmio(dev, &s->pci_ioport);
-+    sysbus_init_mmio(sbd, &s->pci_ioport);
- 
-     return 0;
- }
-@@ -783,11 +783,10 @@ static const TypeInfo pbm_pci_host_info = {
- static void pbm_host_class_init(ObjectClass *klass, void *data)
- {
-     DeviceClass *dc = DEVICE_CLASS(klass);
--    SysBusDeviceClass *k = SYS_BUS_DEVICE_CLASS(klass);
- 
--    k->init = pci_pbm_init_device;
--    set_bit(DEVICE_CATEGORY_BRIDGE, dc->categories);
-+    dc->init = pci_pbm_init_device;
-     dc->reset = pci_pbm_reset;
-+    set_bit(DEVICE_CATEGORY_BRIDGE, dc->categories);
- }
- 
- static const TypeInfo pbm_host_info = {
+-PCIBus *pci_apb_init(hwaddr special_base,
+-                     hwaddr mem_base,
+-                     qemu_irq *ivec_irqs, PCIBus **bus2, PCIBus **bus3);
++APBState *pci_apb_init(hwaddr special_base,
++                       hwaddr mem_base,
++                       qemu_irq *ivec_irqs, PCIBus **bus2, PCIBus **bus3);
+ #endif
 -- 
 1.7.10.4
