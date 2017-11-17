@@ -1,26 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49822)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49784)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1eFdvE-0000nt-EA
-	for qemu-devel@nongnu.org; Fri, 17 Nov 2017 05:30:58 -0500
+	(envelope-from <kraxel@redhat.com>) id 1eFdvD-0000mD-OI
+	for qemu-devel@nongnu.org; Fri, 17 Nov 2017 05:30:57 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1eFdvC-0007OC-W4
-	for qemu-devel@nongnu.org; Fri, 17 Nov 2017 05:30:56 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:53908)
+	(envelope-from <kraxel@redhat.com>) id 1eFdvB-0007Lu-BM
+	for qemu-devel@nongnu.org; Fri, 17 Nov 2017 05:30:55 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:51896)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1eFdvC-0007Nc-Ng
-	for qemu-devel@nongnu.org; Fri, 17 Nov 2017 05:30:54 -0500
+	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1eFdvB-0007Kx-5i
+	for qemu-devel@nongnu.org; Fri, 17 Nov 2017 05:30:53 -0500
 Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
 	[10.5.11.15])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id D6A9ED9659
-	for <qemu-devel@nongnu.org>; Fri, 17 Nov 2017 10:30:53 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id 69CABC01A661
+	for <qemu-devel@nongnu.org>; Fri, 17 Nov 2017 10:30:52 +0000 (UTC)
 From: Gerd Hoffmann <kraxel@redhat.com>
-Date: Fri, 17 Nov 2017 11:30:43 +0100
-Message-Id: <20171117103046.15943-22-kraxel@redhat.com>
+Date: Fri, 17 Nov 2017 11:30:41 +0100
+Message-Id: <20171117103046.15943-20-kraxel@redhat.com>
 In-Reply-To: <20171117103046.15943-1-kraxel@redhat.com>
 References: <20171117103046.15943-1-kraxel@redhat.com>
-Subject: [Qemu-devel] [PATCH 21/24] sdl: build as module
+Subject: [Qemu-devel] [PATCH 19/24] console: add and use
+ qemu_display_find_default
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,62 +31,85 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Markus Armbruster <armbru@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>
+Cc: Markus Armbruster <armbru@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
+
+Using the new registry instead of #ifdefs in vl.c.
 
 Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
 ---
- configure        | 2 +-
- Makefile.objs    | 1 +
- ui/Makefile.objs | 6 +++---
- 3 files changed, 5 insertions(+), 4 deletions(-)
+ include/ui/console.h |  1 +
+ ui/console.c         | 19 +++++++++++++++++++
+ vl.c                 | 15 +++++----------
+ 3 files changed, 25 insertions(+), 10 deletions(-)
 
-diff --git a/configure b/configure
-index 0e856bbc04..7d1e9b187d 100755
---- a/configure
-+++ b/configure
-@@ -5754,7 +5754,7 @@ if test "$modules" = "yes"; then
-   echo "CONFIG_MODULES=y" >> $config_host_mak
- fi
- if test "$sdl" = "yes" ; then
--  echo "CONFIG_SDL=y" >> $config_host_mak
-+  echo "CONFIG_SDL=m" >> $config_host_mak
-   echo "CONFIG_SDLABI=$sdlabi" >> $config_host_mak
-   echo "SDL_CFLAGS=$sdl_cflags" >> $config_host_mak
-   echo "SDL_LIBS=$sdl_libs" >> $config_host_mak
-diff --git a/Makefile.objs b/Makefile.objs
-index 285c6f3c15..a567df479c 100644
---- a/Makefile.objs
-+++ b/Makefile.objs
-@@ -56,6 +56,7 @@ common-obj-y += hw/
- common-obj-y += replay/
+diff --git a/include/ui/console.h b/include/ui/console.h
+index 6c89599355..7c9e40cc9a 100644
+--- a/include/ui/console.h
++++ b/include/ui/console.h
+@@ -442,6 +442,7 @@ struct QemuDisplay {
+ };
  
- common-obj-y += ui/
-+common-obj-m += ui/
- common-obj-y += bt-host.o bt-vhci.o
- bt-host.o-cflags := $(BLUEZ_CFLAGS)
+ void qemu_display_register(QemuDisplay *ui);
++bool qemu_display_find_default(DisplayOptions *opts);
+ void qemu_display_early_init(DisplayOptions *opts);
+ void qemu_display_init(DisplayState *ds, DisplayOptions *opts);
  
-diff --git a/ui/Makefile.objs b/ui/Makefile.objs
-index ec8533d6d9..6c13d7e5ed 100644
---- a/ui/Makefile.objs
-+++ b/ui/Makefile.objs
-@@ -8,15 +8,15 @@ vnc-obj-y += vnc-ws.o
- vnc-obj-y += vnc-jobs.o
+diff --git a/ui/console.c b/ui/console.c
+index aa8afbfe26..4c9ac8b21a 100644
+--- a/ui/console.c
++++ b/ui/console.c
+@@ -2176,6 +2176,25 @@ void qemu_display_register(QemuDisplay *ui)
+     dpys[ui->type] = ui;
+ }
  
- common-obj-y += keymaps.o console.o cursor.o qemu-pixman.o
--common-obj-y += input.o input-keymap.o input-legacy.o
-+common-obj-y += input.o input-keymap.o input-legacy.o x_keymap.o
- common-obj-$(CONFIG_LINUX) += input-linux.o
- common-obj-$(CONFIG_SPICE) += spice-core.o spice-input.o spice-display.o
--common-obj-$(CONFIG_SDL) += sdl.mo x_keymap.o
- common-obj-$(CONFIG_COCOA) += cocoa.o
- common-obj-$(CONFIG_CURSES) += curses.o
- common-obj-$(CONFIG_VNC) += $(vnc-obj-y)
--common-obj-$(CONFIG_GTK) += gtk.o x_keymap.o
-+common-obj-$(CONFIG_GTK) += gtk.o
- 
-+common-obj-$(CONFIG_SDL) += sdl.mo
- ifeq ($(CONFIG_SDLABI),1.2)
- sdl.mo-objs := sdl.o sdl_zoom.o
- endif
++bool qemu_display_find_default(DisplayOptions *opts)
++{
++    static DisplayType prio[] = {
++        DISPLAY_TYPE_GTK,
++        DISPLAY_TYPE_SDL,
++        DISPLAY_TYPE_COCOA
++    };
++    int i;
++
++    for (i = 0; i < ARRAY_SIZE(prio); i++) {
++        if (dpys[prio[i]] == NULL) {
++            continue;
++        }
++        opts->type = prio[i];
++        return true;
++    }
++    return false;
++}
++
+ void qemu_display_early_init(DisplayOptions *opts)
+ {
+     assert(opts->type < DISPLAY_TYPE__MAX);
+diff --git a/vl.c b/vl.c
+index df0c10398d..f861562bb2 100644
+--- a/vl.c
++++ b/vl.c
+@@ -4406,17 +4406,12 @@ int main(int argc, char **argv, char **envp)
+     }
+ #endif
+     if (dpy.type == DISPLAY_TYPE_DEFAULT && !display_remote) {
+-#if defined(CONFIG_GTK)
+-        dpy.type = DISPLAY_TYPE_GTK;
+-#elif defined(CONFIG_SDL)
+-        dpy.type = DISPLAY_TYPE_SDL;
+-#elif defined(CONFIG_COCOA)
+-        dpy.type = DISPLAY_TYPE_COCOA;
+-#elif defined(CONFIG_VNC)
+-        vnc_parse("localhost:0,to=99,id=default", &error_abort);
+-#else
+-        dpy.type = DISPLAY_TYPE_NONE;
++        if (!qemu_display_find_default(&dpy)) {
++            dpy.type = DISPLAY_TYPE_NONE;
++#if defined(CONFIG_VNC)
++            vnc_parse("localhost:0,to=99,id=default", &error_abort);
+ #endif
++        }
+     }
+     if (dpy.type == DISPLAY_TYPE_DEFAULT) {
+         dpy.type = DISPLAY_TYPE_NONE;
 -- 
 2.9.3
