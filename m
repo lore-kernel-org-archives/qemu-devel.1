@@ -1,26 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36142)
-	by lists.gnu.org with esmtp (Exim 4.71) (envelope-from <n54@gmx.com>)
-	id 1eFeU5-0004Ld-PJ
-	for qemu-devel@nongnu.org; Fri, 17 Nov 2017 06:07:03 -0500
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37991)
+	by lists.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <no-reply@patchew.org>) id 1eFebM-0005GH-Qa
+	for qemu-devel@nongnu.org; Fri, 17 Nov 2017 06:14:34 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <n54@gmx.com>) id 1eFeTw-00086S-12
-	for qemu-devel@nongnu.org; Fri, 17 Nov 2017 06:06:57 -0500
-Received: from mout.gmx.net ([212.227.15.15]:56111)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <n54@gmx.com>) id 1eFeTv-00084R-LI
-	for qemu-devel@nongnu.org; Fri, 17 Nov 2017 06:06:47 -0500
-References: <e1e3a1d3-da53-e46a-ce9b-7d1707e3a493@linux.intel.com>
-	<cd3fcaf0-8f53-6adf-3898-d0dab2aa6f92@gmx.com>
-	<a4842f5b-4f81-1486-d044-a5ba623ccdf9@linux.intel.com>
-From: Kamil Rytarowski <n54@gmx.com>
-Message-ID: <21935287-010e-fac0-73a8-4a3e9d8c9223@gmx.com>
-Date: Fri, 17 Nov 2017 12:09:03 +0100
+	(envelope-from <no-reply@patchew.org>) id 1eFebJ-0007lV-K7
+	for qemu-devel@nongnu.org; Fri, 17 Nov 2017 06:14:28 -0500
+Resent-Message-Id: <E1eFebJ-0007lV-K7@eggs.gnu.org>
+Received: from sender-of-o52.zoho.com ([135.84.80.217]:21433)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
+	id 1eFebJ-0007iI-Dg
+	for qemu-devel@nongnu.org; Fri, 17 Nov 2017 06:14:25 -0500
+Reply-To: <qemu-devel@nongnu.org>
+Message-ID: <151091632192.438.3101813470415878481@bafd83ae6430>
+In-Reply-To: <20171117103046.15943-1-kraxel@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <a4842f5b-4f81-1486-d044-a5ba623ccdf9@linux.intel.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="cpVlnhQRaqF5q4NMwCaRTshJjI1huln3s"
-Subject: Re: [Qemu-devel] HAXM is now open source
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+From: no-reply@patchew.org
+Date: Fri, 17 Nov 2017 02:58:42 -0800 (PST)
+Subject: Re: [Qemu-devel] [PATCH 00/24] RfC: rework display initialization
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,122 +28,81 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Yu Ning <yu.ning@linux.intel.com>, qemu-devel@nongnu.org
+To: kraxel@redhat.com
+Cc: famz@redhat.com, qemu-devel@nongnu.org, armbru@redhat.com
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---cpVlnhQRaqF5q4NMwCaRTshJjI1huln3s
-From: Kamil Rytarowski <n54@gmx.com>
-To: Yu Ning <yu.ning@linux.intel.com>, qemu-devel@nongnu.org
-Message-ID: <21935287-010e-fac0-73a8-4a3e9d8c9223@gmx.com>
-Subject: Re: [Qemu-devel] HAXM is now open source
-References: <e1e3a1d3-da53-e46a-ce9b-7d1707e3a493@linux.intel.com>
- <cd3fcaf0-8f53-6adf-3898-d0dab2aa6f92@gmx.com>
- <a4842f5b-4f81-1486-d044-a5ba623ccdf9@linux.intel.com>
-In-Reply-To: <a4842f5b-4f81-1486-d044-a5ba623ccdf9@linux.intel.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-
-On 17.11.2017 11:30, Yu Ning wrote:
->=20
->=20
-> On 11/17/2017 16:53, Kamil Rytarowski wrote:
->> On 14.11.2017 09:54, Yu Ning wrote:
->>> Hello,
->>>
->>> As some of you may have noticed, since QEMU 2.9.0, an accelerator kno=
-wn
->>> as =E2=80=9Chax=E2=80=9D has been available for Windows and macOS bui=
-lds of QEMU, thanks
->>> to the hard work of Vincent Palatin and help from this community (Pao=
-lo
->>> Bonzini, Stefan Weil, et al.).
->>>
->>> The accelerator requires a host kernel module (driver) known as Intel=
-
->>> Hardware Accelerated Execution Manager (HAXM), i.e. intelhaxm.sys on
->>> Windows or intelhaxm.kext on macOS, similar to how the KVM accelerato=
-r
->>> depends on kvm.ko on Linux.
->>>
->>> Today, we released the source code of the HAXM kernel module under th=
-e
->>> BSD 3-clause license:
->>>
->>> https://github.com/intel/haxm
->>>
->>> We look forward to working with the community to improve HAXM (both t=
-he
->>> kernel module and the accelerator). The code is accompanied by some
->>> basic documentation (README.md and API.md), which is incomplete, but
->>> hopefully helps people get started. If you have any questions or
->>> suggestions, please create an issue or post a comment on GitHub.
->>>
->>> Thanks,
->>> Yu
->>>
->> Please make it clear whether this module can be ported (as host) to
->> other OSes
->=20
-> It was designed with only Windows and Mac hosts in mind, and we don't
-> plan to support more host OSes. But porting HAXM to another host OS is
-> possible.  If you take a look at the HAXM source tree, there are pretty=
-
-> clear boundaries between host-independent code (core/, include/*.h),
-> Windows-specific code (windows/, include/windows/) and Mac-specific cod=
-e
-> (darwin/, include/darwin/).
-
-Sounds good. I will give it a try.
-
->>   and whether it can support arbitrary guests OSes (for the
->> same CPU).
->=20
-> Unfortunately not, but again it can be done.  Initially HAXM was
-> designed to support only two guest OSes, namely Android and Tizen. When=
-
-> we upstreamed the HAXM accelerator module to QEMU, we verified it using=
-
-> various desktop OS images, mostly Linux-based (Chrome OS, Debian,
-> Ubuntu, CentOS, etc.), although there were a few others (FreeDOS, etc.)=
-=2E
->=20
-> Nevertheless, you may run into issues when you boot a completely
-> different guest OS (e.g. Windows, which we have never tested), or even
-> with one that is similar to what I've mentioned (e.g. Fedora, which IIR=
-C
-> will boot to a kernel panic).  In such cases, the culprit is usually
-> bug(s) in the HAXM kernel module, causing incorrect behavior when the
-> guest executes certain x86 instructions.  Once all the bugs exposed by =
-a
-> specific guest OS are fixed, that guest OS will work correctly.
->=20
-
-If it will run BSD for start it will be good enough for now.
-
-Thank you for the answers!
-
-
---cpVlnhQRaqF5q4NMwCaRTshJjI1huln3s
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2
-
-iQIcBAEBCAAGBQJaDsNUAAoJEEuzCOmwLnZso2oP/12POz02ZvrA8w32Ntf+OG6q
-hD5JeqctDTKCJ+CX7ISTnQBfgan3PkQWDGjcRtryUW7d5Lxc968R/MbwBkglg7fk
-YF5EjfbpgBeU8uj5ihgQr+uh97vbxGNvfU/iRQtKNw0j74E7V6H0uY6YRTHpqQcZ
-jCVAI4fKlEeNy+5omNzGtwlCqVRYx/XKclRca06s5ljkBkLRYctYHNKuoXFUN75S
-BEqSYg8Y8aJFMmw3Cm7eQLER9zJqy+J6dnwZV1aNy4o4UzJwJUVqRBfplYQlJwfq
-rhACU4Ha3MOcTC2B2XFqooapgijxFTSHh42KPG/q+YYsbZNROrSgCttQ5cpfWMU1
-58gAwyqWv7Nd+ISjzemhGbwuCW27x05OygWvHtRtgyGybnP3yMPED2GQ1MauIeL2
-gJod1PYw3vBkOwuKItdfIGLtyN064AV2NNr3Mn0NabBL4QJzqlOZZ8WuGZga9Bse
-naFiBFu91QIgrLtTcN0V0h6vaCXfWpGPehTtY8dp74EqfQHicyGZXY9i2+EYzKHl
-M+AZ1R5vI5B322qUkZiPWGFbKIXbPISzpqcI+6ymxmJtEZmurZWYV08Qd0xY1Tul
-AqLDdorbKXZM47WnhKQgUbHIPx9GKzYsEDVxFrVy+RJZ8hZCM49mC82zYvJlZC7f
-QRT94mMl6kzHRp5PZzZP
-=+WOm
------END PGP SIGNATURE-----
-
---cpVlnhQRaqF5q4NMwCaRTshJjI1huln3s--
+SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
+LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKU3ViamVjdDogW1FlbXUt
+ZGV2ZWxdIFtQQVRDSCAwMC8yNF0gUmZDOiByZXdvcmsgZGlzcGxheSBpbml0aWFsaXphdGlvbgpU
+eXBlOiBzZXJpZXMKTWVzc2FnZS1pZDogMjAxNzExMTcxMDMwNDYuMTU5NDMtMS1rcmF4ZWxAcmVk
+aGF0LmNvbQoKPT09IFRFU1QgU0NSSVBUIEJFR0lOID09PQojIS9iaW4vYmFzaAoKQkFTRT1iYXNl
+Cm49MQp0b3RhbD0kKGdpdCBsb2cgLS1vbmVsaW5lICRCQVNFLi4gfCB3YyAtbCkKZmFpbGVkPTAK
+CmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLnJlbmFtZWxpbWl0IDAKZ2l0IGNvbmZpZyAtLWxvY2Fs
+IGRpZmYucmVuYW1lcyBUcnVlCgpjb21taXRzPSIkKGdpdCBsb2cgLS1mb3JtYXQ9JUggLS1yZXZl
+cnNlICRCQVNFLi4pIgpmb3IgYyBpbiAkY29tbWl0czsgZG8KICAgIGVjaG8gIkNoZWNraW5nIFBB
+VENIICRuLyR0b3RhbDogJChnaXQgbG9nIC1uIDEgLS1mb3JtYXQ9JXMgJGMpLi4uIgogICAgaWYg
+ISBnaXQgc2hvdyAkYyAtLWZvcm1hdD1lbWFpbCB8IC4vc2NyaXB0cy9jaGVja3BhdGNoLnBsIC0t
+bWFpbGJhY2sgLTsgdGhlbgogICAgICAgIGZhaWxlZD0xCiAgICAgICAgZWNobwogICAgZmkKICAg
+IG49JCgobisxKSkKZG9uZQoKZXhpdCAkZmFpbGVkCj09PSBURVNUIFNDUklQVCBFTkQgPT09CgpV
+cGRhdGluZyAzYzhjZjVhOWMyMWZmODc4MjE2NGQxZGVmN2Y0NGJkODg4NzEzMzg0CkZyb20gaHR0
+cHM6Ly9naXRodWIuY29tL3BhdGNoZXctcHJvamVjdC9xZW11CiAqIFtuZXcgdGFnXSAgICAgICAg
+ICAgICAgIHBhdGNoZXcvMjAxNzExMTcxMDMwNDYuMTU5NDMtMS1rcmF4ZWxAcmVkaGF0LmNvbSAt
+PiBwYXRjaGV3LzIwMTcxMTE3MTAzMDQ2LjE1OTQzLTEta3JheGVsQHJlZGhhdC5jb20KU3dpdGNo
+ZWQgdG8gYSBuZXcgYnJhbmNoICd0ZXN0Jwo4YWQ4YTNhNDlmIGJ1aWxkOiBvcGVuZ2wgc2hvdWxk
+IG5vdCBuZWVkIFgxMQo2ZjMyNjg5OGJlIGN1cnNlczogYnVpbGQgYXMgbW9kdWxlCmYyOGNiZTBj
+NzEgZ3RrOiBidWlsZCBhcyBtb2R1bGUKYjQwYThhYjgzMSBzZGw6IGJ1aWxkIGFzIG1vZHVsZQpi
+MmZmMzU1MzBjIGNvbnNvbGU6IGFkZCB1aSBtb2R1bGUgbG9hZGluZyBzdXBwb3J0CjYwODU0MWVj
+ZjEgY29uc29sZTogYWRkIGFuZCB1c2UgcWVtdV9kaXNwbGF5X2ZpbmRfZGVmYXVsdApjOWVhNWM4
+Zjk4IGVnbC1oZWFkbGVzczogaG9vayB1cCB0byBkaXNwbGF5IHJlZ2lzdHJ5CmU0MDI3NjExZDYg
+Y3Vyc2VzOiBob29rIHVwIHRvIGRpc3BsYXkgcmVnaXN0cnkKZTgwNzM4YTJlNCBjb2NvYTogaG9v
+ayB1cCB0byBkaXNwbGF5IHJlZ2lzdHJ5CmQ0ZTE0MGJjMGQgc2RsOiBob29rIHVwIHRvIGRpc3Bs
+YXkgcmVnaXN0cnkKNTI3MTQ2YmJhZiBjb25zb2xlOiBhZGQgcWVtdSBkaXNwbGF5IHJlZ2lzdHJ5
+LCBhZGQgZ3RrCjMzODc4Y2E5Mzggdmw6IGRyb3AgcmVxdWVzdF9vcGVuZ2wgdmFyaWFibGUKZDc4
+OGM3YjAyYiB2bDogZHJvcCBkaXNwbGF5X3R5cGUgdmFyaWFibGUKNzk4NjRiZjVhOCB2bDogZHJv
+cCBmdWxsX3NjcmVlbiB2YXJpYWJsZQo4NjkyMGU4MDBmIGNvY29hOiB1c2UgRGlzcGxheU9wdGlv
+bnMKYzQ1MmE2ZTI0MyBjdXJzZXM6IHVzZSBEaXNwbGF5T3B0aW9ucwoyYzgyOTUwZjFjIGVnbC1o
+ZWFkbGVzczogdXNlIERpc3BsYXlPcHRpb25zCmIxNDRhOTVkM2Qgdmw6IGRyb3Agbm9fcXVpdCB2
+YXJpYWJsZQo2NDBiNTliNzUyIHNkbDogdXNlIERpc3BsYXlPcHRpb25zCjJhMzA4MWQzNWIgZ3Rr
+OiBhZGQgYW5kIHVzZSBEaXNwbGF5T3B0aW9ucyArIERpc3BsYXlHVEsKNzU2ODI0ZDBjZiB2bDog
+cmVuYW1lIERpc3BsYXlUeXBlIHRvIExlZ2FjeURpc3BsYXlUeXBlCmE3YTZmMGMwYjIgc2RsOiB1
+c2UgY3RybC1hbHQtZyBhcyBncmFiIGhvdGtleQplNGRkZTM0MzhmIHNkbDogcmVtb3ZlIC1hbHQt
+Z3JhYiBhbmQgLWN0cmwtZ3JhYiBzdXBwb3J0CjFjMzJkZDYyNGYgc2RsOiByZW1vdmUgLW5vLWZy
+YW1lIHN1cHBvcnQKCj09PSBPVVRQVVQgQkVHSU4gPT09CkNoZWNraW5nIFBBVENIIDEvMjQ6IHNk
+bDogcmVtb3ZlIC1uby1mcmFtZSBzdXBwb3J0Li4uCkNoZWNraW5nIFBBVENIIDIvMjQ6IHNkbDog
+cmVtb3ZlIC1hbHQtZ3JhYiBhbmQgLWN0cmwtZ3JhYiBzdXBwb3J0Li4uCkVSUk9SOiBzcGFjZSBw
+cm9oaWJpdGVkIGFmdGVyIHRoYXQgJyYnIChjdHg6V3hXKQojNDg6IEZJTEU6IHVpL3NkbC5jOjU1
+NDoKKyAgICBtb2Rfc3RhdGUgPSAoU0RMX0dldE1vZFN0YXRlKCkgJiBndWlfZ3JhYl9jb2RlKSA9
+PSBndWlfZ3JhYl9jb2RlOwogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBeCgpF
+UlJPUjogc3BhY2UgcHJvaGliaXRlZCBhZnRlciB0aGF0ICcmJyAoY3R4Old4VykKIzk2OiBGSUxF
+OiB1aS9zZGwyLmM6MzMzOgorICAgIG1vZF9zdGF0ZSA9IChTRExfR2V0TW9kU3RhdGUoKSAmIGd1
+aV9ncmFiX2NvZGUpID09IGd1aV9ncmFiX2NvZGU7CiAgICAgICAgICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgIF4KCnRvdGFsOiAyIGVycm9ycywgMCB3YXJuaW5ncywgMTM1IGxpbmVzIGNoZWNr
+ZWQKCllvdXIgcGF0Y2ggaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55
+IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBt
+YWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KCkNoZWNraW5nIFBBVENI
+IDMvMjQ6IHNkbDogdXNlIGN0cmwtYWx0LWcgYXMgZ3JhYiBob3RrZXkuLi4KQ2hlY2tpbmcgUEFU
+Q0ggNC8yNDogdmw6IHJlbmFtZSBEaXNwbGF5VHlwZSB0byBMZWdhY3lEaXNwbGF5VHlwZS4uLgpD
+aGVja2luZyBQQVRDSCA1LzI0OiBndGs6IGFkZCBhbmQgdXNlIERpc3BsYXlPcHRpb25zICsgRGlz
+cGxheUdUSy4uLgpDaGVja2luZyBQQVRDSCA2LzI0OiBzZGw6IHVzZSBEaXNwbGF5T3B0aW9ucy4u
+LgpDaGVja2luZyBQQVRDSCA3LzI0OiB2bDogZHJvcCBub19xdWl0IHZhcmlhYmxlLi4uCkNoZWNr
+aW5nIFBBVENIIDgvMjQ6IGVnbC1oZWFkbGVzczogdXNlIERpc3BsYXlPcHRpb25zLi4uCkNoZWNr
+aW5nIFBBVENIIDkvMjQ6IGN1cnNlczogdXNlIERpc3BsYXlPcHRpb25zLi4uCkNoZWNraW5nIFBB
+VENIIDEwLzI0OiBjb2NvYTogdXNlIERpc3BsYXlPcHRpb25zLi4uCkNoZWNraW5nIFBBVENIIDEx
+LzI0OiB2bDogZHJvcCBmdWxsX3NjcmVlbiB2YXJpYWJsZS4uLgpDaGVja2luZyBQQVRDSCAxMi8y
+NDogdmw6IGRyb3AgZGlzcGxheV90eXBlIHZhcmlhYmxlLi4uCkNoZWNraW5nIFBBVENIIDEzLzI0
+OiB2bDogZHJvcCByZXF1ZXN0X29wZW5nbCB2YXJpYWJsZS4uLgpDaGVja2luZyBQQVRDSCAxNC8y
+NDogY29uc29sZTogYWRkIHFlbXUgZGlzcGxheSByZWdpc3RyeSwgYWRkIGd0ay4uLgpDaGVja2lu
+ZyBQQVRDSCAxNS8yNDogc2RsOiBob29rIHVwIHRvIGRpc3BsYXkgcmVnaXN0cnkuLi4KQ2hlY2tp
+bmcgUEFUQ0ggMTYvMjQ6IGNvY29hOiBob29rIHVwIHRvIGRpc3BsYXkgcmVnaXN0cnkuLi4KQ2hl
+Y2tpbmcgUEFUQ0ggMTcvMjQ6IGN1cnNlczogaG9vayB1cCB0byBkaXNwbGF5IHJlZ2lzdHJ5Li4u
+CkNoZWNraW5nIFBBVENIIDE4LzI0OiBlZ2wtaGVhZGxlc3M6IGhvb2sgdXAgdG8gZGlzcGxheSBy
+ZWdpc3RyeS4uLgpDaGVja2luZyBQQVRDSCAxOS8yNDogY29uc29sZTogYWRkIGFuZCB1c2UgcWVt
+dV9kaXNwbGF5X2ZpbmRfZGVmYXVsdC4uLgpDaGVja2luZyBQQVRDSCAyMC8yNDogY29uc29sZTog
+YWRkIHVpIG1vZHVsZSBsb2FkaW5nIHN1cHBvcnQuLi4KQ2hlY2tpbmcgUEFUQ0ggMjEvMjQ6IHNk
+bDogYnVpbGQgYXMgbW9kdWxlLi4uCkNoZWNraW5nIFBBVENIIDIyLzI0OiBndGs6IGJ1aWxkIGFz
+IG1vZHVsZS4uLgpDaGVja2luZyBQQVRDSCAyMy8yNDogY3Vyc2VzOiBidWlsZCBhcyBtb2R1bGUu
+Li4KQ2hlY2tpbmcgUEFUQ0ggMjQvMjQ6IGJ1aWxkOiBvcGVuZ2wgc2hvdWxkIG5vdCBuZWVkIFgx
+MS4uLgo9PT0gT1VUUFVUIEVORCA9PT0KClRlc3QgY29tbWFuZCBleGl0ZWQgd2l0aCBjb2RlOiAx
+CgoKLS0tCkVtYWlsIGdlbmVyYXRlZCBhdXRvbWF0aWNhbGx5IGJ5IFBhdGNoZXcgW2h0dHA6Ly9w
+YXRjaGV3Lm9yZy9dLgpQbGVhc2Ugc2VuZCB5b3VyIGZlZWRiYWNrIHRvIHBhdGNoZXctZGV2ZWxA
+ZnJlZWxpc3RzLm9yZw==
