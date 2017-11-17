@@ -1,26 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58760)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33837)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jfreimann@redhat.com>) id 1eFckD-0001BZ-KX
-	for qemu-devel@nongnu.org; Fri, 17 Nov 2017 04:15:30 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1eFctk-00047h-9e
+	for qemu-devel@nongnu.org; Fri, 17 Nov 2017 04:25:21 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jfreimann@redhat.com>) id 1eFckC-0003L2-N0
-	for qemu-devel@nongnu.org; Fri, 17 Nov 2017 04:15:29 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:45904)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <jfreimann@redhat.com>)
-	id 1eFckC-0003KU-GF
-	for qemu-devel@nongnu.org; Fri, 17 Nov 2017 04:15:28 -0500
-Date: Fri, 17 Nov 2017 10:15:20 +0100
-From: Jens Freimann <jfreimann@redhat.com>
-Message-ID: <20171117091520.3n4xrohvkk26osrl@dhcp-192-218.str.redhat.com>
-References: <20171116184835.28556-1-maxime.coquelin@redhat.com>
-	<20171116184835.28556-2-maxime.coquelin@redhat.com>
+	(envelope-from <peter.maydell@linaro.org>) id 1eFctj-0004Vj-Fh
+	for qemu-devel@nongnu.org; Fri, 17 Nov 2017 04:25:20 -0500
+Received: from mail-wm0-x244.google.com ([2a00:1450:400c:c09::244]:43183)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1eFctj-0004V1-5Q
+	for qemu-devel@nongnu.org; Fri, 17 Nov 2017 04:25:19 -0500
+Received: by mail-wm0-x244.google.com with SMTP id x63so5079225wmf.2
+	for <qemu-devel@nongnu.org>; Fri, 17 Nov 2017 01:25:18 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii; format=flowed
-Content-Disposition: inline
-In-Reply-To: <20171116184835.28556-2-maxime.coquelin@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH 1/2] virtio: Add queue interface to restore
- avail index from vring used index
+In-Reply-To: <1510850407-17266-1-git-send-email-mst@redhat.com>
+References: <1510850407-17266-1-git-send-email-mst@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Fri, 17 Nov 2017 09:24:57 +0000
+Message-ID: <CAFEAcA8uoR98QD1p09q=XvmEy+0hSYYPZhRBCkh2z1mWtFuqVg@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PULL 0/9] pc, pci, virtio: fixes for rc1
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,23 +28,30 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Maxime Coquelin <maxime.coquelin@redhat.com>
-Cc: mst@redhat.com, yuri.benditovich@daynix.com, yvugenfi@redhat.com, jasowang@redhat.com, qemu-devel@nongnu.org
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 
-On Thu, Nov 16, 2017 at 06:48:34PM +0000, Maxime Coquelin wrote:
->In case of backend crash, it is not possible to restore internal
->avail index from the backend value as vhost_get_vring_base
->callback fails.
+On 16 November 2017 at 16:40, Michael S. Tsirkin <mst@redhat.com> wrote:
+> The following changes since commit 6a7cb8c3d674815cab08d884740d203fded12249:
 >
->This patch provides a new interface to restore internal avail index
->from the vring used index, as done by some vhost-user backend on
->reconnection.
+>   Merge remote-tracking branch 'remotes/rth/tags/pull-tcg-20171115' into staging (2017-11-16 12:45:14 +0000)
 >
->Signed-off-by: Maxime Coquelin <maxime.coquelin@redhat.com>
->---
-> hw/virtio/virtio.c         | 10 ++++++++++
-> include/hw/virtio/virtio.h |  1 +
-> 2 files changed, 11 insertions(+)
+> are available in the git repository at:
+>
+>   git://git.kernel.org/pub/scm/virt/kvm/mst/qemu.git tags/for_upstream
+>
+> for you to fetch changes up to 3831c07b89ab1f7aa1427bc56e9cdf70f5367933:
+>
+>   tests/bios-tables-test: Fix endianess problems when passing data to iasl (2017-11-16 18:36:54 +0200)
+>
+> ----------------------------------------------------------------
+> pc, pci, virtio: fixes for rc1
+>
+> A bunch of fixes all over the place.
+>
+> Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
 >
 
-Reviewed-by: Jens Freimann <jfreimann@redhat.com>
+Applied, thanks.
+
+-- PMM
