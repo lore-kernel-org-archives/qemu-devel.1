@@ -1,23 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48849)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49372)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1eFbv7-0001Nl-U1
-	for qemu-devel@nongnu.org; Fri, 17 Nov 2017 03:22:43 -0500
+	(envelope-from <jiangyiwen@huawei.com>) id 1eFbxX-0002PB-5s
+	for qemu-devel@nongnu.org; Fri, 17 Nov 2017 03:25:11 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1eFbv6-00066I-BN
-	for qemu-devel@nongnu.org; Fri, 17 Nov 2017 03:22:41 -0500
-References: <20171113162053.58795-1-vsementsov@virtuozzo.com>
-	<01108daa-fed3-c142-bbd6-0ecc4c8b795d@redhat.com>
-	<cd0a2e5e-f788-0e5a-dec7-f428479f3b89@virtuozzo.com>
-	<8c61f43c-5f56-8c1b-a2fe-f954d34dc687@redhat.com>
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Message-ID: <40392ab9-ec2a-30ed-ddab-a557682a4192@virtuozzo.com>
-Date: Fri, 17 Nov 2017 11:22:26 +0300
+	(envelope-from <jiangyiwen@huawei.com>) id 1eFbxU-0000NB-1l
+	for qemu-devel@nongnu.org; Fri, 17 Nov 2017 03:25:11 -0500
+Received: from szxga04-in.huawei.com ([45.249.212.190]:2792)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_ARCFOUR_SHA1:16) (Exim 4.71)
+	(envelope-from <jiangyiwen@huawei.com>) id 1eFbxT-0000Io-Ej
+	for qemu-devel@nongnu.org; Fri, 17 Nov 2017 03:25:07 -0500
+From: jiangyiwen <jiangyiwen@huawei.com>
+Message-ID: <5A0E9C91.4050108@huawei.com>
+Date: Fri, 17 Nov 2017 16:23:45 +0800
 MIME-Version: 1.0
-In-Reply-To: <8c61f43c-5f56-8c1b-a2fe-f954d34dc687@redhat.com>
-Content-Language: en-US
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH for-2.12 0/4] qmp dirty bitmap API
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+Subject: [Qemu-devel] [PATCH] Don't ignore O_DIRECT flag in the 9pfs server
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,108 +24,41 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: John Snow <jsnow@redhat.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org
-Cc: kwolf@redhat.com, famz@redhat.com, armbru@redhat.com, mnestratov@virtuozzo.com, mreitz@redhat.com, nshirokovskiy@virtuozzo.com, stefanha@redhat.com, den@openvz.org, pbonzini@redhat.com
+To: aneesh.kumar@linux.vnet.ibm.com, groug@kaod.org, qemu-devel@nongnu.org
+Cc: sochin.jiang@huawei.com, Eduard.Shishkin@huawei.com
 
-17.11.2017 06:10, John Snow wrote:
->
-> On 11/16/2017 03:17 AM, Vladimir Sementsov-Ogievskiy wrote:
->> 16.11.2017 00:20, John Snow wrote:
->>> On 11/13/2017 11:20 AM, Vladimir Sementsov-Ogievskiy wrote:
->>>> Hi all.
->>>>
->>>> There are three qmp commands, needed to implement external backup API.
->>>>
->>>> Using these three commands, client may do all needed bitmap
->>>> management by
->>>> hand:
->>>>
->>>> on backup start we need to do a transaction:
->>>>    {disable old bitmap, create new bitmap}
->>>>
->>>> on backup success:
->>>>    drop old bitmap
->>>>
->>>> on backup fail:
->>>>    enable old bitmap
->>>>    merge new bitmap to old bitmap
->>>>    drop new bitmap
->>>>
->>> Can you give me an example of how you expect these commands to be used,
->>> and why they're required?
->>>
->>> I'm a little weary about how error-prone these commands might be and the
->>> potential for incorrect usage seems... high. Why do we require them?
->> It is needed for incremental backup. It looks like bad idea to export
->> abdicate/reclaim functionality, it is simpler
->> and clearer to allow user to merge/enable/disable bitmaps by hand.
->>
->> usage is like this:
->>
->> 1. we have dirty bitmap bitmap0 for incremental backup.
->>
->> 2. prepare image fleecing (create temporary image with backing=our_disk)
->> 3. in qmp transaction:
->>      - disable bitmap0
->>      - create bitmap1
->>      - start image fleecing (backup sync=none our_disk -> temp_disk)
-> This could probably just be its own command, though:
->
-> block-job-fleece node=foobar bitmap=bitmap0 etc=etera etc=etera
->
-> Could handle forking the bitmap. I'm not sure what the arguments would
-> look like, but we could name the NBD export here, too. (Assuming the
-> server is already started and we just need to create the share.)
->
-> Then, we can basically do what mirror does:
->
-> (1) Cancel
-> (2) Complete
->
-> Cancel would instruct QEMU to keep the bitmap changes (i.e. roll back),
-> and Complete would instruct QEMU to discard the changes.
->
-> This way we don't need to expose commands like split or merge that will
-> almost always be dangerous to use over QMP.
->
-> In fact, a fleecing job would be really convenient even without a
-> bitmap, because it'd still be nice to have a convenience command for it.
-> Using an existing infrastructure and understood paradigm is just a bonus.
+Now v9fs in linux has already supported O_DIRECT(v9fs_direct_IO),
+when guest user open file with O_DIRECT flag and return success,
+so user hopes data doesn't pass through page cache, but 9pfs in
+qemu ignore direct disk access and use host page cache, it is not
+match to DIRECT_IO semantic, so we should not ignore O_DIRECT in
+9pfs unless v9fs in linux don't support DIRECT_IO.
 
-1. If I understand correctly, Kevin and Max said in their report in 
-Prague about new block-job approach,
-   using filter nodes, so I'm not sure that this is a good Idea to 
-introduce now new old-style block-job, where we can
-   do without it.
+And if server fs don't support O_DIRECT, user will receive -EINVAL
+and know the filesystem don't support O_DIRECT.
 
-2. there is the following scenario: customers needs a possibility to 
-create a backup of data changed since some
-point in time. So, maintaining several static and one (or several) activ 
-bitmaps with a possiblity of merge some of them
-and create a backup using this merged bitmap may be convenient.
+So in order to ensure semantic consistency, don't ignore direct
+disk access in 9pfs.
 
-3. And I don't see any danger here: we already can create, delete and 
-clear dirty bitmaps through qmp. Some additional
-operations should not be bad.
+Signed-off-by: Yiwen Jiang <jiangyiwen@huawei.com>
+---
+ hw/9pfs/9p.c | 4 ----
+ 1 file changed, 4 deletions(-)
 
-4. Interesting: "disabled" field looks like never used..
-
->
->> 4. export temp_disk (it looks like a snapshot) and bitmap0 through NBD
->>
->> === external tool can get bitmap0 and then copy some clusters through
->> NBD ===
->>
->> on successful backup external tool can drop bitmap0. or can save it and
->> reuse somehow
->>
->> on failed backup external tool can do the following:
->>      - enable bitmap0
->>      - merge bitmap1 to bitmap0
->>      - drop bitmap1
->>
-
+diff --git a/hw/9pfs/9p.c b/hw/9pfs/9p.c
+index 52d4663..5ea01c4 100644
+--- a/hw/9pfs/9p.c
++++ b/hw/9pfs/9p.c
+@@ -155,10 +155,6 @@ static int get_dotl_openflags(V9fsState *s, int oflags)
+      */
+     flags = dotl_to_open_flags(oflags);
+     flags &= ~(O_NOCTTY | O_ASYNC | O_CREAT);
+-    /*
+-     * Ignore direct disk access hint until the server supports it.
+-     */
+-    flags &= ~O_DIRECT;
+     return flags;
+ }
 
 -- 
-Best regards,
-Vladimir
+1.8.3.1
