@@ -1,22 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60014)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60363)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1eFi9z-00026J-KL
-	for qemu-devel@nongnu.org; Fri, 17 Nov 2017 10:02:30 -0500
+	(envelope-from <kraxel@redhat.com>) id 1eFiB4-0003In-43
+	for qemu-devel@nongnu.org; Fri, 17 Nov 2017 10:03:39 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1eFi9q-00048A-5M
-	for qemu-devel@nongnu.org; Fri, 17 Nov 2017 10:02:27 -0500
-References: <20171023092945.54532-1-vsementsov@virtuozzo.com>
-	<20171117123059.GB4795@localhost.localdomain>
-From: Max Reitz <mreitz@redhat.com>
-Message-ID: <b95aaa97-39d0-fdc1-21a1-2e0ea7acac17@redhat.com>
-Date: Fri, 17 Nov 2017 16:01:56 +0100
+	(envelope-from <kraxel@redhat.com>) id 1eFiB1-0005jf-20
+	for qemu-devel@nongnu.org; Fri, 17 Nov 2017 10:03:34 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:55168)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1eFiB0-0005ik-Sn
+	for qemu-devel@nongnu.org; Fri, 17 Nov 2017 10:03:30 -0500
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+	[10.5.11.15])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 1D945C051674
+	for <qemu-devel@nongnu.org>; Fri, 17 Nov 2017 15:03:30 +0000 (UTC)
+Date: Fri, 17 Nov 2017 16:03:28 +0100
+From: Gerd Hoffmann <kraxel@redhat.com>
+Message-ID: <20171117150328.dfqke3kb3axdg2n2@sirius.home.kraxel.org>
+References: <20171117103046.15943-1-kraxel@redhat.com>
+	<20171117103046.15943-20-kraxel@redhat.com>
+	<20171117125535.dhyvy5qwnh6d6e7d@starbug-vm.ie.oracle.com>
+	<20171117132454.33pngiqu7vcdbmm5@sirius.home.kraxel.org>
+	<20171117141650.bhvfbzbibo7trmv4@starbug-vm.ie.oracle.com>
 MIME-Version: 1.0
-In-Reply-To: <20171117123059.GB4795@localhost.localdomain>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="8d1EGbFmIvtbWs1Exxia2J1wpDtCRGUtH"
-Subject: Re: [Qemu-devel] [PATCH] block/snapshot: dirty all dirty bitmaps on
- snapshot-switch
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20171117141650.bhvfbzbibo7trmv4@starbug-vm.ie.oracle.com>
+Subject: Re: [Qemu-devel] [PATCH 19/24] console: add and use
+ qemu_display_find_default
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,75 +37,41 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Kevin Wolf <kwolf@redhat.com>, Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Cc: qemu-block@nongnu.org, qemu-devel@nongnu.org, eblake@redhat.com, jsnow@redhat.com, famz@redhat.com, den@openvz.org, stefanha@redhat.com
+To: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Markus Armbruster <armbru@redhat.com>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---8d1EGbFmIvtbWs1Exxia2J1wpDtCRGUtH
-From: Max Reitz <mreitz@redhat.com>
-To: Kevin Wolf <kwolf@redhat.com>,
- Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Cc: qemu-block@nongnu.org, qemu-devel@nongnu.org, eblake@redhat.com,
- jsnow@redhat.com, famz@redhat.com, den@openvz.org, stefanha@redhat.com
-Message-ID: <b95aaa97-39d0-fdc1-21a1-2e0ea7acac17@redhat.com>
-Subject: Re: [PATCH] block/snapshot: dirty all dirty bitmaps on
- snapshot-switch
-References: <20171023092945.54532-1-vsementsov@virtuozzo.com>
- <20171117123059.GB4795@localhost.localdomain>
-In-Reply-To: <20171117123059.GB4795@localhost.localdomain>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+  Hi,
 
-On 2017-11-17 13:30, Kevin Wolf wrote:
-> Am 23.10.2017 um 11:29 hat Vladimir Sementsov-Ogievskiy geschrieben:
->> Snapshot-switch actually changes active state of disk so it should
->> reflect on dirty bitmaps. Otherwise next incremental backup using
->> these bitmaps will be invalid.
->>
->> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>=
+> OK, so the odd thing then is the check for !remote_display earlier
+> on in the function (missing from the quote above) which seems to end
+> up initializing VNC (albeit with localhost) when CONFIG_VNC is
+> defined, but no other local display type has been selected.
 
->=20
-> We discussed this quite a while ago, and I'm still not convinced that
-> this approach makes sense.
+remote_display is set in case either -vnc or -spice was given on the
+command line, and qemu will not start a local user display in that case
+(unless you explicitly ask for it via -display).
 
-I think it at least makes more sense than not handling this case at all.
+> OK, so neither SPICE or VNC really fit into this patchset because
+> they are seen as additional to the display type, not the actual
+> display type - SPICE is even more special too given the dependency
+> on a guest VM driver to really function correctly.
 
-> Can you give just one example of a use case where dirtying the whole
-> bitmap while loading a snapshot is the desired behaviour?
->=20
-> I think the most useful behaviour would be something where the bitmaps
-> themselves are snapshotted, too.
+Hmm?  spice works just fine with any display.
 
-Agreed.
+> I wonder should there be a, similar, qemu_display_find_remote_default()
+> which would be used when no local display is defined. And that would
+> use a similar mechanism to permit selecting VNC or SPICE via
+> registration mechanisms over rather than the #ifdef style for remote
+> displays that will remain ever after this patchset (certainly could
+> be another patchset beyond this one).
 
->                                  But for the time being, the easiest an=
-d
-> safest solution might just be to error out in any snapshot operations
-> if any bitmaps are in use.
+Well, historically qemu tried to do alot of stuff (like picking a
+display to use) automatically for the user.  And we did stick to that
+for backward compatibility reasons.  But this automagic causes quite
+some headache now and then, when changing things and the autmagic logic
+gets into the way.  So I don't feel like adding more of this.  Also vnc
+is in pretty much any qemu build, because it is enabled by default and
+doesn't need any external dependencies, so falling back to spice would
+be quite rare ...
 
-Sounds OK, too.  I personally don't have an opinion either way.
-
-But in any case, what we did before this patch was definitely wrong so I
-consider it an improvement.
-
-Max
-
-
---8d1EGbFmIvtbWs1Exxia2J1wpDtCRGUtH
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQFGBAEBCAAwFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAloO+eQSHG1yZWl0ekBy
-ZWRoYXQuY29tAAoJEPQH2wBh1c9AlgoIAKOKOq/v0mGsXHa3JqDbSmfrkJI/yASc
-z7AxmA1UCsVNyNk0M7RGjs3I5o3LNXWZdyOzXpW9ZQju1B3O0ZUSZ9JVSuCqfy42
-WTNp/yVWECqynoRUeTSY3hWvYXbM64tOrX+OK7kDCIL+3i2jP5HwOBqDKBOtdNmL
-InEfoHnN01GJPz8vTsiB9FN1wbYSD+GKHHPslTP871vz1e3xYZwwA1WqJDt2ebWK
-yO8/KGO9VpkyZ8MuzAxFubFqX8B1QMsJJu+XNuYZBdt6Auh5CLhho7NQGpXxbQRQ
-+W8qagIVgouhqzEaaPydWVQ65bN3wpqmzhEi0petMp1RMC8hcn30DGI=
-=3uaP
------END PGP SIGNATURE-----
-
---8d1EGbFmIvtbWs1Exxia2J1wpDtCRGUtH--
+cheers,
+  Gerd
