@@ -1,23 +1,14 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59692)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34576)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1eFlna-0003FM-Au
-	for qemu-devel@nongnu.org; Fri, 17 Nov 2017 13:55:35 -0500
+	(envelope-from <eblake@redhat.com>) id 1eFlwM-0006BA-5d
+	for qemu-devel@nongnu.org; Fri, 17 Nov 2017 14:04:39 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1eFlnZ-0000H7-C3
-	for qemu-devel@nongnu.org; Fri, 17 Nov 2017 13:55:34 -0500
-References: <20171117164747.11525-1-eblake@redhat.com>
-	<9279377e-9165-d6b9-930f-7949c2c1fb72@redhat.com>
-	<dbb84db4-ead4-e8cf-25c4-fba4dd8701c4@redhat.com>
+	(envelope-from <eblake@redhat.com>) id 1eFlwL-0000Ia-59
+	for qemu-devel@nongnu.org; Fri, 17 Nov 2017 14:04:38 -0500
 From: Eric Blake <eblake@redhat.com>
-Message-ID: <b9dd49c3-6272-d709-0c1c-e915cbabbf30@redhat.com>
-Date: Fri, 17 Nov 2017 12:55:25 -0600
-MIME-Version: 1.0
-In-Reply-To: <dbb84db4-ead4-e8cf-25c4-fba4dd8701c4@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="78edtggCNEcahD8dj4iAKf9tRiHcFJbM3"
-Subject: Re: [Qemu-devel] [PATCH for-2.11] qcow2: fix image corruption on
- commit with persistent snapshot
+Date: Fri, 17 Nov 2017 13:04:22 -0600
+Message-Id: <20171117190422.23626-1-eblake@redhat.com>
+Subject: [Qemu-devel] [PATCH for-2.11] iotests: Fix 176 on 32-bit host
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,67 +17,91 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Max Reitz <mreitz@redhat.com>, qemu-devel@nongnu.org
-Cc: kwolf@redhat.com, vsementsov@virtuozzo.com, qemu-block@nongnu.org
+To: qemu-devel@nongnu.org
+Cc: mreitz@redhat.com, kwolf@redhat.com, qemu-block@nongnu.org
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---78edtggCNEcahD8dj4iAKf9tRiHcFJbM3
-From: Eric Blake <eblake@redhat.com>
-To: Max Reitz <mreitz@redhat.com>, qemu-devel@nongnu.org
-Cc: kwolf@redhat.com, vsementsov@virtuozzo.com, qemu-block@nongnu.org
-Message-ID: <b9dd49c3-6272-d709-0c1c-e915cbabbf30@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH for-2.11] qcow2: fix image corruption on
- commit with persistent snapshot
-References: <20171117164747.11525-1-eblake@redhat.com>
- <9279377e-9165-d6b9-930f-7949c2c1fb72@redhat.com>
- <dbb84db4-ead4-e8cf-25c4-fba4dd8701c4@redhat.com>
-In-Reply-To: <dbb84db4-ead4-e8cf-25c4-fba4dd8701c4@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+The contents of a qcow2 bitmap are rounded up to a size that
+matches the number of bits available for the granularity, but
+that granularity differs for 32-bit hosts (our default 64k
+cluster allows for 2M bitmap coverage per 'long') and 64-bit
+hosts (4M bitmap per 'long').  If the image is a multiple of
+2M but not 4M, then the number of bytes occupied by the array
+of longs in memory differs between architecture, thus
+resulting in different SHA256 hashes.
 
-On 11/17/2017 12:46 PM, Eric Blake wrote:
+Furthermore (but untested by me), if our computation of the
+SHA256 hash is at all endian-dependent because of how we store
+data in memory, that's another variable we'd have to account
+for (ideally, we specified the bitmap stored in qcow2 as
+fixed-endian on disk, because the same qcow2 file must be
+usable across any architecture; but that says nothing about
+how we represent things in memory).  But we already have test
+165 to validate that bitmaps are stored correctly on disk,
+while this test is merely testing that the bitmap exists.
 
->>
->> The test fails with -m32 and probably also on Big Endian architectures=
-,
->> because the bitmap hash differs.
->=20
-> Oh my.  Thanks for the rapid testing.
->=20
->> We could "fix" this by replacing the 2100 by a 2102, so for both bit
->> widths rounding is the same.
+So for this test, the easiest solution is to filter out the
+actual hash value.  Broken in commit 4096974e.
 
-Actually, thinking about it more, are we sure that a .qcow2 image
-created on an -m32 host can be properly loaded on a 64-bit host, despite
-their different rounded-up sizes for the bitmaps?  If the difference in
-hash is due only to the in-memory representation, but the on-disk layout
-is identical, then we are safe; but if the difference in hash is visible
-on-disk, then we have a real bug in our qcow2 specification or
-implementation of persistent bitmaps.
+Reported-by: Max Reitz <mreitz@redhat.com>
+Signed-off-by: Eric Blake <eblake@redhat.com>
+---
+ tests/qemu-iotests/176     | 3 ++-
+ tests/qemu-iotests/176.out | 8 ++++----
+ 2 files changed, 6 insertions(+), 5 deletions(-)
 
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
+diff --git a/tests/qemu-iotests/176 b/tests/qemu-iotests/176
+index 0f31a20294..b8dc17c592 100755
+--- a/tests/qemu-iotests/176
++++ b/tests/qemu-iotests/176
+@@ -52,7 +52,8 @@ _supported_os Linux
+ function run_qemu()
+ {
+     $QEMU -nographic -qmp stdio -serial none "$@" 2>&1 \
+-	| _filter_testdir | _filter_qmp | _filter_qemu
++	| _filter_testdir | _filter_qmp | _filter_qemu \
++        | sed 's/"sha256": ".\{64\}"/"sha256": HASH/'
+ }
 
+ for reason in snapshot bitmap; do
+diff --git a/tests/qemu-iotests/176.out b/tests/qemu-iotests/176.out
+index e62085cd0a..f03a2e776c 100644
+--- a/tests/qemu-iotests/176.out
++++ b/tests/qemu-iotests/176.out
+@@ -205,7 +205,7 @@ Offset          Length          File
+ QMP_VERSION
+ {"return": {}}
+ {"return": {}}
+-{"return": {"sha256": "e12600978d86b5a453861ae5c17d275204673fef3874b7c3c5433c6153d84706"}}
++{"return": {"sha256": HASH}}
+ {"return": {}}
+ {"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "SHUTDOWN", "data": {"guest": false}}
 
---78edtggCNEcahD8dj4iAKf9tRiHcFJbM3
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
+@@ -255,7 +255,7 @@ Offset          Length          File
+ QMP_VERSION
+ {"return": {}}
+ {"return": {}}
+-{"return": {"sha256": "e12600978d86b5a453861ae5c17d275204673fef3874b7c3c5433c6153d84706"}}
++{"return": {"sha256": HASH}}
+ {"return": {}}
+ {"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "SHUTDOWN", "data": {"guest": false}}
 
------BEGIN PGP SIGNATURE-----
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+@@ -305,7 +305,7 @@ Offset          Length          File
+ QMP_VERSION
+ {"return": {}}
+ {"return": {}}
+-{"return": {"sha256": "e12600978d86b5a453861ae5c17d275204673fef3874b7c3c5433c6153d84706"}}
++{"return": {"sha256": HASH}}
+ {"return": {}}
+ {"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "SHUTDOWN", "data": {"guest": false}}
 
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAloPMJ0ACgkQp6FrSiUn
-Q2pgLwgAgaCvuJRYk7Z5F4RV4cgA34U7q/JfckAsR8a+5+NU18V3XWz6Bt3hMJnz
-hEOfdTZy4GFVlYZDSr5qvHEtglQIMa71jtMH5MuBkJauSz+QuVq3wegKSOJ0aSHI
-9gb277J+kQXZlN0dCMwtCBCESWDixoUyRtT2ygwCfswrVv3gCHzYmAo63TKi5yBH
-1VBZC9E4P41s10dvsgZCdtxAdUC2N9pnK8N6tn5N3huIEIYNxOjs79/H8dlQCxsT
-6+7+t1Rq1ocqeMzFAu8onuiLEnKH0lHxEKWIpXHrq1CfbbQQm3FukutnUZKWVI4C
-N6iYAkrq8TQdesNs217FYVzMRIT6zg==
-=6bKx
------END PGP SIGNATURE-----
-
---78edtggCNEcahD8dj4iAKf9tRiHcFJbM3--
+@@ -352,7 +352,7 @@ Offset          Length          File
+ QMP_VERSION
+ {"return": {}}
+ {"return": {}}
+-{"return": {"sha256": "e12600978d86b5a453861ae5c17d275204673fef3874b7c3c5433c6153d84706"}}
++{"return": {"sha256": HASH}}
+ {"return": {}}
+ {"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "SHUTDOWN", "data": {"guest": false}}
+ *** done
+-- 
+2.13.6
