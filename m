@@ -1,21 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43183)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43175)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1eFlCg-0001RC-F5
-	for qemu-devel@nongnu.org; Fri, 17 Nov 2017 13:17:27 -0500
+	(envelope-from <kwolf@redhat.com>) id 1eFlCg-0001Qs-9C
+	for qemu-devel@nongnu.org; Fri, 17 Nov 2017 13:17:28 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1eFlCf-0002Xa-Bp
+	(envelope-from <kwolf@redhat.com>) id 1eFlCe-0002Wk-9y
 	for qemu-devel@nongnu.org; Fri, 17 Nov 2017 13:17:26 -0500
-References: <20171117164747.11525-1-eblake@redhat.com>
-From: Max Reitz <mreitz@redhat.com>
-Message-ID: <9279377e-9165-d6b9-930f-7949c2c1fb72@redhat.com>
-Date: Fri, 17 Nov 2017 19:17:17 +0100
-MIME-Version: 1.0
-In-Reply-To: <20171117164747.11525-1-eblake@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="n1JoHCJ4XxkhHotJwGgK4OLesBQKceRFs"
-Subject: Re: [Qemu-devel] [PATCH for-2.11] qcow2: fix image corruption on
- commit with persistent snapshot
+From: Kevin Wolf <kwolf@redhat.com>
+Date: Fri, 17 Nov 2017 19:16:43 +0100
+Message-Id: <20171117181653.20651-16-kwolf@redhat.com>
+In-Reply-To: <20171117181653.20651-1-kwolf@redhat.com>
+References: <20171117181653.20651-1-kwolf@redhat.com>
+Subject: [Qemu-devel] [PULL 15/25] tests: Add check-qobject for equality
+ tests
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,108 +20,401 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org
-Cc: qemu-block@nongnu.org, kwolf@redhat.com, vsementsov@virtuozzo.com
+To: qemu-block@nongnu.org
+Cc: kwolf@redhat.com, qemu-devel@nongnu.org
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---n1JoHCJ4XxkhHotJwGgK4OLesBQKceRFs
 From: Max Reitz <mreitz@redhat.com>
-To: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org
-Cc: qemu-block@nongnu.org, kwolf@redhat.com, vsementsov@virtuozzo.com
-Message-ID: <9279377e-9165-d6b9-930f-7949c2c1fb72@redhat.com>
-Subject: Re: [PATCH for-2.11] qcow2: fix image corruption on commit with
- persistent snapshot
-References: <20171117164747.11525-1-eblake@redhat.com>
-In-Reply-To: <20171117164747.11525-1-eblake@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
 
-On 2017-11-17 17:47, Eric Blake wrote:
-> If an image contains persistent snapshots, we cannot use the
-> fast path of bdrv_make_empty() to clear the image during
-> qemu-img commit, because that will lose the clusters related
-> to the bitmaps.
->=20
-> Also leave a comment in qcow2_read_extensions to remind future
-> feature additions to think about fast-path removal, since we
-> just barely fixed the same bug for LUKS encryption.
->=20
-> It's a pain that qemu-img has not yet been taught to manipulate,
-> or even at a very minimum display, information about persistent
-> bitmaps; instead, we have to use QMP commands.  It's also a
-> pain that only qeury-block and x-debug-block-dirty-bitmap-sha256
-> will allow bitmap introspection; but the former requires the
-> node to be hooked to a block device, and the latter is experimental.
->=20
-> Signed-off-by: Eric Blake <eblake@redhat.com>
-> ---
->=20
-> As promised, based on Dan's similar patch for LUKS encryption
->=20
->  block/qcow2.c              |  17 ++--
->  tests/qemu-iotests/176     |  55 ++++++++++--
->  tests/qemu-iotests/176.out | 216 +++++++++++++++++++++++++++++++++++++=
-+++++++-
->  3 files changed, 270 insertions(+), 18 deletions(-)
+Add a new test file (check-qobject.c) for unit tests that concern
+QObjects as a whole.
 
-The test fails with -m32 and probably also on Big Endian architectures,
-because the bitmap hash differs.
+Its only purpose for now is to test the qobject_is_equal() function.
 
-The reason the hash differs for -m32 is because of different bitmap
-sizes: The default bitmap granularity is 64 kB, so for 32 bit this means
-the bitmap always covers a multiple of 2 MB, whereas for 64 bit, the
-bitmap always covers a multiple of 4 MB.
-> diff --git a/tests/qemu-iotests/176 b/tests/qemu-iotests/176
-> index 950b28720e..0f31a20294 100755
-> --- a/tests/qemu-iotests/176
-> +++ b/tests/qemu-iotests/176
+Signed-off-by: Max Reitz <mreitz@redhat.com>
+Message-id: 20171114180128.17076-7-mreitz@redhat.com
+Reviewed-by: Eric Blake <eblake@redhat.com>
+Signed-off-by: Max Reitz <mreitz@redhat.com>
+---
+ tests/check-qobject.c  | 328 +++++++++++++++++++++++++++++++++++++++++++++++++
+ tests/.gitignore       |   1 +
+ tests/Makefile.include |   4 +-
+ 3 files changed, 332 insertions(+), 1 deletion(-)
+ create mode 100644 tests/check-qobject.c
 
-[...]
-
-> @@ -66,14 +74,29 @@ _supported_os Linux
->  for i in 0 1 2 3; do
->=20
->  echo
-> -echo "=3D=3D=3D Test pass $i =3D=3D=3D"
-> +echo "=3D=3D=3D Test pass $reason.$i =3D=3D=3D"
->  echo
->=20
->  len=3D$((2100 * 1024 * 1024 + 512)) # larger than 2G, and not cluster =
-aligned
-
-That means that with -m64, the bitmap will behave as if a 2104 MB image
-has been created, but with -m32, it will behave as if it is a 2102 MB
-image.  Therefore, you get different hashes (because the 64 bit bitmap
-has 32 more zero bits than the 32 bit bitmap).
-
-We could "fix" this by replacing the 2100 by a 2102, so for both bit
-widths rounding is the same.  But that would still leave the issue open
-for Big Endian architectures (which generate just completely different
-hashes) -- and I'm not really a fan of testing this on every possible
-architecture and then adding different reference outputs.
-
-Therefore, the best fix is probably to just filter the hashes out (you
-don't need the exact value anyway, do you?), and I think it's fine to do
-this as a follow-up.
-
-Max
-
-
---n1JoHCJ4XxkhHotJwGgK4OLesBQKceRFs
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQFGBAEBCAAwFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAloPJ60SHG1yZWl0ekBy
-ZWRoYXQuY29tAAoJEPQH2wBh1c9A6L4IAKrEJ677oYzpK413xSNW8oQ8nm93qpH9
-IC7opgTv0kbPj3nNGBDVCH+xxhsPxghFSdn7HutLk41221k9pJTlXcqWfiChO5Av
-qUygxubL0fwP30OO/xXqEiivRG8rnW+oGflS4zv0PCtAEwedQV6FJpVAzLyKa3RQ
-PoPhyGSHeB9sepGMSNZquA7lZq92kdC1qA9K7yraUmD7J+IVV26fzohYhxSq0lFT
-gpgvvAvqL5xETz/zuTv6aXBgkOPv6Pb0CEYUxCHeUrR0xEUrTAOE6lUn5L9ZTxGr
-z4Sq8s1tIIrpAEmmkSTI+spMa7XhcMLjFiPBS6B8JEfsZsm4tbf5g+w=
-=q/0L
------END PGP SIGNATURE-----
-
---n1JoHCJ4XxkhHotJwGgK4OLesBQKceRFs--
+diff --git a/tests/check-qobject.c b/tests/check-qobject.c
+new file mode 100644
+index 0000000000..03e9175113
+--- /dev/null
++++ b/tests/check-qobject.c
+@@ -0,0 +1,328 @@
++/*
++ * Generic QObject unit-tests.
++ *
++ * Copyright (C) 2017 Red Hat Inc.
++ *
++ * This work is licensed under the terms of the GNU LGPL, version 2.1 or later.
++ * See the COPYING.LIB file in the top-level directory.
++ */
++#include "qemu/osdep.h"
++
++#include "qapi/qmp/types.h"
++#include "qemu-common.h"
++
++#include <math.h>
++
++/* Marks the end of the test_equality() argument list.
++ * We cannot use NULL there because that is a valid argument. */
++static QObject test_equality_end_of_arguments;
++
++/**
++ * Test whether all variadic QObject *arguments are equal (@expected
++ * is true) or whether they are all not equal (@expected is false).
++ * Every QObject is tested to be equal to itself (to test
++ * reflexivity), all tests are done both ways (to test symmetry), and
++ * transitivity is not assumed but checked (each object is compared to
++ * every other one).
++ *
++ * Note that qobject_is_equal() is not really an equivalence relation,
++ * so this function may not be used for all objects (reflexivity is
++ * not guaranteed, e.g. in the case of a QNum containing NaN).
++ *
++ * The @_ argument is required because a boolean may not be the last
++ * argument before a variadic argument list (C11 7.16.1.4 para. 4).
++ */
++static void do_test_equality(bool expected, int _, ...)
++{
++    va_list ap_count, ap_extract;
++    QObject **args;
++    int arg_count = 0;
++    int i, j;
++
++    va_start(ap_count, _);
++    va_copy(ap_extract, ap_count);
++    while (va_arg(ap_count, QObject *) != &test_equality_end_of_arguments) {
++        arg_count++;
++    }
++    va_end(ap_count);
++
++    args = g_new(QObject *, arg_count);
++    for (i = 0; i < arg_count; i++) {
++        args[i] = va_arg(ap_extract, QObject *);
++    }
++    va_end(ap_extract);
++
++    for (i = 0; i < arg_count; i++) {
++        g_assert(qobject_is_equal(args[i], args[i]) == true);
++
++        for (j = i + 1; j < arg_count; j++) {
++            g_assert(qobject_is_equal(args[i], args[j]) == expected);
++        }
++    }
++}
++
++#define check_equal(...) \
++    do_test_equality(true, 0, __VA_ARGS__, &test_equality_end_of_arguments)
++#define check_unequal(...) \
++    do_test_equality(false, 0, __VA_ARGS__, &test_equality_end_of_arguments)
++
++static void do_free_all(int _, ...)
++{
++    va_list ap;
++    QObject *obj;
++
++    va_start(ap, _);
++    while ((obj = va_arg(ap, QObject *)) != NULL) {
++        qobject_decref(obj);
++    }
++    va_end(ap);
++}
++
++#define free_all(...) \
++    do_free_all(0, __VA_ARGS__, NULL)
++
++static void qobject_is_equal_null_test(void)
++{
++    check_unequal(qnull(), NULL);
++}
++
++static void qobject_is_equal_num_test(void)
++{
++    QNum *u0, *i0, *d0, *dnan, *um42, *im42, *dm42;
++
++    u0 = qnum_from_uint(0u);
++    i0 = qnum_from_int(0);
++    d0 = qnum_from_double(0.0);
++    dnan = qnum_from_double(NAN);
++    um42 = qnum_from_uint((uint64_t)-42);
++    im42 = qnum_from_int(-42);
++    dm42 = qnum_from_double(-42.0);
++
++    /* Integers representing a mathematically equal number should
++     * compare equal */
++    check_equal(u0, i0);
++    /* Doubles, however, are always unequal to integers */
++    check_unequal(u0, d0);
++    check_unequal(i0, d0);
++
++    /* Do not assume any object is equal to itself -- note however
++     * that NaN cannot occur in a JSON object anyway. */
++    g_assert(qobject_is_equal(QOBJECT(dnan), QOBJECT(dnan)) == false);
++
++    /* No unsigned overflow */
++    check_unequal(um42, im42);
++    check_unequal(um42, dm42);
++    check_unequal(im42, dm42);
++
++    free_all(u0, i0, d0, dnan, um42, im42, dm42);
++}
++
++static void qobject_is_equal_bool_test(void)
++{
++    QBool *btrue_0, *btrue_1, *bfalse_0, *bfalse_1;
++
++    btrue_0 = qbool_from_bool(true);
++    btrue_1 = qbool_from_bool(true);
++    bfalse_0 = qbool_from_bool(false);
++    bfalse_1 = qbool_from_bool(false);
++
++    check_equal(btrue_0, btrue_1);
++    check_equal(bfalse_0, bfalse_1);
++    check_unequal(btrue_0, bfalse_0);
++
++    free_all(btrue_0, btrue_1, bfalse_0, bfalse_1);
++}
++
++static void qobject_is_equal_string_test(void)
++{
++    QString *str_base, *str_whitespace_0, *str_whitespace_1, *str_whitespace_2;
++    QString *str_whitespace_3, *str_case, *str_built;
++
++    str_base = qstring_from_str("foo");
++    str_whitespace_0 = qstring_from_str(" foo");
++    str_whitespace_1 = qstring_from_str("foo ");
++    str_whitespace_2 = qstring_from_str("foo\b");
++    str_whitespace_3 = qstring_from_str("fooo\b");
++    str_case = qstring_from_str("Foo");
++
++    /* Should yield "foo" */
++    str_built = qstring_from_substr("form", 0, 1);
++    qstring_append_chr(str_built, 'o');
++
++    check_unequal(str_base, str_whitespace_0, str_whitespace_1,
++                  str_whitespace_2, str_whitespace_3, str_case);
++
++    check_equal(str_base, str_built);
++
++    free_all(str_base, str_whitespace_0, str_whitespace_1, str_whitespace_2,
++             str_whitespace_3, str_case, str_built);
++}
++
++static void qobject_is_equal_list_test(void)
++{
++    QList *list_0, *list_1, *list_cloned;
++    QList *list_reordered, *list_longer, *list_shorter;
++
++    list_0 = qlist_new();
++    list_1 = qlist_new();
++    list_reordered = qlist_new();
++    list_longer = qlist_new();
++    list_shorter = qlist_new();
++
++    qlist_append_int(list_0, 1);
++    qlist_append_int(list_0, 2);
++    qlist_append_int(list_0, 3);
++
++    qlist_append_int(list_1, 1);
++    qlist_append_int(list_1, 2);
++    qlist_append_int(list_1, 3);
++
++    qlist_append_int(list_reordered, 1);
++    qlist_append_int(list_reordered, 3);
++    qlist_append_int(list_reordered, 2);
++
++    qlist_append_int(list_longer, 1);
++    qlist_append_int(list_longer, 2);
++    qlist_append_int(list_longer, 3);
++    qlist_append_null(list_longer);
++
++    qlist_append_int(list_shorter, 1);
++    qlist_append_int(list_shorter, 2);
++
++    list_cloned = qlist_copy(list_0);
++
++    check_equal(list_0, list_1, list_cloned);
++    check_unequal(list_0, list_reordered, list_longer, list_shorter);
++
++    /* With a NaN in it, the list should no longer compare equal to
++     * itself */
++    qlist_append(list_0, qnum_from_double(NAN));
++    g_assert(qobject_is_equal(QOBJECT(list_0), QOBJECT(list_0)) == false);
++
++    free_all(list_0, list_1, list_cloned, list_reordered, list_longer,
++             list_shorter);
++}
++
++static void qobject_is_equal_dict_test(void)
++{
++    Error *local_err = NULL;
++    QDict *dict_0, *dict_1, *dict_cloned;
++    QDict *dict_different_key, *dict_different_value, *dict_different_null_key;
++    QDict *dict_longer, *dict_shorter, *dict_nested;
++    QDict *dict_crumpled;
++
++    dict_0 = qdict_new();
++    dict_1 = qdict_new();
++    dict_different_key = qdict_new();
++    dict_different_value = qdict_new();
++    dict_different_null_key = qdict_new();
++    dict_longer = qdict_new();
++    dict_shorter = qdict_new();
++    dict_nested = qdict_new();
++
++    qdict_put_int(dict_0, "f.o", 1);
++    qdict_put_int(dict_0, "bar", 2);
++    qdict_put_int(dict_0, "baz", 3);
++    qdict_put_null(dict_0, "null");
++
++    qdict_put_int(dict_1, "f.o", 1);
++    qdict_put_int(dict_1, "bar", 2);
++    qdict_put_int(dict_1, "baz", 3);
++    qdict_put_null(dict_1, "null");
++
++    qdict_put_int(dict_different_key, "F.o", 1);
++    qdict_put_int(dict_different_key, "bar", 2);
++    qdict_put_int(dict_different_key, "baz", 3);
++    qdict_put_null(dict_different_key, "null");
++
++    qdict_put_int(dict_different_value, "f.o", 42);
++    qdict_put_int(dict_different_value, "bar", 2);
++    qdict_put_int(dict_different_value, "baz", 3);
++    qdict_put_null(dict_different_value, "null");
++
++    qdict_put_int(dict_different_null_key, "f.o", 1);
++    qdict_put_int(dict_different_null_key, "bar", 2);
++    qdict_put_int(dict_different_null_key, "baz", 3);
++    qdict_put_null(dict_different_null_key, "none");
++
++    qdict_put_int(dict_longer, "f.o", 1);
++    qdict_put_int(dict_longer, "bar", 2);
++    qdict_put_int(dict_longer, "baz", 3);
++    qdict_put_int(dict_longer, "xyz", 4);
++    qdict_put_null(dict_longer, "null");
++
++    qdict_put_int(dict_shorter, "f.o", 1);
++    qdict_put_int(dict_shorter, "bar", 2);
++    qdict_put_int(dict_shorter, "baz", 3);
++
++    qdict_put(dict_nested, "f", qdict_new());
++    qdict_put_int(qdict_get_qdict(dict_nested, "f"), "o", 1);
++    qdict_put_int(dict_nested, "bar", 2);
++    qdict_put_int(dict_nested, "baz", 3);
++    qdict_put_null(dict_nested, "null");
++
++    dict_cloned = qdict_clone_shallow(dict_0);
++
++    check_equal(dict_0, dict_1, dict_cloned);
++    check_unequal(dict_0, dict_different_key, dict_different_value,
++                  dict_different_null_key, dict_longer, dict_shorter,
++                  dict_nested);
++
++    dict_crumpled = qobject_to_qdict(qdict_crumple(dict_1, &local_err));
++    g_assert(!local_err);
++    check_equal(dict_crumpled, dict_nested);
++
++    qdict_flatten(dict_nested);
++    check_equal(dict_0, dict_nested);
++
++    /* Containing an NaN value will make this dict compare unequal to
++     * itself */
++    qdict_put(dict_0, "NaN", qnum_from_double(NAN));
++    g_assert(qobject_is_equal(QOBJECT(dict_0), QOBJECT(dict_0)) == false);
++
++    free_all(dict_0, dict_1, dict_cloned, dict_different_key,
++             dict_different_value, dict_different_null_key, dict_longer,
++             dict_shorter, dict_nested, dict_crumpled);
++}
++
++static void qobject_is_equal_conversion_test(void)
++{
++    QNum *u0, *i0, *d0;
++    QString *s0, *s_empty;
++    QBool *bfalse;
++
++    u0 = qnum_from_uint(0u);
++    i0 = qnum_from_int(0);
++    d0 = qnum_from_double(0.0);
++    s0 = qstring_from_str("0");
++    s_empty = qstring_new();
++    bfalse = qbool_from_bool(false);
++
++    /* No automatic type conversion */
++    check_unequal(u0, s0, s_empty, bfalse, qnull(), NULL);
++    check_unequal(i0, s0, s_empty, bfalse, qnull(), NULL);
++    check_unequal(d0, s0, s_empty, bfalse, qnull(), NULL);
++
++    free_all(u0, i0, d0, s0, s_empty, bfalse);
++}
++
++int main(int argc, char **argv)
++{
++    g_test_init(&argc, &argv, NULL);
++
++    g_test_add_func("/public/qobject_is_equal_null",
++                    qobject_is_equal_null_test);
++    g_test_add_func("/public/qobject_is_equal_num", qobject_is_equal_num_test);
++    g_test_add_func("/public/qobject_is_equal_bool",
++                    qobject_is_equal_bool_test);
++    g_test_add_func("/public/qobject_is_equal_string",
++                    qobject_is_equal_string_test);
++    g_test_add_func("/public/qobject_is_equal_list",
++                    qobject_is_equal_list_test);
++    g_test_add_func("/public/qobject_is_equal_dict",
++                    qobject_is_equal_dict_test);
++    g_test_add_func("/public/qobject_is_equal_conversion",
++                    qobject_is_equal_conversion_test);
++
++    return g_test_run();
++}
+diff --git a/tests/.gitignore b/tests/.gitignore
+index 53cb2efaee..74e55d7264 100644
+--- a/tests/.gitignore
++++ b/tests/.gitignore
+@@ -8,6 +8,7 @@ check-qjson
+ check-qlist
+ check-qlit
+ check-qnull
++check-qobject
+ check-qstring
+ check-qom-interface
+ check-qom-proplist
+diff --git a/tests/Makefile.include b/tests/Makefile.include
+index 434a2ce868..c002352134 100644
+--- a/tests/Makefile.include
++++ b/tests/Makefile.include
+@@ -41,6 +41,7 @@ check-unit-y += tests/check-qlist$(EXESUF)
+ gcov-files-check-qlist-y = qobject/qlist.c
+ check-unit-y += tests/check-qnull$(EXESUF)
+ gcov-files-check-qnull-y = qobject/qnull.c
++check-unit-y += tests/check-qobject$(EXESUF)
+ check-unit-y += tests/check-qjson$(EXESUF)
+ gcov-files-check-qjson-y = qobject/qjson.c
+ check-unit-y += tests/check-qlit$(EXESUF)
+@@ -546,7 +547,7 @@ GENERATED_FILES += tests/test-qapi-types.h tests/test-qapi-visit.h \
+ 	tests/test-qmp-introspect.h
+ 
+ test-obj-y = tests/check-qnum.o tests/check-qstring.o tests/check-qdict.o \
+-	tests/check-qlist.o tests/check-qnull.o \
++	tests/check-qlist.o tests/check-qnull.o tests/check-qobject.o \
+ 	tests/check-qjson.o tests/check-qlit.o \
+ 	tests/test-coroutine.o tests/test-string-output-visitor.o \
+ 	tests/test-string-input-visitor.o tests/test-qobject-output-visitor.o \
+@@ -580,6 +581,7 @@ tests/check-qstring$(EXESUF): tests/check-qstring.o $(test-util-obj-y)
+ tests/check-qdict$(EXESUF): tests/check-qdict.o $(test-util-obj-y)
+ tests/check-qlist$(EXESUF): tests/check-qlist.o $(test-util-obj-y)
+ tests/check-qnull$(EXESUF): tests/check-qnull.o $(test-util-obj-y)
++tests/check-qobject$(EXESUF): tests/check-qobject.o $(test-util-obj-y)
+ tests/check-qjson$(EXESUF): tests/check-qjson.o $(test-util-obj-y)
+ tests/check-qlit$(EXESUF): tests/check-qlit.o $(test-util-obj-y)
+ tests/check-qom-interface$(EXESUF): tests/check-qom-interface.o $(test-qom-obj-y)
+-- 
+2.13.6
