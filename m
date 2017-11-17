@@ -1,23 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54541)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55136)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1eFhvD-0004ex-Sn
-	for qemu-devel@nongnu.org; Fri, 17 Nov 2017 09:47:13 -0500
+	(envelope-from <kraxel@redhat.com>) id 1eFhxB-0005om-9S
+	for qemu-devel@nongnu.org; Fri, 17 Nov 2017 09:49:14 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1eFhv9-0004YG-Lv
-	for qemu-devel@nongnu.org; Fri, 17 Nov 2017 09:47:11 -0500
-References: <20171030163309.75770-1-vsementsov@virtuozzo.com>
-	<20171030163309.75770-5-vsementsov@virtuozzo.com>
-	<a593e984-5d1e-a95c-9b80-dbe82227b8f9@redhat.com>
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Message-ID: <fac1abb3-f783-ec93-3a60-13dbd666d26e@virtuozzo.com>
-Date: Fri, 17 Nov 2017 17:46:58 +0300
+	(envelope-from <kraxel@redhat.com>) id 1eFhx7-0007Th-5a
+	for qemu-devel@nongnu.org; Fri, 17 Nov 2017 09:49:13 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:59846)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1eFhx6-0007Ss-VP
+	for qemu-devel@nongnu.org; Fri, 17 Nov 2017 09:49:09 -0500
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+	[10.5.11.11])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id DA9817655D
+	for <qemu-devel@nongnu.org>; Fri, 17 Nov 2017 14:49:07 +0000 (UTC)
+Date: Fri, 17 Nov 2017 15:49:06 +0100
+From: Gerd Hoffmann <kraxel@redhat.com>
+Message-ID: <20171117144906.4z36tvqclc2gah2d@sirius.home.kraxel.org>
+References: <20171117103046.15943-1-kraxel@redhat.com>
+	<20171117103046.15943-2-kraxel@redhat.com>
+	<20171117142130.GU25830@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <a593e984-5d1e-a95c-9b80-dbe82227b8f9@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
-Content-Language: en-US
-Subject: Re: [Qemu-devel] [PATCH v8 04/14] block/dirty-bitmap: add
- bdrv_dirty_bitmap_set_frozen
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20171117142130.GU25830@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH 01/24] sdl: remove -no-frame support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,166 +34,29 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: John Snow <jsnow@redhat.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org, famz@redhat.com
-Cc: kwolf@redhat.com, peter.maydell@linaro.org, lirans@il.ibm.com, quintela@redhat.com, armbru@redhat.com, mreitz@redhat.com, stefanha@redhat.com, den@openvz.org, amit.shah@redhat.com, pbonzini@redhat.com, dgilbert@redhat.com
+To: "Daniel P. Berrange" <berrange@redhat.com>
+Cc: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Markus Armbruster <armbru@redhat.com>
 
-14.11.2017 02:32, John Snow wrote:
->
-> On 10/30/2017 12:32 PM, Vladimir Sementsov-Ogievskiy wrote:
->> Make it possible to set bitmap 'frozen' without a successor.
->> This is needed to protect the bitmap during outgoing bitmap postcopy
->> migration.
->>
->> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
->> ---
->>   include/block/dirty-bitmap.h |  1 +
->>   block/dirty-bitmap.c         | 22 ++++++++++++++++++++--
->>   2 files changed, 21 insertions(+), 2 deletions(-)
->>
->> diff --git a/include/block/dirty-bitmap.h b/include/block/dirty-bitmap.h
->> index a9e2a92e4f..ae6d697850 100644
->> --- a/include/block/dirty-bitmap.h
->> +++ b/include/block/dirty-bitmap.h
->> @@ -39,6 +39,7 @@ uint32_t bdrv_get_default_bitmap_granularity(BlockDriverState *bs);
->>   uint32_t bdrv_dirty_bitmap_granularity(const BdrvDirtyBitmap *bitmap);
->>   bool bdrv_dirty_bitmap_enabled(BdrvDirtyBitmap *bitmap);
->>   bool bdrv_dirty_bitmap_frozen(BdrvDirtyBitmap *bitmap);
->> +void bdrv_dirty_bitmap_set_frozen(BdrvDirtyBitmap *bitmap, bool frozen);
->>   const char *bdrv_dirty_bitmap_name(const BdrvDirtyBitmap *bitmap);
->>   int64_t bdrv_dirty_bitmap_size(const BdrvDirtyBitmap *bitmap);
->>   DirtyBitmapStatus bdrv_dirty_bitmap_status(BdrvDirtyBitmap *bitmap);
->> diff --git a/block/dirty-bitmap.c b/block/dirty-bitmap.c
->> index 7578863aa1..67fc6bd6e0 100644
->> --- a/block/dirty-bitmap.c
->> +++ b/block/dirty-bitmap.c
->> @@ -40,6 +40,8 @@ struct BdrvDirtyBitmap {
->>       QemuMutex *mutex;
->>       HBitmap *bitmap;            /* Dirty bitmap implementation */
->>       HBitmap *meta;              /* Meta dirty bitmap */
->> +    bool frozen;                /* Bitmap is frozen, it can't be modified
->> +                                   through QMP */
-> I hesitate, because this now means that we have two independent bits of
-> state we need to update and maintain consistency with.
+On Fri, Nov 17, 2017 at 02:21:30PM +0000, Daniel P. Berrange wrote:
+> On Fri, Nov 17, 2017 at 11:30:23AM +0100, Gerd Hoffmann wrote:
+> > SDL2 doesn't support this any more, the SDL_NOFRAME window flag is gone.
+> > Drop the code, print a notice when the option is still used.
+> > 
+> > Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
+> > ---
+> >  include/ui/console.h |  5 ++---
+> >  ui/sdl.c             |  8 +-------
+> >  ui/sdl2.c            |  7 +------
+> >  vl.c                 | 15 ++++-----------
+> >  4 files changed, 8 insertions(+), 27 deletions(-)
+> 
+> This needs to go through the deprecation process before we can
+> drop it. There's still time to get it into 2.11 deprecated list
+> which would cut the time needed to wait for real deletion.
 
-it was your proposal)))
+I fail to see the point.  SDL2 simply doesn't support it, so it never
+worked with SDL2.  We switched to SDL2 as default recently.  So it seems
+fair to me to just say so instead of silently ignoring the option ...
 
-https://lists.gnu.org/archive/html/qemu-devel/2017-07/msg01172.html
-
-"
-Your new use case here sounds like Frozen to me, but it simply does not
-have an anonymous successor to force it to be recognized as "frozen." We
-can add a `bool protected` or `bool frozen` field to force recognition
-of this status and adjust the json documentation accordingly.
-
-I think then we'd have four recognized states:
-
-FROZEN: Cannot be reset/deleted. Bitmap is in-use by a block job or
-other internal process. Bitmap is otherwise ACTIVE.
-DISABLED: Not recording any writes (by choice.)
-READONLY: Not able to record any writes (by necessity.)
-ACTIVE: Normal bitmap status.
-
-Sound right?
-"
-
-
->
-> Before:
->
-> Frozen: "Bitmap has a successor and is no longer itself recording
-> writes, though we are guaranteed to have a successor doing so on our
-> behalf."
->
-> After:
->
-> Frozen: "Bitmap may or may not have a successor, but it is disabled with
-> an even more limited subset of tasks than a traditionally disabled bitmap."
->
-> This changes the meaning of "frozen" a little, and I am not sure that is
-> a problem as such, but it does make the interface seem a little
-> "fuzzier" than it did prior.
->
->>       BdrvDirtyBitmap *successor; /* Anonymous child; implies frozen status */
->>       char *name;                 /* Optional non-empty unique ID */
->>       int64_t size;               /* Size of the bitmap, in bytes */
->> @@ -183,13 +185,22 @@ const char *bdrv_dirty_bitmap_name(const BdrvDirtyBitmap *bitmap)
->>   /* Called with BQL taken.  */
->>   bool bdrv_dirty_bitmap_frozen(BdrvDirtyBitmap *bitmap)
->>   {
->> -    return bitmap->successor;
->> +    return bitmap->frozen;
->> +}
-> Are there any cases where we will be unfrozen, but actually have a
-> successor now? If so, under what circumstances does that happen?
->
->> +
->> +/* Called with BQL taken.  */
->> +void bdrv_dirty_bitmap_set_frozen(BdrvDirtyBitmap *bitmap, bool frozen)
->> +{
->> +    qemu_mutex_lock(bitmap->mutex);
->> +    assert(bitmap->successor == NULL);
->> +    bitmap->frozen = frozen;
->> +    qemu_mutex_unlock(bitmap->mutex);
->>   }
->>   
-> OK, so we can only "set frozen" (or unset) if we don't have a successor.
->
->>   /* Called with BQL taken.  */
->>   bool bdrv_dirty_bitmap_enabled(BdrvDirtyBitmap *bitmap)
->>   {
->> -    return !(bitmap->disabled || bitmap->successor);
->> +    return !(bitmap->disabled || (bitmap->successor != NULL));
->>   }
->>   
-> I guess this just makes 'successor' more obviously non-boolean, which is
-> fine.
->
->>   /* Called with BQL taken.  */
->> @@ -234,6 +245,7 @@ int bdrv_dirty_bitmap_create_successor(BlockDriverState *bs,
->>   
->>       /* Install the successor and freeze the parent */
->>       bitmap->successor = child;
->> +    bitmap->frozen = true;
->>       return 0;
->>   }
->>   
->> @@ -266,6 +278,8 @@ BdrvDirtyBitmap *bdrv_dirty_bitmap_abdicate(BlockDriverState *bs,
->>       name = bitmap->name;
->>       bitmap->name = NULL;
->>       successor->name = name;
->> +    assert(bitmap->frozen);
->> +    bitmap->frozen = false;
->>       bitmap->successor = NULL;
->>       successor->persistent = bitmap->persistent;
->>       bitmap->persistent = false;
->> @@ -298,6 +312,8 @@ BdrvDirtyBitmap *bdrv_reclaim_dirty_bitmap(BlockDriverState *bs,
->>           return NULL;
->>       }
->>       bdrv_release_dirty_bitmap(bs, successor);
->> +    assert(parent->frozen);
->> +    parent->frozen = false;
->>       parent->successor = NULL;
->>   
->>       return parent;
->> @@ -439,6 +455,8 @@ void bdrv_dirty_bitmap_release_successor(BlockDriverState *bs,
->>   
->>       if (parent->successor) {
->>           bdrv_release_dirty_bitmap_locked(bs, parent->successor);
->> +        assert(parent->frozen);
->> +        parent->frozen = false;
->>           parent->successor = NULL;
->>       }
->>   
->>
-> Tentatively:
->
-> Reviewed-by: John Snow <jsnow@redhat.com>
->
-> Fam, any thoughts?
->
-> --John
-
-
--- 
-Best regards,
-Vladimir
+cheers,
+  Gerd
