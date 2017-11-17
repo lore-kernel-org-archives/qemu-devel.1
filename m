@@ -1,27 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35878)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39491)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1eFg10-0007Ni-Ux
-	for qemu-devel@nongnu.org; Fri, 17 Nov 2017 07:45:04 -0500
+	(envelope-from <darren.kenny@oracle.com>) id 1eFgBQ-0001js-60
+	for qemu-devel@nongnu.org; Fri, 17 Nov 2017 07:55:49 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1eFg0w-0004vg-72
-	for qemu-devel@nongnu.org; Fri, 17 Nov 2017 07:45:03 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:56088)
+	(envelope-from <darren.kenny@oracle.com>) id 1eFgBN-0001tt-23
+	for qemu-devel@nongnu.org; Fri, 17 Nov 2017 07:55:48 -0500
+Received: from aserp1040.oracle.com ([141.146.126.69]:28578)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1eFg0v-0004vF-Uy
-	for qemu-devel@nongnu.org; Fri, 17 Nov 2017 07:44:58 -0500
-Date: Fri, 17 Nov 2017 14:44:48 +0200
-From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <20171117144253-mutt-send-email-mst@kernel.org>
-References: <1509696786-1597-1-git-send-email-wei.w.wang@intel.com>
-	<1509696786-1597-7-git-send-email-wei.w.wang@intel.com>
-	<20171115220743-mutt-send-email-mst@kernel.org>
-	<5A0D923C.4020807@intel.com> <5A0EC967.5090407@intel.com>
+	(Exim 4.71) (envelope-from <darren.kenny@oracle.com>)
+	id 1eFgBM-0001rZ-Qg
+	for qemu-devel@nongnu.org; Fri, 17 Nov 2017 07:55:44 -0500
+Date: Fri, 17 Nov 2017 12:55:35 +0000
+From: Darren Kenny <darren.kenny@oracle.com>
+Message-ID: <20171117125535.dhyvy5qwnh6d6e7d@starbug-vm.ie.oracle.com>
+References: <20171117103046.15943-1-kraxel@redhat.com>
+	<20171117103046.15943-20-kraxel@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Disposition: inline
-In-Reply-To: <5A0EC967.5090407@intel.com>
-Subject: Re: [Qemu-devel] [virtio-dev] Re: [PATCH v17 6/6] virtio-balloon:
- VIRTIO_BALLOON_F_FREE_PAGE_VQ
+In-Reply-To: <20171117103046.15943-20-kraxel@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH 19/24] console: add and use
+ qemu_display_find_default
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,113 +29,101 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Wei Wang <wei.w.wang@intel.com>
-Cc: aarcange@redhat.com, virtio-dev@lists.oasis-open.org, kvm@vger.kernel.org, mawilcox@microsoft.com, qemu-devel@nongnu.org, amit.shah@redhat.com, penguin-kernel@I-love.SAKURA.ne.jp, linux-kernel@vger.kernel.org, willy@infradead.org, virtualization@lists.linux-foundation.org, linux-mm@kvack.org, yang.zhang.wz@gmail.com, quan.xu@aliyun.com, cornelia.huck@de.ibm.com, pbonzini@redhat.com, akpm@linux-foundation.org, mhocko@kernel.org, mgorman@techsingularity.net, liliang.opensource@gmail.com
+To: Gerd Hoffmann <kraxel@redhat.com>
+Cc: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Markus Armbruster <armbru@redhat.com>
 
-On Fri, Nov 17, 2017 at 07:35:03PM +0800, Wei Wang wrote:
-> On 11/16/2017 09:27 PM, Wei Wang wrote:
-> > On 11/16/2017 04:32 AM, Michael S. Tsirkin wrote:
-> > > On Fri, Nov 03, 2017 at 04:13:06PM +0800, Wei Wang wrote:
-> > > > Negotiation of the VIRTIO_BALLOON_F_FREE_PAGE_VQ feature indicates the
-> > > > support of reporting hints of guest free pages to the host via
-> > > > virtio-balloon. The host requests the guest to report the free pages by
-> > > > sending commands via the virtio-balloon configuration registers.
-> > > > 
-> > > > When the guest starts to report, the first element added to the
-> > > > free page
-> > > > vq is a sequence id of the start reporting command. The id is given by
-> > > > the host, and it indicates whether the following free pages correspond
-> > > > to the command. For example, the host may stop the report and
-> > > > start again
-> > > > with a new command id. The obsolete pages for the previous start
-> > > > command
-> > > > can be detected by the id dismatching on the host. The id is
-> > > > added to the
-> > > > vq using an output buffer, and the free pages are added to the vq using
-> > > > input buffer.
-> > > > 
-> > > > Here are some explainations about the added configuration registers:
-> > > > - host2guest_cmd: a register used by the host to send commands to the
-> > > > guest.
-> > > > - guest2host_cmd: written by the guest to ACK to the host about the
-> > > > commands that have been received. The host will clear the corresponding
-> > > > bits on the host2guest_cmd register. The guest also uses this register
-> > > > to send commands to the host (e.g. when finish free page reporting).
-> > > > - free_page_cmd_id: the sequence id of the free page report command
-> > > > given by the host.
-> > > > 
-> > > > Signed-off-by: Wei Wang <wei.w.wang@intel.com>
-> > > > Signed-off-by: Liang Li <liang.z.li@intel.com>
-> > > > Cc: Michael S. Tsirkin <mst@redhat.com>
-> > > > Cc: Michal Hocko <mhocko@kernel.org>
-> > > > ---
-> > > > 
-> > > > +
-> > > > +static void report_free_page(struct work_struct *work)
-> > > > +{
-> > > > +    struct virtio_balloon *vb;
-> > > > +
-> > > > +    vb = container_of(work, struct virtio_balloon,
-> > > > report_free_page_work);
-> > > > +    report_free_page_cmd_id(vb);
-> > > > +    walk_free_mem_block(vb, 0, &virtio_balloon_send_free_pages);
-> > > > +    /*
-> > > > +     * The last few free page blocks that were added may not reach the
-> > > > +     * batch size, but need a kick to notify the device to
-> > > > handle them.
-> > > > +     */
-> > > > +    virtqueue_kick(vb->free_page_vq);
-> > > > +    report_free_page_end(vb);
-> > > > +}
-> > > > +
-> > > I think there's an issue here: if pages are poisoned and hypervisor
-> > > subsequently drops them, testing them after allocation will
-> > > trigger a false positive.
-> > > 
-> > > The specific configuration:
-> > > 
-> > > PAGE_POISONING on
-> > > PAGE_POISONING_NO_SANITY off
-> > > PAGE_POISONING_ZERO off
-> > > 
-> > > 
-> > > Solutions:
-> > > 1. disable the feature in that configuration
-> > >     suggested as an initial step
-> > 
-> > Thanks for the finding.
-> > Similar to this option: I'm thinking could we make walk_free_mem_block()
-> > simply return if that option is on?
-> > That is, at the beginning of the function:
-> >     if (!page_poisoning_enabled())
-> >                 return;
-> > 
-> 
-> 
-> Thought about it more, I think it would be better to put this logic to
-> virtio_balloon:
-> 
->         send_free_page_cmd_id(vb, &vb->start_cmd_id);
->         if (page_poisoning_enabled() &&
->             !IS_ENABLED(CONFIG_PAGE_POISONING_NO_SANITY))
->                 walk_free_mem_block(vb, 0, &virtio_balloon_send_free_pages);
->         send_free_page_cmd_id(vb, &vb->stop_cmd_id);
-> 
-> 
-> walk_free_mem_block() should be a more generic API, and this potential page
-> poisoning issue is specific to live migration which is only one use case of
-> this function, so I think it is better to handle it in the special use case
-> itself.
-> 
-> Best,
-> Wei
-> 
+On Fri, Nov 17, 2017 at 11:30:41AM +0100, Gerd Hoffmann wrote:
+>Using the new registry instead of #ifdefs in vl.c.
+>
+>Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
+>---
+> include/ui/console.h |  1 +
+> ui/console.c         | 19 +++++++++++++++++++
+> vl.c                 | 15 +++++----------
+> 3 files changed, 25 insertions(+), 10 deletions(-)
+>
+>diff --git a/include/ui/console.h b/include/ui/console.h
+>index 6c89599355..7c9e40cc9a 100644
+>--- a/include/ui/console.h
+>+++ b/include/ui/console.h
+>@@ -442,6 +442,7 @@ struct QemuDisplay {
+> };
+>
+> void qemu_display_register(QemuDisplay *ui);
+>+bool qemu_display_find_default(DisplayOptions *opts);
+> void qemu_display_early_init(DisplayOptions *opts);
+> void qemu_display_init(DisplayState *ds, DisplayOptions *opts);
+>
+>diff --git a/ui/console.c b/ui/console.c
+>index aa8afbfe26..4c9ac8b21a 100644
+>--- a/ui/console.c
+>+++ b/ui/console.c
+>@@ -2176,6 +2176,25 @@ void qemu_display_register(QemuDisplay *ui)
+>     dpys[ui->type] = ui;
+> }
+>
+>+bool qemu_display_find_default(DisplayOptions *opts)
+>+{
+>+    static DisplayType prio[] = {
+>+        DISPLAY_TYPE_GTK,
+>+        DISPLAY_TYPE_SDL,
+>+        DISPLAY_TYPE_COCOA
+>+    };
+>+    int i;
+>+
+>+    for (i = 0; i < ARRAY_SIZE(prio); i++) {
+>+        if (dpys[prio[i]] == NULL) {
+>+            continue;
+>+        }
+>+        opts->type = prio[i];
+>+        return true;
+>+    }
+>+    return false;
+>+}
+>+
+> void qemu_display_early_init(DisplayOptions *opts)
+> {
+>     assert(opts->type < DISPLAY_TYPE__MAX);
+>diff --git a/vl.c b/vl.c
+>index df0c10398d..f861562bb2 100644
+>--- a/vl.c
+>+++ b/vl.c
+>@@ -4406,17 +4406,12 @@ int main(int argc, char **argv, char **envp)
+>     }
+> #endif
+>     if (dpy.type == DISPLAY_TYPE_DEFAULT && !display_remote) {
+>-#if defined(CONFIG_GTK)
+>-        dpy.type = DISPLAY_TYPE_GTK;
+>-#elif defined(CONFIG_SDL)
+>-        dpy.type = DISPLAY_TYPE_SDL;
+>-#elif defined(CONFIG_COCOA)
+>-        dpy.type = DISPLAY_TYPE_COCOA;
+>-#elif defined(CONFIG_VNC)
+>-        vnc_parse("localhost:0,to=99,id=default", &error_abort);
+>-#else
+>-        dpy.type = DISPLAY_TYPE_NONE;
+>+        if (!qemu_display_find_default(&dpy)) {
+>+            dpy.type = DISPLAY_TYPE_NONE;
+>+#if defined(CONFIG_VNC)
+>+            vnc_parse("localhost:0,to=99,id=default", &error_abort);
+> #endif
 
-It's a quick work-around but it doesn't make me very happy.
+Mostly some questions on this:
 
-AFAIK e.g. RHEL has a debug kernel with poisoning enabled.
-If this never uses free page hinting at all, it will
-be much less useful for debugging guests.
+- I'm curious, why is VNC not just one of the ones searched for in
+  qemu_display_find_default()? 
 
--- 
-MST
+- What if there is another display type added? Would it be added to
+  qemu_display_find_default() or in this if statement?
+
+- Is there a reason that VNC doesn't follow the same registration
+  mechanism you're proposing here (as in you've no changes to that
+  module in this patch set).
+
+- In the spirit of encapsulation, would it not make sense for the
+  vnc_parse() to be in the VNC code itself as a fall back if no
+  specific options are given to the -vnc option?
+
+Thanks,
+
+Darren.
