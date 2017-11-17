@@ -1,25 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42927)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44549)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jasowang@redhat.com>) id 1eFWxH-0006Q7-2B
-	for qemu-devel@nongnu.org; Thu, 16 Nov 2017 22:04:36 -0500
+	(envelope-from <jsnow@redhat.com>) id 1eFX3Y-0008SE-6O
+	for qemu-devel@nongnu.org; Thu, 16 Nov 2017 22:11:05 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jasowang@redhat.com>) id 1eFWxD-0006UR-3L
-	for qemu-devel@nongnu.org; Thu, 16 Nov 2017 22:04:35 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:35718)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <jasowang@redhat.com>) id 1eFWxC-0006UA-Rp
-	for qemu-devel@nongnu.org; Thu, 16 Nov 2017 22:04:31 -0500
-References: <1510701814-52973-1-git-send-email-eswierk@skyportsystems.com>
-From: Jason Wang <jasowang@redhat.com>
-Message-ID: <e9f7aaa0-6b5d-e494-8da0-26bf3f4f6929@redhat.com>
-Date: Fri, 17 Nov 2017 11:04:25 +0800
+	(envelope-from <jsnow@redhat.com>) id 1eFX3X-0001SG-5x
+	for qemu-devel@nongnu.org; Thu, 16 Nov 2017 22:11:04 -0500
+References: <20171113162053.58795-1-vsementsov@virtuozzo.com>
+	<01108daa-fed3-c142-bbd6-0ecc4c8b795d@redhat.com>
+	<cd0a2e5e-f788-0e5a-dec7-f428479f3b89@virtuozzo.com>
+From: John Snow <jsnow@redhat.com>
+Message-ID: <8c61f43c-5f56-8c1b-a2fe-f954d34dc687@redhat.com>
+Date: Thu, 16 Nov 2017 22:10:48 -0500
 MIME-Version: 1.0
-In-Reply-To: <1510701814-52973-1-git-send-email-eswierk@skyportsystems.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
+In-Reply-To: <cd0a2e5e-f788-0e5a-dec7-f428479f3b89@virtuozzo.com>
+Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 0/2] e1000: Correct TX offload context
- handling
+Subject: Re: [Qemu-devel] [PATCH for-2.12 0/4] qmp dirty bitmap API
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,158 +25,93 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Ed Swierk <eswierk@skyportsystems.com>, "Daniel P . Berrange" <berrange@redhat.com>, Stefan Hajnoczi <stefanha@gmail.com>
-Cc: qemu-devel@nongnu.org
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org
+Cc: kwolf@redhat.com, famz@redhat.com, armbru@redhat.com, mnestratov@virtuozzo.com, mreitz@redhat.com, nshirokovskiy@virtuozzo.com, stefanha@redhat.com, den@openvz.org, pbonzini@redhat.com
 
 
 
-On 2017=E5=B9=B411=E6=9C=8815=E6=97=A5 07:23, Ed Swierk via Qemu-devel wr=
-ote:
-> The transmit offload implementation in QEMU's e1000 device is
-> deficient and causes packet data corruption in some situations.
->
-> According to the Intel 8254x software developer's manual[1], the
-> device maintains two separate contexts: the TCP segmentation offload
-> context includes parameters for both segmentation offload and checksum
-> offload, and the normal (checksum-offload-only) context includes only
-> checksum offload parameters. These parameters specify over which
-> packet data to compute the checksum, and where in the packet to store
-> the computed checksum(s).
->
-> [1] https://www.intel.com/content/dam/doc/manual/pci-pci-x-family-gbe-c=
-ontrollers-software-dev-manual.pdf
->
-> The e1000 driver can update either of these contexts by sending a
-> transmit context descriptor. The TSE bit in the TUCMD field controls
-> which context is modified by the descriptor. Crucially, a transmit
-> context descriptor with TSE=3D1 changes only the TSO context, leaving
-> the non-TSO context unchanged; with TSE=3D0 the opposite is true.
->
-> Fields in the transmit data descriptor determine which (if either) of
-> these two contexts the device uses when actually transmitting some
-> data:
->
-> - If the TSE bit in the DCMD field is set, then the device performs
->    TCP segmentation offload using the parameters previously set in the
->    TSO context. In addition, if TXSM and/or IXSM is set in the POPTS
->    field, the device performs the appropriate checksum offloads using
->    the parameters in the same (TSO) context.
->
-> - Otherwise, if the TSE bit in the DCMD field is clear, then there is
->    no TCP segmentation offload. If TXSM and/or IXSM is set in the POPTS
->    field, the device performs the appropriate checksum offloads using
->    the parameters in the non-TSO context.
->
-> The e1000 driver is free to set up the TSO and non-TSO contexts and
-> then transmit a mixture of data, with each data descriptor using a
-> different (or neither) context. This is what the e1000 driver for
-> Windows (Intel(R) PRO/1000 MT Network Connection, aka E1G6023E.sys)
-> does in certain cases. Sometimes with quite undesirable results, since
-> the QEMU e1000 device doesn't work as described above.
->
-> Instead, the QEMU e1000 device maintains only one context in its state
-> structure. When it receives a transmit context descriptor from the
-> driver, it overwrites the context parameters regardless of the TSE bit
-> in the TUCMD field.
->
-> To see why this is wrong, suppose the driver first sets up a non-TSO
-> context with UDP checksum offload parameters (say, TUCSO pointing to
-> the appropriate offset for a UDP checksum, 6 bytes into the header),
-> and then sets up a TSO context with TCP checksum offload parameters
-> (TUCSO pointing to the appropriate offset for a TCP checksum, 16 bytes
-> into the header). The driver then sends a transmit data descriptor
-> with TSO=3D0 and TXSM=3D1 along with a UDP datagram. The QEMU e1000 dev=
-ice
-> computes the checksum using the last set of checksum offload
-> parameters, and writes the checksum to offset 16, stomping on two
-> bytes of UDP data, and leaving the wrong checksum in the UDP checksum
-> field.
->
-> To make matters worse, if the network stack on the host running QEMU
-> treats data transmitted from a VM as locally originated, it may do its
-> own UDP checksum computation, "correcting" it to match the corrupt
-> data before sending it on the wire. Now the corrupt UDP packet makes
-> its way all the way to the peer application.
->
-> I have reproduced this behavior with a Windows 10 guest, rather easily
-> with a TCP iperf and a UDP iperf running in parallel. With the
-> patchlet below, you'll see an error message whenever the bug is
-> triggered.
->
->
->   --- a/hw/net/e1000.c
->   +++ b/hw/net/e1000.c
->   @@ -534,6 +534,30 @@ e1000_send_packet(E1000State *s, const uint8_t *=
-buf, int size)
->    }
->   =20
->    static void
->   +debug_csum(struct e1000_tx *tp, uint16_t oldsum)
->   +{
->   +    e1000x_txd_props *props =3D &tp->props;
->   +    uint8_t proto =3D tp->data[14 + 9];
->   +    uint32_t sumoff =3D props->tucso - props->tucss;
->   +
->   +    if ((proto =3D=3D 17 && sumoff !=3D 6) ||
->   +        (proto =3D=3D 6 && sumoff !=3D 16)) {
->   +        DBGOUT(TXERR, "txsum bug! ver %d src %08x dst %08x len %d pr=
-oto %d "
->   +               "cptse %d sum_needed %x oldsum %x newsum %x realsum %=
-x\n",
->   +               tp->data[14] >> 4,
->   +               ldl_be_p(tp->data + 14 + 12),
->   +               ldl_be_p(tp->data + 14 + 16),
->   +               lduw_be_p(tp->data + 14 + 2),
->   +               proto,
->   +               props->cptse,
->   +               props->sum_needed,
->   +               oldsum,
->   +               lduw_be_p(tp->data + props->tucso),
->   +               lduw_be_p(tp->data + props->tucss + (proto =3D=3D 6 ?=
- 16 : 6)));
->   +    }
->   +}
->   +
->   +static void
->    xmit_seg(E1000State *s)
->    {
->        uint16_t len;
->   @@ -577,8 +601,10 @@ xmit_seg(E1000State *s)
->        }
->   =20
->        if (tp->props.sum_needed & E1000_TXD_POPTS_TXSM) {
->   +        uint16_t oldsum =3D lduw_be_p(tp->data + tp->props.tucso);
->            putsum(tp->data, tp->size, tp->props.tucso,
->                   tp->props.tucss, tp->props.tucse);
->   +        debug_csum(tp, oldsum); /* FIXME: remove */
->        }
->        if (tp->props.sum_needed & E1000_TXD_POPTS_IXSM) {
->            putsum(tp->data, tp->size, tp->props.ipcso,
->
->
-> This patch series first moves per-TX packet flags out of the context
-> struct, which is used by both e1000 and e1000e. ("Used" is generous,
-> as e1000e ignores most of the context parameters supplied by the guest
-> and does its own thing, which is only sometimes correct. Taming e1000e
-> is a project for another day. The change to e1000e here is a baby step
-> in that direction.)
->
-> Then we separate the e1000 TSO and non-TSO contexts, which fixes the
-> UDP TX corruption bug.
->
-> Ed Swierk (2):
->    e1000, e1000e: Move per-packet TX offload flags out of context state
->    e1000: Separate TSO and non-TSO contexts, fixing UDP TX corruption
->
->   hw/net/e1000.c         | 92 ++++++++++++++++++++++++++++-------------=
----------
->   hw/net/e1000e.c        |  4 +--
->   hw/net/e1000e_core.c   | 16 ++++-----
->   hw/net/e1000e_core.h   |  2 ++
->   hw/net/e1000x_common.h |  2 --
->   5 files changed, 64 insertions(+), 52 deletions(-)
->
+On 11/16/2017 03:17 AM, Vladimir Sementsov-Ogievskiy wrote:
+> 16.11.2017 00:20, John Snow wrote:
+>>
+>> On 11/13/2017 11:20 AM, Vladimir Sementsov-Ogievskiy wrote:
+>>> Hi all.
+>>>
+>>> There are three qmp commands, needed to implement external backup API=
+.
+>>>
+>>> Using these three commands, client may do all needed bitmap
+>>> management by
+>>> hand:
+>>>
+>>> on backup start we need to do a transaction:
+>>> =C2=A0 {disable old bitmap, create new bitmap}
+>>>
+>>> on backup success:
+>>> =C2=A0 drop old bitmap
+>>>
+>>> on backup fail:
+>>> =C2=A0 enable old bitmap
+>>> =C2=A0 merge new bitmap to old bitmap
+>>> =C2=A0 drop new bitmap
+>>>
+>> Can you give me an example of how you expect these commands to be used=
+,
+>> and why they're required?
+>>
+>> I'm a little weary about how error-prone these commands might be and t=
+he
+>> potential for incorrect usage seems... high. Why do we require them?
+>=20
+> It is needed for incremental backup. It looks like bad idea to export
+> abdicate/reclaim functionality, it is simpler
+> and clearer to allow user to merge/enable/disable bitmaps by hand.
+>=20
+> usage is like this:
+>=20
+> 1. we have dirty bitmap bitmap0 for incremental backup.
+>=20
+> 2. prepare image fleecing (create temporary image with backing=3Dour_di=
+sk)
+> 3. in qmp transaction:
+> =C2=A0=C2=A0=C2=A0 - disable bitmap0
+> =C2=A0=C2=A0=C2=A0 - create bitmap1
+> =C2=A0=C2=A0=C2=A0 - start image fleecing (backup sync=3Dnone our_disk =
+-> temp_disk)
 
-Consider the risk for rc1, I've queued this for 2.12.
+This could probably just be its own command, though:
 
-Thanks
+block-job-fleece node=3Dfoobar bitmap=3Dbitmap0 etc=3Detera etc=3Detera
+
+Could handle forking the bitmap. I'm not sure what the arguments would
+look like, but we could name the NBD export here, too. (Assuming the
+server is already started and we just need to create the share.)
+
+Then, we can basically do what mirror does:
+
+(1) Cancel
+(2) Complete
+
+Cancel would instruct QEMU to keep the bitmap changes (i.e. roll back),
+and Complete would instruct QEMU to discard the changes.
+
+This way we don't need to expose commands like split or merge that will
+almost always be dangerous to use over QMP.
+
+In fact, a fleecing job would be really convenient even without a
+bitmap, because it'd still be nice to have a convenience command for it.
+Using an existing infrastructure and understood paradigm is just a bonus.
+
+> 4. export temp_disk (it looks like a snapshot) and bitmap0 through NBD
+>=20
+> =3D=3D=3D external tool can get bitmap0 and then copy some clusters thr=
+ough
+> NBD =3D=3D=3D
+>=20
+> on successful backup external tool can drop bitmap0. or can save it and
+> reuse somehow
+>=20
+> on failed backup external tool can do the following:
+> =C2=A0 =C2=A0 - enable bitmap0
+> =C2=A0 =C2=A0 - merge bitmap1 to bitmap0
+> =C2=A0 =C2=A0 - drop bitmap1
+>=20
