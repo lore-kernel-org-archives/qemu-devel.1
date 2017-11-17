@@ -1,32 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58375)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59285)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <longpeng2@huawei.com>) id 1eFVyx-00021k-7c
-	for qemu-devel@nongnu.org; Thu, 16 Nov 2017 21:02:16 -0500
+	(envelope-from <caoxinhua@huawei.com>) id 1eFW2q-000391-T4
+	for qemu-devel@nongnu.org; Thu, 16 Nov 2017 21:06:18 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <longpeng2@huawei.com>) id 1eFVyu-0005bq-5U
-	for qemu-devel@nongnu.org; Thu, 16 Nov 2017 21:02:15 -0500
-Received: from szxga05-in.huawei.com ([45.249.212.191]:2730)
+	(envelope-from <caoxinhua@huawei.com>) id 1eFW2n-0004GF-N0
+	for qemu-devel@nongnu.org; Thu, 16 Nov 2017 21:06:16 -0500
+Received: from szxga04-in.huawei.com ([45.249.212.190]:2357)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_ARCFOUR_SHA1:16) (Exim 4.71)
-	(envelope-from <longpeng2@huawei.com>) id 1eFVyt-0005ZG-KH
-	for qemu-devel@nongnu.org; Thu, 16 Nov 2017 21:02:12 -0500
-Message-ID: <5A0E4310.2060803@huawei.com>
-Date: Fri, 17 Nov 2017 10:01:52 +0800
-From: "Longpeng (Mike)" <longpeng2@huawei.com>
+	(envelope-from <caoxinhua@huawei.com>) id 1eFW2m-000496-So
+	for qemu-devel@nongnu.org; Thu, 16 Nov 2017 21:06:13 -0500
+From: "xinhua.Cao" <caoxinhua@huawei.com>
+Date: Fri, 17 Nov 2017 10:04:47 +0800
+Message-ID: <20171117020447.9776-1-caoxinhua@huawei.com>
 MIME-Version: 1.0
-References: <CACnE9pzALCNV62Jmo4SUawD=pQiPFENWR_BwK3=+yY7V1U54Ag@mail.gmail.com>
-	<cd39d029-48f9-20d6-cc19-ff87a45240ab@redhat.com>
-	<CACnE9pzm5zabq=nJhqB4LHzSXk2vDGiAN5SbJco3ZfGkfRbW-g@mail.gmail.com>
-	<5A0D27D8.6050506@huawei.com>
-	<2e0ddd76-3903-d715-9a86-73f1286322e7@redhat.com>
-	<33183CC9F5247A488A2544077AF19020DA46E2A6@DGGEMA505-MBS.china.huawei.com>
-	<6aaaca2b-81ef-a1c1-4745-830d008b3770@redhat.com>
-	<5A0D5B1B.3080708@huawei.com>
-	<55f2edb1-1fe3-d03f-7f4f-418a3b15997a@redhat.com>
-In-Reply-To: <55f2edb1-1fe3-d03f-7f4f-418a3b15997a@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [Question] why need to start all queues in
- vhost_net_start
+Content-Type: text/plain
+Subject: [Qemu-devel] [PATCH v2] ipmi: check ibe status before ibe outlen at
+ ipmi_bmc_extern_handle_command
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,95 +24,105 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Jason Wang <jasowang@redhat.com>
-Cc: "Huangweidong (C)" <weidong.huang@huawei.com>, "stefanha@redhat.com" <stefanha@redhat.com>, "mst@redhat.com" <mst@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "Wangjing (King, Euler)" <king.wang@huawei.com>, "Gonglei (Arei)" <arei.gonglei@huawei.com>, "Longpeng(Mike)" <longpeng.mike@gmail.com>
+To: qemu-devel@nongnu.org, marcandre.lureau@redhat.com, f4bug@amsat.org, anton.nefedov@virtuozzo.com, pbonzini@redhat.com, vsementsov@virtuozzo.com
+Cc: weidong.huang@huawei.com, yanqiangjun@huawei.com, weifuqiang@huawei.com, king.wang@huawei.com, arei.gonglei@huawei.com, "xinhua.Cao" <caoxinhua@huawei.com>
 
+When we always kill vm's ipmi_sim program. qemu will do handling chr_event
+to reconnect ipmi_sim. handling chain is chr_event -> continue_send ->
+qemu_chr_fe_write. if ipmi_sim program was killed again. then qemu_chr_fe_write
+will failed. then ibe's outlen and outbuf will not cleared. so if vcpu handle
+a ipmi_bmc_extern_handle_command. qemu aborted. here is backtrace.
 
+(gdb) bt
+0  0x00007f3d9f4181d7 in raise () from /usr/lib64/libc.so.6
+1  0x00007f3d9f4198c8 in abort () from /usr/lib64/libc.so.6
+2  0x0000000000635c20 in ipmi_bmc_extern_handle_command (b=<optimized out>,
+   cmd=0x4290198 "\030\001\004\001", cmd_len=2,
+   max_cmd_len=300, msg_id=39 '\'') at hw/ipmi/ipmi_bmc_extern.c:586
+3  0x0000000000636e1d in ipmi_kcs_signal (ii=0x428fea0, ik=<optimized out>)
+   at hw/ipmi/isa_ipmi_kcs.c:126
+4  0x000000000047341a in memory_region_write_accessor (mr=0x428ff60, addr=0,
+   value=<optimized out>, size=1, shift=<optimized out>, mask=<optimized out>,
+   attrs=...) at /root/rpmbuild/BUILD/qemu-kvm-2.8.1/memory.c:527
+5  0x000000000047221f in access_with_adjusted_size (addr=addr@entry=0,
+   value=value@entry=0x7f3d8affc838, size=size@entry=1,
+   access_size_min=<optimized out>, access_size_max=<optimized out>,
+   access=access@entry=0x4733a0 <memory_region_write_accessor>,
+   mr=mr@entry=0x428ff60, attrs=attrs@entry=...)
+   at /root/rpmbuild/BUILD/qemu-kvm-2.8.1/memory.c:593
+6  0x0000000000473e4d in memory_region_dispatch_write (mr=mr@entry=0x428ff60,
+   addr=addr@entry=0, data=1, size=size@entry=1, attrs=attrs@entry=...) at
+   /root/rpmbuild/BUILD/qemu-kvm-2.8.1/memory.c:1334
+7  0x000000000042c2ed in address_space_write_continue (as=as@entry=0xecb400
+   <address_space_io>, addr=addr@entry=3234, attrs=..., attrs@entry=...,
+   buf=buf@entry=0x7f3da59fe000 <Address 0x7f3da59fe000 out of bounds>, len=len@entry=1,
+   addr1=0, l=1, mr=0x428ff60) at /root/rpmbuild/BUILD/qemu-kvm-2.8.1/exec.c:2998
+8  0x000000000042de66 in address_space_write (as=0xecb400 <address_space_io>,
+   addr=3234, attrs=...,buf=0x7f3da59fe000 <Address 0x7f3da59fe000 out of bounds>,
+   len=1) at /root/rpmbuild/BUILD/qemu-kvm-2.8.1/exec.c:3043
+9  0x000000000042e34d in address_space_rw (as=<optimized out>, addr=addr@entry=3234,
+   attrs=..., attrs@entry=..., buf=buf@entry=0x7f3da59fe000 <Address 0x7f3da59fe000
+   out of bounds>, len=len@entry=1, is_write=is_write@entry=true)
+   at /root/rpmbuild/BUILD/qemu-kvm-2.8.1/exec.c:3145
+10 0x000000000046b751 in kvm_handle_io (port=3234, attrs=attrs@entry=...,
+   data=<optimized out>, direction=<optimized out>, size=1, count=1)
+   at /root/rpmbuild/BUILD/qemu-kvm-2.8.1/kvm_all.c:1822
+11 0x000000000046f4a7 in kvm_cpu_exec (cpu=cpu@entry=0x36f3060)
+   at /root/rpmbuild/BUILD/qemu-kvm-2.8.1/kvm_all.c:1980
+12 0x0000000000459cf5 in qemu_kvm_cpu_thread_fn (arg=arg@entry=0x36f3060)
+   at /root/rpmbuild/BUILD/qemu-kvm-2.8.1/cpus.c:1072
+13 0x0000000000848818 in thread_entry_for_hotfix (pthread_cb=<optimized out>)
+   at uvp/hotpatch/qemu_hotpatch_helper.c:502
+14 0x00007f3d9f7acdc5 in start_thread () from /usr/lib64/libpthread.so.0
+15 0x00007f3d9f4da6fd in clone () from /usr/lib64/libc.so.6
 
-On 2017/11/16 20:04, Jason Wang wrote:
+we check ibe status before ibe outlen at ipmi_bmc_extern_handle_command to fix this abort.
+---
+ hw/ipmi/ipmi_bmc_extern.c | 17 ++++++++++-------
+ 1 file changed, 10 insertions(+), 7 deletions(-)
 
-> 
-> 
-> On 2017年11月16日 17:32, Longpeng (Mike) wrote:
->> Hi Jason,
->>
->> On 2017/11/16 17:13, Jason Wang wrote:
->>
->>>
->>> On 2017年11月16日 17:01, Gonglei (Arei) wrote:
->>>> No, Windows guest + vhost-user/DPDK.
->>>>
->>>> BTW pls see virtio spec in :
->>>>
->>>> "If VIRTIO_NET_F_MQ is negotiated, each of receiveq1. . .receiveqN that will
->>>> be used SHOULD be populated
->>>> with receive buffers."
->>>>
->>>> It is not mandatory that all queues must be initialized.
->>> I think not, since it said we should fill receive buffers for each queue which
->>> means we should initialize all queues. May Michael can clarify on this.
->>>
->>
->> I think this doesn't matter, but QEMU should consider this scenario...
->>
->> For example, if one queues isn't initialized (Windows guest), the vring.avail=0,
->> so vq->desc_phys=0, then vq->desc='a avail HVA'(which is the start addr of
->> pc.ram).
->>
->>      vq->desc_size = s = l = virtio_queue_get_desc_size(vdev, idx);
->>      vq->desc_phys = a = virtio_queue_get_desc_addr(vdev, idx);
->>      vq->desc = vhost_memory_map(dev, a, &l, 0);
->>      if (!vq->desc || l != s) {
->>          r = -ENOMEM;
->>          goto fail_alloc_desc;
->>      }
->>      .....
->>      r = vhost_virtqueue_set_addr(dev, vq, vhost_vq_index, dev->log_enabled);
->>      if (r < 0) {
->>          r = -errno;
->>          goto fail_alloc;
->>      }
->>
->> Then the HVA is send to the vhost-user.
->>
->> I think this is wrong, because the '0' here means guest driver doesn't init this
->> queues, it should not be used to calculate the HVA for this vq.
-> 
-> Yes, workaround is not hard if windows driver won't use the left 3 queues any
-> more. But we should have a complete solution. The main problem is when vhost
-> need to be started. For legacy device, there's no easy way to detect whether or
-> not a specific virtqueue is ready to be used. For modern device, we can probably
-> do this through queue_enable (but this is not implemented in current code).
-> 
-
-
-Can we initialize the vring.desc/vring.avail/vring.used to -1, then we can
-detect whether or not a specific vq is ready to be used by check the addr of its
-tables is -1 or not ?
-
-Initialize to 0 is not suitable, because we don't know whether the guest set GPA
-0 or the guest not initialize this vq.
-
-> Thanks
-> 
->>
->>> Thanks
->>>
->>>> Thanks,
->>>> -Gonglei
->>>>
->>>
->>>
->>>
->>> .
->>>
->>
-> 
-> 
-> .
-> 
-
-
+diff --git a/hw/ipmi/ipmi_bmc_extern.c b/hw/ipmi/ipmi_bmc_extern.c
+index abab3bb..02033e3 100644
+--- a/hw/ipmi/ipmi_bmc_extern.c
++++ b/hw/ipmi/ipmi_bmc_extern.c
+@@ -192,13 +192,6 @@ static void ipmi_bmc_extern_handle_command(IPMIBmc *b,
+     uint8_t err = 0, csum;
+     unsigned int i;
+ 
+-    if (ibe->outlen) {
+-        /* We already have a command queued.  Shouldn't ever happen. */
+-        fprintf(stderr, "IPMI KCS: Got command when not finished with the"
+-                " previous command\n");
+-        abort();
+-    }
+-
+     /* If it's too short or it was truncated, return an error. */
+     if (cmd_len < 2) {
+         err = IPMI_CC_REQUEST_DATA_LENGTH_INVALID;
+@@ -206,7 +199,10 @@ static void ipmi_bmc_extern_handle_command(IPMIBmc *b,
+         err = IPMI_CC_REQUEST_DATA_TRUNCATED;
+     } else if (!ibe->connected) {
+         err = IPMI_CC_BMC_INIT_IN_PROGRESS;
++    } else if (ibe->wdt_state.trans_fail) {
++        err = IPMI_CC_BMC_INIT_IN_PROGRESS;
+     }
++
+     if (err) {
+         IPMIInterfaceClass *k = IPMI_INTERFACE_GET_CLASS(s);
+         unsigned char rsp[3];
+@@ -218,6 +214,13 @@ static void ipmi_bmc_extern_handle_command(IPMIBmc *b,
+         goto out;
+     }
+ 
++    if (ibe->outlen) {
++        /* We already have a command queued.  Shouldn't ever happen. */
++        fprintf(stderr, "IPMI KCS: Got command when not finished with the"
++                " previous command\n");
++        abort();
++    }
++
+     addchar(ibe, msg_id);
+     for (i = 0; i < cmd_len; i++) {
+         addchar(ibe, cmd[i]);
 -- 
-Regards,
-Longpeng(Mike)
+2.8.3
