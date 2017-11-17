@@ -1,29 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36119)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38036)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1eFnLq-0001AN-8E
-	for qemu-devel@nongnu.org; Fri, 17 Nov 2017 15:35:03 -0500
+	(envelope-from <jsnow@redhat.com>) id 1eFnRB-0003CF-H8
+	for qemu-devel@nongnu.org; Fri, 17 Nov 2017 15:40:34 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1eFnLp-000424-8h
-	for qemu-devel@nongnu.org; Fri, 17 Nov 2017 15:35:02 -0500
-Received: from mail-wm0-x241.google.com ([2a00:1450:400c:c09::241]:40666)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1eFnLp-00041E-1V
-	for qemu-devel@nongnu.org; Fri, 17 Nov 2017 15:35:01 -0500
-Received: by mail-wm0-x241.google.com with SMTP id b189so8628014wmd.5
-	for <qemu-devel@nongnu.org>; Fri, 17 Nov 2017 12:35:00 -0800 (PST)
+	(envelope-from <jsnow@redhat.com>) id 1eFnRA-0002sm-Ip
+	for qemu-devel@nongnu.org; Fri, 17 Nov 2017 15:40:33 -0500
+References: <20171023092945.54532-1-vsementsov@virtuozzo.com>
+	<20171117123059.GB4795@localhost.localdomain>
+	<b95aaa97-39d0-fdc1-21a1-2e0ea7acac17@redhat.com>
+	<79f2607f-d4f9-8f92-76df-c99ae48b9936@redhat.com>
+	<20171117182526.GK4795@localhost.localdomain>
+From: John Snow <jsnow@redhat.com>
+Message-ID: <fa7cd556-c784-2105-6777-bae1c5814c76@redhat.com>
+Date: Fri, 17 Nov 2017 15:40:16 -0500
 MIME-Version: 1.0
-In-Reply-To: <bf4bedd9-0ef8-cff3-6153-531fba597237@redhat.com>
-References: <20171116115926.16627-1-pbonzini@redhat.com>
-	<20171116115926.16627-8-pbonzini@redhat.com>
-	<CAFEAcA-06-VmH7Pvymo-o-HmiQ-uQ67Hs0KhWZfxswBxsfD2-g@mail.gmail.com>
-	<bf4bedd9-0ef8-cff3-6153-531fba597237@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri, 17 Nov 2017 20:34:39 +0000
-Message-ID: <CAFEAcA9Rnd3gtrHb389e6fOEAae4aLhJnQWU-vKyzTM4o-riOQ@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PULL 07/11] cpu-exec: don't overwrite
- exception_index
+In-Reply-To: <20171117182526.GK4795@localhost.localdomain>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH] block/snapshot: dirty all dirty bitmaps on
+ snapshot-switch
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,23 +28,77 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, Pavel Dovgalyuk <pavel.dovgaluk@ispras.ru>
+To: Kevin Wolf <kwolf@redhat.com>
+Cc: Max Reitz <mreitz@redhat.com>, Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org, eblake@redhat.com, famz@redhat.com, den@openvz.org, stefanha@redhat.com
 
-On 17 November 2017 at 20:26, Paolo Bonzini <pbonzini@redhat.com> wrote:
-> On 17/11/2017 21:07, Peter Maydell wrote:
->> Hi. This commit breaks booting of Debian on aarch64 virt board.
->> (repro instructions for creating the image available at:
->> https://translatedcode.wordpress.com/2017/07/24/installing-debian-on-qemus-64-bit-arm-virt-board/)
->> The guest kernel never prints anything to the serial port.
+
+
+On 11/17/2017 01:25 PM, Kevin Wolf wrote:
+> Am 17.11.2017 um 19:15 hat John Snow geschrieben:
 >>
->> Reverting this commit fixes master for me, so I plan to do
->> that on Monday.
->
-> Maybe you can also test moving the atomic_set inside the "if".  It does
-> seem to be a genuine bugfix.
+>>
+>> On 11/17/2017 10:01 AM, Max Reitz wrote:
+>>> On 2017-11-17 13:30, Kevin Wolf wrote:
+>>>> Am 23.10.2017 um 11:29 hat Vladimir Sementsov-Ogievskiy geschrieben:
+>>>>> Snapshot-switch actually changes active state of disk so it should
+>>>>> reflect on dirty bitmaps. Otherwise next incremental backup using
+>>>>> these bitmaps will be invalid.
+>>>>>
+>>>>> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+>>>>
+>>>> We discussed this quite a while ago, and I'm still not convinced that
+>>>> this approach makes sense.
+>>>
+>>> I think it at least makes more sense than not handling this case at all.
+>>>
+>>>> Can you give just one example of a use case where dirtying the whole
+>>>> bitmap while loading a snapshot is the desired behaviour?
+>>>>
+>>>> I think the most useful behaviour would be something where the bitmaps
+>>>> themselves are snapshotted, too.
+>>>
+>>> Agreed.
+>>>
+>>>>                                  But for the time being, the easiest and
+>>>> safest solution might just be to error out in any snapshot operations
+>>>> if any bitmaps are in use.
+>>>
+>>> Sounds OK, too.  I personally don't have an opinion either way.
+>>>
+>>> But in any case, what we did before this patch was definitely wrong so I
+>>> consider it an improvement.
+>>>
+>>
+>> This is how I feel about it too. Erroring out entirely is an option, but
+>> code-wise just dirtying everything is at least verifiably not-wrong and
+>> pretty simple to implement.
+> 
+> But that's exactly the problem: If something is just plain wrong, you
+> can always replace it with something that makes sense. If it errors out,
+> you can still remove that error later. But if you have something that
+> doesn't make a whole lot of sense, but kinda sorta works (like after
+> this patch), it's ABI and you can't implement something more useful
+> later any more.
+> 
+>> It's an improvement... Don't do it, but at least you won't get
+>> something wrong after, just something heinously unoptimal.
+> 
+> It's a short-term improvement that may become a long-term burden.
+> 
+> Kevin
+> 
 
-No, that doesn't help: guest still sits there like a lemon.
+I see your point.
 
-thanks
--- PMM
+If we enable it now, we always have to.
+If we disable it now, we *can* later if we wish.
+
+...however, I think it's been the case that we haven't prohibited it
+before, but also it's a pretty good case that nobody has been using this
+feature in production because they're not yet persistent and migratable.
+
+An error message asking the user to delete bitmaps (which will very
+obviously invalidate them) would be fine, too. I was erring on the side
+of "just let things work," but you have a point that making sure the
+user knows that what they're trying to accomplish is not a good idea is
+probably better than silently doing the very stupid thing.
