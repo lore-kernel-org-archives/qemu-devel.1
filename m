@@ -1,22 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57953)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58096)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1eFgxd-0002pm-8h
-	for qemu-devel@nongnu.org; Fri, 17 Nov 2017 08:45:38 -0500
+	(envelope-from <den@virtuozzo.com>) id 1eFgxw-00036e-5B
+	for qemu-devel@nongnu.org; Fri, 17 Nov 2017 08:45:57 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1eFgxa-0003ek-Jy
-	for qemu-devel@nongnu.org; Fri, 17 Nov 2017 08:45:37 -0500
-References: <cover.1510612380.git.alistair.francis@xilinx.com>
-	<a78b2c8879bded4abe59b71d7e9fb172e784a35d.1510612380.git.alistair.francis@xilinx.com>
-From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-Message-ID: <abbeaa0a-2023-7f04-41b2-cd9837acb8e4@ilande.co.uk>
-Date: Fri, 17 Nov 2017 13:45:18 +0000
+	(envelope-from <den@virtuozzo.com>) id 1eFgxt-0004MA-Iw
+	for qemu-devel@nongnu.org; Fri, 17 Nov 2017 08:45:56 -0500
+References: <20171023092945.54532-1-vsementsov@virtuozzo.com>
+	<20171117123059.GB4795@localhost.localdomain>
+	<75e64a04-dfd4-2e66-dad6-95c8f012ad6f@openvz.org>
+	<20171117134247.GE4795@localhost.localdomain>
+From: "Denis V. Lunev" <den@openvz.org>
+Message-ID: <097511ea-ec81-c801-6a39-07f77663abde@openvz.org>
+Date: Fri, 17 Nov 2017 16:45:46 +0300
 MIME-Version: 1.0
-In-Reply-To: <a78b2c8879bded4abe59b71d7e9fb172e784a35d.1510612380.git.alistair.francis@xilinx.com>
+In-Reply-To: <20171117134247.GE4795@localhost.localdomain>
 Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
 Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH v5 24/29] hw/sparc*: Replace fprintf(stderr,
- "*\n" with error_report()
+Subject: Re: [Qemu-devel] [PATCH] block/snapshot: dirty all dirty bitmaps on
+ snapshot-switch
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,232 +27,65 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alistair Francis <alistair.francis@xilinx.com>, qemu-devel@nongnu.org, qemu-trivial@nongnu.org
-Cc: alistair23@gmail.com, armbru@redhat.com, Fabien Chouteau <chouteau@adacore.com>, Artyom Tarasenko <atar4qemu@gmail.com>
+To: Kevin Wolf <kwolf@redhat.com>
+Cc: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org, mreitz@redhat.com, eblake@redhat.com, jsnow@redhat.com, famz@redhat.com, stefanha@redhat.com
 
-On 13/11/17 22:35, Alistair Francis wrote:
+On 11/17/2017 04:42 PM, Kevin Wolf wrote:
+> Am 17.11.2017 um 13:58 hat Denis V. Lunev geschrieben:
+>> On 11/17/2017 03:30 PM, Kevin Wolf wrote:
+>>> Am 23.10.2017 um 11:29 hat Vladimir Sementsov-Ogievskiy geschrieben:
+>>>> Snapshot-switch actually changes active state of disk so it should
+>>>> reflect on dirty bitmaps. Otherwise next incremental backup using
+>>>> these bitmaps will be invalid.
+>>>>
+>>>> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+>>> We discussed this quite a while ago, and I'm still not convinced that
+>>> this approach makes sense.
+>>>
+>>> Can you give just one example of a use case where dirtying the whole
+>>> bitmap while loading a snapshot is the desired behaviour?
+>>>
+>>> I think the most useful behaviour would be something where the bitmaps
+>>> themselves are snapshotted, too. But for the time being, the easiest and
+>>> safest solution might just be to error out in any snapshot operations
+>>> if any bitmaps are in use.
+>>>
+>> The problem is that snapshotting of bitmaps will just provide wrong
+>> result.
+> Only if the user does the wrong thing. :-)
+>
+>> Let us assume that we have bitmap named A.
+>>
+>> The user has started it and made full backup B.
+>> The user made snapshot S. At this moment bitmap A is saved as A' to bitmap.
+>> The user has made incremental backup B1. A is reset to 0.
+>> The user has made incremental backup B2. A is reset to 0 again.
+>>
+>> At this moment the user has reverted to snapshot S.
+>> What we need to make incremental backup at the moment?
+> The important point here is that the backup that you should make is not
+> incremental compared to B2, but to B (i.e. the last backup at the point
+> when the snapshot was made).
+>
+> If your snapshot chain branches, your backups have to branch, too.
+>
+>> The difference in between states B2 and S. This is __for sure__
+>> not A'. Thus saving of the bitmap at the moment is quite
+>> useless and we need to reset bitmap to full.
+> A' still contains the differences between B and the point when S was
+> created. So if you take a new incremental backup B'1 based on B, the
+> correct bitmap to use would be A'.
+>
+> But I agree that this is complicated and probably easy to misuse, so
+> just erroring out is a serious option. And if we do this, at least we
+> don't set a bad solution in stone and can always add a better solution
+> if we can later think of one.
+>
+> I just don't think that marking everything dirty is a good solution. It
+> forces the user to make a full backup, so we could just as well ask the
+> user to delete the bitmap before they load a snapshot.
+>
+> Kevin
+Agree. This is also an option.
 
-> Replace a large number of the fprintf(stderr, "*\n" calls with
-> error_report(). The functions were renamed with these commands and then
-> compiler issues where manually fixed.
-> 
-> find ./* -type f -exec sed -i \
->     'N;N;N;N;N;N;N;N;N;N;N;N; {s|fprintf(stderr, "\(.*\)\\n"\(.*\));|error_report("\1"\2);|Ig}' \
->     {} +
-> find ./* -type f -exec sed -i \
->     'N;N;N;N;N;N;N;N;N;N;N; {s|fprintf(stderr, "\(.*\)\\n"\(.*\));|error_report("\1"\2);|Ig}' \
->     {} +
-> find ./* -type f -exec sed -i \
->     'N;N;N;N;N;N;N;N;N; {s|fprintf(stderr, "\(.*\)\\n"\(.*\));|error_report("\1"\2);|Ig}' \
->     {} +
-> find ./* -type f -exec sed -i \
->     'N;N;N;N;N;N;N;N; {s|fprintf(stderr, "\(.*\)\\n"\(.*\));|error_report("\1"\2);|Ig}' \
->     {} +
-> find ./* -type f -exec sed -i \
->     'N;N;N;N;N;N;N; {s|fprintf(stderr, "\(.*\)\\n"\(.*\));|error_report("\1"\2);|Ig}' \
->     {} +
-> find ./* -type f -exec sed -i \
->     'N;N;N;N;N;N; {s|fprintf(stderr, "\(.*\)\\n"\(.*\));|error_report("\1"\2);|Ig}' \
->     {} +
-> find ./* -type f -exec sed -i \
->     'N;N;N;N;N; {s|fprintf(stderr, "\(.*\)\\n"\(.*\));|error_report("\1"\2);|Ig}' \
->     {} +
-> find ./* -type f -exec sed -i \
->     'N;N;N;N; {s|fprintf(stderr, "\(.*\)\\n"\(.*\));|error_report("\1"\2);|Ig}' \
->     {} +
-> find ./* -type f -exec sed -i \
->     'N;N;N; {s|fprintf(stderr, "\(.*\)\\n"\(.*\));|error_report("\1"\2);|Ig}' \
->     {} +
-> find ./* -type f -exec sed -i \
->     'N;N; {s|fprintf(stderr, "\(.*\)\\n"\(.*\));|error_report("\1"\2);|Ig}' \
->     {} +
-> find ./* -type f -exec sed -i \
->     'N; {s|fprintf(stderr, "\(.*\)\\n"\(.*\));|error_report("\1"\2);|Ig}' \
->     {} +
-> 
-> Some lines where then manually tweaked to pass checkpatch.
-> 
-> Signed-off-by: Alistair Francis <alistair.francis@xilinx.com>
-> Cc: Fabien Chouteau <chouteau@adacore.com>
-> Cc: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-> Cc: Artyom Tarasenko <atar4qemu@gmail.com>
-> Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
-> ---
-> V2:
->  - Split hw patch into individual directories
-> 
->  hw/sparc/leon3.c     | 16 +++++++---------
->  hw/sparc/sun4m.c     | 16 +++++++---------
->  hw/sparc64/niagara.c |  4 ++--
->  hw/sparc64/sun4u.c   | 10 +++++-----
->  4 files changed, 21 insertions(+), 25 deletions(-)
-> 
-> diff --git a/hw/sparc/leon3.c b/hw/sparc/leon3.c
-> index 8c66d5af24..bba3aa3dee 100644
-> --- a/hw/sparc/leon3.c
-> +++ b/hw/sparc/leon3.c
-> @@ -22,6 +22,7 @@
->   * THE SOFTWARE.
->   */
->  #include "qemu/osdep.h"
-> +#include "qemu/error-report.h"
->  #include "qapi/error.h"
->  #include "qemu-common.h"
->  #include "cpu.h"
-> @@ -139,9 +140,8 @@ static void leon3_generic_hw_init(MachineState *machine)
->  
->      /* Allocate RAM */
->      if ((uint64_t)ram_size > (1UL << 30)) {
-> -        fprintf(stderr,
-> -                "qemu: Too much memory for this machine: %d, maximum 1G\n",
-> -                (unsigned int)(ram_size / (1024 * 1024)));
-> +        error_report("Too much memory for this machine: %d, maximum 1G",
-> +                     (unsigned int)(ram_size / (1024 * 1024)));
->          exit(1);
->      }
->  
-> @@ -167,19 +167,18 @@ static void leon3_generic_hw_init(MachineState *machine)
->      }
->  
->      if (bios_size > prom_size) {
-> -        fprintf(stderr, "qemu: could not load prom '%s': file too big\n",
-> -                filename);
-> +        error_report("could not load prom '%s': file too big", filename);
->          exit(1);
->      }
->  
->      if (bios_size > 0) {
->          ret = load_image_targphys(filename, 0x00000000, bios_size);
->          if (ret < 0 || ret > prom_size) {
-> -            fprintf(stderr, "qemu: could not load prom '%s'\n", filename);
-> +            error_report("could not load prom '%s'", filename);
->              exit(1);
->          }
->      } else if (kernel_filename == NULL && !qtest_enabled()) {
-> -        fprintf(stderr, "Can't read bios image %s\n", filename);
-> +        error_report("Can't read bios image %s", filename);
->          exit(1);
->      }
->      g_free(filename);
-> @@ -192,8 +191,7 @@ static void leon3_generic_hw_init(MachineState *machine)
->          kernel_size = load_elf(kernel_filename, NULL, NULL, &entry, NULL, NULL,
->                                 1 /* big endian */, EM_SPARC, 0, 0);
->          if (kernel_size < 0) {
-> -            fprintf(stderr, "qemu: could not load kernel '%s'\n",
-> -                    kernel_filename);
-> +            error_report("could not load kernel '%s'", kernel_filename);
->              exit(1);
->          }
->          if (bios_size <= 0) {
-> diff --git a/hw/sparc/sun4m.c b/hw/sparc/sun4m.c
-> index 24c2b8a555..e9e0ef0630 100644
-> --- a/hw/sparc/sun4m.c
-> +++ b/hw/sparc/sun4m.c
-> @@ -260,8 +260,7 @@ static unsigned long sun4m_load_kernel(const char *kernel_filename,
->                                                KERNEL_LOAD_ADDR,
->                                                RAM_size - KERNEL_LOAD_ADDR);
->          if (kernel_size < 0) {
-> -            fprintf(stderr, "qemu: could not load kernel '%s'\n",
-> -                    kernel_filename);
-> +            error_report("could not load kernel '%s'", kernel_filename);
->              exit(1);
->          }
->  
-> @@ -272,8 +271,8 @@ static unsigned long sun4m_load_kernel(const char *kernel_filename,
->                                                INITRD_LOAD_ADDR,
->                                                RAM_size - INITRD_LOAD_ADDR);
->              if (initrd_size < 0) {
-> -                fprintf(stderr, "qemu: could not load initial ram disk '%s'\n",
-> -                        initrd_filename);
-> +                error_report("could not load initial ram disk '%s'",
-> +                             initrd_filename);
->                  exit(1);
->              }
->          }
-> @@ -681,7 +680,7 @@ static void prom_init(hwaddr addr, const char *bios_name)
->          ret = -1;
->      }
->      if (ret < 0 || ret > PROM_SIZE_MAX) {
-> -        fprintf(stderr, "qemu: could not load prom '%s'\n", bios_name);
-> +        error_report("could not load prom '%s'", bios_name);
->          exit(1);
->      }
->  }
-> @@ -747,10 +746,9 @@ static void ram_init(hwaddr addr, ram_addr_t RAM_size,
->  
->      /* allocate RAM */
->      if ((uint64_t)RAM_size > max_mem) {
-> -        fprintf(stderr,
-> -                "qemu: Too much memory for this machine: %d, maximum %d\n",
-> -                (unsigned int)(RAM_size / (1024 * 1024)),
-> -                (unsigned int)(max_mem / (1024 * 1024)));
-> +        error_report("Too much memory for this machine: %d, maximum %d",
-> +                     (unsigned int)(RAM_size / (1024 * 1024)),
-> +                     (unsigned int)(max_mem / (1024 * 1024)));
->          exit(1);
->      }
->      dev = qdev_create(NULL, "memory");
-> diff --git a/hw/sparc64/niagara.c b/hw/sparc64/niagara.c
-> index 7a723326c5..996ce2ada0 100644
-> --- a/hw/sparc64/niagara.c
-> +++ b/hw/sparc64/niagara.c
-> @@ -152,8 +152,8 @@ static void niagara_init(MachineState *machine)
->              dinfo->is_default = 1;
->              rom_add_file_fixed(blk_bs(blk)->filename, NIAGARA_VDISK_BASE, -1);
->          } else {
-> -            fprintf(stderr, "qemu: could not load ram disk '%s'\n",
-> -                    blk_bs(blk)->filename);
-> +            error_report("could not load ram disk '%s'",
-> +                         blk_bs(blk)->filename);
->              exit(1);
->          }
->      }
-> diff --git a/hw/sparc64/sun4u.c b/hw/sparc64/sun4u.c
-> index 1672f256e7..1fd1c3c861 100644
-> --- a/hw/sparc64/sun4u.c
-> +++ b/hw/sparc64/sun4u.c
-> @@ -22,6 +22,7 @@
->   * THE SOFTWARE.
->   */
->  #include "qemu/osdep.h"
-> +#include "qemu/error-report.h"
->  #include "qapi/error.h"
->  #include "qemu-common.h"
->  #include "cpu.h"
-> @@ -166,8 +167,7 @@ static uint64_t sun4u_load_kernel(const char *kernel_filename,
->                                                RAM_size - KERNEL_LOAD_ADDR);
->          }
->          if (kernel_size < 0) {
-> -            fprintf(stderr, "qemu: could not load kernel '%s'\n",
-> -                    kernel_filename);
-> +            error_report("could not load kernel '%s'", kernel_filename);
->              exit(1);
->          }
->          /* load initrd above kernel */
-> @@ -179,8 +179,8 @@ static uint64_t sun4u_load_kernel(const char *kernel_filename,
->                                                 *initrd_addr,
->                                                 RAM_size - *initrd_addr);
->              if ((int)*initrd_size < 0) {
-> -                fprintf(stderr, "qemu: could not load initial ram disk '%s'\n",
-> -                        initrd_filename);
-> +                error_report("could not load initial ram disk '%s'",
-> +                             initrd_filename);
->                  exit(1);
->              }
->          }
-> @@ -327,7 +327,7 @@ static void prom_init(hwaddr addr, const char *bios_name)
->          ret = -1;
->      }
->      if (ret < 0 || ret > PROM_SIZE_MAX) {
-> -        fprintf(stderr, "qemu: could not load prom '%s'\n", bios_name);
-> +        error_report("could not load prom '%s'", bios_name);
->          exit(1);
->      }
->  }
-
-Acked-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-
-
-ATB,
-
-Mark.
+Den
