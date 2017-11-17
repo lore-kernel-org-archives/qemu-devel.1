@@ -1,21 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57060)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57857)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1eFjKZ-00087c-E3
-	for qemu-devel@nongnu.org; Fri, 17 Nov 2017 11:17:30 -0500
+	(envelope-from <berto@igalia.com>) id 1eFjMI-0000fG-DN
+	for qemu-devel@nongnu.org; Fri, 17 Nov 2017 11:19:15 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1eFjKW-0004QQ-7W
-	for qemu-devel@nongnu.org; Fri, 17 Nov 2017 11:17:27 -0500
-References: <20170628120530.31251-1-vsementsov@virtuozzo.com>
-	<fb5c092b-9db5-c5bf-3f61-9317a6371168@redhat.com>
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Message-ID: <bb7ce518-8542-f3ab-ac42-7d1106f52b69@virtuozzo.com>
-Date: Fri, 17 Nov 2017 19:17:14 +0300
+	(envelope-from <berto@igalia.com>) id 1eFjMF-00080i-6j
+	for qemu-devel@nongnu.org; Fri, 17 Nov 2017 11:19:14 -0500
+From: Alberto Garcia <berto@igalia.com>
+In-Reply-To: <e30a779a-df6d-b929-f39b-ee4b3a580443@redhat.com>
+References: <20171106145345.12038-1-berto@igalia.com>
+	<e30a779a-df6d-b929-f39b-ee4b3a580443@redhat.com>
+Date: Fri, 17 Nov 2017 17:19:09 +0100
+Message-ID: <w51po8glvya.fsf@maestria.local.igalia.com>
 MIME-Version: 1.0
-In-Reply-To: <fb5c092b-9db5-c5bf-3f61-9317a6371168@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
-Content-Language: en-US
-Subject: Re: [Qemu-devel] [PATCH v22 00/30] qcow2: persistent dirty bitmaps
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PATCH] block: Close a BlockDriverState completely
+ even when bs->drv is NULL
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,63 +23,43 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org
-Cc: kwolf@redhat.com, mreitz@redhat.com, armbru@redhat.com, jsnow@redhat.com, famz@redhat.com, den@openvz.org, stefanha@redhat.com, pbonzini@redhat.com
+To: Max Reitz <mreitz@redhat.com>, qemu-devel@nongnu.org
+Cc: qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>
 
-17.11.2017 19:04, Eric Blake wrote:
-> Revisiting an old series:
+On Fri 17 Nov 2017 05:14:08 PM CET, Max Reitz wrote:
+> On 2017-11-06 15:53, Alberto Garcia wrote:
+>> bdrv_close() skips much of its logic when bs->drv is NULL. This is
+>> fine when we're closing a BlockDriverState that has just been created
+>> (because e.g the initialization process failed), but it's not enough
+>> in other cases.
+>> 
+>> For example, when a valid qcow2 image is found to be corrupted then
+>> QEMU marks it as such in the file header and then sets bs->drv to
+>> NULL in order to make the BlockDriverState unusable. When that BDS is
+>> later closed then many of its data structures are not freed (leaking
+>> their memory) and none of its children are detached. This results in
+>> bdrv_close_all() failing to close all BDSs and making this assertion
+>> fail when QEMU is being shut down:
+>> 
+>>    bdrv_close_all: Assertion `QTAILQ_EMPTY(&all_bdrv_states)' failed.
+>> 
+>> This patch makes bdrv_close() do the full uninitialization process
+>> in all cases. This fixes the problem with corrupted images and still
+>> works fine with freshly created BDSs.
+>> 
+>> Signed-off-by: Alberto Garcia <berto@igalia.com>
+>> ---
+>>  block.c                    | 57 +++++++++++++++++++++++-----------------------
+>>  tests/qemu-iotests/060     | 13 +++++++++++
+>>  tests/qemu-iotests/060.out | 12 ++++++++++
+>>  3 files changed, 53 insertions(+), 29 deletions(-)
 >
-> On 06/28/2017 07:05 AM, Vladimir Sementsov-Ogievskiy wrote:
->> Hi all!
->>
->> There is a new update of qcow2-bitmap series - v22.
->>
->> web: https://src.openvz.org/users/vsementsov/repos/qemu/browse?at=qcow2-bitmap-v22
->> git: https://src.openvz.org/scm/~vsementsov/qemu.git (tag qcow2-bitmap-v22)
->>
->> v22:
->>
->> Rebase on master, so changes, mostly related to new dirty bitmaps mutex:
->>
->>    qcow2: add persistent dirty bitmaps support
->>   block.c                      |   65 +-
->>   block/Makefile.objs          |    2 +-
->>   block/dirty-bitmap.c         |  154 ++++-
->>   block/io.c                   |    8 +
->>   block/qcow2-bitmap.c         | 1481 ++++++++++++++++++++++++++++++++++++++++++
->>   block/qcow2-refcount.c       |   59 +-
->>   block/qcow2.c                |  155 ++++-
->>   block/qcow2.h                |   43 ++
->>   blockdev.c                   |   73 ++-
->>   docs/interop/qcow2.txt       |    8 +-
->>   include/block/block.h        |    3 +
->>   include/block/block_int.h    |   14 +
->>   include/block/dirty-bitmap.h |   22 +-
->>   include/qemu/hbitmap.h       |   49 +-
->>   qapi/block-core.json         |   42 +-
->>   tests/Makefile.include       |    2 +-
->>   tests/qemu-iotests/165       |  105 +++
->>   tests/qemu-iotests/165.out   |    5 +
->>   tests/qemu-iotests/group     |    1 +
->>   tests/test-hbitmap.c         |   19 +
->>   util/hbitmap.c               |   51 +-
->>   21 files changed, 2280 insertions(+), 81 deletions(-)
-> Nothing in this series touched qemu-img.  At the very minimum, it would
-> be nice if 'qemu-img info' were to display a summary of all bitmaps in
-> the qcow2 file; the QMP type ImageInfoSpecificQCow2 should be updated to
-> mention this information, and qemu-img updated to output it.  Being able
-> to create and remove persistent bitmaps from an at-rest qcow2 file
-> without having to fire up qemu to issue QMP commands to do so would also
-> be nice.
->
-> It's a bit late for getting this request into 2.12, but had it been
-> available, it would make my work at testing that 'qemu-img commit'
-> doesn't corrupt persistent bitmaps.
->
+> Sooo...  What's the exact status of this patch? :-)
 
-You are right, this is needed, but I can't promise something for the 
-nearest future..
+I can resend it rebased on top of your block branch, but I'm fine if you
+merge the iotest manually (it's a trivial merge).
 
--- 
-Best regards,
-Vladimir
+I'm not sure about Kevin's comments though, it wasn't clear to me if
+he's fine if we apply this patch or not.
+
+Berto
