@@ -1,24 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58096)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58213)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <den@virtuozzo.com>) id 1eFgxw-00036e-5B
-	for qemu-devel@nongnu.org; Fri, 17 Nov 2017 08:45:57 -0500
+	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1eFgyM-0003Qb-2V
+	for qemu-devel@nongnu.org; Fri, 17 Nov 2017 08:46:23 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <den@virtuozzo.com>) id 1eFgxt-0004MA-Iw
-	for qemu-devel@nongnu.org; Fri, 17 Nov 2017 08:45:56 -0500
-References: <20171023092945.54532-1-vsementsov@virtuozzo.com>
-	<20171117123059.GB4795@localhost.localdomain>
-	<75e64a04-dfd4-2e66-dad6-95c8f012ad6f@openvz.org>
-	<20171117134247.GE4795@localhost.localdomain>
-From: "Denis V. Lunev" <den@openvz.org>
-Message-ID: <097511ea-ec81-c801-6a39-07f77663abde@openvz.org>
-Date: Fri, 17 Nov 2017 16:45:46 +0300
-MIME-Version: 1.0
-In-Reply-To: <20171117134247.GE4795@localhost.localdomain>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-Content-Language: en-US
-Subject: Re: [Qemu-devel] [PATCH] block/snapshot: dirty all dirty bitmaps on
- snapshot-switch
+	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1eFgyK-0005FY-Je
+	for qemu-devel@nongnu.org; Fri, 17 Nov 2017 08:46:22 -0500
+Received: from chuckie.co.uk ([82.165.15.123]:59140
+	helo=s16892447.onlinehome-server.info)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <mark.cave-ayland@ilande.co.uk>)
+	id 1eFgyK-0005EE-Cl
+	for qemu-devel@nongnu.org; Fri, 17 Nov 2017 08:46:20 -0500
+From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+Date: Fri, 17 Nov 2017 13:42:43 +0000
+Message-Id: <1510926167-23326-12-git-send-email-mark.cave-ayland@ilande.co.uk>
+In-Reply-To: <1510926167-23326-1-git-send-email-mark.cave-ayland@ilande.co.uk>
+References: <1510926167-23326-1-git-send-email-mark.cave-ayland@ilande.co.uk>
+Subject: [Qemu-devel] [PATCH 11/15] apb: split pci_pbm_map_irq() into
+ separate functions for bus A and bus B
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,65 +26,133 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Kevin Wolf <kwolf@redhat.com>
-Cc: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org, mreitz@redhat.com, eblake@redhat.com, jsnow@redhat.com, famz@redhat.com, stefanha@redhat.com
+To: qemu-devel@nongnu.org, atar4qemu@gmail.com
 
-On 11/17/2017 04:42 PM, Kevin Wolf wrote:
-> Am 17.11.2017 um 13:58 hat Denis V. Lunev geschrieben:
->> On 11/17/2017 03:30 PM, Kevin Wolf wrote:
->>> Am 23.10.2017 um 11:29 hat Vladimir Sementsov-Ogievskiy geschrieben:
->>>> Snapshot-switch actually changes active state of disk so it should
->>>> reflect on dirty bitmaps. Otherwise next incremental backup using
->>>> these bitmaps will be invalid.
->>>>
->>>> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
->>> We discussed this quite a while ago, and I'm still not convinced that
->>> this approach makes sense.
->>>
->>> Can you give just one example of a use case where dirtying the whole
->>> bitmap while loading a snapshot is the desired behaviour?
->>>
->>> I think the most useful behaviour would be something where the bitmaps
->>> themselves are snapshotted, too. But for the time being, the easiest and
->>> safest solution might just be to error out in any snapshot operations
->>> if any bitmaps are in use.
->>>
->> The problem is that snapshotting of bitmaps will just provide wrong
->> result.
-> Only if the user does the wrong thing. :-)
->
->> Let us assume that we have bitmap named A.
->>
->> The user has started it and made full backup B.
->> The user made snapshot S. At this moment bitmap A is saved as A' to bitmap.
->> The user has made incremental backup B1. A is reset to 0.
->> The user has made incremental backup B2. A is reset to 0 again.
->>
->> At this moment the user has reverted to snapshot S.
->> What we need to make incremental backup at the moment?
-> The important point here is that the backup that you should make is not
-> incremental compared to B2, but to B (i.e. the last backup at the point
-> when the snapshot was made).
->
-> If your snapshot chain branches, your backups have to branch, too.
->
->> The difference in between states B2 and S. This is __for sure__
->> not A'. Thus saving of the bitmap at the moment is quite
->> useless and we need to reset bitmap to full.
-> A' still contains the differences between B and the point when S was
-> created. So if you take a new incremental backup B'1 based on B, the
-> correct bitmap to use would be A'.
->
-> But I agree that this is complicated and probably easy to misuse, so
-> just erroring out is a serious option. And if we do this, at least we
-> don't set a bad solution in stone and can always add a better solution
-> if we can later think of one.
->
-> I just don't think that marking everything dirty is a good solution. It
-> forces the user to make a full backup, so we could just as well ask the
-> user to delete the bitmap before they load a snapshot.
->
-> Kevin
-Agree. This is also an option.
+After the previous refactoring it is now possible to use separate functions
+to improve clarity of the interrupt paths. Similarly by checking the PCI
+devnfn to identify busA during apb_pci_bridge_realize() it becomes possible
+to completely remove the busA property from the PBMPCIBridge state.
 
-Den
+Signed-off-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+---
+ hw/pci-host/apb.c         |   54 ++++++++++++++++++---------------------------
+ include/hw/pci-host/apb.h |    3 ---
+ 2 files changed, 21 insertions(+), 36 deletions(-)
+
+diff --git a/hw/pci-host/apb.c b/hw/pci-host/apb.c
+index 6c20285..268100e 100644
+--- a/hw/pci-host/apb.c
++++ b/hw/pci-host/apb.c
+@@ -517,32 +517,27 @@ static int pci_apb_map_irq(PCIDevice *pci_dev, int irq_num)
+     return irq_num;
+ }
+ 
+-static int pci_pbm_map_irq(PCIDevice *pci_dev, int irq_num)
++static int pci_pbmA_map_irq(PCIDevice *pci_dev, int irq_num)
+ {
+-    PBMPCIBridge *br = PBM_PCI_BRIDGE(pci_bridge_get_device(
+-                           PCI_BUS(qdev_get_parent_bus(DEVICE(pci_dev)))));
+-
+-    int bus_offset;
+-    if (br->busA) {
+-        bus_offset = 0x0;
++    /* The on-board devices have fixed (legacy) OBIO intnos */
++    switch (PCI_SLOT(pci_dev->devfn)) {
++    case 1:
++        /* Onboard NIC */
++        return 0x21;
++    case 3:
++        /* Onboard IDE */
++        return 0x20;
++    default:
++        /* Normal intno, fall through */
++        break;
++    }
+ 
+-        /* The on-board devices have fixed (legacy) OBIO intnos */
+-        switch (PCI_SLOT(pci_dev->devfn)) {
+-        case 1:
+-            /* Onboard NIC */
+-            return 0x21;
+-        case 3:
+-            /* Onboard IDE */
+-            return 0x20;
++    return ((PCI_SLOT(pci_dev->devfn) << 2) + irq_num) & 0x1f;
++}
+ 
+-        default:
+-            /* Normal intno, fall through */
+-            break;
+-        }
+-    } else {
+-        bus_offset = 0x10;
+-    }
+-    return (bus_offset + (PCI_SLOT(pci_dev->devfn) << 2) + irq_num) & 0x1f;
++static int pci_pbmB_map_irq(PCIDevice *pci_dev, int irq_num)
++{
++    return (0x10 + (PCI_SLOT(pci_dev->devfn) << 2) + irq_num) & 0x1f;
+ }
+ 
+ static void pci_apb_set_irq(void *opaque, int irq_num, int level)
+@@ -593,7 +588,7 @@ static void apb_pci_bridge_realize(PCIDevice *dev, Error **errp)
+ 
+     /* If initialising busA, ensure that we allow IO transactions so that
+        we get the early serial console until OpenBIOS configures the bridge */
+-    if (br->busA) {
++    if (dev->devfn == PCI_DEVFN(1, 1)) {
+         cmd |= PCI_COMMAND_IO;
+     }
+ 
+@@ -673,14 +668,13 @@ static void pci_pbm_realize(DeviceState *dev, Error **errp)
+     pci_dev = pci_create_multifunction(phb->bus, PCI_DEVFN(1, 0), true,
+                                    TYPE_PBM_PCI_BRIDGE);
+     s->bridgeB = PCI_BRIDGE(pci_dev);
+-    pci_bridge_map_irq(s->bridgeB, "pciB", pci_pbm_map_irq);
++    pci_bridge_map_irq(s->bridgeB, "pciB", pci_pbmB_map_irq);
+     qdev_init_nofail(&pci_dev->qdev);
+ 
+     pci_dev = pci_create_multifunction(phb->bus, PCI_DEVFN(1, 1), true,
+                                    TYPE_PBM_PCI_BRIDGE);
+     s->bridgeA = PCI_BRIDGE(pci_dev);
+-    pci_bridge_map_irq(s->bridgeA, "pciA", pci_pbm_map_irq);
+-    qdev_prop_set_bit(DEVICE(pci_dev), "busA", true);
++    pci_bridge_map_irq(s->bridgeA, "pciA", pci_pbmA_map_irq);
+     qdev_init_nofail(&pci_dev->qdev);
+ }
+ 
+@@ -789,11 +783,6 @@ static const TypeInfo pbm_host_info = {
+     .class_init    = pbm_host_class_init,
+ };
+ 
+-static Property pbm_pci_properties[] = {
+-    DEFINE_PROP_BOOL("busA", PBMPCIBridge, busA, false),
+-    DEFINE_PROP_END_OF_LIST(),
+-};
+-
+ static void pbm_pci_bridge_class_init(ObjectClass *klass, void *data)
+ {
+     DeviceClass *dc = DEVICE_CLASS(klass);
+@@ -809,7 +798,6 @@ static void pbm_pci_bridge_class_init(ObjectClass *klass, void *data)
+     set_bit(DEVICE_CATEGORY_BRIDGE, dc->categories);
+     dc->reset = pci_bridge_reset;
+     dc->vmsd = &vmstate_pci_device;
+-    dc->props = pbm_pci_properties;
+ }
+ 
+ static const TypeInfo pbm_pci_bridge_info = {
+diff --git a/include/hw/pci-host/apb.h b/include/hw/pci-host/apb.h
+index f0074f7..dd49437 100644
+--- a/include/hw/pci-host/apb.h
++++ b/include/hw/pci-host/apb.h
+@@ -86,9 +86,6 @@ typedef struct APBState {
+ typedef struct PBMPCIBridge {
+     /*< private >*/
+     PCIBridge parent_obj;
+-
+-    /* Is this busA with in-built devices (ebus)? */
+-    bool busA;
+ } PBMPCIBridge;
+ 
+ #define TYPE_PBM_PCI_BRIDGE "pbm-bridge"
+-- 
+1.7.10.4
