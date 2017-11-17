@@ -1,29 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47402)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48849)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <yu.ning@linux.intel.com>) id 1eFbq1-0000XJ-El
-	for qemu-devel@nongnu.org; Fri, 17 Nov 2017 03:17:26 -0500
+	(envelope-from <vsementsov@virtuozzo.com>) id 1eFbv7-0001Nl-U1
+	for qemu-devel@nongnu.org; Fri, 17 Nov 2017 03:22:43 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <yu.ning@linux.intel.com>) id 1eFbpy-0001NP-AN
-	for qemu-devel@nongnu.org; Fri, 17 Nov 2017 03:17:25 -0500
-Received: from mga01.intel.com ([192.55.52.88]:59988)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <yu.ning@linux.intel.com>)
-	id 1eFbpy-0001IV-2T
-	for qemu-devel@nongnu.org; Fri, 17 Nov 2017 03:17:22 -0500
-References: <e1e3a1d3-da53-e46a-ce9b-7d1707e3a493@linux.intel.com>
-	<81495d39-0026-dba2-10b9-86d7df5babd3@tuxfamily.org>
-	<4a983bfc-442c-c55f-e3eb-9cb58a0d9ba8@redhat.com>
-	<aac92ba4-337c-df4f-c8f5-03b9fef1e2f0@linux.intel.com>
-	<cdd6e0a4-93cd-66ca-5e69-7a834f0b10d0@redhat.com>
-From: Yu Ning <yu.ning@linux.intel.com>
-Message-ID: <a1648b4d-946f-49c4-93c5-5990baa0bce8@linux.intel.com>
-Date: Fri, 17 Nov 2017 16:17:13 +0800
+	(envelope-from <vsementsov@virtuozzo.com>) id 1eFbv6-00066I-BN
+	for qemu-devel@nongnu.org; Fri, 17 Nov 2017 03:22:41 -0500
+References: <20171113162053.58795-1-vsementsov@virtuozzo.com>
+	<01108daa-fed3-c142-bbd6-0ecc4c8b795d@redhat.com>
+	<cd0a2e5e-f788-0e5a-dec7-f428479f3b89@virtuozzo.com>
+	<8c61f43c-5f56-8c1b-a2fe-f954d34dc687@redhat.com>
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Message-ID: <40392ab9-ec2a-30ed-ddab-a557682a4192@virtuozzo.com>
+Date: Fri, 17 Nov 2017 11:22:26 +0300
 MIME-Version: 1.0
-In-Reply-To: <cdd6e0a4-93cd-66ca-5e69-7a834f0b10d0@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
+In-Reply-To: <8c61f43c-5f56-8c1b-a2fe-f954d34dc687@redhat.com>
 Content-Language: en-US
-Subject: Re: [Qemu-devel] HAXM is now open source
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH for-2.12 0/4] qmp dirty bitmap API
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,54 +26,108 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>, John Snow <jsnow@redhat.com>, Thomas Huth <huth@tuxfamily.org>, qemu-devel <qemu-devel@nongnu.org>, Stefan Weil <sw@weilnetz.de>
-Cc: Vincent Palatin <vpalatin@chromium.org>
+To: John Snow <jsnow@redhat.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org
+Cc: kwolf@redhat.com, famz@redhat.com, armbru@redhat.com, mnestratov@virtuozzo.com, mreitz@redhat.com, nshirokovskiy@virtuozzo.com, stefanha@redhat.com, den@openvz.org, pbonzini@redhat.com
 
-
-
-On 11/15/2017 22:18, Paolo Bonzini wrote:
-> On 15/11/2017 09:25, Yu Ning wrote:
->>
->> On 11/15/2017 3:13, John Snow wrote:
->>> On 11/14/2017 06:09 AM, Thomas Huth wrote:
->>>> That's great news! I hope this all will help to promote QEMU on Windows
->>>> and macOS quite a bit!
+17.11.2017 06:10, John Snow wrote:
+>
+> On 11/16/2017 03:17 AM, Vladimir Sementsov-Ogievskiy wrote:
+>> 16.11.2017 00:20, John Snow wrote:
+>>> On 11/13/2017 11:20 AM, Vladimir Sementsov-Ogievskiy wrote:
+>>>> Hi all.
 >>>>
->>>> However, during the past months, I noticed a couple of times that users
->>>> ask on IRC or the qemu-discuss mailing list how they could accelerate
->>>> their QEMU on Windows - and they are running only in TCG mode when you
->>>> ask how they start QEMU. So it seems like there is not much knowledge
->>>> about "--accel hax" in the public yet. Maybe you could write a nice blog
->>>> post for the QEMU blog or something similar that explains how to use
->>>> HAXM with QEMU on Windows for the normal users? Or maybe make it more
->>>> prominent in the QEMU wiki? (e.g. the main page only mentions KVM and
->>>> Xen, but not HAXM)
->>> A blog post advertising this new development would be an absolute
->>> miracle for linking to people who are just getting started with QEMU on
->>> Windows.
+>>>> There are three qmp commands, needed to implement external backup API.
+>>>>
+>>>> Using these three commands, client may do all needed bitmap
+>>>> management by
+>>>> hand:
+>>>>
+>>>> on backup start we need to do a transaction:
+>>>>    {disable old bitmap, create new bitmap}
+>>>>
+>>>> on backup success:
+>>>>    drop old bitmap
+>>>>
+>>>> on backup fail:
+>>>>    enable old bitmap
+>>>>    merge new bitmap to old bitmap
+>>>>    drop new bitmap
+>>>>
+>>> Can you give me an example of how you expect these commands to be used,
+>>> and why they're required?
 >>>
->>> (It would also be really good for idiots like me, who do not use Windows
->>> for anything other than playing video games and sometimes forget that it
->>> is capable of doing other things.)
->> Thanks for the encouragement.
+>>> I'm a little weary about how error-prone these commands might be and the
+>>> potential for incorrect usage seems... high. Why do we require them?
+>> It is needed for incremental backup. It looks like bad idea to export
+>> abdicate/reclaim functionality, it is simpler
+>> and clearer to allow user to merge/enable/disable bitmaps by hand.
 >>
->> I think I can start by writing a small section that can be added to an
->> existing document, and later expanded to a blog article. But I haven't
->> found a suitable place for it on the QEMU wiki.
+>> usage is like this:
 >>
->> Does it make sense to add the proposed piece to the QEMU user manual
->> (qemu-doc.texi), under the Quick Start section (2.2)? The user manual is
->> published on Stefan's website and referred to by qemu.org:
+>> 1. we have dirty bitmap bitmap0 for incremental backup.
 >>
->> https://qemu.weilnetz.de/doc/qemu-doc.html
-> Unfortunately the "Quick Start" section is quite out of date (it doesn't
-> even mention KVM!) and is basically a huge list of options.  We are in
-> the process of improving QEMU documentation, so I think a blog post is
-> preferrable at this stage.
+>> 2. prepare image fleecing (create temporary image with backing=our_disk)
+>> 3. in qmp transaction:
+>>      - disable bitmap0
+>>      - create bitmap1
+>>      - start image fleecing (backup sync=none our_disk -> temp_disk)
+> This could probably just be its own command, though:
 >
+> block-job-fleece node=foobar bitmap=bitmap0 etc=etera etc=etera
 >
-I see. I'll take the advice.
+> Could handle forking the bitmap. I'm not sure what the arguments would
+> look like, but we could name the NBD export here, too. (Assuming the
+> server is already started and we just need to create the share.)
+>
+> Then, we can basically do what mirror does:
+>
+> (1) Cancel
+> (2) Complete
+>
+> Cancel would instruct QEMU to keep the bitmap changes (i.e. roll back),
+> and Complete would instruct QEMU to discard the changes.
+>
+> This way we don't need to expose commands like split or merge that will
+> almost always be dangerous to use over QMP.
+>
+> In fact, a fleecing job would be really convenient even without a
+> bitmap, because it'd still be nice to have a convenience command for it.
+> Using an existing infrastructure and understood paradigm is just a bonus.
 
-Is there a preferred document format for the QEMU blog, e.g. Markdown? 
-I'll get the content ready by early next week, and then I'll need 
-someone to help me post it.
+1. If I understand correctly, Kevin and Max said in their report in 
+Prague about new block-job approach,
+   using filter nodes, so I'm not sure that this is a good Idea to 
+introduce now new old-style block-job, where we can
+   do without it.
+
+2. there is the following scenario: customers needs a possibility to 
+create a backup of data changed since some
+point in time. So, maintaining several static and one (or several) activ 
+bitmaps with a possiblity of merge some of them
+and create a backup using this merged bitmap may be convenient.
+
+3. And I don't see any danger here: we already can create, delete and 
+clear dirty bitmaps through qmp. Some additional
+operations should not be bad.
+
+4. Interesting: "disabled" field looks like never used..
+
+>
+>> 4. export temp_disk (it looks like a snapshot) and bitmap0 through NBD
+>>
+>> === external tool can get bitmap0 and then copy some clusters through
+>> NBD ===
+>>
+>> on successful backup external tool can drop bitmap0. or can save it and
+>> reuse somehow
+>>
+>> on failed backup external tool can do the following:
+>>      - enable bitmap0
+>>      - merge bitmap1 to bitmap0
+>>      - drop bitmap1
+>>
+
+
+-- 
+Best regards,
+Vladimir
