@@ -1,41 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39100)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49016)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <danielhb@linux.vnet.ibm.com>) id 1eFnTJ-0004m1-Md
-	for qemu-devel@nongnu.org; Fri, 17 Nov 2017 15:42:47 -0500
+	(envelope-from <kraxel@redhat.com>) id 1eFnxq-0004h3-2a
+	for qemu-devel@nongnu.org; Fri, 17 Nov 2017 16:14:19 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <danielhb@linux.vnet.ibm.com>) id 1eFnTF-00065E-HR
-	for qemu-devel@nongnu.org; Fri, 17 Nov 2017 15:42:45 -0500
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:41202)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <danielhb@linux.vnet.ibm.com>)
-	id 1eFnTF-00063p-8U
-	for qemu-devel@nongnu.org; Fri, 17 Nov 2017 15:42:41 -0500
-Received: from pps.filterd (m0098396.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
-	vAHKdMfU093472
-	for <qemu-devel@nongnu.org>; Fri, 17 Nov 2017 15:42:32 -0500
-Received: from e38.co.us.ibm.com (e38.co.us.ibm.com [32.97.110.159])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2ea4fuy2u6-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Fri, 17 Nov 2017 15:42:32 -0500
-Received: from localhost
-	by e38.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
-	Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <danielhb@linux.vnet.ibm.com>;
-	Fri, 17 Nov 2017 13:42:31 -0700
-References: <151092340873.11818.16813698420232981002.stgit@bahia>
-	<48df4371-5966-a428-f5df-37c014c1ab94@linux.vnet.ibm.com>
-	<151094277418.31225.11006663740924379616@sif>
-From: Daniel Henrique Barboza <danielhb@linux.vnet.ibm.com>
-Date: Fri, 17 Nov 2017 18:42:25 -0200
+	(envelope-from <kraxel@redhat.com>) id 1eFnxm-0005X5-SF
+	for qemu-devel@nongnu.org; Fri, 17 Nov 2017 16:14:18 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:58692)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1eFnxm-0005Vw-MC
+	for qemu-devel@nongnu.org; Fri, 17 Nov 2017 16:14:14 -0500
+Date: Fri, 17 Nov 2017 22:14:12 +0100
+From: Gerd Hoffmann <kraxel@redhat.com>
+Message-ID: <20171117211412.ar4d4z52um2uq7c7@sirius.home.kraxel.org>
+References: <mailman.8273.1510914667.27993.qemu-devel@nongnu.org>
+	<50461419-2FB0-4A94-A6E6-4EFB459FF39D@gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <151094277418.31225.11006663740924379616@sif>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
-Content-Language: en-US
-Message-Id: <02367603-093e-3c09-e026-d78928a3f291@linux.vnet.ibm.com>
-Subject: Re: [Qemu-devel] [Qemu-ppc] [PATCH for-2.11] spapr: reset DRCs
- after devices
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <50461419-2FB0-4A94-A6E6-4EFB459FF39D@gmail.com>
+Subject: Re: [Qemu-devel] [PATCH 02/24] sdl: remove -alt-grab and -ctrl-grab
+ support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -44,173 +28,30 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Michael Roth <mdroth@linux.vnet.ibm.com>, Greg Kurz <groug@kaod.org>, qemu-devel@nongnu.org
-Cc: qemu-stable@nongnu.org, qemu-ppc@nongnu.org, David Gibson <david@gibson.dropbear.id.au>
+To: Programmingkid <programmingkidx@gmail.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, Markus Armbruster <armbru@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
 
+On Fri, Nov 17, 2017 at 11:06:12AM -0500, Programmingkid wrote:
+> 
+> > With absolute pointer devices such as usb-tablet being widely used
+> > mouse grabs (for relative pointing devices) should be rarely needed
+> > these days.  So the benefit of the options to configure the hotkey
+> > modifiers for grab (and other actions) seems questionable.  Which
+> > is expecially true for the -ctrl-grab which isn't handled in the
+> > handle_keyup() code.
+> 
+> So does this mean you are against a patch that would allow the user to
+> chose a key to act as a mouse ungrab key?
 
+I don't consider it a top priority, and given there I have lots of other
+things to do I most likely wouldn't implement that.  But I wouldn't
+object if someone comes up with a sane implementation.
 
-On 11/17/2017 04:19 PM, Michael Roth wrote:
-> Quoting Daniel Henrique Barboza (2017-11-17 10:21:27)
->>
->> On 11/17/2017 10:56 AM, Greg Kurz wrote:
->>> A DRC with a pending unplug request releases its associated device at
->>> machine reset time.
->>>
->>> In the case of LMB, when all DRCs for a DIMM device have been reset,
->>> the DIMM gets unplugged, causing guest memory to disappear. This may
->>> be very confusing for anything still using this memory.
->>>
->>> This is exactly what happens with vhost backends, and QEMU aborts
->>> with:
->>>
->>> qemu-system-ppc64: used ring relocated for ring 2
->>> qemu-system-ppc64: qemu/hw/virtio/vhost.c:649: vhost_commit: Assertion
->>>    `r >= 0' failed.
->>>
->>> The issue is that each DRC registers a QEMU reset handler, and we
->>> don't control the order in which these handlers are called (ie,
->>> a LMB DRC will unplug a DIMM before the virtio device using the
->>> memory on this DIMM could stop its vhost backend).
->>>
->>> To avoid such situations, let's reset DRCs after all devices
->>> have been reset.
->>>
->>> Reported-by: Mallesh N. Koti <mallesh@linux.vnet.ibm.com>
->>> Signed-off-by: Greg Kurz <groug@kaod.org>
->>> ---
->> I believe this has to do with the problem discussed at the memory
->> unplug reboot with vhost=on, right?
->>
->> I don't see any problem with this patch and it's probably the best solution
->> short-term for the problem (and potentially other related LMB release
->> problems), but that said, how hard it is to forbid LMB unplug at all if the
->> memory is being used in vhost?
->>
->> The way I see it, the root problem is that a device unplug failed at the
->> guest
->> side and we don't know about it, leaving drc->unplug_requested flags set
->> around the code when it shouldn't. Reading that thread I see a comment from
-> I'm not sure we want to go down the road of preemptively aborting
-> specific cases where we think unplug will fail in the guest. We already
-> need to deal with the cases where we don't know whether they'll fail
-> ahead of time, so it seems like more of a headache to add special cases
-> on top of that that management would need to deal with.
+What we have right now is just a big mess though, both in code and the
+user interface.  First, these are toplevel command line options.  It
+belongs to -display though.  Second, it's two hard-coded names for two
+hard-coded variations.  So it's not like you can configure much.  On top
+of that the names are not exactly intuitive.  And it works with SDL only.
 
-Just to be clear, I only advocate this kind of constraint if the LMB unplug,
-at this specific scenario, has a 100% chance of fail. Otherwise we're
-better of rolling the dice.
-
-
->
-> And in this particular case we'd never be able to unplug the DIMM if
-> the guest happens to use it for the vring each boot (unless maybe the
-> unplug request occured during early boot), even though there's no
-> technical reason we shouldn't be able to at least handle it on the
-> next reset.
-
-I am ok going this route if we have our bases covered. Does this
-behavior of unplugging the LMBs pending unplug at reset documented
-in the PAPR specs? If not, we would need to document it somewhere else
-(or ask for a PAPR revision to add it).
-
-Otherwise, I am not sure if management will be OK with LMBs being
-"inadvertently" hot unplugged in a reset due to a failed LMB hot unplug that
-might have occurred days ago and the user doesn't even remember it
-anymore :)
-
-
-Thanks,
-
-
-Daniel
->
->> Michael S. Tsirkin saying that this bug is somewhat expected, that vhost
->> backend will
->> not behave well if memory is going away. Unlike other LMB unplug
->> failures from
->> the guest side that might happen for any other reason, this one sees
->> predicable
->> and we can avoid it.
->>
->> I think this is something worth considering. But for now,
->>
->>
->> Reviewed-by: Daniel Henrique Barboza <danielhb@linux.vnet.ibm.com>
->>
->>>    hw/ppc/spapr.c     |   21 +++++++++++++++++++++
->>>    hw/ppc/spapr_drc.c |    7 -------
->>>    2 files changed, 21 insertions(+), 7 deletions(-)
->>>
->>> diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
->>> index 6841bd294b3c..6285f7211f9a 100644
->>> --- a/hw/ppc/spapr.c
->>> +++ b/hw/ppc/spapr.c
->>> @@ -1411,6 +1411,19 @@ static void find_unknown_sysbus_device(SysBusDevice *sbdev, void *opaque)
->>>        }
->>>    }
->>>
->>> +static int spapr_reset_drcs(Object *child, void *opaque)
->>> +{
->>> +    sPAPRDRConnector *drc =
->>> +        (sPAPRDRConnector *) object_dynamic_cast(child,
->>> +                                                 TYPE_SPAPR_DR_CONNECTOR);
->>> +
->>> +    if (drc) {
->>> +        spapr_drc_reset(drc);
->>> +    }
->>> +
->>> +    return 0;
->>> +}
->>> +
->>>    static void ppc_spapr_reset(void)
->>>    {
->>>        MachineState *machine = MACHINE(qdev_get_machine());
->>> @@ -1434,6 +1447,14 @@ static void ppc_spapr_reset(void)
->>>        }
->>>
->>>        qemu_devices_reset();
->>> +
->>> +    /* DRC reset may cause a device to be unplugged. This will cause troubles
->>> +     * if this device is used by another device (eg, a running vhost backend
->>> +     * will crash QEMU if the DIMM holding the vring goes away). To avoid such
->>> +     * situations, we reset DRCs after all devices have been reset.
->>> +     */
->>> +    object_child_foreach_recursive(object_get_root(), spapr_reset_drcs, NULL);
->>> +
->>>        spapr_clear_pending_events(spapr);
->>>
->>>        /*
->>> diff --git a/hw/ppc/spapr_drc.c b/hw/ppc/spapr_drc.c
->>> index 915e9b51c40c..e3b122968e89 100644
->>> --- a/hw/ppc/spapr_drc.c
->>> +++ b/hw/ppc/spapr_drc.c
->>> @@ -455,11 +455,6 @@ void spapr_drc_reset(sPAPRDRConnector *drc)
->>>        }
->>>    }
->>>
->>> -static void drc_reset(void *opaque)
->>> -{
->>> -    spapr_drc_reset(SPAPR_DR_CONNECTOR(opaque));
->>> -}
->>> -
->>>    bool spapr_drc_needed(void *opaque)
->>>    {
->>>        sPAPRDRConnector *drc = (sPAPRDRConnector *)opaque;
->>> @@ -518,7 +513,6 @@ static void realize(DeviceState *d, Error **errp)
->>>        }
->>>        vmstate_register(DEVICE(drc), spapr_drc_index(drc), &vmstate_spapr_drc,
->>>                         drc);
->>> -    qemu_register_reset(drc_reset, drc);
->>>        trace_spapr_drc_realize_complete(spapr_drc_index(drc));
->>>    }
->>>
->>> @@ -529,7 +523,6 @@ static void unrealize(DeviceState *d, Error **errp)
->>>        gchar *name;
->>>
->>>        trace_spapr_drc_unrealize(spapr_drc_index(drc));
->>> -    qemu_unregister_reset(drc_reset, drc);
->>>        vmstate_unregister(DEVICE(drc), &vmstate_spapr_drc, drc);
->>>        root_container = container_get(object_get_root(), DRC_CONTAINER_PATH);
->>>        name = g_strdup_printf("%x", spapr_drc_index(drc));
->>>
->>>
+cheers,
+  Gerd
