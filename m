@@ -1,16 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42852)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42856)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1eFlCU-0001AX-1b
-	for qemu-devel@nongnu.org; Fri, 17 Nov 2017 13:17:15 -0500
+	(envelope-from <kwolf@redhat.com>) id 1eFlCU-0001Ad-2h
+	for qemu-devel@nongnu.org; Fri, 17 Nov 2017 13:17:16 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1eFlCP-0002F4-1c
+	(envelope-from <kwolf@redhat.com>) id 1eFlCP-0002Fw-PV
 	for qemu-devel@nongnu.org; Fri, 17 Nov 2017 13:17:13 -0500
 From: Kevin Wolf <kwolf@redhat.com>
-Date: Fri, 17 Nov 2017 19:16:35 +0100
-Message-Id: <20171117181653.20651-8-kwolf@redhat.com>
+Date: Fri, 17 Nov 2017 19:16:34 +0100
+Message-Id: <20171117181653.20651-7-kwolf@redhat.com>
 In-Reply-To: <20171117181653.20651-1-kwolf@redhat.com>
 References: <20171117181653.20651-1-kwolf@redhat.com>
-Subject: [Qemu-devel] [PULL 07/25] block: Fix permissions in image activation
+Subject: [Qemu-devel] [PULL 06/25] qcow2: fix image corruption after
+ committing qcow2 image into base
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,70 +23,315 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org
 Cc: kwolf@redhat.com, qemu-devel@nongnu.org
 
-Inactive images generally request less permissions for their image files
-than they would if they were active (in particular, write permissions).
-Activating the image involves extending the permissions, therefore.
+From: "Daniel P. Berrange" <berrange@redhat.com>
 
-drv->bdrv_invalidate_cache() can already require write access to the
-image file, so we have to update the permissions earlier than that.
-The current code does it only later, so we have to move up this part.
+After committing the qcow2 image contents into the base image, qemu-img
+will call bdrv_make_empty to drop the payload in the layered image.
 
+When this is done for qcow2 images, it blows away the LUKS encryption
+header, making the resulting image unusable. There are two codepaths
+for emptying a qcow2 image, and the second (slower) codepath leaves
+the LUKS header intact, so force use of that codepath.
+
+Reviewed-by: Eric Blake <eblake@redhat.com>
+Signed-off-by: Daniel P. Berrange <berrange@redhat.com>
 Signed-off-by: Kevin Wolf <kwolf@redhat.com>
-Reviewed-by: Max Reitz <mreitz@redhat.com>
 ---
- block.c | 32 ++++++++++++++++++++++----------
- 1 file changed, 22 insertions(+), 10 deletions(-)
+ block/qcow2.c                    |   6 +-
+ tests/qemu-iotests/198           | 104 ++++++++++++++++++++++++++++++++
+ tests/qemu-iotests/198.out       | 126 +++++++++++++++++++++++++++++++++++++++
+ tests/qemu-iotests/common.filter |   4 +-
+ tests/qemu-iotests/group         |   1 +
+ 5 files changed, 238 insertions(+), 3 deletions(-)
+ create mode 100755 tests/qemu-iotests/198
+ create mode 100644 tests/qemu-iotests/198.out
 
-diff --git a/block.c b/block.c
-index 0ed0c27140..752fe6192b 100644
---- a/block.c
-+++ b/block.c
-@@ -4174,7 +4174,29 @@ void bdrv_invalidate_cache(BlockDriverState *bs, Error **errp)
-         }
+diff --git a/block/qcow2.c b/block/qcow2.c
+index 92e5d548e3..e9a86b7443 100644
+--- a/block/qcow2.c
++++ b/block/qcow2.c
+@@ -3601,12 +3601,14 @@ static int qcow2_make_empty(BlockDriverState *bs)
+     l1_clusters = DIV_ROUND_UP(s->l1_size, s->cluster_size / sizeof(uint64_t));
+ 
+     if (s->qcow_version >= 3 && !s->snapshots &&
+-        3 + l1_clusters <= s->refcount_block_size) {
++        3 + l1_clusters <= s->refcount_block_size &&
++        s->crypt_method_header != QCOW_CRYPT_LUKS) {
+         /* The following function only works for qcow2 v3 images (it requires
+          * the dirty flag) and only as long as there are no snapshots (because
+          * it completely empties the image). Furthermore, the L1 table and three
+          * additional clusters (image header, refcount table, one refcount
+-         * block) have to fit inside one refcount block. */
++         * block) have to fit inside one refcount block. It cannot be used
++         * for LUKS (yet) as it throws away the LUKS header cluster(s) */
+         return make_completely_empty(bs);
      }
  
-+    /*
-+     * Update permissions, they may differ for inactive nodes.
-+     *
-+     * Note that the required permissions of inactive images are always a
-+     * subset of the permissions required after activating the image. This
-+     * allows us to just get the permissions upfront without restricting
-+     * drv->bdrv_invalidate_cache().
-+     *
-+     * It also means that in error cases, we don't have to try and revert to
-+     * the old permissions (which is an operation that could fail, too). We can
-+     * just keep the extended permissions for the next time that an activation
-+     * of the image is tried.
-+     */
-     bs->open_flags &= ~BDRV_O_INACTIVE;
-+    bdrv_get_cumulative_perm(bs, &perm, &shared_perm);
-+    ret = bdrv_check_perm(bs, NULL, perm, shared_perm, NULL, &local_err);
-+    if (ret < 0) {
-+        bs->open_flags |= BDRV_O_INACTIVE;
-+        error_propagate(errp, local_err);
-+        return;
-+    }
-+    bdrv_set_perm(bs, perm, shared_perm);
+diff --git a/tests/qemu-iotests/198 b/tests/qemu-iotests/198
+new file mode 100755
+index 0000000000..34ef666381
+--- /dev/null
++++ b/tests/qemu-iotests/198
+@@ -0,0 +1,104 @@
++#!/bin/bash
++#
++# Test commit of encrypted qcow2 files
++#
++# Copyright (C) 2017 Red Hat, Inc.
++#
++# This program is free software; you can redistribute it and/or modify
++# it under the terms of the GNU General Public License as published by
++# the Free Software Foundation; either version 2 of the License, or
++# (at your option) any later version.
++#
++# This program is distributed in the hope that it will be useful,
++# but WITHOUT ANY WARRANTY; without even the implied warranty of
++# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++# GNU General Public License for more details.
++#
++# You should have received a copy of the GNU General Public License
++# along with this program.  If not, see <http://www.gnu.org/licenses/>.
++#
 +
-     if (bs->drv->bdrv_invalidate_cache) {
-         bs->drv->bdrv_invalidate_cache(bs, &local_err);
-         if (local_err) {
-@@ -4191,16 +4213,6 @@ void bdrv_invalidate_cache(BlockDriverState *bs, Error **errp)
-         return;
-     }
++# creator
++owner=berrange@redhat.com
++
++seq=`basename $0`
++echo "QA output created by $seq"
++
++here=`pwd`
++status=1	# failure is the default!
++
++_cleanup()
++{
++	_cleanup_test_img
++}
++trap "_cleanup; exit \$status" 0 1 2 3 15
++
++# get standard environment, filters and checks
++. ./common.rc
++. ./common.filter
++
++_supported_fmt qcow2
++_supported_proto generic
++_supported_os Linux
++
++
++size=16M
++TEST_IMG_BASE=$TEST_IMG.base
++SECRET0="secret,id=sec0,data=astrochicken"
++SECRET1="secret,id=sec1,data=furby"
++
++TEST_IMG_SAVE=$TEST_IMG
++TEST_IMG=$TEST_IMG_BASE
++echo "== create base =="
++_make_test_img --object $SECRET0 -o "encrypt.format=luks,encrypt.key-secret=sec0,encrypt.iter-time=10" $size
++TEST_IMG=$TEST_IMG_SAVE
++
++IMGSPECBASE="driver=$IMGFMT,file.filename=$TEST_IMG_BASE,encrypt.key-secret=sec0"
++IMGSPECLAYER="driver=$IMGFMT,file.filename=$TEST_IMG,encrypt.key-secret=sec1"
++IMGSPEC="$IMGSPECLAYER,backing.driver=$IMGFMT,backing.file.filename=$TEST_IMG_BASE,backing.encrypt.key-secret=sec0"
++QEMU_IO_OPTIONS=$QEMU_IO_OPTIONS_NO_FMT
++
++echo
++echo "== writing whole image base =="
++$QEMU_IO --object $SECRET0 -c "write -P 0xa 0 $size" --image-opts $IMGSPECBASE | _filter_qemu_io | _filter_testdir
++
++echo "== create overlay =="
++_make_test_img --object $SECRET1 -o "encrypt.format=luks,encrypt.key-secret=sec1,encrypt.iter-time=10" -u -b "$TEST_IMG_BASE" $size
++
++echo
++echo "== writing whole image layer =="
++$QEMU_IO --object $SECRET0 --object $SECRET1 -c "write -P 0x9 0 $size" --image-opts $IMGSPEC | _filter_qemu_io | _filter_testdir
++
++echo
++echo "== verify pattern base =="
++$QEMU_IO --object $SECRET0 -c "read -P 0xa 0 $size" --image-opts $IMGSPECBASE | _filter_qemu_io | _filter_testdir
++
++echo
++echo "== verify pattern layer =="
++$QEMU_IO --object $SECRET0 --object $SECRET1 -c "read -P 0x9 0 $size" --image-opts $IMGSPEC | _filter_qemu_io | _filter_testdir
++
++echo
++echo "== committing layer into base =="
++$QEMU_IMG commit --object $SECRET0 --object $SECRET1 --image-opts $IMGSPEC | _filter_testdir
++
++echo
++echo "== verify pattern base =="
++$QEMU_IO --object $SECRET0 -c "read -P 0x9 0 $size" --image-opts $IMGSPECBASE | _filter_qemu_io | _filter_testdir
++
++echo
++echo "== verify pattern layer =="
++$QEMU_IO --object $SECRET0 --object $SECRET1 -c "read -P 0x9 0 $size" --image-opts $IMGSPEC | _filter_qemu_io | _filter_testdir
++
++echo
++echo "== checking image base =="
++$QEMU_IMG info --image-opts $IMGSPECBASE | _filter_img_info | _filter_testdir | sed -e "/^disk size:/ D"
++
++echo
++echo "== checking image layer =="
++$QEMU_IMG info --image-opts $IMGSPECLAYER | _filter_img_info | _filter_testdir | sed -e "/^disk size:/ D"
++
++
++# success, all done
++echo "*** done"
++rm -f $seq.full
++status=0
+diff --git a/tests/qemu-iotests/198.out b/tests/qemu-iotests/198.out
+new file mode 100644
+index 0000000000..2db565e16b
+--- /dev/null
++++ b/tests/qemu-iotests/198.out
+@@ -0,0 +1,126 @@
++QA output created by 198
++== create base ==
++Formatting 'TEST_DIR/t.IMGFMT.base', fmt=IMGFMT size=16777216 encrypt.format=luks encrypt.key-secret=sec0 encrypt.iter-time=10
++
++== writing whole image base ==
++wrote 16777216/16777216 bytes at offset 0
++16 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
++== create overlay ==
++Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=16777216 backing_file=TEST_DIR/t.IMGFMT.base encrypt.format=luks encrypt.key-secret=sec1 encrypt.iter-time=10
++
++== writing whole image layer ==
++wrote 16777216/16777216 bytes at offset 0
++16 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
++
++== verify pattern base ==
++read 16777216/16777216 bytes at offset 0
++16 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
++
++== verify pattern layer ==
++read 16777216/16777216 bytes at offset 0
++16 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
++
++== committing layer into base ==
++Image committed.
++
++== verify pattern base ==
++read 16777216/16777216 bytes at offset 0
++16 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
++
++== verify pattern layer ==
++read 16777216/16777216 bytes at offset 0
++16 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
++
++== checking image base ==
++image: json:{"encrypt.key-secret": "sec0", "driver": "IMGFMT", "file": {"driver": "file", "filename": "TEST_DIR/t.IMGFMT.base"}}
++file format: IMGFMT
++virtual size: 16M (16777216 bytes)
++Format specific information:
++    compat: 1.1
++    lazy refcounts: false
++    refcount bits: 16
++    encrypt:
++        ivgen alg: plain64
++        hash alg: sha256
++        cipher alg: aes-256
++        uuid: 00000000-0000-0000-0000-000000000000
++        format: luks
++        cipher mode: xts
++        slots:
++            [0]:
++                active: true
++                iters: 1024
++                key offset: 4096
++                stripes: 4000
++            [1]:
++                active: false
++                key offset: 262144
++            [2]:
++                active: false
++                key offset: 520192
++            [3]:
++                active: false
++                key offset: 778240
++            [4]:
++                active: false
++                key offset: 1036288
++            [5]:
++                active: false
++                key offset: 1294336
++            [6]:
++                active: false
++                key offset: 1552384
++            [7]:
++                active: false
++                key offset: 1810432
++        payload offset: 2068480
++        master key iters: 1024
++    corrupt: false
++
++== checking image layer ==
++image: json:{"encrypt.key-secret": "sec1", "driver": "IMGFMT", "file": {"driver": "file", "filename": "TEST_DIR/t.IMGFMT"}}
++file format: IMGFMT
++virtual size: 16M (16777216 bytes)
++backing file: TEST_DIR/t.IMGFMT.base
++Format specific information:
++    compat: 1.1
++    lazy refcounts: false
++    refcount bits: 16
++    encrypt:
++        ivgen alg: plain64
++        hash alg: sha256
++        cipher alg: aes-256
++        uuid: 00000000-0000-0000-0000-000000000000
++        format: luks
++        cipher mode: xts
++        slots:
++            [0]:
++                active: true
++                iters: 1024
++                key offset: 4096
++                stripes: 4000
++            [1]:
++                active: false
++                key offset: 262144
++            [2]:
++                active: false
++                key offset: 520192
++            [3]:
++                active: false
++                key offset: 778240
++            [4]:
++                active: false
++                key offset: 1036288
++            [5]:
++                active: false
++                key offset: 1294336
++            [6]:
++                active: false
++                key offset: 1552384
++            [7]:
++                active: false
++                key offset: 1810432
++        payload offset: 2068480
++        master key iters: 1024
++    corrupt: false
++*** done
+diff --git a/tests/qemu-iotests/common.filter b/tests/qemu-iotests/common.filter
+index 873ca6b104..d9237799e9 100644
+--- a/tests/qemu-iotests/common.filter
++++ b/tests/qemu-iotests/common.filter
+@@ -157,7 +157,9 @@ _filter_img_info()
+         -e "/lazy_refcounts: \\(on\\|off\\)/d" \
+         -e "/block_size: [0-9]\\+/d" \
+         -e "/block_state_zero: \\(on\\|off\\)/d" \
+-        -e "/log_size: [0-9]\\+/d"
++        -e "/log_size: [0-9]\\+/d" \
++        -e "s/iters: [0-9]\\+/iters: 1024/" \
++        -e "s/uuid: [-a-f0-9]\\+/uuid: 00000000-0000-0000-0000-000000000000/"
+ }
  
--    /* Update permissions, they may differ for inactive nodes */
--    bdrv_get_cumulative_perm(bs, &perm, &shared_perm);
--    ret = bdrv_check_perm(bs, NULL, perm, shared_perm, NULL, &local_err);
--    if (ret < 0) {
--        bs->open_flags |= BDRV_O_INACTIVE;
--        error_propagate(errp, local_err);
--        return;
--    }
--    bdrv_set_perm(bs, perm, shared_perm);
--
-     QLIST_FOREACH(parent, &bs->parents, next_parent) {
-         if (parent->role->activate) {
-             parent->role->activate(parent, &local_err);
+ # filter out offsets and file names from qemu-img map; good for both
+diff --git a/tests/qemu-iotests/group b/tests/qemu-iotests/group
+index 24e5ad1b79..83b839bbe3 100644
+--- a/tests/qemu-iotests/group
++++ b/tests/qemu-iotests/group
+@@ -194,3 +194,4 @@
+ 194 rw auto migration quick
+ 195 rw auto quick
+ 197 rw auto quick
++198 rw auto
 -- 
 2.13.6
