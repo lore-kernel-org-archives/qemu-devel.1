@@ -1,22 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59093)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41319)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <sjitindarsingh@gmail.com>) id 1eFTsL-00007t-9p
-	for qemu-devel@nongnu.org; Thu, 16 Nov 2017 18:47:18 -0500
+	(envelope-from <jsnow@redhat.com>) id 1eFUdk-0001Hp-Ro
+	for qemu-devel@nongnu.org; Thu, 16 Nov 2017 19:36:17 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <sjitindarsingh@gmail.com>) id 1eFTsJ-0004Tz-Lr
-	for qemu-devel@nongnu.org; Thu, 16 Nov 2017 18:47:17 -0500
-Message-ID: <1510876024.2461.1.camel@gmail.com>
-From: Suraj Jitindar Singh <sjitindarsingh@gmail.com>
-Date: Fri, 17 Nov 2017 10:47:04 +1100
-In-Reply-To: <20171116192437.6fc1222b@bahia.lab.toulouse-stg.fr.ibm.com>
-References: <20171116041607.31852-1-sjitindarsingh@gmail.com>
-	<20171116041607.31852-2-sjitindarsingh@gmail.com>
-	<20171116192437.6fc1222b@bahia.lab.toulouse-stg.fr.ibm.com>
-Content-Type: text/plain; charset="UTF-8"
-Mime-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [Qemu-ppc] [QEMU-PPC] [PATCH] target/ppc: Update
- setting of cpu features to account for compat modes
+	(envelope-from <jsnow@redhat.com>) id 1eFUdk-00058l-7P
+	for qemu-devel@nongnu.org; Thu, 16 Nov 2017 19:36:16 -0500
+References: <20171030163309.75770-1-vsementsov@virtuozzo.com>
+	<20171030163309.75770-11-vsementsov@virtuozzo.com>
+	<97084802-ba48-4bc0-f106-dbeb906fd6e4@redhat.com>
+	<8d68daea-955b-21e6-3f14-1daef683651d@virtuozzo.com>
+From: John Snow <jsnow@redhat.com>
+Message-ID: <661343f3-3971-ae6f-670d-3c07cdaf34eb@redhat.com>
+Date: Thu, 16 Nov 2017 19:36:07 -0500
+MIME-Version: 1.0
+In-Reply-To: <8d68daea-955b-21e6-3f14-1daef683651d@virtuozzo.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v8 10/14] migration: add postcopy migration
+ of dirty bitmaps
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,201 +27,45 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Greg Kurz <groug@kaod.org>
-Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, sam.bobroff@au1.ibm.com, david@gibson.dropbear.id.au
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org
+Cc: stefanha@redhat.com, Peter Lieven <pl@kamp.de>
 
-On Thu, 2017-11-16 at 19:24 +0100, Greg Kurz wrote:
-> On Thu, 16 Nov 2017 15:16:07 +1100
-> Suraj Jitindar Singh <sjitindarsingh@gmail.com> wrote:
-> 
-> > The device tree nodes ibm,arch-vec-5-platform-support and ibm,pa-
-> > features
-> > are used to communicate features of the cpu to the guest operating
-> > system. The properties of each of these are determined based on the
-> > selected cpu model and the availability of hypervisor features.
-> > Currently the compatibility mode of the cpu is not taken into
-> > account.
-> > 
-> > The ibm,arch-vec-5-platform-support node is used to communicate the
-> > level of support for various ISAv3 processor features to the guest
-> > before CAS to inform the guests' request. The available mmu mode
-> > should
-> > only be hash unless the cpu is a POWER9 which is not in a prePOWER9
-> > compat mode, in which case the available modes depend on the
-> > accelerator and the hypervisor capabilities.
-> > 
-> > The ibm,pa-featues node is used to communicate the level of cpu
-> > support
-> > for various features to the guest os. This should only contain
-> > features
-> > relevant to the operating mode of the processor, that is the
-> > selected
-> > cpu model taking into account any compat mode. This means that the
-> > compat mode should be taken into account when choosing the
-> > properties of
-> > ibm,pa-features and they should match the compat mode selected, or
-> > the
-> > cpu model selected if no compat mode.
-> > 
-> > Update the setting of these cpu features in the device tree as
-> > described
-> > above to properly take into account any compat mode.
-> > 
-> > Signed-off-by: Suraj Jitindar Singh <sjitindarsingh@gmail.com>
-> > ---
-> >  hw/ppc/spapr.c | 38 +++++++++++++++++++++++++++++++++-----
-> >  1 file changed, 33 insertions(+), 5 deletions(-)
-> > 
-> > diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-> > index d682f01..0dab6f1 100644
-> > --- a/hw/ppc/spapr.c
-> > +++ b/hw/ppc/spapr.c
-> > @@ -44,6 +44,7 @@
-> >  #include "migration/register.h"
-> >  #include "mmu-hash64.h"
-> >  #include "mmu-book3s-v3.h"
-> > +#include "cpu-models.h"
-> >  #include "qom/cpu.h"
-> >  
-> >  #include "hw/boards.h"
-> > @@ -255,6 +256,7 @@ static int spapr_fixup_cpu_numa_dt(void *fdt,
-> > int offset, PowerPCCPU *cpu)
-> >  static void spapr_populate_pa_features(CPUPPCState *env, void
-> > *fdt, int offset,
-> >                                        bool legacy_guest)
-> >  {
-> > +    PowerPCCPU *cpu = ppc_env_get_cpu(env);
-> 
-> If spapr_populate_pa_features() now needs to peek into PowerPCCPU,
-> then it
-> should be passed a PowerPCCPU * instead of doing container_of()
-> contorsions.
-> Both callers, spapr_fixup_cpu_dt() and spapr_populate_cpu_dt() can do
-> that.
 
-Good point :)
 
-> 
-> >      uint8_t pa_features_206[] = { 6, 0,
-> >          0xf6, 0x1f, 0xc7, 0x00, 0x80, 0xc0 };
-> >      uint8_t pa_features_207[] = { 24, 0,
-> > @@ -290,16 +292,36 @@ static void
-> > spapr_populate_pa_features(CPUPPCState *env, void *fdt, int offset,
-> >      uint8_t *pa_features;
-> >      size_t pa_size;
-> >  
-> > -    switch (POWERPC_MMU_VER(env->mmu_model)) {
-> > -    case POWERPC_MMU_VER_2_06:
-> > +    switch (cpu->compat_pvr) {
-> > +    case 0:
-> > +        /* If not in a compat mode then determine based on the mmu
-> > model */
-> > +        switch (POWERPC_MMU_VER(env->mmu_model)) {
-> > +        case POWERPC_MMU_VER_2_06:
-> > +            pa_features = pa_features_206;
-> > +            pa_size = sizeof(pa_features_206);
-> > +            break;
-> > +        case POWERPC_MMU_VER_2_07:
-> > +            pa_features = pa_features_207;
-> > +            pa_size = sizeof(pa_features_207);
-> > +            break;
-> > +        case POWERPC_MMU_VER_3_00:
-> > +            pa_features = pa_features_300;
-> > +            pa_size = sizeof(pa_features_300);
-> > +            break;
-> > +        default:
-> > +            return;
-> > +        }
-> > +        break;
-> > +    case CPU_POWERPC_LOGICAL_2_06:
-> > +    case CPU_POWERPC_LOGICAL_2_06_PLUS:
-> >          pa_features = pa_features_206;
-> >          pa_size = sizeof(pa_features_206);
-> >          break;
-> > -    case POWERPC_MMU_VER_2_07:
-> > +    case CPU_POWERPC_LOGICAL_2_07:
-> >          pa_features = pa_features_207;
-> >          pa_size = sizeof(pa_features_207);
-> >          break;
-> > -    case POWERPC_MMU_VER_3_00:
-> > +    case CPU_POWERPC_LOGICAL_3_00:
-> >          pa_features = pa_features_300;
-> >          pa_size = sizeof(pa_features_300);
-> >          break;
-> > @@ -941,6 +963,7 @@ static void spapr_dt_rtas(sPAPRMachineState
-> > *spapr, void *fdt)
-> >  static void spapr_dt_ov5_platform_support(void *fdt, int chosen)
-> >  {
-> >      PowerPCCPU *first_ppc_cpu = POWERPC_CPU(first_cpu);
-> > +    CPUPPCState *env = &first_ppc_cpu->env;
-> >  
-> >      char val[2 * 4] = {
-> >          23, 0x00, /* Xive mode, filled in below. */
-> > @@ -949,7 +972,12 @@ static void spapr_dt_ov5_platform_support(void
-> > *fdt, int chosen)
-> >          26, 0x40, /* Radix options: GTSE == yes. */
-> >      };
-> >  
-> > -    if (kvm_enabled()) {
-> > +    if (POWERPC_MMU_VER(env->mmu_model) != POWERPC_MMU_VER_3_00 ||
-> > +        (first_ppc_cpu->compat_pvr && (first_ppc_cpu->compat_pvr <
-> > +                                       CPU_POWERPC_LOGICAL_3_00)))
-> > {
-> > +        /* If we're in a pre POWER9 compat mode then the guest
-> > should do hash */
-> > +        val[3] = 0x00; /* Hash */
-> > +    } else if (kvm_enabled()) {
-> >          if (kvmppc_has_cap_mmu_radix() &&
-> > kvmppc_has_cap_mmu_hash_v3()) {
-> >              val[3] = 0x80; /* OV5_MMU_BOTH */
-> >          } else if (kvmppc_has_cap_mmu_radix()) {
-> 
-> So we end up with:
-> 
->     if (POWERPC_MMU_VER(env->mmu_model) != POWERPC_MMU_VER_3_00 ||
-> 
-> Isn't this case handled...
-> 
->         (first_ppc_cpu->compat_pvr && (first_ppc_cpu->compat_pvr <
->                                        CPU_POWERPC_LOGICAL_3_00))) {
->         /* If we're in a pre POWER9 compat mode then the guest should
-> do hash */
->         val[3] = 0x00; /* Hash */
->     } else if (kvm_enabled()) {
->         if (kvmppc_has_cap_mmu_radix() &&
-> kvmppc_has_cap_mmu_hash_v3()) {
->             val[3] = 0x80; /* OV5_MMU_BOTH */
->         } else if (kvmppc_has_cap_mmu_radix()) {
->             val[3] = 0x40; /* OV5_MMU_RADIX_300 */
->         } else {
->             val[3] = 0x00; /* Hash */
->         }
->     } else {
->         if (first_ppc_cpu->env.mmu_model & POWERPC_MMU_V3) {
-> 
-> s/first_ppc_cpu->env./env->/ ?
-> 
->             /* V3 MMU supports both hash and radix (with dynamic
-> switching) */
->             val[3] = 0xC0;
->         } else {
->             /* Otherwise we can only do hash */
->             val[3] = 0x00;
-> 
-> ... here ?
+On 11/16/2017 05:24 AM, Vladimir Sementsov-Ogievskiy wrote:
+>>> +=C2=A0=C2=A0=C2=A0 /* if a block is zero we need to flush here since=
+ the network
+>>> +=C2=A0=C2=A0=C2=A0=C2=A0 * bandwidth is now a lot higher than the st=
+orage device bandwidth.
+>>> +=C2=A0=C2=A0=C2=A0=C2=A0 * thus if we queue zero blocks we slow down=
+ the migration. */
+>> Can you elaborate on this for me?
+>=20
+> it comes from migration/block.c, as it was a prototype for dirty bitmap=
+s
+> migration.
+> May be the original thought was to give destination storage more time t=
+o
+> handle
+> write-zeros? It may make sense if it can't do it fast but really writes
+> zeros.
+>=20
+>>
+>>> +=C2=A0=C2=A0=C2=A0 if (flags & DIRTY_BITMAP_MIG_FLAG_ZEROES) {
+>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 qemu_fflush(f);
+>>> +=C2=A0=C2=A0=C2=A0 } else {
+>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 qemu_put_be64(f, buf_size=
+);
+>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 qemu_put_buffer(f, buf, b=
+uf_size);
+>>> +=C2=A0=C2=A0=C2=A0 }
+>>> +
+>>> +=C2=A0=C2=A0=C2=A0 g_free(buf);
+>>> +}=20
 
-Another good point :)
+Peter, Stefan; do you have any insight on the reason for this blurb's
+appearance in migration/block.c? Looks like it showed up in
+323004a39d4d8d33c744a5b108f80bfe6402fca3
 
-> 
->         }
->     }
-> 
-
-In reality the entire cpu capability handling is a bit of a mess and
-requires an entire rework, I just don't have the time. Rather than
-querying the cpu model, compat mode and kvm capabilities everywhere I
-would like to see a single set of cpu capabilities which are
-manipulated by the cpu model selection, compat mode selection and kvm
-capability querying code to have a single set of unified capabilities
-that can be queried to discover the current capabilities of the
-operating mode. But that's something for a rainy day :D
+I'm not sure I understand what the concern was that lead to this, unless
+it's simply that without a flush() we can't guarantee progress.
