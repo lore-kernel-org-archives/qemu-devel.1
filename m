@@ -1,32 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44058)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44976)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1eFhXN-0006XJ-Pm
-	for qemu-devel@nongnu.org; Fri, 17 Nov 2017 09:22:34 -0500
+	(envelope-from <atar4qemu@gmail.com>) id 1eFhZA-00080c-MW
+	for qemu-devel@nongnu.org; Fri, 17 Nov 2017 09:24:26 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1eFhXK-0007qi-D7
-	for qemu-devel@nongnu.org; Fri, 17 Nov 2017 09:22:33 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:56172)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1eFhXK-0007oV-7G
-	for qemu-devel@nongnu.org; Fri, 17 Nov 2017 09:22:30 -0500
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
-	[10.5.11.14])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 6E60C267F5
-	for <qemu-devel@nongnu.org>; Fri, 17 Nov 2017 14:22:29 +0000 (UTC)
-Date: Fri, 17 Nov 2017 14:22:22 +0000
-From: "Daniel P. Berrange" <berrange@redhat.com>
-Message-ID: <20171117142222.GV25830@redhat.com>
-Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
-References: <20171117103046.15943-1-kraxel@redhat.com>
-	<20171117103046.15943-3-kraxel@redhat.com>
+	(envelope-from <atar4qemu@gmail.com>) id 1eFhZ9-0002kq-7b
+	for qemu-devel@nongnu.org; Fri, 17 Nov 2017 09:24:24 -0500
+Received: from mail-it0-x242.google.com ([2607:f8b0:4001:c0b::242]:43187)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <atar4qemu@gmail.com>) id 1eFhZ9-0002jm-1w
+	for qemu-devel@nongnu.org; Fri, 17 Nov 2017 09:24:23 -0500
+Received: by mail-it0-x242.google.com with SMTP id m191so4218729itg.2
+	for <qemu-devel@nongnu.org>; Fri, 17 Nov 2017 06:24:22 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20171117103046.15943-3-kraxel@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH 02/24] sdl: remove -alt-grab and -ctrl-grab
- support
+In-Reply-To: <1510926167-23326-2-git-send-email-mark.cave-ayland@ilande.co.uk>
+References: <1510926167-23326-1-git-send-email-mark.cave-ayland@ilande.co.uk>
+	<1510926167-23326-2-git-send-email-mark.cave-ayland@ilande.co.uk>
+From: Artyom Tarasenko <atar4qemu@gmail.com>
+Date: Fri, 17 Nov 2017 15:24:01 +0100
+Message-ID: <CACXAS8DBV72n4Vp0eUc-Hg6df37QYAXjLTnSQn3r71TTtaWGdg@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH 01/15] apb: move QOM macros and typedefs
+ from apb.c to apb.h
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,25 +29,232 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Gerd Hoffmann <kraxel@redhat.com>
-Cc: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Markus Armbruster <armbru@redhat.com>
+To: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+Cc: qemu-devel <qemu-devel@nongnu.org>
 
-On Fri, Nov 17, 2017 at 11:30:24AM +0100, Gerd Hoffmann wrote:
-> With absolute pointer devices such as usb-tablet being widely used
-> mouse grabs (for relative pointing devices) should be rarely needed
-> these days.  So the benefit of the options to configure the hotkey
-> modifiers for grab (and other actions) seems questionable.  Which
-> is expecially true for the -ctrl-grab which isn't handled in the
-> handle_keyup() code.
-> 
-> Drop the code, print a notice when the option is still used.
+Hi Mark,
 
-These need to go through the proper deprecation process too.
+On Fri, Nov 17, 2017 at 2:42 PM, Mark Cave-Ayland
+<mark.cave-ayland@ilande.co.uk> wrote:
+> This also includes the related IOMMUState typedef and defines.
+>
+> Signed-off-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+> ---
+>  hw/pci-host/apb.c         |   85 --------------------------------------------
+>  include/hw/pci-host/apb.h |   86 +++++++++++++++++++++++++++++++++++++++++++++
+>  2 files changed, 86 insertions(+), 85 deletions(-)
+>
+> diff --git a/hw/pci-host/apb.c b/hw/pci-host/apb.c
+> index 64025cd..f743a4e 100644
+> --- a/hw/pci-host/apb.c
+> +++ b/hw/pci-host/apb.c
+> @@ -82,91 +82,6 @@ do { printf("IOMMU: " fmt , ## __VA_ARGS__); } while (0)
+>  #define MAX_IVEC 0x40
+>  #define NO_IRQ_REQUEST (MAX_IVEC + 1)
+>
+> -#define IOMMU_PAGE_SIZE_8K      (1ULL << 13)
+> -#define IOMMU_PAGE_MASK_8K      (~(IOMMU_PAGE_SIZE_8K - 1))
+> -#define IOMMU_PAGE_SIZE_64K     (1ULL << 16)
+> -#define IOMMU_PAGE_MASK_64K     (~(IOMMU_PAGE_SIZE_64K - 1))
+> -
+> -#define IOMMU_NREGS             3
+> -
+> -#define IOMMU_CTRL              0x0
+> -#define IOMMU_CTRL_TBW_SIZE     (1ULL << 2)
+> -#define IOMMU_CTRL_MMU_EN       (1ULL)
+> -
+> -#define IOMMU_CTRL_TSB_SHIFT    16
+> -
+> -#define IOMMU_BASE              0x8
+> -#define IOMMU_FLUSH             0x10
+> -
+> -#define IOMMU_TTE_DATA_V        (1ULL << 63)
+> -#define IOMMU_TTE_DATA_SIZE     (1ULL << 61)
+> -#define IOMMU_TTE_DATA_W        (1ULL << 1)
+> -
+> -#define IOMMU_TTE_PHYS_MASK_8K  0x1ffffffe000ULL
+> -#define IOMMU_TTE_PHYS_MASK_64K 0x1ffffff8000ULL
+> -
+> -#define IOMMU_TSB_8K_OFFSET_MASK_8M    0x00000000007fe000ULL
+> -#define IOMMU_TSB_8K_OFFSET_MASK_16M   0x0000000000ffe000ULL
+> -#define IOMMU_TSB_8K_OFFSET_MASK_32M   0x0000000001ffe000ULL
+> -#define IOMMU_TSB_8K_OFFSET_MASK_64M   0x0000000003ffe000ULL
+> -#define IOMMU_TSB_8K_OFFSET_MASK_128M  0x0000000007ffe000ULL
+> -#define IOMMU_TSB_8K_OFFSET_MASK_256M  0x000000000fffe000ULL
+> -#define IOMMU_TSB_8K_OFFSET_MASK_512M  0x000000001fffe000ULL
+> -#define IOMMU_TSB_8K_OFFSET_MASK_1G    0x000000003fffe000ULL
+> -
+> -#define IOMMU_TSB_64K_OFFSET_MASK_64M  0x0000000003ff0000ULL
+> -#define IOMMU_TSB_64K_OFFSET_MASK_128M 0x0000000007ff0000ULL
+> -#define IOMMU_TSB_64K_OFFSET_MASK_256M 0x000000000fff0000ULL
+> -#define IOMMU_TSB_64K_OFFSET_MASK_512M 0x000000001fff0000ULL
+> -#define IOMMU_TSB_64K_OFFSET_MASK_1G   0x000000003fff0000ULL
+> -#define IOMMU_TSB_64K_OFFSET_MASK_2G   0x000000007fff0000ULL
+> -
+> -typedef struct IOMMUState {
+> -    AddressSpace iommu_as;
+> -    IOMMUMemoryRegion iommu;
+> -
+> -    uint64_t regs[IOMMU_NREGS];
+> -} IOMMUState;
+> -
+> -#define TYPE_APB "pbm"
+> -
+> -#define APB_DEVICE(obj) \
+> -    OBJECT_CHECK(APBState, (obj), TYPE_APB)
+> -
+> -#define TYPE_APB_IOMMU_MEMORY_REGION "pbm-iommu-memory-region"
+> -
+> -typedef struct APBState {
+> -    PCIHostState parent_obj;
+> -
+> -    MemoryRegion apb_config;
+> -    MemoryRegion pci_config;
+> -    MemoryRegion pci_mmio;
+> -    MemoryRegion pci_ioport;
+> -    uint64_t pci_irq_in;
+> -    IOMMUState iommu;
+> -    uint32_t pci_control[16];
+> -    uint32_t pci_irq_map[8];
+> -    uint32_t pci_err_irq_map[4];
+> -    uint32_t obio_irq_map[32];
+> -    qemu_irq *pbm_irqs;
+> -    qemu_irq *ivec_irqs;
+> -    unsigned int irq_request;
+> -    uint32_t reset_control;
+> -    unsigned int nr_resets;
+> -} APBState;
+> -
+> -#define TYPE_PBM_PCI_BRIDGE "pbm-bridge"
+> -#define PBM_PCI_BRIDGE(obj) \
+> -    OBJECT_CHECK(PBMPCIBridge, (obj), TYPE_PBM_PCI_BRIDGE)
+> -
+> -typedef struct PBMPCIBridge {
+> -    /*< private >*/
+> -    PCIBridge parent_obj;
+> -
+> -    /* Is this busA with in-built devices (ebus)? */
+> -    bool busA;
+> -} PBMPCIBridge;
+> -
+>  static inline void pbm_set_request(APBState *s, unsigned int irq_num)
+>  {
+>      APB_DPRINTF("%s: request irq %d\n", __func__, irq_num);
+> diff --git a/include/hw/pci-host/apb.h b/include/hw/pci-host/apb.h
+> index b19bd55..5d39c03 100644
+> --- a/include/hw/pci-host/apb.h
+> +++ b/include/hw/pci-host/apb.h
+> @@ -2,6 +2,92 @@
+>  #define PCI_HOST_APB_H
+>
+>  #include "qemu-common.h"
+> +#include "hw/pci/pci_host.h"
+> +
+> +#define IOMMU_NREGS             3
+> +
+> +#define IOMMU_PAGE_SIZE_8K      (1ULL << 13)
+> +#define IOMMU_PAGE_MASK_8K      (~(IOMMU_PAGE_SIZE_8K - 1))
+> +#define IOMMU_PAGE_SIZE_64K     (1ULL << 16)
+> +#define IOMMU_PAGE_MASK_64K     (~(IOMMU_PAGE_SIZE_64K - 1))
+> +
+> +#define IOMMU_CTRL              0x0
+> +#define IOMMU_CTRL_TBW_SIZE     (1ULL << 2)
+> +#define IOMMU_CTRL_MMU_EN       (1ULL)
+
+While at it, I think the naming for the model-specific constants
+should be more explicit.
+How about US2I_IOMMU_ or SABRE_IOMMU_?
+
+> +
+> +#define IOMMU_CTRL_TSB_SHIFT    16
+> +
+> +#define IOMMU_BASE              0x8
+> +#define IOMMU_FLUSH             0x10
+> +
+> +#define IOMMU_TTE_DATA_V        (1ULL << 63)
+> +#define IOMMU_TTE_DATA_SIZE     (1ULL << 61)
+> +#define IOMMU_TTE_DATA_W        (1ULL << 1)
+> +
+> +#define IOMMU_TTE_PHYS_MASK_8K  0x1ffffffe000ULL
+> +#define IOMMU_TTE_PHYS_MASK_64K 0x1ffffff8000ULL
+> +
+> +#define IOMMU_TSB_8K_OFFSET_MASK_8M    0x00000000007fe000ULL
+> +#define IOMMU_TSB_8K_OFFSET_MASK_16M   0x0000000000ffe000ULL
+> +#define IOMMU_TSB_8K_OFFSET_MASK_32M   0x0000000001ffe000ULL
+> +#define IOMMU_TSB_8K_OFFSET_MASK_64M   0x0000000003ffe000ULL
+> +#define IOMMU_TSB_8K_OFFSET_MASK_128M  0x0000000007ffe000ULL
+> +#define IOMMU_TSB_8K_OFFSET_MASK_256M  0x000000000fffe000ULL
+> +#define IOMMU_TSB_8K_OFFSET_MASK_512M  0x000000001fffe000ULL
+> +#define IOMMU_TSB_8K_OFFSET_MASK_1G    0x000000003fffe000ULL
+> +
+> +#define IOMMU_TSB_64K_OFFSET_MASK_64M  0x0000000003ff0000ULL
+> +#define IOMMU_TSB_64K_OFFSET_MASK_128M 0x0000000007ff0000ULL
+> +#define IOMMU_TSB_64K_OFFSET_MASK_256M 0x000000000fff0000ULL
+> +#define IOMMU_TSB_64K_OFFSET_MASK_512M 0x000000001fff0000ULL
+> +#define IOMMU_TSB_64K_OFFSET_MASK_1G   0x000000003fff0000ULL
+> +#define IOMMU_TSB_64K_OFFSET_MASK_2G   0x000000007fff0000ULL
+
+Maybe it's possible to compute the mask from the bits, similarly to
+how it's done in the Niagara model?
+If so, these defines would be not necessary.
+
+> +
+> +typedef struct IOMMUState {
+> +    AddressSpace iommu_as;
+> +    IOMMUMemoryRegion iommu;
+> +
+> +    uint64_t regs[IOMMU_NREGS];
+> +} IOMMUState;
+> +
+> +#define TYPE_APB "pbm"
+> +
+> +#define APB_DEVICE(obj) \
+> +    OBJECT_CHECK(APBState, (obj), TYPE_APB)
+> +
+> +#define TYPE_APB_IOMMU_MEMORY_REGION "pbm-iommu-memory-region"
+> +
+> +typedef struct APBState {
+> +    PCIHostState parent_obj;
+> +
+> +    MemoryRegion apb_config;
+> +    MemoryRegion pci_config;
+> +    MemoryRegion pci_mmio;
+> +    MemoryRegion pci_ioport;
+> +    uint64_t pci_irq_in;
+> +    IOMMUState iommu;
+> +    uint32_t pci_control[16];
+> +    uint32_t pci_irq_map[8];
+> +    uint32_t pci_err_irq_map[4];
+> +    uint32_t obio_irq_map[32];
+> +    qemu_irq *pbm_irqs;
+> +    qemu_irq *ivec_irqs;
+> +    unsigned int irq_request;
+> +    uint32_t reset_control;
+> +    unsigned int nr_resets;
+> +} APBState;
+> +
+> +typedef struct PBMPCIBridge {
+> +    /*< private >*/
+> +    PCIBridge parent_obj;
+> +
+> +    /* Is this busA with in-built devices (ebus)? */
+> +    bool busA;
+> +} PBMPCIBridge;
+> +
+> +#define TYPE_PBM_PCI_BRIDGE "pbm-bridge"
+> +#define PBM_PCI_BRIDGE(obj) \
+> +    OBJECT_CHECK(PBMPCIBridge, (obj), TYPE_PBM_PCI_BRIDGE)
+>
+>  PCIBus *pci_apb_init(hwaddr special_base,
+>                       hwaddr mem_base,
+> --
+> 1.7.10.4
+>
 
 
-Regards,
-Daniel
+
 -- 
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
+Regards,
+Artyom Tarasenko
+
+SPARC and PPC PReP under qemu blog: http://tyom.blogspot.com/search/label/qemu
