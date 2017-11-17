@@ -1,30 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38421)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39194)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1eFazY-0001yD-6j
-	for qemu-devel@nongnu.org; Fri, 17 Nov 2017 02:23:13 -0500
+	(envelope-from <pbonzini@redhat.com>) id 1eFb1g-0003cA-BS
+	for qemu-devel@nongnu.org; Fri, 17 Nov 2017 02:25:25 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1eFazU-0004w2-6B
-	for qemu-devel@nongnu.org; Fri, 17 Nov 2017 02:23:12 -0500
-Received: from 9.mo68.mail-out.ovh.net ([46.105.78.111]:60213)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1eFazT-0004uo-TY
-	for qemu-devel@nongnu.org; Fri, 17 Nov 2017 02:23:08 -0500
-Received: from player750.ha.ovh.net (b6.ovh.net [213.186.33.56])
-	by mo68.mail-out.ovh.net (Postfix) with ESMTP id 5A3D49DCA4
-	for <qemu-devel@nongnu.org>; Fri, 17 Nov 2017 08:23:06 +0100 (CET)
-References: <20171110152017.24324-1-clg@kaod.org>
-	<20171110152017.24324-9-clg@kaod.org>
-	<20171117045412.GC26448@umbus.fritz.box>
-From: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
-Message-ID: <54f87bb8-e502-fdc8-1069-2f6081e0d446@kaod.org>
-Date: Fri, 17 Nov 2017 08:23:00 +0100
+	(envelope-from <pbonzini@redhat.com>) id 1eFb1c-0006rZ-7W
+	for qemu-devel@nongnu.org; Fri, 17 Nov 2017 02:25:24 -0500
+Received: from mail-wm0-f43.google.com ([74.125.82.43]:41731)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1eFb1b-0006qh-In
+	for qemu-devel@nongnu.org; Fri, 17 Nov 2017 02:25:19 -0500
+Received: by mail-wm0-f43.google.com with SMTP id b189so4527208wmd.0
+	for <qemu-devel@nongnu.org>; Thu, 16 Nov 2017 23:25:19 -0800 (PST)
+References: <20171116173810.16457-1-crosa@redhat.com>
+	<20171116173810.16457-2-crosa@redhat.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <a5c42ab2-f384-4768-6e07-30814789ef5c@redhat.com>
+Date: Fri, 17 Nov 2017 08:25:16 +0100
 MIME-Version: 1.0
-In-Reply-To: <20171117045412.GC26448@umbus.fritz.box>
-Content-Type: text/plain; charset=windows-1252
+In-Reply-To: <20171116173810.16457-2-crosa@redhat.com>
+Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH for-2.12 v3 08/11] spapr: introduce a
- XICSFabric irq_is_lsi() operation
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [Qemu-block] [PATCH 01/10] qemu-iotests: make
+ execution of tests agnostic to test type
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,249 +31,122 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Gibson <david@gibson.dropbear.id.au>
-Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, Greg Kurz <groug@kaod.org>, Benjamin Herrenschmidt <benh@kernel.crashing.org>
+To: Cleber Rosa <crosa@redhat.com>, qemu-devel@nongnu.org
+Cc: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>
 
-On 11/17/2017 05:54 AM, David Gibson wrote:
-> On Fri, Nov 10, 2017 at 03:20:14PM +0000, C=E9dric Le Goater wrote:
->> It will be used later on to distinguish the allocation of an LSI
->> interrupt from an MSI and also to reduce the use of the ICSIRQState
->> array of the ICSState object, which is on our way to introduce XIVE.
->>
->> The 'irq' parameter continues to refer to the global IRQ number space.
->>
->> On PowerNV, only the PSI controller interrupts are handled and they
->> are all LSIs.
->>
->> Signed-off-by: C=E9dric Le Goater <clg@kaod.org>
->=20
-> !?! AFAICT this is a step backwards.  The users of ics_is_lsi() here
-> are in the xics code.  So they already have the right information
-> locally in the ICSState object.  Why on earth would you indirect
-> through the fabric.
+On 16/11/2017 18:38, Cleber Rosa wrote:
+> check makes a distinction on how it runs Python based tests.  The
+> current approach is inconsistent because:
+> 
+> 1) a large number of Python tests are already set as executable files
+> (eg: 030, 040, 041, 044, 045, 055, 056, 057, 065, 093, 118, 147, 149,
+> 155, 165 and 194)
+> 
+> 2) a smaller number of Python tests are not set as executable files
+> 
+> 3) the true purpose of a shebang line is to make a file executable,
+> while it currently is used (inconsistently) as a test type flag
+> 
+> 4) the same logic could in theory be applied to shell based tests,
+> that is, if first line contains a shell shebang, run it with
+> "$SHELL $test_file", but it'd be pointless
+> 
+> IMO, there's no value in the distinction that check makes.  Dropping
+> this distinction makes the interface simpler: check requires an
+> executable file.
+> 
+> Signed-off-by: Cleber Rosa <crosa@redhat.com>
 
-because I am trying to get rid of the fact that the current ICS=20
-allocator handles two things at the same time : IRQ allocation=20
-and IRQ type. And that's a problem because the ICSState object=20
-is just used everywhere in the code.=20
+This is quirky, but I think it makes sense to obey the configure
+script's chosen Python interpreter.  Unlike /bin/sh or /bin/bash, there
+can be many Python interpreters on a system and the user may not want
+the one in /usr/bin/python (think of old RHEL with software collections,
+even though our use of Python is generally portable to older versions).
 
-OK, So that's is not to your liking, I will come up with some=20
-other solution. Thanks for looking.
+I'd keep it for now; in the longer term, we should set up a virtual
+environment so that the shebang line does the right thing.
 
-C.  =20
- =20
->=20
->> ---
->>  hw/intc/xics.c        | 26 +++++++++++++++++---------
->>  hw/intc/xics_kvm.c    |  4 ++--
->>  hw/ppc/pnv.c          | 16 ++++++++++++++++
->>  hw/ppc/spapr.c        |  9 +++++++++
->>  include/hw/ppc/xics.h |  2 ++
->>  5 files changed, 46 insertions(+), 11 deletions(-)
->>
->> diff --git a/hw/intc/xics.c b/hw/intc/xics.c
->> index 2c4899f278e2..42880e736697 100644
->> --- a/hw/intc/xics.c
->> +++ b/hw/intc/xics.c
->> @@ -33,6 +33,7 @@
->>  #include "trace.h"
->>  #include "qemu/timer.h"
->>  #include "hw/ppc/xics.h"
->> +#include "hw/ppc/spapr.h"
->>  #include "qemu/error-report.h"
->>  #include "qapi/visitor.h"
->>  #include "monitor/monitor.h"
->> @@ -70,8 +71,7 @@ void ics_pic_print_info(ICSState *ics, Monitor *mon)
->>          }
->>          monitor_printf(mon, "  %4x %s %02x %02x\n",
->>                         ics->offset + i,
->> -                       (irq->flags & XICS_FLAGS_IRQ_LSI) ?
->> -                       "LSI" : "MSI",
->> +                       ics_is_lsi(ics, i) ? "LSI" : "MSI",
->=20
-> !?!=20
->=20
->>                         irq->priority, irq->status);
->>      }
->>  }
->> @@ -377,6 +377,14 @@ static const TypeInfo icp_info =3D {
->>  /*
->>   * ICS: Source layer
->>   */
->> +bool ics_is_lsi(ICSState *ics, int srcno)
->> +{
->> +    XICSFabric *xi =3D ics->xics;
->> +    XICSFabricClass *xic =3D XICS_FABRIC_GET_CLASS(xi);
->> +
->> +    return xic->irq_is_lsi(xi, srcno + ics->offset);
->> +}
->> +
->>  static void ics_simple_resend_msi(ICSState *ics, int srcno)
->>  {
->>      ICSIRQState *irq =3D ics->irqs + srcno;
->> @@ -435,7 +443,7 @@ static void ics_simple_set_irq(void *opaque, int s=
-rcno, int val)
->>  {
->>      ICSState *ics =3D (ICSState *)opaque;
->> =20
->> -    if (ics->irqs[srcno].flags & XICS_FLAGS_IRQ_LSI) {
->> +    if (ics_is_lsi(ics, srcno)) {
->>          ics_simple_set_irq_lsi(ics, srcno, val);
->>      } else {
->>          ics_simple_set_irq_msi(ics, srcno, val);
->> @@ -472,7 +480,7 @@ void ics_simple_write_xive(ICSState *ics, int srcn=
-o, int server,
->>      trace_xics_ics_simple_write_xive(ics->offset + srcno, srcno, serv=
-er,
->>                                       priority);
->> =20
->> -    if (ics->irqs[srcno].flags & XICS_FLAGS_IRQ_LSI) {
->> +    if (ics_is_lsi(ics, srcno)) {
->>          ics_simple_write_xive_lsi(ics, srcno);
->>      } else {
->>          ics_simple_write_xive_msi(ics, srcno);
->> @@ -484,10 +492,10 @@ static void ics_simple_reject(ICSState *ics, uin=
-t32_t nr)
->>      ICSIRQState *irq =3D ics->irqs + nr - ics->offset;
->> =20
->>      trace_xics_ics_simple_reject(nr, nr - ics->offset);
->> -    if (irq->flags & XICS_FLAGS_IRQ_MSI) {
->> -        irq->status |=3D XICS_STATUS_REJECTED;
->> -    } else if (irq->flags & XICS_FLAGS_IRQ_LSI) {
->> +    if (ics_is_lsi(ics, nr - ics->offset)) {
->>          irq->status &=3D ~XICS_STATUS_SENT;
->> +    } else {
->> +        irq->status |=3D XICS_STATUS_REJECTED;
->>      }
->>  }
->> =20
->> @@ -497,7 +505,7 @@ static void ics_simple_resend(ICSState *ics)
->> =20
->>      for (i =3D 0; i < ics->nr_irqs; i++) {
->>          /* FIXME: filter by server#? */
->> -        if (ics->irqs[i].flags & XICS_FLAGS_IRQ_LSI) {
->> +        if (ics_is_lsi(ics, i)) {
->>              ics_simple_resend_lsi(ics, i);
->>          } else {
->>              ics_simple_resend_msi(ics, i);
->> @@ -512,7 +520,7 @@ static void ics_simple_eoi(ICSState *ics, uint32_t=
- nr)
->> =20
->>      trace_xics_ics_simple_eoi(nr);
->> =20
->> -    if (ics->irqs[srcno].flags & XICS_FLAGS_IRQ_LSI) {
->> +    if (ics_is_lsi(ics, srcno)) {
->>          irq->status &=3D ~XICS_STATUS_SENT;
->>      }
->>  }
->> diff --git a/hw/intc/xics_kvm.c b/hw/intc/xics_kvm.c
->> index 3091ad3ac2c8..2f10637c9f7c 100644
->> --- a/hw/intc/xics_kvm.c
->> +++ b/hw/intc/xics_kvm.c
->> @@ -258,7 +258,7 @@ static int ics_set_kvm_state(ICSState *ics, int ve=
-rsion_id)
->>              state |=3D KVM_XICS_MASKED;
->>          }
->> =20
->> -        if (ics->irqs[i].flags & XICS_FLAGS_IRQ_LSI) {
->> +        if (ics_is_lsi(ics, i)) {
->>              state |=3D KVM_XICS_LEVEL_SENSITIVE;
->>              if (irq->status & XICS_STATUS_ASSERTED) {
->>                  state |=3D KVM_XICS_PENDING;
->> @@ -293,7 +293,7 @@ static void ics_kvm_set_irq(void *opaque, int srcn=
-o, int val)
->>      int rc;
->> =20
->>      args.irq =3D srcno + ics->offset;
->> -    if (ics->irqs[srcno].flags & XICS_FLAGS_IRQ_MSI) {
->> +    if (!ics_is_lsi(ics, srcno)) {
->>          if (!val) {
->>              return;
->>          }
->> diff --git a/hw/ppc/pnv.c b/hw/ppc/pnv.c
->> index 8288940ef9d7..958223376b4c 100644
->> --- a/hw/ppc/pnv.c
->> +++ b/hw/ppc/pnv.c
->> @@ -1035,6 +1035,21 @@ static bool pnv_irq_test(XICSFabric *xi, int ir=
-q)
->>      return false;
->>  }
->> =20
->> +static bool pnv_irq_is_lsi(XICSFabric *xi, int irq)
->> +{
->> +    PnvMachineState *pnv =3D POWERNV_MACHINE(xi);
->> +    int i;
->> +
->> +    /* PowerNV machine only has PSI interrupts which are all LSIs */
->> +    for (i =3D 0; i < pnv->num_chips; i++) {
->> +        ICSState *ics =3D &pnv->chips[i]->psi.ics;
->> +        if (ics_valid_irq(ics, irq)) {
->> +            return true;
->> +        }
->> +    }
->> +    return false;
->> +}
->> +
->>  static void pnv_pic_print_info(InterruptStatsProvider *obj,
->>                                 Monitor *mon)
->>  {
->> @@ -1120,6 +1135,7 @@ static void powernv_machine_class_init(ObjectCla=
-ss *oc, void *data)
->>      xic->ics_get =3D pnv_ics_get;
->>      xic->ics_resend =3D pnv_ics_resend;
->>      xic->irq_test =3D pnv_irq_test;
->> +    xic->irq_is_lsi =3D pnv_irq_is_lsi;
->>      ispc->print_info =3D pnv_pic_print_info;
->> =20
->>      powernv_machine_class_props_init(oc);
->> diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
->> index 1cbbd7715a85..ce314fcf38db 100644
->> --- a/hw/ppc/spapr.c
->> +++ b/hw/ppc/spapr.c
->> @@ -3628,6 +3628,14 @@ static void spapr_irq_free_block_2_11(XICSFabri=
-c *xi, int irq, int num)
->>      }
->>  }
->> =20
->> +static bool spapr_irq_is_lsi(XICSFabric *xi, int irq)
->> +{
->> +    sPAPRMachineState *spapr =3D SPAPR_MACHINE(xi);
->> +    int srcno =3D irq - spapr->ics->offset;
->> +
->> +    return spapr->ics->irqs[srcno].flags & XICS_FLAGS_IRQ_LSI;
->> +}
->> +
->>  static bool spapr_irq_test(XICSFabric *xi, int irq)
->>  {
->>      sPAPRMachineState *spapr =3D SPAPR_MACHINE(xi);
->> @@ -3765,6 +3773,7 @@ static void spapr_machine_class_init(ObjectClass=
- *oc, void *data)
->>      xic->irq_test =3D spapr_irq_test;
->>      xic->irq_alloc_block =3D spapr_irq_alloc_block;
->>      xic->irq_free_block =3D spapr_irq_free_block;
->> +    xic->irq_is_lsi =3D spapr_irq_is_lsi;
->> =20
->>      ispc->print_info =3D spapr_pic_print_info;
->>      /* Force NUMA node memory size to be a multiple of
->> diff --git a/include/hw/ppc/xics.h b/include/hw/ppc/xics.h
->> index 30e7f2e0a7dd..478f8e510179 100644
->> --- a/include/hw/ppc/xics.h
->> +++ b/include/hw/ppc/xics.h
->> @@ -179,6 +179,7 @@ typedef struct XICSFabricClass {
->>      bool (*irq_test)(XICSFabric *xi, int irq);
->>      int (*irq_alloc_block)(XICSFabric *xi, int count, int align);
->>      void (*irq_free_block)(XICSFabric *xi, int irq, int num);
->> +    bool (*irq_is_lsi)(XICSFabric *xi, int irq);
->>  } XICSFabricClass;
->> =20
->>  #define XICS_IRQS_SPAPR               1024
->> @@ -205,6 +206,7 @@ void ics_simple_write_xive(ICSState *ics, int nr, =
-int server,
->>  void ics_set_irq_type(ICSState *ics, int srcno, bool lsi);
->>  void icp_pic_print_info(ICPState *icp, Monitor *mon);
->>  void ics_pic_print_info(ICSState *ics, Monitor *mon);
->> +bool ics_is_lsi(ICSState *ics, int srno);
->> =20
->>  void ics_resend(ICSState *ics);
->>  void icp_resend(ICPState *ss);
->=20
+However, making files executable is certainly a good idea.
+
+Thanks,
+
+Paolo
+
+
+> ---
+>  tests/qemu-iotests/096   | 0
+>  tests/qemu-iotests/124   | 0
+>  tests/qemu-iotests/129   | 0
+>  tests/qemu-iotests/132   | 0
+>  tests/qemu-iotests/136   | 0
+>  tests/qemu-iotests/139   | 0
+>  tests/qemu-iotests/148   | 0
+>  tests/qemu-iotests/152   | 0
+>  tests/qemu-iotests/163   | 0
+>  tests/qemu-iotests/check | 9 ++-------
+>  10 files changed, 2 insertions(+), 7 deletions(-)
+>  mode change 100644 => 100755 tests/qemu-iotests/096
+>  mode change 100644 => 100755 tests/qemu-iotests/124
+>  mode change 100644 => 100755 tests/qemu-iotests/129
+>  mode change 100644 => 100755 tests/qemu-iotests/132
+>  mode change 100644 => 100755 tests/qemu-iotests/136
+>  mode change 100644 => 100755 tests/qemu-iotests/139
+>  mode change 100644 => 100755 tests/qemu-iotests/148
+>  mode change 100644 => 100755 tests/qemu-iotests/152
+>  mode change 100644 => 100755 tests/qemu-iotests/163
+> 
+> diff --git a/tests/qemu-iotests/096 b/tests/qemu-iotests/096
+> old mode 100644
+> new mode 100755
+> diff --git a/tests/qemu-iotests/124 b/tests/qemu-iotests/124
+> old mode 100644
+> new mode 100755
+> diff --git a/tests/qemu-iotests/129 b/tests/qemu-iotests/129
+> old mode 100644
+> new mode 100755
+> diff --git a/tests/qemu-iotests/132 b/tests/qemu-iotests/132
+> old mode 100644
+> new mode 100755
+> diff --git a/tests/qemu-iotests/136 b/tests/qemu-iotests/136
+> old mode 100644
+> new mode 100755
+> diff --git a/tests/qemu-iotests/139 b/tests/qemu-iotests/139
+> old mode 100644
+> new mode 100755
+> diff --git a/tests/qemu-iotests/148 b/tests/qemu-iotests/148
+> old mode 100644
+> new mode 100755
+> diff --git a/tests/qemu-iotests/152 b/tests/qemu-iotests/152
+> old mode 100644
+> new mode 100755
+> diff --git a/tests/qemu-iotests/163 b/tests/qemu-iotests/163
+> old mode 100644
+> new mode 100755
+> diff --git a/tests/qemu-iotests/check b/tests/qemu-iotests/check
+> index e6b6ff7a04..08741328d0 100755
+> --- a/tests/qemu-iotests/check
+> +++ b/tests/qemu-iotests/check
+> @@ -741,20 +741,15 @@ do
+>          start=`_wallclock`
+>          $timestamp && printf %s "        [$(date "+%T")]"
+>  
+> -        if [ "$(head -n 1 "$source_iotests/$seq")" == "#!/usr/bin/env python" ]; then
+> -            run_command="$PYTHON $seq"
+> -        else
+> -            run_command="./$seq"
+> -        fi
+>          export OUTPUT_DIR=$PWD
+>          if $debug; then
+>              (cd "$source_iotests";
+>              MALLOC_PERTURB_=${MALLOC_PERTURB_:-$(($RANDOM % 255 + 1))} \
+> -                    $run_command -d 2>&1 | tee $tmp.out)
+> +                    ./$seq -d 2>&1 | tee $tmp.out)
+>          else
+>              (cd "$source_iotests";
+>              MALLOC_PERTURB_=${MALLOC_PERTURB_:-$(($RANDOM % 255 + 1))} \
+> -                    $run_command >$tmp.out 2>&1)
+> +                    ./$seq >$tmp.out 2>&1)
+>          fi
+>          sts=$?
+>          $timestamp && _timestamp
+> 
