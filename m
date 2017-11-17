@@ -1,26 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56770)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57060)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berto@igalia.com>) id 1eFjJy-0007o5-I4
-	for qemu-devel@nongnu.org; Fri, 17 Nov 2017 11:16:51 -0500
+	(envelope-from <vsementsov@virtuozzo.com>) id 1eFjKZ-00087c-E3
+	for qemu-devel@nongnu.org; Fri, 17 Nov 2017 11:17:30 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berto@igalia.com>) id 1eFjJv-0003QO-B4
-	for qemu-devel@nongnu.org; Fri, 17 Nov 2017 11:16:50 -0500
-From: Alberto Garcia <berto@igalia.com>
-In-Reply-To: <127bc8f6-af95-62ae-8470-2e2e39f27f89@redhat.com>
-References: <dd350838-9132-e787-10b1-4cb200076ec9@virtuozzo.com>
-	<w51inekzv59.fsf@maestria.local.igalia.com>
-	<w518tff4dvi.fsf@maestria.local.igalia.com>
-	<20171110030223.GA7303@lemon>
-	<w518tf7k0ov.fsf@maestria.local.igalia.com>
-	<14461b9b-d62d-3723-d2bb-c2fe873207c5@virtuozzo.com>
-	<w51bmk2qkvv.fsf@maestria.local.igalia.com>
-	<127bc8f6-af95-62ae-8470-2e2e39f27f89@redhat.com>
-Date: Fri, 17 Nov 2017 17:16:06 +0100
-Message-ID: <w51shdclw3d.fsf@maestria.local.igalia.com>
+	(envelope-from <vsementsov@virtuozzo.com>) id 1eFjKW-0004QQ-7W
+	for qemu-devel@nongnu.org; Fri, 17 Nov 2017 11:17:27 -0500
+References: <20170628120530.31251-1-vsementsov@virtuozzo.com>
+	<fb5c092b-9db5-c5bf-3f61-9317a6371168@redhat.com>
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Message-ID: <bb7ce518-8542-f3ab-ac42-7d1106f52b69@virtuozzo.com>
+Date: Fri, 17 Nov 2017 19:17:14 +0300
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [Qemu-block] segfault in parallel blockjobs
- (iotest 30)
+In-Reply-To: <fb5c092b-9db5-c5bf-3f61-9317a6371168@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
+Content-Language: en-US
+Subject: Re: [Qemu-devel] [PATCH v22 00/30] qcow2: persistent dirty bitmaps
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,50 +24,63 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: John Snow <jsnow@redhat.com>, Anton Nefedov <anton.nefedov@virtuozzo.com>, Fam Zheng <famz@redhat.com>
-Cc: qemu-devel@nongnu.org, kwolf@redhat.com, qemu-block@nongnu.org, mreitz@redhat.com
+To: Eric Blake <eblake@redhat.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org
+Cc: kwolf@redhat.com, mreitz@redhat.com, armbru@redhat.com, jsnow@redhat.com, famz@redhat.com, den@openvz.org, stefanha@redhat.com, pbonzini@redhat.com
 
-On Thu 16 Nov 2017 10:56:58 PM CET, John Snow wrote:
->>>> I have the impression that one major source of headaches is the fact
->>>> that the reopen queue contains nodes that don't need to be reopened at
->>>> all. Ideally this should be detected early on in bdrv_reopen_queue(), so
->>>> there's no chance that the queue contains nodes used by a different
->>>> block job. If we had that then op blockers should be enough to prevent
->>>> these things. Or am I missing something?
->>>>
->>> After applying Max's patch I tried the similar approach; that is keep
->>> BDSes referenced while they are in the reopen queue.  Now I get the
->>> stream job hanging. Somehow one blk_root_drained_begin() is not paired
->>> with blk_root_drained_end(). So the job stays paused.
->> 
->> I can see this if I apply Max's patch and keep refs to BDSs in the
->> reopen queue:
->> 
->> #0  block_job_pause (...) at blockjob.c:130
->> #1  0x000055c143cb586d in block_job_drained_begin (...) at blockjob.c:227
->> #2  0x000055c143d08067 in blk_set_dev_ops (...) at block/block-backend.c:887
->> #3  0x000055c143cb69db in block_job_create (...) at blockjob.c:678
->> #4  0x000055c143d17c0c in mirror_start_job (...) at block/mirror.c:1177
->> 
->> There's a ops->drained_begin(opaque) call in blk_set_dev_ops() that
->> doesn't seem to be paired. And when you call block_job_start() then it
->> yields immediately waiting for the resume (that never arrives).
->> 
->> John, this change was yours (f4d9cc88ee69a5b04). Any idea?
+17.11.2017 19:04, Eric Blake wrote:
+> Revisiting an old series:
 >
-> The idea at the time was that if you tell the BlockBackend to drain and
-> then attach a job to it, once you go to *end* the drained region you'd
-> have a mismatched begin/end pair.
+> On 06/28/2017 07:05 AM, Vladimir Sementsov-Ogievskiy wrote:
+>> Hi all!
+>>
+>> There is a new update of qcow2-bitmap series - v22.
+>>
+>> web: https://src.openvz.org/users/vsementsov/repos/qemu/browse?at=qcow2-bitmap-v22
+>> git: https://src.openvz.org/scm/~vsementsov/qemu.git (tag qcow2-bitmap-v22)
+>>
+>> v22:
+>>
+>> Rebase on master, so changes, mostly related to new dirty bitmaps mutex:
+>>
+>>    qcow2: add persistent dirty bitmaps support
+>>   block.c                      |   65 +-
+>>   block/Makefile.objs          |    2 +-
+>>   block/dirty-bitmap.c         |  154 ++++-
+>>   block/io.c                   |    8 +
+>>   block/qcow2-bitmap.c         | 1481 ++++++++++++++++++++++++++++++++++++++++++
+>>   block/qcow2-refcount.c       |   59 +-
+>>   block/qcow2.c                |  155 ++++-
+>>   block/qcow2.h                |   43 ++
+>>   blockdev.c                   |   73 ++-
+>>   docs/interop/qcow2.txt       |    8 +-
+>>   include/block/block.h        |    3 +
+>>   include/block/block_int.h    |   14 +
+>>   include/block/dirty-bitmap.h |   22 +-
+>>   include/qemu/hbitmap.h       |   49 +-
+>>   qapi/block-core.json         |   42 +-
+>>   tests/Makefile.include       |    2 +-
+>>   tests/qemu-iotests/165       |  105 +++
+>>   tests/qemu-iotests/165.out   |    5 +
+>>   tests/qemu-iotests/group     |    1 +
+>>   tests/test-hbitmap.c         |   19 +
+>>   util/hbitmap.c               |   51 +-
+>>   21 files changed, 2280 insertions(+), 81 deletions(-)
+> Nothing in this series touched qemu-img.  At the very minimum, it would
+> be nice if 'qemu-img info' were to display a summary of all bitmaps in
+> the qcow2 file; the QMP type ImageInfoSpecificQCow2 should be updated to
+> mention this information, and qemu-img updated to output it.  Being able
+> to create and remove persistent bitmaps from an at-rest qcow2 file
+> without having to fire up qemu to issue QMP commands to do so would also
+> be nice.
 >
-> To allow for some flexibility and to make sure that you *didn't* have a
-> mismatched begin/end call, what I did was that if you attach dev_ops to
-> an already drained backend (i.e. we "missed our chance" to issue the
-> drained_begin) we play catch-up and issue the drained call.
+> It's a bit late for getting this request into 2.12, but had it been
+> available, it would make my work at testing that 'qemu-img commit'
+> doesn't corrupt persistent bitmaps.
 >
-> There's no matching call here, because I anticipated whoever initially
-> bumped that quiesce_counter up to be issuing the drained_end, which will
-> then be propagated according to the dev_ops structure in place.
 
-I see, thanks!
+You are right, this is needed, but I can't promise something for the 
+nearest future..
 
-Berto
+-- 
+Best regards,
+Vladimir
