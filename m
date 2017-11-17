@@ -1,28 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39194)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43243)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1eFb1g-0003cA-BS
-	for qemu-devel@nongnu.org; Fri, 17 Nov 2017 02:25:25 -0500
+	(envelope-from <vsementsov@virtuozzo.com>) id 1eFbQa-0001oa-Aa
+	for qemu-devel@nongnu.org; Fri, 17 Nov 2017 02:51:09 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1eFb1c-0006rZ-7W
-	for qemu-devel@nongnu.org; Fri, 17 Nov 2017 02:25:24 -0500
-Received: from mail-wm0-f43.google.com ([74.125.82.43]:41731)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1eFb1b-0006qh-In
-	for qemu-devel@nongnu.org; Fri, 17 Nov 2017 02:25:19 -0500
-Received: by mail-wm0-f43.google.com with SMTP id b189so4527208wmd.0
-	for <qemu-devel@nongnu.org>; Thu, 16 Nov 2017 23:25:19 -0800 (PST)
-References: <20171116173810.16457-1-crosa@redhat.com>
-	<20171116173810.16457-2-crosa@redhat.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <a5c42ab2-f384-4768-6e07-30814789ef5c@redhat.com>
-Date: Fri, 17 Nov 2017 08:25:16 +0100
+	(envelope-from <vsementsov@virtuozzo.com>) id 1eFbQZ-0001nR-0h
+	for qemu-devel@nongnu.org; Fri, 17 Nov 2017 02:51:08 -0500
+References: <20171110175457.30173-1-vsementsov@virtuozzo.com>
+	<20171110200245.GJ5466@localhost.localdomain>
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Message-ID: <3482183c-0a63-334c-4147-835a76802360@virtuozzo.com>
+Date: Fri, 17 Nov 2017 10:50:54 +0300
 MIME-Version: 1.0
-In-Reply-To: <20171116173810.16457-2-crosa@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
+In-Reply-To: <20171110200245.GJ5466@localhost.localdomain>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [Qemu-block] [PATCH 01/10] qemu-iotests: make
- execution of tests agnostic to test type
+Content-Language: en-US
+Subject: Re: [Qemu-devel] [PATCH] iotests: test clearing unknown
+ autoclear_features by qcow2
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,122 +25,121 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Cleber Rosa <crosa@redhat.com>, qemu-devel@nongnu.org
-Cc: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>
+To: Kevin Wolf <kwolf@redhat.com>
+Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, mreitz@redhat.com, eblake@redhat.com, dgilbert@redhat.com, quintela@redhat.com, den@openvz.org
 
-On 16/11/2017 18:38, Cleber Rosa wrote:
-> check makes a distinction on how it runs Python based tests.  The
-> current approach is inconsistent because:
-> 
-> 1) a large number of Python tests are already set as executable files
-> (eg: 030, 040, 041, 044, 045, 055, 056, 057, 065, 093, 118, 147, 149,
-> 155, 165 and 194)
-> 
-> 2) a smaller number of Python tests are not set as executable files
-> 
-> 3) the true purpose of a shebang line is to make a file executable,
-> while it currently is used (inconsistently) as a test type flag
-> 
-> 4) the same logic could in theory be applied to shell based tests,
-> that is, if first line contains a shell shebang, run it with
-> "$SHELL $test_file", but it'd be pointless
-> 
-> IMO, there's no value in the distinction that check makes.  Dropping
-> this distinction makes the interface simpler: check requires an
-> executable file.
-> 
-> Signed-off-by: Cleber Rosa <crosa@redhat.com>
+10.11.2017 23:02, Kevin Wolf wrote:
+> Am 10.11.2017 um 18:54 hat Vladimir Sementsov-Ogievskiy geschrieben:
+>> Test clearing unknown autoclear_features by qcow2 on incoming
+>> migration.
+>>
+>> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+>> ---
+>>
+>> Hi all!
+>>
+>> This patch shows degradation, added in 2.10 in commit
+>>
+>> commit 9c5e6594f15b7364624a3ad40306c396c93a2145
+>> Author: Kevin Wolf <kwolf@redhat.com>
+>> Date:   Thu May 4 18:52:40 2017 +0200
+>>
+>>      block: Fix write/resize permissions for inactive images
+>>
+>> The problem:
+>> When on incoming migration with shared storage we reopen image to RW mode
+>> we call bdrv_invalidate_cache it firstly call drv->bdrv_invalidate_cache and
+>> only after it, through "parent->role->activate(parent, &local_err);" we set
+>> appropriate RW permission.
+>>
+>> Because of this, if drv->bdrv_invalidate_cache wants to write something
+>> (image is RW and BDRV_O_INACTIVE is not set) it goes into
+>> "bdrv_aligned_pwritev: Assertion `child->perm & BLK_PERM_WRITE' failed"
+>>
+>> One case, when qcow2_invalidate_cache wants to write
+>> something - when it wants to clear some unknown autoclear features. So,
+>> here is a test for it.
+>>
+>> Another case is when we try to migrate persistent dirty bitmaps through
+>> shared storage, on invalidate_cache qcow2 will try to set DIRTY bit in
+>> all loaded bitmaps.
+>>
+>> Kevin, what do you think? I understand that operation order should be changed
+>> somehow in bdrv_invalidate_cache, but I'm not sure about how "parent->role->.."
+>> things works and can we safely move this part from function end to the middle.
+> I don't think you need to move the parent->role->activate() callback,
+> but just the bdrv_set_perm() so that we request the correct permissions
+> for operation without the BDRV_O_INACTIVE flag.
+>
+> The following seems to work for me (including a fix for the test case,
+> we don't seem to get a RESUME event).
 
-This is quirky, but I think it makes sense to obey the configure
-script's chosen Python interpreter.  Unlike /bin/sh or /bin/bash, there
-can be many Python interpreters on a system and the user may not want
-the one in /usr/bin/python (think of old RHEL with software collections,
-even though our use of Python is generally portable to older versions).
+hmm, it works for me with RESUME..
 
-I'd keep it for now; in the longer term, we should set up a virtual
-environment so that the shebang line does the right thing.
+> I'm not sure about the error paths
+> yet. We should probably try do undo the permission changes there. I can
+> have a closer look into this next week.
+>
+> Kevin
+>
+>
+> diff --git a/block.c b/block.c
+> index edc5bb9f9b..f530b630b6 100644
+> --- a/block.c
+> +++ b/block.c
+> @@ -4178,7 +4178,17 @@ void bdrv_invalidate_cache(BlockDriverState *bs, Error **errp)
+>           }
+>       }
+>   
+> +    /* Update permissions, they may differ for inactive nodes */
+>       bs->open_flags &= ~BDRV_O_INACTIVE;
+> +    bdrv_get_cumulative_perm(bs, &perm, &shared_perm);
+> +    ret = bdrv_check_perm(bs, NULL, perm, shared_perm, NULL, &local_err);
+> +    if (ret < 0) {
+> +        bs->open_flags |= BDRV_O_INACTIVE;
+> +        error_propagate(errp, local_err);
+> +        return;
+> +    }
+> +    bdrv_set_perm(bs, perm, shared_perm);
+> +
+>       if (bs->drv->bdrv_invalidate_cache) {
+>           bs->drv->bdrv_invalidate_cache(bs, &local_err);
+>           if (local_err) {
+> @@ -4195,16 +4205,6 @@ void bdrv_invalidate_cache(BlockDriverState *bs, Error **errp)
+>           return;
+>       }
+>   
+> -    /* Update permissions, they may differ for inactive nodes */
+> -    bdrv_get_cumulative_perm(bs, &perm, &shared_perm);
+> -    ret = bdrv_check_perm(bs, NULL, perm, shared_perm, NULL, &local_err);
+> -    if (ret < 0) {
+> -        bs->open_flags |= BDRV_O_INACTIVE;
+> -        error_propagate(errp, local_err);
+> -        return;
+> -    }
+> -    bdrv_set_perm(bs, perm, shared_perm);
+> -
+>       QLIST_FOREACH(parent, &bs->parents, next_parent) {
+>           if (parent->role->activate) {
+>               parent->role->activate(parent, &local_err);
+> diff --git a/tests/qemu-iotests/196 b/tests/qemu-iotests/196
+> index 9ffbc723c2..4116ebc92b 100755
+> --- a/tests/qemu-iotests/196
+> +++ b/tests/qemu-iotests/196
+> @@ -53,7 +53,10 @@ class TestInvalidateAutoclear(iotests.QMPTestCase):
+>               f.write(b'\xff')
+>   
+>           self.vm_b.launch()
+> -        self.assertNotEqual(self.vm_b.event_wait("RESUME"), None)
+> +        while True:
+> +            result = self.vm_b.qmp('query-status')
+> +            if result['return']['status'] == 'running':
+> +                break
+>   
+>           with open(disk, 'rb') as f:
+>               f.seek(88)
 
-However, making files executable is certainly a good idea.
 
-Thanks,
-
-Paolo
-
-
-> ---
->  tests/qemu-iotests/096   | 0
->  tests/qemu-iotests/124   | 0
->  tests/qemu-iotests/129   | 0
->  tests/qemu-iotests/132   | 0
->  tests/qemu-iotests/136   | 0
->  tests/qemu-iotests/139   | 0
->  tests/qemu-iotests/148   | 0
->  tests/qemu-iotests/152   | 0
->  tests/qemu-iotests/163   | 0
->  tests/qemu-iotests/check | 9 ++-------
->  10 files changed, 2 insertions(+), 7 deletions(-)
->  mode change 100644 => 100755 tests/qemu-iotests/096
->  mode change 100644 => 100755 tests/qemu-iotests/124
->  mode change 100644 => 100755 tests/qemu-iotests/129
->  mode change 100644 => 100755 tests/qemu-iotests/132
->  mode change 100644 => 100755 tests/qemu-iotests/136
->  mode change 100644 => 100755 tests/qemu-iotests/139
->  mode change 100644 => 100755 tests/qemu-iotests/148
->  mode change 100644 => 100755 tests/qemu-iotests/152
->  mode change 100644 => 100755 tests/qemu-iotests/163
-> 
-> diff --git a/tests/qemu-iotests/096 b/tests/qemu-iotests/096
-> old mode 100644
-> new mode 100755
-> diff --git a/tests/qemu-iotests/124 b/tests/qemu-iotests/124
-> old mode 100644
-> new mode 100755
-> diff --git a/tests/qemu-iotests/129 b/tests/qemu-iotests/129
-> old mode 100644
-> new mode 100755
-> diff --git a/tests/qemu-iotests/132 b/tests/qemu-iotests/132
-> old mode 100644
-> new mode 100755
-> diff --git a/tests/qemu-iotests/136 b/tests/qemu-iotests/136
-> old mode 100644
-> new mode 100755
-> diff --git a/tests/qemu-iotests/139 b/tests/qemu-iotests/139
-> old mode 100644
-> new mode 100755
-> diff --git a/tests/qemu-iotests/148 b/tests/qemu-iotests/148
-> old mode 100644
-> new mode 100755
-> diff --git a/tests/qemu-iotests/152 b/tests/qemu-iotests/152
-> old mode 100644
-> new mode 100755
-> diff --git a/tests/qemu-iotests/163 b/tests/qemu-iotests/163
-> old mode 100644
-> new mode 100755
-> diff --git a/tests/qemu-iotests/check b/tests/qemu-iotests/check
-> index e6b6ff7a04..08741328d0 100755
-> --- a/tests/qemu-iotests/check
-> +++ b/tests/qemu-iotests/check
-> @@ -741,20 +741,15 @@ do
->          start=`_wallclock`
->          $timestamp && printf %s "        [$(date "+%T")]"
->  
-> -        if [ "$(head -n 1 "$source_iotests/$seq")" == "#!/usr/bin/env python" ]; then
-> -            run_command="$PYTHON $seq"
-> -        else
-> -            run_command="./$seq"
-> -        fi
->          export OUTPUT_DIR=$PWD
->          if $debug; then
->              (cd "$source_iotests";
->              MALLOC_PERTURB_=${MALLOC_PERTURB_:-$(($RANDOM % 255 + 1))} \
-> -                    $run_command -d 2>&1 | tee $tmp.out)
-> +                    ./$seq -d 2>&1 | tee $tmp.out)
->          else
->              (cd "$source_iotests";
->              MALLOC_PERTURB_=${MALLOC_PERTURB_:-$(($RANDOM % 255 + 1))} \
-> -                    $run_command >$tmp.out 2>&1)
-> +                    ./$seq >$tmp.out 2>&1)
->          fi
->          sts=$?
->          $timestamp && _timestamp
-> 
+-- 
+Best regards,
+Vladimir
