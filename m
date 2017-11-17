@@ -1,24 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49062)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49429)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1eFhhz-0003qw-8A
-	for qemu-devel@nongnu.org; Fri, 17 Nov 2017 09:33:35 -0500
+	(envelope-from <atar4qemu@gmail.com>) id 1eFhif-0004G9-HG
+	for qemu-devel@nongnu.org; Fri, 17 Nov 2017 09:34:16 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1eFhhy-0008Ol-AJ
-	for qemu-devel@nongnu.org; Fri, 17 Nov 2017 09:33:31 -0500
-References: <20171103144113.7188-1-berrange@redhat.com>
-	<9b0c5170-c97a-51d5-b1e4-003f1628d7be@redhat.com>
-	<20171110172253.GH30685@redhat.com>
-	<fa4f8209-37ec-f8e9-eaf1-ac48453c1bff@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <c31a2050-7d01-cfc5-a28b-492cf4f82ca5@redhat.com>
-Date: Fri, 17 Nov 2017 08:33:22 -0600
+	(envelope-from <atar4qemu@gmail.com>) id 1eFhie-00019a-4r
+	for qemu-devel@nongnu.org; Fri, 17 Nov 2017 09:34:13 -0500
+Received: from mail-io0-x241.google.com ([2607:f8b0:4001:c06::241]:45594)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <atar4qemu@gmail.com>) id 1eFhid-00018X-Vm
+	for qemu-devel@nongnu.org; Fri, 17 Nov 2017 09:34:12 -0500
+Received: by mail-io0-x241.google.com with SMTP id z74so8920261iof.12
+	for <qemu-devel@nongnu.org>; Fri, 17 Nov 2017 06:34:11 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <fa4f8209-37ec-f8e9-eaf1-ac48453c1bff@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="l9veilP6tVEmuJBGtnjj4gxwfn9KB89fe"
-Subject: Re: [Qemu-devel] [PATCH] qcow2: fix image corruption after
- committing qcow2 image into base
+In-Reply-To: <1510926167-23326-12-git-send-email-mark.cave-ayland@ilande.co.uk>
+References: <1510926167-23326-1-git-send-email-mark.cave-ayland@ilande.co.uk>
+	<1510926167-23326-12-git-send-email-mark.cave-ayland@ilande.co.uk>
+From: Artyom Tarasenko <atar4qemu@gmail.com>
+Date: Fri, 17 Nov 2017 15:33:50 +0100
+Message-ID: <CACXAS8D7kJ7sk3Z+72-PaUnWwLUK7Xwb1_zHUjQe0BXBaYoKyA@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH 11/15] apb: split pci_pbm_map_irq() into
+ separate functions for bus A and bus B
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,72 +29,149 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Max Reitz <mreitz@redhat.com>, "Daniel P. Berrange" <berrange@redhat.com>
-Cc: qemu-devel@nongnu.org, Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org, Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+To: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+Cc: qemu-devel <qemu-devel@nongnu.org>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---l9veilP6tVEmuJBGtnjj4gxwfn9KB89fe
-From: Eric Blake <eblake@redhat.com>
-To: Max Reitz <mreitz@redhat.com>, "Daniel P. Berrange" <berrange@redhat.com>
-Cc: qemu-devel@nongnu.org, Kevin Wolf <kwolf@redhat.com>,
- qemu-block@nongnu.org,
- Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Message-ID: <c31a2050-7d01-cfc5-a28b-492cf4f82ca5@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH] qcow2: fix image corruption after committing
- qcow2 image into base
-References: <20171103144113.7188-1-berrange@redhat.com>
- <9b0c5170-c97a-51d5-b1e4-003f1628d7be@redhat.com>
- <20171110172253.GH30685@redhat.com>
- <fa4f8209-37ec-f8e9-eaf1-ac48453c1bff@redhat.com>
-In-Reply-To: <fa4f8209-37ec-f8e9-eaf1-ac48453c1bff@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+On Fri, Nov 17, 2017 at 2:42 PM, Mark Cave-Ayland
+<mark.cave-ayland@ilande.co.uk> wrote:
+> After the previous refactoring it is now possible to use separate functions
+> to improve clarity of the interrupt paths. Similarly by checking the PCI
+> devnfn to identify busA during apb_pci_bridge_realize() it becomes possible
+> to completely remove the busA property from the PBMPCIBridge state.
+>
+> Signed-off-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+> ---
+>  hw/pci-host/apb.c         |   54 ++++++++++++++++++---------------------------
+>  include/hw/pci-host/apb.h |    3 ---
+>  2 files changed, 21 insertions(+), 36 deletions(-)
+>
+> diff --git a/hw/pci-host/apb.c b/hw/pci-host/apb.c
+> index 6c20285..268100e 100644
+> --- a/hw/pci-host/apb.c
+> +++ b/hw/pci-host/apb.c
+> @@ -517,32 +517,27 @@ static int pci_apb_map_irq(PCIDevice *pci_dev, int irq_num)
+>      return irq_num;
+>  }
+>
+> -static int pci_pbm_map_irq(PCIDevice *pci_dev, int irq_num)
+> +static int pci_pbmA_map_irq(PCIDevice *pci_dev, int irq_num)
+>  {
+> -    PBMPCIBridge *br = PBM_PCI_BRIDGE(pci_bridge_get_device(
+> -                           PCI_BUS(qdev_get_parent_bus(DEVICE(pci_dev)))));
+> -
+> -    int bus_offset;
+> -    if (br->busA) {
+> -        bus_offset = 0x0;
+> +    /* The on-board devices have fixed (legacy) OBIO intnos */
+> +    switch (PCI_SLOT(pci_dev->devfn)) {
+> +    case 1:
+> +        /* Onboard NIC */
+> +        return 0x21;
+> +    case 3:
+> +        /* Onboard IDE */
+> +        return 0x20;
+> +    default:
+> +        /* Normal intno, fall through */
+> +        break;
+> +    }
+>
+> -        /* The on-board devices have fixed (legacy) OBIO intnos */
+> -        switch (PCI_SLOT(pci_dev->devfn)) {
+> -        case 1:
+> -            /* Onboard NIC */
+> -            return 0x21;
+> -        case 3:
+> -            /* Onboard IDE */
+> -            return 0x20;
+> +    return ((PCI_SLOT(pci_dev->devfn) << 2) + irq_num) & 0x1f;
+> +}
+>
+> -        default:
+> -            /* Normal intno, fall through */
+> -            break;
+> -        }
+> -    } else {
+> -        bus_offset = 0x10;
+> -    }
+> -    return (bus_offset + (PCI_SLOT(pci_dev->devfn) << 2) + irq_num) & 0x1f;
+> +static int pci_pbmB_map_irq(PCIDevice *pci_dev, int irq_num)
+> +{
+> +    return (0x10 + (PCI_SLOT(pci_dev->devfn) << 2) + irq_num) & 0x1f;
+>  }
+>
+>  static void pci_apb_set_irq(void *opaque, int irq_num, int level)
+> @@ -593,7 +588,7 @@ static void apb_pci_bridge_realize(PCIDevice *dev, Error **errp)
+>
+>      /* If initialising busA, ensure that we allow IO transactions so that
+>         we get the early serial console until OpenBIOS configures the bridge */
+> -    if (br->busA) {
+> +    if (dev->devfn == PCI_DEVFN(1, 1)) {
 
-On 11/14/2017 07:52 AM, Max Reitz wrote:
-
->>> Hmm - I wonder if persistent bitmaps are also corrupted in the fast p=
-ath.
->>
->> I also wonder if there's anything better we can do to make us safer by=
-
->> default, so we default to the slow & safe path, unless we can provide
->> we *only* have the subset of features that are safe for the fast path =
-?
->=20
-> I have wondered the same but I can't think of any.  The only thing that=
-
-> comes close would be to check for which header extensions there are; bu=
-t
-> at the same time, we could just add a comment to qcow2_read_extensions(=
-)
-> ("If you add a new feature to qcow2, note that you may want to adjust
-> the qcow2_make_empty() fastpath conditions").
-
-Indeed, such a comment may be helpful.
-
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
+I think the previous syntax was more explicit here. A comment would be nice.
 
 
---l9veilP6tVEmuJBGtnjj4gxwfn9KB89fe
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
+>          cmd |= PCI_COMMAND_IO;
+>      }
+>
+> @@ -673,14 +668,13 @@ static void pci_pbm_realize(DeviceState *dev, Error **errp)
+>      pci_dev = pci_create_multifunction(phb->bus, PCI_DEVFN(1, 0), true,
+>                                     TYPE_PBM_PCI_BRIDGE);
+>      s->bridgeB = PCI_BRIDGE(pci_dev);
+> -    pci_bridge_map_irq(s->bridgeB, "pciB", pci_pbm_map_irq);
+> +    pci_bridge_map_irq(s->bridgeB, "pciB", pci_pbmB_map_irq);
+>      qdev_init_nofail(&pci_dev->qdev);
+>
+>      pci_dev = pci_create_multifunction(phb->bus, PCI_DEVFN(1, 1), true,
+>                                     TYPE_PBM_PCI_BRIDGE);
+>      s->bridgeA = PCI_BRIDGE(pci_dev);
+> -    pci_bridge_map_irq(s->bridgeA, "pciA", pci_pbm_map_irq);
+> -    qdev_prop_set_bit(DEVICE(pci_dev), "busA", true);
+> +    pci_bridge_map_irq(s->bridgeA, "pciA", pci_pbmA_map_irq);
+>      qdev_init_nofail(&pci_dev->qdev);
+>  }
+>
+> @@ -789,11 +783,6 @@ static const TypeInfo pbm_host_info = {
+>      .class_init    = pbm_host_class_init,
+>  };
+>
+> -static Property pbm_pci_properties[] = {
+> -    DEFINE_PROP_BOOL("busA", PBMPCIBridge, busA, false),
+> -    DEFINE_PROP_END_OF_LIST(),
+> -};
+> -
+>  static void pbm_pci_bridge_class_init(ObjectClass *klass, void *data)
+>  {
+>      DeviceClass *dc = DEVICE_CLASS(klass);
+> @@ -809,7 +798,6 @@ static void pbm_pci_bridge_class_init(ObjectClass *klass, void *data)
+>      set_bit(DEVICE_CATEGORY_BRIDGE, dc->categories);
+>      dc->reset = pci_bridge_reset;
+>      dc->vmsd = &vmstate_pci_device;
+> -    dc->props = pbm_pci_properties;
+>  }
+>
+>  static const TypeInfo pbm_pci_bridge_info = {
+> diff --git a/include/hw/pci-host/apb.h b/include/hw/pci-host/apb.h
+> index f0074f7..dd49437 100644
+> --- a/include/hw/pci-host/apb.h
+> +++ b/include/hw/pci-host/apb.h
+> @@ -86,9 +86,6 @@ typedef struct APBState {
+>  typedef struct PBMPCIBridge {
+>      /*< private >*/
+>      PCIBridge parent_obj;
+> -
+> -    /* Is this busA with in-built devices (ebus)? */
+> -    bool busA;
+>  } PBMPCIBridge;
+>
+>  #define TYPE_PBM_PCI_BRIDGE "pbm-bridge"
+> --
+> 1.7.10.4
+>
 
------BEGIN PGP SIGNATURE-----
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
 
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAloO8zIACgkQp6FrSiUn
-Q2p34AgAq3KeWiXfqej0B99RC2QwvrOA7WjEGlZMiPKIvqR4FqTLSnNTVHrRh2ZU
-d5nPXQHabjoXKSXwOV9j0aAM05PDe7udsnCzxGD4HFXZPujFPIzIjofzrpKBkFda
-Dhg0T+AiAURt5zVqQ0MpiZIOwtNUe/Ub4WgEH5AtZaWPUaWNEWHCfxop2dyI4Of/
-tuKCFrA7B2402JGaWY8n1CQXmWV4FVFw1LEcTavl4dYxn+OxPh9H+DKHF1I6LR1X
-nZKbx/XEQyTc3kIDyqb8g38zXty9F1FwaUNuOOWoGyF70mM75DfA5TN3o9VJSZHq
-za1Na7JHwHpy2v/N3r8XOkWOTO+Hjg==
-=kQE9
------END PGP SIGNATURE-----
 
---l9veilP6tVEmuJBGtnjj4gxwfn9KB89fe--
+-- 
+Regards,
+Artyom Tarasenko
+
+SPARC and PPC PReP under qemu blog: http://tyom.blogspot.com/search/label/qemu
