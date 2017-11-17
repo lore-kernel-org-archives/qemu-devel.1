@@ -1,16 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42700)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42728)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1eFlCL-0000k2-PY
-	for qemu-devel@nongnu.org; Fri, 17 Nov 2017 13:17:06 -0500
+	(envelope-from <kwolf@redhat.com>) id 1eFlCM-0000kR-KH
+	for qemu-devel@nongnu.org; Fri, 17 Nov 2017 13:17:07 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1eFlCK-00029a-PZ
-	for qemu-devel@nongnu.org; Fri, 17 Nov 2017 13:17:05 -0500
+	(envelope-from <kwolf@redhat.com>) id 1eFlCL-0002As-Nr
+	for qemu-devel@nongnu.org; Fri, 17 Nov 2017 13:17:06 -0500
 From: Kevin Wolf <kwolf@redhat.com>
-Date: Fri, 17 Nov 2017 19:16:30 +0100
-Message-Id: <20171117181653.20651-3-kwolf@redhat.com>
+Date: Fri, 17 Nov 2017 19:16:31 +0100
+Message-Id: <20171117181653.20651-4-kwolf@redhat.com>
 In-Reply-To: <20171117181653.20651-1-kwolf@redhat.com>
 References: <20171117181653.20651-1-kwolf@redhat.com>
-Subject: [Qemu-devel] [PULL 02/25] qemu-iotests: Use -nographic in 182
+Subject: [Qemu-devel] [PULL 03/25] block: Fix error path in
+ bdrv_backing_update_filename()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,30 +23,29 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org
 Cc: kwolf@redhat.com, qemu-devel@nongnu.org
 
-This avoids that random UI frontend error messages end up in the output.
-In particular, we were seeing this line in CI error logs:
-
-+Unable to init server: Could not connect: Connection refused
+error_setg_errno() takes a positive errno code. Spotted by Coverity
+(CID 1381628).
 
 Signed-off-by: Kevin Wolf <kwolf@redhat.com>
-Reviewed-by: Kashyap Chamarthy <kchamart@redhat.com>
-Reviewed-by: Jeff Cody <jcody@redhat.com>
+Reviewed-by: Alberto Garcia <berto@igalia.com>
+Reviewed-by: Eric Blake <eblake@redhat.com>
+Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
 ---
- tests/qemu-iotests/182 | 2 +-
+ block.c | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/tests/qemu-iotests/182 b/tests/qemu-iotests/182
-index 2e078ceed8..4b31592fb8 100755
---- a/tests/qemu-iotests/182
-+++ b/tests/qemu-iotests/182
-@@ -62,7 +62,7 @@ _launch_qemu -drive file=$TEST_IMG,if=none,id=drive0,file.locking=on \
+diff --git a/block.c b/block.c
+index 684cb018da..f6415547fe 100644
+--- a/block.c
++++ b/block.c
+@@ -998,7 +998,7 @@ static int bdrv_backing_update_filename(BdrvChild *c, BlockDriverState *base,
+     ret = bdrv_change_backing_file(parent, filename,
+                                    base->drv ? base->drv->format_name : "");
+     if (ret < 0) {
+-        error_setg_errno(errp, ret, "Could not update backing file link");
++        error_setg_errno(errp, -ret, "Could not update backing file link");
+     }
  
- echo
- echo "Starting a second QEMU using the same image should fail"
--echo 'quit' | $QEMU -monitor stdio \
-+echo 'quit' | $QEMU -nographic -monitor stdio \
-     -drive file=$TEST_IMG,if=none,id=drive0,file.locking=on \
-     -device $virtioblk,drive=drive0 2>&1 | _filter_testdir 2>&1 |
-     _filter_qemu |
+     if (!(orig_flags & BDRV_O_RDWR)) {
 -- 
 2.13.6
