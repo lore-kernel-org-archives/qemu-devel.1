@@ -1,15 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42097)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43351)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1eFeq1-0003vU-9F
-	for qemu-devel@nongnu.org; Fri, 17 Nov 2017 06:29:39 -0500
+	(envelope-from <wei.w.wang@intel.com>) id 1eFet9-0005D8-9P
+	for qemu-devel@nongnu.org; Fri, 17 Nov 2017 06:32:52 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1eFepz-0003w8-M8
-	for qemu-devel@nongnu.org; Fri, 17 Nov 2017 06:29:37 -0500
-From: "Daniel P. Berrange" <berrange@redhat.com>
-Date: Fri, 17 Nov 2017 11:29:13 +0000
-Message-Id: <20171117112913.21875-1-berrange@redhat.com>
-Subject: [Qemu-devel] [PATCH v2 (for-2.11)] qcow2: fix image corruption
- after committing qcow2 image into base
+	(envelope-from <wei.w.wang@intel.com>) id 1eFet5-0007S3-6a
+	for qemu-devel@nongnu.org; Fri, 17 Nov 2017 06:32:51 -0500
+Received: from mga09.intel.com ([134.134.136.24]:58316)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <wei.w.wang@intel.com>)
+	id 1eFet4-0007Q5-T7
+	for qemu-devel@nongnu.org; Fri, 17 Nov 2017 06:32:47 -0500
+Message-ID: <5A0EC967.5090407@intel.com>
+Date: Fri, 17 Nov 2017 19:35:03 +0800
+From: Wei Wang <wei.w.wang@intel.com>
+MIME-Version: 1.0
+References: <1509696786-1597-1-git-send-email-wei.w.wang@intel.com>	<1509696786-1597-7-git-send-email-wei.w.wang@intel.com>	<20171115220743-mutt-send-email-mst@kernel.org>
+	<5A0D923C.4020807@intel.com>
+In-Reply-To: <5A0D923C.4020807@intel.com>
+Content-Type: text/plain; charset=windows-1252; format=flowed
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [virtio-dev] Re: [PATCH v17 6/6] virtio-balloon:
+ VIRTIO_BALLOON_F_FREE_PAGE_VQ
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -18,315 +29,103 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, Eric Blake <eblake@redhat.com>, "Daniel P. Berrange" <berrange@redhat.com>
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: aarcange@redhat.com, virtio-dev@lists.oasis-open.org, kvm@vger.kernel.org, mawilcox@microsoft.com, qemu-devel@nongnu.org, amit.shah@redhat.com, penguin-kernel@I-love.SAKURA.ne.jp, linux-kernel@vger.kernel.org, willy@infradead.org, virtualization@lists.linux-foundation.org, linux-mm@kvack.org, yang.zhang.wz@gmail.com, quan.xu@aliyun.com, cornelia.huck@de.ibm.com, pbonzini@redhat.com, akpm@linux-foundation.org, mhocko@kernel.org, mgorman@techsingularity.net, liliang.opensource@gmail.com
 
-After committing the qcow2 image contents into the base image, qemu-img
-will call bdrv_make_empty to drop the payload in the layered image.
+On 11/16/2017 09:27 PM, Wei Wang wrote:
+> On 11/16/2017 04:32 AM, Michael S. Tsirkin wrote:
+>> On Fri, Nov 03, 2017 at 04:13:06PM +0800, Wei Wang wrote:
+>>> Negotiation of the VIRTIO_BALLOON_F_FREE_PAGE_VQ feature indicates the
+>>> support of reporting hints of guest free pages to the host via
+>>> virtio-balloon. The host requests the guest to report the free pages by
+>>> sending commands via the virtio-balloon configuration registers.
+>>>
+>>> When the guest starts to report, the first element added to the free 
+>>> page
+>>> vq is a sequence id of the start reporting command. The id is given by
+>>> the host, and it indicates whether the following free pages correspond
+>>> to the command. For example, the host may stop the report and start 
+>>> again
+>>> with a new command id. The obsolete pages for the previous start 
+>>> command
+>>> can be detected by the id dismatching on the host. The id is added 
+>>> to the
+>>> vq using an output buffer, and the free pages are added to the vq using
+>>> input buffer.
+>>>
+>>> Here are some explainations about the added configuration registers:
+>>> - host2guest_cmd: a register used by the host to send commands to the
+>>> guest.
+>>> - guest2host_cmd: written by the guest to ACK to the host about the
+>>> commands that have been received. The host will clear the corresponding
+>>> bits on the host2guest_cmd register. The guest also uses this register
+>>> to send commands to the host (e.g. when finish free page reporting).
+>>> - free_page_cmd_id: the sequence id of the free page report command
+>>> given by the host.
+>>>
+>>> Signed-off-by: Wei Wang <wei.w.wang@intel.com>
+>>> Signed-off-by: Liang Li <liang.z.li@intel.com>
+>>> Cc: Michael S. Tsirkin <mst@redhat.com>
+>>> Cc: Michal Hocko <mhocko@kernel.org>
+>>> ---
+>>>
+>>> +
+>>> +static void report_free_page(struct work_struct *work)
+>>> +{
+>>> +    struct virtio_balloon *vb;
+>>> +
+>>> +    vb = container_of(work, struct virtio_balloon, 
+>>> report_free_page_work);
+>>> +    report_free_page_cmd_id(vb);
+>>> +    walk_free_mem_block(vb, 0, &virtio_balloon_send_free_pages);
+>>> +    /*
+>>> +     * The last few free page blocks that were added may not reach the
+>>> +     * batch size, but need a kick to notify the device to handle 
+>>> them.
+>>> +     */
+>>> +    virtqueue_kick(vb->free_page_vq);
+>>> +    report_free_page_end(vb);
+>>> +}
+>>> +
+>> I think there's an issue here: if pages are poisoned and hypervisor
+>> subsequently drops them, testing them after allocation will
+>> trigger a false positive.
+>>
+>> The specific configuration:
+>>
+>> PAGE_POISONING on
+>> PAGE_POISONING_NO_SANITY off
+>> PAGE_POISONING_ZERO off
+>>
+>>
+>> Solutions:
+>> 1. disable the feature in that configuration
+>>     suggested as an initial step
+>
+> Thanks for the finding.
+> Similar to this option: I'm thinking could we make 
+> walk_free_mem_block() simply return if that option is on?
+> That is, at the beginning of the function:
+>     if (!page_poisoning_enabled())
+>                 return;
+>
 
-When this is done for qcow2 images, it blows away the LUKS encryption
-header, making the resulting image unusable. There are two codepaths
-for emptying a qcow2 image, and the second (slower) codepath leaves
-the LUKS header intact, so force use of that codepath.
 
-Reviewed-by: Eric Blake <eblake@redhat.com>
-Signed-off-by: Daniel P. Berrange <berrange@redhat.com>
----
- block/qcow2.c                    |   6 +-
- tests/qemu-iotests/198           | 104 ++++++++++++++++++++++++++++++++
- tests/qemu-iotests/198.out       | 126 +++++++++++++++++++++++++++++++++++++++
- tests/qemu-iotests/common.filter |   4 +-
- tests/qemu-iotests/group         |   1 +
- 5 files changed, 238 insertions(+), 3 deletions(-)
- create mode 100755 tests/qemu-iotests/198
- create mode 100644 tests/qemu-iotests/198.out
+Thought about it more, I think it would be better to put this logic to 
+virtio_balloon:
 
-diff --git a/block/qcow2.c b/block/qcow2.c
-index 92e5d548e3..e9a86b7443 100644
---- a/block/qcow2.c
-+++ b/block/qcow2.c
-@@ -3601,12 +3601,14 @@ static int qcow2_make_empty(BlockDriverState *bs)
-     l1_clusters = DIV_ROUND_UP(s->l1_size, s->cluster_size / sizeof(uint64_t));
- 
-     if (s->qcow_version >= 3 && !s->snapshots &&
--        3 + l1_clusters <= s->refcount_block_size) {
-+        3 + l1_clusters <= s->refcount_block_size &&
-+        s->crypt_method_header != QCOW_CRYPT_LUKS) {
-         /* The following function only works for qcow2 v3 images (it requires
-          * the dirty flag) and only as long as there are no snapshots (because
-          * it completely empties the image). Furthermore, the L1 table and three
-          * additional clusters (image header, refcount table, one refcount
--         * block) have to fit inside one refcount block. */
-+         * block) have to fit inside one refcount block. It cannot be used
-+         * for LUKS (yet) as it throws away the LUKS header cluster(s) */
-         return make_completely_empty(bs);
-     }
- 
-diff --git a/tests/qemu-iotests/198 b/tests/qemu-iotests/198
-new file mode 100755
-index 0000000000..34ef666381
---- /dev/null
-+++ b/tests/qemu-iotests/198
-@@ -0,0 +1,104 @@
-+#!/bin/bash
-+#
-+# Test commit of encrypted qcow2 files
-+#
-+# Copyright (C) 2017 Red Hat, Inc.
-+#
-+# This program is free software; you can redistribute it and/or modify
-+# it under the terms of the GNU General Public License as published by
-+# the Free Software Foundation; either version 2 of the License, or
-+# (at your option) any later version.
-+#
-+# This program is distributed in the hope that it will be useful,
-+# but WITHOUT ANY WARRANTY; without even the implied warranty of
-+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+# GNU General Public License for more details.
-+#
-+# You should have received a copy of the GNU General Public License
-+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
-+#
-+
-+# creator
-+owner=berrange@redhat.com
-+
-+seq=`basename $0`
-+echo "QA output created by $seq"
-+
-+here=`pwd`
-+status=1	# failure is the default!
-+
-+_cleanup()
-+{
-+	_cleanup_test_img
-+}
-+trap "_cleanup; exit \$status" 0 1 2 3 15
-+
-+# get standard environment, filters and checks
-+. ./common.rc
-+. ./common.filter
-+
-+_supported_fmt qcow2
-+_supported_proto generic
-+_supported_os Linux
-+
-+
-+size=16M
-+TEST_IMG_BASE=$TEST_IMG.base
-+SECRET0="secret,id=sec0,data=astrochicken"
-+SECRET1="secret,id=sec1,data=furby"
-+
-+TEST_IMG_SAVE=$TEST_IMG
-+TEST_IMG=$TEST_IMG_BASE
-+echo "== create base =="
-+_make_test_img --object $SECRET0 -o "encrypt.format=luks,encrypt.key-secret=sec0,encrypt.iter-time=10" $size
-+TEST_IMG=$TEST_IMG_SAVE
-+
-+IMGSPECBASE="driver=$IMGFMT,file.filename=$TEST_IMG_BASE,encrypt.key-secret=sec0"
-+IMGSPECLAYER="driver=$IMGFMT,file.filename=$TEST_IMG,encrypt.key-secret=sec1"
-+IMGSPEC="$IMGSPECLAYER,backing.driver=$IMGFMT,backing.file.filename=$TEST_IMG_BASE,backing.encrypt.key-secret=sec0"
-+QEMU_IO_OPTIONS=$QEMU_IO_OPTIONS_NO_FMT
-+
-+echo
-+echo "== writing whole image base =="
-+$QEMU_IO --object $SECRET0 -c "write -P 0xa 0 $size" --image-opts $IMGSPECBASE | _filter_qemu_io | _filter_testdir
-+
-+echo "== create overlay =="
-+_make_test_img --object $SECRET1 -o "encrypt.format=luks,encrypt.key-secret=sec1,encrypt.iter-time=10" -u -b "$TEST_IMG_BASE" $size
-+
-+echo
-+echo "== writing whole image layer =="
-+$QEMU_IO --object $SECRET0 --object $SECRET1 -c "write -P 0x9 0 $size" --image-opts $IMGSPEC | _filter_qemu_io | _filter_testdir
-+
-+echo
-+echo "== verify pattern base =="
-+$QEMU_IO --object $SECRET0 -c "read -P 0xa 0 $size" --image-opts $IMGSPECBASE | _filter_qemu_io | _filter_testdir
-+
-+echo
-+echo "== verify pattern layer =="
-+$QEMU_IO --object $SECRET0 --object $SECRET1 -c "read -P 0x9 0 $size" --image-opts $IMGSPEC | _filter_qemu_io | _filter_testdir
-+
-+echo
-+echo "== committing layer into base =="
-+$QEMU_IMG commit --object $SECRET0 --object $SECRET1 --image-opts $IMGSPEC | _filter_testdir
-+
-+echo
-+echo "== verify pattern base =="
-+$QEMU_IO --object $SECRET0 -c "read -P 0x9 0 $size" --image-opts $IMGSPECBASE | _filter_qemu_io | _filter_testdir
-+
-+echo
-+echo "== verify pattern layer =="
-+$QEMU_IO --object $SECRET0 --object $SECRET1 -c "read -P 0x9 0 $size" --image-opts $IMGSPEC | _filter_qemu_io | _filter_testdir
-+
-+echo
-+echo "== checking image base =="
-+$QEMU_IMG info --image-opts $IMGSPECBASE | _filter_img_info | _filter_testdir | sed -e "/^disk size:/ D"
-+
-+echo
-+echo "== checking image layer =="
-+$QEMU_IMG info --image-opts $IMGSPECLAYER | _filter_img_info | _filter_testdir | sed -e "/^disk size:/ D"
-+
-+
-+# success, all done
-+echo "*** done"
-+rm -f $seq.full
-+status=0
-diff --git a/tests/qemu-iotests/198.out b/tests/qemu-iotests/198.out
-new file mode 100644
-index 0000000000..2db565e16b
---- /dev/null
-+++ b/tests/qemu-iotests/198.out
-@@ -0,0 +1,126 @@
-+QA output created by 198
-+== create base ==
-+Formatting 'TEST_DIR/t.IMGFMT.base', fmt=IMGFMT size=16777216 encrypt.format=luks encrypt.key-secret=sec0 encrypt.iter-time=10
-+
-+== writing whole image base ==
-+wrote 16777216/16777216 bytes at offset 0
-+16 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+== create overlay ==
-+Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=16777216 backing_file=TEST_DIR/t.IMGFMT.base encrypt.format=luks encrypt.key-secret=sec1 encrypt.iter-time=10
-+
-+== writing whole image layer ==
-+wrote 16777216/16777216 bytes at offset 0
-+16 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+
-+== verify pattern base ==
-+read 16777216/16777216 bytes at offset 0
-+16 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+
-+== verify pattern layer ==
-+read 16777216/16777216 bytes at offset 0
-+16 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+
-+== committing layer into base ==
-+Image committed.
-+
-+== verify pattern base ==
-+read 16777216/16777216 bytes at offset 0
-+16 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+
-+== verify pattern layer ==
-+read 16777216/16777216 bytes at offset 0
-+16 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+
-+== checking image base ==
-+image: json:{"encrypt.key-secret": "sec0", "driver": "IMGFMT", "file": {"driver": "file", "filename": "TEST_DIR/t.IMGFMT.base"}}
-+file format: IMGFMT
-+virtual size: 16M (16777216 bytes)
-+Format specific information:
-+    compat: 1.1
-+    lazy refcounts: false
-+    refcount bits: 16
-+    encrypt:
-+        ivgen alg: plain64
-+        hash alg: sha256
-+        cipher alg: aes-256
-+        uuid: 00000000-0000-0000-0000-000000000000
-+        format: luks
-+        cipher mode: xts
-+        slots:
-+            [0]:
-+                active: true
-+                iters: 1024
-+                key offset: 4096
-+                stripes: 4000
-+            [1]:
-+                active: false
-+                key offset: 262144
-+            [2]:
-+                active: false
-+                key offset: 520192
-+            [3]:
-+                active: false
-+                key offset: 778240
-+            [4]:
-+                active: false
-+                key offset: 1036288
-+            [5]:
-+                active: false
-+                key offset: 1294336
-+            [6]:
-+                active: false
-+                key offset: 1552384
-+            [7]:
-+                active: false
-+                key offset: 1810432
-+        payload offset: 2068480
-+        master key iters: 1024
-+    corrupt: false
-+
-+== checking image layer ==
-+image: json:{"encrypt.key-secret": "sec1", "driver": "IMGFMT", "file": {"driver": "file", "filename": "TEST_DIR/t.IMGFMT"}}
-+file format: IMGFMT
-+virtual size: 16M (16777216 bytes)
-+backing file: TEST_DIR/t.IMGFMT.base
-+Format specific information:
-+    compat: 1.1
-+    lazy refcounts: false
-+    refcount bits: 16
-+    encrypt:
-+        ivgen alg: plain64
-+        hash alg: sha256
-+        cipher alg: aes-256
-+        uuid: 00000000-0000-0000-0000-000000000000
-+        format: luks
-+        cipher mode: xts
-+        slots:
-+            [0]:
-+                active: true
-+                iters: 1024
-+                key offset: 4096
-+                stripes: 4000
-+            [1]:
-+                active: false
-+                key offset: 262144
-+            [2]:
-+                active: false
-+                key offset: 520192
-+            [3]:
-+                active: false
-+                key offset: 778240
-+            [4]:
-+                active: false
-+                key offset: 1036288
-+            [5]:
-+                active: false
-+                key offset: 1294336
-+            [6]:
-+                active: false
-+                key offset: 1552384
-+            [7]:
-+                active: false
-+                key offset: 1810432
-+        payload offset: 2068480
-+        master key iters: 1024
-+    corrupt: false
-+*** done
-diff --git a/tests/qemu-iotests/common.filter b/tests/qemu-iotests/common.filter
-index 873ca6b104..d9237799e9 100644
---- a/tests/qemu-iotests/common.filter
-+++ b/tests/qemu-iotests/common.filter
-@@ -157,7 +157,9 @@ _filter_img_info()
-         -e "/lazy_refcounts: \\(on\\|off\\)/d" \
-         -e "/block_size: [0-9]\\+/d" \
-         -e "/block_state_zero: \\(on\\|off\\)/d" \
--        -e "/log_size: [0-9]\\+/d"
-+        -e "/log_size: [0-9]\\+/d" \
-+        -e "s/iters: [0-9]\\+/iters: 1024/" \
-+        -e "s/uuid: [-a-f0-9]\\+/uuid: 00000000-0000-0000-0000-000000000000/"
- }
- 
- # filter out offsets and file names from qemu-img map; good for both
-diff --git a/tests/qemu-iotests/group b/tests/qemu-iotests/group
-index 24e5ad1b79..83b839bbe3 100644
---- a/tests/qemu-iotests/group
-+++ b/tests/qemu-iotests/group
-@@ -194,3 +194,4 @@
- 194 rw auto migration quick
- 195 rw auto quick
- 197 rw auto quick
-+198 rw auto
--- 
-2.14.3
+         send_free_page_cmd_id(vb, &vb->start_cmd_id);
+         if (page_poisoning_enabled() &&
+             !IS_ENABLED(CONFIG_PAGE_POISONING_NO_SANITY))
+                 walk_free_mem_block(vb, 0, 
+&virtio_balloon_send_free_pages);
+         send_free_page_cmd_id(vb, &vb->stop_cmd_id);
+
+
+walk_free_mem_block() should be a more generic API, and this potential 
+page poisoning issue is specific to live migration which is only one use 
+case of this function, so I think it is better to handle it in the 
+special use case itself.
+
+Best,
+Wei
