@@ -1,21 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49372)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50228)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jiangyiwen@huawei.com>) id 1eFbxX-0002PB-5s
-	for qemu-devel@nongnu.org; Fri, 17 Nov 2017 03:25:11 -0500
+	(envelope-from <thuth@redhat.com>) id 1eFc2Z-0004bv-AD
+	for qemu-devel@nongnu.org; Fri, 17 Nov 2017 03:30:24 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jiangyiwen@huawei.com>) id 1eFbxU-0000NB-1l
-	for qemu-devel@nongnu.org; Fri, 17 Nov 2017 03:25:11 -0500
-Received: from szxga04-in.huawei.com ([45.249.212.190]:2792)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_ARCFOUR_SHA1:16) (Exim 4.71)
-	(envelope-from <jiangyiwen@huawei.com>) id 1eFbxT-0000Io-Ej
-	for qemu-devel@nongnu.org; Fri, 17 Nov 2017 03:25:07 -0500
-From: jiangyiwen <jiangyiwen@huawei.com>
-Message-ID: <5A0E9C91.4050108@huawei.com>
-Date: Fri, 17 Nov 2017 16:23:45 +0800
+	(envelope-from <thuth@redhat.com>) id 1eFc2W-00051r-6x
+	for qemu-devel@nongnu.org; Fri, 17 Nov 2017 03:30:23 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:58616)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1eFc2W-00051T-1E
+	for qemu-devel@nongnu.org; Fri, 17 Nov 2017 03:30:20 -0500
+References: <e1e3a1d3-da53-e46a-ce9b-7d1707e3a493@linux.intel.com>
+	<81495d39-0026-dba2-10b9-86d7df5babd3@tuxfamily.org>
+	<4a983bfc-442c-c55f-e3eb-9cb58a0d9ba8@redhat.com>
+	<aac92ba4-337c-df4f-c8f5-03b9fef1e2f0@linux.intel.com>
+	<cdd6e0a4-93cd-66ca-5e69-7a834f0b10d0@redhat.com>
+	<a1648b4d-946f-49c4-93c5-5990baa0bce8@linux.intel.com>
+From: Thomas Huth <thuth@redhat.com>
+Message-ID: <3cc5c809-001e-bb14-52fd-7a66ed00b38c@redhat.com>
+Date: Fri, 17 Nov 2017 09:30:07 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Subject: [Qemu-devel] [PATCH] Don't ignore O_DIRECT flag in the 9pfs server
+In-Reply-To: <a1648b4d-946f-49c4-93c5-5990baa0bce8@linux.intel.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] HAXM is now open source
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,41 +32,26 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: aneesh.kumar@linux.vnet.ibm.com, groug@kaod.org, qemu-devel@nongnu.org
-Cc: sochin.jiang@huawei.com, Eduard.Shishkin@huawei.com
+To: Yu Ning <yu.ning@linux.intel.com>, Paolo Bonzini <pbonzini@redhat.com>, John Snow <jsnow@redhat.com>, Thomas Huth <huth@tuxfamily.org>, qemu-devel <qemu-devel@nongnu.org>, Stefan Weil <sw@weilnetz.de>
+Cc: Vincent Palatin <vpalatin@chromium.org>
 
-Now v9fs in linux has already supported O_DIRECT(v9fs_direct_IO),
-when guest user open file with O_DIRECT flag and return success,
-so user hopes data doesn't pass through page cache, but 9pfs in
-qemu ignore direct disk access and use host page cache, it is not
-match to DIRECT_IO semantic, so we should not ignore O_DIRECT in
-9pfs unless v9fs in linux don't support DIRECT_IO.
+On 17.11.2017 09:17, Yu Ning wrote:
+[...]
+> Is there a preferred document format for the QEMU blog, e.g. Markdown?
 
-And if server fs don't support O_DIRECT, user will receive -EINVAL
-and know the filesystem don't support O_DIRECT.
+Yes, we're using markdown of Jekyll (https://jekyllrb.com/docs/posts/).
+Please clone the qemu-web repository (see
+https://git.qemu.org/?p=3Dqemu-web.git), and have a look in the "_posts"
+directory to see how the files should look like.
 
-So in order to ensure semantic consistency, don't ignore direct
-disk access in 9pfs.
+> I'll get the content ready by early next week, and then I'll need
+> someone to help me post it.
 
-Signed-off-by: Yiwen Jiang <jiangyiwen@huawei.com>
----
- hw/9pfs/9p.c | 4 ----
- 1 file changed, 4 deletions(-)
+Sure, Paolo and I should be able to help. The preferred way is to create
+a patch against the qemu-web repository and send that patch to
+qemu-devel, with CC: to Paolo and myself. We then can give feedback, do
+sanity checking (in case you don't want to install Jekyll on your HD),
+and push the patch to the website if everything is fine.
 
-diff --git a/hw/9pfs/9p.c b/hw/9pfs/9p.c
-index 52d4663..5ea01c4 100644
---- a/hw/9pfs/9p.c
-+++ b/hw/9pfs/9p.c
-@@ -155,10 +155,6 @@ static int get_dotl_openflags(V9fsState *s, int oflags)
-      */
-     flags = dotl_to_open_flags(oflags);
-     flags &= ~(O_NOCTTY | O_ASYNC | O_CREAT);
--    /*
--     * Ignore direct disk access hint until the server supports it.
--     */
--    flags &= ~O_DIRECT;
-     return flags;
- }
-
--- 
-1.8.3.1
+ Thanks!
+  Thomas
