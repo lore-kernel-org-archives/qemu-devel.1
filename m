@@ -1,27 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52964)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54269)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <programmingkidx@gmail.com>) id 1eFj9n-0002E5-3i
-	for qemu-devel@nongnu.org; Fri, 17 Nov 2017 11:06:22 -0500
+	(envelope-from <mreitz@redhat.com>) id 1eFjCW-0003f4-KJ
+	for qemu-devel@nongnu.org; Fri, 17 Nov 2017 11:09:09 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <programmingkidx@gmail.com>) id 1eFj9j-00067f-5h
-	for qemu-devel@nongnu.org; Fri, 17 Nov 2017 11:06:19 -0500
-Received: from mail-io0-x22a.google.com ([2607:f8b0:4001:c06::22a]:46992)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <programmingkidx@gmail.com>)
-	id 1eFj9j-00066s-0O
-	for qemu-devel@nongnu.org; Fri, 17 Nov 2017 11:06:15 -0500
-Received: by mail-io0-x22a.google.com with SMTP id t11so9197150iof.13
-	for <qemu-devel@nongnu.org>; Fri, 17 Nov 2017 08:06:14 -0800 (PST)
-Content-Type: text/plain; charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 10.3 \(3273\))
-From: Programmingkid <programmingkidx@gmail.com>
-In-Reply-To: <mailman.8273.1510914667.27993.qemu-devel@nongnu.org>
-Date: Fri, 17 Nov 2017 11:06:12 -0500
-Content-Transfer-Encoding: quoted-printable
-Message-Id: <50461419-2FB0-4A94-A6E6-4EFB459FF39D@gmail.com>
-References: <mailman.8273.1510914667.27993.qemu-devel@nongnu.org>
-Subject: Re: [Qemu-devel] [PATCH 02/24] sdl: remove -alt-grab and -ctrl-grab
- support
+	(envelope-from <mreitz@redhat.com>) id 1eFjCV-00017H-HF
+	for qemu-devel@nongnu.org; Fri, 17 Nov 2017 11:09:08 -0500
+References: <20171110172545.32609-1-mreitz@redhat.com>
+From: Max Reitz <mreitz@redhat.com>
+Message-ID: <5effaf53-cd83-b74d-e68b-78faae56ce26@redhat.com>
+Date: Fri, 17 Nov 2017 17:08:36 +0100
+MIME-Version: 1.0
+In-Reply-To: <20171110172545.32609-1-mreitz@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="kfPf7xAWcFxotAXHxlKC5Ptkv5jm2bPuu"
+Subject: Re: [Qemu-devel] [PATCH v2 for-2.11] block: Make bdrv_next() keep
+ strong references
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,16 +24,89 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Gerd Hoffmann <kraxel@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>
-Cc: Markus Armbruster <armbru@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
+To: qemu-block@nongnu.org
+Cc: qemu-devel@nongnu.org, Kevin Wolf <kwolf@redhat.com>, Fam Zheng <famz@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Eric Blake <eblake@redhat.com>
+
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--kfPf7xAWcFxotAXHxlKC5Ptkv5jm2bPuu
+From: Max Reitz <mreitz@redhat.com>
+To: qemu-block@nongnu.org
+Cc: qemu-devel@nongnu.org, Kevin Wolf <kwolf@redhat.com>,
+ Fam Zheng <famz@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>,
+ Eric Blake <eblake@redhat.com>
+Message-ID: <5effaf53-cd83-b74d-e68b-78faae56ce26@redhat.com>
+Subject: Re: [PATCH v2 for-2.11] block: Make bdrv_next() keep strong
+ references
+References: <20171110172545.32609-1-mreitz@redhat.com>
+In-Reply-To: <20171110172545.32609-1-mreitz@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+
+On 2017-11-10 18:25, Max Reitz wrote:
+> On one hand, it is a good idea for bdrv_next() to return a strong
+> reference because ideally nearly every pointer should be refcounted.
+> This fixes intermittent failure of iotest 194.
+>=20
+> On the other, it is absolutely necessary for bdrv_next() itself to keep=
+
+> a strong reference to both the BB (in its first phase) and the BDS (at
+> least in the second phase) because when called the next time, it will
+> dereference those objects to get a link to the next one.  Therefore, it=
+
+> needs these objects to stay around until then.  Just storing the pointe=
+r
+> to the next in the iterator is not really viable because that pointer
+> might become invalid as well.
+>=20
+> Both arguments taken together means we should probably just invoke
+> bdrv_ref() and blk_ref() in bdrv_next().  This means we have to assert
+> that bdrv_next() is always called from the main loop, but that was
+> probably necessary already before this patch and judging from the
+> callers, it also looks to actually be the case.
+>=20
+> Keeping these strong references means however that callers need to give=
+
+> them up if they decide to abort the iteration early.  They can do so
+> through the new bdrv_next_cleanup() function.
+>=20
+> Suggested-by: Kevin Wolf <kwolf@redhat.com>
+> Signed-off-by: Max Reitz <mreitz@redhat.com>
+> ---
+> v2: Instead of keeping the strong reference in bdrv_drain_all_*() only,=
+
+>     have them for all callers of bdrv_next() [Fam, Kevin]
+>     (Completely different patch now, so no git-backport-diff included
+>      here)
+> ---
+>  include/block/block.h |  1 +
+>  block.c               |  3 +++
+>  block/block-backend.c | 48 +++++++++++++++++++++++++++++++++++++++++++=
++++--
+>  block/snapshot.c      |  6 ++++++
+>  migration/block.c     |  1 +
+>  5 files changed, 57 insertions(+), 2 deletions(-)
+
+Due to one supporter and otherwise lack of resistance: Applied to my
+block branch (https://github.com/XanClic/qemu/commits/block).
+
+Max
 
 
-> With absolute pointer devices such as usb-tablet being widely used
-> mouse grabs (for relative pointing devices) should be rarely needed
-> these days.  So the benefit of the options to configure the hotkey
-> modifiers for grab (and other actions) seems questionable.  Which
-> is expecially true for the -ctrl-grab which isn't handled in the
-> handle_keyup() code.
+--kfPf7xAWcFxotAXHxlKC5Ptkv5jm2bPuu
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
 
-So does this mean you are against a patch that would allow the user to =
-chose a key to act as a mouse ungrab key?=
+-----BEGIN PGP SIGNATURE-----
+
+iQFGBAEBCAAwFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAloPCYQSHG1yZWl0ekBy
+ZWRoYXQuY29tAAoJEPQH2wBh1c9AH6AH/RB9QpUZrN8Q11V2qClRfa5NeslIWHF3
+OtWQgYtA1cVMoSSolM+dioOgZ5Y/cVy0FpDOYOiCReDmmPXvzi0vzf9uQPKt61iV
+Pmjp+X8AXVNadyxa8ojZ9PhCd9XlPq3apM/0rtspqyRYWgY5UGlegibFSTQ5QwkK
+EKvHTOQYxGDnRxqQMHRVoFSlcub8aCvKDdGvN/OUK4Wi3w5SD4UbwHjnXeH4bOlM
+eSRU7dh/3SvObQCcXtK+Jy8pA31d96QIKSalWCNBODMqouV1cp79RNmUwlFNctNQ
+GhnAb4zdARQUx4wB1sBJXHmBTNM/zygZDiY/AsAIVG3PL5kYTHpVjwY=
+=TwmC
+-----END PGP SIGNATURE-----
+
+--kfPf7xAWcFxotAXHxlKC5Ptkv5jm2bPuu--
