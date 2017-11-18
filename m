@@ -1,26 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33262)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39711)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1eFqLJ-0000MG-5x
-	for qemu-devel@nongnu.org; Fri, 17 Nov 2017 18:46:42 -0500
+	(envelope-from <wei.w.wang@intel.com>) id 1eFvaU-0004wo-Cw
+	for qemu-devel@nongnu.org; Sat, 18 Nov 2017 00:22:43 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1eFqLH-000886-TQ
-	for qemu-devel@nongnu.org; Fri, 17 Nov 2017 18:46:41 -0500
-References: <20171030163309.75770-1-vsementsov@virtuozzo.com>
-	<20171030163309.75770-5-vsementsov@virtuozzo.com>
-	<a593e984-5d1e-a95c-9b80-dbe82227b8f9@redhat.com>
-	<fac1abb3-f783-ec93-3a60-13dbd666d26e@virtuozzo.com>
-	<d27739c1-9cbe-ea30-d711-bf067013918f@redhat.com>
-	<8a02c94e-b323-1e45-0c05-e8fddc6285e2@virtuozzo.com>
-From: John Snow <jsnow@redhat.com>
-Message-ID: <77afd31d-5272-5518-18dc-494a4fdf9c92@redhat.com>
-Date: Fri, 17 Nov 2017 18:46:24 -0500
-MIME-Version: 1.0
-In-Reply-To: <8a02c94e-b323-1e45-0c05-e8fddc6285e2@virtuozzo.com>
-Content-Type: text/plain; charset=utf-8
+	(envelope-from <wei.w.wang@intel.com>) id 1eFvaP-0005oH-CR
+	for qemu-devel@nongnu.org; Sat, 18 Nov 2017 00:22:42 -0500
+Received: from mga09.intel.com ([134.134.136.24]:22830)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <wei.w.wang@intel.com>)
+	id 1eFvaO-0005lD-W7
+	for qemu-devel@nongnu.org; Sat, 18 Nov 2017 00:22:37 -0500
+From: "Wang, Wei W" <wei.w.wang@intel.com>
+Date: Sat, 18 Nov 2017 05:22:28 +0000
+Message-ID: <286AC319A985734F985F78AFA26841F73936A8E7@shsmsx102.ccr.corp.intel.com>
+References: <1509696786-1597-1-git-send-email-wei.w.wang@intel.com>
+	<1509696786-1597-7-git-send-email-wei.w.wang@intel.com>
+	<20171115220743-mutt-send-email-mst@kernel.org>
+	<5A0D923C.4020807@intel.com> <5A0EC967.5090407@intel.com>
+	<20171117144253-mutt-send-email-mst@kernel.org>
+In-Reply-To: <20171117144253-mutt-send-email-mst@kernel.org>
 Content-Language: en-US
+Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v8 04/14] block/dirty-bitmap: add
- bdrv_dirty_bitmap_set_frozen
+MIME-Version: 1.0
+Subject: Re: [Qemu-devel] [virtio-dev] Re: [PATCH v17 6/6] virtio-balloon:
+ VIRTIO_BALLOON_F_FREE_PAGE_VQ
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,147 +33,125 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org, famz@redhat.com
-Cc: kwolf@redhat.com, peter.maydell@linaro.org, lirans@il.ibm.com, quintela@redhat.com, armbru@redhat.com, mreitz@redhat.com, stefanha@redhat.com, den@openvz.org, amit.shah@redhat.com, pbonzini@redhat.com, dgilbert@redhat.com
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: "aarcange@redhat.com" <aarcange@redhat.com>, "virtio-dev@lists.oasis-open.org" <virtio-dev@lists.oasis-open.org>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>, "mawilcox@microsoft.com" <mawilcox@microsoft.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "amit.shah@redhat.com" <amit.shah@redhat.com>, "penguin-kernel@I-love.SAKURA.ne.jp" <penguin-kernel@I-love.SAKURA.ne.jp>, "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, "willy@infradead.org" <willy@infradead.org>, "virtualization@lists.linux-foundation.org" <virtualization@lists.linux-foundation.org>, "linux-mm@kvack.org" <linux-mm@kvack.org>, "yang.zhang.wz@gmail.com" <yang.zhang.wz@gmail.com>, "quan.xu@aliyun.com" <quan.xu@aliyun.com>, "cornelia.huck@de.ibm.com" <cornelia.huck@de.ibm.com>, "pbonzini@redhat.com" <pbonzini@redhat.com>, "akpm@linux-foundation.org" <akpm@linux-foundation.org>, "mhocko@kernel.org" <mhocko@kernel.org>, "mgorman@techsingularity.net" <mgorman@techsingularity.net>, "liliang.opensource@gmail.com" <liliang.opensource@gmail.com>
 
-
-
-On 11/17/2017 12:30 PM, Vladimir Sementsov-Ogievskiy wrote:
-> 17.11.2017 20:20, John Snow wrote:
->>
->> On 11/17/2017 09:46 AM, Vladimir Sementsov-Ogievskiy wrote:
->>> 14.11.2017 02:32, John Snow wrote:
->>>> On 10/30/2017 12:32 PM, Vladimir Sementsov-Ogievskiy wrote:
->>>>> Make it possible to set bitmap 'frozen' without a successor.
->>>>> This is needed to protect the bitmap during outgoing bitmap postcop=
-y
->>>>> migration.
->>>>>
->>>>> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.c=
-om>
->>>>> ---
->>>>> =C2=A0=C2=A0 include/block/dirty-bitmap.h |=C2=A0 1 +
->>>>> =C2=A0=C2=A0 block/dirty-bitmap.c=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0 | 22 ++++++++++++++++++++--
->>>>> =C2=A0=C2=A0 2 files changed, 21 insertions(+), 2 deletions(-)
->>>>>
->>>>> diff --git a/include/block/dirty-bitmap.h
->>>>> b/include/block/dirty-bitmap.h
->>>>> index a9e2a92e4f..ae6d697850 100644
->>>>> --- a/include/block/dirty-bitmap.h
->>>>> +++ b/include/block/dirty-bitmap.h
->>>>> @@ -39,6 +39,7 @@ uint32_t
->>>>> bdrv_get_default_bitmap_granularity(BlockDriverState *bs);
->>>>> =C2=A0=C2=A0 uint32_t bdrv_dirty_bitmap_granularity(const BdrvDirty=
-Bitmap
->>>>> *bitmap);
->>>>> =C2=A0=C2=A0 bool bdrv_dirty_bitmap_enabled(BdrvDirtyBitmap *bitmap=
-);
->>>>> =C2=A0=C2=A0 bool bdrv_dirty_bitmap_frozen(BdrvDirtyBitmap *bitmap)=
-;
->>>>> +void bdrv_dirty_bitmap_set_frozen(BdrvDirtyBitmap *bitmap, bool
->>>>> frozen);
->>>>> =C2=A0=C2=A0 const char *bdrv_dirty_bitmap_name(const BdrvDirtyBitm=
-ap *bitmap);
->>>>> =C2=A0=C2=A0 int64_t bdrv_dirty_bitmap_size(const BdrvDirtyBitmap *=
-bitmap);
->>>>> =C2=A0=C2=A0 DirtyBitmapStatus bdrv_dirty_bitmap_status(BdrvDirtyBi=
-tmap
->>>>> *bitmap);
->>>>> diff --git a/block/dirty-bitmap.c b/block/dirty-bitmap.c
->>>>> index 7578863aa1..67fc6bd6e0 100644
->>>>> --- a/block/dirty-bitmap.c
->>>>> +++ b/block/dirty-bitmap.c
->>>>> @@ -40,6 +40,8 @@ struct BdrvDirtyBitmap {
->>>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 QemuMutex *mutex;
->>>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 HBitmap *bitmap;=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 /* Dirty bitmap imple=
-mentation */
->>>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 HBitmap *meta;=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 /* Meta dirt=
-y bitmap */
->>>>> +=C2=A0=C2=A0=C2=A0 bool frozen;=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 /* Bitmap is froze=
-n, it can't be
->>>>> modified
->>>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 through Q=
-MP */
->>>> I hesitate, because this now means that we have two independent bits=
- of
->>>> state we need to update and maintain consistency with.
->>> it was your proposal)))
->>>
->>> https://lists.gnu.org/archive/html/qemu-devel/2017-07/msg01172.html
->>>
->>> "
->>> Your new use case here sounds like Frozen to me, but it simply does n=
-ot
->>> have an anonymous successor to force it to be recognized as "frozen."=
- We
->>> can add a `bool protected` or `bool frozen` field to force recognitio=
-n
->>> of this status and adjust the json documentation accordingly.
->>>
->>> I think then we'd have four recognized states:
->>>
->>> FROZEN: Cannot be reset/deleted. Bitmap is in-use by a block job or
->>> other internal process. Bitmap is otherwise ACTIVE.
->>> DISABLED: Not recording any writes (by choice.)
->>> READONLY: Not able to record any writes (by necessity.)
->>> ACTIVE: Normal bitmap status.
->>>
->>> Sound right?
->>> "
->>>
->>>
->> I was afraid you'd say that :(
->>
->> It's okay, anyway. I shouldn't let myself go so long between reviews
->> like this, because you catch me changing my mind. Anyway, please go
->> ahead with it. I don't want to delay you on something that works becau=
-se
->> I can't make up *my* mind.
+On Friday, November 17, 2017 8:45 PM, Michael S. Tsirkin wrote:
+> On Fri, Nov 17, 2017 at 07:35:03PM +0800, Wei Wang wrote:
+> > On 11/16/2017 09:27 PM, Wei Wang wrote:
+> > > On 11/16/2017 04:32 AM, Michael S. Tsirkin wrote:
+> > > > On Fri, Nov 03, 2017 at 04:13:06PM +0800, Wei Wang wrote:
+> > > > > Negotiation of the VIRTIO_BALLOON_F_FREE_PAGE_VQ feature
+> > > > > indicates the support of reporting hints of guest free pages to
+> > > > > the host via virtio-balloon. The host requests the guest to
+> > > > > report the free pages by sending commands via the virtio-balloon
+> configuration registers.
+> > > > >
+> > > > > When the guest starts to report, the first element added to the
+> > > > > free page vq is a sequence id of the start reporting command.
+> > > > > The id is given by the host, and it indicates whether the
+> > > > > following free pages correspond to the command. For example, the
+> > > > > host may stop the report and start again with a new command id.
+> > > > > The obsolete pages for the previous start command can be
+> > > > > detected by the id dismatching on the host. The id is added to
+> > > > > the vq using an output buffer, and the free pages are added to
+> > > > > the vq using input buffer.
+> > > > >
+> > > > > Here are some explainations about the added configuration registe=
+rs:
+> > > > > - host2guest_cmd: a register used by the host to send commands
+> > > > > to the guest.
+> > > > > - guest2host_cmd: written by the guest to ACK to the host about
+> > > > > the commands that have been received. The host will clear the
+> > > > > corresponding bits on the host2guest_cmd register. The guest
+> > > > > also uses this register to send commands to the host (e.g. when f=
+inish
+> free page reporting).
+> > > > > - free_page_cmd_id: the sequence id of the free page report
+> > > > > command given by the host.
+> > > > >
+> > > > > Signed-off-by: Wei Wang <wei.w.wang@intel.com>
+> > > > > Signed-off-by: Liang Li <liang.z.li@intel.com>
+> > > > > Cc: Michael S. Tsirkin <mst@redhat.com>
+> > > > > Cc: Michal Hocko <mhocko@kernel.org>
+> > > > > ---
+> > > > >
+> > > > > +
+> > > > > +static void report_free_page(struct work_struct *work) {
+> > > > > +    struct virtio_balloon *vb;
+> > > > > +
+> > > > > +    vb =3D container_of(work, struct virtio_balloon,
+> > > > > report_free_page_work);
+> > > > > +    report_free_page_cmd_id(vb);
+> > > > > +    walk_free_mem_block(vb, 0, &virtio_balloon_send_free_pages);
+> > > > > +    /*
+> > > > > +     * The last few free page blocks that were added may not rea=
+ch the
+> > > > > +     * batch size, but need a kick to notify the device to
+> > > > > handle them.
+> > > > > +     */
+> > > > > +    virtqueue_kick(vb->free_page_vq);
+> > > > > +    report_free_page_end(vb);
+> > > > > +}
+> > > > > +
+> > > > I think there's an issue here: if pages are poisoned and
+> > > > hypervisor subsequently drops them, testing them after allocation
+> > > > will trigger a false positive.
+> > > >
+> > > > The specific configuration:
+> > > >
+> > > > PAGE_POISONING on
+> > > > PAGE_POISONING_NO_SANITY off
+> > > > PAGE_POISONING_ZERO off
+> > > >
+> > > >
+> > > > Solutions:
+> > > > 1. disable the feature in that configuration
+> > > >     suggested as an initial step
+> > >
+> > > Thanks for the finding.
+> > > Similar to this option: I'm thinking could we make
+> > > walk_free_mem_block() simply return if that option is on?
+> > > That is, at the beginning of the function:
+> > >     if (!page_poisoning_enabled())
+> > >                 return;
+> > >
+> >
+> >
+> > Thought about it more, I think it would be better to put this logic to
+> > virtio_balloon:
+> >
+> >         send_free_page_cmd_id(vb, &vb->start_cmd_id);
+> >         if (page_poisoning_enabled() &&
+> >             !IS_ENABLED(CONFIG_PAGE_POISONING_NO_SANITY))
+> >                 walk_free_mem_block(vb, 0, &virtio_balloon_send_free_pa=
+ges);
+> >         send_free_page_cmd_id(vb, &vb->stop_cmd_id);
+> >
+> >
+> > walk_free_mem_block() should be a more generic API, and this potential
+> > page poisoning issue is specific to live migration which is only one
+> > use case of this function, so I think it is better to handle it in the
+> > special use case itself.
+> >
+> > Best,
+> > Wei
+> >
 >=20
-> Hm, if you remember, reusing "frozen" state was strange for me too. And
-> it's not
-> late to move to
-> 1. make a new state: MIGRATION, which disallows qmp operations on bitma=
-p
-> 2. or just make them unnamed, so they can't be touched by qmp
-
-"Migrating" is fine as a state name. You could probably announce this by
-having it be "frozen" in the usual way (it has a successor) and a new
-bool that lets you do whatever special handling you need to do for it.
-
+> It's a quick work-around but it doesn't make me very happy.
 >=20
-> anything is ok for me as well as leaving it as is. It's all little
-> things, the core is patch 10.
->=20
-> "frozen" sounds like unchanged, but user will see dirty-count changing
-> in query-block.
-
-I guess it's a strange misnomer now... or maybe just always was a bad
-name, since it's not really "frozen" but rather "locked" in a way that
-the QMP user cannot interfere with it -- but it's still a live,
-functioning object.
-
+> AFAIK e.g. RHEL has a debug kernel with poisoning enabled.
+> If this never uses free page hinting at all, it will be much less useful =
+for
+> debugging guests.
 >=20
 
-I'm remembering what I was talking about, but I think my preference is
-illustrably worse. I was trying to avoid boolean bloat by advocating
-re-use, but the re-use is kind of confusing...
+I understand your concern. I think people who use debugging guests don't re=
+gard performance as the first priority, and most vendors usually wouldn't u=
+se debugging guests for their products.
 
-I think I was hoping that a bitmap on the receiving end could simply be
-"frozen" in the usual way, in that it has a successor recording writes.
+How about taking it as the initial solution? We can exploit more solutions =
+after this series is done.
 
-I think the way you want to handle it though is with different semantics
-for cleanup and recovery which makes it not quite the same state, which
-needs either a new bool or some such.
-
-Go with what you think is cleanest at this point, including if you want
-to leave it alone. I don't want to cause you to respin it over bikesheddi=
-ng.
-
---js
+Best,
+Wei
