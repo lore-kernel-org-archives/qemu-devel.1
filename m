@@ -1,30 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39711)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40992)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <wei.w.wang@intel.com>) id 1eFvaU-0004wo-Cw
-	for qemu-devel@nongnu.org; Sat, 18 Nov 2017 00:22:43 -0500
+	(envelope-from <bounces@canonical.com>) id 1eFviY-0006Me-Fj
+	for qemu-devel@nongnu.org; Sat, 18 Nov 2017 00:31:03 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <wei.w.wang@intel.com>) id 1eFvaP-0005oH-CR
-	for qemu-devel@nongnu.org; Sat, 18 Nov 2017 00:22:42 -0500
-Received: from mga09.intel.com ([134.134.136.24]:22830)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <wei.w.wang@intel.com>)
-	id 1eFvaO-0005lD-W7
-	for qemu-devel@nongnu.org; Sat, 18 Nov 2017 00:22:37 -0500
-From: "Wang, Wei W" <wei.w.wang@intel.com>
-Date: Sat, 18 Nov 2017 05:22:28 +0000
-Message-ID: <286AC319A985734F985F78AFA26841F73936A8E7@shsmsx102.ccr.corp.intel.com>
-References: <1509696786-1597-1-git-send-email-wei.w.wang@intel.com>
-	<1509696786-1597-7-git-send-email-wei.w.wang@intel.com>
-	<20171115220743-mutt-send-email-mst@kernel.org>
-	<5A0D923C.4020807@intel.com> <5A0EC967.5090407@intel.com>
-	<20171117144253-mutt-send-email-mst@kernel.org>
-In-Reply-To: <20171117144253-mutt-send-email-mst@kernel.org>
-Content-Language: en-US
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+	(envelope-from <bounces@canonical.com>) id 1eFviT-0003Wj-I6
+	for qemu-devel@nongnu.org; Sat, 18 Nov 2017 00:31:02 -0500
+Received: from indium.canonical.com ([91.189.90.7]:37348)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1eFviT-0003Uf-BE
+	for qemu-devel@nongnu.org; Sat, 18 Nov 2017 00:30:57 -0500
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1eFviR-0005Jh-KD
+	for <qemu-devel@nongnu.org>; Sat, 18 Nov 2017 05:30:55 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 973AF2E80CD
+	for <qemu-devel@nongnu.org>; Sat, 18 Nov 2017 05:30:55 +0000 (UTC)
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [virtio-dev] Re: [PATCH v17 6/6] virtio-balloon:
- VIRTIO_BALLOON_F_FREE_PAGE_VQ
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Sat, 18 Nov 2017 05:21:08 -0000
+From: Andrew Baumann <launchpad.net@ab.id.au>
+Reply-To: Bug 1717708 <1717708@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <150558614762.29770.16367876405044972592.malonedeb@chaenomeles.canonical.com>
+Message-Id: <151098246822.1317.436831196418823156.malone@chaenomeles.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1717708] Re: QEMU aarch64 can't run Windows ARM64
+ iso's
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,125 +37,62 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: "aarcange@redhat.com" <aarcange@redhat.com>, "virtio-dev@lists.oasis-open.org" <virtio-dev@lists.oasis-open.org>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>, "mawilcox@microsoft.com" <mawilcox@microsoft.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "amit.shah@redhat.com" <amit.shah@redhat.com>, "penguin-kernel@I-love.SAKURA.ne.jp" <penguin-kernel@I-love.SAKURA.ne.jp>, "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, "willy@infradead.org" <willy@infradead.org>, "virtualization@lists.linux-foundation.org" <virtualization@lists.linux-foundation.org>, "linux-mm@kvack.org" <linux-mm@kvack.org>, "yang.zhang.wz@gmail.com" <yang.zhang.wz@gmail.com>, "quan.xu@aliyun.com" <quan.xu@aliyun.com>, "cornelia.huck@de.ibm.com" <cornelia.huck@de.ibm.com>, "pbonzini@redhat.com" <pbonzini@redhat.com>, "akpm@linux-foundation.org" <akpm@linux-foundation.org>, "mhocko@kernel.org" <mhocko@kernel.org>, "mgorman@techsingularity.net" <mgorman@techsingularity.net>, "liliang.opensource@gmail.com" <liliang.opensource@gmail.com>
+To: qemu-devel@nongnu.org
 
-On Friday, November 17, 2017 8:45 PM, Michael S. Tsirkin wrote:
-> On Fri, Nov 17, 2017 at 07:35:03PM +0800, Wei Wang wrote:
-> > On 11/16/2017 09:27 PM, Wei Wang wrote:
-> > > On 11/16/2017 04:32 AM, Michael S. Tsirkin wrote:
-> > > > On Fri, Nov 03, 2017 at 04:13:06PM +0800, Wei Wang wrote:
-> > > > > Negotiation of the VIRTIO_BALLOON_F_FREE_PAGE_VQ feature
-> > > > > indicates the support of reporting hints of guest free pages to
-> > > > > the host via virtio-balloon. The host requests the guest to
-> > > > > report the free pages by sending commands via the virtio-balloon
-> configuration registers.
-> > > > >
-> > > > > When the guest starts to report, the first element added to the
-> > > > > free page vq is a sequence id of the start reporting command.
-> > > > > The id is given by the host, and it indicates whether the
-> > > > > following free pages correspond to the command. For example, the
-> > > > > host may stop the report and start again with a new command id.
-> > > > > The obsolete pages for the previous start command can be
-> > > > > detected by the id dismatching on the host. The id is added to
-> > > > > the vq using an output buffer, and the free pages are added to
-> > > > > the vq using input buffer.
-> > > > >
-> > > > > Here are some explainations about the added configuration registe=
-rs:
-> > > > > - host2guest_cmd: a register used by the host to send commands
-> > > > > to the guest.
-> > > > > - guest2host_cmd: written by the guest to ACK to the host about
-> > > > > the commands that have been received. The host will clear the
-> > > > > corresponding bits on the host2guest_cmd register. The guest
-> > > > > also uses this register to send commands to the host (e.g. when f=
-inish
-> free page reporting).
-> > > > > - free_page_cmd_id: the sequence id of the free page report
-> > > > > command given by the host.
-> > > > >
-> > > > > Signed-off-by: Wei Wang <wei.w.wang@intel.com>
-> > > > > Signed-off-by: Liang Li <liang.z.li@intel.com>
-> > > > > Cc: Michael S. Tsirkin <mst@redhat.com>
-> > > > > Cc: Michal Hocko <mhocko@kernel.org>
-> > > > > ---
-> > > > >
-> > > > > +
-> > > > > +static void report_free_page(struct work_struct *work) {
-> > > > > +    struct virtio_balloon *vb;
-> > > > > +
-> > > > > +    vb =3D container_of(work, struct virtio_balloon,
-> > > > > report_free_page_work);
-> > > > > +    report_free_page_cmd_id(vb);
-> > > > > +    walk_free_mem_block(vb, 0, &virtio_balloon_send_free_pages);
-> > > > > +    /*
-> > > > > +     * The last few free page blocks that were added may not rea=
-ch the
-> > > > > +     * batch size, but need a kick to notify the device to
-> > > > > handle them.
-> > > > > +     */
-> > > > > +    virtqueue_kick(vb->free_page_vq);
-> > > > > +    report_free_page_end(vb);
-> > > > > +}
-> > > > > +
-> > > > I think there's an issue here: if pages are poisoned and
-> > > > hypervisor subsequently drops them, testing them after allocation
-> > > > will trigger a false positive.
-> > > >
-> > > > The specific configuration:
-> > > >
-> > > > PAGE_POISONING on
-> > > > PAGE_POISONING_NO_SANITY off
-> > > > PAGE_POISONING_ZERO off
-> > > >
-> > > >
-> > > > Solutions:
-> > > > 1. disable the feature in that configuration
-> > > >     suggested as an initial step
-> > >
-> > > Thanks for the finding.
-> > > Similar to this option: I'm thinking could we make
-> > > walk_free_mem_block() simply return if that option is on?
-> > > That is, at the beginning of the function:
-> > >     if (!page_poisoning_enabled())
-> > >                 return;
-> > >
-> >
-> >
-> > Thought about it more, I think it would be better to put this logic to
-> > virtio_balloon:
-> >
-> >         send_free_page_cmd_id(vb, &vb->start_cmd_id);
-> >         if (page_poisoning_enabled() &&
-> >             !IS_ENABLED(CONFIG_PAGE_POISONING_NO_SANITY))
-> >                 walk_free_mem_block(vb, 0, &virtio_balloon_send_free_pa=
-ges);
-> >         send_free_page_cmd_id(vb, &vb->stop_cmd_id);
-> >
-> >
-> > walk_free_mem_block() should be a more generic API, and this potential
-> > page poisoning issue is specific to live migration which is only one
-> > use case of this function, so I think it is better to handle it in the
-> > special use case itself.
-> >
-> > Best,
-> > Wei
-> >
->=20
-> It's a quick work-around but it doesn't make me very happy.
->=20
-> AFAIK e.g. RHEL has a debug kernel with poisoning enabled.
-> If this never uses free page hinting at all, it will be much less useful =
-for
-> debugging guests.
->=20
+I just noticed this bug via qemu-devel. For the record, recent QEMU
+(2.11-rc1 and later) can run recent arm64 Windows images using -M virt
+and the virtio storage/input/networking drivers in the guest. I was
+using older UEFI build that still includes the VGA framebuffer support.
+(I only just learned via this bug that it had been removed, but as
+PeterM pointed out this isn't the right place to discuss it.)
 
-I understand your concern. I think people who use debugging guests don't re=
-gard performance as the first priority, and most vendors usually wouldn't u=
-se debugging guests for their products.
+Here's a sample invocation:
+qemu-system-aarch64 -M virt -cpu cortex-a57 -m 4G -smp 4 -bios QEMU_EFI-arm=
+64.fd \
+  -serial stdio -device VGA -device virtio-keyboard-pci -device virtio-mous=
+e-pci \
+  -netdev user,id=3Dnet0 -device virtio-net-pci,disable-legacy=3Don,netdev=
+=3Dnet0,mac=3D00:11:22:33:44:55,addr=3D08 \
+  -drive if=3Dnone,file=3Dmyimage.vhdx,id=3Dhd0 -device virtio-blk-pci,driv=
+e=3Dhd0
 
-How about taking it as the initial solution? We can exploit more solutions =
-after this series is done.
+-- =
 
-Best,
-Wei
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1717708
+
+Title:
+  QEMU aarch64 can't run Windows ARM64 iso's
+
+Status in QEMU:
+  New
+
+Bug description:
+  Hi,
+  recently Windows ARM64 ISOs have been posted on the internet..
+  just checked with latest QEMU 2.10 release from =
+
+  https://qemu.weilnetz.de/w64/qemu-w64-setup-20170830.exe =
+
+  "h:\qemu\qemu-system-aarch64.exe" -boot d -cdrom h:\iso\16353.1000.170825=
+-1423.RS_PRERELEASE_CLIENTPRO_OEMRET_ARM64FRE_ES-ES.ISO -m 2048 -cpu cortex=
+-a57 -smp 1 -machine virt
+  seems no video output..
+  checked various machine options for example versatilepb (says guest has n=
+ot initialized the guest)..
+
+  so don't know if it's a QEMU bug or lacking feature but can support
+  running Windows ARM64 builds (would be nice if you can add a
+  Snapdragon835 machine type which is which first machines will be
+  running..)
+
+  =
+
+  note running a Windows x64 ISO with similar parameters works (removing -c=
+pu and -machine as not needed)
+
+  thanks..
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1717708/+subscriptions
