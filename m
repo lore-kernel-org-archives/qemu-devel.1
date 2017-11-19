@@ -1,23 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:32838)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49052)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jcd@tribudubois.net>) id 1eGQL6-00044E-Q9
-	for qemu-devel@nongnu.org; Sun, 19 Nov 2017 09:12:53 -0500
+	(envelope-from <mst@redhat.com>) id 1eGRGt-0000Mk-7W
+	for qemu-devel@nongnu.org; Sun, 19 Nov 2017 10:12:36 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jcd@tribudubois.net>) id 1eGQL5-0000p4-Km
-	for qemu-devel@nongnu.org; Sun, 19 Nov 2017 09:12:52 -0500
-Received: from relay2-d.mail.gandi.net ([2001:4b98:c:538::194]:34707)
+	(envelope-from <mst@redhat.com>) id 1eGRGp-00017x-4Q
+	for qemu-devel@nongnu.org; Sun, 19 Nov 2017 10:12:35 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:56828)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <jcd@tribudubois.net>) id 1eGQL5-0000nt-DX
-	for qemu-devel@nongnu.org; Sun, 19 Nov 2017 09:12:51 -0500
-From: Jean-Christophe DUBOIS <jcd@tribudubois.net>
-Message-ID: <e0721b53-fa00-55a2-b8b8-209be025611f@tribudubois.net>
-Date: Sun, 19 Nov 2017 15:12:46 +0100
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1eGRGo-000171-Qx
+	for qemu-devel@nongnu.org; Sun, 19 Nov 2017 10:12:31 -0500
+Date: Sun, 19 Nov 2017 17:11:24 +0200
+From: "Michael S. Tsirkin" <mst@redhat.com>
+Message-ID: <20171119170319-mutt-send-email-mst@kernel.org>
+References: <1509696786-1597-1-git-send-email-wei.w.wang@intel.com>
+	<1509696786-1597-7-git-send-email-wei.w.wang@intel.com>
+	<20171115220743-mutt-send-email-mst@kernel.org>
+	<5A0D923C.4020807@intel.com> <5A0EC967.5090407@intel.com>
+	<20171117144253-mutt-send-email-mst@kernel.org>
+	<286AC319A985734F985F78AFA26841F73936A8E7@shsmsx102.ccr.corp.intel.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 8bit
-Content-Language: en-US
-Subject: [Qemu-devel] [SPARC] Qemu failed to display MMU mapping for non
- memory area.
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <286AC319A985734F985F78AFA26841F73936A8E7@shsmsx102.ccr.corp.intel.com>
+Subject: Re: [Qemu-devel] [virtio-dev] Re: [PATCH v17 6/6] virtio-balloon:
+ VIRTIO_BALLOON_F_FREE_PAGE_VQ
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,130 +32,134 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org, mark.cave-ayland@ilande.co.uk, atar4qemu@gmail.com
-Cc: Jean-Christophe Dubois <jcd@tribudubois.net>
+To: "Wang, Wei W" <wei.w.wang@intel.com>
+Cc: "aarcange@redhat.com" <aarcange@redhat.com>, "virtio-dev@lists.oasis-open.org" <virtio-dev@lists.oasis-open.org>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>, "mawilcox@microsoft.com" <mawilcox@microsoft.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "amit.shah@redhat.com" <amit.shah@redhat.com>, "penguin-kernel@I-love.SAKURA.ne.jp" <penguin-kernel@I-love.SAKURA.ne.jp>, "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, "willy@infradead.org" <willy@infradead.org>, "virtualization@lists.linux-foundation.org" <virtualization@lists.linux-foundation.org>, "linux-mm@kvack.org" <linux-mm@kvack.org>, "yang.zhang.wz@gmail.com" <yang.zhang.wz@gmail.com>, "quan.xu@aliyun.com" <quan.xu@aliyun.com>, "cornelia.huck@de.ibm.com" <cornelia.huck@de.ibm.com>, "pbonzini@redhat.com" <pbonzini@redhat.com>, "akpm@linux-foundation.org" <akpm@linux-foundation.org>, "mhocko@kernel.org" <mhocko@kernel.org>, "mgorman@techsingularity.net" <mgorman@techsingularity.net>, "liliang.opensource@gmail.com" <liliang.opensource@gmail.com>
 
-Hello,
+On Sat, Nov 18, 2017 at 05:22:28AM +0000, Wang, Wei W wrote:
+> On Friday, November 17, 2017 8:45 PM, Michael S. Tsirkin wrote:
+> > On Fri, Nov 17, 2017 at 07:35:03PM +0800, Wei Wang wrote:
+> > > On 11/16/2017 09:27 PM, Wei Wang wrote:
+> > > > On 11/16/2017 04:32 AM, Michael S. Tsirkin wrote:
+> > > > > On Fri, Nov 03, 2017 at 04:13:06PM +0800, Wei Wang wrote:
+> > > > > > Negotiation of the VIRTIO_BALLOON_F_FREE_PAGE_VQ feature
+> > > > > > indicates the support of reporting hints of guest free pages to
+> > > > > > the host via virtio-balloon. The host requests the guest to
+> > > > > > report the free pages by sending commands via the virtio-balloon
+> > configuration registers.
+> > > > > >
+> > > > > > When the guest starts to report, the first element added to the
+> > > > > > free page vq is a sequence id of the start reporting command.
+> > > > > > The id is given by the host, and it indicates whether the
+> > > > > > following free pages correspond to the command. For example, the
+> > > > > > host may stop the report and start again with a new command id.
+> > > > > > The obsolete pages for the previous start command can be
+> > > > > > detected by the id dismatching on the host. The id is added to
+> > > > > > the vq using an output buffer, and the free pages are added to
+> > > > > > the vq using input buffer.
+> > > > > >
+> > > > > > Here are some explainations about the added configuration registers:
+> > > > > > - host2guest_cmd: a register used by the host to send commands
+> > > > > > to the guest.
+> > > > > > - guest2host_cmd: written by the guest to ACK to the host about
+> > > > > > the commands that have been received. The host will clear the
+> > > > > > corresponding bits on the host2guest_cmd register. The guest
+> > > > > > also uses this register to send commands to the host (e.g. when finish
+> > free page reporting).
+> > > > > > - free_page_cmd_id: the sequence id of the free page report
+> > > > > > command given by the host.
+> > > > > >
+> > > > > > Signed-off-by: Wei Wang <wei.w.wang@intel.com>
+> > > > > > Signed-off-by: Liang Li <liang.z.li@intel.com>
+> > > > > > Cc: Michael S. Tsirkin <mst@redhat.com>
+> > > > > > Cc: Michal Hocko <mhocko@kernel.org>
+> > > > > > ---
+> > > > > >
+> > > > > > +
+> > > > > > +static void report_free_page(struct work_struct *work) {
+> > > > > > +    struct virtio_balloon *vb;
+> > > > > > +
+> > > > > > +    vb = container_of(work, struct virtio_balloon,
+> > > > > > report_free_page_work);
+> > > > > > +    report_free_page_cmd_id(vb);
+> > > > > > +    walk_free_mem_block(vb, 0, &virtio_balloon_send_free_pages);
+> > > > > > +    /*
+> > > > > > +     * The last few free page blocks that were added may not reach the
+> > > > > > +     * batch size, but need a kick to notify the device to
+> > > > > > handle them.
+> > > > > > +     */
+> > > > > > +    virtqueue_kick(vb->free_page_vq);
+> > > > > > +    report_free_page_end(vb);
+> > > > > > +}
+> > > > > > +
+> > > > > I think there's an issue here: if pages are poisoned and
+> > > > > hypervisor subsequently drops them, testing them after allocation
+> > > > > will trigger a false positive.
+> > > > >
+> > > > > The specific configuration:
+> > > > >
+> > > > > PAGE_POISONING on
+> > > > > PAGE_POISONING_NO_SANITY off
+> > > > > PAGE_POISONING_ZERO off
+> > > > >
+> > > > >
+> > > > > Solutions:
+> > > > > 1. disable the feature in that configuration
+> > > > >     suggested as an initial step
+> > > >
+> > > > Thanks for the finding.
+> > > > Similar to this option: I'm thinking could we make
+> > > > walk_free_mem_block() simply return if that option is on?
+> > > > That is, at the beginning of the function:
+> > > >     if (!page_poisoning_enabled())
+> > > >                 return;
+> > > >
+> > >
+> > >
+> > > Thought about it more, I think it would be better to put this logic to
+> > > virtio_balloon:
+> > >
+> > >         send_free_page_cmd_id(vb, &vb->start_cmd_id);
+> > >         if (page_poisoning_enabled() &&
+> > >             !IS_ENABLED(CONFIG_PAGE_POISONING_NO_SANITY))
+> > >                 walk_free_mem_block(vb, 0, &virtio_balloon_send_free_pages);
+> > >         send_free_page_cmd_id(vb, &vb->stop_cmd_id);
+> > >
+> > >
+> > > walk_free_mem_block() should be a more generic API, and this potential
+> > > page poisoning issue is specific to live migration which is only one
+> > > use case of this function, so I think it is better to handle it in the
+> > > special use case itself.
+> > >
+> > > Best,
+> > > Wei
+> > >
+> > 
+> > It's a quick work-around but it doesn't make me very happy.
+> > 
+> > AFAIK e.g. RHEL has a debug kernel with poisoning enabled.
+> > If this never uses free page hinting at all, it will be much less useful for
+> > debugging guests.
+> > 
+> 
+> I understand your concern. I think people who use debugging guests
+> don't regard performance as the first priority, and most vendors
+> usually wouldn't use debugging guests for their products.
 
-I am using Qemu to emulate a Leon3 based board.
+And when one of these crashes but only after migration what do you do?  A
+very common step is for Red Hat support is to ask people to try
+reproducing with a debug build.
 
-In the software I am running on Qemu, I configured the virtual memory 
-through MMU programming.
+IOT being able to debug guests is important, if a debugging guest takes
+a significantly different path from non-debug one, we have a problem.
 
-In particular, I mapped the built-in UART to a 4K page.
+> 
+> How about taking it as the initial solution? We can exploit more
+> solutions after this series is done.
+> 
+> Best,
+> Wei
 
-To check that my MMU table was OK I switched on (at compile time) the 
-DEBUG_MMU facility in the target/sparc/ldst_helper.c file.
+I think it's fine as a separate patch.
 
-Then anytime I changed the MMU setting (through software) I got a 
-display of it. A typical debug from Qemu console is as follow:
-
-MMU: mmu change reg[2]: 0x00000001 -> 0x00000002
-Root ptr: 0000000040003000, ctx: 2
-VA: 40000000, PA: 0000000040000000 PDE: 04000401
-  VA: 40000000, PA: 0000000040000000 PDE: 04000421
-   VA: 40000000, PA: 0000000040000000 PTE: 040000ba
-   VA: 40001000, PA: 0000000040001000 PTE: 0400019a
-   VA: 40002000, PA: 0000000040002000 PTE: 0400029a
-   VA: 40006000, PA: 0000000040006000 PTE: 0400069e
-   VA: 40007000, PA: 0000000040007000 PTE: 0400079a
-   VA: 40008000, PA: 0000000040008000 PTE: 0400089e
-  VA: 40800000, PA: 000000004000d000 PDE: 04000411
-   VA: 40800000, PA: 000000004000d000 PTE: 04000db2
-   VA: 40802000, PA: 000000004000e000 PTE: 04000e82
-   VA: 40804000, PA: 0000000040013000 PTE: 04001386
-   VA: 40806000, PA: 0000000040017000 PTE: 04001786
-   VA: 40808000, PA: ffffffffffffffff PTE: 08000006
-   VA: 4080a000, PA: 000000004001a000 PTE: 04001a82
-   VA: 4080c000, PA: 0000000040019000 PTE: 04001982
-   VA: 4080e000, PA: 000000004001c000 PTE: 04001c82
-   VA: 40810000, PA: 000000004001b000 PTE: 04001b82
-
-As you can see Qemu (debug) is unable to find the physical address 
-associated to 0x40808000 (which should be 0x80000000 where the UART lives).
-
-Note: This also has on impact on the ability to explore the memory 
-through GDB. Trying to access 0x40808100 (mapped to 0x80000100) through 
-gdb (connected to Qemu) is impossible.
-
-(gdb) x 0x40808100
-0x40808100:    Cannot access memory at address 0x40808100
-(gdb)
-
-I traced the problem down to the sparc_cpu_get_phys_page_debug() 
-function in the target/sparc/mmu_helper.c file.
-
-By commenting out the last part of the function, the MMU mapping debug 
-in Qemu is functional again.
-
-hwaddr sparc_cpu_get_phys_page_debug(CPUState *cs, vaddr addr)
-{
-     SPARCCPU *cpu = SPARC_CPU(cs);
-     CPUSPARCState *env = &cpu->env;
-     hwaddr phys_addr;
-     int mmu_idx = cpu_mmu_index(env, false);
-     //MemoryRegionSection section;
-
-     if (cpu_sparc_get_phys_page(env, &phys_addr, addr, 2, mmu_idx) != 0) {
-         if (cpu_sparc_get_phys_page(env, &phys_addr, addr, 0, mmu_idx) 
-!= 0) {
-             return -1;
-         }
-     }
-     /*
-     section = memory_region_find(get_system_memory(), phys_addr, 1);
-     memory_region_unref(section.mr);
-     if (!int128_nz(section.size)) {
-         printf("%s: failed to int128_nz()\n", __func__);
-         return -1;
-     }
-     */
-     return phys_addr;
-}
-
-Root ptr: 0000000040003000, ctx: 2
-VA: 40000000, PA: 0000000040000000 PDE: 04000401
-  VA: 40000000, PA: 0000000040000000 PDE: 04000421
-   VA: 40000000, PA: 0000000040000000 PTE: 040000ba
-   VA: 40001000, PA: 0000000040001000 PTE: 0400019a
-   VA: 40002000, PA: 0000000040002000 PTE: 0400029a
-   VA: 40006000, PA: 0000000040006000 PTE: 0400069e
-   VA: 40007000, PA: 0000000040007000 PTE: 0400079a
-   VA: 40008000, PA: 0000000040008000 PTE: 0400089e
-  VA: 40800000, PA: 000000004000d000 PDE: 04000411
-   VA: 40800000, PA: 000000004000d000 PTE: 04000db2
-   VA: 40802000, PA: 000000004000e000 PTE: 04000e82
-   VA: 40804000, PA: 0000000040013000 PTE: 04001386
-   VA: 40806000, PA: 0000000040017000 PTE: 04001786
-   VA: 40808000, PA: 0000000080000000 PTE: 08000006
-   VA: 4080a000, PA: 000000004001a000 PTE: 04001a82
-   VA: 4080c000, PA: 0000000040019000 PTE: 04001982
-   VA: 4080e000, PA: 000000004001c000 PTE: 04001c82
-   VA: 40810000, PA: 000000004001b000 PTE: 04001b82
-
-Moreover, the GDB memory display is also working again with this change.
-
-(gdb) x 0x40808100
-0x40808100:    0x00000000
-(gdb)
-0x40808104:    0x00000006
-(gdb)
-0x40808108:    0x00000002
-
-I am not sure the proposed change is correct because GDB would then 
-display memory result for memory area where there is no device mapped. 
-For example accessing 0x40808000 would return 0 when there is no device 
-mapped from 0x80000000 to 0x800000FF.
-
-(gdb) x 0x40808000
-0x40808000:    0x00000000
-(gdb)
-0x40808004:    0x00000000
-(gdb)
-0x40808008:    0x00000000
-
-You feed back would be appreciated.
-
-Regards.
-
-JC
+-- 
+MST
