@@ -1,27 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48446)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48447)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1eGZ75-0005vW-Ot
+	(envelope-from <dgibson@ozlabs.org>) id 1eGZ75-0005vX-PO
 	for qemu-devel@nongnu.org; Sun, 19 Nov 2017 18:35:01 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1eGZ71-0006zw-Ok
+	(envelope-from <dgibson@ozlabs.org>) id 1eGZ71-000702-PB
 	for qemu-devel@nongnu.org; Sun, 19 Nov 2017 18:34:59 -0500
-Date: Mon, 20 Nov 2017 10:17:51 +1100
+Date: Mon, 20 Nov 2017 10:12:51 +1100
 From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20171119231751.GD19214@umbus.fritz.box>
-References: <150789430473.4410.10317971414202753256.stgit@bahia.lan>
-	<20171014093337.GG28032@umbus.fritz.box>
-	<20171016102638.6977381f@nial.brq.redhat.com>
-	<20171017061609.GL2776@umbus.fritz.box>
-	<20171106160307.215d3cbd@bahia>
-	<20171106190455.GA12514@umbus.fritz.box>
-	<20171114085943.5f2439a9@bahia.lan>
+Message-ID: <20171119231251.GC19214@umbus.fritz.box>
+References: <151092340873.11818.16813698420232981002.stgit@bahia>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="brEuL7wsLY8+TuWz"
+	protocol="application/pgp-signature"; boundary="sgneBHv3152wZ8jf"
 Content-Disposition: inline
-In-Reply-To: <20171114085943.5f2439a9@bahia.lan>
-Subject: Re: [Qemu-devel] [Qemu-ppc] [PATCH] spapr_cpu_core: instantiate
- CPUs separately
+In-Reply-To: <151092340873.11818.16813698420232981002.stgit@bahia>
+Subject: Re: [Qemu-devel] [PATCH for-2.11] spapr: reset DRCs after devices
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,100 +24,128 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: Greg Kurz <groug@kaod.org>
-Cc: Igor Mammedov <imammedo@redhat.com>, qemu-ppc@nongnu.org, qemu-devel@nongnu.org
+Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org, Michael Roth <mdroth@linux.vnet.ibm.com>, qemu-stable@nongnu.org
 
 
---brEuL7wsLY8+TuWz
+--sgneBHv3152wZ8jf
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Tue, Nov 14, 2017 at 08:59:43AM +0100, Greg Kurz wrote:
-> On Tue, 7 Nov 2017 06:04:55 +1100
-> David Gibson <david@gibson.dropbear.id.au> wrote:
+On Fri, Nov 17, 2017 at 01:56:48PM +0100, Greg Kurz wrote:
+> A DRC with a pending unplug request releases its associated device at
+> machine reset time.
 >=20
-> > On Mon, Nov 06, 2017 at 04:03:07PM +0100, Greg Kurz wrote:
-> > > On Tue, 17 Oct 2017 17:16:09 +1100
-> > > David Gibson <david@gibson.dropbear.id.au> wrote:
-> > >  =20
-> > > > On Mon, Oct 16, 2017 at 10:26:38AM +0200, Igor Mammedov wrote: =20
-> > > > > On Sat, 14 Oct 2017 20:33:37 +1100
-> > > > > David Gibson <david@gibson.dropbear.id.au> wrote:
-> > > > >    =20
-> > > > > > On Fri, Oct 13, 2017 at 01:31:44PM +0200, Greg Kurz wrote:   =
-=20
-> > > > > > > The current code assumes that only the CPU core object holds a
-> > > > > > > reference on each individual CPU object, and happily frees th=
-eir
-> > > > > > > allocated memory when the core is unrealized. This is dangero=
-us
-> > > > > > > as some other code can legitimely keep a pointer to a CPU if =
-it
-> > > > > > > calls object_ref(), but it would end up with a dangling point=
-er.
-> > > > > > >=20
-> > > > > > > Let's allocate all CPUs with object_new() and let QOM frees t=
-hem
-> > > > > > > when their reference count reaches zero. This greatly simplif=
-y the
-> > > > > > > code as we don't have to fiddle with the instance size anymor=
-e.
-> > > > > > >=20
-> > > > > > > Signed-off-by: Greg Kurz <groug@kaod.org>     =20
-> > > > > >=20
-> > > > > > So, I'm pretty sure my first drafts of the core stuff did thing=
-s this
-> > > > > > waym and it got nacked, for QOM lifetime reasons that I never r=
-eally
-> > > > > > understood.   =20
-> > > > > From what I remember, Andreas would like to see composite CPU obj=
-ect
-> > > > > allocated in one go and then its children initialized with object=
-_initialize()
-> > > > > so that no more allocation were needed.   =20
-> > > >=20
-> > > > Ah, ok.
-> > > >  =20
-> > > > > That potentially would benefit hotplug, since we could gracefully
-> > > > > fail object creation early if there is not enough memory.   =20
-> > > >=20
-> > > > Yeah, it sounds nice, but I don't see how we can do it.  In order to
-> > > > do that the core object has to have enough space for all the thread=
-s,
-> > > > which means we need both the size of each thread object and the num=
-ber
-> > > > of them.  The size we have (and will be easier to handle after Igor=
-'s
-> > > > cleanups).  The number, we don't.
-> > > >  =20
-> > > > > But the way it's implemented currently doesn't really match that =
-initial
-> > > > > goal as array for threads is dynamically allocated later
-> > > > > and then we need to dance around it with pointer arithmetic.
-> > > > >=20
-> > > > > BTW: almost any allocation failure in qemu currently
-> > > > > is fatal so whether we fail on array alloc or on individual
-> > > > > object_new() won't make any difference.
-> > > > >=20
-> > > > > I'd rather see this clean up merged as it simplifies code
-> > > > > in these case.   =20
-> > > >=20
-> > > > Ok, works for me.
-> > > >  =20
-> > >=20
-> > > Since we're in soft freeze already, I guess this won't go to 2.11. Ma=
-ybe it's
-> > > time to create ppc-for-2.12 and apply it there ? =20
-> >=20
-> > Yeah, sounds like a plan.
-> >=20
+> In the case of LMB, when all DRCs for a DIMM device have been reset,
+> the DIMM gets unplugged, causing guest memory to disappear. This may
+> be very confusing for anything still using this memory.
 >=20
-> Friendly reminder: can you push this to ppc-for-2.12 so that it doesn't f=
-all
-> through the cracks ? :)
+> This is exactly what happens with vhost backends, and QEMU aborts
+> with:
+>=20
+> qemu-system-ppc64: used ring relocated for ring 2
+> qemu-system-ppc64: qemu/hw/virtio/vhost.c:649: vhost_commit: Assertion
+>  `r >=3D 0' failed.
+>=20
+> The issue is that each DRC registers a QEMU reset handler, and we
+> don't control the order in which these handlers are called (ie,
+> a LMB DRC will unplug a DIMM before the virtio device using the
+> memory on this DIMM could stop its vhost backend).
+>=20
+> To avoid such situations, let's reset DRCs after all devices
+> have been reset.
+>=20
+> Reported-by: Mallesh N. Koti <mallesh@linux.vnet.ibm.com>
+> Signed-off-by: Greg Kurz <groug@kaod.org>
 
-Uh.. sorry.  I thought there was another spin of this coming.  Can you
-resend, and I'll apply to ppc-for-2.12.
+Applied to ppc-for-2.11.  I'll be looking at preparing a pull request
+today.
+
+> ---
+>  hw/ppc/spapr.c     |   21 +++++++++++++++++++++
+>  hw/ppc/spapr_drc.c |    7 -------
+>  2 files changed, 21 insertions(+), 7 deletions(-)
+>=20
+> diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
+> index 6841bd294b3c..6285f7211f9a 100644
+> --- a/hw/ppc/spapr.c
+> +++ b/hw/ppc/spapr.c
+> @@ -1411,6 +1411,19 @@ static void find_unknown_sysbus_device(SysBusDevic=
+e *sbdev, void *opaque)
+>      }
+>  }
+> =20
+> +static int spapr_reset_drcs(Object *child, void *opaque)
+> +{
+> +    sPAPRDRConnector *drc =3D
+> +        (sPAPRDRConnector *) object_dynamic_cast(child,
+> +                                                 TYPE_SPAPR_DR_CONNECTOR=
+);
+> +
+> +    if (drc) {
+> +        spapr_drc_reset(drc);
+> +    }
+> +
+> +    return 0;
+> +}
+> +
+>  static void ppc_spapr_reset(void)
+>  {
+>      MachineState *machine =3D MACHINE(qdev_get_machine());
+> @@ -1434,6 +1447,14 @@ static void ppc_spapr_reset(void)
+>      }
+> =20
+>      qemu_devices_reset();
+> +
+> +    /* DRC reset may cause a device to be unplugged. This will cause tro=
+ubles
+> +     * if this device is used by another device (eg, a running vhost bac=
+kend
+> +     * will crash QEMU if the DIMM holding the vring goes away). To avoi=
+d such
+> +     * situations, we reset DRCs after all devices have been reset.
+> +     */
+> +    object_child_foreach_recursive(object_get_root(), spapr_reset_drcs, =
+NULL);
+> +
+>      spapr_clear_pending_events(spapr);
+> =20
+>      /*
+> diff --git a/hw/ppc/spapr_drc.c b/hw/ppc/spapr_drc.c
+> index 915e9b51c40c..e3b122968e89 100644
+> --- a/hw/ppc/spapr_drc.c
+> +++ b/hw/ppc/spapr_drc.c
+> @@ -455,11 +455,6 @@ void spapr_drc_reset(sPAPRDRConnector *drc)
+>      }
+>  }
+> =20
+> -static void drc_reset(void *opaque)
+> -{
+> -    spapr_drc_reset(SPAPR_DR_CONNECTOR(opaque));
+> -}
+> -
+>  bool spapr_drc_needed(void *opaque)
+>  {
+>      sPAPRDRConnector *drc =3D (sPAPRDRConnector *)opaque;
+> @@ -518,7 +513,6 @@ static void realize(DeviceState *d, Error **errp)
+>      }
+>      vmstate_register(DEVICE(drc), spapr_drc_index(drc), &vmstate_spapr_d=
+rc,
+>                       drc);
+> -    qemu_register_reset(drc_reset, drc);
+>      trace_spapr_drc_realize_complete(spapr_drc_index(drc));
+>  }
+> =20
+> @@ -529,7 +523,6 @@ static void unrealize(DeviceState *d, Error **errp)
+>      gchar *name;
+> =20
+>      trace_spapr_drc_unrealize(spapr_drc_index(drc));
+> -    qemu_unregister_reset(drc_reset, drc);
+>      vmstate_unregister(DEVICE(drc), &vmstate_spapr_drc, drc);
+>      root_container =3D container_get(object_get_root(), DRC_CONTAINER_PA=
+TH);
+>      name =3D g_strdup_printf("%x", spapr_drc_index(drc));
+>=20
 
 --=20
 David Gibson			| I'll have my music baroque, and my code
@@ -132,24 +153,24 @@ david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
 				| _way_ _around_!
 http://www.ozlabs.org/~dgibson
 
---brEuL7wsLY8+TuWz
+--sgneBHv3152wZ8jf
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAloSER8ACgkQbDjKyiDZ
-s5I9hhAAk24FdsksJZsvXzPuDr1Ug+gQvv7dPekjrhW9fShV99QJFXGKdcteH8hs
-2qKDQjkpfYoumNSX+5DK8pU2WK10JkGHPmICYm8hcGExtalM9QsOhE/bJjOpyf8h
-q7munm0kHFVhaXXPVI8RhLaKaokae+XKeji1+opm8rBgh/A5kIDnnfKd0I6bM6T+
-QEoesjUpBvUDS3QCFMiNODMsO6e9vdh6humgd0Dco+53HQ9h6YZcnNG5DLwKc5DC
-nv9TodHBebUuqBaY5xuNv2SxudhblP0brIKdS+htNdyx1zSbhOWvLKrfEEeHIFRL
-Odc/NghDN/Y1T5XQUEBbFazxFMMLibWLW5pYaxxkkDgYYpy64xLfbWauxTCwZwXW
-ChW4HjkfNtnCrVdVtehNRdoL2lBXhku6GSdEkMRhRMOThspcUKa51kC9JOaROMEK
-MdMrK3Vrt2bC0IUzEMxTr8YkknskoBfiQHC8CFgA0mQ2yYB2dD3PVdvYJw3Y2mbE
-OMJcq0hrDov3KZDJJw9VgFXz6jxC8kKO7lM5AqtlzsSguTBjQzg0IrJT5Y8HJpEb
-c+egNuwd6LytgJRRSI4hJQkEmppqNzSVnVwf7L/XXo3+iwcHk37D+Nvz1sWDbNcG
-0VCagk8rSukP/ZhuX+MDmpgLTF3Xsg9QaWV5uBN96s05Mi3LaJY=
-=SsbM
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAloSD/IACgkQbDjKyiDZ
+s5KO+g/9GB4n+gYaEp+rf7J/HcNOHuhlSpl/hIR15aAbzjbGYKQaaTTrcFZe854l
+Hbtg5fzz+dg4rh36eSAaIPH27YpRtePoUf94WfuZrQ+3CZdzrliYLUuyfiYNejHk
+B6prdIQq3en0yvK0nrEYBQOEy1yA1BB7YJHO0Suxtn1Jr6jPmeU8B7rDPQXVuHmX
+qy70CYV7W9jkjSJYTNd5Y8Kze4vtsOkuBlQC5UzyNCfkVe7Wz3zgQk/8eHyNgmTq
+k36v462xb3gFaDCLarFjtzE0y5zcuWJgpckZKV8rIoRNwqRskWVprBdohiPy2KoL
+ieWUJPW+Ua3AcfDrRO7e5xb0SUA7FoFhZN3flP1QD/FkjKE2VlNC8BbQsS+rO5MG
+c3U/zOpBg8ET+v4RmsTngkk2JFFloK+Ekr4ECm/lcDO6iZZM8vimIJ76qhB/SZys
+iykfyXmcTjVF/CouAaoihoOd0r1rMRipNEYw2NvFBt4/TEo5tenJu+KERG+qeVJp
+bnhjagtsRavFTD37VDMa0wDF9flHQhXd0vXAMqeTm3HVGcxAqnH1huh33rzNF0Pn
+7KTOlRXgDEcGnWijmE8SjOLhLK7dwp0AA3M9wdocHL/eBvyR2KrtyA2CGfIv93PJ
+1Qx4hvp5M7LqaQTIZ8oDH8sYS69gHtBWKX/bD72eFswTitSSaR4=
+=ofor
 -----END PGP SIGNATURE-----
 
---brEuL7wsLY8+TuWz--
+--sgneBHv3152wZ8jf--
