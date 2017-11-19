@@ -1,29 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49052)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41876)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1eGRGt-0000Mk-7W
-	for qemu-devel@nongnu.org; Sun, 19 Nov 2017 10:12:36 -0500
+	(envelope-from <geoff@hostfission.com>) id 1eGWMy-0006OY-D9
+	for qemu-devel@nongnu.org; Sun, 19 Nov 2017 15:39:13 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1eGRGp-00017x-4Q
-	for qemu-devel@nongnu.org; Sun, 19 Nov 2017 10:12:35 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:56828)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1eGRGo-000171-Qx
-	for qemu-devel@nongnu.org; Sun, 19 Nov 2017 10:12:31 -0500
-Date: Sun, 19 Nov 2017 17:11:24 +0200
-From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <20171119170319-mutt-send-email-mst@kernel.org>
-References: <1509696786-1597-1-git-send-email-wei.w.wang@intel.com>
-	<1509696786-1597-7-git-send-email-wei.w.wang@intel.com>
-	<20171115220743-mutt-send-email-mst@kernel.org>
-	<5A0D923C.4020807@intel.com> <5A0EC967.5090407@intel.com>
-	<20171117144253-mutt-send-email-mst@kernel.org>
-	<286AC319A985734F985F78AFA26841F73936A8E7@shsmsx102.ccr.corp.intel.com>
+	(envelope-from <geoff@hostfission.com>) id 1eGWMu-0005lV-G4
+	for qemu-devel@nongnu.org; Sun, 19 Nov 2017 15:39:12 -0500
+Received: from mail1.hostfission.com ([139.99.139.48]:37996)
+	by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <geoff@hostfission.com>) id 1eGWMu-0005km-5d
+	for qemu-devel@nongnu.org; Sun, 19 Nov 2017 15:39:08 -0500
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <286AC319A985734F985F78AFA26841F73936A8E7@shsmsx102.ccr.corp.intel.com>
-Subject: Re: [Qemu-devel] [virtio-dev] Re: [PATCH v17 6/6] virtio-balloon:
- VIRTIO_BALLOON_F_FREE_PAGE_VQ
+Content-Type: text/plain; charset=US-ASCII;
+ format=flowed
+Content-Transfer-Encoding: 7bit
+Date: Mon, 20 Nov 2017 07:39:02 +1100
+From: geoff@hostfission.com
+In-Reply-To: <20171115073144.14758-1-lprosek@redhat.com>
+References: <20171115073144.14758-1-lprosek@redhat.com>
+Message-ID: <1f8754babd990beb90c516d2973b21d3@hostfission.com>
+Subject: Re: [Qemu-devel] [PATCH v2 0/3] ivshmem: MSI bug fixes
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,134 +27,31 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Wang, Wei W" <wei.w.wang@intel.com>
-Cc: "aarcange@redhat.com" <aarcange@redhat.com>, "virtio-dev@lists.oasis-open.org" <virtio-dev@lists.oasis-open.org>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>, "mawilcox@microsoft.com" <mawilcox@microsoft.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "amit.shah@redhat.com" <amit.shah@redhat.com>, "penguin-kernel@I-love.SAKURA.ne.jp" <penguin-kernel@I-love.SAKURA.ne.jp>, "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, "willy@infradead.org" <willy@infradead.org>, "virtualization@lists.linux-foundation.org" <virtualization@lists.linux-foundation.org>, "linux-mm@kvack.org" <linux-mm@kvack.org>, "yang.zhang.wz@gmail.com" <yang.zhang.wz@gmail.com>, "quan.xu@aliyun.com" <quan.xu@aliyun.com>, "cornelia.huck@de.ibm.com" <cornelia.huck@de.ibm.com>, "pbonzini@redhat.com" <pbonzini@redhat.com>, "akpm@linux-foundation.org" <akpm@linux-foundation.org>, "mhocko@kernel.org" <mhocko@kernel.org>, "mgorman@techsingularity.net" <mgorman@techsingularity.net>, "liliang.opensource@gmail.com" <liliang.opensource@gmail.com>
+To: Ladi Prosek <lprosek@redhat.com>
+Cc: qemu-devel@nongnu.org, pbonzini@redhat.com, armbru@redhat.com, marcandre.lureau@redhat.com
 
-On Sat, Nov 18, 2017 at 05:22:28AM +0000, Wang, Wei W wrote:
-> On Friday, November 17, 2017 8:45 PM, Michael S. Tsirkin wrote:
-> > On Fri, Nov 17, 2017 at 07:35:03PM +0800, Wei Wang wrote:
-> > > On 11/16/2017 09:27 PM, Wei Wang wrote:
-> > > > On 11/16/2017 04:32 AM, Michael S. Tsirkin wrote:
-> > > > > On Fri, Nov 03, 2017 at 04:13:06PM +0800, Wei Wang wrote:
-> > > > > > Negotiation of the VIRTIO_BALLOON_F_FREE_PAGE_VQ feature
-> > > > > > indicates the support of reporting hints of guest free pages to
-> > > > > > the host via virtio-balloon. The host requests the guest to
-> > > > > > report the free pages by sending commands via the virtio-balloon
-> > configuration registers.
-> > > > > >
-> > > > > > When the guest starts to report, the first element added to the
-> > > > > > free page vq is a sequence id of the start reporting command.
-> > > > > > The id is given by the host, and it indicates whether the
-> > > > > > following free pages correspond to the command. For example, the
-> > > > > > host may stop the report and start again with a new command id.
-> > > > > > The obsolete pages for the previous start command can be
-> > > > > > detected by the id dismatching on the host. The id is added to
-> > > > > > the vq using an output buffer, and the free pages are added to
-> > > > > > the vq using input buffer.
-> > > > > >
-> > > > > > Here are some explainations about the added configuration registers:
-> > > > > > - host2guest_cmd: a register used by the host to send commands
-> > > > > > to the guest.
-> > > > > > - guest2host_cmd: written by the guest to ACK to the host about
-> > > > > > the commands that have been received. The host will clear the
-> > > > > > corresponding bits on the host2guest_cmd register. The guest
-> > > > > > also uses this register to send commands to the host (e.g. when finish
-> > free page reporting).
-> > > > > > - free_page_cmd_id: the sequence id of the free page report
-> > > > > > command given by the host.
-> > > > > >
-> > > > > > Signed-off-by: Wei Wang <wei.w.wang@intel.com>
-> > > > > > Signed-off-by: Liang Li <liang.z.li@intel.com>
-> > > > > > Cc: Michael S. Tsirkin <mst@redhat.com>
-> > > > > > Cc: Michal Hocko <mhocko@kernel.org>
-> > > > > > ---
-> > > > > >
-> > > > > > +
-> > > > > > +static void report_free_page(struct work_struct *work) {
-> > > > > > +    struct virtio_balloon *vb;
-> > > > > > +
-> > > > > > +    vb = container_of(work, struct virtio_balloon,
-> > > > > > report_free_page_work);
-> > > > > > +    report_free_page_cmd_id(vb);
-> > > > > > +    walk_free_mem_block(vb, 0, &virtio_balloon_send_free_pages);
-> > > > > > +    /*
-> > > > > > +     * The last few free page blocks that were added may not reach the
-> > > > > > +     * batch size, but need a kick to notify the device to
-> > > > > > handle them.
-> > > > > > +     */
-> > > > > > +    virtqueue_kick(vb->free_page_vq);
-> > > > > > +    report_free_page_end(vb);
-> > > > > > +}
-> > > > > > +
-> > > > > I think there's an issue here: if pages are poisoned and
-> > > > > hypervisor subsequently drops them, testing them after allocation
-> > > > > will trigger a false positive.
-> > > > >
-> > > > > The specific configuration:
-> > > > >
-> > > > > PAGE_POISONING on
-> > > > > PAGE_POISONING_NO_SANITY off
-> > > > > PAGE_POISONING_ZERO off
-> > > > >
-> > > > >
-> > > > > Solutions:
-> > > > > 1. disable the feature in that configuration
-> > > > >     suggested as an initial step
-> > > >
-> > > > Thanks for the finding.
-> > > > Similar to this option: I'm thinking could we make
-> > > > walk_free_mem_block() simply return if that option is on?
-> > > > That is, at the beginning of the function:
-> > > >     if (!page_poisoning_enabled())
-> > > >                 return;
-> > > >
-> > >
-> > >
-> > > Thought about it more, I think it would be better to put this logic to
-> > > virtio_balloon:
-> > >
-> > >         send_free_page_cmd_id(vb, &vb->start_cmd_id);
-> > >         if (page_poisoning_enabled() &&
-> > >             !IS_ENABLED(CONFIG_PAGE_POISONING_NO_SANITY))
-> > >                 walk_free_mem_block(vb, 0, &virtio_balloon_send_free_pages);
-> > >         send_free_page_cmd_id(vb, &vb->stop_cmd_id);
-> > >
-> > >
-> > > walk_free_mem_block() should be a more generic API, and this potential
-> > > page poisoning issue is specific to live migration which is only one
-> > > use case of this function, so I think it is better to handle it in the
-> > > special use case itself.
-> > >
-> > > Best,
-> > > Wei
-> > >
-> > 
-> > It's a quick work-around but it doesn't make me very happy.
-> > 
-> > AFAIK e.g. RHEL has a debug kernel with poisoning enabled.
-> > If this never uses free page hinting at all, it will be much less useful for
-> > debugging guests.
-> > 
+I just updated to the latest build and applied this patch set, now on VM 
+reset the qemu crashes with the following assert:
+
+ivshmem.c:467: ivshmem_add_kvm_msi_virq: Assertion 
+`!s->msi_vectors[vector].pdev' failed.
+
+On 2017-11-15 18:31, Ladi Prosek wrote:
+> Fixes bugs in the ivshmem device implementation uncovered with the new
+> Windows ivshmem driver:
+> https://github.com/virtio-win/kvm-guest-drivers-windows/tree/master/ivshmem
 > 
-> I understand your concern. I think people who use debugging guests
-> don't regard performance as the first priority, and most vendors
-> usually wouldn't use debugging guests for their products.
-
-And when one of these crashes but only after migration what do you do?  A
-very common step is for Red Hat support is to ask people to try
-reproducing with a debug build.
-
-IOT being able to debug guests is important, if a debugging guest takes
-a significantly different path from non-debug one, we have a problem.
-
+> v1->v2:
+> * Patch 1 - added reproducer info to commit message (Markus)
+> * Patch 2 - restructured conditionals, fixed comment formatting 
+> (Markus)
+> * Patch 3 - added reproducer info to commit message (Markus)
 > 
-> How about taking it as the initial solution? We can exploit more
-> solutions after this series is done.
+> Ladi Prosek (3):
+>   ivshmem: Don't update non-existent MSI routes
+>   ivshmem: Always remove irqfd notifiers
+>   ivshmem: Improve MSI irqfd error handling
 > 
-> Best,
-> Wei
-
-I think it's fine as a separate patch.
-
--- 
-MST
+>  hw/misc/ivshmem.c | 77 
+> +++++++++++++++++++++++++++++++++++++++++--------------
+>  1 file changed, 58 insertions(+), 19 deletions(-)
