@@ -1,24 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42292)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43378)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1eGnJn-0002qU-QI
-	for qemu-devel@nongnu.org; Mon, 20 Nov 2017 09:45:04 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1eGnNE-0004Fl-A0
+	for qemu-devel@nongnu.org; Mon, 20 Nov 2017 09:48:37 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1eGnJk-0002ld-LI
-	for qemu-devel@nongnu.org; Mon, 20 Nov 2017 09:45:03 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:48574)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1eGnJk-0002kx-F3
-	for qemu-devel@nongnu.org; Mon, 20 Nov 2017 09:45:00 -0500
-Date: Mon, 20 Nov 2017 12:44:54 -0200
-From: Eduardo Habkost <ehabkost@redhat.com>
-Message-ID: <20171120144454.GK3037@localhost.localdomain>
-References: <1511188453-248734-1-git-send-email-imammedo@redhat.com>
+	(envelope-from <peter.maydell@linaro.org>) id 1eGnND-0004Py-D4
+	for qemu-devel@nongnu.org; Mon, 20 Nov 2017 09:48:36 -0500
+Received: from mail-wm0-x233.google.com ([2a00:1450:400c:c09::233]:46020)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1eGnND-0004PQ-6w
+	for qemu-devel@nongnu.org; Mon, 20 Nov 2017 09:48:35 -0500
+Received: by mail-wm0-x233.google.com with SMTP id 9so19289028wme.4
+	for <qemu-devel@nongnu.org>; Mon, 20 Nov 2017 06:48:34 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1511188453-248734-1-git-send-email-imammedo@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH for-2.11] pc: fix crash on attempted cpu
- unplug
+In-Reply-To: <1aaf0a6f-c38b-d80d-b09a-1a54545c7660@twiddle.net>
+References: <1511184421-23535-1-git-send-email-peter.maydell@linaro.org>
+	<1511184421-23535-3-git-send-email-peter.maydell@linaro.org>
+	<1aaf0a6f-c38b-d80d-b09a-1a54545c7660@twiddle.net>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Mon, 20 Nov 2017 14:47:58 +0000
+Message-ID: <CAFEAcA-RXwYtL7yjNjxdHmuBfHe61-mYNX6ytDJ4bETLyA3DHA@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH for-2.11 2/2] accel/tcg: Handle atomic
+ accesses to notdirty memory correctly
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,57 +31,46 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Igor Mammedov <imammedo@redhat.com>
-Cc: qemu-devel@nongnu.org, mst@redhat.com, pbonzini@redhat.com, rth@twiddle.net
+To: Richard Henderson <rth@twiddle.net>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, qemu-stable <qemu-stable@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>, Stuart Monteith <stuart.monteith@linaro.org>
 
-On Mon, Nov 20, 2017 at 03:34:13PM +0100, Igor Mammedov wrote:
-> when qemu is started with '-no-acpi' CLI option, an attempt
-> to unplug a CPU using device_del results in null pointer
-> dereference at:
-> 
->   #0 object_get_class
->   #1 pc_machine_device_unplug_request_cb
->   #2 qmp_marshal_device_del
-> 
-> which is caused by pcms->acpi_dev == NULL due to ACPI support
-> being disabled.
-> 
-> Considering that ACPI support is necessary for unplug to work,
-> check that it's enabled and fail unplug request gracefully
-> if no acpi device were found.
-> 
-> Signed-off-by: Igor Mammedov <imammedo@redhat.com>
+On 20 November 2017 at 14:27, Richard Henderson <rth@twiddle.net> wrote:
+> On 11/20/2017 02:27 PM, Peter Maydell wrote:
+>> -    return (void *)((uintptr_t)addr + tlbe->addend);
+>> +    hostaddr = (void *)((uintptr_t)addr + tlbe->addend);
+>> +
+>> +    memory_notdirty_write_prepare(ndi, ENV_GET_CPU(env), addr,
+>> +                                  qemu_ram_addr_from_host_nofail(hostaddr),
+>> +                                  1 << s_bits);
+>
+> These calls should be conditional on TLB_NOTDIRTY being set.
+> We certainly don't need to do anything like taking a lock otherwise.
 
-Reviewed-by: Eduardo Habkost <ehabkost@redhat.com>
+We only take the lock if the dirty flag is set for the
+physical memory, which it won't be if TLB_NOTDIRTY wasn't set...
 
-But I have one small suggestion:
+> Perhaps an extra bool in NDI, like
+>
+>   ndi->active = false;
+>   if (unlikely(tlb_addr & TLB_NOTDIRTY)) {
+>       ndi->active = true;
+>       memory_notdirty_write_prepare(ndi, ...);
+>   }
+>
+> and
+>
+> #define ATOMIC_MMU_CLEANUP \
+> do { \
+>   if (unlikely(ndi->active)) { \
+>      memory_notdirty_write_complete(ndi); \
+>   } \
+> } while (0)
 
-> ---
->  hw/i386/pc.c | 5 +++++
->  1 file changed, 5 insertions(+)
-> 
-> diff --git a/hw/i386/pc.c b/hw/i386/pc.c
-> index c3afe5b..d80cec3 100644
-> --- a/hw/i386/pc.c
-> +++ b/hw/i386/pc.c
-> @@ -1842,6 +1842,11 @@ static void pc_cpu_unplug_request_cb(HotplugHandler *hotplug_dev,
->      X86CPU *cpu = X86_CPU(dev);
->      PCMachineState *pcms = PC_MACHINE(hotplug_dev);
->  
-> +    if (!pcms->acpi_dev) {
-> +        error_setg(&local_err, "not supported without acpi");
+...but yes, we could skip the whole thing if the TLB entry
+isn't marked notdirty.
 
-I suggest "CPU hot unplug not supported without ACPI" instead.
+(Having NDI be "mostly opaque apart from this one thing" is a
+little ugly, though.)
 
-> +        goto out;
-> +    }
-> +
->      pc_find_cpu_slot(MACHINE(pcms), cpu->apic_id, &idx);
->      assert(idx != -1);
->      if (idx == 0) {
-> -- 
-> 2.7.4
-> 
-
--- 
-Eduardo
+thanks
+-- PMM
