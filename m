@@ -1,25 +1,42 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59313)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59953)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1eGiFO-0006Ah-Bt
-	for qemu-devel@nongnu.org; Mon, 20 Nov 2017 04:20:16 -0500
+	(envelope-from <borntraeger@de.ibm.com>) id 1eGiGH-0006uF-4U
+	for qemu-devel@nongnu.org; Mon, 20 Nov 2017 04:21:06 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1eGiFI-0005D5-E5
-	for qemu-devel@nongnu.org; Mon, 20 Nov 2017 04:20:10 -0500
-Received: from 8.mo5.mail-out.ovh.net ([178.32.116.78]:42589)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1eGiFI-0005CS-4x
-	for qemu-devel@nongnu.org; Mon, 20 Nov 2017 04:20:04 -0500
-Received: from player786.ha.ovh.net (b7.ovh.net [213.186.33.57])
-	by mo5.mail-out.ovh.net (Postfix) with ESMTP id A651214F623
-	for <qemu-devel@nongnu.org>; Mon, 20 Nov 2017 10:20:01 +0100 (CET)
-From: Greg Kurz <groug@kaod.org>
-Date: Mon, 20 Nov 2017 10:19:54 +0100
-Message-ID: <151116959472.32765.11476730637006052305.stgit@bahia.lan>
+	(envelope-from <borntraeger@de.ibm.com>) id 1eGiGE-0005j6-0i
+	for qemu-devel@nongnu.org; Mon, 20 Nov 2017 04:21:05 -0500
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:34630)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <borntraeger@de.ibm.com>)
+	id 1eGiGD-0005hs-Mm
+	for qemu-devel@nongnu.org; Mon, 20 Nov 2017 04:21:01 -0500
+Received: from pps.filterd (m0098409.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
+	vAK9IvJw123992
+	for <qemu-devel@nongnu.org>; Mon, 20 Nov 2017 04:20:52 -0500
+Received: from e06smtp10.uk.ibm.com (e06smtp10.uk.ibm.com [195.75.94.106])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2ebtc9f705-1
+	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Mon, 20 Nov 2017 04:20:52 -0500
+Received: from localhost
+	by e06smtp10.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	Only! Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <borntraeger@de.ibm.com>;
+	Mon, 20 Nov 2017 09:20:49 -0000
+References: <1510942228-22822-1-git-send-email-thuth@redhat.com>
+	<b083a168-4743-46a7-d78c-78b86d300dbc@de.ibm.com>
+	<b4f16003-a1ff-c5dd-dc06-c285929254ba@de.ibm.com>
+	<e40a4f25-3384-f670-7cc9-ca6334213f1b@redhat.com>
+From: Christian Borntraeger <borntraeger@de.ibm.com>
+Date: Mon, 20 Nov 2017 10:20:46 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+In-Reply-To: <e40a4f25-3384-f670-7cc9-ca6334213f1b@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Subject: [Qemu-devel] [PATCH for-2.12 REPOST] spapr_cpu_core: instantiate
- CPUs separately
+Message-Id: <08016a8f-1310-d596-8c32-ec1702df5a78@de.ibm.com>
+Subject: Re: [Qemu-devel] [qemu-s390x] [PATCH for-2.11] pc-bios/s390-ccw:
+ Fix problem with invalid virtio-scsi LUN when rebooting
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,150 +45,56 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: qemu-ppc@nongnu.org, David Gibson <david@gibson.dropbear.id.au>, Igor Mammedov <imammedo@redhat.com>
+To: Thomas Huth <thuth@redhat.com>, qemu-s390x@nongnu.org, Cornelia Huck <cohuck@redhat.com>
+Cc: qemu-devel@nongnu.org
 
-The current code assumes that only the CPU core object holds a
-reference on each individual CPU object, and happily frees their
-allocated memory when the core is unrealized. This is dangerous
-as some other code can legitimely keep a pointer to a CPU if it
-calls object_ref(), but it would end up with a dangling pointer.
 
-Let's allocate all CPUs with object_new() and let QOM frees them
-when their reference count reaches zero. This greatly simplify the
-code as we don't have to fiddle with the instance size anymore.
 
-Signed-off-by: Greg Kurz <groug@kaod.org>
----
- hw/ppc/spapr.c                  |   11 +++--------
- hw/ppc/spapr_cpu_core.c         |   19 +++++++------------
- include/hw/ppc/spapr_cpu_core.h |    2 +-
- 3 files changed, 11 insertions(+), 21 deletions(-)
+On 11/20/2017 10:18 AM, Thomas Huth wrote:
+> On 20.11.2017 09:48, Christian Borntraeger wrote:
+>> Thomas,
+>>
+>> does this patch help as well?
+>>
+>> diff --git a/pc-bios/s390-ccw/Makefile b/pc-bios/s390-ccw/Makefile
+>> index 6d0c2ee..2687590 100644
+>> --- a/pc-bios/s390-ccw/Makefile
+>> +++ b/pc-bios/s390-ccw/Makefile
+>> @@ -12,7 +12,7 @@ $(call set-vpath, $(SRC_PATH)/pc-bios/s390-ccw)
+>>  OBJECTS = start.o main.o bootmap.o sclp.o virtio.o virtio-scsi.o virtio-blkdev.o
+>>  QEMU_CFLAGS := $(filter -W%, $(QEMU_CFLAGS))
+>>  QEMU_CFLAGS += -ffreestanding -fno-delete-null-pointer-checks -msoft-float
+>> -QEMU_CFLAGS += -march=z900 -fPIE -fno-strict-aliasing
+>> +QEMU_CFLAGS += -march=z900 -fPIE -fno-strict-aliasing -fno-zero-initialized-in-bss
+>>  QEMU_CFLAGS += $(call cc-option, $(QEMU_CFLAGS), -fno-stack-protector)
+>>  LDFLAGS += -Wl,-pie -nostdlib
+> 
+> No, that alone does not help, the default_scsi_device variable is still
+> in the normal .bss section in that case (you can also check that with
+> objdump for example). You'd have to apply this patch on top to fix it
+> that way:
+> 
+> diff --git a/pc-bios/s390-ccw/virtio-scsi.c b/pc-bios/s390-ccw/virtio-scsi.c
+> index c92f5d3..64ab095 100644
+> --- a/pc-bios/s390-ccw/virtio-scsi.c
+> +++ b/pc-bios/s390-ccw/virtio-scsi.c
+> @@ -15,7 +15,7 @@
+>  #include "scsi.h"
+>  #include "virtio-scsi.h"
+> 
+> -static ScsiDevice default_scsi_device;
+> +static ScsiDevice default_scsi_device = { 0 };
+>  static VirtioScsiCmdReq req;
+>  static VirtioScsiCmdResp resp;
+> 
+> ... then the variable is in the .data section instead.
+> 
+> But since the problem with other uninitialized .bss variables is then
+> still pending, I think we should rather go with my patch for 2.11 and
+> fix future problems properly in v2.12 by initializing the complete .bss
+> to zero in the start.S file.
 
-diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-index 174e7ff0678d..fc92b9d914a5 100644
---- a/hw/ppc/spapr.c
-+++ b/hw/ppc/spapr.c
-@@ -3173,12 +3173,10 @@ void spapr_core_release(DeviceState *dev)
- 
-     if (smc->pre_2_10_has_unused_icps) {
-         sPAPRCPUCore *sc = SPAPR_CPU_CORE(OBJECT(dev));
--        sPAPRCPUCoreClass *scc = SPAPR_CPU_CORE_GET_CLASS(OBJECT(cc));
--        size_t size = object_type_get_instance_size(scc->cpu_type);
-         int i;
- 
-         for (i = 0; i < cc->nr_threads; i++) {
--            CPUState *cs = CPU(sc->threads + i * size);
-+            CPUState *cs = CPU(sc->threads[i]);
- 
-             pre_2_10_vmstate_register_dummy_icp(cs->cpu_index);
-         }
-@@ -3224,7 +3222,7 @@ static void spapr_core_plug(HotplugHandler *hotplug_dev, DeviceState *dev,
-     sPAPRMachineClass *smc = SPAPR_MACHINE_CLASS(mc);
-     sPAPRCPUCore *core = SPAPR_CPU_CORE(OBJECT(dev));
-     CPUCore *cc = CPU_CORE(dev);
--    CPUState *cs = CPU(core->threads);
-+    CPUState *cs = CPU(core->threads[0]);
-     sPAPRDRConnector *drc;
-     Error *local_err = NULL;
-     int smt = kvmppc_smt_threads();
-@@ -3269,15 +3267,12 @@ static void spapr_core_plug(HotplugHandler *hotplug_dev, DeviceState *dev,
-     core_slot->cpu = OBJECT(dev);
- 
-     if (smc->pre_2_10_has_unused_icps) {
--        sPAPRCPUCoreClass *scc = SPAPR_CPU_CORE_GET_CLASS(OBJECT(cc));
--        size_t size = object_type_get_instance_size(scc->cpu_type);
-         int i;
- 
-         for (i = 0; i < cc->nr_threads; i++) {
-             sPAPRCPUCore *sc = SPAPR_CPU_CORE(dev);
--            void *obj = sc->threads + i * size;
- 
--            cs = CPU(obj);
-+            cs = CPU(sc->threads[i]);
-             pre_2_10_vmstate_unregister_dummy_icp(cs->cpu_index);
-         }
-     }
-diff --git a/hw/ppc/spapr_cpu_core.c b/hw/ppc/spapr_cpu_core.c
-index 3a4c17401226..588f9b45714a 100644
---- a/hw/ppc/spapr_cpu_core.c
-+++ b/hw/ppc/spapr_cpu_core.c
-@@ -79,13 +79,11 @@ const char *spapr_get_cpu_core_type(const char *cpu_type)
- static void spapr_cpu_core_unrealizefn(DeviceState *dev, Error **errp)
- {
-     sPAPRCPUCore *sc = SPAPR_CPU_CORE(OBJECT(dev));
--    sPAPRCPUCoreClass *scc = SPAPR_CPU_CORE_GET_CLASS(OBJECT(dev));
--    size_t size = object_type_get_instance_size(scc->cpu_type);
-     CPUCore *cc = CPU_CORE(dev);
-     int i;
- 
-     for (i = 0; i < cc->nr_threads; i++) {
--        void *obj = sc->threads + i * size;
-+        Object *obj = OBJECT(sc->threads[i]);
-         DeviceState *dev = DEVICE(obj);
-         CPUState *cs = CPU(dev);
-         PowerPCCPU *cpu = POWERPC_CPU(cs);
-@@ -146,9 +144,8 @@ static void spapr_cpu_core_realize(DeviceState *dev, Error **errp)
-     sPAPRCPUCore *sc = SPAPR_CPU_CORE(OBJECT(dev));
-     sPAPRCPUCoreClass *scc = SPAPR_CPU_CORE_GET_CLASS(OBJECT(dev));
-     CPUCore *cc = CPU_CORE(OBJECT(dev));
--    size_t size;
-     Error *local_err = NULL;
--    void *obj;
-+    Object *obj;
-     int i, j;
- 
-     if (!spapr) {
-@@ -156,18 +153,16 @@ static void spapr_cpu_core_realize(DeviceState *dev, Error **errp)
-         return;
-     }
- 
--    size = object_type_get_instance_size(scc->cpu_type);
--    sc->threads = g_malloc0(size * cc->nr_threads);
-+    sc->threads = g_new(PowerPCCPU *, cc->nr_threads);
-     for (i = 0; i < cc->nr_threads; i++) {
-         char id[32];
-         CPUState *cs;
-         PowerPCCPU *cpu;
- 
--        obj = sc->threads + i * size;
-+        obj = object_new(scc->cpu_type);
- 
--        object_initialize(obj, size, scc->cpu_type);
-         cs = CPU(obj);
--        cpu = POWERPC_CPU(cs);
-+        cpu = sc->threads[i] = POWERPC_CPU(obj);
-         cs->cpu_index = cc->core_id + i;
-         cpu->vcpu_id = (cc->core_id * spapr->vsmt / smp_threads) + i;
-         if (kvm_enabled() && !kvm_vcpu_id_is_valid(cpu->vcpu_id)) {
-@@ -192,7 +187,7 @@ static void spapr_cpu_core_realize(DeviceState *dev, Error **errp)
-     }
- 
-     for (j = 0; j < cc->nr_threads; j++) {
--        obj = sc->threads + j * size;
-+        obj = OBJECT(sc->threads[j]);
- 
-         spapr_cpu_core_realize_child(obj, spapr, &local_err);
-         if (local_err) {
-@@ -203,7 +198,7 @@ static void spapr_cpu_core_realize(DeviceState *dev, Error **errp)
- 
- err:
-     while (--i >= 0) {
--        obj = sc->threads + i * size;
-+        obj = OBJECT(sc->threads[i]);
-         object_unparent(obj);
-     }
-     g_free(sc->threads);
-diff --git a/include/hw/ppc/spapr_cpu_core.h b/include/hw/ppc/spapr_cpu_core.h
-index f2d48d6a6786..1129f344aa0c 100644
---- a/include/hw/ppc/spapr_cpu_core.h
-+++ b/include/hw/ppc/spapr_cpu_core.h
-@@ -28,7 +28,7 @@ typedef struct sPAPRCPUCore {
-     CPUCore parent_obj;
- 
-     /*< public >*/
--    void *threads;
-+    PowerPCCPU **threads;
-     int node_id;
- } sPAPRCPUCore;
- 
+Yes. Ack.
+> 
+>  Thomas
+> 
