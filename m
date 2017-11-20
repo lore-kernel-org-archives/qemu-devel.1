@@ -1,34 +1,15 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48840)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51468)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1eGqYN-0005Qm-OY
-	for qemu-devel@nongnu.org; Mon, 20 Nov 2017 13:12:21 -0500
+	(envelope-from <pm215@archaic.org.uk>) id 1eGqf2-0001rr-6y
+	for qemu-devel@nongnu.org; Mon, 20 Nov 2017 13:19:13 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1eGqYH-0006SJ-Qd
-	for qemu-devel@nongnu.org; Mon, 20 Nov 2017 13:12:19 -0500
-Received: from indium.canonical.com ([91.189.90.7]:49880)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1eGqYH-0006S8-Jj
-	for qemu-devel@nongnu.org; Mon, 20 Nov 2017 13:12:13 -0500
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1eGqYE-0002vo-8e
-	for <qemu-devel@nongnu.org>; Mon, 20 Nov 2017 18:12:10 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 4D1112E8279
-	for <qemu-devel@nongnu.org>; Mon, 20 Nov 2017 18:11:56 +0000 (UTC)
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Mon, 20 Nov 2017 18:00:39 -0000
+	(envelope-from <pm215@archaic.org.uk>) id 1eGqf1-0000Wb-87
+	for qemu-devel@nongnu.org; Mon, 20 Nov 2017 13:19:12 -0500
 From: Peter Maydell <peter.maydell@linaro.org>
-Reply-To: Bug 1673976 <1673976@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <20170318142657.21676.52259.malonedeb@chaenomeles.canonical.com>
-Message-Id: <151120083945.2410.17555643783445125291.malone@soybean.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1673976] Re: linux-user clone() can't handle
- glibc posix_spawn() (causes locale-gen to assert)
+Date: Mon, 20 Nov 2017 18:08:26 +0000
+Message-Id: <1511201308-23580-1-git-send-email-peter.maydell@linaro.org>
+Subject: [Qemu-devel] [PATCH v2 for-2.11 0/2] Fix TCG atomic writes to
+ nondirty pages
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -38,39 +19,49 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
+Cc: qemu-stable@nongnu.org, Richard Henderson <rth@twiddle.net>, Paolo Bonzini <pbonzini@redhat.com>, Stuart Monteith <stuart.monteith@linaro.org>
 
-Not without messing with the QEMU source, no.
+To do a write to memory that is marked as notdirty, we need
+to invalidate any TBs we have cached for that memory, and
+update the cpu physical memory dirty flags for VGA and migration.
+The slowpath code in notdirty_mem_write() does all this correctly,
+but the new atomic handling code in atomic_mmu_lookup() doesn't
+do anything at all, it just clears the dirty bit in the TLB.
 
--- =
+The effect of this bug is that if the first write to a notdirty
+page for which we have cached TBs is by a guest atomic access,
+we fail to invalidate the TBs and subsequently will execute
+incorrect code. This can be seen by trying to run 'javac' on AArch64.
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1673976
+The first patch here refactors notdirty_mem_write() to pull out
+the "correctly handle dirty bit updates" parts of the code into
+two new functions memory_notdirty_write_prepare() and
+memory_notdirty_write_complete(). The second patch then uses
+those functions to fix the atomic helpers.
 
-Title:
-  linux-user clone() can't handle glibc posix_spawn() (causes locale-gen
-  to assert)
+Changes v1->v2:
+ * add the 'bool active;' flag to NotDirtyInfo in patch 1
+ * change the comment on NotDirtyInfo in patch 1 to document
+   the active flag (and to fix incorrect references to function
+   names that I forgot to update when I decided on the names for
+   the prepare/complete functions)
+ * in patch 2, don't call prepare unless the TLB was notdirty
+ * in patch 2, use the active flag to track whether we need to
+   call complete or not
 
-Status in QEMU:
-  New
+thanks
+-- PMM
 
-Bug description:
-  I'm running a command (locale-gen) inside of an armv7h chroot mounted
-  on my x86_64 desktop by putting qemu-arm-static into /usr/bin/ of the
-  chroot file system and I get a core dump.
+Peter Maydell (2):
+  exec.c: Factor out before/after actions for notdirty memory writes
+  accel/tcg: Handle atomic accesses to notdirty memory correctly
 
-  locale-gen
-  Generating locales...
-  =C2=A0=C2=A0en_US.UTF-8...localedef: ../sysdeps/unix/sysv/linux/spawni.c:=
-360: __spawnix: Assertion `ec >=3D 0' failed.
-  qemu: uncaught target signal 6 (Aborted) - core dumped
-  /usr/bin/locale-gen: line 41:    34 Aborted                 (core dumped)=
- localedef -i $input -c -f $charset -A /usr/share/locale/locale.alias $loca=
-le
+ accel/tcg/atomic_template.h    | 12 ++++++++
+ include/exec/memory-internal.h | 62 ++++++++++++++++++++++++++++++++++++++++
+ accel/tcg/cputlb.c             | 38 +++++++++++++++---------
+ accel/tcg/user-exec.c          |  1 +
+ exec.c                         | 65 ++++++++++++++++++++++++++++--------------
+ 5 files changed, 144 insertions(+), 34 deletions(-)
 
-  I've done this same thing successfully for years, but this breakage
-  has appeared some time in the last 3 or so months. Possibly with the
-  update to qemu version 2.8.
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1673976/+subscriptions
+-- 
+2.7.4
