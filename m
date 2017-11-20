@@ -1,24 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44486)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44547)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1eGoyp-0006Jr-Ok
-	for qemu-devel@nongnu.org; Mon, 20 Nov 2017 11:31:32 -0500
+	(envelope-from <shameerali.kolothum.thodi@huawei.com>)
+	id 1eGoyu-0006LA-03
+	for qemu-devel@nongnu.org; Mon, 20 Nov 2017 11:31:37 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1eGoyk-0005BB-22
-	for qemu-devel@nongnu.org; Mon, 20 Nov 2017 11:31:31 -0500
-References: <20171120145006.551-1-kwolf@redhat.com>
-	<20171120145006.551-2-kwolf@redhat.com>
-	<e6c36f4b-cc50-c428-fd0f-443c5c466f9e@virtuozzo.com>
-	<20171120162334.GE7197@localhost.localdomain>
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Message-ID: <76129c6f-6f90-2046-4474-8b5c4b655fc3@virtuozzo.com>
-Date: Mon, 20 Nov 2017 19:31:19 +0300
-MIME-Version: 1.0
-In-Reply-To: <20171120162334.GE7197@localhost.localdomain>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
+	(envelope-from <shameerali.kolothum.thodi@huawei.com>)
+	id 1eGoys-0005Ei-Pw
+	for qemu-devel@nongnu.org; Mon, 20 Nov 2017 11:31:36 -0500
+From: Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>
+Date: Mon, 20 Nov 2017 16:31:17 +0000
+Message-ID: <5FC3163CFD30C246ABAA99954A238FA8384726CE@FRAEML521-MBX.china.huawei.com>
+References: <1510622154-17224-1-git-send-email-zhuyijun@huawei.com>
+	<1510622154-17224-2-git-send-email-zhuyijun@huawei.com>
+	<20171114084735.68e87546@t450s.home>
+	<5FC3163CFD30C246ABAA99954A238FA83845EDBF@FRAEML521-MBX.china.huawei.com>
+	<20171115112513.3c035023@t450s.home>
+	<5FC3163CFD30C246ABAA99954A238FA8384704C0@FRAEML521-MBX.china.huawei.com>
+	<20171120085745.0147df5c@t450s.home>
+In-Reply-To: <20171120085745.0147df5c@t450s.home>
 Content-Language: en-US
-Subject: Re: [Qemu-devel] [PATCH for-2.11 1/3] block: Add errp to
- bdrv_snapshot_goto()
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
+MIME-Version: 1.0
+Subject: Re: [Qemu-devel] [RFC 1/5] hw/vfio: Add function for getting
+ reserved_region of device iommu group
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,106 +32,163 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Kevin Wolf <kwolf@redhat.com>
-Cc: qemu-block@nongnu.org, mreitz@redhat.com, eblake@redhat.com, jsnow@redhat.com, den@openvz.org, qemu-devel@nongnu.org
-
-20.11.2017 19:23, Kevin Wolf wrote:
-> Am 20.11.2017 um 17:07 hat Vladimir Sementsov-Ogievskiy geschrieben:
->> 20.11.2017 17:50, Kevin Wolf wrote:
->>> Signed-off-by: Kevin Wolf <kwolf@redhat.com>
->>> ---
->>>    include/block/snapshot.h |  3 ++-
->>>    block/snapshot.c         | 21 ++++++++++++++++-----
->>>    qemu-img.c               |  6 +++---
->>>    3 files changed, 21 insertions(+), 9 deletions(-)
->>>
->>> diff --git a/include/block/snapshot.h b/include/block/snapshot.h
->>> index e5c0553115..aeb80405e8 100644
->>> --- a/include/block/snapshot.h
->>> +++ b/include/block/snapshot.h
->>> @@ -57,7 +57,8 @@ int bdrv_can_snapshot(BlockDriverState *bs);
->>>    int bdrv_snapshot_create(BlockDriverState *bs,
->>>                             QEMUSnapshotInfo *sn_info);
->>>    int bdrv_snapshot_goto(BlockDriverState *bs,
->>> -                       const char *snapshot_id);
->>> +                       const char *snapshot_id,
->>> +                       Error **errp);
->>>    int bdrv_snapshot_delete(BlockDriverState *bs,
->>>                             const char *snapshot_id,
->>>                             const char *name,
->>> diff --git a/block/snapshot.c b/block/snapshot.c
->>> index be0743abac..9c941e638d 100644
->>> --- a/block/snapshot.c
->>> +++ b/block/snapshot.c
->>> @@ -177,18 +177,21 @@ int bdrv_snapshot_create(BlockDriverState *bs,
->>>    }
->>>    int bdrv_snapshot_goto(BlockDriverState *bs,
->>> -                       const char *snapshot_id)
->>> +                       const char *snapshot_id,
->>> +                       Error **errp)
->>>    {
->>>        BlockDriver *drv = bs->drv;
->>>        int ret, open_ret;
->>>        int64_t len;
->>>        if (!drv) {
->>> +        error_setg(errp, "Block driver is closed");
->>>            return -ENOMEDIUM;
->>>        }
->>>        len = bdrv_getlength(bs);
->>>        if (len < 0) {
->>> +        error_setg_errno(errp, -len, "Cannot get block device size");
->>>            return len;
->>>        }
->>>        /* We should set all bits in all enabled dirty bitmaps, because dirty
->>> @@ -200,13 +203,18 @@ int bdrv_snapshot_goto(BlockDriverState *bs,
->>>        bdrv_set_dirty(bs, 0, len);
->>>        if (drv->bdrv_snapshot_goto) {
->>> -        return drv->bdrv_snapshot_goto(bs, snapshot_id);
->>> +        ret = drv->bdrv_snapshot_goto(bs, snapshot_id);
->>> +        if (ret < 0) {
->>> +            error_setg_errno(errp, -ret, "Failed to load snapshot");
->>> +        }
->>> +        return ret;
->>>        }
->>>        if (bs->file) {
->>>            BlockDriverState *file;
->>>            QDict *options = qdict_clone_shallow(bs->options);
->>>            QDict *file_options;
->>> +        Error *local_err = NULL;
->>>            file = bs->file->bs;
->>>            /* Prevent it from getting deleted when detached from bs */
->>> @@ -220,12 +228,14 @@ int bdrv_snapshot_goto(BlockDriverState *bs,
->>>            bdrv_unref_child(bs, bs->file);
->>>            bs->file = NULL;
->>> -        ret = bdrv_snapshot_goto(file, snapshot_id);
->>> -        open_ret = drv->bdrv_open(bs, options, bs->open_flags, NULL);
->>> +        ret = bdrv_snapshot_goto(file, snapshot_id, errp);
->>> +        open_ret = drv->bdrv_open(bs, options, bs->open_flags, &local_err);
->>>            QDECREF(options);
->>>            if (open_ret < 0) {
->>>                bdrv_unref(file);
->>>                bs->drv = NULL;
->>> +            /* A bdrv_snapshot_goto() error takes precedence */
->> you return open_ret from bdrv_open and err msg from bdrv_snapshot_goto.
->> the may not correspond to each other.
-> Hm, yes. Is this a problem, though?
->
-> If it is, I guess we can change the return value below:
->
->>> +            error_propagate(errp, local_err);
->>>                return open_ret;
-> return ret < 0 ? ret : open_ret;
->
-> Would people prefer this?
-
-looks good,
-
-Reviewed-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-
->
-> Kevin
+To: Alex Williamson <alex.williamson@redhat.com>
+Cc: "eric.auger@redhat.com" <eric.auger@redhat.com>, Zhuyijun <zhuyijun@huawei.com>, "qemu-arm@nongnu.org" <qemu-arm@nongnu.org>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "peter.maydell@linaro.org" <peter.maydell@linaro.org>, Zhaoshenglong <zhaoshenglong@huawei.com>, Linuxarm <linuxarm@huawei.com>
 
 
--- 
-Best regards,
-Vladimir
+
+> -----Original Message-----
+> From: Alex Williamson [mailto:alex.williamson@redhat.com]
+> Sent: Monday, November 20, 2017 3:58 PM
+> To: Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>
+> Cc: eric.auger@redhat.com; Zhuyijun <zhuyijun@huawei.com>; qemu-
+> arm@nongnu.org; qemu-devel@nongnu.org; peter.maydell@linaro.org;
+> Zhaoshenglong <zhaoshenglong@huawei.com>; Linuxarm
+> <linuxarm@huawei.com>
+> Subject: Re: [Qemu-devel] [RFC 1/5] hw/vfio: Add function for getting
+> reserved_region of device iommu group
+>=20
+> On Mon, 20 Nov 2017 11:58:43 +0000
+> Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com> wrote:
+>=20
+> > > -----Original Message-----
+> > > From: Alex Williamson [mailto:alex.williamson@redhat.com]
+> > > Sent: Wednesday, November 15, 2017 6:25 PM
+> > > To: Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>
+> > > Cc: Zhuyijun <zhuyijun@huawei.com>; qemu-arm@nongnu.org; qemu-
+> > > devel@nongnu.org; eric.auger@redhat.com; peter.maydell@linaro.org;
+> > > Zhaoshenglong <zhaoshenglong@huawei.com>
+> > > Subject: Re: [Qemu-devel] [RFC 1/5] hw/vfio: Add function for getting
+> > > reserved_region of device iommu group
+> > >
+> > > On Wed, 15 Nov 2017 09:49:41 +0000
+> > > Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>
+> wrote:
+> > >
+> > > > Hi Alex,
+> > > >
+> > > > > -----Original Message-----
+> > > > > From: Alex Williamson [mailto:alex.williamson@redhat.com]
+> > > > > Sent: Tuesday, November 14, 2017 3:48 PM
+> > > > > To: Zhuyijun <zhuyijun@huawei.com>
+> > > > > Cc: qemu-arm@nongnu.org; qemu-devel@nongnu.org;
+> > > > > eric.auger@redhat.com; peter.maydell@linaro.org; Shameerali
+> Kolothum
+> > > > > Thodi <shameerali.kolothum.thodi@huawei.com>; Zhaoshenglong
+> > > > > <zhaoshenglong@huawei.com>
+> > > > > Subject: Re: [Qemu-devel] [RFC 1/5] hw/vfio: Add function for get=
+ting
+> > > > > reserved_region of device iommu group
+> > > > >
+> > > > > On Tue, 14 Nov 2017 09:15:50 +0800
+> > > > > <zhuyijun@huawei.com> wrote:
+> > > > >
+> > > > > > From: Zhu Yijun <zhuyijun@huawei.com>
+> > > > > >
+> > > > > > With kernel 4.11, iommu/smmu will populate the MSI IOVA reserve=
+d
+> > > > > > window and PCI reserved window which has to be excluded from
+> Guest
+> > > iova
+> > > > > allocations.
+> > > > > >
+> > > > > > However, If it falls within the Qemu default virtual memory add=
+ress
+> > > > > > space, then reserved regions may get allocated for a Guest VF D=
+MA
+> iova
+> > > > > > and it will fail.
+> > > > > >
+> > > > > > So get those reserved regions in this patch and create some hol=
+es in
+> > > > > > the Qemu ram address in next patchset.
+> > > > > >
+> > > > > > Signed-off-by: Zhu Yijun <zhuyijun@huawei.com>
+> > > > > > ---
+> > > > > >  hw/vfio/common.c              | 67
+> > > > > +++++++++++++++++++++++++++++++++++++++++++
+> > > > > >  hw/vfio/pci.c                 |  2 ++
+> > > > > >  hw/vfio/platform.c            |  2 ++
+> > > > > >  include/exec/memory.h         |  7 +++++
+> > > > > >  include/hw/vfio/vfio-common.h |  3 ++
+> > > > > >  5 files changed, 81 insertions(+)
+> > > > >
+> > > > > I generally prefer the vfio interface to be more self sufficient,=
+ if there
+> are
+> > > > > regions the IOMMU cannot map, we should be describing those via
+> > > capabilities
+> > > > > on the container through the vfio interface.  If we're just scrap=
+ing
+> together
+> > > > > things from sysfs, the user can just as easily do that and provid=
+e an
+> explicit
+> > > > > memory map for the VM taking the devices into account.
+> > > >
+> > > > Ok. I was under the impression that the purpose of introducing the
+> > > > /sys/kernel/iommu_groups/reserved_regions was to get the IOVA regio=
+ns
+> > > > that are reserved(MSI or non-mappable) for Qemu or other apps to
+> > > > make use of.  I think this was introduced as part of the "KVM/MSI
+> passthrough
+> > > > support on ARM" patch series. And if I remember correctly, Eric had
+> > > > an approach where the user space can retrieve all the reserved regi=
+ons
+> > > through
+> > > > the VFIO_IOMMU_GET_INFO ioctl and later this idea was replaced with
+> the
+> > > > sysfs interface.
+> > > >
+> > > > May be I am missing something here.
+> > >
+> > > And sysfs is a good interface if the user wants to use it to configur=
+e
+> > > the VM in a way that's compatible with a device.  For instance, in yo=
+ur
+> > > case, a user could evaluate these reserved regions across all devices=
+ in
+> > > a system, or even across an entire cluster, and instantiate the VM wi=
+th
+> > > a memory map compatible with hotplugging any of those evaluated
+> > > devices (QEMU implementation of allowing the user to do this TBD).
+> > > Having the vfio device evaluate these reserved regions only helps in
+> > > the cold-plug case.  So the proposed solution is limited in scope and
+> > > doesn't address similar needs on other platforms.  There is value to
+> > > verifying that a device's IOVA space is compatible with a VM memory m=
+ap
+> > > and modifying the memory map on cold-plug or rejecting the device on
+> > > hot-plug, but isn't that why we have an ioctl within vfio to expose
+> > > information about the IOMMU?  Why take the path of allowing QEMU to
+> > > rummage through sysfs files outside of vfio, implying additional
+> > > security and access concerns, rather than filling the gap within the
+> > > vifo API?
+> >
+> > Thanks Alex for the explanation.
+> >
+> > I came across this patch[1] from Eric where he introduced the IOCTL
+> interface to
+> > retrieve the reserved regions. It looks like this can be reworked to
+> accommodate
+> > the above requirement.
+>=20
+> I don't think we need a new ioctl for this, nor do I think that
+> describing the holes is the correct approach.  The existing
+> VFIO_IOMMU_GET_INFO ioctl can be extended to support capability chains,
+> as we've done for VFIO_DEVICE_GET_REGION_INFO.=20
+
+Right, as far as I can see the above mentioned patch is doing exactly the s=
+ame,=20
+extending the VFIO_IOMMU_GET_INFO ioctl with capability chain.
+
+> IMO, we should try to
+> describe the available fixed IOVA regions which are available for
+> mapping rather than describing various holes within the address space
+> which are unavailable.  The latter method always fails to describe the
+> end of the mappable IOVA space and gets bogged down in trying to
+> classify the types of holes that might exist.  Thanks,
+
+Ok. I guess that is to take care iommu max address width case.
+
+Thanks,
+Shameer
