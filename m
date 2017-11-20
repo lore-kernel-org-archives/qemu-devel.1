@@ -1,23 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37175)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37283)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <rth7680@gmail.com>) id 1eGn3b-0003vy-1g
-	for qemu-devel@nongnu.org; Mon, 20 Nov 2017 09:28:22 -0500
+	(envelope-from <famz@redhat.com>) id 1eGn3t-0004AO-FN
+	for qemu-devel@nongnu.org; Mon, 20 Nov 2017 09:28:38 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <rth7680@gmail.com>) id 1eGn3a-0003eC-5W
-	for qemu-devel@nongnu.org; Mon, 20 Nov 2017 09:28:19 -0500
-Sender: Richard Henderson <rth7680@gmail.com>
-References: <1511184421-23535-1-git-send-email-peter.maydell@linaro.org>
-	<1511184421-23535-2-git-send-email-peter.maydell@linaro.org>
-From: Richard Henderson <rth@twiddle.net>
-Message-ID: <e0b4b129-bc85-ff0e-f967-5d8f261689a8@twiddle.net>
-Date: Mon, 20 Nov 2017 15:28:11 +0100
+	(envelope-from <famz@redhat.com>) id 1eGn3q-0003lS-D2
+	for qemu-devel@nongnu.org; Mon, 20 Nov 2017 09:28:37 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:58388)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <famz@redhat.com>) id 1eGn3q-0003l8-6X
+	for qemu-devel@nongnu.org; Mon, 20 Nov 2017 09:28:34 -0500
+Date: Mon, 20 Nov 2017 22:28:28 +0800
+From: Fam Zheng <famz@redhat.com>
+Message-ID: <20171120142828.GB6828@lemon.lan>
+References: <1510899814-19372-1-git-send-email-yang.zhong@intel.com>
 MIME-Version: 1.0
-In-Reply-To: <1511184421-23535-2-git-send-email-peter.maydell@linaro.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH for-2.11 1/2] exec.c: Factor out
- before/after actions for notdirty memory writes
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1510899814-19372-1-git-send-email-yang.zhong@intel.com>
+Subject: Re: [Qemu-devel] [PATCH] rcu: reduce half heap memory size by
+ malloc_trim()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,29 +27,19 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org
-Cc: qemu-stable@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Stuart Monteith <stuart.monteith@linaro.org>
+To: Yang Zhong <yang.zhong@intel.com>
+Cc: qemu-devel@nongnu.org, pbonzini@redhat.com, weidong.huang@huawei.com, arei.gonglei@huawei.com, liujunjie23@huawei.com, wangxinxin.wang@huawei.com, stone.xulei@huawei.com, anthony.xu@intel.com, stefanha@redhat.com, zhang.zhanghailiang@huawei.com
 
-On 11/20/2017 02:27 PM, Peter Maydell wrote:
-> The function notdirty_mem_write() has a sequence of actions
-> it has to do before and after the actual business of writing
-> data to host RAM to ensure that dirty flags are correctly
-> updated and we flush any TCG translations for the region.
-> We need to do this also in other places that write directly
-> to host RAM, most notably the TCG atomic helper functions.
-> Pull out the before and after pieces into their own functions.
-> 
-> We use an API where the prepare function stashes the various
-> bits of information about the write into a struct for the
-> complete function to use, because in the calls for the atomic
-> helpers the place where the complete function will be called
-> doesn't have the information to hand.
-> 
-> Cc: qemu-stable@nongnu.org
-> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
-> ---
+On Fri, 11/17 14:23, Yang Zhong wrote:
+> diff --git a/util/rcu.c b/util/rcu.c
+> index ca5a63e..8d491a6 100644
+> --- a/util/rcu.c
+> +++ b/util/rcu.c
+> @@ -26,6 +26,7 @@
+>   * IBM's contributions to this file may be relicensed under LGPLv2 or later.
+>   */
+>  
+> +#include <malloc.h>
 
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
-
-
-r~
+BTW, if you respin, the "qemu/osdep.h" header should always be included first as
+per HACKING file.
