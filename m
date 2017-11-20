@@ -1,18 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59977)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60605)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1eGphR-00089U-2P
-	for qemu-devel@nongnu.org; Mon, 20 Nov 2017 12:17:37 -0500
+	(envelope-from <imammedo@redhat.com>) id 1eGpjJ-0000q1-03
+	for qemu-devel@nongnu.org; Mon, 20 Nov 2017 12:19:34 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1eGphN-0005Nz-RH
-	for qemu-devel@nongnu.org; Mon, 20 Nov 2017 12:17:37 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:46968)
+	(envelope-from <imammedo@redhat.com>) id 1eGpjF-0007Sm-QZ
+	for qemu-devel@nongnu.org; Mon, 20 Nov 2017 12:19:32 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:49390)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1eGphN-0005NP-Kp
-	for qemu-devel@nongnu.org; Mon, 20 Nov 2017 12:17:33 -0500
-From: "Daniel P. Berrange" <berrange@redhat.com>
-Date: Mon, 20 Nov 2017 17:17:28 +0000
-Message-Id: <20171120171728.31266-1-berrange@redhat.com>
-Subject: [Qemu-devel] [PATCH] build: disarm the TCG unit test trap
+	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1eGpjF-0007Rw-Jx
+	for qemu-devel@nongnu.org; Mon, 20 Nov 2017 12:19:29 -0500
+From: Igor Mammedov <imammedo@redhat.com>
+Date: Mon, 20 Nov 2017 18:19:23 +0100
+Message-Id: <1511198363-106442-1-git-send-email-imammedo@redhat.com>
+Subject: [Qemu-devel] [PATCH for-2.11 v2] pc: fix crash on attempted cpu
+ unplug
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,50 +23,47 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Peter Maydell <peter.maydell@linaro.org>, "Daniel P. Berrange" <berrange@redhat.com>
+Cc: mst@redhat.com, pbonzini@redhat.com, ehabkost@redhat.com, rth@twiddle.net
 
-Developers sometimes mistakenly run 'make test' instead of 'make check'.
-'make test' triggers the ancient, unmaintained tcg unit tests in
-tests/tcg/Makefile which have long since ceased compiling.
+when qemu is started with '-no-acpi' CLI option, an attempt
+to unplug a CPU using device_del results in null pointer
+dereference at:
 
-Even if someone fixes the TCG tests, it makes little sense to put
-them in a 'make test' target, rather they should be 'make check-tcg',
-possibly wired up as a dependency of 'make check'.
+  #0 object_get_class
+  #1 pc_machine_device_unplug_request_cb
+  #2 qmp_marshal_device_del
 
-In the meantime, this patch disarms the 'make test' trap by turning
-it into a synonym for 'make check'.
+which is caused by pcms->acpi_dev == NULL due to ACPI support
+being disabled.
 
-Signed-off-by: Daniel P. Berrange <berrange@redhat.com>
+Considering that ACPI support is necessary for unplug to work,
+check that it's enabled and fail unplug request gracefully
+if no acpi device were found.
+
+Signed-off-by: Igor Mammedov <imammedo@redhat.com>
+Reviewed-by: Eduardo Habkost <ehabkost@redhat.com>
 ---
- tests/Makefile.include | 1 +
- tests/tcg/Makefile     | 3 ---
- 2 files changed, 1 insertion(+), 3 deletions(-)
+v2:
+  - make error message more verbose (ehabkost@redhat.com)
+---
+ hw/i386/pc.c | 5 +++++
+ 1 file changed, 5 insertions(+)
 
-diff --git a/tests/Makefile.include b/tests/Makefile.include
-index 434a2ce868..55fd99f451 100644
---- a/tests/Makefile.include
-+++ b/tests/Makefile.include
-@@ -919,6 +919,7 @@ check-unit: $(patsubst %,check-%, $(check-unit-y))
- check-speed: $(patsubst %,check-%, $(check-speed-y))
- check-block: $(patsubst %,check-%, $(check-block-y))
- check: check-qapi-schema check-unit check-qtest
-+test: check
- check-clean:
- 	$(MAKE) -C tests/tcg clean
- 	rm -rf $(check-unit-y) tests/*.o $(QEMU_IOTESTS_HELPERS-y)
-diff --git a/tests/tcg/Makefile b/tests/tcg/Makefile
-index 89e3342f3d..4b5d196326 100644
---- a/tests/tcg/Makefile
-+++ b/tests/tcg/Makefile
-@@ -36,9 +36,6 @@ ifneq ($(call find-in-path, $(CC_I386)),)
- TESTS += $(I386_TESTS)
- endif
+diff --git a/hw/i386/pc.c b/hw/i386/pc.c
+index c3afe5b..186545d 100644
+--- a/hw/i386/pc.c
++++ b/hw/i386/pc.c
+@@ -1842,6 +1842,11 @@ static void pc_cpu_unplug_request_cb(HotplugHandler *hotplug_dev,
+     X86CPU *cpu = X86_CPU(dev);
+     PCMachineState *pcms = PC_MACHINE(hotplug_dev);
  
--all: $(patsubst %,run-%,$(TESTS))
--test: all
--
- # rules to run tests
- 
- .PHONY: $(patsubst %,run-%,$(TESTS))
++    if (!pcms->acpi_dev) {
++        error_setg(&local_err, "CPU hot unplug not supported without ACPI");
++        goto out;
++    }
++
+     pc_find_cpu_slot(MACHINE(pcms), cpu->apic_id, &idx);
+     assert(idx != -1);
+     if (idx == 0) {
 -- 
-2.14.3
+2.7.4
