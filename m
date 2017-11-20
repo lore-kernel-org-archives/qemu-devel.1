@@ -1,25 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33663)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34379)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.williamson@redhat.com>) id 1eGoSN-0002NR-Tz
-	for qemu-devel@nongnu.org; Mon, 20 Nov 2017 10:58:01 -0500
+	(envelope-from <den@virtuozzo.com>) id 1eGoVB-0003q3-JZ
+	for qemu-devel@nongnu.org; Mon, 20 Nov 2017 11:00:59 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.williamson@redhat.com>) id 1eGoSM-0006Ct-KU
-	for qemu-devel@nongnu.org; Mon, 20 Nov 2017 10:57:59 -0500
-Date: Mon, 20 Nov 2017 08:57:45 -0700
-From: Alex Williamson <alex.williamson@redhat.com>
-Message-ID: <20171120085745.0147df5c@t450s.home>
-In-Reply-To: <5FC3163CFD30C246ABAA99954A238FA8384704C0@FRAEML521-MBX.china.huawei.com>
-References: <1510622154-17224-1-git-send-email-zhuyijun@huawei.com>
-	<1510622154-17224-2-git-send-email-zhuyijun@huawei.com>
-	<20171114084735.68e87546@t450s.home>
-	<5FC3163CFD30C246ABAA99954A238FA83845EDBF@FRAEML521-MBX.china.huawei.com>
-	<20171115112513.3c035023@t450s.home>
-	<5FC3163CFD30C246ABAA99954A238FA8384704C0@FRAEML521-MBX.china.huawei.com>
+	(envelope-from <den@virtuozzo.com>) id 1eGoV5-00082V-P8
+	for qemu-devel@nongnu.org; Mon, 20 Nov 2017 11:00:53 -0500
+References: <20171113162053.58795-1-vsementsov@virtuozzo.com>
+	<01108daa-fed3-c142-bbd6-0ecc4c8b795d@redhat.com>
+	<cd0a2e5e-f788-0e5a-dec7-f428479f3b89@virtuozzo.com>
+	<8c61f43c-5f56-8c1b-a2fe-f954d34dc687@redhat.com>
+From: "Denis V. Lunev" <den@openvz.org>
+Message-ID: <ef42121a-fe94-adef-2bda-7c5db14de0c7@openvz.org>
+Date: Mon, 20 Nov 2017 19:00:31 +0300
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [RFC 1/5] hw/vfio: Add function for getting
- reserved_region of device iommu group
+In-Reply-To: <8c61f43c-5f56-8c1b-a2fe-f954d34dc687@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Content-Language: en-US
+Subject: Re: [Qemu-devel] [PATCH for-2.12 0/4] qmp dirty bitmap API
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,115 +26,98 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>
-Cc: "eric.auger@redhat.com" <eric.auger@redhat.com>, Zhuyijun <zhuyijun@huawei.com>, "qemu-arm@nongnu.org" <qemu-arm@nongnu.org>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "peter.maydell@linaro.org" <peter.maydell@linaro.org>, Zhaoshenglong <zhaoshenglong@huawei.com>, Linuxarm <linuxarm@huawei.com>
+To: John Snow <jsnow@redhat.com>, Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org
+Cc: kwolf@redhat.com, famz@redhat.com, armbru@redhat.com, mnestratov@virtuozzo.com, mreitz@redhat.com, nshirokovskiy@virtuozzo.com, stefanha@redhat.com, pbonzini@redhat.com
 
-On Mon, 20 Nov 2017 11:58:43 +0000
-Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com> wrote:
+On 11/17/2017 06:10 AM, John Snow wrote:
+>
+> On 11/16/2017 03:17 AM, Vladimir Sementsov-Ogievskiy wrote:
+>> 16.11.2017 00:20, John Snow wrote:
+>>> On 11/13/2017 11:20 AM, Vladimir Sementsov-Ogievskiy wrote:
+>>>> Hi all.
+>>>>
+>>>> There are three qmp commands, needed to implement external backup AP=
+I.
+>>>>
+>>>> Using these three commands, client may do all needed bitmap
+>>>> management by
+>>>> hand:
+>>>>
+>>>> on backup start we need to do a transaction:
+>>>> =C2=A0 {disable old bitmap, create new bitmap}
+>>>>
+>>>> on backup success:
+>>>> =C2=A0 drop old bitmap
+>>>>
+>>>> on backup fail:
+>>>> =C2=A0 enable old bitmap
+>>>> =C2=A0 merge new bitmap to old bitmap
+>>>> =C2=A0 drop new bitmap
+>>>>
+>>> Can you give me an example of how you expect these commands to be use=
+d,
+>>> and why they're required?
+>>>
+>>> I'm a little weary about how error-prone these commands might be and =
+the
+>>> potential for incorrect usage seems... high. Why do we require them?
+>> It is needed for incremental backup. It looks like bad idea to export
+>> abdicate/reclaim functionality, it is simpler
+>> and clearer to allow user to merge/enable/disable bitmaps by hand.
+>>
+>> usage is like this:
+>>
+>> 1. we have dirty bitmap bitmap0 for incremental backup.
+>>
+>> 2. prepare image fleecing (create temporary image with backing=3Dour_d=
+isk)
+>> 3. in qmp transaction:
+>> =C2=A0=C2=A0=C2=A0 - disable bitmap0
+>> =C2=A0=C2=A0=C2=A0 - create bitmap1
+>> =C2=A0=C2=A0=C2=A0 - start image fleecing (backup sync=3Dnone our_disk=
+ -> temp_disk)
+> This could probably just be its own command, though:
+>
+> block-job-fleece node=3Dfoobar bitmap=3Dbitmap0 etc=3Detera etc=3Detera=
 
-> > -----Original Message-----
-> > From: Alex Williamson [mailto:alex.williamson@redhat.com]
-> > Sent: Wednesday, November 15, 2017 6:25 PM
-> > To: Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>
-> > Cc: Zhuyijun <zhuyijun@huawei.com>; qemu-arm@nongnu.org; qemu-
-> > devel@nongnu.org; eric.auger@redhat.com; peter.maydell@linaro.org;
-> > Zhaoshenglong <zhaoshenglong@huawei.com>
-> > Subject: Re: [Qemu-devel] [RFC 1/5] hw/vfio: Add function for getting
-> > reserved_region of device iommu group
-> > 
-> > On Wed, 15 Nov 2017 09:49:41 +0000
-> > Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com> wrote:
-> >   
-> > > Hi Alex,
-> > >  
-> > > > -----Original Message-----
-> > > > From: Alex Williamson [mailto:alex.williamson@redhat.com]
-> > > > Sent: Tuesday, November 14, 2017 3:48 PM
-> > > > To: Zhuyijun <zhuyijun@huawei.com>
-> > > > Cc: qemu-arm@nongnu.org; qemu-devel@nongnu.org;
-> > > > eric.auger@redhat.com; peter.maydell@linaro.org; Shameerali Kolothum
-> > > > Thodi <shameerali.kolothum.thodi@huawei.com>; Zhaoshenglong
-> > > > <zhaoshenglong@huawei.com>
-> > > > Subject: Re: [Qemu-devel] [RFC 1/5] hw/vfio: Add function for getting
-> > > > reserved_region of device iommu group
-> > > >
-> > > > On Tue, 14 Nov 2017 09:15:50 +0800
-> > > > <zhuyijun@huawei.com> wrote:
-> > > >  
-> > > > > From: Zhu Yijun <zhuyijun@huawei.com>
-> > > > >
-> > > > > With kernel 4.11, iommu/smmu will populate the MSI IOVA reserved
-> > > > > window and PCI reserved window which has to be excluded from Guest  
-> > iova  
-> > > > allocations.  
-> > > > >
-> > > > > However, If it falls within the Qemu default virtual memory address
-> > > > > space, then reserved regions may get allocated for a Guest VF DMA iova
-> > > > > and it will fail.
-> > > > >
-> > > > > So get those reserved regions in this patch and create some holes in
-> > > > > the Qemu ram address in next patchset.
-> > > > >
-> > > > > Signed-off-by: Zhu Yijun <zhuyijun@huawei.com>
-> > > > > ---
-> > > > >  hw/vfio/common.c              | 67  
-> > > > +++++++++++++++++++++++++++++++++++++++++++  
-> > > > >  hw/vfio/pci.c                 |  2 ++
-> > > > >  hw/vfio/platform.c            |  2 ++
-> > > > >  include/exec/memory.h         |  7 +++++
-> > > > >  include/hw/vfio/vfio-common.h |  3 ++
-> > > > >  5 files changed, 81 insertions(+)  
-> > > >
-> > > > I generally prefer the vfio interface to be more self sufficient, if there are
-> > > > regions the IOMMU cannot map, we should be describing those via  
-> > capabilities  
-> > > > on the container through the vfio interface.  If we're just scraping together
-> > > > things from sysfs, the user can just as easily do that and provide an explicit
-> > > > memory map for the VM taking the devices into account.  
-> > >
-> > > Ok. I was under the impression that the purpose of introducing the
-> > > /sys/kernel/iommu_groups/reserved_regions was to get the IOVA regions
-> > > that are reserved(MSI or non-mappable) for Qemu or other apps to
-> > > make use of.  I think this was introduced as part of the "KVM/MSI passthrough
-> > > support on ARM" patch series. And if I remember correctly, Eric had
-> > > an approach where the user space can retrieve all the reserved regions  
-> > through  
-> > > the VFIO_IOMMU_GET_INFO ioctl and later this idea was replaced with the
-> > > sysfs interface.
-> > >
-> > > May be I am missing something here.  
-> > 
-> > And sysfs is a good interface if the user wants to use it to configure
-> > the VM in a way that's compatible with a device.  For instance, in your
-> > case, a user could evaluate these reserved regions across all devices in
-> > a system, or even across an entire cluster, and instantiate the VM with
-> > a memory map compatible with hotplugging any of those evaluated
-> > devices (QEMU implementation of allowing the user to do this TBD).
-> > Having the vfio device evaluate these reserved regions only helps in
-> > the cold-plug case.  So the proposed solution is limited in scope and
-> > doesn't address similar needs on other platforms.  There is value to
-> > verifying that a device's IOVA space is compatible with a VM memory map
-> > and modifying the memory map on cold-plug or rejecting the device on
-> > hot-plug, but isn't that why we have an ioctl within vfio to expose
-> > information about the IOMMU?  Why take the path of allowing QEMU to
-> > rummage through sysfs files outside of vfio, implying additional
-> > security and access concerns, rather than filling the gap within the
-> > vifo API?    
-> 
-> Thanks Alex for the explanation. 
-> 
-> I came across this patch[1] from Eric where he introduced the IOCTL interface to
-> retrieve the reserved regions. It looks like this can be reworked to accommodate 
-> the above requirement.
+>
+> Could handle forking the bitmap. I'm not sure what the arguments would
+> look like, but we could name the NBD export here, too. (Assuming the
+> server is already started and we just need to create the share.)
+>
+> Then, we can basically do what mirror does:
+>
+> (1) Cancel
+> (2) Complete
+>
+> Cancel would instruct QEMU to keep the bitmap changes (i.e. roll back),=
 
-I don't think we need a new ioctl for this, nor do I think that
-describing the holes is the correct approach.  The existing
-VFIO_IOMMU_GET_INFO ioctl can be extended to support capability chains,
-as we've done for VFIO_DEVICE_GET_REGION_INFO.  IMO, we should try to
-describe the available fixed IOVA regions which are available for
-mapping rather than describing various holes within the address space
-which are unavailable.  The latter method always fails to describe the
-end of the mappable IOVA space and gets bogged down in trying to
-classify the types of holes that might exist.  Thanks,
+> and Complete would instruct QEMU to discard the changes.
+>
+> This way we don't need to expose commands like split or merge that will=
 
-Alex
+> almost always be dangerous to use over QMP.
+>
+> In fact, a fleecing job would be really convenient even without a
+> bitmap, because it'd still be nice to have a convenience command for it=
+=2E
+> Using an existing infrastructure and understood paradigm is just a bonu=
+s.
+>
+actually this is a very good question about safety/simplicity...
+
+We actually have spent a bit of time on design and have not
+come to a good solution. Yes, technically for now we can put
+all into fleecing command and rely on its semantics. Though
+I am not convinced with that approach. We can think that this
+can be reused on snapshot operations (may be, may be not).
+Also technically there are other cases.
+
+This is actually a matter that QEMU should provide low level
+API while management software should make decisions.
+Providing merge etc operations is done using exactly that
+approach. We can also consider this in a similar way we have
+recently fixed "revert to snapshot" operation. Management
+can make and should make a decision.
+
+Den
