@@ -1,21 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52419)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52458)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <den@virtuozzo.com>) id 1eGntV-0005zA-Dc
-	for qemu-devel@nongnu.org; Mon, 20 Nov 2017 10:22:02 -0500
+	(envelope-from <cohuck@redhat.com>) id 1eGnta-00062K-NS
+	for qemu-devel@nongnu.org; Mon, 20 Nov 2017 10:22:04 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <den@virtuozzo.com>) id 1eGntP-0000uY-NX
-	for qemu-devel@nongnu.org; Mon, 20 Nov 2017 10:21:57 -0500
-References: <20171120145006.551-1-kwolf@redhat.com>
-From: "Denis V. Lunev" <den@openvz.org>
-Message-ID: <daa12314-459e-fcbc-72de-4a8770d7461c@openvz.org>
-Date: Mon, 20 Nov 2017 18:21:43 +0300
-MIME-Version: 1.0
-In-Reply-To: <20171120145006.551-1-kwolf@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-Content-Language: en-US
-Subject: Re: [Qemu-devel] [PATCH for-2.11 0/3] block: Error out on load_vm
- with active dirty bitmaps
+	(envelope-from <cohuck@redhat.com>) id 1eGntV-0000vQ-0l
+	for qemu-devel@nongnu.org; Mon, 20 Nov 2017 10:22:02 -0500
+From: Cornelia Huck <cohuck@redhat.com>
+Date: Mon, 20 Nov 2017 16:21:42 +0100
+Message-Id: <20171120152145.25853-2-cohuck@redhat.com>
+In-Reply-To: <20171120152145.25853-1-cohuck@redhat.com>
+References: <20171120152145.25853-1-cohuck@redhat.com>
+Subject: [Qemu-devel] [PULL for-2.11 1/4] s390x: fix storing CPU status
+ (again)
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,24 +20,36 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
-Cc: mreitz@redhat.com, eblake@redhat.com, jsnow@redhat.com, vsementsov@virtuozzo.com, qemu-devel@nongnu.org
+To: peter.maydell@linaro.org
+Cc: qemu-devel@nongnu.org, qemu-s390x@nongnu.org, rth@twiddle.net, agraf@suse.de, thuth@redhat.com, borntraeger@de.ibm.com, david@redhat.com, Cornelia Huck <cohuck@redhat.com>
 
-On 11/20/2017 05:50 PM, Kevin Wolf wrote:
-> Following the discussing at
-> https://lists.gnu.org/archive/html/qemu-devel/2017-11/msg03572.html
-> this implements the error return for loading a snapshot while dirty
-> bitmaps are active.
->
-> Kevin Wolf (3):
->   block: Add errp to bdrv_snapshot_goto()
->   block: Add errp to bdrv_all_goto_snapshot()
->   block: Error out on load_vm with active dirty bitmaps
->
->  include/block/snapshot.h |  6 ++++--
->  block/snapshot.c         | 43 +++++++++++++++++++++++--------------------
->  migration/savevm.c       |  6 +++---
->  qemu-img.c               |  6 +++---
->  4 files changed, 33 insertions(+), 28 deletions(-)
->
-Reviewed-by: Denis V. Lunev <den@openvz.org>
+From: David Hildenbrand <david@redhat.com>
+
+Looks like the last fix + cleanup introduced another bug. (for now Linux
+guests don't seem to care) - we store the crs into ars.
+
+Fixes: 947a38bd6f13 ("s390x/kvm: fix and cleanup storing CPU status")
+Signed-off-by: David Hildenbrand <david@redhat.com>
+Message-Id: <20171116170526.12643-2-david@redhat.com>
+Reviewed-by: Thomas Huth <thuth@redhat.com>
+Reviewed-by: Christian Borntraeger <borntraeger@de.ibm.com>
+Signed-off-by: Cornelia Huck <cohuck@redhat.com>
+---
+ target/s390x/helper.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/target/s390x/helper.c b/target/s390x/helper.c
+index f78983dd6a..246ba20f0d 100644
+--- a/target/s390x/helper.c
++++ b/target/s390x/helper.c
+@@ -279,7 +279,7 @@ int s390_store_status(S390CPU *cpu, hwaddr addr, bool store_arch)
+         sa->ars[i] = cpu_to_be32(cpu->env.aregs[i]);
+     }
+     for (i = 0; i < 16; ++i) {
+-        sa->ars[i] = cpu_to_be64(cpu->env.cregs[i]);
++        sa->crs[i] = cpu_to_be64(cpu->env.cregs[i]);
+     }
+ 
+     cpu_physical_memory_unmap(sa, len, 1, len);
+-- 
+2.13.6
