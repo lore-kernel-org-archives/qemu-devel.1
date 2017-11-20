@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52551)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52572)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1eGntj-00068J-15
-	for qemu-devel@nongnu.org; Mon, 20 Nov 2017 10:22:14 -0500
+	(envelope-from <cohuck@redhat.com>) id 1eGntl-00068R-Az
+	for qemu-devel@nongnu.org; Mon, 20 Nov 2017 10:22:19 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1eGntZ-0000zC-Ne
-	for qemu-devel@nongnu.org; Mon, 20 Nov 2017 10:22:11 -0500
+	(envelope-from <cohuck@redhat.com>) id 1eGntf-00010s-6G
+	for qemu-devel@nongnu.org; Mon, 20 Nov 2017 10:22:13 -0500
 From: Cornelia Huck <cohuck@redhat.com>
-Date: Mon, 20 Nov 2017 16:21:43 +0100
-Message-Id: <20171120152145.25853-3-cohuck@redhat.com>
+Date: Mon, 20 Nov 2017 16:21:44 +0100
+Message-Id: <20171120152145.25853-4-cohuck@redhat.com>
 In-Reply-To: <20171120152145.25853-1-cohuck@redhat.com>
 References: <20171120152145.25853-1-cohuck@redhat.com>
-Subject: [Qemu-devel] [PULL for-2.11 2/4] s390x/tcg: fix DIAG 308 with > 1
- VCPU (MTTCG)
+Subject: [Qemu-devel] [PULL for-2.11 3/4] pc-bios/s390-ccw: Fix problem with
+ invalid virtio-scsi LUN when rebooting
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,35 +23,45 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: peter.maydell@linaro.org
 Cc: qemu-devel@nongnu.org, qemu-s390x@nongnu.org, rth@twiddle.net, agraf@suse.de, thuth@redhat.com, borntraeger@de.ibm.com, david@redhat.com, Cornelia Huck <cohuck@redhat.com>
 
-From: David Hildenbrand <david@redhat.com>
+From: Thomas Huth <thuth@redhat.com>
 
-Currently, multi threaded TCG with > 1 VCPU gets stuck during IPL, when
-the bios tries to switch to the loaded kernel via DIAG 308.
+When rebooting a guest that has a virtio-scsi disk, the s390-ccw
+bios sometimes bails out with an error message like this:
 
-As run_on_cpu() is used, we run into a deadlock after handling the reset.
-We need the iolock (just like KVM).
+! SCSI cannot report LUNs: STATUS=02 RSPN=70 KEY=05 CODE=25 QLFR=00, sure !
 
-Signed-off-by: David Hildenbrand <david@redhat.com>
-Message-Id: <20171116170526.12643-4-david@redhat.com>
-Reviewed-by: Thomas Huth <thuth@redhat.com>
+Enabling the scsi_req* tracing in QEMU shows that the ccw bios is
+trying to execute the REPORT LUNS SCSI command with a LUN != 0, and
+this causes the SCSI command to fail.
+Looks like we neither clear the BSS of the s390-ccw bios during reboot,
+nor do we explicitly set the default_scsi_device.lun value to 0, so
+this variable can contain random values from the OS after the reboot.
+By setting this variable explicitly to 0, the problem is fixed and
+the reboots always succeed.
+
+Buglink: https://bugzilla.redhat.com/show_bug.cgi?id=1514352
+Signed-off-by: Thomas Huth <thuth@redhat.com>
+Message-Id: <1510942228-22822-1-git-send-email-thuth@redhat.com>
+Acked-by: Christian Borntraeger <borntraeger@de.ibm.com>
+Reviewed-by: David Hildenbrand <david@redhat.com>
 Signed-off-by: Cornelia Huck <cohuck@redhat.com>
 ---
- target/s390x/misc_helper.c | 2 ++
- 1 file changed, 2 insertions(+)
+ pc-bios/s390-ccw/virtio-scsi.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
-diff --git a/target/s390x/misc_helper.c b/target/s390x/misc_helper.c
-index 4afd90b969..d272851e1c 100644
---- a/target/s390x/misc_helper.c
-+++ b/target/s390x/misc_helper.c
-@@ -103,7 +103,9 @@ void HELPER(diag)(CPUS390XState *env, uint32_t r1, uint32_t r3, uint32_t num)
-         break;
-     case 0x308:
-         /* ipl */
-+        qemu_mutex_lock_iothread();
-         handle_diag_308(env, r1, r3);
-+        qemu_mutex_unlock_iothread();
-         r = 0;
-         break;
-     case 0x288:
+diff --git a/pc-bios/s390-ccw/virtio-scsi.c b/pc-bios/s390-ccw/virtio-scsi.c
+index c92f5d3fa0..4fe4b9d261 100644
+--- a/pc-bios/s390-ccw/virtio-scsi.c
++++ b/pc-bios/s390-ccw/virtio-scsi.c
+@@ -223,7 +223,8 @@ static void virtio_scsi_locate_device(VDev *vdev)
+ 
+     for (target = 0; target <= vdev->config.scsi.max_target; target++) {
+         sdev->channel = channel;
+-        sdev->target = target; /* sdev->lun will be 0 here */
++        sdev->target = target;
++        sdev->lun = 0;          /* LUN has to be 0 for REPORT LUNS */
+         if (!scsi_report_luns(vdev, data, sizeof(data))) {
+             if (resp.response == VIRTIO_SCSI_S_BAD_TARGET) {
+                 continue;
 -- 
 2.13.6
