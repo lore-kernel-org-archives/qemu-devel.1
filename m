@@ -1,23 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44620)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46691)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1eGso9-0004WN-DO
-	for qemu-devel@nongnu.org; Mon, 20 Nov 2017 15:36:46 -0500
+	(envelope-from <mst@redhat.com>) id 1eGsvz-00075b-UY
+	for qemu-devel@nongnu.org; Mon, 20 Nov 2017 15:44:53 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1eGso8-0005CN-7M
-	for qemu-devel@nongnu.org; Mon, 20 Nov 2017 15:36:45 -0500
-References: <20171117190422.23626-1-eblake@redhat.com>
-	<6f4f6793-c3fc-6711-39af-971964adb37c@redhat.com>
-	<367da343-8031-56b4-a6d2-bf7191447bd5@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <aa14c192-9b58-ea65-da63-db1d357097cd@redhat.com>
-Date: Mon, 20 Nov 2017 14:36:32 -0600
+	(envelope-from <mst@redhat.com>) id 1eGsvw-0003FB-Qp
+	for qemu-devel@nongnu.org; Mon, 20 Nov 2017 15:44:51 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:36674)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1eGsvw-0003B4-Hx
+	for qemu-devel@nongnu.org; Mon, 20 Nov 2017 15:44:48 -0500
+Date: Mon, 20 Nov 2017 22:44:37 +0200
+From: "Michael S. Tsirkin" <mst@redhat.com>
+Message-ID: <20171120224001-mutt-send-email-mst@kernel.org>
+References: <1510865080-32027-1-git-send-email-changpeng.liu@intel.com>
+	<1510865080-32027-2-git-send-email-changpeng.liu@intel.com>
+	<20171120162631.GK4516@stefanha-x1.localdomain>
 MIME-Version: 1.0
-In-Reply-To: <367da343-8031-56b4-a6d2-bf7191447bd5@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="LnBg46IsTV4q0aQgdUNCXL30rp5IIk31X"
-Subject: Re: [Qemu-devel] [Qemu-block] [PATCH for-2.11] iotests: Fix 176 on
- 32-bit host
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20171120162631.GK4516@stefanha-x1.localdomain>
+Subject: Re: [Qemu-devel] [PATCH v5 1/4] vhost-user: add new vhost user
+ messages to support virtio config space
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,78 +29,127 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: John Snow <jsnow@redhat.com>, qemu-devel@nongnu.org
-Cc: kwolf@redhat.com, qemu-block@nongnu.org, mreitz@redhat.com
+To: Stefan Hajnoczi <stefanha@gmail.com>
+Cc: Changpeng Liu <changpeng.liu@intel.com>, qemu-devel@nongnu.org, pbonzini@redhat.com, marcandre.lureau@redhat.com, felipe@nutanix.com, james.r.harris@intel.com
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---LnBg46IsTV4q0aQgdUNCXL30rp5IIk31X
-From: Eric Blake <eblake@redhat.com>
-To: John Snow <jsnow@redhat.com>, qemu-devel@nongnu.org
-Cc: kwolf@redhat.com, qemu-block@nongnu.org, mreitz@redhat.com
-Message-ID: <aa14c192-9b58-ea65-da63-db1d357097cd@redhat.com>
-Subject: Re: [Qemu-block] [Qemu-devel] [PATCH for-2.11] iotests: Fix 176 on
- 32-bit host
-References: <20171117190422.23626-1-eblake@redhat.com>
- <6f4f6793-c3fc-6711-39af-971964adb37c@redhat.com>
- <367da343-8031-56b4-a6d2-bf7191447bd5@redhat.com>
-In-Reply-To: <367da343-8031-56b4-a6d2-bf7191447bd5@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+On Mon, Nov 20, 2017 at 04:26:31PM +0000, Stefan Hajnoczi wrote:
+> On Fri, Nov 17, 2017 at 04:44:37AM +0800, Changpeng Liu wrote:
+> > Add VHOST_USER_GET_CONFIG/VHOST_USER_SET_CONFIG messages which can be
+> > used for live migration of vhost user devices, also vhost user devices
+> > can benefit from the messages to get/set virtio config space from/to the
+> > I/O target. For the purpose to support virtio config space change,
+> > VHOST_USER_SET_CONFIG_FD message is added as the event notifier
+> > in case virtio config space change in the I/O target.
+> > 
+> > Signed-off-by: Changpeng Liu <changpeng.liu@intel.com>
+> > ---
+> >  docs/interop/vhost-user.txt       | 39 ++++++++++++++++
+> >  hw/virtio/vhost-user.c            | 98 +++++++++++++++++++++++++++++++++++++++
+> >  hw/virtio/vhost.c                 | 63 +++++++++++++++++++++++++
+> >  include/hw/virtio/vhost-backend.h |  8 ++++
+> >  include/hw/virtio/vhost.h         | 16 +++++++
+> >  5 files changed, 224 insertions(+)
+> > 
+> > diff --git a/docs/interop/vhost-user.txt b/docs/interop/vhost-user.txt
+> > index 954771d..1b98388 100644
+> > --- a/docs/interop/vhost-user.txt
+> > +++ b/docs/interop/vhost-user.txt
+> > @@ -116,6 +116,16 @@ Depending on the request type, payload can be:
+> >      - 3: IOTLB invalidate
+> >      - 4: IOTLB access fail
+> >  
+> > + * Virtio device config space
+> > +   ---------------------------
+> > +   | offset | size | payload |
+> > +   ---------------------------
+> > +
+> > +   Offset: a 32-bit offset of virtio device's configuration space
+> 
+> s/of/in the/
+> 
+> > +   Size: a 32-bit size of configuration space that master wanted to change
+> 
+> Is this also used for GET_CONFIG?  If yes, I suggest "a 32-bit
+> configuration space access size in bytes".
+> 
+> Please mention that Size must be <= 256 bytes.
+> 
+> > +   Payload: a 256-bytes array holding the contents of the virtio
+> > +       device's configuration space
+> 
+> What about bytes outside the [offset, offset+size) range?  I guess they
+> must be 0 and are ignored by the master/slave.
+> 
+> Would it be cleaner to make Payload a variable-sized field with Size
+> bytes?  That way it's not necessary to transfer 0s and memcpy() a subset
+> of the payload array.
+> 
+> > +
+> >  In QEMU the vhost-user message is implemented with the following struct:
+> >  
+> >  typedef struct VhostUserMsg {
+> > @@ -129,6 +139,7 @@ typedef struct VhostUserMsg {
+> >          VhostUserMemory memory;
+> >          VhostUserLog log;
+> >          struct vhost_iotlb_msg iotlb;
+> > +        VhostUserConfig config;
+> >      };
+> >  } QEMU_PACKED VhostUserMsg;
+> >  
+> > @@ -596,6 +607,34 @@ Master message types
+> >        and expect this message once (per VQ) during device configuration
+> >        (ie. before the master starts the VQ).
+> >  
+> > + * VHOST_USER_GET_CONFIG
+> > +      Id: 24
+> > +      Equivalent ioctl: N/A
+> > +      Master payload: virtio device config space
+> > +
+> > +      Submitted by the vhost-user master to fetch the contents of the virtio
+> > +      device configuration space. The vhost-user master may cache the contents
+> > +      to avoid repeated VHOST_USER_GET_CONFIG calls.
+> > +
+> > +* VHOST_USER_SET_CONFIG
+> > +      Id: 25
+> > +      Equivalent ioctl: N/A
+> > +      Master payload: virtio device config space
+> > +
+> > +      Submitted by the vhost-user master when the Guest changes the virtio
+> > +      device configuration space and also can be used for live migration
+> > +      on the destination host.
+> 
+> There might be security issues if the vhost slave cannot tell whether
+> SET_CONFIG is coming from the guest driver or from the master process
+> (live migration).  Typically certain fields are read-only for the guest
+> driver.  Maybe those fields need to be set by the master after live
+> migration.
+> 
+> One way to solve this is adding a flags field to the message.  A special
+> flag can be used for live migration so the slave knows that this
+> SET_CONFIG message is allowed to write to read-only fields.
+> 
+> It's also worth documenting that slaves MUST NOT accept SET_CONFIG for
+> read-only configuration space fields unless the live migration bit is
+> set.  Hopefully this will remind implementors to think through the
+> security issues.
 
-On 11/17/2017 04:59 PM, John Snow wrote:
->>> So for this test, the easiest solution is to filter out the
->>> actual hash value.  Broken in commit 4096974e.
->>
->> Of course, if Kevin sends a v2 pull, it's probably better to just squa=
-sh
->> this in to my original testsuite change (since a v2 would probably
->> invalidate that commit id).
->>
->=20
-> Whichever way you go,
+Live migrations is supposed to be migrating guest writeable state too.
+If you mean migrating RO fields like size, then
+I don't think it's a good idea to reuse SET_CONFIG for that.
+SET_CONFIG should obey exactly the virtio semantics.
 
-Commit 4096974e has already landed in master, so this commit message is
-correct as-is and belongs in the next pull request (whether for -rc2 or
--rc3 depends on timing).
+And I agree, it should say that slave must treat it as a write,
+and get config as a read according to virtio semantics.
 
->=20
-> Reviewed-by: John Snow <jsnow@redhat.com>
->=20
-> I don't know how important it is to nail this down, but the purpose of
-> this command is primarily for sanity testing and not necessarily betwee=
-n
-> architectures, so this might just be a limitation to document.
->=20
-> Also, don't use this for anything except testing.
+If someone needs to pass configuration from qemu to
+slave, let's add specific messages with precisely defined semantics.
 
-Indeed, the name of x-debug-block-dirty-bitmap-sha256 already implies
-its limited portability; but it also gives us free reign to change it's
-behavior if we find something we like better for the same ease of bitmap
-testing/debugging.
+Which reminds me.
 
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
+virtio 1 changed endian-ness for config.
 
+I think we should specify it's all virtio 1 format, and
+just disallow vhost blk for virtio 0 guests.
 
---LnBg46IsTV4q0aQgdUNCXL30rp5IIk31X
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
-
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAloTPNAACgkQp6FrSiUn
-Q2qA6Qf9Ew30rNKoR1e97zSvHDM01t4eIkVOh/z6xTHmw3zbBoLYZ8lg4nCpv/vl
-oVrcOdh+c5SCLHjrW9JWHyvfl96JL6KMWtGgHDuKLF4Yb9kIGiKzoAd2OXWObrs0
-PooGL4mZt0gYjbpnc9qVO1KxDpQJ8XKD51U68ICSif24NbdWej/EK4JX/EJMR3kQ
-jIQEyjnD47X34hM0MpQKnsjFHAj5sW1wOIJSA+RjLYvc1GXVEqWXfhhtO9c7TlFX
-9NXQOuk5V8gUC8BMnBv8NCgaBqXNBhLgQ/LzLTUq6yekiQHAGN8qA5JdLjelQwkd
-koqMmOmEKpv0Ok3pIrv8R7lgSsZPxQ==
-=al/A
------END PGP SIGNATURE-----
-
---LnBg46IsTV4q0aQgdUNCXL30rp5IIk31X--
+-- 
+MST
