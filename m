@@ -1,22 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58185)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58843)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <gengdongjiu@huawei.com>) id 1eGlH7-0000wE-VK
-	for qemu-devel@nongnu.org; Mon, 20 Nov 2017 07:34:10 -0500
+	(envelope-from <borntraeger@de.ibm.com>) id 1eGlIc-0001ax-Ik
+	for qemu-devel@nongnu.org; Mon, 20 Nov 2017 07:35:43 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <gengdongjiu@huawei.com>) id 1eGlH4-0008Kg-TW
-	for qemu-devel@nongnu.org; Mon, 20 Nov 2017 07:34:09 -0500
-Received: from szxga04-in.huawei.com ([45.249.212.190]:2797)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_ARCFOUR_SHA1:16) (Exim 4.71)
-	(envelope-from <gengdongjiu@huawei.com>) id 1eGlH4-0008Ij-Ai
-	for qemu-devel@nongnu.org; Mon, 20 Nov 2017 07:34:06 -0500
-From: gengdongjiu <gengdongjiu@huawei.com>
-Message-ID: <8726068c-1112-eaea-5315-ec17ae37ae33@huawei.com>
-Date: Mon, 20 Nov 2017 20:32:38 +0800
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: [Qemu-devel] [question] mask SIGBUS in qemu main thread
+	(envelope-from <borntraeger@de.ibm.com>) id 1eGlIZ-0000VT-Fc
+	for qemu-devel@nongnu.org; Mon, 20 Nov 2017 07:35:42 -0500
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:52074)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <borntraeger@de.ibm.com>)
+	id 1eGlIZ-0000VE-5f
+	for qemu-devel@nongnu.org; Mon, 20 Nov 2017 07:35:39 -0500
+Received: from pps.filterd (m0098394.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
+	vAKCWEo9065154
+	for <qemu-devel@nongnu.org>; Mon, 20 Nov 2017 07:35:33 -0500
+Received: from e06smtp14.uk.ibm.com (e06smtp14.uk.ibm.com [195.75.94.110])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2ebx2kv5q7-1
+	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Mon, 20 Nov 2017 07:35:32 -0500
+Received: from localhost
+	by e06smtp14.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	Only! Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <borntraeger@de.ibm.com>;
+	Mon, 20 Nov 2017 12:35:30 -0000
+From: Christian Borntraeger <borntraeger@de.ibm.com>
+Date: Mon, 20 Nov 2017 13:35:23 +0100
+Message-Id: <20171120123525.147663-1-borntraeger@de.ibm.com>
+Subject: [Qemu-devel] [PATCH/RFC 0/2] valgrind fallout for s390x/kvm
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,70 +35,21 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: QEMU Developers <qemu-devel@nongnu.org>, mst@redhat.com, "peter.maydell@linaro.org" <peter.maydell@linaro.org>, Ingo Molnar <mingo@redhat.com>
-Cc: Huangshaoyu <huangshaoyu@huawei.com>, Wuquanming <wuquanming@huawei.com>
+To: Cornelia Huck <cohuck@redhat.com>
+Cc: qemu-devel <qemu-devel@nongnu.org>, qemu-s390x <qemu-s390x@nongnu.org>, Halil Pasic <pasic@linux.vnet.ibm.com>, Alexander Graf <agraf@suse.de>, Richard Henderson <rth@twiddle.net>, Thomas Huth <thuth@redhat.com>, Christian Borntraeger <borntraeger@de.ibm.com>
 
-Hi all,
-  sorry to disturb you, I have a question to consult with you why the SIGBUS mask bit is set in the Qemu main thread?
-do we not want to Qemu main thread to handle the SIGBUS signal? thanks.
-As shown in [1], the Qemu main thread PID is 30976.
-"cat /proc/30976/status" in [2], we can see the "SigBlk: 0000000010002240", SIGBUS block bit is 7, so the SIGBUS block bit is set.
-then the Qemu main thread will not be woken up if there is SIGBUS set to it.
-thanks!
+I need these patches below to run valgrind on s390x/kvm without
+a lot of false positives.
 
 
-[1]:
-# ps -eL | grep "qemu"
-30976 30976 pts/7    00:00:00 qemu-system-x86
-30976 30977 pts/7    00:00:00 qemu-system-x86
+Christian Borntraeger (2):
+  s390x/migration: use zero flag parameter
+  s390x/kvm: use valgrind annotations for kvm device attributes
 
-[2]
-# cat /proc/30976/status
-Name:   qemu-system-x86
-State:  S (sleeping)
-Tgid:   30976
-Ngid:   0
-Pid:    30976
-PPid:   34807
-TracerPid:      0
-Uid:    1000    1000    1000    1000
-Gid:    1000    1000    1000    1000
-FDSize: 256
-Groups: 4 24 27 30 46 108 114 115 1000
-NStgid: 30976
-NSpid:  30976
-NSpgid: 30976
-NSsid:  34772
-VmPeak:   604260 kB
-VmSize:   538724 kB
-VmLck:         0 kB
-VmPin:         0 kB
-VmHWM:     34176 kB
-VmRSS:     34176 kB
-VmData:   294308 kB
-VmStk:       136 kB
-VmExe:      4808 kB
-VmLib:     36144 kB
-VmPTE:       528 kB
-VmPMD:        16 kB
-VmSwap:        0 kB
-HugetlbPages:          0 kB
-Threads:        2
-SigQ:   6/514067
-SigPnd: 0000000000000000
-ShdPnd: 0000000000000000
-SigBlk: 0000000010002240
-SigIgn: 0000000000001000
-SigCgt: 0000000180004243
-CapInh: 0000000000000000
-CapPrm: 0000000000000000
-CapEff: 0000000000000000
-CapBnd: 0000003fffffffff
-CapAmb: 0000000000000000
-Seccomp:        0
-Cpus_allowed:   ffff,ffffffff
-Cpus_allowed_list:      0-47
-Mems_allowed:   00000000,00000003
-Mems_allowed_list:      0-1
-voluntary_ctxt_switches:        7638
-nonvoluntary_ctxt_switches:     3
+ hw/s390x/s390-skeys-kvm.c    | 12 ++++++++-
+ hw/s390x/s390-stattrib-kvm.c |  7 ++++++
+ target/s390x/kvm.c           | 59 ++++++++++++++++++++++++++++++++++++++------
+ 3 files changed, 69 insertions(+), 9 deletions(-)
+
+-- 
+2.9.4
