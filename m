@@ -1,28 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60505)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34852)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1eGmqn-0005Vg-7Z
-	for qemu-devel@nongnu.org; Mon, 20 Nov 2017 09:15:11 -0500
+	(envelope-from <lprosek@redhat.com>) id 1eGmxz-0008Cp-T9
+	for qemu-devel@nongnu.org; Mon, 20 Nov 2017 09:22:32 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1eGmqi-0005t2-Tc
-	for qemu-devel@nongnu.org; Mon, 20 Nov 2017 09:15:05 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:40956)
+	(envelope-from <lprosek@redhat.com>) id 1eGmxw-00010I-Oy
+	for qemu-devel@nongnu.org; Mon, 20 Nov 2017 09:22:31 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:49584)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1eGmqi-0005sN-KA
-	for qemu-devel@nongnu.org; Mon, 20 Nov 2017 09:15:00 -0500
-Date: Mon, 20 Nov 2017 14:14:50 +0000
-From: "Daniel P. Berrange" <berrange@redhat.com>
-Message-ID: <20171120141450.GL31943@redhat.com>
-Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
-References: <1510899814-19372-1-git-send-email-yang.zhong@intel.com>
-	<20171117135409.GA3669@stefanha-x1.localdomain>
-	<20171117140620.GS25830@redhat.com>
-	<20171120085442.GB6622@yangzhon-Virtual>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20171120085442.GB6622@yangzhon-Virtual>
-Subject: Re: [Qemu-devel] [PATCH] rcu: reduce half heap memory size by
- malloc_trim()
+	(Exim 4.71) (envelope-from <lprosek@redhat.com>) id 1eGmxw-000102-IT
+	for qemu-devel@nongnu.org; Mon, 20 Nov 2017 09:22:28 -0500
+From: Ladi Prosek <lprosek@redhat.com>
+Date: Mon, 20 Nov 2017 15:22:16 +0100
+Message-Id: <20171120142216.17832-1-lprosek@redhat.com>
+Subject: [Qemu-devel] [PATCH] msix: don't mask already masked vectors on
+ reset
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,75 +22,50 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Zhong Yang <yang.zhong@intel.com>
-Cc: qemu-devel@nongnu.org, pbonzini@redhat.com, stefanha@redhat.com, anthony.xu@intel.com, stone.xulei@huawei.com, arei.gonglei@huawei.com, wangxinxin.wang@huawei.com, weidong.huang@huawei.com, zhang.zhanghailiang@huawei.com, liujunjie23@huawei.com
+To: qemu-devel@nongnu.org
+Cc: mst@redhat.com, marcel@redhat.com, geoff@hostfission.com
 
-On Mon, Nov 20, 2017 at 04:54:42PM +0800, Zhong Yang wrote:
-> On Fri, Nov 17, 2017 at 02:06:20PM +0000, Daniel P. Berrange wrote:
-> > On Fri, Nov 17, 2017 at 01:54:09PM +0000, Stefan Hajnoczi wrote:
-> > > On Fri, Nov 17, 2017 at 02:23:34PM +0800, Yang Zhong wrote:
-> > > > diff --git a/util/rcu.c b/util/rcu.c
-> > > > index ca5a63e..8d491a6 100644
-> > > > --- a/util/rcu.c
-> > > > +++ b/util/rcu.c
-> > > > @@ -26,6 +26,7 @@
-> > > >   * IBM's contributions to this file may be relicensed under LGPLv2 or later.
-> > > >   */
-> > > >  
-> > > > +#include <malloc.h>
-> > > 
-> > > This header file is not mentioned in the C99 standard or POSIX.  It is
-> > > probably not available on all host OSes that QEMU supports.  Please use
-> > > #ifdef CONFIG_LINUX.
-> > > 
-> > > >  #include "qemu/osdep.h"
-> > > >  #include "qemu-common.h"
-> > > >  #include "qemu/rcu.h"
-> > > > @@ -272,6 +273,9 @@ static void *call_rcu_thread(void *opaque)
-> > > >              node->func(node);
-> > > >          }
-> > > >          qemu_mutex_unlock_iothread();
-> > > > +#ifdef CONFIG_LINUX
-> > > > +        malloc_trim(0);
-> > > > +#endif
-> > > 
-> > > It is important that the rcu thread isn't overzealous in minimizing heap
-> > > size if that means ordinary malloc(3) calls will experience latency
-> > > spikes.  Please leave a few MB free so that malloc(3) doesn't take the
-> > > slow path.
-> > 
-> > If you pass '0' the docs say that the minimum amount is left in the
-> > heap, per M_TOP_PAD, which is 128kb.
-> > 
-> > Strangely the mallopt(3) man page suggests, that free() should automatically
-> > trim the heap when its size exceeds M_TOP_TRIM, which is again 128kb by
-> > default.  So I'm puzzelled by malloc_trim() would be needed unless there
-> > are scenarios in which free() won't trim, that aren't mentioned in the
-> > manpage.
-> 
->   In fact, i firstly adopted mallopt() solution to optimize the heap memory,
->   but i found this function is NOT useful, which are difference with MAN's
->   description, so i had to swith to use malloc_trim().
+msix_mask_all() is supposed to invoke the release vector notifier if the state of the
+respective vector changed from unmasked or masked. The way it's currently called from
+msix_reset(), though, may result in calling the release notifier even if the vector
+is already masked.
 
+1) msix_reset() clears out the msix_cap field and the msix_table.
+2) msix_mask_all() runs with was_masked=false for all vectors because of 1), which
+   results in calling the release notifier on all vectors.
+3) if msix_reset() is subsequently called again, it goes through the same steps and
+   calls the release notifier on all vectors again.
 
-> > Also, how does malloc_trim interact with tcmalloc.so that people often
-> > use in preference to glibc's built in malloc ?
->   Thanks, you reminded me to consider tcmalloc or jemalloc.
->  
->   Whether below code is more suitable? thanks!
->   #if defined(CONFIG_LINUX) && defined(__GLIBC__)
->          malloc_trim(0);
->   #endif
+This commit moves msix_mask_all() up so it runs before the device state is lost. And
+it adds a call to msix_update_function_masked() so that the device remembers that
+MSI-X is masked.
 
-Both of those macro symbols will still be defined even when tcmalloc/jemalloc
-are in use.
+This is likely a low impact issue, found while debugging an already broken device. It
+is however easy to fix and the expectation that the use and release notifier invocations
+are always balanced is very natural.
 
-I wonder if tcmalloc/jemalloc even suffer from the same problem that libc's
-builtin malloc has ?
+Signed-off-by: Ladi Prosek <lprosek@redhat.com>
+---
+ hw/pci/msix.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
-Regards,
-Daniel
+diff --git a/hw/pci/msix.c b/hw/pci/msix.c
+index c944c02135..34656de9b0 100644
+--- a/hw/pci/msix.c
++++ b/hw/pci/msix.c
+@@ -500,11 +500,12 @@ void msix_reset(PCIDevice *dev)
+         return;
+     }
+     msix_clear_all_vectors(dev);
++    msix_mask_all(dev, dev->msix_entries_nr);
+     dev->config[dev->msix_cap + MSIX_CONTROL_OFFSET] &=
+ 	    ~dev->wmask[dev->msix_cap + MSIX_CONTROL_OFFSET];
+     memset(dev->msix_table, 0, dev->msix_entries_nr * PCI_MSIX_ENTRY_SIZE);
+     memset(dev->msix_pba, 0, QEMU_ALIGN_UP(dev->msix_entries_nr, 64) / 8);
+-    msix_mask_all(dev, dev->msix_entries_nr);
++    msix_update_function_masked(dev);
+ }
+ 
+ /* PCI spec suggests that devices make it possible for software to configure
 -- 
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
+2.13.5
