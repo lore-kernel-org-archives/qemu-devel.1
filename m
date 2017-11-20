@@ -1,18 +1,18 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51370)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51369)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <anton.nefedov@virtuozzo.com>) id 1eGpI3-0002f9-EF
+	(envelope-from <anton.nefedov@virtuozzo.com>) id 1eGpI3-0002f6-Dm
 	for qemu-devel@nongnu.org; Mon, 20 Nov 2017 11:51:24 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <anton.nefedov@virtuozzo.com>) id 1eGpHz-0003pg-34
+	(envelope-from <anton.nefedov@virtuozzo.com>) id 1eGpHz-0003px-HX
 	for qemu-devel@nongnu.org; Mon, 20 Nov 2017 11:51:23 -0500
 From: Anton Nefedov <anton.nefedov@virtuozzo.com>
-Date: Mon, 20 Nov 2017 19:50:58 +0300
-Message-Id: <1511196664-85304-2-git-send-email-anton.nefedov@virtuozzo.com>
+Date: Mon, 20 Nov 2017 19:50:59 +0300
+Message-Id: <1511196664-85304-3-git-send-email-anton.nefedov@virtuozzo.com>
 In-Reply-To: <1511196664-85304-1-git-send-email-anton.nefedov@virtuozzo.com>
 References: <1511196664-85304-1-git-send-email-anton.nefedov@virtuozzo.com>
 MIME-Version: 1.0
 Content-Type: text/plain
-Subject: [Qemu-devel] [PATCH 1/7] qapi: add unmap to BlockDeviceStats
+Subject: [Qemu-devel] [PATCH 2/7] ide: account UNMAP (TRIM) operations
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,95 +27,45 @@ Cc: kwolf@redhat.com, mreitz@redhat.com, armbru@redhat.com, jsnow@redhat.com, pb
 Signed-off-by: Anton Nefedov <anton.nefedov@virtuozzo.com>
 Reviewed-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 ---
- qapi/block-core.json       | 20 ++++++++++++++++++++
- include/block/accounting.h |  1 +
- block/qapi.c               |  6 ++++++
- 3 files changed, 27 insertions(+)
+ hw/ide/core.c | 12 ++++++++++++
+ 1 file changed, 12 insertions(+)
 
-diff --git a/qapi/block-core.json b/qapi/block-core.json
-index 76bf50f..ba2705d 100644
---- a/qapi/block-core.json
-+++ b/qapi/block-core.json
-@@ -730,6 +730,23 @@
- # @timed_stats: Statistics specific to the set of previously defined
- #               intervals of time (Since 2.5)
- #
-+# @unmap_bytes: The number of bytes unmapped by the device (Since 2.12)
-+#
-+# @unmap_operations: The number of unmap operations performed by the device
-+#                    (Since 2.12)
-+#
-+# @unmap_total_time_ns: Total time spent on unmap operations in nano-seconds
-+#                       (Since 2.12)
-+#
-+# @unmap_merged: Number of unmap requests that have been merged into another
-+#                request (Since 2.12)
-+#
-+# @failed_unmap_operations: The number of failed unmap operations performed
-+#                           by the device (Since 2.12)
-+#
-+# @invalid_unmap_operations: The number of invalid unmap operations performed
-+#                            by the device (Since 2.12)
-+#
- # Since: 0.14.0
- ##
- { 'struct': 'BlockDeviceStats',
-@@ -741,6 +758,9 @@
-            'failed_rd_operations': 'int', 'failed_wr_operations': 'int',
-            'failed_flush_operations': 'int', 'invalid_rd_operations': 'int',
-            'invalid_wr_operations': 'int', 'invalid_flush_operations': 'int',
-+           'unmap_bytes' : 'int', 'unmap_operations': 'int',
-+           'unmap_total_time_ns': 'int', 'unmap_merged': 'int',
-+           'failed_unmap_operations': 'int', 'invalid_unmap_operations': 'int',
-            'account_invalid': 'bool', 'account_failed': 'bool',
-            'timed_stats': ['BlockDeviceTimedStats'] } }
+diff --git a/hw/ide/core.c b/hw/ide/core.c
+index 471d0c9..2e4dea7 100644
+--- a/hw/ide/core.c
++++ b/hw/ide/core.c
+@@ -389,6 +389,7 @@ typedef struct TrimAIOCB {
+     QEMUIOVector *qiov;
+     BlockAIOCB *aiocb;
+     int i, j;
++    BlockAcctCookie acct;
+ } TrimAIOCB;
  
-diff --git a/include/block/accounting.h b/include/block/accounting.h
-index b833d26..4e53c4a 100644
---- a/include/block/accounting.h
-+++ b/include/block/accounting.h
-@@ -35,6 +35,7 @@ enum BlockAcctType {
-     BLOCK_ACCT_READ,
-     BLOCK_ACCT_WRITE,
-     BLOCK_ACCT_FLUSH,
-+    BLOCK_ACCT_UNMAP,
-     BLOCK_MAX_IOTYPE,
- };
+ static void trim_aio_cancel(BlockAIOCB *acb)
+@@ -426,6 +427,14 @@ static void ide_trim_bh_cb(void *opaque)
+ static void ide_issue_trim_cb(void *opaque, int ret)
+ {
+     TrimAIOCB *iocb = opaque;
++    if (iocb->i >= 0) {
++        if (ret >= 0) {
++            block_acct_done(blk_get_stats(iocb->blk), &iocb->acct);
++        } else {
++            block_acct_failed(blk_get_stats(iocb->blk), &iocb->acct);
++        }
++    }
++
+     if (ret >= 0) {
+         while (iocb->j < iocb->qiov->niov) {
+             int j = iocb->j;
+@@ -442,6 +451,9 @@ static void ide_issue_trim_cb(void *opaque, int ret)
+                     continue;
+                 }
  
-diff --git a/block/qapi.c b/block/qapi.c
-index fc10f0a..6e110f2 100644
---- a/block/qapi.c
-+++ b/block/qapi.c
-@@ -396,24 +396,30 @@ static void bdrv_query_blk_stats(BlockDeviceStats *ds, BlockBackend *blk)
- 
-     ds->rd_bytes = stats->nr_bytes[BLOCK_ACCT_READ];
-     ds->wr_bytes = stats->nr_bytes[BLOCK_ACCT_WRITE];
-+    ds->unmap_bytes = stats->nr_bytes[BLOCK_ACCT_UNMAP];
-     ds->rd_operations = stats->nr_ops[BLOCK_ACCT_READ];
-     ds->wr_operations = stats->nr_ops[BLOCK_ACCT_WRITE];
-+    ds->unmap_operations = stats->nr_ops[BLOCK_ACCT_UNMAP];
- 
-     ds->failed_rd_operations = stats->failed_ops[BLOCK_ACCT_READ];
-     ds->failed_wr_operations = stats->failed_ops[BLOCK_ACCT_WRITE];
-     ds->failed_flush_operations = stats->failed_ops[BLOCK_ACCT_FLUSH];
-+    ds->failed_unmap_operations = stats->failed_ops[BLOCK_ACCT_UNMAP];
- 
-     ds->invalid_rd_operations = stats->invalid_ops[BLOCK_ACCT_READ];
-     ds->invalid_wr_operations = stats->invalid_ops[BLOCK_ACCT_WRITE];
-     ds->invalid_flush_operations =
-         stats->invalid_ops[BLOCK_ACCT_FLUSH];
-+    ds->invalid_unmap_operations = stats->invalid_ops[BLOCK_ACCT_UNMAP];
- 
-     ds->rd_merged = stats->merged[BLOCK_ACCT_READ];
-     ds->wr_merged = stats->merged[BLOCK_ACCT_WRITE];
-+    ds->unmap_merged = stats->merged[BLOCK_ACCT_UNMAP];
-     ds->flush_operations = stats->nr_ops[BLOCK_ACCT_FLUSH];
-     ds->wr_total_time_ns = stats->total_time_ns[BLOCK_ACCT_WRITE];
-     ds->rd_total_time_ns = stats->total_time_ns[BLOCK_ACCT_READ];
-     ds->flush_total_time_ns = stats->total_time_ns[BLOCK_ACCT_FLUSH];
-+    ds->unmap_total_time_ns = stats->total_time_ns[BLOCK_ACCT_UNMAP];
- 
-     ds->has_idle_time_ns = stats->last_access_time_ns > 0;
-     if (ds->has_idle_time_ns) {
++                block_acct_start(blk_get_stats(iocb->blk), &iocb->acct,
++                                 count << BDRV_SECTOR_BITS, BLOCK_ACCT_UNMAP);
++
+                 /* Got an entry! Submit and exit.  */
+                 iocb->aiocb = blk_aio_pdiscard(iocb->blk,
+                                                sector << BDRV_SECTOR_BITS,
 -- 
 2.7.4
