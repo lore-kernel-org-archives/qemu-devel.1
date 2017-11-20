@@ -1,34 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38831)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39803)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1eGofL-0008Fc-05
-	for qemu-devel@nongnu.org; Mon, 20 Nov 2017 11:11:29 -0500
+	(envelope-from <vsementsov@virtuozzo.com>) id 1eGoj0-0001Kj-2i
+	for qemu-devel@nongnu.org; Mon, 20 Nov 2017 11:15:15 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1eGofE-0008IY-VR
-	for qemu-devel@nongnu.org; Mon, 20 Nov 2017 11:11:22 -0500
-Received: from indium.canonical.com ([91.189.90.7]:35634)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1eGofE-0008HS-P3
-	for qemu-devel@nongnu.org; Mon, 20 Nov 2017 11:11:16 -0500
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1eGofD-0002mf-3V
-	for <qemu-devel@nongnu.org>; Mon, 20 Nov 2017 16:11:15 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 00EF62E80CE
-	for <qemu-devel@nongnu.org>; Mon, 20 Nov 2017 16:11:15 +0000 (UTC)
+	(envelope-from <vsementsov@virtuozzo.com>) id 1eGoiu-0002Km-7z
+	for qemu-devel@nongnu.org; Mon, 20 Nov 2017 11:15:10 -0500
+References: <20171120145006.551-1-kwolf@redhat.com>
+	<20171120145006.551-3-kwolf@redhat.com>
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Message-ID: <062bb311-ec52-b91e-70c2-97598b35ff8a@virtuozzo.com>
+Date: Mon, 20 Nov 2017 19:14:57 +0300
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Mon, 20 Nov 2017 16:01:05 -0000
-From: "Laszlo Ersek \(Red Hat\)" <lersek@redhat.com>
-Reply-To: Bug 1717708 <1717708@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <150558614762.29770.16367876405044972592.malonedeb@chaenomeles.canonical.com>
-Message-Id: <151119366567.13258.15910888029004794798.malone@soybean.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1717708] Re: QEMU aarch64 can't run Windows ARM64
- iso's
+In-Reply-To: <20171120145006.551-3-kwolf@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
+Content-Language: en-US
+Subject: Re: [Qemu-devel] [PATCH for-2.11 2/3] block: Add errp to
+ bdrv_all_goto_snapshot()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,51 +25,96 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
+Cc: mreitz@redhat.com, eblake@redhat.com, jsnow@redhat.com, den@openvz.org, qemu-devel@nongnu.org
 
-@Andrew: are you implying that you successfully rebuilt the virtio guest
-drivers for ARM64 Windows? If that's the case, could you please share
-specifics about the build setup? I'm not the one working on the virtio
-GPU driver for Windows, but I assume your aarch64 build steps would
-apply to that driver similarly. Thank you.
+20.11.2017 17:50, Kevin Wolf wrote:
+> Signed-off-by: Kevin Wolf <kwolf@redhat.com>
+> ---
+>   include/block/snapshot.h |  3 ++-
+>   block/snapshot.c         | 11 ++++++-----
+>   migration/savevm.c       |  6 +++---
+>   3 files changed, 11 insertions(+), 9 deletions(-)
+>
+> diff --git a/include/block/snapshot.h b/include/block/snapshot.h
+> index aeb80405e8..9407799941 100644
+> --- a/include/block/snapshot.h
+> +++ b/include/block/snapshot.h
+> @@ -84,7 +84,8 @@ int bdrv_snapshot_load_tmp_by_id_or_name(BlockDriverState *bs,
+>   bool bdrv_all_can_snapshot(BlockDriverState **first_bad_bs);
+>   int bdrv_all_delete_snapshot(const char *name, BlockDriverState **first_bsd_bs,
+>                                Error **err);
+> -int bdrv_all_goto_snapshot(const char *name, BlockDriverState **first_bsd_bs);
+> +int bdrv_all_goto_snapshot(const char *name, BlockDriverState **first_bad_bs,
+> +                           Error **errp);
+>   int bdrv_all_find_snapshot(const char *name, BlockDriverState **first_bad_bs);
+>   int bdrv_all_create_snapshot(QEMUSnapshotInfo *sn,
+>                                BlockDriverState *vm_state_bs,
+> diff --git a/block/snapshot.c b/block/snapshot.c
+> index 9c941e638d..13ec3b1c8c 100644
+> --- a/block/snapshot.c
+> +++ b/block/snapshot.c
+> @@ -467,9 +467,10 @@ fail:
+>   }
+>   
+>   
+> -int bdrv_all_goto_snapshot(const char *name, BlockDriverState **first_bad_bs)
+> +int bdrv_all_goto_snapshot(const char *name, BlockDriverState **first_bad_bs,
+> +                           Error **errp)
+>   {
+> -    int err = 0;
+> +    int ret = 0;
+>       BlockDriverState *bs;
+>       BdrvNextIterator it;
+>   
+> @@ -478,10 +479,10 @@ int bdrv_all_goto_snapshot(const char *name, BlockDriverState **first_bad_bs)
+>   
+>           aio_context_acquire(ctx);
+>           if (bdrv_can_snapshot(bs)) {
+> -            err = bdrv_snapshot_goto(bs, name, NULL);
+> +            ret = bdrv_snapshot_goto(bs, name, errp);
+>           }
+>           aio_context_release(ctx);
+> -        if (err < 0) {
+> +        if (ret < 0) {
+>               bdrv_next_cleanup(&it);
+>               goto fail;
+>           }
+> @@ -489,7 +490,7 @@ int bdrv_all_goto_snapshot(const char *name, BlockDriverState **first_bad_bs)
+>   
+>   fail:
+>       *first_bad_bs = bs;
+> -    return err;
+> +    return ret;
+>   }
+>   
+>   int bdrv_all_find_snapshot(const char *name, BlockDriverState **first_bad_bs)
+> diff --git a/migration/savevm.c b/migration/savevm.c
+> index 4a88228614..192f2d82cd 100644
+> --- a/migration/savevm.c
+> +++ b/migration/savevm.c
+> @@ -2346,10 +2346,10 @@ int load_snapshot(const char *name, Error **errp)
+>       /* Flush all IO requests so they don't interfere with the new state.  */
+>       bdrv_drain_all_begin();
+>   
+> -    ret = bdrv_all_goto_snapshot(name, &bs);
+> +    ret = bdrv_all_goto_snapshot(name, &bs, errp);
+>       if (ret < 0) {
+> -        error_setg(errp, "Error %d while activating snapshot '%s' on '%s'",
+> -                     ret, name, bdrv_get_device_name(bs));
+> +        error_prepend(errp, "Could not load snapshot '%s' on '%s': ",
+> +                      name, bdrv_get_device_name(bs));
 
--- =
+possible resulting msg: "Could not load snapshot 'snap0' on 'dev0': 
+Failed to load snapshot". a bit weird. with this fixed or not:
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1717708
+Reviewed-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 
-Title:
-  QEMU aarch64 can't run Windows ARM64 iso's
+>           goto err_drain;
+>       }
+>   
 
-Status in QEMU:
-  New
 
-Bug description:
-  Hi,
-  recently Windows ARM64 ISOs have been posted on the internet..
-  just checked with latest QEMU 2.10 release from =
-
-  https://qemu.weilnetz.de/w64/qemu-w64-setup-20170830.exe =
-
-  "h:\qemu\qemu-system-aarch64.exe" -boot d -cdrom h:\iso\16353.1000.170825=
--1423.RS_PRERELEASE_CLIENTPRO_OEMRET_ARM64FRE_ES-ES.ISO -m 2048 -cpu cortex=
--a57 -smp 1 -machine virt
-  seems no video output..
-  checked various machine options for example versatilepb (says guest has n=
-ot initialized the guest)..
-
-  so don't know if it's a QEMU bug or lacking feature but can support
-  running Windows ARM64 builds (would be nice if you can add a
-  Snapdragon835 machine type which is which first machines will be
-  running..)
-
-  =
-
-  note running a Windows x64 ISO with similar parameters works (removing -c=
-pu and -machine as not needed)
-
-  thanks..
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1717708/+subscriptions
+-- 
+Best regards,
+Vladimir
