@@ -1,43 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45352)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45743)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <borntraeger@de.ibm.com>) id 1eGivK-0000Gy-UW
-	for qemu-devel@nongnu.org; Mon, 20 Nov 2017 05:03:31 -0500
+	(envelope-from <clg@kaod.org>) id 1eGiw2-0000hL-PE
+	for qemu-devel@nongnu.org; Mon, 20 Nov 2017 05:04:18 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <borntraeger@de.ibm.com>) id 1eGivH-00019B-PB
-	for qemu-devel@nongnu.org; Mon, 20 Nov 2017 05:03:30 -0500
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:35404
-	helo=mx0a-001b2d01.pphosted.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <borntraeger@de.ibm.com>)
-	id 1eGivH-00018p-JW
-	for qemu-devel@nongnu.org; Mon, 20 Nov 2017 05:03:27 -0500
-Received: from pps.filterd (m0098420.ppops.net [127.0.0.1])
-	by mx0b-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
-	vAKA3HcL088183
-	for <qemu-devel@nongnu.org>; Mon, 20 Nov 2017 05:03:21 -0500
-Received: from e06smtp13.uk.ibm.com (e06smtp13.uk.ibm.com [195.75.94.109])
-	by mx0b-001b2d01.pphosted.com with ESMTP id 2ebuyqjvjg-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Mon, 20 Nov 2017 05:03:18 -0500
-Received: from localhost
-	by e06smtp13.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
-	Only! Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <borntraeger@de.ibm.com>;
-	Mon, 20 Nov 2017 10:02:50 -0000
-References: <20171120091520.86128-1-borntraeger@de.ibm.com>
-	<5a4be37f-29b5-1d0d-91ab-9cb15c93e088@suse.de>
-	<08cec003-1291-8302-1280-d53cba5c7538@de.ibm.com>
-	<5a6cd622-3064-a920-8f72-bc820aa13203@suse.de>
-From: Christian Borntraeger <borntraeger@de.ibm.com>
-Date: Mon, 20 Nov 2017 11:02:46 +0100
+	(envelope-from <clg@kaod.org>) id 1eGivz-0001fR-KM
+	for qemu-devel@nongnu.org; Mon, 20 Nov 2017 05:04:14 -0500
+Received: from 10.mo173.mail-out.ovh.net ([46.105.74.148]:56676)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1eGivz-0001XF-Eu
+	for qemu-devel@nongnu.org; Mon, 20 Nov 2017 05:04:11 -0500
+Received: from player739.ha.ovh.net (b9.ovh.net [213.186.33.59])
+	by mo173.mail-out.ovh.net (Postfix) with ESMTP id B70F886EAB
+	for <qemu-devel@nongnu.org>; Mon, 20 Nov 2017 11:03:59 +0100 (CET)
+From: =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>
+Date: Mon, 20 Nov 2017 11:03:44 +0100
+Message-Id: <20171120100347.8601-1-clg@kaod.org>
 MIME-Version: 1.0
-In-Reply-To: <5a6cd622-3064-a920-8f72-bc820aa13203@suse.de>
-Content-Type: text/plain; charset=windows-1252
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Message-Id: <ca89eb6e-4565-c789-02f4-98ea6ab05b2f@de.ibm.com>
-Subject: Re: [Qemu-devel] [PATCH] pc-bios/s390-ccw: build s390 bios with
- -fno-zero-initialized-in-bss
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PATCH for-2.12 v3 0/3] disable the decrementer
+ interrupt when a CPU is unplugged
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -46,30 +28,57 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alexander Graf <agraf@suse.de>, Cornelia Huck <cohuck@redhat.com>
-Cc: qemu-devel <qemu-devel@nongnu.org>, qemu-s390x <qemu-s390x@nongnu.org>, Halil Pasic <pasic@linux.vnet.ibm.com>, Richard Henderson <rth@twiddle.net>, Thomas Huth <thuth@redhat.com>
+To: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, David Gibson <david@gibson.dropbear.id.au>, Nikunj A Dadhania <nikunj@linux.vnet.ibm.com>, Benjamin Herrenschmidt <benh@kernel.crashing.org>
+Cc: =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>
 
+Hello,
 
+When a CPU is stopped with the 'stop-self' RTAS call, its state
+'halted' is switched to 1 and, in this case, the MSR is not taken into
+account anymore in the cpu_has_work() routine. Only the pending
+hardware interrupts are checked with their LPCR:PECE* enablement bit.
 
-On 11/20/2017 10:29 AM, Alexander Graf wrote:
-> On 11/20/2017 10:27 AM, Christian Borntraeger wrote:
->>
->> On 11/20/2017 10:19 AM, Alexander Graf wrote:
->>> On 11/20/2017 10:15 AM, Christian Borntraeger wrote:
->>>> The QEMU ELF loader does not initialize the bss segment. This has
->>>> triggered several bugs in the past, e.g. see commit 5d739a4787a5
->>>> ("s390-ccw.img: Fix sporadic errors with ccw boot image - initialize
->>>> css").
->>>>
->>>> Instead of fixing these things one-by-one we can build the BIOS
->>>> with -fno-zero-initialized-in-bss. This will move the zero variables
->>>> also into the data segment, which is then part of a LOAD section.
->>> Doesn't this bloat the firmware? Why don't we just manually clear bss in the firmware itself? It's what all other firmwares do :)
->> Yes the proper fix is to initialize bss in the bios itself.
->> I was trying to come up with something for 2.11, but since the patch does not solve the original issues, lets drop it.
-> 
-> 
-> Initializing bss is quite simple. You can probably even do it from C. Just set two variables before and after .bss in the linker script and memset(0) from start to end :).
+If the DECR timer fires after 'stop-self' is called and before the CPU
+'stop' state is reached, the nearly-dead CPU will have some work to do
+and the guest will crash. This case happens very frequently with the
+not yet upstream P9 XIVE exploitation mode. In XICS mode, the DECR is
+occasionally fired but after 'stop' state, so no work is to be done
+and the guest survives.
 
-Yes, I know but then we have to change the build process to use a linker script.(we rely on the default
-linker script right now).
+I suspect there is a race between the QEMU mainloop triggering the
+timers and the TCG CPU thread but I could not quite identify the root
+cause. To be safe, let's disable the decrementer interrupt in the LPCR
+when the CPU is halted and reenable it when the CPU is restarted.
+Reseting the MSR is now pointless, so remove this dubious workaround.
+
+Thanks,
+
+C.
+
+Changes in v3:
+
+ - removed the ppc_cpu_pvr_match() routine testing the CPU family.
+ - introduced a cpu_ppc_papr_pece_bits() helper to gather the PECE
+   bits depending on the CPU family.  =20
+ - enabled Power-saving mode Exit Cause exceptions only on the boot CPU.
+=20
+Changes in v2:
+
+ - used a new routine ppc_cpu_pvr_match() to discriminate CPU versions
+ - removed the LPCR:PECE* enablement bit when the CPU is initialized
+   if it is a secondary
+ - included Nikunj's fix to reboot SMP TCG guests
+=20
+C=C3=A9dric Le Goater (3):
+  spapr/rtas: disable the decrementer interrupt when a CPU is unplugged
+  spapr/rtas: fix reboot of a a SMP TCG guest
+  spapr/rtas: do not reset the MSR in stop-self command
+
+ hw/ppc/spapr_cpu_core.c     |  7 +++++++
+ hw/ppc/spapr_rtas.c         | 19 +++++++++----------
+ target/ppc/cpu.h            |  1 +
+ target/ppc/translate_init.c | 33 +++++++++++++++++++++++++--------
+ 4 files changed, 42 insertions(+), 18 deletions(-)
+
+--=20
+2.13.6
