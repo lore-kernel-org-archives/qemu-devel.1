@@ -1,39 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47006)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55057)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mdroth@linux.vnet.ibm.com>) id 1eGu7g-0001yD-Cy
-	for qemu-devel@nongnu.org; Mon, 20 Nov 2017 17:01:07 -0500
+	(envelope-from <pbonzini@redhat.com>) id 1eGuVr-0000k2-CM
+	for qemu-devel@nongnu.org; Mon, 20 Nov 2017 17:26:00 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mdroth@linux.vnet.ibm.com>) id 1eGu7d-0003jR-Bd
-	for qemu-devel@nongnu.org; Mon, 20 Nov 2017 17:01:00 -0500
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:60238
-	helo=mx0a-001b2d01.pphosted.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mdroth@linux.vnet.ibm.com>)
-	id 1eGu7d-0003iz-6L
-	for qemu-devel@nongnu.org; Mon, 20 Nov 2017 17:00:57 -0500
-Received: from pps.filterd (m0098414.ppops.net [127.0.0.1])
-	by mx0b-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
-	vAKLx3Eb081111
-	for <qemu-devel@nongnu.org>; Mon, 20 Nov 2017 17:00:51 -0500
-Received: from e19.ny.us.ibm.com (e19.ny.us.ibm.com [129.33.205.209])
-	by mx0b-001b2d01.pphosted.com with ESMTP id 2ec6qwhv84-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Mon, 20 Nov 2017 17:00:51 -0500
-Received: from localhost
-	by e19.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
-	Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <mdroth@linux.vnet.ibm.com>;
-	Mon, 20 Nov 2017 17:00:50 -0500
-Content-Type: text/plain; charset="utf-8"
+	(envelope-from <pbonzini@redhat.com>) id 1eGuVq-0006ny-MW
+	for qemu-devel@nongnu.org; Mon, 20 Nov 2017 17:25:59 -0500
+References: <cover.1511145863.git.jcody@redhat.com>
+	<2cd4d33dc68bb3c738e1c9aa39a0ddd4108c401e.1511145863.git.jcody@redhat.com>
+	<20171120111653.GB4516@stefanha-x1.localdomain>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <b910238b-d42c-abfe-9d57-1db2c97728cc@redhat.com>
+Date: Mon, 20 Nov 2017 23:25:37 +0100
 MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-From: Michael Roth <mdroth@linux.vnet.ibm.com>
-In-Reply-To: <20171107205201.10207-1-mdroth@linux.vnet.ibm.com>
-References: <20171107205201.10207-1-mdroth@linux.vnet.ibm.com>
-Date: Mon, 20 Nov 2017 16:00:39 -0600
-Message-Id: <151121523989.31225.8242493880994615406@sif>
-Subject: Re: [Qemu-devel] [Qemu-stable] [PATCH for-2.11]
- scripts/make-release: ship u-boot source as a tarball
+In-Reply-To: <20171120111653.GB4516@stefanha-x1.localdomain>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="u0ClNopGCsQwiiwar50RPV9GmVgKcI7bJ"
+Subject: Re: [Qemu-devel] [Qemu-block] [PATCH 1/5] blockjob: do not allow
+ coroutine double entry or entry-after-completion
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -42,58 +26,54 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Peter Maydell <peter.maydell@linaro.org>, Thomas Huth <thuth@redhat.com>, Richard Henderson <richard.henderson@linaro.org>, qemu-stable@nongnu.org, Alexander Graf <agraf@suse.de>
+To: Stefan Hajnoczi <stefanha@gmail.com>, Jeff Cody <jcody@redhat.com>
+Cc: qemu-devel@nongnu.org, kwolf@redhat.com, famz@redhat.com, qemu-block@nongnu.org, mreitz@redhat.com, stefanha@redhat.com
 
-Quoting Michael Roth (2017-11-07 14:52:01)
-> The u-boot sources we ship currently cause problems with unpacking on
-> a case-insensitive filesystem due to path conflicts. This has been
-> fixed in upstream u-boot via commit 610eec7f, but since it is not
-> yet included in an official release we implement this approach as a
-> temporary workaround.
-> =
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--u0ClNopGCsQwiiwar50RPV9GmVgKcI7bJ
+From: Paolo Bonzini <pbonzini@redhat.com>
+To: Stefan Hajnoczi <stefanha@gmail.com>, Jeff Cody <jcody@redhat.com>
+Cc: qemu-devel@nongnu.org, kwolf@redhat.com, famz@redhat.com,
+ qemu-block@nongnu.org, mreitz@redhat.com, stefanha@redhat.com
+Message-ID: <b910238b-d42c-abfe-9d57-1db2c97728cc@redhat.com>
+Subject: Re: [Qemu-block] [PATCH 1/5] blockjob: do not allow coroutine double
+ entry or entry-after-completion
+References: <cover.1511145863.git.jcody@redhat.com>
+ <2cd4d33dc68bb3c738e1c9aa39a0ddd4108c401e.1511145863.git.jcody@redhat.com>
+ <20171120111653.GB4516@stefanha-x1.localdomain>
+In-Reply-To: <20171120111653.GB4516@stefanha-x1.localdomain>
+Content-Type: text/plain; charset=windows-1252
+Content-Transfer-Encoding: quoted-printable
 
-> Once we move to a u-boot containing commit 610eec7f we should revert
-> this patch.
-> =
-
-> Cc: qemu-stable@nongnu.org
-> Cc: Alexander Graf <agraf@suse.de>
-> Cc: Richard Henderson <richard.henderson@linaro.org>
-> Cc: Thomas Huth <thuth@redhat.com>
-> Cc: Peter Maydell <peter.maydell@linaro.org>
-> Suggested-by: Richard Henderson <richard.henderson@linaro.org>
-> Signed-off-by: Michael Roth <mdroth@linux.vnet.ibm.com>
-
-Ping.
-
-Peter, would you be able to apply this directly? Not sure who else this
-would go through.
-
-> ---
->  scripts/make-release | 4 ++++
->  1 file changed, 4 insertions(+)
-> =
-
-> diff --git a/scripts/make-release b/scripts/make-release
-> index fa6323fda8..3917df7142 100755
-> --- a/scripts/make-release
-> +++ b/scripts/make-release
-> @@ -20,6 +20,10 @@ git checkout "v${version}"
->  git submodule update --init
->  (cd roms/seabios && git describe --tags --long --dirty > .version)
->  rm -rf .git roms/*/.git dtc/.git pixman/.git
-> +# FIXME: The following line is a workaround for avoiding filename collis=
-ions
-> +# when unpacking u-boot sources on case-insensitive filesystems. Once we
-> +# update to something with u-boot commit 610eec7f0 we can drop this line.
-> +tar cfj roms/u-boot.tar.bz2 -C roms u-boot && rm -rf roms/u-boot
->  popd
->  tar cfj ${destination}.tar.bz2 ${destination}
->  rm -rf ${destination}
-> -- =
-
-> 2.11.0
-> =
-
+On 20/11/2017 12:16, Stefan Hajnoczi wrote:
+> This raises questions about the ability to cancel sleep:
 >=20
+> 1. Does something depend on cancelling sleep?
+
+block_job_cancel does, but in practice the sleep time is so small
+(smaller than SLICE_TIME, which is 100 ms) that we probably don't care.
+
+I agree with Jeff that canceling the sleep by force-entering the
+coroutine seemed clever but is probably a very bad idea.
+
+Paolo
+
+
+--u0ClNopGCsQwiiwar50RPV9GmVgKcI7bJ
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEE8TM4V0tmI4mGbHaCv/vSX3jHroMFAloTVmQACgkQv/vSX3jH
+roMgEAf9GhnWRWpNGGsAiJz5ufdrsDjjGC9aBmjAfR5IiXjkDf5Sla1BKa96QZVW
+tHG3QLc77Qy0o7g6cD3Fz7twYyRtq68CJPHVk8K6B6BZjIQP3GL0mfYt39f6jgpZ
+3r2dLiPux3GPGxHqPy2Oz2BMHIP+Ega2fy0ovM6qvxgY93Hl74oSxanHTDeRRT1S
+qRWLV5AXEK+CBXEhnIllOLTQ3ywe71HrLh3LKkBBoJDcBK+kaCruT1+ZXigmI2+L
+XalgP7ccq/0yQSiJMdi2UinDrfE+l2rM5hKlr7JzMlk+fbtFuumPyQ6uLDan79Qr
+gOe08qcgFgrMciQo+9cKWHlJM8r7+Q==
+=ClmR
+-----END PGP SIGNATURE-----
+
+--u0ClNopGCsQwiiwar50RPV9GmVgKcI7bJ--
