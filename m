@@ -1,31 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37467)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39800)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1eGjuV-0001Bj-01
-	for qemu-devel@nongnu.org; Mon, 20 Nov 2017 06:06:44 -0500
+	(envelope-from <stefanha@gmail.com>) id 1eGk4S-0003N7-Gj
+	for qemu-devel@nongnu.org; Mon, 20 Nov 2017 06:17:01 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1eGjuN-0005Xl-4i
-	for qemu-devel@nongnu.org; Mon, 20 Nov 2017 06:06:42 -0500
-Received: from mail-wm0-x242.google.com ([2a00:1450:400c:c09::242]:34964)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1eGjuM-0005XR-Tx
-	for qemu-devel@nongnu.org; Mon, 20 Nov 2017 06:06:35 -0500
-Received: by mail-wm0-x242.google.com with SMTP id y80so17790629wmd.0
-	for <qemu-devel@nongnu.org>; Mon, 20 Nov 2017 03:06:34 -0800 (PST)
+	(envelope-from <stefanha@gmail.com>) id 1eGk4P-0001Ps-Cv
+	for qemu-devel@nongnu.org; Mon, 20 Nov 2017 06:17:00 -0500
+Date: Mon, 20 Nov 2017 11:16:53 +0000
+From: Stefan Hajnoczi <stefanha@gmail.com>
+Message-ID: <20171120111653.GB4516@stefanha-x1.localdomain>
+References: <cover.1511145863.git.jcody@redhat.com>
+	<2cd4d33dc68bb3c738e1c9aa39a0ddd4108c401e.1511145863.git.jcody@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <001b01d361e9$d46ace40$7d406ac0$@ru>
-References: <20171116115926.16627-1-pbonzini@redhat.com>
-	<20171116115926.16627-8-pbonzini@redhat.com>
-	<CAFEAcA-06-VmH7Pvymo-o-HmiQ-uQ67Hs0KhWZfxswBxsfD2-g@mail.gmail.com>
-	<bf4bedd9-0ef8-cff3-6153-531fba597237@redhat.com>
-	<CAFEAcA9Rnd3gtrHb389e6fOEAae4aLhJnQWU-vKyzTM4o-riOQ@mail.gmail.com>
-	<001b01d361e9$d46ace40$7d406ac0$@ru>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon, 20 Nov 2017 11:06:13 +0000
-Message-ID: <CAFEAcA8NGnmG_8SipvPN5_dPhokH2zZAXykN2KiW10XhB-9xXQ@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PULL 07/11] cpu-exec: don't overwrite
- exception_index
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="MfFXiAuoTsnnDAfZ"
+Content-Disposition: inline
+In-Reply-To: <2cd4d33dc68bb3c738e1c9aa39a0ddd4108c401e.1511145863.git.jcody@redhat.com>
+Subject: Re: [Qemu-devel] [Qemu-block] [PATCH 1/5] blockjob: do not allow
+ coroutine double entry or entry-after-completion
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,32 +25,93 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Pavel Dovgalyuk <dovgaluk@ispras.ru>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>, Pavel Dovgalyuk <pavel.dovgaluk@ispras.ru>
+To: Jeff Cody <jcody@redhat.com>
+Cc: qemu-devel@nongnu.org, kwolf@redhat.com, famz@redhat.com, qemu-block@nongnu.org, mreitz@redhat.com, stefanha@redhat.com, pbonzini@redhat.com
 
-On 20 November 2017 at 10:25, Pavel Dovgalyuk <dovgaluk@ispras.ru> wrote:
->> From: Peter Maydell [mailto:peter.maydell@linaro.org]
->> On 17 November 2017 at 20:26, Paolo Bonzini <pbonzini@redhat.com> wrote:
->> > On 17/11/2017 21:07, Peter Maydell wrote:
->> >> Hi. This commit breaks booting of Debian on aarch64 virt board.
->> >> (repro instructions for creating the image available at:
->> >> https://translatedcode.wordpress.com/2017/07/24/installing-debian-on-qemus-64-bit-arm-virt-
->> board/)
->> >> The guest kernel never prints anything to the serial port.
->> >>
->> >> Reverting this commit fixes master for me, so I plan to do
->> >> that on Monday.
->> >
->> > Maybe you can also test moving the atomic_set inside the "if".  It does
->> > seem to be a genuine bugfix.
->>
->> No, that doesn't help: guest still sits there like a lemon.
->
-> Maybe this is a more complex problem?
-> I tried removing this if and aarch64 still does not work.
 
-Reverting the commit fixes it for me; I have that going through
-build tests and will push the revert later today.
+--MfFXiAuoTsnnDAfZ
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-thanks
--- PMM
+On Sun, Nov 19, 2017 at 09:46:42PM -0500, Jeff Cody wrote:
+> --- a/blockjob.c
+> +++ b/blockjob.c
+> @@ -291,10 +291,10 @@ void block_job_start(BlockJob *job)
+>  {
+>      assert(job && !block_job_started(job) && job->paused &&
+>             job->driver && job->driver->start);
+> -    job->co =3D qemu_coroutine_create(block_job_co_entry, job);
+>      job->pause_count--;
+>      job->busy =3D true;
+>      job->paused =3D false;
+> +    job->co =3D qemu_coroutine_create(block_job_co_entry, job);
+>      bdrv_coroutine_enter(blk_bs(job->blk), job->co);
+>  }
+> =20
+
+This hunk makes no difference.  The coroutine is only entered by
+bdrv_coroutine_enter() so the order of job field initialization doesn't
+matter.
+
+> @@ -797,11 +797,14 @@ void block_job_sleep_ns(BlockJob *job, QEMUClockTyp=
+e type, int64_t ns)
+>          return;
+>      }
+> =20
+> -    job->busy =3D false;
+> +    /* We need to leave job->busy set here, because when we have
+> +     * put a coroutine to 'sleep', we have scheduled it to run in
+> +     * the future.  We cannot enter that same coroutine again before
+> +     * it wakes and runs, otherwise we risk double-entry or entry after
+> +     * completion. */
+>      if (!block_job_should_pause(job)) {
+>          co_aio_sleep_ns(blk_get_aio_context(job->blk), type, ns);
+>      }
+> -    job->busy =3D true;
+> =20
+>      block_job_pause_point(job);
+
+This leaves a stale doc comment in include/block/blockjob_int.h:
+
+  /**
+   * block_job_sleep_ns:
+   * @job: The job that calls the function.
+   * @clock: The clock to sleep on.
+   * @ns: How many nanoseconds to stop for.
+   *
+   * Put the job to sleep (assuming that it wasn't canceled) for @ns
+   * nanoseconds.  Canceling the job will interrupt the wait immediately.
+                   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   */
+  void block_job_sleep_ns(BlockJob *job, QEMUClockType type, int64_t ns);
+
+This raises questions about the ability to cancel sleep:
+
+1. Does something depend on cancelling sleep?
+
+2. Did cancellation work properly in commit
+   4513eafe928ff47486f4167c28d364c72b5ff7e3 ("block: add
+   block_job_sleep_ns") and was it broken afterwards?
+
+It is possible to fix the recursive coroutine entry without losing sleep
+cancellation.  Whether it's worth the trouble depends on the answers to
+the above questions.
+
+Stefan
+
+--MfFXiAuoTsnnDAfZ
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEcBAEBAgAGBQJaErmlAAoJEJykq7OBq3PIvYAIAKiZWRXNx0EJawJ46AHbsLGl
+qb3rbyAS3v3svNxIfGPvyQh4Wd5C2Nlcar2qrbK+XcwXc7uIX2SHTwLCbA7Cx/2k
+bE8EV/M8IsOheWSWOwX0fqgDVf/BpRxlz4hP3/wV34vRaNpW6MUM8jr7/KJwIYva
+awD63thVnJopLX7IvMFucdJInXOp2Wp/pFncazt+xaP3ug9tKS5f9f6CmAcvwQKT
+eYCzK69CWFxFF6gd+ZqGtCKEoabIi5Ih9594DI/jAfOwRBN2HjQjT1w3YpQOF5tj
+VplmTdxNcFXBLWPNYGy4zEAsIXebMVg7O41O9LHFt7HfJCu8cwJa4U7ZKfy9hwk=
+=qgJM
+-----END PGP SIGNATURE-----
+
+--MfFXiAuoTsnnDAfZ--
