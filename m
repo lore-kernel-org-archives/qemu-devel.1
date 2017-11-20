@@ -1,28 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43378)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43921)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1eGnNE-0004Fl-A0
-	for qemu-devel@nongnu.org; Mon, 20 Nov 2017 09:48:37 -0500
+	(envelope-from <kwolf@redhat.com>) id 1eGnP1-0005WV-J2
+	for qemu-devel@nongnu.org; Mon, 20 Nov 2017 09:50:28 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1eGnND-0004Py-D4
-	for qemu-devel@nongnu.org; Mon, 20 Nov 2017 09:48:36 -0500
-Received: from mail-wm0-x233.google.com ([2a00:1450:400c:c09::233]:46020)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1eGnND-0004PQ-6w
-	for qemu-devel@nongnu.org; Mon, 20 Nov 2017 09:48:35 -0500
-Received: by mail-wm0-x233.google.com with SMTP id 9so19289028wme.4
-	for <qemu-devel@nongnu.org>; Mon, 20 Nov 2017 06:48:34 -0800 (PST)
-MIME-Version: 1.0
-In-Reply-To: <1aaf0a6f-c38b-d80d-b09a-1a54545c7660@twiddle.net>
-References: <1511184421-23535-1-git-send-email-peter.maydell@linaro.org>
-	<1511184421-23535-3-git-send-email-peter.maydell@linaro.org>
-	<1aaf0a6f-c38b-d80d-b09a-1a54545c7660@twiddle.net>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon, 20 Nov 2017 14:47:58 +0000
-Message-ID: <CAFEAcA-RXwYtL7yjNjxdHmuBfHe61-mYNX6ytDJ4bETLyA3DHA@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH for-2.11 2/2] accel/tcg: Handle atomic
- accesses to notdirty memory correctly
+	(envelope-from <kwolf@redhat.com>) id 1eGnP0-00058i-HJ
+	for qemu-devel@nongnu.org; Mon, 20 Nov 2017 09:50:27 -0500
+From: Kevin Wolf <kwolf@redhat.com>
+Date: Mon, 20 Nov 2017 15:50:04 +0100
+Message-Id: <20171120145006.551-2-kwolf@redhat.com>
+In-Reply-To: <20171120145006.551-1-kwolf@redhat.com>
+References: <20171120145006.551-1-kwolf@redhat.com>
+Subject: [Qemu-devel] [PATCH for-2.11 1/3] block: Add errp to
+ bdrv_snapshot_goto()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,46 +20,128 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Richard Henderson <rth@twiddle.net>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, qemu-stable <qemu-stable@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>, Stuart Monteith <stuart.monteith@linaro.org>
+To: qemu-block@nongnu.org
+Cc: kwolf@redhat.com, mreitz@redhat.com, eblake@redhat.com, jsnow@redhat.com, vsementsov@virtuozzo.com, den@openvz.org, qemu-devel@nongnu.org
 
-On 20 November 2017 at 14:27, Richard Henderson <rth@twiddle.net> wrote:
-> On 11/20/2017 02:27 PM, Peter Maydell wrote:
->> -    return (void *)((uintptr_t)addr + tlbe->addend);
->> +    hostaddr = (void *)((uintptr_t)addr + tlbe->addend);
->> +
->> +    memory_notdirty_write_prepare(ndi, ENV_GET_CPU(env), addr,
->> +                                  qemu_ram_addr_from_host_nofail(hostaddr),
->> +                                  1 << s_bits);
->
-> These calls should be conditional on TLB_NOTDIRTY being set.
-> We certainly don't need to do anything like taking a lock otherwise.
+Signed-off-by: Kevin Wolf <kwolf@redhat.com>
+---
+ include/block/snapshot.h |  3 ++-
+ block/snapshot.c         | 21 ++++++++++++++++-----
+ qemu-img.c               |  6 +++---
+ 3 files changed, 21 insertions(+), 9 deletions(-)
 
-We only take the lock if the dirty flag is set for the
-physical memory, which it won't be if TLB_NOTDIRTY wasn't set...
-
-> Perhaps an extra bool in NDI, like
->
->   ndi->active = false;
->   if (unlikely(tlb_addr & TLB_NOTDIRTY)) {
->       ndi->active = true;
->       memory_notdirty_write_prepare(ndi, ...);
->   }
->
-> and
->
-> #define ATOMIC_MMU_CLEANUP \
-> do { \
->   if (unlikely(ndi->active)) { \
->      memory_notdirty_write_complete(ndi); \
->   } \
-> } while (0)
-
-...but yes, we could skip the whole thing if the TLB entry
-isn't marked notdirty.
-
-(Having NDI be "mostly opaque apart from this one thing" is a
-little ugly, though.)
-
-thanks
--- PMM
+diff --git a/include/block/snapshot.h b/include/block/snapshot.h
+index e5c0553115..aeb80405e8 100644
+--- a/include/block/snapshot.h
++++ b/include/block/snapshot.h
+@@ -57,7 +57,8 @@ int bdrv_can_snapshot(BlockDriverState *bs);
+ int bdrv_snapshot_create(BlockDriverState *bs,
+                          QEMUSnapshotInfo *sn_info);
+ int bdrv_snapshot_goto(BlockDriverState *bs,
+-                       const char *snapshot_id);
++                       const char *snapshot_id,
++                       Error **errp);
+ int bdrv_snapshot_delete(BlockDriverState *bs,
+                          const char *snapshot_id,
+                          const char *name,
+diff --git a/block/snapshot.c b/block/snapshot.c
+index be0743abac..9c941e638d 100644
+--- a/block/snapshot.c
++++ b/block/snapshot.c
+@@ -177,18 +177,21 @@ int bdrv_snapshot_create(BlockDriverState *bs,
+ }
+ 
+ int bdrv_snapshot_goto(BlockDriverState *bs,
+-                       const char *snapshot_id)
++                       const char *snapshot_id,
++                       Error **errp)
+ {
+     BlockDriver *drv = bs->drv;
+     int ret, open_ret;
+     int64_t len;
+ 
+     if (!drv) {
++        error_setg(errp, "Block driver is closed");
+         return -ENOMEDIUM;
+     }
+ 
+     len = bdrv_getlength(bs);
+     if (len < 0) {
++        error_setg_errno(errp, -len, "Cannot get block device size");
+         return len;
+     }
+     /* We should set all bits in all enabled dirty bitmaps, because dirty
+@@ -200,13 +203,18 @@ int bdrv_snapshot_goto(BlockDriverState *bs,
+     bdrv_set_dirty(bs, 0, len);
+ 
+     if (drv->bdrv_snapshot_goto) {
+-        return drv->bdrv_snapshot_goto(bs, snapshot_id);
++        ret = drv->bdrv_snapshot_goto(bs, snapshot_id);
++        if (ret < 0) {
++            error_setg_errno(errp, -ret, "Failed to load snapshot");
++        }
++        return ret;
+     }
+ 
+     if (bs->file) {
+         BlockDriverState *file;
+         QDict *options = qdict_clone_shallow(bs->options);
+         QDict *file_options;
++        Error *local_err = NULL;
+ 
+         file = bs->file->bs;
+         /* Prevent it from getting deleted when detached from bs */
+@@ -220,12 +228,14 @@ int bdrv_snapshot_goto(BlockDriverState *bs,
+         bdrv_unref_child(bs, bs->file);
+         bs->file = NULL;
+ 
+-        ret = bdrv_snapshot_goto(file, snapshot_id);
+-        open_ret = drv->bdrv_open(bs, options, bs->open_flags, NULL);
++        ret = bdrv_snapshot_goto(file, snapshot_id, errp);
++        open_ret = drv->bdrv_open(bs, options, bs->open_flags, &local_err);
+         QDECREF(options);
+         if (open_ret < 0) {
+             bdrv_unref(file);
+             bs->drv = NULL;
++            /* A bdrv_snapshot_goto() error takes precedence */
++            error_propagate(errp, local_err);
+             return open_ret;
+         }
+ 
+@@ -234,6 +244,7 @@ int bdrv_snapshot_goto(BlockDriverState *bs,
+         return ret;
+     }
+ 
++    error_setg(errp, "Block driver does not support snapshots");
+     return -ENOTSUP;
+ }
+ 
+@@ -467,7 +478,7 @@ int bdrv_all_goto_snapshot(const char *name, BlockDriverState **first_bad_bs)
+ 
+         aio_context_acquire(ctx);
+         if (bdrv_can_snapshot(bs)) {
+-            err = bdrv_snapshot_goto(bs, name);
++            err = bdrv_snapshot_goto(bs, name, NULL);
+         }
+         aio_context_release(ctx);
+         if (err < 0) {
+diff --git a/qemu-img.c b/qemu-img.c
+index 02a6e27beb..68b375f998 100644
+--- a/qemu-img.c
++++ b/qemu-img.c
+@@ -2989,10 +2989,10 @@ static int img_snapshot(int argc, char **argv)
+         break;
+ 
+     case SNAPSHOT_APPLY:
+-        ret = bdrv_snapshot_goto(bs, snapshot_name);
++        ret = bdrv_snapshot_goto(bs, snapshot_name, &err);
+         if (ret) {
+-            error_report("Could not apply snapshot '%s': %d (%s)",
+-                snapshot_name, ret, strerror(-ret));
++            error_reportf_err(err, "Could not apply snapshot '%s': ",
++                              snapshot_name);
+         }
+         break;
+ 
+-- 
+2.13.6
