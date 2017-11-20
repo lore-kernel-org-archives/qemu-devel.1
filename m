@@ -1,25 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33671)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37507)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1eGppO-0002FC-JA
-	for qemu-devel@nongnu.org; Mon, 20 Nov 2017 12:25:51 -0500
+	(envelope-from <pm215@archaic.org.uk>) id 1eGq0h-0008HK-7N
+	for qemu-devel@nongnu.org; Mon, 20 Nov 2017 12:37:32 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1eGppN-0001vY-Le
-	for qemu-devel@nongnu.org; Mon, 20 Nov 2017 12:25:50 -0500
-Received: from mail-wr0-x244.google.com ([2a00:1450:400c:c0c::244]:33519)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1eGppN-0001vJ-EC
-	for qemu-devel@nongnu.org; Mon, 20 Nov 2017 12:25:49 -0500
-Received: by mail-wr0-x244.google.com with SMTP id 4so8794623wrt.0
-	for <qemu-devel@nongnu.org>; Mon, 20 Nov 2017 09:25:49 -0800 (PST)
-MIME-Version: 1.0
-In-Reply-To: <20171120171728.31266-1-berrange@redhat.com>
-References: <20171120171728.31266-1-berrange@redhat.com>
+	(envelope-from <pm215@archaic.org.uk>) id 1eGq0f-0006Id-Sm
+	for qemu-devel@nongnu.org; Mon, 20 Nov 2017 12:37:31 -0500
+Received: from orth.archaic.org.uk ([2001:8b0:1d0::2]:38456)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pm215@archaic.org.uk>)
+	id 1eGq0f-0006HX-Lb
+	for qemu-devel@nongnu.org; Mon, 20 Nov 2017 12:37:29 -0500
+Received: from pm215 by orth.archaic.org.uk with local (Exim 4.89)
+	(envelope-from <pm215@archaic.org.uk>) id 1eGq0c-0006Md-7R
+	for qemu-devel@nongnu.org; Mon, 20 Nov 2017 17:37:26 +0000
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon, 20 Nov 2017 17:25:27 +0000
-Message-ID: <CAFEAcA9CxyLdE6cs9sEf6YasA+cmFSgUkvj__3ePSMncjD+wng@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH] build: disarm the TCG unit test trap
+Date: Mon, 20 Nov 2017 17:37:20 +0000
+Message-Id: <1511199444-17922-2-git-send-email-peter.maydell@linaro.org>
+In-Reply-To: <1511199444-17922-1-git-send-email-peter.maydell@linaro.org>
+References: <1511199444-17922-1-git-send-email-peter.maydell@linaro.org>
+Subject: [Qemu-devel] [PULL 1/5] target/arm: Report GICv3 sysregs present in
+ ID registers if needed
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,58 +28,103 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Daniel P. Berrange" <berrange@redhat.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
+To: qemu-devel@nongnu.org
 
-On 20 November 2017 at 17:17, Daniel P. Berrange <berrange@redhat.com> wrote:
-> Developers sometimes mistakenly run 'make test' instead of 'make check'.
-> 'make test' triggers the ancient, unmaintained tcg unit tests in
-> tests/tcg/Makefile which have long since ceased compiling.
->
-> Even if someone fixes the TCG tests, it makes little sense to put
-> them in a 'make test' target, rather they should be 'make check-tcg',
-> possibly wired up as a dependency of 'make check'.
->
-> In the meantime, this patch disarms the 'make test' trap by turning
-> it into a synonym for 'make check'.
->
-> Signed-off-by: Daniel P. Berrange <berrange@redhat.com>
-> ---
->  tests/Makefile.include | 1 +
->  tests/tcg/Makefile     | 3 ---
->  2 files changed, 1 insertion(+), 3 deletions(-)
->
-> diff --git a/tests/Makefile.include b/tests/Makefile.include
-> index 434a2ce868..55fd99f451 100644
-> --- a/tests/Makefile.include
-> +++ b/tests/Makefile.include
-> @@ -919,6 +919,7 @@ check-unit: $(patsubst %,check-%, $(check-unit-y))
->  check-speed: $(patsubst %,check-%, $(check-speed-y))
->  check-block: $(patsubst %,check-%, $(check-block-y))
->  check: check-qapi-schema check-unit check-qtest
-> +test: check
->  check-clean:
->         $(MAKE) -C tests/tcg clean
->         rm -rf $(check-unit-y) tests/*.o $(QEMU_IOTESTS_HELPERS-y)
-> diff --git a/tests/tcg/Makefile b/tests/tcg/Makefile
-> index 89e3342f3d..4b5d196326 100644
-> --- a/tests/tcg/Makefile
-> +++ b/tests/tcg/Makefile
-> @@ -36,9 +36,6 @@ ifneq ($(call find-in-path, $(CC_I386)),)
->  TESTS += $(I386_TESTS)
->  endif
->
-> -all: $(patsubst %,run-%,$(TESTS))
-> -test: all
-> -
->  # rules to run tests
->
->  .PHONY: $(patsubst %,run-%,$(TESTS))
-> --
-> 2.14.3
+The CPU ID registers ID_AA64PFR0_EL1, ID_PFR1_EL1 and ID_PFR1
+have a field for reporting presence of GICv3 system registers.
+We need to report this field correctly in order for Xen to
+work as a guest inside QEMU emulation. We mustn't incorrectly
+claim the sysregs exist when they don't, though, or Linux will
+crash.
 
-I'm inclined to prefer having 'make test' just fail rather
-than silently behave like 'make check'.
+Unfortunately the way we've designed the GICv3 emulation in QEMU
+puts the system registers as part of the GICv3 device, which
+may be created after the CPU proper has been realized. This
+means that we don't know at the point when we define the ID
+registers what the correct value is. Handle this by switching
+them to calling a function at runtime to read the value, where
+we can fill in the GIC field appropriately.
 
-thanks
--- PMM
+Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+Tested-by: Stefano Stabellini <sstabellini@kernel.org>
+Message-id: 1510066898-3725-1-git-send-email-peter.maydell@linaro.org
+---
+ target/arm/helper.c | 44 ++++++++++++++++++++++++++++++++++++++++----
+ 1 file changed, 40 insertions(+), 4 deletions(-)
+
+diff --git a/target/arm/helper.c b/target/arm/helper.c
+index f61fb3e..35c5bd6 100644
+--- a/target/arm/helper.c
++++ b/target/arm/helper.c
+@@ -4549,6 +4549,33 @@ static void define_debug_regs(ARMCPU *cpu)
+     }
+ }
+ 
++/* We don't know until after realize whether there's a GICv3
++ * attached, and that is what registers the gicv3 sysregs.
++ * So we have to fill in the GIC fields in ID_PFR/ID_PFR1_EL1/ID_AA64PFR0_EL1
++ * at runtime.
++ */
++static uint64_t id_pfr1_read(CPUARMState *env, const ARMCPRegInfo *ri)
++{
++    ARMCPU *cpu = arm_env_get_cpu(env);
++    uint64_t pfr1 = cpu->id_pfr1;
++
++    if (env->gicv3state) {
++        pfr1 |= 1 << 28;
++    }
++    return pfr1;
++}
++
++static uint64_t id_aa64pfr0_read(CPUARMState *env, const ARMCPRegInfo *ri)
++{
++    ARMCPU *cpu = arm_env_get_cpu(env);
++    uint64_t pfr0 = cpu->id_aa64pfr0;
++
++    if (env->gicv3state) {
++        pfr0 |= 1 << 24;
++    }
++    return pfr0;
++}
++
+ void register_cp_regs_for_features(ARMCPU *cpu)
+ {
+     /* Register all the coprocessor registers based on feature bits */
+@@ -4573,10 +4600,14 @@ void register_cp_regs_for_features(ARMCPU *cpu)
+               .opc0 = 3, .opc1 = 0, .crn = 0, .crm = 1, .opc2 = 0,
+               .access = PL1_R, .type = ARM_CP_CONST,
+               .resetvalue = cpu->id_pfr0 },
++            /* ID_PFR1 is not a plain ARM_CP_CONST because we don't know
++             * the value of the GIC field until after we define these regs.
++             */
+             { .name = "ID_PFR1", .state = ARM_CP_STATE_BOTH,
+               .opc0 = 3, .opc1 = 0, .crn = 0, .crm = 1, .opc2 = 1,
+-              .access = PL1_R, .type = ARM_CP_CONST,
+-              .resetvalue = cpu->id_pfr1 },
++              .access = PL1_R, .type = ARM_CP_NO_RAW,
++              .readfn = id_pfr1_read,
++              .writefn = arm_cp_write_ignore },
+             { .name = "ID_DFR0", .state = ARM_CP_STATE_BOTH,
+               .opc0 = 3, .opc1 = 0, .crn = 0, .crm = 1, .opc2 = 2,
+               .access = PL1_R, .type = ARM_CP_CONST,
+@@ -4692,10 +4723,15 @@ void register_cp_regs_for_features(ARMCPU *cpu)
+          * define new registers here.
+          */
+         ARMCPRegInfo v8_idregs[] = {
++            /* ID_AA64PFR0_EL1 is not a plain ARM_CP_CONST because we don't
++             * know the right value for the GIC field until after we
++             * define these regs.
++             */
+             { .name = "ID_AA64PFR0_EL1", .state = ARM_CP_STATE_AA64,
+               .opc0 = 3, .opc1 = 0, .crn = 0, .crm = 4, .opc2 = 0,
+-              .access = PL1_R, .type = ARM_CP_CONST,
+-              .resetvalue = cpu->id_aa64pfr0 },
++              .access = PL1_R, .type = ARM_CP_NO_RAW,
++              .readfn = id_aa64pfr0_read,
++              .writefn = arm_cp_write_ignore },
+             { .name = "ID_AA64PFR1_EL1", .state = ARM_CP_STATE_AA64,
+               .opc0 = 3, .opc1 = 0, .crn = 0, .crm = 4, .opc2 = 1,
+               .access = PL1_R, .type = ARM_CP_CONST,
+-- 
+2.7.4
