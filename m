@@ -1,27 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50574)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51935)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1eGj4z-0005UW-Cf
-	for qemu-devel@nongnu.org; Mon, 20 Nov 2017 05:13:44 -0500
+	(envelope-from <agraf@suse.de>) id 1eGj8A-0006Od-5C
+	for qemu-devel@nongnu.org; Mon, 20 Nov 2017 05:16:49 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1eGj4g-0007C4-5N
-	for qemu-devel@nongnu.org; Mon, 20 Nov 2017 05:13:29 -0500
-Received: from 7.mo5.mail-out.ovh.net ([178.32.124.100]:40389)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1eGj4f-0007BE-N6
-	for qemu-devel@nongnu.org; Mon, 20 Nov 2017 05:13:09 -0500
-Received: from player786.ha.ovh.net (b7.ovh.net [213.186.33.57])
-	by mo5.mail-out.ovh.net (Postfix) with ESMTP id 2E36A151BC5
-	for <qemu-devel@nongnu.org>; Mon, 20 Nov 2017 11:13:08 +0100 (CET)
-Date: Mon, 20 Nov 2017 11:13:03 +0100
-From: Greg Kurz <groug@kaod.org>
-Message-ID: <20171120111303.2db7cdd0@bahia.lab.toulouse-stg.fr.ibm.com>
-In-Reply-To: <5A126CCB.3010602@huawei.com>
-References: <5A126CCB.3010602@huawei.com>
+	(envelope-from <agraf@suse.de>) id 1eGj82-0000po-O1
+	for qemu-devel@nongnu.org; Mon, 20 Nov 2017 05:16:46 -0500
+References: <20171120091520.86128-1-borntraeger@de.ibm.com>
+	<5a4be37f-29b5-1d0d-91ab-9cb15c93e088@suse.de>
+	<08cec003-1291-8302-1280-d53cba5c7538@de.ibm.com>
+	<5a6cd622-3064-a920-8f72-bc820aa13203@suse.de>
+	<ca89eb6e-4565-c789-02f4-98ea6ab05b2f@de.ibm.com>
+From: Alexander Graf <agraf@suse.de>
+Message-ID: <7c64f444-d9b7-f2d0-0717-717365efa268@suse.de>
+Date: Mon, 20 Nov 2017 11:16:37 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+In-Reply-To: <ca89eb6e-4565-c789-02f4-98ea6ab05b2f@de.ibm.com>
+Content-Type: text/plain; charset=windows-1252; format=flowed
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] 9pfs: don't ignore O_DIRECT flag in the
- 9pfs server
+Subject: Re: [Qemu-devel] [PATCH] pc-bios/s390-ccw: build s390 bios with
+ -fno-zero-initialized-in-bss
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,54 +27,49 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: jiangyiwen <jiangyiwen@huawei.com>
-Cc: aneesh.kumar@linux.vnet.ibm.com, qemu-devel@nongnu.org, sochin.jiang@huawei.com
+To: Christian Borntraeger <borntraeger@de.ibm.com>, Cornelia Huck <cohuck@redhat.com>
+Cc: qemu-devel <qemu-devel@nongnu.org>, qemu-s390x <qemu-s390x@nongnu.org>, Halil Pasic <pasic@linux.vnet.ibm.com>, Richard Henderson <rth@twiddle.net>, Thomas Huth <thuth@redhat.com>
 
-On Mon, 20 Nov 2017 13:48:59 +0800
-jiangyiwen <jiangyiwen@huawei.com> wrote:
+On 11/20/2017 11:02 AM, Christian Borntraeger wrote:
+>
+> On 11/20/2017 10:29 AM, Alexander Graf wrote:
+>> On 11/20/2017 10:27 AM, Christian Borntraeger wrote:
+>>> On 11/20/2017 10:19 AM, Alexander Graf wrote:
+>>>> On 11/20/2017 10:15 AM, Christian Borntraeger wrote:
+>>>>> The QEMU ELF loader does not initialize the bss segment. This has
+>>>>> triggered several bugs in the past, e.g. see commit 5d739a4787a5
+>>>>> ("s390-ccw.img: Fix sporadic errors with ccw boot image - initialize
+>>>>> css").
+>>>>>
+>>>>> Instead of fixing these things one-by-one we can build the BIOS
+>>>>> with -fno-zero-initialized-in-bss. This will move the zero variables
+>>>>> also into the data segment, which is then part of a LOAD section.
+>>>> Doesn't this bloat the firmware? Why don't we just manually clear bss in the firmware itself? It's what all other firmwares do :)
+>>> Yes the proper fix is to initialize bss in the bios itself.
+>>> I was trying to come up with something for 2.11, but since the patch does not solve the original issues, lets drop it.
+>>
+>> Initializing bss is quite simple. You can probably even do it from C. Just set two variables before and after .bss in the linker script and memset(0) from start to end :).
+> Yes, I know but then we have to change the build process to use a linker script.(we rely on the default
+> linker script right now).
 
-> Now v9fs in linux has already supported O_DIRECT(v9fs_direct_IO),
-> when guest user open file with O_DIRECT flag and return success,
-> so user hopes data doesn't pass through page cache, but 9pfs in
-> qemu ignore direct disk access and use host page cache, it is not
-> match to DIRECT_IO semantic, so we should not ignore O_DIRECT in
-> 9pfs unless v9fs in linux don't support DIRECT_IO.
-> 
-> And if server fs don't support O_DIRECT, user will receive -EINVAL
-> and know the filesystem don't support O_DIRECT.
-> 
-> So in order to ensure semantic consistency, don't ignore direct
-> disk access in 9pfs.
-> 
 
-There are good reasons for us to ignore O_DIRECT. AFAIK, O_DIRECT requires
-the application to take care of the alignment of the buffers with either the
-logical block size of the filesystem (linux <= 2.4) or the logical block size
-of the underlying storage... I don't really see how you can achieve that since
-the linux 9p client only cares to break up requests into msize-chunks, and
-ignores alignment. ie, you're likely to not ensure semantic consistency on the
-host side anyway and linux will fallback to cached I/O.
+I'm not sure how common generic linker scripts are, but in our default 
+script we have existing markers for bss and end. You can look at the 
+default linker script using gcc <c file> -Wl,-verbose. This simple 
+source worked for me:
 
-Also, this change would silently break existing users of O_DIRECT, which isn't
-acceptable... it would require some fsdev property to enable this new behavior.
 
-> Signed-off-by: Yiwen Jiang <jiangyiwen@huawei.com>
-> ---
->  hw/9pfs/9p.c | 4 ----
->  1 file changed, 4 deletions(-)
-> 
-> diff --git a/hw/9pfs/9p.c b/hw/9pfs/9p.c
-> index 52d4663..5ea01c4 100644
-> --- a/hw/9pfs/9p.c
-> +++ b/hw/9pfs/9p.c
-> @@ -155,10 +155,6 @@ static int get_dotl_openflags(V9fsState *s, int oflags)
->       */
->      flags = dotl_to_open_flags(oflags);
->      flags &= ~(O_NOCTTY | O_ASYNC | O_CREAT);
-> -    /*
-> -     * Ignore direct disk access hint until the server supports it.
-> -     */
-> -    flags &= ~O_DIRECT;
->      return flags;
->  }
-> 
+#include <stdio.h>
+
+extern char __bss_start[];
+extern char _end[];
+
+int main(void)
+{
+     printf("BSS size: %lx\n", (long)_end - (long)__bss_start);
+     return 0;
+}
+
+
+
+Alex
