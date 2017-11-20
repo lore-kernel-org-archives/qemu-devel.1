@@ -1,26 +1,15 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46702)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50712)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <arei.gonglei@huawei.com>) id 1eGg1s-00064W-LI
-	for qemu-devel@nongnu.org; Mon, 20 Nov 2017 01:58:06 -0500
+	(envelope-from <dgibson@ozlabs.org>) id 1eGgHr-0000AE-Sy
+	for qemu-devel@nongnu.org; Mon, 20 Nov 2017 02:14:36 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <arei.gonglei@huawei.com>) id 1eGg1o-0005Nb-Hx
-	for qemu-devel@nongnu.org; Mon, 20 Nov 2017 01:58:04 -0500
-Received: from szxga01-in.huawei.com ([45.249.212.187]:4503)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_ARCFOUR_SHA1:16) (Exim 4.71)
-	(envelope-from <arei.gonglei@huawei.com>) id 1eGg1n-0005He-LJ
-	for qemu-devel@nongnu.org; Mon, 20 Nov 2017 01:58:00 -0500
-From: "Gonglei (Arei)" <arei.gonglei@huawei.com>
-Date: Mon, 20 Nov 2017 06:57:32 +0000
-Message-ID: <33183CC9F5247A488A2544077AF19020DA4964D4@DGGEMA505-MBS.china.huawei.com>
-References: <58CFE56E.9090303@huawei.com>
-	<135b6663-b65c-b5ba-d3a8-b2a2127a07fa@redhat.com>
-	<58E59E29.7070305@huawei.com>
-In-Reply-To: <58E59E29.7070305@huawei.com>
-Content-Language: zh-CN
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [BUG/RFC] INIT IPI lost when VM starts
+	(envelope-from <dgibson@ozlabs.org>) id 1eGgHo-0004D6-MA
+	for qemu-devel@nongnu.org; Mon, 20 Nov 2017 02:14:35 -0500
+From: David Gibson <david@gibson.dropbear.id.au>
+Date: Mon, 20 Nov 2017 18:14:23 +1100
+Message-Id: <20171120071423.11693-1-david@gibson.dropbear.id.au>
+Subject: [Qemu-devel] [PATCH] spapr: Implement bug in spapr-vty device to be
+ compatible with PowerVM
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,65 +18,57 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>, "rkrcmar@redhat.com" <rkrcmar@redhat.com>, "afaerber@suse.de" <afaerber@suse.de>, "jan.kiszka@siemens.com" <jan.kiszka@siemens.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>, "wangxin (U)" <wangxinxin.wang@huawei.com>, "Huangweidong (C)" <weidong.huang@huawei.com>
-Cc: linzhecheng <linzhecheng@huawei.com>
+To: lvivier@redhat.com, paulus@samba.org, groug@kaod.org
+Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, David Gibson <david@gibson.dropbear.id.au>
 
-SGkgUGFvbG8sDQoNCldoYXQncyB5b3VyIG9waW5pb24gYWJvdXQgdGhpcyBwYXRjaD8gV2UgZm91
-bmQgaXQganVzdCBiZWZvcmUgZmluaXNoaW5nIHBhdGNoZXMgDQpmb3IgdGhlIHBhc3QgdHdvIGRh
-eXMuDQoNCg0KVGhhbmtzLA0KLUdvbmdsZWkNCg0KDQo+IC0tLS0tT3JpZ2luYWwgTWVzc2FnZS0t
-LS0tDQo+IEZyb206IGt2bS1vd25lckB2Z2VyLmtlcm5lbC5vcmcgW21haWx0bzprdm0tb3duZXJA
-dmdlci5rZXJuZWwub3JnXSBPbg0KPiBCZWhhbGYgT2YgSGVyb25nZ3VhbmcgKFN0ZXBoZW4pDQo+
-IFNlbnQ6IFRodXJzZGF5LCBBcHJpbCAwNiwgMjAxNyA5OjQ3IEFNDQo+IFRvOiBQYW9sbyBCb256
-aW5pOyBya3JjbWFyQHJlZGhhdC5jb207IGFmYWVyYmVyQHN1c2UuZGU7DQo+IGphbi5raXN6a2FA
-c2llbWVucy5jb207IHFlbXUtZGV2ZWxAbm9uZ251Lm9yZzsga3ZtQHZnZXIua2VybmVsLm9yZzsN
-Cj4gd2FuZ3hpbiAoVSk7IEh1YW5nd2VpZG9uZyAoQykNCj4gU3ViamVjdDogUmU6IFtCVUcvUkZD
-XSBJTklUIElQSSBsb3N0IHdoZW4gVk0gc3RhcnRzDQo+IA0KPiANCj4gDQo+IE9uIDIwMTcvNC82
-IDA6MTYsIFBhb2xvIEJvbnppbmkgd3JvdGU6DQo+ID4NCj4gPiBPbiAyMC8wMy8yMDE3IDE1OjIx
-LCBIZXJvbmdndWFuZyAoU3RlcGhlbikgd3JvdGU6DQo+ID4+IFdlIGVuY291bnRlcmVkIGEgcHJv
-YmxlbSB0aGF0IHdoZW4gYSBkb21haW4gc3RhcnRzLCBzZWFiaW9zIGZhaWxlZCB0bw0KPiA+PiBv
-bmxpbmUgYSB2Q1BVLg0KPiA+Pg0KPiA+PiBBZnRlciBpbnZlc3RpZ2F0aW9uLCB3ZSBmb3VuZCB0
-aGF0IHRoZSByZWFzb24gaXMgaW4ga3ZtLWttb2QsDQo+ID4+IEtWTV9BUElDX0lOSVQgYml0IGlu
-DQo+ID4+IHZjcHUtPmFyY2guYXBpYy0+cGVuZGluZ19ldmVudHMgd2FzIG92ZXJ3cml0dGVuIGJ5
-IHFlbXUsIGFuZCB0aHVzIGFuDQo+ID4+IElOSVQgSVBJIHNlbnQNCj4gPj4gdG8gQVAgd2FzIGxv
-c3QuIFFlbXUgZG9lcyB0aGlzIHNpbmNlIGxpYnZpcnRkIHNlbmRzIGEg4oCYcXVlcnktY3B1c+KA
-mSBxbXANCj4gPj4gY29tbWFuZCB0byBxZW11DQo+ID4+IG9uIFZNIHN0YXJ0Lg0KPiA+Pg0KPiA+
-PiBJbiBxZW11LCBxbXBfcXVlcnlfY3B1cy0+IGNwdV9zeW5jaHJvbml6ZV9zdGF0ZS0+DQo+ID4+
-IGt2bV9jcHVfc3luY2hyb25pemVfc3RhdGUtPg0KPiA+PiBkb19rdm1fY3B1X3N5bmNocm9uaXpl
-X3N0YXRlLCBxZW11IGdldHMgcmVnaXN0ZXJzL3ZjcHVfZXZlbnRzIGZyb20NCj4gPj4ga3ZtLWtt
-b2QgYW5kDQo+ID4+IHNldHMgY3B1LT5rdm1fdmNwdV9kaXJ0eSB0byB0cnVlLCBhbmQgdmNwdSB0
-aHJlYWQgaW4gcWVtdSB3aWxsIGNhbGwNCj4gPj4ga3ZtX2FyY2hfcHV0X3JlZ2lzdGVycyBpZiBj
-cHUtPmt2bV92Y3B1X2RpcnR5IGlzIHRydWUsIHRodXMNCj4gPj4gcGVuZGluZ19ldmVudHMgaXMN
-Cj4gPj4gb3ZlcndyaXR0ZW4gYnkgcWVtdS4NCj4gPj4NCj4gPj4gSSB0aGluayB0aGVyZSBpcyBu
-byBuZWVkIGZvciBxZW11IHRvIHNldCBjcHUtPmt2bV92Y3B1X2RpcnR5IHRvIHRydWUNCj4gPj4g
-YWZ0ZXIg4oCYcXVlcnktY3B1c+KAmSwNCj4gPj4gYW5kICBrdm0ta21vZCBzaG91bGQgbm90IGNs
-ZWFyIEtWTV9BUElDX0lOSVQgdW5jb25kaXRpb25hbGx5LiBBbmQgSSBhbQ0KPiA+PiBub3Qgc3Vy
-ZSB3aGV0aGVyDQo+ID4+IGl0IGlzIE9LIGZvciBxZW11IHRvIHNldCBjcHUtPmt2bV92Y3B1X2Rp
-cnR5IGluDQo+ID4+IGRvX2t2bV9jcHVfc3luY2hyb25pemVfc3RhdGUgaW4gZWFjaCBjYWxsZXIu
-DQo+ID4+DQo+ID4+IFdoYXTigJlzIHlvdXIgb3Bpbmlvbj8NCj4gPiBIaSBSb25nZ3VhbmcsDQo+
-ID4NCj4gPiBzb3JyeSBmb3IgdGhlIGxhdGUgcmVzcG9uc2UuDQo+ID4NCj4gPiBXaGVyZSBleGFj
-dGx5IGlzIEtWTV9BUElDX0lOSVQgZHJvcHBlZD8gIGt2bV9nZXRfbXBfc3RhdGUgZG9lcyBjbGVh
-cg0KPiB0aGUNCj4gPiBiaXQsIGJ1dCB0aGUgcmVzdWx0IG9mIHRoZSBJTklUIGlzIHN0b3JlZCBp
-biBtcF9zdGF0ZS4NCj4gDQo+IEl0J3MgZHJvcHBlZCBpbiBLVk1fU0VUX1ZDUFVfRVZFTlRTLCBz
-ZWUgYmVsb3cuDQo+IA0KPiA+DQo+ID4ga3ZtX2dldF92Y3B1X2V2ZW50cyBpcyBjYWxsZWQgYWZ0
-ZXIga3ZtX2dldF9tcF9zdGF0ZTsgaXQgcmV0cmlldmVzDQo+ID4gS1ZNX0FQSUNfSU5JVCBpbiBl
-dmVudHMuc21pLmxhdGNoZWRfaW5pdCBhbmQga3ZtX3NldF92Y3B1X2V2ZW50cyBwYXNzZXMNCj4g
-PiBpdCBiYWNrLiAgTWF5YmUgaXQgc2hvdWxkIGlnbm9yZSBldmVudHMuc21pLmxhdGNoZWRfaW5p
-dCBpZiBub3QgaW4gU01NLA0KPiA+IGJ1dCBJIHdvdWxkIGxpa2UgdG8gdW5kZXJzdGFuZCB0aGUg
-ZXhhY3Qgc2VxdWVuY2Ugb2YgZXZlbnRzLg0KPiANCj4gdGltZTA6DQo+IHZjcHUxOg0KPiBxbXBf
-cXVlcnlfY3B1cy0+IGNwdV9zeW5jaHJvbml6ZV9zdGF0ZS0+IGt2bV9jcHVfc3luY2hyb25pemVf
-c3RhdGUtPg0KPiAgPiBkb19rdm1fY3B1X3N5bmNocm9uaXplX3N0YXRlKGFuZCBzZXQgdmNwdTEn
-cyBjcHUtPmt2bV92Y3B1X2RpcnR5IHRvDQo+IHRydWUpLT4ga3ZtX2FyY2hfZ2V0X3JlZ2lzdGVy
-cyhLVk1fQVBJQ19JTklUIGJpdCBpbg0KPiB2Y3B1LT5hcmNoLmFwaWMtPnBlbmRpbmdfZXZlbnRz
-IHdhcyBub3Qgc2V0KQ0KPiANCj4gdGltZTE6DQo+IHZjcHUwOg0KPiBzZW5kIElOSVQtU0lQSSB0
-byBhbGwgQVAtPihpbiB2Y3B1IDAncw0KPiBjb250ZXh0KV9fYXBpY19hY2NlcHRfaXJxKEtWTV9B
-UElDX0lOSVQgYml0IGluIHZjcHUxJ3MNCj4gYXJjaC5hcGljLT5wZW5kaW5nX2V2ZW50cyBpcyBz
-ZXQpDQo+IA0KPiB0aW1lMjoNCj4gdmNwdTE6DQo+IGt2bV9jcHVfZXhlYy0+KGlmIGNwdS0+a3Zt
-X3ZjcHVfZGlydHkgaXMNCj4gdHJ1ZSlrdm1fYXJjaF9wdXRfcmVnaXN0ZXJzLT5rdm1fcHV0X3Zj
-cHVfZXZlbnRzKG92ZXJ3cml0dGVuDQo+IEtWTV9BUElDX0lOSVQgYml0IGluIHZjcHUtPmFyY2gu
-YXBpYy0+cGVuZGluZ19ldmVudHMhKQ0KPiANCj4gU28gaXQncyBhIHJhY2UgYmV0d2VlbiB2Y3B1
-MSBnZXQvcHV0IHJlZ2lzdGVycyB3aXRoIGt2bS9vdGhlciB2Y3B1cyBjaGFuZ2luZw0KPiB2Y3B1
-MSdzIHN0YXR1cy9zdHJ1Y3R1cmUgZmllbGRzIGluIHRoZSBtZWFuIHRpbWUsIEkgYW0gaW4gd29y
-cnkgb2YgaWYgdGhlcmUgYXJlDQo+IG90aGVyIGZpZWxkcyBtYXkgYmUgb3ZlcndyaXR0ZW4sDQo+
-IHNpcGlfdmVjdG9yIGlzIG9uZS4NCj4gDQo+IGFsc28gc2VlOg0KPiBodHRwczovL3d3dy5tYWls
-LWFyY2hpdmUuY29tL3FlbXUtZGV2ZWxAbm9uZ251Lm9yZy9tc2c0Mzg2NzUuaHRtbA0KPiANCj4g
-PiBUaGFua3MsDQo+ID4NCj4gPiBwYW9sbw0KPiA+DQo+ID4gLg0KPiA+DQo+IA0KDQo=
+The spapr-vty device implements the PAPR defined virtual console,
+which is also implemented by IBM's proprietary PowerVM hypervisor.
+
+PowerVM's implementation has a bug where it inserts an extra \0 after
+every \r going to the guest.  Because of that Linux's guest side
+driver has a workaround which strips \0 characters that appear
+immediately after a \r.
+
+That means that when running under qemu, sending a binary stream from
+host to guest via spapr-vty which happens to include a \r\0 sequence
+will get corrupted by that workaround.
+
+To deal with that, this patch duplicates PowerVM's bug, inserting an
+extra \0 after each \r.  Ugly, but the best option available.
+
+Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
+---
+ hw/char/spapr_vty.c | 18 ++++++++++++++++++
+ 1 file changed, 18 insertions(+)
+
+diff --git a/hw/char/spapr_vty.c b/hw/char/spapr_vty.c
+index 0fa416ca6b..a95e5e91a7 100644
+--- a/hw/char/spapr_vty.c
++++ b/hw/char/spapr_vty.c
+@@ -58,6 +58,24 @@ static int vty_getchars(VIOsPAPRDevice *sdev, uint8_t *buf, int max)
+ 
+     while ((n < max) && (dev->out != dev->in)) {
+         buf[n++] = dev->buf[dev->out++ % VTERM_BUFSIZE];
++
++        /* PowerVM's vty implementation has a bug where it inserts a
++         * \0 after every \r going to the guest.  Existing guests have
++         * a workaround for this which removes every \0 immediately
++         * following a \r, so here we make ourselves bug-for-bug
++         * compatible, so that the guest won't drop a real \0-after-\r
++         * that happens to occur in a binary stream. */
++        if (buf[n-1] == '\r') {
++            if (n < max) {
++                buf[n++] = '\0';
++            } else {
++                /* No room for the extra \0, roll back and try again
++                 * next time */
++                dev->out--;
++                n--;
++                break;
++            }
++        }
+     }
+ 
+     qemu_chr_fe_accept_input(&dev->chardev);
+-- 
+2.14.3
