@@ -1,27 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49349)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50566)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1eGmHy-0008Rx-2Z
-	for qemu-devel@nongnu.org; Mon, 20 Nov 2017 08:39:07 -0500
+	(envelope-from <jcody@redhat.com>) id 1eGmLh-0001ug-GK
+	for qemu-devel@nongnu.org; Mon, 20 Nov 2017 08:42:58 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1eGmHx-0003Sf-0p
-	for qemu-devel@nongnu.org; Mon, 20 Nov 2017 08:39:06 -0500
-Received: from mail-wm0-x243.google.com ([2a00:1450:400c:c09::243]:41999)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1eGmHw-0003SL-Q5
-	for qemu-devel@nongnu.org; Mon, 20 Nov 2017 08:39:04 -0500
-Received: by mail-wm0-x243.google.com with SMTP id 5so17755032wmk.1
-	for <qemu-devel@nongnu.org>; Mon, 20 Nov 2017 05:39:04 -0800 (PST)
+	(envelope-from <jcody@redhat.com>) id 1eGmLg-00050D-Kw
+	for qemu-devel@nongnu.org; Mon, 20 Nov 2017 08:42:57 -0500
+Date: Mon, 20 Nov 2017 08:42:40 -0500
+From: Jeff Cody <jcody@redhat.com>
+Message-ID: <20171120134240.GH5399@localhost.localdomain>
+References: <cover.1511145863.git.jcody@redhat.com>
+	<5bec37564f83e39e216d2ebcf7a380b0c7704e0e.1511145863.git.jcody@redhat.com>
+	<20171120112826.GC4516@stefanha-x1.localdomain>
 MIME-Version: 1.0
-In-Reply-To: <98692fd0-2048-ce69-3fc2-8b7f44417bfa@twiddle.net>
-References: <1510079118-3923-1-git-send-email-peter.maydell@linaro.org>
-	<98692fd0-2048-ce69-3fc2-8b7f44417bfa@twiddle.net>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon, 20 Nov 2017 13:38:43 +0000
-Message-ID: <CAFEAcA_MA7LmRLhzff26c84XQQbipPbjFgVq=fHnCnYh_kMbNA@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH for-2.11] linux-user: Fix calculation of
- auxv length
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20171120112826.GC4516@stefanha-x1.localdomain>
+Subject: Re: [Qemu-devel] [Qemu-block] [PATCH 2/5] coroutine: abort if we
+ try to enter coroutine scheduled for another ctx
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,34 +25,73 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Richard Henderson <rth@twiddle.net>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, "patches@linaro.org" <patches@linaro.org>, Riku Voipio <riku.voipio@iki.fi>, Laurent Vivier <laurent@vivier.eu>
+To: Stefan Hajnoczi <stefanha@gmail.com>
+Cc: qemu-devel@nongnu.org, kwolf@redhat.com, famz@redhat.com, qemu-block@nongnu.org, mreitz@redhat.com, stefanha@redhat.com, pbonzini@redhat.com
 
-On 8 November 2017 at 08:41, Richard Henderson <rth@twiddle.net> wrote:
-> On 11/07/2017 07:25 PM, Peter Maydell wrote:
->> In commit 7c4ee5bcc82e643 we changed the order in which we construct
->> the AUXV, but forgot to adjust the calculation of the length. The
->> result is that we set info->auxv_len to a bogus and negative value,
->> and then later on the code in open_self_auxv() gets confused and
->> ends up presenting the guest with an empty file.
->>
->> Since we now have to calculate the auxv length up-front as part
->> of figuring out how much we're going to put on the stack, set
->> info->auxv_len then; this allows us to assert that we put the
->> same number of entries into auxv as we pre-calculated, rather
->> than merely having a comment saying we need to do that.
->>
->> Fixes: https://bugs.launchpad.net/qemu/+bug/1728116
->>
->> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
->> ---
->>  linux-user/elfload.c | 11 +++++++++--
->>  1 file changed, 9 insertions(+), 2 deletions(-)
->
-> Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+On Mon, Nov 20, 2017 at 11:28:26AM +0000, Stefan Hajnoczi wrote:
+> On Sun, Nov 19, 2017 at 09:46:43PM -0500, Jeff Cody wrote:
+> > diff --git a/include/qemu/coroutine_int.h b/include/qemu/coroutine_int.h
+> > index cb98892..931cdc9 100644
+> > --- a/include/qemu/coroutine_int.h
+> > +++ b/include/qemu/coroutine_int.h
+> > @@ -53,6 +53,9 @@ struct Coroutine {
+> >  
+> >      /* Only used when the coroutine has yielded.  */
+> >      AioContext *ctx;
+> > +
+> > +    int scheduled;
+> 
+> s/int/bool/
+> 
 
-Ping! This is a for-2.11 patch with review, and rc2 is tomorrow:
-Riku, are you planning a pull request?
+OK.
 
-thanks
--- PMM
+> > diff --git a/util/qemu-coroutine.c b/util/qemu-coroutine.c
+> > index d6095c1..2edab63 100644
+> > --- a/util/qemu-coroutine.c
+> > +++ b/util/qemu-coroutine.c
+> > @@ -109,6 +109,15 @@ void qemu_aio_coroutine_enter(AioContext *ctx, Coroutine *co)
+> >  
+> >      trace_qemu_aio_coroutine_enter(ctx, self, co, co->entry_arg);
+> >  
+> > +    /* if the Coroutine has already been scheduled, entering it again will
+> > +     * cause us to enter it twice, potentially even after the coroutine has
+> > +     * been deleted */
+> > +    if (co->scheduled == 1) {
+> > +        fprintf(stderr, "Cannot enter a co-routine that has already "
+> > +                        "been scheduled to run in a different AioContext\n");
+> 
+> This error message is too specific, the AioContext doesn't have to be
+> different from the current one:
+> 
+> block/blkdebug.c:        aio_co_schedule(qemu_get_current_aio_context(), qemu_coroutine_self());
+> 
+> If something calls qemu_aio_coroutine_enter() on the coroutine it might
+> be from the same AioContext - but still an error condition worth failing
+> loudly on.
+> 
+
+Good point.
+
+
+> I suggest simplifying the error message:
+> 
+>   fprintf(stderr, "Cannot enter a co-routine that has already "
+>                   "been scheduled\n");
+
+OK. I'll also change the wording here to what you have above, as well:
+
+  void aio_co_schedule(AioContext *ctx, Coroutine *co)
+  {
+       trace_aio_co_schedule(ctx, co);
+  +    if (co->scheduled == 1) {
+  +        fprintf(stderr,
+  +                "Cannot schedule a co-routine that is already scheduled\n");
+  +        abort();
+  +    }
+  +    co->scheduled = 1;
+       QSLIST_INSERT_HEAD_ATOMIC(&ctx->scheduled_coroutines,
+                                 co, co_scheduled_next);
+
+
+Jeff
