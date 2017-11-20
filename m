@@ -1,26 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33719)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34041)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <lprosek@redhat.com>) id 1eGlVo-00063N-BD
-	for qemu-devel@nongnu.org; Mon, 20 Nov 2017 07:49:21 -0500
+	(envelope-from <alex.bennee@linaro.org>) id 1eGlX1-0006eZ-2O
+	for qemu-devel@nongnu.org; Mon, 20 Nov 2017 07:50:36 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <lprosek@redhat.com>) id 1eGlVl-0006oj-84
-	for qemu-devel@nongnu.org; Mon, 20 Nov 2017 07:49:20 -0500
-Received: from mail-ua0-f196.google.com ([209.85.217.196]:39138)
+	(envelope-from <alex.bennee@linaro.org>) id 1eGlWy-0007A8-1F
+	for qemu-devel@nongnu.org; Mon, 20 Nov 2017 07:50:35 -0500
+Received: from mail-wm0-x243.google.com ([2a00:1450:400c:c09::243]:35647)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <lprosek@redhat.com>) id 1eGlVl-0006oa-36
-	for qemu-devel@nongnu.org; Mon, 20 Nov 2017 07:49:17 -0500
-Received: by mail-ua0-f196.google.com with SMTP id 31so645695uaj.6
-	for <qemu-devel@nongnu.org>; Mon, 20 Nov 2017 04:49:16 -0800 (PST)
+	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+	id 1eGlWx-00079t-Op
+	for qemu-devel@nongnu.org; Mon, 20 Nov 2017 07:50:31 -0500
+Received: by mail-wm0-x243.google.com with SMTP id y80so18438282wmd.0
+	for <qemu-devel@nongnu.org>; Mon, 20 Nov 2017 04:50:31 -0800 (PST)
+References: <8726068c-1112-eaea-5315-ec17ae37ae33@huawei.com>
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+In-reply-to: <8726068c-1112-eaea-5315-ec17ae37ae33@huawei.com>
+Date: Mon, 20 Nov 2017 12:50:28 +0000
+Message-ID: <878tf1xgff.fsf@linaro.org>
 MIME-Version: 1.0
-In-Reply-To: <CABdb7363ki8=BroGTP6Z+Shc+WLn3kJjM2e5y3N=R7vL=y4rKg@mail.gmail.com>
-References: <20171115073144.14758-1-lprosek@redhat.com>
-	<1f8754babd990beb90c516d2973b21d3@hostfission.com>
-	<CABdb7363ki8=BroGTP6Z+Shc+WLn3kJjM2e5y3N=R7vL=y4rKg@mail.gmail.com>
-From: Ladi Prosek <lprosek@redhat.com>
-Date: Mon, 20 Nov 2017 13:49:15 +0100
-Message-ID: <CABdb736YcfLJxGY9M-rzT1KuLjmxVTRf3VxJjP9101VBHj6Apw@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH v2 0/3] ivshmem: MSI bug fixes
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [question] mask SIGBUS in qemu main thread
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,106 +29,91 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Geoffrey McRae <geoff@hostfission.com>
-Cc: qemu-devel <qemu-devel@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>, Markus Armbruster <armbru@redhat.com>, =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@redhat.com>
+To: gengdongjiu <gengdongjiu@huawei.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, mst@redhat.com, "peter.maydell@linaro.org" <peter.maydell@linaro.org>, Ingo Molnar <mingo@redhat.com>, Wuquanming <wuquanming@huawei.com>, Huangshaoyu <huangshaoyu@huawei.com>
 
-On Mon, Nov 20, 2017 at 10:07 AM, Ladi Prosek <lprosek@redhat.com> wrote:
-> On Sun, Nov 19, 2017 at 9:39 PM,  <geoff@hostfission.com> wrote:
->> I just updated to the latest build and applied this patch set, now on VM
->> reset the qemu crashes with the following assert:
->>
->> ivshmem.c:467: ivshmem_add_kvm_msi_virq: Assertion
->> `!s->msi_vectors[vector].pdev' failed.
+
+gengdongjiu <gengdongjiu@huawei.com> writes:
+
+> Hi all,
+>   sorry to disturb you, I have a question to consult with you why the SIG=
+BUS mask bit is set in the Qemu main thread?
+> do we not want to Qemu main thread to handle the SIGBUS signal?
+>   thanks.
+
+What exactly do you expect the main thread to do with a SIGBUS signal?
+
+If QEMU doesn't catch the SIGBUS it will be up to the kernel to deal
+with it, probably by terminating QEMU. This is fine because this is a
+bug in QEMU that shouldn't have occurred.
+
+This is different from dealing with SIGBUS due to the guests action
+which might occur in the various vCPU threads.
+
+> As shown in [1], the Qemu main thread PID is 30976.
+> "cat /proc/30976/status" in [2], we can see the "SigBlk: 0000000010002240=
+", SIGBUS block bit is 7, so the SIGBUS block bit is set.
+> then the Qemu main thread will not be woken up if there is SIGBUS set to =
+it.
+> thanks!
 >
-> I see asserts too. Even with v1 on top of QEMU v2.10.0 so I must have
-> missed something.
 >
-> Looking. And, needless to say, these patches should not be applied just yet :)
-
-Ok, here goes it.
-
-1)
-ivshmem.c:467: ivshmem_add_kvm_msi_virq: Assertion
-`!s->msi_vectors[vector].pdev' failed.
-
-Is caused by the ivshmem device not undoing the effects of
-ivshmem_enable_irqfd() on reset.
-
-This fix works for me:
-
---- a/hw/misc/ivshmem.c
-+++ b/hw/misc/ivshmem.c
-@@ -758,10 +758,15 @@ static void ivshmem_msix_vector_use(IVShmemState *s)
-     }
- }
-
-+
-+static void ivshmem_disable_irqfd(IVShmemState *s);
-+
- static void ivshmem_reset(DeviceState *d)
- {
-     IVShmemState *s = IVSHMEM_COMMON(d);
-
-+    ivshmem_disable_irqfd(s);
-+
-     s->intrstatus = 0;
-     s->intrmask = 0;
-     if (ivshmem_has_feature(s, IVSHMEM_MSI)) {
-
-
-2)
-ivshmem.c:354: ivshmem_vector_mask: Assertion `v->unmasked' failed.
-
-which I've been also getting after I enabled Driver Verifier and
-Windows started crashing
-(https://github.com/virtio-win/kvm-guest-drivers-windows/pull/199), is
-caused by the MSI-X code masking already masked vectors on reset. I'm
-going to post a patch similar to this:
-
---- a/hw/pci/msix.c
-+++ b/hw/pci/msix.c
-@@ -500,11 +500,12 @@ void msix_reset(PCIDevice *dev)
-         return;
-     }
-     msix_clear_all_vectors(dev);
-+    msix_mask_all(dev, dev->msix_entries_nr);
-     dev->config[dev->msix_cap + MSIX_CONTROL_OFFSET] &=
-            ~dev->wmask[dev->msix_cap + MSIX_CONTROL_OFFSET];
-     memset(dev->msix_table, 0, dev->msix_entries_nr * PCI_MSIX_ENTRY_SIZE);
-     memset(dev->msix_pba, 0, QEMU_ALIGN_UP(dev->msix_entries_nr, 64) / 8);
--    msix_mask_all(dev, dev->msix_entries_nr);
-+    msix_update_function_masked(dev);
- }
-
-
-Then either no further changes to this patchset are necessary. Or, if
-relying on unmasks/masks (or
-msix_vector_use_notifier/msix_vector_release_notifier as it's called
-in msix.c) always being balanced is not recommended, the assert will
-simply change into an if.
-
-> Thanks!
-> Ladi
+> [1]:
+> # ps -eL | grep "qemu"
+> 30976 30976 pts/7    00:00:00 qemu-system-x86
+> 30976 30977 pts/7    00:00:00 qemu-system-x86
 >
->> On 2017-11-15 18:31, Ladi Prosek wrote:
->>>
->>> Fixes bugs in the ivshmem device implementation uncovered with the new
->>> Windows ivshmem driver:
->>>
->>> https://github.com/virtio-win/kvm-guest-drivers-windows/tree/master/ivshmem
->>>
->>> v1->v2:
->>> * Patch 1 - added reproducer info to commit message (Markus)
->>> * Patch 2 - restructured conditionals, fixed comment formatting (Markus)
->>> * Patch 3 - added reproducer info to commit message (Markus)
->>>
->>> Ladi Prosek (3):
->>>   ivshmem: Don't update non-existent MSI routes
->>>   ivshmem: Always remove irqfd notifiers
->>>   ivshmem: Improve MSI irqfd error handling
->>>
->>>  hw/misc/ivshmem.c | 77
->>> +++++++++++++++++++++++++++++++++++++++++--------------
->>>  1 file changed, 58 insertions(+), 19 deletions(-)
->>
->>
+> [2]
+> # cat /proc/30976/status
+> Name:   qemu-system-x86
+> State:  S (sleeping)
+> Tgid:   30976
+> Ngid:   0
+> Pid:    30976
+> PPid:   34807
+> TracerPid:      0
+> Uid:    1000    1000    1000    1000
+> Gid:    1000    1000    1000    1000
+> FDSize: 256
+> Groups: 4 24 27 30 46 108 114 115 1000
+> NStgid: 30976
+> NSpid:  30976
+> NSpgid: 30976
+> NSsid:  34772
+> VmPeak:   604260 kB
+> VmSize:   538724 kB
+> VmLck:         0 kB
+> VmPin:         0 kB
+> VmHWM:     34176 kB
+> VmRSS:     34176 kB
+> VmData:   294308 kB
+> VmStk:       136 kB
+> VmExe:      4808 kB
+> VmLib:     36144 kB
+> VmPTE:       528 kB
+> VmPMD:        16 kB
+> VmSwap:        0 kB
+> HugetlbPages:          0 kB
+> Threads:        2
+> SigQ:   6/514067
+> SigPnd: 0000000000000000
+> ShdPnd: 0000000000000000
+> SigBlk: 0000000010002240
+> SigIgn: 0000000000001000
+> SigCgt: 0000000180004243
+> CapInh: 0000000000000000
+> CapPrm: 0000000000000000
+> CapEff: 0000000000000000
+> CapBnd: 0000003fffffffff
+> CapAmb: 0000000000000000
+> Seccomp:        0
+> Cpus_allowed:   ffff,ffffffff
+> Cpus_allowed_list:      0-47
+> Mems_allowed:   00000000,00000003
+> Mems_allowed_list:      0-1
+> voluntary_ctxt_switches:        7638
+> nonvoluntary_ctxt_switches:     3
+
+
+--
+Alex Benn=C3=A9e
