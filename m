@@ -1,39 +1,39 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39006)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40603)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <borntraeger@de.ibm.com>) id 1eGlkV-00055P-Fs
-	for qemu-devel@nongnu.org; Mon, 20 Nov 2017 08:04:35 -0500
+	(envelope-from <borntraeger@de.ibm.com>) id 1eGlrX-0007yX-WA
+	for qemu-devel@nongnu.org; Mon, 20 Nov 2017 08:11:49 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <borntraeger@de.ibm.com>) id 1eGlkQ-0006HG-St
-	for qemu-devel@nongnu.org; Mon, 20 Nov 2017 08:04:31 -0500
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:39710)
+	(envelope-from <borntraeger@de.ibm.com>) id 1eGlrU-0000ZW-8M
+	for qemu-devel@nongnu.org; Mon, 20 Nov 2017 08:11:47 -0500
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:40292)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <borntraeger@de.ibm.com>)
-	id 1eGlkQ-0006Gu-Jq
-	for qemu-devel@nongnu.org; Mon, 20 Nov 2017 08:04:26 -0500
-Received: from pps.filterd (m0098393.ppops.net [127.0.0.1])
+	id 1eGlrT-0000Z7-Vu
+	for qemu-devel@nongnu.org; Mon, 20 Nov 2017 08:11:44 -0500
+Received: from pps.filterd (m0098399.ppops.net [127.0.0.1])
 	by mx0a-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
-	vAKD3AOT139182
-	for <qemu-devel@nongnu.org>; Mon, 20 Nov 2017 08:04:21 -0500
-Received: from e06smtp14.uk.ibm.com (e06smtp14.uk.ibm.com [195.75.94.110])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2ebykhg1gq-1
+	vAKDBS0x069241
+	for <qemu-devel@nongnu.org>; Mon, 20 Nov 2017 08:11:39 -0500
+Received: from e06smtp15.uk.ibm.com (e06smtp15.uk.ibm.com [195.75.94.111])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2ebx32e3pg-1
 	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Mon, 20 Nov 2017 08:04:20 -0500
+	for <qemu-devel@nongnu.org>; Mon, 20 Nov 2017 08:11:30 -0500
 Received: from localhost
-	by e06smtp14.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	by e06smtp15.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
 	Only! Violators will be prosecuted
 	for <qemu-devel@nongnu.org> from <borntraeger@de.ibm.com>;
-	Mon, 20 Nov 2017 13:04:18 -0000
+	Mon, 20 Nov 2017 13:11:06 -0000
 References: <20171120123525.147663-1-borntraeger@de.ibm.com>
 	<20171120123525.147663-3-borntraeger@de.ibm.com>
 	<20171120140052.48c7f646.cohuck@redhat.com>
 From: Christian Borntraeger <borntraeger@de.ibm.com>
-Date: Mon, 20 Nov 2017 14:04:13 +0100
+Date: Mon, 20 Nov 2017 14:11:03 +0100
 MIME-Version: 1.0
 In-Reply-To: <20171120140052.48c7f646.cohuck@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Message-Id: <e3893f02-9038-62c0-e704-2b3bf6f1c351@de.ibm.com>
+Message-Id: <84eddd46-e843-8d4a-5905-1e6956187f4e@de.ibm.com>
 Subject: Re: [Qemu-devel] [PATCH 2/2] s390x/kvm: use valgrind annotations
  for kvm device attributes
 List-Id: <qemu-devel.nongnu.org>
@@ -94,15 +94,20 @@ On 11/20/2017 02:00 PM, Cornelia Huck wrote:
 > 
 > This looks ugly :(
 > 
-> Is s390x the only one hitting those side effects? If we need to
+> Is s390x the only one hitting those side effects?
+
+Almost nobody else uses the device attributes. And when they use it they
+have the same problem
+We papered over some bugs by zero-initializing structs but I think marking
+only the really changed memory will help to detect real bugs (e.g. if code
+reads ioctl data but the ioctl fails we will not detect this when pre-zeroing.
+
+
+ If we need to
 > sprinkle those all over the source code, it improves valgrind results
 > but makes the code harder to read...
->
+> 
 > (And no, I don't have a better idea.)
-
-We could provide a wrapper?
-
-
 > 
 >> +    }
 >> +    return ret;
