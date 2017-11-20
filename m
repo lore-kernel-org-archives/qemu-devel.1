@@ -1,23 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33200)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33360)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1eGiLS-0001Pe-II
-	for qemu-devel@nongnu.org; Mon, 20 Nov 2017 04:26:27 -0500
+	(envelope-from <zhuyijun@huawei.com>) id 1eGiMC-0001np-OV
+	for qemu-devel@nongnu.org; Mon, 20 Nov 2017 04:27:13 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1eGiLP-0008Px-DZ
-	for qemu-devel@nongnu.org; Mon, 20 Nov 2017 04:26:26 -0500
-Date: Mon, 20 Nov 2017 10:26:12 +0100
-From: Cornelia Huck <cohuck@redhat.com>
-Message-ID: <20171120102612.07d77bb3.cohuck@redhat.com>
-In-Reply-To: <e40a4f25-3384-f670-7cc9-ca6334213f1b@redhat.com>
-References: <1510942228-22822-1-git-send-email-thuth@redhat.com>
-	<b083a168-4743-46a7-d78c-78b86d300dbc@de.ibm.com>
-	<b4f16003-a1ff-c5dd-dc06-c285929254ba@de.ibm.com>
-	<e40a4f25-3384-f670-7cc9-ca6334213f1b@redhat.com>
+	(envelope-from <zhuyijun@huawei.com>) id 1eGiM9-0000Fn-LN
+	for qemu-devel@nongnu.org; Mon, 20 Nov 2017 04:27:12 -0500
+Message-ID: <5A129EE4.2090704@huawei.com>
+Date: Mon, 20 Nov 2017 17:22:44 +0800
+From: Zhu Yijun <zhuyijun@huawei.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+References: <1510622154-17224-1-git-send-email-zhuyijun@huawei.com>
+	<1510622154-17224-3-git-send-email-zhuyijun@huawei.com>
+	<20171114144708.uzh6mkmjygojfpbu@kamzik.brq.redhat.com>
+In-Reply-To: <20171114144708.uzh6mkmjygojfpbu@kamzik.brq.redhat.com>
+Content-Type: text/plain; charset="ISO-8859-1"
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [qemu-s390x] [PATCH for-2.11] pc-bios/s390-ccw:
- Fix problem with invalid virtio-scsi LUN when rebooting
+Subject: Re: [Qemu-devel] [RFC 2/5] hw/arm/virt: Enable dynamic generation
+ of guest RAM memory regions
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,54 +25,105 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>
-Cc: Christian Borntraeger <borntraeger@de.ibm.com>, qemu-s390x@nongnu.org, qemu-devel@nongnu.org
+To: Andrew Jones <drjones@redhat.com>
+Cc: qemu-arm@nongnu.org, qemu-devel@nongnu.org, eric.auger@redhat.com, peter.maydell@linaro.org, shameerali.kolothum.thodi@huawei.com, zhaoshenglong@huawei.com
 
-On Mon, 20 Nov 2017 10:18:38 +0100
-Thomas Huth <thuth@redhat.com> wrote:
+Hi Andrew,
 
-> On 20.11.2017 09:48, Christian Borntraeger wrote:
-> > Thomas,
-> > 
-> > does this patch help as well?
-> > 
-> > diff --git a/pc-bios/s390-ccw/Makefile b/pc-bios/s390-ccw/Makefile
-> > index 6d0c2ee..2687590 100644
-> > --- a/pc-bios/s390-ccw/Makefile
-> > +++ b/pc-bios/s390-ccw/Makefile
-> > @@ -12,7 +12,7 @@ $(call set-vpath, $(SRC_PATH)/pc-bios/s390-ccw)
-> >  OBJECTS = start.o main.o bootmap.o sclp.o virtio.o virtio-scsi.o virtio-blkdev.o
-> >  QEMU_CFLAGS := $(filter -W%, $(QEMU_CFLAGS))
-> >  QEMU_CFLAGS += -ffreestanding -fno-delete-null-pointer-checks -msoft-float
-> > -QEMU_CFLAGS += -march=z900 -fPIE -fno-strict-aliasing
-> > +QEMU_CFLAGS += -march=z900 -fPIE -fno-strict-aliasing -fno-zero-initialized-in-bss
-> >  QEMU_CFLAGS += $(call cc-option, $(QEMU_CFLAGS), -fno-stack-protector)
-> >  LDFLAGS += -Wl,-pie -nostdlib  
-> 
-> No, that alone does not help, the default_scsi_device variable is still
-> in the normal .bss section in that case (you can also check that with
-> objdump for example). You'd have to apply this patch on top to fix it
-> that way:
-> 
-> diff --git a/pc-bios/s390-ccw/virtio-scsi.c b/pc-bios/s390-ccw/virtio-scsi.c
-> index c92f5d3..64ab095 100644
-> --- a/pc-bios/s390-ccw/virtio-scsi.c
-> +++ b/pc-bios/s390-ccw/virtio-scsi.c
-> @@ -15,7 +15,7 @@
->  #include "scsi.h"
->  #include "virtio-scsi.h"
-> 
-> -static ScsiDevice default_scsi_device;
-> +static ScsiDevice default_scsi_device = { 0 };
->  static VirtioScsiCmdReq req;
->  static VirtioScsiCmdResp resp;
-> 
-> ... then the variable is in the .data section instead.
-> 
-> But since the problem with other uninitialized .bss variables is then
-> still pending, I think we should rather go with my patch for 2.11 and
-> fix future problems properly in v2.12 by initializing the complete .bss
-> to zero in the start.S file.
+Thanks for your review!
 
-OK, I'll go with that. We can (should) invest more cycles for fixing
-the whole class of problems for the next release.
+On 2017/11/14 22:47, Andrew Jones wrote:
+> On Tue, Nov 14, 2017 at 09:15:51AM +0800, zhuyijun@huawei.com wrote:
+>> From: Zhu Yijun <zhuyijun@huawei.com>
+>>
+>> Register a ram_memory_region_init notify to allocate memory region
+>> from system memory and add them as subregions.
+>>
+>> Signed-off-by: Zhu Yijun <zhuyijun@huawei.com>
+>> ---
+>>  hw/arm/virt.c         | 21 ++++++++++++++++-----
+>>  include/hw/arm/virt.h |  1 +
+>>  2 files changed, 17 insertions(+), 5 deletions(-)
+>>
+>> diff --git a/hw/arm/virt.c b/hw/arm/virt.c
+>> index 9e18b41..ddde5e1 100644
+>> --- a/hw/arm/virt.c
+>> +++ b/hw/arm/virt.c
+>> @@ -1225,6 +1225,19 @@ void virt_machine_done(Notifier *notifier, void *data)
+>>      virt_build_smbios(vms);
+>>  }
+>>  
+>> +static void virt_ram_memory_region_init(Notifier *notifier, void *data)
+>> +{
+>> +    MachineState *machine = MACHINE(qdev_get_machine());
+> No need to use qdev_get_machine(), you can get it with MACHINE(vms).
+OK
+>> +    MemoryRegion *sysmem = get_system_memory();
+>> +    MemoryRegion *ram = g_new(MemoryRegion, 1);
+>> +    VirtMachineState *vms = container_of(notifier, VirtMachineState,
+>> +                                         ram_memory_region_init);
+>> +
+>> +    memory_region_allocate_system_memory(ram, NULL, "mach-virt.ram",
+>> +                                         machine->ram_size);
+>> +    memory_region_add_subregion(sysmem, vms->memmap[VIRT_MEM].base, ram);
+>> +}
+>> +
+>>  static uint64_t virt_cpu_mp_affinity(VirtMachineState *vms, int idx)
+>>  {
+>>      uint8_t clustersz = ARM_DEFAULT_CPUS_PER_CLUSTER;
+>> @@ -1258,7 +1271,6 @@ static void machvirt_init(MachineState *machine)
+>>      MemoryRegion *sysmem = get_system_memory();
+>>      MemoryRegion *secure_sysmem = NULL;
+>>      int n, virt_max_cpus;
+>> -    MemoryRegion *ram = g_new(MemoryRegion, 1);
+>>      bool firmware_loaded = bios_name || drive_get(IF_PFLASH, 0, 0);
+>>  
+>>      /* We can probe only here because during property set
+>> @@ -1409,10 +1421,6 @@ static void machvirt_init(MachineState *machine)
+>>      fdt_add_cpu_nodes(vms);
+>>      fdt_add_psci_node(vms);
+>>  
+>> -    memory_region_allocate_system_memory(ram, NULL, "mach-virt.ram",
+>> -                                         machine->ram_size);
+>> -    memory_region_add_subregion(sysmem, vms->memmap[VIRT_MEM].base, ram);
+>> -
+>>      create_flash(vms, sysmem, secure_sysmem ? secure_sysmem : sysmem);
+>>  
+>>      create_gic(vms, pic);
+>> @@ -1462,6 +1470,9 @@ static void machvirt_init(MachineState *machine)
+>>       * Notifiers are executed in registration reverse order.
+>>       */
+>>      create_platform_bus(vms, pic);
+>> +
+>> +    vms->ram_memory_region_init.notify = virt_ram_memory_region_init;
+>> +    qemu_add_machine_init_done_notifier(&vms->ram_memory_region_init);
+> Does this notifier need to be the first one executed? If so, then a
+> comment should be added to state that. Actually the comment above
+> create_platform_bus() could be replaced with a comment above the first
+> notifier that states all notifier dependencies.
+Yes, it should be the first notifier, because reserved memory regions must get before memory node created in arm_load_kernel_notify.
+>>  }
+>>  
+>>  static bool virt_get_secure(Object *obj, Error **errp)
+>> diff --git a/include/hw/arm/virt.h b/include/hw/arm/virt.h
+>> index 33b0ff3..38906b8 100644
+>> --- a/include/hw/arm/virt.h
+>> +++ b/include/hw/arm/virt.h
+>> @@ -90,6 +90,7 @@ typedef struct {
+>>  typedef struct {
+>>      MachineState parent;
+>>      Notifier machine_done;
+>> +    Notifier ram_memory_region_init;
+>>      FWCfgState *fw_cfg;
+>>      bool secure;
+>>      bool highmem;
+>> -- 
+>> 1.8.3.1
+>>
+>>
+>>
+> Thanks,
+> drew 
+>
+> .
+>
