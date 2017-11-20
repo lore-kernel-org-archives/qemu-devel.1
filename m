@@ -1,24 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40272)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40831)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <s.priebe@profihost.ag>) id 1eGr82-0001dQ-D2
-	for qemu-devel@nongnu.org; Mon, 20 Nov 2017 13:49:11 -0500
+	(envelope-from <bounces@canonical.com>) id 1eGr9u-0002hH-Qe
+	for qemu-devel@nongnu.org; Mon, 20 Nov 2017 13:51:08 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <s.priebe@profihost.ag>) id 1eGr7z-0006pj-49
-	for qemu-devel@nongnu.org; Mon, 20 Nov 2017 13:49:10 -0500
-Received: from cloud1-vm154.de-nserver.de ([178.250.10.56]:42526)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <s.priebe@profihost.ag>)
-	id 1eGr7y-0006nU-PG
-	for qemu-devel@nongnu.org; Mon, 20 Nov 2017 13:49:07 -0500
-From: Stefan Priebe - Profihost AG <s.priebe@profihost.ag>
-Message-ID: <71615aa0-1c39-a4bc-b5f1-770f2feeb1ba@profihost.ag>
-Date: Mon, 20 Nov 2017 19:48:58 +0100
+	(envelope-from <bounces@canonical.com>) id 1eGr9r-0007eB-HR
+	for qemu-devel@nongnu.org; Mon, 20 Nov 2017 13:51:06 -0500
+Received: from indium.canonical.com ([91.189.90.7]:38166)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1eGr9r-0007dD-Az
+	for qemu-devel@nongnu.org; Mon, 20 Nov 2017 13:51:03 -0500
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1eGr9p-0004hZ-MD
+	for <qemu-devel@nongnu.org>; Mon, 20 Nov 2017 18:51:01 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 8D8D22E80D2
+	for <qemu-devel@nongnu.org>; Mon, 20 Nov 2017 18:51:01 +0000 (UTC)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Language: de-DE
-Content-Transfer-Encoding: 7bit
-Subject: [Qemu-devel] kvm: Failed to flush the L2 table cache: Input/output
- error
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Mon, 20 Nov 2017 18:36:40 -0000
+From: Peter Maydell <peter.maydell@linaro.org>
+Reply-To: Bug 1673976 <1673976@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <20170318142657.21676.52259.malonedeb@chaenomeles.canonical.com>
+Message-Id: <151120300007.28762.2157378064855965898.malone@gac.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1673976] Re: linux-user clone() can't handle
+ glibc posix_spawn() (causes locale-gen to assert)
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,28 +37,65 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel <qemu-devel@nongnu.org>
+To: qemu-devel@nongnu.org
 
-Hello,
+OK, this can't be as simple as "posix_spawn() fails", because I've just
+tried the test program from the posix_spawn manpage
+(http://man7.org/linux/man-pages/man3/posix_spawn.3.html) and that works
+fine for x86-64 guest, aarch64 guest and armhf guest. In the x86 and
+armhf cases the libc I have seems to use the NR_vfork syscall, but for
+aarch64 it uses clone(CLONE_VM | CLONE_VFORK | SIGCHLD, ...) which is
+what the glibc sources linked in comment #5 do, and that all works fine.
 
-while using qemu 2.9.1 and doing a backup of a disk:
+And locale-gen runs fine for my xenial-armhf chroot using current head-
+of-git QEMU:
 
-I have sometimes the following output:
+root@e104462:/# locale-gen   =
 
-Formatting '/mnt/qemu-249-2017_11_19-04_00_05.qcow2', fmt=qcow2
-size=236223201280 encryption=off cluster_size=65536 lazy_refcounts=off
-refcount_bits=16
+Generating locales (this might take a while)...
+  en_GB.UTF-8... done
+Generation complete.
 
+So can I ask that people: (1) please try with current head of git (or
+with 2.11-rc1, which is almost the same thing); (2) if there's still a
+problem with localegen or with programs calling posix_spawn() or other
+real-world code, please provide full repro instructions so I can try to
+reproduce locally.
 
-followed by:
+I don't think we can make clone() in general work, so oddball demo code
+like the example program in the clone(2) manpage is out of scope, but
+there may well be specific cases we can address.
 
-kvm: Failed to flush the L2 table cache: Input/output error
-kvm: Failed to flush the refcount block cache: Input/output error
+-- =
 
-If this error happens (Failed to flush) the whole backup is incomplete.
-Host kernel is a 4.4 based openSuSE 42.3 kernel.
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1673976
 
-Is this a known bug?
+Title:
+  linux-user clone() can't handle glibc posix_spawn() (causes locale-gen
+  to assert)
 
-Greets,
-Stefan
+Status in QEMU:
+  New
+
+Bug description:
+  I'm running a command (locale-gen) inside of an armv7h chroot mounted
+  on my x86_64 desktop by putting qemu-arm-static into /usr/bin/ of the
+  chroot file system and I get a core dump.
+
+  locale-gen
+  Generating locales...
+  =C2=A0=C2=A0en_US.UTF-8...localedef: ../sysdeps/unix/sysv/linux/spawni.c:=
+360: __spawnix: Assertion `ec >=3D 0' failed.
+  qemu: uncaught target signal 6 (Aborted) - core dumped
+  /usr/bin/locale-gen: line 41:    34 Aborted                 (core dumped)=
+ localedef -i $input -c -f $charset -A /usr/share/locale/locale.alias $loca=
+le
+
+  I've done this same thing successfully for years, but this breakage
+  has appeared some time in the last 3 or so months. Possibly with the
+  update to qemu version 2.8.
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1673976/+subscriptions
