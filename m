@@ -1,24 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42468)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50570)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1eGd0y-000745-It
-	for qemu-devel@nongnu.org; Sun, 19 Nov 2017 22:44:58 -0500
+	(envelope-from <thuth@redhat.com>) id 1eGds9-0006l5-Ul
+	for qemu-devel@nongnu.org; Sun, 19 Nov 2017 23:39:55 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1eGd0u-0005jd-99
-	for qemu-devel@nongnu.org; Sun, 19 Nov 2017 22:44:56 -0500
-Resent-Message-Id: <E1eGd0u-0005jd-99@eggs.gnu.org>
-Received: from sender-of-o52.zoho.com ([135.84.80.217]:21325)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
-	id 1eGd0u-0005gL-29
-	for qemu-devel@nongnu.org; Sun, 19 Nov 2017 22:44:52 -0500
-Reply-To: <qemu-devel@nongnu.org>
-Message-ID: <151114945961.516.12961636629059722792@bafd83ae6430>
-In-Reply-To: <1511148687-24909-1-git-send-email-jasowang@redhat.com>
+	(envelope-from <thuth@redhat.com>) id 1eGds6-0008Ts-1y
+	for qemu-devel@nongnu.org; Sun, 19 Nov 2017 23:39:53 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:52260)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1eGds5-0008Tb-Re
+	for qemu-devel@nongnu.org; Sun, 19 Nov 2017 23:39:49 -0500
+References: <151114945961.516.12961636629059722792@bafd83ae6430>
+From: Thomas Huth <thuth@redhat.com>
+Message-ID: <f7970693-0e13-0028-5e1d-a0e303d4cfe3@redhat.com>
+Date: Mon, 20 Nov 2017 05:39:43 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Sun, 19 Nov 2017 19:44:20 -0800 (PST)
+In-Reply-To: <151114945961.516.12961636629059722792@bafd83ae6430>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Subject: Re: [Qemu-devel] [PULL 0/6] Net patches
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
@@ -28,85 +27,75 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: jasowang@redhat.com
-Cc: famz@redhat.com, qemu-devel@nongnu.org, peter.maydell@linaro.org
+To: qemu-devel@nongnu.org, no-reply@patchew.org, jasowang@redhat.com
+Cc: peter.maydell@linaro.org, famz@redhat.com
 
-SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
-LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKU3ViamVjdDogW1FlbXUt
-ZGV2ZWxdIFtQVUxMIDAvNl0gTmV0IHBhdGNoZXMKVHlwZTogc2VyaWVzCk1lc3NhZ2UtaWQ6IDE1
-MTExNDg2ODctMjQ5MDktMS1naXQtc2VuZC1lbWFpbC1qYXNvd2FuZ0ByZWRoYXQuY29tCgo9PT0g
-VEVTVCBTQ1JJUFQgQkVHSU4gPT09CiMhL2Jpbi9iYXNoCgpCQVNFPWJhc2UKbj0xCnRvdGFsPSQo
-Z2l0IGxvZyAtLW9uZWxpbmUgJEJBU0UuLiB8IHdjIC1sKQpmYWlsZWQ9MAoKZ2l0IGNvbmZpZyAt
-LWxvY2FsIGRpZmYucmVuYW1lbGltaXQgMApnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVz
-IFRydWUKCmNvbW1pdHM9IiQoZ2l0IGxvZyAtLWZvcm1hdD0lSCAtLXJldmVyc2UgJEJBU0UuLiki
-CmZvciBjIGluICRjb21taXRzOyBkbwogICAgZWNobyAiQ2hlY2tpbmcgUEFUQ0ggJG4vJHRvdGFs
-OiAkKGdpdCBsb2cgLW4gMSAtLWZvcm1hdD0lcyAkYykuLi4iCiAgICBpZiAhIGdpdCBzaG93ICRj
-IC0tZm9ybWF0PWVtYWlsIHwgLi9zY3JpcHRzL2NoZWNrcGF0Y2gucGwgLS1tYWlsYmFjayAtOyB0
-aGVuCiAgICAgICAgZmFpbGVkPTEKICAgICAgICBlY2hvCiAgICBmaQogICAgbj0kKChuKzEpKQpk
-b25lCgpleGl0ICRmYWlsZWQKPT09IFRFU1QgU0NSSVBUIEVORCA9PT0KClVwZGF0aW5nIDNjOGNm
-NWE5YzIxZmY4NzgyMTY0ZDFkZWY3ZjQ0YmQ4ODg3MTMzODQKRnJvbSBodHRwczovL2dpdGh1Yi5j
-b20vcGF0Y2hldy1wcm9qZWN0L3FlbXUKIHQgW3RhZyB1cGRhdGVdICAgICAgICAgICAgcGF0Y2hl
-dy8xNTEwOTI2MTY3LTIzMzI2LTEtZ2l0LXNlbmQtZW1haWwtbWFyay5jYXZlLWF5bGFuZEBpbGFu
-ZGUuY28udWsgLT4gcGF0Y2hldy8xNTEwOTI2MTY3LTIzMzI2LTEtZ2l0LXNlbmQtZW1haWwtbWFy
-ay5jYXZlLWF5bGFuZEBpbGFuZGUuY28udWsKICogW25ldyB0YWddICAgICAgICAgICAgICAgcGF0
-Y2hldy8xNTExMTQ4Njg3LTI0OTA5LTEtZ2l0LXNlbmQtZW1haWwtamFzb3dhbmdAcmVkaGF0LmNv
-bSAtPiBwYXRjaGV3LzE1MTExNDg2ODctMjQ5MDktMS1naXQtc2VuZC1lbWFpbC1qYXNvd2FuZ0By
-ZWRoYXQuY29tClN3aXRjaGVkIHRvIGEgbmV3IGJyYW5jaCAndGVzdCcKNmQ5OThkY2IzZSBody9u
-ZXQvdm14bmV0MzogRml4IGNvZGUgdG8gd29yayBvbiBiaWcgZW5kaWFuIGhvc3RzLCB0b28KZTNi
-N2QzMDQ1YiBuZXQ6IFRyYW5zbWl0IHplcm8gVURQIGNoZWNrc3VtIGFzIDB4RkZGRgo1Mjg2OTNl
-MmJhIE1BSU5UQUlORVJTOiBBZGQgbWlzc2luZyBlbnRyeSBmb3IgZWVwcm8xMDAgZW11bGF0aW9u
-CjQzNGQzZjA5ODcgaHcvbmV0L2VlcHJvMTAwOiBGaXggZW5kaWFubmVzcyBwcm9ibGVtIG9uIGJp
-ZyBlbmRpYW4gaG9zdHMKYzJlMGI1MmRkNyBSZXZlcnQgIkFkZCBuZXcgUENJIElEIGZvciBpODI1
-NTlhIgozZTcwNzQyYzJkIGNvbG8tY29tcGFyZTogZml4IHRoZSBkYW5nZXJvdXMgYXNzaWdubWVu
-dAoKPT09IE9VVFBVVCBCRUdJTiA9PT0KQ2hlY2tpbmcgUEFUQ0ggMS82OiBjb2xvLWNvbXBhcmU6
-IGZpeCB0aGUgZGFuZ2Vyb3VzIGFzc2lnbm1lbnQuLi4KQ2hlY2tpbmcgUEFUQ0ggMi82OiBSZXZl
-cnQgIkFkZCBuZXcgUENJIElEIGZvciBpODI1NTlhIi4uLgpDaGVja2luZyBQQVRDSCAzLzY6IGh3
-L25ldC9lZXBybzEwMDogRml4IGVuZGlhbm5lc3MgcHJvYmxlbSBvbiBiaWcgZW5kaWFuIGhvc3Rz
-Li4uCkNoZWNraW5nIFBBVENIIDQvNjogTUFJTlRBSU5FUlM6IEFkZCBtaXNzaW5nIGVudHJ5IGZv
-ciBlZXBybzEwMCBlbXVsYXRpb24uLi4KQ2hlY2tpbmcgUEFUQ0ggNS82OiBuZXQ6IFRyYW5zbWl0
-IHplcm8gVURQIGNoZWNrc3VtIGFzIDB4RkZGRi4uLgpDaGVja2luZyBQQVRDSCA2LzY6IGh3L25l
-dC92bXhuZXQzOiBGaXggY29kZSB0byB3b3JrIG9uIGJpZyBlbmRpYW4gaG9zdHMsIHRvby4uLgpF
-UlJPUjogc3BhY2VzIHJlcXVpcmVkIGFyb3VuZCB0aGF0ICc6JyAoY3R4OlZ4VikKIzIzNzogRklM
-RTogaHcvbmV0L3ZteG5ldDMuaDoyMzI6CisgICAgICAgICAgICB1MzIgbXNzY29mOjE0OyAgLyog
-TVNTLCBjaGVja3N1bSBvZmZzZXQsIGZsYWdzICovCiAgICAgICAgICAgICAgICAgICAgICAgXgoK
-RVJST1I6IHNwYWNlcyByZXF1aXJlZCBhcm91bmQgdGhhdCAnOicgKGN0eDpWeFYpCiMyMzg6IEZJ
-TEU6IGh3L25ldC92bXhuZXQzLmg6MjMzOgorICAgICAgICAgICAgdTMyIGV4dDE6MTsKICAgICAg
-ICAgICAgICAgICAgICAgXgoKRVJST1I6IHNwYWNlcyByZXF1aXJlZCBhcm91bmQgdGhhdCAnOicg
-KGN0eDpWeFYpCiMyMzk6IEZJTEU6IGh3L25ldC92bXhuZXQzLmg6MjM0OgorICAgICAgICAgICAg
-dTMyIGR0eXBlOjE7ICAgIC8qIGRlc2NyaXB0b3IgdHlwZSAqLwogICAgICAgICAgICAgICAgICAg
-ICAgXgoKRVJST1I6IHNwYWNlcyByZXF1aXJlZCBhcm91bmQgdGhhdCAnOicgKGN0eDpWeFYpCiMy
-NDA6IEZJTEU6IGh3L25ldC92bXhuZXQzLmg6MjM1OgorICAgICAgICAgICAgdTMyIHJzdmQ6MTsK
-ICAgICAgICAgICAgICAgICAgICAgXgoKRVJST1I6IHNwYWNlcyByZXF1aXJlZCBhcm91bmQgdGhh
-dCAnOicgKGN0eDpWeFYpCiMyNDE6IEZJTEU6IGh3L25ldC92bXhuZXQzLmg6MjM2OgorICAgICAg
-ICAgICAgdTMyIGdlbjoxOyAgICAgIC8qIGdlbmVyYXRpb24gYml0ICovCiAgICAgICAgICAgICAg
-ICAgICAgXgoKRVJST1I6IHNwYWNlcyByZXF1aXJlZCBhcm91bmQgdGhhdCAnOicgKGN0eDpWeFYp
-CiMyNDI6IEZJTEU6IGh3L25ldC92bXhuZXQzLmg6MjM3OgorICAgICAgICAgICAgdTMyIGxlbjox
-NDsKICAgICAgICAgICAgICAgICAgICBeCgpFUlJPUjogc3BhY2VzIHJlcXVpcmVkIGFyb3VuZCB0
-aGF0ICc6JyAoY3R4OlZ4VikKIzI1MDogRklMRTogaHcvbmV0L3ZteG5ldDMuaDoyMzk6CisgICAg
-ICAgICAgICB1MzIgbGVuOjE0OwogICAgICAgICAgICAgICAgICAgIF4KCkVSUk9SOiBzcGFjZXMg
-cmVxdWlyZWQgYXJvdW5kIHRoYXQgJzonIChjdHg6VnhWKQojMjUxOiBGSUxFOiBody9uZXQvdm14
-bmV0My5oOjI0MDoKKyAgICAgICAgICAgIHUzMiBnZW46MTsgICAgICAvKiBnZW5lcmF0aW9uIGJp
-dCAqLwogICAgICAgICAgICAgICAgICAgIF4KCkVSUk9SOiBzcGFjZXMgcmVxdWlyZWQgYXJvdW5k
-IHRoYXQgJzonIChjdHg6VnhWKQojMjUyOiBGSUxFOiBody9uZXQvdm14bmV0My5oOjI0MToKKyAg
-ICAgICAgICAgIHUzMiByc3ZkOjE7CiAgICAgICAgICAgICAgICAgICAgIF4KCkVSUk9SOiBzcGFj
-ZXMgcmVxdWlyZWQgYXJvdW5kIHRoYXQgJzonIChjdHg6VnhWKQojMjUzOiBGSUxFOiBody9uZXQv
-dm14bmV0My5oOjI0MjoKKyAgICAgICAgICAgIHUzMiBkdHlwZToxOyAgICAvKiBkZXNjcmlwdG9y
-IHR5cGUgKi8KICAgICAgICAgICAgICAgICAgICAgIF4KCkVSUk9SOiBzcGFjZXMgcmVxdWlyZWQg
-YXJvdW5kIHRoYXQgJzonIChjdHg6VnhWKQojMjU0OiBGSUxFOiBody9uZXQvdm14bmV0My5oOjI0
-MzoKKyAgICAgICAgICAgIHUzMiBleHQxOjE7CiAgICAgICAgICAgICAgICAgICAgIF4KCkVSUk9S
-OiBzcGFjZXMgcmVxdWlyZWQgYXJvdW5kIHRoYXQgJzonIChjdHg6VnhWKQojMjU1OiBGSUxFOiBo
-dy9uZXQvdm14bmV0My5oOjI0NDoKKyAgICAgICAgICAgIHUzMiBtc3Njb2Y6MTQ7ICAvKiBNU1Ms
-IGNoZWNrc3VtIG9mZnNldCwgZmxhZ3MgKi8KICAgICAgICAgICAgICAgICAgICAgICBeCgpFUlJP
-UjogdHJhaWxpbmcgd2hpdGVzcGFjZQojMjYxOiBGSUxFOiBody9uZXQvdm14bmV0My5oOjI0OToK
-KyAgICAkCgpXQVJOSU5HOiBhcmNoaXRlY3R1cmUgc3BlY2lmaWMgZGVmaW5lcyBzaG91bGQgYmUg
-YXZvaWRlZAojMzEwOiBGSUxFOiBody9uZXQvdm14bmV0My5oOjMwNjoKKyNpZmRlZiBfX0JJR19F
-TkRJQU5fQklURklFTEQKCldBUk5JTkc6IGFyY2hpdGVjdHVyZSBzcGVjaWZpYyBkZWZpbmVzIHNo
-b3VsZCBiZSBhdm9pZGVkCiMzMjg6IEZJTEU6IGh3L25ldC92bXhuZXQzLmg6MzIxOgorI2lmZGVm
-IF9fQklHX0VORElBTl9CSVRGSUVMRAoKdG90YWw6IDEzIGVycm9ycywgMiB3YXJuaW5ncywgNDQx
-IGxpbmVzIGNoZWNrZWQKCllvdXIgcGF0Y2ggaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2
-aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0
-aGVtIHRvIHRoZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KCj09
-PSBPVVRQVVQgRU5EID09PQoKVGVzdCBjb21tYW5kIGV4aXRlZCB3aXRoIGNvZGU6IDEKCgotLS0K
-RW1haWwgZ2VuZXJhdGVkIGF1dG9tYXRpY2FsbHkgYnkgUGF0Y2hldyBbaHR0cDovL3BhdGNoZXcu
-b3JnL10uClBsZWFzZSBzZW5kIHlvdXIgZmVlZGJhY2sgdG8gcGF0Y2hldy1kZXZlbEBmcmVlbGlz
-dHMub3Jn
+On 20.11.2017 04:44, no-reply@patchew.org wrote:
+> Hi,
+> 
+> This series seems to have some coding style problems. See output below for
+> more information:
+> 
+> Subject: [Qemu-devel] [PULL 0/6] Net patches
+> Type: series
+> Message-id: 1511148687-24909-1-git-send-email-jasowang@redhat.com
+> 
+> === TEST SCRIPT BEGIN ===
+> #!/bin/bash
+> 
+> BASE=base
+> n=1
+> total=$(git log --oneline $BASE.. | wc -l)
+> failed=0
+> 
+> git config --local diff.renamelimit 0
+> git config --local diff.renames True
+> 
+> commits="$(git log --format=%H --reverse $BASE..)"
+> for c in $commits; do
+>     echo "Checking PATCH $n/$total: $(git log -n 1 --format=%s $c)..."
+>     if ! git show $c --format=email | ./scripts/checkpatch.pl --mailback -; then
+>         failed=1
+>         echo
+>     fi
+>     n=$((n+1))
+> done
+> 
+> exit $failed
+> === TEST SCRIPT END ===
+> 
+> Updating 3c8cf5a9c21ff8782164d1def7f44bd888713384
+> From https://github.com/patchew-project/qemu
+>  t [tag update]            patchew/1510926167-23326-1-git-send-email-mark.cave-ayland@ilande.co.uk -> patchew/1510926167-23326-1-git-send-email-mark.cave-ayland@ilande.co.uk
+>  * [new tag]               patchew/1511148687-24909-1-git-send-email-jasowang@redhat.com -> patchew/1511148687-24909-1-git-send-email-jasowang@redhat.com
+> Switched to a new branch 'test'
+> 6d998dcb3e hw/net/vmxnet3: Fix code to work on big endian hosts, too
+> e3b7d3045b net: Transmit zero UDP checksum as 0xFFFF
+> 528693e2ba MAINTAINERS: Add missing entry for eepro100 emulation
+> 434d3f0987 hw/net/eepro100: Fix endianness problem on big endian hosts
+> c2e0b52dd7 Revert "Add new PCI ID for i82559a"
+> 3e70742c2d colo-compare: fix the dangerous assignment
+> 
+> === OUTPUT BEGIN ===
+> Checking PATCH 1/6: colo-compare: fix the dangerous assignment...
+> Checking PATCH 2/6: Revert "Add new PCI ID for i82559a"...
+> Checking PATCH 3/6: hw/net/eepro100: Fix endianness problem on big endian hosts...
+> Checking PATCH 4/6: MAINTAINERS: Add missing entry for eepro100 emulation...
+> Checking PATCH 5/6: net: Transmit zero UDP checksum as 0xFFFF...
+> Checking PATCH 6/6: hw/net/vmxnet3: Fix code to work on big endian hosts, too...
+> ERROR: spaces required around that ':' (ctx:VxV)
+> #237: FILE: hw/net/vmxnet3.h:232:
+> +            u32 msscof:14;  /* MSS, checksum offset, flags */
+>                        ^
+> 
+> ERROR: spaces required around that ':' (ctx:VxV)
+> #238: FILE: hw/net/vmxnet3.h:233:
+> +            u32 ext1:1;
+>                      ^
+
+Just for the records (again): These errors seem to be false positives
+from checkpatch. I originally tried to add spaces to all changed
+bitfields, but then checkpatch suddenly complains that spaces are not
+allowed there...
+
+ Thomas
