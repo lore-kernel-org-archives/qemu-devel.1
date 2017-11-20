@@ -1,24 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44676)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44730)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1eGnRU-0008Ns-Qk
-	for qemu-devel@nongnu.org; Mon, 20 Nov 2017 09:53:01 -0500
+	(envelope-from <stefanha@gmail.com>) id 1eGnRn-0000B9-Mq
+	for qemu-devel@nongnu.org; Mon, 20 Nov 2017 09:53:20 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1eGnRQ-0006Ab-Ad
-	for qemu-devel@nongnu.org; Mon, 20 Nov 2017 09:53:00 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:55510)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1eGnRQ-0006A4-1u
-	for qemu-devel@nongnu.org; Mon, 20 Nov 2017 09:52:56 -0500
-Date: Mon, 20 Nov 2017 14:52:48 +0000
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20171120145248.GD2338@work-vm>
-References: <20171116151419.694-1-anthony.perard@citrix.com>
+	(envelope-from <stefanha@gmail.com>) id 1eGnRi-0006H1-QD
+	for qemu-devel@nongnu.org; Mon, 20 Nov 2017 09:53:19 -0500
+Date: Mon, 20 Nov 2017 14:53:11 +0000
+From: Stefan Hajnoczi <stefanha@gmail.com>
+Message-ID: <20171120145311.GG4516@stefanha-x1.localdomain>
+References: <1510851298-59922-1-git-send-email-anton.nefedov@virtuozzo.com>
+	<1510851298-59922-2-git-send-email-anton.nefedov@virtuozzo.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="2NLGdgz3UMHa/lqP"
 Content-Disposition: inline
-In-Reply-To: <20171116151419.694-1-anthony.perard@citrix.com>
-Subject: Re: [Qemu-devel] [PATCH v2 for-2.11] migration,
- xen: Fix block image lock issue on live migration
+In-Reply-To: <1510851298-59922-2-git-send-email-anton.nefedov@virtuozzo.com>
+Subject: Re: [Qemu-devel] [PATCH v2 1/4] qcow2: multiple clusters write
+ compressed
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,116 +25,168 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Anthony PERARD <anthony.perard@citrix.com>
-Cc: qemu-devel@nongnu.org, Stefano Stabellini <sstabellini@kernel.org>, Kevin Wolf <kwolf@redhat.com>, Ian Jackson <ian.jackson@eu.citrix.com>, Wei Liu <wei.liu2@citrix.com>, Juan Quintela <quintela@redhat.com>, Eric Blake <eblake@redhat.com>, Markus Armbruster <armbru@redhat.com>
+To: Kevin Wolf <kwolf@redhat.com>
+Cc: qemu-devel@nongnu.org, famz@redhat.com, den@virtuozzo.com, qemu-block@nongnu.org, Pavel Butsykin <pbutsykin@virtuozzo.com>, mreitz@redhat.com, stefanha@redhat.com, Anton Nefedov <anton.nefedov@virtuozzo.com>
 
-* Anthony PERARD (anthony.perard@citrix.com) wrote:
-> When doing a live migration of a Xen guest with libxl, the images for
-> block devices are locked by the original QEMU process, and this prevent
-> the QEMU at the destination to take the lock and the migration fail.
-> 
-> From QEMU point of view, once the RAM of a domain is migrated, there is
-> two QMP commands, "stop" then "xen-save-devices-state", at which point a
-> new QEMU is spawned at the destination.
-> 
-> Release locks in "xen-save-devices-state" so the destination can takes
-> them, if it's a live migration.
-> 
-> This patch add the "live" parameter to "xen-save-devices-state" which
-> default to true so older version of libxenlight can work with newer
-> version of QEMU.
-> 
-> Signed-off-by: Anthony PERARD <anthony.perard@citrix.com>
 
-Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+--2NLGdgz3UMHa/lqP
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
+On Thu, Nov 16, 2017 at 07:54:55PM +0300, Anton Nefedov wrote:
+> From: Pavel Butsykin <pbutsykin@virtuozzo.com>
+>=20
+> At the moment, qcow2_co_pwritev_compressed can process the requests size
+> less than or equal to one cluster. This patch added possibility to write
+> compressed data in the QCOW2 more than one cluster. The implementation
+> is simple, we just split large requests into separate clusters and write
+> using existing functionality.
+>=20
+> Signed-off-by: Anton Nefedov <anton.nefedov@virtuozzo.com>
 > ---
-> Changes in V2:
-> - add the live parameter
-> 
-> CC: Kevin Wolf <kwolf@redhat.com>
-> 
-> also CCing libxl maintainers:
-> CC: Ian Jackson <ian.jackson@eu.citrix.com>
-> CC: Wei Liu <wei.liu2@citrix.com>
-> ---
->  migration/savevm.c  | 23 ++++++++++++++++++++++-
->  qapi/migration.json |  6 +++++-
->  2 files changed, 27 insertions(+), 2 deletions(-)
-> 
-> diff --git a/migration/savevm.c b/migration/savevm.c
-> index 4a88228614..7bc4e23e65 100644
-> --- a/migration/savevm.c
-> +++ b/migration/savevm.c
-> @@ -2242,13 +2242,20 @@ int save_snapshot(const char *name, Error **errp)
+>  block/qcow2.c | 73 ++++++++++++++++++++++++++++++++++++++++++-----------=
+------
+>  1 file changed, 52 insertions(+), 21 deletions(-)
+
+Kevin: qcow2_alloc_compressed_cluster_offset() sets up an L2 table entry
+before doing the compressed data write.  Can the following scenario
+occur if there is another request racing with the compressed write?
+
+1. Compressed cluster L2 table entry added to qcow2 in-memory cache
+2. Another request forces cached L2 table to be written to disk
+3. Power failure or crash before compressed data is written
+
+Now there is an L2 table entry pointing to garbage data.  This violates
+qcow2's data integrity model.
+
+I'm not sure if compressed writes are safe...  It may have been okay for
+qemu-img convert but the risk is increased when running a VM.
+
+> diff --git a/block/qcow2.c b/block/qcow2.c
+> index c276b24..f1e2759 100644
+> --- a/block/qcow2.c
+> +++ b/block/qcow2.c
+> @@ -3332,11 +3332,9 @@ static int qcow2_truncate(BlockDriverState *bs, in=
+t64_t offset,
+>      return 0;
+>  }
+> =20
+> -/* XXX: put compressed sectors first, then all the cluster aligned
+> -   tables to avoid losing bytes in alignment */
+>  static coroutine_fn int
+> -qcow2_co_pwritev_compressed(BlockDriverState *bs, uint64_t offset,
+> -                            uint64_t bytes, QEMUIOVector *qiov)
+> +qcow2_co_pwritev_cluster_compressed(BlockDriverState *bs, uint64_t offse=
+t,
+> +                                    uint64_t bytes, QEMUIOVector *qiov)
+>  {
+>      BDRVQcow2State *s =3D bs->opaque;
+>      QEMUIOVector hd_qiov;
+> @@ -3346,25 +3344,12 @@ qcow2_co_pwritev_compressed(BlockDriverState *bs,=
+ uint64_t offset,
+>      uint8_t *buf, *out_buf;
+>      int64_t cluster_offset;
+> =20
+> -    if (bytes =3D=3D 0) {
+> -        /* align end of file to a sector boundary to ease reading with
+> -           sector based I/Os */
+> -        cluster_offset =3D bdrv_getlength(bs->file->bs);
+> -        if (cluster_offset < 0) {
+> -            return cluster_offset;
+> -        }
+> -        return bdrv_truncate(bs->file, cluster_offset, PREALLOC_MODE_OFF=
+, NULL);
+> -    }
+> -
+> -    if (offset_into_cluster(s, offset)) {
+> -        return -EINVAL;
+> -    }
+> +    assert(bytes <=3D s->cluster_size);
+> +    assert(!offset_into_cluster(s, offset));
+> =20
+>      buf =3D qemu_blockalign(bs, s->cluster_size);
+> -    if (bytes !=3D s->cluster_size) {
+> -        if (bytes > s->cluster_size ||
+> -            offset + bytes !=3D bs->total_sectors << BDRV_SECTOR_BITS)
+> -        {
+> +    if (bytes < s->cluster_size) {
+> +        if (offset + bytes !=3D bs->total_sectors << BDRV_SECTOR_BITS) {
+>              qemu_vfree(buf);
+>              return -EINVAL;
+>          }
+> @@ -3444,6 +3429,52 @@ fail:
 >      return ret;
 >  }
->  
-> -void qmp_xen_save_devices_state(const char *filename, Error **errp)
-> +void qmp_xen_save_devices_state(const char *filename, bool has_live, bool live,
-> +                                Error **errp)
->  {
->      QEMUFile *f;
->      QIOChannelFile *ioc;
->      int saved_vm_running;
->      int ret;
->  
-> +    if (!has_live) {
-> +        /* live default to true so old version of Xen tool stack can have a
-> +         * successfull live migration */
-> +        live = true;
+> =20
+> +/* XXX: put compressed sectors first, then all the cluster aligned
+> +   tables to avoid losing bytes in alignment */
+> +static coroutine_fn int
+> +qcow2_co_pwritev_compressed(BlockDriverState *bs, uint64_t offset,
+> +                            uint64_t bytes, QEMUIOVector *qiov)
+> +{
+> +    BDRVQcow2State *s =3D bs->opaque;
+> +    QEMUIOVector hd_qiov;
+> +    uint64_t curr_off =3D 0;
+> +    int ret;
+> +
+> +    if (bytes =3D=3D 0) {
+> +        /* align end of file to a sector boundary to ease reading with
+> +           sector based I/Os */
+> +        int64_t cluster_offset =3D bdrv_getlength(bs->file->bs);
+> +        if (cluster_offset < 0) {
+> +            return cluster_offset;
+> +        }
+> +        return bdrv_truncate(bs->file, cluster_offset, PREALLOC_MODE_OFF=
+, NULL);
 > +    }
 > +
->      saved_vm_running = runstate_is_running();
->      vm_stop(RUN_STATE_SAVE_VM);
->      global_state_store_running();
-> @@ -2263,6 +2270,20 @@ void qmp_xen_save_devices_state(const char *filename, Error **errp)
->      qemu_fclose(f);
->      if (ret < 0) {
->          error_setg(errp, QERR_IO_ERROR);
-> +    } else {
-> +        /* libxl calls the QMP command "stop" before calling
-> +         * "xen-save-devices-state" and in case of migration failure, libxl
-> +         * would call "cont".
-> +         * So call bdrv_inactivate_all (release locks) here to let the other
-> +         * side of the migration take controle of the images.
-> +         */
-> +        if (live && !saved_vm_running) {
-> +            ret = bdrv_inactivate_all();
-> +            if (ret) {
-> +                error_setg(errp, "%s: bdrv_inactivate_all() failed (%d)",
-> +                           __func__, ret);
-> +            }
+> +    if (offset_into_cluster(s, offset)) {
+> +        return -EINVAL;
+> +    }
+> +
+> +    qemu_iovec_init(&hd_qiov, qiov->niov);
+> +    do {
+> +        uint32_t chunk_size;
+> +
+> +        qemu_iovec_reset(&hd_qiov);
+> +        chunk_size =3D MIN(bytes, s->cluster_size);
+> +        qemu_iovec_concat(&hd_qiov, qiov, curr_off, chunk_size);
+> +
+> +        ret =3D qcow2_co_pwritev_cluster_compressed(bs, offset + curr_of=
+f,
+> +                                                  chunk_size, &hd_qiov);
+> +        if (ret < 0) {
+> +            break;
 > +        }
->      }
->  
->   the_end:
-> diff --git a/qapi/migration.json b/qapi/migration.json
-> index bbc4671ded..03f57c9616 100644
-> --- a/qapi/migration.json
-> +++ b/qapi/migration.json
-> @@ -1075,6 +1075,9 @@
->  # data. See xen-save-devices-state.txt for a description of the binary
->  # format.
->  #
-> +# @live: Optional argument to ask QEMU to treat this command as part of a live
-> +# migration. Default to true. (since 2.11)
-> +#
->  # Returns: Nothing on success
->  #
->  # Since: 1.1
-> @@ -1086,7 +1089,8 @@
->  # <- { "return": {} }
->  #
->  ##
-> -{ 'command': 'xen-save-devices-state', 'data': {'filename': 'str'} }
-> +{ 'command': 'xen-save-devices-state',
-> +  'data': {'filename': 'str', '*live':'bool' } }
->  
->  ##
->  # @xen-set-replication:
-> -- 
-> Anthony PERARD
-> 
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+> +        curr_off +=3D chunk_size;
+> +        bytes -=3D chunk_size;
+> +    } while (bytes);
+> +    qemu_iovec_destroy(&hd_qiov);
+> +
+> +    return ret;
+> +}
+> +
+>  static int make_completely_empty(BlockDriverState *bs)
+>  {
+>      BDRVQcow2State *s =3D bs->opaque;
+> --=20
+> 2.7.4
+>=20
+>=20
+
+--2NLGdgz3UMHa/lqP
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEcBAEBAgAGBQJaEuxXAAoJEJykq7OBq3PIxdgH/jUm6b5nUcq083kO0VakUQO/
+VSkcOX1A6nWuO7fMUXb6wbiwQOO+poj6Y3z1g4MnMRys+ZTVLoyXvPk3b5Fp1xdr
+JczbCYr1qoTyc0si3VTJjCqBt8cMYl3mrrB4v9WyYO4pk5jRPiRweDnAmlo2kxas
+lLsHJtcVET1TsClLVLqnqeokX968h0vCc5L5QHBV7ja0LdGB/UeaNO2rIHJjrGKV
+emFoJz2Y8VHNTNp1K0R6brm/bOGRJmhX+pB7NNdJGRQ+EM6AksMgFXrp0k4YWy7/
+14uhX3I1Lx4gC4dAMzf2dJV1HRyZeDJLp37t+PCyFf6lYw9ubMXUq+PGrJreMSU=
+=zxM4
+-----END PGP SIGNATURE-----
+
+--2NLGdgz3UMHa/lqP--
