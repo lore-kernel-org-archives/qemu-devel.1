@@ -1,21 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36049)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37422)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1eGldw-0000Xv-AI
-	for qemu-devel@nongnu.org; Mon, 20 Nov 2017 07:57:45 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1eGlgd-0001kS-0i
+	for qemu-devel@nongnu.org; Mon, 20 Nov 2017 08:00:33 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1eGldt-0003La-9U
-	for qemu-devel@nongnu.org; Mon, 20 Nov 2017 07:57:44 -0500
-Date: Mon, 20 Nov 2017 13:57:34 +0100
-From: Cornelia Huck <cohuck@redhat.com>
-Message-ID: <20171120135734.23a4e4a1.cohuck@redhat.com>
-In-Reply-To: <20171120123525.147663-2-borntraeger@de.ibm.com>
-References: <20171120123525.147663-1-borntraeger@de.ibm.com>
-	<20171120123525.147663-2-borntraeger@de.ibm.com>
+	(envelope-from <peter.maydell@linaro.org>) id 1eGlgV-0004U9-B8
+	for qemu-devel@nongnu.org; Mon, 20 Nov 2017 08:00:31 -0500
+Received: from mail-wm0-x244.google.com ([2a00:1450:400c:c09::244]:36237)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1eGlgV-0004TF-4t
+	for qemu-devel@nongnu.org; Mon, 20 Nov 2017 08:00:23 -0500
+Received: by mail-wm0-x244.google.com with SMTP id r68so18615380wmr.1
+	for <qemu-devel@nongnu.org>; Mon, 20 Nov 2017 05:00:22 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 1/2] s390x/migration: use zero flag
- parameter
+In-Reply-To: <878tf1xgff.fsf@linaro.org>
+References: <8726068c-1112-eaea-5315-ec17ae37ae33@huawei.com>
+	<878tf1xgff.fsf@linaro.org>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Mon, 20 Nov 2017 13:00:01 +0000
+Message-ID: <CAFEAcA9pg-yRfNJg5uFqU=pve9ypboisB5jo3piZ+ffLVy2xwQ@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [question] mask SIGBUS in qemu main thread
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,47 +30,27 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Christian Borntraeger <borntraeger@de.ibm.com>
-Cc: qemu-devel <qemu-devel@nongnu.org>, qemu-s390x <qemu-s390x@nongnu.org>, Halil Pasic <pasic@linux.vnet.ibm.com>, Alexander Graf <agraf@suse.de>, Richard Henderson <rth@twiddle.net>, Thomas Huth <thuth@redhat.com>
+To: =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>
+Cc: gengdongjiu <gengdongjiu@huawei.com>, QEMU Developers <qemu-devel@nongnu.org>, "Michael S. Tsirkin" <mst@redhat.com>, Ingo Molnar <mingo@redhat.com>, Wuquanming <wuquanming@huawei.com>, Huangshaoyu <huangshaoyu@huawei.com>
 
-On Mon, 20 Nov 2017 13:35:24 +0100
-Christian Borntraeger <borntraeger@de.ibm.com> wrote:
+On 20 November 2017 at 12:50, Alex Benn=C3=A9e <alex.bennee@linaro.org> wro=
+te:
+> What exactly do you expect the main thread to do with a SIGBUS signal?
 
-> valgrind pointed out that we call KVM_S390_GET_IRQ_STATE with an
-> undefined value for flags. Right now this is unused, but we
-> better play safe.
-> 
-> Signed-off-by: Christian Borntraeger <borntraeger@de.ibm.com>
-> ---
->  target/s390x/kvm.c | 8 ++++----
->  1 file changed, 4 insertions(+), 4 deletions(-)
-> 
-> diff --git a/target/s390x/kvm.c b/target/s390x/kvm.c
-> index 343fcec..b0439a1 100644
-> --- a/target/s390x/kvm.c
-> +++ b/target/s390x/kvm.c
-> @@ -2069,7 +2069,10 @@ int kvm_s390_set_cpu_state(S390CPU *cpu, uint8_t cpu_state)
->  
->  void kvm_s390_vcpu_interrupt_pre_save(S390CPU *cpu)
->  {
-> -    struct kvm_s390_irq_state irq_state;
-> +    struct kvm_s390_irq_state irq_state = {
-> +        .buf = (uint64_t) cpu->irqstate,
-> +        .len = VCPU_IRQ_BUF_SIZE,
-> +    };
->      CPUState *cs = CPU(cpu);
->      int32_t bytes;
->  
-> @@ -2077,9 +2080,6 @@ void kvm_s390_vcpu_interrupt_pre_save(S390CPU *cpu)
->          return;
->      }
->  
-> -    irq_state.buf = (uint64_t) cpu->irqstate;
-> -    irq_state.len = VCPU_IRQ_BUF_SIZE;
-> -
->      bytes = kvm_vcpu_ioctl(cs, KVM_S390_GET_IRQ_STATE, &irq_state);
->      if (bytes < 0) {
->          cpu->irqstate_saved_size = 0;
+For KVM, we (can) use SIGBUS for handling machine check exceptions:
+see qemu_init_sigbus() in cpus.c, where we use prctl(PR_MCE_KILL)
+to ask the host kernel to send us a SIGBUS if the memory used
+by the VM has memory corruption detected by the hardwar. This
+then lets us inform the guest (see kvm_mce_inject() in target/i386).
+(This will probably be coming to Arm KVM at some point, as part
+of the RAS extension support. See various threads in kvmarm list.)
 
-I'm wondering why it does not also complain for KVM_S390_SET_IRQ_STATE?
-It would make sense to use a struct initializer there as well.
+Because asynchronous signals are a pain to deal with, for the
+main thread we handle all our signals via signalfd(), which is
+why the main thread shows SIGBUS as blocked. The main thread
+will pick the signal up via the fd at some point. For KVM vcpu
+threads, the signal arrives asynchronously. See sigbus_handler()
+in cpus.c.
+
+thanks
+-- PMM
