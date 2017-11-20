@@ -1,23 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39615)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40238)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1eGnBT-00082N-KV
-	for qemu-devel@nongnu.org; Mon, 20 Nov 2017 09:36:31 -0500
+	(envelope-from <stefanha@gmail.com>) id 1eGnDL-0000e5-P9
+	for qemu-devel@nongnu.org; Mon, 20 Nov 2017 09:38:25 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1eGnBS-0007It-Pk
-	for qemu-devel@nongnu.org; Mon, 20 Nov 2017 09:36:27 -0500
-Date: Mon, 20 Nov 2017 15:36:18 +0100
-From: Kevin Wolf <kwolf@redhat.com>
-Message-ID: <20171120143618.GC7197@localhost.localdomain>
-References: <20171117164747.11525-1-eblake@redhat.com>
-	<9279377e-9165-d6b9-930f-7949c2c1fb72@redhat.com>
-	<dbb84db4-ead4-e8cf-25c4-fba4dd8701c4@redhat.com>
+	(envelope-from <stefanha@gmail.com>) id 1eGnDG-0008CJ-Gw
+	for qemu-devel@nongnu.org; Mon, 20 Nov 2017 09:38:23 -0500
+Date: Mon, 20 Nov 2017 14:38:14 +0000
+From: Stefan Hajnoczi <stefanha@gmail.com>
+Message-ID: <20171120143814.GF4516@stefanha-x1.localdomain>
+References: <1510851298-59922-1-git-send-email-anton.nefedov@virtuozzo.com>
+	<1510851298-59922-5-git-send-email-anton.nefedov@virtuozzo.com>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="JP+T4n/bALQSJXh8"
+	protocol="application/pgp-signature"; boundary="WlEyl6ow+jlIgNUh"
 Content-Disposition: inline
-In-Reply-To: <dbb84db4-ead4-e8cf-25c4-fba4dd8701c4@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH for-2.11] qcow2: fix image corruption on
- commit with persistent snapshot
+In-Reply-To: <1510851298-59922-5-git-send-email-anton.nefedov@virtuozzo.com>
+Subject: Re: [Qemu-devel] [PATCH v2 4/4] iotests: 030: add compressed
+ block-stream test
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,56 +25,130 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>
-Cc: Max Reitz <mreitz@redhat.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org, vsementsov@virtuozzo.com
+To: Anton Nefedov <anton.nefedov@virtuozzo.com>
+Cc: qemu-devel@nongnu.org, kwolf@redhat.com, famz@redhat.com, den@virtuozzo.com, qemu-block@nongnu.org, mreitz@redhat.com, stefanha@redhat.com
 
 
---JP+T4n/bALQSJXh8
+--WlEyl6ow+jlIgNUh
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-Am 17.11.2017 um 19:46 hat Eric Blake geschrieben:
-> > -- and I'm not really a fan of testing this on every possible
-> > architecture and then adding different reference outputs.
-> >=20
-> > Therefore, the best fix is probably to just filter the hashes out (you
-> > don't need the exact value anyway, do you?), and I think it's fine to do
-> > this as a follow-up.
+On Thu, Nov 16, 2017 at 07:54:58PM +0300, Anton Nefedov wrote:
+> Signed-off-by: Anton Nefedov <anton.nefedov@virtuozzo.com>
+> ---
+>  tests/qemu-iotests/030     | 66 ++++++++++++++++++++++++++++++++++++++++=
++++++-
+>  tests/qemu-iotests/030.out |  4 +--
+>  2 files changed, 67 insertions(+), 3 deletions(-)
 >=20
-> At any rate, I concur with this conclusion; I'll post a followup that
-> filters out the hash (for this test, we only care that the existence of
-> a hash proves the bitmap exists; unlike 165 where we want to validate
-> that it is actually tracking correct information).
->=20
-> I missed Kevin's -rc2 pull, unless he wants to send a v2; but we also
-> have time (it's not the end of the world if the fix goes in -rc3).
+> diff --git a/tests/qemu-iotests/030 b/tests/qemu-iotests/030
+> index 457984b..831d6f3 100755
+> --- a/tests/qemu-iotests/030
+> +++ b/tests/qemu-iotests/030
+> @@ -21,7 +21,7 @@
+>  import time
+>  import os
+>  import iotests
+> -from iotests import qemu_img, qemu_io
+> +from iotests import qemu_img, qemu_img_pipe, qemu_io
+> =20
+>  backing_img =3D os.path.join(iotests.test_dir, 'backing.img')
+>  mid_img =3D os.path.join(iotests.test_dir, 'mid.img')
+> @@ -804,5 +804,69 @@ class TestSetSpeed(iotests.QMPTestCase):
+> =20
+>          self.cancel_and_wait(resume=3DTrue)
+> =20
+> +class TestCompressed(iotests.QMPTestCase):
+> +    supported_fmts =3D ['qcow2']
+> +    cluster_size =3D 64 * 1024;
+> +    image_len =3D 1 * 1024 * 1024;
 
-There is no rule that a maintainer can only send one pull request per
-release candidate. I already missed -rc1, so I wanted to make sure to
-get things merged definitely in time for -rc2, but it's not too unlikely
-that I'll send another small pull request for tomorrow.
+Please drop the unnecessary semicolons
 
-Kevin
+> +
+> +    def setUp(self):
+> +        qemu_img('create', '-f', iotests.imgfmt, '-o', 'cluster_size=3D%=
+d' % TestCompressed.cluster_size, backing_img, str(TestCompressed.image_len=
+))
+> +        qemu_io('-c', 'write -P 1 0 ' + str(TestCompressed.image_len), b=
+acking_img)
+> +        qemu_img('create', '-f', iotests.imgfmt, '-o', 'backing_file=3D%=
+s,cluster_size=3D%d' % (backing_img, TestCompressed.cluster_size), test_img)
+> +
+> +        # write '3' in every 3rd cluster
+> +        step =3D 3
+> +        for off in range(0, TestCompressed.image_len, TestCompressed.clu=
+ster_size * step):
+> +            qemu_io('-c', 'write -P %d %d %d' %
+> +                    (step, off, TestCompressed.cluster_size), test_img)
+> +
+> +        self.vm =3D iotests.VM().add_drive(test_img)
+> +        self.vm.launch()
+> +
+> +    def tearDown(self):
+> +        os.remove(test_img)
+> +        os.remove(backing_img)
+> +
+> +    def _first_divider(self, x, divs):
 
---JP+T4n/bALQSJXh8
+"Divisor" or "factor":
+https://en.wikipedia.org/wiki/Divisor
+
+> +        return divs[0] if not x%divs[0] else self._first_divider(x, divs=
+[1:])
+
+An alternative that I find easier to read than conditional expressions:
+
+  for divisor in divs:
+      if x % divisor =3D=3D 0:
+          return divisor
+  raise ValueError('No suitable divisor found')
+
+> +
+> +    def test_compressed(self):
+> +        self.assert_no_active_block_jobs()
+> +
+> +        result =3D self.vm.qmp('block-stream', device=3D'drive0', compre=
+ss=3DTrue)
+> +        if iotests.imgfmt not in TestCompressed.supported_fmts:
+> +            self.assert_qmp(
+> +                result, 'error/desc',
+> +                'Compression is not supported for this drive drive0')
+> +            return
+> +        self.assert_qmp(result, 'return', {})
+> +
+> +        # write '4' in every 4th cluster
+> +        step =3D 4
+> +        for off in range(0, TestCompressed.image_len, TestCompressed.clu=
+ster_size * step):
+> +            result =3D self.vm.qmp('human-monitor-command',
+> +                                 command_line=3D
+> +                                 'qemu-io drive0 "write -P %d %d %d"' %
+> +                                 (step, off, TestCompressed.cluster_size=
+))
+> +            self.assert_qmp(result, 'return', "")
+> +
+> +        self.wait_until_completed()
+> +        self.assert_no_active_block_jobs()
+> +
+> +        self.vm.shutdown()
+
+It is safe to call self.vm.shutdown() multiple times.  Please call it
+=66rom tearDown() too so the QEMU process is cleaned up on failure.
+
+--WlEyl6ow+jlIgNUh
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQIcBAEBAgAGBQJaEuhiAAoJEH8JsnLIjy/Wt8UP/ilDx6/sn6vDqkZqVcMuxsd4
-zhfTxaHS04tas2uFX6IydmROQSe9nbTCKMFqR/LstqunayNlHEayQhug3A1ZdmQ4
-XQAQGe1/DPLWqE4neSVJ4uXT6uUe8PbC/hbHjQLBpr7KkL6cdh95XnWe0tjb3UQt
-prlKY7sh1Sw8LFxlpqGcCBtU6fAkVL78KlvKNQhog4HL+SNctKxpVHLlfcF/0sad
-4NAzQCg4pzMrLILNAMfQNCeaH1uFmEQNO0lvKO1lFreV2IOsK6YLoWYdwkQ1mAl6
-PMidS317QeAZu3VzxUoMmqzA5wdJqYNp+ne5JLD0J03vNvJNchAXRWBkKLIQZek0
-PlFFWMULVihOh2mx1cd3pbNh5jh9fH+vXVJF9zmM7CoVBPokP062O0SEMGAVdnok
-QiKeK4Av9WmnxU5YC8xF95RGCelUXF3Cqw+rrVydtKUeZmF/8nAmDuu5iiE77MrY
-UpeuVl56AiQ5/bNrvG1hxn4XPKleBh8gKZAZzQTP0iV0oVCG3IGgt6N4YD7OEARJ
-Po9LpHjFQVeHMVeQ/zFbvNEXk8hmy8xh+N4lscIqDl+nVXs+TjNrISLzOBKnijiT
-rly9fouNdhy0TAOIbGpghHGxyOBEw8dtHtQ8qr1eAkOEpTjisq5ulbFbvHKKq+10
-ilft++vwSgWIt2tkHsAZ
-=EKol
+iQEcBAEBAgAGBQJaEujWAAoJEJykq7OBq3PImpgH/3jbiLCFOZyvI/Y6bzpMPJY9
+BIluu1DGqNGsujni6v/drSfQQFVwd/Kgj9+I9DmsOgcwAkw5C2YhNW9rLrfvvQ0t
+HeFrrTAwsP6Ps1fTwNZ3c3IAnoYrXTUQJ7tbXWlsniTrob6dbqAvRsBuJ5xQh2Nh
+uHPgS14dGlSCiw36fsXo0gIifcPy7L582Go5+c9f2NRvP3LH13vOeSJUa4vPTKFS
+kefN8Rh8R9CQodpE0n6yXJdJ+E9IrtWlgEFQF0pFPlUTEno8s84/4SGzX14iRaAR
+P6diAaZ5WkDSDz60o5rFJGn3lTleug6ZjQZHAifFw3HyOMsPBrqamrHCwy0uQLE=
+=SDId
 -----END PGP SIGNATURE-----
 
---JP+T4n/bALQSJXh8--
+--WlEyl6ow+jlIgNUh--
