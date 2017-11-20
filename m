@@ -1,25 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48786)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50574)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1eGj1e-0003yU-ON
-	for qemu-devel@nongnu.org; Mon, 20 Nov 2017 05:10:03 -0500
+	(envelope-from <groug@kaod.org>) id 1eGj4z-0005UW-Cf
+	for qemu-devel@nongnu.org; Mon, 20 Nov 2017 05:13:44 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1eGj1b-00059A-Gk
-	for qemu-devel@nongnu.org; Mon, 20 Nov 2017 05:10:02 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:57138)
+	(envelope-from <groug@kaod.org>) id 1eGj4g-0007C4-5N
+	for qemu-devel@nongnu.org; Mon, 20 Nov 2017 05:13:29 -0500
+Received: from 7.mo5.mail-out.ovh.net ([178.32.124.100]:40389)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1eGj1b-00057t-Ap
-	for qemu-devel@nongnu.org; Mon, 20 Nov 2017 05:09:59 -0500
-Date: Mon, 20 Nov 2017 10:09:43 +0000
-From: "Daniel P. Berrange" <berrange@redhat.com>
-Message-ID: <20171120100943.GC31943@redhat.com>
-Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
-References: <20171119224207.GA7484@localhost.localdomain>
-	<CAFEAcA-C3nwLrOcgFgN6t_UpzVr8xLJw0VE2Afe8abt2_U5k2Q@mail.gmail.com>
+	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1eGj4f-0007BE-N6
+	for qemu-devel@nongnu.org; Mon, 20 Nov 2017 05:13:09 -0500
+Received: from player786.ha.ovh.net (b7.ovh.net [213.186.33.57])
+	by mo5.mail-out.ovh.net (Postfix) with ESMTP id 2E36A151BC5
+	for <qemu-devel@nongnu.org>; Mon, 20 Nov 2017 11:13:08 +0100 (CET)
+Date: Mon, 20 Nov 2017 11:13:03 +0100
+From: Greg Kurz <groug@kaod.org>
+Message-ID: <20171120111303.2db7cdd0@bahia.lab.toulouse-stg.fr.ibm.com>
+In-Reply-To: <5A126CCB.3010602@huawei.com>
+References: <5A126CCB.3010602@huawei.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <CAFEAcA-C3nwLrOcgFgN6t_UpzVr8xLJw0VE2Afe8abt2_U5k2Q@mail.gmail.com>
-Subject: Re: [Qemu-devel] qemu.org vs qemu-project.org
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH] 9pfs: don't ignore O_DIRECT flag in the
+ 9pfs server
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,36 +30,54 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: Eduardo Habkost <ehabkost@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>, Stefan Hajnoczi <stefanha@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Thomas Huth <thuth@redhat.com>, Michael Roth <mdroth@linux.vnet.ibm.com>
+To: jiangyiwen <jiangyiwen@huawei.com>
+Cc: aneesh.kumar@linux.vnet.ibm.com, qemu-devel@nongnu.org, sochin.jiang@huawei.com
 
-On Sun, Nov 19, 2017 at 10:46:20PM +0000, Peter Maydell wrote:
-> On 19 November 2017 at 22:42, Eduardo Habkost <ehabkost@redhat.com> wrote:
-> > Hi,
-> >
-> > I've noticed that README, MAINTAINERS .gitmodules, and other
-> > files in qemu.git are pointing to qemu-project.org, while the
-> > QEMU web site and other files in qemu.git are pointing to
-> > qemu.org.
-> >
-> > I assume that the situation mentioned in commit
-> > 8593898109 ("Use qemu-project.org domain name") has improved.
-> > Should we update the existing files to point to qemu.org, now?
+On Mon, 20 Nov 2017 13:48:59 +0800
+jiangyiwen <jiangyiwen@huawei.com> wrote:
+
+> Now v9fs in linux has already supported O_DIRECT(v9fs_direct_IO),
+> when guest user open file with O_DIRECT flag and return success,
+> so user hopes data doesn't pass through page cache, but 9pfs in
+> qemu ignore direct disk access and use host page cache, it is not
+> match to DIRECT_IO semantic, so we should not ignore O_DIRECT in
+> 9pfs unless v9fs in linux don't support DIRECT_IO.
 > 
-> Yeah, we decided that we should go with qemu.org as the
-> main name (so qemu-project.org urls redirect to it).
-> We should probably generally move to qemu.org in our
-> documentation, at least. I'm not sure if there are
-> any unfortunate side-effects to changing a .gitmodules
-> URL ?
+> And if server fs don't support O_DIRECT, user will receive -EINVAL
+> and know the filesystem don't support O_DIRECT.
+> 
+> So in order to ensure semantic consistency, don't ignore direct
+> disk access in 9pfs.
+> 
 
-Quite possibly - we would have todo some testing to see what, if
-any, fallout there is.
+There are good reasons for us to ignore O_DIRECT. AFAIK, O_DIRECT requires
+the application to take care of the alignment of the buffers with either the
+logical block size of the filesystem (linux <= 2.4) or the logical block size
+of the underlying storage... I don't really see how you can achieve that since
+the linux 9p client only cares to break up requests into msize-chunks, and
+ignores alignment. ie, you're likely to not ensure semantic consistency on the
+host side anyway and linux will fallback to cached I/O.
 
+Also, this change would silently break existing users of O_DIRECT, which isn't
+acceptable... it would require some fsdev property to enable this new behavior.
 
-Regards,
-Daniel
--- 
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
+> Signed-off-by: Yiwen Jiang <jiangyiwen@huawei.com>
+> ---
+>  hw/9pfs/9p.c | 4 ----
+>  1 file changed, 4 deletions(-)
+> 
+> diff --git a/hw/9pfs/9p.c b/hw/9pfs/9p.c
+> index 52d4663..5ea01c4 100644
+> --- a/hw/9pfs/9p.c
+> +++ b/hw/9pfs/9p.c
+> @@ -155,10 +155,6 @@ static int get_dotl_openflags(V9fsState *s, int oflags)
+>       */
+>      flags = dotl_to_open_flags(oflags);
+>      flags &= ~(O_NOCTTY | O_ASYNC | O_CREAT);
+> -    /*
+> -     * Ignore direct disk access hint until the server supports it.
+> -     */
+> -    flags &= ~O_DIRECT;
+>      return flags;
+>  }
+> 
