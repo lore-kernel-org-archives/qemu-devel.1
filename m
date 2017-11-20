@@ -1,32 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34145)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36049)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1eGlXH-0006mb-Ie
-	for qemu-devel@nongnu.org; Mon, 20 Nov 2017 07:50:52 -0500
+	(envelope-from <cohuck@redhat.com>) id 1eGldw-0000Xv-AI
+	for qemu-devel@nongnu.org; Mon, 20 Nov 2017 07:57:45 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1eGlXF-0007EM-TI
-	for qemu-devel@nongnu.org; Mon, 20 Nov 2017 07:50:51 -0500
-Received: from mail-wr0-x244.google.com ([2a00:1450:400c:c0c::244]:45878)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1eGlXF-0007E8-MS
-	for qemu-devel@nongnu.org; Mon, 20 Nov 2017 07:50:49 -0500
-Received: by mail-wr0-x244.google.com with SMTP id a63so7952706wrc.12
-	for <qemu-devel@nongnu.org>; Mon, 20 Nov 2017 04:50:49 -0800 (PST)
+	(envelope-from <cohuck@redhat.com>) id 1eGldt-0003La-9U
+	for qemu-devel@nongnu.org; Mon, 20 Nov 2017 07:57:44 -0500
+Date: Mon, 20 Nov 2017 13:57:34 +0100
+From: Cornelia Huck <cohuck@redhat.com>
+Message-ID: <20171120135734.23a4e4a1.cohuck@redhat.com>
+In-Reply-To: <20171120123525.147663-2-borntraeger@de.ibm.com>
+References: <20171120123525.147663-1-borntraeger@de.ibm.com>
+	<20171120123525.147663-2-borntraeger@de.ibm.com>
 MIME-Version: 1.0
-In-Reply-To: <CAFEAcA8NGnmG_8SipvPN5_dPhokH2zZAXykN2KiW10XhB-9xXQ@mail.gmail.com>
-References: <20171116115926.16627-1-pbonzini@redhat.com>
-	<20171116115926.16627-8-pbonzini@redhat.com>
-	<CAFEAcA-06-VmH7Pvymo-o-HmiQ-uQ67Hs0KhWZfxswBxsfD2-g@mail.gmail.com>
-	<bf4bedd9-0ef8-cff3-6153-531fba597237@redhat.com>
-	<CAFEAcA9Rnd3gtrHb389e6fOEAae4aLhJnQWU-vKyzTM4o-riOQ@mail.gmail.com>
-	<001b01d361e9$d46ace40$7d406ac0$@ru>
-	<CAFEAcA8NGnmG_8SipvPN5_dPhokH2zZAXykN2KiW10XhB-9xXQ@mail.gmail.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon, 20 Nov 2017 12:50:27 +0000
-Message-ID: <CAFEAcA9PUOyK_vEnMKJkZV5s7o4zHDRedUY7z0ZH0i5ULEGzwg@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PULL 07/11] cpu-exec: don't overwrite
- exception_index
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH 1/2] s390x/migration: use zero flag
+ parameter
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,44 +24,47 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Pavel Dovgalyuk <dovgaluk@ispras.ru>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>, Pavel Dovgalyuk <pavel.dovgaluk@ispras.ru>
+To: Christian Borntraeger <borntraeger@de.ibm.com>
+Cc: qemu-devel <qemu-devel@nongnu.org>, qemu-s390x <qemu-s390x@nongnu.org>, Halil Pasic <pasic@linux.vnet.ibm.com>, Alexander Graf <agraf@suse.de>, Richard Henderson <rth@twiddle.net>, Thomas Huth <thuth@redhat.com>
 
-On 20 November 2017 at 11:06, Peter Maydell <peter.maydell@linaro.org> wrote:
-> On 20 November 2017 at 10:25, Pavel Dovgalyuk <dovgaluk@ispras.ru> wrote:
->>> From: Peter Maydell [mailto:peter.maydell@linaro.org]
->>> On 17 November 2017 at 20:26, Paolo Bonzini <pbonzini@redhat.com> wrote:
->>> > On 17/11/2017 21:07, Peter Maydell wrote:
->>> >> Hi. This commit breaks booting of Debian on aarch64 virt board.
->>> >> (repro instructions for creating the image available at:
->>> >> https://translatedcode.wordpress.com/2017/07/24/installing-debian-on-qemus-64-bit-arm-virt-
->>> board/)
->>> >> The guest kernel never prints anything to the serial port.
->>> >>
->>> >> Reverting this commit fixes master for me, so I plan to do
->>> >> that on Monday.
->>> >
->>> > Maybe you can also test moving the atomic_set inside the "if".  It does
->>> > seem to be a genuine bugfix.
->>>
->>> No, that doesn't help: guest still sits there like a lemon.
->>
->> Maybe this is a more complex problem?
->> I tried removing this if and aarch64 still does not work.
->
-> Reverting the commit fixes it for me; I have that going through
-> build tests and will push the revert later today.
+On Mon, 20 Nov 2017 13:35:24 +0100
+Christian Borntraeger <borntraeger@de.ibm.com> wrote:
 
-Revert pushed to git master.
+> valgrind pointed out that we call KVM_S390_GET_IRQ_STATE with an
+> undefined value for flags. Right now this is unused, but we
+> better play safe.
+> 
+> Signed-off-by: Christian Borntraeger <borntraeger@de.ibm.com>
+> ---
+>  target/s390x/kvm.c | 8 ++++----
+>  1 file changed, 4 insertions(+), 4 deletions(-)
+> 
+> diff --git a/target/s390x/kvm.c b/target/s390x/kvm.c
+> index 343fcec..b0439a1 100644
+> --- a/target/s390x/kvm.c
+> +++ b/target/s390x/kvm.c
+> @@ -2069,7 +2069,10 @@ int kvm_s390_set_cpu_state(S390CPU *cpu, uint8_t cpu_state)
+>  
+>  void kvm_s390_vcpu_interrupt_pre_save(S390CPU *cpu)
+>  {
+> -    struct kvm_s390_irq_state irq_state;
+> +    struct kvm_s390_irq_state irq_state = {
+> +        .buf = (uint64_t) cpu->irqstate,
+> +        .len = VCPU_IRQ_BUF_SIZE,
+> +    };
+>      CPUState *cs = CPU(cpu);
+>      int32_t bytes;
+>  
+> @@ -2077,9 +2080,6 @@ void kvm_s390_vcpu_interrupt_pre_save(S390CPU *cpu)
+>          return;
+>      }
+>  
+> -    irq_state.buf = (uint64_t) cpu->irqstate;
+> -    irq_state.len = VCPU_IRQ_BUF_SIZE;
+> -
+>      bytes = kvm_vcpu_ioctl(cs, KVM_S390_GET_IRQ_STATE, &irq_state);
+>      if (bytes < 0) {
+>          cpu->irqstate_saved_size = 0;
 
-More generally, this commit seems to assume that QEMU always
-does:
- * set exception_index to something
- * handle that
- * clear exception_index to -1
-
-but it's not clear to me that it's actually always the case
-that it gets cleared back to -1.
-
-thanks
--- PMM
+I'm wondering why it does not also complain for KVM_S390_SET_IRQ_STATE?
+It would make sense to use a struct initializer there as well.
