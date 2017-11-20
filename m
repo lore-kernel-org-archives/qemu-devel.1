@@ -1,28 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47277)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48113)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <wei.w.wang@intel.com>) id 1eGkRg-00078C-5F
-	for qemu-devel@nongnu.org; Mon, 20 Nov 2017 06:41:01 -0500
+	(envelope-from <stefanha@gmail.com>) id 1eGkUI-0007tz-RI
+	for qemu-devel@nongnu.org; Mon, 20 Nov 2017 06:43:43 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <wei.w.wang@intel.com>) id 1eGkRb-000695-Cv
-	for qemu-devel@nongnu.org; Mon, 20 Nov 2017 06:41:00 -0500
-Received: from mga03.intel.com ([134.134.136.65]:58316)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <wei.w.wang@intel.com>)
-	id 1eGkRb-00068U-4k
-	for qemu-devel@nongnu.org; Mon, 20 Nov 2017 06:40:55 -0500
-Message-ID: <5A12BFB0.5030402@intel.com>
-Date: Mon, 20 Nov 2017 19:42:40 +0800
-From: Wei Wang <wei.w.wang@intel.com>
+	(envelope-from <stefanha@gmail.com>) id 1eGkUD-0007bV-Tj
+	for qemu-devel@nongnu.org; Mon, 20 Nov 2017 06:43:42 -0500
+Date: Mon, 20 Nov 2017 11:43:34 +0000
+From: Stefan Hajnoczi <stefanha@gmail.com>
+Message-ID: <20171120114334.GD4516@stefanha-x1.localdomain>
+References: <cover.1511145863.git.jcody@redhat.com>
+	<0c039d00e03331d863ee249810d9778313670803.1511145863.git.jcody@redhat.com>
 MIME-Version: 1.0
-References: <1509696786-1597-1-git-send-email-wei.w.wang@intel.com>
-	<1509696786-1597-7-git-send-email-wei.w.wang@intel.com>
-	<5A097548.8000608@intel.com>
-	<20171113192309-mutt-send-email-mst@kernel.org>
-In-Reply-To: <20171113192309-mutt-send-email-mst@kernel.org>
-Content-Type: text/plain; charset=windows-1252; format=flowed
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v17 6/6] virtio-balloon:
- VIRTIO_BALLOON_F_FREE_PAGE_VQ
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="jCrbxBqMcLqd4mOl"
+Content-Disposition: inline
+In-Reply-To: <0c039d00e03331d863ee249810d9778313670803.1511145863.git.jcody@redhat.com>
+Subject: Re: [Qemu-devel] [Qemu-block] [PATCH 3/5] coroutines: abort if we
+ try to enter a still-sleeping coroutine
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,90 +25,62 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: virtio-dev@lists.oasis-open.org, linux-kernel@vger.kernel.org, qemu-devel@nongnu.org, virtualization@lists.linux-foundation.org, kvm@vger.kernel.org, linux-mm@kvack.org, mhocko@kernel.org, akpm@linux-foundation.org, mawilcox@microsoft.com, david@redhat.com, penguin-kernel@I-love.SAKURA.ne.jp, cornelia.huck@de.ibm.com, mgorman@techsingularity.net, aarcange@redhat.com, amit.shah@redhat.com, pbonzini@redhat.com, willy@infradead.org, liliang.opensource@gmail.com, yang.zhang.wz@gmail.com, quan.xu@aliyun.com, Nitesh Narayan Lal <nilal@redhat.com>, Rik van Riel <riel@redhat.com>
-
-On 11/14/2017 01:32 AM, Michael S. Tsirkin wrote:
-> You should Cc Nitesh who is working on a related feature.
-
-OK, I'll do. We have two more issues which haven't been discussed yet, 
-please have a check below.
-
->
-> On Mon, Nov 13, 2017 at 06:34:48PM +0800, Wei Wang wrote:
->> Ping for comments, thanks.
->>
->> On 11/03/2017 04:13 PM, Wei Wang wrote:
->>> +static void virtballoon_cmd_report_free_page_start(struct virtio_balloon *vb)
->>> +{
->>> +	unsigned long flags;
->>> +
->>> +	vb->report_free_page_stop = false;
-> this flag is used a lot outside any locks. Why is this safe?
-> Please add some comments explaining access to this flag.
-
-I will revert the logic as suggested: vb->report_free_page. Also plan to 
-simplify its usage as below.
-
-The flag is set or cleared in the config handler according to the 
-new_cmd_id given
-by the host:
-
-new_cmd_id=0:                    WRITE_ONCE(vb->report_free_page, 
-false); // stop reporting
-new_cmd_id != old_cmd_id: WRITE_ONCE(vb->report_free_page, true);  // 
-start reporting
+To: Jeff Cody <jcody@redhat.com>
+Cc: qemu-devel@nongnu.org, kwolf@redhat.com, famz@redhat.com, qemu-block@nongnu.org, mreitz@redhat.com, stefanha@redhat.com, pbonzini@redhat.com
 
 
-The flag is read by virtio_balloon_send_free_pages() - the callback to 
-report free pages:
+--jCrbxBqMcLqd4mOl
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-if (!READ_ONCE(vb->report_free_page))
-                 return false;
+On Sun, Nov 19, 2017 at 09:46:44PM -0500, Jeff Cody wrote:
+> diff --git a/include/qemu/coroutine_int.h b/include/qemu/coroutine_int.h
+> index 931cdc9..b071217 100644
+> --- a/include/qemu/coroutine_int.h
+> +++ b/include/qemu/coroutine_int.h
+> @@ -56,6 +56,8 @@ struct Coroutine {
+> =20
+>      int scheduled;
+> =20
+> +    int sleeping;
 
-I don't find where it could be unsafe then (the flag is written by the 
-config handler only).
+s/int/bool/
 
+BTW an alternative to adding individual bools is to implement a finite
+state machine for the entire coroutine lifecycle.  A single function can
+validate all state transitions:
 
+  void check_state_transition(CoState old, CoState new,
+                              const char *action)
+  {
+      const char *errmsg =3D fsm[old][new];
+      if (!errmsg) {
+          return; /* valid transition! */
+      }
 
->
->>> +}
->>> +
->>>    static inline s64 towards_target(struct virtio_balloon *vb)
->>>    {
->>>    	s64 target;
->>> @@ -597,42 +673,147 @@ static void update_balloon_size_func(struct work_struct *work)
->>>    		queue_work(system_freezable_wq, work);
->>>    }
->>> -static int init_vqs(struct virtio_balloon *vb)
->>> +static bool virtio_balloon_send_free_pages(void *opaque, unsigned long pfn,
->>> +					   unsigned long nr_pages)
->>>    {
->>> -	struct virtqueue *vqs[3];
->>> -	vq_callback_t *callbacks[] = { balloon_ack, balloon_ack, stats_request };
->>> -	static const char * const names[] = { "inflate", "deflate", "stats" };
->>> -	int err, nvqs;
->>> +	struct virtio_balloon *vb = (struct virtio_balloon *)opaque;
->>> +	void *addr = (void *)pfn_to_kaddr(pfn);
-> How do we know all free pages have a kaddr?
+      fprintf(stderr, "Cannot %s coroutine from %s state\n",
+              action, state_name[old]);
+      abort();
+  }
 
-For x86_64, it works well since the kernel has all the physical memory 
-mapped already. But for 32-bit kernel, yes, the high memory usually 
-isn't mapped and thus no kaddr. Essentially, this pfn_to_kaddr convert 
-isn't necessary, we do it here because the current API that virtio has 
-is based on "struct scatterlist", which takes a kaddr, and this kaddr is 
-then convert back to physical address in virtqueue_add() when assigning 
-to desc->addr.
+Specifying fsm[][] forces us to think through all possible state
+transitions.  This approach is proactive whereas adding bool flags is
+reactive since it only covers a subset of states that were encountered
+after crashes.  I'm not sure if it's worth it though :).
 
-I think a better solution would be to add a new API, which directly 
-assigns the caller's guest physical address to desc->addr, similar to 
-the previous implementation "add_one_chunk()" 
-(https://lists.gnu.org/archive/html/qemu-devel/2017-06/msg02452.html). 
-But we can change that to a general virtio API:
-virtqueue_add_one_desc(struct virtqueue *_vq, u64 base_addr, u32 size, 
-bool in_desc, void *data);
+--jCrbxBqMcLqd4mOl
+Content-Type: application/pgp-signature; name="signature.asc"
 
-What do you think?
+-----BEGIN PGP SIGNATURE-----
 
-Best,
-Wei
+iQEcBAEBAgAGBQJaEr/mAAoJEJykq7OBq3PIxR8H/1nIsOsTCcDfmkWE4miQuknn
+kAPjOZZsWyT/oBAjs1GG1Yoo6jN+DD3YYT15plmFPjRjcB0QNm71g/YRD2F/BuI8
+BEVIHdDl3elWVXORfCbEOdU4Bq3OkQ7X3c5gJlWRS6+Xa89ojOEsrLnSRgpaue5b
+Ua+9OTwE9tpSpjQKK4b0cNNdW0UXove7I41mPh778HFmKJ5UJjoE5d8580+RcVoS
+pbcdy/Q/0mKovupFOeJ+8dKbwncI6uOKhRxhT3UqBIbJIMksoF1se1j0efFsCVFy
+JJ31Dwh2IuMbDmnP/huye4NEh43TbuHc86ZE6g2ciq/cI6jZLwszU9QrDcmZxMA=
+=yQQ1
+-----END PGP SIGNATURE-----
+
+--jCrbxBqMcLqd4mOl--
