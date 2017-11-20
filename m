@@ -1,26 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34041)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34145)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1eGlX1-0006eZ-2O
-	for qemu-devel@nongnu.org; Mon, 20 Nov 2017 07:50:36 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1eGlXH-0006mb-Ie
+	for qemu-devel@nongnu.org; Mon, 20 Nov 2017 07:50:52 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1eGlWy-0007A8-1F
-	for qemu-devel@nongnu.org; Mon, 20 Nov 2017 07:50:35 -0500
-Received: from mail-wm0-x243.google.com ([2a00:1450:400c:c09::243]:35647)
+	(envelope-from <peter.maydell@linaro.org>) id 1eGlXF-0007EM-TI
+	for qemu-devel@nongnu.org; Mon, 20 Nov 2017 07:50:51 -0500
+Received: from mail-wr0-x244.google.com ([2a00:1450:400c:c0c::244]:45878)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1eGlWx-00079t-Op
-	for qemu-devel@nongnu.org; Mon, 20 Nov 2017 07:50:31 -0500
-Received: by mail-wm0-x243.google.com with SMTP id y80so18438282wmd.0
-	for <qemu-devel@nongnu.org>; Mon, 20 Nov 2017 04:50:31 -0800 (PST)
-References: <8726068c-1112-eaea-5315-ec17ae37ae33@huawei.com>
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-In-reply-to: <8726068c-1112-eaea-5315-ec17ae37ae33@huawei.com>
-Date: Mon, 20 Nov 2017 12:50:28 +0000
-Message-ID: <878tf1xgff.fsf@linaro.org>
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1eGlXF-0007E8-MS
+	for qemu-devel@nongnu.org; Mon, 20 Nov 2017 07:50:49 -0500
+Received: by mail-wr0-x244.google.com with SMTP id a63so7952706wrc.12
+	for <qemu-devel@nongnu.org>; Mon, 20 Nov 2017 04:50:49 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [question] mask SIGBUS in qemu main thread
+In-Reply-To: <CAFEAcA8NGnmG_8SipvPN5_dPhokH2zZAXykN2KiW10XhB-9xXQ@mail.gmail.com>
+References: <20171116115926.16627-1-pbonzini@redhat.com>
+	<20171116115926.16627-8-pbonzini@redhat.com>
+	<CAFEAcA-06-VmH7Pvymo-o-HmiQ-uQ67Hs0KhWZfxswBxsfD2-g@mail.gmail.com>
+	<bf4bedd9-0ef8-cff3-6153-531fba597237@redhat.com>
+	<CAFEAcA9Rnd3gtrHb389e6fOEAae4aLhJnQWU-vKyzTM4o-riOQ@mail.gmail.com>
+	<001b01d361e9$d46ace40$7d406ac0$@ru>
+	<CAFEAcA8NGnmG_8SipvPN5_dPhokH2zZAXykN2KiW10XhB-9xXQ@mail.gmail.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Mon, 20 Nov 2017 12:50:27 +0000
+Message-ID: <CAFEAcA9PUOyK_vEnMKJkZV5s7o4zHDRedUY7z0ZH0i5ULEGzwg@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PULL 07/11] cpu-exec: don't overwrite
+ exception_index
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,91 +35,44 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: gengdongjiu <gengdongjiu@huawei.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, mst@redhat.com, "peter.maydell@linaro.org" <peter.maydell@linaro.org>, Ingo Molnar <mingo@redhat.com>, Wuquanming <wuquanming@huawei.com>, Huangshaoyu <huangshaoyu@huawei.com>
+To: Pavel Dovgalyuk <dovgaluk@ispras.ru>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>, Pavel Dovgalyuk <pavel.dovgaluk@ispras.ru>
 
-
-gengdongjiu <gengdongjiu@huawei.com> writes:
-
-> Hi all,
->   sorry to disturb you, I have a question to consult with you why the SIG=
-BUS mask bit is set in the Qemu main thread?
-> do we not want to Qemu main thread to handle the SIGBUS signal?
->   thanks.
-
-What exactly do you expect the main thread to do with a SIGBUS signal?
-
-If QEMU doesn't catch the SIGBUS it will be up to the kernel to deal
-with it, probably by terminating QEMU. This is fine because this is a
-bug in QEMU that shouldn't have occurred.
-
-This is different from dealing with SIGBUS due to the guests action
-which might occur in the various vCPU threads.
-
-> As shown in [1], the Qemu main thread PID is 30976.
-> "cat /proc/30976/status" in [2], we can see the "SigBlk: 0000000010002240=
-", SIGBUS block bit is 7, so the SIGBUS block bit is set.
-> then the Qemu main thread will not be woken up if there is SIGBUS set to =
-it.
-> thanks!
+On 20 November 2017 at 11:06, Peter Maydell <peter.maydell@linaro.org> wrote:
+> On 20 November 2017 at 10:25, Pavel Dovgalyuk <dovgaluk@ispras.ru> wrote:
+>>> From: Peter Maydell [mailto:peter.maydell@linaro.org]
+>>> On 17 November 2017 at 20:26, Paolo Bonzini <pbonzini@redhat.com> wrote:
+>>> > On 17/11/2017 21:07, Peter Maydell wrote:
+>>> >> Hi. This commit breaks booting of Debian on aarch64 virt board.
+>>> >> (repro instructions for creating the image available at:
+>>> >> https://translatedcode.wordpress.com/2017/07/24/installing-debian-on-qemus-64-bit-arm-virt-
+>>> board/)
+>>> >> The guest kernel never prints anything to the serial port.
+>>> >>
+>>> >> Reverting this commit fixes master for me, so I plan to do
+>>> >> that on Monday.
+>>> >
+>>> > Maybe you can also test moving the atomic_set inside the "if".  It does
+>>> > seem to be a genuine bugfix.
+>>>
+>>> No, that doesn't help: guest still sits there like a lemon.
+>>
+>> Maybe this is a more complex problem?
+>> I tried removing this if and aarch64 still does not work.
 >
->
-> [1]:
-> # ps -eL | grep "qemu"
-> 30976 30976 pts/7    00:00:00 qemu-system-x86
-> 30976 30977 pts/7    00:00:00 qemu-system-x86
->
-> [2]
-> # cat /proc/30976/status
-> Name:   qemu-system-x86
-> State:  S (sleeping)
-> Tgid:   30976
-> Ngid:   0
-> Pid:    30976
-> PPid:   34807
-> TracerPid:      0
-> Uid:    1000    1000    1000    1000
-> Gid:    1000    1000    1000    1000
-> FDSize: 256
-> Groups: 4 24 27 30 46 108 114 115 1000
-> NStgid: 30976
-> NSpid:  30976
-> NSpgid: 30976
-> NSsid:  34772
-> VmPeak:   604260 kB
-> VmSize:   538724 kB
-> VmLck:         0 kB
-> VmPin:         0 kB
-> VmHWM:     34176 kB
-> VmRSS:     34176 kB
-> VmData:   294308 kB
-> VmStk:       136 kB
-> VmExe:      4808 kB
-> VmLib:     36144 kB
-> VmPTE:       528 kB
-> VmPMD:        16 kB
-> VmSwap:        0 kB
-> HugetlbPages:          0 kB
-> Threads:        2
-> SigQ:   6/514067
-> SigPnd: 0000000000000000
-> ShdPnd: 0000000000000000
-> SigBlk: 0000000010002240
-> SigIgn: 0000000000001000
-> SigCgt: 0000000180004243
-> CapInh: 0000000000000000
-> CapPrm: 0000000000000000
-> CapEff: 0000000000000000
-> CapBnd: 0000003fffffffff
-> CapAmb: 0000000000000000
-> Seccomp:        0
-> Cpus_allowed:   ffff,ffffffff
-> Cpus_allowed_list:      0-47
-> Mems_allowed:   00000000,00000003
-> Mems_allowed_list:      0-1
-> voluntary_ctxt_switches:        7638
-> nonvoluntary_ctxt_switches:     3
+> Reverting the commit fixes it for me; I have that going through
+> build tests and will push the revert later today.
 
+Revert pushed to git master.
 
---
-Alex Benn=C3=A9e
+More generally, this commit seems to assume that QEMU always
+does:
+ * set exception_index to something
+ * handle that
+ * clear exception_index to -1
+
+but it's not clear to me that it's actually always the case
+that it gets cleared back to -1.
+
+thanks
+-- PMM
