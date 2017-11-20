@@ -1,20 +1,36 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50252)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54333)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1eGt6S-0003un-No
-	for qemu-devel@nongnu.org; Mon, 20 Nov 2017 15:55:41 -0500
+	(envelope-from <paolo.bonzini@gmail.com>) id 1eGtIj-0007ls-Pd
+	for qemu-devel@nongnu.org; Mon, 20 Nov 2017 16:08:22 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1eGt6R-0000j1-NN
-	for qemu-devel@nongnu.org; Mon, 20 Nov 2017 15:55:40 -0500
-References: <20171117190422.23626-1-eblake@redhat.com>
-From: Max Reitz <mreitz@redhat.com>
-Message-ID: <0ec6d36c-c576-f184-19da-7ddf8ff1f11e@redhat.com>
-Date: Mon, 20 Nov 2017 21:55:29 +0100
+	(envelope-from <paolo.bonzini@gmail.com>) id 1eGtIf-0002p1-HV
+	for qemu-devel@nongnu.org; Mon, 20 Nov 2017 16:08:21 -0500
+Received: from mail-wm0-x244.google.com ([2a00:1450:400c:c09::244]:37224)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
+	id 1eGtIf-0002oh-B9
+	for qemu-devel@nongnu.org; Mon, 20 Nov 2017 16:08:17 -0500
+Received: by mail-wm0-x244.google.com with SMTP id v186so21360295wma.2
+	for <qemu-devel@nongnu.org>; Mon, 20 Nov 2017 13:08:17 -0800 (PST)
+Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
+References: <20171116115926.16627-1-pbonzini@redhat.com>
+	<20171116115926.16627-8-pbonzini@redhat.com>
+	<CAFEAcA-06-VmH7Pvymo-o-HmiQ-uQ67Hs0KhWZfxswBxsfD2-g@mail.gmail.com>
+	<bf4bedd9-0ef8-cff3-6153-531fba597237@redhat.com>
+	<CAFEAcA9Rnd3gtrHb389e6fOEAae4aLhJnQWU-vKyzTM4o-riOQ@mail.gmail.com>
+	<001b01d361e9$d46ace40$7d406ac0$@ru>
+	<CAFEAcA8NGnmG_8SipvPN5_dPhokH2zZAXykN2KiW10XhB-9xXQ@mail.gmail.com>
+	<CAFEAcA9PUOyK_vEnMKJkZV5s7o4zHDRedUY7z0ZH0i5ULEGzwg@mail.gmail.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <619db202-f919-c8e9-c881-ff08373f287d@redhat.com>
+Date: Mon, 20 Nov 2017 22:08:14 +0100
 MIME-Version: 1.0
-In-Reply-To: <20171117190422.23626-1-eblake@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="p915dOmXA7takNLkBwgpFHmRvSNQ14HiJ"
-Subject: Re: [Qemu-devel] [PATCH for-2.11] iotests: Fix 176 on 32-bit host
+In-Reply-To: <CAFEAcA9PUOyK_vEnMKJkZV5s7o4zHDRedUY7z0ZH0i5ULEGzwg@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PULL 07/11] cpu-exec: don't overwrite
+ exception_index
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,78 +39,44 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org
-Cc: kwolf@redhat.com, qemu-block@nongnu.org
+To: Peter Maydell <peter.maydell@linaro.org>, Pavel Dovgalyuk <dovgaluk@ispras.ru>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, Pavel Dovgalyuk <pavel.dovgaluk@ispras.ru>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---p915dOmXA7takNLkBwgpFHmRvSNQ14HiJ
-From: Max Reitz <mreitz@redhat.com>
-To: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org
-Cc: kwolf@redhat.com, qemu-block@nongnu.org
-Message-ID: <0ec6d36c-c576-f184-19da-7ddf8ff1f11e@redhat.com>
-Subject: Re: [PATCH for-2.11] iotests: Fix 176 on 32-bit host
-References: <20171117190422.23626-1-eblake@redhat.com>
-In-Reply-To: <20171117190422.23626-1-eblake@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+On 20/11/2017 13:50, Peter Maydell wrote:
+> More generally, this commit seems to assume that QEMU always
+> does:
+>  * set exception_index to something
+>  * handle that
+>  * clear exception_index to -1
+> 
+> but it's not clear to me that it's actually always the case
+> that it gets cleared back to -1.
 
-On 2017-11-17 20:04, Eric Blake wrote:
-> The contents of a qcow2 bitmap are rounded up to a size that
-> matches the number of bits available for the granularity, but
-> that granularity differs for 32-bit hosts (our default 64k
-> cluster allows for 2M bitmap coverage per 'long') and 64-bit
-> hosts (4M bitmap per 'long').  If the image is a multiple of
-> 2M but not 4M, then the number of bytes occupied by the array
-> of longs in memory differs between architecture, thus
-> resulting in different SHA256 hashes.
->=20
-> Furthermore (but untested by me), if our computation of the
-> SHA256 hash is at all endian-dependent because of how we store
-> data in memory, that's another variable we'd have to account
-> for (ideally, we specified the bitmap stored in qcow2 as
-> fixed-endian on disk, because the same qcow2 file must be
-> usable across any architecture; but that says nothing about
-> how we represent things in memory).  But we already have test
-> 165 to validate that bitmaps are stored correctly on disk,
-> while this test is merely testing that the bitmap exists.
->=20
-> So for this test, the easiest solution is to filter out the
-> actual hash value.  Broken in commit 4096974e.
->=20
-> Reported-by: Max Reitz <mreitz@redhat.com>
-> Signed-off-by: Eric Blake <eblake@redhat.com>
-> ---
->  tests/qemu-iotests/176     | 3 ++-
->  tests/qemu-iotests/176.out | 8 ++++----
->  2 files changed, 6 insertions(+), 5 deletions(-)
+After returning from cpu_handle_interrupt, cpu_exec goes to
+cpu_handle_exception which does
 
-Now that I've failed to keep my tree empty anyway:
+    if (cpu->exception_index >= EXCP_INTERRUPT) {
+        *ret = cpu->exception_index;
+        if (*ret == EXCP_DEBUG) {
+            cpu_handle_debug_exception(cpu);
+        }
+        cpu->exception_index = -1;
+        return true;
+    } else {
+        CPUClass *cc = CPU_GET_CLASS(cpu);
+        qemu_mutex_lock_iothread();
+        cc->do_interrupt(cpu);
+        qemu_mutex_unlock_iothread();
+        cpu->exception_index = -1;
+    }
 
-Thanks, applied to my block branch:
+    return false;
 
-https://github.com/XanClic/qemu/commits/block
+Does ARM have a case where cc->do_interrupt can longjmp back to the
+beginning of cpu_handle_exception?  But I still do not understand why
+you don't eventually clear exception_index to -1.  Maybe there should be
+an assertion for that before and after cpu_handle_interrupt.
 
-(No offense taken if **someone** *cough* *cough* were to take it from me)=
+Thanks,
 
-
-Max
-
-
---p915dOmXA7takNLkBwgpFHmRvSNQ14HiJ
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQFGBAEBCAAwFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAloTQUESHG1yZWl0ekBy
-ZWRoYXQuY29tAAoJEPQH2wBh1c9AaQoIAKFj6wU8aLColwl7OyBHK3m12eHxPCwu
-x3KQKPK2j/jXglRfWF29qvU1p6gMfugX3XI20sLbx3gAM23K33HPRVTzy6/MOihK
-pwr6/QNRVDpXWixMlBTHnpATCT9i3hkOZPRaB78ESyhBHbUF1iktEgZp7RbiYIoG
-6pOh86D8nJ46LaRCf6gMuJ62d/MZxNdpNk07VtloUJN2h2nV4vfq5sCXl/8lzEm/
-penPn9OGcfXiFpsAUJdPWdzoB51qzl4uXok1AFjnsTPPyGLn43QOT+wGm25Xaq09
-coBpADL9J7Z5bSRcZEpH2JIYvgF+YgqzkByX4VA0V1Fe5ZtP4H4l3Aw=
-=LdnJ
------END PGP SIGNATURE-----
-
---p915dOmXA7takNLkBwgpFHmRvSNQ14HiJ--
+Paolo
