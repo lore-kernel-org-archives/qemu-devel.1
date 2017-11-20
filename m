@@ -1,24 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37283)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37706)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1eGn3t-0004AO-FN
-	for qemu-devel@nongnu.org; Mon, 20 Nov 2017 09:28:38 -0500
+	(envelope-from <berrange@redhat.com>) id 1eGn51-00053w-HV
+	for qemu-devel@nongnu.org; Mon, 20 Nov 2017 09:29:48 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1eGn3q-0003lS-D2
-	for qemu-devel@nongnu.org; Mon, 20 Nov 2017 09:28:37 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:58388)
+	(envelope-from <berrange@redhat.com>) id 1eGn4y-0004H9-C3
+	for qemu-devel@nongnu.org; Mon, 20 Nov 2017 09:29:47 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:57612)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <famz@redhat.com>) id 1eGn3q-0003l8-6X
-	for qemu-devel@nongnu.org; Mon, 20 Nov 2017 09:28:34 -0500
-Date: Mon, 20 Nov 2017 22:28:28 +0800
-From: Fam Zheng <famz@redhat.com>
-Message-ID: <20171120142828.GB6828@lemon.lan>
-References: <1510899814-19372-1-git-send-email-yang.zhong@intel.com>
+	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1eGn4y-0004Gn-5H
+	for qemu-devel@nongnu.org; Mon, 20 Nov 2017 09:29:44 -0500
+Date: Mon, 20 Nov 2017 14:29:36 +0000
+From: "Daniel P. Berrange" <berrange@redhat.com>
+Message-ID: <20171120142936.GM31943@redhat.com>
+Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
+References: <20171120142248.16432-1-stefanha@redhat.com>
+	<20171120142248.16432-2-stefanha@redhat.com>
+	<CAFEAcA-A4T_q5+AMuAmEAGCHA+BXaXXUqLiu2tvK6MOCiniZBQ@mail.gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <1510899814-19372-1-git-send-email-yang.zhong@intel.com>
-Subject: Re: [Qemu-devel] [PATCH] rcu: reduce half heap memory size by
- malloc_trim()
+In-Reply-To: <CAFEAcA-A4T_q5+AMuAmEAGCHA+BXaXXUqLiu2tvK6MOCiniZBQ@mail.gmail.com>
+Subject: Re: [Qemu-devel] [PATCH 1/2] Use qemu.org domain name
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,19 +29,41 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Yang Zhong <yang.zhong@intel.com>
-Cc: qemu-devel@nongnu.org, pbonzini@redhat.com, weidong.huang@huawei.com, arei.gonglei@huawei.com, liujunjie23@huawei.com, wangxinxin.wang@huawei.com, stone.xulei@huawei.com, anthony.xu@intel.com, stefanha@redhat.com, zhang.zhanghailiang@huawei.com
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: Stefan Hajnoczi <stefanha@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>, Markus Armbruster <armbru@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>
 
-On Fri, 11/17 14:23, Yang Zhong wrote:
-> diff --git a/util/rcu.c b/util/rcu.c
-> index ca5a63e..8d491a6 100644
-> --- a/util/rcu.c
-> +++ b/util/rcu.c
-> @@ -26,6 +26,7 @@
->   * IBM's contributions to this file may be relicensed under LGPLv2 or later.
->   */
->  
-> +#include <malloc.h>
+On Mon, Nov 20, 2017 at 02:26:15PM +0000, Peter Maydell wrote:
+> On 20 November 2017 at 14:22, Stefan Hajnoczi <stefanha@redhat.com> wrote:
+> > The owner of qemu.org has delegated authority to modify DNS records to
+> > the QEMU Project.  This has allowed us to use the domain name without
+> > worries about IP address changes or technical issues disrupting service.
+> > The issues described in commit 859389810910f232188675d2f10b15f1aad77660
+> > ("Use qemu-project.org domain name") have therefore been mitigated.
+> >
+> > This patch switches back to consistently using qemu.org instead of
+> > qemu-project.org.
+> >
+> > Note that git-submodule(1) does not detect URL changes.  The following
+> > commands clean up all submodules to ensure you will use the latest URLs:
+> >
+> >   $ git submodule deinit . # you'll be warned if you have local changes
+> >   $ rm -rf .git/modules    # also clear cached .git/ directories
+> 
+> Are we really sure we want to do this in the middle of
+> a release? I'd be rather happier if we fixed the documentation
+> now and saved messing around with .gitmodules until afterwards...
 
-BTW, if you respin, the "qemu/osdep.h" header should always be included first as
-per HACKING file.
+We can probably also put a workaround in scripts/git-submodules.sh to
+automatically change the git origin of all currently checked out
+submodules, so that the change doesn't affect devs at all.
+
+IOW, I'd suggest respinning this series without the submodule
+changes, as that's a functional change, and the rest of this
+is all non-functional changes.
+
+Regards,
+Daniel
+-- 
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
