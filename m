@@ -1,34 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39290)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41059)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <gandalf.corvotempesta@gmail.com>) id 1eGtvB-00051M-Tr
-	for qemu-devel@nongnu.org; Mon, 20 Nov 2017 16:48:07 -0500
+	(envelope-from <mst@redhat.com>) id 1eGtws-0005kj-Be
+	for qemu-devel@nongnu.org; Mon, 20 Nov 2017 16:49:51 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <gandalf.corvotempesta@gmail.com>) id 1eGtvA-0001u9-Te
-	for qemu-devel@nongnu.org; Mon, 20 Nov 2017 16:48:05 -0500
+	(envelope-from <mst@redhat.com>) id 1eGtwp-0004Ei-4n
+	for qemu-devel@nongnu.org; Mon, 20 Nov 2017 16:49:50 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:54680)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1eGtwo-0004B1-R6
+	for qemu-devel@nongnu.org; Mon, 20 Nov 2017 16:49:47 -0500
+Date: Mon, 20 Nov 2017 23:49:32 +0200
+From: "Michael S. Tsirkin" <mst@redhat.com>
+Message-ID: <20171120232407-mutt-send-email-mst@kernel.org>
+References: <20171120095519.15214-1-marcandre.lureau@redhat.com>
+	<20171120095519.15214-4-marcandre.lureau@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <d52519be-e4d7-1324-736d-f36c321f3924@redhat.com>
-References: <CAJH6TXiMxUoU2sFEHAoZ8jhDMtg_saEnTHM9f0vJ6Nhqj7099w@mail.gmail.com>
-	<c2ecae32-f999-9f1e-46a6-37cdab2a62e3@redhat.com>
-	<CAJH6TXhBAaBE9gBSxksWZqNywWmencRaGyeY-oN3jbKdgUettQ@mail.gmail.com>
-	<0e6cc220-814a-17fd-4fd7-7b0665d34e81@redhat.com>
-	<CAJH6TXh2v-F=yqxQbUUawk_Ctq-sgFefGp1XvMsC=syX_5jEqA@mail.gmail.com>
-	<30b54865-2255-d13d-a054-afcf5bbd06b2@redhat.com>
-	<20171115202440.GJ19514@redhat.com>
-	<7b11bb2b-b93d-e8ff-f396-703c93549d0d@redhat.com>
-	<20171115202938.GN2787@redhat.com>
-	<CAJH6TXiPuLu62-+o2+PrUGpstrks_5pLotFEe1bAOmsbn20otw@mail.gmail.com>
-	<5b6f8758-5e3e-e759-1592-2768eb85b322@redhat.com>
-	<CAJH6TXgrOWxP7jFg98_jv-R1nrFKOXBQA6pPxbkzGWTVW=EReA@mail.gmail.com>
-	<CAJH6TXg7eCiqH+3Wq=-QEH3xFhJJekTXm+c1F5w7BebiQGni8A@mail.gmail.com>
-	<d8b9ba38-f39a-9b79-ac89-64e9ab3e6a33@redhat.com>
-	<04518567-9905-c22c-78f8-ea9dcde7e7ac@redhat.com>
-	<CAJH6TXjZMN9msT5sTHLcgFtfgR2bxPVCr2C7ndpnzWdHG0CfqA@mail.gmail.com>
-	<d52519be-e4d7-1324-736d-f36c321f3924@redhat.com>
-From: Gandalf Corvotempesta <gandalf.corvotempesta@gmail.com>
-Date: Mon, 20 Nov 2017 22:48:00 +0100
-Message-ID: <CAJH6TXgenK5dN1t7s69vvSLOz0vZsgBD6JuNBx05nmjU13OGMA@mail.gmail.com>
-Content-Type: multipart/mixed; boundary="94eb2c0b8076513388055e710a9b"
-Subject: Re: [Qemu-devel] [Libguestfs]  [qemu-img] support for XVA
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+In-Reply-To: <20171120095519.15214-4-marcandre.lureau@redhat.com>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v7 3/5] fw_cfg: do DMA read operation
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,100 +28,312 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Max Reitz <mreitz@redhat.com>
-Cc: "Richard W.M. Jones" <rjones@redhat.com>, Qemu-block <qemu-block@nongnu.org>, qemu-devel@nongnu.org, libguestfs <libguestfs@redhat.com>
+To: =?iso-8859-1?Q?Marc-Andr=E9?= Lureau <marcandre.lureau@redhat.com>
+Cc: linux-kernel@vger.kernel.org, qemu-devel@nongnu.org, somlo@cmu.edu, xiaolong.ye@intel.com
 
---94eb2c0b8076513388055e710a9b
-Content-Type: text/plain; charset="UTF-8"
+On Mon, Nov 20, 2017 at 10:55:17AM +0100, Marc-Andr=E9 Lureau wrote:
+> Modify fw_cfg_read_blob() to use DMA if the device supports it.
+> Return errors, because the operation may fail.
+>=20
+> The DMA operation is expected to run synchronously with today qemu,
+> but the specification states that it may become async, so we run
+> "control" field check in a loop for eventual changes.
+>=20
+> We may want to switch all the *buf addresses to use only kmalloc'ed
+> buffers (instead of using stack/image addresses with dma=3Dfalse).
+>=20
+> Signed-off-by: Marc-Andr=E9 Lureau <marcandre.lureau@redhat.com>
+> ---
+>  drivers/firmware/qemu_fw_cfg.c | 140 +++++++++++++++++++++++++++++++++=
++++-----
+>  1 file changed, 123 insertions(+), 17 deletions(-)
+>=20
+> diff --git a/drivers/firmware/qemu_fw_cfg.c b/drivers/firmware/qemu_fw_=
+cfg.c
+> index 740df0df2260..e0fe6ff037c3 100644
+> --- a/drivers/firmware/qemu_fw_cfg.c
+> +++ b/drivers/firmware/qemu_fw_cfg.c
+> @@ -33,6 +33,8 @@
+>  #include <linux/slab.h>
+>  #include <linux/io.h>
+>  #include <linux/ioport.h>
+> +#include <linux/delay.h>
+> +#include <linux/dma-mapping.h>
+> =20
+>  MODULE_AUTHOR("Gabriel L. Somlo <somlo@cmu.edu>");
+>  MODULE_DESCRIPTION("QEMU fw_cfg sysfs support");
+> @@ -43,12 +45,25 @@ MODULE_LICENSE("GPL");
+>  #define FW_CFG_ID         0x01
+>  #define FW_CFG_FILE_DIR   0x19
+> =20
+> +#define FW_CFG_VERSION_DMA     0x02
+> +#define FW_CFG_DMA_CTL_ERROR   0x01
+> +#define FW_CFG_DMA_CTL_READ    0x02
+> +#define FW_CFG_DMA_CTL_SKIP    0x04
+> +#define FW_CFG_DMA_CTL_SELECT  0x08
+> +#define FW_CFG_DMA_CTL_WRITE   0x10
+> +
+>  /* size in bytes of fw_cfg signature */
+>  #define FW_CFG_SIG_SIZE 4
+> =20
+>  /* fw_cfg "file name" is up to 56 characters (including terminating nu=
+l) */
+>  #define FW_CFG_MAX_FILE_PATH 56
+> =20
+> +/* platform device for dma mapping */
+> +static struct device *dev;
+> +
+> +/* fw_cfg revision attribute, in /sys/firmware/qemu_fw_cfg top-level d=
+ir. */
+> +static u32 fw_cfg_rev;
+> +
+>  /* fw_cfg file directory entry type */
+>  struct fw_cfg_file {
+>  	u32 size;
+> @@ -57,6 +72,12 @@ struct fw_cfg_file {
+>  	char name[FW_CFG_MAX_FILE_PATH];
+>  };
+> =20
+> +struct fw_cfg_dma {
+> +	u32 control;
+> +	u32 length;
+> +	u64 address;
+> +} __packed;
+> +
+>  /* fw_cfg device i/o register addresses */
+>  static bool fw_cfg_is_mmio;
+>  static phys_addr_t fw_cfg_p_base;
 
-I did something different, that will build a raw image directly from a
-xenserver export, on the fly.
-Compared the resulting file (via MD5) with xenmygrate.py and there is a match.
+Drop __packed please. It causes many gcc versions to do insane things.
+Can be a patch on top.
 
-Currently, this is the faster way to convert a XenServer image to a
-raw file. Don't need to wait
-for export, tar extract and conversion. It does all of that, at the
-same time during the VM export in a single pass.
 
-If someone interested in testing it, it would be apreciated.
+> @@ -75,12 +96,79 @@ static inline u16 fw_cfg_sel_endianness(u16 key)
+>  	return fw_cfg_is_mmio ? cpu_to_be16(key) : cpu_to_le16(key);
+>  }
+> =20
+> +static inline bool fw_cfg_dma_enabled(void)
+> +{
+> +	return fw_cfg_rev & FW_CFG_VERSION_DMA && fw_cfg_reg_dma;
+> +}
+> +
+> +/* qemu fw_cfg device is sync today, but spec says it may become async=
+ */
+> +static void fw_cfg_wait_for_control(struct fw_cfg_dma *d, dma_addr_t d=
+ma)
+> +{
+> +	do {
+> +		dma_sync_single_for_cpu(dev, dma, sizeof(*d), DMA_FROM_DEVICE);
+> +		if ((be32_to_cpu(d->control) & ~FW_CFG_DMA_CTL_ERROR) =3D=3D 0)
+> +			return;
+> +
+> +		usleep_range(50, 100);
 
-2017-11-16 15:02 GMT+01:00 Max Reitz <mreitz@redhat.com>:
-> On 2017-11-16 11:08, Gandalf Corvotempesta wrote:
->> 2017-11-15 23:55 GMT+01:00 Max Reitz <mreitz@redhat.com>:
->>> https://xanclic.moe/convert-xva.rb -- does this work?
->>> (It seems to works on the two example images I found...)
->>>
->>> An example is in the code, you use it like this:
->>>
->>> $ ./convert-xva.rb ~/Downloads/stats-appliance-2.36.020502.xva Ref:73
->>
->>
->> It doesn't work on huge images:
->>
->> # time convert-xva.rb 20171115_193814_efff_.xva Ref:10 -O qcow2 disk1.qcow2
->> /usr/bin/convert-xva.rb:119:in `exec': Argument list too long -
->> qemu-img (Errno::E2BIG)
->> from /usr/bin/convert-xva.rb:119:in `<main>'
->>
->> real 9m41.414s
->> user 0m19.280s
->> sys 0m3.260s
->
-> Well, there is this:
->
-> https://github.com/XanClic/qemu.rb/blob/master/examples/convert-xva-online.rb
->
-> That should get around that restriction, but currently it is stupidly
-> slow (because it just issues all 1 MB copy operations simultaneously),
-> and it doesn't use qemu-img convert.  Instead, it uses a real qemu with
-> block jobs.  Ideally, you'd use it like this:
->
-> $ ./convert-xva-online.rb ~/Downloads/stats-appliance-2.36.020502.xva
-> Ref:73      81936 M
-> $ qemu-img create -f qcow2 [whatever options you need] disk1.qcow2 \
->     81936M
-> Formatting 'disk1.qcow2', fmt=qcow2 size=85916123136 encryption=off
-> cluster_size=65536 lazy_refcounts=off refcount_bits=16
-> $ ./convert-xva-online.rb ~/Downloads/stats-appliance-2.36.020502.xva \
->     Ref:73 \
->     '{"driver":"qcow2",
->       "detect-zeroes":"unmap",
->       "discard":"unmap",
->       "file":{"driver":"file","filename":"disk1.qcow2"}}'
-> Adding block devices...
-> Starting block jobs...
-> 100.00 % of jobs completed
->
-> (Maybe I can get it faster.)
->
-> Max
->
+And since in practice we never get to this line,
+maybe we should just go back to yield here.
 
---94eb2c0b8076513388055e710a9b
-Content-Type: application/x-sh; name="xva_conv.sh"
-Content-Disposition: attachment; filename="xva_conv.sh"
-Content-Transfer-Encoding: base64
-X-Attachment-Id: f_ja8q0qku1
-
-IyEvYmluL2Jhc2gKIwojIChjKSAyMDE3IEdVRVNULml0IHMuci5sLiAtIEFsZXNzYW5kcm8gQ29y
-YmVsbGkKIyBMaWNlbnNlOiBHUEwKIwojIFNhbXBsZSB1c2FnZToKIyB3Z2V0IC0taHR0cC11c2Vy
-PXggLS1odHRwLXBhc3N3b3JkPXkgaHR0cDovL3lvdXIueGVuLnNlcnZlci5ob3N0L2V4cG9ydD91
-dWlkPTxWTV9VVUlEPiAtTyAtIHwgdGFyIC0tdG8tY29tbWFuZD0uL3h2YV9jb252LnNoIC14ZiAt
-CiMKClRNUF9MQVNUTkFNRV9QUkVGSVg9Ii90bXAvbGFzdG5hbWUiCgppZiBbICIke1RBUl9GSUxF
-VFlQRX0iICE9ICJmIiBdOyB0aGVuCiAgIGV4aXQKZmkKCmlmIFtbICIke1RBUl9GSUxFTkFNRX0i
-ID1+ICJjaGVja3N1bSIgfHwgIiR7VEFSX0ZJTEVOQU1FfSIgPT0gIm92YS54bWwiIF1dOyB0aGVu
-CiAgIGV4aXQKZmkKCkRJU0tOQU1FPSR7VEFSX0ZJTEVOQU1FJS8qfQpGSUxFTkFNRT0ke1RBUl9G
-SUxFTkFNRSMqL30KQ1VSTlVNQkVSPSR7RklMRU5BTUUjIiR7RklMRU5BTUUlJVshMF0qfSJ9Cgoj
-IEZpcnN0IGZpbGUgPyBUTVBfTEFTVE5BTUUgc2hvdWxkIGJlIGVtcHR5CmlmIFsgISAtZiAiJHtU
-TVBfTEFTVE5BTUVfUFJFRklYfV8ke0RJU0tOQU1FfSIgXTsgdGhlbgogICBlY2hvICR7Q1VSTlVN
-QkVSfSA+ICR7VE1QX0xBU1ROQU1FX1BSRUZJWH1fJHtESVNLTkFNRX0KCiAgIGNhdCA+ICR7RElT
-S05BTUV9LnJhdyAKZWxzZQogICBMQVNUTlVNPSQoY2F0ICR7VE1QX0xBU1ROQU1FX1BSRUZJWH1f
-JHtESVNLTkFNRX0pOwoKICAgIyBpcyBzZXF1ZW50aWFsID8KICAgaWYgWyAkKGV4cHIgJHtMQVNU
-TlVNfSArIDEpIC1lcSAiJHtGSUxFTkFNRX0iIF07IHRoZW4KICAgICAgY2F0ID4+ICR7RElTS05B
-TUV9LnJhdwogICBlbHNlCgkgIGZvciBpIGluICQoc2VxICQoZXhwciAke0xBU1ROVU19ICsgMSkg
-JChleHByICR7RklMRU5BTUV9IC0gMSkpOyBkbwogICAgICAgICBkZCBpZj0vZGV2L3plcm8gb2Y9
-JHtESVNLTkFNRX0ucmF3IGJzPTFNIGNvdW50PTEgb2ZsYWc9YXBwZW5kIGNvbnY9bm90cnVuYyAy
-Pi9kZXYvbnVsbAogICAgICBkb25lCgogICAgICBjYXQgPj4gJHtESVNLTkFNRX0ucmF3CiAgIGZp
-CgogICBlY2hvICR7Q1VSTlVNQkVSfSA+ICR7VE1QX0xBU1ROQU1FX1BSRUZJWH1fJHtESVNLTkFN
-RX0KZmkK
---94eb2c0b8076513388055e710a9b--
+> +	} while (true);
+> +}
+> +
+> +static ssize_t fw_cfg_dma_transfer(void *address, u32 length, u32 cont=
+rol)
+> +{
+> +	dma_addr_t dma_addr =3D 0;
+> +	static struct fw_cfg_dma d;
+> +	dma_addr_t dma;
+> +	ssize_t ret =3D length;
+> +	enum dma_data_direction dir =3D
+> +		(control & FW_CFG_DMA_CTL_READ ? DMA_FROM_DEVICE : 0);
+> +
+> +	if (address && length) {
+> +		dma_addr =3D dma_map_single(dev, address, length, dir);
+> +		if (dma_mapping_error(NULL, dma_addr)) {
+> +			WARN(1, "%s: failed to map address\n", __func__);
+> +			return -EFAULT;
+> +		}
+> +	}
+> +
+> +	d =3D (struct fw_cfg_dma) {
+> +		.address =3D cpu_to_be64(dma_addr),
+> +		.length =3D cpu_to_be32(length),
+> +		.control =3D cpu_to_be32(control)
+> +	};
+> +
+> +	dma =3D dma_map_single(dev, &d, sizeof(d), DMA_BIDIRECTIONAL);
+> +	if (dma_mapping_error(NULL, dma)) {
+> +		WARN(1, "%s: failed to map fw_cfg_dma\n", __func__);
+> +		ret =3D -EFAULT;
+> +		goto end;
+> +	}
+> +
+> +	iowrite32be((u64)dma >> 32, fw_cfg_reg_dma);
+> +	iowrite32be(dma, fw_cfg_reg_dma + 4);
+> +
+> +	fw_cfg_wait_for_control(&d, dma);
+> +
+> +	if (be32_to_cpu(d.control) & FW_CFG_DMA_CTL_ERROR) {
+> +		ret =3D -EIO;
+> +	}
+> +
+> +	dma_unmap_single(dev, dma, sizeof(d), DMA_BIDIRECTIONAL);
+> +
+> +end:
+> +	if (dma_addr)
+> +		dma_unmap_single(dev, dma_addr, length, dir);
+> +
+> +	return ret;
+> +}
+> +
+>  /* read chunk of given fw_cfg blob (caller responsible for sanity-chec=
+k) */
+> -static inline void fw_cfg_read_blob(u16 key,
+> -				    void *buf, loff_t pos, size_t count)
+> +static ssize_t fw_cfg_read_blob(u16 key,
+> +				void *buf, loff_t pos, size_t count,
+> +				bool dma)
+>  {
+>  	u32 glk =3D -1U;
+>  	acpi_status status;
+> +	ssize_t ret =3D count;
+> =20
+>  	/* If we have ACPI, ensure mutual exclusion against any potential
+>  	 * device access by the firmware, e.g. via AML methods:
+> @@ -90,17 +178,36 @@ static inline void fw_cfg_read_blob(u16 key,
+>  		/* Should never get here */
+>  		WARN(1, "fw_cfg_read_blob: Failed to lock ACPI!\n");
+>  		memset(buf, 0, count);
+> -		return;
+> +		return -EINVAL;
+>  	}
+> =20
+>  	mutex_lock(&fw_cfg_dev_lock);
+> -	iowrite16(fw_cfg_sel_endianness(key), fw_cfg_reg_ctrl);
+> -	while (pos-- > 0)
+> -		ioread8(fw_cfg_reg_data);
+> -	ioread8_rep(fw_cfg_reg_data, buf, count);
+> +	if (dma && fw_cfg_dma_enabled()) {
+> +		if (pos =3D=3D 0) {
+> +			ret =3D fw_cfg_dma_transfer(buf, count, key << 16
+> +						  | FW_CFG_DMA_CTL_SELECT
+> +						  | FW_CFG_DMA_CTL_READ);
+> +		} else {
+> +			iowrite16(fw_cfg_sel_endianness(key), fw_cfg_reg_ctrl);
+> +			ret =3D fw_cfg_dma_transfer(NULL, pos, FW_CFG_DMA_CTL_SKIP);
+> +			if (ret < 0)
+> +				goto end;
+> +			ret =3D fw_cfg_dma_transfer(buf, count,
+> +						  FW_CFG_DMA_CTL_READ);
+> +		}
+> +	} else {
+> +		iowrite16(fw_cfg_sel_endianness(key), fw_cfg_reg_ctrl);
+> +		while (pos-- > 0)
+> +			ioread8(fw_cfg_reg_data);
+> +		ioread8_rep(fw_cfg_reg_data, buf, count);
+> +	}
+> +
+> +end:
+>  	mutex_unlock(&fw_cfg_dev_lock);
+> =20
+>  	acpi_release_global_lock(glk);
+> +
+> +	return ret;
+>  }
+> =20
+>  /* clean up fw_cfg device i/o */
+> @@ -192,7 +299,7 @@ static int fw_cfg_do_platform_probe(struct platform=
+_device *pdev)
+>  #endif
+> =20
+>  	/* verify fw_cfg device signature */
+> -	fw_cfg_read_blob(FW_CFG_SIGNATURE, sig, 0, FW_CFG_SIG_SIZE);
+> +	fw_cfg_read_blob(FW_CFG_SIGNATURE, sig, 0, FW_CFG_SIG_SIZE, false);
+>  	if (memcmp(sig, "QEMU", FW_CFG_SIG_SIZE) !=3D 0) {
+>  		fw_cfg_io_cleanup();
+>  		return -ENODEV;
+> @@ -201,9 +308,6 @@ static int fw_cfg_do_platform_probe(struct platform=
+_device *pdev)
+>  	return 0;
+>  }
+> =20
+> -/* fw_cfg revision attribute, in /sys/firmware/qemu_fw_cfg top-level d=
+ir. */
+> -static u32 fw_cfg_rev;
+> -
+>  static ssize_t fw_cfg_showrev(struct kobject *k, struct attribute *a, =
+char *buf)
+>  {
+>  	return sprintf(buf, "%u\n", fw_cfg_rev);
+> @@ -351,8 +455,7 @@ static ssize_t fw_cfg_sysfs_read_raw(struct file *f=
+ilp, struct kobject *kobj,
+>  	if (count > entry->f.size - pos)
+>  		count =3D entry->f.size - pos;
+> =20
+> -	fw_cfg_read_blob(entry->f.select, buf, pos, count);
+> -	return count;
+> +	return fw_cfg_read_blob(entry->f.select, buf, pos, count, true);
+>  }
+> =20
+>  static struct bin_attribute fw_cfg_sysfs_attr_raw =3D {
+> @@ -505,7 +608,7 @@ static int fw_cfg_register_dir_entries(void)
+>  	struct fw_cfg_file *dir;
+>  	size_t dir_size;
+> =20
+> -	fw_cfg_read_blob(FW_CFG_FILE_DIR, &count, 0, sizeof(count));
+> +	fw_cfg_read_blob(FW_CFG_FILE_DIR, &count, 0, sizeof(count), false);
+>  	count =3D be32_to_cpu(count);
+>  	dir_size =3D count * sizeof(struct fw_cfg_file);
+> =20
+> @@ -513,7 +616,7 @@ static int fw_cfg_register_dir_entries(void)
+>  	if (!dir)
+>  		return -ENOMEM;
+> =20
+> -	fw_cfg_read_blob(FW_CFG_FILE_DIR, dir, sizeof(count), dir_size);
+> +	fw_cfg_read_blob(FW_CFG_FILE_DIR, dir, sizeof(count), dir_size, true)=
+;
+> =20
+>  	for (i =3D 0; i < count; i++) {
+>  		dir[i].size =3D be32_to_cpu(dir[i].size);
+> @@ -544,9 +647,10 @@ static int fw_cfg_sysfs_probe(struct platform_devi=
+ce *pdev)
+>  	 * one fw_cfg device exist system-wide, so if one was already found
+>  	 * earlier, we might as well stop here.
+>  	 */
+> -	if (fw_cfg_sel_ko)
+> +	if (dev)
+>  		return -EBUSY;
+> =20
+> +	dev =3D &pdev->dev;
+>  	/* create by_key and by_name subdirs of /sys/firmware/qemu_fw_cfg/ */
+>  	err =3D -ENOMEM;
+>  	fw_cfg_sel_ko =3D kobject_create_and_add("by_key", fw_cfg_top_ko);
+> @@ -562,7 +666,7 @@ static int fw_cfg_sysfs_probe(struct platform_devic=
+e *pdev)
+>  		goto err_probe;
+> =20
+>  	/* get revision number, add matching top-level attribute */
+> -	fw_cfg_read_blob(FW_CFG_ID, &fw_cfg_rev, 0, sizeof(fw_cfg_rev));
+> +	fw_cfg_read_blob(FW_CFG_ID, &fw_cfg_rev, 0, sizeof(fw_cfg_rev), false=
+);
+>  	fw_cfg_rev =3D le32_to_cpu(fw_cfg_rev);
+>  	err =3D sysfs_create_file(fw_cfg_top_ko, &fw_cfg_rev_attr.attr);
+>  	if (err)
+> @@ -587,6 +691,7 @@ static int fw_cfg_sysfs_probe(struct platform_devic=
+e *pdev)
+>  err_name:
+>  	fw_cfg_kobj_cleanup(fw_cfg_sel_ko);
+>  err_sel:
+> +	dev =3D NULL;
+>  	return err;
+>  }
+> =20
+> @@ -598,6 +703,7 @@ static int fw_cfg_sysfs_remove(struct platform_devi=
+ce *pdev)
+>  	fw_cfg_io_cleanup();
+>  	fw_cfg_kset_unregister_recursive(fw_cfg_fname_kset);
+>  	fw_cfg_kobj_cleanup(fw_cfg_sel_ko);
+> +	dev =3D NULL;
+>  	return 0;
+>  }
+> =20
+> --=20
+> 2.15.0.277.ga3d2ad2c43
