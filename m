@@ -1,18 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51369)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51368)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <anton.nefedov@virtuozzo.com>) id 1eGpI3-0002f6-Dm
+	(envelope-from <anton.nefedov@virtuozzo.com>) id 1eGpI3-0002f5-Dg
 	for qemu-devel@nongnu.org; Mon, 20 Nov 2017 11:51:24 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <anton.nefedov@virtuozzo.com>) id 1eGpHz-0003px-HX
+	(envelope-from <anton.nefedov@virtuozzo.com>) id 1eGpHy-0003pD-Hg
 	for qemu-devel@nongnu.org; Mon, 20 Nov 2017 11:51:23 -0500
 From: Anton Nefedov <anton.nefedov@virtuozzo.com>
-Date: Mon, 20 Nov 2017 19:50:59 +0300
-Message-Id: <1511196664-85304-3-git-send-email-anton.nefedov@virtuozzo.com>
-In-Reply-To: <1511196664-85304-1-git-send-email-anton.nefedov@virtuozzo.com>
-References: <1511196664-85304-1-git-send-email-anton.nefedov@virtuozzo.com>
+Date: Mon, 20 Nov 2017 19:50:57 +0300
+Message-Id: <1511196664-85304-1-git-send-email-anton.nefedov@virtuozzo.com>
 MIME-Version: 1.0
 Content-Type: text/plain
-Subject: [Qemu-devel] [PATCH 2/7] ide: account UNMAP (TRIM) operations
+Subject: [Qemu-devel] [PATCH 0/7] discard blockstats
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,48 +22,103 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org, qemu-block@nongnu.org
 Cc: kwolf@redhat.com, mreitz@redhat.com, armbru@redhat.com, jsnow@redhat.com, pbonzini@redhat.com, eblake@redhat.com, den@virtuozzo.com, Anton Nefedov <anton.nefedov@virtuozzo.com>
 
-Signed-off-by: Anton Nefedov <anton.nefedov@virtuozzo.com>
-Reviewed-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
----
- hw/ide/core.c | 12 ++++++++++++
- 1 file changed, 12 insertions(+)
+qmp query-blockstats provides stats info for write/read/flush ops.
 
-diff --git a/hw/ide/core.c b/hw/ide/core.c
-index 471d0c9..2e4dea7 100644
---- a/hw/ide/core.c
-+++ b/hw/ide/core.c
-@@ -389,6 +389,7 @@ typedef struct TrimAIOCB {
-     QEMUIOVector *qiov;
-     BlockAIOCB *aiocb;
-     int i, j;
-+    BlockAcctCookie acct;
- } TrimAIOCB;
- 
- static void trim_aio_cancel(BlockAIOCB *acb)
-@@ -426,6 +427,14 @@ static void ide_trim_bh_cb(void *opaque)
- static void ide_issue_trim_cb(void *opaque, int ret)
- {
-     TrimAIOCB *iocb = opaque;
-+    if (iocb->i >= 0) {
-+        if (ret >= 0) {
-+            block_acct_done(blk_get_stats(iocb->blk), &iocb->acct);
-+        } else {
-+            block_acct_failed(blk_get_stats(iocb->blk), &iocb->acct);
-+        }
-+    }
-+
-     if (ret >= 0) {
-         while (iocb->j < iocb->qiov->niov) {
-             int j = iocb->j;
-@@ -442,6 +451,9 @@ static void ide_issue_trim_cb(void *opaque, int ret)
-                     continue;
-                 }
- 
-+                block_acct_start(blk_get_stats(iocb->blk), &iocb->acct,
-+                                 count << BDRV_SECTOR_BITS, BLOCK_ACCT_UNMAP);
-+
-                 /* Got an entry! Submit and exit.  */
-                 iocb->aiocb = blk_aio_pdiscard(iocb->blk,
-                                                sector << BDRV_SECTOR_BITS,
+Patches 1-5 implement the similar for discard (unmap) command for scsi
+and ide disks.
+Discard stat "unmap_ops / unmap_bytes" is supposed to account the ops that
+have completed without an error.
+
+However, discard operation is advisory. Specifically,
+ - common block layer ignores ENOTSUP error code.
+   That might be returned if the block driver does not support discard,
+   or discard has been configured to be ignored.
+ - format drivers such as qcow2 may ignore discard if they were configured
+   to ignore that, or if the corresponding area is already marked unused
+   (unallocated / zero clusters).
+
+And what is actually useful is the number of bytes actually discarded
+down on the host filesystem.
+To achieve that, driver-specific statistics has been added to blockstats
+(patch 7).
+With patch 6, file-posix driver accounts discard operations on its level too.
+
+query-blockstat result:
+
+(note the difference between blockdevice unmap and file discard stats. qcow2
+sends a few ops down to the file as the clusters are actually unallocated
+on qcow2 level)
+
+{"return": [
+{"device": "drive-scsi0-0-0-0"
+  "parent": {
+    "stats": {
+>      "unmap_operations": 0
+>      "unmap_merged": 0
+      "flush_total_time_ns": 0
+      "wr_highest_offset": 8111718400
+      [..]
+      "invalid_wr_operations": 0
+      "invalid_rd_operations": 0}
+    "node-name": "#block047"
+>    "driver_stats": {
+>      "type": "file"
+>      "data": {
+>        "discard_bytes_ok": 1572864
+>        "discard_nb_failed": 0
+>        "discard_nb_ok": 5}}}
+  "stats": {
+>   "unmap_operations": 472
+>   "unmap_merged": 0
+    "flush_total_time_ns": 44530540
+    "wr_highest_offset": 7106662400
+    "wr_total_time_ns": 45518856
+    "failed_wr_operations": 0
+    "failed_rd_operations": 0
+    "wr_merged": 0
+    "wr_bytes": 889856
+    "timed_stats": []
+>    "failed_unmap_operations": 0
+    "failed_flush_operations": 0
+    "account_invalid": true
+    "rd_total_time_ns": 3306264098
+>    "invalid_unmap_operations": 0
+    "flush_operations": 18
+    "wr_operations": 120
+>    "unmap_bytes": 12312014848
+    "rd_merged": 0
+    "rd_bytes": 137103360
+>    "unmap_total_time_ns": 22664692
+    "invalid_flush_operations": 0
+    "account_failed": true
+    "idle_time_ns": 437316567
+    "rd_operations": 5636
+    "invalid_wr_operations": 0
+    "invalid_rd_operations": 0}
+  "node-name": "#block128"}
+
+  {"device": "drive-ide0-0-0"
+  [..]
+
+Anton Nefedov (7):
+  qapi: add unmap to BlockDeviceStats
+  ide: account UNMAP (TRIM) operations
+  scsi: store unmap offset and nb_sectors in request struct
+  scsi: move unmap error checking to the complete callback
+  scsi: account unmap operations
+  file-posix: account discard operations
+  qapi: query-blockstat: add driver specific file-posix stats
+
+ qapi/block-core.json       | 57 ++++++++++++++++++++++++++++++++++++++++++++++
+ include/block/accounting.h |  1 +
+ include/block/block.h      |  1 +
+ include/block/block_int.h  |  1 +
+ block.c                    |  9 ++++++++
+ block/file-posix.c         | 42 ++++++++++++++++++++++++++++++++--
+ block/qapi.c               | 11 +++++++++
+ hw/ide/core.c              | 12 ++++++++++
+ hw/scsi/scsi-disk.c        | 29 ++++++++++++++---------
+ 9 files changed, 150 insertions(+), 13 deletions(-)
+
 -- 
 2.7.4
