@@ -1,30 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47277)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48840)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1eGqVY-0003TQ-Jc
-	for qemu-devel@nongnu.org; Mon, 20 Nov 2017 13:09:25 -0500
+	(envelope-from <bounces@canonical.com>) id 1eGqYN-0005Qm-OY
+	for qemu-devel@nongnu.org; Mon, 20 Nov 2017 13:12:21 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1eGqVX-00051m-Nw
-	for qemu-devel@nongnu.org; Mon, 20 Nov 2017 13:09:24 -0500
-Received: from mail-wr0-x236.google.com ([2a00:1450:400c:c0c::236]:34224)
+	(envelope-from <bounces@canonical.com>) id 1eGqYH-0006SJ-Qd
+	for qemu-devel@nongnu.org; Mon, 20 Nov 2017 13:12:19 -0500
+Received: from indium.canonical.com ([91.189.90.7]:49880)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1eGqVX-00051G-H5
-	for qemu-devel@nongnu.org; Mon, 20 Nov 2017 13:09:23 -0500
-Received: by mail-wr0-x236.google.com with SMTP id k18so3952628wre.1
-	for <qemu-devel@nongnu.org>; Mon, 20 Nov 2017 10:09:23 -0800 (PST)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1eGqYH-0006S8-Jj
+	for qemu-devel@nongnu.org; Mon, 20 Nov 2017 13:12:13 -0500
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1eGqYE-0002vo-8e
+	for <qemu-devel@nongnu.org>; Mon, 20 Nov 2017 18:12:10 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 4D1112E8279
+	for <qemu-devel@nongnu.org>; Mon, 20 Nov 2017 18:11:56 +0000 (UTC)
 MIME-Version: 1.0
-In-Reply-To: <9c3820a5-f41d-f835-58bb-8dfb7233403b@twiddle.net>
-References: <1511184421-23535-1-git-send-email-peter.maydell@linaro.org>
-	<1511184421-23535-3-git-send-email-peter.maydell@linaro.org>
-	<1aaf0a6f-c38b-d80d-b09a-1a54545c7660@twiddle.net>
-	<CAFEAcA-RXwYtL7yjNjxdHmuBfHe61-mYNX6ytDJ4bETLyA3DHA@mail.gmail.com>
-	<9c3820a5-f41d-f835-58bb-8dfb7233403b@twiddle.net>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Mon, 20 Nov 2017 18:00:39 -0000
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon, 20 Nov 2017 18:09:01 +0000
-Message-ID: <CAFEAcA8r-JGi4FTMP99c0M0mQ2E=z71uhi3FyFp0YN-eaW_rsA@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH for-2.11 2/2] accel/tcg: Handle atomic
- accesses to notdirty memory correctly
+Reply-To: Bug 1673976 <1673976@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <20170318142657.21676.52259.malonedeb@chaenomeles.canonical.com>
+Message-Id: <151120083945.2410.17555643783445125291.malone@soybean.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1673976] Re: linux-user clone() can't handle
+ glibc posix_spawn() (causes locale-gen to assert)
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,17 +37,40 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Richard Henderson <rth@twiddle.net>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, qemu-stable <qemu-stable@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>, Stuart Monteith <stuart.monteith@linaro.org>
+To: qemu-devel@nongnu.org
 
-On 20 November 2017 at 15:00, Richard Henderson <rth@twiddle.net> wrote:
-> On 11/20/2017 03:47 PM, Peter Maydell wrote:
->> (Having NDI be "mostly opaque apart from this one thing" is a
->> little ugly, though.)
->
-> Yeah, well... nothing else sensible is coming to mind.
+Not without messing with the QEMU source, no.
 
-I've just sent a v2 that takes this approach.
+-- =
 
-thanks
--- PMM
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1673976
+
+Title:
+  linux-user clone() can't handle glibc posix_spawn() (causes locale-gen
+  to assert)
+
+Status in QEMU:
+  New
+
+Bug description:
+  I'm running a command (locale-gen) inside of an armv7h chroot mounted
+  on my x86_64 desktop by putting qemu-arm-static into /usr/bin/ of the
+  chroot file system and I get a core dump.
+
+  locale-gen
+  Generating locales...
+  =C2=A0=C2=A0en_US.UTF-8...localedef: ../sysdeps/unix/sysv/linux/spawni.c:=
+360: __spawnix: Assertion `ec >=3D 0' failed.
+  qemu: uncaught target signal 6 (Aborted) - core dumped
+  /usr/bin/locale-gen: line 41:    34 Aborted                 (core dumped)=
+ localedef -i $input -c -f $charset -A /usr/share/locale/locale.alias $loca=
+le
+
+  I've done this same thing successfully for years, but this breakage
+  has appeared some time in the last 3 or so months. Possibly with the
+  update to qemu version 2.8.
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1673976/+subscriptions
