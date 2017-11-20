@@ -1,42 +1,41 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38790)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39006)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <borntraeger@de.ibm.com>) id 1eGljo-0004PL-Pl
-	for qemu-devel@nongnu.org; Mon, 20 Nov 2017 08:03:54 -0500
+	(envelope-from <borntraeger@de.ibm.com>) id 1eGlkV-00055P-Fs
+	for qemu-devel@nongnu.org; Mon, 20 Nov 2017 08:04:35 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <borntraeger@de.ibm.com>) id 1eGljk-00064T-66
-	for qemu-devel@nongnu.org; Mon, 20 Nov 2017 08:03:48 -0500
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:35686
-	helo=mx0a-001b2d01.pphosted.com)
+	(envelope-from <borntraeger@de.ibm.com>) id 1eGlkQ-0006HG-St
+	for qemu-devel@nongnu.org; Mon, 20 Nov 2017 08:04:31 -0500
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:39710)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <borntraeger@de.ibm.com>)
-	id 1eGljk-00064I-0U
-	for qemu-devel@nongnu.org; Mon, 20 Nov 2017 08:03:44 -0500
-Received: from pps.filterd (m0098416.ppops.net [127.0.0.1])
-	by mx0b-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
-	vAKCxCNF118109
-	for <qemu-devel@nongnu.org>; Mon, 20 Nov 2017 08:03:43 -0500
-Received: from e06smtp10.uk.ibm.com (e06smtp10.uk.ibm.com [195.75.94.106])
-	by mx0b-001b2d01.pphosted.com with ESMTP id 2ebwjdqm2w-1
+	id 1eGlkQ-0006Gu-Jq
+	for qemu-devel@nongnu.org; Mon, 20 Nov 2017 08:04:26 -0500
+Received: from pps.filterd (m0098393.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
+	vAKD3AOT139182
+	for <qemu-devel@nongnu.org>; Mon, 20 Nov 2017 08:04:21 -0500
+Received: from e06smtp14.uk.ibm.com (e06smtp14.uk.ibm.com [195.75.94.110])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2ebykhg1gq-1
 	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Mon, 20 Nov 2017 08:03:43 -0500
+	for <qemu-devel@nongnu.org>; Mon, 20 Nov 2017 08:04:20 -0500
 Received: from localhost
-	by e06smtp10.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	by e06smtp14.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
 	Only! Violators will be prosecuted
 	for <qemu-devel@nongnu.org> from <borntraeger@de.ibm.com>;
-	Mon, 20 Nov 2017 13:03:35 -0000
+	Mon, 20 Nov 2017 13:04:18 -0000
 References: <20171120123525.147663-1-borntraeger@de.ibm.com>
-	<20171120123525.147663-2-borntraeger@de.ibm.com>
-	<20171120135734.23a4e4a1.cohuck@redhat.com>
+	<20171120123525.147663-3-borntraeger@de.ibm.com>
+	<20171120140052.48c7f646.cohuck@redhat.com>
 From: Christian Borntraeger <borntraeger@de.ibm.com>
-Date: Mon, 20 Nov 2017 14:03:30 +0100
+Date: Mon, 20 Nov 2017 14:04:13 +0100
 MIME-Version: 1.0
-In-Reply-To: <20171120135734.23a4e4a1.cohuck@redhat.com>
+In-Reply-To: <20171120140052.48c7f646.cohuck@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Message-Id: <6e479813-043f-af53-26f9-3382b68ab570@de.ibm.com>
-Subject: Re: [Qemu-devel] [PATCH 1/2] s390x/migration: use zero flag
- parameter
+Message-Id: <e3893f02-9038-62c0-e704-2b3bf6f1c351@de.ibm.com>
+Subject: Re: [Qemu-devel] [PATCH 2/2] s390x/kvm: use valgrind annotations
+ for kvm device attributes
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -50,64 +49,62 @@ Cc: qemu-devel <qemu-devel@nongnu.org>, qemu-s390x <qemu-s390x@nongnu.org>, Hali
 
 
 
-On 11/20/2017 01:57 PM, Cornelia Huck wrote:
-> On Mon, 20 Nov 2017 13:35:24 +0100
+On 11/20/2017 02:00 PM, Cornelia Huck wrote:
+> On Mon, 20 Nov 2017 13:35:25 +0100
 > Christian Borntraeger <borntraeger@de.ibm.com> wrote:
 > 
->> valgrind pointed out that we call KVM_S390_GET_IRQ_STATE with an
->> undefined value for flags. Right now this is unused, but we
->> better play safe.
+>> the KVM_GET/SET_DEVICE_ATTR calls have non-self-describing
+>> side effects. Use valgrind annotations to properly mark
+>> all storage changes instead of using memset or designated
+>> initializers.
 >>
 >> Signed-off-by: Christian Borntraeger <borntraeger@de.ibm.com>
 >> ---
->>  target/s390x/kvm.c | 8 ++++----
->>  1 file changed, 4 insertions(+), 4 deletions(-)
+>>  hw/s390x/s390-skeys-kvm.c    | 12 ++++++++++-
+>>  hw/s390x/s390-stattrib-kvm.c |  7 ++++++
+>>  target/s390x/kvm.c           | 51 ++++++++++++++++++++++++++++++++++++++++----
+>>  3 files changed, 65 insertions(+), 5 deletions(-)
 >>
->> diff --git a/target/s390x/kvm.c b/target/s390x/kvm.c
->> index 343fcec..b0439a1 100644
->> --- a/target/s390x/kvm.c
->> +++ b/target/s390x/kvm.c
->> @@ -2069,7 +2069,10 @@ int kvm_s390_set_cpu_state(S390CPU *cpu, uint8_t cpu_state)
+>> diff --git a/hw/s390x/s390-skeys-kvm.c b/hw/s390x/s390-skeys-kvm.c
+>> index dc54ed8..0986795 100644
+>> --- a/hw/s390x/s390-skeys-kvm.c
+>> +++ b/hw/s390x/s390-skeys-kvm.c
+>> @@ -13,6 +13,9 @@
+>>  #include "hw/s390x/storage-keys.h"
+>>  #include "sysemu/kvm.h"
+>>  #include "qemu/error-report.h"
+>> +#ifdef CONFIG_VALGRIND_H
+>> +#include <valgrind/memcheck.h>
+>> +#endif
 >>  
->>  void kvm_s390_vcpu_interrupt_pre_save(S390CPU *cpu)
+>>  static int kvm_s390_skeys_enabled(S390SKeysState *ss)
 >>  {
->> -    struct kvm_s390_irq_state irq_state;
->> +    struct kvm_s390_irq_state irq_state = {
->> +        .buf = (uint64_t) cpu->irqstate,
->> +        .len = VCPU_IRQ_BUF_SIZE,
->> +    };
->>      CPUState *cs = CPU(cpu);
->>      int32_t bytes;
+>> @@ -35,8 +38,15 @@ static int kvm_s390_skeys_get(S390SKeysState *ss, uint64_t start_gfn,
+>>          .count = count,
+>>          .skeydata_addr = (__u64)keys
+>>      };
+>> +    int ret;
 >>  
->> @@ -2077,9 +2080,6 @@ void kvm_s390_vcpu_interrupt_pre_save(S390CPU *cpu)
->>          return;
->>      }
->>  
->> -    irq_state.buf = (uint64_t) cpu->irqstate;
->> -    irq_state.len = VCPU_IRQ_BUF_SIZE;
->> -
->>      bytes = kvm_vcpu_ioctl(cs, KVM_S390_GET_IRQ_STATE, &irq_state);
->>      if (bytes < 0) {
->>          cpu->irqstate_saved_size = 0;
+>> -    return kvm_vm_ioctl(kvm_state, KVM_S390_GET_SKEYS, &args);
+>> +    ret = kvm_vm_ioctl(kvm_state, KVM_S390_GET_SKEYS, &args);
+>> +    if (!ret) {
+>> +#ifdef CONFIG_VALGRIND_H
+>> +        VALGRIND_MAKE_MEM_DEFINED(keys, count);
+>> +#endif
 > 
-> I'm wondering why it does not also complain for KVM_S390_SET_IRQ_STATE?
+> This looks ugly :(
+> 
+> Is s390x the only one hitting those side effects? If we need to
+> sprinkle those all over the source code, it improves valgrind results
+> but makes the code harder to read...
+>
+> (And no, I don't have a better idea.)
 
-I guess that my tests do not having peding interrupts during migration and we exit early in
-
-int kvm_s390_vcpu_interrupt_post_load(S390CPU *cpu)
-{
-    CPUState *cs = CPU(cpu);
-    struct kvm_s390_irq_state irq_state;
-    int r;
-
--->    if (cpu->irqstate_saved_size == 0) {
--->        return 0;
-    }
+We could provide a wrapper?
 
 
-
-
-> It would make sense to use a struct initializer there as well.
-
-Yes, I think you are right.
+> 
+>> +    }
+>> +    return ret;
+>>  }
 > 
