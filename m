@@ -1,25 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44844)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44863)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1eGnS8-0000Sg-AQ
-	for qemu-devel@nongnu.org; Mon, 20 Nov 2017 09:53:41 -0500
+	(envelope-from <stefanha@gmail.com>) id 1eGnS9-0000TQ-5x
+	for qemu-devel@nongnu.org; Mon, 20 Nov 2017 09:53:42 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1eGnS7-0006ST-He
-	for qemu-devel@nongnu.org; Mon, 20 Nov 2017 09:53:40 -0500
-Received: from mail-wr0-x230.google.com ([2a00:1450:400c:c0c::230]:46198)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1eGnS7-0006S7-BO
-	for qemu-devel@nongnu.org; Mon, 20 Nov 2017 09:53:39 -0500
-Received: by mail-wr0-x230.google.com with SMTP id r2so1866632wra.13
-	for <qemu-devel@nongnu.org>; Mon, 20 Nov 2017 06:53:39 -0800 (PST)
+	(envelope-from <stefanha@gmail.com>) id 1eGnS7-0006SI-6m
+	for qemu-devel@nongnu.org; Mon, 20 Nov 2017 09:53:41 -0500
+Date: Mon, 20 Nov 2017 14:53:36 +0000
+From: Stefan Hajnoczi <stefanha@gmail.com>
+Message-ID: <20171120145336.GI4516@stefanha-x1.localdomain>
+References: <1510851298-59922-1-git-send-email-anton.nefedov@virtuozzo.com>
+	<1510851298-59922-4-git-send-email-anton.nefedov@virtuozzo.com>
 MIME-Version: 1.0
-In-Reply-To: <20171117181653.20651-1-kwolf@redhat.com>
-References: <20171117181653.20651-1-kwolf@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon, 20 Nov 2017 14:53:17 +0000
-Message-ID: <CAFEAcA8Y9OpRpSkQwAHPaN8gAPen7M3kJmLi4FDLB7DWBKV1WA@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PULL 00/25] Block layer patches for 2.11.0-rc2
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="ijf6z65S790CMqo8"
+Content-Disposition: inline
+In-Reply-To: <1510851298-59922-4-git-send-email-anton.nefedov@virtuozzo.com>
+Subject: Re: [Qemu-devel] [Qemu-block] [PATCH v2 3/4] block-stream: add
+ compress option
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,36 +25,44 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Kevin Wolf <kwolf@redhat.com>
-Cc: Qemu-block <qemu-block@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>
+To: Anton Nefedov <anton.nefedov@virtuozzo.com>
+Cc: qemu-devel@nongnu.org, kwolf@redhat.com, famz@redhat.com, den@virtuozzo.com, qemu-block@nongnu.org, mreitz@redhat.com, stefanha@redhat.com
 
-On 17 November 2017 at 18:16, Kevin Wolf <kwolf@redhat.com> wrote:
-> The following changes since commit fec035a53fa15c4c8c4e62bfef56a35df4161e38:
->
->   Merge remote-tracking branch 'remotes/kraxel/tags/ui-20171117-pull-request' into staging (2017-11-17 10:18:41 +0000)
->
-> are available in the git repository at:
->
->   git://repo.or.cz/qemu/kevin.git tags/for-upstream
->
-> for you to fetch changes up to d5a49c6e7d9e42059450674ec845b7bc0d62cb7e:
->
->   Merge remote-tracking branch 'mreitz/tags/pull-block-2017-11-17' into queue-block (2017-11-17 18:24:30 +0100)
->
-> ----------------------------------------------------------------
-> Block layer patches for 2.11.0-rc2
->
-> ----------------------------------------------------------------
 
-Hi. I'm afraid this fails 'make check' (Linux x86-64, gcc, debug build):
+--ijf6z65S790CMqo8
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-  GTESTER tests/test-replication
-**
-ERROR:/home/petmay01/linaro/qemu-for-merges/tests/test-replication.c:117:test_blk_write:
-assertion failed: (async_ret == 0)
-GTester: last random seed: R02S7bcadec8b2ecdf71fa8abd7f833c90f5
-/home/petmay01/linaro/qemu-for-merges/tests/Makefile.include:863:
-recipe for target 'check-tests/test-replication' failed
+On Thu, Nov 16, 2017 at 07:54:57PM +0300, Anton Nefedov wrote:
+> It might be useful to compress images during block-stream;
+> this way the user can merge compressed images of a backing chain and
+> the result will remain compressed.
+>=20
+> Signed-off-by: Anton Nefedov <anton.nefedov@virtuozzo.com>
+> ---
+>  qapi/block-core.json      |  4 ++++
+>  include/block/block_int.h |  4 +++-
+>  block/stream.c            | 16 ++++++++++++----
+>  blockdev.c                | 13 ++++++++++++-
+>  hmp.c                     |  2 ++
+>  hmp-commands.hx           |  4 ++--
+>  6 files changed, 35 insertions(+), 8 deletions(-)
 
-thanks
--- PMM
+Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
+
+--ijf6z65S790CMqo8
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEcBAEBAgAGBQJaEuxwAAoJEJykq7OBq3PIlfEH/26/MzzKxGMo0GvWUbPVC8ae
+Xfs+ukHbYOzcQiamHVcm1XEx2rubRNXI8FrfLe5fWXvZahvA1TT7wqF8GU6HsmWQ
++quoPhtxhDyyebo68ost7itNSNUVSoGnf+aIpoHzlbHLDrnoTFbsiNdOrPIfLYOg
+Wkgv5qQGy0LalnIdU7TLBtL50VrZovcjuoGyl9BWUIN4K53L1zNBmx5xcPgSDh5V
+esgb0zXl1KoGaz2yOGhjAbZubangjidajCNnaFykADOehZuOQ2z88clYLe/Br3Us
+K1NBG9IZ7BLCdgJ6VaT/itTGDMiLz5E6gVkZ9xReEq5COsEA5BJwgGM5MpM0rEI=
+=D5Gp
+-----END PGP SIGNATURE-----
+
+--ijf6z65S790CMqo8--
