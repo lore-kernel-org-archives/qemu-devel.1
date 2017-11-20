@@ -1,25 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34721)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35893)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1eGiPX-0003xj-62
-	for qemu-devel@nongnu.org; Mon, 20 Nov 2017 04:30:40 -0500
+	(envelope-from <david@redhat.com>) id 1eGiSv-0005B1-6r
+	for qemu-devel@nongnu.org; Mon, 20 Nov 2017 04:34:10 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1eGiPU-0001dM-26
-	for qemu-devel@nongnu.org; Mon, 20 Nov 2017 04:30:39 -0500
-References: <20171030163309.75770-1-vsementsov@virtuozzo.com>
-	<20171030163309.75770-3-vsementsov@virtuozzo.com>
-	<5027d8bb-fdec-a6ce-8150-96730d3a5ce4@redhat.com>
-	<8f3d2255-22e8-13a0-33f8-8b2db0d17bec@virtuozzo.com>
-	<ae98b3f3-f51e-f8fa-b445-3fbfd6d71b63@redhat.com>
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Message-ID: <77a1f8bb-17c6-d3c0-6a65-e0c5862aae76@virtuozzo.com>
-Date: Mon, 20 Nov 2017 12:30:24 +0300
+	(envelope-from <david@redhat.com>) id 1eGiSq-00034G-8o
+	for qemu-devel@nongnu.org; Mon, 20 Nov 2017 04:34:09 -0500
+References: <1510942228-22822-1-git-send-email-thuth@redhat.com>
+From: David Hildenbrand <david@redhat.com>
+Message-ID: <70a17598-7361-0470-5d44-7fb4727719e0@redhat.com>
+Date: Mon, 20 Nov 2017 10:34:00 +0100
 MIME-Version: 1.0
-In-Reply-To: <ae98b3f3-f51e-f8fa-b445-3fbfd6d71b63@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: quoted-printable
+In-Reply-To: <1510942228-22822-1-git-send-email-thuth@redhat.com>
+Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Subject: Re: [Qemu-devel] [PATCH v8 02/14] block/dirty-bitmap: add locked
- version of bdrv_release_dirty_bitmap
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [qemu-s390x] [PATCH for-2.11] pc-bios/s390-ccw:
+ Fix problem with invalid virtio-scsi LUN when rebooting
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,57 +24,50 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: John Snow <jsnow@redhat.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org
-Cc: kwolf@redhat.com, peter.maydell@linaro.org, famz@redhat.com, lirans@il.ibm.com, quintela@redhat.com, armbru@redhat.com, mreitz@redhat.com, stefanha@redhat.com, den@openvz.org, amit.shah@redhat.com, pbonzini@redhat.com, dgilbert@redhat.com
+To: Thomas Huth <thuth@redhat.com>, qemu-s390x@nongnu.org, Cornelia Huck <cohuck@redhat.com>, Christian Borntraeger <borntraeger@de.ibm.com>
+Cc: qemu-devel@nongnu.org
 
-17.11.2017 21:25, John Snow wrote:
->
-> On 11/17/2017 03:07 AM, Vladimir Sementsov-Ogievskiy wrote:
->> 11.11.2017 01:52, John Snow wrote:
->>> On 10/30/2017 12:32 PM, Vladimir Sementsov-Ogievskiy wrote:
->>>> It is needed to realize bdrv_dirty_bitmap_release_successor in
->>>> the following patch.
->>>>
->>> OK, but...
->>>
->>>> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
->>>> ---
->>>>  =C2=A0 block/dirty-bitmap.c | 25 ++++++++++++++++++++-----
->>>>  =C2=A0 1 file changed, 20 insertions(+), 5 deletions(-)
->>>>
->>>> diff --git a/block/dirty-bitmap.c b/block/dirty-bitmap.c
->>>> index 81adbeb6d4..981f99d362 100644
->>>> --- a/block/dirty-bitmap.c
->>>> +++ b/block/dirty-bitmap.c
->>>> @@ -326,13 +326,13 @@ static bool
->>>> bdrv_dirty_bitmap_has_name(BdrvDirtyBitmap *bitmap)
->>>>  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 return !!bdrv_dirty_bitmap_name(bitmap=
-);
->>>>  =C2=A0 }
->>>>  =C2=A0 -/* Called with BQL taken.=C2=A0 */
->>>> -static void bdrv_do_release_matching_dirty_bitmap(
->>>> +/* Called within bdrv_dirty_bitmap_lock..unlock */
->>> ...Add this so it will compile:
->> how do you compile to get an error? and what is unused?
->>
-> .../src/qemu/block/dirty-bitmap.c:368:13: error:
-> =E2=80=98bdrv_release_dirty_bitmap_locked=E2=80=99 defined but not used
-> [-Werror=3Dunused-function]
->   static void bdrv_release_dirty_bitmap_locked(BlockDriverState *bs,
->               ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-> cc1: all warnings being treated as errors
->
->
-> I commented on the wrong prototype. The ((__unused__)) attribute just
-> quiets this warning so it can compile without you having to refactor.
+On 17.11.2017 19:10, Thomas Huth wrote:
+> When rebooting a guest that has a virtio-scsi disk, the s390-ccw
+> bios sometimes bails out with an error message like this:
+> 
+> ! SCSI cannot report LUNs: STATUS=02 RSPN=70 KEY=05 CODE=25 QLFR=00, sure !
+> 
+> Enabling the scsi_req* tracing in QEMU shows that the ccw bios is
+> trying to execute the REPORT LUNS SCSI command with a LUN != 0, and
+> this causes the SCSI command to fail.
+> Looks like we neither clear the BSS of the s390-ccw bios during reboot,
+> nor do we explicitly set the default_scsi_device.lun value to 0, so
+> this variable can contain random values from the OS after the reboot.
+> By setting this variable explicitly to 0, the problem is fixed and
+> the reboots always succeed.
+> 
+> Buglink: https://bugzilla.redhat.com/show_bug.cgi?id=1514352
+> Signed-off-by: Thomas Huth <thuth@redhat.com>
+> ---
+>  pc-bios/s390-ccw/virtio-scsi.c | 3 ++-
+>  1 file changed, 2 insertions(+), 1 deletion(-)
+> 
+> diff --git a/pc-bios/s390-ccw/virtio-scsi.c b/pc-bios/s390-ccw/virtio-scsi.c
+> index c92f5d3..4fe4b9d 100644
+> --- a/pc-bios/s390-ccw/virtio-scsi.c
+> +++ b/pc-bios/s390-ccw/virtio-scsi.c
+> @@ -223,7 +223,8 @@ static void virtio_scsi_locate_device(VDev *vdev)
+>  
+>      for (target = 0; target <= vdev->config.scsi.max_target; target++) {
+>          sdev->channel = channel;
+> -        sdev->target = target; /* sdev->lun will be 0 here */
+> +        sdev->target = target;
+> +        sdev->lun = 0;          /* LUN has to be 0 for REPORT LUNS */
+>          if (!scsi_report_luns(vdev, data, sizeof(data))) {
+>              if (resp.response == VIRTIO_SCSI_S_BAD_TARGET) {
+>                  continue;
+> 
 
+Reviewed-by: David Hildenbrand <david@redhat.com>
 
-aha ok, you are right
+-- 
 
->
-> --js
+Thanks,
 
-
---=20
-Best regards,
-Vladimir
+David / dhildenb
