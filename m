@@ -1,16 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60636)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60639)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1eGer5-00010x-5I
+	(envelope-from <dgibson@ozlabs.org>) id 1eGer5-00010y-BT
 	for qemu-devel@nongnu.org; Mon, 20 Nov 2017 00:42:52 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1eGer4-0004AW-4W
+	(envelope-from <dgibson@ozlabs.org>) id 1eGer4-0004Aa-4e
 	for qemu-devel@nongnu.org; Mon, 20 Nov 2017 00:42:51 -0500
 From: David Gibson <david@gibson.dropbear.id.au>
-Date: Mon, 20 Nov 2017 16:42:39 +1100
-Message-Id: <20171120054239.8739-3-david@gibson.dropbear.id.au>
+Date: Mon, 20 Nov 2017 16:42:38 +1100
+Message-Id: <20171120054239.8739-2-david@gibson.dropbear.id.au>
 In-Reply-To: <20171120054239.8739-1-david@gibson.dropbear.id.au>
 References: <20171120054239.8739-1-david@gibson.dropbear.id.au>
-Subject: [Qemu-devel] [PULL 2/2] spapr: reset DRCs after devices
+Subject: [Qemu-devel] [PULL 1/2] target/ppc: Update setting of cpu features
+ to account for compat modes
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -20,112 +21,153 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: peter.maydell@linaro.org
-Cc: agraf@suse.de, groug@kaod.org, qemu-ppc@nongnu.org, qemu-devel@nongnu.org, David Gibson <david@gibson.dropbear.id.au>
+Cc: agraf@suse.de, groug@kaod.org, qemu-ppc@nongnu.org, qemu-devel@nongnu.org, Suraj Jitindar Singh <sjitindarsingh@gmail.com>, David Gibson <david@gibson.dropbear.id.au>
 
-From: Greg Kurz <groug@kaod.org>
+From: Suraj Jitindar Singh <sjitindarsingh@gmail.com>
 
-A DRC with a pending unplug request releases its associated device at
-machine reset time.
+The device tree nodes ibm,arch-vec-5-platform-support and ibm,pa-features
+are used to communicate features of the cpu to the guest operating
+system. The properties of each of these are determined based on the
+selected cpu model and the availability of hypervisor features.
+Currently the compatibility mode of the cpu is not taken into account.
 
-In the case of LMB, when all DRCs for a DIMM device have been reset,
-the DIMM gets unplugged, causing guest memory to disappear. This may
-be very confusing for anything still using this memory.
+The ibm,arch-vec-5-platform-support node is used to communicate the
+level of support for various ISAv3 processor features to the guest
+before CAS to inform the guests' request. The available mmu mode should
+only be hash unless the cpu is a POWER9 which is not in a prePOWER9
+compat mode, in which case the available modes depend on the
+accelerator and the hypervisor capabilities.
 
-This is exactly what happens with vhost backends, and QEMU aborts
-with:
+The ibm,pa-featues node is used to communicate the level of cpu support
+for various features to the guest os. This should only contain features
+relevant to the operating mode of the processor, that is the selected
+cpu model taking into account any compat mode. This means that the
+compat mode should be taken into account when choosing the properties of
+ibm,pa-features and they should match the compat mode selected, or the
+cpu model selected if no compat mode.
 
-qemu-system-ppc64: used ring relocated for ring 2
-qemu-system-ppc64: qemu/hw/virtio/vhost.c:649: vhost_commit: Assertion
- `r >= 0' failed.
+Update the setting of these cpu features in the device tree as described
+above to properly take into account any compat mode. We use the
+ppc_check_compat function which takes into account the current processor
+model and the cpu compat mode.
 
-The issue is that each DRC registers a QEMU reset handler, and we
-don't control the order in which these handlers are called (ie,
-a LMB DRC will unplug a DIMM before the virtio device using the
-memory on this DIMM could stop its vhost backend).
-
-To avoid such situations, let's reset DRCs after all devices
-have been reset.
-
-Reported-by: Mallesh N. Koti <mallesh@linux.vnet.ibm.com>
-Signed-off-by: Greg Kurz <groug@kaod.org>
-Reviewed-by: Daniel Henrique Barboza <danielhb@linux.vnet.ibm.com>
-Reviewed-by: Michael Roth <mdroth@linux.vnet.ibm.com>
+Signed-off-by: Suraj Jitindar Singh <sjitindarsingh@gmail.com>
 Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
 ---
- hw/ppc/spapr.c     | 21 +++++++++++++++++++++
- hw/ppc/spapr_drc.c |  7 -------
- 2 files changed, 21 insertions(+), 7 deletions(-)
+ hw/ppc/spapr.c | 43 +++++++++++++++++++++----------------------
+ 1 file changed, 21 insertions(+), 22 deletions(-)
 
 diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-index 6841bd294b..6285f7211f 100644
+index d682f013d4..6841bd294b 100644
 --- a/hw/ppc/spapr.c
 +++ b/hw/ppc/spapr.c
-@@ -1411,6 +1411,19 @@ static void find_unknown_sysbus_device(SysBusDevice *sbdev, void *opaque)
-     }
+@@ -44,6 +44,7 @@
+ #include "migration/register.h"
+ #include "mmu-hash64.h"
+ #include "mmu-book3s-v3.h"
++#include "cpu-models.h"
+ #include "qom/cpu.h"
+ 
+ #include "hw/boards.h"
+@@ -252,9 +253,10 @@ static int spapr_fixup_cpu_numa_dt(void *fdt, int offset, PowerPCCPU *cpu)
  }
  
-+static int spapr_reset_drcs(Object *child, void *opaque)
-+{
-+    sPAPRDRConnector *drc =
-+        (sPAPRDRConnector *) object_dynamic_cast(child,
-+                                                 TYPE_SPAPR_DR_CONNECTOR);
-+
-+    if (drc) {
-+        spapr_drc_reset(drc);
+ /* Populate the "ibm,pa-features" property */
+-static void spapr_populate_pa_features(CPUPPCState *env, void *fdt, int offset,
+-                                      bool legacy_guest)
++static void spapr_populate_pa_features(PowerPCCPU *cpu, void *fdt, int offset,
++                                       bool legacy_guest)
+ {
++    CPUPPCState *env = &cpu->env;
+     uint8_t pa_features_206[] = { 6, 0,
+         0xf6, 0x1f, 0xc7, 0x00, 0x80, 0xc0 };
+     uint8_t pa_features_207[] = { 24, 0,
+@@ -287,23 +289,22 @@ static void spapr_populate_pa_features(CPUPPCState *env, void *fdt, int offset,
+         /* 60: NM atomic, 62: RNG */
+         0x80, 0x00, 0x80, 0x00, 0x00, 0x00, /* 60 - 65 */
+     };
+-    uint8_t *pa_features;
++    uint8_t *pa_features = NULL;
+     size_t pa_size;
+ 
+-    switch (POWERPC_MMU_VER(env->mmu_model)) {
+-    case POWERPC_MMU_VER_2_06:
++    if (ppc_check_compat(cpu, CPU_POWERPC_LOGICAL_2_06, 0, cpu->compat_pvr)) {
+         pa_features = pa_features_206;
+         pa_size = sizeof(pa_features_206);
+-        break;
+-    case POWERPC_MMU_VER_2_07:
 +    }
-+
-+    return 0;
-+}
-+
- static void ppc_spapr_reset(void)
- {
-     MachineState *machine = MACHINE(qdev_get_machine());
-@@ -1434,6 +1447,14 @@ static void ppc_spapr_reset(void)
++    if (ppc_check_compat(cpu, CPU_POWERPC_LOGICAL_2_07, 0, cpu->compat_pvr)) {
+         pa_features = pa_features_207;
+         pa_size = sizeof(pa_features_207);
+-        break;
+-    case POWERPC_MMU_VER_3_00:
++    }
++    if (ppc_check_compat(cpu, CPU_POWERPC_LOGICAL_3_00, 0, cpu->compat_pvr)) {
+         pa_features = pa_features_300;
+         pa_size = sizeof(pa_features_300);
+-        break;
+-    default:
++    }
++    if (!pa_features) {
+         return;
      }
  
-     qemu_devices_reset();
-+
-+    /* DRC reset may cause a device to be unplugged. This will cause troubles
-+     * if this device is used by another device (eg, a running vhost backend
-+     * will crash QEMU if the DIMM holding the vring goes away). To avoid such
-+     * situations, we reset DRCs after all devices have been reset.
-+     */
-+    object_child_foreach_recursive(object_get_root(), spapr_reset_drcs, NULL);
-+
-     spapr_clear_pending_events(spapr);
+@@ -340,7 +341,6 @@ static int spapr_fixup_cpu_dt(void *fdt, sPAPRMachineState *spapr)
  
-     /*
-diff --git a/hw/ppc/spapr_drc.c b/hw/ppc/spapr_drc.c
-index 915e9b51c4..e3b122968e 100644
---- a/hw/ppc/spapr_drc.c
-+++ b/hw/ppc/spapr_drc.c
-@@ -455,11 +455,6 @@ void spapr_drc_reset(sPAPRDRConnector *drc)
+     CPU_FOREACH(cs) {
+         PowerPCCPU *cpu = POWERPC_CPU(cs);
+-        CPUPPCState *env = &cpu->env;
+         DeviceClass *dc = DEVICE_GET_CLASS(cs);
+         int index = spapr_vcpu_id(cpu);
+         int compat_smt = MIN(smp_threads, ppc_compat_max_threads(cpu));
+@@ -384,7 +384,7 @@ static int spapr_fixup_cpu_dt(void *fdt, sPAPRMachineState *spapr)
+             return ret;
+         }
+ 
+-        spapr_populate_pa_features(env, fdt, offset,
++        spapr_populate_pa_features(cpu, fdt, offset,
+                                          spapr->cas_legacy_guest_workaround);
      }
- }
- 
--static void drc_reset(void *opaque)
--{
--    spapr_drc_reset(SPAPR_DR_CONNECTOR(opaque));
--}
--
- bool spapr_drc_needed(void *opaque)
- {
-     sPAPRDRConnector *drc = (sPAPRDRConnector *)opaque;
-@@ -518,7 +513,6 @@ static void realize(DeviceState *d, Error **errp)
+     return ret;
+@@ -579,7 +579,7 @@ static void spapr_populate_cpu_dt(CPUState *cs, void *fdt, int offset,
+                           page_sizes_prop, page_sizes_prop_size)));
      }
-     vmstate_register(DEVICE(drc), spapr_drc_index(drc), &vmstate_spapr_drc,
-                      drc);
--    qemu_register_reset(drc_reset, drc);
-     trace_spapr_drc_realize_complete(spapr_drc_index(drc));
- }
  
-@@ -529,7 +523,6 @@ static void unrealize(DeviceState *d, Error **errp)
-     gchar *name;
+-    spapr_populate_pa_features(env, fdt, offset, false);
++    spapr_populate_pa_features(cpu, fdt, offset, false);
  
-     trace_spapr_drc_unrealize(spapr_drc_index(drc));
--    qemu_unregister_reset(drc_reset, drc);
-     vmstate_unregister(DEVICE(drc), &vmstate_spapr_drc, drc);
-     root_container = container_get(object_get_root(), DRC_CONTAINER_PATH);
-     name = g_strdup_printf("%x", spapr_drc_index(drc));
+     _FDT((fdt_setprop_cell(fdt, offset, "ibm,chip-id",
+                            cs->cpu_index / vcpus_per_socket)));
+@@ -949,7 +949,11 @@ static void spapr_dt_ov5_platform_support(void *fdt, int chosen)
+         26, 0x40, /* Radix options: GTSE == yes. */
+     };
+ 
+-    if (kvm_enabled()) {
++    if (!ppc_check_compat(first_ppc_cpu, CPU_POWERPC_LOGICAL_3_00, 0,
++                          first_ppc_cpu->compat_pvr)) {
++        /* If we're in a pre POWER9 compat mode then the guest should do hash */
++        val[3] = 0x00; /* Hash */
++    } else if (kvm_enabled()) {
+         if (kvmppc_has_cap_mmu_radix() && kvmppc_has_cap_mmu_hash_v3()) {
+             val[3] = 0x80; /* OV5_MMU_BOTH */
+         } else if (kvmppc_has_cap_mmu_radix()) {
+@@ -958,13 +962,8 @@ static void spapr_dt_ov5_platform_support(void *fdt, int chosen)
+             val[3] = 0x00; /* Hash */
+         }
+     } else {
+-        if (first_ppc_cpu->env.mmu_model & POWERPC_MMU_V3) {
+-            /* V3 MMU supports both hash and radix (with dynamic switching) */
+-            val[3] = 0xC0;
+-        } else {
+-            /* Otherwise we can only do hash */
+-            val[3] = 0x00;
+-        }
++        /* V3 MMU supports both hash and radix in tcg (with dynamic switching) */
++        val[3] = 0xC0;
+     }
+     _FDT(fdt_setprop(fdt, chosen, "ibm,arch-vec-5-platform-support",
+                      val, sizeof(val)));
 -- 
 2.14.3
