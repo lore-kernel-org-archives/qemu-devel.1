@@ -1,20 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41019)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42948)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1eGsf9-00064e-0O
-	for qemu-devel@nongnu.org; Mon, 20 Nov 2017 15:27:28 -0500
+	(envelope-from <mst@redhat.com>) id 1eGsk9-0001yb-Lz
+	for qemu-devel@nongnu.org; Mon, 20 Nov 2017 15:32:38 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1eGsf7-0000j7-Rl
-	for qemu-devel@nongnu.org; Mon, 20 Nov 2017 15:27:27 -0500
-References: <20171117190422.23626-1-eblake@redhat.com>
-From: Max Reitz <mreitz@redhat.com>
-Message-ID: <39726f30-600f-6fd6-d5d8-411f280c0ab9@redhat.com>
-Date: Mon, 20 Nov 2017 21:27:17 +0100
+	(envelope-from <mst@redhat.com>) id 1eGsk6-0003zr-6T
+	for qemu-devel@nongnu.org; Mon, 20 Nov 2017 15:32:37 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:58942)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1eGsk5-0003wp-Rh
+	for qemu-devel@nongnu.org; Mon, 20 Nov 2017 15:32:34 -0500
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+	[10.5.11.11])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 3C2362CE91A
+	for <qemu-devel@nongnu.org>; Mon, 20 Nov 2017 20:32:32 +0000 (UTC)
+Date: Mon, 20 Nov 2017 22:32:29 +0200
+From: "Michael S. Tsirkin" <mst@redhat.com>
+Message-ID: <20171120223048-mutt-send-email-mst@kernel.org>
+References: <1510834622-28800-1-git-send-email-thuth@redhat.com>
+	<20171120175522.76bf71c3@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20171117190422.23626-1-eblake@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="naARwhXksLkMfgBPnOullArE9spgqmHAu"
-Subject: Re: [Qemu-devel] [PATCH for-2.11] iotests: Fix 176 on 32-bit host
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20171120175522.76bf71c3@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v2] tests/bios-tables-test: Fix endianess
+ problems when passing data to iasl
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,69 +34,74 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org
-Cc: kwolf@redhat.com, qemu-block@nongnu.org
+To: Igor Mammedov <imammedo@redhat.com>
+Cc: Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---naARwhXksLkMfgBPnOullArE9spgqmHAu
-From: Max Reitz <mreitz@redhat.com>
-To: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org
-Cc: kwolf@redhat.com, qemu-block@nongnu.org
-Message-ID: <39726f30-600f-6fd6-d5d8-411f280c0ab9@redhat.com>
-Subject: Re: [PATCH for-2.11] iotests: Fix 176 on 32-bit host
-References: <20171117190422.23626-1-eblake@redhat.com>
-In-Reply-To: <20171117190422.23626-1-eblake@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+On Mon, Nov 20, 2017 at 05:55:22PM +0100, Igor Mammedov wrote:
+> On Thu, 16 Nov 2017 13:17:02 +0100
+> Thomas Huth <thuth@redhat.com> wrote:
+> 
+> > The bios-tables-test was writing out files that we pass to iasl in
+> > with the wrong endianness in the header when running on a big endian
+> > host. So instead of storing mixed endian information in our structures,
+> > let's keep everything in little endian and byte-swap it only when we
+> > need a value in the code.
+> > 
+> > Reported-by: Daniel P. Berrange <berrange@redhat.com>
+> > Buglink: https://bugs.launchpad.net/qemu/+bug/1724570
+> > Suggested-by: Michael S. Tsirkin <mst@redhat.com>
+> > Signed-off-by: Thomas Huth <thuth@redhat.com>
+> > ---
+> >  v2: Fixed vmgenid-test which was accidentially broken in v1
+> > 
+> >  tests/acpi-utils.h       | 27 +++++----------------------
+> >  tests/bios-tables-test.c | 42 ++++++++++++++++++++++--------------------
+> >  tests/vmgenid-test.c     | 22 ++++++++++++----------
+> >  3 files changed, 39 insertions(+), 52 deletions(-)
+> > 
+> > diff --git a/tests/acpi-utils.h b/tests/acpi-utils.h
+> > index f8d8723..d5ca5b6 100644
+> > --- a/tests/acpi-utils.h
+> > +++ b/tests/acpi-utils.h
+> > @@ -28,24 +28,9 @@ typedef struct {
+> >      bool tmp_files_retain;   /* do not delete the temp asl/aml */
+> >  } AcpiSdtTable;
+> >  
+> > -#define ACPI_READ_FIELD(field, addr)           \
+> > -    do {                                       \
+> > -        switch (sizeof(field)) {               \
+> > -        case 1:                                \
+> > -            field = readb(addr);               \
+> > -            break;                             \
+> > -        case 2:                                \
+> > -            field = readw(addr);               \
+> > -            break;                             \
+> > -        case 4:                                \
+> > -            field = readl(addr);               \
+> > -            break;                             \
+> > -        case 8:                                \
+> > -            field = readq(addr);               \
+> > -            break;                             \
+> > -        default:                               \
+> > -            g_assert(false);                   \
+> > -        }                                      \
+> probably it's been discussed but, why not do
+>  leXX_to_cpu()
+> here, instead of making each place that access read field
+> to do leXX_to_cpu() manually.?
+> 
+> Beside of keeping access to structure in natural host order,
+> it should also be less error-prone as field users don't
+> have to worry about endianness.
 
-On 2017-11-17 20:04, Eric Blake wrote:
-> The contents of a qcow2 bitmap are rounded up to a size that
-> matches the number of bits available for the granularity, but
-> that granularity differs for 32-bit hosts (our default 64k
-> cluster allows for 2M bitmap coverage per 'long') and 64-bit
-> hosts (4M bitmap per 'long').  If the image is a multiple of
-> 2M but not 4M, then the number of bytes occupied by the array
-> of longs in memory differs between architecture, thus
-> resulting in different SHA256 hashes.
->=20
-> Furthermore (but untested by me), if our computation of the
-> SHA256 hash is at all endian-dependent because of how we store
-> data in memory, that's another variable we'd have to account
-> for (ideally, we specified the bitmap stored in qcow2 as
-> fixed-endian on disk, because the same qcow2 file must be
-> usable across any architecture; but that says nothing about
-> how we represent things in memory).  But we already have test
-> 165 to validate that bitmaps are stored correctly on disk,
-> while this test is merely testing that the bitmap exists.
->=20
-> So for this test, the easiest solution is to filter out the
-> actual hash value.  Broken in commit 4096974e.
->=20
-> Reported-by: Max Reitz <mreitz@redhat.com>
-> Signed-off-by: Eric Blake <eblake@redhat.com>
-> ---
->  tests/qemu-iotests/176     | 3 ++-
->  tests/qemu-iotests/176.out | 8 ++++----
->  2 files changed, 6 insertions(+), 5 deletions(-)
+Yes, I suggested that.
+The issue is that we don't byte-swap all of the tables
+(we can't, that would require a full ACPI parser).
+So when byte-swapping we end up with a mixed host/LE
+structures.
 
-Reviewed-by: Max Reitz <mreitz@redhat.com>
+Keeping it all LE seems cleaner.
 
 
---naARwhXksLkMfgBPnOullArE9spgqmHAu
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQFGBAEBCAAwFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAloTOqUSHG1yZWl0ekBy
-ZWRoYXQuY29tAAoJEPQH2wBh1c9AdHIIAIyIlIhixY2B3a8tJLRvF7XmRMKlbxwA
-NIve0j9hA57Mml5QOCdJiGrLLSMXLcudlMUCeBBNgkqkIlzI34Wtmtl5F9jov2Sy
-V5LhUnBGxoDQKVWIMqY5JTFGVNkQHQdjnIVczQvGq52YW/e7ewjZHjNY2xdipB06
-7BYef0YVngfPE2rkKOyt5gcuDYn01FZiiShUrpMyRqxNmnKjV89kSK2/YMshgqrd
-4ueD8k4kYyl3PSkJ7epf2L0jJvu9njKi0crlux30Cvz91lasNPB3SZ5MYlVdtuRC
-o0j3xnrGEMnqr4ZmFf2L1X9J8tBRXSWsPImFfpJ3gZ9OSinhgsZfMlI=
-=z1rn
------END PGP SIGNATURE-----
-
---naARwhXksLkMfgBPnOullArE9spgqmHAu--
+-- 
+MST
