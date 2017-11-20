@@ -1,23 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58218)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58235)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <riku.voipio@linaro.org>) id 1eGtVx-0004fz-Bp
+	(envelope-from <riku.voipio@linaro.org>) id 1eGtVz-0004g1-1N
 	for qemu-devel@nongnu.org; Mon, 20 Nov 2017 16:22:03 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <riku.voipio@linaro.org>) id 1eGtVw-0007ty-GG
-	for qemu-devel@nongnu.org; Mon, 20 Nov 2017 16:22:01 -0500
-Received: from mail-lf0-x244.google.com ([2a00:1450:4010:c07::244]:33260)
+	(envelope-from <riku.voipio@linaro.org>) id 1eGtVy-0007xd-1i
+	for qemu-devel@nongnu.org; Mon, 20 Nov 2017 16:22:03 -0500
+Received: from mail-lf0-x241.google.com ([2a00:1450:4010:c07::241]:42559)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <riku.voipio@linaro.org>)
-	id 1eGtVw-0007s6-9E
-	for qemu-devel@nongnu.org; Mon, 20 Nov 2017 16:22:00 -0500
-Received: by mail-lf0-x244.google.com with SMTP id x68so11727188lff.0
-	for <qemu-devel@nongnu.org>; Mon, 20 Nov 2017 13:22:00 -0800 (PST)
+	id 1eGtVx-0007wv-QM
+	for qemu-devel@nongnu.org; Mon, 20 Nov 2017 16:22:01 -0500
+Received: by mail-lf0-x241.google.com with SMTP id m1so11692554lfj.9
+	for <qemu-devel@nongnu.org>; Mon, 20 Nov 2017 13:22:01 -0800 (PST)
 From: riku.voipio@linaro.org
-Date: Mon, 20 Nov 2017 23:21:37 +0200
-Message-Id: <a4dd3d5172c951e05a7424f14c0f9372522b48f8.1511212753.git.riku.voipio@linaro.org>
+Date: Mon, 20 Nov 2017 23:21:38 +0200
+Message-Id: <a8b154a637b586441bad42259a8a9b9619cd117c.1511212753.git.riku.voipio@linaro.org>
 In-Reply-To: <cover.1511212753.git.riku.voipio@linaro.org>
 References: <cover.1511212753.git.riku.voipio@linaro.org>
-Subject: [Qemu-devel] [PULL 09/15] linux-user: fix 'finshed' typo in comment
+Subject: [Qemu-devel] [PULL 10/15] linux-user: return EINVAL from
+ prctl(PR_*_SECCOMP)
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,28 +28,43 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: "Emilio G. Cota" <cota@braap.org>
+Cc: James Cowgill <james.cowgill@mips.com>
 
-From: "Emilio G. Cota" <cota@braap.org>
+From: James Cowgill <james.cowgill@mips.com>
 
-Signed-off-by: Emilio G. Cota <cota@braap.org>
+If an application tries to install a seccomp filter using
+prctl(PR_SET_SECCOMP), the filter is likely for the target instead of the host
+architecture. This will probably cause qemu to be immediately killed when it
+executes another syscall.
+
+Prevent this from happening by returning EINVAL from both seccomp prctl
+calls. This is the error returned by the kernel when seccomp support is
+disabled.
+
+Fixes: https://bugs.launchpad.net/qemu/+bug/1726394
+Reviewed-by: Laurent Vivier <laurent@vivier.eu>
+Signed-off-by: James Cowgill <james.cowgill@mips.com>
 Signed-off-by: Riku Voipio <riku.voipio@linaro.org>
 ---
- linux-user/syscall.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ linux-user/syscall.c | 6 ++++++
+ 1 file changed, 6 insertions(+)
 
 diff --git a/linux-user/syscall.c b/linux-user/syscall.c
-index 9268c3ef69..84e123b67b 100644
+index 84e123b67b..f31b853bb7 100644
 --- a/linux-user/syscall.c
 +++ b/linux-user/syscall.c
-@@ -6258,7 +6258,7 @@ static void *clone_func(void *arg)
-     pthread_mutex_lock(&info->mutex);
-     pthread_cond_broadcast(&info->cond);
-     pthread_mutex_unlock(&info->mutex);
--    /* Wait until the parent has finshed initializing the tls state.  */
-+    /* Wait until the parent has finished initializing the tls state.  */
-     pthread_mutex_lock(&clone_lock);
-     pthread_mutex_unlock(&clone_lock);
-     cpu_loop(env);
+@@ -10505,6 +10505,12 @@ abi_long do_syscall(void *cpu_env, int num, abi_long arg1,
+             break;
+         }
+ #endif
++        case PR_GET_SECCOMP:
++        case PR_SET_SECCOMP:
++            /* Disable seccomp to prevent the target disabling syscalls we
++             * need. */
++            ret = -TARGET_EINVAL;
++            break;
+         default:
+             /* Most prctl options have no pointer arguments */
+             ret = get_errno(prctl(arg1, arg2, arg3, arg4, arg5));
 -- 
 2.14.2
