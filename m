@@ -1,26 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41288)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42663)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1eGik9-0001oN-Mx
-	for qemu-devel@nongnu.org; Mon, 20 Nov 2017 04:51:58 -0500
+	(envelope-from <zhuyijun@huawei.com>) id 1eGinS-0003Bq-C2
+	for qemu-devel@nongnu.org; Mon, 20 Nov 2017 04:55:23 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1eGik5-0003Qt-OW
-	for qemu-devel@nongnu.org; Mon, 20 Nov 2017 04:51:57 -0500
-References: <20171023092945.54532-1-vsementsov@virtuozzo.com>
-	<20171117123059.GB4795@localhost.localdomain>
-	<b95aaa97-39d0-fdc1-21a1-2e0ea7acac17@redhat.com>
-	<79f2607f-d4f9-8f92-76df-c99ae48b9936@redhat.com>
-	<20171117182526.GK4795@localhost.localdomain>
-	<fa7cd556-c784-2105-6777-bae1c5814c76@redhat.com>
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Message-ID: <923a2b4c-b85f-3840-384a-9c99126483ef@virtuozzo.com>
-Date: Mon, 20 Nov 2017 12:51:47 +0300
+	(envelope-from <zhuyijun@huawei.com>) id 1eGinO-00052t-5v
+	for qemu-devel@nongnu.org; Mon, 20 Nov 2017 04:55:22 -0500
+Message-ID: <5A12A65A.5060202@huawei.com>
+Date: Mon, 20 Nov 2017 17:54:34 +0800
+From: Zhu Yijun <zhuyijun@huawei.com>
 MIME-Version: 1.0
-In-Reply-To: <fa7cd556-c784-2105-6777-bae1c5814c76@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: quoted-printable
-Content-Language: en-US
-Subject: Re: [Qemu-devel] [PATCH] block/snapshot: dirty all dirty bitmaps on
- snapshot-switch
+References: <1510622154-17224-1-git-send-email-zhuyijun@huawei.com>
+	<1510622154-17224-4-git-send-email-zhuyijun@huawei.com>
+	<20171114145002.jbrw7k4n2m2rfwes@kamzik.brq.redhat.com>
+In-Reply-To: <20171114145002.jbrw7k4n2m2rfwes@kamzik.brq.redhat.com>
+Content-Type: text/plain; charset="ISO-8859-1"
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [RFC 3/5] hw/arm: add scattered RAM memory region
+ support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,81 +25,229 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: John Snow <jsnow@redhat.com>, Kevin Wolf <kwolf@redhat.com>
-Cc: Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org, eblake@redhat.com, famz@redhat.com, den@openvz.org, stefanha@redhat.com
+To: Andrew Jones <drjones@redhat.com>
+Cc: qemu-arm@nongnu.org, qemu-devel@nongnu.org, eric.auger@redhat.com, peter.maydell@linaro.org, shameerali.kolothum.thodi@huawei.com, zhaoshenglong@huawei.com
 
-17.11.2017 23:40, John Snow wrote:
->
-> On 11/17/2017 01:25 PM, Kevin Wolf wrote:
->> Am 17.11.2017 um 19:15 hat John Snow geschrieben:
->>>
->>> On 11/17/2017 10:01 AM, Max Reitz wrote:
->>>> On 2017-11-17 13:30, Kevin Wolf wrote:
->>>>> Am 23.10.2017 um 11:29 hat Vladimir Sementsov-Ogievskiy geschrieben:
->>>>>> Snapshot-switch actually changes active state of disk so it should
->>>>>> reflect on dirty bitmaps. Otherwise next incremental backup using
->>>>>> these bitmaps will be invalid.
->>>>>>
->>>>>> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.co=
-m>
->>>>> We discussed this quite a while ago, and I'm still not convinced that
->>>>> this approach makes sense.
->>>> I think it at least makes more sense than not handling this case at al=
-l.
->>>>
->>>>> Can you give just one example of a use case where dirtying the whole
->>>>> bitmap while loading a snapshot is the desired behaviour?
->>>>>
->>>>> I think the most useful behaviour would be something where the bitmap=
-s
->>>>> themselves are snapshotted, too.
->>>> Agreed.
->>>>
->>>>>                                   But for the time being, the easiest=
- and
->>>>> safest solution might just be to error out in any snapshot operations
->>>>> if any bitmaps are in use.
->>>> Sounds OK, too.  I personally don't have an opinion either way.
->>>>
->>>> But in any case, what we did before this patch was definitely wrong so=
- I
->>>> consider it an improvement.
->>>>
->>> This is how I feel about it too. Erroring out entirely is an option, bu=
-t
->>> code-wise just dirtying everything is at least verifiably not-wrong and
->>> pretty simple to implement.
->> But that's exactly the problem: If something is just plain wrong, you
->> can always replace it with something that makes sense. If it errors out,
->> you can still remove that error later. But if you have something that
->> doesn't make a whole lot of sense, but kinda sorta works (like after
->> this patch), it's ABI and you can't implement something more useful
->> later any more.
+On 2017/11/14 22:50, Andrew Jones wrote:
+> On Tue, Nov 14, 2017 at 09:15:52AM +0800, zhuyijun@huawei.com wrote:
+>> From: Zhu Yijun <zhuyijun@huawei.com>
 >>
->>> It's an improvement... Don't do it, but at least you won't get
->>> something wrong after, just something heinously unoptimal.
->> It's a short-term improvement that may become a long-term burden.
+>> Dig out reserved memory holes and collect scattered RAM memory
+>> regions by adding mem_list member in arm_boot_info struct.
 >>
->> Kevin
+>> Signed-off-by: Zhu Yijun <zhuyijun@huawei.com>
+>> ---
+>>  hw/arm/boot.c        |   8 ++++
+>>  hw/arm/virt.c        | 101 ++++++++++++++++++++++++++++++++++++++++++++++++++-
+>>  include/hw/arm/arm.h |   1 +
+>>  3 files changed, 108 insertions(+), 2 deletions(-)
 >>
-> I see your point.
->
-> If we enable it now, we always have to.
-> If we disable it now, we *can* later if we wish.
->
-> ...however, I think it's been the case that we haven't prohibited it
-> before, but also it's a pretty good case that nobody has been using this
-> feature in production because they're not yet persistent and migratable.
->
-> An error message asking the user to delete bitmaps (which will very
-> obviously invalidate them) would be fine, too. I was erring on the side
-> of "just let things work," but you have a point that making sure the
-> user knows that what they're trying to accomplish is not a good idea is
-> probably better than silently doing the very stupid thing.
+>> diff --git a/hw/arm/boot.c b/hw/arm/boot.c
+>> index c2720c8..30438f4 100644
+>> --- a/hw/arm/boot.c
+>> +++ b/hw/arm/boot.c
+>> @@ -836,6 +836,14 @@ static void arm_load_kernel_notify(Notifier *notifier, void *data)
+>>       */
+>>      assert(!(info->secure_board_setup && kvm_enabled()));
+>>  
+>> +    /* If machine is not virt, the mem_list will empty. */
+>> +    if (QLIST_EMPTY(&vms->bootinfo.mem_list)) {
+>> +        RAMRegion *new = g_new(RAMRegion, 1);
+>> +        new->base = info->loader_start;
+>> +        new->size = info->ram_size;
+>> +        QLIST_INSERT_HEAD(&vms->bootinfo.mem_list, new, next);
+>> +    }
+>> +
+>>      info->dtb_filename = qemu_opt_get(qemu_get_machine_opts(), "dtb");
+>>  
+>>      /* Load the kernel.  */
+>> diff --git a/hw/arm/virt.c b/hw/arm/virt.c
+>> index ddde5e1..ff334c1 100644
+>> --- a/hw/arm/virt.c
+>> +++ b/hw/arm/virt.c
+>> @@ -56,6 +56,7 @@
+>>  #include "hw/smbios/smbios.h"
+>>  #include "qapi/visitor.h"
+>>  #include "standard-headers/linux/input.h"
+>> +#include "hw/vfio/vfio-common.h"
+>>  
+>>  #define DEFINE_VIRT_MACHINE_LATEST(major, minor, latest) \
+>>      static void virt_##major##_##minor##_class_init(ObjectClass *oc, \
+>> @@ -1225,6 +1226,98 @@ void virt_machine_done(Notifier *notifier, void *data)
+>>      virt_build_smbios(vms);
+>>  }
+>>  
+>> +static void handle_reserved_ram_region_overlap(void)
+>> +{
+>> +    hwaddr cur_end, next_end;
+>> +    RAMRegion *reg, *next_reg, *tmp_reg;
+>> +
+>> +    QLIST_FOREACH(reg, &reserved_ram_regions, next) {
+>> +        next_reg = QLIST_NEXT(reg, next);
+>> +
+>> +        while (next_reg && next_reg->base <= (reg->base + reg->size)) {
+>> +            next_end = next_reg->base + next_reg->size;
+>> +            cur_end = reg->base + reg->size;
+>> +            if (next_end > cur_end) {
+>> +                reg->size += (next_end - cur_end);
+>> +            }
+>> +
+>> +            tmp_reg = QLIST_NEXT(next_reg, next);
+>> +            QLIST_REMOVE(next_reg, next);
+>> +            g_free(next_reg);
+>> +            next_reg = tmp_reg;
+>> +        }
+>> +    }
+>> +}
+> Why isn't the above integrated into the reserved ram region insertion?
 
-Hi all. erroring=C2=A0 is ok for me too. And looks like it's a way which=20
-looks ok for all interested in. Should I make a patch?
+We can do it once all the reserved regions are captured and then update the list once for any overlaps.
 
---=20
-Best regards,
-Vladimir
+>> +
+>> +static void update_memory_regions(VirtMachineState *vms, hwaddr ram_size)
+>> +{
+>> +
+>> +    RAMRegion *new, *reg, *last = NULL;
+>> +    hwaddr virt_start, virt_end;
+> Either need a blank line here, or to initialize virt_start/end on the
+> declaration lines.
+
+OK
+
+>> +    virt_start = vms->memmap[VIRT_MEM].base;
+>> +    virt_end = virt_start + ram_size - 1;
+>> +
+>> +    handle_reserved_ram_region_overlap();
+>> +
+>> +    QLIST_FOREACH(reg, &reserved_ram_regions, next) {
+>> +        if (reg->base >= virt_start && reg->base < virt_end) {
+> What about the case where reg->base + reg->size > virt_start?
+
+I will add the case next version.
+
+>> +            if (reg->base == virt_start) {
+>> +                virt_start += reg->size;
+> We can't move virt_start without breaking AAVMF.
+
+But it may exist reserved memory region which begins at 0x40000000 in theory.
+>
+>> +                virt_end += reg->size;
+> We can't increase virt_end without checking it against RAMLIMIT.
+>
+>> +                continue;
+>> +            } else {
+>> +                new = g_new(RAMRegion, 1);
+>> +                new->base = virt_start;
+>> +                new->size = reg->base - virt_start;
+>> +                virt_start = reg->base + reg->size;
+>> +            }
+>> +
+>> +            if (QLIST_EMPTY(&vms->bootinfo.mem_list)) {
+>> +                QLIST_INSERT_HEAD(&vms->bootinfo.mem_list, new, next);
+>> +            } else {
+>> +                QLIST_INSERT_AFTER(last, new, next);
+>> +            }
+>> +
+>> +            last = new;
+>> +            ram_size -= new->size;
+>> +            virt_end += reg->size;
+>> +        }
+>> +    }
+>> +
+>> +    if (ram_size > 0) {
+>> +        new = g_new(RAMRegion, 1);
+>> +        new->base = virt_start;
+>> +        new->size = ram_size;
+>> +
+>> +        if (QLIST_EMPTY(&vms->bootinfo.mem_list)) {
+>> +            QLIST_INSERT_HEAD(&vms->bootinfo.mem_list, new, next);
+>> +        } else {
+>> +            QLIST_INSERT_AFTER(last, new, next);
+>> +        }
+>> +    }
+> Where's the else? ram_size <= 0 is not likely something we should ignore.
+
+ok, will add it.
+
+>> +}
+>> +
+>> +static void create_ram_alias(VirtMachineState *vms,
+>> +                             MemoryRegion *sysmem,
+>> +                             MemoryRegion *ram)
+>> +{
+>> +    RAMRegion *reg;
+>> +    MemoryRegion *ram_memory;
+>> +    char *nodename;
+>> +    hwaddr sz = 0;
+>> +
+>> +    QLIST_FOREACH(reg, &vms->bootinfo.mem_list, next) {
+>> +        nodename = g_strdup_printf("ram@%" PRIx64, reg->base);
+>> +        ram_memory = g_new(MemoryRegion, 1);
+>> +        memory_region_init_alias(ram_memory, NULL, nodename, ram, sz,
+>> +                                 reg->size);
+>> +        memory_region_add_subregion(sysmem, reg->base, ram_memory);
+>> +        sz += reg->size;
+>> +
+>> +        g_free(nodename);
+>> +    }
+>> +}
+> Instead of using memory region aliases, it would be best if each RAM
+> region was modeled with pc-dimms, as that would move us towards supporting
+> memory hotplug and allow the regions to be explicitly identified
+> (start/size) on the command line - supporting migration. Actually, how
+> does this series address migration? What if the host we migrate to doesn't
+> have the same reserved regions in sysfs?
+
+I  did not consider memory hotplug and migration before, thinks for pointing it out to me.
+
+>> +
+>>  static void virt_ram_memory_region_init(Notifier *notifier, void *data)
+>>  {
+>>      MachineState *machine = MACHINE(qdev_get_machine());
+>> @@ -1232,10 +1325,15 @@ static void virt_ram_memory_region_init(Notifier *notifier, void *data)
+>>      MemoryRegion *ram = g_new(MemoryRegion, 1);
+>>      VirtMachineState *vms = container_of(notifier, VirtMachineState,
+>>                                           ram_memory_region_init);
+>> +    RAMRegion *first_mem_reg;
+>>  
+>>      memory_region_allocate_system_memory(ram, NULL, "mach-virt.ram",
+>>                                           machine->ram_size);
+>> -    memory_region_add_subregion(sysmem, vms->memmap[VIRT_MEM].base, ram);
+>> +    update_memory_regions(vms, machine->ram_size);
+>> +    create_ram_alias(vms, sysmem, ram);
+>> +
+>> +    first_mem_reg = QLIST_FIRST(&vms->bootinfo.mem_list);
+>> +    vms->bootinfo.loader_start = first_mem_reg->base;
+>>  }
+>>  
+>>  static uint64_t virt_cpu_mp_affinity(VirtMachineState *vms, int idx)
+>> @@ -1458,7 +1556,6 @@ static void machvirt_init(MachineState *machine)
+>>      vms->bootinfo.initrd_filename = machine->initrd_filename;
+>>      vms->bootinfo.nb_cpus = smp_cpus;
+>>      vms->bootinfo.board_id = -1;
+>> -    vms->bootinfo.loader_start = vms->memmap[VIRT_MEM].base;
+>>      vms->bootinfo.get_dtb = machvirt_dtb;
+>>      vms->bootinfo.firmware_loaded = firmware_loaded;
+>>      arm_load_kernel(ARM_CPU(first_cpu), &vms->bootinfo);
+>> diff --git a/include/hw/arm/arm.h b/include/hw/arm/arm.h
+>> index ce769bd..d953026 100644
+>> --- a/include/hw/arm/arm.h
+>> +++ b/include/hw/arm/arm.h
+>> @@ -124,6 +124,7 @@ struct arm_boot_info {
+>>      bool secure_board_setup;
+>>  
+>>      arm_endianness endianness;
+>> +    QLIST_HEAD(, RAMRegion) mem_list;
+>>  };
+>>  
+>>  /**
+>> -- 
+>> 1.8.3.1
+>>
+>>
+>>
+> Thanks,
+> drew
+>
+> .
+>
