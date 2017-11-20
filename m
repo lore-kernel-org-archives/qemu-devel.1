@@ -1,27 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45946)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48786)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1eGiwE-0000zm-Vv
-	for qemu-devel@nongnu.org; Mon, 20 Nov 2017 05:04:30 -0500
+	(envelope-from <berrange@redhat.com>) id 1eGj1e-0003yU-ON
+	for qemu-devel@nongnu.org; Mon, 20 Nov 2017 05:10:03 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1eGiw9-0001oh-CO
-	for qemu-devel@nongnu.org; Mon, 20 Nov 2017 05:04:26 -0500
-Received: from 4.mo173.mail-out.ovh.net ([46.105.34.219]:38104)
+	(envelope-from <berrange@redhat.com>) id 1eGj1b-00059A-Gk
+	for qemu-devel@nongnu.org; Mon, 20 Nov 2017 05:10:02 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:57138)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1eGiw8-0001mb-HH
-	for qemu-devel@nongnu.org; Mon, 20 Nov 2017 05:04:21 -0500
-Received: from player739.ha.ovh.net (b9.ovh.net [213.186.33.59])
-	by mo173.mail-out.ovh.net (Postfix) with ESMTP id CC65788A58
-	for <qemu-devel@nongnu.org>; Mon, 20 Nov 2017 11:04:17 +0100 (CET)
-From: =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>
-Date: Mon, 20 Nov 2017 11:03:47 +0100
-Message-Id: <20171120100347.8601-4-clg@kaod.org>
-In-Reply-To: <20171120100347.8601-1-clg@kaod.org>
-References: <20171120100347.8601-1-clg@kaod.org>
+	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1eGj1b-00057t-Ap
+	for qemu-devel@nongnu.org; Mon, 20 Nov 2017 05:09:59 -0500
+Date: Mon, 20 Nov 2017 10:09:43 +0000
+From: "Daniel P. Berrange" <berrange@redhat.com>
+Message-ID: <20171120100943.GC31943@redhat.com>
+Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
+References: <20171119224207.GA7484@localhost.localdomain>
+	<CAFEAcA-C3nwLrOcgFgN6t_UpzVr8xLJw0VE2Afe8abt2_U5k2Q@mail.gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH for-2.12 v3 3/3] spapr/rtas: do not reset the
- MSR in stop-self command
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <CAFEAcA-C3nwLrOcgFgN6t_UpzVr8xLJw0VE2Afe8abt2_U5k2Q@mail.gmail.com>
+Subject: Re: [Qemu-devel] qemu.org vs qemu-project.org
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,45 +28,36 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, David Gibson <david@gibson.dropbear.id.au>, Nikunj A Dadhania <nikunj@linux.vnet.ibm.com>, Benjamin Herrenschmidt <benh@kernel.crashing.org>
-Cc: =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: Eduardo Habkost <ehabkost@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>, Stefan Hajnoczi <stefanha@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Thomas Huth <thuth@redhat.com>, Michael Roth <mdroth@linux.vnet.ibm.com>
 
-When a CPU is stopped with the 'stop-self' RTAS call, its state
-'halted' is switched to 1 and, in this case, the MSR is not taken into
-account anymore in the cpu_has_work() routine. Only the pending
-hardware interrupts are checked with their LPCR:PECE* enablement bit.
+On Sun, Nov 19, 2017 at 10:46:20PM +0000, Peter Maydell wrote:
+> On 19 November 2017 at 22:42, Eduardo Habkost <ehabkost@redhat.com> wrote:
+> > Hi,
+> >
+> > I've noticed that README, MAINTAINERS .gitmodules, and other
+> > files in qemu.git are pointing to qemu-project.org, while the
+> > QEMU web site and other files in qemu.git are pointing to
+> > qemu.org.
+> >
+> > I assume that the situation mentioned in commit
+> > 8593898109 ("Use qemu-project.org domain name") has improved.
+> > Should we update the existing files to point to qemu.org, now?
+> 
+> Yeah, we decided that we should go with qemu.org as the
+> main name (so qemu-project.org urls redirect to it).
+> We should probably generally move to qemu.org in our
+> documentation, at least. I'm not sure if there are
+> any unfortunate side-effects to changing a .gitmodules
+> URL ?
 
-The CPU is now also protected from the decrementer interrupt by the
-LPCR:PECE* bits which are disabled in the 'stop-self' RTAS
-call. Reseting the MSR is pointless.
+Quite possibly - we would have todo some testing to see what, if
+any, fallout there is.
 
-Signed-off-by: C=C3=A9dric Le Goater <clg@kaod.org>
-Reviewed-by: David Gibson <david@gibson.dropbear.id.au>
----
- hw/ppc/spapr_rtas.c | 10 ----------
- 1 file changed, 10 deletions(-)
 
-diff --git a/hw/ppc/spapr_rtas.c b/hw/ppc/spapr_rtas.c
-index b5cff3ab29d3..7ddddc1c9c8a 100644
---- a/hw/ppc/spapr_rtas.c
-+++ b/hw/ppc/spapr_rtas.c
-@@ -204,16 +204,6 @@ static void rtas_stop_self(PowerPCCPU *cpu, sPAPRMac=
-hineState *spapr,
-=20
-     cs->halted =3D 1;
-     qemu_cpu_kick(cs);
--    /*
--     * While stopping a CPU, the guest calls H_CPPR which
--     * effectively disables interrupts on XICS level.
--     * However decrementer interrupts in TCG can still
--     * wake the CPU up so here we disable interrupts in MSR
--     * as well.
--     * As rtas_start_cpu() resets the whole MSR anyway, there is
--     * no need to bother with specific bits, we just clear it.
--     */
--    env->msr =3D 0;
-=20
-     /* Disable Power-saving mode Exit Cause exceptions for the CPU.
-      * This could deliver an interrupt on a dying CPU and crash the
---=20
-2.13.6
+Regards,
+Daniel
+-- 
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
