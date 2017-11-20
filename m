@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46887)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46870)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1eGqUu-00030R-4C
-	for qemu-devel@nongnu.org; Mon, 20 Nov 2017 13:08:45 -0500
+	(envelope-from <pm215@archaic.org.uk>) id 1eGqUs-00030Q-J4
+	for qemu-devel@nongnu.org; Mon, 20 Nov 2017 13:08:47 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1eGqUp-0004d9-Qc
-	for qemu-devel@nongnu.org; Mon, 20 Nov 2017 13:08:44 -0500
+	(envelope-from <pm215@archaic.org.uk>) id 1eGqUq-0004dP-Tq
+	for qemu-devel@nongnu.org; Mon, 20 Nov 2017 13:08:42 -0500
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon, 20 Nov 2017 18:08:27 +0000
-Message-Id: <1511201308-23580-2-git-send-email-peter.maydell@linaro.org>
+Date: Mon, 20 Nov 2017 18:08:28 +0000
+Message-Id: <1511201308-23580-3-git-send-email-peter.maydell@linaro.org>
 In-Reply-To: <1511201308-23580-1-git-send-email-peter.maydell@linaro.org>
 References: <1511201308-23580-1-git-send-email-peter.maydell@linaro.org>
-Subject: [Qemu-devel] [PATCH v2 for-2.11 1/2] exec.c: Factor out
- before/after actions for notdirty memory writes
+Subject: [Qemu-devel] [PATCH v2 for-2.11 2/2] accel/tcg: Handle atomic
+ accesses to notdirty memory correctly
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,197 +23,232 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: qemu-stable@nongnu.org, Richard Henderson <rth@twiddle.net>, Paolo Bonzini <pbonzini@redhat.com>, Stuart Monteith <stuart.monteith@linaro.org>
 
-The function notdirty_mem_write() has a sequence of actions
-it has to do before and after the actual business of writing
-data to host RAM to ensure that dirty flags are correctly
-updated and we flush any TCG translations for the region.
-We need to do this also in other places that write directly
-to host RAM, most notably the TCG atomic helper functions.
-Pull out the before and after pieces into their own functions.
+To do a write to memory that is marked as notdirty, we need
+to invalidate any TBs we have cached for that memory, and
+update the cpu physical memory dirty flags for VGA and migration.
+The slowpath code in notdirty_mem_write() does all this correctly,
+but the new atomic handling code in atomic_mmu_lookup() doesn't
+do anything at all, it just clears the dirty bit in the TLB.
 
-We use an API where the prepare function stashes the various
-bits of information about the write into a struct for the
-complete function to use, because in the calls for the atomic
-helpers the place where the complete function will be called
-doesn't have the information to hand.
+The effect of this bug is that if the first write to a notdirty
+page for which we have cached TBs is by a guest atomic access,
+we fail to invalidate the TBs and subsequently will execute
+incorrect code. This can be seen by trying to run 'javac' on AArch64.
+
+Use the new notdirty_call_before() and notdirty_call_after()
+functions to correctly handle the update to notdirty memory
+in the atomic codepath.
 
 Cc: qemu-stable@nongnu.org
 Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 ---
-Yes, memory-internal.h's header comment claims it's for
-"obsolete" functions; but that was added in 2011 and in
-practice the functions are still here. I think it's useful
-as a header for functions that only need to be shared between
-the memory subsystem and the accel/tcg code, which are always
-going to be fairly tightly coupled. I'll send a separate
-patch to fix up those comments, but I didn't want to put it
-in with this for-stable bugfix.
----
- include/exec/memory-internal.h | 62 ++++++++++++++++++++++++++++++++++++++++
- exec.c                         | 65 ++++++++++++++++++++++++++++--------------
- 2 files changed, 106 insertions(+), 21 deletions(-)
+ accel/tcg/atomic_template.h | 12 ++++++++++++
+ accel/tcg/cputlb.c          | 38 +++++++++++++++++++++++++-------------
+ accel/tcg/user-exec.c       |  1 +
+ 3 files changed, 38 insertions(+), 13 deletions(-)
 
-diff --git a/include/exec/memory-internal.h b/include/exec/memory-internal.h
-index 647e9bd..98d8296 100644
---- a/include/exec/memory-internal.h
-+++ b/include/exec/memory-internal.h
-@@ -39,5 +39,67 @@ void mtree_print_dispatch(fprintf_function mon, void *f,
-                           struct AddressSpaceDispatch *d,
-                           MemoryRegion *root);
+diff --git a/accel/tcg/atomic_template.h b/accel/tcg/atomic_template.h
+index 1c7c175..e022df4 100644
+--- a/accel/tcg/atomic_template.h
++++ b/accel/tcg/atomic_template.h
+@@ -61,6 +61,7 @@
+ ABI_TYPE ATOMIC_NAME(cmpxchg)(CPUArchState *env, target_ulong addr,
+                               ABI_TYPE cmpv, ABI_TYPE newv EXTRA_ARGS)
+ {
++    ATOMIC_MMU_DECLS;
+     DATA_TYPE *haddr = ATOMIC_MMU_LOOKUP;
+     DATA_TYPE ret = atomic_cmpxchg__nocheck(haddr, cmpv, newv);
+     ATOMIC_MMU_CLEANUP;
+@@ -70,6 +71,7 @@ ABI_TYPE ATOMIC_NAME(cmpxchg)(CPUArchState *env, target_ulong addr,
+ #if DATA_SIZE >= 16
+ ABI_TYPE ATOMIC_NAME(ld)(CPUArchState *env, target_ulong addr EXTRA_ARGS)
+ {
++    ATOMIC_MMU_DECLS;
+     DATA_TYPE val, *haddr = ATOMIC_MMU_LOOKUP;
+     __atomic_load(haddr, &val, __ATOMIC_RELAXED);
+     ATOMIC_MMU_CLEANUP;
+@@ -79,6 +81,7 @@ ABI_TYPE ATOMIC_NAME(ld)(CPUArchState *env, target_ulong addr EXTRA_ARGS)
+ void ATOMIC_NAME(st)(CPUArchState *env, target_ulong addr,
+                      ABI_TYPE val EXTRA_ARGS)
+ {
++    ATOMIC_MMU_DECLS;
+     DATA_TYPE *haddr = ATOMIC_MMU_LOOKUP;
+     __atomic_store(haddr, &val, __ATOMIC_RELAXED);
+     ATOMIC_MMU_CLEANUP;
+@@ -87,6 +90,7 @@ void ATOMIC_NAME(st)(CPUArchState *env, target_ulong addr,
+ ABI_TYPE ATOMIC_NAME(xchg)(CPUArchState *env, target_ulong addr,
+                            ABI_TYPE val EXTRA_ARGS)
+ {
++    ATOMIC_MMU_DECLS;
+     DATA_TYPE *haddr = ATOMIC_MMU_LOOKUP;
+     DATA_TYPE ret = atomic_xchg__nocheck(haddr, val);
+     ATOMIC_MMU_CLEANUP;
+@@ -97,6 +101,7 @@ ABI_TYPE ATOMIC_NAME(xchg)(CPUArchState *env, target_ulong addr,
+ ABI_TYPE ATOMIC_NAME(X)(CPUArchState *env, target_ulong addr,       \
+                  ABI_TYPE val EXTRA_ARGS)                           \
+ {                                                                   \
++    ATOMIC_MMU_DECLS;                                               \
+     DATA_TYPE *haddr = ATOMIC_MMU_LOOKUP;                           \
+     DATA_TYPE ret = atomic_##X(haddr, val);                         \
+     ATOMIC_MMU_CLEANUP;                                             \
+@@ -130,6 +135,7 @@ GEN_ATOMIC_HELPER(xor_fetch)
+ ABI_TYPE ATOMIC_NAME(cmpxchg)(CPUArchState *env, target_ulong addr,
+                               ABI_TYPE cmpv, ABI_TYPE newv EXTRA_ARGS)
+ {
++    ATOMIC_MMU_DECLS;
+     DATA_TYPE *haddr = ATOMIC_MMU_LOOKUP;
+     DATA_TYPE ret = atomic_cmpxchg__nocheck(haddr, BSWAP(cmpv), BSWAP(newv));
+     ATOMIC_MMU_CLEANUP;
+@@ -139,6 +145,7 @@ ABI_TYPE ATOMIC_NAME(cmpxchg)(CPUArchState *env, target_ulong addr,
+ #if DATA_SIZE >= 16
+ ABI_TYPE ATOMIC_NAME(ld)(CPUArchState *env, target_ulong addr EXTRA_ARGS)
+ {
++    ATOMIC_MMU_DECLS;
+     DATA_TYPE val, *haddr = ATOMIC_MMU_LOOKUP;
+     __atomic_load(haddr, &val, __ATOMIC_RELAXED);
+     ATOMIC_MMU_CLEANUP;
+@@ -148,6 +155,7 @@ ABI_TYPE ATOMIC_NAME(ld)(CPUArchState *env, target_ulong addr EXTRA_ARGS)
+ void ATOMIC_NAME(st)(CPUArchState *env, target_ulong addr,
+                      ABI_TYPE val EXTRA_ARGS)
+ {
++    ATOMIC_MMU_DECLS;
+     DATA_TYPE *haddr = ATOMIC_MMU_LOOKUP;
+     val = BSWAP(val);
+     __atomic_store(haddr, &val, __ATOMIC_RELAXED);
+@@ -157,6 +165,7 @@ void ATOMIC_NAME(st)(CPUArchState *env, target_ulong addr,
+ ABI_TYPE ATOMIC_NAME(xchg)(CPUArchState *env, target_ulong addr,
+                            ABI_TYPE val EXTRA_ARGS)
+ {
++    ATOMIC_MMU_DECLS;
+     DATA_TYPE *haddr = ATOMIC_MMU_LOOKUP;
+     ABI_TYPE ret = atomic_xchg__nocheck(haddr, BSWAP(val));
+     ATOMIC_MMU_CLEANUP;
+@@ -167,6 +176,7 @@ ABI_TYPE ATOMIC_NAME(xchg)(CPUArchState *env, target_ulong addr,
+ ABI_TYPE ATOMIC_NAME(X)(CPUArchState *env, target_ulong addr,       \
+                  ABI_TYPE val EXTRA_ARGS)                           \
+ {                                                                   \
++    ATOMIC_MMU_DECLS;                                               \
+     DATA_TYPE *haddr = ATOMIC_MMU_LOOKUP;                           \
+     DATA_TYPE ret = atomic_##X(haddr, BSWAP(val));                  \
+     ATOMIC_MMU_CLEANUP;                                             \
+@@ -187,6 +197,7 @@ GEN_ATOMIC_HELPER(xor_fetch)
+ ABI_TYPE ATOMIC_NAME(fetch_add)(CPUArchState *env, target_ulong addr,
+                          ABI_TYPE val EXTRA_ARGS)
+ {
++    ATOMIC_MMU_DECLS;
+     DATA_TYPE *haddr = ATOMIC_MMU_LOOKUP;
+     DATA_TYPE ldo, ldn, ret, sto;
  
-+/* Opaque struct for passing info from memory_notdirty_write_prepare()
-+ * to memory_notdirty_write_complete(). Callers should treat all fields
-+ * as private, with the exception of @active.
-+ *
-+ * @active is a field which is not touched by either the prepare or
-+ * complete functions, but which the caller can use if it wishes to
-+ * track whether it has called prepare for this struct and so needs
-+ * to later call the complete function.
-+ */
-+typedef struct {
-+    CPUState *cpu;
-+    ram_addr_t ram_addr;
-+    vaddr mem_vaddr;
-+    unsigned size;
-+    bool locked;
-+    bool active;
-+} NotDirtyInfo;
-+
-+/**
-+ * memory_notdirty_write_prepare: call before writing to non-dirty memory
-+ * @ndi: pointer to opaque NotDirtyInfo struct
-+ * @cpu: CPU doing the write
-+ * @mem_vaddr: virtual address of write
-+ * @ram_addr: the ram address of the write
-+ * @size: size of write in bytes
-+ *
-+ * Any code which writes to the host memory corresponding to
-+ * guest RAM which has been marked as NOTDIRTY must wrap those
-+ * writes in calls to memory_notdirty_write_prepare() and
-+ * memory_notdirty_write_complete():
-+ *
-+ *  NotDirtyInfo ndi;
-+ *  memory_notdirty_write_prepare(&ndi, ....);
-+ *  ... perform write here ...
-+ *  memory_notdirty_write_complete(&ndi);
-+ *
-+ * These calls will ensure that we flush any TCG translated code for
-+ * the memory being written, update the dirty bits and (if possible)
-+ * remove the slowpath callback for writing to the memory.
-+ *
-+ * This must only be called if we are using TCG; it will assert otherwise.
-+ *
-+ * We may take a lock in the prepare call, so callers must ensure that
-+ * they don't exit (via longjump or otherwise) without calling complete.
-+ *
-+ * This call must only be made inside an RCU critical section.
-+ * (Note that while we're executing a TCG TB we're always in an
-+ * RCU critical section, which is likely to be the case for callers
-+ * of these functions.)
-+ */
-+void memory_notdirty_write_prepare(NotDirtyInfo *ndi,
-+                                   CPUState *cpu,
-+                                   vaddr mem_vaddr,
-+                                   ram_addr_t ram_addr,
-+                                   unsigned size);
-+/**
-+ * memory_notdirty_write_complete: finish write to non-dirty memory
-+ * @ndi: pointer to the opaque NotDirtyInfo struct which was initialized
-+ * by memory_not_dirty_write_prepare().
-+ */
-+void memory_notdirty_write_complete(NotDirtyInfo *ndi);
-+
- #endif
- #endif
-diff --git a/exec.c b/exec.c
-index 2202f2d..03238a3 100644
---- a/exec.c
-+++ b/exec.c
-@@ -2354,18 +2354,55 @@ ram_addr_t qemu_ram_addr_from_host(void *ptr)
-     return block->offset + offset;
- }
+@@ -206,6 +217,7 @@ ABI_TYPE ATOMIC_NAME(fetch_add)(CPUArchState *env, target_ulong addr,
+ ABI_TYPE ATOMIC_NAME(add_fetch)(CPUArchState *env, target_ulong addr,
+                          ABI_TYPE val EXTRA_ARGS)
+ {
++    ATOMIC_MMU_DECLS;
+     DATA_TYPE *haddr = ATOMIC_MMU_LOOKUP;
+     DATA_TYPE ldo, ldn, ret, sto;
  
--/* Called within RCU critical section.  */
--static void notdirty_mem_write(void *opaque, hwaddr ram_addr,
--                               uint64_t val, unsigned size)
--{
--    bool locked = false;
-+/* Called within RCU critical section. */
-+void memory_notdirty_write_prepare(NotDirtyInfo *ndi,
-+                          CPUState *cpu,
-+                          vaddr mem_vaddr,
-+                          ram_addr_t ram_addr,
-+                          unsigned size)
-+{
-+    ndi->cpu = cpu;
-+    ndi->ram_addr = ram_addr;
-+    ndi->mem_vaddr = mem_vaddr;
-+    ndi->size = size;
-+    ndi->locked = false;
+diff --git a/accel/tcg/cputlb.c b/accel/tcg/cputlb.c
+index d071ca4..8fd8420 100644
+--- a/accel/tcg/cputlb.c
++++ b/accel/tcg/cputlb.c
+@@ -946,7 +946,8 @@ void probe_write(CPUArchState *env, target_ulong addr, int mmu_idx,
+ /* Probe for a read-modify-write atomic operation.  Do not allow unaligned
+  * operations, or io operations to proceed.  Return the host address.  */
+ static void *atomic_mmu_lookup(CPUArchState *env, target_ulong addr,
+-                               TCGMemOpIdx oi, uintptr_t retaddr)
++                               TCGMemOpIdx oi, uintptr_t retaddr,
++                               NotDirtyInfo *ndi)
+ {
+     size_t mmu_idx = get_mmuidx(oi);
+     size_t index = (addr >> TARGET_PAGE_BITS) & (CPU_TLB_SIZE - 1);
+@@ -955,6 +956,7 @@ static void *atomic_mmu_lookup(CPUArchState *env, target_ulong addr,
+     TCGMemOp mop = get_memop(oi);
+     int a_bits = get_alignment_bits(mop);
+     int s_bits = mop & MO_SIZE;
++    void *hostaddr;
  
-     assert(tcg_enabled());
-     if (!cpu_physical_memory_get_dirty_flag(ram_addr, DIRTY_MEMORY_CODE)) {
--        locked = true;
-+        ndi->locked = true;
-         tb_lock();
-         tb_invalidate_phys_page_fast(ram_addr, size);
+     /* Adjust the given return address.  */
+     retaddr -= GETPC_ADJ;
+@@ -984,21 +986,15 @@ static void *atomic_mmu_lookup(CPUArchState *env, target_ulong addr,
+         tlb_addr = tlbe->addr_write & ~TLB_INVALID_MASK;
      }
-+}
-+
-+/* Called within RCU critical section. */
-+void memory_notdirty_write_complete(NotDirtyInfo *ndi)
-+{
-+    if (ndi->locked) {
-+        tb_unlock();
-+    }
-+
-+    /* Set both VGA and migration bits for simplicity and to remove
-+     * the notdirty callback faster.
-+     */
-+    cpu_physical_memory_set_dirty_range(ndi->ram_addr, ndi->size,
-+                                        DIRTY_CLIENTS_NOCODE);
-+    /* we remove the notdirty callback only if the code has been
-+       flushed */
-+    if (!cpu_physical_memory_is_clean(ndi->ram_addr)) {
-+        tlb_set_dirty(ndi->cpu, ndi->mem_vaddr);
-+    }
-+}
-+
-+/* Called within RCU critical section.  */
-+static void notdirty_mem_write(void *opaque, hwaddr ram_addr,
-+                               uint64_t val, unsigned size)
-+{
-+    NotDirtyInfo ndi;
-+
-+    memory_notdirty_write_prepare(&ndi, current_cpu, current_cpu->mem_io_vaddr,
-+                         ram_addr, size);
-+
-     switch (size) {
-     case 1:
-         stb_p(qemu_map_ram_ptr(NULL, ram_addr), val);
-@@ -2382,21 +2419,7 @@ static void notdirty_mem_write(void *opaque, hwaddr ram_addr,
-     default:
-         abort();
-     }
--
--    if (locked) {
--        tb_unlock();
+ 
+-    /* Check notdirty */
+-    if (unlikely(tlb_addr & TLB_NOTDIRTY)) {
+-        tlb_set_dirty(ENV_GET_CPU(env), addr);
+-        tlb_addr = tlb_addr & ~TLB_NOTDIRTY;
 -    }
 -
--    /* Set both VGA and migration bits for simplicity and to remove
--     * the notdirty callback faster.
--     */
--    cpu_physical_memory_set_dirty_range(ram_addr, size,
--                                        DIRTY_CLIENTS_NOCODE);
--    /* we remove the notdirty callback only if the code has been
--       flushed */
--    if (!cpu_physical_memory_is_clean(ram_addr)) {
--        tlb_set_dirty(current_cpu, current_cpu->mem_io_vaddr);
--    }
-+    memory_notdirty_write_complete(&ndi);
+     /* Notice an IO access  */
+-    if (unlikely(tlb_addr & ~TARGET_PAGE_MASK)) {
++    if (unlikely(tlb_addr & TLB_MMIO)) {
+         /* There's really nothing that can be done to
+            support this apart from stop-the-world.  */
+         goto stop_the_world;
+     }
+ 
+     /* Let the guest notice RMW on a write-only page.  */
+-    if (unlikely(tlbe->addr_read != tlb_addr)) {
++    if (unlikely(tlbe->addr_read != (tlb_addr & ~TLB_NOTDIRTY))) {
+         tlb_fill(ENV_GET_CPU(env), addr, MMU_DATA_LOAD, mmu_idx, retaddr);
+         /* Since we don't support reads and writes to different addresses,
+            and we do have the proper page loaded for write, this shouldn't
+@@ -1006,7 +1002,17 @@ static void *atomic_mmu_lookup(CPUArchState *env, target_ulong addr,
+         goto stop_the_world;
+     }
+ 
+-    return (void *)((uintptr_t)addr + tlbe->addend);
++    hostaddr = (void *)((uintptr_t)addr + tlbe->addend);
++
++    ndi->active = false;
++    if (unlikely(tlb_addr & TLB_NOTDIRTY)) {
++        ndi->active = true;
++        memory_notdirty_write_prepare(ndi, ENV_GET_CPU(env), addr,
++                                      qemu_ram_addr_from_host_nofail(hostaddr),
++                                      1 << s_bits);
++    }
++
++    return hostaddr;
+ 
+  stop_the_world:
+     cpu_loop_exit_atomic(ENV_GET_CPU(env), retaddr);
+@@ -1040,8 +1046,14 @@ static void *atomic_mmu_lookup(CPUArchState *env, target_ulong addr,
+ #define EXTRA_ARGS     , TCGMemOpIdx oi, uintptr_t retaddr
+ #define ATOMIC_NAME(X) \
+     HELPER(glue(glue(glue(atomic_ ## X, SUFFIX), END), _mmu))
+-#define ATOMIC_MMU_LOOKUP  atomic_mmu_lookup(env, addr, oi, retaddr)
+-#define ATOMIC_MMU_CLEANUP do { } while (0)
++#define ATOMIC_MMU_DECLS NotDirtyInfo ndi
++#define ATOMIC_MMU_LOOKUP atomic_mmu_lookup(env, addr, oi, retaddr, &ndi)
++#define ATOMIC_MMU_CLEANUP                              \
++    do {                                                \
++        if (unlikely(ndi.active)) {                     \
++            memory_notdirty_write_complete(&ndi);       \
++        }                                               \
++    } while (0)
+ 
+ #define DATA_SIZE 1
+ #include "atomic_template.h"
+@@ -1069,7 +1081,7 @@ static void *atomic_mmu_lookup(CPUArchState *env, target_ulong addr,
+ #undef ATOMIC_MMU_LOOKUP
+ #define EXTRA_ARGS         , TCGMemOpIdx oi
+ #define ATOMIC_NAME(X)     HELPER(glue(glue(atomic_ ## X, SUFFIX), END))
+-#define ATOMIC_MMU_LOOKUP  atomic_mmu_lookup(env, addr, oi, GETPC())
++#define ATOMIC_MMU_LOOKUP  atomic_mmu_lookup(env, addr, oi, GETPC(), &ndi)
+ 
+ #define DATA_SIZE 1
+ #include "atomic_template.h"
+diff --git a/accel/tcg/user-exec.c b/accel/tcg/user-exec.c
+index 0324ba8..f42285e 100644
+--- a/accel/tcg/user-exec.c
++++ b/accel/tcg/user-exec.c
+@@ -624,6 +624,7 @@ static void *atomic_mmu_lookup(CPUArchState *env, target_ulong addr,
  }
  
- static bool notdirty_mem_accepts(void *opaque, hwaddr addr,
+ /* Macro to call the above, with local variables from the use context.  */
++#define ATOMIC_MMU_DECLS do {} while (0)
+ #define ATOMIC_MMU_LOOKUP  atomic_mmu_lookup(env, addr, DATA_SIZE, GETPC())
+ #define ATOMIC_MMU_CLEANUP do { helper_retaddr = 0; } while (0)
+ 
 -- 
 2.7.4
