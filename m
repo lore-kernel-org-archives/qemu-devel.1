@@ -1,22 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44424)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46652)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1eGm6U-0002pr-Sq
-	for qemu-devel@nongnu.org; Mon, 20 Nov 2017 08:27:21 -0500
+	(envelope-from <gengdongjiu@huawei.com>) id 1eGmCx-00066j-AI
+	for qemu-devel@nongnu.org; Mon, 20 Nov 2017 08:33:56 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1eGm6T-0006wj-Fo
-	for qemu-devel@nongnu.org; Mon, 20 Nov 2017 08:27:14 -0500
-Received: from orth.archaic.org.uk ([2001:8b0:1d0::2]:38424)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pm215@archaic.org.uk>)
-	id 1eGm6T-0006tX-6z
-	for qemu-devel@nongnu.org; Mon, 20 Nov 2017 08:27:13 -0500
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon, 20 Nov 2017 13:27:00 +0000
-Message-Id: <1511184421-23535-2-git-send-email-peter.maydell@linaro.org>
-In-Reply-To: <1511184421-23535-1-git-send-email-peter.maydell@linaro.org>
-References: <1511184421-23535-1-git-send-email-peter.maydell@linaro.org>
-Subject: [Qemu-devel] [PATCH for-2.11 1/2] exec.c: Factor out before/after
- actions for notdirty memory writes
+	(envelope-from <gengdongjiu@huawei.com>) id 1eGmCt-00011B-Ck
+	for qemu-devel@nongnu.org; Mon, 20 Nov 2017 08:33:55 -0500
+Received: from szxga05-in.huawei.com ([45.249.212.191]:2733)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_ARCFOUR_SHA1:16) (Exim 4.71)
+	(envelope-from <gengdongjiu@huawei.com>) id 1eGmCs-00010D-RB
+	for qemu-devel@nongnu.org; Mon, 20 Nov 2017 08:33:51 -0500
+References: <8726068c-1112-eaea-5315-ec17ae37ae33@huawei.com>
+	<878tf1xgff.fsf@linaro.org>
+	<CAFEAcA9pg-yRfNJg5uFqU=pve9ypboisB5jo3piZ+ffLVy2xwQ@mail.gmail.com>
+From: gengdongjiu <gengdongjiu@huawei.com>
+Message-ID: <56804ea7-8bd1-ffe7-6b9b-986460b2560d@huawei.com>
+Date: Mon, 20 Nov 2017 21:32:34 +0800
+MIME-Version: 1.0
+In-Reply-To: <CAFEAcA9pg-yRfNJg5uFqU=pve9ypboisB5jo3piZ+ffLVy2xwQ@mail.gmail.com>
+Content-Type: text/plain; charset="utf-8"
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [question] mask SIGBUS in qemu main thread
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,193 +29,86 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: qemu-stable@nongnu.org, Richard Henderson <rth@twiddle.net>, Paolo Bonzini <pbonzini@redhat.com>, Stuart Monteith <stuart.monteith@linaro.org>
+To: Peter Maydell <peter.maydell@linaro.org>, =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, "Michael S. Tsirkin" <mst@redhat.com>, Ingo Molnar <mingo@redhat.com>, Wuquanming <wuquanming@huawei.com>, Huangshaoyu <huangshaoyu@huawei.com>
 
-The function notdirty_mem_write() has a sequence of actions
-it has to do before and after the actual business of writing
-data to host RAM to ensure that dirty flags are correctly
-updated and we flush any TCG translations for the region.
-We need to do this also in other places that write directly
-to host RAM, most notably the TCG atomic helper functions.
-Pull out the before and after pieces into their own functions.
+On 2017/11/20 21:00, Peter Maydell wrote:
+> On 20 November 2017 at 12:50, Alex Bennée <alex.bennee@linaro.org> wrote:
+>> What exactly do you expect the main thread to do with a SIGBUS signal?
+> 
+> For KVM, we (can) use SIGBUS for handling machine check exceptions:
+> see qemu_init_sigbus() in cpus.c, where we use prctl(PR_MCE_KILL)
+> to ask the host kernel to send us a SIGBUS if the memory used
+> by the VM has memory corruption detected by the hardwar. This
+> then lets us inform the guest (see kvm_mce_inject() in target/i386).
+> (This will probably be coming to Arm KVM at some point, as part
+> of the RAS extension support. See various threads in kvmarm list.)
 
-We use an API where the prepare function stashes the various
-bits of information about the write into a struct for the
-complete function to use, because in the calls for the atomic
-helpers the place where the complete function will be called
-doesn't have the information to hand.
+thanks, yes, indeed.
 
-Cc: qemu-stable@nongnu.org
-Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
----
-Yes, memory-internal.h's header comment claims it's for
-"obsolete" functions; but that was added in 2011 and in
-practice the functions are still here. I think it's useful
-as a header for functions that only need to be shared between
-the memory subsystem and the accel/tcg code, which are always
-going to be fairly tightly coupled. I'll send a separate
-patch to fix up those comments, but I didn't want to put it
-in with this for-stable bugfix.
----
- include/exec/memory-internal.h | 56 ++++++++++++++++++++++++++++++++++++
- exec.c                         | 65 ++++++++++++++++++++++++++++--------------
- 2 files changed, 100 insertions(+), 21 deletions(-)
+when the RAS is enabled, if a guest memory address is corruption, host will unmap the stage2 mapping and try to find a Qemu thread to
+deliver the SIGBUS signal[1]. when Qemu receive the signal, it will try to do some recovery for guest.
+such as kvm_mce_inject() in target/i386.
 
-diff --git a/include/exec/memory-internal.h b/include/exec/memory-internal.h
-index 647e9bd..90dfbfe 100644
---- a/include/exec/memory-internal.h
-+++ b/include/exec/memory-internal.h
-@@ -39,5 +39,61 @@ void mtree_print_dispatch(fprintf_function mon, void *f,
-                           struct AddressSpaceDispatch *d,
-                           MemoryRegion *root);
- 
-+/* Opaque struct for passing info from notdirty_call_before()
-+ * to notdirty_call_after(). Callers should treat all fields
-+ * as private.
-+ */
-+typedef struct {
-+    CPUState *cpu;
-+    ram_addr_t ram_addr;
-+    vaddr mem_vaddr;
-+    unsigned size;
-+    bool locked;
-+} NotDirtyInfo;
-+
-+/**
-+ * memory_notdirty_write_prepare: call before writing to non-dirty memory
-+ * @ndi: pointer to opaque NotDirtyInfo struct
-+ * @cpu: CPU doing the write
-+ * @mem_vaddr: virtual address of write
-+ * @ram_addr: the ram address of the write
-+ * @size: size of write in bytes
-+ *
-+ * Any code which writes to the host memory corresponding to
-+ * guest RAM which has been marked as NOTDIRTY must wrap those
-+ * writes in calls to memory_notdirty_write_prepare() and
-+ * memory_notdirty_write_complete():
-+ *
-+ *  NotDirtyInfo ndi;
-+ *  memory_notdirty_write_prepare(&ndi, ....);
-+ *  ... perform write here ...
-+ *  memory_notdirty_write_complete(&ndi);
-+ *
-+ * These calls will ensure that we flush any TCG translated code for
-+ * the memory being written, update the dirty bits and (if possible)
-+ * remove the slowpath callback for writing to the memory.
-+ *
-+ * This must only be called if we are using TCG; it will assert otherwise.
-+ *
-+ * We may take a lock in the prepare call, so callers must ensure that
-+ * they don't exit (via longjump or otherwise) without calling complete.
-+ *
-+ * This call must only be made inside an RCU critical section.
-+ * (Note that while we're executing a TCG TB we're always in an
-+ * RCU critical section, which is likely to be the case for callers
-+ * of these functions.)
-+ */
-+void memory_notdirty_write_prepare(NotDirtyInfo *ndi,
-+                                   CPUState *cpu,
-+                                   vaddr mem_vaddr,
-+                                   ram_addr_t ram_addr,
-+                                   unsigned size);
-+/**
-+ * memory_notdirty_write_complete: finish write to non-dirty memory
-+ * @ndi: pointer to the opaque NotDirtyInfo struct which was initialized
-+ * by memory_not_dirty_write_prepare().
-+ */
-+void memory_notdirty_write_complete(NotDirtyInfo *ndi);
-+
- #endif
- #endif
-diff --git a/exec.c b/exec.c
-index 2202f2d..03238a3 100644
---- a/exec.c
-+++ b/exec.c
-@@ -2354,18 +2354,55 @@ ram_addr_t qemu_ram_addr_from_host(void *ptr)
-     return block->offset + offset;
- }
- 
--/* Called within RCU critical section.  */
--static void notdirty_mem_write(void *opaque, hwaddr ram_addr,
--                               uint64_t val, unsigned size)
--{
--    bool locked = false;
-+/* Called within RCU critical section. */
-+void memory_notdirty_write_prepare(NotDirtyInfo *ndi,
-+                          CPUState *cpu,
-+                          vaddr mem_vaddr,
-+                          ram_addr_t ram_addr,
-+                          unsigned size)
-+{
-+    ndi->cpu = cpu;
-+    ndi->ram_addr = ram_addr;
-+    ndi->mem_vaddr = mem_vaddr;
-+    ndi->size = size;
-+    ndi->locked = false;
- 
-     assert(tcg_enabled());
-     if (!cpu_physical_memory_get_dirty_flag(ram_addr, DIRTY_MEMORY_CODE)) {
--        locked = true;
-+        ndi->locked = true;
-         tb_lock();
-         tb_invalidate_phys_page_fast(ram_addr, size);
-     }
-+}
-+
-+/* Called within RCU critical section. */
-+void memory_notdirty_write_complete(NotDirtyInfo *ndi)
-+{
-+    if (ndi->locked) {
-+        tb_unlock();
-+    }
-+
-+    /* Set both VGA and migration bits for simplicity and to remove
-+     * the notdirty callback faster.
-+     */
-+    cpu_physical_memory_set_dirty_range(ndi->ram_addr, ndi->size,
-+                                        DIRTY_CLIENTS_NOCODE);
-+    /* we remove the notdirty callback only if the code has been
-+       flushed */
-+    if (!cpu_physical_memory_is_clean(ndi->ram_addr)) {
-+        tlb_set_dirty(ndi->cpu, ndi->mem_vaddr);
-+    }
-+}
-+
-+/* Called within RCU critical section.  */
-+static void notdirty_mem_write(void *opaque, hwaddr ram_addr,
-+                               uint64_t val, unsigned size)
-+{
-+    NotDirtyInfo ndi;
-+
-+    memory_notdirty_write_prepare(&ndi, current_cpu, current_cpu->mem_io_vaddr,
-+                         ram_addr, size);
-+
-     switch (size) {
-     case 1:
-         stb_p(qemu_map_ram_ptr(NULL, ram_addr), val);
-@@ -2382,21 +2419,7 @@ static void notdirty_mem_write(void *opaque, hwaddr ram_addr,
-     default:
-         abort();
-     }
--
--    if (locked) {
--        tb_unlock();
--    }
--
--    /* Set both VGA and migration bits for simplicity and to remove
--     * the notdirty callback faster.
--     */
--    cpu_physical_memory_set_dirty_range(ram_addr, size,
--                                        DIRTY_CLIENTS_NOCODE);
--    /* we remove the notdirty callback only if the code has been
--       flushed */
--    if (!cpu_physical_memory_is_clean(ram_addr)) {
--        tlb_set_dirty(current_cpu, current_cpu->mem_io_vaddr);
--    }
-+    memory_notdirty_write_complete(&ndi);
- }
- 
- static bool notdirty_mem_accepts(void *opaque, hwaddr addr,
--- 
-2.7.4
+In host kernel[1], if the flag  set MF_ACTION_REQUIRED, host will find current vcpu thread to deliver SIGBUS with si_code BUS_MCEERR_AR
+Otherwise it will  find Qemu main thread to deliver the SIGBUS with si_code BUS_MCEERR_AO
+For this case, Qemu will block this SIGBUS and this signal will be always pending.
+
+For the KVM[2], it does not matter, because KVM will choose the current vcpu thread to deliver SIGBUS, not the main Qemu thread.
+
+
+[1]
+static int kill_proc(struct task_struct *t, unsigned long addr, int trapno,
+                        unsigned long pfn, struct page *page, int flags)
+	..................
+        if ((flags & MF_ACTION_REQUIRED) && t->mm == current->mm) {
+                si.si_code = BUS_MCEERR_AR;
+                ret = force_sig_info(SIGBUS, &si, current);
+        } else {
+                /*
+                 * Don't use force here, it's convenient if the signal
+                 * can be temporarily blocked.
+                 * This could cause a loop when the user sets SIGBUS
+                 * to SIG_IGN, but hopefully no one will do that?
+                 */
+                si.si_code = BUS_MCEERR_AO;
+                ret = send_sig_info(SIGBUS, &si, t);  /* synchronous? */
+        }
+}
+
+
+[2]
+static void kvm_send_hwpoison_signal(unsigned long address,
+                                     struct vm_area_struct *vma)
+{
+        siginfo_t info;
+
+        info.si_signo   = SIGBUS;
+        info.si_errno   = 0;
+        info.si_code    = BUS_MCEERR_AR;
+        info.si_addr    = (void __user *)address;
+
+        if (is_vm_hugetlb_page(vma))
+                info.si_addr_lsb = huge_page_shift(hstate_vma(vma));
+        else
+                info.si_addr_lsb = PAGE_SHIFT;
+
+        send_sig_info(SIGBUS, &info, current);
+}
+
+> 
+> Because asynchronous signals are a pain to deal with, for the
+> main thread we handle all our signals via signalfd(), which is
+> why the main thread shows SIGBUS as blocked. The main thread
+> will pick the signal up via the fd at some point. For KVM vcpu
+> threads, the signal arrives asynchronously. See sigbus_handler()
+> in cpus.c.
+
+thanks Pether's explanation.
+yes, you are right.
+
+> 
+> thanks
+> -- PMM
+> 
+> 
