@@ -1,22 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34117)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34721)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <agraf@suse.de>) id 1eGiO9-0002yd-EU
-	for qemu-devel@nongnu.org; Mon, 20 Nov 2017 04:29:14 -0500
+	(envelope-from <vsementsov@virtuozzo.com>) id 1eGiPX-0003xj-62
+	for qemu-devel@nongnu.org; Mon, 20 Nov 2017 04:30:40 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <agraf@suse.de>) id 1eGiO6-00010X-BY
-	for qemu-devel@nongnu.org; Mon, 20 Nov 2017 04:29:13 -0500
-References: <20171120091520.86128-1-borntraeger@de.ibm.com>
-	<5a4be37f-29b5-1d0d-91ab-9cb15c93e088@suse.de>
-	<08cec003-1291-8302-1280-d53cba5c7538@de.ibm.com>
-From: Alexander Graf <agraf@suse.de>
-Message-ID: <5a6cd622-3064-a920-8f72-bc820aa13203@suse.de>
-Date: Mon, 20 Nov 2017 10:29:08 +0100
+	(envelope-from <vsementsov@virtuozzo.com>) id 1eGiPU-0001dM-26
+	for qemu-devel@nongnu.org; Mon, 20 Nov 2017 04:30:39 -0500
+References: <20171030163309.75770-1-vsementsov@virtuozzo.com>
+	<20171030163309.75770-3-vsementsov@virtuozzo.com>
+	<5027d8bb-fdec-a6ce-8150-96730d3a5ce4@redhat.com>
+	<8f3d2255-22e8-13a0-33f8-8b2db0d17bec@virtuozzo.com>
+	<ae98b3f3-f51e-f8fa-b445-3fbfd6d71b63@redhat.com>
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Message-ID: <77a1f8bb-17c6-d3c0-6a65-e0c5862aae76@virtuozzo.com>
+Date: Mon, 20 Nov 2017 12:30:24 +0300
 MIME-Version: 1.0
-In-Reply-To: <08cec003-1291-8302-1280-d53cba5c7538@de.ibm.com>
-Content-Type: text/plain; charset=windows-1252; format=flowed
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] pc-bios/s390-ccw: build s390 bios with
- -fno-zero-initialized-in-bss
+In-Reply-To: <ae98b3f3-f51e-f8fa-b445-3fbfd6d71b63@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: quoted-printable
+Content-Language: en-US
+Subject: Re: [Qemu-devel] [PATCH v8 02/14] block/dirty-bitmap: add locked
+ version of bdrv_release_dirty_bitmap
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,28 +28,57 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Christian Borntraeger <borntraeger@de.ibm.com>, Cornelia Huck <cohuck@redhat.com>
-Cc: qemu-devel <qemu-devel@nongnu.org>, qemu-s390x <qemu-s390x@nongnu.org>, Halil Pasic <pasic@linux.vnet.ibm.com>, Richard Henderson <rth@twiddle.net>, Thomas Huth <thuth@redhat.com>
+To: John Snow <jsnow@redhat.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org
+Cc: kwolf@redhat.com, peter.maydell@linaro.org, famz@redhat.com, lirans@il.ibm.com, quintela@redhat.com, armbru@redhat.com, mreitz@redhat.com, stefanha@redhat.com, den@openvz.org, amit.shah@redhat.com, pbonzini@redhat.com, dgilbert@redhat.com
 
-On 11/20/2017 10:27 AM, Christian Borntraeger wrote:
+17.11.2017 21:25, John Snow wrote:
 >
-> On 11/20/2017 10:19 AM, Alexander Graf wrote:
->> On 11/20/2017 10:15 AM, Christian Borntraeger wrote:
->>> The QEMU ELF loader does not initialize the bss segment. This has
->>> triggered several bugs in the past, e.g. see commit 5d739a4787a5
->>> ("s390-ccw.img: Fix sporadic errors with ccw boot image - initialize
->>> css").
+> On 11/17/2017 03:07 AM, Vladimir Sementsov-Ogievskiy wrote:
+>> 11.11.2017 01:52, John Snow wrote:
+>>> On 10/30/2017 12:32 PM, Vladimir Sementsov-Ogievskiy wrote:
+>>>> It is needed to realize bdrv_dirty_bitmap_release_successor in
+>>>> the following patch.
+>>>>
+>>> OK, but...
 >>>
->>> Instead of fixing these things one-by-one we can build the BIOS
->>> with -fno-zero-initialized-in-bss. This will move the zero variables
->>> also into the data segment, which is then part of a LOAD section.
->> Doesn't this bloat the firmware? Why don't we just manually clear bss in the firmware itself? It's what all other firmwares do :)
-> Yes the proper fix is to initialize bss in the bios itself.
-> I was trying to come up with something for 2.11, but since the patch does not solve the original issues, lets drop it.
+>>>> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+>>>> ---
+>>>>  =C2=A0 block/dirty-bitmap.c | 25 ++++++++++++++++++++-----
+>>>>  =C2=A0 1 file changed, 20 insertions(+), 5 deletions(-)
+>>>>
+>>>> diff --git a/block/dirty-bitmap.c b/block/dirty-bitmap.c
+>>>> index 81adbeb6d4..981f99d362 100644
+>>>> --- a/block/dirty-bitmap.c
+>>>> +++ b/block/dirty-bitmap.c
+>>>> @@ -326,13 +326,13 @@ static bool
+>>>> bdrv_dirty_bitmap_has_name(BdrvDirtyBitmap *bitmap)
+>>>>  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 return !!bdrv_dirty_bitmap_name(bitmap=
+);
+>>>>  =C2=A0 }
+>>>>  =C2=A0 -/* Called with BQL taken.=C2=A0 */
+>>>> -static void bdrv_do_release_matching_dirty_bitmap(
+>>>> +/* Called within bdrv_dirty_bitmap_lock..unlock */
+>>> ...Add this so it will compile:
+>> how do you compile to get an error? and what is unused?
+>>
+> .../src/qemu/block/dirty-bitmap.c:368:13: error:
+> =E2=80=98bdrv_release_dirty_bitmap_locked=E2=80=99 defined but not used
+> [-Werror=3Dunused-function]
+>   static void bdrv_release_dirty_bitmap_locked(BlockDriverState *bs,
+>               ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+> cc1: all warnings being treated as errors
+>
+>
+> I commented on the wrong prototype. The ((__unused__)) attribute just
+> quiets this warning so it can compile without you having to refactor.
 
 
-Initializing bss is quite simple. You can probably even do it from C. 
-Just set two variables before and after .bss in the linker script and 
-memset(0) from start to end :).
+aha ok, you are right
 
-Alex
+>
+> --js
+
+
+--=20
+Best regards,
+Vladimir
