@@ -1,24 +1,43 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42974)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45352)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1eGioE-0003oc-6c
-	for qemu-devel@nongnu.org; Mon, 20 Nov 2017 04:56:11 -0500
+	(envelope-from <borntraeger@de.ibm.com>) id 1eGivK-0000Gy-UW
+	for qemu-devel@nongnu.org; Mon, 20 Nov 2017 05:03:31 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1eGioD-0005gS-4V
-	for qemu-devel@nongnu.org; Mon, 20 Nov 2017 04:56:10 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:42346)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <marcandre.lureau@redhat.com>)
-	id 1eGioC-0005ft-SJ
-	for qemu-devel@nongnu.org; Mon, 20 Nov 2017 04:56:09 -0500
-From: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
-Date: Mon, 20 Nov 2017 10:55:19 +0100
-Message-Id: <20171120095519.15214-6-marcandre.lureau@redhat.com>
-In-Reply-To: <20171120095519.15214-1-marcandre.lureau@redhat.com>
-References: <20171120095519.15214-1-marcandre.lureau@redhat.com>
+	(envelope-from <borntraeger@de.ibm.com>) id 1eGivH-00019B-PB
+	for qemu-devel@nongnu.org; Mon, 20 Nov 2017 05:03:30 -0500
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:35404
+	helo=mx0a-001b2d01.pphosted.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <borntraeger@de.ibm.com>)
+	id 1eGivH-00018p-JW
+	for qemu-devel@nongnu.org; Mon, 20 Nov 2017 05:03:27 -0500
+Received: from pps.filterd (m0098420.ppops.net [127.0.0.1])
+	by mx0b-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
+	vAKA3HcL088183
+	for <qemu-devel@nongnu.org>; Mon, 20 Nov 2017 05:03:21 -0500
+Received: from e06smtp13.uk.ibm.com (e06smtp13.uk.ibm.com [195.75.94.109])
+	by mx0b-001b2d01.pphosted.com with ESMTP id 2ebuyqjvjg-1
+	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Mon, 20 Nov 2017 05:03:18 -0500
+Received: from localhost
+	by e06smtp13.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	Only! Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <borntraeger@de.ibm.com>;
+	Mon, 20 Nov 2017 10:02:50 -0000
+References: <20171120091520.86128-1-borntraeger@de.ibm.com>
+	<5a4be37f-29b5-1d0d-91ab-9cb15c93e088@suse.de>
+	<08cec003-1291-8302-1280-d53cba5c7538@de.ibm.com>
+	<5a6cd622-3064-a920-8f72-bc820aa13203@suse.de>
+From: Christian Borntraeger <borntraeger@de.ibm.com>
+Date: Mon, 20 Nov 2017 11:02:46 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v7 5/5] fw_cfg: write vmcoreinfo details
+In-Reply-To: <5a6cd622-3064-a920-8f72-bc820aa13203@suse.de>
+Content-Type: text/plain; charset=windows-1252
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Message-Id: <ca89eb6e-4565-c789-02f4-98ea6ab05b2f@de.ibm.com>
+Subject: Re: [Qemu-devel] [PATCH] pc-bios/s390-ccw: build s390 bios with
+ -fno-zero-initialized-in-bss
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,151 +46,30 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: linux-kernel@vger.kernel.org
-Cc: qemu-devel@nongnu.org, somlo@cmu.edu, xiaolong.ye@intel.com, mst@redhat.com, =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
+To: Alexander Graf <agraf@suse.de>, Cornelia Huck <cohuck@redhat.com>
+Cc: qemu-devel <qemu-devel@nongnu.org>, qemu-s390x <qemu-s390x@nongnu.org>, Halil Pasic <pasic@linux.vnet.ibm.com>, Richard Henderson <rth@twiddle.net>, Thomas Huth <thuth@redhat.com>
 
-If the "etc/vmcoreinfo" fw_cfg file is present and we are not running
-the kdump kernel, write the addr/size of the vmcoreinfo ELF note.
 
-Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
-Reviewed-by: Gabriel Somlo <somlo@cmu.edu>
----
- drivers/firmware/qemu_fw_cfg.c | 82 ++++++++++++++++++++++++++++++++++++=
-+++++-
- 1 file changed, 81 insertions(+), 1 deletion(-)
 
-diff --git a/drivers/firmware/qemu_fw_cfg.c b/drivers/firmware/qemu_fw_cf=
-g.c
-index e0fe6ff037c3..66d2fd6e9452 100644
---- a/drivers/firmware/qemu_fw_cfg.c
-+++ b/drivers/firmware/qemu_fw_cfg.c
-@@ -35,6 +35,8 @@
- #include <linux/ioport.h>
- #include <linux/delay.h>
- #include <linux/dma-mapping.h>
-+#include <linux/crash_core.h>
-+#include <linux/crash_dump.h>
-=20
- MODULE_AUTHOR("Gabriel L. Somlo <somlo@cmu.edu>");
- MODULE_DESCRIPTION("QEMU fw_cfg sysfs support");
-@@ -58,6 +60,8 @@ MODULE_LICENSE("GPL");
- /* fw_cfg "file name" is up to 56 characters (including terminating nul)=
- */
- #define FW_CFG_MAX_FILE_PATH 56
-=20
-+#define VMCOREINFO_FORMAT_ELF 0x1
-+
- /* platform device for dma mapping */
- static struct device *dev;
-=20
-@@ -120,7 +124,8 @@ static ssize_t fw_cfg_dma_transfer(void *address, u32=
- length, u32 control)
- 	dma_addr_t dma;
- 	ssize_t ret =3D length;
- 	enum dma_data_direction dir =3D
--		(control & FW_CFG_DMA_CTL_READ ? DMA_FROM_DEVICE : 0);
-+		(control & FW_CFG_DMA_CTL_READ ? DMA_FROM_DEVICE : 0) |
-+		(control & FW_CFG_DMA_CTL_WRITE ? DMA_TO_DEVICE : 0);
-=20
- 	if (address && length) {
- 		dma_addr =3D dma_map_single(dev, address, length, dir);
-@@ -210,6 +215,48 @@ static ssize_t fw_cfg_read_blob(u16 key,
- 	return ret;
- }
-=20
-+#ifdef CONFIG_CRASH_CORE
-+/* write chunk of given fw_cfg blob (caller responsible for sanity-check=
-) */
-+static ssize_t fw_cfg_write_blob(u16 key,
-+				 void *buf, loff_t pos, size_t count)
-+{
-+	u32 glk =3D -1U;
-+	acpi_status status;
-+	ssize_t ret =3D count;
-+
-+	/* If we have ACPI, ensure mutual exclusion against any potential
-+	 * device access by the firmware, e.g. via AML methods:
-+	 */
-+	status =3D acpi_acquire_global_lock(ACPI_WAIT_FOREVER, &glk);
-+	if (ACPI_FAILURE(status) && status !=3D AE_NOT_CONFIGURED) {
-+		/* Should never get here */
-+		WARN(1, "%s: Failed to lock ACPI!\n", __func__);
-+		memset(buf, 0, count);
-+		return -EINVAL;
-+	}
-+
-+	mutex_lock(&fw_cfg_dev_lock);
-+	if (pos =3D=3D 0) {
-+		ret =3D fw_cfg_dma_transfer(buf, count, key << 16
-+					  | FW_CFG_DMA_CTL_SELECT
-+					  | FW_CFG_DMA_CTL_WRITE);
-+	} else {
-+		iowrite16(fw_cfg_sel_endianness(key), fw_cfg_reg_ctrl);
-+		ret =3D fw_cfg_dma_transfer(NULL, pos, FW_CFG_DMA_CTL_SKIP);
-+		if (ret < 0)
-+			goto end;
-+		ret =3D fw_cfg_dma_transfer(buf, count, FW_CFG_DMA_CTL_WRITE);
-+	}
-+
-+end:
-+	mutex_unlock(&fw_cfg_dev_lock);
-+
-+	acpi_release_global_lock(glk);
-+
-+	return ret;
-+}
-+#endif /* CONFIG_CRASH_CORE */
-+
- /* clean up fw_cfg device i/o */
- static void fw_cfg_io_cleanup(void)
- {
-@@ -328,6 +375,32 @@ struct fw_cfg_sysfs_entry {
- 	struct list_head list;
- };
-=20
-+#ifdef CONFIG_CRASH_CORE
-+static ssize_t write_vmcoreinfo(const struct fw_cfg_file *f)
-+{
-+	struct vmci {
-+		__le16 host_format;
-+		__le16 guest_format;
-+		__le32 size;
-+		__le64 paddr;
-+	} __packed;
-+	static struct vmci data;
-+	ssize_t ret;
-+
-+	data =3D (struct vmci) {
-+		.guest_format =3D cpu_to_le16(VMCOREINFO_FORMAT_ELF),
-+		.size =3D cpu_to_le32(VMCOREINFO_NOTE_SIZE),
-+		.paddr =3D cpu_to_le64(paddr_vmcoreinfo_note())
-+	};
-+	/* spare ourself reading host format support for now since we
-+	 * don't know what else to format - host may ignore ours
-+	 */
-+	ret =3D fw_cfg_write_blob(f->select, &data, 0, sizeof(struct vmci));
-+
-+	return ret;
-+}
-+#endif /* CONFIG_CRASH_CORE */
-+
- /* get fw_cfg_sysfs_entry from kobject member */
- static inline struct fw_cfg_sysfs_entry *to_entry(struct kobject *kobj)
- {
-@@ -567,6 +640,13 @@ static int fw_cfg_register_file(const struct fw_cfg_=
-file *f)
- 	int err;
- 	struct fw_cfg_sysfs_entry *entry;
-=20
-+#ifdef CONFIG_CRASH_CORE
-+	if (strcmp(f->name, "etc/vmcoreinfo") =3D=3D 0 && !is_kdump_kernel()) {
-+		if (write_vmcoreinfo(f) < 0)
-+			pr_warn("fw_cfg: failed to write vmcoreinfo");
-+	}
-+#endif
-+
- 	/* allocate new entry */
- 	entry =3D kzalloc(sizeof(*entry), GFP_KERNEL);
- 	if (!entry)
---=20
-2.15.0.277.ga3d2ad2c43
+On 11/20/2017 10:29 AM, Alexander Graf wrote:
+> On 11/20/2017 10:27 AM, Christian Borntraeger wrote:
+>>
+>> On 11/20/2017 10:19 AM, Alexander Graf wrote:
+>>> On 11/20/2017 10:15 AM, Christian Borntraeger wrote:
+>>>> The QEMU ELF loader does not initialize the bss segment. This has
+>>>> triggered several bugs in the past, e.g. see commit 5d739a4787a5
+>>>> ("s390-ccw.img: Fix sporadic errors with ccw boot image - initialize
+>>>> css").
+>>>>
+>>>> Instead of fixing these things one-by-one we can build the BIOS
+>>>> with -fno-zero-initialized-in-bss. This will move the zero variables
+>>>> also into the data segment, which is then part of a LOAD section.
+>>> Doesn't this bloat the firmware? Why don't we just manually clear bss in the firmware itself? It's what all other firmwares do :)
+>> Yes the proper fix is to initialize bss in the bios itself.
+>> I was trying to come up with something for 2.11, but since the patch does not solve the original issues, lets drop it.
+> 
+> 
+> Initializing bss is quite simple. You can probably even do it from C. Just set two variables before and after .bss in the linker script and memset(0) from start to end :).
+
+Yes, I know but then we have to change the build process to use a linker script.(we rely on the default
+linker script right now).
