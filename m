@@ -1,41 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49878)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51396)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <borntraeger@de.ibm.com>) id 1eGhl2-0004xV-Qi
-	for qemu-devel@nongnu.org; Mon, 20 Nov 2017 03:48:50 -0500
+	(envelope-from <yang.zhong@intel.com>) id 1eGhrT-00071x-Aj
+	for qemu-devel@nongnu.org; Mon, 20 Nov 2017 03:55:28 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <borntraeger@de.ibm.com>) id 1eGhkz-0000Fq-Es
-	for qemu-devel@nongnu.org; Mon, 20 Nov 2017 03:48:48 -0500
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:56836
-	helo=mx0a-001b2d01.pphosted.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <borntraeger@de.ibm.com>)
-	id 1eGhkz-0000FQ-8B
-	for qemu-devel@nongnu.org; Mon, 20 Nov 2017 03:48:45 -0500
-Received: from pps.filterd (m0098419.ppops.net [127.0.0.1])
-	by mx0b-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
-	vAK8iGeI113806
-	for <qemu-devel@nongnu.org>; Mon, 20 Nov 2017 03:48:40 -0500
-Received: from e06smtp10.uk.ibm.com (e06smtp10.uk.ibm.com [195.75.94.106])
-	by mx0b-001b2d01.pphosted.com with ESMTP id 2ebustgbrn-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Mon, 20 Nov 2017 03:48:40 -0500
-Received: from localhost
-	by e06smtp10.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
-	Only! Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <borntraeger@de.ibm.com>;
-	Mon, 20 Nov 2017 08:48:38 -0000
-From: Christian Borntraeger <borntraeger@de.ibm.com>
-References: <1510942228-22822-1-git-send-email-thuth@redhat.com>
-	<b083a168-4743-46a7-d78c-78b86d300dbc@de.ibm.com>
-Date: Mon, 20 Nov 2017 09:48:36 +0100
+	(envelope-from <yang.zhong@intel.com>) id 1eGhrQ-0003Hl-8p
+	for qemu-devel@nongnu.org; Mon, 20 Nov 2017 03:55:27 -0500
+Received: from mga11.intel.com ([192.55.52.93]:1377)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <yang.zhong@intel.com>)
+	id 1eGhrP-0003H4-T4
+	for qemu-devel@nongnu.org; Mon, 20 Nov 2017 03:55:24 -0500
+Date: Mon, 20 Nov 2017 16:54:42 +0800
+From: Zhong Yang <yang.zhong@intel.com>
+Message-ID: <20171120085442.GB6622@yangzhon-Virtual>
+References: <1510899814-19372-1-git-send-email-yang.zhong@intel.com>
+	<20171117135409.GA3669@stefanha-x1.localdomain>
+	<20171117140620.GS25830@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <b083a168-4743-46a7-d78c-78b86d300dbc@de.ibm.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Message-Id: <b4f16003-a1ff-c5dd-dc06-c285929254ba@de.ibm.com>
-Subject: Re: [Qemu-devel] [qemu-s390x] [PATCH for-2.11] pc-bios/s390-ccw:
- Fix problem with invalid virtio-scsi LUN when rebooting
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20171117140620.GS25830@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH] rcu: reduce half heap memory size by
+ malloc_trim()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -44,76 +30,77 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>, qemu-s390x@nongnu.org, Cornelia Huck <cohuck@redhat.com>
-Cc: qemu-devel@nongnu.org
+To: "Daniel P. Berrange" <berrange@redhat.com>
+Cc: qemu-devel@nongnu.org, pbonzini@redhat.com, stefanha@redhat.com, anthony.xu@intel.com, stone.xulei@huawei.com, arei.gonglei@huawei.com, wangxinxin.wang@huawei.com, weidong.huang@huawei.com, zhang.zhanghailiang@huawei.com, liujunjie23@huawei.com
 
-Thomas,
+On Fri, Nov 17, 2017 at 02:06:20PM +0000, Daniel P. Berrange wrote:
+> On Fri, Nov 17, 2017 at 01:54:09PM +0000, Stefan Hajnoczi wrote:
+> > On Fri, Nov 17, 2017 at 02:23:34PM +0800, Yang Zhong wrote:
+> > > diff --git a/util/rcu.c b/util/rcu.c
+> > > index ca5a63e..8d491a6 100644
+> > > --- a/util/rcu.c
+> > > +++ b/util/rcu.c
+> > > @@ -26,6 +26,7 @@
+> > >   * IBM's contributions to this file may be relicensed under LGPLv2 or later.
+> > >   */
+> > >  
+> > > +#include <malloc.h>
+> > 
+> > This header file is not mentioned in the C99 standard or POSIX.  It is
+> > probably not available on all host OSes that QEMU supports.  Please use
+> > #ifdef CONFIG_LINUX.
+> > 
+> > >  #include "qemu/osdep.h"
+> > >  #include "qemu-common.h"
+> > >  #include "qemu/rcu.h"
+> > > @@ -272,6 +273,9 @@ static void *call_rcu_thread(void *opaque)
+> > >              node->func(node);
+> > >          }
+> > >          qemu_mutex_unlock_iothread();
+> > > +#ifdef CONFIG_LINUX
+> > > +        malloc_trim(0);
+> > > +#endif
+> > 
+> > It is important that the rcu thread isn't overzealous in minimizing heap
+> > size if that means ordinary malloc(3) calls will experience latency
+> > spikes.  Please leave a few MB free so that malloc(3) doesn't take the
+> > slow path.
+> 
+> If you pass '0' the docs say that the minimum amount is left in the
+> heap, per M_TOP_PAD, which is 128kb.
+> 
+> Strangely the mallopt(3) man page suggests, that free() should automatically
+> trim the heap when its size exceeds M_TOP_TRIM, which is again 128kb by
+> default.  So I'm puzzelled by malloc_trim() would be needed unless there
+> are scenarios in which free() won't trim, that aren't mentioned in the
+> manpage.
+  Hello Daniel,
 
-does this patch help as well?
+  In fact, i firstly adopted mallopt() solution to optimize the heap memory,
+  but i found this function is NOT useful, which are difference with MAN's
+  description, so i had to swith to use malloc_trim().
+  
+  Regards,
 
-diff --git a/pc-bios/s390-ccw/Makefile b/pc-bios/s390-ccw/Makefile
-index 6d0c2ee..2687590 100644
---- a/pc-bios/s390-ccw/Makefile
-+++ b/pc-bios/s390-ccw/Makefile
-@@ -12,7 +12,7 @@ $(call set-vpath, $(SRC_PATH)/pc-bios/s390-ccw)
- OBJECTS = start.o main.o bootmap.o sclp.o virtio.o virtio-scsi.o virtio-blkdev.o
- QEMU_CFLAGS := $(filter -W%, $(QEMU_CFLAGS))
- QEMU_CFLAGS += -ffreestanding -fno-delete-null-pointer-checks -msoft-float
--QEMU_CFLAGS += -march=z900 -fPIE -fno-strict-aliasing
-+QEMU_CFLAGS += -march=z900 -fPIE -fno-strict-aliasing -fno-zero-initialized-in-bss
- QEMU_CFLAGS += $(call cc-option, $(QEMU_CFLAGS), -fno-stack-protector)
- LDFLAGS += -Wl,-pie -nostdlib
+  Yang
+
+> Also, how does malloc_trim interact with tcmalloc.so that people often
+> use in preference to glibc's built in malloc ?
+  Thanks, you reminded me to consider tcmalloc or jemalloc.
  
+  Whether below code is more suitable? thanks!
+  #if defined(CONFIG_LINUX) && defined(__GLIBC__)
+         malloc_trim(0);
+  #endif
 
+  Regards,
 
+  Yang
 
-On 11/17/2017 07:45 PM, Christian Borntraeger wrote:
 > 
-> 
-> On 11/17/2017 07:10 PM, Thomas Huth wrote:
->> When rebooting a guest that has a virtio-scsi disk, the s390-ccw
->> bios sometimes bails out with an error message like this:
->>
->> ! SCSI cannot report LUNs: STATUS=02 RSPN=70 KEY=05 CODE=25 QLFR=00, sure !
->>
->> Enabling the scsi_req* tracing in QEMU shows that the ccw bios is
->> trying to execute the REPORT LUNS SCSI command with a LUN != 0, and
->> this causes the SCSI command to fail.
->> Looks like we neither clear the BSS of the s390-ccw bios during reboot,
->> nor do we explicitly set the default_scsi_device.lun value to 0, so
->> this variable can contain random values from the OS after the reboot.
->> By setting this variable explicitly to 0, the problem is fixed and
->> the reboots always succeed.
->>
->> Buglink: https://bugzilla.redhat.com/show_bug.cgi?id=1514352
->> Signed-off-by: Thomas Huth <thuth@redhat.com>
-> 
-> Acked-by: Christian Borntraeger <borntraeger@de.ibm.com>
-> 
-> We had these things multile times in the past. The QEMU elf loader does not
-> zero the BSS (it just loads the load section).  Hmm, what about letting the 
-> BIOS zero its bss itself. IIRC the kernel does the same thing. I will have a
-> look into that for 2.12.
-> 
-> PS: Please do not forget to rebuild the bios
->> ---
->>  pc-bios/s390-ccw/virtio-scsi.c | 3 ++-
->>  1 file changed, 2 insertions(+), 1 deletion(-)
->>
->> diff --git a/pc-bios/s390-ccw/virtio-scsi.c b/pc-bios/s390-ccw/virtio-scsi.c
->> index c92f5d3..4fe4b9d 100644
->> --- a/pc-bios/s390-ccw/virtio-scsi.c
->> +++ b/pc-bios/s390-ccw/virtio-scsi.c
->> @@ -223,7 +223,8 @@ static void virtio_scsi_locate_device(VDev *vdev)
->>
->>      for (target = 0; target <= vdev->config.scsi.max_target; target++) {
->>          sdev->channel = channel;
->> -        sdev->target = target; /* sdev->lun will be 0 here */
->> +        sdev->target = target;
->> +        sdev->lun = 0;          /* LUN has to be 0 for REPORT LUNS */
->>          if (!scsi_report_luns(vdev, data, sizeof(data))) {
->>              if (resp.response == VIRTIO_SCSI_S_BAD_TARGET) {
->>                  continue;
->>
-> 
-> 
+> Regards,
+> Daniel
+> -- 
+> |: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
+> |: https://libvirt.org         -o-            https://fstop138.berrange.com :|
+> |: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
