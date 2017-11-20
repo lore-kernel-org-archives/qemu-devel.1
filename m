@@ -1,21 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37906)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38263)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1eGlhL-0002Gc-9n
-	for qemu-devel@nongnu.org; Mon, 20 Nov 2017 08:01:24 -0500
+	(envelope-from <thuth@redhat.com>) id 1eGli9-0002ox-O0
+	for qemu-devel@nongnu.org; Mon, 20 Nov 2017 08:02:06 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1eGlhC-0004tf-27
-	for qemu-devel@nongnu.org; Mon, 20 Nov 2017 08:01:15 -0500
-Date: Mon, 20 Nov 2017 14:00:52 +0100
-From: Cornelia Huck <cohuck@redhat.com>
-Message-ID: <20171120140052.48c7f646.cohuck@redhat.com>
-In-Reply-To: <20171120123525.147663-3-borntraeger@de.ibm.com>
+	(envelope-from <thuth@redhat.com>) id 1eGli3-0005RB-Nr
+	for qemu-devel@nongnu.org; Mon, 20 Nov 2017 08:02:05 -0500
 References: <20171120123525.147663-1-borntraeger@de.ibm.com>
-	<20171120123525.147663-3-borntraeger@de.ibm.com>
+	<20171120123525.147663-2-borntraeger@de.ibm.com>
+From: Thomas Huth <thuth@redhat.com>
+Message-ID: <3cf122b0-b258-136c-a33d-770ca51638f4@redhat.com>
+Date: Mon, 20 Nov 2017 14:01:29 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 2/2] s390x/kvm: use valgrind annotations
- for kvm device attributes
+In-Reply-To: <20171120123525.147663-2-borntraeger@de.ibm.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH 1/2] s390x/migration: use zero flag
+ parameter
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,59 +25,52 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Christian Borntraeger <borntraeger@de.ibm.com>
-Cc: qemu-devel <qemu-devel@nongnu.org>, qemu-s390x <qemu-s390x@nongnu.org>, Halil Pasic <pasic@linux.vnet.ibm.com>, Alexander Graf <agraf@suse.de>, Richard Henderson <rth@twiddle.net>, Thomas Huth <thuth@redhat.com>
+To: Christian Borntraeger <borntraeger@de.ibm.com>, Cornelia Huck <cohuck@redhat.com>
+Cc: qemu-devel <qemu-devel@nongnu.org>, qemu-s390x <qemu-s390x@nongnu.org>, Halil Pasic <pasic@linux.vnet.ibm.com>, Alexander Graf <agraf@suse.de>, Richard Henderson <rth@twiddle.net>, Jens Freimann <jfreimann@redhat.com>
 
-On Mon, 20 Nov 2017 13:35:25 +0100
-Christian Borntraeger <borntraeger@de.ibm.com> wrote:
-
-> the KVM_GET/SET_DEVICE_ATTR calls have non-self-describing
-> side effects. Use valgrind annotations to properly mark
-> all storage changes instead of using memset or designated
-> initializers.
-> 
+On 20.11.2017 13:35, Christian Borntraeger wrote:
+> valgrind pointed out that we call KVM_S390_GET_IRQ_STATE with an
+> undefined value for flags. Right now this is unused, but we
+> better play safe.
+>=20
 > Signed-off-by: Christian Borntraeger <borntraeger@de.ibm.com>
 > ---
->  hw/s390x/s390-skeys-kvm.c    | 12 ++++++++++-
->  hw/s390x/s390-stattrib-kvm.c |  7 ++++++
->  target/s390x/kvm.c           | 51 ++++++++++++++++++++++++++++++++++++++++----
->  3 files changed, 65 insertions(+), 5 deletions(-)
-> 
-> diff --git a/hw/s390x/s390-skeys-kvm.c b/hw/s390x/s390-skeys-kvm.c
-> index dc54ed8..0986795 100644
-> --- a/hw/s390x/s390-skeys-kvm.c
-> +++ b/hw/s390x/s390-skeys-kvm.c
-> @@ -13,6 +13,9 @@
->  #include "hw/s390x/storage-keys.h"
->  #include "sysemu/kvm.h"
->  #include "qemu/error-report.h"
-> +#ifdef CONFIG_VALGRIND_H
-> +#include <valgrind/memcheck.h>
-> +#endif
->  
->  static int kvm_s390_skeys_enabled(S390SKeysState *ss)
+>  target/s390x/kvm.c | 8 ++++----
+>  1 file changed, 4 insertions(+), 4 deletions(-)
+>=20
+> diff --git a/target/s390x/kvm.c b/target/s390x/kvm.c
+> index 343fcec..b0439a1 100644
+> --- a/target/s390x/kvm.c
+> +++ b/target/s390x/kvm.c
+> @@ -2069,7 +2069,10 @@ int kvm_s390_set_cpu_state(S390CPU *cpu, uint8_t=
+ cpu_state)
+> =20
+>  void kvm_s390_vcpu_interrupt_pre_save(S390CPU *cpu)
 >  {
-> @@ -35,8 +38,15 @@ static int kvm_s390_skeys_get(S390SKeysState *ss, uint64_t start_gfn,
->          .count = count,
->          .skeydata_addr = (__u64)keys
->      };
-> +    int ret;
->  
-> -    return kvm_vm_ioctl(kvm_state, KVM_S390_GET_SKEYS, &args);
-> +    ret = kvm_vm_ioctl(kvm_state, KVM_S390_GET_SKEYS, &args);
-> +    if (!ret) {
-> +#ifdef CONFIG_VALGRIND_H
-> +        VALGRIND_MAKE_MEM_DEFINED(keys, count);
-> +#endif
+> -    struct kvm_s390_irq_state irq_state;
+> +    struct kvm_s390_irq_state irq_state =3D {
+> +        .buf =3D (uint64_t) cpu->irqstate,
+> +        .len =3D VCPU_IRQ_BUF_SIZE,
+> +    };
+>      CPUState *cs =3D CPU(cpu);
+>      int32_t bytes;
+> =20
+> @@ -2077,9 +2080,6 @@ void kvm_s390_vcpu_interrupt_pre_save(S390CPU *cp=
+u)
+>          return;
+>      }
+> =20
+> -    irq_state.buf =3D (uint64_t) cpu->irqstate;
+> -    irq_state.len =3D VCPU_IRQ_BUF_SIZE;
+> -
+>      bytes =3D kvm_vcpu_ioctl(cs, KVM_S390_GET_IRQ_STATE, &irq_state);
+>      if (bytes < 0) {
+>          cpu->irqstate_saved_size =3D 0;
+>=20
 
-This looks ugly :(
+Reviewed-by: Thomas Huth <thuth@redhat.com>
 
-Is s390x the only one hitting those side effects? If we need to
-sprinkle those all over the source code, it improves valgrind results
-but makes the code harder to read...
+BTW, should we have a check in the kernel that flags is properly set to
+zero?
 
-(And no, I don't have a better idea.)
-
-> +    }
-> +    return ret;
->  }
+ Thomas
