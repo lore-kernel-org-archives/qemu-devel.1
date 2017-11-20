@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58235)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58264)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <riku.voipio@linaro.org>) id 1eGtVz-0004g1-1N
-	for qemu-devel@nongnu.org; Mon, 20 Nov 2017 16:22:03 -0500
+	(envelope-from <riku.voipio@linaro.org>) id 1eGtW1-0004nM-Nx
+	for qemu-devel@nongnu.org; Mon, 20 Nov 2017 16:22:08 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <riku.voipio@linaro.org>) id 1eGtVy-0007xd-1i
-	for qemu-devel@nongnu.org; Mon, 20 Nov 2017 16:22:03 -0500
-Received: from mail-lf0-x241.google.com ([2a00:1450:4010:c07::241]:42559)
+	(envelope-from <riku.voipio@linaro.org>) id 1eGtW0-000827-Tn
+	for qemu-devel@nongnu.org; Mon, 20 Nov 2017 16:22:05 -0500
+Received: from mail-lf0-x244.google.com ([2a00:1450:4010:c07::244]:37686)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <riku.voipio@linaro.org>)
-	id 1eGtVx-0007wv-QM
-	for qemu-devel@nongnu.org; Mon, 20 Nov 2017 16:22:01 -0500
-Received: by mail-lf0-x241.google.com with SMTP id m1so11692554lfj.9
-	for <qemu-devel@nongnu.org>; Mon, 20 Nov 2017 13:22:01 -0800 (PST)
+	id 1eGtW0-0007yn-Mk
+	for qemu-devel@nongnu.org; Mon, 20 Nov 2017 16:22:04 -0500
+Received: by mail-lf0-x244.google.com with SMTP id y2so10781007lfj.4
+	for <qemu-devel@nongnu.org>; Mon, 20 Nov 2017 13:22:04 -0800 (PST)
 From: riku.voipio@linaro.org
-Date: Mon, 20 Nov 2017 23:21:38 +0200
-Message-Id: <a8b154a637b586441bad42259a8a9b9619cd117c.1511212753.git.riku.voipio@linaro.org>
+Date: Mon, 20 Nov 2017 23:21:40 +0200
+Message-Id: <15e692a6fc716f32976eea47946a4892e8ad7a3f.1511212753.git.riku.voipio@linaro.org>
 In-Reply-To: <cover.1511212753.git.riku.voipio@linaro.org>
 References: <cover.1511212753.git.riku.voipio@linaro.org>
-Subject: [Qemu-devel] [PULL 10/15] linux-user: return EINVAL from
- prctl(PR_*_SECCOMP)
+Subject: [Qemu-devel] [PULL 12/15] linux-user/ppc: Report correct fault
+ address for data faults
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,43 +28,39 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: James Cowgill <james.cowgill@mips.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>
 
-From: James Cowgill <james.cowgill@mips.com>
+From: Peter Maydell <peter.maydell@linaro.org>
 
-If an application tries to install a seccomp filter using
-prctl(PR_SET_SECCOMP), the filter is likely for the target instead of the host
-architecture. This will probably cause qemu to be immediately killed when it
-executes another syscall.
+For faults on loads and stores, ppc_cpu_handle_mmu_fault() in
+target/ppc/user_only_helper.c stores the offending address
+in env->spr[SPR_DAR]. Report this correctly to the guest
+in si_addr, rather than incorrectly using the address of the
+instruction that caused the fault.
 
-Prevent this from happening by returning EINVAL from both seccomp prctl
-calls. This is the error returned by the kernel when seccomp support is
-disabled.
+This fixes the test case in
+https://bugs.launchpad.net/qemu/+bug/1077116
+for ppc, ppc64 and ppc64le.
 
-Fixes: https://bugs.launchpad.net/qemu/+bug/1726394
 Reviewed-by: Laurent Vivier <laurent@vivier.eu>
-Signed-off-by: James Cowgill <james.cowgill@mips.com>
+Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 Signed-off-by: Riku Voipio <riku.voipio@linaro.org>
 ---
- linux-user/syscall.c | 6 ++++++
- 1 file changed, 6 insertions(+)
+ linux-user/main.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/linux-user/syscall.c b/linux-user/syscall.c
-index 84e123b67b..f31b853bb7 100644
---- a/linux-user/syscall.c
-+++ b/linux-user/syscall.c
-@@ -10505,6 +10505,12 @@ abi_long do_syscall(void *cpu_env, int num, abi_long arg1,
+diff --git a/linux-user/main.c b/linux-user/main.c
+index b6dd9efd2d..6286661bd3 100644
+--- a/linux-user/main.c
++++ b/linux-user/main.c
+@@ -1420,7 +1420,7 @@ void cpu_loop(CPUPPCState *env)
+                 info.si_code = TARGET_SEGV_MAPERR;
+                 break;
+             }
+-            info._sifields._sigfault._addr = env->nip;
++            info._sifields._sigfault._addr = env->spr[SPR_DAR];
+             queue_signal(env, info.si_signo, QEMU_SI_FAULT, &info);
              break;
-         }
- #endif
-+        case PR_GET_SECCOMP:
-+        case PR_SET_SECCOMP:
-+            /* Disable seccomp to prevent the target disabling syscalls we
-+             * need. */
-+            ret = -TARGET_EINVAL;
-+            break;
-         default:
-             /* Most prctl options have no pointer arguments */
-             ret = get_errno(prctl(arg1, arg2, arg3, arg4, arg5));
+         case POWERPC_EXCP_ISI:      /* Instruction storage exception         */
 -- 
 2.14.2
