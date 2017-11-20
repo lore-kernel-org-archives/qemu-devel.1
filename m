@@ -1,16 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37407)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37360)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mdavidsaver@gmail.com>) id 1eGchc-0001ks-C4
-	for qemu-devel@nongnu.org; Sun, 19 Nov 2017 22:24:57 -0500
+	(envelope-from <mdavidsaver@gmail.com>) id 1eGcha-0001ha-K0
+	for qemu-devel@nongnu.org; Sun, 19 Nov 2017 22:24:55 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mdavidsaver@gmail.com>) id 1eGchb-0006WD-Iw
-	for qemu-devel@nongnu.org; Sun, 19 Nov 2017 22:24:56 -0500
+	(envelope-from <mdavidsaver@gmail.com>) id 1eGchZ-0006V3-O7
+	for qemu-devel@nongnu.org; Sun, 19 Nov 2017 22:24:54 -0500
 From: Michael Davidsaver <mdavidsaver@gmail.com>
-Date: Sun, 19 Nov 2017 21:24:16 -0600
-Message-Id: <20171120032420.9134-9-mdavidsaver@gmail.com>
+Date: Sun, 19 Nov 2017 21:24:13 -0600
+Message-Id: <20171120032420.9134-6-mdavidsaver@gmail.com>
 In-Reply-To: <20171120032420.9134-1-mdavidsaver@gmail.com>
 References: <20171120032420.9134-1-mdavidsaver@gmail.com>
-Subject: [Qemu-devel] [PATCH 08/12] e500: add mpc8540 i2c controller to ccsr
+Subject: [Qemu-devel] [PATCH 05/12] e500: name openpic and pci host bridge
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,27 +24,30 @@ Cc: qemu-devel@nongnu.org, Michael Davidsaver <mdavidsaver@gmail.com>
 
 Signed-off-by: Michael Davidsaver <mdavidsaver@gmail.com>
 ---
- hw/ppc/e500.c | 8 ++++++++
- 1 file changed, 8 insertions(+)
+ hw/ppc/e500.c | 4 ++++
+ 1 file changed, 4 insertions(+)
 
 diff --git a/hw/ppc/e500.c b/hw/ppc/e500.c
-index 6f77844303..bef7d313d4 100644
+index 057be1751b..6f77844303 100644
 --- a/hw/ppc/e500.c
 +++ b/hw/ppc/e500.c
-@@ -861,6 +861,14 @@ void ppce500_init(MachineState *machine, PPCE500Params *params)
+@@ -685,6 +685,8 @@ static DeviceState *ppce500_init_mpic_qemu(PPCE500Params *params,
+     int i, j, k;
+ 
+     dev = qdev_create(NULL, TYPE_OPENPIC);
++    object_property_add_child(qdev_get_machine(), "pic", OBJECT(dev),
++                              &error_fatal);
+     qdev_prop_set_uint32(dev, "model", params->mpic_version);
+     qdev_prop_set_uint32(dev, "nb_cpus", smp_cpus);
+ 
+@@ -876,6 +878,8 @@ void ppce500_init(MachineState *machine, PPCE500Params *params)
+ 
+     /* PCI */
+     dev = qdev_create(NULL, "e500-pcihost");
++    object_property_add_child(qdev_get_machine(), "pci-host", OBJECT(dev),
++                              &error_abort);
+     qdev_prop_set_uint32(dev, "first_slot", params->pci_first_slot);
+     qdev_prop_set_uint32(dev, "first_pin_irq", pci_irq_nrs[0]);
      qdev_init_nofail(dev);
-     ccsr_addr_space = sysbus_mmio_get_region(SYS_BUS_DEVICE(dev), 0);
- 
-+    dev = qdev_create(NULL, "mpc8540-i2c");
-+    object_property_add_child(qdev_get_machine(), "i2c[*]",
-+                              OBJECT(dev), NULL);
-+    qdev_init_nofail(dev);
-+    s = SYS_BUS_DEVICE(dev);
-+    memory_region_add_subregion(ccsr_addr_space, 0x3000,
-+                                sysbus_mmio_get_region(s, 0));
-+
-     mpicdev = ppce500_init_mpic(machine, params, ccsr_addr_space, irqs);
- 
-     /* Serial */
 -- 
 2.11.0
