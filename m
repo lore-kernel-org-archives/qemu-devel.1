@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35326)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35349)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1eGsPW-00008Y-UY
-	for qemu-devel@nongnu.org; Mon, 20 Nov 2017 15:11:19 -0500
+	(envelope-from <mreitz@redhat.com>) id 1eGsPZ-0000Ap-9u
+	for qemu-devel@nongnu.org; Mon, 20 Nov 2017 15:11:22 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1eGsPS-0007Iz-KW
-	for qemu-devel@nongnu.org; Mon, 20 Nov 2017 15:11:18 -0500
+	(envelope-from <mreitz@redhat.com>) id 1eGsPY-0007OC-FI
+	for qemu-devel@nongnu.org; Mon, 20 Nov 2017 15:11:21 -0500
 From: Max Reitz <mreitz@redhat.com>
-Date: Mon, 20 Nov 2017 21:09:53 +0100
-Message-Id: <20171120201004.14999-15-mreitz@redhat.com>
+Date: Mon, 20 Nov 2017 21:09:54 +0100
+Message-Id: <20171120201004.14999-16-mreitz@redhat.com>
 In-Reply-To: <20171120201004.14999-1-mreitz@redhat.com>
 References: <20171120201004.14999-1-mreitz@redhat.com>
-Subject: [Qemu-devel] [PATCH v7 for-2.12 14/25] block/nbd: Make
- bdrv_dirname() return NULL
+Subject: [Qemu-devel] [PATCH v7 for-2.12 15/25] block/nfs: Implement
+ bdrv_dirname()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,60 +23,48 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org
 Cc: qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Alberto Garcia <berto@igalia.com>, Eric Blake <eblake@redhat.com>, John Snow <jsnow@redhat.com>
 
-The generic bdrv_dirname() implementation would be able to generate some
-form of directory name for many NBD nodes, but it would be always wrong.
-Therefore, we have to explicitly make it an error (until NBD has some
-form of specification for export paths, if it ever will).
+While the basic idea is obvious and could be handled by the default
+bdrv_dirname() implementation, we cannot generate a directory name if
+the gid or uid are set, so we have to explicitly return NULL in those
+cases.
 
 Signed-off-by: Max Reitz <mreitz@redhat.com>
+Reviewed-by: Alberto Garcia <berto@igalia.com>
 ---
- block/nbd.c | 13 +++++++++++++
- 1 file changed, 13 insertions(+)
+ block/nfs.c | 14 ++++++++++++++
+ 1 file changed, 14 insertions(+)
 
-diff --git a/block/nbd.c b/block/nbd.c
-index a50d24b50a..ed921fa333 100644
---- a/block/nbd.c
-+++ b/block/nbd.c
-@@ -565,6 +565,16 @@ static void nbd_refresh_filename(BlockDriverState *bs, QDict *options)
+diff --git a/block/nfs.c b/block/nfs.c
+index 337fcd9c84..0152a9bd32 100644
+--- a/block/nfs.c
++++ b/block/nfs.c
+@@ -875,6 +875,19 @@ static void nfs_refresh_filename(BlockDriverState *bs, QDict *options)
      bs->full_open_options = opts;
  }
  
-+static char *nbd_dirname(BlockDriverState *bs, Error **errp)
++static char *nfs_dirname(BlockDriverState *bs, Error **errp)
 +{
-+    /* The generic bdrv_dirname() implementation is able to work out some
-+     * directory name for NBD nodes, but that would be wrong. So far there is no
-+     * specification for how "export paths" would work, so NBD does not have
-+     * directory names. */
-+    error_setg(errp, "Cannot generate a base directory for NBD nodes");
-+    return NULL;
++    NFSClient *client = bs->opaque;
++
++    if (client->uid || client->gid) {
++        error_setg(errp, "Cannot generate a base directory for NBD node '%s'",
++                   bs->filename);
++        return NULL;
++    }
++
++    return g_strdup_printf("nfs://%s%s/", client->server->host, client->path);
 +}
 +
- static BlockDriver bdrv_nbd = {
-     .format_name                = "nbd",
-     .protocol_name              = "nbd",
-@@ -582,6 +592,7 @@ static BlockDriver bdrv_nbd = {
-     .bdrv_detach_aio_context    = nbd_detach_aio_context,
-     .bdrv_attach_aio_context    = nbd_attach_aio_context,
-     .bdrv_refresh_filename      = nbd_refresh_filename,
-+    .bdrv_dirname               = nbd_dirname,
- };
+ #ifdef LIBNFS_FEATURE_PAGECACHE
+ static void nfs_invalidate_cache(BlockDriverState *bs,
+                                  Error **errp)
+@@ -908,6 +921,7 @@ static BlockDriver bdrv_nfs = {
+     .bdrv_detach_aio_context        = nfs_detach_aio_context,
+     .bdrv_attach_aio_context        = nfs_attach_aio_context,
+     .bdrv_refresh_filename          = nfs_refresh_filename,
++    .bdrv_dirname                   = nfs_dirname,
  
- static BlockDriver bdrv_nbd_tcp = {
-@@ -601,6 +612,7 @@ static BlockDriver bdrv_nbd_tcp = {
-     .bdrv_detach_aio_context    = nbd_detach_aio_context,
-     .bdrv_attach_aio_context    = nbd_attach_aio_context,
-     .bdrv_refresh_filename      = nbd_refresh_filename,
-+    .bdrv_dirname               = nbd_dirname,
- };
- 
- static BlockDriver bdrv_nbd_unix = {
-@@ -620,6 +632,7 @@ static BlockDriver bdrv_nbd_unix = {
-     .bdrv_detach_aio_context    = nbd_detach_aio_context,
-     .bdrv_attach_aio_context    = nbd_attach_aio_context,
-     .bdrv_refresh_filename      = nbd_refresh_filename,
-+    .bdrv_dirname               = nbd_dirname,
- };
- 
- static void bdrv_nbd_init(void)
+ #ifdef LIBNFS_FEATURE_PAGECACHE
+     .bdrv_invalidate_cache          = nfs_invalidate_cache,
 -- 
 2.13.6
