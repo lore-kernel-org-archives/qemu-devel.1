@@ -1,22 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50566)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51366)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jcody@redhat.com>) id 1eGmLh-0001ug-GK
-	for qemu-devel@nongnu.org; Mon, 20 Nov 2017 08:42:58 -0500
+	(envelope-from <jcody@redhat.com>) id 1eGmOH-0002nB-KW
+	for qemu-devel@nongnu.org; Mon, 20 Nov 2017 08:45:41 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jcody@redhat.com>) id 1eGmLg-00050D-Kw
-	for qemu-devel@nongnu.org; Mon, 20 Nov 2017 08:42:57 -0500
-Date: Mon, 20 Nov 2017 08:42:40 -0500
+	(envelope-from <jcody@redhat.com>) id 1eGmOG-00065J-Nh
+	for qemu-devel@nongnu.org; Mon, 20 Nov 2017 08:45:37 -0500
+Date: Mon, 20 Nov 2017 08:45:21 -0500
 From: Jeff Cody <jcody@redhat.com>
-Message-ID: <20171120134240.GH5399@localhost.localdomain>
+Message-ID: <20171120134521.GB32161@localhost.localdomain>
 References: <cover.1511145863.git.jcody@redhat.com>
-	<5bec37564f83e39e216d2ebcf7a380b0c7704e0e.1511145863.git.jcody@redhat.com>
-	<20171120112826.GC4516@stefanha-x1.localdomain>
+	<0c039d00e03331d863ee249810d9778313670803.1511145863.git.jcody@redhat.com>
+	<20171120114334.GD4516@stefanha-x1.localdomain>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20171120112826.GC4516@stefanha-x1.localdomain>
-Subject: Re: [Qemu-devel] [Qemu-block] [PATCH 2/5] coroutine: abort if we
- try to enter coroutine scheduled for another ctx
+In-Reply-To: <20171120114334.GD4516@stefanha-x1.localdomain>
+Subject: Re: [Qemu-devel] [Qemu-block] [PATCH 3/5] coroutines: abort if we
+ try to enter a still-sleeping coroutine
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,70 +28,45 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: Stefan Hajnoczi <stefanha@gmail.com>
 Cc: qemu-devel@nongnu.org, kwolf@redhat.com, famz@redhat.com, qemu-block@nongnu.org, mreitz@redhat.com, stefanha@redhat.com, pbonzini@redhat.com
 
-On Mon, Nov 20, 2017 at 11:28:26AM +0000, Stefan Hajnoczi wrote:
-> On Sun, Nov 19, 2017 at 09:46:43PM -0500, Jeff Cody wrote:
+On Mon, Nov 20, 2017 at 11:43:34AM +0000, Stefan Hajnoczi wrote:
+> On Sun, Nov 19, 2017 at 09:46:44PM -0500, Jeff Cody wrote:
 > > diff --git a/include/qemu/coroutine_int.h b/include/qemu/coroutine_int.h
-> > index cb98892..931cdc9 100644
+> > index 931cdc9..b071217 100644
 > > --- a/include/qemu/coroutine_int.h
 > > +++ b/include/qemu/coroutine_int.h
-> > @@ -53,6 +53,9 @@ struct Coroutine {
+> > @@ -56,6 +56,8 @@ struct Coroutine {
 > >  
-> >      /* Only used when the coroutine has yielded.  */
-> >      AioContext *ctx;
-> > +
-> > +    int scheduled;
+> >      int scheduled;
+> >  
+> > +    int sleeping;
 > 
 > s/int/bool/
 > 
 
 OK.
 
-> > diff --git a/util/qemu-coroutine.c b/util/qemu-coroutine.c
-> > index d6095c1..2edab63 100644
-> > --- a/util/qemu-coroutine.c
-> > +++ b/util/qemu-coroutine.c
-> > @@ -109,6 +109,15 @@ void qemu_aio_coroutine_enter(AioContext *ctx, Coroutine *co)
-> >  
-> >      trace_qemu_aio_coroutine_enter(ctx, self, co, co->entry_arg);
-> >  
-> > +    /* if the Coroutine has already been scheduled, entering it again will
-> > +     * cause us to enter it twice, potentially even after the coroutine has
-> > +     * been deleted */
-> > +    if (co->scheduled == 1) {
-> > +        fprintf(stderr, "Cannot enter a co-routine that has already "
-> > +                        "been scheduled to run in a different AioContext\n");
+> BTW an alternative to adding individual bools is to implement a finite
+> state machine for the entire coroutine lifecycle.  A single function can
+> validate all state transitions:
 > 
-> This error message is too specific, the AioContext doesn't have to be
-> different from the current one:
+>   void check_state_transition(CoState old, CoState new,
+>                               const char *action)
+>   {
+>       const char *errmsg = fsm[old][new];
+>       if (!errmsg) {
+>           return; /* valid transition! */
+>       }
 > 
-> block/blkdebug.c:        aio_co_schedule(qemu_get_current_aio_context(), qemu_coroutine_self());
+>       fprintf(stderr, "Cannot %s coroutine from %s state\n",
+>               action, state_name[old]);
+>       abort();
+>   }
 > 
-> If something calls qemu_aio_coroutine_enter() on the coroutine it might
-> be from the same AioContext - but still an error condition worth failing
-> loudly on.
-> 
+> Specifying fsm[][] forces us to think through all possible state
+> transitions.  This approach is proactive whereas adding bool flags is
+> reactive since it only covers a subset of states that were encountered
+> after crashes.  I'm not sure if it's worth it though :).
 
-Good point.
-
-
-> I suggest simplifying the error message:
-> 
->   fprintf(stderr, "Cannot enter a co-routine that has already "
->                   "been scheduled\n");
-
-OK. I'll also change the wording here to what you have above, as well:
-
-  void aio_co_schedule(AioContext *ctx, Coroutine *co)
-  {
-       trace_aio_co_schedule(ctx, co);
-  +    if (co->scheduled == 1) {
-  +        fprintf(stderr,
-  +                "Cannot schedule a co-routine that is already scheduled\n");
-  +        abort();
-  +    }
-  +    co->scheduled = 1;
-       QSLIST_INSERT_HEAD_ATOMIC(&ctx->scheduled_coroutines,
-                                 co, co_scheduled_next);
-
+Interesting idea; maybe more for 2.12 instead of 2.11, though?
 
 Jeff
