@@ -1,29 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44547)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49320)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <shameerali.kolothum.thodi@huawei.com>)
-	id 1eGoyu-0006LA-03
-	for qemu-devel@nongnu.org; Mon, 20 Nov 2017 11:31:37 -0500
+	(envelope-from <kwolf@redhat.com>) id 1eGpCW-0001Sf-9B
+	for qemu-devel@nongnu.org; Mon, 20 Nov 2017 11:45:41 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <shameerali.kolothum.thodi@huawei.com>)
-	id 1eGoys-0005Ei-Pw
-	for qemu-devel@nongnu.org; Mon, 20 Nov 2017 11:31:36 -0500
-From: Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>
-Date: Mon, 20 Nov 2017 16:31:17 +0000
-Message-ID: <5FC3163CFD30C246ABAA99954A238FA8384726CE@FRAEML521-MBX.china.huawei.com>
-References: <1510622154-17224-1-git-send-email-zhuyijun@huawei.com>
-	<1510622154-17224-2-git-send-email-zhuyijun@huawei.com>
-	<20171114084735.68e87546@t450s.home>
-	<5FC3163CFD30C246ABAA99954A238FA83845EDBF@FRAEML521-MBX.china.huawei.com>
-	<20171115112513.3c035023@t450s.home>
-	<5FC3163CFD30C246ABAA99954A238FA8384704C0@FRAEML521-MBX.china.huawei.com>
-	<20171120085745.0147df5c@t450s.home>
-In-Reply-To: <20171120085745.0147df5c@t450s.home>
-Content-Language: en-US
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+	(envelope-from <kwolf@redhat.com>) id 1eGpCT-0001bp-7E
+	for qemu-devel@nongnu.org; Mon, 20 Nov 2017 11:45:40 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:54792)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <kwolf@redhat.com>) id 1eGpCT-0001be-0I
+	for qemu-devel@nongnu.org; Mon, 20 Nov 2017 11:45:37 -0500
+Date: Mon, 20 Nov 2017 17:45:32 +0100
+From: Kevin Wolf <kwolf@redhat.com>
+Message-ID: <20171120164532.GF7197@localhost.localdomain>
+References: <20171012235439.19457-1-anatol.pomozov@gmail.com>
+	<20171012235439.19457-4-anatol.pomozov@gmail.com>
+	<CAOMFOmUaJT+OdfN9Yin91AiP_+HXMbVFXuPY0FORb1PNvzYCmw@mail.gmail.com>
+	<20171019093647.GA6195@localhost.localdomain>
+	<CAOMFOmVQ0zWgqjMED-AWfS5Nt2caoHz5JxXmc690AEqD1Kji_w@mail.gmail.com>
+	<CAOMFOmUNrgZhpzkXLx2Ne1RKpPS6AbVU7LvBmKE=E6QZiWnw8w@mail.gmail.com>
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [RFC 1/5] hw/vfio: Add function for getting
- reserved_region of device iommu group
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CAOMFOmUNrgZhpzkXLx2Ne1RKpPS6AbVU7LvBmKE=E6QZiWnw8w@mail.gmail.com>
+Subject: Re: [Qemu-devel] [PATCH 3/4] multiboot: load elf sections and
+ section headers
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,163 +32,40 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alex Williamson <alex.williamson@redhat.com>
-Cc: "eric.auger@redhat.com" <eric.auger@redhat.com>, Zhuyijun <zhuyijun@huawei.com>, "qemu-arm@nongnu.org" <qemu-arm@nongnu.org>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "peter.maydell@linaro.org" <peter.maydell@linaro.org>, Zhaoshenglong <zhaoshenglong@huawei.com>, Linuxarm <linuxarm@huawei.com>
+To: Anatol Pomozov <anatol.pomozov@gmail.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, Richard Henderson <rth@twiddle.net>, Eduardo Habkost <ehabkost@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Alexander Graf <agraf@suse.de>, peter.maydell@linaro.org
 
-
-
-> -----Original Message-----
-> From: Alex Williamson [mailto:alex.williamson@redhat.com]
-> Sent: Monday, November 20, 2017 3:58 PM
-> To: Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>
-> Cc: eric.auger@redhat.com; Zhuyijun <zhuyijun@huawei.com>; qemu-
-> arm@nongnu.org; qemu-devel@nongnu.org; peter.maydell@linaro.org;
-> Zhaoshenglong <zhaoshenglong@huawei.com>; Linuxarm
-> <linuxarm@huawei.com>
-> Subject: Re: [Qemu-devel] [RFC 1/5] hw/vfio: Add function for getting
-> reserved_region of device iommu group
->=20
-> On Mon, 20 Nov 2017 11:58:43 +0000
-> Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com> wrote:
->=20
-> > > -----Original Message-----
-> > > From: Alex Williamson [mailto:alex.williamson@redhat.com]
-> > > Sent: Wednesday, November 15, 2017 6:25 PM
-> > > To: Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>
-> > > Cc: Zhuyijun <zhuyijun@huawei.com>; qemu-arm@nongnu.org; qemu-
-> > > devel@nongnu.org; eric.auger@redhat.com; peter.maydell@linaro.org;
-> > > Zhaoshenglong <zhaoshenglong@huawei.com>
-> > > Subject: Re: [Qemu-devel] [RFC 1/5] hw/vfio: Add function for getting
-> > > reserved_region of device iommu group
-> > >
-> > > On Wed, 15 Nov 2017 09:49:41 +0000
-> > > Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>
-> wrote:
-> > >
-> > > > Hi Alex,
-> > > >
-> > > > > -----Original Message-----
-> > > > > From: Alex Williamson [mailto:alex.williamson@redhat.com]
-> > > > > Sent: Tuesday, November 14, 2017 3:48 PM
-> > > > > To: Zhuyijun <zhuyijun@huawei.com>
-> > > > > Cc: qemu-arm@nongnu.org; qemu-devel@nongnu.org;
-> > > > > eric.auger@redhat.com; peter.maydell@linaro.org; Shameerali
-> Kolothum
-> > > > > Thodi <shameerali.kolothum.thodi@huawei.com>; Zhaoshenglong
-> > > > > <zhaoshenglong@huawei.com>
-> > > > > Subject: Re: [Qemu-devel] [RFC 1/5] hw/vfio: Add function for get=
-ting
-> > > > > reserved_region of device iommu group
-> > > > >
-> > > > > On Tue, 14 Nov 2017 09:15:50 +0800
-> > > > > <zhuyijun@huawei.com> wrote:
-> > > > >
-> > > > > > From: Zhu Yijun <zhuyijun@huawei.com>
-> > > > > >
-> > > > > > With kernel 4.11, iommu/smmu will populate the MSI IOVA reserve=
-d
-> > > > > > window and PCI reserved window which has to be excluded from
-> Guest
-> > > iova
-> > > > > allocations.
-> > > > > >
-> > > > > > However, If it falls within the Qemu default virtual memory add=
-ress
-> > > > > > space, then reserved regions may get allocated for a Guest VF D=
-MA
-> iova
-> > > > > > and it will fail.
-> > > > > >
-> > > > > > So get those reserved regions in this patch and create some hol=
-es in
-> > > > > > the Qemu ram address in next patchset.
-> > > > > >
-> > > > > > Signed-off-by: Zhu Yijun <zhuyijun@huawei.com>
-> > > > > > ---
-> > > > > >  hw/vfio/common.c              | 67
-> > > > > +++++++++++++++++++++++++++++++++++++++++++
-> > > > > >  hw/vfio/pci.c                 |  2 ++
-> > > > > >  hw/vfio/platform.c            |  2 ++
-> > > > > >  include/exec/memory.h         |  7 +++++
-> > > > > >  include/hw/vfio/vfio-common.h |  3 ++
-> > > > > >  5 files changed, 81 insertions(+)
-> > > > >
-> > > > > I generally prefer the vfio interface to be more self sufficient,=
- if there
-> are
-> > > > > regions the IOMMU cannot map, we should be describing those via
-> > > capabilities
-> > > > > on the container through the vfio interface.  If we're just scrap=
-ing
-> together
-> > > > > things from sysfs, the user can just as easily do that and provid=
-e an
-> explicit
-> > > > > memory map for the VM taking the devices into account.
-> > > >
-> > > > Ok. I was under the impression that the purpose of introducing the
-> > > > /sys/kernel/iommu_groups/reserved_regions was to get the IOVA regio=
-ns
-> > > > that are reserved(MSI or non-mappable) for Qemu or other apps to
-> > > > make use of.  I think this was introduced as part of the "KVM/MSI
-> passthrough
-> > > > support on ARM" patch series. And if I remember correctly, Eric had
-> > > > an approach where the user space can retrieve all the reserved regi=
-ons
-> > > through
-> > > > the VFIO_IOMMU_GET_INFO ioctl and later this idea was replaced with
-> the
-> > > > sysfs interface.
-> > > >
-> > > > May be I am missing something here.
-> > >
-> > > And sysfs is a good interface if the user wants to use it to configur=
-e
-> > > the VM in a way that's compatible with a device.  For instance, in yo=
-ur
-> > > case, a user could evaluate these reserved regions across all devices=
- in
-> > > a system, or even across an entire cluster, and instantiate the VM wi=
-th
-> > > a memory map compatible with hotplugging any of those evaluated
-> > > devices (QEMU implementation of allowing the user to do this TBD).
-> > > Having the vfio device evaluate these reserved regions only helps in
-> > > the cold-plug case.  So the proposed solution is limited in scope and
-> > > doesn't address similar needs on other platforms.  There is value to
-> > > verifying that a device's IOVA space is compatible with a VM memory m=
-ap
-> > > and modifying the memory map on cold-plug or rejecting the device on
-> > > hot-plug, but isn't that why we have an ioctl within vfio to expose
-> > > information about the IOMMU?  Why take the path of allowing QEMU to
-> > > rummage through sysfs files outside of vfio, implying additional
-> > > security and access concerns, rather than filling the gap within the
-> > > vifo API?
+Am 17.11.2017 um 22:33 hat Anatol Pomozov geschrieben:
+> On Tue, Oct 31, 2017 at 11:38 AM, Anatol Pomozov
+> <anatol.pomozov@gmail.com> wrote:
+> > Hi
 > >
-> > Thanks Alex for the explanation.
+> > On Thu, Oct 19, 2017 at 2:36 AM, Kevin Wolf <kwolf@redhat.com> wrote:
+> >> Am 18.10.2017 um 19:22 hat Anatol Pomozov geschrieben:
+> >>> Hello qemu-devs,
+> >>>
+> >>> This patchset has been posted a while ago. I would like to move
+> >>> forward with it and look at the next task (e.g. multiboot2 support in
+> >>> QEMU). Who is the multiboot code maintainer who can help to review
+> >>> this patchset and give go/no-go answer?
+> >>
+> >> I think that's exactly your problem, there is nobody who feels
+> >> responsible for Multiboot support. Officially, it is part of the PC/x86
+> >> subsystems:
 > >
-> > I came across this patch[1] from Eric where he introduced the IOCTL
-> interface to
-> > retrieve the reserved regions. It looks like this can be reworked to
-> accommodate
-> > the above requirement.
->=20
-> I don't think we need a new ioctl for this, nor do I think that
-> describing the holes is the correct approach.  The existing
-> VFIO_IOMMU_GET_INFO ioctl can be extended to support capability chains,
-> as we've done for VFIO_DEVICE_GET_REGION_INFO.=20
+> > In this case I would like to become the official Qemu/Multiboot
+> > maintainer. I do development related to x86 osdev and actively use
+> > qemu for my projects. I am interested in having a feature-rich and
+> > robust Multiboot implementation.
+> 
+> It is very unfortunate to see lack of interest in improving
+> qemu/multiboot functionality. I guess my best option for now is to
+> avoid using qemu multiboot implementation and use grub instead.
 
-Right, as far as I can see the above mentioned patch is doing exactly the s=
-ame,=20
-extending the VFIO_IOMMU_GET_INFO ioctl with capability chain.
+Let's wait until 2.11 is out and we're out of freeze, and then I think
+your best bet is to just prepare a pull request that adds you to
+MAINTAINERS and applies the patches you created so far.
 
-> IMO, we should try to
-> describe the available fixed IOVA regions which are available for
-> mapping rather than describing various holes within the address space
-> which are unavailable.  The latter method always fails to describe the
-> end of the mappable IOVA space and gets bogged down in trying to
-> classify the types of holes that might exist.  Thanks,
+Peter, does this sound right?
 
-Ok. I guess that is to take care iommu max address width case.
-
-Thanks,
-Shameer
+Kevin
