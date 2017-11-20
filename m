@@ -1,31 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42948)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44620)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1eGsk9-0001yb-Lz
-	for qemu-devel@nongnu.org; Mon, 20 Nov 2017 15:32:38 -0500
+	(envelope-from <eblake@redhat.com>) id 1eGso9-0004WN-DO
+	for qemu-devel@nongnu.org; Mon, 20 Nov 2017 15:36:46 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1eGsk6-0003zr-6T
-	for qemu-devel@nongnu.org; Mon, 20 Nov 2017 15:32:37 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:58942)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1eGsk5-0003wp-Rh
-	for qemu-devel@nongnu.org; Mon, 20 Nov 2017 15:32:34 -0500
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
-	[10.5.11.11])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 3C2362CE91A
-	for <qemu-devel@nongnu.org>; Mon, 20 Nov 2017 20:32:32 +0000 (UTC)
-Date: Mon, 20 Nov 2017 22:32:29 +0200
-From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <20171120223048-mutt-send-email-mst@kernel.org>
-References: <1510834622-28800-1-git-send-email-thuth@redhat.com>
-	<20171120175522.76bf71c3@redhat.com>
+	(envelope-from <eblake@redhat.com>) id 1eGso8-0005CN-7M
+	for qemu-devel@nongnu.org; Mon, 20 Nov 2017 15:36:45 -0500
+References: <20171117190422.23626-1-eblake@redhat.com>
+	<6f4f6793-c3fc-6711-39af-971964adb37c@redhat.com>
+	<367da343-8031-56b4-a6d2-bf7191447bd5@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <aa14c192-9b58-ea65-da63-db1d357097cd@redhat.com>
+Date: Mon, 20 Nov 2017 14:36:32 -0600
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20171120175522.76bf71c3@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v2] tests/bios-tables-test: Fix endianess
- problems when passing data to iasl
+In-Reply-To: <367da343-8031-56b4-a6d2-bf7191447bd5@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="LnBg46IsTV4q0aQgdUNCXL30rp5IIk31X"
+Subject: Re: [Qemu-devel] [Qemu-block] [PATCH for-2.11] iotests: Fix 176 on
+ 32-bit host
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,74 +26,78 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Igor Mammedov <imammedo@redhat.com>
-Cc: Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org
+To: John Snow <jsnow@redhat.com>, qemu-devel@nongnu.org
+Cc: kwolf@redhat.com, qemu-block@nongnu.org, mreitz@redhat.com
 
-On Mon, Nov 20, 2017 at 05:55:22PM +0100, Igor Mammedov wrote:
-> On Thu, 16 Nov 2017 13:17:02 +0100
-> Thomas Huth <thuth@redhat.com> wrote:
-> 
-> > The bios-tables-test was writing out files that we pass to iasl in
-> > with the wrong endianness in the header when running on a big endian
-> > host. So instead of storing mixed endian information in our structures,
-> > let's keep everything in little endian and byte-swap it only when we
-> > need a value in the code.
-> > 
-> > Reported-by: Daniel P. Berrange <berrange@redhat.com>
-> > Buglink: https://bugs.launchpad.net/qemu/+bug/1724570
-> > Suggested-by: Michael S. Tsirkin <mst@redhat.com>
-> > Signed-off-by: Thomas Huth <thuth@redhat.com>
-> > ---
-> >  v2: Fixed vmgenid-test which was accidentially broken in v1
-> > 
-> >  tests/acpi-utils.h       | 27 +++++----------------------
-> >  tests/bios-tables-test.c | 42 ++++++++++++++++++++++--------------------
-> >  tests/vmgenid-test.c     | 22 ++++++++++++----------
-> >  3 files changed, 39 insertions(+), 52 deletions(-)
-> > 
-> > diff --git a/tests/acpi-utils.h b/tests/acpi-utils.h
-> > index f8d8723..d5ca5b6 100644
-> > --- a/tests/acpi-utils.h
-> > +++ b/tests/acpi-utils.h
-> > @@ -28,24 +28,9 @@ typedef struct {
-> >      bool tmp_files_retain;   /* do not delete the temp asl/aml */
-> >  } AcpiSdtTable;
-> >  
-> > -#define ACPI_READ_FIELD(field, addr)           \
-> > -    do {                                       \
-> > -        switch (sizeof(field)) {               \
-> > -        case 1:                                \
-> > -            field = readb(addr);               \
-> > -            break;                             \
-> > -        case 2:                                \
-> > -            field = readw(addr);               \
-> > -            break;                             \
-> > -        case 4:                                \
-> > -            field = readl(addr);               \
-> > -            break;                             \
-> > -        case 8:                                \
-> > -            field = readq(addr);               \
-> > -            break;                             \
-> > -        default:                               \
-> > -            g_assert(false);                   \
-> > -        }                                      \
-> probably it's been discussed but, why not do
->  leXX_to_cpu()
-> here, instead of making each place that access read field
-> to do leXX_to_cpu() manually.?
-> 
-> Beside of keeping access to structure in natural host order,
-> it should also be less error-prone as field users don't
-> have to worry about endianness.
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--LnBg46IsTV4q0aQgdUNCXL30rp5IIk31X
+From: Eric Blake <eblake@redhat.com>
+To: John Snow <jsnow@redhat.com>, qemu-devel@nongnu.org
+Cc: kwolf@redhat.com, qemu-block@nongnu.org, mreitz@redhat.com
+Message-ID: <aa14c192-9b58-ea65-da63-db1d357097cd@redhat.com>
+Subject: Re: [Qemu-block] [Qemu-devel] [PATCH for-2.11] iotests: Fix 176 on
+ 32-bit host
+References: <20171117190422.23626-1-eblake@redhat.com>
+ <6f4f6793-c3fc-6711-39af-971964adb37c@redhat.com>
+ <367da343-8031-56b4-a6d2-bf7191447bd5@redhat.com>
+In-Reply-To: <367da343-8031-56b4-a6d2-bf7191447bd5@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-Yes, I suggested that.
-The issue is that we don't byte-swap all of the tables
-(we can't, that would require a full ACPI parser).
-So when byte-swapping we end up with a mixed host/LE
-structures.
+On 11/17/2017 04:59 PM, John Snow wrote:
+>>> So for this test, the easiest solution is to filter out the
+>>> actual hash value.  Broken in commit 4096974e.
+>>
+>> Of course, if Kevin sends a v2 pull, it's probably better to just squa=
+sh
+>> this in to my original testsuite change (since a v2 would probably
+>> invalidate that commit id).
+>>
+>=20
+> Whichever way you go,
 
-Keeping it all LE seems cleaner.
+Commit 4096974e has already landed in master, so this commit message is
+correct as-is and belongs in the next pull request (whether for -rc2 or
+-rc3 depends on timing).
+
+>=20
+> Reviewed-by: John Snow <jsnow@redhat.com>
+>=20
+> I don't know how important it is to nail this down, but the purpose of
+> this command is primarily for sanity testing and not necessarily betwee=
+n
+> architectures, so this might just be a limitation to document.
+>=20
+> Also, don't use this for anything except testing.
+
+Indeed, the name of x-debug-block-dirty-bitmap-sha256 already implies
+its limited portability; but it also gives us free reign to change it's
+behavior if we find something we like better for the same ease of bitmap
+testing/debugging.
+
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
 
 
--- 
-MST
+--LnBg46IsTV4q0aQgdUNCXL30rp5IIk31X
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAloTPNAACgkQp6FrSiUn
+Q2qA6Qf9Ew30rNKoR1e97zSvHDM01t4eIkVOh/z6xTHmw3zbBoLYZ8lg4nCpv/vl
+oVrcOdh+c5SCLHjrW9JWHyvfl96JL6KMWtGgHDuKLF4Yb9kIGiKzoAd2OXWObrs0
+PooGL4mZt0gYjbpnc9qVO1KxDpQJ8XKD51U68ICSif24NbdWej/EK4JX/EJMR3kQ
+jIQEyjnD47X34hM0MpQKnsjFHAj5sW1wOIJSA+RjLYvc1GXVEqWXfhhtO9c7TlFX
+9NXQOuk5V8gUC8BMnBv8NCgaBqXNBhLgQ/LzLTUq6yekiQHAGN8qA5JdLjelQwkd
+koqMmOmEKpv0Ok3pIrv8R7lgSsZPxQ==
+=al/A
+-----END PGP SIGNATURE-----
+
+--LnBg46IsTV4q0aQgdUNCXL30rp5IIk31X--
