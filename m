@@ -1,22 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42832)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47277)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1eGkFd-0005Nw-SD
-	for qemu-devel@nongnu.org; Mon, 20 Nov 2017 06:28:34 -0500
+	(envelope-from <wei.w.wang@intel.com>) id 1eGkRg-00078C-5F
+	for qemu-devel@nongnu.org; Mon, 20 Nov 2017 06:41:01 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1eGkFa-0000DX-OQ
-	for qemu-devel@nongnu.org; Mon, 20 Nov 2017 06:28:33 -0500
-Date: Mon, 20 Nov 2017 11:28:26 +0000
-From: Stefan Hajnoczi <stefanha@gmail.com>
-Message-ID: <20171120112826.GC4516@stefanha-x1.localdomain>
-References: <cover.1511145863.git.jcody@redhat.com>
-	<5bec37564f83e39e216d2ebcf7a380b0c7704e0e.1511145863.git.jcody@redhat.com>
+	(envelope-from <wei.w.wang@intel.com>) id 1eGkRb-000695-Cv
+	for qemu-devel@nongnu.org; Mon, 20 Nov 2017 06:41:00 -0500
+Received: from mga03.intel.com ([134.134.136.65]:58316)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <wei.w.wang@intel.com>)
+	id 1eGkRb-00068U-4k
+	for qemu-devel@nongnu.org; Mon, 20 Nov 2017 06:40:55 -0500
+Message-ID: <5A12BFB0.5030402@intel.com>
+Date: Mon, 20 Nov 2017 19:42:40 +0800
+From: Wei Wang <wei.w.wang@intel.com>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="kfjH4zxOES6UT95V"
-Content-Disposition: inline
-In-Reply-To: <5bec37564f83e39e216d2ebcf7a380b0c7704e0e.1511145863.git.jcody@redhat.com>
-Subject: Re: [Qemu-devel] [Qemu-block] [PATCH 2/5] coroutine: abort if we
- try to enter coroutine scheduled for another ctx
+References: <1509696786-1597-1-git-send-email-wei.w.wang@intel.com>
+	<1509696786-1597-7-git-send-email-wei.w.wang@intel.com>
+	<5A097548.8000608@intel.com>
+	<20171113192309-mutt-send-email-mst@kernel.org>
+In-Reply-To: <20171113192309-mutt-send-email-mst@kernel.org>
+Content-Type: text/plain; charset=windows-1252; format=flowed
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v17 6/6] virtio-balloon:
+ VIRTIO_BALLOON_F_FREE_PAGE_VQ
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,75 +31,90 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Jeff Cody <jcody@redhat.com>
-Cc: qemu-devel@nongnu.org, kwolf@redhat.com, famz@redhat.com, qemu-block@nongnu.org, mreitz@redhat.com, stefanha@redhat.com, pbonzini@redhat.com
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: virtio-dev@lists.oasis-open.org, linux-kernel@vger.kernel.org, qemu-devel@nongnu.org, virtualization@lists.linux-foundation.org, kvm@vger.kernel.org, linux-mm@kvack.org, mhocko@kernel.org, akpm@linux-foundation.org, mawilcox@microsoft.com, david@redhat.com, penguin-kernel@I-love.SAKURA.ne.jp, cornelia.huck@de.ibm.com, mgorman@techsingularity.net, aarcange@redhat.com, amit.shah@redhat.com, pbonzini@redhat.com, willy@infradead.org, liliang.opensource@gmail.com, yang.zhang.wz@gmail.com, quan.xu@aliyun.com, Nitesh Narayan Lal <nilal@redhat.com>, Rik van Riel <riel@redhat.com>
+
+On 11/14/2017 01:32 AM, Michael S. Tsirkin wrote:
+> You should Cc Nitesh who is working on a related feature.
+
+OK, I'll do. We have two more issues which haven't been discussed yet, 
+please have a check below.
+
+>
+> On Mon, Nov 13, 2017 at 06:34:48PM +0800, Wei Wang wrote:
+>> Ping for comments, thanks.
+>>
+>> On 11/03/2017 04:13 PM, Wei Wang wrote:
+>>> +static void virtballoon_cmd_report_free_page_start(struct virtio_balloon *vb)
+>>> +{
+>>> +	unsigned long flags;
+>>> +
+>>> +	vb->report_free_page_stop = false;
+> this flag is used a lot outside any locks. Why is this safe?
+> Please add some comments explaining access to this flag.
+
+I will revert the logic as suggested: vb->report_free_page. Also plan to 
+simplify its usage as below.
+
+The flag is set or cleared in the config handler according to the 
+new_cmd_id given
+by the host:
+
+new_cmd_id=0:                    WRITE_ONCE(vb->report_free_page, 
+false); // stop reporting
+new_cmd_id != old_cmd_id: WRITE_ONCE(vb->report_free_page, true);  // 
+start reporting
 
 
---kfjH4zxOES6UT95V
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+The flag is read by virtio_balloon_send_free_pages() - the callback to 
+report free pages:
 
-On Sun, Nov 19, 2017 at 09:46:43PM -0500, Jeff Cody wrote:
-> diff --git a/include/qemu/coroutine_int.h b/include/qemu/coroutine_int.h
-> index cb98892..931cdc9 100644
-> --- a/include/qemu/coroutine_int.h
-> +++ b/include/qemu/coroutine_int.h
-> @@ -53,6 +53,9 @@ struct Coroutine {
-> =20
->      /* Only used when the coroutine has yielded.  */
->      AioContext *ctx;
-> +
-> +    int scheduled;
+if (!READ_ONCE(vb->report_free_page))
+                 return false;
 
-s/int/bool/
+I don't find where it could be unsafe then (the flag is written by the 
+config handler only).
 
-> diff --git a/util/qemu-coroutine.c b/util/qemu-coroutine.c
-> index d6095c1..2edab63 100644
-> --- a/util/qemu-coroutine.c
-> +++ b/util/qemu-coroutine.c
-> @@ -109,6 +109,15 @@ void qemu_aio_coroutine_enter(AioContext *ctx, Corou=
-tine *co)
-> =20
->      trace_qemu_aio_coroutine_enter(ctx, self, co, co->entry_arg);
-> =20
-> +    /* if the Coroutine has already been scheduled, entering it again wi=
-ll
-> +     * cause us to enter it twice, potentially even after the coroutine =
-has
-> +     * been deleted */
-> +    if (co->scheduled =3D=3D 1) {
-> +        fprintf(stderr, "Cannot enter a co-routine that has already "
-> +                        "been scheduled to run in a different AioContext=
-\n");
 
-This error message is too specific, the AioContext doesn't have to be
-different from the current one:
 
-block/blkdebug.c:        aio_co_schedule(qemu_get_current_aio_context(), qe=
-mu_coroutine_self());
+>
+>>> +}
+>>> +
+>>>    static inline s64 towards_target(struct virtio_balloon *vb)
+>>>    {
+>>>    	s64 target;
+>>> @@ -597,42 +673,147 @@ static void update_balloon_size_func(struct work_struct *work)
+>>>    		queue_work(system_freezable_wq, work);
+>>>    }
+>>> -static int init_vqs(struct virtio_balloon *vb)
+>>> +static bool virtio_balloon_send_free_pages(void *opaque, unsigned long pfn,
+>>> +					   unsigned long nr_pages)
+>>>    {
+>>> -	struct virtqueue *vqs[3];
+>>> -	vq_callback_t *callbacks[] = { balloon_ack, balloon_ack, stats_request };
+>>> -	static const char * const names[] = { "inflate", "deflate", "stats" };
+>>> -	int err, nvqs;
+>>> +	struct virtio_balloon *vb = (struct virtio_balloon *)opaque;
+>>> +	void *addr = (void *)pfn_to_kaddr(pfn);
+> How do we know all free pages have a kaddr?
 
-If something calls qemu_aio_coroutine_enter() on the coroutine it might
-be from the same AioContext - but still an error condition worth failing
-loudly on.
+For x86_64, it works well since the kernel has all the physical memory 
+mapped already. But for 32-bit kernel, yes, the high memory usually 
+isn't mapped and thus no kaddr. Essentially, this pfn_to_kaddr convert 
+isn't necessary, we do it here because the current API that virtio has 
+is based on "struct scatterlist", which takes a kaddr, and this kaddr is 
+then convert back to physical address in virtqueue_add() when assigning 
+to desc->addr.
 
-I suggest simplifying the error message:
+I think a better solution would be to add a new API, which directly 
+assigns the caller's guest physical address to desc->addr, similar to 
+the previous implementation "add_one_chunk()" 
+(https://lists.gnu.org/archive/html/qemu-devel/2017-06/msg02452.html). 
+But we can change that to a general virtio API:
+virtqueue_add_one_desc(struct virtqueue *_vq, u64 base_addr, u32 size, 
+bool in_desc, void *data);
 
-  fprintf(stderr, "Cannot enter a co-routine that has already "
-                  "been scheduled\n");
+What do you think?
 
---kfjH4zxOES6UT95V
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEcBAEBAgAGBQJaErxaAAoJEJykq7OBq3PISHwIAJOqU9SW76Y9Anqq0rF3kMWO
-bRGEfgaKJtBUEuZKTeelxU6RUrj673eA3LUPLDen7fSZ7K4csMHD9Mjt2DyMXGlo
-lfMNbrXLQ240LvBrl89SCL4N56vl5x43+nIKasVfCBStuJDa2YRRMGX3gtiIu4Cl
-HDQflUwZVsfWYezEEdCGvBQrvya7FW93yHr6VK3f+fsc7TeewJwJ7QB7y3yLYtbV
-8Za9PX5j+QrwudIoIpukSfvfPpnYteP1pnlo8F+ABI9DRQufpFqWDk/oognIucre
-fZj92N9adwnnuJKiVwtj8je0W0ahS7Y2QkKTAK8QBjNs8+PpYwjKgH96e1qVrBg=
-=ImYc
------END PGP SIGNATURE-----
-
---kfjH4zxOES6UT95V--
+Best,
+Wei
