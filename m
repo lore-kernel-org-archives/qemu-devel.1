@@ -1,20 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36107)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36893)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1eHA9o-00080Y-Kl
-	for qemu-devel@nongnu.org; Tue, 21 Nov 2017 10:08:17 -0500
+	(envelope-from <kwolf@redhat.com>) id 1eHABz-00033z-TQ
+	for qemu-devel@nongnu.org; Tue, 21 Nov 2017 10:10:39 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1eHA9i-00044T-Oe
-	for qemu-devel@nongnu.org; Tue, 21 Nov 2017 10:08:16 -0500
-Received: from orth.archaic.org.uk ([2001:8b0:1d0::2]:38492)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pm215@archaic.org.uk>)
-	id 1eHA9i-000446-HG
-	for qemu-devel@nongnu.org; Tue, 21 Nov 2017 10:08:10 -0500
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 21 Nov 2017 15:08:08 +0000
-Message-Id: <1511276888-17834-1-git-send-email-peter.maydell@linaro.org>
-Subject: [Qemu-devel] [PATCH] memory-internal.h: Remove obsolete claim that
- header is obsolete
+	(envelope-from <kwolf@redhat.com>) id 1eHABy-0005AX-Sh
+	for qemu-devel@nongnu.org; Tue, 21 Nov 2017 10:10:31 -0500
+From: Kevin Wolf <kwolf@redhat.com>
+Date: Tue, 21 Nov 2017 16:10:11 +0100
+Message-Id: <20171121151017.28158-2-kwolf@redhat.com>
+In-Reply-To: <20171121151017.28158-1-kwolf@redhat.com>
+References: <20171121151017.28158-1-kwolf@redhat.com>
+Subject: [Qemu-devel] [PULL 1/7] block: Don't use BLK_PERM_CONSISTENT_READ
+ for format probing
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,48 +20,40 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: patches@linaro.org, Paolo Bonzini <pbonzini@redhat.com>
+To: qemu-block@nongnu.org
+Cc: kwolf@redhat.com, qemu-devel@nongnu.org, peter.maydell@linaro.org
 
-The memory-internal.h header claims that it is for "obsolete
-exec.c functions" which "will be removed soon". This statement
-was added in 2011, six years ago, but the header is still here.
-(Admittedly none of the prototypes added in commit 67d95c153bef55f6
-are still in the header.)
+For format probing, we don't really care whether all of the image
+content is consistent. The only thing we're looking at is the image
+header, and specifically the magic numbers that are expected to never
+change, no matter how inconsistent the guest visible disk content is.
 
-It's convenient to have a place to put prototypes for functions
-which are used internally to the various .c files of the memory
-system or by the accel/tcg code, which is inevitably fairly
-closely coupled. So keep the header but update the comments to
-reflect what we're actually using it for.
+Therefore, don't request BLK_PERM_CONSISTENT_READ. This allows to use
+format probing, e.g. in the context of 'qemu-img info', even while the
+guest visible data in the image is inconsistent during a running block
+job.
 
-Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+Signed-off-by: Kevin Wolf <kwolf@redhat.com>
+Reviewed-by: Fam Zheng <famz@redhat.com>
 ---
- include/exec/memory-internal.h | 7 ++++---
- 1 file changed, 4 insertions(+), 3 deletions(-)
+ block.c | 5 ++++-
+ 1 file changed, 4 insertions(+), 1 deletion(-)
 
-diff --git a/include/exec/memory-internal.h b/include/exec/memory-internal.h
-index 98d8296..4162474 100644
---- a/include/exec/memory-internal.h
-+++ b/include/exec/memory-internal.h
-@@ -1,5 +1,5 @@
- /*
-- * Declarations for obsolete exec.c functions
-+ * Declarations for functions which are internal to the memory subsystem.
-  *
-  * Copyright 2011 Red Hat, Inc. and/or its affiliates
-  *
-@@ -12,8 +12,9 @@
-  */
- 
- /*
-- * This header is for use by exec.c and memory.c ONLY.  Do not include it.
-- * The functions declared here will be removed soon.
-+ * This header is for use by exec.c, memory.c and accel/tcg/cputlb.c ONLY,
-+ * for declarations which are shared between the memory subsystem's
-+ * internals and the TCG TLB code. Do not include it from elsewhere.
-  */
- 
- #ifndef MEMORY_INTERNAL_H
+diff --git a/block.c b/block.c
+index 6c8ef98dfa..68b724206d 100644
+--- a/block.c
++++ b/block.c
+@@ -2579,7 +2579,10 @@ static BlockDriverState *bdrv_open_inherit(const char *filename,
+             goto fail;
+         }
+         if (file_bs != NULL) {
+-            file = blk_new(BLK_PERM_CONSISTENT_READ, BLK_PERM_ALL);
++            /* Not requesting BLK_PERM_CONSISTENT_READ because we're only
++             * looking at the header to guess the image format. This works even
++             * in cases where a guest would not see a consistent state. */
++            file = blk_new(0, BLK_PERM_ALL);
+             blk_insert_bs(file, file_bs, &local_err);
+             bdrv_unref(file_bs);
+             if (local_err) {
 -- 
-2.7.4
+2.13.6
