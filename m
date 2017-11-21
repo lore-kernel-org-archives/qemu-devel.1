@@ -1,26 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38281)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41826)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1eH7fL-0004Pr-RB
-	for qemu-devel@nongnu.org; Tue, 21 Nov 2017 07:28:40 -0500
+	(envelope-from <kwolf@redhat.com>) id 1eH7sg-0006rf-4Q
+	for qemu-devel@nongnu.org; Tue, 21 Nov 2017 07:42:26 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1eH7fJ-0000EY-4C
-	for qemu-devel@nongnu.org; Tue, 21 Nov 2017 07:28:39 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:56578)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1eH7fI-0000E0-Tq
-	for qemu-devel@nongnu.org; Tue, 21 Nov 2017 07:28:37 -0500
-References: <20171012185916.22776-1-eblake@redhat.com>
-	<243ad517-3fb9-43a4-5cb3-118b312a5720@virtuozzo.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <b4a403ee-8981-5589-5a18-f7c499d1f89c@redhat.com>
-Date: Tue, 21 Nov 2017 06:28:34 -0600
+	(envelope-from <kwolf@redhat.com>) id 1eH7sf-0005sU-D6
+	for qemu-devel@nongnu.org; Tue, 21 Nov 2017 07:42:26 -0500
+Date: Tue, 21 Nov 2017 13:42:09 +0100
+From: Kevin Wolf <kwolf@redhat.com>
+Message-ID: <20171121124209.GA11073@localhost.localdomain>
+References: <cover.1511145863.git.jcody@redhat.com>
+	<2cd4d33dc68bb3c738e1c9aa39a0ddd4108c401e.1511145863.git.jcody@redhat.com>
+	<20171120111653.GB4516@stefanha-x1.localdomain>
+	<b910238b-d42c-abfe-9d57-1db2c97728cc@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <243ad517-3fb9-43a4-5cb3-118b312a5720@virtuozzo.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="IWXxJrNfMEK7C8Gp55pfxGS3LL42UhSKw"
-Subject: Re: [Qemu-devel] [PATCH v4 00/20] add byte-based block_status
- driver callbacks
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="BXVAT5kNtrzKuDFl"
+Content-Disposition: inline
+In-Reply-To: <b910238b-d42c-abfe-9d57-1db2c97728cc@redhat.com>
+Subject: Re: [Qemu-devel] [Qemu-block] [PATCH 1/5] blockjob: do not allow
+ coroutine double entry or entry-after-completion
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,57 +27,54 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, qemu-devel@nongnu.org
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: Stefan Hajnoczi <stefanha@gmail.com>, Jeff Cody <jcody@redhat.com>, qemu-devel@nongnu.org, famz@redhat.com, qemu-block@nongnu.org, mreitz@redhat.com, stefanha@redhat.com
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---IWXxJrNfMEK7C8Gp55pfxGS3LL42UhSKw
-From: Eric Blake <eblake@redhat.com>
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
- qemu-devel@nongnu.org
-Message-ID: <b4a403ee-8981-5589-5a18-f7c499d1f89c@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v4 00/20] add byte-based block_status driver
- callbacks
-References: <20171012185916.22776-1-eblake@redhat.com>
- <243ad517-3fb9-43a4-5cb3-118b312a5720@virtuozzo.com>
-In-Reply-To: <243ad517-3fb9-43a4-5cb3-118b312a5720@virtuozzo.com>
-Content-Type: text/plain; charset=utf-8
+
+--BXVAT5kNtrzKuDFl
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On 11/21/2017 05:27 AM, Vladimir Sementsov-Ogievskiy wrote:
-> Hi!
+Am 20.11.2017 um 23:25 hat Paolo Bonzini geschrieben:
+> On 20/11/2017 12:16, Stefan Hajnoczi wrote:
+> > This raises questions about the ability to cancel sleep:
+> >=20
+> > 1. Does something depend on cancelling sleep?
 >=20
-> Is it a latest portion of moving to byte-based? All other parts are
-> already merged? Are you going to update it? (or this version if ok for
-> review?)
+> block_job_cancel does, but in practice the sleep time is so small
+> (smaller than SLICE_TIME, which is 100 ms) that we probably don't care.
 
-This version is okay to review; although it will need a v5 respin once
-2.12 is reopened for some minor merge conflicts that have crept in
-during the meantime (regarding bs->drv NULL checks).
+Just note that this is something that can happen during the final
+migration phase when the VM is already stopped. In other words, with
+non-shared storage, these up to 100 ms are added to the migration
+downtime.
 
+Kevin
 
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
+> I agree with Jeff that canceling the sleep by force-entering the
+> coroutine seemed clever but is probably a very bad idea.
+>=20
+> Paolo
 
-
---IWXxJrNfMEK7C8Gp55pfxGS3LL42UhSKw
+--BXVAT5kNtrzKuDFl
 Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
 
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAloUG/IACgkQp6FrSiUn
-Q2rThQf/Q3b7kG8CfzSLo2FHUMnoCB6Q36Vi2L8Jn04HX85gOYGG4nF7YiOw8EX2
-ZofM8cIaL0PoL5Xak7PIvdvYxFiVGPYzPhyFOcgOBFW4Ypy2JbB5nR/WhV/bfMCw
-T/gtfQ2m3O/uiR2MYvHmCLdRFAiXA14aHkBDAfN6u8f5eNWbdLm0CsB1GOgRjnQ/
-WlsHS++3TvppKfKB29+GWmVXBTX2B6pN9i/D0WZh3exYqay76lxVn3KeweZ0208+
-NQ98LsTPJuAjchJtclmeVN4tC4JrY7Tv7MuzJFMH151M3BG8NXZ11FIw+Vs11laf
-4Y9chbr9BXjbKTonzUIWGvYDGLznFg==
-=WRnk
+iQIcBAEBAgAGBQJaFB8hAAoJEH8JsnLIjy/W3RQQAMP79WhLzHIic5UTw4sOfsAf
+1u0PiKRdG4Lj7n8zxBqLgtAhz/Ib3YKRMLDlY0/uNwbyHSvIlAhBixFY2BWkY+XY
+0liPyg/0+l634ISJ4G6cIzT46mme3SbUO46g77nivIkRFuJGNn1R6hwtekflmtbj
+nlmbF86ZYgOQBU7i/h11c24lvgKgUFAd/JXt+1wJ9NgQRrTsgm8m+U9XfbKd5P8H
+PzrrtwfNpFdv5z9eMIGCvnJF7Vav6K6+cNxOWTPO2DmMRriD6ku2U4FjthhVJV7y
+e2S6YmABM/DI6dnUQGepDqVyHt8ClOCOUsTHibvgfbBZggDirnQUCsnR+rCbT/rG
+BA45nnU9GvqUPzI9Sor3A3wK/4LShns8/SCx9el6g0QkhWWs64q0Db5y/t6EOcV0
+T/9wrPreKZAo403W/PtyV9eN7zeAM6x6lbiU9ZF4gT03GRXfAS6+xlVJG10fcEqg
+j1RWdxSXTKI/jK3ZPGrPNsVHAq0qURcxV+8/Xd+SHSsYhNTT5X+MONmczzdySaQI
+PrT5Mhcu5VBPw1fburK7PR/w9ZKsjuzFx8+qawLYrkyhICPEaD2nMSJc87VRR+OB
+oMZUv6xVGeaqPKSiae3dc8QO1nFq9EiqhT5mtNdxCTBIYACgFXUKPv/OBt0SPCOJ
+dwQaS+qbt38kekPsEsQ5
+=TCKX
 -----END PGP SIGNATURE-----
 
---IWXxJrNfMEK7C8Gp55pfxGS3LL42UhSKw--
+--BXVAT5kNtrzKuDFl--
