@@ -1,33 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54025)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54058)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1eHG59-0004Mr-0Z
-	for qemu-devel@nongnu.org; Tue, 21 Nov 2017 16:27:52 -0500
+	(envelope-from <richard.henderson@linaro.org>) id 1eHG5A-0004Ok-Nk
+	for qemu-devel@nongnu.org; Tue, 21 Nov 2017 16:27:53 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1eHG57-0007ho-Ff
-	for qemu-devel@nongnu.org; Tue, 21 Nov 2017 16:27:50 -0500
-Received: from mail-wm0-x241.google.com ([2a00:1450:400c:c09::241]:38057)
+	(envelope-from <richard.henderson@linaro.org>) id 1eHG59-0007jF-KW
+	for qemu-devel@nongnu.org; Tue, 21 Nov 2017 16:27:52 -0500
+Received: from mail-wm0-x243.google.com ([2a00:1450:400c:c09::243]:38918)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1eHG57-0007hL-52
-	for qemu-devel@nongnu.org; Tue, 21 Nov 2017 16:27:49 -0500
-Received: by mail-wm0-x241.google.com with SMTP id 128so6267641wmo.3
-	for <qemu-devel@nongnu.org>; Tue, 21 Nov 2017 13:27:49 -0800 (PST)
+	id 1eHG59-0007ie-Ci
+	for qemu-devel@nongnu.org; Tue, 21 Nov 2017 16:27:51 -0500
+Received: by mail-wm0-x243.google.com with SMTP id x63so6255618wmf.4
+	for <qemu-devel@nongnu.org>; Tue, 21 Nov 2017 13:27:51 -0800 (PST)
 Received: from cloudburst.twiddle.net
 	(70.red-37-158-60.dynamicip.rima-tde.net. [37.158.60.70])
 	by smtp.gmail.com with ESMTPSA id
-	e124sm706517wmg.34.2017.11.21.13.27.46 for <qemu-devel@nongnu.org>
+	e124sm706517wmg.34.2017.11.21.13.27.49 for <qemu-devel@nongnu.org>
 	(version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
-	Tue, 21 Nov 2017 13:27:47 -0800 (PST)
+	Tue, 21 Nov 2017 13:27:49 -0800 (PST)
 From: Richard Henderson <richard.henderson@linaro.org>
-Date: Tue, 21 Nov 2017 22:25:17 +0100
-Message-Id: <20171121212534.5177-10-richard.henderson@linaro.org>
+Date: Tue, 21 Nov 2017 22:25:19 +0100
+Message-Id: <20171121212534.5177-12-richard.henderson@linaro.org>
 In-Reply-To: <20171121212534.5177-1-richard.henderson@linaro.org>
 References: <20171121212534.5177-1-richard.henderson@linaro.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v6 09/26] target/arm: Use vector infrastructure
- for aa64 add/sub/logic
+Subject: [Qemu-devel] [PATCH v6 11/26] target/arm: Use vector infrastructure
+ for aa64 dup/movi
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -38,287 +35,151 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-Reviewed-by: Alex Bennée <alex.bennee@linaro.org>
 Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- target/arm/translate-a64.c | 207 +++++++++++++++++++++++++++++----------------
- 1 file changed, 134 insertions(+), 73 deletions(-)
+ target/arm/translate-a64.c | 83 +++++++++++++++++++---------------------------
+ 1 file changed, 34 insertions(+), 49 deletions(-)
 
 diff --git a/target/arm/translate-a64.c b/target/arm/translate-a64.c
-index ba94f7d045..572af456d1 100644
+index bc14c28e71..55a4902fc2 100644
 --- a/target/arm/translate-a64.c
 +++ b/target/arm/translate-a64.c
-@@ -21,6 +21,7 @@
- #include "cpu.h"
- #include "exec/exec-all.h"
- #include "tcg-op.h"
-+#include "tcg-op-gvec.h"
- #include "qemu/log.h"
- #include "arm_ldst.h"
- #include "translate.h"
-@@ -83,6 +84,10 @@ typedef void NeonGenOneOpFn(TCGv_i64, TCGv_i64);
- typedef void CryptoTwoOpEnvFn(TCGv_ptr, TCGv_i32, TCGv_i32);
- typedef void CryptoThreeOpEnvFn(TCGv_ptr, TCGv_i32, TCGv_i32, TCGv_i32);
- 
-+/* Note that the gvec expanders operate on offsets + sizes.  */
-+typedef void GVecGen3Fn(unsigned, uint32_t, uint32_t,
-+                        uint32_t, uint32_t, uint32_t);
+@@ -5846,38 +5846,24 @@ static void disas_simd_across_lanes(DisasContext *s, uint32_t insn)
+  *
+  * size: encoded in imm5 (see ARM ARM LowestSetBit())
+  */
 +
- /* initialize TCG globals.  */
- void a64_translate_init(void)
+ static void handle_simd_dupe(DisasContext *s, int is_q, int rd, int rn,
+                              int imm5)
  {
-@@ -535,6 +540,21 @@ static inline int vec_reg_offset(DisasContext *s, int regno,
-     return offs;
- }
+     int size = ctz32(imm5);
+-    int esize = 8 << size;
+-    int elements = (is_q ? 128 : 64) / esize;
+-    int index, i;
+-    TCGv_i64 tmp;
++    int index = imm5 >> (size + 1);
  
-+/* Return the offset info CPUARMState of the "whole" vector register Qn.  */
-+static inline int vec_full_reg_offset(DisasContext *s, int regno)
-+{
-+    assert_fp_access_checked(s);
-+    return offsetof(CPUARMState, vfp.regs[regno * 2]);
-+}
-+
-+/* Return the byte size of the "whole" vector register, VL / 8.  */
-+static inline int vec_full_reg_size(DisasContext *s)
-+{
-+    /* FIXME SVE: We should put the composite ZCR_EL* value into tb->flags.
-+       In the meantime this is just the AdvSIMD length of 128.  */
-+    return 128 / 8;
-+}
-+
- /* Return the offset into CPUARMState of a slice (from
-  * the least significant end) of FP register Qn (ie
-  * Dn, Sn, Hn or Bn).
-@@ -9048,85 +9068,125 @@ static void disas_simd_three_reg_diff(DisasContext *s, uint32_t insn)
+     if (size > 3 || (size == 3 && !is_q)) {
+         unallocated_encoding(s);
+         return;
      }
- }
- 
-+static void gen_bsl_i64(TCGv_i64 rd, TCGv_i64 rn, TCGv_i64 rm)
-+{
-+    tcg_gen_xor_i64(rn, rn, rm);
-+    tcg_gen_and_i64(rn, rn, rd);
-+    tcg_gen_xor_i64(rd, rm, rn);
-+}
-+
-+static void gen_bit_i64(TCGv_i64 rd, TCGv_i64 rn, TCGv_i64 rm)
-+{
-+    tcg_gen_xor_i64(rn, rn, rd);
-+    tcg_gen_and_i64(rn, rn, rm);
-+    tcg_gen_xor_i64(rd, rd, rn);
-+}
-+
-+static void gen_bif_i64(TCGv_i64 rd, TCGv_i64 rn, TCGv_i64 rm)
-+{
-+    tcg_gen_xor_i64(rn, rn, rd);
-+    tcg_gen_andc_i64(rn, rn, rm);
-+    tcg_gen_xor_i64(rd, rd, rn);
-+}
-+
-+static void gen_bsl_vec(unsigned vece, TCGv_vec rd, TCGv_vec rn, TCGv_vec rm)
-+{
-+    tcg_gen_xor_vec(vece, rn, rn, rm);
-+    tcg_gen_and_vec(vece, rn, rn, rd);
-+    tcg_gen_xor_vec(vece, rd, rm, rn);
-+}
-+
-+static void gen_bit_vec(unsigned vece, TCGv_vec rd, TCGv_vec rn, TCGv_vec rm)
-+{
-+    tcg_gen_xor_vec(vece, rn, rn, rd);
-+    tcg_gen_and_vec(vece, rn, rn, rm);
-+    tcg_gen_xor_vec(vece, rd, rd, rn);
-+}
-+
-+static void gen_bif_vec(unsigned vece, TCGv_vec rd, TCGv_vec rn, TCGv_vec rm)
-+{
-+    tcg_gen_xor_vec(vece, rn, rn, rd);
-+    tcg_gen_andc_vec(vece, rn, rn, rm);
-+    tcg_gen_xor_vec(vece, rd, rd, rn);
-+}
-+
- /* Logic op (opcode == 3) subgroup of C3.6.16. */
- static void disas_simd_3same_logic(DisasContext *s, uint32_t insn)
- {
-+    static const GVecGen3 bsl_op = {
-+        .fni8 = gen_bsl_i64,
-+        .fniv = gen_bsl_vec,
-+        .prefer_i64 = TCG_TARGET_REG_BITS == 64,
-+        .load_dest = true
-+    };
-+    static const GVecGen3 bit_op = {
-+        .fni8 = gen_bit_i64,
-+        .fniv = gen_bit_vec,
-+        .prefer_i64 = TCG_TARGET_REG_BITS == 64,
-+        .load_dest = true
-+    };
-+    static const GVecGen3 bif_op = {
-+        .fni8 = gen_bif_i64,
-+        .fniv = gen_bif_vec,
-+        .prefer_i64 = TCG_TARGET_REG_BITS == 64,
-+        .load_dest = true
-+    };
-+
-     int rd = extract32(insn, 0, 5);
-     int rn = extract32(insn, 5, 5);
-     int rm = extract32(insn, 16, 5);
-     int size = extract32(insn, 22, 2);
-     bool is_u = extract32(insn, 29, 1);
-     bool is_q = extract32(insn, 30, 1);
--    TCGv_i64 tcg_op1, tcg_op2, tcg_res[2];
--    int pass;
-+    GVecGen3Fn *gvec_fn;
-+    const GVecGen3 *gvec_op;
- 
+-
      if (!fp_access_check(s)) {
          return;
      }
  
--    tcg_op1 = tcg_temp_new_i64();
--    tcg_op2 = tcg_temp_new_i64();
--    tcg_res[0] = tcg_temp_new_i64();
--    tcg_res[1] = tcg_temp_new_i64();
+-    index = imm5 >> (size + 1);
 -
--    for (pass = 0; pass < (is_q ? 2 : 1); pass++) {
--        read_vec_element(s, tcg_op1, rn, pass, MO_64);
--        read_vec_element(s, tcg_op2, rm, pass, MO_64);
+-    tmp = tcg_temp_new_i64();
+-    read_vec_element(s, tmp, rn, index, size);
 -
--        if (!is_u) {
--            switch (size) {
--            case 0: /* AND */
--                tcg_gen_and_i64(tcg_res[pass], tcg_op1, tcg_op2);
--                break;
--            case 1: /* BIC */
--                tcg_gen_andc_i64(tcg_res[pass], tcg_op1, tcg_op2);
--                break;
--            case 2: /* ORR */
--                tcg_gen_or_i64(tcg_res[pass], tcg_op1, tcg_op2);
--                break;
--            case 3: /* ORN */
--                tcg_gen_orc_i64(tcg_res[pass], tcg_op1, tcg_op2);
--                break;
--            }
--        } else {
--            if (size != 0) {
--                /* B* ops need res loaded to operate on */
--                read_vec_element(s, tcg_res[pass], rd, pass, MO_64);
--            }
--
--            switch (size) {
--            case 0: /* EOR */
--                tcg_gen_xor_i64(tcg_res[pass], tcg_op1, tcg_op2);
--                break;
--            case 1: /* BSL bitwise select */
--                tcg_gen_xor_i64(tcg_op1, tcg_op1, tcg_op2);
--                tcg_gen_and_i64(tcg_op1, tcg_op1, tcg_res[pass]);
--                tcg_gen_xor_i64(tcg_res[pass], tcg_op2, tcg_op1);
--                break;
--            case 2: /* BIT, bitwise insert if true */
--                tcg_gen_xor_i64(tcg_op1, tcg_op1, tcg_res[pass]);
--                tcg_gen_and_i64(tcg_op1, tcg_op1, tcg_op2);
--                tcg_gen_xor_i64(tcg_res[pass], tcg_res[pass], tcg_op1);
--                break;
--            case 3: /* BIF, bitwise insert if false */
--                tcg_gen_xor_i64(tcg_op1, tcg_op1, tcg_res[pass]);
--                tcg_gen_andc_i64(tcg_op1, tcg_op1, tcg_op2);
--                tcg_gen_xor_i64(tcg_res[pass], tcg_res[pass], tcg_op1);
--                break;
--            }
--        }
+-    for (i = 0; i < elements; i++) {
+-        write_vec_element(s, tmp, rd, i, size);
 -    }
-+    switch (size + 4 * is_u) {
-+    case 0: /* AND */
-+        gvec_fn = tcg_gen_gvec_and;
-+        goto do_fn;
-+    case 1: /* BIC */
-+        gvec_fn = tcg_gen_gvec_andc;
-+        goto do_fn;
-+    case 2: /* ORR */
-+        gvec_fn = tcg_gen_gvec_or;
-+        goto do_fn;
-+    case 3: /* ORN */
-+        gvec_fn = tcg_gen_gvec_orc;
-+        goto do_fn;
-+    case 4: /* EOR */
-+        gvec_fn = tcg_gen_gvec_xor;
-+        goto do_fn;
-+    do_fn:
-+        gvec_fn(0, vec_full_reg_offset(s, rd),
-+                vec_full_reg_offset(s, rn),
-+                vec_full_reg_offset(s, rm),
-+                is_q ? 16 : 8, vec_full_reg_size(s));
-+        return;
-+
-+    case 5: /* BSL bitwise select */
-+        gvec_op = &bsl_op;
-+        goto do_op;
-+    case 6: /* BIT, bitwise insert if true */
-+        gvec_op = &bit_op;
-+        goto do_op;
-+    case 7: /* BIF, bitwise insert if false */
-+        gvec_op = &bif_op;
-+        goto do_op;
-+    do_op:
-+        tcg_gen_gvec_3(vec_full_reg_offset(s, rd),
-+                       vec_full_reg_offset(s, rn),
-+                       vec_full_reg_offset(s, rm),
-+                       is_q ? 16 : 8, vec_full_reg_size(s), gvec_op);
-+        return;
- 
--    write_vec_element(s, tcg_res[0], rd, 0, MO_64);
--    if (!is_q) {
--        tcg_gen_movi_i64(tcg_res[1], 0);
-+    default:
-+        g_assert_not_reached();
-     }
--    write_vec_element(s, tcg_res[1], rd, 1, MO_64);
 -
--    tcg_temp_free_i64(tcg_op1);
--    tcg_temp_free_i64(tcg_op2);
--    tcg_temp_free_i64(tcg_res[0]);
--    tcg_temp_free_i64(tcg_res[1]);
+-    if (!is_q) {
+-        clear_vec_high(s, rd);
+-    }
+-
+-    tcg_temp_free_i64(tmp);
++    tcg_gen_gvec_dup_mem(size, vec_full_reg_offset(s, rd),
++                         vec_reg_offset(s, rn, index, size),
++                         is_q ? 16 : 8, vec_full_reg_size(s));
  }
  
- /* Helper functions for 32 bit comparisons */
-@@ -9387,6 +9447,7 @@ static void disas_simd_3same_int(DisasContext *s, uint32_t insn)
-     int rn = extract32(insn, 5, 5);
-     int rd = extract32(insn, 0, 5);
-     int pass;
-+    GVecGen3Fn *gvec_op;
+ /* DUP (element, scalar)
+@@ -5926,9 +5912,7 @@ static void handle_simd_dupg(DisasContext *s, int is_q, int rd, int rn,
+                              int imm5)
+ {
+     int size = ctz32(imm5);
+-    int esize = 8 << size;
+-    int elements = (is_q ? 128 : 64)/esize;
+-    int i = 0;
++    uint32_t dofs, oprsz, maxsz;
  
-     switch (opcode) {
-     case 0x13: /* MUL, PMUL */
-@@ -9426,6 +9487,16 @@ static void disas_simd_3same_int(DisasContext *s, uint32_t insn)
+     if (size > 3 || ((size == 3) && !is_q)) {
+         unallocated_encoding(s);
+@@ -5939,12 +5923,11 @@ static void handle_simd_dupg(DisasContext *s, int is_q, int rd, int rn,
          return;
      }
  
-+    switch (opcode) {
-+    case 0x10: /* ADD, SUB */
-+        gvec_op = u ? tcg_gen_gvec_sub : tcg_gen_gvec_add;
-+        gvec_op(size, vec_full_reg_offset(s, rd),
-+                vec_full_reg_offset(s, rn),
-+                vec_full_reg_offset(s, rm),
-+                is_q ? 16 : 8, vec_full_reg_size(s));
-+        return;
-+    }
+-    for (i = 0; i < elements; i++) {
+-        write_vec_element(s, cpu_reg(s, rn), rd, i, size);
+-    }
+-    if (!is_q) {
+-        clear_vec_high(s, rd);
+-    }
++    dofs = vec_full_reg_offset(s, rd);
++    oprsz = is_q ? 16 : 8;
++    maxsz = vec_full_reg_size(s);
 +
-     if (size == 3) {
-         assert(is_q);
-         for (pass = 0; pass < 2; pass++) {
-@@ -9598,16 +9669,6 @@ static void disas_simd_3same_int(DisasContext *s, uint32_t insn)
-                 genfn = fns[size][u];
-                 break;
++    tcg_gen_gvec_dup_i64(size, dofs, oprsz, maxsz, cpu_reg(s, rn));
+ }
+ 
+ /* INS (Element)
+@@ -6135,7 +6118,6 @@ static void disas_simd_mod_imm(DisasContext *s, uint32_t insn)
+     bool is_neg = extract32(insn, 29, 1);
+     bool is_q = extract32(insn, 30, 1);
+     uint64_t imm = 0;
+-    TCGv_i64 tcg_rd, tcg_imm;
+     int i;
+ 
+     if (o2 != 0 || ((cmode == 0xf) && is_neg && !is_q)) {
+@@ -6217,32 +6199,35 @@ static void disas_simd_mod_imm(DisasContext *s, uint32_t insn)
+         imm = ~imm;
+     }
+ 
+-    tcg_imm = tcg_const_i64(imm);
+-    tcg_rd = new_tmp_a64(s);
++    if (!((cmode & 0x9) == 0x1 || (cmode & 0xd) == 0x9)) {
++        /* MOVI or MVNI, with MVNI negation handled above.  */
++        tcg_gen_gvec_dup64i(vec_full_reg_offset(s, rd), is_q ? 16 : 8,
++                            vec_full_reg_size(s), imm);
++    } else {
++        TCGv_i64 tcg_imm = tcg_const_i64(imm);
++        TCGv_i64 tcg_rd = new_tmp_a64(s);
+ 
+-    for (i = 0; i < 2; i++) {
+-        int foffs = i ? fp_reg_hi_offset(s, rd) : fp_reg_offset(s, rd, MO_64);
++        for (i = 0; i < 2; i++) {
++            int foffs = vec_reg_offset(s, rd, i, MO_64);
+ 
+-        if (i == 1 && !is_q) {
+-            /* non-quad ops clear high half of vector */
+-            tcg_gen_movi_i64(tcg_rd, 0);
+-        } else if ((cmode & 0x9) == 0x1 || (cmode & 0xd) == 0x9) {
+-            tcg_gen_ld_i64(tcg_rd, cpu_env, foffs);
+-            if (is_neg) {
+-                /* AND (BIC) */
+-                tcg_gen_and_i64(tcg_rd, tcg_rd, tcg_imm);
++            if (i == 1 && !is_q) {
++                /* non-quad ops clear high half of vector */
++                tcg_gen_movi_i64(tcg_rd, 0);
+             } else {
+-                /* ORR */
+-                tcg_gen_or_i64(tcg_rd, tcg_rd, tcg_imm);
++                tcg_gen_ld_i64(tcg_rd, cpu_env, foffs);
++                if (is_neg) {
++                    /* AND (BIC) */
++                    tcg_gen_and_i64(tcg_rd, tcg_rd, tcg_imm);
++                } else {
++                    /* ORR */
++                    tcg_gen_or_i64(tcg_rd, tcg_rd, tcg_imm);
++                }
              }
--            case 0x10: /* ADD, SUB */
--            {
--                static NeonGenTwoOpFn * const fns[3][2] = {
--                    { gen_helper_neon_add_u8, gen_helper_neon_sub_u8 },
--                    { gen_helper_neon_add_u16, gen_helper_neon_sub_u16 },
--                    { tcg_gen_add_i32, tcg_gen_sub_i32 },
--                };
--                genfn = fns[size][u];
--                break;
--            }
-             case 0x11: /* CMTST, CMEQ */
-             {
-                 static NeonGenTwoOpFn * const fns[3][2] = {
+-        } else {
+-            /* MOVI */
+-            tcg_gen_mov_i64(tcg_rd, tcg_imm);
++            tcg_gen_st_i64(tcg_rd, cpu_env, foffs);
+         }
+-        tcg_gen_st_i64(tcg_rd, cpu_env, foffs);
+-    }
+ 
+-    tcg_temp_free_i64(tcg_imm);
++        tcg_temp_free_i64(tcg_imm);
++    }
+ }
+ 
+ /* AdvSIMD scalar copy
 -- 
 2.13.6
