@@ -1,22 +1,42 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35931)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38680)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.purdie@linuxfoundation.org>)
-	id 1eHCQg-0007kh-Tf
-	for qemu-devel@nongnu.org; Tue, 21 Nov 2017 12:33:53 -0500
+	(envelope-from <pmorel@linux.vnet.ibm.com>) id 1eHCYR-0003LS-BD
+	for qemu-devel@nongnu.org; Tue, 21 Nov 2017 12:41:52 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.purdie@linuxfoundation.org>)
-	id 1eHCQd-00028k-Ly
-	for qemu-devel@nongnu.org; Tue, 21 Nov 2017 12:33:50 -0500
-Message-ID: <1511285617.862.65.camel@linuxfoundation.org>
-From: Richard Purdie <richard.purdie@linuxfoundation.org>
-Date: Tue, 21 Nov 2017 17:33:37 +0000
-In-Reply-To: <8760a4x8f9.fsf@linaro.org>
-References: <1511222455.862.5.camel@linuxfoundation.org>
-	<8760a4x8f9.fsf@linaro.org>
-Content-Type: text/plain; charset="UTF-8"
-Mime-Version: 1.0
+	(envelope-from <pmorel@linux.vnet.ibm.com>) id 1eHCYO-00055s-N9
+	for qemu-devel@nongnu.org; Tue, 21 Nov 2017 12:41:51 -0500
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:54426
+	helo=mx0a-001b2d01.pphosted.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pmorel@linux.vnet.ibm.com>)
+	id 1eHCYO-00055I-H8
+	for qemu-devel@nongnu.org; Tue, 21 Nov 2017 12:41:48 -0500
+Received: from pps.filterd (m0098417.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
+	vALHet4j044879
+	for <qemu-devel@nongnu.org>; Tue, 21 Nov 2017 12:41:42 -0500
+Received: from e06smtp13.uk.ibm.com (e06smtp13.uk.ibm.com [195.75.94.109])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2ecq4378cs-1
+	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Tue, 21 Nov 2017 12:41:41 -0500
+Received: from localhost
+	by e06smtp13.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	Only! Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <pmorel@linux.vnet.ibm.com>;
+	Tue, 21 Nov 2017 17:41:39 -0000
+References: <1510854715-7081-1-git-send-email-pmorel@linux.vnet.ibm.com>
+	<1510854715-7081-2-git-send-email-pmorel@linux.vnet.ibm.com>
+	<20171121113506.78788104.cohuck@redhat.com>
+From: Pierre Morel <pmorel@linux.vnet.ibm.com>
+Date: Tue, 21 Nov 2017 18:41:35 +0100
+MIME-Version: 1.0
+In-Reply-To: <20171121113506.78788104.cohuck@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Message-Id: <2202dba4-de17-e7fe-0fac-3aa293d2ab72@linux.vnet.ibm.com>
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] qemu-system-ppc hangs
+Subject: Re: [Qemu-devel] [PATCH v2 1/7] s390x/pci: factor out endianess
+ conversion
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,109 +45,97 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alex =?ISO-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>
-Cc: qemu-ppc@nongnu.org, qemu-devel <qemu-devel@nongnu.org>, david@gibson.dropbear.id.au
+To: Cornelia Huck <cohuck@redhat.com>
+Cc: qemu-devel@nongnu.org, agraf@suse.de, borntraeger@de.ibm.com, zyimin@linux.vnet.ibm.com, pasic@linux.vnet.ibm.com
 
-On Tue, 2017-11-21 at 09:55 +0000, Alex Benn=C3=A9e wrote:
-> Richard Purdie <richard.purdie@linuxfoundation.org> writes:
-> > At this point I therefore wanted to seek advice on what the real
-> > issue
-> > is here and how to fix it!
-> Code should be using cpu_interrupt() to change things but we have
-> plenty
-> of examples in the code of messing with cpu->interrupt_request
-> directly
-> which is often why the assert() in cpu_interrupt() doesn't get a
-> chance
-> to fire.
+On 21/11/2017 11:35, Cornelia Huck wrote:
+> On Thu, 16 Nov 2017 18:51:49 +0100
+> Pierre Morel <pmorel@linux.vnet.ibm.com> wrote:
 >=20
-> The two most prolific direct users seems to be i386 and ppc.
+>> There are two places where the same endianness conversion
+>> is done.
+>> Let's factor this out into a static function.
+>>
+>> Signed-off-by: Pierre Morel <pmorel@linux.vnet.ibm.com>
+>> Reviewed-by: Yi Min Zhao <zyimin@linux.vnet.ibm.com>
+>> Signed-off-by: Pierre Morel <pmorel@linux.vnet.ibm.com>
 >=20
-> The i386 cases are all most likely OK as it tends to be in KVM
-> emulation
-> code where by definition the BQL is already held by the time you get
-> there. For PPC it will depend on how you got there. The
-> multi-thread-tcg.txt document describes the approach:
+> Your two s-o-bs look a bit odd...
 >=20
-> =C2=A0 Emulated hardware state
-> =C2=A0 -----------------------
+>> ---
+>>   hw/s390x/s390-pci-inst.c | 59 +++++++++++++++++++++++++++-----------=
+----------
+>>   1 file changed, 33 insertions(+), 26 deletions(-)
+>>
+>> diff --git a/hw/s390x/s390-pci-inst.c b/hw/s390x/s390-pci-inst.c
+>> index 8e088f3..ded1556 100644
+>> --- a/hw/s390x/s390-pci-inst.c
+>> +++ b/hw/s390x/s390-pci-inst.c
+>> @@ -314,6 +314,36 @@ out:
+>>       return 0;
+>>   }
+>>  =20
+>> +/**
+>> + * This function is called when endianess is fixed, whatever the host=
+ endianess
+>> + * is, like in our case from s390x BIG endian registers to little end=
+ian PCI
+>> + * Bars, to translate the uint64_t pointed from one endianess to the =
+other.
 >=20
-> =C2=A0 Currently thanks to KVM work any access to IO memory is
-> automatically
-> =C2=A0 protected by the global iothread mutex, also known as the BQL (B=
-ig
-> =C2=A0 Qemu Lock). Any IO region that doesn't use global mutex is expec=
-ted
-> to
-> =C2=A0 do its own locking.
+> I would rephrase this a bit:
 >=20
-> =C2=A0 However IO memory isn't the only way emulated hardware state can=
- be
-> =C2=A0 modified. Some architectures have model specific registers that
-> =C2=A0 trigger hardware emulation features. Generally any translation
-> helper
-> =C2=A0 that needs to update more than a single vCPUs of state should ta=
-ke
-> the
-> =C2=A0 BQL.
->=20
-> =C2=A0 As the BQL, or global iothread mutex is shared across the system=
- we
-> =C2=A0 push the use of the lock as far down into the TCG code as possib=
-le
-> to
-> =C2=A0 minimise contention.
->=20
-> =C2=A0 (Current solution)
->=20
-> =C2=A0 MMIO access automatically serialises hardware emulation by way o=
-f
-> the
-> =C2=A0 BQL. Currently ARM targets serialise all ARM_CP_IO register
-> accesses
-> =C2=A0 and also defer the reset/startup of vCPUs to the vCPU context by
-> way
-> =C2=A0 of async_run_on_cpu().
->=20
-> =C2=A0 Updates to interrupt state are also protected by the BQL as they
-> can
-> =C2=A0 often be cross vCPU.
->=20
-> So basically it comes down to the call-path into your final
-> cpu_interrupt() call which is why I guess your doing the:
->=20
-> =C2=A0 if (!qemu_mutex_iothread_locked()) {
-> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0qemu_mutex_lock_iothread();
-> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0cpu_interrupt(cs, CPU_INTERRUPT_EXITTB);
-> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0qemu_mutex_unlock_iothread();
-> =C2=A0 }
->=20
-> dance. I suspect the helper functions are called both from device
-> emulation (where BQL is held) and from vCPU helpers (where it is
-> currently not).
->=20
-> So I suggest the fix is:
->=20
-> =C2=A01. Convert sites doing their own manipulation of
-> =C2=A0cpu->interrupt_request() to call the helper instead
-> =C2=A02. If helper directly called from TCG code:
-> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0- take BQL before calling cpu_inter=
-rupt(), release after
-> =C2=A0=C2=A0=C2=A0=C2=A0Else if helper shared between MMIO/TCG paths
-> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0- take BQL from TCG path, call help=
-er, release after
->=20
-> It might be there is some sensible re-factoring that could be done to
-> make things clearer but I'll leave that to the PPC experts to weigh
-> in
-> on.
->=20
-> Hope that helps!
+> "Swap data contained in s390x big endian registers to little endian PCI
+> bars."
 
-It does indeed, thanks. I've sent out a proposed patch which does the
-above so people can review it and see if its the right thing to do.
-Certainly its working fine locally.
+Simpler and clearer. thanks.
 
-Cheers,
+>=20
+> That makes it clear that this function is for a specialized use case.
+>=20
+>> + *
+>> + * @ptr: a pointer to a uint64_t data field
+>> + * @len: the length of the valid data, must be 1,2,4 or 8
+>> + */
+>> +static int zpci_endian_swap(uint64_t *ptr, uint8_t len)
+>> +{
+>> +    uint64_t data =3D *ptr;
+>=20
+> Please add an extra empty line.
 
-Richard
+yes.
+
+>=20
+>> +    switch (len) {
+>> +    case 1:
+>> +        break;
+>> +    case 2:
+>> +        data =3D bswap16(data);
+>> +        break;
+>> +    case 4:
+>> +        data =3D bswap32(data);
+>> +        break;
+>> +    case 8:
+>> +        data =3D bswap64(data);
+>> +        break;
+>> +    default:
+>> +        return -EINVAL;
+>> +    }
+>> +    *ptr =3D data;
+>> +    return 0;
+>> +}
+>> +
+>>   int pcilg_service_call(S390CPU *cpu, uint8_t r1, uint8_t r2)
+>>   {
+>>       CPUS390XState *env =3D &cpu->env;
+>=20
+> Other than the nits above, looks good.
+>=20
+
+Thanks for the review
+
+Pierre
+
+--=20
+Pierre Morel
+Linux/KVM/QEMU in B=C3=B6blingen - Germany
