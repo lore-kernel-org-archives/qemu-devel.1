@@ -1,25 +1,42 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57363)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58012)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1eHDNQ-0004oo-Ih
-	for qemu-devel@nongnu.org; Tue, 21 Nov 2017 13:34:33 -0500
+	(envelope-from <riel@redhat.com>) id 1eHDP1-0005iT-N3
+	for qemu-devel@nongnu.org; Tue, 21 Nov 2017 13:36:12 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1eHDNP-0000yv-CD
-	for qemu-devel@nongnu.org; Tue, 21 Nov 2017 13:34:32 -0500
-Received: from mail-oi0-x243.google.com ([2607:f8b0:4003:c06::243]:45684)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1eHDNP-0000yV-7B
-	for qemu-devel@nongnu.org; Tue, 21 Nov 2017 13:34:31 -0500
-Received: by mail-oi0-x243.google.com with SMTP id v123so9193822oif.12
-	for <qemu-devel@nongnu.org>; Tue, 21 Nov 2017 10:34:31 -0800 (PST)
-MIME-Version: 1.0
-In-Reply-To: <20171106154813.19936-1-andrew.smirnov@gmail.com>
-References: <20171106154813.19936-1-andrew.smirnov@gmail.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 21 Nov 2017 18:34:10 +0000
-Message-ID: <CAFEAcA8u2-o2u93OfgV8-4hTx0NwTZ1zC7DjFF6GmTXhxo3-Qg@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH v3 00/30] Initial i.MX7 support
+	(envelope-from <riel@redhat.com>) id 1eHDOw-0001uf-Q6
+	for qemu-devel@nongnu.org; Tue, 21 Nov 2017 13:36:11 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:59334)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <riel@redhat.com>) id 1eHDOw-0001sM-Gq
+	for qemu-devel@nongnu.org; Tue, 21 Nov 2017 13:36:06 -0500
+Message-ID: <1511289358.1080.15.camel@redhat.com>
+From: Rik van Riel <riel@redhat.com>
+Date: Tue, 21 Nov 2017 13:35:58 -0500
+In-Reply-To: <CAPcyv4jJGg4AceWYY74EoiM+8f8NEotOVCvJu8aMXGjkvRPpMg@mail.gmail.com>
+References: <1455443283.33337333.1500618150787.JavaMail.zimbra@redhat.com>
+	<1888117852.34216619.1500992835767.JavaMail.zimbra@redhat.com>
+	<CAPcyv4in28F3FOVKp9abvrggxPuXdbGynF5=ZvBXCrywoa06JA@mail.gmail.com>
+	<1501016375.26846.21.camel@redhat.com>
+	<1063764405.34607875.1501076841865.JavaMail.zimbra@redhat.com>
+	<1501104453.26846.45.camel@redhat.com>
+	<CAPcyv4hsqrqBxoipUHPAbSctuzbVWCRnT-gN08i9uhXTWY6iPQ@mail.gmail.com>
+	<1501112787.4073.49.camel@redhat.com>
+	<CAPcyv4gbC6Hx_4YsCfOd2t=fn=wPGp5h__1QH=-p40TPFNbFzA@mail.gmail.com>
+	<0a26793f-86f7-29e7-f61b-dc4c1ef08c8e@gmail.com>
+	<CAPcyv4iw2cCpDmr+4kxsFvdy+iGZiz=ok-kLhsDKpqDy+szf-Q@mail.gmail.com>
+	<378b10f3-b32f-84f5-2bbc-50c2ec5bcdd4@gmail.com>
+	<CAPcyv4jR_LdbsX-rAsHC7++C6d-WYC084uWXzr+08PSYwoXFMw@mail.gmail.com>
+	<ca6aaa77-cca0-441e-be49-73133d8581cf@gmail.com>
+	<CAPcyv4gKzvd39WbnKjbs3Bn9+o1tt=vz90CYMFu0DF5PsfHUig@mail.gmail.com>
+	<86754966-281f-c3ed-938c-f009440de563@gmail.com>
+	<CAPcyv4iH==cqVAdd8i1y-8A6SuXU75OH1EZzgNMvtA21wfxPpQ@mail.gmail.com>
+	<ec5ff7c2-864e-5020-0aaa-6663e78e3756@gmail.com>
+	<1511288389.1080.14.camel@redhat.com>
+	<CAPcyv4jJGg4AceWYY74EoiM+8f8NEotOVCvJu8aMXGjkvRPpMg@mail.gmail.com>
+Content-Type: multipart/signed; micalg="pgp-sha256";
+	protocol="application/pgp-signature"; boundary="=-risAOjzV9xFysia27LQL"
+Mime-Version: 1.0
+Subject: Re: [Qemu-devel] KVM "fake DAX" flushing interface - discussion
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,90 +45,91 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Andrey Smirnov <andrew.smirnov@gmail.com>
-Cc: qemu-arm <qemu-arm@nongnu.org>, Jason Wang <jasowang@redhat.com>, =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>, QEMU Developers <qemu-devel@nongnu.org>, Andrey Yurovsky <yurovsky@gmail.com>
+To: Dan Williams <dan.j.williams@intel.com>
+Cc: Xiao Guangrong <xiaoguangrong.eric@gmail.com>, Pankaj Gupta <pagupta@redhat.com>, Jan Kara <jack@suse.cz>, Stefan Hajnoczi <stefanha@redhat.com>, Stefan Hajnoczi <stefanha@gmail.com>, kvm-devel <kvm@vger.kernel.org>, Qemu Developers <qemu-devel@nongnu.org>, "linux-nvdimm@lists.01.org" <linux-nvdimm@ml01.01.org>, ross zwisler <ross.zwisler@linux.intel.com>, Paolo Bonzini <pbonzini@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Nitesh Narayan Lal <nilal@redhat.com>, Haozhong Zhang <haozhong.zhang@intel.com>, Ross Zwisler <ross.zwisler@intel.com>
 
-On 6 November 2017 at 15:47, Andrey Smirnov <andrew.smirnov@gmail.com> wrote:
-> Hi everyone,
->     - Added proper USB emulation code, so now it should be possible to
->       emulated guest's USB bus
 
-The patchset is huge as it is, if you add more stuff to it
-it makes it even more likely to sink to the bottom of my
-to-review queue...
+--=-risAOjzV9xFysia27LQL
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-> Peter, I didn't hear anything from you about the code of
-> mcimx7d_add_psci_node(), as discussed here:
->
-> https://www.mail-archive.com/qemu-devel@nongnu.org/msg486874.html
->
-> so I kept the original code intact. As I mentioned before, my goal was
-> to be able to boot into vanilla Linux kerenel and have working SMP
-> without needing to use a PSCI implementing bootloader. If that is
-> something that new board code shouldn't do, please let me know.
+On Tue, 2017-11-21 at 10:26 -0800, Dan Williams wrote:
+> On Tue, Nov 21, 2017 at 10:19 AM, Rik van Riel <riel@redhat.com>
+> wrote:
+> > On Fri, 2017-11-03 at 14:21 +0800, Xiao Guangrong wrote:
+> > > On 11/03/2017 12:30 AM, Dan Williams wrote:
+> > > >=20
+> > > > Good point, I was assuming that the mmio flush interface would
+> > > > be
+> > > > discovered separately from the NFIT-defined memory range.
+> > > > Perhaps
+> > > > via
+> > > > PCI in the guest? This piece of the proposal=C2=A0=C2=A0needs a bit=
+ more
+> > > > thought...
+> > > >=20
+> > >=20
+> > > Consider the case that the vNVDIMM device on normal storage and
+> > > vNVDIMM device on real nvdimm hardware can both exist in VM, the
+> > > flush interface should be able to associate with the SPA region
+> > > respectively. That's why I'd like to integrate the flush
+> > > interface
+> > > into NFIT/ACPI by using a separate table. Is it possible to be a
+> > > part of ACPI specification? :)
+> >=20
+> > It would also be perfectly fine to have the
+> > virtio PCI device indicate which vNVDIMM
+> > range it flushes.
+> >=20
+> > Since the guest OS needs to support that kind
+> > of device anyway, does it really matter which
+> > direction the device association points?
+> >=20
+> > We can go with the "best" interface for what
+> > could be a relatively slow flush (fsync on a
+> > file on ssd/disk on the host), which requires
+> > that the flushing task wait on completion
+> > asynchronously.
+> >=20
+> > If that kind of interface cannot be advertised
+> > through NFIT/ACPI, wouldn't it be perfectly fine
+> > to have only the virtio PCI device indicate which
+> > vNVDIMM range it flushes?
+> >=20
+>=20
+> Yes, we could do this with a custom PCI device, however the NFIT is
+> frustratingly close to being able to define something like this. At
+> the very least we can start with a "SPA Range GUID" that is Linux
+> specific to indicate "call this virtio flush interface on FUA / flush
+> cache requests" as a stop gap until a standardized flush interface
+> can
+> be defined.
 
-Broadly, board code should work the same way the real hardware
-does, unless there's a clear reason why not. "virt" is special
-because it writes its own dtb entirely.
+Ahh, is that a "look for a device with this GUID"
+NFIT hint?
 
-Maybe PSCI does need to be a different special case, since we're
-emulating part of a bootloader here. But if so I think that code
-belongs more in hw/arm/boot.c, so that we automatically fix up the
-dtb to say "we have psci" if we are (a) booting a kernel directly
-and (b) the CPU has the psci-conduit property set to enable QEMU's
-PSCI implementation.
+That would be enough to tip off OSes that do not
+support that device that they found a vNVDIMM
+device that they cannot safely flush, which could
+help them report such errors to userspace...
 
-(Also the code in virt.c for adding a PSCI node is considerably
-fuller-featured than yours is.)
+--=20
+All rights reversed
+--=-risAOjzV9xFysia27LQL
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: This is a digitally signed message part
+Content-Transfer-Encoding: 7bit
 
-> Thanks,
-> Andrey Smirnov
->
-> [v2] https://lists.gnu.org/archive/html/qemu-devel/2017-10/msg05516.html
-> [v1] https://lists.gnu.org/archive/html/qemu-devel/2017-09/msg04770.html
->
->
-> Andrey Smirnov (30):
->   imx_fec: Do not link to netdev
->   imx_fec: Refactor imx_eth_enable_rx()
->   imx_fec: Change queue flushing heuristics
->   imx_fec: Use ENET_FTRL to determine truncation length
->   imx_fec: Use MIN instead of explicit ternary operator
->   imx_fec: Emulate SHIFT16 in ENETx_RACC
->   imx_fec: Add support for multiple Tx DMA rings
->   imx_fec: Use correct length for packet size
->   imx_fec: Fix a typo in imx_enet_receive()
->   imx_fec: Reserve full 4K page for the register file
->   sdhci: Add i.MX specific subtype of SDHCI
->   sdhci: Implement write method of ACMD12ERRSTS register
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
 
-Everything above here is pretty nearly ready to go in;
-if you send that as a patchseries then it should be easy
-to review and queue ready for 2.12 (which will open up
-for new commits in mid-december).
+iQEcBAABCAAGBQJaFHIOAAoJEM553pKExN6DEv8H/3ac63iIIfWrbtU+6VR296yO
+//S2mCDMUPYnbcb/60TaADGV9cLOxK7OddJk7AZWxNF80QrDGetGguyxQutflAZP
+iVGTXxBYZdWj3vGfTXgDkYNqZD5epUVC37fAIFjV2DcwV/xpsEdtVzjS7gGPCmrv
+KkxVeujgrrGcUVEZv4XMGuSyTZCK+kg3NvdqHaPKGOgsq1qKsHbguY91pETtSvTK
+eao6y0X/t9RQ08lU2JoUhUeeGGn4p4/z43Y7Su7MDuDU0tCiD91WY5uKP94q1f7K
+yhtBwlsSAGs7QZa+tk5Twkh68fi0iFk7nPeYCtt9lJKD6esZLSCYgoPie4dyi5Y=
+=JEbE
+-----END PGP SIGNATURE-----
 
->   i.MX: Add code to emulate i.MX7 CCM, PMU and ANALOG IP blocks
->   i.MX: Add code to emulate i.MX2 watchdog IP block
->   i.MX: Add code to emulate i.MX7 SNVS IP-block
->   i.MX: Add code to emulate GPCv2 IP block
->   i.MX: Add code to emulate i.MX7 IOMUXC IP block
->   i.MX: Add i.MX7 GPT variant
->   i.MX: Add code to emulate SDMA IP block
->   i.MX: Add code to emulate FlexCAN IP block
->   i.MX: Add implementation of i.MX7 GPR IP block
->   pci: Add support for Designware IP block
->   i.MX: Add code to emulate i.MX7 USBMISC IP block
->   i.MX: Add code to emulate i.MX7 ADC IP block
->   i.MX: Add code to emulate i.MX7 SRC IP-block
->   usb: Add basic code to emulate Chipidea USB IP
->   ARM: Add basic code to emulate A7MPCore DAP block
->   i.MX: Add code to emulate i.MX LCD block
->   i.MX: Add i.MX7 SOC implementation.
->   Implement support for i.MX7 Sabre board
-
-My review in this part of the patchset is more sketchy,
-but you can probably adjust the later patches as per
-remarks on the earlier ones.
-
-thanks
--- PMM
+--=-risAOjzV9xFysia27LQL--
