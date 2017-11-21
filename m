@@ -1,25 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37373)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41910)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1eH31X-000354-8k
-	for qemu-devel@nongnu.org; Tue, 21 Nov 2017 02:31:16 -0500
+	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1eH3Ko-0008FV-SQ
+	for qemu-devel@nongnu.org; Tue, 21 Nov 2017 02:51:11 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1eH31R-0001eu-GE
-	for qemu-devel@nongnu.org; Tue, 21 Nov 2017 02:31:15 -0500
-Received: from mout.kundenserver.de ([217.72.192.75]:62193)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1eH31R-0001dL-6X
-	for qemu-devel@nongnu.org; Tue, 21 Nov 2017 02:31:09 -0500
-References: <20171121064106.13721-1-ybettan@redhat.com>
-From: Laurent Vivier <laurent@vivier.eu>
-Message-ID: <fe42e8d1-afde-f761-9780-b1a8f7d4030f@vivier.eu>
-Date: Tue, 21 Nov 2017 08:30:54 +0100
+	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1eH3Kl-000133-37
+	for qemu-devel@nongnu.org; Tue, 21 Nov 2017 02:51:10 -0500
+References: <1511222455.862.5.camel@linuxfoundation.org>
+From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+Message-ID: <e1b4faed-60f1-bfe3-2231-e357718dda1f@ilande.co.uk>
+Date: Tue, 21 Nov 2017 07:50:48 +0000
 MIME-Version: 1.0
-In-Reply-To: <20171121064106.13721-1-ybettan@redhat.com>
+In-Reply-To: <1511222455.862.5.camel@linuxfoundation.org>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH] vl.c && linux-user/main.c : removed **envp
- from main() arguments
+Subject: Re: [Qemu-devel] qemu-system-ppc hangs
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,54 +23,76 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Yoni Bettan <ybettan@redhat.com>, qemu-devel@nongnu.org
-Cc: Riku Voipio <riku.voipio@iki.fi>, Paolo Bonzini <pbonzini@redhat.com>
+To: Richard Purdie <richard.purdie@linuxfoundation.org>, qemu-ppc@nongnu.org, david@gibson.dropbear.id.au
+Cc: qemu-devel <qemu-devel@nongnu.org>
 
-Le 21/11/2017 à 07:41, Yoni Bettan a écrit :
->         * it was added on 2008 902b3d5c392bb6f48ef340ad8ecc3311705d2800
->           when introduced cache-utils.[ch]
->         * since then cache-utils.[ch] were removed but **envp was left
->           behind
+On 21/11/17 00:00, Richard Purdie wrote:
+
+> Hi,
 > 
-> Signed-off-by: Yoni Bettan <ybettan@redhat.com>
-> ---
->  linux-user/main.c | 2 +-
->  vl.c              | 6 +++---
->  2 files changed, 4 insertions(+), 4 deletions(-)
+> I work on the Yocto Project and we use qemu to test boot our Linux
+> images and run tests against them. We've been noticing some instability
+> for ppc where the images sometimes hang, usually around udevd bring up
+> time so just after booting into userspace.
 > 
-> diff --git a/linux-user/main.c b/linux-user/main.c
-> index aa02f25b85..ca5628c1ca 100644
-> --- a/linux-user/main.c
-> +++ b/linux-user/main.c
-> @@ -4233,7 +4233,7 @@ static int parse_args(int argc, char **argv)
->      return optind;
->  }
->  
-> -int main(int argc, char **argv, char **envp)
-> +int main(int argc, char **argv)
->  {
->      struct target_pt_regs regs1, *regs = &regs1;
->      struct image_info info1, *info = &info1;
-> diff --git a/vl.c b/vl.c
-> index 1ad1c04637..9667756ccc 100644
-> --- a/vl.c
-> +++ b/vl.c
-> @@ -35,10 +35,10 @@
->  #ifdef CONFIG_SDL
->  #if defined(__APPLE__) || defined(main)
->  #include <SDL.h>
-> -int qemu_main(int argc, char **argv, char **envp);
-> +int qemu_main(int argc, char **argv);
->  int main(int argc, char **argv)
->  {
-> -    return qemu_main(argc, argv, NULL);
-> +    return qemu_main(argc, argv);
->  }
->  #undef main
->  #define main qemu_main
+> To cut a long story short, I've tracked down what I think is the
+> problem. I believe the decrementer timer stops receiving interrupts so
+> tasks in our images hang indefinitely as the timer stopped. 
+> 
+> It can be summed up with this line of debug:
+> 
+> ppc_set_irq: 0x55b4e0d562f0 n_IRQ 8 level 1 => pending 00000100req 00000004
+> 
+> It should normally read:
+> 
+> ppc_set_irq: 0x55b4e0d562f0 n_IRQ 8 level 1 => pending 00000100req 00000002
+> 
+> The question is why CPU_INTERRUPT_EXITTB ends up being set when the
+> lines above this log message clearly sets CPU_INTERRUPT_HARD (via 
+> cpu_interrupt() ).
+> 
+> I note in cpu.h:
+> 
+>     /* updates protected by BQL */
+>     uint32_t interrupt_request;
+> 
+> (for struct CPUState)
+> 
+> The ppc code does "cs->interrupt_request |= CPU_INTERRUPT_EXITTB" in 5
+> places, 3 in excp_helper.c and 2 in helper_regs.h. In all cases,  
+> g_assert(qemu_mutex_iothread_locked()); fails. If I do something like:
+> 
+> if (!qemu_mutex_iothread_locked()) {
+>     qemu_mutex_lock_iothread();
+>     cpu_interrupt(cs, CPU_INTERRUPT_EXITTB);
+>     qemu_mutex_unlock_iothread();
+> } else {
+>     cpu_interrupt(cs, CPU_INTERRUPT_EXITTB);
+> }
+> 
+> in these call sites then I can no longer lock qemu up with my test
+> case.
+> 
+> I suspect the _HARD setting gets overwritten which stops the 
+> decrementer interrupts being delivered.
+> 
+> I don't know if taking this lock in these situations is going to be bad
+> for performance and whether such a patch would be right/wrong.
+> 
+> At this point I therefore wanted to seek advice on what the real issue
+> is here and how to fix it!
 
-I think this part can be removed now. As it seems it has been added
-because of the envp parameter.
+Thanks for the report - given that a lot of work has been done on MTTCG
+and iothread over the past few releases, it wouldn't be a complete
+surprise if something had crept in here.
 
-Thanks,
-Laurent
+Firstly let's start off with some basics: what is your host
+architecture, QEMU version and full command line being used to launch QEMU?
+
+Would it also be possible for you to make your test image available for
+other people to see if they can recreate the same issue?
+
+
+ATB,
+
+Mark.
