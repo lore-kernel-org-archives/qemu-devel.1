@@ -1,22 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42634)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54091)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1eGz9U-0008DA-11
-	for qemu-devel@nongnu.org; Mon, 20 Nov 2017 22:23:13 -0500
+	(envelope-from <jiangyiwen@huawei.com>) id 1eGzzg-0003Em-K0
+	for qemu-devel@nongnu.org; Mon, 20 Nov 2017 23:17:09 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1eGz9Q-0008Vv-Rz
-	for qemu-devel@nongnu.org; Mon, 20 Nov 2017 22:23:12 -0500
-Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
-	<philippe.mathieu.daude@gmail.com>
-From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
-Date: Tue, 21 Nov 2017 00:22:47 -0300
-Message-Id: <20171121032247.14579-1-f4bug@amsat.org>
+	(envelope-from <jiangyiwen@huawei.com>) id 1eGzzd-00073S-Fb
+	for qemu-devel@nongnu.org; Mon, 20 Nov 2017 23:17:08 -0500
+Received: from [45.249.212.32] (port=38298 helo=huawei.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <jiangyiwen@huawei.com>)
+	id 1eGzzd-0006xg-3f
+	for qemu-devel@nongnu.org; Mon, 20 Nov 2017 23:17:05 -0500
+References: <5A126CCB.3010602@huawei.com>
+	<20171120111303.2db7cdd0@bahia.lab.toulouse-stg.fr.ibm.com>
+From: jiangyiwen <jiangyiwen@huawei.com>
+Message-ID: <5A139D5D.9050907@huawei.com>
+Date: Tue, 21 Nov 2017 11:28:29 +0800
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH for-2.11] Makefile: add more targets to the
- UNCHECKED_GOALS rule
+In-Reply-To: <20171120111303.2db7cdd0@bahia.lab.toulouse-stg.fr.ibm.com>
+Content-Type: text/plain; charset="windows-1252"
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH] 9pfs: don't ignore O_DIRECT flag in the
+ 9pfs server
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,32 +29,66 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>, "Daniel P . Berrange" <berrange@redhat.com>, Fam Zheng <famz@redhat.com>, Eric Blake <eblake@redhat.com>
-Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, qemu-devel@nongnu.org, qemu-trivial@nongnu.org, Markus Armbruster <armbru@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>
+To: Greg Kurz <groug@kaod.org>
+Cc: aneesh.kumar@linux.vnet.ibm.com, qemu-devel@nongnu.org, sochin.jiang@huawei.com
 
-These targets don't need a full build of git submodules.
-(See b8e535ae8af and eaa2ddbb767).
+On 2017/11/20 18:13, Greg Kurz wrote:
+> On Mon, 20 Nov 2017 13:48:59 +0800
+> jiangyiwen <jiangyiwen@huawei.com> wrote:
+> 
+>> Now v9fs in linux has already supported O_DIRECT(v9fs_direct_IO),
+>> when guest user open file with O_DIRECT flag and return success,
+>> so user hopes data doesn't pass through page cache, but 9pfs in
+>> qemu ignore direct disk access and use host page cache, it is not
+>> match to DIRECT_IO semantic, so we should not ignore O_DIRECT in
+>> 9pfs unless v9fs in linux don't support DIRECT_IO.
+>>
+>> And if server fs don't support O_DIRECT, user will receive -EINVAL
+>> and know the filesystem don't support O_DIRECT.
+>>
+>> So in order to ensure semantic consistency, don't ignore direct
+>> disk access in 9pfs.
+>>
+> 
+> There are good reasons for us to ignore O_DIRECT. AFAIK, O_DIRECT requires
+> the application to take care of the alignment of the buffers with either the
+> logical block size of the filesystem (linux <= 2.4) or the logical block size
+> of the underlying storage... I don't really see how you can achieve that since
+> the linux 9p client only cares to break up requests into msize-chunks, and
+> ignores alignment. ie, you're likely to not ensure semantic consistency on the
+> host side anyway and linux will fallback to cached I/O.
+> 
+> Also, this change would silently break existing users of O_DIRECT, which isn't
+> acceptable... it would require some fsdev property to enable this new behavior.
+> 
 
-Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
----
- Makefile | 5 ++++-
- 1 file changed, 4 insertions(+), 1 deletion(-)
+Thank you very much, I understand what your mean, v9fs in linux doesn't take care
+of the alignment, only split as the msize. Then there is another problem,
+should v9fs support DIRECT_IO? or delete DIRECT_IO ops in v9fs?
 
-diff --git a/Makefile b/Makefile
-index adda3fb63e..5e8d79618c 100644
---- a/Makefile
-+++ b/Makefile
-@@ -6,7 +6,10 @@ BUILD_DIR=$(CURDIR)
- # Before including a proper config-host.mak, assume we are in the source tree
- SRC_PATH=.
- 
--UNCHECKED_GOALS := %clean TAGS cscope ctags docker docker-% help
-+UNCHECKED_GOALS := %clean TAGS cscope ctags dist \
-+    html info pdf txt \
-+    help check-help \
-+    docker docker-% vm-test vm-build-%
- 
- # All following code might depend on configuration variables
- ifneq ($(wildcard config-host.mak),)
--- 
-2.15.0
+Thanks,
+Yiwen.
+>> Signed-off-by: Yiwen Jiang <jiangyiwen@huawei.com>
+>> ---
+>>  hw/9pfs/9p.c | 4 ----
+>>  1 file changed, 4 deletions(-)
+>>
+>> diff --git a/hw/9pfs/9p.c b/hw/9pfs/9p.c
+>> index 52d4663..5ea01c4 100644
+>> --- a/hw/9pfs/9p.c
+>> +++ b/hw/9pfs/9p.c
+>> @@ -155,10 +155,6 @@ static int get_dotl_openflags(V9fsState *s, int oflags)
+>>       */
+>>      flags = dotl_to_open_flags(oflags);
+>>      flags &= ~(O_NOCTTY | O_ASYNC | O_CREAT);
+>> -    /*
+>> -     * Ignore direct disk access hint until the server supports it.
+>> -     */
+>> -    flags &= ~O_DIRECT;
+>>      return flags;
+>>  }
+>>
+> 
+> 
+> .
+> 
