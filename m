@@ -1,30 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54212)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54213)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1eHG5R-0004gB-6d
+	(envelope-from <richard.henderson@linaro.org>) id 1eHG5R-0004gC-6g
 	for qemu-devel@nongnu.org; Tue, 21 Nov 2017 16:28:10 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1eHG5Q-0007qx-94
+	(envelope-from <richard.henderson@linaro.org>) id 1eHG5O-0007pv-1B
 	for qemu-devel@nongnu.org; Tue, 21 Nov 2017 16:28:09 -0500
-Received: from mail-wr0-x244.google.com ([2a00:1450:400c:c0c::244]:34090)
+Received: from mail-wm0-x241.google.com ([2a00:1450:400c:c09::241]:38919)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1eHG5Q-0007qm-13
-	for qemu-devel@nongnu.org; Tue, 21 Nov 2017 16:28:08 -0500
-Received: by mail-wr0-x244.google.com with SMTP id k18so7664007wre.1
-	for <qemu-devel@nongnu.org>; Tue, 21 Nov 2017 13:28:07 -0800 (PST)
+	id 1eHG5N-0007pf-N1
+	for qemu-devel@nongnu.org; Tue, 21 Nov 2017 16:28:05 -0500
+Received: by mail-wm0-x241.google.com with SMTP id x63so6256553wmf.4
+	for <qemu-devel@nongnu.org>; Tue, 21 Nov 2017 13:28:05 -0800 (PST)
 Received: from cloudburst.twiddle.net
 	(70.red-37-158-60.dynamicip.rima-tde.net. [37.158.60.70])
 	by smtp.gmail.com with ESMTPSA id
-	e124sm706517wmg.34.2017.11.21.13.28.05 for <qemu-devel@nongnu.org>
+	e124sm706517wmg.34.2017.11.21.13.28.03 for <qemu-devel@nongnu.org>
 	(version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
-	Tue, 21 Nov 2017 13:28:06 -0800 (PST)
+	Tue, 21 Nov 2017 13:28:03 -0800 (PST)
 From: Richard Henderson <richard.henderson@linaro.org>
-Date: Tue, 21 Nov 2017 22:25:32 +0100
-Message-Id: <20171121212534.5177-25-richard.henderson@linaro.org>
+Date: Tue, 21 Nov 2017 22:25:30 +0100
+Message-Id: <20171121212534.5177-23-richard.henderson@linaro.org>
 In-Reply-To: <20171121212534.5177-1-richard.henderson@linaro.org>
 References: <20171121212534.5177-1-richard.henderson@linaro.org>
-Subject: [Qemu-devel] [PATCH v6 24/26] target/arm: Use vector infrastructure
- for aa64 widening shifts
+Subject: [Qemu-devel] [PATCH v6 22/26] target/arm: Use vector infrastructure
+ for aa64 multiplies
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,56 +37,234 @@ To: qemu-devel@nongnu.org
 
 Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- target/arm/translate-a64.c | 29 ++++++++++++-----------------
- 1 file changed, 12 insertions(+), 17 deletions(-)
+ target/arm/translate-a64.c | 171 ++++++++++++++++++++++++++++++++++++---------
+ 1 file changed, 138 insertions(+), 33 deletions(-)
 
 diff --git a/target/arm/translate-a64.c b/target/arm/translate-a64.c
-index c47d9caa49..1f7e9c4e19 100644
+index 1ea7e37b03..c47d9caa49 100644
 --- a/target/arm/translate-a64.c
 +++ b/target/arm/translate-a64.c
-@@ -8705,12 +8705,7 @@ static void handle_vec_simd_wshli(DisasContext *s, bool is_q, bool is_u,
-     int size = 32 - clz32(immh) - 1;
-     int immhb = immh << 3 | immb;
-     int shift = immhb - (8 << size);
--    int dsize = 64;
--    int esize = 8 << size;
--    int elements = dsize/esize;
--    TCGv_i64 tcg_rn = new_tmp_a64(s);
--    TCGv_i64 tcg_rd = new_tmp_a64(s);
--    int i;
-+    GVecGen2Fn *gvec_fn;
- 
-     if (size >= 3) {
-         unallocated_encoding(s);
-@@ -8721,18 +8716,18 @@ static void handle_vec_simd_wshli(DisasContext *s, bool is_q, bool is_u,
-         return;
+@@ -9691,6 +9691,66 @@ static void disas_simd_3same_float(DisasContext *s, uint32_t insn)
      }
- 
--    /* For the LL variants the store is larger than the load,
--     * so if rd == rn we would overwrite parts of our input.
--     * So load everything right now and use shifts in the main loop.
--     */
--    read_vec_element(s, tcg_rn, rn, is_q ? 1 : 0, MO_64);
--
--    for (i = 0; i < elements; i++) {
--        tcg_gen_shri_i64(tcg_rd, tcg_rn, i * esize);
--        ext_and_shift_reg(tcg_rd, tcg_rd, size | (!is_u << 2), 0);
--        tcg_gen_shli_i64(tcg_rd, tcg_rd, shift);
--        write_vec_element(s, tcg_rd, rd, i, size + 1);
-+    if (is_u) {
-+        gvec_fn = is_q ? tcg_gen_gvec_extuh : tcg_gen_gvec_extul;
-+    } else {
-+        gvec_fn = is_q ? tcg_gen_gvec_extsh : tcg_gen_gvec_extsl;
-     }
-+    gvec_fn(size, vec_full_reg_offset(s, rd),
-+            vec_full_reg_offset(s, rn), 16, 16);
-+
-+    /* Perform the shift in the wider format.  */
-+    tcg_gen_gvec_shli(size + 1, vec_full_reg_offset(s, rd),
-+                      vec_full_reg_offset(s, rd),
-+                      16, vec_full_reg_size(s), shift);
  }
  
- /* SHRN/RSHRN - Shift right with narrowing (and potential rounding) */
++static void gen_mla8_i32(TCGv_i32 d, TCGv_i32 a, TCGv_i32 b)
++{
++    gen_helper_neon_mul_u8(a, a, b);
++    gen_helper_neon_add_u8(d, d, a);
++}
++
++static void gen_mla16_i32(TCGv_i32 d, TCGv_i32 a, TCGv_i32 b)
++{
++    gen_helper_neon_mul_u16(a, a, b);
++    gen_helper_neon_add_u16(d, d, a);
++}
++
++static void gen_mla32_i32(TCGv_i32 d, TCGv_i32 a, TCGv_i32 b)
++{
++    tcg_gen_mul_i32(a, a, b);
++    tcg_gen_add_i32(d, d, a);
++}
++
++static void gen_mla64_i64(TCGv_i64 d, TCGv_i64 a, TCGv_i64 b)
++{
++    tcg_gen_mul_i64(a, a, b);
++    tcg_gen_add_i64(d, d, a);
++}
++
++static void gen_mla_vec(unsigned vece, TCGv_vec d, TCGv_vec a, TCGv_vec b)
++{
++    tcg_gen_mul_vec(vece, a, a, b);
++    tcg_gen_add_vec(vece, d, d, a);
++}
++
++static void gen_mls8_i32(TCGv_i32 d, TCGv_i32 a, TCGv_i32 b)
++{
++    gen_helper_neon_mul_u8(a, a, b);
++    gen_helper_neon_sub_u8(d, d, a);
++}
++
++static void gen_mls16_i32(TCGv_i32 d, TCGv_i32 a, TCGv_i32 b)
++{
++    gen_helper_neon_mul_u16(a, a, b);
++    gen_helper_neon_sub_u16(d, d, a);
++}
++
++static void gen_mls32_i32(TCGv_i32 d, TCGv_i32 a, TCGv_i32 b)
++{
++    tcg_gen_mul_i32(a, a, b);
++    tcg_gen_sub_i32(d, d, a);
++}
++
++static void gen_mls64_i64(TCGv_i64 d, TCGv_i64 a, TCGv_i64 b)
++{
++    tcg_gen_mul_i64(a, a, b);
++    tcg_gen_sub_i64(d, d, a);
++}
++
++static void gen_mls_vec(unsigned vece, TCGv_vec d, TCGv_vec a, TCGv_vec b)
++{
++    tcg_gen_mul_vec(vece, a, a, b);
++    tcg_gen_sub_vec(vece, d, d, a);
++}
++
+ /* Integer op subgroup of C3.6.16. */
+ static void disas_simd_3same_int(DisasContext *s, uint32_t insn)
+ {
+@@ -9702,7 +9762,8 @@ static void disas_simd_3same_int(DisasContext *s, uint32_t insn)
+     int rn = extract32(insn, 5, 5);
+     int rd = extract32(insn, 0, 5);
+     int pass;
+-    GVecGen3Fn *gvec_op;
++    GVecGen3Fn *gvec_fn;
++    const GVecGen3 *gvec_op;
+     TCGCond cond;
+ 
+     switch (opcode) {
+@@ -9745,12 +9806,70 @@ static void disas_simd_3same_int(DisasContext *s, uint32_t insn)
+ 
+     switch (opcode) {
+     case 0x10: /* ADD, SUB */
+-        gvec_op = u ? tcg_gen_gvec_sub : tcg_gen_gvec_add;
+-        gvec_op(size, vec_full_reg_offset(s, rd),
++        gvec_fn = u ? tcg_gen_gvec_sub : tcg_gen_gvec_add;
++    do_gvec:
++        gvec_fn(size, vec_full_reg_offset(s, rd),
+                 vec_full_reg_offset(s, rn),
+                 vec_full_reg_offset(s, rm),
+                 is_q ? 16 : 8, vec_full_reg_size(s));
+         return;
++    case 0x13: /* MUL, PMUL */
++        if (!u) { /* MUL */
++            gvec_fn = tcg_gen_gvec_mul;
++            goto do_gvec;
++        }
++        break;
++    case 0x12: /* MLA, MLS */
++        {
++            static const GVecGen3 mla_op[4] = {
++                { .fni4 = gen_mla8_i32,
++                  .fniv = gen_mla_vec,
++                  .opc = INDEX_op_mul_vec,
++                  .load_dest = true,
++                  .vece = MO_8 },
++                { .fni4 = gen_mla16_i32,
++                  .fniv = gen_mla_vec,
++                  .opc = INDEX_op_mul_vec,
++                  .load_dest = true,
++                  .vece = MO_16 },
++                { .fni4 = gen_mla32_i32,
++                  .fniv = gen_mla_vec,
++                  .opc = INDEX_op_mul_vec,
++                  .load_dest = true,
++                  .vece = MO_32 },
++                { .fni8 = gen_mla64_i64,
++                  .fniv = gen_mla_vec,
++                  .opc = INDEX_op_mul_vec,
++                  .prefer_i64 = TCG_TARGET_REG_BITS == 64,
++                  .load_dest = true,
++                  .vece = MO_64 },
++            };
++            static const GVecGen3 mls_op[4] = {
++                { .fni4 = gen_mls8_i32,
++                  .fniv = gen_mls_vec,
++                  .opc = INDEX_op_mul_vec,
++                  .load_dest = true,
++                  .vece = MO_8 },
++                { .fni4 = gen_mls16_i32,
++                  .fniv = gen_mls_vec,
++                  .opc = INDEX_op_mul_vec,
++                  .load_dest = true,
++                  .vece = MO_16 },
++                { .fni4 = gen_mls32_i32,
++                  .fniv = gen_mls_vec,
++                  .opc = INDEX_op_mul_vec,
++                  .load_dest = true,
++                  .vece = MO_32 },
++                { .fni8 = gen_mls64_i64,
++                  .fniv = gen_mls_vec,
++                  .opc = INDEX_op_mul_vec,
++                  .prefer_i64 = TCG_TARGET_REG_BITS == 64,
++                  .load_dest = true,
++                  .vece = MO_64 },
++            };
++            gvec_op = (u ? &mls_op[size] : &mla_op[size]);
++        }
++        goto do_gvec_op;
+     case 0x11:
+         if (u) { /* CMEQ */
+             cond = TCG_COND_EQ;
+@@ -9771,12 +9890,13 @@ static void disas_simd_3same_int(DisasContext *s, uint32_t insn)
+                   .prefer_i64 = TCG_TARGET_REG_BITS == 64,
+                   .vece = MO_64 },
+             };
+-            tcg_gen_gvec_3(vec_full_reg_offset(s, rd),
+-                           vec_full_reg_offset(s, rn),
+-                           vec_full_reg_offset(s, rm),
+-                           is_q ? 16 : 8, vec_full_reg_size(s),
+-                           &cmtst_op[size]);
++            gvec_op = &cmtst_op[size];
+         }
++    do_gvec_op:
++        tcg_gen_gvec_3(vec_full_reg_offset(s, rd),
++                       vec_full_reg_offset(s, rn),
++                       vec_full_reg_offset(s, rm),
++                       is_q ? 16 : 8, vec_full_reg_size(s), gvec_op);
+         return;
+     case 0x06: /* CMGT, CMHI */
+         cond = u ? TCG_COND_GTU : TCG_COND_GT;
+@@ -9944,23 +10064,10 @@ static void disas_simd_3same_int(DisasContext *s, uint32_t insn)
+                 break;
+             }
+             case 0x13: /* MUL, PMUL */
+-                if (u) {
+-                    /* PMUL */
+-                    assert(size == 0);
+-                    genfn = gen_helper_neon_mul_p8;
+-                    break;
+-                }
+-                /* fall through : MUL */
+-            case 0x12: /* MLA, MLS */
+-            {
+-                static NeonGenTwoOpFn * const fns[3] = {
+-                    gen_helper_neon_mul_u8,
+-                    gen_helper_neon_mul_u16,
+-                    tcg_gen_mul_i32,
+-                };
+-                genfn = fns[size];
++                assert(u); /* PMUL */
++                assert(size == 0);
++                genfn = gen_helper_neon_mul_p8;
+                 break;
+-            }
+             case 0x16: /* SQDMULH, SQRDMULH */
+             {
+                 static NeonGenTwoOpEnvFn * const fns[2][2] = {
+@@ -9981,18 +10088,16 @@ static void disas_simd_3same_int(DisasContext *s, uint32_t insn)
+                 genfn(tcg_res, tcg_op1, tcg_op2);
+             }
+ 
+-            if (opcode == 0xf || opcode == 0x12) {
+-                /* SABA, UABA, MLA, MLS: accumulating ops */
+-                static NeonGenTwoOpFn * const fns[3][2] = {
+-                    { gen_helper_neon_add_u8, gen_helper_neon_sub_u8 },
+-                    { gen_helper_neon_add_u16, gen_helper_neon_sub_u16 },
+-                    { tcg_gen_add_i32, tcg_gen_sub_i32 },
++            if (opcode == 0xf) {
++                /* SABA, UABA: accumulating ops */
++                static NeonGenTwoOpFn * const fns[3] = {
++                    gen_helper_neon_add_u8,
++                    gen_helper_neon_add_u16,
++                    tcg_gen_add_i32,
+                 };
+-                bool is_sub = (opcode == 0x12 && u); /* MLS */
+ 
+-                genfn = fns[size][is_sub];
+                 read_vec_element_i32(s, tcg_op1, rd, pass, MO_32);
+-                genfn(tcg_res, tcg_op1, tcg_res);
++                fns[size](tcg_res, tcg_op1, tcg_res);
+             }
+ 
+             write_vec_element_i32(s, tcg_res, rd, pass, MO_32);
 -- 
 2.13.6
