@@ -1,34 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55291)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56045)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1eHB2G-0003Dm-K3
-	for qemu-devel@nongnu.org; Tue, 21 Nov 2017 11:04:33 -0500
+	(envelope-from <cohuck@redhat.com>) id 1eHB4e-0003yh-SV
+	for qemu-devel@nongnu.org; Tue, 21 Nov 2017 11:07:05 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1eHB2B-0005Gx-Vl
-	for qemu-devel@nongnu.org; Tue, 21 Nov 2017 11:04:32 -0500
-Received: from mail-qk0-x244.google.com ([2607:f8b0:400d:c09::244]:44535)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1eHB2B-0005Gc-RI
-	for qemu-devel@nongnu.org; Tue, 21 Nov 2017 11:04:27 -0500
-Received: by mail-qk0-x244.google.com with SMTP id n3so12703779qkn.11
-	for <qemu-devel@nongnu.org>; Tue, 21 Nov 2017 08:04:27 -0800 (PST)
-Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
-	<philippe.mathieu.daude@gmail.com>
-References: <1511276888-17834-1-git-send-email-peter.maydell@linaro.org>
-	<7308e432-4cf5-04bd-4a22-f330dda1f933@amsat.org>
-	<CAFEAcA_NK63LdJs=3Y6zvdrn2Vn7Vvq-CF=p_J4kq9+6VKDOXg@mail.gmail.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <7c5ebc0b-c588-e405-58a4-783c357169b6@amsat.org>
-Date: Tue, 21 Nov 2017 13:04:24 -0300
+	(envelope-from <cohuck@redhat.com>) id 1eHB4Z-0006bq-Tc
+	for qemu-devel@nongnu.org; Tue, 21 Nov 2017 11:07:00 -0500
+Date: Tue, 21 Nov 2017 17:06:50 +0100
+From: Cornelia Huck <cohuck@redhat.com>
+Message-ID: <20171121170650.323c6959.cohuck@redhat.com>
+In-Reply-To: <66e1c5e3-575f-ec7c-d88c-4ada23f358fa@de.ibm.com>
+References: <20171121111825.17916-1-pasic@linux.vnet.ibm.com>
+	<20171121144457.60adb0c3.cohuck@redhat.com>
+	<66e1c5e3-575f-ec7c-d88c-4ada23f358fa@de.ibm.com>
 MIME-Version: 1.0
-In-Reply-To: <CAFEAcA_NK63LdJs=3Y6zvdrn2Vn7Vvq-CF=p_J4kq9+6VKDOXg@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH] memory-internal.h: Remove obsolete claim
- that header is obsolete
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [RFC PATCH 1/1] s390x/css: unresrict cssids
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,41 +24,149 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>, "patches@linaro.org" <patches@linaro.org>
+To: Christian Borntraeger <borntraeger@de.ibm.com>
+Cc: Halil Pasic <pasic@linux.vnet.ibm.com>, Boris Fiuczynski <fiuczy@linux.vnet.ibm.com>, Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>, Shalini Chellathurai Saroja <shalini@linux.vnet.ibm.com>, qemu-devel@nongnu.org, qemu-s390x@nongnu.org
 
-On 11/21/2017 01:00 PM, Peter Maydell wrote:
-> On 21 November 2017 at 15:57, Philippe Mathieu-Daudé <f4bug@amsat.org> wrote:
->> Hi Peter,
->>
->> On 11/21/2017 12:08 PM, Peter Maydell wrote:
->>> The memory-internal.h header claims that it is for "obsolete
->>> exec.c functions" which "will be removed soon". This statement
->>> was added in 2011, six years ago, but the header is still here.
->>> (Admittedly none of the prototypes added in commit 67d95c153bef55f6
->>> are still in the header.)
->>>
->>> It's convenient to have a place to put prototypes for functions
->>> which are used internally to the various .c files of the memory
->>> system or by the accel/tcg code, which is inevitably fairly
->>> closely coupled. So keep the header but update the comments to
->>> reflect what we're actually using it for.
->>
->> Until your NotDirtyInfo addition, the only prototype used was
->> memory_region_access_valid() (in s390-pci-inst.c).
->>
->> Since "none of the prototypes added in commit 67d95c153bef55f6 are still
->> in the header" we could restrict it out of include/exec/ (kinda 'revert'
->> 022c62cbbc) and only keep memory_region_access_valid() + NotDirtyInfo
->> exposed in include/exec/.
+On Tue, 21 Nov 2017 15:45:17 +0100
+Christian Borntraeger <borntraeger@de.ibm.com> wrote:
+
+> On 11/21/2017 02:44 PM, Cornelia Huck wrote:
+> > On Tue, 21 Nov 2017 12:18:25 +0100
+> > Halil Pasic <pasic@linux.vnet.ibm.com> wrote:
+> > 
+> > Subject: s/unresrict/unrestrict/
+> >   
+> >> The default css 0xFE is currently restricted to virtual subchannel
+> >> devices. The hope when the decision was made was, that non-virtual
+> >> subchannel devices will come around when guest can exploit multiple
+> >> channel subsystems. Since the guests generally don't do, the pain
+> >> of the partitioned (cssid) namespace outweighs the gain.
+> >>
+> >> Let us remove the corresponding restrictions (virtual devices
+> >> can be put only in 0xFE and non-virtual devices in any css except
+> >> the 0xFE), and inform management software property on all ccw
+> >> devices.  
+> > 
+> > I do not really like dropping the restrictions while still keeping the
+> > default cssid as 0xfe. Putting virtual devices into css 0 seems
+> > completely fine, but putting non-virtual devices into css 0xfe still
+> > feels a bit wrong. What about:
+> > 
+> > - Add a property to specify the default cssid. Compat machines use a
+> >   default cssid of 0xfe.
+> > - Default to a cssid of 0.
+> > - (optional) Warn when putting a non-virtual device into css 0xfe,
+> >   unless it is the default css.  
 > 
-> I'm not sure what you're suggesting. I definitely think the
-> s390 usage is pretty nasty but I guess it would need some
-> rework to get rid of. For everything else, it's nice
-> to have somewhere to share these things. You could argue
-> for splitting the header into two, one for 'between memory.c
-> and exec.c' and one for 'between memory.c and cputlb.c',
-> but is it worth the effort?
+> To make it more clear, I think the most compatible solution would be to allow
+> vfio-ccw also in FE. (But continue to force virtual devices in FE as well).
+> This was more or less the first proposal that we had. Then we asked ourselves
+> why not also allow virtual devices in 0?
+> 
+> I think your proposal of specifying a default css (and then allowing
+> all devices in that) is actually pretty close to Halils proposal. The only
+> difference is that Halils variant keeps fe as default css. 
+> So I think we could even combine both approaches. Use Halils patch as a base
+> and in addition provide a way to change the default css away from fe. Have to
+> think about that.
 
-Why not move memory_region_access_valid() + NotDirtyInfo in
-"exec/exec-all.h" and only use this to "share these things"?
+If keeping the default of 0xfe makes the life of management software
+easier, sure. As it is, we seem to be far more entrenched with
+paravirtual devices than I had expected when I first wrote this, so
+0xfe might be the sensible choice even if mcss-e is available in the
+future. In this case, I think we should lift all cssid restrictions.
+
+> 
+> 
+> [...]
+> >>
+> >> ---
+> >>  hw/s390x/ccw-device.c | 6 ++++++
+> >>  hw/s390x/css.c        | 9 ---------
+> >>  2 files changed, 6 insertions(+), 9 deletions(-)
+> >>
+> >> diff --git a/hw/s390x/ccw-device.c b/hw/s390x/ccw-device.c
+> >> index f9bfa154d6..2167ccea5d 100644
+> >> --- a/hw/s390x/ccw-device.c
+> >> +++ b/hw/s390x/ccw-device.c
+> >> @@ -40,6 +40,10 @@ static Property ccw_device_properties[] = {
+> >>      DEFINE_PROP_END_OF_LIST(),
+> >>  };
+> >>  
+> >> +static bool prop_get_true(Object *obj, Error **errp)
+> >> +{
+> >> +    return true;
+> >> +}
+> >>  static void ccw_device_class_init(ObjectClass *klass, void *data)
+> >>  {
+> >>      DeviceClass *dc = DEVICE_CLASS(klass);
+> >> @@ -48,6 +52,8 @@ static void ccw_device_class_init(ObjectClass *klass, void *data)
+> >>      k->realize = ccw_device_realize;
+> >>      k->refill_ids = ccw_device_refill_ids;
+> >>      dc->props = ccw_device_properties;
+> >> +    object_class_property_add_bool(klass, "cssid-unrestricted",
+> >> +                                   prop_get_true, NULL, NULL);  
+> > 
+> > This looks really, really strange. This is a property that is always
+> > true if it exists.
+> > 
+> > What about compat machines? This qemu won't have the restriction, but
+> > old qemus will.
+> > 
+> > Also, I'd consider this a property of the machine, not of the
+> > individual devices. Or of the ChannelSubsystem structure, which is not
+> > qom'ified.  
+> 
+> A property per device allow to put restrictions on specific devices if necessary.
+> Not sure if we need it.
+
+If we would need restrictions, putting in the valid cssids (or
+forbidding ids) would make more sense. But frankly, I don't really see
+a use case for that.
+
+> I think for libvirt several variants would work out
+> (a property as seen here, a new object, the default_css machine option)
+
+If so, I'd vote for either a new css object or a machine option.
+
+> 
+> > 
+> > As an alternative, I think providing a machine default_cssid parameter
+> > makes more sense: It is understandable, and you keep compatibility. I
+> > think we want this in the long run anyway.
+> >   
+> >>  }
+> >>  
+> >>  const VMStateDescription vmstate_ccw_dev = {
+> >> diff --git a/hw/s390x/css.c b/hw/s390x/css.c
+> >> index f6b5c807cd..957cb9ec90 100644
+> >> --- a/hw/s390x/css.c
+> >> +++ b/hw/s390x/css.c
+> >> @@ -2377,15 +2377,6 @@ SubchDev *css_create_sch(CssDevId bus_id, bool is_virtual, bool squash_mcss,
+> >>      SubchDev *sch;
+> >>  
+> >>      if (bus_id.valid) {
+> >> -        if (is_virtual != (bus_id.cssid == VIRTUAL_CSSID)) {
+> >> -            error_setg(errp, "cssid %hhx not valid for %s devices",
+> >> -                       bus_id.cssid,
+> >> -                       (is_virtual ? "virtual" : "non-virtual"));
+> >> -            return NULL;
+> >> -        }
+> >> -    }  
+> > 
+> > This allows building a commandline in a compat machine that will not
+> > work with old qemus, no?  
+> 
+> I think this is pretty common to have new devices and things that will not
+> work on old QEMUs but are allowed on compat machines, e.g. virtio-gpu was
+> added in 2.4 but
+> 
+> [cborntra@oc7330422307 qemu]$ build/i386-softmmu/qemu-system-i386 -device virtio-gpu-pci -M pc-i440fx-2.2
+> VNC server running on ::1:5900
+> 
+> works fine
+
+It seems a bit more unexpected, though.
+
+(And I'm still not quite sure how all of this interacts with the squash
+option.)
