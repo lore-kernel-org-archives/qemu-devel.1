@@ -1,15 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35948)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36107)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1eHA9J-0007aN-7z
-	for qemu-devel@nongnu.org; Tue, 21 Nov 2017 10:07:54 -0500
+	(envelope-from <pm215@archaic.org.uk>) id 1eHA9o-00080Y-Kl
+	for qemu-devel@nongnu.org; Tue, 21 Nov 2017 10:08:17 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1eHA9E-0003tq-OG
-	for qemu-devel@nongnu.org; Tue, 21 Nov 2017 10:07:45 -0500
+	(envelope-from <pm215@archaic.org.uk>) id 1eHA9i-00044T-Oe
+	for qemu-devel@nongnu.org; Tue, 21 Nov 2017 10:08:16 -0500
+Received: from orth.archaic.org.uk ([2001:8b0:1d0::2]:38492)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pm215@archaic.org.uk>)
+	id 1eHA9i-000446-HG
+	for qemu-devel@nongnu.org; Tue, 21 Nov 2017 10:08:10 -0500
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 21 Nov 2017 15:07:31 +0000
-Message-Id: <1511276851-17680-1-git-send-email-peter.maydell@linaro.org>
-Subject: [Qemu-devel] [PATCH] accel/tcg/cpu-exec-common.c: Remove
- unnecessary include of memory-internal.h
+Date: Tue, 21 Nov 2017 15:08:08 +0000
+Message-Id: <1511276888-17834-1-git-send-email-peter.maydell@linaro.org>
+Subject: [Qemu-devel] [PATCH] memory-internal.h: Remove obsolete claim that
+ header is obsolete
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -18,28 +23,48 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org, qemu-trivial@nongnu.org
-Cc: patches@linaro.org
+To: qemu-devel@nongnu.org
+Cc: patches@linaro.org, Paolo Bonzini <pbonzini@redhat.com>
 
-The cpu-exec-common.c file includes memory-internal.h, but it doesn't
-actually use anything from that header. Remove the unnecessary include.
+The memory-internal.h header claims that it is for "obsolete
+exec.c functions" which "will be removed soon". This statement
+was added in 2011, six years ago, but the header is still here.
+(Admittedly none of the prototypes added in commit 67d95c153bef55f6
+are still in the header.)
+
+It's convenient to have a place to put prototypes for functions
+which are used internally to the various .c files of the memory
+system or by the accel/tcg code, which is inevitably fairly
+closely coupled. So keep the header but update the comments to
+reflect what we're actually using it for.
 
 Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 ---
- accel/tcg/cpu-exec-common.c | 1 -
- 1 file changed, 1 deletion(-)
+ include/exec/memory-internal.h | 7 ++++---
+ 1 file changed, 4 insertions(+), 3 deletions(-)
 
-diff --git a/accel/tcg/cpu-exec-common.c b/accel/tcg/cpu-exec-common.c
-index 5b4ae54..dac5aac 100644
---- a/accel/tcg/cpu-exec-common.c
-+++ b/accel/tcg/cpu-exec-common.c
-@@ -21,7 +21,6 @@
- #include "cpu.h"
- #include "sysemu/cpus.h"
- #include "exec/exec-all.h"
--#include "exec/memory-internal.h"
+diff --git a/include/exec/memory-internal.h b/include/exec/memory-internal.h
+index 98d8296..4162474 100644
+--- a/include/exec/memory-internal.h
++++ b/include/exec/memory-internal.h
+@@ -1,5 +1,5 @@
+ /*
+- * Declarations for obsolete exec.c functions
++ * Declarations for functions which are internal to the memory subsystem.
+  *
+  * Copyright 2011 Red Hat, Inc. and/or its affiliates
+  *
+@@ -12,8 +12,9 @@
+  */
  
- bool tcg_allowed;
+ /*
+- * This header is for use by exec.c and memory.c ONLY.  Do not include it.
+- * The functions declared here will be removed soon.
++ * This header is for use by exec.c, memory.c and accel/tcg/cputlb.c ONLY,
++ * for declarations which are shared between the memory subsystem's
++ * internals and the TCG TLB code. Do not include it from elsewhere.
+  */
  
+ #ifndef MEMORY_INTERNAL_H
 -- 
 2.7.4
