@@ -1,19 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60005)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60040)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <gengdongjiu@huawei.com>) id 1eH5qz-0001Pw-JJ
-	for qemu-devel@nongnu.org; Tue, 21 Nov 2017 05:32:35 -0500
+	(envelope-from <gengdongjiu@huawei.com>) id 1eH5r3-0001Sq-2S
+	for qemu-devel@nongnu.org; Tue, 21 Nov 2017 05:32:40 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <gengdongjiu@huawei.com>) id 1eH5qy-0005hw-BJ
-	for qemu-devel@nongnu.org; Tue, 21 Nov 2017 05:32:33 -0500
+	(envelope-from <gengdongjiu@huawei.com>) id 1eH5r0-0005is-Pn
+	for qemu-devel@nongnu.org; Tue, 21 Nov 2017 05:32:37 -0500
 From: Dongjiu Geng <gengdongjiu@huawei.com>
-Date: Wed, 22 Nov 2017 02:37:10 +0800
-Message-ID: <1511289434-1551-9-git-send-email-gengdongjiu@huawei.com>
+Date: Wed, 22 Nov 2017 02:37:07 +0800
+Message-ID: <1511289434-1551-6-git-send-email-gengdongjiu@huawei.com>
 In-Reply-To: <1511289434-1551-1-git-send-email-gengdongjiu@huawei.com>
 References: <1511289434-1551-1-git-send-email-gengdongjiu@huawei.com>
 MIME-Version: 1.0
 Content-Type: text/plain
-Subject: [Qemu-devel] [PATCH RESEND v12 08/12] target-arm: kvm64: inject
- synchronous External Abort
+Subject: [Qemu-devel] [PATCH RESEND v12 05/12] linux-headers: sync against
+ Linux v4.14-rc8
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,136 +25,309 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: pbonzini@redhat.com, mst@redhat.com, imammedo@redhat.com, zhaoshenglong@huawei.com, peter.maydell@linaro.org, mtosatti@redhat.com, james.morse@arm.com, lersek@redhat.com, marc.zyngier@arm.com, christoffer.dall@linaro.org, rth@twiddle.net, ehabkost@redhat.com, kvm@vger.kernel.org, guohanjun@huawei.com, lijinyue@huawei.com, huangshaoyu@huawei.com, wuquanming@huawei.com, zhengqiang10@huawei.com, linuxarm@huawei.com, qemu-devel@nongnu.org, qemu-arm@nongnu.org, dingtianhong@huawei.com, wangxiongfeng2@huawei.com
 Cc: gengdongjiu@huawei.com
 
-Add synchronous external abort injection logic, setup
-spsr_elx, esr_elx, PSTATE, elr_elx etc, when switch to
-guest, guest will jump to the synchronous external abort
-vector table entry.
-
-The ESR_ELx.DFSC is set to Synchronous external abort(0x10),
-and ESR_ELx.FnV is set to not valid(0x1), which will tell
-guest that FAR is not valid and holds an UNKNOWN value.
-
-These value will be set to KVM related structure through
-KVM_SET_ONE_REG IOCTL.
-
 Signed-off-by: Dongjiu Geng <gengdongjiu@huawei.com>
-Signed-off-by: Quanming Wu <wuquanming@huawei.com>
 
 ---
-Marc is against that KVM inject the synchronous external abort(SEA) in [1],
-so user space how to inject it. The log that Qemu injects SEA to guest is
-shown in [2].
+Address Peter's comments to sync mainline Linux header file in [1]
 
-[1]: https://lkml.org/lkml/2017/3/2/110
-[2]:
-Taking exception 4 [Data Abort]
-...from EL0 to EL1
-...with ESR 0x24/0x92000410
-...with FAR 0x0
-...with ELR 0x40cf04
-...to EL1 PC 0xffffffc000084c00 PSTATE 0x3c5
-after kvm_inject_arm_sea
-Unhandled fault: synchronous external abort (0x92000410) at 0x0000007fa234c12c
-CPU: 0 PID: 536 Comm: devmem Not tainted 4.1.0+ #20
-Hardware name: linux,dummy-virt (DT)
-task: ffffffc019ab2b00 ti: ffffffc008134000 task.ti: ffffffc008134000
-PC is at 0x40cf04
-LR is at 0x40cdec
-pc : [<000000000040cf04>] lr : [<000000000040cdec>] pstate: 60000000
-sp : 0000007ff7b24130
-x29: 0000007ff7b24260 x28: 0000000000000000
-x27: 00000000000000ad x26: 000000000049c000
-x25: 000000000048904b x24: 000000000049c000
-x23: 0000000040600000 x22: 0000007ff7b243a0
-x21: 0000000000000002 x20: 0000000000000000
-x19: 0000000000000020 x18: 0000000000000000
-x17: 000000000049c6d0 x16: 0000007fa22c85c0
-x15: 0000000000005798 x14: 0000007fa2205f1c
-x13: 0000007fa241ccb0 x12: 0000000000000137
-x11: 0000000000000000 x10: 0000000000000000
-x9 : 0000000000000000 x8 : 00000000000000de
-x7 : 0000000000000000 x6 : 0000000000002000
-x5 : 0000000040600000 x4 : 0000000000000003
-x3 : 0000000000000001 x2 : 0000000000000000
-x1 : 0000000000000000 x0 : 0000007fa2418000
+[1]: https://lkml.org/lkml/2017/9/5/575
 ---
- target/arm/kvm64.c | 64 ++++++++++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 64 insertions(+)
+ include/standard-headers/asm-s390/kvm_virtio.h     | 1 +
+ include/standard-headers/asm-s390/virtio-ccw.h     | 1 +
+ include/standard-headers/asm-x86/hyperv.h          | 1 +
+ include/standard-headers/linux/input-event-codes.h | 1 +
+ include/standard-headers/linux/input.h             | 1 +
+ include/standard-headers/linux/pci_regs.h          | 1 +
+ linux-headers/asm-arm/kvm.h                        | 1 +
+ linux-headers/asm-arm/kvm_para.h                   | 1 +
+ linux-headers/asm-arm/unistd.h                     | 1 +
+ linux-headers/asm-arm64/kvm.h                      | 1 +
+ linux-headers/asm-arm64/unistd.h                   | 1 +
+ linux-headers/asm-powerpc/epapr_hcalls.h           | 1 +
+ linux-headers/asm-powerpc/kvm.h                    | 1 +
+ linux-headers/asm-powerpc/kvm_para.h               | 1 +
+ linux-headers/asm-powerpc/unistd.h                 | 1 +
+ linux-headers/asm-s390/kvm.h                       | 1 +
+ linux-headers/asm-s390/kvm_para.h                  | 1 +
+ linux-headers/asm-s390/unistd.h                    | 1 +
+ linux-headers/asm-x86/kvm.h                        | 1 +
+ linux-headers/asm-x86/kvm_para.h                   | 1 +
+ linux-headers/asm-x86/unistd.h                     | 1 +
+ linux-headers/linux/kvm.h                          | 4 ++++
+ linux-headers/linux/kvm_para.h                     | 1 +
+ linux-headers/linux/psci.h                         | 1 +
+ linux-headers/linux/userfaultfd.h                  | 1 +
+ linux-headers/linux/vfio.h                         | 1 +
+ linux-headers/linux/vfio_ccw.h                     | 1 +
+ linux-headers/linux/vhost.h                        | 1 +
+ 28 files changed, 31 insertions(+)
 
-diff --git a/target/arm/kvm64.c b/target/arm/kvm64.c
-index 2d0eb32..7f662e9 100644
---- a/target/arm/kvm64.c
-+++ b/target/arm/kvm64.c
-@@ -582,6 +582,70 @@ int kvm_arm_cpreg_level(uint64_t regidx)
-     return KVM_PUT_RUNTIME_STATE;
- }
+diff --git a/include/standard-headers/asm-s390/kvm_virtio.h b/include/standard-headers/asm-s390/kvm_virtio.h
+index daad324..4af18ca 100644
+--- a/include/standard-headers/asm-s390/kvm_virtio.h
++++ b/include/standard-headers/asm-s390/kvm_virtio.h
+@@ -1,3 +1,4 @@
++/* SPDX-License-Identifier: GPL-2.0 WITH Linux-syscall-note */
+ /*
+  * definition for virtio for kvm on s390
+  *
+diff --git a/include/standard-headers/asm-s390/virtio-ccw.h b/include/standard-headers/asm-s390/virtio-ccw.h
+index a9a4ebf..967aad3 100644
+--- a/include/standard-headers/asm-s390/virtio-ccw.h
++++ b/include/standard-headers/asm-s390/virtio-ccw.h
+@@ -1,3 +1,4 @@
++/* SPDX-License-Identifier: GPL-2.0 WITH Linux-syscall-note */
+ /*
+  * Definitions for virtio-ccw devices.
+  *
+diff --git a/include/standard-headers/asm-x86/hyperv.h b/include/standard-headers/asm-x86/hyperv.h
+index fac7651..2c8a3ff 100644
+--- a/include/standard-headers/asm-x86/hyperv.h
++++ b/include/standard-headers/asm-x86/hyperv.h
+@@ -1,3 +1,4 @@
++/* SPDX-License-Identifier: GPL-2.0 WITH Linux-syscall-note */
+ #ifndef _ASM_X86_HYPERV_H
+ #define _ASM_X86_HYPERV_H
  
-+static int kvm_arm_cpreg_value(ARMCPU *cpu, ptrdiff_t fieldoffset)
-+{
-+    int i;
-+
-+    for (i = 0; i < cpu->cpreg_array_len; i++) {
-+        uint32_t regidx = kvm_to_cpreg_id(cpu->cpreg_indexes[i]);
-+        const ARMCPRegInfo *ri;
-+        ri = get_arm_cp_reginfo(cpu->cp_regs, regidx);
-+        if (!ri) {
-+            continue;
-+        }
-+
-+        if (ri->type & ARM_CP_NO_RAW) {
-+            continue;
-+        }
-+
-+        if (ri->fieldoffset == fieldoffset) {
-+            cpu->cpreg_values[i] = read_raw_cp_reg(&cpu->env, ri);
-+            return 0;
-+        }
-+    }
-+    return -EINVAL;
-+}
-+
-+/* Inject synchronous external abort */
-+static void kvm_inject_arm_sea(CPUState *c)
-+{
-+    ARMCPU *cpu = ARM_CPU(c);
-+    CPUARMState *env = &cpu->env;
-+    unsigned long cpsr = pstate_read(env);
-+    uint32_t esr, ret;
-+
-+    c->exception_index = EXCP_DATA_ABORT;
-+    /* Inject the exception to El1 */
-+    env->exception.target_el = 1;
-+    CPUClass *cc = CPU_GET_CLASS(c);
-+
-+    /* Set the DFSC to Synchronous external abort and FnV to not valid,
-+     * this will tell guest the FAR_EL1 is UNKNOWN.
-+     */
-+    esr = (0x10 | (1 << 10));
-+
-+    /* This exception is EL0 or EL1 fault. */
-+    if ((cpsr & 0xf) == PSTATE_MODE_EL0t) {
-+        esr |= (EC_DATAABORT << ARM_EL_EC_SHIFT);
-+    } else {
-+        esr |= (EC_DATAABORT_SAME_EL << ARM_EL_EC_SHIFT);
-+    }
-+
-+    /* In the aarch64, there is only 32-bit instruction*/
-+    esr |= ARM_EL_IL;
-+    env->exception.syndrome = esr;
-+
-+    cc->do_interrupt(c);
-+
-+    /* set ESR_EL1 */
-+    ret = kvm_arm_cpreg_value(cpu, offsetof(CPUARMState, cp15.esr_el[1]));
-+
-+    if (ret) {
-+        fprintf(stderr, "<%s> failed to set esr_el1\n", __func__);
-+        abort();
-+    }
-+}
-+
- #define AARCH64_CORE_REG(x)   (KVM_REG_ARM64 | KVM_REG_SIZE_U64 | \
-                  KVM_REG_ARM_CORE | KVM_REG_ARM_CORE_REG(x))
+diff --git a/include/standard-headers/linux/input-event-codes.h b/include/standard-headers/linux/input-event-codes.h
+index 2fa0f4e..7cc0fcb 100644
+--- a/include/standard-headers/linux/input-event-codes.h
++++ b/include/standard-headers/linux/input-event-codes.h
+@@ -1,3 +1,4 @@
++/* SPDX-License-Identifier: GPL-2.0 WITH Linux-syscall-note */
+ /*
+  * Input event codes
+  *
+diff --git a/include/standard-headers/linux/input.h b/include/standard-headers/linux/input.h
+index 666e201..bc3e6d3 100644
+--- a/include/standard-headers/linux/input.h
++++ b/include/standard-headers/linux/input.h
+@@ -1,3 +1,4 @@
++/* SPDX-License-Identifier: GPL-2.0 WITH Linux-syscall-note */
+ /*
+  * Copyright (c) 1999-2002 Vojtech Pavlik
+  *
+diff --git a/include/standard-headers/linux/pci_regs.h b/include/standard-headers/linux/pci_regs.h
+index c22d3eb..92500c3 100644
+--- a/include/standard-headers/linux/pci_regs.h
++++ b/include/standard-headers/linux/pci_regs.h
+@@ -1,3 +1,4 @@
++/* SPDX-License-Identifier: GPL-2.0 WITH Linux-syscall-note */
+ /*
+  *	pci_regs.h
+  *
+diff --git a/linux-headers/asm-arm/kvm.h b/linux-headers/asm-arm/kvm.h
+index fa9fae8..17ffa87 100644
+--- a/linux-headers/asm-arm/kvm.h
++++ b/linux-headers/asm-arm/kvm.h
+@@ -1,3 +1,4 @@
++/* SPDX-License-Identifier: GPL-2.0 WITH Linux-syscall-note */
+ /*
+  * Copyright (C) 2012 - Virtual Open Systems and Columbia University
+  * Author: Christoffer Dall <c.dall@virtualopensystems.com>
+diff --git a/linux-headers/asm-arm/kvm_para.h b/linux-headers/asm-arm/kvm_para.h
+index 14fab8f..baacc49 100644
+--- a/linux-headers/asm-arm/kvm_para.h
++++ b/linux-headers/asm-arm/kvm_para.h
+@@ -1 +1,2 @@
++/* SPDX-License-Identifier: GPL-2.0 WITH Linux-syscall-note */
+ #include <asm-generic/kvm_para.h>
+diff --git a/linux-headers/asm-arm/unistd.h b/linux-headers/asm-arm/unistd.h
+index 155571b..8ee6d25 100644
+--- a/linux-headers/asm-arm/unistd.h
++++ b/linux-headers/asm-arm/unistd.h
+@@ -1,3 +1,4 @@
++/* SPDX-License-Identifier: GPL-2.0 WITH Linux-syscall-note */
+ /*
+  *  arch/arm/include/asm/unistd.h
+  *
+diff --git a/linux-headers/asm-arm64/kvm.h b/linux-headers/asm-arm64/kvm.h
+index d254700..2c79c6f 100644
+--- a/linux-headers/asm-arm64/kvm.h
++++ b/linux-headers/asm-arm64/kvm.h
+@@ -1,3 +1,4 @@
++/* SPDX-License-Identifier: GPL-2.0 WITH Linux-syscall-note */
+ /*
+  * Copyright (C) 2012,2013 - ARM Ltd
+  * Author: Marc Zyngier <marc.zyngier@arm.com>
+diff --git a/linux-headers/asm-arm64/unistd.h b/linux-headers/asm-arm64/unistd.h
+index 043d17a..5072cbd 100644
+--- a/linux-headers/asm-arm64/unistd.h
++++ b/linux-headers/asm-arm64/unistd.h
+@@ -1,3 +1,4 @@
++/* SPDX-License-Identifier: GPL-2.0 WITH Linux-syscall-note */
+ /*
+  * Copyright (C) 2012 ARM Ltd.
+  *
+diff --git a/linux-headers/asm-powerpc/epapr_hcalls.h b/linux-headers/asm-powerpc/epapr_hcalls.h
+index 33b3f89..6cca559 100644
+--- a/linux-headers/asm-powerpc/epapr_hcalls.h
++++ b/linux-headers/asm-powerpc/epapr_hcalls.h
+@@ -1,3 +1,4 @@
++/* SPDX-License-Identifier: ((GPL-2.0+ WITH Linux-syscall-note) OR BSD-3-Clause) */
+ /*
+  * ePAPR hcall interface
+  *
+diff --git a/linux-headers/asm-powerpc/kvm.h b/linux-headers/asm-powerpc/kvm.h
+index 8cf8f0c..61d6049 100644
+--- a/linux-headers/asm-powerpc/kvm.h
++++ b/linux-headers/asm-powerpc/kvm.h
+@@ -1,3 +1,4 @@
++/* SPDX-License-Identifier: GPL-2.0 WITH Linux-syscall-note */
+ /*
+  * This program is free software; you can redistribute it and/or modify
+  * it under the terms of the GNU General Public License, version 2, as
+diff --git a/linux-headers/asm-powerpc/kvm_para.h b/linux-headers/asm-powerpc/kvm_para.h
+index 2abcc46..9beb49c 100644
+--- a/linux-headers/asm-powerpc/kvm_para.h
++++ b/linux-headers/asm-powerpc/kvm_para.h
+@@ -1,3 +1,4 @@
++/* SPDX-License-Identifier: GPL-2.0 WITH Linux-syscall-note */
+ /*
+  * This program is free software; you can redistribute it and/or modify
+  * it under the terms of the GNU General Public License, version 2, as
+diff --git a/linux-headers/asm-powerpc/unistd.h b/linux-headers/asm-powerpc/unistd.h
+index a178634..36abf58 100644
+--- a/linux-headers/asm-powerpc/unistd.h
++++ b/linux-headers/asm-powerpc/unistd.h
+@@ -1,3 +1,4 @@
++/* SPDX-License-Identifier: GPL-2.0+ WITH Linux-syscall-note */
+ /*
+  * This file contains the system call numbers.
+  *
+diff --git a/linux-headers/asm-s390/kvm.h b/linux-headers/asm-s390/kvm.h
+index 8387d71..a0ed5b7 100644
+--- a/linux-headers/asm-s390/kvm.h
++++ b/linux-headers/asm-s390/kvm.h
+@@ -1,3 +1,4 @@
++/* SPDX-License-Identifier: GPL-2.0 WITH Linux-syscall-note */
+ #ifndef __LINUX_KVM_S390_H
+ #define __LINUX_KVM_S390_H
+ /*
+diff --git a/linux-headers/asm-s390/kvm_para.h b/linux-headers/asm-s390/kvm_para.h
+index ff1f4e7..0dc86b3 100644
+--- a/linux-headers/asm-s390/kvm_para.h
++++ b/linux-headers/asm-s390/kvm_para.h
+@@ -1,3 +1,4 @@
++/* SPDX-License-Identifier: GPL-2.0 WITH Linux-syscall-note */
+ /*
+  * User API definitions for paravirtual devices on s390
+  *
+diff --git a/linux-headers/asm-s390/unistd.h b/linux-headers/asm-s390/unistd.h
+index 65e7e59..4deb1fe 100644
+--- a/linux-headers/asm-s390/unistd.h
++++ b/linux-headers/asm-s390/unistd.h
+@@ -1,3 +1,4 @@
++/* SPDX-License-Identifier: GPL-2.0 WITH Linux-syscall-note */
+ /*
+  *  S390 version
+  *
+diff --git a/linux-headers/asm-x86/kvm.h b/linux-headers/asm-x86/kvm.h
+index c2824d0..f3a9604 100644
+--- a/linux-headers/asm-x86/kvm.h
++++ b/linux-headers/asm-x86/kvm.h
+@@ -1,3 +1,4 @@
++/* SPDX-License-Identifier: GPL-2.0 WITH Linux-syscall-note */
+ #ifndef _ASM_X86_KVM_H
+ #define _ASM_X86_KVM_H
  
+diff --git a/linux-headers/asm-x86/kvm_para.h b/linux-headers/asm-x86/kvm_para.h
+index cefa127..ba3d11e 100644
+--- a/linux-headers/asm-x86/kvm_para.h
++++ b/linux-headers/asm-x86/kvm_para.h
+@@ -1,3 +1,4 @@
++/* SPDX-License-Identifier: GPL-2.0 WITH Linux-syscall-note */
+ #ifndef _ASM_X86_KVM_PARA_H
+ #define _ASM_X86_KVM_PARA_H
+ 
+diff --git a/linux-headers/asm-x86/unistd.h b/linux-headers/asm-x86/unistd.h
+index 1f99b12..c04f638 100644
+--- a/linux-headers/asm-x86/unistd.h
++++ b/linux-headers/asm-x86/unistd.h
+@@ -1,3 +1,4 @@
++/* SPDX-License-Identifier: GPL-2.0 WITH Linux-syscall-note */
+ #ifndef _ASM_X86_UNISTD_H
+ #define _ASM_X86_UNISTD_H
+ 
+diff --git a/linux-headers/linux/kvm.h b/linux-headers/linux/kvm.h
+index 7971a4f..0d6d52c 100644
+--- a/linux-headers/linux/kvm.h
++++ b/linux-headers/linux/kvm.h
+@@ -1,3 +1,4 @@
++/* SPDX-License-Identifier: GPL-2.0 WITH Linux-syscall-note */
+ #ifndef __LINUX_KVM_H
+ #define __LINUX_KVM_H
+ 
+@@ -929,6 +930,7 @@ struct kvm_ppc_resize_hpt {
+ #define KVM_CAP_PPC_SMT_POSSIBLE 147
+ #define KVM_CAP_HYPERV_SYNIC2 148
+ #define KVM_CAP_HYPERV_VP_INDEX 149
++#define KVM_CAP_ARM_INJECT_SERROR_ESR 150
+ 
+ #ifdef KVM_CAP_IRQ_ROUTING
+ 
+@@ -1355,6 +1357,8 @@ struct kvm_s390_ucas_mapping {
+ /* Available with KVM_CAP_S390_CMMA_MIGRATION */
+ #define KVM_S390_GET_CMMA_BITS      _IOWR(KVMIO, 0xb8, struct kvm_s390_cmma_log)
+ #define KVM_S390_SET_CMMA_BITS      _IOW(KVMIO, 0xb9, struct kvm_s390_cmma_log)
++/* Available with KVM_CAP_ARM_INJECT_SERROR_ESR */
++#define KVM_ARM_INJECT_SERROR_ESR       _IOW(KVMIO,  0xba, __u32)
+ 
+ #define KVM_DEV_ASSIGN_ENABLE_IOMMU	(1 << 0)
+ #define KVM_DEV_ASSIGN_PCI_2_3		(1 << 1)
+diff --git a/linux-headers/linux/kvm_para.h b/linux-headers/linux/kvm_para.h
+index 15b24ff..8bcd0aa 100644
+--- a/linux-headers/linux/kvm_para.h
++++ b/linux-headers/linux/kvm_para.h
+@@ -1,3 +1,4 @@
++/* SPDX-License-Identifier: GPL-2.0 WITH Linux-syscall-note */
+ #ifndef __LINUX_KVM_PARA_H
+ #define __LINUX_KVM_PARA_H
+ 
+diff --git a/linux-headers/linux/psci.h b/linux-headers/linux/psci.h
+index 08d443f..ccd1773 100644
+--- a/linux-headers/linux/psci.h
++++ b/linux-headers/linux/psci.h
+@@ -1,3 +1,4 @@
++/* SPDX-License-Identifier: GPL-2.0 WITH Linux-syscall-note */
+ /*
+  * ARM Power State and Coordination Interface (PSCI) header
+  *
+diff --git a/linux-headers/linux/userfaultfd.h b/linux-headers/linux/userfaultfd.h
+index 9701772..f7fd160 100644
+--- a/linux-headers/linux/userfaultfd.h
++++ b/linux-headers/linux/userfaultfd.h
+@@ -1,3 +1,4 @@
++/* SPDX-License-Identifier: GPL-2.0 WITH Linux-syscall-note */
+ /*
+  *  include/linux/userfaultfd.h
+  *
+diff --git a/linux-headers/linux/vfio.h b/linux-headers/linux/vfio.h
+index 4e7ab4c..4312e96 100644
+--- a/linux-headers/linux/vfio.h
++++ b/linux-headers/linux/vfio.h
+@@ -1,3 +1,4 @@
++/* SPDX-License-Identifier: GPL-2.0 WITH Linux-syscall-note */
+ /*
+  * VFIO API definition
+  *
+diff --git a/linux-headers/linux/vfio_ccw.h b/linux-headers/linux/vfio_ccw.h
+index 3a56551..5bf96c3 100644
+--- a/linux-headers/linux/vfio_ccw.h
++++ b/linux-headers/linux/vfio_ccw.h
+@@ -1,3 +1,4 @@
++/* SPDX-License-Identifier: GPL-2.0 WITH Linux-syscall-note */
+ /*
+  * Interfaces for vfio-ccw
+  *
+diff --git a/linux-headers/linux/vhost.h b/linux-headers/linux/vhost.h
+index 1e86a3d..e336395 100644
+--- a/linux-headers/linux/vhost.h
++++ b/linux-headers/linux/vhost.h
+@@ -1,3 +1,4 @@
++/* SPDX-License-Identifier: GPL-2.0 WITH Linux-syscall-note */
+ #ifndef _LINUX_VHOST_H
+ #define _LINUX_VHOST_H
+ /* Userspace interface for in-kernel virtio accelerators. */
 -- 
 1.8.3.1
