@@ -1,17 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37109)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37144)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1eHACC-0003Ev-05
-	for qemu-devel@nongnu.org; Tue, 21 Nov 2017 10:10:48 -0500
+	(envelope-from <kwolf@redhat.com>) id 1eHACG-0003Ia-2S
+	for qemu-devel@nongnu.org; Tue, 21 Nov 2017 10:10:54 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1eHAC7-0005HQ-7q
-	for qemu-devel@nongnu.org; Tue, 21 Nov 2017 10:10:43 -0500
+	(envelope-from <kwolf@redhat.com>) id 1eHACF-0005Ka-0X
+	for qemu-devel@nongnu.org; Tue, 21 Nov 2017 10:10:48 -0500
 From: Kevin Wolf <kwolf@redhat.com>
-Date: Tue, 21 Nov 2017 16:10:15 +0100
-Message-Id: <20171121151017.28158-6-kwolf@redhat.com>
+Date: Tue, 21 Nov 2017 16:10:17 +0100
+Message-Id: <20171121151017.28158-8-kwolf@redhat.com>
 In-Reply-To: <20171121151017.28158-1-kwolf@redhat.com>
 References: <20171121151017.28158-1-kwolf@redhat.com>
-Subject: [Qemu-devel] [PULL 5/7] block: Error out on load_vm with active
- dirty bitmaps
+Subject: [Qemu-devel] [PULL 7/7] iotests: Fix 176 on 32-bit host
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,54 +22,94 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org
 Cc: kwolf@redhat.com, qemu-devel@nongnu.org, peter.maydell@linaro.org
 
-Loading a snapshot invalidates the bitmap. Just marking all blocks dirty
-is not a useful response in practice, instead the user needs to be aware
-that we switch to a completely different state. If they are okay with
-losing the dirty bitmap, they can just explicitly delete it.
+From: Eric Blake <eblake@redhat.com>
 
-This effectively reverts commit 04dec3c3ae5.
+The contents of a qcow2 bitmap are rounded up to a size that
+matches the number of bits available for the granularity, but
+that granularity differs for 32-bit hosts (our default 64k
+cluster allows for 2M bitmap coverage per 'long') and 64-bit
+hosts (4M bitmap per 'long').  If the image is a multiple of
+2M but not 4M, then the number of bytes occupied by the array
+of longs in memory differs between architecture, thus
+resulting in different SHA256 hashes.
 
-Signed-off-by: Kevin Wolf <kwolf@redhat.com>
-Reviewed-by: Eric Blake <eblake@redhat.com>
-Reviewed-by: Denis V. Lunev <den@openvz.org>
-Reviewed-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Furthermore (but untested by me), if our computation of the
+SHA256 hash is at all endian-dependent because of how we store
+data in memory, that's another variable we'd have to account
+for (ideally, we specified the bitmap stored in qcow2 as
+fixed-endian on disk, because the same qcow2 file must be
+usable across any architecture; but that says nothing about
+how we represent things in memory).  But we already have test
+165 to validate that bitmaps are stored correctly on disk,
+while this test is merely testing that the bitmap exists.
+
+So for this test, the easiest solution is to filter out the
+actual hash value.  Broken in commit 4096974e.
+
+Reported-by: Max Reitz <mreitz@redhat.com>
+Signed-off-by: Eric Blake <eblake@redhat.com>
+Message-id: 20171117190422.23626-1-eblake@redhat.com
 Reviewed-by: John Snow <jsnow@redhat.com>
+Reviewed-by: Max Reitz <mreitz@redhat.com>
+Signed-off-by: Max Reitz <mreitz@redhat.com>
 ---
- block/snapshot.c | 15 +++------------
- 1 file changed, 3 insertions(+), 12 deletions(-)
+ tests/qemu-iotests/176     | 3 ++-
+ tests/qemu-iotests/176.out | 8 ++++----
+ 2 files changed, 6 insertions(+), 5 deletions(-)
 
-diff --git a/block/snapshot.c b/block/snapshot.c
-index 8585599579..8cb70dbad5 100644
---- a/block/snapshot.c
-+++ b/block/snapshot.c
-@@ -182,25 +182,16 @@ int bdrv_snapshot_goto(BlockDriverState *bs,
+diff --git a/tests/qemu-iotests/176 b/tests/qemu-iotests/176
+index 0f31a20294..b8dc17c592 100755
+--- a/tests/qemu-iotests/176
++++ b/tests/qemu-iotests/176
+@@ -52,7 +52,8 @@ _supported_os Linux
+ function run_qemu()
  {
-     BlockDriver *drv = bs->drv;
-     int ret, open_ret;
--    int64_t len;
+     $QEMU -nographic -qmp stdio -serial none "$@" 2>&1 \
+-	| _filter_testdir | _filter_qmp | _filter_qemu
++	| _filter_testdir | _filter_qmp | _filter_qemu \
++        | sed 's/"sha256": ".\{64\}"/"sha256": HASH/'
+ }
  
-     if (!drv) {
-         error_setg(errp, "Block driver is closed");
-         return -ENOMEDIUM;
-     }
+ for reason in snapshot bitmap; do
+diff --git a/tests/qemu-iotests/176.out b/tests/qemu-iotests/176.out
+index e62085cd0a..f03a2e776c 100644
+--- a/tests/qemu-iotests/176.out
++++ b/tests/qemu-iotests/176.out
+@@ -205,7 +205,7 @@ Offset          Length          File
+ QMP_VERSION
+ {"return": {}}
+ {"return": {}}
+-{"return": {"sha256": "e12600978d86b5a453861ae5c17d275204673fef3874b7c3c5433c6153d84706"}}
++{"return": {"sha256": HASH}}
+ {"return": {}}
+ {"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "SHUTDOWN", "data": {"guest": false}}
  
--    len = bdrv_getlength(bs);
--    if (len < 0) {
--        error_setg_errno(errp, -len, "Cannot get block device size");
--        return len;
-+    if (!QLIST_EMPTY(&bs->dirty_bitmaps)) {
-+        error_setg(errp, "Device has active dirty bitmaps");
-+        return -EBUSY;
-     }
--    /* We should set all bits in all enabled dirty bitmaps, because dirty
--     * bitmaps reflect active state of disk and snapshot switch operation
--     * actually dirties active state.
--     * TODO: It may make sense not to set all bits but analyze block status of
--     * current state and destination snapshot and do not set bits corresponding
--     * to both-zero or both-unallocated areas. */
--    bdrv_set_dirty(bs, 0, len);
+@@ -255,7 +255,7 @@ Offset          Length          File
+ QMP_VERSION
+ {"return": {}}
+ {"return": {}}
+-{"return": {"sha256": "e12600978d86b5a453861ae5c17d275204673fef3874b7c3c5433c6153d84706"}}
++{"return": {"sha256": HASH}}
+ {"return": {}}
+ {"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "SHUTDOWN", "data": {"guest": false}}
  
-     if (drv->bdrv_snapshot_goto) {
-         ret = drv->bdrv_snapshot_goto(bs, snapshot_id);
+@@ -305,7 +305,7 @@ Offset          Length          File
+ QMP_VERSION
+ {"return": {}}
+ {"return": {}}
+-{"return": {"sha256": "e12600978d86b5a453861ae5c17d275204673fef3874b7c3c5433c6153d84706"}}
++{"return": {"sha256": HASH}}
+ {"return": {}}
+ {"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "SHUTDOWN", "data": {"guest": false}}
+ 
+@@ -352,7 +352,7 @@ Offset          Length          File
+ QMP_VERSION
+ {"return": {}}
+ {"return": {}}
+-{"return": {"sha256": "e12600978d86b5a453861ae5c17d275204673fef3874b7c3c5433c6153d84706"}}
++{"return": {"sha256": HASH}}
+ {"return": {}}
+ {"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "SHUTDOWN", "data": {"guest": false}}
+ *** done
 -- 
 2.13.6
