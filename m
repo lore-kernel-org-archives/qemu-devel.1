@@ -1,25 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47429)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48528)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1eH5I0-0000l7-18
-	for qemu-devel@nongnu.org; Tue, 21 Nov 2017 04:56:24 -0500
+	(envelope-from <kchamart@redhat.com>) id 1eH5KX-0002Yb-3H
+	for qemu-devel@nongnu.org; Tue, 21 Nov 2017 04:59:01 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1eH5Hv-0007BI-BI
-	for qemu-devel@nongnu.org; Tue, 21 Nov 2017 04:56:24 -0500
-Received: from mail-wr0-x241.google.com ([2a00:1450:400c:c0c::241]:36398)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1eH5Hv-00078o-4S
-	for qemu-devel@nongnu.org; Tue, 21 Nov 2017 04:56:19 -0500
-Received: by mail-wr0-x241.google.com with SMTP id y42so10744416wrd.3
-	for <qemu-devel@nongnu.org>; Tue, 21 Nov 2017 01:56:15 -0800 (PST)
+	(envelope-from <kchamart@redhat.com>) id 1eH5KW-0008KB-C8
+	for qemu-devel@nongnu.org; Tue, 21 Nov 2017 04:59:01 -0500
+Date: Tue, 21 Nov 2017 10:58:48 +0100
+From: Kashyap Chamarthy <kchamart@redhat.com>
+Message-ID: <20171121095848.3wblgmlnubhtdfad@eukaryote>
+References: <20171117185444.4947-1-kchamart@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20171120152145.25853-1-cohuck@redhat.com>
-References: <20171120152145.25853-1-cohuck@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 21 Nov 2017 09:55:53 +0000
-Message-ID: <CAFEAcA-utzXSWExXkdBRVASwOX_+1heGRkPyy1Bn8bGktW16Gg@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PULL for-2.11 0/4] s390x fixes for 2.11
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20171117185444.4947-1-kchamart@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v4 for-2.11] QAPI & interop: Clarify events
+ emitted by 'block-job-cancel'
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,45 +23,42 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Cornelia Huck <cohuck@redhat.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, qemu-s390x@nongnu.org, Richard Henderson <rth@twiddle.net>, Alexander Graf <agraf@suse.de>, Thomas Huth <thuth@redhat.com>, Christian Borntraeger <borntraeger@de.ibm.com>, David Hildenbrand <david@redhat.com>
+To: qemu-devel@nongnu.org, qemu-block@nongnu.org
+Cc: jsnow@redhat.com, armbru@redhat.com, mreitz@redhat.com, dgilbert@redhat.com
 
-On 20 November 2017 at 15:21, Cornelia Huck <cohuck@redhat.com> wrote:
-> The following changes since commit 2e02083438962d26ef9dcc7100f3b378104183db:
->
->   Merge remote-tracking branch 'remotes/kevin/tags/for-upstream' into staging (2017-11-17 19:08:07 +0000)
->
-> are available in the git repository at:
->
->   git://github.com/cohuck/qemu tags/s390x-20171120-v1
->
-> for you to fetch changes up to 6cbf1ec85caf8a7d9f2fd829422c9f0a1c8983e1:
->
->   pc-bios/s390-ccw.img: update image (2017-11-20 16:04:11 +0100)
->
-> ----------------------------------------------------------------
-> Fix storing cpu status (both kvm and tcg), locking around diag 308
-> (tcg only) and a non-zero variable in the s390-ccw bios.
->
-> ----------------------------------------------------------------
->
-> Cornelia Huck (1):
->   pc-bios/s390-ccw.img: update image
->
-> David Hildenbrand (2):
->   s390x: fix storing CPU status (again)
->   s390x/tcg: fix DIAG 308 with > 1 VCPU (MTTCG)
->
-> Thomas Huth (1):
->   pc-bios/s390-ccw: Fix problem with invalid virtio-scsi LUN when
->     rebooting
->
->  pc-bios/s390-ccw.img           | Bin 30520 -> 26416 bytes
->  pc-bios/s390-ccw/virtio-scsi.c |   3 ++-
->  target/s390x/helper.c          |   2 +-
->  target/s390x/misc_helper.c     |   2 ++
->  4 files changed, 5 insertions(+), 2 deletions(-)
+On Fri, Nov 17, 2017 at 07:54:44PM +0100, Kashyap Chamarthy wrote:
 
-Applied, thanks.
+[...]
 
--- PMM
+> +So there are two possible actions to take, after a 'mirror' job has
+> +emitted the event ``BLOCK_JOB_READY``, indicating that the source and
+> +target have reached synchronization:
+> +
+> +(1) Issuing the command ``block-job-cancel`` (after it emits the event
+> +    ``BLOCK_JOB_COMPLETED``) will create a point-in-time (which is at
+> +    the time of *triggering* the cancel command) copy of the entire disk
+>      image chain (or only the top-most image, depending on the ``sync``
+> -    mode).
+> +    mode), contained in the target image [E].
+>  
+> -(2) Issuing the command ``block-job-complete`` after it emits the event
+> -    ``BLOCK_JOB_COMPLETED``: will, after completing synchronization of
+> -    the content, adjust the guest device (i.e. live QEMU) to point to
+> -    the target image, and, causing all the new writes from this point on
+> -    to happen there.  One use case for this is live storage migration.
+> +(2) Issuing the command ``block-job-complete`` (after it emits the event
+> +    ``BLOCK_JOB_COMPLETED``) will adjust the guest device (i.e. live
+> +    QEMU) to point to the target image, [E], causing all the new writes
+> +    from this point on to happen there.  One use case for this is live
+> +    storage migration.
+
+Dave Gilbert pointed out on IRC that last sentence ("One use case for
+this is live storage migration") should apply to point (1) above.  He's
+right, I'll send a v5 with that (and the commit message tweak I noted
+earlier) fix.
+
+[...]
+
+
+-- 
+/kashyap
