@@ -1,24 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40545)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40577)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mikhail.abakumov@ispras.ru>) id 1eH9Gn-00036d-Lu
-	for qemu-devel@nongnu.org; Tue, 21 Nov 2017 09:11:26 -0500
+	(envelope-from <mikhail.abakumov@ispras.ru>) id 1eH9Gv-0003Dy-IO
+	for qemu-devel@nongnu.org; Tue, 21 Nov 2017 09:11:37 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mikhail.abakumov@ispras.ru>) id 1eH9Gl-0003ey-2G
-	for qemu-devel@nongnu.org; Tue, 21 Nov 2017 09:11:25 -0500
-Received: from mail.ispras.ru ([83.149.199.45]:38734)
+	(envelope-from <mikhail.abakumov@ispras.ru>) id 1eH9Gq-0003gO-PZ
+	for qemu-devel@nongnu.org; Tue, 21 Nov 2017 09:11:33 -0500
+Received: from mail.ispras.ru ([83.149.199.45]:38758)
 	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mikhail.abakumov@ispras.ru>) id 1eH9Gk-0003eo-QK
-	for qemu-devel@nongnu.org; Tue, 21 Nov 2017 09:11:22 -0500
+	(envelope-from <mikhail.abakumov@ispras.ru>) id 1eH9Gq-0003gF-HQ
+	for qemu-devel@nongnu.org; Tue, 21 Nov 2017 09:11:28 -0500
 From: Mihail Abakumov <mikhail.abakumov@ispras.ru>
-Date: Tue, 21 Nov 2017 17:11:20 +0300
-Message-ID: <151127347991.6888.8008733504996106931.stgit@Misha-PC.lan02.inno>
+Date: Tue, 21 Nov 2017 17:11:25 +0300
+Message-ID: <151127348551.6888.14578205398774037869.stgit@Misha-PC.lan02.inno>
 In-Reply-To: <151127322955.6888.16198535123422076171.stgit@Misha-PC.lan02.inno>
 References: <151127322955.6888.16198535123422076171.stgit@Misha-PC.lan02.inno>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Subject: [Qemu-devel] [PATCH v3 43/45] windbg: implemented
- kd_api_query_memory
+Subject: [Qemu-devel] [PATCH v3 44/45] windbg: added new api functions
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,62 +29,58 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: sw@weilnetz.de, lprosek@redhat.com, dovgaluk@ispras.ru, rkagan@virtuozzo.com, pbonzini@redhat.com, den@openvz.org
 
+Added some definitions for new windbg.
+
 Signed-off-by: Mihail Abakumov <mikhail.abakumov@ispras.ru>
 Signed-off-by: Pavel Dovgalyuk <dovgaluk@ispras.ru>
 Signed-off-by: Dmitriy Koltunov <koltunov@ispras.ru>
 ---
- include/exec/windbgstub-utils.h |    1 +
- windbgstub-utils.c              |   12 ++++++++++++
- windbgstub.c                    |    4 ++++
- 3 files changed, 17 insertions(+)
+ include/exec/windbgkd.h |   21 ++++++++++++++++++++-
+ 1 file changed, 20 insertions(+), 1 deletion(-)
 
-diff --git a/include/exec/windbgstub-utils.h b/include/exec/windbgstub-utils.h
-index e144294b51..fa1ebbb6d2 100755
---- a/include/exec/windbgstub-utils.h
-+++ b/include/exec/windbgstub-utils.h
-@@ -105,6 +105,7 @@ void kd_api_write_msr(CPUState *cpu, PacketData *pd);
- void kd_api_search_memory(CPUState *cpu, PacketData *pd);
- void kd_api_fill_memory(CPUState *cpu, PacketData *pd);
- void kd_api_unsupported(CPUState *cpu, PacketData *pd);
-+void kd_api_query_memory(CPUState *cpu, PacketData *pd);
+diff --git a/include/exec/windbgkd.h b/include/exec/windbgkd.h
+index 40a23f8cd0..e5b9bb3b37 100755
+--- a/include/exec/windbgkd.h
++++ b/include/exec/windbgkd.h
+@@ -112,7 +112,10 @@
+ #define DbgKdFillMemoryApi                  0x0000315b
+ #define DbgKdQueryMemoryApi                 0x0000315c
+ #define DbgKdSwitchPartition                0x0000315d
+-#define DbgKdMaximumManipulate              0x0000315e
++#define DbgKdWriteCustomBreakpointApi       0x0000315e
++#define DbgKdGetContextExApi                0x0000315f
++#define DbgKdSetContextExApi                0x00003160
++#define DbgKdMaximumManipulate              0x00003161
  
- SizedBuf kd_gen_exception_sc(CPUState *cpu);
- SizedBuf kd_gen_load_symbols_sc(CPUState *cpu);
-diff --git a/windbgstub-utils.c b/windbgstub-utils.c
-index fb2c378460..edd23c1971 100755
---- a/windbgstub-utils.c
-+++ b/windbgstub-utils.c
-@@ -333,6 +333,18 @@ void kd_api_fill_memory(CPUState *cpu, PacketData *pd)
-     }
- }
+ /*
+  * Debug I/O Types
+@@ -723,6 +726,20 @@ typedef struct _DBGKD_SWITCH_PARTITION {
+     uint32_t Partition;
+ } DBGKD_SWITCH_PARTITION;
  
-+void kd_api_query_memory(CPUState *cpu, PacketData *pd)
-+{
-+    DBGKD_QUERY_MEMORY *mem = &pd->m64.u.QueryMemory;
++typedef struct _DBGKD_CONTEXT_EX {
++   uint32_t Offset;
++   uint32_t ByteCount;
++   uint32_t BytesCopied;
++} DBGKD_CONTEXT_EX, *PDBGKD_CONTEXT_EX;
 +
-+    mem->AddressSpace = DBGKD_QUERY_MEMORY_PROCESS;
-+    mem->Flags = DBGKD_QUERY_MEMORY_READ |
-+                 DBGKD_QUERY_MEMORY_WRITE |
-+                 DBGKD_QUERY_MEMORY_EXECUTE;
-+    mem->AddressSpace = ldl_p(&mem->AddressSpace);
-+    mem->Flags = ldl_p(&mem->Flags);
-+}
++typedef struct _DBGKD_WRITE_CUSTOM_BREAKPOINT {
++   uint64_t BreakPointAddress;
++   uint64_t BreakPointInstruction;
++   uint32_t BreakPointHandle;
++   uint16_t BreakPointInstructionSize;
++   uint16_t BreakPointInstructionAlignment;
++} DBGKD_WRITE_CUSTOM_BREAKPOINT, *PDBGKD_WRITE_CUSTOM_BREAKPOINT;
 +
- void kd_api_unsupported(CPUState *cpu, PacketData *pd)
- {
-     WINDBG_ERROR("Caught unimplemented api %s",
-diff --git a/windbgstub.c b/windbgstub.c
-index b348028dfd..36372c0ea5 100755
---- a/windbgstub.c
-+++ b/windbgstub.c
-@@ -220,6 +220,10 @@ static void windbg_process_manipulate_packet(ParsingContext *ctx)
-         kd_api_fill_memory(cpu, &ctx->data);
-         break;
+ /*
+  * DBGKD Structure for Manipulate
+  */
+@@ -787,6 +804,8 @@ typedef struct _DBGKD_MANIPULATE_STATE64 {
+         DBGKD_FILL_MEMORY FillMemory;
+         DBGKD_QUERY_MEMORY QueryMemory;
+         DBGKD_SWITCH_PARTITION SwitchPartition;
++        DBGKD_WRITE_CUSTOM_BREAKPOINT WriteCustomBreakpoint;
++        DBGKD_CONTEXT_EX ContextEx;
+     } u;
+ } DBGKD_MANIPULATE_STATE64, *PDBGKD_MANIPULATE_STATE64;
  
-+    case DbgKdQueryMemoryApi:
-+        kd_api_query_memory(cpu, &ctx->data);
-+        break;
-+
-     default:
-         kd_api_unsupported(cpu, &ctx->data);
-         break;
