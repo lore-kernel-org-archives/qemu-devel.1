@@ -1,29 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53904)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53880)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1eHG51-0004Gv-Up
+	(envelope-from <richard.henderson@linaro.org>) id 1eHG51-0004Gc-8b
 	for qemu-devel@nongnu.org; Tue, 21 Nov 2017 16:27:46 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1eHG4z-0007cp-2d
+	(envelope-from <richard.henderson@linaro.org>) id 1eHG4y-0007cQ-5E
 	for qemu-devel@nongnu.org; Tue, 21 Nov 2017 16:27:43 -0500
-Received: from mail-wm0-x22f.google.com ([2a00:1450:400c:c09::22f]:42836)
+Received: from mail-wm0-x244.google.com ([2a00:1450:400c:c09::244]:44104)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1eHG4y-0007cM-O7
-	for qemu-devel@nongnu.org; Tue, 21 Nov 2017 16:27:41 -0500
-Received: by mail-wm0-x22f.google.com with SMTP id l188so4522627wma.1
-	for <qemu-devel@nongnu.org>; Tue, 21 Nov 2017 13:27:40 -0800 (PST)
+	id 1eHG4x-0007bV-Nu
+	for qemu-devel@nongnu.org; Tue, 21 Nov 2017 16:27:40 -0500
+Received: by mail-wm0-x244.google.com with SMTP id r68so6351915wmr.3
+	for <qemu-devel@nongnu.org>; Tue, 21 Nov 2017 13:27:39 -0800 (PST)
 Received: from cloudburst.twiddle.net
 	(70.red-37-158-60.dynamicip.rima-tde.net. [37.158.60.70])
 	by smtp.gmail.com with ESMTPSA id
-	e124sm706517wmg.34.2017.11.21.13.27.38 for <qemu-devel@nongnu.org>
+	e124sm706517wmg.34.2017.11.21.13.27.36 for <qemu-devel@nongnu.org>
 	(version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
-	Tue, 21 Nov 2017 13:27:38 -0800 (PST)
+	Tue, 21 Nov 2017 13:27:37 -0800 (PST)
 From: Richard Henderson <richard.henderson@linaro.org>
-Date: Tue, 21 Nov 2017 22:25:10 +0100
-Message-Id: <20171121212534.5177-3-richard.henderson@linaro.org>
+Date: Tue, 21 Nov 2017 22:25:09 +0100
+Message-Id: <20171121212534.5177-2-richard.henderson@linaro.org>
 In-Reply-To: <20171121212534.5177-1-richard.henderson@linaro.org>
 References: <20171121212534.5177-1-richard.henderson@linaro.org>
-Subject: [Qemu-devel] [PATCH v6 02/26] tcg: Dynamically allocate TCGOps
+Subject: [Qemu-devel] [PATCH v6 01/26] tcg: Remove TCGV_UNUSED* and
+ TCGV_IS_UNUSED*
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,628 +35,981 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-With no fixed array allocation, we can't overflow a buffer.
-This will be important as optimizations related to host vectors
-may expand the number of ops used.
-
-Use QTAILQ to link the ops together.
+These are now trivial sets and tests against NULL.  Unwrap.
 
 Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- include/exec/gen-icount.h     |   9 ++--
- include/qemu/queue.h          |   5 ++
- target/arm/translate.h        |  10 ++--
- tcg/tcg.h                     |  35 +++++-------
- target/arm/translate-a64.c    |   2 +-
- target/arm/translate.c        |   2 +-
- target/cris/translate.c       |   2 -
- target/lm32/translate.c       |   2 -
- target/microblaze/translate.c |   4 --
- tcg/optimize.c                |  16 ++----
- tcg/tcg-op.c                  |  24 ---------
- tcg/tcg.c                     | 123 ++++++++++++++++--------------------------
- 12 files changed, 77 insertions(+), 157 deletions(-)
+ tcg/tcg-op.h                 |  4 ---
+ tcg/tcg.h                    |  9 -------
+ target/alpha/translate.c     | 22 ++++++++--------
+ target/arm/translate-a64.c   | 35 +++++++++++-------------
+ target/arm/translate.c       | 29 ++++++++++----------
+ target/cris/translate.c      |  2 +-
+ target/hppa/translate.c      | 63 ++++++++++++++++++++++----------------------
+ target/i386/translate.c      | 13 +++++----
+ target/m68k/translate.c      | 14 +++++-----
+ target/mips/translate.c      |  2 +-
+ target/nios2/translate.c     |  6 ++---
+ target/ppc/translate.c       |  2 +-
+ target/s390x/translate.c     | 42 ++++++++++++++---------------
+ target/sh4/translate.c       |  2 +-
+ target/sparc/translate.c     |  2 +-
+ target/tilegx/translate.c    | 10 +++----
+ target/unicore32/translate.c |  4 +--
+ tcg/tcg.c                    |  4 +--
+ 18 files changed, 122 insertions(+), 143 deletions(-)
 
-diff --git a/include/exec/gen-icount.h b/include/exec/gen-icount.h
-index 049bba86e9..54aaa61d65 100644
---- a/include/exec/gen-icount.h
-+++ b/include/exec/gen-icount.h
-@@ -5,7 +5,7 @@
- 
- /* Helpers for instruction counting code generation.  */
- 
--static int icount_start_insn_idx;
-+static TCGOp *icount_start_insn;
- 
- static inline void gen_tb_start(TranslationBlock *tb)
- {
-@@ -26,8 +26,8 @@ static inline void gen_tb_start(TranslationBlock *tb)
-         /* We emit a movi with a dummy immediate argument. Keep the insn index
-          * of the movi so that we later (when we know the actual insn count)
-          * can update the immediate argument with the actual insn count.  */
--        icount_start_insn_idx = tcg_op_buf_count();
-         tcg_gen_movi_i32(imm, 0xdeadbeef);
-+        icount_start_insn = tcg_last_op();
- 
-         tcg_gen_sub_i32(count, count, imm);
-         tcg_temp_free_i32(imm);
-@@ -48,14 +48,11 @@ static inline void gen_tb_end(TranslationBlock *tb, int num_insns)
-     if (tb_cflags(tb) & CF_USE_ICOUNT) {
-         /* Update the num_insn immediate parameter now that we know
-          * the actual insn count.  */
--        tcg_set_insn_param(icount_start_insn_idx, 1, num_insns);
-+        tcg_set_insn_param(icount_start_insn, 1, num_insns);
-     }
- 
-     gen_set_label(tcg_ctx->exitreq_label);
-     tcg_gen_exit_tb((uintptr_t)tb + TB_EXIT_REQUESTED);
--
--    /* Terminate the linked list.  */
--    tcg_ctx->gen_op_buf[tcg_ctx->gen_op_buf[0].prev].next = 0;
- }
- 
- static inline void gen_io_start(void)
-diff --git a/include/qemu/queue.h b/include/qemu/queue.h
-index 35292c3155..aa270d2b38 100644
---- a/include/qemu/queue.h
-+++ b/include/qemu/queue.h
-@@ -425,6 +425,11 @@ struct {                                                                \
-                 (var);                                                  \
-                 (var) = (*(((struct headname *)((var)->field.tqe_prev))->tqh_last)))
- 
-+#define QTAILQ_FOREACH_REVERSE_SAFE(var, head, headname, field, prev_var) \
-+        for ((var) = (*(((struct headname *)((head)->tqh_last))->tqh_last)); \
-+             (var) && ((prev_var) = (*(((struct headname *)((var)->field.tqe_prev))->tqh_last)), 1); \
-+             (var) = (prev_var))
-+
- /*
-  * Tail queue access methods.
-  */
-diff --git a/target/arm/translate.h b/target/arm/translate.h
-index 410ba79c0d..cd7313ace7 100644
---- a/target/arm/translate.h
-+++ b/target/arm/translate.h
-@@ -66,8 +66,8 @@ typedef struct DisasContext {
-     bool ss_same_el;
-     /* Bottom two bits of XScale c15_cpar coprocessor access control reg */
-     int c15_cpar;
--    /* TCG op index of the current insn_start.  */
--    int insn_start_idx;
-+    /* TCG op of the current insn_start.  */
-+    TCGOp *insn_start;
- #define TMP_A64_MAX 16
-     int tmp_a64_count;
-     TCGv_i64 tmp_a64[TMP_A64_MAX];
-@@ -117,9 +117,9 @@ static void disas_set_insn_syndrome(DisasContext *s, uint32_t syn)
-     syn >>= ARM_INSN_START_WORD2_SHIFT;
- 
-     /* We check and clear insn_start_idx to catch multiple updates.  */
--    assert(s->insn_start_idx != 0);
--    tcg_set_insn_param(s->insn_start_idx, 2, syn);
--    s->insn_start_idx = 0;
-+    assert(s->insn_start != NULL);
-+    tcg_set_insn_param(s->insn_start, 2, syn);
-+    s->insn_start = NULL;
- }
- 
- /* is_jmp field values */
+diff --git a/tcg/tcg-op.h b/tcg/tcg-op.h
+index 3129159907..ca07b32b65 100644
+--- a/tcg/tcg-op.h
++++ b/tcg/tcg-op.h
+@@ -807,8 +807,6 @@ void tcg_gen_lookup_and_goto_ptr(void);
+ #define tcg_global_mem_new tcg_global_mem_new_i32
+ #define tcg_temp_local_new() tcg_temp_local_new_i32()
+ #define tcg_temp_free tcg_temp_free_i32
+-#define TCGV_UNUSED(x) TCGV_UNUSED_I32(x)
+-#define TCGV_IS_UNUSED(x) TCGV_IS_UNUSED_I32(x)
+ #define tcg_gen_qemu_ld_tl tcg_gen_qemu_ld_i32
+ #define tcg_gen_qemu_st_tl tcg_gen_qemu_st_i32
+ #else
+@@ -817,8 +815,6 @@ void tcg_gen_lookup_and_goto_ptr(void);
+ #define tcg_global_mem_new tcg_global_mem_new_i64
+ #define tcg_temp_local_new() tcg_temp_local_new_i64()
+ #define tcg_temp_free tcg_temp_free_i64
+-#define TCGV_UNUSED(x) TCGV_UNUSED_I64(x)
+-#define TCGV_IS_UNUSED(x) TCGV_IS_UNUSED_I64(x)
+ #define tcg_gen_qemu_ld_tl tcg_gen_qemu_ld_i64
+ #define tcg_gen_qemu_st_tl tcg_gen_qemu_st_i64
+ #endif
 diff --git a/tcg/tcg.h b/tcg/tcg.h
-index c21194c858..a577447846 100644
+index cb7b329876..c21194c858 100644
 --- a/tcg/tcg.h
 +++ b/tcg/tcg.h
-@@ -29,6 +29,7 @@
- #include "cpu.h"
- #include "exec/tb-context.h"
- #include "qemu/bitops.h"
-+#include "qemu/queue.h"
- #include "tcg-mo.h"
- #include "tcg-target.h"
- 
-@@ -48,8 +49,6 @@
-  * and up to 4 + N parameters on 64-bit archs
-  * (N = number of input arguments + output arguments).  */
- #define MAX_OPC_PARAM (4 + (MAX_OPC_PARAM_PER_ARG * MAX_OPC_PARAM_ARGS))
--#define OPC_BUF_SIZE 640
--#define OPC_MAX_SIZE (OPC_BUF_SIZE - MAX_OP_PER_INSTR)
- 
- #define CPU_TEMP_BUF_NLONGS 128
- 
-@@ -572,23 +571,18 @@ typedef struct TCGOp {
-     unsigned callo  : 2;        /* 14 */
-     unsigned        : 2;        /* 16 */
- 
--    /* Index of the prev/next op, or 0 for the end of the list.  */
--    unsigned prev   : 16;       /* 32 */
--    unsigned next   : 16;       /* 48 */
--
-     /* Lifetime data of the operands.  */
--    unsigned life   : 16;       /* 64 */
-+    unsigned life   : 16;       /* 32 */
-+
-+    /* Next and previous opcodes.  */
-+    QTAILQ_ENTRY(TCGOp) link;
- 
-     /* Arguments for the opcode.  */
-     TCGArg args[MAX_OPC_PARAM];
- } TCGOp;
- 
--/* Make sure that we don't expand the structure without noticing.  */
--QEMU_BUILD_BUG_ON(sizeof(TCGOp) != 8 + sizeof(TCGArg) * MAX_OPC_PARAM);
--
- /* Make sure operands fit in the bitfields above.  */
- QEMU_BUILD_BUG_ON(NB_OPS > (1 << 8));
--QEMU_BUILD_BUG_ON(OPC_BUF_SIZE > (1 << 16));
- 
- typedef struct TCGProfile {
-     int64_t tb_count1;
-@@ -642,8 +636,6 @@ struct TCGContext {
-     int goto_tb_issue_mask;
+@@ -428,15 +428,6 @@ typedef TCGv_ptr TCGv_env;
+ #error Unhandled TARGET_LONG_BITS value
  #endif
  
--    int gen_next_op_idx;
+-/* See the comment before tcgv_i32_temp.  */
+-#define TCGV_UNUSED_I32(x) (x = (TCGv_i32)NULL)
+-#define TCGV_UNUSED_I64(x) (x = (TCGv_i64)NULL)
+-#define TCGV_UNUSED_PTR(x) (x = (TCGv_ptr)NULL)
 -
-     /* Code generation.  Note that we specifically do not use tcg_insn_unit
-        here, because there's too much arithmetic throughout that relies
-        on addition and subtraction working on bytes.  Rely on the GCC
-@@ -674,12 +666,12 @@ struct TCGContext {
-     TCGTempSet free_temps[TCG_TYPE_COUNT * 2];
-     TCGTemp temps[TCG_MAX_TEMPS]; /* globals first, temps after */
- 
-+    QTAILQ_HEAD(TCGOpHead, TCGOp) ops, free_ops;
-+
-     /* Tells which temporary holds a given register.
-        It does not take into account fixed registers */
-     TCGTemp *reg_to_temp[TCG_TARGET_NB_REGS];
- 
--    TCGOp gen_op_buf[OPC_BUF_SIZE];
+-#define TCGV_IS_UNUSED_I32(x) ((x) == (TCGv_i32)NULL)
+-#define TCGV_IS_UNUSED_I64(x) ((x) == (TCGv_i64)NULL)
+-#define TCGV_IS_UNUSED_PTR(x) ((x) == (TCGv_ptr)NULL)
 -
-     uint16_t gen_insn_end_off[TCG_MAX_INSNS];
-     target_ulong gen_insn_data[TCG_MAX_INSNS][TARGET_INSN_START_WORDS];
- };
-@@ -769,21 +761,21 @@ static inline TCGv_i32 TCGV_HIGH(TCGv_i64 t)
- }
- #endif
+ /* call flags */
+ /* Helper does not read globals (either directly or through an exception). It
+    implies TCG_CALL_NO_WRITE_GLOBALS. */
+diff --git a/target/alpha/translate.c b/target/alpha/translate.c
+index 629f35ec8e..73a1b5e63e 100644
+--- a/target/alpha/translate.c
++++ b/target/alpha/translate.c
+@@ -156,7 +156,7 @@ void alpha_translate_init(void)
  
--static inline void tcg_set_insn_param(int op_idx, int arg, TCGArg v)
-+static inline void tcg_set_insn_param(TCGOp *op, int arg, TCGArg v)
+ static TCGv load_zero(DisasContext *ctx)
  {
--    tcg_ctx->gen_op_buf[op_idx].args[arg] = v;
-+    op->args[arg] = v;
- }
+-    if (TCGV_IS_UNUSED_I64(ctx->zero)) {
++    if (!ctx->zero) {
+         ctx->zero = tcg_const_i64(0);
+     }
+     return ctx->zero;
+@@ -164,7 +164,7 @@ static TCGv load_zero(DisasContext *ctx)
  
--/* The number of opcodes emitted so far.  */
--static inline int tcg_op_buf_count(void)
-+/* The last op that was emitted.  */
-+static inline TCGOp *tcg_last_op(void)
+ static TCGv dest_sink(DisasContext *ctx)
  {
--    return tcg_ctx->gen_next_op_idx;
-+    return QTAILQ_LAST(&tcg_ctx->ops, TCGOpHead);
- }
+-    if (TCGV_IS_UNUSED_I64(ctx->sink)) {
++    if (!ctx->sink) {
+         ctx->sink = tcg_temp_new();
+     }
+     return ctx->sink;
+@@ -172,18 +172,18 @@ static TCGv dest_sink(DisasContext *ctx)
  
- /* Test for whether to terminate the TB for using too many opcodes.  */
- static inline bool tcg_op_buf_full(void)
+ static void free_context_temps(DisasContext *ctx)
  {
--    return tcg_op_buf_count() >= OPC_MAX_SIZE;
-+    return false;
+-    if (!TCGV_IS_UNUSED_I64(ctx->sink)) {
++    if (ctx->sink) {
+         tcg_gen_discard_i64(ctx->sink);
+         tcg_temp_free(ctx->sink);
+-        TCGV_UNUSED_I64(ctx->sink);
++        ctx->sink = NULL;
+     }
+-    if (!TCGV_IS_UNUSED_I64(ctx->zero)) {
++    if (ctx->zero) {
+         tcg_temp_free(ctx->zero);
+-        TCGV_UNUSED_I64(ctx->zero);
++        ctx->zero = NULL;
+     }
+-    if (!TCGV_IS_UNUSED_I64(ctx->lit)) {
++    if (ctx->lit) {
+         tcg_temp_free(ctx->lit);
+-        TCGV_UNUSED_I64(ctx->lit);
++        ctx->lit = NULL;
+     }
  }
  
- /* pool based memory allocation */
-@@ -967,6 +959,7 @@ bool tcg_op_supported(TCGOpcode op);
+@@ -2948,9 +2948,9 @@ static int alpha_tr_init_disas_context(DisasContextBase *dcbase,
+     /* Similarly for flush-to-zero.  */
+     ctx->tb_ftz = -1;
  
- void tcg_gen_callN(void *func, TCGTemp *ret, int nargs, TCGTemp **args);
+-    TCGV_UNUSED_I64(ctx->zero);
+-    TCGV_UNUSED_I64(ctx->sink);
+-    TCGV_UNUSED_I64(ctx->lit);
++    ctx->zero = NULL;
++    ctx->sink = NULL;
++    ctx->lit = NULL;
  
-+TCGOp *tcg_emit_op(TCGOpcode opc);
- void tcg_op_remove(TCGContext *s, TCGOp *op);
- TCGOp *tcg_op_insert_before(TCGContext *s, TCGOp *op, TCGOpcode opc, int narg);
- TCGOp *tcg_op_insert_after(TCGContext *s, TCGOp *op, TCGOpcode opc, int narg);
+     /* Bound the number of insns to execute to those left on the page.  */
+     if (in_superpage(ctx, ctx->base.pc_first)) {
 diff --git a/target/arm/translate-a64.c b/target/arm/translate-a64.c
-index 460bab5987..ba94f7d045 100644
+index 625ef2dfd2..460bab5987 100644
 --- a/target/arm/translate-a64.c
 +++ b/target/arm/translate-a64.c
-@@ -11290,8 +11290,8 @@ static void aarch64_tr_insn_start(DisasContextBase *dcbase, CPUState *cpu)
+@@ -405,10 +405,7 @@ static void unallocated_encoding(DisasContext *s)
+ static void init_tmp_a64_array(DisasContext *s)
  {
-     DisasContext *dc = container_of(dcbase, DisasContext, base);
- 
--    dc->insn_start_idx = tcg_op_buf_count();
-     tcg_gen_insn_start(dc->pc, 0, 0);
-+    dc->insn_start = tcg_last_op();
+ #ifdef CONFIG_DEBUG_TCG
+-    int i;
+-    for (i = 0; i < ARRAY_SIZE(s->tmp_a64); i++) {
+-        TCGV_UNUSED_I64(s->tmp_a64[i]);
+-    }
++    memset(s->tmp_a64, 0, sizeof(s->tmp_a64));
+ #endif
+     s->tmp_a64_count = 0;
  }
+@@ -6276,7 +6273,7 @@ static void disas_simd_scalar_pairwise(DisasContext *s, uint32_t insn)
+             return;
+         }
  
- static bool aarch64_tr_breakpoint_check(DisasContextBase *dcbase, CPUState *cpu,
+-        TCGV_UNUSED_PTR(fpst);
++        fpst = NULL;
+         break;
+     case 0xc: /* FMAXNMP */
+     case 0xd: /* FADDP */
+@@ -6371,7 +6368,7 @@ static void disas_simd_scalar_pairwise(DisasContext *s, uint32_t insn)
+         tcg_temp_free_i32(tcg_res);
+     }
+ 
+-    if (!TCGV_IS_UNUSED_PTR(fpst)) {
++    if (fpst) {
+         tcg_temp_free_ptr(fpst);
+     }
+ }
+@@ -6387,7 +6384,7 @@ static void handle_shri_with_rndacc(TCGv_i64 tcg_res, TCGv_i64 tcg_src,
+                                     bool is_u, int size, int shift)
+ {
+     bool extended_result = false;
+-    bool round = !TCGV_IS_UNUSED_I64(tcg_rnd);
++    bool round = tcg_rnd != NULL;
+     int ext_lshift = 0;
+     TCGv_i64 tcg_src_hi;
+ 
+@@ -6533,7 +6530,7 @@ static void handle_scalar_simd_shri(DisasContext *s,
+         uint64_t round_const = 1ULL << (shift - 1);
+         tcg_round = tcg_const_i64(round_const);
+     } else {
+-        TCGV_UNUSED_I64(tcg_round);
++        tcg_round = NULL;
+     }
+ 
+     tcg_rn = read_fp_dreg(s, rn);
+@@ -6649,7 +6646,7 @@ static void handle_vec_simd_sqshrn(DisasContext *s, bool is_scalar, bool is_q,
+         uint64_t round_const = 1ULL << (shift - 1);
+         tcg_round = tcg_const_i64(round_const);
+     } else {
+-        TCGV_UNUSED_I64(tcg_round);
++        tcg_round = NULL;
+     }
+ 
+     for (i = 0; i < elements; i++) {
+@@ -8239,8 +8236,8 @@ static void disas_simd_scalar_two_reg_misc(DisasContext *s, uint32_t insn)
+         gen_helper_set_rmode(tcg_rmode, tcg_rmode, cpu_env);
+         tcg_fpstatus = get_fpstatus_ptr();
+     } else {
+-        TCGV_UNUSED_I32(tcg_rmode);
+-        TCGV_UNUSED_PTR(tcg_fpstatus);
++        tcg_rmode = NULL;
++        tcg_fpstatus = NULL;
+     }
+ 
+     if (size == 3) {
+@@ -8360,7 +8357,7 @@ static void handle_vec_simd_shri(DisasContext *s, bool is_q, bool is_u,
+         uint64_t round_const = 1ULL << (shift - 1);
+         tcg_round = tcg_const_i64(round_const);
+     } else {
+-        TCGV_UNUSED_I64(tcg_round);
++        tcg_round = NULL;
+     }
+ 
+     for (i = 0; i < elements; i++) {
+@@ -8502,7 +8499,7 @@ static void handle_vec_simd_shrn(DisasContext *s, bool is_q,
+         uint64_t round_const = 1ULL << (shift - 1);
+         tcg_round = tcg_const_i64(round_const);
+     } else {
+-        TCGV_UNUSED_I64(tcg_round);
++        tcg_round = NULL;
+     }
+ 
+     for (i = 0; i < elements; i++) {
+@@ -9168,7 +9165,7 @@ static void handle_simd_3same_pair(DisasContext *s, int is_q, int u, int opcode,
+     if (opcode >= 0x58) {
+         fpst = get_fpstatus_ptr();
+     } else {
+-        TCGV_UNUSED_PTR(fpst);
++        fpst = NULL;
+     }
+ 
+     if (!fp_access_check(s)) {
+@@ -9305,7 +9302,7 @@ static void handle_simd_3same_pair(DisasContext *s, int is_q, int u, int opcode,
+         }
+     }
+ 
+-    if (!TCGV_IS_UNUSED_PTR(fpst)) {
++    if (fpst) {
+         tcg_temp_free_ptr(fpst);
+     }
+ }
+@@ -10226,13 +10223,13 @@ static void disas_simd_two_reg_misc(DisasContext *s, uint32_t insn)
+     if (need_fpstatus) {
+         tcg_fpstatus = get_fpstatus_ptr();
+     } else {
+-        TCGV_UNUSED_PTR(tcg_fpstatus);
++        tcg_fpstatus = NULL;
+     }
+     if (need_rmode) {
+         tcg_rmode = tcg_const_i32(arm_rmode_to_sf(rmode));
+         gen_helper_set_rmode(tcg_rmode, tcg_rmode, cpu_env);
+     } else {
+-        TCGV_UNUSED_I32(tcg_rmode);
++        tcg_rmode = NULL;
+     }
+ 
+     if (size == 3) {
+@@ -10593,7 +10590,7 @@ static void disas_simd_indexed(DisasContext *s, uint32_t insn)
+     if (is_fp) {
+         fpst = get_fpstatus_ptr();
+     } else {
+-        TCGV_UNUSED_PTR(fpst);
++        fpst = NULL;
+     }
+ 
+     if (size == 3) {
+@@ -10917,7 +10914,7 @@ static void disas_simd_indexed(DisasContext *s, uint32_t insn)
+         }
+     }
+ 
+-    if (!TCGV_IS_UNUSED_PTR(fpst)) {
++    if (fpst) {
+         tcg_temp_free_ptr(fpst);
+     }
+ }
 diff --git a/target/arm/translate.c b/target/arm/translate.c
-index 0b74ce7dec..20c3246912 100644
+index 4afb0c86ec..0b74ce7dec 100644
 --- a/target/arm/translate.c
 +++ b/target/arm/translate.c
-@@ -12065,10 +12065,10 @@ static void arm_tr_insn_start(DisasContextBase *dcbase, CPUState *cpu)
- {
-     DisasContext *dc = container_of(dcbase, DisasContext, base);
+@@ -2165,8 +2165,8 @@ static int disas_iwmmxt_insn(DisasContext *s, uint32_t insn)
+             tmp3 = tcg_const_i32((insn & 1) << 5);
+             break;
+         default:
+-            TCGV_UNUSED_I32(tmp2);
+-            TCGV_UNUSED_I32(tmp3);
++            tmp2 = NULL;
++            tmp3 = NULL;
+         }
+         gen_helper_iwmmxt_insr(cpu_M0, cpu_M0, tmp, tmp2, tmp3);
+         tcg_temp_free_i32(tmp3);
+@@ -4935,7 +4935,7 @@ static int disas_neon_ls_insn(DisasContext *s, uint32_t insn)
+                         }
+                     } else /* size == 0 */ {
+                         if (load) {
+-                            TCGV_UNUSED_I32(tmp2);
++                            tmp2 = NULL;
+                             for (n = 0; n < 4; n++) {
+                                 tmp = tcg_temp_new_i32();
+                                 gen_aa32_ld8u(s, tmp, addr, get_mem_index(s));
+@@ -6639,11 +6639,11 @@ static int disas_neon_data_insn(DisasContext *s, uint32_t insn)
+                     tmp = neon_load_reg(rn, 1);
+                     neon_store_scratch(2, tmp);
+                 }
+-                TCGV_UNUSED_I32(tmp3);
++                tmp3 = NULL;
+                 for (pass = 0; pass < 2; pass++) {
+                     if (src1_wide) {
+                         neon_load_reg64(cpu_V0, rn + pass);
+-                        TCGV_UNUSED_I32(tmp);
++                        tmp = NULL;
+                     } else {
+                         if (pass == 1 && rd == rn) {
+                             tmp = neon_load_scratch(2);
+@@ -6656,7 +6656,7 @@ static int disas_neon_data_insn(DisasContext *s, uint32_t insn)
+                     }
+                     if (src2_wide) {
+                         neon_load_reg64(cpu_V1, rm + pass);
+-                        TCGV_UNUSED_I32(tmp2);
++                        tmp2 = NULL;
+                     } else {
+                         if (pass == 1 && rd == rm) {
+                             tmp2 = neon_load_scratch(2);
+@@ -7074,7 +7074,7 @@ static int disas_neon_data_insn(DisasContext *s, uint32_t insn)
+                     if (rm & 1) {
+                         return 1;
+                     }
+-                    TCGV_UNUSED_I32(tmp2);
++                    tmp2 = NULL;
+                     for (pass = 0; pass < 2; pass++) {
+                         neon_load_reg64(cpu_V0, rm + pass);
+                         tmp = tcg_temp_new_i32();
+@@ -7213,7 +7213,7 @@ static int disas_neon_data_insn(DisasContext *s, uint32_t insn)
+                         if (neon_2rm_is_float_op(op)) {
+                             tcg_gen_ld_f32(cpu_F0s, cpu_env,
+                                            neon_reg_offset(rm, pass));
+-                            TCGV_UNUSED_I32(tmp);
++                            tmp = NULL;
+                         } else {
+                             tmp = neon_load_reg(rm, pass);
+                         }
+@@ -8662,7 +8662,7 @@ static void disas_arm_insn(DisasContext *s, unsigned int insn)
+             rn = (insn >> 16) & 0xf;
+             tmp = load_reg(s, rn);
+         } else {
+-            TCGV_UNUSED_I32(tmp);
++            tmp = NULL;
+         }
+         rd = (insn >> 12) & 0xf;
+         switch(op1) {
+@@ -9501,7 +9501,7 @@ static void disas_arm_insn(DisasContext *s, unsigned int insn)
  
--    dc->insn_start_idx = tcg_op_buf_count();
-     tcg_gen_insn_start(dc->pc,
-                        (dc->condexec_cond << 4) | (dc->condexec_mask >> 1),
-                        0);
-+    dc->insn_start = tcg_last_op();
- }
+                 /* compute total size */
+                 loaded_base = 0;
+-                TCGV_UNUSED_I32(loaded_var);
++                loaded_var = NULL;
+                 n = 0;
+                 for(i=0;i<16;i++) {
+                     if (insn & (1 << i))
+@@ -10043,7 +10043,7 @@ static int disas_thumb2_insn(DisasContext *s, uint32_t insn)
+                     tcg_gen_addi_i32(addr, addr, -offset);
+                 }
  
- static bool arm_tr_breakpoint_check(DisasContextBase *dcbase, CPUState *cpu,
+-                TCGV_UNUSED_I32(loaded_var);
++                loaded_var = NULL;
+                 for (i = 0; i < 16; i++) {
+                     if ((insn & (1 << i)) == 0)
+                         continue;
+@@ -11324,7 +11324,7 @@ static void disas_thumb_insn(DisasContext *s, uint32_t insn)
+         } else if (op != 0xf) { /* mvn doesn't read its first operand */
+             tmp = load_reg(s, rd);
+         } else {
+-            TCGV_UNUSED_I32(tmp);
++            tmp = NULL;
+         }
+ 
+         tmp2 = load_reg(s, rm);
+@@ -11655,7 +11655,7 @@ static void disas_thumb_insn(DisasContext *s, uint32_t insn)
+                     tcg_gen_addi_i32(addr, addr, 4);
+                 }
+             }
+-            TCGV_UNUSED_I32(tmp);
++            tmp = NULL;
+             if (insn & (1 << 8)) {
+                 if (insn & (1 << 11)) {
+                     /* pop pc */
+@@ -11800,8 +11800,7 @@ static void disas_thumb_insn(DisasContext *s, uint32_t insn)
+     case 12:
+     {
+         /* load/store multiple */
+-        TCGv_i32 loaded_var;
+-        TCGV_UNUSED_I32(loaded_var);
++        TCGv_i32 loaded_var = NULL;
+         rn = (insn >> 8) & 0x7;
+         addr = load_reg(s, rn);
+         for (i = 0; i < 8; i++) {
 diff --git a/target/cris/translate.c b/target/cris/translate.c
-index 74822ed31f..f51a731db9 100644
+index 2831419845..74822ed31f 100644
 --- a/target/cris/translate.c
 +++ b/target/cris/translate.c
-@@ -3297,8 +3297,6 @@ void gen_intermediate_code(CPUState *cs, struct TranslationBlock *tb)
-         qemu_log("--------------\n");
-         qemu_log("IN: %s\n", lookup_symbol(pc_start));
-         log_target_disas(cs, pc_start, dc->pc - pc_start);
--        qemu_log("\nisize=%d osize=%d\n",
--                 dc->pc - pc_start, tcg_op_buf_count());
-         qemu_log_unlock();
+@@ -2603,7 +2603,7 @@ static int dec_movem_mr(CPUCRISState *env, DisasContext *dc)
+         tcg_gen_addi_tl(addr, cpu_R[dc->op1], i * 8);
+         gen_load(dc, tmp32, addr, 4, 0);
+     } else {
+-        TCGV_UNUSED(tmp32);
++        tmp32 = NULL;
      }
- #endif
-diff --git a/target/lm32/translate.c b/target/lm32/translate.c
-index b8b2b13e36..2e1c5e6d01 100644
---- a/target/lm32/translate.c
-+++ b/target/lm32/translate.c
-@@ -1156,8 +1156,6 @@ void gen_intermediate_code(CPUState *cs, struct TranslationBlock *tb)
-         qemu_log_lock();
-         qemu_log("\n");
-         log_target_disas(cs, pc_start, dc->pc - pc_start);
--        qemu_log("\nisize=%d osize=%d\n",
--                 dc->pc - pc_start, tcg_op_buf_count());
-         qemu_log_unlock();
-     }
- #endif
-diff --git a/target/microblaze/translate.c b/target/microblaze/translate.c
-index e7b5597c46..7628b0e25b 100644
---- a/target/microblaze/translate.c
-+++ b/target/microblaze/translate.c
-@@ -1808,11 +1808,7 @@ void gen_intermediate_code(CPUState *cs, struct TranslationBlock *tb)
-         && qemu_log_in_addr_range(pc_start)) {
-         qemu_log_lock();
-         qemu_log("--------------\n");
--#if DISAS_GNU
-         log_target_disas(cs, pc_start, dc->pc - pc_start);
--#endif
--        qemu_log("\nisize=%d osize=%d\n",
--                 dc->pc - pc_start, tcg_op_buf_count());
-         qemu_log_unlock();
-     }
- #endif
-diff --git a/tcg/optimize.c b/tcg/optimize.c
-index 438321c6cc..e495680e95 100644
---- a/tcg/optimize.c
-+++ b/tcg/optimize.c
-@@ -602,8 +602,8 @@ static bool swap_commutative2(TCGArg *p1, TCGArg *p2)
- /* Propagate constants and copies, fold constant expressions. */
- void tcg_optimize(TCGContext *s)
+     tcg_temp_free(addr);
+ 
+diff --git a/target/hppa/translate.c b/target/hppa/translate.c
+index 53aa1f88c4..31d9a2a31b 100644
+--- a/target/hppa/translate.c
++++ b/target/hppa/translate.c
+@@ -125,7 +125,7 @@ void hppa_translate_init(void)
+ 
+     int i;
+ 
+-    TCGV_UNUSED(cpu_gr[0]);
++    cpu_gr[0] = NULL;
+     for (i = 1; i < 32; i++) {
+         cpu_gr[i] = tcg_global_mem_new(cpu_env,
+                                        offsetof(CPUHPPAState, gr[i]),
+@@ -140,28 +140,31 @@ void hppa_translate_init(void)
+ 
+ static DisasCond cond_make_f(void)
  {
--    int oi, oi_next, nb_temps, nb_globals;
--    TCGOp *prev_mb = NULL;
-+    int nb_temps, nb_globals;
-+    TCGOp *op, *op_next, *prev_mb = NULL;
-     struct tcg_temp_info *infos;
-     TCGTempSet temps_used;
+-    DisasCond r = { .c = TCG_COND_NEVER };
+-    TCGV_UNUSED(r.a0);
+-    TCGV_UNUSED(r.a1);
+-    return r;
++    return (DisasCond){
++        .c = TCG_COND_NEVER,
++        .a0 = NULL,
++        .a1 = NULL,
++    };
+ }
  
-@@ -617,17 +617,13 @@ void tcg_optimize(TCGContext *s)
-     bitmap_zero(temps_used.l, nb_temps);
-     infos = tcg_malloc(sizeof(struct tcg_temp_info) * nb_temps);
- 
--    for (oi = s->gen_op_buf[0].next; oi != 0; oi = oi_next) {
-+    QTAILQ_FOREACH_SAFE(op, &s->ops, link, op_next) {
-         tcg_target_ulong mask, partmask, affected;
-         int nb_oargs, nb_iargs, i;
-         TCGArg tmp;
--
--        TCGOp * const op = &s->gen_op_buf[oi];
-         TCGOpcode opc = op->opc;
-         const TCGOpDef *def = &tcg_op_defs[opc];
- 
--        oi_next = op->next;
--
-         /* Count the arguments, and initialize the temps that are
-            going to be used */
-         if (opc == INDEX_op_call) {
-@@ -1261,9 +1257,6 @@ void tcg_optimize(TCGContext *s)
-                 rh = op->args[1];
-                 tcg_opt_gen_movi(s, op, rl, (int32_t)a);
-                 tcg_opt_gen_movi(s, op2, rh, (int32_t)(a >> 32));
--
--                /* We've done all we need to do with the movi.  Skip it.  */
--                oi_next = op2->next;
-                 break;
-             }
-             goto do_default;
-@@ -1280,9 +1273,6 @@ void tcg_optimize(TCGContext *s)
-                 rh = op->args[1];
-                 tcg_opt_gen_movi(s, op, rl, (int32_t)r);
-                 tcg_opt_gen_movi(s, op2, rh, (int32_t)(r >> 32));
--
--                /* We've done all we need to do with the movi.  Skip it.  */
--                oi_next = op2->next;
-                 break;
-             }
-             goto do_default;
-diff --git a/tcg/tcg-op.c b/tcg/tcg-op.c
-index 3cad30b1f2..0c509bfe46 100644
---- a/tcg/tcg-op.c
-+++ b/tcg/tcg-op.c
-@@ -42,30 +42,6 @@ extern TCGv_i32 TCGV_HIGH_link_error(TCGv_i64);
- #define TCGV_HIGH TCGV_HIGH_link_error
- #endif
- 
--/* Note that this is optimized for sequential allocation during translate.
--   Up to and including filling in the forward link immediately.  We'll do
--   proper termination of the end of the list after we finish translation.  */
--
--static inline TCGOp *tcg_emit_op(TCGOpcode opc)
--{
--    TCGContext *ctx = tcg_ctx;
--    int oi = ctx->gen_next_op_idx;
--    int ni = oi + 1;
--    int pi = oi - 1;
--    TCGOp *op = &ctx->gen_op_buf[oi];
--
--    tcg_debug_assert(oi < OPC_BUF_SIZE);
--    ctx->gen_op_buf[0].prev = oi;
--    ctx->gen_next_op_idx = ni;
--
--    memset(op, 0, offsetof(TCGOp, args));
--    op->opc = opc;
--    op->prev = pi;
--    op->next = ni;
--
--    return op;
--}
--
- void tcg_gen_op1(TCGOpcode opc, TCGArg a1)
+ static DisasCond cond_make_n(void)
  {
-     TCGOp *op = tcg_emit_op(opc);
+-    DisasCond r = { .c = TCG_COND_NE, .a0_is_n = true, .a1_is_0 = true };
+-    r.a0 = cpu_psw_n;
+-    TCGV_UNUSED(r.a1);
+-    return r;
++    return (DisasCond){
++        .c = TCG_COND_NE,
++        .a0 = cpu_psw_n,
++        .a0_is_n = true,
++        .a1 = NULL,
++        .a1_is_0 = true
++    };
+ }
+ 
+ static DisasCond cond_make_0(TCGCond c, TCGv a0)
+ {
+-    DisasCond r = { .c = c, .a1_is_0 = true };
++    DisasCond r = { .c = c, .a1 = NULL, .a1_is_0 = true };
+ 
+     assert (c != TCG_COND_NEVER && c != TCG_COND_ALWAYS);
+     r.a0 = tcg_temp_new();
+     tcg_gen_mov_tl(r.a0, a0);
+-    TCGV_UNUSED(r.a1);
+ 
+     return r;
+ }
+@@ -199,8 +202,8 @@ static void cond_free(DisasCond *cond)
+         }
+         cond->a0_is_n = false;
+         cond->a1_is_0 = false;
+-        TCGV_UNUSED(cond->a0);
+-        TCGV_UNUSED(cond->a1);
++        cond->a0 = NULL;
++        cond->a1 = NULL;
+         /* fallthru */
+     case TCG_COND_ALWAYS:
+         cond->c = TCG_COND_NEVER;
+@@ -716,9 +719,8 @@ static DisasCond do_sed_cond(unsigned orig, TCGv res)
+ static DisasCond do_unit_cond(unsigned cf, TCGv res, TCGv in1, TCGv in2)
+ {
+     DisasCond cond;
+-    TCGv tmp, cb;
++    TCGv tmp, cb = NULL;
+ 
+-    TCGV_UNUSED(cb);
+     if (cf & 8) {
+         /* Since we want to test lots of carry-out bits all at once, do not
+          * do our normal thing and compute carry-in of bit B+1 since that
+@@ -826,8 +828,8 @@ static DisasJumpType do_add(DisasContext *ctx, unsigned rt, TCGv in1, TCGv in2,
+     DisasCond cond;
+ 
+     dest = tcg_temp_new();
+-    TCGV_UNUSED(cb);
+-    TCGV_UNUSED(cb_msb);
++    cb = NULL;
++    cb_msb = NULL;
+ 
+     if (shift) {
+         tmp = get_temp(ctx);
+@@ -856,7 +858,7 @@ static DisasJumpType do_add(DisasContext *ctx, unsigned rt, TCGv in1, TCGv in2,
+     }
+ 
+     /* Compute signed overflow if required.  */
+-    TCGV_UNUSED(sv);
++    sv = NULL;
+     if (is_tsv || c == 6) {
+         sv = do_add_sv(ctx, dest, in1, in2);
+         if (is_tsv) {
+@@ -919,7 +921,7 @@ static DisasJumpType do_sub(DisasContext *ctx, unsigned rt, TCGv in1, TCGv in2,
+     tcg_temp_free(zero);
+ 
+     /* Compute signed overflow if required.  */
+-    TCGV_UNUSED(sv);
++    sv = NULL;
+     if (is_tsv || c == 6) {
+         sv = do_sub_sv(ctx, dest, in1, in2);
+         if (is_tsv) {
+@@ -965,7 +967,7 @@ static DisasJumpType do_cmpclr(DisasContext *ctx, unsigned rt, TCGv in1,
+     tcg_gen_sub_tl(dest, in1, in2);
+ 
+     /* Compute signed overflow if required.  */
+-    TCGV_UNUSED(sv);
++    sv = NULL;
+     if ((cf >> 1) == 6) {
+         sv = do_sub_sv(ctx, dest, in1, in2);
+     }
+@@ -2070,8 +2072,7 @@ static DisasJumpType trans_ds(DisasContext *ctx, uint32_t insn,
+ 
+     /* Install the new nullification.  */
+     if (cf) {
+-        TCGv sv;
+-        TCGV_UNUSED(sv);
++        TCGv sv = NULL;
+         if (cf >> 1 == 6) {
+             /* ??? The lshift is supposed to contribute to overflow.  */
+             sv = do_add_sv(ctx, dest, add1, add2);
+@@ -2542,7 +2543,7 @@ static DisasJumpType trans_cmpb(DisasContext *ctx, uint32_t insn,
+ 
+     tcg_gen_sub_tl(dest, in1, in2);
+ 
+-    TCGV_UNUSED(sv);
++    sv = NULL;
+     if (c == 6) {
+         sv = do_sub_sv(ctx, dest, in1, in2);
+     }
+@@ -2571,8 +2572,8 @@ static DisasJumpType trans_addb(DisasContext *ctx, uint32_t insn,
+     }
+     in2 = load_gpr(ctx, r);
+     dest = dest_gpr(ctx, r);
+-    TCGV_UNUSED(sv);
+-    TCGV_UNUSED(cb_msb);
++    sv = NULL;
++    cb_msb = NULL;
+ 
+     switch (c) {
+     default:
+@@ -3732,18 +3733,16 @@ static int hppa_tr_init_disas_context(DisasContextBase *dcbase,
+ {
+     DisasContext *ctx = container_of(dcbase, DisasContext, base);
+     TranslationBlock *tb = ctx->base.tb;
+-    int i, bound;
++    int bound;
+ 
+     ctx->cs = cs;
+     ctx->iaoq_f = tb->pc;
+     ctx->iaoq_b = tb->cs_base;
+     ctx->iaoq_n = -1;
+-    TCGV_UNUSED(ctx->iaoq_n_var);
++    ctx->iaoq_n_var = NULL;
+ 
+     ctx->ntemps = 0;
+-    for (i = 0; i < ARRAY_SIZE(ctx->temps); ++i) {
+-        TCGV_UNUSED(ctx->temps[i]);
+-    }
++    memset(ctx->temps, 0, sizeof(ctx->temps));
+ 
+     bound = -(tb->pc | TARGET_PAGE_MASK) / 4;
+     return MIN(max_insns, bound);
+@@ -3804,7 +3803,7 @@ static void hppa_tr_translate_insn(DisasContextBase *dcbase, CPUState *cs)
+             tcg_gen_addi_tl(ctx->iaoq_n_var, cpu_iaoq_b, 4);
+         } else {
+             ctx->iaoq_n = ctx->iaoq_b + 4;
+-            TCGV_UNUSED(ctx->iaoq_n_var);
++            ctx->iaoq_n_var = NULL;
+         }
+ 
+         if (unlikely(ctx->null_cond.c == TCG_COND_ALWAYS)) {
+@@ -3819,7 +3818,7 @@ static void hppa_tr_translate_insn(DisasContextBase *dcbase, CPUState *cs)
+     /* Free any temporaries allocated.  */
+     for (i = 0, n = ctx->ntemps; i < n; ++i) {
+         tcg_temp_free(ctx->temps[i]);
+-        TCGV_UNUSED(ctx->temps[i]);
++        ctx->temps[i] = NULL;
+     }
+     ctx->ntemps = 0;
+ 
+diff --git a/target/i386/translate.c b/target/i386/translate.c
+index 088a9d9766..8c5f12985a 100644
+--- a/target/i386/translate.c
++++ b/target/i386/translate.c
+@@ -689,7 +689,7 @@ static void gen_compute_eflags(DisasContext *s)
+         return;
+     }
+ 
+-    TCGV_UNUSED(zero);
++    zero = NULL;
+     dst = cpu_cc_dst;
+     src1 = cpu_cc_src;
+     src2 = cpu_cc_src2;
+@@ -2050,9 +2050,8 @@ static AddressParts gen_lea_modrm_0(CPUX86State *env, DisasContext *s,
+ /* Compute the address, with a minimum number of TCG ops.  */
+ static TCGv gen_lea_modrm_1(AddressParts a)
+ {
+-    TCGv ea;
++    TCGv ea = NULL;
+ 
+-    TCGV_UNUSED(ea);
+     if (a.index >= 0) {
+         if (a.scale == 0) {
+             ea = cpu_regs[a.index];
+@@ -2067,7 +2066,7 @@ static TCGv gen_lea_modrm_1(AddressParts a)
+     } else if (a.base >= 0) {
+         ea = cpu_regs[a.base];
+     }
+-    if (TCGV_IS_UNUSED(ea)) {
++    if (!ea) {
+         tcg_gen_movi_tl(cpu_A0, a.disp);
+         ea = cpu_A0;
+     } else if (a.disp != 0) {
+@@ -3951,7 +3950,7 @@ static void gen_sse(CPUX86State *env, DisasContext *s, int b,
+                     gen_ldst_modrm(env, s, modrm, ot, OR_TMP0, 0);
+ 
+                     /* Re-use the carry-out from a previous round.  */
+-                    TCGV_UNUSED(carry_in);
++                    carry_in = NULL;
+                     carry_out = (b == 0x1f6 ? cpu_cc_dst : cpu_cc_src2);
+                     switch (s->cc_op) {
+                     case CC_OP_ADCX:
+@@ -3979,7 +3978,7 @@ static void gen_sse(CPUX86State *env, DisasContext *s, int b,
+                         break;
+                     }
+                     /* If we can't reuse carry-out, get it out of EFLAGS.  */
+-                    if (TCGV_IS_UNUSED(carry_in)) {
++                    if (!carry_in) {
+                         if (s->cc_op != CC_OP_ADCX && s->cc_op != CC_OP_ADOX) {
+                             gen_compute_eflags(s);
+                         }
+@@ -7672,7 +7671,7 @@ static target_ulong disas_insn(DisasContext *s, CPUState *cpu)
+                 tcg_gen_mov_tl(a0, cpu_A0);
+             } else {
+                 gen_op_mov_v_reg(ot, t0, rm);
+-                TCGV_UNUSED(a0);
++                a0 = NULL;
+             }
+             gen_op_mov_v_reg(ot, t1, reg);
+             tcg_gen_andi_tl(cpu_tmp0, t0, 3);
+diff --git a/target/m68k/translate.c b/target/m68k/translate.c
+index b60909222c..e78c9f208b 100644
+--- a/target/m68k/translate.c
++++ b/target/m68k/translate.c
+@@ -3956,8 +3956,8 @@ DISAS_INSN(bfop_reg)
+     int ofs = extract32(ext, 6, 5);  /* big bit-endian */
+     TCGv mask, tofs, tlen;
+ 
+-    TCGV_UNUSED(tofs);
+-    TCGV_UNUSED(tlen);
++    tofs = NULL;
++    tlen = NULL;
+     if ((insn & 0x0f00) == 0x0d00) { /* bfffo */
+         tofs = tcg_temp_new();
+         tlen = tcg_temp_new();
+@@ -3973,7 +3973,7 @@ DISAS_INSN(bfop_reg)
+         }
+         tcg_gen_andi_i32(QREG_CC_N, QREG_CC_N, ~maski);
+         mask = tcg_const_i32(ror32(maski, ofs));
+-        if (!TCGV_IS_UNUSED(tofs)) {
++        if (tofs) {
+             tcg_gen_movi_i32(tofs, ofs);
+             tcg_gen_movi_i32(tlen, len);
+         }
+@@ -3985,13 +3985,13 @@ DISAS_INSN(bfop_reg)
+             tcg_gen_andi_i32(tmp, tmp, 31);
+             mask = tcg_const_i32(0x7fffffffu);
+             tcg_gen_shr_i32(mask, mask, tmp);
+-            if (!TCGV_IS_UNUSED(tlen)) {
++            if (tlen) {
+                 tcg_gen_addi_i32(tlen, tmp, 1);
+             }
+         } else {
+             /* Immediate width */
+             mask = tcg_const_i32(0x7fffffffu >> (len - 1));
+-            if (!TCGV_IS_UNUSED(tlen)) {
++            if (tlen) {
+                 tcg_gen_movi_i32(tlen, len);
+             }
+         }
+@@ -4001,7 +4001,7 @@ DISAS_INSN(bfop_reg)
+             tcg_gen_rotl_i32(QREG_CC_N, src, tmp);
+             tcg_gen_andc_i32(QREG_CC_N, QREG_CC_N, mask);
+             tcg_gen_rotr_i32(mask, mask, tmp);
+-            if (!TCGV_IS_UNUSED(tofs)) {
++            if (tofs) {
+                 tcg_gen_mov_i32(tofs, tmp);
+             }
+         } else {
+@@ -4009,7 +4009,7 @@ DISAS_INSN(bfop_reg)
+             tcg_gen_rotli_i32(QREG_CC_N, src, ofs);
+             tcg_gen_andc_i32(QREG_CC_N, QREG_CC_N, mask);
+             tcg_gen_rotri_i32(mask, mask, ofs);
+-            if (!TCGV_IS_UNUSED(tofs)) {
++            if (tofs) {
+                 tcg_gen_movi_i32(tofs, ofs);
+             }
+         }
+diff --git a/target/mips/translate.c b/target/mips/translate.c
+index b022f840c9..d05ee67e63 100644
+--- a/target/mips/translate.c
++++ b/target/mips/translate.c
+@@ -20453,7 +20453,7 @@ void mips_tcg_init(void)
+ {
+     int i;
+ 
+-    TCGV_UNUSED(cpu_gpr[0]);
++    cpu_gpr[0] = NULL;
+     for (i = 1; i < 32; i++)
+         cpu_gpr[i] = tcg_global_mem_new(cpu_env,
+                                         offsetof(CPUMIPSState, active_tc.gpr[i]),
+diff --git a/target/nios2/translate.c b/target/nios2/translate.c
+index 72329002ac..0afd10f08a 100644
+--- a/target/nios2/translate.c
++++ b/target/nios2/translate.c
+@@ -124,7 +124,7 @@ static uint8_t get_opxcode(uint32_t code)
+ 
+ static TCGv load_zero(DisasContext *dc)
+ {
+-    if (TCGV_IS_UNUSED_I32(dc->zero)) {
++    if (!dc->zero) {
+         dc->zero = tcg_const_i32(0);
+     }
+     return dc->zero;
+@@ -754,12 +754,12 @@ static void handle_instruction(DisasContext *dc, CPUNios2State *env)
+         goto illegal_op;
+     }
+ 
+-    TCGV_UNUSED_I32(dc->zero);
++    dc->zero = NULL;
+ 
+     instr = &i_type_instructions[op];
+     instr->handler(dc, code, instr->flags);
+ 
+-    if (!TCGV_IS_UNUSED_I32(dc->zero)) {
++    if (dc->zero) {
+         tcg_temp_free(dc->zero);
+     }
+ 
+diff --git a/target/ppc/translate.c b/target/ppc/translate.c
+index 998fbed848..4f7b66f990 100644
+--- a/target/ppc/translate.c
++++ b/target/ppc/translate.c
+@@ -3495,7 +3495,7 @@ static inline void gen_bcond(DisasContext *ctx, int type)
+         else
+             tcg_gen_mov_tl(target, cpu_lr);
+     } else {
+-        TCGV_UNUSED(target);
++        target = NULL;
+     }
+     if (LK(ctx->opcode))
+         gen_setlr(ctx, ctx->nip);
+diff --git a/target/s390x/translate.c b/target/s390x/translate.c
+index 85d0a6c3af..03eca099f6 100644
+--- a/target/s390x/translate.c
++++ b/target/s390x/translate.c
+@@ -440,11 +440,9 @@ static void set_cc_static(DisasContext *s)
+ /* calculates cc into cc_op */
+ static void gen_op_calc_cc(DisasContext *s)
+ {
+-    TCGv_i32 local_cc_op;
+-    TCGv_i64 dummy;
++    TCGv_i32 local_cc_op = NULL;
++    TCGv_i64 dummy = NULL;
+ 
+-    TCGV_UNUSED_I32(local_cc_op);
+-    TCGV_UNUSED_I64(dummy);
+     switch (s->cc_op) {
+     default:
+         dummy = tcg_const_i64(0);
+@@ -534,10 +532,10 @@ static void gen_op_calc_cc(DisasContext *s)
+         tcg_abort();
+     }
+ 
+-    if (!TCGV_IS_UNUSED_I32(local_cc_op)) {
++    if (local_cc_op) {
+         tcg_temp_free_i32(local_cc_op);
+     }
+-    if (!TCGV_IS_UNUSED_I64(dummy)) {
++    if (dummy) {
+         tcg_temp_free_i64(dummy);
+     }
+ 
+@@ -1195,7 +1193,7 @@ static ExitStatus help_branch(DisasContext *s, DisasCompare *c,
+             goto egress;
+         }
+     } else {
+-        if (TCGV_IS_UNUSED_I64(cdest)) {
++        if (!cdest) {
+             /* E.g. bcr %r0 -> no branch.  */
+             ret = NO_EXIT;
+             goto egress;
+@@ -1415,7 +1413,7 @@ static ExitStatus op_andi(DisasContext *s, DisasOps *o)
+ static ExitStatus op_bas(DisasContext *s, DisasOps *o)
+ {
+     tcg_gen_movi_i64(o->out, pc_to_link_info(s, s->next_pc));
+-    if (!TCGV_IS_UNUSED_I64(o->in2)) {
++    if (o->in2) {
+         tcg_gen_mov_i64(psw_addr, o->in2);
+         per_branch(s, false);
+         return EXIT_PC_UPDATED;
+@@ -2997,7 +2995,7 @@ static ExitStatus op_mov2(DisasContext *s, DisasOps *o)
+ {
+     o->out = o->in2;
+     o->g_out = o->g_in2;
+-    TCGV_UNUSED_I64(o->in2);
++    o->in2 = NULL;
+     o->g_in2 = false;
+     return NO_EXIT;
+ }
+@@ -3009,7 +3007,7 @@ static ExitStatus op_mov2e(DisasContext *s, DisasOps *o)
+ 
+     o->out = o->in2;
+     o->g_out = o->g_in2;
+-    TCGV_UNUSED_I64(o->in2);
++    o->in2 = NULL;
+     o->g_in2 = false;
+ 
+     switch (s->tb->flags & FLAG_MASK_ASC) {
+@@ -3043,8 +3041,8 @@ static ExitStatus op_movx(DisasContext *s, DisasOps *o)
+     o->out2 = o->in2;
+     o->g_out = o->g_in1;
+     o->g_out2 = o->g_in2;
+-    TCGV_UNUSED_I64(o->in1);
+-    TCGV_UNUSED_I64(o->in2);
++    o->in1 = NULL;
++    o->in2 = NULL;
+     o->g_in1 = o->g_in2 = false;
+     return NO_EXIT;
+ }
+@@ -5801,11 +5799,11 @@ static ExitStatus translate_one(CPUS390XState *env, DisasContext *s)
+     s->insn = insn;
+     s->fields = &f;
+     o.g_out = o.g_out2 = o.g_in1 = o.g_in2 = false;
+-    TCGV_UNUSED_I64(o.out);
+-    TCGV_UNUSED_I64(o.out2);
+-    TCGV_UNUSED_I64(o.in1);
+-    TCGV_UNUSED_I64(o.in2);
+-    TCGV_UNUSED_I64(o.addr1);
++    o.out = NULL;
++    o.out2 = NULL;
++    o.in1 = NULL;
++    o.in2 = NULL;
++    o.addr1 = NULL;
+ 
+     /* Implement the instruction.  */
+     if (insn->help_in1) {
+@@ -5828,19 +5826,19 @@ static ExitStatus translate_one(CPUS390XState *env, DisasContext *s)
+     }
+ 
+     /* Free any temporaries created by the helpers.  */
+-    if (!TCGV_IS_UNUSED_I64(o.out) && !o.g_out) {
++    if (o.out && !o.g_out) {
+         tcg_temp_free_i64(o.out);
+     }
+-    if (!TCGV_IS_UNUSED_I64(o.out2) && !o.g_out2) {
++    if (o.out2 && !o.g_out2) {
+         tcg_temp_free_i64(o.out2);
+     }
+-    if (!TCGV_IS_UNUSED_I64(o.in1) && !o.g_in1) {
++    if (o.in1 && !o.g_in1) {
+         tcg_temp_free_i64(o.in1);
+     }
+-    if (!TCGV_IS_UNUSED_I64(o.in2) && !o.g_in2) {
++    if (o.in2 && !o.g_in2) {
+         tcg_temp_free_i64(o.in2);
+     }
+-    if (!TCGV_IS_UNUSED_I64(o.addr1)) {
++    if (o.addr1) {
+         tcg_temp_free_i64(o.addr1);
+     }
+ 
+diff --git a/target/sh4/translate.c b/target/sh4/translate.c
+index 703020fe87..48ea0fe7e0 100644
+--- a/target/sh4/translate.c
++++ b/target/sh4/translate.c
+@@ -1901,7 +1901,7 @@ static int decode_gusa(DisasContext *ctx, CPUSH4State *env, int *pmax_insns)
+     op_dst = op_src = op_opc = -1;
+     mt_dst = -1;
+     st_src = st_mop = -1;
+-    TCGV_UNUSED(op_arg);
++    op_arg = NULL;
+     i = 0;
+ 
+ #define NEXT_INSN \
+diff --git a/target/sparc/translate.c b/target/sparc/translate.c
+index 849a02aebd..71e0853e43 100644
+--- a/target/sparc/translate.c
++++ b/target/sparc/translate.c
+@@ -5922,7 +5922,7 @@ void sparc_tcg_init(void)
+         *rtl[i].ptr = tcg_global_mem_new(cpu_env, rtl[i].off, rtl[i].name);
+     }
+ 
+-    TCGV_UNUSED(cpu_regs[0]);
++    cpu_regs[0] = NULL;
+     for (i = 1; i < 8; ++i) {
+         cpu_regs[i] = tcg_global_mem_new(cpu_env,
+                                          offsetof(CPUSPARCState, gregs[i]),
+diff --git a/target/tilegx/translate.c b/target/tilegx/translate.c
+index d55549dabc..d63bf5bba3 100644
+--- a/target/tilegx/translate.c
++++ b/target/tilegx/translate.c
+@@ -143,7 +143,7 @@ static bool check_gr(DisasContext *dc, uint8_t reg)
+ 
+ static TCGv load_zero(DisasContext *dc)
+ {
+-    if (TCGV_IS_UNUSED_I64(dc->zero)) {
++    if (!dc->zero) {
+         dc->zero = tcg_const_i64(0);
+     }
+     return dc->zero;
+@@ -2324,7 +2324,7 @@ static void translate_one_bundle(DisasContext *dc, uint64_t bundle)
+     for (i = 0; i < ARRAY_SIZE(dc->wb); i++) {
+         DisasContextTemp *wb = &dc->wb[i];
+         wb->reg = TILEGX_R_NOREG;
+-        TCGV_UNUSED_I64(wb->val);
++        wb->val = NULL;
+     }
+     dc->num_wb = 0;
+ 
+@@ -2384,9 +2384,9 @@ void gen_intermediate_code(CPUState *cs, struct TranslationBlock *tb)
+     dc->exit_tb = false;
+     dc->atomic_excp = TILEGX_EXCP_NONE;
+     dc->jmp.cond = TCG_COND_NEVER;
+-    TCGV_UNUSED_I64(dc->jmp.dest);
+-    TCGV_UNUSED_I64(dc->jmp.val1);
+-    TCGV_UNUSED_I64(dc->zero);
++    dc->jmp.dest = NULL;
++    dc->jmp.val1 = NULL;
++    dc->zero = NULL;
+ 
+     if (qemu_loglevel_mask(CPU_LOG_TB_IN_ASM)) {
+         qemu_log_lock();
+diff --git a/target/unicore32/translate.c b/target/unicore32/translate.c
+index 384aa86027..5b51f2166d 100644
+--- a/target/unicore32/translate.c
++++ b/target/unicore32/translate.c
+@@ -1230,7 +1230,7 @@ static void do_datap(CPUUniCore32State *env, DisasContext *s, uint32_t insn)
+     if (UCOP_OPCODES != 0x0f && UCOP_OPCODES != 0x0d) {
+         tmp = load_reg(s, UCOP_REG_N);
+     } else {
+-        TCGV_UNUSED(tmp);
++        tmp = NULL;
+     }
+ 
+     switch (UCOP_OPCODES) {
+@@ -1652,7 +1652,7 @@ static void do_ldst_m(CPUUniCore32State *env, DisasContext *s, uint32_t insn)
+ 
+     /* compute total size */
+     loaded_base = 0;
+-    TCGV_UNUSED(loaded_var);
++    loaded_var = NULL;
+     n = 0;
+     for (i = 0; i < 6; i++) {
+         if (UCOP_SET(i)) {
 diff --git a/tcg/tcg.c b/tcg/tcg.c
-index 68bcd2267b..f26949a900 100644
+index c22f1c4441..68bcd2267b 100644
 --- a/tcg/tcg.c
 +++ b/tcg/tcg.c
-@@ -862,9 +862,8 @@ void tcg_func_start(TCGContext *s)
-     s->goto_tb_issue_mask = 0;
- #endif
+@@ -1358,8 +1358,8 @@ void tcg_gen_callN(void *func, TCGTemp *ret, int nargs, TCGTemp **args)
+     TCGv_i64 retl, reth;
+     TCGTemp *split_args[MAX_OPC_PARAM];
  
--    s->gen_op_buf[0].next = 1;
--    s->gen_op_buf[0].prev = 0;
--    s->gen_next_op_idx = 1;
-+    QTAILQ_INIT(&s->ops);
-+    QTAILQ_INIT(&s->free_ops);
- }
- 
- static inline TCGTemp *tcg_temp_alloc(TCGContext *s)
-@@ -1339,7 +1338,6 @@ bool tcg_op_supported(TCGOpcode op)
-    and endian swap in tcg_reg_alloc_call(). */
- void tcg_gen_callN(void *func, TCGTemp *ret, int nargs, TCGTemp **args)
- {
--    TCGContext *s = tcg_ctx;
-     int i, real_args, nb_rets, pi;
-     unsigned sizemask, flags;
-     TCGHelperInfo *info;
-@@ -1395,17 +1393,7 @@ void tcg_gen_callN(void *func, TCGTemp *ret, int nargs, TCGTemp **args)
-     }
- #endif /* TCG_TARGET_EXTEND_ARGS */
- 
--    i = s->gen_next_op_idx;
--    tcg_debug_assert(i < OPC_BUF_SIZE);
--    s->gen_op_buf[0].prev = i;
--    s->gen_next_op_idx = i + 1;
--    op = &s->gen_op_buf[i];
--
--    /* Set links for sequential allocation during translation.  */
--    memset(op, 0, offsetof(TCGOp, args));
--    op->opc = INDEX_op_call;
--    op->prev = i - 1;
--    op->next = i + 1;
-+    op = tcg_emit_op(INDEX_op_call);
- 
-     pi = 0;
-     if (ret != NULL) {
-@@ -1622,20 +1610,18 @@ void tcg_dump_ops(TCGContext *s)
- {
-     char buf[128];
-     TCGOp *op;
--    int oi;
- 
--    for (oi = s->gen_op_buf[0].next; oi != 0; oi = op->next) {
-+    QTAILQ_FOREACH(op, &s->ops, link) {
-         int i, k, nb_oargs, nb_iargs, nb_cargs;
-         const TCGOpDef *def;
-         TCGOpcode c;
-         int col = 0;
- 
--        op = &s->gen_op_buf[oi];
-         c = op->opc;
-         def = &tcg_op_defs[c];
- 
-         if (c == INDEX_op_insn_start) {
--            col += qemu_log("%s ----", oi != s->gen_op_buf[0].next ? "\n" : "");
-+            col += qemu_log("\n ----");
- 
-             for (i = 0; i < TARGET_INSN_START_WORDS; ++i) {
-                 target_ulong a;
-@@ -1898,65 +1884,51 @@ static void process_op_defs(TCGContext *s)
- 
- void tcg_op_remove(TCGContext *s, TCGOp *op)
- {
--    int next = op->next;
--    int prev = op->prev;
--
--    /* We should never attempt to remove the list terminator.  */
--    tcg_debug_assert(op != &s->gen_op_buf[0]);
--
--    s->gen_op_buf[next].prev = prev;
--    s->gen_op_buf[prev].next = next;
--
--    memset(op, 0, sizeof(*op));
-+    QTAILQ_REMOVE(&s->ops, op, link);
-+    QTAILQ_INSERT_TAIL(&s->free_ops, op, link);
- 
- #ifdef CONFIG_PROFILER
-     atomic_set(&s->prof.del_op_count, s->prof.del_op_count + 1);
- #endif
- }
- 
--TCGOp *tcg_op_insert_before(TCGContext *s, TCGOp *old_op,
--                            TCGOpcode opc, int nargs)
-+static TCGOp *tcg_op_alloc(TCGOpcode opc)
- {
--    int oi = s->gen_next_op_idx;
--    int prev = old_op->prev;
--    int next = old_op - s->gen_op_buf;
--    TCGOp *new_op;
-+    TCGContext *s = tcg_ctx;
-+    TCGOp *op;
- 
--    tcg_debug_assert(oi < OPC_BUF_SIZE);
--    s->gen_next_op_idx = oi + 1;
-+    if (likely(QTAILQ_EMPTY(&s->free_ops))) {
-+        op = tcg_malloc(sizeof(TCGOp));
-+    } else {
-+        op = QTAILQ_FIRST(&s->free_ops);
-+        QTAILQ_REMOVE(&s->free_ops, op, link);
-+    }
-+    memset(op, 0, offsetof(TCGOp, link));
-+    op->opc = opc;
- 
--    new_op = &s->gen_op_buf[oi];
--    *new_op = (TCGOp){
--        .opc = opc,
--        .prev = prev,
--        .next = next
--    };
--    s->gen_op_buf[prev].next = oi;
--    old_op->prev = oi;
-+    return op;
-+}
-+
-+TCGOp *tcg_emit_op(TCGOpcode opc)
-+{
-+    TCGOp *op = tcg_op_alloc(opc);
-+    QTAILQ_INSERT_TAIL(&tcg_ctx->ops, op, link);
-+    return op;
-+}
- 
-+TCGOp *tcg_op_insert_before(TCGContext *s, TCGOp *old_op,
-+                            TCGOpcode opc, int nargs)
-+{
-+    TCGOp *new_op = tcg_op_alloc(opc);
-+    QTAILQ_INSERT_BEFORE(old_op, new_op, link);
-     return new_op;
- }
- 
- TCGOp *tcg_op_insert_after(TCGContext *s, TCGOp *old_op,
-                            TCGOpcode opc, int nargs)
- {
--    int oi = s->gen_next_op_idx;
--    int prev = old_op - s->gen_op_buf;
--    int next = old_op->next;
--    TCGOp *new_op;
--
--    tcg_debug_assert(oi < OPC_BUF_SIZE);
--    s->gen_next_op_idx = oi + 1;
--
--    new_op = &s->gen_op_buf[oi];
--    *new_op = (TCGOp){
--        .opc = opc,
--        .prev = prev,
--        .next = next
--    };
--    s->gen_op_buf[next].prev = oi;
--    old_op->next = oi;
--
-+    TCGOp *new_op = tcg_op_alloc(opc);
-+    QTAILQ_INSERT_AFTER(&s->ops, old_op, new_op, link);
-     return new_op;
- }
- 
-@@ -2006,23 +1978,19 @@ static void tcg_la_bb_end(TCGContext *s)
- static void liveness_pass_1(TCGContext *s)
- {
-     int nb_globals = s->nb_globals;
--    int oi, oi_prev;
-+    TCGOp *op, *op_prev;
- 
-     tcg_la_func_end(s);
- 
--    for (oi = s->gen_op_buf[0].prev; oi != 0; oi = oi_prev) {
-+    QTAILQ_FOREACH_REVERSE_SAFE(op, &s->ops, TCGOpHead, link, op_prev) {
-         int i, nb_iargs, nb_oargs;
-         TCGOpcode opc_new, opc_new2;
-         bool have_opc_new2;
-         TCGLifeData arg_life = 0;
-         TCGTemp *arg_ts;
--
--        TCGOp * const op = &s->gen_op_buf[oi];
-         TCGOpcode opc = op->opc;
-         const TCGOpDef *def = &tcg_op_defs[opc];
- 
--        oi_prev = op->prev;
--
-         switch (opc) {
-         case INDEX_op_call:
-             {
-@@ -2233,8 +2201,9 @@ static void liveness_pass_1(TCGContext *s)
- static bool liveness_pass_2(TCGContext *s)
- {
-     int nb_globals = s->nb_globals;
--    int nb_temps, i, oi, oi_next;
-+    int nb_temps, i;
-     bool changes = false;
-+    TCGOp *op, *op_next;
- 
-     /* Create a temporary for each indirect global.  */
-     for (i = 0; i < nb_globals; ++i) {
-@@ -2256,16 +2225,13 @@ static bool liveness_pass_2(TCGContext *s)
-         its->state = TS_DEAD;
-     }
- 
--    for (oi = s->gen_op_buf[0].next; oi != 0; oi = oi_next) {
--        TCGOp *op = &s->gen_op_buf[oi];
-+    QTAILQ_FOREACH_SAFE(op, &s->ops, link, op_next) {
-         TCGOpcode opc = op->opc;
-         const TCGOpDef *def = &tcg_op_defs[opc];
-         TCGLifeData arg_life = op->life;
-         int nb_iargs, nb_oargs, call_flags;
-         TCGTemp *arg_ts, *dir_ts;
- 
--        oi_next = op->next;
--
-         if (opc == INDEX_op_call) {
-             nb_oargs = op->callo;
-             nb_iargs = op->calli;
-@@ -3168,13 +3134,16 @@ int tcg_gen_code(TCGContext *s, TranslationBlock *tb)
- #ifdef CONFIG_PROFILER
-     TCGProfile *prof = &s->prof;
- #endif
--    int i, oi, oi_next, num_insns;
-+    int i, num_insns;
-+    TCGOp *op;
- 
- #ifdef CONFIG_PROFILER
-     {
-         int n;
- 
--        n = s->gen_op_buf[0].prev + 1;
-+        QTAILQ_FOREACH(op, &s->ops, link) {
-+            n++;
-+        }
-         atomic_set(&prof->op_count, prof->op_count + n);
-         if (n > prof->op_count_max) {
-             atomic_set(&prof->op_count_max, n);
-@@ -3260,11 +3229,9 @@ int tcg_gen_code(TCGContext *s, TranslationBlock *tb)
- #endif
- 
-     num_insns = -1;
--    for (oi = s->gen_op_buf[0].next; oi != 0; oi = oi_next) {
--        TCGOp * const op = &s->gen_op_buf[oi];
-+    QTAILQ_FOREACH(op, &s->ops, link) {
-         TCGOpcode opc = op->opc;
- 
--        oi_next = op->next;
- #ifdef CONFIG_PROFILER
-         atomic_set(&prof->table_op_count[opc], prof->table_op_count[opc] + 1);
- #endif
+-    TCGV_UNUSED_I64(retl);
+-    TCGV_UNUSED_I64(reth);
++    retl = NULL;
++    reth = NULL;
+     if (sizemask != 0) {
+         for (i = real_args = 0; i < nargs; ++i) {
+             int is_64bit = sizemask & (1 << (i+1)*2);
 -- 
 2.13.6
