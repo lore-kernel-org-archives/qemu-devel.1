@@ -1,19 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52520)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56029)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.purdie@linuxfoundation.org>)
-	id 1eGvzy-0006lL-CO
-	for qemu-devel@nongnu.org; Mon, 20 Nov 2017 19:01:11 -0500
+	(envelope-from <pbonzini@redhat.com>) id 1eGwEo-0000vf-5t
+	for qemu-devel@nongnu.org; Mon, 20 Nov 2017 19:16:31 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.purdie@linuxfoundation.org>)
-	id 1eGvzt-0002eF-HR
-	for qemu-devel@nongnu.org; Mon, 20 Nov 2017 19:01:10 -0500
-Message-ID: <1511222455.862.5.camel@linuxfoundation.org>
-From: Richard Purdie <richard.purdie@linuxfoundation.org>
-Date: Tue, 21 Nov 2017 00:00:55 +0000
-Content-Type: text/plain; charset="UTF-8"
-Mime-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] qemu-system-ppc hangs
+	(envelope-from <pbonzini@redhat.com>) id 1eGwEj-0000P7-Tq
+	for qemu-devel@nongnu.org; Mon, 20 Nov 2017 19:16:29 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:56230)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1eGwEj-0000Ou-NK
+	for qemu-devel@nongnu.org; Mon, 20 Nov 2017 19:16:25 -0500
+References: <1510865080-32027-1-git-send-email-changpeng.liu@intel.com>
+	<1510865080-32027-2-git-send-email-changpeng.liu@intel.com>
+	<20171120162631.GK4516@stefanha-x1.localdomain>
+	<20171120224001-mutt-send-email-mst@kernel.org>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <776f5005-8bb8-773a-1f16-56b5675e7d74@redhat.com>
+Date: Tue, 21 Nov 2017 01:16:12 +0100
+MIME-Version: 1.0
+In-Reply-To: <20171120224001-mutt-send-email-mst@kernel.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v5 1/4] vhost-user: add new vhost user
+ messages to support virtio config space
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,66 +31,23 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-ppc@nongnu.org, david@gibson.dropbear.id.au
-Cc: qemu-devel <qemu-devel@nongnu.org>
+To: "Michael S. Tsirkin" <mst@redhat.com>, Stefan Hajnoczi <stefanha@gmail.com>
+Cc: Changpeng Liu <changpeng.liu@intel.com>, qemu-devel@nongnu.org, marcandre.lureau@redhat.com, felipe@nutanix.com, james.r.harris@intel.com
 
-Hi,
+On 20/11/2017 21:44, Michael S. Tsirkin wrote:
+> Live migrations is supposed to be migrating guest writeable state too.
+> If you mean migrating RO fields like size, then
+> I don't think it's a good idea to reuse SET_CONFIG for that.
+> SET_CONFIG should obey exactly the virtio semantics.
+> 
+> And I agree, it should say that slave must treat it as a write,
+> and get config as a read according to virtio semantics.
+> 
+> If someone needs to pass configuration from qemu to
+> slave, let's add specific messages with precisely defined semantics.
 
-I work on the Yocto Project and we use qemu to test boot our Linux
-images and run tests against them. We've been noticing some instability
-for ppc where the images sometimes hang, usually around udevd bring up
-time so just after booting into userspace.
+Fair enough, but I'd add nevertheless a 32-bit flags field to both
+GET_CONFIG and SET_CONFIG, and document that the slave MUST check that
+it is zero and otherwise fail.
 
-To cut a long story short, I've tracked down what I think is the
-problem. I believe the decrementer timer stops receiving interrupts so
-tasks in our images hang indefinitely as the timer stopped.=C2=A0
-
-It can be summed up with this line of debug:
-
-ppc_set_irq: 0x55b4e0d562f0 n_IRQ 8 level 1 =3D> pending 00000100req 0000=
-0004
-
-It should normally read:
-
-ppc_set_irq: 0x55b4e0d562f0 n_IRQ 8 level=C2=A01 =3D> pending 00000100req=
- 00000002
-
-The question is why=C2=A0CPU_INTERRUPT_EXITTB ends up being set when the
-lines above this=C2=A0log message clearly sets=C2=A0CPU_INTERRUPT_HARD (v=
-ia=C2=A0
-cpu_interrupt() ).
-
-I note in cpu.h:
-
-=C2=A0=C2=A0=C2=A0=C2=A0/* updates protected by BQL */
-=C2=A0=C2=A0=C2=A0=C2=A0uint32_t interrupt_request;
-
-(for struct CPUState)
-
-The ppc code does "cs->interrupt_request |=3D CPU_INTERRUPT_EXITTB" in 5
-places, 3 in excp_helper.c and 2 in helper_regs.h. In all cases, =C2=A0
-g_assert(qemu_mutex_iothread_locked()); fails. If I do something like:
-
-if (!qemu_mutex_iothread_locked()) {
-=C2=A0=C2=A0=C2=A0=C2=A0qemu_mutex_lock_iothread();
-=C2=A0=C2=A0=C2=A0=C2=A0cpu_interrupt(cs, CPU_INTERRUPT_EXITTB);
-=C2=A0=C2=A0=C2=A0=C2=A0qemu_mutex_unlock_iothread();
-} else {
-=C2=A0=C2=A0=C2=A0=C2=A0cpu_interrupt(cs, CPU_INTERRUPT_EXITTB);
-}
-
-in these call sites then I can no longer lock qemu up with my test
-case.
-
-I suspect the _HARD setting gets overwritten which stops the=C2=A0
-decrementer interrupts being delivered.
-
-I don't know if taking this lock in these situations is going to be bad
-for performance and whether such a patch would be right/wrong.
-
-At this point I therefore wanted to seek advice on what the real issue
-is here and how to fix it!
-
-Cheers,
-
-Richard
+Paolo
