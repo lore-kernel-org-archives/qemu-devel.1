@@ -1,23 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39823)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39821)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mikhail.abakumov@ispras.ru>) id 1eH9F4-0001ZH-Mf
-	for qemu-devel@nongnu.org; Tue, 21 Nov 2017 09:09:42 -0500
+	(envelope-from <s1seetee@linux.vnet.ibm.com>) id 1eH9F4-0001Z1-EW
+	for qemu-devel@nongnu.org; Tue, 21 Nov 2017 09:09:46 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mikhail.abakumov@ispras.ru>) id 1eH9Eu-0002sl-Ph
+	(envelope-from <s1seetee@linux.vnet.ibm.com>) id 1eH9Ez-0002tO-Oo
 	for qemu-devel@nongnu.org; Tue, 21 Nov 2017 09:09:38 -0500
-Received: from mail.ispras.ru ([83.149.199.45]:38178)
-	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mikhail.abakumov@ispras.ru>) id 1eH9Eu-0002sb-De
-	for qemu-devel@nongnu.org; Tue, 21 Nov 2017 09:09:28 -0500
-From: Mihail Abakumov <mikhail.abakumov@ispras.ru>
-Date: Tue, 21 Nov 2017 17:09:25 +0300
-Message-ID: <151127336553.6888.5261319788471833164.stgit@Misha-PC.lan02.inno>
-In-Reply-To: <151127322955.6888.16198535123422076171.stgit@Misha-PC.lan02.inno>
-References: <151127322955.6888.16198535123422076171.stgit@Misha-PC.lan02.inno>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Subject: [Qemu-devel] [PATCH v3 23/45] windbg: kernel's structures
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:34338
+	helo=mx0a-001b2d01.pphosted.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <s1seetee@linux.vnet.ibm.com>)
+	id 1eH9Ez-0002t4-J8
+	for qemu-devel@nongnu.org; Tue, 21 Nov 2017 09:09:33 -0500
+Received: from pps.filterd (m0098413.ppops.net [127.0.0.1])
+	by mx0b-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
+	vALE8hfJ141642
+	for <qemu-devel@nongnu.org>; Tue, 21 Nov 2017 09:09:27 -0500
+Received: from e06smtp15.uk.ibm.com (e06smtp15.uk.ibm.com [195.75.94.111])
+	by mx0b-001b2d01.pphosted.com with ESMTP id 2ecm8nx0m7-1
+	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Tue, 21 Nov 2017 09:09:27 -0500
+Received: from localhost
+	by e06smtp15.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	Only! Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <s1seetee@linux.vnet.ibm.com>;
+	Tue, 21 Nov 2017 14:09:26 -0000
+From: Seeteena Thoufeek <s1seetee@linux.vnet.ibm.com>
+Date: Tue, 21 Nov 2017 19:39:18 +0530
+Message-Id: <1511273358-21789-1-git-send-email-s1seetee@linux.vnet.ibm.com>
+Subject: [Qemu-devel] [PATCH v1] hmp: 'info snapshots' not showing the id
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,273 +36,35 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: sw@weilnetz.de, lprosek@redhat.com, dovgaluk@ispras.ru, rkagan@virtuozzo.com, pbonzini@redhat.com, den@openvz.org
+To: dgilbert@redhat.com, qemu-devel@nongnu.org
+Cc: s1seetee@linux.vnet.ibm.com
 
-Defined Windows kernel's structures (CPU_CONTEXT and CPU_KSPECIAL_REGISTERS) for i386 and x64_86.
+(qemu) info snapshots
+List of snapshots present on all disks:
+ID        TAG                 VM SIZE                DATE       VM CLOCK
+--         1                      314M 2017-11-15 15:22:18   00:02:25.695
+--         2                      319M 2017-11-15 15:23:03   00:02:45.970
+--         3                      319M 2017-11-15 15:23:37   00:02:56.328
 
-Signed-off-by: Mihail Abakumov <mikhail.abakumov@ispras.ru>
-Signed-off-by: Pavel Dovgalyuk <dovgaluk@ispras.ru>
-Signed-off-by: Dmitriy Koltunov <koltunov@ispras.ru>
+ID field is showing -- with no information.
+
+Signed-off-by: Seeteena Thoufeek <s1seetee@linux.vnet.ibm.com>
 ---
- target/i386/windbgstub.c |  247 ++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 247 insertions(+)
+ hmp.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/target/i386/windbgstub.c b/target/i386/windbgstub.c
-index 261e441db1..43efb47471 100755
---- a/target/i386/windbgstub.c
-+++ b/target/i386/windbgstub.c
-@@ -26,6 +26,253 @@
- # define OFFSET_KPRCB_CURRTHREAD 0x4
- #endif
- 
-+/*
-+ * Next code copied from winnt.h
-+ */
-+#ifdef TARGET_X86_64
-+
-+#define CPU_CONTEXT_AMD64 0x100000
-+
-+#define CPU_CONTEXT_CONTROL         (CPU_CONTEXT_AMD64 | 0x1)
-+#define CPU_CONTEXT_INTEGER         (CPU_CONTEXT_AMD64 | 0x2)
-+#define CPU_CONTEXT_SEGMENTS        (CPU_CONTEXT_AMD64 | 0x4)
-+#define CPU_CONTEXT_FLOATING_POINT  (CPU_CONTEXT_AMD64 | 0x8)
-+#define CPU_CONTEXT_DEBUG_REGISTERS (CPU_CONTEXT_AMD64 | 0x10)
-+
-+#define CPU_CONTEXT_FULL \
-+    (CPU_CONTEXT_CONTROL | CPU_CONTEXT_INTEGER | CPU_CONTEXT_FLOATING_POINT)
-+#define CPU_CONTEXT_ALL \
-+    (CPU_CONTEXT_FULL | CPU_CONTEXT_SEGMENTS | CPU_CONTEXT_DEBUG_REGISTERS)
-+
-+typedef struct _CPU_DESCRIPTOR {
-+    uint16_t Pad[3];
-+    uint16_t Limit;
-+    uint64_t Base;
-+} CPU_DESCRIPTOR, *PCPU_DESCRIPTOR;
-+
-+typedef struct _CPU_KSPECIAL_REGISTERS {
-+    uint64_t Cr0;
-+    uint64_t Cr2;
-+    uint64_t Cr3;
-+    uint64_t Cr4;
-+    uint64_t KernelDr0;
-+    uint64_t KernelDr1;
-+    uint64_t KernelDr2;
-+    uint64_t KernelDr3;
-+    uint64_t KernelDr6;
-+    uint64_t KernelDr7;
-+    CPU_DESCRIPTOR Gdtr;
-+    CPU_DESCRIPTOR Idtr;
-+    uint16_t Tr;
-+    uint16_t Ldtr;
-+    uint32_t MxCsr;
-+    uint64_t DebugControl;
-+    uint64_t LastBranchToRip;
-+    uint64_t LastBranchFromRip;
-+    uint64_t LastExceptionToRip;
-+    uint64_t LastExceptionFromRip;
-+    uint64_t Cr8;
-+    uint64_t MsrGsBase;
-+    uint64_t MsrGsSwap;
-+    uint64_t MsrStar;
-+    uint64_t MsrLStar;
-+    uint64_t MsrCStar;
-+    uint64_t MsrSyscallMask;
-+    uint64_t Xcr0;
-+} CPU_KSPECIAL_REGISTERS, *PCPU_KSPECIAL_REGISTERS;
-+
-+#pragma pack(push, 2)
-+typedef struct _CPU_M128A {
-+    uint64_t Low;
-+    int64_t High;
-+} CPU_M128A, *PCPU_M128A;
-+#pragma pack(pop)
-+
-+typedef struct _CPU_XMM_SAVE_AREA32 {
-+    uint16_t ControlWord;
-+    uint16_t StatusWord;
-+    uint8_t TagWord;
-+    uint8_t Reserved1;
-+    uint16_t ErrorOpcode;
-+    uint32_t ErrorOffset;
-+    uint16_t ErrorSelector;
-+    uint16_t Reserved2;
-+    uint32_t DataOffset;
-+    uint16_t DataSelector;
-+    uint16_t Reserved3;
-+    uint32_t MxCsr;
-+    uint32_t MxCsr_Mask;
-+    CPU_M128A FloatRegisters[8];
-+    CPU_M128A XmmRegisters[16];
-+    uint8_t Reserved4[96];
-+} CPU_XMM_SAVE_AREA32, *PCPU_XMM_SAVE_AREA32;
-+
-+#pragma pack(push, 2)
-+typedef struct _CPU_CONTEXT { /* sizeof = 1232 */
-+    uint64_t P1Home;
-+    uint64_t P2Home;
-+    uint64_t P3Home;
-+    uint64_t P4Home;
-+    uint64_t P5Home;
-+    uint64_t P6Home;
-+    uint32_t ContextFlags;
-+    uint32_t MxCsr;
-+    uint16_t SegCs;
-+    uint16_t SegDs;
-+    uint16_t SegEs;
-+    uint16_t SegFs;
-+    uint16_t SegGs;
-+    uint16_t SegSs;
-+    uint32_t EFlags;
-+    uint64_t Dr0;
-+    uint64_t Dr1;
-+    uint64_t Dr2;
-+    uint64_t Dr3;
-+    uint64_t Dr6;
-+    uint64_t Dr7;
-+    uint64_t Rax;
-+    uint64_t Rcx;
-+    uint64_t Rdx;
-+    uint64_t Rbx;
-+    uint64_t Rsp;
-+    uint64_t Rbp;
-+    uint64_t Rsi;
-+    uint64_t Rdi;
-+    uint64_t R8;
-+    uint64_t R9;
-+    uint64_t R10;
-+    uint64_t R11;
-+    uint64_t R12;
-+    uint64_t R13;
-+    uint64_t R14;
-+    uint64_t R15;
-+    uint64_t Rip;
-+    union {
-+        CPU_XMM_SAVE_AREA32 FltSave;
-+        CPU_XMM_SAVE_AREA32 FloatSave;
-+        struct {
-+            CPU_M128A Header[2];
-+            CPU_M128A Legacy[8];
-+            CPU_M128A Xmm0;
-+            CPU_M128A Xmm1;
-+            CPU_M128A Xmm2;
-+            CPU_M128A Xmm3;
-+            CPU_M128A Xmm4;
-+            CPU_M128A Xmm5;
-+            CPU_M128A Xmm6;
-+            CPU_M128A Xmm7;
-+            CPU_M128A Xmm8;
-+            CPU_M128A Xmm9;
-+            CPU_M128A Xmm10;
-+            CPU_M128A Xmm11;
-+            CPU_M128A Xmm12;
-+            CPU_M128A Xmm13;
-+            CPU_M128A Xmm14;
-+            CPU_M128A Xmm15;
-+        };
-+    };
-+    CPU_M128A VectorRegister[26];
-+    uint64_t VectorControl;
-+    uint64_t DebugControl;
-+    uint64_t LastBranchToRip;
-+    uint64_t LastBranchFromRip;
-+    uint64_t LastExceptionToRip;
-+    uint64_t LastExceptionFromRip;
-+} CPU_CONTEXT, *PCPU_CONTEXT;
-+#pragma pack(pop)
-+
-+#else
-+
-+#define SIZE_OF_X86_REG 80
-+#define MAX_SUP_EXT 512
-+
-+#define CPU_CONTEXT_i386 0x10000
-+
-+#define CPU_CONTEXT_CONTROL            (CPU_CONTEXT_i386 | 0x1)
-+#define CPU_CONTEXT_INTEGER            (CPU_CONTEXT_i386 | 0x2)
-+#define CPU_CONTEXT_SEGMENTS           (CPU_CONTEXT_i386 | 0x4)
-+#define CPU_CONTEXT_FLOATING_POINT     (CPU_CONTEXT_i386 | 0x8)
-+#define CPU_CONTEXT_DEBUG_REGISTERS    (CPU_CONTEXT_i386 | 0x10)
-+#define CPU_CONTEXT_EXTENDED_REGISTERS (CPU_CONTEXT_i386 | 0x20)
-+
-+#define CPU_CONTEXT_FULL \
-+    (CPU_CONTEXT_CONTROL | CPU_CONTEXT_INTEGER | CPU_CONTEXT_SEGMENTS)
-+#define CPU_CONTEXT_ALL \
-+    (CPU_CONTEXT_FULL | CPU_CONTEXT_FLOATING_POINT | \
-+     CPU_CONTEXT_DEBUG_REGISTERS | CPU_CONTEXT_EXTENDED_REGISTERS)
-+
-+typedef struct _CPU_DESCRIPTOR {
-+    uint16_t Pad;
-+    uint16_t Limit;
-+    uint32_t Base;
-+} CPU_DESCRIPTOR, *PCPU_DESCRIPTOR;
-+
-+typedef struct _CPU_KSPECIAL_REGISTERS {
-+    uint32_t Cr0;
-+    uint32_t Cr2;
-+    uint32_t Cr3;
-+    uint32_t Cr4;
-+    uint32_t KernelDr0;
-+    uint32_t KernelDr1;
-+    uint32_t KernelDr2;
-+    uint32_t KernelDr3;
-+    uint32_t KernelDr6;
-+    uint32_t KernelDr7;
-+    CPU_DESCRIPTOR Gdtr;
-+    CPU_DESCRIPTOR Idtr;
-+    uint16_t Tr;
-+    uint16_t Ldtr;
-+    uint32_t Reserved[6];
-+} CPU_KSPECIAL_REGISTERS, *PCPU_KSPECIAL_REGISTERS;
-+
-+typedef struct _CPU_FLOATING_SAVE_AREA {
-+    uint32_t ControlWord;
-+    uint32_t StatusWord;
-+    uint32_t TagWord;
-+    uint32_t ErrorOffset;
-+    uint32_t ErrorSelector;
-+    uint32_t DataOffset;
-+    uint32_t DataSelector;
-+    uint8_t RegisterArea[SIZE_OF_X86_REG];
-+    uint32_t Cr0NpxState;
-+} CPU_FLOATING_SAVE_AREA, *PCPU_FLOATING_SAVE_AREA;
-+
-+typedef struct _CPU_CONTEXT { /* sizeof = 716 */
-+    uint32_t ContextFlags;
-+    uint32_t Dr0;
-+    uint32_t Dr1;
-+    uint32_t Dr2;
-+    uint32_t Dr3;
-+    uint32_t Dr6;
-+    uint32_t Dr7;
-+    CPU_FLOATING_SAVE_AREA FloatSave;
-+    uint32_t SegGs;
-+    uint32_t SegFs;
-+    uint32_t SegEs;
-+    uint32_t SegDs;
-+
-+    uint32_t Edi;
-+    uint32_t Esi;
-+    uint32_t Ebx;
-+    uint32_t Edx;
-+    uint32_t Ecx;
-+    uint32_t Eax;
-+    uint32_t Ebp;
-+    uint32_t Eip;
-+    uint32_t SegCs;
-+    uint32_t EFlags;
-+    uint32_t Esp;
-+    uint32_t SegSs;
-+    uint8_t ExtendedRegisters[MAX_SUP_EXT];
-+} CPU_CONTEXT, *PCPU_CONTEXT;
-+
-+#endif
-+
-+typedef struct _CPU_KPROCESSOR_STATE {
-+    CPU_CONTEXT ContextFrame;
-+    CPU_KSPECIAL_REGISTERS SpecialRegisters;
-+} CPU_KPROCESSOR_STATE, *PCPU_KPROCESSOR_STATE;
-+
- bool windbg_on_load(void)
- {
-     CPUState *cpu = qemu_get_cpu(0);
+diff --git a/hmp.c b/hmp.c
+index 35a7041..1921b3b 100644
+--- a/hmp.c
++++ b/hmp.c
+@@ -1454,7 +1454,7 @@ void hmp_info_snapshots(Monitor *mon, const QDict *qdict)
+             /* The ID is not guaranteed to be the same on all images, so
+              * overwrite it.
+              */
+-            pstrcpy(sn->id_str, sizeof(sn->id_str), "--");
++            pstrcpy(sn->id_str, sizeof(sn->id_str), sn->id_str);
+             bdrv_snapshot_dump((fprintf_function)monitor_printf, mon, sn);
+             monitor_printf(mon, "\n");
+         }
+-- 
+1.8.3.1
