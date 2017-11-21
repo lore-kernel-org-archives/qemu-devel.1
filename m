@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48309)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48467)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jcody@redhat.com>) id 1eHBy4-0008KW-Rh
-	for qemu-devel@nongnu.org; Tue, 21 Nov 2017 12:04:18 -0500
+	(envelope-from <jcody@redhat.com>) id 1eHByC-0008Pd-Dg
+	for qemu-devel@nongnu.org; Tue, 21 Nov 2017 12:04:30 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jcody@redhat.com>) id 1eHBy0-0005lF-Jv
-	for qemu-devel@nongnu.org; Tue, 21 Nov 2017 12:04:16 -0500
+	(envelope-from <jcody@redhat.com>) id 1eHByB-0005rG-49
+	for qemu-devel@nongnu.org; Tue, 21 Nov 2017 12:04:24 -0500
 From: Jeff Cody <jcody@redhat.com>
-Date: Tue, 21 Nov 2017 12:03:47 -0500
-Message-Id: <20171121170350.31290-2-jcody@redhat.com>
+Date: Tue, 21 Nov 2017 12:03:48 -0500
+Message-Id: <20171121170350.31290-3-jcody@redhat.com>
 In-Reply-To: <20171121170350.31290-1-jcody@redhat.com>
 References: <20171121170350.31290-1-jcody@redhat.com>
-Subject: [Qemu-devel] [PULL 1/4] blockjob: do not allow coroutine double
- entry or entry-after-completion
+Subject: [Qemu-devel] [PULL 2/4] coroutine: abort if we try to schedule or
+ enter a pending coroutine
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,65 +23,159 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org
 Cc: peter.maydell@linaro.org, jcody@redhat.com, qemu-devel@nongnu.org, stefanha@redhat.com, pbonzini@redhat.com
 
-When block_job_sleep_ns() is called, the co-routine is scheduled for
-future execution.  If we allow the job to be re-entered prior to the
-scheduled time, we present a race condition in which a coroutine can be
-entered recursively, or even entered after the coroutine is deleted.
+The previous patch fixed a race condition, in which there were
+coroutines being executing doubly, or after coroutine deletion.
 
-The job->busy flag is used by blockjobs when a coroutine is busy
-executing. The function 'block_job_enter()' obeys the busy flag,
-and will not enter a coroutine if set.  If we sleep a job, we need to
-leave the busy flag set, so that subsequent calls to block_job_enter()
-are prevented.
+We can detect common scenarios when this happens, and print an error
+message and abort before we corrupt memory / data, or segfault.
 
-This changes the prior behavior of block_job_cancel() being able to
-immediately wake up and cancel a job; in practice, this should not be an
-issue, as the coroutine sleep times are generally very small, and the
-cancel will occur the next time the coroutine wakes up.
+This patch will abort if an attempt to enter a coroutine is made while
+it is currently pending execution, either in a specific AioContext bh,
+or pending execution via a timer.  It will also abort if a coroutine
+is scheduled, before a prior scheduled run has occurred.
 
-This fixes: https://bugzilla.redhat.com/show_bug.cgi?id=1508708
+We cannot rely on the existing co->caller check for recursive re-entry
+to catch this, as the coroutine may run and exit with
+COROUTINE_TERMINATE before the scheduled coroutine executes.
+
+(This is the scenario that was occurring and fixed in the previous
+patch).
+
+This patch also re-orders the Coroutine struct elements in an attempt to
+optimize caching.
 
 Signed-off-by: Jeff Cody <jcody@redhat.com>
 Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
 ---
- blockjob.c                   | 7 +++++--
- include/block/blockjob_int.h | 3 ++-
- 2 files changed, 7 insertions(+), 3 deletions(-)
+ include/qemu/coroutine_int.h | 13 ++++++++++---
+ util/async.c                 | 13 +++++++++++++
+ util/qemu-coroutine-sleep.c  | 12 ++++++++++++
+ util/qemu-coroutine.c        | 14 ++++++++++++++
+ 4 files changed, 49 insertions(+), 3 deletions(-)
 
-diff --git a/blockjob.c b/blockjob.c
-index 3a0c491..ff9a614 100644
---- a/blockjob.c
-+++ b/blockjob.c
-@@ -797,11 +797,14 @@ void block_job_sleep_ns(BlockJob *job, QEMUClockType type, int64_t ns)
-         return;
-     }
+diff --git a/include/qemu/coroutine_int.h b/include/qemu/coroutine_int.h
+index cb98892..59e8406 100644
+--- a/include/qemu/coroutine_int.h
++++ b/include/qemu/coroutine_int.h
+@@ -46,14 +46,21 @@ struct Coroutine {
  
--    job->busy = false;
-+    /* We need to leave job->busy set here, because when we have
-+     * put a coroutine to 'sleep', we have scheduled it to run in
-+     * the future.  We cannot enter that same coroutine again before
-+     * it wakes and runs, otherwise we risk double-entry or entry after
-+     * completion. */
-     if (!block_job_should_pause(job)) {
-         co_aio_sleep_ns(blk_get_aio_context(job->blk), type, ns);
-     }
--    job->busy = true;
+     size_t locks_held;
  
-     block_job_pause_point(job);
++    /* Only used when the coroutine has yielded.  */
++    AioContext *ctx;
++
++    /* Used to catch and abort on illegal co-routine entry.
++     * Will contain the name of the function that had first
++     * scheduled the coroutine. */
++    const char *scheduled;
++
++    QSIMPLEQ_ENTRY(Coroutine) co_queue_next;
++
+     /* Coroutines that should be woken up when we yield or terminate.
+      * Only used when the coroutine is running.
+      */
+     QSIMPLEQ_HEAD(, Coroutine) co_queue_wakeup;
+ 
+-    /* Only used when the coroutine has yielded.  */
+-    AioContext *ctx;
+-    QSIMPLEQ_ENTRY(Coroutine) co_queue_next;
+     QSLIST_ENTRY(Coroutine) co_scheduled_next;
+ };
+ 
+diff --git a/util/async.c b/util/async.c
+index 0e1bd87..4dd9d95 100644
+--- a/util/async.c
++++ b/util/async.c
+@@ -388,6 +388,9 @@ static void co_schedule_bh_cb(void *opaque)
+         QSLIST_REMOVE_HEAD(&straight, co_scheduled_next);
+         trace_aio_co_schedule_bh_cb(ctx, co);
+         aio_context_acquire(ctx);
++
++        /* Protected by write barrier in qemu_aio_coroutine_enter */
++        atomic_set(&co->scheduled, NULL);
+         qemu_coroutine_enter(co);
+         aio_context_release(ctx);
+     }
+@@ -438,6 +441,16 @@ fail:
+ void aio_co_schedule(AioContext *ctx, Coroutine *co)
+ {
+     trace_aio_co_schedule(ctx, co);
++    const char *scheduled = atomic_cmpxchg(&co->scheduled, NULL,
++                                           __func__);
++
++    if (scheduled) {
++        fprintf(stderr,
++                "%s: Co-routine was already scheduled in '%s'\n",
++                __func__, scheduled);
++        abort();
++    }
++
+     QSLIST_INSERT_HEAD_ATOMIC(&ctx->scheduled_coroutines,
+                               co, co_scheduled_next);
+     qemu_bh_schedule(ctx->co_schedule_bh);
+diff --git a/util/qemu-coroutine-sleep.c b/util/qemu-coroutine-sleep.c
+index 9c56550..254349c 100644
+--- a/util/qemu-coroutine-sleep.c
++++ b/util/qemu-coroutine-sleep.c
+@@ -13,6 +13,7 @@
+ 
+ #include "qemu/osdep.h"
+ #include "qemu/coroutine.h"
++#include "qemu/coroutine_int.h"
+ #include "qemu/timer.h"
+ #include "block/aio.h"
+ 
+@@ -25,6 +26,8 @@ static void co_sleep_cb(void *opaque)
+ {
+     CoSleepCB *sleep_cb = opaque;
+ 
++    /* Write of schedule protected by barrier write in aio_co_schedule */
++    atomic_set(&sleep_cb->co->scheduled, NULL);
+     aio_co_wake(sleep_cb->co);
  }
-diff --git a/include/block/blockjob_int.h b/include/block/blockjob_int.h
-index f13ad05..43f3be2 100644
---- a/include/block/blockjob_int.h
-+++ b/include/block/blockjob_int.h
-@@ -143,7 +143,8 @@ void *block_job_create(const char *job_id, const BlockJobDriver *driver,
-  * @ns: How many nanoseconds to stop for.
-  *
-  * Put the job to sleep (assuming that it wasn't canceled) for @ns
-- * nanoseconds.  Canceling the job will interrupt the wait immediately.
-+ * nanoseconds.  Canceling the job will not interrupt the wait, so the
-+ * cancel will not process until the coroutine wakes up.
-  */
- void block_job_sleep_ns(BlockJob *job, QEMUClockType type, int64_t ns);
  
+@@ -34,6 +37,15 @@ void coroutine_fn co_aio_sleep_ns(AioContext *ctx, QEMUClockType type,
+     CoSleepCB sleep_cb = {
+         .co = qemu_coroutine_self(),
+     };
++
++    const char *scheduled = atomic_cmpxchg(&sleep_cb.co->scheduled, NULL,
++                                           __func__);
++    if (scheduled) {
++        fprintf(stderr,
++                "%s: Co-routine was already scheduled in '%s'\n",
++                __func__, scheduled);
++        abort();
++    }
+     sleep_cb.ts = aio_timer_new(ctx, type, SCALE_NS, co_sleep_cb, &sleep_cb);
+     timer_mod(sleep_cb.ts, qemu_clock_get_ns(type) + ns);
+     qemu_coroutine_yield();
+diff --git a/util/qemu-coroutine.c b/util/qemu-coroutine.c
+index d6095c1..9eff7fd 100644
+--- a/util/qemu-coroutine.c
++++ b/util/qemu-coroutine.c
+@@ -107,8 +107,22 @@ void qemu_aio_coroutine_enter(AioContext *ctx, Coroutine *co)
+     Coroutine *self = qemu_coroutine_self();
+     CoroutineAction ret;
+ 
++    /* Cannot rely on the read barrier for co in aio_co_wake(), as there are
++     * callers outside of aio_co_wake() */
++    const char *scheduled = atomic_mb_read(&co->scheduled);
++
+     trace_qemu_aio_coroutine_enter(ctx, self, co, co->entry_arg);
+ 
++    /* if the Coroutine has already been scheduled, entering it again will
++     * cause us to enter it twice, potentially even after the coroutine has
++     * been deleted */
++    if (scheduled) {
++        fprintf(stderr,
++                "%s: Co-routine was already scheduled in '%s'\n",
++                __func__, scheduled);
++        abort();
++    }
++
+     if (co->caller) {
+         fprintf(stderr, "Co-routine re-entered recursively\n");
+         abort();
 -- 
 2.9.5
