@@ -1,19 +1,40 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46862)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50396)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jcody@redhat.com>) id 1eHAeD-00073G-D1
-	for qemu-devel@nongnu.org; Tue, 21 Nov 2017 10:39:42 -0500
+	(envelope-from <pasic@linux.vnet.ibm.com>) id 1eHAna-0003LD-3w
+	for qemu-devel@nongnu.org; Tue, 21 Nov 2017 10:49:26 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jcody@redhat.com>) id 1eHAe8-0001u2-Kd
-	for qemu-devel@nongnu.org; Tue, 21 Nov 2017 10:39:41 -0500
-From: Jeff Cody <jcody@redhat.com>
-Date: Tue, 21 Nov 2017 10:38:53 -0500
-Message-Id: <5dca6da3e02396423d3135e82dfa99e74c434dbd.1511278397.git.jcody@redhat.com>
-In-Reply-To: <cover.1511278397.git.jcody@redhat.com>
-References: <cover.1511278397.git.jcody@redhat.com>
-In-Reply-To: <cover.1511278397.git.jcody@redhat.com>
-References: <cover.1511278397.git.jcody@redhat.com>
-Subject: [Qemu-devel] [PATCH v3 for-2.11 4/4] qemu-iotest: add test for
- blockjob coroutine race condition
+	(envelope-from <pasic@linux.vnet.ibm.com>) id 1eHAnV-0006Oq-5h
+	for qemu-devel@nongnu.org; Tue, 21 Nov 2017 10:49:22 -0500
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:34070
+	helo=mx0a-001b2d01.pphosted.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pasic@linux.vnet.ibm.com>)
+	id 1eHAnV-0006OZ-0H
+	for qemu-devel@nongnu.org; Tue, 21 Nov 2017 10:49:17 -0500
+Received: from pps.filterd (m0098416.ppops.net [127.0.0.1])
+	by mx0b-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
+	vALFmXuU036101
+	for <qemu-devel@nongnu.org>; Tue, 21 Nov 2017 10:49:11 -0500
+Received: from e06smtp15.uk.ibm.com (e06smtp15.uk.ibm.com [195.75.94.111])
+	by mx0b-001b2d01.pphosted.com with ESMTP id 2ecpa53dda-1
+	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Tue, 21 Nov 2017 10:48:32 -0500
+Received: from localhost
+	by e06smtp15.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	Only! Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <pasic@linux.vnet.ibm.com>;
+	Tue, 21 Nov 2017 15:47:32 -0000
+References: <20171121111825.17916-1-pasic@linux.vnet.ibm.com>
+	<20171121144457.60adb0c3.cohuck@redhat.com>
+From: Halil Pasic <pasic@linux.vnet.ibm.com>
+Date: Tue, 21 Nov 2017 16:47:29 +0100
+MIME-Version: 1.0
+In-Reply-To: <20171121144457.60adb0c3.cohuck@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Message-Id: <1145a6bc-45fd-820a-9dcc-249d9b2802ff@linux.vnet.ibm.com>
+Subject: Re: [Qemu-devel] [RFC PATCH 1/1] s390x/css: unresrict cssids
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,151 +43,255 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: qemu-block@nongnu.org, mreitz@redhat.com, stefanha@redhat.com, famz@redhat.com, pbonzini@redhat.com, kwolf@redhat.com
+To: Cornelia Huck <cohuck@redhat.com>
+Cc: Boris Fiuczynski <fiuczy@linux.vnet.ibm.com>, Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>, Christian Borntraeger <borntraeger@de.ibm.com>, Shalini Chellathurai Saroja <shalini@linux.vnet.ibm.com>, qemu-devel@nongnu.org, qemu-s390x@nongnu.org
 
-Signed-off-by: Jeff Cody <jcody@redhat.com>
----
- tests/qemu-iotests/200     | 99 ++++++++++++++++++++++++++++++++++++++++++++++
- tests/qemu-iotests/200.out | 14 +++++++
- tests/qemu-iotests/group   |  1 +
- 3 files changed, 114 insertions(+)
- create mode 100755 tests/qemu-iotests/200
- create mode 100644 tests/qemu-iotests/200.out
 
-diff --git a/tests/qemu-iotests/200 b/tests/qemu-iotests/200
-new file mode 100755
-index 0000000..d8787dd
---- /dev/null
-+++ b/tests/qemu-iotests/200
-@@ -0,0 +1,99 @@
-+#!/bin/bash
-+#
-+# Block job co-routine race condition test.
-+#
-+# See: https://bugzilla.redhat.com/show_bug.cgi?id=1508708
-+#
-+# Copyright (C) 2017 Red Hat, Inc.
-+#
-+# This program is free software; you can redistribute it and/or modify
-+# it under the terms of the GNU General Public License as published by
-+# the Free Software Foundation; either version 2 of the License, or
-+# (at your option) any later version.
-+#
-+# This program is distributed in the hope that it will be useful,
-+# but WITHOUT ANY WARRANTY; without even the implied warranty of
-+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+# GNU General Public License for more details.
-+#
-+# You should have received a copy of the GNU General Public License
-+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
-+#
-+
-+# creator
-+owner=jcody@redhat.com
-+
-+seq=`basename $0`
-+echo "QA output created by $seq"
-+
-+here=`pwd`
-+status=1    # failure is the default!
-+
-+_cleanup()
-+{
-+    _cleanup_qemu
-+    rm -f "${TEST_IMG}" "${BACKING_IMG}"
-+}
-+trap "_cleanup; exit \$status" 0 1 2 3 15
-+
-+# get standard environment, filters and checks
-+. ./common.rc
-+. ./common.filter
-+. ./common.qemu
-+
-+_supported_fmt qcow2 qed
-+_supported_proto file
-+_supported_os Linux
-+
-+BACKING_IMG="${TEST_DIR}/backing.img"
-+TEST_IMG="${TEST_DIR}/test.img"
-+
-+${QEMU_IMG} create -f $IMGFMT "${BACKING_IMG}" 512M | _filter_img_create
-+${QEMU_IMG} create -f $IMGFMT -F $IMGFMT "${TEST_IMG}" -b "${BACKING_IMG}" 512M | _filter_img_create
-+
-+${QEMU_IO} -c "write -P 0xa5 512 300M" "${BACKING_IMG}" | _filter_qemu_io
-+
-+echo
-+echo === Starting QEMU VM ===
-+echo
-+qemu_comm_method="qmp"
-+_launch_qemu -device pci-bridge,id=bridge1,chassis_nr=1,bus=pci.0 \
-+             -object iothread,id=iothread0 \
-+             -device virtio-scsi-pci,bus=bridge1,addr=0x1f,id=scsi0,iothread=iothread0 \
-+             -drive file="${TEST_IMG}",media=disk,if=none,cache=none,id=drive_sysdisk,aio=native,format=$IMGFMT \
-+             -device scsi-hd,drive=drive_sysdisk,bus=scsi0.0,id=sysdisk,bootindex=0
-+h1=$QEMU_HANDLE
-+
-+_send_qemu_cmd $h1 "{ 'execute': 'qmp_capabilities' }" 'return'
-+
-+echo
-+echo === Sending stream/cancel, checking for SIGSEGV only  ===
-+echo
-+for (( i=1;i<500;i++ ))
-+do
-+    mismatch_only='y' qemu_error_no_exit='n' _send_qemu_cmd $h1 \
-+                       "{
-+                            'execute': 'block-stream',
-+                            'arguments': {
-+                                'device': 'drive_sysdisk',
-+                                'speed': 10000000,
-+                                'on-error': 'report',
-+                                'job-id': 'job-$i'
-+                             }
-+                        }
-+                        {
-+                            'execute': 'block-job-cancel',
-+                            'arguments': {
-+                                'device': 'job-$i'
-+                             }
-+                        }" \
-+                       "{.*{.*}.*}"  # should match all well-formed QMP responses
-+done
-+
-+silent='y' _send_qemu_cmd $h1  "{ 'execute': 'quit' }" 'return'
-+
-+echo "$i iterations performed"
-+
-+echo "*** done"
-+rm -f $seq.full
-+status=0
-diff --git a/tests/qemu-iotests/200.out b/tests/qemu-iotests/200.out
-new file mode 100644
-index 0000000..af6a809
---- /dev/null
-+++ b/tests/qemu-iotests/200.out
-@@ -0,0 +1,14 @@
-+QA output created by 200
-+Formatting 'TEST_DIR/backing.img', fmt=IMGFMT size=536870912
-+Formatting 'TEST_DIR/test.img', fmt=IMGFMT size=536870912 backing_file=TEST_DIR/backing.img backing_fmt=IMGFMT
-+wrote 314572800/314572800 bytes at offset 512
-+300 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+
-+=== Starting QEMU VM ===
-+
-+{"return": {}}
-+
-+=== Sending stream/cancel, checking for SIGSEGV only ===
-+
-+500 iterations performed
-+*** done
-diff --git a/tests/qemu-iotests/group b/tests/qemu-iotests/group
-index 24e5ad1..25d9adf 100644
---- a/tests/qemu-iotests/group
-+++ b/tests/qemu-iotests/group
-@@ -194,3 +194,4 @@
- 194 rw auto migration quick
- 195 rw auto quick
- 197 rw auto quick
-+200 rw auto
--- 
-2.9.5
+
+On 11/21/2017 02:44 PM, Cornelia Huck wrote:
+> On Tue, 21 Nov 2017 12:18:25 +0100
+> Halil Pasic <pasic@linux.vnet.ibm.com> wrote:
+> 
+> Subject: s/unresrict/unrestrict/
+
+Sure!
+
+> 
+>> The default css 0xFE is currently restricted to virtual subchannel
+>> devices. The hope when the decision was made was, that non-virtual
+>> subchannel devices will come around when guest can exploit multiple
+>> channel subsystems. Since the guests generally don't do, the pain
+>> of the partitioned (cssid) namespace outweighs the gain.
+>>
+>> Let us remove the corresponding restrictions (virtual devices
+>> can be put only in 0xFE and non-virtual devices in any css except
+>> the 0xFE), and inform management software property on all ccw
+>> devices.
+> 
+> I do not really like dropping the restrictions while still keeping the
+> default cssid as 0xfe. Putting virtual devices into css 0 seems
+> completely fine, but putting non-virtual devices into css 0xfe still
+> feels a bit wrong. What about:
+> 
+> - Add a property to specify the default cssid. Compat machines use a
+>   default cssid of 0xfe.
+> - Default to a cssid of 0.
+> - (optional) Warn when putting a non-virtual device into css 0xfe,
+>   unless it is the default css.
+> 
+
+Please see Christians response. IMHO the libvirt perspective, and
+especially keeping the domain xmls as they are today viable is the
+key to a good solution.
+
+AFAIU one should probably use vfio-ccw as devices having their own
+xml managed via attach-device and detach-device, as they are not
+migratable (thus need to be removed before migrating). If we want
+to be able to attach such devices to domains especially created
+with vfio-ccw in mind putting all the devices into 0xfe seems to
+be the only sane way.
+
+Something like mcsse-squash isn't really a good solution, because
+doing it behind of the back of the user in libvirt feels wrong,
+and if we have to make the user put it in the domain xml then
+we are back at special domain definitions problem.
+
+>>
+>> The adverse effect on migration should not be too severe as
+>> vfio-ccw devices are not live-migratable yet, and for virtual
+>> devices using the extra freedom would only make sense with
+>> the aforementioned guest support in place.
+>>
+>> Signed-off-by: Halil Pasic <pasic@linux.vnet.ibm.com>
+>> Acked-by: Christian Borntraeger <borntraeger@de.ibm.com>
+>> Reviewed-by: Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>
+>>
+>> ---
+>> Hi!
+>>
+>> About indicating this at the ccw devices instead of, e.g. as a machine
+>> property (or otherwise globally), was requested by our libvirt guys. I
+>> have no strong opinion regarding in this matter.
+> 
+> I would like to understand why. It feels very odd.
+> 
+
+@Boris: I would like to delegate explaining to you. I did understand
+your arguments, but I'm not confident about being able to reproduce them
+authentically.
+
+>>
+>> This patch is intended as a discussion starter. I would at least like to
+>> get a Tested-by by Shalini before promoting it to non-RFC (provided the
+>> discussion goes well).
+>>
+>> TODOs:
+>> * Consider adding a description for the new property.
+> 
+> As it is, it is rather incomprehensible. But see below.
+> 
+
+OK. The idea is that this property should be used for libvirt.
+
+Comprehensibility is a general problem as the user should not
+really have to care about mcss-e at all (see PoP). How should we
+explain mcss-e to the user? AFAIR this is what triggered the usability
+discussion.
+
+>> * Consider renaming VIRTUAL_CSSID.
+> 
+> Why? This is still reserved for virtual devices in the architecture.
+> You just change qemu policy (and possibly what the default cssid is).
+>
+
+I don't think so. Where is it reserved in the architecture? The
+only reference I've found is our VSM book. Sorry I really can't
+find it.
+ 
+>> * Consider changing the bus-id generation scheme (when
+>> devno is not specified by the user). his patch keep the current scheme in
+>> place: they won't go into the default css (but slots are filled up
+>> starting at cssid 0). This is theoretically good for migration
+>> compatibility same command line same addresses.  Practically since there
+>> is no migratable non-virtual ccw device, we should consider using the
+>> same bus-id generation scheme for virtual and non-virtual devices.
+> 
+> How does this interact with the squash parameter?
+
+
+With squash it would not change anything: we would start at default cssid which is 0
+with squash. Without squash it would have the effect that we first
+fill the default css and then proceed to the next one. Would change
+behavior. The hope is that nobody used non-virtual devices without
+squash on, as they are useless that way since there is no mcss-e
+guest around.
+
+The expected benefit is that the devices would show up in the guest
+instead of being effectively inaccessible -- sane defaults.
+
+I forgot to write, but I would actually like to deprecate the squash.
+I see it as something on top though.
+
+> 
+> If we force the default css to 0xfe for compat machines, we should be
+> fine if we autogenerate to the default css. If you start at css 0
+> regardless of the default css, you might end up with a configuration
+> that the user did not expect at all.
+> 
+
+I don't force anything in the compat machines here. So I don't understand
+your question.
+
+
+>>
+>> ---
+>>  hw/s390x/ccw-device.c | 6 ++++++
+>>  hw/s390x/css.c        | 9 ---------
+>>  2 files changed, 6 insertions(+), 9 deletions(-)
+>>
+>> diff --git a/hw/s390x/ccw-device.c b/hw/s390x/ccw-device.c
+>> index f9bfa154d6..2167ccea5d 100644
+>> --- a/hw/s390x/ccw-device.c
+>> +++ b/hw/s390x/ccw-device.c
+>> @@ -40,6 +40,10 @@ static Property ccw_device_properties[] = {
+>>      DEFINE_PROP_END_OF_LIST(),
+>>  };
+>>  
+>> +static bool prop_get_true(Object *obj, Error **errp)
+>> +{
+>> +    return true;
+>> +}
+>>  static void ccw_device_class_init(ObjectClass *klass, void *data)
+>>  {
+>>      DeviceClass *dc = DEVICE_CLASS(klass);
+>> @@ -48,6 +52,8 @@ static void ccw_device_class_init(ObjectClass *klass, void *data)
+>>      k->realize = ccw_device_realize;
+>>      k->refill_ids = ccw_device_refill_ids;
+>>      dc->props = ccw_device_properties;
+>> +    object_class_property_add_bool(klass, "cssid-unrestricted",
+>> +                                   prop_get_true, NULL, NULL);
+> 
+> This looks really, really strange. This is a property that is always
+> true if it exists.
+> 
+
+Won't argue about that. The libvirt guys are actually not interested
+int he value at all: only that there is such a property.
+
+> What about compat machines? This qemu won't have the restriction, but
+> old qemus will.
+> 
+
+Very true. But as the commit message implies it should not be a problem.
+
+> Also, I'd consider this a property of the machine, not of the
+> individual devices. Or of the ChannelSubsystem structure, which is not
+> qom'ified.
+> 
+
+I've said the exact same thing to Boris. He said from libvirt perspective
+a device property is better.
+
+> As an alternative, I think providing a machine default_cssid parameter
+> makes more sense: It is understandable, and you keep compatibility. I
+> think we want this in the long run anyway.
+> 
+
+I think most of us had the idea. I support this idea fully (expose default
+cssid to the user (rw)). I see it as something that can be done on top
+and is not a pressing issue, but rather a nice to have.
+
+>>  }
+>>  
+>>  const VMStateDescription vmstate_ccw_dev = {
+>> diff --git a/hw/s390x/css.c b/hw/s390x/css.c
+>> index f6b5c807cd..957cb9ec90 100644
+>> --- a/hw/s390x/css.c
+>> +++ b/hw/s390x/css.c
+>> @@ -2377,15 +2377,6 @@ SubchDev *css_create_sch(CssDevId bus_id, bool is_virtual, bool squash_mcss,
+>>      SubchDev *sch;
+>>  
+>>      if (bus_id.valid) {
+>> -        if (is_virtual != (bus_id.cssid == VIRTUAL_CSSID)) {
+>> -            error_setg(errp, "cssid %hhx not valid for %s devices",
+>> -                       bus_id.cssid,
+>> -                       (is_virtual ? "virtual" : "non-virtual"));
+>> -            return NULL;
+>> -        }
+>> -    }
+> 
+> This allows building a commandline in a compat machine that will not
+> work with old qemus, no?
+> 
+
+Yes. We have considered this. I was convinced by Christian that
+it ain't too bad. In the end, if we don't want non-virtual device
+aware domains (see above), then there is no way to make this work
+with libvirt. Actually to make the migration work with libvirt with
+old qemus the only way would be to use sqash. But libvirt does not
+want that.
+
+Also consider that vfio-ccw (AFAIK the only non-virtual css device
+type) is not migratable. So having them on the command line and live
+migrating is a lost case already.
+
+Yes, having a pre- 2.12 binary version and a post 2.12 binary version
+way to use vfio-ccw is ugly to some extent. The recommendation would
+be don't use it with pre 2.12 (libvirt is going to plainly refuse).
+
+And yes with this one is going to be able to write a 2.12 command
+line which does not work with 2.11 but that is normal.
+
+This patch keeps the squash so the 2.10 definition will still be
+viable for 2.12. Should we sometime get rid of the squash, then
+that would be a breaking change.
+
+Regards,
+Halil
+
+>> -
+>> -    if (bus_id.valid) {
+>>          if (squash_mcss) {
+>>              bus_id.cssid = channel_subsys.default_cssid;
+>>          } else if (!channel_subsys.css[bus_id.cssid]) {
+> 
