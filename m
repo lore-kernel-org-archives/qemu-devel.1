@@ -1,19 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60202)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60174)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <gengdongjiu@huawei.com>) id 1eH5rK-0001gP-CE
+	(envelope-from <gengdongjiu@huawei.com>) id 1eH5rG-0001cz-Q6
 	for qemu-devel@nongnu.org; Tue, 21 Nov 2017 05:32:55 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <gengdongjiu@huawei.com>) id 1eH5rG-0005mj-9n
-	for qemu-devel@nongnu.org; Tue, 21 Nov 2017 05:32:54 -0500
+	(envelope-from <gengdongjiu@huawei.com>) id 1eH5rF-0005mN-Ux
+	for qemu-devel@nongnu.org; Tue, 21 Nov 2017 05:32:50 -0500
 From: Dongjiu Geng <gengdongjiu@huawei.com>
-Date: Wed, 22 Nov 2017 02:37:13 +0800
-Message-ID: <1511289434-1551-12-git-send-email-gengdongjiu@huawei.com>
+Date: Wed, 22 Nov 2017 02:37:08 +0800
+Message-ID: <1511289434-1551-7-git-send-email-gengdongjiu@huawei.com>
 In-Reply-To: <1511289434-1551-1-git-send-email-gengdongjiu@huawei.com>
 References: <1511289434-1551-1-git-send-email-gengdongjiu@huawei.com>
 MIME-Version: 1.0
 Content-Type: text/plain
-Subject: [Qemu-devel] [PATCH RESEND v12 11/12] hw/arm/virt: Add RAS platform
- version for migration
+Subject: [Qemu-devel] [PATCH RESEND v12 06/12] target-arm: kvm64: detect
+ whether can set vsesr_el2
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,87 +25,37 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: pbonzini@redhat.com, mst@redhat.com, imammedo@redhat.com, zhaoshenglong@huawei.com, peter.maydell@linaro.org, mtosatti@redhat.com, james.morse@arm.com, lersek@redhat.com, marc.zyngier@arm.com, christoffer.dall@linaro.org, rth@twiddle.net, ehabkost@redhat.com, kvm@vger.kernel.org, guohanjun@huawei.com, lijinyue@huawei.com, huangshaoyu@huawei.com, wuquanming@huawei.com, zhengqiang10@huawei.com, linuxarm@huawei.com, qemu-devel@nongnu.org, qemu-arm@nongnu.org, dingtianhong@huawei.com, wangxiongfeng2@huawei.com
 Cc: gengdongjiu@huawei.com
 
-Support this feature since version 2.10, disable it by
-default in the old version.
+Check if kvm can support to set vsesr_el2 value for vcpu. When
+guest takes a virtual SError interrupt exception, this value
+will provides syndrome value reported into ESR_EL1 ISS filed.
 
 Signed-off-by: Dongjiu Geng <gengdongjiu@huawei.com>
----
-Address Shannon's comments to add platform version in [1].
+Signed-off-by: Quanming Wu <wuquanming@huawei.com>
 
-[1]: https://lkml.org/lkml/2017/8/25/821
 ---
- hw/arm/virt-acpi-build.c | 14 +++++++++-----
- hw/arm/virt.c            |  4 ++++
- include/hw/arm/virt.h    |  1 +
- 3 files changed, 14 insertions(+), 5 deletions(-)
+Address James's(james.morse@arm.com) comments to detect whether KVM has the capability to set ESR
+instead of detecting CPU RAS capability in [1]
 
-diff --git a/hw/arm/virt-acpi-build.c b/hw/arm/virt-acpi-build.c
-index 92c8c38..961b67d 100644
---- a/hw/arm/virt-acpi-build.c
-+++ b/hw/arm/virt-acpi-build.c
-@@ -801,10 +801,11 @@ void virt_acpi_build(VirtMachineState *vms, AcpiBuildTables *tables)
-     acpi_add_table(table_offsets, tables_blob);
-     build_spcr(tables_blob, tables->linker, vms);
+[1]
+https://www.spinics.net/lists/kvm-arm/msg27150.html
+https://www.spinics.net/lists/arm-kernel/msg604440.html
+---
+ target/arm/kvm64.c | 6 ++++++
+ 1 file changed, 6 insertions(+)
+
+diff --git a/target/arm/kvm64.c b/target/arm/kvm64.c
+index a16abc8..af8ebc9 100644
+--- a/target/arm/kvm64.c
++++ b/target/arm/kvm64.c
+@@ -980,3 +980,9 @@ bool kvm_arm_handle_debug(CPUState *cs, struct kvm_debug_exit_arch *debug_exit)
  
--    acpi_add_table(table_offsets, tables_blob);
--    build_error_block(tables->hardware_errors, tables->linker);
--    build_apei_ghes(tables_blob, tables->hardware_errors, tables->linker);
--
-+    if (!vmc->no_ras) {
-+        acpi_add_table(table_offsets, tables_blob);
-+        build_error_block(tables->hardware_errors, tables->linker);
-+        build_apei_ghes(tables_blob, tables->hardware_errors, tables->linker);
-+    }
- 
-     if (nb_numa_nodes > 0) {
-         acpi_add_table(table_offsets, tables_blob);
-@@ -891,6 +892,7 @@ static const VMStateDescription vmstate_virt_acpi_build = {
- 
- void virt_acpi_setup(VirtMachineState *vms)
- {
-+    VirtMachineClass *vmc = VIRT_MACHINE_GET_CLASS(vms);
-     AcpiBuildTables tables;
-     AcpiBuildState *build_state;
- 
-@@ -922,7 +924,9 @@ void virt_acpi_setup(VirtMachineState *vms)
-     fw_cfg_add_file(vms->fw_cfg, ACPI_BUILD_TPMLOG_FILE, tables.tcpalog->data,
-                     acpi_data_len(tables.tcpalog));
- 
--    ghes_add_fw_cfg(vms->fw_cfg, tables.hardware_errors);
-+    if (!vmc->no_ras) {
-+        ghes_add_fw_cfg(vms->fw_cfg, tables.hardware_errors);
-+    }
- 
-     build_state->rsdp_mr = acpi_add_rom_blob(build_state, tables.rsdp,
-                                               ACPI_BUILD_RSDP_FILE, 0);
-diff --git a/hw/arm/virt.c b/hw/arm/virt.c
-index 68495c2..ab79988 100644
---- a/hw/arm/virt.c
-+++ b/hw/arm/virt.c
-@@ -1732,8 +1732,12 @@ static void virt_2_9_instance_init(Object *obj)
- 
- static void virt_machine_2_9_options(MachineClass *mc)
- {
-+    VirtMachineClass *vmc = VIRT_MACHINE_CLASS(OBJECT_CLASS(mc));
-+
-     virt_machine_2_10_options(mc);
-     SET_MACHINE_COMPAT(mc, VIRT_COMPAT_2_9);
-+    /* memory recovery feature was introduced since 2.10 */
-+    vmc->no_ras = true;
+     return false;
  }
- DEFINE_VIRT_MACHINE(2, 9)
- 
-diff --git a/include/hw/arm/virt.h b/include/hw/arm/virt.h
-index 33b0ff3..8fbd664 100644
---- a/include/hw/arm/virt.h
-+++ b/include/hw/arm/virt.h
-@@ -84,6 +84,7 @@ typedef struct {
-     bool disallow_affinity_adjustment;
-     bool no_its;
-     bool no_pmu;
-+    bool no_ras;
-     bool claim_edge_triggered_timers;
- } VirtMachineClass;
- 
++
++static bool kvm_can_set_vcpu_esr(struct KVMState *state)
++{
++    int ret = kvm_check_extension(state, KVM_CAP_ARM_INJECT_SERROR_ESR);
++    return (ret) ? true : false;
++}
 -- 
 1.8.3.1
