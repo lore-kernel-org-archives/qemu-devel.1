@@ -1,22 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54128)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59887)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1eH5ao-0005fT-9D
-	for qemu-devel@nongnu.org; Tue, 21 Nov 2017 05:16:12 -0500
+	(envelope-from <gengdongjiu@huawei.com>) id 1eH5qg-0001Cq-Ae
+	for qemu-devel@nongnu.org; Tue, 21 Nov 2017 05:32:18 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1eH5aT-0007Nc-3W
-	for qemu-devel@nongnu.org; Tue, 21 Nov 2017 05:15:50 -0500
-Date: Tue, 21 Nov 2017 11:15:22 +0100
-From: Cornelia Huck <cohuck@redhat.com>
-Message-ID: <20171121111522.04dd2faf.cohuck@redhat.com>
-In-Reply-To: <20171121065125.GG5859@bjsdjshi@linux.vnet.ibm.com>
-References: <20171114082547.GB12696@bjsdjshi@linux.vnet.ibm.com>
-	<20171114115014.3b3d709d.cohuck@redhat.com>
-	<20171121065125.GG5859@bjsdjshi@linux.vnet.ibm.com>
+	(envelope-from <gengdongjiu@huawei.com>) id 1eH5qf-0005eG-3c
+	for qemu-devel@nongnu.org; Tue, 21 Nov 2017 05:32:14 -0500
+From: Dongjiu Geng <gengdongjiu@huawei.com>
+Date: Wed, 22 Nov 2017 02:37:05 +0800
+Message-ID: <1511289434-1551-4-git-send-email-gengdongjiu@huawei.com>
+In-Reply-To: <1511289434-1551-1-git-send-email-gengdongjiu@huawei.com>
+References: <1511289434-1551-1-git-send-email-gengdongjiu@huawei.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] Questions about usability mess that caused by
- differentiating address based on devices types
+Content-Type: text/plain
+Subject: [Qemu-devel] [PATCH RESEND v12 03/12] docs: APEI GHES generation
+ description
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,90 +22,122 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>
-Cc: qemu-devel@nongnu.org, fiuczy@linux.vnet.ibm.com, bwalk@linux.vnet.ibm.com, shalini@linux.vnet.ibm.com, pasic@linux.vnet.ibm.com, borntraeger@de.ibm.com, qemu-s390x@nongnu.org
+To: pbonzini@redhat.com, mst@redhat.com, imammedo@redhat.com, zhaoshenglong@huawei.com, peter.maydell@linaro.org, mtosatti@redhat.com, james.morse@arm.com, lersek@redhat.com, marc.zyngier@arm.com, christoffer.dall@linaro.org, rth@twiddle.net, ehabkost@redhat.com, kvm@vger.kernel.org, guohanjun@huawei.com, lijinyue@huawei.com, huangshaoyu@huawei.com, wuquanming@huawei.com, zhengqiang10@huawei.com, linuxarm@huawei.com, qemu-devel@nongnu.org, qemu-arm@nongnu.org, dingtianhong@huawei.com, wangxiongfeng2@huawei.com
+Cc: gengdongjiu@huawei.com
 
-On Tue, 21 Nov 2017 14:51:26 +0800
-Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com> wrote:
+Add APEI/GHES description document
 
-> * Cornelia Huck <cohuck@redhat.com> [2017-11-14 11:50:14 +0100]:
-> 
-> Hallo Conny,
-> 
-> After spending some time, just some updates for this one.
-> 
-> > On Tue, 14 Nov 2017 16:25:47 +0800
-> > Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com> wrote:
+Signed-off-by: Dongjiu Geng <gengdongjiu@huawei.com>
+---
+Address Igor's comments to add a doc
+---
+ docs/specs/acpi_hest_ghes.txt | 98 +++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 98 insertions(+)
+ create mode 100644 docs/specs/acpi_hest_ghes.txt
 
-> > > So that we can remove the restrictions for the cssid validation for each
-> > > type of device. Even we could drop the s390-squash-mcss, and just allow
-> > > the user to define any device in any css.  
-> > 
-> > Opening up the different csses for all devices might help, but we need
-> > to be careful:
-> > - We still want to keep the chpids separated. Probably not a problem
-> >   right now.
-> > - We need to be able to point to a default css, especially as there are
-> >   no MCSS-E capable OSs around yet.
-> > - You need to double check if there are further restrictions on the
-> >   allowed css ids. (I know that 0xff is reserved for special usage as
-> >   well; but I can't find out more.)
-> > - Backwards compatibility and migration: We certainly don't want old
-> >   setups to break, and compat machines need to force the old scheme.
-> > 
-> > All best tested out via a prototype :)
-> >   
-> After a round of internal discussion, Halil now has a prototype. I think
-> sooner he will post his patch with our internal agreement, and we can
-> continuing talking based on that then.
-
-Please post upstream as soon as it make sense. Makes discussion
-easier :)
-
-> 
-> > > 
-> > > 3. If we have to keep the squash property, then when squashing, it's
-> > > somewhat like "I don't care for the cssid", so is it possible for us to
-> > > not check the cssid in the device devno?
-> > > Libvirt would be benifited with this when automatically generating the
-> > > addresses.  
-> > 
-> > I think we still need to keep the squashing around for compatibility,
-> > but we may be able to give it the chop for something like 3.0.
-> > 
-> > (And we probably need to keep the existing restrictions in compat mode.)
-> >   
-> Can we just drop the squash property, right after we opened up all the
-> csses?
-> We do not support LGM for vfio-ccw, and there is no libvirt user until
-> now. So what else case could it be to stop us from dropping it?
-
-IIRC, we still require a non-0xfe cssid for non-virtual devices with
-the squash parameter; they are just mapped into the default css later.
-Just dropping the parameter would break existing command lines, and
-accepting but ignoring it makes a previously working commandline
-suddenly non-working (not all devices visible to guest).
-
-We either need to follow the proper deprecation procedure (which means
-that the parameter will stay around for two releases), or kill it in a
-3.0 release (if that comes earlier). But we should be able to get rid
-of it at least in the long run.
-
-> > > To sum up, we got the feeling that, this mess is not only for Libvirt
-> > > but also for QEMU cmd line users. And we are wondering if there is some
-> > > way to improve it.  
-> > 
-> > Using css 0xfe seems to be an idea that turned out not to be as useful
-> > as we hoped it would be. Maybe the right way forward is indeed to open
-> > up the csses for all devices (although there might be a case for
-> > putting non-virtual devices not into 0xfe by default and instead making
-> > 0 the default css).
-> > 
-> > Another thing: Should libvirt give its users enough rope to hang
-> > themselves by allowing to create domains with devices all over the
-> > channel subsystem images?
-> >   
-> I think the commit message of Halil's patch will show you the idea.
-> Let's wait for some moment.
-
-Yup, let's see what he comes up with.
+diff --git a/docs/specs/acpi_hest_ghes.txt b/docs/specs/acpi_hest_ghes.txt
+new file mode 100644
+index 0000000..816d7b9
+--- /dev/null
++++ b/docs/specs/acpi_hest_ghes.txt
+@@ -0,0 +1,98 @@
++Generating APEI tables and record CPER
++=============================
++
++Copyright (C) 2017 HuaWei Corporation.
++
++Design Details:
++-------------------
++
++       etc/acpi/tables                               etc/hardware_errors
++    ====================                    ==========================================
+++ +--------------------------+            +------------------+
++| | HEST                     |            |    address       |              +--------------+
++| +--------------------------+            |    registers     |              | Error Status |
++| | GHES1                    |            | +----------------+              | Data Block 1 |
++| +--------------------------+ +--------->| |status_address1 |------------->| +------------+
++| | .................        | |          | +----------------+              | |  CPER      |
++| | error_status_address-----+-+ +------->| |status_address2 |----------+   | |  CPER      |
++| | .................        |   |        | +----------------+          |   | |  ....      |
++| | read_ack_register--------+-+ |        |  .............   |          |   | |  CPER      |
++| | read_ack_preserve        | | |        +------------------+          |   | +------------+
++| | read_ack_write           | | | +----->| |status_addressN |--------+ |   | Error Status |
+++ +--------------------------+ | | |      | +----------------+        | |   | Data Block 2 |
++| | GHES2                    | +-+-+----->| | ack_value1     |        | +-->| +------------+
+++ +--------------------------+   | |      | +----------------+        |     | |  CPER      |
++| | .................        |   | | +--->| | ack_value2     |        |     | |  CPER      |
++| | error_status_address-----+---+ | |    | +----------------+        |     | |  ....      |
++| | .................        |     | |    | |  ............. |        |     | |  CPER      |
++| | read_ack_register--------+-----+-+    | +----------------+        |     +-+------------+
++| | read_ack_preserve        |     |   +->| | ack_valueN     |        |     | |..........  |
++| | read_ack_write           |     |   |  | +----------------+        |     | +------------+
+++ +--------------------------|     |   |                              |     | Error Status |
++| | ...............          |     |   |                              |     | Data Block N |
+++ +--------------------------+     |   |                              +---->| +------------+
++| | GHESN                    |     |   |                                    | |  CPER      |
+++ +--------------------------+     |   |                                    | |  CPER      |
++| | .................        |     |   |                                    | |  ....      |
++| | error_status_address-----+-----+   |                                    | |  CPER      |
++| | .................        |         |                                    +-+------------+
++| | read_ack_register--------+---------+
++| | read_ack_preserve        |
++| | read_ack_write           |
+++ +--------------------------+
++
++(1) QEMU generates the ACPI HEST table. This table goes in the current
++    "etc/acpi/tables" fw_cfg blob. Each error source has different
++    notification type.
++
++(2) A new fw_cfg blob called "etc/hardware_errors" is introduced. QEMU
++    also need to populate this blob. The "etc/hardwre_errors" fw_cfg blob contains
++    one address registers table and one Error Status Data Block table, all
++    of which are pre-allocated.
++
++(3) The address registers table contains N Error Status Address entries
++    and N Read Ack Address entries, the size for each entry is 8-byte. The
++    Error Status Data Block table contains N Error Status Data Block entry,
++    the size for each entry is 0x1000(4096) bytes. The total size for
++    "etc/hardware_errors" fw_cfg blob is (N * 8 * 2 + N * 4096) bytes
++
++(4) QEMU generates the ACPI linker/loader script for the firmware
++
++(4a) The HEST table is part of "etc/acpi/tables", which the firmware
++    already allocates memory for it and downloads, because QEMU already
++    generates an ALLOCATE linker/loader command for it.
++
++(4b) QEMU creates another ALLOCATE command for the "etc/hardware_errors"
++    blob. The firmware allocates memory for this blob,
++    and downloads it.
++
++(5) QEMU generates, N ADD_POINTER commands, which patch address in the
++    "Error Status Address" fields of the HEST table with a pointer to the
++    corresponding address registers in the downloaded "etc/hardware_errors" blob.
++
++(6) QEMU generates N ADD_POINTER commands for the firmware, pointing the
++    address registers (located in guest memory, in the downloaded
++    "etc/hardware_errors" blob) to the respective Error Status Data Blocks.
++
++(7) QEMU Defines a third, write-only fw_cfg blob, called "etc/hardware_errors_addr".
++    Through that blob, the firmware can send back the guest-side allocation addresses
++    to QEMU. The "etc/hardware_errors_addr" blob contains a 8-byte entry. QEMU generates
++    a single WRITE_POINTER commands for the firmware, the firmware will write the start
++    address of Error Status Data Block0 back to fw_cfg file "etc/hardware_errors_addr".
++    Then Qemu will know the start address of Error Status Data Block0. For error source K
++    (0 <= K < 2), its address offset is K * 0x1000, because each of Error Status Data Block
++    has fixed size which is 0x1000. Using this way, QEMU will know the address of each
++    Error Status Data Block.
++
++(8) When QEMU gets SIGBUS from the kernel, QEMU format the CPER right into guest
++    memory, and then inject whatever interrupt (or assert whatever GPIO line) which is
++    necessary for notifying the guest.
++
++(9) This notification (in virtual hardware) can either be handled by the
++    guest kernel stand-alone, or else the guest kernel can invoke an ACPI
++    event handler method with it. The ACPI event handler method could
++    invoke the specific guest kernel driver for error handling via a
++    Notify() operation.
++
++For the above design, it would leave the firmware alone after OS boot and firmware no need
++to care about HEST, GHES, CPER.
+-- 
+1.8.3.1
