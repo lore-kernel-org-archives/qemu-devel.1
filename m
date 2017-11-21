@@ -1,17 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48570)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49126)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jcody@redhat.com>) id 1eHByN-00007C-Ah
-	for qemu-devel@nongnu.org; Tue, 21 Nov 2017 12:04:41 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1eHBzh-0001EP-DL
+	for qemu-devel@nongnu.org; Tue, 21 Nov 2017 12:05:58 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jcody@redhat.com>) id 1eHByI-0005tc-BF
-	for qemu-devel@nongnu.org; Tue, 21 Nov 2017 12:04:35 -0500
-From: Jeff Cody <jcody@redhat.com>
-Date: Tue, 21 Nov 2017 12:03:49 -0500
-Message-Id: <20171121170350.31290-4-jcody@redhat.com>
-In-Reply-To: <20171121170350.31290-1-jcody@redhat.com>
-References: <20171121170350.31290-1-jcody@redhat.com>
-Subject: [Qemu-devel] [PULL 3/4] qemu-iotests: add option in common.qemu for
- mismatch only
+	(envelope-from <peter.maydell@linaro.org>) id 1eHBzg-0006Q5-6O
+	for qemu-devel@nongnu.org; Tue, 21 Nov 2017 12:05:57 -0500
+Received: from mail-oi0-x231.google.com ([2607:f8b0:4003:c06::231]:34654)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1eHBzg-0006Pl-08
+	for qemu-devel@nongnu.org; Tue, 21 Nov 2017 12:05:56 -0500
+Received: by mail-oi0-x231.google.com with SMTP id a75so9019328oib.1
+	for <qemu-devel@nongnu.org>; Tue, 21 Nov 2017 09:05:55 -0800 (PST)
+MIME-Version: 1.0
+In-Reply-To: <20171121151017.28158-1-kwolf@redhat.com>
+References: <20171121151017.28158-1-kwolf@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Tue, 21 Nov 2017 17:05:34 +0000
+Message-ID: <CAFEAcA-OesL5MTmVHw0p41hPJ0UzMZgqRObUA=6ffGkQ55mZzg@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PULL 0/7] Block layer patches for 2.11.0-rc2
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -20,52 +28,27 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-block@nongnu.org
-Cc: peter.maydell@linaro.org, jcody@redhat.com, qemu-devel@nongnu.org, stefanha@redhat.com, pbonzini@redhat.com
+To: Kevin Wolf <kwolf@redhat.com>
+Cc: Qemu-block <qemu-block@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>
 
-Add option to echo response to QMP / HMP command only on mismatch.
+On 21 November 2017 at 15:10, Kevin Wolf <kwolf@redhat.com> wrote:
+> The following changes since commit d0dead3b6df7f6cd970ed02e8369ab8730aac9d3:
+>
+>   scripts/make-release: ship u-boot source as a tarball (2017-11-21 12:48:20 +0000)
+>
+> are available in the git repository at:
+>
+>   git://repo.or.cz/qemu/kevin.git tags/for-upstream
+>
+> for you to fetch changes up to 4fd0295c151e596944be2f8062c4563cdf9106a0:
+>
+>   Merge remote-tracking branch 'mreitz/tags/pull-block-2017-11-21' into queue-block (2017-11-21 15:09:54 +0100)
+>
+> ----------------------------------------------------------------
+> Block layer patches for 2.11.0-rc2
+>
+> ----------------------------------------------------------------
 
-Useful for ignore all normal responses, but catching things like
-segfaults.
+Applied, thanks.
 
-Signed-off-by: Jeff Cody <jcody@redhat.com>
-Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
----
- tests/qemu-iotests/common.qemu | 8 +++++++-
- 1 file changed, 7 insertions(+), 1 deletion(-)
-
-diff --git a/tests/qemu-iotests/common.qemu b/tests/qemu-iotests/common.qemu
-index 7b3052d..85f66b8 100644
---- a/tests/qemu-iotests/common.qemu
-+++ b/tests/qemu-iotests/common.qemu
-@@ -50,6 +50,8 @@ _in_fd=4
- #
- # If $silent is set to anything but an empty string, then
- # response is not echoed out.
-+# If $mismatch_only is set, only non-matching responses will
-+# be echoed.
- function _timed_wait_for()
- {
-     local h=${1}
-@@ -58,14 +60,18 @@ function _timed_wait_for()
-     QEMU_STATUS[$h]=0
-     while IFS= read -t ${QEMU_COMM_TIMEOUT} resp <&${QEMU_OUT[$h]}
-     do
--        if [ -z "${silent}" ]; then
-+        if [ -z "${silent}" ] && [ -z "${mismatch_only}" ]; then
-             echo "${resp}" | _filter_testdir | _filter_qemu \
-                            | _filter_qemu_io | _filter_qmp | _filter_hmp
-         fi
-         grep -q "${*}" < <(echo "${resp}")
-         if [ $? -eq 0 ]; then
-             return
-+        elif [ -z "${silent}" ] && [ -n "${mismatch_only}" ]; then
-+            echo "${resp}" | _filter_testdir | _filter_qemu \
-+                           | _filter_qemu_io | _filter_qmp | _filter_hmp
-         fi
-+
-     done
-     QEMU_STATUS[$h]=-1
-     if [ -z "${qemu_error_no_exit}" ]; then
--- 
-2.9.5
+-- PMM
