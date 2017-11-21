@@ -1,24 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40265)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40291)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mikhail.abakumov@ispras.ru>) id 1eH9G0-0002Ri-UO
-	for qemu-devel@nongnu.org; Tue, 21 Nov 2017 09:10:41 -0500
+	(envelope-from <mikhail.abakumov@ispras.ru>) id 1eH9G4-0002US-I8
+	for qemu-devel@nongnu.org; Tue, 21 Nov 2017 09:10:50 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mikhail.abakumov@ispras.ru>) id 1eH9Fv-0003Fd-1B
-	for qemu-devel@nongnu.org; Tue, 21 Nov 2017 09:10:36 -0500
-Received: from mail.ispras.ru ([83.149.199.45]:38510)
+	(envelope-from <mikhail.abakumov@ispras.ru>) id 1eH9G0-0003Gs-Er
+	for qemu-devel@nongnu.org; Tue, 21 Nov 2017 09:10:40 -0500
+Received: from mail.ispras.ru ([83.149.199.45]:38532)
 	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mikhail.abakumov@ispras.ru>) id 1eH9Fu-0003FJ-EC
-	for qemu-devel@nongnu.org; Tue, 21 Nov 2017 09:10:30 -0500
+	(envelope-from <mikhail.abakumov@ispras.ru>) id 1eH9G0-0003Gh-2F
+	for qemu-devel@nongnu.org; Tue, 21 Nov 2017 09:10:36 -0500
 From: Mihail Abakumov <mikhail.abakumov@ispras.ru>
-Date: Tue, 21 Nov 2017 17:10:27 +0300
-Message-ID: <151127342748.6888.16000796755963632674.stgit@Misha-PC.lan02.inno>
+Date: Tue, 21 Nov 2017 17:10:33 +0300
+Message-ID: <151127343314.6888.13289325558071964830.stgit@Misha-PC.lan02.inno>
 In-Reply-To: <151127322955.6888.16198535123422076171.stgit@Misha-PC.lan02.inno>
 References: <151127322955.6888.16198535123422076171.stgit@Misha-PC.lan02.inno>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Subject: [Qemu-devel] [PATCH v3 34/45] windbg: implemented
- kd_api_write_breakpoint and kd_api_restore_breakpoint
+Subject: [Qemu-devel] [PATCH v3 35/45] windbg: debug exception subscribing
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,136 +29,121 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: sw@weilnetz.de, lprosek@redhat.com, dovgaluk@ispras.ru, rkagan@virtuozzo.com, pbonzini@redhat.com, den@openvz.org
 
-Added supporting of windbg breakpoints.
+Added handler registration of gdb debug exception. Its exception also can be used for windbg.
 
 Signed-off-by: Mihail Abakumov <mikhail.abakumov@ispras.ru>
 Signed-off-by: Pavel Dovgalyuk <dovgaluk@ispras.ru>
 Signed-off-by: Dmitriy Koltunov <koltunov@ispras.ru>
 ---
- include/exec/windbgstub-utils.h |    2 +
- windbgstub-utils.c              |   62 +++++++++++++++++++++++++++++++++++++++
- windbgstub.c                    |   11 +++++++
- 3 files changed, 75 insertions(+)
+ cpus.c                  |   18 +++++++++++++++++-
+ gdbstub.c               |    4 ++++
+ include/sysemu/sysemu.h |    2 ++
+ windbgstub.c            |   16 ++++++++++++----
+ 4 files changed, 35 insertions(+), 5 deletions(-)
 
-diff --git a/include/exec/windbgstub-utils.h b/include/exec/windbgstub-utils.h
-index 5e5893bac8..0d9ccf9801 100755
---- a/include/exec/windbgstub-utils.h
-+++ b/include/exec/windbgstub-utils.h
-@@ -90,6 +90,8 @@ void kd_api_read_virtual_memory(CPUState *cpu, PacketData *pd);
- void kd_api_write_virtual_memory(CPUState *cpu, PacketData *pd);
- void kd_api_get_context(CPUState *cpu, PacketData *pd);
- void kd_api_set_context(CPUState *cpu, PacketData *pd);
-+void kd_api_write_breakpoint(CPUState *cpu, PacketData *pd);
-+void kd_api_restore_breakpoint(CPUState *cpu, PacketData *pd);
- void kd_api_read_control_space(CPUState *cpu, PacketData *pd);
- void kd_api_write_control_space(CPUState *cpu, PacketData *pd);
- void kd_api_unsupported(CPUState *cpu, PacketData *pd);
-diff --git a/windbgstub-utils.c b/windbgstub-utils.c
-index 1e81c37501..f00dab2a9d 100755
---- a/windbgstub-utils.c
-+++ b/windbgstub-utils.c
-@@ -14,6 +14,8 @@
- static InitedAddr KPCR;
- static InitedAddr version;
+diff --git a/cpus.c b/cpus.c
+index 9bed61eefc..212553b7e3 100644
+--- a/cpus.c
++++ b/cpus.c
+@@ -77,6 +77,8 @@ int64_t max_advance;
+ static QEMUTimer *throttle_timer;
+ static unsigned int throttle_percentage;
  
-+static InitedAddr bps[KD_BREAKPOINT_MAX];
++static void (*excp_debug_handler)(CPUState *cpu);
 +
- InitedAddr *windbg_get_KPCR(void)
- {
-     return &KPCR;
-@@ -71,6 +73,66 @@ void kd_api_write_virtual_memory(CPUState *cpu, PacketData *pd)
-     stl_p(&mem->ActualBytesWritten, len);
+ #define CPU_THROTTLE_PCT_MIN 1
+ #define CPU_THROTTLE_PCT_MAX 99
+ #define CPU_THROTTLE_TIMESLICE_NS 10000000
+@@ -960,9 +962,23 @@ static bool cpu_can_run(CPUState *cpu)
+     return true;
  }
  
-+void kd_api_write_breakpoint(CPUState *cpu, PacketData *pd)
++bool register_excp_debug_handler(void (*handler)(CPUState *cpu))
 +{
-+    DBGKD_WRITE_BREAKPOINT64 *m64c = &pd->m64.u.WriteBreakPoint;
-+    target_ulong addr;
-+    int i, err = 0;
-+
-+    addr = ldtul_p(&m64c->BreakPointAddress);
-+
-+    for (i = 0; i < KD_BREAKPOINT_MAX; ++i) {
-+        if (!bps[i].is_init) {
-+            err = cpu_breakpoint_insert(cpu, addr, BP_GDB, NULL);
-+            if (!err) {
-+                bps[i].addr = addr;
-+                bps[i].is_init = true;
-+                WINDBG_DEBUG("write_breakpoint: " FMT_ADDR, addr);
-+                break;
-+            } else {
-+                WINDBG_ERROR("write_breakpoint: " FMT_ADDR ", " FMT_ERR,
-+                             addr, err);
-+                pd->m64.ReturnStatus = STATUS_UNSUCCESSFUL;
-+                return;
-+            }
-+        } else if (addr == bps[i].addr) {
-+            break;
-+        }
-+    }
-+
-+    if (!err) {
-+        stl_p(&m64c->BreakPointHandle, i + 1);
-+        pd->m64.ReturnStatus = STATUS_SUCCESS;
++    if (excp_debug_handler == NULL) {
++        excp_debug_handler = handler;
++        return true;
 +    } else {
-+        WINDBG_ERROR("write_breakpoint: All breakpoints occupied");
-+        pd->m64.ReturnStatus = STATUS_UNSUCCESSFUL;
++        error_report("ERROR: Something debugger already using");
++        return false;
 +    }
 +}
 +
-+void kd_api_restore_breakpoint(CPUState *cpu, PacketData *pd)
-+{
-+    DBGKD_RESTORE_BREAKPOINT *m64c = &pd->m64.u.RestoreBreakPoint;
-+    uint8_t index;
-+    int err = -1;
-+
-+    index = ldtul_p(&m64c->BreakPointHandle) - 1;
-+
-+    if (bps[index].is_init) {
-+        err = cpu_breakpoint_remove(cpu, bps[index].addr, BP_GDB);
-+        if (!err) {
-+            WINDBG_DEBUG("restore_breakpoint: " FMT_ADDR ", index(%d)",
-+                         bps[index].addr, index);
-+        } else {
-+            WINDBG_ERROR("restore_breakpoint: " FMT_ADDR ", index(%d), "
-+                         FMT_ERR, bps[index].addr, index, err);
-+        }
-+        bps[index].is_init = false;
-+        pd->m64.ReturnStatus = STATUS_SUCCESS;
-+    } else {
-+        pd->m64.ReturnStatus = STATUS_UNSUCCESSFUL;
-+    }
-+}
-+
- void kd_api_unsupported(CPUState *cpu, PacketData *pd)
+ static void cpu_handle_guest_debug(CPUState *cpu)
  {
-     WINDBG_ERROR("Caught unimplemented api %s",
+-    gdb_set_stop_cpu(cpu);
++    if (excp_debug_handler != NULL) {
++        excp_debug_handler(cpu);
++    }
++
+     qemu_system_debug_request();
+     cpu->stopped = true;
+ }
+diff --git a/gdbstub.c b/gdbstub.c
+index 2a94030d3b..8c76f54117 100644
+--- a/gdbstub.c
++++ b/gdbstub.c
+@@ -2006,6 +2006,10 @@ int gdbserver_start(const char *device)
+     s->mon_chr = mon_chr;
+     s->current_syscall_cb = NULL;
+ 
++    if (!register_excp_debug_handler(gdb_set_stop_cpu)) {
++        exit(1);
++    }
++
+     return 0;
+ }
+ 
+diff --git a/include/sysemu/sysemu.h b/include/sysemu/sysemu.h
+index b21369672a..34588c99b4 100644
+--- a/include/sysemu/sysemu.h
++++ b/include/sysemu/sysemu.h
+@@ -193,6 +193,8 @@ QemuOpts *qemu_get_machine_opts(void);
+ 
+ bool defaults_enabled(void);
+ 
++bool register_excp_debug_handler(void (*handler)(CPUState *cpu));
++
+ extern QemuOptsList qemu_legacy_drive_opts;
+ extern QemuOptsList qemu_common_drive_opts;
+ extern QemuOptsList qemu_drive_opts;
 diff --git a/windbgstub.c b/windbgstub.c
-index 5b0a15ea4e..489abe6d6c 100755
+index 489abe6d6c..b33f412659 100755
 --- a/windbgstub.c
 +++ b/windbgstub.c
-@@ -156,6 +156,14 @@ static void windbg_process_manipulate_packet(ParsingContext *ctx)
-         kd_api_set_context(cpu, &ctx->data);
-         break;
+@@ -115,16 +115,20 @@ static void windbg_send_control_packet(uint16_t type)
+     windbg_state->ctrl_packet_id ^= 1;
+ }
  
-+    case DbgKdWriteBreakPointApi:
-+        kd_api_write_breakpoint(cpu, &ctx->data);
-+        break;
-+
-+    case DbgKdRestoreBreakPointApi:
-+        kd_api_restore_breakpoint(cpu, &ctx->data);
-+        break;
-+
-     case DbgKdReadControlSpaceApi:
-         kd_api_read_control_space(cpu, &ctx->data);
-         break;
-@@ -164,6 +172,9 @@ static void windbg_process_manipulate_packet(ParsingContext *ctx)
-         kd_api_write_control_space(cpu, &ctx->data);
-         break;
+-static void windbg_vm_stop(void)
++static void windbg_bp_handler(CPUState *cpu)
+ {
+-    CPUState *cpu = qemu_get_cpu(0);
+-    vm_stop(RUN_STATE_PAUSED);
+-
+     SizedBuf buf = kd_gen_exception_sc(cpu);
+     windbg_send_data_packet(buf.data, buf.size, PACKET_TYPE_KD_STATE_CHANGE64);
+     SBUF_FREE(buf);
+ }
  
-+    case DbgKdClearAllInternalBreakpointsApi:
-+        return;
++static void windbg_vm_stop(void)
++{
++    CPUState *cpu = qemu_get_cpu(0);
++    vm_stop(RUN_STATE_PAUSED);
++    windbg_bp_handler(cpu);
++}
 +
-     default:
-         kd_api_unsupported(cpu, &ctx->data);
-         break;
+ static void windbg_process_manipulate_packet(ParsingContext *ctx)
+ {
+     CPUState *cpu;
+@@ -432,6 +436,10 @@ int windbg_server_start(const char *device)
+ 
+     qemu_register_reset(windbg_handle_reset, NULL);
+ 
++    if (!register_excp_debug_handler(windbg_bp_handler)) {
++        exit(1);
++    }
++
+     atexit(windbg_exit);
+     return 0;
+ }
