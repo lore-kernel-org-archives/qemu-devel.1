@@ -1,22 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40251)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40882)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1eHBaK-0003T7-DN
-	for qemu-devel@nongnu.org; Tue, 21 Nov 2017 11:39:45 -0500
+	(envelope-from <stefanha@redhat.com>) id 1eHBcT-0004EV-F9
+	for qemu-devel@nongnu.org; Tue, 21 Nov 2017 11:41:58 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1eHBaJ-0003HK-ID
-	for qemu-devel@nongnu.org; Tue, 21 Nov 2017 11:39:44 -0500
-Date: Tue, 21 Nov 2017 16:39:33 +0000
+	(envelope-from <stefanha@redhat.com>) id 1eHBcS-000467-Dd
+	for qemu-devel@nongnu.org; Tue, 21 Nov 2017 11:41:57 -0500
+Date: Tue, 21 Nov 2017 16:41:46 +0000
 From: Stefan Hajnoczi <stefanha@redhat.com>
-Message-ID: <20171121163933.GB32089@stefanha-x1.localdomain>
+Message-ID: <20171121164146.GC32089@stefanha-x1.localdomain>
 References: <cover.1511278397.git.jcody@redhat.com>
-	<ccb6b6368f2ba5198f786559acc92c8432c7a936.1511278397.git.jcody@redhat.com>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="lEGEL1/lMxI0MVQ2"
+	protocol="application/pgp-signature"; boundary="9Ek0hoCL9XbhcSqy"
 Content-Disposition: inline
-In-Reply-To: <ccb6b6368f2ba5198f786559acc92c8432c7a936.1511278397.git.jcody@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v3 for-2.11 2/4] coroutine: abort if we try
- to schedule or enter a pending coroutine
+In-Reply-To: <cover.1511278397.git.jcody@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v3 for-2.11 0/4] Fix segfault in blockjob
+ race condition
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,43 +28,105 @@ To: Jeff Cody <jcody@redhat.com>
 Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, mreitz@redhat.com, famz@redhat.com, pbonzini@redhat.com, kwolf@redhat.com
 
 
---lEGEL1/lMxI0MVQ2
+--9Ek0hoCL9XbhcSqy
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Tue, Nov 21, 2017 at 10:38:51AM -0500, Jeff Cody wrote:
-> diff --git a/util/qemu-coroutine.c b/util/qemu-coroutine.c
-> index d6095c1..9e4ed43 100644
-> --- a/util/qemu-coroutine.c
-> +++ b/util/qemu-coroutine.c
-> @@ -107,8 +107,21 @@ void qemu_aio_coroutine_enter(AioContext *ctx, Corou=
-tine *co)
->      Coroutine *self =3D qemu_coroutine_self();
->      CoroutineAction ret;
-> =20
-> +    /* Prior read of co protected by callers - e.g., aio_co_wake */
-> +    const char *scheduled =3D atomic_read(&co->scheduled);
+On Tue, Nov 21, 2017 at 10:38:49AM -0500, Jeff Cody wrote:
+> Changes from v2 -> v3:
+> -----------------------
+>=20
+> Patch 1: Updated commit message to include why immediate cancel is
+>          ok to remove (Thanks Paolo)
+>=20
+>          Dropped useless hunk (Thanks Stefan)
+>=20
+>=20
+> Patch 2: Use correct atomic primitives, and document implicit
+>          assumptions (Thanks Stefan, Paolo)
+>=20
+>         Fix spelling in commit message (Thanks Eric)
+>=20
+> Patch 3/4: Unchanged.
+>=20
+>=20
+> Changes from v1 -> v2:
+> -----------------------
+>=20
+> Patch 1: Updated docs in blockjob_int.h (Thanks Stefan)
+>=20
+> Patch 2/3: Squashed, and used const char * to hold the __func__ name of
+>            the original scheduler (Thanks Paolo)
+>=20
+> Patch 4: Unchanged.
+>=20
+> Patch 5: Dropped qcow format for the test, it was so slow the test times
+>          out, and it doesn't add any new dimension to the test.
+>=20
+>=20
+> # git-backport-diff -r qemu/master.. -u github/bz1508708
+>=20
+> 001/4:[0003] [FC] 'blockjob: do not allow coroutine double entry or entry=
+-after-completion'
+> 002/4:[down] 'coroutine: abort if we try to schedule or enter a pending c=
+oroutine'
+> 003/4:[----] [--] 'qemu-iotests: add option in common.qemu for mismatch o=
+nly'
+> 004/4:[0002] [FC] 'qemu-iotest: add test for blockjob coroutine race cond=
+ition'
+>=20
+>=20
+> This series fixes a race condition segfault when using iothreads with
+> blockjobs.
+>=20
+> The qemu iotest in this series is a reproducer, as is the reproducer
+> script attached in this bug report:
+>=20
+> https://bugzilla.redhat.com/show_bug.cgi?id=3D1508708
+>=20
+> There are two additional patches to try and catch this sort of scenario
+> with an abort, before a segfault or memory corruption occurs.
+>=20
+>=20
+> Jeff Cody (4):
+>   blockjob: do not allow coroutine double entry or
+>     entry-after-completion
+>   coroutine: abort if we try to schedule or enter a pending coroutine
+>   qemu-iotests: add option in common.qemu for mismatch only
+>   qemu-iotest: add test for blockjob coroutine race condition
+>=20
+>  blockjob.c                     |  7 ++-
+>  include/block/blockjob_int.h   |  3 +-
+>  include/qemu/coroutine_int.h   |  6 +++
+>  tests/qemu-iotests/200         | 99 ++++++++++++++++++++++++++++++++++++=
+++++++
+>  tests/qemu-iotests/200.out     | 14 ++++++
+>  tests/qemu-iotests/common.qemu |  8 +++-
+>  tests/qemu-iotests/group       |  1 +
+>  util/async.c                   | 13 ++++++
+>  util/qemu-coroutine-sleep.c    | 12 +++++
+>  util/qemu-coroutine.c          | 13 ++++++
+>  10 files changed, 172 insertions(+), 4 deletions(-)
+>  create mode 100755 tests/qemu-iotests/200
+>  create mode 100644 tests/qemu-iotests/200.out
 
-Consider: user code -> qemu_coroutine_enter() ->
-qemu_aio_coroutine_enter().  Unlike the
-aio_co_wake() code path, there is no read barrier here.
+Besides the read memory barrier issue:
 
-I think atomic_mb_read() is needed to guarantee the thread sees the
-latest value.
+Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
 
---lEGEL1/lMxI0MVQ2
+--9Ek0hoCL9XbhcSqy
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQEcBAEBAgAGBQJaFFbFAAoJEJykq7OBq3PIwccH/3qvB4dl1oyJKv+18xArJKnO
-hWQucBcs5AzSwdcaxE2/l1xWjqFYWfmbnYDwuDyzyTid21Xj3g+nCd9ogG1betjf
-ne+NMn9oB3MEdeQh94KvL4vFwQ67wn9FKV6IoxF0/ZFHku8LydSWaz0Gm7SA1drw
-e8a25mNBGjN3trXNK7a8fP/1NE4FMGgEYXIKO5kV8F12mbtaaDcSDT0DxI+RIfzo
-Ywu6ATyBipzp8qbojJsFdetzBcEEe+eoX+V+0RsBSvHAyFVW9Yi1ONr88YX75p6x
-EMMLCCGd2tVLbyN8Z5FYhxJ6Wp1swe53inHTHKR9PqJo+a0TidEJKKp+KwCep1s=
-=OWVP
+iQEcBAEBAgAGBQJaFFdKAAoJEJykq7OBq3PIeWoH/3xKI6Jjkt30NnWmEYw7NBe7
+elCOo61tSbncEGo53+LCHKje3Dn7pUx8VdYHKj2SLNMtIrNObVEM/CCfdM+bb5yS
+KVhkHAJ2aqs505L2Xgbj0TAQJXN6gK+mKkrw/s68ta7TuAdIoI6eI6jcisalQ3ei
+kjKZbSM9bX/YF6MwglsLOrGb7qQ5pFoQpepxDWUZN7f1O9QxN3GEVz0xHllaxH1H
+7ctmCTR93YO0pBYWVULhG0Riemv1Lj3MF90x9CEXUQRmmSIzsL45vuv6zRfVVz6u
+PAqXAtYaioKmHfMWgKBibgcNipYeBtRrZfGinACnzoOICFy7+lcmC4Wxlb0MGC4=
+=IrPE
 -----END PGP SIGNATURE-----
 
---lEGEL1/lMxI0MVQ2--
+--9Ek0hoCL9XbhcSqy--
