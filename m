@@ -1,23 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50449)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52154)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1eH8MC-0006b5-DU
-	for qemu-devel@nongnu.org; Tue, 21 Nov 2017 08:12:57 -0500
+	(envelope-from <dgilbert@redhat.com>) id 1eH8RZ-0008Rx-Cp
+	for qemu-devel@nongnu.org; Tue, 21 Nov 2017 08:18:35 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1eH8MB-0001iy-F4
-	for qemu-devel@nongnu.org; Tue, 21 Nov 2017 08:12:56 -0500
-References: <cover.1511230683.git.jcody@redhat.com>
-	<d21a7bb5d13a8d8db55bea05e46f5f4e18ed481e.1511230683.git.jcody@redhat.com>
-	<20171121104946.GA25265@stefanha-x1.localdomain>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <072692b7-3b3e-b44d-02c8-9d8f4e745b67@redhat.com>
-Date: Tue, 21 Nov 2017 14:12:32 +0100
+	(envelope-from <dgilbert@redhat.com>) id 1eH8RU-0003bz-Ep
+	for qemu-devel@nongnu.org; Tue, 21 Nov 2017 08:18:29 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:55460)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1eH8RU-0003bg-8v
+	for qemu-devel@nongnu.org; Tue, 21 Nov 2017 08:18:24 -0500
+Date: Tue, 21 Nov 2017 13:18:13 +0000
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20171121131812.GC2434@work-vm>
+References: <20171116075155.22378-1-ppandit@redhat.com>
+	<658ecab6-1f09-0c94-c89e-55f71c37309a@redhat.com>
+	<20171117093556.ntseydf7eiboeyww@sirius.home.kraxel.org>
 MIME-Version: 1.0
-In-Reply-To: <20171121104946.GA25265@stefanha-x1.localdomain>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="fwgVVUr94qi5fa5j4e3RpSlQNUMc8wbfn"
-Subject: Re: [Qemu-devel] [PATCH v2 for-2.11 1/4] blockjob: do not allow
- coroutine double entry or entry-after-completion
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20171117093556.ntseydf7eiboeyww@sirius.home.kraxel.org>
+Subject: Re: [Qemu-devel] [PATCH v1] ps2: check PS2Queue pointers in
+ post_load routine
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,67 +29,56 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefan Hajnoczi <stefanha@redhat.com>, Jeff Cody <jcody@redhat.com>
-Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, mreitz@redhat.com, famz@redhat.com, kwolf@redhat.com
+To: Gerd Hoffmann <kraxel@redhat.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, P J P <ppandit@redhat.com>, Qemu Developers <qemu-devel@nongnu.org>, "Daniel P . Berrange" <berrange@redhat.com>, Cyrille Chatras <cyrille.chatras@orange.com>, Prasad J Pandit <pjp@fedoraproject.org>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---fwgVVUr94qi5fa5j4e3RpSlQNUMc8wbfn
-From: Paolo Bonzini <pbonzini@redhat.com>
-To: Stefan Hajnoczi <stefanha@redhat.com>, Jeff Cody <jcody@redhat.com>
-Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, mreitz@redhat.com,
- famz@redhat.com, kwolf@redhat.com
-Message-ID: <072692b7-3b3e-b44d-02c8-9d8f4e745b67@redhat.com>
-Subject: Re: [PATCH v2 for-2.11 1/4] blockjob: do not allow coroutine double
- entry or entry-after-completion
-References: <cover.1511230683.git.jcody@redhat.com>
- <d21a7bb5d13a8d8db55bea05e46f5f4e18ed481e.1511230683.git.jcody@redhat.com>
- <20171121104946.GA25265@stefanha-x1.localdomain>
-In-Reply-To: <20171121104946.GA25265@stefanha-x1.localdomain>
-Content-Type: text/plain; charset=windows-1252
-Content-Transfer-Encoding: quoted-printable
+* Gerd Hoffmann (kraxel@redhat.com) wrote:
+> > > diff --git a/hw/input/ps2.c b/hw/input/ps2.c
+> > > index f388a23c8e..de171a28dd 100644
+> > > --- a/hw/input/ps2.c
+> > > +++ b/hw/input/ps2.c
+> > > @@ -1225,24 +1225,21 @@ static void ps2_common_reset(PS2State *s)
+> > >  static void ps2_common_post_load(PS2State *s)
+> > >  {
+> > >      PS2Queue *q = &s->queue;
+> > > -    int size;
+> > > -    int i;
+> > > -    int tmp_data[PS2_QUEUE_SIZE];
+> > > +    uint8_t i, size;
+> > > +    uint8_t tmp_data[PS2_QUEUE_SIZE];
+> > 
+> > Hi Prasad,
+> > 
+> > you don't need to change the invalid values to sane ones.  Instead, make
+> > ps2_common_post_load return an int (just like the .post_load member of
+> > VMStateDescription).  You can then detect out of range count/rptr/wptr
+> > and return -1 for bad indices.
+> 
+> Well, it's not that simple because older qemu versions had larger
+> queues.  So post_load accepts migrations with queues which are too big.
+> It just clears the queue in that case, so the input events are dropped
+> in that (highly unlikely) case.
+> 
+> Also note that the current post_load is broken.  tmp_data is int whereas
+> q->data is uint8_t.  So ...
+> 
+> > > -        memcpy(q->data, tmp_data, size);
+> 
+> ... this memcpy doesn't work as intended.  Nobody noticed in years.
 
-On 21/11/2017 11:49, Stefan Hajnoczi wrote:
-> On Mon, Nov 20, 2017 at 09:23:23PM -0500, Jeff Cody wrote:
->> @@ -291,10 +291,10 @@ void block_job_start(BlockJob *job)
->>  {
->>      assert(job && !block_job_started(job) && job->paused &&
->>             job->driver && job->driver->start);
->> -    job->co =3D qemu_coroutine_create(block_job_co_entry, job);
->>      job->pause_count--;
->>      job->busy =3D true;
->>      job->paused =3D false;
->> +    job->co =3D qemu_coroutine_create(block_job_co_entry, job);
->>      bdrv_coroutine_enter(blk_bs(job->blk), job->co);
->>  }
->=20
-> Please see discussion on v1 about this hunk.
->=20
-> The rest looks good.
+Oops!
 
-I'm okay with this hunk, but I would appreciate that the commit message
-said why it's okay to delay block job cancellation after
-block_job_sleep_ns returns.
+> v1 fixes this bug, v2 doesn't.
+> 
+> So, I'm tempted to just rip out the whole backward compatibility buffer
+> shuffling logic.  Or take v1 of this patch.
 
-Thanks,
+I think v1 is OK.
 
-Paolo
+Dave
 
-
---fwgVVUr94qi5fa5j4e3RpSlQNUMc8wbfn
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEE8TM4V0tmI4mGbHaCv/vSX3jHroMFAloUJkAACgkQv/vSX3jH
-roP7IQf/RY2OUQ3mAkB4NqGkmbYUa5bWnIOpxlkfv+edRudny2h9eswT5w15O6x6
-pzNVXRZ5NUPY1XcMGCM1tDEXPxPqT6TcA738CSzyE8nxpHmLnnY7/IS5UwXVPXEH
-5FgxV2m0SFVcz+uraaA7yYMmkazgpqYGc0UBVxYGQhCMv1WHLWLXoQdCDYcsJSjr
-wdIUlHdUZJv4feEOMaRHomoCS4yQLhLuPkkRkKUvVt8qiuPlt4IBpprzaXlQlO2T
-52A7N1Vcosfx76Exn8cHxkVWmraJx9zna0gRDy4imBjny7x/RB4DQ7dCz6Vxf6Fm
-5FhtZUBgZjic02vQGYrdc9d9Vjm3Qg==
-=xIFQ
------END PGP SIGNATURE-----
-
---fwgVVUr94qi5fa5j4e3RpSlQNUMc8wbfn--
+> cheers,
+>   Gerd
+> 
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
