@@ -1,25 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46387)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46733)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mlureau@redhat.com>) id 1eH6Yt-0005e9-H9
-	for qemu-devel@nongnu.org; Tue, 21 Nov 2017 06:17:58 -0500
+	(envelope-from <pasic@linux.vnet.ibm.com>) id 1eH6Zk-0006jF-A4
+	for qemu-devel@nongnu.org; Tue, 21 Nov 2017 06:18:49 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mlureau@redhat.com>) id 1eH6Yp-0007eD-CJ
-	for qemu-devel@nongnu.org; Tue, 21 Nov 2017 06:17:55 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:48364)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mlureau@redhat.com>) id 1eH6Yp-0007cs-3R
-	for qemu-devel@nongnu.org; Tue, 21 Nov 2017 06:17:51 -0500
-Date: Tue, 21 Nov 2017 06:17:46 -0500 (EST)
-From: =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>
-Message-ID: <1367386885.43304805.1511263066456.JavaMail.zimbra@redhat.com>
-In-Reply-To: <20171120232407-mutt-send-email-mst@kernel.org>
-References: <20171120095519.15214-1-marcandre.lureau@redhat.com>
-	<20171120095519.15214-4-marcandre.lureau@redhat.com>
-	<20171120232407-mutt-send-email-mst@kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v7 3/5] fw_cfg: do DMA read operation
+	(envelope-from <pasic@linux.vnet.ibm.com>) id 1eH6Zg-00082b-6m
+	for qemu-devel@nongnu.org; Tue, 21 Nov 2017 06:18:48 -0500
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:59534)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pasic@linux.vnet.ibm.com>)
+	id 1eH6Zf-00081a-UE
+	for qemu-devel@nongnu.org; Tue, 21 Nov 2017 06:18:44 -0500
+Received: from pps.filterd (m0098409.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
+	vALBI3qC034837
+	for <qemu-devel@nongnu.org>; Tue, 21 Nov 2017 06:18:37 -0500
+Received: from e06smtp11.uk.ibm.com (e06smtp11.uk.ibm.com [195.75.94.107])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2ecjmvhyr8-1
+	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Tue, 21 Nov 2017 06:18:36 -0500
+Received: from localhost
+	by e06smtp11.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	Only! Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <pasic@linux.vnet.ibm.com>;
+	Tue, 21 Nov 2017 11:18:30 -0000
+From: Halil Pasic <pasic@linux.vnet.ibm.com>
+Date: Tue, 21 Nov 2017 12:18:25 +0100
+Message-Id: <20171121111825.17916-1-pasic@linux.vnet.ibm.com>
+Subject: [Qemu-devel] [RFC PATCH 1/1] s390x/css: unresrict cssids
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,335 +35,99 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: linux-kernel@vger.kernel.org, qemu-devel@nongnu.org, somlo@cmu.edu, xiaolong ye <xiaolong.ye@intel.com>
+To: Boris Fiuczynski <fiuczy@linux.vnet.ibm.com>, Cornelia Huck <cohuck@redhat.com>
+Cc: Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>, Christian Borntraeger <borntraeger@de.ibm.com>, Shalini Chellathurai Saroja <shalini@linux.vnet.ibm.com>, qemu-devel@nongnu.org, qemu-s390x@nongnu.org, Halil Pasic <pasic@linux.vnet.ibm.com>
 
-Hi
+The default css 0xFE is currently restricted to virtual subchannel
+devices. The hope when the decision was made was, that non-virtual
+subchannel devices will come around when guest can exploit multiple
+channel subsystems. Since the guests generally don't do, the pain
+of the partitioned (cssid) namespace outweighs the gain.
 
------ Original Message -----
-> On Mon, Nov 20, 2017 at 10:55:17AM +0100, Marc-Andr=C3=A9 Lureau wrote:
-> > Modify fw_cfg_read_blob() to use DMA if the device supports it.
-> > Return errors, because the operation may fail.
-> >=20
-> > The DMA operation is expected to run synchronously with today qemu,
-> > but the specification states that it may become async, so we run
-> > "control" field check in a loop for eventual changes.
-> >=20
-> > We may want to switch all the *buf addresses to use only kmalloc'ed
-> > buffers (instead of using stack/image addresses with dma=3Dfalse).
-> >=20
-> > Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
-> > ---
-> >  drivers/firmware/qemu_fw_cfg.c | 140
-> >  ++++++++++++++++++++++++++++++++++++-----
-> >  1 file changed, 123 insertions(+), 17 deletions(-)
-> >=20
-> > diff --git a/drivers/firmware/qemu_fw_cfg.c
-> > b/drivers/firmware/qemu_fw_cfg.c
-> > index 740df0df2260..e0fe6ff037c3 100644
-> > --- a/drivers/firmware/qemu_fw_cfg.c
-> > +++ b/drivers/firmware/qemu_fw_cfg.c
-> > @@ -33,6 +33,8 @@
-> >  #include <linux/slab.h>
-> >  #include <linux/io.h>
-> >  #include <linux/ioport.h>
-> > +#include <linux/delay.h>
-> > +#include <linux/dma-mapping.h>
-> > =20
-> >  MODULE_AUTHOR("Gabriel L. Somlo <somlo@cmu.edu>");
-> >  MODULE_DESCRIPTION("QEMU fw_cfg sysfs support");
-> > @@ -43,12 +45,25 @@ MODULE_LICENSE("GPL");
-> >  #define FW_CFG_ID         0x01
-> >  #define FW_CFG_FILE_DIR   0x19
-> > =20
-> > +#define FW_CFG_VERSION_DMA     0x02
-> > +#define FW_CFG_DMA_CTL_ERROR   0x01
-> > +#define FW_CFG_DMA_CTL_READ    0x02
-> > +#define FW_CFG_DMA_CTL_SKIP    0x04
-> > +#define FW_CFG_DMA_CTL_SELECT  0x08
-> > +#define FW_CFG_DMA_CTL_WRITE   0x10
-> > +
-> >  /* size in bytes of fw_cfg signature */
-> >  #define FW_CFG_SIG_SIZE 4
-> > =20
-> >  /* fw_cfg "file name" is up to 56 characters (including terminating nu=
-l)
-> >  */
-> >  #define FW_CFG_MAX_FILE_PATH 56
-> > =20
-> > +/* platform device for dma mapping */
-> > +static struct device *dev;
-> > +
-> > +/* fw_cfg revision attribute, in /sys/firmware/qemu_fw_cfg top-level d=
-ir.
-> > */
-> > +static u32 fw_cfg_rev;
-> > +
-> >  /* fw_cfg file directory entry type */
-> >  struct fw_cfg_file {
-> >  =09u32 size;
-> > @@ -57,6 +72,12 @@ struct fw_cfg_file {
-> >  =09char name[FW_CFG_MAX_FILE_PATH];
-> >  };
-> > =20
-> > +struct fw_cfg_dma {
-> > +=09u32 control;
-> > +=09u32 length;
-> > +=09u64 address;
-> > +} __packed;
-> > +
-> >  /* fw_cfg device i/o register addresses */
-> >  static bool fw_cfg_is_mmio;
-> >  static phys_addr_t fw_cfg_p_base;
->=20
-> Drop __packed please. It causes many gcc versions to do insane things.
-> Can be a patch on top.
+Let us remove the corresponding restrictions (virtual devices
+can be put only in 0xFE and non-virtual devices in any css except
+the 0xFE), and inform management software property on all ccw
+devices.
 
-Oh? I think __packed should translate to __attribute__((packed)) (include/l=
-inux/compiler-gcc.h), there would be serious problems if gcc "do insane thi=
-ngs" with it.
+The adverse effect on migration should not be too severe as
+vfio-ccw devices are not live-migratable yet, and for virtual
+devices using the extra freedom would only make sense with
+the aforementioned guest support in place.
 
->=20
->=20
-> > @@ -75,12 +96,79 @@ static inline u16 fw_cfg_sel_endianness(u16 key)
-> >  =09return fw_cfg_is_mmio ? cpu_to_be16(key) : cpu_to_le16(key);
-> >  }
-> > =20
-> > +static inline bool fw_cfg_dma_enabled(void)
-> > +{
-> > +=09return fw_cfg_rev & FW_CFG_VERSION_DMA && fw_cfg_reg_dma;
-> > +}
-> > +
-> > +/* qemu fw_cfg device is sync today, but spec says it may become async=
- */
-> > +static void fw_cfg_wait_for_control(struct fw_cfg_dma *d, dma_addr_t d=
-ma)
-> > +{
-> > +=09do {
-> > +=09=09dma_sync_single_for_cpu(dev, dma, sizeof(*d), DMA_FROM_DEVICE);
-> > +=09=09if ((be32_to_cpu(d->control) & ~FW_CFG_DMA_CTL_ERROR) =3D=3D 0)
-> > +=09=09=09return;
-> > +
-> > +=09=09usleep_range(50, 100);
->=20
-> And since in practice we never get to this line,
-> maybe we should just go back to yield here.
+Signed-off-by: Halil Pasic <pasic@linux.vnet.ibm.com>
+Acked-by: Christian Borntraeger <borntraeger@de.ibm.com>
+Reviewed-by: Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>
 
-Or cond_resched() ?
+---
+Hi!
 
->=20
-> > +=09} while (true);
-> > +}
-> > +
-> > +static ssize_t fw_cfg_dma_transfer(void *address, u32 length, u32 cont=
-rol)
-> > +{
-> > +=09dma_addr_t dma_addr =3D 0;
-> > +=09static struct fw_cfg_dma d;
-> > +=09dma_addr_t dma;
-> > +=09ssize_t ret =3D length;
-> > +=09enum dma_data_direction dir =3D
-> > +=09=09(control & FW_CFG_DMA_CTL_READ ? DMA_FROM_DEVICE : 0);
-> > +
-> > +=09if (address && length) {
-> > +=09=09dma_addr =3D dma_map_single(dev, address, length, dir);
-> > +=09=09if (dma_mapping_error(NULL, dma_addr)) {
-> > +=09=09=09WARN(1, "%s: failed to map address\n", __func__);
-> > +=09=09=09return -EFAULT;
-> > +=09=09}
-> > +=09}
-> > +
-> > +=09d =3D (struct fw_cfg_dma) {
-> > +=09=09.address =3D cpu_to_be64(dma_addr),
-> > +=09=09.length =3D cpu_to_be32(length),
-> > +=09=09.control =3D cpu_to_be32(control)
-> > +=09};
-> > +
-> > +=09dma =3D dma_map_single(dev, &d, sizeof(d), DMA_BIDIRECTIONAL);
-> > +=09if (dma_mapping_error(NULL, dma)) {
-> > +=09=09WARN(1, "%s: failed to map fw_cfg_dma\n", __func__);
-> > +=09=09ret =3D -EFAULT;
-> > +=09=09goto end;
-> > +=09}
-> > +
-> > +=09iowrite32be((u64)dma >> 32, fw_cfg_reg_dma);
-> > +=09iowrite32be(dma, fw_cfg_reg_dma + 4);
-> > +
-> > +=09fw_cfg_wait_for_control(&d, dma);
-> > +
-> > +=09if (be32_to_cpu(d.control) & FW_CFG_DMA_CTL_ERROR) {
-> > +=09=09ret =3D -EIO;
-> > +=09}
-> > +
-> > +=09dma_unmap_single(dev, dma, sizeof(d), DMA_BIDIRECTIONAL);
-> > +
-> > +end:
-> > +=09if (dma_addr)
-> > +=09=09dma_unmap_single(dev, dma_addr, length, dir);
-> > +
-> > +=09return ret;
-> > +}
-> > +
-> >  /* read chunk of given fw_cfg blob (caller responsible for sanity-chec=
-k)
-> >  */
-> > -static inline void fw_cfg_read_blob(u16 key,
-> > -=09=09=09=09    void *buf, loff_t pos, size_t count)
-> > +static ssize_t fw_cfg_read_blob(u16 key,
-> > +=09=09=09=09void *buf, loff_t pos, size_t count,
-> > +=09=09=09=09bool dma)
-> >  {
-> >  =09u32 glk =3D -1U;
-> >  =09acpi_status status;
-> > +=09ssize_t ret =3D count;
-> > =20
-> >  =09/* If we have ACPI, ensure mutual exclusion against any potential
-> >  =09 * device access by the firmware, e.g. via AML methods:
-> > @@ -90,17 +178,36 @@ static inline void fw_cfg_read_blob(u16 key,
-> >  =09=09/* Should never get here */
-> >  =09=09WARN(1, "fw_cfg_read_blob: Failed to lock ACPI!\n");
-> >  =09=09memset(buf, 0, count);
-> > -=09=09return;
-> > +=09=09return -EINVAL;
-> >  =09}
-> > =20
-> >  =09mutex_lock(&fw_cfg_dev_lock);
-> > -=09iowrite16(fw_cfg_sel_endianness(key), fw_cfg_reg_ctrl);
-> > -=09while (pos-- > 0)
-> > -=09=09ioread8(fw_cfg_reg_data);
-> > -=09ioread8_rep(fw_cfg_reg_data, buf, count);
-> > +=09if (dma && fw_cfg_dma_enabled()) {
-> > +=09=09if (pos =3D=3D 0) {
-> > +=09=09=09ret =3D fw_cfg_dma_transfer(buf, count, key << 16
-> > +=09=09=09=09=09=09  | FW_CFG_DMA_CTL_SELECT
-> > +=09=09=09=09=09=09  | FW_CFG_DMA_CTL_READ);
-> > +=09=09} else {
-> > +=09=09=09iowrite16(fw_cfg_sel_endianness(key), fw_cfg_reg_ctrl);
-> > +=09=09=09ret =3D fw_cfg_dma_transfer(NULL, pos, FW_CFG_DMA_CTL_SKIP);
-> > +=09=09=09if (ret < 0)
-> > +=09=09=09=09goto end;
-> > +=09=09=09ret =3D fw_cfg_dma_transfer(buf, count,
-> > +=09=09=09=09=09=09  FW_CFG_DMA_CTL_READ);
-> > +=09=09}
-> > +=09} else {
-> > +=09=09iowrite16(fw_cfg_sel_endianness(key), fw_cfg_reg_ctrl);
-> > +=09=09while (pos-- > 0)
-> > +=09=09=09ioread8(fw_cfg_reg_data);
-> > +=09=09ioread8_rep(fw_cfg_reg_data, buf, count);
-> > +=09}
-> > +
-> > +end:
-> >  =09mutex_unlock(&fw_cfg_dev_lock);
-> > =20
-> >  =09acpi_release_global_lock(glk);
-> > +
-> > +=09return ret;
-> >  }
-> > =20
-> >  /* clean up fw_cfg device i/o */
-> > @@ -192,7 +299,7 @@ static int fw_cfg_do_platform_probe(struct
-> > platform_device *pdev)
-> >  #endif
-> > =20
-> >  =09/* verify fw_cfg device signature */
-> > -=09fw_cfg_read_blob(FW_CFG_SIGNATURE, sig, 0, FW_CFG_SIG_SIZE);
-> > +=09fw_cfg_read_blob(FW_CFG_SIGNATURE, sig, 0, FW_CFG_SIG_SIZE, false);
-> >  =09if (memcmp(sig, "QEMU", FW_CFG_SIG_SIZE) !=3D 0) {
-> >  =09=09fw_cfg_io_cleanup();
-> >  =09=09return -ENODEV;
-> > @@ -201,9 +308,6 @@ static int fw_cfg_do_platform_probe(struct
-> > platform_device *pdev)
-> >  =09return 0;
-> >  }
-> > =20
-> > -/* fw_cfg revision attribute, in /sys/firmware/qemu_fw_cfg top-level d=
-ir.
-> > */
-> > -static u32 fw_cfg_rev;
-> > -
-> >  static ssize_t fw_cfg_showrev(struct kobject *k, struct attribute *a, =
-char
-> >  *buf)
-> >  {
-> >  =09return sprintf(buf, "%u\n", fw_cfg_rev);
-> > @@ -351,8 +455,7 @@ static ssize_t fw_cfg_sysfs_read_raw(struct file *f=
-ilp,
-> > struct kobject *kobj,
-> >  =09if (count > entry->f.size - pos)
-> >  =09=09count =3D entry->f.size - pos;
-> > =20
-> > -=09fw_cfg_read_blob(entry->f.select, buf, pos, count);
-> > -=09return count;
-> > +=09return fw_cfg_read_blob(entry->f.select, buf, pos, count, true);
-> >  }
-> > =20
-> >  static struct bin_attribute fw_cfg_sysfs_attr_raw =3D {
-> > @@ -505,7 +608,7 @@ static int fw_cfg_register_dir_entries(void)
-> >  =09struct fw_cfg_file *dir;
-> >  =09size_t dir_size;
-> > =20
-> > -=09fw_cfg_read_blob(FW_CFG_FILE_DIR, &count, 0, sizeof(count));
-> > +=09fw_cfg_read_blob(FW_CFG_FILE_DIR, &count, 0, sizeof(count), false);
-> >  =09count =3D be32_to_cpu(count);
-> >  =09dir_size =3D count * sizeof(struct fw_cfg_file);
-> > =20
-> > @@ -513,7 +616,7 @@ static int fw_cfg_register_dir_entries(void)
-> >  =09if (!dir)
-> >  =09=09return -ENOMEM;
-> > =20
-> > -=09fw_cfg_read_blob(FW_CFG_FILE_DIR, dir, sizeof(count), dir_size);
-> > +=09fw_cfg_read_blob(FW_CFG_FILE_DIR, dir, sizeof(count), dir_size, tru=
-e);
-> > =20
-> >  =09for (i =3D 0; i < count; i++) {
-> >  =09=09dir[i].size =3D be32_to_cpu(dir[i].size);
-> > @@ -544,9 +647,10 @@ static int fw_cfg_sysfs_probe(struct platform_devi=
-ce
-> > *pdev)
-> >  =09 * one fw_cfg device exist system-wide, so if one was already found
-> >  =09 * earlier, we might as well stop here.
-> >  =09 */
-> > -=09if (fw_cfg_sel_ko)
-> > +=09if (dev)
-> >  =09=09return -EBUSY;
-> > =20
-> > +=09dev =3D &pdev->dev;
-> >  =09/* create by_key and by_name subdirs of /sys/firmware/qemu_fw_cfg/ =
-*/
-> >  =09err =3D -ENOMEM;
-> >  =09fw_cfg_sel_ko =3D kobject_create_and_add("by_key", fw_cfg_top_ko);
-> > @@ -562,7 +666,7 @@ static int fw_cfg_sysfs_probe(struct platform_devic=
-e
-> > *pdev)
-> >  =09=09goto err_probe;
-> > =20
-> >  =09/* get revision number, add matching top-level attribute */
-> > -=09fw_cfg_read_blob(FW_CFG_ID, &fw_cfg_rev, 0, sizeof(fw_cfg_rev));
-> > +=09fw_cfg_read_blob(FW_CFG_ID, &fw_cfg_rev, 0, sizeof(fw_cfg_rev), fal=
-se);
-> >  =09fw_cfg_rev =3D le32_to_cpu(fw_cfg_rev);
-> >  =09err =3D sysfs_create_file(fw_cfg_top_ko, &fw_cfg_rev_attr.attr);
-> >  =09if (err)
-> > @@ -587,6 +691,7 @@ static int fw_cfg_sysfs_probe(struct platform_devic=
-e
-> > *pdev)
-> >  err_name:
-> >  =09fw_cfg_kobj_cleanup(fw_cfg_sel_ko);
-> >  err_sel:
-> > +=09dev =3D NULL;
-> >  =09return err;
-> >  }
-> > =20
-> > @@ -598,6 +703,7 @@ static int fw_cfg_sysfs_remove(struct platform_devi=
-ce
-> > *pdev)
-> >  =09fw_cfg_io_cleanup();
-> >  =09fw_cfg_kset_unregister_recursive(fw_cfg_fname_kset);
-> >  =09fw_cfg_kobj_cleanup(fw_cfg_sel_ko);
-> > +=09dev =3D NULL;
-> >  =09return 0;
-> >  }
-> > =20
-> > --
-> > 2.15.0.277.ga3d2ad2c43
->=20
+About indicating this at the ccw devices instead of, e.g. as a machine
+property (or otherwise globally), was requested by our libvirt guys. I
+have no strong opinion regarding in this matter.
+
+This patch is intended as a discussion starter. I would at least like to
+get a Tested-by by Shalini before promoting it to non-RFC (provided the
+discussion goes well).
+
+TODOs:
+* Consider adding a description for the new property.
+* Consider renaming VIRTUAL_CSSID.
+* Consider changing the bus-id generation scheme (when
+devno is not specified by the user). his patch keep the current scheme in
+place: they won't go into the default css (but slots are filled up
+starting at cssid 0). This is theoretically good for migration
+compatibility same command line same addresses.  Practically since there
+is no migratable non-virtual ccw device, we should consider using the
+same bus-id generation scheme for virtual and non-virtual devices.
+
+---
+ hw/s390x/ccw-device.c | 6 ++++++
+ hw/s390x/css.c        | 9 ---------
+ 2 files changed, 6 insertions(+), 9 deletions(-)
+
+diff --git a/hw/s390x/ccw-device.c b/hw/s390x/ccw-device.c
+index f9bfa154d6..2167ccea5d 100644
+--- a/hw/s390x/ccw-device.c
++++ b/hw/s390x/ccw-device.c
+@@ -40,6 +40,10 @@ static Property ccw_device_properties[] = {
+     DEFINE_PROP_END_OF_LIST(),
+ };
+ 
++static bool prop_get_true(Object *obj, Error **errp)
++{
++    return true;
++}
+ static void ccw_device_class_init(ObjectClass *klass, void *data)
+ {
+     DeviceClass *dc = DEVICE_CLASS(klass);
+@@ -48,6 +52,8 @@ static void ccw_device_class_init(ObjectClass *klass, void *data)
+     k->realize = ccw_device_realize;
+     k->refill_ids = ccw_device_refill_ids;
+     dc->props = ccw_device_properties;
++    object_class_property_add_bool(klass, "cssid-unrestricted",
++                                   prop_get_true, NULL, NULL);
+ }
+ 
+ const VMStateDescription vmstate_ccw_dev = {
+diff --git a/hw/s390x/css.c b/hw/s390x/css.c
+index f6b5c807cd..957cb9ec90 100644
+--- a/hw/s390x/css.c
++++ b/hw/s390x/css.c
+@@ -2377,15 +2377,6 @@ SubchDev *css_create_sch(CssDevId bus_id, bool is_virtual, bool squash_mcss,
+     SubchDev *sch;
+ 
+     if (bus_id.valid) {
+-        if (is_virtual != (bus_id.cssid == VIRTUAL_CSSID)) {
+-            error_setg(errp, "cssid %hhx not valid for %s devices",
+-                       bus_id.cssid,
+-                       (is_virtual ? "virtual" : "non-virtual"));
+-            return NULL;
+-        }
+-    }
+-
+-    if (bus_id.valid) {
+         if (squash_mcss) {
+             bus_id.cssid = channel_subsys.default_cssid;
+         } else if (!channel_subsys.css[bus_id.cssid]) {
+-- 
+2.13.5
