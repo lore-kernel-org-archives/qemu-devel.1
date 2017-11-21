@@ -1,34 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53146)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54046)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1eHAwK-0006ye-MD
-	for qemu-devel@nongnu.org; Tue, 21 Nov 2017 10:58:25 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1eHAyL-00005k-33
+	for qemu-devel@nongnu.org; Tue, 21 Nov 2017 11:00:35 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1eHAwH-0002IR-Iu
-	for qemu-devel@nongnu.org; Tue, 21 Nov 2017 10:58:24 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:49476)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1eHAwH-0002Hz-0i
-	for qemu-devel@nongnu.org; Tue, 21 Nov 2017 10:58:21 -0500
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
-	[10.5.11.12])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 593657E389
-	for <qemu-devel@nongnu.org>; Tue, 21 Nov 2017 15:58:19 +0000 (UTC)
-Date: Tue, 21 Nov 2017 16:58:09 +0100
-From: Igor Mammedov <imammedo@redhat.com>
-Message-ID: <20171121165809.1ec4362a@redhat.com>
-In-Reply-To: <20171121164254-mutt-send-email-mst@kernel.org>
-References: <1510834622-28800-1-git-send-email-thuth@redhat.com>
-	<20171120175522.76bf71c3@redhat.com>
-	<20171120223048-mutt-send-email-mst@kernel.org>
-	<20171121142639.3e6d2e79@redhat.com>
-	<20171121164254-mutt-send-email-mst@kernel.org>
+	(envelope-from <peter.maydell@linaro.org>) id 1eHAyF-00037h-Fa
+	for qemu-devel@nongnu.org; Tue, 21 Nov 2017 11:00:29 -0500
+Received: from mail-oi0-x22c.google.com ([2607:f8b0:4003:c06::22c]:41692)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1eHAyF-00037Q-7t
+	for qemu-devel@nongnu.org; Tue, 21 Nov 2017 11:00:23 -0500
+Received: by mail-oi0-x22c.google.com with SMTP id h81so8840890oib.8
+	for <qemu-devel@nongnu.org>; Tue, 21 Nov 2017 08:00:23 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v2] tests/bios-tables-test: Fix endianess
- problems when passing data to iasl
+In-Reply-To: <7308e432-4cf5-04bd-4a22-f330dda1f933@amsat.org>
+References: <1511276888-17834-1-git-send-email-peter.maydell@linaro.org>
+	<7308e432-4cf5-04bd-4a22-f330dda1f933@amsat.org>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Tue, 21 Nov 2017 16:00:01 +0000
+Message-ID: <CAFEAcA_NK63LdJs=3Y6zvdrn2Vn7Vvq-CF=p_J4kq9+6VKDOXg@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH] memory-internal.h: Remove obsolete claim
+ that header is obsolete
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,91 +31,41 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org
+To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>, "patches@linaro.org" <patches@linaro.org>
 
-On Tue, 21 Nov 2017 16:47:11 +0200
-"Michael S. Tsirkin" <mst@redhat.com> wrote:
+On 21 November 2017 at 15:57, Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>=
+ wrote:
+> Hi Peter,
+>
+> On 11/21/2017 12:08 PM, Peter Maydell wrote:
+>> The memory-internal.h header claims that it is for "obsolete
+>> exec.c functions" which "will be removed soon". This statement
+>> was added in 2011, six years ago, but the header is still here.
+>> (Admittedly none of the prototypes added in commit 67d95c153bef55f6
+>> are still in the header.)
+>>
+>> It's convenient to have a place to put prototypes for functions
+>> which are used internally to the various .c files of the memory
+>> system or by the accel/tcg code, which is inevitably fairly
+>> closely coupled. So keep the header but update the comments to
+>> reflect what we're actually using it for.
+>
+> Until your NotDirtyInfo addition, the only prototype used was
+> memory_region_access_valid() (in s390-pci-inst.c).
+>
+> Since "none of the prototypes added in commit 67d95c153bef55f6 are still
+> in the header" we could restrict it out of include/exec/ (kinda 'revert'
+> 022c62cbbc) and only keep memory_region_access_valid() + NotDirtyInfo
+> exposed in include/exec/.
 
-> On Tue, Nov 21, 2017 at 02:26:39PM +0100, Igor Mammedov wrote:
-> > On Mon, 20 Nov 2017 22:32:29 +0200
-> > "Michael S. Tsirkin" <mst@redhat.com> wrote:
-> >   
-> > > On Mon, Nov 20, 2017 at 05:55:22PM +0100, Igor Mammedov wrote:  
-> > > > On Thu, 16 Nov 2017 13:17:02 +0100
-> > > > Thomas Huth <thuth@redhat.com> wrote:
-> > > >     
-> > > > > The bios-tables-test was writing out files that we pass to iasl in
-> > > > > with the wrong endianness in the header when running on a big endian
-> > > > > host. So instead of storing mixed endian information in our structures,
-> > > > > let's keep everything in little endian and byte-swap it only when we
-> > > > > need a value in the code.
-> > > > > 
-> > > > > Reported-by: Daniel P. Berrange <berrange@redhat.com>
-> > > > > Buglink: https://bugs.launchpad.net/qemu/+bug/1724570
-> > > > > Suggested-by: Michael S. Tsirkin <mst@redhat.com>
-> > > > > Signed-off-by: Thomas Huth <thuth@redhat.com>
-> > > > > ---
-> > > > >  v2: Fixed vmgenid-test which was accidentially broken in v1
-> > > > > 
-> > > > >  tests/acpi-utils.h       | 27 +++++----------------------
-> > > > >  tests/bios-tables-test.c | 42 ++++++++++++++++++++++--------------------
-> > > > >  tests/vmgenid-test.c     | 22 ++++++++++++----------
-> > > > >  3 files changed, 39 insertions(+), 52 deletions(-)
-> > > > > 
-> > > > > diff --git a/tests/acpi-utils.h b/tests/acpi-utils.h
-> > > > > index f8d8723..d5ca5b6 100644
-> > > > > --- a/tests/acpi-utils.h
-> > > > > +++ b/tests/acpi-utils.h
-> > > > > @@ -28,24 +28,9 @@ typedef struct {
-> > > > >      bool tmp_files_retain;   /* do not delete the temp asl/aml */
-> > > > >  } AcpiSdtTable;
-> > > > >  
-> > > > > -#define ACPI_READ_FIELD(field, addr)           \
-> > > > > -    do {                                       \
-> > > > > -        switch (sizeof(field)) {               \
-> > > > > -        case 1:                                \
-> > > > > -            field = readb(addr);               \
-> > > > > -            break;                             \
-> > > > > -        case 2:                                \
-> > > > > -            field = readw(addr);               \
-> > > > > -            break;                             \
-> > > > > -        case 4:                                \
-> > > > > -            field = readl(addr);               \
-> > > > > -            break;                             \
-> > > > > -        case 8:                                \
-> > > > > -            field = readq(addr);               \
-> > > > > -            break;                             \
-> > > > > -        default:                               \
-> > > > > -            g_assert(false);                   \
-> > > > > -        }                                      \    
-> > > > probably it's been discussed but, why not do
-> > > >  leXX_to_cpu()
-> > > > here, instead of making each place that access read field
-> > > > to do leXX_to_cpu() manually.?
-> > > > 
-> > > > Beside of keeping access to structure in natural host order,
-> > > > it should also be less error-prone as field users don't
-> > > > have to worry about endianness.    
-> > > 
-> > > Yes, I suggested that.
-> > > The issue is that we don't byte-swap all of the tables
-> > > (we can't, that would require a full ACPI parser).
-> > > So when byte-swapping we end up with a mixed host/LE
-> > > structures.  
-...
-> > What tables/use-cases do you have in mind where we'd need full
-> > ACPI parser /whatever it is/?  
-> 
-> We dump ACPI tables for parsing by iasl.
-I don't really see a problem here (i.e. how dumping blobs for
-iasl would require byte-swap all of the tables).
+I'm not sure what you're suggesting. I definitely think the
+s390 usage is pretty nasty but I guess it would need some
+rework to get rid of. For everything else, it's nice
+to have somewhere to share these things. You could argue
+for splitting the header into two, one for 'between memory.c
+and exec.c' and one for 'between memory.c and cputlb.c',
+but is it worth the effort?
 
-Where bios-tables-test.c is concerned we should just read
-a blob from qemu (get its location/len/name) and dump it to
-disk without changing anything in it.
-
-> >   
-> > > Keeping it all LE seems cleaner.
-> > > 
-> > >   
+thanks
+-- PMM
