@@ -1,34 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45096)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45920)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1eHFfn-0003Qm-8e
-	for qemu-devel@nongnu.org; Tue, 21 Nov 2017 16:01:40 -0500
+	(envelope-from <sw@weilnetz.de>) id 1eHFib-0004Tb-Mc
+	for qemu-devel@nongnu.org; Tue, 21 Nov 2017 16:04:34 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1eHFfj-0002nV-CJ
-	for qemu-devel@nongnu.org; Tue, 21 Nov 2017 16:01:39 -0500
-Received: from indium.canonical.com ([91.189.90.7]:35990)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1eHFfj-0002kZ-63
-	for qemu-devel@nongnu.org; Tue, 21 Nov 2017 16:01:35 -0500
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1eHFff-00042P-6i
-	for <qemu-devel@nongnu.org>; Tue, 21 Nov 2017 21:01:31 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id C22302E81BB
-	for <qemu-devel@nongnu.org>; Tue, 21 Nov 2017 21:01:26 +0000 (UTC)
+	(envelope-from <sw@weilnetz.de>) id 1eHFiX-0004DG-OG
+	for qemu-devel@nongnu.org; Tue, 21 Nov 2017 16:04:33 -0500
+References: <20171116163732.31584-1-sw@weilnetz.de>
+From: Stefan Weil <sw@weilnetz.de>
+Message-ID: <e52d9ae1-50df-8484-4476-e7b9d6ea0d76@weilnetz.de>
+Date: Tue, 21 Nov 2017 22:04:26 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Tue, 21 Nov 2017 20:53:02 -0000
-From: Tyler Doherty <1728256@bugs.launchpad.net>
-Reply-To: Bug 1728256 <1728256@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <150920686502.20214.12572544661418580428.malonedeb@soybean.canonical.com>
-Message-Id: <151129758247.18705.6495511163995730205.malone@gac.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1728256] Re: Memory corruption in Windows 10
- guest / amd64
+In-Reply-To: <20171116163732.31584-1-sw@weilnetz.de>
+Content-Type: text/plain; charset=utf-8
+Content-Language: de-DE
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH for-2.11] Fix build of console and GUI
+ executables for Windows
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,60 +24,39 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Peter Maydell <peter.maydell@linaro.org>, Fam Zheng <famz@redhat.com>, qemu-trivial@nongnu.org
+Cc: qemu-devel@nongnu.org
 
-I am on Arch as well, using a customized kernel using the vfio patchset
-(in this case 4.13.11). I was having the same issue as you guys, where
-my Windows 10 VM with an NVIDIA card passed in was getting the
-CRITICAL_STRUCTURE_CORRUPTION blue screen error message after running
-for a while. Usually I saw this when hitting some form of memory (GPU or
-system RAM), and it was quick (~3 hours) to crash while mining on the
-GPU (as that hits the GPU memory hard).
+Am 16.11.2017 um 17:37 schrieb Stefan Weil:
+> It was broken by commit 8ecc89f6e792152496eccb684d6c8c48aba8027d which
+> moved the SDL linker flags from macro libs_softmmu to macro SDL_LIBS.
+> 
+> Signed-off-by: Stefan Weil <sw@weilnetz.de>
+> ---
+> 
+> Peter, can you apply this fix directly, or do you need a pull request?
+> 
+> Regards
+> Stefan
+> 
+>  Makefile.target | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/Makefile.target b/Makefile.target
+> index e4244c188a..f9a9da7e7c 100644
+> --- a/Makefile.target
+> +++ b/Makefile.target
+> @@ -22,7 +22,7 @@ QEMU_PROG_BUILD = $(QEMU_PROG)
+>  else
+>  # system emulator name
+>  QEMU_PROG=qemu-system-$(TARGET_NAME)$(EXESUF)
+> -ifneq (,$(findstring -mwindows,$(libs_softmmu)))
+> +ifneq (,$(findstring -mwindows,$(SDL_LIBS)))
+>  # Terminate program name with a 'w' because the linker builds a windows executable.
+>  QEMU_PROGW=qemu-system-$(TARGET_NAME)w$(EXESUF)
+>  $(QEMU_PROG): $(QEMU_PROGW)
 
-It looks like what Jimi said above about swap seeming to be a
-contributing factor seems to be correct. I have disabled swap on my host
-and have seen no instability thus far.
 
-Windows 7 also may be seeing similar issues, though it was just crashing
-though without displaying an error as far as I could see. This VM has an
-AMD card in it. Same goes for it, where it also has not crashed after
-more than a day after disabling swap.
+The fix missed v2.11.0-rc2. Can it be applied before v2.11.0-rc3?
 
--- =
-
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1728256
-
-Title:
-  Memory corruption in Windows 10 guest / amd64
-
-Status in QEMU:
-  New
-
-Bug description:
-  I have a Win 10 Pro x64 guest inside a qemu/kvm running on an Arch x86_64=
- host. The VM has a physical GPU passed through, as well as the physical US=
-B controllers, as well as a dedicated SSD attached via SATA; you can find t=
-he complete libvirt xml here: https://pastebin.com/U1ZAXBNg
-  I built qemu from source using the qemu-minimal-git AUR package; you can =
-find the build script here: https://aur.archlinux.org/cgit/aur.git/tree/PKG=
-BUILD?h=3Dqemu-minimal-git (if you aren't familiar with Arch, this is essen=
-tially a bash script where build() and package() are run to build the files=
-, and then install them into the $pkgdir to later tar them up.)
-
-  Starting with qemu v2.10.0, Windows crashes randomly with a bluescreen
-  about CRITICAL_STRUCTURE_CORRUPTION. I also tested the git heads
-  f90ea7ba7c, 861cd431c9 and e822e81e35, before I went back to v2.9.0,
-  which is running stable for over 50 hours right now.
-
-  During my tests I found that locking the memory pages alleviates the
-  problem somewhat, but never completely avoids it. However, with the
-  crashes occuring randomly, that could as well be false conclusions; I
-  had crashes within minutes after boot with that too.
-
-  I will now start `git bisect`ing; if you have any other suggestions on
-  what I could try or possible patches feel free to leave them with me.
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1728256/+subscriptions
+Thanks, Stefan
