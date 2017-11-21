@@ -1,23 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40445)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40506)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mikhail.abakumov@ispras.ru>) id 1eH9GP-0002n3-K5
-	for qemu-devel@nongnu.org; Tue, 21 Nov 2017 09:11:05 -0500
+	(envelope-from <mikhail.abakumov@ispras.ru>) id 1eH9Ga-0002wp-K6
+	for qemu-devel@nongnu.org; Tue, 21 Nov 2017 09:11:15 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mikhail.abakumov@ispras.ru>) id 1eH9GM-0003Qn-VJ
-	for qemu-devel@nongnu.org; Tue, 21 Nov 2017 09:11:01 -0500
-Received: from mail.ispras.ru ([83.149.199.45]:38644)
+	(envelope-from <mikhail.abakumov@ispras.ru>) id 1eH9GT-0003bR-Qt
+	for qemu-devel@nongnu.org; Tue, 21 Nov 2017 09:11:12 -0500
+Received: from mail.ispras.ru ([83.149.199.45]:38678)
 	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mikhail.abakumov@ispras.ru>) id 1eH9GM-0003QD-Nd
-	for qemu-devel@nongnu.org; Tue, 21 Nov 2017 09:10:58 -0500
+	(envelope-from <mikhail.abakumov@ispras.ru>) id 1eH9GT-0003b4-Cc
+	for qemu-devel@nongnu.org; Tue, 21 Nov 2017 09:11:05 -0500
 From: Mihail Abakumov <mikhail.abakumov@ispras.ru>
-Date: Tue, 21 Nov 2017 17:10:56 +0300
-Message-ID: <151127345586.6888.4109654104815822158.stgit@Misha-PC.lan02.inno>
+Date: Tue, 21 Nov 2017 17:11:01 +0300
+Message-ID: <151127346143.6888.10589409888753299614.stgit@Misha-PC.lan02.inno>
 In-Reply-To: <151127322955.6888.16198535123422076171.stgit@Misha-PC.lan02.inno>
 References: <151127322955.6888.16198535123422076171.stgit@Misha-PC.lan02.inno>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Subject: [Qemu-devel] [PATCH v3 39/45] windbg: implemented kd_api_get_version
+Subject: [Qemu-devel] [PATCH v3 40/45] windbg: implemented kd_api_read_msr
+ and kd_api_write_msr
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,68 +34,370 @@ Signed-off-by: Mihail Abakumov <mikhail.abakumov@ispras.ru>
 Signed-off-by: Pavel Dovgalyuk <dovgaluk@ispras.ru>
 Signed-off-by: Dmitriy Koltunov <koltunov@ispras.ru>
 ---
- include/exec/windbgstub-utils.h |    1 +
- windbgstub-utils.c              |   22 ++++++++++++++++++++++
- windbgstub.c                    |    4 ++++
- 3 files changed, 27 insertions(+)
+ include/exec/windbgstub-utils.h |    2 
+ target/i386/windbgstub.c        |  319 +++++++++++++++++++++++++++++++++++++++
+ windbgstub.c                    |    8 +
+ 3 files changed, 329 insertions(+)
 
 diff --git a/include/exec/windbgstub-utils.h b/include/exec/windbgstub-utils.h
-index be48f69f40..bc5b6a8468 100755
+index bc5b6a8468..73d49b774d 100755
 --- a/include/exec/windbgstub-utils.h
 +++ b/include/exec/windbgstub-utils.h
-@@ -99,6 +99,7 @@ void kd_api_read_io_space(CPUState *cpu, PacketData *pd);
- void kd_api_write_io_space(CPUState *cpu, PacketData *pd);
+@@ -100,6 +100,8 @@ void kd_api_write_io_space(CPUState *cpu, PacketData *pd);
  void kd_api_read_physical_memory(CPUState *cpu, PacketData *pd);
  void kd_api_write_physical_memory(CPUState *cpu, PacketData *pd);
-+void kd_api_get_version(CPUState *cpu, PacketData *pd);
+ void kd_api_get_version(CPUState *cpu, PacketData *pd);
++void kd_api_read_msr(CPUState *cpu, PacketData *pd);
++void kd_api_write_msr(CPUState *cpu, PacketData *pd);
  void kd_api_unsupported(CPUState *cpu, PacketData *pd);
  
  SizedBuf kd_gen_exception_sc(CPUState *cpu);
-diff --git a/windbgstub-utils.c b/windbgstub-utils.c
-index 6708e62798..7ef301bac7 100755
---- a/windbgstub-utils.c
-+++ b/windbgstub-utils.c
-@@ -239,6 +239,28 @@ void kd_api_write_physical_memory(CPUState *cpu, PacketData *pd)
+diff --git a/target/i386/windbgstub.c b/target/i386/windbgstub.c
+index 43e6d45df9..735b2edd5f 100755
+--- a/target/i386/windbgstub.c
++++ b/target/i386/windbgstub.c
+@@ -1003,6 +1003,325 @@ void kd_api_write_control_space(CPUState *cpu, PacketData *pd)
      stl_p(&mem->ActualBytesWritten, len);
  }
  
-+void kd_api_get_version(CPUState *cpu, PacketData *pd)
++void kd_api_read_msr(CPUState *cpu, PacketData *pd)
 +{
-+    DBGKD_GET_VERSION64 *kdver;
-+    int err = cpu_memory_rw_debug(cpu, version.addr, PTR(pd->m64) + 0x10,
-+                                  sizeof(DBGKD_MANIPULATE_STATE64) - 0x10, 0);
-+    if (!err) {
-+        kdver = (DBGKD_GET_VERSION64 *) (PTR(pd->m64) + 0x10);
++    DBGKD_READ_WRITE_MSR *m64c = &pd->m64.u.ReadWriteMsr;
++    CPUArchState *env = cpu->env_ptr;
 +
-+        stw_p(&kdver->MajorVersion, kdver->MajorVersion);
-+        stw_p(&kdver->MinorVersion, kdver->MinorVersion);
-+        stw_p(&kdver->Flags, kdver->Flags);
-+        stw_p(&kdver->MachineType, kdver->MachineType);
-+        stw_p(&kdver->Unused[0], kdver->Unused[0]);
-+        sttul_p(&kdver->KernBase, kdver->KernBase);
-+        sttul_p(&kdver->PsLoadedModuleList, kdver->PsLoadedModuleList);
-+        sttul_p(&kdver->DebuggerDataList, kdver->DebuggerDataList);
-+    } else {
-+        pd->m64.ReturnStatus = STATUS_UNSUCCESSFUL;
-+        WINDBG_ERROR("get_version: " FMT_ERR, err);
++    uint64_t val;
++
++    cpu_svm_check_intercept_param(env, SVM_EXIT_MSR, 0, 0);
++
++    switch ((uint32_t)env->regs[R_ECX]) {
++    case MSR_IA32_SYSENTER_CS:
++        val = env->sysenter_cs;
++        break;
++    case MSR_IA32_SYSENTER_ESP:
++        val = env->sysenter_esp;
++        break;
++    case MSR_IA32_SYSENTER_EIP:
++        val = env->sysenter_eip;
++        break;
++    case MSR_IA32_APICBASE:
++        val = cpu_get_apic_base(x86_env_get_cpu(env)->apic_state);
++        break;
++    case MSR_EFER:
++        val = env->efer;
++        break;
++    case MSR_STAR:
++        val = env->star;
++        break;
++    case MSR_PAT:
++        val = env->pat;
++        break;
++    case MSR_VM_HSAVE_PA:
++        val = env->vm_hsave;
++        break;
++    case MSR_IA32_PERF_STATUS:
++        /* tsc_increment_by_tick */
++        val = 1000ULL;
++        /* CPU multiplier */
++        val |= (((uint64_t)4ULL) << 40);
++        break;
++#ifdef TARGET_X86_64
++    case MSR_LSTAR:
++        val = env->lstar;
++        break;
++    case MSR_CSTAR:
++        val = env->cstar;
++        break;
++    case MSR_FMASK:
++        val = env->fmask;
++        break;
++    case MSR_FSBASE:
++        val = env->segs[R_FS].base;
++        break;
++    case MSR_GSBASE:
++        val = env->segs[R_GS].base;
++        break;
++    case MSR_KERNELGSBASE:
++        val = env->kernelgsbase;
++        break;
++    case MSR_TSC_AUX:
++        val = env->tsc_aux;
++        break;
++#endif
++    case MSR_MTRRphysBase(0):
++    case MSR_MTRRphysBase(1):
++    case MSR_MTRRphysBase(2):
++    case MSR_MTRRphysBase(3):
++    case MSR_MTRRphysBase(4):
++    case MSR_MTRRphysBase(5):
++    case MSR_MTRRphysBase(6):
++    case MSR_MTRRphysBase(7):
++        val = env->mtrr_var[((uint32_t)env->regs[R_ECX] -
++                             MSR_MTRRphysBase(0)) / 2].base;
++        break;
++    case MSR_MTRRphysMask(0):
++    case MSR_MTRRphysMask(1):
++    case MSR_MTRRphysMask(2):
++    case MSR_MTRRphysMask(3):
++    case MSR_MTRRphysMask(4):
++    case MSR_MTRRphysMask(5):
++    case MSR_MTRRphysMask(6):
++    case MSR_MTRRphysMask(7):
++        val = env->mtrr_var[((uint32_t)env->regs[R_ECX] -
++                             MSR_MTRRphysMask(0)) / 2].mask;
++        break;
++    case MSR_MTRRfix64K_00000:
++        val = env->mtrr_fixed[0];
++        break;
++    case MSR_MTRRfix16K_80000:
++    case MSR_MTRRfix16K_A0000:
++        val = env->mtrr_fixed[(uint32_t)env->regs[R_ECX] -
++                              MSR_MTRRfix16K_80000 + 1];
++        break;
++    case MSR_MTRRfix4K_C0000:
++    case MSR_MTRRfix4K_C8000:
++    case MSR_MTRRfix4K_D0000:
++    case MSR_MTRRfix4K_D8000:
++    case MSR_MTRRfix4K_E0000:
++    case MSR_MTRRfix4K_E8000:
++    case MSR_MTRRfix4K_F0000:
++    case MSR_MTRRfix4K_F8000:
++        val = env->mtrr_fixed[(uint32_t)env->regs[R_ECX] -
++                              MSR_MTRRfix4K_C0000 + 3];
++        break;
++    case MSR_MTRRdefType:
++        val = env->mtrr_deftype;
++        break;
++    case MSR_MTRRcap:
++        if (env->features[FEAT_1_EDX] & CPUID_MTRR) {
++            val = MSR_MTRRcap_VCNT | MSR_MTRRcap_FIXRANGE_SUPPORT |
++                MSR_MTRRcap_WC_SUPPORTED;
++        } else {
++            /* XXX: exception? */
++            val = 0;
++        }
++        break;
++    case MSR_MCG_CAP:
++        val = env->mcg_cap;
++        break;
++    case MSR_MCG_CTL:
++        if (env->mcg_cap & MCG_CTL_P) {
++            val = env->mcg_ctl;
++        } else {
++            val = 0;
++        }
++        break;
++    case MSR_MCG_STATUS:
++        val = env->mcg_status;
++        break;
++    case MSR_IA32_MISC_ENABLE:
++        val = env->msr_ia32_misc_enable;
++        break;
++    case MSR_IA32_BNDCFGS:
++        val = env->msr_bndcfgs;
++        break;
++    default:
++        if ((uint32_t)env->regs[R_ECX] >= MSR_MC0_CTL
++            && (uint32_t)env->regs[R_ECX] < MSR_MC0_CTL +
++            (4 * env->mcg_cap & 0xff)) {
++            uint32_t offset = (uint32_t)env->regs[R_ECX] - MSR_MC0_CTL;
++            val = env->mce_banks[offset];
++            break;
++        }
++        /* XXX: exception? */
++        val = 0;
++        break;
 +    }
++
++    stq_p(&val, val);
++    m64c->DataValueLow  = UINT32_P(val)[0];
++    m64c->DataValueHigh = UINT32_P(val)[1];
++    pd->m64.ReturnStatus = STATUS_SUCCESS;
 +}
 +
- void kd_api_unsupported(CPUState *cpu, PacketData *pd)
++void kd_api_write_msr(CPUState *cpu, PacketData *pd)
++{
++    DBGKD_READ_WRITE_MSR *m64c = &pd->m64.u.ReadWriteMsr;
++    CPUArchState *env = cpu->env_ptr;
++
++    uint64_t val;
++
++    cpu_svm_check_intercept_param(env, SVM_EXIT_MSR, 1, 0);
++
++    val = m64c->DataValueLow | ((uint64_t) m64c->DataValueHigh) << 32;
++    val = ldq_p(&val);
++
++    switch ((uint32_t)env->regs[R_ECX]) {
++    case MSR_IA32_SYSENTER_CS:
++        env->sysenter_cs = val & 0xffff;
++        break;
++    case MSR_IA32_SYSENTER_ESP:
++        env->sysenter_esp = val;
++        break;
++    case MSR_IA32_SYSENTER_EIP:
++        env->sysenter_eip = val;
++        break;
++    case MSR_IA32_APICBASE:
++        cpu_set_apic_base(x86_env_get_cpu(env)->apic_state, val);
++        break;
++    case MSR_EFER:
++        {
++            uint64_t update_mask;
++
++            update_mask = 0;
++            if (env->features[FEAT_8000_0001_EDX] & CPUID_EXT2_SYSCALL) {
++                update_mask |= MSR_EFER_SCE;
++            }
++            if (env->features[FEAT_8000_0001_EDX] & CPUID_EXT2_LM) {
++                update_mask |= MSR_EFER_LME;
++            }
++            if (env->features[FEAT_8000_0001_EDX] & CPUID_EXT2_FFXSR) {
++                update_mask |= MSR_EFER_FFXSR;
++            }
++            if (env->features[FEAT_8000_0001_EDX] & CPUID_EXT2_NX) {
++                update_mask |= MSR_EFER_NXE;
++            }
++            if (env->features[FEAT_8000_0001_ECX] & CPUID_EXT3_SVM) {
++                update_mask |= MSR_EFER_SVME;
++            }
++            if (env->features[FEAT_8000_0001_EDX] & CPUID_EXT2_FFXSR) {
++                update_mask |= MSR_EFER_FFXSR;
++            }
++            cpu_load_efer(env, (env->efer & ~update_mask) |
++                          (val & update_mask));
++        }
++        break;
++    case MSR_STAR:
++        env->star = val;
++        break;
++    case MSR_PAT:
++        env->pat = val;
++        break;
++    case MSR_VM_HSAVE_PA:
++        env->vm_hsave = val;
++        break;
++#ifdef TARGET_X86_64
++    case MSR_LSTAR:
++        env->lstar = val;
++        break;
++    case MSR_CSTAR:
++        env->cstar = val;
++        break;
++    case MSR_FMASK:
++        env->fmask = val;
++        break;
++    case MSR_FSBASE:
++        env->segs[R_FS].base = val;
++        break;
++    case MSR_GSBASE:
++        env->segs[R_GS].base = val;
++        break;
++    case MSR_KERNELGSBASE:
++        env->kernelgsbase = val;
++        break;
++#endif
++    case MSR_MTRRphysBase(0):
++    case MSR_MTRRphysBase(1):
++    case MSR_MTRRphysBase(2):
++    case MSR_MTRRphysBase(3):
++    case MSR_MTRRphysBase(4):
++    case MSR_MTRRphysBase(5):
++    case MSR_MTRRphysBase(6):
++    case MSR_MTRRphysBase(7):
++        env->mtrr_var[((uint32_t)env->regs[R_ECX] -
++                       MSR_MTRRphysBase(0)) / 2].base = val;
++        break;
++    case MSR_MTRRphysMask(0):
++    case MSR_MTRRphysMask(1):
++    case MSR_MTRRphysMask(2):
++    case MSR_MTRRphysMask(3):
++    case MSR_MTRRphysMask(4):
++    case MSR_MTRRphysMask(5):
++    case MSR_MTRRphysMask(6):
++    case MSR_MTRRphysMask(7):
++        env->mtrr_var[((uint32_t)env->regs[R_ECX] -
++                       MSR_MTRRphysMask(0)) / 2].mask = val;
++        break;
++    case MSR_MTRRfix64K_00000:
++        env->mtrr_fixed[(uint32_t)env->regs[R_ECX] -
++                        MSR_MTRRfix64K_00000] = val;
++        break;
++    case MSR_MTRRfix16K_80000:
++    case MSR_MTRRfix16K_A0000:
++        env->mtrr_fixed[(uint32_t)env->regs[R_ECX] -
++                        MSR_MTRRfix16K_80000 + 1] = val;
++        break;
++    case MSR_MTRRfix4K_C0000:
++    case MSR_MTRRfix4K_C8000:
++    case MSR_MTRRfix4K_D0000:
++    case MSR_MTRRfix4K_D8000:
++    case MSR_MTRRfix4K_E0000:
++    case MSR_MTRRfix4K_E8000:
++    case MSR_MTRRfix4K_F0000:
++    case MSR_MTRRfix4K_F8000:
++        env->mtrr_fixed[(uint32_t)env->regs[R_ECX] -
++                        MSR_MTRRfix4K_C0000 + 3] = val;
++        break;
++    case MSR_MTRRdefType:
++        env->mtrr_deftype = val;
++        break;
++    case MSR_MCG_STATUS:
++        env->mcg_status = val;
++        break;
++    case MSR_MCG_CTL:
++        if ((env->mcg_cap & MCG_CTL_P)
++            && (val == 0 || val == ~(uint64_t)0)) {
++            env->mcg_ctl = val;
++        }
++        break;
++    case MSR_TSC_AUX:
++        env->tsc_aux = val;
++        break;
++    case MSR_IA32_MISC_ENABLE:
++        env->msr_ia32_misc_enable = val;
++        break;
++    case MSR_IA32_BNDCFGS:
++        /* FIXME: #GP if reserved bits are set.  */
++        /* FIXME: Extend highest implemented bit of linear address.  */
++        env->msr_bndcfgs = val;
++        cpu_sync_bndcs_hflags(env);
++        break;
++    default:
++        if ((uint32_t)env->regs[R_ECX] >= MSR_MC0_CTL
++            && (uint32_t)env->regs[R_ECX] < MSR_MC0_CTL +
++            (4 * env->mcg_cap & 0xff)) {
++            uint32_t offset = (uint32_t)env->regs[R_ECX] - MSR_MC0_CTL;
++            if ((offset & 0x3) != 0
++                || (val == 0 || val == ~(uint64_t)0)) {
++                env->mce_banks[offset] = val;
++            }
++            break;
++        }
++        /* XXX: exception? */
++        break;
++    }
++
++    pd->m64.ReturnStatus = STATUS_SUCCESS;
++}
++
+ bool windbg_on_load(void)
  {
-     WINDBG_ERROR("Caught unimplemented api %s",
+     CPUState *cpu = qemu_get_cpu(0);
 diff --git a/windbgstub.c b/windbgstub.c
-index 72324ae53d..ddca290694 100755
+index ddca290694..0268d0818e 100755
 --- a/windbgstub.c
 +++ b/windbgstub.c
-@@ -197,6 +197,10 @@ static void windbg_process_manipulate_packet(ParsingContext *ctx)
+@@ -197,6 +197,14 @@ static void windbg_process_manipulate_packet(ParsingContext *ctx)
          kd_api_write_physical_memory(cpu, &ctx->data);
          break;
  
-+    case DbgKdGetVersionApi:
-+        kd_api_get_version(cpu, &ctx->data);
++    case DbgKdReadMachineSpecificRegister:
++        kd_api_read_msr(cpu, &ctx->data);
 +        break;
 +
-     case DbgKdClearAllInternalBreakpointsApi:
-         return;
- 
++    case DbgKdWriteMachineSpecificRegister:
++        kd_api_write_msr(cpu, &ctx->data);
++        break;
++
+     case DbgKdGetVersionApi:
+         kd_api_get_version(cpu, &ctx->data);
+         break;
