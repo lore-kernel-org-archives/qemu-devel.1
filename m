@@ -1,42 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38680)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38780)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pmorel@linux.vnet.ibm.com>) id 1eHCYR-0003LS-BD
-	for qemu-devel@nongnu.org; Tue, 21 Nov 2017 12:41:52 -0500
+	(envelope-from <kwolf@redhat.com>) id 1eHCYp-0003YY-Va
+	for qemu-devel@nongnu.org; Tue, 21 Nov 2017 12:42:17 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pmorel@linux.vnet.ibm.com>) id 1eHCYO-00055s-N9
-	for qemu-devel@nongnu.org; Tue, 21 Nov 2017 12:41:51 -0500
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:54426
-	helo=mx0a-001b2d01.pphosted.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pmorel@linux.vnet.ibm.com>)
-	id 1eHCYO-00055I-H8
-	for qemu-devel@nongnu.org; Tue, 21 Nov 2017 12:41:48 -0500
-Received: from pps.filterd (m0098417.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
-	vALHet4j044879
-	for <qemu-devel@nongnu.org>; Tue, 21 Nov 2017 12:41:42 -0500
-Received: from e06smtp13.uk.ibm.com (e06smtp13.uk.ibm.com [195.75.94.109])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2ecq4378cs-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Tue, 21 Nov 2017 12:41:41 -0500
-Received: from localhost
-	by e06smtp13.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
-	Only! Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <pmorel@linux.vnet.ibm.com>;
-	Tue, 21 Nov 2017 17:41:39 -0000
-References: <1510854715-7081-1-git-send-email-pmorel@linux.vnet.ibm.com>
-	<1510854715-7081-2-git-send-email-pmorel@linux.vnet.ibm.com>
-	<20171121113506.78788104.cohuck@redhat.com>
-From: Pierre Morel <pmorel@linux.vnet.ibm.com>
-Date: Tue, 21 Nov 2017 18:41:35 +0100
+	(envelope-from <kwolf@redhat.com>) id 1eHCYo-0005N8-NZ
+	for qemu-devel@nongnu.org; Tue, 21 Nov 2017 12:42:16 -0500
+Date: Tue, 21 Nov 2017 18:42:02 +0100
+From: Kevin Wolf <kwolf@redhat.com>
+Message-ID: <20171121174202.GD11073@localhost.localdomain>
+References: <1510654613-47868-1-git-send-email-anton.nefedov@virtuozzo.com>
+	<1510654613-47868-3-git-send-email-anton.nefedov@virtuozzo.com>
+	<97df2225-908c-e817-8364-2454f1451768@redhat.com>
+	<1dae35e5-390f-cfbe-fbd1-8c993517d596@virtuozzo.com>
+	<efa75e61-f1f7-478f-b5b5-ab39491761e2@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20171121113506.78788104.cohuck@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Message-Id: <2202dba4-de17-e7fe-0fac-3aa293d2ab72@linux.vnet.ibm.com>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v2 1/7] s390x/pci: factor out endianess
- conversion
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="WYTEVAkct0FjGQmd"
+Content-Disposition: inline
+In-Reply-To: <efa75e61-f1f7-478f-b5b5-ab39491761e2@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH 2/5] qcow2: multiple clusters write
+ compressed
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -45,97 +28,127 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Cornelia Huck <cohuck@redhat.com>
-Cc: qemu-devel@nongnu.org, agraf@suse.de, borntraeger@de.ibm.com, zyimin@linux.vnet.ibm.com, pasic@linux.vnet.ibm.com
+To: Max Reitz <mreitz@redhat.com>
+Cc: Anton Nefedov <anton.nefedov@virtuozzo.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org, eblake@redhat.com, stefanha@redhat.com, famz@redhat.com, den@virtuozzo.com, Pavel Butsykin <pbutsykin@virtuozzo.com>
 
-On 21/11/2017 11:35, Cornelia Huck wrote:
-> On Thu, 16 Nov 2017 18:51:49 +0100
-> Pierre Morel <pmorel@linux.vnet.ibm.com> wrote:
->=20
->> There are two places where the same endianness conversion
->> is done.
->> Let's factor this out into a static function.
->>
->> Signed-off-by: Pierre Morel <pmorel@linux.vnet.ibm.com>
->> Reviewed-by: Yi Min Zhao <zyimin@linux.vnet.ibm.com>
->> Signed-off-by: Pierre Morel <pmorel@linux.vnet.ibm.com>
->=20
-> Your two s-o-bs look a bit odd...
->=20
->> ---
->>   hw/s390x/s390-pci-inst.c | 59 +++++++++++++++++++++++++++-----------=
-----------
->>   1 file changed, 33 insertions(+), 26 deletions(-)
->>
->> diff --git a/hw/s390x/s390-pci-inst.c b/hw/s390x/s390-pci-inst.c
->> index 8e088f3..ded1556 100644
->> --- a/hw/s390x/s390-pci-inst.c
->> +++ b/hw/s390x/s390-pci-inst.c
->> @@ -314,6 +314,36 @@ out:
->>       return 0;
->>   }
->>  =20
->> +/**
->> + * This function is called when endianess is fixed, whatever the host=
- endianess
->> + * is, like in our case from s390x BIG endian registers to little end=
-ian PCI
->> + * Bars, to translate the uint64_t pointed from one endianess to the =
-other.
->=20
-> I would rephrase this a bit:
->=20
-> "Swap data contained in s390x big endian registers to little endian PCI
-> bars."
 
-Simpler and clearer. thanks.
+--WYTEVAkct0FjGQmd
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
+Am 15.11.2017 um 17:30 hat Max Reitz geschrieben:
+> On 2017-11-15 17:28, Anton Nefedov wrote:
+> > On 15/11/2017 6:11 PM, Max Reitz wrote:
+> >> On 2017-11-14 11:16, Anton Nefedov wrote:
+> >>> From: Pavel Butsykin <pbutsykin@virtuozzo.com>
+> >>>
+> >>> At the moment, qcow2_co_pwritev_compressed can process the requests s=
+ize
+> >>> less than or equal to one cluster. This patch added possibility to wr=
+ite
+> >>> compressed data in the QCOW2 more than one cluster. The implementation
+> >>> is simple, we just split large requests into separate clusters and wr=
+ite
+> >>> using existing functionality. For unaligned requests we use a workaro=
+und
+> >>> and do write data without compression.
+> >>>
+> >>> Signed-off-by: Anton Nefedov <anton.nefedov@virtuozzo.com>
+> >>> ---
+> >>> =A0 block/qcow2.c | 77
+> >>> +++++++++++++++++++++++++++++++++++++++++++----------------
+> >>> =A0 1 file changed, 56 insertions(+), 21 deletions(-)
+> >>
+> >> On one hand, it might be better to do this centrally somewhere in
+> >> block/io.c.=A0 On the other, that would require more work because it w=
+ould
+> >> probably mean having to introduce another field in BlockLimits, and it
+> >> wouldn't do much -- because qcow (v1) is, well, qcow v1...=A0 And vmdk
+> >> seems to completely not care about this single cluster limitation.=A0 =
+So
+> >> for now we probably wouldn't even gain anything by doing this in
+> >> block/io.c.
+> >>
+> >> So long story short, it's OK to do this locally in qcow2, yes.
+> >>
+> >=20
+> > [..]
+> >=20
+> >>> +=A0=A0=A0=A0=A0=A0=A0 qemu_iovec_reset(&hd_qiov);
+> >>> +=A0=A0=A0=A0=A0=A0=A0 chunk_size =3D MIN(bytes, s->cluster_size);
+> >>> +=A0=A0=A0=A0=A0=A0=A0 qemu_iovec_concat(&hd_qiov, qiov, curr_off, ch=
+unk_size);
+> >>> +
+> >>> +=A0=A0=A0=A0=A0=A0=A0 ret =3D qcow2_co_pwritev_cluster_compressed(bs=
+, offset +
+> >>> curr_off,
+> >>> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=
+=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=
+=A0=A0 chunk_size,
+> >>> &hd_qiov);
+> >>> +=A0=A0=A0=A0=A0=A0=A0 if (ret =3D=3D -ENOTSUP) {
+> >>
+> >> Why this?=A0 I mean, I can see the appeal, but then we should probably
+> >> actually return -ENOTSUP somewhere (e.g. for unaligned clusters and the
+> >> like) -- and we should not abort if offset_into_cluster(s, cluster) is
+> >> true, but we should write the header uncompressed and compress the main
+> >> bulk.
+> >>
+> >> Max
+> >>
+> >=20
+> > Right, sorry, missed this part when porting the patch.
+> >=20
+> > I think this needs to be removed (and the commit message fixed
+> > accordingly).
+> > Returning an error, rather than silently falling back to uncompressed
+> > seems preferable to me. "Compressing writers" (backup, img convert and
+> > now stream) are aware that they have to cluster-align, and if they fail
+> > to do so that means there is an error somewhere.
 >=20
-> That makes it clear that this function is for a specialized use case.
+> OK for me.
 >=20
->> + *
->> + * @ptr: a pointer to a uint64_t data field
->> + * @len: the length of the valid data, must be 1,2,4 or 8
->> + */
->> +static int zpci_endian_swap(uint64_t *ptr, uint8_t len)
->> +{
->> +    uint64_t data =3D *ptr;
+> > If it won't return an error anymore, then the unaligned tail shouldn't
+> > either. So we can end up 'letting' the callers send small unaligned
+> > requests which will never get compressed.
 >=20
-> Please add an extra empty line.
+> Either way is fine.  It just looks to me like vmdk falls back to
+> uncompressed writes, so it's not like it would be completely new behavior=
+=2E..
+>=20
+> (But I won't judge whether what vmdk does is a good idea.)
 
-yes.
+Probably not.
 
->=20
->> +    switch (len) {
->> +    case 1:
->> +        break;
->> +    case 2:
->> +        data =3D bswap16(data);
->> +        break;
->> +    case 4:
->> +        data =3D bswap32(data);
->> +        break;
->> +    case 8:
->> +        data =3D bswap64(data);
->> +        break;
->> +    default:
->> +        return -EINVAL;
->> +    }
->> +    *ptr =3D data;
->> +    return 0;
->> +}
->> +
->>   int pcilg_service_call(S390CPU *cpu, uint8_t r1, uint8_t r2)
->>   {
->>       CPUS390XState *env =3D &cpu->env;
->=20
-> Other than the nits above, looks good.
->=20
+If we let io.c know about the cluster-size alignment requirement for
+compressed writes, the usual RMW code path could kick in. Wouldn't this
+actually be a better solution than uncompressed writes or erroring out?
 
-Thanks for the review
+In fact, with this, we might even be very close to an option that turns
+every write into a compressed write, so you get images that stay
+compressed even while they are in use.
 
-Pierre
+Kevin
 
---=20
-Pierre Morel
-Linux/KVM/QEMU in B=C3=B6blingen - Germany
+--WYTEVAkct0FjGQmd
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIcBAEBAgAGBQJaFGVqAAoJEH8JsnLIjy/WJdEP/2Qhd+FX+9iYKuRunvWISNHJ
+BFURS1CP+N00gAtoJUzsgeCtT/wMg1S5eyVK6u6C8S6LwlkqyeOu2kr5eHAbwAmw
+8/MEB8VR0hDvNfyp4bvzUYEE2ZqbPeVqg0Gw7d0qQy4nS89WLB8ff4zupm9Ar7ht
+UfwDpEnqCapBg3Ipfpg87hVALCOR6wAJ6rXu9sf6FCqENsV8i8uMzaI0Zw/wBUHw
+lrRZW4YZug8bCSamuDEWhyBxXA5aYWUvXXjQkIZm+60MXC/GSQblpWqJd0/HLzQ4
+9Knx+BlGZBsBymHnTO5aNJi2bVlugTRBiW6FgkfvTHgBO8Ji0e5HPfHcUWZY3Z5J
+L018CDtJeHrY9gPDDx6KKcrJeky18lxs8bCl8iC6OuFYlrNxP0IUitGt2UDutWnQ
+qucvwC7nGNgbZdruDS7tiDj9vNHvz3s4+dCrCQcV/CEu8B4+eHjc5NyPMIgY6omn
+dHEDLmcyODcix4J890Mni5JJKUV5oBn0KncN8apUn1uGznTQEMD73U0Gpe9XYBe9
+3vHBOPzbSyXLKKJLLD6sGFIBVsG/gsBWElm1Z4CRVPuv5d8OAOWtGLuvcxNJgsJd
+XVVSs0UusRPtzb1SRIghwzEW9Yg/TL3FkbfmA0cEHZWLh+dK8BHMQ9itAmdHtn6I
+gqzCnivB0sktgB8pRMfd
+=FW8l
+-----END PGP SIGNATURE-----
+
+--WYTEVAkct0FjGQmd--
