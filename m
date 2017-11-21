@@ -1,31 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37429)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38830)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1eH98U-0006SL-NK
-	for qemu-devel@nongnu.org; Tue, 21 Nov 2017 09:02:57 -0500
+	(envelope-from <mikhail.abakumov@ispras.ru>) id 1eH9Cu-0007wr-QO
+	for qemu-devel@nongnu.org; Tue, 21 Nov 2017 09:07:30 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1eH98O-0005bZ-8N
-	for qemu-devel@nongnu.org; Tue, 21 Nov 2017 09:02:50 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:43934)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1eH98O-0005ad-0I
-	for qemu-devel@nongnu.org; Tue, 21 Nov 2017 09:02:44 -0500
-Date: Tue, 21 Nov 2017 15:02:36 +0100
-From: Igor Mammedov <imammedo@redhat.com>
-Message-ID: <20171121150236.1277cfca@redhat.com>
-In-Reply-To: <20171109200235.GG3111@localhost.localdomain>
-References: <1508170976-96869-4-git-send-email-imammedo@redhat.com>
-	<1508325132-70513-1-git-send-email-imammedo@redhat.com>
-	<20171019063151.GA13245@umbus>
-	<20171031150114.60e0958e@nial.brq.redhat.com>
-	<20171106180216.GT3111@localhost.localdomain>
-	<20171107160404.40e368da.cohuck@redhat.com>
-	<20171109065803.GG7732@umbus.fritz.box>
-	<20171109200235.GG3111@localhost.localdomain>
+	(envelope-from <mikhail.abakumov@ispras.ru>) id 1eH9Cq-0001oJ-NV
+	for qemu-devel@nongnu.org; Tue, 21 Nov 2017 09:07:24 -0500
+Received: from mail.ispras.ru ([83.149.199.45]:37600)
+	by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <mikhail.abakumov@ispras.ru>) id 1eH9Cq-0001m5-9q
+	for qemu-devel@nongnu.org; Tue, 21 Nov 2017 09:07:20 -0500
+From: Mihail Abakumov <mikhail.abakumov@ispras.ru>
+Date: Tue, 21 Nov 2017 17:07:16 +0300
+Message-ID: <151127322955.6888.16198535123422076171.stgit@Misha-PC.lan02.inno>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [RFC v2 3/6] possible_cpus: add CPUArchId::type
- field
+Subject: [Qemu-devel] [PATCH v3 00/45] Windbg supporting
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,129 +24,125 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eduardo Habkost <ehabkost@redhat.com>
-Cc: David Gibson <david@gibson.dropbear.id.au>, Cornelia Huck <cohuck@redhat.com>, qemu-devel@nongnu.org, peter.maydell@linaro.org, pkrempa@redhat.com, pbonzini@redhat.com, drjones@redhat.com
+To: qemu-devel@nongnu.org
+Cc: sw@weilnetz.de, lprosek@redhat.com, dovgaluk@ispras.ru, rkagan@virtuozzo.com, pbonzini@redhat.com, den@openvz.org
 
-On Thu, 9 Nov 2017 18:02:35 -0200
-Eduardo Habkost <ehabkost@redhat.com> wrote:
+An update of:
 
-> On Thu, Nov 09, 2017 at 05:58:03PM +1100, David Gibson wrote:
-> > On Tue, Nov 07, 2017 at 04:04:04PM +0100, Cornelia Huck wrote:  
-> > > On Mon, 6 Nov 2017 16:02:16 -0200
-> > > Eduardo Habkost <ehabkost@redhat.com> wrote:
-> > >   
-> > > > On Tue, Oct 31, 2017 at 03:01:14PM +0100, Igor Mammedov wrote:  
-> > > > > On Thu, 19 Oct 2017 17:31:51 +1100
-> > > > > David Gibson <david@gibson.dropbear.id.au> wrote:
-> > > > >     
-> > > > > > On Wed, Oct 18, 2017 at 01:12:12PM +0200, Igor Mammedov wrote:    
-> > > > > > > For enabling early cpu to numa node configuration at runtime
-> > > > > > > qmp_query_hotpluggable_cpus() should provide a list of available
-> > > > > > > cpu slots at early stage, before machine_init() is called and
-> > > > > > > the 1st cpu is created, so that mgmt might be able to call it
-> > > > > > > and use output to set numa mapping.
-> > > > > > > Use MachineClass::possible_cpu_arch_ids() callback to set
-> > > > > > > cpu type info, along with the rest of possible cpu properties,
-> > > > > > > to let machine define which cpu type* will be used.
-> > > > > > > 
-> > > > > > > * for SPAPR it will be a spapr core type and for ARM/s390x/x86
-> > > > > > >   a respective descendant of CPUClass.
-> > > > > > > 
-> > > > > > > Move parse_numa_opts() in vl.c after cpu_model is parsed into
-> > > > > > > cpu_type so that possible_cpu_arch_ids() would know which
-> > > > > > > cpu_type to use during layout initialization.
-> > > > > > > 
-> > > > > > > Signed-off-by: Igor Mammedov <imammedo@redhat.com>      
-> > > > > > 
-> > > > > > Reviewed-by: David Gibson <david@gibson.dropbear.id.au>
-> > > > > >     
-> > > > > > > ---
-> > > > > > >   v2:
-> > > > > > >      - fix NULL dereference caused by not initialized
-> > > > > > >        MachineState::cpu_type at the time parse_numa_opts()
-> > > > > > >        were called
-> > > > > > > ---
-> > > > > > >  include/hw/boards.h        |  2 ++
-> > > > > > >  hw/arm/virt.c              |  3 ++-
-> > > > > > >  hw/core/machine.c          | 12 ++++++------
-> > > > > > >  hw/i386/pc.c               |  4 +++-
-> > > > > > >  hw/ppc/spapr.c             | 13 ++++++++-----
-> > > > > > >  hw/s390x/s390-virtio-ccw.c |  1 +
-> > > > > > >  vl.c                       |  3 +--
-> > > > > > >  7 files changed, 23 insertions(+), 15 deletions(-)
-> > > > > > > 
-> > > > > > > diff --git a/include/hw/boards.h b/include/hw/boards.h
-> > > > > > > index 191a5b3..fa21758 100644
-> > > > > > > --- a/include/hw/boards.h
-> > > > > > > +++ b/include/hw/boards.h
-> > > > > > > @@ -80,6 +80,7 @@ void machine_set_cpu_numa_node(MachineState *machine,
-> > > > > > >   * CPUArchId:
-> > > > > > >   * @arch_id - architecture-dependent CPU ID of present or possible CPU      
-> > > > > > 
-> > > > > > I know this isn't really in scope for this patch, but is @arch_id here
-> > > > > > supposed to have meaning defined by the target, or by the machine?
-> > > > > > 
-> > > > > > If it's the machime, it could do with a rename - "arch" means target
-> > > > > > to most people (thanks to Linux).
-> > > > > > 
-> > > > > > If it's the target, it's kind of bogus, because it doesn't necessarily
-> > > > > > have a clear meaning per target - get_arch_id in CPUClass has the same
-> > > > > > problem, which is probably one reason it's basically only used by the
-> > > > > > x86 code at present.
-> > > > > > 
-> > > > > > e.g. for target/ppc, what do we use?  There's the PIR, which is in the
-> > > > > > CPU.. but only on some cpu models, not all.  There will generally be
-> > > > > > some kind of master PIC id, but there are different PIC models on
-> > > > > > different boards.  What goes in the devicetree?  Well only some
-> > > > > > machines use devicetree, and they might define the cpu reg 
-> > > > > > differently.
-> > > > > > 
-> > > > > > Board designs will generally try to make some if not all of those
-> > > > > > possible values equal for simplicity, but there's still no real way of
-> > > > > > defining a sensible arch_id independent of machine / board.    
-> > > > > I'd say arch_id is machine specific so far, it was introduced when we
-> > > > > didn't have CpuInstanceProperties and at that time we considered only
-> > > > > vcpus (threads) and doesn't really apply to spapr cores.
-> > > > > 
-> > > > > In general we could do away with arch_id and use CpuInstanceProperties
-> > > > > instead, but arch_id also serves aux purpose, it allows machine to
-> > > > > pre-calculate(cache) apic-id/mpidr values in one place and then they
-> > > > > are/(could be) used by arch in-depended code to build acpi tables.
-> > > > > So if we drop arch_id we would need to introduce a machine hook,
-> > > > > which would translate CpuInstanceProperties into current arch_id.    
-> > > > 
-> > > > I think we need to do a better to job documenting where exactly
-> > > > we expect arch_id to be used and how, so people know what it's
-> > > > supposed to return.
-> > > > 
-> > > > If the only place where it's useful now is ACPI code (is it?),
-> > > > should we rename it to something like get_acpi_id()?  
-> > > 
-> > > It is also used in hw/s390x/sclp.c to fill out a control block, so acpi
-> > > isn't the only user.  
-> > 
-> > Yeah.. this is kind of bogus.  The s390 use is in machine specific
-> > code, so it's basically just re-using the field for an unrelated usage
-> > to the x86/arm one (ACPI).
-> > 
-> > If we can't assign a universal meaning to the field (even if the
-> > actual values are per-machine) - and I don't think we can - then I
-> > really don't think it belongs in CPUState.  A machine hook which
-> > translates an ArchId to an acpi_id is the correct solution I believe.
-> > Or even an ACPIMachine interface (to be implemented by machines which
-> > do ACPI) which has a method to do this.
-> > 
-> > Since both the assignment and use are in machine type specific code
-> > for s390, it can have its own field in the s390 specific cpu subclass.
-> >   
-> 
-> I agree.  This might require duplicating cpu_by_arch_id() and
-> cpu_exists() into machine-specific code, but this doesn't sound
-> too bad: there's only one user of cpu_by_arch_id() (that's
-> x86-specific code living inside monitor.c), and one user of
-> cpu_exists() (that's s390-specific code).
-> 
-> (Maybe those users could be rewritten to use
-> MachineState::possible_cpus, like pc_find_cpu_slot()).
-I've  added  getting rid of arch_id from generic structure on
-my TODO list.
+	v1: https://lists.nongnu.org/archive/html/qemu-devel/2017-09/msg07092.html
+
+We made the debugger module WinDbg (like GDB) for QEMU. This is the replacement of the remote stub in Windows kernel. Used for remote Windows kernel debugging without debugging mode.
+
+WinDbg is a multipurpose debugger for the Microsoft Windows computer operating system, distributed by Microsoft. Recent versions of WinDbg have been and are being distributed as part of the free Debugging Tools for Windows suite.
+
+How to start debugging QEMU using WinDbg:
+  Run QEMU with next option:
+    -windbg pipe:<name>
+  QEMU will start and pause for waiting WinDbg connection.
+  Run WinDbg with next options:
+    -b -k com:pipe,baud=115200,port=\\.\pipe\<name>,resets=0
+  Wait for debugger connect to kernel.
+
+Note: You can add Symbol Search Path in WinDbg such as srv*c:\tmp*http://msdl.microsoft.com/download/symbols.
+
+How it works:
+The WinDbg debugger has the possibility of connecting to a remote debug service (Kdsrv.exe) in the Windows kernel. Therefore, it is possible to connect to the guest system running in the QEMU emulator. Kernel debugging is possible only with the enabled debugging mode, may change at the same time. Our module of WinDbg debugger for QEMU is an alternative of the remote debugging service in the kernel. Thus, the debugger connects to the debugging module, not to the kernel of the operating system. The module obtains all the necessary information answering debugger requests from the QEMU emulator. At the same time for debugging there is no need to enable debugging mode in the kernel. This leads to hidden debugging. Our module supports all features of WinDbg regarding remote debugging, besides interception of events and exceptions. Only i386 is supported now.
+
+Changed in v3:
+
+ - Add a support of the new api functions from the WinDbg v10.
+
+Changed in v2:
+
+ - Move target specific code in the 'target/' directory. (Alistair Francis)
+ - Change 'kd_api_fill_memory'. Made a fill of memory by line segments. Before that, a full array was immediately collected and written in RAM. (Ladi Prosek)
+ - Change 'kd_api_search_memory'. Made a search for memory by line segments. (Ladi Prosek)
+ - Change ld* to st* where it needs. (Ladi Prosek)
+ - Add a additional check of input arguments in 'windbg_read_context' and 'windbg_read_ks_regs'. (Ladi Prosek)
+ - Fix typos. (Ladi Prosek)
+ - Add a fliping back 'windbg_state->is_loaded' after reset VM.
+ - Add a check to disabled kvm. It is supported yet. (Ladi Prosek)
+ - Add a check to device in windbg option. Only pipe is supporting now. (Alistair Francis)
+ - Add a check to 'ifdef' WINDBG_DEBUG_ON before define it. (Alistair Francis)
+ - Replace printf to qemu_log. (Alistair Francis)
+ - Fix build on s390x host. (patchew)
+ - Fix code style error. (patchew)
+
+---
+
+Mihail Abakumov (45):
+      windbg: added empty windbgstub files
+      windbg: added windbg's KD header file
+      windbg: modified windbgkd.h
+      windbg: added '-windbg' option
+      windbg: added helper features
+      windbg: added WindbgState
+      windbg: added chardev
+      windbg: hook to wrmsr operation
+      windbg: handler of fs/gs register
+      windbg: structures for parsing data stream
+      windbg: parsing data stream
+      windbg: send data and control packets
+      windbg: handler of parsing context
+      windbg: init DBGKD_ANY_WAIT_STATE_CHANGE
+      windbg: sized data buffer
+      windbg: generate ExceptionStateChange
+      windbg: generate LoadSymbolsStateChange
+      windbg: windbg_vm_stop
+      windbg: implemented windbg_process_control_packet
+      windbg: implemented windbg_process_data_packet
+      windbg: implemented windbg_process_manipulate_packet
+      windbg: implemented kd_api_read_virtual_memory and kd_api_write_virtual_memory
+      windbg: kernel's structures
+      windbg: implemented kd_api_get_context and kd_api_set_context
+      windbg: implemented kd_api_read_control_space and kd_api_write_control_space
+      windbg: implemented windbg_read_context
+      windbg: implemented windbg_write_context
+      windbg: implemented windbg_read_ks_regs
+      windbg: implemented windbg_write_ks_regs
+      windbg: implemented windbg_set_sr
+      windbg: implemented windbg_set_dr
+      windbg: implemented windbg_set_dr7
+      windbg: implemented windbg_hw_breakpoint_insert and windbg_hw_breakpoint_remove
+      windbg: implemented kd_api_write_breakpoint and kd_api_restore_breakpoint
+      windbg: debug exception subscribing
+      windbg: implemented kd_api_continue
+      windbg: implemented kd_api_read_io_space and kd_api_write_io_space
+      windbg: implemented kd_api_read_physical_memory and kd_api_write_physical_memory
+      windbg: implemented kd_api_get_version
+      windbg: implemented kd_api_read_msr and kd_api_write_msr
+      windbg: implemented kd_api_search_memory
+      windbg: implemented kd_api_fill_memory
+      windbg: implemented kd_api_query_memory
+      windbg: added new api functions
+      windbg: implemented kd_api_get_context_ex and kd_api_set_context_ex
+
+
+ Makefile.target                 |    7 
+ cpus.c                          |   18 
+ gdbstub.c                       |    4 
+ include/exec/windbgkd.h         |  967 +++++++++++++++++++++++++
+ include/exec/windbgstub-utils.h |  117 +++
+ include/exec/windbgstub.h       |   24 +
+ include/sysemu/sysemu.h         |    2 
+ qemu-options.hx                 |    8 
+ stubs/Makefile.objs             |    1 
+ stubs/windbgstub.c              |   21 +
+ target/i386/Makefile.objs       |    2 
+ target/i386/misc_helper.c       |    3 
+ target/i386/windbgstub.c        | 1502 +++++++++++++++++++++++++++++++++++++++
+ vl.c                            |    8 
+ windbgstub-utils.c              |  354 +++++++++
+ windbgstub.c                    |  498 +++++++++++++
+ 16 files changed, 3534 insertions(+), 2 deletions(-)
+ create mode 100755 include/exec/windbgkd.h
+ create mode 100755 include/exec/windbgstub-utils.h
+ create mode 100755 include/exec/windbgstub.h
+ create mode 100755 stubs/windbgstub.c
+ create mode 100755 target/i386/windbgstub.c
+ create mode 100755 windbgstub-utils.c
+ create mode 100755 windbgstub.c
+
+--
+Thanks,
+Mihail Abakumov
