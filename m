@@ -1,38 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45864)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46832)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1eHBsN-0000LS-8q
-	for qemu-devel@nongnu.org; Tue, 21 Nov 2017 11:58:24 -0500
+	(envelope-from <jcody@redhat.com>) id 1eHBuV-0004wp-TN
+	for qemu-devel@nongnu.org; Tue, 21 Nov 2017 12:00:40 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1eHBsI-0002bo-AQ
-	for qemu-devel@nongnu.org; Tue, 21 Nov 2017 11:58:23 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:6935)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1eHBsI-0002bX-1A
-	for qemu-devel@nongnu.org; Tue, 21 Nov 2017 11:58:18 -0500
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
-	[10.5.11.13])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id DEE1F37E6E
-	for <qemu-devel@nongnu.org>; Tue, 21 Nov 2017 16:58:16 +0000 (UTC)
-Date: Tue, 21 Nov 2017 17:58:12 +0100
-From: Igor Mammedov <imammedo@redhat.com>
-Message-ID: <20171121175812.6f922e2e@redhat.com>
-In-Reply-To: <20171121182432-mutt-send-email-mst@kernel.org>
-References: <1510834622-28800-1-git-send-email-thuth@redhat.com>
-	<20171120175522.76bf71c3@redhat.com>
-	<20171120223048-mutt-send-email-mst@kernel.org>
-	<20171121142639.3e6d2e79@redhat.com>
-	<20171121164254-mutt-send-email-mst@kernel.org>
-	<20171121165809.1ec4362a@redhat.com>
-	<20171121180202-mutt-send-email-mst@kernel.org>
-	<20171121172236.618c8e08@redhat.com>
-	<20171121182432-mutt-send-email-mst@kernel.org>
+	(envelope-from <jcody@redhat.com>) id 1eHBuM-0003gO-WD
+	for qemu-devel@nongnu.org; Tue, 21 Nov 2017 12:00:35 -0500
+Date: Tue, 21 Nov 2017 11:59:56 -0500
+From: Jeff Cody <jcody@redhat.com>
+Message-ID: <20171121165956.GN5399@localhost.localdomain>
+References: <cover.1511278397.git.jcody@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v2] tests/bios-tables-test: Fix endianess
- problems when passing data to iasl
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <cover.1511278397.git.jcody@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v3 for-2.11 0/4] Fix segfault in blockjob
+ race condition
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -41,82 +23,93 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org
+To: qemu-devel@nongnu.org
+Cc: qemu-block@nongnu.org, mreitz@redhat.com, stefanha@redhat.com, famz@redhat.com, pbonzini@redhat.com, kwolf@redhat.com
 
-On Tue, 21 Nov 2017 18:31:19 +0200
-"Michael S. Tsirkin" <mst@redhat.com> wrote:
+On Tue, Nov 21, 2017 at 10:38:49AM -0500, Jeff Cody wrote:
+> Changes from v2 -> v3:
+> -----------------------
+> 
+> Patch 1: Updated commit message to include why immediate cancel is
+>          ok to remove (Thanks Paolo)
+> 
+>          Dropped useless hunk (Thanks Stefan)
+> 
+> 
+> Patch 2: Use correct atomic primitives, and document implicit
+>          assumptions (Thanks Stefan, Paolo)
+> 
+>         Fix spelling in commit message (Thanks Eric)
+> 
+> Patch 3/4: Unchanged.
+> 
+> 
+> Changes from v1 -> v2:
+> -----------------------
+> 
+> Patch 1: Updated docs in blockjob_int.h (Thanks Stefan)
+> 
+> Patch 2/3: Squashed, and used const char * to hold the __func__ name of
+>            the original scheduler (Thanks Paolo)
+> 
+> Patch 4: Unchanged.
+> 
+> Patch 5: Dropped qcow format for the test, it was so slow the test times
+>          out, and it doesn't add any new dimension to the test.
+> 
+> 
+> # git-backport-diff -r qemu/master.. -u github/bz1508708
+> 
+> 001/4:[0003] [FC] 'blockjob: do not allow coroutine double entry or entry-after-completion'
+> 002/4:[down] 'coroutine: abort if we try to schedule or enter a pending coroutine'
+> 003/4:[----] [--] 'qemu-iotests: add option in common.qemu for mismatch only'
+> 004/4:[0002] [FC] 'qemu-iotest: add test for blockjob coroutine race condition'
+> 
+> 
+> This series fixes a race condition segfault when using iothreads with
+> blockjobs.
+> 
+> The qemu iotest in this series is a reproducer, as is the reproducer
+> script attached in this bug report:
+> 
+> https://bugzilla.redhat.com/show_bug.cgi?id=1508708
+> 
+> There are two additional patches to try and catch this sort of scenario
+> with an abort, before a segfault or memory corruption occurs.
+> 
+> 
+> Jeff Cody (4):
+>   blockjob: do not allow coroutine double entry or
+>     entry-after-completion
+>   coroutine: abort if we try to schedule or enter a pending coroutine
+>   qemu-iotests: add option in common.qemu for mismatch only
+>   qemu-iotest: add test for blockjob coroutine race condition
+> 
+>  blockjob.c                     |  7 ++-
+>  include/block/blockjob_int.h   |  3 +-
+>  include/qemu/coroutine_int.h   |  6 +++
+>  tests/qemu-iotests/200         | 99 ++++++++++++++++++++++++++++++++++++++++++
+>  tests/qemu-iotests/200.out     | 14 ++++++
+>  tests/qemu-iotests/common.qemu |  8 +++-
+>  tests/qemu-iotests/group       |  1 +
+>  util/async.c                   | 13 ++++++
+>  util/qemu-coroutine-sleep.c    | 12 +++++
+>  util/qemu-coroutine.c          | 13 ++++++
+>  10 files changed, 172 insertions(+), 4 deletions(-)
+>  create mode 100755 tests/qemu-iotests/200
+>  create mode 100644 tests/qemu-iotests/200.out
+> 
+> -- 
+> 2.9.5
+> 
 
-> On Tue, Nov 21, 2017 at 05:22:36PM +0100, Igor Mammedov wrote:
-> > > > > > > > probably it's been discussed but, why not do
-> > > > > > > >  leXX_to_cpu()
-> > > > > > > > here, instead of making each place that access read field
-> > > > > > > > to do leXX_to_cpu() manually.?
-> > > > > > > > 
-> > > > > > > > Beside of keeping access to structure in natural host order,
-> > > > > > > > it should also be less error-prone as field users don't
-> > > > > > > > have to worry about endianness.        
-> > > > > > > 
-> > > > > > > Yes, I suggested that.
-> > > > > > > The issue is that we don't byte-swap all of the tables
-> > > > > > > (we can't, that would require a full ACPI parser).
-> > > > > > > So when byte-swapping we end up with a mixed host/LE
-> > > > > > > structures.      
-> > > > ...    
-> > > > > > What tables/use-cases do you have in mind where we'd need full
-> > > > > > ACPI parser /whatever it is/?      
-> > > > > 
-> > > > > We dump ACPI tables for parsing by iasl.    
-> > > > I don't really see a problem here (i.e. how dumping blobs for
-> > > > iasl would require byte-swap all of the tables).    
-> > > 
-> > > It's not all the tables. We would need to track what is and
-> > > what isn't swapped.  
-> > Why we need track swapping at all?
-> > Why not just convert everything to host order and work with that
-> > in C code, so we won't have to deal with mixed endianness anywhere
-> > in code beside of accessors wrappers?   
-> 
-> It's a tooling issue really.
-> 
-> Consider any structure, e.g. AcpiRsdtDescriptorRev1.  We want its fields
-> to have specific endian-ness so we can use static checking for that down
-> the line.
-> 
-> So it must be LE since we use it to format guest tables.
-> 
-> Therefore this change:
-> -    uint32_t addr = data->rsdp_table.rsdt_physical_address;
-> +    uint32_t addr = le32_to_cpu(data->rsdp_table.rsdt_physical_address);
-> 
-> is really a requirement, otherwise we end up with converting
-> field format in-place and static checkers can't support that
-> right now.
 
-I didn't really used static checker for this purpose but in my humble
-experience of writing portable cross platform code, mixed endianness
-always was a source of bugs and reviewing corresponding code is much
-harder and a way to reduce/simplify code was isolate byte-swapping to
-accessors while the the rest of the code works with native encoding.
+Thanks,
 
-it seems a bit wrong to make code twisted (when we don't have) for
-the sake of some tooling to work.
+Made the change suggested by Stefan and Paolo.
 
-anyways, if you prefer having mixed endianness here, I won't mind much,
-as impact of test case is much smaller so we'll see down the road
-if it became any better. (as far as we continue going in direction
-of using host byteorder within main qemu acpi code, which we were
-doing by gradually converting acpi structures to build_append_foo API)
+Applied to my block branch:
 
-> 
-> >    
-> > > > Where bios-tables-test.c is concerned we should just read
-> > > > a blob from qemu (get its location/len/name) and dump it to
-> > > > disk without changing anything in it.    
-> > > 
-> > > Exactly.
-> > >   
-> > > > > >       
-> > > > > > > Keeping it all LE seems cleaner.
-> > > > > > > 
-> > > > > > >       
+git://github.com/codyprime/qemu-kvm-jtc block
+
+-Jeff
