@@ -1,19 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46795)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46862)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jcody@redhat.com>) id 1eHAe0-0006ui-Vi
-	for qemu-devel@nongnu.org; Tue, 21 Nov 2017 10:39:36 -0500
+	(envelope-from <jcody@redhat.com>) id 1eHAeD-00073G-D1
+	for qemu-devel@nongnu.org; Tue, 21 Nov 2017 10:39:42 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jcody@redhat.com>) id 1eHAdw-0001pk-2w
-	for qemu-devel@nongnu.org; Tue, 21 Nov 2017 10:39:29 -0500
+	(envelope-from <jcody@redhat.com>) id 1eHAe8-0001u2-Kd
+	for qemu-devel@nongnu.org; Tue, 21 Nov 2017 10:39:41 -0500
 From: Jeff Cody <jcody@redhat.com>
-Date: Tue, 21 Nov 2017 10:38:50 -0500
-Message-Id: <dd0e99997299b76eeeefa11ce7113a81fe56b704.1511278397.git.jcody@redhat.com>
+Date: Tue, 21 Nov 2017 10:38:53 -0500
+Message-Id: <5dca6da3e02396423d3135e82dfa99e74c434dbd.1511278397.git.jcody@redhat.com>
 In-Reply-To: <cover.1511278397.git.jcody@redhat.com>
 References: <cover.1511278397.git.jcody@redhat.com>
 In-Reply-To: <cover.1511278397.git.jcody@redhat.com>
 References: <cover.1511278397.git.jcody@redhat.com>
-Subject: [Qemu-devel] [PATCH v3 for-2.11 1/4] blockjob: do not allow
- coroutine double entry or entry-after-completion
+Subject: [Qemu-devel] [PATCH v3 for-2.11 4/4] qemu-iotest: add test for
+ blockjob coroutine race condition
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,64 +25,148 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: qemu-block@nongnu.org, mreitz@redhat.com, stefanha@redhat.com, famz@redhat.com, pbonzini@redhat.com, kwolf@redhat.com
 
-When block_job_sleep_ns() is called, the co-routine is scheduled for
-future execution.  If we allow the job to be re-entered prior to the
-scheduled time, we present a race condition in which a coroutine can be
-entered recursively, or even entered after the coroutine is deleted.
-
-The job->busy flag is used by blockjobs when a coroutine is busy
-executing. The function 'block_job_enter()' obeys the busy flag,
-and will not enter a coroutine if set.  If we sleep a job, we need to
-leave the busy flag set, so that subsequent calls to block_job_enter()
-are prevented.
-
-This changes the prior behavior of block_job_cancel() being able to
-immediately wake up and cancel a job; in practice, this should not be an
-issue, as the coroutine sleep times are generally very small, and the
-cancel will occur the next time the coroutine wakes up.
-
-This fixes: https://bugzilla.redhat.com/show_bug.cgi?id=1508708
-
 Signed-off-by: Jeff Cody <jcody@redhat.com>
 ---
- blockjob.c                   | 7 +++++--
- include/block/blockjob_int.h | 3 ++-
- 2 files changed, 7 insertions(+), 3 deletions(-)
+ tests/qemu-iotests/200     | 99 ++++++++++++++++++++++++++++++++++++++++++++++
+ tests/qemu-iotests/200.out | 14 +++++++
+ tests/qemu-iotests/group   |  1 +
+ 3 files changed, 114 insertions(+)
+ create mode 100755 tests/qemu-iotests/200
+ create mode 100644 tests/qemu-iotests/200.out
 
-diff --git a/blockjob.c b/blockjob.c
-index 3a0c491..ff9a614 100644
---- a/blockjob.c
-+++ b/blockjob.c
-@@ -797,11 +797,14 @@ void block_job_sleep_ns(BlockJob *job, QEMUClockType type, int64_t ns)
-         return;
-     }
- 
--    job->busy = false;
-+    /* We need to leave job->busy set here, because when we have
-+     * put a coroutine to 'sleep', we have scheduled it to run in
-+     * the future.  We cannot enter that same coroutine again before
-+     * it wakes and runs, otherwise we risk double-entry or entry after
-+     * completion. */
-     if (!block_job_should_pause(job)) {
-         co_aio_sleep_ns(blk_get_aio_context(job->blk), type, ns);
-     }
--    job->busy = true;
- 
-     block_job_pause_point(job);
- }
-diff --git a/include/block/blockjob_int.h b/include/block/blockjob_int.h
-index f13ad05..43f3be2 100644
---- a/include/block/blockjob_int.h
-+++ b/include/block/blockjob_int.h
-@@ -143,7 +143,8 @@ void *block_job_create(const char *job_id, const BlockJobDriver *driver,
-  * @ns: How many nanoseconds to stop for.
-  *
-  * Put the job to sleep (assuming that it wasn't canceled) for @ns
-- * nanoseconds.  Canceling the job will interrupt the wait immediately.
-+ * nanoseconds.  Canceling the job will not interrupt the wait, so the
-+ * cancel will not process until the coroutine wakes up.
-  */
- void block_job_sleep_ns(BlockJob *job, QEMUClockType type, int64_t ns);
- 
+diff --git a/tests/qemu-iotests/200 b/tests/qemu-iotests/200
+new file mode 100755
+index 0000000..d8787dd
+--- /dev/null
++++ b/tests/qemu-iotests/200
+@@ -0,0 +1,99 @@
++#!/bin/bash
++#
++# Block job co-routine race condition test.
++#
++# See: https://bugzilla.redhat.com/show_bug.cgi?id=1508708
++#
++# Copyright (C) 2017 Red Hat, Inc.
++#
++# This program is free software; you can redistribute it and/or modify
++# it under the terms of the GNU General Public License as published by
++# the Free Software Foundation; either version 2 of the License, or
++# (at your option) any later version.
++#
++# This program is distributed in the hope that it will be useful,
++# but WITHOUT ANY WARRANTY; without even the implied warranty of
++# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++# GNU General Public License for more details.
++#
++# You should have received a copy of the GNU General Public License
++# along with this program.  If not, see <http://www.gnu.org/licenses/>.
++#
++
++# creator
++owner=jcody@redhat.com
++
++seq=`basename $0`
++echo "QA output created by $seq"
++
++here=`pwd`
++status=1    # failure is the default!
++
++_cleanup()
++{
++    _cleanup_qemu
++    rm -f "${TEST_IMG}" "${BACKING_IMG}"
++}
++trap "_cleanup; exit \$status" 0 1 2 3 15
++
++# get standard environment, filters and checks
++. ./common.rc
++. ./common.filter
++. ./common.qemu
++
++_supported_fmt qcow2 qed
++_supported_proto file
++_supported_os Linux
++
++BACKING_IMG="${TEST_DIR}/backing.img"
++TEST_IMG="${TEST_DIR}/test.img"
++
++${QEMU_IMG} create -f $IMGFMT "${BACKING_IMG}" 512M | _filter_img_create
++${QEMU_IMG} create -f $IMGFMT -F $IMGFMT "${TEST_IMG}" -b "${BACKING_IMG}" 512M | _filter_img_create
++
++${QEMU_IO} -c "write -P 0xa5 512 300M" "${BACKING_IMG}" | _filter_qemu_io
++
++echo
++echo === Starting QEMU VM ===
++echo
++qemu_comm_method="qmp"
++_launch_qemu -device pci-bridge,id=bridge1,chassis_nr=1,bus=pci.0 \
++             -object iothread,id=iothread0 \
++             -device virtio-scsi-pci,bus=bridge1,addr=0x1f,id=scsi0,iothread=iothread0 \
++             -drive file="${TEST_IMG}",media=disk,if=none,cache=none,id=drive_sysdisk,aio=native,format=$IMGFMT \
++             -device scsi-hd,drive=drive_sysdisk,bus=scsi0.0,id=sysdisk,bootindex=0
++h1=$QEMU_HANDLE
++
++_send_qemu_cmd $h1 "{ 'execute': 'qmp_capabilities' }" 'return'
++
++echo
++echo === Sending stream/cancel, checking for SIGSEGV only  ===
++echo
++for (( i=1;i<500;i++ ))
++do
++    mismatch_only='y' qemu_error_no_exit='n' _send_qemu_cmd $h1 \
++                       "{
++                            'execute': 'block-stream',
++                            'arguments': {
++                                'device': 'drive_sysdisk',
++                                'speed': 10000000,
++                                'on-error': 'report',
++                                'job-id': 'job-$i'
++                             }
++                        }
++                        {
++                            'execute': 'block-job-cancel',
++                            'arguments': {
++                                'device': 'job-$i'
++                             }
++                        }" \
++                       "{.*{.*}.*}"  # should match all well-formed QMP responses
++done
++
++silent='y' _send_qemu_cmd $h1  "{ 'execute': 'quit' }" 'return'
++
++echo "$i iterations performed"
++
++echo "*** done"
++rm -f $seq.full
++status=0
+diff --git a/tests/qemu-iotests/200.out b/tests/qemu-iotests/200.out
+new file mode 100644
+index 0000000..af6a809
+--- /dev/null
++++ b/tests/qemu-iotests/200.out
+@@ -0,0 +1,14 @@
++QA output created by 200
++Formatting 'TEST_DIR/backing.img', fmt=IMGFMT size=536870912
++Formatting 'TEST_DIR/test.img', fmt=IMGFMT size=536870912 backing_file=TEST_DIR/backing.img backing_fmt=IMGFMT
++wrote 314572800/314572800 bytes at offset 512
++300 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
++
++=== Starting QEMU VM ===
++
++{"return": {}}
++
++=== Sending stream/cancel, checking for SIGSEGV only ===
++
++500 iterations performed
++*** done
+diff --git a/tests/qemu-iotests/group b/tests/qemu-iotests/group
+index 24e5ad1..25d9adf 100644
+--- a/tests/qemu-iotests/group
++++ b/tests/qemu-iotests/group
+@@ -194,3 +194,4 @@
+ 194 rw auto migration quick
+ 195 rw auto quick
+ 197 rw auto quick
++200 rw auto
 -- 
 2.9.5
