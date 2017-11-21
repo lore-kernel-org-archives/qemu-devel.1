@@ -1,22 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58461)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58463)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1eGwPf-0003Eo-Uk
+	(envelope-from <dgibson@ozlabs.org>) id 1eGwPf-0003Ep-Vl
 	for qemu-devel@nongnu.org; Mon, 20 Nov 2017 19:27:45 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1eGwPe-0003qe-Sw
+	(envelope-from <dgibson@ozlabs.org>) id 1eGwPe-0003qj-Tc
 	for qemu-devel@nongnu.org; Mon, 20 Nov 2017 19:27:43 -0500
-Date: Tue, 21 Nov 2017 11:25:55 +1100
+Date: Tue, 21 Nov 2017 11:12:26 +1100
 From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20171121002555.GP19214@umbus.fritz.box>
-References: <20171120071423.11693-1-david@gibson.dropbear.id.au>
-	<151116233520.519.2313246296341795954@bafd83ae6430>
+Message-ID: <20171121001226.GN19214@umbus.fritz.box>
+References: <1511163878-11977-1-git-send-email-thuth@redhat.com>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="qnK4RqISe3HuYx1/"
+	protocol="application/pgp-signature"; boundary="QRo3kt64Wi40AlcO"
 Content-Disposition: inline
-In-Reply-To: <151116233520.519.2313246296341795954@bafd83ae6430>
-Subject: Re: [Qemu-devel] [PATCH] spapr: Implement bug in spapr-vty device
- to be compatible with PowerVM
+In-Reply-To: <1511163878-11977-1-git-send-email-thuth@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH for-2.11] hw/ppc/spapr: Fix virtio-scsi
+ bootindex handling for LUNs >= 256
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,67 +24,53 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: famz@redhat.com, lvivier@redhat.com, paulus@samba.org, groug@kaod.org, qemu-ppc@nongnu.org
+To: Thomas Huth <thuth@redhat.com>
+Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org
 
 
---qnK4RqISe3HuYx1/
+--QRo3kt64Wi40AlcO
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Sun, Nov 19, 2017 at 11:18:55PM -0800, no-reply@patchew.org wrote:
-> Hi,
+On Mon, Nov 20, 2017 at 08:44:38AM +0100, Thomas Huth wrote:
+> LUNs >=3D 256 have to be encoded with the so-called "flat space
+> addressing method" for virtio-scsi, where an additional bit has to
+> be set. SLOF already took care of this with the following commit:
 >=20
-> This series seems to have some coding style problems. See output below for
-> more information:
+>  https://git.qemu.org/?p=3DSLOF.git;a=3Dcommitdiff;h=3Df72a37713fea47da
+>  (see https://bugzilla.redhat.com/show_bug.cgi?id=3D1431584 for details)
 >=20
-> Subject: [Qemu-devel] [PATCH] spapr: Implement bug in spapr-vty device to=
- be compatible with PowerVM
-> Type: series
-> Message-id: 20171120071423.11693-1-david@gibson.dropbear.id.au
+> But QEMU does not use this encoding yet for device tree paths
+> that have to be handed over to SLOF to deal with the "bootindex"
+> property, so SLOF currently fails to boot from virtio-scsi devices
+> with LUNs >=3D 256 in the right boot order. Fix it by using the bit
+> to indicate the "flat space addressing method" for LUNs >=3D 256.
 >=20
-> =3D=3D=3D TEST SCRIPT BEGIN =3D=3D=3D
-> #!/bin/bash
->=20
-> BASE=3Dbase
-> n=3D1
-> total=3D$(git log --oneline $BASE.. | wc -l)
-> failed=3D0
->=20
-> git config --local diff.renamelimit 0
-> git config --local diff.renames True
->=20
-> commits=3D"$(git log --format=3D%H --reverse $BASE..)"
-> for c in $commits; do
->     echo "Checking PATCH $n/$total: $(git log -n 1 --format=3D%s $c)..."
->     if ! git show $c --format=3Demail | ./scripts/checkpatch.pl --mailbac=
-k -; then
->         failed=3D1
->         echo
->     fi
->     n=3D$((n+1))
-> done
->=20
-> exit $failed
-> =3D=3D=3D TEST SCRIPT END =3D=3D=3D
->=20
-> Updating 3c8cf5a9c21ff8782164d1def7f44bd888713384
-> From https://github.com/patchew-project/qemu
->  * [new tag]               patchew/20171120071423.11693-1-david@gibson.dr=
-opbear.id.au -> patchew/20171120071423.11693-1-david@gibson.dropbear.id.au
-> Switched to a new branch 'test'
-> 08e9d8fe82 spapr: Implement bug in spapr-vty device to be compatible with=
- PowerVM
->=20
-> =3D=3D=3D OUTPUT BEGIN =3D=3D=3D
-> Checking PATCH 1/1: spapr: Implement bug in spapr-vty device to be compat=
-ible with PowerVM...
-> ERROR: spaces required around that '-' (ctx:VxV)
-> #40: FILE: hw/char/spapr_vty.c:68:
-> +        if (buf[n-1] =3D=3D '\r') {
+> Signed-off-by: Thomas Huth <thuth@redhat.com>
 
-I've corrected this in my tree.
+Applied to ppc-for-2.11, thanks.
+
+> ---
+>  hw/ppc/spapr.c | 4 ++++
+>  1 file changed, 4 insertions(+)
+>=20
+> diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
+> index d682f01..ff2eec4 100644
+> --- a/hw/ppc/spapr.c
+> +++ b/hw/ppc/spapr.c
+> @@ -2643,6 +2643,10 @@ static char *spapr_get_fw_dev_path(FWPathProvider =
+*p, BusState *bus,
+>               * swap 0100 or 10 << or 20 << ( target lun-id -- srplun )
+>               */
+>              unsigned id =3D 0x1000000 | (d->id << 16) | d->lun;
+> +            if (d->lun >=3D 256) {
+> +                /* Use the LUN "flat space addressing method" */
+> +                id |=3D 0x4000;
+> +            }
+>              return g_strdup_printf("%s@%"PRIX64, qdev_fw_name(dev),
+>                                     (uint64_t)id << 32);
+>          } else if (usb) {
 
 --=20
 David Gibson			| I'll have my music baroque, and my code
@@ -93,24 +78,24 @@ david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
 				| _way_ _around_!
 http://www.ozlabs.org/~dgibson
 
---qnK4RqISe3HuYx1/
+--QRo3kt64Wi40AlcO
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAloTcpAACgkQbDjKyiDZ
-s5IBDRAAxEf9MftrNPcwfS5sAYhZqwtrsrkkTLXdHtBba3M3u/rcmKhxI6B89vZM
-5BmGVQ1bIMauWlj/9Hlb0imU628nGwFnYjeFCgewHeJ2WCiVot2sXM58p61+amQ8
-LV7Ns/pvOWPI4zlb0k0U78GEGYYXBNwF/f2WW8q9dArnmocqnqwiwKnpvmOsHkyi
-DzPV8rRTNeUnuzUfpK4kIcPKzyysH1eIQimQjRv8DC3Uax4gJ2ph3if9ZfNR6H+h
-x2u+TqDAeGUpXcoYDVpRgfAPcLCkz8FEOlRAFB+9IoABSJ68XYh4UvMxJB66p7jL
-onWi8BLeFIQX/LoLunmj24rs7hUYEbRmH860jnvjLmpgqa4vG7f/rhPkb6+2FEqr
-LxTEabHvq1S6qJsvyybHySXTvybNyWQtJs2m1+f08CDQTiQtVl9B3BwKqjxxEok3
-GdoTKMA3mVhuo28oij7rU+iQx9eDyj4jCy+zlXzvnc+Glice6y4IYslIAKHd0esW
-tgZ77JtV+CU5kqcsrGu+ILCSrWFRWti9Xv5d+Vs5PFKbshNmjQrud2JLm6MBONb1
-/YzcY8n1+vbViwOzPS0kB7imteNjNtK7rk3gILCmMYhFMRZPitkyCivTMwCm3Xff
-lxW5BkQhZ4rXL8wd0ac5gX6tG4o8JBRTAj2+Ga9neRMrYZGfuts=
-=q57C
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAloTb2cACgkQbDjKyiDZ
+s5KvYQ/+Kz/D9tc7zO8Me9qudhc2TYgYfaR7ijunGwh0vlQPLx/MU0nEJeqb4tKU
+B2S8D8qIk+xsujx+tgaxCIEvJyUPPxjeNSx6kqNakEx9qWh/dhlSvRunQwmVs8Sb
+i8kZTn0QXfX1sr48jvgOChZZub2zWbiRuVGCRK62x95aH4wpV0WGaAkHedbdQ1ro
+fV292eGicDr3H/O76ydjyaT7MRlqaAxBUVuIEqRAdYXoDL5YV63iFzkIl2wFancp
+IQaCLPQAP3YZjp36R0M35xMp2sg008BEuqLiDaNPmqqvui0ym2re/6RfgSMDVlFM
+yYlXks4Whz/ctIRq1G4oPtV5p/l3tEWGpKbSpyIm9PtRIlwF1r7O0/cfpUuYrR8C
+eVkDKEY1haJZFtvbco+4CGPnYOWB/Ew96i2blR02JKsQPuZPhGbmxHObY2fQmUVS
+Qfrtdx6UITiaLjlPTy2NPvSQsLUMGN1oc+w3IZAm8EeWiS4YwwSXTYpeIzcw3bCE
+Q3/fpngio3vs24PeIhfqMnxiUBbnxIZp9rzacqOC1h/8peLtyHzwEbnYrNBdRNl+
+xuEE5gLvJ2xlNqolE+upLmuqnO8cWJ5xMo4u4y6tTaKHL7q0W0It9aYsP6TYouDA
+auHiHSPv893cGag0txgEwI4uztqde1RqkdS93jyGQFI449NA4fA=
+=AYS1
 -----END PGP SIGNATURE-----
 
---qnK4RqISe3HuYx1/--
+--QRo3kt64Wi40AlcO--
