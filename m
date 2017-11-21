@@ -1,25 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59411)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59536)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1eHDTp-00089p-Fk
-	for qemu-devel@nongnu.org; Tue, 21 Nov 2017 13:41:10 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1eHDUA-0008Ou-KZ
+	for qemu-devel@nongnu.org; Tue, 21 Nov 2017 13:41:31 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1eHDTk-00042P-Is
-	for qemu-devel@nongnu.org; Tue, 21 Nov 2017 13:41:09 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:48602)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1eHDTk-00041D-Ak
-	for qemu-devel@nongnu.org; Tue, 21 Nov 2017 13:41:04 -0500
-From: Juan Quintela <quintela@redhat.com>
-In-Reply-To: <20171110203516.17027-1-danielhb@linux.vnet.ibm.com> (Daniel
-	Henrique Barboza's message of "Fri, 10 Nov 2017 18:35:16 -0200")
-References: <20171110203516.17027-1-danielhb@linux.vnet.ibm.com>
-Reply-To: quintela@redhat.com
-Date: Tue, 21 Nov 2017 19:41:01 +0100
-Message-ID: <87vai3pj9e.fsf@secure.mitica>
+	(envelope-from <peter.maydell@linaro.org>) id 1eHDU9-0004Na-J7
+	for qemu-devel@nongnu.org; Tue, 21 Nov 2017 13:41:30 -0500
+Received: from mail-ot0-x244.google.com ([2607:f8b0:4003:c0f::244]:37034)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1eHDU9-0004NN-Da
+	for qemu-devel@nongnu.org; Tue, 21 Nov 2017 13:41:29 -0500
+Received: by mail-ot0-x244.google.com with SMTP id s4so11397902ote.4
+	for <qemu-devel@nongnu.org>; Tue, 21 Nov 2017 10:41:29 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH v1] migration/ram.c: do not set
- 'postcopy_running' in POSTCOPY_INCOMING_END
+In-Reply-To: <1510140763-18256-2-git-send-email-frederic.konrad@adacore.com>
+References: <1510140763-18256-1-git-send-email-frederic.konrad@adacore.com>
+	<1510140763-18256-2-git-send-email-frederic.konrad@adacore.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Tue, 21 Nov 2017 18:41:08 +0000
+Message-ID: <CAFEAcA87vxBQsh4HH-3saV1jN=xJOJ7MAbjhCVxD6ry7gNvAAQ@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH for-2.12 1/2] cadence_ttc: extract
+ CadenceTTCState to a new header file
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,104 +30,37 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Daniel Henrique Barboza <danielhb@linux.vnet.ibm.com>
-Cc: qemu-devel@nongnu.org, mdroth@linux.vnet.ibm.com, dgilbert@redhat.com
+To: KONRAD Frederic <frederic.konrad@adacore.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, Alistair Francis <alistair.francis@xilinx.com>, "Edgar E. Iglesias" <edgar.iglesias@gmail.com>
 
-Daniel Henrique Barboza <danielhb@linux.vnet.ibm.com> wrote:
-> When migrating a VM with 'migrate_set_capability postcopy-ram on'
-> a postcopy_state is set during the process, ending up with the
-> state POSTCOPY_INCOMING_END when the migration is over. This
-> postcopy_state is taken into account inside ram_load to check
-> how it will load the memory pages. This same ram_load is called when
-> in a loadvm command.
+On 8 November 2017 at 11:32, KONRAD Frederic
+<frederic.konrad@adacore.com> wrote:
+> We want to add this model to the xlnx-zynqmp board so let's make
+> CadenceTTCState available in an header file.
 >
-> Inside ram_load, the logic to see if we're at postcopy_running state
-> is:
->
-> postcopy_running = postcopy_state_get() >= POSTCOPY_INCOMING_LISTENING
->
-> postcopy_state_get() returns this enum type:
->
-> typedef enum {
->     POSTCOPY_INCOMING_NONE = 0,
->     POSTCOPY_INCOMING_ADVISE,
->     POSTCOPY_INCOMING_DISCARD,
->     POSTCOPY_INCOMING_LISTENING,
->     POSTCOPY_INCOMING_RUNNING,
->     POSTCOPY_INCOMING_END
-> } PostcopyState;
->
-> In the case where ram_load is executed and postcopy_state is
-> POSTCOPY_INCOMING_END, postcopy_running will be set to 'true' and
-> ram_load will behave like a postcopy is in progress. This scenario isn't
-> achievable in a migration but it is reproducible when executing
-> savevm/loadvm after migrating with 'postcopy-ram on', causing loadvm
-> to fail with Error -22:
->
-> Source:
->
-> (qemu) migrate_set_capability postcopy-ram on
-> (qemu) migrate tcp:127.0.0.1:4444
->
-> Dest:
->
-> (qemu) migrate_set_capability postcopy-ram on
-> (qemu)
-> ubuntu1704-intel login:
-> Ubuntu 17.04 ubuntu1704-intel ttyS0
->
-> ubuntu1704-intel login: (qemu)
-> (qemu) savevm test1
-> (qemu) loadvm test1
-> Unknown combination of migration flags: 0x4 (postcopy mode)
-> error while loading state for instance 0x0 of device 'ram'
-> Error -22 while loading VM state
-> (qemu)
->
-> This patch fixes this problem by changing a bit the semantics
-> of postcopy_running inside ram_load, verifying first if
-> we're not in the POSTCOPY_INCOMING_END state. In this case,
-> postcopy_running is set to 'false'.
->
-> Signed-off-by: Daniel Henrique Barboza <danielhb@linux.vnet.ibm.com>
-
-Reviewed-by: Juan Quintela <quintela@redhat.com>
-
-queued
-
+> Signed-off-by: KONRAD Frederic <frederic.konrad@adacore.com>
 > ---
->  migration/ram.c | 22 +++++++++++++++-------
->  1 file changed, 15 insertions(+), 7 deletions(-)
+>  hw/timer/cadence_ttc.c         | 35 +-----------------------
+>  include/hw/timer/cadence_ttc.h | 61 ++++++++++++++++++++++++++++++++++++++++++
+>  2 files changed, 62 insertions(+), 34 deletions(-)
+>  create mode 100644 include/hw/timer/cadence_ttc.h
 >
-> diff --git a/migration/ram.c b/migration/ram.c
-> index 8620aa400a..43ed719668 100644
-> --- a/migration/ram.c
-> +++ b/migration/ram.c
-> @@ -2803,13 +2803,21 @@ static int ram_load(QEMUFile *f, void *opaque, int version_id)
->      int flags = 0, ret = 0, invalid_flags = 0;
->      static uint64_t seq_iter;
->      int len = 0;
-> -    /*
-> -     * If system is running in postcopy mode, page inserts to host memory must
-> -     * be atomic
-> -     */
-> -    bool postcopy_running = postcopy_state_get() >= POSTCOPY_INCOMING_LISTENING;
-> -    /* ADVISE is earlier, it shows the source has the postcopy capability on */
-> -    bool postcopy_advised = postcopy_state_get() >= POSTCOPY_INCOMING_ADVISE;
-> +    bool postcopy_advised = false, postcopy_running = false;
-> +    uint8_t postcopy_state = postcopy_state_get();
-> +
-> +    if (postcopy_state != POSTCOPY_INCOMING_END) {
-> +        /*
-> +         * If system is running in postcopy mode, page inserts to host memory
-> +         * must be atomic
-> +         */
-> +        postcopy_running = postcopy_state >= POSTCOPY_INCOMING_LISTENING;
-> +
-> +        /* ADVISE is earlier, it shows the source has the postcopy
-> +         * capability on
-> +         */
-> +        postcopy_advised = postcopy_state >= POSTCOPY_INCOMING_ADVISE;
-> +    }
->  
->      seq_iter++;
+> diff --git a/hw/timer/cadence_ttc.c b/hw/timer/cadence_ttc.c
+> index 03f5b9c..bb4a5ef 100644
+> --- a/hw/timer/cadence_ttc.c
+> +++ b/hw/timer/cadence_ttc.c
+> @@ -16,9 +16,7 @@
+>   * with this program; if not, see <http://www.gnu.org/licenses/>.
+>   */
+>
+> -#include "qemu/osdep.h"
+> -#include "hw/sysbus.h"
+> -#include "qemu/timer.h"
+> +#include "hw/timer/cadence_ttc.h"
+
+Something's gone wrong here. osdep.h should always be the first
+header in any .c file, and it should never be included by any
+other .h file.
+
+thanks
+-- PMM
