@@ -1,24 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33035)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33043)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1eHDaH-0002w1-8M
+	(envelope-from <quintela@redhat.com>) id 1eHDaH-0002wI-P2
 	for qemu-devel@nongnu.org; Tue, 21 Nov 2017 13:47:50 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1eHDaC-0007Pj-Us
+	(envelope-from <quintela@redhat.com>) id 1eHDaE-0007QM-Sz
 	for qemu-devel@nongnu.org; Tue, 21 Nov 2017 13:47:49 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:37580)
+Received: from mx1.redhat.com ([209.132.183.28]:37618)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1eHDaC-0007PZ-Oe
-	for qemu-devel@nongnu.org; Tue, 21 Nov 2017 13:47:44 -0500
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
-	[10.5.11.13])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 9A81B4A6EB
-	for <qemu-devel@nongnu.org>; Tue, 21 Nov 2017 18:47:43 +0000 (UTC)
+	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1eHDaE-0007Q6-K2
+	for qemu-devel@nongnu.org; Tue, 21 Nov 2017 13:47:46 -0500
 From: Juan Quintela <quintela@redhat.com>
-Date: Tue, 21 Nov 2017 19:47:36 +0100
-Message-Id: <20171121184738.8502-1-quintela@redhat.com>
-Subject: [Qemu-devel] [PULL 0/2]  Migration pull request
+Date: Tue, 21 Nov 2017 19:47:37 +0100
+Message-Id: <20171121184738.8502-2-quintela@redhat.com>
+In-Reply-To: <20171121184738.8502-1-quintela@redhat.com>
+References: <20171121184738.8502-1-quintela@redhat.com>
+Subject: [Qemu-devel] [PULL 1/2] migration,
+ xen: Fix block image lock issue on live migration
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,37 +25,104 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: dgilbert@redhat.com, lvivier@redhat.com, peterx@redhat.com
+Cc: dgilbert@redhat.com, lvivier@redhat.com, peterx@redhat.com, Anthony PERARD <anthony.perard@citrix.com>
 
-Hi
+From: Anthony PERARD <anthony.perard@citrix.com>
 
-THis has two fixes for migration, please apply.
+When doing a live migration of a Xen guest with libxl, the images for
+block devices are locked by the original QEMU process, and this prevent
+the QEMU at the destination to take the lock and the migration fail.
 
-Later, Juan.
+>From QEMU point of view, once the RAM of a domain is migrated, there is
+two QMP commands, "stop" then "xen-save-devices-state", at which point a
+new QEMU is spawned at the destination.
 
-The following changes since commit a15d835f00dce270fd3194e83d9910f4b5b44ac0:
+Release locks in "xen-save-devices-state" so the destination can takes
+them, if it's a live migration.
 
-  Update version for v2.11.0-rc2 release (2017-11-21 17:50:36 +0000)
+This patch add the "live" parameter to "xen-save-devices-state" which
+default to true so older version of libxenlight can work with newer
+version of QEMU.
 
-are available in the git repository at:
-
-  git://github.com/juanquintela/qemu.git tags/migration/20171121
-
-for you to fetch changes up to 383d8a77222c016610d626887de80e770cdd9936:
-
-  migration/ram.c: do not set 'postcopy_running' in POSTCOPY_INCOMING_END (2017-11-21 19:42:26 +0100)
-
-----------------------------------------------------------------
-migration/next for 20171121
-
-----------------------------------------------------------------
-Anthony PERARD (1):
-      migration, xen: Fix block image lock issue on live migration
-
-Daniel Henrique Barboza (1):
-      migration/ram.c: do not set 'postcopy_running' in POSTCOPY_INCOMING_END
-
- migration/ram.c     | 22 +++++++++++++++-------
+Signed-off-by: Anthony PERARD <anthony.perard@citrix.com>
+Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+Reviewed-by: Juan Quintela <quintela@redhat.com>
+Signed-off-by: Juan Quintela <quintela@redhat.com>
+---
  migration/savevm.c  | 23 ++++++++++++++++++++++-
  qapi/migration.json |  6 +++++-
- 3 files changed, 42 insertions(+), 9 deletions(-)
+ 2 files changed, 27 insertions(+), 2 deletions(-)
+
+diff --git a/migration/savevm.c b/migration/savevm.c
+index 192f2d82cd..b7908f62be 100644
+--- a/migration/savevm.c
++++ b/migration/savevm.c
+@@ -2242,13 +2242,20 @@ int save_snapshot(const char *name, Error **errp)
+     return ret;
+ }
+ 
+-void qmp_xen_save_devices_state(const char *filename, Error **errp)
++void qmp_xen_save_devices_state(const char *filename, bool has_live, bool live,
++                                Error **errp)
+ {
+     QEMUFile *f;
+     QIOChannelFile *ioc;
+     int saved_vm_running;
+     int ret;
+ 
++    if (!has_live) {
++        /* live default to true so old version of Xen tool stack can have a
++         * successfull live migration */
++        live = true;
++    }
++
+     saved_vm_running = runstate_is_running();
+     vm_stop(RUN_STATE_SAVE_VM);
+     global_state_store_running();
+@@ -2263,6 +2270,20 @@ void qmp_xen_save_devices_state(const char *filename, Error **errp)
+     qemu_fclose(f);
+     if (ret < 0) {
+         error_setg(errp, QERR_IO_ERROR);
++    } else {
++        /* libxl calls the QMP command "stop" before calling
++         * "xen-save-devices-state" and in case of migration failure, libxl
++         * would call "cont".
++         * So call bdrv_inactivate_all (release locks) here to let the other
++         * side of the migration take controle of the images.
++         */
++        if (live && !saved_vm_running) {
++            ret = bdrv_inactivate_all();
++            if (ret) {
++                error_setg(errp, "%s: bdrv_inactivate_all() failed (%d)",
++                           __func__, ret);
++            }
++        }
+     }
+ 
+  the_end:
+diff --git a/qapi/migration.json b/qapi/migration.json
+index bbc4671ded..03f57c9616 100644
+--- a/qapi/migration.json
++++ b/qapi/migration.json
+@@ -1075,6 +1075,9 @@
+ # data. See xen-save-devices-state.txt for a description of the binary
+ # format.
+ #
++# @live: Optional argument to ask QEMU to treat this command as part of a live
++# migration. Default to true. (since 2.11)
++#
+ # Returns: Nothing on success
+ #
+ # Since: 1.1
+@@ -1086,7 +1089,8 @@
+ # <- { "return": {} }
+ #
+ ##
+-{ 'command': 'xen-save-devices-state', 'data': {'filename': 'str'} }
++{ 'command': 'xen-save-devices-state',
++  'data': {'filename': 'str', '*live':'bool' } }
+ 
+ ##
+ # @xen-set-replication:
+-- 
+2.13.6
