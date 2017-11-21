@@ -1,26 +1,38 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43709)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45864)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1eHBlq-0006PR-UI
-	for qemu-devel@nongnu.org; Tue, 21 Nov 2017 11:51:40 -0500
+	(envelope-from <imammedo@redhat.com>) id 1eHBsN-0000LS-8q
+	for qemu-devel@nongnu.org; Tue, 21 Nov 2017 11:58:24 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1eHBlp-0007b2-V8
-	for qemu-devel@nongnu.org; Tue, 21 Nov 2017 11:51:38 -0500
-Received: from mail-oi0-x230.google.com ([2607:f8b0:4003:c06::230]:34598)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1eHBlp-0007ap-Oq
-	for qemu-devel@nongnu.org; Tue, 21 Nov 2017 11:51:37 -0500
-Received: by mail-oi0-x230.google.com with SMTP id a75so8985528oib.1
-	for <qemu-devel@nongnu.org>; Tue, 21 Nov 2017 08:51:37 -0800 (PST)
+	(envelope-from <imammedo@redhat.com>) id 1eHBsI-0002bo-AQ
+	for qemu-devel@nongnu.org; Tue, 21 Nov 2017 11:58:23 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:6935)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1eHBsI-0002bX-1A
+	for qemu-devel@nongnu.org; Tue, 21 Nov 2017 11:58:18 -0500
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+	[10.5.11.13])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id DEE1F37E6E
+	for <qemu-devel@nongnu.org>; Tue, 21 Nov 2017 16:58:16 +0000 (UTC)
+Date: Tue, 21 Nov 2017 17:58:12 +0100
+From: Igor Mammedov <imammedo@redhat.com>
+Message-ID: <20171121175812.6f922e2e@redhat.com>
+In-Reply-To: <20171121182432-mutt-send-email-mst@kernel.org>
+References: <1510834622-28800-1-git-send-email-thuth@redhat.com>
+	<20171120175522.76bf71c3@redhat.com>
+	<20171120223048-mutt-send-email-mst@kernel.org>
+	<20171121142639.3e6d2e79@redhat.com>
+	<20171121164254-mutt-send-email-mst@kernel.org>
+	<20171121165809.1ec4362a@redhat.com>
+	<20171121180202-mutt-send-email-mst@kernel.org>
+	<20171121172236.618c8e08@redhat.com>
+	<20171121182432-mutt-send-email-mst@kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <20171107150558.22131-1-alex.bennee@linaro.org>
-References: <20171107150558.22131-1-alex.bennee@linaro.org>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 21 Nov 2017 16:51:16 +0000
-Message-ID: <CAFEAcA8-kyLTiaJxfwmWx-85qZ2W31V8whqLot9hPX5AizCZng@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [RISU PATCH 00/10] Initial support for SVE
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v2] tests/bios-tables-test: Fix endianess
+ problems when passing data to iasl
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,65 +41,82 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>
-Cc: Dave P Martin <Dave.Martin@arm.com>, QEMU Developers <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org
 
-On 7 November 2017 at 15:05, Alex Benn=C3=A9e <alex.bennee@linaro.org> wrot=
-e:
-> Hi,
->
-> These patches apply on-top of the last clean-up series:
->
->   Subject: [RISU PATCH 0/7] Add @Group support and some aarch64.risu clea=
-nups
->   Date: Tue, 31 Oct 2017 14:54:37 +0000
->   Message-Id: <20171031145444.13766-1-alex.bennee@linaro.org>
->
-> This series adds support for SVE to RISU. Most of the initial patches
-> are plumbing changes to better support arch specific option flags
-> (cleaning up a TODO in the process). I also needed to ensure configure
-> actually honoured CPPFLAGS so it could be passed yet to be released
-> headers.
->
-> The actual guts of the SVE support is in 3 patches. One to risugen so
-> it can generate random values for the vector registers. If this isn't
-> done you get inconsistent runs because of left over junk in the
-> registers. The remaining two patches add support for copying the SVE
-> vectors from the signal context and dumping any differences found.
->
-> To test this I ran on the Foundation model with:
->
->   ${RTSM_MODEL} --no-secure-memory --gicv3 --data=3D${BL1_FIRMWARE}@0x0 -=
--data=3D${FIP_FIRMWARE}@0x8000000 \
->                 --semihost --network nat --network-nat-ports=3D8022=3D22 =
---block-device ${DISK_IMAGE}
->
-> With my hacked up copy of secure firmware to ensure SVE is enabled.
-> You also need a kernel with SVE support:
->
->   Subject: [PATCH v5 00/30] ARM Scalable Vector Extension (SVE)
->   Date: Tue, 31 Oct 2017 15:50:52 +0000
->   Message-Id: <1509465082-30427-1-git-send-email-Dave.Martin@arm.com>
->
-> My testing so far has been to ensure that each run on the foundation
-> model is deterministic (same m5sum on each trace) and that differences
-> are printed out when the user-space vector length is tweaked
-> (/proc/sys/abi/sve_default_vector_length).
->
->
-> Alex Benn=C3=A9e (10):
->   build-all-arches: drop -t (for tty) from docker invocation
->   risu.c: split out setting up options
->   risu.c: add missing --trace longopt
->   risu: move optional args to each architecture
->   configure: allow repeated invocation of configure in build dir
->   configure: support CPPFLAGS
->   risugen: add --sve support
->   aarch64.risu: initial SVE instruction
->   risu_reginfo_aarch64: add reginfo_copy_sve
->   risu_reginfo_aarch64: add SVE support to reginfo_dump_mismatch
+On Tue, 21 Nov 2017 18:31:19 +0200
+"Michael S. Tsirkin" <mst@redhat.com> wrote:
 
-I've applied patches 1, 2, 3, 5, 6 to risu master.
+> On Tue, Nov 21, 2017 at 05:22:36PM +0100, Igor Mammedov wrote:
+> > > > > > > > probably it's been discussed but, why not do
+> > > > > > > >  leXX_to_cpu()
+> > > > > > > > here, instead of making each place that access read field
+> > > > > > > > to do leXX_to_cpu() manually.?
+> > > > > > > > 
+> > > > > > > > Beside of keeping access to structure in natural host order,
+> > > > > > > > it should also be less error-prone as field users don't
+> > > > > > > > have to worry about endianness.        
+> > > > > > > 
+> > > > > > > Yes, I suggested that.
+> > > > > > > The issue is that we don't byte-swap all of the tables
+> > > > > > > (we can't, that would require a full ACPI parser).
+> > > > > > > So when byte-swapping we end up with a mixed host/LE
+> > > > > > > structures.      
+> > > > ...    
+> > > > > > What tables/use-cases do you have in mind where we'd need full
+> > > > > > ACPI parser /whatever it is/?      
+> > > > > 
+> > > > > We dump ACPI tables for parsing by iasl.    
+> > > > I don't really see a problem here (i.e. how dumping blobs for
+> > > > iasl would require byte-swap all of the tables).    
+> > > 
+> > > It's not all the tables. We would need to track what is and
+> > > what isn't swapped.  
+> > Why we need track swapping at all?
+> > Why not just convert everything to host order and work with that
+> > in C code, so we won't have to deal with mixed endianness anywhere
+> > in code beside of accessors wrappers?   
+> 
+> It's a tooling issue really.
+> 
+> Consider any structure, e.g. AcpiRsdtDescriptorRev1.  We want its fields
+> to have specific endian-ness so we can use static checking for that down
+> the line.
+> 
+> So it must be LE since we use it to format guest tables.
+> 
+> Therefore this change:
+> -    uint32_t addr = data->rsdp_table.rsdt_physical_address;
+> +    uint32_t addr = le32_to_cpu(data->rsdp_table.rsdt_physical_address);
+> 
+> is really a requirement, otherwise we end up with converting
+> field format in-place and static checkers can't support that
+> right now.
 
-thanks
--- PMM
+I didn't really used static checker for this purpose but in my humble
+experience of writing portable cross platform code, mixed endianness
+always was a source of bugs and reviewing corresponding code is much
+harder and a way to reduce/simplify code was isolate byte-swapping to
+accessors while the the rest of the code works with native encoding.
+
+it seems a bit wrong to make code twisted (when we don't have) for
+the sake of some tooling to work.
+
+anyways, if you prefer having mixed endianness here, I won't mind much,
+as impact of test case is much smaller so we'll see down the road
+if it became any better. (as far as we continue going in direction
+of using host byteorder within main qemu acpi code, which we were
+doing by gradually converting acpi structures to build_append_foo API)
+
+> 
+> >    
+> > > > Where bios-tables-test.c is concerned we should just read
+> > > > a blob from qemu (get its location/len/name) and dump it to
+> > > > disk without changing anything in it.    
+> > > 
+> > > Exactly.
+> > >   
+> > > > > >       
+> > > > > > > Keeping it all LE seems cleaner.
+> > > > > > > 
+> > > > > > >       
