@@ -1,25 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40791)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44723)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1eHAKC-0002Di-HC
-	for qemu-devel@nongnu.org; Tue, 21 Nov 2017 10:19:08 -0500
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1eHAWj-0004vt-Gf
+	for qemu-devel@nongnu.org; Tue, 21 Nov 2017 10:32:03 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1eHAK4-0000xZ-RG
-	for qemu-devel@nongnu.org; Tue, 21 Nov 2017 10:19:00 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:32866)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1eHAK4-0000wB-LM
-	for qemu-devel@nongnu.org; Tue, 21 Nov 2017 10:18:52 -0500
-References: <1511276888-17834-1-git-send-email-peter.maydell@linaro.org>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <e2a7e3fa-a660-a1e1-9e34-4585a10ae6ad@redhat.com>
-Date: Tue, 21 Nov 2017 16:18:49 +0100
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1eHAWg-0006HO-Ct
+	for qemu-devel@nongnu.org; Tue, 21 Nov 2017 10:31:57 -0500
+Received: from mail-qt0-x229.google.com ([2607:f8b0:400d:c0d::229]:34529)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1eHAWg-0006HG-8U
+	for qemu-devel@nongnu.org; Tue, 21 Nov 2017 10:31:54 -0500
+Received: by mail-qt0-x229.google.com with SMTP id 33so10820141qtv.1
+	for <qemu-devel@nongnu.org>; Tue, 21 Nov 2017 07:31:54 -0800 (PST)
+Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
+	<philippe.mathieu.daude@gmail.com>
+References: <20171121142538.22072-1-berrange@redhat.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Message-ID: <bc25154c-287a-ecc2-d96f-e55cfbfe11f2@amsat.org>
+Date: Tue, 21 Nov 2017 12:31:50 -0300
 MIME-Version: 1.0
-In-Reply-To: <1511276888-17834-1-git-send-email-peter.maydell@linaro.org>
+In-Reply-To: <20171121142538.22072-1-berrange@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] memory-internal.h: Remove obsolete claim
- that header is obsolete
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH v2] build: disarm the TCG unit test trap
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,54 +34,60 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org
-Cc: patches@linaro.org
+To: "Daniel P. Berrange" <berrange@redhat.com>, qemu-devel@nongnu.org
+Cc: Peter Maydell <peter.maydell@linaro.org>
 
-On 21/11/2017 16:08, Peter Maydell wrote:
-> The memory-internal.h header claims that it is for "obsolete
-> exec.c functions" which "will be removed soon". This statement
-> was added in 2011, six years ago, but the header is still here.
-> (Admittedly none of the prototypes added in commit 67d95c153bef55f6
-> are still in the header.)
+On 11/21/2017 11:25 AM, Daniel P. Berrange wrote:
+> Developers sometimes mistakenly run 'make test' instead of 'make check'.
+> 'make test' triggers the ancient, unmaintained tcg unit tests in
+> tests/tcg/Makefile which have long since ceased compiling.
 > 
-> It's convenient to have a place to put prototypes for functions
-> which are used internally to the various .c files of the memory
-> system or by the accel/tcg code, which is inevitably fairly
-> closely coupled. So keep the header but update the comments to
-> reflect what we're actually using it for.
+> Even if someone fixes the TCG tests, it makes little sense to put
+> them in a 'make test' target, rather they should be 'make check-tcg',
+> possibly wired up as a dependency of 'make check'.
 > 
-> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+> In the meantime, this patch disarms the 'make test' trap by simply
+> deleting it so users get an immediate error. This should be enough
+> for them to remember to type 'make check' instead (or 'make help'
+> to learn). It also deletes 'make speed' which is another route
+> into the tcg tests.
+> 
+> Signed-off-by: Daniel P. Berrange <berrange@redhat.com>
+
+Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+
 > ---
->  include/exec/memory-internal.h | 7 ++++---
->  1 file changed, 4 insertions(+), 3 deletions(-)
 > 
-> diff --git a/include/exec/memory-internal.h b/include/exec/memory-internal.h
-> index 98d8296..4162474 100644
-> --- a/include/exec/memory-internal.h
-> +++ b/include/exec/memory-internal.h
-> @@ -1,5 +1,5 @@
->  /*
-> - * Declarations for obsolete exec.c functions
-> + * Declarations for functions which are internal to the memory subsystem.
->   *
->   * Copyright 2011 Red Hat, Inc. and/or its affiliates
->   *
-> @@ -12,8 +12,9 @@
->   */
->  
->  /*
-> - * This header is for use by exec.c and memory.c ONLY.  Do not include it.
-> - * The functions declared here will be removed soon.
-> + * This header is for use by exec.c, memory.c and accel/tcg/cputlb.c ONLY,
-> + * for declarations which are shared between the memory subsystem's
-> + * internals and the TCG TLB code. Do not include it from elsewhere.
->   */
->  
->  #ifndef MEMORY_INTERNAL_H
+> Changed in v2:
 > 
-
-Acked-by: Paolo Bonzini <pbonzini@redhat.com>
-
-Thanks,
-
-Paolo
+>  - Remove 'test' & 'speed' targets, instead of making 'test'
+>    a synonym for 'check'
+> 
+>  Makefile | 6 +-----
+>  1 file changed, 1 insertion(+), 5 deletions(-)
+> 
+> diff --git a/Makefile b/Makefile
+> index d2e31d98af..ab0354c153 100644
+> --- a/Makefile
+> +++ b/Makefile
+> @@ -253,7 +253,7 @@ Makefile: ;
+>  configure: ;
+>  
+>  .PHONY: all clean cscope distclean html info install install-doc \
+> -	pdf txt recurse-all speed test dist msi FORCE
+> +	pdf txt recurse-all dist msi FORCE
+>  
+>  $(call set-vpath, $(SRC_PATH))
+>  
+> @@ -716,10 +716,6 @@ endif
+>  	$(MAKE) $(SUBDIR_MAKEFLAGS) TARGET_DIR=$$d/ -C $$d $@ || exit 1 ; \
+>          done
+>  
+> -# various test targets
+> -test speed: all
+> -	$(MAKE) -C tests/tcg $@
+> -
+>  .PHONY: ctags
+>  ctags:
+>  	rm -f tags
+> 
