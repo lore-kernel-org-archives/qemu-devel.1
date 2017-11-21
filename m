@@ -1,23 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49956)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50449)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1eH8Ko-0005Yn-Hp
-	for qemu-devel@nongnu.org; Tue, 21 Nov 2017 08:11:31 -0500
+	(envelope-from <pbonzini@redhat.com>) id 1eH8MC-0006b5-DU
+	for qemu-devel@nongnu.org; Tue, 21 Nov 2017 08:12:57 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1eH8Kn-0000or-F8
-	for qemu-devel@nongnu.org; Tue, 21 Nov 2017 08:11:30 -0500
+	(envelope-from <pbonzini@redhat.com>) id 1eH8MB-0001iy-F4
+	for qemu-devel@nongnu.org; Tue, 21 Nov 2017 08:12:56 -0500
 References: <cover.1511230683.git.jcody@redhat.com>
-	<1f0fd95c2096688add2c7b3cfcd7016756ef19fb.1511230683.git.jcody@redhat.com>
-	<20171121105935.GB25265@stefanha-x1.localdomain>
+	<d21a7bb5d13a8d8db55bea05e46f5f4e18ed481e.1511230683.git.jcody@redhat.com>
+	<20171121104946.GA25265@stefanha-x1.localdomain>
 From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <78d9e8ec-8d87-571d-9202-572a3190b959@redhat.com>
-Date: Tue, 21 Nov 2017 14:11:07 +0100
+Message-ID: <072692b7-3b3e-b44d-02c8-9d8f4e745b67@redhat.com>
+Date: Tue, 21 Nov 2017 14:12:32 +0100
 MIME-Version: 1.0
-In-Reply-To: <20171121105935.GB25265@stefanha-x1.localdomain>
+In-Reply-To: <20171121104946.GA25265@stefanha-x1.localdomain>
 Content-Type: multipart/signed; micalg=pgp-sha256;
 	protocol="application/pgp-signature";
-	boundary="XDjfb0hr7Gx0qI3KEXoo8XEn9ExbWNXjA"
-Subject: Re: [Qemu-devel] [PATCH v2 for-2.11 2/4] coroutine: abort if we try
- to schedule or enter a pending coroutine
+	boundary="fwgVVUr94qi5fa5j4e3RpSlQNUMc8wbfn"
+Subject: Re: [Qemu-devel] [PATCH v2 for-2.11 1/4] blockjob: do not allow
+ coroutine double entry or entry-after-completion
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,93 +30,63 @@ To: Stefan Hajnoczi <stefanha@redhat.com>, Jeff Cody <jcody@redhat.com>
 Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, mreitz@redhat.com, famz@redhat.com, kwolf@redhat.com
 
 This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---XDjfb0hr7Gx0qI3KEXoo8XEn9ExbWNXjA
+--fwgVVUr94qi5fa5j4e3RpSlQNUMc8wbfn
 From: Paolo Bonzini <pbonzini@redhat.com>
 To: Stefan Hajnoczi <stefanha@redhat.com>, Jeff Cody <jcody@redhat.com>
 Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, mreitz@redhat.com,
  famz@redhat.com, kwolf@redhat.com
-Message-ID: <78d9e8ec-8d87-571d-9202-572a3190b959@redhat.com>
-Subject: Re: [PATCH v2 for-2.11 2/4] coroutine: abort if we try to schedule or
- enter a pending coroutine
+Message-ID: <072692b7-3b3e-b44d-02c8-9d8f4e745b67@redhat.com>
+Subject: Re: [PATCH v2 for-2.11 1/4] blockjob: do not allow coroutine double
+ entry or entry-after-completion
 References: <cover.1511230683.git.jcody@redhat.com>
- <1f0fd95c2096688add2c7b3cfcd7016756ef19fb.1511230683.git.jcody@redhat.com>
- <20171121105935.GB25265@stefanha-x1.localdomain>
-In-Reply-To: <20171121105935.GB25265@stefanha-x1.localdomain>
+ <d21a7bb5d13a8d8db55bea05e46f5f4e18ed481e.1511230683.git.jcody@redhat.com>
+ <20171121104946.GA25265@stefanha-x1.localdomain>
+In-Reply-To: <20171121104946.GA25265@stefanha-x1.localdomain>
 Content-Type: text/plain; charset=windows-1252
 Content-Transfer-Encoding: quoted-printable
 
-On 21/11/2017 11:59, Stefan Hajnoczi wrote:
-> On Mon, Nov 20, 2017 at 09:23:24PM -0500, Jeff Cody wrote:
->> @@ -438,6 +439,16 @@ fail:
->>  void aio_co_schedule(AioContext *ctx, Coroutine *co)
+On 21/11/2017 11:49, Stefan Hajnoczi wrote:
+> On Mon, Nov 20, 2017 at 09:23:23PM -0500, Jeff Cody wrote:
+>> @@ -291,10 +291,10 @@ void block_job_start(BlockJob *job)
 >>  {
->>      trace_aio_co_schedule(ctx, co);
->> +    const char *scheduled =3D atomic_read(&co->scheduled);
->> +
->> +    if (scheduled) {
->> +        fprintf(stderr,
->> +                "%s: Co-routine was already scheduled in '%s'\n",
->> +                __func__, scheduled);
->> +        abort();
->> +    }
->> +    atomic_set(&co->scheduled, __func__);
+>>      assert(job && !block_job_started(job) && job->paused &&
+>>             job->driver && job->driver->start);
+>> -    job->co =3D qemu_coroutine_create(block_job_co_entry, job);
+>>      job->pause_count--;
+>>      job->busy =3D true;
+>>      job->paused =3D false;
+>> +    job->co =3D qemu_coroutine_create(block_job_co_entry, job);
+>>      bdrv_coroutine_enter(blk_bs(job->blk), job->co);
+>>  }
 >=20
-> According to docs/devel/atomics.txt atomic_set()/atomic_read() are
-> weakly ordered.  They require memory barriers to provide guarantees
-> about ordering.  Your patch doesn't include barriers or comments about
-> where the implicit barriers are.
+> Please see discussion on v1 about this hunk.
 >=20
-> The docs recommend using the following instead of
-> atomic_read()/atomic_set() to get ordering:
->=20
->   typeof(*ptr) atomic_mb_read(ptr)
->   void         atomic_mb_set(ptr, val)
+> The rest looks good.
 
-Even with atomic_mb_read/atomic_mb_set we should document what memory
-ordering is required for correctness (i.e. what should be ordered
-against what, or equivalently what operation has release/acquire semantic=
-s).
-
-My reasoning is that the NULL write to co->scheduled should be ordered
-before a write of co (anywhere), but the same is true for co->ctx so the
-NULL write is ordered by the smp_wmb in qemu_aio_coroutine_enter.  So
-that is fine but it needs a comment.
-
-Dually, the read should be ordered after a read of co, but that's
-handled by the callers via atomic_rcu_read if they need the ordering.
-No comment needed here I think.
-
-What's left is the __func__ write, where atomic_mb_set should be used
-indeed. Or, perhaps better:
-
-    const char *scheduled =3D atomic_cmpxchg(&co->scheduled,
-                                           NULL, __func__);
-    if (scheduled) {
-        ...
-    }
-
-=2E.. which also removes the atomic_read.
+I'm okay with this hunk, but I would appreciate that the commit message
+said why it's okay to delay block job cancellation after
+block_job_sleep_ns returns.
 
 Thanks,
 
 Paolo
 
 
---XDjfb0hr7Gx0qI3KEXoo8XEn9ExbWNXjA
+--fwgVVUr94qi5fa5j4e3RpSlQNUMc8wbfn
 Content-Type: application/pgp-signature; name="signature.asc"
 Content-Description: OpenPGP digital signature
 Content-Disposition: attachment; filename="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQEzBAEBCAAdFiEE8TM4V0tmI4mGbHaCv/vSX3jHroMFAloUJewACgkQv/vSX3jH
-roMrwQf/e1Jj0UwFH8zEXqyv6WXuitNK4eDCCbiKAndeiOyxULnXeJEnD97anu5s
-lgDZyz41WmbyHhZP3ysHZGqioQOiHEMtdVZdRaqcjGbFj+ZPjoe0W42yZkyRBr8g
-VDthGACKxt5agrz1otFZAZjdSNeZ22IBqC9U/8b8fAanEklddNI99lMZ1qXxA7ws
-TvcRWYlYgNtz8Amn99e3VxtVaHMemV5a2Rnc1vovS5jLvn3FcHB5/T1ARwlhAVAz
-yCQVnBVWvOLzrgzN7we/Y1nUY618DzHm9mtQI2nmLiFRokzfVXIfUxHNZQTw9OC1
-qbj4EO2tTDZXyCP/dxQaBcHpRFNgeg==
-=ZmHO
+iQEzBAEBCAAdFiEE8TM4V0tmI4mGbHaCv/vSX3jHroMFAloUJkAACgkQv/vSX3jH
+roP7IQf/RY2OUQ3mAkB4NqGkmbYUa5bWnIOpxlkfv+edRudny2h9eswT5w15O6x6
+pzNVXRZ5NUPY1XcMGCM1tDEXPxPqT6TcA738CSzyE8nxpHmLnnY7/IS5UwXVPXEH
+5FgxV2m0SFVcz+uraaA7yYMmkazgpqYGc0UBVxYGQhCMv1WHLWLXoQdCDYcsJSjr
+wdIUlHdUZJv4feEOMaRHomoCS4yQLhLuPkkRkKUvVt8qiuPlt4IBpprzaXlQlO2T
+52A7N1Vcosfx76Exn8cHxkVWmraJx9zna0gRDy4imBjny7x/RB4DQ7dCz6Vxf6Fm
+5FhtZUBgZjic02vQGYrdc9d9Vjm3Qg==
+=xIFQ
 -----END PGP SIGNATURE-----
 
---XDjfb0hr7Gx0qI3KEXoo8XEn9ExbWNXjA--
+--fwgVVUr94qi5fa5j4e3RpSlQNUMc8wbfn--
