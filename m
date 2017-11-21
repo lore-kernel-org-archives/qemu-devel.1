@@ -1,42 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49270)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49429)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <borntraeger@de.ibm.com>) id 1eHD05-0002hy-Hg
-	for qemu-devel@nongnu.org; Tue, 21 Nov 2017 13:10:26 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1eHD0U-0002xV-Hw
+	for qemu-devel@nongnu.org; Tue, 21 Nov 2017 13:10:51 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <borntraeger@de.ibm.com>) id 1eHD01-0000LK-UR
-	for qemu-devel@nongnu.org; Tue, 21 Nov 2017 13:10:25 -0500
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:46414
-	helo=mx0a-001b2d01.pphosted.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <borntraeger@de.ibm.com>)
-	id 1eHD01-0000Kw-Ka
-	for qemu-devel@nongnu.org; Tue, 21 Nov 2017 13:10:21 -0500
-Received: from pps.filterd (m0098419.ppops.net [127.0.0.1])
-	by mx0b-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
-	vALI4PwC145402
-	for <qemu-devel@nongnu.org>; Tue, 21 Nov 2017 13:10:21 -0500
-Received: from e06smtp11.uk.ibm.com (e06smtp11.uk.ibm.com [195.75.94.107])
-	by mx0b-001b2d01.pphosted.com with ESMTP id 2ecqmfepef-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Tue, 21 Nov 2017 13:10:20 -0500
-Received: from localhost
-	by e06smtp11.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
-	Only! Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <borntraeger@de.ibm.com>;
-	Tue, 21 Nov 2017 18:10:18 -0000
-References: <20171121111825.17916-1-pasic@linux.vnet.ibm.com>
-	<20171121144457.60adb0c3.cohuck@redhat.com>
-	<66e1c5e3-575f-ec7c-d88c-4ada23f358fa@de.ibm.com>
-	<20171121170650.323c6959.cohuck@redhat.com>
-From: Christian Borntraeger <borntraeger@de.ibm.com>
-Date: Tue, 21 Nov 2017 19:10:15 +0100
+	(envelope-from <peter.maydell@linaro.org>) id 1eHD0T-0000SB-Bh
+	for qemu-devel@nongnu.org; Tue, 21 Nov 2017 13:10:50 -0500
+Received: from mail-oi0-x241.google.com ([2607:f8b0:4003:c06::241]:33644)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1eHD0T-0000Rv-5t
+	for qemu-devel@nongnu.org; Tue, 21 Nov 2017 13:10:49 -0500
+Received: by mail-oi0-x241.google.com with SMTP id f135so9164137oib.0
+	for <qemu-devel@nongnu.org>; Tue, 21 Nov 2017 10:10:49 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <20171121170650.323c6959.cohuck@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Message-Id: <a59023ce-931b-2c03-b877-11dfa2e4adf1@de.ibm.com>
-Subject: Re: [Qemu-devel] [RFC PATCH 1/1] s390x/css: unresrict cssids
+In-Reply-To: <20171106154813.19936-15-andrew.smirnov@gmail.com>
+References: <20171106154813.19936-1-andrew.smirnov@gmail.com>
+	<20171106154813.19936-15-andrew.smirnov@gmail.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Tue, 21 Nov 2017 18:10:28 +0000
+Message-ID: <CAFEAcA8gxXmEL3yeu0J12C8D0AkKFqBKC1Sud2HLbT1EdUO41Q@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v3 14/30] i.MX: Add code to emulate i.MX2
+ watchdog IP block
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -45,85 +31,186 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Cornelia Huck <cohuck@redhat.com>
-Cc: Halil Pasic <pasic@linux.vnet.ibm.com>, Boris Fiuczynski <fiuczy@linux.vnet.ibm.com>, Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>, Shalini Chellathurai Saroja <shalini@linux.vnet.ibm.com>, qemu-devel@nongnu.org, qemu-s390x@nongnu.org
+To: Andrey Smirnov <andrew.smirnov@gmail.com>
+Cc: qemu-arm <qemu-arm@nongnu.org>, Jason Wang <jasowang@redhat.com>, =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>, QEMU Developers <qemu-devel@nongnu.org>, Andrey Yurovsky <yurovsky@gmail.com>
 
+On 6 November 2017 at 15:47, Andrey Smirnov <andrew.smirnov@gmail.com> wrot=
+e:
+> Add enough code to emulate i.MX2 watchdog IP block so it would be
+> possible to reboot the machine running Linux Guest.
+>
+> Cc: Peter Maydell <peter.maydell@linaro.org>
+> Cc: Jason Wang <jasowang@redhat.com>
+> Cc: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
+> Cc: qemu-devel@nongnu.org
+> Cc: qemu-arm@nongnu.org
+> Cc: yurovsky@gmail.com
+> Signed-off-by: Andrey Smirnov <andrew.smirnov@gmail.com>
+> ---
+>  hw/misc/Makefile.objs      |  1 +
+>  hw/misc/imx2_wdt.c         | 88 ++++++++++++++++++++++++++++++++++++++++=
+++++++
+>  include/hw/misc/imx2_wdt.h | 34 ++++++++++++++++++
+>  3 files changed, 123 insertions(+)
+>  create mode 100644 hw/misc/imx2_wdt.c
+>  create mode 100644 include/hw/misc/imx2_wdt.h
+>
+> diff --git a/hw/misc/Makefile.objs b/hw/misc/Makefile.objs
+> index ac1be05a03..c393a93456 100644
+> --- a/hw/misc/Makefile.objs
+> +++ b/hw/misc/Makefile.objs
+> @@ -35,6 +35,7 @@ obj-$(CONFIG_IMX) +=3D imx25_ccm.o
+>  obj-$(CONFIG_IMX) +=3D imx6_ccm.o
+>  obj-$(CONFIG_IMX) +=3D imx6_src.o
+>  obj-$(CONFIG_IMX) +=3D imx7_ccm.o
+> +obj-$(CONFIG_IMX) +=3D imx2_wdt.o
+>  obj-$(CONFIG_MILKYMIST) +=3D milkymist-hpdmc.o
+>  obj-$(CONFIG_MILKYMIST) +=3D milkymist-pfpu.o
+>  obj-$(CONFIG_MAINSTONE) +=3D mst_fpga.o
+> diff --git a/hw/misc/imx2_wdt.c b/hw/misc/imx2_wdt.c
+> new file mode 100644
+> index 0000000000..3a1c33aa51
+> --- /dev/null
+> +++ b/hw/misc/imx2_wdt.c
+> @@ -0,0 +1,88 @@
+> +/*
+> + * Copyright (c) 2017, Impinj, Inc.
+> + *
+> + * i.MX2 Watchdog IP block
+> + *
+> + * Author: Andrey Smirnov <andrew.smirnov@gmail.com>
+> + *
+> + * This work is licensed under the terms of the GNU GPL, version 2 or la=
+ter.
+> + * See the COPYING file in the top-level directory.
+> + */
+> +
+> +#include "qemu/osdep.h"
+> +#include "sysemu/watchdog.h"
+> +
+> +#include "hw/misc/imx2_wdt.h"
+> +
+> +#define IMX2_WDT_WCR_WDA    BIT(5)      /* -> External Reset WDOG_B */
+> +#define IMX2_WDT_WCR_SRS    BIT(4)      /* -> Software Reset Signal */
+> +
+> +static uint64_t imx2_wdt_read(void *opaque, hwaddr addr,
+> +                              unsigned int size)
+> +{
+> +    return 0;
+> +}
+> +
+> +static void imx2_wdt_write(void *opaque, hwaddr addr,
+> +                           uint64_t value, unsigned int size)
+> +{
+> +    if (addr =3D=3D IMX2_WDT_WCR &&
+> +        (value & (IMX2_WDT_WCR_WDA | IMX2_WDT_WCR_SRS))) {
+> +        watchdog_perform_action();
+> +    }
+> +}
+> +
+> +static const MemoryRegionOps imx2_wdt_ops =3D {
+> +    .read  =3D imx2_wdt_read,
+> +    .write =3D imx2_wdt_write,
+> +    .endianness =3D DEVICE_NATIVE_ENDIAN,
+> +    .impl =3D {
+> +        /*
+> +         * Our device would not work correctly if the guest was doing
+> +         * unaligned access. This might not be a limitation on the
+> +         * real device but in practice there is no reason for a guest
+> +         * to access this device unaligned.
+> +         */
+> +        .min_access_size =3D 4,
+> +        .max_access_size =3D 4,
+> +        .unaligned =3D false,
+> +    },
+> +};
+> +
+> +static void imx2_wdt_realize(DeviceState *dev, Error **errp)
+> +{
+> +    IMX2WdtState *s =3D IMX2_WDT(dev);
+> +
+> +    memory_region_init_io(&s->mmio, OBJECT(dev),
+> +                          &imx2_wdt_ops, s,
+> +                          TYPE_IMX2_WDT".mmio",
+> +                          IMX2_WDT_REG_NUM * sizeof(uint16_t));
+> +    sysbus_init_mmio(SYS_BUS_DEVICE(dev), &s->mmio);
+> +}
+> +
+> +static void imx2_wdt_class_init(ObjectClass *klass, void *data)
+> +{
+> +    DeviceClass *dc =3D DEVICE_CLASS(klass);
+> +
+> +    dc->realize =3D imx2_wdt_realize;
+> +    set_bit(DEVICE_CATEGORY_MISC, dc->categories);
+> +}
+> +
+> +static const TypeInfo imx2_wdt_info =3D {
+> +    .name          =3D TYPE_IMX2_WDT,
+> +    .parent        =3D TYPE_SYS_BUS_DEVICE,
+> +    .instance_size =3D sizeof(IMX2WdtState),
+> +    .class_init    =3D imx2_wdt_class_init,
+> +};
+> +
+> +static WatchdogTimerModel model =3D {
+> +    .wdt_name =3D "imx2-watchdog",
+> +    .wdt_description =3D "i.MX2 Watchdog",
+> +};
+> +
+> +static void imx2_wdt_register_type(void)
+> +{
+> +    watchdog_add_model(&model);
+> +    type_register_static(&imx2_wdt_info);
+> +}
+> +type_init(imx2_wdt_register_type)
+> diff --git a/include/hw/misc/imx2_wdt.h b/include/hw/misc/imx2_wdt.h
+> new file mode 100644
+> index 0000000000..e67ac6939d
+> --- /dev/null
+> +++ b/include/hw/misc/imx2_wdt.h
+> @@ -0,0 +1,34 @@
+> +/*
+> + * Copyright (c) 2017, Impinj, Inc.
+> + *
+> + * i.MX2 Watchdog IP block
+> + *
+> + * Author: Andrey Smirnov <andrew.smirnov@gmail.com>
+> + *
+> + * This work is licensed under the terms of the GNU GPL, version 2 or la=
+ter.
+> + * See the COPYING file in the top-level directory.
+> + */
+> +
+> +#ifndef IMX2_WDT_H
+> +#define IMX2_WDT_H
+> +
+> +#include "qemu/bitops.h"
+> +#include "hw/sysbus.h"
 
+The bitops.h include should be in the .c file, not here.
 
-On 11/21/2017 05:06 PM, Cornelia Huck wrote:
-> On Tue, 21 Nov 2017 15:45:17 +0100
-> Christian Borntraeger <borntraeger@de.ibm.com> wrote:
-> 
->> On 11/21/2017 02:44 PM, Cornelia Huck wrote:
->>> On Tue, 21 Nov 2017 12:18:25 +0100
->>> Halil Pasic <pasic@linux.vnet.ibm.com> wrote:
->>>
->>> Subject: s/unresrict/unrestrict/
->>>   
->>>> The default css 0xFE is currently restricted to virtual subchannel
->>>> devices. The hope when the decision was made was, that non-virtual
->>>> subchannel devices will come around when guest can exploit multiple
->>>> channel subsystems. Since the guests generally don't do, the pain
->>>> of the partitioned (cssid) namespace outweighs the gain.
->>>>
->>>> Let us remove the corresponding restrictions (virtual devices
->>>> can be put only in 0xFE and non-virtual devices in any css except
->>>> the 0xFE), and inform management software property on all ccw
->>>> devices.  
->>>
->>> I do not really like dropping the restrictions while still keeping the
->>> default cssid as 0xfe. Putting virtual devices into css 0 seems
->>> completely fine, but putting non-virtual devices into css 0xfe still
->>> feels a bit wrong. What about:
->>>
->>> - Add a property to specify the default cssid. Compat machines use a
->>>   default cssid of 0xfe.
->>> - Default to a cssid of 0.
->>> - (optional) Warn when putting a non-virtual device into css 0xfe,
->>>   unless it is the default css.  
->>
->> To make it more clear, I think the most compatible solution would be to allow
->> vfio-ccw also in FE. (But continue to force virtual devices in FE as well).
->> This was more or less the first proposal that we had. Then we asked ourselves
->> why not also allow virtual devices in 0?
->>
->> I think your proposal of specifying a default css (and then allowing
->> all devices in that) is actually pretty close to Halils proposal. The only
->> difference is that Halils variant keeps fe as default css. 
->> So I think we could even combine both approaches. Use Halils patch as a base
->> and in addition provide a way to change the default css away from fe. Have to
->> think about that.
-> 
-> If keeping the default of 0xfe makes the life of management software
-> easier, sure. As it is, we seem to be far more entrenched with
-> paravirtual devices than I had expected when I first wrote this, so
-> 0xfe might be the sensible choice even if mcss-e is available in the
-> future. In this case, I think we should lift all cssid restrictions.
+> +
+> +#define TYPE_IMX2_WDT "imx2.wdt"
+> +#define IMX2_WDT(obj) OBJECT_CHECK(IMX2WdtState, (obj), TYPE_IMX2_WDT)
+> +
+> +enum IMX2WdtRegisters {
+> +    IMX2_WDT_WCR     =3D 0x0000,
+> +    IMX2_WDT_REG_NUM =3D 0x0008 / sizeof(uint16_t) + 1,
+> +};
+> +
+> +
+> +typedef struct IMX2WdtState {
+> +    /* <private> */
+> +    SysBusDevice parent_obj;
+> +
+> +    MemoryRegion mmio;
+> +} IMX2WdtState;
+> +
+> +#endif /* IMX7_SNVS_H */
+> --
+> 2.13.6
+>
+Otherwise
+Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
 
-So basically agree with the restriction lifting, but you want to have a
-different method of telling libvirt about it?
-[...]
->>> This allows building a commandline in a compat machine that will not
->>> work with old qemus, no?  
->>
->> I think this is pretty common to have new devices and things that will not
->> work on old QEMUs but are allowed on compat machines, e.g. virtio-gpu was
->> added in 2.4 but
->>
->> [cborntra@oc7330422307 qemu]$ build/i386-softmmu/qemu-system-i386 -device virtio-gpu-pci -M pc-i440fx-2.2
->> VNC server running on ::1:5900
->>
->> works fine
-> 
-> It seems a bit more unexpected, though.
-
-What I understood from the CPU model discussion is, that the machine version basically sets the migration
-stream format and any "invisible" setting that the user cannot influence. But it is not there to the fence
-the user from specifying new devices or new CPU types (that the old QEMU does not know) or different 
-command lines. You get a compatible machine if you specify an identical command line that will work for
-both.
-> 
-> (And I'm still not quite sure how all of this interacts with the squash
-> option.)
-
-I think we should deprecate the squash option and not use it to simplify things.
+thanks
+-- PMM
