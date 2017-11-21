@@ -1,25 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52622)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52970)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1eHAuz-00060O-IF
-	for qemu-devel@nongnu.org; Tue, 21 Nov 2017 10:57:02 -0500
+	id 1eHAvs-0006ej-Vl
+	for qemu-devel@nongnu.org; Tue, 21 Nov 2017 10:57:57 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1eHAuw-0001dC-Gb
-	for qemu-devel@nongnu.org; Tue, 21 Nov 2017 10:57:01 -0500
-Received: from mail-qk0-x243.google.com ([2607:f8b0:400d:c09::243]:46176)
+	id 1eHAvp-00028K-Uh
+	for qemu-devel@nongnu.org; Tue, 21 Nov 2017 10:57:57 -0500
+Received: from mail-qk0-x244.google.com ([2607:f8b0:400d:c09::244]:42800)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1eHAuw-0001d4-Bb
-	for qemu-devel@nongnu.org; Tue, 21 Nov 2017 10:56:58 -0500
-Received: by mail-qk0-x243.google.com with SMTP id b85so12672494qkc.13
-	for <qemu-devel@nongnu.org>; Tue, 21 Nov 2017 07:56:58 -0800 (PST)
+	id 1eHAvp-000286-Pb
+	for qemu-devel@nongnu.org; Tue, 21 Nov 2017 10:57:53 -0500
+Received: by mail-qk0-x244.google.com with SMTP id a194so12662855qkc.9
+	for <qemu-devel@nongnu.org>; Tue, 21 Nov 2017 07:57:53 -0800 (PST)
 Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
 	<philippe.mathieu.daude@gmail.com>
 References: <1511276888-17834-1-git-send-email-peter.maydell@linaro.org>
 From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <4cf3ddce-b83f-3891-524e-5c3b1440f1cd@amsat.org>
-Date: Tue, 21 Nov 2017 12:56:11 -0300
+Message-ID: <7308e432-4cf5-04bd-4a22-f330dda1f933@amsat.org>
+Date: Tue, 21 Nov 2017 12:57:50 -0300
 MIME-Version: 1.0
 In-Reply-To: <1511276888-17834-1-git-send-email-peter.maydell@linaro.org>
 Content-Type: text/plain; charset=utf-8
@@ -60,6 +60,8 @@ Since "none of the prototypes added in commit 67d95c153bef55f6 are still
 in the header" we could restrict it out of include/exec/ (kinda 'revert'
 022c62cbbc) and only keep memory_region_access_valid() + NotDirtyInfo
 exposed in include/exec/.
+
+(During 2.12)
 
 > 
 > Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
