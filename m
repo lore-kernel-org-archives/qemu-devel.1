@@ -1,14 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48131)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48309)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jcody@redhat.com>) id 1eHBxv-0008D3-Jx
-	for qemu-devel@nongnu.org; Tue, 21 Nov 2017 12:04:13 -0500
+	(envelope-from <jcody@redhat.com>) id 1eHBy4-0008KW-Rh
+	for qemu-devel@nongnu.org; Tue, 21 Nov 2017 12:04:18 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jcody@redhat.com>) id 1eHBxr-0005ep-Iy
-	for qemu-devel@nongnu.org; Tue, 21 Nov 2017 12:04:07 -0500
+	(envelope-from <jcody@redhat.com>) id 1eHBy0-0005lF-Jv
+	for qemu-devel@nongnu.org; Tue, 21 Nov 2017 12:04:16 -0500
 From: Jeff Cody <jcody@redhat.com>
-Date: Tue, 21 Nov 2017 12:03:46 -0500
-Message-Id: <20171121170350.31290-1-jcody@redhat.com>
-Subject: [Qemu-devel] [PULL 0/4] Late blockjob / coroutine patches for -rc2
+Date: Tue, 21 Nov 2017 12:03:47 -0500
+Message-Id: <20171121170350.31290-2-jcody@redhat.com>
+In-Reply-To: <20171121170350.31290-1-jcody@redhat.com>
+References: <20171121170350.31290-1-jcody@redhat.com>
+Subject: [Qemu-devel] [PULL 1/4] blockjob: do not allow coroutine double
+ entry or entry-after-completion
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -20,42 +23,65 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org
 Cc: peter.maydell@linaro.org, jcody@redhat.com, qemu-devel@nongnu.org, stefanha@redhat.com, pbonzini@redhat.com
 
-The following changes since commit 7c3d1917fd7a3de906170fa3d6d3d4c5918b1e49:
+When block_job_sleep_ns() is called, the co-routine is scheduled for
+future execution.  If we allow the job to be re-entered prior to the
+scheduled time, we present a race condition in which a coroutine can be
+entered recursively, or even entered after the coroutine is deleted.
 
-  build: disarm the TCG unit test trap (2017-11-21 15:42:47 +0000)
+The job->busy flag is used by blockjobs when a coroutine is busy
+executing. The function 'block_job_enter()' obeys the busy flag,
+and will not enter a coroutine if set.  If we sleep a job, we need to
+leave the busy flag set, so that subsequent calls to block_job_enter()
+are prevented.
 
-are available in the git repository at:
+This changes the prior behavior of block_job_cancel() being able to
+immediately wake up and cancel a job; in practice, this should not be an
+issue, as the coroutine sleep times are generally very small, and the
+cancel will occur the next time the coroutine wakes up.
 
-  git://github.com/codyprime/qemu-kvm-jtc.git tags/block-pull-request
+This fixes: https://bugzilla.redhat.com/show_bug.cgi?id=1508708
 
-for you to fetch changes up to d975301dc8ae56fb3154348878e47a6211843c0b:
+Signed-off-by: Jeff Cody <jcody@redhat.com>
+Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
+---
+ blockjob.c                   | 7 +++++--
+ include/block/blockjob_int.h | 3 ++-
+ 2 files changed, 7 insertions(+), 3 deletions(-)
 
-  qemu-iotest: add test for blockjob coroutine race condition (2017-11-21 11:58:12 -0500)
-
-----------------------------------------------------------------
-Late fix for blockjob / coroutine segfaults w/iothreads
-----------------------------------------------------------------
-
-Jeff Cody (4):
-  blockjob: do not allow coroutine double entry or
-    entry-after-completion
-  coroutine: abort if we try to schedule or enter a pending coroutine
-  qemu-iotests: add option in common.qemu for mismatch only
-  qemu-iotest: add test for blockjob coroutine race condition
-
- blockjob.c                     |  7 ++-
- include/block/blockjob_int.h   |  3 +-
- include/qemu/coroutine_int.h   | 13 ++++--
- tests/qemu-iotests/200         | 99 ++++++++++++++++++++++++++++++++++++++++++
- tests/qemu-iotests/200.out     | 14 ++++++
- tests/qemu-iotests/common.qemu |  8 +++-
- tests/qemu-iotests/group       |  1 +
- util/async.c                   | 13 ++++++
- util/qemu-coroutine-sleep.c    | 12 +++++
- util/qemu-coroutine.c          | 14 ++++++
- 10 files changed, 177 insertions(+), 7 deletions(-)
- create mode 100755 tests/qemu-iotests/200
- create mode 100644 tests/qemu-iotests/200.out
-
+diff --git a/blockjob.c b/blockjob.c
+index 3a0c491..ff9a614 100644
+--- a/blockjob.c
++++ b/blockjob.c
+@@ -797,11 +797,14 @@ void block_job_sleep_ns(BlockJob *job, QEMUClockType type, int64_t ns)
+         return;
+     }
+ 
+-    job->busy = false;
++    /* We need to leave job->busy set here, because when we have
++     * put a coroutine to 'sleep', we have scheduled it to run in
++     * the future.  We cannot enter that same coroutine again before
++     * it wakes and runs, otherwise we risk double-entry or entry after
++     * completion. */
+     if (!block_job_should_pause(job)) {
+         co_aio_sleep_ns(blk_get_aio_context(job->blk), type, ns);
+     }
+-    job->busy = true;
+ 
+     block_job_pause_point(job);
+ }
+diff --git a/include/block/blockjob_int.h b/include/block/blockjob_int.h
+index f13ad05..43f3be2 100644
+--- a/include/block/blockjob_int.h
++++ b/include/block/blockjob_int.h
+@@ -143,7 +143,8 @@ void *block_job_create(const char *job_id, const BlockJobDriver *driver,
+  * @ns: How many nanoseconds to stop for.
+  *
+  * Put the job to sleep (assuming that it wasn't canceled) for @ns
+- * nanoseconds.  Canceling the job will interrupt the wait immediately.
++ * nanoseconds.  Canceling the job will not interrupt the wait, so the
++ * cancel will not process until the coroutine wakes up.
+  */
+ void block_job_sleep_ns(BlockJob *job, QEMUClockType type, int64_t ns);
+ 
 -- 
 2.9.5
