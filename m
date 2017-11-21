@@ -1,26 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59129)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59411)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1eHDSs-0007c9-7g
-	for qemu-devel@nongnu.org; Tue, 21 Nov 2017 13:40:11 -0500
+	(envelope-from <quintela@redhat.com>) id 1eHDTp-00089p-Fk
+	for qemu-devel@nongnu.org; Tue, 21 Nov 2017 13:41:10 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1eHDSr-0003gc-HN
-	for qemu-devel@nongnu.org; Tue, 21 Nov 2017 13:40:10 -0500
-Received: from mail-ot0-x243.google.com ([2607:f8b0:4003:c0f::243]:42297)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1eHDSr-0003fP-At
-	for qemu-devel@nongnu.org; Tue, 21 Nov 2017 13:40:09 -0500
-Received: by mail-ot0-x243.google.com with SMTP id 18so11385499oty.9
-	for <qemu-devel@nongnu.org>; Tue, 21 Nov 2017 10:40:09 -0800 (PST)
+	(envelope-from <quintela@redhat.com>) id 1eHDTk-00042P-Is
+	for qemu-devel@nongnu.org; Tue, 21 Nov 2017 13:41:09 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:48602)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1eHDTk-00041D-Ak
+	for qemu-devel@nongnu.org; Tue, 21 Nov 2017 13:41:04 -0500
+From: Juan Quintela <quintela@redhat.com>
+In-Reply-To: <20171110203516.17027-1-danielhb@linux.vnet.ibm.com> (Daniel
+	Henrique Barboza's message of "Fri, 10 Nov 2017 18:35:16 -0200")
+References: <20171110203516.17027-1-danielhb@linux.vnet.ibm.com>
+Reply-To: quintela@redhat.com
+Date: Tue, 21 Nov 2017 19:41:01 +0100
+Message-ID: <87vai3pj9e.fsf@secure.mitica>
 MIME-Version: 1.0
-In-Reply-To: <20171103000109.28244-1-frasse.iglesias@gmail.com>
-References: <20171103000109.28244-1-frasse.iglesias@gmail.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 21 Nov 2017 18:39:48 +0000
-Message-ID: <CAFEAcA8OWP=x=YCumVzc4biETn7SbUxaBDasYR3XNx71aabdmw@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH v7 00/13] Add support for the ZynqMP
- Generic QSPI
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PATCH v1] migration/ram.c: do not set
+ 'postcopy_running' in POSTCOPY_INCOMING_END
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,31 +28,104 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Francisco Iglesias <frasse.iglesias@gmail.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, Edgar Iglesias <edgari@xilinx.com>, alistai@xilinx.com, francisco.iglesias@feimtech.se, =?UTF-8?Q?Marcin_Krzemi=C5=84ski?= <mar.krzeminski@gmail.com>
+To: Daniel Henrique Barboza <danielhb@linux.vnet.ibm.com>
+Cc: qemu-devel@nongnu.org, mdroth@linux.vnet.ibm.com, dgilbert@redhat.com
 
-On 3 November 2017 at 00:00, Francisco Iglesias
-<frasse.iglesias@gmail.com> wrote:
-> Hi,
+Daniel Henrique Barboza <danielhb@linux.vnet.ibm.com> wrote:
+> When migrating a VM with 'migrate_set_capability postcopy-ram on'
+> a postcopy_state is set during the process, ending up with the
+> state POSTCOPY_INCOMING_END when the migration is over. This
+> postcopy_state is taken into account inside ram_load to check
+> how it will load the memory pages. This same ram_load is called when
+> in a loadvm command.
 >
-> This patch series is an attempt to add support for the ZynqMP QSPI (consisting
-> of the Generic QSPI and the legacy QSPI) to the xlnx-zcu102 board and connect
-> Numonyx n25q512a11 flashes to the QSPI. Also some functionality is added to
-> m25p80.
+> Inside ram_load, the logic to see if we're at postcopy_running state
+> is:
 >
-> The series starts by adding support in m25p80 for continous read out of status
-> registers, SST flash READ ID commands, bank address register accesses, bulk
-> erase (0x60) and two Numonyx flashes (n25q512a11 and n25q512a13). Thereafter it
-> updates the striping behaviour to be bit big endiann in the Xilinx QSPI model
-> and adds support for RX discard, zero pumping according transfer register and 4
-> byte LQSPI addresses. Finally it adds support for the ZynqMP Generic QSPI and
-> adds the ZynqMP QSPI to the xlnx-zcu102 board.
+> postcopy_running = postcopy_state_get() >= POSTCOPY_INCOMING_LISTENING
 >
-> Best regards,
-> Francisco Iglesias
+> postcopy_state_get() returns this enum type:
+>
+> typedef enum {
+>     POSTCOPY_INCOMING_NONE = 0,
+>     POSTCOPY_INCOMING_ADVISE,
+>     POSTCOPY_INCOMING_DISCARD,
+>     POSTCOPY_INCOMING_LISTENING,
+>     POSTCOPY_INCOMING_RUNNING,
+>     POSTCOPY_INCOMING_END
+> } PostcopyState;
+>
+> In the case where ram_load is executed and postcopy_state is
+> POSTCOPY_INCOMING_END, postcopy_running will be set to 'true' and
+> ram_load will behave like a postcopy is in progress. This scenario isn't
+> achievable in a migration but it is reproducible when executing
+> savevm/loadvm after migrating with 'postcopy-ram on', causing loadvm
+> to fail with Error -22:
+>
+> Source:
+>
+> (qemu) migrate_set_capability postcopy-ram on
+> (qemu) migrate tcp:127.0.0.1:4444
+>
+> Dest:
+>
+> (qemu) migrate_set_capability postcopy-ram on
+> (qemu)
+> ubuntu1704-intel login:
+> Ubuntu 17.04 ubuntu1704-intel ttyS0
+>
+> ubuntu1704-intel login: (qemu)
+> (qemu) savevm test1
+> (qemu) loadvm test1
+> Unknown combination of migration flags: 0x4 (postcopy mode)
+> error while loading state for instance 0x0 of device 'ram'
+> Error -22 while loading VM state
+> (qemu)
+>
+> This patch fixes this problem by changing a bit the semantics
+> of postcopy_running inside ram_load, verifying first if
+> we're not in the POSTCOPY_INCOMING_END state. In this case,
+> postcopy_running is set to 'false'.
+>
+> Signed-off-by: Daniel Henrique Barboza <danielhb@linux.vnet.ibm.com>
 
-Hi; just a note to say that I'm assuming the Xilinx folk are going
-to review the xilinx_spips patches in this set...
+Reviewed-by: Juan Quintela <quintela@redhat.com>
 
-thanks
--- PMM
+queued
+
+> ---
+>  migration/ram.c | 22 +++++++++++++++-------
+>  1 file changed, 15 insertions(+), 7 deletions(-)
+>
+> diff --git a/migration/ram.c b/migration/ram.c
+> index 8620aa400a..43ed719668 100644
+> --- a/migration/ram.c
+> +++ b/migration/ram.c
+> @@ -2803,13 +2803,21 @@ static int ram_load(QEMUFile *f, void *opaque, int version_id)
+>      int flags = 0, ret = 0, invalid_flags = 0;
+>      static uint64_t seq_iter;
+>      int len = 0;
+> -    /*
+> -     * If system is running in postcopy mode, page inserts to host memory must
+> -     * be atomic
+> -     */
+> -    bool postcopy_running = postcopy_state_get() >= POSTCOPY_INCOMING_LISTENING;
+> -    /* ADVISE is earlier, it shows the source has the postcopy capability on */
+> -    bool postcopy_advised = postcopy_state_get() >= POSTCOPY_INCOMING_ADVISE;
+> +    bool postcopy_advised = false, postcopy_running = false;
+> +    uint8_t postcopy_state = postcopy_state_get();
+> +
+> +    if (postcopy_state != POSTCOPY_INCOMING_END) {
+> +        /*
+> +         * If system is running in postcopy mode, page inserts to host memory
+> +         * must be atomic
+> +         */
+> +        postcopy_running = postcopy_state >= POSTCOPY_INCOMING_LISTENING;
+> +
+> +        /* ADVISE is earlier, it shows the source has the postcopy
+> +         * capability on
+> +         */
+> +        postcopy_advised = postcopy_state >= POSTCOPY_INCOMING_ADVISE;
+> +    }
+>  
+>      seq_iter++;
