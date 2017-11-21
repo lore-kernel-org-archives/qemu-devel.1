@@ -1,28 +1,15 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35208)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35645)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1eHCOZ-0004Mv-SM
-	for qemu-devel@nongnu.org; Tue, 21 Nov 2017 12:31:40 -0500
+	(envelope-from <richard@rpsys.net>) id 1eHCPn-00068p-WC
+	for qemu-devel@nongnu.org; Tue, 21 Nov 2017 12:32:58 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1eHCOY-00014p-PM
-	for qemu-devel@nongnu.org; Tue, 21 Nov 2017 12:31:39 -0500
-Received: from mail-ot0-x241.google.com ([2607:f8b0:4003:c0f::241]:42820)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1eHCOY-00014J-KL
-	for qemu-devel@nongnu.org; Tue, 21 Nov 2017 12:31:38 -0500
-Received: by mail-ot0-x241.google.com with SMTP id 18so11200228oty.9
-	for <qemu-devel@nongnu.org>; Tue, 21 Nov 2017 09:31:38 -0800 (PST)
-MIME-Version: 1.0
-In-Reply-To: <20171106154813.19936-5-andrew.smirnov@gmail.com>
-References: <20171106154813.19936-1-andrew.smirnov@gmail.com>
-	<20171106154813.19936-5-andrew.smirnov@gmail.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 21 Nov 2017 17:31:17 +0000
-Message-ID: <CAFEAcA9EhzPxayCGDOiM_6U9YSS6HK1gCgBroR=C1LM=H=FpQw@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v3 04/30] imx_fec: Use ENET_FTRL to
- determine truncation length
+	(envelope-from <richard@rpsys.net>) id 1eHCPm-0001hh-TP
+	for qemu-devel@nongnu.org; Tue, 21 Nov 2017 12:32:56 -0500
+From: Richard Purdie <richard.purdie@linuxfoundation.org>
+Date: Tue, 21 Nov 2017 17:32:18 +0000
+Message-Id: <1511285538-22883-1-git-send-email-richard.purdie@linuxfoundation.org>
+Subject: [Qemu-devel] [PATCH] target/ppc: Fix system lockups caused by
+ interrupt_request state corruption
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,66 +18,99 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Andrey Smirnov <andrew.smirnov@gmail.com>
-Cc: qemu-arm <qemu-arm@nongnu.org>, Jason Wang <jasowang@redhat.com>, =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>, QEMU Developers <qemu-devel@nongnu.org>, Andrey Yurovsky <yurovsky@gmail.com>
+To: qemu-devel@nongnu.org, david@gibson.dropbear.id.au
+Cc: qemu-ppc@nongnu.org, Richard Purdie <richard.purdie@linuxfoundation.org>
 
-On 6 November 2017 at 15:47, Andrey Smirnov <andrew.smirnov@gmail.com> wrot=
-e:
-> Frame truncation length, TRUNC_FL, is determined by the contents of
-> ENET_FTRL register, so convert the code to use it instead of a
-> hardcoded constant.
->
-> To avoid the case where TRUNC_FL is greater that ENET_MAX_FRAME_SIZE,
-> increase the value of the latter to its theoretical maximum of 16K.
->
-> Cc: Peter Maydell <peter.maydell@linaro.org>
-> Cc: Jason Wang <jasowang@redhat.com>
-> Cc: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
-> Cc: qemu-devel@nongnu.org
-> Cc: qemu-arm@nongnu.org
-> Cc: yurovsky@gmail.com
-> Signed-off-by: Andrey Smirnov <andrew.smirnov@gmail.com>
-> ---
->  hw/net/imx_fec.c         | 4 ++--
->  include/hw/net/imx_fec.h | 3 ++-
->  2 files changed, 4 insertions(+), 3 deletions(-)
->
-> diff --git a/hw/net/imx_fec.c b/hw/net/imx_fec.c
-> index eb034ffd0c..dda0816fb3 100644
-> --- a/hw/net/imx_fec.c
-> +++ b/hw/net/imx_fec.c
-> @@ -1052,8 +1052,8 @@ static ssize_t imx_enet_receive(NetClientState *nc,=
- const uint8_t *buf,
->      crc_ptr =3D (uint8_t *) &crc;
->
->      /* Huge frames are truncted.  */
-> -    if (size > ENET_MAX_FRAME_SIZE) {
-> -        size =3D ENET_MAX_FRAME_SIZE;
-> +    if (size > s->regs[ENET_FTRL]) {
-> +        size =3D s->regs[ENET_FTRL];
->          flags |=3D ENET_BD_TR | ENET_BD_LG;
->      }
->
-> diff --git a/include/hw/net/imx_fec.h b/include/hw/net/imx_fec.h
-> index 4bc8f03ec2..0fcc4f0c71 100644
-> --- a/include/hw/net/imx_fec.h
-> +++ b/include/hw/net/imx_fec.h
-> @@ -86,7 +86,6 @@
->  #define ENET_TCCR3             393
->  #define ENET_MAX               400
->
-> -#define ENET_MAX_FRAME_SIZE    2032
->
->  /* EIR and EIMR */
->  #define ENET_INT_HB            (1 << 31)
-> @@ -155,6 +154,8 @@
->  #define ENET_RCR_NLC           (1 << 30)
->  #define ENET_RCR_GRS           (1 << 31)
->
-> +#define ENET_MAX_FRAME_SIZE    (1 << ENET_RCR_MAX_FL_LENGTH)
+Occasionally in Linux guests on x86_64 we're seeing logs like:
 
-This means we now have functions with 16K local array
-variables on the stack, which seems like a bad idea.
+ppc_set_irq: 0x55b4e0d562f0 n_IRQ 8 level 1 => pending 00000100req 00000004
 
-thanks
--- PMM
+when they should read:
+
+ppc_set_irq: 0x55b4e0d562f0 n_IRQ 8 level 1 => pending 00000100req 00000002
+
+The "00000004" is CPU_INTERRUPT_EXITTB yet the code calls
+cpu_interrupt(cs, CPU_INTERRUPT_HARD) ("00000002") in this function
+just before the log message. Something is causing the HARD bit setting
+to get lost.
+
+The knock on effect of losing that bit is the decrementer timer interrupts
+don't get delivered which causes the guest to sit idle in its idle handler
+and 'hang'.
+
+The issue occurs due to races from code which sets CPU_INTERRUPT_EXITTB.
+
+Rather than poking directly into cs->interrupt_request, that code needs to:
+
+a) hold BQL
+b) use the cpu_interrupt() helper
+
+This patch fixes the call sites to do this, fixing the hang.
+
+Signed-off-by: Richard Purdie <richard.purdie@linuxfoundation.org>
+---
+ target/ppc/excp_helper.c | 12 +++++++++---
+ target/ppc/helper_regs.h |  8 ++++++--
+ 2 files changed, 15 insertions(+), 5 deletions(-)
+
+diff --git a/target/ppc/excp_helper.c b/target/ppc/excp_helper.c
+index e6009e7..f175c21 100644
+--- a/target/ppc/excp_helper.c
++++ b/target/ppc/excp_helper.c
+@@ -207,7 +207,9 @@ static inline void powerpc_excp(PowerPCCPU *cpu, int excp_model, int excp)
+                         "Entering checkstop state\n");
+             }
+             cs->halted = 1;
+-            cs->interrupt_request |= CPU_INTERRUPT_EXITTB;
++            qemu_mutex_lock_iothread();
++            cpu_interrupt(cs, CPU_INTERRUPT_EXITTB);
++            qemu_mutex_unlock_iothread();
+         }
+         if (env->msr_mask & MSR_HVB) {
+             /* ISA specifies HV, but can be delivered to guest with HV clear
+@@ -940,7 +942,9 @@ void helper_store_msr(CPUPPCState *env, target_ulong val)
+ 
+     if (excp != 0) {
+         CPUState *cs = CPU(ppc_env_get_cpu(env));
+-        cs->interrupt_request |= CPU_INTERRUPT_EXITTB;
++        qemu_mutex_lock_iothread();
++        cpu_interrupt(cs, CPU_INTERRUPT_EXITTB);
++        qemu_mutex_unlock_iothread();
+         raise_exception(env, excp);
+     }
+ }
+@@ -995,7 +999,9 @@ static inline void do_rfi(CPUPPCState *env, target_ulong nip, target_ulong msr)
+     /* No need to raise an exception here,
+      * as rfi is always the last insn of a TB
+      */
+-    cs->interrupt_request |= CPU_INTERRUPT_EXITTB;
++    qemu_mutex_lock_iothread();
++    cpu_interrupt(cs, CPU_INTERRUPT_EXITTB);
++    qemu_mutex_unlock_iothread();
+ 
+     /* Reset the reservation */
+     env->reserve_addr = -1;
+diff --git a/target/ppc/helper_regs.h b/target/ppc/helper_regs.h
+index 2627a70..13dd0b8 100644
+--- a/target/ppc/helper_regs.h
++++ b/target/ppc/helper_regs.h
+@@ -114,11 +114,15 @@ static inline int hreg_store_msr(CPUPPCState *env, target_ulong value,
+     }
+     if (((value >> MSR_IR) & 1) != msr_ir ||
+         ((value >> MSR_DR) & 1) != msr_dr) {
+-        cs->interrupt_request |= CPU_INTERRUPT_EXITTB;
++        qemu_mutex_lock_iothread();
++        cpu_interrupt(cs, CPU_INTERRUPT_EXITTB);
++        qemu_mutex_unlock_iothread();
+     }
+     if ((env->mmu_model & POWERPC_MMU_BOOKE) &&
+         ((value >> MSR_GS) & 1) != msr_gs) {
+-        cs->interrupt_request |= CPU_INTERRUPT_EXITTB;
++        qemu_mutex_lock_iothread();
++        cpu_interrupt(cs, CPU_INTERRUPT_EXITTB);
++        qemu_mutex_unlock_iothread();
+     }
+     if (unlikely((env->flags & POWERPC_FLAG_TGPR) &&
+                  ((value ^ env->msr) & (1 << MSR_TGPR)))) {
+-- 
+2.7.4
