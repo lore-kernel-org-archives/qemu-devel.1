@@ -1,30 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53851)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53877)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1eHG4z-0004GW-LW
-	for qemu-devel@nongnu.org; Tue, 21 Nov 2017 16:27:42 -0500
+	(envelope-from <richard.henderson@linaro.org>) id 1eHG51-0004Gb-5q
+	for qemu-devel@nongnu.org; Tue, 21 Nov 2017 16:27:44 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1eHG4w-0007bD-HS
-	for qemu-devel@nongnu.org; Tue, 21 Nov 2017 16:27:41 -0500
-Received: from mail-wm0-x22c.google.com ([2a00:1450:400c:c09::22c]:41707)
+	(envelope-from <richard.henderson@linaro.org>) id 1eHG4z-0007d9-KZ
+	for qemu-devel@nongnu.org; Tue, 21 Nov 2017 16:27:43 -0500
+Received: from mail-wm0-x241.google.com ([2a00:1450:400c:c09::241]:46812)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1eHG4w-0007an-9p
-	for qemu-devel@nongnu.org; Tue, 21 Nov 2017 16:27:38 -0500
-Received: by mail-wm0-x22c.google.com with SMTP id b189so6312515wmd.0
-	for <qemu-devel@nongnu.org>; Tue, 21 Nov 2017 13:27:38 -0800 (PST)
+	id 1eHG4z-0007ci-EI
+	for qemu-devel@nongnu.org; Tue, 21 Nov 2017 16:27:41 -0500
+Received: by mail-wm0-x241.google.com with SMTP id u83so6327078wmb.5
+	for <qemu-devel@nongnu.org>; Tue, 21 Nov 2017 13:27:41 -0800 (PST)
 Received: from cloudburst.twiddle.net
 	(70.red-37-158-60.dynamicip.rima-tde.net. [37.158.60.70])
 	by smtp.gmail.com with ESMTPSA id
-	e124sm706517wmg.34.2017.11.21.13.27.35 for <qemu-devel@nongnu.org>
+	e124sm706517wmg.34.2017.11.21.13.27.39 for <qemu-devel@nongnu.org>
 	(version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
-	Tue, 21 Nov 2017 13:27:35 -0800 (PST)
+	Tue, 21 Nov 2017 13:27:39 -0800 (PST)
 From: Richard Henderson <richard.henderson@linaro.org>
-Date: Tue, 21 Nov 2017 22:25:08 +0100
-Message-Id: <20171121212534.5177-1-richard.henderson@linaro.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v6 00/26] tcg: generic vector operations
+Date: Tue, 21 Nov 2017 22:25:11 +0100
+Message-Id: <20171121212534.5177-4-richard.henderson@linaro.org>
+In-Reply-To: <20171121212534.5177-1-richard.henderson@linaro.org>
+References: <20171121212534.5177-1-richard.henderson@linaro.org>
+Subject: [Qemu-devel] [PATCH v6 03/26] tcg: Generalize TCGOp parameters
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,102 +34,128 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-Quite a lot has changed since last time.
+We had two fields specific to INDEX_op_call.  Rename these and
+add some macros so that the fields may be reused for other opcodes.
 
-The representation has changed such that the vector length and element
-size is stored in the TCGOp structure.  The functions have changed such
-that the element size is passed explicitly rather than being encoded in
-the function name.
+Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+---
+ tcg/tcg.h      | 10 ++++++----
+ tcg/optimize.c |  4 ++--
+ tcg/tcg.c      | 22 +++++++++++-----------
+ 3 files changed, 19 insertions(+), 17 deletions(-)
 
-I've added additional operations for multiply, immediate shifts, compares,
-element interleaves, and widening.  I believe this is all we'll need for
-implementing ARM SVE, so I'll leave off for now.
-
-This has been tested vs aa64 risu on both x86_64 and aa64 hosts.
-
-
-r~
-
-
-Richard Henderson (26):
-  tcg: Remove TCGV_UNUSED* and TCGV_IS_UNUSED*
-  tcg: Dynamically allocate TCGOps
-  tcg: Generalize TCGOp parameters
-  tcg: Add types and basic operations for host vectors
-  tcg: Add generic vector expanders
-  tcg: Allow multiple word entries into the constant pool
-  tcg: Add tcg_signed_cond
-  target/arm: Align vector registers
-  target/arm: Use vector infrastructure for aa64 add/sub/logic
-  target/arm: Use vector infrastructure for aa64 mov/not/neg
-  target/arm: Use vector infrastructure for aa64 dup/movi
-  tcg/i386: Add vector operations
-  tcg: Add tcg_expand_vec_op and tcg-target.opc.h
-  tcg: Add generic vector ops for interleave
-  target/arm: Use vector infrastructure for aa64 zip/uzp/trn/xtn
-  tcg: Add generic vector ops for constant shifts
-  target/arm: Use vector infrastructure for aa64 constant shifts
-  tcg: Add generic vector ops for comparisons
-  target/arm: Use vector infrastructure for aa64 compares
-  tcg/i386: Add vector operations/expansions for shift/cmp/interleave
-  tcg: Add generic vector ops for multiplication
-  target/arm: Use vector infrastructure for aa64 multiplies
-  tcg: Add generic vector ops for extension
-  target/arm: Use vector infrastructure for aa64 widening shifts
-  tcg/i386: Add vector operations/expansions for mul/extend
-  tcg/aarch64: Add vector operations
-
- Makefile.target               |    4 +-
- accel/tcg/tcg-runtime.h       |  102 +++
- include/exec/gen-icount.h     |    9 +-
- include/qemu/queue.h          |    5 +
- target/arm/cpu.h              |    2 +-
- target/arm/translate.h        |   10 +-
- tcg/aarch64/tcg-target.h      |   30 +-
- tcg/aarch64/tcg-target.opc.h  |    3 +
- tcg/i386/tcg-target.h         |   46 +-
- tcg/i386/tcg-target.opc.h     |   11 +
- tcg/tcg-gvec-desc.h           |   49 +
- tcg/tcg-op-gvec.h             |  219 +++++
- tcg/tcg-op.h                  |   55 +-
- tcg/tcg-opc.h                 |   59 ++
- tcg/tcg.h                     |  135 ++-
- accel/tcg/tcg-runtime-gvec.c  |  616 +++++++++++++
- target/alpha/translate.c      |   22 +-
- target/arm/translate-a64.c    | 1135 ++++++++++++++++-------
- target/arm/translate.c        |   31 +-
- target/cris/translate.c       |    4 +-
- target/hppa/translate.c       |   63 +-
- target/i386/translate.c       |   13 +-
- target/lm32/translate.c       |    2 -
- target/m68k/translate.c       |   14 +-
- target/microblaze/translate.c |    4 -
- target/mips/translate.c       |    2 +-
- target/nios2/translate.c      |    6 +-
- target/ppc/translate.c        |    2 +-
- target/s390x/translate.c      |   42 +-
- target/sh4/translate.c        |    2 +-
- target/sparc/translate.c      |    2 +-
- target/tilegx/translate.c     |   10 +-
- target/unicore32/translate.c  |    4 +-
- tcg/aarch64/tcg-target.inc.c  |  674 +++++++++++++-
- tcg/i386/tcg-target.inc.c     | 1325 +++++++++++++++++++++++++--
- tcg/optimize.c                |   20 +-
- tcg/tcg-op-gvec.c             | 2010 +++++++++++++++++++++++++++++++++++++++++
- tcg/tcg-op-vec.c              |  566 ++++++++++++
- tcg/tcg-op.c                  |   24 -
- tcg/tcg-pool.inc.c            |  115 ++-
- tcg/tcg.c                     |  286 ++++--
- accel/tcg/Makefile.objs       |    2 +-
- tcg/README                    |  148 +++
- 43 files changed, 7107 insertions(+), 776 deletions(-)
- create mode 100644 tcg/aarch64/tcg-target.opc.h
- create mode 100644 tcg/i386/tcg-target.opc.h
- create mode 100644 tcg/tcg-gvec-desc.h
- create mode 100644 tcg/tcg-op-gvec.h
- create mode 100644 accel/tcg/tcg-runtime-gvec.c
- create mode 100644 tcg/tcg-op-gvec.c
- create mode 100644 tcg/tcg-op-vec.c
-
+diff --git a/tcg/tcg.h b/tcg/tcg.h
+index a577447846..f25efa9795 100644
+--- a/tcg/tcg.h
++++ b/tcg/tcg.h
+@@ -566,10 +566,9 @@ typedef uint16_t TCGLifeData;
+ typedef struct TCGOp {
+     TCGOpcode opc   : 8;        /*  8 */
+ 
+-    /* The number of out and in parameter for a call.  */
+-    unsigned calli  : 4;        /* 12 */
+-    unsigned callo  : 2;        /* 14 */
+-    unsigned        : 2;        /* 16 */
++    /* Parameters for this opcode.  See below.  */
++    unsigned param1 : 4;        /* 12 */
++    unsigned param2 : 4;        /* 16 */
+ 
+     /* Lifetime data of the operands.  */
+     unsigned life   : 16;       /* 32 */
+@@ -581,6 +580,9 @@ typedef struct TCGOp {
+     TCGArg args[MAX_OPC_PARAM];
+ } TCGOp;
+ 
++#define TCGOP_CALLI(X)    (X)->param1
++#define TCGOP_CALLO(X)    (X)->param2
++
+ /* Make sure operands fit in the bitfields above.  */
+ QEMU_BUILD_BUG_ON(NB_OPS > (1 << 8));
+ 
+diff --git a/tcg/optimize.c b/tcg/optimize.c
+index e495680e95..2cbbeefd53 100644
+--- a/tcg/optimize.c
++++ b/tcg/optimize.c
+@@ -627,8 +627,8 @@ void tcg_optimize(TCGContext *s)
+         /* Count the arguments, and initialize the temps that are
+            going to be used */
+         if (opc == INDEX_op_call) {
+-            nb_oargs = op->callo;
+-            nb_iargs = op->calli;
++            nb_oargs = TCGOP_CALLO(op);
++            nb_iargs = TCGOP_CALLI(op);
+             for (i = 0; i < nb_oargs + nb_iargs; i++) {
+                 TCGTemp *ts = arg_temp(op->args[i]);
+                 if (ts) {
+diff --git a/tcg/tcg.c b/tcg/tcg.c
+index f26949a900..93caa0be93 100644
+--- a/tcg/tcg.c
++++ b/tcg/tcg.c
+@@ -1430,7 +1430,7 @@ void tcg_gen_callN(void *func, TCGTemp *ret, int nargs, TCGTemp **args)
+     } else {
+         nb_rets = 0;
+     }
+-    op->callo = nb_rets;
++    TCGOP_CALLO(op) = nb_rets;
+ 
+     real_args = 0;
+     for (i = 0; i < nargs; i++) {
+@@ -1469,10 +1469,10 @@ void tcg_gen_callN(void *func, TCGTemp *ret, int nargs, TCGTemp **args)
+     }
+     op->args[pi++] = (uintptr_t)func;
+     op->args[pi++] = flags;
+-    op->calli = real_args;
++    TCGOP_CALLI(op) = real_args;
+ 
+     /* Make sure the fields didn't overflow.  */
+-    tcg_debug_assert(op->calli == real_args);
++    tcg_debug_assert(TCGOP_CALLI(op) == real_args);
+     tcg_debug_assert(pi <= ARRAY_SIZE(op->args));
+ 
+ #if defined(__sparc__) && !defined(__arch64__) \
+@@ -1634,8 +1634,8 @@ void tcg_dump_ops(TCGContext *s)
+             }
+         } else if (c == INDEX_op_call) {
+             /* variable number of arguments */
+-            nb_oargs = op->callo;
+-            nb_iargs = op->calli;
++            nb_oargs = TCGOP_CALLO(op);
++            nb_iargs = TCGOP_CALLI(op);
+             nb_cargs = def->nb_cargs;
+ 
+             /* function name, flags, out args */
+@@ -1996,8 +1996,8 @@ static void liveness_pass_1(TCGContext *s)
+             {
+                 int call_flags;
+ 
+-                nb_oargs = op->callo;
+-                nb_iargs = op->calli;
++                nb_oargs = TCGOP_CALLO(op);
++                nb_iargs = TCGOP_CALLI(op);
+                 call_flags = op->args[nb_oargs + nb_iargs + 1];
+ 
+                 /* pure functions can be removed if their result is unused */
+@@ -2233,8 +2233,8 @@ static bool liveness_pass_2(TCGContext *s)
+         TCGTemp *arg_ts, *dir_ts;
+ 
+         if (opc == INDEX_op_call) {
+-            nb_oargs = op->callo;
+-            nb_iargs = op->calli;
++            nb_oargs = TCGOP_CALLO(op);
++            nb_iargs = TCGOP_CALLI(op);
+             call_flags = op->args[nb_oargs + nb_iargs + 1];
+         } else {
+             nb_iargs = def->nb_iargs;
+@@ -2915,8 +2915,8 @@ static void tcg_reg_alloc_op(TCGContext *s, const TCGOp *op)
+ 
+ static void tcg_reg_alloc_call(TCGContext *s, TCGOp *op)
+ {
+-    const int nb_oargs = op->callo;
+-    const int nb_iargs = op->calli;
++    const int nb_oargs = TCGOP_CALLO(op);
++    const int nb_iargs = TCGOP_CALLI(op);
+     const TCGLifeData arg_life = op->life;
+     int flags, nb_regs, i;
+     TCGReg reg;
 -- 
 2.13.6
