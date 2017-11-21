@@ -1,40 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52732)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53021)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <riel@redhat.com>) id 1eHD9N-0007CI-Cr
-	for qemu-devel@nongnu.org; Tue, 21 Nov 2017 13:20:02 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1eHDA2-0007hH-FO
+	for qemu-devel@nongnu.org; Tue, 21 Nov 2017 13:20:43 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <riel@redhat.com>) id 1eHD9K-0003iw-25
-	for qemu-devel@nongnu.org; Tue, 21 Nov 2017 13:20:01 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:32948)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <riel@redhat.com>) id 1eHD9J-0003iB-Ov
-	for qemu-devel@nongnu.org; Tue, 21 Nov 2017 13:19:57 -0500
-Message-ID: <1511288389.1080.14.camel@redhat.com>
-From: Rik van Riel <riel@redhat.com>
-Date: Tue, 21 Nov 2017 13:19:49 -0500
-In-Reply-To: <ec5ff7c2-864e-5020-0aaa-6663e78e3756@gmail.com>
-References: <1455443283.33337333.1500618150787.JavaMail.zimbra@redhat.com>
-	<1888117852.34216619.1500992835767.JavaMail.zimbra@redhat.com>
-	<CAPcyv4in28F3FOVKp9abvrggxPuXdbGynF5=ZvBXCrywoa06JA@mail.gmail.com>
-	<1501016375.26846.21.camel@redhat.com>
-	<1063764405.34607875.1501076841865.JavaMail.zimbra@redhat.com>
-	<1501104453.26846.45.camel@redhat.com>
-	<CAPcyv4hsqrqBxoipUHPAbSctuzbVWCRnT-gN08i9uhXTWY6iPQ@mail.gmail.com>
-	<1501112787.4073.49.camel@redhat.com>
-	<CAPcyv4gbC6Hx_4YsCfOd2t=fn=wPGp5h__1QH=-p40TPFNbFzA@mail.gmail.com>
-	<0a26793f-86f7-29e7-f61b-dc4c1ef08c8e@gmail.com>
-	<CAPcyv4iw2cCpDmr+4kxsFvdy+iGZiz=ok-kLhsDKpqDy+szf-Q@mail.gmail.com>
-	<378b10f3-b32f-84f5-2bbc-50c2ec5bcdd4@gmail.com>
-	<CAPcyv4jR_LdbsX-rAsHC7++C6d-WYC084uWXzr+08PSYwoXFMw@mail.gmail.com>
-	<ca6aaa77-cca0-441e-be49-73133d8581cf@gmail.com>
-	<CAPcyv4gKzvd39WbnKjbs3Bn9+o1tt=vz90CYMFu0DF5PsfHUig@mail.gmail.com>
-	<86754966-281f-c3ed-938c-f009440de563@gmail.com>
-	<CAPcyv4iH==cqVAdd8i1y-8A6SuXU75OH1EZzgNMvtA21wfxPpQ@mail.gmail.com>
-	<ec5ff7c2-864e-5020-0aaa-6663e78e3756@gmail.com>
-Content-Type: multipart/signed; micalg="pgp-sha256";
-	protocol="application/pgp-signature"; boundary="=-YkxgZx0ZzE65iqL9l6Ah"
-Mime-Version: 1.0
-Subject: Re: [Qemu-devel] KVM "fake DAX" flushing interface - discussion
+	(envelope-from <peter.maydell@linaro.org>) id 1eHDA1-0003yM-I6
+	for qemu-devel@nongnu.org; Tue, 21 Nov 2017 13:20:42 -0500
+Received: from mail-ot0-x22e.google.com ([2607:f8b0:4003:c0f::22e]:36970)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1eHDA1-0003y4-CY
+	for qemu-devel@nongnu.org; Tue, 21 Nov 2017 13:20:41 -0500
+Received: by mail-ot0-x22e.google.com with SMTP id s4so11343913ote.4
+	for <qemu-devel@nongnu.org>; Tue, 21 Nov 2017 10:20:41 -0800 (PST)
+MIME-Version: 1.0
+In-Reply-To: <20171106154813.19936-20-andrew.smirnov@gmail.com>
+References: <20171106154813.19936-1-andrew.smirnov@gmail.com>
+	<20171106154813.19936-20-andrew.smirnov@gmail.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Tue, 21 Nov 2017 18:20:20 +0000
+Message-ID: <CAFEAcA_Ug=6cYD0VD93CorVt+rv_u4WWsa_Gk3k+c18G07bDRg@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v3 19/30] i.MX: Add code to emulate SDMA IP
+ block
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -43,68 +31,33 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Xiao Guangrong <xiaoguangrong.eric@gmail.com>, Dan Williams <dan.j.williams@intel.com>
-Cc: Pankaj Gupta <pagupta@redhat.com>, Jan Kara <jack@suse.cz>, Stefan Hajnoczi <stefanha@redhat.com>, Stefan Hajnoczi <stefanha@gmail.com>, kvm-devel <kvm@vger.kernel.org>, Qemu Developers <qemu-devel@nongnu.org>, "linux-nvdimm@lists.01.org" <linux-nvdimm@ml01.01.org>, ross zwisler <ross.zwisler@linux.intel.com>, Paolo Bonzini <pbonzini@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Nitesh Narayan Lal <nilal@redhat.com>, Haozhong Zhang <haozhong.zhang@intel.com>, Ross Zwisler <ross.zwisler@intel.com>
+To: Andrey Smirnov <andrew.smirnov@gmail.com>
+Cc: qemu-arm <qemu-arm@nongnu.org>, Jason Wang <jasowang@redhat.com>, =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>, QEMU Developers <qemu-devel@nongnu.org>, Andrey Yurovsky <yurovsky@gmail.com>
 
+On 6 November 2017 at 15:48, Andrey Smirnov <andrew.smirnov@gmail.com> wrot=
+e:
+> Add minimal code needed to allow upstream Linux guest to boot.
+>
+> Cc: Peter Maydell <peter.maydell@linaro.org>
+> Cc: Jason Wang <jasowang@redhat.com>
+> Cc: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
+> Cc: qemu-devel@nongnu.org
+> Cc: qemu-arm@nongnu.org
+> Cc: yurovsky@gmail.com
+> Signed-off-by: Andrey Smirnov <andrew.smirnov@gmail.com>
+> ---
+>  hw/dma/Makefile.objs      |  1 +
+>  hw/dma/imx_sdma.c         | 99 +++++++++++++++++++++++++++++++++++++++++=
+++++++
+>  include/hw/dma/imx_sdma.h | 22 +++++++++++
+>  3 files changed, 122 insertions(+)
+>  create mode 100644 hw/dma/imx_sdma.c
+>  create mode 100644 include/hw/dma/imx_sdma.h
+>
 
---=-YkxgZx0ZzE65iqL9l6Ah
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Does Linux really insist on reads-as-written behaviour?
+(ie can you get away with just using
+create_unimplemented_device() ?)
 
-On Fri, 2017-11-03 at 14:21 +0800, Xiao Guangrong wrote:
-> On 11/03/2017 12:30 AM, Dan Williams wrote:
-> >=20
-> > Good point, I was assuming that the mmio flush interface would be
-> > discovered separately from the NFIT-defined memory range. Perhaps
-> > via
-> > PCI in the guest? This piece of the proposal=C2=A0=C2=A0needs a bit mor=
-e
-> > thought...
-> >=20
->=20
-> Consider the case that the vNVDIMM device on normal storage and
-> vNVDIMM device on real nvdimm hardware can both exist in VM, the
-> flush interface should be able to associate with the SPA region
-> respectively. That's why I'd like to integrate the flush interface
-> into NFIT/ACPI by using a separate table. Is it possible to be a
-> part of ACPI specification? :)
-
-It would also be perfectly fine to have the
-virtio PCI device indicate which vNVDIMM
-range it flushes.
-
-Since the guest OS needs to support that kind
-of device anyway, does it really matter which
-direction the device association points?
-
-We can go with the "best" interface for what
-could be a relatively slow flush (fsync on a
-file on ssd/disk on the host), which requires
-that the flushing task wait on completion
-asynchronously.
-
-If that kind of interface cannot be advertised
-through NFIT/ACPI, wouldn't it be perfectly fine
-to have only the virtio PCI device indicate which
-vNVDIMM range it flushes?
-
---=20
-All rights reversed
---=-YkxgZx0ZzE65iqL9l6Ah
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: This is a digitally signed message part
-Content-Transfer-Encoding: 7bit
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2
-
-iQEcBAABCAAGBQJaFG5FAAoJEM553pKExN6DkB8H/2QuJPfLcfkc3wfyk1Y5B2We
-fipWPXwANS0sPCUl4JLIHG78qfV372SrmtnzTwbPpJsBts4IdkR7jcc0oXFIPrdz
-M7BxVEWuO1MSRnPNLtcDak8FoNwx5Ih987pZfrRaNT40N3XVwHsmdbEOnLiWw/gs
-bxPHlzhQ3x/vdbA6rwmxon/aIwa9/4D6wlmR1HQW8WE7Kwc5rrJxjTXb9/4znWVo
-yZsABziwJwK+9XhGXh2UmLp+7xf/PBR/X7uKvamPBL0sGS3pW8AS9sQxCi5CQ0IE
-DGEH7R1KTMDCJaY5+mVQf9Te351+4b1UMpIzkIueLjm5U+Kef7Omw5HjT0J/R2k=
-=Z+Y6
------END PGP SIGNATURE-----
-
---=-YkxgZx0ZzE65iqL9l6Ah--
+thanks
+-- PMM
