@@ -1,14 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37018)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37075)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1eHAC6-00039M-3u
-	for qemu-devel@nongnu.org; Tue, 21 Nov 2017 10:10:44 -0500
+	(envelope-from <kwolf@redhat.com>) id 1eHAC8-0003BM-EJ
+	for qemu-devel@nongnu.org; Tue, 21 Nov 2017 10:10:46 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1eHAC2-0005Dj-Pa
-	for qemu-devel@nongnu.org; Tue, 21 Nov 2017 10:10:38 -0500
+	(envelope-from <kwolf@redhat.com>) id 1eHAC7-0005HZ-FH
+	for qemu-devel@nongnu.org; Tue, 21 Nov 2017 10:10:40 -0500
 From: Kevin Wolf <kwolf@redhat.com>
-Date: Tue, 21 Nov 2017 16:10:10 +0100
-Message-Id: <20171121151017.28158-1-kwolf@redhat.com>
-Subject: [Qemu-devel] [PULL 0/7] Block layer patches for 2.11.0-rc2
+Date: Tue, 21 Nov 2017 16:10:14 +0100
+Message-Id: <20171121151017.28158-5-kwolf@redhat.com>
+In-Reply-To: <20171121151017.28158-1-kwolf@redhat.com>
+References: <20171121151017.28158-1-kwolf@redhat.com>
+Subject: [Qemu-devel] [PULL 4/7] block: Add errp to bdrv_all_goto_snapshot()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -20,44 +22,87 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org
 Cc: kwolf@redhat.com, qemu-devel@nongnu.org, peter.maydell@linaro.org
 
-The following changes since commit d0dead3b6df7f6cd970ed02e8369ab8730aac9d3:
+Signed-off-by: Kevin Wolf <kwolf@redhat.com>
+Reviewed-by: Eric Blake <eblake@redhat.com>
+Reviewed-by: Denis V. Lunev <den@openvz.org>
+Reviewed-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Reviewed-by: John Snow <jsnow@redhat.com>
+---
+ include/block/snapshot.h |  3 ++-
+ block/snapshot.c         | 11 ++++++-----
+ migration/savevm.c       |  6 +++---
+ 3 files changed, 11 insertions(+), 9 deletions(-)
 
-  scripts/make-release: ship u-boot source as a tarball (2017-11-21 12:48:20 +0000)
-
-are available in the git repository at:
-
-  git://repo.or.cz/qemu/kevin.git tags/for-upstream
-
-for you to fetch changes up to 4fd0295c151e596944be2f8062c4563cdf9106a0:
-
-  Merge remote-tracking branch 'mreitz/tags/pull-block-2017-11-21' into queue-block (2017-11-21 15:09:54 +0100)
-
-----------------------------------------------------------------
-Block layer patches for 2.11.0-rc2
-
-----------------------------------------------------------------
-Alberto Garcia (1):
-      block: Close a BlockDriverState completely even when bs->drv is NULL
-
-Eric Blake (1):
-      iotests: Fix 176 on 32-bit host
-
-Kevin Wolf (6):
-      block: Don't use BLK_PERM_CONSISTENT_READ for format probing
-      block: Don't request I/O permission with BDRV_O_NO_IO
-      block: Add errp to bdrv_snapshot_goto()
-      block: Add errp to bdrv_all_goto_snapshot()
-      block: Error out on load_vm with active dirty bitmaps
-      Merge remote-tracking branch 'mreitz/tags/pull-block-2017-11-21' into queue-block
-
- include/block/snapshot.h   |  6 +++--
- block.c                    | 62 ++++++++++++++++++++++++----------------------
- block/block-backend.c      | 10 +++++---
- block/snapshot.c           | 45 +++++++++++++++++----------------
- migration/savevm.c         |  6 ++---
- qemu-img.c                 |  6 ++---
- tests/qemu-iotests/060     | 13 ++++++++++
- tests/qemu-iotests/060.out | 12 +++++++++
- tests/qemu-iotests/176     |  3 ++-
- tests/qemu-iotests/176.out |  8 +++---
- 10 files changed, 103 insertions(+), 68 deletions(-)
+diff --git a/include/block/snapshot.h b/include/block/snapshot.h
+index aeb80405e8..9407799941 100644
+--- a/include/block/snapshot.h
++++ b/include/block/snapshot.h
+@@ -84,7 +84,8 @@ int bdrv_snapshot_load_tmp_by_id_or_name(BlockDriverState *bs,
+ bool bdrv_all_can_snapshot(BlockDriverState **first_bad_bs);
+ int bdrv_all_delete_snapshot(const char *name, BlockDriverState **first_bsd_bs,
+                              Error **err);
+-int bdrv_all_goto_snapshot(const char *name, BlockDriverState **first_bsd_bs);
++int bdrv_all_goto_snapshot(const char *name, BlockDriverState **first_bad_bs,
++                           Error **errp);
+ int bdrv_all_find_snapshot(const char *name, BlockDriverState **first_bad_bs);
+ int bdrv_all_create_snapshot(QEMUSnapshotInfo *sn,
+                              BlockDriverState *vm_state_bs,
+diff --git a/block/snapshot.c b/block/snapshot.c
+index 75562df4cc..8585599579 100644
+--- a/block/snapshot.c
++++ b/block/snapshot.c
+@@ -467,9 +467,10 @@ fail:
+ }
+ 
+ 
+-int bdrv_all_goto_snapshot(const char *name, BlockDriverState **first_bad_bs)
++int bdrv_all_goto_snapshot(const char *name, BlockDriverState **first_bad_bs,
++                           Error **errp)
+ {
+-    int err = 0;
++    int ret = 0;
+     BlockDriverState *bs;
+     BdrvNextIterator it;
+ 
+@@ -478,10 +479,10 @@ int bdrv_all_goto_snapshot(const char *name, BlockDriverState **first_bad_bs)
+ 
+         aio_context_acquire(ctx);
+         if (bdrv_can_snapshot(bs)) {
+-            err = bdrv_snapshot_goto(bs, name, NULL);
++            ret = bdrv_snapshot_goto(bs, name, errp);
+         }
+         aio_context_release(ctx);
+-        if (err < 0) {
++        if (ret < 0) {
+             bdrv_next_cleanup(&it);
+             goto fail;
+         }
+@@ -489,7 +490,7 @@ int bdrv_all_goto_snapshot(const char *name, BlockDriverState **first_bad_bs)
+ 
+ fail:
+     *first_bad_bs = bs;
+-    return err;
++    return ret;
+ }
+ 
+ int bdrv_all_find_snapshot(const char *name, BlockDriverState **first_bad_bs)
+diff --git a/migration/savevm.c b/migration/savevm.c
+index 4a88228614..192f2d82cd 100644
+--- a/migration/savevm.c
++++ b/migration/savevm.c
+@@ -2346,10 +2346,10 @@ int load_snapshot(const char *name, Error **errp)
+     /* Flush all IO requests so they don't interfere with the new state.  */
+     bdrv_drain_all_begin();
+ 
+-    ret = bdrv_all_goto_snapshot(name, &bs);
++    ret = bdrv_all_goto_snapshot(name, &bs, errp);
+     if (ret < 0) {
+-        error_setg(errp, "Error %d while activating snapshot '%s' on '%s'",
+-                     ret, name, bdrv_get_device_name(bs));
++        error_prepend(errp, "Could not load snapshot '%s' on '%s': ",
++                      name, bdrv_get_device_name(bs));
+         goto err_drain;
+     }
+ 
+-- 
+2.13.6
