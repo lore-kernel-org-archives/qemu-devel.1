@@ -1,23 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37893)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40599)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1eHAE0-0005vw-R9
-	for qemu-devel@nongnu.org; Tue, 21 Nov 2017 10:12:37 -0500
+	(envelope-from <anton.nefedov@virtuozzo.com>) id 1eHAJn-0001ud-D7
+	for qemu-devel@nongnu.org; Tue, 21 Nov 2017 10:18:39 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1eHADw-0006IM-2P
-	for qemu-devel@nongnu.org; Tue, 21 Nov 2017 10:12:36 -0500
-References: <cover.1511230683.git.jcody@redhat.com>
-	<1f0fd95c2096688add2c7b3cfcd7016756ef19fb.1511230683.git.jcody@redhat.com>
-	<20171121134754.GB11073@localhost.localdomain>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <6be1cc3c-9f12-e560-f3f8-bb5072f75719@redhat.com>
-Date: Tue, 21 Nov 2017 16:11:49 +0100
+	(envelope-from <anton.nefedov@virtuozzo.com>) id 1eHAJd-0000ij-My
+	for qemu-devel@nongnu.org; Tue, 21 Nov 2017 10:18:35 -0500
+References: <dd350838-9132-e787-10b1-4cb200076ec9@virtuozzo.com>
+	<w51inekzv59.fsf@maestria.local.igalia.com>
+	<w518tff4dvi.fsf@maestria.local.igalia.com>
+	<20171110030223.GA7303@lemon>
+	<w518tf7k0ov.fsf@maestria.local.igalia.com>
+	<14461b9b-d62d-3723-d2bb-c2fe873207c5@virtuozzo.com>
+	<w51bmk2qkvv.fsf@maestria.local.igalia.com>
+	<41e905e4-0c2a-fad3-09a6-4959f04fe546@virtuozzo.com>
+	<w51zi7fbxrd.fsf@maestria.local.igalia.com>
+From: Anton Nefedov <anton.nefedov@virtuozzo.com>
+Message-ID: <160cac7d-7dc6-2daf-5299-82a57bffe14c@virtuozzo.com>
+Date: Tue, 21 Nov 2017 18:18:13 +0300
 MIME-Version: 1.0
-In-Reply-To: <20171121134754.GB11073@localhost.localdomain>
-Content-Type: text/plain; charset=utf-8
+In-Reply-To: <w51zi7fbxrd.fsf@maestria.local.igalia.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v2 for-2.11 2/4] coroutine: abort if we try
- to schedule or enter a pending coroutine
+Subject: Re: [Qemu-devel] [Qemu-block] segfault in parallel blockjobs
+ (iotest 30)
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,64 +32,98 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Kevin Wolf <kwolf@redhat.com>, Jeff Cody <jcody@redhat.com>
-Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, mreitz@redhat.com, stefanha@redhat.com, famz@redhat.com
+To: Alberto Garcia <berto@igalia.com>, Fam Zheng <famz@redhat.com>
+Cc: qemu-devel@nongnu.org, kwolf@redhat.com, qemu-block@nongnu.org, mreitz@redhat.com, John Snow <jsnow@redhat.com>
 
-On 21/11/2017 14:47, Kevin Wolf wrote:
-> Am 21.11.2017 um 03:23 hat Jeff Cody geschrieben:
->> The previous patch fixed a race condition, in which there were
->> coroutines being executing doubly, or after coroutine deletion.
+
+
+On 21/11/2017 3:51 PM, Alberto Garcia wrote:
+> On Thu 16 Nov 2017 05:09:59 PM CET, Anton Nefedov wrote:
+>>>>> I have the impression that one major source of headaches is the
+>>>>> fact that the reopen queue contains nodes that don't need to be
+>>>>> reopened at all. Ideally this should be detected early on in
+>>>>> bdrv_reopen_queue(), so there's no chance that the queue contains
+>>>>> nodes used by a different block job. If we had that then op
+>>>>> blockers should be enough to prevent these things. Or am I missing
+>>>>> something?
+>>>>>
+>>>> After applying Max's patch I tried the similar approach; that is
+>>>> keep BDSes referenced while they are in the reopen queue.  Now I get
+>>>> the stream job hanging. Somehow one blk_root_drained_begin() is not
+>>>> paired with blk_root_drained_end(). So the job stays paused.
+>>>
+>>> I can see this if I apply Max's patch and keep refs to BDSs in the
+>>> reopen queue:
+>>>
+>>> #0  block_job_pause (...) at blockjob.c:130
+>>> #1  0x000055c143cb586d in block_job_drained_begin (...) at blockjob.c:227
+>>> #2  0x000055c143d08067 in blk_set_dev_ops (...) at block/block-backend.c:887
+>>> #3  0x000055c143cb69db in block_job_create (...) at blockjob.c:678
+>>> #4  0x000055c143d17c0c in mirror_start_job (...) at block/mirror.c:1177
+>>>
+>>> There's a ops->drained_begin(opaque) call in blk_set_dev_ops() that
+>>> doesn't seem to be paired.
 >>
->> We can detect common scenarios when this happens, and print an error
->> message and abort before we corrupt memory / data, or segfault.
+>> My understanding for now is
 >>
->> This patch will abort if an attempt to enter a coroutine is made while
->> it is currently pending execution, either in a specific AioContext bh,
->> or pending execution via a timer.  It will also abort if a coroutine
->> is scheduled, before a prior scheduled run has occured.
->>
->> We cannot rely on the existing co->caller check for recursive re-entry
->> to catch this, as the coroutine may run and exit with
->> COROUTINE_TERMINATE before the scheduled coroutine executes.
->>
->> (This is the scenario that was occuring and fixed in the previous
->> patch).
->>
->> Signed-off-by: Jeff Cody <jcody@redhat.com>
->> ---
->>  include/qemu/coroutine_int.h |  6 ++++++
->>  util/async.c                 | 11 +++++++++++
->>  util/qemu-coroutine-sleep.c  | 11 +++++++++++
->>  util/qemu-coroutine.c        | 11 +++++++++++
->>  4 files changed, 39 insertions(+)
->>
->> diff --git a/include/qemu/coroutine_int.h b/include/qemu/coroutine_int.h
->> index cb98892..56e4c48 100644
->> --- a/include/qemu/coroutine_int.h
->> +++ b/include/qemu/coroutine_int.h
->> @@ -53,6 +53,12 @@ struct Coroutine {
->>  
->>      /* Only used when the coroutine has yielded.  */
->>      AioContext *ctx;
->> +
->> +    /* Used to catch and abort on illegal co-routine entry.
->> +     * Will contain the name of the function that had first
->> +     * scheduled the coroutine. */
->> +    const char *scheduled;
+>>     1. in bdrv_drain_all_begin(), BDS gets drained with
+>>        bdrv_parent_drained_begin(), all the parents get
+>>        blk_root_drained_begin(), pause their jobs.
+>>     2. one of the jobs finishes and deletes BB.
+>>     3. in bdrv_drain_all_end(), bdrv_parent_drained_end() is never
+>>        called because even though BDS still exists (referenced in the
+>>        queue), it cannot be accessed as bdrv_next() takes BDS from the
+>>        global BB list (and the corresponding BB is deleted).
 > 
-> Not sure if it makes any difference in practice, but I just want to
-> mention that the new field is right after a cacheline boundary and
-> the only field that is used in qemu_aio_coroutine_enter() and accesses
-> this second cacheline.
+> Yes, I was debugging this and I got to a similar conclusion. With
+> test_stream_commit from iotest 030 I can see that
 > 
-> I'm not paying much attention to this kind of thing in most contexts,
-> but entering a coroutine is a hot path that we want to be fast, so maybe
-> it's worth having a second look.
+>     1. the block-stream job is created first, then stream_run begins and
+>        starts copying the data.
+>     2. block-commit starts and tries to reopen the top image in
+>        read-write mode. This pauses the stream block job and drains all
+>        BDSs.
+>     3. The draining causes the stream job to finish, it is deferred to
+>        the main loop, then stream_complete finishes and unrefs the block
+>        job, deleting it. At the point of deletion the pause count was
+>        still > 0 (because of step (2))
+> 
+>> Max's patch v1 could have helped:
+>> http://lists.nongnu.org/archive/html/qemu-devel/2017-11/msg01835.html
+> 
+> This doesn't solve the problem.
+> 
+>> Or, perhaps another approach, keep BlockJob referenced while it is
+>> paused (by block_job_pause/resume_all()). That should prevent it from
+>> deleting the BB.
+> 
+> Yes, I tried this and it actually solves the issue. But I still think
+> that the problem is that block jobs are allowed to finish when they are
+> paused.
+> 
 
-Makes sense!  Since co_queue_wakeup is used on *yield*, maybe the order
-should be: ctx, scheduled, co_queue_next, co_queue_wakeup,
-co_scheduled_next.
+Agree, but
 
-Thanks,
+> Adding block_job_pause_point(&s->common) at the end of stream_run()
+> fixes the problem too.
+> 
 
-Paolo
+would be a nice fix, but it only works unless the job is already
+deferred, right? And the BH can't be held off while job->paused because
+with mirror job it is always the case.
+So we cover most of the cases but also lose the stable reproduction.
+
+This:
+
+ >> keep BlockJob referenced while it is
+ >> paused (by block_job_pause/resume_all()). That should prevent it from
+ >> deleting the BB.
+
+looks kind of hacky; maybe referencing in block_job_pause() (and not
+just pause_all) seems more correct? I think it didn't work for me
+right away though. But I can look more.
+
+/Anton
+
+> Berto
+> 
