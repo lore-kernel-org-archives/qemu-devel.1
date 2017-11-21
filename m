@@ -1,21 +1,18 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60544)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43418)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <lepton@google.com>) id 1eHGKy-0002hn-NI
-	for qemu-devel@nongnu.org; Tue, 21 Nov 2017 16:44:13 -0500
+	(envelope-from <jsnow@redhat.com>) id 1eHGqO-0003GE-8h
+	for qemu-devel@nongnu.org; Tue, 21 Nov 2017 17:16:41 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <lepton@google.com>) id 1eHGKx-0006ub-O7
-	for qemu-devel@nongnu.org; Tue, 21 Nov 2017 16:44:12 -0500
-Received: from mail-io0-x241.google.com ([2607:f8b0:4001:c06::241]:35106)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <lepton@google.com>) id 1eHGKx-0006uL-J2
-	for qemu-devel@nongnu.org; Tue, 21 Nov 2017 16:44:11 -0500
-Received: by mail-io0-x241.google.com with SMTP id i38so21053045iod.2
-	for <qemu-devel@nongnu.org>; Tue, 21 Nov 2017 13:44:11 -0800 (PST)
-From: Tao Wu <lepton@google.com>
-Date: Tue, 21 Nov 2017 13:43:50 -0800
-Message-Id: <20171121214350.55138-1-lepton@google.com>
-Subject: [Qemu-devel] [PATCH] hw/input/hid: Fix some wrong hid usage
- mappings.
+	(envelope-from <jsnow@redhat.com>) id 1eHGqN-0004Dt-GF
+	for qemu-devel@nongnu.org; Tue, 21 Nov 2017 17:16:40 -0500
+From: John Snow <jsnow@redhat.com>
+Message-ID: <6d62e07f-af78-e3bf-5765-1d3e5dba341e@redhat.com>
+Date: Tue, 21 Nov 2017 17:16:33 -0500
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: [Qemu-devel] qemu iotest 020 failing for vmdk after 2b7731938d9
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,62 +21,40 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: kraxel@redhat.com, Tao Wu <lepton@google.com>
+To: Qemu-block <qemu-block@nongnu.org>
+Cc: qemu-devel <qemu-devel@nongnu.org>, Lukas Doktor <ldoktor@redhat.com>, Max Reitz <mreitz@redhat.com>
 
-There are some wrong hid usage mapping in hid_usage_keys table.
-It can be confirmed with "sendkey" command in monitor and verify
-the behavior in guest OS.
-This CL fixed some wrong hid usage mapping for these keys:
+Commit 2b7731938d9 adds a blkdebug driver test for failing commits, but
+the vmdk driver doesn't appear to appreciate this format:
 
-kp_equals kp_comma audiomute volumedown volumeup power
++_qemu_img_wrapper create -f vmdk -b "json:{'driver': 'raw',
++                         'file': {
++                             'driver': 'blkdebug',
++                             'inject-error': [{
++                                 'event': 'write_aio',
++                                 'errno': 28,
++                                 'once': true
++                             }],
++                             'image': {
++                                 'driver': 'null-co'
++                             }}}"
+"/home/bos/jhuston/src/qemu/bin/git/tests/qemu-iotests/scratch/t.vmdk"
++qemu-img: TEST_DIR/t.IMGFMT: Could not create image: Invalid argument
 
-There still are some wrong mapping left in hid_usage_keys table, but
-they are not as important as above keys. The list of left buggy keys:
 
-open paste ro hiragana henkan yen again props undo front audioprev audionext
-calculator audioplay audiostop cut find sleep ac_refresh stop ac_forward
-ac_back help copy
+...so;
 
-Signed-off-by: Tao Wu <lepton@google.com>
----
- hw/input/hid.c | 12 ++++++------
- 1 file changed, 6 insertions(+), 6 deletions(-)
+(A) VMDK should be dropped from 020, or
+(B) This sub-test should be rewritten, or
+(C) This sub-test should be split out into a new unit where VMDK can be
+dropped.
 
-diff --git a/hw/input/hid.c b/hw/input/hid.c
-index 0d049ff61c..08a0f07bbf 100644
---- a/hw/input/hid.c
-+++ b/hw/input/hid.c
-@@ -47,24 +47,24 @@ static const uint8_t hid_usage_keys[0x100] = {
-     0x3f, 0x40, 0x41, 0x42, 0x43, 0x53, 0x47, 0x5f,
-     0x60, 0x61, 0x56, 0x5c, 0x5d, 0x5e, 0x57, 0x59,
-     0x5a, 0x5b, 0x62, 0x63, 0x46, 0x00, 0x64, 0x44,
--    0x45, 0x68, 0x69, 0x6a, 0x6b, 0x6c, 0x6d, 0x6e,
-+    0x45, 0x67, 0x69, 0x6a, 0x6b, 0x6c, 0x6d, 0x6e,
-     0xe8, 0xe9, 0x71, 0x72, 0x73, 0x00, 0x00, 0x00,
-     0x00, 0x00, 0x00, 0x85, 0x00, 0x00, 0x00, 0x00,
-     0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
--    0x00, 0x00, 0x00, 0x00, 0x00, 0xe3, 0xe7, 0x65,
-+    0x00, 0x00, 0x00, 0x00, 0x00, 0xe3, 0x85, 0x65,
- 
-     0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-     0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-     0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-     0x00, 0x00, 0x00, 0x00, 0x58, 0xe4, 0x00, 0x00,
--    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
--    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
--    0x00, 0x00, 0x00, 0x00, 0x00, 0x54, 0x00, 0x46,
-+    0x7f, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-+    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x81, 0x00,
-+    0x80, 0x00, 0x00, 0x00, 0x00, 0x54, 0x00, 0x46,
-     0xe6, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-     0x00, 0x00, 0x00, 0x00, 0x00, 0x48, 0x48, 0x4a,
-     0x52, 0x4b, 0x00, 0x50, 0x00, 0x4f, 0x00, 0x4d,
-     0x51, 0x4e, 0x49, 0x4c, 0x00, 0x00, 0x00, 0x00,
--    0x00, 0x00, 0x00, 0xe3, 0xe7, 0x65, 0x00, 0x00,
-+    0x00, 0x00, 0x00, 0xe3, 0xe7, 0x65, 0x66, 0x00,
-     0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-     0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-     0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
--- 
-2.15.0.448.gf294e3d99a-goog
+I don't like (A) very much because I like testing our weird formats when
+possible, I don't like (B) very much because I don't really like
+wrangling QMP commands inside of the bash unit tests.
+
+(C) Could work; though it's odd to have it away from its kin in 020.
+
+Opinions?
+
+--js
