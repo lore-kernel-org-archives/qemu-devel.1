@@ -1,26 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54091)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44185)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jiangyiwen@huawei.com>) id 1eGzzg-0003Em-K0
-	for qemu-devel@nongnu.org; Mon, 20 Nov 2017 23:17:09 -0500
+	(envelope-from <yang.zhong@intel.com>) id 1eH1OW-0008T3-CF
+	for qemu-devel@nongnu.org; Tue, 21 Nov 2017 00:46:53 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jiangyiwen@huawei.com>) id 1eGzzd-00073S-Fb
-	for qemu-devel@nongnu.org; Mon, 20 Nov 2017 23:17:08 -0500
-Received: from [45.249.212.32] (port=38298 helo=huawei.com)
+	(envelope-from <yang.zhong@intel.com>) id 1eH1OS-00085y-F6
+	for qemu-devel@nongnu.org; Tue, 21 Nov 2017 00:46:52 -0500
+Received: from mga02.intel.com ([134.134.136.20]:18517)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <jiangyiwen@huawei.com>)
-	id 1eGzzd-0006xg-3f
-	for qemu-devel@nongnu.org; Mon, 20 Nov 2017 23:17:05 -0500
-References: <5A126CCB.3010602@huawei.com>
-	<20171120111303.2db7cdd0@bahia.lab.toulouse-stg.fr.ibm.com>
-From: jiangyiwen <jiangyiwen@huawei.com>
-Message-ID: <5A139D5D.9050907@huawei.com>
-Date: Tue, 21 Nov 2017 11:28:29 +0800
+	(Exim 4.71) (envelope-from <yang.zhong@intel.com>)
+	id 1eH1OS-00085a-5B
+	for qemu-devel@nongnu.org; Tue, 21 Nov 2017 00:46:48 -0500
+Date: Tue, 21 Nov 2017 13:46:08 +0800
+From: Zhong Yang <yang.zhong@intel.com>
+Message-ID: <20171121054608.GC8063@yangzhon-Virtual>
+References: <1510899814-19372-1-git-send-email-yang.zhong@intel.com>
+	<20171117135409.GA3669@stefanha-x1.localdomain>
+	<20171117140620.GS25830@redhat.com>
+	<20171120085442.GB6622@yangzhon-Virtual>
+	<20171120141450.GL31943@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20171120111303.2db7cdd0@bahia.lab.toulouse-stg.fr.ibm.com>
-Content-Type: text/plain; charset="windows-1252"
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] 9pfs: don't ignore O_DIRECT flag in the
- 9pfs server
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20171120141450.GL31943@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH] rcu: reduce half heap memory size by
+ malloc_trim()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,66 +32,103 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Greg Kurz <groug@kaod.org>
-Cc: aneesh.kumar@linux.vnet.ibm.com, qemu-devel@nongnu.org, sochin.jiang@huawei.com
+To: "Daniel P. Berrange" <berrange@redhat.com>, stone.xulei@huawei.com
+Cc: qemu-devel@nongnu.org, pbonzini@redhat.com, weidong.huang@huawei.com, arei.gonglei@huawei.com, liujunjie23@huawei.com, wangxinxin.wang@huawei.com, anthony.xu@intel.com, stefanha@redhat.com, zhang.zhanghailiang@huawei.com, famz@redhat.com, yang.zhong@intel.com
 
-On 2017/11/20 18:13, Greg Kurz wrote:
-> On Mon, 20 Nov 2017 13:48:59 +0800
-> jiangyiwen <jiangyiwen@huawei.com> wrote:
+On Mon, Nov 20, 2017 at 02:14:50PM +0000, Daniel P. Berrange wrote:
+> On Mon, Nov 20, 2017 at 04:54:42PM +0800, Zhong Yang wrote:
+> > On Fri, Nov 17, 2017 at 02:06:20PM +0000, Daniel P. Berrange wrote:
+> > > On Fri, Nov 17, 2017 at 01:54:09PM +0000, Stefan Hajnoczi wrote:
+> > > > On Fri, Nov 17, 2017 at 02:23:34PM +0800, Yang Zhong wrote:
+> > > > > diff --git a/util/rcu.c b/util/rcu.c
+> > > > > index ca5a63e..8d491a6 100644
+> > > > > --- a/util/rcu.c
+> > > > > +++ b/util/rcu.c
+> > > > > @@ -26,6 +26,7 @@
+> > > > >   * IBM's contributions to this file may be relicensed under LGPLv2 or later.
+> > > > >   */
+> > > > >  
+> > > > > +#include <malloc.h>
+> > > > 
+> > > > This header file is not mentioned in the C99 standard or POSIX.  It is
+> > > > probably not available on all host OSes that QEMU supports.  Please use
+> > > > #ifdef CONFIG_LINUX.
+> > > > 
+> > > > >  #include "qemu/osdep.h"
+> > > > >  #include "qemu-common.h"
+> > > > >  #include "qemu/rcu.h"
+> > > > > @@ -272,6 +273,9 @@ static void *call_rcu_thread(void *opaque)
+> > > > >              node->func(node);
+> > > > >          }
+> > > > >          qemu_mutex_unlock_iothread();
+> > > > > +#ifdef CONFIG_LINUX
+> > > > > +        malloc_trim(0);
+> > > > > +#endif
+> > > > 
+> > > > It is important that the rcu thread isn't overzealous in minimizing heap
+> > > > size if that means ordinary malloc(3) calls will experience latency
+> > > > spikes.  Please leave a few MB free so that malloc(3) doesn't take the
+> > > > slow path.
+> > > 
+> > > If you pass '0' the docs say that the minimum amount is left in the
+> > > heap, per M_TOP_PAD, which is 128kb.
+> > > 
+> > > Strangely the mallopt(3) man page suggests, that free() should automatically
+> > > trim the heap when its size exceeds M_TOP_TRIM, which is again 128kb by
+> > > default.  So I'm puzzelled by malloc_trim() would be needed unless there
+> > > are scenarios in which free() won't trim, that aren't mentioned in the
+> > > manpage.
+> > 
+> >   In fact, i firstly adopted mallopt() solution to optimize the heap memory,
+> >   but i found this function is NOT useful, which are difference with MAN's
+> >   description, so i had to swith to use malloc_trim().
 > 
->> Now v9fs in linux has already supported O_DIRECT(v9fs_direct_IO),
->> when guest user open file with O_DIRECT flag and return success,
->> so user hopes data doesn't pass through page cache, but 9pfs in
->> qemu ignore direct disk access and use host page cache, it is not
->> match to DIRECT_IO semantic, so we should not ignore O_DIRECT in
->> 9pfs unless v9fs in linux don't support DIRECT_IO.
->>
->> And if server fs don't support O_DIRECT, user will receive -EINVAL
->> and know the filesystem don't support O_DIRECT.
->>
->> So in order to ensure semantic consistency, don't ignore direct
->> disk access in 9pfs.
->>
 > 
-> There are good reasons for us to ignore O_DIRECT. AFAIK, O_DIRECT requires
-> the application to take care of the alignment of the buffers with either the
-> logical block size of the filesystem (linux <= 2.4) or the logical block size
-> of the underlying storage... I don't really see how you can achieve that since
-> the linux 9p client only cares to break up requests into msize-chunks, and
-> ignores alignment. ie, you're likely to not ensure semantic consistency on the
-> host side anyway and linux will fallback to cached I/O.
+> > > Also, how does malloc_trim interact with tcmalloc.so that people often
+> > > use in preference to glibc's built in malloc ?
+> >   Thanks, you reminded me to consider tcmalloc or jemalloc.
+> >  
+> >   Whether below code is more suitable? thanks!
+> >   #if defined(CONFIG_LINUX) && defined(__GLIBC__)
+> >          malloc_trim(0);
+> >   #endif
 > 
-> Also, this change would silently break existing users of O_DIRECT, which isn't
-> acceptable... it would require some fsdev property to enable this new behavior.
-> 
+> Both of those macro symbols will still be defined even when tcmalloc/jemalloc
+> are in use.
+  
+  Hello Daniel,
 
-Thank you very much, I understand what your mean, v9fs in linux doesn't take care
-of the alignment, only split as the msize. Then there is another problem,
-should v9fs support DIRECT_IO? or delete DIRECT_IO ops in v9fs?
+  If those two macro are NOT useful for this scenario, how about below changes?
 
-Thanks,
-Yiwen.
->> Signed-off-by: Yiwen Jiang <jiangyiwen@huawei.com>
->> ---
->>  hw/9pfs/9p.c | 4 ----
->>  1 file changed, 4 deletions(-)
->>
->> diff --git a/hw/9pfs/9p.c b/hw/9pfs/9p.c
->> index 52d4663..5ea01c4 100644
->> --- a/hw/9pfs/9p.c
->> +++ b/hw/9pfs/9p.c
->> @@ -155,10 +155,6 @@ static int get_dotl_openflags(V9fsState *s, int oflags)
->>       */
->>      flags = dotl_to_open_flags(oflags);
->>      flags &= ~(O_NOCTTY | O_ASYNC | O_CREAT);
->> -    /*
->> -     * Ignore direct disk access hint until the server supports it.
->> -     */
->> -    flags &= ~O_DIRECT;
->>      return flags;
->>  }
->>
-> 
-> 
-> .
-> 
+  In configure file, 
+
+  if test "$tcmalloc" = "yes" ; then
+      echo "CONFIG__TCMALLOC=y" >> $config_host_mak
+  ........ 
+
+  then use !CONFIG_TCMALLOC macro to check malloc_trim()? thanks!
+
+  Regards,
+
+  Yang
+
+ 
+> I wonder if tcmalloc/jemalloc even suffer from the same problem that libc's
+> builtin malloc has ?
+ 
+  Hello Xulei,
+
+  Did you compiled Qemu with tcmalloc or jemalloc ? If you did , would you 
+  please share those datas with different malloc compile option?  Many thanks!
+
+  Regards,
+
+  Yang
+
+
+> Regards,
+> Daniel
+> -- 
+> |: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
+> |: https://libvirt.org         -o-            https://fstop138.berrange.com :|
+> |: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
