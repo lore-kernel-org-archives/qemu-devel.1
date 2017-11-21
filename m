@@ -1,26 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45781)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52520)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jcody@redhat.com>) id 1eGvX4-0000rB-C0
-	for qemu-devel@nongnu.org; Mon, 20 Nov 2017 18:31:20 -0500
+	(envelope-from <richard.purdie@linuxfoundation.org>)
+	id 1eGvzy-0006lL-CO
+	for qemu-devel@nongnu.org; Mon, 20 Nov 2017 19:01:11 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jcody@redhat.com>) id 1eGvX3-0006Ax-G3
-	for qemu-devel@nongnu.org; Mon, 20 Nov 2017 18:31:18 -0500
-Date: Mon, 20 Nov 2017 18:31:06 -0500
-From: Jeff Cody <jcody@redhat.com>
-Message-ID: <20171120233106.GJ5399@localhost.localdomain>
-References: <cover.1511145863.git.jcody@redhat.com>
-	<0c039d00e03331d863ee249810d9778313670803.1511145863.git.jcody@redhat.com>
-	<06d8393e-8422-0576-ad68-f14e49eed1a6@redhat.com>
-	<20171120223536.GC32161@localhost.localdomain>
-	<82e388ce-cbbf-7e59-6433-6e109e426512@redhat.com>
-	<20171120230837.GI5399@localhost.localdomain>
-	<e1b8b6e2-1e86-9a60-2b3c-53b871c59fd6@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <e1b8b6e2-1e86-9a60-2b3c-53b871c59fd6@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH 3/5] coroutines: abort if we try to enter a
- still-sleeping coroutine
+	(envelope-from <richard.purdie@linuxfoundation.org>)
+	id 1eGvzt-0002eF-HR
+	for qemu-devel@nongnu.org; Mon, 20 Nov 2017 19:01:10 -0500
+Message-ID: <1511222455.862.5.camel@linuxfoundation.org>
+From: Richard Purdie <richard.purdie@linuxfoundation.org>
+Date: Tue, 21 Nov 2017 00:00:55 +0000
+Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] qemu-system-ppc hangs
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,35 +22,66 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, mreitz@redhat.com, stefanha@redhat.com, famz@redhat.com, kwolf@redhat.com
+To: qemu-ppc@nongnu.org, david@gibson.dropbear.id.au
+Cc: qemu-devel <qemu-devel@nongnu.org>
 
-On Tue, Nov 21, 2017 at 12:13:46AM +0100, Paolo Bonzini wrote:
-> On 21/11/2017 00:08, Jeff Cody wrote:
-> > @@ -34,6 +36,7 @@ void coroutine_fn co_aio_sleep_ns(AioContext *ctx, QEMUClockType type,
-> >      CoSleepCB sleep_cb = {
-> >          .co = qemu_coroutine_self(),
-> >      };
-> > +    if (sleep_cb.co->sleeping == 1 || sleep_cb.co->scheduled == 1) {
-> > +       fprintf(stderr, "Cannot sleep a co-routine that is already sleeping "
-> > +                       " or scheduled\n");
-> > +       abort();
-> > +    }
-> > +    sleep_cb.co->sleeping = 1;
-> >      sleep_cb.ts = aio_timer_new(ctx, type, SCALE_NS, co_sleep_cb, &sleep_cb);
-> >      timer_mod(sleep_cb.ts, qemu_clock_get_ns(type) + ns);
-> >      qemu_coroutine_yield();
-> 
-> I understand that this was just an example and not the actual patch, but
-> I'll still point out that this loses the benefit (better error message)
-> of keeping the flags separate.
-> 
-> What do you think about making "scheduled" a const char * and assigning
-> __func__ to it (i.e. either "aio_co_schedule" or "co_aio_sleep_ns")?
-> 
+Hi,
 
-Ohhh, nice.  I'll spin a v2 with that, and merge patches 3 and 5 together.
-And then maybe for 2.12 we can look at making it a fsm, like Stefan
-suggested (or somehow make coroutine entry thread safe and idempotent).
+I work on the Yocto Project and we use qemu to test boot our Linux
+images and run tests against them. We've been noticing some instability
+for ppc where the images sometimes hang, usually around udevd bring up
+time so just after booting into userspace.
 
-Jeff
+To cut a long story short, I've tracked down what I think is the
+problem. I believe the decrementer timer stops receiving interrupts so
+tasks in our images hang indefinitely as the timer stopped.=C2=A0
+
+It can be summed up with this line of debug:
+
+ppc_set_irq: 0x55b4e0d562f0 n_IRQ 8 level 1 =3D> pending 00000100req 0000=
+0004
+
+It should normally read:
+
+ppc_set_irq: 0x55b4e0d562f0 n_IRQ 8 level=C2=A01 =3D> pending 00000100req=
+ 00000002
+
+The question is why=C2=A0CPU_INTERRUPT_EXITTB ends up being set when the
+lines above this=C2=A0log message clearly sets=C2=A0CPU_INTERRUPT_HARD (v=
+ia=C2=A0
+cpu_interrupt() ).
+
+I note in cpu.h:
+
+=C2=A0=C2=A0=C2=A0=C2=A0/* updates protected by BQL */
+=C2=A0=C2=A0=C2=A0=C2=A0uint32_t interrupt_request;
+
+(for struct CPUState)
+
+The ppc code does "cs->interrupt_request |=3D CPU_INTERRUPT_EXITTB" in 5
+places, 3 in excp_helper.c and 2 in helper_regs.h. In all cases, =C2=A0
+g_assert(qemu_mutex_iothread_locked()); fails. If I do something like:
+
+if (!qemu_mutex_iothread_locked()) {
+=C2=A0=C2=A0=C2=A0=C2=A0qemu_mutex_lock_iothread();
+=C2=A0=C2=A0=C2=A0=C2=A0cpu_interrupt(cs, CPU_INTERRUPT_EXITTB);
+=C2=A0=C2=A0=C2=A0=C2=A0qemu_mutex_unlock_iothread();
+} else {
+=C2=A0=C2=A0=C2=A0=C2=A0cpu_interrupt(cs, CPU_INTERRUPT_EXITTB);
+}
+
+in these call sites then I can no longer lock qemu up with my test
+case.
+
+I suspect the _HARD setting gets overwritten which stops the=C2=A0
+decrementer interrupts being delivered.
+
+I don't know if taking this lock in these situations is going to be bad
+for performance and whether such a patch would be right/wrong.
+
+At this point I therefore wanted to seek advice on what the real issue
+is here and how to fix it!
+
+Cheers,
+
+Richard
