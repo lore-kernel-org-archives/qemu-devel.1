@@ -1,21 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33044)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34481)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1eHDaH-0002wJ-PP
-	for qemu-devel@nongnu.org; Tue, 21 Nov 2017 13:47:51 -0500
+	(envelope-from <no-reply@patchew.org>) id 1eHDe6-0005IC-TF
+	for qemu-devel@nongnu.org; Tue, 21 Nov 2017 13:51:48 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1eHDaG-0007Qi-KY
-	for qemu-devel@nongnu.org; Tue, 21 Nov 2017 13:47:49 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:42144)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1eHDaG-0007QY-C0
-	for qemu-devel@nongnu.org; Tue, 21 Nov 2017 13:47:48 -0500
-From: Juan Quintela <quintela@redhat.com>
-Date: Tue, 21 Nov 2017 19:47:38 +0100
-Message-Id: <20171121184738.8502-3-quintela@redhat.com>
-In-Reply-To: <20171121184738.8502-1-quintela@redhat.com>
-References: <20171121184738.8502-1-quintela@redhat.com>
-Subject: [Qemu-devel] [PULL 2/2] migration/ram.c: do not set
- 'postcopy_running' in POSTCOPY_INCOMING_END
+	(envelope-from <no-reply@patchew.org>) id 1eHDe2-00011o-V7
+	for qemu-devel@nongnu.org; Tue, 21 Nov 2017 13:51:46 -0500
+Resent-Message-Id: <E1eHDe2-00011o-V7@eggs.gnu.org>
+Received: from sender-of-o52.zoho.com ([135.84.80.217]:21443)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
+	id 1eHDe2-00011N-GA
+	for qemu-devel@nongnu.org; Tue, 21 Nov 2017 13:51:42 -0500
+Reply-To: <qemu-devel@nongnu.org>
+Message-ID: <151127674113.525.15851167844501599193@bafd83ae6430>
+In-Reply-To: <151127322955.6888.16198535123422076171.stgit@Misha-PC.lan02.inno>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+From: no-reply@patchew.org
+Date: Tue, 21 Nov 2017 07:05:41 -0800 (PST)
+Subject: Re: [Qemu-devel] [PATCH v3 00/45] Windbg supporting
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,105 +28,145 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: dgilbert@redhat.com, lvivier@redhat.com, peterx@redhat.com, Daniel Henrique Barboza <danielhb@linux.vnet.ibm.com>
+To: mikhail.abakumov@ispras.ru
+Cc: famz@redhat.com, qemu-devel@nongnu.org, sw@weilnetz.de, lprosek@redhat.com, dovgaluk@ispras.ru, rkagan@virtuozzo.com, pbonzini@redhat.com, den@openvz.org
 
-From: Daniel Henrique Barboza <danielhb@linux.vnet.ibm.com>
-
-When migrating a VM with 'migrate_set_capability postcopy-ram on'
-a postcopy_state is set during the process, ending up with the
-state POSTCOPY_INCOMING_END when the migration is over. This
-postcopy_state is taken into account inside ram_load to check
-how it will load the memory pages. This same ram_load is called when
-in a loadvm command.
-
-Inside ram_load, the logic to see if we're at postcopy_running state
-is:
-
-postcopy_running = postcopy_state_get() >= POSTCOPY_INCOMING_LISTENING
-
-postcopy_state_get() returns this enum type:
-
-typedef enum {
-    POSTCOPY_INCOMING_NONE = 0,
-    POSTCOPY_INCOMING_ADVISE,
-    POSTCOPY_INCOMING_DISCARD,
-    POSTCOPY_INCOMING_LISTENING,
-    POSTCOPY_INCOMING_RUNNING,
-    POSTCOPY_INCOMING_END
-} PostcopyState;
-
-In the case where ram_load is executed and postcopy_state is
-POSTCOPY_INCOMING_END, postcopy_running will be set to 'true' and
-ram_load will behave like a postcopy is in progress. This scenario isn't
-achievable in a migration but it is reproducible when executing
-savevm/loadvm after migrating with 'postcopy-ram on', causing loadvm
-to fail with Error -22:
-
-Source:
-
-(qemu) migrate_set_capability postcopy-ram on
-(qemu) migrate tcp:127.0.0.1:4444
-
-Dest:
-
-(qemu) migrate_set_capability postcopy-ram on
-(qemu)
-ubuntu1704-intel login:
-Ubuntu 17.04 ubuntu1704-intel ttyS0
-
-ubuntu1704-intel login: (qemu)
-(qemu) savevm test1
-(qemu) loadvm test1
-Unknown combination of migration flags: 0x4 (postcopy mode)
-error while loading state for instance 0x0 of device 'ram'
-Error -22 while loading VM state
-(qemu)
-
-This patch fixes this problem by changing a bit the semantics
-of postcopy_running inside ram_load, verifying first if
-we're not in the POSTCOPY_INCOMING_END state. In this case,
-postcopy_running is set to 'false'.
-
-Signed-off-by: Daniel Henrique Barboza <danielhb@linux.vnet.ibm.com>
-Reviewed-by: Juan Quintela <quintela@redhat.com>
-Signed-off-by: Juan Quintela <quintela@redhat.com>
----
- migration/ram.c | 22 +++++++++++++++-------
- 1 file changed, 15 insertions(+), 7 deletions(-)
-
-diff --git a/migration/ram.c b/migration/ram.c
-index 8620aa400a..43ed719668 100644
---- a/migration/ram.c
-+++ b/migration/ram.c
-@@ -2803,13 +2803,21 @@ static int ram_load(QEMUFile *f, void *opaque, int version_id)
-     int flags = 0, ret = 0, invalid_flags = 0;
-     static uint64_t seq_iter;
-     int len = 0;
--    /*
--     * If system is running in postcopy mode, page inserts to host memory must
--     * be atomic
--     */
--    bool postcopy_running = postcopy_state_get() >= POSTCOPY_INCOMING_LISTENING;
--    /* ADVISE is earlier, it shows the source has the postcopy capability on */
--    bool postcopy_advised = postcopy_state_get() >= POSTCOPY_INCOMING_ADVISE;
-+    bool postcopy_advised = false, postcopy_running = false;
-+    uint8_t postcopy_state = postcopy_state_get();
-+
-+    if (postcopy_state != POSTCOPY_INCOMING_END) {
-+        /*
-+         * If system is running in postcopy mode, page inserts to host memory
-+         * must be atomic
-+         */
-+        postcopy_running = postcopy_state >= POSTCOPY_INCOMING_LISTENING;
-+
-+        /* ADVISE is earlier, it shows the source has the postcopy
-+         * capability on
-+         */
-+        postcopy_advised = postcopy_state >= POSTCOPY_INCOMING_ADVISE;
-+    }
- 
-     seq_iter++;
- 
--- 
-2.13.6
+SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
+LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKU3ViamVjdDogW1FlbXUt
+ZGV2ZWxdIFtQQVRDSCB2MyAwMC80NV0gV2luZGJnIHN1cHBvcnRpbmcKVHlwZTogc2VyaWVzCk1l
+c3NhZ2UtaWQ6IDE1MTEyNzMyMjk1NS42ODg4LjE2MTk4NTM1MTIzNDIyMDc2MTcxLnN0Z2l0QE1p
+c2hhLVBDLmxhbjAyLmlubm8KCj09PSBURVNUIFNDUklQVCBCRUdJTiA9PT0KIyEvYmluL2Jhc2gK
+CkJBU0U9YmFzZQpuPTEKdG90YWw9JChnaXQgbG9nIC0tb25lbGluZSAkQkFTRS4uIHwgd2MgLWwp
+CmZhaWxlZD0wCgpnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVsaW1pdCAwCmdpdCBjb25m
+aWcgLS1sb2NhbCBkaWZmLnJlbmFtZXMgVHJ1ZQoKY29tbWl0cz0iJChnaXQgbG9nIC0tZm9ybWF0
+PSVIIC0tcmV2ZXJzZSAkQkFTRS4uKSIKZm9yIGMgaW4gJGNvbW1pdHM7IGRvCiAgICBlY2hvICJD
+aGVja2luZyBQQVRDSCAkbi8kdG90YWw6ICQoZ2l0IGxvZyAtbiAxIC0tZm9ybWF0PSVzICRjKS4u
+LiIKICAgIGlmICEgZ2l0IHNob3cgJGMgLS1mb3JtYXQ9ZW1haWwgfCAuL3NjcmlwdHMvY2hlY2tw
+YXRjaC5wbCAtLW1haWxiYWNrIC07IHRoZW4KICAgICAgICBmYWlsZWQ9MQogICAgICAgIGVjaG8K
+ICAgIGZpCiAgICBuPSQoKG4rMSkpCmRvbmUKCmV4aXQgJGZhaWxlZAo9PT0gVEVTVCBTQ1JJUFQg
+RU5EID09PQoKVXBkYXRpbmcgM2M4Y2Y1YTljMjFmZjg3ODIxNjRkMWRlZjdmNDRiZDg4ODcxMzM4
+NApGcm9tIGh0dHBzOi8vZ2l0aHViLmNvbS9wYXRjaGV3LXByb2plY3QvcWVtdQogKiBbbmV3IHRh
+Z10gICAgICAgICAgICAgICBwYXRjaGV3LzE1MTEyNzMyMjk1NS42ODg4LjE2MTk4NTM1MTIzNDIy
+MDc2MTcxLnN0Z2l0QE1pc2hhLVBDLmxhbjAyLmlubm8gLT4gcGF0Y2hldy8xNTExMjczMjI5NTUu
+Njg4OC4xNjE5ODUzNTEyMzQyMjA3NjE3MS5zdGdpdEBNaXNoYS1QQy5sYW4wMi5pbm5vCiAqIFtu
+ZXcgdGFnXSAgICAgICAgICAgICAgIHBhdGNoZXcvMjAxNzExMjExNDI1MzguMjIwNzItMS1iZXJy
+YW5nZUByZWRoYXQuY29tIC0+IHBhdGNoZXcvMjAxNzExMjExNDI1MzguMjIwNzItMS1iZXJyYW5n
+ZUByZWRoYXQuY29tClN3aXRjaGVkIHRvIGEgbmV3IGJyYW5jaCAndGVzdCcKZDM2MmI4OWNhYyB3
+aW5kYmc6IGltcGxlbWVudGVkIGtkX2FwaV9nZXRfY29udGV4dF9leCBhbmQga2RfYXBpX3NldF9j
+b250ZXh0X2V4CjE4YWZmM2RjMzcgd2luZGJnOiBhZGRlZCBuZXcgYXBpIGZ1bmN0aW9ucwoyYmNi
+NWMzZTRhIHdpbmRiZzogaW1wbGVtZW50ZWQga2RfYXBpX3F1ZXJ5X21lbW9yeQo1ZWMxZjYxNGZl
+IHdpbmRiZzogaW1wbGVtZW50ZWQga2RfYXBpX2ZpbGxfbWVtb3J5CjYyZjMxZDcwY2Ugd2luZGJn
+OiBpbXBsZW1lbnRlZCBrZF9hcGlfc2VhcmNoX21lbW9yeQoyNzFmYTczMTUxIHdpbmRiZzogaW1w
+bGVtZW50ZWQga2RfYXBpX3JlYWRfbXNyIGFuZCBrZF9hcGlfd3JpdGVfbXNyCjNhY2FjOGU2NjAg
+d2luZGJnOiBpbXBsZW1lbnRlZCBrZF9hcGlfZ2V0X3ZlcnNpb24KOWRlNDFmZjRmNCB3aW5kYmc6
+IGltcGxlbWVudGVkIGtkX2FwaV9yZWFkX3BoeXNpY2FsX21lbW9yeSBhbmQga2RfYXBpX3dyaXRl
+X3BoeXNpY2FsX21lbW9yeQo2YjI5YWQxMGU1IHdpbmRiZzogaW1wbGVtZW50ZWQga2RfYXBpX3Jl
+YWRfaW9fc3BhY2UgYW5kIGtkX2FwaV93cml0ZV9pb19zcGFjZQpjNWI4YzZkNDRhIHdpbmRiZzog
+aW1wbGVtZW50ZWQga2RfYXBpX2NvbnRpbnVlCmRkNDgzODJhNGQgd2luZGJnOiBkZWJ1ZyBleGNl
+cHRpb24gc3Vic2NyaWJpbmcKZjM5YmNiYzYyZSB3aW5kYmc6IGltcGxlbWVudGVkIGtkX2FwaV93
+cml0ZV9icmVha3BvaW50IGFuZCBrZF9hcGlfcmVzdG9yZV9icmVha3BvaW50CjA5ZGNhNDI5ZDIg
+d2luZGJnOiBpbXBsZW1lbnRlZCB3aW5kYmdfaHdfYnJlYWtwb2ludF9pbnNlcnQgYW5kIHdpbmRi
+Z19od19icmVha3BvaW50X3JlbW92ZQo2MjM3OTZkMWYyIHdpbmRiZzogaW1wbGVtZW50ZWQgd2lu
+ZGJnX3NldF9kcjcKNzM2ZmMzZGQ4NSB3aW5kYmc6IGltcGxlbWVudGVkIHdpbmRiZ19zZXRfZHIK
+N2ZkZWYyYzQ3NSB3aW5kYmc6IGltcGxlbWVudGVkIHdpbmRiZ19zZXRfc3IKMWE0ZDJhZWNkYiB3
+aW5kYmc6IGltcGxlbWVudGVkIHdpbmRiZ193cml0ZV9rc19yZWdzCjgxMWJkMmFkYTcgd2luZGJn
+OiBpbXBsZW1lbnRlZCB3aW5kYmdfcmVhZF9rc19yZWdzCjY1ZmJkMDY1ZDggd2luZGJnOiBpbXBs
+ZW1lbnRlZCB3aW5kYmdfd3JpdGVfY29udGV4dAo1OGUxNmJlNDI3IHdpbmRiZzogaW1wbGVtZW50
+ZWQgd2luZGJnX3JlYWRfY29udGV4dApkNTM3YjVhNzliIHdpbmRiZzogaW1wbGVtZW50ZWQga2Rf
+YXBpX3JlYWRfY29udHJvbF9zcGFjZSBhbmQga2RfYXBpX3dyaXRlX2NvbnRyb2xfc3BhY2UKZTk3
+YmFiZDcwYiB3aW5kYmc6IGltcGxlbWVudGVkIGtkX2FwaV9nZXRfY29udGV4dCBhbmQga2RfYXBp
+X3NldF9jb250ZXh0CjlkYmUxMWFkYmQgd2luZGJnOiBrZXJuZWwncyBzdHJ1Y3R1cmVzCjc3YjNl
+YmE2MjIgd2luZGJnOiBpbXBsZW1lbnRlZCBrZF9hcGlfcmVhZF92aXJ0dWFsX21lbW9yeSBhbmQg
+a2RfYXBpX3dyaXRlX3ZpcnR1YWxfbWVtb3J5CjdhZWNjMDRhNTggd2luZGJnOiBpbXBsZW1lbnRl
+ZCB3aW5kYmdfcHJvY2Vzc19tYW5pcHVsYXRlX3BhY2tldAoyYWEwYWNjN2QxIHdpbmRiZzogaW1w
+bGVtZW50ZWQgd2luZGJnX3Byb2Nlc3NfZGF0YV9wYWNrZXQKMmJmMGJkOTFlYyB3aW5kYmc6IGlt
+cGxlbWVudGVkIHdpbmRiZ19wcm9jZXNzX2NvbnRyb2xfcGFja2V0Cjc1YzAwOTFjYjYgd2luZGJn
+OiB3aW5kYmdfdm1fc3RvcAphODE4MWJmZjIyIHdpbmRiZzogZ2VuZXJhdGUgTG9hZFN5bWJvbHNT
+dGF0ZUNoYW5nZQowNWY0ZWYzMzU4IHdpbmRiZzogZ2VuZXJhdGUgRXhjZXB0aW9uU3RhdGVDaGFu
+Z2UKYmQ0NmJmMTY5OSB3aW5kYmc6IHNpemVkIGRhdGEgYnVmZmVyCjIwMzJmY2I5ZjAgd2luZGJn
+OiBpbml0IERCR0tEX0FOWV9XQUlUX1NUQVRFX0NIQU5HRQplZWU1NmY1ODg3IHdpbmRiZzogaGFu
+ZGxlciBvZiBwYXJzaW5nIGNvbnRleHQKYTkwNmI4YjBkOSB3aW5kYmc6IHNlbmQgZGF0YSBhbmQg
+Y29udHJvbCBwYWNrZXRzCjdiYTYyYjYyNDEgd2luZGJnOiBwYXJzaW5nIGRhdGEgc3RyZWFtCmRm
+YzA4Y2IyNmMgd2luZGJnOiBzdHJ1Y3R1cmVzIGZvciBwYXJzaW5nIGRhdGEgc3RyZWFtCjdkNzUw
+NzYwZmIgd2luZGJnOiBoYW5kbGVyIG9mIGZzL2dzIHJlZ2lzdGVyCjRjY2Y3NGUzODMgd2luZGJn
+OiBob29rIHRvIHdybXNyIG9wZXJhdGlvbgo2OTZhNWI4OTBlIHdpbmRiZzogYWRkZWQgY2hhcmRl
+dgozZGQyZTM4MDU5IHdpbmRiZzogYWRkZWQgV2luZGJnU3RhdGUKNzFjZGU0MmUwNCB3aW5kYmc6
+IGFkZGVkIGhlbHBlciBmZWF0dXJlcwo4ODAyNzc2ZmI4IHdpbmRiZzogYWRkZWQgJy13aW5kYmcn
+IG9wdGlvbgo2NWVkYzRlOTY1IHdpbmRiZzogbW9kaWZpZWQgd2luZGJna2QuaApkMjExNGFjZDU4
+IHdpbmRiZzogYWRkZWQgd2luZGJnJ3MgS0QgaGVhZGVyIGZpbGUKOGIwNTk5ZGU2OCB3aW5kYmc6
+IGFkZGVkIGVtcHR5IHdpbmRiZ3N0dWIgZmlsZXMKCj09PSBPVVRQVVQgQkVHSU4gPT09CkNoZWNr
+aW5nIFBBVENIIDEvNDU6IHdpbmRiZzogYWRkZWQgZW1wdHkgd2luZGJnc3R1YiBmaWxlcy4uLgpF
+UlJPUjogZG8gbm90IHNldCBleGVjdXRlIHBlcm1pc3Npb25zIGZvciBzb3VyY2UgZmlsZXMKIzMw
+OiBGSUxFOiBpbmNsdWRlL2V4ZWMvd2luZGJnc3R1Yi11dGlscy5oCgpFUlJPUjogZG8gbm90IHNl
+dCBleGVjdXRlIHBlcm1pc3Npb25zIGZvciBzb3VyY2UgZmlsZXMKIzU0OiBGSUxFOiBpbmNsdWRl
+L2V4ZWMvd2luZGJnc3R1Yi5oCgpFUlJPUjogZG8gbm90IHNldCBleGVjdXRlIHBlcm1pc3Npb25z
+IGZvciBzb3VyY2UgZmlsZXMKIzg5OiBGSUxFOiBzdHVicy93aW5kYmdzdHViLmMKCkVSUk9SOiBk
+byBub3Qgc2V0IGV4ZWN1dGUgcGVybWlzc2lvbnMgZm9yIHNvdXJjZSBmaWxlcwojMTIzOiBGSUxF
+OiB0YXJnZXQvaTM4Ni93aW5kYmdzdHViLmMKCkVSUk9SOiBkbyBub3Qgc2V0IGV4ZWN1dGUgcGVy
+bWlzc2lvbnMgZm9yIHNvdXJjZSBmaWxlcwojMTQxOiBGSUxFOiB3aW5kYmdzdHViLXV0aWxzLmMK
+CkVSUk9SOiBkbyBub3Qgc2V0IGV4ZWN1dGUgcGVybWlzc2lvbnMgZm9yIHNvdXJjZSBmaWxlcwoj
+MTU5OiBGSUxFOiB3aW5kYmdzdHViLmMKCnRvdGFsOiA2IGVycm9ycywgMCB3YXJuaW5ncywgMTIx
+IGxpbmVzIGNoZWNrZWQKCllvdXIgcGF0Y2ggaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2
+aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0
+aGVtIHRvIHRoZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KCkNo
+ZWNraW5nIFBBVENIIDIvNDU6IHdpbmRiZzogYWRkZWQgd2luZGJnJ3MgS0QgaGVhZGVyIGZpbGUu
+Li4KRVJST1I6IGRvIG5vdCBzZXQgZXhlY3V0ZSBwZXJtaXNzaW9ucyBmb3Igc291cmNlIGZpbGVz
+CiMxNDogRklMRTogaW5jbHVkZS9leGVjL3dpbmRiZ2tkLmgKCnRvdGFsOiAxIGVycm9ycywgMCB3
+YXJuaW5ncywgODc5IGxpbmVzIGNoZWNrZWQKCllvdXIgcGF0Y2ggaGFzIHN0eWxlIHByb2JsZW1z
+LCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRp
+dmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlO
+VEFJTkVSUy4KCkNoZWNraW5nIFBBVENIIDMvNDU6IHdpbmRiZzogbW9kaWZpZWQgd2luZGJna2Qu
+aC4uLgpDaGVja2luZyBQQVRDSCA0LzQ1OiB3aW5kYmc6IGFkZGVkICctd2luZGJnJyBvcHRpb24u
+Li4KQ2hlY2tpbmcgUEFUQ0ggNS80NTogd2luZGJnOiBhZGRlZCBoZWxwZXIgZmVhdHVyZXMuLi4K
+Q2hlY2tpbmcgUEFUQ0ggNi80NTogd2luZGJnOiBhZGRlZCBXaW5kYmdTdGF0ZS4uLgpDaGVja2lu
+ZyBQQVRDSCA3LzQ1OiB3aW5kYmc6IGFkZGVkIGNoYXJkZXYuLi4KQ2hlY2tpbmcgUEFUQ0ggOC80
+NTogd2luZGJnOiBob29rIHRvIHdybXNyIG9wZXJhdGlvbi4uLgpDaGVja2luZyBQQVRDSCA5LzQ1
+OiB3aW5kYmc6IGhhbmRsZXIgb2YgZnMvZ3MgcmVnaXN0ZXIuLi4KQ2hlY2tpbmcgUEFUQ0ggMTAv
+NDU6IHdpbmRiZzogc3RydWN0dXJlcyBmb3IgcGFyc2luZyBkYXRhIHN0cmVhbS4uLgpDaGVja2lu
+ZyBQQVRDSCAxMS80NTogd2luZGJnOiBwYXJzaW5nIGRhdGEgc3RyZWFtLi4uCkNoZWNraW5nIFBB
+VENIIDEyLzQ1OiB3aW5kYmc6IHNlbmQgZGF0YSBhbmQgY29udHJvbCBwYWNrZXRzLi4uCkNoZWNr
+aW5nIFBBVENIIDEzLzQ1OiB3aW5kYmc6IGhhbmRsZXIgb2YgcGFyc2luZyBjb250ZXh0Li4uCkNo
+ZWNraW5nIFBBVENIIDE0LzQ1OiB3aW5kYmc6IGluaXQgREJHS0RfQU5ZX1dBSVRfU1RBVEVfQ0hB
+TkdFLi4uCkNoZWNraW5nIFBBVENIIDE1LzQ1OiB3aW5kYmc6IHNpemVkIGRhdGEgYnVmZmVyLi4u
+CkNoZWNraW5nIFBBVENIIDE2LzQ1OiB3aW5kYmc6IGdlbmVyYXRlIEV4Y2VwdGlvblN0YXRlQ2hh
+bmdlLi4uCkNoZWNraW5nIFBBVENIIDE3LzQ1OiB3aW5kYmc6IGdlbmVyYXRlIExvYWRTeW1ib2xz
+U3RhdGVDaGFuZ2UuLi4KQ2hlY2tpbmcgUEFUQ0ggMTgvNDU6IHdpbmRiZzogd2luZGJnX3ZtX3N0
+b3AuLi4KQ2hlY2tpbmcgUEFUQ0ggMTkvNDU6IHdpbmRiZzogaW1wbGVtZW50ZWQgd2luZGJnX3By
+b2Nlc3NfY29udHJvbF9wYWNrZXQuLi4KQ2hlY2tpbmcgUEFUQ0ggMjAvNDU6IHdpbmRiZzogaW1w
+bGVtZW50ZWQgd2luZGJnX3Byb2Nlc3NfZGF0YV9wYWNrZXQuLi4KQ2hlY2tpbmcgUEFUQ0ggMjEv
+NDU6IHdpbmRiZzogaW1wbGVtZW50ZWQgd2luZGJnX3Byb2Nlc3NfbWFuaXB1bGF0ZV9wYWNrZXQu
+Li4KQ2hlY2tpbmcgUEFUQ0ggMjIvNDU6IHdpbmRiZzogaW1wbGVtZW50ZWQga2RfYXBpX3JlYWRf
+dmlydHVhbF9tZW1vcnkgYW5kIGtkX2FwaV93cml0ZV92aXJ0dWFsX21lbW9yeS4uLgpDaGVja2lu
+ZyBQQVRDSCAyMy80NTogd2luZGJnOiBrZXJuZWwncyBzdHJ1Y3R1cmVzLi4uCkNoZWNraW5nIFBB
+VENIIDI0LzQ1OiB3aW5kYmc6IGltcGxlbWVudGVkIGtkX2FwaV9nZXRfY29udGV4dCBhbmQga2Rf
+YXBpX3NldF9jb250ZXh0Li4uCkNoZWNraW5nIFBBVENIIDI1LzQ1OiB3aW5kYmc6IGltcGxlbWVu
+dGVkIGtkX2FwaV9yZWFkX2NvbnRyb2xfc3BhY2UgYW5kIGtkX2FwaV93cml0ZV9jb250cm9sX3Nw
+YWNlLi4uCkNoZWNraW5nIFBBVENIIDI2LzQ1OiB3aW5kYmc6IGltcGxlbWVudGVkIHdpbmRiZ19y
+ZWFkX2NvbnRleHQuLi4KQ2hlY2tpbmcgUEFUQ0ggMjcvNDU6IHdpbmRiZzogaW1wbGVtZW50ZWQg
+d2luZGJnX3dyaXRlX2NvbnRleHQuLi4KQ2hlY2tpbmcgUEFUQ0ggMjgvNDU6IHdpbmRiZzogaW1w
+bGVtZW50ZWQgd2luZGJnX3JlYWRfa3NfcmVncy4uLgpDaGVja2luZyBQQVRDSCAyOS80NTogd2lu
+ZGJnOiBpbXBsZW1lbnRlZCB3aW5kYmdfd3JpdGVfa3NfcmVncy4uLgpDaGVja2luZyBQQVRDSCAz
+MC80NTogd2luZGJnOiBpbXBsZW1lbnRlZCB3aW5kYmdfc2V0X3NyLi4uCkNoZWNraW5nIFBBVENI
+IDMxLzQ1OiB3aW5kYmc6IGltcGxlbWVudGVkIHdpbmRiZ19zZXRfZHIuLi4KQ2hlY2tpbmcgUEFU
+Q0ggMzIvNDU6IHdpbmRiZzogaW1wbGVtZW50ZWQgd2luZGJnX3NldF9kcjcuLi4KQ2hlY2tpbmcg
+UEFUQ0ggMzMvNDU6IHdpbmRiZzogaW1wbGVtZW50ZWQgd2luZGJnX2h3X2JyZWFrcG9pbnRfaW5z
+ZXJ0IGFuZCB3aW5kYmdfaHdfYnJlYWtwb2ludF9yZW1vdmUuLi4KQ2hlY2tpbmcgUEFUQ0ggMzQv
+NDU6IHdpbmRiZzogaW1wbGVtZW50ZWQga2RfYXBpX3dyaXRlX2JyZWFrcG9pbnQgYW5kIGtkX2Fw
+aV9yZXN0b3JlX2JyZWFrcG9pbnQuLi4KQ2hlY2tpbmcgUEFUQ0ggMzUvNDU6IHdpbmRiZzogZGVi
+dWcgZXhjZXB0aW9uIHN1YnNjcmliaW5nLi4uCkNoZWNraW5nIFBBVENIIDM2LzQ1OiB3aW5kYmc6
+IGltcGxlbWVudGVkIGtkX2FwaV9jb250aW51ZS4uLgpDaGVja2luZyBQQVRDSCAzNy80NTogd2lu
+ZGJnOiBpbXBsZW1lbnRlZCBrZF9hcGlfcmVhZF9pb19zcGFjZSBhbmQga2RfYXBpX3dyaXRlX2lv
+X3NwYWNlLi4uCkNoZWNraW5nIFBBVENIIDM4LzQ1OiB3aW5kYmc6IGltcGxlbWVudGVkIGtkX2Fw
+aV9yZWFkX3BoeXNpY2FsX21lbW9yeSBhbmQga2RfYXBpX3dyaXRlX3BoeXNpY2FsX21lbW9yeS4u
+LgpDaGVja2luZyBQQVRDSCAzOS80NTogd2luZGJnOiBpbXBsZW1lbnRlZCBrZF9hcGlfZ2V0X3Zl
+cnNpb24uLi4KQ2hlY2tpbmcgUEFUQ0ggNDAvNDU6IHdpbmRiZzogaW1wbGVtZW50ZWQga2RfYXBp
+X3JlYWRfbXNyIGFuZCBrZF9hcGlfd3JpdGVfbXNyLi4uCkNoZWNraW5nIFBBVENIIDQxLzQ1OiB3
+aW5kYmc6IGltcGxlbWVudGVkIGtkX2FwaV9zZWFyY2hfbWVtb3J5Li4uCkNoZWNraW5nIFBBVENI
+IDQyLzQ1OiB3aW5kYmc6IGltcGxlbWVudGVkIGtkX2FwaV9maWxsX21lbW9yeS4uLgpDaGVja2lu
+ZyBQQVRDSCA0My80NTogd2luZGJnOiBpbXBsZW1lbnRlZCBrZF9hcGlfcXVlcnlfbWVtb3J5Li4u
+CkNoZWNraW5nIFBBVENIIDQ0LzQ1OiB3aW5kYmc6IGFkZGVkIG5ldyBhcGkgZnVuY3Rpb25zLi4u
+CkNoZWNraW5nIFBBVENIIDQ1LzQ1OiB3aW5kYmc6IGltcGxlbWVudGVkIGtkX2FwaV9nZXRfY29u
+dGV4dF9leCBhbmQga2RfYXBpX3NldF9jb250ZXh0X2V4Li4uCj09PSBPVVRQVVQgRU5EID09PQoK
+VGVzdCBjb21tYW5kIGV4aXRlZCB3aXRoIGNvZGU6IDEKCgotLS0KRW1haWwgZ2VuZXJhdGVkIGF1
+dG9tYXRpY2FsbHkgYnkgUGF0Y2hldyBbaHR0cDovL3BhdGNoZXcub3JnL10uClBsZWFzZSBzZW5k
+IHlvdXIgZmVlZGJhY2sgdG8gcGF0Y2hldy1kZXZlbEBmcmVlbGlzdHMub3Jn
