@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48467)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48525)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jcody@redhat.com>) id 1eHByC-0008Pd-Dg
-	for qemu-devel@nongnu.org; Tue, 21 Nov 2017 12:04:30 -0500
+	(envelope-from <jcody@redhat.com>) id 1eHByI-0008UM-Ia
+	for qemu-devel@nongnu.org; Tue, 21 Nov 2017 12:04:35 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jcody@redhat.com>) id 1eHByB-0005rG-49
-	for qemu-devel@nongnu.org; Tue, 21 Nov 2017 12:04:24 -0500
+	(envelope-from <jcody@redhat.com>) id 1eHByH-0005tB-Ac
+	for qemu-devel@nongnu.org; Tue, 21 Nov 2017 12:04:30 -0500
 From: Jeff Cody <jcody@redhat.com>
-Date: Tue, 21 Nov 2017 12:03:48 -0500
-Message-Id: <20171121170350.31290-3-jcody@redhat.com>
+Date: Tue, 21 Nov 2017 12:03:50 -0500
+Message-Id: <20171121170350.31290-5-jcody@redhat.com>
 In-Reply-To: <20171121170350.31290-1-jcody@redhat.com>
 References: <20171121170350.31290-1-jcody@redhat.com>
-Subject: [Qemu-devel] [PULL 2/4] coroutine: abort if we try to schedule or
- enter a pending coroutine
+Subject: [Qemu-devel] [PULL 4/4] qemu-iotest: add test for blockjob
+ coroutine race condition
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,159 +23,149 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org
 Cc: peter.maydell@linaro.org, jcody@redhat.com, qemu-devel@nongnu.org, stefanha@redhat.com, pbonzini@redhat.com
 
-The previous patch fixed a race condition, in which there were
-coroutines being executing doubly, or after coroutine deletion.
-
-We can detect common scenarios when this happens, and print an error
-message and abort before we corrupt memory / data, or segfault.
-
-This patch will abort if an attempt to enter a coroutine is made while
-it is currently pending execution, either in a specific AioContext bh,
-or pending execution via a timer.  It will also abort if a coroutine
-is scheduled, before a prior scheduled run has occurred.
-
-We cannot rely on the existing co->caller check for recursive re-entry
-to catch this, as the coroutine may run and exit with
-COROUTINE_TERMINATE before the scheduled coroutine executes.
-
-(This is the scenario that was occurring and fixed in the previous
-patch).
-
-This patch also re-orders the Coroutine struct elements in an attempt to
-optimize caching.
-
 Signed-off-by: Jeff Cody <jcody@redhat.com>
 Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
 ---
- include/qemu/coroutine_int.h | 13 ++++++++++---
- util/async.c                 | 13 +++++++++++++
- util/qemu-coroutine-sleep.c  | 12 ++++++++++++
- util/qemu-coroutine.c        | 14 ++++++++++++++
- 4 files changed, 49 insertions(+), 3 deletions(-)
+ tests/qemu-iotests/200     | 99 ++++++++++++++++++++++++++++++++++++++++++++++
+ tests/qemu-iotests/200.out | 14 +++++++
+ tests/qemu-iotests/group   |  1 +
+ 3 files changed, 114 insertions(+)
+ create mode 100755 tests/qemu-iotests/200
+ create mode 100644 tests/qemu-iotests/200.out
 
-diff --git a/include/qemu/coroutine_int.h b/include/qemu/coroutine_int.h
-index cb98892..59e8406 100644
---- a/include/qemu/coroutine_int.h
-+++ b/include/qemu/coroutine_int.h
-@@ -46,14 +46,21 @@ struct Coroutine {
- 
-     size_t locks_held;
- 
-+    /* Only used when the coroutine has yielded.  */
-+    AioContext *ctx;
+diff --git a/tests/qemu-iotests/200 b/tests/qemu-iotests/200
+new file mode 100755
+index 0000000..d8787dd
+--- /dev/null
++++ b/tests/qemu-iotests/200
+@@ -0,0 +1,99 @@
++#!/bin/bash
++#
++# Block job co-routine race condition test.
++#
++# See: https://bugzilla.redhat.com/show_bug.cgi?id=1508708
++#
++# Copyright (C) 2017 Red Hat, Inc.
++#
++# This program is free software; you can redistribute it and/or modify
++# it under the terms of the GNU General Public License as published by
++# the Free Software Foundation; either version 2 of the License, or
++# (at your option) any later version.
++#
++# This program is distributed in the hope that it will be useful,
++# but WITHOUT ANY WARRANTY; without even the implied warranty of
++# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++# GNU General Public License for more details.
++#
++# You should have received a copy of the GNU General Public License
++# along with this program.  If not, see <http://www.gnu.org/licenses/>.
++#
 +
-+    /* Used to catch and abort on illegal co-routine entry.
-+     * Will contain the name of the function that had first
-+     * scheduled the coroutine. */
-+    const char *scheduled;
++# creator
++owner=jcody@redhat.com
 +
-+    QSIMPLEQ_ENTRY(Coroutine) co_queue_next;
++seq=`basename $0`
++echo "QA output created by $seq"
 +
-     /* Coroutines that should be woken up when we yield or terminate.
-      * Only used when the coroutine is running.
-      */
-     QSIMPLEQ_HEAD(, Coroutine) co_queue_wakeup;
- 
--    /* Only used when the coroutine has yielded.  */
--    AioContext *ctx;
--    QSIMPLEQ_ENTRY(Coroutine) co_queue_next;
-     QSLIST_ENTRY(Coroutine) co_scheduled_next;
- };
- 
-diff --git a/util/async.c b/util/async.c
-index 0e1bd87..4dd9d95 100644
---- a/util/async.c
-+++ b/util/async.c
-@@ -388,6 +388,9 @@ static void co_schedule_bh_cb(void *opaque)
-         QSLIST_REMOVE_HEAD(&straight, co_scheduled_next);
-         trace_aio_co_schedule_bh_cb(ctx, co);
-         aio_context_acquire(ctx);
++here=`pwd`
++status=1    # failure is the default!
 +
-+        /* Protected by write barrier in qemu_aio_coroutine_enter */
-+        atomic_set(&co->scheduled, NULL);
-         qemu_coroutine_enter(co);
-         aio_context_release(ctx);
-     }
-@@ -438,6 +441,16 @@ fail:
- void aio_co_schedule(AioContext *ctx, Coroutine *co)
- {
-     trace_aio_co_schedule(ctx, co);
-+    const char *scheduled = atomic_cmpxchg(&co->scheduled, NULL,
-+                                           __func__);
++_cleanup()
++{
++    _cleanup_qemu
++    rm -f "${TEST_IMG}" "${BACKING_IMG}"
++}
++trap "_cleanup; exit \$status" 0 1 2 3 15
 +
-+    if (scheduled) {
-+        fprintf(stderr,
-+                "%s: Co-routine was already scheduled in '%s'\n",
-+                __func__, scheduled);
-+        abort();
-+    }
++# get standard environment, filters and checks
++. ./common.rc
++. ./common.filter
++. ./common.qemu
 +
-     QSLIST_INSERT_HEAD_ATOMIC(&ctx->scheduled_coroutines,
-                               co, co_scheduled_next);
-     qemu_bh_schedule(ctx->co_schedule_bh);
-diff --git a/util/qemu-coroutine-sleep.c b/util/qemu-coroutine-sleep.c
-index 9c56550..254349c 100644
---- a/util/qemu-coroutine-sleep.c
-+++ b/util/qemu-coroutine-sleep.c
-@@ -13,6 +13,7 @@
- 
- #include "qemu/osdep.h"
- #include "qemu/coroutine.h"
-+#include "qemu/coroutine_int.h"
- #include "qemu/timer.h"
- #include "block/aio.h"
- 
-@@ -25,6 +26,8 @@ static void co_sleep_cb(void *opaque)
- {
-     CoSleepCB *sleep_cb = opaque;
- 
-+    /* Write of schedule protected by barrier write in aio_co_schedule */
-+    atomic_set(&sleep_cb->co->scheduled, NULL);
-     aio_co_wake(sleep_cb->co);
- }
- 
-@@ -34,6 +37,15 @@ void coroutine_fn co_aio_sleep_ns(AioContext *ctx, QEMUClockType type,
-     CoSleepCB sleep_cb = {
-         .co = qemu_coroutine_self(),
-     };
++_supported_fmt qcow2 qed
++_supported_proto file
++_supported_os Linux
 +
-+    const char *scheduled = atomic_cmpxchg(&sleep_cb.co->scheduled, NULL,
-+                                           __func__);
-+    if (scheduled) {
-+        fprintf(stderr,
-+                "%s: Co-routine was already scheduled in '%s'\n",
-+                __func__, scheduled);
-+        abort();
-+    }
-     sleep_cb.ts = aio_timer_new(ctx, type, SCALE_NS, co_sleep_cb, &sleep_cb);
-     timer_mod(sleep_cb.ts, qemu_clock_get_ns(type) + ns);
-     qemu_coroutine_yield();
-diff --git a/util/qemu-coroutine.c b/util/qemu-coroutine.c
-index d6095c1..9eff7fd 100644
---- a/util/qemu-coroutine.c
-+++ b/util/qemu-coroutine.c
-@@ -107,8 +107,22 @@ void qemu_aio_coroutine_enter(AioContext *ctx, Coroutine *co)
-     Coroutine *self = qemu_coroutine_self();
-     CoroutineAction ret;
- 
-+    /* Cannot rely on the read barrier for co in aio_co_wake(), as there are
-+     * callers outside of aio_co_wake() */
-+    const char *scheduled = atomic_mb_read(&co->scheduled);
++BACKING_IMG="${TEST_DIR}/backing.img"
++TEST_IMG="${TEST_DIR}/test.img"
 +
-     trace_qemu_aio_coroutine_enter(ctx, self, co, co->entry_arg);
- 
-+    /* if the Coroutine has already been scheduled, entering it again will
-+     * cause us to enter it twice, potentially even after the coroutine has
-+     * been deleted */
-+    if (scheduled) {
-+        fprintf(stderr,
-+                "%s: Co-routine was already scheduled in '%s'\n",
-+                __func__, scheduled);
-+        abort();
-+    }
++${QEMU_IMG} create -f $IMGFMT "${BACKING_IMG}" 512M | _filter_img_create
++${QEMU_IMG} create -f $IMGFMT -F $IMGFMT "${TEST_IMG}" -b "${BACKING_IMG}" 512M | _filter_img_create
 +
-     if (co->caller) {
-         fprintf(stderr, "Co-routine re-entered recursively\n");
-         abort();
++${QEMU_IO} -c "write -P 0xa5 512 300M" "${BACKING_IMG}" | _filter_qemu_io
++
++echo
++echo === Starting QEMU VM ===
++echo
++qemu_comm_method="qmp"
++_launch_qemu -device pci-bridge,id=bridge1,chassis_nr=1,bus=pci.0 \
++             -object iothread,id=iothread0 \
++             -device virtio-scsi-pci,bus=bridge1,addr=0x1f,id=scsi0,iothread=iothread0 \
++             -drive file="${TEST_IMG}",media=disk,if=none,cache=none,id=drive_sysdisk,aio=native,format=$IMGFMT \
++             -device scsi-hd,drive=drive_sysdisk,bus=scsi0.0,id=sysdisk,bootindex=0
++h1=$QEMU_HANDLE
++
++_send_qemu_cmd $h1 "{ 'execute': 'qmp_capabilities' }" 'return'
++
++echo
++echo === Sending stream/cancel, checking for SIGSEGV only  ===
++echo
++for (( i=1;i<500;i++ ))
++do
++    mismatch_only='y' qemu_error_no_exit='n' _send_qemu_cmd $h1 \
++                       "{
++                            'execute': 'block-stream',
++                            'arguments': {
++                                'device': 'drive_sysdisk',
++                                'speed': 10000000,
++                                'on-error': 'report',
++                                'job-id': 'job-$i'
++                             }
++                        }
++                        {
++                            'execute': 'block-job-cancel',
++                            'arguments': {
++                                'device': 'job-$i'
++                             }
++                        }" \
++                       "{.*{.*}.*}"  # should match all well-formed QMP responses
++done
++
++silent='y' _send_qemu_cmd $h1  "{ 'execute': 'quit' }" 'return'
++
++echo "$i iterations performed"
++
++echo "*** done"
++rm -f $seq.full
++status=0
+diff --git a/tests/qemu-iotests/200.out b/tests/qemu-iotests/200.out
+new file mode 100644
+index 0000000..af6a809
+--- /dev/null
++++ b/tests/qemu-iotests/200.out
+@@ -0,0 +1,14 @@
++QA output created by 200
++Formatting 'TEST_DIR/backing.img', fmt=IMGFMT size=536870912
++Formatting 'TEST_DIR/test.img', fmt=IMGFMT size=536870912 backing_file=TEST_DIR/backing.img backing_fmt=IMGFMT
++wrote 314572800/314572800 bytes at offset 512
++300 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
++
++=== Starting QEMU VM ===
++
++{"return": {}}
++
++=== Sending stream/cancel, checking for SIGSEGV only ===
++
++500 iterations performed
++*** done
+diff --git a/tests/qemu-iotests/group b/tests/qemu-iotests/group
+index 1fad602..3e68867 100644
+--- a/tests/qemu-iotests/group
++++ b/tests/qemu-iotests/group
+@@ -196,3 +196,4 @@
+ 196 rw auto quick
+ 197 rw auto quick
+ 198 rw auto
++200 rw auto
 -- 
 2.9.5
