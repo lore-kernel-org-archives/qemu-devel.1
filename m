@@ -1,24 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40057)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40086)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mikhail.abakumov@ispras.ru>) id 1eH9FW-0001yc-Nj
-	for qemu-devel@nongnu.org; Tue, 21 Nov 2017 09:10:12 -0500
+	(envelope-from <mikhail.abakumov@ispras.ru>) id 1eH9FZ-00020h-0G
+	for qemu-devel@nongnu.org; Tue, 21 Nov 2017 09:10:14 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mikhail.abakumov@ispras.ru>) id 1eH9FS-000337-Lc
-	for qemu-devel@nongnu.org; Tue, 21 Nov 2017 09:10:06 -0500
-Received: from mail.ispras.ru ([83.149.199.45]:38376)
+	(envelope-from <mikhail.abakumov@ispras.ru>) id 1eH9FY-00034f-2t
+	for qemu-devel@nongnu.org; Tue, 21 Nov 2017 09:10:08 -0500
+Received: from mail.ispras.ru ([83.149.199.45]:38400)
 	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mikhail.abakumov@ispras.ru>) id 1eH9FS-00032n-8J
-	for qemu-devel@nongnu.org; Tue, 21 Nov 2017 09:10:02 -0500
+	(envelope-from <mikhail.abakumov@ispras.ru>) id 1eH9FX-00034Z-RQ
+	for qemu-devel@nongnu.org; Tue, 21 Nov 2017 09:10:08 -0500
 From: Mihail Abakumov <mikhail.abakumov@ispras.ru>
-Date: Tue, 21 Nov 2017 17:09:59 +0300
-Message-ID: <151127339933.6888.15067151619046465118.stgit@Misha-PC.lan02.inno>
+Date: Tue, 21 Nov 2017 17:10:05 +0300
+Message-ID: <151127340497.6888.15997106699521359739.stgit@Misha-PC.lan02.inno>
 In-Reply-To: <151127322955.6888.16198535123422076171.stgit@Misha-PC.lan02.inno>
 References: <151127322955.6888.16198535123422076171.stgit@Misha-PC.lan02.inno>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Subject: [Qemu-devel] [PATCH v3 29/45] windbg: implemented
- windbg_write_ks_regs
+Subject: [Qemu-devel] [PATCH v3 30/45] windbg: implemented windbg_set_sr
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,128 +33,34 @@ Signed-off-by: Mihail Abakumov <mikhail.abakumov@ispras.ru>
 Signed-off-by: Pavel Dovgalyuk <dovgaluk@ispras.ru>
 Signed-off-by: Dmitriy Koltunov <koltunov@ispras.ru>
 ---
- target/i386/windbgstub.c |  111 ++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 111 insertions(+)
+ target/i386/windbgstub.c |   17 ++++++++++++++++-
+ 1 file changed, 16 insertions(+), 1 deletion(-)
 
 diff --git a/target/i386/windbgstub.c b/target/i386/windbgstub.c
-index c492ee58d8..63962b48dd 100755
+index 63962b48dd..c59d1401ad 100755
 --- a/target/i386/windbgstub.c
 +++ b/target/i386/windbgstub.c
-@@ -641,6 +641,117 @@ static int windbg_read_ks_regs(CPUState *cpu, uint8_t *buf, int buf_size,
- static int windbg_write_ks_regs(CPUState *cpu, uint8_t *buf, int buf_size,
-                                 int offset, int len)
- {
-+    CPUArchState *env = cpu->env_ptr;
-+    int mem_size;
-+    uint8_t *mem_ptr = buf;
-+    while (len > 0 && offset < sizeof(CPU_KSPECIAL_REGISTERS)) {
-+        mem_size = 1;
-+        switch (offset) {
-+
-+        case offsetof(CPU_KSPECIAL_REGISTERS, Cr0):
-+            mem_size = sizeof_field(CPU_KSPECIAL_REGISTERS, Cr0);
-+            cpu_x86_update_cr0(env, ldtul_p(buf + offset));
-+            break;
-+
-+        case offsetof(CPU_KSPECIAL_REGISTERS, Cr2):
-+            mem_size = sizeof_field(CPU_KSPECIAL_REGISTERS, Cr2);
-+            env->cr[2] = ldtul_p(buf + offset);
-+            break;
-+
-+        case offsetof(CPU_KSPECIAL_REGISTERS, Cr3):
-+            mem_size = sizeof_field(CPU_KSPECIAL_REGISTERS, Cr3);
-+            cpu_x86_update_cr3(env, ldtul_p(buf + offset));
-+            break;
-+
-+        case offsetof(CPU_KSPECIAL_REGISTERS, Cr4):
-+            mem_size = sizeof_field(CPU_KSPECIAL_REGISTERS, Cr4);
-+            cpu_x86_update_cr4(env, ldtul_p(buf + offset));
-+            break;
-+
-+        case offsetof(CPU_KSPECIAL_REGISTERS, KernelDr0):
-+            mem_size = sizeof_field(CPU_KSPECIAL_REGISTERS, KernelDr0);
-+            windbg_set_dr(cpu, 0, ldtul_p(buf + offset));
-+            break;
-+
-+        case offsetof(CPU_KSPECIAL_REGISTERS, KernelDr1):
-+            mem_size = sizeof_field(CPU_KSPECIAL_REGISTERS, KernelDr1);
-+            windbg_set_dr(cpu, 1, ldtul_p(buf + offset));
-+            break;
-+
-+        case offsetof(CPU_KSPECIAL_REGISTERS, KernelDr2):
-+            mem_size = sizeof_field(CPU_KSPECIAL_REGISTERS, KernelDr2);
-+            windbg_set_dr(cpu, 2, ldtul_p(buf + offset));
-+            break;
-+
-+        case offsetof(CPU_KSPECIAL_REGISTERS, KernelDr3):
-+            mem_size = sizeof_field(CPU_KSPECIAL_REGISTERS, KernelDr3);
-+            windbg_set_dr(cpu, 3, ldtul_p(buf + offset));
-+            break;
-+
-+        case offsetof(CPU_KSPECIAL_REGISTERS, KernelDr6):
-+            mem_size = sizeof_field(CPU_KSPECIAL_REGISTERS, KernelDr6);
-+            windbg_set_dr(cpu, 6, ldtul_p(buf + offset));
-+            break;
-+
-+        case offsetof(CPU_KSPECIAL_REGISTERS, KernelDr7):
-+            mem_size = sizeof_field(CPU_KSPECIAL_REGISTERS, KernelDr7);
-+            windbg_set_dr(cpu, 7, ldtul_p(buf + offset));
-+            break;
-+
-+        case offsetof(CPU_KSPECIAL_REGISTERS, Gdtr.Pad):
-+            mem_size = sizeof_field(CPU_KSPECIAL_REGISTERS, Gdtr.Pad);
-+            env->gdt.selector = lduw_p(buf + offset);
-+            break;
-+
-+        case offsetof(CPU_KSPECIAL_REGISTERS, Gdtr.Limit):
-+            mem_size = sizeof_field(CPU_KSPECIAL_REGISTERS, Gdtr.Limit);
-+            env->gdt.limit = lduw_p(buf + offset);
-+            break;
-+
-+        case offsetof(CPU_KSPECIAL_REGISTERS, Gdtr.Base):
-+            mem_size = sizeof_field(CPU_KSPECIAL_REGISTERS, Gdtr.Base);
-+            env->gdt.base = ldtul_p(buf + offset);
-+            break;
-+
-+        case offsetof(CPU_KSPECIAL_REGISTERS, Idtr.Pad):
-+            mem_size = sizeof_field(CPU_KSPECIAL_REGISTERS, Idtr.Pad);
-+            env->idt.selector = lduw_p(buf + offset);
-+            break;
-+
-+        case offsetof(CPU_KSPECIAL_REGISTERS, Idtr.Limit):
-+            mem_size = sizeof_field(CPU_KSPECIAL_REGISTERS, Idtr.Limit);
-+            env->idt.limit = lduw_p(buf + offset);
-+            break;
-+
-+        case offsetof(CPU_KSPECIAL_REGISTERS, Idtr.Base):
-+            mem_size = sizeof_field(CPU_KSPECIAL_REGISTERS, Idtr.Base);
-+            env->idt.base = ldtul_p(buf + offset);
-+            break;
-+
-+        case offsetof(CPU_KSPECIAL_REGISTERS, Tr):
-+            mem_size = sizeof_field(CPU_KSPECIAL_REGISTERS, Tr);
-+            env->tr.selector = lduw_p(buf + offset);
-+            break;
-+
-+        case offsetof(CPU_KSPECIAL_REGISTERS, Ldtr):
-+            mem_size = sizeof_field(CPU_KSPECIAL_REGISTERS, Ldtr);
-+            env->ldt.selector = lduw_p(buf + offset);
-+            break;
-+
-+        case offsetof(CPU_KSPECIAL_REGISTERS, Reserved):
-+            mem_size = sizeof_field(CPU_KSPECIAL_REGISTERS, Reserved);
-+            break;
-+
-+        default:
-+            WINDBG_ERROR("write_context: Unknown offset %d", offset);
-+            return -1;
-+        }
-+
-+        mem_ptr += mem_size;
-+        offset += mem_size;
-+        len -= mem_size;
-+    }
-+
-     return 0;
- }
+@@ -277,7 +277,22 @@ static void windbg_set_dr(CPUState *cpu, int index, target_ulong value)
+ {}
  
+ static void windbg_set_sr(CPUState *cpu, int sr, uint16_t selector)
+-{}
++{
++    CPUArchState *env = cpu->env_ptr;
++
++    if (selector != env->segs[sr].selector &&
++        (!(env->cr[0] & CR0_PE_MASK) || (env->eflags & VM_MASK))) {
++        unsigned int limit, flags;
++        target_ulong base;
++
++        int dpl = (env->eflags & VM_MASK) ? 3 : 0;
++        base = selector << 4;
++        limit = 0xffff;
++        flags = DESC_P_MASK | DESC_S_MASK | DESC_W_MASK |
++                DESC_A_MASK | (dpl << DESC_DPL_SHIFT);
++        cpu_x86_load_seg_cache(env, sr, selector, base, limit, flags);
++    }
++}
+ 
+ static int windbg_read_context(CPUState *cpu, uint8_t *buf, int buf_size,
+                                int offset, int len)
