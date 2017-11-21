@@ -1,29 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40599)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40791)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <anton.nefedov@virtuozzo.com>) id 1eHAJn-0001ud-D7
-	for qemu-devel@nongnu.org; Tue, 21 Nov 2017 10:18:39 -0500
+	(envelope-from <pbonzini@redhat.com>) id 1eHAKC-0002Di-HC
+	for qemu-devel@nongnu.org; Tue, 21 Nov 2017 10:19:08 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <anton.nefedov@virtuozzo.com>) id 1eHAJd-0000ij-My
-	for qemu-devel@nongnu.org; Tue, 21 Nov 2017 10:18:35 -0500
-References: <dd350838-9132-e787-10b1-4cb200076ec9@virtuozzo.com>
-	<w51inekzv59.fsf@maestria.local.igalia.com>
-	<w518tff4dvi.fsf@maestria.local.igalia.com>
-	<20171110030223.GA7303@lemon>
-	<w518tf7k0ov.fsf@maestria.local.igalia.com>
-	<14461b9b-d62d-3723-d2bb-c2fe873207c5@virtuozzo.com>
-	<w51bmk2qkvv.fsf@maestria.local.igalia.com>
-	<41e905e4-0c2a-fad3-09a6-4959f04fe546@virtuozzo.com>
-	<w51zi7fbxrd.fsf@maestria.local.igalia.com>
-From: Anton Nefedov <anton.nefedov@virtuozzo.com>
-Message-ID: <160cac7d-7dc6-2daf-5299-82a57bffe14c@virtuozzo.com>
-Date: Tue, 21 Nov 2017 18:18:13 +0300
+	(envelope-from <pbonzini@redhat.com>) id 1eHAK4-0000xZ-RG
+	for qemu-devel@nongnu.org; Tue, 21 Nov 2017 10:19:00 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:32866)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1eHAK4-0000wB-LM
+	for qemu-devel@nongnu.org; Tue, 21 Nov 2017 10:18:52 -0500
+References: <1511276888-17834-1-git-send-email-peter.maydell@linaro.org>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <e2a7e3fa-a660-a1e1-9e34-4585a10ae6ad@redhat.com>
+Date: Tue, 21 Nov 2017 16:18:49 +0100
 MIME-Version: 1.0
-In-Reply-To: <w51zi7fbxrd.fsf@maestria.local.igalia.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
+In-Reply-To: <1511276888-17834-1-git-send-email-peter.maydell@linaro.org>
+Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [Qemu-block] segfault in parallel blockjobs
- (iotest 30)
+Subject: Re: [Qemu-devel] [PATCH] memory-internal.h: Remove obsolete claim
+ that header is obsolete
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,98 +28,54 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alberto Garcia <berto@igalia.com>, Fam Zheng <famz@redhat.com>
-Cc: qemu-devel@nongnu.org, kwolf@redhat.com, qemu-block@nongnu.org, mreitz@redhat.com, John Snow <jsnow@redhat.com>
+To: Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org
+Cc: patches@linaro.org
 
-
-
-On 21/11/2017 3:51 PM, Alberto Garcia wrote:
-> On Thu 16 Nov 2017 05:09:59 PM CET, Anton Nefedov wrote:
->>>>> I have the impression that one major source of headaches is the
->>>>> fact that the reopen queue contains nodes that don't need to be
->>>>> reopened at all. Ideally this should be detected early on in
->>>>> bdrv_reopen_queue(), so there's no chance that the queue contains
->>>>> nodes used by a different block job. If we had that then op
->>>>> blockers should be enough to prevent these things. Or am I missing
->>>>> something?
->>>>>
->>>> After applying Max's patch I tried the similar approach; that is
->>>> keep BDSes referenced while they are in the reopen queue.  Now I get
->>>> the stream job hanging. Somehow one blk_root_drained_begin() is not
->>>> paired with blk_root_drained_end(). So the job stays paused.
->>>
->>> I can see this if I apply Max's patch and keep refs to BDSs in the
->>> reopen queue:
->>>
->>> #0  block_job_pause (...) at blockjob.c:130
->>> #1  0x000055c143cb586d in block_job_drained_begin (...) at blockjob.c:227
->>> #2  0x000055c143d08067 in blk_set_dev_ops (...) at block/block-backend.c:887
->>> #3  0x000055c143cb69db in block_job_create (...) at blockjob.c:678
->>> #4  0x000055c143d17c0c in mirror_start_job (...) at block/mirror.c:1177
->>>
->>> There's a ops->drained_begin(opaque) call in blk_set_dev_ops() that
->>> doesn't seem to be paired.
->>
->> My understanding for now is
->>
->>     1. in bdrv_drain_all_begin(), BDS gets drained with
->>        bdrv_parent_drained_begin(), all the parents get
->>        blk_root_drained_begin(), pause their jobs.
->>     2. one of the jobs finishes and deletes BB.
->>     3. in bdrv_drain_all_end(), bdrv_parent_drained_end() is never
->>        called because even though BDS still exists (referenced in the
->>        queue), it cannot be accessed as bdrv_next() takes BDS from the
->>        global BB list (and the corresponding BB is deleted).
+On 21/11/2017 16:08, Peter Maydell wrote:
+> The memory-internal.h header claims that it is for "obsolete
+> exec.c functions" which "will be removed soon". This statement
+> was added in 2011, six years ago, but the header is still here.
+> (Admittedly none of the prototypes added in commit 67d95c153bef55f6
+> are still in the header.)
 > 
-> Yes, I was debugging this and I got to a similar conclusion. With
-> test_stream_commit from iotest 030 I can see that
+> It's convenient to have a place to put prototypes for functions
+> which are used internally to the various .c files of the memory
+> system or by the accel/tcg code, which is inevitably fairly
+> closely coupled. So keep the header but update the comments to
+> reflect what we're actually using it for.
 > 
->     1. the block-stream job is created first, then stream_run begins and
->        starts copying the data.
->     2. block-commit starts and tries to reopen the top image in
->        read-write mode. This pauses the stream block job and drains all
->        BDSs.
->     3. The draining causes the stream job to finish, it is deferred to
->        the main loop, then stream_complete finishes and unrefs the block
->        job, deleting it. At the point of deletion the pause count was
->        still > 0 (because of step (2))
+> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+> ---
+>  include/exec/memory-internal.h | 7 ++++---
+>  1 file changed, 4 insertions(+), 3 deletions(-)
 > 
->> Max's patch v1 could have helped:
->> http://lists.nongnu.org/archive/html/qemu-devel/2017-11/msg01835.html
-> 
-> This doesn't solve the problem.
-> 
->> Or, perhaps another approach, keep BlockJob referenced while it is
->> paused (by block_job_pause/resume_all()). That should prevent it from
->> deleting the BB.
-> 
-> Yes, I tried this and it actually solves the issue. But I still think
-> that the problem is that block jobs are allowed to finish when they are
-> paused.
+> diff --git a/include/exec/memory-internal.h b/include/exec/memory-internal.h
+> index 98d8296..4162474 100644
+> --- a/include/exec/memory-internal.h
+> +++ b/include/exec/memory-internal.h
+> @@ -1,5 +1,5 @@
+>  /*
+> - * Declarations for obsolete exec.c functions
+> + * Declarations for functions which are internal to the memory subsystem.
+>   *
+>   * Copyright 2011 Red Hat, Inc. and/or its affiliates
+>   *
+> @@ -12,8 +12,9 @@
+>   */
+>  
+>  /*
+> - * This header is for use by exec.c and memory.c ONLY.  Do not include it.
+> - * The functions declared here will be removed soon.
+> + * This header is for use by exec.c, memory.c and accel/tcg/cputlb.c ONLY,
+> + * for declarations which are shared between the memory subsystem's
+> + * internals and the TCG TLB code. Do not include it from elsewhere.
+>   */
+>  
+>  #ifndef MEMORY_INTERNAL_H
 > 
 
-Agree, but
+Acked-by: Paolo Bonzini <pbonzini@redhat.com>
 
-> Adding block_job_pause_point(&s->common) at the end of stream_run()
-> fixes the problem too.
-> 
+Thanks,
 
-would be a nice fix, but it only works unless the job is already
-deferred, right? And the BH can't be held off while job->paused because
-with mirror job it is always the case.
-So we cover most of the cases but also lose the stable reproduction.
-
-This:
-
- >> keep BlockJob referenced while it is
- >> paused (by block_job_pause/resume_all()). That should prevent it from
- >> deleting the BB.
-
-looks kind of hacky; maybe referencing in block_job_pause() (and not
-just pause_all) seems more correct? I think it didn't work for me
-right away though. But I can look more.
-
-/Anton
-
-> Berto
-> 
+Paolo
