@@ -1,27 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43158)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46302)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1eHCmY-0003fX-R9
-	for qemu-devel@nongnu.org; Tue, 21 Nov 2017 12:56:28 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1eHCt0-00068e-Q6
+	for qemu-devel@nongnu.org; Tue, 21 Nov 2017 13:03:08 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1eHCmU-0002hC-Pc
-	for qemu-devel@nongnu.org; Tue, 21 Nov 2017 12:56:26 -0500
-Received: from mail-wm0-x243.google.com ([2a00:1450:400c:c09::243]:35202)
+	(envelope-from <peter.maydell@linaro.org>) id 1eHCsz-0005uP-Ch
+	for qemu-devel@nongnu.org; Tue, 21 Nov 2017 13:03:06 -0500
+Received: from mail-ot0-x241.google.com ([2607:f8b0:4003:c0f::241]:37728)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1eHCmU-0002gs-EW
-	for qemu-devel@nongnu.org; Tue, 21 Nov 2017 12:56:22 -0500
-Received: by mail-wm0-x243.google.com with SMTP id y80so5183183wmd.0
-	for <qemu-devel@nongnu.org>; Tue, 21 Nov 2017 09:56:21 -0800 (PST)
-References: <1511285538-22883-1-git-send-email-richard.purdie@linuxfoundation.org>
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-In-reply-to: <1511285538-22883-1-git-send-email-richard.purdie@linuxfoundation.org>
-Date: Tue, 21 Nov 2017 17:56:19 +0000
-Message-ID: <87y3mzwm64.fsf@linaro.org>
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1eHCsz-0005uE-5s
+	for qemu-devel@nongnu.org; Tue, 21 Nov 2017 13:03:05 -0500
+Received: by mail-ot0-x241.google.com with SMTP id s4so11294923ote.4
+	for <qemu-devel@nongnu.org>; Tue, 21 Nov 2017 10:03:05 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+In-Reply-To: <20171106154813.19936-12-andrew.smirnov@gmail.com>
+References: <20171106154813.19936-1-andrew.smirnov@gmail.com>
+	<20171106154813.19936-12-andrew.smirnov@gmail.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Tue, 21 Nov 2017 18:02:43 +0000
+Message-ID: <CAFEAcA82Y3fWJyAUwOSxy6btutrS+FPa7sRm3AOKZM_GTcmBrA@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH] target/ppc: Fix system lockups caused by
- interrupt_request state corruption
+Subject: Re: [Qemu-devel] [PATCH v3 11/30] sdhci: Add i.MX specific subtype
+ of SDHCI
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,127 +31,289 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Richard Purdie <richard.purdie@linuxfoundation.org>
-Cc: qemu-devel@nongnu.org, david@gibson.dropbear.id.au, qemu-ppc@nongnu.org
+To: Andrey Smirnov <andrew.smirnov@gmail.com>
+Cc: qemu-arm <qemu-arm@nongnu.org>, Jason Wang <jasowang@redhat.com>, =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>, QEMU Developers <qemu-devel@nongnu.org>, Andrey Yurovsky <yurovsky@gmail.com>
 
+On 6 November 2017 at 15:47, Andrey Smirnov <andrew.smirnov@gmail.com> wrot=
+e:
+> IP block found on several generations of i.MX family does not use
+> vanilla SDHCI implementation and it comes with a number of quirks.
+>
+> Introduce i.MX SDHCI subtype of SDHCI block to add code necessary to
+> support unmodified Linux guest driver.
+>
+> Cc: Peter Maydell <peter.maydell@linaro.org>
+> Cc: Jason Wang <jasowang@redhat.com>
+> Cc: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
+> Cc: qemu-devel@nongnu.org
+> Cc: qemu-arm@nongnu.org
+> Cc: yurovsky@gmail.com
+> Signed-off-by: Andrey Smirnov <andrew.smirnov@gmail.com>
 
-Richard Purdie <richard.purdie@linuxfoundation.org> writes:
+Hi. Mostly this looks ok; some comments below.
 
-> Occasionally in Linux guests on x86_64 we're seeing logs like:
->
-> ppc_set_irq: 0x55b4e0d562f0 n_IRQ 8 level 1 =3D> pending 00000100req 0000=
-0004
->
-> when they should read:
->
-> ppc_set_irq: 0x55b4e0d562f0 n_IRQ 8 level 1 =3D> pending 00000100req 0000=
-0002
->
-> The "00000004" is CPU_INTERRUPT_EXITTB yet the code calls
-> cpu_interrupt(cs, CPU_INTERRUPT_HARD) ("00000002") in this function
-> just before the log message. Something is causing the HARD bit setting
-> to get lost.
->
-> The knock on effect of losing that bit is the decrementer timer interrupts
-> don't get delivered which causes the guest to sit idle in its idle handler
-> and 'hang'.
->
-> The issue occurs due to races from code which sets CPU_INTERRUPT_EXITTB.
->
-> Rather than poking directly into cs->interrupt_request, that code needs t=
-o:
->
-> a) hold BQL
-> b) use the cpu_interrupt() helper
->
-> This patch fixes the call sites to do this, fixing the hang.
->
-> Signed-off-by: Richard Purdie <richard.purdie@linuxfoundation.org>
 > ---
->  target/ppc/excp_helper.c | 12 +++++++++---
->  target/ppc/helper_regs.h |  8 ++++++--
->  2 files changed, 15 insertions(+), 5 deletions(-)
+>  hw/sd/sdhci-internal.h |  15 ++++++
+>  hw/sd/sdhci.c          | 127 +++++++++++++++++++++++++++++++++++++++++++=
++++++-
+>  include/hw/sd/sdhci.h  |   8 ++++
+>  3 files changed, 148 insertions(+), 2 deletions(-)
 >
-> diff --git a/target/ppc/excp_helper.c b/target/ppc/excp_helper.c
-> index e6009e7..f175c21 100644
-> --- a/target/ppc/excp_helper.c
-> +++ b/target/ppc/excp_helper.c
-> @@ -207,7 +207,9 @@ static inline void powerpc_excp(PowerPCCPU *cpu, int =
-excp_model, int excp)
->                          "Entering checkstop state\n");
+> diff --git a/hw/sd/sdhci-internal.h b/hw/sd/sdhci-internal.h
+> index 161177cf39..2a1b4b06ee 100644
+> --- a/hw/sd/sdhci-internal.h
+> +++ b/hw/sd/sdhci-internal.h
+> @@ -91,6 +91,8 @@
+>  #define SDHC_CTRL_ADMA2_32             0x10
+>  #define SDHC_CTRL_ADMA2_64             0x18
+>  #define SDHC_DMA_TYPE(x)               ((x) & SDHC_CTRL_DMA_CHECK_MASK)
+> +#define SDHC_CTRL_4BITBUS              0x02
+> +#define SDHC_CTRL_8BITBUS              0x20
+>
+>  /* R/W Power Control Register 0x0 */
+>  #define SDHC_PWRCON                    0x29
+> @@ -229,4 +231,17 @@ enum {
+>
+>  extern const VMStateDescription sdhci_vmstate;
+>
+> +
+> +#define ESDHC_MIX_CTRL                  0x48
+> +#define ESDHC_VENDOR_SPEC               0xc0
+> +#define ESDHC_DLL_CTRL                  0x60
+> +
+> +#define ESDHC_TUNING_CTRL               0xcc
+> +#define ESDHC_TUNE_CTRL_STATUS          0x68
+> +#define ESDHC_WTMK_LVL                  0x44
+> +
+> +#define ESDHC_CTRL_4BITBUS              (0x1 << 1)
+> +#define ESDHC_CTRL_8BITBUS              (0x2 << 1)
+> +
+> +
+>  #endif
+> diff --git a/hw/sd/sdhci.c b/hw/sd/sdhci.c
+> index 6d6a791ee9..f561cc44e3 100644
+> --- a/hw/sd/sdhci.c
+> +++ b/hw/sd/sdhci.c
+> @@ -265,7 +265,8 @@ static void sdhci_send_command(SDHCIState *s)
 >              }
->              cs->halted =3D 1;
-> -            cs->interrupt_request |=3D CPU_INTERRUPT_EXITTB;
-> +            qemu_mutex_lock_iothread();
-> +            cpu_interrupt(cs, CPU_INTERRUPT_EXITTB);
-> +            qemu_mutex_unlock_iothread();
-
-Not directly related but I wonder why cs->halted is set here rather than
-raising a CPU_INTERRUPT_HALT exception?
-
-My worry with these locks is I think powerpc_excp gets called from both
-paths which means you'll see an assert fire when the BQL is
-double-locked.
-
 >          }
->          if (env->msr_mask & MSR_HVB) {
->              /* ISA specifies HV, but can be delivered to guest with HV c=
-lear
-> @@ -940,7 +942,9 @@ void helper_store_msr(CPUPPCState *env, target_ulong =
-val)
 >
->      if (excp !=3D 0) {
->          CPUState *cs =3D CPU(ppc_env_get_cpu(env));
-> -        cs->interrupt_request |=3D CPU_INTERRUPT_EXITTB;
-> +        qemu_mutex_lock_iothread();
-> +        cpu_interrupt(cs, CPU_INTERRUPT_EXITTB);
-> +        qemu_mutex_unlock_iothread();
->          raise_exception(env, excp);
-
-This is fine as you only come here from TCG code.
-
->      }
+> -        if ((s->norintstsen & SDHC_NISEN_TRSCMP) &&
+> +        if (!(s->quirks & SDHCI_QUIRK_NO_BUSY_IRQ) &&
+> +            (s->norintstsen & SDHC_NISEN_TRSCMP) &&
+>              (s->cmdreg & SDHC_CMD_RESPONSE) =3D=3D SDHC_CMD_RSP_WITH_BUS=
+Y) {
+>              s->norintsts |=3D SDHC_NIS_TRSCMP;
+>          }
+> @@ -1191,6 +1192,8 @@ static void sdhci_initfn(SDHCIState *s)
+>
+>      s->insert_timer =3D timer_new_ns(QEMU_CLOCK_VIRTUAL, sdhci_raise_ins=
+ertion_irq, s);
+>      s->transfer_timer =3D timer_new_ns(QEMU_CLOCK_VIRTUAL, sdhci_data_tr=
+ansfer, s);
+> +
+> +    s->io_ops =3D &sdhci_mmio_ops;
 >  }
-> @@ -995,7 +999,9 @@ static inline void do_rfi(CPUPPCState *env, target_ul=
-ong nip, target_ulong msr)
->      /* No need to raise an exception here,
->       * as rfi is always the last insn of a TB
->       */
-> -    cs->interrupt_request |=3D CPU_INTERRUPT_EXITTB;
-> +    qemu_mutex_lock_iothread();
-> +    cpu_interrupt(cs, CPU_INTERRUPT_EXITTB);
-> +    qemu_mutex_unlock_iothread();
-
-I think this is fine - as again you come from TCG code.
-
 >
->      /* Reset the reservation */
->      env->reserve_addr =3D -1;
-> diff --git a/target/ppc/helper_regs.h b/target/ppc/helper_regs.h
-> index 2627a70..13dd0b8 100644
-> --- a/target/ppc/helper_regs.h
-> +++ b/target/ppc/helper_regs.h
-> @@ -114,11 +114,15 @@ static inline int hreg_store_msr(CPUPPCState *env, =
-target_ulong value,
->      }
->      if (((value >> MSR_IR) & 1) !=3D msr_ir ||
->          ((value >> MSR_DR) & 1) !=3D msr_dr) {
-> -        cs->interrupt_request |=3D CPU_INTERRUPT_EXITTB;
-> +        qemu_mutex_lock_iothread();
-> +        cpu_interrupt(cs, CPU_INTERRUPT_EXITTB);
-> +        qemu_mutex_unlock_iothread();
->      }
->      if ((env->mmu_model & POWERPC_MMU_BOOKE) &&
->          ((value >> MSR_GS) & 1) !=3D msr_gs) {
-> -        cs->interrupt_request |=3D CPU_INTERRUPT_EXITTB;
-> +        qemu_mutex_lock_iothread();
-> +        cpu_interrupt(cs, CPU_INTERRUPT_EXITTB);
-> +        qemu_mutex_unlock_iothread();
->      }
->      if (unlikely((env->flags & POWERPC_FLAG_TGPR) &&
->                   ((value ^ env->msr) & (1 << MSR_TGPR)))) {
+>  static void sdhci_uninitfn(SDHCIState *s)
+> @@ -1347,7 +1350,7 @@ static void sdhci_sysbus_realize(DeviceState *dev, =
+Error ** errp)
+>      s->buf_maxsz =3D sdhci_get_fifolen(s);
+>      s->fifo_buffer =3D g_malloc0(s->buf_maxsz);
+>      sysbus_init_irq(sbd, &s->irq);
+> -    memory_region_init_io(&s->iomem, OBJECT(s), &sdhci_mmio_ops, s, "sdh=
+ci",
+> +    memory_region_init_io(&s->iomem, OBJECT(s), s->io_ops, s, "sdhci",
+>              SDHC_REGISTERS_MAP_SIZE);
+>      sysbus_init_mmio(sbd, &s->iomem);
+>  }
+> @@ -1386,11 +1389,131 @@ static const TypeInfo sdhci_bus_info =3D {
+>      .class_init =3D sdhci_bus_class_init,
+>  };
+>
+> +static uint64_t usdhc_read(void *opaque, hwaddr offset, unsigned size)
+> +{
+> +    SDHCIState *s =3D SYSBUS_SDHCI(opaque);
+> +    uint32_t ret;
+> +    uint16_t hostctl;
+> +
+> +    switch (offset) {
+> +    default:
+> +        return sdhci_read(opaque, offset, size);
+> +
+> +    case SDHC_HOSTCTL:
+> +        hostctl =3D SDHC_DMA_TYPE(s->hostctl) << 5;
+> +
+> +        if (s->hostctl & SDHC_CTRL_8BITBUS) {
+> +            hostctl |=3D ESDHC_CTRL_8BITBUS;
+> +        }
+> +
+> +        if (s->hostctl & SDHC_CTRL_4BITBUS) {
+> +            hostctl |=3D ESDHC_CTRL_4BITBUS;
+> +        }
+> +
+> +        ret =3D hostctl | (s->blkgap << 16) |
+> +            (s->wakcon << 24);
+> +
+> +        break;
+> +
+> +    case ESDHC_DLL_CTRL:
+> +    case ESDHC_TUNE_CTRL_STATUS:
+> +    case 0x6c:
+> +    case ESDHC_TUNING_CTRL:
+> +    case ESDHC_VENDOR_SPEC:
+> +    case ESDHC_MIX_CTRL:
+> +    case ESDHC_WTMK_LVL:
+> +        ret =3D 0;
+> +        break;
+> +    }
+> +
+> +    return ret;
+> +}
+> +
+> +static void
+> +usdhc_write(void *opaque, hwaddr offset, uint64_t val, unsigned size)
+> +{
+> +    SDHCIState *s =3D SYSBUS_SDHCI(opaque);
+> +    uint8_t hostctl =3D 0;
+> +    uint32_t value =3D (uint32_t)val;
+> +
+> +    switch (offset) {
+> +    case ESDHC_DLL_CTRL:
+> +    case ESDHC_TUNE_CTRL_STATUS:
+> +    case 0x6c:
+> +    case ESDHC_TUNING_CTRL:
+> +    case ESDHC_WTMK_LVL:
+> +    case ESDHC_VENDOR_SPEC:
+> +        break;
+> +
+> +    case SDHC_HOSTCTL:
+> +        if (value & ESDHC_CTRL_8BITBUS) {
+> +            hostctl |=3D SDHC_CTRL_8BITBUS;
+> +        }
+> +
+> +        if (value & ESDHC_CTRL_4BITBUS) {
+> +            hostctl |=3D ESDHC_CTRL_4BITBUS;
+> +        }
+> +
+> +        hostctl |=3D SDHC_DMA_TYPE(value >> 5);
+> +
+> +        value &=3D ~0xFE;
+> +        value |=3D hostctl;
+> +        value &=3D ~0xFF00;
+> +        value |=3D s->pwrcon;
+> +
+> +        sdhci_write(opaque, offset, value, size);
 
-And this looks good too.
+This is pretty confusing, because we both mess about directly
+with the pwrcon field and also pass the write through
+to sdhci_write(). (a) some comments would help and (b)
+would it be clearer to just implement the different
+SDHC_HOSTCTL behaviour entirely here rather than trying to
+reuse the code in sdhci_write()? I get the impression that
+at least some of this is trying to shuffle stuff around so
+that code can unshuffle it.
 
---
-Alex Benn=C3=A9e
+> +        break;
+> +
+> +    case ESDHC_MIX_CTRL:
+> +        /*
+> +         * The layout of the register is slightly different, but we
+> +         * don't care about those bits
+> +         */
+> +        s->trnmod =3D value & 0xFFFF;
+> +        break;
+> +    case SDHC_TRNMOD:
+> +        sdhci_write(opaque, offset, val | s->trnmod, size);
+
+This one's simpler, but a comment would assist.
+
+> +        break;
+> +    case SDHC_BLKSIZE:
+> +        val |=3D 0x7 << 12;
+> +    default:                    /* FALLTHROUGH */
+> +        sdhci_write(opaque, offset, val, size);
+> +        break;
+> +    }
+> +}
+> +
+> +
+> +static const MemoryRegionOps usdhc_mmio_ops =3D {
+> +    .read =3D usdhc_read,
+> +    .write =3D usdhc_write,
+> +    .valid =3D {
+> +        .min_access_size =3D 1,
+> +        .max_access_size =3D 4,
+> +        .unaligned =3D false
+> +    },
+> +    .endianness =3D DEVICE_LITTLE_ENDIAN,
+> +};
+> +
+> +static void imx_usdhc_init(Object *obj)
+> +{
+> +    SDHCIState *s =3D SYSBUS_SDHCI(obj);
+> +
+> +    s->io_ops =3D &usdhc_mmio_ops;
+> +    s->quirks =3D SDHCI_QUIRK_NO_BUSY_IRQ;
+> +}
+> +
+> +static const TypeInfo imx_usdhc_info =3D {
+> +    .name =3D TYPE_IMX_USDHC,
+> +    .parent =3D TYPE_SYSBUS_SDHCI,
+> +    .instance_init =3D imx_usdhc_init,
+> +};
+> +
+>  static void sdhci_register_types(void)
+>  {
+>      type_register_static(&sdhci_pci_info);
+>      type_register_static(&sdhci_sysbus_info);
+>      type_register_static(&sdhci_bus_info);
+> +    type_register_static(&imx_usdhc_info);
+>  }
+>
+>  type_init(sdhci_register_types)
+> diff --git a/include/hw/sd/sdhci.h b/include/hw/sd/sdhci.h
+> index 0f0c3f1e64..dc1856a33d 100644
+> --- a/include/hw/sd/sdhci.h
+> +++ b/include/hw/sd/sdhci.h
+> @@ -39,6 +39,7 @@ typedef struct SDHCIState {
+>      };
+>      SDBus sdbus;
+>      MemoryRegion iomem;
+> +    const MemoryRegionOps *io_ops;
+>
+>      QEMUTimer *insert_timer;       /* timer for 'changing' sd card. */
+>      QEMUTimer *transfer_timer;
+> @@ -83,8 +84,13 @@ typedef struct SDHCIState {
+>      /* Force Event Auto CMD12 Error Interrupt Reg - write only */
+>      /* Force Event Error Interrupt Register- write only */
+>      /* RO Host Controller Version Register always reads as 0x2401 */
+> +
+> +    unsigned long quirks;
+
+Don't use 'unsigned long', it differs in size from host to host.
+
+>  } SDHCIState;
+>
+> +/* Controller does not provide transfer-complete interrupt when not busy=
+ */
+> +#define SDHCI_QUIRK_NO_BUSY_IRQ    BIT(14)
+
+We only have one quirk, so why is it bit 14?
+
+> +
+>  #define TYPE_PCI_SDHCI "sdhci-pci"
+>  #define PCI_SDHCI(obj) OBJECT_CHECK(SDHCIState, (obj), TYPE_PCI_SDHCI)
+>
+> @@ -92,4 +98,6 @@ typedef struct SDHCIState {
+>  #define SYSBUS_SDHCI(obj)                               \
+>       OBJECT_CHECK(SDHCIState, (obj), TYPE_SYSBUS_SDHCI)
+>
+> +#define TYPE_IMX_USDHC "imx-usdhc"
+> +
+>  #endif /* SDHCI_H */
+> --
+> 2.13.6
+
+thanks
+-- PMM
