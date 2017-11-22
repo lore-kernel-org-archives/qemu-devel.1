@@ -1,21 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36036)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35980)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1eHQev-00083h-LC
-	for qemu-devel@nongnu.org; Wed, 22 Nov 2017 03:45:30 -0500
+	(envelope-from <quintela@redhat.com>) id 1eHQem-0007u9-K8
+	for qemu-devel@nongnu.org; Wed, 22 Nov 2017 03:45:25 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1eHQes-0004D6-8p
-	for qemu-devel@nongnu.org; Wed, 22 Nov 2017 03:45:29 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:40318)
+	(envelope-from <quintela@redhat.com>) id 1eHQej-00048y-Dz
+	for qemu-devel@nongnu.org; Wed, 22 Nov 2017 03:45:20 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:41862)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1eHQer-0004Cq-Ve
-	for qemu-devel@nongnu.org; Wed, 22 Nov 2017 03:45:26 -0500
+	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1eHQej-00047e-8H
+	for qemu-devel@nongnu.org; Wed, 22 Nov 2017 03:45:17 -0500
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+	[10.5.11.12])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 5F82C25C27
+	for <qemu-devel@nongnu.org>; Wed, 22 Nov 2017 08:45:16 +0000 (UTC)
 From: Juan Quintela <quintela@redhat.com>
-Date: Wed, 22 Nov 2017 09:45:04 +0100
-Message-Id: <20171122084504.11984-3-quintela@redhat.com>
-In-Reply-To: <20171122084504.11984-1-quintela@redhat.com>
-References: <20171122084504.11984-1-quintela@redhat.com>
-Subject: [Qemu-devel] [PULL 2/2] migration/ram.c: do not set
- 'postcopy_running' in POSTCOPY_INCOMING_END
+Date: Wed, 22 Nov 2017 09:45:02 +0100
+Message-Id: <20171122084504.11984-1-quintela@redhat.com>
+Subject: [Qemu-devel] [PULL 0/2] Migration PULL take 2
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,109 +28,39 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: dgilbert@redhat.com, lvivier@redhat.com, peterx@redhat.com, Daniel Henrique Barboza <danielhb@linux.vnet.ibm.com>
+Cc: dgilbert@redhat.com, lvivier@redhat.com, peterx@redhat.com
 
-From: Daniel Henrique Barboza <danielhb@linux.vnet.ibm.com>
+Hi
 
-When migrating a VM with 'migrate_set_capability postcopy-ram on'
-a postcopy_state is set during the process, ending up with the
-state POSTCOPY_INCOMING_END when the migration is over. This
-postcopy_state is taken into account inside ram_load to check
-how it will load the memory pages. This same ram_load is called when
-in a loadvm command.
+This uses the right verslion of postcopy_running from from Daniel.
 
-Inside ram_load, the logic to see if we're at postcopy_running state
-is:
+Please, apply.
 
-postcopy_running = postcopy_state_get() >= POSTCOPY_INCOMING_LISTENING
+Later, Juan.
 
-postcopy_state_get() returns this enum type:
+The following changes since commit a15d835f00dce270fd3194e83d9910f4b5b44ac0:
 
-typedef enum {
-    POSTCOPY_INCOMING_NONE = 0,
-    POSTCOPY_INCOMING_ADVISE,
-    POSTCOPY_INCOMING_DISCARD,
-    POSTCOPY_INCOMING_LISTENING,
-    POSTCOPY_INCOMING_RUNNING,
-    POSTCOPY_INCOMING_END
-} PostcopyState;
+  Update version for v2.11.0-rc2 release (2017-11-21 17:50:36 +0000)
 
-In the case where ram_load is executed and postcopy_state is
-POSTCOPY_INCOMING_END, postcopy_running will be set to 'true' and
-ram_load will behave like a postcopy is in progress. This scenario isn't
-achievable in a migration but it is reproducible when executing
-savevm/loadvm after migrating with 'postcopy-ram on', causing loadvm
-to fail with Error -22:
+are available in the git repository at:
 
-Source:
+  git://github.com/juanquintela/qemu.git tags/migration/20171122
 
-(qemu) migrate_set_capability postcopy-ram on
-(qemu) migrate tcp:127.0.0.1:4444
+for you to fetch changes up to acab30b85db0885ab161aff4c83c550628f6d8ca:
 
-Dest:
+  migration/ram.c: do not set 'postcopy_running' in POSTCOPY_INCOMING_END (2017-11-22 08:50:37 +0100)
 
-(qemu) migrate_set_capability postcopy-ram on
-(qemu)
-ubuntu1704-intel login:
-Ubuntu 17.04 ubuntu1704-intel ttyS0
+----------------------------------------------------------------
+migration/next for 20171122
 
-ubuntu1704-intel login: (qemu)
-(qemu) savevm test1
-(qemu) loadvm test1
-Unknown combination of migration flags: 0x4 (postcopy mode)
-error while loading state for instance 0x0 of device 'ram'
-Error -22 while loading VM state
-(qemu)
+----------------------------------------------------------------
+Anthony PERARD (1):
+      migration, xen: Fix block image lock issue on live migration
 
-This patch fixes this problem by changing the existing logic for
-postcopy_advised and postcopy_running in ram_load, making them
-'false' if we're at POSTCOPY_INCOMING_END state.
+Daniel Henrique Barboza (1):
+      migration/ram.c: do not set 'postcopy_running' in POSTCOPY_INCOMING_END
 
-Signed-off-by: Daniel Henrique Barboza <danielhb@linux.vnet.ibm.com>
-CC: Juan Quintela <quintela@redhat.com>
-CC: Dr. David Alan Gilbert <dgilbert@redhat.com>
-Reviewed-by: Peter Xu <peterx@redhat.com>
-Reviewed-by: Juan Quintela <quintela@redhat.com>
-Reported-by: Balamuruhan S <bala24@linux.vnet.ibm.com>
-Signed-off-by: Juan Quintela <quintela@redhat.com>
----
- migration/ram.c | 16 ++++++++++++++--
- 1 file changed, 14 insertions(+), 2 deletions(-)
-
-diff --git a/migration/ram.c b/migration/ram.c
-index 8620aa400a..021d583b9b 100644
---- a/migration/ram.c
-+++ b/migration/ram.c
-@@ -2798,6 +2798,18 @@ static int ram_load_postcopy(QEMUFile *f)
-     return ret;
- }
- 
-+static bool postcopy_is_advised(void)
-+{
-+    PostcopyState ps = postcopy_state_get();
-+    return ps >= POSTCOPY_INCOMING_ADVISE && ps < POSTCOPY_INCOMING_END;
-+}
-+
-+static bool postcopy_is_running(void)
-+{
-+    PostcopyState ps = postcopy_state_get();
-+    return ps >= POSTCOPY_INCOMING_LISTENING && ps < POSTCOPY_INCOMING_END;
-+}
-+
- static int ram_load(QEMUFile *f, void *opaque, int version_id)
- {
-     int flags = 0, ret = 0, invalid_flags = 0;
-@@ -2807,9 +2819,9 @@ static int ram_load(QEMUFile *f, void *opaque, int version_id)
-      * If system is running in postcopy mode, page inserts to host memory must
-      * be atomic
-      */
--    bool postcopy_running = postcopy_state_get() >= POSTCOPY_INCOMING_LISTENING;
-+    bool postcopy_running = postcopy_is_running();
-     /* ADVISE is earlier, it shows the source has the postcopy capability on */
--    bool postcopy_advised = postcopy_state_get() >= POSTCOPY_INCOMING_ADVISE;
-+    bool postcopy_advised = postcopy_is_advised();
- 
-     seq_iter++;
- 
--- 
-2.13.6
+ migration/ram.c     | 16 ++++++++++++++--
+ migration/savevm.c  | 23 ++++++++++++++++++++++-
+ qapi/migration.json |  6 +++++-
+ 3 files changed, 41 insertions(+), 4 deletions(-)
