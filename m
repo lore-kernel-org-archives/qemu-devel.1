@@ -1,33 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41152)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51882)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1eHNhQ-0005Ee-LH
-	for qemu-devel@nongnu.org; Wed, 22 Nov 2017 00:35:53 -0500
+	(envelope-from <jcd@tribudubois.net>) id 1eHOb3-0007hR-NK
+	for qemu-devel@nongnu.org; Wed, 22 Nov 2017 01:33:22 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1eHNhN-0001y7-I5
-	for qemu-devel@nongnu.org; Wed, 22 Nov 2017 00:35:52 -0500
-Received: from indium.canonical.com ([91.189.90.7]:37722)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1eHNhN-0001xl-BA
-	for qemu-devel@nongnu.org; Wed, 22 Nov 2017 00:35:49 -0500
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1eHNhL-0001WM-If
-	for <qemu-devel@nongnu.org>; Wed, 22 Nov 2017 05:35:47 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 2BAAB2E80D5
-	for <qemu-devel@nongnu.org>; Wed, 22 Nov 2017 05:35:47 +0000 (UTC)
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Wed, 22 Nov 2017 05:20:55 -0000
-From: Ken Dickey <Ken.Dickey@whidbey.com>
-Reply-To: Bug 1733720 <1733720@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <151130882565.18495.10192043724404737327.malonedeb@gac.canonical.com>
-Message-Id: <151132805586.14417.2239721291081295955.malone@soybean.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1733720] Re: raspi2 with multiple CPU's #1
+	(envelope-from <jcd@tribudubois.net>) id 1eHOb0-0006e8-J2
+	for qemu-devel@nongnu.org; Wed, 22 Nov 2017 01:33:21 -0500
+Received: from relay4-d.mail.gandi.net ([217.70.183.196]:42525)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <jcd@tribudubois.net>) id 1eHOb0-0006dM-DC
+	for qemu-devel@nongnu.org; Wed, 22 Nov 2017 01:33:18 -0500
+From: Jean-Christophe Dubois <jcd@tribudubois.net>
+Date: Wed, 22 Nov 2017 07:32:50 +0100
+Message-Id: <20171122063250.7674-1-jcd@tribudubois.net>
+Subject: [Qemu-devel] [PATCH] Remove MemoryRegionSection check code from
+ sparc_cpu_get_phys_page_debug()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,102 +23,43 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
+Cc: Jean-Christophe Dubois <jcd@tribudubois.net>, Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, Artyom Tarasenko <atar4qemu@gmail.com>
 
-NOT A BUG
+This code is preventing the MMU debug code from displaying virtual
+mappings of IO devices (anything that is not located in the RAM).
 
-Reviewed the code and found the problem.
+Before this patch, Qemu would output 0xffffffffffffffff (-1) as the
+physical address corresponding to a IO device virtual address.
 
-asm volatile("mrc p15, 0, %[id], c0, c0, 0 @ read MIDR\n\t" ...
+With this patch the intended physical adresse is displayed.
 
-I miscopied the code above; MIDR should have been MIPDR ( 5 )
+Signed-off-by: Jean-Christophe Dubois <jcd@tribudubois.net>
+---
+ target/sparc/mmu_helper.c | 6 ------
+ 1 file changed, 6 deletions(-)
 
-I now get:
-
-Linux:armv7l: ~/Downloads/RaspiTest/BareBones >>> ./qemu.sh =
-
-0H312ello, kernel World!
-
-Sorry about the bogus report!
--KenD
-
-** Changed in: qemu
-       Status: New =3D> Invalid
-
--- =
-
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1733720
-
-Title:
-  raspi2 with multiple CPU's #1
-
-Status in QEMU:
-  Invalid
-
-Bug description:
-  Greetings,
-
-  I am running a small program for raspi2 (from
-  http://wiki.osdev.org/ARM_RaspberryPi_Tutorial_C).
-
-  This code writes "Hello World", but the output ir repeated 4 times.
-
-  My thought was that this is emulating a 4 cpu core system.
-
-  However, when I check the MPIDR registed for CPU number, it always
-  returns 1.
-
-  I git cloned github.com/qemu/qemu.git, made & installed on Acer ARM
-  CB5-311 under Crouton/ubuntu.
-
-  =
-
-  ./qemu.sh =
-
-  1111
-
-  Linux:armv7l: ~/Downloads/RaspiTest/BareBones >>> uname -a
-  Linux localhost 3.10.18 #1 SMP Mon Nov 13 16:34:10 PST 2017 armv7l armv7l=
- armv7l GNU/Linux
-
-  Linux:armv7l: ~/Downloads/RaspiTest/BareBones >>> qemu-system-arm --versi=
-on
-  QEMU emulator version 2.10.91 (v2.11.0-rc1-dirty)
-  Copyright (c) 2003-2017 Fabrice Bellard and the QEMU Project developers
-
-  =3D=3D=3D=3D=3D
-  static inline uint32_t read_mpdir(void)
-  {
-    uint32_t id;
-    =
-
-    asm volatile("mrc p15, 0, %[id], c0, c0, 0 @ read MIDR\n\t"
-  	       : [id] "=3Dr" (id));
-    return id;
-  }
-  =3D=3D=3D=3D=3D=3D
-  void kernel_main(uint32_t r0, uint32_t r1, uint32_t atags)
-  {
-  	// Declare as unused
-  	(void) r0;
-  	(void) r1;
-  	(void) atags;
-
-          uint32_t cpu_id;
-
-          cpu_id =3D read_mpdir() & 0x03;
-
-          uart_putc( "01234"[cpu_id] ); /* output is "1111" */
-
-          if (cpu_id =3D=3D 0) { /* code never executes 8^( */ }
-
-  =3D=3D=3D=3D=3D=3D qemu.sh
-  qemu-system-arm -m 256 -M raspi2 -no-reboot -serial stdio  -kernel myos.e=
-lf
-
-  Thanks much,
-  -KenD
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1733720/+subscriptions
+diff --git a/target/sparc/mmu_helper.c b/target/sparc/mmu_helper.c
+index d5b6c1e48c..f2d2250e7a 100644
+--- a/target/sparc/mmu_helper.c
++++ b/target/sparc/mmu_helper.c
+@@ -857,18 +857,12 @@ hwaddr sparc_cpu_get_phys_page_debug(CPUState *cs, vaddr addr)
+     CPUSPARCState *env = &cpu->env;
+     hwaddr phys_addr;
+     int mmu_idx = cpu_mmu_index(env, false);
+-    MemoryRegionSection section;
+ 
+     if (cpu_sparc_get_phys_page(env, &phys_addr, addr, 2, mmu_idx) != 0) {
+         if (cpu_sparc_get_phys_page(env, &phys_addr, addr, 0, mmu_idx) != 0) {
+             return -1;
+         }
+     }
+-    section = memory_region_find(get_system_memory(), phys_addr, 1);
+-    memory_region_unref(section.mr);
+-    if (!int128_nz(section.size)) {
+-        return -1;
+-    }
+     return phys_addr;
+ }
+ #endif
+-- 
+2.14.1
