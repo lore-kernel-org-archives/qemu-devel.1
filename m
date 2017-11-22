@@ -1,21 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35880)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40772)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1eHSDm-0005R2-6q
-	for qemu-devel@nongnu.org; Wed, 22 Nov 2017 05:25:35 -0500
+	(envelope-from <marcel@redhat.com>) id 1eHSYZ-0003Hx-0i
+	for qemu-devel@nongnu.org; Wed, 22 Nov 2017 05:47:04 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1eHSDl-0007By-4R
-	for qemu-devel@nongnu.org; Wed, 22 Nov 2017 05:25:34 -0500
-Date: Wed, 22 Nov 2017 11:25:15 +0100
-From: Kevin Wolf <kwolf@redhat.com>
-Message-ID: <20171122102515.GA10954@localhost.localdomain>
-References: <20171121170350.31290-1-jcody@redhat.com>
-	<20171121170350.31290-2-jcody@redhat.com>
+	(envelope-from <marcel@redhat.com>) id 1eHSYV-0007Rt-VI
+	for qemu-devel@nongnu.org; Wed, 22 Nov 2017 05:47:03 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:43362)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <marcel@redhat.com>) id 1eHSYV-0007RX-P7
+	for qemu-devel@nongnu.org; Wed, 22 Nov 2017 05:46:59 -0500
+References: <20171120142216.17832-1-lprosek@redhat.com>
+From: Marcel Apfelbaum <marcel@redhat.com>
+Message-ID: <c3c2fa0d-1e93-7f17-f8d3-db8eee82bfd1@redhat.com>
+Date: Wed, 22 Nov 2017 12:46:45 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20171121170350.31290-2-jcody@redhat.com>
-Subject: Re: [Qemu-devel] [Qemu-block] [PULL 1/4] blockjob: do not allow
- coroutine double entry or entry-after-completion
+In-Reply-To: <20171120142216.17832-1-lprosek@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH] msix: don't mask already masked vectors on
+ reset
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,41 +28,81 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Jeff Cody <jcody@redhat.com>
-Cc: qemu-block@nongnu.org, peter.maydell@linaro.org, qemu-devel@nongnu.org, stefanha@redhat.com, pbonzini@redhat.com
+To: Ladi Prosek <lprosek@redhat.com>, qemu-devel@nongnu.org
+Cc: mst@redhat.com, geoff@hostfission.com, Alex Williamson <alex.williamson@redhat.com>
 
-Am 21.11.2017 um 18:03 hat Jeff Cody geschrieben:
-> When block_job_sleep_ns() is called, the co-routine is scheduled for
-> future execution.  If we allow the job to be re-entered prior to the
-> scheduled time, we present a race condition in which a coroutine can be
-> entered recursively, or even entered after the coroutine is deleted.
-> 
-> The job->busy flag is used by blockjobs when a coroutine is busy
-> executing. The function 'block_job_enter()' obeys the busy flag,
-> and will not enter a coroutine if set.  If we sleep a job, we need to
-> leave the busy flag set, so that subsequent calls to block_job_enter()
-> are prevented.
-> 
-> This changes the prior behavior of block_job_cancel() being able to
-> immediately wake up and cancel a job; in practice, this should not be an
-> issue, as the coroutine sleep times are generally very small, and the
-> cancel will occur the next time the coroutine wakes up.
-> 
-> This fixes: https://bugzilla.redhat.com/show_bug.cgi?id=1508708
-> 
-> Signed-off-by: Jeff Cody <jcody@redhat.com>
-> Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
+Hi Ladi,
 
-git bisect says that this is the commit where qemu-iotests started to
-break, e.g. case 020:
+On 20/11/2017 16:22, Ladi Prosek wrote:
+> msix_mask_all() is supposed to invoke the release vector notifier if the state of the
+> respective vector changed from unmasked or masked. 
 
---- /home/kwolf/source/qemu/tests/qemu-iotests/020.out  2017-11-20 10:43:53.157894898 +0100
-+++ /home/kwolf/source/qemu/tests/qemu-iotests/020.out.bad      2017-11-22 11:22:48.781344756 +0100
-@@ -537,7 +537,8 @@
- wrote 65536/65536 bytes at offset 4295098368
- 64 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
- No errors were found on the image.
--Image committed.
-+qemu-img: block/block-backend.c:2086: blk_root_drained_end: Assertion `blk->quiesce_counter' failed.
-+./common.rc: line 61: 17396 Aborted                 (core dumped) ( exec "$QEMU_IMG_PROG" $QEMU_IMG_OPTIONS "$@" )
- Reading from the backing file
+You mean from unmasked "to" masked right?
+
+The way it's currently called from
+> msix_reset(), though, may result in calling the release notifier even if the vector
+> is already masked.
+> 
+> 1) msix_reset() clears out the msix_cap field and the msix_table.
+> 2) msix_mask_all() runs with was_masked=false for all vectors because of 1), which
+>     results in calling the release notifier on all vectors.
+> 3) if msix_reset() is subsequently called again, it goes through the same steps and
+>     calls the release notifier on all vectors again.
+> 
+
+As far as I can see in the code you are right.(very reset will trigger the release notifiers
+again)
+
+> This commit moves msix_mask_all() up so it runs before the device state is lost.
+
+OK
+
+> And
+> it adds a call to msix_update_function_masked() so that the device remembers that
+> MSI-X is masked.
+> 
+
+msix_update_function_masked checks the msix is enabled or masked-off.
+You are building on the fact the msix will not be enabled to set
+"msix_function_masked" to "true", right?
+(I just want to be sure I understand the patch)
+
+> This is likely a low impact issue, found while debugging an already broken device. It
+> is however easy to fix and the expectation that the use and release notifier invocations
+> are always balanced is very natural.
+> 
+
+I would leave it (maybe) out of 2.11 because it may expose other bugs
+and we are after rc2 already.
+
+Adding Alex Williamson to see it does not affect device assignment,
+other than that the patch looks OK to me.
+
+
+Thanks,
+Marcel
+
+> Signed-off-by: Ladi Prosek <lprosek@redhat.com>
+> ---
+>   hw/pci/msix.c | 3 ++-
+>   1 file changed, 2 insertions(+), 1 deletion(-)
+> 
+> diff --git a/hw/pci/msix.c b/hw/pci/msix.c
+> index c944c02135..34656de9b0 100644
+> --- a/hw/pci/msix.c
+> +++ b/hw/pci/msix.c
+> @@ -500,11 +500,12 @@ void msix_reset(PCIDevice *dev)
+>           return;
+>       }
+>       msix_clear_all_vectors(dev);
+> +    msix_mask_all(dev, dev->msix_entries_nr);
+>       dev->config[dev->msix_cap + MSIX_CONTROL_OFFSET] &=
+>   	    ~dev->wmask[dev->msix_cap + MSIX_CONTROL_OFFSET];
+>       memset(dev->msix_table, 0, dev->msix_entries_nr * PCI_MSIX_ENTRY_SIZE);
+>       memset(dev->msix_pba, 0, QEMU_ALIGN_UP(dev->msix_entries_nr, 64) / 8);
+> -    msix_mask_all(dev, dev->msix_entries_nr);
+> +    msix_update_function_masked(dev);
+>   }
+>   
+>   /* PCI spec suggests that devices make it possible for software to configure
+> 
