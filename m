@@ -1,22 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52005)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52192)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <andrew.smirnov@gmail.com>) id 1eHbX3-0000yh-OD
-	for qemu-devel@nongnu.org; Wed, 22 Nov 2017 15:22:06 -0500
+	(envelope-from <andrew.smirnov@gmail.com>) id 1eHbXh-0001Im-09
+	for qemu-devel@nongnu.org; Wed, 22 Nov 2017 15:22:46 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <andrew.smirnov@gmail.com>) id 1eHbX2-0005WT-Kr
-	for qemu-devel@nongnu.org; Wed, 22 Nov 2017 15:22:05 -0500
+	(envelope-from <andrew.smirnov@gmail.com>) id 1eHbXf-0005eo-P1
+	for qemu-devel@nongnu.org; Wed, 22 Nov 2017 15:22:44 -0500
 MIME-Version: 1.0
-In-Reply-To: <CAFEAcA9EhzPxayCGDOiM_6U9YSS6HK1gCgBroR=C1LM=H=FpQw@mail.gmail.com>
+In-Reply-To: <CAFEAcA_+9fz4zzWg6najN0pn6-=jRMzz2zbHneZxca=SYyxDKA@mail.gmail.com>
 References: <20171106154813.19936-1-andrew.smirnov@gmail.com>
-	<20171106154813.19936-5-andrew.smirnov@gmail.com>
-	<CAFEAcA9EhzPxayCGDOiM_6U9YSS6HK1gCgBroR=C1LM=H=FpQw@mail.gmail.com>
+	<20171106154813.19936-4-andrew.smirnov@gmail.com>
+	<CAFEAcA_+9fz4zzWg6najN0pn6-=jRMzz2zbHneZxca=SYyxDKA@mail.gmail.com>
 From: Andrey Smirnov <andrew.smirnov@gmail.com>
-Date: Wed, 22 Nov 2017 12:22:00 -0800
-Message-ID: <CAHQ1cqEW202FqhrNpXOvWTT9s-H-ZGrmdAFTeynRc6VnOia6Uw@mail.gmail.com>
+Date: Wed, 22 Nov 2017 12:22:40 -0800
+Message-ID: <CAHQ1cqFGr9YMeXPHyueKVpRQp8ugvF7+gnwSZRk=rBY20UYV7A@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v3 04/30] imx_fec: Use ENET_FTRL to
- determine truncation length
+Subject: Re: [Qemu-devel] [PATCH v3 03/30] imx_fec: Change queue flushing
+ heuristics
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,16 +28,55 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: Peter Maydell <peter.maydell@linaro.org>
 Cc: qemu-arm <qemu-arm@nongnu.org>, Jason Wang <jasowang@redhat.com>, =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>, QEMU Developers <qemu-devel@nongnu.org>, Andrey Yurovsky <yurovsky@gmail.com>
 
-On Tue, Nov 21, 2017 at 9:31 AM, Peter Maydell <peter.maydell@linaro.org> w=
+On Tue, Nov 21, 2017 at 9:27 AM, Peter Maydell <peter.maydell@linaro.org> w=
 rote:
 > On 6 November 2017 at 15:47, Andrey Smirnov <andrew.smirnov@gmail.com> wr=
 ote:
->> Frame truncation length, TRUNC_FL, is determined by the contents of
->> ENET_FTRL register, so convert the code to use it instead of a
->> hardcoded constant.
+>> In current implementation, packet queue flushing logic seem to suffer
+>> from a deadlock like scenario if a packet is received by the interface
+>> before before Rx ring is initialized by Guest's driver. Consider the
+>> following sequence of events:
 >>
->> To avoid the case where TRUNC_FL is greater that ENET_MAX_FRAME_SIZE,
->> increase the value of the latter to its theoretical maximum of 16K.
+>>         1. A QEMU instance is started against a TAP device on Linux
+>>            host, running Linux guest, e. g., something to the effect
+>>            of:
+>>
+>>            qemu-system-arm \
+>>               -net nic,model=3Dimx.fec,netdev=3Dlan0 \
+>>               netdev tap,id=3Dlan0,ifname=3Dtap0,script=3Dno,downscript=
+=3Dno \
+>>               ... rest of the arguments ...
+>>
+>>         2. Once QEMU starts, but before guest reaches the point where
+>>            FEC deriver is done initializing the HW, Guest, via TAP
+>>            interface, receives a number of multicast MDNS packets from
+>>            Host (not necessarily true for every OS, but it happens at
+>>            least on Fedora 25)
+>>
+>>         3. Recieving a packet in such a state results in
+>>            imx_eth_can_receive() returning '0', which in turn causes
+>>            tap_send() to disable corresponding event (tap.c:203)
+>>
+>>         4. Once Guest's driver reaches the point where it is ready to
+>>            recieve packets it prepares Rx ring descriptors and writes
+>>            ENET_RDAR_RDAR to ENET_RDAR register to indicate to HW that
+>>            more descriptors are ready. And at this points emulation
+>>            layer does this:
+>>
+>>                  s->regs[index] =3D ENET_RDAR_RDAR;
+>>                  imx_eth_enable_rx(s);
+>>
+>>            which, combined with:
+>>
+>>                   if (!s->regs[ENET_RDAR]) {
+>>                      qemu_flush_queued_packets(qemu_get_queue(s->nic));
+>>                   }
+>>
+>>            results in Rx queue never being flushed and corresponding
+>>            I/O event beign disabled.
+>>
+>> To prevent the problem, change the code to always flush packet queue
+>> when ENET_RDAR transitions 0 -> ENET_RDAR_RDAR.
 >>
 >> Cc: Peter Maydell <peter.maydell@linaro.org>
 >> Cc: Jason Wang <jasowang@redhat.com>
@@ -46,54 +85,21 @@ ote:
 >> Cc: qemu-arm@nongnu.org
 >> Cc: yurovsky@gmail.com
 >> Signed-off-by: Andrey Smirnov <andrew.smirnov@gmail.com>
->> ---
->>  hw/net/imx_fec.c         | 4 ++--
->>  include/hw/net/imx_fec.h | 3 ++-
->>  2 files changed, 4 insertions(+), 3 deletions(-)
->>
->> diff --git a/hw/net/imx_fec.c b/hw/net/imx_fec.c
->> index eb034ffd0c..dda0816fb3 100644
->> --- a/hw/net/imx_fec.c
->> +++ b/hw/net/imx_fec.c
->> @@ -1052,8 +1052,8 @@ static ssize_t imx_enet_receive(NetClientState *nc=
-, const uint8_t *buf,
->>      crc_ptr =3D (uint8_t *) &crc;
->>
->>      /* Huge frames are truncted.  */
->> -    if (size > ENET_MAX_FRAME_SIZE) {
->> -        size =3D ENET_MAX_FRAME_SIZE;
->> +    if (size > s->regs[ENET_FTRL]) {
->> +        size =3D s->regs[ENET_FTRL];
->>          flags |=3D ENET_BD_TR | ENET_BD_LG;
->>      }
->>
 >> diff --git a/include/hw/net/imx_fec.h b/include/hw/net/imx_fec.h
->> index 4bc8f03ec2..0fcc4f0c71 100644
+>> index 62ad473b05..4bc8f03ec2 100644
 >> --- a/include/hw/net/imx_fec.h
 >> +++ b/include/hw/net/imx_fec.h
->> @@ -86,7 +86,6 @@
->>  #define ENET_TCCR3             393
->>  #define ENET_MAX               400
+>> @@ -252,6 +252,7 @@ typedef struct IMXFECState {
+>>      uint32_t phy_int_mask;
 >>
->> -#define ENET_MAX_FRAME_SIZE    2032
->>
->>  /* EIR and EIMR */
->>  #define ENET_INT_HB            (1 << 31)
->> @@ -155,6 +154,8 @@
->>  #define ENET_RCR_NLC           (1 << 30)
->>  #define ENET_RCR_GRS           (1 << 31)
->>
->> +#define ENET_MAX_FRAME_SIZE    (1 << ENET_RCR_MAX_FL_LENGTH)
+>>      bool is_fec;
+>> +    bool needs_flush;
+>>  } IMXFECState;
 >
-> This means we now have functions with 16K local array
-> variables on the stack, which seems like a bad idea.
+> This field isn't needed any more in this version of the patch, I think?
 >
 
-Can't say I see a big difference between having a 2K vs 16K buffer on
-the stack, but regardless, I am not quite clear if you are not too hot
-about this patch and want me to drop it (I am fine with it) or do you
-want me to modify it to have the emulation layer allocate said 16K
-buffer on the heap instead of a stack?
+Yeah, my bad, forgot to remove this part. Will do in v4.
 
 Thanks,
 Andrey Smirnov
