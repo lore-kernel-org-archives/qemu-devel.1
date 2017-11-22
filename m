@@ -1,34 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57169)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57861)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1eHYPT-00028t-OS
-	for qemu-devel@nongnu.org; Wed, 22 Nov 2017 12:02:09 -0500
+	(envelope-from <thuth@redhat.com>) id 1eHYRF-0003UQ-Bp
+	for qemu-devel@nongnu.org; Wed, 22 Nov 2017 12:03:54 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1eHYPP-0000lq-MH
-	for qemu-devel@nongnu.org; Wed, 22 Nov 2017 12:02:03 -0500
-Received: from indium.canonical.com ([91.189.90.7]:33708)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1eHYPP-0000lT-Fz
-	for qemu-devel@nongnu.org; Wed, 22 Nov 2017 12:01:59 -0500
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1eHYPM-0008UG-BM
-	for <qemu-devel@nongnu.org>; Wed, 22 Nov 2017 17:01:56 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id F02932E81ED
-	for <qemu-devel@nongnu.org>; Wed, 22 Nov 2017 17:01:51 +0000 (UTC)
+	(envelope-from <thuth@redhat.com>) id 1eHYRB-0001tB-F2
+	for qemu-devel@nongnu.org; Wed, 22 Nov 2017 12:03:53 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:1461)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1eHYRB-0001t2-97
+	for qemu-devel@nongnu.org; Wed, 22 Nov 2017 12:03:49 -0500
+References: <1511338200-20417-1-git-send-email-yu.ning@linux.intel.com>
+	<18c1591d-a46a-cd22-fd1c-d87780829622@redhat.com>
+	<7ce3a417-da98-c5b8-ff6c-ab43d91b63da@linux.intel.com>
+From: Thomas Huth <thuth@redhat.com>
+Message-ID: <8bc6cb19-a05f-e592-1e4d-a5af15c0e67f@redhat.com>
+Date: Wed, 22 Nov 2017 18:03:40 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+In-Reply-To: <7ce3a417-da98-c5b8-ff6c-ab43d91b63da@linux.intel.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
-Date: Wed, 22 Nov 2017 16:52:45 -0000
-From: Peter Maydell <peter.maydell@linaro.org>
-Reply-To: Bug 1673976 <1673976@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <20170318142657.21676.52259.malonedeb@chaenomeles.canonical.com>
-Message-Id: <151136956605.14642.13250082471924913700.malone@wampee.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1673976] Re: linux-user clone() can't handle
- glibc posix_spawn() (causes locale-gen to assert)
+Subject: Re: [Qemu-devel] [PATCH] Add a blog post about HAXM acceleration on
+ Windows
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,42 +30,30 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Yu Ning <yu.ning@linux.intel.com>, pbonzini@redhat.com
+Cc: qemu-devel@nongnu.org, jsnow@redhat.com, sw@weilnetz.de, Yu Ning <yu.ning@intel.com>
 
-Thanks for tracking down the glibc change; I will try to set up a chroot
-with a more recent glibc to see whether we can do something that fixes
-that posix_spawn implementation...
+On 22.11.2017 15:52, Yu Ning wrote:
+>=20
+> On 11/22/2017 20:25, Thomas Huth wrote:
+[...]
+>> Would it be OK to remove the qemu-debian-wheezy-gui-with-haxm.png from
+>> the blog post?
+>=20
+> Yes, I'm fine with removing it.=C2=A0 Sorry I haven't installed Jekyll =
+and
+> didn't test the rendering.
+>=20
+> Would you confirm whether that's the only change I need to make in v2?
 
--- =
+No need to respin, since this was just a one-line change, I was able to
+do it on my own (I still removed the screenshot, even if it seemed to be
+working with Paolo's patch to the CSS, since the screenshot looked just
+a bit too big for the blog - I hope that's OK for you).
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1673976
+So the blog post is now online:
 
-Title:
-  linux-user clone() can't handle glibc posix_spawn() (causes locale-gen
-  to assert)
+ https://www.qemu.org/2017/11/22/haxm-usage-windows/
 
-Status in QEMU:
-  New
-
-Bug description:
-  I'm running a command (locale-gen) inside of an armv7h chroot mounted
-  on my x86_64 desktop by putting qemu-arm-static into /usr/bin/ of the
-  chroot file system and I get a core dump.
-
-  locale-gen
-  Generating locales...
-  =C2=A0=C2=A0en_US.UTF-8...localedef: ../sysdeps/unix/sysv/linux/spawni.c:=
-360: __spawnix: Assertion `ec >=3D 0' failed.
-  qemu: uncaught target signal 6 (Aborted) - core dumped
-  /usr/bin/locale-gen: line 41:    34 Aborted                 (core dumped)=
- localedef -i $input -c -f $charset -A /usr/share/locale/locale.alias $loca=
-le
-
-  I've done this same thing successfully for years, but this breakage
-  has appeared some time in the last 3 or so months. Possibly with the
-  update to qemu version 2.8.
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1673976/+subscriptions
+Thanks again,
+ Thomas
