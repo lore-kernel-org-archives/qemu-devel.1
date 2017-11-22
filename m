@@ -1,22 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59752)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35387)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1eHYVy-0006ho-4s
-	for qemu-devel@nongnu.org; Wed, 22 Nov 2017 12:08:47 -0500
+	(envelope-from <cohuck@redhat.com>) id 1eHYnC-0002qR-N2
+	for qemu-devel@nongnu.org; Wed, 22 Nov 2017 12:26:36 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1eHYVw-0004LF-Ox
-	for qemu-devel@nongnu.org; Wed, 22 Nov 2017 12:08:46 -0500
-References: <20171122101958.17065-1-vsementsov@virtuozzo.com>
-	<20171122101958.17065-3-vsementsov@virtuozzo.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <a7572daf-a3dc-a6bf-ae60-a2e825bfc38d@redhat.com>
-Date: Wed, 22 Nov 2017 11:08:35 -0600
+	(envelope-from <cohuck@redhat.com>) id 1eHYn7-0002km-P9
+	for qemu-devel@nongnu.org; Wed, 22 Nov 2017 12:26:34 -0500
+Date: Wed, 22 Nov 2017 18:26:24 +0100
+From: Cornelia Huck <cohuck@redhat.com>
+Message-ID: <20171122182624.6d7cfd6e.cohuck@redhat.com>
+In-Reply-To: <20171122141832.94779-1-pasic@linux.vnet.ibm.com>
+References: <20171122141832.94779-1-pasic@linux.vnet.ibm.com>
 MIME-Version: 1.0
-In-Reply-To: <20171122101958.17065-3-vsementsov@virtuozzo.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="gWXxKEcChkRP2EFpRssb0wUsQ7dpd9vVe"
-Subject: Re: [Qemu-devel] [PATCH 2/5] nbd/server: add nbd_opt_{read,
- drop} to track client->optlen
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [RFC PATCH 1/1] s390x: deprecate s390-squash-mcss
+ machine prop
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,198 +23,142 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org
-Cc: pbonzini@redhat.com, kwolf@redhat.com, mreitz@redhat.com, den@openvz.org
+To: Halil Pasic <pasic@linux.vnet.ibm.com>
+Cc: Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>, Christian Borntraeger <borntraeger@de.ibm.com>, Shalini Chellathurai Saroja <shalini@linux.vnet.ibm.com>, qemu-devel@nongnu.org, qemu-s390x@nongnu.org
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---gWXxKEcChkRP2EFpRssb0wUsQ7dpd9vVe
-From: Eric Blake <eblake@redhat.com>
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
- qemu-block@nongnu.org, qemu-devel@nongnu.org
-Cc: pbonzini@redhat.com, kwolf@redhat.com, mreitz@redhat.com, den@openvz.org
-Message-ID: <a7572daf-a3dc-a6bf-ae60-a2e825bfc38d@redhat.com>
-Subject: Re: [PATCH 2/5] nbd/server: add nbd_opt_{read,drop} to track
- client->optlen
-References: <20171122101958.17065-1-vsementsov@virtuozzo.com>
- <20171122101958.17065-3-vsementsov@virtuozzo.com>
-In-Reply-To: <20171122101958.17065-3-vsementsov@virtuozzo.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+On Wed, 22 Nov 2017 15:18:32 +0100
+Halil Pasic <pasic@linux.vnet.ibm.com> wrote:
 
-On 11/22/2017 04:19 AM, Vladimir Sementsov-Ogievskiy wrote:
-> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+> With the cssids unrestricted (commit <COMMIT HERE> "s390x/css: unrestrict
 
-The subject line says what and sort of implies why, but the commit
-message body is rather sparse.
+I think you can simply reference the title only. I plan to merge both
+in one go.
+
+> cssids") the s390-squash-mcss machine property should not be used.
+> Actually libvirt never supported this, so the expectation is that
+> removing it should be pretty painless.  But let's play nice and deprecate
+> it first.
+> 
+> Signed-off-by: Halil Pasic <pasic@linux.vnet.ibm.com>
+> ---
+> 
+> I'm not sure about the warnig I generate if 's390-squash-mcss'
+> is set to 'on':
+> * There is prior art where we don't warn_report but info_report
+> (commit 83926ad527) 
+
+Tbh, I don't really care about one or the other.
+
+> * Warning iff specified on the command line regardless of value
+> would probably be cleaner. Yet I'm not sure where would I need
+> to hook in to do that.
+
+Yeah, I don't see a good way to do that either. OTOH, I don't really
+think people set this to false explicitly.
+
+> 
+> I would like to reference a commit for "s390x/css: unrestrict cssids"
+> which is currently in RFC status on the list.
+
+As said, I'll just merge them in one go. We can reference the commit in
+the changelog, though.
+
+There also should be an entry in
+https://wiki.qemu.org/Features/LegacyRemoval, and we should update the
+advice in
+https://wiki.qemu.org/index.php/Features/Channel_I/O_Passthrough.
 
 > ---
->  nbd/server.c | 34 ++++++++++++++++++++++------------
->  1 file changed, 22 insertions(+), 12 deletions(-)
+>  hw/s390x/s390-virtio-ccw.c | 5 ++++-
+>  qemu-doc.texi              | 6 ++++++
+>  qemu-options.hx            | 6 +++++-
+>  3 files changed, 15 insertions(+), 2 deletions(-)
+> 
+> diff --git a/hw/s390x/s390-virtio-ccw.c b/hw/s390x/s390-virtio-ccw.c
+> index 6a57f94197..c71e1d7e55 100644
+> --- a/hw/s390x/s390-virtio-ccw.c
+> +++ b/hw/s390x/s390-virtio-ccw.c
+> @@ -554,6 +554,9 @@ static inline void machine_set_squash_mcss(Object *obj, bool value,
+>      S390CcwMachineState *ms = S390_CCW_MACHINE(obj);
+>  
+>      ms->s390_squash_mcss = value;
+> +    if (ms->s390_squash_mcss) {
+> +        warn_report("the machine property 's390-squash-mcss' is deprecated");
 
-Not a net win in lines of code, so a bit more justification may be helpfu=
-l.
+s/the/The/
 
->=20
-> diff --git a/nbd/server.c b/nbd/server.c
-> index bccc0274e7..c9445a89e9 100644
-> --- a/nbd/server.c
-> +++ b/nbd/server.c
-> @@ -139,6 +139,19 @@ static void nbd_client_receive_next_request(NBDCli=
-ent *client);
-> =20
->  */
-> =20
-> +static inline int nbd_opt_read(NBDClient *client, void *buffer, size_t=
- size,
-> +                               Error **errp)
-> +{
-> +    client->optlen -=3D size;
-> +    return qio_channel_read_all(client->ioc, buffer, size, errp) < 0 ?=
- -EIO : 0;
+You should also add an explanation ("obsoleted by lifting the cssid
+restrictions").
 
-Should this code check that client->optlen >=3D size, and issue the
-appropriate error message if not? That may centralize some of the error
-checking repeated elsewhere.
-
-> +}
+> +    }
+>  }
+>  
+>  static inline void s390_machine_initfn(Object *obj)
+> @@ -583,7 +586,7 @@ static inline void s390_machine_initfn(Object *obj)
+>      object_property_add_bool(obj, "s390-squash-mcss",
+>                               machine_get_squash_mcss,
+>                               machine_set_squash_mcss, NULL);
+> -    object_property_set_description(obj, "s390-squash-mcss",
+> +    object_property_set_description(obj, "s390-squash-mcss", "(deprecated) "
+>              "enable/disable squashing subchannels into the default css",
+>              NULL);
+>      object_property_set_bool(obj, false, "s390-squash-mcss", NULL);
+> diff --git a/qemu-doc.texi b/qemu-doc.texi
+> index d383ac44d4..90aa92d8b9 100644
+> --- a/qemu-doc.texi
+> +++ b/qemu-doc.texi
+> @@ -2500,6 +2500,12 @@ enabled via the ``-machine usb=on'' argument.
+>  
+>  The ``-nodefconfig`` argument is a synonym for ``-no-user-config``.
+>  
+> +@subsection -machine virtio-ccw,s390-squash-mcss=on|off (since 2.12.0)
 > +
-> +static inline int nbd_opt_drop(NBDClient *client, size_t size, Error *=
-*errp)
-> +{
-> +    client->optlen -=3D size;
-> +    return nbd_drop(client->ioc, size, errp);
+> +Since version 2.12.0 the cssid can be chosen freely. Instead of squashing
+> +mcss for guest that don't support multiple channel subsystems we recommend
+> +putting all devices into the default channel subsystem (that is 0xfe).
 
-Same question on size validation.
+"The ``s390-squash-mcss=on`` property has been obsoleted by allowing the
+cssid to be chosen freely. Instead of squashing subchannels into the
+default channel subsystem image for guests that do not support multiple
+channel subsystems, all devices can be put into the default channel
+subsystem image."
 
-> +}
 > +
->  /* Send a reply header, including length, but no payload.
->   * Return -errno on error, 0 on success. */
->  static int nbd_negotiate_send_rep_len(NBDClient *client, uint32_t type=
-,
-> @@ -299,7 +312,7 @@ static int nbd_negotiate_handle_export_name(NBDClie=
-nt *client,
->          error_setg(errp, "Bad length received");
->          return -EINVAL;
->      }
-> -    if (nbd_read(client->ioc, name, client->optlen, errp) < 0) {
-> +    if (nbd_opt_read(client, name, client->optlen, errp) < 0) {
->          error_prepend(errp, "read failed: ");
->          return -EINVAL;
+>  @section qemu-img command line arguments
+>  
+>  @subsection convert -s (since 2.0.0)
+> diff --git a/qemu-options.hx b/qemu-options.hx
+> index 3728e9b4dd..53b13ec203 100644
+> --- a/qemu-options.hx
+> +++ b/qemu-options.hx
+> @@ -43,7 +43,7 @@ DEF("machine", HAS_ARG, QEMU_OPTION_machine, \
+>      "                suppress-vmdesc=on|off disables self-describing migration (default=off)\n"
+>      "                nvdimm=on|off controls NVDIMM support (default=off)\n"
+>      "                enforce-config-section=on|off enforce configuration section migration (default=off)\n"
+> -    "                s390-squash-mcss=on|off controls support for squashing into default css (default=off)\n",
+> +    "                s390-squash-mcss=on|off (deprecated) controls support for squashing into default css (default=off)\n",
+>      QEMU_ARCH_ALL)
+>  STEXI
+>  @item -machine [type=]@var{name}[,prop=@var{value}[,...]]
+> @@ -98,6 +98,10 @@ Enables or disables NVDIMM support. The default is off.
+>  @item s390-squash-mcss=on|off
+>  Enables or disables squashing subchannels into the default css.
+>  The default is off.
+> +NOTE: This property is deprecated and may be removed in future releases.
 
-Here's an example caller that had a previous size validation.
+s/may/will/
 
->      }
-> @@ -383,40 +396,36 @@ static int nbd_negotiate_handle_info(NBDClient *c=
-lient, uint16_t myflags,
->          msg =3D "overall request too short";
->          goto invalid;
->      }
-> -    if (nbd_read(client->ioc, &namelen, sizeof(namelen), errp) < 0) {
-> +    if (nbd_opt_read(client, &namelen, sizeof(namelen), errp) < 0) {
->          return -EIO;
+Let them complain :)
 
-And again, a size validation right before the call.
+> +Since version 2.12.0 the cssid can be chosen freely. Instead of squashing
+> +mcss for guest that don't support multiple channel subsystems we recommend
+> +putting all devices into the default channel subsystem (that is 0xfe).
 
->      }
->      be32_to_cpus(&namelen);
-> -    client->optlen -=3D sizeof(namelen);
+I'd use the same text as above.
 
-Okay, part of the refactoring means you don't have to remember to track
-remaining size separately from reading; that's a nice feature.  I
-suspect it is also possible to assert that client->optlen is zero before
-reading the next opt (I'm reviewing the patch in order, we'll see if I
-come back here). [1]
+>  @item enforce-config-section=on|off
+>  If @option{enforce-config-section} is set to @var{on}, force migration
+>  code to send configuration section even if the machine-type sets the
 
->      if (namelen > client->optlen - sizeof(requests) ||
->          (client->optlen - namelen) % 2)
->      {
->          msg =3D "name length is incorrect";
->          goto invalid;
->      }
-> -    if (nbd_read(client->ioc, name, namelen, errp) < 0) {
-> +    if (nbd_opt_read(client, name, namelen, errp) < 0) {
->          return -EIO;
->      }
-
-Another size check prior to the call (actually checking multiple
-conditions)...
-
->      name[namelen] =3D '\0';
-> -    client->optlen -=3D namelen;
->      trace_nbd_negotiate_handle_export_name_request(name);
-> =20
-> -    if (nbd_read(client->ioc, &requests, sizeof(requests), errp) < 0) =
-{
-> +    if (nbd_opt_read(client, &requests, sizeof(requests), errp) < 0) {=
-
->          return -EIO;
-
-=2E..and no direct size check before this call, because the earlier size
-checks already covered it.  Arguably, the in-place size check error
-messages may be slightly more precise, but any message at all about
-unexpected sizing is appropriate (given that only broken clients should
-be sending incorrect sizes) - so I'm still leaning towards a stronger
-refactoring that puts the size check in the helper function.
-
-> @@ -521,7 +530,7 @@ static int nbd_negotiate_handle_info(NBDClient *cli=
-ent, uint16_t myflags,
->      return rc;
-> =20
->   invalid:
-> -    if (nbd_drop(client->ioc, client->optlen, errp) < 0) {
-> +    if (nbd_opt_drop(client, client->optlen, errp) < 0) {
->          return -EIO;
->      }
->      return nbd_negotiate_send_rep_err(client, NBD_REP_ERR_INVALID,
-> @@ -715,7 +724,7 @@ static int nbd_negotiate_options(NBDClient *client,=
- uint16_t myflags,
->                  return -EINVAL;
-> =20
->              default:
-> -                if (nbd_drop(client->ioc, length, errp) < 0) {
-> +                if (nbd_opt_drop(client, length, errp) < 0) {
-
-Isn't length =3D=3D client->optlen here? If so, can we omit the length
-parameter to nbd_opt_drop(), and instead have it defined as dropping to
-the end of the current option?
-
-> @@ -821,6 +830,7 @@ static int nbd_negotiate_options(NBDClient *client,=
- uint16_t myflags,
->          if (ret < 0) {
->              return ret;
->          }
-> +        assert(client->optlen =3D=3D 0);
-
-[1] Ah, you did add the assertion.
-
-I'm going to propose a variant on this patch, to cover the points I made
-above about ease-of-use (and to hopefully show a net win in lines of code=
-).
-
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
-
-
---gWXxKEcChkRP2EFpRssb0wUsQ7dpd9vVe
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
-
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAloVrxMACgkQp6FrSiUn
-Q2oaWwf/SKwZJQMZcxIM/nPxKdgJmKmGgn5Ary7iweVGRkgkfHz4rSrKstR9MlvX
-x+thPHm1mm9aCYWIean/E23OaNilz5L5bsl7+lPsKBzAvh5bU/cdg3BQsB5+6sTG
-ngKNEAQ3T+auizzEp7Qpo+lUkqyKGre0qL1n+b4fOTCiiCSinnPO7WuFpZ+0LTfa
-YvLm+7pHzbo9CBsAFNOXlna/THa1zsCRCqP7/GAQZ0ChFrPdZnGykJekHeJfom6R
-TkGC9O5NJxyJ+ONrgnxqgeEkfTFZB29rzQIvYd9w3DnWNqY6iYPZWSMp6ZrYOSWr
-pLaDouLzR1RdJYioAnQheyBp9WuS+g==
-=6S0F
------END PGP SIGNATURE-----
-
---gWXxKEcChkRP2EFpRssb0wUsQ7dpd9vVe--
+I'd love to do that for 2.11 already, but it is a bit too late for
+that, I think.
