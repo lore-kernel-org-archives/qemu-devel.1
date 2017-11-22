@@ -1,31 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33274)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33273)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1eHX9V-0003ta-58
+	(envelope-from <bounces@canonical.com>) id 1eHX9V-0003tZ-4q
 	for qemu-devel@nongnu.org; Wed, 22 Nov 2017 10:41:30 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1eHX9R-0004PK-Su
+	(envelope-from <bounces@canonical.com>) id 1eHX9S-0004PU-09
 	for qemu-devel@nongnu.org; Wed, 22 Nov 2017 10:41:29 -0500
-Received: from indium.canonical.com ([91.189.90.7]:33106)
+Received: from indium.canonical.com ([91.189.90.7]:33124)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1eHX9R-0004OV-Lm
+	id 1eHX9R-0004Oq-QV
 	for qemu-devel@nongnu.org; Wed, 22 Nov 2017 10:41:25 -0500
 Received: from loganberry.canonical.com ([91.189.90.37])
 	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1eHX9P-0007nF-JV
-	for <qemu-devel@nongnu.org>; Wed, 22 Nov 2017 15:41:23 +0000
+	id 1eHX9Q-0007jd-38
+	for <qemu-devel@nongnu.org>; Wed, 22 Nov 2017 15:41:24 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 907B62E80CD
-	for <qemu-devel@nongnu.org>; Wed, 22 Nov 2017 15:41:23 +0000 (UTC)
+	by loganberry.canonical.com (Postfix) with ESMTP id 155602E80D3
+	for <qemu-devel@nongnu.org>; Wed, 22 Nov 2017 15:41:24 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Wed, 22 Nov 2017 15:26:39 -0000
+Date: Wed, 22 Nov 2017 15:30:10 -0000
 From: James Cowgill <jcowgill@debian.org>
 Reply-To: Bug 1673976 <1673976@bugs.launchpad.net>
 Sender: bounces@canonical.com
 References: <20170318142657.21676.52259.malonedeb@chaenomeles.canonical.com>
-Message-Id: <151136439958.7769.1815381628972958259.malone@chaenomeles.canonical.com>
+Message-Id: <151136461101.18190.14465747737982475589.malone@gac.canonical.com>
 Errors-To: bounces@canonical.com
 Subject: [Qemu-devel] [Bug 1673976] Re: linux-user clone() can't handle
  glibc posix_spawn() (causes locale-gen to assert)
@@ -39,17 +39,10 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-I think I see the problem. This glibc commit rewrote the posix_spawn implem=
-entation on Linux:
-https://sourceware.org/git/?p=3Dglibc.git;a=3Dcommit;h=3D9ff72da471a509a8c1=
-9791efe469f47fa6977410
-
-It now relies on the exact behavior of clone(CLONE_VM | CLONE_VFORK) - ie:
-- That the parent will wait for the child to exec before continuing.
-- Writes to memory in the child are later visible in the parent
-
-QEMU emulates this clone using fork() which no longer works properly and
-causes the assertion failure.
+Sorry, this is probably the commit that broke things (not the one above). I=
+ was added in glibc 2.25:
+https://sourceware.org/git/?p=3Dglibc.git;a=3Dcommit;h=3D4b4d4056bb154603f3=
+6c6f8845757c1012758158
 
 -- =
 
