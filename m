@@ -1,33 +1,35 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55157)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55187)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pmorel@linux.vnet.ibm.com>) id 1eHd9S-0007CX-08
-	for qemu-devel@nongnu.org; Wed, 22 Nov 2017 17:05:51 -0500
+	(envelope-from <pmorel@linux.vnet.ibm.com>) id 1eHd9U-0007Cf-5G
+	for qemu-devel@nongnu.org; Wed, 22 Nov 2017 17:05:53 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pmorel@linux.vnet.ibm.com>) id 1eHd9N-00035V-W6
-	for qemu-devel@nongnu.org; Wed, 22 Nov 2017 17:05:49 -0500
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:49506)
+	(envelope-from <pmorel@linux.vnet.ibm.com>) id 1eHd9Q-00038q-1h
+	for qemu-devel@nongnu.org; Wed, 22 Nov 2017 17:05:52 -0500
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:49276
+	helo=mx0a-001b2d01.pphosted.com)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <pmorel@linux.vnet.ibm.com>)
-	id 1eHd9N-00034h-NI
-	for qemu-devel@nongnu.org; Wed, 22 Nov 2017 17:05:45 -0500
-Received: from pps.filterd (m0098393.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
-	vAMM51pb055177
-	for <qemu-devel@nongnu.org>; Wed, 22 Nov 2017 17:05:42 -0500
-Received: from e06smtp13.uk.ibm.com (e06smtp13.uk.ibm.com [195.75.94.109])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2edg854xt2-1
+	id 1eHd9P-000384-SD
+	for qemu-devel@nongnu.org; Wed, 22 Nov 2017 17:05:47 -0500
+Received: from pps.filterd (m0098419.ppops.net [127.0.0.1])
+	by mx0b-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
+	vAMM3uW3084549
+	for <qemu-devel@nongnu.org>; Wed, 22 Nov 2017 17:05:46 -0500
+Received: from e06smtp12.uk.ibm.com (e06smtp12.uk.ibm.com [195.75.94.108])
+	by mx0b-001b2d01.pphosted.com with ESMTP id 2edgc7m6hg-1
 	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Wed, 22 Nov 2017 17:05:41 -0500
+	for <qemu-devel@nongnu.org>; Wed, 22 Nov 2017 17:05:46 -0500
 Received: from localhost
-	by e06smtp13.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	by e06smtp12.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
 	Only! Violators will be prosecuted
 	for <qemu-devel@nongnu.org> from <pmorel@linux.vnet.ibm.com>;
-	Wed, 22 Nov 2017 22:05:38 -0000
+	Wed, 22 Nov 2017 22:05:42 -0000
 From: Pierre Morel <pmorel@linux.vnet.ibm.com>
-Date: Wed, 22 Nov 2017 23:05:27 +0100
-Message-Id: <1511388334-16347-1-git-send-email-pmorel@linux.vnet.ibm.com>
-Subject: [Qemu-devel] [PATCH v3 0/7] s390x/pci: Improve zPCI to cover more
- cases
+Date: Wed, 22 Nov 2017 23:05:30 +0100
+In-Reply-To: <1511388334-16347-1-git-send-email-pmorel@linux.vnet.ibm.com>
+References: <1511388334-16347-1-git-send-email-pmorel@linux.vnet.ibm.com>
+Message-Id: <1511388334-16347-4-git-send-email-pmorel@linux.vnet.ibm.com>
+Subject: [Qemu-devel] [PATCH v3 3/7] s390x/pci: rework PCI LOAD
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -39,58 +41,78 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: cohuck@redhat.com, agraf@suse.de, borntraeger@de.ibm.com, zyimin@linux.vnet.ibm.com, pasic@linux.vnet.ibm.com
 
-This patch fixes the following BUG:
-Even a guest is able to detect virtio_pci device, the init function
-the Linux virtio_pci driver will hang because zPCI does not support
-the subregions used by virtio_pci.
+Enhance the fault detection, correction of the fault reporting.
 
-It follows that right now the PCI support is very limited
-(e.g. pass through of a host vfio device)
-To enable features like virtio-pci several modifications needs to be
-done.
+Signed-off-by: Pierre Morel <pmorel@linux.vnet.ibm.com>
+Reviewed-by: Yi Min Zhao <zyimin@linux.vnet.ibm.com>
+---
+ hw/s390x/s390-pci-inst.c | 25 ++++++++++++++-----------
+ 1 file changed, 14 insertions(+), 11 deletions(-)
 
-As already stated above, Virtio-PCI uses subregions, which may eventually
-be discontinuous inside bars instead of a single flat region often used
-by real devices.
-The address offset being formerly calculated from the BAR base address
-must be adapted to the subregions instead of to the single region.
-
-This patch provides the new calculation for the three kind of BAR
-access, zPCI STORE, zPCI LOAD and zPCI STORE BLOCK done by zPCI.
-
-We use the opportunity to
- - enhance the fault detection for zPCI STORE and LOAD,
- - enhance the fault detection and to provide the maximum STORE BLOCK
-   block size, maxstbl, for zPCI STORE BLOCK
- - factor out part of the code used to calculate the offset and
-   access the BARs,
- - factor out the code for endianess conversion.
-
-
-Pierre Morel (7):
-  s390x/pci: factor out endianess conversion
-  s390x/pci: rework PCI STORE
-  s390x/pci: rework PCI LOAD
-  s390x/pci: rework PCI STORE BLOCK
-  s390x/pci: move the memory region read from pcilg
-  s390x/pci: move the memory region write from pcistg
-  s390x/pci: search for subregion inside the BARs
-
- hw/s390x/s390-pci-bus.h  |   1 +
- hw/s390x/s390-pci-inst.c | 248 ++++++++++++++++++++++++++++-------------------
- hw/s390x/s390-pci-inst.h |   2 +-
- 3 files changed, 151 insertions(+), 100 deletions(-)
-
+diff --git a/hw/s390x/s390-pci-inst.c b/hw/s390x/s390-pci-inst.c
+index 930c197..2295412 100644
+--- a/hw/s390x/s390-pci-inst.c
++++ b/hw/s390x/s390-pci-inst.c
+@@ -373,6 +373,11 @@ int pcilg_service_call(S390CPU *cpu, uint8_t r1, uint8_t r2)
+     len = env->regs[r2] & 0xf;
+     offset = env->regs[r2 + 1];
+ 
++    if (!(fh & FH_MASK_ENABLE)) {
++        setcc(cpu, ZPCI_PCI_LS_INVAL_HANDLE);
++        return 0;
++    }
++
+     pbdev = s390_pci_find_dev_by_fh(s390_get_phb(), fh);
+     if (!pbdev) {
+         DPRINTF("pcilg no pci dev\n");
+@@ -381,12 +386,7 @@ int pcilg_service_call(S390CPU *cpu, uint8_t r1, uint8_t r2)
+     }
+ 
+     switch (pbdev->state) {
+-    case ZPCI_FS_RESERVED:
+-    case ZPCI_FS_STANDBY:
+-    case ZPCI_FS_DISABLED:
+     case ZPCI_FS_PERMANENT_ERROR:
+-        setcc(cpu, ZPCI_PCI_LS_INVAL_HANDLE);
+-        return 0;
+     case ZPCI_FS_ERROR:
+         setcc(cpu, ZPCI_PCI_LS_ERR);
+         s390_set_status_code(env, r2, ZPCI_PCI_ST_BLOCKED);
+@@ -395,8 +395,9 @@ int pcilg_service_call(S390CPU *cpu, uint8_t r1, uint8_t r2)
+         break;
+     }
+ 
+-    if (pcias < 6) {
+-        if ((8 - (offset & 0x7)) < len) {
++    switch (pcias) {
++    case 0 ... 5:
++        if (!len || (len > (8 - (offset & 0x7)))) {
+             program_interrupt(env, PGM_OPERAND, 4);
+             return 0;
+         }
+@@ -407,8 +408,9 @@ int pcilg_service_call(S390CPU *cpu, uint8_t r1, uint8_t r2)
+             program_interrupt(env, PGM_OPERAND, 4);
+             return 0;
+         }
+-    } else if (pcias == 15) {
+-        if ((4 - (offset & 0x3)) < len) {
++        break;
++    case 15:
++        if (!len || (len > (4 - (offset & 0x3))) || len == 3) {
+             program_interrupt(env, PGM_OPERAND, 4);
+             return 0;
+         }
+@@ -419,8 +421,9 @@ int pcilg_service_call(S390CPU *cpu, uint8_t r1, uint8_t r2)
+             program_interrupt(env, PGM_OPERAND, 4);
+             return 0;
+         }
+-    } else {
+-        DPRINTF("invalid space\n");
++        break;
++    default:
++        DPRINTF("pcilg invalid space\n");
+         setcc(cpu, ZPCI_PCI_LS_ERR);
+         s390_set_status_code(env, r2, ZPCI_PCI_ST_INVAL_AS);
+         return 0;
 -- 
 2.7.4
-
-Changelog:
-
-from v2
-- rewording of comments, coding style.
-
-from v1
-- suppress fallthrough to PCI_ROM_SLOT to handle it in the default case.
-- reword most of the patch commit messages
-- add comments to the endianness conversion
-- reword somme comments inside the patches
