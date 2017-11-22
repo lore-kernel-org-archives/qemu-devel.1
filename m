@@ -1,19 +1,18 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37508)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37953)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <aik@ozlabs.ru>) id 1eHNOB-0000QQ-2U
-	for qemu-devel@nongnu.org; Wed, 22 Nov 2017 00:15:59 -0500
+	(envelope-from <aik@ozlabs.ru>) id 1eHNPb-0001pW-42
+	for qemu-devel@nongnu.org; Wed, 22 Nov 2017 00:17:28 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <aik@ozlabs.ru>) id 1eHNO7-0004I3-Un
-	for qemu-devel@nongnu.org; Wed, 22 Nov 2017 00:15:59 -0500
-Received: from ozlabs.ru ([107.173.13.209]:59386)
+	(envelope-from <aik@ozlabs.ru>) id 1eHNPX-0005DZ-W8
+	for qemu-devel@nongnu.org; Wed, 22 Nov 2017 00:17:27 -0500
+Received: from ozlabs.ru ([107.173.13.209]:59574)
 	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <aik@ozlabs.ru>) id 1eHNO7-0004Hg-Ow
-	for qemu-devel@nongnu.org; Wed, 22 Nov 2017 00:15:55 -0500
+	(envelope-from <aik@ozlabs.ru>) id 1eHNPX-0005DR-Pw
+	for qemu-devel@nongnu.org; Wed, 22 Nov 2017 00:17:23 -0500
 From: Alexey Kardashevskiy <aik@ozlabs.ru>
-Date: Wed, 22 Nov 2017 16:15:52 +1100
-Message-Id: <20171122051552.3529-1-aik@ozlabs.ru>
-Subject: [Qemu-devel] [PATCH qemu] vfio/spapr: Allow fallback to SPAPR TCE
- IOMMU v1
+Date: Wed, 22 Nov 2017 16:16:49 +1100
+Message-Id: <20171122051649.3599-1-aik@ozlabs.ru>
+Subject: [Qemu-devel] [PATCH qemu] vfio: Allow configuration without INTx
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,34 +24,62 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Alexey Kardashevskiy <aik@ozlabs.ru>, David Gibson <david@gibson.dropbear.id.au>, Alex Williamson <alex.williamson@redhat.com>
 
-The vfio_iommu_spapr_tce driver always advertises v1 and v2 IOMMU support,
-however PR KVM (a special version of KVM designed to work in
-a paravirtualized system; these days used for nested virtualizaion) only
-supports the "pseries" platform which does not support v2. Since there is
-no way to choose the IOMMU version in QEMU, it fails to start.
+On some platforms INTx may not be enabled on a KVM host (one such
+example is IBM pHyp hypervisor and this is intentional). However
+the PCI_INTERRUPT_PIN is not 0 so QEMU tries initializing INTx, fails as
+(!vdev->pdev->irq) in the VFIO's vfio_intx_enable() and this is
+a fatal error.
 
-This adds a fallback to the v1 IOMMU if v2 cannot be used.
+This adds a debug switch - "x-no-intx" - in order to allow broken INTx
+configuration.
 
 Signed-off-by: Alexey Kardashevskiy <aik@ozlabs.ru>
 ---
- hw/vfio/common.c | 5 +++++
- 1 file changed, 5 insertions(+)
 
-diff --git a/hw/vfio/common.c b/hw/vfio/common.c
-index 7b2924c..cd81cc9 100644
---- a/hw/vfio/common.c
-+++ b/hw/vfio/common.c
-@@ -1040,6 +1040,11 @@ static int vfio_connect_container(VFIOGroup *group, AddressSpace *as,
-             v2 ? VFIO_SPAPR_TCE_v2_IOMMU : VFIO_SPAPR_TCE_IOMMU;
-         ret = ioctl(fd, VFIO_SET_IOMMU, container->iommu_type);
+In practice, test teams run PR KVM under HV KVM and there INTx is enabled
+on all levels so having this as a debug switch is enough.
+---
+ hw/vfio/pci.h | 1 +
+ hw/vfio/pci.c | 8 +++++++-
+ 2 files changed, 8 insertions(+), 1 deletion(-)
+
+diff --git a/hw/vfio/pci.h b/hw/vfio/pci.h
+index 502a575..c5e168e 100644
+--- a/hw/vfio/pci.h
++++ b/hw/vfio/pci.h
+@@ -141,6 +141,7 @@ typedef struct VFIOPCIDevice {
+     bool has_flr;
+     bool has_pm_reset;
+     bool rom_read_failed;
++    bool no_intx;
+     bool no_kvm_intx;
+     bool no_kvm_msi;
+     bool no_kvm_msix;
+diff --git a/hw/vfio/pci.c b/hw/vfio/pci.c
+index c977ee3..c9caf6a 100644
+--- a/hw/vfio/pci.c
++++ b/hw/vfio/pci.c
+@@ -2869,7 +2869,12 @@ static void vfio_realize(PCIDevice *pdev, Error **errp)
+         pci_device_set_intx_routing_notifier(&vdev->pdev, vfio_intx_update);
+         ret = vfio_intx_enable(vdev, errp);
          if (ret) {
-+            container->iommu_type = VFIO_SPAPR_TCE_IOMMU;
-+            v2 = false;
-+            ret = ioctl(fd, VFIO_SET_IOMMU, container->iommu_type);
-+        }
-+        if (ret) {
-             error_setg_errno(errp, errno, "failed to set iommu for container");
-             ret = -errno;
-             goto free_container_exit;
+-            goto out_teardown;
++            if (vdev->no_intx) {
++                error_report_err(*errp);
++                *errp = NULL;
++            } else {
++                goto out_teardown;
++            }
+         }
+     }
+ 
+@@ -2986,6 +2991,7 @@ static Property vfio_pci_dev_properties[] = {
+     DEFINE_PROP_BIT("x-igd-opregion", VFIOPCIDevice, features,
+                     VFIO_FEATURE_ENABLE_IGD_OPREGION_BIT, false),
+     DEFINE_PROP_BOOL("x-no-mmap", VFIOPCIDevice, vbasedev.no_mmap, false),
++    DEFINE_PROP_BOOL("x-no-intx", VFIOPCIDevice, no_intx, false),
+     DEFINE_PROP_BOOL("x-no-kvm-intx", VFIOPCIDevice, no_kvm_intx, false),
+     DEFINE_PROP_BOOL("x-no-kvm-msi", VFIOPCIDevice, no_kvm_msi, false),
+     DEFINE_PROP_BOOL("x-no-kvm-msix", VFIOPCIDevice, no_kvm_msix, false),
 -- 
 2.11.0
