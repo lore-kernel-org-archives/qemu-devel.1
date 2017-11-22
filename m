@@ -1,34 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53299)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59432)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1eHWgk-0002fT-Se
-	for qemu-devel@nongnu.org; Wed, 22 Nov 2017 10:11:47 -0500
+	(envelope-from <imammedo@redhat.com>) id 1eHX2r-0000Kh-QP
+	for qemu-devel@nongnu.org; Wed, 22 Nov 2017 10:34:38 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1eHWgf-0000bo-QF
-	for qemu-devel@nongnu.org; Wed, 22 Nov 2017 10:11:46 -0500
-Received: from indium.canonical.com ([91.189.90.7]:41522)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1eHWgf-0000bU-Jh
-	for qemu-devel@nongnu.org; Wed, 22 Nov 2017 10:11:41 -0500
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1eHWgd-0007jn-Go
-	for <qemu-devel@nongnu.org>; Wed, 22 Nov 2017 15:11:39 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id E46432E80CE
-	for <qemu-devel@nongnu.org>; Wed, 22 Nov 2017 15:11:38 +0000 (UTC)
+	(envelope-from <imammedo@redhat.com>) id 1eHX2q-00019e-SU
+	for qemu-devel@nongnu.org; Wed, 22 Nov 2017 10:34:37 -0500
+Date: Wed, 22 Nov 2017 16:34:26 +0100
+From: Igor Mammedov <imammedo@redhat.com>
+Message-ID: <20171122163426.13f3ed3f@redhat.com>
+In-Reply-To: <20171106154813.19936-30-andrew.smirnov@gmail.com>
+References: <20171106154813.19936-1-andrew.smirnov@gmail.com>
+	<20171106154813.19936-30-andrew.smirnov@gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Date: Wed, 22 Nov 2017 15:01:37 -0000
-From: James Cowgill <jcowgill@debian.org>
-Reply-To: Bug 1673976 <1673976@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <20170318142657.21676.52259.malonedeb@chaenomeles.canonical.com>
-Message-Id: <151136289764.7769.12249782009632800336.malone@chaenomeles.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1673976] Re: linux-user clone() can't handle
- glibc posix_spawn() (causes locale-gen to assert)
+Subject: Re: [Qemu-devel] [PATCH v3 29/30] i.MX: Add i.MX7 SOC
+ implementation.
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,44 +24,67 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Andrey Smirnov <andrew.smirnov@gmail.com>
+Cc: qemu-arm@nongnu.org, Peter Maydell <peter.maydell@linaro.org>, Jason Wang <jasowang@redhat.com>, Philippe =?UTF-8?B?TWF0aGlldS1EYXVkw6k=?= <f4bug@amsat.org>, qemu-devel@nongnu.org, yurovsky@gmail.com
 
-I can reproduce the bug in a mips64el chroot running current Debian
-unstable - the posix_spawn example you mention fails there. I have
-tested v2.11.0-rc2 and it fails there as well. I think you need glibc >=3D
-2.25 to trigger the bug (artful / bionic chroot). I only noticed it due
-to Debian updating to a newer glibc recently.
+On Mon,  6 Nov 2017 07:48:12 -0800
+Andrey Smirnov <andrew.smirnov@gmail.com> wrote:
 
--- =
+> The following interfaces are partially or fully emulated:
+>=20
+>     * up to 2 Cortex A9 cores (SMP works with PSCI)
+>     * A7 MPCORE (identical to A15 MPCORE)
+>     * 4 GPTs modules
+>     * 7 GPIO controllers
+>     * 2 IOMUXC controllers
+>     * 1 CCM module
+>     * 1 SVNS module
+>     * 1 SRC module
+>     * 1 GPCv2 controller
+>     * 4 eCSPI controllers
+>     * 4 I2C controllers
+>     * 7 i.MX UART controllers
+>     * 2 FlexCAN controllers
+>     * 2 Ethernet controllers (FEC)
+>     * 3 SD controllers (USDHC)
+>     * 4 WDT modules
+>     * 1 SDMA module
+>     * 1 GPR module
+>     * 2 USBMISC modules
+>     * 2 ADC modules
+>     * 1 PCIe controller
+>=20
+> Tested to boot and work with upstream Linux (4.13+) guest.
+>=20
+> Cc: Peter Maydell <peter.maydell@linaro.org>
+> Cc: Jason Wang <jasowang@redhat.com>
+> Cc: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
+> Cc: qemu-devel@nongnu.org
+> Cc: qemu-arm@nongnu.org
+> Cc: yurovsky@gmail.com
+> Signed-off-by: Andrey Smirnov <andrew.smirnov@gmail.com>
+> ---
+...
+> +
+> +static void fsl_imx7_init(Object *obj)
+> +{
+> +    BusState *sysbus =3D sysbus_get_default();
+> +    FslIMX7State *s =3D FSL_IMX7(obj);
+> +    char name[NAME_SIZE];
+> +    int i;
+> +
+> +    if (smp_cpus > FSL_IMX7_NUM_CPUS) {
+> +        error_report("%s: Only %d CPUs are supported (%d requested)",
+> +                     TYPE_FSL_IMX7, FSL_IMX7_NUM_CPUS, smp_cpus);
+> +        exit(1);
+> +    }
+> +
+> +    for (i =3D 0; i < smp_cpus; i++) {
+> +        object_initialize(&s->cpu[i], sizeof(s->cpu[i]),
+> +                          "cortex-a7-" TYPE_ARM_CPU);
+pls reuse ARM_CPU_TYPE_NAME() macro here
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1673976
-
-Title:
-  linux-user clone() can't handle glibc posix_spawn() (causes locale-gen
-  to assert)
-
-Status in QEMU:
-  New
-
-Bug description:
-  I'm running a command (locale-gen) inside of an armv7h chroot mounted
-  on my x86_64 desktop by putting qemu-arm-static into /usr/bin/ of the
-  chroot file system and I get a core dump.
-
-  locale-gen
-  Generating locales...
-  =C2=A0=C2=A0en_US.UTF-8...localedef: ../sysdeps/unix/sysv/linux/spawni.c:=
-360: __spawnix: Assertion `ec >=3D 0' failed.
-  qemu: uncaught target signal 6 (Aborted) - core dumped
-  /usr/bin/locale-gen: line 41:    34 Aborted                 (core dumped)=
- localedef -i $input -c -f $charset -A /usr/share/locale/locale.alias $loca=
-le
-
-  I've done this same thing successfully for years, but this breakage
-  has appeared some time in the last 3 or so months. Possibly with the
-  update to qemu version 2.8.
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1673976/+subscriptions
+> +        snprintf(name, NAME_SIZE, "cpu%d", i);
+> +        object_property_add_child(obj, name, OBJECT(&s->cpu[i]),
+> +                                  &error_fatal);
+> +    }
