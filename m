@@ -1,30 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55519)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56062)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1eHQGO-00075e-DO
-	for qemu-devel@nongnu.org; Wed, 22 Nov 2017 03:20:14 -0500
+	(envelope-from <quintela@redhat.com>) id 1eHQIe-0007ye-9H
+	for qemu-devel@nongnu.org; Wed, 22 Nov 2017 03:22:29 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1eHQGI-0001hM-G0
-	for qemu-devel@nongnu.org; Wed, 22 Nov 2017 03:20:08 -0500
-Received: from mail-wm0-x230.google.com ([2a00:1450:400c:c09::230]:41555)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1eHQGI-0001h4-8r
-	for qemu-devel@nongnu.org; Wed, 22 Nov 2017 03:20:02 -0500
-Received: by mail-wm0-x230.google.com with SMTP id b189so8401671wmd.0
-	for <qemu-devel@nongnu.org>; Wed, 22 Nov 2017 00:20:02 -0800 (PST)
-From: Richard Henderson <richard.henderson@linaro.org>
-References: <20171109144155.17076-1-batuzovk@ispras.ru>
-	<20171109144155.17076-4-batuzovk@ispras.ru>
-	<c4be5f68-2093-db46-c917-953578a22d46@linaro.org>
-Message-ID: <842a000d-11bf-a3f4-e1ac-8f0f6ed07324@linaro.org>
-Date: Wed, 22 Nov 2017 09:19:58 +0100
+	(envelope-from <quintela@redhat.com>) id 1eHQIZ-0002Oj-50
+	for qemu-devel@nongnu.org; Wed, 22 Nov 2017 03:22:28 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:53778)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1eHQIY-0002Oa-T2
+	for qemu-devel@nongnu.org; Wed, 22 Nov 2017 03:22:23 -0500
+From: Juan Quintela <quintela@redhat.com>
+In-Reply-To: <20171121185457.GA2913@work-vm> (David Alan Gilbert's message of
+	"Tue, 21 Nov 2017 18:54:57 +0000")
+References: <20171110203516.17027-1-danielhb@linux.vnet.ibm.com>
+	<87vai3pj9e.fsf@secure.mitica> <20171121185457.GA2913@work-vm>
+Reply-To: quintela@redhat.com
+Date: Wed, 22 Nov 2017 09:22:19 +0100
+Message-ID: <87h8tmpvt0.fsf@secure.mitica>
 MIME-Version: 1.0
-In-Reply-To: <c4be5f68-2093-db46-c917-953578a22d46@linaro.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH RFC 3/3] tcg/optimize: handle vector loads
- and stores during copy propagation
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PATCH v1] migration/ram.c: do not set
+ 'postcopy_running' in POSTCOPY_INCOMING_END
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,25 +29,121 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Kirill Batuzov <batuzovk@ispras.ru>, qemu-devel@nongnu.org
-Cc: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>
+To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Cc: Daniel Henrique Barboza <danielhb@linux.vnet.ibm.com>, qemu-devel@nongnu.org, mdroth@linux.vnet.ibm.com
 
-On 11/22/2017 09:06 AM, Richard Henderson wrote:
-> On 11/09/2017 03:41 PM, Kirill Batuzov wrote:
->> +                    } else if (re == INDEX_op_mov_vec) {
->> +                        if (ts_are_copies(arg_temp(op->args[0]), ml->copy)) {
->> +                            tcg_op_remove(s, op);
->> +                            break;
->> +                        }
->> +                        op->opc = re;
->> +                        op->args[1] = temp_arg(find_better_copy(s, ml->copy));
->> +                        op->args[2] = op->args[3];
->>                      } else {
-> 
-> Why don't you send this through tcg_opt_gen_mov as with mov_i32 and mov_i64?
+"Dr. David Alan Gilbert" <dgilbert@redhat.com> wrote:
+> * Juan Quintela (quintela@redhat.com) wrote:
+>> Daniel Henrique Barboza <danielhb@linux.vnet.ibm.com> wrote:
+>> > When migrating a VM with 'migrate_set_capability postcopy-ram on'
+>> > a postcopy_state is set during the process, ending up with the
+>> > state POSTCOPY_INCOMING_END when the migration is over. This
+>> > postcopy_state is taken into account inside ram_load to check
+>> > how it will load the memory pages. This same ram_load is called when
+>> > in a loadvm command.
+>> >
+>> > Inside ram_load, the logic to see if we're at postcopy_running state
+>> > is:
+>> >
+>> > postcopy_running = postcopy_state_get() >= POSTCOPY_INCOMING_LISTENING
+>> >
+>> > postcopy_state_get() returns this enum type:
+>> >
+>> > typedef enum {
+>> >     POSTCOPY_INCOMING_NONE = 0,
+>> >     POSTCOPY_INCOMING_ADVISE,
+>> >     POSTCOPY_INCOMING_DISCARD,
+>> >     POSTCOPY_INCOMING_LISTENING,
+>> >     POSTCOPY_INCOMING_RUNNING,
+>> >     POSTCOPY_INCOMING_END
+>> > } PostcopyState;
+>> >
+>> > In the case where ram_load is executed and postcopy_state is
+>> > POSTCOPY_INCOMING_END, postcopy_running will be set to 'true' and
+>> > ram_load will behave like a postcopy is in progress. This scenario isn't
+>> > achievable in a migration but it is reproducible when executing
+>> > savevm/loadvm after migrating with 'postcopy-ram on', causing loadvm
+>> > to fail with Error -22:
+>> >
+>> > Source:
+>> >
+>> > (qemu) migrate_set_capability postcopy-ram on
+>> > (qemu) migrate tcp:127.0.0.1:4444
+>> >
+>> > Dest:
+>> >
+>> > (qemu) migrate_set_capability postcopy-ram on
+>> > (qemu)
+>> > ubuntu1704-intel login:
+>> > Ubuntu 17.04 ubuntu1704-intel ttyS0
+>> >
+>> > ubuntu1704-intel login: (qemu)
+>> > (qemu) savevm test1
+>> > (qemu) loadvm test1
+>> > Unknown combination of migration flags: 0x4 (postcopy mode)
+>> > error while loading state for instance 0x0 of device 'ram'
+>> > Error -22 while loading VM state
+>> > (qemu)
+>> >
+>> > This patch fixes this problem by changing a bit the semantics
+>> > of postcopy_running inside ram_load, verifying first if
+>> > we're not in the POSTCOPY_INCOMING_END state. In this case,
+>> > postcopy_running is set to 'false'.
+>> >
+>> > Signed-off-by: Daniel Henrique Barboza <danielhb@linux.vnet.ibm.com>
+>> 
+>> Reviewed-by: Juan Quintela <quintela@redhat.com>
+>> 
+>> queued
+>
+> Wrong version; v3 is:
 
-Oh nevermind, you're handling the extra size operand that was in v3.  Well,
-good news is that you don't need that anymore.  ;-)
+My bad, sorry.  Got a new one.
 
+No clue why search on my INBOX didn't found this version.
 
-r~
+compiling a new pull request.
+
+>
+> http://lists.nongnu.org/archive/html/qemu-devel/2017-11/msg03188.html
+>
+> Dave
+>
+>> > ---
+>> >  migration/ram.c | 22 +++++++++++++++-------
+>> >  1 file changed, 15 insertions(+), 7 deletions(-)
+>> >
+>> > diff --git a/migration/ram.c b/migration/ram.c
+>> > index 8620aa400a..43ed719668 100644
+>> > --- a/migration/ram.c
+>> > +++ b/migration/ram.c
+>> > @@ -2803,13 +2803,21 @@ static int ram_load(QEMUFile *f, void *opaque, int version_id)
+>> >      int flags = 0, ret = 0, invalid_flags = 0;
+>> >      static uint64_t seq_iter;
+>> >      int len = 0;
+>> > -    /*
+>> > -     * If system is running in postcopy mode, page inserts to host memory must
+>> > -     * be atomic
+>> > -     */
+>> > -    bool postcopy_running = postcopy_state_get() >= POSTCOPY_INCOMING_LISTENING;
+>> > -    /* ADVISE is earlier, it shows the source has the postcopy capability on */
+>> > -    bool postcopy_advised = postcopy_state_get() >= POSTCOPY_INCOMING_ADVISE;
+>> > +    bool postcopy_advised = false, postcopy_running = false;
+>> > +    uint8_t postcopy_state = postcopy_state_get();
+>> > +
+>> > +    if (postcopy_state != POSTCOPY_INCOMING_END) {
+>> > +        /*
+>> > +         * If system is running in postcopy mode, page inserts to host memory
+>> > +         * must be atomic
+>> > +         */
+>> > +        postcopy_running = postcopy_state >= POSTCOPY_INCOMING_LISTENING;
+>> > +
+>> > +        /* ADVISE is earlier, it shows the source has the postcopy
+>> > +         * capability on
+>> > +         */
+>> > +        postcopy_advised = postcopy_state >= POSTCOPY_INCOMING_ADVISE;
+>> > +    }
+>> >  
+>> >      seq_iter++;
+> --
+> Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
