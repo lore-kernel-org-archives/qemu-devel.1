@@ -1,23 +1,39 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52162)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52825)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mdavidsaver@gmail.com>) id 1eHYAn-0003O9-V6
-	for qemu-devel@nongnu.org; Wed, 22 Nov 2017 11:46:54 -0500
+	(envelope-from <borntraeger@de.ibm.com>) id 1eHYCX-0004pB-9t
+	for qemu-devel@nongnu.org; Wed, 22 Nov 2017 11:48:42 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mdavidsaver@gmail.com>) id 1eHYAj-0002GP-3U
-	for qemu-devel@nongnu.org; Wed, 22 Nov 2017 11:46:54 -0500
-References: <20171120032420.9134-1-mdavidsaver@gmail.com>
-	<20171120032420.9134-9-mdavidsaver@gmail.com>
-	<20171122040817.GM2380@umbus.fritz.box>
-From: Michael Davidsaver <mdavidsaver@gmail.com>
-Message-ID: <19c1689b-749d-a422-f2f0-88de6137718d@gmail.com>
-Date: Wed, 22 Nov 2017 10:46:41 -0600
+	(envelope-from <borntraeger@de.ibm.com>) id 1eHYCS-0003KS-9Z
+	for qemu-devel@nongnu.org; Wed, 22 Nov 2017 11:48:41 -0500
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:34584
+	helo=mx0a-001b2d01.pphosted.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <borntraeger@de.ibm.com>)
+	id 1eHYCS-0003KC-3X
+	for qemu-devel@nongnu.org; Wed, 22 Nov 2017 11:48:36 -0500
+Received: from pps.filterd (m0098413.ppops.net [127.0.0.1])
+	by mx0b-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
+	vAMGi5WR022942
+	for <qemu-devel@nongnu.org>; Wed, 22 Nov 2017 11:48:33 -0500
+Received: from e06smtp11.uk.ibm.com (e06smtp11.uk.ibm.com [195.75.94.107])
+	by mx0b-001b2d01.pphosted.com with ESMTP id 2edcbm2k39-1
+	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Wed, 22 Nov 2017 11:48:32 -0500
+Received: from localhost
+	by e06smtp11.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	Only! Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <borntraeger@de.ibm.com>;
+	Wed, 22 Nov 2017 16:48:31 -0000
+References: <20171122163733.4007-1-pbonzini@redhat.com>
+From: Christian Borntraeger <borntraeger@de.ibm.com>
+Date: Wed, 22 Nov 2017 17:48:28 +0100
 MIME-Version: 1.0
-In-Reply-To: <20171122040817.GM2380@umbus.fritz.box>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="OwKIFmenglwlJOiKrkqoNvieKugKRc8Q2"
-Subject: Re: [Qemu-devel] [PATCH 08/12] e500: add mpc8540 i2c controller to
- ccsr
+In-Reply-To: <20171122163733.4007-1-pbonzini@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Message-Id: <e0e56414-cde9-e403-2cfe-be3476331163@de.ibm.com>
+Subject: Re: [Qemu-devel] [qemu-web PATCH] css: avoid over-large images
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,98 +42,35 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Gibson <david@gibson.dropbear.id.au>
-Cc: Alexander Graf <agraf@suse.de>, qemu-ppc@nongnu.org, qemu-devel@nongnu.org
+To: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org
+Cc: thuth@redhat.com
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---OwKIFmenglwlJOiKrkqoNvieKugKRc8Q2
-From: Michael Davidsaver <mdavidsaver@gmail.com>
-To: David Gibson <david@gibson.dropbear.id.au>
-Cc: Alexander Graf <agraf@suse.de>, qemu-ppc@nongnu.org, qemu-devel@nongnu.org
-Message-ID: <19c1689b-749d-a422-f2f0-88de6137718d@gmail.com>
-Subject: Re: [PATCH 08/12] e500: add mpc8540 i2c controller to ccsr
-References: <20171120032420.9134-1-mdavidsaver@gmail.com>
- <20171120032420.9134-9-mdavidsaver@gmail.com>
- <20171122040817.GM2380@umbus.fritz.box>
-In-Reply-To: <20171122040817.GM2380@umbus.fritz.box>
-Content-Type: text/plain; charset=windows-1252
-Content-Transfer-Encoding: quoted-printable
+On 11/22/2017 05:37 PM, Paolo Bonzini wrote:
+> Make sure that images are scaled to fit inside their container.
 
-On 11/21/2017 10:08 PM, David Gibson wrote:
-> On Sun, Nov 19, 2017 at 09:24:16PM -0600, Michael Davidsaver wrote:
->> Signed-off-by: Michael Davidsaver <mdavidsaver@gmail.com>
->=20
-> You're adding what seems to be a fairly specific device to the general
-> e500 init - this again suggests that it should be split, putting
-> creation of devices under control of individual machines.
-
-I'll address the ppce500_init() part of this question separately.
-
-In addition to the MPC8540, I find that documentation for the MPC8544
-(modeled) and P2020 (un-modeled) show the same i2c controller registers.
- So I think it's reasonable for the generic ppce500 machine to have it
-as well.
-
-For what it's worth, the Linux driver for this unit
-(drivers/i2c/busses/i2c-mpc.c) lists compatibility with a number of
-other freescale SoCs with only some differences in clock selection (not
-modeled).  The description for the module is:
-
-> MODULE_DESCRIPTION("I2C-Bus adapter for MPC107 bridge and "
->                    "MPC824x/83xx/85xx/86xx/512x/52xx processors");
-
-
-
->> ---
->>  hw/ppc/e500.c | 8 ++++++++
->>  1 file changed, 8 insertions(+)
->>
->> diff --git a/hw/ppc/e500.c b/hw/ppc/e500.c
->> index 6f77844303..bef7d313d4 100644
->> --- a/hw/ppc/e500.c
->> +++ b/hw/ppc/e500.c
->> @@ -861,6 +861,14 @@ void ppce500_init(MachineState *machine, PPCE500P=
-arams *params)
->>      qdev_init_nofail(dev);
->>      ccsr_addr_space =3D sysbus_mmio_get_region(SYS_BUS_DEVICE(dev), 0=
-);
->> =20
->> +    dev =3D qdev_create(NULL, "mpc8540-i2c");
->> +    object_property_add_child(qdev_get_machine(), "i2c[*]",
->> +                              OBJECT(dev), NULL);
->> +    qdev_init_nofail(dev);
->> +    s =3D SYS_BUS_DEVICE(dev);
->> +    memory_region_add_subregion(ccsr_addr_space, 0x3000,
->> +                                sysbus_mmio_get_region(s, 0));
->> +
->>      mpicdev =3D ppce500_init_mpic(machine, params, ccsr_addr_space, i=
-rqs);
->> =20
->>      /* Serial */
->=20
-
-
-
---OwKIFmenglwlJOiKrkqoNvieKugKRc8Q2
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAEBCAAdFiEEYyRdrpxuENu06SOrlAHmyz1/GOoFAloVqfUACgkQlAHmyz1/
-GOr6ZhAAmb0xc8atppjUrF3QXfJ60YyQ/ZSISXZIZT2RDNoznDjsDmMemduv8yxZ
-w86cKxkutFCAQ9VYnLcxPqjrYNdT+UNeBP3w8easgMQK1QreXKxPj+tgZNmgKo02
-CfoZASlPRXcEHWIwvAXXC9jVq1Ho2E+ZaKigkM7TV75Y6c8DzL5ja4uEJYzKhZEM
-aWInzTUewRABwCEmxz8k3dnRzlo0EaT5pIWHNhR3BpWfQWOlj9QDu4Nc19Ljj4+6
-U7AcRy6b4kJvatfQUWG5aYaJOqWXmrYivN8bkdXrB7nDxv+T2y0kfCRLhbUmfPZ1
-O5yLLXX/9JJg8J2AFkfDeT56FuSrfgI04wAvQLQn+3s9XkhNY2Q5Pk4eDZtzMsv9
-vjZ8AshzPy/5hu1PAl9B3aO3TQqTwta3iZng7t8pogctJADaZyiop07vAXTq2R8h
-vkJzKVDQfEsQTgB7xza7bJLbgNc8irRL3ifKNeQk4ygZWMgaSoudKzrahq068IQc
-iJ85FLUjyW+IiJGnxRw/OS7ACUGFDUcIFMYLOaNfiuRl6CooMUjYG5O2tRURz3u6
-E5yXhag804PF3lN0/wUolbCkDMSydcxSPwog6/Wu9pOJ8HPKMXDv83YOVYzuxxvu
-P9qFcG6c7+h7YwckSyuXgulHk3WuvM2iZPkkq1ZDmjXBdlliezI=
-=45BV
------END PGP SIGNATURE-----
-
---OwKIFmenglwlJOiKrkqoNvieKugKRc8Q2--
+Thanks God. I was thinking "what is wrong with the channel subsystem in QEMU?" when
+reading your subject.....
+ 
+> Tested-by: Thomas Huth <thuth@redhat.com>
+> Reviewed-by: Thomas Huth <thuth@redhat.com>
+> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+> ---
+>  assets/css/style.css | 4 ++++
+>  1 file changed, 4 insertions(+)
+> 
+> diff --git a/assets/css/style.css b/assets/css/style.css
+> index 2d4fe0c..b828887 100644
+> --- a/assets/css/style.css
+> +++ b/assets/css/style.css
+> @@ -200,6 +200,10 @@
+> 
+>  	/* Images */
+> 
+> +		img {
+> +			max-width: 100%;
+> +		}
+> +
+>  		.image
+>  		{
+>  			display: inline-block;
+> 
