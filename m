@@ -1,31 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45927)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47857)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1eHUgy-0000Eu-HY
-	for qemu-devel@nongnu.org; Wed, 22 Nov 2017 08:03:53 -0500
+	(envelope-from <richard.henderson@linaro.org>) id 1eHUpD-0002B5-Pn
+	for qemu-devel@nongnu.org; Wed, 22 Nov 2017 08:12:24 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1eHUgt-0000SJ-Po
-	for qemu-devel@nongnu.org; Wed, 22 Nov 2017 08:03:52 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:46942)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1eHUgt-0000S8-Jm
-	for qemu-devel@nongnu.org; Wed, 22 Nov 2017 08:03:47 -0500
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
-	[10.5.11.16])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 3875137E6E
-	for <qemu-devel@nongnu.org>; Wed, 22 Nov 2017 13:03:46 +0000 (UTC)
-Date: Wed, 22 Nov 2017 13:02:37 +0000
-From: "Daniel P. Berrange" <berrange@redhat.com>
-Message-ID: <20171122130237.GG29565@redhat.com>
-Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
-References: <20171122124219.12954-1-quintela@redhat.com>
-	<20171122124219.12954-4-quintela@redhat.com>
+	(envelope-from <richard.henderson@linaro.org>) id 1eHUp8-0003ZC-RL
+	for qemu-devel@nongnu.org; Wed, 22 Nov 2017 08:12:23 -0500
+Received: from mail-wm0-x232.google.com ([2a00:1450:400c:c09::232]:46052)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+	id 1eHUp8-0003Yq-KR
+	for qemu-devel@nongnu.org; Wed, 22 Nov 2017 08:12:18 -0500
+Received: by mail-wm0-x232.google.com with SMTP id 9so10240929wme.4
+	for <qemu-devel@nongnu.org>; Wed, 22 Nov 2017 05:12:18 -0800 (PST)
+References: <20171004184325.24157-1-richard.henderson@linaro.org>
+	<20171004184325.24157-8-richard.henderson@linaro.org>
+	<87r2t29kje.fsf@linaro.org>
+From: Richard Henderson <richard.henderson@linaro.org>
+Message-ID: <5753185a-0407-6d7e-d874-172e9726c3b9@linaro.org>
+Date: Wed, 22 Nov 2017 14:12:14 +0100
 MIME-Version: 1.0
+In-Reply-To: <87r2t29kje.fsf@linaro.org>
 Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20171122124219.12954-4-quintela@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v2 3/6] migration: Create uri parameter
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH v1 07/12] target/arm: Decode aa32 armv8.1
+ two reg and a scalar
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,47 +33,19 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Juan Quintela <quintela@redhat.com>
-Cc: qemu-devel@nongnu.org, lvivier@redhat.com, dgilbert@redhat.com, peterx@redhat.com, armbru@redhat.com, eblake@redhat.com
+To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>
+Cc: qemu-devel@nongnu.org, qemu-arm@nongnu.org
 
-On Wed, Nov 22, 2017 at 01:42:16PM +0100, Juan Quintela wrote:
-> It will be used to store the uri migration parameter.  Right now it is
-> just the parameter code.
+On 11/13/2017 06:05 PM, Alex Bennée wrote:
+>> -                default: /* 14 and 15 are RESERVED */
+>> +                default:
+>>                      return 1;
 > 
-> Signed-off-by: Juan Quintela <quintela@redhat.com>
-> ---
->  hmp.c                 |  7 +++++++
->  migration/migration.c | 13 +++++++++++++
->  qapi/migration.json   | 18 +++++++++++++++---
->  3 files changed, 35 insertions(+), 3 deletions(-)
+> I think this should now be g_assert_not_reached() as we decode the whole
+> op space. That said it's tricky to follow in the mega function that
+> extracts op with old-school shifts 5 different ways :-/
 
-> diff --git a/qapi/migration.json b/qapi/migration.json
-> index bbc4671ded..ebde890604 100644
-> --- a/qapi/migration.json
-> +++ b/qapi/migration.json
-> @@ -488,6 +488,9 @@
->  #                     and a power of 2
->  #                     (Since 2.11)
->  #
-> +# @uri: defines the method we are susing to migrate
-> +#                     (Since 2.11)
+You're right.  Thanks.
 
-On the migrate command, we've inherited the use of a URI string from the
-very earliest days of QMP design, but I can't help thinking that for any
-new stuff we define, we should do a full QMP model for the paraneters,
-instead of continuing to use the URI. eg we should define a union of
-structs, giving the individual parameters for each component, and the
-tcp/unix parts probably ought to reuse the SocketAddress struct. This
-is how we've approached the blockdev code in QMP, avoiding exposing the
-legacy URI/filename formats in favour of full QMP modelling.
 
-The HMP side could still continue to use a URI though.
-
-Copying Markus/Eric for views on QMP modelling.
-
-Regards,
-Daniel
--- 
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
+r~
