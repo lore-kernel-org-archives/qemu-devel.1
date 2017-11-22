@@ -1,22 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35656)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35893)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <andrew.smirnov@gmail.com>) id 1eHcFb-0007FT-EJ
-	for qemu-devel@nongnu.org; Wed, 22 Nov 2017 16:08:08 -0500
+	(envelope-from <andrew.smirnov@gmail.com>) id 1eHcGE-0007rc-C2
+	for qemu-devel@nongnu.org; Wed, 22 Nov 2017 16:08:47 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <andrew.smirnov@gmail.com>) id 1eHcFa-0005hd-HF
-	for qemu-devel@nongnu.org; Wed, 22 Nov 2017 16:08:07 -0500
+	(envelope-from <andrew.smirnov@gmail.com>) id 1eHcGD-0005yZ-F0
+	for qemu-devel@nongnu.org; Wed, 22 Nov 2017 16:08:46 -0500
 MIME-Version: 1.0
-In-Reply-To: <CAFEAcA_Ug=6cYD0VD93CorVt+rv_u4WWsa_Gk3k+c18G07bDRg@mail.gmail.com>
+In-Reply-To: <20171122163426.13f3ed3f@redhat.com>
 References: <20171106154813.19936-1-andrew.smirnov@gmail.com>
-	<20171106154813.19936-20-andrew.smirnov@gmail.com>
-	<CAFEAcA_Ug=6cYD0VD93CorVt+rv_u4WWsa_Gk3k+c18G07bDRg@mail.gmail.com>
+	<20171106154813.19936-30-andrew.smirnov@gmail.com>
+	<20171122163426.13f3ed3f@redhat.com>
 From: Andrey Smirnov <andrew.smirnov@gmail.com>
-Date: Wed, 22 Nov 2017 13:08:03 -0800
-Message-ID: <CAHQ1cqGxtN=hK51v+Gtq7wngp_HKxXJv4tdRin+bKYeEKv1NKw@mail.gmail.com>
+Date: Wed, 22 Nov 2017 13:08:42 -0800
+Message-ID: <CAHQ1cqGQ-_k6n=Dfj9qQSkiDCbzDVbJBRXyKf+MsVj0tYWNrBA@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v3 19/30] i.MX: Add code to emulate SDMA IP
- block
+Subject: Re: [Qemu-devel] [PATCH v3 29/30] i.MX: Add i.MX7 SOC
+ implementation.
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,14 +25,38 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: qemu-arm <qemu-arm@nongnu.org>, Jason Wang <jasowang@redhat.com>, =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>, QEMU Developers <qemu-devel@nongnu.org>, Andrey Yurovsky <yurovsky@gmail.com>
+To: Igor Mammedov <imammedo@redhat.com>
+Cc: "open list:ARM" <qemu-arm@nongnu.org>, Peter Maydell <peter.maydell@linaro.org>, Jason Wang <jasowang@redhat.com>, =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>, QEMU Developers <qemu-devel@nongnu.org>, Andrey Yurovsky <yurovsky@gmail.com>
 
-On Tue, Nov 21, 2017 at 10:20 AM, Peter Maydell
-<peter.maydell@linaro.org> wrote:
-> On 6 November 2017 at 15:48, Andrey Smirnov <andrew.smirnov@gmail.com> wr=
-ote:
->> Add minimal code needed to allow upstream Linux guest to boot.
+On Wed, Nov 22, 2017 at 7:34 AM, Igor Mammedov <imammedo@redhat.com> wrote:
+> On Mon,  6 Nov 2017 07:48:12 -0800
+> Andrey Smirnov <andrew.smirnov@gmail.com> wrote:
+>
+>> The following interfaces are partially or fully emulated:
+>>
+>>     * up to 2 Cortex A9 cores (SMP works with PSCI)
+>>     * A7 MPCORE (identical to A15 MPCORE)
+>>     * 4 GPTs modules
+>>     * 7 GPIO controllers
+>>     * 2 IOMUXC controllers
+>>     * 1 CCM module
+>>     * 1 SVNS module
+>>     * 1 SRC module
+>>     * 1 GPCv2 controller
+>>     * 4 eCSPI controllers
+>>     * 4 I2C controllers
+>>     * 7 i.MX UART controllers
+>>     * 2 FlexCAN controllers
+>>     * 2 Ethernet controllers (FEC)
+>>     * 3 SD controllers (USDHC)
+>>     * 4 WDT modules
+>>     * 1 SDMA module
+>>     * 1 GPR module
+>>     * 2 USBMISC modules
+>>     * 2 ADC modules
+>>     * 1 PCIe controller
+>>
+>> Tested to boot and work with upstream Linux (4.13+) guest.
 >>
 >> Cc: Peter Maydell <peter.maydell@linaro.org>
 >> Cc: Jason Wang <jasowang@redhat.com>
@@ -42,21 +66,27 @@ ote:
 >> Cc: yurovsky@gmail.com
 >> Signed-off-by: Andrey Smirnov <andrew.smirnov@gmail.com>
 >> ---
->>  hw/dma/Makefile.objs      |  1 +
->>  hw/dma/imx_sdma.c         | 99 ++++++++++++++++++++++++++++++++++++++++=
-+++++++
->>  include/hw/dma/imx_sdma.h | 22 +++++++++++
->>  3 files changed, 122 insertions(+)
->>  create mode 100644 hw/dma/imx_sdma.c
->>  create mode 100644 include/hw/dma/imx_sdma.h
->>
->
-> Does Linux really insist on reads-as-written behaviour?
-> (ie can you get away with just using
-> create_unimplemented_device() ?)
->
+> ...
+>> +
+>> +static void fsl_imx7_init(Object *obj)
+>> +{
+>> +    BusState *sysbus =3D sysbus_get_default();
+>> +    FslIMX7State *s =3D FSL_IMX7(obj);
+>> +    char name[NAME_SIZE];
+>> +    int i;
+>> +
+>> +    if (smp_cpus > FSL_IMX7_NUM_CPUS) {
+>> +        error_report("%s: Only %d CPUs are supported (%d requested)",
+>> +                     TYPE_FSL_IMX7, FSL_IMX7_NUM_CPUS, smp_cpus);
+>> +        exit(1);
+>> +    }
+>> +
+>> +    for (i =3D 0; i < smp_cpus; i++) {
+>> +        object_initialize(&s->cpu[i], sizeof(s->cpu[i]),
+>> +                          "cortex-a7-" TYPE_ARM_CPU);
+> pls reuse ARM_CPU_TYPE_NAME() macro here
 
-Not sure. I'll give it a try for v4.
+Will do in v4.
 
 Thanks,
 Andrey Smirnov
