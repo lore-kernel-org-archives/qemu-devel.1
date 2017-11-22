@@ -1,19 +1,38 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51550)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52205)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berto@igalia.com>) id 1eHWb0-0000In-Ja
-	for qemu-devel@nongnu.org; Wed, 22 Nov 2017 10:05:55 -0500
+	(envelope-from <borntraeger@de.ibm.com>) id 1eHWd2-0001V7-8s
+	for qemu-devel@nongnu.org; Wed, 22 Nov 2017 10:07:57 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berto@igalia.com>) id 1eHWax-00068e-Ag
-	for qemu-devel@nongnu.org; Wed, 22 Nov 2017 10:05:50 -0500
-From: Alberto Garcia <berto@igalia.com>
-In-Reply-To: <dd350838-9132-e787-10b1-4cb200076ec9@virtuozzo.com>
-References: <dd350838-9132-e787-10b1-4cb200076ec9@virtuozzo.com>
-Date: Wed, 22 Nov 2017 16:05:43 +0100
-Message-ID: <w51r2sqs69k.fsf@maestria.local.igalia.com>
+	(envelope-from <borntraeger@de.ibm.com>) id 1eHWcy-0007LE-Ba
+	for qemu-devel@nongnu.org; Wed, 22 Nov 2017 10:07:56 -0500
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:38452)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <borntraeger@de.ibm.com>)
+	id 1eHWcy-0007L0-0l
+	for qemu-devel@nongnu.org; Wed, 22 Nov 2017 10:07:52 -0500
+Received: from pps.filterd (m0098394.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
+	vAMF4mxx034432
+	for <qemu-devel@nongnu.org>; Wed, 22 Nov 2017 10:07:49 -0500
+Received: from e06smtp14.uk.ibm.com (e06smtp14.uk.ibm.com [195.75.94.110])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2eda0m6www-1
+	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Wed, 22 Nov 2017 10:07:46 -0500
+Received: from localhost
+	by e06smtp14.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	Only! Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <borntraeger@de.ibm.com>;
+	Wed, 22 Nov 2017 15:07:39 -0000
+References: <151136249244.558.6340327585120514778@bafd83ae6430>
+From: Christian Borntraeger <borntraeger@de.ibm.com>
+Date: Wed, 22 Nov 2017 16:07:35 +0100
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [Qemu-block] segfault in parallel blockjobs
- (iotest 30)
+In-Reply-To: <151136249244.558.6340327585120514778@bafd83ae6430>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Message-Id: <4e1f86e4-530c-9b51-2c2e-14827707cd9f@de.ibm.com>
+Subject: Re: [Qemu-devel] [PATCH 0/2] s390x fixes (post 2.11)
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,83 +41,18 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Anton Nefedov <anton.nefedov@virtuozzo.com>, qemu-devel@nongnu.org
-Cc: kwolf@redhat.com, qemu-block@nongnu.org, mreitz@redhat.com
+To: qemu-devel@nongnu.org
+Cc: famz@redhat.com, cohuck@redhat.com, agraf@suse.de, thuth@redhat.com, pasic@linux.vnet.ibm.com, qemu-s390x@nongnu.org, rth@twiddle.net
 
-On Tue 07 Nov 2017 05:19:41 PM CET, Anton Nefedov wrote:
+Would have been good to have the qemu iotest before we merged
+4afeffc8572f40d8844b946a30c00b10da4442b1 blockjob: do not allow coroutine double entry or entry-after-completion
+and friends. 
 
-> The small attached tweak makes iotest 30 (-qcow2 -nocache) fail 10/10
-> times on my machine.
 
-I can reproduce the crash with v2.11.0-rc2 without having to modify QEMU
-at all using the attached test case (it's based on one of the existing
-tests from 030). It doesn't fail 100% of the times, though, but enough
-to reproduce it easily.
-
-Berto
-
-----
-
-class TestStreamCommit(iotests.QMPTestCase):
-    num_imgs = 6
-    imgs = []
-
-    def setUp(self):
-        opts = []
-        self.imgs = []
-
-        # Initialize file names and command-line options
-        for i in range(self.num_imgs):
-            img_depth = self.num_imgs - i - 1
-            opts.append("backing." * img_depth + "node-name=node%d" % i)
-            self.imgs.append(os.path.join(iotests.test_dir, 'img-%d.img' % i))
-
-        # Create all images
-        qemu_img('create', '-f', iotests.imgfmt, self.imgs[0], '1M')
-        for i in range(1, self.num_imgs):
-            qemu_img('create', '-f', iotests.imgfmt,
-                     '-o', 'backing_file=%s' % self.imgs[i-1], self.imgs[i])
-
-        qemu_io('-f', iotests.imgfmt, '-c', 'write -P 0x1 256k 512k', self.imgs[1])
-        qemu_io('-f', iotests.imgfmt, '-c', 'write -P 0x2 768k 256k', self.imgs[1])
-        qemu_io('-f', iotests.imgfmt, '-c', 'write -P 0x3 0 1M', self.imgs[5])
-
-        # Attach the drive to the VM
-        self.vm = iotests.VM()
-        self.vm.add_drive(self.imgs[-1], ','.join(opts))
-        self.vm.launch()
-
-    def tearDown(self):
-        self.vm.shutdown()
-        for img in self.imgs:
-            os.remove(img)
-
-    # Test a block-stream and a block-commit job in parallel
-    def test_stream_commit(self):
-        self.assert_no_active_block_jobs()
-
-        # Stream from node0 into node2
-        result = self.vm.qmp('block-stream', device='node2', job_id='node2')
-        self.assert_qmp(result, 'return', {})
-
-        # Commit from the active layer into node3
-        result = self.vm.qmp('block-commit', device='drive0', base=self.imgs[3])
-        self.assert_qmp(result, 'return', {})
-
-        # Wait for all jobs to be finished.
-        pending_jobs = ['node2', 'drive0']
-        while len(pending_jobs) > 0:
-            for event in self.vm.get_qmp_events(wait=True):
-                if event['event'] == 'BLOCK_JOB_COMPLETED':
-                    node_name = self.dictpath(event, 'data/device')
-                    self.assertTrue(node_name in pending_jobs)
-                    self.assert_qmp_absent(event, 'data/error')
-                    pending_jobs.remove(node_name)
-                if event['event'] == 'BLOCK_JOB_READY':
-                    self.assert_qmp(event, 'data/device', 'drive0')
-                    self.assert_qmp(event, 'data/type', 'commit')
-                    self.assert_qmp_absent(event, 'data/error')
-                    self.assertTrue('drive0' in pending_jobs)
-                    self.vm.qmp('block-job-complete', device='drive0')
-
-        self.assert_no_active_block_jobs()
+On 11/22/2017
+[...]
+> -Image committed.
+> +qemu-img: /tmp/qemu-test/src/block/block-backend.c:2088: blk_root_drained_end: Assertion `blk->quiesce_counter' failed.
+> +./common.rc: line 61: 13620 Aborted                 (core dumped) ( exec "$QEMU_IMG_PROG" $QEMU_IMG_OPTIONS "$@" )
+>  Reading from the backing file
+[...]
