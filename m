@@ -1,32 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43327)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43518)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1eHUYa-0004C0-Pm
-	for qemu-devel@nongnu.org; Wed, 22 Nov 2017 07:55:14 -0500
+	(envelope-from <berto@igalia.com>) id 1eHUZC-0004YZ-1H
+	for qemu-devel@nongnu.org; Wed, 22 Nov 2017 07:55:50 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1eHUYX-0004g9-Nj
-	for qemu-devel@nongnu.org; Wed, 22 Nov 2017 07:55:12 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:48358)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1eHUYX-0004fn-Ew
-	for qemu-devel@nongnu.org; Wed, 22 Nov 2017 07:55:09 -0500
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
-	[10.5.11.12])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 49307C04B924
-	for <qemu-devel@nongnu.org>; Wed, 22 Nov 2017 12:55:08 +0000 (UTC)
-Date: Wed, 22 Nov 2017 12:54:58 +0000
-From: "Daniel P. Berrange" <berrange@redhat.com>
-Message-ID: <20171122125458.GE29565@redhat.com>
-Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
-References: <20171030112112.6952-1-quintela@redhat.com>
-	<20171030112112.6952-6-quintela@redhat.com>
-	<20171103100746.GC20155@redhat.com> <873756pkca.fsf@secure.mitica>
+	(envelope-from <berto@igalia.com>) id 1eHUZ9-0004sd-0R
+	for qemu-devel@nongnu.org; Wed, 22 Nov 2017 07:55:50 -0500
+From: Alberto Garcia <berto@igalia.com>
+In-Reply-To: <160cac7d-7dc6-2daf-5299-82a57bffe14c@virtuozzo.com>
+References: <dd350838-9132-e787-10b1-4cb200076ec9@virtuozzo.com>
+	<w51inekzv59.fsf@maestria.local.igalia.com>
+	<w518tff4dvi.fsf@maestria.local.igalia.com>
+	<20171110030223.GA7303@lemon>
+	<w518tf7k0ov.fsf@maestria.local.igalia.com>
+	<14461b9b-d62d-3723-d2bb-c2fe873207c5@virtuozzo.com>
+	<w51bmk2qkvv.fsf@maestria.local.igalia.com>
+	<41e905e4-0c2a-fad3-09a6-4959f04fe546@virtuozzo.com>
+	<w51zi7fbxrd.fsf@maestria.local.igalia.com>
+	<160cac7d-7dc6-2daf-5299-82a57bffe14c@virtuozzo.com>
+Date: Wed, 22 Nov 2017 13:55:17 +0100
+Message-ID: <w51tvxmscay.fsf@maestria.local.igalia.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <873756pkca.fsf@secure.mitica>
-Subject: Re: [Qemu-devel] [PATCH 5/6] migration: Now set the migration uri
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [Qemu-block] segfault in parallel blockjobs
+ (iotest 30)
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,79 +31,53 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Juan Quintela <quintela@redhat.com>
-Cc: qemu-devel@nongnu.org, lvivier@redhat.com, dgilbert@redhat.com, peterx@redhat.com
+To: Anton Nefedov <anton.nefedov@virtuozzo.com>, Fam Zheng <famz@redhat.com>
+Cc: qemu-devel@nongnu.org, kwolf@redhat.com, qemu-block@nongnu.org, mreitz@redhat.com, John Snow <jsnow@redhat.com>
 
-On Wed, Nov 22, 2017 at 01:29:57PM +0100, Juan Quintela wrote:
-> "Daniel P. Berrange" <berrange@redhat.com> wrote:
-> > On Mon, Oct 30, 2017 at 12:21:11PM +0100, Juan Quintela wrote:
-> >> Signed-off-by: Juan Quintela <quintela@redhat.com>
-> >> ---
-> >>  migration/migration.c | 25 ++++++++++++++++++-------
-> >>  migration/migration.h |  2 ++
-> >>  migration/socket.c    |  7 +++++++
-> >>  3 files changed, 27 insertions(+), 7 deletions(-)
-> >
-> >
-> >> diff --git a/migration/socket.c b/migration/socket.c
-> >> index 3a8232dd2d..c3ab81d1fb 100644
-> >> --- a/migration/socket.c
-> >> +++ b/migration/socket.c
-> >> @@ -187,7 +187,14 @@ void tcp_start_incoming_migration(const char *host_port, Error **errp)
-> >>      Error *err = NULL;
-> >>      SocketAddress *saddr = tcp_build_address(host_port, &err);
-> >>      if (!err) {
-> >> +        char *new_uri;
-> >>          socket_start_incoming_migration(saddr, &err);
-> >> +        if (!err) {
-> >> +            new_uri = g_strdup_printf("tcp:%s:%s", saddr->u.inet.host,
-> >> +                                      saddr->u.inet.port);
-> >
-> > This is bad as it is throwing away data that the original URI had. In particular
-> > you loose the 'ipv4=on|off' and 'ipv6=on|off' flags. If you need to keep the
-> > original URI for later, then why not just keep the 'host_port' parameter that
-> > was passed into this function instead of trying to reverse engineeer the URI ?
-> 
-> I don't need the original uri anymore, this is the incoming side of
-> migration, and we can only set that once, if migration fails, we need to
-> restart qemu anymore.
-> 
-> I changed it to this:
-> 
->             new_uri = g_strdup_printf("tcp:%s:%s%s%s", address->u.inet.host,
->                                       address->u.inet.port,
->                                       iaddr->has_ipv4 ? ",ipv4" : "",
->                                       iaddr->has_ipv6 ? ",ipv6" : "");
-> 
-> 
-> Clearly, we don't care about the to= parameter.
-> 
-> The whole point of this exercise is that in destination, we use
-> 
-> -incoming tcp:0:0
-> 
-> and with the output of info migrate_parameters (uri) we are able to
-> migrate to that place.  For rest of migration posibilities, there is no
-> changes at all.
+On Tue 21 Nov 2017 04:18:13 PM CET, Anton Nefedov wrote:
+>  >> keep BlockJob referenced while it is
+>  >> paused (by block_job_pause/resume_all()). That should prevent it from
+>  >> deleting the BB.
+>
+> looks kind of hacky; maybe referencing in block_job_pause() (and not
+> just pause_all) seems more correct? I think it didn't work for me
+> right away though. But I can look more.
 
-That doesn't work typically. When the incoming QEMU listens for connections,
-by default it will listen on 0.0.0.0, or ::, so that's what the address
-you're creating will contain.  You can't use 0.0.0.0 or :: in a connect()
-call on the other side as that's a wildcard address that refers to "any 
-valid IP address on the current host".
+This fixes one crash for me (but only the test_stream_commit, it doesn't
+fix iotest 030 completely), but I agree it looks kind of hacky.
 
-When you connect to the listening QEMU you need the actual IP address
-of one (of the possibly many) NICs on the target host.  IOW, the only
-time the listen address is useful is if you have told QEMU to listen on
-a specific NIC's IP address, instead of the wildcard address.
+Peharps replacing block_job_next() with QLIST_FOREACH_SAFE() is a good
+idea, though, I guess resuming a block job can theoretically lead to its
+destruction?
 
-This is the core reason why libvirt calls 'gethostname()' on the target
-host to identify the primary IP address of the host, and uses that on the
-source host to establish the connection.
+Berto
 
-Regards,
-Daniel
--- 
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
+diff --git a/blockjob.c b/blockjob.c
+index ff9a614531..53cffc7980 100644
+--- a/blockjob.c
++++ b/blockjob.c
+@@ -699,6 +699,7 @@ void block_job_pause_all(void)
+         AioContext *aio_context = blk_get_aio_context(job->blk);
+ 
+         aio_context_acquire(aio_context);
++        block_job_ref(job);
+         block_job_pause(job);
+         aio_context_release(aio_context);
+     }
+@@ -759,12 +760,14 @@ void coroutine_fn block_job_pause_point(BlockJob *job)
+ 
+ void block_job_resume_all(void)
+ {
+-    BlockJob *job = NULL;
+-    while ((job = block_job_next(job))) {
++    BlockJob *job, *next;
++
++    QLIST_FOREACH_SAFE(job, &block_jobs, job_list, next) {
+         AioContext *aio_context = blk_get_aio_context(job->blk);
+ 
+         aio_context_acquire(aio_context);
+         block_job_resume(job);
++        block_job_unref(job);
+         aio_context_release(aio_context);
+     }
+ }
