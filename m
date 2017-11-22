@@ -1,26 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39037)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39039)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1eHUMH-0004g3-9h
-	for qemu-devel@nongnu.org; Wed, 22 Nov 2017 07:42:30 -0500
+	(envelope-from <quintela@redhat.com>) id 1eHUMH-0004g4-Af
+	for qemu-devel@nongnu.org; Wed, 22 Nov 2017 07:42:33 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1eHUMF-000780-FP
+	(envelope-from <quintela@redhat.com>) id 1eHUME-00077b-5b
 	for qemu-devel@nongnu.org; Wed, 22 Nov 2017 07:42:29 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:43940)
+Received: from mx1.redhat.com ([209.132.183.28]:43926)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1eHUMF-00077p-8f
-	for qemu-devel@nongnu.org; Wed, 22 Nov 2017 07:42:27 -0500
+	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1eHUMD-00076v-Ux
+	for qemu-devel@nongnu.org; Wed, 22 Nov 2017 07:42:26 -0500
 Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
 	[10.5.11.11])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 680EFC0587CA
-	for <qemu-devel@nongnu.org>; Wed, 22 Nov 2017 12:42:26 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id A5D80C0587C5
+	for <qemu-devel@nongnu.org>; Wed, 22 Nov 2017 12:42:24 +0000 (UTC)
 From: Juan Quintela <quintela@redhat.com>
-Date: Wed, 22 Nov 2017 13:42:14 +0100
-Message-Id: <20171122124219.12954-2-quintela@redhat.com>
-In-Reply-To: <20171122124219.12954-1-quintela@redhat.com>
-References: <20171122124219.12954-1-quintela@redhat.com>
-Subject: [Qemu-devel] [PATCH v2 1/6] migration: print features as on off
+Date: Wed, 22 Nov 2017 13:42:13 +0100
+Message-Id: <20171122124219.12954-1-quintela@redhat.com>
+Subject: [Qemu-devel] [PATCH v2 0/6] Improve info migrate output on
+ destination
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,38 +31,48 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: dgilbert@redhat.com, lvivier@redhat.com, peterx@redhat.com
 
-Once there, do one thing for line
+Hi
 
-Signed-off-by: Juan Quintela <quintela@redhat.com>
-Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
-Reviewed-by: Peter Xu <peterx@redhat.com>
----
- migration/migration.c | 13 +++++++++----
- 1 file changed, 9 insertions(+), 4 deletions(-)
+For v2:
+- dropped the qio patch, get the address later with qio_socket_get_local_address
+ (danp)
+- set the uri with all the options (danp found it)
+- rebase on top of latest rc
 
-diff --git a/migration/migration.c b/migration/migration.c
-index 4de3b551fe..706d2407ec 100644
---- a/migration/migration.c
-+++ b/migration/migration.c
-@@ -2375,10 +2375,15 @@ void migration_global_dump(Monitor *mon)
- {
-     MigrationState *ms = migrate_get_current();
- 
--    monitor_printf(mon, "globals: store-global-state=%d, only_migratable=%d, "
--                   "send-configuration=%d, send-section-footer=%d\n",
--                   ms->store_global_state, ms->only_migratable,
--                   ms->send_configuration, ms->send_section_footer);
-+    monitor_printf(mon, "globals:\n");
-+    monitor_printf(mon, "store-global-state: %s\n",
-+                   ms->store_global_state ? "on" : "off");
-+    monitor_printf(mon, "only-migratable: %s\n",
-+                   ms->only_migratable ? "on" : "off");
-+    monitor_printf(mon, "send-configuration: %s\n",
-+                   ms->send_configuration ? "on" : "off");
-+    monitor_printf(mon, "send-section-footer: %s\n",
-+                   ms->send_section_footer ? "on" : "off");
- }
- 
- #define DEFINE_PROP_MIG_CAP(name, x)             \
+Please review.
+
+Later, Juan.
+
+[v1]
+This series (on top of my last pull requset) do:
+
+- Make update port for address work for port 0.
+  Right now we only update the _port_ that we ask for, not the one that we receive.
+- Print global options as everything else (i.e. one by line, and on/off)
+- Move addr cleanup to the place where we created it
+- Create an uri migration parameter
+- Fill the migrate parameter and set it.
+- make the uri parameter optional for migrate
+
+Please review.
+
+Later, Juan.
+
+Juan Quintela (6):
+  migration: print features as on off
+  migration: free addr in the same function that we created it
+  migration: Create uri parameter
+  migration: Now set the migration uri
+  migration: make migrate uri parameter optional
+  migration: Set the new port/address in the uri parameter
+
+ hmp-commands.hx       |  4 ++--
+ hmp.c                 | 12 +++++++++--
+ migration/migration.c | 59 ++++++++++++++++++++++++++++++++++++++++-----------
+ migration/migration.h |  2 ++
+ migration/socket.c    | 41 +++++++++++++++++++++++++++++------
+ qapi/migration.json   | 20 +++++++++++++----
+ 6 files changed, 111 insertions(+), 27 deletions(-)
+
 -- 
 2.13.6
