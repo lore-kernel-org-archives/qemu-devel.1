@@ -1,30 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43522)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43962)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1eHW8k-0004Zu-Ch
-	for qemu-devel@nongnu.org; Wed, 22 Nov 2017 09:36:39 -0500
+	(envelope-from <thuth@redhat.com>) id 1eHWA5-0005gJ-7x
+	for qemu-devel@nongnu.org; Wed, 22 Nov 2017 09:38:02 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1eHW8f-00028D-Gh
-	for qemu-devel@nongnu.org; Wed, 22 Nov 2017 09:36:38 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:50986)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1eHW8f-000274-AP
-	for qemu-devel@nongnu.org; Wed, 22 Nov 2017 09:36:33 -0500
-References: <1510865080-32027-1-git-send-email-changpeng.liu@intel.com>
-	<1510865080-32027-2-git-send-email-changpeng.liu@intel.com>
-	<20171120162631.GK4516@stefanha-x1.localdomain>
-	<20171120224001-mutt-send-email-mst@kernel.org>
-	<776f5005-8bb8-773a-1f16-56b5675e7d74@redhat.com>
-	<20171121051156-mutt-send-email-mst@kernel.org>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <0e3d3c5a-c25d-3a0d-6bf5-b7b1db7c30b1@redhat.com>
-Date: Wed, 22 Nov 2017 15:36:22 +0100
+	(envelope-from <thuth@redhat.com>) id 1eHWA4-0004GV-6h
+	for qemu-devel@nongnu.org; Wed, 22 Nov 2017 09:38:01 -0500
+References: <20171122142627.73170-1-borntraeger@de.ibm.com>
+	<20171122142627.73170-2-borntraeger@de.ibm.com>
+From: Thomas Huth <thuth@redhat.com>
+Message-ID: <0154a676-649c-ac64-a139-41aa26aa6097@redhat.com>
+Date: Wed, 22 Nov 2017 15:37:55 +0100
 MIME-Version: 1.0
-In-Reply-To: <20171121051156-mutt-send-email-mst@kernel.org>
+In-Reply-To: <20171122142627.73170-2-borntraeger@de.ibm.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v5 1/4] vhost-user: add new vhost user
- messages to support virtio config space
+Subject: Re: [Qemu-devel] [PATCH 1/2] s390x/migration: use zero flag
+ parameter
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,20 +25,75 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: Stefan Hajnoczi <stefanha@gmail.com>, Changpeng Liu <changpeng.liu@intel.com>, qemu-devel@nongnu.org, marcandre.lureau@redhat.com, felipe@nutanix.com, james.r.harris@intel.com
+To: Christian Borntraeger <borntraeger@de.ibm.com>, Cornelia Huck <cohuck@redhat.com>
+Cc: qemu-devel <qemu-devel@nongnu.org>, qemu-s390x <qemu-s390x@nongnu.org>, Halil Pasic <pasic@linux.vnet.ibm.com>, Alexander Graf <agraf@suse.de>, Richard Henderson <rth@twiddle.net>
 
-On 21/11/2017 04:12, Michael S. Tsirkin wrote:
->> Fair enough, but I'd add nevertheless a 32-bit flags field to both
->> GET_CONFIG and SET_CONFIG, and document that the slave MUST check that
->> it is zero and otherwise fail.
->
-> We generally just use protocol feature bits for extensions.
-> But I have no problem with reserved padding if desired
-> which seems to be what's described here.
+On 22.11.2017 15:26, Christian Borntraeger wrote:
+> valgrind pointed out that we call KVM_S390_GET_IRQ_STATE with an
+> undefined value for flags. Right now this is unused, but we
+> better play safe.
+> The same is true for SET_IRQ_STATE. While QEMU is now fixed in
+> that regard, we should make sure to not use the flag and pad
+> fields in the kernel. A corresponding kernel documentation patch
+> will be submitted later.
+> 
+> Signed-off-by: Christian Borntraeger <borntraeger@de.ibm.com>
+> ---
+>  target/s390x/kvm.c | 16 ++++++++--------
+>  1 file changed, 8 insertions(+), 8 deletions(-)
+> 
+> diff --git a/target/s390x/kvm.c b/target/s390x/kvm.c
+> index 343fcec..76065ec 100644
+> --- a/target/s390x/kvm.c
+> +++ b/target/s390x/kvm.c
+> @@ -2069,7 +2069,10 @@ int kvm_s390_set_cpu_state(S390CPU *cpu, uint8_t cpu_state)
+>  
+>  void kvm_s390_vcpu_interrupt_pre_save(S390CPU *cpu)
+>  {
+> -    struct kvm_s390_irq_state irq_state;
+> +    struct kvm_s390_irq_state irq_state = {
+> +        .buf = (uint64_t) cpu->irqstate,
+> +        .len = VCPU_IRQ_BUF_SIZE,
+> +    };
+>      CPUState *cs = CPU(cpu);
+>      int32_t bytes;
+>  
+> @@ -2077,9 +2080,6 @@ void kvm_s390_vcpu_interrupt_pre_save(S390CPU *cpu)
+>          return;
+>      }
+>  
+> -    irq_state.buf = (uint64_t) cpu->irqstate;
+> -    irq_state.len = VCPU_IRQ_BUF_SIZE;
+> -
+>      bytes = kvm_vcpu_ioctl(cs, KVM_S390_GET_IRQ_STATE, &irq_state);
+>      if (bytes < 0) {
+>          cpu->irqstate_saved_size = 0;
+> @@ -2093,7 +2093,10 @@ void kvm_s390_vcpu_interrupt_pre_save(S390CPU *cpu)
+>  int kvm_s390_vcpu_interrupt_post_load(S390CPU *cpu)
+>  {
+>      CPUState *cs = CPU(cpu);
+> -    struct kvm_s390_irq_state irq_state;
+> +    struct kvm_s390_irq_state irq_state = {
+> +        .buf = (uint64_t) cpu->irqstate,
+> +        .len = cpu->irqstate_saved_size,
+> +    };
+>      int r;
+>  
+>      if (cpu->irqstate_saved_size == 0) {
+> @@ -2104,9 +2107,6 @@ int kvm_s390_vcpu_interrupt_post_load(S390CPU *cpu)
+>          return -ENOSYS;
+>      }
+>  
+> -    irq_state.buf = (uint64_t) cpu->irqstate;
+> -    irq_state.len = cpu->irqstate_saved_size;
+> -
+>      r = kvm_vcpu_ioctl(cs, KVM_S390_SET_IRQ_STATE, &irq_state);
+>      if (r) {
+>          error_report("Setting interrupt state failed %d", r);
+> 
 
-Correct, you would still have a protocol feature bit, but the format
-would be less susceptible to struct size changes which can simplify the
-implementation a bit.
+Reviewed-by: Thomas Huth <thuth@redhat.com>
 
-Paolo
+IMHO that would still be fine for 2.11, too.
+
+ Thomas
