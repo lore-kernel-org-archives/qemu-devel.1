@@ -1,20 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54359)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55519)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <yi.l.liu@linux.intel.com>) id 1eHQBK-0005MN-TP
-	for qemu-devel@nongnu.org; Wed, 22 Nov 2017 03:14:55 -0500
+	(envelope-from <richard.henderson@linaro.org>) id 1eHQGO-00075e-DO
+	for qemu-devel@nongnu.org; Wed, 22 Nov 2017 03:20:14 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <yi.l.liu@linux.intel.com>) id 1eHQBG-0007xu-4U
-	for qemu-devel@nongnu.org; Wed, 22 Nov 2017 03:14:54 -0500
-Received: from mga03.intel.com ([134.134.136.65]:57618)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <yi.l.liu@linux.intel.com>)
-	id 1eHQBF-0007wv-FL
-	for qemu-devel@nongnu.org; Wed, 22 Nov 2017 03:14:50 -0500
-From: "Liu, Yi L" <yi.l.liu@linux.intel.com>
-Date: Wed, 22 Nov 2017 15:58:02 +0800
-Message-Id: <1511337482-15505-1-git-send-email-yi.l.liu@linux.intel.com>
-Subject: [Qemu-devel] [PATCH] vfio/common: init giommu_list and hostwin_list
- of vfio container
+	(envelope-from <richard.henderson@linaro.org>) id 1eHQGI-0001hM-G0
+	for qemu-devel@nongnu.org; Wed, 22 Nov 2017 03:20:08 -0500
+Received: from mail-wm0-x230.google.com ([2a00:1450:400c:c09::230]:41555)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+	id 1eHQGI-0001h4-8r
+	for qemu-devel@nongnu.org; Wed, 22 Nov 2017 03:20:02 -0500
+Received: by mail-wm0-x230.google.com with SMTP id b189so8401671wmd.0
+	for <qemu-devel@nongnu.org>; Wed, 22 Nov 2017 00:20:02 -0800 (PST)
+From: Richard Henderson <richard.henderson@linaro.org>
+References: <20171109144155.17076-1-batuzovk@ispras.ru>
+	<20171109144155.17076-4-batuzovk@ispras.ru>
+	<c4be5f68-2093-db46-c917-953578a22d46@linaro.org>
+Message-ID: <842a000d-11bf-a3f4-e1ac-8f0f6ed07324@linaro.org>
+Date: Wed, 22 Nov 2017 09:19:58 +0100
+MIME-Version: 1.0
+In-Reply-To: <c4be5f68-2093-db46-c917-953578a22d46@linaro.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH RFC 3/3] tcg/optimize: handle vector loads
+ and stores during copy propagation
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,29 +33,25 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: mst@redhat.com, david@gibson.dropbear.id.au, pbonzini@redhat.com, alex.williamson@redhat.com, aik@ozlabs.ru, yi.l.liu@intel.com, "Liu, Yi L" <yi.l.liu@linux.intel.com>
+To: Kirill Batuzov <batuzovk@ispras.ru>, qemu-devel@nongnu.org
+Cc: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>
 
-The init of giommu_list and hostwin_list is missed during container
-initialization.
+On 11/22/2017 09:06 AM, Richard Henderson wrote:
+> On 11/09/2017 03:41 PM, Kirill Batuzov wrote:
+>> +                    } else if (re == INDEX_op_mov_vec) {
+>> +                        if (ts_are_copies(arg_temp(op->args[0]), ml->copy)) {
+>> +                            tcg_op_remove(s, op);
+>> +                            break;
+>> +                        }
+>> +                        op->opc = re;
+>> +                        op->args[1] = temp_arg(find_better_copy(s, ml->copy));
+>> +                        op->args[2] = op->args[3];
+>>                      } else {
+> 
+> Why don't you send this through tcg_opt_gen_mov as with mov_i32 and mov_i64?
 
-Signed-off-by: Liu, Yi L <yi.l.liu@linux.intel.com>
----
- hw/vfio/common.c | 2 ++
- 1 file changed, 2 insertions(+)
+Oh nevermind, you're handling the extra size operand that was in v3.  Well,
+good news is that you don't need that anymore.  ;-)
 
-diff --git a/hw/vfio/common.c b/hw/vfio/common.c
-index 7b2924c..14c5940 100644
---- a/hw/vfio/common.c
-+++ b/hw/vfio/common.c
-@@ -990,6 +990,8 @@ static int vfio_connect_container(VFIOGroup *group, AddressSpace *as,
-     container = g_malloc0(sizeof(*container));
-     container->space = space;
-     container->fd = fd;
-+    QLIST_INIT(&container->giommu_list);
-+    QLIST_INIT(&container->hostwin_list);
-     if (ioctl(fd, VFIO_CHECK_EXTENSION, VFIO_TYPE1_IOMMU) ||
-         ioctl(fd, VFIO_CHECK_EXTENSION, VFIO_TYPE1v2_IOMMU)) {
-         bool v2 = !!ioctl(fd, VFIO_CHECK_EXTENSION, VFIO_TYPE1v2_IOMMU);
--- 
-1.9.1
+
+r~
