@@ -1,20 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38037)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38127)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ldoktor@redhat.com>) id 1eHPSO-0002by-8d
-	for qemu-devel@nongnu.org; Wed, 22 Nov 2017 02:28:28 -0500
+	(envelope-from <yang.zhong@intel.com>) id 1eHPSw-0002u4-VA
+	for qemu-devel@nongnu.org; Wed, 22 Nov 2017 02:29:03 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ldoktor@redhat.com>) id 1eHPSN-0007rk-HQ
-	for qemu-devel@nongnu.org; Wed, 22 Nov 2017 02:28:28 -0500
-References: <20171122001656.12996-1-jsnow@redhat.com>
-From: =?UTF-8?B?THVrw6HFoSBEb2t0b3I=?= <ldoktor@redhat.com>
-Message-ID: <8fd37504-3d8f-a057-d57d-d098ea713d09@redhat.com>
-Date: Wed, 22 Nov 2017 08:28:15 +0100
-MIME-Version: 1.0
-In-Reply-To: <20171122001656.12996-1-jsnow@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="Q3IwQd1QhM2lq2wLetRhUimViCUhlgrT7"
-Subject: Re: [Qemu-devel] [PATCH] iotests: fix 075 and 078
+	(envelope-from <yang.zhong@intel.com>) id 1eHPSs-00084F-4q
+	for qemu-devel@nongnu.org; Wed, 22 Nov 2017 02:29:02 -0500
+Received: from mga01.intel.com ([192.55.52.88]:18350)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <yang.zhong@intel.com>)
+	id 1eHPSr-00083p-RN
+	for qemu-devel@nongnu.org; Wed, 22 Nov 2017 02:28:58 -0500
+From: Yang Zhong <yang.zhong@intel.com>
+Date: Wed, 22 Nov 2017 15:27:56 +0800
+Message-Id: <1511335676-20797-1-git-send-email-yang.zhong@intel.com>
+Subject: [Qemu-devel] [PATCH] x86/cpu: Enable new SSE/AVX/AVX512 cpu features
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,56 +22,64 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: John Snow <jsnow@redhat.com>, qemu-block@nongnu.org
-Cc: kwolf@redhat.com, qemu-devel@nongnu.org, mreitz@redhat.com
+To: qemu-devel@nongnu.org
+Cc: pbonzini@redhat.com, yang.zhong@intel.com
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---Q3IwQd1QhM2lq2wLetRhUimViCUhlgrT7
-From: =?UTF-8?B?THVrw6HFoSBEb2t0b3I=?= <ldoktor@redhat.com>
-To: John Snow <jsnow@redhat.com>, qemu-block@nongnu.org
-Cc: kwolf@redhat.com, qemu-devel@nongnu.org, mreitz@redhat.com
-Message-ID: <8fd37504-3d8f-a057-d57d-d098ea713d09@redhat.com>
-Subject: Re: [PATCH] iotests: fix 075 and 078
-References: <20171122001656.12996-1-jsnow@redhat.com>
-In-Reply-To: <20171122001656.12996-1-jsnow@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+Intel IceLake cpu has added new cpu features,AVX512_VBMI2/GFNI/
+VAES/VPCLMULQDQ/AVX512_VNNI/AVX512_BITALG. Those new cpu features
+need expose to guest VM.
 
-Dne 22.11.2017 v 01:16 John Snow napsal(a):
-> Both of these tests are for formats which now stipulate that they are
-> read-only. Adjust the tests to match.
->=20
-> Signed-off-by: John Snow <jsnow@redhat.com>
-> ---
->  tests/qemu-iotests/075 | 18 +++++++++---------
->  tests/qemu-iotests/078 | 14 +++++++-------
->  2 files changed, 16 insertions(+), 16 deletions(-)
+The bit definition:
+CPUID.(EAX=7,ECX=0):ECX[bit 06] AVX512_VBMI2
+CPUID.(EAX=7,ECX=0):ECX[bit 08] GFNI
+CPUID.(EAX=7,ECX=0):ECX[bit 09] VAES
+CPUID.(EAX=7,ECX=0):ECX[bit 10] VPCLMULQDQ
+CPUID.(EAX=7,ECX=0):ECX[bit 11] AVX512_VNNI
+CPUID.(EAX=7,ECX=0):ECX[bit 12] AVX512_BITALG
 
-Reviewed-by: Luk=C3=A1=C5=A1 Doktor <ldoktor@redhat.com>=20
+The release document ref below link:
+https://software.intel.com/sites/default/files/managed/c5/15/\
+architecture-instruction-set-extensions-programming-reference.pdf
 
-Yep, fixes the issue with "Opening cloop images without an explicit read-=
-only=3Don option is deprecated. Future versions will refuse to open the i=
-mage instead of automatically marking the image read-only.".
+Signed-off-by: Yang Zhong <yang.zhong@intel.com>
+---
+ target/i386/cpu.c | 6 +++---
+ target/i386/cpu.h | 6 ++++++
+ 2 files changed, 9 insertions(+), 3 deletions(-)
 
-Luk=C3=A1=C5=A1
-
-
---Q3IwQd1QhM2lq2wLetRhUimViCUhlgrT7
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2
-
-iQEwBAEBCAAaBQJaFScPExxsZG9rdG9yQHJlZGhhdC5jb20ACgkQJrNi5H/PIsFc
-OwgAw7n/Z2DKwxEytzGKzssA4qsqrar+PGjMlaPySQXo4ZIphbuFf7Lny8B0DKKU
-0K71W2HL/i75OtSgiCC35tMUP2rjXT0TEIeaQw9wPw6g2t5jEOpL0N7bFZdYqysY
-+6y1VUXGZlMlW1SS15m2U4T3JJH1VaJ/75SfTahXdp295buuimpjRfDFGzZQAwu4
-uWBqgeubqghu/Lv6xZmoxhwbnR+/F11X6qRd+X5pswnkWkbieV+98IqCYKjyOo3/
-WXo15MisKTrl8Jx0+un/28QWSK1YDzMyulOoEokPUn0G5peJyOHZQfxXWs+JywWC
-SHqwXF+GjYbB24lKUzTpSuI8LQ==
-=OYIn
------END PGP SIGNATURE-----
-
---Q3IwQd1QhM2lq2wLetRhUimViCUhlgrT7--
+diff --git a/target/i386/cpu.c b/target/i386/cpu.c
+index 045d661..a67ced2 100644
+--- a/target/i386/cpu.c
++++ b/target/i386/cpu.c
+@@ -437,9 +437,9 @@ static FeatureWordInfo feature_word_info[FEATURE_WORDS] = {
+     [FEAT_7_0_ECX] = {
+         .feat_names = {
+             NULL, "avx512vbmi", "umip", "pku",
+-            "ospke", NULL, NULL, NULL,
+-            NULL, NULL, NULL, NULL,
+-            NULL, NULL, "avx512-vpopcntdq", NULL,
++            "ospke", NULL, "avx512vbmi2", NULL,
++            "gfni", "vaes", "vpclmulqdq", "avx512vnni",
++            "avx512bitalg", NULL, "avx512-vpopcntdq", NULL,
+             "la57", NULL, NULL, NULL,
+             NULL, NULL, "rdpid", NULL,
+             NULL, NULL, NULL, NULL,
+diff --git a/target/i386/cpu.h b/target/i386/cpu.h
+index b086b15..cdbf8b0 100644
+--- a/target/i386/cpu.h
++++ b/target/i386/cpu.h
+@@ -635,6 +635,12 @@ typedef uint32_t FeatureWordArray[FEATURE_WORDS];
+ #define CPUID_7_0_ECX_UMIP     (1U << 2)
+ #define CPUID_7_0_ECX_PKU      (1U << 3)
+ #define CPUID_7_0_ECX_OSPKE    (1U << 4)
++#define CPUID_7_0_ECX_VBMI2    (1U << 6) /* Additional VBMI Instrs */
++#define CPUID_7_0_ECX_GFNI     (1U << 8)
++#define CPUID_7_0_ECX_VAES     (1U << 9)
++#define CPUID_7_0_ECX_VPCLMULQDQ (1U << 10)
++#define CPUID_7_0_ECX_AVX512VNNI (1U << 11)
++#define CPUID_7_0_ECX_AVX512BITALG (1U << 12)
+ #define CPUID_7_0_ECX_AVX512_VPOPCNTDQ (1U << 14) /* POPCNT for vectors of DW/QW */
+ #define CPUID_7_0_ECX_LA57     (1U << 16)
+ #define CPUID_7_0_ECX_RDPID    (1U << 22)
+-- 
+1.9.1
