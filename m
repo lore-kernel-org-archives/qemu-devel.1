@@ -1,27 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39121)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39111)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1eHUMR-0004ma-Di
-	for qemu-devel@nongnu.org; Wed, 22 Nov 2017 07:42:40 -0500
-Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1eHUMM-0007Bh-Qg
+	(envelope-from <quintela@redhat.com>) id 1eHUMQ-0004lo-O8
 	for qemu-devel@nongnu.org; Wed, 22 Nov 2017 07:42:39 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:34432)
+Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
+	(envelope-from <quintela@redhat.com>) id 1eHUML-0007B6-1D
+	for qemu-devel@nongnu.org; Wed, 22 Nov 2017 07:42:38 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:34414)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1eHUMM-0007BU-I2
-	for qemu-devel@nongnu.org; Wed, 22 Nov 2017 07:42:34 -0500
+	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1eHUMK-0007AX-Ro
+	for qemu-devel@nongnu.org; Wed, 22 Nov 2017 07:42:32 -0500
 Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
 	[10.5.11.11])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id B0E764ACBB
-	for <qemu-devel@nongnu.org>; Wed, 22 Nov 2017 12:42:33 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id 07E3F4E334
+	for <qemu-devel@nongnu.org>; Wed, 22 Nov 2017 12:42:32 +0000 (UTC)
 From: Juan Quintela <quintela@redhat.com>
-Date: Wed, 22 Nov 2017 13:42:18 +0100
-Message-Id: <20171122124219.12954-6-quintela@redhat.com>
+Date: Wed, 22 Nov 2017 13:42:17 +0100
+Message-Id: <20171122124219.12954-5-quintela@redhat.com>
 In-Reply-To: <20171122124219.12954-1-quintela@redhat.com>
 References: <20171122124219.12954-1-quintela@redhat.com>
-Subject: [Qemu-devel] [PATCH v2 5/6] migration: make migrate uri parameter
- optional
+Subject: [Qemu-devel] [PATCH v2 4/6] migration: Now set the migration uri
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,99 +32,84 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: dgilbert@redhat.com, lvivier@redhat.com, peterx@redhat.com
 
-Now that we have set an uri migration parameter, we can make it
-optional in the command line.
-
 Signed-off-by: Juan Quintela <quintela@redhat.com>
 ---
- hmp-commands.hx       |  4 ++--
- hmp.c                 |  5 +++--
- migration/migration.c | 12 +++++++++---
- qapi/migration.json   |  2 +-
- 4 files changed, 15 insertions(+), 8 deletions(-)
+ migration/migration.c | 25 ++++++++++++++++++-------
+ migration/migration.h |  2 ++
+ 2 files changed, 20 insertions(+), 7 deletions(-)
 
-diff --git a/hmp-commands.hx b/hmp-commands.hx
-index 4afd57cf5f..5be4e3934d 100644
---- a/hmp-commands.hx
-+++ b/hmp-commands.hx
-@@ -928,8 +928,8 @@ ETEXI
- 
-     {
-         .name       = "migrate",
--        .args_type  = "detach:-d,blk:-b,inc:-i,uri:s",
--        .params     = "[-d] [-b] [-i] uri",
-+        .args_type  = "detach:-d,blk:-b,inc:-i,uri:-s",
-+        .params     = "[-d] [-b] [-i] [uri]",
-         .help       = "migrate to URI (using -d to not wait for completion)"
- 		      "\n\t\t\t -b for migration without shared storage with"
- 		      " full copy of disk\n\t\t\t -i for migration without "
-diff --git a/hmp.c b/hmp.c
-index c9241f6947..27e0fca4ac 100644
---- a/hmp.c
-+++ b/hmp.c
-@@ -1928,10 +1928,11 @@ void hmp_migrate(Monitor *mon, const QDict *qdict)
-     bool detach = qdict_get_try_bool(qdict, "detach", false);
-     bool blk = qdict_get_try_bool(qdict, "blk", false);
-     bool inc = qdict_get_try_bool(qdict, "inc", false);
--    const char *uri = qdict_get_str(qdict, "uri");
-+    bool has_uri = qdict_get_try_bool(qdict, "uri", false);
-+    const char *uri = qdict_get_try_str(qdict, "uri");
-     Error *err = NULL;
- 
--    qmp_migrate(uri, !!blk, blk, !!inc, inc, false, false, &err);
-+    qmp_migrate(!!has_uri, uri, !!blk, blk, !!inc, inc, false, false, &err);
-     if (err) {
-         hmp_handle_error(mon, &err);
-         return;
 diff --git a/migration/migration.c b/migration/migration.c
-index 507226907b..3818a83489 100644
+index 3e48d37880..507226907b 100644
 --- a/migration/migration.c
 +++ b/migration/migration.c
-@@ -1356,7 +1356,7 @@ bool migration_is_blocked(Error **errp)
-     return false;
+@@ -240,10 +240,21 @@ void migrate_send_rp_req_pages(MigrationIncomingState *mis, const char *rbname,
+     }
  }
  
--void qmp_migrate(const char *uri, bool has_blk, bool blk,
-+void qmp_migrate(bool has_uri, const char *uri, bool has_blk, bool blk,
-                  bool has_inc, bool inc, bool has_detach, bool detach,
-                  Error **errp)
++void migrate_set_uri(const char *uri, Error **errp)
++{
++    MigrateSetParameters p = {
++        .has_uri = true,
++        .uri = (char *)uri,
++    };
++
++    qmp_migrate_set_parameters(&p, errp);
++}
++
+ void qemu_start_incoming_migration(const char *uri, Error **errp)
  {
-@@ -1374,7 +1374,13 @@ void qmp_migrate(const char *uri, bool has_blk, bool blk,
+     const char *p;
+ 
++    migrate_set_uri(uri, errp);
+     qapi_event_send_migration(MIGRATION_STATUS_SETUP, &error_abort);
+     if (!strcmp(uri, "defer")) {
+         deferred_incoming_migration(errp);
+@@ -1363,7 +1374,7 @@ void qmp_migrate(const char *uri, bool has_blk, bool blk,
          error_setg(errp, "Guest is waiting for an incoming migration");
          return;
      }
--    migrate_set_uri(uri, errp);
-+    if (has_uri && uri) {
-+        migrate_set_uri(uri, errp);
-+    }
-+    if (!s->parameters.uri) {
-+        error_setg(errp, "Migration uri needs to be set");
-+        return;
-+    }
+-
++    migrate_set_uri(uri, errp);
      if (migration_is_blocked(errp)) {
          return;
      }
-@@ -1412,7 +1418,7 @@ void qmp_migrate(const char *uri, bool has_blk, bool blk,
-     } else if (strstart(s->parameters.uri, "fd:", &p)) {
+@@ -1388,20 +1399,20 @@ void qmp_migrate(const char *uri, bool has_blk, bool blk,
+ 
+     s = migrate_init();
+ 
+-    if (strstart(uri, "tcp:", &p)) {
++    if (strstart(s->parameters.uri, "tcp:", &p)) {
+         tcp_start_outgoing_migration(s, p, &local_err);
+ #ifdef CONFIG_RDMA
+-    } else if (strstart(uri, "rdma:", &p)) {
++    } else if (strstart(s->parameters.uri, "rdma:", &p)) {
+         rdma_start_outgoing_migration(s, p, &local_err);
+ #endif
+-    } else if (strstart(uri, "exec:", &p)) {
++    } else if (strstart(s->parameters.uri, "exec:", &p)) {
+         exec_start_outgoing_migration(s, p, &local_err);
+-    } else if (strstart(uri, "unix:", &p)) {
++    } else if (strstart(s->parameters.uri, "unix:", &p)) {
+         unix_start_outgoing_migration(s, p, &local_err);
+-    } else if (strstart(uri, "fd:", &p)) {
++    } else if (strstart(s->parameters.uri, "fd:", &p)) {
          fd_start_outgoing_migration(s, p, &local_err);
      } else {
--        error_setg(errp, QERR_INVALID_PARAMETER_VALUE, "s->parameters.uri",
-+        error_setg(errp, QERR_INVALID_PARAMETER_VALUE, "migration uri",
+-        error_setg(errp, QERR_INVALID_PARAMETER_VALUE, "uri",
++        error_setg(errp, QERR_INVALID_PARAMETER_VALUE, "s->parameters.uri",
                     "a valid migration protocol");
          migrate_set_state(&s->state, MIGRATION_STATUS_SETUP,
                            MIGRATION_STATUS_FAILED);
-diff --git a/qapi/migration.json b/qapi/migration.json
-index ebde890604..6b9758ab99 100644
---- a/qapi/migration.json
-+++ b/qapi/migration.json
-@@ -1042,7 +1042,7 @@
- #
- ##
- { 'command': 'migrate',
--  'data': {'uri': 'str', '*blk': 'bool', '*inc': 'bool', '*detach': 'bool' } }
-+  'data': {'*uri': 'str', '*blk': 'bool', '*inc': 'bool', '*detach': 'bool' } }
+diff --git a/migration/migration.h b/migration/migration.h
+index 663415fe48..cb0ab4807a 100644
+--- a/migration/migration.h
++++ b/migration/migration.h
+@@ -210,4 +210,6 @@ void migrate_send_rp_pong(MigrationIncomingState *mis,
+ void migrate_send_rp_req_pages(MigrationIncomingState *mis, const char* rbname,
+                               ram_addr_t start, size_t len);
  
- ##
- # @migrate-incoming:
++void migrate_set_uri(const char *uri, Error **errp);
++
+ #endif
 -- 
 2.13.6
