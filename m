@@ -1,43 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37318)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52215)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pmorel@linux.vnet.ibm.com>) id 1eHcJg-0001lQ-7B
-	for qemu-devel@nongnu.org; Wed, 22 Nov 2017 16:12:21 -0500
+	(envelope-from <eblake@redhat.com>) id 1eHd0f-0004Am-NX
+	for qemu-devel@nongnu.org; Wed, 22 Nov 2017 16:56:46 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pmorel@linux.vnet.ibm.com>) id 1eHcJd-0007zM-7O
-	for qemu-devel@nongnu.org; Wed, 22 Nov 2017 16:12:20 -0500
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:50854)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pmorel@linux.vnet.ibm.com>)
-	id 1eHcJc-0007yj-UW
-	for qemu-devel@nongnu.org; Wed, 22 Nov 2017 16:12:17 -0500
-Received: from pps.filterd (m0098393.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
-	vAMLAIQb019646
-	for <qemu-devel@nongnu.org>; Wed, 22 Nov 2017 16:12:13 -0500
-Received: from e06smtp13.uk.ibm.com (e06smtp13.uk.ibm.com [195.75.94.109])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2edg852ftc-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Wed, 22 Nov 2017 16:12:13 -0500
-Received: from localhost
-	by e06smtp13.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
-	Only! Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <pmorel@linux.vnet.ibm.com>;
-	Wed, 22 Nov 2017 21:12:10 -0000
-References: <1510854715-7081-1-git-send-email-pmorel@linux.vnet.ibm.com>
-	<1510854715-7081-3-git-send-email-pmorel@linux.vnet.ibm.com>
-	<20171121113845.0a0377d1.cohuck@redhat.com>
-	<20171121152503.1f0a023b.cohuck@redhat.com>
-	<c7ab1846-30ef-cd18-e905-a2b41c7fd9fd@linux.vnet.ibm.com>
-	<20171122142521.2f4493f4.cohuck@redhat.com>
-From: Pierre Morel <pmorel@linux.vnet.ibm.com>
-Date: Wed, 22 Nov 2017 22:12:08 +0100
+	(envelope-from <eblake@redhat.com>) id 1eHd0d-000622-31
+	for qemu-devel@nongnu.org; Wed, 22 Nov 2017 16:56:44 -0500
+References: <20171122101958.17065-1-vsementsov@virtuozzo.com>
+	<20171122101958.17065-5-vsementsov@virtuozzo.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <29b61d23-ddb9-962f-9913-4139598b18b8@redhat.com>
+Date: Wed, 22 Nov 2017 15:56:34 -0600
 MIME-Version: 1.0
-In-Reply-To: <20171122142521.2f4493f4.cohuck@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Message-Id: <11129f73-5590-6f49-07a1-3e5a95180a8a@linux.vnet.ibm.com>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v2 2/7] s390x/pci: rework PCI STORE
+In-Reply-To: <20171122101958.17065-5-vsementsov@virtuozzo.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="VnHiTuQgjpid9JxJ251P8URqcFcAx2WFr"
+Subject: Re: [Qemu-devel] [PATCH 4/5] nbd: rename nbd_option and
+ nbd_opt_reply
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -46,114 +25,61 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Cornelia Huck <cohuck@redhat.com>
-Cc: qemu-devel@nongnu.org, agraf@suse.de, borntraeger@de.ibm.com, zyimin@linux.vnet.ibm.com, pasic@linux.vnet.ibm.com
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org
+Cc: pbonzini@redhat.com, kwolf@redhat.com, mreitz@redhat.com, den@openvz.org
 
-On 22/11/2017 14:25, Cornelia Huck wrote:
-> On Tue, 21 Nov 2017 19:03:17 +0100
-> Pierre Morel <pmorel@linux.vnet.ibm.com> wrote:
->=20
->> On 21/11/2017 15:25, Cornelia Huck wrote:
->>> On Tue, 21 Nov 2017 11:38:45 +0100
->>> Cornelia Huck <cohuck@redhat.com> wrote:
->>>   =20
->>>> On Thu, 16 Nov 2017 18:51:50 +0100
->>>> Pierre Morel <pmorel@linux.vnet.ibm.com> wrote:
->>>   =20
->>>>> @@ -493,9 +494,13 @@ int pcistg_service_call(S390CPU *cpu, uint8_t =
-r1, uint8_t r2)
->>>>>            break;
->>>>>        }
->>>>>   =20
->>>>> -    data =3D env->regs[r1];
->>>>> -    if (pcias < 6) {
->>>>> -        if ((8 - (offset & 0x7)) < len) {
->>>>> +    /* Test that the pcias is valid and do the appropriates operat=
-ions */
->>>>> +    switch (pcias) {
->>>>> +    case 0 ... 5:
->>>>
->>>> Make this
->>>> case 0...5:
->>>> ?
->>>
->>> ...only that it confuses the compiler when using numbers. We can eith=
-er
->>
->> I did not see this as I replied to the previous email, sorry.
->>
->>> keep the slightly ugly version, or introduce #defines.
->>> ZPCI_PCIAS_IOREGION_{MIN,MAX} (and maybe ZPCI_PCIAS_CONFIG for 15)?
->>
->>
->> I agree something is missing.
->> But I am not sure that a #define brings clarity.
->> I would prefer to add a comment.
->> 	/* A ZPCI PCI card may use any BAR from BAR 0 to BAR 5 */
->>
->> ?
->=20
-> It's more a speaking value vs. magic numbers thing. A comment does not
-> hurt either, though :)
->=20
-> (And we get rid of the spacing as well.)
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--VnHiTuQgjpid9JxJ251P8URqcFcAx2WFr
+From: Eric Blake <eblake@redhat.com>
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+ qemu-block@nongnu.org, qemu-devel@nongnu.org
+Cc: pbonzini@redhat.com, kwolf@redhat.com, mreitz@redhat.com, den@openvz.org
+Message-ID: <29b61d23-ddb9-962f-9913-4139598b18b8@redhat.com>
+Subject: Re: [PATCH 4/5] nbd: rename nbd_option and nbd_opt_reply
+References: <20171122101958.17065-1-vsementsov@virtuozzo.com>
+ <20171122101958.17065-5-vsementsov@virtuozzo.com>
+In-Reply-To: <20171122101958.17065-5-vsementsov@virtuozzo.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-OK, thanks.
+On 11/22/2017 04:19 AM, Vladimir Sementsov-Ogievskiy wrote:
+> Rename nbd_optino and nbd_opt_reply to NBDOption and NBDOptionReply
 
->=20
->>
->>
->>>>> +         * A length of 0 is invalid and length should not cross a =
-double word
->>>>> +         */
->>>>> +        if (!len || (len > (8 - (offset & 0x7)))) {
->>>>>                program_interrupt(env, PGM_OPERAND, 4);
->>>>>                return 0;
->>>>>            }
->>>>> @@ -513,21 +518,21 @@ int pcistg_service_call(S390CPU *cpu, uint8_t=
- r1, uint8_t r2)
->>>>>                program_interrupt(env, PGM_OPERAND, 4);
->>>>>                return 0;
->>>>>            }
->>>>> -    } else if (pcias =3D=3D 15) {
->>>>> -        if ((4 - (offset & 0x3)) < len) {
->>>>> -            program_interrupt(env, PGM_OPERAND, 4);
->>>>> -            return 0;
->>>>> -        }
->>>>> -
->>>>> -        if (zpci_endian_swap(&data, len)) {
->>>>> +        break;
->>>>> +    case 15:
->>>>> +        /* ZPCI uses the pseudo BAR number 15 as configuration spa=
-ce */
->>>>> +        /* possible access lengths are 1,2,4 and must not cross a =
-word */
->>>>> +        if (!len || (len > (4 - (offset & 0x3))) || len =3D=3D 3) =
-{
->>>>>                program_interrupt(env, PGM_OPERAND, 4);
->>>>>                return 0;
->>>>>            }
->>>>> -
->>>>> +        /* len =3D 1,2,4 so we do not need to test */
->>>>> +        zpci_endian_swap(&data, len);
->>>>>            pci_host_config_write_common(pbdev->pdev, offset,
->>>>>                                         pci_config_size(pbdev->pdev=
-),
->>>>>                                         data, len);
->>>>> -    } else {
->>>>> +        break;
->>>>> +    default:
->>>>>            DPRINTF("pcistg invalid space\n");
->>>>>            setcc(cpu, ZPCI_PCI_LS_ERR);
->>>>>            s390_set_status_code(env, r2, ZPCI_PCI_ST_INVAL_AS);
->>>>
->>>> Other than the nits, looks good.
->>>   =20
->>
->>
->=20
+s/optino/option/
 
+> to correspond to Qemu coding style and other structures here.
+>=20
+> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+> ---
+>  include/block/nbd.h |  8 ++++----
+>  nbd/client.c        | 12 ++++++------
+>  2 files changed, 10 insertions(+), 10 deletions(-)
+>=20
+Reviewed-by: Eric Blake <eblake@redhat.com>
 
 --=20
-Pierre Morel
-Linux/KVM/QEMU in B=C3=B6blingen - Germany
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
+
+
+--VnHiTuQgjpid9JxJ251P8URqcFcAx2WFr
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAloV8pIACgkQp6FrSiUn
+Q2peIQf+Py3Zu365m5hUcVFa6o0mEuZm4PZopNzmUb6IoIhEmlzywwoZ+ObNzP+w
+9F0CtHZQ1v061Zcrn6/2d7MYJlP3MvcaFzT7EhOLcg6NVvkSJn3iStil9GQfPLJ0
+6wwlcxxnTg0VTL7WCTtwvjeuOcS+cQwRhDJVmEMkTb2ks2s8jQUOv+i8LSwFzfwS
+CRhTM9zy7Ct/0aIBGTxYtKJcFWr5ZL8mLMXwPMsigAg1rGIVk+iMBa8/jO//KRCd
+y8/BnQhzcknYUqiIUSGmkaKH5BfuNL3AqPssg/COdfkkGRl/Eg7C9IOXmZbHkmEW
+QbXd+S74gk2E0wQwlD1K5ejSNe59xg==
+=/mXY
+-----END PGP SIGNATURE-----
+
+--VnHiTuQgjpid9JxJ251P8URqcFcAx2WFr--
