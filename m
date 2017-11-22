@@ -1,31 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36762)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36998)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1eHUCL-000161-8h
-	for qemu-devel@nongnu.org; Wed, 22 Nov 2017 07:32:14 -0500
+	(envelope-from <lprosek@redhat.com>) id 1eHUDA-0001Ti-8o
+	for qemu-devel@nongnu.org; Wed, 22 Nov 2017 07:33:06 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1eHUCH-0003CJ-B0
-	for qemu-devel@nongnu.org; Wed, 22 Nov 2017 07:32:13 -0500
-Received: from mail-qt0-x242.google.com ([2607:f8b0:400d:c0d::242]:40173)
+	(envelope-from <lprosek@redhat.com>) id 1eHUD5-0003Wz-Jt
+	for qemu-devel@nongnu.org; Wed, 22 Nov 2017 07:33:04 -0500
+Received: from mail-ua0-f193.google.com ([209.85.217.193]:41417)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1eHUCH-0003By-66
-	for qemu-devel@nongnu.org; Wed, 22 Nov 2017 07:32:09 -0500
-Received: by mail-qt0-x242.google.com with SMTP id u42so23471356qte.7
-	for <qemu-devel@nongnu.org>; Wed, 22 Nov 2017 04:32:08 -0800 (PST)
-Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
-	<philippe.mathieu.daude@gmail.com>
-References: <20171122084157.11480-1-quintela@redhat.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <757102c5-41ad-8fe7-03f0-255e27ad43f3@amsat.org>
-Date: Wed, 22 Nov 2017 09:32:04 -0300
+	(Exim 4.71) (envelope-from <lprosek@redhat.com>) id 1eHUD5-0003Wa-Go
+	for qemu-devel@nongnu.org; Wed, 22 Nov 2017 07:32:59 -0500
+Received: by mail-ua0-f193.google.com with SMTP id l25so10481141uag.8
+	for <qemu-devel@nongnu.org>; Wed, 22 Nov 2017 04:32:58 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <20171122084157.11480-1-quintela@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH] tcg: Fix complilation with TCG
+In-Reply-To: <c3c2fa0d-1e93-7f17-f8d3-db8eee82bfd1@redhat.com>
+References: <20171120142216.17832-1-lprosek@redhat.com>
+	<c3c2fa0d-1e93-7f17-f8d3-db8eee82bfd1@redhat.com>
+From: Ladi Prosek <lprosek@redhat.com>
+Date: Wed, 22 Nov 2017 13:32:57 +0100
+Message-ID: <CABdb737Evdi0zKEFmkAg1qmp6MqtzX_Gxc=S5-vBbk_m8RNrMw@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH] msix: don't mask already masked vectors on
+ reset
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,47 +29,111 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Juan Quintela <quintela@redhat.com>, qemu-devel@nongnu.org
-Cc: lvivier@redhat.com, dgilbert@redhat.com, peterx@redhat.com
+To: Marcel Apfelbaum <marcel@redhat.com>
+Cc: qemu-devel <qemu-devel@nongnu.org>, "Michael S. Tsirkin" <mst@redhat.com>, Geoffrey McRae <geoff@hostfission.com>, Alex Williamson <alex.williamson@redhat.com>
 
-On 11/22/2017 05:41 AM, Juan Quintela wrote:
-> This commit started use tb_unlock() and tlb_set_dirty() on non TCG
-> code.  Add the function as stubs.
-> 
-> commit 27266271977c5a30f2f7d493e042be1897827bdd
-> Author: Peter Maydell <peter.maydell@linaro.org>
-> Date:   Mon Nov 20 18:08:27 2017 +0000
-> 
->     exec.c: Factor out before/after actions for notdirty memory writes
->     ....
-> 
+On Wed, Nov 22, 2017 at 11:46 AM, Marcel Apfelbaum <marcel@redhat.com> wrote:
+> Hi Ladi,
+>
+> On 20/11/2017 16:22, Ladi Prosek wrote:
+>>
+>> msix_mask_all() is supposed to invoke the release vector notifier if the
+>> state of the
+>> respective vector changed from unmasked or masked.
+>
+>
+> You mean from unmasked "to" masked right?
 
-Maybe pasting the sha-1 is enough "Since 272662719 those stubs are missing".
+Yes, that's a typo.
 
-> Signed-off-by: Juan Quintela <quintela@redhat.com>
+> The way it's currently called from
+>>
+>> msix_reset(), though, may result in calling the release notifier even if
+>> the vector
+>> is already masked.
+>>
+>> 1) msix_reset() clears out the msix_cap field and the msix_table.
+>> 2) msix_mask_all() runs with was_masked=false for all vectors because of
+>> 1), which
+>>     results in calling the release notifier on all vectors.
+>> 3) if msix_reset() is subsequently called again, it goes through the same
+>> steps and
+>>     calls the release notifier on all vectors again.
+>>
+>
+> As far as I can see in the code you are right.(very reset will trigger the
+> release notifiers
+> again)
+>
+>> This commit moves msix_mask_all() up so it runs before the device state is
+>> lost.
+>
+>
+> OK
+>
+>> And
+>> it adds a call to msix_update_function_masked() so that the device
+>> remembers that
+>> MSI-X is masked.
+>>
+>
+> msix_update_function_masked checks the msix is enabled or masked-off.
+> You are building on the fact the msix will not be enabled to set
+> "msix_function_masked" to "true", right?
+> (I just want to be sure I understand the patch)
 
-Updating the subject ("accel: fix compiling without TCG"?):
+Correct. msix_enabled() will return false because we've just reset
 
-Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+  dev->config[dev->msix_cap + MSIX_CONTROL_OFFSET]
 
-> ---
->  accel/stubs/tcg-stub.c | 8 ++++++++
->  1 file changed, 8 insertions(+)
-> 
-> diff --git a/accel/stubs/tcg-stub.c b/accel/stubs/tcg-stub.c
-> index 5dd480b1a2..ee575a8718 100644
-> --- a/accel/stubs/tcg-stub.c
-> +++ b/accel/stubs/tcg-stub.c
-> @@ -20,3 +20,11 @@
->  void tb_flush(CPUState *cpu)
->  {
->  }
-> +
-> +void tb_unlock(void)
-> +{
-> +}
-> +
-> +void tlb_set_dirty(CPUState *cpu, target_ulong vaddr)
-> +{
-> +}
-> 
+I guess we could also simply assign true to it:
+
+  dev->msix_function_masked = true;
+
+just like msix_init() does.
+
+>> This is likely a low impact issue, found while debugging an already broken
+>> device. It
+>> is however easy to fix and the expectation that the use and release
+>> notifier invocations
+>> are always balanced is very natural.
+>>
+>
+> I would leave it (maybe) out of 2.11 because it may expose other bugs
+> and we are after rc2 already.
+>
+> Adding Alex Williamson to see it does not affect device assignment,
+> other than that the patch looks OK to me.
+>
+>
+> Thanks,
+> Marcel
+>
+>
+>> Signed-off-by: Ladi Prosek <lprosek@redhat.com>
+>> ---
+>>   hw/pci/msix.c | 3 ++-
+>>   1 file changed, 2 insertions(+), 1 deletion(-)
+>>
+>> diff --git a/hw/pci/msix.c b/hw/pci/msix.c
+>> index c944c02135..34656de9b0 100644
+>> --- a/hw/pci/msix.c
+>> +++ b/hw/pci/msix.c
+>> @@ -500,11 +500,12 @@ void msix_reset(PCIDevice *dev)
+>>           return;
+>>       }
+>>       msix_clear_all_vectors(dev);
+>> +    msix_mask_all(dev, dev->msix_entries_nr);
+>>       dev->config[dev->msix_cap + MSIX_CONTROL_OFFSET] &=
+>>             ~dev->wmask[dev->msix_cap + MSIX_CONTROL_OFFSET];
+>>       memset(dev->msix_table, 0, dev->msix_entries_nr *
+>> PCI_MSIX_ENTRY_SIZE);
+>>       memset(dev->msix_pba, 0, QEMU_ALIGN_UP(dev->msix_entries_nr, 64) /
+>> 8);
+>> -    msix_mask_all(dev, dev->msix_entries_nr);
+>> +    msix_update_function_masked(dev);
+>>   }
+>>     /* PCI spec suggests that devices make it possible for software to
+>> configure
+>>
+>
