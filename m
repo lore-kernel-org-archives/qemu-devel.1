@@ -1,20 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48359)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48633)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1eHXzU-00071D-LU
-	for qemu-devel@nongnu.org; Wed, 22 Nov 2017 11:35:14 -0500
+	(envelope-from <thuth@redhat.com>) id 1eHY0R-0007VO-Va
+	for qemu-devel@nongnu.org; Wed, 22 Nov 2017 11:36:12 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1eHXzT-0001r6-BV
-	for qemu-devel@nongnu.org; Wed, 22 Nov 2017 11:35:12 -0500
-References: <1511364808-30171-1-git-send-email-deepa.srinivasan@oracle.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <215448fd-8dbf-882a-35af-7778a6c4ab38@redhat.com>
-Date: Wed, 22 Nov 2017 17:34:58 +0100
+	(envelope-from <thuth@redhat.com>) id 1eHY0O-0002a8-S4
+	for qemu-devel@nongnu.org; Wed, 22 Nov 2017 11:36:12 -0500
+References: <20171122142627.73170-1-borntraeger@de.ibm.com>
+	<20171122142627.73170-3-borntraeger@de.ibm.com>
+From: Thomas Huth <thuth@redhat.com>
+Message-ID: <099a442d-fafb-1c96-db41-f4fe87308139@redhat.com>
+Date: Wed, 22 Nov 2017 17:36:03 +0100
 MIME-Version: 1.0
-In-Reply-To: <1511364808-30171-1-git-send-email-deepa.srinivasan@oracle.com>
+In-Reply-To: <20171122142627.73170-3-borntraeger@de.ibm.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] block: Fix qemu crash when using scsi-block
+Subject: Re: [Qemu-devel] [PATCH 2/2] pc-bios/s390-ccw: zero out bss section
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,189 +24,78 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Deepa Srinivasan <deepa.srinivasan@oracle.com>, kwolf@redhat.com, mreitz@redhat.com, stefanha@redhat.com, qemu-block@nongnu.org, qemu-devel@nongnu.org, mark.kanda@oracle.com
-Cc: Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>
+To: Christian Borntraeger <borntraeger@de.ibm.com>, Cornelia Huck <cohuck@redhat.com>
+Cc: qemu-devel <qemu-devel@nongnu.org>, qemu-s390x <qemu-s390x@nongnu.org>, Halil Pasic <pasic@linux.vnet.ibm.com>, Alexander Graf <agraf@suse.de>, Richard Henderson <rth@twiddle.net>
 
-On 22/11/2017 16:33, Deepa Srinivasan wrote:
-> Starting qemu with the following arguments causes qemu to segfault:
-> ... -device lsi,id=lsi0 -drive file=iscsi:<...>,format=raw,if=none,node-name=
-> iscsi1 -device scsi-block,bus=lsi0.0,id=<...>,drive=iscsi1
+On 22.11.2017 15:26, Christian Borntraeger wrote:
+> The QEMU ELF loader does not zero the bss segment.
+> This resulted in several bugs, e.g. see
 > 
-> This patch fixes blk_aio_ioctl() so it does not pass stack addresses to
-> blk_aio_ioctl_entry() which may be invoked after blk_aio_ioctl() returns. More
-> details about the bug follow.
+> commit 5d739a4787a5 (s390-ccw.img: Fix sporadic errors with ccw boot image - initialize css)
+> commit 6a40fa2669d3 (s390-ccw.img: Initialize next_idx)
+> commit 8775d91a0f42 (pc-bios/s390-ccw: Fix problem with invalid virtio-scsi LUN when rebooting)
 > 
-> blk_aio_ioctl() invokes blk_aio_prwv() with blk_aio_ioctl_entry as the
-> coroutine parameter. blk_aio_prwv() ultimately calls aio_co_enter().
+> Lets fix this once and forever by letting the BIOS zero the bss itself.
 > 
-> When blk_aio_ioctl() is executed from within a coroutine context (e.g.
-> iscsi_bh_cb()), aio_co_enter() adds the coroutine (blk_aio_ioctl_entry) to
-> the current coroutine's wakeup queue. blk_aio_ioctl() then returns.
-> 
-> When blk_aio_ioctl_entry() executes later, it accesses an invalid pointer:
-> ....
->     BlkRwCo *rwco = &acb->rwco;
-> 
->     rwco->ret = blk_co_ioctl(rwco->blk, rwco->offset,
->                              rwco->qiov->iov[0].iov_base);  <--- qiov is
->                                                                  invalid here
-> ...
-> 
-> In the case when blk_aio_ioctl() is called from a non-coroutine context,
-> blk_aio_ioctl_entry() executes immediately. But if bdrv_co_ioctl() calls
-> qemu_coroutine_yield(), blk_aio_ioctl() will return. When the coroutine
-> execution is complete, control returns to blk_aio_ioctl_entry() after the call
-> to blk_co_ioctl(). There is no invalid reference after this point, but the
-> function is still holding on to invalid pointers.
-> 
-> The fix is to allocate memory for the QEMUIOVector and struct iovec as part of
-> the request struct which the IO buffer is part of. The memory for this struct is
-> guaranteed to be valid till the AIO is completed.
-> 
-> Signed-off-by: Deepa Srinivasan <deepa.srinivasan@oracle.com>
-> Signed-off-by: Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>
-> Reviewed-by: Mark Kanda <mark.kanda@oracle.com>
+> Suggested-by: Alexander Graf <agraf@suse.de>
+> Signed-off-by: Christian Borntraeger <borntraeger@de.ibm.com>
 > ---
->  block/block-backend.c          | 13 ++-----------
->  hw/block/virtio-blk.c          |  9 ++++++++-
->  hw/scsi/scsi-disk.c            | 10 +++++++++-
->  hw/scsi/scsi-generic.c         |  9 ++++++++-
->  include/sysemu/block-backend.h |  2 +-
->  5 files changed, 28 insertions(+), 15 deletions(-)
+>  pc-bios/s390-ccw/start.S | 30 +++++++++++++++++++++++++++---
+>  1 file changed, 27 insertions(+), 3 deletions(-)
 > 
-> diff --git a/block/block-backend.c b/block/block-backend.c
-> index baef8e7..c275827 100644
-> --- a/block/block-backend.c
-> +++ b/block/block-backend.c
-> @@ -1472,19 +1472,10 @@ static void blk_aio_ioctl_entry(void *opaque)
->      blk_aio_complete(acb);
->  }
+> diff --git a/pc-bios/s390-ccw/start.S b/pc-bios/s390-ccw/start.S
+> index 43f9bd2..eb8d024 100644
+> --- a/pc-bios/s390-ccw/start.S
+> +++ b/pc-bios/s390-ccw/start.S
+> @@ -3,7 +3,7 @@
+>   * into the pc-bios directory of qemu.
+>   *
+>   * Copyright (c) 2013 Alexander Graf <agraf@suse.de>
+> - * Copyright 2013 IBM Corp.
+> + * Copyright IBM Corp. 2013, 2017
+>   *
+>   * This work is licensed under the terms of the GNU GPL, version 2 or (at
+>   * your option) any later version. See the COPYING file in the top-level
+> @@ -13,8 +13,32 @@
+>          .globl _start
+>  _start:
 >  
-> -BlockAIOCB *blk_aio_ioctl(BlockBackend *blk, unsigned long int req, void *buf,
-> +BlockAIOCB *blk_aio_ioctl(BlockBackend *blk, unsigned long int req, QEMUIOVector *qiov,
->                            BlockCompletionFunc *cb, void *opaque)
+> -larl	%r15, stack + 0x8000    /* Set up stack */
+> -j	main                    /* And call C */
+> +	larl   %r15, stack + 0x8000	/* Set up stack */
+> +
+> +	/* clear bss */
+> +	larl %r2, __bss_start
+> +	larl %r3, _end
+> +	slgr %r3, %r2		/* get sizeof bss */
+> +	ltgr	%r3,%r3 	/* bss emtpy? */
+> +	jz	done
+> +	aghi	%r3,-1
+> +	srlg	%r4,%r3,8	/* how many 256 byte chunks? */
+> +	ltgr	%r4,%r4
+> +	lgr	%r1,%r2
+> +	jz	remainder
+> +loop:
+> +	xc	0(256,%r1),0(%r1)
+> +	la	%r1,256(%r1)
+> +	brctg	%r4,loop
+> +remainder:
+> +	larl	%r2,memsetxc
+> +	ex	%r3,0(%r2)
 
-I think this is not the best way to fix the bug, because it adds extra
-unnecessary code in the callers.
+Wow, with EXECUTE :-)
 
-Perhaps you can change BlkRwCo's "qiov" field to "void *buf" and the
-same for blk_aio_prwv's "qiov" argument?
-
-Then the QEMUIOVector is not needed at all, and blk_co_ioctl can just
-use rwco->buf.
-
-Thanks,
-
-Paolo
-
->  {
-> -    QEMUIOVector qiov;
-> -    struct iovec iov;
-> -
-> -    iov = (struct iovec) {
-> -        .iov_base = buf,
-> -        .iov_len = 0,
-> -    };
-> -    qemu_iovec_init_external(&qiov, &iov, 1);
-> -
-> -    return blk_aio_prwv(blk, req, 0, &qiov, blk_aio_ioctl_entry, 0, cb, opaque);
-> +    return blk_aio_prwv(blk, req, 0, qiov, blk_aio_ioctl_entry, 0, cb, opaque);
->  }
->  
->  int blk_co_pdiscard(BlockBackend *blk, int64_t offset, int bytes)
-> diff --git a/hw/block/virtio-blk.c b/hw/block/virtio-blk.c
-> index 05d1440..ed9f774 100644
-> --- a/hw/block/virtio-blk.c
-> +++ b/hw/block/virtio-blk.c
-> @@ -151,6 +151,8 @@ out:
->  typedef struct {
->      VirtIOBlockReq *req;
->      struct sg_io_hdr hdr;
-> +    QEMUIOVector qiov;
-> +    struct iovec iov;
->  } VirtIOBlockIoctlReq;
->  
->  static void virtio_blk_ioctl_complete(void *opaque, int status)
-> @@ -298,7 +300,12 @@ static int virtio_blk_handle_scsi_req(VirtIOBlockReq *req)
->      ioctl_req->hdr.sbp = elem->in_sg[elem->in_num - 3].iov_base;
->      ioctl_req->hdr.mx_sb_len = elem->in_sg[elem->in_num - 3].iov_len;
->  
-> -    acb = blk_aio_ioctl(blk->blk, SG_IO, &ioctl_req->hdr,
-> +    ioctl_req->iov.iov_base = &ioctl_req->hdr;
-> +    ioctl_req->iov.iov_len = 0;
+> +done:
+> +	j      main		/* And call C */
 > +
-> +    qemu_iovec_init_external(&ioctl_req->qiov, &ioctl_req->iov, 1);
+> +memsetxc:
+> +	xc	0(1,%r1),0(%r1)
 > +
-> +    acb = blk_aio_ioctl(blk->blk, SG_IO, &ioctl_req->qiov,
->                          virtio_blk_ioctl_complete, ioctl_req);
->      if (!acb) {
->          g_free(ioctl_req);
-> diff --git a/hw/scsi/scsi-disk.c b/hw/scsi/scsi-disk.c
-> index 1243117..7cbe18d 100644
-> --- a/hw/scsi/scsi-disk.c
-> +++ b/hw/scsi/scsi-disk.c
-> @@ -2636,6 +2636,9 @@ typedef struct SCSIBlockReq {
->      SCSIDiskReq req;
->      sg_io_hdr_t io_header;
 >  
-> +    QEMUIOVector qiov;
-> +    struct iovec iov;
-> +
->      /* Selected bytes of the original CDB, copied into our own CDB.  */
->      uint8_t cmd, cdb1, group_number;
->  
-> @@ -2722,7 +2725,12 @@ static BlockAIOCB *scsi_block_do_sgio(SCSIBlockReq *req,
->      io_header->usr_ptr = r;
->      io_header->flags |= SG_FLAG_DIRECT_IO;
->  
-> -    aiocb = blk_aio_ioctl(s->qdev.conf.blk, SG_IO, io_header, cb, opaque);
-> +    req->iov.iov_base = io_header;
-> +    req->iov.iov_len = 0;
-> +
-> +    qemu_iovec_init_external(&req->qiov, &req->iov, 1);
-> +
-> +    aiocb = blk_aio_ioctl(s->qdev.conf.blk, SG_IO, &req->qiov, cb, opaque);
->      assert(aiocb != NULL);
->      return aiocb;
->  }
-> diff --git a/hw/scsi/scsi-generic.c b/hw/scsi/scsi-generic.c
-> index bd0d9ff..856af7c 100644
-> --- a/hw/scsi/scsi-generic.c
-> +++ b/hw/scsi/scsi-generic.c
-> @@ -46,6 +46,8 @@ typedef struct SCSIGenericReq {
->      int buflen;
->      int len;
->      sg_io_hdr_t io_header;
-> +    QEMUIOVector qiov;
-> +    struct iovec iov;
->  } SCSIGenericReq;
->  
->  static void scsi_generic_save_request(QEMUFile *f, SCSIRequest *req)
-> @@ -135,7 +137,12 @@ static int execute_command(BlockBackend *blk,
->      r->io_header.usr_ptr = r;
->      r->io_header.flags |= SG_FLAG_DIRECT_IO;
->  
-> -    r->req.aiocb = blk_aio_ioctl(blk, SG_IO, &r->io_header, complete, r);
-> +    r->iov.iov_base = &r->io_header;
-> +    r->iov.iov_len = 0;
-> +
-> +    qemu_iovec_init_external(&r->qiov, &r->iov, 1);
-> +
-> +    r->req.aiocb = blk_aio_ioctl(blk, SG_IO, &r->qiov, complete, r);
->      if (r->req.aiocb == NULL) {
->          return -EIO;
->      }
-> diff --git a/include/sysemu/block-backend.h b/include/sysemu/block-backend.h
-> index c4e52a5..32f4486 100644
-> --- a/include/sysemu/block-backend.h
-> +++ b/include/sysemu/block-backend.h
-> @@ -151,7 +151,7 @@ void blk_aio_cancel(BlockAIOCB *acb);
->  void blk_aio_cancel_async(BlockAIOCB *acb);
->  int blk_co_ioctl(BlockBackend *blk, unsigned long int req, void *buf);
->  int blk_ioctl(BlockBackend *blk, unsigned long int req, void *buf);
-> -BlockAIOCB *blk_aio_ioctl(BlockBackend *blk, unsigned long int req, void *buf,
-> +BlockAIOCB *blk_aio_ioctl(BlockBackend *blk, unsigned long int req, QEMUIOVector *qiov,
->                            BlockCompletionFunc *cb, void *opaque);
->  int blk_co_pdiscard(BlockBackend *blk, int64_t offset, int bytes);
->  int blk_co_flush(BlockBackend *blk);
+>  /*
+>   * void disabled_wait(void)
 > 
+
+Looks good to me:
+
+Reviewed-by: Thomas Huth <thuth@redhat.com>
