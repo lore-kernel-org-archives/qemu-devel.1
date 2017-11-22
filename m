@@ -1,26 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39924)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43327)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1eHUP2-00073N-04
-	for qemu-devel@nongnu.org; Wed, 22 Nov 2017 07:45:21 -0500
+	(envelope-from <berrange@redhat.com>) id 1eHUYa-0004C0-Pm
+	for qemu-devel@nongnu.org; Wed, 22 Nov 2017 07:55:14 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1eHUOy-00086j-P2
-	for qemu-devel@nongnu.org; Wed, 22 Nov 2017 07:45:20 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:46248)
+	(envelope-from <berrange@redhat.com>) id 1eHUYX-0004g9-Nj
+	for qemu-devel@nongnu.org; Wed, 22 Nov 2017 07:55:12 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:48358)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1eHUOy-00085V-Fr
-	for qemu-devel@nongnu.org; Wed, 22 Nov 2017 07:45:16 -0500
+	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1eHUYX-0004fn-Ew
+	for qemu-devel@nongnu.org; Wed, 22 Nov 2017 07:55:09 -0500
 Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
 	[10.5.11.12])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id A5054C0587FF
-	for <qemu-devel@nongnu.org>; Wed, 22 Nov 2017 12:45:15 +0000 (UTC)
-From: Juan Quintela <quintela@redhat.com>
-Date: Wed, 22 Nov 2017 13:45:04 +0100
-Message-Id: <20171122124504.13211-2-quintela@redhat.com>
-In-Reply-To: <20171122124504.13211-1-quintela@redhat.com>
-References: <20171122124504.13211-1-quintela@redhat.com>
-Subject: [Qemu-devel] [PATCH v4 1/1] migration: Use proper types in json
+	by mx1.redhat.com (Postfix) with ESMTPS id 49307C04B924
+	for <qemu-devel@nongnu.org>; Wed, 22 Nov 2017 12:55:08 +0000 (UTC)
+Date: Wed, 22 Nov 2017 12:54:58 +0000
+From: "Daniel P. Berrange" <berrange@redhat.com>
+Message-ID: <20171122125458.GE29565@redhat.com>
+Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
+References: <20171030112112.6952-1-quintela@redhat.com>
+	<20171030112112.6952-6-quintela@redhat.com>
+	<20171103100746.GC20155@redhat.com> <873756pkca.fsf@secure.mitica>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <873756pkca.fsf@secure.mitica>
+Subject: Re: [Qemu-devel] [PATCH 5/6] migration: Now set the migration uri
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,244 +35,79 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: dgilbert@redhat.com, lvivier@redhat.com, peterx@redhat.com
+To: Juan Quintela <quintela@redhat.com>
+Cc: qemu-devel@nongnu.org, lvivier@redhat.com, dgilbert@redhat.com, peterx@redhat.com
 
-We use int for everything (int64_t), and then we check that value is
-between 0 and 255.  Change it to the valid types.
+On Wed, Nov 22, 2017 at 01:29:57PM +0100, Juan Quintela wrote:
+> "Daniel P. Berrange" <berrange@redhat.com> wrote:
+> > On Mon, Oct 30, 2017 at 12:21:11PM +0100, Juan Quintela wrote:
+> >> Signed-off-by: Juan Quintela <quintela@redhat.com>
+> >> ---
+> >>  migration/migration.c | 25 ++++++++++++++++++-------
+> >>  migration/migration.h |  2 ++
+> >>  migration/socket.c    |  7 +++++++
+> >>  3 files changed, 27 insertions(+), 7 deletions(-)
+> >
+> >
+> >> diff --git a/migration/socket.c b/migration/socket.c
+> >> index 3a8232dd2d..c3ab81d1fb 100644
+> >> --- a/migration/socket.c
+> >> +++ b/migration/socket.c
+> >> @@ -187,7 +187,14 @@ void tcp_start_incoming_migration(const char *host_port, Error **errp)
+> >>      Error *err = NULL;
+> >>      SocketAddress *saddr = tcp_build_address(host_port, &err);
+> >>      if (!err) {
+> >> +        char *new_uri;
+> >>          socket_start_incoming_migration(saddr, &err);
+> >> +        if (!err) {
+> >> +            new_uri = g_strdup_printf("tcp:%s:%s", saddr->u.inet.host,
+> >> +                                      saddr->u.inet.port);
+> >
+> > This is bad as it is throwing away data that the original URI had. In particular
+> > you loose the 'ipv4=on|off' and 'ipv6=on|off' flags. If you need to keep the
+> > original URI for later, then why not just keep the 'host_port' parameter that
+> > was passed into this function instead of trying to reverse engineeer the URI ?
+> 
+> I don't need the original uri anymore, this is the incoming side of
+> migration, and we can only set that once, if migration fails, we need to
+> restart qemu anymore.
+> 
+> I changed it to this:
+> 
+>             new_uri = g_strdup_printf("tcp:%s:%s%s%s", address->u.inet.host,
+>                                       address->u.inet.port,
+>                                       iaddr->has_ipv4 ? ",ipv4" : "",
+>                                       iaddr->has_ipv6 ? ",ipv6" : "");
+> 
+> 
+> Clearly, we don't care about the to= parameter.
+> 
+> The whole point of this exercise is that in destination, we use
+> 
+> -incoming tcp:0:0
+> 
+> and with the output of info migrate_parameters (uri) we are able to
+> migrate to that place.  For rest of migration posibilities, there is no
+> changes at all.
 
-This change only happens for HMP.  QMP always use bytes and similars.
+That doesn't work typically. When the incoming QEMU listens for connections,
+by default it will listen on 0.0.0.0, or ::, so that's what the address
+you're creating will contain.  You can't use 0.0.0.0 or :: in a connect()
+call on the other side as that's a wildcard address that refers to "any 
+valid IP address on the current host".
 
-Signed-off-by: Juan Quintela <quintela@redhat.com>
----
- hmp.c                 | 22 +++++++++++-----------
- migration/migration.c | 49 ++++++++++++++++++++-----------------------------
- qapi/migration.json   | 22 +++++++++++-----------
- 3 files changed, 42 insertions(+), 51 deletions(-)
+When you connect to the listening QEMU you need the actual IP address
+of one (of the possibly many) NICs on the target host.  IOW, the only
+time the listen address is useful is if you have told QEMU to listen on
+a specific NIC's IP address, instead of the wildcard address.
 
-diff --git a/hmp.c b/hmp.c
-index 27e0fca4ac..1b54c76063 100644
---- a/hmp.c
-+++ b/hmp.c
-@@ -293,23 +293,23 @@ void hmp_info_migrate_parameters(Monitor *mon, const QDict *qdict)
- 
-     if (params) {
-         assert(params->has_compress_level);
--        monitor_printf(mon, "%s: %" PRId64 "\n",
-+        monitor_printf(mon, "%s: %u\n",
-             MigrationParameter_str(MIGRATION_PARAMETER_COMPRESS_LEVEL),
-             params->compress_level);
-         assert(params->has_compress_threads);
--        monitor_printf(mon, "%s: %" PRId64 "\n",
-+        monitor_printf(mon, "%s: %u\n",
-             MigrationParameter_str(MIGRATION_PARAMETER_COMPRESS_THREADS),
-             params->compress_threads);
-         assert(params->has_decompress_threads);
--        monitor_printf(mon, "%s: %" PRId64 "\n",
-+        monitor_printf(mon, "%s: %u\n",
-             MigrationParameter_str(MIGRATION_PARAMETER_DECOMPRESS_THREADS),
-             params->decompress_threads);
-         assert(params->has_cpu_throttle_initial);
--        monitor_printf(mon, "%s: %" PRId64 "\n",
-+        monitor_printf(mon, "%s: %u\n",
-             MigrationParameter_str(MIGRATION_PARAMETER_CPU_THROTTLE_INITIAL),
-             params->cpu_throttle_initial);
-         assert(params->has_cpu_throttle_increment);
--        monitor_printf(mon, "%s: %" PRId64 "\n",
-+        monitor_printf(mon, "%s: %u\n",
-             MigrationParameter_str(MIGRATION_PARAMETER_CPU_THROTTLE_INCREMENT),
-             params->cpu_throttle_increment);
-         assert(params->has_tls_creds);
-@@ -321,28 +321,28 @@ void hmp_info_migrate_parameters(Monitor *mon, const QDict *qdict)
-             MigrationParameter_str(MIGRATION_PARAMETER_TLS_HOSTNAME),
-             params->tls_hostname);
-         assert(params->has_max_bandwidth);
--        monitor_printf(mon, "%s: %" PRId64 " bytes/second\n",
-+        monitor_printf(mon, "%s: %" PRIu64 " bytes/second\n",
-             MigrationParameter_str(MIGRATION_PARAMETER_MAX_BANDWIDTH),
-             params->max_bandwidth);
-         assert(params->has_downtime_limit);
--        monitor_printf(mon, "%s: %" PRId64 " milliseconds\n",
-+        monitor_printf(mon, "%s: %" PRIu64 " milliseconds\n",
-             MigrationParameter_str(MIGRATION_PARAMETER_DOWNTIME_LIMIT),
-             params->downtime_limit);
-         assert(params->has_x_checkpoint_delay);
--        monitor_printf(mon, "%s: %" PRId64 "\n",
-+        monitor_printf(mon, "%s: %u\n",
-             MigrationParameter_str(MIGRATION_PARAMETER_X_CHECKPOINT_DELAY),
-             params->x_checkpoint_delay);
-         assert(params->has_block_incremental);
-         monitor_printf(mon, "%s: %s\n",
-             MigrationParameter_str(MIGRATION_PARAMETER_BLOCK_INCREMENTAL),
-             params->block_incremental ? "on" : "off");
--        monitor_printf(mon, "%s: %" PRId64 "\n",
-+        monitor_printf(mon, "%s: %u\n",
-             MigrationParameter_str(MIGRATION_PARAMETER_X_MULTIFD_CHANNELS),
-             params->x_multifd_channels);
--        monitor_printf(mon, "%s: %" PRId64 "\n",
-+        monitor_printf(mon, "%s: %u\n",
-             MigrationParameter_str(MIGRATION_PARAMETER_X_MULTIFD_PAGE_COUNT),
-             params->x_multifd_page_count);
--        monitor_printf(mon, "%s: %" PRId64 "\n",
-+        monitor_printf(mon, "%s: %" PRIu64 "\n",
-             MigrationParameter_str(MIGRATION_PARAMETER_XBZRLE_CACHE_SIZE),
-             params->xbzrle_cache_size);
-         monitor_printf(mon, "%s: %s\n",
-diff --git a/migration/migration.c b/migration/migration.c
-index 3818a83489..a001190487 100644
---- a/migration/migration.c
-+++ b/migration/migration.c
-@@ -754,22 +754,20 @@ void qmp_migrate_set_capabilities(MigrationCapabilityStatusList *params,
- static bool migrate_params_check(MigrationParameters *params, Error **errp)
- {
-     if (params->has_compress_level &&
--        (params->compress_level < 0 || params->compress_level > 9)) {
-+        (params->compress_level > 9)) {
-         error_setg(errp, QERR_INVALID_PARAMETER_VALUE, "compress_level",
-                    "is invalid, it should be in the range of 0 to 9");
-         return false;
-     }
- 
--    if (params->has_compress_threads &&
--        (params->compress_threads < 1 || params->compress_threads > 255)) {
-+    if (params->has_compress_threads && (params->compress_threads < 1)) {
-         error_setg(errp, QERR_INVALID_PARAMETER_VALUE,
-                    "compress_threads",
-                    "is invalid, it should be in the range of 1 to 255");
-         return false;
-     }
- 
--    if (params->has_decompress_threads &&
--        (params->decompress_threads < 1 || params->decompress_threads > 255)) {
-+    if (params->has_decompress_threads && (params->decompress_threads < 1)) {
-         error_setg(errp, QERR_INVALID_PARAMETER_VALUE,
-                    "decompress_threads",
-                    "is invalid, it should be in the range of 1 to 255");
-@@ -794,38 +792,31 @@ static bool migrate_params_check(MigrationParameters *params, Error **errp)
-         return false;
-     }
- 
--    if (params->has_max_bandwidth &&
--        (params->max_bandwidth < 0 || params->max_bandwidth > SIZE_MAX)) {
-+    if (params->has_max_bandwidth && (params->max_bandwidth > SIZE_MAX)) {
-         error_setg(errp, "Parameter 'max_bandwidth' expects an integer in the"
-                          " range of 0 to %zu bytes/second", SIZE_MAX);
-         return false;
-     }
- 
-     if (params->has_downtime_limit &&
--        (params->downtime_limit < 0 ||
--         params->downtime_limit > MAX_MIGRATE_DOWNTIME)) {
-+        (params->downtime_limit > MAX_MIGRATE_DOWNTIME)) {
-         error_setg(errp, "Parameter 'downtime_limit' expects an integer in "
-                          "the range of 0 to %d milliseconds",
-                          MAX_MIGRATE_DOWNTIME);
-         return false;
-     }
- 
--    if (params->has_x_checkpoint_delay && (params->x_checkpoint_delay < 0)) {
--        error_setg(errp, QERR_INVALID_PARAMETER_VALUE,
--                    "x_checkpoint_delay",
--                    "is invalid, it should be positive");
--        return false;
--    }
--    if (params->has_x_multifd_channels &&
--        (params->x_multifd_channels < 1 || params->x_multifd_channels > 255)) {
-+    /* x_checkpoint_delay is now always positive */
-+
-+    if (params->has_x_multifd_channels && (params->x_multifd_channels < 1)) {
-         error_setg(errp, QERR_INVALID_PARAMETER_VALUE,
-                    "multifd_channels",
-                    "is invalid, it should be in the range of 1 to 255");
-         return false;
-     }
-     if (params->has_x_multifd_page_count &&
--            (params->x_multifd_page_count < 1 ||
--             params->x_multifd_page_count > 10000)) {
-+        (params->x_multifd_page_count < 1 ||
-+         params->x_multifd_page_count > 10000)) {
-         error_setg(errp, QERR_INVALID_PARAMETER_VALUE,
-                    "multifd_page_count",
-                    "is invalid, it should be in the range of 1 to 10000");
-@@ -2425,33 +2416,33 @@ static Property migration_properties[] = {
-                      send_section_footer, true),
- 
-     /* Migration parameters */
--    DEFINE_PROP_INT64("x-compress-level", MigrationState,
-+    DEFINE_PROP_UINT8("x-compress-level", MigrationState,
-                       parameters.compress_level,
-                       DEFAULT_MIGRATE_COMPRESS_LEVEL),
--    DEFINE_PROP_INT64("x-compress-threads", MigrationState,
-+    DEFINE_PROP_UINT8("x-compress-threads", MigrationState,
-                       parameters.compress_threads,
-                       DEFAULT_MIGRATE_COMPRESS_THREAD_COUNT),
--    DEFINE_PROP_INT64("x-decompress-threads", MigrationState,
-+    DEFINE_PROP_UINT8("x-decompress-threads", MigrationState,
-                       parameters.decompress_threads,
-                       DEFAULT_MIGRATE_DECOMPRESS_THREAD_COUNT),
--    DEFINE_PROP_INT64("x-cpu-throttle-initial", MigrationState,
-+    DEFINE_PROP_UINT8("x-cpu-throttle-initial", MigrationState,
-                       parameters.cpu_throttle_initial,
-                       DEFAULT_MIGRATE_CPU_THROTTLE_INITIAL),
--    DEFINE_PROP_INT64("x-cpu-throttle-increment", MigrationState,
-+    DEFINE_PROP_UINT8("x-cpu-throttle-increment", MigrationState,
-                       parameters.cpu_throttle_increment,
-                       DEFAULT_MIGRATE_CPU_THROTTLE_INCREMENT),
--    DEFINE_PROP_INT64("x-max-bandwidth", MigrationState,
-+    DEFINE_PROP_SIZE("x-max-bandwidth", MigrationState,
-                       parameters.max_bandwidth, MAX_THROTTLE),
--    DEFINE_PROP_INT64("x-downtime-limit", MigrationState,
-+    DEFINE_PROP_UINT64("x-downtime-limit", MigrationState,
-                       parameters.downtime_limit,
-                       DEFAULT_MIGRATE_SET_DOWNTIME),
--    DEFINE_PROP_INT64("x-checkpoint-delay", MigrationState,
-+    DEFINE_PROP_UINT32("x-checkpoint-delay", MigrationState,
-                       parameters.x_checkpoint_delay,
-                       DEFAULT_MIGRATE_X_CHECKPOINT_DELAY),
--    DEFINE_PROP_INT64("x-multifd-channels", MigrationState,
-+    DEFINE_PROP_UINT8("x-multifd-channels", MigrationState,
-                       parameters.x_multifd_channels,
-                       DEFAULT_MIGRATE_MULTIFD_CHANNELS),
--    DEFINE_PROP_INT64("x-multifd-page-count", MigrationState,
-+    DEFINE_PROP_UINT32("x-multifd-page-count", MigrationState,
-                       parameters.x_multifd_page_count,
-                       DEFAULT_MIGRATE_MULTIFD_PAGE_COUNT),
-     DEFINE_PROP_SIZE("xbzrle-cache-size", MigrationState,
-diff --git a/qapi/migration.json b/qapi/migration.json
-index 6b9758ab99..68d0703578 100644
---- a/qapi/migration.json
-+++ b/qapi/migration.json
-@@ -679,20 +679,20 @@
- # Since: 2.4
- ##
- { 'struct': 'MigrationParameters',
--  'data': { '*compress-level': 'int',
--            '*compress-threads': 'int',
--            '*decompress-threads': 'int',
--            '*cpu-throttle-initial': 'int',
--            '*cpu-throttle-increment': 'int',
-+  'data': { '*compress-level': 'uint8',
-+            '*compress-threads': 'uint8',
-+            '*decompress-threads': 'uint8',
-+            '*cpu-throttle-initial': 'uint8',
-+            '*cpu-throttle-increment': 'uint8',
-             '*tls-creds': 'str',
-             '*tls-hostname': 'str',
--            '*max-bandwidth': 'int',
--            '*downtime-limit': 'int',
--            '*x-checkpoint-delay': 'int',
-+            '*max-bandwidth': 'size',
-+            '*downtime-limit': 'uint64',
-+            '*x-checkpoint-delay': 'uint32',
-             '*block-incremental': 'bool' ,
--            '*x-multifd-channels': 'int',
--            '*x-multifd-page-count': 'int',
--            '*xbzrle-cache-size': 'size' ,
-+            '*x-multifd-channels': 'uint8',
-+            '*x-multifd-page-count': 'uint32',
-+            '*xbzrle-cache-size': 'size',
-             '*uri': 'str'} }
- 
- ##
+This is the core reason why libvirt calls 'gethostname()' on the target
+host to identify the primary IP address of the host, and uses that on the
+source host to establish the connection.
+
+Regards,
+Daniel
 -- 
-2.13.6
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
