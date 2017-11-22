@@ -1,17 +1,14 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60346)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60383)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1eHMxU-0005vZ-3v
-	for qemu-devel@nongnu.org; Tue, 21 Nov 2017 23:48:25 -0500
+	(envelope-from <dgibson@ozlabs.org>) id 1eHMxW-0005wm-45
+	for qemu-devel@nongnu.org; Tue, 21 Nov 2017 23:48:28 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1eHMxT-000384-4j
-	for qemu-devel@nongnu.org; Tue, 21 Nov 2017 23:48:24 -0500
+	(envelope-from <dgibson@ozlabs.org>) id 1eHMxT-00037y-2d
+	for qemu-devel@nongnu.org; Tue, 21 Nov 2017 23:48:26 -0500
 From: David Gibson <david@gibson.dropbear.id.au>
-Date: Wed, 22 Nov 2017 15:48:12 +1100
-Message-Id: <20171122044814.3001-2-david@gibson.dropbear.id.au>
-In-Reply-To: <20171122044814.3001-1-david@gibson.dropbear.id.au>
-References: <20171122044814.3001-1-david@gibson.dropbear.id.au>
-Subject: [Qemu-devel] [PULL 1/3] hw/ppc/spapr: Fix virtio-scsi bootindex
- handling for LUNs >= 256
+Date: Wed, 22 Nov 2017 15:48:11 +1100
+Message-Id: <20171122044814.3001-1-david@gibson.dropbear.id.au>
+Subject: [Qemu-devel] [PULL 0/3] ppc-for-2.11 queue 20171122
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -21,43 +18,36 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: peter.maydell@linaro.org
-Cc: agraf@suse.de, groug@kaod.org, lvivier@redhat.com, qemu-devel@nongnu.org, qemu-ppc@nongnu.org, Thomas Huth <thuth@redhat.com>, David Gibson <david@gibson.dropbear.id.au>
+Cc: agraf@suse.de, groug@kaod.org, lvivier@redhat.com, qemu-devel@nongnu.org, qemu-ppc@nongnu.org, David Gibson <david@gibson.dropbear.id.au>
 
-From: Thomas Huth <thuth@redhat.com>
+The following changes since commit a15d835f00dce270fd3194e83d9910f4b5b44ac0:
 
-LUNs >= 256 have to be encoded with the so-called "flat space
-addressing method" for virtio-scsi, where an additional bit has to
-be set. SLOF already took care of this with the following commit:
+  Update version for v2.11.0-rc2 release (2017-11-21 17:50:36 +0000)
 
- https://git.qemu.org/?p=SLOF.git;a=commitdiff;h=f72a37713fea47da
- (see https://bugzilla.redhat.com/show_bug.cgi?id=1431584 for details)
+are available in the Git repository at:
 
-But QEMU does not use this encoding yet for device tree paths
-that have to be handed over to SLOF to deal with the "bootindex"
-property, so SLOF currently fails to boot from virtio-scsi devices
-with LUNs >= 256 in the right boot order. Fix it by using the bit
-to indicate the "flat space addressing method" for LUNs >= 256.
+  git://github.com/dgibson/qemu.git tags/ppc-for-2.11-20171122
 
-Signed-off-by: Thomas Huth <thuth@redhat.com>
-Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
----
- hw/ppc/spapr.c | 4 ++++
- 1 file changed, 4 insertions(+)
+for you to fetch changes up to 6dd836f5d32b989e18c6dda655a26f4d73a52f6a:
 
-diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-index 6285f7211f..4d0a84f3ec 100644
---- a/hw/ppc/spapr.c
-+++ b/hw/ppc/spapr.c
-@@ -2663,6 +2663,10 @@ static char *spapr_get_fw_dev_path(FWPathProvider *p, BusState *bus,
-              * swap 0100 or 10 << or 20 << ( target lun-id -- srplun )
-              */
-             unsigned id = 0x1000000 | (d->id << 16) | d->lun;
-+            if (d->lun >= 256) {
-+                /* Use the LUN "flat space addressing method" */
-+                id |= 0x4000;
-+            }
-             return g_strdup_printf("%s@%"PRIX64, qdev_fw_name(dev),
-                                    (uint64_t)id << 32);
-         } else if (usb) {
--- 
-2.14.3
+  ppc: fix VTB migration (2017-11-22 15:28:37 +1100)
+
+----------------------------------------------------------------
+ppc patch queue 2017-11-22
+
+Several more fixes to merge for qemu-2.11.
+
+----------------------------------------------------------------
+David Gibson (1):
+      spapr: Implement bug in spapr-vty device to be compatible with PowerVM
+
+Laurent Vivier (1):
+      ppc: fix VTB migration
+
+Thomas Huth (1):
+      hw/ppc/spapr: Fix virtio-scsi bootindex handling for LUNs >= 256
+
+ hw/char/spapr_vty.c         | 18 ++++++++++++++++++
+ hw/ppc/spapr.c              |  4 ++++
+ target/ppc/translate_init.c |  4 ++--
+ 3 files changed, 24 insertions(+), 2 deletions(-)
