@@ -1,31 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41154)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41152)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1eHNhQ-0005Ef-LO
+	(envelope-from <bounces@canonical.com>) id 1eHNhQ-0005Ee-LH
 	for qemu-devel@nongnu.org; Wed, 22 Nov 2017 00:35:53 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1eHNhN-0001y6-Hr
+	(envelope-from <bounces@canonical.com>) id 1eHNhN-0001y7-I5
 	for qemu-devel@nongnu.org; Wed, 22 Nov 2017 00:35:52 -0500
-Received: from indium.canonical.com ([91.189.90.7]:37732)
+Received: from indium.canonical.com ([91.189.90.7]:37722)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1eHNhN-0001xm-B5
+	id 1eHNhN-0001xl-BA
 	for qemu-devel@nongnu.org; Wed, 22 Nov 2017 00:35:49 -0500
 Received: from loganberry.canonical.com ([91.189.90.37])
 	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1eHNhL-0001Vo-M4
+	id 1eHNhL-0001WM-If
 	for <qemu-devel@nongnu.org>; Wed, 22 Nov 2017 05:35:47 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 763D02E80E0
+	by loganberry.canonical.com (Postfix) with ESMTP id 2BAAB2E80D5
 	for <qemu-devel@nongnu.org>; Wed, 22 Nov 2017 05:35:47 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Wed, 22 Nov 2017 05:28:51 -0000
+Date: Wed, 22 Nov 2017 05:20:55 -0000
 From: Ken Dickey <Ken.Dickey@whidbey.com>
 Reply-To: Bug 1733720 <1733720@bugs.launchpad.net>
 Sender: bounces@canonical.com
 References: <151130882565.18495.10192043724404737327.malonedeb@gac.canonical.com>
-Message-Id: <151132853148.8081.9028419079901926132.malone@chaenomeles.canonical.com>
+Message-Id: <151132805586.14417.2239721291081295955.malone@soybean.canonical.com>
 Errors-To: bounces@canonical.com
 Subject: [Qemu-devel] [Bug 1733720] Re: raspi2 with multiple CPU's #1
 List-Id: <qemu-devel.nongnu.org>
@@ -38,9 +38,25 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-Sorry again, "MPIDR"
+NOT A BUG
 
-Gotta learn to type!
+Reviewed the code and found the problem.
+
+asm volatile("mrc p15, 0, %[id], c0, c0, 0 @ read MIDR\n\t" ...
+
+I miscopied the code above; MIDR should have been MIPDR ( 5 )
+
+I now get:
+
+Linux:armv7l: ~/Downloads/RaspiTest/BareBones >>> ./qemu.sh =
+
+0H312ello, kernel World!
+
+Sorry about the bogus report!
+-KenD
+
+** Changed in: qemu
+       Status: New =3D> Invalid
 
 -- =
 
