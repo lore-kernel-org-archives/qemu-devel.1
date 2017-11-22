@@ -1,23 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33764)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33945)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mdavidsaver@gmail.com>) id 1eHN64-0001y4-DV
-	for qemu-devel@nongnu.org; Tue, 21 Nov 2017 23:57:17 -0500
+	(envelope-from <mdavidsaver@gmail.com>) id 1eHN6u-0002Pu-DW
+	for qemu-devel@nongnu.org; Tue, 21 Nov 2017 23:58:09 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mdavidsaver@gmail.com>) id 1eHN5z-0006M3-Il
-	for qemu-devel@nongnu.org; Tue, 21 Nov 2017 23:57:16 -0500
+	(envelope-from <mdavidsaver@gmail.com>) id 1eHN6p-0006Ux-IZ
+	for qemu-devel@nongnu.org; Tue, 21 Nov 2017 23:58:08 -0500
 References: <20171120032420.9134-1-mdavidsaver@gmail.com>
-	<20171120032420.9134-4-mdavidsaver@gmail.com>
-	<20171122034637.GI2380@umbus.fritz.box>
+	<20171122041217.GP2380@umbus.fritz.box>
 From: Michael Davidsaver <mdavidsaver@gmail.com>
-Message-ID: <f6cdbf61-d595-7710-3c33-d2cf908c93c3@gmail.com>
-Date: Tue, 21 Nov 2017 22:57:03 -0600
+Message-ID: <4d98abb0-c767-cf76-78b3-20754604d8f3@gmail.com>
+Date: Tue, 21 Nov 2017 22:58:00 -0600
 MIME-Version: 1.0
-In-Reply-To: <20171122034637.GI2380@umbus.fritz.box>
+In-Reply-To: <20171122041217.GP2380@umbus.fritz.box>
 Content-Type: multipart/signed; micalg=pgp-sha256;
 	protocol="application/pgp-signature";
-	boundary="KKtfmTMm3m3IG0K7uTbFb56OW2FvXcxUl"
-Subject: Re: [Qemu-devel] [PATCH 03/12] e500: note possible bug with host
- bridge
+	boundary="bdoLUxWP0l0bRxg60pSRPjJQMQMMO7OCc"
+Subject: Re: [Qemu-devel] [PATCH 00/12] Add MVME3100 PPC SBC
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,84 +28,47 @@ To: David Gibson <david@gibson.dropbear.id.au>
 Cc: Alexander Graf <agraf@suse.de>, qemu-ppc@nongnu.org, qemu-devel@nongnu.org
 
 This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---KKtfmTMm3m3IG0K7uTbFb56OW2FvXcxUl
+--bdoLUxWP0l0bRxg60pSRPjJQMQMMO7OCc
 From: Michael Davidsaver <mdavidsaver@gmail.com>
 To: David Gibson <david@gibson.dropbear.id.au>
 Cc: Alexander Graf <agraf@suse.de>, qemu-ppc@nongnu.org, qemu-devel@nongnu.org
-Message-ID: <f6cdbf61-d595-7710-3c33-d2cf908c93c3@gmail.com>
-Subject: Re: [PATCH 03/12] e500: note possible bug with host bridge
+Message-ID: <4d98abb0-c767-cf76-78b3-20754604d8f3@gmail.com>
+Subject: Re: [PATCH 00/12] Add MVME3100 PPC SBC
 References: <20171120032420.9134-1-mdavidsaver@gmail.com>
- <20171120032420.9134-4-mdavidsaver@gmail.com>
- <20171122034637.GI2380@umbus.fritz.box>
-In-Reply-To: <20171122034637.GI2380@umbus.fritz.box>
+ <20171122041217.GP2380@umbus.fritz.box>
+In-Reply-To: <20171122041217.GP2380@umbus.fritz.box>
 Content-Type: text/plain; charset=windows-1252
 Content-Transfer-Encoding: quoted-printable
 
-On 11/21/2017 09:46 PM, David Gibson wrote:
-> On Sun, Nov 19, 2017 at 09:24:11PM -0600, Michael Davidsaver wrote:
->> Signed-off-by: Michael Davidsaver <mdavidsaver@gmail.com>
->=20
-> I'm not sure if you're saying you think there is a hardware bug which
-> we're faithfully emulating, or a software bug.
+On 11/21/2017 10:12 PM, David Gibson wrote:
+=2E..
+> I've applied several patches from this series to ppc-for-2.12, others
+> I've commented on.  If you could address the comments and rebase
+> what's left on ppc-for-2.12, that would be great.
 
-I mean that the emulation is incorrect in that it just sets
-config[PCI_HEADER_TYPE]=3D=3DPCI_HEADER_TYPE_BRIDGE but does none of the
-other initialization of the base-pci-bridge class.
-
-I specifically observed Linux being confused by the fact that the
-primary, secondary, and subordinate bus registers don't work right
-because they're actually the BAR2 address register.
-
-Further, it seems odd that a host bridge would identify itself as a
-pci-to-pci bridge.  The mpc8540 doesn't.  The mpc8544 docs aren't clear,
-and I don't have a real one to test.  My inclination is to remove the
-line changing PCI_HEADER_TYPE, but I'm hesitant about breaking things.
-Especially since this doesn't trigger mis-behavior in Linux or RTEMS.
-
->> ---
->>  hw/pci-host/ppce500.c | 3 +++
->>  1 file changed, 3 insertions(+)
->>
->> diff --git a/hw/pci-host/ppce500.c b/hw/pci-host/ppce500.c
->> index f2d108bc8a..0e2833bd98 100644
->> --- a/hw/pci-host/ppce500.c
->> +++ b/hw/pci-host/ppce500.c
->> @@ -424,6 +424,9 @@ static void e500_pcihost_bridge_realize(PCIDevice =
-*d, Error **errp)
->>      MemoryRegion *ccsr_mr =3D sysbus_mmio_get_region(ccsr, 0);
->> =20
->>      pci_config_set_class(d->config, PCI_CLASS_BRIDGE_PCI);
->> +    /* BUG? identifies as PCI_HEADER_TYPE_BRIDGE but uses
->> +     * standard device config read/write
->> +     */
->>      d->config[PCI_HEADER_TYPE] =3D
->>          (d->config[PCI_HEADER_TYPE] & PCI_HEADER_TYPE_MULTI_FUNCTION)=
- |
->>          PCI_HEADER_TYPE_BRIDGE;
->=20
+Will do.
 
 
-
---KKtfmTMm3m3IG0K7uTbFb56OW2FvXcxUl
+--bdoLUxWP0l0bRxg60pSRPjJQMQMMO7OCc
 Content-Type: application/pgp-signature; name="signature.asc"
 Content-Description: OpenPGP digital signature
 Content-Disposition: attachment; filename="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQIzBAEBCAAdFiEEYyRdrpxuENu06SOrlAHmyz1/GOoFAloVA6MACgkQlAHmyz1/
-GOqVYQ/8DrU9CQ9dLXMyAfTNv06u3IEZLBwwFfLNTwE0S86Lf1q/rP6Q9+nIq9rP
-jHxEJ+6SVmB5f5jSnXNLDwSNQBfIHom94uaH9GzN3Yy9QMyG5ePj8Jyctac46b0m
-Cq5lyBf4CQc/GvpD0u1N/Qv+H1R4IXk/Tvz9VQpsXfQeaY1p4GjEuk3hm0Y+UFdJ
-bFZXS8i/FBXg1GaLDJRejoI2CvL0CtBMfh7NudZT6PfcJwXqHu+XVnnMSbz41rrU
-X17L1zZG6NkOVYQOhy0FKP4k4czG38JDGaGw0tju/RZEQuAVsn0wBqoP3T33CI+O
-mFaEvqK5MJl2qPFAA5GZm7qFDQW3KX5RiL8PSOTcG6bN/ddc6gVSZ3pwNPab1NeN
-ezc4oLd1bQzPvE8wzUEwpOkVZblx2QisqaKrE6sqMnvHfzU8KTtucBWAsxpyNXoO
-lgxJ4YxAUY8OQf1O8d2s1MGz6wO6ct325Kibi7KY6J3o5lLutEFUy/7aXRt9Cahd
-QC7bLs9L9V/qYFQU4YeSAjc61Leouh0o6RG4WDAFdfgcnk406TJMllrvEPyCgqGK
-60Z77gaIKSbL54G/HC1hGcOCcD8f9Yknro/mynPrn96lBmnv/Hx6l6YK/keof9u/
-WgcgHvFzIwduOYk30s7DcQQ+YQhpicQJ/yDU8+XNV0LitRJEDaM=
-=jmkY
+iQIzBAEBCAAdFiEEYyRdrpxuENu06SOrlAHmyz1/GOoFAloVA9gACgkQlAHmyz1/
+GOotmw//dejG7Yi+22Yvp27kzfVIZibq8XWdOPb05f547xYidzbxQ4NGb8c/FvZy
+O6Mv4phntuHeeDX9e3h65pb50xfte1Z8rKwRFxkV2w2dNEoCa859qqcGzzXSZMgr
+Uc0SKxEfqBUgcYqzQG++DhQdSWpnzHwoP33YCdWWLnpljGNY5Flmt/1sl7qW8TwW
+r/QDU0ImLululP899QP+MLOIMa1x4pCVfsI1fnH5SoEBN43DsyphURXuOXN9jnyJ
+SkYGJaLtgfHUTtRMSCcZ05N3VsqXHL8wtLLVCz1NebeZm1Lxvzxpln4g7e+whquh
+dKYIqCLhm6oFbIoxQBXdFlFK5C9YtfJ+ecjqcgdspAJsd1HwObMTr3w1WLyFoAAE
+4qGf5hn0SoTC5gd7FrPsqKQjJSn49MfPz4OSkFEWS7y0z9OKv8QISl541uOJOZN3
+o0bTz6vQn6Pw+s1BhXTVuUIMFGtHY1xMNIGsl1y72bPKndtM0obRlw19IKqrtaVh
+UTKZthYEPc11pSJBNig6KOXYNWnn79tuiLnGv7wDgaY5bsK8G73ngG6pk+2ieVJX
+y+l8NBDmwKiEgu/A+08GaXZUJAbq6LWxm4tXe14jHz8vkUj4xwwimonelyllphpa
+UOmIABLIRJsVIvq6qMwGtvqvZeBpeECekBgGGU4R1x8dyCtTk/Y=
+=U4Iu
 -----END PGP SIGNATURE-----
 
---KKtfmTMm3m3IG0K7uTbFb56OW2FvXcxUl--
+--bdoLUxWP0l0bRxg60pSRPjJQMQMMO7OCc--
