@@ -1,25 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45835)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48359)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1eHXq7-0003M2-8c
-	for qemu-devel@nongnu.org; Wed, 22 Nov 2017 11:25:32 -0500
+	(envelope-from <pbonzini@redhat.com>) id 1eHXzU-00071D-LU
+	for qemu-devel@nongnu.org; Wed, 22 Nov 2017 11:35:14 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1eHXq4-0006T3-54
-	for qemu-devel@nongnu.org; Wed, 22 Nov 2017 11:25:31 -0500
-Date: Wed, 22 Nov 2017 17:25:22 +0100
-From: Cornelia Huck <cohuck@redhat.com>
-Message-ID: <20171122172522.281cfb4b.cohuck@redhat.com>
-In-Reply-To: <594e1952-7097-0927-d913-d3b915df2305@linux.vnet.ibm.com>
-References: <20171121111825.17916-1-pasic@linux.vnet.ibm.com>
-	<20171121144457.60adb0c3.cohuck@redhat.com>
-	<1145a6bc-45fd-820a-9dcc-249d9b2802ff@linux.vnet.ibm.com>
-	<20171121172022.5da16158.cohuck@redhat.com>
-	<88bc72cf-732c-fc07-9898-18d7b58b947d@linux.vnet.ibm.com>
-	<20171122131343.26da0482.cohuck@redhat.com>
-	<594e1952-7097-0927-d913-d3b915df2305@linux.vnet.ibm.com>
+	(envelope-from <pbonzini@redhat.com>) id 1eHXzT-0001r6-BV
+	for qemu-devel@nongnu.org; Wed, 22 Nov 2017 11:35:12 -0500
+References: <1511364808-30171-1-git-send-email-deepa.srinivasan@oracle.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <215448fd-8dbf-882a-35af-7778a6c4ab38@redhat.com>
+Date: Wed, 22 Nov 2017 17:34:58 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+In-Reply-To: <1511364808-30171-1-git-send-email-deepa.srinivasan@oracle.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [RFC PATCH 1/1] s390x/css: unresrict cssids
+Subject: Re: [Qemu-devel] [PATCH] block: Fix qemu crash when using scsi-block
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,67 +23,189 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Boris Fiuczynski <fiuczy@linux.vnet.ibm.com>, Halil Pasic <pasic@linux.vnet.ibm.com>
-Cc: Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>, Christian Borntraeger <borntraeger@de.ibm.com>, Shalini Chellathurai Saroja <shalini@linux.vnet.ibm.com>, qemu-devel@nongnu.org, qemu-s390x@nongnu.org
+To: Deepa Srinivasan <deepa.srinivasan@oracle.com>, kwolf@redhat.com, mreitz@redhat.com, stefanha@redhat.com, qemu-block@nongnu.org, qemu-devel@nongnu.org, mark.kanda@oracle.com
+Cc: Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>
 
-On Wed, 22 Nov 2017 15:45:56 +0100
-Boris Fiuczynski <fiuczy@linux.vnet.ibm.com> wrote:
-
-> On 11/22/2017 01:13 PM, Cornelia Huck wrote:
-> >>>>>> +    object_class_property_add_bool(klass, "cssid-unrestricted",
-> >>>>>> +                                   prop_get_true, NULL, NULL);  
-> >>>>> This looks really, really strange. This is a property that is always
-> >>>>> true if it exists.
-> >>>>>        
-> >>>> Won't argue about that. The libvirt guys are actually not interested
-> >>>> int he value at all: only that there is such a property.  
-> >>> So what about a machine property? Wouldn't that help as well?
-> >>>      
-> >> Technically it is doable. The property would be still a weird
-> >> one, but from QEMU perspective in a less weird place. I was also
-> >> arguing that from OO perspective this kind of a don't care about
-> >> it's value property is weird, but AFAIK not having the info if
-> >> we can do something with a device at the device is weird from
-> >> Libvirt perspective. I'm really uncomforble with speaking for
-> >> Libvirt/Boris. Hope he will make his point tomorrow.
-> >>  
-> >>> Or a css object?
-> >>>      
-> >> My first internal-only version used this approach, but
-> >> I was asked to do it like this.  
-> > If we formulate this rather as "we now expose the default css", we (a)
-> > have something that really makes the most sense at a channel subsystem
-> > or machine level, and (b) can be detected by libvirt as an indicator of
-> > "no restriction for virtual vs. non-virtual".  
+On 22/11/2017 16:33, Deepa Srinivasan wrote:
+> Starting qemu with the following arguments causes qemu to segfault:
+> ... -device lsi,id=lsi0 -drive file=iscsi:<...>,format=raw,if=none,node-name=
+> iscsi1 -device scsi-block,bus=lsi0.0,id=<...>,drive=iscsi1
 > 
-> I think that there are good reasons for using a device property as well 
-> as for using a machine property. Technically both options are possible 
-> (even for libvirt :) without too much rope...). At first my personal 
-> choice was to express the changed behavior/capability on the device 
-> level since that is what a user defines on the command line and also 
-> where he gets restricted to use a css matching his device type.
->  From the libvirt perspective we would have supported vfio-ccw devices 
-> only if the vfio-ccw would be allowed to be defined with unrestricted 
-> cssids.
+> This patch fixes blk_aio_ioctl() so it does not pass stack addresses to
+> blk_aio_ioctl_entry() which may be invoked after blk_aio_ioctl() returns. More
+> details about the bug follow.
+> 
+> blk_aio_ioctl() invokes blk_aio_prwv() with blk_aio_ioctl_entry as the
+> coroutine parameter. blk_aio_prwv() ultimately calls aio_co_enter().
+> 
+> When blk_aio_ioctl() is executed from within a coroutine context (e.g.
+> iscsi_bh_cb()), aio_co_enter() adds the coroutine (blk_aio_ioctl_entry) to
+> the current coroutine's wakeup queue. blk_aio_ioctl() then returns.
+> 
+> When blk_aio_ioctl_entry() executes later, it accesses an invalid pointer:
+> ....
+>     BlkRwCo *rwco = &acb->rwco;
+> 
+>     rwco->ret = blk_co_ioctl(rwco->blk, rwco->offset,
+>                              rwco->qiov->iov[0].iov_base);  <--- qiov is
+>                                                                  invalid here
+> ...
+> 
+> In the case when blk_aio_ioctl() is called from a non-coroutine context,
+> blk_aio_ioctl_entry() executes immediately. But if bdrv_co_ioctl() calls
+> qemu_coroutine_yield(), blk_aio_ioctl() will return. When the coroutine
+> execution is complete, control returns to blk_aio_ioctl_entry() after the call
+> to blk_co_ioctl(). There is no invalid reference after this point, but the
+> function is still holding on to invalid pointers.
+> 
+> The fix is to allocate memory for the QEMUIOVector and struct iovec as part of
+> the request struct which the IO buffer is part of. The memory for this struct is
+> guaranteed to be valid till the AIO is completed.
+> 
+> Signed-off-by: Deepa Srinivasan <deepa.srinivasan@oracle.com>
+> Signed-off-by: Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>
+> Reviewed-by: Mark Kanda <mark.kanda@oracle.com>
+> ---
+>  block/block-backend.c          | 13 ++-----------
+>  hw/block/virtio-blk.c          |  9 ++++++++-
+>  hw/scsi/scsi-disk.c            | 10 +++++++++-
+>  hw/scsi/scsi-generic.c         |  9 ++++++++-
+>  include/sysemu/block-backend.h |  2 +-
+>  5 files changed, 28 insertions(+), 15 deletions(-)
+> 
+> diff --git a/block/block-backend.c b/block/block-backend.c
+> index baef8e7..c275827 100644
+> --- a/block/block-backend.c
+> +++ b/block/block-backend.c
+> @@ -1472,19 +1472,10 @@ static void blk_aio_ioctl_entry(void *opaque)
+>      blk_aio_complete(acb);
+>  }
+>  
+> -BlockAIOCB *blk_aio_ioctl(BlockBackend *blk, unsigned long int req, void *buf,
+> +BlockAIOCB *blk_aio_ioctl(BlockBackend *blk, unsigned long int req, QEMUIOVector *qiov,
+>                            BlockCompletionFunc *cb, void *opaque)
 
-Thanks, I can now understand where that property came from.
+I think this is not the best way to fix the bug, because it adds extra
+unnecessary code in the callers.
 
-> As I wrote before I also understand the reasoning to express the channel 
-> subsystem wide changed behavior as a machine option. In that case 
-> libvirt would need to check that both capabilities (vfio-ccw and machine 
-> option cssid-unrestricted) are set and not just 
-> vfio-cww.cssid-unrestricted. All doable. A qemu command line user would 
-> obviously need to know the correlation of the machine option and the ccw 
-> devices but that certainly is also nothing new.
-> When talking to Christian and Halil I started to favor the idea of a new 
-> css object especially when thinking about the future in which the user 
-> might want to specify the default css. It for sure would also be able to 
-> be set with the use of a machine option but a css object would at that 
-> point be much a nicer and more capable approach. What do you think?
+Perhaps you can change BlkRwCo's "qiov" field to "void *buf" and the
+same for blk_aio_prwv's "qiov" argument?
 
-I think exposing the css object and making the default_css property
-available is the cleanest solution (especially if we want more css
-properties in the future). The only drawback I see is that it needs
-more coding (and probably care to keep it backwards compatible.)
+Then the QEMUIOVector is not needed at all, and blk_co_ioctl can just
+use rwco->buf.
 
-Halil, do you think you can come up with something?
+Thanks,
+
+Paolo
+
+>  {
+> -    QEMUIOVector qiov;
+> -    struct iovec iov;
+> -
+> -    iov = (struct iovec) {
+> -        .iov_base = buf,
+> -        .iov_len = 0,
+> -    };
+> -    qemu_iovec_init_external(&qiov, &iov, 1);
+> -
+> -    return blk_aio_prwv(blk, req, 0, &qiov, blk_aio_ioctl_entry, 0, cb, opaque);
+> +    return blk_aio_prwv(blk, req, 0, qiov, blk_aio_ioctl_entry, 0, cb, opaque);
+>  }
+>  
+>  int blk_co_pdiscard(BlockBackend *blk, int64_t offset, int bytes)
+> diff --git a/hw/block/virtio-blk.c b/hw/block/virtio-blk.c
+> index 05d1440..ed9f774 100644
+> --- a/hw/block/virtio-blk.c
+> +++ b/hw/block/virtio-blk.c
+> @@ -151,6 +151,8 @@ out:
+>  typedef struct {
+>      VirtIOBlockReq *req;
+>      struct sg_io_hdr hdr;
+> +    QEMUIOVector qiov;
+> +    struct iovec iov;
+>  } VirtIOBlockIoctlReq;
+>  
+>  static void virtio_blk_ioctl_complete(void *opaque, int status)
+> @@ -298,7 +300,12 @@ static int virtio_blk_handle_scsi_req(VirtIOBlockReq *req)
+>      ioctl_req->hdr.sbp = elem->in_sg[elem->in_num - 3].iov_base;
+>      ioctl_req->hdr.mx_sb_len = elem->in_sg[elem->in_num - 3].iov_len;
+>  
+> -    acb = blk_aio_ioctl(blk->blk, SG_IO, &ioctl_req->hdr,
+> +    ioctl_req->iov.iov_base = &ioctl_req->hdr;
+> +    ioctl_req->iov.iov_len = 0;
+> +
+> +    qemu_iovec_init_external(&ioctl_req->qiov, &ioctl_req->iov, 1);
+> +
+> +    acb = blk_aio_ioctl(blk->blk, SG_IO, &ioctl_req->qiov,
+>                          virtio_blk_ioctl_complete, ioctl_req);
+>      if (!acb) {
+>          g_free(ioctl_req);
+> diff --git a/hw/scsi/scsi-disk.c b/hw/scsi/scsi-disk.c
+> index 1243117..7cbe18d 100644
+> --- a/hw/scsi/scsi-disk.c
+> +++ b/hw/scsi/scsi-disk.c
+> @@ -2636,6 +2636,9 @@ typedef struct SCSIBlockReq {
+>      SCSIDiskReq req;
+>      sg_io_hdr_t io_header;
+>  
+> +    QEMUIOVector qiov;
+> +    struct iovec iov;
+> +
+>      /* Selected bytes of the original CDB, copied into our own CDB.  */
+>      uint8_t cmd, cdb1, group_number;
+>  
+> @@ -2722,7 +2725,12 @@ static BlockAIOCB *scsi_block_do_sgio(SCSIBlockReq *req,
+>      io_header->usr_ptr = r;
+>      io_header->flags |= SG_FLAG_DIRECT_IO;
+>  
+> -    aiocb = blk_aio_ioctl(s->qdev.conf.blk, SG_IO, io_header, cb, opaque);
+> +    req->iov.iov_base = io_header;
+> +    req->iov.iov_len = 0;
+> +
+> +    qemu_iovec_init_external(&req->qiov, &req->iov, 1);
+> +
+> +    aiocb = blk_aio_ioctl(s->qdev.conf.blk, SG_IO, &req->qiov, cb, opaque);
+>      assert(aiocb != NULL);
+>      return aiocb;
+>  }
+> diff --git a/hw/scsi/scsi-generic.c b/hw/scsi/scsi-generic.c
+> index bd0d9ff..856af7c 100644
+> --- a/hw/scsi/scsi-generic.c
+> +++ b/hw/scsi/scsi-generic.c
+> @@ -46,6 +46,8 @@ typedef struct SCSIGenericReq {
+>      int buflen;
+>      int len;
+>      sg_io_hdr_t io_header;
+> +    QEMUIOVector qiov;
+> +    struct iovec iov;
+>  } SCSIGenericReq;
+>  
+>  static void scsi_generic_save_request(QEMUFile *f, SCSIRequest *req)
+> @@ -135,7 +137,12 @@ static int execute_command(BlockBackend *blk,
+>      r->io_header.usr_ptr = r;
+>      r->io_header.flags |= SG_FLAG_DIRECT_IO;
+>  
+> -    r->req.aiocb = blk_aio_ioctl(blk, SG_IO, &r->io_header, complete, r);
+> +    r->iov.iov_base = &r->io_header;
+> +    r->iov.iov_len = 0;
+> +
+> +    qemu_iovec_init_external(&r->qiov, &r->iov, 1);
+> +
+> +    r->req.aiocb = blk_aio_ioctl(blk, SG_IO, &r->qiov, complete, r);
+>      if (r->req.aiocb == NULL) {
+>          return -EIO;
+>      }
+> diff --git a/include/sysemu/block-backend.h b/include/sysemu/block-backend.h
+> index c4e52a5..32f4486 100644
+> --- a/include/sysemu/block-backend.h
+> +++ b/include/sysemu/block-backend.h
+> @@ -151,7 +151,7 @@ void blk_aio_cancel(BlockAIOCB *acb);
+>  void blk_aio_cancel_async(BlockAIOCB *acb);
+>  int blk_co_ioctl(BlockBackend *blk, unsigned long int req, void *buf);
+>  int blk_ioctl(BlockBackend *blk, unsigned long int req, void *buf);
+> -BlockAIOCB *blk_aio_ioctl(BlockBackend *blk, unsigned long int req, void *buf,
+> +BlockAIOCB *blk_aio_ioctl(BlockBackend *blk, unsigned long int req, QEMUIOVector *qiov,
+>                            BlockCompletionFunc *cb, void *opaque);
+>  int blk_co_pdiscard(BlockBackend *blk, int64_t offset, int bytes);
+>  int blk_co_flush(BlockBackend *blk);
+> 
