@@ -1,29 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47828)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54139)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <frederic.konrad@adacore.com>) id 1eHRQ2-0002wa-55
-	for qemu-devel@nongnu.org; Wed, 22 Nov 2017 04:34:11 -0500
+	(envelope-from <kraxel@redhat.com>) id 1eHRjY-0000B7-Ja
+	for qemu-devel@nongnu.org; Wed, 22 Nov 2017 04:54:21 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <frederic.konrad@adacore.com>) id 1eHRQ1-0007Jp-3i
-	for qemu-devel@nongnu.org; Wed, 22 Nov 2017 04:34:10 -0500
-Received: from mel.act-europe.fr ([2a02:2ab8:224:1::a0a:d2]:34957
-	helo=smtp.eu.adacore.com)
+	(envelope-from <kraxel@redhat.com>) id 1eHRjT-0000af-Rg
+	for qemu-devel@nongnu.org; Wed, 22 Nov 2017 04:54:20 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:59820)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <frederic.konrad@adacore.com>)
-	id 1eHRQ0-0007JK-US
-	for qemu-devel@nongnu.org; Wed, 22 Nov 2017 04:34:09 -0500
-References: <1510140763-18256-1-git-send-email-frederic.konrad@adacore.com>
-	<1510140763-18256-2-git-send-email-frederic.konrad@adacore.com>
-	<CAFEAcA87vxBQsh4HH-3saV1jN=xJOJ7MAbjhCVxD6ry7gNvAAQ@mail.gmail.com>
-From: KONRAD Frederic <frederic.konrad@adacore.com>
-Message-ID: <96705ba7-9db5-51b6-77ad-177f537b2dcb@adacore.com>
-Date: Wed, 22 Nov 2017 10:34:05 +0100
+	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1eHRjT-0000ZS-IE
+	for qemu-devel@nongnu.org; Wed, 22 Nov 2017 04:54:15 -0500
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+	[10.5.11.11])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id D4AB08553E
+	for <qemu-devel@nongnu.org>; Wed, 22 Nov 2017 09:54:12 +0000 (UTC)
+Date: Wed, 22 Nov 2017 10:54:11 +0100
+From: Gerd Hoffmann <kraxel@redhat.com>
+Message-ID: <20171122095411.ul6tlqus3gm2ur5j@sirius.home.kraxel.org>
+References: <20171120120636.GJ3037@localhost.localdomain>
 MIME-Version: 1.0
-In-Reply-To: <CAFEAcA87vxBQsh4HH-3saV1jN=xJOJ7MAbjhCVxD6ry7gNvAAQ@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH for-2.12 1/2] cadence_ttc: extract
- CadenceTTCState to a new header file
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20171120120636.GJ3037@localhost.localdomain>
+Subject: Re: [Qemu-devel] "make -C roms lgplvgabios" broken
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,47 +32,34 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, Alistair Francis <alistair.francis@xilinx.com>, "Edgar E. Iglesias" <edgar.iglesias@gmail.com>
+To: Eduardo Habkost <ehabkost@redhat.com>
+Cc: qemu-devel@nongnu.org
 
+  Hi,
 
+> Do we still care enough about lgplvgabios to try to fix that, or
+> should we just remove the lgplvgabios rules and the roms/vgabios
+> submodule?  The last commit in our vgabios.git submodule was 7
+> years ago.
 
-On 11/21/2017 07:41 PM, Peter Maydell wrote:
-> On 8 November 2017 at 11:32, KONRAD Frederic
-> <frederic.konrad@adacore.com> wrote:
->> We want to add this model to the xlnx-zynqmp board so let's make
->> CadenceTTCState available in an header file.
->>
->> Signed-off-by: KONRAD Frederic <frederic.konrad@adacore.com>
->> ---
->>   hw/timer/cadence_ttc.c         | 35 +-----------------------
->>   include/hw/timer/cadence_ttc.h | 61 ++++++++++++++++++++++++++++++++++++++++++
->>   2 files changed, 62 insertions(+), 34 deletions(-)
->>   create mode 100644 include/hw/timer/cadence_ttc.h
->>
->> diff --git a/hw/timer/cadence_ttc.c b/hw/timer/cadence_ttc.c
->> index 03f5b9c..bb4a5ef 100644
->> --- a/hw/timer/cadence_ttc.c
->> +++ b/hw/timer/cadence_ttc.c
->> @@ -16,9 +16,7 @@
->>    * with this program; if not, see <http://www.gnu.org/licenses/>.
->>    */
->>
->> -#include "qemu/osdep.h"
->> -#include "hw/sysbus.h"
->> -#include "qemu/timer.h"
->> +#include "hw/timer/cadence_ttc.h"
-> 
-> Something's gone wrong here. osdep.h should always be the first
-> header in any .c file, and it should never be included by any
-> other .h file.
-> 
-> thanks
-> -- PMM
-> 
+I plan to zap it anyway when switching to the separate firmware repo[1].
+Which will probably take a while though as I'm handicapped atm with my
+right arm in plaster.
 
-Hi Peter,
+Feel free to remove it earlier.
 
-Thanks for your input. I'll fix that.
+It is there as backup just in case there are regressions due to the
+switch to seavgabios, but at this point in time we surely wouldn't
+switch back ...
 
-Fred
+> Related to that, pc-bios/README seems to be outdated, as it says
+> the VGA BIOS come from lgplvgabios, which doesn't seem to be the
+> case anymore.
+
+Indeed.
+
+cheers,
+  Gerd
+
+[1] sneak preview with seabios and edk2 at
+    https://www.kraxel.org/cgit/qemu-firmware/
