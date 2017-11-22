@@ -1,20 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45372)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46409)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1eHZO3-00059L-4w
-	for qemu-devel@nongnu.org; Wed, 22 Nov 2017 13:04:40 -0500
+	(envelope-from <kwolf@redhat.com>) id 1eHZQL-0006dl-Rz
+	for qemu-devel@nongnu.org; Wed, 22 Nov 2017 13:07:06 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1eHZO2-0003Ip-65
-	for qemu-devel@nongnu.org; Wed, 22 Nov 2017 13:04:39 -0500
-Date: Wed, 22 Nov 2017 19:04:26 +0100
+	(envelope-from <kwolf@redhat.com>) id 1eHZQI-0004Cz-Il
+	for qemu-devel@nongnu.org; Wed, 22 Nov 2017 13:07:01 -0500
+Date: Wed, 22 Nov 2017 19:06:40 +0100
 From: Kevin Wolf <kwolf@redhat.com>
-Message-ID: <20171122180426.GC10954@localhost.localdomain>
+Message-ID: <20171122180640.GD10954@localhost.localdomain>
 References: <1511364808-30171-1-git-send-email-deepa.srinivasan@oracle.com>
-	<20171122170607.GA8217@stefanha-x1.localdomain>
+	<215448fd-8dbf-882a-35af-7778a6c4ab38@redhat.com>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="liOOAslEiF7prFVr"
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20171122170607.GA8217@stefanha-x1.localdomain>
+In-Reply-To: <215448fd-8dbf-882a-35af-7778a6c4ab38@redhat.com>
 Subject: Re: [Qemu-devel] [PATCH] block: Fix qemu crash when using scsi-block
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
@@ -24,101 +23,79 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefan Hajnoczi <stefanha@redhat.com>
-Cc: Deepa Srinivasan <deepa.srinivasan@oracle.com>, mreitz@redhat.com, pbonzini@redhat.com, qemu-block@nongnu.org, qemu-devel@nongnu.org, mark.kanda@oracle.com, Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: Deepa Srinivasan <deepa.srinivasan@oracle.com>, mreitz@redhat.com, stefanha@redhat.com, qemu-block@nongnu.org, qemu-devel@nongnu.org, mark.kanda@oracle.com, Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>
 
-
---liOOAslEiF7prFVr
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
-
-Am 22.11.2017 um 18:06 hat Stefan Hajnoczi geschrieben:
-> On Wed, Nov 22, 2017 at 07:33:28AM -0800, Deepa Srinivasan wrote:
+Am 22.11.2017 um 17:34 hat Paolo Bonzini geschrieben:
+> On 22/11/2017 16:33, Deepa Srinivasan wrote:
 > > Starting qemu with the following arguments causes qemu to segfault:
-> > ... -device lsi,id=3Dlsi0 -drive file=3Discsi:<...>,format=3Draw,if=3Dn=
-one,node-name=3D
-> > iscsi1 -device scsi-block,bus=3Dlsi0.0,id=3D<...>,drive=3Discsi1
-> >=20
+> > ... -device lsi,id=lsi0 -drive file=iscsi:<...>,format=raw,if=none,node-name=
+> > iscsi1 -device scsi-block,bus=lsi0.0,id=<...>,drive=iscsi1
+> > 
 > > This patch fixes blk_aio_ioctl() so it does not pass stack addresses to
-> > blk_aio_ioctl_entry() which may be invoked after blk_aio_ioctl() return=
-s. More
+> > blk_aio_ioctl_entry() which may be invoked after blk_aio_ioctl() returns. More
 > > details about the bug follow.
-> >=20
+> > 
 > > blk_aio_ioctl() invokes blk_aio_prwv() with blk_aio_ioctl_entry as the
 > > coroutine parameter. blk_aio_prwv() ultimately calls aio_co_enter().
-> >=20
+> > 
 > > When blk_aio_ioctl() is executed from within a coroutine context (e.g.
-> > iscsi_bh_cb()), aio_co_enter() adds the coroutine (blk_aio_ioctl_entry)=
- to
+> > iscsi_bh_cb()), aio_co_enter() adds the coroutine (blk_aio_ioctl_entry) to
 > > the current coroutine's wakeup queue. blk_aio_ioctl() then returns.
-> >=20
-> > When blk_aio_ioctl_entry() executes later, it accesses an invalid point=
-er:
+> > 
+> > When blk_aio_ioctl_entry() executes later, it accesses an invalid pointer:
 > > ....
-> >     BlkRwCo *rwco =3D &acb->rwco;
-> >=20
-> >     rwco->ret =3D blk_co_ioctl(rwco->blk, rwco->offset,
+> >     BlkRwCo *rwco = &acb->rwco;
+> > 
+> >     rwco->ret = blk_co_ioctl(rwco->blk, rwco->offset,
 > >                              rwco->qiov->iov[0].iov_base);  <--- qiov is
-> >                                                                  invali=
-d here
+> >                                                                  invalid here
 > > ...
-> >=20
+> > 
 > > In the case when blk_aio_ioctl() is called from a non-coroutine context,
 > > blk_aio_ioctl_entry() executes immediately. But if bdrv_co_ioctl() calls
 > > qemu_coroutine_yield(), blk_aio_ioctl() will return. When the coroutine
-> > execution is complete, control returns to blk_aio_ioctl_entry() after t=
-he call
-> > to blk_co_ioctl(). There is no invalid reference after this point, but =
-the
+> > execution is complete, control returns to blk_aio_ioctl_entry() after the call
+> > to blk_co_ioctl(). There is no invalid reference after this point, but the
 > > function is still holding on to invalid pointers.
-> >=20
-> > The fix is to allocate memory for the QEMUIOVector and struct iovec as =
-part of
-> > the request struct which the IO buffer is part of. The memory for this =
-struct is
+> > 
+> > The fix is to allocate memory for the QEMUIOVector and struct iovec as part of
+> > the request struct which the IO buffer is part of. The memory for this struct is
 > > guaranteed to be valid till the AIO is completed.
->=20
-> Thanks for the patch!
->=20
-> AIO APIs currently don't require the caller to match qiov's lifetime to
-> the I/O request lifetime.  This patch changes that for blk_aio_ioctl()
-> only.  If we want to do this consistently then all aio callers need to
-> be audited and fixed.
->=20
-> The alternative is to make the API copy qiov when necessary.  That is
-> less efficient but avoids modifying all callers.
->=20
-> Either way, the lifetime of qiov must be consistent across all aio APIs,
-> not just blk_aio_ioctl().
+> > 
+> > Signed-off-by: Deepa Srinivasan <deepa.srinivasan@oracle.com>
+> > Signed-off-by: Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>
+> > Reviewed-by: Mark Kanda <mark.kanda@oracle.com>
+> > ---
+> >  block/block-backend.c          | 13 ++-----------
+> >  hw/block/virtio-blk.c          |  9 ++++++++-
+> >  hw/scsi/scsi-disk.c            | 10 +++++++++-
+> >  hw/scsi/scsi-generic.c         |  9 ++++++++-
+> >  include/sysemu/block-backend.h |  2 +-
+> >  5 files changed, 28 insertions(+), 15 deletions(-)
+> > 
+> > diff --git a/block/block-backend.c b/block/block-backend.c
+> > index baef8e7..c275827 100644
+> > --- a/block/block-backend.c
+> > +++ b/block/block-backend.c
+> > @@ -1472,19 +1472,10 @@ static void blk_aio_ioctl_entry(void *opaque)
+> >      blk_aio_complete(acb);
+> >  }
+> >  
+> > -BlockAIOCB *blk_aio_ioctl(BlockBackend *blk, unsigned long int req, void *buf,
+> > +BlockAIOCB *blk_aio_ioctl(BlockBackend *blk, unsigned long int req, QEMUIOVector *qiov,
+> >                            BlockCompletionFunc *cb, void *opaque)
+> 
+> I think this is not the best way to fix the bug, because it adds extra
+> unnecessary code in the callers.
+> 
+> Perhaps you can change BlkRwCo's "qiov" field to "void *buf" and the
+> same for blk_aio_prwv's "qiov" argument?
+> 
+> Then the QEMUIOVector is not needed at all, and blk_co_ioctl can just
+> use rwco->buf.
 
-Don't all blk_aio_*() APIs that take a qiov pointer require that it
-remains valid until the request completes? I don't think they are copied
-anywhere for blk_aio_preadv/pwritev() before being passed to the block
-driver.
-
-So this does look consistent with the existing functions to me.
+But the same struct is used for read and write requests that do use an
+actual QEMUIOVector and not just a linear buffer.
 
 Kevin
-
---liOOAslEiF7prFVr
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQIcBAEBAgAGBQJaFbwqAAoJEH8JsnLIjy/WsdMP/iMqoF+7fbePy6P5n9tMCQhk
-7uXujFByLFqzavHbgmog1pqY38mdCYm6kK77JPstRdw8J+blhTW8rwf17igPGkLI
-wTVGp57knzCdUOOyLfkFAVHBtUFWAXuON3Ovvn8DeMLEXSExlPvndTc7sQbmkfMj
-L2DD+TZ6kCBKjr11Eumxj3+S6/I4SKXRgdzHIdKrxWZEzWRGgvHQj0h2L1WnkAZF
-jptdCZf4HnDMlI8/55dabqke9Z4VCsUU4PsDd9hQJ2IC/Em6SmxBqfXDIjBwWoHZ
-ShbYvzA1WkMQ+Aa+VFWchNQejliMxjZzNcJbvkNOLg1L2Z3Z7PAi1jJaK2osE5Rz
-l5jA2jx3gD0ZDhk6ecZmICAolK2UKnpPsiEqvuVCUnUOC+UwpO2vybe9fhLVkAVK
-DyQCZqY0jdq2LJOgcvdIKyPYjKwllFDyLG6tRxFhRN0pDpx/Y9BqGMwYh74qkkuF
-EqX9yo3B+7nMx+nZMNWdqrPBUSQNoPoGd99ZpeDmb2Z4AKGq+c/y/GFEbC70vzMY
-s1AZMjedbc+MYRPxLcTH05+kbcqq6B64J623uaHQXS9QuwfrCeEURJ6fJt4k/Ezp
-IlHn5PHpnzeUwZlDipWDBEXWdHInbttMCWs5+384lfmDrl94fgPp65Fm70fahbjo
-pG/ICnUSlYWlw1DyToMf
-=n9Vh
------END PGP SIGNATURE-----
-
---liOOAslEiF7prFVr--
