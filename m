@@ -1,31 +1,14 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45318)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46332)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1eHIfu-0004kS-Fk
-	for qemu-devel@nongnu.org; Tue, 21 Nov 2017 19:13:59 -0500
+	(envelope-from <jsnow@redhat.com>) id 1eHIiw-00060f-Ev
+	for qemu-devel@nongnu.org; Tue, 21 Nov 2017 19:17:07 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1eHIft-0007TD-EE
-	for qemu-devel@nongnu.org; Tue, 21 Nov 2017 19:13:58 -0500
-References: <dd350838-9132-e787-10b1-4cb200076ec9@virtuozzo.com>
-	<w51inekzv59.fsf@maestria.local.igalia.com>
-	<w518tff4dvi.fsf@maestria.local.igalia.com>
-	<20171110030223.GA7303@lemon>
-	<w518tf7k0ov.fsf@maestria.local.igalia.com>
-	<14461b9b-d62d-3723-d2bb-c2fe873207c5@virtuozzo.com>
-	<w51bmk2qkvv.fsf@maestria.local.igalia.com>
-	<41e905e4-0c2a-fad3-09a6-4959f04fe546@virtuozzo.com>
-	<w51zi7fbxrd.fsf@maestria.local.igalia.com>
-	<160cac7d-7dc6-2daf-5299-82a57bffe14c@virtuozzo.com>
-	<w51wp2jbqcd.fsf@maestria.local.igalia.com>
+	(envelope-from <jsnow@redhat.com>) id 1eHIiv-0000Cq-8r
+	for qemu-devel@nongnu.org; Tue, 21 Nov 2017 19:17:06 -0500
 From: John Snow <jsnow@redhat.com>
-Message-ID: <683910c4-1ef3-f072-caf2-87d344735d03@redhat.com>
-Date: Tue, 21 Nov 2017 19:13:47 -0500
-MIME-Version: 1.0
-In-Reply-To: <w51wp2jbqcd.fsf@maestria.local.igalia.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [Qemu-block] segfault in parallel blockjobs
- (iotest 30)
+Date: Tue, 21 Nov 2017 19:16:56 -0500
+Message-Id: <20171122001656.12996-1-jsnow@redhat.com>
+Subject: [Qemu-devel] [PATCH] iotests: fix 075 and 078
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,52 +17,140 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alberto Garcia <berto@igalia.com>, Anton Nefedov <anton.nefedov@virtuozzo.com>, Fam Zheng <famz@redhat.com>
-Cc: qemu-devel@nongnu.org, kwolf@redhat.com, qemu-block@nongnu.org, mreitz@redhat.com, Jeff Cody <jcody@redhat.com>
+To: qemu-block@nongnu.org
+Cc: kwolf@redhat.com, ldoktor@redhat.com, qemu-devel@nongnu.org, mreitz@redhat.com, John Snow <jsnow@redhat.com>
 
-CC Jeff Cody
+Both of these tests are for formats which now stipulate that they are
+read-only. Adjust the tests to match.
 
-... who may or may not be preoccupied with Thanksgiving travel now.
+Signed-off-by: John Snow <jsnow@redhat.com>
+---
+ tests/qemu-iotests/075 | 18 +++++++++---------
+ tests/qemu-iotests/078 | 14 +++++++-------
+ 2 files changed, 16 insertions(+), 16 deletions(-)
 
-Convenient URL for reading past replies:
-https://lists.nongnu.org/archive/html/qemu-devel/2017-11/msg03844.html
-
-On 11/21/2017 10:31 AM, Alberto Garcia wrote:
-> On Tue 21 Nov 2017 04:18:13 PM CET, Anton Nefedov wrote:
-> 
->>>> Or, perhaps another approach, keep BlockJob referenced while it is
->>>> paused (by block_job_pause/resume_all()). That should prevent it
->>>> from deleting the BB.
->>>
->>> Yes, I tried this and it actually solves the issue. But I still think
->>> that the problem is that block jobs are allowed to finish when they
->>> are paused.
->>
->> Agree, but
->>
->>> Adding block_job_pause_point(&s->common) at the end of stream_run()
->>> fixes the problem too.
->>
->> would be a nice fix, but it only works unless the job is already
->> deferred, right?
-> 
-> Right, I didn't mean to propose it as the proper solution (it would
-> still leave mirror job vulnerable because it's already paused by the
-> time it calls defer_to_main_loop()).
-> 
->> This:
->>
->>  >> keep BlockJob referenced while it is
->>  >> paused (by block_job_pause/resume_all()). That should prevent it from
->>  >> deleting the BB.
->>
->> looks kind of hacky; maybe referencing in block_job_pause() (and not
->> just pause_all) seems more correct? I think it didn't work for me
->> right away though. But I can look more.
-> 
-> You have to be careful when you unref the block job because you may
-> destroy it, and therefore block_job_next() in block_job_resume_all()
-> would be using freed memory.
-> 
-> Berto
-> 
+diff --git a/tests/qemu-iotests/075 b/tests/qemu-iotests/075
+index 770d51c6cb..caa30d4743 100755
+--- a/tests/qemu-iotests/075
++++ b/tests/qemu-iotests/075
+@@ -48,56 +48,56 @@ offsets_offset=136
+ echo
+ echo "== check that the first sector can be read =="
+ _use_sample_img simple-pattern.cloop.bz2
+-$QEMU_IO -c "read 0 512" $TEST_IMG 2>&1 | _filter_qemu_io | _filter_testdir
++$QEMU_IO -r -c "read 0 512" $TEST_IMG 2>&1 | _filter_qemu_io | _filter_testdir
+ 
+ echo
+ echo "== check that the last sector can be read =="
+ _use_sample_img simple-pattern.cloop.bz2
+-$QEMU_IO -c "read $((1024 * 1024 - 512)) 512" $TEST_IMG 2>&1 | _filter_qemu_io | _filter_testdir
++$QEMU_IO -r -c "read $((1024 * 1024 - 512)) 512" $TEST_IMG 2>&1 | _filter_qemu_io | _filter_testdir
+ 
+ echo
+ echo "== block_size must be a multiple of 512 =="
+ _use_sample_img simple-pattern.cloop.bz2
+ poke_file "$TEST_IMG" "$block_size_offset" "\x00\x00\x02\x01"
+-$QEMU_IO -c "read 0 512" $TEST_IMG 2>&1 | _filter_qemu_io | _filter_testdir
++$QEMU_IO -r -c "read 0 512" $TEST_IMG 2>&1 | _filter_qemu_io | _filter_testdir
+ 
+ echo
+ echo "== block_size cannot be zero =="
+ _use_sample_img simple-pattern.cloop.bz2
+ poke_file "$TEST_IMG" "$block_size_offset" "\x00\x00\x00\x00"
+-$QEMU_IO -c "read 0 512" $TEST_IMG 2>&1 | _filter_qemu_io | _filter_testdir
++$QEMU_IO -r -c "read 0 512" $TEST_IMG 2>&1 | _filter_qemu_io | _filter_testdir
+ 
+ echo
+ echo "== huge block_size ==="
+ _use_sample_img simple-pattern.cloop.bz2
+ poke_file "$TEST_IMG" "$block_size_offset" "\xff\xff\xfe\x00"
+-$QEMU_IO -c "read 0 512" $TEST_IMG 2>&1 | _filter_qemu_io | _filter_testdir
++$QEMU_IO -r -c "read 0 512" $TEST_IMG 2>&1 | _filter_qemu_io | _filter_testdir
+ 
+ echo
+ echo "== offsets_size overflow ==="
+ _use_sample_img simple-pattern.cloop.bz2
+ poke_file "$TEST_IMG" "$n_blocks_offset" "\xff\xff\xff\xff"
+-$QEMU_IO -c "read 0 512" $TEST_IMG 2>&1 | _filter_qemu_io | _filter_testdir
++$QEMU_IO -r -c "read 0 512" $TEST_IMG 2>&1 | _filter_qemu_io | _filter_testdir
+ 
+ echo
+ echo "== refuse images that require too many offsets ==="
+ _use_sample_img simple-pattern.cloop.bz2
+ poke_file "$TEST_IMG" "$n_blocks_offset" "\x04\x00\x00\x01"
+-$QEMU_IO -c "read 0 512" $TEST_IMG 2>&1 | _filter_qemu_io | _filter_testdir
++$QEMU_IO -r -c "read 0 512" $TEST_IMG 2>&1 | _filter_qemu_io | _filter_testdir
+ 
+ echo
+ echo "== refuse images with non-monotonically increasing offsets =="
+ _use_sample_img simple-pattern.cloop.bz2
+ poke_file "$TEST_IMG" "$offsets_offset" "\x00\x00\x00\x00\xff\xff\xff\xff"
+ poke_file "$TEST_IMG" $((offsets_offset + 8)) "\x00\x00\x00\x00\xff\xfe\x00\x00"
+-$QEMU_IO -c "read 0 512" $TEST_IMG 2>&1 | _filter_qemu_io | _filter_testdir
++$QEMU_IO -r -c "read 0 512" $TEST_IMG 2>&1 | _filter_qemu_io | _filter_testdir
+ 
+ echo
+ echo "== refuse images with invalid compressed block size =="
+ _use_sample_img simple-pattern.cloop.bz2
+ poke_file "$TEST_IMG" "$offsets_offset" "\x00\x00\x00\x00\x00\x00\x00\x00"
+ poke_file "$TEST_IMG" $((offsets_offset + 8)) "\xff\xff\xff\xff\xff\xff\xff\xff"
+-$QEMU_IO -c "read 0 512" $TEST_IMG 2>&1 | _filter_qemu_io | _filter_testdir
++$QEMU_IO -r -c "read 0 512" $TEST_IMG 2>&1 | _filter_qemu_io | _filter_testdir
+ 
+ # success, all done
+ echo "*** done"
+diff --git a/tests/qemu-iotests/078 b/tests/qemu-iotests/078
+index f333e9ac84..a106c26f6b 100755
+--- a/tests/qemu-iotests/078
++++ b/tests/qemu-iotests/078
+@@ -48,41 +48,41 @@ disk_size_offset=$((0x58))
+ echo
+ echo "== Read from a valid image =="
+ _use_sample_img empty.bochs.bz2
+-{ $QEMU_IO -c "read 0 512" $TEST_IMG; } 2>&1 | _filter_qemu_io | _filter_testdir
++{ $QEMU_IO -r -c "read 0 512" $TEST_IMG; } 2>&1 | _filter_qemu_io | _filter_testdir
+ 
+ echo
+ echo "== Negative catalog size =="
+ _use_sample_img empty.bochs.bz2
+ poke_file "$TEST_IMG" "$catalog_size_offset" "\xff\xff\xff\xff"
+-{ $QEMU_IO -c "read 0 512" $TEST_IMG; } 2>&1 | _filter_qemu_io | _filter_testdir
++{ $QEMU_IO -r -c "read 0 512" $TEST_IMG; } 2>&1 | _filter_qemu_io | _filter_testdir
+ 
+ echo
+ echo "== Overflow for catalog size * sizeof(uint32_t) =="
+ _use_sample_img empty.bochs.bz2
+ poke_file "$TEST_IMG" "$catalog_size_offset" "\x00\x00\x00\x40"
+-{ $QEMU_IO -c "read 0 512" $TEST_IMG; } 2>&1 | _filter_qemu_io | _filter_testdir
++{ $QEMU_IO -r -c "read 0 512" $TEST_IMG; } 2>&1 | _filter_qemu_io | _filter_testdir
+ 
+ echo
+ echo "== Too small catalog bitmap for image size =="
+ _use_sample_img empty.bochs.bz2
+ poke_file "$TEST_IMG" "$disk_size_offset" "\x00\xc0\x0f\x00\x00\x00\x00\x7f"
+-{ $QEMU_IO -c "read 2T 4k" $TEST_IMG; } 2>&1 | _filter_qemu_io | _filter_testdir
++{ $QEMU_IO -r -c "read 2T 4k" $TEST_IMG; } 2>&1 | _filter_qemu_io | _filter_testdir
+ 
+ _use_sample_img empty.bochs.bz2
+ poke_file "$TEST_IMG" "$catalog_size_offset" "\x10\x00\x00\x00"
+-{ $QEMU_IO -c "read 0xfbe00 512" $TEST_IMG; } 2>&1 | _filter_qemu_io | _filter_testdir
++{ $QEMU_IO -r -c "read 0xfbe00 512" $TEST_IMG; } 2>&1 | _filter_qemu_io | _filter_testdir
+ 
+ echo
+ echo "== Negative extent size =="
+ _use_sample_img empty.bochs.bz2
+ poke_file "$TEST_IMG" "$extent_size_offset" "\x00\x00\x00\x80"
+-{ $QEMU_IO -c "read 768k 512" $TEST_IMG; } 2>&1 | _filter_qemu_io | _filter_testdir
++{ $QEMU_IO -r -c "read 768k 512" $TEST_IMG; } 2>&1 | _filter_qemu_io | _filter_testdir
+ 
+ echo
+ echo "== Zero extent size =="
+ _use_sample_img empty.bochs.bz2
+ poke_file "$TEST_IMG" "$extent_size_offset" "\x00\x00\x00\x00"
+-{ $QEMU_IO -c "read 0 512" $TEST_IMG; } 2>&1 | _filter_qemu_io | _filter_testdir
++{ $QEMU_IO -r -c "read 0 512" $TEST_IMG; } 2>&1 | _filter_qemu_io | _filter_testdir
+ 
+ # success, all done
+ echo "*** done"
+-- 
+2.14.3
