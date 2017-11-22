@@ -1,29 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35421)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36007)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1eHQdq-0007ND-5b
-	for qemu-devel@nongnu.org; Wed, 22 Nov 2017 03:44:23 -0500
+	(envelope-from <quintela@redhat.com>) id 1eHQep-0007y2-BQ
+	for qemu-devel@nongnu.org; Wed, 22 Nov 2017 03:45:24 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1eHQdm-0003WN-UK
-	for qemu-devel@nongnu.org; Wed, 22 Nov 2017 03:44:22 -0500
-Received: from mail-wm0-x232.google.com ([2a00:1450:400c:c09::232]:36152)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1eHQdm-0003Vz-Lu
-	for qemu-devel@nongnu.org; Wed, 22 Nov 2017 03:44:18 -0500
-Received: by mail-wm0-x232.google.com with SMTP id r68so8497724wmr.1
-	for <qemu-devel@nongnu.org>; Wed, 22 Nov 2017 00:44:18 -0800 (PST)
-References: <20171109144155.17076-1-batuzovk@ispras.ru>
-	<20171109144155.17076-3-batuzovk@ispras.ru>
-From: Richard Henderson <richard.henderson@linaro.org>
-Message-ID: <1236eb3c-7612-4b96-3925-a0375e0c9888@linaro.org>
-Date: Wed, 22 Nov 2017 09:44:14 +0100
-MIME-Version: 1.0
-In-Reply-To: <20171109144155.17076-3-batuzovk@ispras.ru>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH RFC 2/3] tcg/optimize: do copy propagation
- for memory locations
+	(envelope-from <quintela@redhat.com>) id 1eHQeo-0004Bw-5p
+	for qemu-devel@nongnu.org; Wed, 22 Nov 2017 03:45:23 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:49510)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1eHQen-0004Bm-MW
+	for qemu-devel@nongnu.org; Wed, 22 Nov 2017 03:45:22 -0500
+From: Juan Quintela <quintela@redhat.com>
+Date: Wed, 22 Nov 2017 09:45:03 +0100
+Message-Id: <20171122084504.11984-2-quintela@redhat.com>
+In-Reply-To: <20171122084504.11984-1-quintela@redhat.com>
+References: <20171122084504.11984-1-quintela@redhat.com>
+Subject: [Qemu-devel] [PULL 1/2] migration,
+ xen: Fix block image lock issue on live migration
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,75 +24,105 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Kirill Batuzov <batuzovk@ispras.ru>, qemu-devel@nongnu.org
-Cc: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>
+To: qemu-devel@nongnu.org
+Cc: dgilbert@redhat.com, lvivier@redhat.com, peterx@redhat.com, Anthony PERARD <anthony.perard@citrix.com>
 
-On 11/09/2017 03:41 PM, Kirill Batuzov wrote:
-> +typedef struct TCGMemLocation {
-> +    /* Offset is relative to ENV. Only fields of CPUState are accounted.  */
-> +    tcg_target_ulong offset;
-> +    tcg_target_ulong size;
-> +    TCGType type;
-> +    /* Pointer to a temp containing a valid copy of this memory location.  */
-> +    TCGTemp *copy;
-> +    /* Pointer to the next memory location containing copy of the same
-> +       content.  */
-> +    struct TCGMemLocation *next_copy;
+From: Anthony PERARD <anthony.perard@citrix.com>
 
-Did you ever find copies of memories that weren't also copies within temps?
-I.e. you could have found this through copy->next_copy?
+When doing a live migration of a Xen guest with libxl, the images for
+block devices are locked by the original QEMU process, and this prevent
+the QEMU at the destination to take the lock and the migration fail.
 
-> +    /* Double-linked list of all memory locations.  */
-> +    struct TCGMemLocation *next;
-> +    struct TCGMemLocation **prev_ptr;
+>From QEMU point of view, once the RAM of a domain is migrated, there is
+two QMP commands, "stop" then "xen-save-devices-state", at which point a
+new QEMU is spawned at the destination.
 
-Use QTAILQ_* for common double-linked-list manipulation.
+Release locks in "xen-save-devices-state" so the destination can takes
+them, if it's a live migration.
 
-> +struct TCGMemLocation *mem_locations;
-> +struct TCGMemLocation *free_mls;
+This patch add the "live" parameter to "xen-save-devices-state" which
+default to true so older version of libxenlight can work with newer
+version of QEMU.
 
-These can't be globals anymore -- we're do multi-threaded code generation now.
+Signed-off-by: Anthony PERARD <anthony.perard@citrix.com>
+Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+Reviewed-by: Juan Quintela <quintela@redhat.com>
+Signed-off-by: Juan Quintela <quintela@redhat.com>
+---
+ migration/savevm.c  | 23 ++++++++++++++++++++++-
+ qapi/migration.json |  6 +++++-
+ 2 files changed, 27 insertions(+), 2 deletions(-)
 
-> @@ -77,12 +125,27 @@ static void reset_ts(TCGTemp *ts)
->      struct tcg_temp_info *pi = ts_info(ti->prev_copy);
->      struct tcg_temp_info *ni = ts_info(ti->next_copy);
->  
-> +    if (ti->mem_loc && ts_is_copy(ts) && 0) {
-> +        TCGMemLocation *ml, *nml;
-> +        for (ml = ti->mem_loc; ml; ml = nml) {
-> +            nml = ml->next_copy;
-> +            ml->copy = ti->next_copy;
-> +            ml->next_copy = ni->mem_loc;
-> +            ni->mem_loc = ml;
-> +        }
-> +    } else {
-> +        while (ti->mem_loc) {
-> +            reset_ml(ti->mem_loc);
-> +        }
-
-Why would a single temp be associated with more than one memory?
-
-> +static TCGOpcode ld_to_mov(TCGOpcode op)
-> +{
-> +#define LD_TO_EXT(sz, w)                                 \
-> +    case glue(glue(INDEX_op_ld, sz), glue(_i, w)):       \
-> +        return glue(glue(INDEX_op_ext, sz), glue(_i, w))
-> +
-> +    switch (op) {
-> +    LD_TO_EXT(8s, 32);
-> +    LD_TO_EXT(8u, 32);
-> +    LD_TO_EXT(16s, 32);
-> +    LD_TO_EXT(16u, 32);
-> +    LD_TO_EXT(8s, 64);
-> +    LD_TO_EXT(8u, 64);
-> +    LD_TO_EXT(16s, 64);
-> +    LD_TO_EXT(16u, 64);
-> +    LD_TO_EXT(32s, 64);
-> +    LD_TO_EXT(32u, 64);
-
-How many extensions did you find?  Or is this Just In Case?
-
-Otherwise this looks quite reasonable.
-
-
-r~
+diff --git a/migration/savevm.c b/migration/savevm.c
+index 192f2d82cd..b7908f62be 100644
+--- a/migration/savevm.c
++++ b/migration/savevm.c
+@@ -2242,13 +2242,20 @@ int save_snapshot(const char *name, Error **errp)
+     return ret;
+ }
+ 
+-void qmp_xen_save_devices_state(const char *filename, Error **errp)
++void qmp_xen_save_devices_state(const char *filename, bool has_live, bool live,
++                                Error **errp)
+ {
+     QEMUFile *f;
+     QIOChannelFile *ioc;
+     int saved_vm_running;
+     int ret;
+ 
++    if (!has_live) {
++        /* live default to true so old version of Xen tool stack can have a
++         * successfull live migration */
++        live = true;
++    }
++
+     saved_vm_running = runstate_is_running();
+     vm_stop(RUN_STATE_SAVE_VM);
+     global_state_store_running();
+@@ -2263,6 +2270,20 @@ void qmp_xen_save_devices_state(const char *filename, Error **errp)
+     qemu_fclose(f);
+     if (ret < 0) {
+         error_setg(errp, QERR_IO_ERROR);
++    } else {
++        /* libxl calls the QMP command "stop" before calling
++         * "xen-save-devices-state" and in case of migration failure, libxl
++         * would call "cont".
++         * So call bdrv_inactivate_all (release locks) here to let the other
++         * side of the migration take controle of the images.
++         */
++        if (live && !saved_vm_running) {
++            ret = bdrv_inactivate_all();
++            if (ret) {
++                error_setg(errp, "%s: bdrv_inactivate_all() failed (%d)",
++                           __func__, ret);
++            }
++        }
+     }
+ 
+  the_end:
+diff --git a/qapi/migration.json b/qapi/migration.json
+index bbc4671ded..03f57c9616 100644
+--- a/qapi/migration.json
++++ b/qapi/migration.json
+@@ -1075,6 +1075,9 @@
+ # data. See xen-save-devices-state.txt for a description of the binary
+ # format.
+ #
++# @live: Optional argument to ask QEMU to treat this command as part of a live
++# migration. Default to true. (since 2.11)
++#
+ # Returns: Nothing on success
+ #
+ # Since: 1.1
+@@ -1086,7 +1089,8 @@
+ # <- { "return": {} }
+ #
+ ##
+-{ 'command': 'xen-save-devices-state', 'data': {'filename': 'str'} }
++{ 'command': 'xen-save-devices-state',
++  'data': {'filename': 'str', '*live':'bool' } }
+ 
+ ##
+ # @xen-set-replication:
+-- 
+2.13.6
