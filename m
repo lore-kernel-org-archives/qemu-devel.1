@@ -1,21 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43548)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50970)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1eHSlC-0007FY-HG
-	for qemu-devel@nongnu.org; Wed, 22 Nov 2017 06:00:11 -0500
+	(envelope-from <sameeh@daynix.com>) id 1eHTEa-00060K-B3
+	for qemu-devel@nongnu.org; Wed, 22 Nov 2017 06:30:34 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1eHSl8-0003e0-S2
-	for qemu-devel@nongnu.org; Wed, 22 Nov 2017 06:00:06 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:18170)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1eHSl8-0003dg-ME
-	for qemu-devel@nongnu.org; Wed, 22 Nov 2017 06:00:02 -0500
-Date: Wed, 22 Nov 2017 10:59:58 +0000
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20171122105957.GC2443@work-vm>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Subject: [Qemu-devel] postcopy test under load
+	(envelope-from <sameeh@daynix.com>) id 1eHTEV-00025r-Ln
+	for qemu-devel@nongnu.org; Wed, 22 Nov 2017 06:30:28 -0500
+Received: from mail-wr0-x243.google.com ([2a00:1450:400c:c0c::243]:41487)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <sameeh@daynix.com>) id 1eHTEV-00025G-E3
+	for qemu-devel@nongnu.org; Wed, 22 Nov 2017 06:30:23 -0500
+Received: by mail-wr0-x243.google.com with SMTP id z14so14206335wrb.8
+	for <qemu-devel@nongnu.org>; Wed, 22 Nov 2017 03:30:22 -0800 (PST)
+From: Sameeh Jubran <sameeh@daynix.com>
+Date: Wed, 22 Nov 2017 13:30:14 +0200
+Message-Id: <20171122113014.2512-1-sameeh@daynix.com>
+Subject: [Qemu-devel] [PATCH] qga-win: VSS: Handle
+ VSS_E_PROVIDER_ALREADY_REGISTERED error
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,31 +24,40 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: peter.maydell@linaro.org
-Cc: qemu-devel@nongnu.org
+To: qemu-devel@nongnu.org, mdroth@linux.vnet.ibm.com
+Cc: Yan Vugenfirer <yan@daynix.com>
 
-Hi Peter,
-  I was trying to reproduce the occasional travis postcopy
-test case failures you were seeing; I can reproduce them but
-only with tcg - which makes me wonder if the problem is in
-the test or actually in tcg.
+From: Sameeh Jubran <sjubran@redhat.com>
 
-My test is:
+We can get VSS_E_PROVIDER_ALREADY_REGISTERED error if for some
+reason the uninstall of qemu-ga didn't complete successfully.
+In this case we can try to unregister the component service
+and attempt to register it again.
 
-export QTEST_QEMU_BINARY=wherever/try/x86_64-softmmu/qemu-system-x86_64
-cd whereever/try
-for NUM in $(seq 1 100)
-do
-  echo 'while true; do ./tests/migration-test || break; done' | taskset 2 bash &
-done
+Signed-off-by: Sameeh Jubran <sjubran@redhat.com>
+---
+ qga/vss-win32/install.cpp | 9 +++++++++
+ 1 file changed, 9 insertions(+)
 
-
-so all of the instances are pinned to one core using taskset.
-
-I had 100 instances of kvm running overnight (x86-64) and didn't
-hit any problems.
-30 instances of tcg hit the problem in 5 minutes (x86-64 on x86-64).
-
-Dave
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+diff --git a/qga/vss-win32/install.cpp b/qga/vss-win32/install.cpp
+index 51838eeb26..e7bc5e1d9d 100644
+--- a/qga/vss-win32/install.cpp
++++ b/qga/vss-win32/install.cpp
+@@ -443,6 +443,15 @@ STDAPI DllRegisterServer(void)
+                                      VSS_PROV_SOFTWARE,
+                                      const_cast<WCHAR*>(QGA_PROVIDER_VERSION),
+                                      g_gProviderVersion);
++    if (hr == (long int) VSS_E_PROVIDER_ALREADY_REGISTERED) {
++        DllUnregisterServer();
++        hr = pVssAdmin->RegisterProvider(g_gProviderId, CLSID_QGAVSSProvider,
++                                     const_cast<WCHAR * >(QGA_PROVIDER_LNAME),
++                                     VSS_PROV_SOFTWARE,
++                                     const_cast<WCHAR * >(QGA_PROVIDER_VERSION),
++                                     g_gProviderVersion);
++    }
++
+     if (FAILED(hr)) {
+         errmsg_dialog(hr, "RegisterProvider failed");
+     }
+-- 
+2.13.6
