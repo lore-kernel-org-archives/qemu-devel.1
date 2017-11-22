@@ -1,22 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53764)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55157)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1eHd6S-0006NQ-PK
-	for qemu-devel@nongnu.org; Wed, 22 Nov 2017 17:02:45 -0500
+	(envelope-from <pmorel@linux.vnet.ibm.com>) id 1eHd9S-0007CX-08
+	for qemu-devel@nongnu.org; Wed, 22 Nov 2017 17:05:51 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1eHd6R-0000XL-FI
-	for qemu-devel@nongnu.org; Wed, 22 Nov 2017 17:02:44 -0500
-References: <20171122101958.17065-1-vsementsov@virtuozzo.com>
-	<20171122101958.17065-6-vsementsov@virtuozzo.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <9104d2de-e723-9a16-09bc-5c69d6d0c880@redhat.com>
-Date: Wed, 22 Nov 2017 16:02:34 -0600
-MIME-Version: 1.0
-In-Reply-To: <20171122101958.17065-6-vsementsov@virtuozzo.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="950VKmvjM5GlKfSwUlOi0l1KbTrksjqtI"
-Subject: Re: [Qemu-devel] [PATCH 5/5] nbd/server: structurize option reply
- sending
+	(envelope-from <pmorel@linux.vnet.ibm.com>) id 1eHd9N-00035V-W6
+	for qemu-devel@nongnu.org; Wed, 22 Nov 2017 17:05:49 -0500
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:49506)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pmorel@linux.vnet.ibm.com>)
+	id 1eHd9N-00034h-NI
+	for qemu-devel@nongnu.org; Wed, 22 Nov 2017 17:05:45 -0500
+Received: from pps.filterd (m0098393.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
+	vAMM51pb055177
+	for <qemu-devel@nongnu.org>; Wed, 22 Nov 2017 17:05:42 -0500
+Received: from e06smtp13.uk.ibm.com (e06smtp13.uk.ibm.com [195.75.94.109])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2edg854xt2-1
+	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Wed, 22 Nov 2017 17:05:41 -0500
+Received: from localhost
+	by e06smtp13.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	Only! Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <pmorel@linux.vnet.ibm.com>;
+	Wed, 22 Nov 2017 22:05:38 -0000
+From: Pierre Morel <pmorel@linux.vnet.ibm.com>
+Date: Wed, 22 Nov 2017 23:05:27 +0100
+Message-Id: <1511388334-16347-1-git-send-email-pmorel@linux.vnet.ibm.com>
+Subject: [Qemu-devel] [PATCH v3 0/7] s390x/pci: Improve zPCI to cover more
+ cases
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,74 +36,61 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org
-Cc: pbonzini@redhat.com, kwolf@redhat.com, mreitz@redhat.com, den@openvz.org
+To: qemu-devel@nongnu.org
+Cc: cohuck@redhat.com, agraf@suse.de, borntraeger@de.ibm.com, zyimin@linux.vnet.ibm.com, pasic@linux.vnet.ibm.com
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---950VKmvjM5GlKfSwUlOi0l1KbTrksjqtI
-From: Eric Blake <eblake@redhat.com>
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
- qemu-block@nongnu.org, qemu-devel@nongnu.org
-Cc: pbonzini@redhat.com, kwolf@redhat.com, mreitz@redhat.com, den@openvz.org
-Message-ID: <9104d2de-e723-9a16-09bc-5c69d6d0c880@redhat.com>
-Subject: Re: [PATCH 5/5] nbd/server: structurize option reply sending
-References: <20171122101958.17065-1-vsementsov@virtuozzo.com>
- <20171122101958.17065-6-vsementsov@virtuozzo.com>
-In-Reply-To: <20171122101958.17065-6-vsementsov@virtuozzo.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+This patch fixes the following BUG:
+Even a guest is able to detect virtio_pci device, the init function
+the Linux virtio_pci driver will hang because zPCI does not support
+the subregions used by virtio_pci.
 
-On 11/22/2017 04:19 AM, Vladimir Sementsov-Ogievskiy wrote:
-> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-> ---
->  nbd/server.c | 40 +++++++++++++---------------------------
->  1 file changed, 13 insertions(+), 27 deletions(-)
->=20
+It follows that right now the PCI support is very limited
+(e.g. pass through of a host vfio device)
+To enable features like virtio-pci several modifications needs to be
+done.
 
-Nice diffstat; shows that this one probably makes sense (even if it will
-need rebasing on top of the planned churn for the rest of the series).
+As already stated above, Virtio-PCI uses subregions, which may eventually
+be discontinuous inside bars instead of a single flat region often used
+by real devices.
+The address offset being formerly calculated from the BAR base address
+must be adapted to the subregions instead of to the single region.
 
-> diff --git a/nbd/server.c b/nbd/server.c
-> index 79b937d88f..975fe8efe9 100644
-> --- a/nbd/server.c
-> +++ b/nbd/server.c
-> @@ -152,43 +152,29 @@ static inline int nbd_opt_drop(NBDClient *client,=
- size_t size, Error **errp)
->      return nbd_drop(client->ioc, size, errp);
->  }
-> =20
-> +static inline void set_be_option_rep(NBDOptionReply *rep, uint32_t opt=
-ion,
-> +                                     uint32_t type, uint32_t length)
+This patch provides the new calculation for the three kind of BAR
+access, zPCI STORE, zPCI LOAD and zPCI STORE BLOCK done by zPCI.
 
-'static inline' is probably pointless; the compiler already knows what
-static functions are ideal to inline, without us having to name it (I
-realize you've already done this in other patches, so I probably ought
-to post a cleanup patch that removes 'inline').
-
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
+We use the opportunity to
+ - enhance the fault detection for zPCI STORE and LOAD,
+ - enhance the fault detection and to provide the maximum STORE BLOCK
+   block size, maxstbl, for zPCI STORE BLOCK
+ - factor out part of the code used to calculate the offset and
+   access the BARs,
+ - factor out the code for endianess conversion.
 
 
---950VKmvjM5GlKfSwUlOi0l1KbTrksjqtI
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
+Pierre Morel (7):
+  s390x/pci: factor out endianess conversion
+  s390x/pci: rework PCI STORE
+  s390x/pci: rework PCI LOAD
+  s390x/pci: rework PCI STORE BLOCK
+  s390x/pci: move the memory region read from pcilg
+  s390x/pci: move the memory region write from pcistg
+  s390x/pci: search for subregion inside the BARs
 
------BEGIN PGP SIGNATURE-----
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+ hw/s390x/s390-pci-bus.h  |   1 +
+ hw/s390x/s390-pci-inst.c | 248 ++++++++++++++++++++++++++++-------------------
+ hw/s390x/s390-pci-inst.h |   2 +-
+ 3 files changed, 151 insertions(+), 100 deletions(-)
 
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAloV8/oACgkQp6FrSiUn
-Q2rkYggAq9+GqojRf8Sbsoc2oVhVAvNYPEsXJ/d5vUPx0ibSJ/DXyNGxFNMnV8H5
-GfpcOgcMYf9r4tGx+Vf4rpVkKHAO79XftrKxUIPPw/q+DrwdyY9c9frGN3FxFn9I
-BVlbf+ovLpAeAUCrKZ673YTbsNwFrYyHAZIK0jftPiU5I6kbtjcA1gIfhUN4ByYs
-KDIXGkfKTNodNILLgkQJjk/u01QGMHa87KutLf2fccRD9GmRYReUjJpOOxez4Asc
-wcqzn/tBBktaVe+dJDrIZEer7+TxaL4EWoGGzrEOx/xuzGpXMzmRghkaf0oE/vj2
-umdnKTH3rphrxymh0XOKFI8WcO4rpQ==
-=wXRf
------END PGP SIGNATURE-----
+-- 
+2.7.4
 
---950VKmvjM5GlKfSwUlOi0l1KbTrksjqtI--
+Changelog:
+
+from v2
+- rewording of comments, coding style.
+
+from v1
+- suppress fallthrough to PCI_ROM_SLOT to handle it in the default case.
+- reword most of the patch commit messages
+- add comments to the endianness conversion
+- reword somme comments inside the patches
