@@ -1,23 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48463)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48464)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <rkagan@virtuozzo.com>) id 1eHZXd-0000fz-LZ
+	(envelope-from <rkagan@virtuozzo.com>) id 1eHZXd-0000g0-Lq
 	for qemu-devel@nongnu.org; Wed, 22 Nov 2017 13:14:34 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <rkagan@virtuozzo.com>) id 1eHZXb-0007b2-0k
+	(envelope-from <rkagan@virtuozzo.com>) id 1eHZXc-0007c6-7L
 	for qemu-devel@nongnu.org; Wed, 22 Nov 2017 13:14:33 -0500
 Received: from mail-eopbgr20115.outbound.protection.outlook.com
 	([40.107.2.115]:44320
 	helo=EUR02-VE1-obe.outbound.protection.outlook.com)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <rkagan@virtuozzo.com>)
-	id 1eHZXa-0007aQ-AQ
-	for qemu-devel@nongnu.org; Wed, 22 Nov 2017 13:14:30 -0500
+	id 1eHZXc-0007aQ-0d
+	for qemu-devel@nongnu.org; Wed, 22 Nov 2017 13:14:32 -0500
 From: Roman Kagan <rkagan@virtuozzo.com>
-Date: Wed, 22 Nov 2017 21:14:15 +0300
-Message-Id: <20171122181418.14180-1-rkagan@virtuozzo.com>
+Date: Wed, 22 Nov 2017 21:14:18 +0300
+Message-Id: <20171122181418.14180-4-rkagan@virtuozzo.com>
+In-Reply-To: <20171122181418.14180-1-rkagan@virtuozzo.com>
+References: <20171122181418.14180-1-rkagan@virtuozzo.com>
 MIME-Version: 1.0
 Content-Type: text/plain
-Subject: [Qemu-devel] [PATCH 0/3] hyperv: hv msr initialization fixes
+Subject: [Qemu-devel] [PATCH 3/3] hyperv: make SynIC version msr constant
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,18 +31,72 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>
 Cc: "Denis V. Lunev" <den@openvz.org>
 
-These patches fix problems with hyperv msr initialization.
+The value of HV_X64_MSR_SVERSION is initialized once at vcpu init, and
+is reset to zero on vcpu reset, which is wrong.
 
-Evgeny Yakovlev (1):
-  hyperv: set partition-wide MSRs only on first vcpu
+It is supposed to be a constant, so drop the field from X86CPU, set the
+msr with the constant value, and don't bother getting it.
 
-Roman Kagan (2):
-  hyperv: ensure SINTx msrs are reset properly
-  hyperv: make SynIC version msr constant
+Signed-off-by: Roman Kagan <rkagan@virtuozzo.com>
+---
+ target/i386/cpu.h | 1 -
+ target/i386/kvm.c | 9 ++-------
+ 2 files changed, 2 insertions(+), 8 deletions(-)
 
- target/i386/cpu.h |  6 ++++--
- target/i386/kvm.c | 44 ++++++++++++++++++++++++--------------------
- 2 files changed, 28 insertions(+), 22 deletions(-)
-
+diff --git a/target/i386/cpu.h b/target/i386/cpu.h
+index ea9db80de5..b264419678 100644
+--- a/target/i386/cpu.h
++++ b/target/i386/cpu.h
+@@ -1101,7 +1101,6 @@ typedef struct CPUX86State {
+     uint64_t msr_hv_crash_params[HV_CRASH_PARAMS];
+     uint64_t msr_hv_runtime;
+     uint64_t msr_hv_synic_control;
+-    uint64_t msr_hv_synic_version;
+     uint64_t msr_hv_synic_evt_page;
+     uint64_t msr_hv_synic_msg_page;
+     uint64_t msr_hv_synic_sint[HV_SINT_COUNT];
+diff --git a/target/i386/kvm.c b/target/i386/kvm.c
+index ea6e6e5f30..0479fa4e4a 100644
+--- a/target/i386/kvm.c
++++ b/target/i386/kvm.c
+@@ -669,7 +669,6 @@ static int hyperv_handle_properties(CPUState *cs)
+         }
+ 
+         env->features[FEAT_HYPERV_EAX] |= HV_SYNIC_AVAILABLE;
+-        env->msr_hv_synic_version = HV_SYNIC_VERSION;
+     }
+     if (cpu->hyperv_stimer) {
+         if (!has_msr_hv_stimer) {
+@@ -1715,10 +1714,10 @@ static int kvm_put_msrs(X86CPU *cpu, int level)
+         if (cpu->hyperv_synic) {
+             int j;
+ 
++            kvm_msr_entry_add(cpu, HV_X64_MSR_SVERSION, HV_SYNIC_VERSION);
++
+             kvm_msr_entry_add(cpu, HV_X64_MSR_SCONTROL,
+                               env->msr_hv_synic_control);
+-            kvm_msr_entry_add(cpu, HV_X64_MSR_SVERSION,
+-                              env->msr_hv_synic_version);
+             kvm_msr_entry_add(cpu, HV_X64_MSR_SIEFP,
+                               env->msr_hv_synic_evt_page);
+             kvm_msr_entry_add(cpu, HV_X64_MSR_SIMP,
+@@ -2082,7 +2081,6 @@ static int kvm_get_msrs(X86CPU *cpu)
+         uint32_t msr;
+ 
+         kvm_msr_entry_add(cpu, HV_X64_MSR_SCONTROL, 0);
+-        kvm_msr_entry_add(cpu, HV_X64_MSR_SVERSION, 0);
+         kvm_msr_entry_add(cpu, HV_X64_MSR_SIEFP, 0);
+         kvm_msr_entry_add(cpu, HV_X64_MSR_SIMP, 0);
+         for (msr = HV_X64_MSR_SINT0; msr <= HV_X64_MSR_SINT15; msr++) {
+@@ -2286,9 +2284,6 @@ static int kvm_get_msrs(X86CPU *cpu)
+         case HV_X64_MSR_SCONTROL:
+             env->msr_hv_synic_control = msrs[i].data;
+             break;
+-        case HV_X64_MSR_SVERSION:
+-            env->msr_hv_synic_version = msrs[i].data;
+-            break;
+         case HV_X64_MSR_SIEFP:
+             env->msr_hv_synic_evt_page = msrs[i].data;
+             break;
 -- 
 2.14.3
