@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39109)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39121)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1eHUMQ-0004lR-Cy
-	for qemu-devel@nongnu.org; Wed, 22 Nov 2017 07:42:39 -0500
+	(envelope-from <quintela@redhat.com>) id 1eHUMR-0004ma-Di
+	for qemu-devel@nongnu.org; Wed, 22 Nov 2017 07:42:40 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1eHUMO-0007Cb-Gw
-	for qemu-devel@nongnu.org; Wed, 22 Nov 2017 07:42:38 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:34454)
+	(envelope-from <quintela@redhat.com>) id 1eHUMM-0007Bh-Qg
+	for qemu-devel@nongnu.org; Wed, 22 Nov 2017 07:42:39 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:34432)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1eHUMO-0007Bz-7p
-	for qemu-devel@nongnu.org; Wed, 22 Nov 2017 07:42:36 -0500
+	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1eHUMM-0007BU-I2
+	for qemu-devel@nongnu.org; Wed, 22 Nov 2017 07:42:34 -0500
 Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
 	[10.5.11.11])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 6610549025
-	for <qemu-devel@nongnu.org>; Wed, 22 Nov 2017 12:42:35 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id B0E764ACBB
+	for <qemu-devel@nongnu.org>; Wed, 22 Nov 2017 12:42:33 +0000 (UTC)
 From: Juan Quintela <quintela@redhat.com>
-Date: Wed, 22 Nov 2017 13:42:19 +0100
-Message-Id: <20171122124219.12954-7-quintela@redhat.com>
+Date: Wed, 22 Nov 2017 13:42:18 +0100
+Message-Id: <20171122124219.12954-6-quintela@redhat.com>
 In-Reply-To: <20171122124219.12954-1-quintela@redhat.com>
 References: <20171122124219.12954-1-quintela@redhat.com>
-Subject: [Qemu-devel] [PATCH v2 6/6] migration: Set the new port/address in
- the uri parameter
+Subject: [Qemu-devel] [PATCH v2 5/6] migration: make migrate uri parameter
+ optional
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,89 +33,99 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: dgilbert@redhat.com, lvivier@redhat.com, peterx@redhat.com
 
-We can set the port parameter as zero.  This patch lets us know what
-port the system was choosen for us.  Now we can migrate to this place.
+Now that we have set an uri migration parameter, we can make it
+optional in the command line.
 
 Signed-off-by: Juan Quintela <quintela@redhat.com>
 ---
- migration/socket.c | 37 ++++++++++++++++++++++++++++++++-----
- 1 file changed, 32 insertions(+), 5 deletions(-)
+ hmp-commands.hx       |  4 ++--
+ hmp.c                 |  5 +++--
+ migration/migration.c | 12 +++++++++---
+ qapi/migration.json   |  2 +-
+ 4 files changed, 15 insertions(+), 8 deletions(-)
 
-diff --git a/migration/socket.c b/migration/socket.c
-index 3a8232dd2d..5f9cbaf54a 100644
---- a/migration/socket.c
-+++ b/migration/socket.c
-@@ -162,17 +162,24 @@ out:
- }
+diff --git a/hmp-commands.hx b/hmp-commands.hx
+index 4afd57cf5f..5be4e3934d 100644
+--- a/hmp-commands.hx
++++ b/hmp-commands.hx
+@@ -928,8 +928,8 @@ ETEXI
  
- 
--static void socket_start_incoming_migration(SocketAddress *saddr,
--                                            Error **errp)
-+static SocketAddress *socket_start_incoming_migration(SocketAddress *saddr,
-+                                                      Error **errp)
- {
-     QIOChannelSocket *listen_ioc = qio_channel_socket_new();
-+    SocketAddress *address;
- 
-     qio_channel_set_name(QIO_CHANNEL(listen_ioc),
-                          "migration-socket-listener");
- 
-     if (qio_channel_socket_listen_sync(listen_ioc, saddr, errp) < 0) {
-         object_unref(OBJECT(listen_ioc));
--        return;
-+        return NULL;
-+    }
-+
-+    address = qio_channel_socket_get_local_address(listen_ioc, errp);
-+    if (address < 0) {
-+        object_unref(OBJECT(listen_ioc));
-+        return NULL;
-     }
- 
-     qio_channel_add_watch(QIO_CHANNEL(listen_ioc),
-@@ -180,14 +187,31 @@ static void socket_start_incoming_migration(SocketAddress *saddr,
-                           socket_accept_incoming_migration,
-                           listen_ioc,
-                           (GDestroyNotify)object_unref);
-+    return address;
- }
- 
- void tcp_start_incoming_migration(const char *host_port, Error **errp)
- {
+     {
+         .name       = "migrate",
+-        .args_type  = "detach:-d,blk:-b,inc:-i,uri:s",
+-        .params     = "[-d] [-b] [-i] uri",
++        .args_type  = "detach:-d,blk:-b,inc:-i,uri:-s",
++        .params     = "[-d] [-b] [-i] [uri]",
+         .help       = "migrate to URI (using -d to not wait for completion)"
+ 		      "\n\t\t\t -b for migration without shared storage with"
+ 		      " full copy of disk\n\t\t\t -i for migration without "
+diff --git a/hmp.c b/hmp.c
+index c9241f6947..27e0fca4ac 100644
+--- a/hmp.c
++++ b/hmp.c
+@@ -1928,10 +1928,11 @@ void hmp_migrate(Monitor *mon, const QDict *qdict)
+     bool detach = qdict_get_try_bool(qdict, "detach", false);
+     bool blk = qdict_get_try_bool(qdict, "blk", false);
+     bool inc = qdict_get_try_bool(qdict, "inc", false);
+-    const char *uri = qdict_get_str(qdict, "uri");
++    bool has_uri = qdict_get_try_bool(qdict, "uri", false);
++    const char *uri = qdict_get_try_str(qdict, "uri");
      Error *err = NULL;
-     SocketAddress *saddr = tcp_build_address(host_port, &err);
-+
-     if (!err) {
--        socket_start_incoming_migration(saddr, &err);
-+        SocketAddress *address = socket_start_incoming_migration(saddr, &err);
-+
-+        if (address &&
-+            (strcmp(address->u.inet.port, saddr->u.inet.port) ||
-+             strcmp(address->u.inet.host, saddr->u.inet.host))) {
-+            char *new_uri;
-+            InetSocketAddress *iaddr = &saddr->u.inet;
-+
-+            new_uri = g_strdup_printf("tcp:%s:%s%s%s", address->u.inet.host,
-+                                      address->u.inet.port,
-+                                      iaddr->has_ipv4 ? ",ipv4" : "",
-+                                      iaddr->has_ipv6 ? ",ipv6" : "");
-+            migrate_set_uri(new_uri, errp);
-+            g_free(new_uri);
-+            qapi_free_SocketAddress(address);
-+        }
-     }
-     qapi_free_SocketAddress(saddr);
-     error_propagate(errp, err);
-@@ -196,6 +220,9 @@ void tcp_start_incoming_migration(const char *host_port, Error **errp)
- void unix_start_incoming_migration(const char *path, Error **errp)
- {
-     SocketAddress *saddr = unix_build_address(path);
--    socket_start_incoming_migration(saddr, errp);
-+    SocketAddress *address;
-+
-+    address = socket_start_incoming_migration(saddr, errp);
-+    qapi_free_SocketAddress(address);
-     qapi_free_SocketAddress(saddr);
+ 
+-    qmp_migrate(uri, !!blk, blk, !!inc, inc, false, false, &err);
++    qmp_migrate(!!has_uri, uri, !!blk, blk, !!inc, inc, false, false, &err);
+     if (err) {
+         hmp_handle_error(mon, &err);
+         return;
+diff --git a/migration/migration.c b/migration/migration.c
+index 507226907b..3818a83489 100644
+--- a/migration/migration.c
++++ b/migration/migration.c
+@@ -1356,7 +1356,7 @@ bool migration_is_blocked(Error **errp)
+     return false;
  }
+ 
+-void qmp_migrate(const char *uri, bool has_blk, bool blk,
++void qmp_migrate(bool has_uri, const char *uri, bool has_blk, bool blk,
+                  bool has_inc, bool inc, bool has_detach, bool detach,
+                  Error **errp)
+ {
+@@ -1374,7 +1374,13 @@ void qmp_migrate(const char *uri, bool has_blk, bool blk,
+         error_setg(errp, "Guest is waiting for an incoming migration");
+         return;
+     }
+-    migrate_set_uri(uri, errp);
++    if (has_uri && uri) {
++        migrate_set_uri(uri, errp);
++    }
++    if (!s->parameters.uri) {
++        error_setg(errp, "Migration uri needs to be set");
++        return;
++    }
+     if (migration_is_blocked(errp)) {
+         return;
+     }
+@@ -1412,7 +1418,7 @@ void qmp_migrate(const char *uri, bool has_blk, bool blk,
+     } else if (strstart(s->parameters.uri, "fd:", &p)) {
+         fd_start_outgoing_migration(s, p, &local_err);
+     } else {
+-        error_setg(errp, QERR_INVALID_PARAMETER_VALUE, "s->parameters.uri",
++        error_setg(errp, QERR_INVALID_PARAMETER_VALUE, "migration uri",
+                    "a valid migration protocol");
+         migrate_set_state(&s->state, MIGRATION_STATUS_SETUP,
+                           MIGRATION_STATUS_FAILED);
+diff --git a/qapi/migration.json b/qapi/migration.json
+index ebde890604..6b9758ab99 100644
+--- a/qapi/migration.json
++++ b/qapi/migration.json
+@@ -1042,7 +1042,7 @@
+ #
+ ##
+ { 'command': 'migrate',
+-  'data': {'uri': 'str', '*blk': 'bool', '*inc': 'bool', '*detach': 'bool' } }
++  'data': {'*uri': 'str', '*blk': 'bool', '*inc': 'bool', '*detach': 'bool' } }
+ 
+ ##
+ # @migrate-incoming:
 -- 
 2.13.6
