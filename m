@@ -1,29 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38027)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38060)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1eHadM-0002Fq-OF
-	for qemu-devel@nongnu.org; Wed, 22 Nov 2017 14:24:34 -0500
+	(envelope-from <andrew.smirnov@gmail.com>) id 1eHadU-0002KY-7V
+	for qemu-devel@nongnu.org; Wed, 22 Nov 2017 14:24:41 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1eHadJ-0003ji-BR
-	for qemu-devel@nongnu.org; Wed, 22 Nov 2017 14:24:32 -0500
-Received: from mail-wm0-f67.google.com ([74.125.82.67]:41325)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1eHadJ-0003jV-4j
-	for qemu-devel@nongnu.org; Wed, 22 Nov 2017 14:24:29 -0500
-Received: by mail-wm0-f67.google.com with SMTP id b189so12517356wmd.0
-	for <qemu-devel@nongnu.org>; Wed, 22 Nov 2017 11:24:29 -0800 (PST)
-References: <1511364808-30171-1-git-send-email-deepa.srinivasan@oracle.com>
-	<215448fd-8dbf-882a-35af-7778a6c4ab38@redhat.com>
-	<20171122180640.GD10954@localhost.localdomain>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <d883af5c-7e59-6acc-c475-04c30b16de61@redhat.com>
-Date: Wed, 22 Nov 2017 20:24:25 +0100
+	(envelope-from <andrew.smirnov@gmail.com>) id 1eHadS-0003m6-VZ
+	for qemu-devel@nongnu.org; Wed, 22 Nov 2017 14:24:40 -0500
 MIME-Version: 1.0
-In-Reply-To: <20171122180640.GD10954@localhost.localdomain>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [Qemu-block] [PATCH] block: Fix qemu crash when
- using scsi-block
+In-Reply-To: <CAFEAcA8WbQobHPT8jZy6bnR9_wtmZ0ogJmmWo13_-StuDxXUWw@mail.gmail.com>
+References: <20171106154813.19936-1-andrew.smirnov@gmail.com>
+	<20171106154813.19936-31-andrew.smirnov@gmail.com>
+	<CAFEAcA8WbQobHPT8jZy6bnR9_wtmZ0ogJmmWo13_-StuDxXUWw@mail.gmail.com>
+From: Andrey Smirnov <andrew.smirnov@gmail.com>
+Date: Wed, 22 Nov 2017 11:24:34 -0800
+Message-ID: <CAHQ1cqFJ=qGaLtHAp4cDYW_XBqJC5BUwZtOZmrYR9NiVKuxKow@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v3 30/30] Implement support for i.MX7 Sabre
+ board
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,93 +25,106 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Kevin Wolf <kwolf@redhat.com>
-Cc: mark.kanda@oracle.com, qemu-block@nongnu.org, Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>, qemu-devel@nongnu.org, mreitz@redhat.com, Deepa Srinivasan <deepa.srinivasan@oracle.com>, stefanha@redhat.com
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: qemu-arm <qemu-arm@nongnu.org>, Jason Wang <jasowang@redhat.com>, =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>, QEMU Developers <qemu-devel@nongnu.org>, Andrey Yurovsky <yurovsky@gmail.com>
 
-On 22/11/2017 19:06, Kevin Wolf wrote:
-> Am 22.11.2017 um 17:34 hat Paolo Bonzini geschrieben:
->> On 22/11/2017 16:33, Deepa Srinivasan wrote:
->>> Starting qemu with the following arguments causes qemu to segfault:
->>> ... -device lsi,id=lsi0 -drive file=iscsi:<...>,format=raw,if=none,node-name=
->>> iscsi1 -device scsi-block,bus=lsi0.0,id=<...>,drive=iscsi1
->>>
->>> This patch fixes blk_aio_ioctl() so it does not pass stack addresses to
->>> blk_aio_ioctl_entry() which may be invoked after blk_aio_ioctl() returns. More
->>> details about the bug follow.
->>>
->>> blk_aio_ioctl() invokes blk_aio_prwv() with blk_aio_ioctl_entry as the
->>> coroutine parameter. blk_aio_prwv() ultimately calls aio_co_enter().
->>>
->>> When blk_aio_ioctl() is executed from within a coroutine context (e.g.
->>> iscsi_bh_cb()), aio_co_enter() adds the coroutine (blk_aio_ioctl_entry) to
->>> the current coroutine's wakeup queue. blk_aio_ioctl() then returns.
->>>
->>> When blk_aio_ioctl_entry() executes later, it accesses an invalid pointer:
->>> ....
->>>     BlkRwCo *rwco = &acb->rwco;
->>>
->>>     rwco->ret = blk_co_ioctl(rwco->blk, rwco->offset,
->>>                              rwco->qiov->iov[0].iov_base);  <--- qiov is
->>>                                                                  invalid here
->>> ...
->>>
->>> In the case when blk_aio_ioctl() is called from a non-coroutine context,
->>> blk_aio_ioctl_entry() executes immediately. But if bdrv_co_ioctl() calls
->>> qemu_coroutine_yield(), blk_aio_ioctl() will return. When the coroutine
->>> execution is complete, control returns to blk_aio_ioctl_entry() after the call
->>> to blk_co_ioctl(). There is no invalid reference after this point, but the
->>> function is still holding on to invalid pointers.
->>>
->>> The fix is to allocate memory for the QEMUIOVector and struct iovec as part of
->>> the request struct which the IO buffer is part of. The memory for this struct is
->>> guaranteed to be valid till the AIO is completed.
->>>
->>> Signed-off-by: Deepa Srinivasan <deepa.srinivasan@oracle.com>
->>> Signed-off-by: Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>
->>> Reviewed-by: Mark Kanda <mark.kanda@oracle.com>
->>> ---
->>>  block/block-backend.c          | 13 ++-----------
->>>  hw/block/virtio-blk.c          |  9 ++++++++-
->>>  hw/scsi/scsi-disk.c            | 10 +++++++++-
->>>  hw/scsi/scsi-generic.c         |  9 ++++++++-
->>>  include/sysemu/block-backend.h |  2 +-
->>>  5 files changed, 28 insertions(+), 15 deletions(-)
->>>
->>> diff --git a/block/block-backend.c b/block/block-backend.c
->>> index baef8e7..c275827 100644
->>> --- a/block/block-backend.c
->>> +++ b/block/block-backend.c
->>> @@ -1472,19 +1472,10 @@ static void blk_aio_ioctl_entry(void *opaque)
->>>      blk_aio_complete(acb);
->>>  }
->>>  
->>> -BlockAIOCB *blk_aio_ioctl(BlockBackend *blk, unsigned long int req, void *buf,
->>> +BlockAIOCB *blk_aio_ioctl(BlockBackend *blk, unsigned long int req, QEMUIOVector *qiov,
->>>                            BlockCompletionFunc *cb, void *opaque)
+On Tue, Nov 21, 2017 at 10:22 AM, Peter Maydell
+<peter.maydell@linaro.org> wrote:
+> On 6 November 2017 at 15:48, Andrey Smirnov <andrew.smirnov@gmail.com> wr=
+ote:
+>> Implement code needed to set up emulation of MCIMX7SABRE board from
+>> NXP. For more info about the HW see:
 >>
->> I think this is not the best way to fix the bug, because it adds extra
->> unnecessary code in the callers.
+>> https://www.nxp.com/support/developer-resources/hardware-development-too=
+ls/sabre-development-system/sabre-board-for-smart-devices-based-on-the-i.mx=
+-7dual-applications-processors:MCIMX7SABRE
+>
+> You could put this URL in a comment in the code as well.
+>
+>> Cc: Peter Maydell <peter.maydell@linaro.org>
+>> Cc: Jason Wang <jasowang@redhat.com>
+>> Cc: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
+>> Cc: qemu-devel@nongnu.org
+>> Cc: qemu-arm@nongnu.org
+>> Cc: yurovsky@gmail.com
+>> Signed-off-by: Andrey Smirnov <andrew.smirnov@gmail.com>
+>> ---
+>>  hw/arm/Makefile.objs   |   2 +-
+>>  hw/arm/mcimx7d-sabre.c | 101 ++++++++++++++++++++++++++++++++++++++++++=
++++++++
+>>  2 files changed, 102 insertions(+), 1 deletion(-)
+>>  create mode 100644 hw/arm/mcimx7d-sabre.c
 >>
->> Perhaps you can change BlkRwCo's "qiov" field to "void *buf" and the
->> same for blk_aio_prwv's "qiov" argument?
+>> diff --git a/hw/arm/Makefile.objs b/hw/arm/Makefile.objs
+>> index f379ddc74b..eb6f6c5997 100644
+>> --- a/hw/arm/Makefile.objs
+>> +++ b/hw/arm/Makefile.objs
+>> @@ -19,5 +19,5 @@ obj-$(CONFIG_FSL_IMX31) +=3D fsl-imx31.o kzm.o
+>>  obj-$(CONFIG_FSL_IMX6) +=3D fsl-imx6.o sabrelite.o
+>>  obj-$(CONFIG_ASPEED_SOC) +=3D aspeed_soc.o aspeed.o
+>>  obj-$(CONFIG_MPS2) +=3D mps2.o
+>> -obj-$(CONFIG_FSL_IMX7) +=3D fsl-imx7.o
+>> +obj-$(CONFIG_FSL_IMX7) +=3D fsl-imx7.o mcimx7d-sabre.o
 >>
->> Then the QEMUIOVector is not needed at all, and blk_co_ioctl can just
->> use rwco->buf.
-> 
-> But the same struct is used for read and write requests that do use an
-> actual QEMUIOVector and not just a linear buffer.
+>> diff --git a/hw/arm/mcimx7d-sabre.c b/hw/arm/mcimx7d-sabre.c
+>> new file mode 100644
+>> index 0000000000..7ca8e668e8
+>> --- /dev/null
+>> +++ b/hw/arm/mcimx7d-sabre.c
+>> @@ -0,0 +1,101 @@
+>> +/*
+>> + * Copyright (c) 2017, Impinj, Inc.
+>> + *
+>> + * MCIMX7D_SABRE Board System emulation.
+>> + *
+>> + * Author: Andrey Smirnov <andrew.smirnov@gmail.com>
+>> + *
+>> + * This code is licensed under the GPL, version 2 or later.
+>> + * See the file `COPYING' in the top level directory.
+>> + *
+>> + * It (partially) emulates a mcimx7d_sabre board, with a Freescale
+>> + * i.MX7 SoC
+>> + */
+>> +
+>> +#include "qemu/osdep.h"
+>> +#include "qapi/error.h"
+>> +#include "qemu-common.h"
+>> +#include "hw/arm/fsl-imx7.h"
+>> +#include "hw/boards.h"
+>> +#include "sysemu/sysemu.h"
+>> +#include "sysemu/device_tree.h"
+>> +#include "qemu/error-report.h"
+>> +#include "sysemu/qtest.h"
+>> +#include "net/net.h"
+>> +
+>> +typedef struct {
+>> +    FslIMX7State soc;
+>> +    MemoryRegion ram;
+>> +} MCIMX7Sabre;
+>> +
+>> +static void mcimx7d_add_psci_node(const struct arm_boot_info *boot_info=
+,
+>> +                                  void *fdt)
+>> +{
+>> +    const char comp[] =3D "arm,psci-0.2\0arm,psci";
+>> +
+>> +    qemu_fdt_add_subnode(fdt, "/psci");
+>> +    qemu_fdt_setprop(fdt, "/psci", "compatible", comp, sizeof(comp));
+>> +    qemu_fdt_setprop_string(fdt, "/psci", "method", "smc");
+>> +}
+>
+> I'm still unconvinced by this (none of the other i.mx boards we have
+> have anything like it).
 
-Then let's call it "void *opaque", or make it a union (but I think
-that's overkill).
+None of the other boards are both SMP capable and support SMP in
+upstream Linux only through PSCI (as it the case for i.MX7), so
+comparing against the precedent is not very helpful.
 
-The QEMUIOVector pointer is opaque as far as blk_aio_prwv is concerned,
-and it is only created by blk_aio_ioctl for blk_aio_ioctl_entry to
-extract buf:
+> How does the real hardware boot SMP ?
+>
 
-    rwco->ret = blk_co_ioctl(rwco->blk, rwco->offset,
-                             rwco->qiov->iov[0].iov_base);
+Real hardware executes a bootloader which is expected to implement
+PSCI and do the DTB fixup as I implemented above.
 
-Exposing the fake QEMUIOVector to the callers of blk_aio_ioctl is much
-uglier than using a void* for what is effectively a multi-type pointer.
-
-Paolo
+Thanks,
+Andrey Smirnov
