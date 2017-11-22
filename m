@@ -1,34 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41223)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41229)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <borntraeger@de.ibm.com>) id 1eHVz7-0000iL-So
-	for qemu-devel@nongnu.org; Wed, 22 Nov 2017 09:26:42 -0500
+	(envelope-from <borntraeger@de.ibm.com>) id 1eHVz8-0000iN-Cm
+	for qemu-devel@nongnu.org; Wed, 22 Nov 2017 09:26:43 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <borntraeger@de.ibm.com>) id 1eHVz3-0005GK-F3
-	for qemu-devel@nongnu.org; Wed, 22 Nov 2017 09:26:41 -0500
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:38388)
+	(envelope-from <borntraeger@de.ibm.com>) id 1eHVz3-0005GP-FK
+	for qemu-devel@nongnu.org; Wed, 22 Nov 2017 09:26:42 -0500
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:38390)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <borntraeger@de.ibm.com>)
-	id 1eHVz3-0005FV-6h
+	id 1eHVz3-0005FW-6o
 	for qemu-devel@nongnu.org; Wed, 22 Nov 2017 09:26:37 -0500
 Received: from pps.filterd (m0098404.ppops.net [127.0.0.1])
 	by mx0a-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
-	vAMEPno9122544
-	for <qemu-devel@nongnu.org>; Wed, 22 Nov 2017 09:26:34 -0500
-Received: from e06smtp13.uk.ibm.com (e06smtp13.uk.ibm.com [195.75.94.109])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2edaya0530-1
+	vAMEPuqn123277
+	for <qemu-devel@nongnu.org>; Wed, 22 Nov 2017 09:26:35 -0500
+Received: from e06smtp14.uk.ibm.com (e06smtp14.uk.ibm.com [195.75.94.110])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2edaya0542-1
 	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Wed, 22 Nov 2017 09:26:33 -0500
+	for <qemu-devel@nongnu.org>; Wed, 22 Nov 2017 09:26:34 -0500
 Received: from localhost
-	by e06smtp13.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	by e06smtp14.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
 	Only! Violators will be prosecuted
 	for <qemu-devel@nongnu.org> from <borntraeger@de.ibm.com>;
-	Wed, 22 Nov 2017 14:26:30 -0000
+	Wed, 22 Nov 2017 14:26:32 -0000
 From: Christian Borntraeger <borntraeger@de.ibm.com>
-Date: Wed, 22 Nov 2017 15:26:26 +0100
+Date: Wed, 22 Nov 2017 15:26:27 +0100
 In-Reply-To: <20171122142627.73170-1-borntraeger@de.ibm.com>
 References: <20171122142627.73170-1-borntraeger@de.ibm.com>
-Message-Id: <20171122142627.73170-2-borntraeger@de.ibm.com>
-Subject: [Qemu-devel] [PATCH 1/2] s390x/migration: use zero flag parameter
+Message-Id: <20171122142627.73170-3-borntraeger@de.ibm.com>
+Subject: [Qemu-devel] [PATCH 2/2] pc-bios/s390-ccw: zero out bss section
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -40,66 +40,68 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: Cornelia Huck <cohuck@redhat.com>
 Cc: qemu-devel <qemu-devel@nongnu.org>, qemu-s390x <qemu-s390x@nongnu.org>, Halil Pasic <pasic@linux.vnet.ibm.com>, Alexander Graf <agraf@suse.de>, Richard Henderson <rth@twiddle.net>, Thomas Huth <thuth@redhat.com>, Christian Borntraeger <borntraeger@de.ibm.com>
 
-valgrind pointed out that we call KVM_S390_GET_IRQ_STATE with an
-undefined value for flags. Right now this is unused, but we
-better play safe.
-The same is true for SET_IRQ_STATE. While QEMU is now fixed in
-that regard, we should make sure to not use the flag and pad
-fields in the kernel. A corresponding kernel documentation patch
-will be submitted later.
+The QEMU ELF loader does not zero the bss segment.
+This resulted in several bugs, e.g. see
 
+commit 5d739a4787a5 (s390-ccw.img: Fix sporadic errors with ccw boot image - initialize css)
+commit 6a40fa2669d3 (s390-ccw.img: Initialize next_idx)
+commit 8775d91a0f42 (pc-bios/s390-ccw: Fix problem with invalid virtio-scsi LUN when rebooting)
+
+Lets fix this once and forever by letting the BIOS zero the bss itself.
+
+Suggested-by: Alexander Graf <agraf@suse.de>
 Signed-off-by: Christian Borntraeger <borntraeger@de.ibm.com>
 ---
- target/s390x/kvm.c | 16 ++++++++--------
- 1 file changed, 8 insertions(+), 8 deletions(-)
+ pc-bios/s390-ccw/start.S | 30 +++++++++++++++++++++++++++---
+ 1 file changed, 27 insertions(+), 3 deletions(-)
 
-diff --git a/target/s390x/kvm.c b/target/s390x/kvm.c
-index 343fcec..76065ec 100644
---- a/target/s390x/kvm.c
-+++ b/target/s390x/kvm.c
-@@ -2069,7 +2069,10 @@ int kvm_s390_set_cpu_state(S390CPU *cpu, uint8_t cpu_state)
+diff --git a/pc-bios/s390-ccw/start.S b/pc-bios/s390-ccw/start.S
+index 43f9bd2..eb8d024 100644
+--- a/pc-bios/s390-ccw/start.S
++++ b/pc-bios/s390-ccw/start.S
+@@ -3,7 +3,7 @@
+  * into the pc-bios directory of qemu.
+  *
+  * Copyright (c) 2013 Alexander Graf <agraf@suse.de>
+- * Copyright 2013 IBM Corp.
++ * Copyright IBM Corp. 2013, 2017
+  *
+  * This work is licensed under the terms of the GNU GPL, version 2 or (at
+  * your option) any later version. See the COPYING file in the top-level
+@@ -13,8 +13,32 @@
+         .globl _start
+ _start:
  
- void kvm_s390_vcpu_interrupt_pre_save(S390CPU *cpu)
- {
--    struct kvm_s390_irq_state irq_state;
-+    struct kvm_s390_irq_state irq_state = {
-+        .buf = (uint64_t) cpu->irqstate,
-+        .len = VCPU_IRQ_BUF_SIZE,
-+    };
-     CPUState *cs = CPU(cpu);
-     int32_t bytes;
+-larl	%r15, stack + 0x8000    /* Set up stack */
+-j	main                    /* And call C */
++	larl   %r15, stack + 0x8000	/* Set up stack */
++
++	/* clear bss */
++	larl %r2, __bss_start
++	larl %r3, _end
++	slgr %r3, %r2		/* get sizeof bss */
++	ltgr	%r3,%r3 	/* bss emtpy? */
++	jz	done
++	aghi	%r3,-1
++	srlg	%r4,%r3,8	/* how many 256 byte chunks? */
++	ltgr	%r4,%r4
++	lgr	%r1,%r2
++	jz	remainder
++loop:
++	xc	0(256,%r1),0(%r1)
++	la	%r1,256(%r1)
++	brctg	%r4,loop
++remainder:
++	larl	%r2,memsetxc
++	ex	%r3,0(%r2)
++done:
++	j      main		/* And call C */
++
++memsetxc:
++	xc	0(1,%r1),0(%r1)
++
  
-@@ -2077,9 +2080,6 @@ void kvm_s390_vcpu_interrupt_pre_save(S390CPU *cpu)
-         return;
-     }
- 
--    irq_state.buf = (uint64_t) cpu->irqstate;
--    irq_state.len = VCPU_IRQ_BUF_SIZE;
--
-     bytes = kvm_vcpu_ioctl(cs, KVM_S390_GET_IRQ_STATE, &irq_state);
-     if (bytes < 0) {
-         cpu->irqstate_saved_size = 0;
-@@ -2093,7 +2093,10 @@ void kvm_s390_vcpu_interrupt_pre_save(S390CPU *cpu)
- int kvm_s390_vcpu_interrupt_post_load(S390CPU *cpu)
- {
-     CPUState *cs = CPU(cpu);
--    struct kvm_s390_irq_state irq_state;
-+    struct kvm_s390_irq_state irq_state = {
-+        .buf = (uint64_t) cpu->irqstate,
-+        .len = cpu->irqstate_saved_size,
-+    };
-     int r;
- 
-     if (cpu->irqstate_saved_size == 0) {
-@@ -2104,9 +2107,6 @@ int kvm_s390_vcpu_interrupt_post_load(S390CPU *cpu)
-         return -ENOSYS;
-     }
- 
--    irq_state.buf = (uint64_t) cpu->irqstate;
--    irq_state.len = cpu->irqstate_saved_size;
--
-     r = kvm_vcpu_ioctl(cs, KVM_S390_SET_IRQ_STATE, &irq_state);
-     if (r) {
-         error_report("Setting interrupt state failed %d", r);
+ /*
+  * void disabled_wait(void)
 -- 
 2.9.4
