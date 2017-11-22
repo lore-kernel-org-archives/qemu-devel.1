@@ -1,28 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60850)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34711)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <aik@ozlabs.ru>) id 1eHL5V-0003Zd-8v
-	for qemu-devel@nongnu.org; Tue, 21 Nov 2017 21:48:34 -0500
+	(envelope-from <changpeng.liu@intel.com>) id 1eHLBO-0005u8-Jb
+	for qemu-devel@nongnu.org; Tue, 21 Nov 2017 21:54:39 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <aik@ozlabs.ru>) id 1eHL5S-0001Pv-6u
-	for qemu-devel@nongnu.org; Tue, 21 Nov 2017 21:48:33 -0500
-Received: from mail-pf0-x22f.google.com ([2607:f8b0:400e:c00::22f]:41419)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <aik@ozlabs.ru>) id 1eHL5R-0001OV-Vk
-	for qemu-devel@nongnu.org; Tue, 21 Nov 2017 21:48:30 -0500
-Received: by mail-pf0-x22f.google.com with SMTP id j28so11325847pfk.8
-	for <qemu-devel@nongnu.org>; Tue, 21 Nov 2017 18:48:29 -0800 (PST)
-References: <20171026064635.7179-1-aik@ozlabs.ru>
-	<13277057-669f-cd77-95f1-f0e54f7ae222@redhat.com>
-From: Alexey Kardashevskiy <aik@ozlabs.ru>
-Message-ID: <7e694888-43ce-6653-92a0-c0b4c235d4ca@ozlabs.ru>
-Date: Wed, 22 Nov 2017 13:48:23 +1100
+	(envelope-from <changpeng.liu@intel.com>) id 1eHLBL-0003qV-Ga
+	for qemu-devel@nongnu.org; Tue, 21 Nov 2017 21:54:38 -0500
+Received: from [134.134.136.24] (port=44300 helo=mga09.intel.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <changpeng.liu@intel.com>)
+	id 1eHLBL-0003q4-4j
+	for qemu-devel@nongnu.org; Tue, 21 Nov 2017 21:54:35 -0500
+From: "Liu, Changpeng" <changpeng.liu@intel.com>
+Date: Wed, 22 Nov 2017 02:25:12 +0000
+Message-ID: <FF7FC980937D6342B9D289F5F3C7C2625B5DFBFE@SHSMSX103.ccr.corp.intel.com>
+References: <1510865080-32027-1-git-send-email-changpeng.liu@intel.com>
+	<1510865080-32027-2-git-send-email-changpeng.liu@intel.com>
+	<20171120162631.GK4516@stefanha-x1.localdomain>
+In-Reply-To: <20171120162631.GK4516@stefanha-x1.localdomain>
+Content-Language: en-US
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
-In-Reply-To: <13277057-669f-cd77-95f1-f0e54f7ae222@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-AU
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH qemu] fdc: Exit if ISA controller does not
- support DMA
+Subject: Re: [Qemu-devel] [PATCH v5 1/4] vhost-user: add new vhost user
+ messages to support virtio config space
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,75 +31,132 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: John Snow <jsnow@redhat.com>, qemu-devel@nongnu.org
-Cc: Eric Blake <eblake@redhat.com>, Markus Armbruster <armbru@redhat.com>
-
-On 07/11/17 11:58, John Snow wrote:
-> 
-> 
-> On 10/26/2017 02:46 AM, Alexey Kardashevskiy wrote:
->> A "powernv" machine type defines an ISA bus but it does not add any DMA
->> controller to it so it is possible to hit assert(fdctrl->dma) by
->> adding "-machine powernv -device isa-fdc".
->>
->> This replaces assert() with an error message.
->>
->> Signed-off-by: Alexey Kardashevskiy <aik@ozlabs.ru>
->> ---
->>
->> Is it a must for ISA to have DMA controllers?
->>
->>
->> ---
->>  hw/block/fdc.c | 5 ++++-
->>  1 file changed, 4 insertions(+), 1 deletion(-)
->>
->> diff --git a/hw/block/fdc.c b/hw/block/fdc.c
->> index 67f78ac702..ed8b367572 100644
->> --- a/hw/block/fdc.c
->> +++ b/hw/block/fdc.c
->> @@ -2700,7 +2700,10 @@ static void isabus_fdc_realize(DeviceState *dev, Error **errp)
->>      fdctrl->dma_chann = isa->dma;
->>      if (fdctrl->dma_chann != -1) {
->>          fdctrl->dma = isa_get_dma(isa_bus_from_device(isadev), isa->dma);
->> -        assert(fdctrl->dma);
->> +        if (!fdctrl->dma) {
->> +            error_setg(errp, "ISA controller does not support DMA, exiting");
->> +            return;
->> +        }
->>      }
->>  
->>      qdev_set_legacy_instance_id(dev, isa->iobase, 2);
->>
-> 
-> I've been MIA for a little while, so I'm out of the loop -- but I am not
-> sure this is entirely the right way to fix this problem. I think it is
-> more the case that certain boards should not be able to ask for certain
-> types of devices, and we should prohibit e.g. powernv from being able to
-> ask for an ISA floppy disk controller.
-> 
-> (It doesn't seem to have an ISA DMA controller by default, but I have no
-> idea if that means it can't EVER have one...)
-> 
-> Papering over this by making it a soft error when we fail to execute
-> isa_get_dma and then assuming in retrospect it's because the machine
-> type we're on cannot have an ISA DMA controller seems a little
-> wrong-headed. It also leaves side-effects from isa_register_portio_list
-> and isa_init_irq, so we can't just bail here -- it's only marginally
-> better than the assert() it's doing.
-> 
-> That said, I am not really sure what the right thing to do is ... I
-> suspect the "right thing" is to express the dependency that isa-fdc
-> requires an ISA DMA controller -- and maybe that check happens here when
-> isa_get_dma fails and we have to unwind the realize function, but we
-> need to do it gracefully.
-> 
-> Give me a day to think about it, but I do want to make sure this is in
-> the next release.
+To: Stefan Hajnoczi <stefanha@gmail.com>
+Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "pbonzini@redhat.com" <pbonzini@redhat.com>, "mst@redhat.com" <mst@redhat.com>, "marcandre.lureau@redhat.com" <marcandre.lureau@redhat.com>, "felipe@nutanix.com" <felipe@nutanix.com>, "Harris, James R" <james.r.harris@intel.com>
 
 
-The day has passed, any news? :)
 
-
--- 
-Alexey
+> -----Original Message-----
+> From: Stefan Hajnoczi [mailto:stefanha@gmail.com]
+> Sent: Tuesday, November 21, 2017 12:27 AM
+> To: Liu, Changpeng <changpeng.liu@intel.com>
+> Cc: qemu-devel@nongnu.org; pbonzini@redhat.com; mst@redhat.com;
+> marcandre.lureau@redhat.com; felipe@nutanix.com; Harris, James R
+> <james.r.harris@intel.com>
+> Subject: Re: [PATCH v5 1/4] vhost-user: add new vhost user messages to su=
+pport
+> virtio config space
+>=20
+> On Fri, Nov 17, 2017 at 04:44:37AM +0800, Changpeng Liu wrote:
+> > Add VHOST_USER_GET_CONFIG/VHOST_USER_SET_CONFIG messages which can
+> be
+> > used for live migration of vhost user devices, also vhost user devices
+> > can benefit from the messages to get/set virtio config space from/to th=
+e
+> > I/O target. For the purpose to support virtio config space change,
+> > VHOST_USER_SET_CONFIG_FD message is added as the event notifier
+> > in case virtio config space change in the I/O target.
+> >
+> > Signed-off-by: Changpeng Liu <changpeng.liu@intel.com>
+> > ---
+> >  docs/interop/vhost-user.txt       | 39 ++++++++++++++++
+> >  hw/virtio/vhost-user.c            | 98 +++++++++++++++++++++++++++++++=
+++++++++
+> >  hw/virtio/vhost.c                 | 63 +++++++++++++++++++++++++
+> >  include/hw/virtio/vhost-backend.h |  8 ++++
+> >  include/hw/virtio/vhost.h         | 16 +++++++
+> >  5 files changed, 224 insertions(+)
+> >
+> > diff --git a/docs/interop/vhost-user.txt b/docs/interop/vhost-user.txt
+> > index 954771d..1b98388 100644
+> > --- a/docs/interop/vhost-user.txt
+> > +++ b/docs/interop/vhost-user.txt
+> > @@ -116,6 +116,16 @@ Depending on the request type, payload can be:
+> >      - 3: IOTLB invalidate
+> >      - 4: IOTLB access fail
+> >
+> > + * Virtio device config space
+> > +   ---------------------------
+> > +   | offset | size | payload |
+> > +   ---------------------------
+> > +
+> > +   Offset: a 32-bit offset of virtio device's configuration space
+>=20
+> s/of/in the/
+>=20
+> > +   Size: a 32-bit size of configuration space that master wanted to ch=
+ange
+>=20
+> Is this also used for GET_CONFIG?  If yes, I suggest "a 32-bit
+> configuration space access size in bytes".
+ok.
+>=20
+> Please mention that Size must be <=3D 256 bytes.
+>=20
+> > +   Payload: a 256-bytes array holding the contents of the virtio
+> > +       device's configuration space
+>=20
+> What about bytes outside the [offset, offset+size) range?  I guess they
+> must be 0 and are ignored by the master/slave.
+>=20
+> Would it be cleaner to make Payload a variable-sized field with Size
+> bytes?  That way it's not necessary to transfer 0s and memcpy() a subset
+> of the payload array.
+sounds good, but for vhost-blk driver it can call get_config for the whole =
+virtio_blk_config space.
+>=20
+> > +
+> >  In QEMU the vhost-user message is implemented with the following struc=
+t:
+> >
+> >  typedef struct VhostUserMsg {
+> > @@ -129,6 +139,7 @@ typedef struct VhostUserMsg {
+> >          VhostUserMemory memory;
+> >          VhostUserLog log;
+> >          struct vhost_iotlb_msg iotlb;
+> > +        VhostUserConfig config;
+> >      };
+> >  } QEMU_PACKED VhostUserMsg;
+> >
+> > @@ -596,6 +607,34 @@ Master message types
+> >        and expect this message once (per VQ) during device configuratio=
+n
+> >        (ie. before the master starts the VQ).
+> >
+> > + * VHOST_USER_GET_CONFIG
+> > +      Id: 24
+> > +      Equivalent ioctl: N/A
+> > +      Master payload: virtio device config space
+> > +
+> > +      Submitted by the vhost-user master to fetch the contents of the =
+virtio
+> > +      device configuration space. The vhost-user master may cache the =
+contents
+> > +      to avoid repeated VHOST_USER_GET_CONFIG calls.
+> > +
+> > +* VHOST_USER_SET_CONFIG
+> > +      Id: 25
+> > +      Equivalent ioctl: N/A
+> > +      Master payload: virtio device config space
+> > +
+> > +      Submitted by the vhost-user master when the Guest changes the vi=
+rtio
+> > +      device configuration space and also can be used for live migrati=
+on
+> > +      on the destination host.
+>=20
+> There might be security issues if the vhost slave cannot tell whether
+> SET_CONFIG is coming from the guest driver or from the master process
+> (live migration).  Typically certain fields are read-only for the guest
+> driver.  Maybe those fields need to be set by the master after live
+> migration.
+>=20
+> One way to solve this is adding a flags field to the message.  A special
+> flag can be used for live migration so the slave knows that this
+> SET_CONFIG message is allowed to write to read-only fields.
+>=20
+Ok.
+> It's also worth documenting that slaves MUST NOT accept SET_CONFIG for
+> read-only configuration space fields unless the live migration bit is
+> set.  Hopefully this will remind implementors to think through the
+> security issues.
