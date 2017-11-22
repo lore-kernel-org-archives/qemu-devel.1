@@ -1,24 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55168)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57169)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1eHYHC-0006ge-Mh
-	for qemu-devel@nongnu.org; Wed, 22 Nov 2017 11:53:31 -0500
+	(envelope-from <bounces@canonical.com>) id 1eHYPT-00028t-OS
+	for qemu-devel@nongnu.org; Wed, 22 Nov 2017 12:02:09 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1eHYH7-0005fy-Sg
-	for qemu-devel@nongnu.org; Wed, 22 Nov 2017 11:53:30 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:35118)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <cohuck@redhat.com>) id 1eHYH7-0005fZ-Lt
-	for qemu-devel@nongnu.org; Wed, 22 Nov 2017 11:53:25 -0500
-Date: Wed, 22 Nov 2017 17:53:21 +0100
-From: Cornelia Huck <cohuck@redhat.com>
-Message-ID: <20171122175321.6a3dad1b.cohuck@redhat.com>
-In-Reply-To: <e0e56414-cde9-e403-2cfe-be3476331163@de.ibm.com>
-References: <20171122163733.4007-1-pbonzini@redhat.com>
-	<e0e56414-cde9-e403-2cfe-be3476331163@de.ibm.com>
+	(envelope-from <bounces@canonical.com>) id 1eHYPP-0000lq-MH
+	for qemu-devel@nongnu.org; Wed, 22 Nov 2017 12:02:03 -0500
+Received: from indium.canonical.com ([91.189.90.7]:33708)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1eHYPP-0000lT-Fz
+	for qemu-devel@nongnu.org; Wed, 22 Nov 2017 12:01:59 -0500
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1eHYPM-0008UG-BM
+	for <qemu-devel@nongnu.org>; Wed, 22 Nov 2017 17:01:56 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id F02932E81ED
+	for <qemu-devel@nongnu.org>; Wed, 22 Nov 2017 17:01:51 +0000 (UTC)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [qemu-web PATCH] css: avoid over-large images
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Wed, 22 Nov 2017 16:52:45 -0000
+From: Peter Maydell <peter.maydell@linaro.org>
+Reply-To: Bug 1673976 <1673976@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <20170318142657.21676.52259.malonedeb@chaenomeles.canonical.com>
+Message-Id: <151136956605.14642.13250082471924913700.malone@wampee.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1673976] Re: linux-user clone() can't handle
+ glibc posix_spawn() (causes locale-gen to assert)
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,43 +37,42 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Christian Borntraeger <borntraeger@de.ibm.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org, thuth@redhat.com
+To: qemu-devel@nongnu.org
 
-On Wed, 22 Nov 2017 17:48:28 +0100
-Christian Borntraeger <borntraeger@de.ibm.com> wrote:
+Thanks for tracking down the glibc change; I will try to set up a chroot
+with a more recent glibc to see whether we can do something that fixes
+that posix_spawn implementation...
 
-> On 11/22/2017 05:37 PM, Paolo Bonzini wrote:
-> > Make sure that images are scaled to fit inside their container.  
-> 
-> Thanks God. I was thinking "what is wrong with the channel subsystem in QEMU?" when
-> reading your subject.....
+-- =
 
-Me too. Hurray for overloaded TLAs ;)
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1673976
 
->  
-> > Tested-by: Thomas Huth <thuth@redhat.com>
-> > Reviewed-by: Thomas Huth <thuth@redhat.com>
-> > Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
-> > ---
-> >  assets/css/style.css | 4 ++++
-> >  1 file changed, 4 insertions(+)
-> > 
-> > diff --git a/assets/css/style.css b/assets/css/style.css
-> > index 2d4fe0c..b828887 100644
-> > --- a/assets/css/style.css
-> > +++ b/assets/css/style.css
-> > @@ -200,6 +200,10 @@
-> > 
-> >  	/* Images */
-> > 
-> > +		img {
-> > +			max-width: 100%;
-> > +		}
-> > +
-> >  		.image
-> >  		{
-> >  			display: inline-block;
-> >   
-> 
-> 
+Title:
+  linux-user clone() can't handle glibc posix_spawn() (causes locale-gen
+  to assert)
+
+Status in QEMU:
+  New
+
+Bug description:
+  I'm running a command (locale-gen) inside of an armv7h chroot mounted
+  on my x86_64 desktop by putting qemu-arm-static into /usr/bin/ of the
+  chroot file system and I get a core dump.
+
+  locale-gen
+  Generating locales...
+  =C2=A0=C2=A0en_US.UTF-8...localedef: ../sysdeps/unix/sysv/linux/spawni.c:=
+360: __spawnix: Assertion `ec >=3D 0' failed.
+  qemu: uncaught target signal 6 (Aborted) - core dumped
+  /usr/bin/locale-gen: line 41:    34 Aborted                 (core dumped)=
+ localedef -i $input -c -f $charset -A /usr/share/locale/locale.alias $loca=
+le
+
+  I've done this same thing successfully for years, but this breakage
+  has appeared some time in the last 3 or so months. Possibly with the
+  update to qemu version 2.8.
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1673976/+subscriptions
