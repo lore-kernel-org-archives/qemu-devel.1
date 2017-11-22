@@ -1,22 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39853)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39859)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <maozy.fnst@cn.fujitsu.com>) id 1eHLTB-0001dI-W6
+	(envelope-from <maozy.fnst@cn.fujitsu.com>) id 1eHLTC-0001dO-DT
 	for qemu-devel@nongnu.org; Tue, 21 Nov 2017 22:13:03 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <maozy.fnst@cn.fujitsu.com>) id 1eHLT9-0006pz-2X
-	for qemu-devel@nongnu.org; Tue, 21 Nov 2017 22:13:01 -0500
-Received: from mail.cn.fujitsu.com ([183.91.158.132]:38494
+	(envelope-from <maozy.fnst@cn.fujitsu.com>) id 1eHLTB-0006ur-7D
+	for qemu-devel@nongnu.org; Tue, 21 Nov 2017 22:13:02 -0500
+Received: from mail.cn.fujitsu.com ([183.91.158.132]:49268
 	helo=heian.cn.fujitsu.com) by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <maozy.fnst@cn.fujitsu.com>) id 1eHLT7-0006i7-UN
-	for qemu-devel@nongnu.org; Tue, 21 Nov 2017 22:12:59 -0500
+	(envelope-from <maozy.fnst@cn.fujitsu.com>) id 1eHLTA-0006n9-Cm
+	for qemu-devel@nongnu.org; Tue, 21 Nov 2017 22:13:01 -0500
 From: Mao Zhongyi <maozy.fnst@cn.fujitsu.com>
-Date: Wed, 22 Nov 2017 11:08:44 +0800
-Message-ID: <ac0edc1fc70c4457e5cec94405eb7d1f89f9c2c1.1511317952.git.maozy.fnst@cn.fujitsu.com>
+Date: Wed, 22 Nov 2017 11:08:46 +0800
+Message-ID: <11e6003433abce35f3f4970e1acc71ee92dbcf51.1511317952.git.maozy.fnst@cn.fujitsu.com>
 In-Reply-To: <cover.1511317952.git.maozy.fnst@cn.fujitsu.com>
 References: <cover.1511317952.git.maozy.fnst@cn.fujitsu.com>
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: [Qemu-devel] [PATCH v4 2/4] hw/block: Fix the return type
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
+Subject: [Qemu-devel] [PATCH v4 4/4] dev-storage: Fix the unusual function
+ name
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,167 +28,96 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: John Snow <jsnow@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>
+Cc: Gerd Hoffmann <kraxel@redhat.com>
 
-When the function no success value to transmit, it usually make the
-function return void. It has turned out not to be a success, because
-it means that the extra local_err variable and error_propagate() will
-be needed. It leads to cumbersome code, therefore, transmit success/
-failure in the return value is worth.
+The function name of usb_msd_{realize,unrealize}_*,
+usb_msd_class_initfn_* are unusual. Rename it to
+usb_msd_*_{realize,unrealize}, usb_msd_class_*_initfn.
 
-So fix the return type of blkconf_apply_backend_options(),
-blkconf_geometry() and virtio_blk_data_plane_create() to avoid it.
-
-Cc: John Snow <jsnow@redhat.com>
-Cc: Kevin Wolf <kwolf@redhat.com>
-Cc: Max Reitz <mreitz@redhat.com>
-Cc: Stefan Hajnoczi <stefanha@redhat.com>
+Cc: Gerd Hoffmann <kraxel@redhat.com>
 
 Signed-off-by: Mao Zhongyi <maozy.fnst@cn.fujitsu.com>
-Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
+Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 ---
- hw/block/block.c                | 15 +++++++++------
- hw/block/dataplane/virtio-blk.c | 12 +++++++-----
- hw/block/dataplane/virtio-blk.h |  2 +-
- include/hw/block/block.h        |  4 ++--
- 4 files changed, 19 insertions(+), 14 deletions(-)
+ hw/usb/dev-storage.c | 20 ++++++++++----------
+ 1 file changed, 10 insertions(+), 10 deletions(-)
 
-diff --git a/hw/block/block.c b/hw/block/block.c
-index 27878d0..b0269c8 100644
---- a/hw/block/block.c
-+++ b/hw/block/block.c
-@@ -51,7 +51,7 @@ void blkconf_blocksizes(BlockConf *conf)
-     }
+diff --git a/hw/usb/dev-storage.c b/hw/usb/dev-storage.c
+index a9bcc67..9722ac8 100644
+--- a/hw/usb/dev-storage.c
++++ b/hw/usb/dev-storage.c
+@@ -596,7 +596,7 @@ static void usb_msd_unrealize_storage(USBDevice *dev, Error **errp)
+     object_unref(OBJECT(&s->bus));
  }
  
--void blkconf_apply_backend_options(BlockConf *conf, bool readonly,
-+bool blkconf_apply_backend_options(BlockConf *conf, bool readonly,
-                                    bool resizable, Error **errp)
+-static void usb_msd_realize_storage(USBDevice *dev, Error **errp)
++static void usb_msd_storage_realize(USBDevice *dev, Error **errp)
  {
-     BlockBackend *blk = conf->blk;
-@@ -76,7 +76,7 @@ void blkconf_apply_backend_options(BlockConf *conf, bool readonly,
- 
-     ret = blk_set_perm(blk, perm, shared_perm, errp);
-     if (ret < 0) {
--        return;
-+        return false;
-     }
- 
-     switch (conf->wce) {
-@@ -99,9 +99,11 @@ void blkconf_apply_backend_options(BlockConf *conf, bool readonly,
- 
-     blk_set_enable_write_cache(blk, wce);
-     blk_set_on_error(blk, rerror, werror);
-+
-+    return true;
+     MSDState *s = USB_STORAGE_DEV(dev);
+     BlockBackend *blk = s->conf.blk;
+@@ -643,14 +643,14 @@ static void usb_msd_realize_storage(USBDevice *dev, Error **errp)
+     s->scsi_dev = scsi_dev;
  }
  
--void blkconf_geometry(BlockConf *conf, int *ptrans,
-+bool blkconf_geometry(BlockConf *conf, int *ptrans,
-                       unsigned cyls_max, unsigned heads_max, unsigned secs_max,
-                       Error **errp)
+-static void usb_msd_unrealize_bot(USBDevice *dev, Error **errp)
++static void usb_msd_bot_unrealize(USBDevice *dev, Error **errp)
  {
-@@ -129,15 +131,16 @@ void blkconf_geometry(BlockConf *conf, int *ptrans,
-     if (conf->cyls || conf->heads || conf->secs) {
-         if (conf->cyls < 1 || conf->cyls > cyls_max) {
-             error_setg(errp, "cyls must be between 1 and %u", cyls_max);
--            return;
-+            return false;
-         }
-         if (conf->heads < 1 || conf->heads > heads_max) {
-             error_setg(errp, "heads must be between 1 and %u", heads_max);
--            return;
-+            return false;
-         }
-         if (conf->secs < 1 || conf->secs > secs_max) {
-             error_setg(errp, "secs must be between 1 and %u", secs_max);
--            return;
-+            return false;
-         }
-     }
-+    return true;
- }
-diff --git a/hw/block/dataplane/virtio-blk.c b/hw/block/dataplane/virtio-blk.c
-index 5556f0e..f6fc639 100644
---- a/hw/block/dataplane/virtio-blk.c
-+++ b/hw/block/dataplane/virtio-blk.c
-@@ -76,7 +76,7 @@ static void notify_guest_bh(void *opaque)
+     MSDState *s = USB_STORAGE_DEV(dev);
+ 
+     object_unref(OBJECT(&s->bus));
  }
  
- /* Context: QEMU global mutex held */
--void virtio_blk_data_plane_create(VirtIODevice *vdev, VirtIOBlkConf *conf,
-+bool virtio_blk_data_plane_create(VirtIODevice *vdev, VirtIOBlkConf *conf,
-                                   VirtIOBlockDataPlane **dataplane,
-                                   Error **errp)
+-static void usb_msd_realize_bot(USBDevice *dev, Error **errp)
++static void usb_msd_bot_realize(USBDevice *dev, Error **errp)
  {
-@@ -91,11 +91,11 @@ void virtio_blk_data_plane_create(VirtIODevice *vdev, VirtIOBlkConf *conf,
-             error_setg(errp,
-                        "device is incompatible with iothread "
-                        "(transport does not support notifiers)");
--            return;
-+            return false;
-         }
-         if (!virtio_device_ioeventfd_enabled(vdev)) {
-             error_setg(errp, "ioeventfd is required for iothread");
--            return;
-+            return false;
-         }
- 
-         /* If dataplane is (re-)enabled while the guest is running there could
-@@ -103,12 +103,12 @@ void virtio_blk_data_plane_create(VirtIODevice *vdev, VirtIOBlkConf *conf,
-          */
-         if (blk_op_is_blocked(conf->conf.blk, BLOCK_OP_TYPE_DATAPLANE, errp)) {
-             error_prepend(errp, "cannot start virtio-blk dataplane: ");
--            return;
-+            return false;
-         }
-     }
-     /* Don't try if transport does not support notifiers. */
-     if (!virtio_device_ioeventfd_enabled(vdev)) {
--        return;
-+        return false;
-     }
- 
-     s = g_new0(VirtIOBlockDataPlane, 1);
-@@ -126,6 +126,8 @@ void virtio_blk_data_plane_create(VirtIODevice *vdev, VirtIOBlkConf *conf,
-     s->batch_notify_vqs = bitmap_new(conf->num_queues);
- 
-     *dataplane = s;
-+
-+    return true;
+     MSDState *s = USB_STORAGE_DEV(dev);
+     DeviceState *d = DEVICE(dev);
+@@ -764,12 +764,12 @@ static void usb_msd_class_initfn_common(ObjectClass *klass, void *data)
+     dc->vmsd = &vmstate_usb_msd;
  }
  
- /* Context: QEMU global mutex held */
-diff --git a/hw/block/dataplane/virtio-blk.h b/hw/block/dataplane/virtio-blk.h
-index db3f47b..5e18bb9 100644
---- a/hw/block/dataplane/virtio-blk.h
-+++ b/hw/block/dataplane/virtio-blk.h
-@@ -19,7 +19,7 @@
+-static void usb_msd_class_initfn_storage(ObjectClass *klass, void *data)
++static void usb_msd_class_storage_initfn(ObjectClass *klass, void *data)
+ {
+     DeviceClass *dc = DEVICE_CLASS(klass);
+     USBDeviceClass *uc = USB_DEVICE_CLASS(klass);
  
- typedef struct VirtIOBlockDataPlane VirtIOBlockDataPlane;
+-    uc->realize = usb_msd_realize_storage;
++    uc->realize = usb_msd_storage_realize;
+     uc->unrealize = usb_msd_unrealize_storage;
+     dc->props = msd_properties;
+ }
+@@ -828,26 +828,26 @@ static void usb_msd_instance_init(Object *obj)
+     object_property_set_int(obj, -1, "bootindex", NULL);
+ }
  
--void virtio_blk_data_plane_create(VirtIODevice *vdev, VirtIOBlkConf *conf,
-+bool virtio_blk_data_plane_create(VirtIODevice *vdev, VirtIOBlkConf *conf,
-                                   VirtIOBlockDataPlane **dataplane,
-                                   Error **errp);
- void virtio_blk_data_plane_destroy(VirtIOBlockDataPlane *s);
-diff --git a/include/hw/block/block.h b/include/hw/block/block.h
-index f3f6e8e..64b9298 100644
---- a/include/hw/block/block.h
-+++ b/include/hw/block/block.h
-@@ -72,11 +72,11 @@ static inline unsigned int get_physical_block_exp(BlockConf *conf)
- /* Configuration helpers */
+-static void usb_msd_class_initfn_bot(ObjectClass *klass, void *data)
++static void usb_msd_class_bot_initfn(ObjectClass *klass, void *data)
+ {
+     USBDeviceClass *uc = USB_DEVICE_CLASS(klass);
  
- void blkconf_serial(BlockConf *conf, char **serial);
--void blkconf_geometry(BlockConf *conf, int *trans,
-+bool blkconf_geometry(BlockConf *conf, int *trans,
-                       unsigned cyls_max, unsigned heads_max, unsigned secs_max,
-                       Error **errp);
- void blkconf_blocksizes(BlockConf *conf);
--void blkconf_apply_backend_options(BlockConf *conf, bool readonly,
-+bool blkconf_apply_backend_options(BlockConf *conf, bool readonly,
-                                    bool resizable, Error **errp);
+-    uc->realize = usb_msd_realize_bot;
+-    uc->unrealize = usb_msd_unrealize_bot;
++    uc->realize = usb_msd_bot_realize;
++    uc->unrealize = usb_msd_bot_unrealize;
+     uc->attached_settable = true;
+ }
  
- /* Hard disk geometry */
+ static const TypeInfo msd_info = {
+     .name          = "usb-storage",
+     .parent        = TYPE_USB_STORAGE,
+-    .class_init    = usb_msd_class_initfn_storage,
++    .class_init    = usb_msd_class_storage_initfn,
+     .instance_init = usb_msd_instance_init,
+ };
+ 
+ static const TypeInfo bot_info = {
+     .name          = "usb-bot",
+     .parent        = TYPE_USB_STORAGE,
+-    .class_init    = usb_msd_class_initfn_bot,
++    .class_init    = usb_msd_class_bot_initfn,
+ };
+ 
+ static void usb_msd_register_types(void)
 -- 
 2.9.4
