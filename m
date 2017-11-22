@@ -1,34 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33273)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34256)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1eHX9V-0003tZ-4q
-	for qemu-devel@nongnu.org; Wed, 22 Nov 2017 10:41:30 -0500
+	(envelope-from <jsnow@redhat.com>) id 1eHXD7-0005ah-W3
+	for qemu-devel@nongnu.org; Wed, 22 Nov 2017 10:45:14 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1eHX9S-0004PU-09
-	for qemu-devel@nongnu.org; Wed, 22 Nov 2017 10:41:29 -0500
-Received: from indium.canonical.com ([91.189.90.7]:33124)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1eHX9R-0004Oq-QV
-	for qemu-devel@nongnu.org; Wed, 22 Nov 2017 10:41:25 -0500
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1eHX9Q-0007jd-38
-	for <qemu-devel@nongnu.org>; Wed, 22 Nov 2017 15:41:24 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 155602E80D3
-	for <qemu-devel@nongnu.org>; Wed, 22 Nov 2017 15:41:24 +0000 (UTC)
+	(envelope-from <jsnow@redhat.com>) id 1eHXD7-0006Bx-7D
+	for qemu-devel@nongnu.org; Wed, 22 Nov 2017 10:45:14 -0500
+References: <20171122001656.12996-1-jsnow@redhat.com>
+	<1cc87e18-67f9-2ec5-a2a6-78e93dfbe462@redhat.com>
+From: John Snow <jsnow@redhat.com>
+Message-ID: <0aced134-ec01-2643-ca2a-ead5f965bdae@redhat.com>
+Date: Wed, 22 Nov 2017 10:45:04 -0500
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Wed, 22 Nov 2017 15:30:10 -0000
-From: James Cowgill <jcowgill@debian.org>
-Reply-To: Bug 1673976 <1673976@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <20170318142657.21676.52259.malonedeb@chaenomeles.canonical.com>
-Message-Id: <151136461101.18190.14465747737982475589.malone@gac.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1673976] Re: linux-user clone() can't handle
- glibc posix_spawn() (causes locale-gen to assert)
+In-Reply-To: <1cc87e18-67f9-2ec5-a2a6-78e93dfbe462@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH] iotests: fix 075 and 078
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,43 +24,31 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Eric Blake <eblake@redhat.com>, qemu-block@nongnu.org
+Cc: kwolf@redhat.com, ldoktor@redhat.com, qemu-devel@nongnu.org, mreitz@redhat.com
 
-Sorry, this is probably the commit that broke things (not the one above). I=
- was added in glibc 2.25:
-https://sourceware.org/git/?p=3Dglibc.git;a=3Dcommit;h=3D4b4d4056bb154603f3=
-6c6f8845757c1012758158
 
--- =
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1673976
+On 11/21/2017 09:07 PM, Eric Blake wrote:
+> On 11/21/2017 06:16 PM, John Snow wrote:
+>> Both of these tests are for formats which now stipulate that they are
+>> read-only. Adjust the tests to match.
+>>
+>> Signed-off-by: John Snow <jsnow@redhat.com>
+>> ---
+>>  tests/qemu-iotests/075 | 18 +++++++++---------
+>>  tests/qemu-iotests/078 | 14 +++++++-------
+>>  2 files changed, 16 insertions(+), 16 deletions(-)
+>>
+> 
+> Reviewed-by: Eric Blake <eblake@redhat.com>
+> 
+> Safe for 2.11, although now that -rc2 is out, it's also okay if this
+> slips into 2.12.
+> 
 
-Title:
-  linux-user clone() can't handle glibc posix_spawn() (causes locale-gen
-  to assert)
+Yes, I just wanted to address the test suite prior to release. Whether
+or not other people agree on that being important is another matter :)
 
-Status in QEMU:
-  New
-
-Bug description:
-  I'm running a command (locale-gen) inside of an armv7h chroot mounted
-  on my x86_64 desktop by putting qemu-arm-static into /usr/bin/ of the
-  chroot file system and I get a core dump.
-
-  locale-gen
-  Generating locales...
-  =C2=A0=C2=A0en_US.UTF-8...localedef: ../sysdeps/unix/sysv/linux/spawni.c:=
-360: __spawnix: Assertion `ec >=3D 0' failed.
-  qemu: uncaught target signal 6 (Aborted) - core dumped
-  /usr/bin/locale-gen: line 41:    34 Aborted                 (core dumped)=
- localedef -i $input -c -f $charset -A /usr/share/locale/locale.alias $loca=
-le
-
-  I've done this same thing successfully for years, but this breakage
-  has appeared some time in the last 3 or so months. Possibly with the
-  update to qemu version 2.8.
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1673976/+subscriptions
+Thanks
+--js
