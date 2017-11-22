@@ -1,27 +1,39 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52142)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49803)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1eHV1v-0006Xz-AG
-	for qemu-devel@nongnu.org; Wed, 22 Nov 2017 08:25:36 -0500
+	(envelope-from <shalini@linux.vnet.ibm.com>) id 1eHTA5-0004mC-J3
+	for qemu-devel@nongnu.org; Wed, 22 Nov 2017 06:25:50 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1eHV1r-0001pY-BP
-	for qemu-devel@nongnu.org; Wed, 22 Nov 2017 08:25:31 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:55506)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <cohuck@redhat.com>) id 1eHV1r-0001pP-2i
-	for qemu-devel@nongnu.org; Wed, 22 Nov 2017 08:25:27 -0500
-Date: Wed, 22 Nov 2017 14:25:21 +0100
-From: Cornelia Huck <cohuck@redhat.com>
-Message-ID: <20171122142521.2f4493f4.cohuck@redhat.com>
-In-Reply-To: <c7ab1846-30ef-cd18-e905-a2b41c7fd9fd@linux.vnet.ibm.com>
-References: <1510854715-7081-1-git-send-email-pmorel@linux.vnet.ibm.com>
-	<1510854715-7081-3-git-send-email-pmorel@linux.vnet.ibm.com>
-	<20171121113845.0a0377d1.cohuck@redhat.com>
-	<20171121152503.1f0a023b.cohuck@redhat.com>
-	<c7ab1846-30ef-cd18-e905-a2b41c7fd9fd@linux.vnet.ibm.com>
+	(envelope-from <shalini@linux.vnet.ibm.com>) id 1eHTA2-00005q-2k
+	for qemu-devel@nongnu.org; Wed, 22 Nov 2017 06:25:49 -0500
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:45996
+	helo=mx0a-001b2d01.pphosted.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <shalini@linux.vnet.ibm.com>)
+	id 1eHTA1-00005A-TS
+	for qemu-devel@nongnu.org; Wed, 22 Nov 2017 06:25:46 -0500
+Received: from pps.filterd (m0098417.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
+	vAMBOZUU136298
+	for <qemu-devel@nongnu.org>; Wed, 22 Nov 2017 06:25:42 -0500
+Received: from e06smtp11.uk.ibm.com (e06smtp11.uk.ibm.com [195.75.94.107])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2ed6n4ww41-1
+	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Wed, 22 Nov 2017 06:25:42 -0500
+Received: from localhost
+	by e06smtp11.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	Only! Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <shalini@linux.vnet.ibm.com>;
+	Wed, 22 Nov 2017 11:25:40 -0000
+References: <20171121111825.17916-1-pasic@linux.vnet.ibm.com>
+From: Shalini Chellathurai Saroja <shalini@linux.vnet.ibm.com>
+Date: Wed, 22 Nov 2017 12:25:37 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+In-Reply-To: <20171121111825.17916-1-pasic@linux.vnet.ibm.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v2 2/7] s390x/pci: rework PCI STORE
+Content-Language: en-US
+Message-Id: <c9d1613b-e54a-2212-dce9-aa0a5f56a682@linux.vnet.ibm.com>
+Subject: Re: [Qemu-devel] [RFC PATCH 1/1] s390x/css: unresrict cssids
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,95 +42,102 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Pierre Morel <pmorel@linux.vnet.ibm.com>
-Cc: qemu-devel@nongnu.org, agraf@suse.de, borntraeger@de.ibm.com, zyimin@linux.vnet.ibm.com, pasic@linux.vnet.ibm.com
+To: Halil Pasic <pasic@linux.vnet.ibm.com>, Boris Fiuczynski <fiuczy@linux.vnet.ibm.com>, Cornelia Huck <cohuck@redhat.com>
+Cc: Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>, Christian Borntraeger <borntraeger@de.ibm.com>, qemu-devel@nongnu.org, qemu-s390x@nongnu.org
 
-On Tue, 21 Nov 2017 19:03:17 +0100
-Pierre Morel <pmorel@linux.vnet.ibm.com> wrote:
 
-> On 21/11/2017 15:25, Cornelia Huck wrote:
-> > On Tue, 21 Nov 2017 11:38:45 +0100
-> > Cornelia Huck <cohuck@redhat.com> wrote:
-> >   
-> >> On Thu, 16 Nov 2017 18:51:50 +0100
-> >> Pierre Morel <pmorel@linux.vnet.ibm.com> wrote:  
-> >   
-> >>> @@ -493,9 +494,13 @@ int pcistg_service_call(S390CPU *cpu, uint8_t r1, uint8_t r2)
-> >>>           break;
-> >>>       }
-> >>>   
-> >>> -    data = env->regs[r1];
-> >>> -    if (pcias < 6) {
-> >>> -        if ((8 - (offset & 0x7)) < len) {
-> >>> +    /* Test that the pcias is valid and do the appropriates operations */
-> >>> +    switch (pcias) {
-> >>> +    case 0 ... 5:  
-> >>
-> >> Make this
-> >> case 0...5:
-> >> ?  
-> > 
-> > ...only that it confuses the compiler when using numbers. We can either  
-> 
-> I did not see this as I replied to the previous email, sorry.
-> 
-> > keep the slightly ugly version, or introduce #defines.
-> > ZPCI_PCIAS_IOREGION_{MIN,MAX} (and maybe ZPCI_PCIAS_CONFIG for 15)?  
-> 
-> 
-> I agree something is missing.
-> But I am not sure that a #define brings clarity.
-> I would prefer to add a comment.
-> 	/* A ZPCI PCI card may use any BAR from BAR 0 to BAR 5 */
-> 
-> ?
 
-It's more a speaking value vs. magic numbers thing. A comment does not
-hurt either, though :)
-
-(And we get rid of the spacing as well.)
-
-> 
-> 
-> >>> +         * A length of 0 is invalid and length should not cross a double word
-> >>> +         */
-> >>> +        if (!len || (len > (8 - (offset & 0x7)))) {
-> >>>               program_interrupt(env, PGM_OPERAND, 4);
-> >>>               return 0;
-> >>>           }
-> >>> @@ -513,21 +518,21 @@ int pcistg_service_call(S390CPU *cpu, uint8_t r1, uint8_t r2)
-> >>>               program_interrupt(env, PGM_OPERAND, 4);
-> >>>               return 0;
-> >>>           }
-> >>> -    } else if (pcias == 15) {
-> >>> -        if ((4 - (offset & 0x3)) < len) {
-> >>> -            program_interrupt(env, PGM_OPERAND, 4);
-> >>> -            return 0;
-> >>> -        }
-> >>> -
-> >>> -        if (zpci_endian_swap(&data, len)) {
-> >>> +        break;
-> >>> +    case 15:
-> >>> +        /* ZPCI uses the pseudo BAR number 15 as configuration space */
-> >>> +        /* possible access lengths are 1,2,4 and must not cross a word */
-> >>> +        if (!len || (len > (4 - (offset & 0x3))) || len == 3) {
-> >>>               program_interrupt(env, PGM_OPERAND, 4);
-> >>>               return 0;
-> >>>           }
-> >>> -
-> >>> +        /* len = 1,2,4 so we do not need to test */
-> >>> +        zpci_endian_swap(&data, len);
-> >>>           pci_host_config_write_common(pbdev->pdev, offset,
-> >>>                                        pci_config_size(pbdev->pdev),
-> >>>                                        data, len);
-> >>> -    } else {
-> >>> +        break;
-> >>> +    default:
-> >>>           DPRINTF("pcistg invalid space\n");
-> >>>           setcc(cpu, ZPCI_PCI_LS_ERR);
-> >>>           s390_set_status_code(env, r2, ZPCI_PCI_ST_INVAL_AS);  
-> >>
-> >> Other than the nits, looks good.  
-> >   
-> 
-> 
+On 11/21/2017 12:18 PM, Halil Pasic wrote:
+> The default css 0xFE is currently restricted to virtual subchannel
+> devices. The hope when the decision was made was, that non-virtual
+> subchannel devices will come around when guest can exploit multiple
+> channel subsystems. Since the guests generally don't do, the pain
+> of the partitioned (cssid) namespace outweighs the gain.
+>
+> Let us remove the corresponding restrictions (virtual devices
+> can be put only in 0xFE and non-virtual devices in any css except
+> the 0xFE), and inform management software property on all ccw
+> devices.
+>
+> The adverse effect on migration should not be too severe as
+> vfio-ccw devices are not live-migratable yet, and for virtual
+> devices using the extra freedom would only make sense with
+> the aforementioned guest support in place.
+>
+> Signed-off-by: Halil Pasic <pasic@linux.vnet.ibm.com>
+> Acked-by: Christian Borntraeger <borntraeger@de.ibm.com>
+> Reviewed-by: Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>
+>
+> ---
+> Hi!
+>
+> About indicating this at the ccw devices instead of, e.g. as a machine
+> property (or otherwise globally), was requested by our libvirt guys. I
+> have no strong opinion regarding in this matter.
+>
+> This patch is intended as a discussion starter. I would at least like to
+> get a Tested-by by Shalini before promoting it to non-RFC (provided the
+> discussion goes well).
+Tested the patch in libvirt. It works as expected (allows to specify 
+cssid of vfio devices as 0xfe).
+Thank you.
+> TODOs:
+> * Consider adding a description for the new property.
+> * Consider renaming VIRTUAL_CSSID.
+> * Consider changing the bus-id generation scheme (when
+> devno is not specified by the user). his patch keep the current scheme in
+> place: they won't go into the default css (but slots are filled up
+> starting at cssid 0). This is theoretically good for migration
+> compatibility same command line same addresses.  Practically since there
+> is no migratable non-virtual ccw device, we should consider using the
+> same bus-id generation scheme for virtual and non-virtual devices.
+>
+> ---
+>   hw/s390x/ccw-device.c | 6 ++++++
+>   hw/s390x/css.c        | 9 ---------
+>   2 files changed, 6 insertions(+), 9 deletions(-)
+>
+> diff --git a/hw/s390x/ccw-device.c b/hw/s390x/ccw-device.c
+> index f9bfa154d6..2167ccea5d 100644
+> --- a/hw/s390x/ccw-device.c
+> +++ b/hw/s390x/ccw-device.c
+> @@ -40,6 +40,10 @@ static Property ccw_device_properties[] = {
+>       DEFINE_PROP_END_OF_LIST(),
+>   };
+>
+> +static bool prop_get_true(Object *obj, Error **errp)
+> +{
+> +    return true;
+> +}
+>   static void ccw_device_class_init(ObjectClass *klass, void *data)
+>   {
+>       DeviceClass *dc = DEVICE_CLASS(klass);
+> @@ -48,6 +52,8 @@ static void ccw_device_class_init(ObjectClass *klass, void *data)
+>       k->realize = ccw_device_realize;
+>       k->refill_ids = ccw_device_refill_ids;
+>       dc->props = ccw_device_properties;
+> +    object_class_property_add_bool(klass, "cssid-unrestricted",
+> +                                   prop_get_true, NULL, NULL);
+>   }
+>
+>   const VMStateDescription vmstate_ccw_dev = {
+> diff --git a/hw/s390x/css.c b/hw/s390x/css.c
+> index f6b5c807cd..957cb9ec90 100644
+> --- a/hw/s390x/css.c
+> +++ b/hw/s390x/css.c
+> @@ -2377,15 +2377,6 @@ SubchDev *css_create_sch(CssDevId bus_id, bool is_virtual, bool squash_mcss,
+>       SubchDev *sch;
+>
+>       if (bus_id.valid) {
+> -        if (is_virtual != (bus_id.cssid == VIRTUAL_CSSID)) {
+> -            error_setg(errp, "cssid %hhx not valid for %s devices",
+> -                       bus_id.cssid,
+> -                       (is_virtual ? "virtual" : "non-virtual"));
+> -            return NULL;
+> -        }
+> -    }
+> -
+> -    if (bus_id.valid) {
+>           if (squash_mcss) {
+>               bus_id.cssid = channel_subsys.default_cssid;
+>           } else if (!channel_subsys.css[bus_id.cssid]) {
