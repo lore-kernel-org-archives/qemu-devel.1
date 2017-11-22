@@ -1,21 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33945)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44598)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mdavidsaver@gmail.com>) id 1eHN6u-0002Pu-DW
-	for qemu-devel@nongnu.org; Tue, 21 Nov 2017 23:58:09 -0500
+	(envelope-from <bounces@canonical.com>) id 1eHIcy-0003iO-P0
+	for qemu-devel@nongnu.org; Tue, 21 Nov 2017 19:10:57 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mdavidsaver@gmail.com>) id 1eHN6p-0006Ux-IZ
-	for qemu-devel@nongnu.org; Tue, 21 Nov 2017 23:58:08 -0500
-References: <20171120032420.9134-1-mdavidsaver@gmail.com>
-	<20171122041217.GP2380@umbus.fritz.box>
-From: Michael Davidsaver <mdavidsaver@gmail.com>
-Message-ID: <4d98abb0-c767-cf76-78b3-20754604d8f3@gmail.com>
-Date: Tue, 21 Nov 2017 22:58:00 -0600
+	(envelope-from <bounces@canonical.com>) id 1eHIcv-0005vN-IJ
+	for qemu-devel@nongnu.org; Tue, 21 Nov 2017 19:10:56 -0500
+Received: from indium.canonical.com ([91.189.90.7]:45630)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1eHIcv-0005ux-9Z
+	for qemu-devel@nongnu.org; Tue, 21 Nov 2017 19:10:53 -0500
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1eHIcu-0008Oc-Cv
+	for <qemu-devel@nongnu.org>; Wed, 22 Nov 2017 00:10:52 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 58E202E80C7
+	for <qemu-devel@nongnu.org>; Wed, 22 Nov 2017 00:10:52 +0000 (UTC)
 MIME-Version: 1.0
-In-Reply-To: <20171122041217.GP2380@umbus.fritz.box>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="bdoLUxWP0l0bRxg60pSRPjJQMQMMO7OCc"
-Subject: Re: [Qemu-devel] [PATCH 00/12] Add MVME3100 PPC SBC
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Wed, 22 Nov 2017 00:00:25 -0000
+From: Ken Dickey <Ken.Dickey@whidbey.com>
+Reply-To: Bug 1733720 <1733720@bugs.launchpad.net>
+Sender: bounces@canonical.com
+Message-Id: <151130882565.18495.10192043724404737327.malonedeb@gac.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1733720] [NEW] raspi2 with multiple CPU's #1
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,51 +35,149 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Gibson <david@gibson.dropbear.id.au>
-Cc: Alexander Graf <agraf@suse.de>, qemu-ppc@nongnu.org, qemu-devel@nongnu.org
+To: qemu-devel@nongnu.org
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---bdoLUxWP0l0bRxg60pSRPjJQMQMMO7OCc
-From: Michael Davidsaver <mdavidsaver@gmail.com>
-To: David Gibson <david@gibson.dropbear.id.au>
-Cc: Alexander Graf <agraf@suse.de>, qemu-ppc@nongnu.org, qemu-devel@nongnu.org
-Message-ID: <4d98abb0-c767-cf76-78b3-20754604d8f3@gmail.com>
-Subject: Re: [PATCH 00/12] Add MVME3100 PPC SBC
-References: <20171120032420.9134-1-mdavidsaver@gmail.com>
- <20171122041217.GP2380@umbus.fritz.box>
-In-Reply-To: <20171122041217.GP2380@umbus.fritz.box>
-Content-Type: text/plain; charset=windows-1252
-Content-Transfer-Encoding: quoted-printable
+Public bug reported:
 
-On 11/21/2017 10:12 PM, David Gibson wrote:
-=2E..
-> I've applied several patches from this series to ppc-for-2.12, others
-> I've commented on.  If you could address the comments and rebase
-> what's left on ppc-for-2.12, that would be great.
+Greetings,
 
-Will do.
+I am running a small program for raspi2 (from
+http://wiki.osdev.org/ARM_RaspberryPi_Tutorial_C).
+
+This code writes "Hello World", but the output ir repeated 4 times.
+
+My thought was that this is emulating a 4 cpu core system.
+
+However, when I check the MPIDR registed for CPU number, it always
+returns 1.
+
+I git cloned github.com/qemu/qemu.git, made & installed on Acer ARM
+CB5-311 under Crouton/ubuntu.
 
 
---bdoLUxWP0l0bRxg60pSRPjJQMQMMO7OCc
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
+./qemu.sh =
 
------BEGIN PGP SIGNATURE-----
+1111
 
-iQIzBAEBCAAdFiEEYyRdrpxuENu06SOrlAHmyz1/GOoFAloVA9gACgkQlAHmyz1/
-GOotmw//dejG7Yi+22Yvp27kzfVIZibq8XWdOPb05f547xYidzbxQ4NGb8c/FvZy
-O6Mv4phntuHeeDX9e3h65pb50xfte1Z8rKwRFxkV2w2dNEoCa859qqcGzzXSZMgr
-Uc0SKxEfqBUgcYqzQG++DhQdSWpnzHwoP33YCdWWLnpljGNY5Flmt/1sl7qW8TwW
-r/QDU0ImLululP899QP+MLOIMa1x4pCVfsI1fnH5SoEBN43DsyphURXuOXN9jnyJ
-SkYGJaLtgfHUTtRMSCcZ05N3VsqXHL8wtLLVCz1NebeZm1Lxvzxpln4g7e+whquh
-dKYIqCLhm6oFbIoxQBXdFlFK5C9YtfJ+ecjqcgdspAJsd1HwObMTr3w1WLyFoAAE
-4qGf5hn0SoTC5gd7FrPsqKQjJSn49MfPz4OSkFEWS7y0z9OKv8QISl541uOJOZN3
-o0bTz6vQn6Pw+s1BhXTVuUIMFGtHY1xMNIGsl1y72bPKndtM0obRlw19IKqrtaVh
-UTKZthYEPc11pSJBNig6KOXYNWnn79tuiLnGv7wDgaY5bsK8G73ngG6pk+2ieVJX
-y+l8NBDmwKiEgu/A+08GaXZUJAbq6LWxm4tXe14jHz8vkUj4xwwimonelyllphpa
-UOmIABLIRJsVIvq6qMwGtvqvZeBpeECekBgGGU4R1x8dyCtTk/Y=
-=U4Iu
------END PGP SIGNATURE-----
+Linux:armv7l: ~/Downloads/RaspiTest/BareBones >>> uname -a
+Linux localhost 3.10.18 #1 SMP Mon Nov 13 16:34:10 PST 2017 armv7l armv7l a=
+rmv7l GNU/Linux
 
---bdoLUxWP0l0bRxg60pSRPjJQMQMMO7OCc--
+Linux:armv7l: ~/Downloads/RaspiTest/BareBones >>> qemu-system-arm --version
+QEMU emulator version 2.10.91 (v2.11.0-rc1-dirty)
+Copyright (c) 2003-2017 Fabrice Bellard and the QEMU Project developers
+
+=3D=3D=3D=3D=3D
+static inline uint32_t read_mpdir(void)
+{
+  uint32_t id;
+  =
+
+  asm volatile("mrc p15, 0, %[id], c0, c0, 0 @ read MIDR\n\t"
+	       : [id] "=3Dr" (id));
+  return id;
+}
+=3D=3D=3D=3D=3D=3D
+void kernel_main(uint32_t r0, uint32_t r1, uint32_t atags)
+{
+	// Declare as unused
+	(void) r0;
+	(void) r1;
+	(void) atags;
+
+        uint32_t cpu_id;
+
+        cpu_id =3D read_mpdir() & 0x03;
+
+        uart_putc( "01234"[cpu_id] ); /* output is "1111" */
+
+        if (cpu_id =3D=3D 0) { /* code never executes 8^( */ }
+
+=3D=3D=3D=3D=3D=3D qemu.sh
+qemu-system-arm -m 256 -M raspi2 -no-reboot -serial stdio  -kernel myos.elf
+
+Thanks much,
+-KenD
+
+** Affects: qemu
+     Importance: Undecided
+         Status: New
+
+-- =
+
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1733720
+
+Title:
+  raspi2 with multiple CPU's #1
+
+Status in QEMU:
+  New
+
+Bug description:
+  Greetings,
+
+  I am running a small program for raspi2 (from
+  http://wiki.osdev.org/ARM_RaspberryPi_Tutorial_C).
+
+  This code writes "Hello World", but the output ir repeated 4 times.
+
+  My thought was that this is emulating a 4 cpu core system.
+
+  However, when I check the MPIDR registed for CPU number, it always
+  returns 1.
+
+  I git cloned github.com/qemu/qemu.git, made & installed on Acer ARM
+  CB5-311 under Crouton/ubuntu.
+
+  =
+
+  ./qemu.sh =
+
+  1111
+
+  Linux:armv7l: ~/Downloads/RaspiTest/BareBones >>> uname -a
+  Linux localhost 3.10.18 #1 SMP Mon Nov 13 16:34:10 PST 2017 armv7l armv7l=
+ armv7l GNU/Linux
+
+  Linux:armv7l: ~/Downloads/RaspiTest/BareBones >>> qemu-system-arm --versi=
+on
+  QEMU emulator version 2.10.91 (v2.11.0-rc1-dirty)
+  Copyright (c) 2003-2017 Fabrice Bellard and the QEMU Project developers
+
+  =3D=3D=3D=3D=3D
+  static inline uint32_t read_mpdir(void)
+  {
+    uint32_t id;
+    =
+
+    asm volatile("mrc p15, 0, %[id], c0, c0, 0 @ read MIDR\n\t"
+  	       : [id] "=3Dr" (id));
+    return id;
+  }
+  =3D=3D=3D=3D=3D=3D
+  void kernel_main(uint32_t r0, uint32_t r1, uint32_t atags)
+  {
+  	// Declare as unused
+  	(void) r0;
+  	(void) r1;
+  	(void) atags;
+
+          uint32_t cpu_id;
+
+          cpu_id =3D read_mpdir() & 0x03;
+
+          uart_putc( "01234"[cpu_id] ); /* output is "1111" */
+
+          if (cpu_id =3D=3D 0) { /* code never executes 8^( */ }
+
+  =3D=3D=3D=3D=3D=3D qemu.sh
+  qemu-system-arm -m 256 -M raspi2 -no-reboot -serial stdio  -kernel myos.e=
+lf
+
+  Thanks much,
+  -KenD
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1733720/+subscriptions
