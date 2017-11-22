@@ -1,25 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34119)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35039)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <rkrcmar@redhat.com>) id 1eHc9n-0005G9-2n
-	for qemu-devel@nongnu.org; Wed, 22 Nov 2017 16:02:07 -0500
+	(envelope-from <andrew.smirnov@gmail.com>) id 1eHcDx-0006Ch-1W
+	for qemu-devel@nongnu.org; Wed, 22 Nov 2017 16:06:26 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <rkrcmar@redhat.com>) id 1eHc9j-0001yk-K9
-	for qemu-devel@nongnu.org; Wed, 22 Nov 2017 16:02:07 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:44599)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <rkrcmar@redhat.com>) id 1eHc9j-0001yD-Dy
-	for qemu-devel@nongnu.org; Wed, 22 Nov 2017 16:02:03 -0500
-Date: Wed, 22 Nov 2017 22:01:59 +0100
-From: Radim =?utf-8?B?S3LEjW3DocWZ?= <rkrcmar@redhat.com>
-Message-ID: <20171122210158.GB21184@flask>
-References: <20171122180908.31389-1-rkrcmar@redhat.com>
-	<20171122202800.GU3037@localhost.localdomain>
+	(envelope-from <andrew.smirnov@gmail.com>) id 1eHcDw-0004c8-1R
+	for qemu-devel@nongnu.org; Wed, 22 Nov 2017 16:06:25 -0500
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20171122202800.GU3037@localhost.localdomain>
+In-Reply-To: <CAFEAcA-NHA1Pya+p659F3ZWXvcwbA3SRJTb1tPzzqW2mzytSxw@mail.gmail.com>
+References: <20171106154813.19936-1-andrew.smirnov@gmail.com>
+	<20171106154813.19936-14-andrew.smirnov@gmail.com>
+	<CAFEAcA-NHA1Pya+p659F3ZWXvcwbA3SRJTb1tPzzqW2mzytSxw@mail.gmail.com>
+From: Andrey Smirnov <andrew.smirnov@gmail.com>
+Date: Wed, 22 Nov 2017 13:06:20 -0800
+Message-ID: <CAHQ1cqG4hn2wbXRUAK-BnOafzmqLKSHLJaNVdKPrVv+p2jMRpw@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH] kvm: apic: save and restore x2APIC LDR
+Subject: Re: [Qemu-devel] [PATCH v3 13/30] i.MX: Add code to emulate i.MX7
+ CCM, PMU and ANALOG IP blocks
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,32 +25,68 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eduardo Habkost <ehabkost@redhat.com>
-Cc: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: qemu-arm <qemu-arm@nongnu.org>, Jason Wang <jasowang@redhat.com>, =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>, QEMU Developers <qemu-devel@nongnu.org>, Andrey Yurovsky <yurovsky@gmail.com>
 
-2017-11-22 18:28-0200, Eduardo Habkost:
-> On Wed, Nov 22, 2017 at 07:09:08PM +0100, Radim Kr=C4=8Dm=C3=A1=C5=99 w=
-rote:
-> > QEMU saves only 8 bits of APIC LDR, which means that it does not supp=
-ort
-> > x2APIC.  The correct way of fixing this would be to save and restore =
-the
-> > full 32 bit register, but because x2APIC LDR is a function of x2APIC =
-ID,
-> > we can also compute it and keep the migration format untouched.
-> >=20
-> > KVM always expected the LDR format to follow the xAPIC/x2APIC standar=
-d,
-> > but pre 4.1 KVMs used non-standard x2APIC ID in case the OS changed
-> > xAPIC ID before switching to x2APIC, which means that QEMU has to use
-> > the kvm_x2apic_api feature to derive the x2APIC ID.
-> >=20
-> > This bug has also been addressed on the KVM side with patch 5849d75a5=
-c9b
-> > ("KVM: lapic: Fixup LDR on load in x2apic").
->=20
-> Is this sufficient to fix the bug on hosts that lack KVM commit
-> 5849d75a5c9b, or we need both the KVM and QEMU patches?
+On Tue, Nov 21, 2017 at 10:08 AM, Peter Maydell
+<peter.maydell@linaro.org> wrote:
+> On 6 November 2017 at 15:47, Andrey Smirnov <andrew.smirnov@gmail.com> wr=
+ote:
+>> Add minimal code needed to allow upstream Linux guest to boot.
+>>
+>> Cc: Peter Maydell <peter.maydell@linaro.org>
+>> Cc: Jason Wang <jasowang@redhat.com>
+>> Cc: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
+>> Cc: qemu-devel@nongnu.org
+>> Cc: qemu-arm@nongnu.org
+>> Cc: yurovsky@gmail.com
+>> Signed-off-by: Andrey Smirnov <andrew.smirnov@gmail.com>
+>> ---
+>>  hw/misc/Makefile.objs      |   1 +
+>>  hw/misc/imx7_ccm.c         | 233 ++++++++++++++++++++++++++++++++++++++=
++++++++
+>>  include/hw/misc/imx7_ccm.h | 130 +++++++++++++++++++++++++
+>>  3 files changed, 364 insertions(+)
+>>  create mode 100644 hw/misc/imx7_ccm.c
+>>  create mode 100644 include/hw/misc/imx7_ccm.h
+>>
+>> diff --git a/hw/misc/Makefile.objs b/hw/misc/Makefile.objs
+>> index 29fb922cef..ac1be05a03 100644
+>> --- a/hw/misc/Makefile.objs
+>> +++ b/hw/misc/Makefile.objs
+>> @@ -34,6 +34,7 @@ obj-$(CONFIG_IMX) +=3D imx31_ccm.o
+>>  obj-$(CONFIG_IMX) +=3D imx25_ccm.o
+>>  obj-$(CONFIG_IMX) +=3D imx6_ccm.o
+>>  obj-$(CONFIG_IMX) +=3D imx6_src.o
+>> +obj-$(CONFIG_IMX) +=3D imx7_ccm.o
+>>  obj-$(CONFIG_MILKYMIST) +=3D milkymist-hpdmc.o
+>>  obj-$(CONFIG_MILKYMIST) +=3D milkymist-pfpu.o
+>>  obj-$(CONFIG_MAINSTONE) +=3D mst_fpga.o
+>> diff --git a/hw/misc/imx7_ccm.c b/hw/misc/imx7_ccm.c
+>> new file mode 100644
+>> index 0000000000..2876164cfa
+>> --- /dev/null
+>> +++ b/hw/misc/imx7_ccm.c
+>> @@ -0,0 +1,233 @@
+>> +/*
+>> + * Copyright (c) 2017, Impinj, Inc.
+>> + *
+>> + * i.MX7 CCM, PMU and ANALOG IP blocks emulation code
+>
+> Should these really all be in one single device rather
+> than one device per IP block ?
+>
 
-Good point, either one is enough to fix the bug.
-This patch makes x2APIC LDR work on old KVMs.
+They all share the same register write semantics,
+imx7_set_clr_tog_write, so I'd like to keep them in the same file. But
+other than that, they can be split into all sorts of configurations.
+As far as memory map in i.MX7 RM is concerned "CCM" and "Analog" are
+distinct register files where the rest of them ("digiprog", "pmu") are
+"sub-blocks" of those two (or at least that's my interpretation). I'll
+change v4 to have that split.
+
+If you want me to convert every block _and_ sub-block into a
+standalone device, let me know.
+
+Thanks,
+Andrey Smirnov
