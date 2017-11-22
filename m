@@ -1,22 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47973)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51420)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1eHbFA-0005QO-Hm
-	for qemu-devel@nongnu.org; Wed, 22 Nov 2017 15:03:37 -0500
+	(envelope-from <andrew.smirnov@gmail.com>) id 1eHbUq-0008NU-Mh
+	for qemu-devel@nongnu.org; Wed, 22 Nov 2017 15:19:50 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1eHbF9-0004tX-CP
-	for qemu-devel@nongnu.org; Wed, 22 Nov 2017 15:03:36 -0500
-References: <20171122101958.17065-1-vsementsov@virtuozzo.com>
-	<20171122101958.17065-3-vsementsov@virtuozzo.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <a07578ae-f57b-cb82-e87e-23b6c39cbd10@redhat.com>
-Date: Wed, 22 Nov 2017 14:03:25 -0600
+	(envelope-from <andrew.smirnov@gmail.com>) id 1eHbUp-0004rZ-69
+	for qemu-devel@nongnu.org; Wed, 22 Nov 2017 15:19:48 -0500
 MIME-Version: 1.0
-In-Reply-To: <20171122101958.17065-3-vsementsov@virtuozzo.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="PImqWjFIqbiGF3CsLRT07Flb4XwmXNuJd"
-Subject: Re: [Qemu-devel] [PATCH 2/5] nbd/server: add nbd_opt_{read,
- drop} to track client->optlen
+In-Reply-To: <CAFEAcA8u2-o2u93OfgV8-4hTx0NwTZ1zC7DjFF6GmTXhxo3-Qg@mail.gmail.com>
+References: <20171106154813.19936-1-andrew.smirnov@gmail.com>
+	<CAFEAcA8u2-o2u93OfgV8-4hTx0NwTZ1zC7DjFF6GmTXhxo3-Qg@mail.gmail.com>
+From: Andrey Smirnov <andrew.smirnov@gmail.com>
+Date: Wed, 22 Nov 2017 12:19:41 -0800
+Message-ID: <CAHQ1cqErRbmw2HGc-jY+-3P_MyOijtPry5RZaJ3GOTX+X6zD-Q@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH v3 00/30] Initial i.MX7 support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,115 +22,141 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org
-Cc: pbonzini@redhat.com, kwolf@redhat.com, mreitz@redhat.com, den@openvz.org
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: qemu-arm <qemu-arm@nongnu.org>, Jason Wang <jasowang@redhat.com>, =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>, QEMU Developers <qemu-devel@nongnu.org>, Andrey Yurovsky <yurovsky@gmail.com>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---PImqWjFIqbiGF3CsLRT07Flb4XwmXNuJd
-From: Eric Blake <eblake@redhat.com>
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
- qemu-block@nongnu.org, qemu-devel@nongnu.org
-Cc: pbonzini@redhat.com, kwolf@redhat.com, mreitz@redhat.com, den@openvz.org
-Message-ID: <a07578ae-f57b-cb82-e87e-23b6c39cbd10@redhat.com>
-Subject: Re: [PATCH 2/5] nbd/server: add nbd_opt_{read,drop} to track
- client->optlen
-References: <20171122101958.17065-1-vsementsov@virtuozzo.com>
- <20171122101958.17065-3-vsementsov@virtuozzo.com>
-In-Reply-To: <20171122101958.17065-3-vsementsov@virtuozzo.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+On Tue, Nov 21, 2017 at 10:34 AM, Peter Maydell
+<peter.maydell@linaro.org> wrote:
+> On 6 November 2017 at 15:47, Andrey Smirnov <andrew.smirnov@gmail.com> wrote:
+>> Hi everyone,
+>>     - Added proper USB emulation code, so now it should be possible to
+>>       emulated guest's USB bus
+>
+> The patchset is huge as it is, if you add more stuff to it
+> it makes it even more likely to sink to the bottom of my
+> to-review queue...
+>
 
-On 11/22/2017 04:19 AM, Vladimir Sementsov-Ogievskiy wrote:
-> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-> ---
->  nbd/server.c | 34 ++++++++++++++++++++++------------
->  1 file changed, 22 insertions(+), 12 deletions(-)
->=20
-
-Hmm, revisiting my idea about moving more of the error checking into the
-helper function.  As of this patch, we only have two clients of
-nbd_opt_read:
-
-> @@ -299,7 +312,7 @@ static int nbd_negotiate_handle_export_name(NBDClie=
-nt *client,
->          error_setg(errp, "Bad length received");
->          return -EINVAL;
->      }
-> -    if (nbd_read(client->ioc, name, client->optlen, errp) < 0) {
-> +    if (nbd_opt_read(client, name, client->optlen, errp) < 0) {
->          error_prepend(errp, "read failed: ");
->          return -EINVAL;
-
-1. NBD_OPT_EXPORT_NAME, where the length check is based on the maximum
-size name we're willing to accept (and NOT on comparison to the header
-size, as we request the entire client->optlen).  This call cannot send
-an error reply (so if the length is bogus, we can just drop the
-connection by returning -EINVAL).  Furthermore, once we handle this
-option, option processing is done; we do not reach the assert that
-client->optlen =3D=3D 0.
-
->      }
-> @@ -383,40 +396,36 @@ static int nbd_negotiate_handle_info(NBDClient *c=
-lient, uint16_t myflags,
->          msg =3D "overall request too short";
->          goto invalid;
->      }
-> -    if (nbd_read(client->ioc, &namelen, sizeof(namelen), errp) < 0) {
-> +    if (nbd_opt_read(client, &namelen, sizeof(namelen), errp) < 0) {
->          return -EIO;
->      }
-
-2. Multiple calls within NBD_OPT_INFO/NBD_OPT_GO.  Here, the length
-check is based on our read being a subset of client->optlen, and our
-desired response on a failed check is whatever is at the invalid: label,
-namely:
-
- invalid:
-    if (nbd_opt_drop(client, client->optlen, errp) < 0) {
-        return -EIO;
-    }
-    return nbd_negotiate_send_rep_err(client, NBD_REP_ERR_INVALID,
-                                      errp, "%s", msg);
-
-We want to drop all remaining data, reply to the client, and return 0 to
-keep the connection alive (or -EIO if the read or write failed).
-
-You are planning on adding more calls withing NBD_OPT_LIST_META_CONTEXT,
-which will have semantics more like 2 (if we detect an inconsistent
-size, we want to consume the rest of the input and return an EINVAL
-reply to the client, but keep the connection alive unless there is an
-I/O error in the meantime).
-
-I think that means we need a tri-state return from nbd_opt_read(): < 0
-on I/O failure, 0 if the EINVAL message has been sent, and 1 if the read
-was successful; I also think it means that the handler for
-NBD_OPT_EXPORT_NAME does not really fit the bill for using the same
-handler.  Hopefully this explanation will give you more insight into the
-counter-proposal patch I'm about to post.
-
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
+USB peripheral emulation had to be a part of a patch-set, either in
+dummy or a full featured form, in order to be able to boot vanilla
+Linux kernel because you insisted that I don't use
+"ignore_memory_transaction_failures". The reason why the dummy
+emulation version of it it was not a part of v2 was because I did my
+test with a bad kernel config where USB was disabled, didn't realize
+USB was essential and did not write code to support it. Now, once I
+realized it, I wrote a dummy version, and then later, while waiting
+for v2 to be reviewed, worked on proper USB emulation the code. Said
+code turned out to be comparatively trivial to the first dummy
+implementation, so instead of going through the exercise of submitting
+dummy first and then proper version later I squashed both and the
+result in v3.
 
 
---PImqWjFIqbiGF3CsLRT07Flb4XwmXNuJd
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
+>> Peter, I didn't hear anything from you about the code of
+>> mcimx7d_add_psci_node(), as discussed here:
+>>
+>> https://www.mail-archive.com/qemu-devel@nongnu.org/msg486874.html
+>>
+>> so I kept the original code intact. As I mentioned before, my goal was
+>> to be able to boot into vanilla Linux kerenel and have working SMP
+>> without needing to use a PSCI implementing bootloader. If that is
+>> something that new board code shouldn't do, please let me know.
+>
+> Broadly, board code should work the same way the real hardware
+> does, unless there's a clear reason why not.
 
------BEGIN PGP SIGNATURE-----
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+Yes, this all makes sense. As far as I understand convenience being
+able to boot Linux directly in QEMU has long been the "clear reason
+why not". Now that certain SoC specific versions of Linux are not as
+self-sufficient and can't support SMP without external help, emulating
+PSCI and doing appropriate DTB fixups for that is just an adaptaion of
+the old convenience mechanism to new times and circumstances, IMHO.
 
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAloV2A0ACgkQp6FrSiUn
-Q2r8bgf+KKkKD6wKrrhoO8m3BdSxQlbc9Dsalfc2aVj6Qq4fh98u7MgIE0kTXCcx
-hyuQiRP5TvaUeDYwfMYtOw2YiTK8/7VelwS057sfsbh++HD+G9PwJzxAuclEDsRK
-vK/fEwf0R0mK7d/SzVFKg0McibAem/LMhymrNaEyke15PjFbDY8u16eyHumZ/6BR
-QWhCvIXzo7rHC0O81EvAqi11EdQJv42VtBNzt5wPDhHCw6/V19+/DuHTKZxxYL2E
-4s7HG5AHvAWGz8Hpxn1XYF/lRHMl0l8wb5a0DdTI6QKxdlka/gcLOv4RetQLoYI+
-uX6b7HMthxpl/Fv+NECqBxIgpkPslw==
-=aPZt
------END PGP SIGNATURE-----
+> "virt" is special because it writes its own dtb entirely.
+>
+> Maybe PSCI does need to be a different special case, since we're
+> emulating part of a bootloader here.
 
---PImqWjFIqbiGF3CsLRT07Flb4XwmXNuJd--
+OK, I'll ignore the "maybe" part and proceed as if we are in agreement
+on PSCI for v4.
+
+> But if so I think that code belongs more in hw/arm/boot.c, so that we automatically fix up the
+> dtb to say "we have psci" if we are (a) booting a kernel directly
+> and (b) the CPU has the psci-conduit property set to enable QEMU's
+> PSCI implementation.
+>
+
+OK, sure, makes sense. I'll change the patch to use shared
+infrastructure for that.
+
+> (Also the code in virt.c for adding a PSCI node is considerably
+> fuller-featured than yours is.)
+>
+
+Okay... My code is targeting both fixed PSCI conduit (smc) and PSCI
+implementation (0.2/1.0), implementing support for anything but that
+in my board specific code would've been, IMHO, silly. OK, I'll
+interpret that comment not as a slight, but as a request to use
+virt.c's implementation for shared infrastructure.
+
+>> Thanks,
+>> Andrey Smirnov
+>>
+>> [v2] https://lists.gnu.org/archive/html/qemu-devel/2017-10/msg05516.html
+>> [v1] https://lists.gnu.org/archive/html/qemu-devel/2017-09/msg04770.html
+>>
+>>
+>> Andrey Smirnov (30):
+>>   imx_fec: Do not link to netdev
+>>   imx_fec: Refactor imx_eth_enable_rx()
+>>   imx_fec: Change queue flushing heuristics
+>>   imx_fec: Use ENET_FTRL to determine truncation length
+>>   imx_fec: Use MIN instead of explicit ternary operator
+>>   imx_fec: Emulate SHIFT16 in ENETx_RACC
+>>   imx_fec: Add support for multiple Tx DMA rings
+>>   imx_fec: Use correct length for packet size
+>>   imx_fec: Fix a typo in imx_enet_receive()
+>>   imx_fec: Reserve full 4K page for the register file
+>>   sdhci: Add i.MX specific subtype of SDHCI
+>>   sdhci: Implement write method of ACMD12ERRSTS register
+>
+> Everything above here is pretty nearly ready to go in;
+> if you send that as a patchseries then it should be easy
+> to review and queue ready for 2.12 (which will open up
+> for new commits in mid-december).
+>
+
+I'm not quite sure where you stand on "imx_fec: Use ENET_FTRL to
+determine truncation length", but sure, sounds good, I'll prepare the
+rest of them as a separate patch set and submit it, as soon as I get a
+chance.
+
+>>   i.MX: Add code to emulate i.MX7 CCM, PMU and ANALOG IP blocks
+>>   i.MX: Add code to emulate i.MX2 watchdog IP block
+>>   i.MX: Add code to emulate i.MX7 SNVS IP-block
+>>   i.MX: Add code to emulate GPCv2 IP block
+>>   i.MX: Add code to emulate i.MX7 IOMUXC IP block
+>>   i.MX: Add i.MX7 GPT variant
+>>   i.MX: Add code to emulate SDMA IP block
+>>   i.MX: Add code to emulate FlexCAN IP block
+>>   i.MX: Add implementation of i.MX7 GPR IP block
+>>   pci: Add support for Designware IP block
+>>   i.MX: Add code to emulate i.MX7 USBMISC IP block
+>>   i.MX: Add code to emulate i.MX7 ADC IP block
+>>   i.MX: Add code to emulate i.MX7 SRC IP-block
+>>   usb: Add basic code to emulate Chipidea USB IP
+>>   ARM: Add basic code to emulate A7MPCore DAP block
+>>   i.MX: Add code to emulate i.MX LCD block
+>>   i.MX: Add i.MX7 SOC implementation.
+>>   Implement support for i.MX7 Sabre board
+>
+> My review in this part of the patchset is more sketchy,
+> but you can probably adjust the later patches as per
+> remarks on the earlier ones.
+>
+
+OK, no problem. I am fine on iterating on the rest of the series until
+it's in good shape.
+
+Thanks,
+Andrey Smirnov
