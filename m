@@ -1,26 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38842)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42124)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1eHaf7-0003X3-6f
-	for qemu-devel@nongnu.org; Wed, 22 Nov 2017 14:26:22 -0500
+	(envelope-from <dgilbert@redhat.com>) id 1eHauJ-0007k5-AZ
+	for qemu-devel@nongnu.org; Wed, 22 Nov 2017 14:42:04 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1eHaf3-0004ta-QF
-	for qemu-devel@nongnu.org; Wed, 22 Nov 2017 14:26:21 -0500
-Received: from mail-wr0-f193.google.com ([209.85.128.193]:34719)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1eHaf3-0004t1-JM
-	for qemu-devel@nongnu.org; Wed, 22 Nov 2017 14:26:17 -0500
-Received: by mail-wr0-f193.google.com with SMTP id k18so10587382wre.1
-	for <qemu-devel@nongnu.org>; Wed, 22 Nov 2017 11:26:17 -0800 (PST)
-References: <20171122180908.31389-1-rkrcmar@redhat.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <adada925-d23d-af1c-8965-f18904f5184d@redhat.com>
-Date: Wed, 22 Nov 2017 20:26:14 +0100
+	(envelope-from <dgilbert@redhat.com>) id 1eHauG-00042w-JS
+	for qemu-devel@nongnu.org; Wed, 22 Nov 2017 14:42:03 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:46212)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1eHauG-00041J-Ad
+	for qemu-devel@nongnu.org; Wed, 22 Nov 2017 14:42:00 -0500
+Date: Wed, 22 Nov 2017 19:41:54 +0000
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20171122194153.GB4338@work-vm>
+References: <1b862cf2-2fee-3243-cb54-2780ace6f25b@profihost.ag>
+	<971cc10f-7930-9830-0528-27e8faac7282@redhat.com>
+	<748c4d0d-f84b-303d-f9a6-bafa6037d669@profihost.ag>
+	<f4b0cb70-7f86-f7cf-bb89-3a9f7ae15dc2@redhat.com>
+	<4c2913e2-5946-47db-cced-a5702538bc3b@profihost.ag>
+	<dc3bf74f-fbd6-573d-0d7c-d456469fcf1d@profihost.ag>
+	<9c8673a5-faf7-ca9c-27d3-398df4223d6a@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20171122180908.31389-1-rkrcmar@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH] kvm: apic: save and restore x2APIC LDR
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <9c8673a5-faf7-ca9c-27d3-398df4223d6a@redhat.com>
+Subject: Re: [Qemu-devel] kvm: virtio-net: saved image requires TUN_F_UFO
+ support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,32 +33,90 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?B?UmFkaW0gS3LEjW3DocWZ?= <rkrcmar@redhat.com>, qemu-devel@nongnu.org
-Cc: Eduardo Habkost <ehabkost@redhat.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>, Richard Henderson <rth@twiddle.net>
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: Stefan Priebe - Profihost AG <s.priebe@profihost.ag>, qemu-devel <qemu-devel@nongnu.org>, "Jason Wang (jasowang@redhat.com)" <jasowang@redhat.com>
 
-On 22/11/2017 19:09, Radim Krčmář wrote:
-> QEMU saves only 8 bits of APIC LDR, which means that it does not support
-> x2APIC.  The correct way of fixing this would be to save and restore the
-> full 32 bit register, but because x2APIC LDR is a function of x2APIC ID,
-> we can also compute it and keep the migration format untouched.
+* Paolo Bonzini (pbonzini@redhat.com) wrote:
+> On 06/11/2017 12:09, Stefan Priebe - Profihost AG wrote:
+> > HI Paolo,
+> > 
+> > could this patchset be related?
 > 
-> KVM always expected the LDR format to follow the xAPIC/x2APIC standard,
-> but pre 4.1 KVMs used non-standard x2APIC ID in case the OS changed
-> xAPIC ID before switching to x2APIC, which means that QEMU has to use
-> the kvm_x2apic_api feature to derive the x2APIC ID.
+> Uh oh, yes it should.  Jason, any ways to fix it?  I suppose we need to
+> disable UFO in the newest machine types, but do we also have to do
+> (software) UFO in vhost-net and QEMU for migration compatibility?
+
+Was there a solution to this?
+
+Dave
+
+> Thanks,
 > 
-> This bug has also been addressed on the KVM side with patch 5849d75a5c9b
-> ("KVM: lapic: Fixup LDR on load in x2apic").
-
-> +    if (s->apicbase & MSR_IA32_APICBASE_EXTD) {
-> +        kvm_apic_set_reg(kapic, 0xd, kvm_apic_calc_x2apic_ldr(s));
-
-Is this correct if the kernel doesn't support the new-style x2APIC API?
-
-In the end, it seems simpler to just fix it in the kernel.
-
-Paolo
-
-> +    } else {
-> +        kvm_apic_set_reg(kapic, 0xd, s->log_dest << 24);
-> +    }
+> Paolo
+> 
+> > Greets,
+> > Stefan
+> > 
+> > Am 06.11.2017 um 10:52 schrieb Stefan Priebe - Profihost AG:
+> >> Hi Paolo,
+> >>
+> >> Am 06.11.2017 um 10:49 schrieb Paolo Bonzini:
+> >>> On 06/11/2017 10:48, Stefan Priebe - Profihost AG wrote:
+> >>>> Hi Paolo,
+> >>>>
+> >>>> Am 06.11.2017 um 10:40 schrieb Paolo Bonzini:
+> >>>>> On 06/11/2017 10:38, Stefan Priebe - Profihost AG wrote:
+> >>>>>> Hello,
+> >>>>>>
+> >>>>>> i've upgraded some servers from kernel 4.4 to 4.12 - both running Qemu
+> >>>>>> 2.9.1.
+> >>>>>>
+> >>>>>> If i migrate a VM from a host running kernel 4.4 to a host running 4.12
+> >>>>>> i get:
+> >>>>>>
+> >>>>>> kvm: virtio-net: saved image requires TUN_F_UFO support
+> >>>>>> kvm: Failed to load virtio-net-device:tmp
+> >>>>>> kvm: Failed to load virtio-net:virtio
+> >>>>>> kvm: error while loading state for instance 0x0 of device
+> >>>>>> '0000:00:12.0/virtio-net'
+> >>>>>> kvm: load of migration failed: Invalid argument
+> >>>>>>
+> >>>>>>
+> >>>>>> while migrating from 4.12 to 4.4 works fine.
+> >>>>>>
+> >>>>>> Can anybody help? Is this expected?
+> >>>>>
+> >>>>> Can you check why peer_has_ufo failed (in hw/net/virtio-net.c)?
+> >>>>
+> >>>> May be - how can i archieve this? Patching the code is not a problem if
+> >>>> you can give me a hint.
+> >>>>
+> >>>>> Also, did this ioctl fail when the tap device was set up on the 4.12 destination?
+> >>>>> int tap_probe_has_ufo(int fd)
+> >>>>> {
+> >>>>>     unsigned offload;
+> >>>>>
+> >>>>>     offload = TUN_F_CSUM | TUN_F_UFO;
+> >>>>>
+> >>>>>     if (ioctl(fd, TUNSETOFFLOAD, offload) < 0)
+> >>>>>         return 0;
+> >>>>>
+> >>>>>     return 1;
+> >>>>> }
+> >>>>
+> >>>> Should there be any kernel output or how can i detect / check it?
+> >>>
+> >>> For both, the simplest answer is probably just using printf.
+> >>
+> >> arg i missed an important part. The kernel is an opensuse SLE15 one.
+> >>
+> >> I've seen it contains the following patchset:
+> >> https://www.spinics.net/lists/netdev/msg443821.html
+> >>
+> >> Greets,
+> >> Stefan
+> >>
+> 
+> 
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
