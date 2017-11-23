@@ -1,27 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56322)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59703)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1eHrqQ-0007MZ-Jz
-	for qemu-devel@nongnu.org; Thu, 23 Nov 2017 08:47:17 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1eHrtJ-000186-AE
+	for qemu-devel@nongnu.org; Thu, 23 Nov 2017 08:50:10 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1eHrqP-0002rr-Hm
-	for qemu-devel@nongnu.org; Thu, 23 Nov 2017 08:47:10 -0500
-Received: from mail-ot0-x241.google.com ([2607:f8b0:4003:c0f::241]:39374)
+	(envelope-from <peter.maydell@linaro.org>) id 1eHrtI-0007BK-Gx
+	for qemu-devel@nongnu.org; Thu, 23 Nov 2017 08:50:09 -0500
+Received: from mail-ot0-x244.google.com ([2607:f8b0:4003:c0f::244]:37404)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1eHrqP-0002rJ-Bl
-	for qemu-devel@nongnu.org; Thu, 23 Nov 2017 08:47:09 -0500
-Received: by mail-ot0-x241.google.com with SMTP id v15so16359354ote.6
-	for <qemu-devel@nongnu.org>; Thu, 23 Nov 2017 05:47:09 -0800 (PST)
+	id 1eHrtI-0007AL-Cg
+	for qemu-devel@nongnu.org; Thu, 23 Nov 2017 08:50:08 -0500
+Received: by mail-ot0-x244.google.com with SMTP id s4so16368255ote.4
+	for <qemu-devel@nongnu.org>; Thu, 23 Nov 2017 05:50:08 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <20171113173120.3686-1-michael.nawrocki@gtri.gatech.edu>
-References: <20171113161446.2862-1-michael.nawrocki@gtri.gatech.edu>
-	<20171113173120.3686-1-michael.nawrocki@gtri.gatech.edu>
+In-Reply-To: <20171122044814.3001-1-david@gibson.dropbear.id.au>
+References: <20171122044814.3001-1-david@gibson.dropbear.id.au>
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Thu, 23 Nov 2017 13:46:48 +0000
-Message-ID: <CAFEAcA8fA3VMCdVwZ84vRUVvBt0RbYiKZb2cxjyV9S3QrCmD6w@mail.gmail.com>
+Date: Thu, 23 Nov 2017 13:49:47 +0000
+Message-ID: <CAFEAcA8eGWknRWXdpyV3tQgZAd+-5W11RjOWRKh_N50L7St1sw@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH v3 3/3] Add partial flash interleaving to
- AMD CFI devices
+Subject: Re: [Qemu-devel] [PULL 0/3] ppc-for-2.11 queue 20171122
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,74 +28,43 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Mike Nawrocki <michael.nawrocki@gtri.gatech.edu>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, Qemu-block <qemu-block@nongnu.org>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
+To: David Gibson <david@gibson.dropbear.id.au>
+Cc: Alexander Graf <agraf@suse.de>, Greg Kurz <groug@kaod.org>, Laurent Vivier <lvivier@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>, "qemu-ppc@nongnu.org" <qemu-ppc@nongnu.org>
 
-On 13 November 2017 at 17:31, Mike Nawrocki
-<michael.nawrocki@gtri.gatech.edu> wrote:
-> This mirrors the interleaving support already in place in
-> pflash_cfi01.c, using the max_device_width and device_width properties.
+On 22 November 2017 at 04:48, David Gibson <david@gibson.dropbear.id.au> wrote:
+> The following changes since commit a15d835f00dce270fd3194e83d9910f4b5b44ac0:
 >
-> Signed-off-by: Mike Nawrocki <michael.nawrocki@gtri.gatech.edu>
-> ---
->  hw/block/pflash_cfi02.c | 244 +++++++++++++++++++++++++++++++++++++++++-------
->  1 file changed, 209 insertions(+), 35 deletions(-)
+>   Update version for v2.11.0-rc2 release (2017-11-21 17:50:36 +0000)
+>
+> are available in the Git repository at:
+>
+>   git://github.com/dgibson/qemu.git tags/ppc-for-2.11-20171122
+>
+> for you to fetch changes up to 6dd836f5d32b989e18c6dda655a26f4d73a52f6a:
+>
+>   ppc: fix VTB migration (2017-11-22 15:28:37 +1100)
+>
+> ----------------------------------------------------------------
+> ppc patch queue 2017-11-22
+>
+> Several more fixes to merge for qemu-2.11.
+>
+> ----------------------------------------------------------------
+> David Gibson (1):
+>       spapr: Implement bug in spapr-vty device to be compatible with PowerVM
+>
+> Laurent Vivier (1):
+>       ppc: fix VTB migration
+>
+> Thomas Huth (1):
+>       hw/ppc/spapr: Fix virtio-scsi bootindex handling for LUNs >= 256
+>
+>  hw/char/spapr_vty.c         | 18 ++++++++++++++++++
+>  hw/ppc/spapr.c              |  4 ++++
+>  target/ppc/translate_init.c |  4 ++--
+>  3 files changed, 24 insertions(+), 2 deletions(-)
 
-Thanks for this patch. There is some code duplication from cfi01.c,
-but I think it's ok not to worry about trying to share code.
 
->      case 0xA0:
->      case 0x10:
->      case 0x30:
->          /* Status register read */
->          ret = pfl->status;
-> -        DPRINTF("%s: status %x\n", __func__, ret);
-> +        for (i = pfl->device_width;
-> +             i < pfl->bank_width; i += pfl->device_width) {
-> +            ret = deposit64(ret, 8 * i, 8 * pfl->device_width, ret);
-> +        }
+Applied, thanks.
 
-This will loop forever in the legacy "device_width == 0" case,
-won't it?
-
-> +        DPRINTF("%s: status %" PRIx64 "\n", __func__, ret);
->          /* Toggle bit 6 */
->          pfl->status ^= 0x40;
->          break;
-> @@ -745,7 +901,25 @@ static Property pflash_cfi02_properties[] = {
->      DEFINE_PROP_DRIVE("drive", struct pflash_t, blk),
->      DEFINE_PROP_UINT32("num-blocks", struct pflash_t, nb_blocs, 0),
->      DEFINE_PROP_UINT32("sector-length", struct pflash_t, sector_len, 0),
-> -    DEFINE_PROP_UINT8("width", struct pflash_t, width, 0),
-> +    /* width here is the overall width of this QEMU device in bytes.
-> +     * The QEMU device may be emulating a number of flash devices
-> +     * wired up in parallel; the width of each individual flash
-> +     * device should be specified via device-width. If the individual
-> +     * devices have a maximum width which is greater than the width
-> +     * they are being used for, this maximum width should be set via
-> +     * max-device-width (which otherwise defaults to device-width).
-> +     * So for instance a 32-bit wide QEMU flash device made from four
-> +     * 16-bit flash devices used in 8-bit wide mode would be configured
-> +     * with width = 4, device-width = 1, max-device-width = 2.
-> +     *
-> +     * If device-width is not specified we default to backwards
-> +     * compatible behaviour which is a bad emulation of two
-> +     * 16 bit devices making up a 32 bit wide QEMU device. This
-> +     * is deprecated for new uses of this device.
-
-Is this correct for pflash_cfi02 ? In cfi01 you can see that our
-legacy behaviour does things like jamming two ID values
-together into one response because it's doing this "bad emulation
-of two 16 bit devices", but I don't see similar code in cfi02,
-so maybe the legacy default is something different ?
-
-In particular, if the legacy default is actually "just looks like
-a single device" and the old code's behaviour is identical to
-the new code with device_width 1, we may be able to simply set
-the default width to 1 and avoid the nasty back-compat hacks.
-(I had to put the hacks in for cfi01 because they really are
-different behaviour, and we didn't want to potentially break
-the use in the pc platform.)
-
-thanks
 -- PMM
