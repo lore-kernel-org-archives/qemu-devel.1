@@ -1,41 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56787)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60465)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pasic@linux.vnet.ibm.com>) id 1eHpph-0000cl-Us
-	for qemu-devel@nongnu.org; Thu, 23 Nov 2017 06:38:24 -0500
+	(envelope-from <thuth@redhat.com>) id 1eHpsF-0001WF-2E
+	for qemu-devel@nongnu.org; Thu, 23 Nov 2017 06:41:00 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pasic@linux.vnet.ibm.com>) id 1eHppb-0008OX-TV
-	for qemu-devel@nongnu.org; Thu, 23 Nov 2017 06:38:17 -0500
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:40920)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pasic@linux.vnet.ibm.com>)
-	id 1eHppb-0008Nc-Ka
-	for qemu-devel@nongnu.org; Thu, 23 Nov 2017 06:38:11 -0500
-Received: from pps.filterd (m0098404.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
-	vANBbxtq098845
-	for <qemu-devel@nongnu.org>; Thu, 23 Nov 2017 06:38:09 -0500
-Received: from e06smtp10.uk.ibm.com (e06smtp10.uk.ibm.com [195.75.94.106])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2educ82grb-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Thu, 23 Nov 2017 06:38:08 -0500
-Received: from localhost
-	by e06smtp10.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
-	Only! Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <pasic@linux.vnet.ibm.com>;
-	Thu, 23 Nov 2017 11:38:06 -0000
-References: <20171108165422.46267-1-pasic@linux.vnet.ibm.com>
-	<20171108165422.46267-2-pasic@linux.vnet.ibm.com>
-	<20171123082003.GJ5859@bjsdjshi@linux.vnet.ibm.com>
-From: Halil Pasic <pasic@linux.vnet.ibm.com>
-Date: Thu, 23 Nov 2017 12:38:03 +0100
+	(envelope-from <thuth@redhat.com>) id 1eHpsA-0004cU-Q1
+	for qemu-devel@nongnu.org; Thu, 23 Nov 2017 06:40:55 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:53982)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1eHpsA-0004bC-HH
+	for qemu-devel@nongnu.org; Thu, 23 Nov 2017 06:40:50 -0500
+References: <20171110152017.24324-1-clg@kaod.org>
+	<20171110152017.24324-2-clg@kaod.org>
+	<715a7bd1-7aa5-fa64-a9b8-76782ee20576@redhat.com>
+	<20171123110345.03541b50.cohuck@redhat.com>
+	<CAFEAcA83-oqifsZboJmvDVYhhr4=QOEEGF1TZba-jCewpUFtyg@mail.gmail.com>
+	<1dff6d6c-be83-f6e1-2b7e-82d98bdb8a63@redhat.com>
+	<20171123111105.GG8166@redhat.com>
+	<a6581131-852d-f67f-6169-8721134ea763@redhat.com>
+	<20171123113324.GJ8166@redhat.com>
+From: Thomas Huth <thuth@redhat.com>
+Message-ID: <90c8b23c-b0cd-8de3-c0b8-04ee3452112c@redhat.com>
+Date: Thu, 23 Nov 2017 12:40:45 +0100
 MIME-Version: 1.0
-In-Reply-To: <20171123082003.GJ5859@bjsdjshi@linux.vnet.ibm.com>
+In-Reply-To: <20171123113324.GJ8166@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Message-Id: <af73b3dc-0e9b-07d1-138f-d9b9774d7f90@linux.vnet.ibm.com>
-Subject: Re: [Qemu-devel] [RFC PATCH v2 1/3] s390x/ccs: add ccw-testdev
- emulated device
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] QEMU 3.0 ?
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -44,70 +35,65 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Cornelia Huck <cohuck@redhat.com>, Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>, Thomas Huth <thuth@redhat.com>, Pierre Morel <pmorel@linux.vnet.ibm.com>, qemu-devel@nongnu.org, qemu-s390x@nongnu.org
+To: "Daniel P. Berrange" <berrange@redhat.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, Markus Armbruster <armbru@redhat.com>, Cornelia Huck <cohuck@redhat.com>, Greg Kurz <groug@kaod.org>, QEMU Developers <qemu-devel@nongnu.org>, =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>, Paolo Bonzini <pbonzini@redhat.com>, David Gibson <david@gibson.dropbear.id.au>
 
-
-
-On 11/23/2017 09:20 AM, Dong Jia Shi wrote:
-> * Halil Pasic <pasic@linux.vnet.ibm.com> [2017-11-08 17:54:20 +0100]:
+On 23.11.2017 12:33, Daniel P. Berrange wrote:
+> On Thu, Nov 23, 2017 at 12:24:24PM +0100, Thomas Huth wrote:
+>> On 23.11.2017 12:11, Daniel P. Berrange wrote:
+>>> On Thu, Nov 23, 2017 at 11:57:34AM +0100, Thomas Huth wrote:
+>>>> On 23.11.2017 11:17, Peter Maydell wrote:
+>>>>> On 23 November 2017 at 10:03, Cornelia Huck <cohuck@redhat.com> wrote:
+>>>>>> On Mon, 13 Nov 2017 08:14:28 +0100
+>>>>>> Thomas Huth <thuth@redhat.com> wrote:
+>>>>>>
+>>>>>>> By the way, before everybody now introduces "2.12" machine types ... is
+>>>>>>> there already a consensus that the next version will be "2.12" ?
+>>>>>>>
+>>>>>>> A couple of months ago, we discussed that we could maybe do a 3.0 after
+>>>>>>> 2.11, e.g. here:
+>>>>>>>
+>>>>>>>  https://lists.gnu.org/archive/html/qemu-devel/2017-03/msg05056.html
+>>>>>>>
+>>>>>>> I'd still like to see that happen... Peter, any thoughts on this?
+>>>>>>
+>>>>>> So, as I just thought about preparing the new machine for s390x as
+>>>>>> well: Did we reach any consensus about what the next qemu version will
+>>>>>> be called?
+>>>>>
+>>>>> I haven't seen any sufficiently solid plan to make me want to
+>>>>> pick anything except "2.12".
+>>>>
+>>>> I still don't think that we need a big plan for this... The change from
+>>>> 1.7 to 2.0 was also rather arbitrary, wasn't it?
+>>>>
+>>>> Anyway, I've now started a Wiki page to collect ideas:
+>>>>
+>>>>  https://wiki.qemu.org/Features/Version3.0
+>>>>
+>>>> Maybe we can jump to version 3.0 if there are enough doable items on the
+>>>> list that we can all agree upon.
+>>>
+>>> From the mgmt app / libvirt POV, I'm against the idea of doing such an
+>>> API incompatible release associated with major versions. The whole point
+>>> of the documented deprecation timeframe, was that we can incrementally
+>>> remove legacy interfaces without having a big bang break the whole
+>>> world.
+>>
+>> Yes, I agree ... that's why I tried to split the list into a "doable"
+>> part (which hopefully does not mean any breakage for the upper stack),
+>> and a "controversial" part (which we could use for collecting ideas, but
+>> it is likely not feasible to do it any time soon). Sorry for not stating
+>> this more clearly.
 > 
-> Hi Halil,
-> 
->> Add a fake device meant for testing the correctness of our css emulation.
->>
->> What we currently have is writing a Fibonacci sequence of uint32_t to the
->> device via ccw write. The write is going to fail if it ain't a Fibonacci
->> and indicate a device exception in scsw together with the proper residual
->> count. With this we can do basic verification of data integrity.
->>
->> Of course lot's of invalid inputs (besides basic data processing) can be
->> tested with that as well.
->>
->> We also have a no-op mode where the device just tells all-good! This
->> could be useful for fuzzing.
->>
->> Usage:
->> 1) fire up a qemu with something like -device ccw-testdev,devno=fe.0.0001
->>    on the command line
->> 2) exercise the device from the guest
->>
->> Signed-off-by: Halil Pasic <pasic@linux.vnet.ibm.com>
->> ---
->>
->> Introduction
->> ------------
->>
->> While discussing v1 we (more or less) decided a test device for ccw is a
->> good idea. This is an RFC because there are some unresolved technical
->> questions I would like to discuss.
->>
-> Regarding to test coverage, this mainly covers the cds_read. 
+> Your "doable" list includes removing all deprecated features, which
+> basically just nullifies the deprecation process, which declared
+> that they would live for 2 releases with a warning and then be
+> deleted. That will break the upper stack.
 
-This series has only a linux module with some texts and is more
-of a PoC than the way it should be done. I think I wrote somewhere
-about this.
+Sorry again, that's not what I meant here. I meant to respect the 2
+release cycle warning period - and used "accordingly" here to express
+that. Looks like this was not very clear :-( I've rephrased the sentence
+now, I hope it is now not ambiguous any more.
 
-The ccw-testdev being mainly about cds_read is not correct. See
-the TIC must have zero count test in patch 3. The cds things only
-become relevant if data matters for the test. The ccw-testdev is
-about making it possible to check how does the channel subsystem respond
-to certain stimuli without actually having to care about a real device.
-
-> What we
-> want would be surely more than this. So to extend the coverage, we need
-> to design more modes (aka, test cases), right?
-
-Modes and testcases are not the same. See patches 2 and 3. Modes are
-mostly for being extensible in a sense of expect the unexpected. I don't
-have too may ideas for modes (one more I can think of could be some tee
-like proxy for doing whatever kind of assertions/analysis on what some
-driver does).  In the previous round we said we want this extensible, and
-it make sense.
-
-
-> 
-> If nobody disagrees with the basic idea of this series, I can start a
-> review then. ;)
-> 
-> [...]
-> 
+ Thomas
