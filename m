@@ -1,14 +1,18 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55400)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41546)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1eHqaM-0005Fr-0E
-	for qemu-devel@nongnu.org; Thu, 23 Nov 2017 07:26:30 -0500
+	(envelope-from <cohuck@redhat.com>) id 1eHqnC-000822-Iq
+	for qemu-devel@nongnu.org; Thu, 23 Nov 2017 07:40:01 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1eHqaI-0004Wn-Rc
-	for qemu-devel@nongnu.org; Thu, 23 Nov 2017 07:26:30 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:33640)
+	(envelope-from <cohuck@redhat.com>) id 1eHqmz-0000wL-Ao
+	for qemu-devel@nongnu.org; Thu, 23 Nov 2017 07:39:46 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:41242)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1eHqaI-0004Vv-Hw
-	for qemu-devel@nongnu.org; Thu, 23 Nov 2017 07:26:26 -0500
+	(Exim 4.71) (envelope-from <cohuck@redhat.com>) id 1eHqmy-0000sd-Gk
+	for qemu-devel@nongnu.org; Thu, 23 Nov 2017 07:39:32 -0500
+Date: Thu, 23 Nov 2017 13:39:24 +0100
+From: Cornelia Huck <cohuck@redhat.com>
+Message-ID: <20171123133924.60e9f616.cohuck@redhat.com>
+In-Reply-To: <b3b9837e-c6b0-d718-faaf-1ef198256634@redhat.com>
 References: <20171110152017.24324-1-clg@kaod.org>
 	<20171110152017.24324-2-clg@kaod.org>
 	<715a7bd1-7aa5-fa64-a9b8-76782ee20576@redhat.com>
@@ -19,14 +23,10 @@ References: <20171110152017.24324-1-clg@kaod.org>
 	<8cd1c0b3-8386-d41e-ccfb-1a2073cdf4fb@redhat.com>
 	<16011ac4-77c4-af75-5754-5f9586d6d629@redhat.com>
 	<20171123130908.6ab004d3.cohuck@redhat.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <b3b9837e-c6b0-d718-faaf-1ef198256634@redhat.com>
-Date: Thu, 23 Nov 2017 13:26:14 +0100
+	<b3b9837e-c6b0-d718-faaf-1ef198256634@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20171123130908.6ab004d3.cohuck@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 Subject: Re: [Qemu-devel] QEMU 3.0 ?
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
@@ -36,66 +36,69 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Cornelia Huck <cohuck@redhat.com>
-Cc: Thomas Huth <thuth@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>, QEMU Developers <qemu-devel@nongnu.org>, David Gibson <david@gibson.dropbear.id.au>, Greg Kurz <groug@kaod.org>, Markus Armbruster <armbru@redhat.com>, "Daniel P. Berrange" <berrange@redhat.com>, Eric Blake <eblake@redhat.com>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, sergio.g.delreal@gmail.com, alex@alex.org.uk
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: Thomas Huth <thuth@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, =?UTF-8?B?Q8OpZHJpYw==?= Le Goater <clg@kaod.org>, QEMU Developers <qemu-devel@nongnu.org>, David Gibson <david@gibson.dropbear.id.au>, Greg Kurz <groug@kaod.org>, Markus Armbruster <armbru@redhat.com>, "Daniel P. Berrange" <berrange@redhat.com>, Eric Blake <eblake@redhat.com>, Philippe =?UTF-8?B?TWF0aGlldS1EYXVkw6k=?= <f4bug@amsat.org>, sergio.g.delreal@gmail.com, alex@alex.org.uk
 
-On 23/11/2017 13:09, Cornelia Huck wrote:
-> On Thu, 23 Nov 2017 13:05:33 +0100
-> Paolo Bonzini <pbonzini@redhat.com> wrote:
->=20
->> On 23/11/2017 12:57, Thomas Huth wrote:
->>> On 23.11.2017 12:17, Paolo Bonzini wrote: =20
->>>> On 23/11/2017 11:57, Thomas Huth wrote: =20
->>> [...] =20
->>>>> I've put "--accel kvm:hax:tcg" also on the doable list since I don'=
-t
->>>>> remember any objections to that idea so far -- feel free to move it=
- to
->>>>> the controversial list instead if you think it needs more discussio=
-n. =20
->>>>
->>>> "hax" is very far from feature parity with TCG, it doesn't even supp=
-ort
->>>> CPUID (-cpu).  "-accel kvm:hvf:tcg" could be a possibility, but only=
- if
->>>> we have resources to test it.  As far as I know the only active x86
->>>> developer who owns a Mac is Igor? =20
->>>
->>> hvf hasn't been merged yet ... do you expect it to hit master after 2=
-.11
->>> has been released? =20
->>
->> Yes, more or less.
->>
->>> Otherwise, we should maybe rather simply go with
->>> "--accel kvm:tcg"? =20
->>
->> Yes, HVF can come later.
->=20
-> This switch sounds like something we can easily do for the next
-> release; I'd hope that anyone explicitly requiring tcg already
-> specifies it.
+On Thu, 23 Nov 2017 13:26:14 +0100
+Paolo Bonzini <pbonzini@redhat.com> wrote:
 
-I seriously doubt that.  Most people are probably using a
-distro-provided qemu-kvm script for KVM, and qemu-system-x86_64 for TCG.
- In fact, that is probably the best of both worlds for anybody who
-doesn't compile its own QEMU; and since KVM is Linux-only, there are
-very few non-developers in the intersection of "compile its own QEMU"
-and "use KVM".
+> On 23/11/2017 13:09, Cornelia Huck wrote:
+> > On Thu, 23 Nov 2017 13:05:33 +0100
+> > Paolo Bonzini <pbonzini@redhat.com> wrote:
+> >   
+> >> On 23/11/2017 12:57, Thomas Huth wrote:  
+> >>> On 23.11.2017 12:17, Paolo Bonzini wrote:    
+> >>>> On 23/11/2017 11:57, Thomas Huth wrote:    
+> >>> [...]    
+> >>>>> I've put "--accel kvm:hax:tcg" also on the doable list since I don't
+> >>>>> remember any objections to that idea so far -- feel free to move it to
+> >>>>> the controversial list instead if you think it needs more discussion.    
+> >>>>
+> >>>> "hax" is very far from feature parity with TCG, it doesn't even support
+> >>>> CPUID (-cpu).  "-accel kvm:hvf:tcg" could be a possibility, but only if
+> >>>> we have resources to test it.  As far as I know the only active x86
+> >>>> developer who owns a Mac is Igor?    
+> >>>
+> >>> hvf hasn't been merged yet ... do you expect it to hit master after 2.11
+> >>> has been released?    
+> >>
+> >> Yes, more or less.
+> >>  
+> >>> Otherwise, we should maybe rather simply go with
+> >>> "--accel kvm:tcg"?    
+> >>
+> >> Yes, HVF can come later.  
+> > 
+> > This switch sounds like something we can easily do for the next
+> > release; I'd hope that anyone explicitly requiring tcg already
+> > specifies it.  
+> 
+> I seriously doubt that.  Most people are probably using a
+> distro-provided qemu-kvm script for KVM, and qemu-system-x86_64 for TCG.
+>  In fact, that is probably the best of both worlds for anybody who
+> doesn't compile its own QEMU; and since KVM is Linux-only, there are
+> very few non-developers in the intersection of "compile its own QEMU"
+> and "use KVM".
 
-And in fact that is the main reason why have never bothered switching
-the default... only RHEL does it, because it ships the QEMU binary as
-qemu-kvm rather than qemu-system-xxx plus a wrapper script.
+I'm wondering how many people want to run e.g. x86_64-on-x86_64
+_without_ using an available kvm (and I expect those people to
+explicitly specify tcg).
 
-Perhaps we could:
+> 
+> And in fact that is the main reason why have never bothered switching
+> the default... only RHEL does it, because it ships the QEMU binary as
+> qemu-kvm rather than qemu-system-xxx plus a wrapper script.
+> 
+> Perhaps we could:
+> 
+> 1) look for "qemu-{kvm,hvf,hax}" in argv[0] and change the "-accel" default?
+> 
+> 2) change "make install" to install one or more of qemu-kvm/hvf/hax
+> based on target architecture and OS.
+> 
+> Then distros can do away with the script and Windows/Mac users can learn
+> to use qemu-hvf and qemu-hax.
 
-1) look for "qemu-{kvm,hvf,hax}" in argv[0] and change the "-accel" defau=
-lt?
-
-2) change "make install" to install one or more of qemu-kvm/hvf/hax
-based on target architecture and OS.
-
-Then distros can do away with the script and Windows/Mac users can learn
-to use qemu-hvf and qemu-hax.
-
-Paolo
+I'm not sure I like that. For me, qemu-kvm comes with the connotation
+of "there used to be a fork of qemu for kvm usage, and we stuck with
+the name because it is likely scattered through scripts".
