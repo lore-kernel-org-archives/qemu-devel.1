@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38312)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38534)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1eHrbQ-000148-CH
-	for qemu-devel@nongnu.org; Thu, 23 Nov 2017 08:31:43 -0500
+	(envelope-from <clg@kaod.org>) id 1eHrbY-0001Qw-6T
+	for qemu-devel@nongnu.org; Thu, 23 Nov 2017 08:31:50 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1eHrbG-0000sD-Ls
-	for qemu-devel@nongnu.org; Thu, 23 Nov 2017 08:31:40 -0500
-Received: from 11.mo3.mail-out.ovh.net ([87.98.184.158]:50733)
+	(envelope-from <clg@kaod.org>) id 1eHrbR-0001Ha-Ku
+	for qemu-devel@nongnu.org; Thu, 23 Nov 2017 08:31:48 -0500
+Received: from 19.mo3.mail-out.ovh.net ([178.32.98.231]:55585)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1eHrbG-0000oO-DK
-	for qemu-devel@nongnu.org; Thu, 23 Nov 2017 08:31:30 -0500
+	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1eHrbQ-0001D0-Q4
+	for qemu-devel@nongnu.org; Thu, 23 Nov 2017 08:31:41 -0500
 Received: from player797.ha.ovh.net (gw6.ovh.net [213.251.189.206])
-	by mo3.mail-out.ovh.net (Postfix) with ESMTP id 249B4175AB0
-	for <qemu-devel@nongnu.org>; Thu, 23 Nov 2017 14:31:29 +0100 (CET)
+	by mo3.mail-out.ovh.net (Postfix) with ESMTP id 74C32175A1C
+	for <qemu-devel@nongnu.org>; Thu, 23 Nov 2017 14:31:39 +0100 (CET)
 From: =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>
-Date: Thu, 23 Nov 2017 14:29:36 +0100
-Message-Id: <20171123132955.1261-7-clg@kaod.org>
+Date: Thu, 23 Nov 2017 14:29:38 +0100
+Message-Id: <20171123132955.1261-9-clg@kaod.org>
 In-Reply-To: <20171123132955.1261-1-clg@kaod.org>
 References: <20171123132955.1261-1-clg@kaod.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH 06/25] spapr: introduce a spapr_irq_get_qirq()
- helper
+Subject: [Qemu-devel] [PATCH 08/25] spapr: introduce a skeleton for the XIVE
+ interrupt controller
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,178 +33,338 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, David Gibson <david@gibson.dropbear.id.au>, Benjamin Herrenschmidt <benh@kernel.crashing.org>
 Cc: =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>
 
-xics_get_qirq() is only used by the sPAPR machine. Let's move it there
-and change its name to reflect its scope. It will be useful for XIVE
-support which will use its own set of qirqs.
+The XIVE interrupt controller uses a set of tables to redirect exception
+from event sources to CPU threads. The Interrupt Virtualization Entry (IV=
+E)
+table, also known as Event Assignment Structure (EAS), is one them.
+
+The XIVE model is designed to make use of the full range of the IRQ
+number space and does not use an offset like the XICS mode does.
+Hence, the IVE table is directly indexed by the IRQ number.
+
+The IVE stores Event Queue data associated with a source. The lookups
+are performed when the source is configured or when an event is
+triggered.
 
 Signed-off-by: C=C3=A9dric Le Goater <clg@kaod.org>
 ---
- hw/intc/xics.c              | 12 ------------
- hw/ppc/spapr.c              | 11 +++++++++++
- hw/ppc/spapr_events.c       | 12 +++++-------
- hw/ppc/spapr_pci.c          |  2 +-
- include/hw/pci-host/spapr.h |  2 +-
- include/hw/ppc/spapr.h      |  1 +
- include/hw/ppc/spapr_vio.h  |  2 +-
- include/hw/ppc/xics.h       |  1 -
- 8 files changed, 20 insertions(+), 23 deletions(-)
+ default-configs/ppc64-softmmu.mak |   1 +
+ hw/intc/Makefile.objs             |   1 +
+ hw/intc/spapr_xive.c              | 165 ++++++++++++++++++++++++++++++++=
+++++++
+ hw/intc/xive-internal.h           |  50 ++++++++++++
+ include/hw/ppc/spapr_xive.h       |  44 ++++++++++
+ 5 files changed, 261 insertions(+)
+ create mode 100644 hw/intc/spapr_xive.c
+ create mode 100644 hw/intc/xive-internal.h
+ create mode 100644 include/hw/ppc/spapr_xive.h
 
-diff --git a/hw/intc/xics.c b/hw/intc/xics.c
-index 0f2e7273bc8f..a78b4dbd033d 100644
---- a/hw/intc/xics.c
-+++ b/hw/intc/xics.c
-@@ -714,18 +714,6 @@ static const TypeInfo xics_fabric_info =3D {
- /*
-  * Exported functions
-  */
--qemu_irq xics_get_qirq(XICSFabric *xi, int irq)
--{
--    XICSFabricClass *xic =3D XICS_FABRIC_GET_CLASS(xi);
--    ICSState *ics =3D xic->ics_get(xi, irq);
--
--    if (ics) {
--        return ics->qirqs[irq - ics->offset];
--    }
--
--    return NULL;
--}
--
- ICPState *xics_icp_get(XICSFabric *xi, int server)
- {
-     XICSFabricClass *xic =3D XICS_FABRIC_GET_CLASS(xi);
-diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-index 79f38a9ff4e1..5d3325ca3c88 100644
---- a/hw/ppc/spapr.c
-+++ b/hw/ppc/spapr.c
-@@ -3689,6 +3689,17 @@ void spapr_irq_free(sPAPRMachineState *spapr, int =
-irq, int num)
-     }
- }
-=20
-+qemu_irq spapr_irq_get_qirq(sPAPRMachineState *spapr, int irq)
+diff --git a/default-configs/ppc64-softmmu.mak b/default-configs/ppc64-so=
+ftmmu.mak
+index d1b3a6dd50f8..4a7f6a0696de 100644
+--- a/default-configs/ppc64-softmmu.mak
++++ b/default-configs/ppc64-softmmu.mak
+@@ -56,6 +56,7 @@ CONFIG_SM501=3Dy
+ CONFIG_XICS=3D$(CONFIG_PSERIES)
+ CONFIG_XICS_SPAPR=3D$(CONFIG_PSERIES)
+ CONFIG_XICS_KVM=3D$(call land,$(CONFIG_PSERIES),$(CONFIG_KVM))
++CONFIG_XIVE_SPAPR=3D$(CONFIG_PSERIES)
+ # For PReP
+ CONFIG_SERIAL_ISA=3Dy
+ CONFIG_MC146818RTC=3Dy
+diff --git a/hw/intc/Makefile.objs b/hw/intc/Makefile.objs
+index ae358569a155..49e13e7aeeee 100644
+--- a/hw/intc/Makefile.objs
++++ b/hw/intc/Makefile.objs
+@@ -35,6 +35,7 @@ obj-$(CONFIG_SH4) +=3D sh_intc.o
+ obj-$(CONFIG_XICS) +=3D xics.o
+ obj-$(CONFIG_XICS_SPAPR) +=3D xics_spapr.o
+ obj-$(CONFIG_XICS_KVM) +=3D xics_kvm.o
++obj-$(CONFIG_XIVE_SPAPR) +=3D spapr_xive.o
+ obj-$(CONFIG_POWERNV) +=3D xics_pnv.o
+ obj-$(CONFIG_ALLWINNER_A10_PIC) +=3D allwinner-a10-pic.o
+ obj-$(CONFIG_S390_FLIC) +=3D s390_flic.o
+diff --git a/hw/intc/spapr_xive.c b/hw/intc/spapr_xive.c
+new file mode 100644
+index 000000000000..b2fc3007c85f
+--- /dev/null
++++ b/hw/intc/spapr_xive.c
+@@ -0,0 +1,165 @@
++/*
++ * QEMU PowerPC sPAPR XIVE model
++ *
++ * Copyright (c) 2017, IBM Corporation.
++ *
++ * This program is free software; you can redistribute it and/or modify
++ * it under the terms of the GNU General Public License, version 2, as
++ * published by the Free Software Foundation.
++ *
++ * This program is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ * GNU General Public License for more details.
++ *
++ * You should have received a copy of the GNU General Public License
++ * along with this program; if not, see <http://www.gnu.org/licenses/>.
++ */
++#include "qemu/osdep.h"
++#include "qemu/log.h"
++#include "qapi/error.h"
++#include "target/ppc/cpu.h"
++#include "sysemu/cpus.h"
++#include "sysemu/dma.h"
++#include "monitor/monitor.h"
++#include "hw/ppc/spapr_xive.h"
++
++#include "xive-internal.h"
++
++/*
++ * Main XIVE object
++ */
++
++void spapr_xive_pic_print_info(sPAPRXive *xive, Monitor *mon)
 +{
-+    ICSState *ics =3D spapr->ics;
++    int i;
 +
-+    if (ics_valid_irq(ics, irq)) {
-+        return ics->qirqs[irq - ics->offset];
++    for (i =3D 0; i < xive->nr_irqs; i++) {
++        XiveIVE *ive =3D &xive->ivt[i];
++
++        if (!(ive->w & IVE_VALID)) {
++            continue;
++        }
++
++        monitor_printf(mon, "  %4x %s %08x %08x\n", i,
++                       ive->w & IVE_MASKED ? "M" : " ",
++                       (int) GETFIELD(IVE_EQ_INDEX, ive->w),
++                       (int) GETFIELD(IVE_EQ_DATA, ive->w));
 +    }
-+
-+    return NULL;
 +}
 +
- static void spapr_pic_print_info(InterruptStatsProvider *obj,
-                                  Monitor *mon)
- {
-diff --git a/hw/ppc/spapr_events.c b/hw/ppc/spapr_events.c
-index cead596f3e7a..0427590e9cac 100644
---- a/hw/ppc/spapr_events.c
-+++ b/hw/ppc/spapr_events.c
-@@ -472,9 +472,8 @@ static void spapr_powerdown_req(Notifier *n, void *op=
-aque)
-=20
-     rtas_event_log_queue(spapr, entry);
-=20
--    qemu_irq_pulse(xics_get_qirq(XICS_FABRIC(spapr),
--                                 rtas_event_log_to_irq(spapr,
--                                                       RTAS_LOG_TYPE_EPO=
-W)));
-+    qemu_irq_pulse(spapr_irq_get_qirq(spapr,
-+                   rtas_event_log_to_irq(spapr, RTAS_LOG_TYPE_EPOW)));
- }
-=20
- static void spapr_hotplug_req_event(uint8_t hp_id, uint8_t hp_action,
-@@ -556,9 +555,8 @@ static void spapr_hotplug_req_event(uint8_t hp_id, ui=
-nt8_t hp_action,
-=20
-     rtas_event_log_queue(spapr, entry);
-=20
--    qemu_irq_pulse(xics_get_qirq(XICS_FABRIC(spapr),
--                                 rtas_event_log_to_irq(spapr,
--                                                       RTAS_LOG_TYPE_HOT=
-PLUG)));
-+    qemu_irq_pulse(spapr_irq_get_qirq(spapr,
-+                   rtas_event_log_to_irq(spapr, RTAS_LOG_TYPE_HOTPLUG)))=
-;
- }
-=20
- void spapr_hotplug_req_add_by_index(sPAPRDRConnector *drc)
-@@ -678,7 +676,7 @@ static void check_exception(PowerPCCPU *cpu, sPAPRMac=
-hineState *spapr,
-                 spapr_event_sources_get_source(spapr->event_sources, i);
-=20
-             g_assert(source->enabled);
--            qemu_irq_pulse(xics_get_qirq(XICS_FABRIC(spapr), source->irq=
-));
-+            qemu_irq_pulse(spapr_irq_get_qirq(spapr, source->irq));
-         }
-     }
-=20
-diff --git a/hw/ppc/spapr_pci.c b/hw/ppc/spapr_pci.c
-index e0ef77a480e5..a02faa12333e 100644
---- a/hw/ppc/spapr_pci.c
-+++ b/hw/ppc/spapr_pci.c
-@@ -723,7 +723,7 @@ static void spapr_msi_write(void *opaque, hwaddr addr=
-,
-=20
-     trace_spapr_pci_msi_write(addr, data, irq);
-=20
--    qemu_irq_pulse(xics_get_qirq(XICS_FABRIC(spapr), irq));
-+    qemu_irq_pulse(spapr_irq_get_qirq(spapr, irq));
- }
-=20
- static const MemoryRegionOps spapr_msi_ops =3D {
-diff --git a/include/hw/pci-host/spapr.h b/include/hw/pci-host/spapr.h
-index 38470b2f0e5c..3059fdd614e6 100644
---- a/include/hw/pci-host/spapr.h
-+++ b/include/hw/pci-host/spapr.h
-@@ -108,7 +108,7 @@ static inline qemu_irq spapr_phb_lsi_qirq(struct sPAP=
-RPHBState *phb, int pin)
- {
-     sPAPRMachineState *spapr =3D SPAPR_MACHINE(qdev_get_machine());
-=20
--    return xics_get_qirq(XICS_FABRIC(spapr), phb->lsi_table[pin].irq);
-+    return spapr_irq_get_qirq(spapr, phb->lsi_table[pin].irq);
- }
-=20
- PCIHostState *spapr_create_phb(sPAPRMachineState *spapr, int index);
-diff --git a/include/hw/ppc/spapr.h b/include/hw/ppc/spapr.h
-index 7a133f80411a..9a3885593c86 100644
---- a/include/hw/ppc/spapr.h
-+++ b/include/hw/ppc/spapr.h
-@@ -714,5 +714,6 @@ int spapr_irq_alloc(sPAPRMachineState *spapr, int irq=
-_hint, bool lsi,
- int spapr_irq_alloc_block(sPAPRMachineState *spapr, int num, bool lsi,
-                           bool align, Error **errp);
- void spapr_irq_free(sPAPRMachineState *spapr, int irq, int num);
-+qemu_irq spapr_irq_get_qirq(sPAPRMachineState *spapr, int irq);
-=20
- #endif /* HW_SPAPR_H */
-diff --git a/include/hw/ppc/spapr_vio.h b/include/hw/ppc/spapr_vio.h
-index 2e9685a5d900..404f1de2c046 100644
---- a/include/hw/ppc/spapr_vio.h
-+++ b/include/hw/ppc/spapr_vio.h
-@@ -87,7 +87,7 @@ static inline qemu_irq spapr_vio_qirq(VIOsPAPRDevice *d=
-ev)
- {
-     sPAPRMachineState *spapr =3D SPAPR_MACHINE(qdev_get_machine());
-=20
--    return xics_get_qirq(XICS_FABRIC(spapr), dev->irq);
-+    return spapr_irq_get_qirq(spapr, dev->irq);
- }
-=20
- static inline bool spapr_vio_dma_valid(VIOsPAPRDevice *dev, uint64_t tad=
-dr,
-diff --git a/include/hw/ppc/xics.h b/include/hw/ppc/xics.h
-index cea462bc7f3e..2f1f35294e6d 100644
---- a/include/hw/ppc/xics.h
-+++ b/include/hw/ppc/xics.h
-@@ -183,7 +183,6 @@ typedef struct XICSFabricClass {
-=20
- void spapr_dt_xics(int nr_servers, void *fdt, uint32_t phandle);
-=20
--qemu_irq xics_get_qirq(XICSFabric *xi, int irq);
- ICPState *xics_icp_get(XICSFabric *xi, int server);
-=20
- /* Internal XICS interfaces */
++void spapr_xive_reset(void *dev)
++{
++    sPAPRXive *xive =3D SPAPR_XIVE(dev);
++    int i;
++
++    /* Mask all valid IVEs in the IRQ number space. */
++    for (i =3D 0; i < xive->nr_irqs; i++) {
++        XiveIVE *ive =3D &xive->ivt[i];
++        if (ive->w & IVE_VALID) {
++            ive->w |=3D IVE_MASKED;
++        }
++    }
++}
++
++static void spapr_xive_realize(DeviceState *dev, Error **errp)
++{
++    sPAPRXive *xive =3D SPAPR_XIVE(dev);
++
++    if (!xive->nr_irqs) {
++        error_setg(errp, "Number of interrupt needs to be greater 0");
++        return;
++    }
++
++    /* Allocate the IVT (Interrupt Virtualization Table) */
++    xive->ivt =3D g_malloc0(xive->nr_irqs * sizeof(XiveIVE));
++
++    qemu_register_reset(spapr_xive_reset, dev);
++}
++
++static const VMStateDescription vmstate_spapr_xive_ive =3D {
++    .name =3D TYPE_SPAPR_XIVE "/ive",
++    .version_id =3D 1,
++    .minimum_version_id =3D 1,
++    .fields =3D (VMStateField []) {
++        VMSTATE_UINT64(w, XiveIVE),
++        VMSTATE_END_OF_LIST()
++    },
++};
++
++static bool vmstate_spapr_xive_needed(void *opaque)
++{
++    /* TODO check machine XIVE support */
++    return true;
++}
++
++static const VMStateDescription vmstate_spapr_xive =3D {
++    .name =3D TYPE_SPAPR_XIVE,
++    .version_id =3D 1,
++    .minimum_version_id =3D 1,
++    .needed =3D vmstate_spapr_xive_needed,
++    .fields =3D (VMStateField[]) {
++        VMSTATE_UINT32_EQUAL(nr_irqs, sPAPRXive, NULL),
++        VMSTATE_STRUCT_VARRAY_UINT32_ALLOC(ivt, sPAPRXive, nr_irqs, 1,
++                                           vmstate_spapr_xive_ive, XiveI=
+VE),
++        VMSTATE_END_OF_LIST()
++    },
++};
++
++static Property spapr_xive_properties[] =3D {
++    DEFINE_PROP_UINT32("nr-irqs", sPAPRXive, nr_irqs, 0),
++    DEFINE_PROP_END_OF_LIST(),
++};
++
++static void spapr_xive_class_init(ObjectClass *klass, void *data)
++{
++    DeviceClass *dc =3D DEVICE_CLASS(klass);
++
++    dc->realize =3D spapr_xive_realize;
++    dc->props =3D spapr_xive_properties;
++    dc->desc =3D "sPAPR XIVE interrupt controller";
++    dc->vmsd =3D &vmstate_spapr_xive;
++}
++
++static const TypeInfo spapr_xive_info =3D {
++    .name =3D TYPE_SPAPR_XIVE,
++    .parent =3D TYPE_SYS_BUS_DEVICE,
++    .instance_size =3D sizeof(sPAPRXive),
++    .class_init =3D spapr_xive_class_init,
++};
++
++static void spapr_xive_register_types(void)
++{
++    type_register_static(&spapr_xive_info);
++}
++
++type_init(spapr_xive_register_types)
++
++XiveIVE *spapr_xive_get_ive(sPAPRXive *xive, uint32_t lisn)
++{
++    return lisn < xive->nr_irqs ? &xive->ivt[lisn] : NULL;
++}
++
++bool spapr_xive_irq_set(sPAPRXive *xive, uint32_t lisn)
++{
++    XiveIVE *ive =3D spapr_xive_get_ive(xive, lisn);
++
++    if (!ive) {
++        return false;
++    }
++
++    ive->w |=3D IVE_VALID;
++    return true;
++}
++
++bool spapr_xive_irq_unset(sPAPRXive *xive, uint32_t lisn)
++{
++    XiveIVE *ive =3D spapr_xive_get_ive(xive, lisn);
++
++    if (!ive) {
++        return false;
++    }
++
++    ive->w &=3D ~IVE_VALID;
++    return true;
++}
+diff --git a/hw/intc/xive-internal.h b/hw/intc/xive-internal.h
+new file mode 100644
+index 000000000000..bea88d82992c
+--- /dev/null
++++ b/hw/intc/xive-internal.h
+@@ -0,0 +1,50 @@
++/*
++ * QEMU PowerPC XIVE model
++ *
++ * Copyright 2016,2017 IBM Corporation.
++ *
++ * This program is free software; you can redistribute it and/or
++ * modify it under the terms of the GNU General Public License
++ * as published by the Free Software Foundation; either version
++ * 2 of the License, or (at your option) any later version.
++ */
++#ifndef _INTC_XIVE_INTERNAL_H
++#define _INTC_XIVE_INTERNAL_H
++
++/* Utilities to manipulate these (originaly from OPAL) */
++#define MASK_TO_LSH(m)          (__builtin_ffsl(m) - 1)
++#define GETFIELD(m, v)          (((v) & (m)) >> MASK_TO_LSH(m))
++#define SETFIELD(m, v, val)                             \
++        (((v) & ~(m)) | ((((typeof(v))(val)) << MASK_TO_LSH(m)) & (m)))
++
++#define PPC_BIT(bit)            (0x8000000000000000UL >> (bit))
++#define PPC_BIT32(bit)          (0x80000000UL >> (bit))
++#define PPC_BIT8(bit)           (0x80UL >> (bit))
++#define PPC_BITMASK(bs, be)     ((PPC_BIT(bs) - PPC_BIT(be)) | PPC_BIT(b=
+s))
++#define PPC_BITMASK32(bs, be)   ((PPC_BIT32(bs) - PPC_BIT32(be)) | \
++                                 PPC_BIT32(bs))
++
++/* IVE/EAS
++ *
++ * One per interrupt source. Targets that interrupt to a given EQ
++ * and provides the corresponding logical interrupt number (EQ data)
++ *
++ * We also map this structure to the escalation descriptor inside
++ * an EQ, though in that case the valid and masked bits are not used.
++ */
++typedef struct XiveIVE {
++        /* Use a single 64-bit definition to make it easier to
++         * perform atomic updates
++         */
++        uint64_t        w;
++#define IVE_VALID       PPC_BIT(0)
++#define IVE_EQ_BLOCK    PPC_BITMASK(4, 7)        /* Destination EQ block=
+# */
++#define IVE_EQ_INDEX    PPC_BITMASK(8, 31)       /* Destination EQ index=
+ */
++#define IVE_MASKED      PPC_BIT(32)              /* Masked */
++#define IVE_EQ_DATA     PPC_BITMASK(33, 63)      /* Data written to the =
+EQ */
++} XiveIVE;
++
++void spapr_xive_reset(void *dev);
++XiveIVE *spapr_xive_get_ive(sPAPRXive *xive, uint32_t lisn);
++
++#endif /* _INTC_XIVE_INTERNAL_H */
+diff --git a/include/hw/ppc/spapr_xive.h b/include/hw/ppc/spapr_xive.h
+new file mode 100644
+index 000000000000..795b3f4ded7c
+--- /dev/null
++++ b/include/hw/ppc/spapr_xive.h
+@@ -0,0 +1,44 @@
++/*
++ * QEMU PowerPC sPAPR XIVE model
++ *
++ * Copyright (c) 2017, IBM Corporation.
++ *
++ * This program is free software; you can redistribute it and/or modify
++ * it under the terms of the GNU General Public License, version 2, as
++ * published by the Free Software Foundation.
++ *
++ * This program is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ * GNU General Public License for more details.
++ *
++ * You should have received a copy of the GNU General Public License
++ * along with this program; if not, see <http://www.gnu.org/licenses/>.
++ */
++
++#ifndef PPC_SPAPR_XIVE_H
++#define PPC_SPAPR_XIVE_H
++
++#include <hw/sysbus.h>
++
++typedef struct sPAPRXive sPAPRXive;
++typedef struct XiveIVE XiveIVE;
++
++#define TYPE_SPAPR_XIVE "spapr-xive"
++#define SPAPR_XIVE(obj) OBJECT_CHECK(sPAPRXive, (obj), TYPE_SPAPR_XIVE)
++
++struct sPAPRXive {
++    SysBusDevice parent;
++
++    /* Properties */
++    uint32_t     nr_irqs;
++
++    /* XIVE internal tables */
++    XiveIVE      *ivt;
++};
++
++bool spapr_xive_irq_set(sPAPRXive *xive, uint32_t lisn);
++bool spapr_xive_irq_unset(sPAPRXive *xive, uint32_t lisn);
++void spapr_xive_pic_print_info(sPAPRXive *xive, Monitor *mon);
++
++#endif /* PPC_SPAPR_XIVE_H */
 --=20
 2.13.6
