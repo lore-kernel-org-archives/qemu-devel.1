@@ -1,28 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42885)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50265)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1eHpfA-0005Tz-14
-	for qemu-devel@nongnu.org; Thu, 23 Nov 2017 06:27:25 -0500
+	(envelope-from <berrange@redhat.com>) id 1eHpl8-0007WI-I0
+	for qemu-devel@nongnu.org; Thu, 23 Nov 2017 06:33:36 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1eHpf8-0003hV-TK
-	for qemu-devel@nongnu.org; Thu, 23 Nov 2017 06:27:24 -0500
-Received: from mail-ot0-x243.google.com ([2607:f8b0:4003:c0f::243]:45917)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1eHpf8-0003gb-Ov
-	for qemu-devel@nongnu.org; Thu, 23 Nov 2017 06:27:22 -0500
-Received: by mail-ot0-x243.google.com with SMTP id u10so16048116otc.12
-	for <qemu-devel@nongnu.org>; Thu, 23 Nov 2017 03:27:22 -0800 (PST)
+	(envelope-from <berrange@redhat.com>) id 1eHpl5-0002VR-9p
+	for qemu-devel@nongnu.org; Thu, 23 Nov 2017 06:33:34 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:57866)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1eHpl5-0002Ur-1L
+	for qemu-devel@nongnu.org; Thu, 23 Nov 2017 06:33:31 -0500
+Date: Thu, 23 Nov 2017 11:33:24 +0000
+From: "Daniel P. Berrange" <berrange@redhat.com>
+Message-ID: <20171123113324.GJ8166@redhat.com>
+Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
+References: <20171110152017.24324-1-clg@kaod.org>
+	<20171110152017.24324-2-clg@kaod.org>
+	<715a7bd1-7aa5-fa64-a9b8-76782ee20576@redhat.com>
+	<20171123110345.03541b50.cohuck@redhat.com>
+	<CAFEAcA83-oqifsZboJmvDVYhhr4=QOEEGF1TZba-jCewpUFtyg@mail.gmail.com>
+	<1dff6d6c-be83-f6e1-2b7e-82d98bdb8a63@redhat.com>
+	<20171123111105.GG8166@redhat.com>
+	<a6581131-852d-f67f-6169-8721134ea763@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <CAFEAcA8FDoLRx+OCMwjUzYd-X3HX7Z77SUTmNbSB9YWYT77AcA@mail.gmail.com>
-References: <20171113161446.2862-1-michael.nawrocki@gtri.gatech.edu>
-	<20171113161446.2862-2-michael.nawrocki@gtri.gatech.edu>
-	<CAFEAcA8FDoLRx+OCMwjUzYd-X3HX7Z77SUTmNbSB9YWYT77AcA@mail.gmail.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Thu, 23 Nov 2017 11:27:01 +0000
-Message-ID: <CAFEAcA-JwUm5+N-Km1fZjuPYA81sMCekguchJiV59BvqjnPJOA@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH v3 1/3] Switch AMD CFI flash to use new
- MMIO API
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <a6581131-852d-f67f-6169-8721134ea763@redhat.com>
+Subject: Re: [Qemu-devel] QEMU 3.0 ?
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,47 +34,68 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Mike Nawrocki <michael.nawrocki@gtri.gatech.edu>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, Qemu-block <qemu-block@nongnu.org>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
+To: Thomas Huth <thuth@redhat.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>, Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, Markus Armbruster <armbru@redhat.com>, Cornelia Huck <cohuck@redhat.com>, Greg Kurz <groug@kaod.org>, QEMU Developers <qemu-devel@nongnu.org>, =?utf-8?Q?C=C3=A9dric?= Le Goater <clg@kaod.org>, Paolo Bonzini <pbonzini@redhat.com>, David Gibson <david@gibson.dropbear.id.au>
 
-On 23 November 2017 at 11:26, Peter Maydell <peter.maydell@linaro.org> wrote:
-> On 13 November 2017 at 16:14, Mike Nawrocki
-> <michael.nawrocki@gtri.gatech.edu> wrote:
->> Signed-off-by: Mike Nawrocki <michael.nawrocki@gtri.gatech.edu>
->> ---
->>  hw/block/pflash_cfi02.c | 97 +++++++++----------------------------------------
->>  1 file changed, 18 insertions(+), 79 deletions(-)
->>
->> diff --git a/hw/block/pflash_cfi02.c b/hw/block/pflash_cfi02.c
->> index c81ddd3a99..a81df913f6 100644
->> --- a/hw/block/pflash_cfi02.c
->> +++ b/hw/block/pflash_cfi02.c
->> @@ -138,12 +138,12 @@ static void pflash_timer (void *opaque)
->>      pfl->cmd = 0;
->>  }
->>
->> -static uint32_t pflash_read (pflash_t *pfl, hwaddr offset,
->> -                             int width, int be)
->> +static uint64_t pflash_read(pflash_t *pfl, hwaddr offset,
->> +                            int width, int be)
->>  {
->>      hwaddr boff;
->> -    uint32_t ret;
->>      uint8_t *p;
->> +    uint64_t ret;
->
-> I suspect you'll find that the change of type for 'ret' here
-> and the 'value' argument to pflash_write() will break compilation
-> with PFLASH_DEBUG defined, because the type won't match the DPRINTF
-> format strings any more.
->
-> You could either fix up the format strings, or (since there's a
-> wrapper function here anyway) leave the types of pflash_read()
-> and pflash_write() alone and let the wrappers implicitly do
-> the conversion between uint64_t and uint32_t.
+On Thu, Nov 23, 2017 at 12:24:24PM +0100, Thomas Huth wrote:
+> On 23.11.2017 12:11, Daniel P. Berrange wrote:
+> > On Thu, Nov 23, 2017 at 11:57:34AM +0100, Thomas Huth wrote:
+> >> On 23.11.2017 11:17, Peter Maydell wrote:
+> >>> On 23 November 2017 at 10:03, Cornelia Huck <cohuck@redhat.com> wrote:
+> >>>> On Mon, 13 Nov 2017 08:14:28 +0100
+> >>>> Thomas Huth <thuth@redhat.com> wrote:
+> >>>>
+> >>>>> By the way, before everybody now introduces "2.12" machine types ... is
+> >>>>> there already a consensus that the next version will be "2.12" ?
+> >>>>>
+> >>>>> A couple of months ago, we discussed that we could maybe do a 3.0 after
+> >>>>> 2.11, e.g. here:
+> >>>>>
+> >>>>>  https://lists.gnu.org/archive/html/qemu-devel/2017-03/msg05056.html
+> >>>>>
+> >>>>> I'd still like to see that happen... Peter, any thoughts on this?
+> >>>>
+> >>>> So, as I just thought about preparing the new machine for s390x as
+> >>>> well: Did we reach any consensus about what the next qemu version will
+> >>>> be called?
+> >>>
+> >>> I haven't seen any sufficiently solid plan to make me want to
+> >>> pick anything except "2.12".
+> >>
+> >> I still don't think that we need a big plan for this... The change from
+> >> 1.7 to 2.0 was also rather arbitrary, wasn't it?
+> >>
+> >> Anyway, I've now started a Wiki page to collect ideas:
+> >>
+> >>  https://wiki.qemu.org/Features/Version3.0
+> >>
+> >> Maybe we can jump to version 3.0 if there are enough doable items on the
+> >> list that we can all agree upon.
+> > 
+> > From the mgmt app / libvirt POV, I'm against the idea of doing such an
+> > API incompatible release associated with major versions. The whole point
+> > of the documented deprecation timeframe, was that we can incrementally
+> > remove legacy interfaces without having a big bang break the whole
+> > world.
+> 
+> Yes, I agree ... that's why I tried to split the list into a "doable"
+> part (which hopefully does not mean any breakage for the upper stack),
+> and a "controversial" part (which we could use for collecting ideas, but
+> it is likely not feasible to do it any time soon). Sorry for not stating
+> this more clearly.
 
-...ah, just noticed that in patch 2 you want to add 8-byte
-accesses. So you'll need to fix the format strings.
+Your "doable" list includes removing all deprecated features, which
+basically just nullifies the deprecation process, which declared
+that they would live for 2 releases with a warning and then be
+deleted. That will break the upper stack.
 
-thanks
--- PMM
+For the --accel item though, if that's doable without breakage then
+there's no point delaying that until a 3.0 release. Just do it as
+soon as its functionally ready for any release.
+
+Regards,
+Daniel
+-- 
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
