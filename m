@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35709)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36505)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alistair23@gmail.com>) id 1eHfPi-0007WR-0N
-	for qemu-devel@nongnu.org; Wed, 22 Nov 2017 19:30:46 -0500
+	(envelope-from <alistair23@gmail.com>) id 1eHfSP-00009E-AD
+	for qemu-devel@nongnu.org; Wed, 22 Nov 2017 19:33:34 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alistair23@gmail.com>) id 1eHfPh-0003nF-3g
-	for qemu-devel@nongnu.org; Wed, 22 Nov 2017 19:30:46 -0500
-Received: from mail-wr0-x243.google.com ([2a00:1450:400c:c0c::243]:43763)
+	(envelope-from <alistair23@gmail.com>) id 1eHfSO-0005Wn-CE
+	for qemu-devel@nongnu.org; Wed, 22 Nov 2017 19:33:33 -0500
+Received: from mail-wm0-x242.google.com ([2a00:1450:400c:c09::242]:44628)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <alistair23@gmail.com>)
-	id 1eHfPg-0003mi-UG
-	for qemu-devel@nongnu.org; Wed, 22 Nov 2017 19:30:45 -0500
-Received: by mail-wr0-x243.google.com with SMTP id u40so16126031wrf.10
-	for <qemu-devel@nongnu.org>; Wed, 22 Nov 2017 16:30:44 -0800 (PST)
+	id 1eHfSO-0005WX-6Z
+	for qemu-devel@nongnu.org; Wed, 22 Nov 2017 19:33:32 -0500
+Received: by mail-wm0-x242.google.com with SMTP id r68so13689952wmr.3
+	for <qemu-devel@nongnu.org>; Wed, 22 Nov 2017 16:33:32 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <CAFEAcA8OWP=x=YCumVzc4biETn7SbUxaBDasYR3XNx71aabdmw@mail.gmail.com>
+In-Reply-To: <20171103000109.28244-6-frasse.iglesias@gmail.com>
 References: <20171103000109.28244-1-frasse.iglesias@gmail.com>
-	<CAFEAcA8OWP=x=YCumVzc4biETn7SbUxaBDasYR3XNx71aabdmw@mail.gmail.com>
+	<20171103000109.28244-6-frasse.iglesias@gmail.com>
 From: Alistair Francis <alistair23@gmail.com>
-Date: Wed, 22 Nov 2017 16:30:13 -0800
-Message-ID: <CAKmqyKPsB_F+Z8k36Vc9FdTLE5CKHK68TN31QtkoCvjUNshYow@mail.gmail.com>
+Date: Wed, 22 Nov 2017 16:33:00 -0800
+Message-ID: <CAKmqyKMw-MA2u2x3PO+rcPd3W5Ky4BhoDODMEuEjVF46ommFsg@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH v7 00/13] Add support for the ZynqMP
- Generic QSPI
+Subject: Re: [Qemu-devel] [PATCH v7 05/13] xilinx_spips: Move FlashCMD,
+ XilinxQSPIPS and XilinxSPIPSClass
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,39 +30,144 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: Francisco Iglesias <frasse.iglesias@gmail.com>, Edgar Iglesias <edgari@xilinx.com>, Alistair Francis <alistai@xilinx.com>, QEMU Developers <qemu-devel@nongnu.org>, francisco.iglesias@feimtech.se, =?UTF-8?Q?Marcin_Krzemi=C5=84ski?= <mar.krzeminski@gmail.com>
+To: Francisco Iglesias <frasse.iglesias@gmail.com>
+Cc: "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>, Peter Maydell <peter.maydell@linaro.org>, Edgar Iglesias <edgari@xilinx.com>, Alistair Francis <alistai@xilinx.com>, francisco.iglesias@feimtech.se, "mar.krzeminski" <mar.krzeminski@gmail.com>
 
-On Tue, Nov 21, 2017 at 10:39 AM, Peter Maydell
-<peter.maydell@linaro.org> wrote:
-> On 3 November 2017 at 00:00, Francisco Iglesias
-> <frasse.iglesias@gmail.com> wrote:
->> Hi,
->>
->> This patch series is an attempt to add support for the ZynqMP QSPI (consisting
->> of the Generic QSPI and the legacy QSPI) to the xlnx-zcu102 board and connect
->> Numonyx n25q512a11 flashes to the QSPI. Also some functionality is added to
->> m25p80.
->>
->> The series starts by adding support in m25p80 for continous read out of status
->> registers, SST flash READ ID commands, bank address register accesses, bulk
->> erase (0x60) and two Numonyx flashes (n25q512a11 and n25q512a13). Thereafter it
->> updates the striping behaviour to be bit big endiann in the Xilinx QSPI model
->> and adds support for RX discard, zero pumping according transfer register and 4
->> byte LQSPI addresses. Finally it adds support for the ZynqMP Generic QSPI and
->> adds the ZynqMP QSPI to the xlnx-zcu102 board.
->>
->> Best regards,
->> Francisco Iglesias
+On Thu, Nov 2, 2017 at 5:01 PM, Francisco Iglesias
+<frasse.iglesias@gmail.com> wrote:
+> Move the FlashCMD enum, XilinxQSPIPS and XilinxSPIPSClass structures to the
+> header for consistency (struct XilinxSPIPS is found there). Also move out
+> a define and remove two dubbel included headers (while touching the code).
+
+s/dubbel/double/g
+
+> Finally, add 4 byte address commands to the FlashCMD enum.
+
+This probably could be a separate patch, but I'm not fussed either way.
+
 >
-> Hi; just a note to say that I'm assuming the Xilinx folk are going
-> to review the xilinx_spips patches in this set...
+> Signed-off-by: Francisco Iglesias <frasse.iglesias@gmail.com>
 
-Yep, we will!
+Reviewed-by: Alistair Francis <alistair.francis@xilinx.com>
 
 Alistair
 
+> ---
+>  hw/ssi/xilinx_spips.c         | 35 -----------------------------------
+>  include/hw/ssi/xilinx_spips.h | 34 ++++++++++++++++++++++++++++++++++
+>  2 files changed, 34 insertions(+), 35 deletions(-)
 >
-> thanks
-> -- PMM
+> diff --git a/hw/ssi/xilinx_spips.c b/hw/ssi/xilinx_spips.c
+> index ef56d35..559fa79 100644
+> --- a/hw/ssi/xilinx_spips.c
+> +++ b/hw/ssi/xilinx_spips.c
+> @@ -27,8 +27,6 @@
+>  #include "sysemu/sysemu.h"
+>  #include "hw/ptimer.h"
+>  #include "qemu/log.h"
+> -#include "qemu/fifo8.h"
+> -#include "hw/ssi/ssi.h"
+>  #include "qemu/bitops.h"
+>  #include "hw/ssi/xilinx_spips.h"
+>  #include "qapi/error.h"
+> @@ -116,44 +114,11 @@
+>
+>  /* 16MB per linear region */
+>  #define LQSPI_ADDRESS_BITS 24
+> -/* Bite off 4k chunks at a time */
+> -#define LQSPI_CACHE_SIZE 1024
+>
+>  #define SNOOP_CHECKING 0xFF
+>  #define SNOOP_NONE 0xFE
+>  #define SNOOP_STRIPING 0
+>
+> -typedef enum {
+> -    READ = 0x3,
+> -    FAST_READ = 0xb,
+> -    DOR = 0x3b,
+> -    QOR = 0x6b,
+> -    DIOR = 0xbb,
+> -    QIOR = 0xeb,
+> -
+> -    PP = 0x2,
+> -    DPP = 0xa2,
+> -    QPP = 0x32,
+> -} FlashCMD;
+> -
+> -typedef struct {
+> -    XilinxSPIPS parent_obj;
+> -
+> -    uint8_t lqspi_buf[LQSPI_CACHE_SIZE];
+> -    hwaddr lqspi_cached_addr;
+> -    Error *migration_blocker;
+> -    bool mmio_execution_enabled;
+> -} XilinxQSPIPS;
+> -
+> -typedef struct XilinxSPIPSClass {
+> -    SysBusDeviceClass parent_class;
+> -
+> -    const MemoryRegionOps *reg_ops;
+> -
+> -    uint32_t rx_fifo_size;
+> -    uint32_t tx_fifo_size;
+> -} XilinxSPIPSClass;
+> -
+>  static inline int num_effective_busses(XilinxSPIPS *s)
+>  {
+>      return (s->regs[R_LQSPI_CFG] & LQSPI_CFG_SEP_BUS &&
+> diff --git a/include/hw/ssi/xilinx_spips.h b/include/hw/ssi/xilinx_spips.h
+> index 06aa096..7f9e2fc 100644
+> --- a/include/hw/ssi/xilinx_spips.h
+> +++ b/include/hw/ssi/xilinx_spips.h
+> @@ -32,6 +32,22 @@ typedef struct XilinxSPIPS XilinxSPIPS;
+>
+>  #define XLNX_SPIPS_R_MAX        (0x100 / 4)
+>
+> +/* Bite off 4k chunks at a time */
+> +#define LQSPI_CACHE_SIZE 1024
+> +
+> +typedef enum {
+> +    READ = 0x3,         READ_4 = 0x13,
+> +    FAST_READ = 0xb,    FAST_READ_4 = 0x0c,
+> +    DOR = 0x3b,         DOR_4 = 0x3c,
+> +    QOR = 0x6b,         QOR_4 = 0x6c,
+> +    DIOR = 0xbb,        DIOR_4 = 0xbc,
+> +    QIOR = 0xeb,        QIOR_4 = 0xec,
+> +
+> +    PP = 0x2,           PP_4 = 0x12,
+> +    DPP = 0xa2,
+> +    QPP = 0x32,         QPP_4 = 0x34,
+> +} FlashCMD;
+> +
+>  struct XilinxSPIPS {
+>      SysBusDevice parent_obj;
+>
+> @@ -56,6 +72,24 @@ struct XilinxSPIPS {
+>      uint32_t regs[XLNX_SPIPS_R_MAX];
+>  };
+>
+> +typedef struct {
+> +    XilinxSPIPS parent_obj;
+> +
+> +    uint8_t lqspi_buf[LQSPI_CACHE_SIZE];
+> +    hwaddr lqspi_cached_addr;
+> +    Error *migration_blocker;
+> +    bool mmio_execution_enabled;
+> +} XilinxQSPIPS;
+> +
+> +typedef struct XilinxSPIPSClass {
+> +    SysBusDeviceClass parent_class;
+> +
+> +    const MemoryRegionOps *reg_ops;
+> +
+> +    uint32_t rx_fifo_size;
+> +    uint32_t tx_fifo_size;
+> +} XilinxSPIPSClass;
+> +
+>  #define TYPE_XILINX_SPIPS "xlnx.ps7-spi"
+>  #define TYPE_XILINX_QSPIPS "xlnx.ps7-qspi"
+>
+> --
+> 2.9.3
+>
 >
