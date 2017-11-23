@@ -1,31 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42173)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42172)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1eHmz9-0007aL-Qt
-	for qemu-devel@nongnu.org; Thu, 23 Nov 2017 03:35:53 -0500
+	(envelope-from <bounces@canonical.com>) id 1eHmz9-0007aK-QG
+	for qemu-devel@nongnu.org; Thu, 23 Nov 2017 03:35:58 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1eHmz6-0002zs-Jf
+	(envelope-from <bounces@canonical.com>) id 1eHmz6-0002zw-JL
 	for qemu-devel@nongnu.org; Thu, 23 Nov 2017 03:35:51 -0500
-Received: from indium.canonical.com ([91.189.90.7]:47336)
+Received: from indium.canonical.com ([91.189.90.7]:47338)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1eHmz6-0002zD-Bi
+	id 1eHmz6-0002zE-Ca
 	for qemu-devel@nongnu.org; Thu, 23 Nov 2017 03:35:48 -0500
 Received: from loganberry.canonical.com ([91.189.90.37])
 	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1eHmz4-0008BE-2j
+	id 1eHmz4-0008An-Lu
 	for <qemu-devel@nongnu.org>; Thu, 23 Nov 2017 08:35:46 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 105592E8048
+	by loganberry.canonical.com (Postfix) with ESMTP id 9378A2E80C7
 	for <qemu-devel@nongnu.org>; Thu, 23 Nov 2017 08:35:46 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Thu, 23 Nov 2017 08:20:31 -0000
+Date: Thu, 23 Nov 2017 08:21:42 -0000
 From: Matt Keys <1329956@bugs.launchpad.net>
 Reply-To: Bug 1329956 <1329956@bugs.launchpad.net>
 Sender: bounces@canonical.com
 References: <20140613211439.4618.98205.malonedeb@soybean.canonical.com>
-Message-Id: <151142523139.14997.12675108565748694036.malone@wampee.canonical.com>
+Message-Id: <151142530261.18530.16686571440428545246.malone@gac.canonical.com>
 Errors-To: bounces@canonical.com
 Subject: [Qemu-devel] [Bug 1329956] Re: multi-core FreeBSD guest hangs after
  warm reboot
@@ -39,8 +39,7 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-I found this bug report through https://redmine.pfsense.org/issues/7925
-, btw.
+sorry, make that https://redmine.pfsense.org/issues/4377
 
 -- =
 
