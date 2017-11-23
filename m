@@ -1,22 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34103)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34520)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1eHoDI-0005cO-3X
-	for qemu-devel@nongnu.org; Thu, 23 Nov 2017 04:54:33 -0500
+	(envelope-from <cohuck@redhat.com>) id 1eHoDn-0005rV-2S
+	for qemu-devel@nongnu.org; Thu, 23 Nov 2017 04:55:08 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1eHoDE-0001aY-4V
-	for qemu-devel@nongnu.org; Thu, 23 Nov 2017 04:54:32 -0500
+	(envelope-from <cohuck@redhat.com>) id 1eHoDj-0001v1-2s
+	for qemu-devel@nongnu.org; Thu, 23 Nov 2017 04:55:03 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:41104)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <cohuck@redhat.com>) id 1eHoDi-0001uR-Pt
+	for qemu-devel@nongnu.org; Thu, 23 Nov 2017 04:54:59 -0500
+Date: Thu, 23 Nov 2017 10:54:53 +0100
+From: Cornelia Huck <cohuck@redhat.com>
+Message-ID: <20171123105453.4263b000.cohuck@redhat.com>
+In-Reply-To: <1511388334-16347-3-git-send-email-pmorel@linux.vnet.ibm.com>
 References: <1511388334-16347-1-git-send-email-pmorel@linux.vnet.ibm.com>
-	<1511388334-16347-8-git-send-email-pmorel@linux.vnet.ibm.com>
-From: Thomas Huth <thuth@redhat.com>
-Message-ID: <deec080f-b03c-85ae-72dd-5704d557cc02@redhat.com>
-Date: Thu, 23 Nov 2017 10:54:22 +0100
+	<1511388334-16347-3-git-send-email-pmorel@linux.vnet.ibm.com>
 MIME-Version: 1.0
-In-Reply-To: <1511388334-16347-8-git-send-email-pmorel@linux.vnet.ibm.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v3 7/7] s390x/pci: search for subregion
- inside the BARs
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v3 2/7] s390x/pci: rework PCI STORE
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,137 +27,105 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Pierre Morel <pmorel@linux.vnet.ibm.com>, qemu-devel@nongnu.org
-Cc: borntraeger@de.ibm.com, pasic@linux.vnet.ibm.com, cohuck@redhat.com, zyimin@linux.vnet.ibm.com, agraf@suse.de, Qemu-s390x list <qemu-s390x@nongnu.org>
+To: Pierre Morel <pmorel@linux.vnet.ibm.com>
+Cc: qemu-devel@nongnu.org, agraf@suse.de, borntraeger@de.ibm.com, zyimin@linux.vnet.ibm.com, pasic@linux.vnet.ibm.com
 
-On 22.11.2017 23:05, Pierre Morel wrote:
-> When dispatching memory access to PCI BAR region, we must
-> look for possible subregions, used by the PCI device to map
-> different memory areas inside the same PCI BAR.
->=20
-> Since the data offset we received is calculated starting at the
-> region start address we need to adjust the offset for the subregion.
->=20
-> The data offset inside the subregion is calculated by substracting
-> the subregion's starting address from the data offset in the region.
->=20
-> The access to the MSIX region is now handled in a generic way,
-> we do not need the specific trap_msix() function anymore.
->=20
+On Wed, 22 Nov 2017 23:05:29 +0100
+Pierre Morel <pmorel@linux.vnet.ibm.com> wrote:
+
+> Enhance the fault detection, correction of the fault reporting.
+> 
 > Signed-off-by: Pierre Morel <pmorel@linux.vnet.ibm.com>
 > Reviewed-by: Yi Min Zhao <zyimin@linux.vnet.ibm.com>
 > ---
->  hw/s390x/s390-pci-inst.c | 44 +++++++++++++++++++++++++---------------=
-----
->  1 file changed, 25 insertions(+), 19 deletions(-)
->=20
+>  hw/s390x/s390-pci-inst.c | 39 ++++++++++++++++++++++-----------------
+>  1 file changed, 22 insertions(+), 17 deletions(-)
+> 
 > diff --git a/hw/s390x/s390-pci-inst.c b/hw/s390x/s390-pci-inst.c
-> index 8d35f8f..fae3ef7 100644
+> index 3e1f1a0..930c197 100644
 > --- a/hw/s390x/s390-pci-inst.c
 > +++ b/hw/s390x/s390-pci-inst.c
-> @@ -345,12 +345,31 @@ static int zpci_endian_swap(uint64_t *ptr, uint8_=
-t len)
->      return 0;
->  }
-> =20
-> +static MemoryRegion *s390_get_subregion(MemoryRegion *mr, uint64_t off=
-set,
-> +                                        uint8_t len)
-> +{
-> +    MemoryRegion *other;
-
-Just my personal taste, but I'd rather call it "submr" or something simil=
-ar.
-
-> +    uint64_t subregion_size;
+> @@ -470,6 +470,12 @@ int pcistg_service_call(S390CPU *cpu, uint8_t r1, uint8_t r2)
+>      pcias = (env->regs[r2] >> 16) & 0xf;
+>      len = env->regs[r2] & 0xf;
+>      offset = env->regs[r2 + 1];
+> +    data = env->regs[r1];
 > +
-> +    QTAILQ_FOREACH(other, &mr->subregions, subregions_link) {
-> +        subregion_size =3D int128_get64(other->size);
-> +        if ((offset >=3D other->addr) &&
-> +            (offset + len) <=3D (other->addr + subregion_size)) {
-
-(Too much parentheses for my taste ;-))
-
-> +            mr =3D other;
-> +            break;
-> +        }
+> +    if (!(fh & FH_MASK_ENABLE)) {
+> +        setcc(cpu, ZPCI_PCI_LS_INVAL_HANDLE);
+> +        return 0;
 > +    }
-> +    return mr;
-> +}
-> +
->  static MemTxResult zpci_read_bar(S390PCIBusDevice *pbdev, uint8_t pcia=
-s,
->                                   uint64_t offset, uint64_t *data, uint=
-8_t len)
->  {
->      MemoryRegion *mr;
-> =20
->      mr =3D pbdev->pdev->io_regions[pcias].memory;
-> +    mr =3D s390_get_subregion(mr, offset, len);
-> +    offset -=3D mr->addr;
-
-I'm not that familiar with the MemoryRegion nesting ... So may I ask: Is
-that "offset -=3D mr->addr" also right if mr does *not* point to a
-sub-region, but to the main memory region? (I.e. is mr->addr =3D=3D 0 in
-that case?)
-
->      return memory_region_dispatch_read(mr, offset, data, len,
->                                         MEMTXATTRS_UNSPECIFIED);
->  }
-> @@ -442,30 +461,14 @@ int pcilg_service_call(S390CPU *cpu, uint8_t r1, =
-uint8_t r2)
->      return 0;
->  }
-> =20
-> -static int trap_msix(S390PCIBusDevice *pbdev, uint64_t offset, uint8_t=
- pcias)
-> -{
-> -    if (pbdev->msix.available && pbdev->msix.table_bar =3D=3D pcias &&
-> -        offset >=3D pbdev->msix.table_offset &&
-> -        offset < (pbdev->msix.table_offset +
-> -                  pbdev->msix.entries * PCI_MSIX_ENTRY_SIZE)) {
-> -        return 1;
-> -    } else {
-> -        return 0;
-> -    }
-> -}
-> -
->  static MemTxResult zpci_write_bar(S390PCIBusDevice *pbdev, uint8_t pci=
-as,
->                                    uint64_t offset, uint64_t data, uint=
-8_t len)
->  {
->      MemoryRegion *mr;
-> =20
-> -    if (trap_msix(pbdev, offset, pcias)) {
-> -        offset =3D offset - pbdev->msix.table_offset;
-> -        mr =3D &pbdev->pdev->msix_table_mmio;
-> -    } else {
-> -        mr =3D pbdev->pdev->io_regions[pcias].memory;
-> -    }
-> -
-> +    mr =3D pbdev->pdev->io_regions[pcias].memory;
-> +    mr =3D s390_get_subregion(mr, offset, len);
-> +    offset -=3D mr->addr;
->      return memory_region_dispatch_write(mr, offset, data, len,
->                                          MEMTXATTRS_UNSPECIFIED);
->  }
-> @@ -726,6 +729,9 @@ int pcistb_service_call(S390CPU *cpu, uint8_t r1, u=
-int8_t r3, uint64_t gaddr,
+>  
+>      pbdev = s390_pci_find_dev_by_fh(s390_get_phb(), fh);
+>      if (!pbdev) {
+> @@ -479,12 +485,7 @@ int pcistg_service_call(S390CPU *cpu, uint8_t r1, uint8_t r2)
 >      }
-> =20
->      mr =3D pbdev->pdev->io_regions[pcias].memory;
+>  
+>      switch (pbdev->state) {
+> -    case ZPCI_FS_RESERVED:
+> -    case ZPCI_FS_STANDBY:
+> -    case ZPCI_FS_DISABLED:
+>      case ZPCI_FS_PERMANENT_ERROR:
+> -        setcc(cpu, ZPCI_PCI_LS_INVAL_HANDLE);
+> -        return 0;
 
-Since this above line is done right before all calls to
-s390_get_subregion(), you could maybe move it into that function, too.
-(and rather call the function sth. like pci_mem_get_subregion() instead?)
+Maybe add a comment that the remaining states are already covered by
+the FH_MASK_ENABLE check above?
 
-> +    mr =3D s390_get_subregion(mr, offset, len);
-> +    offset -=3D mr->addr;
-> +
->      if (!memory_region_access_valid(mr, offset, len, true)) {
->          program_interrupt(env, PGM_OPERAND, 6);
->          return 0;
->=20
+>      case ZPCI_FS_ERROR:
+>          setcc(cpu, ZPCI_PCI_LS_ERR);
+>          s390_set_status_code(env, r2, ZPCI_PCI_ST_BLOCKED);
+> @@ -493,9 +494,13 @@ int pcistg_service_call(S390CPU *cpu, uint8_t r1, uint8_t r2)
+>          break;
+>      }
+>  
+> -    data = env->regs[r1];
+> -    if (pcias < 6) {
+> -        if ((8 - (offset & 0x7)) < len) {
+> +    switch (pcias) {
+> +        /* A ZPCI PCI card may use any BAR from BAR 0 to BAR 5 */
+> +    case 0 ... 5:
 
- Thomas
+Hm... I'd still prefer speaking #defines here.
+
+> +        /* Check length:
+> +         * A length of 0 is invalid and length should not cross a double word
+> +         */
+> +        if (!len || (len > (8 - (offset & 0x7)))) {
+>              program_interrupt(env, PGM_OPERAND, 4);
+>              return 0;
+>          }
+> @@ -513,21 +518,21 @@ int pcistg_service_call(S390CPU *cpu, uint8_t r1, uint8_t r2)
+>              program_interrupt(env, PGM_OPERAND, 4);
+>              return 0;
+>          }
+> -    } else if (pcias == 15) {
+> -        if ((4 - (offset & 0x3)) < len) {
+> -            program_interrupt(env, PGM_OPERAND, 4);
+> -            return 0;
+> -        }
+> -
+> -        if (zpci_endian_swap(&data, len)) {
+> +        break;
+> +    case 15:
+
+And here.
+
+> +        /* ZPCI uses the pseudo BAR number 15 as configuration space */
+> +        /* possible access lengths are 1,2,4 and must not cross a word */
+> +        if (!len || (len > (4 - (offset & 0x3))) || len == 3) {
+>              program_interrupt(env, PGM_OPERAND, 4);
+>              return 0;
+>          }
+> -
+> +        /* len = 1,2,4 so we do not need to test */
+> +        zpci_endian_swap(&data, len);
+>          pci_host_config_write_common(pbdev->pdev, offset,
+>                                       pci_config_size(pbdev->pdev),
+>                                       data, len);
+> -    } else {
+> +        break;
+> +    default:
+>          DPRINTF("pcistg invalid space\n");
+>          setcc(cpu, ZPCI_PCI_LS_ERR);
+>          s390_set_status_code(env, r2, ZPCI_PCI_ST_INVAL_AS);
