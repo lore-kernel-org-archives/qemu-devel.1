@@ -1,34 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60039)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33047)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1eHrVW-0006Wv-3W
-	for qemu-devel@nongnu.org; Thu, 23 Nov 2017 08:25:37 -0500
+	(envelope-from <clg@kaod.org>) id 1eHrWi-00078p-Pi
+	for qemu-devel@nongnu.org; Thu, 23 Nov 2017 08:26:49 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1eHrVS-0001HH-5t
-	for qemu-devel@nongnu.org; Thu, 23 Nov 2017 08:25:34 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:43868)
+	(envelope-from <clg@kaod.org>) id 1eHrWf-0002MT-KS
+	for qemu-devel@nongnu.org; Thu, 23 Nov 2017 08:26:48 -0500
+Received: from 18.mo3.mail-out.ovh.net ([87.98.172.162]:40652)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1eHrVR-0001GT-Uz
-	for qemu-devel@nongnu.org; Thu, 23 Nov 2017 08:25:30 -0500
-References: <CAFEAcA83-oqifsZboJmvDVYhhr4=QOEEGF1TZba-jCewpUFtyg@mail.gmail.com>
-	<1dff6d6c-be83-f6e1-2b7e-82d98bdb8a63@redhat.com>
-	<6dd7061e-2ebe-7a51-8142-f67d5d75a81a@redhat.com>
-	<8cd1c0b3-8386-d41e-ccfb-1a2073cdf4fb@redhat.com>
-	<16011ac4-77c4-af75-5754-5f9586d6d629@redhat.com>
-	<20171123130908.6ab004d3.cohuck@redhat.com>
-	<b3b9837e-c6b0-d718-faaf-1ef198256634@redhat.com>
-	<20171123133924.60e9f616.cohuck@redhat.com>
-	<20171123125949.GN8166@redhat.com>
-	<7f92f916-4858-15b7-89e9-bd9c1d6f1be9@redhat.com>
-	<20171123132325.GO8166@redhat.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <f68f4669-195f-f145-5bb7-5ad81a7c0602@redhat.com>
-Date: Thu, 23 Nov 2017 14:25:23 +0100
+	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1eHrWf-0002Li-Dc
+	for qemu-devel@nongnu.org; Thu, 23 Nov 2017 08:26:45 -0500
+Received: from player797.ha.ovh.net (gw6.ovh.net [213.251.189.206])
+	by mo3.mail-out.ovh.net (Postfix) with ESMTP id 119B7175AA8
+	for <qemu-devel@nongnu.org>; Thu, 23 Nov 2017 14:26:44 +0100 (CET)
+References: <20171110152017.24324-1-clg@kaod.org>
+	<20171110152017.24324-9-clg@kaod.org>
+	<20171117045412.GC26448@umbus.fritz.box>
+	<54f87bb8-e502-fdc8-1069-2f6081e0d446@kaod.org>
+	<20171123111202.GD22454@umbus.fritz.box>
+From: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
+Message-ID: <d2ddfa50-ef16-8620-e471-bc98901a3f35@kaod.org>
+Date: Thu, 23 Nov 2017 14:26:39 +0100
 MIME-Version: 1.0
-In-Reply-To: <20171123132325.GO8166@redhat.com>
-Content-Type: text/plain; charset=utf-8
+In-Reply-To: <20171123111202.GD22454@umbus.fritz.box>
+Content-Type: text/plain; charset=windows-1252
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] QEMU 3.0 ?
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH for-2.12 v3 08/11] spapr: introduce a
+ XICSFabric irq_is_lsi() operation
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,31 +35,63 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Daniel P. Berrange" <berrange@redhat.com>
-Cc: Cornelia Huck <cohuck@redhat.com>, Thomas Huth <thuth@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>, QEMU Developers <qemu-devel@nongnu.org>, David Gibson <david@gibson.dropbear.id.au>, Greg Kurz <groug@kaod.org>, Markus Armbruster <armbru@redhat.com>, Eric Blake <eblake@redhat.com>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, sergio.g.delreal@gmail.com, alex@alex.org.uk
+To: David Gibson <david@gibson.dropbear.id.au>
+Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, Greg Kurz <groug@kaod.org>, Benjamin Herrenschmidt <benh@kernel.crashing.org>
 
-On 23/11/2017 14:23, Daniel P. Berrange wrote:
-> On Thu, Nov 23, 2017 at 02:08:42PM +0100, Paolo Bonzini wrote:
->> On 23/11/2017 13:59, Daniel P. Berrange wrote:
->>>> I'm not sure I like that. For me, qemu-kvm comes with the connotation
->>>> of "there used to be a fork of qemu for kvm usage, and we stuck with
->>>> the name because it is likely scattered through scripts".
+On 11/23/2017 12:12 PM, David Gibson wrote:
+> On Fri, Nov 17, 2017 at 08:23:00AM +0100, C=E9dric Le Goater wrote:
+>> On 11/17/2017 05:54 AM, David Gibson wrote:
+>>> On Fri, Nov 10, 2017 at 03:20:14PM +0000, C=E9dric Le Goater wrote:
+>>>> It will be used later on to distinguish the allocation of an LSI
+>>>> interrupt from an MSI and also to reduce the use of the ICSIRQState
+>>>> array of the ICSState object, which is on our way to introduce XIVE.
+>>>>
+>>>> The 'irq' parameter continues to refer to the global IRQ number spac=
+e.
+>>>>
+>>>> On PowerNV, only the PSI controller interrupts are handled and they
+>>>> are all LSIs.
+>>>>
+>>>> Signed-off-by: C=E9dric Le Goater <clg@kaod.org>
 >>>
->>> Yes, qemu-kvm is a historical artifact in Fedora solely because of the
->>> previous fork.
+>>> !?! AFAICT this is a step backwards.  The users of ics_is_lsi() here
+>>> are in the xics code.  So they already have the right information
+>>> locally in the ICSState object.  Why on earth would you indirect
+>>> through the fabric.
 >>
->> In Fedora, Debian, Ubuntu, Arch Linux and NixOS at least.  AFAICS only
->> Gentoo doesn't have it.
->>
->> Looks like something that upstream should provide, let's not fight
->> windmills.
-> 
-> I thought that Ubuntu / Debian had /usr/bin/kvm originally instead of
-> qemu-kvm
+>> because I am trying to get rid of the fact that the current ICS=20
+>> allocator handles two things at the same time : IRQ allocation=20
+>> and IRQ type. And that's a problem because the ICSState object=20
+>> is just used everywhere in the code.
+>=20
+> That's a good goal, but I don't think this is the right way there.
+> One of the reasons that conflation of allocation and typing is bad is
+> that the typing is essentially local information to the PIC itself,
+> whereas the allocation is a machine concern.
 
-Yeah, though the package is named qemu-kvm (confusing...).  Still the
-point stands that if there is distro confusion, we should consider
-looking at what the de facto standards are, and provide it ourselves in
-a way that makes sense (and /usr/bin/kvm doesn't).
+OK.
 
-Paolo
+> By using a XICSFabric hook you're essentially wiring the irq typing
+> through the machine, which again seems like a step in the wrong
+> direction.
+
+I agree.
+=20
+>> OK, So that's is not to your liking, I will come up with some=20
+>> other solution. Thanks for looking.
+>=20
+> Sorry if I was a bit harsh; quite a few unrelated things have been
+> frustrating me, which has made me grumpy.
+
+No problem. I am also trying to cover too many things at the same=20
+time. XIVE is a big piece enough.=20
+
+I think the XIVE patchset is stabilizing. So I will it send today=20
+and see how it is perceived. But let's keep in mind that we have=20
+some more needs for the PHBs and their IRQs placement.
+
+Thanks,
+
+C.   =20
+
+  =20
