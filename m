@@ -1,24 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54760)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55097)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1eHpS8-0005Ap-N7
-	for qemu-devel@nongnu.org; Thu, 23 Nov 2017 06:14:00 -0500
+	(envelope-from <berrange@redhat.com>) id 1eHpSP-0005QP-AD
+	for qemu-devel@nongnu.org; Thu, 23 Nov 2017 06:14:21 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1eHpS4-0005QD-MS
-	for qemu-devel@nongnu.org; Thu, 23 Nov 2017 06:13:56 -0500
-Date: Thu, 23 Nov 2017 22:12:02 +1100
-From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20171123111202.GD22454@umbus.fritz.box>
+	(envelope-from <berrange@redhat.com>) id 1eHpSL-0005fk-H2
+	for qemu-devel@nongnu.org; Thu, 23 Nov 2017 06:14:13 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:58436)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1eHpSL-0005ei-AM
+	for qemu-devel@nongnu.org; Thu, 23 Nov 2017 06:14:09 -0500
+Date: Thu, 23 Nov 2017 11:14:03 +0000
+From: "Daniel P. Berrange" <berrange@redhat.com>
+Message-ID: <20171123111403.GH8166@redhat.com>
+Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
 References: <20171110152017.24324-1-clg@kaod.org>
-	<20171110152017.24324-9-clg@kaod.org>
-	<20171117045412.GC26448@umbus.fritz.box>
-	<54f87bb8-e502-fdc8-1069-2f6081e0d446@kaod.org>
+	<20171110152017.24324-2-clg@kaod.org>
+	<715a7bd1-7aa5-fa64-a9b8-76782ee20576@redhat.com>
+	<20171123110345.03541b50.cohuck@redhat.com>
+	<CAFEAcA83-oqifsZboJmvDVYhhr4=QOEEGF1TZba-jCewpUFtyg@mail.gmail.com>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="84ND8YJRMFlzkrP4"
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <54f87bb8-e502-fdc8-1069-2f6081e0d446@kaod.org>
-Subject: Re: [Qemu-devel] [PATCH for-2.12 v3 08/11] spapr: introduce a
- XICSFabric irq_is_lsi() operation
+In-Reply-To: <CAFEAcA83-oqifsZboJmvDVYhhr4=QOEEGF1TZba-jCewpUFtyg@mail.gmail.com>
+Subject: Re: [Qemu-devel] QEMU 3.0 ? (was: [PATCH for-2.12 v3 01/11] spapr:
+ add pseries 2.12 machine type)
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,78 +32,44 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?iso-8859-1?Q?C=E9dric?= Le Goater <clg@kaod.org>
-Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, Greg Kurz <groug@kaod.org>, Benjamin Herrenschmidt <benh@kernel.crashing.org>
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: Cornelia Huck <cohuck@redhat.com>, Greg Kurz <groug@kaod.org>, Thomas Huth <thuth@redhat.com>, David Gibson <david@gibson.dropbear.id.au>, =?utf-8?Q?C=C3=A9dric?= Le Goater <clg@kaod.org>, QEMU Developers <qemu-devel@nongnu.org>
 
-
---84ND8YJRMFlzkrP4
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
-
-On Fri, Nov 17, 2017 at 08:23:00AM +0100, C=E9dric Le Goater wrote:
-> On 11/17/2017 05:54 AM, David Gibson wrote:
-> > On Fri, Nov 10, 2017 at 03:20:14PM +0000, C=E9dric Le Goater wrote:
-> >> It will be used later on to distinguish the allocation of an LSI
-> >> interrupt from an MSI and also to reduce the use of the ICSIRQState
-> >> array of the ICSState object, which is on our way to introduce XIVE.
+On Thu, Nov 23, 2017 at 10:17:48AM +0000, Peter Maydell wrote:
+> On 23 November 2017 at 10:03, Cornelia Huck <cohuck@redhat.com> wrote:
+> > On Mon, 13 Nov 2017 08:14:28 +0100
+> > Thomas Huth <thuth@redhat.com> wrote:
+> >
+> >> By the way, before everybody now introduces "2.12" machine types ... is
+> >> there already a consensus that the next version will be "2.12" ?
 > >>
-> >> The 'irq' parameter continues to refer to the global IRQ number space.
+> >> A couple of months ago, we discussed that we could maybe do a 3.0 after
+> >> 2.11, e.g. here:
 > >>
-> >> On PowerNV, only the PSI controller interrupts are handled and they
-> >> are all LSIs.
+> >>  https://lists.gnu.org/archive/html/qemu-devel/2017-03/msg05056.html
 > >>
-> >> Signed-off-by: C=E9dric Le Goater <clg@kaod.org>
-> >=20
-> > !?! AFAICT this is a step backwards.  The users of ics_is_lsi() here
-> > are in the xics code.  So they already have the right information
-> > locally in the ICSState object.  Why on earth would you indirect
-> > through the fabric.
->=20
-> because I am trying to get rid of the fact that the current ICS=20
-> allocator handles two things at the same time : IRQ allocation=20
-> and IRQ type. And that's a problem because the ICSState object=20
-> is just used everywhere in the code.
+> >> I'd still like to see that happen... Peter, any thoughts on this?
+> >
+> > So, as I just thought about preparing the new machine for s390x as
+> > well: Did we reach any consensus about what the next qemu version will
+> > be called?
+> 
+> I haven't seen any sufficiently solid plan to make me want to
+> pick anything except "2.12".
 
-That's a good goal, but I don't think this is the right way there.
-One of the reasons that conflation of allocation and typing is bad is
-that the typing is essentially local information to the PIC itself,
-whereas the allocation is a machine concern.
+I would suggest we just make major version number changes explicitly an
+arbitrary choice. ie just bump the major version for the first release
+of each year. Or just always bump it when we get to x.5 o x.9.
 
-By using a XICSFabric hook you're essentially wiring the irq typing
-through the machine, which again seems like a step in the wrong
-direction.
+We have a planned deprecation process for making incompatible changes
+at an arbitrary time, with no need to batch it up in a "big bang" break
+the whole world release. This kind of incremental change is much preferred
+from libvirt POV, as adapting to a huge pile of changes at the same time
+is a much bigger burden to deal with.
 
-> OK, So that's is not to your liking, I will come up with some=20
-> other solution. Thanks for looking.
-
-Sorry if I was a bit harsh; quite a few unrelated things have been
-frustrating me, which has made me grumpy.
-
---=20
-David Gibson			| I'll have my music baroque, and my code
-david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
-				| _way_ _around_!
-http://www.ozlabs.org/~dgibson
-
---84ND8YJRMFlzkrP4
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAloWrQIACgkQbDjKyiDZ
-s5IQ3A//Rd1DXensVzMGgknf08iQ89i3uqV25dLOreKJatsVQ4pLLv9xce8Khto1
-/qb2lXxiyZpMZmGb3u7VQIuNbK20xpaNcfjWKYHdse8ofcPfhjBv9ISyyxQ0vTQ7
-jM/J4pM+aE5Ywwm72yNZwWShulcIvUhH8p36ARKbLdMQylXSzvr2k/y/Ek3rj2yc
-EvnHfdl2Wo0x64J4aHofXspEZNL4kA95NM+oLsZaewHnwym8pYwIWsX8nAs3d3Hb
-0hmwHqj5siEMYFdbKwy8XaSanKtBb26dC9NOft5kCPIIQKNJKHQHKbkoFbedK2m5
-QiWvgLtOwNM6Kpt5QsPNVBfeBMoE/abq8iorwPnDWwdKz2wmgT79+QaHnEkGFDTr
-+LlIuwtZpXpCG7OFhQi6lHjeT/N+YPi72OwEYS0G4QtYoBX6TGmiZh6ESpEnekLP
-+bYL3I5DCyKDKjp26Bv9i1+bsldiVtQsN92pcv7CCMIPzWqivifxLyiLAugfuJiC
-JUXpSMeLoeHcnuxtlA3sNipEFdAoINB13jIXcGSk5jpPQ06WQQ1M28ZKmTK3RDww
-ZlereiIPHolKPuwuGLLuqNn+2uhKd6RaiO79gCwzcKv+sbX1AEt8hEBkFEf2lgm2
-A0yDbnH2P4FUzuXSw4QNZ05ntw8+qQZ+C9nhbKEYwqC2An+wgcU=
-=oW/C
------END PGP SIGNATURE-----
-
---84ND8YJRMFlzkrP4--
+Regards,
+Daniel
+-- 
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
