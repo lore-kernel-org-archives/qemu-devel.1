@@ -1,29 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35016)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42535)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <wouter@grep.be>) id 1eHpui-0002DX-Ma
-	for qemu-devel@nongnu.org; Thu, 23 Nov 2017 06:43:30 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1eHq16-0004CD-NK
+	for qemu-devel@nongnu.org; Thu, 23 Nov 2017 06:50:06 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <wouter@grep.be>) id 1eHpuf-0007P8-Jc
-	for qemu-devel@nongnu.org; Thu, 23 Nov 2017 06:43:28 -0500
-Date: Thu, 23 Nov 2017 12:42:26 +0100
-From: Wouter Verhelst <w@uter.be>
-Message-ID: <20171123114226.b6qgod25zv4c45bj@grep.be>
-References: <20170118080126.nyldkjhxdsxd4u2b@grep.be>
-	<CAMxP3BTjBSQEhycavgyfWXEA6pTg=sxfHe5sf+nxVY9ejXWMXQ@mail.gmail.com>
-	<20170122114339.l3ijhy3uymsru4ed@grep.be>
-	<4a5a82d6-7d66-cfb4-bd42-cea596115f6f@redhat.com>
-	<09ef1805-8361-5dff-300e-deede4863e55@redhat.com>
-	<20171114173745.egvtklxyrcprlcdn@grep.be>
-	<cd864bff-b429-20aa-7fc9-2f9296581470@redhat.com>
-	<20171116095116.4weodui6w27clyre@grep.be>
-	<11977343-24b6-9b1d-59e0-275de8b988cb@redhat.com>
-	<20171116162029.jslqnlx3jsaz6wpy@grep.be>
+	(envelope-from <peter.maydell@linaro.org>) id 1eHq15-00050M-3l
+	for qemu-devel@nongnu.org; Thu, 23 Nov 2017 06:50:04 -0500
+Received: from mail-oi0-x241.google.com ([2607:f8b0:4003:c06::241]:43368)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1eHq14-0004zl-S9
+	for qemu-devel@nongnu.org; Thu, 23 Nov 2017 06:50:03 -0500
+Received: by mail-oi0-x241.google.com with SMTP id z143so538418oia.10
+	for <qemu-devel@nongnu.org>; Thu, 23 Nov 2017 03:50:02 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20171116162029.jslqnlx3jsaz6wpy@grep.be>
-Subject: Re: [Qemu-devel] [Nbd] [Qemu-block] How to online resize qemu disk
- with nbd protocol?
+In-Reply-To: <20171113161446.2862-3-michael.nawrocki@gtri.gatech.edu>
+References: <20171113161446.2862-1-michael.nawrocki@gtri.gatech.edu>
+	<20171113161446.2862-3-michael.nawrocki@gtri.gatech.edu>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Thu, 23 Nov 2017 11:49:41 +0000
+Message-ID: <CAFEAcA8w2PCKyGfPZyoQ1LLiMkEHpyDQv6-nz8voNsVJ_0Fv-Q@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH v3 2/3] Enable 8-byte wide access to AMD
+ CFI devices
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,143 +30,261 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>
-Cc: Bob Chen <a175818323@gmail.com>, nbd list <nbd@other.debian.org>, Stefan Hajnoczi <stefanha@gmail.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, qemu block <qemu-block@nongnu.org>
+To: Mike Nawrocki <michael.nawrocki@gtri.gatech.edu>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, Qemu-block <qemu-block@nongnu.org>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
 
-Ping. Should I write this up as a proper proposal?
+On 13 November 2017 at 16:14, Mike Nawrocki
+<michael.nawrocki@gtri.gatech.edu> wrote:
+> Signed-off-by: Mike Nawrocki <michael.nawrocki@gtri.gatech.edu>
+> ---
+>  hw/block/pflash_cfi02.c | 143 ++++++++++++++++++++++++++++++++++--------------
+>  1 file changed, 102 insertions(+), 41 deletions(-)
+>
+> diff --git a/hw/block/pflash_cfi02.c b/hw/block/pflash_cfi02.c
+> index a81df913f6..29eb0429a3 100644
+> --- a/hw/block/pflash_cfi02.c
+> +++ b/hw/block/pflash_cfi02.c
+> @@ -18,7 +18,7 @@
+>   */
+>
+>  /*
+> - * For now, this code can emulate flashes of 1, 2 or 4 bytes width.
+> + * For now, this code can emulate flashes of 1, 2, 4, or 8 bytes width.
+>   * Supported commands/modes are:
+>   * - flash read
+>   * - flash write
+> @@ -138,11 +138,72 @@ static void pflash_timer (void *opaque)
+>      pfl->cmd = 0;
+>  }
+>
+> +static uint64_t _flash_read(pflash_t *pfl, hwaddr offset,
+> +                            int width, int be)
 
-On Thu, Nov 16, 2017 at 05:20:29PM +0100, Wouter Verhelst wrote:
-> On Thu, Nov 16, 2017 at 09:30:41AM -0600, Eric Blake wrote:
-> > On 11/16/2017 03:51 AM, Wouter Verhelst wrote:
-> > 
-> > >> I also remember from talking with Vladimir during KVM Forum last month
-> > >> that one of the shortfalls of the NBD protocol is that you can only ever
-> > >> send a length of up to 32 bits on the command side (unless we introduce
-> > >> structured commands in addition to our current work to add structured
-> > >> replies);
-> > > 
-> > > Yes, and I'm thinking we should do so. This will obviously require more
-> > > negotiation.
-> > > 
-> > > Can be done fairly easily though:
-> > > - Client negotiates structured replies (don't think it makes sense to do
-> > >   structured requests without structured replies)
-> > > - Server sets an extra transmission flag to say "I am capable of
-> > >   receiving extended requests"
-> > > - Extended requests have a different magic number, and should have a
-> > >   "request length" field as well. I'm thinking we make it:
-> > > 
-> > > magic          (32b)
-> > > request length (16b)
-> > > type           (16b)
-> > > flags          (64b)
-> > > handle         (64b)
-> > > from           (64b)
-> > > data length    (64b)
-> > > (extra data)
-> > > 
-> > > Request length in this proposal should always be at least 320.
-> > 
-> > 320 bits, but we pass length in bytes, so 40.
-> 
-> Umm. Yes. I didn't sleep very well last night, sorry.
-> 
-> > > I made flags 64 bits rather than 16 as per the current format, because
-> > > that way everything is aligned on a 4-byte boundary, which makes things
-> > > a bit easier on some architectures (e.g., I know that sparc doesn't like
-> > > unaligned 64-bit access). 64 bits for flags looks like a bit of a waste,
-> > > but then if we're going to waste some bits somewhere, I guess it's best
-> > > to assign them to flags.
-> > > 
-> > > The idea is that "request length" is the length of the data that the
-> > > client is sending, and "data length" is the length of the range that
-> > > we're trying to deal with.
-> > 
-> > Yep, sounds reasonable.
-> > 
-> > > A write request would thus have to have request length be (data length +
-> > > 320); a read request would have request length be 320, and expect data
-> > > to be returned of data length bytes.
-> > 
-> > Umm, if data length is 64 bits, but request length is 16 bits, we can't
-> > properly support write requests with that much payload.
-> 
-> mumble mumble. Yes, of course. See above ;-)
-> 
-> > I think it goes
-> > back to the idea of block sizes: the maximum request that a server is
-> > willing to accept (advertised via INFO during NBD_OPT_GO) still applies,
-> > so you can't NBD_CMD_WRITE with more than that maximum size (and
-> > therefore your maximum request size can't be more than that size plus
-> > the overhead of the 40 byte header), but OTHER commands that CAN operate
-> > on larger chunks of the export (WRITE_ZEROES, BLOCK_STATUS, maybe a new
-> > extension LOCK for allowing fcntl()-like locking semantics) can now be
-> > accommodated, because they don't have to send large amounts of payload
-> > along with the request.
-> > 
-> > Keeping request length at 16 bits may therefore be too small (if we want
-> > to allow 32M write payloads), and may require us laying out the
-> > structured write header slightly differently (maybe fewer flag bits
-> > after all).
-> 
-> Right, so let's make it:
-> 
-> magic          (32b)
-> flags          (16b)
-> type           (16b)
-> handle         (64b)
-> from           (64b)
-> data length    (64b)
-> request length (64b)
-> (extra data)
-> 
-> That actually copies the same structure as the current request header, but:
-> - data length is extended from 32 bits to 64 bits, so that long requests can be
->   made where they make sense. We should make it clear though that block
->   size limitations still apply, and that a request to read 2^63 bytes of
->   data is likely to be refused by a server.
-> - request lenght is added, also as a 64-bit value. I could be persuaded
->   to make that a 32-bit value rather than a 64-bit one, though.
-> 
-> This way, common code can be used to handle all data up to and including
-> the "from" field; what's beyond that would need to be decided based upon
-> the value of the magic field (32-byte data length in case of old
-> requests, 2 64-byte length values in the other case).
-> 
-> Maybe, by the time we get here, it makes sense to also have "request
-> length" be 0 for a command that doesn't have any extra data beyond that
-> header. That would also make one particular case easier to read:
-> 
-> if(req.type == NBD_CMD_WRITE && req.data_length != req.request_length)
->         return EINVAL;
-> 
-> However, the downside of that is that we include header length in all
-> other cases (negotiation, structured replies), and this one would then
-> be the odd one out; I could imagine that might cause too much confusion.
-> Not sure whether the minor advantage above is worth that.
-> 
-> > Or we can say that NBD_CMD_WRITE still has to use old-style requests.
-> 
-> Let's not :-)
-> 
-> > > A metadata request could then tack on extra data, where request length
-> > > of 320 implies "all negotiated metadata contexts", but anything more
-> > > than that would imply there are some metadata IDs passed along.
-> > 
-> > Again, 40 bytes (not 320 bits), but yeah, that would be the idea.
-> 
-> Right.
-> 
-> -- 
-> Could you people please use IRC like normal people?!?
-> 
->   -- Amaya Rodrigo Sastre, trying to quiet down the buzz in the DebConf 2008
->      Hacklab
-> 
-> 
+Don't use leading underscores in function names, please --
+they are reserved for the system (C library, etc).
 
--- 
-Could you people please use IRC like normal people?!?
+> +{
+> +    /* Flash area read */
+> +    uint64_t ret = 0;
+> +    uint8_t *p = pfl->storage;
+> +
+> +    switch (width) {
+> +    case 1:
+> +        ret = p[offset];
+> +        /* DPRINTF("%s: data offset %08x %02x\n", __func__, offset, ret); */
+> +        break;
+> +    case 2:
+> +        if (be) {
+> +            ret = p[offset] << 8;
+> +            ret |= p[offset + 1];
+> +        } else {
+> +            ret = p[offset];
+> +            ret |= p[offset + 1] << 8;
+> +        }
+> +        /* DPRINTF("%s: data offset %08x %04x\n", __func__, offset, ret); */
+> +        break;
+> +    case 4:
+> +        if (be) {
+> +            ret = p[offset] << 24;
+> +            ret |= p[offset + 1] << 16;
+> +            ret |= p[offset + 2] << 8;
+> +            ret |= p[offset + 3];
+> +        } else {
+> +            ret = p[offset];
+> +            ret |= p[offset + 1] << 8;
+> +            ret |= p[offset + 2] << 16;
+> +            ret |= p[offset + 3] << 24;
+> +        }
+> +        /* DPRINTF("%s: data offset %08x %08x\n", __func__, offset, ret); */
+> +        break;
+> +    case 8:
+> +        if (be) {
+> +            ret = (uint64_t)p[offset] << 56;
+> +            ret |= (uint64_t)p[offset + 1] << 48;
+> +            ret |= (uint64_t)p[offset + 2] << 40;
+> +            ret |= (uint64_t)p[offset + 3] << 32;
+> +            ret |= (uint64_t)p[offset + 4] << 24;
+> +            ret |= (uint64_t)p[offset + 5] << 16;
+> +            ret |= (uint64_t)p[offset + 6] << 8;
+> +            ret |= (uint64_t)p[offset + 7];
+> +        } else {
+> +            ret = (uint64_t)p[offset];
+> +            ret |= (uint64_t)p[offset + 1] << 8;
+> +            ret |= (uint64_t)p[offset + 2] << 16;
+> +            ret |= (uint64_t)p[offset + 3] << 24;
+> +            ret |= (uint64_t)p[offset + 4] << 32;
+> +            ret |= (uint64_t)p[offset + 5] << 40;
+> +            ret |= (uint64_t)p[offset + 6] << 48;
+> +            ret |= (uint64_t)p[offset + 7] << 56;
+> +        }
+> +        break;
+> +    }
 
-  -- Amaya Rodrigo Sastre, trying to quiet down the buzz in the DebConf 2008
-     Hacklab
+This can be rewritten in a shorter and clearer way using
+the ld*_le_p() and ld*_be_p() functions, eg case 4 is
+
+    ret = be ? ldl_be_p(p + offset) : ldl_le_p(p + offset);
+
+
+case 2 uses lduw_be_p() and lduw_le_p(), case 8 uses
+ldq_be_p() and ldq_le_p().
+
+case 1 is just
+    ret = ldub_p(p + offset);
+because there's no endianness issue for 1 byte.
+
+
+> +
+> +    return ret;
+> +}
+> +
+>  static uint64_t pflash_read(pflash_t *pfl, hwaddr offset,
+>                              int width, int be)
+>  {
+>      hwaddr boff;
+> -    uint8_t *p;
+>      uint64_t ret;
+>
+>      DPRINTF("%s: offset " TARGET_FMT_plx "\n", __func__, offset);
+> @@ -158,6 +219,8 @@ static uint64_t pflash_read(pflash_t *pfl, hwaddr offset,
+>          boff = boff >> 1;
+>      else if (pfl->width == 4)
+>          boff = boff >> 2;
+> +    else if (pfl->width == 8)
+> +        boff = boff >> 3;
+
+If you run this patch through scripts/checkpatch.pl it should tell
+you that our coding style would like you to put braces on this if.
+Our usual practice is that if you're touching an existing statement
+that isn't in line with our coding style you should fix at least the
+parts checkpatch complains about (ie add {} to all the arms of the
+if, here).
+
+>      switch (pfl->cmd) {
+>      default:
+>          /* This should never happen : reset state & treat it as a read*/
+> @@ -170,37 +233,7 @@ static uint64_t pflash_read(pflash_t *pfl, hwaddr offset,
+>      case 0x00:
+>      flash_read:
+>          /* Flash area read */
+> -        p = pfl->storage;
+> -        switch (width) {
+> -        case 1:
+> -            ret = p[offset];
+> -//            DPRINTF("%s: data offset %08x %02x\n", __func__, offset, ret);
+> -            break;
+> -        case 2:
+> -            if (be) {
+> -                ret = p[offset] << 8;
+> -                ret |= p[offset + 1];
+> -            } else {
+> -                ret = p[offset];
+> -                ret |= p[offset + 1] << 8;
+> -            }
+> -//            DPRINTF("%s: data offset %08x %04x\n", __func__, offset, ret);
+> -            break;
+> -        case 4:
+> -            if (be) {
+> -                ret = p[offset] << 24;
+> -                ret |= p[offset + 1] << 16;
+> -                ret |= p[offset + 2] << 8;
+> -                ret |= p[offset + 3];
+> -            } else {
+> -                ret = p[offset];
+> -                ret |= p[offset + 1] << 8;
+> -                ret |= p[offset + 2] << 16;
+> -                ret |= p[offset + 3] << 24;
+> -            }
+> -//            DPRINTF("%s: data offset %08x %08x\n", __func__, offset, ret);
+> -            break;
+> -        }
+> +        ret = _flash_read(pfl, offset, width, be);
+>          break;
+>      case 0x90:
+>          /* flash ID read */
+> @@ -260,8 +293,8 @@ static void pflash_update(pflash_t *pfl, int offset,
+>      }
+>  }
+>
+> -static void pflash_write (pflash_t *pfl, hwaddr offset,
+> -                          uint64_t value, int width, int be)
+> +static void pflash_write(pflash_t *pfl, hwaddr offset,
+> +                         uint64_t value, int width, int be)
+>  {
+>      hwaddr boff;
+>      uint8_t *p;
+> @@ -275,17 +308,19 @@ static void pflash_write (pflash_t *pfl, hwaddr offset,
+>  #endif
+>          goto reset_flash;
+>      }
+> -    DPRINTF("%s: offset " TARGET_FMT_plx " %08x %d %d\n", __func__,
+> -            offset, value, width, pfl->wcycle);
+> +    DPRINTF("%s: offset " TARGET_FMT_plx " %08" PRIx64 " %d %d\n",
+> +            __func__, offset, value, width, pfl->wcycle);
+>      offset &= pfl->chip_len - 1;
+>
+> -    DPRINTF("%s: offset " TARGET_FMT_plx " %08x %d\n", __func__,
+> -            offset, value, width);
+> +    DPRINTF("%s: offset " TARGET_FMT_plx " %08" PRIx64 " %d\n",
+> +            __func__, offset, value, width);
+>      boff = offset & (pfl->sector_len - 1);
+>      if (pfl->width == 2)
+>          boff = boff >> 1;
+>      else if (pfl->width == 4)
+>          boff = boff >> 2;
+> +    else if (pfl->width == 8)
+> +        boff = boff >> 3;
+>      switch (pfl->wcycle) {
+>      case 0:
+>          /* Set the device in I/O access mode if required */
+> @@ -346,8 +381,8 @@ static void pflash_write (pflash_t *pfl, hwaddr offset,
+>              /* We need another unlock sequence */
+>              goto check_unlock0;
+>          case 0xA0:
+> -            DPRINTF("%s: write data offset " TARGET_FMT_plx " %08x %d\n",
+> -                    __func__, offset, value, width);
+> +            DPRINTF("%s: write data offset " TARGET_FMT_plx
+> +                    " %08" PRIx64 " %d\n", __func__, offset, value, width);
+>              p = pfl->storage;
+>              if (!pfl->ro) {
+>                  switch (width) {
+> @@ -379,6 +414,28 @@ static void pflash_write (pflash_t *pfl, hwaddr offset,
+>                      }
+>                      pflash_update(pfl, offset, 4);
+>                      break;
+> +                case 8:
+> +                    if (be) {
+> +                        p[offset] &= value >> 56;
+> +                        p[offset + 1] &= value >> 48;
+> +                        p[offset + 2] &= value >> 40;
+> +                        p[offset + 3] &= value >> 32;
+> +                        p[offset + 4] &= value >> 24;
+> +                        p[offset + 5] &= value >> 16;
+> +                        p[offset + 6] &= value >> 8;
+> +                        p[offset + 7] &= value;
+> +                    } else {
+> +                        p[offset] &= value;
+> +                        p[offset + 1] &= value >> 8;
+> +                        p[offset + 2] &= value >> 16;
+> +                        p[offset + 3] &= value >> 24;
+> +                        p[offset + 4] &= value >> 32;
+> +                        p[offset + 5] &= value >> 40;
+> +                        p[offset + 6] &= value >> 48;
+> +                        p[offset + 7] &= value >> 56;
+> +                    }
+> +                    pflash_update(pfl, offset, 8);
+> +                    break;
+>                  }
+
+Similarly here we can use
+   if (be) {
+       uint64_t oldv = ldq_be_p(p + offset);
+       stq_be_p(p + offset, oldv & value);
+   } else {
+       ...ditto with _le_
+   }
+
+Other than those minor issues, patch looks good.
+
+thanks
+-- PMM
