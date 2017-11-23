@@ -1,25 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40365)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53847)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1eHtHn-0005JQ-4n
-	for qemu-devel@nongnu.org; Thu, 23 Nov 2017 10:19:35 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1eHtTV-0000Tk-6m
+	for qemu-devel@nongnu.org; Thu, 23 Nov 2017 10:31:38 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1eHtHm-0004SM-1V
-	for qemu-devel@nongnu.org; Thu, 23 Nov 2017 10:19:31 -0500
-Received: from mail-oi0-x242.google.com ([2607:f8b0:4003:c06::242]:40187)
+	(envelope-from <peter.maydell@linaro.org>) id 1eHtTU-0004Bx-6b
+	for qemu-devel@nongnu.org; Thu, 23 Nov 2017 10:31:37 -0500
+Received: from mail-oi0-x236.google.com ([2607:f8b0:4003:c06::236]:42264)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1eHtHl-0004Rb-ST
-	for qemu-devel@nongnu.org; Thu, 23 Nov 2017 10:19:29 -0500
-Received: by mail-oi0-x242.google.com with SMTP id l138so13354040oib.7
-	for <qemu-devel@nongnu.org>; Thu, 23 Nov 2017 07:19:29 -0800 (PST)
+	id 1eHtTU-0004Ay-19
+	for qemu-devel@nongnu.org; Thu, 23 Nov 2017 10:31:36 -0500
+Received: by mail-oi0-x236.google.com with SMTP id p23so10277915oie.9
+	for <qemu-devel@nongnu.org>; Thu, 23 Nov 2017 07:31:35 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <1511448975-28326-1-git-send-email-eric.auger@redhat.com>
-References: <1511448975-28326-1-git-send-email-eric.auger@redhat.com>
+In-Reply-To: <7733d617-0e56-acdc-ad6d-aafce0c7160d@redhat.com>
+References: <20171106005656.GC84093@humpty.home.comstyle.com>
+	<CAFEAcA_2i0p9C3amtoB0o9Y4K83aCP7Gkw1cDqmLjrkLwJTZxg@mail.gmail.com>
+	<20171106112638.GF23361@redhat.com>
+	<7733d617-0e56-acdc-ad6d-aafce0c7160d@redhat.com>
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Thu, 23 Nov 2017 15:19:08 +0000
-Message-ID: <CAFEAcA8T4cShPYONdo8hiaZKvd+zq9Uo1o5awU3rA03uu8Vsiw@mail.gmail.com>
+Date: Thu, 23 Nov 2017 15:31:14 +0000
+Message-ID: <CAFEAcA8DDdPUZRoA0dRVpP1vr9f7VdLmbvr19Pu9kC67Hd2j9w@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [RFC v3 0/4] vITS Reset
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH] osdep: Deal with TIME_MAX and OpenBSD
+ 64-bit time_t
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,30 +33,31 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Auger <eric.auger@redhat.com>
-Cc: eric.auger.pro@gmail.com, qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>, wanghaibin.wang@huawei.com, Vijay Kilari <vijay.kilari@gmail.com>, Andrew Jones <drjones@redhat.com>, Wei Huang <wei@redhat.com>, Juan Quintela <quintela@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Christoffer Dall <christoffer.dall@linaro.org>, wu.wubin@huawei.com
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: "Daniel P. Berrange" <berrange@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>, Brad Smith <brad@comstyle.com>
 
-On 23 November 2017 at 14:56, Eric Auger <eric.auger@redhat.com> wrote:
-> At the moment the ITS is not properly reset. On System reset or
-> reboot, previous ITS register values and caches are left
-> unchanged. Some of the registers might point to some guest RAM
-> tables which are not valid anymore. This leads to state
-> inconsistencies that are detected by the kernel save/restore
-> code. And eventually this may cause qemu abort.
+On 6 November 2017 at 17:41, Paolo Bonzini <pbonzini@redhat.com> wrote:
+> What about
 >
-> This series adds vITS reset modality:
-> - the 2 first patches bring a minimalist reset through individual
->   register writes. However, with kernel versions < 4.15, this reset
->   is not complete (vITS caches are not voided).
-> - With kernel versions >= 4.15 we can rely on a new ITS KVM device
->   reset IOTCL. The last 2 patches introduce the full reset.
+> #define type_max(t)                   \
+>     ((t) -1 > 0                       \
+>      ? (t)~0                          \
+>      : (((t)1) <<                     \
+>          (sizeof(t) * 8 - 1)) - 1)    \
 >
-> Patches 1-2 have all kernel dependencies resolved.
-> Patches 3-4' dependencies were pulled for v4.15-rc0 but as the tag is
-> not set, the kernel header update still is partial.
+> #define TIME_MAX type_max(time_t)
+>
+> ?  We don't need it to be a cpp constant, do we?  Or if we did, we could
+> assume it to be signed, it's enough for the three users.
 
-We don't need the change to be tagged for us to sync with the
-kernel headers: if it's in mainline that's good enough.
+GCC doesn't like this phrasing, it complains
+qmp.c: In function =E2=80=98qmp_expire_password=E2=80=99:
+qmp.c:334:89: error: integer overflow in expression [-Werror=3Doverflow]
+
+because of the shift into the sign bit. Instead we can borrow the
+TYPE_MAXIMUM macro from gnulib, which uses basically the same
+approach but avoids the UB and the compiler warning. I'll send
+a patch in a bit.
 
 thanks
 -- PMM
