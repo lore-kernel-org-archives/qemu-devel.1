@@ -1,26 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38244)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57852)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <rkrcmar@redhat.com>) id 1eHtcv-0006CF-C4
-	for qemu-devel@nongnu.org; Thu, 23 Nov 2017 10:41:22 -0500
+	(envelope-from <pm215@archaic.org.uk>) id 1eHtrw-0001a5-Gk
+	for qemu-devel@nongnu.org; Thu, 23 Nov 2017 10:56:53 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <rkrcmar@redhat.com>) id 1eHtcs-0001Th-1d
-	for qemu-devel@nongnu.org; Thu, 23 Nov 2017 10:41:21 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:49104)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <rkrcmar@redhat.com>) id 1eHtcr-0001SZ-Pc
-	for qemu-devel@nongnu.org; Thu, 23 Nov 2017 10:41:17 -0500
-Date: Thu, 23 Nov 2017 16:41:12 +0100
-From: "rkrcmar@redhat.com" <rkrcmar@redhat.com>
-Message-ID: <20171123154111.GC21279@flask>
-References: <58CFE56E.9090303@huawei.com>
-	<135b6663-b65c-b5ba-d3a8-b2a2127a07fa@redhat.com>
-	<58E59E29.7070305@huawei.com>
-	<33183CC9F5247A488A2544077AF19020DA4964D4@DGGEMA505-MBS.china.huawei.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <33183CC9F5247A488A2544077AF19020DA4964D4@DGGEMA505-MBS.china.huawei.com>
-Subject: Re: [Qemu-devel] [BUG/RFC] INIT IPI lost when VM starts
+	(envelope-from <pm215@archaic.org.uk>) id 1eHtrv-0001dp-PS
+	for qemu-devel@nongnu.org; Thu, 23 Nov 2017 10:56:52 -0500
+Received: from orth.archaic.org.uk ([2001:8b0:1d0::2]:38520)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pm215@archaic.org.uk>)
+	id 1eHtrv-0001U6-Ij
+	for qemu-devel@nongnu.org; Thu, 23 Nov 2017 10:56:51 -0500
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Thu, 23 Nov 2017 15:56:38 +0000
+Message-Id: <1511452598-6077-1-git-send-email-peter.maydell@linaro.org>
+Subject: [Qemu-devel] [PATCH for-2.11?] osdep.h: Make TIME_MAX handle
+ different time_t types
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,69 +23,64 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Gonglei (Arei)" <arei.gonglei@huawei.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, "afaerber@suse.de" <afaerber@suse.de>, "jan.kiszka@siemens.com" <jan.kiszka@siemens.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>, "wangxin (U)" <wangxinxin.wang@huawei.com>, "Huangweidong (C)" <weidong.huang@huawei.com>, linzhecheng <linzhecheng@huawei.com>
+To: qemu-devel@nongnu.org
+Cc: patches@linaro.org, Paolo Bonzini <pbonzini@redhat.com>, Brad Smith <brad@comstyle.com>, Kamil Rytarowski <n54@gmx.com>
 
-2017-11-20 06:57+0000, Gonglei (Arei):
-> Hi Paolo,
-> 
-> What's your opinion about this patch? We found it just before finishing patches 
-> for the past two days.
+In our various supported host OSes, the time_t type may be either 32
+or 64 bit, and could in theory also be either signed or unsigned.
+Notably, in OpenBSD time_t is a 64 bit type even if 'long' is 32
+bits, so using LONG_MAX for TIME_MAX is incorrect.
 
-I think your case was fixed by f4ef19108608 ("KVM: X86: Fix loss of
-pending INIT due to race"), but that patch didn't fix it perfectly, so
-maybe you're hitting a similar case that happens in SMM ...
+Use an approach suggested by Paolo Bonzini which calculates
+the maximum value of the type rather than hardcoding it;
+to do this we use the TYPE_MAXIMUM macro from Gnulib.
 
-> > -----Original Message-----
-> > From: kvm-owner@vger.kernel.org [mailto:kvm-owner@vger.kernel.org] On
-> > Behalf Of Herongguang (Stephen)
-> > On 2017/4/6 0:16, Paolo Bonzini wrote:
-> > > Hi Rongguang,
-> > >
-> > > sorry for the late response.
-> > >
-> > > Where exactly is KVM_APIC_INIT dropped?  kvm_get_mp_state does clear
-> > the
-> > > bit, but the result of the INIT is stored in mp_state.
-> > 
-> > It's dropped in KVM_SET_VCPU_EVENTS, see below.
-> > 
-> > >
-> > > kvm_get_vcpu_events is called after kvm_get_mp_state; it retrieves
-> > > KVM_APIC_INIT in events.smi.latched_init and kvm_set_vcpu_events passes
-> > > it back.  Maybe it should ignore events.smi.latched_init if not in SMM,
-> > > but I would like to understand the exact sequence of events.
-> > 
-> > time0:
-> > vcpu1:
-> > qmp_query_cpus-> cpu_synchronize_state-> kvm_cpu_synchronize_state->
-> >  > do_kvm_cpu_synchronize_state(and set vcpu1's cpu->kvm_vcpu_dirty to
-> > true)-> kvm_arch_get_registers(KVM_APIC_INIT bit in
-> > vcpu->arch.apic->pending_events was not set)
-> > 
-> > time1:
-> > vcpu0:
-> > send INIT-SIPI to all AP->(in vcpu 0's
-> > context)__apic_accept_irq(KVM_APIC_INIT bit in vcpu1's
-> > arch.apic->pending_events is set)
-> > 
-> > time2:
-> > vcpu1:
-> > kvm_cpu_exec->(if cpu->kvm_vcpu_dirty is
-> > true)kvm_arch_put_registers->kvm_put_vcpu_events(overwritten
-> > KVM_APIC_INIT bit in vcpu->arch.apic->pending_events!)
-> > 
-> > So it's a race between vcpu1 get/put registers with kvm/other vcpus changing
-> > vcpu1's status/structure fields in the mean time, I am in worry of if there are
-> > other fields may be overwritten,
-> > sipi_vector is one.
+Suggested-by: Paolo Bonzini <pbonzini@redhat.com>
+Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+---
+ include/qemu/osdep.h | 29 ++++++++++++++++++++++++++++-
+ 1 file changed, 28 insertions(+), 1 deletion(-)
 
-Fields that can be asynchronously written by other VCPUs (like SIPI,
-NMI) must not be SET if other VCPUs were not paused since the last GET.
-(Looking at the interface, we can currently lose pending SMI.)
-
-INIT is one of the restricted fields, but the API unconditionally
-couples SMM with latched INIT, which means that we can lose an INIT if
-the VCPU is in SMM mode -- do you see SMM in kvm_vcpu_events?
-
-Thanks.
+diff --git a/include/qemu/osdep.h b/include/qemu/osdep.h
+index 281782d..e8568a0 100644
+--- a/include/qemu/osdep.h
++++ b/include/qemu/osdep.h
+@@ -147,8 +147,35 @@ extern int daemon(int, int);
+ #if !defined(ESHUTDOWN)
+ #define ESHUTDOWN 4099
+ #endif
++
++/* time_t may be either 32 or 64 bits depending on the host OS, and
++ * can be either signed or unsigned, so we can't just hardcode a
++ * specific maximum value. This is not a C preprocessor constant,
++ * so you can't use TIME_MAX in an #ifdef, but for our purposes
++ * this isn't a problem.
++ */
++
++/* The macros TYPE_SIGNED, TYPE_WIDTH, and TYPE_MAXIMUM are from
++ * Gnulib, and are under the LGPL v2.1 or (at your option) any
++ * later version.
++ */
++
++/* True if the real type T is signed.  */
++#define TYPE_SIGNED(t) (!((t)0 < (t)-1))
++
++/* The width in bits of the integer type or expression T.
++ * Padding bits are not supported.
++ */
++#define TYPE_WIDTH(t) (sizeof(t) * CHAR_BIT)
++
++/* The maximum and minimum values for the integer type T.  */
++#define TYPE_MAXIMUM(t)                                                \
++  ((t) (!TYPE_SIGNED(t)                                                \
++        ? (t)-1                                                        \
++        : ((((t)1 << (TYPE_WIDTH(t) - 2)) - 1) * 2 + 1)))
++
+ #ifndef TIME_MAX
+-#define TIME_MAX LONG_MAX
++#define TIME_MAX TYPE_MAXIMUM(time_t)
+ #endif
+ 
+ /* HOST_LONG_BITS is the size of a native pointer in bits. */
+-- 
+2.7.4
