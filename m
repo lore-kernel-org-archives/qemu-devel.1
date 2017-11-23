@@ -1,39 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39280)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41106)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1eHs0K-0006LZ-SX
-	for qemu-devel@nongnu.org; Thu, 23 Nov 2017 08:57:25 -0500
+	(envelope-from <famz@redhat.com>) id 1eHs2A-0007mR-I4
+	for qemu-devel@nongnu.org; Thu, 23 Nov 2017 08:59:19 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1eHs0K-0008WO-6n
-	for qemu-devel@nongnu.org; Thu, 23 Nov 2017 08:57:24 -0500
-Received: from mail-ot0-x241.google.com ([2607:f8b0:4003:c0f::241]:43156)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1eHs0K-0008W8-1k
-	for qemu-devel@nongnu.org; Thu, 23 Nov 2017 08:57:24 -0500
-Received: by mail-ot0-x241.google.com with SMTP id 105so16365405oth.10
-	for <qemu-devel@nongnu.org>; Thu, 23 Nov 2017 05:57:23 -0800 (PST)
-MIME-Version: 1.0
-In-Reply-To: <fb4911b9-af89-a0a3-031a-964bf093aa59@redhat.com>
-References: <20171110152017.24324-1-clg@kaod.org>
-	<20171110152017.24324-2-clg@kaod.org>
-	<715a7bd1-7aa5-fa64-a9b8-76782ee20576@redhat.com>
-	<20171123110345.03541b50.cohuck@redhat.com>
-	<CAFEAcA83-oqifsZboJmvDVYhhr4=QOEEGF1TZba-jCewpUFtyg@mail.gmail.com>
-	<1dff6d6c-be83-f6e1-2b7e-82d98bdb8a63@redhat.com>
-	<6dd7061e-2ebe-7a51-8142-f67d5d75a81a@redhat.com>
-	<8cd1c0b3-8386-d41e-ccfb-1a2073cdf4fb@redhat.com>
-	<16011ac4-77c4-af75-5754-5f9586d6d629@redhat.com>
-	<20171123130908.6ab004d3.cohuck@redhat.com>
-	<b3b9837e-c6b0-d718-faaf-1ef198256634@redhat.com>
-	<20171123133924.60e9f616.cohuck@redhat.com>
-	<1519a9dc-5f0b-7ddd-18ac-d1f33782656d@redhat.com>
-	<CAFEAcA_G_oG==OprY+NCGELyZx+rxgNFBMwQtLeGf6JsSHOQYw@mail.gmail.com>
-	<fb4911b9-af89-a0a3-031a-964bf093aa59@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Thu, 23 Nov 2017 13:57:02 +0000
-Message-ID: <CAFEAcA_WF7bKMgTW6O9skp=qNdcjQ4+Dofst=9y1Nz9MU6hJmQ@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] QEMU 3.0 ?
+	(envelope-from <famz@redhat.com>) id 1eHs29-0001aR-9G
+	for qemu-devel@nongnu.org; Thu, 23 Nov 2017 08:59:18 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:50986)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <famz@redhat.com>) id 1eHs28-0001Z9-Tn
+	for qemu-devel@nongnu.org; Thu, 23 Nov 2017 08:59:17 -0500
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+	[10.5.11.15])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 06082FC7BA
+	for <qemu-devel@nongnu.org>; Thu, 23 Nov 2017 13:59:16 +0000 (UTC)
+From: Fam Zheng <famz@redhat.com>
+Date: Thu, 23 Nov 2017 21:59:05 +0800
+Message-Id: <20171123135906.12852-2-famz@redhat.com>
+In-Reply-To: <20171123135906.12852-1-famz@redhat.com>
+References: <20171123135906.12852-1-famz@redhat.com>
+Subject: [Qemu-devel] [PATCH 1/2] docs: Add image locking subsection
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -42,32 +29,76 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: Cornelia Huck <cohuck@redhat.com>, Thomas Huth <thuth@redhat.com>, =?UTF-8?Q?C=C3=A9dric_Le_Goater?= <clg@kaod.org>, QEMU Developers <qemu-devel@nongnu.org>, David Gibson <david@gibson.dropbear.id.au>, Greg Kurz <groug@kaod.org>, Markus Armbruster <armbru@redhat.com>, "Daniel P. Berrange" <berrange@redhat.com>, Eric Blake <eblake@redhat.com>, =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>, =?UTF-8?Q?Sergio_Andr=C3=A9s_G=C3=B3mez_Del_Real?= <sergio.g.delreal@gmail.com>, Alex Bligh <alex@alex.org.uk>
+To: qemu-devel@nongnu.org
+Cc: kwolf@redhat.com, famz@redhat.com, mreitz@redhat.com
 
-On 23 November 2017 at 13:51, Paolo Bonzini <pbonzini@redhat.com> wrote:
-> On 23/11/2017 14:13, Peter Maydell wrote:
->> On 23 November 2017 at 13:02, Paolo Bonzini <pbonzini@redhat.com> wrote:
->>> In theory I don't like it either (and I hadn't thought about it until
->>> today).  In practice, qemu-kvm is not going away from
->>> blogs/scripts/tutorials in a decade, so we might as well embrace it...
->> Isn't this distro-specific? In ubuntu by default there isn't
->> any wrapper, and if you do install the optional 'qemu-kvm' package
->> the wrapper it provides is /usr/bin/kvm, not /usr/bin/qemu-kvm.
->
-> Fedora also has no wrapper in the qemu-system-x86 package, and only
-> "qemu-kvm" installs one.  In practice if you install the virtualization
-> package group you get it.  What about Ubuntu?
+This documents the image locking feature and explains when and how
+related options can be used.
 
-Well, I didn't have the qemu-kvm package installed until I
-pulled it in to check the wrapper name.
+Signed-off-by: Fam Zheng <famz@redhat.com>
+---
+ docs/qemu-block-drivers.texi | 36 ++++++++++++++++++++++++++++++++++++
+ qemu-doc.texi                |  1 +
+ 2 files changed, 37 insertions(+)
 
-My point is more that if there's no consensus between distros
-about what the wrapper script name should be then as upstream
-if we provide a qemu-kvm then we might be helping Fedora/RedHat
-but we're just increasing confusion for those distros that
-used a different name or have already transitioned away from
-the wrapper entirely.
-
-thanks
--- PMM
+diff --git a/docs/qemu-block-drivers.texi b/docs/qemu-block-drivers.texi
+index 1cb1e55686..fa2e90d15f 100644
+--- a/docs/qemu-block-drivers.texi
++++ b/docs/qemu-block-drivers.texi
+@@ -785,6 +785,42 @@ warning: ssh server @code{ssh.example.com:22} does not support fsync
+ With sufficiently new versions of libssh2 and OpenSSH, @code{fsync} is
+ supported.
+ 
++@node disk_image_locking
++@subsection Disk image file locking
++
++By default, QEMU tries to protect image files from unexpected concurrent
++access, as long as it's supported by the block protocol driver and host
++operating system. If multiple QEMU processes (including QEMU emulators and
++utilities) try to open the same image with conflicting accessing modes, all but
++the first one will get an error.
++
++This feature is currently supported by the file protocol on Linux with Open
++File Descriptor (OFD) locking API, and can be configured to fall back to POSIX
++locking if the POSIX host doesn't support Linux OFD locking.
++
++To explicitly enable image locking, specify "locking=on" in the file protocol
++driver options. If OFD locking is not possible, a warning will be printed and
++the POSIX locking API will be used. In this case there is risk that the lock
++will get silently lost when doing hot plugging and block jobs, due to the
++shortcomings of the POSIX locking API.
++
++QEMU transparently handles lock handover during shared storage migration.  For
++shared virtual disk images between multiple VMs, the "share-rw" device option
++should be used.
++
++Alternatively, locking can be fully disabled by "locking=off" block device
++option. In the command line the option is usually in the form of
++"file.locking=off" as the protocol driver is normally placed as a "file" child
++under a format driver. For example:
++
++@code{-blockdev driver=qcow2,file.filename=/path/to/image,file.locking=off,file.driver=file}
++
++To check if image locking is active, check the output of "lslocks" command on
++host and see if there are locks held by QEMU process on the image file. More
++than one bytes could be locked by a QEMU instance, each byte of which reflects
++a perticular permission that are acquired or protected by the running block
++driver.
++
+ @c man end
+ 
+ @ignore
+diff --git a/qemu-doc.texi b/qemu-doc.texi
+index 617254917d..db2351c746 100644
+--- a/qemu-doc.texi
++++ b/qemu-doc.texi
+@@ -405,6 +405,7 @@ encrypted disk images.
+ * disk_images_iscsi::         iSCSI LUNs
+ * disk_images_gluster::       GlusterFS disk images
+ * disk_images_ssh::           Secure Shell (ssh) disk images
++* disk_image_locking::        Disk image file locking
+ @end menu
+ 
+ @node disk_images_quickstart
+-- 
+2.14.3
