@@ -1,16 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33990)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33991)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1eHgxW-0005GK-8F
+	(envelope-from <mreitz@redhat.com>) id 1eHgxW-0005GL-8D
 	for qemu-devel@nongnu.org; Wed, 22 Nov 2017 21:09:47 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1eHgxV-0001vC-6R
+	(envelope-from <mreitz@redhat.com>) id 1eHgxV-0001uz-1L
 	for qemu-devel@nongnu.org; Wed, 22 Nov 2017 21:09:46 -0500
 From: Max Reitz <mreitz@redhat.com>
-Date: Thu, 23 Nov 2017 03:08:26 +0100
-Message-Id: <20171123020832.8165-12-mreitz@redhat.com>
+Date: Thu, 23 Nov 2017 03:08:25 +0100
+Message-Id: <20171123020832.8165-11-mreitz@redhat.com>
 In-Reply-To: <20171123020832.8165-1-mreitz@redhat.com>
 References: <20171123020832.8165-1-mreitz@redhat.com>
-Subject: [Qemu-devel] [PATCH 11/17] iotests: Fix 051 for compat=0.10
+Subject: [Qemu-devel] [PATCH 10/17] iotests: Fix 020 for vmdk
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,55 +22,75 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org
 Cc: qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>, Kevin Wolf <kwolf@redhat.com>, John Snow <jsnow@redhat.com>, Fam Zheng <famz@redhat.com>
 
-051 has both compat=1.1 and compat=0.10 tests (once it uses
-lazy_refcounts, once it tests that setting them does not work).
-For the compat=0.10 tests, it already explicitly creates a suitable
-image.  So let's just ignore the user-specified compat level for the
-lazy_refcounts test and explicitly create a compat=1.1 image there, too.
+vmdk cannot work with anything but vmdk backing files, so make the
+backing file be the same format as the overlay.
 
+Reported-by: John Snow <jsnow@redhat.com>
 Signed-off-by: Max Reitz <mreitz@redhat.com>
 ---
- tests/qemu-iotests/051        | 2 ++
- tests/qemu-iotests/051.out    | 1 +
- tests/qemu-iotests/051.pc.out | 1 +
- 3 files changed, 4 insertions(+)
+ tests/qemu-iotests/020     | 9 ++++++---
+ tests/qemu-iotests/020.out | 6 ++++--
+ 2 files changed, 10 insertions(+), 5 deletions(-)
 
-diff --git a/tests/qemu-iotests/051 b/tests/qemu-iotests/051
-index dba8816c9f..0c3be16489 100755
---- a/tests/qemu-iotests/051
-+++ b/tests/qemu-iotests/051
-@@ -131,6 +131,8 @@ echo
- echo === Enable and disable lazy refcounting on the command line, plus some invalid values ===
+diff --git a/tests/qemu-iotests/020 b/tests/qemu-iotests/020
+index d22ab81414..eac5080f83 100755
+--- a/tests/qemu-iotests/020
++++ b/tests/qemu-iotests/020
+@@ -111,10 +111,12 @@ echo
+ echo 'Testing failing commit'
  echo
  
-+_make_test_img -o compat=1.1 "$size"
++TEST_IMG="$TEST_IMG.base" _make_test_img 1M
 +
- run_qemu -drive file="$TEST_IMG",format=qcow2,lazy-refcounts=on
- run_qemu -drive file="$TEST_IMG",format=qcow2,lazy-refcounts=off
- run_qemu -drive file="$TEST_IMG",format=qcow2,lazy-refcounts=
-diff --git a/tests/qemu-iotests/051.out b/tests/qemu-iotests/051.out
-index e3c6eaba57..dd9846d1ce 100644
---- a/tests/qemu-iotests/051.out
-+++ b/tests/qemu-iotests/051.out
-@@ -77,6 +77,7 @@ QEMU_PROG: -drive file=TEST_DIR/t.qcow2,file.backing.driver=qcow2,file.backing.f
+ # Create an image with a null backing file to which committing will fail (with
+ # ENOSPC so we can distinguish the result from some generic EIO which may be
+ # generated anywhere in the block layer)
+-_make_test_img -b "json:{'driver': 'raw',
++_make_test_img -b "json:{'driver': '$IMGFMT',
+                          'file': {
+                              'driver': 'blkdebug',
+                              'inject-error': [{
+@@ -123,14 +125,15 @@ _make_test_img -b "json:{'driver': 'raw',
+                                  'once': true
+                              }],
+                              'image': {
+-                                 'driver': 'null-co'
++                                 'driver': 'file',
++                                 'filename': '$TEST_IMG.base'
+                              }}}"
  
- === Enable and disable lazy refcounting on the command line, plus some invalid values ===
+ # Just write anything so committing will not be a no-op
+ $QEMU_IO -c 'writev 0 64k' "$TEST_IMG" | _filter_qemu_io
  
-+Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=134217728
- Testing: -drive file=TEST_DIR/t.qcow2,format=qcow2,lazy-refcounts=on
- QEMU X.Y.Z monitor - type 'help' for more information
- (qemu) quit
-diff --git a/tests/qemu-iotests/051.pc.out b/tests/qemu-iotests/051.pc.out
-index f2c5622cee..830c11880a 100644
---- a/tests/qemu-iotests/051.pc.out
-+++ b/tests/qemu-iotests/051.pc.out
-@@ -77,6 +77,7 @@ QEMU_PROG: -drive file=TEST_DIR/t.qcow2,file.backing.driver=qcow2,file.backing.f
+ $QEMU_IMG commit "$TEST_IMG"
+-_cleanup_test_img
++_cleanup
  
- === Enable and disable lazy refcounting on the command line, plus some invalid values ===
+ # success, all done
+ echo "*** done"
+diff --git a/tests/qemu-iotests/020.out b/tests/qemu-iotests/020.out
+index 165b70aa49..4b722b2dd0 100644
+--- a/tests/qemu-iotests/020.out
++++ b/tests/qemu-iotests/020.out
+@@ -1078,7 +1078,8 @@ No errors were found on the image.
  
-+Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=134217728
- Testing: -drive file=TEST_DIR/t.qcow2,format=qcow2,lazy-refcounts=on
- QEMU X.Y.Z monitor - type 'help' for more information
- (qemu) quit
+ Testing failing commit
+ 
+-Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=1073741824 backing_file=json:{'driver': 'raw',,
++Formatting 'TEST_DIR/t.IMGFMT.base', fmt=IMGFMT size=1048576
++Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=1048576 backing_file=json:{'driver': 'IMGFMT',,
+                          'file': {
+                              'driver': 'blkdebug',,
+                              'inject-error': [{
+@@ -1087,7 +1088,8 @@ Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=1073741824 backing_file=json:{'d
+                                  'once': true
+                              }],,
+                              'image': {
+-                                 'driver': 'null-co'
++                                 'driver': 'file',,
++                                 'filename': 'TEST_DIR/t.IMGFMT.base'
+                              }}}
+ wrote 65536/65536 bytes at offset 0
+ 64 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
 -- 
 2.13.6
