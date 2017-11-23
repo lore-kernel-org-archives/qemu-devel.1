@@ -1,20 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40053)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43767)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1eHlsQ-00087X-M7
-	for qemu-devel@nongnu.org; Thu, 23 Nov 2017 02:24:51 -0500
+	(envelope-from <richard.henderson@linaro.org>) id 1eHlzv-00026X-QW
+	for qemu-devel@nongnu.org; Thu, 23 Nov 2017 02:32:39 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1eHlsP-0005rU-Tp
-	for qemu-devel@nongnu.org; Thu, 23 Nov 2017 02:24:50 -0500
-Date: Thu, 23 Nov 2017 15:24:38 +0800
-From: Fam Zheng <famz@redhat.com>
-Message-ID: <20171123072438.GE1624@lemon>
-References: <20171123020832.8165-1-mreitz@redhat.com>
+	(envelope-from <richard.henderson@linaro.org>) id 1eHlzr-00021M-T8
+	for qemu-devel@nongnu.org; Thu, 23 Nov 2017 02:32:35 -0500
+Received: from mail-wm0-x242.google.com ([2a00:1450:400c:c09::242]:45167)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+	id 1eHlzr-00020w-LX
+	for qemu-devel@nongnu.org; Thu, 23 Nov 2017 02:32:31 -0500
+Received: by mail-wm0-x242.google.com with SMTP id 9so14717925wme.4
+	for <qemu-devel@nongnu.org>; Wed, 22 Nov 2017 23:32:31 -0800 (PST)
+References: <20171122142627.73170-1-borntraeger@de.ibm.com>
+	<20171122142627.73170-3-borntraeger@de.ibm.com>
+From: Richard Henderson <richard.henderson@linaro.org>
+Message-ID: <7ca173f9-c4f3-2daa-04b0-38b4ade27504@linaro.org>
+Date: Thu, 23 Nov 2017 08:32:26 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20171123020832.8165-1-mreitz@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH 00/17] iotests: Fix iotests for weird
- formats/options
+In-Reply-To: <20171122142627.73170-3-borntraeger@de.ibm.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH 2/2] pc-bios/s390-ccw: zero out bss section
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,24 +31,26 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Max Reitz <mreitz@redhat.com>
-Cc: qemu-block@nongnu.org, qemu-devel@nongnu.org, Kevin Wolf <kwolf@redhat.com>, John Snow <jsnow@redhat.com>
+To: Christian Borntraeger <borntraeger@de.ibm.com>, Cornelia Huck <cohuck@redhat.com>
+Cc: Alexander Graf <agraf@suse.de>, Thomas Huth <thuth@redhat.com>, Halil Pasic <pasic@linux.vnet.ibm.com>, qemu-devel <qemu-devel@nongnu.org>, qemu-s390x <qemu-s390x@nongnu.org>, Richard Henderson <rth@twiddle.net>
 
-On Thu, 11/23 03:08, Max Reitz wrote:
-> (I hate to write Python tests because the boilerplate seems so large and
->  the debugging is so hard.  But there is test 194 which shows that it is
->  possible to write simple bash-like tests as well--and that is how I
->  should probably write tests from now on.)
+On 11/22/2017 03:26 PM, Christian Borntraeger wrote:
+> The QEMU ELF loader does not zero the bss segment.
+> This resulted in several bugs, e.g. see
+> 
+> commit 5d739a4787a5 (s390-ccw.img: Fix sporadic errors with ccw boot image - initialize css)
+> commit 6a40fa2669d3 (s390-ccw.img: Initialize next_idx)
+> commit 8775d91a0f42 (pc-bios/s390-ccw: Fix problem with invalid virtio-scsi LUN when rebooting)
+> 
+> Lets fix this once and forever by letting the BIOS zero the bss itself.
+> 
+> Suggested-by: Alexander Graf <agraf@suse.de>
+> Signed-off-by: Christian Borntraeger <borntraeger@de.ibm.com>
+> ---
+>  pc-bios/s390-ccw/start.S | 30 +++++++++++++++++++++++++++---
+>  1 file changed, 27 insertions(+), 3 deletions(-)
 
-If the boilerplate means copy&paste from another test it is not a big problem;
-if you really mean it's more cumbersome than bash to write test code, I think we
-can try new ways to exploit Python's expressiveness. 2c93c5cb43 and f4844ac0ad
-are good examples.
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 
-So what do you think about debugging? IMO the biggest problem is the less
-verbose reference output, and lack of a separate logging channel. We can and
-should improve that, even for existing scripts.
 
-And yes, the 194 style is actually better than "iotests.QMPTestCase" ones.
-
-Fam
+r~
