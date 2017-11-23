@@ -1,21 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54602)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35709)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1eHe0q-0007Qu-KV
-	for qemu-devel@nongnu.org; Wed, 22 Nov 2017 18:01:01 -0500
+	(envelope-from <alistair23@gmail.com>) id 1eHfPi-0007WR-0N
+	for qemu-devel@nongnu.org; Wed, 22 Nov 2017 19:30:46 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1eHe0p-0004g7-LP
-	for qemu-devel@nongnu.org; Wed, 22 Nov 2017 18:01:00 -0500
-References: <20171122101958.17065-1-vsementsov@virtuozzo.com>
-	<20171122101958.17065-4-vsementsov@virtuozzo.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <ec347fad-3a8e-8ff0-cfc5-ffb6b8e60600@redhat.com>
-Date: Wed, 22 Nov 2017 17:00:51 -0600
+	(envelope-from <alistair23@gmail.com>) id 1eHfPh-0003nF-3g
+	for qemu-devel@nongnu.org; Wed, 22 Nov 2017 19:30:46 -0500
+Received: from mail-wr0-x243.google.com ([2a00:1450:400c:c0c::243]:43763)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <alistair23@gmail.com>)
+	id 1eHfPg-0003mi-UG
+	for qemu-devel@nongnu.org; Wed, 22 Nov 2017 19:30:45 -0500
+Received: by mail-wr0-x243.google.com with SMTP id u40so16126031wrf.10
+	for <qemu-devel@nongnu.org>; Wed, 22 Nov 2017 16:30:44 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <20171122101958.17065-4-vsementsov@virtuozzo.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="Uoa9HBPfiKeppLbnXuNpumXl3W4o0eM7X"
-Subject: Re: [Qemu-devel] [PATCH 3/5] nbd/server: add helper nbd_opt_invalid
+In-Reply-To: <CAFEAcA8OWP=x=YCumVzc4biETn7SbUxaBDasYR3XNx71aabdmw@mail.gmail.com>
+References: <20171103000109.28244-1-frasse.iglesias@gmail.com>
+	<CAFEAcA8OWP=x=YCumVzc4biETn7SbUxaBDasYR3XNx71aabdmw@mail.gmail.com>
+From: Alistair Francis <alistair23@gmail.com>
+Date: Wed, 22 Nov 2017 16:30:13 -0800
+Message-ID: <CAKmqyKPsB_F+Z8k36Vc9FdTLE5CKHK68TN31QtkoCvjUNshYow@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH v7 00/13] Add support for the ZynqMP
+ Generic QSPI
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,68 +30,39 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org
-Cc: pbonzini@redhat.com, kwolf@redhat.com, mreitz@redhat.com, den@openvz.org
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: Francisco Iglesias <frasse.iglesias@gmail.com>, Edgar Iglesias <edgari@xilinx.com>, Alistair Francis <alistai@xilinx.com>, QEMU Developers <qemu-devel@nongnu.org>, francisco.iglesias@feimtech.se, =?UTF-8?Q?Marcin_Krzemi=C5=84ski?= <mar.krzeminski@gmail.com>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---Uoa9HBPfiKeppLbnXuNpumXl3W4o0eM7X
-From: Eric Blake <eblake@redhat.com>
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
- qemu-block@nongnu.org, qemu-devel@nongnu.org
-Cc: pbonzini@redhat.com, kwolf@redhat.com, mreitz@redhat.com, den@openvz.org
-Message-ID: <ec347fad-3a8e-8ff0-cfc5-ffb6b8e60600@redhat.com>
-Subject: Re: [PATCH 3/5] nbd/server: add helper nbd_opt_invalid
-References: <20171122101958.17065-1-vsementsov@virtuozzo.com>
- <20171122101958.17065-4-vsementsov@virtuozzo.com>
-In-Reply-To: <20171122101958.17065-4-vsementsov@virtuozzo.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+On Tue, Nov 21, 2017 at 10:39 AM, Peter Maydell
+<peter.maydell@linaro.org> wrote:
+> On 3 November 2017 at 00:00, Francisco Iglesias
+> <frasse.iglesias@gmail.com> wrote:
+>> Hi,
+>>
+>> This patch series is an attempt to add support for the ZynqMP QSPI (consisting
+>> of the Generic QSPI and the legacy QSPI) to the xlnx-zcu102 board and connect
+>> Numonyx n25q512a11 flashes to the QSPI. Also some functionality is added to
+>> m25p80.
+>>
+>> The series starts by adding support in m25p80 for continous read out of status
+>> registers, SST flash READ ID commands, bank address register accesses, bulk
+>> erase (0x60) and two Numonyx flashes (n25q512a11 and n25q512a13). Thereafter it
+>> updates the striping behaviour to be bit big endiann in the Xilinx QSPI model
+>> and adds support for RX discard, zero pumping according transfer register and 4
+>> byte LQSPI addresses. Finally it adds support for the ZynqMP Generic QSPI and
+>> adds the ZynqMP QSPI to the xlnx-zcu102 board.
+>>
+>> Best regards,
+>> Francisco Iglesias
+>
+> Hi; just a note to say that I'm assuming the Xilinx folk are going
+> to review the xilinx_spips patches in this set...
 
-On 11/22/2017 04:19 AM, Vladimir Sementsov-Ogievskiy wrote:
-> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-> ---
->  nbd/server.c | 74 +++++++++++++++++++++++++++++++++++++---------------=
---------
->  1 file changed, 46 insertions(+), 28 deletions(-)
->=20
+Yep, we will!
 
-> @@ -418,8 +447,8 @@ static int nbd_negotiate_handle_info(NBDClient *cli=
-ent, uint16_t myflags,
->      be16_to_cpus(&requests);
->      trace_nbd_negotiate_handle_info_requests(requests);
->      if (requests !=3D client->optlen / sizeof(request)) {
-> -        msg =3D "incorrect number of  requests for overall length";
-> -        goto invalid;
-> +        return nbd_opt_invalid(
-> +            client, errp, "incorrect number of requests for overall le=
-ngth");
+Alistair
 
-Nice that you are fixing the typo of the double space in the error messag=
-e.
-
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
-
-
---Uoa9HBPfiKeppLbnXuNpumXl3W4o0eM7X
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
-
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAloWAaMACgkQp6FrSiUn
-Q2oPswf+KPMICBMlYxgj4/pOZ40TjVIaEPn0ilIEqZbV4K7jd2T6tYXbuu3kNyCn
-3Vy+VQzdds9Odjz9DH20rjwabGtjo2e2M3DIVYZJ6UY6hs0gZBhHoH0FGkfHwYVf
-kCtFFN8bC9p3QvAuM578bWXxJemtz3V8BaKdJG8zGJ0zRfQ8R4rTdbcM13OK7F/j
-/s48tlKta6j6w0IPKnHmj/FXPf8bbGNjWUwIIq1fRB3RwJWcKu9m0sOclDGCeCIb
-1WTaZJFjuUbK4jc0AZcJL2DxKXWZToGUdkA/KFCOcRZ1ssPR6byuY7HhtLBRSZKN
-BCJmPnWWo4lT0FJPMH4e4fwRWvJLig==
-=VjXw
------END PGP SIGNATURE-----
-
---Uoa9HBPfiKeppLbnXuNpumXl3W4o0eM7X--
+>
+> thanks
+> -- PMM
+>
