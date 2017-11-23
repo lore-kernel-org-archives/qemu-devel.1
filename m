@@ -1,30 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46513)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46962)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1eHusX-0002us-SE
-	for qemu-devel@nongnu.org; Thu, 23 Nov 2017 12:01:38 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1eHust-0003Hw-S2
+	for qemu-devel@nongnu.org; Thu, 23 Nov 2017 12:01:57 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1eHusT-0004J7-IH
-	for qemu-devel@nongnu.org; Thu, 23 Nov 2017 12:01:33 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:34964)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <kwolf@redhat.com>) id 1eHusT-0004Im-99
-	for qemu-devel@nongnu.org; Thu, 23 Nov 2017 12:01:29 -0500
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
-	[10.5.11.15])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id A6B41C05679B
-	for <qemu-devel@nongnu.org>; Thu, 23 Nov 2017 17:01:27 +0000 (UTC)
-Date: Thu, 23 Nov 2017 18:01:22 +0100
-From: Kevin Wolf <kwolf@redhat.com>
-Message-ID: <20171123170122.GB4375@localhost.localdomain>
-References: <20171123135906.12852-1-famz@redhat.com>
-	<20171123135906.12852-2-famz@redhat.com>
+	(envelope-from <peter.maydell@linaro.org>) id 1eHuss-0004p8-Pu
+	for qemu-devel@nongnu.org; Thu, 23 Nov 2017 12:01:55 -0500
+Received: from mail-ot0-x22b.google.com ([2607:f8b0:4003:c0f::22b]:37673)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1eHuss-0004nc-Hi
+	for qemu-devel@nongnu.org; Thu, 23 Nov 2017 12:01:54 -0500
+Received: by mail-ot0-x22b.google.com with SMTP id s4so16783441ote.4
+	for <qemu-devel@nongnu.org>; Thu, 23 Nov 2017 09:01:54 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20171123135906.12852-2-famz@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH 1/2] docs: Add image locking subsection
+In-Reply-To: <1bede1e5-cc11-dca6-9f0b-ef16b9031d7a@redhat.com>
+References: <1511448975-28326-1-git-send-email-eric.auger@redhat.com>
+	<CAFEAcA8T4cShPYONdo8hiaZKvd+zq9Uo1o5awU3rA03uu8Vsiw@mail.gmail.com>
+	<1bede1e5-cc11-dca6-9f0b-ef16b9031d7a@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Thu, 23 Nov 2017 17:01:32 +0000
+Message-ID: <CAFEAcA_ZUGR+t2T3cvVo2OkyOccVjtRW+YTN-5KXaw+rFRiRqg@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [RFC v3 0/4] vITS Reset
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,87 +30,25 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Fam Zheng <famz@redhat.com>
-Cc: qemu-devel@nongnu.org, mreitz@redhat.com
+To: Auger Eric <eric.auger@redhat.com>
+Cc: Wei Huang <wei@redhat.com>, Andrew Jones <drjones@redhat.com>, Vijay Kilari <vijay.kilari@gmail.com>, Juan Quintela <quintela@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, qemu-arm <qemu-arm@nongnu.org>, wu.wubin@huawei.com, wanghaibin.wang@huawei.com, Christoffer Dall <christoffer.dall@linaro.org>, eric.auger.pro@gmail.com, Cornelia Huck <cohuck@redhat.com>, Christian Borntraeger <borntraeger@de.ibm.com>
 
-Am 23.11.2017 um 14:59 hat Fam Zheng geschrieben:
-> This documents the image locking feature and explains when and how
-> related options can be used.
-> 
-> Signed-off-by: Fam Zheng <famz@redhat.com>
-> ---
->  docs/qemu-block-drivers.texi | 36 ++++++++++++++++++++++++++++++++++++
->  qemu-doc.texi                |  1 +
->  2 files changed, 37 insertions(+)
-> 
-> diff --git a/docs/qemu-block-drivers.texi b/docs/qemu-block-drivers.texi
-> index 1cb1e55686..fa2e90d15f 100644
-> --- a/docs/qemu-block-drivers.texi
-> +++ b/docs/qemu-block-drivers.texi
-> @@ -785,6 +785,42 @@ warning: ssh server @code{ssh.example.com:22} does not support fsync
->  With sufficiently new versions of libssh2 and OpenSSH, @code{fsync} is
->  supported.
->  
-> +@node disk_image_locking
-> +@subsection Disk image file locking
-> +
-> +By default, QEMU tries to protect image files from unexpected concurrent
-> +access, as long as it's supported by the block protocol driver and host
-> +operating system. If multiple QEMU processes (including QEMU emulators and
-> +utilities) try to open the same image with conflicting accessing modes, all but
-> +the first one will get an error.
-> +
-> +This feature is currently supported by the file protocol on Linux with Open
+On 23 November 2017 at 16:05, Auger Eric <eric.auger@redhat.com> wrote:
+> When using update-linux-headers.sh I get suspicious errors at the end:
+> grep: /tmp/tmp.A5NjLtHOij/include/asm/kvm_virtio.h: No such file or
+> directory
+> sed: can't read /tmp/tmp.A5NjLtHOij/include/asm/kvm_virtio.h: No such
+> file or directory
+>
+> and include/standard-headers/asm-s390/virtio-ccw.h deleted
+>
+> I would prefer having s390 people checking and testing that.
 
-s/with/with the/
+I think the kvm_virtio.h problem should be fixed by
+http://patchwork.ozlabs.org/patch/838230/
+which removes it from the set of headers the script imports.
 
-> +File Descriptor (OFD) locking API, and can be configured to fall back to POSIX
-> +locking if the POSIX host doesn't support Linux OFD locking.
-> +
-> +To explicitly enable image locking, specify "locking=on" in the file protocol
-> +driver options. If OFD locking is not possible, a warning will be printed and
-> +the POSIX locking API will be used. In this case there is risk that the lock
+Cornelia/Christian -- any idea about the virtio-ccw.h issue ?
 
-s/risk/a risk/ (native speakers, is this the right correction?)
-
-> +will get silently lost when doing hot plugging and block jobs, due to the
-> +shortcomings of the POSIX locking API.
-> +
-> +QEMU transparently handles lock handover during shared storage migration.  For
-> +shared virtual disk images between multiple VMs, the "share-rw" device option
-> +should be used.
-> +
-> +Alternatively, locking can be fully disabled by "locking=off" block device
-
-s/by/with the/
-
-> +option. In the command line the option is usually in the form of
-
-Comma after "command line"?
-
-> +"file.locking=off" as the protocol driver is normally placed as a "file" child
-> +under a format driver. For example:
-> +
-> +@code{-blockdev driver=qcow2,file.filename=/path/to/image,file.locking=off,file.driver=file}
-> +
-> +To check if image locking is active, check the output of "lslocks" command on
-
-_the_ "lslocks" command
-
-> +host and see if there are locks held by QEMU process on the image file. More
-
-"by a" or "by the", depending on what exactly you want to say
-
-> +than one bytes could be locked by a QEMU instance, each byte of which reflects
-
-s/bytes/byte/
-
-> +a perticular permission that are acquired or protected by the running block
-
-s/are/is/
-
-> +driver.
-> +
->  @c man end
-
-Kevin
+thanks
+-- PMM
