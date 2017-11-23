@@ -1,15 +1,43 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40894)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51231)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jasowang@redhat.com>) id 1eHiKz-00078n-4f
-	for qemu-devel@nongnu.org; Wed, 22 Nov 2017 22:38:05 -0500
+	(envelope-from <xiaoguangrong.eric@gmail.com>) id 1eHilU-000411-14
+	for qemu-devel@nongnu.org; Wed, 22 Nov 2017 23:05:28 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jasowang@redhat.com>) id 1eHiKu-000218-Je
-	for qemu-devel@nongnu.org; Wed, 22 Nov 2017 22:38:05 -0500
-From: Jason Wang <jasowang@redhat.com>
-Date: Thu, 23 Nov 2017 11:37:46 +0800
-Message-Id: <1511408266-4139-1-git-send-email-jasowang@redhat.com>
-Subject: [Qemu-devel] [PATCH for 2.11] virtio-net: don't touch virtqueue if
- vm is stopped
+	(envelope-from <xiaoguangrong.eric@gmail.com>) id 1eHilQ-0007t1-T7
+	for qemu-devel@nongnu.org; Wed, 22 Nov 2017 23:05:28 -0500
+Received: from mail-pl0-x241.google.com ([2607:f8b0:400e:c01::241]:38169)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <xiaoguangrong.eric@gmail.com>)
+	id 1eHilQ-0007sc-Jh
+	for qemu-devel@nongnu.org; Wed, 22 Nov 2017 23:05:24 -0500
+Received: by mail-pl0-x241.google.com with SMTP id s10so1979155plj.5
+	for <qemu-devel@nongnu.org>; Wed, 22 Nov 2017 20:05:24 -0800 (PST)
+References: <1455443283.33337333.1500618150787.JavaMail.zimbra@redhat.com>
+	<1501016375.26846.21.camel@redhat.com>
+	<1063764405.34607875.1501076841865.JavaMail.zimbra@redhat.com>
+	<1501104453.26846.45.camel@redhat.com>
+	<CAPcyv4hsqrqBxoipUHPAbSctuzbVWCRnT-gN08i9uhXTWY6iPQ@mail.gmail.com>
+	<1501112787.4073.49.camel@redhat.com>
+	<CAPcyv4gbC6Hx_4YsCfOd2t=fn=wPGp5h__1QH=-p40TPFNbFzA@mail.gmail.com>
+	<0a26793f-86f7-29e7-f61b-dc4c1ef08c8e@gmail.com>
+	<CAPcyv4iw2cCpDmr+4kxsFvdy+iGZiz=ok-kLhsDKpqDy+szf-Q@mail.gmail.com>
+	<378b10f3-b32f-84f5-2bbc-50c2ec5bcdd4@gmail.com>
+	<CAPcyv4jR_LdbsX-rAsHC7++C6d-WYC084uWXzr+08PSYwoXFMw@mail.gmail.com>
+	<ca6aaa77-cca0-441e-be49-73133d8581cf@gmail.com>
+	<CAPcyv4gKzvd39WbnKjbs3Bn9+o1tt=vz90CYMFu0DF5PsfHUig@mail.gmail.com>
+	<86754966-281f-c3ed-938c-f009440de563@gmail.com>
+	<CAPcyv4iH==cqVAdd8i1y-8A6SuXU75OH1EZzgNMvtA21wfxPpQ@mail.gmail.com>
+	<ec5ff7c2-864e-5020-0aaa-6663e78e3756@gmail.com>
+	<1511288389.1080.14.camel@redhat.com>
+From: Xiao Guangrong <xiaoguangrong.eric@gmail.com>
+Message-ID: <d1df875c-5b64-67d9-2b3c-4ec14c03b85b@gmail.com>
+Date: Thu, 23 Nov 2017 12:05:45 +0800
+MIME-Version: 1.0
+In-Reply-To: <1511288389.1080.14.camel@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] KVM "fake DAX" flushing interface - discussion
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -18,43 +46,30 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: mst@redhat.com, jasowang@redhat.com, qemu-devel@nongnu.org
-Cc: Yuri Benditovich <yuri.benditovich@daynix.com>, Paolo Bonzini <pbonzini@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, qemu-stable@nongnu.org
+To: Rik van Riel <riel@redhat.com>, Dan Williams <dan.j.williams@intel.com>
+Cc: Pankaj Gupta <pagupta@redhat.com>, Jan Kara <jack@suse.cz>, Stefan Hajnoczi <stefanha@redhat.com>, Stefan Hajnoczi <stefanha@gmail.com>, kvm-devel <kvm@vger.kernel.org>, Qemu Developers <qemu-devel@nongnu.org>, "linux-nvdimm@lists.01.org" <linux-nvdimm@ml01.01.org>, ross zwisler <ross.zwisler@linux.intel.com>, Paolo Bonzini <pbonzini@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Nitesh Narayan Lal <nilal@redhat.com>, Haozhong Zhang <haozhong.zhang@intel.com>, Ross Zwisler <ross.zwisler@intel.com>
 
-Guest state should not be touched if VM is stopped, unfortunately we
-didn't check running state and tried to drain tx queue unconditionally
-in virtio_net_set_status(). A crash was then noticed as a migration
-destination when user type quit after virtqueue state is loaded but
-before region cache is initialized. In this case,
-virtio_net_drop_tx_queue_data() tries to access the uninitialized
-region cache.
 
-Fix this by only dropping tx queue data when vm is running.
 
-Fixes: 283e2c2adcb80 ("net: virtio-net discards TX data after link down")
-Cc: Yuri Benditovich <yuri.benditovich@daynix.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>
-Cc: Stefan Hajnoczi <stefanha@redhat.com>
-Cc: Michael S. Tsirkin <mst@redhat.com>
-Cc: qemu-stable@nongnu.org
-Signed-off-by: Jason Wang <jasowang@redhat.com>
----
- hw/net/virtio-net.c | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+On 11/22/2017 02:19 AM, Rik van Riel wrote:
 
-diff --git a/hw/net/virtio-net.c b/hw/net/virtio-net.c
-index 150fd07..38674b0 100644
---- a/hw/net/virtio-net.c
-+++ b/hw/net/virtio-net.c
-@@ -288,7 +288,8 @@ static void virtio_net_set_status(struct VirtIODevice *vdev, uint8_t status)
-                 qemu_bh_cancel(q->tx_bh);
-             }
-             if ((n->status & VIRTIO_NET_S_LINK_UP) == 0 &&
--                (queue_status & VIRTIO_CONFIG_S_DRIVER_OK)) {
-+                (queue_status & VIRTIO_CONFIG_S_DRIVER_OK) &&
-+                vdev->vm_running) {
-                 /* if tx is waiting we are likely have some packets in tx queue
-                  * and disabled notification */
-                 q->tx_waiting = 0;
--- 
-2.7.4
+> We can go with the "best" interface for what
+> could be a relatively slow flush (fsync on a
+> file on ssd/disk on the host), which requires
+> that the flushing task wait on completion
+> asynchronously.
+
+I'd like to clarify the interface of "wait on completion
+asynchronously" and KVM async page fault a bit more.
+
+Current design of async-page-fault only works on RAM rather
+than MMIO, i.e, if the page fault caused by accessing the
+device memory of a emulated device, it needs to go to
+userspace (QEMU) which emulates the operation in vCPU's
+thread.
+
+As i mentioned before the memory region used for vNVDIMM
+flush interface should be MMIO and consider its support
+on other hypervisors, so we do better push this async
+mechanism into the flush interface design itself rather
+than depends on kvm async-page-fault.
