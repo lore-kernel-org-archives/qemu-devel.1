@@ -1,31 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36342)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46795)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1eHqJo-0001OR-Gs
-	for qemu-devel@nongnu.org; Thu, 23 Nov 2017 07:09:25 -0500
+	(envelope-from <thuth@redhat.com>) id 1eHqT6-0003mr-4F
+	for qemu-devel@nongnu.org; Thu, 23 Nov 2017 07:19:01 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1eHqJe-00037D-Og
-	for qemu-devel@nongnu.org; Thu, 23 Nov 2017 07:09:24 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:57236)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <cohuck@redhat.com>) id 1eHqJe-00034m-Gz
-	for qemu-devel@nongnu.org; Thu, 23 Nov 2017 07:09:14 -0500
-Date: Thu, 23 Nov 2017 13:09:08 +0100
-From: Cornelia Huck <cohuck@redhat.com>
-Message-ID: <20171123130908.6ab004d3.cohuck@redhat.com>
-In-Reply-To: <16011ac4-77c4-af75-5754-5f9586d6d629@redhat.com>
-References: <20171110152017.24324-1-clg@kaod.org>
-	<20171110152017.24324-2-clg@kaod.org>
-	<715a7bd1-7aa5-fa64-a9b8-76782ee20576@redhat.com>
-	<20171123110345.03541b50.cohuck@redhat.com>
-	<CAFEAcA83-oqifsZboJmvDVYhhr4=QOEEGF1TZba-jCewpUFtyg@mail.gmail.com>
-	<1dff6d6c-be83-f6e1-2b7e-82d98bdb8a63@redhat.com>
-	<6dd7061e-2ebe-7a51-8142-f67d5d75a81a@redhat.com>
-	<8cd1c0b3-8386-d41e-ccfb-1a2073cdf4fb@redhat.com>
-	<16011ac4-77c4-af75-5754-5f9586d6d629@redhat.com>
+	(envelope-from <thuth@redhat.com>) id 1eHqT1-0003x4-TH
+	for qemu-devel@nongnu.org; Thu, 23 Nov 2017 07:18:59 -0500
+References: <1511388334-16347-1-git-send-email-pmorel@linux.vnet.ibm.com>
+	<1511388334-16347-2-git-send-email-pmorel@linux.vnet.ibm.com>
+	<3acc6fdb-5638-97b2-2dc7-bce34d22cd1f@redhat.com>
+	<20171123104903.24424b40.cohuck@redhat.com>
+	<a3655016-0e6b-b80f-2282-f6efbff9e1f9@redhat.com>
+	<20171123110844.4649f3b1.cohuck@redhat.com>
+	<58a08c1d-3935-42e7-cdc0-7bc45c08d2d3@redhat.com>
+	<20171123113326.3b2c5281.cohuck@redhat.com>
+	<6ab0d29e-1af0-888a-c932-a0a294ea225d@linux.vnet.ibm.com>
+From: Thomas Huth <thuth@redhat.com>
+Message-ID: <d59edb51-71ba-7b75-83df-e4be246d2fce@redhat.com>
+Date: Thu, 23 Nov 2017 13:18:50 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] QEMU 3.0 ?
+In-Reply-To: <6ab0d29e-1af0-888a-c932-a0a294ea225d@linux.vnet.ibm.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [qemu-s390x] [PATCH v3 1/7] s390x/pci: factor out
+ endianess conversion
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,35 +32,115 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: Thomas Huth <thuth@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, =?UTF-8?B?Q8OpZHJpYw==?= Le Goater <clg@kaod.org>, QEMU Developers <qemu-devel@nongnu.org>, David Gibson <david@gibson.dropbear.id.au>, Greg Kurz <groug@kaod.org>, Markus Armbruster <armbru@redhat.com>, "Daniel P. Berrange" <berrange@redhat.com>, Eric Blake <eblake@redhat.com>, Philippe =?UTF-8?B?TWF0aGlldS1EYXVkw6k=?= <f4bug@amsat.org>, sergio.g.delreal@gmail.com, alex@alex.org.uk
+To: Yi Min Zhao <zyimin@linux.vnet.ibm.com>, Cornelia Huck <cohuck@redhat.com>
+Cc: pasic@linux.vnet.ibm.com, Pierre Morel <pmorel@linux.vnet.ibm.com>, qemu-devel@nongnu.org, agraf@suse.de, borntraeger@de.ibm.com, Qemu-s390x list <qemu-s390x@nongnu.org>
 
-On Thu, 23 Nov 2017 13:05:33 +0100
-Paolo Bonzini <pbonzini@redhat.com> wrote:
+On 23.11.2017 13:07, Yi Min Zhao wrote:
+>=20
+>=20
+> =E5=9C=A8 2017/11/23 =E4=B8=8B=E5=8D=886:33, Cornelia Huck =E5=86=99=E9=
+=81=93:
+>> On Thu, 23 Nov 2017 11:25:10 +0100
+>> Thomas Huth <thuth@redhat.com> wrote:
+>>
+>>> On 23.11.2017 11:08, Cornelia Huck wrote:
+>>>> On Thu, 23 Nov 2017 11:01:23 +0100
+>>>> Thomas Huth <thuth@redhat.com> wrote:
+>>>> =C2=A0=C2=A0
+>>>>> On 23.11.2017 10:49, Cornelia Huck wrote:
+>>>>>> On Thu, 23 Nov 2017 09:48:41 +0100
+>>>>>> Thomas Huth <thuth@redhat.com> wrote:
+>>>>>>> On 22.11.2017 23:05, Pierre Morel wrote:
+>>> [...]
+>>>>>>>> +/**
+>>>>>>>> + * Swap data contained in s390x big endian registers to little
+>>>>>>>> endian
+>>>>>>>> + * PCI bars.
+>>>>>>>> + *
+>>>>>>>> + * @ptr: a pointer to a uint64_t data field
+>>>>>>>> + * @len: the length of the valid data, must be 1,2,4 or 8
+>>>>>>>> + */
+>>>>>>>> +static int zpci_endian_swap(uint64_t *ptr, uint8_t len)
+>>>>>>>> +{
+>>>>>>>> +=C2=A0=C2=A0=C2=A0 uint64_t data =3D *ptr;
+>>>>>>>> +
+>>>>>>>> +=C2=A0=C2=A0=C2=A0 switch (len) {
+>>>>>>>> +=C2=A0=C2=A0=C2=A0 case 1:
+>>>>>>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 break;
+>>>>>>>> +=C2=A0=C2=A0=C2=A0 case 2:
+>>>>>>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 data =3D bswap16(dat=
+a);
+>>>>>>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 break;
+>>>>>>>> +=C2=A0=C2=A0=C2=A0 case 4:
+>>>>>>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 data =3D bswap32(dat=
+a);
+>>>>>>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 break;
+>>>>>>>> +=C2=A0=C2=A0=C2=A0 case 8:
+>>>>>>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 data =3D bswap64(dat=
+a);
+>>>>>>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 break;
+>>>>>>>> +=C2=A0=C2=A0=C2=A0 default:
+>>>>>>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 return -EINVAL;
+>>>>>>>> +=C2=A0=C2=A0=C2=A0 }
+>>>>>>>> +=C2=A0=C2=A0=C2=A0 *ptr =3D data;
+>>>>>>>> +=C2=A0=C2=A0=C2=A0 return 0;
+>>>>>>>> +}
+>>>>>>> While you're at it, I think that should rather be leXX_to_cpu()
+>>>>>>> instead
+>>>>>>> of bswapXX() here,
+>>>>>> I don't think that's correct, as this is supposed to swap BE
+>>>>>> registers
+>>>>>> to LE PCI bars.
+>>>>> Yes, but for the CPU emulation, the registers are stored in the hos=
+t's
+>>>>> endianness in the CPUS390XState structure. Or why do we byte-swap t=
+hem
+>>>>> again with cpu_to_be64() during s390_store_status(), for example?
+>>>> Gah, endian conversion is eating my brain...
+>>>>
+>>>> So, is the content we get BE or not? I thought in our last discussio=
+n
+>>>> we came to the conclusion that it is.
+>>> data is read from / written to env->regs[r1], so this is host endian,=
+ as
+>>> far as I know. PCI is little endian, so using le32_to_cpu() /
+>>> cpu_to_le32() should IMHO be the right way to go here.
+>>>
+>>> By the way, if we want to use both, cpu_to_le and le_to_cpu, dependin=
+g
+>>> on whether we read from or write to PCI, we should maybe *not* put th=
+is
+>>> code into a separate function?
+>> Yes, if your assessment is correct, we need two functions (I think thi=
+s
+>> conversion is used in other places in later patches as well). Or are
+>> there mechanisms for that already available?
+>
+> I have a question, is the data in cpu->regs the guest's endianess?
 
-> On 23/11/2017 12:57, Thomas Huth wrote:
-> > On 23.11.2017 12:17, Paolo Bonzini wrote:  
-> >> On 23/11/2017 11:57, Thomas Huth wrote:  
-> > [...]  
-> >>> I've put "--accel kvm:hax:tcg" also on the doable list since I don't
-> >>> remember any objections to that idea so far -- feel free to move it to
-> >>> the controversial list instead if you think it needs more discussion.  
-> >>
-> >> "hax" is very far from feature parity with TCG, it doesn't even support
-> >> CPUID (-cpu).  "-accel kvm:hvf:tcg" could be a possibility, but only if
-> >> we have resources to test it.  As far as I know the only active x86
-> >> developer who owns a Mac is Igor?  
-> > 
-> > hvf hasn't been merged yet ... do you expect it to hit master after 2.11
-> > has been released?  
-> 
-> Yes, more or less.
-> 
-> > Otherwise, we should maybe rather simply go with
-> > "--accel kvm:tcg"?  
-> 
-> Yes, HVF can come later.
+As far as I know, it's host endianness, so on x86 with TCG emulation,
+it's little endian.
 
-This switch sounds like something we can easily do for the next
-release; I'd hope that anyone explicitly requiring tcg already
-specifies it.
+> In our case, the guest is S390. Although the arch is big-endian, the
+> data in
+> pcilg/stg instructions is little-endian.
+
+PCI memory is always little endian, right.
+
+> Another question, does 'cpu' in cpu_to_le**() or le**_to_cpu() mean the
+> host endianess?
+
+Yes, the "cpu" in cpu_to_le or le_to_cpu means the host, indeed. It's
+confusing :-/
+
+> If the answers to upper two questions are yes, we actually need handle
+> two cases.
+> 1) For pcilg, we need to translate the data to little-endian, thus
+> cpu_to_le**().
+> 2) For pcistg, we need to translate the data to host endianess, thus
+> le**_to_cpu().
+
+I think we've got to byte-swap if the host is big endian (s390x), but
+not if the host is little endian (x86 with TCG).
+
+ Thomas
