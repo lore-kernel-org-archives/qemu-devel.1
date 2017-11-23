@@ -1,24 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60958)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34219)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1eHp6u-0006Dp-FE
-	for qemu-devel@nongnu.org; Thu, 23 Nov 2017 05:52:01 -0500
+	(envelope-from <berrange@redhat.com>) id 1eHp8I-000722-3X
+	for qemu-devel@nongnu.org; Thu, 23 Nov 2017 05:53:30 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1eHp6r-0005oY-Al
-	for qemu-devel@nongnu.org; Thu, 23 Nov 2017 05:52:00 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:34992)
+	(envelope-from <berrange@redhat.com>) id 1eHp8G-0007Me-MT
+	for qemu-devel@nongnu.org; Thu, 23 Nov 2017 05:53:26 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:46462)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1eHp6r-0005nc-1C
-	for qemu-devel@nongnu.org; Thu, 23 Nov 2017 05:51:57 -0500
-Date: Thu, 23 Nov 2017 10:51:43 +0000
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20171123105142.GA3153@work-vm>
+	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1eHp8G-0007Ln-D6
+	for qemu-devel@nongnu.org; Thu, 23 Nov 2017 05:53:24 -0500
+Date: Thu, 23 Nov 2017 10:53:08 +0000
+From: "Daniel P. Berrange" <berrange@redhat.com>
+Message-ID: <20171123105308.GF8166@redhat.com>
+Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
 References: <20171116130610.23582-1-peterx@redhat.com>
 	<20171116130610.23582-10-peterx@redhat.com>
-	<20171123104625.GA2462@work-vm>
+	<20171123104625.GA2462@work-vm> <20171123105142.GA3153@work-vm>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20171123104625.GA2462@work-vm>
+In-Reply-To: <20171123105142.GA3153@work-vm>
 Subject: Re: [Qemu-devel] [RFC v4 09/27] monitor: create monitor dedicate
  iothread
 List-Id: <qemu-devel.nongnu.org>
@@ -29,117 +30,101 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Xu <peterx@redhat.com>
-Cc: qemu-devel@nongnu.org, Stefan Hajnoczi <shajnocz@redhat.com>, "Daniel P . Berrange" <berrange@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Fam Zheng <famz@redhat.com>, Juan Quintela <quintela@redhat.com>, mdroth@linux.vnet.ibm.com, Eric Blake <eblake@redhat.com>, Laurent Vivier <lvivier@redhat.com>, Markus Armbruster <armbru@redhat.com>, marcandre.lureau@redhat.com
+To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Cc: Peter Xu <peterx@redhat.com>, qemu-devel@nongnu.org, Stefan Hajnoczi <shajnocz@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Fam Zheng <famz@redhat.com>, Juan Quintela <quintela@redhat.com>, mdroth@linux.vnet.ibm.com, Eric Blake <eblake@redhat.com>, Laurent Vivier <lvivier@redhat.com>, Markus Armbruster <armbru@redhat.com>, marcandre.lureau@redhat.com
 
-* Dr. David Alan Gilbert (dgilbert@redhat.com) wrote:
-> * Peter Xu (peterx@redhat.com) wrote:
-> > Create one IOThread for the monitors, prepared to handle all the
-> > input/output IOs using existing iothread framework.
+On Thu, Nov 23, 2017 at 10:51:43AM +0000, Dr. David Alan Gilbert wrote:
+> * Dr. David Alan Gilbert (dgilbert@redhat.com) wrote:
+> > * Peter Xu (peterx@redhat.com) wrote:
+> > > Create one IOThread for the monitors, prepared to handle all the
+> > > input/output IOs using existing iothread framework.
+> > > 
+> > > Signed-off-by: Peter Xu <peterx@redhat.com>
+> > > ---
+> > >  monitor.c | 29 +++++++++++++++++++++++++++++
+> > >  1 file changed, 29 insertions(+)
+> > > 
+> > > diff --git a/monitor.c b/monitor.c
+> > > index a70ab5606b..4ce9828fab 100644
+> > > --- a/monitor.c
+> > > +++ b/monitor.c
+> > > @@ -76,6 +76,7 @@
+> > >  #include "qmp-introspect.h"
+> > >  #include "sysemu/qtest.h"
+> > >  #include "sysemu/cpus.h"
+> > > +#include "sysemu/iothread.h"
+> > >  #include "qemu/cutils.h"
+> > >  #include "qapi/qmp/dispatch.h"
+> > >  
+> > > @@ -208,6 +209,12 @@ struct Monitor {
+> > >      QTAILQ_ENTRY(Monitor) entry;
+> > >  };
+> > >  
+> > > +struct MonitorGlobal {
+> > > +    IOThread *mon_iothread;
+> > > +};
+> > > +
+> > > +static struct MonitorGlobal mon_global;
+> > > +
+> > >  /* QMP checker flags */
+> > >  #define QMP_ACCEPT_UNKNOWNS 1
+> > >  
+> > > @@ -4034,12 +4041,24 @@ static void sortcmdlist(void)
+> > >      qsort((void *)info_cmds, array_num, elem_size, compare_mon_cmd);
+> > >  }
+> > >  
+> > > +static GMainContext *monitor_io_context_get(void)
+> > > +{
+> > > +    return iothread_get_g_main_context(mon_global.mon_iothread);
+> > > +}
+> > > +
+> > > +static void monitor_iothread_init(void)
+> > > +{
+> > > +    mon_global.mon_iothread = iothread_create("monitor_iothread",
+> > > +                                              &error_abort);
 > > 
-> > Signed-off-by: Peter Xu <peterx@redhat.com>
-> > ---
-> >  monitor.c | 29 +++++++++++++++++++++++++++++
-> >  1 file changed, 29 insertions(+)
+> > That name is one character too long for pthread_setname_np that it
+> > ends up being passed too (it's 16 char including the terminator);
+> > that probably means the thread ends up unnamed.  I suggest
+> > you make it "mon_iothread"
 > > 
-> > diff --git a/monitor.c b/monitor.c
-> > index a70ab5606b..4ce9828fab 100644
-> > --- a/monitor.c
-> > +++ b/monitor.c
-> > @@ -76,6 +76,7 @@
-> >  #include "qmp-introspect.h"
-> >  #include "sysemu/qtest.h"
-> >  #include "sysemu/cpus.h"
-> > +#include "sysemu/iothread.h"
-> >  #include "qemu/cutils.h"
-> >  #include "qapi/qmp/dispatch.h"
-> >  
-> > @@ -208,6 +209,12 @@ struct Monitor {
-> >      QTAILQ_ENTRY(Monitor) entry;
-> >  };
-> >  
-> > +struct MonitorGlobal {
-> > +    IOThread *mon_iothread;
-> > +};
-> > +
-> > +static struct MonitorGlobal mon_global;
-> > +
-> >  /* QMP checker flags */
-> >  #define QMP_ACCEPT_UNKNOWNS 1
-> >  
-> > @@ -4034,12 +4041,24 @@ static void sortcmdlist(void)
-> >      qsort((void *)info_cmds, array_num, elem_size, compare_mon_cmd);
-> >  }
-> >  
-> > +static GMainContext *monitor_io_context_get(void)
-> > +{
-> > +    return iothread_get_g_main_context(mon_global.mon_iothread);
-> > +}
-> > +
-> > +static void monitor_iothread_init(void)
-> > +{
-> > +    mon_global.mon_iothread = iothread_create("monitor_iothread",
-> > +                                              &error_abort);
-> 
-> That name is one character too long for pthread_setname_np that it
-> ends up being passed too (it's 16 char including the terminator);
-> that probably means the thread ends up unnamed.  I suggest
-> you make it "mon_iothread"
-> 
-> > +}
-> > +
-> >  void monitor_init_globals(void)
-> >  {
-> >      monitor_init_qmp_commands();
-> >      monitor_qapi_event_init();
-> >      sortcmdlist();
-> >      qemu_mutex_init(&monitor_lock);
-> > +    monitor_iothread_init();
-> >  }
-> >  
-> >  /* These functions just adapt the readline interface in a typesafe way.  We
-> > @@ -4117,6 +4136,13 @@ void monitor_cleanup(void)
-> >  {
-> >      Monitor *mon, *next;
-> >  
-> > +    /*
-> > +     * We need to explicitly stop the iothread (but not destroy it),
-> > +     * cleanup the monitor resources, then destroy the iothread.  See
-> > +     * again on the glib bug mentioned in 2b316774f6 for a reason.
-> 
-> I wonder if that bug is still live?   2b316774f6 says that:
->    'glib developers found and fixed the deadlock as part of implementing
-> child sources.'
->    but doesn't say which glib version that was fixed in; we have
-> increased the minimum glib version we support since 2013, so maybe...
-
-Paolo says it wasn't fixed until 2.28 and we still allow 2.22 ; so a
-little way before we can declare that one dead.
-
-Dave
-
-> Dave
-> 
-> > +     */
-> > +    iothread_stop(mon_global.mon_iothread);
-> > +
-> >      qemu_mutex_lock(&monitor_lock);
-> >      QTAILQ_FOREACH_SAFE(mon, &mon_list, entry, next) {
-> >          QTAILQ_REMOVE(&mon_list, mon, entry);
-> > @@ -4124,6 +4150,9 @@ void monitor_cleanup(void)
-> >          g_free(mon);
-> >      }
-> >      qemu_mutex_unlock(&monitor_lock);
-> > +
-> > +    iothread_destroy(mon_global.mon_iothread);
-> > +    mon_global.mon_iothread = NULL;
-> >  }
-> >  
-> >  QemuOptsList qemu_mon_opts = {
-> > -- 
-> > 2.13.6
+> > > +}
+> > > +
+> > >  void monitor_init_globals(void)
+> > >  {
+> > >      monitor_init_qmp_commands();
+> > >      monitor_qapi_event_init();
+> > >      sortcmdlist();
+> > >      qemu_mutex_init(&monitor_lock);
+> > > +    monitor_iothread_init();
+> > >  }
+> > >  
+> > >  /* These functions just adapt the readline interface in a typesafe way.  We
+> > > @@ -4117,6 +4136,13 @@ void monitor_cleanup(void)
+> > >  {
+> > >      Monitor *mon, *next;
+> > >  
+> > > +    /*
+> > > +     * We need to explicitly stop the iothread (but not destroy it),
+> > > +     * cleanup the monitor resources, then destroy the iothread.  See
+> > > +     * again on the glib bug mentioned in 2b316774f6 for a reason.
 > > 
-> --
-> Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+> > I wonder if that bug is still live?   2b316774f6 says that:
+> >    'glib developers found and fixed the deadlock as part of implementing
+> > child sources.'
+> >    but doesn't say which glib version that was fixed in; we have
+> > increased the minimum glib version we support since 2013, so maybe...
+> 
+> Paolo says it wasn't fixed until 2.28 and we still allow 2.22 ; so a
+> little way before we can declare that one dead.
+
+Please update the comment to mention that we can remove the hack
+in 2.28, since I bet we'll forget about this by the time that time
+comes :=)
+
+Regards,
+Daniel
+-- 
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
