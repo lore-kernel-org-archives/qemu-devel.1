@@ -1,31 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38678)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49786)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1eHx7t-00027p-Sx
-	for qemu-devel@nongnu.org; Thu, 23 Nov 2017 14:25:35 -0500
+	(envelope-from <bounces@canonical.com>) id 1eHxHK-0005Ob-0v
+	for qemu-devel@nongnu.org; Thu, 23 Nov 2017 14:35:19 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1eHx7q-0002Qt-U7
-	for qemu-devel@nongnu.org; Thu, 23 Nov 2017 14:25:33 -0500
-Received: from indium.canonical.com ([91.189.90.7]:43058)
+	(envelope-from <bounces@canonical.com>) id 1eHxHE-0000gK-IA
+	for qemu-devel@nongnu.org; Thu, 23 Nov 2017 14:35:16 -0500
+Received: from indium.canonical.com ([91.189.90.7]:44116)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1eHx7q-0002Nl-HD
-	for qemu-devel@nongnu.org; Thu, 23 Nov 2017 14:25:30 -0500
+	id 1eHxHE-0000e8-9X
+	for qemu-devel@nongnu.org; Thu, 23 Nov 2017 14:35:12 -0500
 Received: from loganberry.canonical.com ([91.189.90.37])
 	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1eHx7p-0000G7-NI
-	for <qemu-devel@nongnu.org>; Thu, 23 Nov 2017 19:25:29 +0000
+	id 1eHxHB-0001tY-UN
+	for <qemu-devel@nongnu.org>; Thu, 23 Nov 2017 19:35:09 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id AEC2F2E80C7
-	for <qemu-devel@nongnu.org>; Thu, 23 Nov 2017 19:25:29 +0000 (UTC)
+	by loganberry.canonical.com (Postfix) with ESMTP id DC8C22E80C3
+	for <qemu-devel@nongnu.org>; Thu, 23 Nov 2017 19:35:09 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Thu, 23 Nov 2017 19:11:11 -0000
-From: Peter Maydell <peter.maydell@linaro.org>
+Date: Thu, 23 Nov 2017 19:20:30 -0000
+From: Richard Jones <rjones@redhat.com>
 Reply-To: Bug 1378554 <1378554@bugs.launchpad.net>
 Sender: bounces@canonical.com
 References: <20141007223616.4736.27907.malonedeb@wampee.canonical.com>
-Message-Id: <151146427200.14475.2667732288372162721.malone@wampee.canonical.com>
+Message-Id: <151146483160.14333.7252941633694496282.malone@wampee.canonical.com>
 Errors-To: bounces@canonical.com
 Subject: [Qemu-devel] [Bug 1378554] Re: qemu segfault in
  virtio_scsi_handle_cmd_req_submit on ARM 32 bit
@@ -39,12 +39,7 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-Ah, my mail client found the thread that tells me this was fixed in
-commit 35e4e96c4d5bfcf. So we can close this.
-
-
-** Changed in: qemu
-       Status: New =3D> Fix Released
+Yes, qemu's working fine on aarch64 so this must have been fixed.
 
 -- =
 
