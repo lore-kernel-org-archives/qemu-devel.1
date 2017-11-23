@@ -1,34 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52127)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55015)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1eHwWL-0004dD-Ln
-	for qemu-devel@nongnu.org; Thu, 23 Nov 2017 13:46:47 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1eHwYl-0006Ra-1x
+	for qemu-devel@nongnu.org; Thu, 23 Nov 2017 13:49:16 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1eHwWK-0007GX-HN
-	for qemu-devel@nongnu.org; Thu, 23 Nov 2017 13:46:45 -0500
-Received: from indium.canonical.com ([91.189.90.7]:59486)
+	(envelope-from <peter.maydell@linaro.org>) id 1eHwYk-0001Nf-9t
+	for qemu-devel@nongnu.org; Thu, 23 Nov 2017 13:49:15 -0500
+Received: from mail-ot0-x243.google.com ([2607:f8b0:4003:c0f::243]:40000)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1eHwWK-0007Eq-Ar
-	for qemu-devel@nongnu.org; Thu, 23 Nov 2017 13:46:44 -0500
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1eHwWI-00011N-Dg
-	for <qemu-devel@nongnu.org>; Thu, 23 Nov 2017 18:46:42 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id B74232E80D2
-	for <qemu-devel@nongnu.org>; Thu, 23 Nov 2017 18:46:41 +0000 (UTC)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1eHwYk-0001Mq-4f
+	for qemu-devel@nongnu.org; Thu, 23 Nov 2017 13:49:14 -0500
+Received: by mail-ot0-x243.google.com with SMTP id g104so17013799otg.7
+	for <qemu-devel@nongnu.org>; Thu, 23 Nov 2017 10:49:13 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Thu, 23 Nov 2017 18:34:54 -0000
+In-Reply-To: <CAFEAcA-15KQdCaemdtAva9EA0YPPC3j1sYuHt1OBrTo_BHEO-w@mail.gmail.com>
+References: <20171107234608.GA395@humpty.home.comstyle.com>
+	<CAFEAcA-15KQdCaemdtAva9EA0YPPC3j1sYuHt1OBrTo_BHEO-w@mail.gmail.com>
 From: Peter Maydell <peter.maydell@linaro.org>
-Reply-To: Bug 1172613 <1172613@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <20130425082449.5153.30611.malonedeb@wampee.canonical.com>
-Message-Id: <151146209421.14642.6256239011450248036.malone@wampee.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1172613] Re: [qemu 1.4.1] inconsistent behavior
- on different architecture
+Date: Thu, 23 Nov 2017 18:48:52 +0000
+Message-ID: <CAFEAcA9mn2VqQtV33tGdvA2NDW+a_DW46e1LahFsZY_2nSOzJQ@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH v2] configure: Deal with OpenBSD/i386
+ emulation linker
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,97 +30,47 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Brad Smith <brad@comstyle.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 
-In particular, the only crashes here are the ones where --library-path
-isn't specified, so it isn't even a case of "QEMU should somehow support
-whiteouts in --library-path so you can tell it to ignore the host
-ld.so.cache". So I'm going to close this bug report (with 'invalid' as
-the closest sensible resolution).
+On 20 November 2017 at 13:46, Peter Maydell <peter.maydell@linaro.org> wrote:
+> On 7 November 2017 at 23:46, Brad Smith <brad@comstyle.com> wrote:
+>> OpenBSD/i386 uses elf_i386_obsd for the emulation linker.
+>>
+>> Signed-off-by: Brad Smith <brad@comstyle.com>
+>>
+>>
+>> diff --git a/configure b/configure
+>> index dd73cce62f..c9dd747283 100755
+>> --- a/configure
+>> +++ b/configure
+>> @@ -5159,9 +5159,9 @@ if test \( "$cpu" = "i386" -o "$cpu" = "x86_64" \) -a \
+>>          "$targetos" != "Darwin" -a "$targetos" != "SunOS" -a \
+>>          "$softmmu" = yes ; then
+>>      # Different host OS linkers have different ideas about the name of the ELF
+>> -    # emulation. Linux and OpenBSD use 'elf_i386'; FreeBSD uses the _fbsd
+>> -    # variant; and Windows uses i386pe.
+>> -    for emu in elf_i386 elf_i386_fbsd i386pe; do
+>> +    # emulation. Linux and OpenBSD/amd64 use 'elf_i386'; FreeBSD uses the _fbsd
+>> +    # variant; OpenBSD/i386 uses the _obsd variant; and Windows uses i386pe.
+>> +    for emu in elf_i386 elf_i386_fbsd elf_i386_obsd i386pe; do
+>>          if "$ld" -verbose 2>&1 | grep -q "^[[:space:]]*$emu[[:space:]]*$"; then
+>>              ld_i386_emulation="$emu"
+>>              roms="optionrom"
+>
+> Hi; just a reminder that this patch is still blocked on getting
+> an answer to why the correct answer for OpenBSD/x86_64 is
+> "elf_i386" and not "elf_i386_obsd"...
 
+I went and looked through the binutils source, and as far as
+I can tell the _obsd variant sets some extra defaults which
+we probably don't care about for ROM images, and in practice
+the binary blobs are the same for both if run on openbsd/x86_64.
+So I think that the current behaviour (use elf_i386 in preference
+to elf_i386_obsd) is the right thing, because the binaries we're
+creating are not specifically openbsd binaries.
 
-** Changed in: qemu
-       Status: New =3D> Invalid
+So I've applied this patch to master.
 
--- =
-
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1172613
-
-Title:
-  [qemu 1.4.1] inconsistent behavior on different architecture
-
-Status in QEMU:
-  Invalid
-
-Bug description:
-  Running with qemu 1.4.1 and eglibc 2.17 on Debian Linux 7.0 for amd64
-
-  ---------------- armhf ----------------
-  $ arm-linux-gnueabihf-gcc hello.c
-  $ qemu-arm ./a.out
-  /lib/ld-linux-armhf.so.3: No such file or directory
-
-  $ qemu-arm arm-linux-gnueabihf/lib/ld-2.17.so ./a.out
-  ./a.out: error while loading shared libraries: libc.so.6: cannot open sha=
-red object file: No such file or directory
-
-  $ qemu-arm arm-linux-gnueabihf/lib/ld-2.17.so --library-path  arm-linux-g=
-nueabihf/lib ./a.out
-  Hello, world !
-
-  ---------------- powerpc64 ----------------
-  $ powerpc64-linux-gcc hello.c
-
-  $ qemu-ppc64 ./a.out
-  /lib64/ld64.so.1: No such file or directory
-
-  [BAD BEHAVIOR !!!]
-  $ qemu-ppc64 powerpc64-linux/lib64/ld-2.17.so ./a.out
-  Invalid data memory access: 0x00000041988fd008
-  NIP 000000400001cb2c   LR 000000400001cc30 CTR 0000000000000000 XER 00000=
-00000000000
-  MSR 8000000002006000 HID0 0000000060000000  HF 8000000002006000 idx 0
-  TB 00000000 00000000
-  GPR00 0000000000000000 000000400083a220 0000004000041230 00000043309bd010
-  GPR04 0000004000026f12 000000000000000b 000000000000002e 000000000000002e
-  GPR08 0000000000000030 000000008803fffc 00000041988fcff4 0000000000000037
-  GPR12 0000000000000000 0000000000000000 0000000000000000 0000000000000000
-  GPR16 0000000000000000 000000400003a4d8 000000400083a6d0 000000400083a6d8
-  GPR20 000000400003a898 000000000000000a 0000000000000000 00000043309bd010
-  GPR24 0000004000037b60 00000000cfe8ced7 000000400003a430 0000000010000261
-  GPR28 00000001980bfff4 0000000000000000 000000004401ffff 000000002200ffff
-  CR 22242224  [ E  E  E  G  E  E  E  G  ]             RES ffffffffffffffff
-  FPR00 0000000000000000 0000000000000000 0000000000000000 0000000000000000
-  FPR04 0000000000000000 0000000000000000 0000000000000000 0000000000000000
-  FPR08 0000000000000000 0000000000000000 0000000000000000 0000000000000000
-  FPR12 0000000000000000 0000000000000000 0000000000000000 0000000000000000
-  FPR16 0000000000000000 0000000000000000 0000000000000000 0000000000000000
-  FPR20 0000000000000000 0000000000000000 0000000000000000 0000000000000000
-  FPR24 0000000000000000 0000000000000000 0000000000000000 0000000000000000
-  FPR28 0000000000000000 0000000000000000 0000000000000000 0000000000000000
-  FPSCR 0000000000000000
-  qemu: uncaught target signal 11 (Segmentation fault) - core dumped
-  Segmentation fault
-
-  $ qemu-ppc64 powerpc64-linux/lib64/ld-2.17.so --library-path powerpc64-li=
-nux/lib64 ./a.out
-  Hello, world !
-
-  ---------------- sparc64 ----------------
-  $ sparc64-linux-gcc hello.c
-
-  $ qemu-sparc64 ./a.out
-  /lib64/ld-linux.so.2: No such file or directory
-
-  [BAD BEHAVIOR !!!]
-  $ qemu-sparc64 sparc64-linux/lib64/ld-2.17.so ./a.out
-  Segmentation fault
-
-  $ qemu-sparc64 sparc64-linux/lib64/ld-2.17.so --library-path sparc64-linu=
-x/lib64 ./a.out
-  Hello, world !
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1172613/+subscriptions
+thanks
+-- PMM
