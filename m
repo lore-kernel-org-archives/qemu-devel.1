@@ -1,22 +1,15 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50211)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36616)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dan.j.williams@intel.com>) id 1eHu8w-0008Vx-I3
-	for qemu-devel@nongnu.org; Thu, 23 Nov 2017 11:14:27 -0500
+	(envelope-from <pbonzini@redhat.com>) id 1eHuMM-0003oK-Cs
+	for qemu-devel@nongnu.org; Thu, 23 Nov 2017 11:28:19 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dan.j.williams@intel.com>) id 1eHu8v-0002Gp-Iy
-	for qemu-devel@nongnu.org; Thu, 23 Nov 2017 11:14:26 -0500
-Received: from mail-oi0-x232.google.com ([2607:f8b0:4003:c06::232]:39979)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <dan.j.williams@intel.com>)
-	id 1eHu8v-0002Fv-9u
-	for qemu-devel@nongnu.org; Thu, 23 Nov 2017 11:14:25 -0500
-Received: by mail-oi0-x232.google.com with SMTP id l138so13451969oib.7
-	for <qemu-devel@nongnu.org>; Thu, 23 Nov 2017 08:14:24 -0800 (PST)
-MIME-Version: 1.0
-In-Reply-To: <d1df875c-5b64-67d9-2b3c-4ec14c03b85b@gmail.com>
+	(envelope-from <pbonzini@redhat.com>) id 1eHuMI-00046n-SH
+	for qemu-devel@nongnu.org; Thu, 23 Nov 2017 11:28:18 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:56134)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1eHuMI-00044I-Lh
+	for qemu-devel@nongnu.org; Thu, 23 Nov 2017 11:28:14 -0500
 References: <1455443283.33337333.1500618150787.JavaMail.zimbra@redhat.com>
-	<1501016375.26846.21.camel@redhat.com>
-	<1063764405.34607875.1501076841865.JavaMail.zimbra@redhat.com>
 	<1501104453.26846.45.camel@redhat.com>
 	<CAPcyv4hsqrqBxoipUHPAbSctuzbVWCRnT-gN08i9uhXTWY6iPQ@mail.gmail.com>
 	<1501112787.4073.49.camel@redhat.com>
@@ -32,10 +25,15 @@ References: <1455443283.33337333.1500618150787.JavaMail.zimbra@redhat.com>
 	<ec5ff7c2-864e-5020-0aaa-6663e78e3756@gmail.com>
 	<1511288389.1080.14.camel@redhat.com>
 	<d1df875c-5b64-67d9-2b3c-4ec14c03b85b@gmail.com>
-From: Dan Williams <dan.j.williams@intel.com>
-Date: Thu, 23 Nov 2017 08:14:23 -0800
-Message-ID: <CAPcyv4ip6m6e9Bh7weJNB3m3kpDpRkhHDZf0JYyr5UbkD41oLg@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
+	<CAPcyv4ip6m6e9Bh7weJNB3m3kpDpRkhHDZf0JYyr5UbkD41oLg@mail.gmail.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <654f8935-258e-22ef-fae4-3e14e91e8fae@redhat.com>
+Date: Thu, 23 Nov 2017 17:28:05 +0100
+MIME-Version: 1.0
+In-Reply-To: <CAPcyv4ip6m6e9Bh7weJNB3m3kpDpRkhHDZf0JYyr5UbkD41oLg@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Subject: Re: [Qemu-devel] KVM "fake DAX" flushing interface - discussion
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
@@ -45,36 +43,43 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Xiao Guangrong <xiaoguangrong.eric@gmail.com>
-Cc: Rik van Riel <riel@redhat.com>, Pankaj Gupta <pagupta@redhat.com>, Jan Kara <jack@suse.cz>, Stefan Hajnoczi <stefanha@redhat.com>, Stefan Hajnoczi <stefanha@gmail.com>, kvm-devel <kvm@vger.kernel.org>, Qemu Developers <qemu-devel@nongnu.org>, "linux-nvdimm@lists.01.org" <linux-nvdimm@ml01.01.org>, ross zwisler <ross.zwisler@linux.intel.com>, Paolo Bonzini <pbonzini@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Nitesh Narayan Lal <nilal@redhat.com>, Haozhong Zhang <haozhong.zhang@intel.com>, Ross Zwisler <ross.zwisler@intel.com>
+To: Dan Williams <dan.j.williams@intel.com>, Xiao Guangrong <xiaoguangrong.eric@gmail.com>
+Cc: Rik van Riel <riel@redhat.com>, Pankaj Gupta <pagupta@redhat.com>, Jan Kara <jack@suse.cz>, Stefan Hajnoczi <stefanha@redhat.com>, Stefan Hajnoczi <stefanha@gmail.com>, kvm-devel <kvm@vger.kernel.org>, Qemu Developers <qemu-devel@nongnu.org>, "linux-nvdimm@lists.01.org" <linux-nvdimm@ml01.01.org>, ross zwisler <ross.zwisler@linux.intel.com>, Kevin Wolf <kwolf@redhat.com>, Nitesh Narayan Lal <nilal@redhat.com>, Haozhong Zhang <haozhong.zhang@intel.com>, Ross Zwisler <ross.zwisler@intel.com>
 
-On Wed, Nov 22, 2017 at 8:05 PM, Xiao Guangrong
-<xiaoguangrong.eric@gmail.com> wrote:
->
->
-> On 11/22/2017 02:19 AM, Rik van Riel wrote:
->
->> We can go with the "best" interface for what
->> could be a relatively slow flush (fsync on a
->> file on ssd/disk on the host), which requires
->> that the flushing task wait on completion
->> asynchronously.
->
->
-> I'd like to clarify the interface of "wait on completion
-> asynchronously" and KVM async page fault a bit more.
->
-> Current design of async-page-fault only works on RAM rather
-> than MMIO, i.e, if the page fault caused by accessing the
-> device memory of a emulated device, it needs to go to
-> userspace (QEMU) which emulates the operation in vCPU's
-> thread.
->
-> As i mentioned before the memory region used for vNVDIMM
-> flush interface should be MMIO and consider its support
-> on other hypervisors, so we do better push this async
-> mechanism into the flush interface design itself rather
-> than depends on kvm async-page-fault.
+On 23/11/2017 17:14, Dan Williams wrote:
+> On Wed, Nov 22, 2017 at 8:05 PM, Xiao Guangrong
+> <xiaoguangrong.eric@gmail.com> wrote:
+>>
+>>
+>> On 11/22/2017 02:19 AM, Rik van Riel wrote:
+>>
+>>> We can go with the "best" interface for what
+>>> could be a relatively slow flush (fsync on a
+>>> file on ssd/disk on the host), which requires
+>>> that the flushing task wait on completion
+>>> asynchronously.
+>>
+>>
+>> I'd like to clarify the interface of "wait on completion
+>> asynchronously" and KVM async page fault a bit more.
+>>
+>> Current design of async-page-fault only works on RAM rather
+>> than MMIO, i.e, if the page fault caused by accessing the
+>> device memory of a emulated device, it needs to go to
+>> userspace (QEMU) which emulates the operation in vCPU's
+>> thread.
+>>
+>> As i mentioned before the memory region used for vNVDIMM
+>> flush interface should be MMIO and consider its support
+>> on other hypervisors, so we do better push this async
+>> mechanism into the flush interface design itself rather
+>> than depends on kvm async-page-fault.
+> 
+> I would expect this interface to be virtio-ring based to queue flush
+> requests asynchronously to the host.
 
-I would expect this interface to be virtio-ring based to queue flush
-requests asynchronously to the host.
+Could we reuse the virtio-blk device, only with a different device id?
+
+Thanks,
+
+Paolo
