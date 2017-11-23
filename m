@@ -1,28 +1,15 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57858)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33346)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <aik@ozlabs.ru>) id 1eHgmN-0001Gv-KT
-	for qemu-devel@nongnu.org; Wed, 22 Nov 2017 20:58:16 -0500
+	(envelope-from <mreitz@redhat.com>) id 1eHgwZ-0004Vl-RN
+	for qemu-devel@nongnu.org; Wed, 22 Nov 2017 21:08:49 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <aik@ozlabs.ru>) id 1eHgmK-0003WK-Gc
-	for qemu-devel@nongnu.org; Wed, 22 Nov 2017 20:58:15 -0500
-Received: from mail-pg0-x242.google.com ([2607:f8b0:400e:c05::242]:37156)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <aik@ozlabs.ru>) id 1eHgmK-0003W6-7M
-	for qemu-devel@nongnu.org; Wed, 22 Nov 2017 20:58:12 -0500
-Received: by mail-pg0-x242.google.com with SMTP id m4so3430282pgc.4
-	for <qemu-devel@nongnu.org>; Wed, 22 Nov 2017 17:58:12 -0800 (PST)
-References: <20171122051552.3529-1-aik@ozlabs.ru>
-	<20171122133952.GT2380@umbus.fritz.box>
-From: Alexey Kardashevskiy <aik@ozlabs.ru>
-Message-ID: <3fde27e3-fb09-6084-a3e9-f98cfb4a527d@ozlabs.ru>
-Date: Thu, 23 Nov 2017 12:58:06 +1100
-MIME-Version: 1.0
-In-Reply-To: <20171122133952.GT2380@umbus.fritz.box>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="fau6clnQASFQPlKPjgVImasjucG3soUJB"
-Subject: Re: [Qemu-devel] [PATCH qemu] vfio/spapr: Allow fallback to SPAPR
- TCE IOMMU v1
+	(envelope-from <mreitz@redhat.com>) id 1eHgwY-00018d-LL
+	for qemu-devel@nongnu.org; Wed, 22 Nov 2017 21:08:47 -0500
+From: Max Reitz <mreitz@redhat.com>
+Date: Thu, 23 Nov 2017 03:08:15 +0100
+Message-Id: <20171123020832.8165-1-mreitz@redhat.com>
+Subject: [Qemu-devel] [PATCH 00/17] iotests: Fix iotests for weird
+ formats/options
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,104 +18,91 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Gibson <david@gibson.dropbear.id.au>
-Cc: qemu-devel@nongnu.org, Alex Williamson <alex.williamson@redhat.com>
+To: qemu-block@nongnu.org
+Cc: qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>, Kevin Wolf <kwolf@redhat.com>, John Snow <jsnow@redhat.com>, Fam Zheng <famz@redhat.com>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---fau6clnQASFQPlKPjgVImasjucG3soUJB
-From: Alexey Kardashevskiy <aik@ozlabs.ru>
-To: David Gibson <david@gibson.dropbear.id.au>
-Cc: qemu-devel@nongnu.org, Alex Williamson <alex.williamson@redhat.com>
-Message-ID: <3fde27e3-fb09-6084-a3e9-f98cfb4a527d@ozlabs.ru>
-Subject: Re: [PATCH qemu] vfio/spapr: Allow fallback to SPAPR TCE IOMMU v1
-References: <20171122051552.3529-1-aik@ozlabs.ru>
- <20171122133952.GT2380@umbus.fritz.box>
-In-Reply-To: <20171122133952.GT2380@umbus.fritz.box>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+This series fixes the qemu-iotests for qcow, vmdk, qcow2 v2 and qcow2 v3
+with refcount_bits=1.
 
-On 23/11/17 00:39, David Gibson wrote:
-> On Wed, Nov 22, 2017 at 04:15:52PM +1100, Alexey Kardashevskiy wrote:
->> The vfio_iommu_spapr_tce driver always advertises v1 and v2 IOMMU supp=
-ort,
->> however PR KVM (a special version of KVM designed to work in
->> a paravirtualized system; these days used for nested virtualizaion) on=
-ly
->> supports the "pseries" platform which does not support v2. Since there=
- is
->> no way to choose the IOMMU version in QEMU, it fails to start.
->>
->> This adds a fallback to the v1 IOMMU if v2 cannot be used.
->>
->> Signed-off-by: Alexey Kardashevskiy <aik@ozlabs.ru>
->=20
-> The fallback itself isn't a bad idea, but your commit message contains
-> several inaccurracies.  KVM PR is not particularly designed to work in
-> a paravirtualized system, and it doesn't only support the pseries
-> platform (as guest *or* host).  It's actually a lot more general than
-> KVM HV - just slow, not that well tested and missing a number of
-> features that no-one's bothered to port to it.
+Patches 1 and 2 contain real fixes (not urgent, though, so no need to
+hurry for 2.11--we can take them into 2.11 if we want to, but there is
+no absolute need for them).
 
-Well, true. I kinda tried to give an example of how this may be useful an=
-d
-exaggerated a bit, plus my ignorance :) I'll repost if Alex does not have=
+Patches 3 and 4 add blkdebug events to qcow and vmdk so iotests 020 can
+work with them even after patch 10.
 
-objections otherwise.
+Patches 5 and 6 are general "fixes" for the iotests infrastructure.
+
+Patches 7, 8, and 9 add some missing skips under certain circumstances
+to tests that need them.
+
+The rest of this series (patches 10 through 17) actually fix tests so
+they work for the formats and options mentioned above.
+
+(Fun fact: qcow v1 wasn't broken before this series.  But it would be
+ broken by patch 10 if I didn't include patch 3.  That is why I
+ mentioned it above.)
 
 
+Personal note:  I should really stop writing bash tests, at least as
+soon as there is QMP involved.  While working on this series I got
+sidetracked a bit and actually wrote some iotests.py functions that may
+come in handy next time I write a test.
 
->=20
->> ---
->>  hw/vfio/common.c | 5 +++++
->>  1 file changed, 5 insertions(+)
->>
->> diff --git a/hw/vfio/common.c b/hw/vfio/common.c
->> index 7b2924c..cd81cc9 100644
->> --- a/hw/vfio/common.c
->> +++ b/hw/vfio/common.c
->> @@ -1040,6 +1040,11 @@ static int vfio_connect_container(VFIOGroup *gr=
-oup, AddressSpace *as,
->>              v2 ? VFIO_SPAPR_TCE_v2_IOMMU : VFIO_SPAPR_TCE_IOMMU;
->>          ret =3D ioctl(fd, VFIO_SET_IOMMU, container->iommu_type);
->>          if (ret) {
->> +            container->iommu_type =3D VFIO_SPAPR_TCE_IOMMU;
->> +            v2 =3D false;
->> +            ret =3D ioctl(fd, VFIO_SET_IOMMU, container->iommu_type);=
-
->> +        }
->> +        if (ret) {
->>              error_setg_errno(errp, errno, "failed to set iommu for co=
-ntainer");
->>              ret =3D -errno;
->>              goto free_container_exit;
->=20
+(I hate to write Python tests because the boilerplate seems so large and
+ the debugging is so hard.  But there is test 194 which shows that it is
+ possible to write simple bash-like tests as well--and that is how I
+ should probably write tests from now on.)
 
 
---=20
-Alexey
+Max Reitz (17):
+  block/vmdk: Fix , instead of ; at end of line
+  qcow2: No persistent dirty bitmaps for compat=0.10
+  block/qcow: Add blkdebug events
+  block/vmdk: Add blkdebug events
+  iotests: Fix _img_info for backslashes
+  iotests: Drop format-specific in _filter_img_info
+  iotests: Forbid 020 for non-file protocols
+  iotests: Skip 103 for refcount_bits=1
+  iotests: Disable some tests for compat=0.10
+  iotests: Fix 020 for vmdk
+  iotests: Fix 051 for compat=0.10
+  iotests: Fix 059's reference output
+  iotests: Fix 067 for compat=0.10
+  iotests: Make 089 compatible with compat=0.10
+  iotests: Make 184 image-less
+  iotests: Make 191 work with qcow2 options
+  iotests: Filter compat-dependent info in 198
 
+ block/qcow.c                     |  16 ++
+ block/qcow2-bitmap.c             |  10 ++
+ block/qcow2.c                    |  14 +-
+ block/vmdk.c                     |  18 ++-
+ tests/qemu-iotests/020           |  17 +--
+ tests/qemu-iotests/020.out       |   6 +-
+ tests/qemu-iotests/051           |   2 +
+ tests/qemu-iotests/051.out       |   1 +
+ tests/qemu-iotests/051.pc.out    |   1 +
+ tests/qemu-iotests/059.out       |   2 +-
+ tests/qemu-iotests/067           |   3 +-
+ tests/qemu-iotests/067.out       |  97 ++++--------
+ tests/qemu-iotests/080           |   5 +-
+ tests/qemu-iotests/089           |   4 +-
+ tests/qemu-iotests/089.out       |  10 --
+ tests/qemu-iotests/103           |   2 +
+ tests/qemu-iotests/130           |   2 +
+ tests/qemu-iotests/137           |   2 +
+ tests/qemu-iotests/176           |   2 +
+ tests/qemu-iotests/177           |  13 +-
+ tests/qemu-iotests/184           |  25 +---
+ tests/qemu-iotests/184.out       |  63 ++------
+ tests/qemu-iotests/191           |   5 +-
+ tests/qemu-iotests/191.out       | 313 +++++++++++----------------------------
+ tests/qemu-iotests/198           |   8 +-
+ tests/qemu-iotests/198.out       |   8 -
+ tests/qemu-iotests/common.filter |  29 +++-
+ tests/qemu-iotests/common.rc     |   2 +-
+ 28 files changed, 254 insertions(+), 426 deletions(-)
 
---fau6clnQASFQPlKPjgVImasjucG3soUJB
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQJCBAEBCAAsFiEEZSrPibrORRTHQ99dhhM92CvBILkFAloWKy4OHGFpa0Bvemxh
-YnMucnUACgkQhhM92CvBILndTw/+OftNH0mCnHvGely/pcfomunyFHIidLAuc5cb
-pktcWQTxaLVdS6Y3BF55mdErUo66xnP63ubxi3R1vuH+P0qvI5GohwghW+kgnh+e
-Z59CrAeQMt67Qj0iNllJJ/1B9z93tujUG19FNIwvLcQQggSJ3Mnpw1Ga3z4PLokz
-X9Kd44CkbmwDhrdtNHm8LLn5h+LBa+VbNdvK0f3a6nBgKVZ1FqgFWhLDulsVkrsG
-pXo5suf0uVGLDP+8zRNBZgKoSKXMp5JcmxlB/2CSiZqg2Dt9LGQXZkqAfj7PMI7t
-GSucklVdWR8mfMSY+uJrN0JS/Fv71Lt4rWqXFTOeThUOr41J6BSGRptkpNtd28WT
-HzyjXjPIwe6pS0PO00vFbd113lkVyptIC2OF4FXKNruTzsvRRvgpuFdH1hVzcG0N
-CsbbLCugdz0RHDk2sXeDoGw2G61XQ7a8N6lldigauy1Af3c7zZQxs1Jo57PcDKlK
-T/JVjapnM4WUiOUXwQxeSpgY17Vh3FSao4kRUxGvYXN7JS87sj6sYcm9sgeP+X8Y
-O10fIqQoFLIY4dca6XgveGcjYxgqHbTSiMpb4bLu/nTD+9+nVe4TBb+RIhZpDLxm
-1MpLgwmrVQvLnxDwhZIJTTpAhj8dGJWvvbfXBkDovVBBk6/g+thj1Aqd+oiQvWue
-ue6TEfg=
-=ktqd
------END PGP SIGNATURE-----
-
---fau6clnQASFQPlKPjgVImasjucG3soUJB--
+-- 
+2.13.6
