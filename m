@@ -1,34 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42172)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47485)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1eHmz9-0007aK-QG
-	for qemu-devel@nongnu.org; Thu, 23 Nov 2017 03:35:58 -0500
+	(envelope-from <jianjay.zhou@huawei.com>) id 1eHnBN-0002QN-QZ
+	for qemu-devel@nongnu.org; Thu, 23 Nov 2017 03:48:30 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1eHmz6-0002zw-JL
-	for qemu-devel@nongnu.org; Thu, 23 Nov 2017 03:35:51 -0500
-Received: from indium.canonical.com ([91.189.90.7]:47338)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1eHmz6-0002zE-Ca
-	for qemu-devel@nongnu.org; Thu, 23 Nov 2017 03:35:48 -0500
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1eHmz4-0008An-Lu
-	for <qemu-devel@nongnu.org>; Thu, 23 Nov 2017 08:35:46 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 9378A2E80C7
-	for <qemu-devel@nongnu.org>; Thu, 23 Nov 2017 08:35:46 +0000 (UTC)
+	(envelope-from <jianjay.zhou@huawei.com>) id 1eHnBH-0005uf-O3
+	for qemu-devel@nongnu.org; Thu, 23 Nov 2017 03:48:29 -0500
+Received: from szxga05-in.huawei.com ([45.249.212.191]:2734)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_ARCFOUR_SHA1:16) (Exim 4.71)
+	(envelope-from <jianjay.zhou@huawei.com>) id 1eHnBH-0005rs-0o
+	for qemu-devel@nongnu.org; Thu, 23 Nov 2017 03:48:23 -0500
+From: Jay Zhou <jianjay.zhou@huawei.com>
+Date: Thu, 23 Nov 2017 16:47:52 +0800
+Message-ID: <1511426872-13980-1-git-send-email-jianjay.zhou@huawei.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Thu, 23 Nov 2017 08:21:42 -0000
-From: Matt Keys <1329956@bugs.launchpad.net>
-Reply-To: Bug 1329956 <1329956@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <20140613211439.4618.98205.malonedeb@soybean.canonical.com>
-Message-Id: <151142530261.18530.16686571440428545246.malone@gac.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1329956] Re: multi-core FreeBSD guest hangs after
- warm reboot
+Content-Type: text/plain
+Subject: [Qemu-devel] [PATCH] docs/devel/migration.txt: keep functions
+ consistent with the code
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -38,65 +25,73 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
+Cc: quintela@redhat.com, dgilbert@redhat.com, weidong.huang@huawei.com, wangxinxin.wang@huawei.com, Jay Zhou <jianjay.zhou@huawei.com>
 
-sorry, make that https://redmine.pfsense.org/issues/4377
+Since the commit 11808bb0c422134bf09119f4aa22c59b0ce84bf3 removed
+the put_buffer callback and using an iovec based write handler instead,
+the docs should be sync with the code too.
 
--- =
+Signed-off-by: Jay Zhou <jianjay.zhou@huawei.com>
+---
+ docs/devel/migration.txt | 31 ++++++++++++++++++-------------
+ 1 file changed, 18 insertions(+), 13 deletions(-)
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1329956
-
-Title:
-  multi-core FreeBSD guest hangs after warm reboot
-
-Status in QEMU:
-  Fix Released
-Status in Debian:
-  New
-
-Bug description:
-  On some Linux KVM hosts in our environment, FreeBSD guests fail to
-  reboot properly if they have more than one CPU (socket, core, and/or
-  thread). They will boot fine the first time, but after issuing a
-  "reboot" command via the OS the guest starts to boot but hangs during
-  SMP initialization. Fully shutting down and restarting the guest works
-  in all cases.
-
-  The only meaningful difference between hosts with the problem and those w=
-ithout is the CPU. Hosts with Xeon E5-26xx v2 processors have the problem, =
-including at least the "Intel(R) Xeon(R) CPU E5-2667 v2" and the "Intel(R) =
-Xeon(R) CPU E5-2650 v2".
-  Hosts with any other CPU, including "Intel(R) Xeon(R) CPU E5-2650 0", "In=
-tel(R) Xeon(R) CPU E5-2620 0", or "AMD Opteron(TM) Processor 6274" do not h=
-ave the problem. Note the "v2" in the names of the problematic CPUs.
-
-  On hosts with a "v2" Xeon, I can reproduce the problem under Linux
-  kernel 3.10 or 3.12 and Qemu 1.7.0 or 2.0.0.
-
-  The problem occurs with all currently-supported versions of FreeBSD,
-  including 8.4, 9.2, 10.0 and 11-CURRENT.
-
-  On a Linux KVM host with a "v2" Xeon, this command line is adequate to
-  reproduce the problem:
-
-  /usr/bin/qemu-system-x86_64 -machine accel=3Dkvm -name bsdtest -m 512
-  -smp 2,sockets=3D1,cores=3D1,threads=3D2 -drive
-  file=3D./20140613_FreeBSD_9.2-RELEASE_ufs.qcow2,if=3Dnone,id=3Ddrive0,for=
-mat=3Dqcow2
-  -device virtio-blk-pci,scsi=3Doff,drive=3Ddrive0 -vnc 0.0.0.0:0 -net none
-
-  I have tried many variations including different models of -machine
-  and -cpu for the guest with no visible difference.
-
-  A native FreeBSD installation on a host with a "v2" Xeon does not have
-  the problem, nor do a paravirtualized FreeBSD guests under bhyve (the
-  BSD legacy-free hypervisor) using the same FreeBSD disk images as on
-  the Linux hosts. So it seems unlikely the cause is on the FreeBSD side
-  of things.
-
-  I would greatly appreciate any feedback or developer attention to
-  this. I am happy to provide additional details, test patches, etc.
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1329956/+subscriptions
+diff --git a/docs/devel/migration.txt b/docs/devel/migration.txt
+index 4030703..e7b08c9 100644
+--- a/docs/devel/migration.txt
++++ b/docs/devel/migration.txt
+@@ -52,26 +52,31 @@ QEMU uses a QEMUFile abstraction to be able to do migration.  Any type
+ of migration that wants to use QEMU infrastructure has to create a
+ QEMUFile with:
+ 
+-QEMUFile *qemu_fopen_ops(void *opaque,
+-                         QEMUFilePutBufferFunc *put_buffer,
+-                         QEMUFileGetBufferFunc *get_buffer,
+-                         QEMUFileCloseFunc *close);
++typedef struct QEMUFileOps {
++    QEMUFileGetBufferFunc *get_buffer;
++    QEMUFileCloseFunc *close;
++    QEMUFileSetBlocking *set_blocking;
++    QEMUFileWritevBufferFunc *writev_buffer;
++    QEMURetPathFunc *get_return_path;
++    QEMUFileShutdownFunc *shut_down;
++} QEMUFileOps;
+ 
+-The functions have the following functionality:
++QEMUFile *qemu_fopen_ops(void *opaque, const QEMUFileOps *ops);
+ 
+-This function writes a chunk of data to a file at the given position.
+-The pos argument can be ignored if the file is only used for
+-streaming.  The handler should try to write all of the data it can.
++The main functions of QEMUFileOps have the following functionality:
+ 
+-typedef int (QEMUFilePutBufferFunc)(void *opaque, const uint8_t *buf,
+-                                    int64_t pos, int size);
++This function writes an iovec to file. The handler must write all
++of the data or return a negative errno value.
++
++typedef ssize_t (QEMUFileWritevBufferFunc)(void *opaque, struct iovec *iov,
++                                           int iovcnt, int64_t pos);
+ 
+ Read a chunk of data from a file at the given position.  The pos argument
+ can be ignored if the file is only be used for streaming.  The number of
+ bytes actually read should be returned.
+ 
+-typedef int (QEMUFileGetBufferFunc)(void *opaque, uint8_t *buf,
+-                                    int64_t pos, int size);
++typedef ssize_t (QEMUFileGetBufferFunc)(void *opaque, uint8_t *buf,
++                                        int64_t pos, int size);
+ 
+ Close a file and return an error code.
+ 
+@@ -80,7 +85,7 @@ typedef int (QEMUFileCloseFunc)(void *opaque);
+ You can use any internal state that you need using the opaque void *
+ pointer that is passed to all functions.
+ 
+-The important functions for us are put_buffer()/get_buffer() that
++The important functions for us are writev_buffer()/get_buffer() that
+ allow to write/read a buffer into the QEMUFile.
+ 
+ === How to save the state of one device ===
+-- 
+1.8.3.1
