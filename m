@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33680)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33737)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1eHgx9-0004wV-1D
-	for qemu-devel@nongnu.org; Wed, 22 Nov 2017 21:09:26 -0500
+	(envelope-from <mreitz@redhat.com>) id 1eHgxD-0004yp-VX
+	for qemu-devel@nongnu.org; Wed, 22 Nov 2017 21:09:28 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1eHgx8-0001Xq-06
-	for qemu-devel@nongnu.org; Wed, 22 Nov 2017 21:09:23 -0500
+	(envelope-from <mreitz@redhat.com>) id 1eHgxD-0001cT-33
+	for qemu-devel@nongnu.org; Wed, 22 Nov 2017 21:09:27 -0500
 From: Max Reitz <mreitz@redhat.com>
-Date: Thu, 23 Nov 2017 03:08:21 +0100
-Message-Id: <20171123020832.8165-7-mreitz@redhat.com>
+Date: Thu, 23 Nov 2017 03:08:22 +0100
+Message-Id: <20171123020832.8165-8-mreitz@redhat.com>
 In-Reply-To: <20171123020832.8165-1-mreitz@redhat.com>
 References: <20171123020832.8165-1-mreitz@redhat.com>
-Subject: [Qemu-devel] [PATCH 06/17] iotests: Drop format-specific in
- _filter_img_info
+Subject: [Qemu-devel] [PATCH 07/17] iotests: Forbid 020 for non-file
+ protocols
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,87 +23,39 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org
 Cc: qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>, Kevin Wolf <kwolf@redhat.com>, John Snow <jsnow@redhat.com>, Fam Zheng <famz@redhat.com>
 
-_filter_img_info should remove format-specific information, too.  We
-already have such a filter in _img_info, and it is very useful for
-query-block-named-block-nodes (etc.), too.
-
-However, in 198 we need that information (but we still want the rest of
-the filter), so make that filtering optional.  Note that "the rest of
-the filter" includes filtering of the test directory, so we can drop the
-_filter_testdir from 198 at the same time.
+This test does funny things like TEST_IMG="TEST_IMG.base" _make_test_img
+that usually only work with the file protocol.  More specifically, they
+do not work with the most interesting non-file protocols, so we might as
+well skip this for anything but file.
 
 Signed-off-by: Max Reitz <mreitz@redhat.com>
 ---
- tests/qemu-iotests/198           |  6 ++++--
- tests/qemu-iotests/common.filter | 29 ++++++++++++++++++++++++++++-
- 2 files changed, 32 insertions(+), 3 deletions(-)
+ tests/qemu-iotests/020 | 8 +-------
+ 1 file changed, 1 insertion(+), 7 deletions(-)
 
-diff --git a/tests/qemu-iotests/198 b/tests/qemu-iotests/198
-index 34ef666381..a84a058396 100755
---- a/tests/qemu-iotests/198
-+++ b/tests/qemu-iotests/198
-@@ -91,11 +91,13 @@ $QEMU_IO --object $SECRET0 --object $SECRET1 -c "read -P 0x9 0 $size" --image-op
+diff --git a/tests/qemu-iotests/020 b/tests/qemu-iotests/020
+index cefe3a830e..d22ab81414 100755
+--- a/tests/qemu-iotests/020
++++ b/tests/qemu-iotests/020
+@@ -42,18 +42,12 @@ trap "_cleanup; exit \$status" 0 1 2 3 15
  
- echo
- echo "== checking image base =="
--$QEMU_IMG info --image-opts $IMGSPECBASE | _filter_img_info | _filter_testdir | sed -e "/^disk size:/ D"
-+$QEMU_IMG info --image-opts $IMGSPECBASE | _filter_img_info --format-specific \
-+    | sed -e "/^disk size:/ D"
+ # Any format supporting backing files
+ _supported_fmt qcow qcow2 vmdk qed
+-_supported_proto generic
+-_unsupported_proto vxhs
++_supported_proto file
+ _supported_os Linux
+ _unsupported_imgopts "subformat=monolithicFlat" \
+                      "subformat=twoGbMaxExtentFlat" \
+                      "subformat=twoGbMaxExtentSparse"
  
- echo
- echo "== checking image layer =="
--$QEMU_IMG info --image-opts $IMGSPECLAYER | _filter_img_info | _filter_testdir | sed -e "/^disk size:/ D"
-+$QEMU_IMG info --image-opts $IMGSPECLAYER | _filter_img_info --format-specific \
-+    | sed -e "/^disk size:/ D"
+-# NFS does not support bdrv_reopen_prepare thus qemu-img commit fails.
+-if [ "$IMGPROTO" = "nfs" ]; then
+-    _notrun "image protocol $IMGPROTO does not support bdrv_commit"
+-fi
+-
+ TEST_OFFSETS="0 4294967296"
  
- 
- # success, all done
-diff --git a/tests/qemu-iotests/common.filter b/tests/qemu-iotests/common.filter
-index d9237799e9..0c0e53fae7 100644
---- a/tests/qemu-iotests/common.filter
-+++ b/tests/qemu-iotests/common.filter
-@@ -139,6 +139,15 @@ _filter_img_create()
- 
- _filter_img_info()
- {
-+    if [[ "$1" == "--format-specific" ]]; then
-+        local format_specific=1
-+        shift
-+    else
-+        local format_specific=0
-+    fi
-+
-+    discard=0
-+    regex_json_spec_start='^ *"format-specific": \{'
-     sed -e "s#$IMGPROTO:$TEST_DIR#TEST_DIR#g" \
-         -e "s#$TEST_DIR#TEST_DIR#g" \
-         -e "s#$IMGFMT#IMGFMT#g" \
-@@ -159,7 +168,25 @@ _filter_img_info()
-         -e "/block_state_zero: \\(on\\|off\\)/d" \
-         -e "/log_size: [0-9]\\+/d" \
-         -e "s/iters: [0-9]\\+/iters: 1024/" \
--        -e "s/uuid: [-a-f0-9]\\+/uuid: 00000000-0000-0000-0000-000000000000/"
-+        -e "s/uuid: [-a-f0-9]\\+/uuid: 00000000-0000-0000-0000-000000000000/" | \
-+    while IFS='' read -r line; do
-+        if [[ $format_specific == 1 ]]; then
-+            discard=0
-+        elif [[ $line == "Format specific information:" ]]; then
-+            discard=1
-+        elif [[ $line =~ $regex_json_spec_start ]]; then
-+            discard=2
-+            regex_json_spec_end="^${line%%[^ ]*}\\},? *$"
-+        fi
-+        if [[ $discard == 0 ]]; then
-+            echo "$line"
-+        elif [[ $discard == 1 && ! $line ]]; then
-+            echo
-+            discard=0
-+        elif [[ $discard == 2 && $line =~ $regex_json_spec_end ]]; then
-+            discard=0
-+        fi
-+    done
- }
- 
- # filter out offsets and file names from qemu-img map; good for both
+ TEST_IMG_SAVE="$TEST_IMG"
 -- 
 2.13.6
