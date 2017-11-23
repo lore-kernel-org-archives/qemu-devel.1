@@ -1,20 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40389)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41252)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eric.auger@redhat.com>) id 1eHu0Z-0004N6-Hg
-	for qemu-devel@nongnu.org; Thu, 23 Nov 2017 11:05:52 -0500
+	(envelope-from <pbonzini@redhat.com>) id 1eHu1P-0004mL-P5
+	for qemu-devel@nongnu.org; Thu, 23 Nov 2017 11:06:47 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eric.auger@redhat.com>) id 1eHu0T-0002UZ-Mx
-	for qemu-devel@nongnu.org; Thu, 23 Nov 2017 11:05:47 -0500
-References: <1511448975-28326-1-git-send-email-eric.auger@redhat.com>
-	<CAFEAcA8T4cShPYONdo8hiaZKvd+zq9Uo1o5awU3rA03uu8Vsiw@mail.gmail.com>
-From: Auger Eric <eric.auger@redhat.com>
-Message-ID: <1bede1e5-cc11-dca6-9f0b-ef16b9031d7a@redhat.com>
-Date: Thu, 23 Nov 2017 17:05:28 +0100
+	(envelope-from <pbonzini@redhat.com>) id 1eHu1O-0003E9-VF
+	for qemu-devel@nongnu.org; Thu, 23 Nov 2017 11:06:39 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:57698)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1eHu1O-0003DY-Pi
+	for qemu-devel@nongnu.org; Thu, 23 Nov 2017 11:06:38 -0500
+References: <20171123092333.16085-1-peterx@redhat.com>
+	<20171123092333.16085-3-peterx@redhat.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <039e8f8a-53e1-4208-7b4e-48a05d6faf5c@redhat.com>
+Date: Thu, 23 Nov 2017 17:06:31 +0100
 MIME-Version: 1.0
-In-Reply-To: <CAFEAcA8T4cShPYONdo8hiaZKvd+zq9Uo1o5awU3rA03uu8Vsiw@mail.gmail.com>
+In-Reply-To: <20171123092333.16085-3-peterx@redhat.com>
 Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [RFC v3 0/4] vITS Reset
+Subject: Re: [Qemu-devel] [PATCH 2/3] cpu: refactor cpu_address_space_init()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,53 +28,22 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: Wei Huang <wei@redhat.com>, Andrew Jones <drjones@redhat.com>, Vijay Kilari <vijay.kilari@gmail.com>, Juan Quintela <quintela@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, qemu-arm <qemu-arm@nongnu.org>, wu.wubin@huawei.com, wanghaibin.wang@huawei.com, Christoffer Dall <christoffer.dall@linaro.org>, eric.auger.pro@gmail.com
+To: Peter Xu <peterx@redhat.com>, qemu-devel@nongnu.org
+Cc: Eduardo Habkost <ehabkost@redhat.com>, Alexey Kardashevskiy <aik@ozlabs.ru>, Richard Henderson <rth@twiddle.net>, Peter Maydell <peter.maydell@linaro.org>
 
-Hi Peter,
+On 23/11/2017 10:23, Peter Xu wrote:
+> +                            const char *prefix, MemoryRegion *mr)
+>  {
+>      CPUAddressSpace *newas;
+> +    AddressSpace *as = g_new0(AddressSpace, 1);
+> +
+> +    assert(mr);
+> +    address_space_init(as, mr, prefix);
+>  
 
-On 23/11/17 16:19, Peter Maydell wrote:
-> On 23 November 2017 at 14:56, Eric Auger <eric.auger@redhat.com> wrote:
->> At the moment the ITS is not properly reset. On System reset or
->> reboot, previous ITS register values and caches are left
->> unchanged. Some of the registers might point to some guest RAM
->> tables which are not valid anymore. This leads to state
->> inconsistencies that are detected by the kernel save/restore
->> code. And eventually this may cause qemu abort.
->>
->> This series adds vITS reset modality:
->> - the 2 first patches bring a minimalist reset through individual
->>   register writes. However, with kernel versions < 4.15, this reset
->>   is not complete (vITS caches are not voided).
->> - With kernel versions >= 4.15 we can rely on a new ITS KVM device
->>   reset IOTCL. The last 2 patches introduce the full reset.
->>
->> Patches 1-2 have all kernel dependencies resolved.
->> Patches 3-4' dependencies were pulled for v4.15-rc0 but as the tag is
->> not set, the kernel header update still is partial.
-> 
-> We don't need the change to be tagged for us to sync with the
-> kernel headers: if it's in mainline that's good enough.
+Now that address_space_init_shareable doesn't exist anymore, the
+AddressSpace could be placed directly in CPUAddressSpace instead of
+having a pointer.  But the patches are already okay, that's a separate
+change.
 
-OK. do you allow me to keep a partial update for:
- linux-headers/asm-arm/kvm.h
- linux-headers/asm-arm64/kvm.h?
-
-When using update-linux-headers.sh I get suspicious errors at the end:
-grep: /tmp/tmp.A5NjLtHOij/include/asm/kvm_virtio.h: No such file or
-directory
-sed: can't read /tmp/tmp.A5NjLtHOij/include/asm/kvm_virtio.h: No such
-file or directory
-
-and include/standard-headers/asm-s390/virtio-ccw.h deleted
-
-I would prefer having s390 people checking and testing that.
-
-Thanks
-
-Eric
-
-> 
-> thanks
-> -- PMM
-> 
+Paolo
