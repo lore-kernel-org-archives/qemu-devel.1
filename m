@@ -1,29 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52217)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54708)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1eHpPa-000464-8b
-	for qemu-devel@nongnu.org; Thu, 23 Nov 2017 06:11:24 -0500
+	(envelope-from <dgibson@ozlabs.org>) id 1eHpS5-0005Ai-Rb
+	for qemu-devel@nongnu.org; Thu, 23 Nov 2017 06:13:55 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1eHpPW-0002lE-1g
-	for qemu-devel@nongnu.org; Thu, 23 Nov 2017 06:11:18 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:46462)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1eHpPV-0002kN-Ob
-	for qemu-devel@nongnu.org; Thu, 23 Nov 2017 06:11:13 -0500
-Date: Thu, 23 Nov 2017 11:11:05 +0000
-From: "Daniel P. Berrange" <berrange@redhat.com>
-Message-ID: <20171123111105.GG8166@redhat.com>
-Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
+	(envelope-from <dgibson@ozlabs.org>) id 1eHpS4-0005QN-NJ
+	for qemu-devel@nongnu.org; Thu, 23 Nov 2017 06:13:53 -0500
+Date: Thu, 23 Nov 2017 22:13:09 +1100
+From: David Gibson <david@gibson.dropbear.id.au>
+Message-ID: <20171123111309.GE22454@umbus.fritz.box>
 References: <20171110152017.24324-1-clg@kaod.org>
-	<20171110152017.24324-2-clg@kaod.org>
-	<715a7bd1-7aa5-fa64-a9b8-76782ee20576@redhat.com>
-	<20171123110345.03541b50.cohuck@redhat.com>
-	<CAFEAcA83-oqifsZboJmvDVYhhr4=QOEEGF1TZba-jCewpUFtyg@mail.gmail.com>
-	<1dff6d6c-be83-f6e1-2b7e-82d98bdb8a63@redhat.com>
+	<20171110152017.24324-6-clg@kaod.org>
+	<20171114104224.63ed5e87@bahia.lan>
+	<20171117045053.GB26448@umbus.fritz.box>
+	<20171120130742.7410a80b@bahia.lab.toulouse-stg.fr.ibm.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature"; boundary="/QKKmeG/X/bPShih"
 Content-Disposition: inline
-In-Reply-To: <1dff6d6c-be83-f6e1-2b7e-82d98bdb8a63@redhat.com>
-Subject: Re: [Qemu-devel] QEMU 3.0 ?
+In-Reply-To: <20171120130742.7410a80b@bahia.lab.toulouse-stg.fr.ibm.com>
+Subject: Re: [Qemu-devel] [PATCH for-2.12 v3 05/11] spapr: introduce an IRQ
+ allocator using a bitmap
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,60 +28,100 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>
-Cc: Peter Maydell <peter.maydell@linaro.org>, Cornelia Huck <cohuck@redhat.com>, =?utf-8?Q?C=C3=A9dric?= Le Goater <clg@kaod.org>, QEMU Developers <qemu-devel@nongnu.org>, David Gibson <david@gibson.dropbear.id.au>, Greg Kurz <groug@kaod.org>, Markus Armbruster <armbru@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Eric Blake <eblake@redhat.com>, Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
+To: Greg Kurz <groug@kaod.org>
+Cc: =?iso-8859-1?Q?C=E9dric?= Le Goater <clg@kaod.org>, qemu-ppc@nongnu.org, qemu-devel@nongnu.org, Benjamin Herrenschmidt <benh@kernel.crashing.org>
 
-On Thu, Nov 23, 2017 at 11:57:34AM +0100, Thomas Huth wrote:
-> On 23.11.2017 11:17, Peter Maydell wrote:
-> > On 23 November 2017 at 10:03, Cornelia Huck <cohuck@redhat.com> wrote:
-> >> On Mon, 13 Nov 2017 08:14:28 +0100
-> >> Thomas Huth <thuth@redhat.com> wrote:
-> >>
-> >>> By the way, before everybody now introduces "2.12" machine types ... is
-> >>> there already a consensus that the next version will be "2.12" ?
-> >>>
-> >>> A couple of months ago, we discussed that we could maybe do a 3.0 after
-> >>> 2.11, e.g. here:
-> >>>
-> >>>  https://lists.gnu.org/archive/html/qemu-devel/2017-03/msg05056.html
-> >>>
-> >>> I'd still like to see that happen... Peter, any thoughts on this?
-> >>
-> >> So, as I just thought about preparing the new machine for s390x as
-> >> well: Did we reach any consensus about what the next qemu version will
-> >> be called?
-> > 
-> > I haven't seen any sufficiently solid plan to make me want to
-> > pick anything except "2.12".
-> 
-> I still don't think that we need a big plan for this... The change from
-> 1.7 to 2.0 was also rather arbitrary, wasn't it?
->
-> Anyway, I've now started a Wiki page to collect ideas:
-> 
->  https://wiki.qemu.org/Features/Version3.0
-> 
-> Maybe we can jump to version 3.0 if there are enough doable items on the
-> list that we can all agree upon.
 
->From the mgmt app / libvirt POV, I'm against the idea of doing such an
-API incompatible release associated with major versions. The whole point
-of the documented deprecation timeframe, was that we can incrementally
-remove legacy interfaces without having a big bang break the whole
-world. It gives management apps a clear warning on what will go away,
-and a consistent timeframe for how long they have to adapt before it
-goes away.
+--/QKKmeG/X/bPShih
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-Tieing breakage to "major" releases, gives a very inconsistent lead up
-for mgmt apps - some features will live on the "to be removed" list
-for years, while other features put on the 3.0 kill list may only have
-less than a single release warning before being removed. What's worse
-is that, for features which change their impl rather than being deleted,
-apps have to adapt to everything at the same time. It
+On Mon, Nov 20, 2017 at 01:07:42PM +0100, Greg Kurz wrote:
+> On Fri, 17 Nov 2017 15:50:53 +1100
+> David Gibson <david@gibson.dropbear.id.au> wrote:
+>=20
+> > On Tue, Nov 14, 2017 at 10:42:24AM +0100, Greg Kurz wrote:
+> > > On Fri, 10 Nov 2017 15:20:11 +0000
+> > > C=E9dric Le Goater <clg@kaod.org> wrote:
+> > >  =20
+> > > > Let's define a new set of XICSFabric IRQ operations for the latest
+> > > > pseries machine. These simply use a a bitmap 'irq_map' as a IRQ num=
+ber
+> > > > allocator.
+> > > >=20
+> > > > The previous pseries machines keep the old set of IRQ operations us=
+ing
+> > > > the ICSIRQState array.
+> > > >=20
+> > > > Signed-off-by: C=E9dric Le Goater <clg@kaod.org>
+> > > > ---
+> > > >=20
+> > > >  Changes since v2 :
+> > > >=20
+> > > >  - introduced a second set of XICSFabric IRQ operations for older
+> > > >    pseries machines
+> > > >=20
+> > > >  hw/ppc/spapr.c         | 76 ++++++++++++++++++++++++++++++++++++++=
+++++++++----
+> > > >  include/hw/ppc/spapr.h |  3 ++
+> > > >  2 files changed, 74 insertions(+), 5 deletions(-)
+> > > >=20
+> > > > diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
+> > > > index 4bdceb45a14f..4ef0b73559ca 100644
+> > > > --- a/hw/ppc/spapr.c
+> > > > +++ b/hw/ppc/spapr.c
+> > > > @@ -1681,6 +1681,22 @@ static const VMStateDescription vmstate_spap=
+r_patb_entry =3D {
+> > > >      },
+> > > >  };
+> > > > =20
+> > > > +static bool spapr_irq_map_needed(void *opaque)
+> > > > +{
+> > > > +    return true; =20
+> > >=20
+> > > I see that the next patch adds some code to avoid sending the
+> > > bitmap if it doesn't contain state, but I guess you should also
+> > > explicitly have this function to return false for older machine
+> > > types (see remark below). =20
+> >=20
+> > I don't see that you should need to migrate this at all.  The machine
+> > needs to reliably allocate the same interrupts each time, and that
+> > means source and dest should have the same allocations without
+> > migrating data.
+> >=20
+>=20
+> Is this true for MSIs ? With the current code, the guest can change
+> the allocation of such interrupts with the ibm,rtas-change-msi RTAS
+> call. How can the dest know about that ?
 
-Regards,
-Daniel
--- 
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
+Yeah, true.  The MSIs really are dynamically allocated by the guest
+and so will need to have information migrated.
+
+--=20
+David Gibson			| I'll have my music baroque, and my code
+david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
+				| _way_ _around_!
+http://www.ozlabs.org/~dgibson
+
+--/QKKmeG/X/bPShih
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAloWrUQACgkQbDjKyiDZ
+s5Lulg//eta/uv9BZpYqkCrU7s3m5r7dDpTyrjTKZBN857ASBYElqdcx4x8XT/OQ
+xvv0Q7JpCuSMqsND2hSS9OG1IrId2/SQVqhBDCtP7axd1VywPCOcBGoLp9kQ4MTM
+3eAzZH7EAr+G6QsmdSSudHbiUHmuh9eZdv4kGN084zyGQ/xYjRtNejheyqKtMPfJ
+UL65R15cji8axe4LrJBBTvoia7AfgyQQ19+dLD5KQuSoa7P6Doq/hP7gGMfEdUBq
+cO5lmBxUKeTZ3bRX/X0N7fRXK44dxtH5/YIeAsBEyRXSSF6O/i4TIow5Q6KmZcXA
+Q7lLY2TWMzEFvEjYP0Es8hAFRp3/FJFg9AcrX8TmMyiFx66q2KN8Bfkp3X1WC9Y3
+TJRPvDJmKmbQ4FO3SlVL75+MPuNzxZ3V4JAFoL4i1bC+7NmtIj8kjL1213nPTbHI
+pnSRxMyVOfIj71kO7ZehcTfA5sjVvr44VY9qO5ryGbbEF2COlgbUBSWsjOeCSf1m
+Qme9mOR12dUYb8BAQdOH1aNbF1CNwR4JleJJRZwk6/CI5Y624yTnoKcv283vR6FO
+aEJBRFaKzQjhno3bwF6fi3eWxUSoC8l4I2WfWj7upgi6KEY8XRYSPfWsFWVlz9S9
+ag/KeSy0IpuxYtC5bqpZ7hOJfzqgRsMoxd5obrzA2V4E4kETw7k=
+=U+LI
+-----END PGP SIGNATURE-----
+
+--/QKKmeG/X/bPShih--
