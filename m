@@ -1,31 +1,44 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42015)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44704)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1eHu20-0005PF-Nc
-	for qemu-devel@nongnu.org; Thu, 23 Nov 2017 11:07:23 -0500
+	(envelope-from <pasic@linux.vnet.ibm.com>) id 1eHu4A-00078C-Pp
+	for qemu-devel@nongnu.org; Thu, 23 Nov 2017 11:09:32 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1eHu1x-0003p7-Mi
-	for qemu-devel@nongnu.org; Thu, 23 Nov 2017 11:07:16 -0500
-Received: from 3.mo3.mail-out.ovh.net ([46.105.44.175]:53766)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1eHu1x-0003nh-Ed
-	for qemu-devel@nongnu.org; Thu, 23 Nov 2017 11:07:13 -0500
-Received: from player797.ha.ovh.net (gw6.ovh.net [213.251.189.206])
-	by mo3.mail-out.ovh.net (Postfix) with ESMTP id 9E6B8175B25
-	for <qemu-devel@nongnu.org>; Thu, 23 Nov 2017 17:07:11 +0100 (CET)
-References: <20171120032420.9134-1-mdavidsaver@gmail.com>
-	<20171120032420.9134-2-mdavidsaver@gmail.com>
-	<20171122032852.GG2380@umbus.fritz.box>
-	<791a1520-6f3b-f380-3029-a89cdd0fbff6@gmail.com>
-From: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
-Message-ID: <1535252e-ae96-99fa-d5be-7e53750124ce@kaod.org>
-Date: Thu, 23 Nov 2017 17:07:04 +0100
+	(envelope-from <pasic@linux.vnet.ibm.com>) id 1eHu47-0005iQ-Sx
+	for qemu-devel@nongnu.org; Thu, 23 Nov 2017 11:09:30 -0500
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:41336
+	helo=mx0a-001b2d01.pphosted.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pasic@linux.vnet.ibm.com>)
+	id 1eHu47-0005hs-NP
+	for qemu-devel@nongnu.org; Thu, 23 Nov 2017 11:09:27 -0500
+Received: from pps.filterd (m0098420.ppops.net [127.0.0.1])
+	by mx0b-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
+	vANG8qra067815
+	for <qemu-devel@nongnu.org>; Thu, 23 Nov 2017 11:09:24 -0500
+Received: from e06smtp12.uk.ibm.com (e06smtp12.uk.ibm.com [195.75.94.108])
+	by mx0b-001b2d01.pphosted.com with ESMTP id 2edw6w5fqk-1
+	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Thu, 23 Nov 2017 11:09:23 -0500
+Received: from localhost
+	by e06smtp12.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	Only! Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <pasic@linux.vnet.ibm.com>;
+	Thu, 23 Nov 2017 16:09:20 -0000
+References: <20171121111825.17916-1-pasic@linux.vnet.ibm.com>
+	<20171121144457.60adb0c3.cohuck@redhat.com>
+	<1145a6bc-45fd-820a-9dcc-249d9b2802ff@linux.vnet.ibm.com>
+	<20171121172022.5da16158.cohuck@redhat.com>
+	<88bc72cf-732c-fc07-9898-18d7b58b947d@linux.vnet.ibm.com>
+	<20171122131343.26da0482.cohuck@redhat.com>
+From: Halil Pasic <pasic@linux.vnet.ibm.com>
+Date: Thu, 23 Nov 2017 17:09:16 +0100
 MIME-Version: 1.0
-In-Reply-To: <791a1520-6f3b-f380-3029-a89cdd0fbff6@gmail.com>
-Content-Type: text/plain; charset=windows-1252
+In-Reply-To: <20171122131343.26da0482.cohuck@redhat.com>
+Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [Qemu-ppc] [PATCH 01/12] e500: add board config
- options
+Content-Transfer-Encoding: 8bit
+Message-Id: <35aee93c-70e0-d9dd-b8e1-598c4e4c6a1c@linux.vnet.ibm.com>
+Subject: Re: [Qemu-devel] [RFC PATCH 1/1] s390x/css: unresrict cssids
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,159 +47,273 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Michael Davidsaver <mdavidsaver@gmail.com>, David Gibson <david@gibson.dropbear.id.au>
-Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org
+To: Cornelia Huck <cohuck@redhat.com>
+Cc: Shalini Chellathurai Saroja <shalini@linux.vnet.ibm.com>, qemu-devel@nongnu.org, Christian Borntraeger <borntraeger@de.ibm.com>, qemu-s390x@nongnu.org, Boris Fiuczynski <fiuczy@linux.vnet.ibm.com>, Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>Christian Borntraeger <borntraeger@de.ibm.com>
 
-On 11/22/2017 06:55 PM, Michael Davidsaver wrote:
-> On 11/21/2017 09:28 PM, David Gibson wrote:
->> On Sun, Nov 19, 2017 at 09:24:09PM -0600, Michael Davidsaver wrote:
->>> allow board code to skip common NIC and guest image setup
->>> and configure decrementor frequency.
->>> Existing boards unchanged.
+
+
+On 11/22/2017 01:13 PM, Cornelia Huck wrote:
+[..]
+
+>> The original question was about weather keep the start putting
+>> non-virtual devices into (the non-guest-visible) 0 if no devno is
+>> specified, or rather fill the default first and only then spill
+>> to the next css.
+> 
+> Combined with what I said right below, I think we should be fine
+> autogenerating into the default css. Anything else will just generate
+> unusable configurations when the squash parameter is gone.
+> 
+
+OK. Will think about how to address this for v2 (separate patch or
+part of this).
+
+[..]
+
 >>>
->>> Signed-off-by: Michael Davidsaver <mdavidsaver@gmail.com>
+>>> So what about a machine property? Wouldn't that help as well?
+>>>   
 >>
->> So, it's spelled "decrementer".
+>> Technically it is doable. The property would be still a weird
+>> one, but from QEMU perspective in a less weird place. I was also
+>> arguing that from OO perspective this kind of a don't care about
+>> it's value property is weird, but AFAIK not having the info if
+>> we can do something with a device at the device is weird from
+>> Libvirt perspective. I'm really uncomforble with speaking for
+>> Libvirt/Boris. Hope he will make his point tomorrow.
 >>
->> Other than that, the patch looks correct.  However having a big common
->> function for overall init with a pile of ad-hoc configuration
->> parameters is usually not a great way to go.  I think what we want
->> instead is to eliminate ppce500_init(), instead doing the setup logic
->> separately in each of the e500 machines.   The large common slabs of
->> code can be helpers in e500.c, but the overall logic - including most
->> of the things controlled by the current params - would be under the
->> individual machine's control.
+>>> Or a css object?
+
+This seems to be a concurrent discussion. Please see my other email.
+
+>>>   
+>>
+>> My first internal-only version used this approach, but
+>> I was asked to do it like this.
 > 
-> I agree that ppce500_init() is unwieldy, and am willing to spend some
-> time on cleanup.  I'm just not sure what to do.
+> If we formulate this rather as "we now expose the default css", we (a)
+> have something that really makes the most sense at a channel subsystem
+> or machine level, and (b) can be detected by libvirt as an indicator of
+> "no restriction for virtual vs. non-virtual".
 > 
-> I can see moving initialization of at least the serial, i2c, gpio, and
-> possibly MPIC and PCI host bridge into the e500-ccsr class.
 
-each of these controllers should have a QOM model possibly.
+My previous statement was not entirely correct. I used a QOM type
+but not to represent the css but this particular (cssids unrestricred
+trait of the css).
 
-I think that the part above : 
 
-	    /* Load kernel. */
-
-is machine specific and the part below is generic and could be called 
-from each machine init routine. You would still need some op/struct for 
-the device tree.
-
-> I'm not sure what to do with all the device tree construction code in
-> e500.c, which has a bunch of hard coded register offsets.  A comment
-> here summarizes the problem nicely.
-> 
->> /* TODO: parameterize */
->> #define MPC8544_CCSRBAR_SIZE       0x00100000ULL
->> #define MPC8544_MPIC_REGS_OFFSET   0x40000ULL
-> 
-> It seems desirable to avoid having these offsets appear in two different
-> files, which could allow them to get out of sync.
-> 
-> I had the idea of using an Interface to split up device tree
-> construction, and was encouraged to find PnvXScomInterfaceClass which
-> seems be a way of combining device tree construction in a device class.
-> Is this the way to go?
-
-yes. You would need to QOM'ify the whole machine and have all controllers
-be children of a 'board' object to loop on them.
-
-> Some guidance would be appreciated.
-
-The models of the ARM SoC are good examples to follow. You could check 
-the Aspeed machines which have been slowly growing and which have had 
-some good reviews from Peter. The ARM machines are all QOM'ified and 
-that might be difficult to apply to the e500 boards quickly. At least, 
-the models for the new controllers should follow QOM. It will ease the 
-future work.      
-
-Thanks,
-
-C. 
-
-> 
-> Michael
-> 
-> 
->>> ---
->>>  hw/ppc/e500.c      | 8 ++++++--
->>>  hw/ppc/e500.h      | 3 +++
->>>  hw/ppc/e500plat.c  | 1 +
->>>  hw/ppc/mpc8544ds.c | 1 +
->>>  4 files changed, 11 insertions(+), 2 deletions(-)
+>>
+>>>>  
+>>>>> What about compat machines? This qemu won't have the restriction, but
+>>>>> old qemus will.
+>>>>>     
+>>>>
+>>>> Very true. But as the commit message implies it should not be a problem.  
 >>>
->>> diff --git a/hw/ppc/e500.c b/hw/ppc/e500.c
->>> index 5cf0dabef3..9e7e1b29c4 100644
->>> --- a/hw/ppc/e500.c
->>> +++ b/hw/ppc/e500.c
->>> @@ -826,7 +826,7 @@ void ppce500_init(MachineState *machine, PPCE500Params *params)
->>>          env->mpic_iack = params->ccsrbar_base +
->>>                           MPC8544_MPIC_REGS_OFFSET + 0xa0;
->>>  
->>> -        ppc_booke_timers_init(cpu, 400000000, PPC_TIMER_E500);
->>> +        ppc_booke_timers_init(cpu, params->decrementor_freq, PPC_TIMER_E500);
->>>  
->>>          /* Register reset handler */
->>>          if (!i) {
->>> @@ -899,7 +899,7 @@ void ppce500_init(MachineState *machine, PPCE500Params *params)
->>>      if (!pci_bus)
->>>          printf("couldn't create PCI controller!\n");
->>>  
->>> -    if (pci_bus) {
->>> +    if (pci_bus && !params->tsec_nic) {
->>>          /* Register network interfaces. */
->>>          for (i = 0; i < nb_nics; i++) {
->>>              pci_nic_init_nofail(&nd_table[i], pci_bus, "virtio", NULL);
->>> @@ -948,6 +948,10 @@ void ppce500_init(MachineState *machine, PPCE500Params *params)
->>>                                      sysbus_mmio_get_region(s, 0));
->>>      }
->>>  
->>> +    if (params->skip_load) {
->>> +        return;
->>> +    }
->>> +
->>>      /* Load kernel. */
->>>      if (machine->kernel_filename) {
->>>          kernel_base = cur_base;
->>> diff --git a/hw/ppc/e500.h b/hw/ppc/e500.h
->>> index 70ba1d8f4f..40f72f2de2 100644
->>> --- a/hw/ppc/e500.h
->>> +++ b/hw/ppc/e500.h
->>> @@ -22,6 +22,9 @@ typedef struct PPCE500Params {
->>>      hwaddr pci_mmio_base;
->>>      hwaddr pci_mmio_bus_base;
->>>      hwaddr spin_base;
->>> +    uint32_t decrementor_freq; /* in Hz */
->>> +    bool skip_load;
->>> +    bool tsec_nic;
->>>  } PPCE500Params;
->>>  
->>>  void ppce500_init(MachineState *machine, PPCE500Params *params);
->>> diff --git a/hw/ppc/e500plat.c b/hw/ppc/e500plat.c
->>> index e59e80fb9e..3d07987bd1 100644
->>> --- a/hw/ppc/e500plat.c
->>> +++ b/hw/ppc/e500plat.c
->>> @@ -47,6 +47,7 @@ static void e500plat_init(MachineState *machine)
->>>          .pci_mmio_base = 0xC00000000ULL,
->>>          .pci_mmio_bus_base = 0xE0000000ULL,
->>>          .spin_base = 0xFEF000000ULL,
->>> +        .decrementor_freq = 400000000,
->>>      };
->>>  
->>>      /* Older KVM versions don't support EPR which breaks guests when we announce
->>> diff --git a/hw/ppc/mpc8544ds.c b/hw/ppc/mpc8544ds.c
->>> index 1717953ec7..6d9931c475 100644
->>> --- a/hw/ppc/mpc8544ds.c
->>> +++ b/hw/ppc/mpc8544ds.c
->>> @@ -40,6 +40,7 @@ static void mpc8544ds_init(MachineState *machine)
->>>          .pci_mmio_bus_base = 0xC0000000ULL,
->>>          .pci_pio_base = 0xE1000000ULL,
->>>          .spin_base = 0xEF000000ULL,
->>> +        .decrementor_freq = 400000000,
->>>      };
->>>  
->>>      if (machine->ram_size > 0xc0000000) {
+>>> How is that supposed to play with libvirt detection, then?
+>>>   
 >>
+>> As written above. Libvirt will simply refuse to use vfio-ccw if the property
+>> is not defined. This results in no prior history to care about for libvirt
+>> users: vfio-ccw effectively becomes available with qemu 2.12.
 > 
+> I'm not worried about vfio-ccw. As you said, this should work. We just
+> need to make sure that we don't break existing setups. (I don't think
+> we will.)
 > 
+
+OK.
+
+>>
+>>>>  
+>>>>> Also, I'd consider this a property of the machine, not of the
+>>>>> individual devices. Or of the ChannelSubsystem structure, which is not
+>>>>> qom'ified.
+>>>>>     
+>>>>
+>>>> I've said the exact same thing to Boris. He said from libvirt perspective
+>>>> a device property is better.
+>>>>  
+>>>>> As an alternative, I think providing a machine default_cssid parameter
+>>>>> makes more sense: It is understandable, and you keep compatibility. I
+>>>>> think we want this in the long run anyway.
+>>>>>     
+>>>>
+>>>> I think most of us had the idea. I support this idea fully (expose default
+>>>> cssid to the user (rw)). I see it as something that can be done on top
+>>>> and is not a pressing issue, but rather a nice to have.  
+>>>
+>>> TBH, this weird property is what I like least about this patch.
+>>>   
+>>
+>> I'm fine with any of the 3 alternatives (as is, new type, new machine prop).
+>>
+>> I do agree the property is weird, but a machine property would in my opinion
+>> also be weird (especially form libvirt perspective, but also from qemu
+>> perspective e.g. compat handling and machine type none).
+>>
+>> I used to think that using a trait type is the cleanest, but one advantage
+> 
+> What is a "trait type"?
+> 
+
+In code I did something like this:
+--- a/hw/s390x/s390-virtio-ccw.c
++++ b/hw/s390x/s390-virtio-ccw.c
+@@ -961,3 +961,24 @@ static void ccw_machine_register_types(void)
+ }
+
+ type_init(ccw_machine_register_types)
++
++static const TypeInfo  s390_trait = {
++    .name =  TYPE_S390_TRAIT,
++    .parent = TYPE_OBJECT,
++    .abstract = true,
++};
++
++
++static const TypeInfo  cssids_unrestricted_info = {
++    .name = "s390-cssids-unresticted",
++    .parent = TYPE_S390_TRAIT,
++    .abstract = true,
++};
++
++static void css_register_traits(void)
++{
++    type_register_static(&s390_trait);
++    type_register_static(&cssids_unrestricted_info);
++}
++
++type_init(css_register_traits);
+
+So management software could do something like
+{"execute": "qom-list-types", "arguments" : {"abstract": true, "implements": "s390-trait"}
+
+To figure out the traits (on binary basis). If "s390-cssids-unresticted"
+pops up it means the restriction is no more (for the binary).
+
+Since it is just a type there is no interaction with machine type 'none'
+used for probing, no need to instantiate an object to read a property,
+or just assume it's value is true, and no confusion about why does the
+property pop up at multiple places (all virtio-ccw machine derived machines
+or all ccw-device derived devices).
+
+It's just basically tagging the qemu binary with a type. Since we
+are doing something non-standard (kind of breaking compatibility)
+I figured expressing it in a non-standard way may not be that bad.
+
+I was eventually convinced that it is too strange. And command line
+users would be completely unaware, which isn't necessarily a good thing.
+
+(About trait: https://www.merriam-webster.com/dictionary/trait
+and more specifically in CS it's a pretty commonly used idiom
+in c++ template meta-programming for doing compile time conditional stuff
+based on type parameters and their properties. )
+
+>> of the approach taken in this patch is that it can be introspected via command
+>> line (it is quite weird though).
+> 
+> Any property should be introspectable, no?
+> 
+
+Yes, the existence. The value AFAIK not via the command line.
+
+>>
+>>>>>>  }
+>>>>>>  
+>>>>>>  const VMStateDescription vmstate_ccw_dev = {
+>>>>>> diff --git a/hw/s390x/css.c b/hw/s390x/css.c
+>>>>>> index f6b5c807cd..957cb9ec90 100644
+>>>>>> --- a/hw/s390x/css.c
+>>>>>> +++ b/hw/s390x/css.c
+>>>>>> @@ -2377,15 +2377,6 @@ SubchDev *css_create_sch(CssDevId bus_id, bool is_virtual, bool squash_mcss,
+>>>>>>      SubchDev *sch;
+>>>>>>  
+>>>>>>      if (bus_id.valid) {
+>>>>>> -        if (is_virtual != (bus_id.cssid == VIRTUAL_CSSID)) {
+>>>>>> -            error_setg(errp, "cssid %hhx not valid for %s devices",
+>>>>>> -                       bus_id.cssid,
+>>>>>> -                       (is_virtual ? "virtual" : "non-virtual"));
+>>>>>> -            return NULL;
+>>>>>> -        }
+>>>>>> -    }    
+>>>>>
+>>>>> This allows building a commandline in a compat machine that will not
+>>>>> work with old qemus, no?
+>>>>>     
+>>>>
+>>>> Yes. We have considered this. I was convinced by Christian that
+>>>> it ain't too bad. In the end, if we don't want non-virtual device
+>>>> aware domains (see above), then there is no way to make this work
+>>>> with libvirt. Actually to make the migration work with libvirt with
+>>>> old qemus the only way would be to use sqash. But libvirt does not
+>>>> want that.
+>>>>
+>>>> Also consider that vfio-ccw (AFAIK the only non-virtual css device
+>>>> type) is not migratable. So having them on the command line and live
+>>>> migrating is a lost case already.
+>>>>
+>>>> Yes, having a pre- 2.12 binary version and a post 2.12 binary version
+>>>> way to use vfio-ccw is ugly to some extent. The recommendation would
+>>>> be don't use it with pre 2.12 (libvirt is going to plainly refuse).
+>>>>
+>>>> And yes with this one is going to be able to write a 2.12 command
+>>>> line which does not work with 2.11 but that is normal.
+>>>>
+>>>> This patch keeps the squash so the 2.10 definition will still be
+>>>> viable for 2.12. Should we sometime get rid of the squash, then
+>>>> that would be a breaking change.  
+>>>
+>>> Removing squash is easy to detect. I'm a bit worried about
+>>> not-obvious-at-the-start breakage.
+>>>   
+>>
+>> Again won't happen with libvirt. With a direct command line user
+>> downgrading or moving to a qemu 2.10 or 2.11 it is a risk we can
+>> take IMHO.
+> 
+> I want to avoid setting landmines, though.
+> 
+
+That's humane. I think doing full compat handling for the unrestrict
+is also doable: Introduce a machine property that is going to be
+false for less equal 2.11 and true for greater. And make the check
+conditional on that property. The question is what do we gain by
+that except having more code around that can makes only sense if
+one knows the history behind it.
+
+When I wrote my internal RFC the idea was maybe we can pretend
+nobody ever used either vfio-ccw nor a ccsid other than 0xfe. The
+idea seemed to resonate with the people.
+
+Do you think we can get around full compat handling? Because if
+we have to do that, then IMHO the property needs to be at the
+machine. And is probably best implemented as an user r/w property.
+
+My current status is that you and Christian agreed that we don't
+want compat handling, but better sure than sorry.
+
+>>
+>> Also I can't find anything about vfio-ccw in the upstream users
+>> manual for 2.10.91. 
+> 
+> We have an "upstream users manual"?
+> 
+This is what I mean:
+https://qemu.weilnetz.de/doc/qemu-doc.html
+
+>> So I would argue using vfio-ccw is using an
+>> undocumented feature: if undocumented features changing in a non
+>> compatible way hits you, it's partly your own fault.
+> 
+> If it's an x- interface, it is preliminary. If not, we should avoid
+> breaking it.
+> 
+
+I don't see this documented in the users manual? Shouldn't the users
+know what is preliminary?
+
+Where is this documented?
+
+Regards,
+Halil
