@@ -1,27 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42535)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51660)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1eHq16-0004CD-NK
-	for qemu-devel@nongnu.org; Thu, 23 Nov 2017 06:50:06 -0500
+	(envelope-from <thuth@redhat.com>) id 1eHq8p-0006Oi-M5
+	for qemu-devel@nongnu.org; Thu, 23 Nov 2017 06:58:04 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1eHq15-00050M-3l
-	for qemu-devel@nongnu.org; Thu, 23 Nov 2017 06:50:04 -0500
-Received: from mail-oi0-x241.google.com ([2607:f8b0:4003:c06::241]:43368)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1eHq14-0004zl-S9
-	for qemu-devel@nongnu.org; Thu, 23 Nov 2017 06:50:03 -0500
-Received: by mail-oi0-x241.google.com with SMTP id z143so538418oia.10
-	for <qemu-devel@nongnu.org>; Thu, 23 Nov 2017 03:50:02 -0800 (PST)
+	(envelope-from <thuth@redhat.com>) id 1eHq8k-0004BK-SR
+	for qemu-devel@nongnu.org; Thu, 23 Nov 2017 06:58:03 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:51044)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1eHq8k-0004AI-MD
+	for qemu-devel@nongnu.org; Thu, 23 Nov 2017 06:57:58 -0500
+References: <20171110152017.24324-1-clg@kaod.org>
+	<20171110152017.24324-2-clg@kaod.org>
+	<715a7bd1-7aa5-fa64-a9b8-76782ee20576@redhat.com>
+	<20171123110345.03541b50.cohuck@redhat.com>
+	<CAFEAcA83-oqifsZboJmvDVYhhr4=QOEEGF1TZba-jCewpUFtyg@mail.gmail.com>
+	<1dff6d6c-be83-f6e1-2b7e-82d98bdb8a63@redhat.com>
+	<6dd7061e-2ebe-7a51-8142-f67d5d75a81a@redhat.com>
+From: Thomas Huth <thuth@redhat.com>
+Message-ID: <8cd1c0b3-8386-d41e-ccfb-1a2073cdf4fb@redhat.com>
+Date: Thu, 23 Nov 2017 12:57:50 +0100
 MIME-Version: 1.0
-In-Reply-To: <20171113161446.2862-3-michael.nawrocki@gtri.gatech.edu>
-References: <20171113161446.2862-1-michael.nawrocki@gtri.gatech.edu>
-	<20171113161446.2862-3-michael.nawrocki@gtri.gatech.edu>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Thu, 23 Nov 2017 11:49:41 +0000
-Message-ID: <CAFEAcA8w2PCKyGfPZyoQ1LLiMkEHpyDQv6-nz8voNsVJ_0Fv-Q@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH v3 2/3] Enable 8-byte wide access to AMD
- CFI devices
+In-Reply-To: <6dd7061e-2ebe-7a51-8142-f67d5d75a81a@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] QEMU 3.0 ?
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,261 +33,23 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Mike Nawrocki <michael.nawrocki@gtri.gatech.edu>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, Qemu-block <qemu-block@nongnu.org>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
+To: Paolo Bonzini <pbonzini@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, Cornelia Huck <cohuck@redhat.com>
+Cc: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>, QEMU Developers <qemu-devel@nongnu.org>, David Gibson <david@gibson.dropbear.id.au>, Greg Kurz <groug@kaod.org>, Markus Armbruster <armbru@redhat.com>, "Daniel P. Berrange" <berrange@redhat.com>, Eric Blake <eblake@redhat.com>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, sergio.g.delreal@gmail.com, alex@alex.org.uk
 
-On 13 November 2017 at 16:14, Mike Nawrocki
-<michael.nawrocki@gtri.gatech.edu> wrote:
-> Signed-off-by: Mike Nawrocki <michael.nawrocki@gtri.gatech.edu>
-> ---
->  hw/block/pflash_cfi02.c | 143 ++++++++++++++++++++++++++++++++++--------------
->  1 file changed, 102 insertions(+), 41 deletions(-)
->
-> diff --git a/hw/block/pflash_cfi02.c b/hw/block/pflash_cfi02.c
-> index a81df913f6..29eb0429a3 100644
-> --- a/hw/block/pflash_cfi02.c
-> +++ b/hw/block/pflash_cfi02.c
-> @@ -18,7 +18,7 @@
->   */
->
->  /*
-> - * For now, this code can emulate flashes of 1, 2 or 4 bytes width.
-> + * For now, this code can emulate flashes of 1, 2, 4, or 8 bytes width.
->   * Supported commands/modes are:
->   * - flash read
->   * - flash write
-> @@ -138,11 +138,72 @@ static void pflash_timer (void *opaque)
->      pfl->cmd = 0;
->  }
->
-> +static uint64_t _flash_read(pflash_t *pfl, hwaddr offset,
-> +                            int width, int be)
+On 23.11.2017 12:17, Paolo Bonzini wrote:
+> On 23/11/2017 11:57, Thomas Huth wrote:
+[...]
+>> I've put "--accel kvm:hax:tcg" also on the doable list since I don't
+>> remember any objections to that idea so far -- feel free to move it to
+>> the controversial list instead if you think it needs more discussion.
+> 
+> "hax" is very far from feature parity with TCG, it doesn't even support
+> CPUID (-cpu).  "-accel kvm:hvf:tcg" could be a possibility, but only if
+> we have resources to test it.  As far as I know the only active x86
+> developer who owns a Mac is Igor?
 
-Don't use leading underscores in function names, please --
-they are reserved for the system (C library, etc).
+hvf hasn't been merged yet ... do you expect it to hit master after 2.11
+has been released? Otherwise, we should maybe rather simply go with
+"--accel kvm:tcg"?
 
-> +{
-> +    /* Flash area read */
-> +    uint64_t ret = 0;
-> +    uint8_t *p = pfl->storage;
-> +
-> +    switch (width) {
-> +    case 1:
-> +        ret = p[offset];
-> +        /* DPRINTF("%s: data offset %08x %02x\n", __func__, offset, ret); */
-> +        break;
-> +    case 2:
-> +        if (be) {
-> +            ret = p[offset] << 8;
-> +            ret |= p[offset + 1];
-> +        } else {
-> +            ret = p[offset];
-> +            ret |= p[offset + 1] << 8;
-> +        }
-> +        /* DPRINTF("%s: data offset %08x %04x\n", __func__, offset, ret); */
-> +        break;
-> +    case 4:
-> +        if (be) {
-> +            ret = p[offset] << 24;
-> +            ret |= p[offset + 1] << 16;
-> +            ret |= p[offset + 2] << 8;
-> +            ret |= p[offset + 3];
-> +        } else {
-> +            ret = p[offset];
-> +            ret |= p[offset + 1] << 8;
-> +            ret |= p[offset + 2] << 16;
-> +            ret |= p[offset + 3] << 24;
-> +        }
-> +        /* DPRINTF("%s: data offset %08x %08x\n", __func__, offset, ret); */
-> +        break;
-> +    case 8:
-> +        if (be) {
-> +            ret = (uint64_t)p[offset] << 56;
-> +            ret |= (uint64_t)p[offset + 1] << 48;
-> +            ret |= (uint64_t)p[offset + 2] << 40;
-> +            ret |= (uint64_t)p[offset + 3] << 32;
-> +            ret |= (uint64_t)p[offset + 4] << 24;
-> +            ret |= (uint64_t)p[offset + 5] << 16;
-> +            ret |= (uint64_t)p[offset + 6] << 8;
-> +            ret |= (uint64_t)p[offset + 7];
-> +        } else {
-> +            ret = (uint64_t)p[offset];
-> +            ret |= (uint64_t)p[offset + 1] << 8;
-> +            ret |= (uint64_t)p[offset + 2] << 16;
-> +            ret |= (uint64_t)p[offset + 3] << 24;
-> +            ret |= (uint64_t)p[offset + 4] << 32;
-> +            ret |= (uint64_t)p[offset + 5] << 40;
-> +            ret |= (uint64_t)p[offset + 6] << 48;
-> +            ret |= (uint64_t)p[offset + 7] << 56;
-> +        }
-> +        break;
-> +    }
-
-This can be rewritten in a shorter and clearer way using
-the ld*_le_p() and ld*_be_p() functions, eg case 4 is
-
-    ret = be ? ldl_be_p(p + offset) : ldl_le_p(p + offset);
-
-
-case 2 uses lduw_be_p() and lduw_le_p(), case 8 uses
-ldq_be_p() and ldq_le_p().
-
-case 1 is just
-    ret = ldub_p(p + offset);
-because there's no endianness issue for 1 byte.
-
-
-> +
-> +    return ret;
-> +}
-> +
->  static uint64_t pflash_read(pflash_t *pfl, hwaddr offset,
->                              int width, int be)
->  {
->      hwaddr boff;
-> -    uint8_t *p;
->      uint64_t ret;
->
->      DPRINTF("%s: offset " TARGET_FMT_plx "\n", __func__, offset);
-> @@ -158,6 +219,8 @@ static uint64_t pflash_read(pflash_t *pfl, hwaddr offset,
->          boff = boff >> 1;
->      else if (pfl->width == 4)
->          boff = boff >> 2;
-> +    else if (pfl->width == 8)
-> +        boff = boff >> 3;
-
-If you run this patch through scripts/checkpatch.pl it should tell
-you that our coding style would like you to put braces on this if.
-Our usual practice is that if you're touching an existing statement
-that isn't in line with our coding style you should fix at least the
-parts checkpatch complains about (ie add {} to all the arms of the
-if, here).
-
->      switch (pfl->cmd) {
->      default:
->          /* This should never happen : reset state & treat it as a read*/
-> @@ -170,37 +233,7 @@ static uint64_t pflash_read(pflash_t *pfl, hwaddr offset,
->      case 0x00:
->      flash_read:
->          /* Flash area read */
-> -        p = pfl->storage;
-> -        switch (width) {
-> -        case 1:
-> -            ret = p[offset];
-> -//            DPRINTF("%s: data offset %08x %02x\n", __func__, offset, ret);
-> -            break;
-> -        case 2:
-> -            if (be) {
-> -                ret = p[offset] << 8;
-> -                ret |= p[offset + 1];
-> -            } else {
-> -                ret = p[offset];
-> -                ret |= p[offset + 1] << 8;
-> -            }
-> -//            DPRINTF("%s: data offset %08x %04x\n", __func__, offset, ret);
-> -            break;
-> -        case 4:
-> -            if (be) {
-> -                ret = p[offset] << 24;
-> -                ret |= p[offset + 1] << 16;
-> -                ret |= p[offset + 2] << 8;
-> -                ret |= p[offset + 3];
-> -            } else {
-> -                ret = p[offset];
-> -                ret |= p[offset + 1] << 8;
-> -                ret |= p[offset + 2] << 16;
-> -                ret |= p[offset + 3] << 24;
-> -            }
-> -//            DPRINTF("%s: data offset %08x %08x\n", __func__, offset, ret);
-> -            break;
-> -        }
-> +        ret = _flash_read(pfl, offset, width, be);
->          break;
->      case 0x90:
->          /* flash ID read */
-> @@ -260,8 +293,8 @@ static void pflash_update(pflash_t *pfl, int offset,
->      }
->  }
->
-> -static void pflash_write (pflash_t *pfl, hwaddr offset,
-> -                          uint64_t value, int width, int be)
-> +static void pflash_write(pflash_t *pfl, hwaddr offset,
-> +                         uint64_t value, int width, int be)
->  {
->      hwaddr boff;
->      uint8_t *p;
-> @@ -275,17 +308,19 @@ static void pflash_write (pflash_t *pfl, hwaddr offset,
->  #endif
->          goto reset_flash;
->      }
-> -    DPRINTF("%s: offset " TARGET_FMT_plx " %08x %d %d\n", __func__,
-> -            offset, value, width, pfl->wcycle);
-> +    DPRINTF("%s: offset " TARGET_FMT_plx " %08" PRIx64 " %d %d\n",
-> +            __func__, offset, value, width, pfl->wcycle);
->      offset &= pfl->chip_len - 1;
->
-> -    DPRINTF("%s: offset " TARGET_FMT_plx " %08x %d\n", __func__,
-> -            offset, value, width);
-> +    DPRINTF("%s: offset " TARGET_FMT_plx " %08" PRIx64 " %d\n",
-> +            __func__, offset, value, width);
->      boff = offset & (pfl->sector_len - 1);
->      if (pfl->width == 2)
->          boff = boff >> 1;
->      else if (pfl->width == 4)
->          boff = boff >> 2;
-> +    else if (pfl->width == 8)
-> +        boff = boff >> 3;
->      switch (pfl->wcycle) {
->      case 0:
->          /* Set the device in I/O access mode if required */
-> @@ -346,8 +381,8 @@ static void pflash_write (pflash_t *pfl, hwaddr offset,
->              /* We need another unlock sequence */
->              goto check_unlock0;
->          case 0xA0:
-> -            DPRINTF("%s: write data offset " TARGET_FMT_plx " %08x %d\n",
-> -                    __func__, offset, value, width);
-> +            DPRINTF("%s: write data offset " TARGET_FMT_plx
-> +                    " %08" PRIx64 " %d\n", __func__, offset, value, width);
->              p = pfl->storage;
->              if (!pfl->ro) {
->                  switch (width) {
-> @@ -379,6 +414,28 @@ static void pflash_write (pflash_t *pfl, hwaddr offset,
->                      }
->                      pflash_update(pfl, offset, 4);
->                      break;
-> +                case 8:
-> +                    if (be) {
-> +                        p[offset] &= value >> 56;
-> +                        p[offset + 1] &= value >> 48;
-> +                        p[offset + 2] &= value >> 40;
-> +                        p[offset + 3] &= value >> 32;
-> +                        p[offset + 4] &= value >> 24;
-> +                        p[offset + 5] &= value >> 16;
-> +                        p[offset + 6] &= value >> 8;
-> +                        p[offset + 7] &= value;
-> +                    } else {
-> +                        p[offset] &= value;
-> +                        p[offset + 1] &= value >> 8;
-> +                        p[offset + 2] &= value >> 16;
-> +                        p[offset + 3] &= value >> 24;
-> +                        p[offset + 4] &= value >> 32;
-> +                        p[offset + 5] &= value >> 40;
-> +                        p[offset + 6] &= value >> 48;
-> +                        p[offset + 7] &= value >> 56;
-> +                    }
-> +                    pflash_update(pfl, offset, 8);
-> +                    break;
->                  }
-
-Similarly here we can use
-   if (be) {
-       uint64_t oldv = ldq_be_p(p + offset);
-       stq_be_p(p + offset, oldv & value);
-   } else {
-       ...ditto with _le_
-   }
-
-Other than those minor issues, patch looks good.
-
-thanks
--- PMM
+ Thomas
