@@ -1,34 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52119)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52127)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1eHwWL-0004cq-FA
-	for qemu-devel@nongnu.org; Thu, 23 Nov 2017 13:46:46 -0500
+	(envelope-from <bounces@canonical.com>) id 1eHwWL-0004dD-Ln
+	for qemu-devel@nongnu.org; Thu, 23 Nov 2017 13:46:47 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1eHwWH-0007AJ-FD
+	(envelope-from <bounces@canonical.com>) id 1eHwWK-0007GX-HN
 	for qemu-devel@nongnu.org; Thu, 23 Nov 2017 13:46:45 -0500
-Received: from indium.canonical.com ([91.189.90.7]:59214)
+Received: from indium.canonical.com ([91.189.90.7]:59486)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1eHwWH-00076p-8g
-	for qemu-devel@nongnu.org; Thu, 23 Nov 2017 13:46:41 -0500
+	id 1eHwWK-0007Eq-Ar
+	for qemu-devel@nongnu.org; Thu, 23 Nov 2017 13:46:44 -0500
 Received: from loganberry.canonical.com ([91.189.90.37])
 	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1eHwWD-00011W-RM
-	for <qemu-devel@nongnu.org>; Thu, 23 Nov 2017 18:46:38 +0000
+	id 1eHwWI-00011N-Dg
+	for <qemu-devel@nongnu.org>; Thu, 23 Nov 2017 18:46:42 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 7397D2E80D0
-	for <qemu-devel@nongnu.org>; Thu, 23 Nov 2017 18:46:37 +0000 (UTC)
+	by loganberry.canonical.com (Postfix) with ESMTP id B74232E80D2
+	for <qemu-devel@nongnu.org>; Thu, 23 Nov 2017 18:46:41 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Thu, 23 Nov 2017 18:35:26 -0000
+Date: Thu, 23 Nov 2017 18:34:54 -0000
 From: Peter Maydell <peter.maydell@linaro.org>
-Reply-To: Bug 1364501 <1364501@bugs.launchpad.net>
+Reply-To: Bug 1172613 <1172613@bugs.launchpad.net>
 Sender: bounces@canonical.com
-References: <20140902163848.4037.99496.malonedeb@soybean.canonical.com>
-Message-Id: <151146212853.15025.7929608096740176136.launchpad@soybean.canonical.com>
+References: <20130425082449.5153.30611.malonedeb@wampee.canonical.com>
+Message-Id: <151146209421.14642.6256239011450248036.malone@wampee.canonical.com>
 Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1364501] Re: Gdb hangs when trying to single-step
- after an invalid instruction
+Subject: [Qemu-devel] [Bug 1172613] Re: [qemu 1.4.1] inconsistent behavior
+ on different architecture
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -39,60 +39,95 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-** Tags added: arm
+In particular, the only crashes here are the ones where --library-path
+isn't specified, so it isn't even a case of "QEMU should somehow support
+whiteouts in --library-path so you can tell it to ignore the host
+ld.so.cache". So I'm going to close this bug report (with 'invalid' as
+the closest sensible resolution).
+
+
+** Changed in: qemu
+       Status: New =3D> Invalid
 
 -- =
 
 You received this bug notification because you are a member of qemu-
 devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1364501
+https://bugs.launchpad.net/bugs/1172613
 
 Title:
-  Gdb hangs when trying to single-step after an invalid instruction
+  [qemu 1.4.1] inconsistent behavior on different architecture
 
 Status in QEMU:
-  New
+  Invalid
 
 Bug description:
-  When using Gdb to remote-debug a program and manually setting its PC
-  to point to an address containing an invalid instruction and then
-  doing a single step, Qemu will never return control to the remote Gdb.
+  Running with qemu 1.4.1 and eglibc 2.17 on Debian Linux 7.0 for amd64
 
-  For instance, let's say address 0x114 contains an invalid instruction.
-  On the remote Gdb, we'd do:
+  ---------------- armhf ----------------
+  $ arm-linux-gnueabihf-gcc hello.c
+  $ qemu-arm ./a.out
+  /lib/ld-linux-armhf.so.3: No such file or directory
 
-  (gdb) set $pc =3D 0x114
-  (gdb) stepi
+  $ qemu-arm arm-linux-gnueabihf/lib/ld-2.17.so ./a.out
+  ./a.out: error while loading shared libraries: libc.so.6: cannot open sha=
+red object file: No such file or directory
 
-  After doing that we won't get the (gdb) prompt unless we do a Ctrl-C.
-  If we do so we'll be left at 0x114 instead of going towards the
-  exception handler as we should. This happens with stepi, step and
-  next. If instead of single-stepping we used continue, the program will
-  proceed into the exception handler as it should.
+  $ qemu-arm arm-linux-gnueabihf/lib/ld-2.17.so --library-path  arm-linux-g=
+nueabihf/lib ./a.out
+  Hello, world !
 
-  The reason this is happening is that when Qemu realizes it's about to
-  translate an instruction it doesn't recognize it'll generate a call to
-  helper_exception_with_syndrome(), which will register the exception
-  and then call cpu_loop_exit(). At the same time, because we're doing a
-  single-step, Qemu will also generate a call to
-  helper_exception_internal() passing it an EXCP_DEBUG, which lets the
-  system know it'll give control back to the remote debugger, and it
-  also ends with a call to cpu_loop_exit(). However, because the
-  syndrome exception calls cpu_loop_exit() first, the call to the
-  internal exception won't be reached and Qemu will be stuck in a loop
-  without returning control to the remote debugger.
+  ---------------- powerpc64 ----------------
+  $ powerpc64-linux-gcc hello.c
 
-  What makes this a bit tricky to fix is that we must call
-  cpu_loop_exit() at the end of helper_exception_with_syndrome(),
-  otherwise the target exception will go undetected and its handler
-  won't be excecuted.
+  $ qemu-ppc64 ./a.out
+  /lib64/ld64.so.1: No such file or directory
 
-  Tested on latest head by emulating a Stellaris lm3s6965 board and
-  running RTEMS 4.11:
+  [BAD BEHAVIOR !!!]
+  $ qemu-ppc64 powerpc64-linux/lib64/ld-2.17.so ./a.out
+  Invalid data memory access: 0x00000041988fd008
+  NIP 000000400001cb2c   LR 000000400001cc30 CTR 0000000000000000 XER 00000=
+00000000000
+  MSR 8000000002006000 HID0 0000000060000000  HF 8000000002006000 idx 0
+  TB 00000000 00000000
+  GPR00 0000000000000000 000000400083a220 0000004000041230 00000043309bd010
+  GPR04 0000004000026f12 000000000000000b 000000000000002e 000000000000002e
+  GPR08 0000000000000030 000000008803fffc 00000041988fcff4 0000000000000037
+  GPR12 0000000000000000 0000000000000000 0000000000000000 0000000000000000
+  GPR16 0000000000000000 000000400003a4d8 000000400083a6d0 000000400083a6d8
+  GPR20 000000400003a898 000000000000000a 0000000000000000 00000043309bd010
+  GPR24 0000004000037b60 00000000cfe8ced7 000000400003a430 0000000010000261
+  GPR28 00000001980bfff4 0000000000000000 000000004401ffff 000000002200ffff
+  CR 22242224  [ E  E  E  G  E  E  E  G  ]             RES ffffffffffffffff
+  FPR00 0000000000000000 0000000000000000 0000000000000000 0000000000000000
+  FPR04 0000000000000000 0000000000000000 0000000000000000 0000000000000000
+  FPR08 0000000000000000 0000000000000000 0000000000000000 0000000000000000
+  FPR12 0000000000000000 0000000000000000 0000000000000000 0000000000000000
+  FPR16 0000000000000000 0000000000000000 0000000000000000 0000000000000000
+  FPR20 0000000000000000 0000000000000000 0000000000000000 0000000000000000
+  FPR24 0000000000000000 0000000000000000 0000000000000000 0000000000000000
+  FPR28 0000000000000000 0000000000000000 0000000000000000 0000000000000000
+  FPSCR 0000000000000000
+  qemu: uncaught target signal 11 (Segmentation fault) - core dumped
+  Segmentation fault
 
-  $ qemu-system-arm -nographic -s -S -M lm3s6965evb -kernel my_rtems_app
+  $ qemu-ppc64 powerpc64-linux/lib64/ld-2.17.so --library-path powerpc64-li=
+nux/lib64 ./a.out
+  Hello, world !
 
-  Commit hash in qemu.git: 30eaca3acdf17d7bcbd1213eb149c02037edfb0b
+  ---------------- sparc64 ----------------
+  $ sparc64-linux-gcc hello.c
+
+  $ qemu-sparc64 ./a.out
+  /lib64/ld-linux.so.2: No such file or directory
+
+  [BAD BEHAVIOR !!!]
+  $ qemu-sparc64 sparc64-linux/lib64/ld-2.17.so ./a.out
+  Segmentation fault
+
+  $ qemu-sparc64 sparc64-linux/lib64/ld-2.17.so --library-path sparc64-linu=
+x/lib64 ./a.out
+  Hello, world !
 
 To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1364501/+subscriptions
+https://bugs.launchpad.net/qemu/+bug/1172613/+subscriptions
