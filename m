@@ -1,18 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40908)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40950)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ppandit@redhat.com>) id 1eHwkr-00030L-Kq
-	for qemu-devel@nongnu.org; Thu, 23 Nov 2017 14:01:46 -0500
+	(envelope-from <ppandit@redhat.com>) id 1eHwkt-00033W-N1
+	for qemu-devel@nongnu.org; Thu, 23 Nov 2017 14:01:48 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ppandit@redhat.com>) id 1eHwko-0006Oi-O8
-	for qemu-devel@nongnu.org; Thu, 23 Nov 2017 14:01:45 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:44358)
+	(envelope-from <ppandit@redhat.com>) id 1eHwks-0006Sz-UO
+	for qemu-devel@nongnu.org; Thu, 23 Nov 2017 14:01:47 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:55946)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ppandit@redhat.com>) id 1eHwko-0006Nd-Ij
-	for qemu-devel@nongnu.org; Thu, 23 Nov 2017 14:01:42 -0500
+	(Exim 4.71) (envelope-from <ppandit@redhat.com>) id 1eHwks-0006Rb-Iq
+	for qemu-devel@nongnu.org; Thu, 23 Nov 2017 14:01:46 -0500
 From: P J P <ppandit@redhat.com>
-Date: Fri, 24 Nov 2017 00:31:29 +0530
-Message-Id: <20171123190131.5138-1-ppandit@redhat.com>
-Subject: [Qemu-devel] [PATCH 0/2] check VirtiQueue Vring objects
+Date: Fri, 24 Nov 2017 00:31:31 +0530
+Message-Id: <20171123190131.5138-3-ppandit@redhat.com>
+In-Reply-To: <20171123190131.5138-1-ppandit@redhat.com>
+References: <20171123190131.5138-1-ppandit@redhat.com>
+Subject: [Qemu-devel] [PATCH 2/2] tests: add test to check VirtQueue object
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,22 +28,53 @@ Cc: Stefan Hajnoczi <stefanha@redhat.com>, zhangboxian <zhangboxian@huawei.com>,
 
 From: Prasad J Pandit <pjp@fedoraproject.org>
 
-Hello,
+An uninitialised VirtQueue object or one with Vring.align field
+set to zero(0) could lead to arithmetic exceptions. Add a unit
+test to validate it.
 
-An user could attempt to use an uninitialised VirtQueue object
-or set Vring object with undue values, raising an unexpected
-exception in Qemu. This patch set fixes this issue and also adds
-a unit test to the suite.
-
-Thank you.
---
-Prasad J Pandit (2):
-  virtio: check VirtQueue Vring object is set
-  tests: add test to check VirtQueue object
-
- hw/virtio/virtio.c      | 11 ++++++++---
+Signed-off-by: Prasad J Pandit <pjp@fedoraproject.org>
+---
  tests/virtio-blk-test.c | 21 +++++++++++++++++++++
- 2 files changed, 29 insertions(+), 3 deletions(-)
+ 1 file changed, 21 insertions(+)
 
+diff --git a/tests/virtio-blk-test.c b/tests/virtio-blk-test.c
+index e6fb9bac87..d00ceb0501 100644
+--- a/tests/virtio-blk-test.c
++++ b/tests/virtio-blk-test.c
+@@ -674,6 +674,26 @@ static void pci_hotplug(void)
+     qtest_shutdown(qs);
+ }
+ 
++static void test_vring_align(void)
++{
++    QPCIBar bar0;
++    QOSState *qs;
++    QPCIDevice *dev;
++
++    qs = pci_test_start();
++    dev = qpci_device_find(qs->pcibus, QPCI_DEVFN(4, 0));
++    g_assert(dev != NULL);
++
++    qpci_device_enable(dev);
++    bar0 = qpci_iomap(dev, 0, NULL);
++
++    qpci_io_writeb(dev, bar0, VIRTIO_PCI_QUEUE_SEL, 2);
++    qpci_io_writel(dev, bar0, VIRTIO_PCI_QUEUE_PFN, 1);
++
++    g_free(dev);
++    qtest_shutdown(qs);
++}
++
+ static void mmio_basic(void)
+ {
+     QVirtioMMIODevice *dev;
+@@ -724,6 +744,7 @@ int main(int argc, char **argv)
+         qtest_add_func("/virtio/blk/pci/basic", pci_basic);
+         qtest_add_func("/virtio/blk/pci/indirect", pci_indirect);
+         qtest_add_func("/virtio/blk/pci/config", pci_config);
++        qtest_add_func("/virtio/blk/pci/vring", test_vring_align);
+         if (strcmp(arch, "i386") == 0 || strcmp(arch, "x86_64") == 0) {
+             qtest_add_func("/virtio/blk/pci/msix", pci_msix);
+             qtest_add_func("/virtio/blk/pci/idx", pci_idx);
 -- 
 2.13.6
