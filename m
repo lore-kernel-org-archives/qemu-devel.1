@@ -1,33 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38676)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38678)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1eHx7t-00027o-SD
-	for qemu-devel@nongnu.org; Thu, 23 Nov 2017 14:25:34 -0500
+	(envelope-from <bounces@canonical.com>) id 1eHx7t-00027p-Sx
+	for qemu-devel@nongnu.org; Thu, 23 Nov 2017 14:25:35 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1eHx7p-0002LN-7W
+	(envelope-from <bounces@canonical.com>) id 1eHx7q-0002Qt-U7
 	for qemu-devel@nongnu.org; Thu, 23 Nov 2017 14:25:33 -0500
-Received: from indium.canonical.com ([91.189.90.7]:43008)
+Received: from indium.canonical.com ([91.189.90.7]:43058)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1eHx7o-0002HF-U2
-	for qemu-devel@nongnu.org; Thu, 23 Nov 2017 14:25:29 -0500
+	id 1eHx7q-0002Nl-HD
+	for qemu-devel@nongnu.org; Thu, 23 Nov 2017 14:25:30 -0500
 Received: from loganberry.canonical.com ([91.189.90.37])
 	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1eHx7n-0000Eq-Pv
-	for <qemu-devel@nongnu.org>; Thu, 23 Nov 2017 19:25:27 +0000
+	id 1eHx7p-0000G7-NI
+	for <qemu-devel@nongnu.org>; Thu, 23 Nov 2017 19:25:29 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id C17622E80C8
-	for <qemu-devel@nongnu.org>; Thu, 23 Nov 2017 19:25:27 +0000 (UTC)
+	by loganberry.canonical.com (Postfix) with ESMTP id AEC2F2E80C7
+	for <qemu-devel@nongnu.org>; Thu, 23 Nov 2017 19:25:29 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Thu, 23 Nov 2017 19:08:58 -0000
+Date: Thu, 23 Nov 2017 19:11:11 -0000
 From: Peter Maydell <peter.maydell@linaro.org>
-Reply-To: Bug 1596204 <1596204@bugs.launchpad.net>
+Reply-To: Bug 1378554 <1378554@bugs.launchpad.net>
 Sender: bounces@canonical.com
-References: <20160625163153.2158.13940.malonedeb@chaenomeles.canonical.com>
-Message-Id: <151146413830.14516.15550293669751391012.malone@soybean.canonical.com>
+References: <20141007223616.4736.27907.malonedeb@wampee.canonical.com>
+Message-Id: <151146427200.14475.2667732288372162721.malone@wampee.canonical.com>
 Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1596204] Re: UART problem in raspi2
+Subject: [Qemu-devel] [Bug 1378554] Re: qemu segfault in
+ virtio_scsi_handle_cmd_req_submit on ARM 32 bit
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -38,61 +39,292 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-This is because you're running a binary for the raspberry pi 1 on a
-model of the raspberry pi 2. The peripherals are at different locations
-on the two boards, and so your program doesn't work. You can fix that by
-changing all the register addresses that start 0x20..... to 0x3f...., or
-more complicatedly by using the boards/cpuid/ code in that raspberrypi
-repo to detect the correct PBASE value to use.
-
-Secondly, the output goes to the second serial port, which in your
-command line is not being directed anywhere. You can put the second
-serial port's output on stdio with the first serial port output thrown
-away using '-serial null -serial stdio'. (For more complicated
-redirections, see the QEMU docs.)
-
-If I do those two things, then the uart01 example runs fine on QEMU.
+Ah, my mail client found the thread that tells me this was fixed in
+commit 35e4e96c4d5bfcf. So we can close this.
 
 
 ** Changed in: qemu
-       Status: New =3D> Invalid
+       Status: New =3D> Fix Released
 
 -- =
 
 You received this bug notification because you are a member of qemu-
 devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1596204
+https://bugs.launchpad.net/bugs/1378554
 
 Title:
-  UART problem in raspi2
+  qemu segfault in virtio_scsi_handle_cmd_req_submit on ARM 32 bit
 
 Status in QEMU:
-  Invalid
+  Fix Released
 
 Bug description:
-  I was trying to run the raspberry pi uart example at
-  https://github.com/dwelch67/raspberrypi/tree/master/uart01 using qemu
-  2.6.0, but it didn't work.
+  /home/rjones/d/qemu/arm-softmmu/qemu-system-arm \
+      -global virtio-blk-device.scsi=3Doff \
+      -nodefconfig \
+      -enable-fips \
+      -nodefaults \
+      -display none \
+      -M virt \
+      -machine accel=3Dkvm:tcg \
+      -m 500 \
+      -no-reboot \
+      -rtc driftfix=3Dslew \
+      -global kvm-pit.lost_tick_policy=3Ddiscard \
+      -kernel /home/rjones/d/libguestfs/tmp/.guestfs-1001/appliance.d/kerne=
+l \
+      -initrd /home/rjones/d/libguestfs/tmp/.guestfs-1001/appliance.d/initr=
+d \
+      -device virtio-scsi-device,id=3Dscsi \
+      -drive file=3D/home/rjones/d/libguestfs/tmp/libguestfseV4fT5/scratch.=
+1,cache=3Dunsafe,format=3Draw,id=3Dhd0,if=3Dnone \
+      -device scsi-hd,drive=3Dhd0 \
+      -drive file=3D/home/rjones/d/libguestfs/tmp/.guestfs-1001/appliance.d=
+/root,snapshot=3Don,id=3Dappliance,cache=3Dunsafe,if=3Dnone \
+      -device scsi-hd,drive=3Dappliance \
+      -device virtio-serial-device \
+      -serial stdio \
+      -chardev socket,path=3D/home/rjones/d/libguestfs/tmp/libguestfseV4fT5=
+/guestfsd.sock,id=3Dchannel0 \
+      -device virtserialport,chardev=3Dchannel0,name=3Dorg.libguestfs.chann=
+el.0 \
+      -append 'panic=3D1 mem=3D500M console=3DttyAMA0 udevtimeout=3D6000 no=
+_timer_check lpj=3D4464640 acpi=3Doff printk.time=3D1 cgroup_disable=3Dmemo=
+ry root=3D/dev/sdb selinux=3D0 guestfs_verbose=3D1 TERM=3Dxterm-256color'
 
-  The steps I took were:
-  * Edit uart01/memmap and change origin to 0x10000 (which is the address q=
-emu starts executing),
-  * make
-  * /usr/local/bin/qemu-system-arm -machine raspi2 -m 512M -nographic -gdb =
-tcp::26000 -S -kernel uart01.bin
+  The appliance boots, but segfaults as soon as the virtio-scsi driver
+  is loaded:
 
-  Then start arm-none-eabi-gdb and run following commands:
+  supermin: internal insmod virtio_scsi.ko
+  [    3.992963] scsi0 : Virtio SCSI HBA
+  libguestfs: error: appliance closed the connection unexpectedly, see earl=
+ier error messages
 
-  target remote localhost:26000
-  symbol-file ./uart01.elf
+  I captured a core dump:
 
-  =
+  Core was generated by `/home/rjones/d/qemu/arm-softmmu/qemu-system-arm -g=
+lobal virtio-blk-device.scsi=3D'.
+  Program terminated with signal SIGSEGV, Segmentation fault.
+  #0  0x000856bc in virtio_scsi_handle_cmd_req_submit (s=3D<optimized out>, =
 
-  Then, when I start the program, it seems that the GET32(AUX_MU_LSR_REG)&0=
-x20 condition never becomes true.
+      req=3D0x6c03acf8) at /home/rjones/d/qemu/hw/scsi/virtio-scsi.c:551
+  551	    bdrv_io_unplug(req->sreq->dev->conf.bs);
+  (gdb) bt
+  #0  0x000856bc in virtio_scsi_handle_cmd_req_submit (s=3D<optimized out>, =
 
-  This works on actual hardware, so I am wondering if I'm doing any
-  steps incorrectly or missing.
+      req=3D0x6c03acf8) at /home/rjones/d/qemu/hw/scsi/virtio-scsi.c:551
+  #1  0x0008573a in virtio_scsi_handle_cmd (vdev=3D0xac4d68, vq=3D0xafe4b8)
+      at /home/rjones/d/qemu/hw/scsi/virtio-scsi.c:573
+  #2  0x0004fdbe in access_with_adjusted_size (addr=3D80, =
+
+      value=3Dvalue@entry=3D0x4443e6c0, size=3Dsize@entry=3D4, access_size_=
+min=3D1, =
+
+      access_size_max=3D<optimized out>, access_size_max@entry=3D0, =
+
+      access=3Daccess@entry=3D0x4fee9 <memory_region_write_accessor>, =
+
+      mr=3Dmr@entry=3D0xa53fa8) at /home/rjones/d/qemu/memory.c:480
+  #3  0x00054234 in memory_region_dispatch_write (size=3D4, data=3D2, =
+
+      addr=3D<optimized out>, mr=3D0xa53fa8) at /home/rjones/d/qemu/memory.=
+c:1117
+  #4  io_mem_write (mr=3D0xa53fa8, addr=3D<optimized out>, val=3Dval@entry=
+=3D2, =
+
+      size=3Dsize@entry=3D4) at /home/rjones/d/qemu/memory.c:1958
+  #5  0x00021c88 in address_space_rw (as=3D0x3b96b4 <address_space_memory>, =
+
+      addr=3D167788112, buf=3Dbuf@entry=3D0x4443e790 "\002", len=3Dlen@entr=
+y=3D4, =
+
+      is_write=3Dis_write@entry=3Dtrue) at /home/rjones/d/qemu/exec.c:2135
+  #6  0x00021de6 in address_space_write (len=3D4, buf=3D0x4443e790 "\002", =
+
+      addr=3D<optimized out>, as=3D<optimized out>)
+      at /home/rjones/d/qemu/exec.c:2202
+  #7  subpage_write (opaque=3D<optimized out>, addr=3D<optimized out>, valu=
+e=3D2, =
+
+      len=3D4) at /home/rjones/d/qemu/exec.c:1811
+  #8  0x0004fdbe in access_with_adjusted_size (addr=3D592, =
+
+      value=3Dvalue@entry=3D0x4443e820, size=3Dsize@entry=3D4, access_size_=
+min=3D1, =
+
+      access_size_max=3D<optimized out>, access_size_max@entry=3D0, =
+
+      access=3Daccess@entry=3D0x4fee9 <memory_region_write_accessor>, =
+
+      mr=3Dmr@entry=3D0xaed980) at /home/rjones/d/qemu/memory.c:480
+  #9  0x00054234 in memory_region_dispatch_write (size=3D4, data=3D2, =
+
+      addr=3D<optimized out>, mr=3D0xaed980) at /home/rjones/d/qemu/memory.=
+c:1117
+  #10 io_mem_write (mr=3D0xaed980, addr=3D<optimized out>, val=3D2, size=3D=
+size@entry=3D4)
+      at /home/rjones/d/qemu/memory.c:1958
+  #11 0x00057f24 in io_writel (retaddr=3D1121296542, Cannot access memory a=
+t address 0x0
+  addr=3D<optimized out>, val=3D2, =
+
+      physaddr=3D592, env=3D0x9d6c50) at /home/rjones/d/qemu/softmmu_templa=
+te.h:381
+  #12 helper_le_stl_mmu (env=3D0x9d6c50, addr=3D<optimized out>, val=3D2, =
+
+      mmu_idx=3D<optimized out>, retaddr=3D1121296542)
+      at /home/rjones/d/qemu/softmmu_template.h:419
+  #13 0x42d5a0a0 in ?? ()
+  Cannot access memory at address 0x0
+  Backtrace stopped: previous frame identical to this frame (corrupt stack?)
+  (gdb) print req
+  $1 =3D (VirtIOSCSIReq *) 0x6c03acf8
+  (gdb) print req->sreq
+  $2 =3D (SCSIRequest *) 0xc2c2c2c2
+  (gdb) print req->sreq->dev
+  Cannot access memory at address 0xc2c2c2c6
+  (gdb) print *req
+  $3 =3D {
+    dev =3D 0x6c000040, =
+
+    vq =3D 0x6c000040, =
+
+    qsgl =3D {
+      sg =3D 0x0, =
+
+      nsg =3D 0, =
+
+      nalloc =3D -1027423550, =
+
+      size =3D 3267543746, =
+
+      dev =3D 0xc2c2c2c2, =
+
+      as =3D 0xc2c2c2c2
+    }, =
+
+    resp_iov =3D {
+      iov =3D 0xc2c2c2c2, =
+
+      niov =3D -1027423550, =
+
+      nalloc =3D -1027423550, =
+
+      size =3D 3267543746
+    }, =
+
+    elem =3D {
+      index =3D 3267543746, =
+
+      out_num =3D 3267543746, =
+
+      in_num =3D 3267543746, =
+
+      in_addr =3D {14033993530586874562 <repeats 1024 times>}, =
+
+      out_addr =3D {14033993530586874562 <repeats 1024 times>}, =
+
+      in_sg =3D {{
+          iov_base =3D 0xc2c2c2c2, =
+
+          iov_len =3D 3267543746
+        } <repeats 1024 times>}, =
+
+      out_sg =3D {{
+          iov_base =3D 0xc2c2c2c2, =
+
+          iov_len =3D 3267543746
+        } <repeats 1024 times>}
+    }, =
+
+    vring =3D 0xc2c2c2c2, =
+
+    {
+      next =3D {
+        tqe_next =3D 0xc2c2c2c2, =
+
+        tqe_prev =3D 0xc2c2c2c2
+      }, =
+
+      remaining =3D -1027423550
+    }, =
+
+    sreq =3D 0xc2c2c2c2, =
+
+    resp_size =3D 3267543746, =
+
+    mode =3D (SCSI_XFER_TO_DEV | unknown: 3267543744), =
+
+    resp =3D {
+      cmd =3D {
+        sense_len =3D 3267543746, =
+
+        resid =3D 3267543746, =
+
+        status_qualifier =3D 49858, =
+
+        status =3D 194 '\302', =
+
+        response =3D 194 '\302'
+      }, =
+
+      tmf =3D {
+        response =3D 194 '\302'
+      }, =
+
+      an =3D {
+        event_actual =3D 3267543746, =
+
+        response =3D 194 '\302'
+      }, =
+
+      event =3D {
+        event =3D 3267543746, =
+
+        lun =3D "\302\302\302\302\302\302\302", <incomplete sequence \302>, =
+
+        reason =3D 3267543746
+      }
+    }, =
+
+    req =3D {
+      {
+        cmd =3D {
+          lun =3D "\302\302\302\302\302\302\302", <incomplete sequence \302=
+>, =
+
+          tag =3D 14033993530586874562, =
+
+          task_attr =3D 194 '\302', =
+
+          prio =3D 194 '\302', =
+
+          crn =3D 194 '\302'
+        }, =
+
+        cdb =3D 0x6c042d73 '\302' <repeats 36 times>, <incomplete sequence =
+\302>
+      }, =
+
+      tmf =3D {
+        type =3D 3267543746, =
+
+        subtype =3D 3267543746, =
+
+        lun =3D "\302\302\302\302\302\302\302", <incomplete sequence \302>, =
+
+        tag =3D 14033993530586874562
+      }, =
+
+      an =3D {
+        type =3D 3267543746, =
+
+        lun =3D "\302\302\302\302\302\302\302", <incomplete sequence \302>, =
+
+        event_requested =3D 3267543746
+      }
+    }
+  }
 
 To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1596204/+subscriptions
+https://bugs.launchpad.net/qemu/+bug/1378554/+subscriptions
