@@ -1,16 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33627)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33680)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1eHgx3-0004r7-9A
-	for qemu-devel@nongnu.org; Wed, 22 Nov 2017 21:09:18 -0500
+	(envelope-from <mreitz@redhat.com>) id 1eHgx9-0004wV-1D
+	for qemu-devel@nongnu.org; Wed, 22 Nov 2017 21:09:26 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1eHgx0-0001R2-1r
-	for qemu-devel@nongnu.org; Wed, 22 Nov 2017 21:09:17 -0500
+	(envelope-from <mreitz@redhat.com>) id 1eHgx8-0001Xq-06
+	for qemu-devel@nongnu.org; Wed, 22 Nov 2017 21:09:23 -0500
 From: Max Reitz <mreitz@redhat.com>
-Date: Thu, 23 Nov 2017 03:08:20 +0100
-Message-Id: <20171123020832.8165-6-mreitz@redhat.com>
+Date: Thu, 23 Nov 2017 03:08:21 +0100
+Message-Id: <20171123020832.8165-7-mreitz@redhat.com>
 In-Reply-To: <20171123020832.8165-1-mreitz@redhat.com>
 References: <20171123020832.8165-1-mreitz@redhat.com>
-Subject: [Qemu-devel] [PATCH 05/17] iotests: Fix _img_info for backslashes
+Subject: [Qemu-devel] [PATCH 06/17] iotests: Drop format-specific in
+ _filter_img_info
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,25 +23,87 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org
 Cc: qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>, Kevin Wolf <kwolf@redhat.com>, John Snow <jsnow@redhat.com>, Fam Zheng <famz@redhat.com>
 
-read without -r eats backslashes.
+_filter_img_info should remove format-specific information, too.  We
+already have such a filter in _img_info, and it is very useful for
+query-block-named-block-nodes (etc.), too.
+
+However, in 198 we need that information (but we still want the rest of
+the filter), so make that filtering optional.  Note that "the rest of
+the filter" includes filtering of the test directory, so we can drop the
+_filter_testdir from 198 at the same time.
 
 Signed-off-by: Max Reitz <mreitz@redhat.com>
 ---
- tests/qemu-iotests/common.rc | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ tests/qemu-iotests/198           |  6 ++++--
+ tests/qemu-iotests/common.filter | 29 ++++++++++++++++++++++++++++-
+ 2 files changed, 32 insertions(+), 3 deletions(-)
 
-diff --git a/tests/qemu-iotests/common.rc b/tests/qemu-iotests/common.rc
-index dbae7d74ba..6fa0495e10 100644
---- a/tests/qemu-iotests/common.rc
-+++ b/tests/qemu-iotests/common.rc
-@@ -338,7 +338,7 @@ _img_info()
-             -e "s#$IMGFMT#IMGFMT#g" \
-             -e "/^disk size:/ D" \
-             -e "/actual-size/ D" | \
--        while IFS='' read line; do
-+        while IFS='' read -r line; do
-             if [[ $format_specific == 1 ]]; then
-                 discard=0
-             elif [[ $line == "Format specific information:" ]]; then
+diff --git a/tests/qemu-iotests/198 b/tests/qemu-iotests/198
+index 34ef666381..a84a058396 100755
+--- a/tests/qemu-iotests/198
++++ b/tests/qemu-iotests/198
+@@ -91,11 +91,13 @@ $QEMU_IO --object $SECRET0 --object $SECRET1 -c "read -P 0x9 0 $size" --image-op
+ 
+ echo
+ echo "== checking image base =="
+-$QEMU_IMG info --image-opts $IMGSPECBASE | _filter_img_info | _filter_testdir | sed -e "/^disk size:/ D"
++$QEMU_IMG info --image-opts $IMGSPECBASE | _filter_img_info --format-specific \
++    | sed -e "/^disk size:/ D"
+ 
+ echo
+ echo "== checking image layer =="
+-$QEMU_IMG info --image-opts $IMGSPECLAYER | _filter_img_info | _filter_testdir | sed -e "/^disk size:/ D"
++$QEMU_IMG info --image-opts $IMGSPECLAYER | _filter_img_info --format-specific \
++    | sed -e "/^disk size:/ D"
+ 
+ 
+ # success, all done
+diff --git a/tests/qemu-iotests/common.filter b/tests/qemu-iotests/common.filter
+index d9237799e9..0c0e53fae7 100644
+--- a/tests/qemu-iotests/common.filter
++++ b/tests/qemu-iotests/common.filter
+@@ -139,6 +139,15 @@ _filter_img_create()
+ 
+ _filter_img_info()
+ {
++    if [[ "$1" == "--format-specific" ]]; then
++        local format_specific=1
++        shift
++    else
++        local format_specific=0
++    fi
++
++    discard=0
++    regex_json_spec_start='^ *"format-specific": \{'
+     sed -e "s#$IMGPROTO:$TEST_DIR#TEST_DIR#g" \
+         -e "s#$TEST_DIR#TEST_DIR#g" \
+         -e "s#$IMGFMT#IMGFMT#g" \
+@@ -159,7 +168,25 @@ _filter_img_info()
+         -e "/block_state_zero: \\(on\\|off\\)/d" \
+         -e "/log_size: [0-9]\\+/d" \
+         -e "s/iters: [0-9]\\+/iters: 1024/" \
+-        -e "s/uuid: [-a-f0-9]\\+/uuid: 00000000-0000-0000-0000-000000000000/"
++        -e "s/uuid: [-a-f0-9]\\+/uuid: 00000000-0000-0000-0000-000000000000/" | \
++    while IFS='' read -r line; do
++        if [[ $format_specific == 1 ]]; then
++            discard=0
++        elif [[ $line == "Format specific information:" ]]; then
++            discard=1
++        elif [[ $line =~ $regex_json_spec_start ]]; then
++            discard=2
++            regex_json_spec_end="^${line%%[^ ]*}\\},? *$"
++        fi
++        if [[ $discard == 0 ]]; then
++            echo "$line"
++        elif [[ $discard == 1 && ! $line ]]; then
++            echo
++            discard=0
++        elif [[ $discard == 2 && $line =~ $regex_json_spec_end ]]; then
++            discard=0
++        fi
++    done
+ }
+ 
+ # filter out offsets and file names from qemu-img map; good for both
 -- 
 2.13.6
