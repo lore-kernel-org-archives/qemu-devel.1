@@ -1,27 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34219)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38706)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1eHp8I-000722-3X
-	for qemu-devel@nongnu.org; Thu, 23 Nov 2017 05:53:30 -0500
+	(envelope-from <thuth@redhat.com>) id 1eHpCS-0000Ld-SJ
+	for qemu-devel@nongnu.org; Thu, 23 Nov 2017 05:57:45 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1eHp8G-0007Me-MT
-	for qemu-devel@nongnu.org; Thu, 23 Nov 2017 05:53:26 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:46462)
+	(envelope-from <thuth@redhat.com>) id 1eHpCO-0004iI-KW
+	for qemu-devel@nongnu.org; Thu, 23 Nov 2017 05:57:44 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:45718)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1eHp8G-0007Ln-D6
-	for qemu-devel@nongnu.org; Thu, 23 Nov 2017 05:53:24 -0500
-Date: Thu, 23 Nov 2017 10:53:08 +0000
-From: "Daniel P. Berrange" <berrange@redhat.com>
-Message-ID: <20171123105308.GF8166@redhat.com>
-Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
-References: <20171116130610.23582-1-peterx@redhat.com>
-	<20171116130610.23582-10-peterx@redhat.com>
-	<20171123104625.GA2462@work-vm> <20171123105142.GA3153@work-vm>
+	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1eHpCO-0004gc-Ep
+	for qemu-devel@nongnu.org; Thu, 23 Nov 2017 05:57:40 -0500
+References: <20171110152017.24324-1-clg@kaod.org>
+	<20171110152017.24324-2-clg@kaod.org>
+	<715a7bd1-7aa5-fa64-a9b8-76782ee20576@redhat.com>
+	<20171123110345.03541b50.cohuck@redhat.com>
+	<CAFEAcA83-oqifsZboJmvDVYhhr4=QOEEGF1TZba-jCewpUFtyg@mail.gmail.com>
+From: Thomas Huth <thuth@redhat.com>
+Message-ID: <1dff6d6c-be83-f6e1-2b7e-82d98bdb8a63@redhat.com>
+Date: Thu, 23 Nov 2017 11:57:34 +0100
 MIME-Version: 1.0
+In-Reply-To: <CAFEAcA83-oqifsZboJmvDVYhhr4=QOEEGF1TZba-jCewpUFtyg@mail.gmail.com>
 Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20171123105142.GA3153@work-vm>
-Subject: Re: [Qemu-devel] [RFC v4 09/27] monitor: create monitor dedicate
- iothread
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] QEMU 3.0 ?
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,101 +31,45 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Cc: Peter Xu <peterx@redhat.com>, qemu-devel@nongnu.org, Stefan Hajnoczi <shajnocz@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Fam Zheng <famz@redhat.com>, Juan Quintela <quintela@redhat.com>, mdroth@linux.vnet.ibm.com, Eric Blake <eblake@redhat.com>, Laurent Vivier <lvivier@redhat.com>, Markus Armbruster <armbru@redhat.com>, marcandre.lureau@redhat.com
+To: Peter Maydell <peter.maydell@linaro.org>, Cornelia Huck <cohuck@redhat.com>
+Cc: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>, QEMU Developers <qemu-devel@nongnu.org>, David Gibson <david@gibson.dropbear.id.au>, Greg Kurz <groug@kaod.org>, Markus Armbruster <armbru@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, "Daniel P. Berrange" <berrange@redhat.com>, Eric Blake <eblake@redhat.com>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
 
-On Thu, Nov 23, 2017 at 10:51:43AM +0000, Dr. David Alan Gilbert wrote:
-> * Dr. David Alan Gilbert (dgilbert@redhat.com) wrote:
-> > * Peter Xu (peterx@redhat.com) wrote:
-> > > Create one IOThread for the monitors, prepared to handle all the
-> > > input/output IOs using existing iothread framework.
-> > > 
-> > > Signed-off-by: Peter Xu <peterx@redhat.com>
-> > > ---
-> > >  monitor.c | 29 +++++++++++++++++++++++++++++
-> > >  1 file changed, 29 insertions(+)
-> > > 
-> > > diff --git a/monitor.c b/monitor.c
-> > > index a70ab5606b..4ce9828fab 100644
-> > > --- a/monitor.c
-> > > +++ b/monitor.c
-> > > @@ -76,6 +76,7 @@
-> > >  #include "qmp-introspect.h"
-> > >  #include "sysemu/qtest.h"
-> > >  #include "sysemu/cpus.h"
-> > > +#include "sysemu/iothread.h"
-> > >  #include "qemu/cutils.h"
-> > >  #include "qapi/qmp/dispatch.h"
-> > >  
-> > > @@ -208,6 +209,12 @@ struct Monitor {
-> > >      QTAILQ_ENTRY(Monitor) entry;
-> > >  };
-> > >  
-> > > +struct MonitorGlobal {
-> > > +    IOThread *mon_iothread;
-> > > +};
-> > > +
-> > > +static struct MonitorGlobal mon_global;
-> > > +
-> > >  /* QMP checker flags */
-> > >  #define QMP_ACCEPT_UNKNOWNS 1
-> > >  
-> > > @@ -4034,12 +4041,24 @@ static void sortcmdlist(void)
-> > >      qsort((void *)info_cmds, array_num, elem_size, compare_mon_cmd);
-> > >  }
-> > >  
-> > > +static GMainContext *monitor_io_context_get(void)
-> > > +{
-> > > +    return iothread_get_g_main_context(mon_global.mon_iothread);
-> > > +}
-> > > +
-> > > +static void monitor_iothread_init(void)
-> > > +{
-> > > +    mon_global.mon_iothread = iothread_create("monitor_iothread",
-> > > +                                              &error_abort);
-> > 
-> > That name is one character too long for pthread_setname_np that it
-> > ends up being passed too (it's 16 char including the terminator);
-> > that probably means the thread ends up unnamed.  I suggest
-> > you make it "mon_iothread"
-> > 
-> > > +}
-> > > +
-> > >  void monitor_init_globals(void)
-> > >  {
-> > >      monitor_init_qmp_commands();
-> > >      monitor_qapi_event_init();
-> > >      sortcmdlist();
-> > >      qemu_mutex_init(&monitor_lock);
-> > > +    monitor_iothread_init();
-> > >  }
-> > >  
-> > >  /* These functions just adapt the readline interface in a typesafe way.  We
-> > > @@ -4117,6 +4136,13 @@ void monitor_cleanup(void)
-> > >  {
-> > >      Monitor *mon, *next;
-> > >  
-> > > +    /*
-> > > +     * We need to explicitly stop the iothread (but not destroy it),
-> > > +     * cleanup the monitor resources, then destroy the iothread.  See
-> > > +     * again on the glib bug mentioned in 2b316774f6 for a reason.
-> > 
-> > I wonder if that bug is still live?   2b316774f6 says that:
-> >    'glib developers found and fixed the deadlock as part of implementing
-> > child sources.'
-> >    but doesn't say which glib version that was fixed in; we have
-> > increased the minimum glib version we support since 2013, so maybe...
-> 
-> Paolo says it wasn't fixed until 2.28 and we still allow 2.22 ; so a
-> little way before we can declare that one dead.
+On 23.11.2017 11:17, Peter Maydell wrote:
+> On 23 November 2017 at 10:03, Cornelia Huck <cohuck@redhat.com> wrote:
+>> On Mon, 13 Nov 2017 08:14:28 +0100
+>> Thomas Huth <thuth@redhat.com> wrote:
+>>
+>>> By the way, before everybody now introduces "2.12" machine types ... =
+is
+>>> there already a consensus that the next version will be "2.12" ?
+>>>
+>>> A couple of months ago, we discussed that we could maybe do a 3.0 aft=
+er
+>>> 2.11, e.g. here:
+>>>
+>>>  https://lists.gnu.org/archive/html/qemu-devel/2017-03/msg05056.html
+>>>
+>>> I'd still like to see that happen... Peter, any thoughts on this?
+>>
+>> So, as I just thought about preparing the new machine for s390x as
+>> well: Did we reach any consensus about what the next qemu version will
+>> be called?
+>=20
+> I haven't seen any sufficiently solid plan to make me want to
+> pick anything except "2.12".
 
-Please update the comment to mention that we can remove the hack
-in 2.28, since I bet we'll forget about this by the time that time
-comes :=)
+I still don't think that we need a big plan for this... The change from
+1.7 to 2.0 was also rather arbitrary, wasn't it?
 
-Regards,
-Daniel
--- 
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
+Anyway, I've now started a Wiki page to collect ideas:
+
+ https://wiki.qemu.org/Features/Version3.0
+
+Maybe we can jump to version 3.0 if there are enough doable items on the
+list that we can all agree upon.
+
+I've put "--accel kvm:hax:tcg" also on the doable list since I don't
+remember any objections to that idea so far -- feel free to move it to
+the controversial list instead if you think it needs more discussion.
+
+ Thomas
