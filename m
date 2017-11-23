@@ -1,44 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59002)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52132)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <borntraeger@de.ibm.com>) id 1eHvp2-0000TU-Da
-	for qemu-devel@nongnu.org; Thu, 23 Nov 2017 13:02:01 -0500
+	(envelope-from <bounces@canonical.com>) id 1eHwWL-0004dT-Nz
+	for qemu-devel@nongnu.org; Thu, 23 Nov 2017 13:46:46 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <borntraeger@de.ibm.com>) id 1eHvoy-0003RP-QG
-	for qemu-devel@nongnu.org; Thu, 23 Nov 2017 13:02:00 -0500
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:36794
-	helo=mx0a-001b2d01.pphosted.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <borntraeger@de.ibm.com>)
-	id 1eHvoy-0003PG-LP
-	for qemu-devel@nongnu.org; Thu, 23 Nov 2017 13:01:56 -0500
-Received: from pps.filterd (m0098419.ppops.net [127.0.0.1])
-	by mx0b-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
-	vANI0U5W131674
-	for <qemu-devel@nongnu.org>; Thu, 23 Nov 2017 13:01:53 -0500
-Received: from e06smtp11.uk.ibm.com (e06smtp11.uk.ibm.com [195.75.94.107])
-	by mx0b-001b2d01.pphosted.com with ESMTP id 2ee1etkvx0-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Thu, 23 Nov 2017 13:01:53 -0500
-Received: from localhost
-	by e06smtp11.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
-	Only! Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <borntraeger@de.ibm.com>;
-	Thu, 23 Nov 2017 18:01:51 -0000
-References: <1511448975-28326-1-git-send-email-eric.auger@redhat.com>
-	<CAFEAcA8T4cShPYONdo8hiaZKvd+zq9Uo1o5awU3rA03uu8Vsiw@mail.gmail.com>
-	<1bede1e5-cc11-dca6-9f0b-ef16b9031d7a@redhat.com>
-	<CAFEAcA_ZUGR+t2T3cvVo2OkyOccVjtRW+YTN-5KXaw+rFRiRqg@mail.gmail.com>
-	<20171123181402.627fd5df.cohuck@redhat.com>
-	<f3a550ab-5eff-1c9c-15e0-32ac70a4c2a6@redhat.com>
-From: Christian Borntraeger <borntraeger@de.ibm.com>
-Date: Thu, 23 Nov 2017 19:01:46 +0100
+	(envelope-from <bounces@canonical.com>) id 1eHwWK-0007GM-G6
+	for qemu-devel@nongnu.org; Thu, 23 Nov 2017 13:46:45 -0500
+Received: from indium.canonical.com ([91.189.90.7]:59480)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1eHwWK-0007EX-9d
+	for qemu-devel@nongnu.org; Thu, 23 Nov 2017 13:46:44 -0500
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1eHwWH-00012C-Uc
+	for <qemu-devel@nongnu.org>; Thu, 23 Nov 2017 18:46:42 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 1C0732E80E7
+	for <qemu-devel@nongnu.org>; Thu, 23 Nov 2017 18:46:41 +0000 (UTC)
 MIME-Version: 1.0
-In-Reply-To: <f3a550ab-5eff-1c9c-15e0-32ac70a4c2a6@redhat.com>
-Content-Type: text/plain; charset=windows-1252
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Message-Id: <619fb88b-7ab1-a48a-a82c-53c21c691807@de.ibm.com>
-Subject: Re: [Qemu-devel] [RFC v3 0/4] vITS Reset
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Thu, 23 Nov 2017 18:32:47 -0000
+From: Peter Maydell <peter.maydell@linaro.org>
+Reply-To: Bug 1172613 <1172613@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <20130425082449.5153.30611.malonedeb@wampee.canonical.com>
+Message-Id: <151146196739.7595.484415470961461158.malone@chaenomeles.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1172613] Re: [qemu 1.4.1] inconsistent behavior
+ on different architecture
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -47,50 +37,91 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Auger Eric <eric.auger@redhat.com>, Cornelia Huck <cohuck@redhat.com>, Peter Maydell <peter.maydell@linaro.org>
-Cc: Wei Huang <wei@redhat.com>, Andrew Jones <drjones@redhat.com>, Vijay Kilari <vijay.kilari@gmail.com>, Juan Quintela <quintela@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>, wu.wubin@huawei.com, wanghaibin.wang@huawei.com, Christoffer Dall <christoffer.dall@linaro.org>, eric.auger.pro@gmail.com
+To: qemu-devel@nongnu.org
 
+This is going to be the same "glibc crashes if it sees a wrong-
+endianness /etc/ld.so.cache" situation also seen in lp:1701798.
+Personally I think it's a glibc bug, not really a QEMU bug.
 
+-- =
 
-On 11/23/2017 06:44 PM, Auger Eric wrote:
-> Hi Cornelia, Peter,
-> 
-> On 23/11/17 18:14, Cornelia Huck wrote:
->> On Thu, 23 Nov 2017 17:01:32 +0000
->> Peter Maydell <peter.maydell@linaro.org> wrote:
->>
->>> On 23 November 2017 at 16:05, Auger Eric <eric.auger@redhat.com> wrote:
->>>> When using update-linux-headers.sh I get suspicious errors at the end:
->>>> grep: /tmp/tmp.A5NjLtHOij/include/asm/kvm_virtio.h: No such file or
->>>> directory
->>>> sed: can't read /tmp/tmp.A5NjLtHOij/include/asm/kvm_virtio.h: No such
->>>> file or directory
->>>>
->>>> and include/standard-headers/asm-s390/virtio-ccw.h deletedch
->>>>
->>>> I would prefer having s390 people checking and testing that.  
->>>
->>> I think the kvm_virtio.h problem should be fixed by
->>> http://patchwork.ozlabs.org/patch/838230/
->>> which removes it from the set of headers the script imports.
->>>
->>> Cornelia/Christian -- any idea about the virtio-ccw.h issue ?
->>>
->>> thanks
->>> -- PMM
->>
->> I had that commit queued for post-2.11, but I can also send it for 2.11.
->>
->> The virtio-ccw.h one looks weird... if I run the script on my s390-next
->> branch against recent-ish Linux master, I just get the SPDX notice
->> update for virtio-ccw.h.
->>
-> 
-> http://patchwork.ozlabs.org/patch/838230/ effectively fixes all issues:
-> - no errors anymore and
-> - no deletion of include/standard-headers/asm-s390/virtio-ccw.h anymore,
-> which is consistent with include/standard-headers/asm-s390/virtio-ccw.h.
-> 
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1172613
 
-I assume the vITS code is post 2.11? If not, we can certainly submit 3 or 4 
-s390 patches (including 838230) for 2.11.
+Title:
+  [qemu 1.4.1] inconsistent behavior on different architecture
+
+Status in QEMU:
+  Invalid
+
+Bug description:
+  Running with qemu 1.4.1 and eglibc 2.17 on Debian Linux 7.0 for amd64
+
+  ---------------- armhf ----------------
+  $ arm-linux-gnueabihf-gcc hello.c
+  $ qemu-arm ./a.out
+  /lib/ld-linux-armhf.so.3: No such file or directory
+
+  $ qemu-arm arm-linux-gnueabihf/lib/ld-2.17.so ./a.out
+  ./a.out: error while loading shared libraries: libc.so.6: cannot open sha=
+red object file: No such file or directory
+
+  $ qemu-arm arm-linux-gnueabihf/lib/ld-2.17.so --library-path  arm-linux-g=
+nueabihf/lib ./a.out
+  Hello, world !
+
+  ---------------- powerpc64 ----------------
+  $ powerpc64-linux-gcc hello.c
+
+  $ qemu-ppc64 ./a.out
+  /lib64/ld64.so.1: No such file or directory
+
+  [BAD BEHAVIOR !!!]
+  $ qemu-ppc64 powerpc64-linux/lib64/ld-2.17.so ./a.out
+  Invalid data memory access: 0x00000041988fd008
+  NIP 000000400001cb2c   LR 000000400001cc30 CTR 0000000000000000 XER 00000=
+00000000000
+  MSR 8000000002006000 HID0 0000000060000000  HF 8000000002006000 idx 0
+  TB 00000000 00000000
+  GPR00 0000000000000000 000000400083a220 0000004000041230 00000043309bd010
+  GPR04 0000004000026f12 000000000000000b 000000000000002e 000000000000002e
+  GPR08 0000000000000030 000000008803fffc 00000041988fcff4 0000000000000037
+  GPR12 0000000000000000 0000000000000000 0000000000000000 0000000000000000
+  GPR16 0000000000000000 000000400003a4d8 000000400083a6d0 000000400083a6d8
+  GPR20 000000400003a898 000000000000000a 0000000000000000 00000043309bd010
+  GPR24 0000004000037b60 00000000cfe8ced7 000000400003a430 0000000010000261
+  GPR28 00000001980bfff4 0000000000000000 000000004401ffff 000000002200ffff
+  CR 22242224  [ E  E  E  G  E  E  E  G  ]             RES ffffffffffffffff
+  FPR00 0000000000000000 0000000000000000 0000000000000000 0000000000000000
+  FPR04 0000000000000000 0000000000000000 0000000000000000 0000000000000000
+  FPR08 0000000000000000 0000000000000000 0000000000000000 0000000000000000
+  FPR12 0000000000000000 0000000000000000 0000000000000000 0000000000000000
+  FPR16 0000000000000000 0000000000000000 0000000000000000 0000000000000000
+  FPR20 0000000000000000 0000000000000000 0000000000000000 0000000000000000
+  FPR24 0000000000000000 0000000000000000 0000000000000000 0000000000000000
+  FPR28 0000000000000000 0000000000000000 0000000000000000 0000000000000000
+  FPSCR 0000000000000000
+  qemu: uncaught target signal 11 (Segmentation fault) - core dumped
+  Segmentation fault
+
+  $ qemu-ppc64 powerpc64-linux/lib64/ld-2.17.so --library-path powerpc64-li=
+nux/lib64 ./a.out
+  Hello, world !
+
+  ---------------- sparc64 ----------------
+  $ sparc64-linux-gcc hello.c
+
+  $ qemu-sparc64 ./a.out
+  /lib64/ld-linux.so.2: No such file or directory
+
+  [BAD BEHAVIOR !!!]
+  $ qemu-sparc64 sparc64-linux/lib64/ld-2.17.so ./a.out
+  Segmentation fault
+
+  $ qemu-sparc64 sparc64-linux/lib64/ld-2.17.so --library-path sparc64-linu=
+x/lib64 ./a.out
+  Hello, world !
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1172613/+subscriptions
