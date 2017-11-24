@@ -1,20 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:32975)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:32987)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eric.auger@redhat.com>) id 1eIF1e-0003LL-2u
-	for qemu-devel@nongnu.org; Fri, 24 Nov 2017 09:32:18 -0500
+	(envelope-from <rkagan@virtuozzo.com>) id 1eIF1j-0003Ow-34
+	for qemu-devel@nongnu.org; Fri, 24 Nov 2017 09:32:24 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eric.auger@redhat.com>) id 1eIF1d-0002HB-7a
-	for qemu-devel@nongnu.org; Fri, 24 Nov 2017 09:32:18 -0500
-References: <1511533107-5315-1-git-send-email-eric.auger@redhat.com>
-	<CAFEAcA_K4f=mmuoEbyuFCHP2dor5p2UPyedteELQoxPYFzAcEg@mail.gmail.com>
-From: Auger Eric <eric.auger@redhat.com>
-Message-ID: <dd80f8f3-26da-5893-fa4b-cfa31790394d@redhat.com>
-Date: Fri, 24 Nov 2017 15:32:05 +0100
+	(envelope-from <rkagan@virtuozzo.com>) id 1eIF1f-0002Hb-Vp
+	for qemu-devel@nongnu.org; Fri, 24 Nov 2017 09:32:23 -0500
+Received: from mail-he1eur01on0113.outbound.protection.outlook.com
+	([104.47.0.113]:47053
+	helo=EUR01-HE1-obe.outbound.protection.outlook.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <rkagan@virtuozzo.com>)
+	id 1eIF1f-0002H9-8E
+	for qemu-devel@nongnu.org; Fri, 24 Nov 2017 09:32:19 -0500
+From: Roman Kagan <rkagan@virtuozzo.com>
+Date: Fri, 24 Nov 2017 17:32:06 +0300
+Message-Id: <20171124143206.28833-1-rkagan@virtuozzo.com>
 MIME-Version: 1.0
-In-Reply-To: <CAFEAcA_K4f=mmuoEbyuFCHP2dor5p2UPyedteELQoxPYFzAcEg@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v5 0/4] ITS Reset
+Content-Type: text/plain
+Subject: [Qemu-devel] [PATCH] util: add is_equal to UUID API
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,49 +26,91 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: eric.auger.pro@gmail.com, qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>, wanghaibin.wang@huawei.com, Vijay Kilari <vijay.kilari@gmail.com>, Andrew Jones <drjones@redhat.com>, Wei Huang <wei@redhat.com>, Juan Quintela <quintela@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Christoffer Dall <christoffer.dall@linaro.org>, wu.wubin@huawei.com
+To: qemu-devel@nongnu.org, Fam Zheng <famz@redhat.com>
+Cc: "Denis V. Lunev" <den@openvz.org>
 
-Hi Peter,
+It's going to be useful, in particular, in VMBus code massively using
+uuids aka GUIDs.
 
-On 24/11/17 15:20, Peter Maydell wrote:
-> On 24 November 2017 at 14:18, Eric Auger <eric.auger@redhat.com> wrote:
->> At the moment the ITS is not properly reset. On System reset or
->> reboot, previous ITS register values and caches are left
->> unchanged. Some of the registers might point to some guest RAM
->> tables which are not valid anymore. This leads to state
->> inconsistencies that are detected by the kernel save/restore
->> code. And eventually this may cause qemu abort.
->>
->> This series adds vITS reset modality:
->> - the 2 first patches bring a minimalist reset through individual
->>   register writes. However, with kernel versions < 4.15, this reset
->>   is not complete (vITS caches are not voided).
->> - With kernel versions >= 4.15 we can rely on a new ITS KVM device
->>   reset IOTCL. The last 2 patches introduce the full reset.
->>
->> Tested with 4.11, 4.14 and 4.15 host kernels.
-> 
-> Thanks. My remaining question is: how important it is to
-> put some of this into 2.11? We're getting quite close to
-> the release now so I'm getting gradually more reluctant
-> to put in changes.
+Signed-off-by: Roman Kagan <rkagan@virtuozzo.com>
+---
+ include/qemu/uuid.h |  2 ++
+ tests/test-uuid.c   | 24 ++++++++++++++++++++++++
+ util/uuid.c         |  7 ++++++-
+ 3 files changed, 32 insertions(+), 1 deletion(-)
 
-I fully understand.
-
-Anyway clean and comprehensive reset modality would require v4.15 + full
-QEMU series (otherwise you get the scary error message even if full
-reset can be achieved by individual register writes).
-
-This means the migration of guests while they are booting will not be
-functional in 2.11. However it should not abort QEMU as it did before,
-with a kernel >= v4.14.
-
-Thanks
-
-Eric
-
-> 
-> thanks
-> -- PMM
-> 
+diff --git a/include/qemu/uuid.h b/include/qemu/uuid.h
+index afe4840296..09489ce5c5 100644
+--- a/include/qemu/uuid.h
++++ b/include/qemu/uuid.h
+@@ -48,6 +48,8 @@ void qemu_uuid_generate(QemuUUID *out);
+ 
+ int qemu_uuid_is_null(const QemuUUID *uu);
+ 
++int qemu_uuid_is_equal(const QemuUUID *lhv, const QemuUUID *rhv);
++
+ void qemu_uuid_unparse(const QemuUUID *uuid, char *out);
+ 
+ char *qemu_uuid_unparse_strdup(const QemuUUID *uuid);
+diff --git a/tests/test-uuid.c b/tests/test-uuid.c
+index d3a2791fd4..c6c8148117 100644
+--- a/tests/test-uuid.c
++++ b/tests/test-uuid.c
+@@ -116,6 +116,29 @@ static void test_uuid_is_null(void)
+     g_assert_false(qemu_uuid_is_null(&uuid_not_null_2));
+ }
+ 
++static void test_uuid_is_equal(void)
++{
++    int i;
++    QemuUUID uuid;
++    QemuUUID uuid_null = { };
++    QemuUUID uuid_not_null = { { {
++        0x58, 0x6e, 0xce, 0x27, 0x7f, 0x09, 0x41, 0xe0,
++        0x9e, 0x74, 0xe9, 0x01, 0x31, 0x7e, 0x9d, 0x42
++    } } };
++    QemuUUID uuid_null_2 = uuid_null;
++    QemuUUID uuid_not_null_2 = uuid_not_null;
++
++    g_assert(qemu_uuid_is_equal(&uuid_null, &uuid_null_2));
++    g_assert(qemu_uuid_is_equal(&uuid_not_null, &uuid_not_null_2));
++    g_assert_false(qemu_uuid_is_equal(&uuid_null, &uuid_not_null));
++
++    for (i = 0; i < 100; ++i) {
++        qemu_uuid_generate(&uuid);
++        g_assert_false(qemu_uuid_is_equal(&uuid_null, &uuid));
++        g_assert_false(qemu_uuid_is_equal(&uuid_not_null, &uuid));
++    }
++}
++
+ static void test_uuid_parse(void)
+ {
+     int i, r;
+@@ -170,6 +193,7 @@ int main(int argc, char **argv)
+     g_test_init(&argc, &argv, NULL);
+     g_test_add_func("/uuid/generate", test_uuid_generate);
+     g_test_add_func("/uuid/is_null", test_uuid_is_null);
++    g_test_add_func("/uuid/is_equal", test_uuid_is_equal);
+     g_test_add_func("/uuid/parse", test_uuid_parse);
+     g_test_add_func("/uuid/unparse", test_uuid_unparse);
+     g_test_add_func("/uuid/unparse_strdup", test_uuid_unparse_strdup);
+diff --git a/util/uuid.c b/util/uuid.c
+index dd6b5fdf05..ebf06c049a 100644
+--- a/util/uuid.c
++++ b/util/uuid.c
+@@ -41,7 +41,12 @@ void qemu_uuid_generate(QemuUUID *uuid)
+ int qemu_uuid_is_null(const QemuUUID *uu)
+ {
+     static QemuUUID null_uuid;
+-    return memcmp(uu, &null_uuid, sizeof(QemuUUID)) == 0;
++    return qemu_uuid_is_equal(uu, &null_uuid);
++}
++
++int qemu_uuid_is_equal(const QemuUUID *lhv, const QemuUUID *rhv)
++{
++    return memcmp(lhv, rhv, sizeof(QemuUUID)) == 0;
+ }
+ 
+ void qemu_uuid_unparse(const QemuUUID *uuid, char *out)
+-- 
+2.14.3
