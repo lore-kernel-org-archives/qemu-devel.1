@@ -1,28 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42123)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50875)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1eI15W-0006QE-RS
-	for qemu-devel@nongnu.org; Thu, 23 Nov 2017 18:39:24 -0500
+	(envelope-from <dgibson@ozlabs.org>) id 1eI1aS-0004VC-Sd
+	for qemu-devel@nongnu.org; Thu, 23 Nov 2017 19:11:21 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1eI15T-00056l-1g
-	for qemu-devel@nongnu.org; Thu, 23 Nov 2017 18:39:22 -0500
-Received: from mail-wm0-f47.google.com ([74.125.82.47]:39151)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1eI15S-000555-NE
-	for qemu-devel@nongnu.org; Thu, 23 Nov 2017 18:39:18 -0500
-Received: by mail-wm0-f47.google.com with SMTP id x63so19312862wmf.4
-	for <qemu-devel@nongnu.org>; Thu, 23 Nov 2017 15:39:18 -0800 (PST)
-References: <20171123190131.5138-1-ppandit@redhat.com>
-	<20171123190131.5138-2-ppandit@redhat.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <adb78e77-491a-c899-8454-d628b845cd29@redhat.com>
-Date: Fri, 24 Nov 2017 00:39:15 +0100
+	(envelope-from <dgibson@ozlabs.org>) id 1eI1aR-0005GI-On
+	for qemu-devel@nongnu.org; Thu, 23 Nov 2017 19:11:20 -0500
+Date: Fri, 24 Nov 2017 11:09:18 +1100
+From: David Gibson <david@gibson.dropbear.id.au>
+Message-ID: <20171124000918.GF22454@umbus.fritz.box>
+References: <20171123170524.3865-1-clg@kaod.org>
 MIME-Version: 1.0
-In-Reply-To: <20171123190131.5138-2-ppandit@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 1/2] virtio: check VirtQueue Vring object
- is set
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature"; boundary="/Zw+/jwnNHcBRYYu"
+Content-Disposition: inline
+In-Reply-To: <20171123170524.3865-1-clg@kaod.org>
+Subject: Re: [Qemu-devel] [PATCH] pcc: define the Power-saving mode Exit
+ Cause Enable bits in PowerPCCPUClass
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,33 +24,50 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: P J P <ppandit@redhat.com>, Qemu Developers <qemu-devel@nongnu.org>
-Cc: zhangboxian <zhangboxian@huawei.com>, Stefan Hajnoczi <stefanha@redhat.com>, Prasad J Pandit <pjp@fedoraproject.org>
+To: =?iso-8859-1?Q?C=E9dric?= Le Goater <clg@kaod.org>
+Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org
 
-On 23/11/2017 20:01, P J P wrote:
-> @@ -182,7 +182,7 @@ void virtio_queue_update_rings(VirtIODevice *vdev, int n)
->  {
->      VRing *vring = &vdev->vq[n].vring;
->  
-> -    if (!vring->desc) {
-> +    if (!vring->desc || !vring->align) {
->          /* not yet setup -> nothing to do */
->          return;
->      }
-> @@ -1414,6 +1414,9 @@ void virtio_config_modern_writel(VirtIODevice *vdev,
->  
->  void virtio_queue_set_addr(VirtIODevice *vdev, int n, hwaddr addr)
->  {
-> +    if (!vdev->vq[n].vring.num) {
-> +        return;
-> +    }
 
-Why not check vring->num in virtio_queue_update_rings too?
+--/Zw+/jwnNHcBRYYu
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-Thanks,
+On Thu, Nov 23, 2017 at 06:05:24PM +0100, C=E9dric Le Goater wrote:
+> and use the value to define precisely the default value of the LPCR in
+> the helper routine cpu_ppc_set_papr()
+>=20
+> Signed-off-by: C=E9dric Le Goater <clg@kaod.org>
 
-Paolo
+Applied to ppc-for-2.12.
 
->      vdev->vq[n].vring.desc = addr;
->      virtio_queue_update_rings(vdev, n);
->  }
+Sorry, I forgot if we needed this for 2.11 - if so, I can move it
+over.
+
+--=20
+David Gibson			| I'll have my music baroque, and my code
+david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
+				| _way_ _around_!
+http://www.ozlabs.org/~dgibson
+
+--/Zw+/jwnNHcBRYYu
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAloXYywACgkQbDjKyiDZ
+s5Ji2hAApA7C6cZX7EvBRMaGlPFNxE2dH34EknEtx6s1bHYgiZa0KUzAzi5ZWinX
+AQVXAnAPorbJlz1SIHxiuF4aPp6Fs316Lj2VWe1drZAG9xzWa327ul8v6DRYfTda
+Hby6Xtw6iQ+GESJzSyw1yipUJR8MbCf66020mi4Z/XKyQqsseUsyQ4yKiDDCjRBA
+5Rfvzc//chpuBwTpyE3gn8HKOyAkvNIM9lWuubkQZAarGx3xDzpv6dogVKE4R04Z
+W+J2cW8zaFMgUf74r92VwIcck8GdwF54hQ8tUgidfAra8csoX4drNB4pgCXOjLh8
+3zEZ8kbsuZz+8i/Edzul051O1eXGO1wbPibbnwzNxeb/k/4+9AQ+UpMUSa0o72TW
+g2vBO9reTE156KiH9h60xEMjU/L6pcztjALBZofNbOTGBObnhpFPtw+S5eVPvjXo
+4dSbC1Cg+1D25iLTJN2RwO+/X/JF8aqFJ9YNO8XXFHgxhPzjOHnFsjFSxhTWo8NP
+mD+jRBKQk1xS9ODoP4rTj3dKyoXgPijSfy89QjzqttkGBp4o16n0YD3hW17vsnQl
+M35wGkUpRCjvqzIR2JPCW11tgaNFFrv+bMyIFCXa21YvvU+DR8oC7XLmltDx7705
+A20OhPDXQGBPD+erka5k9ZTZufzQ8oHscZ4OOc9rPgvcCG4H+mg=
+=29FP
+-----END PGP SIGNATURE-----
+
+--/Zw+/jwnNHcBRYYu--
