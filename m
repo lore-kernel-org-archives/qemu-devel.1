@@ -1,20 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55862)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43064)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eric.auger@redhat.com>) id 1eIB2e-0000YD-VR
-	for qemu-devel@nongnu.org; Fri, 24 Nov 2017 05:17:08 -0500
+	(envelope-from <arei.gonglei@huawei.com>) id 1eIBKE-00049b-NZ
+	for qemu-devel@nongnu.org; Fri, 24 Nov 2017 05:35:21 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eric.auger@redhat.com>) id 1eIB2b-000244-2v
-	for qemu-devel@nongnu.org; Fri, 24 Nov 2017 05:17:04 -0500
-References: <1511516626-21178-1-git-send-email-eric.auger@redhat.com>
-	<CAFEAcA-Fjpg+KC4eUzupLFf7fAco2GDmZG8nWNqSARnn9vypxA@mail.gmail.com>
-From: Auger Eric <eric.auger@redhat.com>
-Message-ID: <20a7f496-5f85-f3c9-646e-aab32bdfad0f@redhat.com>
-Date: Fri, 24 Nov 2017 11:16:53 +0100
+	(envelope-from <arei.gonglei@huawei.com>) id 1eIBKA-0004r8-DA
+	for qemu-devel@nongnu.org; Fri, 24 Nov 2017 05:35:14 -0500
+Received: from szxga03-in.huawei.com ([45.249.212.189]:4370)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_ARCFOUR_SHA1:16) (Exim 4.71)
+	(envelope-from <arei.gonglei@huawei.com>) id 1eIBK9-0004eH-Qo
+	for qemu-devel@nongnu.org; Fri, 24 Nov 2017 05:35:10 -0500
+From: "Gonglei (Arei)" <arei.gonglei@huawei.com>
+Date: Fri, 24 Nov 2017 10:28:48 +0000
+Message-ID: <33183CC9F5247A488A2544077AF19020DA4A4429@DGGEMA505-MBS.china.huawei.com>
+Content-Language: zh-CN
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
-In-Reply-To: <CAFEAcA-Fjpg+KC4eUzupLFf7fAco2GDmZG8nWNqSARnn9vypxA@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH for 2.11] hw/arm/virt: Add 2.11 machine type
+Subject: [Qemu-devel] [Questions] about the VHOST_MEMORY_MAX_NREGIONS of
+ vhost-user backend?
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,35 +26,68 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: eric.auger.pro@gmail.com, qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>, Andrew Jones <drjones@redhat.com>
+To: "mst@redhat.com" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>, "n.nikolaev@virtualopensystems.com" <n.nikolaev@virtualopensystems.com>
+Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "dev@dpdk.org" <dev@dpdk.org>, Fanhenglong <fanhenglong@huawei.com>, "Lianxueguo (Albert)" <lianxueguo@huawei.com>, "wangxin (U)" <wangxinxin.wang@huawei.com>, "Huangweidong (C)" <weidong.huang@huawei.com>
 
-Hi Peter,
+Hi,
 
-On 24/11/17 11:11, Peter Maydell wrote:
-> On 24 November 2017 at 09:43, Eric Auger <eric.auger@redhat.com> wrote:
->> Add virt-2.11 machine type.
->>
->> Signed-off-by: Eric Auger <eric.auger@redhat.com>
->>
->> ---
-> 
-> Argh, did we forget this again?
+Currently, the maximum number of supported memory regions for vhost-user ba=
+ckends is 8,=20
+and the maximum supported memory regions for vhost-net backends is determin=
+ed by=20
+" /sys/module/vhost/parameters/max_mem_regions".=20
 
-Yes we did, please apologize for that.
+In many scenarios, the vhost-user NIC will cause the memory region to becom=
+e a bottleneck, reports
+ "a used vhost backend has no free memory slots left".=20
 
- I think we should just
-> make a rule that we have to bump all the versioned machine
-> types when the dev tree reopens...
+Such as memory hotplug (need to support multiple memory slots),=20
+and GPU pass-through (need to register multiple bar regions) and so on.
 
-I can take this in charge in the future.
+So, my questions are: Why definition vhost-user memory card memory region u=
+p to 8?
+Does it have any side effects if we increase the VHOST_MEMORY_MAX_NREGIONS?=
+=20
+What about cross-version migration?
 
-Thanks
+#define VHOST_MEMORY_MAX_NREGIONS    8
 
-Eric
-I wonder if there's a
-> way to catch this automatically?
-> 
-> thanks
-> -- PMM
-> 
+static int vhost_user_memslots_limit(struct vhost_dev *dev)
+{
+    return VHOST_MEMORY_MAX_NREGIONS;
+}
+
+Which is introduced by=20
+commit 5f6f6664bf24dc53f4bf98ba812d55ca93684cd5
+Author: Nikolay Nikolaev <n.nikolaev@virtualopensystems.com>
+Date:   Tue May 27 15:06:02 2014 +0300
+
+    Add vhost-user as a vhost backend.
+   =20
+    The initialization takes a chardev backed by a unix domain socket.
+    It should implement qemu_fe_set_msgfds in order to be able to pass
+    file descriptors to the remote process.
+   =20
+    Each ioctl request of vhost-kernel has a vhost-user message equivalent,
+    which is sent over the control socket.
+   =20
+    The general approach is to copy the data from the supplied argument
+    pointer to a designated field in the message. If a file descriptor is
+    to be passed it will be placed in the fds array for inclusion in
+    the sendmsg control header.
+   =20
+    VHOST_SET_MEM_TABLE ignores the supplied vhost_memory structure and sca=
+ns
+    the global ram_list for ram blocks with a valid fd field set. This woul=
+d
+    be set when the '-object memory-file' option with share=3Don property i=
+s used.
+   =20
+    Signed-off-by: Antonios Motakis <a.motakis@virtualopensystems.com>
+    Signed-off-by: Nikolay Nikolaev <n.nikolaev@virtualopensystems.com>
+    Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
+    Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
+
+
+Thanks,
+-Gonglei
