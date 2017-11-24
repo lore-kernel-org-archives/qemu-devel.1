@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43229)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43421)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1eIFfV-00028K-1d
-	for qemu-devel@nongnu.org; Fri, 24 Nov 2017 10:13:29 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1eIFg7-0002Tg-Us
+	for qemu-devel@nongnu.org; Fri, 24 Nov 2017 10:14:08 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1eIFfU-0007xS-BI
-	for qemu-devel@nongnu.org; Fri, 24 Nov 2017 10:13:29 -0500
-Received: from mail-oi0-x242.google.com ([2607:f8b0:4003:c06::242]:43079)
+	(envelope-from <peter.maydell@linaro.org>) id 1eIFg7-0008VT-5m
+	for qemu-devel@nongnu.org; Fri, 24 Nov 2017 10:14:07 -0500
+Received: from mail-oi0-x231.google.com ([2607:f8b0:4003:c06::231]:33230)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1eIFfU-0007wT-6N
-	for qemu-devel@nongnu.org; Fri, 24 Nov 2017 10:13:28 -0500
-Received: by mail-oi0-x242.google.com with SMTP id z143so2810528oia.10
-	for <qemu-devel@nongnu.org>; Fri, 24 Nov 2017 07:13:28 -0800 (PST)
+	id 1eIFg7-0008Uz-1h
+	for qemu-devel@nongnu.org; Fri, 24 Nov 2017 10:14:07 -0500
+Received: by mail-oi0-x231.google.com with SMTP id f135so15276432oib.0
+	for <qemu-devel@nongnu.org>; Fri, 24 Nov 2017 07:14:07 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <bdbc6042-bbae-b057-c9ee-769c6d7e8345@redhat.com>
-References: <1511452598-6077-1-git-send-email-peter.maydell@linaro.org>
-	<bdbc6042-bbae-b057-c9ee-769c6d7e8345@redhat.com>
+In-Reply-To: <20a7f496-5f85-f3c9-646e-aab32bdfad0f@redhat.com>
+References: <1511516626-21178-1-git-send-email-eric.auger@redhat.com>
+	<CAFEAcA-Fjpg+KC4eUzupLFf7fAco2GDmZG8nWNqSARnn9vypxA@mail.gmail.com>
+	<20a7f496-5f85-f3c9-646e-aab32bdfad0f@redhat.com>
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri, 24 Nov 2017 15:13:07 +0000
-Message-ID: <CAFEAcA9304UPDvL2MeQUUomFJFG9BB4SohxOgxJ7wsc2nk-sgQ@mail.gmail.com>
+Date: Fri, 24 Nov 2017 15:13:46 +0000
+Message-ID: <CAFEAcA_4GcxNkWzZ=P1znV9Vv+ssnUo0hO9dqUHaKqkWLP6naA@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH for-2.11?] osdep.h: Make TIME_MAX handle
- different time_t types
+Subject: Re: [Qemu-devel] [PATCH for 2.11] hw/arm/virt: Add 2.11 machine type
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,26 +30,26 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, "patches@linaro.org" <patches@linaro.org>, Brad Smith <brad@comstyle.com>, Kamil Rytarowski <n54@gmx.com>
+To: Auger Eric <eric.auger@redhat.com>
+Cc: eric.auger.pro@gmail.com, qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>, Andrew Jones <drjones@redhat.com>
 
-On 23 November 2017 at 16:00, Paolo Bonzini <pbonzini@redhat.com> wrote:
-> On 23/11/2017 16:56, Peter Maydell wrote:
->> In our various supported host OSes, the time_t type may be either 32
->> or 64 bit, and could in theory also be either signed or unsigned.
->> Notably, in OpenBSD time_t is a 64 bit type even if 'long' is 32
->> bits, so using LONG_MAX for TIME_MAX is incorrect.
+On 24 November 2017 at 10:16, Auger Eric <eric.auger@redhat.com> wrote:
+> Hi Peter,
+>
+> On 24/11/17 11:11, Peter Maydell wrote:
+>> On 24 November 2017 at 09:43, Eric Auger <eric.auger@redhat.com> wrote:
+>>> Add virt-2.11 machine type.
+>>>
+>>> Signed-off-by: Eric Auger <eric.auger@redhat.com>
+>>>
+>>> ---
 >>
->> Use an approach suggested by Paolo Bonzini which calculates
->> the maximum value of the type rather than hardcoding it;
->> to do this we use the TYPE_MAXIMUM macro from Gnulib.
->>
->> Suggested-by: Paolo Bonzini <pbonzini@redhat.com>
->> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
->> ---
+>> Argh, did we forget this again?
+>
+> Yes we did, please apologize for that.
 
-> Reviewed-by: Paolo Bonzini <pbonzini@redhat.com>
+Sorry :-)
 
-Thanks; applied to master.
+I've now applied this to master.
 
 -- PMM
