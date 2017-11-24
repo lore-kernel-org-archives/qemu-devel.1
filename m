@@ -1,21 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52218)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52216)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1eI8VN-0002zh-31
+	(envelope-from <peterx@redhat.com>) id 1eI8VN-0002zg-20
 	for qemu-devel@nongnu.org; Fri, 24 Nov 2017 02:34:34 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1eI8VM-0004rP-0d
+	(envelope-from <peterx@redhat.com>) id 1eI8VH-0004og-0A
 	for qemu-devel@nongnu.org; Fri, 24 Nov 2017 02:34:33 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:46762)
+Received: from mx1.redhat.com ([209.132.183.28]:33750)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1eI8VL-0004qs-OH
-	for qemu-devel@nongnu.org; Fri, 24 Nov 2017 02:34:31 -0500
+	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1eI8VG-0004nS-NK
+	for qemu-devel@nongnu.org; Fri, 24 Nov 2017 02:34:26 -0500
 From: Peter Xu <peterx@redhat.com>
-Date: Fri, 24 Nov 2017 15:34:17 +0800
-Message-Id: <20171124073417.4342-4-peterx@redhat.com>
+Date: Fri, 24 Nov 2017 15:34:15 +0800
+Message-Id: <20171124073417.4342-2-peterx@redhat.com>
 In-Reply-To: <20171124073417.4342-1-peterx@redhat.com>
 References: <20171124073417.4342-1-peterx@redhat.com>
-Subject: [Qemu-devel] [PATCH v2 3/3] cpu: put AddressSpace into
- CPUAddressSpace
+Subject: [Qemu-devel] [PATCH v2 1/3] cpu: refactor cpu_address_space_init()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,120 +26,149 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Eduardo Habkost <ehabkost@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, Alexey Kardashevskiy <aik@ozlabs.ru>, peterx@redhat.com
 
-Now we can put AddressSpace into CPUAddressSpace struct, then we don't
-need dynamic allocation of AddressSpaces.
+Normally we create an address space for that CPU and pass that address
+space into the function.  Let's just do it inside to unify address space
+creations.  It'll simplify my next patch to rename those address spaces.
 
-Suggested-by: Paolo Bonzini <pbonzini@redhat.com>
 Signed-off-by: Peter Xu <peterx@redhat.com>
 ---
- exec.c | 33 ++++++++++++++++++---------------
- 1 file changed, 18 insertions(+), 15 deletions(-)
+ cpus.c                  |  5 +----
+ exec.c                  |  7 ++++++-
+ include/exec/exec-all.h |  6 ++++--
+ target/arm/cpu.c        | 13 +++----------
+ target/i386/cpu.c       | 10 ++--------
+ 5 files changed, 16 insertions(+), 25 deletions(-)
 
+diff --git a/cpus.c b/cpus.c
+index 114c29b6a0..ae9dbf9510 100644
+--- a/cpus.c
++++ b/cpus.c
+@@ -1778,11 +1778,8 @@ void qemu_init_vcpu(CPUState *cpu)
+         /* If the target cpu hasn't set up any address spaces itself,
+          * give it the default one.
+          */
+-        AddressSpace *as = g_new0(AddressSpace, 1);
+-
+-        address_space_init(as, cpu->memory, "cpu-memory");
+         cpu->num_ases = 1;
+-        cpu_address_space_init(cpu, as, 0);
++        cpu_address_space_init(cpu, 0, "cpu-memory", cpu->memory);
+     }
+ 
+     if (kvm_enabled()) {
 diff --git a/exec.c b/exec.c
-index 41f89f8164..511217f38c 100644
+index 03238a3449..d845542139 100644
 --- a/exec.c
 +++ b/exec.c
-@@ -221,7 +221,7 @@ static MemoryRegion io_mem_watch;
-  */
- struct CPUAddressSpace {
-     CPUState *cpu;
--    AddressSpace *as;
-+    AddressSpace as;
-     struct AddressSpaceDispatch *memory_dispatch;
-     MemoryListener tcg_as_listener;
- };
-@@ -712,10 +712,19 @@ void cpu_address_space_init(CPUState *cpu, int asidx,
-                             const char *prefix, MemoryRegion *mr)
+@@ -708,9 +708,14 @@ CPUState *qemu_get_cpu(int index)
+ }
+ 
+ #if !defined(CONFIG_USER_ONLY)
+-void cpu_address_space_init(CPUState *cpu, AddressSpace *as, int asidx)
++void cpu_address_space_init(CPUState *cpu, int asidx,
++                            const char *prefix, MemoryRegion *mr)
  {
      CPUAddressSpace *newas;
--    AddressSpace *as = g_new0(AddressSpace, 1);
-+    AddressSpace *as;
-     char *as_name;
- 
-     assert(mr);
++    AddressSpace *as = g_new0(AddressSpace, 1);
 +
-+    if (!cpu->cpu_ases) {
-+        /* This should be setup before calling the function. */
-+        assert(cpu->num_ases > 0);
-+        cpu->cpu_ases = g_new0(CPUAddressSpace, cpu->num_ases);
-+    }
-+    newas = &cpu->cpu_ases[asidx];
-+    as = &newas->as;
-+
-     as_name = g_strdup_printf("%s-%d", prefix, cpu->cpu_index);
-     address_space_init(as, mr, as_name);
-     g_free(as_name);
-@@ -731,13 +740,7 @@ void cpu_address_space_init(CPUState *cpu, int asidx,
-     /* KVM cannot currently support multiple address spaces. */
-     assert(asidx == 0 || !kvm_enabled());
++    assert(mr);
++    address_space_init(as, mr, prefix);
  
--    if (!cpu->cpu_ases) {
--        cpu->cpu_ases = g_new0(CPUAddressSpace, cpu->num_ases);
--    }
--
--    newas = &cpu->cpu_ases[asidx];
-     newas->cpu = cpu;
--    newas->as = as;
-     if (tcg_enabled()) {
-         newas->tcg_as_listener.commit = tcg_commit;
-         memory_listener_register(&newas->tcg_as_listener, as);
-@@ -747,7 +750,7 @@ void cpu_address_space_init(CPUState *cpu, int asidx,
- AddressSpace *cpu_get_address_space(CPUState *cpu, int asidx)
- {
-     /* Return the AddressSpace corresponding to the specified index */
--    return cpu->cpu_ases[asidx].as;
-+    return &cpu->cpu_ases[asidx].as;
- }
+     /* Target code should have set num_ases before calling us */
+     assert(asidx < cpu->num_ases);
+diff --git a/include/exec/exec-all.h b/include/exec/exec-all.h
+index 0f51c92adb..b37f7d8d92 100644
+--- a/include/exec/exec-all.h
++++ b/include/exec/exec-all.h
+@@ -74,8 +74,9 @@ void cpu_reloading_memory_map(void);
+ /**
+  * cpu_address_space_init:
+  * @cpu: CPU to add this address space to
+- * @as: address space to add
+  * @asidx: integer index of this address space
++ * @prefix: prefix to be used as name of address space
++ * @mr: the root memory region of address space
+  *
+  * Add the specified address space to the CPU's cpu_ases list.
+  * The address space added with @asidx 0 is the one used for the
+@@ -89,7 +90,8 @@ void cpu_reloading_memory_map(void);
+  *
+  * Note that with KVM only one address space is supported.
+  */
+-void cpu_address_space_init(CPUState *cpu, AddressSpace *as, int asidx);
++void cpu_address_space_init(CPUState *cpu, int asidx,
++                            const char *prefix, MemoryRegion *mr);
  #endif
  
-@@ -830,7 +833,7 @@ static void breakpoint_invalidate(CPUState *cpu, target_ulong pc)
-     int asidx = cpu_asidx_from_attrs(cpu, attrs);
-     if (phys != -1) {
-         /* Locks grabbed by tb_invalidate_phys_addr */
--        tb_invalidate_phys_addr(cpu->cpu_ases[asidx].as,
-+        tb_invalidate_phys_addr(cpu_get_address_space(cpu, asidx),
-                                 phys | (pc & ~TARGET_PAGE_MASK));
-     }
- }
-@@ -2518,7 +2521,7 @@ static MemTxResult watch_mem_read(void *opaque, hwaddr addr, uint64_t *pdata,
-     MemTxResult res;
-     uint64_t data;
-     int asidx = cpu_asidx_from_attrs(current_cpu, attrs);
--    AddressSpace *as = current_cpu->cpu_ases[asidx].as;
-+    AddressSpace *as = cpu_get_address_space(current_cpu, asidx);
+ #if !defined(CONFIG_USER_ONLY) && defined(CONFIG_TCG)
+diff --git a/target/arm/cpu.c b/target/arm/cpu.c
+index 7f7a3d1e32..cc1856c32b 100644
+--- a/target/arm/cpu.c
++++ b/target/arm/cpu.c
+@@ -705,9 +705,6 @@ static void arm_cpu_realizefn(DeviceState *dev, Error **errp)
+     CPUARMState *env = &cpu->env;
+     int pagebits;
+     Error *local_err = NULL;
+-#ifndef CONFIG_USER_ONLY
+-    AddressSpace *as;
+-#endif
  
-     check_watchpoint(addr & ~TARGET_PAGE_MASK, size, attrs, BP_MEM_READ);
-     switch (size) {
-@@ -2546,7 +2549,7 @@ static MemTxResult watch_mem_write(void *opaque, hwaddr addr,
- {
-     MemTxResult res;
-     int asidx = cpu_asidx_from_attrs(current_cpu, attrs);
--    AddressSpace *as = current_cpu->cpu_ases[asidx].as;
-+    AddressSpace *as = cpu_get_address_space(current_cpu, asidx);
+     cpu_exec_realizefn(cs, &local_err);
+     if (local_err != NULL) {
+@@ -912,21 +909,17 @@ static void arm_cpu_realizefn(DeviceState *dev, Error **errp)
  
-     check_watchpoint(addr & ~TARGET_PAGE_MASK, size, attrs, BP_MEM_WRITE);
-     switch (size) {
-@@ -2793,7 +2796,7 @@ static void tcg_commit(MemoryListener *listener)
-      * We reload the dispatch pointer now because cpu_reloading_memory_map()
-      * may have split the RCU critical section.
-      */
--    d = address_space_to_dispatch(cpuas->as);
-+    d = address_space_to_dispatch(&cpuas->as);
-     atomic_rcu_set(&cpuas->memory_dispatch, d);
-     tlb_flush(cpuas->cpu);
- }
-@@ -3539,10 +3542,10 @@ int cpu_memory_rw_debug(CPUState *cpu, target_ulong addr,
-             l = len;
-         phys_addr += (addr & ~TARGET_PAGE_MASK);
-         if (is_write) {
--            cpu_physical_memory_write_rom(cpu->cpu_ases[asidx].as,
-+            cpu_physical_memory_write_rom(cpu_get_address_space(cpu, asidx),
-                                           phys_addr, buf, l);
-         } else {
--            address_space_rw(cpu->cpu_ases[asidx].as, phys_addr,
-+            address_space_rw(cpu_get_address_space(cpu, asidx), phys_addr,
-                              MEMTXATTRS_UNSPECIFIED,
-                              buf, l, 0);
+ #ifndef CONFIG_USER_ONLY
+     if (cpu->has_el3 || arm_feature(env, ARM_FEATURE_M_SECURITY)) {
+-        as = g_new0(AddressSpace, 1);
+-
+         cs->num_ases = 2;
+ 
+         if (!cpu->secure_memory) {
+             cpu->secure_memory = cs->memory;
          }
+-        address_space_init(as, cpu->secure_memory, "cpu-secure-memory");
+-        cpu_address_space_init(cs, as, ARMASIdx_S);
++        cpu_address_space_init(cs, ARMASIdx_S, "cpu-secure-memory",
++                               cpu->secure_memory);
+     } else {
+         cs->num_ases = 1;
+     }
+-    as = g_new0(AddressSpace, 1);
+-    address_space_init(as, cs->memory, "cpu-memory");
+-    cpu_address_space_init(cs, as, ARMASIdx_NS);
++    cpu_address_space_init(cs, ARMASIdx_NS, "cpu-memory", cs->memory);
+ #endif
+ 
+     qemu_init_vcpu(cs);
+diff --git a/target/i386/cpu.c b/target/i386/cpu.c
+index 045d66191f..d5b58abecb 100644
+--- a/target/i386/cpu.c
++++ b/target/i386/cpu.c
+@@ -3736,11 +3736,6 @@ static void x86_cpu_realizefn(DeviceState *dev, Error **errp)
+ 
+ #ifndef CONFIG_USER_ONLY
+     if (tcg_enabled()) {
+-        AddressSpace *as_normal = g_new0(AddressSpace, 1);
+-        AddressSpace *as_smm = g_new(AddressSpace, 1);
+-
+-        address_space_init(as_normal, cs->memory, "cpu-memory");
+-
+         cpu->cpu_as_mem = g_new(MemoryRegion, 1);
+         cpu->cpu_as_root = g_new(MemoryRegion, 1);
+ 
+@@ -3755,11 +3750,10 @@ static void x86_cpu_realizefn(DeviceState *dev, Error **errp)
+                                  get_system_memory(), 0, ~0ull);
+         memory_region_add_subregion_overlap(cpu->cpu_as_root, 0, cpu->cpu_as_mem, 0);
+         memory_region_set_enabled(cpu->cpu_as_mem, true);
+-        address_space_init(as_smm, cpu->cpu_as_root, "CPU");
+ 
+         cs->num_ases = 2;
+-        cpu_address_space_init(cs, as_normal, 0);
+-        cpu_address_space_init(cs, as_smm, 1);
++        cpu_address_space_init(cs, 0, "cpu-memory", cs->memory);
++        cpu_address_space_init(cs, 1, "cpu-smm", cpu->cpu_as_root);
+ 
+         /* ... SMRAM with higher priority, linked from /machine/smram.  */
+         cpu->machine_done.notify = x86_cpu_machine_done;
 -- 
 2.14.3
