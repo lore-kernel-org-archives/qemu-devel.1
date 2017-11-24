@@ -1,30 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36080)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39729)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1eIAiI-0006du-6s
-	for qemu-devel@nongnu.org; Fri, 24 Nov 2017 04:56:08 -0500
+	(envelope-from <cohuck@redhat.com>) id 1eIAmK-0000LT-9X
+	for qemu-devel@nongnu.org; Fri, 24 Nov 2017 05:00:16 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1eIAiC-0004yk-Pl
-	for qemu-devel@nongnu.org; Fri, 24 Nov 2017 04:56:02 -0500
-Received: from 10.mo3.mail-out.ovh.net ([87.98.165.232]:47390)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1eIAiC-0004xe-H2
-	for qemu-devel@nongnu.org; Fri, 24 Nov 2017 04:55:56 -0500
-Received: from player758.ha.ovh.net (b6.ovh.net [213.186.33.56])
-	by mo3.mail-out.ovh.net (Postfix) with ESMTP id CD9FC170D20
-	for <qemu-devel@nongnu.org>; Fri, 24 Nov 2017 10:55:54 +0100 (CET)
-Date: Fri, 24 Nov 2017 10:55:47 +0100
-From: Greg Kurz <groug@kaod.org>
-Message-ID: <20171124105547.4234dc14@bahia.lan>
-In-Reply-To: <20171124025100.GA28000@umbus.fritz.box>
-References: <20171123132955.1261-1-clg@kaod.org>
-	<20171123132955.1261-2-clg@kaod.org>
-	<20171124025100.GA28000@umbus.fritz.box>
-MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	boundary="Sig_/azfFk.ws.oxG0F7+3LCYd1A";
-	protocol="application/pgp-signature"
-Subject: Re: [Qemu-devel] [Qemu-ppc] [PATCH 01/25] ppc/xics: introduce an
- icp_create() helper
+	(envelope-from <cohuck@redhat.com>) id 1eIAm9-0008Pj-17
+	for qemu-devel@nongnu.org; Fri, 24 Nov 2017 05:00:12 -0500
+From: Cornelia Huck <cohuck@redhat.com>
+Date: Fri, 24 Nov 2017 10:59:49 +0100
+Message-Id: <20171124095949.16323-2-cohuck@redhat.com>
+In-Reply-To: <20171124095949.16323-1-cohuck@redhat.com>
+References: <20171124095949.16323-1-cohuck@redhat.com>
+Subject: [Qemu-devel] [PULL for-2.11 1/1] s390/kvm_virtio/linux-headers:
+ remove traces of old virtio transport
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,193 +20,134 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Gibson <david@gibson.dropbear.id.au>
-Cc: =?UTF-8?B?Q8OpZHJpYw==?= Le Goater <clg@kaod.org>, qemu-ppc@nongnu.org, qemu-devel@nongnu.org
+To: peter.maydell@linaro.org
+Cc: qemu-devel@nongnu.org, qemu-s390x@nongnu.org, rth@twiddle.net, agraf@suse.de, thuth@redhat.com, borntraeger@de.ibm.com, david@redhat.com, Cornelia Huck <cohuck@redhat.com>
 
---Sig_/azfFk.ws.oxG0F7+3LCYd1A
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
+From: Christian Borntraeger <borntraeger@de.ibm.com>
 
-On Fri, 24 Nov 2017 13:51:00 +1100
-David Gibson <david@gibson.dropbear.id.au> wrote:
+We no longer support the old s390 transport, neither does the newest
+Linux kernel. Remove it from the linux header script as well as the
+s390x virtio code.  We still should handle the VIRTIO_NOTIFY hypercall,
+to tolerate early printk on older guest kernels without an sclp console.
+We continue to ignore these events.
 
-> On Thu, Nov 23, 2017 at 02:29:31PM +0100, C=C3=A9dric Le Goater wrote:
-> > The sPAPR and the PowerNV core objects create the interrupt presenter
-> > object of the CPUs in a very similar way. Let's provide a common
-> > routine in which we use the presenter 'type' as a child identifier.
-> >=20
-> > Signed-off-by: C=C3=A9dric Le Goater <clg@kaod.org> =20
->=20
-> One tiny nit.., apart from that
->=20
-> Reviewed-by: David Gibson <david@gibson.dropbear.id.au>
->=20
-> > ---
-> >  hw/intc/xics.c          | 22 ++++++++++++++++++++++
-> >  hw/ppc/pnv_core.c       | 10 +---------
-> >  hw/ppc/spapr_cpu_core.c | 13 ++-----------
-> >  include/hw/ppc/xics.h   |  3 +++
-> >  4 files changed, 28 insertions(+), 20 deletions(-)
-> >=20
-> > diff --git a/hw/intc/xics.c b/hw/intc/xics.c
-> > index a1cc0e420c98..e4ccdff8f577 100644
-> > --- a/hw/intc/xics.c
-> > +++ b/hw/intc/xics.c
-> > @@ -384,6 +384,28 @@ static const TypeInfo icp_info =3D {
-> >      .class_size =3D sizeof(ICPStateClass),
-> >  };
-> > =20
-> > +Object *icp_create(CPUState *cs, const char *type, XICSFabric *xi, Err=
-or **errp)
-> > +{
-> > +    Object *child =3D OBJECT(cs); =20
->=20
-> In the original context 'child' made sense, since it was the child
-> object of the core.  Here, it's misleading, since it's the parent of
-> the xics link.  It's only used in a couple of places, so I suggest you
+Signed-off-by: Christian Borntraeger <borntraeger@de.ibm.com>
+Message-Id: <20171115154223.109991-1-borntraeger@de.ibm.com>
+Signed-off-by: Cornelia Huck <cohuck@redhat.com>
+---
+ hw/s390x/s390-virtio-hcall.h                   |  6 ++-
+ include/standard-headers/asm-s390/kvm_virtio.h | 64 --------------------------
+ scripts/update-linux-headers.sh                |  1 -
+ 3 files changed, 4 insertions(+), 67 deletions(-)
+ delete mode 100644 include/standard-headers/asm-s390/kvm_virtio.h
 
-Oops yes :)
-
-> just opencode OBJECT(cs) in each place.
->=20
-
-or rename child to owner, as it is done with DRCs and TCE tables.
-
-> > +    Error *local_err =3D NULL;
-> > +    Object *obj;
-> > +
-> > +    obj =3D object_new(type);
-> > +    object_property_add_child(child, type, obj, &error_abort);
-> > +    object_unref(obj);
-> > +    object_property_add_const_link(obj, ICP_PROP_XICS, OBJECT(xi),
-> > +                                   &error_abort);
-> > +    object_property_add_const_link(obj, ICP_PROP_CPU, child, &error_ab=
-ort);
-> > +    object_property_set_bool(obj, true, "realized", &local_err);
-> > +    if (local_err) {
-> > +        object_unparent(obj);
-> > +        error_propagate(errp, local_err);
-> > +        obj =3D NULL;
-> > +    }
-> > +
-> > +    return obj;
-> > +}
-> > +
-> >  /*
-> >   * ICS: Source layer
-> >   */
-> > diff --git a/hw/ppc/pnv_core.c b/hw/ppc/pnv_core.c
-> > index 82ff440b3334..a066736846f8 100644
-> > --- a/hw/ppc/pnv_core.c
-> > +++ b/hw/ppc/pnv_core.c
-> > @@ -126,7 +126,6 @@ static void pnv_core_realize_child(Object *child, X=
-ICSFabric *xi, Error **errp)
-> >      Error *local_err =3D NULL;
-> >      CPUState *cs =3D CPU(child);
-> >      PowerPCCPU *cpu =3D POWERPC_CPU(cs);
-> > -    Object *obj;
-> > =20
-> >      object_property_set_bool(child, true, "realized", &local_err);
-> >      if (local_err) {
-> > @@ -134,13 +133,7 @@ static void pnv_core_realize_child(Object *child, =
-XICSFabric *xi, Error **errp)
-> >          return;
-> >      }
-> > =20
-> > -    obj =3D object_new(TYPE_PNV_ICP);
-> > -    object_property_add_child(child, "icp", obj, NULL);
-> > -    object_unref(obj);
-> > -    object_property_add_const_link(obj, ICP_PROP_XICS, OBJECT(xi),
-> > -                                   &error_abort);
-> > -    object_property_add_const_link(obj, ICP_PROP_CPU, child, &error_ab=
-ort);
-> > -    object_property_set_bool(obj, true, "realized", &local_err);
-> > +    icp_create(cs, TYPE_PNV_ICP, xi, &local_err);
-> >      if (local_err) {
-> >          error_propagate(errp, local_err);
-> >          return;
-> > @@ -148,7 +141,6 @@ static void pnv_core_realize_child(Object *child, X=
-ICSFabric *xi, Error **errp)
-> > =20
-> >      powernv_cpu_init(cpu, &local_err);
-> >      if (local_err) {
-> > -        object_unparent(obj);
-> >          error_propagate(errp, local_err);
-> >          return;
-> >      }
-> > diff --git a/hw/ppc/spapr_cpu_core.c b/hw/ppc/spapr_cpu_core.c
-> > index 4ba8563d49e4..f8a520a2fa2d 100644
-> > --- a/hw/ppc/spapr_cpu_core.c
-> > +++ b/hw/ppc/spapr_cpu_core.c
-> > @@ -111,7 +111,6 @@ static void spapr_cpu_core_realize_child(Object *ch=
-ild,
-> >      Error *local_err =3D NULL;
-> >      CPUState *cs =3D CPU(child);
-> >      PowerPCCPU *cpu =3D POWERPC_CPU(cs);
-> > -    Object *obj;
-> > =20
-> >      object_property_set_bool(child, true, "realized", &local_err);
-> >      if (local_err) {
-> > @@ -123,21 +122,13 @@ static void spapr_cpu_core_realize_child(Object *=
-child,
-> >          goto error;
-> >      }
-> > =20
-> > -    obj =3D object_new(spapr->icp_type);
-> > -    object_property_add_child(child, "icp", obj, &error_abort);
-> > -    object_unref(obj);
-> > -    object_property_add_const_link(obj, ICP_PROP_XICS, OBJECT(spapr),
-> > -                                   &error_abort);
-> > -    object_property_add_const_link(obj, ICP_PROP_CPU, child, &error_ab=
-ort);
-> > -    object_property_set_bool(obj, true, "realized", &local_err);
-> > +    icp_create(cs, spapr->icp_type, XICS_FABRIC(spapr), &local_err);
-> >      if (local_err) {
-> > -        goto free_icp;
-> > +        goto error;
-> >      }
-> > =20
-> >      return;
-> > =20
-> > -free_icp:
-> > -    object_unparent(obj);
-> >  error:
-> >      error_propagate(errp, local_err);
-> >  }
-> > diff --git a/include/hw/ppc/xics.h b/include/hw/ppc/xics.h
-> > index 2df99be111ce..126b47dec38b 100644
-> > --- a/include/hw/ppc/xics.h
-> > +++ b/include/hw/ppc/xics.h
-> > @@ -212,4 +212,7 @@ typedef struct sPAPRMachineState sPAPRMachineState;
-> >  int xics_kvm_init(sPAPRMachineState *spapr, Error **errp);
-> >  void xics_spapr_init(sPAPRMachineState *spapr);
-> > =20
-> > +Object *icp_create(CPUState *cs, const char *type, XICSFabric *xi,
-> > +                   Error **errp);
-> > +
-> >  #endif /* XICS_H */ =20
->=20
-
-
---Sig_/azfFk.ws.oxG0F7+3LCYd1A
-Content-Type: application/pgp-signature
-Content-Description: OpenPGP digital signature
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAEBCAAdFiEEtIKLr5QxQM7yo0kQcdTV5YIvc9YFAloX7KMACgkQcdTV5YIv
-c9YM/RAAk92DAdl/8Vo6JnRbmFUS3Quls66JARe5TmCBNyL5fywYcWcddaM+zgOL
-vGSR0Lz1jyCLFX9t6BupHr86bpHoNWT2k5BhY0YB+S0GjUsKddtzQzMzE5VZeWx8
-udYvo7rfhnpD4pT7RcZFoN6ypzpyJo5s1d4/COQPBPeqfvgeSGL+3waXnwxl4AK4
-LHzPKevYhwHs82Lx2S5hwh/Nze42SQJzRPNeWJ/0khbIM5je0N6+tIuLByB+mF/9
-oA8KTjesTDflQD/y9ncqaHZYiNgBpnv01DVM0C7CgC4gHHhg3cZta7RpLxz7fEB5
-cfXIgBrGOKKjI1PdL1Fr51epIaQ1hsfvbW8mWXTTGfhgqztrnHpS2RwyCD9xfzF0
-4y7VToG8a5VKbewtjhU7zZGocyeTr3+QKcmiOnKo9UcYp8yGu9TgXhzlsaf8TmmQ
-0oxgjkL8ALY50/+rAXTJ6f1/g/h5RD+gCN+UahC725fBeLqHXQd2wc77E3J8Ql1+
-iNCFqaE0opoP097fSCPUIGao8Y/WSj4aHL0DjUlBRyMhu85wEMHNkxoajOLocIvg
-GHEUYrtba6z2QG+IikiCKUVupiO1czIg9k9IAKfDrEAPvGmulOKGx8J906yt0k0b
-WeuvnVreZN1N7IL8LRVHjPDm0wW50oT81fIuxfPN3dgqQbMleVs=
-=wLMd
------END PGP SIGNATURE-----
-
---Sig_/azfFk.ws.oxG0F7+3LCYd1A--
+diff --git a/hw/s390x/s390-virtio-hcall.h b/hw/s390x/s390-virtio-hcall.h
+index cbc270eef3..9800c4b351 100644
+--- a/hw/s390x/s390-virtio-hcall.h
++++ b/hw/s390x/s390-virtio-hcall.h
+@@ -1,7 +1,7 @@
+ /*
+  * Support for virtio hypercalls on s390x
+  *
+- * Copyright 2012 IBM Corp.
++ * Copyright IBM Corp. 2012, 2017
+  * Author(s): Cornelia Huck <cornelia.huck@de.ibm.com>
+  *
+  * This work is licensed under the terms of the GNU GPL, version 2 or (at
+@@ -12,9 +12,11 @@
+ #ifndef HW_S390_VIRTIO_HCALL_H
+ #define HW_S390_VIRTIO_HCALL_H
+ 
+-#include "standard-headers/asm-s390/kvm_virtio.h"
+ #include "standard-headers/asm-s390/virtio-ccw.h"
+ 
++/* The only thing that we need from the old kvm_virtio.h file */
++#define KVM_S390_VIRTIO_NOTIFY 0
++
+ typedef int (*s390_virtio_fn)(const uint64_t *args);
+ void s390_register_virtio_hypercall(uint64_t code, s390_virtio_fn fn);
+ int s390_virtio_hypercall(CPUS390XState *env);
+diff --git a/include/standard-headers/asm-s390/kvm_virtio.h b/include/standard-headers/asm-s390/kvm_virtio.h
+deleted file mode 100644
+index daad3249d2..0000000000
+--- a/include/standard-headers/asm-s390/kvm_virtio.h
++++ /dev/null
+@@ -1,64 +0,0 @@
+-/*
+- * definition for virtio for kvm on s390
+- *
+- * Copyright IBM Corp. 2008
+- *
+- * This program is free software; you can redistribute it and/or modify
+- * it under the terms of the GNU General Public License (version 2 only)
+- * as published by the Free Software Foundation.
+- *
+- *    Author(s): Christian Borntraeger <borntraeger@de.ibm.com>
+- */
+-
+-#ifndef __KVM_S390_VIRTIO_H
+-#define __KVM_S390_VIRTIO_H
+-
+-#include "standard-headers/linux/types.h"
+-
+-struct kvm_device_desc {
+-	/* The device type: console, network, disk etc.  Type 0 terminates. */
+-	uint8_t type;
+-	/* The number of virtqueues (first in config array) */
+-	uint8_t num_vq;
+-	/*
+-	 * The number of bytes of feature bits.  Multiply by 2: one for host
+-	 * features and one for guest acknowledgements.
+-	 */
+-	uint8_t feature_len;
+-	/* The number of bytes of the config array after virtqueues. */
+-	uint8_t config_len;
+-	/* A status byte, written by the Guest. */
+-	uint8_t status;
+-	uint8_t config[0];
+-};
+-
+-/*
+- * This is how we expect the device configuration field for a virtqueue
+- * to be laid out in config space.
+- */
+-struct kvm_vqconfig {
+-	/* The token returned with an interrupt. Set by the guest */
+-	uint64_t token;
+-	/* The address of the virtio ring */
+-	uint64_t address;
+-	/* The number of entries in the virtio_ring */
+-	uint16_t num;
+-
+-};
+-
+-#define KVM_S390_VIRTIO_NOTIFY		0
+-#define KVM_S390_VIRTIO_RESET		1
+-#define KVM_S390_VIRTIO_SET_STATUS	2
+-
+-/* The alignment to use between consumer and producer parts of vring.
+- * This is pagesize for historical reasons. */
+-#define KVM_S390_VIRTIO_RING_ALIGN	4096
+-
+-
+-/* These values are supposed to be in ext_params on an interrupt */
+-#define VIRTIO_PARAM_MASK		0xff
+-#define VIRTIO_PARAM_VRING_INTERRUPT	0x0
+-#define VIRTIO_PARAM_CONFIG_CHANGED	0x1
+-#define VIRTIO_PARAM_DEV_ADD		0x2
+-
+-#endif
+diff --git a/scripts/update-linux-headers.sh b/scripts/update-linux-headers.sh
+index 76fd894a77..135a10d96a 100755
+--- a/scripts/update-linux-headers.sh
++++ b/scripts/update-linux-headers.sh
+@@ -95,7 +95,6 @@ for arch in $ARCHLIST; do
+     rm -rf "$output/include/standard-headers/asm-$arch"
+     mkdir -p "$output/include/standard-headers/asm-$arch"
+     if [ $arch = s390 ]; then
+-        cp_portable "$tmpdir/include/asm/kvm_virtio.h" "$output/include/standard-headers/asm-s390/"
+         cp_portable "$tmpdir/include/asm/virtio-ccw.h" "$output/include/standard-headers/asm-s390/"
+     fi
+     if [ $arch = arm ]; then
+-- 
+2.13.6
