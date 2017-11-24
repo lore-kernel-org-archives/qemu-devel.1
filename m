@@ -1,22 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52177)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52218)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1eI4h1-0000Gj-7W
-	for qemu-devel@nongnu.org; Thu, 23 Nov 2017 22:30:20 -0500
+	(envelope-from <dgibson@ozlabs.org>) id 1eI4h3-0000IS-Dq
+	for qemu-devel@nongnu.org; Thu, 23 Nov 2017 22:30:23 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1eI4gz-0003Df-U3
-	for qemu-devel@nongnu.org; Thu, 23 Nov 2017 22:30:19 -0500
-Date: Fri, 24 Nov 2017 14:18:20 +1100
+	(envelope-from <dgibson@ozlabs.org>) id 1eI4gz-0003Dh-Tq
+	for qemu-devel@nongnu.org; Thu, 23 Nov 2017 22:30:21 -0500
+Date: Fri, 24 Nov 2017 14:13:47 +1100
 From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20171124031820.GE28000@umbus.fritz.box>
+Message-ID: <20171124031347.GC28000@umbus.fritz.box>
 References: <20171123132955.1261-1-clg@kaod.org>
-	<20171123132955.1261-7-clg@kaod.org>
+	<20171123132955.1261-5-clg@kaod.org>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="cYtjc4pxslFTELvY"
+	protocol="application/pgp-signature"; boundary="NKoe5XOeduwbEQHU"
 Content-Disposition: inline
-In-Reply-To: <20171123132955.1261-7-clg@kaod.org>
-Subject: Re: [Qemu-devel] [PATCH 06/25] spapr: introduce a
- spapr_irq_get_qirq() helper
+In-Reply-To: <20171123132955.1261-5-clg@kaod.org>
+Subject: Re: [Qemu-devel] [PATCH 04/25] spapr: move the IRQ allocation
+ routines under the machine
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,192 +29,443 @@ To: =?iso-8859-1?Q?C=E9dric?= Le Goater <clg@kaod.org>
 Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, Benjamin Herrenschmidt <benh@kernel.crashing.org>
 
 
---cYtjc4pxslFTELvY
+--NKoe5XOeduwbEQHU
 Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Thu, Nov 23, 2017 at 02:29:36PM +0100, C=E9dric Le Goater wrote:
-> xics_get_qirq() is only used by the sPAPR machine. Let's move it there
-> and change its name to reflect its scope. It will be useful for XIVE
-> support which will use its own set of qirqs.
+On Thu, Nov 23, 2017 at 02:29:34PM +0100, C=E9dric Le Goater wrote:
+> Also change the prototype to use a sPAPRMachineState and prefix them
+> with spapr_irq_. It will let us synchronise the IRQ allocation with
+> the XIVE interrupt mode when available.
 >=20
 > Signed-off-by: C=E9dric Le Goater <clg@kaod.org>
-
-s/spapr_irq_get_qirq/spapr_qirq/
-
-for brevity
-
-With that change
 
 Reviewed-by: David Gibson <david@gibson.dropbear.id.au>
 
 > ---
->  hw/intc/xics.c              | 12 ------------
->  hw/ppc/spapr.c              | 11 +++++++++++
->  hw/ppc/spapr_events.c       | 12 +++++-------
->  hw/ppc/spapr_pci.c          |  2 +-
->  include/hw/pci-host/spapr.h |  2 +-
->  include/hw/ppc/spapr.h      |  1 +
->  include/hw/ppc/spapr_vio.h  |  2 +-
->  include/hw/ppc/xics.h       |  1 -
->  8 files changed, 20 insertions(+), 23 deletions(-)
+>  hw/intc/trace-events   |   4 --
+>  hw/intc/xics_spapr.c   | 114 -------------------------------------------=
+------
+>  hw/ppc/spapr.c         | 114 +++++++++++++++++++++++++++++++++++++++++++=
+++++++
+>  hw/ppc/spapr_events.c  |   4 +-
+>  hw/ppc/spapr_pci.c     |   8 ++--
+>  hw/ppc/spapr_vio.c     |   2 +-
+>  hw/ppc/trace-events    |   4 ++
+>  include/hw/ppc/spapr.h |   6 +++
+>  include/hw/ppc/xics.h  |   4 --
+>  9 files changed, 131 insertions(+), 129 deletions(-)
 >=20
-> diff --git a/hw/intc/xics.c b/hw/intc/xics.c
-> index 0f2e7273bc8f..a78b4dbd033d 100644
-> --- a/hw/intc/xics.c
-> +++ b/hw/intc/xics.c
-> @@ -714,18 +714,6 @@ static const TypeInfo xics_fabric_info =3D {
->  /*
->   * Exported functions
->   */
-> -qemu_irq xics_get_qirq(XICSFabric *xi, int irq)
-> -{
-> -    XICSFabricClass *xic =3D XICS_FABRIC_GET_CLASS(xi);
-> -    ICSState *ics =3D xic->ics_get(xi, irq);
-> -
-> -    if (ics) {
-> -        return ics->qirqs[irq - ics->offset];
-> -    }
-> -
-> -    return NULL;
-> -}
-> -
->  ICPState *xics_icp_get(XICSFabric *xi, int server)
->  {
->      XICSFabricClass *xic =3D XICS_FABRIC_GET_CLASS(xi);
-> diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-> index 79f38a9ff4e1..5d3325ca3c88 100644
-> --- a/hw/ppc/spapr.c
-> +++ b/hw/ppc/spapr.c
-> @@ -3689,6 +3689,17 @@ void spapr_irq_free(sPAPRMachineState *spapr, int =
-irq, int num)
->      }
+> diff --git a/hw/intc/trace-events b/hw/intc/trace-events
+> index b298fac7c6a8..7077aaaee6d0 100644
+> --- a/hw/intc/trace-events
+> +++ b/hw/intc/trace-events
+> @@ -64,10 +64,6 @@ xics_ics_simple_set_irq_lsi(int srcno, int nr) "set_ir=
+q_lsi: srcno %d [irq 0x%x]
+>  xics_ics_simple_write_xive(int nr, int srcno, int server, uint8_t priori=
+ty) "ics_write_xive: irq 0x%x [src %d] server 0x%x prio 0x%x"
+>  xics_ics_simple_reject(int nr, int srcno) "reject irq 0x%x [src %d]"
+>  xics_ics_simple_eoi(int nr) "ics_eoi: irq 0x%x"
+> -xics_alloc(int irq) "irq %d"
+> -xics_alloc_block(int first, int num, bool lsi, int align) "first irq %d,=
+ %d irqs, lsi=3D%d, alignnum %d"
+> -xics_ics_free(int src, int irq, int num) "Source#%d, first irq %d, %d ir=
+qs"
+> -xics_ics_free_warn(int src, int irq) "Source#%d, irq %d is already free"
+> =20
+>  # hw/intc/s390_flic_kvm.c
+>  flic_create_device(int err) "flic: create device failed %d"
+> diff --git a/hw/intc/xics_spapr.c b/hw/intc/xics_spapr.c
+> index e8c0a1b3e903..5a0967caf430 100644
+> --- a/hw/intc/xics_spapr.c
+> +++ b/hw/intc/xics_spapr.c
+> @@ -245,120 +245,6 @@ void xics_spapr_init(sPAPRMachineState *spapr)
+>      spapr_register_hypercall(H_IPOLL, h_ipoll);
 >  }
 > =20
-> +qemu_irq spapr_irq_get_qirq(sPAPRMachineState *spapr, int irq)
-> +{
-> +    ICSState *ics =3D spapr->ics;
+> -#define ICS_IRQ_FREE(ics, srcno)   \
+> -    (!((ics)->irqs[(srcno)].flags & (XICS_FLAGS_IRQ_MASK)))
+> -
+> -static int ics_find_free_block(ICSState *ics, int num, int alignnum)
+> -{
+> -    int first, i;
+> -
+> -    for (first =3D 0; first < ics->nr_irqs; first +=3D alignnum) {
+> -        if (num > (ics->nr_irqs - first)) {
+> -            return -1;
+> -        }
+> -        for (i =3D first; i < first + num; ++i) {
+> -            if (!ICS_IRQ_FREE(ics, i)) {
+> -                break;
+> -            }
+> -        }
+> -        if (i =3D=3D (first + num)) {
+> -            return first;
+> -        }
+> -    }
+> -
+> -    return -1;
+> -}
+> -
+> -int spapr_ics_alloc(ICSState *ics, int irq_hint, bool lsi, Error **errp)
+> -{
+> -    int irq;
+> -
+> -    if (!ics) {
+> -        return -1;
+> -    }
+> -    if (irq_hint) {
+> -        if (!ICS_IRQ_FREE(ics, irq_hint - ics->offset)) {
+> -            error_setg(errp, "can't allocate IRQ %d: already in use", ir=
+q_hint);
+> -            return -1;
+> -        }
+> -        irq =3D irq_hint;
+> -    } else {
+> -        irq =3D ics_find_free_block(ics, 1, 1);
+> -        if (irq < 0) {
+> -            error_setg(errp, "can't allocate IRQ: no IRQ left");
+> -            return -1;
+> -        }
+> -        irq +=3D ics->offset;
+> -    }
+> -
+> -    ics_set_irq_type(ics, irq - ics->offset, lsi);
+> -    trace_xics_alloc(irq);
+> -
+> -    return irq;
+> -}
+> -
+> -/*
+> - * Allocate block of consecutive IRQs, and return the number of the firs=
+t IRQ in
+> - * the block. If align=3D=3Dtrue, aligns the first IRQ number to num.
+> - */
+> -int spapr_ics_alloc_block(ICSState *ics, int num, bool lsi,
+> -                          bool align, Error **errp)
+> -{
+> -    int i, first =3D -1;
+> -
+> -    if (!ics) {
+> -        return -1;
+> -    }
+> -
+> -    /*
+> -     * MSIMesage::data is used for storing VIRQ so
+> -     * it has to be aligned to num to support multiple
+> -     * MSI vectors. MSI-X is not affected by this.
+> -     * The hint is used for the first IRQ, the rest should
+> -     * be allocated continuously.
+> -     */
+> -    if (align) {
+> -        assert((num =3D=3D 1) || (num =3D=3D 2) || (num =3D=3D 4) ||
+> -               (num =3D=3D 8) || (num =3D=3D 16) || (num =3D=3D 32));
+> -        first =3D ics_find_free_block(ics, num, num);
+> -    } else {
+> -        first =3D ics_find_free_block(ics, num, 1);
+> -    }
+> -    if (first < 0) {
+> -        error_setg(errp, "can't find a free %d-IRQ block", num);
+> -        return -1;
+> -    }
+> -
+> -    for (i =3D first; i < first + num; ++i) {
+> -        ics_set_irq_type(ics, i, lsi);
+> -    }
+> -    first +=3D ics->offset;
+> -
+> -    trace_xics_alloc_block(first, num, lsi, align);
+> -
+> -    return first;
+> -}
+> -
+> -static void ics_free(ICSState *ics, int srcno, int num)
+> -{
+> -    int i;
+> -
+> -    for (i =3D srcno; i < srcno + num; ++i) {
+> -        if (ICS_IRQ_FREE(ics, i)) {
+> -            trace_xics_ics_free_warn(0, i + ics->offset);
+> -        }
+> -        memset(&ics->irqs[i], 0, sizeof(ICSIRQState));
+> -    }
+> -}
+> -
+> -void spapr_ics_free(ICSState *ics, int irq, int num)
+> -{
+> -    if (ics_valid_irq(ics, irq)) {
+> -        trace_xics_ics_free(0, irq, num);
+> -        ics_free(ics, irq - ics->offset, num);
+> -    }
+> -}
+> -
+>  void spapr_dt_xics(int nr_servers, void *fdt, uint32_t phandle)
+>  {
+>      uint32_t interrupt_server_ranges_prop[] =3D {
+> diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
+> index 925cbd3c1bf4..7ae84d40bdb4 100644
+> --- a/hw/ppc/spapr.c
+> +++ b/hw/ppc/spapr.c
+> @@ -3570,6 +3570,120 @@ Object *spapr_icp_create(sPAPRMachineState *spapr=
+, CPUState *cs, Error **errp)
+>      return obj;
+>  }
+> =20
+> +#define ICS_IRQ_FREE(ics, srcno)   \
+> +    (!((ics)->irqs[(srcno)].flags & (XICS_FLAGS_IRQ_MASK)))
 > +
-> +    if (ics_valid_irq(ics, irq)) {
-> +        return ics->qirqs[irq - ics->offset];
+> +static int ics_find_free_block(ICSState *ics, int num, int alignnum)
+> +{
+> +    int first, i;
+> +
+> +    for (first =3D 0; first < ics->nr_irqs; first +=3D alignnum) {
+> +        if (num > (ics->nr_irqs - first)) {
+> +            return -1;
+> +        }
+> +        for (i =3D first; i < first + num; ++i) {
+> +            if (!ICS_IRQ_FREE(ics, i)) {
+> +                break;
+> +            }
+> +        }
+> +        if (i =3D=3D (first + num)) {
+> +            return first;
+> +        }
 > +    }
 > +
-> +    return NULL;
+> +    return -1;
+> +}
+> +
+> +int spapr_irq_alloc(sPAPRMachineState *spapr, int irq_hint, bool lsi,
+> +                    Error **errp)
+> +{
+> +    ICSState *ics =3D spapr->ics;
+> +    int irq;
+> +
+> +    if (!ics) {
+> +        return -1;
+> +    }
+> +    if (irq_hint) {
+> +        if (!ICS_IRQ_FREE(ics, irq_hint - ics->offset)) {
+> +            error_setg(errp, "can't allocate IRQ %d: already in use", ir=
+q_hint);
+> +            return -1;
+> +        }
+> +        irq =3D irq_hint;
+> +    } else {
+> +        irq =3D ics_find_free_block(ics, 1, 1);
+> +        if (irq < 0) {
+> +            error_setg(errp, "can't allocate IRQ: no IRQ left");
+> +            return -1;
+> +        }
+> +        irq +=3D ics->offset;
+> +    }
+> +
+> +    ics_set_irq_type(ics, irq - ics->offset, lsi);
+> +    trace_spapr_irq_alloc(irq);
+> +
+> +    return irq;
+> +}
+> +
+> +/*
+> + * Allocate block of consecutive IRQs, and return the number of the firs=
+t IRQ in
+> + * the block. If align=3D=3Dtrue, aligns the first IRQ number to num.
+> + */
+> +int spapr_irq_alloc_block(sPAPRMachineState *spapr, int num, bool lsi,
+> +                          bool align, Error **errp)
+> +{
+> +    ICSState *ics =3D spapr->ics;
+> +    int i, first =3D -1;
+> +
+> +    if (!ics) {
+> +        return -1;
+> +    }
+> +
+> +    /*
+> +     * MSIMesage::data is used for storing VIRQ so
+> +     * it has to be aligned to num to support multiple
+> +     * MSI vectors. MSI-X is not affected by this.
+> +     * The hint is used for the first IRQ, the rest should
+> +     * be allocated continuously.
+> +     */
+> +    if (align) {
+> +        assert((num =3D=3D 1) || (num =3D=3D 2) || (num =3D=3D 4) ||
+> +               (num =3D=3D 8) || (num =3D=3D 16) || (num =3D=3D 32));
+> +        first =3D ics_find_free_block(ics, num, num);
+> +    } else {
+> +        first =3D ics_find_free_block(ics, num, 1);
+> +    }
+> +    if (first < 0) {
+> +        error_setg(errp, "can't find a free %d-IRQ block", num);
+> +        return -1;
+> +    }
+> +
+> +    for (i =3D first; i < first + num; ++i) {
+> +        ics_set_irq_type(ics, i, lsi);
+> +    }
+> +    first +=3D ics->offset;
+> +
+> +    trace_spapr_irq_alloc_block(first, num, lsi, align);
+> +
+> +    return first;
+> +}
+> +
+> +void spapr_irq_free(sPAPRMachineState *spapr, int irq, int num)
+> +{
+> +    ICSState *ics =3D spapr->ics;
+> +    int srcno =3D irq - ics->offset;
+> +    int i;
+> +
+> +    if (ics_valid_irq(ics, irq)) {
+> +        trace_spapr_irq_free(0, irq, num);
+> +        for (i =3D srcno; i < srcno + num; ++i) {
+> +            if (ICS_IRQ_FREE(ics, i)) {
+> +                trace_spapr_irq_free_warn(0, i + ics->offset);
+> +            }
+> +            memset(&ics->irqs[i], 0, sizeof(ICSIRQState));
+> +        }
+> +    }
 > +}
 > +
 >  static void spapr_pic_print_info(InterruptStatsProvider *obj,
 >                                   Monitor *mon)
 >  {
 > diff --git a/hw/ppc/spapr_events.c b/hw/ppc/spapr_events.c
-> index cead596f3e7a..0427590e9cac 100644
+> index e377fc7ddea2..cead596f3e7a 100644
 > --- a/hw/ppc/spapr_events.c
 > +++ b/hw/ppc/spapr_events.c
-> @@ -472,9 +472,8 @@ static void spapr_powerdown_req(Notifier *n, void *op=
-aque)
+> @@ -718,7 +718,7 @@ void spapr_events_init(sPAPRMachineState *spapr)
+>      spapr->event_sources =3D spapr_event_sources_new();
 > =20
->      rtas_event_log_queue(spapr, entry);
+>      spapr_event_sources_register(spapr->event_sources, EVENT_CLASS_EPOW,
+> -                                 spapr_ics_alloc(spapr->ics, 0, false,
+> +                                 spapr_irq_alloc(spapr, 0, false,
+>                                                    &error_fatal));
 > =20
-> -    qemu_irq_pulse(xics_get_qirq(XICS_FABRIC(spapr),
-> -                                 rtas_event_log_to_irq(spapr,
-> -                                                       RTAS_LOG_TYPE_EPO=
-W)));
-> +    qemu_irq_pulse(spapr_irq_get_qirq(spapr,
-> +                   rtas_event_log_to_irq(spapr, RTAS_LOG_TYPE_EPOW)));
->  }
-> =20
->  static void spapr_hotplug_req_event(uint8_t hp_id, uint8_t hp_action,
-> @@ -556,9 +555,8 @@ static void spapr_hotplug_req_event(uint8_t hp_id, ui=
-nt8_t hp_action,
-> =20
->      rtas_event_log_queue(spapr, entry);
-> =20
-> -    qemu_irq_pulse(xics_get_qirq(XICS_FABRIC(spapr),
-> -                                 rtas_event_log_to_irq(spapr,
-> -                                                       RTAS_LOG_TYPE_HOT=
-PLUG)));
-> +    qemu_irq_pulse(spapr_irq_get_qirq(spapr,
-> +                   rtas_event_log_to_irq(spapr, RTAS_LOG_TYPE_HOTPLUG)));
->  }
-> =20
->  void spapr_hotplug_req_add_by_index(sPAPRDRConnector *drc)
-> @@ -678,7 +676,7 @@ static void check_exception(PowerPCCPU *cpu, sPAPRMac=
-hineState *spapr,
->                  spapr_event_sources_get_source(spapr->event_sources, i);
-> =20
->              g_assert(source->enabled);
-> -            qemu_irq_pulse(xics_get_qirq(XICS_FABRIC(spapr), source->irq=
-));
-> +            qemu_irq_pulse(spapr_irq_get_qirq(spapr, source->irq));
->          }
+>      /* NOTE: if machine supports modern/dedicated hotplug event source,
+> @@ -731,7 +731,7 @@ void spapr_events_init(sPAPRMachineState *spapr)
+>       */
+>      if (spapr->use_hotplug_event_source) {
+>          spapr_event_sources_register(spapr->event_sources, EVENT_CLASS_H=
+OT_PLUG,
+> -                                     spapr_ics_alloc(spapr->ics, 0, fals=
+e,
+> +                                     spapr_irq_alloc(spapr, 0, false,
+>                                                        &error_fatal));
 >      }
 > =20
 > diff --git a/hw/ppc/spapr_pci.c b/hw/ppc/spapr_pci.c
-> index e0ef77a480e5..a02faa12333e 100644
+> index 5a3122a9f9f9..e0ef77a480e5 100644
 > --- a/hw/ppc/spapr_pci.c
 > +++ b/hw/ppc/spapr_pci.c
-> @@ -723,7 +723,7 @@ static void spapr_msi_write(void *opaque, hwaddr addr,
+> @@ -314,7 +314,7 @@ static void rtas_ibm_change_msi(PowerPCCPU *cpu, sPAP=
+RMachineState *spapr,
+>              return;
+>          }
 > =20
->      trace_spapr_pci_msi_write(addr, data, irq);
+> -        spapr_ics_free(spapr->ics, msi->first_irq, msi->num);
+> +        spapr_irq_free(spapr, msi->first_irq, msi->num);
+>          if (msi_present(pdev)) {
+>              spapr_msi_setmsg(pdev, 0, false, 0, 0);
+>          }
+> @@ -352,7 +352,7 @@ static void rtas_ibm_change_msi(PowerPCCPU *cpu, sPAP=
+RMachineState *spapr,
+>      }
 > =20
-> -    qemu_irq_pulse(xics_get_qirq(XICS_FABRIC(spapr), irq));
-> +    qemu_irq_pulse(spapr_irq_get_qirq(spapr, irq));
->  }
+>      /* Allocate MSIs */
+> -    irq =3D spapr_ics_alloc_block(spapr->ics, req_num, false,
+> +    irq =3D spapr_irq_alloc_block(spapr, req_num, false,
+>                             ret_intr_type =3D=3D RTAS_TYPE_MSI, &err);
+>      if (err) {
+>          error_reportf_err(err, "Can't allocate MSIs for device %x: ",
+> @@ -363,7 +363,7 @@ static void rtas_ibm_change_msi(PowerPCCPU *cpu, sPAP=
+RMachineState *spapr,
 > =20
->  static const MemoryRegionOps spapr_msi_ops =3D {
-> diff --git a/include/hw/pci-host/spapr.h b/include/hw/pci-host/spapr.h
-> index 38470b2f0e5c..3059fdd614e6 100644
-> --- a/include/hw/pci-host/spapr.h
-> +++ b/include/hw/pci-host/spapr.h
-> @@ -108,7 +108,7 @@ static inline qemu_irq spapr_phb_lsi_qirq(struct sPAP=
-RPHBState *phb, int pin)
->  {
->      sPAPRMachineState *spapr =3D SPAPR_MACHINE(qdev_get_machine());
+>      /* Release previous MSIs */
+>      if (msi) {
+> -        spapr_ics_free(spapr->ics, msi->first_irq, msi->num);
+> +        spapr_irq_free(spapr, msi->first_irq, msi->num);
+>          g_hash_table_remove(phb->msi, &config_addr);
+>      }
 > =20
-> -    return xics_get_qirq(XICS_FABRIC(spapr), phb->lsi_table[pin].irq);
-> +    return spapr_irq_get_qirq(spapr, phb->lsi_table[pin].irq);
->  }
+> @@ -1675,7 +1675,7 @@ static void spapr_phb_realize(DeviceState *dev, Err=
+or **errp)
+>          uint32_t irq;
+>          Error *local_err =3D NULL;
 > =20
->  PCIHostState *spapr_create_phb(sPAPRMachineState *spapr, int index);
+> -        irq =3D spapr_ics_alloc_block(spapr->ics, 1, true, false, &local=
+_err);
+> +        irq =3D spapr_irq_alloc_block(spapr, 1, true, false, &local_err);
+>          if (local_err) {
+>              error_propagate(errp, local_err);
+>              error_prepend(errp, "can't allocate LSIs: ");
+> diff --git a/hw/ppc/spapr_vio.c b/hw/ppc/spapr_vio.c
+> index ea3bc8bd9e21..bb7ed2c537b0 100644
+> --- a/hw/ppc/spapr_vio.c
+> +++ b/hw/ppc/spapr_vio.c
+> @@ -454,7 +454,7 @@ static void spapr_vio_busdev_realize(DeviceState *qde=
+v, Error **errp)
+>          dev->qdev.id =3D id;
+>      }
+> =20
+> -    dev->irq =3D spapr_ics_alloc(spapr->ics, dev->irq, false, &local_err=
+);
+> +    dev->irq =3D spapr_irq_alloc(spapr, dev->irq, false, &local_err);
+>      if (local_err) {
+>          error_propagate(errp, local_err);
+>          return;
+> diff --git a/hw/ppc/trace-events b/hw/ppc/trace-events
+> index 4a6a6490fa78..b7c3e64b5ee7 100644
+> --- a/hw/ppc/trace-events
+> +++ b/hw/ppc/trace-events
+> @@ -12,6 +12,10 @@ spapr_pci_msi_retry(unsigned config_addr, unsigned req=
+_num, unsigned max_irqs) "
+>  # hw/ppc/spapr.c
+>  spapr_cas_failed(unsigned long n) "DT diff buffer is too small: %ld byte=
+s"
+>  spapr_cas_continue(unsigned long n) "Copy changes to the guest: %ld byte=
+s"
+> +spapr_irq_alloc(int irq) "irq %d"
+> +spapr_irq_alloc_block(int first, int num, bool lsi, int align) "first ir=
+q %d, %d irqs, lsi=3D%d, alignnum %d"
+> +spapr_irq_free(int src, int irq, int num) "Source#%d, first irq %d, %d i=
+rqs"
+> +spapr_irq_free_warn(int src, int irq) "Source#%d, irq %d is already free"
+> =20
+>  # hw/ppc/spapr_hcall.c
+>  spapr_cas_pvr_try(uint32_t pvr) "0x%x"
 > diff --git a/include/hw/ppc/spapr.h b/include/hw/ppc/spapr.h
-> index 7a133f80411a..9a3885593c86 100644
+> index 9da38de34277..7a133f80411a 100644
 > --- a/include/hw/ppc/spapr.h
 > +++ b/include/hw/ppc/spapr.h
-> @@ -714,5 +714,6 @@ int spapr_irq_alloc(sPAPRMachineState *spapr, int irq=
-_hint, bool lsi,
->  int spapr_irq_alloc_block(sPAPRMachineState *spapr, int num, bool lsi,
->                            bool align, Error **errp);
->  void spapr_irq_free(sPAPRMachineState *spapr, int irq, int num);
-> +qemu_irq spapr_irq_get_qirq(sPAPRMachineState *spapr, int irq);
+> @@ -709,4 +709,10 @@ PowerPCCPU *spapr_find_cpu(int vcpu_id);
 > =20
+>  Object *spapr_icp_create(sPAPRMachineState *spapr, CPUState *cs, Error *=
+*errp);
+> =20
+> +int spapr_irq_alloc(sPAPRMachineState *spapr, int irq_hint, bool lsi,
+> +                    Error **errp);
+> +int spapr_irq_alloc_block(sPAPRMachineState *spapr, int num, bool lsi,
+> +                          bool align, Error **errp);
+> +void spapr_irq_free(sPAPRMachineState *spapr, int irq, int num);
+> +
 >  #endif /* HW_SPAPR_H */
-> diff --git a/include/hw/ppc/spapr_vio.h b/include/hw/ppc/spapr_vio.h
-> index 2e9685a5d900..404f1de2c046 100644
-> --- a/include/hw/ppc/spapr_vio.h
-> +++ b/include/hw/ppc/spapr_vio.h
-> @@ -87,7 +87,7 @@ static inline qemu_irq spapr_vio_qirq(VIOsPAPRDevice *d=
-ev)
->  {
->      sPAPRMachineState *spapr =3D SPAPR_MACHINE(qdev_get_machine());
-> =20
-> -    return xics_get_qirq(XICS_FABRIC(spapr), dev->irq);
-> +    return spapr_irq_get_qirq(spapr, dev->irq);
->  }
-> =20
->  static inline bool spapr_vio_dma_valid(VIOsPAPRDevice *dev, uint64_t tad=
-dr,
 > diff --git a/include/hw/ppc/xics.h b/include/hw/ppc/xics.h
-> index cea462bc7f3e..2f1f35294e6d 100644
+> index 126b47dec38b..cea462bc7f3e 100644
 > --- a/include/hw/ppc/xics.h
 > +++ b/include/hw/ppc/xics.h
-> @@ -183,7 +183,6 @@ typedef struct XICSFabricClass {
+> @@ -181,10 +181,6 @@ typedef struct XICSFabricClass {
 > =20
+>  #define XICS_IRQS_SPAPR               1024
+> =20
+> -int spapr_ics_alloc(ICSState *ics, int irq_hint, bool lsi, Error **errp);
+> -int spapr_ics_alloc_block(ICSState *ics, int num, bool lsi, bool align,
+> -                           Error **errp);
+> -void spapr_ics_free(ICSState *ics, int irq, int num);
 >  void spapr_dt_xics(int nr_servers, void *fdt, uint32_t phandle);
 > =20
-> -qemu_irq xics_get_qirq(XICSFabric *xi, int irq);
->  ICPState *xics_icp_get(XICSFabric *xi, int server);
-> =20
->  /* Internal XICS interfaces */
+>  qemu_irq xics_get_qirq(XICSFabric *xi, int irq);
 
 --=20
 David Gibson			| I'll have my music baroque, and my code
@@ -222,24 +473,24 @@ david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
 				| _way_ _around_!
 http://www.ozlabs.org/~dgibson
 
---cYtjc4pxslFTELvY
+--NKoe5XOeduwbEQHU
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAloXj3wACgkQbDjKyiDZ
-s5Klew//aT4dQ2FWZXZawu1DrXyH+x65y87pzRWDFFvcLM9TLEuI4YPtULdR+QZ4
-s+VezgYsLABmlGiYnRfgqzJGdGSZqFFegUgaD+Z09X70FHqjWfezcgqAcegmRzF0
-gLtj2pQcSPI0zRifH12a90AnV/Q5rG9vuht93jkYXBX7eI7LbrJGV2o31kcGV6qO
-QcMc4mLjjSjI7T5E2n6uCkfUuAIDsY2Z4SObedVCSxas6yCrpwQ38sY8C+H04Mzp
-ScQftqV2YMmq25KkGAyFAAQbqHddl1QAQdP1utlWN/Ahv79zPoWes5zCwnH29a7o
-IcJ7g18fm81HugTPw815QpthLRmNcaVlzJSbLBadNkqyshbEN8lA7lgF+hFjGcct
-/jRMkk/qjQiN+2f834+HZ4DGmZ59jXHsVyWJgLaIZwGx4eDH1ywvy+tYcwy24cjI
-Ny687VapV5iqpjsll4Yzk7DGiYLXDWldw7CQhL1BxPTwlqtWMVnu25OPnuSUCpUm
-BgxA7IEYpsZpJuG/+PCoqa8PqP3UdZlbKraKCNZdCXlTf6Hx1WRvEUHrLP8YPUBL
-to966iTfrrHhbYWb3mTTDhpw5cz+uGSH3Y+D13Ud5O/Mq/23aDlu89eqDZcOSI8g
-d55KleYHjk5G+5C/NDych0JHT8R9kWxmM+NUZx5oOxfyUCynzxU=
-=rICr
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAloXjmkACgkQbDjKyiDZ
+s5K+Bw/9HeAbpV9QhsjP1bc8X36wdOmcXup0GMIRiMTgIvPBdm+f4Zy046Qdz6zd
+wxjCEB/DYPp4ML6BmI/5be0qBxzFHgUFSEOkPsfM4TXJxRq1C9zk1pLxc0r3bCG8
+yNQik47q3MhZoBo66UR9UvU9iPF9ApAuyHlMpNN4vbQ+ZC0zPeknWgSGLdPqebpp
+imMZ0ItM/Gaxoj08x+Lsu8QIW1SXPWxACbCFsnUBt4pPDaGW/R5zwqCugO63d8NM
+j2PzfE9I8ajkZj8Q1JGSOUHRdH2+QYHxUDYCyE2L2WVlJ1YCqpwshYKrf8YrVGuy
+eVhWCkTPs11U9L0b/3SGgWvyHgMr+Fi+gCn2jyKiyrn9wSQd803Zy6po+FFWfqJS
+ikzkAfTYABCOqDHipe4Z5VbXJgXfS9o01FvOngUCLVelei/1pmye3y1p16c9JfmH
+I28gGlmewCeX47j21OmlfAiR8+JlvnpKnW+QUVEz7FsSBwUsKi7eXfUX9HbHWU8D
+biA6LDT4uzvm98J5t0ZEJZgNUB5RLam+tZPUOo0NKZ3m02vynIum4cas72H/PTD4
+QmZzpm544gv1jNvQj+pv7oH4ZxrRPxSxfp4PabgYlxIAfHZnvP5GjvCss7o9fVxC
+plnpKXcoQhROTt2GAyJAXqD2A1jEQPYQH6MyC7VQ2BWrR3k7sPE=
+=oDLU
 -----END PGP SIGNATURE-----
 
---cYtjc4pxslFTELvY--
+--NKoe5XOeduwbEQHU--
