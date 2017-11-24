@@ -1,27 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33301)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36978)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1eIDNk-0003ir-Rx
-	for qemu-devel@nongnu.org; Fri, 24 Nov 2017 07:47:01 -0500
+	(envelope-from <imammedo@redhat.com>) id 1eIDY0-0006df-T7
+	for qemu-devel@nongnu.org; Fri, 24 Nov 2017 07:57:37 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1eIDNh-0003bP-M1
-	for qemu-devel@nongnu.org; Fri, 24 Nov 2017 07:47:00 -0500
-Date: Fri, 24 Nov 2017 13:46:50 +0100
-From: Cornelia Huck <cohuck@redhat.com>
-Message-ID: <20171124134650.46665791.cohuck@redhat.com>
-In-Reply-To: <76f95c6f-641e-2fe0-73b4-3ab24fc1a93f@linux.vnet.ibm.com>
-References: <20171121111825.17916-1-pasic@linux.vnet.ibm.com>
-	<20171121144457.60adb0c3.cohuck@redhat.com>
-	<1145a6bc-45fd-820a-9dcc-249d9b2802ff@linux.vnet.ibm.com>
-	<20171121172022.5da16158.cohuck@redhat.com>
-	<88bc72cf-732c-fc07-9898-18d7b58b947d@linux.vnet.ibm.com>
-	<20171122131343.26da0482.cohuck@redhat.com>
-	<594e1952-7097-0927-d913-d3b915df2305@linux.vnet.ibm.com>
-	<20171122172522.281cfb4b.cohuck@redhat.com>
-	<76f95c6f-641e-2fe0-73b4-3ab24fc1a93f@linux.vnet.ibm.com>
+	(envelope-from <imammedo@redhat.com>) id 1eIDXx-00022E-Ot
+	for qemu-devel@nongnu.org; Fri, 24 Nov 2017 07:57:36 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:35794)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1eIDXx-00021Y-Ix
+	for qemu-devel@nongnu.org; Fri, 24 Nov 2017 07:57:33 -0500
+Date: Fri, 24 Nov 2017 13:57:29 +0100
+From: Igor Mammedov <imammedo@redhat.com>
+Message-ID: <20171124135729.60ceff1e@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [RFC PATCH 1/1] s390x/css: unresrict cssids
+Subject: [Qemu-devel] Windows 10 guest hang during 'info mem'
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,86 +24,22 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Halil Pasic <pasic@linux.vnet.ibm.com>
-Cc: Boris Fiuczynski <fiuczy@linux.vnet.ibm.com>, Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>, Christian Borntraeger <borntraeger@de.ibm.com>, Shalini Chellathurai Saroja <shalini@linux.vnet.ibm.com>, qemu-devel@nongnu.org, qemu-s390x@nongnu.org
+To: Qemu Developers <qemu-devel@nongnu.org>
+Cc: kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>, Radim =?UTF-8?B?S3LEjW3DocWZ?= <rkrcmar@redhat.com>
 
-On Thu, 23 Nov 2017 14:33:56 +0100
-Halil Pasic <pasic@linux.vnet.ibm.com> wrote:
+I've stumbled on WS2016 hang when trying to list memory map in QEMU.
 
-> Having an adequate representation for the css in QOM would be certainly
-> interesting, but at the same time (IMHO) is somewhat challenging. Let me
-> make some observations, which should some of my concerns. 
-> 
-> We already have virtual-css-bridge which is  the QOM type/object that
-> kind of conceptually stands for the channel subsystem as subsystem (not
-> for the images but for the big whole).
-> 
-> The virtual-css-bridge is however non-user-creatable (inherited this from
-> sysbus-device-type), so I doubt it can be used for specifying properties
-> on the command line. That is no good for something like specifying the
-> default css (image, not the big whole). What we usually do is pull up the
-> property to the machine level. But this comes at a cost.
+Steps to reproduce:
+  qemu-system-x86_64 -monitor stdio -enable-kvm -m 1G ws2016x64.img
+ wait till guest boots and execute in monitor 
+  (qemu) info mem
 
-It might be better to not have inherit this from sysbus (at the price
-of doing some stuff like reset handling ourselves.) Not sure if that
-helps for this concrete issue, though.
+qemu will hang while printing mappings, consuming 100% cpu and not
+responding to ^C.
 
-> 
-> A small digression, Christian pointed me to the -set cmd line option.
-> I've done a quick PoC (assigned an id in code and did the command line)
-> but I failed.
-> 
-> Furthermore the (canonical) QOM path of virtual-css-bridge is
-> /machine/unattached/device[2] (there is a link from sysbus but the child
-> property is connecting it to unattached, see [1]). I would prefer seeing
-> and working wit something like /machine/css/default_css.
+I've also tried with old (2.8) and current qemu master and today's
+upstream kernel where it also doesn't work but WS2012R2x64 guest
+works just fine.
 
-That's because the parent reference is not set up before registering
-the device. It should do a object_property_add_child() (as e.g. the
-flic does) so that it will show up as attached to the machine.
-
-> 
-> Under the virtual-css-bridge there is a virtual-css-bus called
-> QOM-path-ly virtual-css, so it's canonical path is
-> /machine/unattached/device[2]/virtual-css. The virtual-css-bus is in qdev
-> a bus however. AFAIU buses are not very suitable for hosting properties
-> (as one can't attach/add buses directly only via devices.
-> 
-> Another interesting fact is that virtio-ccw devices are QOMly only linked
-> to their qdev parent bus, the virtual-ccs-bus, and are a QOMly children
-> of /machine/peripheral (see [2]).
-
-That's true of anything added via qdev_device_add().
-
-[As an aside, that's why the autogenerated net devices show up as
-unattached as well. Not sure if it is worth doing anything about it.]
-
-> 
-> To sum it up: I'm pretty confused with the QOM view of things.
-> 
-> My intuition would be that the object/device has to be somewhere between
-> /machine and the vrtio-ccw devices in the children graph.  And since we
-> want to do a command line controllable properties on the css object, the
-> object probably needs to be a device.
-> 
-> Given what we currently have I don't see a good place for this css
-> object.
-
-I don't think qom is supposed to map the hardware hierarchy (I might be
-mistaken, though.) I don't see anything speaking against a css object
-attached to the machine (if we can't use the css bridge for that
-purpose.)
-
-> 
-> Furthermore I'm currently under the impression that every non-abstract
-> device is user creatable (but some can be created only implicitly). Some
-> seem to go even further and say should workwith device-add [3].
-
-There are quite a number of devices for which being user-createable
-does not make any sense at all.
-
-What _could_ make sense is having a way to add css images manually and
-having specify whether they are default. (Obviously not when they are
-hotplugged.) For compatibility, we could create css image 0xfe
-automatically as default if none has been defined. Not sure how easy it
-would be to get this right, though.
+PS:
+CCing KVM list as the issue happens only when KVM is enabled.
