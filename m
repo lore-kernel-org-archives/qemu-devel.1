@@ -1,32 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42147)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44261)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1eIDuG-0005gk-86
-	for qemu-devel@nongnu.org; Fri, 24 Nov 2017 08:20:40 -0500
+	(envelope-from <dplotnikov@virtuozzo.com>) id 1eIE0t-00009W-3t
+	for qemu-devel@nongnu.org; Fri, 24 Nov 2017 08:27:28 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1eIDuB-00059B-Ej
-	for qemu-devel@nongnu.org; Fri, 24 Nov 2017 08:20:36 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:52624)
+	(envelope-from <dplotnikov@virtuozzo.com>) id 1eIE0p-0000Z8-1m
+	for qemu-devel@nongnu.org; Fri, 24 Nov 2017 08:27:27 -0500
+Received: from mailhub.sw.ru ([195.214.232.25]:3107 helo=relay.sw.ru)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1eIDuB-000593-8w
-	for qemu-devel@nongnu.org; Fri, 24 Nov 2017 08:20:31 -0500
-References: <1455443283.33337333.1500618150787.JavaMail.zimbra@redhat.com>
-	<ec5ff7c2-864e-5020-0aaa-6663e78e3756@gmail.com>
-	<1511288389.1080.14.camel@redhat.com>
-	<d1df875c-5b64-67d9-2b3c-4ec14c03b85b@gmail.com>
-	<CAPcyv4ip6m6e9Bh7weJNB3m3kpDpRkhHDZf0JYyr5UbkD41oLg@mail.gmail.com>
-	<654f8935-258e-22ef-fae4-3e14e91e8fae@redhat.com>
-	<336152896.34452750.1511527207457.JavaMail.zimbra@redhat.com>
-	<d5bcb61c-1f7c-faa7-f19b-a8f02f505b4a@redhat.com>
-	<919538865.34455774.1511528573448.JavaMail.zimbra@redhat.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <9357a268-3801-367e-0aaa-a01163ea0cbc@redhat.com>
-Date: Fri, 24 Nov 2017 14:20:22 +0100
-MIME-Version: 1.0
-In-Reply-To: <919538865.34455774.1511528573448.JavaMail.zimbra@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] KVM "fake DAX" flushing interface - discussion
+	(Exim 4.71) (envelope-from <dplotnikov@virtuozzo.com>)
+	id 1eIE0o-0000YZ-LL
+	for qemu-devel@nongnu.org; Fri, 24 Nov 2017 08:27:22 -0500
+From: Denis Plotnikov <dplotnikov@virtuozzo.com>
+Date: Fri, 24 Nov 2017 16:26:50 +0300
+Message-Id: <1511530010-511740-1-git-send-email-dplotnikov@virtuozzo.com>
+Subject: [Qemu-devel] [PATCH] i386: turn off l3-cache property by default
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,31 +22,92 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Pankaj Gupta <pagupta@redhat.com>, Christoph Hellwig <hch@infradead.org>
-Cc: Dan Williams <dan.j.williams@intel.com>, Rik van Riel <riel@redhat.com>, Xiao Guangrong <xiaoguangrong.eric@gmail.com>, Kevin Wolf <kwolf@redhat.com>, Haozhong Zhang <haozhong.zhang@intel.com>, Jan Kara <jack@suse.cz>, kvm-devel <kvm@vger.kernel.org>, "linux-nvdimm@lists.01.org" <linux-nvdimm@ml01.01.org>, Ross Zwisler <ross.zwisler@intel.com>, Qemu Developers <qemu-devel@nongnu.org>, Stefan Hajnoczi <stefanha@redhat.com>, Stefan Hajnoczi <stefanha@gmail.com>, ross zwisler <ross.zwisler@linux.intel.com>, Nitesh Narayan Lal <nilal@redhat.com>
+To: mst@redhat.com, pbonzini@redhat.com, rth@twiddle.net, ehabkost@redhat.com
+Cc: rkagan@virtuozzo.com, dplotnikov@virtuozzo.com, den@virtuozzo.com, qemu-devel@nongnu.org
 
-On 24/11/2017 14:02, Pankaj Gupta wrote:
-> 
->>>    - Suggestion by Paolo & Stefan(previously) to use virtio-blk makes sense
->>>    if just
->>>      want a flush vehicle to send guest commands to host and get reply
->>>      after asynchronous
->>>      execution. There was previous discussion [1] with Rik & Dan on this.
->>>
->>>     [1] https://lists.gnu.org/archive/html/qemu-devel/2017-07/msg08373.html
->>
->> ... in fact, the virtio-blk device _could_ actually accept regular I/O
->> too.  That would make it easier to boot from pmem.  Is there anything
->> similar in regular hardware?
-> 
-> there is existing block device associated(hard bind) with the pmem range.
-> Also, comment by Christoph [1], about removing block device with DAX support.
-> Still I am not clear about this. Am I missing anything here?
+Commit 14c985cffa "target-i386: present virtual L3 cache info for vcpus"
+introduced and set by default exposing l3 to the guest.
 
-The I/O part of the blk device would only be used by the firmware.  In
-Linux, the different device id would bind the device to a different
-driver that would only be used for flushing.
+The motivation behind it was that in the Linux scheduler, when waking up
+a task on a sibling CPU, the task was put onto the target CPU's runqueue
+directly, without sending a reschedule IPI.  Reduction in the IPI count
+led to performance gain.
 
-But maybe this idea makes no sense. :)
+However, this isn't the whole story.  Once the task is on the target
+CPU's runqueue, it may have to preempt the current task on that CPU, be
+it the idle task putting the CPU to sleep or just another running task.
+For that a reschedule IPI will have to be issued, too.  Only when that
+other CPU is running a normal task for too little time, the fairness
+constraints will prevent the preemption and thus the IPI.
 
-Paolo
+This boils down to the improvement being only achievable in workloads
+with many actively switching tasks.  We had no access to the
+(proprietary?) SAP HANA benchmark the commit referred to, but the
+pattern is also reproduced with "perf bench sched messaging -g 1"
+on 1 socket, 8 cores vCPU topology, we see indeed:
+
+l3-cache	#res IPI /s	#time / 10000 loops
+off		560K		1.8 sec
+on		40K		0.9 sec
+
+Now there's a downside: with L3 cache the Linux scheduler is more eager
+to wake up tasks on sibling CPUs, resulting in unnecessary cross-vCPU
+interactions and therefore exessive halts and IPIs.  E.g. "perf bench
+sched pipe -i 100000" gives
+
+l3-cache	#res IPI /s	#HLT /s		#time /100000 loops
+off		200 (no K)	230		0.2 sec
+on		400K		330K		0.5 sec
+
+In a more realistic test, we observe 15% degradation in VM density
+(measured as the number of VMs, each running Drupal CMS serving 2 http
+requests per second to its main page, with 95%-percentile response
+latency under 100 ms) with l3-cache=on.
+
+We think that mostly-idle scenario is more common in cloud and personal
+usage, and should be optimized for by default; users of highly loaded
+VMs should be able to tune them up themselves.
+
+So switch l3-cache off by default, and add a compat clause for the range
+of machine types where it was on.
+
+Signed-off-by: Denis Plotnikov <dplotnikov@virtuozzo.com>
+Reviewed-by: Roman Kagan <rkagan@virtuozzo.com>
+---
+ include/hw/i386/pc.h | 7 ++++++-
+ target/i386/cpu.c    | 2 +-
+ 2 files changed, 7 insertions(+), 2 deletions(-)
+
+diff --git a/include/hw/i386/pc.h b/include/hw/i386/pc.h
+index 087d184..1d2dcae 100644
+--- a/include/hw/i386/pc.h
++++ b/include/hw/i386/pc.h
+@@ -375,7 +375,12 @@ bool e820_get_entry(int, uint32_t, uint64_t *, uint64_t *);
+         .driver   = TYPE_X86_CPU,\
+         .property = "x-hv-max-vps",\
+         .value    = "0x40",\
+-    },
++    },\
++    {\
++        .driver   = TYPE_X86_CPU,\
++        .property = "l3-cache",\
++        .value    = "on",\
++    },\
+ 
+ #define PC_COMPAT_2_9 \
+     HW_COMPAT_2_9 \
+diff --git a/target/i386/cpu.c b/target/i386/cpu.c
+index 1edcf29..95a51bd 100644
+--- a/target/i386/cpu.c
++++ b/target/i386/cpu.c
+@@ -4154,7 +4154,7 @@ static Property x86_cpu_properties[] = {
+     DEFINE_PROP_STRING("hv-vendor-id", X86CPU, hyperv_vendor_id),
+     DEFINE_PROP_BOOL("cpuid-0xb", X86CPU, enable_cpuid_0xb, true),
+     DEFINE_PROP_BOOL("lmce", X86CPU, enable_lmce, false),
+-    DEFINE_PROP_BOOL("l3-cache", X86CPU, enable_l3_cache, true),
++    DEFINE_PROP_BOOL("l3-cache", X86CPU, enable_l3_cache, false),
+     DEFINE_PROP_BOOL("kvm-no-smi-migration", X86CPU, kvm_no_smi_migration,
+                      false),
+     DEFINE_PROP_BOOL("vmware-cpuid-freq", X86CPU, vmware_cpuid_freq, true),
+-- 
+2.7.4
