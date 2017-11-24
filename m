@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56962)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56998)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eric.auger@redhat.com>) id 1eIEoY-0005Hp-3e
-	for qemu-devel@nongnu.org; Fri, 24 Nov 2017 09:18:47 -0500
+	(envelope-from <eric.auger@redhat.com>) id 1eIEog-0005Ox-1F
+	for qemu-devel@nongnu.org; Fri, 24 Nov 2017 09:18:56 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eric.auger@redhat.com>) id 1eIEoX-0001K2-17
-	for qemu-devel@nongnu.org; Fri, 24 Nov 2017 09:18:46 -0500
+	(envelope-from <eric.auger@redhat.com>) id 1eIEoe-0001MN-Ur
+	for qemu-devel@nongnu.org; Fri, 24 Nov 2017 09:18:54 -0500
 From: Eric Auger <eric.auger@redhat.com>
-Date: Fri, 24 Nov 2017 15:18:24 +0100
-Message-Id: <1511533107-5315-2-git-send-email-eric.auger@redhat.com>
+Date: Fri, 24 Nov 2017 15:18:25 +0100
+Message-Id: <1511533107-5315-3-git-send-email-eric.auger@redhat.com>
 In-Reply-To: <1511533107-5315-1-git-send-email-eric.auger@redhat.com>
 References: <1511533107-5315-1-git-send-email-eric.auger@redhat.com>
-Subject: [Qemu-devel] [PATCH v5 1/4] hw/intc/arm_gicv3_its: Don't call
- post_load on reset
+Subject: [Qemu-devel] [PATCH v5 2/4] hw/intc/arm_gicv3_its: Implement a
+ minimalist reset
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,51 +23,97 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: eric.auger.pro@gmail.com, eric.auger@redhat.com, peter.maydell@linaro.org, qemu-arm@nongnu.org, qemu-devel@nongnu.org, wanghaibin.wang@huawei.com
 Cc: vijay.kilari@gmail.com, drjones@redhat.com, wei@redhat.com, quintela@redhat.com, dgilbert@redhat.com, christoffer.dall@linaro.org, wu.wubin@huawei.com
 
->From the very beginning, post_load() was called from common
-reset. This is not standard and obliged to discriminate the
-reset case from the restore case using the iidr value.
-
-Let's get rid of that call.
+At the moment the ITS is not properly reset and this causes
+various bugs on save/restore. We implement a minimalist reset
+through individual register writes but for kernel versions
+before v4.15 this fails voiding the vITS cache. We cannot
+claim we have a comprehensive reset (hence the error message)
+but that's better than nothing.
 
 Signed-off-by: Eric Auger <eric.auger@redhat.com>
-Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
 
 ---
+v4 -> v5:
+- correct error message
 
-v4 -> V5:
-- added Peter's R-b
+v2 -> v3:
+- individual register writes performed in kvm_arm_its_reset
+- check KVM_DEV_ARM_VGIC_GRP_ITS_REGS support
 ---
- hw/intc/arm_gicv3_its_common.c | 2 --
- hw/intc/arm_gicv3_its_kvm.c    | 4 ----
- 2 files changed, 6 deletions(-)
+ hw/intc/arm_gicv3_its_kvm.c | 41 +++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 41 insertions(+)
 
-diff --git a/hw/intc/arm_gicv3_its_common.c b/hw/intc/arm_gicv3_its_common.c
-index f2cce59..2bd2f0f 100644
---- a/hw/intc/arm_gicv3_its_common.c
-+++ b/hw/intc/arm_gicv3_its_common.c
-@@ -131,8 +131,6 @@ static void gicv3_its_common_reset(DeviceState *dev)
-     s->creadr = 0;
-     s->iidr = 0;
-     memset(&s->baser, 0, sizeof(s->baser));
--
--    gicv3_its_post_load(s, 0);
- }
- 
- static void gicv3_its_common_class_init(ObjectClass *klass, void *data)
 diff --git a/hw/intc/arm_gicv3_its_kvm.c b/hw/intc/arm_gicv3_its_kvm.c
-index 6fb45df..b1b322b 100644
+index b1b322b..8e307c9 100644
 --- a/hw/intc/arm_gicv3_its_kvm.c
 +++ b/hw/intc/arm_gicv3_its_kvm.c
-@@ -155,10 +155,6 @@ static void kvm_arm_its_post_load(GICv3ITSState *s)
+@@ -28,6 +28,16 @@
+ 
+ #define TYPE_KVM_ARM_ITS "arm-its-kvm"
+ #define KVM_ARM_ITS(obj) OBJECT_CHECK(GICv3ITSState, (obj), TYPE_KVM_ARM_ITS)
++#define KVM_ARM_ITS_CLASS(klass) \
++     OBJECT_CLASS_CHECK(KVMARMITSClass, (klass), TYPE_KVM_ARM_ITS)
++#define KVM_ARM_ITS_GET_CLASS(obj) \
++     OBJECT_GET_CLASS(KVMARMITSClass, (obj), TYPE_KVM_ARM_ITS)
++
++typedef struct KVMARMITSClass {
++    GICv3ITSCommonClass parent_class;
++    void (*parent_reset)(DeviceState *dev);
++} KVMARMITSClass;
++
+ 
+ static int kvm_its_send_msi(GICv3ITSState *s, uint32_t value, uint16_t devid)
  {
-     int i;
+@@ -186,6 +196,34 @@ static void kvm_arm_its_post_load(GICv3ITSState *s)
+                       GITS_CTLR, &s->ctlr, true, &error_abort);
+ }
  
--    if (!s->iidr) {
--        return;
--    }
--
-     kvm_device_access(s->dev_fd, KVM_DEV_ARM_VGIC_GRP_ITS_REGS,
-                       GITS_IIDR, &s->iidr, true, &error_abort);
++static void kvm_arm_its_reset(DeviceState *dev)
++{
++    GICv3ITSState *s = ARM_GICV3_ITS_COMMON(dev);
++    KVMARMITSClass *c = KVM_ARM_ITS_GET_CLASS(s);
++    int i;
++
++    c->parent_reset(dev);
++
++    error_report("ITS KVM: full reset is not supported by QEMU");
++
++    if (!kvm_device_check_attr(s->dev_fd, KVM_DEV_ARM_VGIC_GRP_ITS_REGS,
++                               GITS_CTLR)) {
++        return;
++    }
++
++    kvm_device_access(s->dev_fd, KVM_DEV_ARM_VGIC_GRP_ITS_REGS,
++                      GITS_CTLR, &s->ctlr, true, &error_abort);
++
++    kvm_device_access(s->dev_fd, KVM_DEV_ARM_VGIC_GRP_ITS_REGS,
++                      GITS_CBASER, &s->cbaser, true, &error_abort);
++
++    for (i = 0; i < 8; i++) {
++        kvm_device_access(s->dev_fd, KVM_DEV_ARM_VGIC_GRP_ITS_REGS,
++                          GITS_BASER + i * 8, &s->baser[i], true,
++                          &error_abort);
++    }
++}
++
+ static Property kvm_arm_its_props[] = {
+     DEFINE_PROP_LINK("parent-gicv3", GICv3ITSState, gicv3, "kvm-arm-gicv3",
+                      GICv3State *),
+@@ -196,12 +234,15 @@ static void kvm_arm_its_class_init(ObjectClass *klass, void *data)
+ {
+     DeviceClass *dc = DEVICE_CLASS(klass);
+     GICv3ITSCommonClass *icc = ARM_GICV3_ITS_COMMON_CLASS(klass);
++    KVMARMITSClass *ic = KVM_ARM_ITS_CLASS(klass);
  
+     dc->realize = kvm_arm_its_realize;
+     dc->props   = kvm_arm_its_props;
++    ic->parent_reset = dc->reset;
+     icc->send_msi = kvm_its_send_msi;
+     icc->pre_save = kvm_arm_its_pre_save;
+     icc->post_load = kvm_arm_its_post_load;
++    dc->reset = kvm_arm_its_reset;
+ }
+ 
+ static const TypeInfo kvm_arm_its_info = {
 -- 
 2.5.5
