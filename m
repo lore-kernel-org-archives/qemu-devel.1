@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56966)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57001)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <frasse.iglesias@gmail.com>) id 1eILXl-0001WL-DT
-	for qemu-devel@nongnu.org; Fri, 24 Nov 2017 16:29:54 -0500
+	(envelope-from <frasse.iglesias@gmail.com>) id 1eILXq-0001ZL-75
+	for qemu-devel@nongnu.org; Fri, 24 Nov 2017 16:29:59 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <frasse.iglesias@gmail.com>) id 1eILXk-0007aQ-KF
-	for qemu-devel@nongnu.org; Fri, 24 Nov 2017 16:29:53 -0500
-Received: from mail-lf0-x242.google.com ([2a00:1450:4010:c07::242]:43809)
+	(envelope-from <frasse.iglesias@gmail.com>) id 1eILXp-0007bS-8t
+	for qemu-devel@nongnu.org; Fri, 24 Nov 2017 16:29:58 -0500
+Received: from mail-lf0-x242.google.com ([2a00:1450:4010:c07::242]:42994)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <frasse.iglesias@gmail.com>)
-	id 1eILXk-0007Zv-DD
-	for qemu-devel@nongnu.org; Fri, 24 Nov 2017 16:29:52 -0500
-Received: by mail-lf0-x242.google.com with SMTP id 73so26689554lfu.10
-	for <qemu-devel@nongnu.org>; Fri, 24 Nov 2017 13:29:52 -0800 (PST)
+	id 1eILXo-0007bI-UE
+	for qemu-devel@nongnu.org; Fri, 24 Nov 2017 16:29:57 -0500
+Received: by mail-lf0-x242.google.com with SMTP id m1so26700331lfj.9
+	for <qemu-devel@nongnu.org>; Fri, 24 Nov 2017 13:29:56 -0800 (PST)
 From: Francisco Iglesias <frasse.iglesias@gmail.com>
-Date: Fri, 24 Nov 2017 22:29:30 +0100
-Message-Id: <20171124212938.7074-6-frasse.iglesias@gmail.com>
+Date: Fri, 24 Nov 2017 22:29:33 +0100
+Message-Id: <20171124212938.7074-9-frasse.iglesias@gmail.com>
 In-Reply-To: <20171124212938.7074-1-frasse.iglesias@gmail.com>
 References: <20171124212938.7074-1-frasse.iglesias@gmail.com>
-Subject: [Qemu-devel] [PATCH v8 05/13] xilinx_spips: Move FlashCMD,
- XilinxQSPIPS and XilinxSPIPSClass
+Subject: [Qemu-devel] [PATCH v8 08/13] xilinx_spips: Make tx/rx_data_bytes
+ more generic and reusable
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,127 +30,143 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: edgari@xilinx.com, alistai@xilinx.com, francisco.iglesias@feimtech.se, mar.krzeminski@gmail.com, peter.maydell@linaro.org
 
-Move the FlashCMD enum, XilinxQSPIPS and XilinxSPIPSClass structures to the
-header for consistency (struct XilinxSPIPS is found there). Also move out
-a define and remove two double included headers (while touching the code).
-Finally, add 4 byte address commands to the FlashCMD enum.
+Make tx/rx_data_bytes more generic so they can be reused (when adding
+support for the Zynqmp Generic QSPI).
 
 Signed-off-by: Francisco Iglesias <frasse.iglesias@gmail.com>
-Reviewed-by: Alistair Francis <alistair.francis@xilinx.com>
 ---
- hw/ssi/xilinx_spips.c         | 35 -----------------------------------
- include/hw/ssi/xilinx_spips.h | 34 ++++++++++++++++++++++++++++++++++
- 2 files changed, 34 insertions(+), 35 deletions(-)
+ hw/ssi/xilinx_spips.c | 64 +++++++++++++++++++++++++++++----------------------
+ 1 file changed, 37 insertions(+), 27 deletions(-)
 
 diff --git a/hw/ssi/xilinx_spips.c b/hw/ssi/xilinx_spips.c
-index ef56d35..559fa79 100644
+index 691d48d..4621dbb 100644
 --- a/hw/ssi/xilinx_spips.c
 +++ b/hw/ssi/xilinx_spips.c
-@@ -27,8 +27,6 @@
- #include "sysemu/sysemu.h"
- #include "hw/ptimer.h"
- #include "qemu/log.h"
--#include "qemu/fifo8.h"
--#include "hw/ssi/ssi.h"
- #include "qemu/bitops.h"
- #include "hw/ssi/xilinx_spips.h"
- #include "qapi/error.h"
-@@ -116,44 +114,11 @@
+@@ -47,7 +47,7 @@
+ /* config register */
+ #define R_CONFIG            (0x00 / 4)
+ #define IFMODE              (1U << 31)
+-#define ENDIAN              (1 << 26)
++#define R_CONFIG_ENDIAN     (1 << 26)
+ #define MODEFAIL_GEN_EN     (1 << 17)
+ #define MAN_START_COM       (1 << 16)
+ #define MAN_START_EN        (1 << 15)
+@@ -450,13 +450,28 @@ static void xilinx_spips_flush_txfifo(XilinxSPIPS *s)
+     }
+ }
  
- /* 16MB per linear region */
- #define LQSPI_ADDRESS_BITS 24
--/* Bite off 4k chunks at a time */
--#define LQSPI_CACHE_SIZE 1024
- 
- #define SNOOP_CHECKING 0xFF
- #define SNOOP_NONE 0xFE
- #define SNOOP_STRIPING 0
- 
--typedef enum {
--    READ = 0x3,
--    FAST_READ = 0xb,
--    DOR = 0x3b,
--    QOR = 0x6b,
--    DIOR = 0xbb,
--    QIOR = 0xeb,
--
--    PP = 0x2,
--    DPP = 0xa2,
--    QPP = 0x32,
--} FlashCMD;
--
--typedef struct {
--    XilinxSPIPS parent_obj;
--
--    uint8_t lqspi_buf[LQSPI_CACHE_SIZE];
--    hwaddr lqspi_cached_addr;
--    Error *migration_blocker;
--    bool mmio_execution_enabled;
--} XilinxQSPIPS;
--
--typedef struct XilinxSPIPSClass {
--    SysBusDeviceClass parent_class;
--
--    const MemoryRegionOps *reg_ops;
--
--    uint32_t rx_fifo_size;
--    uint32_t tx_fifo_size;
--} XilinxSPIPSClass;
--
- static inline int num_effective_busses(XilinxSPIPS *s)
+-static inline void rx_data_bytes(XilinxSPIPS *s, uint8_t *value, int max)
++static inline void tx_data_bytes(Fifo8 *fifo, uint32_t value, int num, bool be)
  {
-     return (s->regs[R_LQSPI_CFG] & LQSPI_CFG_SEP_BUS &&
-diff --git a/include/hw/ssi/xilinx_spips.h b/include/hw/ssi/xilinx_spips.h
-index 06aa096..7f9e2fc 100644
---- a/include/hw/ssi/xilinx_spips.h
-+++ b/include/hw/ssi/xilinx_spips.h
-@@ -32,6 +32,22 @@ typedef struct XilinxSPIPS XilinxSPIPS;
+     int i;
++    for (i = 0; i < num && !fifo8_is_full(fifo); ++i) {
++        if (be) {
++            fifo8_push(fifo, (uint8_t)(value >> 24));
++            value <<= 8;
++        } else {
++            fifo8_push(fifo, (uint8_t)value);
++            value >>= 8;
++        }
++    }
++}
  
- #define XLNX_SPIPS_R_MAX        (0x100 / 4)
+-    for (i = 0; i < max && !fifo8_is_empty(&s->rx_fifo); ++i) {
+-        value[i] = fifo8_pop(&s->rx_fifo);
++static inline int rx_data_bytes(Fifo8 *fifo, uint8_t *value, int max)
++{
++    int i;
++
++    for (i = 0; i < max && !fifo8_is_empty(fifo); ++i) {
++        value[i] = fifo8_pop(fifo);
+     }
++    return max - i;
+ }
  
-+/* Bite off 4k chunks at a time */
-+#define LQSPI_CACHE_SIZE 1024
-+
-+typedef enum {
-+    READ = 0x3,         READ_4 = 0x13,
-+    FAST_READ = 0xb,    FAST_READ_4 = 0x0c,
-+    DOR = 0x3b,         DOR_4 = 0x3c,
-+    QOR = 0x6b,         QOR_4 = 0x6c,
-+    DIOR = 0xbb,        DIOR_4 = 0xbc,
-+    QIOR = 0xeb,        QIOR_4 = 0xec,
-+
-+    PP = 0x2,           PP_4 = 0x12,
-+    DPP = 0xa2,
-+    QPP = 0x32,         QPP_4 = 0x34,
-+} FlashCMD;
-+
- struct XilinxSPIPS {
-     SysBusDevice parent_obj;
+ static uint64_t xilinx_spips_read(void *opaque, hwaddr addr,
+@@ -466,6 +481,7 @@ static uint64_t xilinx_spips_read(void *opaque, hwaddr addr,
+     uint32_t mask = ~0;
+     uint32_t ret;
+     uint8_t rx_buf[4];
++    int shortfall;
  
-@@ -56,6 +72,24 @@ struct XilinxSPIPS {
-     uint32_t regs[XLNX_SPIPS_R_MAX];
- };
+     addr >>= 2;
+     switch (addr) {
+@@ -496,9 +512,13 @@ static uint64_t xilinx_spips_read(void *opaque, hwaddr addr,
+         break;
+     case R_RX_DATA:
+         memset(rx_buf, 0, sizeof(rx_buf));
+-        rx_data_bytes(s, rx_buf, s->num_txrx_bytes);
+-        ret = s->regs[R_CONFIG] & ENDIAN ? cpu_to_be32(*(uint32_t *)rx_buf)
+-                        : cpu_to_le32(*(uint32_t *)rx_buf);
++        shortfall = rx_data_bytes(&s->rx_fifo, rx_buf, s->num_txrx_bytes);
++        ret = s->regs[R_CONFIG] & R_CONFIG_ENDIAN ?
++                        cpu_to_be32(*(uint32_t *)rx_buf) :
++                        cpu_to_le32(*(uint32_t *)rx_buf);
++        if (!(s->regs[R_CONFIG] & R_CONFIG_ENDIAN)) {
++            ret <<= 8 * shortfall;
++        }
+         DB_PRINT_L(0, "addr=" TARGET_FMT_plx " = %x\n", addr * 4, ret);
+         xilinx_spips_update_ixr(s);
+         return ret;
+@@ -509,20 +529,6 @@ static uint64_t xilinx_spips_read(void *opaque, hwaddr addr,
  
-+typedef struct {
-+    XilinxSPIPS parent_obj;
-+
-+    uint8_t lqspi_buf[LQSPI_CACHE_SIZE];
-+    hwaddr lqspi_cached_addr;
-+    Error *migration_blocker;
-+    bool mmio_execution_enabled;
-+} XilinxQSPIPS;
-+
-+typedef struct XilinxSPIPSClass {
-+    SysBusDeviceClass parent_class;
-+
-+    const MemoryRegionOps *reg_ops;
-+
-+    uint32_t rx_fifo_size;
-+    uint32_t tx_fifo_size;
-+} XilinxSPIPSClass;
-+
- #define TYPE_XILINX_SPIPS "xlnx.ps7-spi"
- #define TYPE_XILINX_QSPIPS "xlnx.ps7-qspi"
+ }
+ 
+-static inline void tx_data_bytes(XilinxSPIPS *s, uint32_t value, int num)
+-{
+-    int i;
+-    for (i = 0; i < num && !fifo8_is_full(&s->tx_fifo); ++i) {
+-        if (s->regs[R_CONFIG] & ENDIAN) {
+-            fifo8_push(&s->tx_fifo, (uint8_t)(value >> 24));
+-            value <<= 8;
+-        } else {
+-            fifo8_push(&s->tx_fifo, (uint8_t)value);
+-            value >>= 8;
+-        }
+-    }
+-}
+-
+ static void xilinx_spips_write(void *opaque, hwaddr addr,
+                                         uint64_t value, unsigned size)
+ {
+@@ -563,16 +569,20 @@ static void xilinx_spips_write(void *opaque, hwaddr addr,
+         mask = 0;
+         break;
+     case R_TX_DATA:
+-        tx_data_bytes(s, (uint32_t)value, s->num_txrx_bytes);
++        tx_data_bytes(&s->tx_fifo, (uint32_t)value, s->num_txrx_bytes,
++                      s->regs[R_CONFIG] & R_CONFIG_ENDIAN);
+         goto no_reg_update;
+     case R_TXD1:
+-        tx_data_bytes(s, (uint32_t)value, 1);
++        tx_data_bytes(&s->tx_fifo, (uint32_t)value, 1,
++                      s->regs[R_CONFIG] & R_CONFIG_ENDIAN);
+         goto no_reg_update;
+     case R_TXD2:
+-        tx_data_bytes(s, (uint32_t)value, 2);
++        tx_data_bytes(&s->tx_fifo, (uint32_t)value, 2,
++                      s->regs[R_CONFIG] & R_CONFIG_ENDIAN);
+         goto no_reg_update;
+     case R_TXD3:
+-        tx_data_bytes(s, (uint32_t)value, 3);
++        tx_data_bytes(&s->tx_fifo, (uint32_t)value, 3,
++                      s->regs[R_CONFIG] & R_CONFIG_ENDIAN);
+         goto no_reg_update;
+     }
+     s->regs[addr] = (s->regs[addr] & ~mask) | (value & mask);
+@@ -682,11 +692,11 @@ static void lqspi_load_cache(void *opaque, hwaddr addr)
+ 
+         while (cache_entry < LQSPI_CACHE_SIZE) {
+             for (i = 0; i < 64; ++i) {
+-                tx_data_bytes(s, 0, 1);
++                tx_data_bytes(&s->tx_fifo, 0, 1, false);
+             }
+             xilinx_spips_flush_txfifo(s);
+             for (i = 0; i < 64; ++i) {
+-                rx_data_bytes(s, &q->lqspi_buf[cache_entry++], 1);
++                rx_data_bytes(&s->rx_fifo, &q->lqspi_buf[cache_entry++], 1);
+             }
+         }
  
 -- 
 2.9.3
