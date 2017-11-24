@@ -1,27 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48706)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50233)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1eIEEU-0000uc-Qt
-	for qemu-devel@nongnu.org; Fri, 24 Nov 2017 08:41:32 -0500
+	(envelope-from <otubo@redhat.com>) id 1eIEJq-0003jQ-LT
+	for qemu-devel@nongnu.org; Fri, 24 Nov 2017 08:47:03 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1eIEEU-0001Ec-0z
-	for qemu-devel@nongnu.org; Fri, 24 Nov 2017 08:41:30 -0500
-Received: from mail-ot0-x243.google.com ([2607:f8b0:4003:c0f::243]:37390)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1eIEET-0001E2-T1
-	for qemu-devel@nongnu.org; Fri, 24 Nov 2017 08:41:29 -0500
-Received: by mail-ot0-x243.google.com with SMTP id s4so18815548ote.4
-	for <qemu-devel@nongnu.org>; Fri, 24 Nov 2017 05:41:29 -0800 (PST)
-MIME-Version: 1.0
-In-Reply-To: <1511530238-18318-2-git-send-email-eric.auger@redhat.com>
-References: <1511530238-18318-1-git-send-email-eric.auger@redhat.com>
-	<1511530238-18318-2-git-send-email-eric.auger@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri, 24 Nov 2017 13:41:08 +0000
-Message-ID: <CAFEAcA_54_CVmkNM=4ufFJzYT5hWhgcfjt6wGFsuVBJnnC0+4Q@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH v4 1/4] hw/intc/arm_gicv3_its: Don't call
- post_load on reset
+	(envelope-from <otubo@redhat.com>) id 1eIEJk-00050y-JS
+	for qemu-devel@nongnu.org; Fri, 24 Nov 2017 08:47:02 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:33320)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <otubo@redhat.com>) id 1eIEJk-00050D-AU
+	for qemu-devel@nongnu.org; Fri, 24 Nov 2017 08:46:56 -0500
+From: Eduardo Otubo <otubo@redhat.com>
+Date: Fri, 24 Nov 2017 14:46:44 +0100
+Message-Id: <20171124134644.490-1-otubo@redhat.com>
+Subject: [Qemu-devel] [PATCHv3] dma/i82374: avoid double creation of i82374
+ device
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,53 +22,211 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Auger <eric.auger@redhat.com>
-Cc: eric.auger.pro@gmail.com, qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>, wanghaibin.wang@huawei.com, Vijay Kilari <vijay.kilari@gmail.com>, Andrew Jones <drjones@redhat.com>, Wei Huang <wei@redhat.com>, Juan Quintela <quintela@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Christoffer Dall <christoffer.dall@linaro.org>, wu.wubin@huawei.com
+To: qemu-devel@nongnu.org
+Cc: mjt@tls.msk.ru, agraf@suse.de, ehabkost@redhat.com, armbru@redhat.com, pbonzini@redhat.com
 
-On 24 November 2017 at 13:30, Eric Auger <eric.auger@redhat.com> wrote:
-> From the very beginning, post_load() was called from common
-> reset. This is not standard and obliged to discriminate the
-> reset case from the restore case using the iidr value.
->
-> Let's get rid of that call.
->
-> Signed-off-by: Eric Auger <eric.auger@redhat.com>
-> ---
->  hw/intc/arm_gicv3_its_common.c | 2 --
->  hw/intc/arm_gicv3_its_kvm.c    | 4 ----
->  2 files changed, 6 deletions(-)
->
-> diff --git a/hw/intc/arm_gicv3_its_common.c b/hw/intc/arm_gicv3_its_common.c
-> index f2cce59..2bd2f0f 100644
-> --- a/hw/intc/arm_gicv3_its_common.c
-> +++ b/hw/intc/arm_gicv3_its_common.c
-> @@ -131,8 +131,6 @@ static void gicv3_its_common_reset(DeviceState *dev)
->      s->creadr = 0;
->      s->iidr = 0;
->      memset(&s->baser, 0, sizeof(s->baser));
-> -
-> -    gicv3_its_post_load(s, 0);
->  }
->
->  static void gicv3_its_common_class_init(ObjectClass *klass, void *data)
-> diff --git a/hw/intc/arm_gicv3_its_kvm.c b/hw/intc/arm_gicv3_its_kvm.c
-> index 6fb45df..b1b322b 100644
-> --- a/hw/intc/arm_gicv3_its_kvm.c
-> +++ b/hw/intc/arm_gicv3_its_kvm.c
-> @@ -155,10 +155,6 @@ static void kvm_arm_its_post_load(GICv3ITSState *s)
->  {
->      int i;
->
-> -    if (!s->iidr) {
-> -        return;
-> -    }
-> -
->      kvm_device_access(s->dev_fd, KVM_DEV_ARM_VGIC_GRP_ITS_REGS,
->                        GITS_IIDR, &s->iidr, true, &error_abort);
->
-> --
+v3:
+ * Removed all unecessary local_err
+ * Change return of isa_bus_dma() and DMA_init() from void to int8_t,
+   returning -EBUSY on error and 0 on success
+ * Added qdev_cleanup_nofail() in case isa_bus_dma() returns error. The
+   cleanup looks safe, but please review if I didn't miss any detail
 
-Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
+v2:
+ * Removed user_creatable=false and replaced by error handling using
+   Error **errp and error_propagate();
 
-thanks
--- PMM
+QEMU fails when used with the following command line:
+
+    ./ppc64-softmmu/qemu-system-ppc64 -S -machine 40p,accel=tcg -device i82374
+    qemu-system-ppc64: hw/isa/isa-bus.c:110: isa_bus_dma: Assertion `!bus->dma[0] && !bus->dma[1]' failed.
+    Aborted (core dumped)
+
+The 40p machine type already created the device i82374. If specified in the
+command line, it will try to create it again, hence generating the error. The
+function isa_bus_dma() isn't supposed to be called twice for the same bus. One
+way to avoid this problem is to set user_creatable=false.
+
+A possible fix in a near future would be making
+isa_bus_dma()/DMA_init()/i82374_realize() return an error instead of asserting
+as well.
+
+Signed-off-by: Eduardo Otubo <otubo@redhat.com>
+---
+ hw/core/qdev.c         | 16 ++++++++++++++++
+ hw/dma/i82374.c        | 13 +++++++------
+ hw/dma/i8257.c         | 38 ++++++++++++++++++++++----------------
+ hw/isa/isa-bus.c       |  8 ++++++--
+ include/hw/isa/isa.h   |  4 ++--
+ include/hw/qdev-core.h |  1 +
+ 6 files changed, 54 insertions(+), 26 deletions(-)
+
+diff --git a/hw/core/qdev.c b/hw/core/qdev.c
+index 606ab53c42..0ef03ee461 100644
+--- a/hw/core/qdev.c
++++ b/hw/core/qdev.c
+@@ -344,6 +344,22 @@ void qdev_init_nofail(DeviceState *dev)
+     object_unref(OBJECT(dev));
+ }
+ 
++void qdev_cleanup_nofail(DeviceState *dev)
++{
++    Error *err = NULL;
++
++    assert(dev->realized);
++
++    object_ref(OBJECT(dev));
++    object_property_set_bool(OBJECT(dev), false, "realized", &err);
++    if (err) {
++        error_reportf_err(err, "Clean up of device %s failed: ",
++                          object_get_typename(OBJECT(dev)));
++        exit(1);
++    }
++    object_unref(OBJECT(dev));
++}
++
+ void qdev_machine_creation_done(void)
+ {
+     /*
+diff --git a/hw/dma/i82374.c b/hw/dma/i82374.c
+index 6c0f975df0..9b792890b2 100644
+--- a/hw/dma/i82374.c
++++ b/hw/dma/i82374.c
+@@ -24,6 +24,7 @@
+ 
+ #include "qemu/osdep.h"
+ #include "hw/isa/isa.h"
++#include "qapi/error.h"
+ 
+ #define TYPE_I82374 "i82374"
+ #define I82374(obj) OBJECT_CHECK(I82374State, (obj), TYPE_I82374)
+@@ -118,13 +119,13 @@ static void i82374_realize(DeviceState *dev, Error **errp)
+ {
+     I82374State *s = I82374(dev);
+ 
+-    portio_list_init(&s->port_list, OBJECT(s), i82374_portio_list, s,
+-                     "i82374");
+-    portio_list_add(&s->port_list, isa_address_space_io(&s->parent_obj),
++    if (DMA_init(isa_bus_from_device(ISA_DEVICE(dev)), 1, errp) == 0) {
++        portio_list_init(&s->port_list, OBJECT(s), i82374_portio_list, s,
++                    "i82374");
++        portio_list_add(&s->port_list, isa_address_space_io(&s->parent_obj),
+                     s->iobase);
+-
+-    DMA_init(isa_bus_from_device(ISA_DEVICE(dev)), 1);
+-    memset(s->commands, 0, sizeof(s->commands));
++        memset(s->commands, 0, sizeof(s->commands));
++    }
+ }
+ 
+ static Property i82374_properties[] = {
+diff --git a/hw/dma/i8257.c b/hw/dma/i8257.c
+index bd23e893bf..7488e3dd12 100644
+--- a/hw/dma/i8257.c
++++ b/hw/dma/i8257.c
+@@ -622,26 +622,32 @@ static void i8257_register_types(void)
+ 
+ type_init(i8257_register_types)
+ 
+-void DMA_init(ISABus *bus, int high_page_enable)
++int8_t DMA_init(ISABus *bus, int high_page_enable, Error **errp)
+ {
+     ISADevice *isa1, *isa2;
+-    DeviceState *d;
++    DeviceState *d1, *d2;
+ 
+     isa1 = isa_create(bus, TYPE_I8257);
+-    d = DEVICE(isa1);
+-    qdev_prop_set_int32(d, "base", 0x00);
+-    qdev_prop_set_int32(d, "page-base", 0x80);
+-    qdev_prop_set_int32(d, "pageh-base", high_page_enable ? 0x480 : -1);
+-    qdev_prop_set_int32(d, "dshift", 0);
+-    qdev_init_nofail(d);
++    d1 = DEVICE(isa1);
++    qdev_prop_set_int32(d1, "base", 0x00);
++    qdev_prop_set_int32(d1, "page-base", 0x80);
++    qdev_prop_set_int32(d1, "pageh-base", high_page_enable ? 0x480 : -1);
++    qdev_prop_set_int32(d1, "dshift", 0);
++    qdev_init_nofail(d1);
+ 
+     isa2 = isa_create(bus, TYPE_I8257);
+-    d = DEVICE(isa2);
+-    qdev_prop_set_int32(d, "base", 0xc0);
+-    qdev_prop_set_int32(d, "page-base", 0x88);
+-    qdev_prop_set_int32(d, "pageh-base", high_page_enable ? 0x488 : -1);
+-    qdev_prop_set_int32(d, "dshift", 1);
+-    qdev_init_nofail(d);
+-
+-    isa_bus_dma(bus, ISADMA(isa1), ISADMA(isa2));
++    d2 = DEVICE(isa2);
++    qdev_prop_set_int32(d2, "base", 0xc0);
++    qdev_prop_set_int32(d2, "page-base", 0x88);
++    qdev_prop_set_int32(d2, "pageh-base", high_page_enable ? 0x488 : -1);
++    qdev_prop_set_int32(d2, "dshift", 1);
++    qdev_init_nofail(d2);
++
++    if (isa_bus_dma(bus, ISADMA(isa1), ISADMA(isa2), errp) < 0) {
++        qdev_cleanup_nofail(d1);
++        qdev_cleanup_nofail(d2);
++        return -EBUSY;
++    }
++
++    return 0;
+ }
+diff --git a/hw/isa/isa-bus.c b/hw/isa/isa-bus.c
+index 348e0eab9d..4781dddaf9 100644
+--- a/hw/isa/isa-bus.c
++++ b/hw/isa/isa-bus.c
+@@ -104,12 +104,16 @@ void isa_connect_gpio_out(ISADevice *isadev, int gpioirq, int isairq)
+     qdev_connect_gpio_out(DEVICE(isadev), gpioirq, irq);
+ }
+ 
+-void isa_bus_dma(ISABus *bus, IsaDma *dma8, IsaDma *dma16)
++int8_t isa_bus_dma(ISABus *bus, IsaDma *dma8, IsaDma *dma16, Error **errp)
+ {
+     assert(bus && dma8 && dma16);
+-    assert(!bus->dma[0] && !bus->dma[1]);
++    if (bus->dma[0] || bus->dma[1]) {
++        error_setg(errp, "DMA already initialized on ISA bus");
++        return -EBUSY;
++    }
+     bus->dma[0] = dma8;
+     bus->dma[1] = dma16;
++    return 0;
+ }
+ 
+ IsaDma *isa_get_dma(ISABus *bus, int nchan)
+diff --git a/include/hw/isa/isa.h b/include/hw/isa/isa.h
+index 95593408ef..2c7f260deb 100644
+--- a/include/hw/isa/isa.h
++++ b/include/hw/isa/isa.h
+@@ -103,7 +103,7 @@ void isa_bus_irqs(ISABus *bus, qemu_irq *irqs);
+ qemu_irq isa_get_irq(ISADevice *dev, int isairq);
+ void isa_init_irq(ISADevice *dev, qemu_irq *p, int isairq);
+ void isa_connect_gpio_out(ISADevice *isadev, int gpioirq, int isairq);
+-void isa_bus_dma(ISABus *bus, IsaDma *dma8, IsaDma *dma16);
++int8_t isa_bus_dma(ISABus *bus, IsaDma *dma8, IsaDma *dma16, Error **errp);
+ IsaDma *isa_get_dma(ISABus *bus, int nchan);
+ MemoryRegion *isa_address_space(ISADevice *dev);
+ MemoryRegion *isa_address_space_io(ISADevice *dev);
+@@ -152,5 +152,5 @@ static inline ISABus *isa_bus_from_device(ISADevice *d)
+ }
+ 
+ /* i8257.c */
+-void DMA_init(ISABus *bus, int high_page_enable);
++int8_t DMA_init(ISABus *bus, int high_page_enable, Error **errp);
+ #endif
+diff --git a/include/hw/qdev-core.h b/include/hw/qdev-core.h
+index 089146197f..77d3b43427 100644
+--- a/include/hw/qdev-core.h
++++ b/include/hw/qdev-core.h
+@@ -283,6 +283,7 @@ typedef struct GlobalProperty {
+ DeviceState *qdev_create(BusState *bus, const char *name);
+ DeviceState *qdev_try_create(BusState *bus, const char *name);
+ void qdev_init_nofail(DeviceState *dev);
++void qdev_cleanup_nofail(DeviceState *dev);
+ void qdev_set_legacy_instance_id(DeviceState *dev, int alias_id,
+                                  int required_for_version);
+ HotplugHandler *qdev_get_hotplug_handler(DeviceState *dev);
+-- 
+2.13.6
