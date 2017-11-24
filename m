@@ -1,19 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50233)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50888)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <otubo@redhat.com>) id 1eIEJq-0003jQ-LT
-	for qemu-devel@nongnu.org; Fri, 24 Nov 2017 08:47:03 -0500
+	(envelope-from <eric.auger@redhat.com>) id 1eIENS-00050U-M9
+	for qemu-devel@nongnu.org; Fri, 24 Nov 2017 08:50:49 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <otubo@redhat.com>) id 1eIEJk-00050y-JS
-	for qemu-devel@nongnu.org; Fri, 24 Nov 2017 08:47:02 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:33320)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <otubo@redhat.com>) id 1eIEJk-00050D-AU
-	for qemu-devel@nongnu.org; Fri, 24 Nov 2017 08:46:56 -0500
-From: Eduardo Otubo <otubo@redhat.com>
-Date: Fri, 24 Nov 2017 14:46:44 +0100
-Message-Id: <20171124134644.490-1-otubo@redhat.com>
-Subject: [Qemu-devel] [PATCHv3] dma/i82374: avoid double creation of i82374
- device
+	(envelope-from <eric.auger@redhat.com>) id 1eIENM-00077U-VW
+	for qemu-devel@nongnu.org; Fri, 24 Nov 2017 08:50:46 -0500
+References: <1511530238-18318-1-git-send-email-eric.auger@redhat.com>
+	<1511530238-18318-4-git-send-email-eric.auger@redhat.com>
+	<CAFEAcA-ro5AkFt-eAhDX+AhDv5HDs6oezS9UYuT+jsMy5jYMWw@mail.gmail.com>
+From: Auger Eric <eric.auger@redhat.com>
+Message-ID: <ab918176-612e-b639-7980-ebeb3db98a5a@redhat.com>
+Date: Fri, 24 Nov 2017 14:50:25 +0100
+MIME-Version: 1.0
+In-Reply-To: <CAFEAcA-ro5AkFt-eAhDX+AhDv5HDs6oezS9UYuT+jsMy5jYMWw@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v4 3/4] linux-headers: update to pre
+ 4.15-rc0
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,211 +25,82 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: mjt@tls.msk.ru, agraf@suse.de, ehabkost@redhat.com, armbru@redhat.com, pbonzini@redhat.com
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: eric.auger.pro@gmail.com, qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>, wanghaibin.wang@huawei.com, Vijay Kilari <vijay.kilari@gmail.com>, Andrew Jones <drjones@redhat.com>, Wei Huang <wei@redhat.com>, Juan Quintela <quintela@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Christoffer Dall <christoffer.dall@linaro.org>, wu.wubin@huawei.com
 
-v3:
- * Removed all unecessary local_err
- * Change return of isa_bus_dma() and DMA_init() from void to int8_t,
-   returning -EBUSY on error and 0 on success
- * Added qdev_cleanup_nofail() in case isa_bus_dma() returns error. The
-   cleanup looks safe, but please review if I didn't miss any detail
+Hi Peter,
 
-v2:
- * Removed user_creatable=false and replaced by error handling using
-   Error **errp and error_propagate();
+On 24/11/17 14:38, Peter Maydell wrote:
+> On 24 November 2017 at 13:30, Eric Auger <eric.auger@redhat.com> wrote:
+>> Update headers against post v4.14 and pre v4.15-rc0.
+>>
+>> Signed-off-by: Eric Auger <eric.auger@redhat.com>
+>> ---
+>>  include/standard-headers/asm-s390/virtio-ccw.h     |   1 +
+>>  include/standard-headers/asm-x86/hyperv.h          | 394 +--------------------
+>>  include/standard-headers/linux/input-event-codes.h |   2 +
+>>  include/standard-headers/linux/input.h             |   1 +
+>>  include/standard-headers/linux/pci_regs.h          |  45 ++-
+>>  linux-headers/asm-arm/kvm.h                        |   8 +
+>>  linux-headers/asm-arm/kvm_para.h                   |   1 +
+>>  linux-headers/asm-arm/unistd.h                     |   2 +
+>>  linux-headers/asm-arm64/kvm.h                      |   8 +
+>>  linux-headers/asm-arm64/unistd.h                   |   1 +
+>>  linux-headers/asm-powerpc/epapr_hcalls.h           |   1 +
+>>  linux-headers/asm-powerpc/kvm.h                    |   1 +
+>>  linux-headers/asm-powerpc/kvm_para.h               |   1 +
+>>  linux-headers/asm-powerpc/unistd.h                 |   1 +
+>>  linux-headers/asm-s390/kvm.h                       |   1 +
+>>  linux-headers/asm-s390/kvm_para.h                  |   1 +
+>>  linux-headers/asm-s390/unistd.h                    |   4 +-
+>>  linux-headers/asm-x86/kvm.h                        |   1 +
+>>  linux-headers/asm-x86/kvm_para.h                   |   2 +-
+>>  linux-headers/asm-x86/unistd.h                     |   1 +
+>>  linux-headers/linux/kvm.h                          |   2 +
+>>  linux-headers/linux/kvm_para.h                     |   1 +
+>>  linux-headers/linux/psci.h                         |   1 +
+>>  linux-headers/linux/userfaultfd.h                  |   1 +
+>>  linux-headers/linux/vfio.h                         |   1 +
+>>  linux-headers/linux/vfio_ccw.h                     |   1 +
+>>  linux-headers/linux/vhost.h                        |   1 +
+> 
+>> --- a/include/standard-headers/asm-x86/hyperv.h
+>> +++ b/include/standard-headers/asm-x86/hyperv.h
+>> @@ -1,393 +1 @@
+>> -#ifndef _ASM_X86_HYPERV_H
+>> -#define _ASM_X86_HYPERV_H
+>> -
+>> -#include "standard-headers/linux/types.h"
+>> -
+>> -/*
+>> - * The below CPUID leaves are present if VersionAndFeatures.HypervisorPresent
+>> - * is set by CPUID(HvCpuIdFunctionVersionAndFeatures).
+>> - */
+>> -#define HYPERV_CPUID_VENDOR_AND_MAX_FUNCTIONS  0x40000000
+>> -#define HYPERV_CPUID_INTERFACE                 0x40000001
+>> -#define HYPERV_CPUID_VERSION                   0x40000002
+>> -#define HYPERV_CPUID_FEATURES                  0x40000003
+>> -#define HYPERV_CPUID_ENLIGHTMENT_INFO          0x40000004
+>> -#define HYPERV_CPUID_IMPLEMENT_LIMITS          0x40000005
+>> -
+>> -#define HYPERV_HYPERVISOR_PRESENT_BIT          0x80000000
+>> -#define HYPERV_CPUID_MIN                       0x40000005
+>> -#define HYPERV_CPUID_MAX                       0x4000ffff
+> 
+> Did you test building on x86 host? It's hard to see how the
+> code in QEMU that uses these HYPERV #defines will still compile.
 
-QEMU fails when used with the following command line:
+Just test built with
 
-    ./ppc64-softmmu/qemu-system-ppc64 -S -machine 40p,accel=tcg -device i82374
-    qemu-system-ppc64: hw/isa/isa-bus.c:110: isa_bus_dma: Assertion `!bus->dma[0] && !bus->dma[1]' failed.
-    Aborted (core dumped)
+./configure --target-list="aarch64-softmmu arm-softmmu arm-linux-user
+x86_64-softmmu i386-softmmu" --enable-kvm --enable-trace-backends=log
 
-The 40p machine type already created the device i82374. If specified in the
-command line, it will try to create it again, hence generating the error. The
-function isa_bus_dma() isn't supposed to be called twice for the same bus. One
-way to avoid this problem is to set user_creatable=false.
+and it looks OK.
 
-A possible fix in a near future would be making
-isa_bus_dma()/DMA_init()/i82374_realize() return an error instead of asserting
-as well.
+Thanks
 
-Signed-off-by: Eduardo Otubo <otubo@redhat.com>
----
- hw/core/qdev.c         | 16 ++++++++++++++++
- hw/dma/i82374.c        | 13 +++++++------
- hw/dma/i8257.c         | 38 ++++++++++++++++++++++----------------
- hw/isa/isa-bus.c       |  8 ++++++--
- include/hw/isa/isa.h   |  4 ++--
- include/hw/qdev-core.h |  1 +
- 6 files changed, 54 insertions(+), 26 deletions(-)
-
-diff --git a/hw/core/qdev.c b/hw/core/qdev.c
-index 606ab53c42..0ef03ee461 100644
---- a/hw/core/qdev.c
-+++ b/hw/core/qdev.c
-@@ -344,6 +344,22 @@ void qdev_init_nofail(DeviceState *dev)
-     object_unref(OBJECT(dev));
- }
- 
-+void qdev_cleanup_nofail(DeviceState *dev)
-+{
-+    Error *err = NULL;
-+
-+    assert(dev->realized);
-+
-+    object_ref(OBJECT(dev));
-+    object_property_set_bool(OBJECT(dev), false, "realized", &err);
-+    if (err) {
-+        error_reportf_err(err, "Clean up of device %s failed: ",
-+                          object_get_typename(OBJECT(dev)));
-+        exit(1);
-+    }
-+    object_unref(OBJECT(dev));
-+}
-+
- void qdev_machine_creation_done(void)
- {
-     /*
-diff --git a/hw/dma/i82374.c b/hw/dma/i82374.c
-index 6c0f975df0..9b792890b2 100644
---- a/hw/dma/i82374.c
-+++ b/hw/dma/i82374.c
-@@ -24,6 +24,7 @@
- 
- #include "qemu/osdep.h"
- #include "hw/isa/isa.h"
-+#include "qapi/error.h"
- 
- #define TYPE_I82374 "i82374"
- #define I82374(obj) OBJECT_CHECK(I82374State, (obj), TYPE_I82374)
-@@ -118,13 +119,13 @@ static void i82374_realize(DeviceState *dev, Error **errp)
- {
-     I82374State *s = I82374(dev);
- 
--    portio_list_init(&s->port_list, OBJECT(s), i82374_portio_list, s,
--                     "i82374");
--    portio_list_add(&s->port_list, isa_address_space_io(&s->parent_obj),
-+    if (DMA_init(isa_bus_from_device(ISA_DEVICE(dev)), 1, errp) == 0) {
-+        portio_list_init(&s->port_list, OBJECT(s), i82374_portio_list, s,
-+                    "i82374");
-+        portio_list_add(&s->port_list, isa_address_space_io(&s->parent_obj),
-                     s->iobase);
--
--    DMA_init(isa_bus_from_device(ISA_DEVICE(dev)), 1);
--    memset(s->commands, 0, sizeof(s->commands));
-+        memset(s->commands, 0, sizeof(s->commands));
-+    }
- }
- 
- static Property i82374_properties[] = {
-diff --git a/hw/dma/i8257.c b/hw/dma/i8257.c
-index bd23e893bf..7488e3dd12 100644
---- a/hw/dma/i8257.c
-+++ b/hw/dma/i8257.c
-@@ -622,26 +622,32 @@ static void i8257_register_types(void)
- 
- type_init(i8257_register_types)
- 
--void DMA_init(ISABus *bus, int high_page_enable)
-+int8_t DMA_init(ISABus *bus, int high_page_enable, Error **errp)
- {
-     ISADevice *isa1, *isa2;
--    DeviceState *d;
-+    DeviceState *d1, *d2;
- 
-     isa1 = isa_create(bus, TYPE_I8257);
--    d = DEVICE(isa1);
--    qdev_prop_set_int32(d, "base", 0x00);
--    qdev_prop_set_int32(d, "page-base", 0x80);
--    qdev_prop_set_int32(d, "pageh-base", high_page_enable ? 0x480 : -1);
--    qdev_prop_set_int32(d, "dshift", 0);
--    qdev_init_nofail(d);
-+    d1 = DEVICE(isa1);
-+    qdev_prop_set_int32(d1, "base", 0x00);
-+    qdev_prop_set_int32(d1, "page-base", 0x80);
-+    qdev_prop_set_int32(d1, "pageh-base", high_page_enable ? 0x480 : -1);
-+    qdev_prop_set_int32(d1, "dshift", 0);
-+    qdev_init_nofail(d1);
- 
-     isa2 = isa_create(bus, TYPE_I8257);
--    d = DEVICE(isa2);
--    qdev_prop_set_int32(d, "base", 0xc0);
--    qdev_prop_set_int32(d, "page-base", 0x88);
--    qdev_prop_set_int32(d, "pageh-base", high_page_enable ? 0x488 : -1);
--    qdev_prop_set_int32(d, "dshift", 1);
--    qdev_init_nofail(d);
--
--    isa_bus_dma(bus, ISADMA(isa1), ISADMA(isa2));
-+    d2 = DEVICE(isa2);
-+    qdev_prop_set_int32(d2, "base", 0xc0);
-+    qdev_prop_set_int32(d2, "page-base", 0x88);
-+    qdev_prop_set_int32(d2, "pageh-base", high_page_enable ? 0x488 : -1);
-+    qdev_prop_set_int32(d2, "dshift", 1);
-+    qdev_init_nofail(d2);
-+
-+    if (isa_bus_dma(bus, ISADMA(isa1), ISADMA(isa2), errp) < 0) {
-+        qdev_cleanup_nofail(d1);
-+        qdev_cleanup_nofail(d2);
-+        return -EBUSY;
-+    }
-+
-+    return 0;
- }
-diff --git a/hw/isa/isa-bus.c b/hw/isa/isa-bus.c
-index 348e0eab9d..4781dddaf9 100644
---- a/hw/isa/isa-bus.c
-+++ b/hw/isa/isa-bus.c
-@@ -104,12 +104,16 @@ void isa_connect_gpio_out(ISADevice *isadev, int gpioirq, int isairq)
-     qdev_connect_gpio_out(DEVICE(isadev), gpioirq, irq);
- }
- 
--void isa_bus_dma(ISABus *bus, IsaDma *dma8, IsaDma *dma16)
-+int8_t isa_bus_dma(ISABus *bus, IsaDma *dma8, IsaDma *dma16, Error **errp)
- {
-     assert(bus && dma8 && dma16);
--    assert(!bus->dma[0] && !bus->dma[1]);
-+    if (bus->dma[0] || bus->dma[1]) {
-+        error_setg(errp, "DMA already initialized on ISA bus");
-+        return -EBUSY;
-+    }
-     bus->dma[0] = dma8;
-     bus->dma[1] = dma16;
-+    return 0;
- }
- 
- IsaDma *isa_get_dma(ISABus *bus, int nchan)
-diff --git a/include/hw/isa/isa.h b/include/hw/isa/isa.h
-index 95593408ef..2c7f260deb 100644
---- a/include/hw/isa/isa.h
-+++ b/include/hw/isa/isa.h
-@@ -103,7 +103,7 @@ void isa_bus_irqs(ISABus *bus, qemu_irq *irqs);
- qemu_irq isa_get_irq(ISADevice *dev, int isairq);
- void isa_init_irq(ISADevice *dev, qemu_irq *p, int isairq);
- void isa_connect_gpio_out(ISADevice *isadev, int gpioirq, int isairq);
--void isa_bus_dma(ISABus *bus, IsaDma *dma8, IsaDma *dma16);
-+int8_t isa_bus_dma(ISABus *bus, IsaDma *dma8, IsaDma *dma16, Error **errp);
- IsaDma *isa_get_dma(ISABus *bus, int nchan);
- MemoryRegion *isa_address_space(ISADevice *dev);
- MemoryRegion *isa_address_space_io(ISADevice *dev);
-@@ -152,5 +152,5 @@ static inline ISABus *isa_bus_from_device(ISADevice *d)
- }
- 
- /* i8257.c */
--void DMA_init(ISABus *bus, int high_page_enable);
-+int8_t DMA_init(ISABus *bus, int high_page_enable, Error **errp);
- #endif
-diff --git a/include/hw/qdev-core.h b/include/hw/qdev-core.h
-index 089146197f..77d3b43427 100644
---- a/include/hw/qdev-core.h
-+++ b/include/hw/qdev-core.h
-@@ -283,6 +283,7 @@ typedef struct GlobalProperty {
- DeviceState *qdev_create(BusState *bus, const char *name);
- DeviceState *qdev_try_create(BusState *bus, const char *name);
- void qdev_init_nofail(DeviceState *dev);
-+void qdev_cleanup_nofail(DeviceState *dev);
- void qdev_set_legacy_instance_id(DeviceState *dev, int alias_id,
-                                  int required_for_version);
- HotplugHandler *qdev_get_hotplug_handler(DeviceState *dev);
--- 
-2.13.6
+Eric
+> 
+> thanks
+> -- PMM
+> 
