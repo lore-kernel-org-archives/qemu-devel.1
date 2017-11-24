@@ -1,17 +1,14 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44981)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44987)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eric.auger@redhat.com>) id 1eIE4N-0001aY-R1
-	for qemu-devel@nongnu.org; Fri, 24 Nov 2017 08:31:04 -0500
+	(envelope-from <eric.auger@redhat.com>) id 1eIE4O-0001bI-MM
+	for qemu-devel@nongnu.org; Fri, 24 Nov 2017 08:31:05 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eric.auger@redhat.com>) id 1eIE4K-0001qe-JW
-	for qemu-devel@nongnu.org; Fri, 24 Nov 2017 08:31:03 -0500
+	(envelope-from <eric.auger@redhat.com>) id 1eIE4K-0001qT-De
+	for qemu-devel@nongnu.org; Fri, 24 Nov 2017 08:31:04 -0500
 From: Eric Auger <eric.auger@redhat.com>
-Date: Fri, 24 Nov 2017 14:30:36 +0100
-Message-Id: <1511530238-18318-3-git-send-email-eric.auger@redhat.com>
-In-Reply-To: <1511530238-18318-1-git-send-email-eric.auger@redhat.com>
-References: <1511530238-18318-1-git-send-email-eric.auger@redhat.com>
-Subject: [Qemu-devel] [PATCH v4 2/4] hw/intc/arm_gicv3_its: Implement a
- minimalist reset
+Date: Fri, 24 Nov 2017 14:30:34 +0100
+Message-Id: <1511530238-18318-1-git-send-email-eric.auger@redhat.com>
+Subject: [Qemu-devel] [PATCH v4 0/4] vITS Reset
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,95 +20,81 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: eric.auger.pro@gmail.com, eric.auger@redhat.com, peter.maydell@linaro.org, qemu-arm@nongnu.org, qemu-devel@nongnu.org, wanghaibin.wang@huawei.com
 Cc: vijay.kilari@gmail.com, drjones@redhat.com, wei@redhat.com, quintela@redhat.com, dgilbert@redhat.com, christoffer.dall@linaro.org, wu.wubin@huawei.com
 
-At the moment the ITS is not properly reset and this causes
-various bugs on save/restore. We implement a minimalist reset
-through individual register writes but for kernel versions
-before v4.15 this fails voiding the vITS cache. We cannot
-claim we have a comprehensive reset (hence the error message)
-but that's better than nothing.
+At the moment the ITS is not properly reset. On System reset or
+reboot, previous ITS register values and caches are left
+unchanged. Some of the registers might point to some guest RAM
+tables which are not valid anymore. This leads to state
+inconsistencies that are detected by the kernel save/restore
+code. And eventually this may cause qemu abort.
 
-Signed-off-by: Eric Auger <eric.auger@redhat.com>
+This series adds vITS reset modality:
+- the 2 first patches bring a minimalist reset through individual
+  register writes. However, with kernel versions < 4.15, this reset
+  is not complete (vITS caches are not voided).
+- With kernel versions >= 4.15 we can rely on a new ITS KVM device
+  reset IOTCL. The last 2 patches introduce the full reset.
 
----
+Tested with 4.11, 4.14 and 4.15 host kernels.
+
+Best Regards
+
+Eric
+
+The series is available at:
+https://github.com/eauger/qemu/tree/2.11.0-rc2-its-reset-v4
+
+History:
+v3 -> v4:
+- replace partial linux header update by an exhaustive one
 
 v2 -> v3:
-- individual register writes performed in kvm_arm_its_reset
-- check KVM_DEV_ARM_VGIC_GRP_ITS_REGS support
----
- hw/intc/arm_gicv3_its_kvm.c | 41 +++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 41 insertions(+)
+- don't call post_load on reset (no iidr check anymore)
 
-diff --git a/hw/intc/arm_gicv3_its_kvm.c b/hw/intc/arm_gicv3_its_kvm.c
-index b1b322b..83e5268 100644
---- a/hw/intc/arm_gicv3_its_kvm.c
-+++ b/hw/intc/arm_gicv3_its_kvm.c
-@@ -28,6 +28,16 @@
- 
- #define TYPE_KVM_ARM_ITS "arm-its-kvm"
- #define KVM_ARM_ITS(obj) OBJECT_CHECK(GICv3ITSState, (obj), TYPE_KVM_ARM_ITS)
-+#define KVM_ARM_ITS_CLASS(klass) \
-+     OBJECT_CLASS_CHECK(KVMARMITSClass, (klass), TYPE_KVM_ARM_ITS)
-+#define KVM_ARM_ITS_GET_CLASS(obj) \
-+     OBJECT_GET_CLASS(KVMARMITSClass, (obj), TYPE_KVM_ARM_ITS)
-+
-+typedef struct KVMARMITSClass {
-+    GICv3ITSCommonClass parent_class;
-+    void (*parent_reset)(DeviceState *dev);
-+} KVMARMITSClass;
-+
- 
- static int kvm_its_send_msi(GICv3ITSState *s, uint32_t value, uint16_t devid)
- {
-@@ -186,6 +196,34 @@ static void kvm_arm_its_post_load(GICv3ITSState *s)
-                       GITS_CTLR, &s->ctlr, true, &error_abort);
- }
- 
-+static void kvm_arm_its_reset(DeviceState *dev)
-+{
-+    GICv3ITSState *s = ARM_GICV3_ITS_COMMON(dev);
-+    KVMARMITSClass *c = KVM_ARM_ITS_GET_CLASS(s);
-+    int i;
-+
-+    c->parent_reset(dev);
-+
-+    error_report("ITS KVM: full reset is not supported by the host kernel");
-+
-+    if (!kvm_device_check_attr(s->dev_fd, KVM_DEV_ARM_VGIC_GRP_ITS_REGS,
-+                               GITS_CTLR)) {
-+        return;
-+    }
-+
-+    kvm_device_access(s->dev_fd, KVM_DEV_ARM_VGIC_GRP_ITS_REGS,
-+                      GITS_CTLR, &s->ctlr, true, &error_abort);
-+
-+    kvm_device_access(s->dev_fd, KVM_DEV_ARM_VGIC_GRP_ITS_REGS,
-+                      GITS_CBASER, &s->cbaser, true, &error_abort);
-+
-+    for (i = 0; i < 8; i++) {
-+        kvm_device_access(s->dev_fd, KVM_DEV_ARM_VGIC_GRP_ITS_REGS,
-+                          GITS_BASER + i * 8, &s->baser[i], true,
-+                          &error_abort);
-+    }
-+}
-+
- static Property kvm_arm_its_props[] = {
-     DEFINE_PROP_LINK("parent-gicv3", GICv3ITSState, gicv3, "kvm-arm-gicv3",
-                      GICv3State *),
-@@ -196,12 +234,15 @@ static void kvm_arm_its_class_init(ObjectClass *klass, void *data)
- {
-     DeviceClass *dc = DEVICE_CLASS(klass);
-     GICv3ITSCommonClass *icc = ARM_GICV3_ITS_COMMON_CLASS(klass);
-+    KVMARMITSClass *ic = KVM_ARM_ITS_CLASS(klass);
- 
-     dc->realize = kvm_arm_its_realize;
-     dc->props   = kvm_arm_its_props;
-+    ic->parent_reset = dc->reset;
-     icc->send_msi = kvm_its_send_msi;
-     icc->pre_save = kvm_arm_its_pre_save;
-     icc->post_load = kvm_arm_its_post_load;
-+    dc->reset = kvm_arm_its_reset;
- }
- 
- static const TypeInfo kvm_arm_its_info = {
+v1 -> v2:
+- Clarify why abort should be removed for save. Leave abort
+  for restore.
+- Adopt the same reset infra as vgic
+- introduce "hw/intc/arm_gicv3_its: Implement a minimalist reset"
+  which perform individual register writes. This is sufficient to
+  fix the issues without ioctl
+
+
+Eric Auger (4):
+  hw/intc/arm_gicv3_its: Don't call post_load on reset
+  hw/intc/arm_gicv3_its: Implement a minimalist reset
+  linux-headers: update to pre 4.15-rc0
+  hw/intc/arm_gicv3_its: Implement full reset
+
+ hw/intc/arm_gicv3_its_common.c                     |   2 -
+ hw/intc/arm_gicv3_its_kvm.c                        |  52 ++-
+ include/standard-headers/asm-s390/virtio-ccw.h     |   1 +
+ include/standard-headers/asm-x86/hyperv.h          | 394 +--------------------
+ include/standard-headers/linux/input-event-codes.h |   2 +
+ include/standard-headers/linux/input.h             |   1 +
+ include/standard-headers/linux/pci_regs.h          |  45 ++-
+ linux-headers/asm-arm/kvm.h                        |   8 +
+ linux-headers/asm-arm/kvm_para.h                   |   1 +
+ linux-headers/asm-arm/unistd.h                     |   2 +
+ linux-headers/asm-arm64/kvm.h                      |   8 +
+ linux-headers/asm-arm64/unistd.h                   |   1 +
+ linux-headers/asm-powerpc/epapr_hcalls.h           |   1 +
+ linux-headers/asm-powerpc/kvm.h                    |   1 +
+ linux-headers/asm-powerpc/kvm_para.h               |   1 +
+ linux-headers/asm-powerpc/unistd.h                 |   1 +
+ linux-headers/asm-s390/kvm.h                       |   1 +
+ linux-headers/asm-s390/kvm_para.h                  |   1 +
+ linux-headers/asm-s390/unistd.h                    |   4 +-
+ linux-headers/asm-x86/kvm.h                        |   1 +
+ linux-headers/asm-x86/kvm_para.h                   |   2 +-
+ linux-headers/asm-x86/unistd.h                     |   1 +
+ linux-headers/linux/kvm.h                          |   2 +
+ linux-headers/linux/kvm_para.h                     |   1 +
+ linux-headers/linux/psci.h                         |   1 +
+ linux-headers/linux/userfaultfd.h                  |   1 +
+ linux-headers/linux/vfio.h                         |   1 +
+ linux-headers/linux/vfio_ccw.h                     |   1 +
+ linux-headers/linux/vhost.h                        |   1 +
+ 29 files changed, 122 insertions(+), 417 deletions(-)
+
 -- 
 2.5.5
