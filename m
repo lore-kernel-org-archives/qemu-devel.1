@@ -1,23 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51615)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37760)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1eIBTc-0006gE-Fw
-	for qemu-devel@nongnu.org; Fri, 24 Nov 2017 05:44:57 -0500
+	(envelope-from <dgilbert@redhat.com>) id 1eIBkI-0002gK-5v
+	for qemu-devel@nongnu.org; Fri, 24 Nov 2017 06:02:20 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1eIBTZ-0002iv-2t
-	for qemu-devel@nongnu.org; Fri, 24 Nov 2017 05:44:56 -0500
-Date: Fri, 24 Nov 2017 10:44:47 +0000
-From: Stefan Hajnoczi <stefanha@redhat.com>
-Message-ID: <20171124104447.GA11589@stefanha-x1.localdomain>
-References: <1511408266-4139-1-git-send-email-jasowang@redhat.com>
-	<20171123105934.GC26022@stefanha-x1.localdomain>
-	<7c6f12d7-8670-2a7b-0e9a-6f6c0ec92759@redhat.com>
+	(envelope-from <dgilbert@redhat.com>) id 1eIBkD-00017t-Jq
+	for qemu-devel@nongnu.org; Fri, 24 Nov 2017 06:02:10 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:35130)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1eIBkD-00013m-DA
+	for qemu-devel@nongnu.org; Fri, 24 Nov 2017 06:02:05 -0500
+Date: Fri, 24 Nov 2017 11:01:49 +0000
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20171124110149.GC2302@work-vm>
+References: <20171116130610.23582-1-peterx@redhat.com>
+	<20171116130610.23582-24-peterx@redhat.com>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="M9NhX3UHpAaciwkO"
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <7c6f12d7-8670-2a7b-0e9a-6f6c0ec92759@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH for 2.11] virtio-net: don't touch virtqueue
- if vm is stopped
+In-Reply-To: <20171116130610.23582-24-peterx@redhat.com>
+Subject: Re: [Qemu-devel] [RFC v4 23/27] monitor: enable IO thread for (qmp
+ & !mux) typed
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,94 +28,49 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Jason Wang <jasowang@redhat.com>
-Cc: Yuri Benditovich <yuri.benditovich@daynix.com>, qemu-stable@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org, mst@redhat.com
+To: Peter Xu <peterx@redhat.com>
+Cc: qemu-devel@nongnu.org, Stefan Hajnoczi <shajnocz@redhat.com>, "Daniel P . Berrange" <berrange@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Fam Zheng <famz@redhat.com>, Juan Quintela <quintela@redhat.com>, mdroth@linux.vnet.ibm.com, Eric Blake <eblake@redhat.com>, Laurent Vivier <lvivier@redhat.com>, Markus Armbruster <armbru@redhat.com>, marcandre.lureau@redhat.com
 
+* Peter Xu (peterx@redhat.com) wrote:
+> Start to use dedicate IO thread for QMP monitors that are not using
+> MUXed chardev.
+> 
+> Signed-off-by: Peter Xu <peterx@redhat.com>
 
---M9NhX3UHpAaciwkO
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
 
-On Fri, Nov 24, 2017 at 10:57:11AM +0800, Jason Wang wrote:
-> On 2017=E5=B9=B411=E6=9C=8823=E6=97=A5 18:59, Stefan Hajnoczi wrote:
-> > On Thu, Nov 23, 2017 at 11:37:46AM +0800, Jason Wang wrote:
-> > > Guest state should not be touched if VM is stopped, unfortunately we
-> > > didn't check running state and tried to drain tx queue unconditionally
-> > > in virtio_net_set_status(). A crash was then noticed as a migration
-> > > destination when user type quit after virtqueue state is loaded but
-> > > before region cache is initialized. In this case,
-> > > virtio_net_drop_tx_queue_data() tries to access the uninitialized
-> > > region cache.
-> > >=20
-> > > Fix this by only dropping tx queue data when vm is running.
-> > hw/virtio/virtio.c:virtio_load() does the following:
-> >=20
-> >    for (i =3D 0; i < num; i++) {
-> >        if (vdev->vq[i].vring.desc) {
-> >            uint16_t nheads;
-> >=20
-> >            /*
-> >             * VIRTIO-1 devices migrate desc, used, and avail ring addre=
-sses so
-> >             * only the region cache needs to be set up.  Legacy devices=
- need
-> >             * to calculate used and avail ring addresses based on the d=
-esc
-> >             * address.
-> >             */
-> >            if (virtio_vdev_has_feature(vdev, VIRTIO_F_VERSION_1)) {
-> >                virtio_init_region_cache(vdev, i);
-> >            } else {
-> >                virtio_queue_update_rings(vdev, i);
-> >            }
-> >=20
-> > So the region caches should be initialized after virtqueue state is
-> > loaded.
-> >=20
-> > It's unclear to me which code path triggers this issue.  Can you add a
-> > backtrace or an explanation?
-> >=20
-> > Thanks,
-> > Stefan
->=20
-> Migration coroutine was yield before region cache was initialized. The
-> backtrace looks like:
-[...]
-> #16 0x0000555555b1c199 in vmstate_load_state (f=3D0x555556f7c010,
-> vmsd=3D0x5555562b8160 <vmstate_virtio>, opaque=3D0x555557d68610, version_=
-id=3D1)
-> =C2=A0=C2=A0=C2=A0 at migration/vmstate.c:160
-> #17 0x0000555555865cc3 in virtio_load (vdev=3D0x555557d68610,
-> f=3D0x555556f7c010, version_id=3D11) at
-> /home/devel/git/qemu/hw/virtio/virtio.c:2110
+I guess another way to do this would be to have a property on the
+Chardev something like 'can use iothread' and clear that for Mux.
 
-Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
+Dave
 
-Thanks for the backtrace!  Your patch is fine but I have a larger
-concern:
-
-The backtrace shows that the virtio code is re-entrant during savevm
-load.  That's probably a bad thing because set_status() and other APIs
-are probably not intended to run while we are half-way through savevm
-load.  The virtqueue is only partially set up at this point :(.  I
-wonder if a more general cleanup is necessary to avoid problems like
-this in the future...
-
-Stefan
-
---M9NhX3UHpAaciwkO
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEcBAEBAgAGBQJaF/geAAoJEJykq7OBq3PIQjoH/iKH8xPa4Sa48XT9hztW1QNi
-z9aTeXDvN9rkolYgezZlJS0MkjJS8Igkk3/LzO3PSNhZOArKnOvo8fl9YFXqD/wt
-EnEu4E1HPJHYQ7X0OlZ6URWoL/j4ukAzkROwXfIf/tSCl0BxZUpZep1qkc8x7gTa
-obblwziraopsAbVS/6eqjS78iOJnx3SnNwvaNiJei7bg46sKJhDk8a1C19FCrxZV
-MAz9OjK2VrA7J4SZMIGcKdLCDvUb73Nt9wueGTLVo1GbWJ3oL4Cix+iDjj46UH18
-vK3BX1cyXmDIUpCMNsmuAUm+6CGrzuVwYMDz67qO2q8rUXAlCD8MWMaxaBRd84E=
-=1ieJ
------END PGP SIGNATURE-----
-
---M9NhX3UHpAaciwkO--
+> ---
+>  monitor.c | 3 ++-
+>  1 file changed, 2 insertions(+), 1 deletion(-)
+> 
+> diff --git a/monitor.c b/monitor.c
+> index b18d9d696c..5e0b8ed9c5 100644
+> --- a/monitor.c
+> +++ b/monitor.c
+> @@ -36,6 +36,7 @@
+>  #include "net/net.h"
+>  #include "net/slirp.h"
+>  #include "chardev/char-fe.h"
+> +#include "chardev/char-mux.h"
+>  #include "ui/qemu-spice.h"
+>  #include "sysemu/numa.h"
+>  #include "monitor/monitor.h"
+> @@ -4456,7 +4457,7 @@ void monitor_init(Chardev *chr, int flags)
+>      Monitor *mon = g_malloc(sizeof(*mon));
+>      GMainContext *context;
+>  
+> -    monitor_data_init(mon, false, false);
+> +    monitor_data_init(mon, false, !CHARDEV_IS_MUX(chr));
+>  
+>      qemu_chr_fe_init(&mon->chr, chr, &error_abort);
+>      mon->flags = flags;
+> -- 
+> 2.13.6
+> 
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
