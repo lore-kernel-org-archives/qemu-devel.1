@@ -1,24 +1,14 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52698)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53831)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1eIAVc-0001zi-L5
-	for qemu-devel@nongnu.org; Fri, 24 Nov 2017 04:42:57 -0500
+	(envelope-from <eric.auger@redhat.com>) id 1eIAWj-0002Yv-3x
+	for qemu-devel@nongnu.org; Fri, 24 Nov 2017 04:44:06 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1eIAVY-00024m-Ew
-	for qemu-devel@nongnu.org; Fri, 24 Nov 2017 04:42:56 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:49374)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1eIAVY-00023O-97
-	for qemu-devel@nongnu.org; Fri, 24 Nov 2017 04:42:52 -0500
-References: <20171124075542.16979-1-ppandit@redhat.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <48adc6ba-270e-ab22-111b-1897d551dc65@redhat.com>
-Date: Fri, 24 Nov 2017 10:42:44 +0100
-MIME-Version: 1.0
-In-Reply-To: <20171124075542.16979-1-ppandit@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v1 0/2] check VirtiQueue Vring objects
+	(envelope-from <eric.auger@redhat.com>) id 1eIAWi-0003Nf-BN
+	for qemu-devel@nongnu.org; Fri, 24 Nov 2017 04:44:05 -0500
+From: Eric Auger <eric.auger@redhat.com>
+Date: Fri, 24 Nov 2017 10:43:46 +0100
+Message-Id: <1511516626-21178-1-git-send-email-eric.auger@redhat.com>
+Subject: [Qemu-devel] [PATCH for 2.11] hw/arm/virt: Add 2.11 machine type
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,28 +17,57 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: P J P <ppandit@redhat.com>, Qemu Developers <qemu-devel@nongnu.org>
-Cc: Stefan Hajnoczi <stefanha@redhat.com>, zhangboxian <zhangboxian@huawei.com>, Prasad J Pandit <pjp@fedoraproject.org>
+To: eric.auger.pro@gmail.com, eric.auger@redhat.com, peter.maydell@linaro.org, qemu-arm@nongnu.org, qemu-devel@nongnu.org
+Cc: drjones@redhat.com
 
-On 24/11/2017 08:55, P J P wrote:
-> From: Prasad J Pandit <pjp@fedoraproject.org>
-> 
-> Hello,
-> 
-> An user could attempt to use an uninitialised VirtQueue object
-> or set Vring object with undue values, raising an unexpected
-> exception in Qemu. This patch set fixes this issue and also adds
-> a unit test to the suite.
-> 
-> Thank you.
-> --
-> Prasad J Pandit (2):
->   virtio: check VirtQueue Vring object is set
->   tests: add test to check VirtQueue object
-> 
->  hw/virtio/virtio.c      | 11 ++++++++---
->  tests/virtio-blk-test.c | 21 +++++++++++++++++++++
->  2 files changed, 29 insertions(+), 3 deletions(-)
-> 
+Add virt-2.11 machine type.
 
-Reviewed-by: Paolo Bonzini <pbonzini@redhat.com>
+Signed-off-by: Eric Auger <eric.auger@redhat.com>
+
+---
+---
+ hw/arm/virt.c | 19 +++++++++++++++++--
+ 1 file changed, 17 insertions(+), 2 deletions(-)
+
+diff --git a/hw/arm/virt.c b/hw/arm/virt.c
+index 9e18b41..151592b 100644
+--- a/hw/arm/virt.c
++++ b/hw/arm/virt.c
+@@ -1618,7 +1618,7 @@ static void machvirt_machine_init(void)
+ }
+ type_init(machvirt_machine_init);
+ 
+-static void virt_2_10_instance_init(Object *obj)
++static void virt_2_11_instance_init(Object *obj)
+ {
+     VirtMachineState *vms = VIRT_MACHINE(obj);
+     VirtMachineClass *vmc = VIRT_MACHINE_GET_CLASS(vms);
+@@ -1678,10 +1678,25 @@ static void virt_2_10_instance_init(Object *obj)
+     vms->irqmap = a15irqmap;
+ }
+ 
++static void virt_machine_2_11_options(MachineClass *mc)
++{
++}
++DEFINE_VIRT_MACHINE_AS_LATEST(2, 11)
++
++#define VIRT_COMPAT_2_10 \
++    HW_COMPAT_2_10
++
++static void virt_2_10_instance_init(Object *obj)
++{
++    virt_2_11_instance_init(obj);
++}
++
+ static void virt_machine_2_10_options(MachineClass *mc)
+ {
++    virt_machine_2_11_options(mc);
++    SET_MACHINE_COMPAT(mc, VIRT_COMPAT_2_10);
+ }
+-DEFINE_VIRT_MACHINE_AS_LATEST(2, 10)
++DEFINE_VIRT_MACHINE(2, 10)
+ 
+ #define VIRT_COMPAT_2_9 \
+     HW_COMPAT_2_9
+-- 
+2.5.5
