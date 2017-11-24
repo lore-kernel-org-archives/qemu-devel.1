@@ -1,18 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40878)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40889)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ppandit@redhat.com>) id 1eII9J-0008IH-1i
-	for qemu-devel@nongnu.org; Fri, 24 Nov 2017 12:52:26 -0500
+	(envelope-from <ppandit@redhat.com>) id 1eII9J-0008IM-Tg
+	for qemu-devel@nongnu.org; Fri, 24 Nov 2017 12:52:27 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ppandit@redhat.com>) id 1eII9F-0003r3-Ty
+	(envelope-from <ppandit@redhat.com>) id 1eII9I-00045x-T2
 	for qemu-devel@nongnu.org; Fri, 24 Nov 2017 12:52:25 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:39556)
+Received: from mx1.redhat.com ([209.132.183.28]:55514)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ppandit@redhat.com>) id 1eII9F-0003oG-Na
-	for qemu-devel@nongnu.org; Fri, 24 Nov 2017 12:52:21 -0500
+	(Exim 4.71) (envelope-from <ppandit@redhat.com>) id 1eII9I-00042H-N9
+	for qemu-devel@nongnu.org; Fri, 24 Nov 2017 12:52:24 -0500
 From: P J P <ppandit@redhat.com>
-Date: Fri, 24 Nov 2017 23:22:09 +0530
-Message-Id: <20171124175211.2234-1-ppandit@redhat.com>
-Subject: [Qemu-devel] [PATCH v2 0/2] check VirtiQueue Vring objects
+Date: Fri, 24 Nov 2017 23:22:10 +0530
+Message-Id: <20171124175211.2234-2-ppandit@redhat.com>
+In-Reply-To: <20171124175211.2234-1-ppandit@redhat.com>
+References: <20171124175211.2234-1-ppandit@redhat.com>
+Subject: [Qemu-devel] [PATCH v2 1/2] virtio: check VirtQueue Vring object is
+ set
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,22 +29,64 @@ Cc: Stefan Hajnoczi <stefanha@redhat.com>, zhangboxian <zhangboxian@huawei.com>,
 
 From: Prasad J Pandit <pjp@fedoraproject.org>
 
-Hello,
-
 An user could attempt to use an uninitialised VirtQueue object
-or set Vring object with undue values, raising an unexpected
-exception in Qemu. This patch set fixes this issue and also adds
-a unit test to the suite.
+or unset Vring.align leading to a arithmetic exception. Add check
+to avoid it.
 
-Thank you.
---
-Prasad J Pandit (2):
-  virtio: check VirtQueue Vring object is set
-  tests: add test to check VirtQueue object
+Reported-by: Zhangboxian <zhangboxian@huawei.com>
+Signed-off-by: Prasad J Pandit <pjp@fedoraproject.org>
+---
+ hw/virtio/virtio.c | 14 +++++++++++---
+ 1 file changed, 11 insertions(+), 3 deletions(-)
 
- hw/virtio/virtio.c      | 14 +++++++++++---
- tests/virtio-blk-test.c | 25 +++++++++++++++++++++++++
- 2 files changed, 36 insertions(+), 3 deletions(-)
+Update: add vring.num check to virtio_queue_set_rings
+  -> https://lists.gnu.org/archive/html/qemu-devel/2017-11/msg04549.html
 
+diff --git a/hw/virtio/virtio.c b/hw/virtio/virtio.c
+index 5884ce3480..f4bfc23344 100644
+--- a/hw/virtio/virtio.c
++++ b/hw/virtio/virtio.c
+@@ -182,7 +182,7 @@ void virtio_queue_update_rings(VirtIODevice *vdev, int n)
+ {
+     VRing *vring = &vdev->vq[n].vring;
+ 
+-    if (!vring->desc) {
++    if (!vdev->vq[n].vring.num || !vring->desc || !vring->align) {
+         /* not yet setup -> nothing to do */
+         return;
+     }
+@@ -1414,6 +1414,9 @@ void virtio_config_modern_writel(VirtIODevice *vdev,
+ 
+ void virtio_queue_set_addr(VirtIODevice *vdev, int n, hwaddr addr)
+ {
++    if (!vdev->vq[n].vring.num) {
++        return;
++    }
+     vdev->vq[n].vring.desc = addr;
+     virtio_queue_update_rings(vdev, n);
+ }
+@@ -1426,6 +1429,9 @@ hwaddr virtio_queue_get_addr(VirtIODevice *vdev, int n)
+ void virtio_queue_set_rings(VirtIODevice *vdev, int n, hwaddr desc,
+                             hwaddr avail, hwaddr used)
+ {
++    if(!vdev->vq[n].vring.num || !desc || !vdev->vq[n].vring.align) {
++        return;
++    }
+     vdev->vq[n].vring.desc = desc;
+     vdev->vq[n].vring.avail = avail;
+     vdev->vq[n].vring.used = used;
+@@ -1494,8 +1500,10 @@ void virtio_queue_set_align(VirtIODevice *vdev, int n, int align)
+      */
+     assert(k->has_variable_vring_alignment);
+ 
+-    vdev->vq[n].vring.align = align;
+-    virtio_queue_update_rings(vdev, n);
++    if (align) {
++        vdev->vq[n].vring.align = align;
++        virtio_queue_update_rings(vdev, n);
++    }
+ }
+ 
+ static bool virtio_queue_notify_aio_vq(VirtQueue *vq)
 -- 
 2.13.6
