@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57001)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56988)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <frasse.iglesias@gmail.com>) id 1eILXq-0001ZL-75
+	(envelope-from <frasse.iglesias@gmail.com>) id 1eILXp-0001ZJ-76
 	for qemu-devel@nongnu.org; Fri, 24 Nov 2017 16:29:59 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <frasse.iglesias@gmail.com>) id 1eILXp-0007bS-8t
-	for qemu-devel@nongnu.org; Fri, 24 Nov 2017 16:29:58 -0500
-Received: from mail-lf0-x242.google.com ([2a00:1450:4010:c07::242]:42994)
+	(envelope-from <frasse.iglesias@gmail.com>) id 1eILXm-0007ao-3C
+	for qemu-devel@nongnu.org; Fri, 24 Nov 2017 16:29:57 -0500
+Received: from mail-lf0-x244.google.com ([2a00:1450:4010:c07::244]:34141)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <frasse.iglesias@gmail.com>)
-	id 1eILXo-0007bI-UE
-	for qemu-devel@nongnu.org; Fri, 24 Nov 2017 16:29:57 -0500
-Received: by mail-lf0-x242.google.com with SMTP id m1so26700331lfj.9
-	for <qemu-devel@nongnu.org>; Fri, 24 Nov 2017 13:29:56 -0800 (PST)
+	id 1eILXl-0007aX-RU
+	for qemu-devel@nongnu.org; Fri, 24 Nov 2017 16:29:54 -0500
+Received: by mail-lf0-x244.google.com with SMTP id i14so26727426lfc.1
+	for <qemu-devel@nongnu.org>; Fri, 24 Nov 2017 13:29:53 -0800 (PST)
 From: Francisco Iglesias <frasse.iglesias@gmail.com>
-Date: Fri, 24 Nov 2017 22:29:33 +0100
-Message-Id: <20171124212938.7074-9-frasse.iglesias@gmail.com>
+Date: Fri, 24 Nov 2017 22:29:31 +0100
+Message-Id: <20171124212938.7074-7-frasse.iglesias@gmail.com>
 In-Reply-To: <20171124212938.7074-1-frasse.iglesias@gmail.com>
 References: <20171124212938.7074-1-frasse.iglesias@gmail.com>
-Subject: [Qemu-devel] [PATCH v8 08/13] xilinx_spips: Make tx/rx_data_bytes
- more generic and reusable
+Subject: [Qemu-devel] [PATCH v8 06/13] xilinx_spips: Update striping to be
+ big-endian bit order
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,142 +30,69 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: edgari@xilinx.com, alistai@xilinx.com, francisco.iglesias@feimtech.se, mar.krzeminski@gmail.com, peter.maydell@linaro.org
 
-Make tx/rx_data_bytes more generic so they can be reused (when adding
-support for the Zynqmp Generic QSPI).
+Update striping functionality to be big-endian bit order (as according to
+the Zynq-7000 Technical Reference Manual). Output thereafter the even bits
+into the flash memory connected to the lower QSPI bus and the odd bits into
+the flash memory connected to the upper QSPI bus.
 
 Signed-off-by: Francisco Iglesias <frasse.iglesias@gmail.com>
+Acked-by: Alistair Francis <alistair.francis@xilinx.com>
 ---
- hw/ssi/xilinx_spips.c | 64 +++++++++++++++++++++++++++++----------------------
- 1 file changed, 37 insertions(+), 27 deletions(-)
+ hw/ssi/xilinx_spips.c | 19 ++++++++++---------
+ 1 file changed, 10 insertions(+), 9 deletions(-)
 
 diff --git a/hw/ssi/xilinx_spips.c b/hw/ssi/xilinx_spips.c
-index 691d48d..4621dbb 100644
+index 559fa79..231aa5b 100644
 --- a/hw/ssi/xilinx_spips.c
 +++ b/hw/ssi/xilinx_spips.c
-@@ -47,7 +47,7 @@
- /* config register */
- #define R_CONFIG            (0x00 / 4)
- #define IFMODE              (1U << 31)
--#define ENDIAN              (1 << 26)
-+#define R_CONFIG_ENDIAN     (1 << 26)
- #define MODEFAIL_GEN_EN     (1 << 17)
- #define MAN_START_COM       (1 << 16)
- #define MAN_START_EN        (1 << 15)
-@@ -450,13 +450,28 @@ static void xilinx_spips_flush_txfifo(XilinxSPIPS *s)
-     }
+@@ -208,14 +208,14 @@ static void xilinx_spips_reset(DeviceState *d)
+     xilinx_spips_update_cs_lines(s);
  }
  
--static inline void rx_data_bytes(XilinxSPIPS *s, uint8_t *value, int max)
-+static inline void tx_data_bytes(Fifo8 *fifo, uint32_t value, int num, bool be)
- {
-     int i;
-+    for (i = 0; i < num && !fifo8_is_full(fifo); ++i) {
-+        if (be) {
-+            fifo8_push(fifo, (uint8_t)(value >> 24));
-+            value <<= 8;
-+        } else {
-+            fifo8_push(fifo, (uint8_t)value);
-+            value >>= 8;
-+        }
-+    }
-+}
+-/* N way (num) in place bit striper. Lay out row wise bits (LSB to MSB)
++/* N way (num) in place bit striper. Lay out row wise bits (MSB to LSB)
+  * column wise (from element 0 to N-1). num is the length of x, and dir
+  * reverses the direction of the transform. Best illustrated by example:
+  * Each digit in the below array is a single bit (num == 3):
+  *
+- * {{ 76543210, }  ----- stripe (dir == false) -----> {{ FCheb630, }
+- *  { hgfedcba, }                                      { GDAfc741, }
+- *  { HGFEDCBA, }} <---- upstripe (dir == true) -----  { HEBgda52, }}
++ * {{ 76543210, }  ----- stripe (dir == false) -----> {{ 741gdaFC, }
++ *  { hgfedcba, }                                      { 630fcHEB, }
++ *  { HGFEDCBA, }} <---- upstripe (dir == true) -----  { 52hebGDA, }}
+  */
  
--    for (i = 0; i < max && !fifo8_is_empty(&s->rx_fifo); ++i) {
--        value[i] = fifo8_pop(&s->rx_fifo);
-+static inline int rx_data_bytes(Fifo8 *fifo, uint8_t *value, int max)
-+{
-+    int i;
-+
-+    for (i = 0; i < max && !fifo8_is_empty(fifo); ++i) {
-+        value[i] = fifo8_pop(fifo);
-     }
-+    return max - i;
- }
+ static inline void stripe8(uint8_t *x, int num, bool dir)
+@@ -223,15 +223,15 @@ static inline void stripe8(uint8_t *x, int num, bool dir)
+     uint8_t r[num];
+     memset(r, 0, sizeof(uint8_t) * num);
+     int idx[2] = {0, 0};
+-    int bit[2] = {0, 0};
++    int bit[2] = {0, 7};
+     int d = dir;
  
- static uint64_t xilinx_spips_read(void *opaque, hwaddr addr,
-@@ -466,6 +481,7 @@ static uint64_t xilinx_spips_read(void *opaque, hwaddr addr,
-     uint32_t mask = ~0;
-     uint32_t ret;
-     uint8_t rx_buf[4];
-+    int shortfall;
- 
-     addr >>= 2;
-     switch (addr) {
-@@ -496,9 +512,13 @@ static uint64_t xilinx_spips_read(void *opaque, hwaddr addr,
-         break;
-     case R_RX_DATA:
-         memset(rx_buf, 0, sizeof(rx_buf));
--        rx_data_bytes(s, rx_buf, s->num_txrx_bytes);
--        ret = s->regs[R_CONFIG] & ENDIAN ? cpu_to_be32(*(uint32_t *)rx_buf)
--                        : cpu_to_le32(*(uint32_t *)rx_buf);
-+        shortfall = rx_data_bytes(&s->rx_fifo, rx_buf, s->num_txrx_bytes);
-+        ret = s->regs[R_CONFIG] & R_CONFIG_ENDIAN ?
-+                        cpu_to_be32(*(uint32_t *)rx_buf) :
-+                        cpu_to_le32(*(uint32_t *)rx_buf);
-+        if (!(s->regs[R_CONFIG] & R_CONFIG_ENDIAN)) {
-+            ret <<= 8 * shortfall;
-+        }
-         DB_PRINT_L(0, "addr=" TARGET_FMT_plx " = %x\n", addr * 4, ret);
-         xilinx_spips_update_ixr(s);
-         return ret;
-@@ -509,20 +529,6 @@ static uint64_t xilinx_spips_read(void *opaque, hwaddr addr,
- 
- }
- 
--static inline void tx_data_bytes(XilinxSPIPS *s, uint32_t value, int num)
--{
--    int i;
--    for (i = 0; i < num && !fifo8_is_full(&s->tx_fifo); ++i) {
--        if (s->regs[R_CONFIG] & ENDIAN) {
--            fifo8_push(&s->tx_fifo, (uint8_t)(value >> 24));
--            value <<= 8;
--        } else {
--            fifo8_push(&s->tx_fifo, (uint8_t)value);
--            value >>= 8;
--        }
--    }
--}
--
- static void xilinx_spips_write(void *opaque, hwaddr addr,
-                                         uint64_t value, unsigned size)
- {
-@@ -563,16 +569,20 @@ static void xilinx_spips_write(void *opaque, hwaddr addr,
-         mask = 0;
-         break;
-     case R_TX_DATA:
--        tx_data_bytes(s, (uint32_t)value, s->num_txrx_bytes);
-+        tx_data_bytes(&s->tx_fifo, (uint32_t)value, s->num_txrx_bytes,
-+                      s->regs[R_CONFIG] & R_CONFIG_ENDIAN);
-         goto no_reg_update;
-     case R_TXD1:
--        tx_data_bytes(s, (uint32_t)value, 1);
-+        tx_data_bytes(&s->tx_fifo, (uint32_t)value, 1,
-+                      s->regs[R_CONFIG] & R_CONFIG_ENDIAN);
-         goto no_reg_update;
-     case R_TXD2:
--        tx_data_bytes(s, (uint32_t)value, 2);
-+        tx_data_bytes(&s->tx_fifo, (uint32_t)value, 2,
-+                      s->regs[R_CONFIG] & R_CONFIG_ENDIAN);
-         goto no_reg_update;
-     case R_TXD3:
--        tx_data_bytes(s, (uint32_t)value, 3);
-+        tx_data_bytes(&s->tx_fifo, (uint32_t)value, 3,
-+                      s->regs[R_CONFIG] & R_CONFIG_ENDIAN);
-         goto no_reg_update;
-     }
-     s->regs[addr] = (s->regs[addr] & ~mask) | (value & mask);
-@@ -682,11 +692,11 @@ static void lqspi_load_cache(void *opaque, hwaddr addr)
- 
-         while (cache_entry < LQSPI_CACHE_SIZE) {
-             for (i = 0; i < 64; ++i) {
--                tx_data_bytes(s, 0, 1);
-+                tx_data_bytes(&s->tx_fifo, 0, 1, false);
+     for (idx[0] = 0; idx[0] < num; ++idx[0]) {
+-        for (bit[0] = 0; bit[0] < 8; ++bit[0]) {
+-            r[idx[d]] |= x[idx[!d]] & 1 << bit[!d] ? 1 << bit[d] : 0;
++        for (bit[0] = 7; bit[0] >= 0; bit[0]--) {
++            r[idx[!d]] |= x[idx[d]] & 1 << bit[d] ? 1 << bit[!d] : 0;
+             idx[1] = (idx[1] + 1) % num;
+             if (!idx[1]) {
+-                bit[1]++;
++                bit[1]--;
              }
-             xilinx_spips_flush_txfifo(s);
-             for (i = 0; i < 64; ++i) {
--                rx_data_bytes(s, &q->lqspi_buf[cache_entry++], 1);
-+                rx_data_bytes(&s->rx_fifo, &q->lqspi_buf[cache_entry++], 1);
-             }
+         }
+     }
+@@ -266,8 +266,9 @@ static void xilinx_spips_flush_txfifo(XilinxSPIPS *s)
+         }
+ 
+         for (i = 0; i < num_effective_busses(s); ++i) {
++            int bus = num_effective_busses(s) - 1 - i;
+             DB_PRINT_L(debug_level, "tx = %02x\n", tx_rx[i]);
+-            tx_rx[i] = ssi_transfer(s->spi[i], (uint32_t)tx_rx[i]);
++            tx_rx[i] = ssi_transfer(s->spi[bus], (uint32_t)tx_rx[i]);
+             DB_PRINT_L(debug_level, "rx = %02x\n", tx_rx[i]);
          }
  
 -- 
