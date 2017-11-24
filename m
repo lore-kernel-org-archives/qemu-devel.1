@@ -1,24 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53052)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56905)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1eILCL-0004AB-7G
-	for qemu-devel@nongnu.org; Fri, 24 Nov 2017 16:07:46 -0500
+	(envelope-from <frasse.iglesias@gmail.com>) id 1eILXg-0001Tf-41
+	for qemu-devel@nongnu.org; Fri, 24 Nov 2017 16:29:49 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1eILCH-0004Fi-7Z
-	for qemu-devel@nongnu.org; Fri, 24 Nov 2017 16:07:45 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:50208)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1eILCH-0004ES-0m
-	for qemu-devel@nongnu.org; Fri, 24 Nov 2017 16:07:41 -0500
-Date: Fri, 24 Nov 2017 23:07:36 +0200
-From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <20171124230416-mutt-send-email-mst@kernel.org>
-References: <33183CC9F5247A488A2544077AF19020DA4A4429@DGGEMA505-MBS.china.huawei.com>
+	(envelope-from <frasse.iglesias@gmail.com>) id 1eILXe-0007Y1-9j
+	for qemu-devel@nongnu.org; Fri, 24 Nov 2017 16:29:48 -0500
+Received: from mail-lf0-x243.google.com ([2a00:1450:4010:c07::243]:44199)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <frasse.iglesias@gmail.com>)
+	id 1eILXe-0007Xg-2I
+	for qemu-devel@nongnu.org; Fri, 24 Nov 2017 16:29:46 -0500
+Received: by mail-lf0-x243.google.com with SMTP id w23so26682713lfd.11
+	for <qemu-devel@nongnu.org>; Fri, 24 Nov 2017 13:29:45 -0800 (PST)
+From: Francisco Iglesias <frasse.iglesias@gmail.com>
+Date: Fri, 24 Nov 2017 22:29:26 +0100
+Message-Id: <20171124212938.7074-2-frasse.iglesias@gmail.com>
+In-Reply-To: <20171124212938.7074-1-frasse.iglesias@gmail.com>
+References: <20171124212938.7074-1-frasse.iglesias@gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <33183CC9F5247A488A2544077AF19020DA4A4429@DGGEMA505-MBS.china.huawei.com>
-Subject: Re: [Qemu-devel] [Questions] about the VHOST_MEMORY_MAX_NREGIONS of
- vhost-user backend?
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Subject: [Qemu-devel] [PATCH v8 01/13] m25p80: Add support for continuous
+ read out of RDSR and READ_FSR
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,65 +30,116 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Gonglei (Arei)" <arei.gonglei@huawei.com>
-Cc: Jason Wang <jasowang@redhat.com>, "n.nikolaev@virtualopensystems.com" <n.nikolaev@virtualopensystems.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "dev@dpdk.org" <dev@dpdk.org>, Fanhenglong <fanhenglong@huawei.com>, "Lianxueguo (Albert)" <lianxueguo@huawei.com>, "wangxin (U)" <wangxinxin.wang@huawei.com>, "Huangweidong (C)" <weidong.huang@huawei.com>
+To: qemu-devel@nongnu.org
+Cc: edgari@xilinx.com, alistai@xilinx.com, francisco.iglesias@feimtech.se, mar.krzeminski@gmail.com, peter.maydell@linaro.org
 
-On Fri, Nov 24, 2017 at 10:28:48AM +0000, Gonglei (Arei) wrote:
-> Hi,
-> 
-> Currently, the maximum number of supported memory regions for vhost-user backends is 8, 
-> and the maximum supported memory regions for vhost-net backends is determined by 
-> " /sys/module/vhost/parameters/max_mem_regions". 
-> 
-> In many scenarios, the vhost-user NIC will cause the memory region to become a bottleneck, reports
->  "a used vhost backend has no free memory slots left". 
-> 
-> Such as memory hotplug (need to support multiple memory slots), 
-> and GPU pass-through (need to register multiple bar regions) and so on.
-> 
-> So, my questions are: Why definition vhost-user memory card memory region up to 8?
-> Does it have any side effects if we increase the VHOST_MEMORY_MAX_NREGIONS? 
-> What about cross-version migration?
-> 
-> #define VHOST_MEMORY_MAX_NREGIONS    8
+Add support for continuous read out of the RDSR and READ_FSR status
+registers until the chip select is deasserted. This feature is supported
+by amongst others 1 or more flashtypes manufactured by Numonyx (Micron),
+Windbond, SST, Gigadevice, Eon and Macronix.
 
-I think we can extend it with a protocol flag.
+Signed-off-by: Francisco Iglesias <frasse.iglesias@gmail.com>
+Acked-by: Marcin Krzemiński<mar.krzeminski@gmail.com>
+---
+ hw/block/m25p80.c | 39 ++++++++++++++++++++++++++++++++++++++-
+ 1 file changed, 38 insertions(+), 1 deletion(-)
 
-
-> static int vhost_user_memslots_limit(struct vhost_dev *dev)
-> {
->     return VHOST_MEMORY_MAX_NREGIONS;
-> }
-> 
-> Which is introduced by 
-> commit 5f6f6664bf24dc53f4bf98ba812d55ca93684cd5
-> Author: Nikolay Nikolaev <n.nikolaev@virtualopensystems.com>
-> Date:   Tue May 27 15:06:02 2014 +0300
-> 
->     Add vhost-user as a vhost backend.
->     
->     The initialization takes a chardev backed by a unix domain socket.
->     It should implement qemu_fe_set_msgfds in order to be able to pass
->     file descriptors to the remote process.
->     
->     Each ioctl request of vhost-kernel has a vhost-user message equivalent,
->     which is sent over the control socket.
->     
->     The general approach is to copy the data from the supplied argument
->     pointer to a designated field in the message. If a file descriptor is
->     to be passed it will be placed in the fds array for inclusion in
->     the sendmsg control header.
->     
->     VHOST_SET_MEM_TABLE ignores the supplied vhost_memory structure and scans
->     the global ram_list for ram blocks with a valid fd field set. This would
->     be set when the '-object memory-file' option with share=on property is used.
->     
->     Signed-off-by: Antonios Motakis <a.motakis@virtualopensystems.com>
->     Signed-off-by: Nikolay Nikolaev <n.nikolaev@virtualopensystems.com>
->     Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
->     Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
-> 
-> 
-> Thanks,
-> -Gonglei
-> 
+diff --git a/hw/block/m25p80.c b/hw/block/m25p80.c
+index a2438b9..d50acc1 100644
+--- a/hw/block/m25p80.c
++++ b/hw/block/m25p80.c
+@@ -423,6 +423,7 @@ typedef struct Flash {
+     uint8_t data[M25P80_INTERNAL_DATA_BUFFER_SZ];
+     uint32_t len;
+     uint32_t pos;
++    bool data_read_loop;
+     uint8_t needed_bytes;
+     uint8_t cmd_in_progress;
+     uint32_t cur_addr;
+@@ -983,6 +984,7 @@ static void decode_new_cmd(Flash *s, uint32_t value)
+         }
+         s->pos = 0;
+         s->len = 1;
++        s->data_read_loop = true;
+         s->state = STATE_READING_DATA;
+         break;
+ 
+@@ -993,6 +995,7 @@ static void decode_new_cmd(Flash *s, uint32_t value)
+         }
+         s->pos = 0;
+         s->len = 1;
++        s->data_read_loop = true;
+         s->state = STATE_READING_DATA;
+         break;
+ 
+@@ -1133,6 +1136,7 @@ static int m25p80_cs(SSISlave *ss, bool select)
+         s->pos = 0;
+         s->state = STATE_IDLE;
+         flash_sync_dirty(s, -1);
++        s->data_read_loop = false;
+     }
+ 
+     DB_PRINT_L(0, "%sselect\n", select ? "de" : "");
+@@ -1198,7 +1202,9 @@ static uint32_t m25p80_transfer8(SSISlave *ss, uint32_t tx)
+         s->pos++;
+         if (s->pos == s->len) {
+             s->pos = 0;
+-            s->state = STATE_IDLE;
++            if (!s->data_read_loop) {
++                s->state = STATE_IDLE;
++            }
+         }
+         break;
+ 
+@@ -1269,11 +1275,38 @@ static Property m25p80_properties[] = {
+     DEFINE_PROP_END_OF_LIST(),
+ };
+ 
++static int m25p80_pre_load(void *opaque)
++{
++    Flash *s = (Flash *)opaque;
++
++    s->data_read_loop = false;
++    return 0;
++}
++
++static bool m25p80_data_read_loop_needed(void *opaque)
++{
++    Flash *s = (Flash *)opaque;
++
++    return s->data_read_loop;
++}
++
++static const VMStateDescription vmstate_m25p80_data_read_loop = {
++    .name = "m25p80/data_read_loop",
++    .version_id = 1,
++    .minimum_version_id = 1,
++    .needed = m25p80_data_read_loop_needed,
++    .fields = (VMStateField[]) {
++        VMSTATE_BOOL(data_read_loop, Flash),
++        VMSTATE_END_OF_LIST()
++    }
++};
++
+ static const VMStateDescription vmstate_m25p80 = {
+     .name = "m25p80",
+     .version_id = 0,
+     .minimum_version_id = 0,
+     .pre_save = m25p80_pre_save,
++    .pre_load = m25p80_pre_load,
+     .fields = (VMStateField[]) {
+         VMSTATE_UINT8(state, Flash),
+         VMSTATE_UINT8_ARRAY(data, Flash, M25P80_INTERNAL_DATA_BUFFER_SZ),
+@@ -1295,6 +1328,10 @@ static const VMStateDescription vmstate_m25p80 = {
+         VMSTATE_UINT8(spansion_cr3nv, Flash),
+         VMSTATE_UINT8(spansion_cr4nv, Flash),
+         VMSTATE_END_OF_LIST()
++    },
++    .subsections = (const VMStateDescription * []) {
++        &vmstate_m25p80_data_read_loop,
++        NULL
+     }
+ };
+ 
+-- 
+2.9.3
