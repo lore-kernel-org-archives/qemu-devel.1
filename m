@@ -1,21 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40139)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52174)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1eI4QH-0004x2-Du
-	for qemu-devel@nongnu.org; Thu, 23 Nov 2017 22:13:02 -0500
+	(envelope-from <dgibson@ozlabs.org>) id 1eI4h1-0000Gc-11
+	for qemu-devel@nongnu.org; Thu, 23 Nov 2017 22:30:19 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1eI4QD-0005ls-AJ
-	for qemu-devel@nongnu.org; Thu, 23 Nov 2017 22:13:01 -0500
-Date: Fri, 24 Nov 2017 13:51:00 +1100
+	(envelope-from <dgibson@ozlabs.org>) id 1eI4gz-0003Dp-UV
+	for qemu-devel@nongnu.org; Thu, 23 Nov 2017 22:30:18 -0500
+Date: Fri, 24 Nov 2017 14:16:59 +1100
 From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20171124025100.GA28000@umbus.fritz.box>
+Message-ID: <20171124031659.GD28000@umbus.fritz.box>
 References: <20171123132955.1261-1-clg@kaod.org>
-	<20171123132955.1261-2-clg@kaod.org>
+	<20171123132955.1261-6-clg@kaod.org>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="AqsLC8rIMeq19msA"
+	protocol="application/pgp-signature"; boundary="tNQTSEo8WG/FKZ8E"
 Content-Disposition: inline
-In-Reply-To: <20171123132955.1261-2-clg@kaod.org>
-Subject: Re: [Qemu-devel] [PATCH 01/25] ppc/xics: introduce an icp_create()
+In-Reply-To: <20171123132955.1261-6-clg@kaod.org>
+Subject: Re: [Qemu-devel] [PATCH 05/25] spapr: introduce a spapr_irq_set()
  helper
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
@@ -29,160 +29,70 @@ To: =?iso-8859-1?Q?C=E9dric?= Le Goater <clg@kaod.org>
 Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, Benjamin Herrenschmidt <benh@kernel.crashing.org>
 
 
---AqsLC8rIMeq19msA
+--tNQTSEo8WG/FKZ8E
 Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Thu, Nov 23, 2017 at 02:29:31PM +0100, C=E9dric Le Goater wrote:
-> The sPAPR and the PowerNV core objects create the interrupt presenter
-> object of the CPUs in a very similar way. Let's provide a common
-> routine in which we use the presenter 'type' as a child identifier.
+On Thu, Nov 23, 2017 at 02:29:35PM +0100, C=E9dric Le Goater wrote:
+> It will make synchronisation easier with the XIVE interrupt mode when
+> available. The 'irq' parameter refers to the global IRQ number space.
 >=20
 > Signed-off-by: C=E9dric Le Goater <clg@kaod.org>
 
-One tiny nit.., apart from that
+s/spapr_irq_set/spapr_irq_set_lsi/
+
+otherwise the name doesn't tell you what it sets.
+
+With that change,
 
 Reviewed-by: David Gibson <david@gibson.dropbear.id.au>
 
 > ---
->  hw/intc/xics.c          | 22 ++++++++++++++++++++++
->  hw/ppc/pnv_core.c       | 10 +---------
->  hw/ppc/spapr_cpu_core.c | 13 ++-----------
->  include/hw/ppc/xics.h   |  3 +++
->  4 files changed, 28 insertions(+), 20 deletions(-)
+>  hw/ppc/spapr.c | 11 ++++++++---
+>  1 file changed, 8 insertions(+), 3 deletions(-)
 >=20
-> diff --git a/hw/intc/xics.c b/hw/intc/xics.c
-> index a1cc0e420c98..e4ccdff8f577 100644
-> --- a/hw/intc/xics.c
-> +++ b/hw/intc/xics.c
-> @@ -384,6 +384,28 @@ static const TypeInfo icp_info =3D {
->      .class_size =3D sizeof(ICPStateClass),
->  };
+> diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
+> index 7ae84d40bdb4..79f38a9ff4e1 100644
+> --- a/hw/ppc/spapr.c
+> +++ b/hw/ppc/spapr.c
+> @@ -3594,6 +3594,11 @@ static int ics_find_free_block(ICSState *ics, int =
+num, int alignnum)
+>      return -1;
+>  }
 > =20
-> +Object *icp_create(CPUState *cs, const char *type, XICSFabric *xi, Error=
- **errp)
+> +static void spapr_irq_set(sPAPRMachineState *spapr, int irq, bool lsi)
 > +{
-> +    Object *child =3D OBJECT(cs);
-
-In the original context 'child' made sense, since it was the child
-object of the core.  Here, it's misleading, since it's the parent of
-the xics link.  It's only used in a couple of places, so I suggest you
-just opencode OBJECT(cs) in each place.
-
-> +    Error *local_err =3D NULL;
-> +    Object *obj;
-> +
-> +    obj =3D object_new(type);
-> +    object_property_add_child(child, type, obj, &error_abort);
-> +    object_unref(obj);
-> +    object_property_add_const_link(obj, ICP_PROP_XICS, OBJECT(xi),
-> +                                   &error_abort);
-> +    object_property_add_const_link(obj, ICP_PROP_CPU, child, &error_abor=
-t);
-> +    object_property_set_bool(obj, true, "realized", &local_err);
-> +    if (local_err) {
-> +        object_unparent(obj);
-> +        error_propagate(errp, local_err);
-> +        obj =3D NULL;
-> +    }
-> +
-> +    return obj;
+> +    ics_set_irq_type(spapr->ics, irq - spapr->ics->offset, lsi);
 > +}
 > +
->  /*
->   * ICS: Source layer
->   */
-> diff --git a/hw/ppc/pnv_core.c b/hw/ppc/pnv_core.c
-> index 82ff440b3334..a066736846f8 100644
-> --- a/hw/ppc/pnv_core.c
-> +++ b/hw/ppc/pnv_core.c
-> @@ -126,7 +126,6 @@ static void pnv_core_realize_child(Object *child, XIC=
-SFabric *xi, Error **errp)
->      Error *local_err =3D NULL;
->      CPUState *cs =3D CPU(child);
->      PowerPCCPU *cpu =3D POWERPC_CPU(cs);
-> -    Object *obj;
-> =20
->      object_property_set_bool(child, true, "realized", &local_err);
->      if (local_err) {
-> @@ -134,13 +133,7 @@ static void pnv_core_realize_child(Object *child, XI=
-CSFabric *xi, Error **errp)
->          return;
+>  int spapr_irq_alloc(sPAPRMachineState *spapr, int irq_hint, bool lsi,
+>                      Error **errp)
+>  {
+> @@ -3618,7 +3623,7 @@ int spapr_irq_alloc(sPAPRMachineState *spapr, int i=
+rq_hint, bool lsi,
+>          irq +=3D ics->offset;
 >      }
 > =20
-> -    obj =3D object_new(TYPE_PNV_ICP);
-> -    object_property_add_child(child, "icp", obj, NULL);
-> -    object_unref(obj);
-> -    object_property_add_const_link(obj, ICP_PROP_XICS, OBJECT(xi),
-> -                                   &error_abort);
-> -    object_property_add_const_link(obj, ICP_PROP_CPU, child, &error_abor=
-t);
-> -    object_property_set_bool(obj, true, "realized", &local_err);
-> +    icp_create(cs, TYPE_PNV_ICP, xi, &local_err);
->      if (local_err) {
->          error_propagate(errp, local_err);
->          return;
-> @@ -148,7 +141,6 @@ static void pnv_core_realize_child(Object *child, XIC=
-SFabric *xi, Error **errp)
+> -    ics_set_irq_type(ics, irq - ics->offset, lsi);
+> +    spapr_irq_set(spapr, irq, lsi);
+>      trace_spapr_irq_alloc(irq);
 > =20
->      powernv_cpu_init(cpu, &local_err);
->      if (local_err) {
-> -        object_unparent(obj);
->          error_propagate(errp, local_err);
->          return;
->      }
-> diff --git a/hw/ppc/spapr_cpu_core.c b/hw/ppc/spapr_cpu_core.c
-> index 4ba8563d49e4..f8a520a2fa2d 100644
-> --- a/hw/ppc/spapr_cpu_core.c
-> +++ b/hw/ppc/spapr_cpu_core.c
-> @@ -111,7 +111,6 @@ static void spapr_cpu_core_realize_child(Object *chil=
-d,
->      Error *local_err =3D NULL;
->      CPUState *cs =3D CPU(child);
->      PowerPCCPU *cpu =3D POWERPC_CPU(cs);
-> -    Object *obj;
-> =20
->      object_property_set_bool(child, true, "realized", &local_err);
->      if (local_err) {
-> @@ -123,21 +122,13 @@ static void spapr_cpu_core_realize_child(Object *ch=
-ild,
->          goto error;
+>      return irq;
+> @@ -3657,10 +3662,10 @@ int spapr_irq_alloc_block(sPAPRMachineState *spap=
+r, int num, bool lsi,
+>          return -1;
 >      }
 > =20
-> -    obj =3D object_new(spapr->icp_type);
-> -    object_property_add_child(child, "icp", obj, &error_abort);
-> -    object_unref(obj);
-> -    object_property_add_const_link(obj, ICP_PROP_XICS, OBJECT(spapr),
-> -                                   &error_abort);
-> -    object_property_add_const_link(obj, ICP_PROP_CPU, child, &error_abor=
-t);
-> -    object_property_set_bool(obj, true, "realized", &local_err);
-> +    icp_create(cs, spapr->icp_type, XICS_FABRIC(spapr), &local_err);
->      if (local_err) {
-> -        goto free_icp;
-> +        goto error;
+> +    first +=3D ics->offset;
+>      for (i =3D first; i < first + num; ++i) {
+> -        ics_set_irq_type(ics, i, lsi);
+> +        spapr_irq_set(spapr, i, lsi);
 >      }
+> -    first +=3D ics->offset;
 > =20
->      return;
+>      trace_spapr_irq_alloc_block(first, num, lsi, align);
 > =20
-> -free_icp:
-> -    object_unparent(obj);
->  error:
->      error_propagate(errp, local_err);
->  }
-> diff --git a/include/hw/ppc/xics.h b/include/hw/ppc/xics.h
-> index 2df99be111ce..126b47dec38b 100644
-> --- a/include/hw/ppc/xics.h
-> +++ b/include/hw/ppc/xics.h
-> @@ -212,4 +212,7 @@ typedef struct sPAPRMachineState sPAPRMachineState;
->  int xics_kvm_init(sPAPRMachineState *spapr, Error **errp);
->  void xics_spapr_init(sPAPRMachineState *spapr);
-> =20
-> +Object *icp_create(CPUState *cs, const char *type, XICSFabric *xi,
-> +                   Error **errp);
-> +
->  #endif /* XICS_H */
 
 --=20
 David Gibson			| I'll have my music baroque, and my code
@@ -190,24 +100,24 @@ david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
 				| _way_ _around_!
 http://www.ozlabs.org/~dgibson
 
---AqsLC8rIMeq19msA
+--tNQTSEo8WG/FKZ8E
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAloXiRIACgkQbDjKyiDZ
-s5JJLBAAixaGqC93g8GwOi3ngiHeym8ay5533hxto7G8st2sMfg8k1rb0dZpOy5p
-8MfiGiXtMHYQDF+h1H/1iDyUenM8GDCuOL5oQn33Lyu3OxKwUFiiYeaJMvtvBvp5
-rUsNBoTTJE2LfFAE5me4QununQYRt8196c7uT/xE78MaF3rOOKkO1XavgG8pmoBz
-s5OsO8xRkFjzpNDv+Bhcg7WBALWOwGESwVG18p/ScQFlQVLVmpi/nc2X0WitFhYU
-RNunmLGeLGoOX/sqhp9qNBSTkni2OVOndl5eUcyPAI6XwsgcOFJopSCotWkkS8W6
-ib99kySSbzLwhkjN28wp57xHZ0oLEfvnp+4TFLEplCSl8uuh2HUS5ZG5ScY856Aj
-2LSwy/gt1F9SdBoJiw0OKLUF10uVi/nnehULBriCOPYWCOalsZ/6dq1uBQjG/RZC
-5HyZJFyYAWrBnICM6l2Iv2T8koG5W+nhx5fKUcf9jy/1beWLqfj1MURoU1Ud9kD5
-NSxH7qNg1xCAaSmOEUT8uEmsmPbgX8/uFX9RH1qakMZrqMxfhJ4BILdYbwSzAEcH
-b7UrschBxgF/OXGXjqa6c/OA9qsWrpD5Zm31yum/mtIYOdwKrEXzQ5ThmiC4R05E
-Wj2D1JxOjIlJ02JONipsvxbeFgZzLpGt5jRQr/bPy5AXzMz9VNc=
-=3/mi
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAloXjysACgkQbDjKyiDZ
+s5K/thAAgbAktZsAFEOBfANXWwcJimF2m2B2tN6jtMHsmFqO0KLdlIG4JwP6kRyR
+LGBISUywp09pRJMTWEfqwkHf9MX3PFdB9MmLvnduZz1DYjr/5Cgph3p1TMvBjGKj
+nRTRVcgaqmn/J4I9gU2o0tPYFhykZ8WGrTXkCetJSBLqRIqnjDlYEac0isCg587Q
+njAJpn/gdiEO6s+tmCUhe/RrTDC1ZhMWgh0kah7AoCwmNSerdDCiNXUIxBUWi/W5
+tBqJCgZOVLAzGcjx+ai3NOx/B30nMIacpw9LKr7Z2w+QG/yFPdNN0t5FbHTeMl9Z
++92z79y4xWnZDT00B03rACnO8Orluoanqj9gbJOlenINw1q4We19s05Ne7WiWVgf
+3glToOJGLeEITSNpxTfZn1laDjABYuanA+IvSpJ+ubCijmjPEX7AIu1cNF/v3TH6
+atYw9jt8qT3EHFUmDCrvo7LbxrvXvBodUxICe8bbbBIuK8V8me4aBapyV2/H5G8G
+KA/tGeWqgNeNSpvGiOiBvybyQYIXgTyZRx5C7mv++MaMPNXz0w71MqejigLSnIQq
+v5gkZAFpUuhlXGl8sO8hLy26SELLMvYvGBMyRIYWzqubOS4fqIilpuwz4jZCDFRQ
+9CdAt3eB0ainqwszDugBTbBXVlISIqaaf4QAVgMAiUWq9NsMNSw=
+=Qe4f
 -----END PGP SIGNATURE-----
 
---AqsLC8rIMeq19msA--
+--tNQTSEo8WG/FKZ8E--
