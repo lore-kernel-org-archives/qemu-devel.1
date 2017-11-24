@@ -1,34 +1,14 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56130)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56942)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1eIElo-0004D6-3n
-	for qemu-devel@nongnu.org; Fri, 24 Nov 2017 09:15:57 -0500
+	(envelope-from <eric.auger@redhat.com>) id 1eIEoV-0005G7-Hm
+	for qemu-devel@nongnu.org; Fri, 24 Nov 2017 09:18:44 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1eIElj-0006m0-69
-	for qemu-devel@nongnu.org; Fri, 24 Nov 2017 09:15:56 -0500
-Received: from indium.canonical.com ([91.189.90.7]:47000)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1eIEli-0006lj-W5
-	for qemu-devel@nongnu.org; Fri, 24 Nov 2017 09:15:51 -0500
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1eIElg-0006NO-UL
-	for <qemu-devel@nongnu.org>; Fri, 24 Nov 2017 14:15:48 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id DE1682E80CC
-	for <qemu-devel@nongnu.org>; Fri, 24 Nov 2017 14:15:48 +0000 (UTC)
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Fri, 24 Nov 2017 14:01:48 -0000
-From: Eduardo Otubo <1721224@bugs.launchpad.net>
-Reply-To: Bug 1721224 <1721224@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <150711240619.28742.14769362567837002713.malonedeb@gac.canonical.com>
-Message-Id: <151153210809.18950.2984855359777133150.malone@gac.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1721224] Re: qemu crashes with Assertion
- `!bus->dma[0] && !bus->dma[1]' failed
+	(envelope-from <eric.auger@redhat.com>) id 1eIEoU-0001Hx-BF
+	for qemu-devel@nongnu.org; Fri, 24 Nov 2017 09:18:43 -0500
+From: Eric Auger <eric.auger@redhat.com>
+Date: Fri, 24 Nov 2017 15:18:23 +0100
+Message-Id: <1511533107-5315-1-git-send-email-eric.auger@redhat.com>
+Subject: [Qemu-devel] [PATCH v5 0/4] ITS Reset
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,46 +17,87 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: eric.auger.pro@gmail.com, eric.auger@redhat.com, peter.maydell@linaro.org, qemu-arm@nongnu.org, qemu-devel@nongnu.org, wanghaibin.wang@huawei.com
+Cc: vijay.kilari@gmail.com, drjones@redhat.com, wei@redhat.com, quintela@redhat.com, dgilbert@redhat.com, christoffer.dall@linaro.org, wu.wubin@huawei.com
 
-v2 patch posted on list and waiting for review:
+At the moment the ITS is not properly reset. On System reset or
+reboot, previous ITS register values and caches are left
+unchanged. Some of the registers might point to some guest RAM
+tables which are not valid anymore. This leads to state
+inconsistencies that are detected by the kernel save/restore
+code. And eventually this may cause qemu abort.
 
-https://lists.gnu.org/archive/html/qemu-devel/2017-11/msg04604.html
-[PATCHv3] dma/i82374: avoid double creation of i82374 device
+This series adds vITS reset modality:
+- the 2 first patches bring a minimalist reset through individual
+  register writes. However, with kernel versions < 4.15, this reset
+  is not complete (vITS caches are not voided).
+- With kernel versions >= 4.15 we can rely on a new ITS KVM device
+  reset IOTCL. The last 2 patches introduce the full reset.
 
--- =
+Tested with 4.11, 4.14 and 4.15 host kernels.
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1721224
+Best Regards
 
-Title:
-  qemu crashes with Assertion `!bus->dma[0] && !bus->dma[1]' failed
+Eric
 
-Status in QEMU:
-  New
+The series is available at:
+https://github.com/eauger/qemu/tree/2.11.0-rc2-its-reset-v5
 
-Bug description:
-  Re-production steps:
-  git clone today's qemu git tree (4th Oct 2017)
-  ./configure --target-list=3Dppc64-softmmu && make -j 8
+History:
+v4 -> v5:
+- correct error message in 2/4
 
-  Run the device-crash-test from scripts folder, seeing the following
-  error
+v3 -> v4:
+- replace partial linux header update by an exhaustive one
 
-  INFO: running test case: machine=3Dprep binary=3Dppc64-softmmu/qemu-syste=
-m-ppc64 device=3Di82374 accel=3Dtcg
-  WARNING: qemu received signal -6: ppc64-softmmu/qemu-system-ppc64 -charde=
-v socket,id=3Dmon,path=3D/var/tmp/qemu-30972-monitor.sock -mon chardev=3Dmo=
-n,mode=3Dcontrol -display none -vga none -S -machine prep,accel=3Dtcg -devi=
-ce i82374
-  CRITICAL: failed: machine=3Dprep binary=3Dppc64-softmmu/qemu-system-ppc64=
- device=3Di82374 accel=3Dtcg
-  CRITICAL: cmdline: ppc64-softmmu/qemu-system-ppc64 -S -machine prep,accel=
-=3Dtcg -device i82374
-  CRITICAL: log: qemu-system-ppc64: hw/isa/isa-bus.c:110: isa_bus_dma: Asse=
-rtion `!bus->dma[0] && !bus->dma[1]' failed.
-  CRITICAL: exit code: -6
+v2 -> v3:
+- don't call post_load on reset (no iidr check anymore)
 
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1721224/+subscriptions
+v1 -> v2:
+- Clarify why abort should be removed for save. Leave abort
+  for restore.
+- Adopt the same reset infra as vgic
+- introduce "hw/intc/arm_gicv3_its: Implement a minimalist reset"
+  which perform individual register writes. This is sufficient to
+  fix the issues without ioctl
+
+
+Eric Auger (4):
+  hw/intc/arm_gicv3_its: Don't call post_load on reset
+  hw/intc/arm_gicv3_its: Implement a minimalist reset
+  linux-headers: update to pre 4.15-rc0
+  hw/intc/arm_gicv3_its: Implement full reset
+
+ hw/intc/arm_gicv3_its_common.c                     |   2 -
+ hw/intc/arm_gicv3_its_kvm.c                        |  52 ++-
+ include/standard-headers/asm-s390/virtio-ccw.h     |   1 +
+ include/standard-headers/asm-x86/hyperv.h          | 394 +--------------------
+ include/standard-headers/linux/input-event-codes.h |   2 +
+ include/standard-headers/linux/input.h             |   1 +
+ include/standard-headers/linux/pci_regs.h          |  45 ++-
+ linux-headers/asm-arm/kvm.h                        |   8 +
+ linux-headers/asm-arm/kvm_para.h                   |   1 +
+ linux-headers/asm-arm/unistd.h                     |   2 +
+ linux-headers/asm-arm64/kvm.h                      |   8 +
+ linux-headers/asm-arm64/unistd.h                   |   1 +
+ linux-headers/asm-powerpc/epapr_hcalls.h           |   1 +
+ linux-headers/asm-powerpc/kvm.h                    |   1 +
+ linux-headers/asm-powerpc/kvm_para.h               |   1 +
+ linux-headers/asm-powerpc/unistd.h                 |   1 +
+ linux-headers/asm-s390/kvm.h                       |   1 +
+ linux-headers/asm-s390/kvm_para.h                  |   1 +
+ linux-headers/asm-s390/unistd.h                    |   4 +-
+ linux-headers/asm-x86/kvm.h                        |   1 +
+ linux-headers/asm-x86/kvm_para.h                   |   2 +-
+ linux-headers/asm-x86/unistd.h                     |   1 +
+ linux-headers/linux/kvm.h                          |   2 +
+ linux-headers/linux/kvm_para.h                     |   1 +
+ linux-headers/linux/psci.h                         |   1 +
+ linux-headers/linux/userfaultfd.h                  |   1 +
+ linux-headers/linux/vfio.h                         |   1 +
+ linux-headers/linux/vfio_ccw.h                     |   1 +
+ linux-headers/linux/vhost.h                        |   1 +
+ 29 files changed, 122 insertions(+), 417 deletions(-)
+
+-- 
+2.5.5
