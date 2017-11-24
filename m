@@ -1,34 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56862)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59843)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1eIDI5-0000xH-8E
-	for qemu-devel@nongnu.org; Fri, 24 Nov 2017 07:41:10 -0500
+	(envelope-from <pbonzini@redhat.com>) id 1eIDLP-0002qK-2v
+	for qemu-devel@nongnu.org; Fri, 24 Nov 2017 07:44:36 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1eIDHz-0007C4-9u
-	for qemu-devel@nongnu.org; Fri, 24 Nov 2017 07:41:09 -0500
-Received: from indium.canonical.com ([91.189.90.7]:41164)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1eIDHz-0007BT-36
-	for qemu-devel@nongnu.org; Fri, 24 Nov 2017 07:41:03 -0500
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1eIDHx-0007VS-4n
-	for <qemu-devel@nongnu.org>; Fri, 24 Nov 2017 12:41:01 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 230A32E8010
-	for <qemu-devel@nongnu.org>; Fri, 24 Nov 2017 12:41:01 +0000 (UTC)
+	(envelope-from <pbonzini@redhat.com>) id 1eIDLL-0001l0-VD
+	for qemu-devel@nongnu.org; Fri, 24 Nov 2017 07:44:35 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:53408)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1eIDLL-0001jl-Pn
+	for qemu-devel@nongnu.org; Fri, 24 Nov 2017 07:44:31 -0500
+References: <1455443283.33337333.1500618150787.JavaMail.zimbra@redhat.com>
+	<86754966-281f-c3ed-938c-f009440de563@gmail.com>
+	<CAPcyv4iH==cqVAdd8i1y-8A6SuXU75OH1EZzgNMvtA21wfxPpQ@mail.gmail.com>
+	<ec5ff7c2-864e-5020-0aaa-6663e78e3756@gmail.com>
+	<1511288389.1080.14.camel@redhat.com>
+	<d1df875c-5b64-67d9-2b3c-4ec14c03b85b@gmail.com>
+	<CAPcyv4ip6m6e9Bh7weJNB3m3kpDpRkhHDZf0JYyr5UbkD41oLg@mail.gmail.com>
+	<654f8935-258e-22ef-fae4-3e14e91e8fae@redhat.com>
+	<336152896.34452750.1511527207457.JavaMail.zimbra@redhat.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <d5bcb61c-1f7c-faa7-f19b-a8f02f505b4a@redhat.com>
+Date: Fri, 24 Nov 2017 13:44:23 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Fri, 24 Nov 2017 12:35:23 -0000
-From: Thomas Huth <1732679@bugs.launchpad.net>
-Reply-To: Bug 1732679 <1732679@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <151083510794.7964.2025182664045014218.malonedeb@wampee.canonical.com>
-Message-Id: <151152692336.18287.13921860656823546346.malone@gac.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1732679] Re: Cisco NX-OSv 9k crashes during boot
- with qemu 2.10.1(Debian 1:2.10.0+dfsg-2) and ovmf 0~20161202.7bbe0b3e-1
+In-Reply-To: <336152896.34452750.1511527207457.JavaMail.zimbra@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] KVM "fake DAX" flushing interface - discussion
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,127 +35,18 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Pankaj Gupta <pagupta@redhat.com>, Dan Williams <dan.j.williams@intel.com>, Rik van Riel <riel@redhat.com>, Xiao Guangrong <xiaoguangrong.eric@gmail.com>, Christoph Hellwig <hch@infradead.org>
+Cc: Jan Kara <jack@suse.cz>, Stefan Hajnoczi <stefanha@redhat.com>, Stefan Hajnoczi <stefanha@gmail.com>, kvm-devel <kvm@vger.kernel.org>, Qemu Developers <qemu-devel@nongnu.org>, "linux-nvdimm@lists.01.org" <linux-nvdimm@ml01.01.org>, ross zwisler <ross.zwisler@linux.intel.com>, Kevin Wolf <kwolf@redhat.com>, Nitesh Narayan Lal <nilal@redhat.com>, Haozhong Zhang <haozhong.zhang@intel.com>, Ross Zwisler <ross.zwisler@intel.com>
 
-Closing, according to the previous comment.
+On 24/11/2017 13:40, Pankaj Gupta wrote:
+>    - Suggestion by Paolo & Stefan(previously) to use virtio-blk makes sense if just 
+>      want a flush vehicle to send guest commands to host and get reply after asynchronous
+>      execution. There was previous discussion [1] with Rik & Dan on this.
+> 
+>     [1] https://lists.gnu.org/archive/html/qemu-devel/2017-07/msg08373.html 
 
-** Changed in: qemu
-       Status: New =3D> Invalid
+... in fact, the virtio-blk device _could_ actually accept regular I/O
+too.  That would make it easier to boot from pmem.  Is there anything
+similar in regular hardware?
 
--- =
-
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1732679
-
-Title:
-  Cisco NX-OSv 9k crashes during boot with qemu 2.10.1(Debian
-  1:2.10.0+dfsg-2) and ovmf 0~20161202.7bbe0b3e-1
-
-Status in QEMU:
-  Invalid
-
-Bug description:
-  Ubuntu 17.04
-  qemu 2.10.1(Debian 1:2.10.0+dfsg-2)
-  gns3 2.0.3
-  NX-OSv 9k 7.0.3.I6.1
-
-  - No such issue with previous qemu 2.8.x
-  - the issue does not seem to come from the debian packaging
-  - the issue does not seem to come from GNS3 either, as confirmed by Jerem=
-y Grossmann at https://github.com/GNS3/gns3-server/issues/1193#issuecomment=
--344240460
-
-  Either some parameters usage have changed (for instance -bios) (which wou=
-ld make qemu not backwards compatible) or there is an issue with qemu itsel=
-f.
-  The configuration parameters are:
-  ```
-                  "compute_id": "local",
-                  "console": 2010,
-                  "console_type": "telnet",
-                  "first_port_name": "mgmt0",
-                  "height": 48,
-                  "label": {
-                      "rotation": 0,
-                      "style": "font-family: TypeWriter;font-size: 10.0;fon=
-t-weight: bold;fill: #000000;fill-opacity: 1.0;",
-                      "text": "NX_OSv_9k_Spine_31",
-                      "x": -54,
-                      "y": -25
-                  },
-                  "name": "NX_OSv_9k_Spine_31",
-                  "node_id": "8d01119a-0adc-41bc-950b-c5639db7708c",
-                  "node_type": "qemu",
-                  "port_name_format": "Ethernet1/{port1}",
-                  "port_segment_size": 0,
-                  "properties": {
-                      "acpi_shutdown": false,
-                      "adapter_type": "e1000",
-                      "adapters": 10,
-                      "bios_image": "",
-                      "bios_image_md5sum": null,
-                      "boot_priority": "c",
-                      "cdrom_image": "",
-                      "cdrom_image_md5sum": null,
-                      "cpu_throttling": 0,
-                      "cpus": 2,
-                      "hda_disk_image": "NX-OSv-9k-7.0.3.I6.1.free.qcow2",
-                      "hda_disk_image_md5sum": "18bb991b814a508d1190575f99d=
-eed99",
-                      "hda_disk_interface": "ide",
-                      "hdb_disk_image": "",
-                      "hdb_disk_image_md5sum": null,
-                      "hdb_disk_interface": "ide",
-                      "hdc_disk_image": "",
-                      "hdc_disk_image_md5sum": null,
-                      "hdc_disk_interface": "ide",
-                      "hdd_disk_image": "",
-                      "hdd_disk_image_md5sum": null,
-                      "hdd_disk_interface": "ide",
-                      "initrd": "",
-                      "initrd_md5sum": null,
-                      "kernel_command_line": "",
-                      "kernel_image": "",
-                      "kernel_image_md5sum": null,
-                      "legacy_networking": false,
-                      "mac_address": "00:07:00:03:16:01",
-                      "options": "-nographic -enable-kvm -cpu host -machine=
- q35 -smp cpus=3D2 -bios /usr/share/ovmf/OVMF.fd",
-                      "platform": "x86_64",
-                      "process_priority": "normal",
-                      "qemu_path": "/usr/bin/qemu-system-x86_64",
-                      "ram": 6144,
-                      "usage": ""
-  ```
-
-  The logs are:
-  - [execution log](https://github.com/GNS3/gns3-server/files/1381651/qemu.=
-log.txt)
-  - [terminal log](https://github.com/GNS3/gns3-server/files/1381660/termin=
-al.log.txt)
-
-  With the latest qemu, I can boot:
-  - Cisco IOSv 15.6(2)T
-  - Cisco IOSv-L2 15.2(20170321:233949)
-  - Cisco CSR 1000v 16.5.1b
-  - Cisco ASAv 9.6(2)
-
-  The major difference with NX-OSv 9k is the bios parameter: ```-bios /usr/=
-share/ovmf/OVMF.fd```: =
-
-  ```
-  ll /usr/share/ovmf/OVMF.fd
-  -rw-r--r-- 1 root root 2097152 Dec  9  2016 /usr/share/ovmf/OVMF.fd
-  ```
-  A normal boot log with qemu 2.8.1 is available [here](https://github.com/=
-GNS3/gns3-server/files/1381729/terminal.log.2.8.txt)
-
-  Highlighting the differences: qemu 2.8.1 on the left, qemu 2.10.1 on the =
-right hand side with the same boot parameters
-  ![qemu 2 8 vs qemu 2 10](https://user-images.githubusercontent.com/131768=
-58/31534998-8429462e-aff9-11e7-9cf3-bf2b00c21e8a.jpg)
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1732679/+subscriptions
+Paolo
