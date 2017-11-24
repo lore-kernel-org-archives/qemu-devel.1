@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56998)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57038)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eric.auger@redhat.com>) id 1eIEog-0005Ox-1F
-	for qemu-devel@nongnu.org; Fri, 24 Nov 2017 09:18:56 -0500
+	(envelope-from <eric.auger@redhat.com>) id 1eIEor-0005ZM-LU
+	for qemu-devel@nongnu.org; Fri, 24 Nov 2017 09:19:09 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eric.auger@redhat.com>) id 1eIEoe-0001MN-Ur
-	for qemu-devel@nongnu.org; Fri, 24 Nov 2017 09:18:54 -0500
+	(envelope-from <eric.auger@redhat.com>) id 1eIEoq-0001Px-QX
+	for qemu-devel@nongnu.org; Fri, 24 Nov 2017 09:19:05 -0500
 From: Eric Auger <eric.auger@redhat.com>
-Date: Fri, 24 Nov 2017 15:18:25 +0100
-Message-Id: <1511533107-5315-3-git-send-email-eric.auger@redhat.com>
+Date: Fri, 24 Nov 2017 15:18:27 +0100
+Message-Id: <1511533107-5315-5-git-send-email-eric.auger@redhat.com>
 In-Reply-To: <1511533107-5315-1-git-send-email-eric.auger@redhat.com>
 References: <1511533107-5315-1-git-send-email-eric.auger@redhat.com>
-Subject: [Qemu-devel] [PATCH v5 2/4] hw/intc/arm_gicv3_its: Implement a
- minimalist reset
+Subject: [Qemu-devel] [PATCH v5 4/4] hw/intc/arm_gicv3_its: Implement full
+ reset
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,97 +23,36 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: eric.auger.pro@gmail.com, eric.auger@redhat.com, peter.maydell@linaro.org, qemu-arm@nongnu.org, qemu-devel@nongnu.org, wanghaibin.wang@huawei.com
 Cc: vijay.kilari@gmail.com, drjones@redhat.com, wei@redhat.com, quintela@redhat.com, dgilbert@redhat.com, christoffer.dall@linaro.org, wu.wubin@huawei.com
 
-At the moment the ITS is not properly reset and this causes
-various bugs on save/restore. We implement a minimalist reset
-through individual register writes but for kernel versions
-before v4.15 this fails voiding the vITS cache. We cannot
-claim we have a comprehensive reset (hence the error message)
-but that's better than nothing.
+Voiding the ITS caches is not supposed to happen via
+individual register writes. So we introduced a dedicated
+ITS KVM device ioctl to perform a cold reset of the ITS:
+KVM_DEV_ARM_VGIC_GRP_CTRL/KVM_DEV_ARM_ITS_CTRL_RESET. Let's
+use this latter if the kernel supports it.
 
 Signed-off-by: Eric Auger <eric.auger@redhat.com>
-
 ---
-v4 -> v5:
-- correct error message
-
-v2 -> v3:
-- individual register writes performed in kvm_arm_its_reset
-- check KVM_DEV_ARM_VGIC_GRP_ITS_REGS support
----
- hw/intc/arm_gicv3_its_kvm.c | 41 +++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 41 insertions(+)
+ hw/intc/arm_gicv3_its_kvm.c | 9 ++++++++-
+ 1 file changed, 8 insertions(+), 1 deletion(-)
 
 diff --git a/hw/intc/arm_gicv3_its_kvm.c b/hw/intc/arm_gicv3_its_kvm.c
-index b1b322b..8e307c9 100644
+index 8e307c9..bad593f 100644
 --- a/hw/intc/arm_gicv3_its_kvm.c
 +++ b/hw/intc/arm_gicv3_its_kvm.c
-@@ -28,6 +28,16 @@
+@@ -204,7 +204,14 @@ static void kvm_arm_its_reset(DeviceState *dev)
  
- #define TYPE_KVM_ARM_ITS "arm-its-kvm"
- #define KVM_ARM_ITS(obj) OBJECT_CHECK(GICv3ITSState, (obj), TYPE_KVM_ARM_ITS)
-+#define KVM_ARM_ITS_CLASS(klass) \
-+     OBJECT_CLASS_CHECK(KVMARMITSClass, (klass), TYPE_KVM_ARM_ITS)
-+#define KVM_ARM_ITS_GET_CLASS(obj) \
-+     OBJECT_GET_CLASS(KVMARMITSClass, (obj), TYPE_KVM_ARM_ITS)
-+
-+typedef struct KVMARMITSClass {
-+    GICv3ITSCommonClass parent_class;
-+    void (*parent_reset)(DeviceState *dev);
-+} KVMARMITSClass;
-+
+     c->parent_reset(dev);
  
- static int kvm_its_send_msi(GICv3ITSState *s, uint32_t value, uint16_t devid)
- {
-@@ -186,6 +196,34 @@ static void kvm_arm_its_post_load(GICv3ITSState *s)
-                       GITS_CTLR, &s->ctlr, true, &error_abort);
- }
- 
-+static void kvm_arm_its_reset(DeviceState *dev)
-+{
-+    GICv3ITSState *s = ARM_GICV3_ITS_COMMON(dev);
-+    KVMARMITSClass *c = KVM_ARM_ITS_GET_CLASS(s);
-+    int i;
-+
-+    c->parent_reset(dev);
-+
-+    error_report("ITS KVM: full reset is not supported by QEMU");
-+
-+    if (!kvm_device_check_attr(s->dev_fd, KVM_DEV_ARM_VGIC_GRP_ITS_REGS,
-+                               GITS_CTLR)) {
+-    error_report("ITS KVM: full reset is not supported by QEMU");
++    if (kvm_device_check_attr(s->dev_fd, KVM_DEV_ARM_VGIC_GRP_CTRL,
++                               KVM_DEV_ARM_ITS_CTRL_RESET)) {
++        kvm_device_access(s->dev_fd, KVM_DEV_ARM_VGIC_GRP_CTRL,
++                          KVM_DEV_ARM_ITS_CTRL_RESET, NULL, true, &error_abort);
 +        return;
 +    }
 +
-+    kvm_device_access(s->dev_fd, KVM_DEV_ARM_VGIC_GRP_ITS_REGS,
-+                      GITS_CTLR, &s->ctlr, true, &error_abort);
-+
-+    kvm_device_access(s->dev_fd, KVM_DEV_ARM_VGIC_GRP_ITS_REGS,
-+                      GITS_CBASER, &s->cbaser, true, &error_abort);
-+
-+    for (i = 0; i < 8; i++) {
-+        kvm_device_access(s->dev_fd, KVM_DEV_ARM_VGIC_GRP_ITS_REGS,
-+                          GITS_BASER + i * 8, &s->baser[i], true,
-+                          &error_abort);
-+    }
-+}
-+
- static Property kvm_arm_its_props[] = {
-     DEFINE_PROP_LINK("parent-gicv3", GICv3ITSState, gicv3, "kvm-arm-gicv3",
-                      GICv3State *),
-@@ -196,12 +234,15 @@ static void kvm_arm_its_class_init(ObjectClass *klass, void *data)
- {
-     DeviceClass *dc = DEVICE_CLASS(klass);
-     GICv3ITSCommonClass *icc = ARM_GICV3_ITS_COMMON_CLASS(klass);
-+    KVMARMITSClass *ic = KVM_ARM_ITS_CLASS(klass);
++    error_report("ITS KVM: full reset is not supported by the host kernel");
  
-     dc->realize = kvm_arm_its_realize;
-     dc->props   = kvm_arm_its_props;
-+    ic->parent_reset = dc->reset;
-     icc->send_msi = kvm_its_send_msi;
-     icc->pre_save = kvm_arm_its_pre_save;
-     icc->post_load = kvm_arm_its_post_load;
-+    dc->reset = kvm_arm_its_reset;
- }
- 
- static const TypeInfo kvm_arm_its_info = {
+     if (!kvm_device_check_attr(s->dev_fd, KVM_DEV_ARM_VGIC_GRP_ITS_REGS,
+                                GITS_CTLR)) {
 -- 
 2.5.5
