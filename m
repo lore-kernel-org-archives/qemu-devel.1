@@ -1,25 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49426)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49423)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <rkagan@virtuozzo.com>) id 1eIG2T-0004Dn-Ok
+	(envelope-from <rkagan@virtuozzo.com>) id 1eIG2T-0004Df-H0
 	for qemu-devel@nongnu.org; Fri, 24 Nov 2017 10:37:14 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <rkagan@virtuozzo.com>) id 1eIG2P-0004cK-Ue
+	(envelope-from <rkagan@virtuozzo.com>) id 1eIG2O-0004bS-UD
 	for qemu-devel@nongnu.org; Fri, 24 Nov 2017 10:37:13 -0500
 Received: from mail-eopbgr40105.outbound.protection.outlook.com
 	([40.107.4.105]:57962
 	helo=EUR03-DB5-obe.outbound.protection.outlook.com)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <rkagan@virtuozzo.com>)
-	id 1eIG2P-0004a7-Mb
-	for qemu-devel@nongnu.org; Fri, 24 Nov 2017 10:37:09 -0500
+	id 1eIG2O-0004a7-Cx
+	for qemu-devel@nongnu.org; Fri, 24 Nov 2017 10:37:08 -0500
 From: Roman Kagan <rkagan@virtuozzo.com>
-Date: Fri, 24 Nov 2017 18:36:56 +0300
-Message-Id: <20171124153656.30199-3-rkagan@virtuozzo.com>
-In-Reply-To: <20171124153656.30199-1-rkagan@virtuozzo.com>
-References: <20171124153656.30199-1-rkagan@virtuozzo.com>
+Date: Fri, 24 Nov 2017 18:36:54 +0300
+Message-Id: <20171124153656.30199-1-rkagan@virtuozzo.com>
 MIME-Version: 1.0
 Content-Type: text/plain
-Subject: [Qemu-devel] [PATCH 2/2] vmgenid: use UUID property type
+Subject: [Qemu-devel] [PATCH 0/2] add UUID property type
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,75 +29,19 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org, "Michael S. Tsirkin" <mst@redhat.com>, Igor Mammedov <imammedo@redhat.com>, Ben Warren <ben@skyportsystems.com>
 Cc: Markus Armbruster <armbru@redhat.com>, =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>, "Denis V. Lunev" <den@openvz.org>
 
-Switch vmgenid device to use the UUID property type introduced in the
-previous patch for its 'guid' property.
+UUIDs (GUIDs) are widely used in VMBus-related stuff, so a dedicated
+property type becomes helpful.
 
-One semantic change it introduces is that post-realize modification of
-'guid' via HMP or QMP will now be rejected with an error; however,
-according to docs/specs/vmgenid.txt this is actually desirable.
+In the existing code, vmgenid can immediately profit from it.
 
-Signed-off-by: Roman Kagan <rkagan@virtuozzo.com>
----
- hw/acpi/vmgenid.c | 30 ++++++++----------------------
- 1 file changed, 8 insertions(+), 22 deletions(-)
+Roman Kagan (2):
+  qdev-properties: add UUID property type
+  vmgenid: use UUID property type
 
-diff --git a/hw/acpi/vmgenid.c b/hw/acpi/vmgenid.c
-index 105044f666..84ff015bda 100644
---- a/hw/acpi/vmgenid.c
-+++ b/hw/acpi/vmgenid.c
-@@ -162,21 +162,6 @@ static void vmgenid_update_guest(VmGenIdState *vms)
-     }
- }
- 
--static void vmgenid_set_guid(Object *obj, const char *value, Error **errp)
--{
--    VmGenIdState *vms = VMGENID(obj);
--
--    if (!strcmp(value, "auto")) {
--        qemu_uuid_generate(&vms->guid);
--    } else if (qemu_uuid_parse(value, &vms->guid) < 0) {
--        error_setg(errp, "'%s. %s': Failed to parse GUID string: %s",
--                   object_get_typename(OBJECT(vms)), VMGENID_GUID, value);
--        return;
--    }
--
--    vmgenid_update_guest(vms);
--}
--
- /* After restoring an image, we need to update the guest memory and notify
-  * it of a potential change to VM Generation ID
-  */
-@@ -224,23 +209,24 @@ static void vmgenid_realize(DeviceState *dev, Error **errp)
-     }
- 
-     qemu_register_reset(vmgenid_handle_reset, vms);
-+
-+    vmgenid_update_guest(vms);
- }
- 
-+static Property vmgenid_device_properties[] = {
-+    DEFINE_PROP_UUID("guid", VmGenIdState, guid),
-+    DEFINE_PROP_END_OF_LIST(),
-+};
-+
- static void vmgenid_device_class_init(ObjectClass *klass, void *data)
- {
-     DeviceClass *dc = DEVICE_CLASS(klass);
- 
-     dc->vmsd = &vmstate_vmgenid;
-     dc->realize = vmgenid_realize;
-+    dc->props = vmgenid_device_properties;
-     dc->hotpluggable = false;
-     set_bit(DEVICE_CATEGORY_MISC, dc->categories);
--
--    object_class_property_add_str(klass, VMGENID_GUID, NULL,
--                                  vmgenid_set_guid, NULL);
--    object_class_property_set_description(klass, VMGENID_GUID,
--                                    "Set Global Unique Identifier "
--                                    "(big-endian) or auto for random value",
--                                    NULL);
- }
- 
- static const TypeInfo vmgenid_device_info = {
+ include/hw/qdev-properties.h |  3 +++
+ hw/acpi/vmgenid.c            | 30 +++++++------------------
+ hw/core/qdev-properties.c    | 52 ++++++++++++++++++++++++++++++++++++++++++++
+ 3 files changed, 63 insertions(+), 22 deletions(-)
+
 -- 
 2.14.3
