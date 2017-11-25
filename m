@@ -1,21 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47800)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34553)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1eIcCD-0005jR-QF
-	for qemu-devel@nongnu.org; Sat, 25 Nov 2017 10:16:46 -0500
+	(envelope-from <bztemail@gmail.com>) id 1eIdYI-0002s7-6L
+	for qemu-devel@nongnu.org; Sat, 25 Nov 2017 11:43:39 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1eIcCC-0005A3-UA
-	for qemu-devel@nongnu.org; Sat, 25 Nov 2017 10:16:45 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:44388)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1eIcCC-00059q-NH
-	for qemu-devel@nongnu.org; Sat, 25 Nov 2017 10:16:44 -0500
-From: Eduardo Habkost <ehabkost@redhat.com>
-Date: Sat, 25 Nov 2017 13:16:10 -0200
-Message-Id: <20171125151610.20547-7-ehabkost@redhat.com>
-In-Reply-To: <20171125151610.20547-1-ehabkost@redhat.com>
-References: <20171125151610.20547-1-ehabkost@redhat.com>
-Subject: [Qemu-devel] [PATCH v2 6/6] q35: Allow only supported dynamic
- sysbus devices
+	(envelope-from <bztemail@gmail.com>) id 1eIdYG-0000ve-VA
+	for qemu-devel@nongnu.org; Sat, 25 Nov 2017 11:43:38 -0500
+MIME-Version: 1.0
+In-Reply-To: <CADYoBw0RjiW2as9jGtPg92E8XK3KR+gM9C5vjC7HHsBauFn4ug@mail.gmail.com>
+References: <CADYoBw2dogvU6-3vChG4js0BNdyTPG8eDvMSRoU50eTX_9DdEQ@mail.gmail.com>
+	<MWHPR21MB01590CD596A992C93E01B5079E460@MWHPR21MB0159.namprd21.prod.outlook.com>
+	<CADYoBw1ksGDo26-PC4eMnyqxZQoZkXNLDeGoWfcRHs-SfTCJkw@mail.gmail.com>
+	<MWHPR21MB01591543E188B048145985709E470@MWHPR21MB0159.namprd21.prod.outlook.com>
+	<CADYoBw0RjiW2as9jGtPg92E8XK3KR+gM9C5vjC7HHsBauFn4ug@mail.gmail.com>
+From: bzt bzt <bztemail@gmail.com>
+Date: Sat, 25 Nov 2017 17:43:34 +0100
+Message-ID: <CADYoBw19GifmUR=Rztkzzc-v3-zWR6frjiNb_wjzsevreAqPDQ@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH] BCM2837 and machine raspi3
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,47 +25,75 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: jgross@suse.com, Thomas Huth <thuth@redhat.com>, sstabellini@kernel.org, Laszlo Ersek <lersek@redhat.com>, Marcel Apfelbaum <marcel@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Marcel Apfelbaum <marcel.a@redhat.com>
+To: Andrew Baumann <Andrew.Baumann@microsoft.com>
+Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, Peter Maydell <peter.maydell@linaro.org>, "qemu-arm@nongnu.org" <qemu-arm@nongnu.org>
 
-The only user-creatable sysbus devices in qemu-system-x86_64 are
-amd-iommu, intel-iommu, and xen-backend.  xen-backend is handled
-by xen_set_dynamic_sysbus(), so we only need to add amd-iommu and
-intel-iommu.
+Dear Andrew,
 
-Cc: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: Marcel Apfelbaum <marcel.a@redhat.com>
-Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
----
-Changes series v1 -> v2:
-* New patch added to series
----
- hw/i386/pc_q35.c | 6 ++++--
- 1 file changed, 4 insertions(+), 2 deletions(-)
+A month passed, and the maintainers didn't gave a damn about raspi3 support
+in qemu. Any ideas?
 
-diff --git a/hw/i386/pc_q35.c b/hw/i386/pc_q35.c
-index d0b0e5b422..db2bebb357 100644
---- a/hw/i386/pc_q35.c
-+++ b/hw/i386/pc_q35.c
-@@ -42,6 +42,8 @@
- #include "exec/address-spaces.h"
- #include "hw/i386/pc.h"
- #include "hw/i386/ich9.h"
-+#include "hw/i386/amd_iommu.h"
-+#include "hw/i386/intel_iommu.h"
- #include "hw/smbios/smbios.h"
- #include "hw/ide/pci.h"
- #include "hw/ide/ahci.h"
-@@ -299,8 +301,8 @@ static void pc_q35_machine_options(MachineClass *m)
-     m->default_machine_opts = "firmware=bios-256k.bin";
-     m->default_display = "std";
-     m->no_floppy = 1;
--    /*TODO: allow only sysbus devices that really work with this machine */
--    machine_class_allow_dynamic_sysbus_dev(m, TYPE_SYS_BUS_DEVICE);
-+    machine_class_allow_dynamic_sysbus_dev(m, TYPE_AMD_IOMMU_DEVICE);
-+    machine_class_allow_dynamic_sysbus_dev(m, TYPE_INTEL_IOMMU_DEVICE);
-     m->max_cpus = 288;
- }
- 
--- 
-2.13.6
+On Wed, Oct 25, 2017 at 10:52 AM, bzt bzt <bztemail@gmail.com> wrote:
+
+> Hi Andrew!
+>
+> On Tue, Oct 24, 2017 at 6:44 PM, Andrew Baumann <
+> Andrew.Baumann@microsoft.com> wrote:
+> [...]
+>
+>> I see. The address space size sounds like it would affect the SoC
+>> (although is there really 40 bits of usable physical address space beyond
+>> the core?). If it's like pi2, however, the wifi and BT are both behind USB,
+>> so that would be handled more naturally in the board model (raspi.c) than
+>> the SoC.
+>>
+> [...]
+>
+>>
+>> Right, but as I wrote above if those devices are behind USB that's not
+>> part of the SoC model, and belongs in the board logic. If "more registers"
+>> just refers to the CPU, then that's irrelevant. If there are really more
+>> devices / device registers on the system bus, then that calls for a deeper
+>> change in the SoC model and perhaps a new implementation.
+>>
+>
+> True, but even if it's behind USB, somehow the USB system should know
+> which one to emulate. Originally for clear code I was thinking along the
+> line of
+> if( TYPE(soc) == TYPE_BCM2836 ) {
+> ...
+> }
+> if( TYPE(soc) == TYPE_BCM2837 ) {
+> ...
+> }
+> when the two are not separated and shares common code. But we are not
+> there yet, let's focus on one step at a time :-)
+>
+> [...]
+>
+>> I'm more open to the need for evolution in the machine init logic
+>> (raspi.c), so splitting there makes more sense to me than in bcm2836/7.
+>>
+>> I see you just posted another patch. FWIW, this isn't quite what I was
+>> proposing -- rather than have bcm2736.c take a version number that is 2 or
+>> 3, I would just pass it the CPU model to instantiate. But at this point I
+>> think it's best waiting for one of the Qemu maintainers to chime in and see
+>> what they prefer.
+>>
+>
+> Again you are right. But I saw Alistair's patch
+> https://lists.gnu.org/archive/html/qemu-devel/2017-10/msg04153.html When
+> it makes through, the bcm2836.c could simply use mc->default_cpu_type and
+> would be no need for anything else in BCM2836State, neither a version nor a
+> CPU model.
+>
+> Okay, for now let's see what the maintainers prefer!
+>
+> Cheers,
+> bzt
+>
+>
+>> Andrew
+>>
+>
+>
