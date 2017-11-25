@@ -1,26 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48873)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44154)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <edgar@xilinx.com>) id 1eIMow-0001Wc-1A
-	for qemu-devel@nongnu.org; Fri, 24 Nov 2017 17:51:43 -0500
+	(envelope-from <tcminyard@gmail.com>) id 1eIQL1-0000gN-8g
+	for qemu-devel@nongnu.org; Fri, 24 Nov 2017 21:37:04 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <edgar@xilinx.com>) id 1eIMor-00033g-3t
-	for qemu-devel@nongnu.org; Fri, 24 Nov 2017 17:51:42 -0500
-Received: from mail-sn1nam01on0066.outbound.protection.outlook.com
-	([104.47.32.66]:62432
-	helo=NAM01-SN1-obe.outbound.protection.outlook.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <edgar@xilinx.com>) id 1eIMoq-00032R-OS
-	for qemu-devel@nongnu.org; Fri, 24 Nov 2017 17:51:37 -0500
-Date: Sat, 25 Nov 2017 05:51:27 +0700
-From: "Edgar E. Iglesias" <edgar.iglesias@xilinx.com>
-Message-ID: <20171124225127.GH3183@toto>
-References: <20171124212938.7074-1-frasse.iglesias@gmail.com>
+	(envelope-from <tcminyard@gmail.com>) id 1eIQKy-0003ap-5q
+	for qemu-devel@nongnu.org; Fri, 24 Nov 2017 21:37:03 -0500
+Received: from mail-pf0-x22f.google.com ([2607:f8b0:400e:c00::22f]:44610)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <tcminyard@gmail.com>) id 1eIQKx-0003aL-Uk
+	for qemu-devel@nongnu.org; Fri, 24 Nov 2017 21:37:00 -0500
+Received: by mail-pf0-x22f.google.com with SMTP id r14so8525508pfl.11
+	for <qemu-devel@nongnu.org>; Fri, 24 Nov 2017 18:36:59 -0800 (PST)
+Reply-To: minyard@acm.org
+References: <20171124153656.30199-1-rkagan@virtuozzo.com>
+	<20171124153656.30199-2-rkagan@virtuozzo.com>
+From: Corey Minyard <tcminyard@gmail.com>
+Message-ID: <1f37e2f7-e83e-8605-4e86-b296abcc826d@gmail.com>
+Date: Fri, 24 Nov 2017 20:36:53 -0600
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Disposition: inline
-In-Reply-To: <20171124212938.7074-1-frasse.iglesias@gmail.com>
-Subject: Re: [Qemu-devel] [PATCH v8 00/13] Add support for the ZynqMP
- Generic QSPI
+In-Reply-To: <20171124153656.30199-2-rkagan@virtuozzo.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 8bit
+Content-Language: en-GB
+Subject: Re: [Qemu-devel] [PATCH 1/2] qdev-properties: add UUID property type
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,102 +31,113 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Francisco Iglesias <frasse.iglesias@gmail.com>
-Cc: qemu-devel@nongnu.org, edgari@xilinx.com, alistai@xilinx.com, francisco.iglesias@feimtech.se, mar.krzeminski@gmail.com, peter.maydell@linaro.org
+To: Roman Kagan <rkagan@virtuozzo.com>, qemu-devel@nongnu.org, "Michael S. Tsirkin" <mst@redhat.com>, Igor Mammedov <imammedo@redhat.com>, Ben Warren <ben@skyportsystems.com>
+Cc: =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>, Markus Armbruster <armbru@redhat.com>, "Denis V. Lunev" <den@openvz.org>
 
-On Fri, Nov 24, 2017 at 10:29:25PM +0100, Francisco Iglesias wrote:
-> Hi,
-> 
-> This patch series is an attempt to add support for the ZynqMP QSPI (consisting
-> of the Generic QSPI and the legacy QSPI) to the xlnx-zcu102 board and connect 
-> Numonyx n25q512a11 flashes to the QSPI. Also some functionality is added to
-> m25p80.
-> 
-> The series starts by adding support in m25p80 for continous read out of status
-> registers, SST flash READ ID commands, bank address register accesses, bulk
-> erase (0x60) and two Numonyx flashes (n25q512a11 and n25q512a13). Thereafter it
-> updates the striping behaviour to be bit big endiann in the Xilinx QSPI model
-> and adds support for RX discard, zero pumping according transfer register and 4
-> byte LQSPI addresses. Finally it adds support for the ZynqMP Generic QSPI and
-> adds the ZynqMP QSPI to the xlnx-zcu102 board.
-> 
-> Best regards,
-> Francisco Iglesias
+On 11/24/2017 09:36 AM, Roman Kagan wrote:
+> UUIDs (GUIDs) are widely used in VMBus-related stuff, so a dedicated
+> property type becomes helpful.
+>
+> Signed-off-by: Roman Kagan <rkagan@virtuozzo.com>
+> ---
+>   include/hw/qdev-properties.h |  3 +++
+>   hw/core/qdev-properties.c    | 52 ++++++++++++++++++++++++++++++++++++++++++++
+>   2 files changed, 55 insertions(+)
+>
+> diff --git a/include/hw/qdev-properties.h b/include/hw/qdev-properties.h
+> index e2321f1cc1..d4da7dd1f1 100644
+> --- a/include/hw/qdev-properties.h
+> +++ b/include/hw/qdev-properties.h
+> @@ -30,6 +30,7 @@ extern const PropertyInfo qdev_prop_vlan;
+>   extern const PropertyInfo qdev_prop_pci_devfn;
+>   extern const PropertyInfo qdev_prop_blocksize;
+>   extern const PropertyInfo qdev_prop_pci_host_devaddr;
+> +extern const PropertyInfo qdev_prop_uuid;
+>   extern const PropertyInfo qdev_prop_arraylen;
+>   extern const PropertyInfo qdev_prop_link;
+>   
+> @@ -212,6 +213,8 @@ extern const PropertyInfo qdev_prop_link;
+>       DEFINE_PROP(_n, _s, _f, qdev_prop_pci_host_devaddr, PCIHostDeviceAddress)
+>   #define DEFINE_PROP_MEMORY_REGION(_n, _s, _f)             \
+>       DEFINE_PROP(_n, _s, _f, qdev_prop_ptr, MemoryRegion *)
+> +#define DEFINE_PROP_UUID(_n, _s, _f) \
+> +    DEFINE_PROP(_n, _s, _f, qdev_prop_uuid, QemuUUID)
+>   
+>   #define DEFINE_PROP_END_OF_LIST()               \
+>       {}
+> diff --git a/hw/core/qdev-properties.c b/hw/core/qdev-properties.c
+> index 1dc80fcea2..49fea5a40a 100644
+> --- a/hw/core/qdev-properties.c
+> +++ b/hw/core/qdev-properties.c
+> @@ -10,6 +10,7 @@
+>   #include "net/hub.h"
+>   #include "qapi/visitor.h"
+>   #include "chardev/char.h"
+> +#include "qemu/uuid.h"
+>   
+>   void qdev_prop_set_after_realize(DeviceState *dev, const char *name,
+>                                     Error **errp)
+> @@ -883,6 +884,57 @@ const PropertyInfo qdev_prop_pci_host_devaddr = {
+>       .set = set_pci_host_devaddr,
+>   };
+>   
+> +/* --- UUID --- */
+> +
+> +static void get_uuid(Object *obj, Visitor *v, const char *name, void *opaque,
+> +                     Error **errp)
+> +{
+> +    DeviceState *dev = DEVICE(obj);
+> +    Property *prop = opaque;
+> +    QemuUUID *uuid = qdev_get_prop_ptr(dev, prop);
+> +    char buffer[UUID_FMT_LEN + 1];
+> +    char *p = buffer;
+> +
+> +    qemu_uuid_unparse(uuid, buffer);
+> +
+> +    visit_type_str(v, name, &p, errp);
+> +}
+> +
+> +static void set_uuid(Object *obj, Visitor *v, const char *name, void *opaque,
+> +                    Error **errp)
+> +{
+> +    DeviceState *dev = DEVICE(obj);
+> +    Property *prop = opaque;
+> +    QemuUUID *uuid = qdev_get_prop_ptr(dev, prop);
+> +    Error *local_err = NULL;
+> +    char *str;
+> +
+> +    if (dev->realized) {
+> +        qdev_prop_set_after_realize(dev, name, errp);
+> +        return;
+> +    }
+> +
+> +    visit_type_str(v, name, &str, &local_err);
+> +    if (local_err) {
+> +        error_propagate(errp, local_err);
+> +        return;
+> +    }
+> +
+> +    if (!strcmp(str, "auto")) {
+> +        qemu_uuid_generate(uuid);
+> +    } else if (qemu_uuid_parse(str, uuid) < 0) {
+> +        error_set_from_qdev_prop_error(errp, EINVAL, dev, prop, str);
+> +    }
+> +    g_free(str);
+> +}
+> +
+> +const PropertyInfo qdev_prop_uuid = {
+> +    .name  = "str",
+> +    .description = "UUID (aka GUID) or \"auto\" for random value",
+> +    .get   = get_uuid,
+> +    .set   = set_uuid,
 
+There is a UUID value you can use as a default in  vl.c, named qemu_uuid.
+Just in case you want to set a default value here.
 
-The entire series looks good to me:
-Reviewed-by: Edgar E. Iglesias <edgar.iglesias@xilinx.com>
+-corey
 
-I also ran some regressions tests on it:
-Tested-by: Edgar E. Iglesias <edgar.iglesias@xilinx.com>
-
-Thanks!
-Edgar
-
-
-
-
-> 
-> Changelog:
-> v7 -> v8
->   * Corrected commit messages in the patches 'xilinx_spips: Don't set TX FIFO
->     UNDERFLOW at cmd done' and 'xilinx_spips: Move FlashCMD, XilinxQSPIPS and
->     XilinxSPIPSClass'.
->   * Changed a for loop and a variable decrease for improving readability in
->     patch 'xilinx_spips: Update striping to be big-endian bit order'.
-> 
-> v6 -> v7
->   * Moved data_read_loop into a vmstate subsection in patch 'm25p80: Add support
->     for continuous read out of RDSR and READ_FSR' for not breaking compatibility
->     against older vmstate versions unless necessary.
->   * Minor tweaks in patch 'xilinx_spips: Add support for the ZynqMP Generic
->     QSPI'.
-> 
-> v5 -> v6
->   * Added data_read_loop to vmstate_m25p80 in patch 'm25p80: Add support for
->     continuous read out of RDSR and READ_FSR'. Also removed acked-by lines in 
->     the commit message because of this update.
->   * Reworked patch 'xilinx_spips: Add support for the ZynqMP Generic QSPI'.
->   * Tweaked commit messages 
-> 
-> v4 -> v5
->   * Added newlines in patch 'xlnx-zcu102: Add support for the ZynqMP QSPI'
-> 
-> v3 -> v4
->   * Corrected patch 'Add support for SST READ ID 0x90/0xAB commands'
->   * Corrected patch 'Add support Add support for BRRD/BRWR and BULK_ERASE'
->   * Minor tweaks in the ZynqMP GQSPI patch for reducing the patch 
-> 
-> v2 -> v3
->   * Tweaked commit messages 
->   * Corrected patch 08 'Make tx/rx_data_bytes more generic and reusable'
->   * Reworked the patch adding the ZynqMP GQSPI and splitted out another QSPI
->     related change into an own patch 'Don't set TX FIFO UNDERFLOW at cmd done'
-> 
-> Francisco Iglesias (13):
->   m25p80: Add support for continuous read out of RDSR and READ_FSR
->   m25p80: Add support for SST READ ID 0x90/0xAB commands
->   m25p80: Add support for BRRD/BRWR and BULK_ERASE (0x60)
->   m25p80: Add support for n25q512a11 and n25q512a13
->   xilinx_spips: Move FlashCMD, XilinxQSPIPS and XilinxSPIPSClass
->   xilinx_spips: Update striping to be big-endian bit order
->   xilinx_spips: Add support for RX discard and RX drain
->   xilinx_spips: Make tx/rx_data_bytes more generic and reusable
->   xilinx_spips: Add support for zero pumping
->   xilinx_spips: Add support for 4 byte addresses in the LQSPI
->   xilinx_spips: Don't set TX FIFO UNDERFLOW at cmd done
->   xilinx_spips: Add support for the ZynqMP Generic QSPI
->   xlnx-zcu102: Add support for the ZynqMP QSPI
-> 
->  default-configs/arm-softmmu.mak |   2 +-
->  hw/arm/xlnx-zcu102.c            |  23 +
->  hw/arm/xlnx-zynqmp.c            |  26 ++
->  hw/block/m25p80.c               |  71 +++-
->  hw/ssi/xilinx_spips.c           | 899 ++++++++++++++++++++++++++++++++++------
->  include/hw/arm/xlnx-zynqmp.h    |   5 +
->  include/hw/ssi/xilinx_spips.h   |  74 +++-
->  7 files changed, 961 insertions(+), 139 deletions(-)
-> 
-> -- 
-> 2.9.3
-> 
+> +};
+> +
+>   /* --- support for array properties --- */
+>   
+>   /* Used as an opaque for the object properties we add for each
