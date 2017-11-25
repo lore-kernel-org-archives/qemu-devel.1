@@ -1,28 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42069)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42610)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ben@skyportsystems.com>) id 1eIUIR-0005IS-8A
-	for qemu-devel@nongnu.org; Sat, 25 Nov 2017 01:50:40 -0500
+	(envelope-from <ben@skyportsystems.com>) id 1eIUQK-0007KW-Gu
+	for qemu-devel@nongnu.org; Sat, 25 Nov 2017 01:58:49 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ben@skyportsystems.com>) id 1eIUIP-0007Uw-TV
-	for qemu-devel@nongnu.org; Sat, 25 Nov 2017 01:50:39 -0500
-Received: from mail-oi0-x244.google.com ([2607:f8b0:4003:c06::244]:42502)
+	(envelope-from <ben@skyportsystems.com>) id 1eIUQJ-0001kZ-CG
+	for qemu-devel@nongnu.org; Sat, 25 Nov 2017 01:58:48 -0500
+Received: from mail-ot0-x241.google.com ([2607:f8b0:4003:c0f::241]:46155)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <ben@skyportsystems.com>)
-	id 1eIUIP-0007Ue-MH
-	for qemu-devel@nongnu.org; Sat, 25 Nov 2017 01:50:37 -0500
-Received: by mail-oi0-x244.google.com with SMTP id p23so13212783oie.9
-	for <qemu-devel@nongnu.org>; Fri, 24 Nov 2017 22:50:36 -0800 (PST)
+	id 1eIUQJ-0001kP-40
+	for qemu-devel@nongnu.org; Sat, 25 Nov 2017 01:58:47 -0500
+Received: by mail-ot0-x241.google.com with SMTP id j29so20340811oth.13
+	for <qemu-devel@nongnu.org>; Fri, 24 Nov 2017 22:58:46 -0800 (PST)
 From: Ben Warren <ben@skyportsystems.com>
-Message-Id: <D15112FD-DC07-454D-A0A6-C91C7F572E48@skyportsystems.com>
+Message-Id: <A16740D0-F4A3-4EC2-8E55-F4CC519A9285@skyportsystems.com>
 Content-Type: multipart/signed;
-	boundary="Apple-Mail=_60CE48D0-3A1A-4121-872C-8F74BE8E3842";
+	boundary="Apple-Mail=_3D86CBFF-F606-4312-8EA7-5A3396DF695A";
 	protocol="application/pkcs7-signature"; micalg=sha1
 Mime-Version: 1.0 (Mac OS X Mail 10.3 \(3273\))
-Date: Fri, 24 Nov 2017 22:50:31 -0800
-In-Reply-To: <20171124153656.30199-3-rkagan@virtuozzo.com>
+Date: Fri, 24 Nov 2017 22:58:43 -0800
+In-Reply-To: <20171124153656.30199-2-rkagan@virtuozzo.com>
 References: <20171124153656.30199-1-rkagan@virtuozzo.com>
-	<20171124153656.30199-3-rkagan@virtuozzo.com>
-Subject: Re: [Qemu-devel] [PATCH 2/2] vmgenid: use UUID property type
+	<20171124153656.30199-2-rkagan@virtuozzo.com>
+Subject: Re: [Qemu-devel] [PATCH 1/2] qdev-properties: add UUID property type
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,100 +35,127 @@ To: Roman Kagan <rkagan@virtuozzo.com>
 Cc: QEMU Developers <qemu-devel@nongnu.org>, "Michael S. Tsirkin" <mst@redhat.com>, Igor Mammedov <imammedo@redhat.com>, Markus Armbruster <armbru@redhat.com>, =?utf-8?Q?Marc-Andr=C3=A9_Lureau?= <marcandre.lureau@redhat.com>, "Denis V. Lunev" <den@openvz.org>
 
 
---Apple-Mail=_60CE48D0-3A1A-4121-872C-8F74BE8E3842
+--Apple-Mail=_3D86CBFF-F606-4312-8EA7-5A3396DF695A
 Content-Transfer-Encoding: quoted-printable
 Content-Type: text/plain;
-	charset=utf-8
+	charset=us-ascii
 
-Thanks Roman, this seems like a nice improvement.  Fix the minor point =
-below, and you can add my R-B.
 
 > On Nov 24, 2017, at 7:36 AM, Roman Kagan <rkagan@virtuozzo.com> wrote:
 >=20
-> Switch vmgenid device to use the UUID property type introduced in the
-> previous patch for its 'guid' property.
->=20
-> One semantic change it introduces is that post-realize modification of
-> 'guid' via HMP or QMP will now be rejected with an error; however,
-> according to docs/specs/vmgenid.txt this is actually desirable.
+> UUIDs (GUIDs) are widely used in VMBus-related stuff, so a dedicated
+> property type becomes helpful.
 >=20
 > Signed-off-by: Roman Kagan <rkagan@virtuozzo.com>
 Reviewed-by: Ben Warren <ben@skyportsystems.com>
 > ---
-> hw/acpi/vmgenid.c | 30 ++++++++----------------------
-> 1 file changed, 8 insertions(+), 22 deletions(-)
+> include/hw/qdev-properties.h |  3 +++
+> hw/core/qdev-properties.c    | 52 =
+++++++++++++++++++++++++++++++++++++++++++++
+> 2 files changed, 55 insertions(+)
 >=20
-> diff --git a/hw/acpi/vmgenid.c b/hw/acpi/vmgenid.c
-> index 105044f666..84ff015bda 100644
-> --- a/hw/acpi/vmgenid.c
-> +++ b/hw/acpi/vmgenid.c
-> @@ -162,21 +162,6 @@ static void vmgenid_update_guest(VmGenIdState =
-*vms)
->     }
-> }
+> diff --git a/include/hw/qdev-properties.h =
+b/include/hw/qdev-properties.h
+> index e2321f1cc1..d4da7dd1f1 100644
+> --- a/include/hw/qdev-properties.h
+> +++ b/include/hw/qdev-properties.h
+> @@ -30,6 +30,7 @@ extern const PropertyInfo qdev_prop_vlan;
+> extern const PropertyInfo qdev_prop_pci_devfn;
+> extern const PropertyInfo qdev_prop_blocksize;
+> extern const PropertyInfo qdev_prop_pci_host_devaddr;
+> +extern const PropertyInfo qdev_prop_uuid;
+> extern const PropertyInfo qdev_prop_arraylen;
+> extern const PropertyInfo qdev_prop_link;
 >=20
-> -static void vmgenid_set_guid(Object *obj, const char *value, Error =
-**errp)
-> -{
-> -    VmGenIdState *vms =3D VMGENID(obj);
-> -
-> -    if (!strcmp(value, "auto")) {
-> -        qemu_uuid_generate(&vms->guid);
-> -    } else if (qemu_uuid_parse(value, &vms->guid) < 0) {
-> -        error_setg(errp, "'%s. %s': Failed to parse GUID string: %s",
-> -                   object_get_typename(OBJECT(vms)), VMGENID_GUID, =
-value);
-> -        return;
-> -    }
-> -
-> -    vmgenid_update_guest(vms);
-> -}
-> -
-> /* After restoring an image, we need to update the guest memory and =
-notify
->  * it of a potential change to VM Generation ID
->  */
-> @@ -224,23 +209,24 @@ static void vmgenid_realize(DeviceState *dev, =
-Error **errp)
->     }
+> @@ -212,6 +213,8 @@ extern const PropertyInfo qdev_prop_link;
+>     DEFINE_PROP(_n, _s, _f, qdev_prop_pci_host_devaddr, =
+PCIHostDeviceAddress)
+> #define DEFINE_PROP_MEMORY_REGION(_n, _s, _f)             \
+>     DEFINE_PROP(_n, _s, _f, qdev_prop_ptr, MemoryRegion *)
+> +#define DEFINE_PROP_UUID(_n, _s, _f) \
+> +    DEFINE_PROP(_n, _s, _f, qdev_prop_uuid, QemuUUID)
 >=20
->     qemu_register_reset(vmgenid_handle_reset, vms);
+> #define DEFINE_PROP_END_OF_LIST()               \
+>     {}
+> diff --git a/hw/core/qdev-properties.c b/hw/core/qdev-properties.c
+> index 1dc80fcea2..49fea5a40a 100644
+> --- a/hw/core/qdev-properties.c
+> +++ b/hw/core/qdev-properties.c
+> @@ -10,6 +10,7 @@
+> #include "net/hub.h"
+> #include "qapi/visitor.h"
+> #include "chardev/char.h"
+> +#include "qemu/uuid.h"
+>=20
+> void qdev_prop_set_after_realize(DeviceState *dev, const char *name,
+>                                   Error **errp)
+> @@ -883,6 +884,57 @@ const PropertyInfo qdev_prop_pci_host_devaddr =3D =
+{
+>     .set =3D set_pci_host_devaddr,
+> };
+>=20
+> +/* --- UUID --- */
 > +
-> +    vmgenid_update_guest(vms);
-> }
->=20
-> +static Property vmgenid_device_properties[] =3D {
-> +    DEFINE_PROP_UUID("guid", VmGenIdState, guid),
-Use VMGENID_GUID instead of =E2=80=9Cguid"
-> +    DEFINE_PROP_END_OF_LIST(),
+> +static void get_uuid(Object *obj, Visitor *v, const char *name, void =
+*opaque,
+> +                     Error **errp)
+> +{
+> +    DeviceState *dev =3D DEVICE(obj);
+> +    Property *prop =3D opaque;
+> +    QemuUUID *uuid =3D qdev_get_prop_ptr(dev, prop);
+> +    char buffer[UUID_FMT_LEN + 1];
+> +    char *p =3D buffer;
+> +
+> +    qemu_uuid_unparse(uuid, buffer);
+> +
+> +    visit_type_str(v, name, &p, errp);
+> +}
+> +
+> +static void set_uuid(Object *obj, Visitor *v, const char *name, void =
+*opaque,
+> +                    Error **errp)
+> +{
+> +    DeviceState *dev =3D DEVICE(obj);
+> +    Property *prop =3D opaque;
+> +    QemuUUID *uuid =3D qdev_get_prop_ptr(dev, prop);
+> +    Error *local_err =3D NULL;
+> +    char *str;
+> +
+> +    if (dev->realized) {
+> +        qdev_prop_set_after_realize(dev, name, errp);
+> +        return;
+> +    }
+> +
+> +    visit_type_str(v, name, &str, &local_err);
+> +    if (local_err) {
+> +        error_propagate(errp, local_err);
+> +        return;
+> +    }
+> +
+> +    if (!strcmp(str, "auto")) {
+> +        qemu_uuid_generate(uuid);
+> +    } else if (qemu_uuid_parse(str, uuid) < 0) {
+> +        error_set_from_qdev_prop_error(errp, EINVAL, dev, prop, str);
+> +    }
+> +    g_free(str);
+> +}
+> +
+> +const PropertyInfo qdev_prop_uuid =3D {
+> +    .name  =3D "str",
+> +    .description =3D "UUID (aka GUID) or \"auto\" for random value",
+> +    .get   =3D get_uuid,
+> +    .set   =3D set_uuid,
 > +};
 > +
-> static void vmgenid_device_class_init(ObjectClass *klass, void *data)
-> {
->     DeviceClass *dc =3D DEVICE_CLASS(klass);
+> /* --- support for array properties --- */
 >=20
->     dc->vmsd =3D &vmstate_vmgenid;
->     dc->realize =3D vmgenid_realize;
-> +    dc->props =3D vmgenid_device_properties;
->     dc->hotpluggable =3D false;
->     set_bit(DEVICE_CATEGORY_MISC, dc->categories);
-> -
-> -    object_class_property_add_str(klass, VMGENID_GUID, NULL,
-> -                                  vmgenid_set_guid, NULL);
-> -    object_class_property_set_description(klass, VMGENID_GUID,
-> -                                    "Set Global Unique Identifier "
-> -                                    "(big-endian) or auto for random =
-value",
-> -                                    NULL);
-> }
->=20
-> static const TypeInfo vmgenid_device_info =3D {
+> /* Used as an opaque for the object properties we add for each
 > --=20
 > 2.14.3
 >=20
 
 
---Apple-Mail=_60CE48D0-3A1A-4121-872C-8F74BE8E3842
+--Apple-Mail=_3D86CBFF-F606-4312-8EA7-5A3396DF695A
 Content-Disposition: attachment;
 	filename=smime.p7s
 Content-Type: application/pkcs7-signature;
@@ -190,17 +217,17 @@ A7cwggOzAgEBMIGsMIGXMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVzdGVy
 MRAwDgYDVQQHEwdTYWxmb3JkMRowGAYDVQQKExFDT01PRE8gQ0EgTGltaXRlZDE9MDsGA1UEAxM0
 Q09NT0RPIFJTQSBDbGllbnQgQXV0aGVudGljYXRpb24gYW5kIFNlY3VyZSBFbWFpbCBDQQIQP3J7
 oHmTT6ADgJUNrPKVGjAJBgUrDgMCGgUAoIIB3zAYBgkqhkiG9w0BCQMxCwYJKoZIhvcNAQcBMBwG
-CSqGSIb3DQEJBTEPFw0xNzExMjUwNjUwMzFaMCMGCSqGSIb3DQEJBDEWBBTDvrmaJSg6JU0NVp4O
-CdvLYdA0jTCBvQYJKwYBBAGCNxAEMYGvMIGsMIGXMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3Jl
+CSqGSIb3DQEJBTEPFw0xNzExMjUwNjU4NDNaMCMGCSqGSIb3DQEJBDEWBBTVbDHpH0h+J+JF/E8E
+VYaecNop4TCBvQYJKwYBBAGCNxAEMYGvMIGsMIGXMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3Jl
 YXRlciBNYW5jaGVzdGVyMRAwDgYDVQQHEwdTYWxmb3JkMRowGAYDVQQKExFDT01PRE8gQ0EgTGlt
 aXRlZDE9MDsGA1UEAxM0Q09NT0RPIFJTQSBDbGllbnQgQXV0aGVudGljYXRpb24gYW5kIFNlY3Vy
 ZSBFbWFpbCBDQQIQP3J7oHmTT6ADgJUNrPKVGjCBvwYLKoZIhvcNAQkQAgsxga+ggawwgZcxCzAJ
 BgNVBAYTAkdCMRswGQYDVQQIExJHcmVhdGVyIE1hbmNoZXN0ZXIxEDAOBgNVBAcTB1NhbGZvcmQx
 GjAYBgNVBAoTEUNPTU9ETyBDQSBMaW1pdGVkMT0wOwYDVQQDEzRDT01PRE8gUlNBIENsaWVudCBB
 dXRoZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBAhA/cnugeZNPoAOAlQ2s8pUaMA0GCSqG
-SIb3DQEBAQUABIIBAA8sdTPT/mBnPxZq4FWH008KwqWxftQmC3quMMNmGGv0mzsbXjvtrVyu2Z3t
-ikLvKRh7QV5Z+n0VeSVdaXQjnAL8rVF4vizywMlWuH3MnB17T4cHgnwdOK7YlIBjVbmTyuXi86Nf
-WSKCbL/4S2sHpxe/0MyaYqFCVcARwr+HXE4PVzU+wzb3bEAaBVIbiP3YtojadBUlteatg5OjBMqn
-gmNXwW7lY28XkO7MhljMVl47LWuBmrawF9T2AfZMw7bHd4RwZDxvhRrgg2vwsF8TiDy0GO+gc3OS
-zTnqzvvNLvU7rD7nd3+9GfRgwU5O9q1jL3/DeYQ63dBT9ACob4BGmiYAAAAAAAA=
---Apple-Mail=_60CE48D0-3A1A-4121-872C-8F74BE8E3842--
+SIb3DQEBAQUABIIBAKEG9cozRhcbd4ZbKxqI0vtmxwU0t19qbzl9zAzuwzqDyyfKFshM9i8ex+Tz
+qBMu9csmKkJl0umLv3QnAIP+tEFhbfhj8iLCUtLRoGyUip5R5YNMAFAv36dmNlFMdsef8Wn31jPf
+s4tHB4Kn18IqHqPmVap7f4dWxuWVM/+2Dq5xTHXoRhvSM1EzEDb4HsxhNtMt8abEitupXj88XpKt
+a0wlHBeldj3nh5Xdwb0dV8so77zmg9ji005N0RXfTCkO7DgEjD0gYkjCT/Z5iL29UWqACCcRuj92
+03fvh1fsA277wyGsGDiTgnlB9evh9GqsYIbvLVAdCTgfYQrecEJbeOEAAAAAAAA=
+--Apple-Mail=_3D86CBFF-F606-4312-8EA7-5A3396DF695A--
