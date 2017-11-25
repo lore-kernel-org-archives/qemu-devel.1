@@ -1,38 +1,38 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36002)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36975)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pmorel@linux.vnet.ibm.com>) id 1eIXqe-00044J-Cq
-	for qemu-devel@nongnu.org; Sat, 25 Nov 2017 05:38:13 -0500
+	(envelope-from <pmorel@linux.vnet.ibm.com>) id 1eIXsI-0004qx-N2
+	for qemu-devel@nongnu.org; Sat, 25 Nov 2017 05:39:55 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pmorel@linux.vnet.ibm.com>) id 1eIXqb-0005aR-8F
-	for qemu-devel@nongnu.org; Sat, 25 Nov 2017 05:38:12 -0500
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:36252)
+	(envelope-from <pmorel@linux.vnet.ibm.com>) id 1eIXsF-00072K-Jn
+	for qemu-devel@nongnu.org; Sat, 25 Nov 2017 05:39:54 -0500
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:58666)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <pmorel@linux.vnet.ibm.com>)
-	id 1eIXqa-0005Xc-Uu
-	for qemu-devel@nongnu.org; Sat, 25 Nov 2017 05:38:09 -0500
-Received: from pps.filterd (m0098399.ppops.net [127.0.0.1])
+	id 1eIXsF-000717-A6
+	for qemu-devel@nongnu.org; Sat, 25 Nov 2017 05:39:51 -0500
+Received: from pps.filterd (m0098394.ppops.net [127.0.0.1])
 	by mx0a-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
-	vAPAaapE127301
-	for <qemu-devel@nongnu.org>; Sat, 25 Nov 2017 05:38:05 -0500
-Received: from e06smtp14.uk.ibm.com (e06smtp14.uk.ibm.com [195.75.94.110])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2ef5jfj3u3-1
+	vAPAd0nJ035760
+	for <qemu-devel@nongnu.org>; Sat, 25 Nov 2017 05:39:48 -0500
+Received: from e06smtp10.uk.ibm.com (e06smtp10.uk.ibm.com [195.75.94.106])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2ef5wq1mg9-1
 	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Sat, 25 Nov 2017 05:38:04 -0500
+	for <qemu-devel@nongnu.org>; Sat, 25 Nov 2017 05:39:47 -0500
 Received: from localhost
-	by e06smtp14.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	by e06smtp10.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
 	Only! Violators will be prosecuted
 	for <qemu-devel@nongnu.org> from <pmorel@linux.vnet.ibm.com>;
-	Sat, 25 Nov 2017 10:38:02 -0000
+	Sat, 25 Nov 2017 10:39:45 -0000
 References: <1511388334-16347-1-git-send-email-pmorel@linux.vnet.ibm.com>
 	<1511388334-16347-3-git-send-email-pmorel@linux.vnet.ibm.com>
-	<20171123105453.4263b000.cohuck@redhat.com>
+	<321b3e16-19bc-f519-4375-fe865ed64bad@redhat.com>
 From: Pierre Morel <pmorel@linux.vnet.ibm.com>
-Date: Sat, 25 Nov 2017 11:37:58 +0100
+Date: Sat, 25 Nov 2017 11:39:40 +0100
 MIME-Version: 1.0
-In-Reply-To: <20171123105453.4263b000.cohuck@redhat.com>
+In-Reply-To: <321b3e16-19bc-f519-4375-fe865ed64bad@redhat.com>
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
-Message-Id: <bc404aa5-a9b3-7448-0663-990eca391271@linux.vnet.ibm.com>
+Message-Id: <9658fc79-5925-5bc7-0aa6-d20d5ab07b84@linux.vnet.ibm.com>
 Content-Transfer-Encoding: quoted-printable
 Subject: Re: [Qemu-devel] [PATCH v3 2/7] s390x/pci: rework PCI STORE
 List-Id: <qemu-devel.nongnu.org>
@@ -43,13 +43,11 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Cornelia Huck <cohuck@redhat.com>
-Cc: qemu-devel@nongnu.org, agraf@suse.de, borntraeger@de.ibm.com, zyimin@linux.vnet.ibm.com, pasic@linux.vnet.ibm.com
+To: Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org
+Cc: borntraeger@de.ibm.com, pasic@linux.vnet.ibm.com, cohuck@redhat.com, zyimin@linux.vnet.ibm.com, agraf@suse.de, qemu-s390x@nongnu.org
 
-On 23/11/2017 10:54, Cornelia Huck wrote:
-> On Wed, 22 Nov 2017 23:05:29 +0100
-> Pierre Morel <pmorel@linux.vnet.ibm.com> wrote:
->=20
+On 23/11/2017 10:01, Thomas Huth wrote:
+> On 22.11.2017 23:05, Pierre Morel wrote:
 >> Enhance the fault detection, correction of the fault reporting.
 >>
 >> Signed-off-by: Pierre Morel <pmorel@linux.vnet.ibm.com>
@@ -88,16 +86,17 @@ On 23/11/2017 10:54, Cornelia Huck wrote:
 >>       case ZPCI_FS_PERMANENT_ERROR:
 >> -        setcc(cpu, ZPCI_PCI_LS_INVAL_HANDLE);
 >> -        return 0;
->=20
-> Maybe add a comment that the remaining states are already covered by
-> the FH_MASK_ENABLE check above?
-
-OK
-
->=20
 >>       case ZPCI_FS_ERROR:
 >>           setcc(cpu, ZPCI_PCI_LS_ERR);
 >>           s390_set_status_code(env, r2, ZPCI_PCI_ST_BLOCKED);
+>=20
+> -EMISSINGPUBLICDOCUMENTATION
+
+Hi Thomas,
+
+I do not understand what you mean here
+
+>=20
 >> @@ -493,9 +494,13 @@ int pcistg_service_call(S390CPU *cpu, uint8_t r1,=
  uint8_t r2)
 >>           break;
@@ -109,12 +108,6 @@ OK
 >> +    switch (pcias) {
 >> +        /* A ZPCI PCI card may use any BAR from BAR 0 to BAR 5 */
 >> +    case 0 ... 5:
->=20
-> Hm... I'd still prefer speaking #defines here.
-
-OK, sorry, I misunderstood your previous comment
-
->=20
 >> +        /* Check length:
 >> +         * A length of 0 is invalid and length should not cross a dou=
 ble word
@@ -137,9 +130,6 @@ ble word
 >> -        if (zpci_endian_swap(&data, len)) {
 >> +        break;
 >> +    case 15:
->=20
-> And here.
->=20
 >> +        /* ZPCI uses the pseudo BAR number 15 as configuration space =
 */
 >> +        /* possible access lengths are 1,2,4 and must not cross a wor=
@@ -160,6 +150,21 @@ d */
 >>           DPRINTF("pcistg invalid space\n");
 >>           setcc(cpu, ZPCI_PCI_LS_ERR);
 >>           s390_set_status_code(env, r2, ZPCI_PCI_ST_INVAL_AS);
+>>
+>=20
+> At least the last two hunks looks fine to me. If you want to have a
+> Reviewed-by for this, you could maybe put these two hunks into a
+> separate patch instead?
+
+I do not understand what yo umean with the first one.
+Can you explain?
+
+Thanks
+
+Pierre
+
+>=20
+>   Thomas
 >=20
 
 
