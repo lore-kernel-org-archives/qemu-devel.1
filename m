@@ -1,18 +1,18 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57012)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57132)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mdavidsaver@gmail.com>) id 1eJ4xz-0007CO-0j
-	for qemu-devel@nongnu.org; Sun, 26 Nov 2017 17:00:00 -0500
+	(envelope-from <mdavidsaver@gmail.com>) id 1eJ4y9-0007Ro-JV
+	for qemu-devel@nongnu.org; Sun, 26 Nov 2017 17:00:11 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mdavidsaver@gmail.com>) id 1eJ4xy-00030H-28
-	for qemu-devel@nongnu.org; Sun, 26 Nov 2017 16:59:59 -0500
+	(envelope-from <mdavidsaver@gmail.com>) id 1eJ4y3-00033V-BV
+	for qemu-devel@nongnu.org; Sun, 26 Nov 2017 17:00:09 -0500
 From: Michael Davidsaver <mdavidsaver@gmail.com>
-Date: Sun, 26 Nov 2017 15:59:11 -0600
-Message-Id: <15378780eee5dc9ebc68361463a0fd6acea55556.1511731946.git.mdavidsaver@gmail.com>
+Date: Sun, 26 Nov 2017 15:59:15 -0600
+Message-Id: <6417d3123f961850c57474272c717152100b917a.1511731946.git.mdavidsaver@gmail.com>
 In-Reply-To: <cover.1511731946.git.mdavidsaver@gmail.com>
 References: <cover.1511731946.git.mdavidsaver@gmail.com>
 In-Reply-To: <cover.1511731946.git.mdavidsaver@gmail.com>
 References: <cover.1511731946.git.mdavidsaver@gmail.com>
-Subject: [Qemu-devel] [PATCH 13/17] e500: move PCI host bridge into CCSR
+Subject: [Qemu-devel] [PATCH 17/17] tests: add mvme3100-test
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,127 +24,121 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: Alexander Graf <agraf@suse.de>, David Gibson <david@gibson.dropbear.id.au>
 Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org, Michael Davidsaver <mdavidsaver@gmail.com>
 
+Exercise some features of the mvme3100 CPLD logic
+and read from the eeprom w/ VPD.
+
 Signed-off-by: Michael Davidsaver <mdavidsaver@gmail.com>
 ---
- hw/ppc/e500.c      | 13 ++++---------
- hw/ppc/e500_ccsr.c | 27 +++++++++++++++++++++++++++
- 2 files changed, 31 insertions(+), 9 deletions(-)
+ tests/Makefile.include |  3 ++
+ tests/mvme3100-test.c  | 79 ++++++++++++++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 82 insertions(+)
+ create mode 100644 tests/mvme3100-test.c
 
-diff --git a/hw/ppc/e500.c b/hw/ppc/e500.c
-index cfd5ed0152..b0c8495aef 100644
---- a/hw/ppc/e500.c
-+++ b/hw/ppc/e500.c
-@@ -769,6 +769,8 @@ void ppce500_init(MachineState *machine, PPCE500Params *params)
-     qdev_prop_set_uint32(dev, "mpic-model", params->mpic_version);
-     qdev_prop_set_uint32(dev, "base", params->ccsrbar_base);
-     qdev_prop_set_uint32(dev, "ram-size", ram_size);
-+    qdev_prop_set_uint32(dev, "pci_first_slot", params->pci_first_slot);
-+    qdev_prop_set_uint32(dev, "pci_first_pin_irq", pci_irq_nrs[0]);
-     qdev_init_nofail(dev);
-     ccsr_addr_space = sysbus_mmio_get_region(SYS_BUS_DEVICE(dev), 0);
+diff --git a/tests/Makefile.include b/tests/Makefile.include
+index 062d4e5b7b..97bce77ee4 100644
+--- a/tests/Makefile.include
++++ b/tests/Makefile.include
+@@ -373,6 +373,8 @@ check-qtest-s390x-y += tests/virtio-balloon-test$(EXESUF)
+ check-qtest-s390x-y += tests/virtio-console-test$(EXESUF)
+ check-qtest-s390x-y += tests/virtio-serial-test$(EXESUF)
  
-@@ -778,20 +780,13 @@ void ppce500_init(MachineState *machine, PPCE500Params *params)
- 
- 
-     /* PCI */
--    dev = qdev_create(NULL, "e500-pcihost");
--    object_property_add_child(qdev_get_machine(), "pci-host", OBJECT(dev),
--                              &error_abort);
--    qdev_prop_set_uint32(dev, "first_slot", params->pci_first_slot);
--    qdev_prop_set_uint32(dev, "first_pin_irq", pci_irq_nrs[0]);
--    qdev_init_nofail(dev);
-+    dev = DEVICE(object_resolve_path("/machine/pci-host", 0));
-+    assert(dev);
-     s = SYS_BUS_DEVICE(dev);
-     for (i = 0; i < PCI_NUM_PINS; i++) {
-         sysbus_connect_irq(s, i, qdev_get_gpio_in(mpicdev, pci_irq_nrs[i]));
-     }
- 
--    memory_region_add_subregion(ccsr_addr_space, MPC8544_PCI_REGS_OFFSET,
--                                sysbus_mmio_get_region(s, 0));
--
-     pci_bus = (PCIBus *)qdev_get_child_bus(dev, "pci.0");
-     if (!pci_bus)
-         printf("couldn't create PCI controller!\n");
-diff --git a/hw/ppc/e500_ccsr.c b/hw/ppc/e500_ccsr.c
-index cd8216daaf..4ec8f7524d 100644
---- a/hw/ppc/e500_ccsr.c
-+++ b/hw/ppc/e500_ccsr.c
-@@ -50,6 +50,8 @@
- 
- #define E500_DUART_OFFSET(N) (0x4500 + (N) * 0x100)
- 
-+#define E500_PCI_OFFSET  (0x8000ULL)
++check-qtest-ppc-$(CONFIG_E500) += tests/mvme3100-test$(EXESUF)
 +
- #define E500_PORPLLSR    (0xE0000)
- #define E500_PVR         (0xE00A0)
- #define E500_SVR         (0xE00A4)
-@@ -75,6 +77,7 @@ typedef struct {
+ check-qtest-generic-y += tests/qom-test$(EXESUF)
+ check-qtest-generic-y += tests/test-hmp$(EXESUF)
  
-     DeviceState *pic;
-     DeviceState *i2c;
-+    DeviceState *pcihost;
- } CCSRState;
- 
- #define TYPE_E500_CCSR "e500-ccsr"
-@@ -201,6 +204,7 @@ static void e500_ccsr_init(Object *obj)
-     DeviceState *dev = DEVICE(obj);
-     CCSRState *ccsr = E500_CCSR(dev);
- 
-+    /* prepare MPIC */
-     assert(current_machine);
-     if (kvm_enabled()) {
- 
-@@ -228,6 +232,18 @@ static void e500_ccsr_init(Object *obj)
-     object_property_add_alias(obj, "mpic-model",
-                               OBJECT(ccsr->pic), "model",
-                               &error_fatal);
+@@ -782,6 +784,7 @@ tests/i82801b11-test$(EXESUF): tests/i82801b11-test.o
+ tests/ac97-test$(EXESUF): tests/ac97-test.o
+ tests/es1370-test$(EXESUF): tests/es1370-test.o
+ tests/intel-hda-test$(EXESUF): tests/intel-hda-test.o
++tests/mvme3100-test$(EXESUF): tests/mvme3100-test.o $(libqos-e500-obj-y)
+ tests/ioh3420-test$(EXESUF): tests/ioh3420-test.o
+ tests/usb-hcd-ohci-test$(EXESUF): tests/usb-hcd-ohci-test.o $(libqos-usb-obj-y)
+ tests/usb-hcd-uhci-test$(EXESUF): tests/usb-hcd-uhci-test.o $(libqos-usb-obj-y)
+diff --git a/tests/mvme3100-test.c b/tests/mvme3100-test.c
+new file mode 100644
+index 0000000000..6dde8d1d29
+--- /dev/null
++++ b/tests/mvme3100-test.c
+@@ -0,0 +1,79 @@
++#include <stdio.h>
 +
-+    /* prepare PCI host bridge */
-+    ccsr->pcihost = qdev_create(NULL, "e500-pcihost");
-+    object_property_add_child(qdev_get_machine(), "pci-host", OBJECT(ccsr->pcihost),
-+                              &error_abort);
++#include "qemu/osdep.h"
++#include "libqtest.h"
++#include "libqos/libqos.h"
++#include "libqos/i2c.h"
 +
-+    object_property_add_alias(obj, "pci_first_slot",
-+                              OBJECT(ccsr->pcihost), "first_slot",
-+                              &error_fatal);
-+    object_property_add_alias(obj, "pci_first_pin_irq",
-+                              OBJECT(ccsr->pcihost), "first_pin_irq",
-+                              &error_fatal);
- }
- 
- static void e500_ccsr_realize(DeviceState *dev, Error **errp)
-@@ -240,6 +256,7 @@ static void e500_ccsr_realize(DeviceState *dev, Error **errp)
-                           ccsr, "e500-ccsr", 1024 * 1024);
-     sysbus_init_mmio(SYS_BUS_DEVICE(dev), &ccsr->iomem);
- 
-+    /* realize MPIC */
-     qdev_init_nofail(ccsr->pic);
-     pic = SYS_BUS_DEVICE(ccsr->pic);
- 
-@@ -275,6 +292,13 @@ static void e500_ccsr_realize(DeviceState *dev, Error **errp)
-                                 sysbus_mmio_get_region(pic, 0));
-     /* Note: MPIC internal interrupts are offset by 16 */
- 
-+    /* realize PCI host bridge*/
-+    qdev_init_nofail(ccsr->pcihost);
++#define assert_equal(A, B) g_assert_cmphex((A), ==, (B))
 +
-+    memory_region_add_subregion(&ccsr->iomem, E500_PCI_OFFSET,
-+                                sysbus_mmio_get_region(
-+                                    SYS_BUS_DEVICE(ccsr->pcihost), 0));
++static
++I2CAdapter *i2c;
 +
-     /* attach I2C controller */
-     ccsr->i2c = qdev_create(NULL, "mpc8540-i2c");
-     object_property_add_child(qdev_get_machine(), "i2c[*]",
-@@ -314,6 +338,9 @@ static Property e500_ccsr_props[] = {
-     DEFINE_PROP_UINT32("porpllsr", CCSRState, porpllsr, 0),
-     DEFINE_PROP_UINT32("ccb-freq", CCSRState, ccb_freq, 333333333u),
-     /* "mpic-model" aliased from MPIC */
-+    /* "pci_first_slot"
-+     * "pci_first_pin_irq" aliased from PCI host bridge
++static
++void test_ccsr(void)
++{
++    /* CCSRBAR is self referential */
++    assert_equal(readl(0xff700000), 0x000ff700);
++
++    /* introspect memory size */
++    assert_equal(readl(0xff702080), 0x80000000);
++    /* value is (ram_size-1)>>24 */
++    assert_equal(readl(0xff702000), 15);
++}
++
++static
++void test_cpld(void)
++{
++    /* read/write to test register */
++    assert_equal(readl(0xe2000010), 0x00000000);
++    assert_equal(readl(0xe2000014), 0xffffffff);
++
++    writel(0xe2000010, 0x12345678);
++
++    assert_equal(readl(0xe2000010), 0x12345678);
++    assert_equal(readl(0xe2000014), 0x12345678 ^ 0xffffffff);
++}
++
++static
++void test_eeprom(void)
++{
++    char buf[] = "\x00\x00MOTOROLA";
++
++    /* 1. zero address pointer
++     * 2. write 8 bytes,
++     * 3. re-zero address pointer
 +     */
-     DEFINE_PROP_END_OF_LIST()
- };
- 
++    i2c_send(i2c, 0xa8, (uint8_t *)buf, 10);
++    i2c_send(i2c, 0xa8, (uint8_t *)buf, 2);
++
++    /* read 8 bytes */
++    i2c_recv(i2c, 0xa8, (uint8_t *)buf, 8);
++    buf[8] = '\0';
++
++    /* Read header for Motorola VPD info */
++    g_assert_cmpstr(buf, ==, "MOTOROLA");
++}
++
++int main(int argc, char *argv[])
++{
++    int ret;
++    g_test_init(&argc, &argv, NULL);
++
++    qtest_start("-machine mvme3100-1152");
++
++    i2c = e500_i2c_create(0xff700000);
++
++    qtest_add_func("/mvme3100/ccsr", test_ccsr);
++    qtest_add_func("/mvme3100/cpld", test_cpld);
++    qtest_add_func("/mvme3100/eeprom", test_eeprom);
++
++    ret = g_test_run();
++
++    printf("Tests done\n");
++
++    qtest_end();
++    printf("Tests end\n");
++
++    return ret;
++}
 -- 
 2.11.0
