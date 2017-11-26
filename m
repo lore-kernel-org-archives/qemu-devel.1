@@ -1,26 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53527)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53596)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1eIwAY-0005c4-Vr
-	for qemu-devel@nongnu.org; Sun, 26 Nov 2017 07:36:24 -0500
+	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1eIwAc-0005eS-1h
+	for qemu-devel@nongnu.org; Sun, 26 Nov 2017 07:36:28 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1eIwAX-0006B3-Tu
-	for qemu-devel@nongnu.org; Sun, 26 Nov 2017 07:36:22 -0500
-Received: from chuckie.co.uk ([82.165.15.123]:48691
+	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1eIwAb-0006E9-7N
+	for qemu-devel@nongnu.org; Sun, 26 Nov 2017 07:36:26 -0500
+Received: from chuckie.co.uk ([82.165.15.123]:48698
 	helo=s16892447.onlinehome-server.info)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <mark.cave-ayland@ilande.co.uk>)
-	id 1eIwAX-0006AE-Mn
-	for qemu-devel@nongnu.org; Sun, 26 Nov 2017 07:36:21 -0500
+	id 1eIwAb-0006DG-1I
+	for qemu-devel@nongnu.org; Sun, 26 Nov 2017 07:36:25 -0500
 From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-Date: Sun, 26 Nov 2017 12:34:44 +0000
-Message-Id: <1511699686-12605-14-git-send-email-mark.cave-ayland@ilande.co.uk>
+Date: Sun, 26 Nov 2017 12:34:45 +0000
+Message-Id: <1511699686-12605-15-git-send-email-mark.cave-ayland@ilande.co.uk>
 In-Reply-To: <1511699686-12605-1-git-send-email-mark.cave-ayland@ilande.co.uk>
 References: <1511699686-12605-1-git-send-email-mark.cave-ayland@ilande.co.uk>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCHv2 13/15] apb: replace OBIO interrupt numbers in
- pci_pbmA_map_irq() with constants
+Subject: [Qemu-devel] [PATCHv2 14/15] sparc64: introduce trace-events for
+ hw/sparc64
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,46 +31,36 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org, atar4qemu@gmail.com
 
-Following on from the previous commit, we can also do the same with
-with legacy OBIO interrupts in pci_pbmA_map_irq().
+This is in preparation for switching code in hw/sparc64 from DPRINTF over to
+trace events.
 
 Signed-off-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
 Reviewed-by: Artyom Tarasenko <atar4qemu@gmail.com>
 Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 ---
- hw/pci-host/apb.c         |    4 ++--
- include/hw/pci-host/apb.h |    2 ++
- 2 files changed, 4 insertions(+), 2 deletions(-)
+ Makefile.objs           |    1 +
+ hw/sparc64/trace-events |    1 +
+ 2 files changed, 2 insertions(+)
+ create mode 100644 hw/sparc64/trace-events
 
-diff --git a/hw/pci-host/apb.c b/hw/pci-host/apb.c
-index 7b066fd..54ab899 100644
---- a/hw/pci-host/apb.c
-+++ b/hw/pci-host/apb.c
-@@ -523,10 +523,10 @@ static int pci_pbmA_map_irq(PCIDevice *pci_dev, int irq_num)
-     switch (PCI_SLOT(pci_dev->devfn)) {
-     case 1:
-         /* Onboard NIC */
--        return 0x21;
-+        return OBIO_NIC_IRQ;
-     case 3:
-         /* Onboard IDE */
--        return 0x20;
-+        return OBIO_HDD_IRQ;
-     default:
-         /* Normal intno, fall through */
-         break;
-diff --git a/include/hw/pci-host/apb.h b/include/hw/pci-host/apb.h
-index 09ebd53..6194c8c 100644
---- a/include/hw/pci-host/apb.h
-+++ b/include/hw/pci-host/apb.h
-@@ -53,6 +53,8 @@ typedef struct IOMMUState {
- #define MAX_IVEC 0x40
- 
- /* OBIO IVEC IRQs */
-+#define OBIO_HDD_IRQ         0x20
-+#define OBIO_NIC_IRQ         0x21
- #define OBIO_LPT_IRQ         0x22
- #define OBIO_FDD_IRQ         0x27
- #define OBIO_KBD_IRQ         0x29
+diff --git a/Makefile.objs b/Makefile.objs
+index 285c6f3..c8b1bba 100644
+--- a/Makefile.objs
++++ b/Makefile.objs
+@@ -140,6 +140,7 @@ trace-events-subdirs += hw/input
+ trace-events-subdirs += hw/timer
+ trace-events-subdirs += hw/dma
+ trace-events-subdirs += hw/sparc
++trace-events-subdirs += hw/sparc64
+ trace-events-subdirs += hw/sd
+ trace-events-subdirs += hw/isa
+ trace-events-subdirs += hw/mem
+diff --git a/hw/sparc64/trace-events b/hw/sparc64/trace-events
+new file mode 100644
+index 0000000..9284b1f
+--- /dev/null
++++ b/hw/sparc64/trace-events
+@@ -0,0 +1 @@
++# See docs/devel/tracing.txt for syntax documentation.
 -- 
 1.7.10.4
