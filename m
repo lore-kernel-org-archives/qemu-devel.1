@@ -1,34 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42452)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48805)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1eJ3t9-0007xC-IN
-	for qemu-devel@nongnu.org; Sun, 26 Nov 2017 15:50:59 -0500
+	(envelope-from <brad@comstyle.com>) id 1eJ4Fm-0005yF-O0
+	for qemu-devel@nongnu.org; Sun, 26 Nov 2017 16:14:23 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1eJ3t5-0008KR-LB
-	for qemu-devel@nongnu.org; Sun, 26 Nov 2017 15:50:55 -0500
-Received: from indium.canonical.com ([91.189.90.7]:51658)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1eJ3t5-0008K2-EI
-	for qemu-devel@nongnu.org; Sun, 26 Nov 2017 15:50:51 -0500
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1eJ3t3-0004Qb-1U
-	for <qemu-devel@nongnu.org>; Sun, 26 Nov 2017 20:50:49 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 0A3622E8071
-	for <qemu-devel@nongnu.org>; Sun, 26 Nov 2017 20:50:49 +0000 (UTC)
+	(envelope-from <brad@comstyle.com>) id 1eJ4Fi-0001bj-8W
+	for qemu-devel@nongnu.org; Sun, 26 Nov 2017 16:14:18 -0500
+Received: from speedy.comstyle.com ([2001:470:1d:8c::2]:22335
+	helo=mail.comstyle.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <brad@comstyle.com>) id 1eJ4Fi-0001Xq-21
+	for qemu-devel@nongnu.org; Sun, 26 Nov 2017 16:14:14 -0500
+Received: from mail.comstyle.com (localhost [127.0.0.1])
+	by mail.comstyle.com (Postfix) with ESMTP id DD09F9843A
+	for <qemu-devel@nongnu.org>; Sun, 26 Nov 2017 16:13:58 -0500 (EST)
+Received: from humpty.home.comstyle.com (unknown
+	[IPv6:2607:fea8:12c0:f00:90cf:984e:6c25:8021])
+	(using TLSv1.2 with cipher DHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested) (Authenticated sender: brad)
+	by mail.comstyle.com (Postfix) with ESMTPSA id A6E0F98439
+	for <qemu-devel@nongnu.org>; Sun, 26 Nov 2017 16:13:58 -0500 (EST)
+Date: Sun, 26 Nov 2017 16:13:57 -0500
+From: Brad Smith <brad@comstyle.com>
+Message-ID: <20171126211356.GA46174@humpty.home.comstyle.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Sun, 26 Nov 2017 20:38:05 -0000
-From: John Paul Adrian Glaubitz <glaubitz@physik.fu-berlin.de>
-Reply-To: Bug 1673976 <1673976@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <20170318142657.21676.52259.malonedeb@chaenomeles.canonical.com>
-Message-Id: <151172868577.14857.10186115528247000560.malone@wampee.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1673976] Re: linux-user clone() can't handle
- glibc posix_spawn() (causes locale-gen to assert)
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Subject: [Qemu-devel] [PATCH] configure: Fix curses probe for older ncurses
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -39,44 +36,23 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-Interestingly, this also affects Microsoft Windows Services For Linux,
-i.e. Microsoft's Linux emulation layer.
+Fix the curses probe with older ncurses (.e.g. 5.7, as used by OpenBSD).
 
-> https://github.com/Microsoft/WSL/issues/1878
+ncurses 5.7 requires _XOPEN_SOURCE_EXTENDED to be defined for WACS_* constants.
 
-** Bug watch added: github.com/Microsoft/WSL/issues #1878
-   https://github.com/Microsoft/WSL/issues/1878
+Signed-off-by: Brad Smith <brad@comstyle.com>
 
--- =
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1673976
-
-Title:
-  linux-user clone() can't handle glibc posix_spawn() (causes locale-gen
-  to assert)
-
-Status in QEMU:
-  New
-
-Bug description:
-  I'm running a command (locale-gen) inside of an armv7h chroot mounted
-  on my x86_64 desktop by putting qemu-arm-static into /usr/bin/ of the
-  chroot file system and I get a core dump.
-
-  locale-gen
-  Generating locales...
-  =C2=A0=C2=A0en_US.UTF-8...localedef: ../sysdeps/unix/sysv/linux/spawni.c:=
-360: __spawnix: Assertion `ec >=3D 0' failed.
-  qemu: uncaught target signal 6 (Aborted) - core dumped
-  /usr/bin/locale-gen: line 41:    34 Aborted                 (core dumped)=
- localedef -i $input -c -f $charset -A /usr/share/locale/locale.alias $loca=
-le
-
-  I've done this same thing successfully for years, but this breakage
-  has appeared some time in the last 3 or so months. Possibly with the
-  update to qemu version 2.8.
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1673976/+subscriptions
+diff --git a/configure b/configure
+index 0c6e7572db..9715b9c2cc 100755
+--- a/configure
++++ b/configure
+@@ -3186,7 +3186,7 @@ EOF
+   IFS=:
+   for curses_inc in $curses_inc_list; do
+     # Make sure we get the wide character prototypes
+-    curses_inc="-DNCURSES_WIDECHAR $curses_inc"
++    curses_inc="-DNCURSES_WIDECHAR -D_XOPEN_SOURCE_EXTENDED $curses_inc"
+     IFS=:
+     for curses_lib in $curses_lib_list; do
+       unset IFS
