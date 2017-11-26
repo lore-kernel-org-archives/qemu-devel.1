@@ -1,18 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57132)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57131)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mdavidsaver@gmail.com>) id 1eJ4y9-0007Ro-JV
+	(envelope-from <mdavidsaver@gmail.com>) id 1eJ4y9-0007Rn-JO
 	for qemu-devel@nongnu.org; Sun, 26 Nov 2017 17:00:11 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mdavidsaver@gmail.com>) id 1eJ4y3-00033V-BV
+	(envelope-from <mdavidsaver@gmail.com>) id 1eJ4y1-00032u-UA
 	for qemu-devel@nongnu.org; Sun, 26 Nov 2017 17:00:09 -0500
 From: Michael Davidsaver <mdavidsaver@gmail.com>
-Date: Sun, 26 Nov 2017 15:59:15 -0600
-Message-Id: <6417d3123f961850c57474272c717152100b917a.1511731946.git.mdavidsaver@gmail.com>
+Date: Sun, 26 Nov 2017 15:59:14 -0600
+Message-Id: <890b7a4e88ca271acd6f19ce20a7979fbac424ae.1511731946.git.mdavidsaver@gmail.com>
 In-Reply-To: <cover.1511731946.git.mdavidsaver@gmail.com>
 References: <cover.1511731946.git.mdavidsaver@gmail.com>
 In-Reply-To: <cover.1511731946.git.mdavidsaver@gmail.com>
 References: <cover.1511731946.git.mdavidsaver@gmail.com>
-Subject: [Qemu-devel] [PATCH 17/17] tests: add mvme3100-test
+Subject: [Qemu-devel] [PATCH 16/17] tests: run ds-rtc-i2c-test w/
+ ppc/mvme3100
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,121 +25,58 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: Alexander Graf <agraf@suse.de>, David Gibson <david@gibson.dropbear.id.au>
 Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org, Michael Davidsaver <mdavidsaver@gmail.com>
 
-Exercise some features of the mvme3100 CPLD logic
-and read from the eeprom w/ VPD.
-
 Signed-off-by: Michael Davidsaver <mdavidsaver@gmail.com>
 ---
- tests/Makefile.include |  3 ++
- tests/mvme3100-test.c  | 79 ++++++++++++++++++++++++++++++++++++++++++++++++++
- 2 files changed, 82 insertions(+)
- create mode 100644 tests/mvme3100-test.c
+ tests/Makefile.include  | 3 ++-
+ tests/ds-rtc-i2c-test.c | 8 ++++++++
+ 2 files changed, 10 insertions(+), 1 deletion(-)
 
 diff --git a/tests/Makefile.include b/tests/Makefile.include
-index 062d4e5b7b..97bce77ee4 100644
+index 56045cdf09..062d4e5b7b 100644
 --- a/tests/Makefile.include
 +++ b/tests/Makefile.include
-@@ -373,6 +373,8 @@ check-qtest-s390x-y += tests/virtio-balloon-test$(EXESUF)
- check-qtest-s390x-y += tests/virtio-console-test$(EXESUF)
- check-qtest-s390x-y += tests/virtio-serial-test$(EXESUF)
+@@ -308,6 +308,7 @@ check-qtest-ppc-y += tests/boot-order-test$(EXESUF)
+ check-qtest-ppc-y += tests/prom-env-test$(EXESUF)
+ check-qtest-ppc-y += tests/drive_del-test$(EXESUF)
+ check-qtest-ppc-y += tests/boot-serial-test$(EXESUF)
++check-qtest-ppc-y += tests/ds-rtc-i2c-test$(EXESUF)
  
-+check-qtest-ppc-$(CONFIG_E500) += tests/mvme3100-test$(EXESUF)
-+
- check-qtest-generic-y += tests/qom-test$(EXESUF)
- check-qtest-generic-y += tests/test-hmp$(EXESUF)
+ check-qtest-ppc64-y = tests/spapr-phb-test$(EXESUF)
+ gcov-files-ppc64-y = ppc64-softmmu/hw/ppc/spapr_pci.c
+@@ -745,7 +746,7 @@ tests/bios-tables-test$(EXESUF): tests/bios-tables-test.o \
+ 	tests/boot-sector.o tests/acpi-utils.o $(libqos-obj-y)
+ tests/pxe-test$(EXESUF): tests/pxe-test.o tests/boot-sector.o $(libqos-obj-y)
+ tests/tmp105-test$(EXESUF): tests/tmp105-test.o $(libqos-omap-obj-y)
+-tests/ds-rtc-i2c-test$(EXESUF): tests/ds-rtc-i2c-test.o $(libqos-imx-obj-y)
++tests/ds-rtc-i2c-test$(EXESUF): tests/ds-rtc-i2c-test.o $(libqos-imx-obj-y) $(libqos-e500-obj-y)
+ tests/m25p80-test$(EXESUF): tests/m25p80-test.o
+ tests/i440fx-test$(EXESUF): tests/i440fx-test.o $(libqos-pc-obj-y)
+ tests/q35-test$(EXESUF): tests/q35-test.o $(libqos-pc-obj-y)
+diff --git a/tests/ds-rtc-i2c-test.c b/tests/ds-rtc-i2c-test.c
+index 0586dbd467..f7dab1863e 100644
+--- a/tests/ds-rtc-i2c-test.c
++++ b/tests/ds-rtc-i2c-test.c
+@@ -18,6 +18,9 @@
+ #define IMX25_I2C_0_BASE 0x43F80000
+ #define DS1338_ADDR 0x68
  
-@@ -782,6 +784,7 @@ tests/i82801b11-test$(EXESUF): tests/i82801b11-test.o
- tests/ac97-test$(EXESUF): tests/ac97-test.o
- tests/es1370-test$(EXESUF): tests/es1370-test.o
- tests/intel-hda-test$(EXESUF): tests/intel-hda-test.o
-+tests/mvme3100-test$(EXESUF): tests/mvme3100-test.o $(libqos-e500-obj-y)
- tests/ioh3420-test$(EXESUF): tests/ioh3420-test.o
- tests/usb-hcd-ohci-test$(EXESUF): tests/usb-hcd-ohci-test.o $(libqos-usb-obj-y)
- tests/usb-hcd-uhci-test$(EXESUF): tests/usb-hcd-uhci-test.o $(libqos-usb-obj-y)
-diff --git a/tests/mvme3100-test.c b/tests/mvme3100-test.c
-new file mode 100644
-index 0000000000..6dde8d1d29
---- /dev/null
-+++ b/tests/mvme3100-test.c
-@@ -0,0 +1,79 @@
-+#include <stdio.h>
++#define E500_CCSR_BASE 0xff700000
++#define DS1375_ADDR 0xd0
 +
-+#include "qemu/osdep.h"
-+#include "libqtest.h"
-+#include "libqos/libqos.h"
-+#include "libqos/i2c.h"
-+
-+#define assert_equal(A, B) g_assert_cmphex((A), ==, (B))
-+
-+static
-+I2CAdapter *i2c;
-+
-+static
-+void test_ccsr(void)
-+{
-+    /* CCSRBAR is self referential */
-+    assert_equal(readl(0xff700000), 0x000ff700);
-+
-+    /* introspect memory size */
-+    assert_equal(readl(0xff702080), 0x80000000);
-+    /* value is (ram_size-1)>>24 */
-+    assert_equal(readl(0xff702000), 15);
-+}
-+
-+static
-+void test_cpld(void)
-+{
-+    /* read/write to test register */
-+    assert_equal(readl(0xe2000010), 0x00000000);
-+    assert_equal(readl(0xe2000014), 0xffffffff);
-+
-+    writel(0xe2000010, 0x12345678);
-+
-+    assert_equal(readl(0xe2000010), 0x12345678);
-+    assert_equal(readl(0xe2000014), 0x12345678 ^ 0xffffffff);
-+}
-+
-+static
-+void test_eeprom(void)
-+{
-+    char buf[] = "\x00\x00MOTOROLA";
-+
-+    /* 1. zero address pointer
-+     * 2. write 8 bytes,
-+     * 3. re-zero address pointer
-+     */
-+    i2c_send(i2c, 0xa8, (uint8_t *)buf, 10);
-+    i2c_send(i2c, 0xa8, (uint8_t *)buf, 2);
-+
-+    /* read 8 bytes */
-+    i2c_recv(i2c, 0xa8, (uint8_t *)buf, 8);
-+    buf[8] = '\0';
-+
-+    /* Read header for Motorola VPD info */
-+    g_assert_cmpstr(buf, ==, "MOTOROLA");
-+}
-+
-+int main(int argc, char *argv[])
-+{
-+    int ret;
-+    g_test_init(&argc, &argv, NULL);
-+
-+    qtest_start("-machine mvme3100-1152");
-+
-+    i2c = e500_i2c_create(0xff700000);
-+
-+    qtest_add_func("/mvme3100/ccsr", test_ccsr);
-+    qtest_add_func("/mvme3100/cpld", test_cpld);
-+    qtest_add_func("/mvme3100/eeprom", test_eeprom);
-+
-+    ret = g_test_run();
-+
-+    printf("Tests done\n");
-+
-+    qtest_end();
-+    printf("Tests end\n");
-+
-+    return ret;
-+}
+ static I2CAdapter *i2c;
+ static uint8_t addr;
+ static bool use_century;
+@@ -148,6 +151,11 @@ int main(int argc, char *argv[])
+         addr = DS1338_ADDR;
+         use_century = false;
+ 
++    } else if (strcmp(arch, "ppc") == 0) {
++        qtest_start("-machine mvme3100-1152");
++        i2c = e500_i2c_create(E500_CCSR_BASE);
++        addr = DS1375_ADDR;
++        use_century = true;
+     }
+ 
+     qtest_add_data_func("/ds-rtc-i2c/set24", test_time_24, test_rtc_set);
 -- 
 2.11.0
