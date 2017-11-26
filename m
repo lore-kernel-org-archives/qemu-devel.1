@@ -1,19 +1,18 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57053)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56914)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mdavidsaver@gmail.com>) id 1eJ4y0-0007E5-Ah
-	for qemu-devel@nongnu.org; Sun, 26 Nov 2017 17:00:01 -0500
+	(envelope-from <mdavidsaver@gmail.com>) id 1eJ4xv-00078c-Rv
+	for qemu-devel@nongnu.org; Sun, 26 Nov 2017 16:59:57 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mdavidsaver@gmail.com>) id 1eJ4xz-00031C-BS
-	for qemu-devel@nongnu.org; Sun, 26 Nov 2017 17:00:00 -0500
+	(envelope-from <mdavidsaver@gmail.com>) id 1eJ4xr-0002vT-7f
+	for qemu-devel@nongnu.org; Sun, 26 Nov 2017 16:59:55 -0500
 From: Michael Davidsaver <mdavidsaver@gmail.com>
-Date: Sun, 26 Nov 2017 15:59:12 -0600
-Message-Id: <9eb62eb9ad147fef563d259f24c1891b4b2e8511.1511731946.git.mdavidsaver@gmail.com>
+Date: Sun, 26 Nov 2017 15:59:06 -0600
+Message-Id: <11edba0f74534a8013e6264f8a4f0cdf064a9ecd.1511731946.git.mdavidsaver@gmail.com>
 In-Reply-To: <cover.1511731946.git.mdavidsaver@gmail.com>
 References: <cover.1511731946.git.mdavidsaver@gmail.com>
 In-Reply-To: <cover.1511731946.git.mdavidsaver@gmail.com>
 References: <cover.1511731946.git.mdavidsaver@gmail.com>
-Subject: [Qemu-devel] [PATCH 14/17] e500: split mpc8544ds specific
- initialization
+Subject: [Qemu-devel] [PATCH 08/17] e500: additional CCSR registers
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,134 +24,214 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: Alexander Graf <agraf@suse.de>, David Gibson <david@gibson.dropbear.id.au>
 Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org, Michael Davidsaver <mdavidsaver@gmail.com>
 
-split off the remaining board specific parts
-of e500_init() as mpc85xx_init() which
-will be used by the existing
-mpc8544ds and generic e500 boards.
+Add CCSRBAR to allow CCSR region to be relocated.
+
+Guest memory size introspection via RAM config
+registers.
+
+Dummy RAM error controls.
+
+Clock introspection via Power on Reset PLL
+Status Register.
 
 Signed-off-by: Michael Davidsaver <mdavidsaver@gmail.com>
+
+ccsrbase also update iack
 ---
- hw/ppc/e500.c      | 49 ++++++++++++++++++++++++++++++++-----------------
- hw/ppc/e500.h      |  3 ++-
- hw/ppc/e500plat.c  |  2 +-
- hw/ppc/mpc8544ds.c |  2 +-
- 4 files changed, 36 insertions(+), 20 deletions(-)
+ hw/ppc/e500.c      |  5 ++-
+ hw/ppc/e500_ccsr.c | 93 ++++++++++++++++++++++++++++++++++++++++++++++++++++--
+ 2 files changed, 95 insertions(+), 3 deletions(-)
 
 diff --git a/hw/ppc/e500.c b/hw/ppc/e500.c
-index b0c8495aef..0ac7cdf6a1 100644
+index b90f4231a6..e22919f4f1 100644
 --- a/hw/ppc/e500.c
 +++ b/hw/ppc/e500.c
-@@ -690,7 +690,32 @@ static void ppce500_power_off(void *opaque, int line, int on)
-     }
- }
+@@ -51,7 +51,9 @@
  
--void ppce500_init(MachineState *machine, PPCE500Params *params)
+ #define RAM_SIZES_ALIGN            (64UL << 20)
+ 
+-/* TODO: parameterize */
++/* TODO: parameterize
++ * Some CCSR offsets duplicated in e500_ccsr.c
++ */
+ #define MPC8544_CCSRBAR_SIZE       0x00100000ULL
+ #define MPC8544_MPIC_REGS_OFFSET   0x40000ULL
+ #define MPC8544_MSI_REGS_OFFSET   0x41600ULL
+@@ -856,6 +858,7 @@ void ppce500_init(MachineState *machine, PPCE500Params *params)
+     object_property_add_child(qdev_get_machine(), "e500-ccsr",
+                               OBJECT(dev), NULL);
+     qdev_prop_set_uint32(dev, "base", params->ccsrbar_base);
++    qdev_prop_set_uint32(dev, "ram-size", ram_size);
+     qdev_init_nofail(dev);
+     ccsr_addr_space = sysbus_mmio_get_region(SYS_BUS_DEVICE(dev), 0);
+ 
+diff --git a/hw/ppc/e500_ccsr.c b/hw/ppc/e500_ccsr.c
+index 1b586c3f42..9400d7cf13 100644
+--- a/hw/ppc/e500_ccsr.c
++++ b/hw/ppc/e500_ccsr.c
+@@ -30,13 +30,26 @@
+ #include "hw/sysbus.h"
+ 
+ /* E500_ denotes registers common to all */
++/* Some CCSR offsets duplicated in e500.c */
+ 
++#define E500_CCSRBAR     (0)
 +
-+void ppce500_init(MachineState *machine, uint32_t decrementer_freq)
++#define E500_CS0_BNDS    (0x2000)
++
++#define E500_CS0_CONFIG  (0x2080)
++
++#define E500_ERR_DETECT  (0x2e40)
++#define E500_ERR_DISABLE (0x2e44)
++
++#define E500_PORPLLSR    (0xE0000)
+ #define E500_PVR         (0xE00A0)
+ #define E500_SVR         (0xE00A4)
+ 
+ #define MPC8544_RSTCR       (0xE00B0)
+ #define MPC8544_RSTCR_RESET      (0x02)
+ 
++#define E500_MPIC_OFFSET   (0x40000ULL)
++
+ typedef struct {
+     /*< private >*/
+     SysBusDevice parent_obj;
+@@ -44,19 +57,59 @@ typedef struct {
+ 
+     MemoryRegion iomem;
+ 
+-    uint32_t defbase;
++    uint32_t defbase, base;
++    uint32_t ram_size;
++    uint32_t merrd;
++
++    uint32_t porpllsr;
++
++    DeviceState *pic;
+ } CCSRState;
+ 
+ #define TYPE_E500_CCSR "e500-ccsr"
+ #define E500_CCSR(obj) OBJECT_CHECK(CCSRState, (obj), TYPE_E500_CCSR)
+ 
++/* call after changing CCSRState::base */
++static void e500_ccsr_post_move(CCSRState *ccsr)
 +{
-+    int i;
-+    for (i = 0; i < smp_cpus; i++) {
-+        PowerPCCPU *cpu;
-+        CPUState *cs;
-+        CPUPPCState *env;
-+
-+        cpu = POWERPC_CPU(cpu_create(machine->cpu_type));
-+        env = &cpu->env;
-+        cs = CPU(cpu);
-+
-+        if (env->mmu_model != POWERPC_MMU_BOOKE206) {
-+            error_report("MMU model %i not supported by this machine.",
-+                         env->mmu_model);
-+            exit(1);
-+        }
-+
-+        env->spr_cb[SPR_BOOKE_PIR].default_value = cs->cpu_index = i;
-+
-+        ppc_booke_timers_init(cpu, decrementer_freq, PPC_TIMER_E500);
-+    }
-+}
-+
-+void mpc85xx_init(MachineState *machine, PPCE500Params *params)
- {
-     MemoryRegion *address_space_mem = get_system_memory();
-     MemoryRegion *ram = g_new(MemoryRegion, 1);
-@@ -716,31 +741,21 @@ void ppce500_init(MachineState *machine, PPCE500Params *params)
-     CPUPPCState *firstenv = NULL;
-     MemoryRegion *ccsr_addr_space;
-     SysBusDevice *s;
 +    CPUState *cs;
- 
--    for (i = 0; i < smp_cpus; i++) {
-+    ppce500_init(machine, 400000000);
 +
 +    CPU_FOREACH(cs) {
-         PowerPCCPU *cpu;
--        CPUState *cs;
++        PowerPCCPU *cpu = POWERPC_CPU(cs);
++        CPUPPCState *env = &cpu->env;
++
++        env->mpic_iack = ccsr->base +
++                         E500_MPIC_OFFSET + 0xa0;
++    }
++
++    sysbus_mmio_map(SYS_BUS_DEVICE(ccsr), 0, ccsr->base);
++}
++
+ static uint64_t e500_ccsr_read(void *opaque, hwaddr addr,
+                                   unsigned size)
+ {
++    CCSRState *ccsr = opaque;
+     PowerPCCPU *cpu = POWERPC_CPU(current_cpu);
+     CPUPPCState *env = &cpu->env;
  
--        cpu = POWERPC_CPU(cpu_create(machine->cpu_type));
-+        cpu = POWERPC_CPU(cs);
-         env = &cpu->env;
--        cs = CPU(cpu);
+     switch (addr) {
++    case E500_CCSRBAR:
++        return ccsr->base >> 12;
++    case E500_CS0_BNDS:
++        /* we model all RAM in a single chip with addresses [0, ram_size) */
++        return (ccsr->ram_size - 1) >> 24;
++    case E500_CS0_CONFIG:
++        return 1 << 31;
++    case E500_ERR_DETECT:
++        return 0; /* (errors not modeled) */
++    case E500_ERR_DISABLE:
++        return ccsr->merrd;
++    case E500_PORPLLSR:
++        if (!ccsr->porpllsr) {
++            qemu_log_mask(LOG_UNIMP,
++                          "Machine does not provide valid PORPLLSR\n");
++        }
++        return ccsr->porpllsr;
+     case E500_PVR:
+         return env->spr[SPR_PVR];
+     case E500_SVR:
+@@ -72,10 +125,22 @@ static uint64_t e500_ccsr_read(void *opaque, hwaddr addr,
+ static void e500_ccsr_write(void *opaque, hwaddr addr,
+                                uint64_t value, unsigned size)
+ {
++    CCSRState *ccsr = opaque;
+     PowerPCCPU *cpu = POWERPC_CPU(current_cpu);
+     CPUPPCState *env = &cpu->env;
+     uint32_t svr = env->spr[SPR_E500_SVR] >> 16;
  
--        if (env->mmu_model != POWERPC_MMU_BOOKE206) {
--            fprintf(stderr, "MMU model %i not supported by this machine.\n",
--                env->mmu_model);
--            exit(1);
--        }
- 
-+        /* Register reset handler */
-         if (!firstenv) {
-             firstenv = env;
--        }
- 
--        env->spr_cb[SPR_BOOKE_PIR].default_value = cs->cpu_index = i;
--
--        ppc_booke_timers_init(cpu, 400000000, PPC_TIMER_E500);
--
--        /* Register reset handler */
--        if (!i) {
-             /* Primary CPU */
-             struct boot_info *boot_info;
-             boot_info = g_malloc0(sizeof(struct boot_info));
-diff --git a/hw/ppc/e500.h b/hw/ppc/e500.h
-index 70ba1d8f4f..350be17462 100644
---- a/hw/ppc/e500.h
-+++ b/hw/ppc/e500.h
-@@ -24,7 +24,8 @@ typedef struct PPCE500Params {
-     hwaddr spin_base;
- } PPCE500Params;
- 
--void ppce500_init(MachineState *machine, PPCE500Params *params);
-+void ppce500_init(MachineState *machine, uint32_t decrementer_freq);
-+void mpc85xx_init(MachineState *machine, PPCE500Params *params);
- 
- hwaddr booke206_page_size_to_tlb(uint64_t size);
- 
-diff --git a/hw/ppc/e500plat.c b/hw/ppc/e500plat.c
-index e59e80fb9e..103efc68c2 100644
---- a/hw/ppc/e500plat.c
-+++ b/hw/ppc/e500plat.c
-@@ -55,7 +55,7 @@ static void e500plat_init(MachineState *machine)
-         params.mpic_version = OPENPIC_MODEL_FSL_MPIC_20;
++    switch (addr) {
++    case E500_CCSRBAR:
++        value &= 0x000fff00;
++        ccsr->base = value << 12;
++        e500_ccsr_post_move(ccsr);
++        return;
++    case E500_ERR_DISABLE:
++        ccsr->merrd = value & 0xd;
++        return;
++    }
++
+     switch (svr) {
+     case 0: /* generic.  assumed to be mpc8544ds or e500plat board */
+     case 0x8034: /* mpc8544 */
+@@ -104,11 +169,20 @@ static const MemoryRegionOps e500_ccsr_ops = {
      }
+ };
  
--    ppce500_init(machine, &params);
-+    mpc85xx_init(machine, &params);
++static int e500_ccsr_post_load(void *opaque, int version_id)
++{
++    CCSRState *ccsr = opaque;
++
++    e500_ccsr_post_move(ccsr);
++    return 0;
++}
++
+ static void e500_ccsr_reset(DeviceState *dev)
+ {
+     CCSRState *ccsr = E500_CCSR(dev);
+ 
+-    sysbus_mmio_map(SYS_BUS_DEVICE(dev), 0, ccsr->defbase);
++    ccsr->base = ccsr->defbase;
++    e500_ccsr_post_move(ccsr);
  }
  
- static void e500plat_machine_init(MachineClass *mc)
-diff --git a/hw/ppc/mpc8544ds.c b/hw/ppc/mpc8544ds.c
-index 1717953ec7..7de4ed8ae2 100644
---- a/hw/ppc/mpc8544ds.c
-+++ b/hw/ppc/mpc8544ds.c
-@@ -47,7 +47,7 @@ static void mpc8544ds_init(MachineState *machine)
-         exit(1);
-     }
+ static void e500_ccsr_initfn(Object *obj)
+@@ -123,15 +197,30 @@ static void e500_ccsr_initfn(Object *obj)
  
--    ppce500_init(machine, &params);
-+    mpc85xx_init(machine, &params);
+ static Property e500_ccsr_props[] = {
+     DEFINE_PROP_UINT32("base", CCSRState, defbase, 0xff700000),
++    DEFINE_PROP_UINT32("ram-size", CCSRState, ram_size, 0),
++    DEFINE_PROP_UINT32("porpllsr", CCSRState, porpllsr, 0),
+     DEFINE_PROP_END_OF_LIST()
+ };
+ 
++static const VMStateDescription vmstate_e500_ccsr = {
++    .name = TYPE_E500_CCSR,
++    .version_id = 1,
++    .minimum_version_id = 1,
++    .post_load = e500_ccsr_post_load,
++    .fields = (VMStateField[]) {
++        VMSTATE_UINT32(base, CCSRState),
++        VMSTATE_UINT32(merrd, CCSRState),
++        VMSTATE_END_OF_LIST()
++    }
++};
++
+ static
+ void e500_ccsr_class_initfn(ObjectClass *klass, void *data)
+ {
+     DeviceClass *dc = DEVICE_CLASS(klass);
+ 
+     dc->props = e500_ccsr_props;
++    dc->vmsd = &vmstate_e500_ccsr;
+     dc->reset = e500_ccsr_reset;
  }
- 
  
 -- 
 2.11.0
