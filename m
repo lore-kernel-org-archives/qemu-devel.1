@@ -1,29 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35979)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50108)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <frasse.iglesias@gmail.com>) id 1eJ5HU-0006uD-FC
-	for qemu-devel@nongnu.org; Sun, 26 Nov 2017 17:20:09 -0500
+	(envelope-from <frasse.iglesias@gmail.com>) id 1eJ6AF-0004Eo-PB
+	for qemu-devel@nongnu.org; Sun, 26 Nov 2017 18:16:45 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <frasse.iglesias@gmail.com>) id 1eJ5HS-00042g-Vf
-	for qemu-devel@nongnu.org; Sun, 26 Nov 2017 17:20:08 -0500
-Received: from mail-pl0-x22e.google.com ([2607:f8b0:400e:c01::22e]:43757)
+	(envelope-from <frasse.iglesias@gmail.com>) id 1eJ6AC-0000oP-Jh
+	for qemu-devel@nongnu.org; Sun, 26 Nov 2017 18:16:43 -0500
+Received: from mail-lf0-x241.google.com ([2a00:1450:4010:c07::241]:38270)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <frasse.iglesias@gmail.com>)
-	id 1eJ5HS-00042J-M5
-	for qemu-devel@nongnu.org; Sun, 26 Nov 2017 17:20:06 -0500
-Received: by mail-pl0-x22e.google.com with SMTP id s23so2035025plk.10
-	for <qemu-devel@nongnu.org>; Sun, 26 Nov 2017 14:20:06 -0800 (PST)
+	id 1eJ6AC-0000o6-BJ
+	for qemu-devel@nongnu.org; Sun, 26 Nov 2017 18:16:40 -0500
+Received: by mail-lf0-x241.google.com with SMTP id c188so23160184lfd.5
+	for <qemu-devel@nongnu.org>; Sun, 26 Nov 2017 15:16:40 -0800 (PST)
+From: Francisco Iglesias <frasse.iglesias@gmail.com>
+Date: Mon, 27 Nov 2017 00:16:21 +0100
+Message-Id: <20171126231634.9531-1-frasse.iglesias@gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <64ae00a4-d66c-b067-5bf4-b3be6fcf0822@amsat.org>
-References: <20171124212938.7074-1-frasse.iglesias@gmail.com>
-	<20171124212938.7074-3-frasse.iglesias@gmail.com>
-	<64ae00a4-d66c-b067-5bf4-b3be6fcf0822@amsat.org>
-From: francisco iglesias <frasse.iglesias@gmail.com>
-Date: Sun, 26 Nov 2017 23:20:04 +0100
-Message-ID: <CAAYMZQvcWb-vb9NgEUd2fuCHyFi3Z-BcJqBaDZxF5kmaOYWDrw@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v8 02/13] m25p80: Add support for SST READ
- ID 0x90/0xAB commands
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Subject: [Qemu-devel] [PATCH v9 00/13] Add support for the ZynqMP Generic
+ QSPI
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,117 +28,86 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>
-Cc: "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>, Peter Maydell <peter.maydell@linaro.org>, Edgar Iglesias <edgari@xilinx.com>, Alistair Francis <alistai@xilinx.com>, Francisco Iglesias <francisco.iglesias@feimtech.se>, "mar.krzeminski" <mar.krzeminski@gmail.com>
+To: qemu-devel@nongnu.org
+Cc: edgari@xilinx.com, alistai@xilinx.com, francisco.iglesias@feimtech.se, mar.krzeminski@gmail.com, peter.maydell@linaro.org, f4bug@amsat.org
 
-On 26 November 2017 at 01:45, Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
-wrote:
+Hi,
 
-> Hi Francisco,
->
-> On 11/24/2017 06:29 PM, Francisco Iglesias wrote:
-> > Add support for SST READ ID 0x90/0xAB commands for reading out the flas=
-h
-> > manufacuter ID and device ID.
-> >
-> > Signed-off-by: Francisco Iglesias <frasse.iglesias@gmail.com>
-> > Acked-by: Alistair Francis <alistair.francis@xilinx.com>
-> > Acked-by: Marcin Krzemi=C5=84ski <mar.krzeminski@gmail.com>
-> > ---
-> >  hw/block/m25p80.c | 23 +++++++++++++++++++++++
-> >  1 file changed, 23 insertions(+)
-> >
-> > diff --git a/hw/block/m25p80.c b/hw/block/m25p80.c
-> > index d50acc1..9d20120 100644
-> > --- a/hw/block/m25p80.c
-> > +++ b/hw/block/m25p80.c
-> > @@ -355,6 +355,8 @@ typedef enum {
-> >      DPP =3D 0xa2,
-> >      QPP =3D 0x32,
-> >      QPP_4 =3D 0x34,
-> > +    RDID_90 =3D 0x90,
-> > +    RDID_AB =3D 0xab,
-> >
-> >      ERASE_4K =3D 0x20,
-> >      ERASE4_4K =3D 0x21,
-> > @@ -405,6 +407,7 @@ typedef enum {
-> >      MAN_MACRONIX,
-> >      MAN_NUMONYX,
-> >      MAN_WINBOND,
-> > +    MAN_SST,
-> >      MAN_GENERIC,
-> >  } Manufacturer;
-> >
-> > @@ -476,6 +479,8 @@ static inline Manufacturer get_man(Flash *s)
-> >          return MAN_SPANSION;
-> >      case 0xC2:
-> >          return MAN_MACRONIX;
-> > +    case 0xBF:
-> > +        return MAN_SST;
-> >      default:
-> >          return MAN_GENERIC;
-> >      }
-> > @@ -711,6 +716,22 @@ static void complete_collecting_data(Flash *s)
-> >      case WEVCR:
-> >          s->enh_volatile_cfg =3D s->data[0];
-> >          break;
-> > +    case RDID_90:
-> > +    case RDID_AB:
-> > +        if (get_man(s) =3D=3D MAN_SST && s->cur_addr <=3D 1) {
->
-> What about reporting if guest access this address when not an SST flash?
->
->            if (get_man(s) =3D=3D MAN_SST) {
->                if (s->cur_addr <=3D 1) {
->
-> > +            if (s->cur_addr) {
-> > +                s->data[0] =3D s->pi->id[2];
-> > +                s->data[1] =3D s->pi->id[0];
-> > +            } else {
-> > +                s->data[0] =3D s->pi->id[0];
-> > +                s->data[1] =3D s->pi->id[2];
-> > +            }
-> > +            s->pos =3D 0;
-> > +            s->len =3D 2;
-> > +            s->data_read_loop =3D true;
-> > +            s->state =3D STATE_READING_DATA;
->
->                } else {
->                     // LOG_UNIMP?
->                }
->            } else {
->                qemu_log_mask(LOG_GUEST_ERROR, ...);
->
+This patch series is an attempt to add support for the ZynqMP QSPI (consisting
+of the Generic QSPI and the legacy QSPI) to the xlnx-zcu102 board and connect 
+Numonyx n25q512a11 flashes to the QSPI. Also some functionality is added to
+m25p80.
 
-Dear Philippe,
-
-Thank you very much for reviewing! I will add the logs in the next version
-of the patch series (v9).
+The series starts by adding support in m25p80 for continous read out of status
+registers, SST flash READ ID commands, bank address register accesses, bulk
+erase (0x60) and two Numonyx flashes (n25q512a11 and n25q512a13). Thereafter it
+updates the striping behaviour to be bit big endiann in the Xilinx QSPI model
+and adds support for RX discard, zero pumping according transfer register and 4
+byte LQSPI addresses. Finally it adds support for the ZynqMP Generic QSPI and
+adds the ZynqMP QSPI to the xlnx-zcu102 board.
 
 Best regards,
 Francisco Iglesias
 
+Changelog:
+v8 -> v9
+  * Improved guest error logging in patch 'm25p80: Add support for SST READ ID
+    0x90/0xAB commands' and removed acked-by lines in the commit message
+    because of this update.
+
+v7 -> v8
+  * Corrected commit messages in the patches 'xilinx_spips: Don't set TX FIFO
+    UNDERFLOW at cmd done' and 'xilinx_spips: Move FlashCMD, XilinxQSPIPS and
+    XilinxSPIPSClass'.
+  * Changed a for loop and a variable decrease for improving readability in
+    patch 'xilinx_spips: Update striping to be big-endian bit order'.
+
+v6 -> v7
+  * Moved data_read_loop into a vmstate subsection in patch 'm25p80: Add support
+    for continuous read out of RDSR and READ_FSR' for not breaking compatibility
+    against older vmstate versions unless necessary.
+  * Minor tweaks in patch 'xilinx_spips: Add support for the ZynqMP Generic
+    QSPI'.
+
+v5 -> v6
+  * Added data_read_loop to vmstate_m25p80 in patch 'm25p80: Add support for
+    continuous read out of RDSR and READ_FSR'. Also removed acked-by lines in 
+    the commit message because of this update.
+  * Reworked patch 'xilinx_spips: Add support for the ZynqMP Generic QSPI'.
+  * Tweaked commit messages 
+
+v4 -> v5
+  * Added newlines in patch 'xlnx-zcu102: Add support for the ZynqMP QSPI'
+
+v3 -> v4
+  * Corrected patch 'Add support for SST READ ID 0x90/0xAB commands'
+  * Corrected patch 'Add support Add support for BRRD/BRWR and BULK_ERASE'
+  * Minor tweaks in the ZynqMP GQSPI patch for reducing the patch 
 
 
+Francisco Iglesias (13):
+  m25p80: Add support for continuous read out of RDSR and READ_FSR
+  m25p80: Add support for SST READ ID 0x90/0xAB commands
+  m25p80: Add support for BRRD/BRWR and BULK_ERASE (0x60)
+  m25p80: Add support for n25q512a11 and n25q512a13
+  xilinx_spips: Move FlashCMD, XilinxQSPIPS and XilinxSPIPSClass
+  xilinx_spips: Update striping to be big-endian bit order
+  xilinx_spips: Add support for RX discard and RX drain
+  xilinx_spips: Make tx/rx_data_bytes more generic and reusable
+  xilinx_spips: Add support for zero pumping
+  xilinx_spips: Add support for 4 byte addresses in the LQSPI
+  xilinx_spips: Don't set TX FIFO UNDERFLOW at cmd done
+  xilinx_spips: Add support for the ZynqMP Generic QSPI
+  xlnx-zcu102: Add support for the ZynqMP QSPI
 
->
-> > +        }
-> > +        break;
-> >      default:
-> >          break;
-> >      }
-> > @@ -926,6 +947,8 @@ static void decode_new_cmd(Flash *s, uint32_t value=
-)
-> >      case PP4:
-> >      case PP4_4:
-> >      case DIE_ERASE:
-> > +    case RDID_90:
-> > +    case RDID_AB:
-> >          s->needed_bytes =3D get_addr_length(s);
-> >          s->pos =3D 0;
-> >          s->len =3D 0;
->
-> Regards,
->
-> Phil.
->
+ default-configs/arm-softmmu.mak |   2 +-
+ hw/arm/xlnx-zcu102.c            |  23 +
+ hw/arm/xlnx-zynqmp.c            |  26 ++
+ hw/block/m25p80.c               |  80 +++-
+ hw/ssi/xilinx_spips.c           | 899 ++++++++++++++++++++++++++++++++++------
+ include/hw/arm/xlnx-zynqmp.h    |   5 +
+ include/hw/ssi/xilinx_spips.h   |  74 +++-
+ 7 files changed, 970 insertions(+), 139 deletions(-)
+
+-- 
+2.9.3
