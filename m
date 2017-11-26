@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50280)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50300)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <frasse.iglesias@gmail.com>) id 1eJ6AS-0004d9-Q0
-	for qemu-devel@nongnu.org; Sun, 26 Nov 2017 18:16:57 -0500
+	(envelope-from <frasse.iglesias@gmail.com>) id 1eJ6AU-0004en-9M
+	for qemu-devel@nongnu.org; Sun, 26 Nov 2017 18:17:01 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <frasse.iglesias@gmail.com>) id 1eJ6AS-0000vQ-0n
-	for qemu-devel@nongnu.org; Sun, 26 Nov 2017 18:16:56 -0500
-Received: from mail-lf0-x241.google.com ([2a00:1450:4010:c07::241]:45062)
+	(envelope-from <frasse.iglesias@gmail.com>) id 1eJ6AT-0000xf-FJ
+	for qemu-devel@nongnu.org; Sun, 26 Nov 2017 18:16:58 -0500
+Received: from mail-lf0-x241.google.com ([2a00:1450:4010:c07::241]:36997)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <frasse.iglesias@gmail.com>)
-	id 1eJ6AR-0000ul-P7
-	for qemu-devel@nongnu.org; Sun, 26 Nov 2017 18:16:55 -0500
-Received: by mail-lf0-x241.google.com with SMTP id f131so22662212lff.12
-	for <qemu-devel@nongnu.org>; Sun, 26 Nov 2017 15:16:55 -0800 (PST)
+	id 1eJ6AT-0000vo-8J
+	for qemu-devel@nongnu.org; Sun, 26 Nov 2017 18:16:57 -0500
+Received: by mail-lf0-x241.google.com with SMTP id y2so29735691lfj.4
+	for <qemu-devel@nongnu.org>; Sun, 26 Nov 2017 15:16:57 -0800 (PST)
 From: Francisco Iglesias <frasse.iglesias@gmail.com>
-Date: Mon, 27 Nov 2017 00:16:31 +0100
-Message-Id: <20171126231634.9531-11-frasse.iglesias@gmail.com>
+Date: Mon, 27 Nov 2017 00:16:32 +0100
+Message-Id: <20171126231634.9531-12-frasse.iglesias@gmail.com>
 In-Reply-To: <20171126231634.9531-1-frasse.iglesias@gmail.com>
 References: <20171126231634.9531-1-frasse.iglesias@gmail.com>
-Subject: [Qemu-devel] [PATCH v9 10/13] xilinx_spips: Add support for 4 byte
- addresses in the LQSPI
+Subject: [Qemu-devel] [PATCH v9 11/13] xilinx_spips: Don't set TX FIFO
+ UNDERFLOW at cmd done
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,40 +30,38 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: edgari@xilinx.com, alistai@xilinx.com, francisco.iglesias@feimtech.se, mar.krzeminski@gmail.com, peter.maydell@linaro.org, f4bug@amsat.org
 
-Add support for 4 byte addresses in the LQSPI and correct LQSPI_CFG_SEP_BUS.
+Don't set TX FIFO UNDERFLOW interrupt after transmitting the commands.
+Also update interrupts after reading out the interrupt status.
 
 Signed-off-by: Francisco Iglesias <frasse.iglesias@gmail.com>
-Reviewed-by: Alistair Francis <alistair.francis@xilinx.com>
+Acked-by: Alistair Francis <alistair.francis@xilinx.com>
 Reviewed-by: Edgar E. Iglesias <edgar.iglesias@xilinx.com>
 Tested-by: Edgar E. Iglesias <edgar.iglesias@xilinx.com>
 ---
- hw/ssi/xilinx_spips.c | 6 +++++-
- 1 file changed, 5 insertions(+), 1 deletion(-)
+ hw/ssi/xilinx_spips.c | 4 +---
+ 1 file changed, 1 insertion(+), 3 deletions(-)
 
 diff --git a/hw/ssi/xilinx_spips.c b/hw/ssi/xilinx_spips.c
-index 878b17e..ab54da8 100644
+index ab54da8..3805d8b 100644
 --- a/hw/ssi/xilinx_spips.c
 +++ b/hw/ssi/xilinx_spips.c
-@@ -92,8 +92,9 @@
- #define R_LQSPI_CFG_RESET       0x03A002EB
- #define LQSPI_CFG_LQ_MODE       (1U << 31)
- #define LQSPI_CFG_TWO_MEM       (1 << 30)
--#define LQSPI_CFG_SEP_BUS       (1 << 30)
-+#define LQSPI_CFG_SEP_BUS       (1 << 29)
- #define LQSPI_CFG_U_PAGE        (1 << 28)
-+#define LQSPI_CFG_ADDR4         (1 << 27)
- #define LQSPI_CFG_MODE_EN       (1 << 25)
- #define LQSPI_CFG_MODE_WIDTH    8
- #define LQSPI_CFG_MODE_SHIFT    16
-@@ -702,6 +703,9 @@ static void lqspi_load_cache(void *opaque, hwaddr addr)
-         fifo8_push(&s->tx_fifo, s->regs[R_LQSPI_CFG] & LQSPI_CFG_INST_CODE);
-         /* read address */
-         DB_PRINT_L(0, "pushing read address %06x\n", flash_addr);
-+        if (s->regs[R_LQSPI_CFG] & LQSPI_CFG_ADDR4) {
-+            fifo8_push(&s->tx_fifo, (uint8_t)(flash_addr >> 24));
-+        }
-         fifo8_push(&s->tx_fifo, (uint8_t)(flash_addr >> 16));
-         fifo8_push(&s->tx_fifo, (uint8_t)(flash_addr >> 8));
-         fifo8_push(&s->tx_fifo, (uint8_t)flash_addr);
+@@ -329,9 +329,6 @@ static void xilinx_spips_flush_txfifo(XilinxSPIPS *s)
+         uint8_t addr_length;
+ 
+         if (fifo8_is_empty(&s->tx_fifo)) {
+-            if (!(s->regs[R_LQSPI_CFG] & LQSPI_CFG_LQ_MODE)) {
+-                s->regs[R_INTR_STATUS] |= IXR_TX_FIFO_UNDERFLOW;
+-            }
+             xilinx_spips_update_ixr(s);
+             return;
+         } else if (s->snoop_state == SNOOP_STRIPING) {
+@@ -530,6 +527,7 @@ static uint64_t xilinx_spips_read(void *opaque, hwaddr addr,
+         ret = s->regs[addr] & IXR_ALL;
+         s->regs[addr] = 0;
+         DB_PRINT_L(0, "addr=" TARGET_FMT_plx " = %x\n", addr * 4, ret);
++        xilinx_spips_update_ixr(s);
+         return ret;
+     case R_INTR_MASK:
+         mask = IXR_ALL;
 -- 
 2.9.3
