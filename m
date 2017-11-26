@@ -1,31 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48805)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55597)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <brad@comstyle.com>) id 1eJ4Fm-0005yF-O0
-	for qemu-devel@nongnu.org; Sun, 26 Nov 2017 16:14:23 -0500
+	(envelope-from <benh@kernel.crashing.org>) id 1eJ4rH-0005KI-Bv
+	for qemu-devel@nongnu.org; Sun, 26 Nov 2017 16:53:04 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <brad@comstyle.com>) id 1eJ4Fi-0001bj-8W
-	for qemu-devel@nongnu.org; Sun, 26 Nov 2017 16:14:18 -0500
-Received: from speedy.comstyle.com ([2001:470:1d:8c::2]:22335
-	helo=mail.comstyle.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <brad@comstyle.com>) id 1eJ4Fi-0001Xq-21
-	for qemu-devel@nongnu.org; Sun, 26 Nov 2017 16:14:14 -0500
-Received: from mail.comstyle.com (localhost [127.0.0.1])
-	by mail.comstyle.com (Postfix) with ESMTP id DD09F9843A
-	for <qemu-devel@nongnu.org>; Sun, 26 Nov 2017 16:13:58 -0500 (EST)
-Received: from humpty.home.comstyle.com (unknown
-	[IPv6:2607:fea8:12c0:f00:90cf:984e:6c25:8021])
-	(using TLSv1.2 with cipher DHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested) (Authenticated sender: brad)
-	by mail.comstyle.com (Postfix) with ESMTPSA id A6E0F98439
-	for <qemu-devel@nongnu.org>; Sun, 26 Nov 2017 16:13:58 -0500 (EST)
-Date: Sun, 26 Nov 2017 16:13:57 -0500
-From: Brad Smith <brad@comstyle.com>
-Message-ID: <20171126211356.GA46174@humpty.home.comstyle.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Subject: [Qemu-devel] [PATCH] configure: Fix curses probe for older ncurses
+	(envelope-from <benh@kernel.crashing.org>) id 1eJ4rC-0008Pz-IG
+	for qemu-devel@nongnu.org; Sun, 26 Nov 2017 16:53:03 -0500
+Message-ID: <1511733153.2466.62.camel@kernel.crashing.org>
+From: Benjamin Herrenschmidt <benh@kernel.crashing.org>
+Date: Mon, 27 Nov 2017 08:52:33 +1100
+In-Reply-To: <33a8ec4c-c47f-e5d4-6562-0e72b2eecdbd@kaod.org>
+References: <20171123132955.1261-1-clg@kaod.org>
+	<20171123132955.1261-14-clg@kaod.org>
+	<1511469108.2466.43.camel@kernel.crashing.org>
+	<33a8ec4c-c47f-e5d4-6562-0e72b2eecdbd@kaod.org>
+Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH 13/25] spapr: introduce the XIVE Event
+ Queues
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,25 +26,21 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: =?ISO-8859-1?Q?C=E9dric?= Le Goater <clg@kaod.org>, qemu-ppc@nongnu.org, qemu-devel@nongnu.org, David Gibson <david@gibson.dropbear.id.au>
 
-Fix the curses probe with older ncurses (.e.g. 5.7, as used by OpenBSD).
+On Fri, 2017-11-24 at 09:15 +0100, C=C3=A9dric Le Goater wrote:
+> So The Linux driver is expected to choose priority 6. The priority
+> validity is then checked in each hcall returning H_P4/H_P3 in case of=20
+> failure. =20
+>=20
+> But it is true that we scale the arrays with :
+> =20
+>     #define XIVE_PRIORITY_MAX  7
+>=20
+> Do you want QEMU to completely remove prio 7 ?=20
 
-ncurses 5.7 requires _XOPEN_SOURCE_EXTENDED to be defined for WACS_* constants.
+I'd like qemu to be consistent, at least make sure it errors out if the
+OS tries to configue prio 7 or route an irq to it.
 
-Signed-off-by: Brad Smith <brad@comstyle.com>
-
-
-diff --git a/configure b/configure
-index 0c6e7572db..9715b9c2cc 100755
---- a/configure
-+++ b/configure
-@@ -3186,7 +3186,7 @@ EOF
-   IFS=:
-   for curses_inc in $curses_inc_list; do
-     # Make sure we get the wide character prototypes
--    curses_inc="-DNCURSES_WIDECHAR $curses_inc"
-+    curses_inc="-DNCURSES_WIDECHAR -D_XOPEN_SOURCE_EXTENDED $curses_inc"
-     IFS=:
-     for curses_lib in $curses_lib_list; do
-       unset IFS
+Cheers,
+Ben.
