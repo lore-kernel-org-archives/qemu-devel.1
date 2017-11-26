@@ -1,25 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50108)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50109)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <frasse.iglesias@gmail.com>) id 1eJ6AF-0004Eo-PB
-	for qemu-devel@nongnu.org; Sun, 26 Nov 2017 18:16:45 -0500
+	(envelope-from <frasse.iglesias@gmail.com>) id 1eJ6AF-0004Eq-PL
+	for qemu-devel@nongnu.org; Sun, 26 Nov 2017 18:16:44 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <frasse.iglesias@gmail.com>) id 1eJ6AC-0000oP-Jh
+	(envelope-from <frasse.iglesias@gmail.com>) id 1eJ6AE-0000p9-7t
 	for qemu-devel@nongnu.org; Sun, 26 Nov 2017 18:16:43 -0500
-Received: from mail-lf0-x241.google.com ([2a00:1450:4010:c07::241]:38270)
+Received: from mail-lf0-x242.google.com ([2a00:1450:4010:c07::242]:34141)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <frasse.iglesias@gmail.com>)
-	id 1eJ6AC-0000o6-BJ
-	for qemu-devel@nongnu.org; Sun, 26 Nov 2017 18:16:40 -0500
-Received: by mail-lf0-x241.google.com with SMTP id c188so23160184lfd.5
-	for <qemu-devel@nongnu.org>; Sun, 26 Nov 2017 15:16:40 -0800 (PST)
+	id 1eJ6AD-0000oi-W8
+	for qemu-devel@nongnu.org; Sun, 26 Nov 2017 18:16:42 -0500
+Received: by mail-lf0-x242.google.com with SMTP id i14so30684119lfc.1
+	for <qemu-devel@nongnu.org>; Sun, 26 Nov 2017 15:16:41 -0800 (PST)
 From: Francisco Iglesias <frasse.iglesias@gmail.com>
-Date: Mon, 27 Nov 2017 00:16:21 +0100
-Message-Id: <20171126231634.9531-1-frasse.iglesias@gmail.com>
+Date: Mon, 27 Nov 2017 00:16:22 +0100
+Message-Id: <20171126231634.9531-2-frasse.iglesias@gmail.com>
+In-Reply-To: <20171126231634.9531-1-frasse.iglesias@gmail.com>
+References: <20171126231634.9531-1-frasse.iglesias@gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v9 00/13] Add support for the ZynqMP Generic
- QSPI
+Subject: [Qemu-devel] [PATCH v9 01/13] m25p80: Add support for continuous
+ read out of RDSR and READ_FSR
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,83 +33,115 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: edgari@xilinx.com, alistai@xilinx.com, francisco.iglesias@feimtech.se, mar.krzeminski@gmail.com, peter.maydell@linaro.org, f4bug@amsat.org
 
-Hi,
+Add support for continuous read out of the RDSR and READ_FSR status
+registers until the chip select is deasserted. This feature is supported
+by amongst others 1 or more flashtypes manufactured by Numonyx (Micron),
+Windbond, SST, Gigadevice, Eon and Macronix.
 
-This patch series is an attempt to add support for the ZynqMP QSPI (consisting
-of the Generic QSPI and the legacy QSPI) to the xlnx-zcu102 board and connect 
-Numonyx n25q512a11 flashes to the QSPI. Also some functionality is added to
-m25p80.
+Signed-off-by: Francisco Iglesias <frasse.iglesias@gmail.com>
+Acked-by: Marcin Krzemiński<mar.krzeminski@gmail.com>
+Reviewed-by: Edgar E. Iglesias <edgar.iglesias@xilinx.com>
+Tested-by: Edgar E. Iglesias <edgar.iglesias@xilinx.com>
+---
+ hw/block/m25p80.c | 39 ++++++++++++++++++++++++++++++++++++++-
+ 1 file changed, 38 insertions(+), 1 deletion(-)
 
-The series starts by adding support in m25p80 for continous read out of status
-registers, SST flash READ ID commands, bank address register accesses, bulk
-erase (0x60) and two Numonyx flashes (n25q512a11 and n25q512a13). Thereafter it
-updates the striping behaviour to be bit big endiann in the Xilinx QSPI model
-and adds support for RX discard, zero pumping according transfer register and 4
-byte LQSPI addresses. Finally it adds support for the ZynqMP Generic QSPI and
-adds the ZynqMP QSPI to the xlnx-zcu102 board.
-
-Best regards,
-Francisco Iglesias
-
-Changelog:
-v8 -> v9
-  * Improved guest error logging in patch 'm25p80: Add support for SST READ ID
-    0x90/0xAB commands' and removed acked-by lines in the commit message
-    because of this update.
-
-v7 -> v8
-  * Corrected commit messages in the patches 'xilinx_spips: Don't set TX FIFO
-    UNDERFLOW at cmd done' and 'xilinx_spips: Move FlashCMD, XilinxQSPIPS and
-    XilinxSPIPSClass'.
-  * Changed a for loop and a variable decrease for improving readability in
-    patch 'xilinx_spips: Update striping to be big-endian bit order'.
-
-v6 -> v7
-  * Moved data_read_loop into a vmstate subsection in patch 'm25p80: Add support
-    for continuous read out of RDSR and READ_FSR' for not breaking compatibility
-    against older vmstate versions unless necessary.
-  * Minor tweaks in patch 'xilinx_spips: Add support for the ZynqMP Generic
-    QSPI'.
-
-v5 -> v6
-  * Added data_read_loop to vmstate_m25p80 in patch 'm25p80: Add support for
-    continuous read out of RDSR and READ_FSR'. Also removed acked-by lines in 
-    the commit message because of this update.
-  * Reworked patch 'xilinx_spips: Add support for the ZynqMP Generic QSPI'.
-  * Tweaked commit messages 
-
-v4 -> v5
-  * Added newlines in patch 'xlnx-zcu102: Add support for the ZynqMP QSPI'
-
-v3 -> v4
-  * Corrected patch 'Add support for SST READ ID 0x90/0xAB commands'
-  * Corrected patch 'Add support Add support for BRRD/BRWR and BULK_ERASE'
-  * Minor tweaks in the ZynqMP GQSPI patch for reducing the patch 
-
-
-Francisco Iglesias (13):
-  m25p80: Add support for continuous read out of RDSR and READ_FSR
-  m25p80: Add support for SST READ ID 0x90/0xAB commands
-  m25p80: Add support for BRRD/BRWR and BULK_ERASE (0x60)
-  m25p80: Add support for n25q512a11 and n25q512a13
-  xilinx_spips: Move FlashCMD, XilinxQSPIPS and XilinxSPIPSClass
-  xilinx_spips: Update striping to be big-endian bit order
-  xilinx_spips: Add support for RX discard and RX drain
-  xilinx_spips: Make tx/rx_data_bytes more generic and reusable
-  xilinx_spips: Add support for zero pumping
-  xilinx_spips: Add support for 4 byte addresses in the LQSPI
-  xilinx_spips: Don't set TX FIFO UNDERFLOW at cmd done
-  xilinx_spips: Add support for the ZynqMP Generic QSPI
-  xlnx-zcu102: Add support for the ZynqMP QSPI
-
- default-configs/arm-softmmu.mak |   2 +-
- hw/arm/xlnx-zcu102.c            |  23 +
- hw/arm/xlnx-zynqmp.c            |  26 ++
- hw/block/m25p80.c               |  80 +++-
- hw/ssi/xilinx_spips.c           | 899 ++++++++++++++++++++++++++++++++++------
- include/hw/arm/xlnx-zynqmp.h    |   5 +
- include/hw/ssi/xilinx_spips.h   |  74 +++-
- 7 files changed, 970 insertions(+), 139 deletions(-)
-
+diff --git a/hw/block/m25p80.c b/hw/block/m25p80.c
+index a2438b9..d50acc1 100644
+--- a/hw/block/m25p80.c
++++ b/hw/block/m25p80.c
+@@ -423,6 +423,7 @@ typedef struct Flash {
+     uint8_t data[M25P80_INTERNAL_DATA_BUFFER_SZ];
+     uint32_t len;
+     uint32_t pos;
++    bool data_read_loop;
+     uint8_t needed_bytes;
+     uint8_t cmd_in_progress;
+     uint32_t cur_addr;
+@@ -983,6 +984,7 @@ static void decode_new_cmd(Flash *s, uint32_t value)
+         }
+         s->pos = 0;
+         s->len = 1;
++        s->data_read_loop = true;
+         s->state = STATE_READING_DATA;
+         break;
+ 
+@@ -993,6 +995,7 @@ static void decode_new_cmd(Flash *s, uint32_t value)
+         }
+         s->pos = 0;
+         s->len = 1;
++        s->data_read_loop = true;
+         s->state = STATE_READING_DATA;
+         break;
+ 
+@@ -1133,6 +1136,7 @@ static int m25p80_cs(SSISlave *ss, bool select)
+         s->pos = 0;
+         s->state = STATE_IDLE;
+         flash_sync_dirty(s, -1);
++        s->data_read_loop = false;
+     }
+ 
+     DB_PRINT_L(0, "%sselect\n", select ? "de" : "");
+@@ -1198,7 +1202,9 @@ static uint32_t m25p80_transfer8(SSISlave *ss, uint32_t tx)
+         s->pos++;
+         if (s->pos == s->len) {
+             s->pos = 0;
+-            s->state = STATE_IDLE;
++            if (!s->data_read_loop) {
++                s->state = STATE_IDLE;
++            }
+         }
+         break;
+ 
+@@ -1269,11 +1275,38 @@ static Property m25p80_properties[] = {
+     DEFINE_PROP_END_OF_LIST(),
+ };
+ 
++static int m25p80_pre_load(void *opaque)
++{
++    Flash *s = (Flash *)opaque;
++
++    s->data_read_loop = false;
++    return 0;
++}
++
++static bool m25p80_data_read_loop_needed(void *opaque)
++{
++    Flash *s = (Flash *)opaque;
++
++    return s->data_read_loop;
++}
++
++static const VMStateDescription vmstate_m25p80_data_read_loop = {
++    .name = "m25p80/data_read_loop",
++    .version_id = 1,
++    .minimum_version_id = 1,
++    .needed = m25p80_data_read_loop_needed,
++    .fields = (VMStateField[]) {
++        VMSTATE_BOOL(data_read_loop, Flash),
++        VMSTATE_END_OF_LIST()
++    }
++};
++
+ static const VMStateDescription vmstate_m25p80 = {
+     .name = "m25p80",
+     .version_id = 0,
+     .minimum_version_id = 0,
+     .pre_save = m25p80_pre_save,
++    .pre_load = m25p80_pre_load,
+     .fields = (VMStateField[]) {
+         VMSTATE_UINT8(state, Flash),
+         VMSTATE_UINT8_ARRAY(data, Flash, M25P80_INTERNAL_DATA_BUFFER_SZ),
+@@ -1295,6 +1328,10 @@ static const VMStateDescription vmstate_m25p80 = {
+         VMSTATE_UINT8(spansion_cr3nv, Flash),
+         VMSTATE_UINT8(spansion_cr4nv, Flash),
+         VMSTATE_END_OF_LIST()
++    },
++    .subsections = (const VMStateDescription * []) {
++        &vmstate_m25p80_data_read_loop,
++        NULL
+     }
+ };
+ 
 -- 
 2.9.3
