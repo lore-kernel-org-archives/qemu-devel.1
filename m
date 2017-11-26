@@ -1,23 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34109)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34134)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1eIx6C-0000Ql-4T
-	for qemu-devel@nongnu.org; Sun, 26 Nov 2017 08:36:01 -0500
+	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1eIx6G-0000SX-OH
+	for qemu-devel@nongnu.org; Sun, 26 Nov 2017 08:36:03 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1eIx68-0006ck-Ta
-	for qemu-devel@nongnu.org; Sun, 26 Nov 2017 08:35:56 -0500
-Received: from chuckie.co.uk ([82.165.15.123]:48795
+	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1eIx6D-0006fs-Uo
+	for qemu-devel@nongnu.org; Sun, 26 Nov 2017 08:36:00 -0500
+Received: from chuckie.co.uk ([82.165.15.123]:48804
 	helo=s16892447.onlinehome-server.info)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <mark.cave-ayland@ilande.co.uk>)
-	id 1eIx68-0006cS-FN
-	for qemu-devel@nongnu.org; Sun, 26 Nov 2017 08:35:52 -0500
+	id 1eIx6D-0006fd-H5
+	for qemu-devel@nongnu.org; Sun, 26 Nov 2017 08:35:57 -0500
 From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-Date: Sun, 26 Nov 2017 13:35:19 +0000
-Message-Id: <1511703326-25325-2-git-send-email-mark.cave-ayland@ilande.co.uk>
+Date: Sun, 26 Nov 2017 13:35:23 +0000
+Message-Id: <1511703326-25325-6-git-send-email-mark.cave-ayland@ilande.co.uk>
 In-Reply-To: <1511703326-25325-1-git-send-email-mark.cave-ayland@ilande.co.uk>
 References: <1511703326-25325-1-git-send-email-mark.cave-ayland@ilande.co.uk>
-Subject: [Qemu-devel] [PATCH 1/8] sun4m: move sun4m_iommu.c from hw/dma to
- hw/sparc
+Subject: [Qemu-devel] [PATCH 5/8] sun4u: split IOMMU device out from apb.c
+ to sun4u_iommu.c
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,328 +28,55 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org, atar4qemu@gmail.com
 
-This seems more appropriate and brings sun4m in line with the other
-architectures.
+By separating the sun4u IOMMU device into new sun4u_iommu.c and sun4m_iommu.h
+files we noticeably simplify apb.c whilst bringing sun4u in line with all the
+other IOMMU-supporting architectures.
 
 Signed-off-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
 ---
- hw/dma/Makefile.objs   |    1 -
- hw/dma/sun4m_iommu.c   |  406 -----------------------------------------------
- hw/dma/trace-events    |   10 --
- hw/sparc/Makefile.objs |    2 +-
- hw/sparc/sun4m_iommu.c |  407 ++++++++++++++++++++++++++++++++++++++++++++++++
- hw/sparc/trace-events  |   10 ++
- 6 files changed, 418 insertions(+), 418 deletions(-)
- delete mode 100644 hw/dma/sun4m_iommu.c
- create mode 100644 hw/sparc/sun4m_iommu.c
+ hw/pci-host/apb.c              |  273 -------------------------------
+ hw/sparc64/Makefile.objs       |    1 +
+ hw/sparc64/sun4u.c             |    1 +
+ hw/sparc64/sun4u_iommu.c       |  350 ++++++++++++++++++++++++++++++++++++++++
+ include/hw/pci-host/apb.h      |   57 +------
+ include/hw/sparc/sun4u_iommu.h |   50 ++++++
+ 6 files changed, 403 insertions(+), 329 deletions(-)
+ create mode 100644 hw/sparc64/sun4u_iommu.c
+ create mode 100644 include/hw/sparc/sun4u_iommu.h
 
-diff --git a/hw/dma/Makefile.objs b/hw/dma/Makefile.objs
-index 087c8e6..0b3a009 100644
---- a/hw/dma/Makefile.objs
-+++ b/hw/dma/Makefile.objs
-@@ -8,7 +8,6 @@ common-obj-$(CONFIG_XILINX_AXI) += xilinx_axidma.o
- common-obj-$(CONFIG_ZYNQ_DEVCFG) += xlnx-zynq-devcfg.o
- common-obj-$(CONFIG_ETRAXFS) += etraxfs_dma.o
- common-obj-$(CONFIG_STP2000) += sparc32_dma.o
--common-obj-$(CONFIG_SUN4M) += sun4m_iommu.o
- obj-$(CONFIG_XLNX_ZYNQMP) += xlnx_dpdma.o
+diff --git a/hw/pci-host/apb.c b/hw/pci-host/apb.c
+index 7eb5ce0..516dc28 100644
+--- a/hw/pci-host/apb.c
++++ b/hw/pci-host/apb.c
+@@ -49,16 +49,6 @@ do { printf("APB: " fmt , ## __VA_ARGS__); } while (0)
+ #define APB_DPRINTF(fmt, ...)
+ #endif
  
- obj-$(CONFIG_OMAP) += omap_dma.o soc_dma.o
-diff --git a/hw/dma/sun4m_iommu.c b/hw/dma/sun4m_iommu.c
-deleted file mode 100644
-index 30a05e8..0000000
---- a/hw/dma/sun4m_iommu.c
-+++ /dev/null
-@@ -1,406 +0,0 @@
--/*
-- * QEMU Sun4m iommu emulation
-- *
-- * Copyright (c) 2003-2005 Fabrice Bellard
-- *
-- * Permission is hereby granted, free of charge, to any person obtaining a copy
-- * of this software and associated documentation files (the "Software"), to deal
-- * in the Software without restriction, including without limitation the rights
-- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-- * copies of the Software, and to permit persons to whom the Software is
-- * furnished to do so, subject to the following conditions:
-- *
-- * The above copyright notice and this permission notice shall be included in
-- * all copies or substantial portions of the Software.
-- *
-- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
-- * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-- * THE SOFTWARE.
-- */
+-/* debug IOMMU */
+-//#define DEBUG_IOMMU
 -
--#include "qemu/osdep.h"
--#include "hw/sparc/sun4m.h"
--#include "hw/sysbus.h"
--#include "exec/address-spaces.h"
--#include "trace.h"
+-#ifdef DEBUG_IOMMU
+-#define IOMMU_DPRINTF(fmt, ...) \
+-do { printf("IOMMU: " fmt , ## __VA_ARGS__); } while (0)
+-#else
+-#define IOMMU_DPRINTF(fmt, ...)
+-#endif
 -
--/*
-- * I/O MMU used by Sun4m systems
-- *
-- * Chipset docs:
-- * "Sun-4M System Architecture (revision 2.0) by Chuck Narad", 950-1373-01,
-- * http://mediacast.sun.com/users/Barton808/media/Sun4M_SystemArchitecture_edited2.pdf
-- */
--
--#define IOMMU_CTRL          (0x0000 >> 2)
--#define IOMMU_CTRL_IMPL     0xf0000000 /* Implementation */
--#define IOMMU_CTRL_VERS     0x0f000000 /* Version */
--#define IOMMU_CTRL_RNGE     0x0000001c /* Mapping RANGE */
--#define IOMMU_RNGE_16MB     0x00000000 /* 0xff000000 -> 0xffffffff */
--#define IOMMU_RNGE_32MB     0x00000004 /* 0xfe000000 -> 0xffffffff */
--#define IOMMU_RNGE_64MB     0x00000008 /* 0xfc000000 -> 0xffffffff */
--#define IOMMU_RNGE_128MB    0x0000000c /* 0xf8000000 -> 0xffffffff */
--#define IOMMU_RNGE_256MB    0x00000010 /* 0xf0000000 -> 0xffffffff */
--#define IOMMU_RNGE_512MB    0x00000014 /* 0xe0000000 -> 0xffffffff */
--#define IOMMU_RNGE_1GB      0x00000018 /* 0xc0000000 -> 0xffffffff */
--#define IOMMU_RNGE_2GB      0x0000001c /* 0x80000000 -> 0xffffffff */
--#define IOMMU_CTRL_ENAB     0x00000001 /* IOMMU Enable */
--#define IOMMU_CTRL_MASK     0x0000001d
--
--#define IOMMU_BASE          (0x0004 >> 2)
--#define IOMMU_BASE_MASK     0x07fffc00
--
--#define IOMMU_TLBFLUSH      (0x0014 >> 2)
--#define IOMMU_TLBFLUSH_MASK 0xffffffff
--
--#define IOMMU_PGFLUSH       (0x0018 >> 2)
--#define IOMMU_PGFLUSH_MASK  0xffffffff
--
--#define IOMMU_AFSR          (0x1000 >> 2)
--#define IOMMU_AFSR_ERR      0x80000000 /* LE, TO, or BE asserted */
--#define IOMMU_AFSR_LE       0x40000000 /* SBUS reports error after
--                                          transaction */
--#define IOMMU_AFSR_TO       0x20000000 /* Write access took more than
--                                          12.8 us. */
--#define IOMMU_AFSR_BE       0x10000000 /* Write access received error
--                                          acknowledge */
--#define IOMMU_AFSR_SIZE     0x0e000000 /* Size of transaction causing error */
--#define IOMMU_AFSR_S        0x01000000 /* Sparc was in supervisor mode */
--#define IOMMU_AFSR_RESV     0x00800000 /* Reserved, forced to 0x8 by
--                                          hardware */
--#define IOMMU_AFSR_ME       0x00080000 /* Multiple errors occurred */
--#define IOMMU_AFSR_RD       0x00040000 /* A read operation was in progress */
--#define IOMMU_AFSR_FAV      0x00020000 /* IOMMU afar has valid contents */
--#define IOMMU_AFSR_MASK     0xff0fffff
--
--#define IOMMU_AFAR          (0x1004 >> 2)
--
--#define IOMMU_AER           (0x1008 >> 2) /* Arbiter Enable Register */
--#define IOMMU_AER_EN_P0_ARB 0x00000001    /* MBus master 0x8 (Always 1) */
--#define IOMMU_AER_EN_P1_ARB 0x00000002    /* MBus master 0x9 */
--#define IOMMU_AER_EN_P2_ARB 0x00000004    /* MBus master 0xa */
--#define IOMMU_AER_EN_P3_ARB 0x00000008    /* MBus master 0xb */
--#define IOMMU_AER_EN_0      0x00010000    /* SBus slot 0 */
--#define IOMMU_AER_EN_1      0x00020000    /* SBus slot 1 */
--#define IOMMU_AER_EN_2      0x00040000    /* SBus slot 2 */
--#define IOMMU_AER_EN_3      0x00080000    /* SBus slot 3 */
--#define IOMMU_AER_EN_F      0x00100000    /* SBus on-board */
--#define IOMMU_AER_SBW       0x80000000    /* S-to-M asynchronous writes */
--#define IOMMU_AER_MASK      0x801f000f
--
--#define IOMMU_SBCFG0        (0x1010 >> 2) /* SBUS configration per-slot */
--#define IOMMU_SBCFG1        (0x1014 >> 2) /* SBUS configration per-slot */
--#define IOMMU_SBCFG2        (0x1018 >> 2) /* SBUS configration per-slot */
--#define IOMMU_SBCFG3        (0x101c >> 2) /* SBUS configration per-slot */
--#define IOMMU_SBCFG_SAB30   0x00010000 /* Phys-address bit 30 when
--                                          bypass enabled */
--#define IOMMU_SBCFG_BA16    0x00000004 /* Slave supports 16 byte bursts */
--#define IOMMU_SBCFG_BA8     0x00000002 /* Slave supports 8 byte bursts */
--#define IOMMU_SBCFG_BYPASS  0x00000001 /* Bypass IOMMU, treat all addresses
--                                          produced by this device as pure
--                                          physical. */
--#define IOMMU_SBCFG_MASK    0x00010003
--
--#define IOMMU_ARBEN         (0x2000 >> 2) /* SBUS arbitration enable */
--#define IOMMU_ARBEN_MASK    0x001f0000
--#define IOMMU_MID           0x00000008
--
--#define IOMMU_MASK_ID       (0x3018 >> 2) /* Mask ID */
--#define IOMMU_MASK_ID_MASK  0x00ffffff
--
--#define IOMMU_MSII_MASK     0x26000000 /* microSPARC II mask number */
--#define IOMMU_TS_MASK       0x23000000 /* turboSPARC mask number */
--
--/* The format of an iopte in the page tables */
--#define IOPTE_PAGE          0xffffff00 /* Physical page number (PA[35:12]) */
--#define IOPTE_CACHE         0x00000080 /* Cached (in vme IOCACHE or
--                                          Viking/MXCC) */
--#define IOPTE_WRITE         0x00000004 /* Writable */
--#define IOPTE_VALID         0x00000002 /* IOPTE is valid */
--#define IOPTE_WAZ           0x00000001 /* Write as zeros */
--
--#define IOMMU_PAGE_SHIFT    12
--#define IOMMU_PAGE_SIZE     (1 << IOMMU_PAGE_SHIFT)
--#define IOMMU_PAGE_MASK     ~(IOMMU_PAGE_SIZE - 1)
--
--static uint64_t iommu_mem_read(void *opaque, hwaddr addr,
--                               unsigned size)
--{
--    IOMMUState *s = opaque;
--    hwaddr saddr;
--    uint32_t ret;
--
--    saddr = addr >> 2;
--    switch (saddr) {
--    default:
--        ret = s->regs[saddr];
--        break;
--    case IOMMU_AFAR:
--    case IOMMU_AFSR:
--        ret = s->regs[saddr];
--        qemu_irq_lower(s->irq);
--        break;
--    }
--    trace_sun4m_iommu_mem_readl(saddr, ret);
--    return ret;
--}
--
--static void iommu_mem_write(void *opaque, hwaddr addr,
--                            uint64_t val, unsigned size)
--{
--    IOMMUState *s = opaque;
--    hwaddr saddr;
--
--    saddr = addr >> 2;
--    trace_sun4m_iommu_mem_writel(saddr, val);
--    switch (saddr) {
--    case IOMMU_CTRL:
--        switch (val & IOMMU_CTRL_RNGE) {
--        case IOMMU_RNGE_16MB:
--            s->iostart = 0xffffffffff000000ULL;
--            break;
--        case IOMMU_RNGE_32MB:
--            s->iostart = 0xfffffffffe000000ULL;
--            break;
--        case IOMMU_RNGE_64MB:
--            s->iostart = 0xfffffffffc000000ULL;
--            break;
--        case IOMMU_RNGE_128MB:
--            s->iostart = 0xfffffffff8000000ULL;
--            break;
--        case IOMMU_RNGE_256MB:
--            s->iostart = 0xfffffffff0000000ULL;
--            break;
--        case IOMMU_RNGE_512MB:
--            s->iostart = 0xffffffffe0000000ULL;
--            break;
--        case IOMMU_RNGE_1GB:
--            s->iostart = 0xffffffffc0000000ULL;
--            break;
--        default:
--        case IOMMU_RNGE_2GB:
--            s->iostart = 0xffffffff80000000ULL;
--            break;
--        }
--        trace_sun4m_iommu_mem_writel_ctrl(s->iostart);
--        s->regs[saddr] = ((val & IOMMU_CTRL_MASK) | s->version);
--        break;
--    case IOMMU_BASE:
--        s->regs[saddr] = val & IOMMU_BASE_MASK;
--        break;
--    case IOMMU_TLBFLUSH:
--        trace_sun4m_iommu_mem_writel_tlbflush(val);
--        s->regs[saddr] = val & IOMMU_TLBFLUSH_MASK;
--        break;
--    case IOMMU_PGFLUSH:
--        trace_sun4m_iommu_mem_writel_pgflush(val);
--        s->regs[saddr] = val & IOMMU_PGFLUSH_MASK;
--        break;
--    case IOMMU_AFAR:
--        s->regs[saddr] = val;
--        qemu_irq_lower(s->irq);
--        break;
--    case IOMMU_AER:
--        s->regs[saddr] = (val & IOMMU_AER_MASK) | IOMMU_AER_EN_P0_ARB;
--        break;
--    case IOMMU_AFSR:
--        s->regs[saddr] = (val & IOMMU_AFSR_MASK) | IOMMU_AFSR_RESV;
--        qemu_irq_lower(s->irq);
--        break;
--    case IOMMU_SBCFG0:
--    case IOMMU_SBCFG1:
--    case IOMMU_SBCFG2:
--    case IOMMU_SBCFG3:
--        s->regs[saddr] = val & IOMMU_SBCFG_MASK;
--        break;
--    case IOMMU_ARBEN:
--        // XXX implement SBus probing: fault when reading unmapped
--        // addresses, fault cause and address stored to MMU/IOMMU
--        s->regs[saddr] = (val & IOMMU_ARBEN_MASK) | IOMMU_MID;
--        break;
--    case IOMMU_MASK_ID:
--        s->regs[saddr] |= val & IOMMU_MASK_ID_MASK;
--        break;
--    default:
--        s->regs[saddr] = val;
--        break;
--    }
--}
--
--static const MemoryRegionOps iommu_mem_ops = {
--    .read = iommu_mem_read,
--    .write = iommu_mem_write,
--    .endianness = DEVICE_NATIVE_ENDIAN,
--    .valid = {
--        .min_access_size = 4,
--        .max_access_size = 4,
--    },
--};
--
--static uint32_t iommu_page_get_flags(IOMMUState *s, hwaddr addr)
--{
--    uint32_t ret;
--    hwaddr iopte;
--    hwaddr pa = addr;
--
--    iopte = s->regs[IOMMU_BASE] << 4;
--    addr &= ~s->iostart;
--    iopte += (addr >> (IOMMU_PAGE_SHIFT - 2)) & ~3;
--    ret = address_space_ldl_be(&address_space_memory, iopte,
--                               MEMTXATTRS_UNSPECIFIED, NULL);
--    trace_sun4m_iommu_page_get_flags(pa, iopte, ret);
--    return ret;
--}
--
--static hwaddr iommu_translate_pa(hwaddr addr,
--                                             uint32_t pte)
--{
--    hwaddr pa;
--
--    pa = ((pte & IOPTE_PAGE) << 4) + (addr & ~IOMMU_PAGE_MASK);
--    trace_sun4m_iommu_translate_pa(addr, pa, pte);
--    return pa;
--}
--
--static void iommu_bad_addr(IOMMUState *s, hwaddr addr,
--                           int is_write)
--{
--    trace_sun4m_iommu_bad_addr(addr);
--    s->regs[IOMMU_AFSR] = IOMMU_AFSR_ERR | IOMMU_AFSR_LE | IOMMU_AFSR_RESV |
--        IOMMU_AFSR_FAV;
--    if (!is_write)
--        s->regs[IOMMU_AFSR] |= IOMMU_AFSR_RD;
--    s->regs[IOMMU_AFAR] = addr;
--    qemu_irq_raise(s->irq);
--}
--
+ /*
+  * Chipset docs:
+  * PBM: "UltraSPARC IIi User's Manual",
+@@ -136,211 +126,6 @@ static AddressSpace *pbm_pci_dma_iommu(PCIBus *bus, void *opaque, int devfn)
+     return &is->iommu_as;
+ }
+ 
 -/* Called from RCU critical section */
--static IOMMUTLBEntry sun4m_translate_iommu(IOMMUMemoryRegion *iommu,
--                                           hwaddr addr,
--                                           IOMMUAccessFlags flags)
+-static IOMMUTLBEntry pbm_translate_iommu(IOMMUMemoryRegion *iommu, hwaddr addr,
+-                                         IOMMUAccessFlags flag)
 -{
 -    IOMMUState *is = container_of(iommu, IOMMUState, iommu);
--    hwaddr page, pa;
--    int is_write = (flags & IOMMU_WO) ? 1 : 0;
--    uint32_t pte;
+-    hwaddr baseaddr, offset;
+-    uint64_t tte;
+-    uint32_t tsbsize;
 -    IOMMUTLBEntry ret = {
 -        .target_as = &address_space_memory,
 -        .iova = 0,
@@ -358,152 +85,302 @@ index 30a05e8..0000000
 -        .perm = IOMMU_NONE,
 -    };
 -
--    page = addr & IOMMU_PAGE_MASK;
--    pte = iommu_page_get_flags(is, page);
--    if (!(pte & IOPTE_VALID)) {
--        iommu_bad_addr(is, page, is_write);
+-    if (!(is->regs[IOMMU_CTRL >> 3] & IOMMU_CTRL_MMU_EN)) {
+-        /* IOMMU disabled, passthrough using standard 8K page */
+-        ret.iova = addr & IOMMU_PAGE_MASK_8K;
+-        ret.translated_addr = addr;
+-        ret.addr_mask = IOMMU_PAGE_MASK_8K;
+-        ret.perm = IOMMU_RW;
+-
 -        return ret;
 -    }
 -
--    pa = iommu_translate_pa(addr, pte);
--    if (is_write && !(pte & IOPTE_WRITE)) {
--        iommu_bad_addr(is, page, is_write);
+-    baseaddr = is->regs[IOMMU_BASE >> 3];
+-    tsbsize = (is->regs[IOMMU_CTRL >> 3] >> IOMMU_CTRL_TSB_SHIFT) & 0x7;
+-
+-    if (is->regs[IOMMU_CTRL >> 3] & IOMMU_CTRL_TBW_SIZE) {
+-        /* 64K */
+-        switch (tsbsize) {
+-        case 0:
+-            offset = (addr & IOMMU_TSB_64K_OFFSET_MASK_64M) >> 13;
+-            break;
+-        case 1:
+-            offset = (addr & IOMMU_TSB_64K_OFFSET_MASK_128M) >> 13;
+-            break;
+-        case 2:
+-            offset = (addr & IOMMU_TSB_64K_OFFSET_MASK_256M) >> 13;
+-            break;
+-        case 3:
+-            offset = (addr & IOMMU_TSB_64K_OFFSET_MASK_512M) >> 13;
+-            break;
+-        case 4:
+-            offset = (addr & IOMMU_TSB_64K_OFFSET_MASK_1G) >> 13;
+-            break;
+-        case 5:
+-            offset = (addr & IOMMU_TSB_64K_OFFSET_MASK_2G) >> 13;
+-            break;
+-        default:
+-            /* Not implemented, error */
+-            return ret;
+-        }
+-    } else {
+-        /* 8K */
+-        switch (tsbsize) {
+-        case 0:
+-            offset = (addr & IOMMU_TSB_8K_OFFSET_MASK_8M) >> 10;
+-            break;
+-        case 1:
+-            offset = (addr & IOMMU_TSB_8K_OFFSET_MASK_16M) >> 10;
+-            break;
+-        case 2:
+-            offset = (addr & IOMMU_TSB_8K_OFFSET_MASK_32M) >> 10;
+-            break;
+-        case 3:
+-            offset = (addr & IOMMU_TSB_8K_OFFSET_MASK_64M) >> 10;
+-            break;
+-        case 4:
+-            offset = (addr & IOMMU_TSB_8K_OFFSET_MASK_128M) >> 10;
+-            break;
+-        case 5:
+-            offset = (addr & IOMMU_TSB_8K_OFFSET_MASK_256M) >> 10;
+-            break;
+-        case 6:
+-            offset = (addr & IOMMU_TSB_8K_OFFSET_MASK_512M) >> 10;
+-            break;
+-        case 7:
+-            offset = (addr & IOMMU_TSB_8K_OFFSET_MASK_1G) >> 10;
+-            break;
+-        }
+-    }
+-
+-    tte = address_space_ldq_be(&address_space_memory, baseaddr + offset,
+-                               MEMTXATTRS_UNSPECIFIED, NULL);
+-
+-    if (!(tte & IOMMU_TTE_DATA_V)) {
+-        /* Invalid mapping */
 -        return ret;
 -    }
 -
--    if (pte & IOPTE_WRITE) {
+-    if (tte & IOMMU_TTE_DATA_W) {
+-        /* Writeable */
 -        ret.perm = IOMMU_RW;
 -    } else {
 -        ret.perm = IOMMU_RO;
 -    }
 -
--    ret.iova = page;
--    ret.translated_addr = pa;
--    ret.addr_mask = ~IOMMU_PAGE_MASK;
+-    /* Extract phys */
+-    if (tte & IOMMU_TTE_DATA_SIZE) {
+-        /* 64K */
+-        ret.iova = addr & IOMMU_PAGE_MASK_64K;
+-        ret.translated_addr = tte & IOMMU_TTE_PHYS_MASK_64K;
+-        ret.addr_mask = (IOMMU_PAGE_SIZE_64K - 1);
+-    } else {
+-        /* 8K */
+-        ret.iova = addr & IOMMU_PAGE_MASK_8K;
+-        ret.translated_addr = tte & IOMMU_TTE_PHYS_MASK_8K;
+-        ret.addr_mask = (IOMMU_PAGE_SIZE_8K - 1);
+-    }
 -
 -    return ret;
 -}
 -
--static const VMStateDescription vmstate_iommu = {
--    .name ="iommu",
--    .version_id = 2,
--    .minimum_version_id = 2,
--    .fields = (VMStateField[]) {
--        VMSTATE_UINT32_ARRAY(regs, IOMMUState, IOMMU_NREGS),
--        VMSTATE_UINT64(iostart, IOMMUState),
--        VMSTATE_END_OF_LIST()
+-static void iommu_mem_write(void *opaque, hwaddr addr,
+-                            uint64_t val, unsigned size)
+-{
+-    IOMMUState *is = opaque;
+-
+-    IOMMU_DPRINTF("IOMMU config write: 0x%" HWADDR_PRIx " val: %" PRIx64
+-                  " size: %d\n", addr, val, size);
+-
+-    switch (addr) {
+-    case IOMMU_CTRL:
+-        if (size == 4) {
+-            is->regs[IOMMU_CTRL >> 3] &= 0xffffffffULL;
+-            is->regs[IOMMU_CTRL >> 3] |= val << 32;
+-        } else {
+-            is->regs[IOMMU_CTRL >> 3] = val;
+-        }
+-        break;
+-    case IOMMU_CTRL + 0x4:
+-        is->regs[IOMMU_CTRL >> 3] &= 0xffffffff00000000ULL;
+-        is->regs[IOMMU_CTRL >> 3] |= val & 0xffffffffULL;
+-        break;
+-    case IOMMU_BASE:
+-        if (size == 4) {
+-            is->regs[IOMMU_BASE >> 3] &= 0xffffffffULL;
+-            is->regs[IOMMU_BASE >> 3] |= val << 32;
+-        } else {
+-            is->regs[IOMMU_BASE >> 3] = val;
+-        }
+-        break;
+-    case IOMMU_BASE + 0x4:
+-        is->regs[IOMMU_BASE >> 3] &= 0xffffffff00000000ULL;
+-        is->regs[IOMMU_BASE >> 3] |= val & 0xffffffffULL;
+-        break;
+-    case IOMMU_FLUSH:
+-    case IOMMU_FLUSH + 0x4:
+-        break;
+-    default:
+-        qemu_log_mask(LOG_UNIMP,
+-                  "apb iommu: Unimplemented register write "
+-                  "reg 0x%" HWADDR_PRIx " size 0x%x value 0x%" PRIx64 "\n",
+-                  addr, size, val);
+-        break;
 -    }
+-}
+-
+-static uint64_t iommu_mem_read(void *opaque, hwaddr addr, unsigned size)
+-{
+-    IOMMUState *is = opaque;
+-    uint64_t val;
+-
+-    switch (addr) {
+-    case IOMMU_CTRL:
+-        if (size == 4) {
+-            val = is->regs[IOMMU_CTRL >> 3] >> 32;
+-        } else {
+-            val = is->regs[IOMMU_CTRL >> 3];
+-        }
+-        break;
+-    case IOMMU_CTRL + 0x4:
+-        val = is->regs[IOMMU_CTRL >> 3] & 0xffffffffULL;
+-        break;
+-    case IOMMU_BASE:
+-        if (size == 4) {
+-            val = is->regs[IOMMU_BASE >> 3] >> 32;
+-        } else {
+-            val = is->regs[IOMMU_BASE >> 3];
+-        }
+-        break;
+-    case IOMMU_BASE + 0x4:
+-        val = is->regs[IOMMU_BASE >> 3] & 0xffffffffULL;
+-        break;
+-    case IOMMU_FLUSH:
+-    case IOMMU_FLUSH + 0x4:
+-        val = 0;
+-        break;
+-    default:
+-        qemu_log_mask(LOG_UNIMP,
+-                      "apb iommu: Unimplemented register read "
+-                      "reg 0x%" HWADDR_PRIx " size 0x%x\n",
+-                      addr, size);
+-        val = 0;
+-        break;
+-    }
+-
+-    IOMMU_DPRINTF("IOMMU config read: 0x%" HWADDR_PRIx " val: %" PRIx64
+-                  " size: %d\n", addr, val, size);
+-
+-    return val;
+-}
+-
+ static void apb_config_writel (void *opaque, hwaddr addr,
+                                uint64_t val, unsigned size)
+ {
+@@ -806,69 +591,11 @@ static const TypeInfo pbm_pci_bridge_info = {
+     },
+ };
+ 
+-static const MemoryRegionOps iommu_mem_ops = {
+-    .read = iommu_mem_read,
+-    .write = iommu_mem_write,
+-    .endianness = DEVICE_BIG_ENDIAN,
 -};
 -
 -static void iommu_reset(DeviceState *d)
 -{
--    IOMMUState *s = SUN4M_IOMMU(d);
+-    IOMMUState *s = SUN4U_IOMMU(d);
 -
--    memset(s->regs, 0, IOMMU_NREGS * 4);
--    s->iostart = 0;
--    s->regs[IOMMU_CTRL] = s->version;
--    s->regs[IOMMU_ARBEN] = IOMMU_MID;
--    s->regs[IOMMU_AFSR] = IOMMU_AFSR_RESV;
--    s->regs[IOMMU_AER] = IOMMU_AER_EN_P0_ARB | IOMMU_AER_EN_P1_ARB;
--    s->regs[IOMMU_MASK_ID] = IOMMU_TS_MASK;
+-    memset(s->regs, 0, IOMMU_NREGS * sizeof(uint64_t));
 -}
 -
 -static void iommu_init(Object *obj)
 -{
--    IOMMUState *s = SUN4M_IOMMU(obj);
--    SysBusDevice *dev = SYS_BUS_DEVICE(obj);
+-    IOMMUState *s = SUN4U_IOMMU(obj);
+-    SysBusDevice *sbd = SYS_BUS_DEVICE(obj);
 -
 -    memory_region_init_iommu(&s->iommu, sizeof(s->iommu),
--                             TYPE_SUN4M_IOMMU_MEMORY_REGION, OBJECT(dev),
--                             "iommu-sun4m", UINT64_MAX);
--    address_space_init(&s->iommu_as, MEMORY_REGION(&s->iommu), "iommu-as");
--
--    sysbus_init_irq(dev, &s->irq);
+-                             TYPE_APB_IOMMU_MEMORY_REGION, OBJECT(s),
+-                             "iommu-apb", UINT64_MAX);
+-    address_space_init(&s->iommu_as, MEMORY_REGION(&s->iommu), "pbm-as");
 -
 -    memory_region_init_io(&s->iomem, obj, &iommu_mem_ops, s, "iommu",
--                          IOMMU_NREGS * sizeof(uint32_t));
--    sysbus_init_mmio(dev, &s->iomem);
+-                          IOMMU_NREGS * sizeof(uint64_t));
+-    sysbus_init_mmio(sbd, &s->iomem);
 -}
--
--static Property iommu_properties[] = {
--    DEFINE_PROP_UINT32("version", IOMMUState, version, 0),
--    DEFINE_PROP_END_OF_LIST(),
--};
 -
 -static void iommu_class_init(ObjectClass *klass, void *data)
 -{
 -    DeviceClass *dc = DEVICE_CLASS(klass);
 -
 -    dc->reset = iommu_reset;
--    dc->vmsd = &vmstate_iommu;
--    dc->props = iommu_properties;
 -}
 -
--static const TypeInfo iommu_info = {
--    .name          = TYPE_SUN4M_IOMMU,
+-static const TypeInfo pbm_iommu_info = {
+-    .name          = TYPE_SUN4U_IOMMU,
 -    .parent        = TYPE_SYS_BUS_DEVICE,
 -    .instance_size = sizeof(IOMMUState),
 -    .instance_init = iommu_init,
 -    .class_init    = iommu_class_init,
 -};
 -
--static void sun4m_iommu_memory_region_class_init(ObjectClass *klass, void *data)
+-static void pbm_iommu_memory_region_class_init(ObjectClass *klass, void *data)
 -{
 -    IOMMUMemoryRegionClass *imrc = IOMMU_MEMORY_REGION_CLASS(klass);
 -
--    imrc->translate = sun4m_translate_iommu;
+-    imrc->translate = pbm_translate_iommu;
 -}
 -
--static const TypeInfo sun4m_iommu_memory_region_info = {
+-static const TypeInfo pbm_iommu_memory_region_info = {
 -    .parent = TYPE_IOMMU_MEMORY_REGION,
--    .name = TYPE_SUN4M_IOMMU_MEMORY_REGION,
--    .class_init = sun4m_iommu_memory_region_class_init,
+-    .name = TYPE_APB_IOMMU_MEMORY_REGION,
+-    .class_init = pbm_iommu_memory_region_class_init,
 -};
 -
--static void iommu_register_types(void)
--{
--    type_register_static(&iommu_info);
--    type_register_static(&sun4m_iommu_memory_region_info);
--}
--
--type_init(iommu_register_types)
-diff --git a/hw/dma/trace-events b/hw/dma/trace-events
-index 6b367f0..22f53d0 100644
---- a/hw/dma/trace-events
-+++ b/hw/dma/trace-events
-@@ -18,15 +18,5 @@ sparc32_dma_mem_writel(uint64_t addr, uint32_t old, uint32_t val) "write dmareg
- sparc32_dma_enable_raise(void) "Raise DMA enable"
- sparc32_dma_enable_lower(void) "Lower DMA enable"
+ static void pbm_register_types(void)
+ {
+     type_register_static(&pbm_host_info);
+     type_register_static(&pbm_pci_host_info);
+     type_register_static(&pbm_pci_bridge_info);
+-    type_register_static(&pbm_iommu_info);
+-    type_register_static(&pbm_iommu_memory_region_info);
+ }
  
--# hw/dma/sun4m_iommu.c
--sun4m_iommu_mem_readl(uint64_t addr, uint32_t ret) "read reg[0x%"PRIx64"] = 0x%x"
--sun4m_iommu_mem_writel(uint64_t addr, uint32_t val) "write reg[0x%"PRIx64"] = 0x%x"
--sun4m_iommu_mem_writel_ctrl(uint64_t iostart) "iostart = 0x%"PRIx64
--sun4m_iommu_mem_writel_tlbflush(uint32_t val) "tlb flush 0x%x"
--sun4m_iommu_mem_writel_pgflush(uint32_t val) "page flush 0x%x"
--sun4m_iommu_page_get_flags(uint64_t pa, uint64_t iopte, uint32_t ret) "get flags addr 0x%"PRIx64" => pte 0x%"PRIx64", *pte = 0x%x"
--sun4m_iommu_translate_pa(uint64_t addr, uint64_t pa, uint32_t iopte) "xlate dva 0x%"PRIx64" => pa 0x%"PRIx64" iopte = 0x%x"
--sun4m_iommu_bad_addr(uint64_t addr) "bad addr 0x%"PRIx64
--
- # hw/dma/i8257.c
- i8257_unregistered_dma(int nchan, int dma_pos, int dma_len) "unregistered DMA channel used nchan=%d dma_pos=%d dma_len=%d"
-diff --git a/hw/sparc/Makefile.objs b/hw/sparc/Makefile.objs
-index c987b5b..e2d0828 100644
---- a/hw/sparc/Makefile.objs
-+++ b/hw/sparc/Makefile.objs
-@@ -1 +1 @@
--obj-y += sun4m.o leon3.o
-+obj-y += sun4m_iommu.o sun4m.o leon3.o
-diff --git a/hw/sparc/sun4m_iommu.c b/hw/sparc/sun4m_iommu.c
+ type_init(pbm_register_types)
+diff --git a/hw/sparc64/Makefile.objs b/hw/sparc64/Makefile.objs
+index cf9de21..117e0ff 100644
+--- a/hw/sparc64/Makefile.objs
++++ b/hw/sparc64/Makefile.objs
+@@ -1,3 +1,4 @@
+ obj-y += sparc64.o
++obj-y += sun4u_iommu.o
+ obj-y += sun4u.o
+ obj-y += niagara.o
+\ No newline at end of file
+diff --git a/hw/sparc64/sun4u.c b/hw/sparc64/sun4u.c
+index aaee3de..ec45ec2 100644
+--- a/hw/sparc64/sun4u.c
++++ b/hw/sparc64/sun4u.c
+@@ -29,6 +29,7 @@
+ #include "hw/pci/pci.h"
+ #include "hw/pci/pci_bridge.h"
+ #include "hw/pci/pci_bus.h"
++#include "hw/pci/pci_host.h"
+ #include "hw/pci-host/apb.h"
+ #include "hw/i386/pc.h"
+ #include "hw/char/serial.h"
+diff --git a/hw/sparc64/sun4u_iommu.c b/hw/sparc64/sun4u_iommu.c
 new file mode 100644
-index 0000000..72a9af5
+index 0000000..e5aa817
 --- /dev/null
-+++ b/hw/sparc/sun4m_iommu.c
-@@ -0,0 +1,407 @@
++++ b/hw/sparc64/sun4u_iommu.c
+@@ -0,0 +1,350 @@
 +/*
-+ * QEMU Sun4m iommu emulation
++ * QEMU sun4u IOMMU emulation
 + *
-+ * Copyright (c) 2003-2005 Fabrice Bellard
++ * Copyright (c) 2006 Fabrice Bellard
++ * Copyright (c) 2012,2013 Artyom Tarasenko
++ * Copyright (c) 2017 Mark Cave-Ayland
 + *
 + * Permission is hereby granted, free of charge, to any person obtaining a copy
 + * of this software and associated documentation files (the "Software"), to deal
@@ -525,271 +402,69 @@ index 0000000..72a9af5
 + */
 +
 +#include "qemu/osdep.h"
-+#include "hw/sparc/sun4m.h"
 +#include "hw/sysbus.h"
++#include "hw/sparc/sun4u_iommu.h"
 +#include "exec/address-spaces.h"
-+#include "trace.h"
++#include "qapi/error.h"
++#include "qemu/log.h"
 +
-+/*
-+ * I/O MMU used by Sun4m systems
-+ *
-+ * Chipset docs:
-+ * "Sun-4M System Architecture (revision 2.0) by Chuck Narad", 950-1373-01,
-+ * http://mediacast.sun.com/users/Barton808/media/Sun4M_SystemArchitecture_edited2.pdf
-+ */
++/* debug IOMMU */
++//#define DEBUG_IOMMU
 +
-+#define IOMMU_CTRL          (0x0000 >> 2)
-+#define IOMMU_CTRL_IMPL     0xf0000000 /* Implementation */
-+#define IOMMU_CTRL_VERS     0x0f000000 /* Version */
-+#define IOMMU_CTRL_RNGE     0x0000001c /* Mapping RANGE */
-+#define IOMMU_RNGE_16MB     0x00000000 /* 0xff000000 -> 0xffffffff */
-+#define IOMMU_RNGE_32MB     0x00000004 /* 0xfe000000 -> 0xffffffff */
-+#define IOMMU_RNGE_64MB     0x00000008 /* 0xfc000000 -> 0xffffffff */
-+#define IOMMU_RNGE_128MB    0x0000000c /* 0xf8000000 -> 0xffffffff */
-+#define IOMMU_RNGE_256MB    0x00000010 /* 0xf0000000 -> 0xffffffff */
-+#define IOMMU_RNGE_512MB    0x00000014 /* 0xe0000000 -> 0xffffffff */
-+#define IOMMU_RNGE_1GB      0x00000018 /* 0xc0000000 -> 0xffffffff */
-+#define IOMMU_RNGE_2GB      0x0000001c /* 0x80000000 -> 0xffffffff */
-+#define IOMMU_CTRL_ENAB     0x00000001 /* IOMMU Enable */
-+#define IOMMU_CTRL_MASK     0x0000001d
++#ifdef DEBUG_IOMMU
++#define IOMMU_DPRINTF(fmt, ...) \
++do { printf("IOMMU: " fmt , ## __VA_ARGS__); } while (0)
++#else
++#define IOMMU_DPRINTF(fmt, ...)
++#endif
 +
-+#define IOMMU_BASE          (0x0004 >> 2)
-+#define IOMMU_BASE_MASK     0x07fffc00
 +
-+#define IOMMU_TLBFLUSH      (0x0014 >> 2)
-+#define IOMMU_TLBFLUSH_MASK 0xffffffff
++#define IOMMU_PAGE_SIZE_8K      (1ULL << 13)
++#define IOMMU_PAGE_MASK_8K      (~(IOMMU_PAGE_SIZE_8K - 1))
++#define IOMMU_PAGE_SIZE_64K     (1ULL << 16)
++#define IOMMU_PAGE_MASK_64K     (~(IOMMU_PAGE_SIZE_64K - 1))
 +
-+#define IOMMU_PGFLUSH       (0x0018 >> 2)
-+#define IOMMU_PGFLUSH_MASK  0xffffffff
++#define IOMMU_CTRL              0x0
++#define IOMMU_CTRL_TBW_SIZE     (1ULL << 2)
++#define IOMMU_CTRL_MMU_EN       (1ULL)
 +
-+#define IOMMU_AFSR          (0x1000 >> 2)
-+#define IOMMU_AFSR_ERR      0x80000000 /* LE, TO, or BE asserted */
-+#define IOMMU_AFSR_LE       0x40000000 /* SBUS reports error after
-+                                          transaction */
-+#define IOMMU_AFSR_TO       0x20000000 /* Write access took more than
-+                                          12.8 us. */
-+#define IOMMU_AFSR_BE       0x10000000 /* Write access received error
-+                                          acknowledge */
-+#define IOMMU_AFSR_SIZE     0x0e000000 /* Size of transaction causing error */
-+#define IOMMU_AFSR_S        0x01000000 /* Sparc was in supervisor mode */
-+#define IOMMU_AFSR_RESV     0x00800000 /* Reserved, forced to 0x8 by
-+                                          hardware */
-+#define IOMMU_AFSR_ME       0x00080000 /* Multiple errors occurred */
-+#define IOMMU_AFSR_RD       0x00040000 /* A read operation was in progress */
-+#define IOMMU_AFSR_FAV      0x00020000 /* IOMMU afar has valid contents */
-+#define IOMMU_AFSR_MASK     0xff0fffff
++#define IOMMU_CTRL_TSB_SHIFT    16
 +
-+#define IOMMU_AFAR          (0x1004 >> 2)
++#define IOMMU_BASE              0x8
++#define IOMMU_FLUSH             0x10
 +
-+#define IOMMU_AER           (0x1008 >> 2) /* Arbiter Enable Register */
-+#define IOMMU_AER_EN_P0_ARB 0x00000001    /* MBus master 0x8 (Always 1) */
-+#define IOMMU_AER_EN_P1_ARB 0x00000002    /* MBus master 0x9 */
-+#define IOMMU_AER_EN_P2_ARB 0x00000004    /* MBus master 0xa */
-+#define IOMMU_AER_EN_P3_ARB 0x00000008    /* MBus master 0xb */
-+#define IOMMU_AER_EN_0      0x00010000    /* SBus slot 0 */
-+#define IOMMU_AER_EN_1      0x00020000    /* SBus slot 1 */
-+#define IOMMU_AER_EN_2      0x00040000    /* SBus slot 2 */
-+#define IOMMU_AER_EN_3      0x00080000    /* SBus slot 3 */
-+#define IOMMU_AER_EN_F      0x00100000    /* SBus on-board */
-+#define IOMMU_AER_SBW       0x80000000    /* S-to-M asynchronous writes */
-+#define IOMMU_AER_MASK      0x801f000f
++#define IOMMU_TTE_DATA_V        (1ULL << 63)
++#define IOMMU_TTE_DATA_SIZE     (1ULL << 61)
++#define IOMMU_TTE_DATA_W        (1ULL << 1)
 +
-+#define IOMMU_SBCFG0        (0x1010 >> 2) /* SBUS configration per-slot */
-+#define IOMMU_SBCFG1        (0x1014 >> 2) /* SBUS configration per-slot */
-+#define IOMMU_SBCFG2        (0x1018 >> 2) /* SBUS configration per-slot */
-+#define IOMMU_SBCFG3        (0x101c >> 2) /* SBUS configration per-slot */
-+#define IOMMU_SBCFG_SAB30   0x00010000 /* Phys-address bit 30 when
-+                                          bypass enabled */
-+#define IOMMU_SBCFG_BA16    0x00000004 /* Slave supports 16 byte bursts */
-+#define IOMMU_SBCFG_BA8     0x00000002 /* Slave supports 8 byte bursts */
-+#define IOMMU_SBCFG_BYPASS  0x00000001 /* Bypass IOMMU, treat all addresses
-+                                          produced by this device as pure
-+                                          physical. */
-+#define IOMMU_SBCFG_MASK    0x00010003
++#define IOMMU_TTE_PHYS_MASK_8K  0x1ffffffe000ULL
++#define IOMMU_TTE_PHYS_MASK_64K 0x1ffffff8000ULL
 +
-+#define IOMMU_ARBEN         (0x2000 >> 2) /* SBUS arbitration enable */
-+#define IOMMU_ARBEN_MASK    0x001f0000
-+#define IOMMU_MID           0x00000008
++#define IOMMU_TSB_8K_OFFSET_MASK_8M    0x00000000007fe000ULL
++#define IOMMU_TSB_8K_OFFSET_MASK_16M   0x0000000000ffe000ULL
++#define IOMMU_TSB_8K_OFFSET_MASK_32M   0x0000000001ffe000ULL
++#define IOMMU_TSB_8K_OFFSET_MASK_64M   0x0000000003ffe000ULL
++#define IOMMU_TSB_8K_OFFSET_MASK_128M  0x0000000007ffe000ULL
++#define IOMMU_TSB_8K_OFFSET_MASK_256M  0x000000000fffe000ULL
++#define IOMMU_TSB_8K_OFFSET_MASK_512M  0x000000001fffe000ULL
++#define IOMMU_TSB_8K_OFFSET_MASK_1G    0x000000003fffe000ULL
 +
-+#define IOMMU_MASK_ID       (0x3018 >> 2) /* Mask ID */
-+#define IOMMU_MASK_ID_MASK  0x00ffffff
++#define IOMMU_TSB_64K_OFFSET_MASK_64M  0x0000000003ff0000ULL
++#define IOMMU_TSB_64K_OFFSET_MASK_128M 0x0000000007ff0000ULL
++#define IOMMU_TSB_64K_OFFSET_MASK_256M 0x000000000fff0000ULL
++#define IOMMU_TSB_64K_OFFSET_MASK_512M 0x000000001fff0000ULL
++#define IOMMU_TSB_64K_OFFSET_MASK_1G   0x000000003fff0000ULL
++#define IOMMU_TSB_64K_OFFSET_MASK_2G   0x000000007fff0000ULL
 +
-+#define IOMMU_MSII_MASK     0x26000000 /* microSPARC II mask number */
-+#define IOMMU_TS_MASK       0x23000000 /* turboSPARC mask number */
-+
-+/* The format of an iopte in the page tables */
-+#define IOPTE_PAGE          0xffffff00 /* Physical page number (PA[35:12]) */
-+#define IOPTE_CACHE         0x00000080 /* Cached (in vme IOCACHE or
-+                                          Viking/MXCC) */
-+#define IOPTE_WRITE         0x00000004 /* Writable */
-+#define IOPTE_VALID         0x00000002 /* IOPTE is valid */
-+#define IOPTE_WAZ           0x00000001 /* Write as zeros */
-+
-+#define IOMMU_PAGE_SHIFT    12
-+#define IOMMU_PAGE_SIZE     (1 << IOMMU_PAGE_SHIFT)
-+#define IOMMU_PAGE_MASK     (~(IOMMU_PAGE_SIZE - 1))
-+
-+static uint64_t iommu_mem_read(void *opaque, hwaddr addr,
-+                               unsigned size)
-+{
-+    IOMMUState *s = opaque;
-+    hwaddr saddr;
-+    uint32_t ret;
-+
-+    saddr = addr >> 2;
-+    switch (saddr) {
-+    default:
-+        ret = s->regs[saddr];
-+        break;
-+    case IOMMU_AFAR:
-+    case IOMMU_AFSR:
-+        ret = s->regs[saddr];
-+        qemu_irq_lower(s->irq);
-+        break;
-+    }
-+    trace_sun4m_iommu_mem_readl(saddr, ret);
-+    return ret;
-+}
-+
-+static void iommu_mem_write(void *opaque, hwaddr addr,
-+                            uint64_t val, unsigned size)
-+{
-+    IOMMUState *s = opaque;
-+    hwaddr saddr;
-+
-+    saddr = addr >> 2;
-+    trace_sun4m_iommu_mem_writel(saddr, val);
-+    switch (saddr) {
-+    case IOMMU_CTRL:
-+        switch (val & IOMMU_CTRL_RNGE) {
-+        case IOMMU_RNGE_16MB:
-+            s->iostart = 0xffffffffff000000ULL;
-+            break;
-+        case IOMMU_RNGE_32MB:
-+            s->iostart = 0xfffffffffe000000ULL;
-+            break;
-+        case IOMMU_RNGE_64MB:
-+            s->iostart = 0xfffffffffc000000ULL;
-+            break;
-+        case IOMMU_RNGE_128MB:
-+            s->iostart = 0xfffffffff8000000ULL;
-+            break;
-+        case IOMMU_RNGE_256MB:
-+            s->iostart = 0xfffffffff0000000ULL;
-+            break;
-+        case IOMMU_RNGE_512MB:
-+            s->iostart = 0xffffffffe0000000ULL;
-+            break;
-+        case IOMMU_RNGE_1GB:
-+            s->iostart = 0xffffffffc0000000ULL;
-+            break;
-+        default:
-+        case IOMMU_RNGE_2GB:
-+            s->iostart = 0xffffffff80000000ULL;
-+            break;
-+        }
-+        trace_sun4m_iommu_mem_writel_ctrl(s->iostart);
-+        s->regs[saddr] = ((val & IOMMU_CTRL_MASK) | s->version);
-+        break;
-+    case IOMMU_BASE:
-+        s->regs[saddr] = val & IOMMU_BASE_MASK;
-+        break;
-+    case IOMMU_TLBFLUSH:
-+        trace_sun4m_iommu_mem_writel_tlbflush(val);
-+        s->regs[saddr] = val & IOMMU_TLBFLUSH_MASK;
-+        break;
-+    case IOMMU_PGFLUSH:
-+        trace_sun4m_iommu_mem_writel_pgflush(val);
-+        s->regs[saddr] = val & IOMMU_PGFLUSH_MASK;
-+        break;
-+    case IOMMU_AFAR:
-+        s->regs[saddr] = val;
-+        qemu_irq_lower(s->irq);
-+        break;
-+    case IOMMU_AER:
-+        s->regs[saddr] = (val & IOMMU_AER_MASK) | IOMMU_AER_EN_P0_ARB;
-+        break;
-+    case IOMMU_AFSR:
-+        s->regs[saddr] = (val & IOMMU_AFSR_MASK) | IOMMU_AFSR_RESV;
-+        qemu_irq_lower(s->irq);
-+        break;
-+    case IOMMU_SBCFG0:
-+    case IOMMU_SBCFG1:
-+    case IOMMU_SBCFG2:
-+    case IOMMU_SBCFG3:
-+        s->regs[saddr] = val & IOMMU_SBCFG_MASK;
-+        break;
-+    case IOMMU_ARBEN:
-+        /* XXX implement SBus probing: fault when reading unmapped
-+           addresses, fault cause and address stored to MMU/IOMMU */
-+        s->regs[saddr] = (val & IOMMU_ARBEN_MASK) | IOMMU_MID;
-+        break;
-+    case IOMMU_MASK_ID:
-+        s->regs[saddr] |= val & IOMMU_MASK_ID_MASK;
-+        break;
-+    default:
-+        s->regs[saddr] = val;
-+        break;
-+    }
-+}
-+
-+static const MemoryRegionOps iommu_mem_ops = {
-+    .read = iommu_mem_read,
-+    .write = iommu_mem_write,
-+    .endianness = DEVICE_NATIVE_ENDIAN,
-+    .valid = {
-+        .min_access_size = 4,
-+        .max_access_size = 4,
-+    },
-+};
-+
-+static uint32_t iommu_page_get_flags(IOMMUState *s, hwaddr addr)
-+{
-+    uint32_t ret;
-+    hwaddr iopte;
-+    hwaddr pa = addr;
-+
-+    iopte = s->regs[IOMMU_BASE] << 4;
-+    addr &= ~s->iostart;
-+    iopte += (addr >> (IOMMU_PAGE_SHIFT - 2)) & ~3;
-+    ret = address_space_ldl_be(&address_space_memory, iopte,
-+                               MEMTXATTRS_UNSPECIFIED, NULL);
-+    trace_sun4m_iommu_page_get_flags(pa, iopte, ret);
-+    return ret;
-+}
-+
-+static hwaddr iommu_translate_pa(hwaddr addr,
-+                                             uint32_t pte)
-+{
-+    hwaddr pa;
-+
-+    pa = ((pte & IOPTE_PAGE) << 4) + (addr & ~IOMMU_PAGE_MASK);
-+    trace_sun4m_iommu_translate_pa(addr, pa, pte);
-+    return pa;
-+}
-+
-+static void iommu_bad_addr(IOMMUState *s, hwaddr addr,
-+                           int is_write)
-+{
-+    trace_sun4m_iommu_bad_addr(addr);
-+    s->regs[IOMMU_AFSR] = IOMMU_AFSR_ERR | IOMMU_AFSR_LE | IOMMU_AFSR_RESV |
-+        IOMMU_AFSR_FAV;
-+    if (!is_write) {
-+        s->regs[IOMMU_AFSR] |= IOMMU_AFSR_RD;
-+    }
-+    s->regs[IOMMU_AFAR] = addr;
-+    qemu_irq_raise(s->irq);
-+}
 +
 +/* Called from RCU critical section */
-+static IOMMUTLBEntry sun4m_translate_iommu(IOMMUMemoryRegion *iommu,
-+                                           hwaddr addr,
-+                                           IOMMUAccessFlags flags)
++static IOMMUTLBEntry pbm_translate_iommu(IOMMUMemoryRegion *iommu, hwaddr addr,
++                                         IOMMUAccessFlags flag)
 +{
 +    IOMMUState *is = container_of(iommu, IOMMUState, iommu);
-+    hwaddr page, pa;
-+    int is_write = (flags & IOMMU_WO) ? 1 : 0;
-+    uint32_t pte;
++    hwaddr baseaddr, offset;
++    uint64_t tte;
++    uint32_t tsbsize;
 +    IOMMUTLBEntry ret = {
 +        .target_as = &address_space_memory,
 +        .iova = 0,
@@ -798,135 +473,388 @@ index 0000000..72a9af5
 +        .perm = IOMMU_NONE,
 +    };
 +
-+    page = addr & IOMMU_PAGE_MASK;
-+    pte = iommu_page_get_flags(is, page);
-+    if (!(pte & IOPTE_VALID)) {
-+        iommu_bad_addr(is, page, is_write);
++    if (!(is->regs[IOMMU_CTRL >> 3] & IOMMU_CTRL_MMU_EN)) {
++        /* IOMMU disabled, passthrough using standard 8K page */
++        ret.iova = addr & IOMMU_PAGE_MASK_8K;
++        ret.translated_addr = addr;
++        ret.addr_mask = IOMMU_PAGE_MASK_8K;
++        ret.perm = IOMMU_RW;
++
 +        return ret;
 +    }
 +
-+    pa = iommu_translate_pa(addr, pte);
-+    if (is_write && !(pte & IOPTE_WRITE)) {
-+        iommu_bad_addr(is, page, is_write);
++    baseaddr = is->regs[IOMMU_BASE >> 3];
++    tsbsize = (is->regs[IOMMU_CTRL >> 3] >> IOMMU_CTRL_TSB_SHIFT) & 0x7;
++
++    if (is->regs[IOMMU_CTRL >> 3] & IOMMU_CTRL_TBW_SIZE) {
++        /* 64K */
++        switch (tsbsize) {
++        case 0:
++            offset = (addr & IOMMU_TSB_64K_OFFSET_MASK_64M) >> 13;
++            break;
++        case 1:
++            offset = (addr & IOMMU_TSB_64K_OFFSET_MASK_128M) >> 13;
++            break;
++        case 2:
++            offset = (addr & IOMMU_TSB_64K_OFFSET_MASK_256M) >> 13;
++            break;
++        case 3:
++            offset = (addr & IOMMU_TSB_64K_OFFSET_MASK_512M) >> 13;
++            break;
++        case 4:
++            offset = (addr & IOMMU_TSB_64K_OFFSET_MASK_1G) >> 13;
++            break;
++        case 5:
++            offset = (addr & IOMMU_TSB_64K_OFFSET_MASK_2G) >> 13;
++            break;
++        default:
++            /* Not implemented, error */
++            return ret;
++        }
++    } else {
++        /* 8K */
++        switch (tsbsize) {
++        case 0:
++            offset = (addr & IOMMU_TSB_8K_OFFSET_MASK_8M) >> 10;
++            break;
++        case 1:
++            offset = (addr & IOMMU_TSB_8K_OFFSET_MASK_16M) >> 10;
++            break;
++        case 2:
++            offset = (addr & IOMMU_TSB_8K_OFFSET_MASK_32M) >> 10;
++            break;
++        case 3:
++            offset = (addr & IOMMU_TSB_8K_OFFSET_MASK_64M) >> 10;
++            break;
++        case 4:
++            offset = (addr & IOMMU_TSB_8K_OFFSET_MASK_128M) >> 10;
++            break;
++        case 5:
++            offset = (addr & IOMMU_TSB_8K_OFFSET_MASK_256M) >> 10;
++            break;
++        case 6:
++            offset = (addr & IOMMU_TSB_8K_OFFSET_MASK_512M) >> 10;
++            break;
++        case 7:
++            offset = (addr & IOMMU_TSB_8K_OFFSET_MASK_1G) >> 10;
++            break;
++        }
++    }
++
++    tte = address_space_ldq_be(&address_space_memory, baseaddr + offset,
++                               MEMTXATTRS_UNSPECIFIED, NULL);
++
++    if (!(tte & IOMMU_TTE_DATA_V)) {
++        /* Invalid mapping */
 +        return ret;
 +    }
 +
-+    if (pte & IOPTE_WRITE) {
++    if (tte & IOMMU_TTE_DATA_W) {
++        /* Writeable */
 +        ret.perm = IOMMU_RW;
 +    } else {
 +        ret.perm = IOMMU_RO;
 +    }
 +
-+    ret.iova = page;
-+    ret.translated_addr = pa;
-+    ret.addr_mask = ~IOMMU_PAGE_MASK;
++    /* Extract phys */
++    if (tte & IOMMU_TTE_DATA_SIZE) {
++        /* 64K */
++        ret.iova = addr & IOMMU_PAGE_MASK_64K;
++        ret.translated_addr = tte & IOMMU_TTE_PHYS_MASK_64K;
++        ret.addr_mask = (IOMMU_PAGE_SIZE_64K - 1);
++    } else {
++        /* 8K */
++        ret.iova = addr & IOMMU_PAGE_MASK_8K;
++        ret.translated_addr = tte & IOMMU_TTE_PHYS_MASK_8K;
++        ret.addr_mask = (IOMMU_PAGE_SIZE_8K - 1);
++    }
 +
 +    return ret;
 +}
 +
-+static const VMStateDescription vmstate_iommu = {
-+    .name = "iommu",
-+    .version_id = 2,
-+    .minimum_version_id = 2,
-+    .fields = (VMStateField[]) {
-+        VMSTATE_UINT32_ARRAY(regs, IOMMUState, IOMMU_NREGS),
-+        VMSTATE_UINT64(iostart, IOMMUState),
-+        VMSTATE_END_OF_LIST()
++static void iommu_mem_write(void *opaque, hwaddr addr,
++                            uint64_t val, unsigned size)
++{
++    IOMMUState *is = opaque;
++
++    IOMMU_DPRINTF("IOMMU config write: 0x%" HWADDR_PRIx " val: %" PRIx64
++                  " size: %d\n", addr, val, size);
++
++    switch (addr) {
++    case IOMMU_CTRL:
++        if (size == 4) {
++            is->regs[IOMMU_CTRL >> 3] &= 0xffffffffULL;
++            is->regs[IOMMU_CTRL >> 3] |= val << 32;
++        } else {
++            is->regs[IOMMU_CTRL >> 3] = val;
++        }
++        break;
++    case IOMMU_CTRL + 0x4:
++        is->regs[IOMMU_CTRL >> 3] &= 0xffffffff00000000ULL;
++        is->regs[IOMMU_CTRL >> 3] |= val & 0xffffffffULL;
++        break;
++    case IOMMU_BASE:
++        if (size == 4) {
++            is->regs[IOMMU_BASE >> 3] &= 0xffffffffULL;
++            is->regs[IOMMU_BASE >> 3] |= val << 32;
++        } else {
++            is->regs[IOMMU_BASE >> 3] = val;
++        }
++        break;
++    case IOMMU_BASE + 0x4:
++        is->regs[IOMMU_BASE >> 3] &= 0xffffffff00000000ULL;
++        is->regs[IOMMU_BASE >> 3] |= val & 0xffffffffULL;
++        break;
++    case IOMMU_FLUSH:
++    case IOMMU_FLUSH + 0x4:
++        break;
++    default:
++        qemu_log_mask(LOG_UNIMP,
++                  "apb iommu: Unimplemented register write "
++                  "reg 0x%" HWADDR_PRIx " size 0x%x value 0x%" PRIx64 "\n",
++                  addr, size, val);
++        break;
 +    }
++}
++
++static uint64_t iommu_mem_read(void *opaque, hwaddr addr, unsigned size)
++{
++    IOMMUState *is = opaque;
++    uint64_t val;
++
++    switch (addr) {
++    case IOMMU_CTRL:
++        if (size == 4) {
++            val = is->regs[IOMMU_CTRL >> 3] >> 32;
++        } else {
++            val = is->regs[IOMMU_CTRL >> 3];
++        }
++        break;
++    case IOMMU_CTRL + 0x4:
++        val = is->regs[IOMMU_CTRL >> 3] & 0xffffffffULL;
++        break;
++    case IOMMU_BASE:
++        if (size == 4) {
++            val = is->regs[IOMMU_BASE >> 3] >> 32;
++        } else {
++            val = is->regs[IOMMU_BASE >> 3];
++        }
++        break;
++    case IOMMU_BASE + 0x4:
++        val = is->regs[IOMMU_BASE >> 3] & 0xffffffffULL;
++        break;
++    case IOMMU_FLUSH:
++    case IOMMU_FLUSH + 0x4:
++        val = 0;
++        break;
++    default:
++        qemu_log_mask(LOG_UNIMP,
++                      "apb iommu: Unimplemented register read "
++                      "reg 0x%" HWADDR_PRIx " size 0x%x\n",
++                      addr, size);
++        val = 0;
++        break;
++    }
++
++    IOMMU_DPRINTF("IOMMU config read: 0x%" HWADDR_PRIx " val: %" PRIx64
++                  " size: %d\n", addr, val, size);
++
++    return val;
++}
++
++static const MemoryRegionOps iommu_mem_ops = {
++    .read = iommu_mem_read,
++    .write = iommu_mem_write,
++    .endianness = DEVICE_BIG_ENDIAN,
 +};
 +
 +static void iommu_reset(DeviceState *d)
 +{
-+    IOMMUState *s = SUN4M_IOMMU(d);
++    IOMMUState *s = SUN4U_IOMMU(d);
 +
-+    memset(s->regs, 0, IOMMU_NREGS * 4);
-+    s->iostart = 0;
-+    s->regs[IOMMU_CTRL] = s->version;
-+    s->regs[IOMMU_ARBEN] = IOMMU_MID;
-+    s->regs[IOMMU_AFSR] = IOMMU_AFSR_RESV;
-+    s->regs[IOMMU_AER] = IOMMU_AER_EN_P0_ARB | IOMMU_AER_EN_P1_ARB;
-+    s->regs[IOMMU_MASK_ID] = IOMMU_TS_MASK;
++    memset(s->regs, 0, IOMMU_NREGS * sizeof(uint64_t));
 +}
 +
 +static void iommu_init(Object *obj)
 +{
-+    IOMMUState *s = SUN4M_IOMMU(obj);
-+    SysBusDevice *dev = SYS_BUS_DEVICE(obj);
++    IOMMUState *s = SUN4U_IOMMU(obj);
++    SysBusDevice *sbd = SYS_BUS_DEVICE(obj);
 +
 +    memory_region_init_iommu(&s->iommu, sizeof(s->iommu),
-+                             TYPE_SUN4M_IOMMU_MEMORY_REGION, OBJECT(dev),
-+                             "iommu-sun4m", UINT64_MAX);
-+    address_space_init(&s->iommu_as, MEMORY_REGION(&s->iommu), "iommu-as");
-+
-+    sysbus_init_irq(dev, &s->irq);
++                             TYPE_APB_IOMMU_MEMORY_REGION, OBJECT(s),
++                             "iommu-apb", UINT64_MAX);
++    address_space_init(&s->iommu_as, MEMORY_REGION(&s->iommu), "pbm-as");
 +
 +    memory_region_init_io(&s->iomem, obj, &iommu_mem_ops, s, "iommu",
-+                          IOMMU_NREGS * sizeof(uint32_t));
-+    sysbus_init_mmio(dev, &s->iomem);
++                          IOMMU_NREGS * sizeof(uint64_t));
++    sysbus_init_mmio(sbd, &s->iomem);
 +}
-+
-+static Property iommu_properties[] = {
-+    DEFINE_PROP_UINT32("version", IOMMUState, version, 0),
-+    DEFINE_PROP_END_OF_LIST(),
-+};
 +
 +static void iommu_class_init(ObjectClass *klass, void *data)
 +{
 +    DeviceClass *dc = DEVICE_CLASS(klass);
 +
 +    dc->reset = iommu_reset;
-+    dc->vmsd = &vmstate_iommu;
-+    dc->props = iommu_properties;
 +}
 +
-+static const TypeInfo iommu_info = {
-+    .name          = TYPE_SUN4M_IOMMU,
++static const TypeInfo pbm_iommu_info = {
++    .name          = TYPE_SUN4U_IOMMU,
 +    .parent        = TYPE_SYS_BUS_DEVICE,
 +    .instance_size = sizeof(IOMMUState),
 +    .instance_init = iommu_init,
 +    .class_init    = iommu_class_init,
 +};
 +
-+static void sun4m_iommu_memory_region_class_init(ObjectClass *klass, void *data)
++static void pbm_iommu_memory_region_class_init(ObjectClass *klass, void *data)
 +{
 +    IOMMUMemoryRegionClass *imrc = IOMMU_MEMORY_REGION_CLASS(klass);
 +
-+    imrc->translate = sun4m_translate_iommu;
++    imrc->translate = pbm_translate_iommu;
 +}
 +
-+static const TypeInfo sun4m_iommu_memory_region_info = {
++static const TypeInfo pbm_iommu_memory_region_info = {
 +    .parent = TYPE_IOMMU_MEMORY_REGION,
-+    .name = TYPE_SUN4M_IOMMU_MEMORY_REGION,
-+    .class_init = sun4m_iommu_memory_region_class_init,
++    .name = TYPE_APB_IOMMU_MEMORY_REGION,
++    .class_init = pbm_iommu_memory_region_class_init,
 +};
 +
-+static void iommu_register_types(void)
++static void pbm_register_types(void)
 +{
-+    type_register_static(&iommu_info);
-+    type_register_static(&sun4m_iommu_memory_region_info);
++    type_register_static(&pbm_iommu_info);
++    type_register_static(&pbm_iommu_memory_region_info);
 +}
 +
-+type_init(iommu_register_types)
-diff --git a/hw/sparc/trace-events b/hw/sparc/trace-events
-index efd765c..6e7259f 100644
---- a/hw/sparc/trace-events
-+++ b/hw/sparc/trace-events
-@@ -6,6 +6,16 @@ sun4m_cpu_reset_interrupt(unsigned int level) "Reset CPU IRQ %d"
- sun4m_cpu_set_irq_raise(int level) "Raise CPU IRQ %d"
- sun4m_cpu_set_irq_lower(int level) "Lower CPU IRQ %d"
++type_init(pbm_register_types)
+diff --git a/include/hw/pci-host/apb.h b/include/hw/pci-host/apb.h
+index 33dbc7a..604d899 100644
+--- a/include/hw/pci-host/apb.h
++++ b/include/hw/pci-host/apb.h
+@@ -1,60 +1,7 @@
+ #ifndef PCI_HOST_APB_H
+ #define PCI_HOST_APB_H
  
-+# hw/sparc/sun4m_iommu.c
-+sun4m_iommu_mem_readl(uint64_t addr, uint32_t ret) "read reg[0x%"PRIx64"] = 0x%x"
-+sun4m_iommu_mem_writel(uint64_t addr, uint32_t val) "write reg[0x%"PRIx64"] = 0x%x"
-+sun4m_iommu_mem_writel_ctrl(uint64_t iostart) "iostart = 0x%"PRIx64
-+sun4m_iommu_mem_writel_tlbflush(uint32_t val) "tlb flush 0x%x"
-+sun4m_iommu_mem_writel_pgflush(uint32_t val) "page flush 0x%x"
-+sun4m_iommu_page_get_flags(uint64_t pa, uint64_t iopte, uint32_t ret) "get flags addr 0x%"PRIx64" => pte 0x%"PRIx64", *pte = 0x%x"
-+sun4m_iommu_translate_pa(uint64_t addr, uint64_t pa, uint32_t iopte) "xlate dva 0x%"PRIx64" => pa 0x%"PRIx64" iopte = 0x%x"
-+sun4m_iommu_bad_addr(uint64_t addr) "bad addr 0x%"PRIx64
+-#include "qemu-common.h"
+-#include "hw/pci/pci_host.h"
+-
+-#define IOMMU_NREGS             3
+-
+-#define IOMMU_PAGE_SIZE_8K      (1ULL << 13)
+-#define IOMMU_PAGE_MASK_8K      (~(IOMMU_PAGE_SIZE_8K - 1))
+-#define IOMMU_PAGE_SIZE_64K     (1ULL << 16)
+-#define IOMMU_PAGE_MASK_64K     (~(IOMMU_PAGE_SIZE_64K - 1))
+-
+-#define IOMMU_CTRL              0x0
+-#define IOMMU_CTRL_TBW_SIZE     (1ULL << 2)
+-#define IOMMU_CTRL_MMU_EN       (1ULL)
+-
+-#define IOMMU_CTRL_TSB_SHIFT    16
+-
+-#define IOMMU_BASE              0x8
+-#define IOMMU_FLUSH             0x10
+-
+-#define IOMMU_TTE_DATA_V        (1ULL << 63)
+-#define IOMMU_TTE_DATA_SIZE     (1ULL << 61)
+-#define IOMMU_TTE_DATA_W        (1ULL << 1)
+-
+-#define IOMMU_TTE_PHYS_MASK_8K  0x1ffffffe000ULL
+-#define IOMMU_TTE_PHYS_MASK_64K 0x1ffffff8000ULL
+-
+-#define IOMMU_TSB_8K_OFFSET_MASK_8M    0x00000000007fe000ULL
+-#define IOMMU_TSB_8K_OFFSET_MASK_16M   0x0000000000ffe000ULL
+-#define IOMMU_TSB_8K_OFFSET_MASK_32M   0x0000000001ffe000ULL
+-#define IOMMU_TSB_8K_OFFSET_MASK_64M   0x0000000003ffe000ULL
+-#define IOMMU_TSB_8K_OFFSET_MASK_128M  0x0000000007ffe000ULL
+-#define IOMMU_TSB_8K_OFFSET_MASK_256M  0x000000000fffe000ULL
+-#define IOMMU_TSB_8K_OFFSET_MASK_512M  0x000000001fffe000ULL
+-#define IOMMU_TSB_8K_OFFSET_MASK_1G    0x000000003fffe000ULL
+-
+-#define IOMMU_TSB_64K_OFFSET_MASK_64M  0x0000000003ff0000ULL
+-#define IOMMU_TSB_64K_OFFSET_MASK_128M 0x0000000007ff0000ULL
+-#define IOMMU_TSB_64K_OFFSET_MASK_256M 0x000000000fff0000ULL
+-#define IOMMU_TSB_64K_OFFSET_MASK_512M 0x000000001fff0000ULL
+-#define IOMMU_TSB_64K_OFFSET_MASK_1G   0x000000003fff0000ULL
+-#define IOMMU_TSB_64K_OFFSET_MASK_2G   0x000000007fff0000ULL
+-
+-typedef struct IOMMUState {
+-    SysBusDevice parent_obj;
+-
+-    AddressSpace iommu_as;
+-    IOMMUMemoryRegion iommu;
+-
+-    MemoryRegion iomem;
+-    uint64_t regs[IOMMU_NREGS];
+-} IOMMUState;
+-
+-#define TYPE_SUN4U_IOMMU "sun4u-iommu"
+-#define SUN4U_IOMMU(obj) OBJECT_CHECK(IOMMUState, (obj), TYPE_SUN4U_IOMMU)
++#include "hw/sparc/sun4u_iommu.h"
+ 
+ #define MAX_IVEC 0x40
+ 
+@@ -72,8 +19,6 @@ typedef struct IOMMUState {
+ #define APB_DEVICE(obj) \
+     OBJECT_CHECK(APBState, (obj), TYPE_APB)
+ 
+-#define TYPE_APB_IOMMU_MEMORY_REGION "pbm-iommu-memory-region"
+-
+ typedef struct APBState {
+     PCIHostState parent_obj;
+ 
+diff --git a/include/hw/sparc/sun4u_iommu.h b/include/hw/sparc/sun4u_iommu.h
+new file mode 100644
+index 0000000..bc4506b
+--- /dev/null
++++ b/include/hw/sparc/sun4u_iommu.h
+@@ -0,0 +1,50 @@
++/*
++ * QEMU sun4u IOMMU emulation
++ *
++ * Copyright (c) 2006 Fabrice Bellard
++ * Copyright (c) 2012,2013 Artyom Tarasenko
++ * Copyright (c) 2017 Mark Cave-Ayland
++ *
++ * Permission is hereby granted, free of charge, to any person obtaining a copy
++ * of this software and associated documentation files (the "Software"), to deal
++ * in the Software without restriction, including without limitation the rights
++ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
++ * copies of the Software, and to permit persons to whom the Software is
++ * furnished to do so, subject to the following conditions:
++ *
++ * The above copyright notice and this permission notice shall be included in
++ * all copies or substantial portions of the Software.
++ *
++ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
++ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
++ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
++ * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
++ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
++ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
++ * THE SOFTWARE.
++ */
 +
- # hw/sparc/leon3.c
- leon3_set_irq(int intno) "Set CPU IRQ %d"
- leon3_reset_irq(int intno) "Reset CPU IRQ %d"
++#ifndef SUN4U_IOMMU_H
++#define SUN4U_IOMMU_H
++
++#include "qemu-common.h"
++#include "hw/sysbus.h"
++
++#define IOMMU_NREGS             3
++
++typedef struct IOMMUState {
++    SysBusDevice parent_obj;
++
++    AddressSpace iommu_as;
++    IOMMUMemoryRegion iommu;
++
++    MemoryRegion iomem;
++    uint64_t regs[IOMMU_NREGS];
++} IOMMUState;
++
++#define TYPE_SUN4U_IOMMU "sun4u-iommu"
++#define SUN4U_IOMMU(obj) OBJECT_CHECK(IOMMUState, (obj), TYPE_SUN4U_IOMMU)
++
++#define TYPE_APB_IOMMU_MEMORY_REGION "pbm-iommu-memory-region"
++
++#endif
 -- 
 1.7.10.4
