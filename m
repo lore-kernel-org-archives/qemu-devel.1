@@ -1,26 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59815)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33615)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jianfeng.tan@intel.com>) id 1eJMO4-0007kA-U3
-	for qemu-devel@nongnu.org; Mon, 27 Nov 2017 11:36:10 -0500
+	(envelope-from <ben@skyportsystems.com>) id 1eJMQh-0000T0-2O
+	for qemu-devel@nongnu.org; Mon, 27 Nov 2017 11:38:48 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jianfeng.tan@intel.com>) id 1eJMNy-0002wt-QA
-	for qemu-devel@nongnu.org; Mon, 27 Nov 2017 11:36:04 -0500
-Received: from mga14.intel.com ([192.55.52.115]:61400)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <jianfeng.tan@intel.com>)
-	id 1eJMNy-0002uy-F5
-	for qemu-devel@nongnu.org; Mon, 27 Nov 2017 11:35:58 -0500
-References: <20171127142515.GA450@yliu-dev>
-	<f7tbmjnpulq.fsf@dhcp-25-97.bos.redhat.com>
-From: "Tan, Jianfeng" <jianfeng.tan@intel.com>
-Message-ID: <d2867f99-2cca-ef43-3797-75aa11281669@intel.com>
-Date: Tue, 28 Nov 2017 00:35:52 +0800
-MIME-Version: 1.0
-In-Reply-To: <f7tbmjnpulq.fsf@dhcp-25-97.bos.redhat.com>
-Content-Type: text/plain; charset=windows-1252; format=flowed
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [dpdk-dev] [ovs-dev] [PATCH RFC] netdev-dpdk: Fix
- device obtain mac address when received first packet in vhost type
+	(envelope-from <ben@skyportsystems.com>) id 1eJMQd-0004XJ-Uy
+	for qemu-devel@nongnu.org; Mon, 27 Nov 2017 11:38:47 -0500
+Received: from mail-pl0-x244.google.com ([2607:f8b0:400e:c01::244]:36041)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <ben@skyportsystems.com>)
+	id 1eJMQd-0004Wa-Lm
+	for qemu-devel@nongnu.org; Mon, 27 Nov 2017 11:38:43 -0500
+Received: by mail-pl0-x244.google.com with SMTP id b12so8780897plm.3
+	for <qemu-devel@nongnu.org>; Mon, 27 Nov 2017 08:38:43 -0800 (PST)
+From: Ben Warren <ben@skyportsystems.com>
+Message-Id: <A9252286-892F-40F4-9BE5-A9F92CC75DF9@skyportsystems.com>
+Content-Type: multipart/signed;
+	boundary="Apple-Mail=_6D1C0930-E14C-4FEE-8563-7130A677DA3D";
+	protocol="application/pkcs7-signature"; micalg=sha1
+Mime-Version: 1.0 (Mac OS X Mail 10.3 \(3273\))
+Date: Mon, 27 Nov 2017 08:38:41 -0800
+In-Reply-To: <20171127130518.26703-3-rkagan@virtuozzo.com>
+References: <20171127130518.26703-1-rkagan@virtuozzo.com>
+	<20171127130518.26703-3-rkagan@virtuozzo.com>
+Subject: Re: [Qemu-devel] [PATCH v2 2/2] vmgenid: use UUID property type
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,104 +31,177 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Aaron Conole <aconole@redhat.com>, Yuanhan Liu <yliu@fridaylinux.org>
-Cc: Chen Hailin <chenhl@arraynetworks.com.cn>, "ovs-dev@openvswitch.org" <ovs-dev@openvswitch.org>, Maxime Coquelin <maxime.coquelin@redhat.com>, qemu-devel <qemu-devel@nongnu.org>, dev <dev@dpdk.org>
+To: Roman Kagan <rkagan@virtuozzo.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, "Michael S. Tsirkin" <mst@redhat.com>, Igor Mammedov <imammedo@redhat.com>, Markus Armbruster <armbru@redhat.com>, =?utf-8?Q?Marc-Andr=C3=A9_Lureau?= <marcandre.lureau@redhat.com>, "Denis V. Lunev" <den@openvz.org>, minyard@acm.org, "Daniel P. Berrange" <berrange@redhat.com>
 
 
+--Apple-Mail=_6D1C0930-E14C-4FEE-8563-7130A677DA3D
+Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain;
+	charset=utf-8
 
-On 11/28/2017 12:14 AM, Aaron Conole wrote:
-> Yuanhan Liu <yliu@fridaylinux.org> writes:
->
->> On Fri, Nov 24, 2017 at 05:59:09PM +0800, Chen Hailin wrote:
->>> Hi Aaron Conole && Jianfeng,
->>>
->>> The stp could not work in ovs-dpdk vhostuser.
->>> Because the attached vhost device doesn't have MAC address.
->>>
->>> Now we have two ways to solve this problem.
->>> 1. The vhost learns MAC address from packet like as my first patch.
->> I do agree with Aaron this is not the right way.
->>
->>> 2. The virtio notifies MAC address actively to vhost user .
->> Unfortunately, AFAIK, there is no way to achieve that so far. we could
->> either let virtio/QEMU to expose the CQ to vhost or add a new VHOST_USER
->> message to carry the mac address. While vhost-user is a generic interface
->> adding a virtio-net specific message also doesn't seem quite right.
->> Exposing CQ is probably the best we can do.
->>
->> Anyway, both need spec change.
-> There are other possible ways.  libvirt knows about the mac address from
-> the domain xml file.  Perhaps it's possible to set the mac column in the
-> database to the correct value when the port is being created in ovs?
-> This would be an action taken by the orchestration tool.
+It looks like you dropped Marc-Andr=C3=A9 and my Reviewed-by lines.  =
+Please put them back.
 
-In OVS db, we can only see vhost port, but not virtio port. That is to 
-say, we could use different mac for vhost port from virtio port, 
-especially when it works as a vrouter instead of vswitch.
+> On Nov 27, 2017, at 5:05 AM, Roman Kagan <rkagan@virtuozzo.com> wrote:
+>=20
+> Switch vmgenid device to use the UUID property type introduced in the
+> previous patch for its 'guid' property.
+>=20
+> One semantic change it introduces is that post-realize modification of
+> 'guid' via HMP or QMP will now be rejected with an error; however,
+> according to docs/specs/vmgenid.txt this is actually desirable.
+>=20
+> Signed-off-by: Roman Kagan <rkagan@virtuozzo.com>
+> ---
+> v1 -> v2:
+> - use the corresponding define for "guid" field name
+>=20
+> hw/acpi/vmgenid.c | 30 ++++++++----------------------
+> 1 file changed, 8 insertions(+), 22 deletions(-)
+>=20
+> diff --git a/hw/acpi/vmgenid.c b/hw/acpi/vmgenid.c
+> index 105044f666..ba6f47b67b 100644
+> --- a/hw/acpi/vmgenid.c
+> +++ b/hw/acpi/vmgenid.c
+> @@ -162,21 +162,6 @@ static void vmgenid_update_guest(VmGenIdState =
+*vms)
+>     }
+> }
+>=20
+> -static void vmgenid_set_guid(Object *obj, const char *value, Error =
+**errp)
+> -{
+> -    VmGenIdState *vms =3D VMGENID(obj);
+> -
+> -    if (!strcmp(value, "auto")) {
+> -        qemu_uuid_generate(&vms->guid);
+> -    } else if (qemu_uuid_parse(value, &vms->guid) < 0) {
+> -        error_setg(errp, "'%s. %s': Failed to parse GUID string: %s",
+> -                   object_get_typename(OBJECT(vms)), VMGENID_GUID, =
+value);
+> -        return;
+> -    }
+> -
+> -    vmgenid_update_guest(vms);
+> -}
+> -
+> /* After restoring an image, we need to update the guest memory and =
+notify
+>  * it of a potential change to VM Generation ID
+>  */
+> @@ -224,23 +209,24 @@ static void vmgenid_realize(DeviceState *dev, =
+Error **errp)
+>     }
+>=20
+>     qemu_register_reset(vmgenid_handle_reset, vms);
+> +
+> +    vmgenid_update_guest(vms);
+> }
+>=20
+> +static Property vmgenid_device_properties[] =3D {
+> +    DEFINE_PROP_UUID(VMGENID_GUID, VmGenIdState, guid),
+> +    DEFINE_PROP_END_OF_LIST(),
+> +};
+> +
+> static void vmgenid_device_class_init(ObjectClass *klass, void *data)
+> {
+>     DeviceClass *dc =3D DEVICE_CLASS(klass);
+>=20
+>     dc->vmsd =3D &vmstate_vmgenid;
+>     dc->realize =3D vmgenid_realize;
+> +    dc->props =3D vmgenid_device_properties;
+>     dc->hotpluggable =3D false;
+>     set_bit(DEVICE_CATEGORY_MISC, dc->categories);
+> -
+> -    object_class_property_add_str(klass, VMGENID_GUID, NULL,
+> -                                  vmgenid_set_guid, NULL);
+> -    object_class_property_set_description(klass, VMGENID_GUID,
+> -                                    "Set Global Unique Identifier "
+> -                                    "(big-endian) or auto for random =
+value",
+> -                                    NULL);
+> }
+>=20
+> static const TypeInfo vmgenid_device_info =3D {
+> --=20
+> 2.14.3
+>=20
 
->
-> Additionally, there's a mechanism in virtio-net to set the mac address
-> from the host to the guest.  Is it possible to expose that functionality
-> through vhost-user?
 
-We can assign mac addr when starting QEMU. After that, I suppose we 
-cannot set mac addr any more, let alone setting it from vhost-user side 
-(vhost-user protocol does not support it yet).
+--Apple-Mail=_6D1C0930-E14C-4FEE-8563-7130A677DA3D
+Content-Disposition: attachment;
+	filename=smime.p7s
+Content-Type: application/pkcs7-signature;
+	name=smime.p7s
+Content-Transfer-Encoding: base64
 
-Thanks,
-Jianfeng
-
->
-> Then when the orchestration tool sets the mac, it can be propagated, and
-> mac_in_use can reflect the appropriate value.  I think that's a workable
-> solution, but I might have missed something.
->
->> 	--yliu
->>> In my opinions,  if we treat it as a device,  we should allocate
->>> MAC address for the device when the VM started.
->>>
->>> Which one do you think better?
->>>
->>>
->>>
->>> Best Regards,
->>> Chen Hailin
->>> chenhl@arraynetworks.com.cn
->>>   
->>> From: Aaron Conole
->>> Date: 2017-11-18 10:00
->>> To: Hailin Chen
->>> CC: ovs-dev@openvswitch.org; Maxime Coquelin; cloud@arraynetworks.com.cn
->>> Subject: Re: [ovs-dev] [PATCH RFC] netdev-dpdk: Fix device obtain
->>> mac address when received first packet in vhost type
->>> Hi Hailin,
->>>   
->>> Hailin Chen <chenhl@arraynetworks.com.cn> writes:
->>>   
->>>> The stp could not work on netdev-dpdk if network is loop.
->>>> Because the stp protocol negotiates designate port by sending
->>>> BPDU packets which contains MAC address.
->>>> However the device doesn't have MAC address in vhostuser type.
->>>> Thus, function send_bpdu_cb would not send BPDU packets.
->>>>
->>>> This patch will set the MAC for device when received first packet.
->>>>
->>>> Signed-off-by: Hailin Chen <chenhl@arraynetworks.com.cn>
->>>> ---
->>>   
->>> Thanks for the patch.
->>>   
->>> In general, I don't think this is the right approach to deal with this
->>> type of issue.  I believe the problem statement is that OvS bridge is
->>> unaware of the guest MAC address - did I get it right?  In that case, I
->>> would think that a better way to solve this would be to have virtio tell
->>> the mac address of the guest.  I don't recall right now if that's
->>> allowed in the virtio spec, but I do remember some kind of negotiation
->>> features.
->>>   
->>> I've CC'd Maxime, who is one of the maintainers of the virtio code from
->>> DPDK side.  Perhaps there is an alternate way to solve this.
->>> _______________________________________________
->>> dev mailing list
->>> dev@openvswitch.org
->>> https://mail.openvswitch.org/mailman/listinfo/ovs-dev
+MIAGCSqGSIb3DQEHAqCAMIACAQExCzAJBgUrDgMCGgUAMIAGCSqGSIb3DQEHAQAAoIILJTCCBTcw
+ggQfoAMCAQICED9ye6B5k0+gA4CVDazylRowDQYJKoZIhvcNAQELBQAwgZcxCzAJBgNVBAYTAkdC
+MRswGQYDVQQIExJHcmVhdGVyIE1hbmNoZXN0ZXIxEDAOBgNVBAcTB1NhbGZvcmQxGjAYBgNVBAoT
+EUNPTU9ETyBDQSBMaW1pdGVkMT0wOwYDVQQDEzRDT01PRE8gUlNBIENsaWVudCBBdXRoZW50aWNh
+dGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBMB4XDTE3MDcxOTAwMDAwMFoXDTE4MDcxOTIzNTk1OVow
+JzElMCMGCSqGSIb3DQEJARYWYmVuQHNreXBvcnRzeXN0ZW1zLmNvbTCCASIwDQYJKoZIhvcNAQEB
+BQADggEPADCCAQoCggEBAKNRYZm9a+xmI5BPBvGwd5GTtRYq3MeP41a2WqewywtPjLGDhanKK0wI
+BghAAqwmQSfs1dukqG1N9fprI5+R+IqOqYle90tdF/P1YdEw6QGYxIfNLJP4Awc3No2LajOw4FcC
+zRkkfCTnetztBMX7Jj2mu9+TRDlH/5nlRHZsXLbUgA5jiqha5u4RlgWCrcIdB3f1IBrQeDEaaWqc
+XUiTbzqqUgTHEMAmwMf0g587n6tU/l6GhLCzPc49rF1ZD6fQoLN0Mxa/zt81MZrsXgaoz2mzvzn5
+ty+9rhGIlKprjnn4vrOzYaU2ieciRLQdAz3B16/nrlVge+EwAe8KCPPIj20CAwEAAaOCAewwggHo
+MB8GA1UdIwQYMBaAFIKvbIz4xf6WYXzoHz0rcUhexIvAMB0GA1UdDgQWBBQCjA79fz82hhynuOG0
+ET1twIBPlzAOBgNVHQ8BAf8EBAMCBaAwDAYDVR0TAQH/BAIwADAgBgNVHSUEGTAXBggrBgEFBQcD
+BAYLKwYBBAGyMQEDBQIwEQYJYIZIAYb4QgEBBAQDAgUgMEYGA1UdIAQ/MD0wOwYMKwYBBAGyMQEC
+AQEBMCswKQYIKwYBBQUHAgEWHWh0dHBzOi8vc2VjdXJlLmNvbW9kby5uZXQvQ1BTMFoGA1UdHwRT
+MFEwT6BNoEuGSWh0dHA6Ly9jcmwuY29tb2RvY2EuY29tL0NPTU9ET1JTQUNsaWVudEF1dGhlbnRp
+Y2F0aW9uYW5kU2VjdXJlRW1haWxDQS5jcmwwgYsGCCsGAQUFBwEBBH8wfTBVBggrBgEFBQcwAoZJ
+aHR0cDovL2NydC5jb21vZG9jYS5jb20vQ09NT0RPUlNBQ2xpZW50QXV0aGVudGljYXRpb25hbmRT
+ZWN1cmVFbWFpbENBLmNydDAkBggrBgEFBQcwAYYYaHR0cDovL29jc3AuY29tb2RvY2EuY29tMCEG
+A1UdEQQaMBiBFmJlbkBza3lwb3J0c3lzdGVtcy5jb20wDQYJKoZIhvcNAQELBQADggEBAERxWav/
+xDSN35gLVL+7SiNwEUTMMI11WRTwYzP4uhcA5cihdsQDdT8+jljvIcVAQmSd/mLZBjbkYsJa4zpC
+fX2D/EtB2D547Fj63efh0vyjLpX4hzhToiLXSXUaLWUhjUQKgGyBpDTpb/2Xbwpg7clWBHy/h4Ax
+75RfOdWpaZtQ6g/VxR2mten4dQ8NhtDiv+TlB89LRlQbcGk5A0k/++HlXKwRdTlOXee8+YePAENO
+OVUV4C3xuI6eXhxcHuZnBZdVdMTsb5WBsSUTONBTNR5BOUE7xLxcEchP8kHqmqaLSiN7unuUTrug
+EYpB7jWGysgKCeKgkEpI9dF++Oqqp70wggXmMIIDzqADAgECAhBqm+E4O/8ra58B1dm4p1JWMA0G
+CSqGSIb3DQEBDAUAMIGFMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVzdGVy
+MRAwDgYDVQQHEwdTYWxmb3JkMRowGAYDVQQKExFDT01PRE8gQ0EgTGltaXRlZDErMCkGA1UEAxMi
+Q09NT0RPIFJTQSBDZXJ0aWZpY2F0aW9uIEF1dGhvcml0eTAeFw0xMzAxMTAwMDAwMDBaFw0yODAx
+MDkyMzU5NTlaMIGXMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVzdGVyMRAw
+DgYDVQQHEwdTYWxmb3JkMRowGAYDVQQKExFDT01PRE8gQ0EgTGltaXRlZDE9MDsGA1UEAxM0Q09N
+T0RPIFJTQSBDbGllbnQgQXV0aGVudGljYXRpb24gYW5kIFNlY3VyZSBFbWFpbCBDQTCCASIwDQYJ
+KoZIhvcNAQEBBQADggEPADCCAQoCggEBAL6znlesKHZ1QBbHOAOY08YYdiFQ8yV5C0y1oNF9Olg+
+nKcxLqf2NHbZhGra0D00SOTq9bus3/mxgUsg/Wh/eXQ0pnp8tZ8XZWAnlyKMpjL+qUByRjXCA6RQ
+yDMqVaVUkbIr5SU0RDX/kSsKwer3H1pT/HUrBN0X8sKtPTdGX8XAWt/VdMLBrZBlgvnkCos+KQWW
+Co63OTTqRvaq8aWccm+KOMjTcE6s2mj6RkalweyDI7X+7U5lNo6jzC8RTXtVV4/Vwdax720YpMPJ
+QaDaElmOupyTf1Qib+cpukNJnQmwygjD8m046DQkLnpXNCAGjuJy1F5NATksUsbfJAr7FLUCAwEA
+AaOCATwwggE4MB8GA1UdIwQYMBaAFLuvfgI9+qbxPISOre44mOzZMjLUMB0GA1UdDgQWBBSCr2yM
++MX+lmF86B89K3FIXsSLwDAOBgNVHQ8BAf8EBAMCAYYwEgYDVR0TAQH/BAgwBgEB/wIBADARBgNV
+HSAECjAIMAYGBFUdIAAwTAYDVR0fBEUwQzBBoD+gPYY7aHR0cDovL2NybC5jb21vZG9jYS5jb20v
+Q09NT0RPUlNBQ2VydGlmaWNhdGlvbkF1dGhvcml0eS5jcmwwcQYIKwYBBQUHAQEEZTBjMDsGCCsG
+AQUFBzAChi9odHRwOi8vY3J0LmNvbW9kb2NhLmNvbS9DT01PRE9SU0FBZGRUcnVzdENBLmNydDAk
+BggrBgEFBQcwAYYYaHR0cDovL29jc3AuY29tb2RvY2EuY29tMA0GCSqGSIb3DQEBDAUAA4ICAQB4
+XLKBKDRPPO5fVs6fl1bsj6JrF/bz9kkIBtTYLzXN30D+03Hj6OxCDBEaIeNmsBhrJmuubvyE7Hto
+SmR809AgcYboW+rcTNZ/8u/Hv+GTrNI/AhqX2/kiQNxmgUPt/eJPs92Qclj0HnVyy9TnSvGkSDU7
+I5Px+TbO+88G4zipA2psZaWeEykgzClZlPz1FjTCkk77ZXp5cQYYexE6zeeN4/0OqqoAloFrjAF4
+o50YJafX8mnahjp3I2Y2mkjhk0xQfhNqbzlLWPoT3m7j7U26u7zg6swjOq8hITYc3/np5tM5aVyu
+6t99p17bTbY7+1RTWBviN9YJzK8HxzObXYWBf/L+VGOYNsQDTxAk0Hbvb1j6KjUhg7fO294F29QI
+hhmiNOr84JHoy+fNLpfvYc/Q9EtFOI5ISYgOxLk3nD/whbUe9rmEQXLp8MB933Ij474gwwCPUpwv
+9mj2PMnXoc7mbrS22XUSeTwxCTP9bcmUdp4jmIoWfhQm7X9w/Zgddg+JZ/YnIHOwsGsaTUgj7fIv
+xqith7DoJC91WJ8Lce3CVJqb1XWeKIJ84F7YLXZN0oa7TktYgDdmQVxYkZo1c5noaDKH9Oq9cbm/
+vOYRUM1cWcef20Wkyk5S/GFyyPJwG0fR1nRas3DqAf4cXxMiEKcff7PNa4M3RGTqH0pWR8p6EjGC
+A7cwggOzAgEBMIGsMIGXMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVzdGVy
+MRAwDgYDVQQHEwdTYWxmb3JkMRowGAYDVQQKExFDT01PRE8gQ0EgTGltaXRlZDE9MDsGA1UEAxM0
+Q09NT0RPIFJTQSBDbGllbnQgQXV0aGVudGljYXRpb24gYW5kIFNlY3VyZSBFbWFpbCBDQQIQP3J7
+oHmTT6ADgJUNrPKVGjAJBgUrDgMCGgUAoIIB3zAYBgkqhkiG9w0BCQMxCwYJKoZIhvcNAQcBMBwG
+CSqGSIb3DQEJBTEPFw0xNzExMjcxNjM4NDJaMCMGCSqGSIb3DQEJBDEWBBTYuLLZpeH5PAaoFjA1
+dC/QU8pfqDCBvQYJKwYBBAGCNxAEMYGvMIGsMIGXMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3Jl
+YXRlciBNYW5jaGVzdGVyMRAwDgYDVQQHEwdTYWxmb3JkMRowGAYDVQQKExFDT01PRE8gQ0EgTGlt
+aXRlZDE9MDsGA1UEAxM0Q09NT0RPIFJTQSBDbGllbnQgQXV0aGVudGljYXRpb24gYW5kIFNlY3Vy
+ZSBFbWFpbCBDQQIQP3J7oHmTT6ADgJUNrPKVGjCBvwYLKoZIhvcNAQkQAgsxga+ggawwgZcxCzAJ
+BgNVBAYTAkdCMRswGQYDVQQIExJHcmVhdGVyIE1hbmNoZXN0ZXIxEDAOBgNVBAcTB1NhbGZvcmQx
+GjAYBgNVBAoTEUNPTU9ETyBDQSBMaW1pdGVkMT0wOwYDVQQDEzRDT01PRE8gUlNBIENsaWVudCBB
+dXRoZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBAhA/cnugeZNPoAOAlQ2s8pUaMA0GCSqG
+SIb3DQEBAQUABIIBAHq992h8ZBW9MxRyQjIP07pKp7wyTnr23WSLQlqorIVndpiG6WdC7y4y/AhX
+wjw6+cjTmJ6Aci6krdQj473PrBMvAC6ZL5NSHvHpsmNvxSKiZAcKTcxzDTId2nsEYEaI4cb3JHHc
+1DsHVRpweD7yAP5mj9mEz3UgyVHZ88Gl2WNScEJsVOhT7WOGPg5Fh31vHau88ZFzPHovCTmxpfdr
+eKUfi7yISSRqekEumYBM7dipvUttcktGhfsuD4gLSxQzdLNu/mdc96uT0Tu+pnRl0GaIuAlT1vv7
+YAGrOTgyYzLfCkg6uxP1UzZPSmtFHvjGuywLlS3gP13EQayqaRBQc1QAAAAAAAA=
+--Apple-Mail=_6D1C0930-E14C-4FEE-8563-7130A677DA3D--
