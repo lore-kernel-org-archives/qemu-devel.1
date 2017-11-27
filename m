@@ -1,18 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54751)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56435)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vapier@gentoo.org>) id 1eJNXZ-0004nQ-P9
-	for qemu-devel@nongnu.org; Mon, 27 Nov 2017 12:49:58 -0500
+	(envelope-from <ppandit@redhat.com>) id 1eJNd9-00077z-Fh
+	for qemu-devel@nongnu.org; Mon, 27 Nov 2017 12:55:44 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vapier@gentoo.org>) id 1eJNXW-0008TG-O2
-	for qemu-devel@nongnu.org; Mon, 27 Nov 2017 12:49:57 -0500
-Received: from smtp.gentoo.org ([140.211.166.183]:44462)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <vapier@gentoo.org>) id 1eJNXW-0008Sp-IF
-	for qemu-devel@nongnu.org; Mon, 27 Nov 2017 12:49:54 -0500
-From: Mike Frysinger <vapier@gentoo.org>
-Date: Mon, 27 Nov 2017 12:49:44 -0500
-Message-Id: <20171127174944.12362-1-vapier@gentoo.org>
-Subject: [Qemu-devel] [PATCH] build: fix typo in error message
+	(envelope-from <ppandit@redhat.com>) id 1eJNd6-00027o-E5
+	for qemu-devel@nongnu.org; Mon, 27 Nov 2017 12:55:43 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:36360)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <ppandit@redhat.com>) id 1eJNd6-00027G-8G
+	for qemu-devel@nongnu.org; Mon, 27 Nov 2017 12:55:40 -0500
+Date: Mon, 27 Nov 2017 23:25:28 +0530 (IST)
+From: P J P <ppandit@redhat.com>
+In-Reply-To: <20171127111532.GI16527@stefanha-x1.localdomain>
+Message-ID: <nycvar.YSQ.7.76.1711272251290.24944@wniryva>
+References: <20171124183446.7308-1-ppandit@redhat.com>
+	<20171124183446.7308-2-ppandit@redhat.com>
+	<20171127111532.GI16527@stefanha-x1.localdomain>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
+Subject: Re: [Qemu-devel] [PATCH v3 1/2] virtio: check VirtQueue Vring
+ object is set
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -21,25 +28,52 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Stefan Hajnoczi <stefanha@redhat.com>
+Cc: Qemu Developers <qemu-devel@nongnu.org>, zhangboxian <zhangboxian@huawei.com>, Paolo Bonzini <pbonzini@redhat.com>, Cornelia Huck <cohuck@redhat.com>
 
-Signed-off-by: Mike Frysinger <vapier@gentoo.org>
----
- scripts/git-submodule.sh | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
++-- On Mon, 27 Nov 2017, Cornelia Huck wrote --+
+|The check for align is not really needed, as virtio-1 disallows setting align 
+|anyway.
 
-diff --git a/scripts/git-submodule.sh b/scripts/git-submodule.sh
-index 030617b4ac0c..bc7224a27fe3 100755
---- a/scripts/git-submodule.sh
-+++ b/scripts/git-submodule.sh
-@@ -24,7 +24,7 @@ error() {
-     echo "Alternatively you may disable automatic GIT submodule checkout"
-     echo "with:"
-     echo
--    echo " $ ./configure --disable-git-update'"
-+    echo " $ ./configure --disable-git-update"
-     echo
-     echo "and then manually update submodules prior to running make, with:"
-     echo
--- 
-2.12.0
+ disallows...?
+
+| Checking for !desc is wrong (why shouldn't a driver be able to unset a
+| descriptor table?)
+
++-- On Mon, 27 Nov 2017, Stefan Hajnoczi wrote --+
+| > +    if (!vdev->vq[n].vring.num || !desc || !vdev->vq[n].vring.align) {
+| ...
+|   vdev->vq[n].vring.desc = desc;
+|
+| Why !desc?
+
+virtio_queue_set_rings
+ virtio_init_region_cache
+   VirtQueue *vq = &vdev->vq[n];
+   ...
+   addr = vq->vring.desc;
+   if (!addr) {
+       return;
+   }
+
+These checks seem to be repeating all over. As mentioned earlier, could these 
+be collated in one place, maybe virtio_queue_get_num()?
+
+  int virtio_queue_get_num(VirtIODevice *vdev, int n)
+  {
+      VirtQueue *vq = &vdev->vq[n];
+
+      if (!vq->.vring.num
+           || !vq->vring.desc
+           || !vq->vring.align) {
+          return 0;  /* vq not set */
+      }
+
+      return vdev->vq[n].vring.num;
+  }
+
+
+Thank you.
+--
+Prasad J Pandit / Red Hat Product Security Team
+47AF CE69 3A90 54AA 9045 1053 DD13 3D32 FE5B 041F
