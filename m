@@ -1,27 +1,35 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33277)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36912)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1eJKn6-0007p2-6N
-	for qemu-devel@nongnu.org; Mon, 27 Nov 2017 09:53:49 -0500
+	(envelope-from <stefanb@linux.vnet.ibm.com>) id 1eJKt4-0002vE-DX
+	for qemu-devel@nongnu.org; Mon, 27 Nov 2017 09:59:59 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1eJKn1-0001wO-80
-	for qemu-devel@nongnu.org; Mon, 27 Nov 2017 09:53:48 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:50842)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1eJKn1-0001vX-1D
-	for qemu-devel@nongnu.org; Mon, 27 Nov 2017 09:53:43 -0500
-References: <CAFEAcA9dz9pO_mQ1xtmsT7MW6kXXnNaedgmXe1Eh0Cp53zPz5Q@mail.gmail.com>
-	<f058c3d3-3d8e-4995-0bf7-abadd2c48d99@redhat.com>
-	<CAFEAcA_t0PYZ68HZruWjpeLsU=iOtPbdP9=ETPWXwG+iBRPGrA@mail.gmail.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <0c5530cd-6f56-bce6-9fdf-91c1468324e4@redhat.com>
-Date: Mon, 27 Nov 2017 15:53:38 +0100
+	(envelope-from <stefanb@linux.vnet.ibm.com>) id 1eJKsz-0005k4-G7
+	for qemu-devel@nongnu.org; Mon, 27 Nov 2017 09:59:58 -0500
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:58736)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <stefanb@linux.vnet.ibm.com>)
+	id 1eJKsz-0005ii-6n
+	for qemu-devel@nongnu.org; Mon, 27 Nov 2017 09:59:53 -0500
+Received: from pps.filterd (m0098404.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
+	vAREwk0q038704
+	for <qemu-devel@nongnu.org>; Mon, 27 Nov 2017 09:59:49 -0500
+Received: from e19.ny.us.ibm.com (e19.ny.us.ibm.com [129.33.205.209])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2eghxca3fu-1
+	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Mon, 27 Nov 2017 09:59:48 -0500
+Received: from localhost
+	by e19.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <stefanb@linux.vnet.ibm.com>;
+	Mon, 27 Nov 2017 09:59:47 -0500
+From: Stefan Berger <stefanb@linux.vnet.ibm.com>
+Date: Mon, 27 Nov 2017 09:59:43 -0500
 MIME-Version: 1.0
-In-Reply-To: <CAFEAcA_t0PYZ68HZruWjpeLsU=iOtPbdP9=ETPWXwG+iBRPGrA@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] javac crash in user-mode emulation: races on
- page_unprotect()
+Message-Id: <d1bb0f60-1c09-8189-a5d1-0b762b3ceecb@linux.vnet.ibm.com>
+Subject: [Qemu-devel] tpm: swtpm and libtpms projects tagged
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,45 +38,26 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, Richard Henderson <rth@twiddle.net>
+To: qemu-devel <qemu-devel@nongnu.org>, tpm2@lists.01.org
+Cc: Patrick Ohly <patrick.ohly@intel.com>, =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>, amarnath.valluri@intel.com
 
-On 27/11/2017 15:47, Peter Maydell wrote:
-> On 27 November 2017 at 15:38, Paolo Bonzini <pbonzini@redhat.com> wrote:
->> On 24/11/2017 18:18, Peter Maydell wrote:
->>>  * threads A & B both try to do a write to a page with code in it at
->>>    the same time (ie which we've made non-writeable, so SEGV)
->>>  * they race into the signal handler with this faulting address
->>>  * thread A happens to get to page_unprotect() first and takes the
->>>    mmap lock, so thread B sits waiting for it to be done
->>>  * A then finds the page, marks it PAGE_WRITE and mprotect()s it writable
->>>  * A can then continue OK (returns from signal handler to retry the
->>>    memory access)
->>>  * ...but when B gets the mmap lock it finds that the page is already
->>>    PAGE_WRITE, and so it exits page_unprotect() via the "not due to
->>>    protected translation" code path, and wrongly delivers the signal
->>>    to the guest rather than just retrying the access
->>>
->>> I'm not sure how best to fix this. We could make page_unprotect()
->>> say "if PAGE_WRITE is set, assume this call raced with another one
->>> and say 'this was caused by protected translation' without doing
->>> anything".
->>
->> Yes, I think this is the only solution since SIGSEGV is raised
->> asynchronously.  Even using a trylock would only narrow the race window
->> but not fix it.
-> 
-> I have a patch from rth based on an idea he and I came up with:
-> we add a field to the PageDesc struct to store the thread id of
-> the thread that last touches the flags. If you come into the
-> segv handler and the page flags/last-modified-by field say "should be
-> writeable and somebody else updated it" then you mark the page as
-> "last modified by this thread" and retry the access. If the
-> flags say "should be writeable, last modified by this thread"
-> then you know the page state hasn't changed since this thread
-> last saw it as "definitely not causing segvs because of cached TBs",
-> and so that should be passed on as a guest SEGV.
+Hello!
 
-Clever, but why would si_code not work?...
+I tagged libtpms with TPM 1.2 and TPM 2 support with tag/v0.6.0-dev1 and 
+swtpm with TPM 1.2 and TPM 2 support with tag/v0.1.0-dev2. The git repos 
+of the respective projects are here:
 
-Paolo
+libtpms: https://github.com/stefanberger/libtpms
+
+swtpm: https://github.com/stefanberger/swtpm
+
+
+Note: Recent modifications to libtpms will produce a state file 
+(tpm2-00.permall) of 64kb. Previous state files will not work anymore, 
+so you may have to remove them.
+
+Compilation instructions can be found on the git hub Wiki pages of these 
+projects.
+
+Regards,
+     Stefan
