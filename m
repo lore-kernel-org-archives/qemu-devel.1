@@ -1,57 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43440)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48691)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pasic@linux.vnet.ibm.com>) id 1eJKAn-0001NT-Db
-	for qemu-devel@nongnu.org; Mon, 27 Nov 2017 09:14:14 -0500
+	(envelope-from <yliu@fridaylinux.org>) id 1eJKO7-00069I-L4
+	for qemu-devel@nongnu.org; Mon, 27 Nov 2017 09:28:00 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pasic@linux.vnet.ibm.com>) id 1eJKAh-0000qj-Cd
-	for qemu-devel@nongnu.org; Mon, 27 Nov 2017 09:14:13 -0500
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:60850
-	helo=mx0a-001b2d01.pphosted.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pasic@linux.vnet.ibm.com>)
-	id 1eJKAh-0000qb-6U
-	for qemu-devel@nongnu.org; Mon, 27 Nov 2017 09:14:07 -0500
-Received: from pps.filterd (m0098413.ppops.net [127.0.0.1])
-	by mx0b-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
-	vARE9WYs047005
-	for <qemu-devel@nongnu.org>; Mon, 27 Nov 2017 09:14:05 -0500
-Received: from e06smtp15.uk.ibm.com (e06smtp15.uk.ibm.com [195.75.94.111])
-	by mx0b-001b2d01.pphosted.com with ESMTP id 2egj5t71wb-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Mon, 27 Nov 2017 09:14:04 -0500
-Received: from localhost
-	by e06smtp15.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
-	Only! Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <pasic@linux.vnet.ibm.com>;
-	Mon, 27 Nov 2017 14:14:03 -0000
-References: <20171121111825.17916-1-pasic@linux.vnet.ibm.com>
-	<20171121144457.60adb0c3.cohuck@redhat.com>
-	<1145a6bc-45fd-820a-9dcc-249d9b2802ff@linux.vnet.ibm.com>
-	<20171121172022.5da16158.cohuck@redhat.com>
-	<88bc72cf-732c-fc07-9898-18d7b58b947d@linux.vnet.ibm.com>
-	<20171122131343.26da0482.cohuck@redhat.com>
-	<594e1952-7097-0927-d913-d3b915df2305@linux.vnet.ibm.com>
-	<20171122172522.281cfb4b.cohuck@redhat.com>
-	<76f95c6f-641e-2fe0-73b4-3ab24fc1a93f@linux.vnet.ibm.com>
-	<20171124134650.46665791.cohuck@redhat.com>
-	<7eaa796e-7815-f943-58b5-ecb5a0bb252e@de.ibm.com>
-	<20171124142758.39d7726f.cohuck@redhat.com>
-	<131b311b-c262-3636-c7ee-1c59ee283823@de.ibm.com>
-	<1ddb44db-2c5c-d64f-56e0-e4582f82b572@linux.vnet.ibm.com>
-	<20171124171510.2343ccdf.cohuck@redhat.com>
-	<8c18df3e-92a0-f88f-6d24-e1df051c8138@linux.vnet.ibm.com>
-	<20171127135624.28052dc5.cohuck@redhat.com>
-	<57f95f61-b9d9-1341-78c7-259006cb5945@linux.vnet.ibm.com>
-	<20171127141929.1d692aad.cohuck@redhat.com>
-From: Halil Pasic <pasic@linux.vnet.ibm.com>
-Date: Mon, 27 Nov 2017 15:13:59 +0100
+	(envelope-from <yliu@fridaylinux.org>) id 1eJKO3-0006TU-MS
+	for qemu-devel@nongnu.org; Mon, 27 Nov 2017 09:27:59 -0500
+Received: from out4-smtp.messagingengine.com ([66.111.4.28]:40575)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <yliu@fridaylinux.org>)
+	id 1eJKO3-0006Sh-D9
+	for qemu-devel@nongnu.org; Mon, 27 Nov 2017 09:27:55 -0500
+Date: Mon, 27 Nov 2017 22:27:32 +0800
+From: Yuanhan Liu <yliu@fridaylinux.org>
+Message-ID: <20171127142515.GA450@yliu-dev>
 MIME-Version: 1.0
-In-Reply-To: <20171127141929.1d692aad.cohuck@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Message-Id: <39cb6a69-7f32-80d4-214d-26e1e81a9fd7@linux.vnet.ibm.com>
-Subject: Re: [Qemu-devel] [RFC PATCH 1/1] s390x/css: unresrict cssids
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <2017112417590937512732@arraynetworks.com.cn>
+Subject: Re: [Qemu-devel] [dpdk-dev] [ovs-dev] [PATCH RFC] netdev-dpdk: Fix
+ device obtain mac address when received first packet in vhost type
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -60,53 +27,76 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Cornelia Huck <cohuck@redhat.com>, Boris Fiuczynski <fiuczy@linux.vnet.ibm.com>
-Cc: Christian Borntraeger <borntraeger@de.ibm.com>, Shalini Chellathurai Saroja <shalini@linux.vnet.ibm.com>, qemu-devel@nongnu.org, qemu-s390x@nongnu.org, Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>
+To: Chen Hailin <chenhl@arraynetworks.com.cn>
+Cc: Aaron Conole <aconole@redhat.com>, "jianfeng.tan" <jianfeng.tan@intel.com>, "ovs-dev@openvswitch.org" <ovs-dev@openvswitch.org>, Maxime Coquelin <maxime.coquelin@redhat.com>, cloud <cloud@arraynetworks.com.cn>, qemu-devel <qemu-devel@nongnu.org>, dev <dev@dpdk.org>
 
-
-
-On 11/27/2017 02:19 PM, Cornelia Huck wrote:
-> On Mon, 27 Nov 2017 14:11:57 +0100
-> Halil Pasic <pasic@linux.vnet.ibm.com> wrote:
+On Fri, Nov 24, 2017 at 05:59:09PM +0800, Chen Hailin wrote:
+> Hi Aaron Conole && Jianfeng,
 > 
->> On 11/27/2017 01:56 PM, Cornelia Huck wrote:
->>> On Fri, 24 Nov 2017 17:39:04 +0100
->>> Halil Pasic <pasic@linux.vnet.ibm.com> wrote:
->>>   
->>>> On 11/24/2017 05:15 PM, Cornelia Huck wrote:  
+> The stp could not work in ovs-dpdk vhostuser.
+> Because the attached vhost device doesn't have MAC address.
 > 
->>>>> (Unless we simply make this a "default cssid" prop after all - then it
->>>>> would be more than just a simple indication for libvirt...)
->>>>>     
->>>>
->>>> We are now talking about the "cssid-unrestricted" property. The default
->>>> cssid is not something I would like to do any time soon.  
->>>
->>> What's so bad about this? As said above, I think it would be much more
->>> useful. If libvirt can detect r/o vs. r/w for properties, we can simply
->>> start out with a r/o variant now...
->>>   
->>
->> I'm not sure I understand you. Are you proposing the following:
->> Drop the restriction, but don't indicate this via a read only
->> "cssid-unrestricted" device property but via a "default-css"
->> read only machine property.
->>
->> Libvirt then should know that if "default-css" is present then
->> we don't have this virtual into 0xfe and non virtual into 0xfd
->> restriction any more.
+> Now we have two ways to solve this problem.
+> 1. The vhost learns MAC address from packet like as my first patch.
+
+I do agree with Aaron this is not the right way.
+
+> 2. The virtio notifies MAC address actively to vhost user .
+
+Unfortunately, AFAIK, there is no way to achieve that so far. we could
+either let virtio/QEMU to expose the CQ to vhost or add a new VHOST_USER
+message to carry the mac address. While vhost-user is a generic interface
+adding a virtio-net specific message also doesn't seem quite right.
+Exposing CQ is probably the best we can do.
+
+Anyway, both need spec change.
+
+	--yliu
 > 
-> Yes.
+> In my opinions,  if we treat it as a device,  we should allocate 
+> MAC address for the device when the VM started.
 > 
-
-@Boris:
-Does this work for you? Technically it's equivalent to having
-"cssid-unrestricted" at machine level.
-
-I don't really like the idea of indicating unrestricted via
-something mostly unrelated (at least for me it ain't obvious that
-having the id of the default css exposed means we got rid of the
-limitation.). But I'm tied of discussing this, so I'm willing to
-compromise.
-
-Halil
+> Which one do you think better?
+> 
+> 
+> 
+> Best Regards,
+> Chen Hailin
+> chenhl@arraynetworks.com.cn
+>  
+> From: Aaron Conole
+> Date: 2017-11-18 10:00
+> To: Hailin Chen
+> CC: ovs-dev@openvswitch.org; Maxime Coquelin; cloud@arraynetworks.com.cn
+> Subject: Re: [ovs-dev] [PATCH RFC] netdev-dpdk: Fix device obtain mac address when received first packet in vhost type
+> Hi Hailin,
+>  
+> Hailin Chen <chenhl@arraynetworks.com.cn> writes:
+>  
+> > The stp could not work on netdev-dpdk if network is loop.
+> > Because the stp protocol negotiates designate port by sending
+> > BPDU packets which contains MAC address.
+> > However the device doesn't have MAC address in vhostuser type.
+> > Thus, function send_bpdu_cb would not send BPDU packets.
+> >
+> > This patch will set the MAC for device when received first packet.
+> >
+> > Signed-off-by: Hailin Chen <chenhl@arraynetworks.com.cn>
+> > ---
+>  
+> Thanks for the patch.
+>  
+> In general, I don't think this is the right approach to deal with this
+> type of issue.  I believe the problem statement is that OvS bridge is
+> unaware of the guest MAC address - did I get it right?  In that case, I
+> would think that a better way to solve this would be to have virtio tell
+> the mac address of the guest.  I don't recall right now if that's
+> allowed in the virtio spec, but I do remember some kind of negotiation
+> features.
+>  
+> I've CC'd Maxime, who is one of the maintainers of the virtio code from
+> DPDK side.  Perhaps there is an alternate way to solve this.
+> _______________________________________________
+> dev mailing list
+> dev@openvswitch.org
+> https://mail.openvswitch.org/mailman/listinfo/ovs-dev
