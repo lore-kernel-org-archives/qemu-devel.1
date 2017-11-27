@@ -1,20 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41290)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41878)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <doug16k@gmail.com>) id 1eJB02-0003EQ-Ka
-	for qemu-devel@nongnu.org; Sun, 26 Nov 2017 23:26:32 -0500
+	(envelope-from <doug16k@gmail.com>) id 1eJB1w-0004Sd-Es
+	for qemu-devel@nongnu.org; Sun, 26 Nov 2017 23:28:30 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <doug16k@gmail.com>) id 1eJAzz-0000Re-BO
-	for qemu-devel@nongnu.org; Sun, 26 Nov 2017 23:26:30 -0500
-Received: from mail-io0-x242.google.com ([2607:f8b0:4001:c06::242]:44414)
+	(envelope-from <doug16k@gmail.com>) id 1eJB1t-0001HS-8C
+	for qemu-devel@nongnu.org; Sun, 26 Nov 2017 23:28:28 -0500
+Received: from mail-it0-x241.google.com ([2607:f8b0:4001:c0b::241]:33728)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <doug16k@gmail.com>) id 1eJAzz-0000RW-4c
-	for qemu-devel@nongnu.org; Sun, 26 Nov 2017 23:26:27 -0500
-Received: by mail-io0-x242.google.com with SMTP id w127so34842921iow.11
-	for <qemu-devel@nongnu.org>; Sun, 26 Nov 2017 20:26:27 -0800 (PST)
+	(Exim 4.71) (envelope-from <doug16k@gmail.com>) id 1eJB1t-0001HF-3I
+	for qemu-devel@nongnu.org; Sun, 26 Nov 2017 23:28:25 -0500
+Received: by mail-it0-x241.google.com with SMTP id o130so19354540itg.0
+	for <qemu-devel@nongnu.org>; Sun, 26 Nov 2017 20:28:25 -0800 (PST)
 From: Doug Gale <doug16k@gmail.com>
-Date: Sun, 26 Nov 2017 23:26:15 -0500
-Message-Id: <20171127042615.30557-1-doug16k@gmail.com>
-Subject: [Qemu-devel] [PATCH v2] gdbstub: add tracing
+Date: Sun, 26 Nov 2017 23:28:15 -0500
+Message-Id: <20171127042815.30725-1-doug16k@gmail.com>
+Subject: [Qemu-devel] [PATCH v3] gdbstub: add tracing
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
