@@ -1,26 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49667)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55077)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <yang.zhong@intel.com>) id 1eJ9lT-0007Ja-0x
-	for qemu-devel@nongnu.org; Sun, 26 Nov 2017 22:07:24 -0500
+	(envelope-from <jasowang@redhat.com>) id 1eJA4J-0002xn-Mq
+	for qemu-devel@nongnu.org; Sun, 26 Nov 2017 22:26:52 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <yang.zhong@intel.com>) id 1eJ9lO-0004zf-6E
-	for qemu-devel@nongnu.org; Sun, 26 Nov 2017 22:07:23 -0500
-Received: from mga07.intel.com ([134.134.136.100]:24852)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <yang.zhong@intel.com>)
-	id 1eJ9lN-0004zW-Q5
-	for qemu-devel@nongnu.org; Sun, 26 Nov 2017 22:07:18 -0500
-Date: Mon, 27 Nov 2017 11:06:35 +0800
-From: Zhong Yang <yang.zhong@intel.com>
-Message-ID: <20171127030635.GA29806@yangzhon-Virtual>
-References: <1511505030-3669-1-git-send-email-yang.zhong@intel.com>
-	<5A1A5C6E.9060409@huawei.com>
+	(envelope-from <jasowang@redhat.com>) id 1eJA4F-0004c4-Np
+	for qemu-devel@nongnu.org; Sun, 26 Nov 2017 22:26:51 -0500
+References: <1511408266-4139-1-git-send-email-jasowang@redhat.com>
+	<20171123105934.GC26022@stefanha-x1.localdomain>
+	<7c6f12d7-8670-2a7b-0e9a-6f6c0ec92759@redhat.com>
+	<20171124104447.GA11589@stefanha-x1.localdomain>
+From: Jason Wang <jasowang@redhat.com>
+Message-ID: <096a9e5b-d622-17d1-2713-764800a11608@redhat.com>
+Date: Mon, 27 Nov 2017 11:26:34 +0800
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <5A1A5C6E.9060409@huawei.com>
-Subject: Re: [Qemu-devel] [PATCH v3] rcu: reduce more than 7MB heap memory
- by malloc_trim()
+In-Reply-To: <20171124104447.GA11589@stefanha-x1.localdomain>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH for 2.11] virtio-net: don't touch virtqueue
+ if vm is stopped
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,180 +27,83 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Shannon Zhao <zhaoshenglong@huawei.com>
-Cc: qemu-devel@nongnu.org, pbonzini@redhat.com, weidong.huang@huawei.com, arei.gonglei@huawei.com, liujunjie23@huawei.com, wangxinxin.wang@huawei.com, stone.xulei@huawei.com, zhang.zhanghailiang@huawei.com, stefanha@redhat.com, berrange@redhat.com, yang.zhong@intel.com
-
-On Sun, Nov 26, 2017 at 02:17:18PM +0800, Shannon Zhao wrote:
-> Hi,
-> 
-> On 2017/11/24 14:30, Yang Zhong wrote:
-> > Since there are some issues in memory alloc/free machenism
-> > in glibc for little chunk memory, if Qemu frequently
-> > alloc/free little chunk memory, the glibc doesn't alloc
-> > little chunk memory from free list of glibc and still
-> > allocate from OS, which make the heap size bigger and bigger.
-> > 
-> > This patch introduce malloc_trim(), which will free heap memory.
-> > 
-> > Below are test results from smaps file.
-> > (1)without patch
-> > 55f0783e1000-55f07992a000 rw-p 00000000 00:00 0  [heap]
-> > Size:              21796 kB
-> > Rss:               14260 kB
-> > Pss:               14260 kB
-> > 
-> > (2)with patch
-> > 55cc5fadf000-55cc61008000 rw-p 00000000 00:00 0  [heap]
-> > Size:              21668 kB
-> > Rss:                6940 kB
-> > Pss:                6940 kB
-> > 
-> > Signed-off-by: Yang Zhong <yang.zhong@intel.com>
-> > ---
-> >  configure  | 29 +++++++++++++++++++++++++++++
-> >  util/rcu.c |  6 ++++++
-> >  2 files changed, 35 insertions(+)
-> > 
-> > diff --git a/configure b/configure
-> > index 0c6e757..6292ab0 100755
-> > --- a/configure
-> > +++ b/configure
-> > @@ -426,6 +426,7 @@ vxhs=""
-> >  supported_cpu="no"
-> >  supported_os="no"
-> >  bogus_os="no"
-> > +malloc_trim="yes"
-> >  
-> >  # parse CC options first
-> >  for opt do
-> > @@ -3857,6 +3858,30 @@ if test "$tcmalloc" = "yes" && test "$jemalloc" = "yes" ; then
-> >      exit 1
-> >  fi
-> >  
-> > +# Even if malloc_trim() is available, these non-libc memory allocators
-> > +# do not support it.
-> > +if test "$tcmalloc" = "yes" || test "$jemalloc" = "yes" ; then
-> > +    if test "$malloc_trim" = "yes" ; then
-> > +        echo "Disabling malloc_trim with non-libc memory allocator"
-> > +    fi
-> > +    malloc_trim="no"
-> > +fi
-> > +
-> > +#######################################
-> > +# malloc_trim
-> > +
-> > +if test "$malloc_trim" != "no" ; then
-> > +    cat > $TMPC << EOF
-> > +#include <malloc.h>
-> > +int main(void) { malloc_trim(0); return 0; }
-> > +EOF
-> > +    if compile_prog "" "" ; then
-> > +        malloc_trim="yes"
-> > +    else
-> > +        malloc_trim="no"
-> > +    fi
-> > +fi
-> > +
-> >  ##########################################
-> >  # tcmalloc probe
-> >  
-> > @@ -6012,6 +6037,10 @@ if test "$opengl" = "yes" ; then
-> >    fi
-> >  fi
-> >  
-> > +if test "$malloc_trim" = "yes" ; then
-> > +  echo "CONFIG_MALLOC_TRIM=y" >> $config_host_mak
-> > +fi
-> > +
-> >  if test "$avx2_opt" = "yes" ; then
-> >    echo "CONFIG_AVX2_OPT=y" >> $config_host_mak
-> >  fi
-> > diff --git a/util/rcu.c b/util/rcu.c
-> > index ca5a63e..f403b77 100644
-> > --- a/util/rcu.c
-> > +++ b/util/rcu.c
-> > @@ -32,6 +32,9 @@
-> >  #include "qemu/atomic.h"
-> >  #include "qemu/thread.h"
-> >  #include "qemu/main-loop.h"
-> > +#if defined(CONFIG_MALLOC_TRIM)
-> > +#include <malloc.h>
-> > +#endif
-> >  
-> >  /*
-> >   * Global grace period counter.  Bit 0 is always one in rcu_gp_ctr.
-> > @@ -272,6 +275,9 @@ static void *call_rcu_thread(void *opaque)
-> >              node->func(node);
-> >          }
-> >          qemu_mutex_unlock_iothread();
-> > +#if defined(CONFIG_MALLOC_TRIM)
-> > +        malloc_trim(4 * 1024 * 1024);
-> > +#endif
-> >      }
-> >      abort();
-> >  }
-> > 
-> 
-> Looks like this patch introduces a performance regression. With this
-> patch the time of booting a VM with 60 scsi disks on ARM64 is increased
-> by 200+ seconds.
-> 
-  Hello Shannon,
-
-  Thanks for your reply!
-  As for your concerns, i did VM bootup compared tests, and results as below:
-
-  #test command
-  ./qemu-system-x86_64 -enable-kvm -cpu host -m 2G -smp cpus=4,cores=4,\
-                       threads=1,sockets=1 -drive format=raw,\
-                       file=test.img,index=0,media=disk -nographic
-
-  #without patch
-  root@intel-internal-corei7-64:~# systemd-analyze
-  Startup finished in 4.979s (kernel) + 1.214s (userspace) = 6.193s
-
-  root@intel-internal-corei7-64:~# systemd-analyze
-  Startup finished in 4.922s (kernel) + 1.175s (userspace) = 6.097s
-
-  root@intel-internal-corei7-64:~# systemd-analyze
-  Startup finished in 4.990s (kernel) + 1.301s (userspace) = 6.291s
-
-  root@intel-internal-corei7-64:~# systemd-analyze
-  Startup finished in 5.063s (kernel) + 1.336s (userspace) = 6.400s
-
-  root@intel-internal-corei7-64:~# systemd-analyze
-  Startup finished in 4.820s (kernel) + 1.237s (userspace) = 6.057s
-
-  avg: kernel 4.9548, userspace 1.2526
+To: Stefan Hajnoczi <stefanha@redhat.com>
+Cc: Yuri Benditovich <yuri.benditovich@daynix.com>, qemu-stable@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org, mst@redhat.com
 
 
-  #with this patch
-  root@intel-internal-corei7-64:~# systemd-analyze
-  Startup finished in 5.099s (kernel) + 1.579s (userspace) = 6.679s
 
-  root@intel-internal-corei7-64:~# systemd-analyze
-  Startup finished in 5.003s (kernel) + 1.343s (userspace) = 6.347s
+On 2017=E5=B9=B411=E6=9C=8824=E6=97=A5 18:44, Stefan Hajnoczi wrote:
+> On Fri, Nov 24, 2017 at 10:57:11AM +0800, Jason Wang wrote:
+>> On 2017=E5=B9=B411=E6=9C=8823=E6=97=A5 18:59, Stefan Hajnoczi wrote:
+>>> On Thu, Nov 23, 2017 at 11:37:46AM +0800, Jason Wang wrote:
+>>>> Guest state should not be touched if VM is stopped, unfortunately we
+>>>> didn't check running state and tried to drain tx queue unconditional=
+ly
+>>>> in virtio_net_set_status(). A crash was then noticed as a migration
+>>>> destination when user type quit after virtqueue state is loaded but
+>>>> before region cache is initialized. In this case,
+>>>> virtio_net_drop_tx_queue_data() tries to access the uninitialized
+>>>> region cache.
+>>>>
+>>>> Fix this by only dropping tx queue data when vm is running.
+>>> hw/virtio/virtio.c:virtio_load() does the following:
+>>>
+>>>     for (i =3D 0; i < num; i++) {
+>>>         if (vdev->vq[i].vring.desc) {
+>>>             uint16_t nheads;
+>>>
+>>>             /*
+>>>              * VIRTIO-1 devices migrate desc, used, and avail ring ad=
+dresses so
+>>>              * only the region cache needs to be set up.  Legacy devi=
+ces need
+>>>              * to calculate used and avail ring addresses based on th=
+e desc
+>>>              * address.
+>>>              */
+>>>             if (virtio_vdev_has_feature(vdev, VIRTIO_F_VERSION_1)) {
+>>>                 virtio_init_region_cache(vdev, i);
+>>>             } else {
+>>>                 virtio_queue_update_rings(vdev, i);
+>>>             }
+>>>
+>>> So the region caches should be initialized after virtqueue state is
+>>> loaded.
+>>>
+>>> It's unclear to me which code path triggers this issue.  Can you add =
+a
+>>> backtrace or an explanation?
+>>>
+>>> Thanks,
+>>> Stefan
+>> Migration coroutine was yield before region cache was initialized. The
+>> backtrace looks like:
+> [...]
+>> #16 0x0000555555b1c199 in vmstate_load_state (f=3D0x555556f7c010,
+>> vmsd=3D0x5555562b8160 <vmstate_virtio>, opaque=3D0x555557d68610, versi=
+on_id=3D1)
+>>  =C2=A0=C2=A0=C2=A0 at migration/vmstate.c:160
+>> #17 0x0000555555865cc3 in virtio_load (vdev=3D0x555557d68610,
+>> f=3D0x555556f7c010, version_id=3D11) at
+>> /home/devel/git/qemu/hw/virtio/virtio.c:2110
+> Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
+>
+> Thanks for the backtrace!  Your patch is fine but I have a larger
+> concern:
+>
+> The backtrace shows that the virtio code is re-entrant during savevm
+> load.  That's probably a bad thing because set_status() and other APIs
+> are probably not intended to run while we are half-way through savevm
+> load.  The virtqueue is only partially set up at this point :(.  I
+> wonder if a more general cleanup is necessary to avoid problems like
+> this in the future...
+>
+> Stefan
 
-  root@intel-internal-corei7-64:~# systemd-analyze
-  Startup finished in 4.853s (kernel) + 1.220s (userspace) = 6.074s
+Yes, this needs some thought. An idea is to guarantee the atomicity of=20
+the virtio state and don't expose partial state. But looks like this=20
+needs lots of changes.
 
-  root@intel-internal-corei7-64:~# systemd-analyze
-  Startup finished in 4.836s (kernel) + 1.111s (userspace) = 5.948s
+Anyway, I will apply this patch first.
 
-  root@intel-internal-corei7-64:~# systemd-analyze
-  Startup finished in 4.917s (kernel) + 1.166s (userspace) = 6.083s
-
-  avg: kernel 4.9416s, userspace: 1.2838
-
-  From above test results, there are almost not any performance regression
-  on x86 platform. Sorry, there is not any ARM based platform in my hand,
-  i can't give related datas.  thanks!
-
-  Regards,
-
-  Yang
-
-
-> Thanks,
-> -- 
-> Shannon
+Thanks
