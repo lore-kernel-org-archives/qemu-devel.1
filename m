@@ -1,29 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37911)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33277)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <adhemerval.zanella@linaro.org>) id 1eJI2M-0001di-LJ
-	for qemu-devel@nongnu.org; Mon, 27 Nov 2017 06:57:23 -0500
+	(envelope-from <pbonzini@redhat.com>) id 1eJKn6-0007p2-6N
+	for qemu-devel@nongnu.org; Mon, 27 Nov 2017 09:53:49 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <adhemerval.zanella@linaro.org>) id 1eJI2J-0005oR-L9
-	for qemu-devel@nongnu.org; Mon, 27 Nov 2017 06:57:22 -0500
-Received: from mail-qk0-x22a.google.com ([2607:f8b0:400d:c09::22a]:37532)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <adhemerval.zanella@linaro.org>)
-	id 1eJI2J-0005o5-En
-	for qemu-devel@nongnu.org; Mon, 27 Nov 2017 06:57:19 -0500
-Received: by mail-qk0-x22a.google.com with SMTP id 136so31983711qkd.4
-	for <qemu-devel@nongnu.org>; Mon, 27 Nov 2017 03:57:18 -0800 (PST)
-References: <ab2eda3b-571f-025e-66e9-6c1577793a08@physik.fu-berlin.de>
-	<b3becdc0-6540-30a6-b70b-8312ac5dddd9@physik.fu-berlin.de>
-From: Adhemerval Zanella <adhemerval.zanella@linaro.org>
-Message-ID: <af9abebc-0650-a7c7-e63d-adafaa7031d6@linaro.org>
-Date: Mon, 27 Nov 2017 09:57:10 -0200
+	(envelope-from <pbonzini@redhat.com>) id 1eJKn1-0001wO-80
+	for qemu-devel@nongnu.org; Mon, 27 Nov 2017 09:53:48 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:50842)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1eJKn1-0001vX-1D
+	for qemu-devel@nongnu.org; Mon, 27 Nov 2017 09:53:43 -0500
+References: <CAFEAcA9dz9pO_mQ1xtmsT7MW6kXXnNaedgmXe1Eh0Cp53zPz5Q@mail.gmail.com>
+	<f058c3d3-3d8e-4995-0bf7-abadd2c48d99@redhat.com>
+	<CAFEAcA_t0PYZ68HZruWjpeLsU=iOtPbdP9=ETPWXwG+iBRPGrA@mail.gmail.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <0c5530cd-6f56-bce6-9fdf-91c1468324e4@redhat.com>
+Date: Mon, 27 Nov 2017 15:53:38 +0100
 MIME-Version: 1.0
-In-Reply-To: <b3becdc0-6540-30a6-b70b-8312ac5dddd9@physik.fu-berlin.de>
+In-Reply-To: <CAFEAcA_t0PYZ68HZruWjpeLsU=iOtPbdP9=ETPWXwG+iBRPGrA@mail.gmail.com>
 Content-Type: text/plain; charset=utf-8
-Content-Language: en-GB
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] glibc "linux: spawni.c: simplify error reporting
- to parent" breaks qemu-user/Windows Service For Linux
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] javac crash in user-mode emulation: races on
+ page_unprotect()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,39 +30,45 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: John Paul Adrian Glaubitz <glaubitz@physik.fu-berlin.de>, Rasmus Villemoes <rv@rasmusvillemoes.dk>
-Cc: Adhemerval Zanella <adhemerval.zanella@linaro.com>, James Clarke <jrtc27@jrtc27.com>, Michael Karcher <debian@mkarcher.dialup.fu-berlin.de>, Laurent Vivier <laurent@vivier.eu>, QEMU Developers <qemu-devel@nongnu.org>
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, Richard Henderson <rth@twiddle.net>
 
-On 26/11/2017 18:35, John Paul Adrian Glaubitz wrote:
-> On 11/26/2017 09:28 PM, John Paul Adrian Glaubitz wrote:
->> I'm not sure yet what the actual problem is but I thought it should be necessary
->> to point you at the problem.
+On 27/11/2017 15:47, Peter Maydell wrote:
+> On 27 November 2017 at 15:38, Paolo Bonzini <pbonzini@redhat.com> wrote:
+>> On 24/11/2017 18:18, Peter Maydell wrote:
+>>>  * threads A & B both try to do a write to a page with code in it at
+>>>    the same time (ie which we've made non-writeable, so SEGV)
+>>>  * they race into the signal handler with this faulting address
+>>>  * thread A happens to get to page_unprotect() first and takes the
+>>>    mmap lock, so thread B sits waiting for it to be done
+>>>  * A then finds the page, marks it PAGE_WRITE and mprotect()s it writable
+>>>  * A can then continue OK (returns from signal handler to retry the
+>>>    memory access)
+>>>  * ...but when B gets the mmap lock it finds that the page is already
+>>>    PAGE_WRITE, and so it exits page_unprotect() via the "not due to
+>>>    protected translation" code path, and wrongly delivers the signal
+>>>    to the guest rather than just retrying the access
+>>>
+>>> I'm not sure how best to fix this. We could make page_unprotect()
+>>> say "if PAGE_WRITE is set, assume this call raced with another one
+>>> and say 'this was caused by protected translation' without doing
+>>> anything".
+>>
+>> Yes, I think this is the only solution since SIGSEGV is raised
+>> asynchronously.  Even using a trylock would only narrow the race window
+>> but not fix it.
 > 
-> Ok, there is already a QEMU bug report for this [1].
-> 
-> Adrian
-> 
->> [1] https://bugs.launchpad.net/qemu/+bug/1673976
-> 
+> I have a patch from rth based on an idea he and I came up with:
+> we add a field to the PageDesc struct to store the thread id of
+> the thread that last touches the flags. If you come into the
+> segv handler and the page flags/last-modified-by field say "should be
+> writeable and somebody else updated it" then you mark the page as
+> "last modified by this thread" and retry the access. If the
+> flags say "should be writeable, last modified by this thread"
+> then you know the page state hasn't changed since this thread
+> last saw it as "definitely not causing segvs because of cached TBs",
+> and so that should be passed on as a guest SEGV.
 
-We found out this potential bogus assert on 2.27 development [1] which
-resulted in two fixes [2][3].
+Clever, but why would si_code not work?...
 
-It should not be an issue for generic posix_spawn usage where there is
-no expectation system/user/program kills random pids (since posix_spawn
-auxiliary process has not yet returned). Some say the possible kind of
-behaviour is rather undefined, but it shouldn't also trigger an assert.
-
-I am not really sure what is happening in qemu usermode because comment
-#4 in the bug reports states clone is returning an error and it should
-not trigger the assert in first place.  What seems to be happening in
-this scenario is clone is actually returning a success, but the auxiliary
-process is being killed before actually calling execve.
-
-In any case I think both fixes I pointed out (which are also on 2.26 and
-2.25) should avoid the assert issue. Regarding the CLONE_VFORK support
-I think we will need to address it on qemu.
-
-[1] https://sourceware.org/bugzilla/show_bug.cgi?id=22273
-[2] https://sourceware.org/git/?p=glibc.git;a=commit;h=fe05e1cb6d64dba6172249c79526f1e9af8f2bfd
-[3] https://sourceware.org/git/?p=glibc.git;a=commit;h=aa95a2414e4f664ca740ad5f4a72d9145abbd426
+Paolo
