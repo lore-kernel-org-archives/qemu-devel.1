@@ -1,33 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52469)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59815)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <adhemerval.zanella@linaro.org>) id 1eJMEP-000595-C6
-	for qemu-devel@nongnu.org; Mon, 27 Nov 2017 11:26:06 -0500
+	(envelope-from <jianfeng.tan@intel.com>) id 1eJMO4-0007kA-U3
+	for qemu-devel@nongnu.org; Mon, 27 Nov 2017 11:36:10 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <adhemerval.zanella@linaro.org>) id 1eJMEM-0004u0-Ls
-	for qemu-devel@nongnu.org; Mon, 27 Nov 2017 11:26:05 -0500
-Received: from mail-qk0-x244.google.com ([2607:f8b0:400d:c09::244]:35317)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <adhemerval.zanella@linaro.org>)
-	id 1eJMEM-0004tO-DI
-	for qemu-devel@nongnu.org; Mon, 27 Nov 2017 11:26:02 -0500
-Received: by mail-qk0-x244.google.com with SMTP id p19so33140362qke.2
-	for <qemu-devel@nongnu.org>; Mon, 27 Nov 2017 08:26:02 -0800 (PST)
-References: <ab2eda3b-571f-025e-66e9-6c1577793a08@physik.fu-berlin.de>
-	<b3becdc0-6540-30a6-b70b-8312ac5dddd9@physik.fu-berlin.de>
-	<af9abebc-0650-a7c7-e63d-adafaa7031d6@linaro.org>
-	<CAFEAcA_mR86vZhqe7yZwUdSSFyKDcms6UoK-NnXgW2ER8GL5tw@mail.gmail.com>
-	<9e520d68-0aba-1a32-06d9-351e90d0a7bf@linaro.org>
-	<35cfeff9-fd4f-ea38-5eaf-c9e7bb7d0428@physik.fu-berlin.de>
-From: Adhemerval Zanella <adhemerval.zanella@linaro.org>
-Message-ID: <3baaf549-b67c-4c36-f96c-8fb8f21c1a36@linaro.org>
-Date: Mon, 27 Nov 2017 14:25:55 -0200
+	(envelope-from <jianfeng.tan@intel.com>) id 1eJMNy-0002wt-QA
+	for qemu-devel@nongnu.org; Mon, 27 Nov 2017 11:36:04 -0500
+Received: from mga14.intel.com ([192.55.52.115]:61400)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <jianfeng.tan@intel.com>)
+	id 1eJMNy-0002uy-F5
+	for qemu-devel@nongnu.org; Mon, 27 Nov 2017 11:35:58 -0500
+References: <20171127142515.GA450@yliu-dev>
+	<f7tbmjnpulq.fsf@dhcp-25-97.bos.redhat.com>
+From: "Tan, Jianfeng" <jianfeng.tan@intel.com>
+Message-ID: <d2867f99-2cca-ef43-3797-75aa11281669@intel.com>
+Date: Tue, 28 Nov 2017 00:35:52 +0800
 MIME-Version: 1.0
-In-Reply-To: <35cfeff9-fd4f-ea38-5eaf-c9e7bb7d0428@physik.fu-berlin.de>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-GB
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] glibc "linux: spawni.c: simplify error reporting
- to parent" breaks qemu-user/Windows Service For Linux
+In-Reply-To: <f7tbmjnpulq.fsf@dhcp-25-97.bos.redhat.com>
+Content-Type: text/plain; charset=windows-1252; format=flowed
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [dpdk-dev] [ovs-dev] [PATCH RFC] netdev-dpdk: Fix
+ device obtain mac address when received first packet in vhost type
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,35 +29,104 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: John Paul Adrian Glaubitz <glaubitz@physik.fu-berlin.de>, Peter Maydell <peter.maydell@linaro.org>
-Cc: Rasmus Villemoes <rv@rasmusvillemoes.dk>, QEMU Developers <qemu-devel@nongnu.org>, Michael Karcher <debian@mkarcher.dialup.fu-berlin.de>, James Clarke <jrtc27@jrtc27.com>, Laurent Vivier <laurent@vivier.eu>, Adhemerval Zanella <adhemerval.zanella@linaro.com>
+To: Aaron Conole <aconole@redhat.com>, Yuanhan Liu <yliu@fridaylinux.org>
+Cc: Chen Hailin <chenhl@arraynetworks.com.cn>, "ovs-dev@openvswitch.org" <ovs-dev@openvswitch.org>, Maxime Coquelin <maxime.coquelin@redhat.com>, qemu-devel <qemu-devel@nongnu.org>, dev <dev@dpdk.org>
 
 
 
-On 27/11/2017 14:10, John Paul Adrian Glaubitz wrote:
-> On 11/27/2017 05:07 PM, Adhemerval Zanella wrote:> However I am not very compelled to change internal posix_spawn
->> on GLIBC on Linux mainly because it uses a slight less resources
->> than the generic POSIX one (check e83be730910c) and it works
->> on Linux kernel as expected.
-> 
-> But it breaks QEMU and Microsoft Windows Services for Linux who -
-> combined together - are certainly not a small number of users.
+On 11/28/2017 12:14 AM, Aaron Conole wrote:
+> Yuanhan Liu <yliu@fridaylinux.org> writes:
+>
+>> On Fri, Nov 24, 2017 at 05:59:09PM +0800, Chen Hailin wrote:
+>>> Hi Aaron Conole && Jianfeng,
+>>>
+>>> The stp could not work in ovs-dpdk vhostuser.
+>>> Because the attached vhost device doesn't have MAC address.
+>>>
+>>> Now we have two ways to solve this problem.
+>>> 1. The vhost learns MAC address from packet like as my first patch.
+>> I do agree with Aaron this is not the right way.
+>>
+>>> 2. The virtio notifies MAC address actively to vhost user .
+>> Unfortunately, AFAIK, there is no way to achieve that so far. we could
+>> either let virtio/QEMU to expose the CQ to vhost or add a new VHOST_USER
+>> message to carry the mac address. While vhost-user is a generic interface
+>> adding a virtio-net specific message also doesn't seem quite right.
+>> Exposing CQ is probably the best we can do.
+>>
+>> Anyway, both need spec change.
+> There are other possible ways.  libvirt knows about the mac address from
+> the domain xml file.  Perhaps it's possible to set the mac column in the
+> database to the correct value when the port is being created in ovs?
+> This would be an action taken by the orchestration tool.
 
-You can bring this to libc-alpha, but I am not sure how other 
-maintainers will see to limit the possible Linux API glibc can use 
-because of potentially unsupported semantics of non default emulation 
-layers.
+In OVS db, we can only see vhost port, but not virtio port. That is to 
+say, we could use different mac for vhost port from virtio port, 
+especially when it works as a vrouter instead of vswitch.
 
-I personally do not see it a good precedence because we can't really
-foretell what kind of kernel ABI or semantic the non default 
-emulation runtime will support or not, so we can't really plan to 
-set what will break or not depending of the underlying emulation.
+>
+> Additionally, there's a mechanism in virtio-net to set the mac address
+> from the host to the guest.  Is it possible to expose that functionality
+> through vhost-user?
 
-> 
-> Isn't there any workaround we can use for the time being?
-> 
-> Adrian
-> 
+We can assign mac addr when starting QEMU. After that, I suppose we 
+cannot set mac addr any more, let alone setting it from vhost-user side 
+(vhost-user protocol does not support it yet).
 
-Maybe recompile glibc with the posix implementation instead of the
-Linux one. If I recall correctly it should be a workable replacement.
+Thanks,
+Jianfeng
+
+>
+> Then when the orchestration tool sets the mac, it can be propagated, and
+> mac_in_use can reflect the appropriate value.  I think that's a workable
+> solution, but I might have missed something.
+>
+>> 	--yliu
+>>> In my opinions,  if we treat it as a device,  we should allocate
+>>> MAC address for the device when the VM started.
+>>>
+>>> Which one do you think better?
+>>>
+>>>
+>>>
+>>> Best Regards,
+>>> Chen Hailin
+>>> chenhl@arraynetworks.com.cn
+>>>   
+>>> From: Aaron Conole
+>>> Date: 2017-11-18 10:00
+>>> To: Hailin Chen
+>>> CC: ovs-dev@openvswitch.org; Maxime Coquelin; cloud@arraynetworks.com.cn
+>>> Subject: Re: [ovs-dev] [PATCH RFC] netdev-dpdk: Fix device obtain
+>>> mac address when received first packet in vhost type
+>>> Hi Hailin,
+>>>   
+>>> Hailin Chen <chenhl@arraynetworks.com.cn> writes:
+>>>   
+>>>> The stp could not work on netdev-dpdk if network is loop.
+>>>> Because the stp protocol negotiates designate port by sending
+>>>> BPDU packets which contains MAC address.
+>>>> However the device doesn't have MAC address in vhostuser type.
+>>>> Thus, function send_bpdu_cb would not send BPDU packets.
+>>>>
+>>>> This patch will set the MAC for device when received first packet.
+>>>>
+>>>> Signed-off-by: Hailin Chen <chenhl@arraynetworks.com.cn>
+>>>> ---
+>>>   
+>>> Thanks for the patch.
+>>>   
+>>> In general, I don't think this is the right approach to deal with this
+>>> type of issue.  I believe the problem statement is that OvS bridge is
+>>> unaware of the guest MAC address - did I get it right?  In that case, I
+>>> would think that a better way to solve this would be to have virtio tell
+>>> the mac address of the guest.  I don't recall right now if that's
+>>> allowed in the virtio spec, but I do remember some kind of negotiation
+>>> features.
+>>>   
+>>> I've CC'd Maxime, who is one of the maintainers of the virtio code from
+>>> DPDK side.  Perhaps there is an alternate way to solve this.
+>>> _______________________________________________
+>>> dev mailing list
+>>> dev@openvswitch.org
+>>> https://mail.openvswitch.org/mailman/listinfo/ovs-dev
