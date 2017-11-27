@@ -1,56 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42510)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42882)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <fiuczy@linux.vnet.ibm.com>) id 1eJL74-0001Z3-EH
-	for qemu-devel@nongnu.org; Mon, 27 Nov 2017 10:14:27 -0500
+	(envelope-from <pbonzini@redhat.com>) id 1eJL7m-0001xn-Mk
+	for qemu-devel@nongnu.org; Mon, 27 Nov 2017 10:15:20 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <fiuczy@linux.vnet.ibm.com>) id 1eJL6y-0004Cb-G1
-	for qemu-devel@nongnu.org; Mon, 27 Nov 2017 10:14:26 -0500
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:55056)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <fiuczy@linux.vnet.ibm.com>)
-	id 1eJL6y-0004Bz-6A
-	for qemu-devel@nongnu.org; Mon, 27 Nov 2017 10:14:20 -0500
-Received: from pps.filterd (m0098394.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
-	vARFBujk020702
-	for <qemu-devel@nongnu.org>; Mon, 27 Nov 2017 10:14:16 -0500
-Received: from e06smtp15.uk.ibm.com (e06smtp15.uk.ibm.com [195.75.94.111])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2egn2y89wt-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Mon, 27 Nov 2017 10:14:16 -0500
-Received: from localhost
-	by e06smtp15.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
-	Only! Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <fiuczy@linux.vnet.ibm.com>;
-	Mon, 27 Nov 2017 15:09:12 -0000
-References: <20171121111825.17916-1-pasic@linux.vnet.ibm.com>
-	<1145a6bc-45fd-820a-9dcc-249d9b2802ff@linux.vnet.ibm.com>
-	<20171121172022.5da16158.cohuck@redhat.com>
-	<88bc72cf-732c-fc07-9898-18d7b58b947d@linux.vnet.ibm.com>
-	<20171122131343.26da0482.cohuck@redhat.com>
-	<594e1952-7097-0927-d913-d3b915df2305@linux.vnet.ibm.com>
-	<20171122172522.281cfb4b.cohuck@redhat.com>
-	<76f95c6f-641e-2fe0-73b4-3ab24fc1a93f@linux.vnet.ibm.com>
-	<20171124134650.46665791.cohuck@redhat.com>
-	<7eaa796e-7815-f943-58b5-ecb5a0bb252e@de.ibm.com>
-	<20171124142758.39d7726f.cohuck@redhat.com>
-	<131b311b-c262-3636-c7ee-1c59ee283823@de.ibm.com>
-	<1ddb44db-2c5c-d64f-56e0-e4582f82b572@linux.vnet.ibm.com>
-	<20171124171510.2343ccdf.cohuck@redhat.com>
-	<8c18df3e-92a0-f88f-6d24-e1df051c8138@linux.vnet.ibm.com>
-	<20171127135624.28052dc5.cohuck@redhat.com>
-	<57f95f61-b9d9-1341-78c7-259006cb5945@linux.vnet.ibm.com>
-	<20171127141929.1d692aad.cohuck@redhat.com>
-	<39cb6a69-7f32-80d4-214d-26e1e81a9fd7@linux.vnet.ibm.com>
-From: Boris Fiuczynski <fiuczy@linux.vnet.ibm.com>
-Date: Mon, 27 Nov 2017 16:09:09 +0100
+	(envelope-from <pbonzini@redhat.com>) id 1eJL7h-0004by-2f
+	for qemu-devel@nongnu.org; Mon, 27 Nov 2017 10:15:10 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:38568)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1eJL7g-0004bV-Tf
+	for qemu-devel@nongnu.org; Mon, 27 Nov 2017 10:15:05 -0500
+References: <CAFEAcA9dz9pO_mQ1xtmsT7MW6kXXnNaedgmXe1Eh0Cp53zPz5Q@mail.gmail.com>
+	<f058c3d3-3d8e-4995-0bf7-abadd2c48d99@redhat.com>
+	<CAFEAcA_t0PYZ68HZruWjpeLsU=iOtPbdP9=ETPWXwG+iBRPGrA@mail.gmail.com>
+	<0c5530cd-6f56-bce6-9fdf-91c1468324e4@redhat.com>
+	<CAFEAcA8h6qU5g7t_YE3b-DJEG-gNrCYqYcp6488xQWX00yZuhg@mail.gmail.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <a7109142-28ee-773a-63cb-945ee0fc7ad8@redhat.com>
+Date: Mon, 27 Nov 2017 16:14:57 +0100
 MIME-Version: 1.0
-In-Reply-To: <39cb6a69-7f32-80d4-214d-26e1e81a9fd7@linux.vnet.ibm.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
+In-Reply-To: <CAFEAcA8h6qU5g7t_YE3b-DJEG-gNrCYqYcp6488xQWX00yZuhg@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Message-Id: <2933e058-0217-9696-2c52-613da8ba7a1c@linux.vnet.ibm.com>
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [RFC PATCH 1/1] s390x/css: unresrict cssids
+Subject: Re: [Qemu-devel] javac crash in user-mode emulation: races on
+ page_unprotect()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -59,72 +32,37 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Halil Pasic <pasic@linux.vnet.ibm.com>, Cornelia Huck <cohuck@redhat.com>
-Cc: Christian Borntraeger <borntraeger@de.ibm.com>, Shalini Chellathurai Saroja <shalini@linux.vnet.ibm.com>, qemu-devel@nongnu.org, qemu-s390x@nongnu.org, Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, Richard Henderson <rth@twiddle.net>
 
-On 11/27/2017 03:13 PM, Halil Pasic wrote:
->=20
->=20
-> On 11/27/2017 02:19 PM, Cornelia Huck wrote:
->> On Mon, 27 Nov 2017 14:11:57 +0100
->> Halil Pasic <pasic@linux.vnet.ibm.com> wrote:
->>
->>> On 11/27/2017 01:56 PM, Cornelia Huck wrote:
->>>> On Fri, 24 Nov 2017 17:39:04 +0100
->>>> Halil Pasic <pasic@linux.vnet.ibm.com> wrote:
->>>>   =20
->>>>> On 11/24/2017 05:15 PM, Cornelia Huck wrote:
->>
->>>>>> (Unless we simply make this a "default cssid" prop after all - the=
-n it
->>>>>> would be more than just a simple indication for libvirt...)
->>>>>>     =20
->>>>>
->>>>> We are now talking about the "cssid-unrestricted" property. The def=
-ault
->>>>> cssid is not something I would like to do any time soon.
->>>>
->>>> What's so bad about this? As said above, I think it would be much mo=
-re
->>>> useful. If libvirt can detect r/o vs. r/w for properties, we can sim=
-ply
->>>> start out with a r/o variant now...
->>>>   =20
->>>
->>> I'm not sure I understand you. Are you proposing the following:
->>> Drop the restriction, but don't indicate this via a read only
->>> "cssid-unrestricted" device property but via a "default-css"
->>> read only machine property.
->>>
->>> Libvirt then should know that if "default-css" is present then
->>> we don't have this virtual into 0xfe and non virtual into 0xfd
->>> restriction any more.
->>
->> Yes.
->>
->=20
-> @Boris:
-> Does this work for you? Technically it's equivalent to having
-> "cssid-unrestricted" at machine level.
->=20
-> I don't really like the idea of indicating unrestricted via
-> something mostly unrelated (at least for me it ain't obvious that
-> having the id of the default css exposed means we got rid of the
-> limitation.). But I'm tied of discussing this, so I'm willing to
-> compromise.
->=20
-> Halil
->=20
-I agree with Christian that we should not throw the "setting of a=20
-default cssid" together with "unrestricted cssid" and than use read/only=20
-and read/write to distinguish between the two!
+On 27/11/2017 16:06, Peter Maydell wrote:
+> On 27 November 2017 at 15:53, Paolo Bonzini <pbonzini@redhat.com> wrote=
+:
+>> On 27/11/2017 15:47, Peter Maydell wrote:
+>>> I have a patch from rth based on an idea he and I came up with:
+>>> we add a field to the PageDesc struct to store the thread id of
+>>> the thread that last touches the flags. If you come into the
+>>> segv handler and the page flags/last-modified-by field say "should be
+>>> writeable and somebody else updated it" then you mark the page as
+>>> "last modified by this thread" and retry the access. If the
+>>> flags say "should be writeable, last modified by this thread"
+>>> then you know the page state hasn't changed since this thread
+>>> last saw it as "definitely not causing segvs because of cached TBs",
+>>> and so that should be passed on as a guest SEGV.
+>> Clever, but why would si_code not work?...
+> Do we have a guarantee that it's absolutely never the case that
+> you can get a SEGV with si_code SEGV_ACCERR for an access to memory
+> that's mapped writeable (and conversely that we'll always get
+> SEGV_ACCERR for the "mapped nonwriteable" case)? If it's ever possible
+> then the guest will go into an infinite loop of taking segfaults that
+> should be delivered to the guest but which we just retry the failing
+> access for forever...
 
---=20
-Mit freundlichen Gr=C3=BC=C3=9Fen/Kind regards
-    Boris Fiuczynski
+At least for x86, yes.
 
-IBM Deutschland Research & Development GmbH
-Vorsitzender des Aufsichtsrats: Martina K=C3=B6deritz
-Gesch=C3=A4ftsf=C3=BChrung: Dirk Wittkopp
-Sitz der Gesellschaft: B=C3=B6blingen
-Registergericht: Amtsgericht Stuttgart, HRB 243294
+For ARM, the syndrome values that trigger SEGV_ACCERR are 9-11 and
+13-15, which seems sane to me but I know much less about ARM than x86.
+
+So I would say "yes except for kernel bugs".
+
+Paolo
