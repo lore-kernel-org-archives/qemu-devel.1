@@ -1,28 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52092)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52711)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1eJKVb-0008FL-2p
-	for qemu-devel@nongnu.org; Mon, 27 Nov 2017 09:35:44 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1eJKWn-0000bo-6P
+	for qemu-devel@nongnu.org; Mon, 27 Nov 2017 09:37:02 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1eJKVX-0001ny-5h
-	for qemu-devel@nongnu.org; Mon, 27 Nov 2017 09:35:43 -0500
-Received: from 10.mo173.mail-out.ovh.net ([46.105.74.148]:40081)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1eJKVW-0001nJ-Uu
-	for qemu-devel@nongnu.org; Mon, 27 Nov 2017 09:35:39 -0500
-Received: from player791.ha.ovh.net (gw6.ovh.net [213.251.189.206])
-	by mo173.mail-out.ovh.net (Postfix) with ESMTP id 6742482F50
-	for <qemu-devel@nongnu.org>; Mon, 27 Nov 2017 15:35:34 +0100 (CET)
-Date: Mon, 27 Nov 2017 15:35:17 +0100
-From: Greg Kurz <groug@kaod.org>
-Message-ID: <20171127153517.07406fa1@bahia.lan>
-In-Reply-To: <20171127043003.15034-3-david@gibson.dropbear.id.au>
-References: <20171127043003.15034-1-david@gibson.dropbear.id.au>
-	<20171127043003.15034-3-david@gibson.dropbear.id.au>
+	(envelope-from <peter.maydell@linaro.org>) id 1eJKWh-0002yd-6S
+	for qemu-devel@nongnu.org; Mon, 27 Nov 2017 09:36:57 -0500
+Received: from mail-ot0-x231.google.com ([2607:f8b0:4003:c0f::231]:41973)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1eJKWg-0002y3-WC
+	for qemu-devel@nongnu.org; Mon, 27 Nov 2017 09:36:51 -0500
+Received: by mail-ot0-x231.google.com with SMTP id b54so24322655otd.8
+	for <qemu-devel@nongnu.org>; Mon, 27 Nov 2017 06:36:50 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PULL 2/2] target/ppc: Fix setting of
- cpu->compat_pvr on incoming migration
+In-Reply-To: <e247c73f-7390-1ce8-14d5-5aba2f1b36f8@comstyle.com>
+References: <20171126211356.GA46174@humpty.home.comstyle.com>
+	<CAFEAcA_m0KMfsUYWpdg2LL2y5U88d4-LoXZuUXkGUxtGCgD66g@mail.gmail.com>
+	<e247c73f-7390-1ce8-14d5-5aba2f1b36f8@comstyle.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Mon, 27 Nov 2017 15:36:29 +0100
+Message-ID: <CAFEAcA__P-1VafTXstnKT3vTHRg5RvQToUEUcd6amXQH40FcXA@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH] configure: Fix curses probe for older
+ ncurses
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,53 +31,49 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Gibson <david@gibson.dropbear.id.au>
-Cc: peter.maydell@linaro.org, agraf@suse.de, surajjs@au1.ibm.com, qemu-devel@nongnu.org, qemu-ppc@nongnu.org, Suraj Jitindar Singh <sjitindarsingh@gmail.com>, qemu-stable@nongnu.org
+To: Brad Smith <brad@comstyle.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 
-On Mon, 27 Nov 2017 15:30:03 +1100
-David Gibson <david@gibson.dropbear.id.au> wrote:
+On 27 November 2017 at 14:52, Brad Smith <brad@comstyle.com> wrote:
+> On 11/27/2017 7:02 AM, Peter Maydell wrote:
+>
+>> On 26 November 2017 at 22:13, Brad Smith <brad@comstyle.com> wrote:
+>>>
+>>> Fix the curses probe with older ncurses (.e.g. 5.7, as used by OpenBSD).
+>>>
+>>> ncurses 5.7 requires _XOPEN_SOURCE_EXTENDED to be defined for WACS_*
+>>> constants.
+>>
+>> ncurses 5.7 was released in 2008 and is now 9 years old. Why
+>> is OpenBSD still using such an ancient version?
 
-> From: Suraj Jitindar Singh <sjitindarsingh@gmail.com>
-> 
-> cpu->compat_pvr is used to store the current compat mode of the cpu.
-> 
-> On the receiving side during incoming migration we check compatibility
-> with the compat mode by calling ppc_set_compat(). However we fail to set
-> the compat mode with the hypervisor since the "new" compat mode doesn't
-> differ from the current (due to a "cpu->compat_pvr != compat_pvr" check).
-> This means that kvm runs the vcpus without a compat mode, which is the
-> incorrect behaviour. The implication being that a compatibility mode
-> will never be in effect after migration.
-> 
-> To fix this so that the compat mode is correctly set with the
-> hypervisor, store the desired compat mode and reset cpu->compat_pvr to
-> zero before calling ppc_set_compat().
-> 
-> Fixes: 5dfaa532 ("ppc: fix ppc_set_compat() with KVM PR")
-> 
+> Someone has to put the time and effort into updating it.
 
-Cc'ing stable since 5dfaa532 was shipped with QEMU 2.10
+Yes, but staying up to date with the libraries you ship is
+table stakes for being a serious OS. Having a sufficiently
+large and active developer community that this can happen is
+one of the things that separates "OS usable in production"
+from "hobby project, research project or just defunct OS"
+in my view.
 
-> Signed-off-by: Suraj Jitindar Singh <sjitindarsingh@gmail.com>
-> Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
-> ---
->  target/ppc/machine.c | 4 +++-
->  1 file changed, 3 insertions(+), 1 deletion(-)
-> 
-> diff --git a/target/ppc/machine.c b/target/ppc/machine.c
-> index 384caee800..24117e8f31 100644
-> --- a/target/ppc/machine.c
-> +++ b/target/ppc/machine.c
-> @@ -237,9 +237,11 @@ static int cpu_post_load(void *opaque, int version_id)
->  
->  #if defined(TARGET_PPC64)
->      if (cpu->compat_pvr) {
-> +        uint32_t compat_pvr = cpu->compat_pvr;
->          Error *local_err = NULL;
->  
-> -        ppc_set_compat(cpu, cpu->compat_pvr, &local_err);
-> +        cpu->compat_pvr = 0;
-> +        ppc_set_compat(cpu, compat_pvr, &local_err);
->          if (local_err) {
->              error_report_err(local_err);
->              return -1;
+>> I'm a bit wary of this because we've found in the past that
+>> defining _XOPEN_* defines breaks compilation with some
+>> C libraries which assume that if you define _XOPEN_whatever
+>> it means "only that X/Open stuff and no OS-specific extras",
+>> and we depend on the OS-specific extras.
+>>
+>> That said, I did a test compile on OSX, which was the
+>> one that had trouble previously, so this may be OK. I think
+>> I'd rather leave it until after 2.11 releases, though.
+
+> The other option I was looking at was removing the add_wch() function
+> call from the probe as the rest of the curses code within QEMU compiles
+> Ok without _XOPEN_SOURCE_EXTENDED.
+
+That would break the fix made in commit 7c7030029626 -- we want
+to be sure we're actually getting a wide-character aware version
+of the headers, on systems which might have both the non-widechar
+and widechar headers in different places.
+
+thanks
+-- PMM
