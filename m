@@ -1,35 +1,36 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53217)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53187)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <walling@linux.vnet.ibm.com>) id 1eJOVF-000696-PI
-	for qemu-devel@nongnu.org; Mon, 27 Nov 2017 13:51:38 -0500
-Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <walling@linux.vnet.ibm.com>) id 1eJOVC-0005LZ-Mr
+	(envelope-from <walling@linux.vnet.ibm.com>) id 1eJOVE-00068B-1Z
 	for qemu-devel@nongnu.org; Mon, 27 Nov 2017 13:51:37 -0500
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:57675
+Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
+	(envelope-from <walling@linux.vnet.ibm.com>) id 1eJOVA-0005K7-RE
+	for qemu-devel@nongnu.org; Mon, 27 Nov 2017 13:51:36 -0500
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:53744
 	helo=mx0a-001b2d01.pphosted.com)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <walling@linux.vnet.ibm.com>)
-	id 1eJOVC-0005L9-Gx
-	for qemu-devel@nongnu.org; Mon, 27 Nov 2017 13:51:34 -0500
-Received: from pps.filterd (m0098416.ppops.net [127.0.0.1])
+	id 1eJOVA-0005Jc-LO
+	for qemu-devel@nongnu.org; Mon, 27 Nov 2017 13:51:32 -0500
+Received: from pps.filterd (m0098413.ppops.net [127.0.0.1])
 	by mx0b-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
-	vARIn899018303
-	for <qemu-devel@nongnu.org>; Mon, 27 Nov 2017 13:51:33 -0500
-Received: from e14.ny.us.ibm.com (e14.ny.us.ibm.com [129.33.205.204])
-	by mx0b-001b2d01.pphosted.com with ESMTP id 2egp8jx3sb-1
+	vARIn5Sl106736
+	for <qemu-devel@nongnu.org>; Mon, 27 Nov 2017 13:51:30 -0500
+Received: from e11.ny.us.ibm.com (e11.ny.us.ibm.com [129.33.205.201])
+	by mx0b-001b2d01.pphosted.com with ESMTP id 2egnad9dp3-1
 	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Mon, 27 Nov 2017 13:51:32 -0500
+	for <qemu-devel@nongnu.org>; Mon, 27 Nov 2017 13:51:29 -0500
 Received: from localhost
-	by e14.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	by e11.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
 	Violators will be prosecuted
 	for <qemu-devel@nongnu.org> from <walling@linux.vnet.ibm.com>;
-	Mon, 27 Nov 2017 13:51:31 -0500
+	Mon, 27 Nov 2017 13:51:29 -0500
 From: "Collin L. Walling" <walling@linux.vnet.ibm.com>
-Date: Mon, 27 Nov 2017 13:50:59 -0500
+Date: Mon, 27 Nov 2017 13:50:57 -0500
 In-Reply-To: <1511808659-8846-1-git-send-email-walling@linux.vnet.ibm.com>
 References: <1511808659-8846-1-git-send-email-walling@linux.vnet.ibm.com>
-Message-Id: <1511808659-8846-5-git-send-email-walling@linux.vnet.ibm.com>
-Subject: [Qemu-devel] [PATCH v1 4/4] s390-ccw: interactive boot menu for scsi
+Message-Id: <1511808659-8846-3-git-send-email-walling@linux.vnet.ibm.com>
+Subject: [Qemu-devel] [PATCH v1 2/4] s390-ccw: parse and set boot menu
+ options
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -40,84 +41,132 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: borntraeger@de.ibm.com, frankja@linux.vnet.ibm.com, qemu-s390x@nongnu.org, qemu-devel@nongnu.org
 
-Interactive boot menu for scsi. This follows the same procedure
-as the interactive menu for eckd dasd. An example follows:
+Set boot menu options for an s390 guest and store them in
+the iplb. These options are set via the QEMU command line
+option:
 
-    s390x Enumerated Boot Menu.
+    -boot menu=on|off[,splash-time=X]
 
-    3 entries detected. Select from index 0 to 2.
+or via the libvirt domain xml:
 
-    Please choose:
+    <os>
+      <bootmenu enable='yes|no' timeout='X'/>
+    </os>
+
+Where X represents some positive integer representing
+milliseconds.
 
 Signed-off-by: Collin L. Walling <walling@linux.vnet.ibm.com>
+Reviewed-by: Janosch Frank <frankja@linux.vnet.ibm.com>
 ---
- pc-bios/s390-ccw/bootmap.c  |  9 ++++++---
- pc-bios/s390-ccw/menu.c     | 14 ++++++++++++++
- pc-bios/s390-ccw/s390-ccw.h |  1 +
- 3 files changed, 21 insertions(+), 3 deletions(-)
+ hw/s390x/ipl.c          | 20 ++++++++++++++++++++
+ hw/s390x/ipl.h          |  8 ++++++--
+ pc-bios/s390-ccw/iplb.h |  8 ++++++--
+ 3 files changed, 32 insertions(+), 4 deletions(-)
 
-diff --git a/pc-bios/s390-ccw/bootmap.c b/pc-bios/s390-ccw/bootmap.c
-index 3aea6e0..a917e9d 100644
---- a/pc-bios/s390-ccw/bootmap.c
-+++ b/pc-bios/s390-ccw/bootmap.c
-@@ -558,15 +558,18 @@ static void ipl_scsi(void)
-         }
+diff --git a/hw/s390x/ipl.c b/hw/s390x/ipl.c
+index 0d06fc1..2b73228 100644
+--- a/hw/s390x/ipl.c
++++ b/hw/s390x/ipl.c
+@@ -23,6 +23,7 @@
+ #include "hw/s390x/ebcdic.h"
+ #include "ipl.h"
+ #include "qemu/error-report.h"
++#include "qemu/config-file.h"
  
-         program_table_entries++;
--        if (program_table_entries == loadparm + 1) {
--            break; /* selected entry found */
--        }
-     }
+ #define KERN_IMAGE_START                0x010000UL
+ #define KERN_PARM_AREA                  0x010480UL
+@@ -219,6 +220,21 @@ static Property s390_ipl_properties[] = {
+     DEFINE_PROP_END_OF_LIST(),
+ };
  
-     debug_print_int("program table entries", program_table_entries);
- 
-     IPL_assert(program_table_entries != 0, "Empty Program Table");
- 
-+    if (menu_is_enabled()) {
-+        loadparm = menu_get_enum_boot_index(program_table_entries);
-+    }
-+
-+    prog_table_entry = (ScsiBlockPtr *)(sec + pte_len * (loadparm + 1));
-+
-     zipl_run(prog_table_entry); /* no return */
- }
- 
-diff --git a/pc-bios/s390-ccw/menu.c b/pc-bios/s390-ccw/menu.c
-index 0bd0be6..cb82d61 100644
---- a/pc-bios/s390-ccw/menu.c
-+++ b/pc-bios/s390-ccw/menu.c
-@@ -96,6 +96,20 @@ int menu_get_zipl_boot_index(const char *data)
-     return menu_get_boot_index(i - 1);
- }
- 
-+int menu_get_enum_boot_index(int entries)
++static void s390_ipl_set_boot_menu(uint8_t *boot_menu_enabled,
++                                   uint16_t *boot_menu_timeout)
 +{
-+    char tmp[4];
++    QemuOptsList *plist = qemu_find_opts("boot-opts");
++    QemuOpts *opts = QTAILQ_FIRST(&plist->head);
++    char *p;
 +
-+    sclp_print("s390x Enumerated Boot Menu.\n\n");
++    *boot_menu_enabled = qemu_opt_get_bool(opts, "menu", false);
 +
-+    sclp_print(itostr(entries, tmp));
-+    sclp_print(" entries detected. Select from boot index 0 to ");
-+    sclp_print(itostr(entries - 1, tmp));
-+    sclp_print(".\n\n");
-+
-+    return menu_get_boot_index(entries);
++    if (*boot_menu_enabled) {
++        p = (char *)qemu_opt_get(opts, "splash-time");
++        *boot_menu_timeout = p ? strtol(p, &p, 10) : 0;
++    }
 +}
 +
- void menu_enable(uint16_t boot_menu_timeout)
+ static bool s390_gen_initial_iplb(S390IPLState *ipl)
  {
-     timeout = boot_menu_timeout;
-diff --git a/pc-bios/s390-ccw/s390-ccw.h b/pc-bios/s390-ccw/s390-ccw.h
-index 3a9c873..1a410a6 100644
---- a/pc-bios/s390-ccw/s390-ccw.h
-+++ b/pc-bios/s390-ccw/s390-ccw.h
-@@ -89,6 +89,7 @@ void zipl_load(void);
- void menu_enable(uint16_t boot_menu_timeout);
- int menu_is_enabled(void);
- int menu_get_zipl_boot_index(const char *data);
-+int menu_get_enum_boot_index(int entries);
+     DeviceState *dev_st;
+@@ -245,6 +261,8 @@ static bool s390_gen_initial_iplb(S390IPLState *ipl)
+             ipl->iplb.pbt = S390_IPL_TYPE_CCW;
+             ipl->iplb.ccw.devno = cpu_to_be16(ccw_dev->sch->devno);
+             ipl->iplb.ccw.ssid = ccw_dev->sch->ssid & 3;
++            s390_ipl_set_boot_menu(&ipl->iplb.ccw.boot_menu_enabled,
++                                   &ipl->iplb.ccw.boot_menu_timeout);
+         } else if (sd) {
+             SCSIBus *bus = scsi_bus_from_device(sd);
+             VirtIOSCSI *vdev = container_of(bus, VirtIOSCSI, bus);
+@@ -266,6 +284,8 @@ static bool s390_gen_initial_iplb(S390IPLState *ipl)
+             ipl->iplb.scsi.channel = cpu_to_be16(sd->channel);
+             ipl->iplb.scsi.devno = cpu_to_be16(ccw_dev->sch->devno);
+             ipl->iplb.scsi.ssid = ccw_dev->sch->ssid & 3;
++            s390_ipl_set_boot_menu(&ipl->iplb.scsi.boot_menu_enabled,
++                                   &ipl->iplb.scsi.boot_menu_timeout);
+         } else {
+             return false; /* unknown device */
+         }
+diff --git a/hw/s390x/ipl.h b/hw/s390x/ipl.h
+index 8a705e0..7c960b1 100644
+--- a/hw/s390x/ipl.h
++++ b/hw/s390x/ipl.h
+@@ -17,7 +17,9 @@
  
- static inline void fill_hex(char *out, unsigned char val)
- {
+ struct IplBlockCcw {
+     uint64_t netboot_start_addr;
+-    uint8_t  reserved0[77];
++    uint8_t  reserved0[74];
++    uint8_t  boot_menu_enabled;
++    uint16_t boot_menu_timeout;
+     uint8_t  ssid;
+     uint16_t devno;
+     uint8_t  vm_flags;
+@@ -51,7 +53,9 @@ struct IplBlockQemuScsi {
+     uint32_t lun;
+     uint16_t target;
+     uint16_t channel;
+-    uint8_t  reserved0[77];
++    uint8_t  reserved0[74];
++    uint8_t  boot_menu_enabled;
++    uint16_t boot_menu_timeout;
+     uint8_t  ssid;
+     uint16_t devno;
+ } QEMU_PACKED;
+diff --git a/pc-bios/s390-ccw/iplb.h b/pc-bios/s390-ccw/iplb.h
+index 890aed9..658d163 100644
+--- a/pc-bios/s390-ccw/iplb.h
++++ b/pc-bios/s390-ccw/iplb.h
+@@ -14,7 +14,9 @@
+ 
+ struct IplBlockCcw {
+     uint64_t netboot_start_addr;
+-    uint8_t  reserved0[77];
++    uint8_t  reserved0[74];
++    uint8_t  boot_menu_enabled;
++    uint16_t boot_menu_timeout;
+     uint8_t  ssid;
+     uint16_t devno;
+     uint8_t  vm_flags;
+@@ -48,7 +50,9 @@ struct IplBlockQemuScsi {
+     uint32_t lun;
+     uint16_t target;
+     uint16_t channel;
+-    uint8_t  reserved0[77];
++    uint8_t  reserved0[74];
++    uint8_t  boot_menu_enabled;
++    uint16_t boot_menu_timeout;
+     uint8_t  ssid;
+     uint16_t devno;
+ } __attribute__ ((packed));
 -- 
 2.7.4
