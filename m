@@ -1,27 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34653)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35764)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <brad@comstyle.com>) id 1eJJq4-0002rh-LH
-	for qemu-devel@nongnu.org; Mon, 27 Nov 2017 08:52:49 -0500
+	(envelope-from <bounces@canonical.com>) id 1eJJsZ-0003kh-6L
+	for qemu-devel@nongnu.org; Mon, 27 Nov 2017 08:55:29 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <brad@comstyle.com>) id 1eJJq1-00083y-IQ
-	for qemu-devel@nongnu.org; Mon, 27 Nov 2017 08:52:48 -0500
-Received: from speedy.comstyle.com ([2001:470:1d:8c::2]:39522
-	helo=mail.comstyle.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <brad@comstyle.com>) id 1eJJq1-00082w-Bi
-	for qemu-devel@nongnu.org; Mon, 27 Nov 2017 08:52:45 -0500
-References: <20171126211356.GA46174@humpty.home.comstyle.com>
-	<CAFEAcA_m0KMfsUYWpdg2LL2y5U88d4-LoXZuUXkGUxtGCgD66g@mail.gmail.com>
-From: Brad Smith <brad@comstyle.com>
-Message-ID: <e247c73f-7390-1ce8-14d5-5aba2f1b36f8@comstyle.com>
-Date: Mon, 27 Nov 2017 08:52:43 -0500
+	(envelope-from <bounces@canonical.com>) id 1eJJsU-0000f5-V0
+	for qemu-devel@nongnu.org; Mon, 27 Nov 2017 08:55:23 -0500
+Received: from indium.canonical.com ([91.189.90.7]:33956)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1eJJsU-0000eV-Ml
+	for qemu-devel@nongnu.org; Mon, 27 Nov 2017 08:55:18 -0500
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1eJJsT-0000oB-Ot
+	for <qemu-devel@nongnu.org>; Mon, 27 Nov 2017 13:55:17 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id B98372E804B
+	for <qemu-devel@nongnu.org>; Mon, 27 Nov 2017 13:55:17 +0000 (UTC)
 MIME-Version: 1.0
-In-Reply-To: <CAFEAcA_m0KMfsUYWpdg2LL2y5U88d4-LoXZuUXkGUxtGCgD66g@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH] configure: Fix curses probe for older
- ncurses
+Date: Mon, 27 Nov 2017 13:43:05 -0000
+From: Thomas Huth <1401798@bugs.launchpad.net>
+Reply-To: Bug 1401798 <1401798@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <20141212081522.22342.50676.malonedeb@gac.canonical.com>
+Message-Id: <151179018564.18387.11440738002105602598.malone@gac.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1401798] Re: Qemu 2.2.0 savevm crash.
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,117 +36,76 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
+To: qemu-devel@nongnu.org
 
-On 11/27/2017 7:02 AM, Peter Maydell wrote:
+Triaging old bug tickets... can you still reproduce this issue with the
+latest version of QEMU? Or could we close this ticket nowadays?
 
-> On 26 November 2017 at 22:13, Brad Smith <brad@comstyle.com> wrote:
->> Fix the curses probe with older ncurses (.e.g. 5.7, as used by OpenBSD=
-).
->>
->> ncurses 5.7 requires _XOPEN_SOURCE_EXTENDED to be defined for WACS_* c=
-onstants.
-> ncurses 5.7 was released in 2008 and is now 9 years old. Why
-> is OpenBSD still using such an ancient version?
+** Changed in: qemu
+       Status: New =3D> Incomplete
 
-Someone has to put the time and effort into updating it.
+-- =
 
-revision 1.61
-date: 2010/09/06 17:26:17;=C2=A0 author: nicm;=C2=A0 state: Exp;=C2=A0 li=
-nes: +257 -5;
-Enable wide character support in ncurses. It is built into libcurses,
-libform, libmenu, libpanel and each library is also linked to a
-corresponding "w" version.
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1401798
 
-This is a major bump for all four libraries.
+Title:
+  Qemu 2.2.0 savevm crash.
 
-Thanks to landry, stsp, sthen, naddy, oga, Martin Pieuchot, and anyone
-else I've forgotten for testing.
+Status in QEMU:
+  Incomplete
 
-ok naddy krw deraadt
-----------------------------
-revision 1.60
-date: 2010/01/12 23:21:59;=C2=A0 author: nicm;=C2=A0 state: Exp;=C2=A0 li=
-nes: +768 -638;
-Update to ncurses 5.7, with local changes reapplied.
+Bug description:
+  qemu 2.1.2 is good.
 
-This is around eight years worth of changes (previously we were around=20
-ncurses
-5.2), too many to list - many bug fixes and also a few new functions.
+  (gdb) bt
+  #0  0x00007ffff4aae445 in raise () from /lib/x86_64-linux-gnu/libc.so.6
+  #1  0x00007ffff4ab1bab in abort () from /lib/x86_64-linux-gnu/libc.so.6
+  #2  0x0000555555997951 in qcow2_cache_find_entry_to_replace (c=3D0x555556=
+389780) at block/qcow2-cache.c:262
+  #3  0x0000555555997a1a in qcow2_cache_do_get (bs=3D0x5555563836f0, c=3D0x=
+555556389780, offset=3D1094713344, table=3D0x7fffffffc528, =
 
-A major bump for libcurses, libpanel, libform and libmenu.
+      read_from_disk=3Dtrue) at block/qcow2-cache.c:285
+  #4  0x0000555555997c45 in qcow2_cache_get (bs=3D0x5555563836f0, c=3D0x555=
+556389780, offset=3D1094713344, table=3D0x7fffffffc528)
+      at block/qcow2-cache.c:331
+  #5  0x0000555555991ca9 in l2_allocate (bs=3D0x5555563836f0, l1_index=3D1,=
+ table=3D0x7fffffffc5a0) at block/qcow2-cluster.c:247
+  #6  0x000055555599290c in get_cluster_table (bs=3D0x5555563836f0, offset=
+=3D549755813888, new_l2_table=3D0x7fffffffc610, =
 
-ok deraadt
-----------------------------
-revision 1.59
-date: 2001/02/28 22:58:53;=C2=A0 author: millert;=C2=A0 state: Exp;=C2=A0=
- lines: +2 -2;
-ncurses-5.2-20010224
-----------------------------
-revision 1.58
-date: 2001/02/22 04:16:34;=C2=A0 author: millert;=C2=A0 state: Exp;=C2=A0=
- lines: +2 -2;
-Update to ncurses-5.2-20010210:
-o remove macro callPutChar() from tty_update.c, since this is no longer
- =C2=A0 needed (reported by Philippe Blain).
-o add a null-pointer check in tic.c to handle the case when the input
- =C2=A0 file is really empty.=C2=A0 Modify the next_char() function in co=
-mp_scan.c
- =C2=A0 to allow arbitrarily long lines, and incidentally supply a newlin=
-e to
- =C2=A0 files that do not end in a newline.=C2=A0 These changes improve t=
-ic's
- =C2=A0 recovery from attempts to read binary files, e.g., its output fro=
-m
- =C2=A0 the terminfo database (reported by Bernhard Rosenkraenzer).
-o revert change to c++/demo.cc from 20001209, which changed definition
- =C2=A0 of main() apparently to accommodate cygwin linker, but broke the =
-demo
- =C2=A0 program.
-----------------------------
-revision 1.57
-date: 2001/01/22 18:01:33;=C2=A0 author: millert;=C2=A0 state: Exp;=C2=A0=
- lines: +497 -484;
-Update to ncurses-5.2-20010114
-----------------------------
-revision 1.56
-date: 2000/12/06 17:18:49;=C2=A0 author: deraadt;=C2=A0 state: Exp;=C2=A0=
- lines: +3 -3;
-use __x__ formats for __attribute__ arguments; guenther@gac.edu
-----------------------------
-revision 1.55
-date: 2000/10/22 18:27:19;=C2=A0 author: millert;=C2=A0 state: Exp;=C2=A0=
- lines: +4 -4;
-update to ncurses 5.2
+      new_l2_index=3D0x7fffffffc62c) at block/qcow2-cluster.c:620
+  #7  0x0000555555994213 in discard_single_l2 (bs=3D0x5555563836f0, offset=
+=3D549755813888, nb_clusters=3D156, type=3DQCOW2_DISCARD_NEVER, =
 
->> Signed-off-by: Brad Smith <brad@comstyle.com>
->>
->>
->> diff --git a/configure b/configure
->> index 0c6e7572db..9715b9c2cc 100755
->> --- a/configure
->> +++ b/configure
->> @@ -3186,7 +3186,7 @@ EOF
->>     IFS=3D:
->>     for curses_inc in $curses_inc_list; do
->>       # Make sure we get the wide character prototypes
->> -    curses_inc=3D"-DNCURSES_WIDECHAR $curses_inc"
->> +    curses_inc=3D"-DNCURSES_WIDECHAR -D_XOPEN_SOURCE_EXTENDED $curses=
-_inc"
-> I'm a bit wary of this because we've found in the past that
-> defining _XOPEN_* defines breaks compilation with some
-> C libraries which assume that if you define _XOPEN_whatever
-> it means "only that X/Open stuff and no OS-specific extras",
-> and we depend on the OS-specific extras.
->
-> That said, I did a test compile on OSX, which was the
-> one that had trouble previously, so this may be OK. I think
-> I'd rather leave it until after 2.11 releases, though.
->
-> thanks
-> -- PMM
+      full_discard=3Dfalse) at block/qcow2-cluster.c:1425
+  #8  0x0000555555994491 in qcow2_discard_clusters (bs=3D0x5555563836f0, of=
+fset=3D549755813888, nb_sectors=3D638976, type=3DQCOW2_DISCARD_NEVER, =
 
-The other option I was looking at was removing the add_wch() function
-call from the probe as the rest of the curses code within QEMU compiles
-Ok without _XOPEN_SOURCE_EXTENDED.
+      full_discard=3Dfalse) at block/qcow2-cluster.c:1516
+  #9  0x00005555559965c8 in qcow2_snapshot_create (bs=3D0x5555563836f0, sn_=
+info=3D0x7fffffffc830) at block/qcow2-snapshot.c:441
+  #10 0x00005555559ad1ad in bdrv_snapshot_create (bs=3D0x5555563836f0, sn_i=
+nfo=3D0x7fffffffc830) at block/snapshot.c:167
+  #11 0x000055555565e90f in do_savevm (mon=3D0x555556992d20, qdict=3D0x5555=
+599d5c00) at /vms/qemu/qemu-2.2.0/savevm.c:1126
+
+  (gdb) show args
+  Argument list to give program being debugged when it is started is "-name=
+ u1404-01 -S -machine pc,accel=3Dkvm,usb=3Doff -m 1024 -smp 2,sockets=3D2,c=
+ores=3D1,threads=3D1 -no-user-config -nodefaults -monitor stdio -rtc base=
+=3Dutc -no-shutdown -device piix3-usb-uhci,id=3Dusb,bus=3Dpci.0,addr=3D0x1.=
+0x2 -device virtio-serial-pci,id=3Dvirtio-serial0,bus=3Dpci.0,addr=3D0x5 -d=
+rive file=3D/vms/images/u1404-01.img,if=3Dnone,id=3Ddrive-virtio-disk0,form=
+at=3Dqcow2,cache=3Ddirectsync -device virtio-blk-pci,scsi=3Doff,bus=3Dpci.0=
+,addr=3D0x4,drive=3Ddrive-virtio-disk0,id=3Dvirtio-disk0 -drive if=3Dnone,i=
+d=3Ddrive-ide0-1-0,readonly=3Don,format=3Draw -device ide-cd,bus=3Dide.1,un=
+it=3D0,drive=3Ddrive-ide0-1-0,id=3Dide0-1-0 -chardev pty,id=3Dcharserial0 -=
+device isa-serial,chardev=3Dcharserial0,id=3Dserial0 -device usb-tablet,id=
+=3Dinput0 -vnc 0.0.0.0:0 -device cirrus-vga,id=3Dvideo0,bus=3Dpci.0,addr=3D=
+0x2 -device virtio-balloon-pci,id=3Dballoon0,bus=3Dpci.0,addr=3D0x6".
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1401798/+subscriptions
