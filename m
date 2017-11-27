@@ -1,36 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45812)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49678)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1eJMhe-0008JY-Ch
-	for qemu-devel@nongnu.org; Mon, 27 Nov 2017 11:56:19 -0500
+	(envelope-from <aconole@redhat.com>) id 1eJMn3-0002m3-PY
+	for qemu-devel@nongnu.org; Mon, 27 Nov 2017 12:01:55 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1eJMhZ-0008Kk-H7
-	for qemu-devel@nongnu.org; Mon, 27 Nov 2017 11:56:18 -0500
-Date: Mon, 27 Nov 2017 17:56:07 +0100
-From: Cornelia Huck <cohuck@redhat.com>
-Message-ID: <20171127175607.75bd999e.cohuck@redhat.com>
-In-Reply-To: <2933e058-0217-9696-2c52-613da8ba7a1c@linux.vnet.ibm.com>
-References: <20171121111825.17916-1-pasic@linux.vnet.ibm.com>
-	<88bc72cf-732c-fc07-9898-18d7b58b947d@linux.vnet.ibm.com>
-	<20171122131343.26da0482.cohuck@redhat.com>
-	<594e1952-7097-0927-d913-d3b915df2305@linux.vnet.ibm.com>
-	<20171122172522.281cfb4b.cohuck@redhat.com>
-	<76f95c6f-641e-2fe0-73b4-3ab24fc1a93f@linux.vnet.ibm.com>
-	<20171124134650.46665791.cohuck@redhat.com>
-	<7eaa796e-7815-f943-58b5-ecb5a0bb252e@de.ibm.com>
-	<20171124142758.39d7726f.cohuck@redhat.com>
-	<131b311b-c262-3636-c7ee-1c59ee283823@de.ibm.com>
-	<1ddb44db-2c5c-d64f-56e0-e4582f82b572@linux.vnet.ibm.com>
-	<20171124171510.2343ccdf.cohuck@redhat.com>
-	<8c18df3e-92a0-f88f-6d24-e1df051c8138@linux.vnet.ibm.com>
-	<20171127135624.28052dc5.cohuck@redhat.com>
-	<57f95f61-b9d9-1341-78c7-259006cb5945@linux.vnet.ibm.com>
-	<20171127141929.1d692aad.cohuck@redhat.com>
-	<39cb6a69-7f32-80d4-214d-26e1e81a9fd7@linux.vnet.ibm.com>
-	<2933e058-0217-9696-2c52-613da8ba7a1c@linux.vnet.ibm.com>
+	(envelope-from <aconole@redhat.com>) id 1eJMmy-0004Sp-0p
+	for qemu-devel@nongnu.org; Mon, 27 Nov 2017 12:01:53 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:41576)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <aconole@redhat.com>) id 1eJMmx-0004Qs-OD
+	for qemu-devel@nongnu.org; Mon, 27 Nov 2017 12:01:47 -0500
+From: Aaron Conole <aconole@redhat.com>
+References: <20171127142515.GA450@yliu-dev>
+	<411329b7-5164-c24e-2e5e-8cf25079c4b9@intel.com>
+Date: Mon, 27 Nov 2017 12:01:41 -0500
+In-Reply-To: <411329b7-5164-c24e-2e5e-8cf25079c4b9@intel.com> (Jianfeng Tan's
+	message of "Mon, 27 Nov 2017 23:34:10 +0800")
+Message-ID: <f7tfu8zodu2.fsf@dhcp-25-97.bos.redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [RFC PATCH 1/1] s390x/css: unresrict cssids
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [dpdk-dev] [ovs-dev] [PATCH RFC] netdev-dpdk: Fix
+ device obtain mac address when received first packet in vhost type
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -39,106 +28,96 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Boris Fiuczynski <fiuczy@linux.vnet.ibm.com>
-Cc: Halil Pasic <pasic@linux.vnet.ibm.com>, Christian Borntraeger <borntraeger@de.ibm.com>, Shalini Chellathurai Saroja <shalini@linux.vnet.ibm.com>, qemu-devel@nongnu.org, qemu-s390x@nongnu.org, Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>
+To: "Tan, Jianfeng" <jianfeng.tan@intel.com>
+Cc: Yuanhan Liu <yliu@fridaylinux.org>, Chen Hailin <chenhl@arraynetworks.com.cn>, "ovs-dev@openvswitch.org" <ovs-dev@openvswitch.org>, Maxime Coquelin <maxime.coquelin@redhat.com>, cloud <cloud@arraynetworks.com.cn>, qemu-devel <qemu-devel@nongnu.org>, dev <dev@dpdk.org>
 
-On Mon, 27 Nov 2017 16:09:09 +0100
-Boris Fiuczynski <fiuczy@linux.vnet.ibm.com> wrote:
+"Tan, Jianfeng" <jianfeng.tan@intel.com> writes:
 
-> On 11/27/2017 03:13 PM, Halil Pasic wrote:
-> > 
-> > 
-> > On 11/27/2017 02:19 PM, Cornelia Huck wrote:  
-> >> On Mon, 27 Nov 2017 14:11:57 +0100
-> >> Halil Pasic <pasic@linux.vnet.ibm.com> wrote:
-> >>  
-> >>> On 11/27/2017 01:56 PM, Cornelia Huck wrote:  
-> >>>> On Fri, 24 Nov 2017 17:39:04 +0100
-> >>>> Halil Pasic <pasic@linux.vnet.ibm.com> wrote:
-> >>>>      
-> >>>>> On 11/24/2017 05:15 PM, Cornelia Huck wrote:  
-> >>  
-> >>>>>> (Unless we simply make this a "default cssid" prop after all - then it
-> >>>>>> would be more than just a simple indication for libvirt...)
-> >>>>>>        
-> >>>>>
-> >>>>> We are now talking about the "cssid-unrestricted" property. The default
-> >>>>> cssid is not something I would like to do any time soon.  
-> >>>>
-> >>>> What's so bad about this? As said above, I think it would be much more
-> >>>> useful. If libvirt can detect r/o vs. r/w for properties, we can simply
-> >>>> start out with a r/o variant now...
-> >>>>      
-> >>>
-> >>> I'm not sure I understand you. Are you proposing the following:
-> >>> Drop the restriction, but don't indicate this via a read only
-> >>> "cssid-unrestricted" device property but via a "default-css"
-> >>> read only machine property.
-> >>>
-> >>> Libvirt then should know that if "default-css" is present then
-> >>> we don't have this virtual into 0xfe and non virtual into 0xfd
-> >>> restriction any more.  
-> >>
-> >> Yes.
-> >>  
-> > 
-> > @Boris:
-> > Does this work for you? Technically it's equivalent to having
-> > "cssid-unrestricted" at machine level.
-> > 
-> > I don't really like the idea of indicating unrestricted via
-> > something mostly unrelated (at least for me it ain't obvious that
-> > having the id of the default css exposed means we got rid of the
-> > limitation.). But I'm tied of discussing this, so I'm willing to
-> > compromise.
-> > 
-> > Halil
-> >   
-> I agree with Christian that we should not throw the "setting of a 
-> default cssid" together with "unrestricted cssid" and than use read/only 
-> and read/write to distinguish between the two!
-> 
+> On 11/27/2017 10:27 PM, Yuanhan Liu wrote:
+>> On Fri, Nov 24, 2017 at 05:59:09PM +0800, Chen Hailin wrote:
+>>> Hi Aaron Conole && Jianfeng,
+>>>
+>>> The stp could not work in ovs-dpdk vhostuser.
+>>> Because the attached vhost device doesn't have MAC address.
+>>>
+>>> Now we have two ways to solve this problem.
+>>> 1. The vhost learns MAC address from packet like as my first patch.
+>> I do agree with Aaron this is not the right way.
+>
+> I do think it should be the vswitch's responsibility to learn mac of
+> vhost port.
+>
+> Except that it's the only feasible way without modifying the spec
+> (yuanhan already makes it very clear below), we can treat the vswitch
+> as a phsical switch, VM as a physical server, virtio/vhost port as a
+> back-to-back connected NICs, the only way of the physical switch to
+> know the mac of the NIC on the other side is ARP learning.
+>
+> Might I ask why you don't think it's a right way?
 
-OK, let's step back and summarize a bit.
+As a quick example, I think a malicious guest in a multi-tenant
+environment could send traffic out to manipulate this feature into
+learning an incorrect mac address.
 
-Current situation:
-- virtual devices must go into 0xfe, non-virtual devices must go into
-  non-0xfe
-- 0xfe is the default cssid; non-mcss-e OSs see only devices in there
-- to expose non-virtual devices to today's guests, you need to use the
-  squash-mcss parameter, which tries to put non-virtual devices into
-  the same place in css 0xfe
+To get this right requires doing deep packet inspection, and making sure
+to only learn based on certain l2 traffic.
 
-This is problematic in various ways (potential for incomprehensible
-errors, amongst others), so we agreed that the way to go is to drop the
-virtual-vs-non-virtual cssid restrictions and allow any device in any
-css image.
-
-Now, we need a way for libvirt to detect this, so that it knows that it
-can put e.g. vfio-ccw devices in the same css image as virtio devices.
-
-Proposal 1: Use a device attribute to show that the device can be put
-anywhere. This approach feels wrong to me (the non-restriction is not a
-property of the individual device, but of the whole css resp. the
-machine), so I would continue to veto this.
-
-Proposal 2: Export the default cssid as a machine property. If this
-property exists, it also implies that devices can be put into any css
-image (although it makes the most sense to put them into the default
-css image as indicated by the property). Can be made r/w later if it is
-too much for 2.12.
-
-Proposal 3: Add a machine property that indicates cssids are not
-restricted. Later, optionally add a second property that exposes the
-default cssid and makes it configurable.
-
-Personally, I prefer 2 (especially as this also allows to find out
-where the best place to put devices for non-mcss-e enabled guests is),
-but I could live with 3 as well (if making this r/w later would be
-problematic for libvirt.)
-
-(In every case, we would deprecate and later remove the squash
-parameter.)
-
-[As an aside, how hard is it to make the default cssid configurable? At
-a glance, it does not seem too bad to me.]
+> Thanks,
+> Jianfeng
+>
+>>
+>>> 2. The virtio notifies MAC address actively to vhost user .
+>> Unfortunately, AFAIK, there is no way to achieve that so far. we could
+>> either let virtio/QEMU to expose the CQ to vhost or add a new VHOST_USER
+>> message to carry the mac address. While vhost-user is a generic interface
+>> adding a virtio-net specific message also doesn't seem quite right.
+>> Exposing CQ is probably the best we can do.
+>>
+>> Anyway, both need spec change.
+>>
+>> 	--yliu
+>>> In my opinions,  if we treat it as a device,  we should allocate
+>>> MAC address for the device when the VM started.
+>>>
+>>> Which one do you think better?
+>>>
+>>>
+>>>
+>>> Best Regards,
+>>> Chen Hailin
+>>> chenhl@arraynetworks.com.cn
+>>>   From: Aaron Conole
+>>> Date: 2017-11-18 10:00
+>>> To: Hailin Chen
+>>> CC: ovs-dev@openvswitch.org; Maxime Coquelin; cloud@arraynetworks.com.cn
+>>> Subject: Re: [ovs-dev] [PATCH RFC] netdev-dpdk: Fix device obtain
+>>> mac address when received first packet in vhost type
+>>> Hi Hailin,
+>>>   Hailin Chen <chenhl@arraynetworks.com.cn> writes:
+>>>   
+>>>> The stp could not work on netdev-dpdk if network is loop.
+>>>> Because the stp protocol negotiates designate port by sending
+>>>> BPDU packets which contains MAC address.
+>>>> However the device doesn't have MAC address in vhostuser type.
+>>>> Thus, function send_bpdu_cb would not send BPDU packets.
+>>>>
+>>>> This patch will set the MAC for device when received first packet.
+>>>>
+>>>> Signed-off-by: Hailin Chen <chenhl@arraynetworks.com.cn>
+>>>> ---
+>>>   Thanks for the patch.
+>>>   In general, I don't think this is the right approach to deal with
+>>> this
+>>> type of issue.  I believe the problem statement is that OvS bridge is
+>>> unaware of the guest MAC address - did I get it right?  In that case, I
+>>> would think that a better way to solve this would be to have virtio tell
+>>> the mac address of the guest.  I don't recall right now if that's
+>>> allowed in the virtio spec, but I do remember some kind of negotiation
+>>> features.
+>>>   I've CC'd Maxime, who is one of the maintainers of the virtio
+>>> code from
+>>> DPDK side.  Perhaps there is an alternate way to solve this.
+>>> _______________________________________________
+>>> dev mailing list
+>>> dev@openvswitch.org
+>>> https://mail.openvswitch.org/mailman/listinfo/ovs-dev
