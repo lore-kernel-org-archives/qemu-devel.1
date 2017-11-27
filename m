@@ -1,26 +1,35 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49713)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58966)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jcd@tribudubois.net>) id 1eJPsM-00021q-0X
-	for qemu-devel@nongnu.org; Mon, 27 Nov 2017 15:19:35 -0500
+	(envelope-from <walling@linux.vnet.ibm.com>) id 1eJQRv-0003WT-Ps
+	for qemu-devel@nongnu.org; Mon, 27 Nov 2017 15:56:20 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jcd@tribudubois.net>) id 1eJPsI-0005Dy-RE
-	for qemu-devel@nongnu.org; Mon, 27 Nov 2017 15:19:34 -0500
-Received: from relay4-d.mail.gandi.net ([217.70.183.196]:41263)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <jcd@tribudubois.net>) id 1eJPsI-0005Di-J4
-	for qemu-devel@nongnu.org; Mon, 27 Nov 2017 15:19:30 -0500
-References: <20171122063250.7674-1-jcd@tribudubois.net>
-	<3d54e331-07f3-dd43-e2b6-aded54ccaf6f@ilande.co.uk>
-From: Jean-Christophe DUBOIS <jcd@tribudubois.net>
-Message-ID: <3a7ef463-a4ff-bc54-e250-705660bd078a@tribudubois.net>
-Date: Mon, 27 Nov 2017 21:19:26 +0100
-MIME-Version: 1.0
-In-Reply-To: <3d54e331-07f3-dd43-e2b6-aded54ccaf6f@ilande.co.uk>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 8bit
-Content-Language: en-US
-Subject: Re: [Qemu-devel] [PATCH] Remove MemoryRegionSection check code from
- sparc_cpu_get_phys_page_debug()
+	(envelope-from <walling@linux.vnet.ibm.com>) id 1eJQRr-0003Ta-Gy
+	for qemu-devel@nongnu.org; Mon, 27 Nov 2017 15:56:19 -0500
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:59696
+	helo=mx0a-001b2d01.pphosted.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <walling@linux.vnet.ibm.com>)
+	id 1eJQRr-0003Sd-BX
+	for qemu-devel@nongnu.org; Mon, 27 Nov 2017 15:56:15 -0500
+Received: from pps.filterd (m0098416.ppops.net [127.0.0.1])
+	by mx0b-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
+	vARKsZc6009274
+	for <qemu-devel@nongnu.org>; Mon, 27 Nov 2017 15:56:13 -0500
+Received: from e11.ny.us.ibm.com (e11.ny.us.ibm.com [129.33.205.201])
+	by mx0b-001b2d01.pphosted.com with ESMTP id 2egp8k2tnd-1
+	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Mon, 27 Nov 2017 15:56:12 -0500
+Received: from localhost
+	by e11.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <walling@linux.vnet.ibm.com>;
+	Mon, 27 Nov 2017 15:56:12 -0500
+From: "Collin L. Walling" <walling@linux.vnet.ibm.com>
+Date: Mon, 27 Nov 2017 15:55:33 -0500
+In-Reply-To: <1511816136-30068-1-git-send-email-walling@linux.vnet.ibm.com>
+References: <1511816136-30068-1-git-send-email-walling@linux.vnet.ibm.com>
+Message-Id: <1511816136-30068-3-git-send-email-walling@linux.vnet.ibm.com>
+Subject: [Qemu-devel] [PATCH v1 2/5] s390-ccw: ipl structs for eckd cdl/ldl
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,133 +38,165 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, qemu-devel@nongnu.org
-Cc: Artyom Tarasenko <atar4qemu@gmail.com>
+To: borntraeger@de.ibm.com, frankja@linux.vnet.ibm.com, qemu-s390x@nongnu.org, qemu-devel@nongnu.org
 
-Hello Mark,
+ECKD DASDs have different IPL structures for CDL and LDL
+formats. The current Ipl1 and Ipl2 structs follow the CDL
+format, so we prepend "EckdCdl" to them. A new struct,
+EckdLdlIpl1 is introduced and contains boot info for LDL.
 
-Did you get any second opinion on this?
+Also introduce structs for IPL stages 1 and 1b and for
+disk geometry.
 
-Also do you need me to resend the patch with the SPARC keyword in the 
-patch subject line?
+Signed-off-by: Collin L. Walling <walling@linux.vnet.ibm.com>
+Acked-by: Janosch Frank <frankja@linux.vnet.ibm.com>
+---
+ pc-bios/s390-ccw/bootmap.c | 24 ++++++++++----------
+ pc-bios/s390-ccw/bootmap.h | 55 +++++++++++++++++++++++++++++++++-------------
+ 2 files changed, 53 insertions(+), 26 deletions(-)
 
-Regards
-
-JC
-
-Le 23/11/2017 à 20:49, Mark Cave-Ayland a écrit :
-> On 22/11/17 06:32, Jean-Christophe Dubois wrote:
->
->> This code is preventing the MMU debug code from displaying virtual
->> mappings of IO devices (anything that is not located in the RAM).
->>
->> Before this patch, Qemu would output 0xffffffffffffffff (-1) as the
->> physical address corresponding to a IO device virtual address.
->>
->> With this patch the intended physical adresse is displayed.
->>
->> Signed-off-by: Jean-Christophe Dubois <jcd@tribudubois.net>
->> ---
->>   target/sparc/mmu_helper.c | 6 ------
->>   1 file changed, 6 deletions(-)
->>
->> diff --git a/target/sparc/mmu_helper.c b/target/sparc/mmu_helper.c
->> index d5b6c1e48c..f2d2250e7a 100644
->> --- a/target/sparc/mmu_helper.c
->> +++ b/target/sparc/mmu_helper.c
->> @@ -857,18 +857,12 @@ hwaddr sparc_cpu_get_phys_page_debug(CPUState *cs, vaddr addr)
->>       CPUSPARCState *env = &cpu->env;
->>       hwaddr phys_addr;
->>       int mmu_idx = cpu_mmu_index(env, false);
->> -    MemoryRegionSection section;
->>   
->>       if (cpu_sparc_get_phys_page(env, &phys_addr, addr, 2, mmu_idx) != 0) {
->>           if (cpu_sparc_get_phys_page(env, &phys_addr, addr, 0, mmu_idx) != 0) {
->>               return -1;
->>           }
->>       }
->> -    section = memory_region_find(get_system_memory(), phys_addr, 1);
->> -    memory_region_unref(section.mr);
->> -    if (!int128_nz(section.size)) {
->> -        return -1;
->> -    }
->>       return phys_addr;
->>   }
->>   #endif
-> Hi Jean-Christophe,
->
-> Thanks for looking into this and providing the patch. I asked on IRC to
-> see if anyone could explain what this code was trying to do and Peter
-> suggested that it could be related to when cpu_get_phys_page_debug()
-> used to have to be more resilient to bad conditions such as missing
-> mappings.
->
-> Tracing through the git log I see it was introduced as part of commit
-> cc4aa830 "sparc: avoid cpu_get_physical_page_desc()":
->
-> diff --git a/target-sparc/mmu_helper.c b/target-sparc/mmu_helper.c
-> index 8cdc224..bdff1c3 100644
-> --- a/target-sparc/mmu_helper.c
-> +++ b/target-sparc/mmu_helper.c
-> @@ -19,6 +19,7 @@
->
->   #include "cpu.h"
->   #include "trace.h"
-> +#include "exec-memory.h"
->
->   /* Sparc MMU emulation */
->
-> @@ -839,13 +840,15 @@ target_phys_addr_t
-> cpu_get_phys_page_debug(CPUState *env, target_ulong addr)
->   {
->       target_phys_addr_t phys_addr;
->       int mmu_idx = cpu_mmu_index(env);
-> +    MemoryRegionSection section;
->
->       if (cpu_sparc_get_phys_page(env, &phys_addr, addr, 2, mmu_idx) != 0) {
->           if (cpu_sparc_get_phys_page(env, &phys_addr, addr, 0, mmu_idx)
-> != 0) {
->               return -1;
->           }
->       }
-> -    if (cpu_get_physical_page_desc(phys_addr) == IO_MEM_UNASSIGNED) {
-> +    section = memory_region_find(get_system_memory(), phys_addr, 1);
-> +    if (!section.size) {
->           return -1;
->       }
->       return phys_addr;
->
-> and cpu_get_physical_page_desc() used to look like this:
->
-> /* XXX: temporary until new memory mapping API */
-> uint32_t cpu_get_physical_page_desc(target_phys_addr_t addr)
-> {
->      PhysPageDesc *p;
->
->      p = phys_page_find(addr >> TARGET_PAGE_BITS);
->      if (!p)
->          return IO_MEM_UNASSIGNED;
->      return p->phys_offset;
-> }
->
-> i.e. IO_MEM_UNASSIGNED indicates there is no physical mapping for this
-> virtual address.
->
-> Now I've had a look at some of the other *_get_phys_page_debug()
-> functions and I don't see any similar logic (and in fact the git log for
-> PPC details the simplification of the ppc_*_get_phys_page_debug()
-> functions by removing permission checks etc.) so I'm inclined to think
-> that commit cc4aa830 did the wrong thing by restricting lookups to the
-> system memory address space and the patch is correct.
->
-> I'd like a second opinion if possible before queuing this patch as I'm
-> not overly familiar with this area of the code (and what the exact
-> behaviour for debug MMIO accesses should be), but otherwise it looks
-> good - the only part missing is a "sparc: " prefix to the subject line.
->
->
-> ATB,
->
-> Mark.
->
->
+diff --git a/pc-bios/s390-ccw/bootmap.c b/pc-bios/s390-ccw/bootmap.c
+index 6f8e30f..5546b79 100644
+--- a/pc-bios/s390-ccw/bootmap.c
++++ b/pc-bios/s390-ccw/bootmap.c
+@@ -221,9 +221,9 @@ static void run_eckd_boot_script(block_number_t mbr_block_nr)
+ static void ipl_eckd_cdl(void)
+ {
+     XEckdMbr *mbr;
+-    Ipl2 *ipl2 = (void *)sec;
++    EckdCdlIpl2 *ipl2 = (void *)sec;
+     IplVolumeLabel *vlbl = (void *)sec;
+-    block_number_t block_nr;
++    block_number_t mbr_block_nr;
+ 
+     /* we have just read the block #0 and recognized it as "IPL1" */
+     sclp_print("CDL\n");
+@@ -231,7 +231,7 @@ static void ipl_eckd_cdl(void)
+     memset(sec, FREE_SPACE_FILLER, sizeof(sec));
+     read_block(1, ipl2, "Cannot read IPL2 record at block 1");
+ 
+-    mbr = &ipl2->u.x.mbr;
++    mbr = &ipl2->mbr;
+     IPL_assert(magic_match(mbr, ZIPL_MAGIC), "No zIPL section in IPL2 record.");
+     IPL_assert(block_size_ok(mbr->blockptr.xeckd.bptr.size),
+                "Bad block size in zIPL section of IPL2 record.");
+@@ -239,7 +239,7 @@ static void ipl_eckd_cdl(void)
+                "Non-ECKD device type in zIPL section of IPL2 record.");
+ 
+     /* save pointer to Boot Script */
+-    block_nr = eckd_block_num((void *)&(mbr->blockptr));
++    mbr_block_nr = eckd_block_num((void *)&(mbr->blockptr));
+ 
+     memset(sec, FREE_SPACE_FILLER, sizeof(sec));
+     read_block(2, vlbl, "Cannot read Volume Label at block 2");
+@@ -249,7 +249,7 @@ static void ipl_eckd_cdl(void)
+                "Invalid magic of volser block");
+     print_volser(vlbl->f.volser);
+ 
+-    run_eckd_boot_script(block_nr);
++    run_eckd_boot_script(mbr_block_nr);
+     /* no return */
+ }
+ 
+@@ -280,8 +280,8 @@ static void print_eckd_ldl_msg(ECKD_IPL_mode_t mode)
+ 
+ static void ipl_eckd_ldl(ECKD_IPL_mode_t mode)
+ {
+-    block_number_t block_nr;
+-    BootInfo *bip = (void *)(sec + 0x70); /* BootInfo is MBR for LDL */
++    block_number_t mbr_block_nr;
++    EckdLdlIpl1 *ipl1 = (void *)sec;
+ 
+     if (mode != ECKD_LDL_UNLABELED) {
+         print_eckd_ldl_msg(mode);
+@@ -292,15 +292,17 @@ static void ipl_eckd_ldl(ECKD_IPL_mode_t mode)
+     memset(sec, FREE_SPACE_FILLER, sizeof(sec));
+     read_block(0, sec, "Cannot read block 0 to grab boot info.");
+     if (mode == ECKD_LDL_UNLABELED) {
+-        if (!magic_match(bip->magic, ZIPL_MAGIC)) {
++        if (!magic_match(ipl1->boot_info.magic, ZIPL_MAGIC)) {
+             return; /* not applicable layout */
+         }
+         sclp_print("unlabeled LDL.\n");
+     }
+-    verify_boot_info(bip);
++    verify_boot_info(&ipl1->boot_info);
++
++    mbr_block_nr =
++        eckd_block_num((void *)&(ipl1->boot_info.bp.ipl.bm_ptr.eckd.bptr));
+ 
+-    block_nr = eckd_block_num((void *)&(bip->bp.ipl.bm_ptr.eckd.bptr));
+-    run_eckd_boot_script(block_nr);
++    run_eckd_boot_script(mbr_block_nr);
+     /* no return */
+ }
+ 
+diff --git a/pc-bios/s390-ccw/bootmap.h b/pc-bios/s390-ccw/bootmap.h
+index 4980838..a2b4695 100644
+--- a/pc-bios/s390-ccw/bootmap.h
++++ b/pc-bios/s390-ccw/bootmap.h
+@@ -226,22 +226,47 @@ typedef struct BootInfo {          /* @ 0x70, record #0    */
+     } bp;
+ } __attribute__ ((packed)) BootInfo; /* see also XEckdMbr   */
+ 
+-typedef struct Ipl1 {
+-    unsigned char key[4]; /* == "IPL1" */
+-    unsigned char data[24];
+-} __attribute__((packed)) Ipl1;
++/*
++ * Structs for IPL
++ */
++#define STAGE2_BLK_CNT_MAX  24 /* Stage 1b can load up to 24 blocks */
+ 
+-typedef struct Ipl2 {
+-    unsigned char key[4]; /* == "IPL2" */
+-    union {
+-        unsigned char data[144];
+-        struct {
+-            unsigned char reserved1[92-4];
+-            XEckdMbr mbr;
+-            unsigned char reserved2[144-(92-4)-sizeof(XEckdMbr)];
+-        } x;
+-    } u;
+-} __attribute__((packed)) Ipl2;
++typedef struct EckdCdlIpl1 {
++    uint8_t key[4]; /* == "IPL1" */
++    uint8_t data[24];
++} __attribute__((packed)) EckdCdlIpl1;
++
++typedef struct BootEckdSeekarg {
++    uint16_t pad;
++    uint16_t cyl;
++    uint16_t head;
++    uint8_t sec;
++    uint8_t pad2;
++} __attribute__ ((packed)) BootEckdSeekarg;
++
++typedef struct BootEckdStage1b {
++    uint8_t reserved[32 * STAGE2_BLK_CNT_MAX];
++    struct BootEckdSeekarg seek[STAGE2_BLK_CNT_MAX];
++    uint8_t unused[64];
++} __attribute__ ((packed)) BootEckdStage1b;
++
++typedef struct BootEckdStage1 {
++    uint8_t reserved[72];
++    struct BootEckdSeekarg seek[2];
++} __attribute__ ((packed)) BootEckdStage1;
++
++typedef struct EckdCdlIpl2 {
++    uint8_t key[4]; /* == "IPL2" */
++    struct BootEckdStage1 stage1;
++    XEckdMbr mbr;
++    uint8_t reserved2[24];
++} __attribute__((packed)) EckdCdlIpl2;
++
++typedef struct EckdLdlIpl1 {
++    uint8_t reserved[24];
++    struct BootEckdStage1 stage1;
++    BootInfo boot_info; /* BootInfo is MBR for LDL */
++} __attribute__((packed)) EckdLdlIpl1;
+ 
+ typedef struct IplVolumeLabel {
+     unsigned char key[4]; /* == "VOL1" */
+-- 
+2.7.4
