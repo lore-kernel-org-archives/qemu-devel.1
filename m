@@ -1,23 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57156)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35063)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <rkagan@virtuozzo.com>) id 1eJIli-0005zS-G8
-	for qemu-devel@nongnu.org; Mon, 27 Nov 2017 07:44:15 -0500
+	(envelope-from <cohuck@redhat.com>) id 1eJIxe-0000cb-J7
+	for qemu-devel@nongnu.org; Mon, 27 Nov 2017 07:56:37 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <rkagan@virtuozzo.com>) id 1eJIld-0006WW-JR
-	for qemu-devel@nongnu.org; Mon, 27 Nov 2017 07:44:14 -0500
-Received: from mail-eopbgr40117.outbound.protection.outlook.com
-	([40.107.4.117]:45024
-	helo=EUR03-DB5-obe.outbound.protection.outlook.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <rkagan@virtuozzo.com>)
-	id 1eJIlc-0006Vl-SL
-	for qemu-devel@nongnu.org; Mon, 27 Nov 2017 07:44:09 -0500
-From: Roman Kagan <rkagan@virtuozzo.com>
-Date: Mon, 27 Nov 2017 15:43:55 +0300
-Message-Id: <20171127124355.26015-1-rkagan@virtuozzo.com>
+	(envelope-from <cohuck@redhat.com>) id 1eJIxa-0004w9-M3
+	for qemu-devel@nongnu.org; Mon, 27 Nov 2017 07:56:34 -0500
+Date: Mon, 27 Nov 2017 13:56:24 +0100
+From: Cornelia Huck <cohuck@redhat.com>
+Message-ID: <20171127135624.28052dc5.cohuck@redhat.com>
+In-Reply-To: <8c18df3e-92a0-f88f-6d24-e1df051c8138@linux.vnet.ibm.com>
+References: <20171121111825.17916-1-pasic@linux.vnet.ibm.com>
+	<20171121144457.60adb0c3.cohuck@redhat.com>
+	<1145a6bc-45fd-820a-9dcc-249d9b2802ff@linux.vnet.ibm.com>
+	<20171121172022.5da16158.cohuck@redhat.com>
+	<88bc72cf-732c-fc07-9898-18d7b58b947d@linux.vnet.ibm.com>
+	<20171122131343.26da0482.cohuck@redhat.com>
+	<594e1952-7097-0927-d913-d3b915df2305@linux.vnet.ibm.com>
+	<20171122172522.281cfb4b.cohuck@redhat.com>
+	<76f95c6f-641e-2fe0-73b4-3ab24fc1a93f@linux.vnet.ibm.com>
+	<20171124134650.46665791.cohuck@redhat.com>
+	<7eaa796e-7815-f943-58b5-ecb5a0bb252e@de.ibm.com>
+	<20171124142758.39d7726f.cohuck@redhat.com>
+	<131b311b-c262-3636-c7ee-1c59ee283823@de.ibm.com>
+	<1ddb44db-2c5c-d64f-56e0-e4582f82b572@linux.vnet.ibm.com>
+	<20171124171510.2343ccdf.cohuck@redhat.com>
+	<8c18df3e-92a0-f88f-6d24-e1df051c8138@linux.vnet.ibm.com>
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: [Qemu-devel] [PATCH v2] util: add is_equal to UUID API
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [RFC PATCH 1/1] s390x/css: unresrict cssids
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,86 +37,38 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org, Fam Zheng <famz@redhat.com>, Thomas Huth <thuth@redhat.com>, "Daniel P. Berrange" <berrange@redhat.com>
-Cc: "Denis V. Lunev" <den@openvz.org>
+To: Halil Pasic <pasic@linux.vnet.ibm.com>
+Cc: Christian Borntraeger <borntraeger@de.ibm.com>, Shalini Chellathurai Saroja <shalini@linux.vnet.ibm.com>, qemu-devel@nongnu.org, qemu-s390x@nongnu.org, Boris Fiuczynski <fiuczy@linux.vnet.ibm.com>, Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>
 
-It's going to be useful, in particular, in VMBus code massively using
-uuids aka GUIDs.
+On Fri, 24 Nov 2017 17:39:04 +0100
+Halil Pasic <pasic@linux.vnet.ibm.com> wrote:
 
-Signed-off-by: Roman Kagan <rkagan@virtuozzo.com>
----
-v1 -> v2:
- - drop dedicated testcase (for it was of no value) and incorporate
-   is_null and is_equal assertions into uuid_generate testcase
+> On 11/24/2017 05:15 PM, Cornelia Huck wrote:
+> >>> In theory this should work. 
+> >>>
+> >>> In reality it seems more complicated. A per-device property is easy and can be
+> >>> inspected on the command line (e.g. -device virtio-blk-ccw,help), while a new 
+> >>> machine property would require to change the qemu help output and qemu-options 
+> >>> file (which makes it visible for all architectures).    
+> >> And then we have the fun of describing, that this property is weird, and can
+> >> not be set, and it's value does not matter.  
+> > Well, that's the case for both, no?  
+> 
+> 
+> I don't think we have to document _device_ properites in qemu-options.hx
+> I don't see any documented neither for virtio-ccw nor for vfio-ccw. The
+> machine properties, on the contrary, are documented in this file.
 
- include/qemu/uuid.h | 2 ++
- tests/test-uuid.c   | 8 +++++++-
- util/uuid.c         | 7 ++++++-
- 3 files changed, 15 insertions(+), 2 deletions(-)
+But not having to describe it does not make it any less weird.
 
-diff --git a/include/qemu/uuid.h b/include/qemu/uuid.h
-index afe4840296..09489ce5c5 100644
---- a/include/qemu/uuid.h
-+++ b/include/qemu/uuid.h
-@@ -48,6 +48,8 @@ void qemu_uuid_generate(QemuUUID *out);
- 
- int qemu_uuid_is_null(const QemuUUID *uu);
- 
-+int qemu_uuid_is_equal(const QemuUUID *lhv, const QemuUUID *rhv);
-+
- void qemu_uuid_unparse(const QemuUUID *uuid, char *out);
- 
- char *qemu_uuid_unparse_strdup(const QemuUUID *uuid);
-diff --git a/tests/test-uuid.c b/tests/test-uuid.c
-index d3a2791fd4..22b4b0727d 100644
---- a/tests/test-uuid.c
-+++ b/tests/test-uuid.c
-@@ -93,12 +93,18 @@ static inline bool uuid_is_valid(QemuUUID *uuid)
- 
- static void test_uuid_generate(void)
- {
-+    QemuUUID uuid_not_null = { { {
-+        0x58, 0x6e, 0xce, 0x27, 0x7f, 0x09, 0x41, 0xe0,
-+        0x9e, 0x74, 0xe9, 0x01, 0x31, 0x7e, 0x9d, 0x42
-+    } } };
-     QemuUUID uuid;
-     int i;
- 
-     for (i = 0; i < 100; ++i) {
-         qemu_uuid_generate(&uuid);
-         g_assert(uuid_is_valid(&uuid));
-+        g_assert_false(qemu_uuid_is_null(&uuid));
-+        g_assert_false(qemu_uuid_is_equal(&uuid_not_null, &uuid));
-     }
- }
- 
-@@ -168,8 +174,8 @@ static void test_uuid_unparse_strdup(void)
- int main(int argc, char **argv)
- {
-     g_test_init(&argc, &argv, NULL);
--    g_test_add_func("/uuid/generate", test_uuid_generate);
-     g_test_add_func("/uuid/is_null", test_uuid_is_null);
-+    g_test_add_func("/uuid/generate", test_uuid_generate);
-     g_test_add_func("/uuid/parse", test_uuid_parse);
-     g_test_add_func("/uuid/unparse", test_uuid_unparse);
-     g_test_add_func("/uuid/unparse_strdup", test_uuid_unparse_strdup);
-diff --git a/util/uuid.c b/util/uuid.c
-index dd6b5fdf05..ebf06c049a 100644
---- a/util/uuid.c
-+++ b/util/uuid.c
-@@ -41,7 +41,12 @@ void qemu_uuid_generate(QemuUUID *uuid)
- int qemu_uuid_is_null(const QemuUUID *uu)
- {
-     static QemuUUID null_uuid;
--    return memcmp(uu, &null_uuid, sizeof(QemuUUID)) == 0;
-+    return qemu_uuid_is_equal(uu, &null_uuid);
-+}
-+
-+int qemu_uuid_is_equal(const QemuUUID *lhv, const QemuUUID *rhv)
-+{
-+    return memcmp(lhv, rhv, sizeof(QemuUUID)) == 0;
- }
- 
- void qemu_uuid_unparse(const QemuUUID *uuid, char *out)
--- 
-2.14.3
+> > 
+> > (Unless we simply make this a "default cssid" prop after all - then it
+> > would be more than just a simple indication for libvirt...)
+> >   
+> 
+> We are now talking about the "cssid-unrestricted" property. The default
+> cssid is not something I would like to do any time soon.
+
+What's so bad about this? As said above, I think it would be much more
+useful. If libvirt can detect r/o vs. r/w for properties, we can simply
+start out with a r/o variant now...
