@@ -1,31 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41853)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43125)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <adhemerval.zanella@linaro.org>) id 1eJLwu-0005jV-4V
-	for qemu-devel@nongnu.org; Mon, 27 Nov 2017 11:08:01 -0500
+	(envelope-from <tpearson@raptorengineering.com>) id 1eJLyM-0006Rr-8V
+	for qemu-devel@nongnu.org; Mon, 27 Nov 2017 11:09:34 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <adhemerval.zanella@linaro.org>) id 1eJLwn-0005H3-Q9
-	for qemu-devel@nongnu.org; Mon, 27 Nov 2017 11:08:00 -0500
-Received: from mail-qk0-x244.google.com ([2607:f8b0:400d:c09::244]:35152)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <adhemerval.zanella@linaro.org>)
-	id 1eJLwn-0005Gn-KG
-	for qemu-devel@nongnu.org; Mon, 27 Nov 2017 11:07:53 -0500
-Received: by mail-qk0-x244.google.com with SMTP id p19so33054180qke.2
-	for <qemu-devel@nongnu.org>; Mon, 27 Nov 2017 08:07:53 -0800 (PST)
-References: <ab2eda3b-571f-025e-66e9-6c1577793a08@physik.fu-berlin.de>
-	<b3becdc0-6540-30a6-b70b-8312ac5dddd9@physik.fu-berlin.de>
-	<af9abebc-0650-a7c7-e63d-adafaa7031d6@linaro.org>
-	<CAFEAcA_mR86vZhqe7yZwUdSSFyKDcms6UoK-NnXgW2ER8GL5tw@mail.gmail.com>
-From: Adhemerval Zanella <adhemerval.zanella@linaro.org>
-Message-ID: <9e520d68-0aba-1a32-06d9-351e90d0a7bf@linaro.org>
-Date: Mon, 27 Nov 2017 14:07:46 -0200
+	(envelope-from <tpearson@raptorengineering.com>) id 1eJLyG-00066k-0E
+	for qemu-devel@nongnu.org; Mon, 27 Nov 2017 11:09:30 -0500
+Received: from mail.rptsys.com ([192.119.205.245]:12698)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <tpearson@raptorengineering.com>)
+	id 1eJLyF-00065Z-9E
+	for qemu-devel@nongnu.org; Mon, 27 Nov 2017 11:09:23 -0500
+Message-ID: <5A1C38AF.5000108@raptorengineering.com>
+Date: Mon, 27 Nov 2017 10:09:19 -0600
+From: Timothy Pearson <tpearson@raptorengineering.com>
 MIME-Version: 1.0
-In-Reply-To: <CAFEAcA_mR86vZhqe7yZwUdSSFyKDcms6UoK-NnXgW2ER8GL5tw@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-GB
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] glibc "linux: spawni.c: simplify error reporting
- to parent" breaks qemu-user/Windows Service For Linux
+References: <20171121212534.5177-1-richard.henderson@linaro.org>
+In-Reply-To: <20171121212534.5177-1-richard.henderson@linaro.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v6 00/26] tcg: generic vector operations
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,98 +27,119 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: John Paul Adrian Glaubitz <glaubitz@physik.fu-berlin.de>, Rasmus Villemoes <rv@rasmusvillemoes.dk>, QEMU Developers <qemu-devel@nongnu.org>, Michael Karcher <debian@mkarcher.dialup.fu-berlin.de>, James Clarke <jrtc27@jrtc27.com>, Laurent Vivier <laurent@vivier.eu>, Adhemerval Zanella <adhemerval.zanella@linaro.com>
+To: Richard Henderson <richard.henderson@linaro.org>
+Cc: qemu-devel@nongnu.org
 
+Just as a note, I've been watching these series with great interest.
+Once the changes settle down / are mergeable we will be looking to
+implement vector <--> vector support between a couple of other
+architectures.
 
+Thanks for working on this!
 
-On 27/11/2017 13:24, Peter Maydell wrote:
-> On 27 November 2017 at 12:57, Adhemerval Zanella
-> <adhemerval.zanella@linaro.org> wrote:
->> We found out this potential bogus assert on 2.27 development [1] which
->> resulted in two fixes [2][3].
->>
->> It should not be an issue for generic posix_spawn usage where there is
->> no expectation system/user/program kills random pids (since posix_spawn
->> auxiliary process has not yet returned). Some say the possible kind of
->> behaviour is rather undefined, but it shouldn't also trigger an assert.
->>
->> I am not really sure what is happening in qemu usermode because comment
->> #4 in the bug reports states clone is returning an error and it should
->> not trigger the assert in first place.  What seems to be happening in
->> this scenario is clone is actually returning a success, but the auxiliary
->> process is being killed before actually calling execve.
+On 11/21/2017 03:25 PM, Richard Henderson wrote:
+> Quite a lot has changed since last time.
 > 
-> The bug report is a bit confused, but I think what is happening
-> in the QEMU case is that QEMU implements clone(CLONE_VFORK) as having
-> the same semantics as fork() (ie the parent will not autowait for
-> the child, and the child does not share a memory map with the parent).
-> (ie QEMU treats it as having the semantics of a vfork() call, which
-> is allowed to be implemented as fork()).
-
-Right, that explains what is happening. 
-
-> Previous versions of glibc's posix_spawn() could cope with this
-> divergence from the kernel's native clone() behaviour, but the
-> rewrite can't. It's not unreasonable for glibc() to rely on the
-> kernel behaviour, but on the other hand it's not too surprising
-> if this breaks non-kernel implementations of the syscall ABI
-> like QEMU and the MS Linux subsystem, because it's a tricky
-> corner case that previously nobody was trying to use.
-
-The problem is vfork is such a broken API [1] that even POSIX has 
-deprecated it on the latest 2008 standard. It was used on GLIBC
-posix_spawn on some specific usage (old POSIX_SPAWN_USEVFORK 
-flag) only because it was 'faster' than using fork, however
-it also created its own set bugs [2][3][4][5].
-
-Current implementation is as fast as using vfork on Linux using
-which should be platform neutral clone flags and assumptions
-(in fact we found out that Linux does not work as expected with
-clone (CLONE_VFORK | CLONE_VM) -> exit -> waitpid (WNOHANG)
-which resulted in aa95a2414).
-
-GLIBC also maintains another implementation at 
-sysdeps/posix/spawni.c which should be more platform neutral
-since it uses only POSIX expected semantics (the synchronization
-is done using a pipe2 instead of CLONE_VM, so a vfork acting
-as fork shouldn't be a problem). It is not used in any architecture
-on GLIBC currently.
-
-However I am not very compelled to change internal posix_spawn
-on GLIBC on Linux mainly because it uses a slight less resources
-than the generic POSIX one (check e83be730910c) and it works
-on Linux kernel as expected.
-
-[1] https://ewontfix.com/7/
-[2] https://sourceware.org/bugzilla/show_bug.cgi?id=14750
-[3] https://sourceware.org/bugzilla/show_bug.cgi?id=14749
-[4] https://sourceware.org/bugzilla/show_bug.cgi?id=14499
-[5] https://sourceware.org/bugzilla/show_bug.cgi?id=10354
-
+> The representation has changed such that the vector length and element
+> size is stored in the TCGOp structure.  The functions have changed such
+> that the element size is passed explicitly rather than being encoded in
+> the function name.
 > 
-> Unfortunately I can't really think of a mechanism for implementing
-> this in QEMU usermode, because the only tools we have available
-> for creating new threads and processes are the ones the host libc
-> gives us: so we can spawn new threads with pthread_create() and
-> fork the process with fork(), but we don't have a safe way to
-> create a new process which shares the memory map and where the
-> new process can call the various libc functions which QEMU will
-> do as it executes the guest code.
+> I've added additional operations for multiply, immediate shifts, compares,
+> element interleaves, and widening.  I believe this is all we'll need for
+> implementing ARM SVE, so I'll leave off for now.
+> 
+> This has been tested vs aa64 risu on both x86_64 and aa64 hosts.
+> 
+> 
+> r~
+> 
+> 
+> Richard Henderson (26):
+>   tcg: Remove TCGV_UNUSED* and TCGV_IS_UNUSED*
+>   tcg: Dynamically allocate TCGOps
+>   tcg: Generalize TCGOp parameters
+>   tcg: Add types and basic operations for host vectors
+>   tcg: Add generic vector expanders
+>   tcg: Allow multiple word entries into the constant pool
+>   tcg: Add tcg_signed_cond
+>   target/arm: Align vector registers
+>   target/arm: Use vector infrastructure for aa64 add/sub/logic
+>   target/arm: Use vector infrastructure for aa64 mov/not/neg
+>   target/arm: Use vector infrastructure for aa64 dup/movi
+>   tcg/i386: Add vector operations
+>   tcg: Add tcg_expand_vec_op and tcg-target.opc.h
+>   tcg: Add generic vector ops for interleave
+>   target/arm: Use vector infrastructure for aa64 zip/uzp/trn/xtn
+>   tcg: Add generic vector ops for constant shifts
+>   target/arm: Use vector infrastructure for aa64 constant shifts
+>   tcg: Add generic vector ops for comparisons
+>   target/arm: Use vector infrastructure for aa64 compares
+>   tcg/i386: Add vector operations/expansions for shift/cmp/interleave
+>   tcg: Add generic vector ops for multiplication
+>   target/arm: Use vector infrastructure for aa64 multiplies
+>   tcg: Add generic vector ops for extension
+>   target/arm: Use vector infrastructure for aa64 widening shifts
+>   tcg/i386: Add vector operations/expansions for mul/extend
+>   tcg/aarch64: Add vector operations
+> 
+>  Makefile.target               |    4 +-
+>  accel/tcg/tcg-runtime.h       |  102 +++
+>  include/exec/gen-icount.h     |    9 +-
+>  include/qemu/queue.h          |    5 +
+>  target/arm/cpu.h              |    2 +-
+>  target/arm/translate.h        |   10 +-
+>  tcg/aarch64/tcg-target.h      |   30 +-
+>  tcg/aarch64/tcg-target.opc.h  |    3 +
+>  tcg/i386/tcg-target.h         |   46 +-
+>  tcg/i386/tcg-target.opc.h     |   11 +
+>  tcg/tcg-gvec-desc.h           |   49 +
+>  tcg/tcg-op-gvec.h             |  219 +++++
+>  tcg/tcg-op.h                  |   55 +-
+>  tcg/tcg-opc.h                 |   59 ++
+>  tcg/tcg.h                     |  135 ++-
+>  accel/tcg/tcg-runtime-gvec.c  |  616 +++++++++++++
+>  target/alpha/translate.c      |   22 +-
+>  target/arm/translate-a64.c    | 1135 ++++++++++++++++-------
+>  target/arm/translate.c        |   31 +-
+>  target/cris/translate.c       |    4 +-
+>  target/hppa/translate.c       |   63 +-
+>  target/i386/translate.c       |   13 +-
+>  target/lm32/translate.c       |    2 -
+>  target/m68k/translate.c       |   14 +-
+>  target/microblaze/translate.c |    4 -
+>  target/mips/translate.c       |    2 +-
+>  target/nios2/translate.c      |    6 +-
+>  target/ppc/translate.c        |    2 +-
+>  target/s390x/translate.c      |   42 +-
+>  target/sh4/translate.c        |    2 +-
+>  target/sparc/translate.c      |    2 +-
+>  target/tilegx/translate.c     |   10 +-
+>  target/unicore32/translate.c  |    4 +-
+>  tcg/aarch64/tcg-target.inc.c  |  674 +++++++++++++-
+>  tcg/i386/tcg-target.inc.c     | 1325 +++++++++++++++++++++++++--
+>  tcg/optimize.c                |   20 +-
+>  tcg/tcg-op-gvec.c             | 2010 +++++++++++++++++++++++++++++++++++++++++
+>  tcg/tcg-op-vec.c              |  566 ++++++++++++
+>  tcg/tcg-op.c                  |   24 -
+>  tcg/tcg-pool.inc.c            |  115 ++-
+>  tcg/tcg.c                     |  286 ++++--
+>  accel/tcg/Makefile.objs       |    2 +-
+>  tcg/README                    |  148 +++
+>  43 files changed, 7107 insertions(+), 776 deletions(-)
+>  create mode 100644 tcg/aarch64/tcg-target.opc.h
+>  create mode 100644 tcg/i386/tcg-target.opc.h
+>  create mode 100644 tcg/tcg-gvec-desc.h
+>  create mode 100644 tcg/tcg-op-gvec.h
+>  create mode 100644 accel/tcg/tcg-runtime-gvec.c
+>  create mode 100644 tcg/tcg-op-gvec.c
+>  create mode 100644 tcg/tcg-op-vec.c
+> 
 
-Current GLIBC won't trigger any assert anymore (and it was backported
-to 2.25 and 2.26 branch as well), however I am not sure if posix_spawn 
-semantic will works for all the expected scenarios in qemu user-mode.
 
-Most likely any failure (sched_set{param,scheduler}, setsid, setpgid,
-seteuid, any file action or execve itself) won't be advertise to main
-process, since err is set 0 as default and the auxiliary process will
-write to a expected shared memory to signalling an issue. 
-
-Also, I don't think trying to emulate "CLONE_VM | CLONE_VFORK" with
-pthread_create without actually synchronize the threads will work
-as expected. If clone actually uses CLONE_VFORK I would expect the
-underlying qemu usermode to block the caller thread (using a condition
-variable or a barrier) and to release its execution only for execve
-or exit in the callee. I am not very versed on qemu code, so I 
-am not sure how complex it would be.
+-- 
+Timothy Pearson
+Raptor Engineering
++1 (415) 727-8645 (direct line)
++1 (512) 690-0200 (switchboard)
+https://www.raptorengineering.com
