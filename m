@@ -1,27 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58100)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59054)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1eJKho-0004S5-TH
-	for qemu-devel@nongnu.org; Mon, 27 Nov 2017 09:48:21 -0500
+	(envelope-from <Dennis.Chen@arm.com>) id 1eJDNN-0007XQ-2g
+	for qemu-devel@nongnu.org; Mon, 27 Nov 2017 01:58:46 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1eJKho-00076Q-3J
-	for qemu-devel@nongnu.org; Mon, 27 Nov 2017 09:48:20 -0500
-Received: from mail-ot0-x243.google.com ([2607:f8b0:4003:c0f::243]:38114)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1eJKhn-00076I-Tg
-	for qemu-devel@nongnu.org; Mon, 27 Nov 2017 09:48:20 -0500
-Received: by mail-ot0-x243.google.com with SMTP id b49so24363352otj.5
-	for <qemu-devel@nongnu.org>; Mon, 27 Nov 2017 06:48:19 -0800 (PST)
+	(envelope-from <Dennis.Chen@arm.com>) id 1eJDNI-0006vv-47
+	for qemu-devel@nongnu.org; Mon, 27 Nov 2017 01:58:45 -0500
+Received: from mail-db5eur01on0057.outbound.protection.outlook.com
+	([104.47.2.57]:31200
+	helo=EUR01-DB5-obe.outbound.protection.outlook.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <Dennis.Chen@arm.com>) id 1eJDNH-0006t8-Ix
+	for qemu-devel@nongnu.org; Mon, 27 Nov 2017 01:58:40 -0500
+Date: Mon, 27 Nov 2017 14:58:29 +0800
+From: Dennis Chen <dennis.chen@arm.com>
+Message-ID: <20171127065828.GA23555@arm.com>
 MIME-Version: 1.0
-In-Reply-To: <f058c3d3-3d8e-4995-0bf7-abadd2c48d99@redhat.com>
-References: <CAFEAcA9dz9pO_mQ1xtmsT7MW6kXXnNaedgmXe1Eh0Cp53zPz5Q@mail.gmail.com>
-	<f058c3d3-3d8e-4995-0bf7-abadd2c48d99@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon, 27 Nov 2017 15:47:58 +0100
-Message-ID: <CAFEAcA_t0PYZ68HZruWjpeLsU=iOtPbdP9=ETPWXwG+iBRPGrA@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] javac crash in user-mode emulation: races on
- page_unprotect()
+Content-Type: text/plain; charset="us-ascii"
+Content-Disposition: inline
+Subject: [Qemu-devel] Question about RNG virtio device
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,43 +26,22 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>, Richard Henderson <rth@twiddle.net>
+To: qemu-devel@nongnu.org
+Cc: dennis.chen@arm.com, nd@arm.com
 
-On 27 November 2017 at 15:38, Paolo Bonzini <pbonzini@redhat.com> wrote:
-> On 24/11/2017 18:18, Peter Maydell wrote:
->>  * threads A & B both try to do a write to a page with code in it at
->>    the same time (ie which we've made non-writeable, so SEGV)
->>  * they race into the signal handler with this faulting address
->>  * thread A happens to get to page_unprotect() first and takes the
->>    mmap lock, so thread B sits waiting for it to be done
->>  * A then finds the page, marks it PAGE_WRITE and mprotect()s it writable
->>  * A can then continue OK (returns from signal handler to retry the
->>    memory access)
->>  * ...but when B gets the mmap lock it finds that the page is already
->>    PAGE_WRITE, and so it exits page_unprotect() via the "not due to
->>    protected translation" code path, and wrongly delivers the signal
->>    to the guest rather than just retrying the access
->>
->> I'm not sure how best to fix this. We could make page_unprotect()
->> say "if PAGE_WRITE is set, assume this call raced with another one
->> and say 'this was caused by protected translation' without doing
->> anything".
->
-> Yes, I think this is the only solution since SIGSEGV is raised
-> asynchronously.  Even using a trylock would only narrow the race window
-> but not fix it.
+Hello QEMU developers,
 
-I have a patch from rth based on an idea he and I came up with:
-we add a field to the PageDesc struct to store the thread id of
-the thread that last touches the flags. If you come into the
-segv handler and the page flags/last-modified-by field say "should be
-writeable and somebody else updated it" then you mark the page as
-"last modified by this thread" and retry the access. If the
-flags say "should be writeable, last modified by this thread"
-then you know the page state hasn't changed since this thread
-last saw it as "definitely not causing segvs because of cached TBs",
-and so that should be passed on as a guest SEGV.
+We all know that there is a virtio-rng device can be para-virtualised from
+the host to guest in case of a real RNG HW exists in the host, my question
+is:
+Can we get some performance gain to use the 'virtio-rng' device if there isn't
+a real RNG HW in host, in this case, what's the default back-end of the virtio
+-rng device?
+For my scenario, I don't want to use a virtio-rng device if the host doesn't have
+a RNG HW, because the guest will get a fake RNG HW with virtio-rng device (/sys/
+devices/virtual/misc/hw_random/rng_current), which is not expected. But if 
+virtio-rng is not used, I don't know how the guest get the entropy from the host,
+the most concern is performance. IOW, what's the difference between virtio-rng used
+and not if there isn't a RNG HW in host?
 
-thanks
--- PMM
+Thanks!
