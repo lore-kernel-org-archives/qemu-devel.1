@@ -1,19 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60865)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60867)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <gengdongjiu@huawei.com>) id 1eJGxl-0005k0-7t
-	for qemu-devel@nongnu.org; Mon, 27 Nov 2017 05:48:34 -0500
+	(envelope-from <gengdongjiu@huawei.com>) id 1eJGxl-0005kR-Iy
+	for qemu-devel@nongnu.org; Mon, 27 Nov 2017 05:48:39 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <gengdongjiu@huawei.com>) id 1eJGxk-0000l1-0s
+	(envelope-from <gengdongjiu@huawei.com>) id 1eJGxj-0000kw-UW
 	for qemu-devel@nongnu.org; Mon, 27 Nov 2017 05:48:33 -0500
 From: Dongjiu Geng <gengdongjiu@huawei.com>
-Date: Tue, 28 Nov 2017 02:49:51 +0800
-Message-ID: <1511808595-24158-9-git-send-email-gengdongjiu@huawei.com>
+Date: Tue, 28 Nov 2017 02:49:53 +0800
+Message-ID: <1511808595-24158-11-git-send-email-gengdongjiu@huawei.com>
 In-Reply-To: <1511808595-24158-1-git-send-email-gengdongjiu@huawei.com>
 References: <1511808595-24158-1-git-send-email-gengdongjiu@huawei.com>
 MIME-Version: 1.0
 Content-Type: text/plain
-Subject: [Qemu-devel] [PATCH v13 08/12] target-arm: kvm64: inject
- synchronous External Abort
+Subject: [Qemu-devel] [PATCH v13 10/12] ARM: ACPI: Add _E04 for hardware
+ error device
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,135 +24,249 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: pbonzini@redhat.com, mst@redhat.com, imammedo@redhat.com, zhaoshenglong@huawei.com, peter.maydell@linaro.org, mtosatti@redhat.com, james.morse@arm.com, lersek@redhat.com, marc.zyngier@arm.com, christoffer.dall@linaro.org, rth@twiddle.net, ehabkost@redhat.com, kvm@vger.kernel.org, guohanjun@huawei.com, lijinyue@huawei.com, huangshaoyu@huawei.com, wuquanming@huawei.com, zhengqiang10@huawei.com, linuxarm@huawei.com, qemu-devel@nongnu.org, qemu-arm@nongnu.org
 
-Add synchronous external abort injection logic, setup
-spsr_elx, esr_elx, PSTATE, elr_elx etc, when switch to
-guest, guest will jump to the synchronous external abort
-vector table entry.
+In ARM platform we implements a notification of error
+events via a GPIO pin. In this case of GPIO-signaled
+events, an _AEI object lists the appropriate GPIO pin.
 
-The ESR_ELx.DFSC is set to Synchronous external abort(0x10),
-and ESR_ELx.FnV is set to not valid(0x1), which will tell
-guest that FAR is not valid and holds an UNKNOWN value.
-
-These value will be set to KVM related structure through
-KVM_SET_ONE_REG IOCTL.
+GPIO pin 4 is used for hardware error device (PNP0C33),
+so add _E04 in ACPI DSDT table. When GPIO-pin 4 signaled
+a events, the guest ACPI driver will receive this
+notification and handing the error.
 
 Signed-off-by: Dongjiu Geng <gengdongjiu@huawei.com>
-Signed-off-by: Quanming Wu <wuquanming@huawei.com>
 ---
-Marc is against that KVM inject the synchronous external abort(SEA) in [1],
-so user space how to inject it. The test result that injection SEA to guest by Qemu
-is shown in [2].
+1. Address discussion result about guest APEI notification type for SIGBUS_MCEERR_AO SIGBUS in [1],
+   the discussion conclusion is using GPIO-Signal
 
-[1]: https://lkml.org/lkml/2017/3/2/110
-[2]:
-Taking exception 4 [Data Abort]
-...from EL0 to EL1
-...with ESR 0x24/0x92000410
-...with FAR 0x0
-...with ELR 0x40cf04
-...to EL1 PC 0xffffffc000084c00 PSTATE 0x3c5
-after kvm_inject_arm_sea
-Unhandled fault: synchronous external abort (0x92000410) at 0x0000007fa234c12c
-CPU: 0 PID: 536 Comm: devmem Not tainted 4.1.0+ #20
-Hardware name: linux,dummy-virt (DT)
-task: ffffffc019ab2b00 ti: ffffffc008134000 task.ti: ffffffc008134000
-PC is at 0x40cf04
-LR is at 0x40cdec
-pc : [<000000000040cf04>] lr : [<000000000040cdec>] pstate: 60000000
-sp : 0000007ff7b24130
-x29: 0000007ff7b24260 x28: 0000000000000000
-x27: 00000000000000ad x26: 000000000049c000
-x25: 000000000048904b x24: 000000000049c000
-x23: 0000000040600000 x22: 0000007ff7b243a0
-x21: 0000000000000002 x20: 0000000000000000
-x19: 0000000000000020 x18: 0000000000000000
-x17: 000000000049c6d0 x16: 0000007fa22c85c0
-x15: 0000000000005798 x14: 0000007fa2205f1c
-x13: 0000007fa241ccb0 x12: 0000000000000137
-x11: 0000000000000000 x10: 0000000000000000
-x9 : 0000000000000000 x8 : 00000000000000de
-x7 : 0000000000000000 x6 : 0000000000002000
-x5 : 0000000040600000 x4 : 0000000000000003
-x3 : 0000000000000001 x2 : 0000000000000000
-x1 : 0000000000000000 x0 : 0000007fa2418000
+[1]:
+https://lists.gnu.org/archive/html/qemu-devel/2017-10/msg03397.html
+https://lists.gnu.org/archive/html/qemu-devel/2017-10/msg03467.html
+https://lists.gnu.org/archive/html/qemu-devel/2017-10/msg03601.html
+https://lists.gnu.org/archive/html/qemu-devel/2017-10/msg03775.html
+
+2. The ASL dump for the GPIO and hardware error device
+
+................
+Device (GPO0)
+{
+    Name (_AEI, ResourceTemplate ()  // _AEI: ACPI Event Interrupts
+    {
+        .............
+        GpioInt (Edge, ActiveHigh, Exclusive, PullUp, 0x0000,
+            "GPO0", 0x00, ResourceConsumer, ,
+            )
+            {   // Pin list
+                0x0004
+            }
+    })
+    Method (_E04, 0, NotSerialized)  // _Exx: Edge-Triggered GPE
+    {
+        Notify (ERRD, 0x80) // Status Change
+    }
+}
+Device (ERRD)
+{
+    Name (_HID, EisaId ("PNP0C33") /* Error Device */)  // _HID: Hardware ID
+    Name (_UID, Zero)  // _UID: Unique ID
+    Method (_STA, 0, NotSerialized)  // _STA: Status
+    {
+        Return (0x0F)
+    }
+}
+
+3. Below is the guest log when Qemu notifies guest using GPIO-signal after record a CPER
+[  504.164899] {1}[Hardware Error]: Hardware error from APEI Generic Hardware Error Source: 7
+[  504.166970] {1}[Hardware Error]: event severity: recoverable
+[  504.251650] {1}[Hardware Error]:  Error 0, type: recoverable
+[  504.252974] {1}[Hardware Error]:   section_type: memory error
+[  504.254380] {1}[Hardware Error]:   physical_address: 0x00000000000003ec
+[  504.255879] {1}[Hardware Error]:   error_type: 3, multi-bit ECC
 ---
- target/arm/kvm64.c | 64 ++++++++++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 64 insertions(+)
+ hw/arm/virt-acpi-build.c | 31 ++++++++++++++++++++++++++++++-
+ hw/arm/virt.c            | 18 ++++++++++++++++++
+ include/sysemu/sysemu.h  |  3 +++
+ vl.c                     | 12 ++++++++++++
+ 4 files changed, 63 insertions(+), 1 deletion(-)
 
-diff --git a/target/arm/kvm64.c b/target/arm/kvm64.c
-index 2d0eb32..7f662e9 100644
---- a/target/arm/kvm64.c
-+++ b/target/arm/kvm64.c
-@@ -582,6 +582,70 @@ int kvm_arm_cpreg_level(uint64_t regidx)
-     return KVM_PUT_RUNTIME_STATE;
+diff --git a/hw/arm/virt-acpi-build.c b/hw/arm/virt-acpi-build.c
+index 7b397c3..92c8c38 100644
+--- a/hw/arm/virt-acpi-build.c
++++ b/hw/arm/virt-acpi-build.c
+@@ -49,6 +49,7 @@
+ 
+ #define ARM_SPI_BASE 32
+ #define ACPI_POWER_BUTTON_DEVICE "PWRB"
++#define ACPI_HARDWARE_ERROR_DEVICE "ERRD"
+ 
+ static void acpi_dsdt_add_cpus(Aml *scope, int smp_cpus)
+ {
+@@ -340,7 +341,13 @@ static void acpi_dsdt_add_gpio(Aml *scope, const MemMapEntry *gpio_memmap,
+ 
+     Aml *aei = aml_resource_template();
+     /* Pin 3 for power button */
+-    const uint32_t pin_list[1] = {3};
++    uint32_t pin_list[1] = {3};
++    aml_append(aei, aml_gpio_int(AML_CONSUMER, AML_EDGE, AML_ACTIVE_HIGH,
++                                 AML_EXCLUSIVE, AML_PULL_UP, 0, pin_list, 1,
++                                 "GPO0", NULL, 0));
++
++    /* Pin 4 for hardware error device */
++    pin_list[0] = 4;
+     aml_append(aei, aml_gpio_int(AML_CONSUMER, AML_EDGE, AML_ACTIVE_HIGH,
+                                  AML_EXCLUSIVE, AML_PULL_UP, 0, pin_list, 1,
+                                  "GPO0", NULL, 0));
+@@ -351,6 +358,13 @@ static void acpi_dsdt_add_gpio(Aml *scope, const MemMapEntry *gpio_memmap,
+     aml_append(method, aml_notify(aml_name(ACPI_POWER_BUTTON_DEVICE),
+                                   aml_int(0x80)));
+     aml_append(dev, method);
++
++    /* _E04 is handle for hardware error */
++    method = aml_method("_E04", 0, AML_NOTSERIALIZED);
++    aml_append(method, aml_notify(aml_name(ACPI_HARDWARE_ERROR_DEVICE),
++                                  aml_int(0x80)));
++    aml_append(dev, method);
++
+     aml_append(scope, dev);
  }
  
-+static int kvm_arm_cpreg_value(ARMCPU *cpu, ptrdiff_t fieldoffset)
-+{
-+    int i;
-+
-+    for (i = 0; i < cpu->cpreg_array_len; i++) {
-+        uint32_t regidx = kvm_to_cpreg_id(cpu->cpreg_indexes[i]);
-+        const ARMCPRegInfo *ri;
-+        ri = get_arm_cp_reginfo(cpu->cp_regs, regidx);
-+        if (!ri) {
-+            continue;
-+        }
-+
-+        if (ri->type & ARM_CP_NO_RAW) {
-+            continue;
-+        }
-+
-+        if (ri->fieldoffset == fieldoffset) {
-+            cpu->cpreg_values[i] = read_raw_cp_reg(&cpu->env, ri);
-+            return 0;
-+        }
-+    }
-+    return -EINVAL;
-+}
-+
-+/* Inject synchronous external abort */
-+static void kvm_inject_arm_sea(CPUState *c)
-+{
-+    ARMCPU *cpu = ARM_CPU(c);
-+    CPUARMState *env = &cpu->env;
-+    unsigned long cpsr = pstate_read(env);
-+    uint32_t esr, ret;
-+
-+    c->exception_index = EXCP_DATA_ABORT;
-+    /* Inject the exception to El1 */
-+    env->exception.target_el = 1;
-+    CPUClass *cc = CPU_GET_CLASS(c);
-+
-+    /* Set the DFSC to Synchronous external abort and FnV to not valid,
-+     * this will tell guest the FAR_EL1 is UNKNOWN.
-+     */
-+    esr = (0x10 | (1 << 10));
-+
-+    /* This exception is EL0 or EL1 fault. */
-+    if ((cpsr & 0xf) == PSTATE_MODE_EL0t) {
-+        esr |= (EC_DATAABORT << ARM_EL_EC_SHIFT);
-+    } else {
-+        esr |= (EC_DATAABORT_SAME_EL << ARM_EL_EC_SHIFT);
-+    }
-+
-+    /* In the aarch64, there is only 32-bit instruction*/
-+    esr |= ARM_EL_IL;
-+    env->exception.syndrome = esr;
-+
-+    cc->do_interrupt(c);
-+
-+    /* set ESR_EL1 */
-+    ret = kvm_arm_cpreg_value(cpu, offsetof(CPUARMState, cp15.esr_el[1]));
-+
-+    if (ret) {
-+        fprintf(stderr, "<%s> failed to set esr_el1\n", __func__);
-+        abort();
-+    }
-+}
-+
- #define AARCH64_CORE_REG(x)   (KVM_REG_ARM64 | KVM_REG_SIZE_U64 | \
-                  KVM_REG_ARM_CORE | KVM_REG_ARM_CORE_REG(x))
+@@ -363,6 +377,20 @@ static void acpi_dsdt_add_power_button(Aml *scope)
+     aml_append(scope, dev);
+ }
  
++static void acpi_dsdt_add_error_device(Aml *scope)
++{
++    Aml *dev = aml_device(ACPI_HARDWARE_ERROR_DEVICE);
++    Aml *method;
++
++    aml_append(dev, aml_name_decl("_HID", aml_eisaid("PNP0C33")));
++    aml_append(dev, aml_name_decl("_UID", aml_int(0)));
++
++    method = aml_method("_STA", 0, AML_NOTSERIALIZED);
++    aml_append(method, aml_return(aml_int(0x0f)));
++    aml_append(dev, method);
++    aml_append(scope, dev);
++}
++
+ /* RSDP */
+ static GArray *
+ build_rsdp(GArray *rsdp_table, BIOSLinker *linker, unsigned xsdt_tbl_offset)
+@@ -716,6 +744,7 @@ build_dsdt(GArray *table_data, BIOSLinker *linker, VirtMachineState *vms)
+     acpi_dsdt_add_gpio(scope, &memmap[VIRT_GPIO],
+                        (irqmap[VIRT_GPIO] + ARM_SPI_BASE));
+     acpi_dsdt_add_power_button(scope);
++    acpi_dsdt_add_error_device(scope);
+ 
+     aml_append(dsdt, scope);
+ 
+diff --git a/hw/arm/virt.c b/hw/arm/virt.c
+index 6b7a0fe..68495c2 100644
+--- a/hw/arm/virt.c
++++ b/hw/arm/virt.c
+@@ -701,16 +701,27 @@ static void create_rtc(const VirtMachineState *vms, qemu_irq *pic)
+ }
+ 
+ static DeviceState *gpio_key_dev;
++static DeviceState *gpio_err_dev;
+ static void virt_powerdown_req(Notifier *n, void *opaque)
+ {
+     /* use gpio Pin 3 for power button event */
+     qemu_set_irq(qdev_get_gpio_in(gpio_key_dev, 0), 1);
+ }
+ 
++static void virt_error_notify_req(Notifier *n, void *opaque)
++{
++    /* use gpio Pin 4 for hardware error event */
++    qemu_set_irq(qdev_get_gpio_in(gpio_err_dev, 0), 1);
++}
++
+ static Notifier virt_system_powerdown_notifier = {
+     .notify = virt_powerdown_req
+ };
+ 
++static Notifier virt_hardware_error_notifier = {
++    .notify = virt_error_notify_req
++};
++
+ static void create_gpio(const VirtMachineState *vms, qemu_irq *pic)
+ {
+     char *nodename;
+@@ -739,6 +750,10 @@ static void create_gpio(const VirtMachineState *vms, qemu_irq *pic)
+ 
+     gpio_key_dev = sysbus_create_simple("gpio-key", -1,
+                                         qdev_get_gpio_in(pl061_dev, 3));
++
++    gpio_err_dev = sysbus_create_simple("gpio-key", -1,
++                                        qdev_get_gpio_in(pl061_dev, 4));
++
+     qemu_fdt_add_subnode(vms->fdt, "/gpio-keys");
+     qemu_fdt_setprop_string(vms->fdt, "/gpio-keys", "compatible", "gpio-keys");
+     qemu_fdt_setprop_cell(vms->fdt, "/gpio-keys", "#size-cells", 0);
+@@ -755,6 +770,9 @@ static void create_gpio(const VirtMachineState *vms, qemu_irq *pic)
+     /* connect powerdown request */
+     qemu_register_powerdown_notifier(&virt_system_powerdown_notifier);
+ 
++    /* connect hardware error notify request */
++    qemu_register_hardware_error_notifier(&virt_hardware_error_notifier);
++
+     g_free(nodename);
+ }
+ 
+diff --git a/include/sysemu/sysemu.h b/include/sysemu/sysemu.h
+index b213696..86931cf 100644
+--- a/include/sysemu/sysemu.h
++++ b/include/sysemu/sysemu.h
+@@ -75,6 +75,7 @@ void qemu_register_wakeup_notifier(Notifier *notifier);
+ void qemu_system_shutdown_request(ShutdownCause reason);
+ void qemu_system_powerdown_request(void);
+ void qemu_register_powerdown_notifier(Notifier *notifier);
++void qemu_register_hardware_error_notifier(Notifier *notifier);
+ void qemu_system_debug_request(void);
+ void qemu_system_vmstop_request(RunState reason);
+ void qemu_system_vmstop_request_prepare(void);
+@@ -93,6 +94,8 @@ void qemu_remove_machine_init_done_notifier(Notifier *notify);
+ 
+ void qemu_announce_self(void);
+ 
++void qemu_hardware_error_notify(void);
++
+ extern int autostart;
+ 
+ typedef enum {
+diff --git a/vl.c b/vl.c
+index d632693..3552f7d 100644
+--- a/vl.c
++++ b/vl.c
+@@ -1614,6 +1614,8 @@ static int suspend_requested;
+ static WakeupReason wakeup_reason;
+ static NotifierList powerdown_notifiers =
+     NOTIFIER_LIST_INITIALIZER(powerdown_notifiers);
++static NotifierList hardware_error_notifiers =
++    NOTIFIER_LIST_INITIALIZER(hardware_error_notifiers);
+ static NotifierList suspend_notifiers =
+     NOTIFIER_LIST_INITIALIZER(suspend_notifiers);
+ static NotifierList wakeup_notifiers =
+@@ -1850,12 +1852,22 @@ void qemu_register_powerdown_notifier(Notifier *notifier)
+     notifier_list_add(&powerdown_notifiers, notifier);
+ }
+ 
++void qemu_register_hardware_error_notifier(Notifier *notifier)
++{
++    notifier_list_add(&hardware_error_notifiers, notifier);
++}
++
+ void qemu_system_debug_request(void)
+ {
+     debug_requested = 1;
+     qemu_notify_event();
+ }
+ 
++void qemu_hardware_error_notify(void)
++{
++    notifier_list_notify(&hardware_error_notifiers, NULL);
++}
++
+ static bool main_loop_should_exit(void)
+ {
+     RunState r;
 -- 
 1.8.3.1
