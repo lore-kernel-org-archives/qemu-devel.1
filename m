@@ -1,26 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39210)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39916)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1eJI4w-0002Dg-2U
-	for qemu-devel@nongnu.org; Mon, 27 Nov 2017 07:00:05 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1eJI7L-0003KD-Aj
+	for qemu-devel@nongnu.org; Mon, 27 Nov 2017 07:02:35 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1eJI4t-0007Hx-2b
-	for qemu-devel@nongnu.org; Mon, 27 Nov 2017 07:00:02 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:46730)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1eJI4s-0007GZ-SF
-	for qemu-devel@nongnu.org; Mon, 27 Nov 2017 06:59:59 -0500
-References: <1511505030-3669-1-git-send-email-yang.zhong@intel.com>
-	<5A1A5C6E.9060409@huawei.com> <20171127030635.GA29806@yangzhon-Virtual>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <9ee66a8b-f5cf-23cc-8a90-f1a87101dec3@redhat.com>
-Date: Mon, 27 Nov 2017 12:59:49 +0100
+	(envelope-from <peter.maydell@linaro.org>) id 1eJI7F-000891-MC
+	for qemu-devel@nongnu.org; Mon, 27 Nov 2017 07:02:31 -0500
+Received: from mail-ot0-x241.google.com ([2607:f8b0:4003:c0f::241]:40088)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1eJI7F-00088t-H1
+	for qemu-devel@nongnu.org; Mon, 27 Nov 2017 07:02:25 -0500
+Received: by mail-ot0-x241.google.com with SMTP id g104so23958579otg.7
+	for <qemu-devel@nongnu.org>; Mon, 27 Nov 2017 04:02:25 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <20171127030635.GA29806@yangzhon-Virtual>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v3] rcu: reduce more than 7MB heap memory
- by malloc_trim()
+In-Reply-To: <20171126211356.GA46174@humpty.home.comstyle.com>
+References: <20171126211356.GA46174@humpty.home.comstyle.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Mon, 27 Nov 2017 13:02:04 +0100
+Message-ID: <CAFEAcA_m0KMfsUYWpdg2LL2y5U88d4-LoXZuUXkGUxtGCgD66g@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH] configure: Fix curses probe for older
+ ncurses
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,60 +29,40 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Zhong Yang <yang.zhong@intel.com>, Shannon Zhao <zhaoshenglong@huawei.com>
-Cc: qemu-devel@nongnu.org, weidong.huang@huawei.com, arei.gonglei@huawei.com, liujunjie23@huawei.com, wangxinxin.wang@huawei.com, stone.xulei@huawei.com, zhang.zhanghailiang@huawei.com, stefanha@redhat.com, berrange@redhat.com
+To: Brad Smith <brad@comstyle.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 
-On 27/11/2017 04:06, Zhong Yang wrote:
->   #test command
->   ./qemu-system-x86_64 -enable-kvm -cpu host -m 2G -smp cpus=4,cores=4,\
->                        threads=1,sockets=1 -drive format=raw,\
->                        file=test.img,index=0,media=disk -nographic
-> 
->   #without patch
->   root@intel-internal-corei7-64:~# systemd-analyze
->   Startup finished in 4.979s (kernel) + 1.214s (userspace) = 6.193s
-> 
->   root@intel-internal-corei7-64:~# systemd-analyze
->   Startup finished in 4.922s (kernel) + 1.175s (userspace) = 6.097s
-> 
->   root@intel-internal-corei7-64:~# systemd-analyze
->   Startup finished in 4.990s (kernel) + 1.301s (userspace) = 6.291s
-> 
->   root@intel-internal-corei7-64:~# systemd-analyze
->   Startup finished in 5.063s (kernel) + 1.336s (userspace) = 6.400s
-> 
->   root@intel-internal-corei7-64:~# systemd-analyze
->   Startup finished in 4.820s (kernel) + 1.237s (userspace) = 6.057s
-> 
->   avg: kernel 4.9548, userspace 1.2526
-> 
-> 
->   #with this patch
->   root@intel-internal-corei7-64:~# systemd-analyze
->   Startup finished in 5.099s (kernel) + 1.579s (userspace) = 6.679s
-> 
->   root@intel-internal-corei7-64:~# systemd-analyze
->   Startup finished in 5.003s (kernel) + 1.343s (userspace) = 6.347s
-> 
->   root@intel-internal-corei7-64:~# systemd-analyze
->   Startup finished in 4.853s (kernel) + 1.220s (userspace) = 6.074s
-> 
->   root@intel-internal-corei7-64:~# systemd-analyze
->   Startup finished in 4.836s (kernel) + 1.111s (userspace) = 5.948s
-> 
->   root@intel-internal-corei7-64:~# systemd-analyze
->   Startup finished in 4.917s (kernel) + 1.166s (userspace) = 6.083s
-> 
->   avg: kernel 4.9416s, userspace: 1.2838
-> 
->   From above test results, there are almost not any performance regression
->   on x86 platform. Sorry, there is not any ARM based platform in my hand,
->   i can't give related datas.  thanks!
+On 26 November 2017 at 22:13, Brad Smith <brad@comstyle.com> wrote:
+> Fix the curses probe with older ncurses (.e.g. 5.7, as used by OpenBSD).
+>
+> ncurses 5.7 requires _XOPEN_SOURCE_EXTENDED to be defined for WACS_* constants.
 
-You are using only one disk, Shannon is using 200.  That may make a
-difference, as PCI BAR setup in the guest becomes very expensive as you
-add more devices.
+ncurses 5.7 was released in 2008 and is now 9 years old. Why
+is OpenBSD still using such an ancient version?
 
-Thanks,
+> Signed-off-by: Brad Smith <brad@comstyle.com>
+>
+>
+> diff --git a/configure b/configure
+> index 0c6e7572db..9715b9c2cc 100755
+> --- a/configure
+> +++ b/configure
+> @@ -3186,7 +3186,7 @@ EOF
+>    IFS=:
+>    for curses_inc in $curses_inc_list; do
+>      # Make sure we get the wide character prototypes
+> -    curses_inc="-DNCURSES_WIDECHAR $curses_inc"
+> +    curses_inc="-DNCURSES_WIDECHAR -D_XOPEN_SOURCE_EXTENDED $curses_inc"
 
-Paolo
+I'm a bit wary of this because we've found in the past that
+defining _XOPEN_* defines breaks compilation with some
+C libraries which assume that if you define _XOPEN_whatever
+it means "only that X/Open stuff and no OS-specific extras",
+and we depend on the OS-specific extras.
+
+That said, I did a test compile on OSX, which was the
+one that had trouble previously, so this may be OK. I think
+I'd rather leave it until after 2.11 releases, though.
+
+thanks
+-- PMM
