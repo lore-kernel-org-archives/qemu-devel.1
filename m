@@ -1,28 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52640)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60566)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1eJHYt-0000xJ-Nr
-	for qemu-devel@nongnu.org; Mon, 27 Nov 2017 06:27:00 -0500
+	(envelope-from <berrange@redhat.com>) id 1eJHrR-0004jE-2W
+	for qemu-devel@nongnu.org; Mon, 27 Nov 2017 06:46:09 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1eJHYo-0004ga-Mt
-	for qemu-devel@nongnu.org; Mon, 27 Nov 2017 06:26:55 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:36152)
+	(envelope-from <berrange@redhat.com>) id 1eJHrM-00072n-VB
+	for qemu-devel@nongnu.org; Mon, 27 Nov 2017 06:46:05 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:50778)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1eJHYo-0004g1-EY
-	for qemu-devel@nongnu.org; Mon, 27 Nov 2017 06:26:50 -0500
-Date: Mon, 27 Nov 2017 19:26:37 +0800
-From: Peter Xu <peterx@redhat.com>
-Message-ID: <20171127112637.GB2678@xz-mi>
-References: <20171116130610.23582-1-peterx@redhat.com>
-	<20171116130610.23582-22-peterx@redhat.com>
-	<20171124131452.GD2302@work-vm> <20171127052003.GB5153@xz-mi>
-	<20171127104426.GB2338@work-vm> <20171127105450.GA2678@xz-mi>
-	<20171127110359.GA3128@work-vm>
+	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1eJHrM-00071R-MV
+	for qemu-devel@nongnu.org; Mon, 27 Nov 2017 06:46:00 -0500
+Date: Mon, 27 Nov 2017 11:45:52 +0000
+From: "Daniel P. Berrange" <berrange@redhat.com>
+Message-ID: <20171127114552.GI32413@redhat.com>
+Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
+References: <20171124143206.28833-1-rkagan@virtuozzo.com>
+	<64158eb0-98a0-5d06-7545-cb3a08a3c472@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20171127110359.GA3128@work-vm>
-Subject: Re: [Qemu-devel] [RFC v4 21/27] qmp: let migrate-incoming allow
- out-of-band
+In-Reply-To: <64158eb0-98a0-5d06-7545-cb3a08a3c472@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH] util: add is_equal to UUID API
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,73 +28,80 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Cc: qemu-devel@nongnu.org, Stefan Hajnoczi <shajnocz@redhat.com>, "Daniel P . Berrange" <berrange@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Fam Zheng <famz@redhat.com>, Juan Quintela <quintela@redhat.com>, mdroth@linux.vnet.ibm.com, Eric Blake <eblake@redhat.com>, Laurent Vivier <lvivier@redhat.com>, Markus Armbruster <armbru@redhat.com>, marcandre.lureau@redhat.com
+To: Thomas Huth <thuth@redhat.com>
+Cc: Roman Kagan <rkagan@virtuozzo.com>, qemu-devel@nongnu.org, Fam Zheng <famz@redhat.com>, "Denis V. Lunev" <den@openvz.org>
 
-On Mon, Nov 27, 2017 at 11:04:00AM +0000, Dr. David Alan Gilbert wrote:
-> * Peter Xu (peterx@redhat.com) wrote:
-> > On Mon, Nov 27, 2017 at 10:44:26AM +0000, Dr. David Alan Gilbert wrote:
+On Fri, Nov 24, 2017 at 06:34:03PM +0100, Thomas Huth wrote:
+> On 24.11.2017 15:32, Roman Kagan wrote:
+> > It's going to be useful, in particular, in VMBus code massively using
+> > uuids aka GUIDs.
 > > 
-> > [...]
+> > Signed-off-by: Roman Kagan <rkagan@virtuozzo.com>
+> > ---
+> >  include/qemu/uuid.h |  2 ++
+> >  tests/test-uuid.c   | 24 ++++++++++++++++++++++++
+> >  util/uuid.c         |  7 ++++++-
+> >  3 files changed, 32 insertions(+), 1 deletion(-)
 > > 
-> > > > > 
-> > > > > But then I added a break on pthread_mutex_lock, and I've got
-> > > > > this set caused by qemu_start_incoming_migration sending a
-> > > > > MIGRATION_STATUS_SETUP event:
-> > > > > 
-> > > > > #1  0x0000555555ba6eba in qemu_mutex_lock (mutex=mutex@entry=0x5555563f9ba0 <monitor_lock>)
-> > > > >     at /home/dgilbert/git/qemu/util/qemu-thread-posix.c:65
-> > > > > #2  0x00005555557f01c1 in monitor_qapi_event_queue (event=QAPI_EVENT_MIGRATION, qdict=0x555557d93c00, errp=<optimized out>) at /home/dgilbert/git/qemu/monitor.c:442
-> > > > > 
-> > > > > 440	    trace_monitor_protocol_event_queue(event, qdict, evconf->rate);
-> > > > > 441	
-> > > > > 442	    qemu_mutex_lock(&monitor_lock);
-> > > > > 443	
-> > > > > 
-> > > > > #3  0x0000555555b92722 in qapi_event_send_migration (status=status@entry=MIGRATION_STATUS_SETUP, errp=0x555556859320 <error_abort>) at qapi-event.c:661
-> > > > > #4  0x0000555555a6159f in qemu_start_incoming_migration (uri=0x555557693f30 "tcp:0:4444", errp=0x7fffffffc700)
-> > > > >     at /home/dgilbert/git/qemu/migration/migration.c:253
-> > > > > #5  0x0000555555a641c5 in qmp_migrate_incoming (uri=0x555557693f30 "tcp:0:4444", errp=0x7fffffffc730)
-> > > > >     at /home/dgilbert/git/qemu/migration/migration.c:1321
-> > > > > 
-> > > > > is there anything which protects us there?
-> > > > 
-> > > > IIUC you mean what if we e.g. page fault during taking the
-> > > > monitor_lock?  IMHO it just can't happen - monitor_lock is really used
-> > > > in limited places and during those critical sections there is no guest
-> > > > memory access at all (which only protects the monitor logic itself
-> > > > AFAICT).
-> > > 
-> > > OK, so we should document somewhere which locks it's OK to take in an
-> > > OOB command, and then make sure that for each of those locks we add
-> > > a note saying that anyone taking them must be careful.
-> > > We should also add a note above teh qmp_migrate_incoming that it's an
-> > > OOB command and to take care.
-> > 
-> > Makes sense.  I think it will be hard to document what locks can be
-> > taken during OOB command handing since there can be too many locks
-> > there...
+> > diff --git a/include/qemu/uuid.h b/include/qemu/uuid.h
+> > index afe4840296..09489ce5c5 100644
+> > --- a/include/qemu/uuid.h
+> > +++ b/include/qemu/uuid.h
+> > @@ -48,6 +48,8 @@ void qemu_uuid_generate(QemuUUID *out);
+> >  
+> >  int qemu_uuid_is_null(const QemuUUID *uu);
+> >  
+> > +int qemu_uuid_is_equal(const QemuUUID *lhv, const QemuUUID *rhv);
+> > +
+> >  void qemu_uuid_unparse(const QemuUUID *uuid, char *out);
+> >  
+> >  char *qemu_uuid_unparse_strdup(const QemuUUID *uuid);
+> > diff --git a/tests/test-uuid.c b/tests/test-uuid.c
+> > index d3a2791fd4..c6c8148117 100644
+> > --- a/tests/test-uuid.c
+> > +++ b/tests/test-uuid.c
+> > @@ -116,6 +116,29 @@ static void test_uuid_is_null(void)
+> >      g_assert_false(qemu_uuid_is_null(&uuid_not_null_2));
+> >  }
+> >  
+> > +static void test_uuid_is_equal(void)
+> > +{
+> > +    int i;
+> > +    QemuUUID uuid;
+> > +    QemuUUID uuid_null = { };
+> > +    QemuUUID uuid_not_null = { { {
+> > +        0x58, 0x6e, 0xce, 0x27, 0x7f, 0x09, 0x41, 0xe0,
+> > +        0x9e, 0x74, 0xe9, 0x01, 0x31, 0x7e, 0x9d, 0x42
+> > +    } } };
+> > +    QemuUUID uuid_null_2 = uuid_null;
+> > +    QemuUUID uuid_not_null_2 = uuid_not_null;
+> > +
+> > +    g_assert(qemu_uuid_is_equal(&uuid_null, &uuid_null_2));
+> > +    g_assert(qemu_uuid_is_equal(&uuid_not_null, &uuid_not_null_2));
+> > +    g_assert_false(qemu_uuid_is_equal(&uuid_null, &uuid_not_null));
+> > +
+> > +    for (i = 0; i < 100; ++i) {
+> > +        qemu_uuid_generate(&uuid);
+> > +        g_assert_false(qemu_uuid_is_equal(&uuid_null, &uuid));
+> > +        g_assert_false(qemu_uuid_is_equal(&uuid_not_null, &uuid));
 > 
-> Yes, but we need people who are marking commands as OOB to really think
-> about it, otherwise they'll use a lock that in some weird corner case
-> can also be taken by another command that can block.
+> Isn't there a very low chance that the last line triggers by accident?
+> Or uuid_no_null guaranteed to not match the generated one? In the latter
+> case, a comment with a short explanation might be helpful here...
 
-Right.  That sounds like a HOWTO to migrate existing commands to
-support OOB.  Hmm, could there be any/much?  I'm curious.
+Regardless of that question, I think this is rather overkill when we are
+just validating the memcmp() works correct in qemu_uuid_is_equal. The
+for() loop  here is not really adding any value over what the earlier
+asserts already did. In fact the for() loop is arguably testing the
+qemu_uuid_generate method, so better done in a separate unit test.
 
-Anyways... how about I add this paragraph to doc patch?
+IOW, I would just suggest deleting this for() loop as its adding no
+value.
 
-  Converting an existing QMP command to be OOB-capable can be either
-  very easy or extremely hard.  The most important thing is that, the
-  command should never be blocked unexpectedly in any form.  For
-  example, it's still legal to take a mutex in an OOB-capable command
-  handler (but never the BQL!), but we need to make sure that all the
-  other code paths that are protected by the same lock won't be
-  blocked too.  Some candidates that can easily block: (1) doing IOs
-  (especially when the backend can be an NFS storage), or (2)
-  accessing guest memories (which can be simply blocked when it
-  triggers a page fault, and which cannot be handled immediately).
 
-Thanks,
-
--- Peter Xu
+Regards,
+Daniel
+-- 
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
