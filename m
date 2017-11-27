@@ -1,22 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50981)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53082)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <deepa.srinivasan@oracle.com>) id 1eJOP0-0004It-Vm
-	for qemu-devel@nongnu.org; Mon, 27 Nov 2017 13:45:16 -0500
+	(envelope-from <walling@linux.vnet.ibm.com>) id 1eJOV6-00065E-El
+	for qemu-devel@nongnu.org; Mon, 27 Nov 2017 13:51:29 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <deepa.srinivasan@oracle.com>) id 1eJOP0-0003Dq-5Y
-	for qemu-devel@nongnu.org; Mon, 27 Nov 2017 13:45:11 -0500
-Content-Type: text/plain; charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 10.3 \(3273\))
-From: Deepa Srinivasan <deepa.srinivasan@oracle.com>
-In-Reply-To: <20171123172927.GD4375@localhost.localdomain>
-Date: Mon, 27 Nov 2017 10:45:22 -0800
-Content-Transfer-Encoding: quoted-printable
-Message-Id: <DEF51D90-1B45-4DDF-B059-4BF4785BE556@oracle.com>
-References: <c4532ef7-6e05-d14a-21de-1b8381aa2112@redhat.com>
-	<1511456107-7081-1-git-send-email-deepa.srinivasan@oracle.com>
-	<3DFDA265-8685-4601-B981-1BB0007C44B4@oracle.com>
-	<20171123172927.GD4375@localhost.localdomain>
-Subject: Re: [Qemu-devel] [PATCH] block: Fix qemu crash when using scsi-block
+	(envelope-from <walling@linux.vnet.ibm.com>) id 1eJOV3-0005Fr-DW
+	for qemu-devel@nongnu.org; Mon, 27 Nov 2017 13:51:28 -0500
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:60296
+	helo=mx0a-001b2d01.pphosted.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <walling@linux.vnet.ibm.com>)
+	id 1eJOV3-0005Fd-7O
+	for qemu-devel@nongnu.org; Mon, 27 Nov 2017 13:51:25 -0500
+Received: from pps.filterd (m0098419.ppops.net [127.0.0.1])
+	by mx0b-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
+	vARIn5gv110656
+	for <qemu-devel@nongnu.org>; Mon, 27 Nov 2017 13:51:21 -0500
+Received: from e16.ny.us.ibm.com (e16.ny.us.ibm.com [129.33.205.206])
+	by mx0b-001b2d01.pphosted.com with ESMTP id 2egqhejcpp-1
+	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Mon, 27 Nov 2017 13:51:21 -0500
+Received: from localhost
+	by e16.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <walling@linux.vnet.ibm.com>;
+	Mon, 27 Nov 2017 13:51:20 -0500
+From: "Collin L. Walling" <walling@linux.vnet.ibm.com>
+Date: Mon, 27 Nov 2017 13:50:55 -0500
+Message-Id: <1511808659-8846-1-git-send-email-walling@linux.vnet.ibm.com>
+Subject: [Qemu-devel] [PATCH v1 0/4] Interactive Boot Menu for DASD and SCSI
+ Guests on s390x
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,50 +37,49 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Kevin Wolf <kwolf@redhat.com>
-Cc: mark.kanda@oracle.com, qemu-block@nongnu.org, Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>, qemu-devel@nongnu.org, mreitz@redhat.com, stefanha@redhat.com, pbonzini@redhat.com
+To: borntraeger@de.ibm.com, frankja@linux.vnet.ibm.com, qemu-s390x@nongnu.org, qemu-devel@nongnu.org
 
+These patches implement a boot menu for ECKD DASD and SCSI guests on s390x. 
+The menu will only appear if the disk has been configured for IPL with the 
+zIPL tool and with the following QEMU command line options:
 
-> On Nov 23, 2017, at 9:29 AM, Kevin Wolf <kwolf@redhat.com> wrote:
->=20
-> Am 23.11.2017 um 18:05 hat Deepa Srinivasan geschrieben:
->> blk_aio_prwv() now takes a void pointer and the coroutine functions
->> have been modified to cast it into QEMUIOVector if needed. It does =
-not
->> use an union in BlkRwCo since this leads to code - blk_aio_prwv()
->> would have to write to the void pointer member, but coroutines would
->> sometimes read the QEMUIOVector member. Paolo also suggested not =
-using
->> a union.
->=20
-> I don't particularly like void pointers, but I guess it's fair enough.
+    -boot menu=on[,splash-time=X] and/or -machine loadparm='prompt'
 
-Agreed, but if a union were to hold QEMUIOVector* and void* in BlkRwCo, =
-blk_aio_prwv() would always write to void* but some coroutine functions =
-would read from the QEMUIOVector* member. Keeping it as a void pointer =
-is a safer option.
+or via the following libvirt domain xml:
 
->=20
->> Note that a similar issue exists in
->> blk_ioctl()/blk_ioctl_entry()/blk_prw() where blk_prw() always =
-creates
->> the QEMUIOVector even if blk_ioctl()/blk_ioctl_entry() does not need =
-a
->> QEMUIOVector. This will need to be fixed separately to keep it
->> consistent with the AIO path.
->=20
-> I don't think there is an actual problem in the blk_ioctl() path =
-because
-> the iov on the stack stays valid as long as the coroutine runs. AIO is
-> different because it returns before the coroutine has terminated.
->=20
+    <os>
+      <bootmenu enable='yes' timeout='X'/>
+    </os>
 
-The problem in blk_ioctl() is not a crash, because blk_prwv() waits for =
-the coroutine completion, as you say.
+    or
+	
+    <disk>
+      ...
+      <boot order='1' loadparm='PROMPT'/>
+    </disk>
 
-The issue is that it unnecessarily creates a QEMUIOVector for the ioctl =
-case. I was saying, if this is to be kept consistent with the AIO patch, =
-then it could be done in a separate patch.
+Where X is some positive integer representing time in milliseconds.
 
-> Kevin
->=20
+Loadparm will override all boot options.
+
+Collin L. Walling (4):
+  s390-ccw: ipl structs for eckd cdl/ldl
+  s390-ccw: parse and set boot menu options
+  s390-ccw: interactive boot menu for eckd dasd
+  s390-ccw: interactive boot menu for scsi
+
+ hw/s390x/ipl.c              |  20 +++++++
+ hw/s390x/ipl.h              |   8 ++-
+ pc-bios/s390-ccw/Makefile   |   2 +-
+ pc-bios/s390-ccw/bootmap.c  | 106 ++++++++++++++++++++++++++++++-----
+ pc-bios/s390-ccw/bootmap.h  |  57 ++++++++++++++-----
+ pc-bios/s390-ccw/iplb.h     |   8 ++-
+ pc-bios/s390-ccw/main.c     |  18 +++++-
+ pc-bios/s390-ccw/menu.c     | 122 ++++++++++++++++++++++++++++++++++++++++
+ pc-bios/s390-ccw/s390-ccw.h |   7 +++
+ pc-bios/s390-ccw/sclp.c     | 132 ++++++++++++++++++++++++++++++++++++++++++++
+ 10 files changed, 444 insertions(+), 36 deletions(-)
+ create mode 100644 pc-bios/s390-ccw/menu.c
+
+-- 
+2.7.4
