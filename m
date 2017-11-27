@@ -1,22 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39730)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40274)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcel@redhat.com>) id 1eJEx0-0001Ay-Ra
-	for qemu-devel@nongnu.org; Mon, 27 Nov 2017 03:39:40 -0500
+	(envelope-from <otubo@redhat.com>) id 1eJEy7-0001sA-7c
+	for qemu-devel@nongnu.org; Mon, 27 Nov 2017 03:40:51 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcel@redhat.com>) id 1eJEwz-0001Zu-BK
-	for qemu-devel@nongnu.org; Mon, 27 Nov 2017 03:39:38 -0500
-References: <20171125151610.20547-1-ehabkost@redhat.com>
-	<20171125151610.20547-2-ehabkost@redhat.com>
-From: Marcel Apfelbaum <marcel@redhat.com>
-Message-ID: <3a584684-6dc8-f91c-d889-fefef6fd753c@redhat.com>
-Date: Mon, 27 Nov 2017 10:39:18 +0200
+	(envelope-from <otubo@redhat.com>) id 1eJEy3-0002V4-8l
+	for qemu-devel@nongnu.org; Mon, 27 Nov 2017 03:40:47 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:42048)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <otubo@redhat.com>) id 1eJEy2-0002Rd-W3
+	for qemu-devel@nongnu.org; Mon, 27 Nov 2017 03:40:43 -0500
+Date: Mon, 27 Nov 2017 09:40:35 +0100
+From: Eduardo Otubo <otubo@redhat.com>
+Message-ID: <20171127084035.GA2718@vader>
+References: <20171124134644.490-1-otubo@redhat.com>
+	<1d5665fa-f425-25b5-041e-5f226192296c@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20171125151610.20547-2-ehabkost@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v2 1/6] machine: Replace has_dynamic_sysbus
- with list of allowed devices
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <1d5665fa-f425-25b5-041e-5f226192296c@redhat.com>
+Subject: Re: [Qemu-devel] [PATCHv3] dma/i82374: avoid double creation of
+ i82374 device
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,226 +28,212 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eduardo Habkost <ehabkost@redhat.com>, qemu-devel@nongnu.org
-Cc: jgross@suse.com, Thomas Huth <thuth@redhat.com>, sstabellini@kernel.org, Laszlo Ersek <lersek@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, "Michael S. Tsirkin" <mst@redhat.com>, Alexander Graf <agraf@suse.de>, David Gibson <david@gibson.dropbear.id.au>, Anthony Perard <anthony.perard@citrix.com>, qemu-arm@nongnu.org, qemu-ppc@nongnu.org, xen-devel@lists.xenproject.org
+To: Thomas Huth <thuth@redhat.com>
+Cc: qemu-devel@nongnu.org, armbru@redhat.com, pbonzini@redhat.com, mjt@tls.msk.ru, agraf@suse.de, ehabkost@redhat.com
 
-On 25/11/2017 17:16, Eduardo Habkost wrote:
-> The existing has_dynamic_sysbus flag makes the machine accept
-> every user-creatable sysbus device type on the command-line.
-> Replace it with a list of allowed device types, so machines can
-> easily accept some sysbus devices while rejecting others.
+On Fri, Nov 24, 2017 at 06:44:59PM +0100, Thomas Huth wrote:
+>  Hi Eduardo,
 > 
-> To keep exactly the same behavior as before, the existing
-> has_dynamic_sysbus=true assignments are replaced with a
-> TYPE_SYS_BUS_DEVICE entry on the allowed list.  Other patches
-> will replace the TYPE_SYS_BUS_DEVICE entries with more specific
-> lists of devices.
+> On 24.11.2017 14:46, Eduardo Otubo wrote:
+> > v3:
+> >  * Removed all unecessary local_err
+> >  * Change return of isa_bus_dma() and DMA_init() from void to int8_t,
+> >    returning -EBUSY on error and 0 on success
+> >  * Added qdev_cleanup_nofail() in case isa_bus_dma() returns error. The
+> >    cleanup looks safe, but please review if I didn't miss any detail
+> > 
+> > v2:
+> >  * Removed user_creatable=false and replaced by error handling using
+> >    Error **errp and error_propagate();
 > 
-> Cc: Peter Maydell <peter.maydell@linaro.org>
-> Cc: Marcel Apfelbaum <marcel@redhat.com>
-> Cc: "Michael S. Tsirkin" <mst@redhat.com>
-> Cc: Alexander Graf <agraf@suse.de>
-> Cc: David Gibson <david@gibson.dropbear.id.au>
-> Cc: Stefano Stabellini <sstabellini@kernel.org>
-> Cc: Anthony Perard <anthony.perard@citrix.com>
-> Cc: qemu-arm@nongnu.org
-> Cc: qemu-ppc@nongnu.org
-> Cc: xen-devel@lists.xenproject.org
-> Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
-> ---
-> Changes v1 -> v2:
-> * Replace "dynamic sysbus whitelist" with "allowed sysbus devices"
-> * Simply add TYPE_SYS_BUS_DEVICE to the list on existing
->    has_dynamic_sysbus=true machines, and make machine-types more
->    strict in separate patches
-> ---
->   include/hw/boards.h  |  5 ++++-
->   hw/arm/virt.c        |  3 ++-
->   hw/core/machine.c    | 43 +++++++++++++++++++++++++++++--------------
->   hw/i386/pc_q35.c     |  3 ++-
->   hw/ppc/e500plat.c    |  4 +++-
->   hw/ppc/spapr.c       |  3 ++-
->   hw/xen/xen_backend.c |  7 ++++++-
->   7 files changed, 48 insertions(+), 20 deletions(-)
+> Version changelog should go below the "---" separator, otherwise it will
+> be included in the git changelog as well, which is kind of ugly.
 > 
-> diff --git a/include/hw/boards.h b/include/hw/boards.h
-> index 156b16f7a6..041bc08971 100644
-> --- a/include/hw/boards.h
-> +++ b/include/hw/boards.h
-> @@ -76,6 +76,9 @@ void machine_set_cpu_numa_node(MachineState *machine,
->                                  const CpuInstanceProperties *props,
->                                  Error **errp);
->   
-> +void machine_class_allow_dynamic_sysbus_dev(MachineClass *mc, const char *type);
-> +
-> +
->   /**
->    * CPUArchId:
->    * @arch_id - architecture-dependent CPU ID of present or possible CPU
-> @@ -179,7 +182,6 @@ struct MachineClass {
->           no_floppy:1,
->           no_cdrom:1,
->           no_sdcard:1,
-> -        has_dynamic_sysbus:1,
->           pci_allow_0_address:1,
->           legacy_fw_cfg_order:1;
->       int is_default;
-> @@ -197,6 +199,7 @@ struct MachineClass {
->       bool ignore_memory_transaction_failures;
->       int numa_mem_align_shift;
->       const char **valid_cpu_types;
-> +    strList *allowed_dynamic_sysbus_devices;
->       bool auto_enable_numa_with_memhp;
->       void (*numa_auto_assign_ram)(MachineClass *mc, NodeInfo *nodes,
->                                    int nb_nodes, ram_addr_t size);
-> diff --git a/hw/arm/virt.c b/hw/arm/virt.c
-> index 9e18b410d7..fa6dc15fcd 100644
-> --- a/hw/arm/virt.c
-> +++ b/hw/arm/virt.c
-> @@ -1591,7 +1591,8 @@ static void virt_machine_class_init(ObjectClass *oc, void *data)
->        * configuration of the particular instance.
->        */
->       mc->max_cpus = 255;
-> -    mc->has_dynamic_sysbus = true;
-> +    /*TODO: allow only sysbus devices that really work with this machine */
-> +    machine_class_allow_dynamic_sysbus_dev(mc, TYPE_SYS_BUS_DEVICE);
->       mc->block_default_type = IF_VIRTIO;
->       mc->no_cdrom = 1;
->       mc->pci_allow_0_address = true;
-> diff --git a/hw/core/machine.c b/hw/core/machine.c
-> index 36c2fb069c..ab2ec292f3 100644
-> --- a/hw/core/machine.c
-> +++ b/hw/core/machine.c
-> @@ -335,29 +335,44 @@ static bool machine_get_enforce_config_section(Object *obj, Error **errp)
->       return ms->enforce_config_section;
->   }
->   
-> -static void error_on_sysbus_device(SysBusDevice *sbdev, void *opaque)
-> +void machine_class_allow_dynamic_sysbus_dev(MachineClass *mc, const char *type)
->   {
-> -    error_report("Option '-device %s' cannot be handled by this machine",
-> -                 object_class_get_name(object_get_class(OBJECT(sbdev))));
-> -    exit(1);
-> +    strList *item = g_new0(strList, 1);
-> +
-> +    item->value = g_strdup(type);
-> +    item->next = mc->allowed_dynamic_sysbus_devices;
-> +    mc->allowed_dynamic_sysbus_devices = item;
->   }
->   
-> -static void machine_init_notify(Notifier *notifier, void *data)
-> +static void validate_sysbus_device(SysBusDevice *sbdev, void *opaque)
->   {
-> -    Object *machine = qdev_get_machine();
-> -    ObjectClass *oc = object_get_class(machine);
-> -    MachineClass *mc = MACHINE_CLASS(oc);
-> +    MachineState *machine = opaque;
-> +    MachineClass *mc = MACHINE_GET_CLASS(machine);
-> +    bool allowed = false;
-> +    strList *wl;
->   
-> -    if (mc->has_dynamic_sysbus) {
-> -        /* Our machine can handle dynamic sysbus devices, we're all good */
-> -        return;
-> +    for (wl = mc->allowed_dynamic_sysbus_devices;
-> +         !allowed && wl;
-> +         wl = wl->next) {
-> +        allowed |= !!object_dynamic_cast(OBJECT(sbdev), wl->value);
->       }
->   
-> +    if (!allowed) {
-> +        error_report("Option '-device %s' cannot be handled by this machine",
-> +                     object_class_get_name(object_get_class(OBJECT(sbdev))));
-> +        exit(1);
-> +    }
-> +}
-> +
-> +static void machine_init_notify(Notifier *notifier, void *data)
-> +{
-> +    MachineState *machine = MACHINE(qdev_get_machine());
-> +
->       /*
-> -     * Loop through all dynamically created devices and check whether there
-> -     * are sysbus devices among them. If there are, error out.
-> +     * Loop through all dynamically created sysbus devices and check if they are
-> +     * all allowed.  If a device is not allowed, error out.
->        */
-> -    foreach_dynamic_sysbus_device(error_on_sysbus_device, NULL);
-> +    foreach_dynamic_sysbus_device(validate_sysbus_device, machine);
->   }
->   
->   HotpluggableCPUList *machine_query_hotpluggable_cpus(MachineState *machine)
-> diff --git a/hw/i386/pc_q35.c b/hw/i386/pc_q35.c
-> index d6060043ac..d0b0e5b422 100644
-> --- a/hw/i386/pc_q35.c
-> +++ b/hw/i386/pc_q35.c
-> @@ -299,7 +299,8 @@ static void pc_q35_machine_options(MachineClass *m)
->       m->default_machine_opts = "firmware=bios-256k.bin";
->       m->default_display = "std";
->       m->no_floppy = 1;
-> -    m->has_dynamic_sysbus = true;
-> +    /*TODO: allow only sysbus devices that really work with this machine */
-> +    machine_class_allow_dynamic_sysbus_dev(m, TYPE_SYS_BUS_DEVICE);
->       m->max_cpus = 288;
->   }
->   
-> diff --git a/hw/ppc/e500plat.c b/hw/ppc/e500plat.c
-> index e59e80fb9e..438118c29b 100644
-> --- a/hw/ppc/e500plat.c
-> +++ b/hw/ppc/e500plat.c
-> @@ -15,6 +15,7 @@
->   #include "hw/boards.h"
->   #include "sysemu/device_tree.h"
->   #include "sysemu/kvm.h"
-> +#include "hw/sysbus.h"
->   #include "hw/pci/pci.h"
->   #include "hw/ppc/openpic.h"
->   #include "kvm_ppc.h"
-> @@ -63,7 +64,8 @@ static void e500plat_machine_init(MachineClass *mc)
->       mc->desc = "generic paravirt e500 platform";
->       mc->init = e500plat_init;
->       mc->max_cpus = 32;
-> -    mc->has_dynamic_sysbus = true;
-> +    /*TODO: allow only sysbus devices that really work with this machine */
-> +    machine_class_allow_dynamic_sysbus_dev(mc, TYPE_SYS_BUS_DEVICE);
->       mc->default_cpu_type = POWERPC_CPU_TYPE_NAME("e500v2_v30");
->   }
->   
-> diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-> index d682f013d4..82040cc5d1 100644
-> --- a/hw/ppc/spapr.c
-> +++ b/hw/ppc/spapr.c
-> @@ -3603,7 +3603,8 @@ static void spapr_machine_class_init(ObjectClass *oc, void *data)
->       mc->default_boot_order = "";
->       mc->default_ram_size = 512 * M_BYTE;
->       mc->kvm_type = spapr_kvm_type;
-> -    mc->has_dynamic_sysbus = true;
-> +    /*TODO: allow only sysbus devices that really work with this machine */
-> +    machine_class_allow_dynamic_sysbus_dev(mc, TYPE_SYS_BUS_DEVICE);
->       mc->pci_allow_0_address = true;
->       mc->get_hotplug_handler = spapr_get_hotplug_handler;
->       hc->pre_plug = spapr_machine_device_pre_plug;
-> diff --git a/hw/xen/xen_backend.c b/hw/xen/xen_backend.c
-> index 0f849a26d2..82380ea9ee 100644
-> --- a/hw/xen/xen_backend.c
-> +++ b/hw/xen/xen_backend.c
-> @@ -564,7 +564,12 @@ static void xen_set_dynamic_sysbus(void)
->       ObjectClass *oc = object_get_class(machine);
->       MachineClass *mc = MACHINE_CLASS(oc);
->   
-> -    mc->has_dynamic_sysbus = true;
-> +    /*
-> +     * Emulate old mc->has_dynamic_sysbus=true assignment
-> +     *
-> +     *TODO: add only Xen devices to the list
-> +     */
-> +    machine_class_allow_dynamic_sysbus_dev(mc, TYPE_SYS_BUS_DEVICE);
->   }
->   
->   int xen_be_register(const char *type, struct XenDevOps *ops)
+> > QEMU fails when used with the following command line:
+> > 
+> >     ./ppc64-softmmu/qemu-system-ppc64 -S -machine 40p,accel=tcg -device i82374
+> >     qemu-system-ppc64: hw/isa/isa-bus.c:110: isa_bus_dma: Assertion `!bus->dma[0] && !bus->dma[1]' failed.
+> >     Aborted (core dumped)
+> > 
+> > The 40p machine type already created the device i82374. If specified in the
+> > command line, it will try to create it again, hence generating the error. The
+> > function isa_bus_dma() isn't supposed to be called twice for the same bus. One
+> > way to avoid this problem is to set user_creatable=false.
+> 
+> You don't do that user_creatable=false here anymore, so please remove it
+> from the description.
+> 
+> > A possible fix in a near future would be making
+> > isa_bus_dma()/DMA_init()/i82374_realize() return an error instead of asserting
+> > as well.
+> 
+> You should rephrase that sentence as well.
 > 
 
-Reviewed-by: Marcel Apfelbaum <marcel@redhat.com>
+Well, I think one mistake lead to another here. I've always put the changelog
+before the --- and that's why the old commit message. For example:
+2f668be77501c0232a84aafb6a066c9915987f0e. But I guess on that context it made
+sense to use the changelog since the commit message was too simplistic. I'm
+gonna fix this on the v3 then, among other thigs that I need to fix. Thanks for
+the heads up :)
 
-Thanks,
-Marcel
+> > Signed-off-by: Eduardo Otubo <otubo@redhat.com>
+> > ---
+> >  hw/core/qdev.c         | 16 ++++++++++++++++
+> >  hw/dma/i82374.c        | 13 +++++++------
+> >  hw/dma/i8257.c         | 38 ++++++++++++++++++++++----------------
+> >  hw/isa/isa-bus.c       |  8 ++++++--
+> >  include/hw/isa/isa.h   |  4 ++--
+> >  include/hw/qdev-core.h |  1 +
+> >  6 files changed, 54 insertions(+), 26 deletions(-)
+> > 
+> > diff --git a/hw/core/qdev.c b/hw/core/qdev.c
+> > index 606ab53c42..0ef03ee461 100644
+> > --- a/hw/core/qdev.c
+> > +++ b/hw/core/qdev.c
+> > @@ -344,6 +344,22 @@ void qdev_init_nofail(DeviceState *dev)
+> >      object_unref(OBJECT(dev));
+> >  }
+> >  
+> > +void qdev_cleanup_nofail(DeviceState *dev)
+> > +{
+> > +    Error *err = NULL;
+> > +
+> > +    assert(dev->realized);
+> > +
+> > +    object_ref(OBJECT(dev));
+> > +    object_property_set_bool(OBJECT(dev), false, "realized", &err);
+> > +    if (err) {
+> > +        error_reportf_err(err, "Clean up of device %s failed: ",
+> > +                          object_get_typename(OBJECT(dev)));
+> > +        exit(1);
+> > +    }
+> > +    object_unref(OBJECT(dev));
+> > +}
+> > +
+> >  void qdev_machine_creation_done(void)
+> >  {
+> >      /*
+> > diff --git a/hw/dma/i82374.c b/hw/dma/i82374.c
+> > index 6c0f975df0..9b792890b2 100644
+> > --- a/hw/dma/i82374.c
+> > +++ b/hw/dma/i82374.c
+> > @@ -24,6 +24,7 @@
+> >  
+> >  #include "qemu/osdep.h"
+> >  #include "hw/isa/isa.h"
+> > +#include "qapi/error.h"
+> >  
+> >  #define TYPE_I82374 "i82374"
+> >  #define I82374(obj) OBJECT_CHECK(I82374State, (obj), TYPE_I82374)
+> > @@ -118,13 +119,13 @@ static void i82374_realize(DeviceState *dev, Error **errp)
+> >  {
+> >      I82374State *s = I82374(dev);
+> >  
+> > -    portio_list_init(&s->port_list, OBJECT(s), i82374_portio_list, s,
+> > -                     "i82374");
+> > -    portio_list_add(&s->port_list, isa_address_space_io(&s->parent_obj),
+> > +    if (DMA_init(isa_bus_from_device(ISA_DEVICE(dev)), 1, errp) == 0) {
+> 
+> I think I'd rather prefer if (DMA_init()) { return; } here ... but
+> that's just my personal taste.
+> 
+> > +        portio_list_init(&s->port_list, OBJECT(s), i82374_portio_list, s,
+> > +                    "i82374");
+> > +        portio_list_add(&s->port_list, isa_address_space_io(&s->parent_obj),
+> >                      s->iobase);
+> > -
+> > -    DMA_init(isa_bus_from_device(ISA_DEVICE(dev)), 1);
+> > -    memset(s->commands, 0, sizeof(s->commands));
+> > +        memset(s->commands, 0, sizeof(s->commands));
+> > +    }
+> >  }
+> >  
+> >  static Property i82374_properties[] = {
+> > diff --git a/hw/dma/i8257.c b/hw/dma/i8257.c
+> > index bd23e893bf..7488e3dd12 100644
+> > --- a/hw/dma/i8257.c
+> > +++ b/hw/dma/i8257.c
+> > @@ -622,26 +622,32 @@ static void i8257_register_types(void)
+> >  
+> >  type_init(i8257_register_types)
+> >  
+> > -void DMA_init(ISABus *bus, int high_page_enable)
+> > +int8_t DMA_init(ISABus *bus, int high_page_enable, Error **errp)
+> 
+> Why int8_t ? Error codes are normally propagated as normal "int", and in
+> the very worst case -EBUSY might even not fit anymore into a normal
+> int8_t on some systems...
+> 
+> >  {
+> >      ISADevice *isa1, *isa2;
+> > -    DeviceState *d;
+> > +    DeviceState *d1, *d2;
+> >  
+> >      isa1 = isa_create(bus, TYPE_I8257);
+> > -    d = DEVICE(isa1);
+> > -    qdev_prop_set_int32(d, "base", 0x00);
+> > -    qdev_prop_set_int32(d, "page-base", 0x80);
+> > -    qdev_prop_set_int32(d, "pageh-base", high_page_enable ? 0x480 : -1);
+> > -    qdev_prop_set_int32(d, "dshift", 0);
+> > -    qdev_init_nofail(d);
+> > +    d1 = DEVICE(isa1);
+> > +    qdev_prop_set_int32(d1, "base", 0x00);
+> > +    qdev_prop_set_int32(d1, "page-base", 0x80);
+> > +    qdev_prop_set_int32(d1, "pageh-base", high_page_enable ? 0x480 : -1);
+> > +    qdev_prop_set_int32(d1, "dshift", 0);
+> > +    qdev_init_nofail(d1);
+> >  
+> >      isa2 = isa_create(bus, TYPE_I8257);
+> > -    d = DEVICE(isa2);
+> > -    qdev_prop_set_int32(d, "base", 0xc0);
+> > -    qdev_prop_set_int32(d, "page-base", 0x88);
+> > -    qdev_prop_set_int32(d, "pageh-base", high_page_enable ? 0x488 : -1);
+> > -    qdev_prop_set_int32(d, "dshift", 1);
+> > -    qdev_init_nofail(d);
+> > -
+> > -    isa_bus_dma(bus, ISADMA(isa1), ISADMA(isa2));
+> > +    d2 = DEVICE(isa2);
+> > +    qdev_prop_set_int32(d2, "base", 0xc0);
+> > +    qdev_prop_set_int32(d2, "page-base", 0x88);
+> > +    qdev_prop_set_int32(d2, "pageh-base", high_page_enable ? 0x488 : -1);
+> > +    qdev_prop_set_int32(d2, "dshift", 1);
+> > +    qdev_init_nofail(d2);
+> > +
+> > +    if (isa_bus_dma(bus, ISADMA(isa1), ISADMA(isa2), errp) < 0) {
+> > +        qdev_cleanup_nofail(d1);
+> > +        qdev_cleanup_nofail(d2);
+> > +        return -EBUSY;
+> > +    }
+> > +
+> > +    return 0;
+> >  }
+> > diff --git a/hw/isa/isa-bus.c b/hw/isa/isa-bus.c
+> > index 348e0eab9d..4781dddaf9 100644
+> > --- a/hw/isa/isa-bus.c
+> > +++ b/hw/isa/isa-bus.c
+> > @@ -104,12 +104,16 @@ void isa_connect_gpio_out(ISADevice *isadev, int gpioirq, int isairq)
+> >      qdev_connect_gpio_out(DEVICE(isadev), gpioirq, irq);
+> >  }
+> >  
+> > -void isa_bus_dma(ISABus *bus, IsaDma *dma8, IsaDma *dma16)
+> > +int8_t isa_bus_dma(ISABus *bus, IsaDma *dma8, IsaDma *dma16, Error **errp)
+> 
+> dito - this should be "int", not "int8_t".
+> 
+> >  {
+> >      assert(bus && dma8 && dma16);
+> > -    assert(!bus->dma[0] && !bus->dma[1]);
+> > +    if (bus->dma[0] || bus->dma[1]) {
+> > +        error_setg(errp, "DMA already initialized on ISA bus");
+> > +        return -EBUSY;
+> > +    }
+> >      bus->dma[0] = dma8;
+> >      bus->dma[1] = dma16;
+> > +    return 0;
+> >  }
+> >  
+>  Thomas
+
+-- 
+Eduardo Otubo
