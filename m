@@ -1,23 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49047)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49698)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jcd@tribudubois.net>) id 1eJPpM-0000Zj-QH
-	for qemu-devel@nongnu.org; Mon, 27 Nov 2017 15:16:34 -0500
+	(envelope-from <eblake@redhat.com>) id 1eJPsC-0001y2-Ki
+	for qemu-devel@nongnu.org; Mon, 27 Nov 2017 15:19:25 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jcd@tribudubois.net>) id 1eJPpI-0004A0-Q1
-	for qemu-devel@nongnu.org; Mon, 27 Nov 2017 15:16:28 -0500
-Received: from relay3-d.mail.gandi.net ([217.70.183.195]:39379)
+	(envelope-from <eblake@redhat.com>) id 1eJPs9-0005Bg-HW
+	for qemu-devel@nongnu.org; Mon, 27 Nov 2017 15:19:24 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:41488)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <jcd@tribudubois.net>) id 1eJPpI-00049Q-IY
-	for qemu-devel@nongnu.org; Mon, 27 Nov 2017 15:16:24 -0500
-From: Jean-Christophe DUBOIS <jcd@tribudubois.net>
-Message-ID: <2a8cfe41-bddb-7812-1e1a-950dc43ebddf@tribudubois.net>
-Date: Mon, 27 Nov 2017 21:16:21 +0100
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1eJPs9-0005BM-AQ
+	for qemu-devel@nongnu.org; Mon, 27 Nov 2017 15:19:21 -0500
+References: <20171127174944.12362-1-vapier@gentoo.org>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <e35413fd-d695-2ae1-4a0a-5cc3ccf7d038@redhat.com>
+Date: Mon, 27 Nov 2017 14:19:18 -0600
 MIME-Version: 1.0
-Content-Language: en-US
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
-Subject: [Qemu-devel] [SPARC] Accessing devices through MMU mapped memory
- region
+In-Reply-To: <20171127174944.12362-1-vapier@gentoo.org>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="IcnJXSBQxQ1ing9jjtNJ2IWxSPeFHG9Ar"
+Subject: Re: [Qemu-devel] [PATCH] build: fix typo in error message
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,45 +27,63 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: mark.cave-ayland@ilande.co.uk, atar4qemu@gmail.com, "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>
+To: Mike Frysinger <vapier@gentoo.org>, qemu-devel@nongnu.org
 
-Hi,
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--IcnJXSBQxQ1ing9jjtNJ2IWxSPeFHG9Ar
+From: Eric Blake <eblake@redhat.com>
+To: Mike Frysinger <vapier@gentoo.org>, qemu-devel@nongnu.org
+Cc: berrange@redhat.com
+Message-ID: <e35413fd-d695-2ae1-4a0a-5cc3ccf7d038@redhat.com>
+Subject: Re: [PATCH] build: fix typo in error message
+References: <20171127174944.12362-1-vapier@gentoo.org>
+In-Reply-To: <20171127174944.12362-1-vapier@gentoo.org>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-I am using Qemu to emulate a Leon3 based board.
+On 11/27/2017 11:49 AM, Mike Frysinger wrote:
+> Signed-off-by: Mike Frysinger <vapier@gentoo.org>
+> ---
+>  scripts/git-submodule.sh | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+>=20
+> diff --git a/scripts/git-submodule.sh b/scripts/git-submodule.sh
+> index 030617b4ac0c..bc7224a27fe3 100755
+> --- a/scripts/git-submodule.sh
+> +++ b/scripts/git-submodule.sh
+> @@ -24,7 +24,7 @@ error() {
+>      echo "Alternatively you may disable automatic GIT submodule checko=
+ut"
+>      echo "with:"
+>      echo
+> -    echo " $ ./configure --disable-git-update'"
+> +    echo " $ ./configure --disable-git-update"
 
-In the software I am running on top of Qemu, I am mapping devices to a 
-virtual address using MMU table.
+Reviewed-by: Eric Blake <eblake@redhat.com>
 
-Now I am experimenting some issues when I am trying to access some 
-device (here the UART port at 0x80000100) through the MMU mapping (with 
-NOCACHE attribute for this page).
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
 
-in my (user space) software I am doing something like:
 
-    #define MY_VIRTUAL_ADDRESS 0x40808100 /* mapped to 0x80000100
-    physical address through MMU */
+--IcnJXSBQxQ1ing9jjtNJ2IWxSPeFHG9Ar
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
 
-    #define UART_CTRL_REG_OFFSET 0x8
+-----BEGIN PGP SIGNATURE-----
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
 
-    #define UART_CTRL_TE 0x00000002
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlocc0YACgkQp6FrSiUn
+Q2rfYQf/edXzWnYAMd84s786hbirbEWd3FcJ9gEfglxwPkBHcOyyBwMwtZ/ZMPuV
+HqC2LtkBY25O8B/0ZCNxibDy3D2WIG8OdtsBj2gwbsbhir7s4DHhVozLwTRR69jF
+pEPUcgX1TUz/goEoWqxQbTWtQdKKVVKW/2lYn+oFnUItzibeWz0SytXWEwIV0ES9
+3/NFmQjQlyW/CHN61LWtCc5TwWTS3s7Ps95lDkxWfNGmERCFGZSo/s10VCBUbl9d
+Vz7pbolQfA3S7yv2LX0ya49bnaEge9ztSLlsHzZyN1yCdTPTYHLvx9HmJzG8KaPT
+RdewvzASku4KX1fBqbU/hug3k6tNqQ==
+=j4XH
+-----END PGP SIGNATURE-----
 
-    *(volatile uint32_t *)(MY_VIRTUAL_ADDRESS + UART_CTRL_REG_OFFSET) =
-    UART_CTRL_TE;
-
-But when the write is propagated by Qemu to the serial device, I am 
-getting 4 x 8bits (1 byte) write access (0x8, 0x9, 0xa, 0xb) instead of 
-a single 32 bits (4 bytes) access.
-
-The Qemu driver emulator for the serial device is unhappy about this as 
-it would not handle byte access for addresses 0x9, 0xa, 0xb which are 
-then tagged as unsupported access.
-
-I am wondering if I am missing something and if there is a reason for my 
-single 32 bits access to be transformed by Qemu in 4 single byte access.
-
-I believe it is expected to be able to get single atomic 32 bits 
-read/write to the device.
-
-Would you have any hint/advice for me?
-
-JC
+--IcnJXSBQxQ1ing9jjtNJ2IWxSPeFHG9Ar--
