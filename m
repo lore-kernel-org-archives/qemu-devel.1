@@ -1,37 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38948)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41853)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1eJLry-0003hn-Sh
-	for qemu-devel@nongnu.org; Mon, 27 Nov 2017 11:02:59 -0500
+	(envelope-from <adhemerval.zanella@linaro.org>) id 1eJLwu-0005jV-4V
+	for qemu-devel@nongnu.org; Mon, 27 Nov 2017 11:08:01 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1eJLrt-00033D-1s
-	for qemu-devel@nongnu.org; Mon, 27 Nov 2017 11:02:54 -0500
-Date: Mon, 27 Nov 2017 17:02:42 +0100
-From: Cornelia Huck <cohuck@redhat.com>
-Message-ID: <20171127170242.170d01f6.cohuck@redhat.com>
-In-Reply-To: <b4f9fd77-4efa-ad51-73f1-bcd17ec0ede4@linux.vnet.ibm.com>
-References: <1511388334-16347-1-git-send-email-pmorel@linux.vnet.ibm.com>
-	<1511388334-16347-2-git-send-email-pmorel@linux.vnet.ibm.com>
-	<3acc6fdb-5638-97b2-2dc7-bce34d22cd1f@redhat.com>
-	<20171123104903.24424b40.cohuck@redhat.com>
-	<a3655016-0e6b-b80f-2282-f6efbff9e1f9@redhat.com>
-	<20171123110844.4649f3b1.cohuck@redhat.com>
-	<58a08c1d-3935-42e7-cdc0-7bc45c08d2d3@redhat.com>
-	<20171123113326.3b2c5281.cohuck@redhat.com>
-	<6ab0d29e-1af0-888a-c932-a0a294ea225d@linux.vnet.ibm.com>
-	<d59edb51-71ba-7b75-83df-e4be246d2fce@redhat.com>
-	<4000596f-d2a0-c32e-7683-7e074e8132e2@linux.vnet.ibm.com>
-	<37aa6eb3-cbdf-39af-2068-7d0e5949e601@linux.vnet.ibm.com>
-	<2ab76ab0-b20a-9eaf-cafb-195e1621edd6@redhat.com>
-	<20171127120255.2d36c8f3.cohuck@redhat.com>
-	<20171127153436.200a01c7.cohuck@redhat.com>
-	<c0fd850b-3d6f-4a4b-f9e0-e5009a273be0@linux.vnet.ibm.com>
-	<20171127163055.6c9989cf.cohuck@redhat.com>
-	<b4f9fd77-4efa-ad51-73f1-bcd17ec0ede4@linux.vnet.ibm.com>
+	(envelope-from <adhemerval.zanella@linaro.org>) id 1eJLwn-0005H3-Q9
+	for qemu-devel@nongnu.org; Mon, 27 Nov 2017 11:08:00 -0500
+Received: from mail-qk0-x244.google.com ([2607:f8b0:400d:c09::244]:35152)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <adhemerval.zanella@linaro.org>)
+	id 1eJLwn-0005Gn-KG
+	for qemu-devel@nongnu.org; Mon, 27 Nov 2017 11:07:53 -0500
+Received: by mail-qk0-x244.google.com with SMTP id p19so33054180qke.2
+	for <qemu-devel@nongnu.org>; Mon, 27 Nov 2017 08:07:53 -0800 (PST)
+References: <ab2eda3b-571f-025e-66e9-6c1577793a08@physik.fu-berlin.de>
+	<b3becdc0-6540-30a6-b70b-8312ac5dddd9@physik.fu-berlin.de>
+	<af9abebc-0650-a7c7-e63d-adafaa7031d6@linaro.org>
+	<CAFEAcA_mR86vZhqe7yZwUdSSFyKDcms6UoK-NnXgW2ER8GL5tw@mail.gmail.com>
+From: Adhemerval Zanella <adhemerval.zanella@linaro.org>
+Message-ID: <9e520d68-0aba-1a32-06d9-351e90d0a7bf@linaro.org>
+Date: Mon, 27 Nov 2017 14:07:46 -0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [qemu-s390x] [PATCH v3 1/7] s390x/pci: factor out
- endianess conversion
+In-Reply-To: <CAFEAcA_mR86vZhqe7yZwUdSSFyKDcms6UoK-NnXgW2ER8GL5tw@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-GB
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] glibc "linux: spawni.c: simplify error reporting
+ to parent" breaks qemu-user/Windows Service For Linux
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -40,101 +34,98 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Pierre Morel <pmorel@linux.vnet.ibm.com>
-Cc: Thomas Huth <thuth@redhat.com>, Yi Min Zhao <zyimin@linux.vnet.ibm.com>, pasic@linux.vnet.ibm.com, qemu-devel@nongnu.org, agraf@suse.de, borntraeger@de.ibm.com, Qemu-s390x list <qemu-s390x@nongnu.org>
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: John Paul Adrian Glaubitz <glaubitz@physik.fu-berlin.de>, Rasmus Villemoes <rv@rasmusvillemoes.dk>, QEMU Developers <qemu-devel@nongnu.org>, Michael Karcher <debian@mkarcher.dialup.fu-berlin.de>, James Clarke <jrtc27@jrtc27.com>, Laurent Vivier <laurent@vivier.eu>, Adhemerval Zanella <adhemerval.zanella@linaro.com>
 
-On Mon, 27 Nov 2017 16:53:04 +0100
-Pierre Morel <pmorel@linux.vnet.ibm.com> wrote:
 
-> On 27/11/2017 16:30, Cornelia Huck wrote:
-> > On Mon, 27 Nov 2017 16:24:08 +0100
-> > Pierre Morel <pmorel@linux.vnet.ibm.com> wrote:
-> >  =20
-> >> On 27/11/2017 15:34, Cornelia Huck wrote: =20
-> >>> On Mon, 27 Nov 2017 12:02:55 +0100
-> >>> Cornelia Huck <cohuck@redhat.com> wrote:
-> >>>     =20
-> >>>> On Mon, 27 Nov 2017 07:59:36 +0100
-> >>>> Thomas Huth <thuth@redhat.com> wrote:
-> >>>>    =20
-> >>>>> On 25.11.2017 14:49, Pierre Morel wrote: =20
-> >>>>>> On 24/11/2017 07:19, Yi Min Zhao wrote: =20
-> >>>>>>>
-> >>>>>>>
-> >>>>>>> =E5=9C=A8 2017/11/23 =E4=B8=8B=E5=8D=888:18, Thomas Huth =E5=86=
-=99=E9=81=93: =20
-> >>>>>>>> On 23.11.2017 13:07, Yi Min Zhao wrote: =20
-> >>>>    =20
-> >>>>>>>>> Another question, does 'cpu' in cpu_to_le**() or le**_to_cpu() =
-mean the
-> >>>>>>>>> host endianess? =20
-> >>>>>>>> Yes, the "cpu" in cpu_to_le or le_to_cpu means the host, indeed.=
- It's
-> >>>>>>>> confusing :-/
-> >>>>>>>>         =20
-> >>>>>>>>> If the answers to upper two questions are yes, we actually need=
- handle
-> >>>>>>>>> two cases.
-> >>>>>>>>> 1) For pcilg, we need to translate the data to little-endian, t=
-hus
-> >>>>>>>>> cpu_to_le**().
-> >>>>>>>>> 2) For pcistg, we need to translate the data to host endianess,=
- thus
-> >>>>>>>>> le**_to_cpu(). =20
-> >>>>>>>> I think we've got to byte-swap if the host is big endian (s390x)=
-, but
-> >>>>>>>> not if the host is little endian (x86 with TCG). =20
-> >>>>>>
-> >>>>>> Here is my comprehension of this funny swapping:
-> >>>>>>
-> >>>>>> - TCG for a BE guest and a le host swap bytes because if we do (re=
-gister
-> >>>>>> & 0x01) in the zPCI interception code it must work what ever the
-> >>>>>> endianess is. =20
-> >>>>>
-> >>>>> Uhhh, I might have missed that the value has already been byte-swap=
-ped
-> >>>>> once by TCG for env->regs[r1] ...
-> >>>>> Now I'm pretty much completely confused ... sorry for the noise if =
-I was
-> >>>>> wrong... I think it's best you ignore my comment for now (i.e. go w=
-ith
-> >>>>> bswapXX() instead of le_to_cpuXX()), and if we later wire up zPCI w=
-ith
-> >>>>> TCG, we still can fix this if necessary. =20
-> >>>>
-> >>>> I'll try my current pci/tcg patches on LPAR with this (or a v4) on t=
-op.
-> >>>> If it works there (it doesn't yet on my laptop), we do have a
-> >>>> endianness issue... (unfortunately, the reverse isn't true.) =20
-> >>>
-> >>> It does not look too bad: I can get a nice enP1p0s0 device from a
-> >>> virtio-net-pci with my tcg patches on my laptop (with these patches as
-> >>> well, of course). So, endianness is likely mostly fine. =20
-> >>
-> >> On the Lpar and on the Laptop or only on the Lpar ? =20
-> >=20
-> > Both :) =20
->=20
-> That's great! :)
 
-Btw, lspci says
+On 27/11/2017 13:24, Peter Maydell wrote:
+> On 27 November 2017 at 12:57, Adhemerval Zanella
+> <adhemerval.zanella@linaro.org> wrote:
+>> We found out this potential bogus assert on 2.27 development [1] which
+>> resulted in two fixes [2][3].
+>>
+>> It should not be an issue for generic posix_spawn usage where there is
+>> no expectation system/user/program kills random pids (since posix_spawn
+>> auxiliary process has not yet returned). Some say the possible kind of
+>> behaviour is rather undefined, but it shouldn't also trigger an assert.
+>>
+>> I am not really sure what is happening in qemu usermode because comment
+>> #4 in the bug reports states clone is returning an error and it should
+>> not trigger the assert in first place.  What seems to be happening in
+>> this scenario is clone is actually returning a success, but the auxiliary
+>> process is being killed before actually calling execve.
+> 
+> The bug report is a bit confused, but I think what is happening
+> in the QEMU case is that QEMU implements clone(CLONE_VFORK) as having
+> the same semantics as fork() (ie the parent will not autowait for
+> the child, and the child does not share a memory map with the parent).
+> (ie QEMU treats it as having the semantics of a vfork() call, which
+> is allowed to be implemented as fork()).
 
-0001:00:00.0 Ethernet controller: Red Hat, Inc. Virtio network device
-        Subsystem: Red Hat, Inc. Device 0001
-        Physical Slot: 00000000
-        Flags: bus master, fast devsel, latency 0
-        I/O ports at <unassigned> [disabled]
-        [virtual] Memory at 8001000000000000 (32-bit, non-prefetchable) [si=
-ze=3D4K]
-        Memory at 8002000000000000 (64-bit, prefetchable) [size=3D16K]
-        Expansion ROM at <unassigned> [disabled] [size=3D256K]
-        Capabilities: [98] MSI-X: Enable+ Count=3D3 Masked-
-        Capabilities: [84] Vendor Specific Information: VirtIO: <unknown>
-        Capabilities: [70] Vendor Specific Information: VirtIO: Notify
-        Capabilities: [60] Vendor Specific Information: VirtIO: DeviceCfg
-        Capabilities: [50] Vendor Specific Information: VirtIO: ISR
-        Capabilities: [40] Vendor Specific Information: VirtIO: CommonCfg
-        Kernel driver in use: virtio-pci
+Right, that explains what is happening. 
 
-Does that look reasonable to you?
+> Previous versions of glibc's posix_spawn() could cope with this
+> divergence from the kernel's native clone() behaviour, but the
+> rewrite can't. It's not unreasonable for glibc() to rely on the
+> kernel behaviour, but on the other hand it's not too surprising
+> if this breaks non-kernel implementations of the syscall ABI
+> like QEMU and the MS Linux subsystem, because it's a tricky
+> corner case that previously nobody was trying to use.
+
+The problem is vfork is such a broken API [1] that even POSIX has 
+deprecated it on the latest 2008 standard. It was used on GLIBC
+posix_spawn on some specific usage (old POSIX_SPAWN_USEVFORK 
+flag) only because it was 'faster' than using fork, however
+it also created its own set bugs [2][3][4][5].
+
+Current implementation is as fast as using vfork on Linux using
+which should be platform neutral clone flags and assumptions
+(in fact we found out that Linux does not work as expected with
+clone (CLONE_VFORK | CLONE_VM) -> exit -> waitpid (WNOHANG)
+which resulted in aa95a2414).
+
+GLIBC also maintains another implementation at 
+sysdeps/posix/spawni.c which should be more platform neutral
+since it uses only POSIX expected semantics (the synchronization
+is done using a pipe2 instead of CLONE_VM, so a vfork acting
+as fork shouldn't be a problem). It is not used in any architecture
+on GLIBC currently.
+
+However I am not very compelled to change internal posix_spawn
+on GLIBC on Linux mainly because it uses a slight less resources
+than the generic POSIX one (check e83be730910c) and it works
+on Linux kernel as expected.
+
+[1] https://ewontfix.com/7/
+[2] https://sourceware.org/bugzilla/show_bug.cgi?id=14750
+[3] https://sourceware.org/bugzilla/show_bug.cgi?id=14749
+[4] https://sourceware.org/bugzilla/show_bug.cgi?id=14499
+[5] https://sourceware.org/bugzilla/show_bug.cgi?id=10354
+
+> 
+> Unfortunately I can't really think of a mechanism for implementing
+> this in QEMU usermode, because the only tools we have available
+> for creating new threads and processes are the ones the host libc
+> gives us: so we can spawn new threads with pthread_create() and
+> fork the process with fork(), but we don't have a safe way to
+> create a new process which shares the memory map and where the
+> new process can call the various libc functions which QEMU will
+> do as it executes the guest code.
+
+Current GLIBC won't trigger any assert anymore (and it was backported
+to 2.25 and 2.26 branch as well), however I am not sure if posix_spawn 
+semantic will works for all the expected scenarios in qemu user-mode.
+
+Most likely any failure (sched_set{param,scheduler}, setsid, setpgid,
+seteuid, any file action or execve itself) won't be advertise to main
+process, since err is set 0 as default and the auxiliary process will
+write to a expected shared memory to signalling an issue. 
+
+Also, I don't think trying to emulate "CLONE_VM | CLONE_VFORK" with
+pthread_create without actually synchronize the threads will work
+as expected. If clone actually uses CLONE_VFORK I would expect the
+underlying qemu usermode to block the caller thread (using a condition
+variable or a barrier) and to release its execution only for execve
+or exit in the callee. I am not very versed on qemu code, so I 
+am not sure how complex it would be.
