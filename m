@@ -1,19 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58582)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58594)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <gengdongjiu@huawei.com>) id 1eJGu0-00026S-6a
+	(envelope-from <gengdongjiu@huawei.com>) id 1eJGu0-00026j-Eq
 	for qemu-devel@nongnu.org; Mon, 27 Nov 2017 05:44:41 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <gengdongjiu@huawei.com>) id 1eJGtz-0007gG-8M
+	(envelope-from <gengdongjiu@huawei.com>) id 1eJGtz-0007gM-J3
 	for qemu-devel@nongnu.org; Mon, 27 Nov 2017 05:44:40 -0500
 From: Dongjiu Geng <gengdongjiu@huawei.com>
-Date: Tue, 28 Nov 2017 02:49:48 +0800
-Message-ID: <1511808595-24158-6-git-send-email-gengdongjiu@huawei.com>
+Date: Tue, 28 Nov 2017 02:49:47 +0800
+Message-ID: <1511808595-24158-5-git-send-email-gengdongjiu@huawei.com>
 In-Reply-To: <1511808595-24158-1-git-send-email-gengdongjiu@huawei.com>
 References: <1511808595-24158-1-git-send-email-gengdongjiu@huawei.com>
 MIME-Version: 1.0
 Content-Type: text/plain
-Subject: [Qemu-devel] [PATCH v13 05/12] linux-headers: sync against Linux
- v4.14-rc8
+Subject: [Qemu-devel] [PATCH v13 04/12] ACPI: enable APEI GHES in the
+ configure file and build it
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,36 +24,35 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: pbonzini@redhat.com, mst@redhat.com, imammedo@redhat.com, zhaoshenglong@huawei.com, peter.maydell@linaro.org, mtosatti@redhat.com, james.morse@arm.com, lersek@redhat.com, marc.zyngier@arm.com, christoffer.dall@linaro.org, rth@twiddle.net, ehabkost@redhat.com, kvm@vger.kernel.org, guohanjun@huawei.com, lijinyue@huawei.com, huangshaoyu@huawei.com, wuquanming@huawei.com, zhengqiang10@huawei.com, linuxarm@huawei.com, qemu-devel@nongnu.org, qemu-arm@nongnu.org
 
+Add CONFIG_ACPI_APEI configuration in the arm-softmmu.mak
+and add build choice in the Makefile.objs.
+
 Signed-off-by: Dongjiu Geng <gengdongjiu@huawei.com>
 ---
-Address Peter's comments to sync mainline Linux header file in [1]
-Address Michael's comments to not sync SPDX from Linux kernel header file
+ default-configs/arm-softmmu.mak | 1 +
+ hw/acpi/Makefile.objs           | 1 +
+ 2 files changed, 2 insertions(+)
 
-[1]: https://lkml.org/lkml/2017/9/5/575
----
- linux-headers/linux/kvm.h | 3 +++
- 1 file changed, 3 insertions(+)
-
-diff --git a/linux-headers/linux/kvm.h b/linux-headers/linux/kvm.h
-index 7971a4f..06a217f 100644
---- a/linux-headers/linux/kvm.h
-+++ b/linux-headers/linux/kvm.h
-@@ -929,6 +929,7 @@ struct kvm_ppc_resize_hpt {
- #define KVM_CAP_PPC_SMT_POSSIBLE 147
- #define KVM_CAP_HYPERV_SYNIC2 148
- #define KVM_CAP_HYPERV_VP_INDEX 149
-+#define KVM_CAP_ARM_INJECT_SERROR_ESR 150
+diff --git a/default-configs/arm-softmmu.mak b/default-configs/arm-softmmu.mak
+index bbdd3c1..c362113 100644
+--- a/default-configs/arm-softmmu.mak
++++ b/default-configs/arm-softmmu.mak
+@@ -129,3 +129,4 @@ CONFIG_ACPI=y
+ CONFIG_SMBIOS=y
+ CONFIG_ASPEED_SOC=y
+ CONFIG_GPIO_KEY=y
++CONFIG_ACPI_APEI=y
+diff --git a/hw/acpi/Makefile.objs b/hw/acpi/Makefile.objs
+index 11c35bc..bafb148 100644
+--- a/hw/acpi/Makefile.objs
++++ b/hw/acpi/Makefile.objs
+@@ -6,6 +6,7 @@ common-obj-$(CONFIG_ACPI_MEMORY_HOTPLUG) += memory_hotplug.o
+ common-obj-$(CONFIG_ACPI_CPU_HOTPLUG) += cpu.o
+ common-obj-$(CONFIG_ACPI_NVDIMM) += nvdimm.o
+ common-obj-$(CONFIG_ACPI_VMGENID) += vmgenid.o
++common-obj-$(CONFIG_ACPI_APEI) += hest_ghes.o
+ common-obj-$(call lnot,$(CONFIG_ACPI_X86)) += acpi-stub.o
  
- #ifdef KVM_CAP_IRQ_ROUTING
- 
-@@ -1355,6 +1356,8 @@ struct kvm_s390_ucas_mapping {
- /* Available with KVM_CAP_S390_CMMA_MIGRATION */
- #define KVM_S390_GET_CMMA_BITS      _IOWR(KVMIO, 0xb8, struct kvm_s390_cmma_log)
- #define KVM_S390_SET_CMMA_BITS      _IOW(KVMIO, 0xb9, struct kvm_s390_cmma_log)
-+/* Available with KVM_CAP_ARM_INJECT_SERROR_ESR */
-+#define KVM_ARM_INJECT_SERROR_ESR       _IOW(KVMIO,  0xba, __u32)
- 
- #define KVM_DEV_ASSIGN_ENABLE_IOMMU	(1 << 0)
- #define KVM_DEV_ASSIGN_PCI_2_3		(1 << 1)
+ common-obj-y += acpi_interface.o
 -- 
 1.8.3.1
