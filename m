@@ -1,24 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45381)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45386)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1eJE04-0008Ci-Fr
+	(envelope-from <dgibson@ozlabs.org>) id 1eJE04-0008Cn-ND
 	for qemu-devel@nongnu.org; Mon, 27 Nov 2017 02:38:45 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1eJE03-00006x-Ab
+	(envelope-from <dgibson@ozlabs.org>) id 1eJE00-000059-Ng
 	for qemu-devel@nongnu.org; Mon, 27 Nov 2017 02:38:44 -0500
-Date: Mon, 27 Nov 2017 18:20:43 +1100
+Date: Mon, 27 Nov 2017 18:19:17 +1100
 From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20171127072043.GJ11775@umbus.fritz.box>
-References: <20171123132955.1261-1-clg@kaod.org>
-	<20171123132955.1261-2-clg@kaod.org>
-	<20171124025100.GA28000@umbus.fritz.box>
-	<20171124105547.4234dc14@bahia.lan>
+Message-ID: <20171127071917.GH11775@umbus.fritz.box>
+References: <20171124070550.6433-1-clg@kaod.org>
+	<20171124070550.6433-3-clg@kaod.org>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="q5r20fdKX+PFtYHw"
+	protocol="application/pgp-signature"; boundary="lrvsYIebpInmECXG"
 Content-Disposition: inline
-In-Reply-To: <20171124105547.4234dc14@bahia.lan>
-Subject: Re: [Qemu-devel] [Qemu-ppc] [PATCH 01/25] ppc/xics: introduce an
- icp_create() helper
+In-Reply-To: <20171124070550.6433-3-clg@kaod.org>
+Subject: Re: [Qemu-devel] [PATCH v4 2/3] spapr/rtas: fix reboot of a a SMP
+ TCG guest
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,63 +25,69 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Greg Kurz <groug@kaod.org>
-Cc: =?iso-8859-1?Q?C=E9dric?= Le Goater <clg@kaod.org>, qemu-ppc@nongnu.org, qemu-devel@nongnu.org
+To: =?iso-8859-1?Q?C=E9dric?= Le Goater <clg@kaod.org>
+Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, Nikunj A Dadhania <nikunj@linux.vnet.ibm.com>
 
 
---q5r20fdKX+PFtYHw
+--lrvsYIebpInmECXG
 Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Fri, Nov 24, 2017 at 10:55:47AM +0100, Greg Kurz wrote:
-> On Fri, 24 Nov 2017 13:51:00 +1100
-> David Gibson <david@gibson.dropbear.id.au> wrote:
+On Fri, Nov 24, 2017 at 08:05:49AM +0100, C=E9dric Le Goater wrote:
+> Just like for hot unplug CPUs, when a guest is rebooted, the secondary
+> CPUs can be awaken by the decrementer and start entering SLOF at the
+> same time the boot CPU is.
 >=20
-> > On Thu, Nov 23, 2017 at 02:29:31PM +0100, C=E9dric Le Goater wrote:
-> > > The sPAPR and the PowerNV core objects create the interrupt presenter
-> > > object of the CPUs in a very similar way. Let's provide a common
-> > > routine in which we use the presenter 'type' as a child identifier.
-> > >=20
-> > > Signed-off-by: C=E9dric Le Goater <clg@kaod.org> =20
-> >=20
-> > One tiny nit.., apart from that
-> >=20
-> > Reviewed-by: David Gibson <david@gibson.dropbear.id.au>
-> >=20
-> > > ---
-> > >  hw/intc/xics.c          | 22 ++++++++++++++++++++++
-> > >  hw/ppc/pnv_core.c       | 10 +---------
-> > >  hw/ppc/spapr_cpu_core.c | 13 ++-----------
-> > >  include/hw/ppc/xics.h   |  3 +++
-> > >  4 files changed, 28 insertions(+), 20 deletions(-)
-> > >=20
-> > > diff --git a/hw/intc/xics.c b/hw/intc/xics.c
-> > > index a1cc0e420c98..e4ccdff8f577 100644
-> > > --- a/hw/intc/xics.c
-> > > +++ b/hw/intc/xics.c
-> > > @@ -384,6 +384,28 @@ static const TypeInfo icp_info =3D {
-> > >      .class_size =3D sizeof(ICPStateClass),
-> > >  };
-> > > =20
-> > > +Object *icp_create(CPUState *cs, const char *type, XICSFabric *xi, E=
-rror **errp)
-> > > +{
-> > > +    Object *child =3D OBJECT(cs); =20
-> >=20
-> > In the original context 'child' made sense, since it was the child
-> > object of the core.  Here, it's misleading, since it's the parent of
-> > the xics link.  It's only used in a couple of places, so I suggest you
+> To be safe, let's disable on the secondaries all the exceptions which
+> can cause an exit while the CPU is in power-saving mode.
 >=20
-> Oops yes :)
+> Based on previous work from Nikunj A Dadhania <nikunj@linux.vnet.ibm.com>
 >=20
-> > just opencode OBJECT(cs) in each place.
-> >=20
->=20
-> or rename child to owner, as it is done with DRCs and TCE tables.
+> Signed-off-by: C=E9dric Le Goater <clg@kaod.org>
+> Reviewed-by: David Gibson <david@gibson.dropbear.id.au>
 
-Sure.  Either's fine by me.
+Applied to ppc-for-2.12.
 
+> ---
+>=20
+> Changes in v4:
+>=20
+>  - used the 'lpcr_pm' field of PowerPCCPUClass
+>=20
+> Changes in v3:
+>=20
+>  - used the cpu_ppc_papr_pece_bits() helper=20
+>=20
+>  hw/ppc/spapr_cpu_core.c | 8 ++++++++
+>  1 file changed, 8 insertions(+)
+>=20
+> diff --git a/hw/ppc/spapr_cpu_core.c b/hw/ppc/spapr_cpu_core.c
+> index 3a4c17401226..a2290528542d 100644
+> --- a/hw/ppc/spapr_cpu_core.c
+> +++ b/hw/ppc/spapr_cpu_core.c
+> @@ -26,6 +26,7 @@ static void spapr_cpu_reset(void *opaque)
+>      PowerPCCPU *cpu =3D opaque;
+>      CPUState *cs =3D CPU(cpu);
+>      CPUPPCState *env =3D &cpu->env;
+> +    PowerPCCPUClass *pcc =3D POWERPC_CPU_GET_CLASS(cpu);
+> =20
+>      cpu_reset(cs);
+> =20
+> @@ -35,6 +36,13 @@ static void spapr_cpu_reset(void *opaque)
+>      cs->halted =3D 1;
+> =20
+>      env->spr[SPR_HIOR] =3D 0;
+> +
+> +    /* Disable Power-saving mode Exit Cause exceptions for the CPU.
+> +     * This can cause issues when rebooting the guest if a secondary
+> +     * is awaken */
+> +    if (cs !=3D first_cpu) {
+> +        env->spr[SPR_LPCR] &=3D ~pcc->lpcr_pm;
+> +    }
+>  }
+> =20
+>  static void spapr_cpu_destroy(PowerPCCPU *cpu)
 
 --=20
 David Gibson			| I'll have my music baroque, and my code
@@ -91,24 +95,24 @@ david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
 				| _way_ _around_!
 http://www.ozlabs.org/~dgibson
 
---q5r20fdKX+PFtYHw
+--lrvsYIebpInmECXG
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlobvMsACgkQbDjKyiDZ
-s5LlfQ/9Fcrkn4BS57e4L/YwgwkKLHZMM+5lon+xz3tK6NHil5Q7BXhSikEsfn4x
-wrIDq76oD4GmtgmyvFM0fRHCsgzEZ04H7W4G29uVst32AtoIv6EzYnRq0yDLSe1w
-eowT7OWNfzXA9aHa7QPV1tBfEuk3e3Vhcu0khzomcoDCM8ZODLIzv6wPNU7ECPwy
-x4czzrRXxCefgNgxI6IXdCNwIhqN/QIIp38JWfqQlrMkousOP56S4Nkp9Nj1vemU
-+iBARuDavy4yoF+cwO51RazPuceXrMeQymOY6pLfNs9j3FjK3F8vhk1v88v8QxR9
-t0LDVKwYOIvs1ASt51jzSqoCeukSZrgj6vF7cL44VuWBPXeHjv/gSwOl6atEShYG
-pgD8Ji8WGh5GiXXqq0Grcy4bztWH5s+btBWMLMo9OunKINWtJTIeaFf1zGRFwKZp
-1KBMi32D/W9pAQgKmU6vOtCXrKF6WX9ePfAs/TPD0xsQDPdi4G+J4grj8VbuDN8/
-Z7NSrei74DZg8YdgPvWu1UX14ogNHiksLDyDTMHv7ekIcOtzQ5evZhZb9H89CN1M
-jBeAw3kU+scVdY8/GihU9uYXPlM2lQaqygL5sp2kwSL0uCpFh4gPZdiJ4bS/GxBu
-9Tna1MNNwyv+y97lQWJXQzFrybS/ECvqobIHU6tXvxB3MilIIlI=
-=vy2o
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlobvHUACgkQbDjKyiDZ
+s5L3Mw/7BWKCfWktUBvzwc0IdPWX8AVuWN050uyRg3I7CcU1EuAszTkxPjblO5Br
+yqnqDgEeYGMoXwnrQApe/pGwDmUv5wphLsrtOdYp72gswK2t6N62Ap/mcvyQzCcm
+L7Pkj45u6LRY6uQoKzQhN7SFoRXAgp8b+O2HSga/dzdqS05kkMYVWz6wrF3tyk2P
+2vHxRR6aoLLQ+nUzx6rn1PYwASfo3C5OeEVTVEV15aKXfn1X4kduTjCuv8DUbkHQ
+mkThJJSclE30QnEkWgVVtVWn3ApxfzcOxjbFst7GxJBkdxe/G//99U4s4msU4GPC
+ktBJTDgzS7ab2ob1EAUbO+/tNDlzDUrhCleR2Wrp0tknwsXHyf3BZtPf1+4Vew0M
+iQUfKpX4TDhpTUq8Yd20AMtb4SAUG7Oy1Zk2PemMUUGc5YCdxX/eBwQKEs8/+PK+
+goze/FBrKkC4c85RzJb1YtMzuX0CwYLvtnTgLE0JkaCx6bvFd8dhte1hZmrfisIP
+kt8RtEdHpD0ZjWLuQYiNSar/s7YLpc4FL+wE5hnpYNp9JyXNIs8yun+i72K+/aVM
+T0qwUlB2Pz9KRodk3fJDxpSOOlGDU8uTMVJcAQMy+ORI4cqdwyyxS590zMDXqJoR
+EM3SBrl6Zb+MQvPbws2xGy4kDFddRgQqKoYaMAjYlmkrYZCnjP8=
+=4Gqp
 -----END PGP SIGNATURE-----
 
---q5r20fdKX+PFtYHw--
+--lrvsYIebpInmECXG--
