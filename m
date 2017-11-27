@@ -1,65 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60687)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39730)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pmorel@linux.vnet.ibm.com>) id 1eJEgO-00058f-2A
-	for qemu-devel@nongnu.org; Mon, 27 Nov 2017 03:22:32 -0500
+	(envelope-from <marcel@redhat.com>) id 1eJEx0-0001Ay-Ra
+	for qemu-devel@nongnu.org; Mon, 27 Nov 2017 03:39:40 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pmorel@linux.vnet.ibm.com>) id 1eJEgJ-0002cU-2x
-	for qemu-devel@nongnu.org; Mon, 27 Nov 2017 03:22:28 -0500
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:49666)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pmorel@linux.vnet.ibm.com>)
-	id 1eJEgI-0002bj-Q2
-	for qemu-devel@nongnu.org; Mon, 27 Nov 2017 03:22:23 -0500
-Received: from pps.filterd (m0098393.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
-	vAR8CjPC144862
-	for <qemu-devel@nongnu.org>; Mon, 27 Nov 2017 03:22:21 -0500
-Received: from e06smtp10.uk.ibm.com (e06smtp10.uk.ibm.com [195.75.94.106])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2egceje8pa-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Mon, 27 Nov 2017 03:22:21 -0500
-Received: from localhost
-	by e06smtp10.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
-	Only! Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <pmorel@linux.vnet.ibm.com>;
-	Mon, 27 Nov 2017 08:22:18 -0000
-Received: from d06av26.portsmouth.uk.ibm.com (d06av26.portsmouth.uk.ibm.com
-	[9.149.105.62])
-	by b06cxnps3075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with
-	ESMTP id vAR8MFX530343196
-	for <qemu-devel@nongnu.org>; Mon, 27 Nov 2017 08:22:15 GMT
-Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 639C3AE055
-	for <qemu-devel@nongnu.org>; Mon, 27 Nov 2017 08:15:25 +0000 (GMT)
-Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 46CC1AE056
-	for <qemu-devel@nongnu.org>; Mon, 27 Nov 2017 08:15:25 +0000 (GMT)
-Received: from [9.145.23.104] (unknown [9.145.23.104])
-	by d06av26.portsmouth.uk.ibm.com (Postfix) with ESMTP
-	for <qemu-devel@nongnu.org>; Mon, 27 Nov 2017 08:15:25 +0000 (GMT)
-References: <1511388334-16347-1-git-send-email-pmorel@linux.vnet.ibm.com>
-	<1511388334-16347-2-git-send-email-pmorel@linux.vnet.ibm.com>
-	<3acc6fdb-5638-97b2-2dc7-bce34d22cd1f@redhat.com>
-	<20171123104903.24424b40.cohuck@redhat.com>
-	<a3655016-0e6b-b80f-2282-f6efbff9e1f9@redhat.com>
-	<20171123110844.4649f3b1.cohuck@redhat.com>
-	<58a08c1d-3935-42e7-cdc0-7bc45c08d2d3@redhat.com>
-	<20171123113326.3b2c5281.cohuck@redhat.com>
-	<6ab0d29e-1af0-888a-c932-a0a294ea225d@linux.vnet.ibm.com>
-	<d59edb51-71ba-7b75-83df-e4be246d2fce@redhat.com>
-	<4000596f-d2a0-c32e-7683-7e074e8132e2@linux.vnet.ibm.com>
-	<37aa6eb3-cbdf-39af-2068-7d0e5949e601@linux.vnet.ibm.com>
-	<2ab76ab0-b20a-9eaf-cafb-195e1621edd6@redhat.com>
-From: Pierre Morel <pmorel@linux.vnet.ibm.com>
-Date: Mon, 27 Nov 2017 09:22:16 +0100
+	(envelope-from <marcel@redhat.com>) id 1eJEwz-0001Zu-BK
+	for qemu-devel@nongnu.org; Mon, 27 Nov 2017 03:39:38 -0500
+References: <20171125151610.20547-1-ehabkost@redhat.com>
+	<20171125151610.20547-2-ehabkost@redhat.com>
+From: Marcel Apfelbaum <marcel@redhat.com>
+Message-ID: <3a584684-6dc8-f91c-d889-fefef6fd753c@redhat.com>
+Date: Mon, 27 Nov 2017 10:39:18 +0200
 MIME-Version: 1.0
-In-Reply-To: <2ab76ab0-b20a-9eaf-cafb-195e1621edd6@redhat.com>
+In-Reply-To: <20171125151610.20547-2-ehabkost@redhat.com>
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
-Message-Id: <53b0540a-6d7a-600c-40fb-44bc4e7139fe@linux.vnet.ibm.com>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [qemu-s390x] [PATCH v3 1/7] s390x/pci: factor out
- endianess conversion
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v2 1/6] machine: Replace has_dynamic_sysbus
+ with list of allowed devices
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -68,150 +25,226 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Eduardo Habkost <ehabkost@redhat.com>, qemu-devel@nongnu.org
+Cc: jgross@suse.com, Thomas Huth <thuth@redhat.com>, sstabellini@kernel.org, Laszlo Ersek <lersek@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, "Michael S. Tsirkin" <mst@redhat.com>, Alexander Graf <agraf@suse.de>, David Gibson <david@gibson.dropbear.id.au>, Anthony Perard <anthony.perard@citrix.com>, qemu-arm@nongnu.org, qemu-ppc@nongnu.org, xen-devel@lists.xenproject.org
 
-On 27/11/2017 07:59, Thomas Huth wrote:
-> On 25.11.2017 14:49, Pierre Morel wrote:
->> On 24/11/2017 07:19, Yi Min Zhao wrote:
->>>
->>>
->>> =E5=9C=A8 2017/11/23 =E4=B8=8B=E5=8D=888:18, Thomas Huth =E5=86=99=E9=
-=81=93:
->>>> On 23.11.2017 13:07, Yi Min Zhao wrote:
->>>>>
->>>>> =E5=9C=A8 2017/11/23 =E4=B8=8B=E5=8D=886:33, Cornelia Huck =E5=86=99=
-=E9=81=93:
->>>>>> On Thu, 23 Nov 2017 11:25:10 +0100
->>>>>> Thomas Huth <thuth@redhat.com> wrote:
->>>>>>
->>>>>>> On 23.11.2017 11:08, Cornelia Huck wrote:
->>>>>>>> On Thu, 23 Nov 2017 11:01:23 +0100
->>>>>>>> Thomas Huth <thuth@redhat.com> wrote:
->>>>>>>>> On 23.11.2017 10:49, Cornelia Huck wrote:
->>>>>>>>>> On Thu, 23 Nov 2017 09:48:41 +0100
->>>>>>>>>> Thomas Huth <thuth@redhat.com> wrote:
->>>>>>>>>>> On 22.11.2017 23:05, Pierre Morel wrote:
->>>>>>> [...]
->>>>>>>>>>>> +/**
->>>>>>>>>>>> + * Swap data contained in s390x big endian registers to lit=
-tle
->>>>>>>>>>>> endian
->>>>>>>>>>>> + * PCI bars.
->>>>>>>>>>>> + *
->>>>>>>>>>>> + * @ptr: a pointer to a uint64_t data field
->>>>>>>>>>>> + * @len: the length of the valid data, must be 1,2,4 or 8
->>>>>>>>>>>> + */
->>>>>>>>>>>> +static int zpci_endian_swap(uint64_t *ptr, uint8_t len)
->>>>>>>>>>>> +{
->>>>>>>>>>>> +=C2=A0=C2=A0=C2=A0 uint64_t data =3D *ptr;
->>>>>>>>>>>> +
->>>>>>>>>>>> +=C2=A0=C2=A0=C2=A0 switch (len) {
->>>>>>>>>>>> +=C2=A0=C2=A0=C2=A0 case 1:
->>>>>>>>>>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 break;
->>>>>>>>>>>> +=C2=A0=C2=A0=C2=A0 case 2:
->>>>>>>>>>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 data =3D bswap16=
-(data);
->>>>>>>>>>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 break;
->>>>>>>>>>>> +=C2=A0=C2=A0=C2=A0 case 4:
->>>>>>>>>>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 data =3D bswap32=
-(data);
->>>>>>>>>>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 break;
->>>>>>>>>>>> +=C2=A0=C2=A0=C2=A0 case 8:
->>>>>>>>>>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 data =3D bswap64=
-(data);
->>>>>>>>>>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 break;
->>>>>>>>>>>> +=C2=A0=C2=A0=C2=A0 default:
->>>>>>>>>>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 return -EINVAL;
->>>>>>>>>>>> +=C2=A0=C2=A0=C2=A0 }
->>>>>>>>>>>> +=C2=A0=C2=A0=C2=A0 *ptr =3D data;
->>>>>>>>>>>> +=C2=A0=C2=A0=C2=A0 return 0;
->>>>>>>>>>>> +}
->>>>>>>>>>> While you're at it, I think that should rather be leXX_to_cpu=
-()
->>>>>>>>>>> instead
->>>>>>>>>>> of bswapXX() here,
->>>>>>>>>> I don't think that's correct, as this is supposed to swap BE
->>>>>>>>>> registers
->>>>>>>>>> to LE PCI bars.
->>>>>>>>> Yes, but for the CPU emulation, the registers are stored in the
->>>>>>>>> host's
->>>>>>>>> endianness in the CPUS390XState structure. Or why do we
->>>>>>>>> byte-swap them
->>>>>>>>> again with cpu_to_be64() during s390_store_status(), for exampl=
-e?
->>>>>>>> Gah, endian conversion is eating my brain...
->>>>>>>>
->>>>>>>> So, is the content we get BE or not? I thought in our last
->>>>>>>> discussion
->>>>>>>> we came to the conclusion that it is.
->>>>>>> data is read from / written to env->regs[r1], so this is host
->>>>>>> endian, as
->>>>>>> far as I know. PCI is little endian, so using le32_to_cpu() /
->>>>>>> cpu_to_le32() should IMHO be the right way to go here.
->>>>>>>
->>>>>>> By the way, if we want to use both, cpu_to_le and le_to_cpu,
->>>>>>> depending
->>>>>>> on whether we read from or write to PCI, we should maybe *not* pu=
-t
->>>>>>> this
->>>>>>> code into a separate function?
->>>>>> Yes, if your assessment is correct, we need two functions (I think
->>>>>> this
->>>>>> conversion is used in other places in later patches as well). Or a=
-re
->>>>>> there mechanisms for that already available?
->>>>> I have a question, is the data in cpu->regs the guest's endianess?
->>>> As far as I know, it's host endianness, so on x86 with TCG emulation=
-,
->>>> it's little endian.
->>>>
->>>>> In our case, the guest is S390. Although the arch is big-endian, th=
-e
->>>>> data in
->>>>> pcilg/stg instructions is little-endian.
->>>> PCI memory is always little endian, right.
->>>>
->>>>> Another question, does 'cpu' in cpu_to_le**() or le**_to_cpu() mean=
- the
->>>>> host endianess?
->>>> Yes, the "cpu" in cpu_to_le or le_to_cpu means the host, indeed. It'=
-s
->>>> confusing :-/
->>>>
->>>>> If the answers to upper two questions are yes, we actually need han=
-dle
->>>>> two cases.
->>>>> 1) For pcilg, we need to translate the data to little-endian, thus
->>>>> cpu_to_le**().
->>>>> 2) For pcistg, we need to translate the data to host endianess, thu=
-s
->>>>> le**_to_cpu().
->>>> I think we've got to byte-swap if the host is big endian (s390x), bu=
-t
->>>> not if the host is little endian (x86 with TCG).
->>
->> Here is my comprehension of this funny swapping:
->>
->> - TCG for a BE guest and a le host swap bytes because if we do (regist=
-er
->> & 0x01) in the zPCI interception code it must work what ever the
->> endianess is.
->=20
-> Uhhh, I might have missed that the value has already been byte-swapped
-> once by TCG for env->regs[r1] ...
-> Now I'm pretty much completely confused ... sorry for the noise if I wa=
-s
-> wrong... I think it's best you ignore my comment for now (i.e. go with
-> bswapXX() instead of le_to_cpuXX()), and if we later wire up zPCI with
-> TCG, we still can fix this if necessary.
->=20
->   Thomas
->=20
+On 25/11/2017 17:16, Eduardo Habkost wrote:
+> The existing has_dynamic_sysbus flag makes the machine accept
+> every user-creatable sysbus device type on the command-line.
+> Replace it with a list of allowed device types, so machines can
+> easily accept some sysbus devices while rejecting others.
+> 
+> To keep exactly the same behavior as before, the existing
+> has_dynamic_sysbus=true assignments are replaced with a
+> TYPE_SYS_BUS_DEVICE entry on the allowed list.  Other patches
+> will replace the TYPE_SYS_BUS_DEVICE entries with more specific
+> lists of devices.
+> 
+> Cc: Peter Maydell <peter.maydell@linaro.org>
+> Cc: Marcel Apfelbaum <marcel@redhat.com>
+> Cc: "Michael S. Tsirkin" <mst@redhat.com>
+> Cc: Alexander Graf <agraf@suse.de>
+> Cc: David Gibson <david@gibson.dropbear.id.au>
+> Cc: Stefano Stabellini <sstabellini@kernel.org>
+> Cc: Anthony Perard <anthony.perard@citrix.com>
+> Cc: qemu-arm@nongnu.org
+> Cc: qemu-ppc@nongnu.org
+> Cc: xen-devel@lists.xenproject.org
+> Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
+> ---
+> Changes v1 -> v2:
+> * Replace "dynamic sysbus whitelist" with "allowed sysbus devices"
+> * Simply add TYPE_SYS_BUS_DEVICE to the list on existing
+>    has_dynamic_sysbus=true machines, and make machine-types more
+>    strict in separate patches
+> ---
+>   include/hw/boards.h  |  5 ++++-
+>   hw/arm/virt.c        |  3 ++-
+>   hw/core/machine.c    | 43 +++++++++++++++++++++++++++++--------------
+>   hw/i386/pc_q35.c     |  3 ++-
+>   hw/ppc/e500plat.c    |  4 +++-
+>   hw/ppc/spapr.c       |  3 ++-
+>   hw/xen/xen_backend.c |  7 ++++++-
+>   7 files changed, 48 insertions(+), 20 deletions(-)
+> 
+> diff --git a/include/hw/boards.h b/include/hw/boards.h
+> index 156b16f7a6..041bc08971 100644
+> --- a/include/hw/boards.h
+> +++ b/include/hw/boards.h
+> @@ -76,6 +76,9 @@ void machine_set_cpu_numa_node(MachineState *machine,
+>                                  const CpuInstanceProperties *props,
+>                                  Error **errp);
+>   
+> +void machine_class_allow_dynamic_sysbus_dev(MachineClass *mc, const char *type);
+> +
+> +
+>   /**
+>    * CPUArchId:
+>    * @arch_id - architecture-dependent CPU ID of present or possible CPU
+> @@ -179,7 +182,6 @@ struct MachineClass {
+>           no_floppy:1,
+>           no_cdrom:1,
+>           no_sdcard:1,
+> -        has_dynamic_sysbus:1,
+>           pci_allow_0_address:1,
+>           legacy_fw_cfg_order:1;
+>       int is_default;
+> @@ -197,6 +199,7 @@ struct MachineClass {
+>       bool ignore_memory_transaction_failures;
+>       int numa_mem_align_shift;
+>       const char **valid_cpu_types;
+> +    strList *allowed_dynamic_sysbus_devices;
+>       bool auto_enable_numa_with_memhp;
+>       void (*numa_auto_assign_ram)(MachineClass *mc, NodeInfo *nodes,
+>                                    int nb_nodes, ram_addr_t size);
+> diff --git a/hw/arm/virt.c b/hw/arm/virt.c
+> index 9e18b410d7..fa6dc15fcd 100644
+> --- a/hw/arm/virt.c
+> +++ b/hw/arm/virt.c
+> @@ -1591,7 +1591,8 @@ static void virt_machine_class_init(ObjectClass *oc, void *data)
+>        * configuration of the particular instance.
+>        */
+>       mc->max_cpus = 255;
+> -    mc->has_dynamic_sysbus = true;
+> +    /*TODO: allow only sysbus devices that really work with this machine */
+> +    machine_class_allow_dynamic_sysbus_dev(mc, TYPE_SYS_BUS_DEVICE);
+>       mc->block_default_type = IF_VIRTIO;
+>       mc->no_cdrom = 1;
+>       mc->pci_allow_0_address = true;
+> diff --git a/hw/core/machine.c b/hw/core/machine.c
+> index 36c2fb069c..ab2ec292f3 100644
+> --- a/hw/core/machine.c
+> +++ b/hw/core/machine.c
+> @@ -335,29 +335,44 @@ static bool machine_get_enforce_config_section(Object *obj, Error **errp)
+>       return ms->enforce_config_section;
+>   }
+>   
+> -static void error_on_sysbus_device(SysBusDevice *sbdev, void *opaque)
+> +void machine_class_allow_dynamic_sysbus_dev(MachineClass *mc, const char *type)
+>   {
+> -    error_report("Option '-device %s' cannot be handled by this machine",
+> -                 object_class_get_name(object_get_class(OBJECT(sbdev))));
+> -    exit(1);
+> +    strList *item = g_new0(strList, 1);
+> +
+> +    item->value = g_strdup(type);
+> +    item->next = mc->allowed_dynamic_sysbus_devices;
+> +    mc->allowed_dynamic_sysbus_devices = item;
+>   }
+>   
+> -static void machine_init_notify(Notifier *notifier, void *data)
+> +static void validate_sysbus_device(SysBusDevice *sbdev, void *opaque)
+>   {
+> -    Object *machine = qdev_get_machine();
+> -    ObjectClass *oc = object_get_class(machine);
+> -    MachineClass *mc = MACHINE_CLASS(oc);
+> +    MachineState *machine = opaque;
+> +    MachineClass *mc = MACHINE_GET_CLASS(machine);
+> +    bool allowed = false;
+> +    strList *wl;
+>   
+> -    if (mc->has_dynamic_sysbus) {
+> -        /* Our machine can handle dynamic sysbus devices, we're all good */
+> -        return;
+> +    for (wl = mc->allowed_dynamic_sysbus_devices;
+> +         !allowed && wl;
+> +         wl = wl->next) {
+> +        allowed |= !!object_dynamic_cast(OBJECT(sbdev), wl->value);
+>       }
+>   
+> +    if (!allowed) {
+> +        error_report("Option '-device %s' cannot be handled by this machine",
+> +                     object_class_get_name(object_get_class(OBJECT(sbdev))));
+> +        exit(1);
+> +    }
+> +}
+> +
+> +static void machine_init_notify(Notifier *notifier, void *data)
+> +{
+> +    MachineState *machine = MACHINE(qdev_get_machine());
+> +
+>       /*
+> -     * Loop through all dynamically created devices and check whether there
+> -     * are sysbus devices among them. If there are, error out.
+> +     * Loop through all dynamically created sysbus devices and check if they are
+> +     * all allowed.  If a device is not allowed, error out.
+>        */
+> -    foreach_dynamic_sysbus_device(error_on_sysbus_device, NULL);
+> +    foreach_dynamic_sysbus_device(validate_sysbus_device, machine);
+>   }
+>   
+>   HotpluggableCPUList *machine_query_hotpluggable_cpus(MachineState *machine)
+> diff --git a/hw/i386/pc_q35.c b/hw/i386/pc_q35.c
+> index d6060043ac..d0b0e5b422 100644
+> --- a/hw/i386/pc_q35.c
+> +++ b/hw/i386/pc_q35.c
+> @@ -299,7 +299,8 @@ static void pc_q35_machine_options(MachineClass *m)
+>       m->default_machine_opts = "firmware=bios-256k.bin";
+>       m->default_display = "std";
+>       m->no_floppy = 1;
+> -    m->has_dynamic_sysbus = true;
+> +    /*TODO: allow only sysbus devices that really work with this machine */
+> +    machine_class_allow_dynamic_sysbus_dev(m, TYPE_SYS_BUS_DEVICE);
+>       m->max_cpus = 288;
+>   }
+>   
+> diff --git a/hw/ppc/e500plat.c b/hw/ppc/e500plat.c
+> index e59e80fb9e..438118c29b 100644
+> --- a/hw/ppc/e500plat.c
+> +++ b/hw/ppc/e500plat.c
+> @@ -15,6 +15,7 @@
+>   #include "hw/boards.h"
+>   #include "sysemu/device_tree.h"
+>   #include "sysemu/kvm.h"
+> +#include "hw/sysbus.h"
+>   #include "hw/pci/pci.h"
+>   #include "hw/ppc/openpic.h"
+>   #include "kvm_ppc.h"
+> @@ -63,7 +64,8 @@ static void e500plat_machine_init(MachineClass *mc)
+>       mc->desc = "generic paravirt e500 platform";
+>       mc->init = e500plat_init;
+>       mc->max_cpus = 32;
+> -    mc->has_dynamic_sysbus = true;
+> +    /*TODO: allow only sysbus devices that really work with this machine */
+> +    machine_class_allow_dynamic_sysbus_dev(mc, TYPE_SYS_BUS_DEVICE);
+>       mc->default_cpu_type = POWERPC_CPU_TYPE_NAME("e500v2_v30");
+>   }
+>   
+> diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
+> index d682f013d4..82040cc5d1 100644
+> --- a/hw/ppc/spapr.c
+> +++ b/hw/ppc/spapr.c
+> @@ -3603,7 +3603,8 @@ static void spapr_machine_class_init(ObjectClass *oc, void *data)
+>       mc->default_boot_order = "";
+>       mc->default_ram_size = 512 * M_BYTE;
+>       mc->kvm_type = spapr_kvm_type;
+> -    mc->has_dynamic_sysbus = true;
+> +    /*TODO: allow only sysbus devices that really work with this machine */
+> +    machine_class_allow_dynamic_sysbus_dev(mc, TYPE_SYS_BUS_DEVICE);
+>       mc->pci_allow_0_address = true;
+>       mc->get_hotplug_handler = spapr_get_hotplug_handler;
+>       hc->pre_plug = spapr_machine_device_pre_plug;
+> diff --git a/hw/xen/xen_backend.c b/hw/xen/xen_backend.c
+> index 0f849a26d2..82380ea9ee 100644
+> --- a/hw/xen/xen_backend.c
+> +++ b/hw/xen/xen_backend.c
+> @@ -564,7 +564,12 @@ static void xen_set_dynamic_sysbus(void)
+>       ObjectClass *oc = object_get_class(machine);
+>       MachineClass *mc = MACHINE_CLASS(oc);
+>   
+> -    mc->has_dynamic_sysbus = true;
+> +    /*
+> +     * Emulate old mc->has_dynamic_sysbus=true assignment
+> +     *
+> +     *TODO: add only Xen devices to the list
+> +     */
+> +    machine_class_allow_dynamic_sysbus_dev(mc, TYPE_SYS_BUS_DEVICE);
+>   }
+>   
+>   int xen_be_register(const char *type, struct XenDevOps *ops)
+> 
 
-OK, thanks.
+Reviewed-by: Marcel Apfelbaum <marcel@redhat.com>
 
-Pierre
-
---=20
-Pierre Morel
-Linux/KVM/QEMU in B=C3=B6blingen - Germany
+Thanks,
+Marcel
