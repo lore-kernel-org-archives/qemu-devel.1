@@ -1,15 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44545)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45370)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ybettan@redhat.com>) id 1eJM14-0007sg-2o
-	for qemu-devel@nongnu.org; Mon, 27 Nov 2017 11:12:24 -0500
+	(envelope-from <aconole@redhat.com>) id 1eJM3B-0000fc-NT
+	for qemu-devel@nongnu.org; Mon, 27 Nov 2017 11:14:33 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ybettan@redhat.com>) id 1eJM0x-0007Fh-MS
-	for qemu-devel@nongnu.org; Mon, 27 Nov 2017 11:12:18 -0500
-From: Yoni Bettan <ybettan@redhat.com>
-Date: Mon, 27 Nov 2017 18:10:48 +0200
-Message-Id: <20171127161048.22447-1-ybettan@redhat.com>
-Subject: [Qemu-devel] [PATCH] pci: removed the is_express field since a
- uniform interface was inserted
+	(envelope-from <aconole@redhat.com>) id 1eJM37-0007xb-UB
+	for qemu-devel@nongnu.org; Mon, 27 Nov 2017 11:14:29 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:49012)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <aconole@redhat.com>) id 1eJM37-0007xG-LQ
+	for qemu-devel@nongnu.org; Mon, 27 Nov 2017 11:14:25 -0500
+From: Aaron Conole <aconole@redhat.com>
+In-Reply-To: <20171127142515.GA450@yliu-dev> (Yuanhan Liu's message of "Mon,
+	27 Nov 2017 22:27:32 +0800")
+References: <20171127142515.GA450@yliu-dev>
+Date: Mon, 27 Nov 2017 11:14:09 -0500
+Message-ID: <f7tbmjnpulq.fsf@dhcp-25-97.bos.redhat.com>
+MIME-Version: 1.0
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [dpdk-dev] [ovs-dev] [PATCH RFC] netdev-dpdk: Fix
+ device obtain mac address when received first packet in vhost type
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -18,183 +27,92 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Yoni Bettan <ybettan@redhat.com>, Keith Busch <keith.busch@intel.com>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, Dmitry Fleytman <dmitry@daynix.com>, Jason Wang <jasowang@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Marcel Apfelbaum <marcel@redhat.com>, Paul Burton <paul.burton@mips.com>, Hannes Reinecke <hare@suse.com>, Paolo Bonzini <pbonzini@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>, Alex Williamson <alex.williamson@redhat.com>, "open list:nvme" <qemu-block@nongnu.org>
+To: Yuanhan Liu <yliu@fridaylinux.org>
+Cc: Chen Hailin <chenhl@arraynetworks.com.cn>, "jianfeng.tan" <jianfeng.tan@intel.com>, "ovs-dev@openvswitch.org" <ovs-dev@openvswitch.org>, Maxime Coquelin <maxime.coquelin@redhat.com>, qemu-devel <qemu-devel@nongnu.org>, dev <dev@dpdk.org>
 
-        * according to Eduardo Habkost's commit
-          fd3b02c8896d597dd8b9e053dec579cf0386aee1
+Yuanhan Liu <yliu@fridaylinux.org> writes:
 
-        * since all PCIEs now implement INTERFACE_PCIE_DEVICE we
-          don't need this field anymore
+> On Fri, Nov 24, 2017 at 05:59:09PM +0800, Chen Hailin wrote:
+>> Hi Aaron Conole && Jianfeng,
+>> 
+>> The stp could not work in ovs-dpdk vhostuser.
+>> Because the attached vhost device doesn't have MAC address.
+>> 
+>> Now we have two ways to solve this problem.
+>> 1. The vhost learns MAC address from packet like as my first patch.
+>
+> I do agree with Aaron this is not the right way.
+>
+>> 2. The virtio notifies MAC address actively to vhost user .
+>
+> Unfortunately, AFAIK, there is no way to achieve that so far. we could
+> either let virtio/QEMU to expose the CQ to vhost or add a new VHOST_USER
+> message to carry the mac address. While vhost-user is a generic interface
+> adding a virtio-net specific message also doesn't seem quite right.
+> Exposing CQ is probably the best we can do.
+>
+> Anyway, both need spec change.
 
-Signed-off-by: Yoni Bettan <ybettan@redhat.com>
----
- hw/block/nvme.c                    | 1 -
- hw/net/e1000e.c                    | 1 -
- hw/pci-bridge/pcie_pci_bridge.c    | 1 -
- hw/pci-bridge/pcie_root_port.c     | 1 -
- hw/pci-bridge/xio3130_downstream.c | 1 -
- hw/pci-bridge/xio3130_upstream.c   | 1 -
- hw/pci-host/xilinx-pcie.c          | 1 -
- hw/pci/pci.c                       | 3 ++-
- hw/scsi/megasas.c                  | 1 -
- hw/usb/hcd-xhci.c                  | 1 -
- hw/vfio/pci.c                      | 1 -
- include/hw/pci/pci.h               | 3 ---
- 12 files changed, 2 insertions(+), 14 deletions(-)
+There are other possible ways.  libvirt knows about the mac address from
+the domain xml file.  Perhaps it's possible to set the mac column in the
+database to the correct value when the port is being created in ovs?
+This would be an action taken by the orchestration tool.
 
-diff --git a/hw/block/nvme.c b/hw/block/nvme.c
-index 441e21ed1f..9325bc0911 100644
---- a/hw/block/nvme.c
-+++ b/hw/block/nvme.c
-@@ -1087,7 +1087,6 @@ static void nvme_class_init(ObjectClass *oc, void *data)
-     pc->vendor_id = PCI_VENDOR_ID_INTEL;
-     pc->device_id = 0x5845;
-     pc->revision = 2;
--    pc->is_express = 1;
- 
-     set_bit(DEVICE_CATEGORY_STORAGE, dc->categories);
-     dc->desc = "Non-Volatile Memory Express";
-diff --git a/hw/net/e1000e.c b/hw/net/e1000e.c
-index f1af279e8d..c360f0d8c9 100644
---- a/hw/net/e1000e.c
-+++ b/hw/net/e1000e.c
-@@ -675,7 +675,6 @@ static void e1000e_class_init(ObjectClass *class, void *data)
-     c->revision = 0;
-     c->romfile = "efi-e1000e.rom";
-     c->class_id = PCI_CLASS_NETWORK_ETHERNET;
--    c->is_express = 1;
- 
-     dc->desc = "Intel 82574L GbE Controller";
-     dc->reset = e1000e_qdev_reset;
-diff --git a/hw/pci-bridge/pcie_pci_bridge.c b/hw/pci-bridge/pcie_pci_bridge.c
-index a4d827c99d..b7d9ebbec2 100644
---- a/hw/pci-bridge/pcie_pci_bridge.c
-+++ b/hw/pci-bridge/pcie_pci_bridge.c
-@@ -169,7 +169,6 @@ static void pcie_pci_bridge_class_init(ObjectClass *klass, void *data)
-     DeviceClass *dc = DEVICE_CLASS(klass);
-     HotplugHandlerClass *hc = HOTPLUG_HANDLER_CLASS(klass);
- 
--    k->is_express = 1;
-     k->is_bridge = 1;
-     k->vendor_id = PCI_VENDOR_ID_REDHAT;
-     k->device_id = PCI_DEVICE_ID_REDHAT_PCIE_BRIDGE;
-diff --git a/hw/pci-bridge/pcie_root_port.c b/hw/pci-bridge/pcie_root_port.c
-index 9b6e4ce512..45f9e8cd4a 100644
---- a/hw/pci-bridge/pcie_root_port.c
-+++ b/hw/pci-bridge/pcie_root_port.c
-@@ -145,7 +145,6 @@ static void rp_class_init(ObjectClass *klass, void *data)
-     DeviceClass *dc = DEVICE_CLASS(klass);
-     PCIDeviceClass *k = PCI_DEVICE_CLASS(klass);
- 
--    k->is_express = 1;
-     k->is_bridge = 1;
-     k->config_write = rp_write_config;
-     k->realize = rp_realize;
-diff --git a/hw/pci-bridge/xio3130_downstream.c b/hw/pci-bridge/xio3130_downstream.c
-index 1e09d2afb7..613a0d6bb7 100644
---- a/hw/pci-bridge/xio3130_downstream.c
-+++ b/hw/pci-bridge/xio3130_downstream.c
-@@ -177,7 +177,6 @@ static void xio3130_downstream_class_init(ObjectClass *klass, void *data)
-     DeviceClass *dc = DEVICE_CLASS(klass);
-     PCIDeviceClass *k = PCI_DEVICE_CLASS(klass);
- 
--    k->is_express = 1;
-     k->is_bridge = 1;
-     k->config_write = xio3130_downstream_write_config;
-     k->realize = xio3130_downstream_realize;
-diff --git a/hw/pci-bridge/xio3130_upstream.c b/hw/pci-bridge/xio3130_upstream.c
-index 227997ce46..d4645bddee 100644
---- a/hw/pci-bridge/xio3130_upstream.c
-+++ b/hw/pci-bridge/xio3130_upstream.c
-@@ -148,7 +148,6 @@ static void xio3130_upstream_class_init(ObjectClass *klass, void *data)
-     DeviceClass *dc = DEVICE_CLASS(klass);
-     PCIDeviceClass *k = PCI_DEVICE_CLASS(klass);
- 
--    k->is_express = 1;
-     k->is_bridge = 1;
-     k->config_write = xio3130_upstream_write_config;
-     k->realize = xio3130_upstream_realize;
-diff --git a/hw/pci-host/xilinx-pcie.c b/hw/pci-host/xilinx-pcie.c
-index 7659253090..a4ca3ba30f 100644
---- a/hw/pci-host/xilinx-pcie.c
-+++ b/hw/pci-host/xilinx-pcie.c
-@@ -298,7 +298,6 @@ static void xilinx_pcie_root_class_init(ObjectClass *klass, void *data)
-     k->device_id = 0x7021;
-     k->revision = 0;
-     k->class_id = PCI_CLASS_BRIDGE_HOST;
--    k->is_express = true;
-     k->is_bridge = true;
-     k->init = xilinx_pcie_root_init;
-     k->exit = pci_bridge_exitfn;
-diff --git a/hw/pci/pci.c b/hw/pci/pci.c
-index b2d139bd9a..02f6f2f37a 100644
---- a/hw/pci/pci.c
-+++ b/hw/pci/pci.c
-@@ -2014,12 +2014,13 @@ static void pci_qdev_realize(DeviceState *qdev, Error **errp)
- {
-     PCIDevice *pci_dev = (PCIDevice *)qdev;
-     PCIDeviceClass *pc = PCI_DEVICE_GET_CLASS(pci_dev);
-+    ObjectClass *klass = &(pc->parent_class.parent_class);
-     Error *local_err = NULL;
-     PCIBus *bus;
-     bool is_default_rom;
- 
-     /* initialize cap_present for pci_is_express() and pci_config_size() */
--    if (pc->is_express) {
-+    if (object_class_dynamic_cast(klass, INTERFACE_PCIE_DEVICE)) {
-         pci_dev->cap_present |= QEMU_PCI_CAP_EXPRESS;
-     }
- 
-diff --git a/hw/scsi/megasas.c b/hw/scsi/megasas.c
-index d5eae6239a..987c064e4b 100644
---- a/hw/scsi/megasas.c
-+++ b/hw/scsi/megasas.c
-@@ -2506,7 +2506,6 @@ static void megasas_class_init(ObjectClass *oc, void *data)
-     pc->subsystem_vendor_id = PCI_VENDOR_ID_LSI_LOGIC;
-     pc->subsystem_id = info->subsystem_id;
-     pc->class_id = PCI_CLASS_STORAGE_RAID;
--    pc->is_express = info->is_express;
-     e->mmio_bar = info->mmio_bar;
-     e->ioport_bar = info->ioport_bar;
-     e->osts = info->osts;
-diff --git a/hw/usb/hcd-xhci.c b/hw/usb/hcd-xhci.c
-index af3a9d88de..12e12f4f21 100644
---- a/hw/usb/hcd-xhci.c
-+++ b/hw/usb/hcd-xhci.c
-@@ -3661,7 +3661,6 @@ static void xhci_class_init(ObjectClass *klass, void *data)
-     k->realize      = usb_xhci_realize;
-     k->exit         = usb_xhci_exit;
-     k->class_id     = PCI_CLASS_SERIAL_USB;
--    k->is_express   = 1;
- }
- 
- static const TypeInfo xhci_info = {
-diff --git a/hw/vfio/pci.c b/hw/vfio/pci.c
-index c977ee327f..d2c1d47148 100644
---- a/hw/vfio/pci.c
-+++ b/hw/vfio/pci.c
-@@ -3026,7 +3026,6 @@ static void vfio_pci_dev_class_init(ObjectClass *klass, void *data)
-     pdc->exit = vfio_exitfn;
-     pdc->config_read = vfio_pci_read_config;
-     pdc->config_write = vfio_pci_write_config;
--    pdc->is_express = 1; /* We might be */
- }
- 
- static const TypeInfo vfio_pci_dev_info = {
-diff --git a/include/hw/pci/pci.h b/include/hw/pci/pci.h
-index 8d02a0a383..a27be85111 100644
---- a/include/hw/pci/pci.h
-+++ b/include/hw/pci/pci.h
-@@ -236,9 +236,6 @@ typedef struct PCIDeviceClass {
-      */
-     int is_bridge;
- 
--    /* pcie stuff */
--    int is_express;   /* is this device pci express? */
--
-     /* rom bar */
-     const char *romfile;
- } PCIDeviceClass;
--- 
-2.13.6
+Additionally, there's a mechanism in virtio-net to set the mac address
+from the host to the guest.  Is it possible to expose that functionality
+through vhost-user?
+
+Then when the orchestration tool sets the mac, it can be propagated, and
+mac_in_use can reflect the appropriate value.  I think that's a workable
+solution, but I might have missed something.
+
+> 	--yliu
+>> 
+>> In my opinions,  if we treat it as a device,  we should allocate 
+>> MAC address for the device when the VM started.
+>> 
+>> Which one do you think better?
+>> 
+>> 
+>> 
+>> Best Regards,
+>> Chen Hailin
+>> chenhl@arraynetworks.com.cn
+>>  
+>> From: Aaron Conole
+>> Date: 2017-11-18 10:00
+>> To: Hailin Chen
+>> CC: ovs-dev@openvswitch.org; Maxime Coquelin; cloud@arraynetworks.com.cn
+>> Subject: Re: [ovs-dev] [PATCH RFC] netdev-dpdk: Fix device obtain
+>> mac address when received first packet in vhost type
+>> Hi Hailin,
+>>  
+>> Hailin Chen <chenhl@arraynetworks.com.cn> writes:
+>>  
+>> > The stp could not work on netdev-dpdk if network is loop.
+>> > Because the stp protocol negotiates designate port by sending
+>> > BPDU packets which contains MAC address.
+>> > However the device doesn't have MAC address in vhostuser type.
+>> > Thus, function send_bpdu_cb would not send BPDU packets.
+>> >
+>> > This patch will set the MAC for device when received first packet.
+>> >
+>> > Signed-off-by: Hailin Chen <chenhl@arraynetworks.com.cn>
+>> > ---
+>>  
+>> Thanks for the patch.
+>>  
+>> In general, I don't think this is the right approach to deal with this
+>> type of issue.  I believe the problem statement is that OvS bridge is
+>> unaware of the guest MAC address - did I get it right?  In that case, I
+>> would think that a better way to solve this would be to have virtio tell
+>> the mac address of the guest.  I don't recall right now if that's
+>> allowed in the virtio spec, but I do remember some kind of negotiation
+>> features.
+>>  
+>> I've CC'd Maxime, who is one of the maintainers of the virtio code from
+>> DPDK side.  Perhaps there is an alternate way to solve this.
+>> _______________________________________________
+>> dev mailing list
+>> dev@openvswitch.org
+>> https://mail.openvswitch.org/mailman/listinfo/ovs-dev
