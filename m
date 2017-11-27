@@ -1,17 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42364)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43856)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1eJB3d-00057D-I5
-	for qemu-devel@nongnu.org; Sun, 26 Nov 2017 23:30:14 -0500
+	(envelope-from <haozhong.zhang@intel.com>) id 1eJB9i-0007pC-Gf
+	for qemu-devel@nongnu.org; Sun, 26 Nov 2017 23:36:31 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1eJB3a-00026K-CX
-	for qemu-devel@nongnu.org; Sun, 26 Nov 2017 23:30:13 -0500
-From: David Gibson <david@gibson.dropbear.id.au>
-Date: Mon, 27 Nov 2017 15:30:03 +1100
-Message-Id: <20171127043003.15034-3-david@gibson.dropbear.id.au>
-In-Reply-To: <20171127043003.15034-1-david@gibson.dropbear.id.au>
-References: <20171127043003.15034-1-david@gibson.dropbear.id.au>
-Subject: [Qemu-devel] [PULL 2/2] target/ppc: Fix setting of cpu->compat_pvr
- on incoming migration
+	(envelope-from <haozhong.zhang@intel.com>) id 1eJB9d-0004v6-I3
+	for qemu-devel@nongnu.org; Sun, 26 Nov 2017 23:36:30 -0500
+Received: from mga02.intel.com ([134.134.136.20]:3941)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <haozhong.zhang@intel.com>)
+	id 1eJB9d-0004tw-99
+	for qemu-devel@nongnu.org; Sun, 26 Nov 2017 23:36:25 -0500
+From: Haozhong Zhang <haozhong.zhang@intel.com>
+Date: Mon, 27 Nov 2017 12:35:14 +0800
+Message-Id: <20171127043517.22441-1-haozhong.zhang@intel.com>
+Subject: [Qemu-devel] [PATCH-for-2.12 v3 0/3] nvdimm: fixes for (non-)dax
+ backends
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -20,49 +23,38 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: peter.maydell@linaro.org
-Cc: surajjs@au1.ibm.com, agraf@suse.de, groug@kaod.org, qemu-ppc@nongnu.org, qemu-devel@nongnu.org, Suraj Jitindar Singh <sjitindarsingh@gmail.com>, David Gibson <david@gibson.dropbear.id.au>
+To: qemu-devel@nongnu.org
+Cc: Xiao Guangrong <guangrong.xiao@gmail.com>, Stefan Hajnoczi <stefanha@gmail.com>, Dan Williams <dan.j.williams@intel.com>, Haozhong Zhang <haozhong.zhang@intel.com>, Eduardo Habkost <ehabkost@redhat.com>, Igor Mammedov <imammedo@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Richard Henderson <rth@twiddle.net>, "Michael S. Tsirkin" <mst@redhat.com>, Xiao Guangrong <xiaoguangrong.eric@gmail.com>
 
-From: Suraj Jitindar Singh <sjitindarsingh@gmail.com>
+Previous versions can be found at
+  v2: https://lists.gnu.org/archive/html/qemu-devel/2017-06/msg01203.html
+  v1: https://lists.gnu.org/archive/html/qemu-devel/2017-05/msg05919.html
 
-cpu->compat_pvr is used to store the current compat mode of the cpu.
+Changes in v3:
+ * Add an option 'align' to 'memory-backend-file' to address the
+   failure when mmap device dax (patch 1).
+ * Remove device dax check, which needs to access sysfs and may not
+   work with SELinux.
+ * Add a boolean option 'unarmed' to '-device nvdimm', which allows
+   users to control the unarmed flag in guest ACPI NFIT. I don't make
+   it as OnOffAuto, because of the remove of device dax check.
+ * Document new options added by this patch series.
 
-On the receiving side during incoming migration we check compatibility
-with the compat mode by calling ppc_set_compat(). However we fail to set
-the compat mode with the hypervisor since the "new" compat mode doesn't
-differ from the current (due to a "cpu->compat_pvr != compat_pvr" check).
-This means that kvm runs the vcpus without a compat mode, which is the
-incorrect behaviour. The implication being that a compatibility mode
-will never be in effect after migration.
+Haozhong Zhang (3):
+  hostmem-file: add "align" option
+  nvdimm: add a macro for property "label-size"
+  nvdimm: add 'unarmed' option
 
-To fix this so that the compat mode is correctly set with the
-hypervisor, store the desired compat mode and reset cpu->compat_pvr to
-zero before calling ppc_set_compat().
+ backends/hostmem-file.c | 41 ++++++++++++++++++++++++++++++++++++++++-
+ docs/nvdimm.txt         | 31 +++++++++++++++++++++++++++++++
+ exec.c                  |  8 +++++++-
+ hw/acpi/nvdimm.c        |  7 +++++++
+ hw/mem/nvdimm.c         | 28 +++++++++++++++++++++++++++-
+ include/exec/memory.h   |  3 +++
+ include/hw/mem/nvdimm.h | 12 ++++++++++++
+ memory.c                |  2 ++
+ numa.c                  |  2 +-
+ 9 files changed, 130 insertions(+), 4 deletions(-)
 
-Fixes: 5dfaa532 ("ppc: fix ppc_set_compat() with KVM PR")
-
-Signed-off-by: Suraj Jitindar Singh <sjitindarsingh@gmail.com>
-Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
----
- target/ppc/machine.c | 4 +++-
- 1 file changed, 3 insertions(+), 1 deletion(-)
-
-diff --git a/target/ppc/machine.c b/target/ppc/machine.c
-index 384caee800..24117e8f31 100644
---- a/target/ppc/machine.c
-+++ b/target/ppc/machine.c
-@@ -237,9 +237,11 @@ static int cpu_post_load(void *opaque, int version_id)
- 
- #if defined(TARGET_PPC64)
-     if (cpu->compat_pvr) {
-+        uint32_t compat_pvr = cpu->compat_pvr;
-         Error *local_err = NULL;
- 
--        ppc_set_compat(cpu, cpu->compat_pvr, &local_err);
-+        cpu->compat_pvr = 0;
-+        ppc_set_compat(cpu, compat_pvr, &local_err);
-         if (local_err) {
-             error_report_err(local_err);
-             return -1;
 -- 
-2.14.3
+2.14.1
