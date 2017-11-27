@@ -1,32 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41906)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42424)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1eJHBo-0008TF-Uc
-	for qemu-devel@nongnu.org; Mon, 27 Nov 2017 06:03:08 -0500
+	(envelope-from <dgilbert@redhat.com>) id 1eJHD7-0000oA-AA
+	for qemu-devel@nongnu.org; Mon, 27 Nov 2017 06:04:29 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1eJHBl-0000Rd-3y
-	for qemu-devel@nongnu.org; Mon, 27 Nov 2017 06:03:05 -0500
-Date: Mon, 27 Nov 2017 12:02:55 +0100
-From: Cornelia Huck <cohuck@redhat.com>
-Message-ID: <20171127120255.2d36c8f3.cohuck@redhat.com>
-In-Reply-To: <2ab76ab0-b20a-9eaf-cafb-195e1621edd6@redhat.com>
-References: <1511388334-16347-1-git-send-email-pmorel@linux.vnet.ibm.com>
-	<1511388334-16347-2-git-send-email-pmorel@linux.vnet.ibm.com>
-	<3acc6fdb-5638-97b2-2dc7-bce34d22cd1f@redhat.com>
-	<20171123104903.24424b40.cohuck@redhat.com>
-	<a3655016-0e6b-b80f-2282-f6efbff9e1f9@redhat.com>
-	<20171123110844.4649f3b1.cohuck@redhat.com>
-	<58a08c1d-3935-42e7-cdc0-7bc45c08d2d3@redhat.com>
-	<20171123113326.3b2c5281.cohuck@redhat.com>
-	<6ab0d29e-1af0-888a-c932-a0a294ea225d@linux.vnet.ibm.com>
-	<d59edb51-71ba-7b75-83df-e4be246d2fce@redhat.com>
-	<4000596f-d2a0-c32e-7683-7e074e8132e2@linux.vnet.ibm.com>
-	<37aa6eb3-cbdf-39af-2068-7d0e5949e601@linux.vnet.ibm.com>
-	<2ab76ab0-b20a-9eaf-cafb-195e1621edd6@redhat.com>
+	(envelope-from <dgilbert@redhat.com>) id 1eJHD1-0000uz-Hi
+	for qemu-devel@nongnu.org; Mon, 27 Nov 2017 06:04:25 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:56934)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1eJHD1-0000us-8r
+	for qemu-devel@nongnu.org; Mon, 27 Nov 2017 06:04:19 -0500
+Date: Mon, 27 Nov 2017 11:04:00 +0000
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20171127110359.GA3128@work-vm>
+References: <20171116130610.23582-1-peterx@redhat.com>
+	<20171116130610.23582-22-peterx@redhat.com>
+	<20171124131452.GD2302@work-vm> <20171127052003.GB5153@xz-mi>
+	<20171127104426.GB2338@work-vm> <20171127105450.GA2678@xz-mi>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [qemu-s390x] [PATCH v3 1/7] s390x/pci: factor out
- endianess conversion
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20171127105450.GA2678@xz-mi>
+Subject: Re: [Qemu-devel] [RFC v4 21/27] qmp: let migrate-incoming allow
+ out-of-band
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,52 +30,73 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>
-Cc: Pierre Morel <pmorel@linux.vnet.ibm.com>, Yi Min Zhao <zyimin@linux.vnet.ibm.com>, pasic@linux.vnet.ibm.com, qemu-devel@nongnu.org, agraf@suse.de, borntraeger@de.ibm.com, Qemu-s390x list <qemu-s390x@nongnu.org>
+To: Peter Xu <peterx@redhat.com>
+Cc: qemu-devel@nongnu.org, Stefan Hajnoczi <shajnocz@redhat.com>, "Daniel P . Berrange" <berrange@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Fam Zheng <famz@redhat.com>, Juan Quintela <quintela@redhat.com>, mdroth@linux.vnet.ibm.com, Eric Blake <eblake@redhat.com>, Laurent Vivier <lvivier@redhat.com>, Markus Armbruster <armbru@redhat.com>, marcandre.lureau@redhat.com
 
-On Mon, 27 Nov 2017 07:59:36 +0100
-Thomas Huth <thuth@redhat.com> wrote:
+* Peter Xu (peterx@redhat.com) wrote:
+> On Mon, Nov 27, 2017 at 10:44:26AM +0000, Dr. David Alan Gilbert wrote:
+> 
+> [...]
+> 
+> > > > 
+> > > > But then I added a break on pthread_mutex_lock, and I've got
+> > > > this set caused by qemu_start_incoming_migration sending a
+> > > > MIGRATION_STATUS_SETUP event:
+> > > > 
+> > > > #1  0x0000555555ba6eba in qemu_mutex_lock (mutex=mutex@entry=0x5555563f9ba0 <monitor_lock>)
+> > > >     at /home/dgilbert/git/qemu/util/qemu-thread-posix.c:65
+> > > > #2  0x00005555557f01c1 in monitor_qapi_event_queue (event=QAPI_EVENT_MIGRATION, qdict=0x555557d93c00, errp=<optimized out>) at /home/dgilbert/git/qemu/monitor.c:442
+> > > > 
+> > > > 440	    trace_monitor_protocol_event_queue(event, qdict, evconf->rate);
+> > > > 441	
+> > > > 442	    qemu_mutex_lock(&monitor_lock);
+> > > > 443	
+> > > > 
+> > > > #3  0x0000555555b92722 in qapi_event_send_migration (status=status@entry=MIGRATION_STATUS_SETUP, errp=0x555556859320 <error_abort>) at qapi-event.c:661
+> > > > #4  0x0000555555a6159f in qemu_start_incoming_migration (uri=0x555557693f30 "tcp:0:4444", errp=0x7fffffffc700)
+> > > >     at /home/dgilbert/git/qemu/migration/migration.c:253
+> > > > #5  0x0000555555a641c5 in qmp_migrate_incoming (uri=0x555557693f30 "tcp:0:4444", errp=0x7fffffffc730)
+> > > >     at /home/dgilbert/git/qemu/migration/migration.c:1321
+> > > > 
+> > > > is there anything which protects us there?
+> > > 
+> > > IIUC you mean what if we e.g. page fault during taking the
+> > > monitor_lock?  IMHO it just can't happen - monitor_lock is really used
+> > > in limited places and during those critical sections there is no guest
+> > > memory access at all (which only protects the monitor logic itself
+> > > AFAICT).
+> > 
+> > OK, so we should document somewhere which locks it's OK to take in an
+> > OOB command, and then make sure that for each of those locks we add
+> > a note saying that anyone taking them must be careful.
+> > We should also add a note above teh qmp_migrate_incoming that it's an
+> > OOB command and to take care.
+> 
+> Makes sense.  I think it will be hard to document what locks can be
+> taken during OOB command handing since there can be too many locks
+> there...
 
-> On 25.11.2017 14:49, Pierre Morel wrote:
-> > On 24/11/2017 07:19, Yi Min Zhao wrote: =20
-> >>
-> >>
-> >> =E5=9C=A8 2017/11/23 =E4=B8=8B=E5=8D=888:18, Thomas Huth =E5=86=99=E9=
-=81=93: =20
-> >>> On 23.11.2017 13:07, Yi Min Zhao wrote: =20
+Yes, but we need people who are marking commands as OOB to really think
+about it, otherwise they'll use a lock that in some weird corner case
+can also be taken by another command that can block.
 
-> >>>> Another question, does 'cpu' in cpu_to_le**() or le**_to_cpu() mean =
-the
-> >>>> host endianess? =20
-> >>> Yes, the "cpu" in cpu_to_le or le_to_cpu means the host, indeed. It's
-> >>> confusing :-/
-> >>> =20
-> >>>> If the answers to upper two questions are yes, we actually need hand=
-le
-> >>>> two cases.
-> >>>> 1) For pcilg, we need to translate the data to little-endian, thus
-> >>>> cpu_to_le**().
-> >>>> 2) For pcistg, we need to translate the data to host endianess, thus
-> >>>> le**_to_cpu(). =20
-> >>> I think we've got to byte-swap if the host is big endian (s390x), but
-> >>> not if the host is little endian (x86 with TCG). =20
-> >=20
-> > Here is my comprehension of this funny swapping:
-> >=20
-> > - TCG for a BE guest and a le host swap bytes because if we do (register
-> > & 0x01) in the zPCI interception code it must work what ever the
-> > endianess is. =20
->=20
-> Uhhh, I might have missed that the value has already been byte-swapped
-> once by TCG for env->regs[r1] ...
-> Now I'm pretty much completely confused ... sorry for the noise if I was
-> wrong... I think it's best you ignore my comment for now (i.e. go with
-> bswapXX() instead of le_to_cpuXX()), and if we later wire up zPCI with
-> TCG, we still can fix this if necessary.
+> But at least I can add a comment to qmp_migrate_incoming()
+> along with current patch to note that this function should be OOB
+> friendly from now on.
 
-I'll try my current pci/tcg patches on LPAR with this (or a v4) on top.
-If it works there (it doesn't yet on my laptop), we do have a
-endianness issue... (unfortunately, the reverse isn't true.)
+Thanks.
 
-I'll post my pci/tcg patches once I get it mostly working (and it does
-not look like a horror from the crypt anymore).
+Dave
+ 
+> > 
+> > However, since you've convinced me it's OK:
+> > 
+> > 
+> > Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+> 
+> Thanks!
+> 
+> -- 
+> Peter Xu
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
