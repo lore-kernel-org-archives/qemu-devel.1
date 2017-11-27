@@ -1,54 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46878)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46902)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pmorel@linux.vnet.ibm.com>) id 1eJLHK-0005NZ-Qd
-	for qemu-devel@nongnu.org; Mon, 27 Nov 2017 10:25:06 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1eJLHN-0005Nb-VE
+	for qemu-devel@nongnu.org; Mon, 27 Nov 2017 10:25:11 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pmorel@linux.vnet.ibm.com>) id 1eJLHH-0008Nb-Eh
-	for qemu-devel@nongnu.org; Mon, 27 Nov 2017 10:25:02 -0500
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:33658
-	helo=mx0a-001b2d01.pphosted.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pmorel@linux.vnet.ibm.com>)
-	id 1eJLHH-0008NP-8d
-	for qemu-devel@nongnu.org; Mon, 27 Nov 2017 10:24:59 -0500
-Received: from pps.filterd (m0098419.ppops.net [127.0.0.1])
-	by mx0b-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
-	vARFOs5c033515
-	for <qemu-devel@nongnu.org>; Mon, 27 Nov 2017 10:24:56 -0500
-Received: from e06smtp13.uk.ibm.com (e06smtp13.uk.ibm.com [195.75.94.109])
-	by mx0b-001b2d01.pphosted.com with ESMTP id 2egkp8w8sx-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Mon, 27 Nov 2017 10:24:55 -0500
-Received: from localhost
-	by e06smtp13.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
-	Only! Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <pmorel@linux.vnet.ibm.com>;
-	Mon, 27 Nov 2017 15:24:12 -0000
-References: <1511388334-16347-1-git-send-email-pmorel@linux.vnet.ibm.com>
-	<1511388334-16347-2-git-send-email-pmorel@linux.vnet.ibm.com>
-	<3acc6fdb-5638-97b2-2dc7-bce34d22cd1f@redhat.com>
-	<20171123104903.24424b40.cohuck@redhat.com>
-	<a3655016-0e6b-b80f-2282-f6efbff9e1f9@redhat.com>
-	<20171123110844.4649f3b1.cohuck@redhat.com>
-	<58a08c1d-3935-42e7-cdc0-7bc45c08d2d3@redhat.com>
-	<20171123113326.3b2c5281.cohuck@redhat.com>
-	<6ab0d29e-1af0-888a-c932-a0a294ea225d@linux.vnet.ibm.com>
-	<d59edb51-71ba-7b75-83df-e4be246d2fce@redhat.com>
-	<4000596f-d2a0-c32e-7683-7e074e8132e2@linux.vnet.ibm.com>
-	<37aa6eb3-cbdf-39af-2068-7d0e5949e601@linux.vnet.ibm.com>
-	<2ab76ab0-b20a-9eaf-cafb-195e1621edd6@redhat.com>
-	<20171127120255.2d36c8f3.cohuck@redhat.com>
-	<20171127153436.200a01c7.cohuck@redhat.com>
-From: Pierre Morel <pmorel@linux.vnet.ibm.com>
-Date: Mon, 27 Nov 2017 16:24:08 +0100
+	(envelope-from <peter.maydell@linaro.org>) id 1eJLHN-0008PI-0n
+	for qemu-devel@nongnu.org; Mon, 27 Nov 2017 10:25:05 -0500
+Received: from mail-ot0-x244.google.com ([2607:f8b0:4003:c0f::244]:33890)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1eJLHM-0008P4-RZ
+	for qemu-devel@nongnu.org; Mon, 27 Nov 2017 10:25:04 -0500
+Received: by mail-ot0-x244.google.com with SMTP id o23so24488855otd.1
+	for <qemu-devel@nongnu.org>; Mon, 27 Nov 2017 07:25:04 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <20171127153436.200a01c7.cohuck@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Message-Id: <c0fd850b-3d6f-4a4b-f9e0-e5009a273be0@linux.vnet.ibm.com>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [qemu-s390x] [PATCH v3 1/7] s390x/pci: factor out
- endianess conversion
+In-Reply-To: <af9abebc-0650-a7c7-e63d-adafaa7031d6@linaro.org>
+References: <ab2eda3b-571f-025e-66e9-6c1577793a08@physik.fu-berlin.de>
+	<b3becdc0-6540-30a6-b70b-8312ac5dddd9@physik.fu-berlin.de>
+	<af9abebc-0650-a7c7-e63d-adafaa7031d6@linaro.org>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Mon, 27 Nov 2017 16:24:43 +0100
+Message-ID: <CAFEAcA_mR86vZhqe7yZwUdSSFyKDcms6UoK-NnXgW2ER8GL5tw@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] glibc "linux: spawni.c: simplify error reporting
+ to parent" breaks qemu-user/Windows Service For Linux
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -57,82 +31,47 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Cornelia Huck <cohuck@redhat.com>, Thomas Huth <thuth@redhat.com>
-Cc: Yi Min Zhao <zyimin@linux.vnet.ibm.com>, pasic@linux.vnet.ibm.com, qemu-devel@nongnu.org, agraf@suse.de, borntraeger@de.ibm.com, Qemu-s390x list <qemu-s390x@nongnu.org>
+To: Adhemerval Zanella <adhemerval.zanella@linaro.org>
+Cc: John Paul Adrian Glaubitz <glaubitz@physik.fu-berlin.de>, Rasmus Villemoes <rv@rasmusvillemoes.dk>, QEMU Developers <qemu-devel@nongnu.org>, Michael Karcher <debian@mkarcher.dialup.fu-berlin.de>, James Clarke <jrtc27@jrtc27.com>, Laurent Vivier <laurent@vivier.eu>, Adhemerval Zanella <adhemerval.zanella@linaro.com>
 
-On 27/11/2017 15:34, Cornelia Huck wrote:
-> On Mon, 27 Nov 2017 12:02:55 +0100
-> Cornelia Huck <cohuck@redhat.com> wrote:
->=20
->> On Mon, 27 Nov 2017 07:59:36 +0100
->> Thomas Huth <thuth@redhat.com> wrote:
->>
->>> On 25.11.2017 14:49, Pierre Morel wrote:
->>>> On 24/11/2017 07:19, Yi Min Zhao wrote:
->>>>>
->>>>>
->>>>> =E5=9C=A8 2017/11/23 =E4=B8=8B=E5=8D=888:18, Thomas Huth =E5=86=99=E9=
-=81=93:
->>>>>> On 23.11.2017 13:07, Yi Min Zhao wrote:
->>
->>>>>>> Another question, does 'cpu' in cpu_to_le**() or le**_to_cpu() me=
-an the
->>>>>>> host endianess?
->>>>>> Yes, the "cpu" in cpu_to_le or le_to_cpu means the host, indeed. I=
-t's
->>>>>> confusing :-/
->>>>>>    =20
->>>>>>> If the answers to upper two questions are yes, we actually need h=
-andle
->>>>>>> two cases.
->>>>>>> 1) For pcilg, we need to translate the data to little-endian, thu=
-s
->>>>>>> cpu_to_le**().
->>>>>>> 2) For pcistg, we need to translate the data to host endianess, t=
-hus
->>>>>>> le**_to_cpu().
->>>>>> I think we've got to byte-swap if the host is big endian (s390x), =
-but
->>>>>> not if the host is little endian (x86 with TCG).
->>>>
->>>> Here is my comprehension of this funny swapping:
->>>>
->>>> - TCG for a BE guest and a le host swap bytes because if we do (regi=
-ster
->>>> & 0x01) in the zPCI interception code it must work what ever the
->>>> endianess is.
->>>
->>> Uhhh, I might have missed that the value has already been byte-swappe=
-d
->>> once by TCG for env->regs[r1] ...
->>> Now I'm pretty much completely confused ... sorry for the noise if I =
-was
->>> wrong... I think it's best you ignore my comment for now (i.e. go wit=
-h
->>> bswapXX() instead of le_to_cpuXX()), and if we later wire up zPCI wit=
-h
->>> TCG, we still can fix this if necessary.
->>
->> I'll try my current pci/tcg patches on LPAR with this (or a v4) on top.
->> If it works there (it doesn't yet on my laptop), we do have a
->> endianness issue... (unfortunately, the reverse isn't true.)
->=20
-> It does not look too bad: I can get a nice enP1p0s0 device from a
-> virtio-net-pci with my tcg patches on my laptop (with these patches as
-> well, of course). So, endianness is likely mostly fine.
+On 27 November 2017 at 12:57, Adhemerval Zanella
+<adhemerval.zanella@linaro.org> wrote:
+> We found out this potential bogus assert on 2.27 development [1] which
+> resulted in two fixes [2][3].
+>
+> It should not be an issue for generic posix_spawn usage where there is
+> no expectation system/user/program kills random pids (since posix_spawn
+> auxiliary process has not yet returned). Some say the possible kind of
+> behaviour is rather undefined, but it shouldn't also trigger an assert.
+>
+> I am not really sure what is happening in qemu usermode because comment
+> #4 in the bug reports states clone is returning an error and it should
+> not trigger the assert in first place.  What seems to be happening in
+> this scenario is clone is actually returning a success, but the auxiliary
+> process is being killed before actually calling execve.
 
-On the Lpar and on the Laptop or only on the Lpar ?
+The bug report is a bit confused, but I think what is happening
+in the QEMU case is that QEMU implements clone(CLONE_VFORK) as having
+the same semantics as fork() (ie the parent will not autowait for
+the child, and the child does not share a memory map with the parent).
+(ie QEMU treats it as having the semantics of a vfork() call, which
+is allowed to be implemented as fork()).
+Previous versions of glibc's posix_spawn() could cope with this
+divergence from the kernel's native clone() behaviour, but the
+rewrite can't. It's not unreasonable for glibc() to rely on the
+kernel behaviour, but on the other hand it's not too surprising
+if this breaks non-kernel implementations of the syscall ABI
+like QEMU and the MS Linux subsystem, because it's a tricky
+corner case that previously nobody was trying to use.
 
->=20
->>
->> I'll post my pci/tcg patches once I get it mostly working (and it does
->> not look like a horror from the crypt anymore).
->=20
-> Time to get out the make up kit for these.
->=20
+Unfortunately I can't really think of a mechanism for implementing
+this in QEMU usermode, because the only tools we have available
+for creating new threads and processes are the ones the host libc
+gives us: so we can spawn new threads with pthread_create() and
+fork the process with fork(), but we don't have a safe way to
+create a new process which shares the memory map and where the
+new process can call the various libc functions which QEMU will
+do as it executes the guest code.
 
-
-
---=20
-Pierre Morel
-Linux/KVM/QEMU in B=C3=B6blingen - Germany
+thanks
+-- PMM
