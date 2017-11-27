@@ -1,19 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60683)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60798)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <gengdongjiu@huawei.com>) id 1eJGxb-0005cI-Op
-	for qemu-devel@nongnu.org; Mon, 27 Nov 2017 05:48:25 -0500
+	(envelope-from <gengdongjiu@huawei.com>) id 1eJGxh-0005gG-5K
+	for qemu-devel@nongnu.org; Mon, 27 Nov 2017 05:48:33 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <gengdongjiu@huawei.com>) id 1eJGxa-0000g5-I4
-	for qemu-devel@nongnu.org; Mon, 27 Nov 2017 05:48:23 -0500
+	(envelope-from <gengdongjiu@huawei.com>) id 1eJGxf-0000io-O5
+	for qemu-devel@nongnu.org; Mon, 27 Nov 2017 05:48:29 -0500
 From: Dongjiu Geng <gengdongjiu@huawei.com>
-Date: Tue, 28 Nov 2017 02:49:55 +0800
-Message-ID: <1511808595-24158-13-git-send-email-gengdongjiu@huawei.com>
+Date: Tue, 28 Nov 2017 02:49:44 +0800
+Message-ID: <1511808595-24158-2-git-send-email-gengdongjiu@huawei.com>
 In-Reply-To: <1511808595-24158-1-git-send-email-gengdongjiu@huawei.com>
 References: <1511808595-24158-1-git-send-email-gengdongjiu@huawei.com>
 MIME-Version: 1.0
 Content-Type: text/plain
-Subject: [Qemu-devel] [PATCH v13 12/12] target-arm: kvm64: handle SIGBUS
- signal from kernel or KVM
+Subject: [Qemu-devel] [PATCH v13 01/12] ACPI: add related GHES structures
+ and macros definition
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,125 +24,87 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: pbonzini@redhat.com, mst@redhat.com, imammedo@redhat.com, zhaoshenglong@huawei.com, peter.maydell@linaro.org, mtosatti@redhat.com, james.morse@arm.com, lersek@redhat.com, marc.zyngier@arm.com, christoffer.dall@linaro.org, rth@twiddle.net, ehabkost@redhat.com, kvm@vger.kernel.org, guohanjun@huawei.com, lijinyue@huawei.com, huangshaoyu@huawei.com, wuquanming@huawei.com, zhengqiang10@huawei.com, linuxarm@huawei.com, qemu-devel@nongnu.org, qemu-arm@nongnu.org
 
-Add SIGBUS signal handler. In this handler, it checks the SIGBUS type,
-translate the host VA which is delivered by host to guest PA, then fill
-this PA to CPER and fill the CPER to guest APEI GHES memory, finally
-notify guest according the SIGBUS type. There are two kinds of SIGBUS
-that QEMU need to handle, which are BUS_MCEERR_AO and BUS_MCEERR_AR.
+Add Generic Error Status Block structures and some macros
+definition, which refer to the ACPI 4.0 and ACPI 6.1. The
+HEST table generation and CPER record will use them.
 
-Guest access device type poisoned memory, generate SError interrupt,
-so it reports it to host firmware. Host kernel gets an APEI notification
-and memory_failure() causes the affected page to be unmapped from the
-guest's stage2, and SIGBUS_MCEERR_AO is sent to user-space. Here Qemu
-will create a new CPER and add it to guest APEI GHES memory, and notify the
-guest with a GPIO-Signal notification.
-
-When guest hit a PG_hwpoison page, it will trap to KVM as stage2 fault,
-here a SIGBUS_MCEERR_AR synchronous signal is delivered to user-space,
-Qemu record this error into guest APEI GHES memory and notify guest using
-Synchronous-External-Abort(SEA).
-
-Suggested-by: James Morse <james.morse@arm.com>
 Signed-off-by: Dongjiu Geng <gengdongjiu@huawei.com>
-Signed-off-by: Quanming Wu <wuquanming@huawei.com>
 ---
-Address James's comments to record CPER and notify guest for SIGBUS signal handling.
-Shown some discussion in [1].
+Address Igor's comments to to get rid of most structures and use
+build_append_int_noprefix() API to compose whole error status block
+and APEI table in [1]
 
-[1]:
-https://lkml.org/lkml/2017/2/27/246
-https://lkml.org/lkml/2017/9/14/241
-https://lkml.org/lkml/2017/9/22/499
+[1]: https://lkml.org/lkml/2017/8/29/187
 ---
- include/sysemu/kvm.h |  2 +-
- target/arm/kvm.c     |  2 ++
- target/arm/kvm64.c   | 34 ++++++++++++++++++++++++++++++++++
- 3 files changed, 37 insertions(+), 1 deletion(-)
+ include/hw/acpi/acpi-defs.h | 49 +++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 49 insertions(+)
 
-diff --git a/include/sysemu/kvm.h b/include/sysemu/kvm.h
-index 3a458f5..90c1605 100644
---- a/include/sysemu/kvm.h
-+++ b/include/sysemu/kvm.h
-@@ -361,7 +361,7 @@ bool kvm_vcpu_id_is_valid(int vcpu_id);
- /* Returns VCPU ID to be used on KVM_CREATE_VCPU ioctl() */
- unsigned long kvm_arch_vcpu_id(CPUState *cpu);
+diff --git a/include/hw/acpi/acpi-defs.h b/include/hw/acpi/acpi-defs.h
+index 72be675..f955f1b 100644
+--- a/include/hw/acpi/acpi-defs.h
++++ b/include/hw/acpi/acpi-defs.h
+@@ -298,6 +298,25 @@ typedef struct AcpiMultipleApicTable AcpiMultipleApicTable;
+ #define ACPI_APIC_RESERVED              16   /* 16 and greater are reserved */
  
--#ifdef TARGET_I386
-+#if defined(TARGET_I386) || defined(TARGET_AARCH64)
- #define KVM_HAVE_MCE_INJECTION 1
- void kvm_arch_on_sigbus_vcpu(CPUState *cpu, int code, void *addr);
- #endif
-diff --git a/target/arm/kvm.c b/target/arm/kvm.c
-index d85e36a..8523158 100644
---- a/target/arm/kvm.c
-+++ b/target/arm/kvm.c
-@@ -26,6 +26,7 @@
- #include "exec/address-spaces.h"
- #include "hw/boards.h"
- #include "qemu/log.h"
-+#include "exec/ram_addr.h"
- 
- const KVMCapabilityInfo kvm_arch_required_capabilities[] = {
-     KVM_CAP_LAST_INFO
-@@ -182,6 +183,7 @@ int kvm_arch_init(MachineState *ms, KVMState *s)
- 
-     cap_has_mp_state = kvm_check_extension(s, KVM_CAP_MP_STATE);
- 
-+    qemu_register_reset(kvm_unpoison_all, NULL);
-     type_register_static(&host_arm_cpu_type_info);
- 
-     return 0;
-diff --git a/target/arm/kvm64.c b/target/arm/kvm64.c
-index 7f662e9..d83863d 100644
---- a/target/arm/kvm64.c
-+++ b/target/arm/kvm64.c
-@@ -27,6 +27,9 @@
- #include "kvm_arm.h"
- #include "internals.h"
- #include "hw/arm/arm.h"
-+#include "exec/ram_addr.h"
-+#include "hw/acpi/acpi-defs.h"
-+#include "hw/acpi/hest_ghes.h"
- 
- static bool have_guest_debug;
- 
-@@ -943,6 +946,37 @@ int kvm_arch_get_registers(CPUState *cs)
-     return ret;
- }
- 
-+void kvm_arch_on_sigbus_vcpu(CPUState *c, int code, void *addr)
-+{
-+    ram_addr_t ram_addr;
-+    hwaddr paddr;
+ /*
++ * ACPI 4.0 spec, "17.3.2.7 Hardware Error Notification"
++ */
++enum AcpiHestNotifyType {
++    ACPI_HEST_NOTIFY_POLLED = 0,
++    ACPI_HEST_NOTIFY_EXTERNAL = 1,
++    ACPI_HEST_NOTIFY_LOCAL = 2,
++    ACPI_HEST_NOTIFY_SCI = 3,
++    ACPI_HEST_NOTIFY_NMI = 4,
++    ACPI_HEST_NOTIFY_CMCI = 5,  /* ACPI 5.0 */
++    ACPI_HEST_NOTIFY_MCE = 6,   /* ACPI 5.0 */
++    ACPI_HEST_NOTIFY_GPIO = 7,  /* ACPI 6.0 */
++    ACPI_HEST_NOTIFY_SEA = 8,   /* ACPI 6.1 */
++    ACPI_HEST_NOTIFY_SEI = 9,   /* ACPI 6.1 */
++    ACPI_HEST_NOTIFY_GSIV = 10, /* ACPI 6.1 */
++    ACPI_HEST_NOTIFY_SDEI = 11, /* ACPI 6.2 */
++    ACPI_HEST_NOTIFY_RESERVED = 12 /* 12 and greater are reserved */
++};
 +
-+    assert(code == BUS_MCEERR_AR || code == BUS_MCEERR_AO);
-+    if (addr) {
-+        ram_addr = qemu_ram_addr_from_host(addr);
-+        if (ram_addr != RAM_ADDR_INVALID &&
-+            kvm_physical_memory_addr_from_host(c->kvm_state, addr, &paddr)) {
-+            kvm_hwpoison_page_add(ram_addr);
-+            if (code == BUS_MCEERR_AR) {
-+                kvm_cpu_synchronize_state(c);
-+                ghes_update_guest(ACPI_HEST_NOTIFY_SEA, paddr);
-+                kvm_inject_arm_sea(c);
-+            } else if (code == BUS_MCEERR_AO) {
-+                ghes_update_guest(ACPI_HEST_NOTIFY_GPIO, paddr);
-+                qemu_hardware_error_notify();
-+            }
-+            return;
-+        }
-+        fprintf(stderr, "Hardware memory error for memory used by "
-+                "QEMU itself instead of guest system!\n");
-+    }
-+
-+    if (code == BUS_MCEERR_AR) {
-+        fprintf(stderr, "Hardware memory error!\n");
-+        exit(1);
-+    }
-+}
-+
- /* C6.6.29 BRK instruction */
- static const uint32_t brk_insn = 0xd4200000;
++/*
+  * MADT sub-structures (Follow MULTIPLE_APIC_DESCRIPTION_TABLE)
+  */
+ #define ACPI_SUB_HEADER_DEF   /* Common ACPI sub-structure header */\
+@@ -474,6 +493,36 @@ struct AcpiSystemResourceAffinityTable {
+ } QEMU_PACKED;
+ typedef struct AcpiSystemResourceAffinityTable AcpiSystemResourceAffinityTable;
  
++/*
++ * ACPI 4.0, "17.3.2.6.1 Generic Error Data"
++ */
++#define ACPI_GEBS_UNCORRECTABLE          (1)
++/*
++ * ACPI 6.1, "18.3.2.8 Generic Hardware Error
++ * Source version 2"
++ */
++#define ACPI_HEST_SOURCE_GENERIC_ERROR_V2    (10)
++/*
++ * Table 17-12 Generic Error Status Block, ACPI 4.0,
++ * "17.3.2.6.1 Generic Error Data"
++ */
++struct AcpiGenericErrorStatus {
++    /* It is a bitmask composed of ACPI_GEBS_xxx macros */
++    uint32_t block_status;
++    uint32_t raw_data_offset;
++    uint32_t raw_data_length;
++    uint32_t data_length;
++    uint32_t error_severity;
++} QEMU_PACKED;
++typedef struct AcpiGenericErrorStatus AcpiGenericErrorStatus;
++
++enum AcpiGenericErrorSeverity {
++    ACPI_CPER_SEV_RECOVERABLE,
++    ACPI_CPER_SEV_FATAL,
++    ACPI_CPER_SEV_CORRECTED,
++    ACPI_CPER_SEV_NONE,
++};
++
+ #define ACPI_SRAT_PROCESSOR_APIC     0
+ #define ACPI_SRAT_MEMORY             1
+ #define ACPI_SRAT_PROCESSOR_x2APIC   2
 -- 
 1.8.3.1
