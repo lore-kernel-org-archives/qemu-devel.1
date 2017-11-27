@@ -1,22 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36955)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37372)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <linzhecheng@huawei.com>) id 1eJKtB-0002yO-Th
-	for qemu-devel@nongnu.org; Mon, 27 Nov 2017 10:00:12 -0500
+	(envelope-from <mreitz@redhat.com>) id 1eJKty-0003Z2-Fn
+	for qemu-devel@nongnu.org; Mon, 27 Nov 2017 10:01:00 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <linzhecheng@huawei.com>) id 1eJKt7-0005oP-8U
-	for qemu-devel@nongnu.org; Mon, 27 Nov 2017 10:00:05 -0500
-Received: from szxga05-in.huawei.com ([45.249.212.191]:2048 helo=huawei.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <linzhecheng@huawei.com>)
-	id 1eJKt6-0005ku-NV
-	for qemu-devel@nongnu.org; Mon, 27 Nov 2017 10:00:01 -0500
-From: linzhecheng <linzhecheng@huawei.com>
-Date: Mon, 27 Nov 2017 22:59:36 +0800
-Message-ID: <20171127145936.15676-1-linzhecheng@huawei.com>
+	(envelope-from <mreitz@redhat.com>) id 1eJKts-00068q-Ci
+	for qemu-devel@nongnu.org; Mon, 27 Nov 2017 10:00:54 -0500
+References: <20171123020832.8165-1-mreitz@redhat.com>
+	<20171123072438.GE1624@lemon>
+From: Max Reitz <mreitz@redhat.com>
+Message-ID: <8be98628-4ade-1c93-8133-5f841ed9fea2@redhat.com>
+Date: Mon, 27 Nov 2017 16:00:29 +0100
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: [Qemu-devel] [PATCH] thread: move detach_thread from creating
- thread to created thread
+In-Reply-To: <20171123072438.GE1624@lemon>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="74FxWt0eaDrXo3QQ4x3Rg5Dj0pnVuWBfa"
+Subject: Re: [Qemu-devel] [PATCH 00/17] iotests: Fix iotests for weird
+ formats/options
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,181 +25,127 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: arei.gonglei@huawei.com, pbonzini@redhat.com, aliguori@us.ibm.com, linzhecheng <linzhecheng@huawei.com>
+To: Fam Zheng <famz@redhat.com>
+Cc: qemu-block@nongnu.org, qemu-devel@nongnu.org, Kevin Wolf <kwolf@redhat.com>, John Snow <jsnow@redhat.com>
 
-If we create a thread with QEMU_THREAD_DETACHED mode, QEMU may get a segfault in a low probability.
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--74FxWt0eaDrXo3QQ4x3Rg5Dj0pnVuWBfa
+From: Max Reitz <mreitz@redhat.com>
+To: Fam Zheng <famz@redhat.com>
+Cc: qemu-block@nongnu.org, qemu-devel@nongnu.org,
+ Kevin Wolf <kwolf@redhat.com>, John Snow <jsnow@redhat.com>
+Message-ID: <8be98628-4ade-1c93-8133-5f841ed9fea2@redhat.com>
+Subject: Re: [PATCH 00/17] iotests: Fix iotests for weird formats/options
+References: <20171123020832.8165-1-mreitz@redhat.com>
+ <20171123072438.GE1624@lemon>
+In-Reply-To: <20171123072438.GE1624@lemon>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-The backtrace is:
-#0  0x00007f46c60291d7 in __GI_raise (sig=sig@entry=6) at ../nptl/sysdeps/unix/sysv/linux/raise.c:56
-#1  0x00007f46c602a8c8 in __GI_abort () at abort.c:90
-#2  0x00000000008543c9 in PAT_abort ()
-#3  0x000000000085140d in patchIllInsHandler ()
-#4  <signal handler called>
-#5  pthread_detach (th=139933037614848) at pthread_detach.c:50
-#6  0x0000000000829759 in qemu_thread_create (thread=thread@entry=0x7ffdaa8205e0, name=name@entry=0x94d94a "io-task-worker", start_routine=start_routine@entry=0x7eb9a0 <qio_task_thread_worker>, 
-    arg=arg@entry=0x3f5cf70, mode=mode@entry=1) at util/qemu_thread_posix.c:512
-#7  0x00000000007ebc96 in qio_task_run_in_thread (task=0x31db2c0, worker=worker@entry=0x7e7e40 <qio_channel_socket_connect_worker>, opaque=0xcd23380, destroy=0x7f1180 <qapi_free_SocketAddress>)
-    at io/task.c:141
-#8  0x00000000007e7f33 in qio_channel_socket_connect_async (ioc=ioc@entry=0x626c0b0, addr=<optimized out>, callback=callback@entry=0x55e080 <qemu_chr_socket_connected>, opaque=opaque@entry=0x42862c0, 
-    destroy=destroy@entry=0x0) at io/channel_socket.c:194
-#9  0x000000000055bdd1 in socket_reconnect_timeout (opaque=0x42862c0) at qemu_char.c:4744
-#10 0x00007f46c72483b3 in g_timeout_dispatch () from /usr/lib64/libglib-2.0.so.0
-#11 0x00007f46c724799a in g_main_context_dispatch () from /usr/lib64/libglib-2.0.so.0
-#12 0x000000000076c646 in glib_pollfds_poll () at main_loop.c:228
-#13 0x000000000076c6eb in os_host_main_loop_wait (timeout=348000000) at main_loop.c:273
-#14 0x000000000076c815 in main_loop_wait (nonblocking=nonblocking@entry=0) at main_loop.c:521
-#15 0x000000000056a511 in main_loop () at vl.c:2076
-#16 0x0000000000420705 in main (argc=<optimized out>, argv=<optimized out>, envp=<optimized out>) at vl.c:4940
+On 2017-11-23 08:24, Fam Zheng wrote:
+> On Thu, 11/23 03:08, Max Reitz wrote:
+>> (I hate to write Python tests because the boilerplate seems so large a=
+nd
+>>  the debugging is so hard.  But there is test 194 which shows that it =
+is
+>>  possible to write simple bash-like tests as well--and that is how I
+>>  should probably write tests from now on.)
+>=20
+> If the boilerplate means copy&paste from another test it is not a big p=
+roblem;
 
-The root cause of this problem is a bug of glibc(version 2.17,the lastest version have the same bug),
-let's see what happened in glibc's code.
-Here is the code slice of pthread_detach.c
+I do much more C&P in bash tests. ;-)
 
-25 int
-26 pthread_detach (pthread_t th)
-27 {
-28  struct pthread *pd = (struct pthread *) th;
-29
-30  /* Make sure the descriptor is valid.  */
-31  if (INVALID_NOT_TERMINATED_TD_P (pd))
-32    /* Not a valid thread handle.  */
-34    return ESRCH;
-35
-36  int result = 0;
-37  /* Mark the thread as detached.  */
-38  if (atomic_compare_and_exchange_bool_acq (&pd->joinid, pd, NULL))
-39    {
-40      /* There are two possibilities here.  First, the thread might
-41	 already be detached.  In this case we return EINVAL.
-42	 Otherwise there might already be a waiter.  The standard does
-43	 not mention what happens in this case.  */
-44     if (IS_DETACHED (pd))
-45	 result = EINVAL;
-46    }
-47  else
-48    /* Check whether the thread terminated meanwhile.  In this case we
-49       will just free the TCB.  */
-50    if ((pd->cancelhandling & EXITING_BITMASK) != 0)
-51      /* Note that the code in __free_tcb makes sure each thread
-52	 control block is freed only once.  */
-53      __free_tcb (pd);
+It's not about the boilerplate I have to write, but the boilerplate that
+exists and that tries its best to be opaque to me.
 
-54  return result;
-55}
+> if you really mean it's more cumbersome than bash to write test code, I=
+ think we
+> can try new ways to exploit Python's expressiveness. 2c93c5cb43 and f48=
+44ac0ad
+> are good examples.
 
-QEMU get a segfault at line 50, becasue pd is an invalid address.
-pd is still valid at line 38 when set pd->joinid = pd, at this moment,
-created thread is just exiting(only keeps runing for a short time), 
-created thread is running in code of start_thread:
+One thing is that I hate to write tests that are methods in classes and
+are called automagically by their method name starting in "test_" (or
+something?).  I personally don't like the start-up/tear-down semantics
+through methods very much either and feel like often it doesn't quite
+fit the iotests.
 
-404  /* If the thread is detached free the TCB.  */
-405  if (IS_DETACHED (pd))
-406    /* Free the TCB.  */
-407    __free_tcb (pd);
-created thread found that pd is detached, so it freed pd, in this case,
-pd became an invalid address.
+Indeed, I like the blocks Stefan uses in 194 with set-up in the with
+statement and implicit tear-down at its end (which f4844ac0ad helps with)=
+=2E
 
-I rewrite qemu_thread_create to move detach_thread from creating thread to created
-to avoid this concurrency problem.
+The kind of other thing is that by boilerplate I mean all of this magic.
+ We have this QMPTestCase framework behind everything (except 194) and I
+have no real idea how it works, and I don't feel like I'm supposed to.
 
-Signed-off-by: linzhecheng <linzhecheng@huawei.com>
+Also, I just personally dislike frameworks in general.  I hate to write
+code that's magically invoked by other code without me knowing how, and
+that's exactly what's happening with QMPTestCase--you write some classes
+and some methods and never are they actually instantiated in your code,
+but it's some other code that I don't see (and that I'm supposed to not
+care about).  I just don't like that.   I want to write a simple test,
+not a library.
+
+Finally, and probably least of the issues, VM.  Which inherits from
+QEMUQtestMachine.  Which inherits from QEMUMachine.  All of which are in
+different files.  This, too, feels a bit like I'm not supposed to know
+what's going on and a bit opaque.  (In contrast to bash's common.qemu,
+where I can see exactly what's doing what and don't have to follow
+method calls through three files.)  But having to look at three files
+instead of one is really a minor issue compared to the rest (but it does
+add to the feeling of boilerplate).
+
+So all in all much very personal annoyance.  But still, since I have to
+write some tests, this personal annoyance used to result in me
+preferring bash for the job.
+
+> So what do you think about debugging? IMO the biggest problem is the le=
+ss
+> verbose reference output, and lack of a separate logging channel. We ca=
+n and
+> should improve that, even for existing scripts.
+
+Yes, those are my issues as well.  Especially that stderr would be my
+preferred separate logging channel, but it's redirected and never
+printed.  Well, I now have this:
+
+#define loggu(...) \
+    do { \
+        FILE *fp =3D fopen("/tmp/log", "a"); \
+=C2=A0       fprintf(fp, __VA_ARGS__); \
+        fclose(fp); \
+    } while (0)
+
+which helps me get around this, but, you know...
+
+> And yes, the 194 style is actually better than "iotests.QMPTestCase" on=
+es.
+
+As you could see, roughly 90 % of my annoyance is due to QMPTestCase, so
+I tend to agree. :-)
+
+(The other 10 % is not iotests.VM, but Python itself--and that's
+comparing it to bash...)
+
+Max
 
 
-diff --git a/include/qemu/thread-posix.h b/include/qemu/thread-posix.h
-index f3f47e426f..d855c15dab 100644
---- a/include/qemu/thread-posix.h
-+++ b/include/qemu/thread-posix.h
-@@ -44,4 +44,12 @@ struct QemuThread {
-     pthread_t thread;
- };
- 
-+struct QemuThread_args {
-+    void *(*start_routine)(void *);
-+    void *arg;
-+    char *name;
-+    int mode;
-+};
-+
-+
- #endif
-diff --git a/include/qemu/thread.h b/include/qemu/thread.h
-index 9910f49b3a..db365242da 100644
---- a/include/qemu/thread.h
-+++ b/include/qemu/thread.h
-@@ -10,6 +10,7 @@ typedef struct QemuSemaphore QemuSemaphore;
- typedef struct QemuEvent QemuEvent;
- typedef struct QemuLockCnt QemuLockCnt;
- typedef struct QemuThread QemuThread;
-+typedef struct QemuThread_args QemuThread_args;
- 
- #ifdef _WIN32
- #include "qemu/thread-win32.h"
-diff --git a/util/qemu-thread-posix.c b/util/qemu-thread-posix.c
-index 7306475899..8c72fb12a8 100644
---- a/util/qemu-thread-posix.c
-+++ b/util/qemu-thread-posix.c
-@@ -482,13 +482,34 @@ static void __attribute__((constructor)) qemu_thread_atexit_init(void)
- /* Attempt to set the threads name; note that this is for debug, so
-  * we're not going to fail if we can't set it.
-  */
--static void qemu_thread_set_name(QemuThread *thread, const char *name)
-+static void qemu_thread_set_name(pthread_t thread, const char *name)
- {
- #ifdef CONFIG_PTHREAD_SETNAME_NP
--    pthread_setname_np(thread->thread, name);
-+    pthread_setname_np(thread, name);
- #endif
- }
- 
-+static void *qemu_thread_start(void *args)
-+{
-+    QemuThread_args *qemu_thread_args;
-+    void *ret;
-+
-+    qemu_thread_args = (QemuThread_args *)args;
-+    if (qemu_thread_args->name) {
-+        qemu_thread_set_name(pthread_self(), qemu_thread_args->name);
-+        g_free(qemu_thread_args->name);
-+    }
-+
-+    if (qemu_thread_args->mode == QEMU_THREAD_DETACHED) {
-+        pthread_detach(pthread_self());
-+    }
-+    ret = qemu_thread_args->start_routine(qemu_thread_args->arg);
-+
-+    g_free(qemu_thread_args);
-+    return ret;
-+}
-+
-+
- void qemu_thread_create(QemuThread *thread, const char *name,
-                        void *(*start_routine)(void*),
-                        void *arg, int mode)
-@@ -496,6 +517,7 @@ void qemu_thread_create(QemuThread *thread, const char *name,
-     sigset_t set, oldset;
-     int err;
-     pthread_attr_t attr;
-+    QemuThread_args *qemu_thread_args;
- 
-     err = pthread_attr_init(&attr);
-     if (err) {
-@@ -505,7 +527,15 @@ void qemu_thread_create(QemuThread *thread, const char *name,
-     /* Leave signal handling to the iothread.  */
-     sigfillset(&set);
-     pthread_sigmask(SIG_SETMASK, &set, &oldset);
--    err = pthread_create(&thread->thread, &attr, start_routine, arg);
-+
-+    qemu_thread_args = g_new0(QemuThread_args, 1);
-+    qemu_thread_args->mode = mode;
-+    qemu_thread_args->name = name_threads ? g_strdup_printf("%s", name) : NULL;
-+    qemu_thread_args->start_routine = start_routine;
-+    qemu_thread_args->arg = arg;
-+
-+    err = pthread_create(&thread->thread, &attr,
-+                         qemu_thread_start, qemu_thread_args);
-     if (err)
-         error_exit(err, __func__);
- 
--- 
-2.12.2.windows.2
+--74FxWt0eaDrXo3QQ4x3Rg5Dj0pnVuWBfa
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQFGBAEBCAAwFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAlocKI0SHG1yZWl0ekBy
+ZWRoYXQuY29tAAoJEPQH2wBh1c9AGTcH/jOUL8OkDV/34vJVFqNgNDFa+lH5mHKx
+5ZH0/9LiXmCkTwTyGS0YnOXZPSQXPruJspiXmlnd8/P51jLIIG5jXUW2di7+MYw9
+w2sfQk10slJ/64pR00Ih7/uydrD6RU+yJa+GH61xiP/hT+9/HYZRmNkrsug8wbSA
+csUdwOsG05Ry+qEBM+tvhR0nD/d9qO/H+vp41QcYmXHDjp0S4QRAl1RQiDql9RWG
+BCfh2kKX53xwiAdDx3pKEjNY+cza4mGBfHcjbBOE0yphsE3ziw+J56AiXuJ0BtS5
+bcYFpMo4yaT73PiiWygxGJYGRCwE8/ilgg+3DGhwYWh1p8iQcDpkcu8=
+=irK+
+-----END PGP SIGNATURE-----
+
+--74FxWt0eaDrXo3QQ4x3Rg5Dj0pnVuWBfa--
