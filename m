@@ -1,25 +1,55 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51395)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:32858)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jianfeng.tan@intel.com>) id 1eJLQL-0000Dg-D2
-	for qemu-devel@nongnu.org; Mon, 27 Nov 2017 10:34:22 -0500
+	(envelope-from <pmorel@linux.vnet.ibm.com>) id 1eJLig-0008UK-ET
+	for qemu-devel@nongnu.org; Mon, 27 Nov 2017 10:53:19 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jianfeng.tan@intel.com>) id 1eJLQF-0004YF-I7
-	for qemu-devel@nongnu.org; Mon, 27 Nov 2017 10:34:21 -0500
-Received: from mga14.intel.com ([192.55.52.115]:25719)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <jianfeng.tan@intel.com>)
-	id 1eJLQF-0004Xd-95
-	for qemu-devel@nongnu.org; Mon, 27 Nov 2017 10:34:15 -0500
-References: <20171127142515.GA450@yliu-dev>
-From: "Tan, Jianfeng" <jianfeng.tan@intel.com>
-Message-ID: <411329b7-5164-c24e-2e5e-8cf25079c4b9@intel.com>
-Date: Mon, 27 Nov 2017 23:34:10 +0800
+	(envelope-from <pmorel@linux.vnet.ibm.com>) id 1eJLic-0004z7-81
+	for qemu-devel@nongnu.org; Mon, 27 Nov 2017 10:53:18 -0500
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:42580)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pmorel@linux.vnet.ibm.com>)
+	id 1eJLib-0004y9-Vp
+	for qemu-devel@nongnu.org; Mon, 27 Nov 2017 10:53:14 -0500
+Received: from pps.filterd (m0098410.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
+	vARFnjTU093901
+	for <qemu-devel@nongnu.org>; Mon, 27 Nov 2017 10:53:11 -0500
+Received: from e06smtp11.uk.ibm.com (e06smtp11.uk.ibm.com [195.75.94.107])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2egm7cvxm5-1
+	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Mon, 27 Nov 2017 10:53:10 -0500
+Received: from localhost
+	by e06smtp11.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	Only! Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <pmorel@linux.vnet.ibm.com>;
+	Mon, 27 Nov 2017 15:53:07 -0000
+References: <1511388334-16347-1-git-send-email-pmorel@linux.vnet.ibm.com>
+	<1511388334-16347-2-git-send-email-pmorel@linux.vnet.ibm.com>
+	<3acc6fdb-5638-97b2-2dc7-bce34d22cd1f@redhat.com>
+	<20171123104903.24424b40.cohuck@redhat.com>
+	<a3655016-0e6b-b80f-2282-f6efbff9e1f9@redhat.com>
+	<20171123110844.4649f3b1.cohuck@redhat.com>
+	<58a08c1d-3935-42e7-cdc0-7bc45c08d2d3@redhat.com>
+	<20171123113326.3b2c5281.cohuck@redhat.com>
+	<6ab0d29e-1af0-888a-c932-a0a294ea225d@linux.vnet.ibm.com>
+	<d59edb51-71ba-7b75-83df-e4be246d2fce@redhat.com>
+	<4000596f-d2a0-c32e-7683-7e074e8132e2@linux.vnet.ibm.com>
+	<37aa6eb3-cbdf-39af-2068-7d0e5949e601@linux.vnet.ibm.com>
+	<2ab76ab0-b20a-9eaf-cafb-195e1621edd6@redhat.com>
+	<20171127120255.2d36c8f3.cohuck@redhat.com>
+	<20171127153436.200a01c7.cohuck@redhat.com>
+	<c0fd850b-3d6f-4a4b-f9e0-e5009a273be0@linux.vnet.ibm.com>
+	<20171127163055.6c9989cf.cohuck@redhat.com>
+From: Pierre Morel <pmorel@linux.vnet.ibm.com>
+Date: Mon, 27 Nov 2017 16:53:04 +0100
 MIME-Version: 1.0
-In-Reply-To: <20171127142515.GA450@yliu-dev>
-Content-Type: text/plain; charset=windows-1252; format=flowed
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [dpdk-dev] [ovs-dev] [PATCH RFC] netdev-dpdk: Fix
- device obtain mac address when received first packet in vhost type
+In-Reply-To: <20171127163055.6c9989cf.cohuck@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Message-Id: <b4f9fd77-4efa-ad51-73f1-bcd17ec0ede4@linux.vnet.ibm.com>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [qemu-s390x] [PATCH v3 1/7] s390x/pci: factor out
+ endianess conversion
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,91 +58,98 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Yuanhan Liu <yliu@fridaylinux.org>, Chen Hailin <chenhl@arraynetworks.com.cn>
-Cc: Aaron Conole <aconole@redhat.com>, "ovs-dev@openvswitch.org" <ovs-dev@openvswitch.org>, Maxime Coquelin <maxime.coquelin@redhat.com>, cloud <cloud@arraynetworks.com.cn>, qemu-devel <qemu-devel@nongnu.org>, dev <dev@dpdk.org>
+To: Cornelia Huck <cohuck@redhat.com>
+Cc: Thomas Huth <thuth@redhat.com>, Yi Min Zhao <zyimin@linux.vnet.ibm.com>, pasic@linux.vnet.ibm.com, qemu-devel@nongnu.org, agraf@suse.de, borntraeger@de.ibm.com, Qemu-s390x list <qemu-s390x@nongnu.org>
 
-
-
-On 11/27/2017 10:27 PM, Yuanhan Liu wrote:
-> On Fri, Nov 24, 2017 at 05:59:09PM +0800, Chen Hailin wrote:
->> Hi Aaron Conole && Jianfeng,
->>
->> The stp could not work in ovs-dpdk vhostuser.
->> Because the attached vhost device doesn't have MAC address.
->>
->> Now we have two ways to solve this problem.
->> 1. The vhost learns MAC address from packet like as my first patch.
-> I do agree with Aaron this is not the right way.
-
-I do think it should be the vswitch's responsibility to learn mac of 
-vhost port.
-
-Except that it's the only feasible way without modifying the spec 
-(yuanhan already makes it very clear below), we can treat the vswitch as 
-a phsical switch, VM as a physical server, virtio/vhost port as a 
-back-to-back connected NICs, the only way of the physical switch to know 
-the mac of the NIC on the other side is ARP learning.
-
-Might I ask why you don't think it's a right way?
-
-Thanks,
-Jianfeng
-
->
->> 2. The virtio notifies MAC address actively to vhost user .
-> Unfortunately, AFAIK, there is no way to achieve that so far. we could
-> either let virtio/QEMU to expose the CQ to vhost or add a new VHOST_USER
-> message to carry the mac address. While vhost-user is a generic interface
-> adding a virtio-net specific message also doesn't seem quite right.
-> Exposing CQ is probably the best we can do.
->
-> Anyway, both need spec change.
->
-> 	--yliu
->> In my opinions,  if we treat it as a device,  we should allocate
->> MAC address for the device when the VM started.
->>
->> Which one do you think better?
->>
->>
->>
->> Best Regards,
->> Chen Hailin
->> chenhl@arraynetworks.com.cn
->>   
->> From: Aaron Conole
->> Date: 2017-11-18 10:00
->> To: Hailin Chen
->> CC: ovs-dev@openvswitch.org; Maxime Coquelin; cloud@arraynetworks.com.cn
->> Subject: Re: [ovs-dev] [PATCH RFC] netdev-dpdk: Fix device obtain mac address when received first packet in vhost type
->> Hi Hailin,
->>   
->> Hailin Chen <chenhl@arraynetworks.com.cn> writes:
->>   
->>> The stp could not work on netdev-dpdk if network is loop.
->>> Because the stp protocol negotiates designate port by sending
->>> BPDU packets which contains MAC address.
->>> However the device doesn't have MAC address in vhostuser type.
->>> Thus, function send_bpdu_cb would not send BPDU packets.
+On 27/11/2017 16:30, Cornelia Huck wrote:
+> On Mon, 27 Nov 2017 16:24:08 +0100
+> Pierre Morel <pmorel@linux.vnet.ibm.com> wrote:
+>=20
+>> On 27/11/2017 15:34, Cornelia Huck wrote:
+>>> On Mon, 27 Nov 2017 12:02:55 +0100
+>>> Cornelia Huck <cohuck@redhat.com> wrote:
+>>>   =20
+>>>> On Mon, 27 Nov 2017 07:59:36 +0100
+>>>> Thomas Huth <thuth@redhat.com> wrote:
+>>>>  =20
+>>>>> On 25.11.2017 14:49, Pierre Morel wrote:
+>>>>>> On 24/11/2017 07:19, Yi Min Zhao wrote:
+>>>>>>>
+>>>>>>>
+>>>>>>> =E5=9C=A8 2017/11/23 =E4=B8=8B=E5=8D=888:18, Thomas Huth =E5=86=99=
+=E9=81=93:
+>>>>>>>> On 23.11.2017 13:07, Yi Min Zhao wrote:
+>>>>  =20
+>>>>>>>>> Another question, does 'cpu' in cpu_to_le**() or le**_to_cpu() =
+mean the
+>>>>>>>>> host endianess?
+>>>>>>>> Yes, the "cpu" in cpu_to_le or le_to_cpu means the host, indeed.=
+ It's
+>>>>>>>> confusing :-/
+>>>>>>>>       =20
+>>>>>>>>> If the answers to upper two questions are yes, we actually need=
+ handle
+>>>>>>>>> two cases.
+>>>>>>>>> 1) For pcilg, we need to translate the data to little-endian, t=
+hus
+>>>>>>>>> cpu_to_le**().
+>>>>>>>>> 2) For pcistg, we need to translate the data to host endianess,=
+ thus
+>>>>>>>>> le**_to_cpu().
+>>>>>>>> I think we've got to byte-swap if the host is big endian (s390x)=
+, but
+>>>>>>>> not if the host is little endian (x86 with TCG).
+>>>>>>
+>>>>>> Here is my comprehension of this funny swapping:
+>>>>>>
+>>>>>> - TCG for a BE guest and a le host swap bytes because if we do (re=
+gister
+>>>>>> & 0x01) in the zPCI interception code it must work what ever the
+>>>>>> endianess is.
+>>>>>
+>>>>> Uhhh, I might have missed that the value has already been byte-swap=
+ped
+>>>>> once by TCG for env->regs[r1] ...
+>>>>> Now I'm pretty much completely confused ... sorry for the noise if =
+I was
+>>>>> wrong... I think it's best you ignore my comment for now (i.e. go w=
+ith
+>>>>> bswapXX() instead of le_to_cpuXX()), and if we later wire up zPCI w=
+ith
+>>>>> TCG, we still can fix this if necessary.
+>>>>
+>>>> I'll try my current pci/tcg patches on LPAR with this (or a v4) on t=
+op.
+>>>> If it works there (it doesn't yet on my laptop), we do have a
+>>>> endianness issue... (unfortunately, the reverse isn't true.)
 >>>
->>> This patch will set the MAC for device when received first packet.
+>>> It does not look too bad: I can get a nice enP1p0s0 device from a
+>>> virtio-net-pci with my tcg patches on my laptop (with these patches a=
+s
+>>> well, of course). So, endianness is likely mostly fine.
+>>
+>> On the Lpar and on the Laptop or only on the Lpar ?
+>=20
+> Both :)
+
+That's great! :)
+
+>=20
+>>
+>>>   =20
+>>>>
+>>>> I'll post my pci/tcg patches once I get it mostly working (and it do=
+es
+>>>> not look like a horror from the crypt anymore).
 >>>
->>> Signed-off-by: Hailin Chen <chenhl@arraynetworks.com.cn>
->>> ---
->>   
->> Thanks for the patch.
->>   
->> In general, I don't think this is the right approach to deal with this
->> type of issue.  I believe the problem statement is that OvS bridge is
->> unaware of the guest MAC address - did I get it right?  In that case, I
->> would think that a better way to solve this would be to have virtio tell
->> the mac address of the guest.  I don't recall right now if that's
->> allowed in the virtio spec, but I do remember some kind of negotiation
->> features.
->>   
->> I've CC'd Maxime, who is one of the maintainers of the virtio code from
->> DPDK side.  Perhaps there is an alternate way to solve this.
->> _______________________________________________
->> dev mailing list
->> dev@openvswitch.org
->> https://mail.openvswitch.org/mailman/listinfo/ovs-dev
+>>> Time to get out the make up kit for these.
+>>>   =20
+>>
+>>
+>>
+>=20
+
+
+--=20
+Pierre Morel
+Linux/KVM/QEMU in B=C3=B6blingen - Germany
