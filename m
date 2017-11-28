@@ -1,22 +1,36 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44045)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46054)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1eJgzP-0004ay-7M
-	for qemu-devel@nongnu.org; Tue, 28 Nov 2017 09:36:00 -0500
+	(envelope-from <cohuck@redhat.com>) id 1eJh8W-0000Jb-Er
+	for qemu-devel@nongnu.org; Tue, 28 Nov 2017 09:45:30 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1eJgzJ-0003rd-4Y
-	for qemu-devel@nongnu.org; Tue, 28 Nov 2017 09:35:59 -0500
-Received: from orth.archaic.org.uk ([2001:8b0:1d0::2]:38580)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pm215@archaic.org.uk>)
-	id 1eJgzI-0003lI-SZ
-	for qemu-devel@nongnu.org; Tue, 28 Nov 2017 09:35:53 -0500
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 28 Nov 2017 14:35:25 +0000
-Message-Id: <1511879725-9576-3-git-send-email-peter.maydell@linaro.org>
-In-Reply-To: <1511879725-9576-1-git-send-email-peter.maydell@linaro.org>
-References: <1511879725-9576-1-git-send-email-peter.maydell@linaro.org>
-Subject: [Qemu-devel] [PATCH 2/2] page_unprotect(): handle calls to pages
- that are PAGE_WRITE
+	(envelope-from <cohuck@redhat.com>) id 1eJh8T-0007U2-6d
+	for qemu-devel@nongnu.org; Tue, 28 Nov 2017 09:45:24 -0500
+Date: Tue, 28 Nov 2017 15:45:14 +0100
+From: Cornelia Huck <cohuck@redhat.com>
+Message-ID: <20171128154514.026098dc.cohuck@redhat.com>
+In-Reply-To: <13a85f8e-28c2-4780-76ad-361913a93d1b@de.ibm.com>
+References: <20171121111825.17916-1-pasic@linux.vnet.ibm.com>
+	<20171124171510.2343ccdf.cohuck@redhat.com>
+	<8c18df3e-92a0-f88f-6d24-e1df051c8138@linux.vnet.ibm.com>
+	<20171127135624.28052dc5.cohuck@redhat.com>
+	<57f95f61-b9d9-1341-78c7-259006cb5945@linux.vnet.ibm.com>
+	<20171127141929.1d692aad.cohuck@redhat.com>
+	<39cb6a69-7f32-80d4-214d-26e1e81a9fd7@linux.vnet.ibm.com>
+	<2933e058-0217-9696-2c52-613da8ba7a1c@linux.vnet.ibm.com>
+	<20171127175607.75bd999e.cohuck@redhat.com>
+	<c49e91f1-0f8a-8f6c-9784-21aa4623e2cf@linux.vnet.ibm.com>
+	<20171128112233.0a1c8c04.cohuck@redhat.com>
+	<377c7bcb-403b-ed66-a9fd-07793c27ea5c@linux.vnet.ibm.com>
+	<20171128131448.551e16b7.cohuck@redhat.com>
+	<1d81d1c1-6f82-0261-51b4-1820a10431e6@de.ibm.com>
+	<99906104-4746-6474-554e-ac85bd20106d@linux.vnet.ibm.com>
+	<71ccf8b6-faa6-f4ac-3571-24bb59a0c498@de.ibm.com>
+	<20171128150107.4cc88a86.cohuck@redhat.com>
+	<13a85f8e-28c2-4780-76ad-361913a93d1b@de.ibm.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [RFC PATCH 1/1] s390x/css: unresrict cssids
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,139 +39,66 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: patches@linaro.org, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Riku Voipio <riku.voipio@iki.fi>, Laurent Vivier <laurent@vivier.eu>
+To: Christian Borntraeger <borntraeger@de.ibm.com>
+Cc: Halil Pasic <pasic@linux.vnet.ibm.com>, Boris Fiuczynski <fiuczy@linux.vnet.ibm.com>, Shalini Chellathurai Saroja <shalini@linux.vnet.ibm.com>, qemu-s390x@nongnu.org, Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>, qemu-devel@nongnu.org
 
-If multiple guest threads in user-mode emulation write to a
-page which QEMU has marked read-only because of cached TCG
-translations, the threads can race in page_unprotect:
+On Tue, 28 Nov 2017 15:17:49 +0100
+Christian Borntraeger <borntraeger@de.ibm.com> wrote:
 
- * threads A & B both try to do a write to a page with code in it at
-   the same time (ie which we've made non-writeable, so SEGV)
- * they race into the signal handler with this faulting address
- * thread A happens to get to page_unprotect() first and takes the
-   mmap lock, so thread B sits waiting for it to be done
- * A then finds the page, marks it PAGE_WRITE and mprotect()s it writable
- * A can then continue OK (returns from signal handler to retry the
-   memory access)
- * ...but when B gets the mmap lock it finds that the page is already
-   PAGE_WRITE, and so it exits page_unprotect() via the "not due to
-   protected translation" code path, and wrongly delivers the signal
-   to the guest rather than just retrying the access
+> On 11/28/2017 03:01 PM, Cornelia Huck wrote:
+> > On Tue, 28 Nov 2017 14:25:08 +0100
+> > Christian Borntraeger <borntraeger@de.ibm.com> wrote:
 
-In particular, this meant that trying to run 'javac' in user-mode
-emulation would fail with a spurious guest SIGSEGV.
+> >> What I want now is to enable vfio-ccw for libvirt and Linux guests and for that
+> >> we need to lift the restriction of having vfio not in FE.  
+> > 
+> > This, however, worries me. I don't really consider vfio-ccw ready for
+> > prime time yet. We still need to figure out path handling at the very
+> > least. And I'm still not sure that our non-handling of halt/clear won't
+> > cause major issues with e.g. a storage server error recovery.
+> > 
+> > Can we flag vfio-ccw as experimental or such in libvirt?  
+> 
+> We should have flagged vfio-ccw experimental in QEMU then.
+> e.g. by using x-vfio-ccw or whatever.I dont think we can do that
+> after the facts.
 
-Handle this by making page_unprotect() assume that a call for a page
-which is already PAGE_WRITE is due to a race of this sort and return
-a "fault handled" indication.
+Yes, we should have done that... can't fix that now, unfortunately.
 
-Since this would cause an infinite loop if we ever called
-page_unprotect() for some other kind of fault than "write failed due
-to bad access permissions", tighten the condition in
-handle_cpu_signal() to check the signal number and si_code, and add a
-comment so that if somebody does ever find themselves debugging an
-infinite loop of faults they have some clue about why.
+> 
+> I am not that deep into vfio-ccw, but I was under the impression that
+> the missing features should not affect the vfio interface that is
+> created by libvirt. After all this should just be a "-device vfio-ccw,....."
+> statement and some setup steps beforehand (unbind + setup of vfio-ccw)
 
-(The trick for identifying the correct setting for
-current_tb_invalidated for thread B (needed to handle the precise-SMC
-case) is due to Richard Henderson.  Paolo Bonzini suggested just
-relying on si_code rather than trying anything more complicated.)
+The halt/clear stuff is highly unlikely to influence the configuration
+interface. I'm still not too clear about path handling, though. Will we
+need different modes (hypervisor managed vs. full passthrough? probably
+only passthrough)? What about pgid handling - do we need some kind of
+pgid manager? (Keep in mind that you get to set the pgid once. This has
+implications for e.g. reserve/release.)
 
-Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
----
- accel/tcg/translate-all.c | 50 +++++++++++++++++++++++++++++------------------
- accel/tcg/user-exec.c     | 13 +++++++++++-
- 2 files changed, 43 insertions(+), 20 deletions(-)
+Also, what about devices other than ECKD DASD? Has there been any
+testing? Tapes should be interesting; the other interesting ccw devices
+are QDIO-based and I'm not sure we want to spend anything on supporting
+those.
 
-diff --git a/accel/tcg/translate-all.c b/accel/tcg/translate-all.c
-index e7f0329..96e68d5 100644
---- a/accel/tcg/translate-all.c
-+++ b/accel/tcg/translate-all.c
-@@ -2182,29 +2182,41 @@ int page_unprotect(target_ulong address, uintptr_t pc)
- 
-     /* if the page was really writable, then we change its
-        protection back to writable */
--    if ((p->flags & PAGE_WRITE_ORG) && !(p->flags & PAGE_WRITE)) {
--        host_start = address & qemu_host_page_mask;
--        host_end = host_start + qemu_host_page_size;
--
--        prot = 0;
-+    if (p->flags & PAGE_WRITE_ORG) {
-         current_tb_invalidated = false;
--        for (addr = host_start ; addr < host_end ; addr += TARGET_PAGE_SIZE) {
--            p = page_find(addr >> TARGET_PAGE_BITS);
--            p->flags |= PAGE_WRITE;
--            prot |= p->flags;
--
--            /* and since the content will be modified, we must invalidate
--               the corresponding translated code. */
--            current_tb_invalidated |= tb_invalidate_phys_page(addr, pc);
--#ifdef CONFIG_USER_ONLY
--            if (DEBUG_TB_CHECK_GATE) {
--                tb_invalidate_check(addr);
-+        if (p->flags & PAGE_WRITE) {
-+            /* If the page is actually marked WRITE then assume this is because
-+             * this thread raced with another one which got here first and
-+             * set the page to PAGE_WRITE and did the TB invalidate for us.
-+             */
-+#ifdef TARGET_HAS_PRECISE_SMC
-+            TranslationBlock *current_tb = tb_find_pc(pc);
-+            if (current_tb) {
-+                current_tb_invalidated = tb_cflags(current_tb) & CF_INVALID;
-             }
- #endif
-+        } else {
-+            host_start = address & qemu_host_page_mask;
-+            host_end = host_start + qemu_host_page_size;
-+
-+            prot = 0;
-+            for (addr = host_start; addr < host_end; addr += TARGET_PAGE_SIZE) {
-+                p = page_find(addr >> TARGET_PAGE_BITS);
-+                p->flags |= PAGE_WRITE;
-+                prot |= p->flags;
-+
-+                /* and since the content will be modified, we must invalidate
-+                   the corresponding translated code. */
-+                current_tb_invalidated |= tb_invalidate_phys_page(addr, pc);
-+#ifdef CONFIG_USER_ONLY
-+                if (DEBUG_TB_CHECK_GATE) {
-+                    tb_invalidate_check(addr);
-+                }
-+#endif
-+            }
-+            mprotect((void *)g2h(host_start), qemu_host_page_size,
-+                     prot & PAGE_BITS);
-         }
--        mprotect((void *)g2h(host_start), qemu_host_page_size,
--                 prot & PAGE_BITS);
--
-         mmap_unlock();
-         /* If current TB was invalidated return to main loop */
-         return current_tb_invalidated ? 2 : 1;
-diff --git a/accel/tcg/user-exec.c b/accel/tcg/user-exec.c
-index e8f26ff..c973752 100644
---- a/accel/tcg/user-exec.c
-+++ b/accel/tcg/user-exec.c
-@@ -104,7 +104,18 @@ static inline int handle_cpu_signal(uintptr_t pc, siginfo_t *info,
-            pc, address, is_write, *(unsigned long *)old_set);
- #endif
-     /* XXX: locking issue */
--    if (is_write && h2g_valid(address)) {
-+    /* Note that it is important that we don't call page_unprotect() unless
-+     * this is really a "write to nonwriteable page" fault, because
-+     * page_unprotect() assumes that if it is called for an access to
-+     * a page that's writeable this means we had two threads racing and
-+     * another thread got there first and already made the page writeable;
-+     * so we will retry the access. If we were to call page_unprotect()
-+     * for some other kind of fault that should really be passed to the
-+     * guest, we'd end up in an infinite loop of retrying the faulting
-+     * access.
-+     */
-+    if (is_write && info->si_signo == SIGSEGV && info->si_code == SEGV_ACCERR &&
-+        h2g_valid(address)) {
-         switch (page_unprotect(h2g(address), pc)) {
-         case 0:
-             /* Fault not caused by a page marked unwritable to protect
--- 
-2.7.4
+The interface is probably fine, but I'd like to get an idea about the
+path stuff (is the attachment spec that contains the pgid stuff
+publicly available, btw.?)
+
+> 
+> If your concern is the serviceability I think it would be valid for a RHEL
+> KVM to disable vfio-ccw in the kernel. Maybe we could even provide a config
+> for QEMU?
+
+It's fine just to turn off vfio-ccw in the kernel.
+
+> PS: I learned from the PCI and CCW experience that I do not want
+> to upstream kernel/qemu code unless I have a working libvirt code that
+> shows that the thing will work.
+
+Yes, I understand the wish to verify the interface, and I think it's a
+good idea. What I'm worried about is that this might be the precursor
+to a push to support it, and I don't think vfio-ccw is ready for that
+yet.
