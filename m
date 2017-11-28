@@ -1,39 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41726)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49645)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <danielhb@linux.vnet.ibm.com>) id 1eJlX4-0000Ys-LR
-	for qemu-devel@nongnu.org; Tue, 28 Nov 2017 14:27:03 -0500
+	(envelope-from <jcody@redhat.com>) id 1eJlnv-0005gZ-B8
+	for qemu-devel@nongnu.org; Tue, 28 Nov 2017 14:44:28 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <danielhb@linux.vnet.ibm.com>) id 1eJlX1-0006OT-BL
-	for qemu-devel@nongnu.org; Tue, 28 Nov 2017 14:27:02 -0500
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:57456
-	helo=mx0a-001b2d01.pphosted.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <danielhb@linux.vnet.ibm.com>)
-	id 1eJlX1-0006O4-5t
-	for qemu-devel@nongnu.org; Tue, 28 Nov 2017 14:26:59 -0500
-Received: from pps.filterd (m0098419.ppops.net [127.0.0.1])
-	by mx0b-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
-	vASJPiqO050497
-	for <qemu-devel@nongnu.org>; Tue, 28 Nov 2017 14:26:56 -0500
-Received: from e14.ny.us.ibm.com (e14.ny.us.ibm.com [129.33.205.204])
-	by mx0b-001b2d01.pphosted.com with ESMTP id 2ehapdacnv-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Tue, 28 Nov 2017 14:26:56 -0500
-Received: from localhost
-	by e14.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
-	Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <danielhb@linux.vnet.ibm.com>;
-	Tue, 28 Nov 2017 14:26:55 -0500
-References: <20171128174310.15700-1-lvivier@redhat.com>
-From: Daniel Henrique Barboza <danielhb@linux.vnet.ibm.com>
-Date: Tue, 28 Nov 2017 17:26:48 -0200
+	(envelope-from <jcody@redhat.com>) id 1eJlnu-00084h-DY
+	for qemu-devel@nongnu.org; Tue, 28 Nov 2017 14:44:27 -0500
+Date: Tue, 28 Nov 2017 14:44:13 -0500
+From: Jeff Cody <jcody@redhat.com>
+Message-ID: <20171128194413.GJ25110@localhost.localdomain>
+References: <20171012135313.227864-1-vsementsov@virtuozzo.com>
+	<d3b891f0-f9bd-5ced-5890-7e2f70ed1437@redhat.com>
+	<20171114050006.GD5399@localhost.localdomain>
 MIME-Version: 1.0
-In-Reply-To: <20171128174310.15700-1-lvivier@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
-Content-Language: en-US
-Message-Id: <bfd918cf-6ca0-deef-a151-bd70ffec681f@linux.vnet.ibm.com>
-Subject: Re: [Qemu-devel] [Qemu-ppc] [PATCH v2] pseries: fix TCG migration
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20171114050006.GD5399@localhost.localdomain>
+Subject: Re: [Qemu-devel] [PATCH v2 0/5] backup improvements part 1
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -42,67 +24,57 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Laurent Vivier <lvivier@redhat.com>, qemu-devel@nongnu.org
-Cc: Bharata B Rao <bharata@linux.vnet.ibm.com>, qemu-ppc@nongnu.org, David Gibson <david@gibson.dropbear.id.au>
+To: John Snow <jsnow@redhat.com>
+Cc: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org, famz@redhat.com, kwolf@redhat.com, mreitz@redhat.com, stefanha@redhat.com, den@openvz.org
 
+On Tue, Nov 14, 2017 at 12:00:06AM -0500, Jeff Cody wrote:
+> On Mon, Nov 13, 2017 at 05:41:13PM -0500, John Snow wrote:
+> > Jeff, I think this ought to go through your tree, but I'll sign off on it.
+> > 
+> > Fam: Do you agree?
+> > 
+> > (Probably -next material, but I'm sending this email because I'm taking
+> > it out of my review queue and I don't want it to get lost.)
+> > 
+> > --js
+> > 
+> 
+> Yes, I can bring in through my tree, unless Fam prefers to have it - I'll
+> pull it in via my block-next branch.
+> 
 
+Rather than keep this on my email queue:
 
-On 11/28/2017 03:43 PM, Laurent Vivier wrote:
-> Migration of pseries is broken with TCG because
-> QEMU tries to restore KVM MMU state unconditionally.
->
-> The result is a SIGSEGV in kvm_vm_ioctl():
->
->    #0  kvm_vm_ioctl (s=0x0, type=-2146390353)
->        at qemu/accel/kvm/kvm-all.c:2032
->    #1  0x00000001003e3e2c in kvmppc_configure_v3_mmu (cpu=<optimized out>,
->        radix=<optimized out>, gtse=<optimized out>, proc_tbl=<optimized out>)
->        at qemu/target/ppc/kvm.c:396
->    #2  0x00000001002f8b88 in spapr_post_load (opaque=0x1019103c0,
->        version_id=<optimized out>) at qemu/hw/ppc/spapr.c:1578
->    #3  0x000000010059e4cc in vmstate_load_state (f=0x106230000,
->        vmsd=0x1009479e0 <vmstate_spapr>, opaque=0x1019103c0,
->        version_id=<optimized out>) at qemu/migration/vmstate.c:165
->    #4  0x00000001005987e0 in vmstate_load (f=<optimized out>, se=<optimized out>)
->        at qemu/migration/savevm.c:748
->
-> This patch fixes the problem by not calling the KVM function with the
-> TCG mode.
->
-> Fixes: d39c90f5f3 ("spapr: Fix migration of Radix guests")
-> Signed-off-by: Laurent Vivier <lvivier@redhat.com>
-> ---
-> v2: fix the comment to keep GDB backtrace lines starting with '#'
->
->   hw/ppc/spapr.c | 2 +-
->   1 file changed, 1 insertion(+), 1 deletion(-)
->
-> diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-> index 9efddeaee5..a471de6cab 100644
-> --- a/hw/ppc/spapr.c
-> +++ b/hw/ppc/spapr.c
-> @@ -1570,7 +1570,7 @@ static int spapr_post_load(void *opaque, int version_id)
->           err = spapr_rtc_import_offset(&spapr->rtc, spapr->rtc_offset);
->       }
->
-> -    if (spapr->patb_entry) {
-> +    if (kvm_enabled() && spapr->patb_entry) {
+Applied to my block-next branch:
 
-As an alternative, I believe you can also do:
+git://github.com/codyprime/qemu-kvm-jtc block-next
 
-if (!!spapr->patb_entry) {
-
-because the !! will return false if patb_entry is either undefined (as in
-TCG) or zero (as set in spapr_reallocate_hpt). This is the same logic used
-in spapr_patb_entry_needed too.
-
-But I am fine with what you did and it's also clearer, so
-
-
-Reviewed-by: Daniel Henrique Barboza <danielhb@linux.vnet.ibm.com>
-
-
-
->           PowerPCCPU *cpu = POWERPC_CPU(first_cpu);
->           bool radix = !!(spapr->patb_entry & PATBE1_GR);
->           bool gtse = !!(cpu->env.spr[SPR_LPCR] & LPCR_GTSE);
+-Jeff
+> 
+> > On 10/12/2017 09:53 AM, Vladimir Sementsov-Ogievskiy wrote:
+> > > Hi all. Here is a continuation of my "new backup architecture" series,
+> > > The very first part, but it is meaningful itself.
+> > > 
+> > > v2: rebase on master
+> > > 01: add test and fix bug
+> > > 02: move commit about NONE mode to this patch, add John's r-b (hope,
+> > >      you are OK with this tiny change)
+> > > 03: tiny refactor (John)
+> > > 04: improve commit message, add John's r-b
+> > > 05: add John's r-b
+> > > 
+> > > Vladimir Sementsov-Ogievskiy (5):
+> > >   hbitmap: add next_zero function
+> > >   backup: move from done_bitmap to copy_bitmap
+> > >   backup: init copy_bitmap from sync_bitmap for incremental
+> > >   backup: simplify non-dirty bits progress processing
+> > >   backup: use copy_bitmap in incremental backup
+> > > 
+> > >  include/block/dirty-bitmap.h |   1 +
+> > >  include/qemu/hbitmap.h       |   8 +++
+> > >  block/backup.c               | 118 ++++++++++++++++++++++++-------------------
+> > >  block/dirty-bitmap.c         |   5 ++
+> > >  tests/test-hbitmap.c         |  61 ++++++++++++++++++++++
+> > >  util/hbitmap.c               |  39 ++++++++++++++
+> > >  6 files changed, 180 insertions(+), 52 deletions(-)
+> > > 
