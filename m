@@ -1,25 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59645)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60943)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1eJjEr-0006hB-Ej
-	for qemu-devel@nongnu.org; Tue, 28 Nov 2017 12:00:18 -0500
+	(envelope-from <pbonzini@redhat.com>) id 1eJjGk-0008Uz-8V
+	for qemu-devel@nongnu.org; Tue, 28 Nov 2017 12:02:06 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1eJjEn-0006uI-Js
-	for qemu-devel@nongnu.org; Tue, 28 Nov 2017 12:00:05 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:48306)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1eJjEn-0006sd-Em
-	for qemu-devel@nongnu.org; Tue, 28 Nov 2017 12:00:01 -0500
-References: <1511880838-56509-1-git-send-email-imammedo@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <332cc741-ea50-897f-e03e-ada0ab022ce6@redhat.com>
-Date: Tue, 28 Nov 2017 10:59:57 -0600
+	(envelope-from <pbonzini@redhat.com>) id 1eJjGg-0008B6-D5
+	for qemu-devel@nongnu.org; Tue, 28 Nov 2017 12:02:02 -0500
+References: <20171128154350.21504-1-kwolf@redhat.com>
+	<20171128154350.21504-2-kwolf@redhat.com>
+	<00b2dbda-e7a1-2fc4-b7ca-e60c0ef08a95@redhat.com>
+	<20171128163725.GG3703@localhost.localdomain>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <cf7eed9c-5047-fce8-f649-f8fb3310546b@redhat.com>
+Date: Tue, 28 Nov 2017 18:01:32 +0100
 MIME-Version: 1.0
-In-Reply-To: <1511880838-56509-1-git-send-email-imammedo@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
+In-Reply-To: <20171128163725.GG3703@localhost.localdomain>
+Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] numa: fix missing '-numa cpu' in '-help'
- output
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH for-2.11 1/4] Revert "coroutine: abort if
+ we try to schedule or enter a pending coroutine"
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,45 +27,53 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Igor Mammedov <imammedo@redhat.com>, qemu-devel@nongnu.org
-Cc: pbonzini@redhat.com, ehabkost@redhat.com, mjt@tls.msk.ru, armbru@redhat.com
+To: Kevin Wolf <kwolf@redhat.com>
+Cc: qemu-block@nongnu.org, mreitz@redhat.com, stefanha@redhat.com, jcody@redhat.com, famz@redhat.com, qemu-devel@nongnu.org
 
-On 11/28/2017 08:53 AM, Igor Mammedov wrote:
-> commit 419fcdec3c (numa: add '-numa cpu,...' option for property based node mapping)
-> added '-numa cpu' option but forgot to update appropriate section for '--help'.
-> Add '-numa cpu' description to '-help' output
-> 
-> Reported-by: Markus Armbruster <armbru@redhat.com>
-> Signed-off-by: Igor Mammedov <imammedo@redhat.com>
-> ---
->   qemu-options.hx | 4 +++-
->   1 file changed, 3 insertions(+), 1 deletion(-)
+On 28/11/2017 17:37, Kevin Wolf wrote:
+>>
+>> It can also conflict badly with another aio_co_schedule().  Your patch
+>> here removes the assertion in this case, and patch 3 makes it easier t=
+o
+>> get into the situation where two aio_co_schedule()s conflict with each
+>> other.
+> I don't see how they conflict. If the second aio_co_schedule() comes
+> before the coroutine is actually entered, they are effectively simply
+> merged into a single one. Which is exactly what was intended.
 
-Documentation only; safe for 2.11 if it makes it through someone's tree 
-(although we're cutting it close); and harmless if it waits for 2.12 
-instead.
+Suppose you have
 
-Reviewed-by: Eric Blake <eblake@redhat.com>
+	ctx->scheduled_coroutines
+	  |
+	  '---> co
+                |
+                '---> NULL
 
-> 
-> diff --git a/qemu-options.hx b/qemu-options.hx
-> index df19cf2..972a5c6 100644
-> --- a/qemu-options.hx
-> +++ b/qemu-options.hx
-> @@ -163,7 +163,9 @@ ETEXI
->   DEF("numa", HAS_ARG, QEMU_OPTION_numa,
->       "-numa node[,mem=size][,cpus=firstcpu[-lastcpu]][,nodeid=node]\n"
->       "-numa node[,memdev=id][,cpus=firstcpu[-lastcpu]][,nodeid=node]\n"
-> -    "-numa dist,src=source,dst=destination,val=distance\n", QEMU_ARCH_ALL)
-> +    "-numa dist,src=source,dst=destination,val=distance\n"
-> +    "-numa cpu,node-id=node[,socket-id=x][,core-id=y][,thread-id=z]\n",
-> +    QEMU_ARCH_ALL)
->   STEXI
->   @item -numa node[,mem=@var{size}][,cpus=@var{firstcpu}[-@var{lastcpu}]][,nodeid=@var{node}]
->   @itemx -numa node[,memdev=@var{id}][,cpus=@var{firstcpu}[-@var{lastcpu}]][,nodeid=@var{node}]
-> 
+Then aio_co_schedule(ctx, co) does QSLIST_INSERT_HEAD_ATOMIC, which is
 
--- 
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
+	/* On entry, ctx->scheduled_coroutines =3D=3D co.  */
+	co->next =3D ctx->scheduled_coroutines
+	change ctx->scheduled_coroutines from co->next to co
+
+This results in a loop:
+=09
+	ctx->scheduled_coroutines
+	  |
+	  '---> co <-.
+                |    |
+                '----'
+
+This is an obvious hang due to list corruption.  In other more
+complicated cases it can skip a wakeup, which is a more subtle kind of
+hang.  You can also get memory corruption if the coroutine terminates
+(and is freed) before aio_co_schedule executes.
+
+Basically, once you do aio_co_schedule or aio_co_wake the coroutine is
+not any more yours.  It's owned by the context that will run it and you
+should not do anything with it.
+
+The same is true for co_aio_sleep_ns.  Just because in practice it works
+(and it seemed like a clever idea at the time) it doesn't mean it *is* a
+good idea...
+
+Paolo
