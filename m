@@ -1,22 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45321)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46180)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1eJfGa-0002Xs-T0
-	for qemu-devel@nongnu.org; Tue, 28 Nov 2017 07:45:38 -0500
+	(envelope-from <ybettan@redhat.com>) id 1eJfJk-00046J-D1
+	for qemu-devel@nongnu.org; Tue, 28 Nov 2017 07:48:54 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1eJfGX-0004bH-R0
-	for qemu-devel@nongnu.org; Tue, 28 Nov 2017 07:45:36 -0500
-Date: Tue, 28 Nov 2017 13:45:28 +0100
-From: Cornelia Huck <cohuck@redhat.com>
-Message-ID: <20171128134528.699488bf.cohuck@redhat.com>
-In-Reply-To: <d007f7af-f15e-105c-7859-13b7141cf260@redhat.com>
-References: <1511816136-30068-1-git-send-email-walling@linux.vnet.ibm.com>
-	<1511816136-30068-5-git-send-email-walling@linux.vnet.ibm.com>
-	<d007f7af-f15e-105c-7859-13b7141cf260@redhat.com>
+	(envelope-from <ybettan@redhat.com>) id 1eJfJh-0005nI-9f
+	for qemu-devel@nongnu.org; Tue, 28 Nov 2017 07:48:52 -0500
+Received: from mail-wm0-f68.google.com ([74.125.82.68]:40391)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <ybettan@redhat.com>) id 1eJfJg-0005n4-Vp
+	for qemu-devel@nongnu.org; Tue, 28 Nov 2017 07:48:49 -0500
+Received: by mail-wm0-f68.google.com with SMTP id b189so1621609wmd.5
+	for <qemu-devel@nongnu.org>; Tue, 28 Nov 2017 04:48:48 -0800 (PST)
+References: <20171128055111.10101-1-ybettan@redhat.com>
+From: Yoni Bettan <ybettan@redhat.com>
+Message-ID: <9eebda40-d3fb-8bd5-9e21-41100cab4479@redhat.com>
+Date: Tue, 28 Nov 2017 14:48:45 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+In-Reply-To: <20171128055111.10101-1-ybettan@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [qemu-s390x] [PATCH v1 4/5] s390-ccw: interactive
- boot menu for eckd dasd
+Content-Language: en-US
+Subject: Re: [Qemu-devel] [PATCH 1/2] pci: removed the is_express field
+ since a uniform interface was inserted
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,36 +30,185 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>
-Cc: "Collin L. Walling" <walling@linux.vnet.ibm.com>, borntraeger@de.ibm.com, frankja@linux.vnet.ibm.com, qemu-s390x@nongnu.org, qemu-devel@nongnu.org
+To: qemu-devel@nongnu.org
+Cc: Keith Busch <keith.busch@intel.com>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, Dmitry Fleytman <dmitry@daynix.com>, Jason Wang <jasowang@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Marcel Apfelbaum <marcel@redhat.com>, Paul Burton <paul.burton@mips.com>, Paolo Bonzini <pbonzini@redhat.com>, Hannes Reinecke <hare@suse.com>, Gerd Hoffmann <kraxel@redhat.com>, Alex Williamson <alex.williamson@redhat.com>, "open list:nvme" <qemu-block@nongnu.org>
 
-On Tue, 28 Nov 2017 13:36:38 +0100
-Thomas Huth <thuth@redhat.com> wrote:
 
-> On 27.11.2017 21:55, Collin L. Walling wrote:
+On 11/28/2017 07:51 AM, Yoni Bettan wrote:
+>          * according to Eduardo Habkost's commit
+>            fd3b02c8896d597dd8b9e053dec579cf0386aee1
+>
+>          * since all PCIEs now implement INTERFACE_PCIE_DEVICE we
+>            don't need this field anymore
 
-> > +static int zipl_boot_menu(block_number_t s1b_block_nr)
-> > +{
-> > +    void *stage2_data, *menu_offset;
-> > +
-> > +    read_stage2(s1b_block_nr, &stage2_data);
-> > +    menu_offset = stage2_data;
-> > +
-> > +    /* Menu banner starts with "zIPL" */
-> > +    while (menu_offset < stage2_data + STAGE2_MAX_SIZE - 4) {
-> > +        if (magic_match(menu_offset, ZIPL_MAGIC_EBCDIC)) {
-> > +            return menu_get_zipl_boot_index(menu_offset);
-> > +        }
-> > +        menu_offset++;
-> > +    }
-> > +
-> > +    panic("\n! No menu data found !\n");  
-> 
-> Maybe remove the initial exclamation mark?
+Hi, please discard this series, i will send V2 soon
 
-It does match the other panics in the code, though.
-
-> 
-> > +    /* should not reach here */
-> > +    return 0;
-> > +}  
+> Signed-off-by: Yoni Bettan <ybettan@redhat.com>
+> ---
+>   hw/block/nvme.c                    | 1 -
+>   hw/net/e1000e.c                    | 1 -
+>   hw/pci-bridge/pcie_pci_bridge.c    | 1 -
+>   hw/pci-bridge/pcie_root_port.c     | 1 -
+>   hw/pci-bridge/xio3130_downstream.c | 1 -
+>   hw/pci-bridge/xio3130_upstream.c   | 1 -
+>   hw/pci-host/xilinx-pcie.c          | 1 -
+>   hw/pci/pci.c                       | 3 ++-
+>   hw/scsi/megasas.c                  | 1 -
+>   hw/usb/hcd-xhci.c                  | 1 -
+>   hw/vfio/pci.c                      | 1 -
+>   include/hw/pci/pci.h               | 3 ---
+>   12 files changed, 2 insertions(+), 14 deletions(-)
+>
+> diff --git a/hw/block/nvme.c b/hw/block/nvme.c
+> index 441e21ed1f..9325bc0911 100644
+> --- a/hw/block/nvme.c
+> +++ b/hw/block/nvme.c
+> @@ -1087,7 +1087,6 @@ static void nvme_class_init(ObjectClass *oc, void *data)
+>       pc->vendor_id = PCI_VENDOR_ID_INTEL;
+>       pc->device_id = 0x5845;
+>       pc->revision = 2;
+> -    pc->is_express = 1;
+>   
+>       set_bit(DEVICE_CATEGORY_STORAGE, dc->categories);
+>       dc->desc = "Non-Volatile Memory Express";
+> diff --git a/hw/net/e1000e.c b/hw/net/e1000e.c
+> index f1af279e8d..c360f0d8c9 100644
+> --- a/hw/net/e1000e.c
+> +++ b/hw/net/e1000e.c
+> @@ -675,7 +675,6 @@ static void e1000e_class_init(ObjectClass *class, void *data)
+>       c->revision = 0;
+>       c->romfile = "efi-e1000e.rom";
+>       c->class_id = PCI_CLASS_NETWORK_ETHERNET;
+> -    c->is_express = 1;
+>   
+>       dc->desc = "Intel 82574L GbE Controller";
+>       dc->reset = e1000e_qdev_reset;
+> diff --git a/hw/pci-bridge/pcie_pci_bridge.c b/hw/pci-bridge/pcie_pci_bridge.c
+> index a4d827c99d..b7d9ebbec2 100644
+> --- a/hw/pci-bridge/pcie_pci_bridge.c
+> +++ b/hw/pci-bridge/pcie_pci_bridge.c
+> @@ -169,7 +169,6 @@ static void pcie_pci_bridge_class_init(ObjectClass *klass, void *data)
+>       DeviceClass *dc = DEVICE_CLASS(klass);
+>       HotplugHandlerClass *hc = HOTPLUG_HANDLER_CLASS(klass);
+>   
+> -    k->is_express = 1;
+>       k->is_bridge = 1;
+>       k->vendor_id = PCI_VENDOR_ID_REDHAT;
+>       k->device_id = PCI_DEVICE_ID_REDHAT_PCIE_BRIDGE;
+> diff --git a/hw/pci-bridge/pcie_root_port.c b/hw/pci-bridge/pcie_root_port.c
+> index 9b6e4ce512..45f9e8cd4a 100644
+> --- a/hw/pci-bridge/pcie_root_port.c
+> +++ b/hw/pci-bridge/pcie_root_port.c
+> @@ -145,7 +145,6 @@ static void rp_class_init(ObjectClass *klass, void *data)
+>       DeviceClass *dc = DEVICE_CLASS(klass);
+>       PCIDeviceClass *k = PCI_DEVICE_CLASS(klass);
+>   
+> -    k->is_express = 1;
+>       k->is_bridge = 1;
+>       k->config_write = rp_write_config;
+>       k->realize = rp_realize;
+> diff --git a/hw/pci-bridge/xio3130_downstream.c b/hw/pci-bridge/xio3130_downstream.c
+> index 1e09d2afb7..613a0d6bb7 100644
+> --- a/hw/pci-bridge/xio3130_downstream.c
+> +++ b/hw/pci-bridge/xio3130_downstream.c
+> @@ -177,7 +177,6 @@ static void xio3130_downstream_class_init(ObjectClass *klass, void *data)
+>       DeviceClass *dc = DEVICE_CLASS(klass);
+>       PCIDeviceClass *k = PCI_DEVICE_CLASS(klass);
+>   
+> -    k->is_express = 1;
+>       k->is_bridge = 1;
+>       k->config_write = xio3130_downstream_write_config;
+>       k->realize = xio3130_downstream_realize;
+> diff --git a/hw/pci-bridge/xio3130_upstream.c b/hw/pci-bridge/xio3130_upstream.c
+> index 227997ce46..d4645bddee 100644
+> --- a/hw/pci-bridge/xio3130_upstream.c
+> +++ b/hw/pci-bridge/xio3130_upstream.c
+> @@ -148,7 +148,6 @@ static void xio3130_upstream_class_init(ObjectClass *klass, void *data)
+>       DeviceClass *dc = DEVICE_CLASS(klass);
+>       PCIDeviceClass *k = PCI_DEVICE_CLASS(klass);
+>   
+> -    k->is_express = 1;
+>       k->is_bridge = 1;
+>       k->config_write = xio3130_upstream_write_config;
+>       k->realize = xio3130_upstream_realize;
+> diff --git a/hw/pci-host/xilinx-pcie.c b/hw/pci-host/xilinx-pcie.c
+> index 7659253090..a4ca3ba30f 100644
+> --- a/hw/pci-host/xilinx-pcie.c
+> +++ b/hw/pci-host/xilinx-pcie.c
+> @@ -298,7 +298,6 @@ static void xilinx_pcie_root_class_init(ObjectClass *klass, void *data)
+>       k->device_id = 0x7021;
+>       k->revision = 0;
+>       k->class_id = PCI_CLASS_BRIDGE_HOST;
+> -    k->is_express = true;
+>       k->is_bridge = true;
+>       k->init = xilinx_pcie_root_init;
+>       k->exit = pci_bridge_exitfn;
+> diff --git a/hw/pci/pci.c b/hw/pci/pci.c
+> index b2d139bd9a..02f6f2f37a 100644
+> --- a/hw/pci/pci.c
+> +++ b/hw/pci/pci.c
+> @@ -2014,12 +2014,13 @@ static void pci_qdev_realize(DeviceState *qdev, Error **errp)
+>   {
+>       PCIDevice *pci_dev = (PCIDevice *)qdev;
+>       PCIDeviceClass *pc = PCI_DEVICE_GET_CLASS(pci_dev);
+> +    ObjectClass *klass = &(pc->parent_class.parent_class);
+>       Error *local_err = NULL;
+>       PCIBus *bus;
+>       bool is_default_rom;
+>   
+>       /* initialize cap_present for pci_is_express() and pci_config_size() */
+> -    if (pc->is_express) {
+> +    if (object_class_dynamic_cast(klass, INTERFACE_PCIE_DEVICE)) {
+>           pci_dev->cap_present |= QEMU_PCI_CAP_EXPRESS;
+>       }
+>   
+> diff --git a/hw/scsi/megasas.c b/hw/scsi/megasas.c
+> index d5eae6239a..987c064e4b 100644
+> --- a/hw/scsi/megasas.c
+> +++ b/hw/scsi/megasas.c
+> @@ -2506,7 +2506,6 @@ static void megasas_class_init(ObjectClass *oc, void *data)
+>       pc->subsystem_vendor_id = PCI_VENDOR_ID_LSI_LOGIC;
+>       pc->subsystem_id = info->subsystem_id;
+>       pc->class_id = PCI_CLASS_STORAGE_RAID;
+> -    pc->is_express = info->is_express;
+>       e->mmio_bar = info->mmio_bar;
+>       e->ioport_bar = info->ioport_bar;
+>       e->osts = info->osts;
+> diff --git a/hw/usb/hcd-xhci.c b/hw/usb/hcd-xhci.c
+> index af3a9d88de..12e12f4f21 100644
+> --- a/hw/usb/hcd-xhci.c
+> +++ b/hw/usb/hcd-xhci.c
+> @@ -3661,7 +3661,6 @@ static void xhci_class_init(ObjectClass *klass, void *data)
+>       k->realize      = usb_xhci_realize;
+>       k->exit         = usb_xhci_exit;
+>       k->class_id     = PCI_CLASS_SERIAL_USB;
+> -    k->is_express   = 1;
+>   }
+>   
+>   static const TypeInfo xhci_info = {
+> diff --git a/hw/vfio/pci.c b/hw/vfio/pci.c
+> index c977ee327f..d2c1d47148 100644
+> --- a/hw/vfio/pci.c
+> +++ b/hw/vfio/pci.c
+> @@ -3026,7 +3026,6 @@ static void vfio_pci_dev_class_init(ObjectClass *klass, void *data)
+>       pdc->exit = vfio_exitfn;
+>       pdc->config_read = vfio_pci_read_config;
+>       pdc->config_write = vfio_pci_write_config;
+> -    pdc->is_express = 1; /* We might be */
+>   }
+>   
+>   static const TypeInfo vfio_pci_dev_info = {
+> diff --git a/include/hw/pci/pci.h b/include/hw/pci/pci.h
+> index 8d02a0a383..a27be85111 100644
+> --- a/include/hw/pci/pci.h
+> +++ b/include/hw/pci/pci.h
+> @@ -236,9 +236,6 @@ typedef struct PCIDeviceClass {
+>        */
+>       int is_bridge;
+>   
+> -    /* pcie stuff */
+> -    int is_express;   /* is this device pci express? */
+> -
+>       /* rom bar */
+>       const char *romfile;
+>   } PCIDeviceClass;
