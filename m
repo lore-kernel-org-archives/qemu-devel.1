@@ -1,53 +1,41 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56201)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60150)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pasic@linux.vnet.ibm.com>) id 1eJhhb-0005ge-NH
-	for qemu-devel@nongnu.org; Tue, 28 Nov 2017 10:21:45 -0500
+	(envelope-from <walling@linux.vnet.ibm.com>) id 1eJhx8-0007uu-0i
+	for qemu-devel@nongnu.org; Tue, 28 Nov 2017 10:37:42 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pasic@linux.vnet.ibm.com>) id 1eJhhY-0005eX-IN
-	for qemu-devel@nongnu.org; Tue, 28 Nov 2017 10:21:39 -0500
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:44176
+	(envelope-from <walling@linux.vnet.ibm.com>) id 1eJhx3-0003WX-42
+	for qemu-devel@nongnu.org; Tue, 28 Nov 2017 10:37:42 -0500
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:44618
 	helo=mx0a-001b2d01.pphosted.com)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pasic@linux.vnet.ibm.com>)
-	id 1eJhhY-0005eN-Bz
-	for qemu-devel@nongnu.org; Tue, 28 Nov 2017 10:21:36 -0500
-Received: from pps.filterd (m0098417.ppops.net [127.0.0.1])
+	(Exim 4.71) (envelope-from <walling@linux.vnet.ibm.com>)
+	id 1eJhx2-0003WG-U5
+	for qemu-devel@nongnu.org; Tue, 28 Nov 2017 10:37:37 -0500
+Received: from pps.filterd (m0098421.ppops.net [127.0.0.1])
 	by mx0a-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
-	vASFD5JW079000
-	for <qemu-devel@nongnu.org>; Tue, 28 Nov 2017 10:21:33 -0500
-Received: from e06smtp10.uk.ibm.com (e06smtp10.uk.ibm.com [195.75.94.106])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2eh9xmhq9r-1
+	vASFZqxI068227
+	for <qemu-devel@nongnu.org>; Tue, 28 Nov 2017 10:37:36 -0500
+Received: from e34.co.us.ibm.com (e34.co.us.ibm.com [32.97.110.152])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2eha8psgm7-1
 	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Tue, 28 Nov 2017 10:21:32 -0500
+	for <qemu-devel@nongnu.org>; Tue, 28 Nov 2017 10:37:34 -0500
 Received: from localhost
-	by e06smtp10.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
-	Only! Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <pasic@linux.vnet.ibm.com>;
-	Tue, 28 Nov 2017 15:21:24 -0000
-Received: from d06av21.portsmouth.uk.ibm.com (d06av21.portsmouth.uk.ibm.com
-	[9.149.105.232])
-	by b06cxnps3075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with
-	ESMTP id vASFLL6o43843774
-	for <qemu-devel@nongnu.org>; Tue, 28 Nov 2017 15:21:21 GMT
-Received: from d06av21.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 91FA352FAD
-	for <qemu-devel@nongnu.org>; Tue, 28 Nov 2017 14:14:43 +0000 (GMT)
-Received: from oc3836556865.ibm.com (unknown [9.152.224.205])
-	by d06av21.portsmouth.uk.ibm.com (Postfix) with ESMTP id 7FD1C52FAE
-	for <qemu-devel@nongnu.org>; Tue, 28 Nov 2017 14:14:43 +0000 (GMT)
-References: <20171128134648.21530-1-cohuck@redhat.com>
-	<6513d1c5-032e-b9d0-3dab-f2d0bd337ae2@linux.vnet.ibm.com>
-	<20171128152718.229a20fe.cohuck@redhat.com>
-From: Halil Pasic <pasic@linux.vnet.ibm.com>
-Date: Tue, 28 Nov 2017 16:21:20 +0100
+	by e34.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <walling@linux.vnet.ibm.com>;
+	Tue, 28 Nov 2017 08:36:49 -0700
+References: <1511816136-30068-1-git-send-email-walling@linux.vnet.ibm.com>
+	<1511816136-30068-2-git-send-email-walling@linux.vnet.ibm.com>
+	<20171128114558.5284f736.cohuck@redhat.com>
+From: "Collin L. Walling" <walling@linux.vnet.ibm.com>
+Date: Tue, 28 Nov 2017 10:36:44 -0500
 MIME-Version: 1.0
-In-Reply-To: <20171128152718.229a20fe.cohuck@redhat.com>
-Content-Type: text/plain; charset=utf-8
+In-Reply-To: <20171128114558.5284f736.cohuck@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
 Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Message-Id: <bf78fad3-b6b2-bf82-2625-477233adb6cf@linux.vnet.ibm.com>
-Subject: Re: [Qemu-devel] [PATCH RFC 0/2] s390x: cut down on unattached
- devices
+Message-Id: <53db60d4-5f6f-0da2-1401-d1f67e45e569@linux.vnet.ibm.com>
+Subject: Re: [Qemu-devel] [qemu-s390x] [PATCH v1 1/5] s390-ccw: update libc.h
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -56,86 +44,30 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Cornelia Huck <cohuck@redhat.com>
+Cc: borntraeger@de.ibm.com, qemu-s390x@nongnu.org, qemu-devel@nongnu.org, frankja@linux.vnet.ibm.com
 
-
-
-On 11/28/2017 03:27 PM, Cornelia Huck wrote:
-> On Tue, 28 Nov 2017 15:17:38 +0100
-> Halil Pasic <pasic@linux.vnet.ibm.com> wrote:
-> 
->> On 11/28/2017 02:46 PM, Cornelia Huck wrote:
->>> info qom-tree shows several devices under unattached that probably
->>> should go somewhere.  
+On 11/28/2017 05:45 AM, Cornelia Huck wrote:
+> On Mon, 27 Nov 2017 15:55:32 -0500
+> "Collin L. Walling" <walling@linux.vnet.ibm.com> wrote:
+>
+>> Moved:
+>>    memcmp from bootmap.h to libc.h (renamed from _memcmp)
+>>    strlen from sclp.c to libc.h (renamed from _strlen)
 >>
->> I think this was reported by me. See 
->> MID: <76f95c6f-641e-2fe0-73b4-3ab24fc1a93f@linux.vnet.ibm.com>
+>> Added C standard functions:
+>>    isdigit
+>>    atoi
 >>
->> I would not mind a Reported-by: Halil Pasic <pasic@linux.vnet.ibm.com>.
->> Or do you see this differently?
-> 
-> Apparently I forgot to add it to the first one. Will do.
-
-np
-
-It's just that I've spent quite some time writing that email and
-identifying the oddities.
-
-> 
+>> Added non-C standard function:
+>>    itostr
 >>
->> If these are bugs. I would prefer commit messages and titles reflecting
->> this fact.
-> 
-> I don't see this as fixing bugs, more removing oddities.
-> 
->>
->> Otherwise at first glance both patches seem sane.
-> 
-> Can I count this as an ack, or do you plan to do more review?
-> 
+>> Signed-off-by: Collin L. Walling <walling@linux.vnet.ibm.com>
+>> Acked-by: Christian Borntraeger <borntraeger@de.ibm.com>
+>> Reviewed-by: frankja@linux.vnet.ibm.com
+> You might want to include Janosch's complete name :)
 
-Yes I was planning to give it another look. And I do already
-have questions. Isn't the QOM composition tree API? I mean
-let's assume the QMP commands working on this tree are not completely
-useless. How is client code (management software) supposed to work,
-assumed it can rely on paths of e.g. properties being stable. Just
-imagine we had this default-cssid property (for the sake of the
-argument, not like we want it) on the css bridge.
+Whoops! I'll make sure his complete name is in there.
 
-Now if the composition tree is API then these can only be bug fixes
-(IMHO).
-
-There are also other oddities I've spotted. My idea was to put
-this composition tree discussion on hold until the vfio-ccw stuff
-is sorted out. I would certainly like to build a better understanding.
-
-Halil
-
->>
->> Regards,
->> Halil
->>
->>>
->>> The css bridge should attach to the machine, as it has a similar
->>> purpose as e.g. a pci host bridge.
->>>
->>> The autogenerated network devices should be in the same bucket as any
->>> other device; I'm just not sure about the way I went about it.
->>>
->>> The zpci devices are still problematic: I don't have a good idea where
->>> they should show up.
->>>
->>> Remaining in the unattached container are the sysbus, memory regions
->>> and cpus.
->>>
->>> Cornelia Huck (2):
->>>   s390x/css: attach css bridge
->>>   s390x: attach autogenerated nics
->>>
->>>  hw/s390x/css-bridge.c      | 2 ++
->>>  hw/s390x/s390-virtio-ccw.c | 2 ++
->>>  2 files changed, 4 insertions(+)
->>>   
->>
-> 
-> 
+-- 
+- Collin L Walling
