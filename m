@@ -1,34 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39991)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40576)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1eJdFB-000717-KY
-	for qemu-devel@nongnu.org; Tue, 28 Nov 2017 05:36:02 -0500
+	(envelope-from <stefanha@redhat.com>) id 1eJdHA-0008Fg-CQ
+	for qemu-devel@nongnu.org; Tue, 28 Nov 2017 05:38:08 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1eJdF5-0003oc-Pq
-	for qemu-devel@nongnu.org; Tue, 28 Nov 2017 05:36:01 -0500
-Received: from indium.canonical.com ([91.189.90.7]:50862)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1eJdF5-0003oF-Ic
-	for qemu-devel@nongnu.org; Tue, 28 Nov 2017 05:35:55 -0500
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1eJdF3-00089E-IN
-	for <qemu-devel@nongnu.org>; Tue, 28 Nov 2017 10:35:53 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 1D7032E81BB
-	for <qemu-devel@nongnu.org>; Tue, 28 Nov 2017 10:35:49 +0000 (UTC)
+	(envelope-from <stefanha@redhat.com>) id 1eJdH7-0004b4-7q
+	for qemu-devel@nongnu.org; Tue, 28 Nov 2017 05:38:04 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:51960)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1eJdH7-0004ae-1B
+	for qemu-devel@nongnu.org; Tue, 28 Nov 2017 05:38:01 -0500
+Date: Tue, 28 Nov 2017 10:37:57 +0000
+From: Stefan Hajnoczi <stefanha@redhat.com>
+Message-ID: <20171128103757.GD17146@stefanha-x1.localdomain>
+References: <20171124183446.7308-1-ppandit@redhat.com>
+	<20171124183446.7308-2-ppandit@redhat.com>
+	<20171127111532.GI16527@stefanha-x1.localdomain>
+	<nycvar.YSQ.7.76.1711272251290.24944@wniryva>
+	<20171128101154.64b49cb0.cohuck@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Tue, 28 Nov 2017 10:30:02 -0000
-From: Maskim Bakulin <1672383@bugs.launchpad.net>
-Reply-To: Bug 1672383 <1672383@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <20170313132927.15361.96547.malonedeb@soybean.canonical.com>
-Message-Id: <151186500252.20943.1149826215783200224.malone@chaenomeles.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1672383] Re: Slow Windows XP load after commit
- a9353fe897ca2687e5b3385ed39e3db3927a90e0
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="eqp4TxRxnD4KrmFZ"
+Content-Disposition: inline
+In-Reply-To: <20171128101154.64b49cb0.cohuck@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v3 1/2] virtio: check VirtQueue Vring
+ object is set
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,59 +32,73 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Cornelia Huck <cohuck@redhat.com>
+Cc: P J P <ppandit@redhat.com>, Qemu Developers <qemu-devel@nongnu.org>, zhangboxian <zhangboxian@huawei.com>, Paolo Bonzini <pbonzini@redhat.com>
 
-Supposedly fixed by commit 406bc339b0505fcfc2ffcbca1f05a3756e338a65
 
-** Changed in: qemu
-       Status: New =3D> Fix Committed
+--eqp4TxRxnD4KrmFZ
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
--- =
+On Tue, Nov 28, 2017 at 10:11:54AM +0100, Cornelia Huck wrote:
+> On Mon, 27 Nov 2017 23:25:28 +0530 (IST)
+> P J P <ppandit@redhat.com> wrote:
+> > +-- On Mon, 27 Nov 2017, Stefan Hajnoczi wrote --+
+> > | > +    if (!vdev->vq[n].vring.num || !desc || !vdev->vq[n].vring.alig=
+n) {
+> > | ...
+> > |   vdev->vq[n].vring.desc =3D desc;
+> > |
+> > | Why !desc?
+> >=20
+> > virtio_queue_set_rings
+> >  virtio_init_region_cache
+> >    VirtQueue *vq =3D &vdev->vq[n];
+> >    ...
+> >    addr =3D vq->vring.desc;
+> >    if (!addr) {
+> >        return;
+> >    }
+> >=20
+> > These checks seem to be repeating all over. As mentioned earlier, could=
+ these=20
+> > be collated in one place, maybe virtio_queue_get_num()?
+> >=20
+> >   int virtio_queue_get_num(VirtIODevice *vdev, int n)
+> >   {
+> >       VirtQueue *vq =3D &vdev->vq[n];
+> >=20
+> >       if (!vq->.vring.num
+> >            || !vq->vring.desc
+> >            || !vq->vring.align) {
+> >           return 0;  /* vq not set */
+> >       }
+> >=20
+> >       return vdev->vq[n].vring.num;
+> >   }
+>=20
+> This is conflating different things:
+> - vq does not exist (num =3D=3D 0)
+> - vq is not setup by the guest (desc =3D=3D 0)
+> - vq has no valid alignment (which is only relevant for legacy)
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1672383
+I agree.
 
-Title:
-  Slow Windows XP load after commit
-  a9353fe897ca2687e5b3385ed39e3db3927a90e0
+Stefan
 
-Status in QEMU:
-  Fix Committed
+--eqp4TxRxnD4KrmFZ
+Content-Type: application/pgp-signature; name="signature.asc"
 
-Bug description:
-  I've recently discovered, that in QEMU 2.8+ my Windows XP loading time
-  has significantly worsened. In 2.7 it took 30-40 second to boot, but
-  in 2.8 it became 2-2,5 minutes.
+-----BEGIN PGP SIGNATURE-----
 
-  I've used Git bisect, and found out that the change happened after
-  commit a9353fe897ca2687e5b3385ed39e3db3927a90e0, which, as far as I
-  can tell from the commit message, handled race condition when
-  invalidating breakpoint.
+iQEcBAEBAgAGBQJaHTyFAAoJEJykq7OBq3PIlegIAIRHoK+w0i5pfbjIkAkzd/l3
+ydhnCO43ORoXp8p3nkmM9OfY6PZxJtmIoCym2BMCm1yFjyZLfv4hL7OCSB8JIljE
+Hg42fqLF0TVSEaWxGFFEHvQI9nIge9xyExkDILuG0G/Dqhsjd/5ncjPL4ZgwGDOo
+xGRXTIDl0q9eJSrDBMy4mFoXFGCwJZ1SY2lnGM5jLptXXQ2QxcdOca6luxYa9MTC
+y72bf8F38KRm6sBH5VSqOdmmm63kb9auB7IfY1uRs9KLWazefO59qDdWb81KauLo
+qqO9D2f5FVRLP1hL9uceCfLPM72WXfqXM11RoLP3dOjJMHR+pAOlEYZkzC96cVY=
+=+pdT
+-----END PGP SIGNATURE-----
 
-  I've set a breakpoint in static void breakpoint_invalidate(CPUState *cpu,=
- target_ulong pc), and here's a backtrace:
-  #0  cpu_breakpoint_insert (cpu=3Dcpu@entry=3D0x555556a73be0, pc=3D144, =
-
-      flags=3Dflags@entry=3D32, breakpoint=3Dbreakpoint@entry=3D0x555556a7c=
-670)
-      at /media/sdd2/qemu-work/exec.c:830
-  #1  0x00005555558746ac in hw_breakpoint_insert (env=3Denv@entry=3D0x55555=
-6a7be60, =
-
-      index=3Dindex@entry=3D0) at /media/sdd2/qemu-work/target-i386/bpt_hel=
-per.c:64
-  #2  0x00005555558748ed in cpu_x86_update_dr7 (env=3D0x555556a7be60, =
-
-      new_dr7=3D<optimised out>)
-      at /media/sdd2/qemu-work/target-i386/bpt_helper.c:160
-  #3  0x00007fffa17421f6 in code_gen_buffer ()
-  #4  0x000055555577fcb4 in cpu_tb_exec (itb=3D<optimised out>, =
-
-      itb=3D<optimised out>, cpu=3D0x7fff8b7763b0)
-      at /media/sdd2/qemu-work/cpu-exec.c:164
-  It seems that XP sets some breakpoints during it's load, and it leads to =
-frequent TB flushes and slow execution.
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1672383/+subscriptions
+--eqp4TxRxnD4KrmFZ--
