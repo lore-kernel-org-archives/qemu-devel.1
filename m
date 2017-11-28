@@ -1,14 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59734)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59793)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <lvivier@redhat.com>) id 1eJjug-0002Ak-8w
-	for qemu-devel@nongnu.org; Tue, 28 Nov 2017 12:43:19 -0500
+	(envelope-from <dgilbert@redhat.com>) id 1eJjur-0002Id-3o
+	for qemu-devel@nongnu.org; Tue, 28 Nov 2017 12:43:30 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <lvivier@redhat.com>) id 1eJjue-0007Py-MQ
-	for qemu-devel@nongnu.org; Tue, 28 Nov 2017 12:43:18 -0500
-From: Laurent Vivier <lvivier@redhat.com>
-Date: Tue, 28 Nov 2017 18:43:10 +0100
-Message-Id: <20171128174310.15700-1-lvivier@redhat.com>
-Subject: [Qemu-devel] [PATCH v2] pseries: fix TCG migration
+	(envelope-from <dgilbert@redhat.com>) id 1eJjun-0007Rk-4b
+	for qemu-devel@nongnu.org; Tue, 28 Nov 2017 12:43:29 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:37600)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1eJjum-0007Re-SB
+	for qemu-devel@nongnu.org; Tue, 28 Nov 2017 12:43:25 -0500
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+	[10.5.11.14])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 036D5D5541
+	for <qemu-devel@nongnu.org>; Tue, 28 Nov 2017 17:43:24 +0000 (UTC)
+Date: Tue, 28 Nov 2017 17:43:16 +0000
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20171128174316.GB3256@work-vm>
+References: <20171128133123.17372-1-vkaplans@redhat.com>
+	<20171128160420.GG2318@work-vm>
+	<20171128181150-mutt-send-email-mst@kernel.org>
+	<1700185825.47104719.1511890732353.JavaMail.zimbra@redhat.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1700185825.47104719.1511890732353.JavaMail.zimbra@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH] vhost-user spec: Clarify policy on setting
+ log_base
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -17,50 +36,70 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: qemu-ppc@nongnu.org, David Gibson <david@gibson.dropbear.id.au>, Bharata B Rao <bharata@linux.vnet.ibm.com>, Daniel Henrique Barboza <danielhb@linux.vnet.ibm.com>, Laurent Vivier <lvivier@redhat.com>
+To: Victor Kaplansky <vkaplans@redhat.com>
+Cc: "Michael S. Tsirkin" <mst@redhat.com>, qemu-devel@nongnu.org, Maxime Coquelin <maxime.coquelin@redhat.com>
 
-Migration of pseries is broken with TCG because
-QEMU tries to restore KVM MMU state unconditionally.
+* Victor Kaplansky (vkaplans@redhat.com) wrote:
+> > From: "Michael S. Tsirkin" <mst@redhat.com>
+> > To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+> > Cc: "Victor Kaplansky" <vkaplans@redhat.com>, qemu-devel@nongnu.org, "Maxime Coquelin" <maxime.coquelin@redhat.com>
+> > Sent: Tuesday, November 28, 2017 6:12:44 PM
+> > Subject: Re: [Qemu-devel] [PATCH] vhost-user spec: Clarify policy on setting log_base
+> > 
+> > On Tue, Nov 28, 2017 at 04:04:21PM +0000, Dr. David Alan Gilbert wrote:
+> > > * Victor Kaplansky (vkaplans@redhat.com) wrote:
+> > > > From: Victor Kaplansky <vkaplans@dell9020.localdomain>
+> > > > 
+> > > > If we allow qemu to change logging area after it was already established,
+> > > > it may require from the backend to acquire a lock on each access to
+> > > > the log_base, which has a potential quite a big performance hit.
+> > > > 
+> > > > Thus we would like to clarify in the spec, that qemu is not expected
+> > > > to resize or remap the logging area, and backend implementations
+> > > > can safely ignore subsequent requests to log_base modifications.
+> > > 
+> > > There's quite a bit of code in vhost to cope with changes in mappings
+> > > of regions; and there's already code in there to handle log size
+> > > changes:
+> > > 
+> > > static inline void vhost_dev_log_resize(struct vhost_dev *dev, uint64_t
+> > > size)
+> > > {
+> > >     struct vhost_log *log = vhost_log_get(size,
+> > >     vhost_dev_log_is_shared(dev));
+> > >     uint64_t log_base = (uintptr_t)log->log;
+> > >     int r;
+> > > 
+> > >     /* inform backend of log switching, this must be done before
+> > >        releasing the current log, to ensure no logging is lost */
+> > >     r = dev->vhost_ops->vhost_set_log_base(dev, log_base, log);
+> > > 
+> > > so when is a log resize legal?
+> > > 
+> > > Dave
+> > 
+> > Log base has nothing to do with log resize.
+> > 
+> > It supplies the physical address of the ring
+> > for dirty logging purposes.
+> > 
+> 
+> Right. Just for complete picture, it also supplies the address for
+> dirty logging of where descriptors can point, in other words for logging
+> whole guest's physical memory. It is why a single log_base is enough for
+> whole device, and there is no need to specify it for every ring separately.
+> 
+> Having said that, there is an obscure possibility to place the ring in
+> a memory different from guest's physical memory, but as far as I know there
+> is no backend that supports this now.
+> 
+> The introduction of this clarification to the vhost-user spec, either with
+> *must* or without it, will enable us to fix in DPDK several BZs open for qemu
+> and related to migration failure of MQ vhost-user.
 
-The result is a SIGSEGV in kvm_vm_ioctl():
+OK thanks for the clarification Michael, Victor!
 
-  #0  kvm_vm_ioctl (s=0x0, type=-2146390353)
-      at qemu/accel/kvm/kvm-all.c:2032
-  #1  0x00000001003e3e2c in kvmppc_configure_v3_mmu (cpu=<optimized out>,
-      radix=<optimized out>, gtse=<optimized out>, proc_tbl=<optimized out>)
-      at qemu/target/ppc/kvm.c:396
-  #2  0x00000001002f8b88 in spapr_post_load (opaque=0x1019103c0,
-      version_id=<optimized out>) at qemu/hw/ppc/spapr.c:1578
-  #3  0x000000010059e4cc in vmstate_load_state (f=0x106230000,
-      vmsd=0x1009479e0 <vmstate_spapr>, opaque=0x1019103c0,
-      version_id=<optimized out>) at qemu/migration/vmstate.c:165
-  #4  0x00000001005987e0 in vmstate_load (f=<optimized out>, se=<optimized out>)
-      at qemu/migration/savevm.c:748
+Dave
 
-This patch fixes the problem by not calling the KVM function with the
-TCG mode.
-
-Fixes: d39c90f5f3 ("spapr: Fix migration of Radix guests")
-Signed-off-by: Laurent Vivier <lvivier@redhat.com>
----
-v2: fix the comment to keep GDB backtrace lines starting with '#'
-
- hw/ppc/spapr.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-index 9efddeaee5..a471de6cab 100644
---- a/hw/ppc/spapr.c
-+++ b/hw/ppc/spapr.c
-@@ -1570,7 +1570,7 @@ static int spapr_post_load(void *opaque, int version_id)
-         err = spapr_rtc_import_offset(&spapr->rtc, spapr->rtc_offset);
-     }
- 
--    if (spapr->patb_entry) {
-+    if (kvm_enabled() && spapr->patb_entry) {
-         PowerPCCPU *cpu = POWERPC_CPU(first_cpu);
-         bool radix = !!(spapr->patb_entry & PATBE1_GR);
-         bool gtse = !!(cpu->env.spr[SPR_LPCR] & LPCR_GTSE);
--- 
-2.13.6
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
