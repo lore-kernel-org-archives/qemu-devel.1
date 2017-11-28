@@ -1,28 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33857)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34526)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1eJeWp-0000a6-IF
-	for qemu-devel@nongnu.org; Tue, 28 Nov 2017 06:58:20 -0500
+	(envelope-from <cohuck@redhat.com>) id 1eJeZ0-0001II-Lc
+	for qemu-devel@nongnu.org; Tue, 28 Nov 2017 07:00:38 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1eJeWo-0002FZ-Ng
-	for qemu-devel@nongnu.org; Tue, 28 Nov 2017 06:58:19 -0500
-Received: from mail-oi0-x22c.google.com ([2607:f8b0:4003:c06::22c]:44440)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1eJeWo-0002FF-Iq
-	for qemu-devel@nongnu.org; Tue, 28 Nov 2017 06:58:18 -0500
-Received: by mail-oi0-x22c.google.com with SMTP id y71so46609oia.11
-	for <qemu-devel@nongnu.org>; Tue, 28 Nov 2017 03:58:18 -0800 (PST)
+	(envelope-from <cohuck@redhat.com>) id 1eJeYv-00037P-OC
+	for qemu-devel@nongnu.org; Tue, 28 Nov 2017 07:00:34 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:34577)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <cohuck@redhat.com>) id 1eJeYv-00036t-HB
+	for qemu-devel@nongnu.org; Tue, 28 Nov 2017 07:00:29 -0500
+Date: Tue, 28 Nov 2017 13:00:12 +0100
+From: Cornelia Huck <cohuck@redhat.com>
+Message-ID: <20171128130012.1466d231.cohuck@redhat.com>
+In-Reply-To: <nycvar.YSQ.7.76.1711281653440.1581@wniryva>
+References: <20171124183446.7308-1-ppandit@redhat.com>
+	<20171124183446.7308-2-ppandit@redhat.com>
+	<20171127111532.GI16527@stefanha-x1.localdomain>
+	<nycvar.YSQ.7.76.1711272251290.24944@wniryva>
+	<20171128101154.64b49cb0.cohuck@redhat.com>
+	<20171128103757.GD17146@stefanha-x1.localdomain>
+	<nycvar.YSQ.7.76.1711281653440.1581@wniryva>
 MIME-Version: 1.0
-In-Reply-To: <2323fa20-ea6e-7895-3a68-1dacf32dcab8@redhat.com>
-References: <20171128113204.22912-1-pbonzini@redhat.com>
-	<CAJ+F1CLzoyrtwG=iiB0_ocMGELrYY9-v_pm4AGaShFw3_CzHhQ@mail.gmail.com>
-	<2323fa20-ea6e-7895-3a68-1dacf32dcab8@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 28 Nov 2017 11:57:57 +0000
-Message-ID: <CAFEAcA9=bjzkoidD=Rpymw4kwkG2_umOEd2GenwL87skj7jbUw@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH] memfd: fix configure test
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v3 1/2] virtio: check VirtQueue Vring
+ object is set
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,33 +33,36 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>, fweimer@redhat.com, QEMU <qemu-devel@nongnu.org>, Cole Robinson <crobinso@redhat.com>
+To: P J P <ppandit@redhat.com>
+Cc: Stefan Hajnoczi <stefanha@redhat.com>, Qemu Developers <qemu-devel@nongnu.org>, zhangboxian <zhangboxian@huawei.com>, Paolo Bonzini <pbonzini@redhat.com>
 
-On 28 November 2017 at 11:49, Paolo Bonzini <pbonzini@redhat.com> wrote:
-> On 28/11/2017 12:42, Marc-Andr=C3=A9 Lureau wrote:
->> It is introduced by this commit, right?
->> https://sourceware.org/git/?p=3Dglibc.git;a=3Dcommit;h=3D59d2cbb1fe4b860=
-1d5cbd359c3806973eab6c62d
->>
->> (I added Florian Weimer in cc)
->>
->> So it's not part of glibc release yet.
->>
->> Couldn't the declarations be put in sys/memfd.h like the man claimed
->> it would be for > 1y?
->
-> Yeah, that would have been better---certainly other software than QEMU
-> is likely to have a static memfd_create declaration, and polluting
-> sys/mman.h is going to trigger the same error.  However, at least
-> systemd seems to have changed the test to sys/mman.h
-> (https://github.com/systemd/systemd/pull/7468), so I think we should
-> follow their lead now
+On Tue, 28 Nov 2017 16:57:34 +0530 (IST)
+P J P <ppandit@redhat.com> wrote:
 
-I don't see why systemd should control anything. If the documentation
-has been around for ages and there hasn't been a released glibc with
-the incorrect placement then the implementation in glibc should follow
-the documentation.
+> +-- On Tue, 28 Nov 2017, Stefan Hajnoczi wrote --+
+> | > This is conflating different things:
+> | > - vq does not exist (num == 0)
+> | > - vq is not setup by the guest (desc == 0)
+> | > - vq has no valid alignment (which is only relevant for legacy)
+> | 
+> | I agree.
+> 
+> Either case, vq would be unfit for use, no?
 
-thanks
--- PMM
+What is "unfit for use"?
+
+I'm not quite sure what you want to achieve with this patch. I assume
+you want to fix the issue that a guest may provide invalid values for
+align etc. which can cause qemu to crash or behave badly.
+
+If so, you need to do different things for the different points above.
+- The guest should not muck around with a non-existing queue (num == 0)
+  in any case, so this should be fenced for any manipulation triggered
+  by the guest.
+- Processing a non-setup queue (desc == 0; also applies to the other
+  buffers for virtio-1) should be skipped. However, _setting_ desc etc.
+  to 0 from the guest is fine (as long as it follows the other
+  constraints of the spec).
+- Setting alignment to 0 only applies to legacy + virtio-mmio. I would
+  not overengineer fencing this. A simple check in update_rings should
+  be enough.
