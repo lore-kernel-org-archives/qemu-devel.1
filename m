@@ -1,23 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52602)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52658)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1eJixS-0001kj-VL
-	for qemu-devel@nongnu.org; Tue, 28 Nov 2017 11:42:07 -0500
+	(envelope-from <jcody@redhat.com>) id 1eJixi-0001tu-N5
+	for qemu-devel@nongnu.org; Tue, 28 Nov 2017 11:42:23 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1eJixO-000672-2G
-	for qemu-devel@nongnu.org; Tue, 28 Nov 2017 11:42:06 -0500
-Date: Tue, 28 Nov 2017 17:41:57 +0100
-From: Cornelia Huck <cohuck@redhat.com>
-Message-ID: <20171128174157.397590c6.cohuck@redhat.com>
-In-Reply-To: <2a2ee45b-c199-2763-a151-938bbed49ca3@linux.vnet.ibm.com>
-References: <1511816136-30068-1-git-send-email-walling@linux.vnet.ibm.com>
-	<1511816136-30068-3-git-send-email-walling@linux.vnet.ibm.com>
-	<20171128114814.55ccfbf3.cornelia.huck@mailbox.org>
-	<2a2ee45b-c199-2763-a151-938bbed49ca3@linux.vnet.ibm.com>
+	(envelope-from <jcody@redhat.com>) id 1eJixh-0006Am-Lf
+	for qemu-devel@nongnu.org; Tue, 28 Nov 2017 11:42:22 -0500
+Date: Tue, 28 Nov 2017 11:42:10 -0500
+From: Jeff Cody <jcody@redhat.com>
+Message-ID: <20171128164210.GG25110@localhost.localdomain>
+References: <20171128154350.21504-1-kwolf@redhat.com>
+	<20171128154350.21504-4-kwolf@redhat.com>
+	<9bd2921d-64c6-724c-0d80-b43e33f41817@redhat.com>
+	<20171128162850.GF3703@localhost.localdomain>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [qemu-s390x] [PATCH v1 2/5] s390-ccw: ipl structs
- for eckd cdl/ldl
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20171128162850.GF3703@localhost.localdomain>
+Subject: Re: [Qemu-devel] [PATCH for-2.11 3/4] coroutine: Cancel
+ aio_co_schedule() on direct entry
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,38 +26,62 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Collin L. Walling" <walling@linux.vnet.ibm.com>
-Cc: borntraeger@de.ibm.com, qemu-s390x@nongnu.org, qemu-devel@nongnu.org, frankja@linux.vnet.ibm.com
+To: Kevin Wolf <kwolf@redhat.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, qemu-block@nongnu.org, mreitz@redhat.com, stefanha@redhat.com, famz@redhat.com, qemu-devel@nongnu.org
 
-On Tue, 28 Nov 2017 10:42:30 -0500
-"Collin L. Walling" <walling@linux.vnet.ibm.com> wrote:
+On Tue, Nov 28, 2017 at 05:28:50PM +0100, Kevin Wolf wrote:
+> Am 28.11.2017 um 17:14 hat Paolo Bonzini geschrieben:
+> > On 28/11/2017 16:43, Kevin Wolf wrote:
+> > > +    /* Make sure that a coroutine that can alternatively reentered from two
+> > > +     * different sources isn't reentered more than once when the first caller
+> > > +     * uses aio_co_schedule() and the other one enters to coroutine directly.
+> > > +     * This is achieved by cancelling the pending aio_co_schedule().
+> > > +     *
+> > > +     * The other way round, if aio_co_schedule() would be called after this
+> > > +     * point, this would be a problem, too, but in practice it doesn't happen
+> > > +     * because we're holding the AioContext lock here and aio_co_schedule()
+> > > +     * callers must do the same.
+> > 
+> > No, this is not true.  aio_co_schedule is thread-safe.
+> 
+> Hm... With the reproducer we were specfically looking at
+> qmp_block_job_cancel(), which does take the AioContext locks. But it
+> might not be as universal as I thought.
+> 
+> To be honest, I just wasn't sure what to do with this case anyway. It
+> means that the coroutine is already running when someone else schedules
+> it. We don't really know whether we have to enter it a second time or
+> not.
+> 
+> So if it can indeed happen in practice, we need to think a bit more
+> about this.
 
-> On 11/28/2017 05:48 AM, Cornelia Huck wrote:
-> > On Mon, 27 Nov 2017 15:55:33 -0500
-> > "Collin L. Walling" <walling@linux.vnet.ibm.com> wrote:
-> >  
-> >> ECKD DASDs have different IPL structures for CDL and LDL
-> >> formats. The current Ipl1 and Ipl2 structs follow the CDL
-> >> format, so we prepend "EckdCdl" to them. A new struct,
-> >> EckdLdlIpl1 is introduced and contains boot info for LDL.  
-> > So does this add support for LDL DASD, or does it simply enhance the
-> > code? It's unclear from the desription alone.  
-> 
-> Enhances. I'll reword it. Perhaps something along the lines of "Boot info
-> for LDL has been *moved* to a new struct, EckdLdlIpl1"
-
-Yes, sounds good.
+It would be nice if, on coroutine termination, we could unschedule all
+pending executions for that coroutine.  I think use-after-free is the main
+concern for someone else calling aio_co_schedule() while the coroutine is
+currently running.
 
 > 
-> >  
-> >> Also introduce structs for IPL stages 1 and 1b and for
-> >> disk geometry.
-> >>
-> >> Signed-off-by: Collin L. Walling <walling@linux.vnet.ibm.com>
-> >> Acked-by: Janosch Frank <frankja@linux.vnet.ibm.com>
-> >> ---
-> >>   pc-bios/s390-ccw/bootmap.c | 24 ++++++++++----------
-> >>   pc-bios/s390-ccw/bootmap.h | 55 +++++++++++++++++++++++++++++++++-------------
-> >>   2 files changed, 53 insertions(+), 26 deletions(-)  
+> > > This means that the coroutine just needs to
+> > > +     * prevent other callers from calling aio_co_schedule() before it yields
+> > > +     * (e.g. block job coroutines by setting job->busy = true).
+> > > +     *
+> > > +     * We still want to ensure that the second case doesn't happen, so reset
+> > > +     * co->scheduled only after setting co->caller to make the above check
+> > > +     * effective for the co_schedule_bh_cb() case. */
+> > > +    atomic_set(&co->scheduled, NULL);
+> > 
+> > This doesn't work.  The coroutine is still in the list, and if someone
+> > calls aio_co_schedule again now, any coroutines linked from "co" via
+> > co_scheduled_next are lost.
 > 
+> Why would they? We still iterate the whole list in co_schedule_bh_cb(),
+> we just skip the single qemu_coroutine_enter().
 > 
+> > (Also, the AioContext lock is by design not protecting any state in
+> > AioContext itself; the AioContext lock is only protecting things that
+> > run in an AioContext but do not have their own lock).
+> 
+> Such as the coroutine we want to enter, no?
+> 
+> Kevin
