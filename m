@@ -1,33 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46615)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49688)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1eJUBi-00043o-61
-	for qemu-devel@nongnu.org; Mon, 27 Nov 2017 19:55:51 -0500
+	(envelope-from <ehabkost@redhat.com>) id 1eJUMr-0007f1-2R
+	for qemu-devel@nongnu.org; Mon, 27 Nov 2017 20:07:22 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1eJUBe-0004w6-9f
-	for qemu-devel@nongnu.org; Mon, 27 Nov 2017 19:55:50 -0500
-Received: from indium.canonical.com ([91.189.90.7]:39960)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1eJUBe-0004vd-3Q
-	for qemu-devel@nongnu.org; Mon, 27 Nov 2017 19:55:46 -0500
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1eJUBZ-0001Ps-TQ
-	for <qemu-devel@nongnu.org>; Tue, 28 Nov 2017 00:55:42 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 8D8342E80D8
-	for <qemu-devel@nongnu.org>; Tue, 28 Nov 2017 00:55:41 +0000 (UTC)
+	(envelope-from <ehabkost@redhat.com>) id 1eJUMn-0002Gx-SG
+	for qemu-devel@nongnu.org; Mon, 27 Nov 2017 20:07:21 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:49322)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1eJUMn-0002Fl-Im
+	for qemu-devel@nongnu.org; Mon, 27 Nov 2017 20:07:17 -0500
+Date: Mon, 27 Nov 2017 23:07:13 -0200
+From: Eduardo Habkost <ehabkost@redhat.com>
+Message-ID: <20171128010713.GC3037@localhost.localdomain>
+References: <20171127043517.22441-1-haozhong.zhang@intel.com>
+	<20171127043517.22441-2-haozhong.zhang@intel.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Tue, 28 Nov 2017 00:41:50 -0000
-From: changlimin <changlimin@h3c.com>
-Reply-To: Bug 1401798 <1401798@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <20141212081522.22342.50676.malonedeb@gac.canonical.com>
-Message-Id: <151182971055.3145.5540142367406841235.launchpad@gac.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1401798] Re: Qemu 2.2.0 savevm crash.
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20171127043517.22441-2-haozhong.zhang@intel.com>
+Subject: Re: [Qemu-devel] [PATCH v3 1/3] hostmem-file: add "align" option
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,73 +27,213 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Haozhong Zhang <haozhong.zhang@intel.com>
+Cc: qemu-devel@nongnu.org, Xiao Guangrong <guangrong.xiao@gmail.com>, Stefan Hajnoczi <stefanha@gmail.com>, Dan Williams <dan.j.williams@intel.com>, Igor Mammedov <imammedo@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Richard Henderson <rth@twiddle.net>
 
-** Changed in: qemu
-       Status: Incomplete =3D> Fix Released
+On Mon, Nov 27, 2017 at 12:35:15PM +0800, Haozhong Zhang wrote:
+> When mmap(2) the backend files, QEMU uses the host page size
+> (getpagesize(2)) by default as the alignment of mapping address.
+> However, some backends may require alignments different than the page
+> size. For example, mmap a device DAX (e.g., /dev/dax0.0) on Linux
+> kernel 4.13 to an address, which is 4K-aligned but not 2M-aligned,
+> fails with a kernel message like
+> 
+> [617494.969768] dax dax0.0: qemu-system-x86: dax_mmap: fail, unaligned vma (0x7fa37c579000 - 0x7fa43c579000, 0x1fffff)
+> 
+> Because there is no common approach to get such alignment requirement,
+> we add the 'align' option to 'memory-backend-file', so that users or
+> management utils, which have enough knowledge about the backend, can
+> specify a proper alignment via this option.
+> 
+> Signed-off-by: Haozhong Zhang <haozhong.zhang@intel.com>
 
--- =
+The new option needs to be documented on qemu-options.hx.
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1401798
+Except for that, the patch looks good to me.
 
-Title:
-  Qemu 2.2.0 savevm crash.
 
-Status in QEMU:
-  Fix Released
+> ---
+>  backends/hostmem-file.c | 41 ++++++++++++++++++++++++++++++++++++++++-
+>  docs/nvdimm.txt         | 16 ++++++++++++++++
+>  exec.c                  |  8 +++++++-
+>  include/exec/memory.h   |  3 +++
+>  memory.c                |  2 ++
+>  numa.c                  |  2 +-
+>  6 files changed, 69 insertions(+), 3 deletions(-)
+> 
+> diff --git a/backends/hostmem-file.c b/backends/hostmem-file.c
+> index e44c319915..e319ec1ad8 100644
+> --- a/backends/hostmem-file.c
+> +++ b/backends/hostmem-file.c
+> @@ -34,6 +34,7 @@ struct HostMemoryBackendFile {
+>      bool share;
+>      bool discard_data;
+>      char *mem_path;
+> +    uint64_t align;
+>  };
+>  
+>  static void
+> @@ -58,7 +59,7 @@ file_backend_memory_alloc(HostMemoryBackend *backend, Error **errp)
+>          path = object_get_canonical_path(OBJECT(backend));
+>          memory_region_init_ram_from_file(&backend->mr, OBJECT(backend),
+>                                   path,
+> -                                 backend->size, fb->share,
+> +                                 backend->size, fb->align, fb->share,
+>                                   fb->mem_path, errp);
+>          g_free(path);
+>      }
+> @@ -115,6 +116,40 @@ static void file_memory_backend_set_discard_data(Object *o, bool value,
+>      MEMORY_BACKEND_FILE(o)->discard_data = value;
+>  }
+>  
+> +static void file_memory_backend_get_align(Object *o, Visitor *v,
+> +                                          const char *name, void *opaque,
+> +                                          Error **errp)
+> +{
+> +    HostMemoryBackendFile *fb = MEMORY_BACKEND_FILE(o);
+> +    uint64_t val = fb->align;
+> +
+> +    visit_type_size(v, name, &val, errp);
+> +}
+> +
+> +static void file_memory_backend_set_align(Object *o, Visitor *v,
+> +                                          const char *name, void *opaque,
+> +                                          Error **errp)
+> +{
+> +    HostMemoryBackend *backend = MEMORY_BACKEND(o);
+> +    HostMemoryBackendFile *fb = MEMORY_BACKEND_FILE(o);
+> +    Error *local_err = NULL;
+> +    uint64_t val;
+> +
+> +    if (host_memory_backend_mr_inited(backend)) {
+> +        error_setg(&local_err, "cannot change property value");
+> +        goto out;
+> +    }
+> +
+> +    visit_type_size(v, name, &val, &local_err);
+> +    if (local_err) {
+> +        goto out;
+> +    }
+> +    fb->align = val;
+> +
+> + out:
+> +    error_propagate(errp, local_err);
+> +}
+> +
+>  static void file_backend_unparent(Object *obj)
+>  {
+>      HostMemoryBackend *backend = MEMORY_BACKEND(obj);
+> @@ -145,6 +180,10 @@ file_backend_class_init(ObjectClass *oc, void *data)
+>      object_class_property_add_str(oc, "mem-path",
+>          get_mem_path, set_mem_path,
+>          &error_abort);
+> +    object_class_property_add(oc, "align", "int",
+> +        file_memory_backend_get_align,
+> +        file_memory_backend_set_align,
+> +        NULL, NULL, &error_abort);
+>  }
+>  
+>  static void file_backend_instance_finalize(Object *o)
+> diff --git a/docs/nvdimm.txt b/docs/nvdimm.txt
+> index 2d9f8c0e8c..21249dd062 100644
+> --- a/docs/nvdimm.txt
+> +++ b/docs/nvdimm.txt
+> @@ -122,3 +122,19 @@ Note:
+>       M >= size of RAM devices +
+>            size of statically plugged vNVDIMM devices +
+>            size of hotplugged vNVDIMM devices
+> +
+> +Alignment
+> +---------
+> +
+> +QEMU uses mmap(2) to maps vNVDIMM backends and aligns the mapping
+> +address to the page size (getpagesize(2)) by default. However, some
+> +types of backends may require an alignment different than the page
+> +size. In that case, QEMU v2.12.0 and later provide 'align' option to
+> +memory-backend-file to allow users to specify the proper alignment.
+> +
+> +For example, device dax require the 2 MB alignment, so we can use
+> +following QEMU command line options to use it (/dev/dax0.0) as the
+> +backend of vNVDIMM:
+> +
+> + -object memory-backend-file,id=mem1,share=on,mem-path=/dev/dax0.0,size=4G,align=2M
+> + -device nvdimm,id=nvdimm1,memdev=mem1
+> diff --git a/exec.c b/exec.c
+> index 03238a3449..90440efecd 100644
+> --- a/exec.c
+> +++ b/exec.c
+> @@ -1600,7 +1600,13 @@ static void *file_ram_alloc(RAMBlock *block,
+>      void *area;
+>  
+>      block->page_size = qemu_fd_getpagesize(fd);
+> -    block->mr->align = block->page_size;
+> +    if (block->mr->align % block->page_size) {
+> +        error_setg(errp, "aligment 0x%" PRIx64
+> +                   " must be multiples of page size 0x%" PRIx64,
+> +                   block->mr->align, block->page_size);
+> +        return NULL;
+> +    }
+> +    block->mr->align = MAX(block->page_size, block->mr->align);
+>  #if defined(__s390x__)
+>      if (kvm_enabled()) {
+>          block->mr->align = MAX(block->mr->align, QEMU_VMALLOC_ALIGN);
+> diff --git a/include/exec/memory.h b/include/exec/memory.h
+> index 5ed4042f87..a1be8b06d3 100644
+> --- a/include/exec/memory.h
+> +++ b/include/exec/memory.h
+> @@ -465,6 +465,8 @@ void memory_region_init_resizeable_ram(MemoryRegion *mr,
+>   * @name: Region name, becomes part of RAMBlock name used in migration stream
+>   *        must be unique within any device
+>   * @size: size of the region.
+> + * @align: alignment of the region base address; if 0, the default alignment
+> + *         (getpagesize()) will be used.
+>   * @share: %true if memory must be mmaped with the MAP_SHARED flag
+>   * @path: the path in which to allocate the RAM.
+>   * @errp: pointer to Error*, to store an error if it happens.
+> @@ -476,6 +478,7 @@ void memory_region_init_ram_from_file(MemoryRegion *mr,
+>                                        struct Object *owner,
+>                                        const char *name,
+>                                        uint64_t size,
+> +                                      uint64_t align,
+>                                        bool share,
+>                                        const char *path,
+>                                        Error **errp);
+> diff --git a/memory.c b/memory.c
+> index e26e5a3b1d..2c80656e39 100644
+> --- a/memory.c
+> +++ b/memory.c
+> @@ -1570,6 +1570,7 @@ void memory_region_init_ram_from_file(MemoryRegion *mr,
+>                                        struct Object *owner,
+>                                        const char *name,
+>                                        uint64_t size,
+> +                                      uint64_t align,
+>                                        bool share,
+>                                        const char *path,
+>                                        Error **errp)
+> @@ -1578,6 +1579,7 @@ void memory_region_init_ram_from_file(MemoryRegion *mr,
+>      mr->ram = true;
+>      mr->terminates = true;
+>      mr->destructor = memory_region_destructor_ram;
+> +    mr->align = align;
+>      mr->ram_block = qemu_ram_alloc_from_file(size, mr, share, path, errp);
+>      mr->dirty_log_mask = tcg_enabled() ? (1 << DIRTY_MEMORY_CODE) : 0;
+>  }
+> diff --git a/numa.c b/numa.c
+> index 7151b24d1c..b0fe22a60c 100644
+> --- a/numa.c
+> +++ b/numa.c
+> @@ -551,7 +551,7 @@ static void allocate_system_memory_nonnuma(MemoryRegion *mr, Object *owner,
+>      if (mem_path) {
+>  #ifdef __linux__
+>          Error *err = NULL;
+> -        memory_region_init_ram_from_file(mr, owner, name, ram_size, false,
+> +        memory_region_init_ram_from_file(mr, owner, name, ram_size, 0, false,
+>                                           mem_path, &err);
+>          if (err) {
+>              error_report_err(err);
+> -- 
+> 2.14.1
+> 
 
-Bug description:
-  qemu 2.1.2 is good.
-
-  (gdb) bt
-  #0  0x00007ffff4aae445 in raise () from /lib/x86_64-linux-gnu/libc.so.6
-  #1  0x00007ffff4ab1bab in abort () from /lib/x86_64-linux-gnu/libc.so.6
-  #2  0x0000555555997951 in qcow2_cache_find_entry_to_replace (c=3D0x555556=
-389780) at block/qcow2-cache.c:262
-  #3  0x0000555555997a1a in qcow2_cache_do_get (bs=3D0x5555563836f0, c=3D0x=
-555556389780, offset=3D1094713344, table=3D0x7fffffffc528, =
-
-      read_from_disk=3Dtrue) at block/qcow2-cache.c:285
-  #4  0x0000555555997c45 in qcow2_cache_get (bs=3D0x5555563836f0, c=3D0x555=
-556389780, offset=3D1094713344, table=3D0x7fffffffc528)
-      at block/qcow2-cache.c:331
-  #5  0x0000555555991ca9 in l2_allocate (bs=3D0x5555563836f0, l1_index=3D1,=
- table=3D0x7fffffffc5a0) at block/qcow2-cluster.c:247
-  #6  0x000055555599290c in get_cluster_table (bs=3D0x5555563836f0, offset=
-=3D549755813888, new_l2_table=3D0x7fffffffc610, =
-
-      new_l2_index=3D0x7fffffffc62c) at block/qcow2-cluster.c:620
-  #7  0x0000555555994213 in discard_single_l2 (bs=3D0x5555563836f0, offset=
-=3D549755813888, nb_clusters=3D156, type=3DQCOW2_DISCARD_NEVER, =
-
-      full_discard=3Dfalse) at block/qcow2-cluster.c:1425
-  #8  0x0000555555994491 in qcow2_discard_clusters (bs=3D0x5555563836f0, of=
-fset=3D549755813888, nb_sectors=3D638976, type=3DQCOW2_DISCARD_NEVER, =
-
-      full_discard=3Dfalse) at block/qcow2-cluster.c:1516
-  #9  0x00005555559965c8 in qcow2_snapshot_create (bs=3D0x5555563836f0, sn_=
-info=3D0x7fffffffc830) at block/qcow2-snapshot.c:441
-  #10 0x00005555559ad1ad in bdrv_snapshot_create (bs=3D0x5555563836f0, sn_i=
-nfo=3D0x7fffffffc830) at block/snapshot.c:167
-  #11 0x000055555565e90f in do_savevm (mon=3D0x555556992d20, qdict=3D0x5555=
-599d5c00) at /vms/qemu/qemu-2.2.0/savevm.c:1126
-
-  (gdb) show args
-  Argument list to give program being debugged when it is started is "-name=
- u1404-01 -S -machine pc,accel=3Dkvm,usb=3Doff -m 1024 -smp 2,sockets=3D2,c=
-ores=3D1,threads=3D1 -no-user-config -nodefaults -monitor stdio -rtc base=
-=3Dutc -no-shutdown -device piix3-usb-uhci,id=3Dusb,bus=3Dpci.0,addr=3D0x1.=
-0x2 -device virtio-serial-pci,id=3Dvirtio-serial0,bus=3Dpci.0,addr=3D0x5 -d=
-rive file=3D/vms/images/u1404-01.img,if=3Dnone,id=3Ddrive-virtio-disk0,form=
-at=3Dqcow2,cache=3Ddirectsync -device virtio-blk-pci,scsi=3Doff,bus=3Dpci.0=
-,addr=3D0x4,drive=3Ddrive-virtio-disk0,id=3Dvirtio-disk0 -drive if=3Dnone,i=
-d=3Ddrive-ide0-1-0,readonly=3Don,format=3Draw -device ide-cd,bus=3Dide.1,un=
-it=3D0,drive=3Ddrive-ide0-1-0,id=3Dide0-1-0 -chardev pty,id=3Dcharserial0 -=
-device isa-serial,chardev=3Dcharserial0,id=3Dserial0 -device usb-tablet,id=
-=3Dinput0 -vnc 0.0.0.0:0 -device cirrus-vga,id=3Dvideo0,bus=3Dpci.0,addr=3D=
-0x2 -device virtio-balloon-pci,id=3Dballoon0,bus=3Dpci.0,addr=3D0x6".
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1401798/+subscriptions
+-- 
+Eduardo
