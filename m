@@ -1,21 +1,15 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56647)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58619)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jcody@redhat.com>) id 1eJYfv-0008On-9B
-	for qemu-devel@nongnu.org; Tue, 28 Nov 2017 00:43:20 -0500
+	(envelope-from <ybettan@redhat.com>) id 1eJYnw-0001xp-Ps
+	for qemu-devel@nongnu.org; Tue, 28 Nov 2017 00:51:38 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jcody@redhat.com>) id 1eJYft-0007e7-Rf
-	for qemu-devel@nongnu.org; Tue, 28 Nov 2017 00:43:19 -0500
-Date: Tue, 28 Nov 2017 00:43:05 -0500
-From: Jeff Cody <jcody@redhat.com>
-Message-ID: <20171128054305.GP5399@localhost.localdomain>
-References: <20171123175747.2309-1-famz@redhat.com>
-	<20171127232909.GF4903@localhost.localdomain>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20171127232909.GF4903@localhost.localdomain>
-Subject: Re: [Qemu-devel] [PATCH 0/1] block: Workaround for the iotests
- errors
+	(envelope-from <ybettan@redhat.com>) id 1eJYnv-0002N9-Md
+	for qemu-devel@nongnu.org; Tue, 28 Nov 2017 00:51:36 -0500
+From: Yoni Bettan <ybettan@redhat.com>
+Date: Tue, 28 Nov 2017 07:51:10 +0200
+Message-Id: <20171128055111.10101-1-ybettan@redhat.com>
+Subject: [Qemu-devel] [PATCH 1/2] pci: removed the is_express field since a
+ uniform interface was inserted
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,148 +18,183 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Kevin Wolf <kwolf@redhat.com>
-Cc: Fam Zheng <famz@redhat.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>, pbonzini@redhat.com, Stefan Hajnoczi <stefanha@redhat.com>
+To: qemu-devel@nongnu.org
+Cc: Yoni Bettan <ybettan@redhat.com>, Keith Busch <keith.busch@intel.com>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, Dmitry Fleytman <dmitry@daynix.com>, Jason Wang <jasowang@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Marcel Apfelbaum <marcel@redhat.com>, Paul Burton <paul.burton@mips.com>, Paolo Bonzini <pbonzini@redhat.com>, Hannes Reinecke <hare@suse.com>, Gerd Hoffmann <kraxel@redhat.com>, Alex Williamson <alex.williamson@redhat.com>, "open list:nvme" <qemu-block@nongnu.org>
 
-On Tue, Nov 28, 2017 at 12:29:09AM +0100, Kevin Wolf wrote:
-> Am 23.11.2017 um 18:57 hat Fam Zheng geschrieben:
-> > Jeff's block job patch made the latent drain bug visible, and I find this
-> > patch, which by itself also makes some sense, can hide it again. :) With it
-> > applied we are at least back to the ground where patchew's iotests (make
-> > docker-test-block@fedora) can pass.
-> > 
-> > The real bug is that in the middle of bdrv_parent_drained_end(), bs's parent
-> > list changes. One drained_end call before the mirror_exit() already did one
-> > blk_root_drained_end(), a second drained_end on an updated parent node can do
-> > another same blk_root_drained_end(), making it unbalanced with
-> > blk_root_drained_begin(). This is shown by the following three backtraces as
-> > captured by rr with a crashed "qemu-img commit", essentially the same as in
-> > the failed iotest 020:
-> 
-> My conclusion what really happens in 020 is that we have a graph like
-> this:
-> 
->                              mirror target BB --+
->                                                 |
->                                                 v
->     qemu-img BB -> mirror_top_bs -> overlay -> base
-> 
-> bdrv_drained_end(base) results in it being available for requests again,
-> so it calls bdrv_parent_drained_end() for overlay. While draining
-> itself, the mirror job completes and changes the BdrvChild between
-> mirror_top_bs and overlay (which is currently being drained) to point to
-> base instead. After returning, QLIST_FOREACH() continues to iterate the
-> parents of base instead of those of overlay, resulting in a second
-> blk_drained_end() for the mirror target BB.
-> 
-> This instance can be fixed relatively easily (see below) by using
-> QLIST_FOREACH_SAFE() instead.
-> 
-> However, I'm not sure if all problems with the graph change can be
-> solved this way and whether we can really allow graph changes while
-> iterating the graph for bdrv_drained_begin/end. Not allowing it would
-> require some more serious changes to the block jobs that delays their
-> completion until after bdrv_drain_end() has finished (not sure how to
-> even get a callback at that point...)
-> 
+        * according to Eduardo Habkost's commit
+          fd3b02c8896d597dd8b9e053dec579cf0386aee1
 
-That is at least part of what is causing the segfaults that I am still
-seeing (after your patch):
+        * since all PCIEs now implement INTERFACE_PCIE_DEVICE we
+          don't need this field anymore
 
-We enter bdrv_drain_recurse(), and the BDS has been reaped:
+Signed-off-by: Yoni Bettan <ybettan@redhat.com>
+---
+ hw/block/nvme.c                    | 1 -
+ hw/net/e1000e.c                    | 1 -
+ hw/pci-bridge/pcie_pci_bridge.c    | 1 -
+ hw/pci-bridge/pcie_root_port.c     | 1 -
+ hw/pci-bridge/xio3130_downstream.c | 1 -
+ hw/pci-bridge/xio3130_upstream.c   | 1 -
+ hw/pci-host/xilinx-pcie.c          | 1 -
+ hw/pci/pci.c                       | 3 ++-
+ hw/scsi/megasas.c                  | 1 -
+ hw/usb/hcd-xhci.c                  | 1 -
+ hw/vfio/pci.c                      | 1 -
+ include/hw/pci/pci.h               | 3 ---
+ 12 files changed, 2 insertions(+), 14 deletions(-)
 
-
-Thread 1 "qemu-img" received signal SIGSEGV, Segmentation fault.
-0x000000010014b56e in qemu_mutex_unlock (mutex=0x76767676767676d6) at util/qemu-thread-posix.c:92
-92          assert(mutex->initialized);
-
-#0  0x000000010014b56e in qemu_mutex_unlock (mutex=0x76767676767676d6) at util/qemu-thread-posix.c:92
-#1  0x00000001001450bf in aio_context_release (ctx=0x7676767676767676) at util/async.c:507
-#2  0x000000010009d5c7 in bdrv_drain_recurse (bs=0x100843270, begin=false) at block/io.c:201
-#3  0x000000010009d949 in bdrv_drained_end (bs=0x100843270) at block/io.c:297
-#4  0x000000010002e705 in bdrv_child_cb_drained_end (child=0x100870c40) at block.c:822
-#5  0x000000010009cdc6 in bdrv_parent_drained_end (bs=0x100863b10) at block/io.c:60
-#6  0x000000010009d938 in bdrv_drained_end (bs=0x100863b10) at block/io.c:296
-#7  0x000000010009d9d5 in bdrv_drain (bs=0x100863b10) at block/io.c:322
-#8  0x000000010008c39c in blk_drain (blk=0x100881220) at block/block-backend.c:1523
-#9  0x000000010009a85e in mirror_drain (job=0x10088df50) at block/mirror.c:996
-#10 0x0000000100037eca in block_job_drain (job=0x10088df50) at blockjob.c:187
-#11 0x000000010003856d in block_job_finish_sync (job=0x10088df50, finish=0x100038926 <block_job_complete>, errp=0x7fffffffd1d8) at blockjob.c:378
-#12 0x0000000100038b80 in block_job_complete_sync (job=0x10088df50, errp=0x7fffffffd1d8) at blockjob.c:544
-#13 0x0000000100023de5 in run_block_job (job=0x10088df50, errp=0x7fffffffd1d8) at qemu-img.c:872
-#14 0x0000000100024305 in img_commit (argc=3, argv=0x7fffffffd390) at qemu-img.c:1034
-#15 0x000000010002ccd1 in main (argc=3, argv=0x7fffffffd390) at qemu-img.c:4763
-
-
-(gdb) f 2
-#2  0x000000010009d5c7 in bdrv_drain_recurse (bs=0x100843270, begin=false) at block/io.c:201
-201         waited = BDRV_POLL_WHILE(bs, atomic_read(&bs->in_flight) > 0);
-(gdb) list
-196
-197         /* Ensure any pending metadata writes are submitted to bs->file.  */
-198         bdrv_drain_invoke(bs, begin);
-199
-200         /* Wait for drained requests to finish */
-201         waited = BDRV_POLL_WHILE(bs, atomic_read(&bs->in_flight) > 0);
-202
-203         QLIST_FOREACH_SAFE(child, &bs->children, next, tmp) {
-204             BlockDriverState *bs = child->bs;
-205             bool in_main_loop =
-
-
-(gdb) p *bs
-$1 = {
-  open_flags = 8835232, 
-  read_only = true, 
-  encrypted = false, 
-  sg = false, 
-  probed = false, 
-  force_share = 56, 
-  implicit = 59, 
-  drv = 0x0, 
-  opaque = 0x0, 
-  aio_context = 0x7676767676767676, 
-  aio_notifiers = {
-    lh_first = 0x7676767676767676
-  }, 
-  [...]
-
-
-
-
-> And the test cases that Jeff mentions still fail with this patch, too.
-> But at least it doesn't only make failure less likely by reducing the
-> window for a race condition, but seems to attack a real problem.
-> 
-> Kevin
-> 
-> 
-> diff --git a/block/io.c b/block/io.c
-> index 4fdf93a014..6773926fc1 100644
-> --- a/block/io.c
-> +++ b/block/io.c
-> @@ -42,9 +42,9 @@ static int coroutine_fn bdrv_co_do_pwrite_zeroes(BlockDriverState *bs,
->  
->  void bdrv_parent_drained_begin(BlockDriverState *bs)
->  {
-> -    BdrvChild *c;
-> +    BdrvChild *c, *next;
->  
-> -    QLIST_FOREACH(c, &bs->parents, next_parent) {
-> +    QLIST_FOREACH_SAFE(c, &bs->parents, next_parent, next) {
->          if (c->role->drained_begin) {
->              c->role->drained_begin(c);
->          }
-> @@ -53,9 +53,9 @@ void bdrv_parent_drained_begin(BlockDriverState *bs)
->  
->  void bdrv_parent_drained_end(BlockDriverState *bs)
->  {
-> -    BdrvChild *c;
-> +    BdrvChild *c, *next;
->  
-> -    QLIST_FOREACH(c, &bs->parents, next_parent) {
-> +    QLIST_FOREACH_SAFE(c, &bs->parents, next_parent, next) {
->          if (c->role->drained_end) {
->              c->role->drained_end(c);
->          }
->
+diff --git a/hw/block/nvme.c b/hw/block/nvme.c
+index 441e21ed1f..9325bc0911 100644
+--- a/hw/block/nvme.c
++++ b/hw/block/nvme.c
+@@ -1087,7 +1087,6 @@ static void nvme_class_init(ObjectClass *oc, void *data)
+     pc->vendor_id = PCI_VENDOR_ID_INTEL;
+     pc->device_id = 0x5845;
+     pc->revision = 2;
+-    pc->is_express = 1;
+ 
+     set_bit(DEVICE_CATEGORY_STORAGE, dc->categories);
+     dc->desc = "Non-Volatile Memory Express";
+diff --git a/hw/net/e1000e.c b/hw/net/e1000e.c
+index f1af279e8d..c360f0d8c9 100644
+--- a/hw/net/e1000e.c
++++ b/hw/net/e1000e.c
+@@ -675,7 +675,6 @@ static void e1000e_class_init(ObjectClass *class, void *data)
+     c->revision = 0;
+     c->romfile = "efi-e1000e.rom";
+     c->class_id = PCI_CLASS_NETWORK_ETHERNET;
+-    c->is_express = 1;
+ 
+     dc->desc = "Intel 82574L GbE Controller";
+     dc->reset = e1000e_qdev_reset;
+diff --git a/hw/pci-bridge/pcie_pci_bridge.c b/hw/pci-bridge/pcie_pci_bridge.c
+index a4d827c99d..b7d9ebbec2 100644
+--- a/hw/pci-bridge/pcie_pci_bridge.c
++++ b/hw/pci-bridge/pcie_pci_bridge.c
+@@ -169,7 +169,6 @@ static void pcie_pci_bridge_class_init(ObjectClass *klass, void *data)
+     DeviceClass *dc = DEVICE_CLASS(klass);
+     HotplugHandlerClass *hc = HOTPLUG_HANDLER_CLASS(klass);
+ 
+-    k->is_express = 1;
+     k->is_bridge = 1;
+     k->vendor_id = PCI_VENDOR_ID_REDHAT;
+     k->device_id = PCI_DEVICE_ID_REDHAT_PCIE_BRIDGE;
+diff --git a/hw/pci-bridge/pcie_root_port.c b/hw/pci-bridge/pcie_root_port.c
+index 9b6e4ce512..45f9e8cd4a 100644
+--- a/hw/pci-bridge/pcie_root_port.c
++++ b/hw/pci-bridge/pcie_root_port.c
+@@ -145,7 +145,6 @@ static void rp_class_init(ObjectClass *klass, void *data)
+     DeviceClass *dc = DEVICE_CLASS(klass);
+     PCIDeviceClass *k = PCI_DEVICE_CLASS(klass);
+ 
+-    k->is_express = 1;
+     k->is_bridge = 1;
+     k->config_write = rp_write_config;
+     k->realize = rp_realize;
+diff --git a/hw/pci-bridge/xio3130_downstream.c b/hw/pci-bridge/xio3130_downstream.c
+index 1e09d2afb7..613a0d6bb7 100644
+--- a/hw/pci-bridge/xio3130_downstream.c
++++ b/hw/pci-bridge/xio3130_downstream.c
+@@ -177,7 +177,6 @@ static void xio3130_downstream_class_init(ObjectClass *klass, void *data)
+     DeviceClass *dc = DEVICE_CLASS(klass);
+     PCIDeviceClass *k = PCI_DEVICE_CLASS(klass);
+ 
+-    k->is_express = 1;
+     k->is_bridge = 1;
+     k->config_write = xio3130_downstream_write_config;
+     k->realize = xio3130_downstream_realize;
+diff --git a/hw/pci-bridge/xio3130_upstream.c b/hw/pci-bridge/xio3130_upstream.c
+index 227997ce46..d4645bddee 100644
+--- a/hw/pci-bridge/xio3130_upstream.c
++++ b/hw/pci-bridge/xio3130_upstream.c
+@@ -148,7 +148,6 @@ static void xio3130_upstream_class_init(ObjectClass *klass, void *data)
+     DeviceClass *dc = DEVICE_CLASS(klass);
+     PCIDeviceClass *k = PCI_DEVICE_CLASS(klass);
+ 
+-    k->is_express = 1;
+     k->is_bridge = 1;
+     k->config_write = xio3130_upstream_write_config;
+     k->realize = xio3130_upstream_realize;
+diff --git a/hw/pci-host/xilinx-pcie.c b/hw/pci-host/xilinx-pcie.c
+index 7659253090..a4ca3ba30f 100644
+--- a/hw/pci-host/xilinx-pcie.c
++++ b/hw/pci-host/xilinx-pcie.c
+@@ -298,7 +298,6 @@ static void xilinx_pcie_root_class_init(ObjectClass *klass, void *data)
+     k->device_id = 0x7021;
+     k->revision = 0;
+     k->class_id = PCI_CLASS_BRIDGE_HOST;
+-    k->is_express = true;
+     k->is_bridge = true;
+     k->init = xilinx_pcie_root_init;
+     k->exit = pci_bridge_exitfn;
+diff --git a/hw/pci/pci.c b/hw/pci/pci.c
+index b2d139bd9a..02f6f2f37a 100644
+--- a/hw/pci/pci.c
++++ b/hw/pci/pci.c
+@@ -2014,12 +2014,13 @@ static void pci_qdev_realize(DeviceState *qdev, Error **errp)
+ {
+     PCIDevice *pci_dev = (PCIDevice *)qdev;
+     PCIDeviceClass *pc = PCI_DEVICE_GET_CLASS(pci_dev);
++    ObjectClass *klass = &(pc->parent_class.parent_class);
+     Error *local_err = NULL;
+     PCIBus *bus;
+     bool is_default_rom;
+ 
+     /* initialize cap_present for pci_is_express() and pci_config_size() */
+-    if (pc->is_express) {
++    if (object_class_dynamic_cast(klass, INTERFACE_PCIE_DEVICE)) {
+         pci_dev->cap_present |= QEMU_PCI_CAP_EXPRESS;
+     }
+ 
+diff --git a/hw/scsi/megasas.c b/hw/scsi/megasas.c
+index d5eae6239a..987c064e4b 100644
+--- a/hw/scsi/megasas.c
++++ b/hw/scsi/megasas.c
+@@ -2506,7 +2506,6 @@ static void megasas_class_init(ObjectClass *oc, void *data)
+     pc->subsystem_vendor_id = PCI_VENDOR_ID_LSI_LOGIC;
+     pc->subsystem_id = info->subsystem_id;
+     pc->class_id = PCI_CLASS_STORAGE_RAID;
+-    pc->is_express = info->is_express;
+     e->mmio_bar = info->mmio_bar;
+     e->ioport_bar = info->ioport_bar;
+     e->osts = info->osts;
+diff --git a/hw/usb/hcd-xhci.c b/hw/usb/hcd-xhci.c
+index af3a9d88de..12e12f4f21 100644
+--- a/hw/usb/hcd-xhci.c
++++ b/hw/usb/hcd-xhci.c
+@@ -3661,7 +3661,6 @@ static void xhci_class_init(ObjectClass *klass, void *data)
+     k->realize      = usb_xhci_realize;
+     k->exit         = usb_xhci_exit;
+     k->class_id     = PCI_CLASS_SERIAL_USB;
+-    k->is_express   = 1;
+ }
+ 
+ static const TypeInfo xhci_info = {
+diff --git a/hw/vfio/pci.c b/hw/vfio/pci.c
+index c977ee327f..d2c1d47148 100644
+--- a/hw/vfio/pci.c
++++ b/hw/vfio/pci.c
+@@ -3026,7 +3026,6 @@ static void vfio_pci_dev_class_init(ObjectClass *klass, void *data)
+     pdc->exit = vfio_exitfn;
+     pdc->config_read = vfio_pci_read_config;
+     pdc->config_write = vfio_pci_write_config;
+-    pdc->is_express = 1; /* We might be */
+ }
+ 
+ static const TypeInfo vfio_pci_dev_info = {
+diff --git a/include/hw/pci/pci.h b/include/hw/pci/pci.h
+index 8d02a0a383..a27be85111 100644
+--- a/include/hw/pci/pci.h
++++ b/include/hw/pci/pci.h
+@@ -236,9 +236,6 @@ typedef struct PCIDeviceClass {
+      */
+     int is_bridge;
+ 
+-    /* pcie stuff */
+-    int is_express;   /* is this device pci express? */
+-
+     /* rom bar */
+     const char *romfile;
+ } PCIDeviceClass;
+-- 
+2.13.6
