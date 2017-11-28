@@ -1,33 +1,53 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53877)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56201)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1eJhY3-0000vX-F5
-	for qemu-devel@nongnu.org; Tue, 28 Nov 2017 10:11:53 -0500
+	(envelope-from <pasic@linux.vnet.ibm.com>) id 1eJhhb-0005ge-NH
+	for qemu-devel@nongnu.org; Tue, 28 Nov 2017 10:21:45 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1eJhXu-0001wg-2H
-	for qemu-devel@nongnu.org; Tue, 28 Nov 2017 10:11:42 -0500
-Received: from mail-qt0-x229.google.com ([2607:f8b0:400d:c0d::229]:44047)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1eJhXt-0001wI-Ul
-	for qemu-devel@nongnu.org; Tue, 28 Nov 2017 10:11:37 -0500
-Received: by mail-qt0-x229.google.com with SMTP id j5so163869qth.11
-	for <qemu-devel@nongnu.org>; Tue, 28 Nov 2017 07:11:37 -0800 (PST)
-Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
-	<philippe.mathieu.daude@gmail.com>
-References: <1511703326-25325-1-git-send-email-mark.cave-ayland@ilande.co.uk>
-	<1511703326-25325-9-git-send-email-mark.cave-ayland@ilande.co.uk>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <3aa9b8ef-27b8-b2c5-3392-f34e1a6606dc@amsat.org>
-Date: Sun, 26 Nov 2017 12:18:08 -0300
+	(envelope-from <pasic@linux.vnet.ibm.com>) id 1eJhhY-0005eX-IN
+	for qemu-devel@nongnu.org; Tue, 28 Nov 2017 10:21:39 -0500
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:44176
+	helo=mx0a-001b2d01.pphosted.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pasic@linux.vnet.ibm.com>)
+	id 1eJhhY-0005eN-Bz
+	for qemu-devel@nongnu.org; Tue, 28 Nov 2017 10:21:36 -0500
+Received: from pps.filterd (m0098417.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
+	vASFD5JW079000
+	for <qemu-devel@nongnu.org>; Tue, 28 Nov 2017 10:21:33 -0500
+Received: from e06smtp10.uk.ibm.com (e06smtp10.uk.ibm.com [195.75.94.106])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2eh9xmhq9r-1
+	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Tue, 28 Nov 2017 10:21:32 -0500
+Received: from localhost
+	by e06smtp10.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	Only! Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <pasic@linux.vnet.ibm.com>;
+	Tue, 28 Nov 2017 15:21:24 -0000
+Received: from d06av21.portsmouth.uk.ibm.com (d06av21.portsmouth.uk.ibm.com
+	[9.149.105.232])
+	by b06cxnps3075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with
+	ESMTP id vASFLL6o43843774
+	for <qemu-devel@nongnu.org>; Tue, 28 Nov 2017 15:21:21 GMT
+Received: from d06av21.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 91FA352FAD
+	for <qemu-devel@nongnu.org>; Tue, 28 Nov 2017 14:14:43 +0000 (GMT)
+Received: from oc3836556865.ibm.com (unknown [9.152.224.205])
+	by d06av21.portsmouth.uk.ibm.com (Postfix) with ESMTP id 7FD1C52FAE
+	for <qemu-devel@nongnu.org>; Tue, 28 Nov 2017 14:14:43 +0000 (GMT)
+References: <20171128134648.21530-1-cohuck@redhat.com>
+	<6513d1c5-032e-b9d0-3dab-f2d0bd337ae2@linux.vnet.ibm.com>
+	<20171128152718.229a20fe.cohuck@redhat.com>
+From: Halil Pasic <pasic@linux.vnet.ibm.com>
+Date: Tue, 28 Nov 2017 16:21:20 +0100
 MIME-Version: 1.0
-In-Reply-To: <1511703326-25325-9-git-send-email-mark.cave-ayland@ilande.co.uk>
+In-Reply-To: <20171128152718.229a20fe.cohuck@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH 8/8] sun4u_iommu: add trace event for IOMMU
- translations
+Message-Id: <bf78fad3-b6b2-bf82-2625-477233adb6cf@linux.vnet.ibm.com>
+Subject: Re: [Qemu-devel] [PATCH RFC 0/2] s390x: cut down on unattached
+ devices
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,38 +56,86 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, qemu-devel@nongnu.org, atar4qemu@gmail.com
+To: qemu-devel@nongnu.org
 
-On 11/26/2017 10:35 AM, Mark Cave-Ayland wrote:
-> Signed-off-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
 
-Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 
-> ---
->  hw/sparc64/sun4u_iommu.c |    2 ++
->  hw/sparc64/trace-events  |    1 +
->  2 files changed, 3 insertions(+)
+On 11/28/2017 03:27 PM, Cornelia Huck wrote:
+> On Tue, 28 Nov 2017 15:17:38 +0100
+> Halil Pasic <pasic@linux.vnet.ibm.com> wrote:
 > 
-> diff --git a/hw/sparc64/sun4u_iommu.c b/hw/sparc64/sun4u_iommu.c
-> index 51fbc39..4cf8e69 100644
-> --- a/hw/sparc64/sun4u_iommu.c
-> +++ b/hw/sparc64/sun4u_iommu.c
-> @@ -184,6 +184,8 @@ static IOMMUTLBEntry sun4u_translate_iommu(IOMMUMemoryRegion *iommu,
->          ret.addr_mask = (IOMMU_PAGE_SIZE_8K - 1);
->      }
->  
-> +    trace_sun4u_iommu_translate(ret.iova, ret.translated_addr, tte);
-> +
->      return ret;
->  }
->  
-> diff --git a/hw/sparc64/trace-events b/hw/sparc64/trace-events
-> index 052352f..2ee2d75 100644
-> --- a/hw/sparc64/trace-events
-> +++ b/hw/sparc64/trace-events
-> @@ -6,3 +6,4 @@ ebus_isa_irq_handler(int n, int level) "Set ISA IRQ %d level %d"
->  # hw/sparc64/sun4u_iommu.c
->  sun4u_iommu_mem_read(uint64_t addr, uint64_t val, int size) "addr: 0x%"PRIx64" val: 0x%"PRIx64" size: %d"
->  sun4u_iommu_mem_write(uint64_t addr, uint64_t val, int size) "addr: 0x%"PRIx64" val: 0x%"PRIx64" size: %d"
-> +sun4u_iommu_translate(uint64_t addr, uint64_t trans_addr, uint64_t tte) "xlate 0x%"PRIx64" => pa 0x%"PRIx64" tte: 0x%"PRIx64
+>> On 11/28/2017 02:46 PM, Cornelia Huck wrote:
+>>> info qom-tree shows several devices under unattached that probably
+>>> should go somewhere.  
+>>
+>> I think this was reported by me. See 
+>> MID: <76f95c6f-641e-2fe0-73b4-3ab24fc1a93f@linux.vnet.ibm.com>
+>>
+>> I would not mind a Reported-by: Halil Pasic <pasic@linux.vnet.ibm.com>.
+>> Or do you see this differently?
+> 
+> Apparently I forgot to add it to the first one. Will do.
+
+np
+
+It's just that I've spent quite some time writing that email and
+identifying the oddities.
+
+> 
+>>
+>> If these are bugs. I would prefer commit messages and titles reflecting
+>> this fact.
+> 
+> I don't see this as fixing bugs, more removing oddities.
+> 
+>>
+>> Otherwise at first glance both patches seem sane.
+> 
+> Can I count this as an ack, or do you plan to do more review?
+> 
+
+Yes I was planning to give it another look. And I do already
+have questions. Isn't the QOM composition tree API? I mean
+let's assume the QMP commands working on this tree are not completely
+useless. How is client code (management software) supposed to work,
+assumed it can rely on paths of e.g. properties being stable. Just
+imagine we had this default-cssid property (for the sake of the
+argument, not like we want it) on the css bridge.
+
+Now if the composition tree is API then these can only be bug fixes
+(IMHO).
+
+There are also other oddities I've spotted. My idea was to put
+this composition tree discussion on hold until the vfio-ccw stuff
+is sorted out. I would certainly like to build a better understanding.
+
+Halil
+
+>>
+>> Regards,
+>> Halil
+>>
+>>>
+>>> The css bridge should attach to the machine, as it has a similar
+>>> purpose as e.g. a pci host bridge.
+>>>
+>>> The autogenerated network devices should be in the same bucket as any
+>>> other device; I'm just not sure about the way I went about it.
+>>>
+>>> The zpci devices are still problematic: I don't have a good idea where
+>>> they should show up.
+>>>
+>>> Remaining in the unattached container are the sysbus, memory regions
+>>> and cpus.
+>>>
+>>> Cornelia Huck (2):
+>>>   s390x/css: attach css bridge
+>>>   s390x: attach autogenerated nics
+>>>
+>>>  hw/s390x/css-bridge.c      | 2 ++
+>>>  hw/s390x/s390-virtio-ccw.c | 2 ++
+>>>  2 files changed, 4 insertions(+)
+>>>   
+>>
+> 
 > 
