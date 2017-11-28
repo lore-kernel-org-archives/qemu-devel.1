@@ -1,28 +1,35 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48247)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48607)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1eJjgo-0006y6-61
-	for qemu-devel@nongnu.org; Tue, 28 Nov 2017 12:29:00 -0500
+	(envelope-from <vkaplans@redhat.com>) id 1eJjgy-0007B3-OR
+	for qemu-devel@nongnu.org; Tue, 28 Nov 2017 12:29:10 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1eJjgi-0007RI-Vd
-	for qemu-devel@nongnu.org; Tue, 28 Nov 2017 12:28:58 -0500
-Date: Tue, 28 Nov 2017 19:28:39 +0200
-From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <20171128192729-mutt-send-email-mst@kernel.org>
-References: <1511388334-16347-1-git-send-email-pmorel@linux.vnet.ibm.com>
-	<1511388334-16347-2-git-send-email-pmorel@linux.vnet.ibm.com>
-	<3acc6fdb-5638-97b2-2dc7-bce34d22cd1f@redhat.com>
-	<20171123104903.24424b40.cohuck@redhat.com>
-	<a3655016-0e6b-b80f-2282-f6efbff9e1f9@redhat.com>
-	<20171123110844.4649f3b1.cohuck@redhat.com>
-	<58a08c1d-3935-42e7-cdc0-7bc45c08d2d3@redhat.com>
-	<20171123113326.3b2c5281.cohuck@redhat.com>
-	<70c48db2-eefd-e536-0a88-7a39ccef9852@redhat.com>
+	(envelope-from <vkaplans@redhat.com>) id 1eJjgw-0007do-IP
+	for qemu-devel@nongnu.org; Tue, 28 Nov 2017 12:29:08 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:44612)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <vkaplans@redhat.com>) id 1eJjgw-0007co-1S
+	for qemu-devel@nongnu.org; Tue, 28 Nov 2017 12:29:06 -0500
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+	[10.5.11.12])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 04DB98553D
+	for <qemu-devel@nongnu.org>; Tue, 28 Nov 2017 17:29:05 +0000 (UTC)
+Received: from colo-mx.corp.redhat.com
+	(colo-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.21])
+	by smtp.corp.redhat.com (Postfix) with ESMTPS id EEC0560BE5
+	for <qemu-devel@nongnu.org>; Tue, 28 Nov 2017 17:29:04 +0000 (UTC)
+Date: Tue, 28 Nov 2017 12:29:04 -0500 (EST)
+From: Victor Kaplansky <vkaplans@redhat.com>
+Message-ID: <1183103709.47097586.1511890144875.JavaMail.zimbra@redhat.com>
+In-Reply-To: <20171128181306-mutt-send-email-mst@kernel.org>
+References: <20171128133123.17372-1-vkaplans@redhat.com>
+	<20171128181306-mutt-send-email-mst@kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <70c48db2-eefd-e536-0a88-7a39ccef9852@redhat.com>
-Subject: Re: [Qemu-devel] [qemu-s390x] [PATCH v3 1/7] s390x/pci: factor out
- endianess conversion
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH] vhost-user spec: Clarify policy on setting
+ log_base
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,90 +38,51 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>
-Cc: Cornelia Huck <cohuck@redhat.com>, pasic@linux.vnet.ibm.com, zyimin@linux.vnet.ibm.com, Pierre Morel <pmorel@linux.vnet.ibm.com>, qemu-devel@nongnu.org, agraf@suse.de, borntraeger@de.ibm.com, Qemu-s390x list <qemu-s390x@nongnu.org>
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: qemu-devel@nongnu.org, Maxime Coquelin <maxime.coquelin@redhat.com>, dgilbert@redhat.com
 
-On Thu, Nov 23, 2017 at 12:35:19PM +0100, Thomas Huth wrote:
-> On 23.11.2017 11:33, Cornelia Huck wrote:
-> > On Thu, 23 Nov 2017 11:25:10 +0100
-> > Thomas Huth <thuth@redhat.com> wrote:
-> > 
-> >> On 23.11.2017 11:08, Cornelia Huck wrote:
-> >>> On Thu, 23 Nov 2017 11:01:23 +0100
-> >>> Thomas Huth <thuth@redhat.com> wrote:
-> >>>   
-> >>>> On 23.11.2017 10:49, Cornelia Huck wrote:  
-> >>>>> On Thu, 23 Nov 2017 09:48:41 +0100
-> >>>>> Thomas Huth <thuth@redhat.com> wrote:  
-> >>>>>> On 22.11.2017 23:05, Pierre Morel wrote:    
-> >> [...]
-> >>>>>>> +/**
-> >>>>>>> + * Swap data contained in s390x big endian registers to little endian
-> >>>>>>> + * PCI bars.
-> >>>>>>> + *
-> >>>>>>> + * @ptr: a pointer to a uint64_t data field
-> >>>>>>> + * @len: the length of the valid data, must be 1,2,4 or 8
-> >>>>>>> + */
-> >>>>>>> +static int zpci_endian_swap(uint64_t *ptr, uint8_t len)
-> >>>>>>> +{
-> >>>>>>> +    uint64_t data = *ptr;
-> >>>>>>> +
-> >>>>>>> +    switch (len) {
-> >>>>>>> +    case 1:
-> >>>>>>> +        break;
-> >>>>>>> +    case 2:
-> >>>>>>> +        data = bswap16(data);
-> >>>>>>> +        break;
-> >>>>>>> +    case 4:
-> >>>>>>> +        data = bswap32(data);
-> >>>>>>> +        break;
-> >>>>>>> +    case 8:
-> >>>>>>> +        data = bswap64(data);
-> >>>>>>> +        break;
-> >>>>>>> +    default:
-> >>>>>>> +        return -EINVAL;
-> >>>>>>> +    }
-> >>>>>>> +    *ptr = data;
-> >>>>>>> +    return 0;
-> >>>>>>> +}      
-> >>>>>>
-> >>>>>> While you're at it, I think that should rather be leXX_to_cpu() instead
-> >>>>>> of bswapXX() here,    
-> >>>>>
-> >>>>> I don't think that's correct, as this is supposed to swap BE registers
-> >>>>> to LE PCI bars.    
-> >>>>
-> >>>> Yes, but for the CPU emulation, the registers are stored in the host's
-> >>>> endianness in the CPUS390XState structure. Or why do we byte-swap them
-> >>>> again with cpu_to_be64() during s390_store_status(), for example?  
-> >>>
-> >>> Gah, endian conversion is eating my brain...
-> >>>
-> >>> So, is the content we get BE or not? I thought in our last discussion
-> >>> we came to the conclusion that it is.  
-> >>
-> >> data is read from / written to env->regs[r1], so this is host endian, as
-> >> far as I know. PCI is little endian, so using le32_to_cpu() /
-> >> cpu_to_le32() should IMHO be the right way to go here.
-> >>
-> >> By the way, if we want to use both, cpu_to_le and le_to_cpu, depending
-> >> on whether we read from or write to PCI, we should maybe *not* put this
-> >> code into a separate function?
-> > 
-> > Yes, if your assessment is correct, we need two functions (I think this
-> > conversion is used in other places in later patches as well). Or are
-> > there mechanisms for that already available?
+> From: "Michael S. Tsirkin" <mst@redhat.com>
+> To: "Victor Kaplansky" <vkaplans@redhat.com>
+> Cc: qemu-devel@nongnu.org, "Maxime Coquelin" <maxime.coquelin@redhat.com>
+> Sent: Tuesday, November 28, 2017 6:16:32 PM
+> Subject: Re: [PATCH] vhost-user spec: Clarify policy on setting log_base
 > 
-> Well, leXX_to_cpu() is the very same as cpu_to_leXX(), so we could cheat
-> here and still use one wrapper function. Depends on whether we want to
-> be more explicit about the data flow or not (and maybe whether we want
-> to use sparse one day to statically check the endianness automatically).
+> On Tue, Nov 28, 2017 at 03:46:44PM +0200, Victor Kaplansky wrote:
+> > From: Victor Kaplansky <vkaplans@dell9020.localdomain>
+> > 
+> > If we allow qemu to change logging area after it was already established,
+> > it may require from the backend to acquire a lock on each access to
+> > the log_base, which has a potential quite a big performance hit.
+
 > 
->  Thomas
+> Do we actually issue VHOST_USER_SET_LOG_BASE when ring is started?
+> 
+> Can we put it simpler:
+> 
+> 	master must not send VHOST_USER_SET_LOG_BASE when ring
+> 	is started and logging of used ring writes is started.
+> 
+> ?
 
-I personally think it's not just sparse. Using leXX_to and to_leXX
-allows reasoning about data endian-ness. So do annotations even
-when not used by sparse.
+I'm OK with this phrasing from DPDK point of view, the problem is
+that right now qemu issues VHOST_USER_SET_LOG_BASE for each queue
+pair, which causes backend to remap logging area, which is very
+prone to race conditions without full fledged lock on log_base variable.
 
--- 
-MST
+The several set_log_base requests by qemu are to the same logging area
+with the same size, but a backend cannot know this, since the information is
+passed by fd (file descriptor).
+
+So, if we use the word *must* it will *require* a change in QEMU, to
+issue single set_log_base for all queue pairs, and not once per queue
+pair, as it is done now.
+
+> 
+> >  Note that when logging modifications to the used ring (when
+> >  VHOST_VRING_F_LOG
+> >  is set for this ring), log_guest_addr should be used to calculate the log
+> >  offset: the write to first byte of the used ring is logged at this offset
+> >  from
+> > --
+> > 2.14.2
+> 
