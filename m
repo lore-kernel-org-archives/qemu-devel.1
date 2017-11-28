@@ -1,21 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39121)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39375)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1eJiIj-00074z-4L
-	for qemu-devel@nongnu.org; Tue, 28 Nov 2017 11:00:02 -0500
+	(envelope-from <jcody@redhat.com>) id 1eJiJJ-0007aa-VM
+	for qemu-devel@nongnu.org; Tue, 28 Nov 2017 11:00:42 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1eJiIi-0004Wo-GE
-	for qemu-devel@nongnu.org; Tue, 28 Nov 2017 11:00:01 -0500
-Date: Tue, 28 Nov 2017 16:59:51 +0100
-From: Kevin Wolf <kwolf@redhat.com>
-Message-ID: <20171128155951.GD3703@localhost.localdomain>
-References: <20171128145327.17248-1-berto@igalia.com>
-	<w51bmjm762e.fsf@maestria.local.igalia.com>
+	(envelope-from <jcody@redhat.com>) id 1eJiJA-0004lW-CE
+	for qemu-devel@nongnu.org; Tue, 28 Nov 2017 11:00:38 -0500
+Date: Tue, 28 Nov 2017 11:00:06 -0500
+From: Jeff Cody <jcody@redhat.com>
+Message-ID: <20171128160006.GB25110@localhost.localdomain>
+References: <20171128154350.21504-1-kwolf@redhat.com>
+	<20171128154350.21504-2-kwolf@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <w51bmjm762e.fsf@maestria.local.igalia.com>
-Subject: Re: [Qemu-devel] [PATCH for-2.11] blockjob: Remove the job from the
- list earlier in block_job_unref()
+In-Reply-To: <20171128154350.21504-2-kwolf@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH for-2.11 1/4] Revert "coroutine: abort if
+ we try to schedule or enter a pending coroutine"
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,26 +24,161 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alberto Garcia <berto@igalia.com>
-Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>, Jeff Cody <jcody@redhat.com>
+To: Kevin Wolf <kwolf@redhat.com>
+Cc: qemu-block@nongnu.org, mreitz@redhat.com, stefanha@redhat.com, pbonzini@redhat.com, famz@redhat.com, qemu-devel@nongnu.org
 
-Am 28.11.2017 um 16:53 hat Alberto Garcia geschrieben:
-> On Tue 28 Nov 2017 03:53:27 PM CET, Alberto Garcia wrote:
-> > When destroying a block job in block_job_unref() we should remove it
-> > from the job list before calling block_job_remove_all_bdrv().
-> >
-> > This is because removing the BDSs can trigger an aio_poll() and wake
-> > up other jobs that might attempt to use the block job list. If that
-> > happens the job we're currently destroying should not be in that list
-> > anymore.
-> > ---
-> >  blockjob.c | 2 +-
-> >  1 file changed, 1 insertion(+), 1 deletion(-)
+On Tue, Nov 28, 2017 at 04:43:47PM +0100, Kevin Wolf wrote:
+> This reverts commit 6133b39f3c36623425a6ede9e89d93175fde15cd.
 > 
-> I forgot this
+> The commit checked conditions that would expose a bug, but there is no
+> real reason to forbid them apart from the bug, which we'll fix in a
+> minute.
 > 
-> Signed-off-by: Alberto Garcia <berto@igalia.com>
+> In particular, reentering a coroutine during co_aio_sleep_ns() is fine;
+> the function is explicitly written to allow this.
+> 
+> aio_co_schedule() can indeed conflict with direct coroutine invocations,
+> but this is exactky what we want to fix, so remove that check again,
 
-Thanks, applied to the block branch.
+s/exactky/exactly/
 
-Kevin
+
+Reviewed-by: Jeff Cody <jcody@redhat.com>
+
+> too.
+> 
+> Signed-off-by: Kevin Wolf <kwolf@redhat.com>
+> ---
+>  include/qemu/coroutine_int.h | 13 +++----------
+>  util/async.c                 | 13 -------------
+>  util/qemu-coroutine-sleep.c  | 12 ------------
+>  util/qemu-coroutine.c        | 14 --------------
+>  4 files changed, 3 insertions(+), 49 deletions(-)
+> 
+> diff --git a/include/qemu/coroutine_int.h b/include/qemu/coroutine_int.h
+> index 59e8406398..cb98892bba 100644
+> --- a/include/qemu/coroutine_int.h
+> +++ b/include/qemu/coroutine_int.h
+> @@ -46,21 +46,14 @@ struct Coroutine {
+>  
+>      size_t locks_held;
+>  
+> -    /* Only used when the coroutine has yielded.  */
+> -    AioContext *ctx;
+> -
+> -    /* Used to catch and abort on illegal co-routine entry.
+> -     * Will contain the name of the function that had first
+> -     * scheduled the coroutine. */
+> -    const char *scheduled;
+> -
+> -    QSIMPLEQ_ENTRY(Coroutine) co_queue_next;
+> -
+>      /* Coroutines that should be woken up when we yield or terminate.
+>       * Only used when the coroutine is running.
+>       */
+>      QSIMPLEQ_HEAD(, Coroutine) co_queue_wakeup;
+>  
+> +    /* Only used when the coroutine has yielded.  */
+> +    AioContext *ctx;
+> +    QSIMPLEQ_ENTRY(Coroutine) co_queue_next;
+>      QSLIST_ENTRY(Coroutine) co_scheduled_next;
+>  };
+>  
+> diff --git a/util/async.c b/util/async.c
+> index 4dd9d95a9e..0e1bd8780a 100644
+> --- a/util/async.c
+> +++ b/util/async.c
+> @@ -388,9 +388,6 @@ static void co_schedule_bh_cb(void *opaque)
+>          QSLIST_REMOVE_HEAD(&straight, co_scheduled_next);
+>          trace_aio_co_schedule_bh_cb(ctx, co);
+>          aio_context_acquire(ctx);
+> -
+> -        /* Protected by write barrier in qemu_aio_coroutine_enter */
+> -        atomic_set(&co->scheduled, NULL);
+>          qemu_coroutine_enter(co);
+>          aio_context_release(ctx);
+>      }
+> @@ -441,16 +438,6 @@ fail:
+>  void aio_co_schedule(AioContext *ctx, Coroutine *co)
+>  {
+>      trace_aio_co_schedule(ctx, co);
+> -    const char *scheduled = atomic_cmpxchg(&co->scheduled, NULL,
+> -                                           __func__);
+> -
+> -    if (scheduled) {
+> -        fprintf(stderr,
+> -                "%s: Co-routine was already scheduled in '%s'\n",
+> -                __func__, scheduled);
+> -        abort();
+> -    }
+> -
+>      QSLIST_INSERT_HEAD_ATOMIC(&ctx->scheduled_coroutines,
+>                                co, co_scheduled_next);
+>      qemu_bh_schedule(ctx->co_schedule_bh);
+> diff --git a/util/qemu-coroutine-sleep.c b/util/qemu-coroutine-sleep.c
+> index 254349cdbb..9c5655041b 100644
+> --- a/util/qemu-coroutine-sleep.c
+> +++ b/util/qemu-coroutine-sleep.c
+> @@ -13,7 +13,6 @@
+>  
+>  #include "qemu/osdep.h"
+>  #include "qemu/coroutine.h"
+> -#include "qemu/coroutine_int.h"
+>  #include "qemu/timer.h"
+>  #include "block/aio.h"
+>  
+> @@ -26,8 +25,6 @@ static void co_sleep_cb(void *opaque)
+>  {
+>      CoSleepCB *sleep_cb = opaque;
+>  
+> -    /* Write of schedule protected by barrier write in aio_co_schedule */
+> -    atomic_set(&sleep_cb->co->scheduled, NULL);
+>      aio_co_wake(sleep_cb->co);
+>  }
+>  
+> @@ -37,15 +34,6 @@ void coroutine_fn co_aio_sleep_ns(AioContext *ctx, QEMUClockType type,
+>      CoSleepCB sleep_cb = {
+>          .co = qemu_coroutine_self(),
+>      };
+> -
+> -    const char *scheduled = atomic_cmpxchg(&sleep_cb.co->scheduled, NULL,
+> -                                           __func__);
+> -    if (scheduled) {
+> -        fprintf(stderr,
+> -                "%s: Co-routine was already scheduled in '%s'\n",
+> -                __func__, scheduled);
+> -        abort();
+> -    }
+>      sleep_cb.ts = aio_timer_new(ctx, type, SCALE_NS, co_sleep_cb, &sleep_cb);
+>      timer_mod(sleep_cb.ts, qemu_clock_get_ns(type) + ns);
+>      qemu_coroutine_yield();
+> diff --git a/util/qemu-coroutine.c b/util/qemu-coroutine.c
+> index 9eff7fd450..d6095c1d5a 100644
+> --- a/util/qemu-coroutine.c
+> +++ b/util/qemu-coroutine.c
+> @@ -107,22 +107,8 @@ void qemu_aio_coroutine_enter(AioContext *ctx, Coroutine *co)
+>      Coroutine *self = qemu_coroutine_self();
+>      CoroutineAction ret;
+>  
+> -    /* Cannot rely on the read barrier for co in aio_co_wake(), as there are
+> -     * callers outside of aio_co_wake() */
+> -    const char *scheduled = atomic_mb_read(&co->scheduled);
+> -
+>      trace_qemu_aio_coroutine_enter(ctx, self, co, co->entry_arg);
+>  
+> -    /* if the Coroutine has already been scheduled, entering it again will
+> -     * cause us to enter it twice, potentially even after the coroutine has
+> -     * been deleted */
+> -    if (scheduled) {
+> -        fprintf(stderr,
+> -                "%s: Co-routine was already scheduled in '%s'\n",
+> -                __func__, scheduled);
+> -        abort();
+> -    }
+> -
+>      if (co->caller) {
+>          fprintf(stderr, "Co-routine re-entered recursively\n");
+>          abort();
+> -- 
+> 2.13.6
+> 
