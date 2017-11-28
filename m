@@ -1,25 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53272)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54204)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1eJluJ-0000p5-Pt
-	for qemu-devel@nongnu.org; Tue, 28 Nov 2017 14:51:04 -0500
+	(envelope-from <eblake@redhat.com>) id 1eJlwL-0002Al-57
+	for qemu-devel@nongnu.org; Tue, 28 Nov 2017 14:53:10 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1eJluH-0004LW-5E
-	for qemu-devel@nongnu.org; Tue, 28 Nov 2017 14:51:03 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:53720)
+	(envelope-from <eblake@redhat.com>) id 1eJlwI-0005Xj-3X
+	for qemu-devel@nongnu.org; Tue, 28 Nov 2017 14:53:09 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:36632)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1eJluG-0004L7-VC
-	for qemu-devel@nongnu.org; Tue, 28 Nov 2017 14:51:01 -0500
-References: <1511530010-511740-1-git-send-email-dplotnikov@virtuozzo.com>
-	<20171128205345-mutt-send-email-mst@kernel.org>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <5837b412-d377-e7ac-9127-4990f8095a99@redhat.com>
-Date: Tue, 28 Nov 2017 20:50:54 +0100
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1eJlwH-0005XV-TF
+	for qemu-devel@nongnu.org; Tue, 28 Nov 2017 14:53:06 -0500
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+	[10.5.11.15])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id EF959356D8
+	for <qemu-devel@nongnu.org>; Tue, 28 Nov 2017 19:53:04 +0000 (UTC)
+References: <20171122124504.13211-1-quintela@redhat.com>
+	<20171122124504.13211-2-quintela@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <6db20c98-22b1-3e39-a5aa-b3cf3abbf3e6@redhat.com>
+Date: Tue, 28 Nov 2017 13:53:01 -0600
 MIME-Version: 1.0
-In-Reply-To: <20171128205345-mutt-send-email-mst@kernel.org>
-Content-Type: text/plain; charset=utf-8
+In-Reply-To: <20171122124504.13211-2-quintela@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] i386: turn off l3-cache property by default
+Subject: Re: [Qemu-devel] [PATCH v4 1/1] migration: Use proper types in json
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,39 +34,29 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Michael S. Tsirkin" <mst@redhat.com>, Denis Plotnikov <dplotnikov@virtuozzo.com>
-Cc: rth@twiddle.net, ehabkost@redhat.com, rkagan@virtuozzo.com, den@virtuozzo.com, qemu-devel@nongnu.org
+To: Juan Quintela <quintela@redhat.com>, qemu-devel@nongnu.org
+Cc: lvivier@redhat.com, dgilbert@redhat.com, peterx@redhat.com
 
-On 28/11/2017 19:54, Michael S. Tsirkin wrote:
->> Now there's a downside: with L3 cache the Linux scheduler is more eager
->> to wake up tasks on sibling CPUs, resulting in unnecessary cross-vCPU
->> interactions and therefore exessive halts and IPIs.  E.g. "perf bench
->> sched pipe -i 100000" gives
->>
->> l3-cache	#res IPI /s	#HLT /s		#time /100000 loops
->> off		200 (no K)	230		0.2 sec
->> on		400K		330K		0.5 sec
->>
->> In a more realistic test, we observe 15% degradation in VM density
->> (measured as the number of VMs, each running Drupal CMS serving 2 http
->> requests per second to its main page, with 95%-percentile response
->> latency under 100 ms) with l3-cache=on.
->>
->> We think that mostly-idle scenario is more common in cloud and personal
->> usage, and should be optimized for by default; users of highly loaded
->> VMs should be able to tune them up themselves.
+On 11/22/2017 06:45 AM, Juan Quintela wrote:
+> We use int for everything (int64_t), and then we check that value is
+> between 0 and 255.  Change it to the valid types.
+> 
+> This change only happens for HMP.  QMP always use bytes and similars.
 
-Hi Denis,
+s/similars/similar/
 
-thanks for the report.  I think there are two cases:
+> 
+> Signed-off-by: Juan Quintela <quintela@redhat.com>
+> ---
+>   hmp.c                 | 22 +++++++++++-----------
+>   migration/migration.c | 49 ++++++++++++++++++++-----------------------------
+>   qapi/migration.json   | 22 +++++++++++-----------
+>   3 files changed, 42 insertions(+), 51 deletions(-)
+> 
 
-1) The dedicated pCPU case: do you still get the performance degradation
-with dedicated pCPUs?
+Reviewed-by: Eric Blake <eblake@redhat.com>
 
-2) The non-dedicated pCPU case: do you still get the performance
-degradation with threads=1?  If not, why do you have sibling vCPUs at
-all, if you don't have a dedicated physical CPU for each vCPU?
-
-Thanks,
-
-Paolo
+-- 
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
