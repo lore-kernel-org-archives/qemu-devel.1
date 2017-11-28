@@ -1,30 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51388)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51539)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <Michael.Nawrocki@gtri.gatech.edu>)
-	id 1eJlqx-0007Qm-5F
-	for qemu-devel@nongnu.org; Tue, 28 Nov 2017 14:47:36 -0500
+	id 1eJlrB-0007ay-D1
+	for qemu-devel@nongnu.org; Tue, 28 Nov 2017 14:47:50 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
 	(envelope-from <Michael.Nawrocki@gtri.gatech.edu>)
-	id 1eJlqu-0001sD-En
-	for qemu-devel@nongnu.org; Tue, 28 Nov 2017 14:47:35 -0500
-Received: from relay2.gtri.gatech.edu ([130.207.199.168]:37457)
+	id 1eJlr8-000248-Mv
+	for qemu-devel@nongnu.org; Tue, 28 Nov 2017 14:47:49 -0500
+Received: from relay2.gtri.gatech.edu ([130.207.199.168]:37579)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <Michael.Nawrocki@gtri.gatech.edu>)
-	id 1eJlqu-0001rv-9S
-	for qemu-devel@nongnu.org; Tue, 28 Nov 2017 14:47:32 -0500
+	id 1eJlr8-00023K-IY
+	for qemu-devel@nongnu.org; Tue, 28 Nov 2017 14:47:46 -0500
 References: <20171113161446.2862-1-michael.nawrocki@gtri.gatech.edu>
-	<20171113161446.2862-3-michael.nawrocki@gtri.gatech.edu>
-	<CAFEAcA8w2PCKyGfPZyoQ1LLiMkEHpyDQv6-nz8voNsVJ_0Fv-Q@mail.gmail.com>
+	<20171113173120.3686-1-michael.nawrocki@gtri.gatech.edu>
+	<CAFEAcA8fA3VMCdVwZ84vRUVvBt0RbYiKZb2cxjyV9S3QrCmD6w@mail.gmail.com>
 From: Michael Nawrocki <michael.nawrocki@gtri.gatech.edu>
-Message-ID: <7766fcae-425a-2087-0066-f1baca889132@gtri.gatech.edu>
-Date: Tue, 28 Nov 2017 14:47:30 -0500
+Message-ID: <44e00d7a-f6c7-cfea-ba2d-acfa2b20b7ca@gtri.gatech.edu>
+Date: Tue, 28 Nov 2017 14:47:44 -0500
 MIME-Version: 1.0
-In-Reply-To: <CAFEAcA8w2PCKyGfPZyoQ1LLiMkEHpyDQv6-nz8voNsVJ_0Fv-Q@mail.gmail.com>
+In-Reply-To: <CAFEAcA8fA3VMCdVwZ84vRUVvBt0RbYiKZb2cxjyV9S3QrCmD6w@mail.gmail.com>
 Content-Type: text/plain; charset="utf-8"; format=flowed
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v3 2/3] Enable 8-byte wide access to AMD
- CFI devices
+Subject: Re: [Qemu-devel] [PATCH v3 3/3] Add partial flash interleaving to
+ AMD CFI devices
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,272 +36,96 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: Peter Maydell <peter.maydell@linaro.org>
 Cc: QEMU Developers <qemu-devel@nongnu.org>, Qemu-block <qemu-block@nongnu.org>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
 
-On 11/23/2017 06:49 AM, Peter Maydell wrote:
-> On 13 November 2017 at 16:14, Mike Nawrocki
+On 11/23/2017 08:46 AM, Peter Maydell wrote:
+> On 13 November 2017 at 17:31, Mike Nawrocki
 > <michael.nawrocki@gtri.gatech.edu> wrote:
+>> This mirrors the interleaving support already in place in
+>> pflash_cfi01.c, using the max_device_width and device_width properties.
+>>
 >> Signed-off-by: Mike Nawrocki <michael.nawrocki@gtri.gatech.edu>
 >> ---
->>   hw/block/pflash_cfi02.c | 143 ++++++++++++++++++++++++++++++++++--------------
->>   1 file changed, 102 insertions(+), 41 deletions(-)
->>
->> diff --git a/hw/block/pflash_cfi02.c b/hw/block/pflash_cfi02.c
->> index a81df913f6..29eb0429a3 100644
->> --- a/hw/block/pflash_cfi02.c
->> +++ b/hw/block/pflash_cfi02.c
->> @@ -18,7 +18,7 @@
->>    */
->>
->>   /*
->> - * For now, this code can emulate flashes of 1, 2 or 4 bytes width.
->> + * For now, this code can emulate flashes of 1, 2, 4, or 8 bytes width.
->>    * Supported commands/modes are:
->>    * - flash read
->>    * - flash write
->> @@ -138,11 +138,72 @@ static void pflash_timer (void *opaque)
->>       pfl->cmd = 0;
->>   }
->>
->> +static uint64_t _flash_read(pflash_t *pfl, hwaddr offset,
->> +                            int width, int be)
+>>   hw/block/pflash_cfi02.c | 244 +++++++++++++++++++++++++++++++++++++++++-------
+>>   1 file changed, 209 insertions(+), 35 deletions(-)
 > 
-> Don't use leading underscores in function names, please --
-> they are reserved for the system (C library, etc).
-
-Gotcha, I'll update this.
-
+> Thanks for this patch. There is some code duplication from cfi01.c,
+> but I think it's ok not to worry about trying to share code.
 > 
->> +{
->> +    /* Flash area read */
->> +    uint64_t ret = 0;
->> +    uint8_t *p = pfl->storage;
->> +
->> +    switch (width) {
->> +    case 1:
->> +        ret = p[offset];
->> +        /* DPRINTF("%s: data offset %08x %02x\n", __func__, offset, ret); */
->> +        break;
->> +    case 2:
->> +        if (be) {
->> +            ret = p[offset] << 8;
->> +            ret |= p[offset + 1];
->> +        } else {
->> +            ret = p[offset];
->> +            ret |= p[offset + 1] << 8;
+>>       case 0xA0:
+>>       case 0x10:
+>>       case 0x30:
+>>           /* Status register read */
+>>           ret = pfl->status;
+>> -        DPRINTF("%s: status %x\n", __func__, ret);
+>> +        for (i = pfl->device_width;
+>> +             i < pfl->bank_width; i += pfl->device_width) {
+>> +            ret = deposit64(ret, 8 * i, 8 * pfl->device_width, ret);
 >> +        }
->> +        /* DPRINTF("%s: data offset %08x %04x\n", __func__, offset, ret); */
->> +        break;
->> +    case 4:
->> +        if (be) {
->> +            ret = p[offset] << 24;
->> +            ret |= p[offset + 1] << 16;
->> +            ret |= p[offset + 2] << 8;
->> +            ret |= p[offset + 3];
->> +        } else {
->> +            ret = p[offset];
->> +            ret |= p[offset + 1] << 8;
->> +            ret |= p[offset + 2] << 16;
->> +            ret |= p[offset + 3] << 24;
->> +        }
->> +        /* DPRINTF("%s: data offset %08x %08x\n", __func__, offset, ret); */
->> +        break;
->> +    case 8:
->> +        if (be) {
->> +            ret = (uint64_t)p[offset] << 56;
->> +            ret |= (uint64_t)p[offset + 1] << 48;
->> +            ret |= (uint64_t)p[offset + 2] << 40;
->> +            ret |= (uint64_t)p[offset + 3] << 32;
->> +            ret |= (uint64_t)p[offset + 4] << 24;
->> +            ret |= (uint64_t)p[offset + 5] << 16;
->> +            ret |= (uint64_t)p[offset + 6] << 8;
->> +            ret |= (uint64_t)p[offset + 7];
->> +        } else {
->> +            ret = (uint64_t)p[offset];
->> +            ret |= (uint64_t)p[offset + 1] << 8;
->> +            ret |= (uint64_t)p[offset + 2] << 16;
->> +            ret |= (uint64_t)p[offset + 3] << 24;
->> +            ret |= (uint64_t)p[offset + 4] << 32;
->> +            ret |= (uint64_t)p[offset + 5] << 40;
->> +            ret |= (uint64_t)p[offset + 6] << 48;
->> +            ret |= (uint64_t)p[offset + 7] << 56;
->> +        }
->> +        break;
->> +    }
 > 
-> This can be rewritten in a shorter and clearer way using
-> the ld*_le_p() and ld*_be_p() functions, eg case 4 is
-> 
->      ret = be ? ldl_be_p(p + offset) : ldl_le_p(p + offset);
-> 
-> 
-> case 2 uses lduw_be_p() and lduw_le_p(), case 8 uses
-> ldq_be_p() and ldq_le_p().
-> 
-> case 1 is just
->      ret = ldub_p(p + offset);
-> because there's no endianness issue for 1 byte.
-> 
-> 
+> This will loop forever in the legacy "device_width == 0" case,
+> won't it?
+>
 
-Agreed, I'll switch these over.
+Ah, yeah looks like it. I'll add a check to fix this.
 
->> +
->> +    return ret;
->> +}
->> +
->>   static uint64_t pflash_read(pflash_t *pfl, hwaddr offset,
->>                               int width, int be)
->>   {
->>       hwaddr boff;
->> -    uint8_t *p;
->>       uint64_t ret;
->>
->>       DPRINTF("%s: offset " TARGET_FMT_plx "\n", __func__, offset);
->> @@ -158,6 +219,8 @@ static uint64_t pflash_read(pflash_t *pfl, hwaddr offset,
->>           boff = boff >> 1;
->>       else if (pfl->width == 4)
->>           boff = boff >> 2;
->> +    else if (pfl->width == 8)
->> +        boff = boff >> 3;
-> 
-> If you run this patch through scripts/checkpatch.pl it should tell
-> you that our coding style would like you to put braces on this if.
-> Our usual practice is that if you're touching an existing statement
-> that isn't in line with our coding style you should fix at least the
-> parts checkpatch complains about (ie add {} to all the arms of the
-> if, here).
-> 
-
-Will do. Oddly, checkpatch isn't warning me about the brace elision...
-
->>       switch (pfl->cmd) {
->>       default:
->>           /* This should never happen : reset state & treat it as a read*/
->> @@ -170,37 +233,7 @@ static uint64_t pflash_read(pflash_t *pfl, hwaddr offset,
->>       case 0x00:
->>       flash_read:
->>           /* Flash area read */
->> -        p = pfl->storage;
->> -        switch (width) {
->> -        case 1:
->> -            ret = p[offset];
->> -//            DPRINTF("%s: data offset %08x %02x\n", __func__, offset, ret);
->> -            break;
->> -        case 2:
->> -            if (be) {
->> -                ret = p[offset] << 8;
->> -                ret |= p[offset + 1];
->> -            } else {
->> -                ret = p[offset];
->> -                ret |= p[offset + 1] << 8;
->> -            }
->> -//            DPRINTF("%s: data offset %08x %04x\n", __func__, offset, ret);
->> -            break;
->> -        case 4:
->> -            if (be) {
->> -                ret = p[offset] << 24;
->> -                ret |= p[offset + 1] << 16;
->> -                ret |= p[offset + 2] << 8;
->> -                ret |= p[offset + 3];
->> -            } else {
->> -                ret = p[offset];
->> -                ret |= p[offset + 1] << 8;
->> -                ret |= p[offset + 2] << 16;
->> -                ret |= p[offset + 3] << 24;
->> -            }
->> -//            DPRINTF("%s: data offset %08x %08x\n", __func__, offset, ret);
->> -            break;
->> -        }
->> +        ret = _flash_read(pfl, offset, width, be);
+>> +        DPRINTF("%s: status %" PRIx64 "\n", __func__, ret);
+>>           /* Toggle bit 6 */
+>>           pfl->status ^= 0x40;
 >>           break;
->>       case 0x90:
->>           /* flash ID read */
->> @@ -260,8 +293,8 @@ static void pflash_update(pflash_t *pfl, int offset,
->>       }
->>   }
->>
->> -static void pflash_write (pflash_t *pfl, hwaddr offset,
->> -                          uint64_t value, int width, int be)
->> +static void pflash_write(pflash_t *pfl, hwaddr offset,
->> +                         uint64_t value, int width, int be)
->>   {
->>       hwaddr boff;
->>       uint8_t *p;
->> @@ -275,17 +308,19 @@ static void pflash_write (pflash_t *pfl, hwaddr offset,
->>   #endif
->>           goto reset_flash;
->>       }
->> -    DPRINTF("%s: offset " TARGET_FMT_plx " %08x %d %d\n", __func__,
->> -            offset, value, width, pfl->wcycle);
->> +    DPRINTF("%s: offset " TARGET_FMT_plx " %08" PRIx64 " %d %d\n",
->> +            __func__, offset, value, width, pfl->wcycle);
->>       offset &= pfl->chip_len - 1;
->>
->> -    DPRINTF("%s: offset " TARGET_FMT_plx " %08x %d\n", __func__,
->> -            offset, value, width);
->> +    DPRINTF("%s: offset " TARGET_FMT_plx " %08" PRIx64 " %d\n",
->> +            __func__, offset, value, width);
->>       boff = offset & (pfl->sector_len - 1);
->>       if (pfl->width == 2)
->>           boff = boff >> 1;
->>       else if (pfl->width == 4)
->>           boff = boff >> 2;
->> +    else if (pfl->width == 8)
->> +        boff = boff >> 3;
->>       switch (pfl->wcycle) {
->>       case 0:
->>           /* Set the device in I/O access mode if required */
->> @@ -346,8 +381,8 @@ static void pflash_write (pflash_t *pfl, hwaddr offset,
->>               /* We need another unlock sequence */
->>               goto check_unlock0;
->>           case 0xA0:
->> -            DPRINTF("%s: write data offset " TARGET_FMT_plx " %08x %d\n",
->> -                    __func__, offset, value, width);
->> +            DPRINTF("%s: write data offset " TARGET_FMT_plx
->> +                    " %08" PRIx64 " %d\n", __func__, offset, value, width);
->>               p = pfl->storage;
->>               if (!pfl->ro) {
->>                   switch (width) {
->> @@ -379,6 +414,28 @@ static void pflash_write (pflash_t *pfl, hwaddr offset,
->>                       }
->>                       pflash_update(pfl, offset, 4);
->>                       break;
->> +                case 8:
->> +                    if (be) {
->> +                        p[offset] &= value >> 56;
->> +                        p[offset + 1] &= value >> 48;
->> +                        p[offset + 2] &= value >> 40;
->> +                        p[offset + 3] &= value >> 32;
->> +                        p[offset + 4] &= value >> 24;
->> +                        p[offset + 5] &= value >> 16;
->> +                        p[offset + 6] &= value >> 8;
->> +                        p[offset + 7] &= value;
->> +                    } else {
->> +                        p[offset] &= value;
->> +                        p[offset + 1] &= value >> 8;
->> +                        p[offset + 2] &= value >> 16;
->> +                        p[offset + 3] &= value >> 24;
->> +                        p[offset + 4] &= value >> 32;
->> +                        p[offset + 5] &= value >> 40;
->> +                        p[offset + 6] &= value >> 48;
->> +                        p[offset + 7] &= value >> 56;
->> +                    }
->> +                    pflash_update(pfl, offset, 8);
->> +                    break;
->>                   }
+>> @@ -745,7 +901,25 @@ static Property pflash_cfi02_properties[] = {
+>>       DEFINE_PROP_DRIVE("drive", struct pflash_t, blk),
+>>       DEFINE_PROP_UINT32("num-blocks", struct pflash_t, nb_blocs, 0),
+>>       DEFINE_PROP_UINT32("sector-length", struct pflash_t, sector_len, 0),
+>> -    DEFINE_PROP_UINT8("width", struct pflash_t, width, 0),
+>> +    /* width here is the overall width of this QEMU device in bytes.
+>> +     * The QEMU device may be emulating a number of flash devices
+>> +     * wired up in parallel; the width of each individual flash
+>> +     * device should be specified via device-width. If the individual
+>> +     * devices have a maximum width which is greater than the width
+>> +     * they are being used for, this maximum width should be set via
+>> +     * max-device-width (which otherwise defaults to device-width).
+>> +     * So for instance a 32-bit wide QEMU flash device made from four
+>> +     * 16-bit flash devices used in 8-bit wide mode would be configured
+>> +     * with width = 4, device-width = 1, max-device-width = 2.
+>> +     *
+>> +     * If device-width is not specified we default to backwards
+>> +     * compatible behaviour which is a bad emulation of two
+>> +     * 16 bit devices making up a 32 bit wide QEMU device. This
+>> +     * is deprecated for new uses of this device.
 > 
-> Similarly here we can use
->     if (be) {
->         uint64_t oldv = ldq_be_p(p + offset);
->         stq_be_p(p + offset, oldv & value);
->     } else {
->         ...ditto with _le_
->     }
+> Is this correct for pflash_cfi02 ? In cfi01 you can see that our
+> legacy behaviour does things like jamming two ID values
+> together into one response because it's doing this "bad emulation
+> of two 16 bit devices", but I don't see similar code in cfi02,
+> so maybe the legacy default is something different ?
 > 
-> Other than those minor issues, patch looks good.
+> In particular, if the legacy default is actually "just looks like
+> a single device" and the old code's behaviour is identical to
+> the new code with device_width 1, we may be able to simply set
+> the default width to 1 and avoid the nasty back-compat hacks.
+> (I had to put the hacks in for cfi01 because they really are
+> different behaviour, and we didn't want to potentially break
+> the use in the pc platform.)
 > 
 > thanks
 > -- PMM
 > 
+I ran into this issue when emulating a PPMC7400 evaluation board. It has 
+a 64-bit wide flash bus comprised of 4 16-bit AMD flash devices (in 
+16-bit mode), and the drivers I have send commands to all 4 devices 
+simultaneously (by packing the data into quadwords). So it expects 4 
+responses packed into a quadword when it reads the response value.
 
-I'll fix these as well.
+As far as I can tell, the legacy default for pflash_cfi02 is "just looks 
+like a single device". I think the legacy behavior is equivalent to 
+setting device_width to bank_width in the new code; setting it to 1 in 
+the new code would mean the response gets duplicated "bank_width" times 
+while setting it to bank_width should result in a single response.
+
+I was referencing pflash_cfi01, so I ended up duplicating the 
+back-compat hacks, but as far as I can tell they are unnecessary here, 
+and it'd be much cleaner to remove them.
+
+I'll go ahead and remove the back-compat hacks and see if everything 
+works as expected. I'll also incorporate your other suggestions and push 
+a newer revision of the patch set as soon as possible.
 Thanks!
