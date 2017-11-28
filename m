@@ -1,22 +1,47 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59302)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34196)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <linzhecheng@huawei.com>) id 1eJV36-0002gd-A2
-	for qemu-devel@nongnu.org; Mon, 27 Nov 2017 20:51:01 -0500
+	(envelope-from <bjsdjshi@linux.vnet.ibm.com>) id 1eJVKU-00075p-Kv
+	for qemu-devel@nongnu.org; Mon, 27 Nov 2017 21:08:59 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <linzhecheng@huawei.com>) id 1eJV33-0003ax-7I
-	for qemu-devel@nongnu.org; Mon, 27 Nov 2017 20:51:00 -0500
-Received: from szxga05-in.huawei.com ([45.249.212.191]:2049 helo=huawei.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <linzhecheng@huawei.com>)
-	id 1eJV32-0003Ym-Kh
-	for qemu-devel@nongnu.org; Mon, 27 Nov 2017 20:50:57 -0500
-From: linzhecheng <linzhecheng@huawei.com>
-Date: Tue, 28 Nov 2017 09:50:39 +0800
-Message-ID: <20171128015039.19060-1-linzhecheng@huawei.com>
+	(envelope-from <bjsdjshi@linux.vnet.ibm.com>) id 1eJVKR-0002AN-Eg
+	for qemu-devel@nongnu.org; Mon, 27 Nov 2017 21:08:58 -0500
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:50972
+	helo=mx0a-001b2d01.pphosted.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <bjsdjshi@linux.vnet.ibm.com>)
+	id 1eJVKR-0002AA-8R
+	for qemu-devel@nongnu.org; Mon, 27 Nov 2017 21:08:55 -0500
+Received: from pps.filterd (m0098414.ppops.net [127.0.0.1])
+	by mx0b-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
+	vAS28qx4120324
+	for <qemu-devel@nongnu.org>; Mon, 27 Nov 2017 21:08:54 -0500
+Received: from e11.ny.us.ibm.com (e11.ny.us.ibm.com [129.33.205.201])
+	by mx0b-001b2d01.pphosted.com with ESMTP id 2egwjtatmx-1
+	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Mon, 27 Nov 2017 21:08:53 -0500
+Received: from localhost
+	by e11.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <bjsdjshi@linux.vnet.ibm.com>;
+	Mon, 27 Nov 2017 21:08:53 -0500
+Date: Tue, 28 Nov 2017 10:08:47 +0800
+From: Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>
+References: <131b311b-c262-3636-c7ee-1c59ee283823@de.ibm.com>
+	<1ddb44db-2c5c-d64f-56e0-e4582f82b572@linux.vnet.ibm.com>
+	<20171124171510.2343ccdf.cohuck@redhat.com>
+	<8c18df3e-92a0-f88f-6d24-e1df051c8138@linux.vnet.ibm.com>
+	<20171127135624.28052dc5.cohuck@redhat.com>
+	<57f95f61-b9d9-1341-78c7-259006cb5945@linux.vnet.ibm.com>
+	<20171127141929.1d692aad.cohuck@redhat.com>
+	<39cb6a69-7f32-80d4-214d-26e1e81a9fd7@linux.vnet.ibm.com>
+	<2933e058-0217-9696-2c52-613da8ba7a1c@linux.vnet.ibm.com>
+	<20171127175607.75bd999e.cohuck@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: [Qemu-devel] [PATCH v2] thread: move detach_thread from creating
- thread to created thread
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20171127175607.75bd999e.cohuck@redhat.com>
+Message-Id: <20171128020847.GM5859@bjsdjshi@linux.vnet.ibm.com>
+Subject: Re: [Qemu-devel] [RFC PATCH 1/1] s390x/css: unresrict cssids
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,176 +50,117 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: arei.gonglei@huawei.com, pbonzini@redhat.com, famz@redhat.com, aliguori@us.ibm.com, linzhecheng <linzhecheng@huawei.com>
+To: Cornelia Huck <cohuck@redhat.com>
+Cc: Boris Fiuczynski <fiuczy@linux.vnet.ibm.com>, Halil Pasic <pasic@linux.vnet.ibm.com>, Christian Borntraeger <borntraeger@de.ibm.com>, Shalini Chellathurai Saroja <shalini@linux.vnet.ibm.com>, qemu-devel@nongnu.org, qemu-s390x@nongnu.org, Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>
 
-If we create a thread with QEMU_THREAD_DETACHED mode, QEMU may get a segfault in a low probability.
+* Cornelia Huck <cohuck@redhat.com> [2017-11-27 17:56:07 +0100]:
 
-The backtrace is:
-    arg=arg@entry=0x3f5cf70, mode=mode@entry=1) at util/qemu_thread_posix.c:512
-    at io/task.c:141
-    destroy=destroy@entry=0x0) at io/channel_socket.c:194
+> On Mon, 27 Nov 2017 16:09:09 +0100
+> Boris Fiuczynski <fiuczy@linux.vnet.ibm.com> wrote:
+> 
+> > On 11/27/2017 03:13 PM, Halil Pasic wrote:
+> > > 
+> > > 
+> > > On 11/27/2017 02:19 PM, Cornelia Huck wrote:  
+> > >> On Mon, 27 Nov 2017 14:11:57 +0100
+> > >> Halil Pasic <pasic@linux.vnet.ibm.com> wrote:
+> > >>  
+> > >>> On 11/27/2017 01:56 PM, Cornelia Huck wrote:  
+> > >>>> On Fri, 24 Nov 2017 17:39:04 +0100
+> > >>>> Halil Pasic <pasic@linux.vnet.ibm.com> wrote:
+> > >>>>      
+> > >>>>> On 11/24/2017 05:15 PM, Cornelia Huck wrote:  
+> > >>  
+> > >>>>>> (Unless we simply make this a "default cssid" prop after all - then it
+> > >>>>>> would be more than just a simple indication for libvirt...)
+> > >>>>>>        
+> > >>>>>
+> > >>>>> We are now talking about the "cssid-unrestricted" property. The default
+> > >>>>> cssid is not something I would like to do any time soon.  
+> > >>>>
+> > >>>> What's so bad about this? As said above, I think it would be much more
+> > >>>> useful. If libvirt can detect r/o vs. r/w for properties, we can simply
+> > >>>> start out with a r/o variant now...
+> > >>>>      
+> > >>>
+> > >>> I'm not sure I understand you. Are you proposing the following:
+> > >>> Drop the restriction, but don't indicate this via a read only
+> > >>> "cssid-unrestricted" device property but via a "default-css"
+> > >>> read only machine property.
+> > >>>
+> > >>> Libvirt then should know that if "default-css" is present then
+> > >>> we don't have this virtual into 0xfe and non virtual into 0xfd
+> > >>> restriction any more.  
+> > >>
+> > >> Yes.
+> > >>  
+> > > 
+> > > @Boris:
+> > > Does this work for you? Technically it's equivalent to having
+> > > "cssid-unrestricted" at machine level.
+> > > 
+> > > I don't really like the idea of indicating unrestricted via
+> > > something mostly unrelated (at least for me it ain't obvious that
+> > > having the id of the default css exposed means we got rid of the
+> > > limitation.). But I'm tied of discussing this, so I'm willing to
+> > > compromise.
+> > > 
+> > > Halil
+> > >   
+> > I agree with Christian that we should not throw the "setting of a 
+> > default cssid" together with "unrestricted cssid" and than use read/only 
+> > and read/write to distinguish between the two!
+> > 
+> 
+> OK, let's step back and summarize a bit.
+> 
+> Current situation:
+> - virtual devices must go into 0xfe, non-virtual devices must go into
+>   non-0xfe
+> - 0xfe is the default cssid; non-mcss-e OSs see only devices in there
+> - to expose non-virtual devices to today's guests, you need to use the
+>   squash-mcss parameter, which tries to put non-virtual devices into
+>   the same place in css 0xfe
+When squashing, everything will be squashed to css 0 which is the
+deafult css in this case.
 
-The root cause of this problem is a bug of glibc(version 2.17,the latest version have the same bug),
-let's see what happened in glibc's code.
-Here is the code slice of pthread_detach.c
+[No effect to the conclusions below, but better to clarify.:-]
 
-25 int
-26 pthread_detach (pthread_t th)
-27 {
-28  struct pthread *pd = (struct pthread *) th;
-29
-30  /* Make sure the descriptor is valid.  */
-31  if (INVALID_NOT_TERMINATED_TD_P (pd))
-32    /* Not a valid thread handle.  */
-34    return ESRCH;
-35
-36  int result = 0;
-37  /* Mark the thread as detached.  */
-38  if (atomic_compare_and_exchange_bool_acq (&pd->joinid, pd, NULL))
-39    {
-40      /* There are two possibilities here.  First, the thread might
-41	 already be detached.  In this case we return EINVAL.
-42	 Otherwise there might already be a waiter.  The standard does
-43	 not mention what happens in this case.  */
-44     if (IS_DETACHED (pd))
-45	 result = EINVAL;
-46    }
-47  else
-48    /* Check whether the thread terminated meanwhile.  In this case we
-49       will just free the TCB.  */
-50    if ((pd->cancelhandling & EXITING_BITMASK) != 0)
-51      /* Note that the code in __free_tcb makes sure each thread
-52	 control block is freed only once.  */
-53      __free_tcb (pd);
+> 
+> This is problematic in various ways (potential for incomprehensible
+> errors, amongst others), so we agreed that the way to go is to drop the
+> virtual-vs-non-virtual cssid restrictions and allow any device in any
+> css image.
+> 
+> Now, we need a way for libvirt to detect this, so that it knows that it
+> can put e.g. vfio-ccw devices in the same css image as virtio devices.
+> 
+> Proposal 1: Use a device attribute to show that the device can be put
+> anywhere. This approach feels wrong to me (the non-restriction is not a
+> property of the individual device, but of the whole css resp. the
+> machine), so I would continue to veto this.
+> 
+> Proposal 2: Export the default cssid as a machine property. If this
+> property exists, it also implies that devices can be put into any css
+> image (although it makes the most sense to put them into the default
+> css image as indicated by the property). Can be made r/w later if it is
+> too much for 2.12.
+> 
+> Proposal 3: Add a machine property that indicates cssids are not
+> restricted. Later, optionally add a second property that exposes the
+> default cssid and makes it configurable.
+> 
+> Personally, I prefer 2 (especially as this also allows to find out
+> where the best place to put devices for non-mcss-e enabled guests is),
+> but I could live with 3 as well (if making this r/w later would be
+> problematic for libvirt.)
+> 
+> (In every case, we would deprecate and later remove the squash
+> parameter.)
+> 
+> [As an aside, how hard is it to make the default cssid configurable? At
+> a glance, it does not seem too bad to me.]
+> 
 
-54  return result;
-55}
-
-QEMU get a segfault at line 50, becasue pd is an invalid address.
-pd is still valid at line 38 when set pd->joinid = pd, at this moment,
-created thread is just exiting(only keeps runing for a short time),
-created thread is running in code of start_thread:
-
-404  /* If the thread is detached free the TCB.  */
-405  if (IS_DETACHED (pd))
-406    /* Free the TCB.  */
-407    __free_tcb (pd);
-created thread found that pd is detached, so it freed pd, in this case,
-pd became an invalid address.
-
-I rewrite qemu_thread_create to move detach_thread from creating thread to created
-to avoid this concurrency problem.
-
-Change-Id: I2293d5be1526241cf58785d701b922f2ffc6491b
-Signed-off-by: linzhecheng <linzhecheng@huawei.com>
----
- include/qemu/thread-posix.h |  8 ++++++++
- include/qemu/thread.h       |  1 +
- util/qemu-thread-posix.c    | 45 ++++++++++++++++++++++++++++++++++-----------
- 3 files changed, 43 insertions(+), 11 deletions(-)
-
-diff --git a/include/qemu/thread-posix.h b/include/qemu/thread-posix.h
-index f3f47e426f..d855c15dab 100644
---- a/include/qemu/thread-posix.h
-+++ b/include/qemu/thread-posix.h
-@@ -44,4 +44,12 @@ struct QemuThread {
-     pthread_t thread;
- };
- 
-+struct QemuThread_args {
-+    void *(*start_routine)(void *);
-+    void *arg;
-+    char *name;
-+    int mode;
-+};
-+
-+
- #endif
-diff --git a/include/qemu/thread.h b/include/qemu/thread.h
-index 9910f49b3a..db365242da 100644
---- a/include/qemu/thread.h
-+++ b/include/qemu/thread.h
-@@ -10,6 +10,7 @@ typedef struct QemuSemaphore QemuSemaphore;
- typedef struct QemuEvent QemuEvent;
- typedef struct QemuLockCnt QemuLockCnt;
- typedef struct QemuThread QemuThread;
-+typedef struct QemuThread_args QemuThread_args;
- 
- #ifdef _WIN32
- #include "qemu/thread-win32.h"
-diff --git a/util/qemu-thread-posix.c b/util/qemu-thread-posix.c
-index 7306475899..07b5838862 100644
---- a/util/qemu-thread-posix.c
-+++ b/util/qemu-thread-posix.c
-@@ -489,6 +489,30 @@ static void qemu_thread_set_name(QemuThread *thread, const char *name)
- #endif
- }
- 
-+static void *qemu_thread_start(void *args)
-+{
-+    QemuThread_args *qemu_thread_args;
-+    void *ret;
-+    QemuThread qemu_thread;
-+
-+    qemu_thread_args = (QemuThread_args *)args;
-+    qemu_thread_get_self(&qemu_thread);
-+
-+    if (qemu_thread_args->name) {
-+        qemu_thread_set_name(&qemu_thread, qemu_thread_args->name);
-+        g_free(qemu_thread_args->name);
-+    }
-+
-+    if (qemu_thread_args->mode == QEMU_THREAD_DETACHED) {
-+        pthread_detach(qemu_thread.thread);
-+    }
-+    ret = qemu_thread_args->start_routine(qemu_thread_args->arg);
-+
-+    g_free(qemu_thread_args);
-+    return ret;
-+}
-+
-+
- void qemu_thread_create(QemuThread *thread, const char *name,
-                        void *(*start_routine)(void*),
-                        void *arg, int mode)
-@@ -496,6 +520,7 @@ void qemu_thread_create(QemuThread *thread, const char *name,
-     sigset_t set, oldset;
-     int err;
-     pthread_attr_t attr;
-+    QemuThread_args *qemu_thread_args;
- 
-     err = pthread_attr_init(&attr);
-     if (err) {
-@@ -505,20 +530,18 @@ void qemu_thread_create(QemuThread *thread, const char *name,
-     /* Leave signal handling to the iothread.  */
-     sigfillset(&set);
-     pthread_sigmask(SIG_SETMASK, &set, &oldset);
--    err = pthread_create(&thread->thread, &attr, start_routine, arg);
-+
-+    qemu_thread_args = g_new0(QemuThread_args, 1);
-+    qemu_thread_args->mode = mode;
-+    qemu_thread_args->name = name_threads ? g_strdup_printf("%s", name) : NULL;
-+    qemu_thread_args->start_routine = start_routine;
-+    qemu_thread_args->arg = arg;
-+
-+    err = pthread_create(&thread->thread, &attr,
-+                         qemu_thread_start, qemu_thread_args);
-     if (err)
-         error_exit(err, __func__);
- 
--    if (name_threads) {
--        qemu_thread_set_name(thread, name);
--    }
--
--    if (mode == QEMU_THREAD_DETACHED) {
--        err = pthread_detach(thread->thread);
--        if (err) {
--            error_exit(err, __func__);
--        }
--    }
-     pthread_sigmask(SIG_SETMASK, &oldset, NULL);
- 
-     pthread_attr_destroy(&attr);
 -- 
-2.12.2.windows.2
+Dong Jia Shi
