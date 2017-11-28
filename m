@@ -1,27 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54798)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54847)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1eJe7d-00071T-9q
-	for qemu-devel@nongnu.org; Tue, 28 Nov 2017 06:32:21 -0500
+	(envelope-from <thuth@redhat.com>) id 1eJe81-0007E7-00
+	for qemu-devel@nongnu.org; Tue, 28 Nov 2017 06:32:41 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1eJe7Z-0000Bv-AM
-	for qemu-devel@nongnu.org; Tue, 28 Nov 2017 06:32:17 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:46852)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1eJe7Z-0000Bn-4v
-	for qemu-devel@nongnu.org; Tue, 28 Nov 2017 06:32:13 -0500
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
-	[10.5.11.14])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 46C4F6A7C2
-	for <qemu-devel@nongnu.org>; Tue, 28 Nov 2017 11:32:12 +0000 (UTC)
-From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Tue, 28 Nov 2017 12:32:04 +0100
-Message-Id: <20171128113204.22912-1-pbonzini@redhat.com>
+	(envelope-from <thuth@redhat.com>) id 1eJe7x-0000G4-1u
+	for qemu-devel@nongnu.org; Tue, 28 Nov 2017 06:32:41 -0500
+References: <1511816136-30068-1-git-send-email-walling@linux.vnet.ibm.com>
+	<1511816136-30068-2-git-send-email-walling@linux.vnet.ibm.com>
+From: Thomas Huth <thuth@redhat.com>
+Message-ID: <ae2d93c2-0521-2044-d9b4-c60b785fabbd@redhat.com>
+Date: Tue, 28 Nov 2017 12:32:32 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+In-Reply-To: <1511816136-30068-2-git-send-email-walling@linux.vnet.ibm.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH] memfd: fix configure test
+Subject: Re: [Qemu-devel] [qemu-s390x] [PATCH v1 1/5] s390-ccw: update libc.h
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,53 +24,106 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: crobinso@redhat.com, =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
+To: "Collin L. Walling" <walling@linux.vnet.ibm.com>, borntraeger@de.ibm.com, frankja@linux.vnet.ibm.com, qemu-s390x@nongnu.org, qemu-devel@nongnu.org
 
-Recent glibc added memfd_create in sys/mman.h.  This conflicts with
-the definition in util/memfd.c:
+On 27.11.2017 21:55, Collin L. Walling wrote:
+> Moved:
+>   memcmp from bootmap.h to libc.h (renamed from _memcmp)
+>   strlen from sclp.c to libc.h (renamed from _strlen)
+>=20
+> Added C standard functions:
+>   isdigit
+>   atoi
+>=20
+> Added non-C standard function:
+>   itostr
+>=20
+> Signed-off-by: Collin L. Walling <walling@linux.vnet.ibm.com>
+> Acked-by: Christian Borntraeger <borntraeger@de.ibm.com>
+> Reviewed-by: frankja@linux.vnet.ibm.com
+> ---
+[...]
+> +/* atoi
+> + *
+> + * Given a string, convert it to an integer. Any
+> + * non-numerical value will end the conversion.
+> + *
+> + * @str - the string to be converted
+> + *
+> + * @return - an integer converted from the string str
+> + */
 
-    /builddir/build/BUILD/qemu-2.11.0-rc1/util/memfd.c:40:12: error: stat=
-ic declaration of memfd_create follows non-static declaration
+Looks like you want to use some kind of doc text markup here, but it
+does not look like any valid syntax that I know ... may I suggest to use
+gtk-doc as this is what most other QEMU developers are using (AFAIK)?
 
-Fix the configure test, and remove the sys/memfd.h inclusion since the
-file actually does not exist---it is a typo in the memfd_create(2) man
-page.
+> +static inline int atoi(const char *str)
+> +{
+> +    int i;
+> +    int val =3D 0;
+> +
+> +    for (i =3D 0; str[i]; i++) {
+> +        char c =3D str[i];
+> +        if (!isdigit(c)) {
+> +            break;
+> +        }
+> +        val *=3D 10;
+> +        val +=3D c - '0';
+> +    }
+> +
+> +    return val;
+> +}
+> +
+> +/* itostr
+> + *
+> + * Given an integer, convert it to a string. The string must be alloca=
+ted
+> + * beforehand. The resulting string will be null terminated and return=
+ed.
+> + *
+> + * @str - the integer to be converted
+> + * @num - a pointer to a string to store the conversion
+> + *
+> + * @return - the string of the converted integer
+> + */
 
-Cc: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
-Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
----
- configure    | 2 +-
- util/memfd.c | 4 +---
- 2 files changed, 2 insertions(+), 4 deletions(-)
+Smells like a good candidate for hard-to-debug buffer overruns later.
+Could you please add a "length" parameter to do some sanity checking of
+the destination buffer length, please?
 
-diff --git a/configure b/configure
-index e31d6a7fee..11eac205ec 100755
---- a/configure
-+++ b/configure
-@@ -3910,7 +3910,7 @@ fi
- # check if memfd is supported
- memfd=3Dno
- cat > $TMPC << EOF
--#include <sys/memfd.h>
-+#include <sys/mman.h>
-=20
- int main(void)
- {
-diff --git a/util/memfd.c b/util/memfd.c
-index 4571d1aba8..412e94a405 100644
---- a/util/memfd.c
-+++ b/util/memfd.c
-@@ -31,9 +31,7 @@
-=20
- #include "qemu/memfd.h"
-=20
--#ifdef CONFIG_MEMFD
--#include <sys/memfd.h>
--#elif defined CONFIG_LINUX
-+#if defined CONFIG_LINUX && !defined CONFIG_MEMFD
- #include <sys/syscall.h>
- #include <asm/unistd.h>
-=20
---=20
-2.14.3
+> +static inline char *itostr(int num, char *str)
+> +{
+> +    int i;
+> +    int len =3D 0;
+> +    long tens =3D 1;
+> +
+> +    /* Handle 0 */
+> +    if (num =3D=3D 0) {
+> +        str[0] =3D '0';
+> +        str[1] =3D '\0';
+> +        return str;
+> +    }
+> +
+> +    /* Count number of digits */
+> +    while (num / tens !=3D 0) {
+> +        tens *=3D 10;
+> +        len++;
+> +    }
+> +
+> +    /* Convert int -> string */
+> +    for (i =3D 0; i < len; i++) {
+> +        tens /=3D 10;
+> +        str[i] =3D num / tens % 10 + '0';
+> +    }
+> +
+> +    str[i] =3D '\0';
+> +
+> +    return str;
+> +}
+
+Having such a bigger, and likely performance-uncritical function as an
+inline function in a header sounds somewhat wrong. Could you maybe move
+this (and atoi()) into a proper .c file (libc.c?) instead, please?
+
+ Thanks,
+  Thomas
