@@ -1,34 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57297)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59302)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1eJUsM-0008Rk-1d
-	for qemu-devel@nongnu.org; Mon, 27 Nov 2017 20:39:55 -0500
+	(envelope-from <linzhecheng@huawei.com>) id 1eJV36-0002gd-A2
+	for qemu-devel@nongnu.org; Mon, 27 Nov 2017 20:51:01 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1eJUsH-0006ia-4D
-	for qemu-devel@nongnu.org; Mon, 27 Nov 2017 20:39:54 -0500
-Received: from indium.canonical.com ([91.189.90.7]:44662)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1eJUsG-0006hq-Tt
-	for qemu-devel@nongnu.org; Mon, 27 Nov 2017 20:39:49 -0500
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1eJUsE-0005Kd-WB
-	for <qemu-devel@nongnu.org>; Tue, 28 Nov 2017 01:39:47 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id DC5032E8010
-	for <qemu-devel@nongnu.org>; Tue, 28 Nov 2017 01:39:46 +0000 (UTC)
+	(envelope-from <linzhecheng@huawei.com>) id 1eJV33-0003ax-7I
+	for qemu-devel@nongnu.org; Mon, 27 Nov 2017 20:51:00 -0500
+Received: from szxga05-in.huawei.com ([45.249.212.191]:2049 helo=huawei.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <linzhecheng@huawei.com>)
+	id 1eJV32-0003Ym-Kh
+	for qemu-devel@nongnu.org; Mon, 27 Nov 2017 20:50:57 -0500
+From: linzhecheng <linzhecheng@huawei.com>
+Date: Tue, 28 Nov 2017 09:50:39 +0800
+Message-ID: <20171128015039.19060-1-linzhecheng@huawei.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Tue, 28 Nov 2017 01:28:09 -0000
-From: Timothy Pearson <kb9vqf@pearsoncomputing.net>
-Reply-To: Bug 1591611 <1591611@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <20160612061620.2663.17249.malonedeb@chaenomeles.canonical.com>
-Message-Id: <151183248958.10567.17562409165978766488.malone@wampee.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1591611] Re: chroot using qemu-x86_64-static
- fails on ppc64el
+Content-Type: text/plain
+Subject: [Qemu-devel] [PATCH v2] thread: move detach_thread from creating
+ thread to created thread
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -38,66 +26,175 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
+Cc: arei.gonglei@huawei.com, pbonzini@redhat.com, famz@redhat.com, aliguori@us.ibm.com, linzhecheng <linzhecheng@huawei.com>
 
-Nope, looks good here.  As a note to other commenters, this won't work
-unless you are using a kernel compiled with the 4k page size -- default
-for PPC64 is 64k.
+If we create a thread with QEMU_THREAD_DETACHED mode, QEMU may get a segfault in a low probability.
 
--- =
+The backtrace is:
+    arg=arg@entry=0x3f5cf70, mode=mode@entry=1) at util/qemu_thread_posix.c:512
+    at io/task.c:141
+    destroy=destroy@entry=0x0) at io/channel_socket.c:194
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1591611
+The root cause of this problem is a bug of glibc(version 2.17,the latest version have the same bug),
+let's see what happened in glibc's code.
+Here is the code slice of pthread_detach.c
 
-Title:
-  chroot using qemu-x86_64-static fails on ppc64el
+25 int
+26 pthread_detach (pthread_t th)
+27 {
+28  struct pthread *pd = (struct pthread *) th;
+29
+30  /* Make sure the descriptor is valid.  */
+31  if (INVALID_NOT_TERMINATED_TD_P (pd))
+32    /* Not a valid thread handle.  */
+34    return ESRCH;
+35
+36  int result = 0;
+37  /* Mark the thread as detached.  */
+38  if (atomic_compare_and_exchange_bool_acq (&pd->joinid, pd, NULL))
+39    {
+40      /* There are two possibilities here.  First, the thread might
+41	 already be detached.  In this case we return EINVAL.
+42	 Otherwise there might already be a waiter.  The standard does
+43	 not mention what happens in this case.  */
+44     if (IS_DETACHED (pd))
+45	 result = EINVAL;
+46    }
+47  else
+48    /* Check whether the thread terminated meanwhile.  In this case we
+49       will just free the TCB.  */
+50    if ((pd->cancelhandling & EXITING_BITMASK) != 0)
+51      /* Note that the code in __free_tcb makes sure each thread
+52	 control block is freed only once.  */
+53      __free_tcb (pd);
 
-Status in QEMU:
-  Fix Committed
+54  return result;
+55}
 
-Bug description:
-  When attempting to use qemu-x86_64-static from qemu 2.5.0 on a ppc64el
-  host to chroot into an amd64 environment, all commands fail with an
-  assertion error.  /usr/bin/qemu-x86_64-static from the host was copied
-  into the chroot /usr/bin, and the host has multiformat support in the
-  kernel.
+QEMU get a segfault at line 50, becasue pd is an invalid address.
+pd is still valid at line 38 when set pd->joinid = pd, at this moment,
+created thread is just exiting(only keeps runing for a short time),
+created thread is running in code of start_thread:
 
-  Sample output illustrating the problem, as well as bash builtins
-  working:
+404  /* If the thread is detached free the TCB.  */
+405  if (IS_DETACHED (pd))
+406    /* Free the TCB.  */
+407    __free_tcb (pd);
+created thread found that pd is detached, so it freed pd, in this case,
+pd became an invalid address.
 
-  # chroot /virtualbox/scratchdisks_local_001/amd64_chroot qemu-x86_64-stat=
-ic /bin/bash
-  # ls
-  bash: ../sysdeps/nptl/fork.c:136: __libc_fork: Assertion `({ __typeof (se=
-lf->tid) __value; if (sizeof (__value) =3D=3D 1) asm volatile ("movb %%fs:%=
-P2,%b0" : "=3Dq" (__value) : "0" (0), "i" (__builtin_offsetof (struct pthre=
-ad, tid))); else if (sizeof (__value) =3D=3D 4) asm volatile ("movl %%fs:%P=
-1,%0" : "=3Dr" (__value) : "i" (__builtin_offsetof (struct pthread, tid)));=
- else { if (sizeof (__value) !=3D 8) abort (); asm volatile ("movq %%fs:%P1=
-,%q0" : "=3Dr" (__value) : "i" (__builtin_offsetof (struct pthread, tid)));=
- } __value; }) !=3D ppid' failed.
-  setup_frame: not implemented
-  setup_frame: not implemented
-  qemu: uncaught target signal 11 (Segmentation fault) - core dumped
-  Segmentation fault
-  setup_frame: not implemented
-  setup_frame: not implemented
-  # echo TEST
-  TEST
-  # cat test
-  bash: ../sysdeps/nptl/fork.c:136: __libc_fork: Assertion `({ __typeof (se=
-lf->tid) __value; if (sizeof (__value) =3D=3D 1) asm volatile ("movb %%fs:%=
-P2,%b0" : "=3Dq" (__value) : "0" (0), "i" (__builtin_offsetof (struct pthre=
-ad, tid))); else if (sizeof (__value) =3D=3D 4) asm volatile ("movl %%fs:%P=
-1,%0" : "=3Dr" (__value) : "i" (__builtin_offsetof (struct pthread, tid)));=
- else { if (sizeof (__value) !=3D 8) abort (); asm volatile ("movq %%fs:%P1=
-,%q0" : "=3Dr" (__value) : "i" (__builtin_offsetof (struct pthread, tid)));=
- } __value; }) !=3D ppid' failed.
-  qemu: uncaught target signal 11 (Segmentation fault) - core dumped
-  Segmentation fault
+I rewrite qemu_thread_create to move detach_thread from creating thread to created
+to avoid this concurrency problem.
 
-  It is currently unknown if other host architectures (e.g. aarch64) are
-  also affected.
+Change-Id: I2293d5be1526241cf58785d701b922f2ffc6491b
+Signed-off-by: linzhecheng <linzhecheng@huawei.com>
+---
+ include/qemu/thread-posix.h |  8 ++++++++
+ include/qemu/thread.h       |  1 +
+ util/qemu-thread-posix.c    | 45 ++++++++++++++++++++++++++++++++++-----------
+ 3 files changed, 43 insertions(+), 11 deletions(-)
 
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1591611/+subscriptions
+diff --git a/include/qemu/thread-posix.h b/include/qemu/thread-posix.h
+index f3f47e426f..d855c15dab 100644
+--- a/include/qemu/thread-posix.h
++++ b/include/qemu/thread-posix.h
+@@ -44,4 +44,12 @@ struct QemuThread {
+     pthread_t thread;
+ };
+ 
++struct QemuThread_args {
++    void *(*start_routine)(void *);
++    void *arg;
++    char *name;
++    int mode;
++};
++
++
+ #endif
+diff --git a/include/qemu/thread.h b/include/qemu/thread.h
+index 9910f49b3a..db365242da 100644
+--- a/include/qemu/thread.h
++++ b/include/qemu/thread.h
+@@ -10,6 +10,7 @@ typedef struct QemuSemaphore QemuSemaphore;
+ typedef struct QemuEvent QemuEvent;
+ typedef struct QemuLockCnt QemuLockCnt;
+ typedef struct QemuThread QemuThread;
++typedef struct QemuThread_args QemuThread_args;
+ 
+ #ifdef _WIN32
+ #include "qemu/thread-win32.h"
+diff --git a/util/qemu-thread-posix.c b/util/qemu-thread-posix.c
+index 7306475899..07b5838862 100644
+--- a/util/qemu-thread-posix.c
++++ b/util/qemu-thread-posix.c
+@@ -489,6 +489,30 @@ static void qemu_thread_set_name(QemuThread *thread, const char *name)
+ #endif
+ }
+ 
++static void *qemu_thread_start(void *args)
++{
++    QemuThread_args *qemu_thread_args;
++    void *ret;
++    QemuThread qemu_thread;
++
++    qemu_thread_args = (QemuThread_args *)args;
++    qemu_thread_get_self(&qemu_thread);
++
++    if (qemu_thread_args->name) {
++        qemu_thread_set_name(&qemu_thread, qemu_thread_args->name);
++        g_free(qemu_thread_args->name);
++    }
++
++    if (qemu_thread_args->mode == QEMU_THREAD_DETACHED) {
++        pthread_detach(qemu_thread.thread);
++    }
++    ret = qemu_thread_args->start_routine(qemu_thread_args->arg);
++
++    g_free(qemu_thread_args);
++    return ret;
++}
++
++
+ void qemu_thread_create(QemuThread *thread, const char *name,
+                        void *(*start_routine)(void*),
+                        void *arg, int mode)
+@@ -496,6 +520,7 @@ void qemu_thread_create(QemuThread *thread, const char *name,
+     sigset_t set, oldset;
+     int err;
+     pthread_attr_t attr;
++    QemuThread_args *qemu_thread_args;
+ 
+     err = pthread_attr_init(&attr);
+     if (err) {
+@@ -505,20 +530,18 @@ void qemu_thread_create(QemuThread *thread, const char *name,
+     /* Leave signal handling to the iothread.  */
+     sigfillset(&set);
+     pthread_sigmask(SIG_SETMASK, &set, &oldset);
+-    err = pthread_create(&thread->thread, &attr, start_routine, arg);
++
++    qemu_thread_args = g_new0(QemuThread_args, 1);
++    qemu_thread_args->mode = mode;
++    qemu_thread_args->name = name_threads ? g_strdup_printf("%s", name) : NULL;
++    qemu_thread_args->start_routine = start_routine;
++    qemu_thread_args->arg = arg;
++
++    err = pthread_create(&thread->thread, &attr,
++                         qemu_thread_start, qemu_thread_args);
+     if (err)
+         error_exit(err, __func__);
+ 
+-    if (name_threads) {
+-        qemu_thread_set_name(thread, name);
+-    }
+-
+-    if (mode == QEMU_THREAD_DETACHED) {
+-        err = pthread_detach(thread->thread);
+-        if (err) {
+-            error_exit(err, __func__);
+-        }
+-    }
+     pthread_sigmask(SIG_SETMASK, &oldset, NULL);
+ 
+     pthread_attr_destroy(&attr);
+-- 
+2.12.2.windows.2
