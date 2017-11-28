@@ -1,17 +1,41 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33124)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33416)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eric.auger@redhat.com>) id 1eJi1i-0001q3-9D
-	for qemu-devel@nongnu.org; Tue, 28 Nov 2017 10:42:31 -0500
+	(envelope-from <walling@linux.vnet.ibm.com>) id 1eJi2I-00037X-Jx
+	for qemu-devel@nongnu.org; Tue, 28 Nov 2017 10:43:03 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eric.auger@redhat.com>) id 1eJi1a-00052U-Mj
-	for qemu-devel@nongnu.org; Tue, 28 Nov 2017 10:42:26 -0500
-From: Eric Auger <eric.auger@redhat.com>
-Date: Tue, 28 Nov 2017 16:41:32 +0100
-Message-Id: <1511883692-11511-5-git-send-email-eric.auger@redhat.com>
-In-Reply-To: <1511883692-11511-1-git-send-email-eric.auger@redhat.com>
-References: <1511883692-11511-1-git-send-email-eric.auger@redhat.com>
-Subject: [Qemu-devel] [PATCH v6 4/4] hw/intc/arm_gicv3_its: Implement full
- reset
+	(envelope-from <walling@linux.vnet.ibm.com>) id 1eJi2D-0005Ej-NU
+	for qemu-devel@nongnu.org; Tue, 28 Nov 2017 10:43:02 -0500
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:36954)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <walling@linux.vnet.ibm.com>)
+	id 1eJi2D-0005ED-Ed
+	for qemu-devel@nongnu.org; Tue, 28 Nov 2017 10:42:57 -0500
+Received: from pps.filterd (m0098410.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
+	vASFgg2P116322
+	for <qemu-devel@nongnu.org>; Tue, 28 Nov 2017 10:42:53 -0500
+Received: from e35.co.us.ibm.com (e35.co.us.ibm.com [32.97.110.153])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2eh8fg8g0g-1
+	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Tue, 28 Nov 2017 10:42:53 -0500
+Received: from localhost
+	by e35.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <walling@linux.vnet.ibm.com>;
+	Tue, 28 Nov 2017 08:42:33 -0700
+References: <1511816136-30068-1-git-send-email-walling@linux.vnet.ibm.com>
+	<1511816136-30068-3-git-send-email-walling@linux.vnet.ibm.com>
+	<20171128114814.55ccfbf3.cornelia.huck@mailbox.org>
+From: "Collin L. Walling" <walling@linux.vnet.ibm.com>
+Date: Tue, 28 Nov 2017 10:42:30 -0500
+MIME-Version: 1.0
+In-Reply-To: <20171128114814.55ccfbf3.cornelia.huck@mailbox.org>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
+Content-Language: en-US
+Message-Id: <2a2ee45b-c199-2763-a151-938bbed49ca3@linux.vnet.ibm.com>
+Subject: Re: [Qemu-devel] [qemu-s390x] [PATCH v1 2/5] s390-ccw: ipl structs
+ for eckd cdl/ldl
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -20,39 +44,34 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: eric.auger.pro@gmail.com, eric.auger@redhat.com, peter.maydell@linaro.org, qemu-arm@nongnu.org, qemu-devel@nongnu.org, wanghaibin.wang@huawei.com
-Cc: vijay.kilari@gmail.com, drjones@redhat.com, wei@redhat.com, quintela@redhat.com, dgilbert@redhat.com, christoffer.dall@linaro.org, wu.wubin@huawei.com
+To: Cornelia Huck <cohuck@redhat.com>
+Cc: borntraeger@de.ibm.com, qemu-s390x@nongnu.org, qemu-devel@nongnu.org, frankja@linux.vnet.ibm.com
 
-Voiding the ITS caches is not supposed to happen via
-individual register writes. So we introduced a dedicated
-ITS KVM device ioctl to perform a cold reset of the ITS:
-KVM_DEV_ARM_VGIC_GRP_CTRL/KVM_DEV_ARM_ITS_CTRL_RESET. Let's
-use this latter if the kernel supports it.
+On 11/28/2017 05:48 AM, Cornelia Huck wrote:
+> On Mon, 27 Nov 2017 15:55:33 -0500
+> "Collin L. Walling" <walling@linux.vnet.ibm.com> wrote:
+>
+>> ECKD DASDs have different IPL structures for CDL and LDL
+>> formats. The current Ipl1 and Ipl2 structs follow the CDL
+>> format, so we prepend "EckdCdl" to them. A new struct,
+>> EckdLdlIpl1 is introduced and contains boot info for LDL.
+> So does this add support for LDL DASD, or does it simply enhance the
+> code? It's unclear from the desription alone.
 
-Signed-off-by: Eric Auger <eric.auger@redhat.com>
----
- hw/intc/arm_gicv3_its_kvm.c | 9 ++++++++-
- 1 file changed, 8 insertions(+), 1 deletion(-)
+Enhances. I'll reword it. Perhaps something along the lines of "Boot info
+for LDL has been *moved* to a new struct, EckdLdlIpl1"
 
-diff --git a/hw/intc/arm_gicv3_its_kvm.c b/hw/intc/arm_gicv3_its_kvm.c
-index 1c663ac..bf290b8 100644
---- a/hw/intc/arm_gicv3_its_kvm.c
-+++ b/hw/intc/arm_gicv3_its_kvm.c
-@@ -204,7 +204,14 @@ static void kvm_arm_its_reset(DeviceState *dev)
- 
-     c->parent_reset(dev);
- 
--    error_report("ITS KVM: full reset is not supported by QEMU");
-+    if (kvm_device_check_attr(s->dev_fd, KVM_DEV_ARM_VGIC_GRP_CTRL,
-+                               KVM_DEV_ARM_ITS_CTRL_RESET)) {
-+        kvm_device_access(s->dev_fd, KVM_DEV_ARM_VGIC_GRP_CTRL,
-+                          KVM_DEV_ARM_ITS_CTRL_RESET, NULL, true, &error_abort);
-+        return;
-+    }
-+
-+    error_report("ITS KVM: full reset is not supported by the host kernel");
- 
-     if (!kvm_device_check_attr(s->dev_fd, KVM_DEV_ARM_VGIC_GRP_ITS_REGS,
-                                GITS_CTLR)) {
+>
+>> Also introduce structs for IPL stages 1 and 1b and for
+>> disk geometry.
+>>
+>> Signed-off-by: Collin L. Walling <walling@linux.vnet.ibm.com>
+>> Acked-by: Janosch Frank <frankja@linux.vnet.ibm.com>
+>> ---
+>>   pc-bios/s390-ccw/bootmap.c | 24 ++++++++++----------
+>>   pc-bios/s390-ccw/bootmap.h | 55 +++++++++++++++++++++++++++++++++-------------
+>>   2 files changed, 53 insertions(+), 26 deletions(-)
+
+
 -- 
-2.5.5
+- Collin L Walling
