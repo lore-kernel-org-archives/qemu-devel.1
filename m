@@ -1,25 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43775)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46885)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1eJW7L-0004gd-B2
-	for qemu-devel@nongnu.org; Mon, 27 Nov 2017 21:59:28 -0500
+	(envelope-from <linzhecheng@huawei.com>) id 1eJWOm-0000Au-Uv
+	for qemu-devel@nongnu.org; Mon, 27 Nov 2017 22:17:30 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1eJW7I-0002jI-Ap
-	for qemu-devel@nongnu.org; Mon, 27 Nov 2017 21:59:27 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:52912)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <famz@redhat.com>) id 1eJW7I-0002j8-4M
-	for qemu-devel@nongnu.org; Mon, 27 Nov 2017 21:59:24 -0500
-Date: Tue, 28 Nov 2017 10:59:20 +0800
-From: Fam Zheng <famz@redhat.com>
-Message-ID: <20171128025920.GB3242@lemon>
-References: <20171126211356.GA46174@humpty.home.comstyle.com>
-	<CAFEAcA_m0KMfsUYWpdg2LL2y5U88d4-LoXZuUXkGUxtGCgD66g@mail.gmail.com>
+	(envelope-from <linzhecheng@huawei.com>) id 1eJWOj-0000FQ-P5
+	for qemu-devel@nongnu.org; Mon, 27 Nov 2017 22:17:28 -0500
+Received: from szxga05-in.huawei.com ([45.249.212.191]:2737)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_ARCFOUR_SHA1:16) (Exim 4.71)
+	(envelope-from <linzhecheng@huawei.com>) id 1eJWOi-0000Ex-Vg
+	for qemu-devel@nongnu.org; Mon, 27 Nov 2017 22:17:25 -0500
+From: linzhecheng <linzhecheng@huawei.com>
+Date: Tue, 28 Nov 2017 11:16:54 +0800
+Message-ID: <20171128031654.15316-1-linzhecheng@huawei.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CAFEAcA_m0KMfsUYWpdg2LL2y5U88d4-LoXZuUXkGUxtGCgD66g@mail.gmail.com>
-Subject: Re: [Qemu-devel] [PATCH] configure: Fix curses probe for older
- ncurses
+Content-Type: text/plain
+Subject: [Qemu-devel] [PATCH v3] thread: move detach_thread from creating
+ thread to created thread
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,43 +24,192 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: Brad Smith <brad@comstyle.com>, QEMU Developers <qemu-devel@nongnu.org>
+To: qemu-devel@nongnu.org
+Cc: arei.gonglei@huawei.com, pbonzini@redhat.com, aliguori@us.ibm.com, famz@redhat.com, linzhecheng <linzhecheng@huawei.com>
 
-On Mon, 11/27 13:02, Peter Maydell wrote:
-> On 26 November 2017 at 22:13, Brad Smith <brad@comstyle.com> wrote:
-> > Fix the curses probe with older ncurses (.e.g. 5.7, as used by OpenBSD).
-> >
-> > ncurses 5.7 requires _XOPEN_SOURCE_EXTENDED to be defined for WACS_* constants.
-> 
-> ncurses 5.7 was released in 2008 and is now 9 years old. Why
-> is OpenBSD still using such an ancient version?
-> 
-> > Signed-off-by: Brad Smith <brad@comstyle.com>
-> >
-> >
-> > diff --git a/configure b/configure
-> > index 0c6e7572db..9715b9c2cc 100755
-> > --- a/configure
-> > +++ b/configure
-> > @@ -3186,7 +3186,7 @@ EOF
-> >    IFS=:
-> >    for curses_inc in $curses_inc_list; do
-> >      # Make sure we get the wide character prototypes
-> > -    curses_inc="-DNCURSES_WIDECHAR $curses_inc"
-> > +    curses_inc="-DNCURSES_WIDECHAR -D_XOPEN_SOURCE_EXTENDED $curses_inc"
-> 
-> I'm a bit wary of this because we've found in the past that
-> defining _XOPEN_* defines breaks compilation with some
-> C libraries which assume that if you define _XOPEN_whatever
-> it means "only that X/Open stuff and no OS-specific extras",
-> and we depend on the OS-specific extras.
-> 
-> That said, I did a test compile on OSX, which was the
-> one that had trouble previously, so this may be OK. I think
-> I'd rather leave it until after 2.11 releases, though.
+If we create a thread with QEMU_THREAD_DETACHED mode, QEMU may get a segfault in a low probability.
 
-One way to contain the effect of this change would be add it to per object
-CFLAGS and LIBS, instead of QEMU_CFLAGS and libs_softmmu.
+The backtrace is:
+#0  0x00007f46c60291d7 in __GI_raise (sig=sig@entry=6) at ../nptl/sysdeps/unix/sysv/linux/raise.c:56
+#1  0x00007f46c602a8c8 in __GI_abort () at abort.c:90
+#2  0x00000000008543c9 in PAT_abort ()
+#3  0x000000000085140d in patchIllInsHandler ()
+#4  <signal handler called>
+#5  pthread_detach (th=139933037614848) at pthread_detach.c:50
+#6  0x0000000000829759 in qemu_thread_create (thread=thread@entry=0x7ffdaa8205e0, name=name@entry=0x94d94a "io-task-worker", start_routine=start_routine@entry=0x7eb9a0 <qio_task_thread_worker>, 
+    arg=arg@entry=0x3f5cf70, mode=mode@entry=1) at util/qemu_thread_posix.c:512
+#7  0x00000000007ebc96 in qio_task_run_in_thread (task=0x31db2c0, worker=worker@entry=0x7e7e40 <qio_channel_socket_connect_worker>, opaque=0xcd23380, destroy=0x7f1180 <qapi_free_SocketAddress>)
+    at io/task.c:141
+#8  0x00000000007e7f33 in qio_channel_socket_connect_async (ioc=ioc@entry=0x626c0b0, addr=<optimized out>, callback=callback@entry=0x55e080 <qemu_chr_socket_connected>, opaque=opaque@entry=0x42862c0, 
+    destroy=destroy@entry=0x0) at io/channel_socket.c:194
+#9  0x000000000055bdd1 in socket_reconnect_timeout (opaque=0x42862c0) at qemu_char.c:4744
+#10 0x00007f46c72483b3 in g_timeout_dispatch () from /usr/lib64/libglib-2.0.so.0
+#11 0x00007f46c724799a in g_main_context_dispatch () from /usr/lib64/libglib-2.0.so.0
+#12 0x000000000076c646 in glib_pollfds_poll () at main_loop.c:228
+#13 0x000000000076c6eb in os_host_main_loop_wait (timeout=348000000) at main_loop.c:273
+#14 0x000000000076c815 in main_loop_wait (nonblocking=nonblocking@entry=0) at main_loop.c:521
+#15 0x000000000056a511 in main_loop () at vl.c:2076
+#16 0x0000000000420705 in main (argc=<optimized out>, argv=<optimized out>, envp=<optimized out>) at vl.c:4940
 
-Fam
+The root cause of this problem is a bug of glibc(version 2.17,the latest version has the same bug),
+let's see what happened in glibc's code.
+Here is the code slice of pthread_detach.c
+
+25 int
+26 pthread_detach (pthread_t th)
+27 {
+28  struct pthread *pd = (struct pthread *) th;
+29
+30  /* Make sure the descriptor is valid.  */
+31  if (INVALID_NOT_TERMINATED_TD_P (pd))
+32    /* Not a valid thread handle.  */
+34    return ESRCH;
+35
+36  int result = 0;
+37  /* Mark the thread as detached.  */
+38  if (atomic_compare_and_exchange_bool_acq (&pd->joinid, pd, NULL))
+39    {
+40      /* There are two possibilities here.  First, the thread might
+41	 already be detached.  In this case we return EINVAL.
+42	 Otherwise there might already be a waiter.  The standard does
+43	 not mention what happens in this case.  */
+44     if (IS_DETACHED (pd))
+45	 result = EINVAL;
+46    }
+47  else
+48    /* Check whether the thread terminated meanwhile.  In this case we
+49       will just free the TCB.  */
+50    if ((pd->cancelhandling & EXITING_BITMASK) != 0)
+51      /* Note that the code in __free_tcb makes sure each thread
+52	 control block is freed only once.  */
+53      __free_tcb (pd);
+54  return result;
+55}
+
+QEMU get a segfault at line 50, becasue pd is an invalid address.
+pd is still valid at line 38 when set pd->joinid = pd, at this moment,
+created thread is just exiting(only keeps runing for a short time),
+created thread is running in code of start_thread:
+
+404  /* If the thread is detached free the TCB.  */
+405  if (IS_DETACHED (pd))
+406    /* Free the TCB.  */
+407    __free_tcb (pd);
+created thread found that pd is detached, so it freed pd, in this case,
+pd became an invalid address.
+
+I rewrite qemu_thread_create to move detach_thread from creating thread to created
+to avoid this concurrency problem.
+
+Change-Id: I2293d5be1526241cf58785d701b922f2ffc6491b
+Signed-off-by: linzhecheng <linzhecheng@huawei.com>
+---
+ include/qemu/thread-posix.h |  8 ++++++++
+ include/qemu/thread.h       |  1 +
+ util/qemu-thread-posix.c    | 45 ++++++++++++++++++++++++++++++++++-----------
+ 3 files changed, 43 insertions(+), 11 deletions(-)
+
+diff --git a/include/qemu/thread-posix.h b/include/qemu/thread-posix.h
+index f3f47e426f..d855c15dab 100644
+--- a/include/qemu/thread-posix.h
++++ b/include/qemu/thread-posix.h
+@@ -44,4 +44,12 @@ struct QemuThread {
+     pthread_t thread;
+ };
+ 
++struct QemuThread_args {
++    void *(*start_routine)(void *);
++    void *arg;
++    char *name;
++    int mode;
++};
++
++
+ #endif
+diff --git a/include/qemu/thread.h b/include/qemu/thread.h
+index 9910f49b3a..db365242da 100644
+--- a/include/qemu/thread.h
++++ b/include/qemu/thread.h
+@@ -10,6 +10,7 @@ typedef struct QemuSemaphore QemuSemaphore;
+ typedef struct QemuEvent QemuEvent;
+ typedef struct QemuLockCnt QemuLockCnt;
+ typedef struct QemuThread QemuThread;
++typedef struct QemuThread_args QemuThread_args;
+ 
+ #ifdef _WIN32
+ #include "qemu/thread-win32.h"
+diff --git a/util/qemu-thread-posix.c b/util/qemu-thread-posix.c
+index 7306475899..07b5838862 100644
+--- a/util/qemu-thread-posix.c
++++ b/util/qemu-thread-posix.c
+@@ -489,6 +489,30 @@ static void qemu_thread_set_name(QemuThread *thread, const char *name)
+ #endif
+ }
+ 
++static void *qemu_thread_start(void *args)
++{
++    QemuThread_args *qemu_thread_args;
++    void *ret;
++    QemuThread qemu_thread;
++
++    qemu_thread_args = (QemuThread_args *)args;
++    qemu_thread_get_self(&qemu_thread);
++
++    if (qemu_thread_args->name) {
++        qemu_thread_set_name(&qemu_thread, qemu_thread_args->name);
++        g_free(qemu_thread_args->name);
++    }
++
++    if (qemu_thread_args->mode == QEMU_THREAD_DETACHED) {
++        pthread_detach(qemu_thread.thread);
++    }
++    ret = qemu_thread_args->start_routine(qemu_thread_args->arg);
++
++    g_free(qemu_thread_args);
++    return ret;
++}
++
++
+ void qemu_thread_create(QemuThread *thread, const char *name,
+                        void *(*start_routine)(void*),
+                        void *arg, int mode)
+@@ -496,6 +520,7 @@ void qemu_thread_create(QemuThread *thread, const char *name,
+     sigset_t set, oldset;
+     int err;
+     pthread_attr_t attr;
++    QemuThread_args *qemu_thread_args;
+ 
+     err = pthread_attr_init(&attr);
+     if (err) {
+@@ -505,20 +530,18 @@ void qemu_thread_create(QemuThread *thread, const char *name,
+     /* Leave signal handling to the iothread.  */
+     sigfillset(&set);
+     pthread_sigmask(SIG_SETMASK, &set, &oldset);
+-    err = pthread_create(&thread->thread, &attr, start_routine, arg);
++
++    qemu_thread_args = g_new0(QemuThread_args, 1);
++    qemu_thread_args->mode = mode;
++    qemu_thread_args->name = name_threads ? g_strdup_printf("%s", name) : NULL;
++    qemu_thread_args->start_routine = start_routine;
++    qemu_thread_args->arg = arg;
++
++    err = pthread_create(&thread->thread, &attr,
++                         qemu_thread_start, qemu_thread_args);
+     if (err)
+         error_exit(err, __func__);
+ 
+-    if (name_threads) {
+-        qemu_thread_set_name(thread, name);
+-    }
+-
+-    if (mode == QEMU_THREAD_DETACHED) {
+-        err = pthread_detach(thread->thread);
+-        if (err) {
+-            error_exit(err, __func__);
+-        }
+-    }
+     pthread_sigmask(SIG_SETMASK, &oldset, NULL);
+ 
+     pthread_attr_destroy(&attr);
+-- 
+2.12.2.windows.2
