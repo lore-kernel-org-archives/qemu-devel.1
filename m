@@ -1,28 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34214)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37480)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <frederic.konrad@adacore.com>) id 1eJp8p-00085H-Un
-	for qemu-devel@nongnu.org; Tue, 28 Nov 2017 18:18:16 -0500
+	(envelope-from <alistair23@gmail.com>) id 1eJpHB-0003Xx-Tq
+	for qemu-devel@nongnu.org; Tue, 28 Nov 2017 18:26:54 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <frederic.konrad@adacore.com>) id 1eJp8m-0001f6-2Q
-	for qemu-devel@nongnu.org; Tue, 28 Nov 2017 18:18:15 -0500
-Received: from mel.act-europe.fr ([194.98.77.210]:48984
-	helo=smtp.eu.adacore.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <frederic.konrad@adacore.com>)
-	id 1eJp8l-0001ei-Rl
-	for qemu-devel@nongnu.org; Tue, 28 Nov 2017 18:18:11 -0500
-References: <cover.1511908159.git.alistair.francis@xilinx.com>
-	<ee595cb7408c5fce0f2ad6d33b721c7ae1fed283.1511908159.git.alistair.francis@xilinx.com>
-From: KONRAD Frederic <frederic.konrad@adacore.com>
-Message-ID: <86f6cfaf-9686-d0ed-db2a-135c697e76ed@adacore.com>
-Date: Wed, 29 Nov 2017 00:18:09 +0100
+	(envelope-from <alistair23@gmail.com>) id 1eJpHA-0005ss-VF
+	for qemu-devel@nongnu.org; Tue, 28 Nov 2017 18:26:53 -0500
+Received: from mail-wr0-x243.google.com ([2a00:1450:400c:c0c::243]:41068)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <alistair23@gmail.com>)
+	id 1eJpHA-0005sN-Oq
+	for qemu-devel@nongnu.org; Tue, 28 Nov 2017 18:26:52 -0500
+Received: by mail-wr0-x243.google.com with SMTP id z18so1702118wrb.8
+	for <qemu-devel@nongnu.org>; Tue, 28 Nov 2017 15:26:52 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <ee595cb7408c5fce0f2ad6d33b721c7ae1fed283.1511908159.git.alistair.francis@xilinx.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH-2.12 v1 3/3] xilinx_spips: Use memset
- instead of a for loop to zero registers
+Sender: alistair23@gmail.com
+In-Reply-To: <CAKmqyKMettqnEmxr2w5Z6o0Dn3gU5Pun8CbQm4VPj_0qXeO33w@mail.gmail.com>
+References: <cover.1508279421.git.alistair.francis@xilinx.com>
+	<CAKmqyKM4CsbVvfT5roqQOi+oVLCV=kN7mFxKeTSkiD_tBNA5Ng@mail.gmail.com>
+	<CAKmqyKMettqnEmxr2w5Z6o0Dn3gU5Pun8CbQm4VPj_0qXeO33w@mail.gmail.com>
+From: Alistair Francis <alistair.francis@xilinx.com>
+Date: Tue, 28 Nov 2017 15:26:20 -0800
+Message-ID: <CAKmqyKNVxfGFLiR6iuMdSkY-bN1eJyTaN1Mw3FO9+h9ObMa_tw@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH v3 0/5] Add a valid_cpu_types property
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,52 +31,92 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alistair Francis <alistair.francis@xilinx.com>
-Cc: qemu-devel@nongnu.org, edgar.iglesias@xilinx.com, edgar.iglesias@gmail.com, alistair23@gmail.com
+To: Alistair Francis <alistair.francis@xilinx.com>, Peter Maydell <peter.maydell@linaro.org>
+Cc: "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>, Eduardo Habkost <ehabkost@redhat.com>, Marcel Apfelbaum <marcel@redhat.com>, Igor Mammedov <imammedo@redhat.com>, =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>
 
+On Tue, Nov 7, 2017 at 3:30 PM, Alistair Francis
+<alistair.francis@xilinx.com> wrote:
+> On Mon, Oct 23, 2017 at 12:26 AM, Alistair Francis <alistair23@gmail.com> wrote:
+>> On Wed, Oct 18, 2017 at 12:31 AM, Alistair Francis
+>> <alistair.francis@xilinx.com> wrote:
+>>> There are numorous QEMU machines that only have a single or a handful of
+>>> valid CPU options. To simplyfy the management of specificying which CPU
+>>> is/isn't valid let's create a property that can be set in the machine
+>>> init. We can then check to see if the user supplied CPU is in that list
+>>> or not.
+>>>
+>>> I have added the valid_cpu_types for some ARM machines only at the
+>>> moment.
+>>>
+>>> Here is what specifying the CPUs looks like now:
+>>>
+>>> $ aarch64-softmmu/qemu-system-aarch64 -M netduino2 -kernel ./u-boot.elf -nographic -cpu "cortex-m3" -S
+>>> QEMU 2.10.50 monitor - type 'help' for more information
+>>> (qemu) info cpus
+>>> * CPU #0: thread_id=24175
+>>> (qemu) q
+>>>
+>>> $ aarch64-softmmu/qemu-system-aarch64 -M netduino2 -kernel ./u-boot.elf -nographic -cpu "cortex-m4" -S
+>>> QEMU 2.10.50 monitor - type 'help' for more information
+>>> (qemu) q
+>>>
+>>> $ aarch64-softmmu/qemu-system-aarch64 -M netduino2 -kernel ./u-boot.elf -nographic -cpu "cortex-m5" -S
+>>> qemu-system-aarch64: unable to find CPU model 'cortex-m5'
+>>>
+>>> $ aarch64-softmmu/qemu-system-aarch64 -M netduino2 -kernel ./u-boot.elf -nographic -cpu "cortex-a9" -S
+>>> qemu-system-aarch64: Invalid CPU type: cortex-a9-arm-cpu
+>>> The valid types are: cortex-m3-arm-cpu, cortex-m4-arm-cpu
+>>
+>> It looks like all the patches have been reviewed now. Can this go
+>> through your tree Peter?
+>
+> Ping!
 
+Ping^2
 
-On 11/28/2017 11:31 PM, Alistair Francis wrote:
-> Use memset() instead of a for loop to zero all of the registers.
-> 
-> Signed-off-by: Alistair Francis <alistair.francis@xilinx.com>
-> ---
-> 
->   hw/ssi/xilinx_spips.c | 11 +++--------
->   1 file changed, 3 insertions(+), 8 deletions(-)
-> 
-> diff --git a/hw/ssi/xilinx_spips.c b/hw/ssi/xilinx_spips.c
-> index 1a37f9c7f5..82436e2f69 100644
-> --- a/hw/ssi/xilinx_spips.c
-> +++ b/hw/ssi/xilinx_spips.c
-> @@ -330,10 +330,7 @@ static void xilinx_spips_reset(DeviceState *d)
->   {
->       XilinxSPIPS *s = XILINX_SPIPS(d);
->   
-> -    int i;
-> -    for (i = 0; i < XLNX_SPIPS_R_MAX; i++) {
-> -        s->regs[i] = 0;
-> -    }
-> +    memset(s->regs, 0, sizeof(s->regs));
->   
->       fifo8_reset(&s->rx_fifo);
->       fifo8_reset(&s->rx_fifo);
-> @@ -358,13 +355,11 @@ static void xilinx_spips_reset(DeviceState *d)
->   static void xlnx_zynqmp_qspips_reset(DeviceState *d)
->   {
->       XlnxZynqMPQSPIPS *s = XLNX_ZYNQMP_QSPIPS(d);
-> -    int i;
->   
->       xilinx_spips_reset(d);
->   
-> -    for (i = 0; i < XLNX_ZYNQMP_SPIPS_R_MAX; i++) {
-> -        s->regs[i] = 0;
-> -    }
-> +    memset(s->regs, 0, sizeof(s->regs));
-> +
->       fifo8_reset(&s->rx_fifo_g);
->       fifo8_reset(&s->rx_fifo_g);
->       fifo32_reset(&s->fifo_g);
-> 
+Can this go through target-arm.next for 2.12?
 
-Reviewed-by: KONRAD Frederic <frederic.konrad@adacore.com>
+Alistair
+
+>
+> I'm happy to send a pull request if that helps. I have a slick signed key now :)
+>
+> Alistair
+>
+>>
+>> Thanks,
+>> Alistair
+>>
+>>>
+>>> V3:
+>>>  - Make the varialbes static
+>>> V2:
+>>>  - Rebase
+>>>  - Reorder patches
+>>>  - Add a Raspberry Pi 2 CPU fix
+>>> V1:
+>>>  - Small fixes to prepare a series instead of RFC
+>>>  - Add commit messages for the commits
+>>>  - Expand the machine support to ARM machines
+>>> RFC v2:
+>>>  - Rebase on Igor's work
+>>>  - Use more QEMUisms inside the code
+>>>  - List the supported machines in a NULL terminated array
+>>>
+>>> Alistair Francis (5):
+>>>   netduino2: Specify the valid CPUs
+>>>   bcm2836: Use the Cortex-A7 instead of Cortex-A15
+>>>   raspi: Specify the valid CPUs
+>>>   xlnx-zcu102: Specify the valid CPUs
+>>>   xilinx_zynq: Specify the valid CPUs
+>>>
+>>>  hw/arm/bcm2836.c     |  2 +-
+>>>  hw/arm/netduino2.c   | 10 +++++++++-
+>>>  hw/arm/raspi.c       |  7 +++++++
+>>>  hw/arm/xilinx_zynq.c |  6 ++++++
+>>>  hw/arm/xlnx-zcu102.c | 17 +++++++++++++++++
+>>>  5 files changed, 40 insertions(+), 2 deletions(-)
+>>>
+>>> --
+>>> 2.11.0
+>>>
