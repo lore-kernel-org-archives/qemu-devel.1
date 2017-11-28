@@ -1,25 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38114)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38319)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <lprosek@redhat.com>) id 1eJb6C-0003aG-NP
-	for qemu-devel@nongnu.org; Tue, 28 Nov 2017 03:18:37 -0500
+	(envelope-from <vsementsov@virtuozzo.com>) id 1eJb7B-00042x-Qw
+	for qemu-devel@nongnu.org; Tue, 28 Nov 2017 03:19:41 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <lprosek@redhat.com>) id 1eJb68-00022r-Js
-	for qemu-devel@nongnu.org; Tue, 28 Nov 2017 03:18:36 -0500
-Received: from mail-ua0-f193.google.com ([209.85.217.193]:45495)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <lprosek@redhat.com>) id 1eJb68-00022d-Fi
-	for qemu-devel@nongnu.org; Tue, 28 Nov 2017 03:18:32 -0500
-Received: by mail-ua0-f193.google.com with SMTP id r11so20920387uah.12
-	for <qemu-devel@nongnu.org>; Tue, 28 Nov 2017 00:18:31 -0800 (PST)
+	(envelope-from <vsementsov@virtuozzo.com>) id 1eJb7A-0002J5-D6
+	for qemu-devel@nongnu.org; Tue, 28 Nov 2017 03:19:37 -0500
+References: <20171012185916.22776-1-eblake@redhat.com>
+	<20171012185916.22776-3-eblake@redhat.com>
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Message-ID: <8ada11cb-5455-20ab-4a23-03f05f5c83c1@virtuozzo.com>
+Date: Tue, 28 Nov 2017 11:19:16 +0300
 MIME-Version: 1.0
-In-Reply-To: <151127326409.6888.9209413226035587910.stgit@Misha-PC.lan02.inno>
-References: <151127322955.6888.16198535123422076171.stgit@Misha-PC.lan02.inno>
-	<151127326409.6888.9209413226035587910.stgit@Misha-PC.lan02.inno>
-From: Ladi Prosek <lprosek@redhat.com>
-Date: Tue, 28 Nov 2017 09:18:30 +0100
-Message-ID: <CABdb7372q-LntFhkDuurfWi2JakzZCM9xVxkEA=cqYMbKv_jGw@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH v3 05/45] windbg: added helper features
+In-Reply-To: <20171012185916.22776-3-eblake@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
+Content-Language: en-US
+Subject: Re: [Qemu-devel] [PATCH v4 02/20] block: Switch passthrough drivers
+ to .bdrv_co_block_status()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,116 +25,224 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Mihail Abakumov <mikhail.abakumov@ispras.ru>
-Cc: qemu-devel <qemu-devel@nongnu.org>, sw@weilnetz.de, Pavel Dovgalyuk <dovgaluk@ispras.ru>, Roman Kagan <rkagan@virtuozzo.com>, Paolo Bonzini <pbonzini@redhat.com>, "Denis V. Lunev" <den@openvz.org>
+To: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org
+Cc: kwolf@redhat.com, famz@redhat.com, qemu-block@nongnu.org, Jeff Cody <jcody@redhat.com>, Max Reitz <mreitz@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, jsnow@redhat.com
 
-On Tue, Nov 21, 2017 at 3:07 PM, Mihail Abakumov
-<mikhail.abakumov@ispras.ru> wrote:
-> Added some helper features for windbgstub.
+12.10.2017 21:58, Eric Blake wrote:
+> We are gradually moving away from sector-based interfaces, towards
+> byte-based.  Update the generic helpers, and all passthrough clients
+> (blkdebug, commit, mirror, throttle) accordingly.
 >
-> Signed-off-by: Mihail Abakumov <mikhail.abakumov@ispras.ru>
-> Signed-off-by: Pavel Dovgalyuk <dovgaluk@ispras.ru>
-> Signed-off-by: Dmitriy Koltunov <koltunov@ispras.ru>
+> Signed-off-by: Eric Blake <eblake@redhat.com>
+>
 > ---
->  include/exec/windbgstub-utils.h |   27 +++++++++++++++++++++++++++
->  include/exec/windbgstub.h       |    6 ++++++
->  2 files changed, 33 insertions(+)
+> v4: rebase to interface tweak
+> v3: rebase to addition of throttle driver
+> v2: rebase to master, retitle while merging blkdebug, commit, and mirror
+> ---
+>   include/block/block_int.h | 28 ++++++++++++++++------------
+>   block/io.c                | 36 ++++++++++++++++++++----------------
+>   block/blkdebug.c          | 20 +++++++++++---------
+>   block/commit.c            |  2 +-
+>   block/mirror.c            |  2 +-
+>   block/throttle.c          |  2 +-
+>   6 files changed, 50 insertions(+), 40 deletions(-)
 >
-> diff --git a/include/exec/windbgstub-utils.h b/include/exec/windbgstub-utils.h
-> index 2390597f1f..e9f5223e94 100755
-> --- a/include/exec/windbgstub-utils.h
-> +++ b/include/exec/windbgstub-utils.h
-> @@ -13,7 +13,34 @@
->  #define WINDBGSTUB_UTILS_H
+> diff --git a/include/block/block_int.h b/include/block/block_int.h
+> index 4153cd646d..7c8503f693 100644
+> --- a/include/block/block_int.h
+> +++ b/include/block/block_int.h
+> @@ -1018,23 +1018,27 @@ void bdrv_format_default_perms(BlockDriverState *bs, BdrvChild *c,
+>                                  uint64_t *nperm, uint64_t *nshared);
 >
->  #include "qemu/osdep.h"
-> +#include "qemu/error-report.h"
-> +#include "log.h"
-> +#include "cpu.h"
->  #include "exec/windbgstub.h"
->  #include "exec/windbgkd.h"
+>   /*
+> - * Default implementation for drivers to pass bdrv_co_get_block_status() to
+> + * Default implementation for drivers to pass bdrv_co_block_status() to
+>    * their file.
+>    */
+> -int64_t coroutine_fn bdrv_co_get_block_status_from_file(BlockDriverState *bs,
+> -                                                        int64_t sector_num,
+> -                                                        int nb_sectors,
+> -                                                        int *pnum,
+> -                                                        BlockDriverState **file);
+> +int coroutine_fn bdrv_co_block_status_from_file(BlockDriverState *bs,
+> +                                                bool want_zero,
+> +                                                int64_t offset,
+> +                                                int64_t bytes,
+> +                                                int64_t *pnum,
+> +                                                int64_t *map,
+> +                                                BlockDriverState **file);
+>   /*
+> - * Default implementation for drivers to pass bdrv_co_get_block_status() to
+> + * Default implementation for drivers to pass bdrv_co_block_status() to
+>    * their backing file.
+>    */
+> -int64_t coroutine_fn bdrv_co_get_block_status_from_backing(BlockDriverState *bs,
+> -                                                           int64_t sector_num,
+> -                                                           int nb_sectors,
+> -                                                           int *pnum,
+> -                                                           BlockDriverState **file);
+> +int coroutine_fn bdrv_co_block_status_from_backing(BlockDriverState *bs,
+> +                                                   bool want_zero,
+> +                                                   int64_t offset,
+> +                                                   int64_t bytes,
+> +                                                   int64_t *pnum,
+> +                                                   int64_t *map,
+> +                                                   BlockDriverState **file);
+>   const char *bdrv_get_parent_name(const BlockDriverState *bs);
+>   void blk_dev_change_media_cb(BlockBackend *blk, bool load, Error **errp);
+>   bool blk_dev_has_removable_media(BlockBackend *blk);
+> diff --git a/block/io.c b/block/io.c
+> index ef9ea44667..6a2a2e1484 100644
+> --- a/block/io.c
+> +++ b/block/io.c
+> @@ -1754,30 +1754,34 @@ typedef struct BdrvCoBlockStatusData {
+>       bool done;
+>   } BdrvCoBlockStatusData;
 >
-> +#define WINDBG_DEBUG(...) do {             \
-> +    if (WINDBG_DEBUG_ON) {                 \
-> +        qemu_log(WINDBG ": " __VA_ARGS__); \
-> +        qemu_log("\n");                    \
-> +    }                                      \
-> +} while (false)
-> +
-> +#define WINDBG_ERROR(...) error_report(WINDBG ": " __VA_ARGS__)
-> +
-> +#define FMT_ADDR "addr:0x" TARGET_FMT_lx
-> +#define FMT_ERR  "Error:%d"
-> +
-> +#define UINT8_P(ptr) ((uint8_t *) (ptr))
-> +#define UINT32_P(ptr) ((uint32_t *) (ptr))
-
-This doesn't cross-compile on Linux:
-
-In file included from
-/home/lprosek/qemu/target/i386/windbgstub.c:15:0:
-/home/lprosek/qemu/target/i386/windbgstub.c: In function
-'kd_api_read_msr':
-/home/lprosek/qemu/include/exec/windbgstub-utils.h:35:24: error: cast
-to pointer from integer of different size
-[-Werror=int-to-pointer-cast]
- #define UINT32_P(ptr) ((uint32_t *) (ptr))
-                        ^
-/home/lprosek/qemu/target/i386/windbgstub.c:1210:27: note: in
-expansion of macro 'UINT32_P'
-     m64c->DataValueLow  = UINT32_P(val)[0];
-                           ^~~~~~~~
-/home/lprosek/qemu/include/exec/windbgstub-utils.h:35:24: error: cast
-to pointer from integer of different size
-[-Werror=int-to-pointer-cast]
- #define UINT32_P(ptr) ((uint32_t *) (ptr))
-                        ^
-/home/lprosek/qemu/target/i386/windbgstub.c:1211:27: note: in
-expansion of macro 'UINT32_P'
-     m64c->DataValueHigh = UINT32_P(val)[1];
-                           ^~~~~~~~
-
-
-The macro or the places where it's used need to make sure that the
-argument is of the right size. I hacked around it by doing:
-
---- a/include/exec/windbgstub-utils.h
-+++ b/include/exec/windbgstub-utils.h
-@@ -32,7 +32,7 @@
- #define FMT_ERR  "Error:%d"
-
- #define UINT8_P(ptr) ((uint8_t *) (ptr))
--#define UINT32_P(ptr) ((uint32_t *) (ptr))
-+#define UINT32_P(ptr) ((uint32_t *) (size_t) (ptr))
- #define PTR(var) UINT8_P(&var)
-
-
-> +#define PTR(var) UINT8_P(&var)
-> +
-> +#define sizeof_field(type, field) sizeof(((type *) NULL)->field)
-> +
-> +#define READ_VMEM(cpu, addr, type) ({                         \
-> +    type _t;                                                  \
-> +    cpu_memory_rw_debug(cpu, addr, PTR(_t), sizeof(type), 0); \
-> +    _t;                                                       \
-> +})
-> +
->  #endif
-> diff --git a/include/exec/windbgstub.h b/include/exec/windbgstub.h
-> index 1a6e1cc6e5..21bc552e58 100755
-> --- a/include/exec/windbgstub.h
-> +++ b/include/exec/windbgstub.h
-> @@ -12,6 +12,12 @@
->  #ifndef WINDBGSTUB_H
->  #define WINDBGSTUB_H
+> -int64_t coroutine_fn bdrv_co_get_block_status_from_file(BlockDriverState *bs,
+> -                                                        int64_t sector_num,
+> -                                                        int nb_sectors,
+> -                                                        int *pnum,
+> -                                                        BlockDriverState **file)
+> +int coroutine_fn bdrv_co_block_status_from_file(BlockDriverState *bs,
+> +                                                bool want_zero,
+> +                                                int64_t offset,
+> +                                                int64_t bytes,
+> +                                                int64_t *pnum,
+> +                                                int64_t *map,
+> +                                                BlockDriverState **file)
+>   {
+>       assert(bs->file && bs->file->bs);
+> -    *pnum = nb_sectors;
+> +    *pnum = bytes;
+> +    *map = offset;
+>       *file = bs->file->bs;
+> -    return BDRV_BLOCK_RAW | BDRV_BLOCK_OFFSET_VALID |
+> -           (sector_num << BDRV_SECTOR_BITS);
+> +    return BDRV_BLOCK_RAW | BDRV_BLOCK_OFFSET_VALID;
+>   }
 >
-> +#define WINDBG "windbg"
-> +
-> +#ifndef WINDBG_DEBUG_ON
-> +#define WINDBG_DEBUG_ON false
-> +#endif
-> +
->  int windbg_server_start(const char *device);
+> -int64_t coroutine_fn bdrv_co_get_block_status_from_backing(BlockDriverState *bs,
+> -                                                           int64_t sector_num,
+> -                                                           int nb_sectors,
+> -                                                           int *pnum,
+> -                                                           BlockDriverState **file)
+> +int coroutine_fn bdrv_co_block_status_from_backing(BlockDriverState *bs,
+> +                                                   bool want_zero,
+> +                                                   int64_t offset,
+> +                                                   int64_t bytes,
+> +                                                   int64_t *pnum,
+> +                                                   int64_t *map,
+> +                                                   BlockDriverState **file)
+>   {
+>       assert(bs->backing && bs->backing->bs);
+> -    *pnum = nb_sectors;
+> +    *pnum = bytes;
+> +    *map = offset;
+>       *file = bs->backing->bs;
+> -    return BDRV_BLOCK_RAW | BDRV_BLOCK_OFFSET_VALID |
+> -           (sector_num << BDRV_SECTOR_BITS);
+> +    return BDRV_BLOCK_RAW | BDRV_BLOCK_OFFSET_VALID;
+>   }
+
+hmm. not related question, but can you please explain, why we use such stubs
+instead of really call bdrv_co_block_status on bs->file->bs or 
+bs->backing->bs ?
+
 >
->  #endif
+>   /*
+> diff --git a/block/blkdebug.c b/block/blkdebug.c
+> index e21669979d..82c30357f8 100644
+> --- a/block/blkdebug.c
+> +++ b/block/blkdebug.c
+> @@ -627,15 +627,17 @@ static int coroutine_fn blkdebug_co_pdiscard(BlockDriverState *bs,
+>       return bdrv_co_pdiscard(bs->file->bs, offset, bytes);
+>   }
 >
+> -static int64_t coroutine_fn blkdebug_co_get_block_status(
+> -    BlockDriverState *bs, int64_t sector_num, int nb_sectors, int *pnum,
+> -    BlockDriverState **file)
+> +static int coroutine_fn blkdebug_co_block_status(BlockDriverState *bs,
+> +                                                 bool want_zero,
+> +                                                 int64_t offset,
+> +                                                 int64_t bytes,
+> +                                                 int64_t *pnum,
+> +                                                 int64_t *map,
+> +                                                 BlockDriverState **file)
+>   {
+> -    assert(QEMU_IS_ALIGNED(sector_num | nb_sectors,
+> -                           DIV_ROUND_UP(bs->bl.request_alignment,
+> -                                        BDRV_SECTOR_SIZE)));
+> -    return bdrv_co_get_block_status_from_file(bs, sector_num, nb_sectors,
+> -                                              pnum, file);
+> +    assert(QEMU_IS_ALIGNED(offset | bytes, bs->bl.request_alignment));
+
+looks like this is obviously guaranteed by block layer, so no needs for 
+special
+function. and we can use
+
+.bdrv_co_block_status       = bdrv_co_block_status_from_backing
+
+like for other drivers.
+
+> +    return bdrv_co_block_status_from_file(bs, want_zero, offset, bytes,
+> +                                          pnum, map, file);
+>   }
+>
+>   static void blkdebug_close(BlockDriverState *bs)
+> @@ -907,7 +909,7 @@ static BlockDriver bdrv_blkdebug = {
+>       .bdrv_co_flush_to_disk  = blkdebug_co_flush,
+>       .bdrv_co_pwrite_zeroes  = blkdebug_co_pwrite_zeroes,
+>       .bdrv_co_pdiscard       = blkdebug_co_pdiscard,
+> -    .bdrv_co_get_block_status = blkdebug_co_get_block_status,
+> +    .bdrv_co_block_status   = blkdebug_co_block_status,
+>
+>       .bdrv_debug_event           = blkdebug_debug_event,
+>       .bdrv_debug_breakpoint      = blkdebug_debug_breakpoint,
+> diff --git a/block/commit.c b/block/commit.c
+> index 5036eec434..ec0511bac7 100644
+> --- a/block/commit.c
+> +++ b/block/commit.c
+> @@ -265,7 +265,7 @@ static void bdrv_commit_top_child_perm(BlockDriverState *bs, BdrvChild *c,
+>   static BlockDriver bdrv_commit_top = {
+>       .format_name                = "commit_top",
+>       .bdrv_co_preadv             = bdrv_commit_top_preadv,
+> -    .bdrv_co_get_block_status   = bdrv_co_get_block_status_from_backing,
+> +    .bdrv_co_block_status       = bdrv_co_block_status_from_backing,
+>       .bdrv_refresh_filename      = bdrv_commit_top_refresh_filename,
+>       .bdrv_close                 = bdrv_commit_top_close,
+>       .bdrv_child_perm            = bdrv_commit_top_child_perm,
+> diff --git a/block/mirror.c b/block/mirror.c
+> index 307b6391a8..79739d063e 100644
+> --- a/block/mirror.c
+> +++ b/block/mirror.c
+> @@ -1094,7 +1094,7 @@ static BlockDriver bdrv_mirror_top = {
+>       .bdrv_co_pwrite_zeroes      = bdrv_mirror_top_pwrite_zeroes,
+>       .bdrv_co_pdiscard           = bdrv_mirror_top_pdiscard,
+>       .bdrv_co_flush              = bdrv_mirror_top_flush,
+> -    .bdrv_co_get_block_status   = bdrv_co_get_block_status_from_backing,
+> +    .bdrv_co_block_status       = bdrv_co_block_status_from_backing,
+>       .bdrv_refresh_filename      = bdrv_mirror_top_refresh_filename,
+>       .bdrv_close                 = bdrv_mirror_top_close,
+>       .bdrv_child_perm            = bdrv_mirror_top_child_perm,
+> diff --git a/block/throttle.c b/block/throttle.c
+> index 5bca76300f..76cd963a8c 100644
+> --- a/block/throttle.c
+> +++ b/block/throttle.c
+> @@ -224,7 +224,7 @@ static BlockDriver bdrv_throttle = {
+>       .bdrv_reopen_prepare                =   throttle_reopen_prepare,
+>       .bdrv_reopen_commit                 =   throttle_reopen_commit,
+>       .bdrv_reopen_abort                  =   throttle_reopen_abort,
+> -    .bdrv_co_get_block_status           =   bdrv_co_get_block_status_from_file,
+> +    .bdrv_co_block_status               =   bdrv_co_block_status_from_file,
+>
+>       .is_filter                          =   true,
+>   };
+
+conversion looks ok,
+Reviewed-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+
+-- 
+Best regards,
+Vladimir
