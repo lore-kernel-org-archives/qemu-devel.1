@@ -1,27 +1,15 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46504)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48041)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1eJh9t-0000vv-MI
-	for qemu-devel@nongnu.org; Tue, 28 Nov 2017 09:46:50 -0500
+	(envelope-from <berto@igalia.com>) id 1eJhHO-0002nA-Ii
+	for qemu-devel@nongnu.org; Tue, 28 Nov 2017 09:54:37 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1eJh9q-0000CH-JQ
-	for qemu-devel@nongnu.org; Tue, 28 Nov 2017 09:46:49 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:47876)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1eJh9q-0000Ba-DY
-	for qemu-devel@nongnu.org; Tue, 28 Nov 2017 09:46:46 -0500
-Date: Tue, 28 Nov 2017 16:46:38 +0200
-From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <20171128164510-mutt-send-email-mst@kernel.org>
-References: <20171127130518.26703-1-rkagan@virtuozzo.com>
-	<20171127130518.26703-3-rkagan@virtuozzo.com>
-	<A9252286-892F-40F4-9BE5-A9F92CC75DF9@skyportsystems.com>
-	<20171128080213.GA12787@rkaganb.sw.ru>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-In-Reply-To: <20171128080213.GA12787@rkaganb.sw.ru>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v2 2/2] vmgenid: use UUID property type
+	(envelope-from <berto@igalia.com>) id 1eJhHI-0002Z9-VX
+	for qemu-devel@nongnu.org; Tue, 28 Nov 2017 09:54:34 -0500
+From: Alberto Garcia <berto@igalia.com>
+Date: Tue, 28 Nov 2017 16:53:27 +0200
+Message-Id: <20171128145327.17248-1-berto@igalia.com>
+Subject: [Qemu-devel] [PATCH for-2.11] blockjob: Remove the job from the
+ list earlier in block_job_unref()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,26 +18,39 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Roman Kagan <rkagan@virtuozzo.com>, Ben Warren <ben@skyportsystems.com>, QEMU Developers <qemu-devel@nongnu.org>, Igor Mammedov <imammedo@redhat.com>, Markus Armbruster <armbru@redhat.com>, =?iso-8859-1?Q?Marc-Andr=E9?= Lureau <marcandre.lureau@redhat.com>, "Denis V. Lunev" <den@openvz.org>, minyard@acm.org, "Daniel P. Berrange" <berrange@redhat.com>
+To: qemu-devel@nongnu.org
+Cc: Alberto Garcia <berto@igalia.com>, qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, Jeff Cody <jcody@redhat.com>
 
-On Tue, Nov 28, 2017 at 11:02:13AM +0300, Roman Kagan wrote:
-> On Mon, Nov 27, 2017 at 08:38:41AM -0800, Ben Warren wrote:
-> > It looks like you dropped Marc-Andr=E9 and my Reviewed-by lines.  Ple=
-ase put them back.
->=20
-> Oops.  I thought that the amount of changes in the first patch was too
-> big to keep the R-b; however, the second patch was basically the same s=
-o
-> I should have put the R-b and save you extra work re-reviewing it.
-> Sorry about that; hope the maintainer who will pick the patches will
-> take care of R-b (unless I get more feedback that will make me respin t=
-he
-> set).
->=20
-> Roman.
+When destroying a block job in block_job_unref() we should remove it
+from the job list before calling block_job_remove_all_bdrv().
 
-Nope, I don't have the time to mangle patches manually, but people can
-ack series, or you can reply to patch youself with some else's ack.
+This is because removing the BDSs can trigger an aio_poll() and wake
+up other jobs that might attempt to use the block job list. If that
+happens the job we're currently destroying should not be in that list
+anymore.
+---
+ blockjob.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
---=20
-MST
+diff --git a/blockjob.c b/blockjob.c
+index ff9a614531..2f0cc1528b 100644
+--- a/blockjob.c
++++ b/blockjob.c
+@@ -152,6 +152,7 @@ void block_job_unref(BlockJob *job)
+ {
+     if (--job->refcnt == 0) {
+         BlockDriverState *bs = blk_bs(job->blk);
++        QLIST_REMOVE(job, job_list);
+         bs->job = NULL;
+         block_job_remove_all_bdrv(job);
+         blk_remove_aio_context_notifier(job->blk,
+@@ -160,7 +161,6 @@ void block_job_unref(BlockJob *job)
+         blk_unref(job->blk);
+         error_free(job->blocker);
+         g_free(job->id);
+-        QLIST_REMOVE(job, job_list);
+         g_free(job);
+     }
+ }
+-- 
+2.11.0
