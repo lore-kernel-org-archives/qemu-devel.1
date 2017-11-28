@@ -1,25 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47987)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50596)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1eJkif-0007px-MS
-	for qemu-devel@nongnu.org; Tue, 28 Nov 2017 13:34:58 -0500
+	(envelope-from <den@virtuozzo.com>) id 1eJkoN-0002Ff-J2
+	for qemu-devel@nongnu.org; Tue, 28 Nov 2017 13:40:52 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1eJkib-0002u6-JY
-	for qemu-devel@nongnu.org; Tue, 28 Nov 2017 13:34:57 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:39764)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1eJkib-0002tg-E7
-	for qemu-devel@nongnu.org; Tue, 28 Nov 2017 13:34:53 -0500
-Date: Tue, 28 Nov 2017 16:34:50 -0200
-From: Eduardo Habkost <ehabkost@redhat.com>
-Message-ID: <20171128183450.GQ3037@localhost.localdomain>
-References: <1511880838-56509-1-git-send-email-imammedo@redhat.com>
-	<332cc741-ea50-897f-e03e-ada0ab022ce6@redhat.com>
+	(envelope-from <den@virtuozzo.com>) id 1eJkoM-0005xC-KU
+	for qemu-devel@nongnu.org; Tue, 28 Nov 2017 13:40:51 -0500
+References: <20171128121055.6954-1-den@openvz.org>
+	<20171128160805.GE3703@localhost.localdomain>
+	<b5cb007b-7a6a-c8a0-b551-2efdc4b0cdac@openvz.org>
+	<a92ce6e2-0d7d-8db2-e12f-418b77e8abd4@redhat.com>
+	<CAFEAcA8Ak5FNNOSujRARVOL78n4v40W-ZfC4n4Bi6imMPJs_FQ@mail.gmail.com>
+From: "Denis V. Lunev" <den@openvz.org>
+Message-ID: <e49af3c9-8a7b-24d1-c4ad-4690185cb9a8@openvz.org>
+Date: Tue, 28 Nov 2017 21:40:36 +0300
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <332cc741-ea50-897f-e03e-ada0ab022ce6@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH] numa: fix missing '-numa cpu' in '-help'
- output
+In-Reply-To: <CAFEAcA8Ak5FNNOSujRARVOL78n4v40W-ZfC4n4Bi6imMPJs_FQ@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
+Content-Language: en-US
+Subject: Re: [Qemu-devel] [PATCH for 2.11 0/2] QEMU crashes with CD device
+ without media
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,28 +28,22 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>
-Cc: Igor Mammedov <imammedo@redhat.com>, qemu-devel@nongnu.org, pbonzini@redhat.com, mjt@tls.msk.ru, armbru@redhat.com
+To: Peter Maydell <peter.maydell@linaro.org>, John Snow <jsnow@redhat.com>
+Cc: Kevin Wolf <kwolf@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, qemu-stable <qemu-stable@nongnu.org>
 
-On Tue, Nov 28, 2017 at 10:59:57AM -0600, Eric Blake wrote:
-> On 11/28/2017 08:53 AM, Igor Mammedov wrote:
-> > commit 419fcdec3c (numa: add '-numa cpu,...' option for property based node mapping)
-> > added '-numa cpu' option but forgot to update appropriate section for '--help'.
-> > Add '-numa cpu' description to '-help' output
-> > 
-> > Reported-by: Markus Armbruster <armbru@redhat.com>
-> > Signed-off-by: Igor Mammedov <imammedo@redhat.com>
-> > ---
-> >   qemu-options.hx | 4 +++-
-> >   1 file changed, 3 insertions(+), 1 deletion(-)
-> 
-> Documentation only; safe for 2.11 if it makes it through someone's tree
-> (although we're cutting it close); and harmless if it waits for 2.12
-> instead.
-> 
-> Reviewed-by: Eric Blake <eblake@redhat.com>
+On 11/28/2017 08:28 PM, Peter Maydell wrote:
+> On 28 November 2017 at 17:01, John Snow <jsnow@redhat.com> wrote:
+>> It's not your fault, it's mine for letting this go for a release. It's
+>> just unfortunate timing. I'm looking at (at least) the IDE portion of
+>> this and the underlying cause in block-backend today.
+> If it's not a regression, and nobody reported it for the whole release
+> cycle, we might choose to not fix it in 2.11...
+>
+> thanks
+> -- PMM
+may be this is related report
+https://patchwork.kernel.org/patch/9779795/
 
-Thanks, queueing it for 2.12 on machine-next.
+Anyway, I will be fine with any decision.
 
--- 
-Eduardo
+Den
