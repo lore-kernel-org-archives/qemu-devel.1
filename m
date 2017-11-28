@@ -1,28 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41841)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45373)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <zyimin@linux.vnet.ibm.com>) id 1eJZaN-0006oy-HE
-	for qemu-devel@nongnu.org; Tue, 28 Nov 2017 01:41:40 -0500
+	(envelope-from <zyimin@linux.vnet.ibm.com>) id 1eJZgw-0000vQ-2d
+	for qemu-devel@nongnu.org; Tue, 28 Nov 2017 01:48:27 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <zyimin@linux.vnet.ibm.com>) id 1eJZaI-0004RM-Hg
-	for qemu-devel@nongnu.org; Tue, 28 Nov 2017 01:41:39 -0500
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:38130)
+	(envelope-from <zyimin@linux.vnet.ibm.com>) id 1eJZgr-0007zZ-5Y
+	for qemu-devel@nongnu.org; Tue, 28 Nov 2017 01:48:26 -0500
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:53538)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <zyimin@linux.vnet.ibm.com>)
-	id 1eJZaI-0004Qd-7Q
-	for qemu-devel@nongnu.org; Tue, 28 Nov 2017 01:41:34 -0500
-Received: from pps.filterd (m0098393.ppops.net [127.0.0.1])
+	id 1eJZgq-0007zK-Sj
+	for qemu-devel@nongnu.org; Tue, 28 Nov 2017 01:48:21 -0500
+Received: from pps.filterd (m0098404.ppops.net [127.0.0.1])
 	by mx0a-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
-	vAS6YuQL089554
-	for <qemu-devel@nongnu.org>; Tue, 28 Nov 2017 01:41:31 -0500
-Received: from e31.co.us.ibm.com (e31.co.us.ibm.com [32.97.110.149])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2eh1hgasr2-1
+	vAS6lcBv052939
+	for <qemu-devel@nongnu.org>; Tue, 28 Nov 2017 01:48:19 -0500
+Received: from e32.co.us.ibm.com (e32.co.us.ibm.com [32.97.110.150])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2eh2q0gbpb-1
 	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Tue, 28 Nov 2017 01:41:31 -0500
+	for <qemu-devel@nongnu.org>; Tue, 28 Nov 2017 01:48:19 -0500
 Received: from localhost
-	by e31.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	by e32.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
 	Violators will be prosecuted
 	for <qemu-devel@nongnu.org> from <zyimin@linux.vnet.ibm.com>;
-	Mon, 27 Nov 2017 23:41:30 -0700
+	Mon, 27 Nov 2017 23:48:18 -0700
 References: <1511388334-16347-1-git-send-email-pmorel@linux.vnet.ibm.com>
 	<1511388334-16347-2-git-send-email-pmorel@linux.vnet.ibm.com>
 	<3acc6fdb-5638-97b2-2dc7-bce34d22cd1f@redhat.com>
@@ -36,14 +36,18 @@ References: <1511388334-16347-1-git-send-email-pmorel@linux.vnet.ibm.com>
 	<4000596f-d2a0-c32e-7683-7e074e8132e2@linux.vnet.ibm.com>
 	<37aa6eb3-cbdf-39af-2068-7d0e5949e601@linux.vnet.ibm.com>
 	<2ab76ab0-b20a-9eaf-cafb-195e1621edd6@redhat.com>
-	<fc028628-55ae-a9d5-d226-ae611d56fa0e@linux.vnet.ibm.com>
-	<29101b83-77c9-7a6f-e243-f4a856a1e609@redhat.com>
+	<20171127120255.2d36c8f3.cohuck@redhat.com>
+	<20171127153436.200a01c7.cohuck@redhat.com>
+	<c0fd850b-3d6f-4a4b-f9e0-e5009a273be0@linux.vnet.ibm.com>
+	<20171127163055.6c9989cf.cohuck@redhat.com>
+	<b4f9fd77-4efa-ad51-73f1-bcd17ec0ede4@linux.vnet.ibm.com>
+	<20171127170242.170d01f6.cohuck@redhat.com>
 From: Yi Min Zhao <zyimin@linux.vnet.ibm.com>
-Date: Tue, 28 Nov 2017 14:41:25 +0800
+Date: Tue, 28 Nov 2017 14:48:11 +0800
 MIME-Version: 1.0
-In-Reply-To: <29101b83-77c9-7a6f-e243-f4a856a1e609@redhat.com>
+In-Reply-To: <20171127170242.170d01f6.cohuck@redhat.com>
 Content-Type: text/plain; charset=utf-8; format=flowed
-Message-Id: <0d3a3b0f-d935-5350-6613-a4d3ca1d0bb8@linux.vnet.ibm.com>
+Message-Id: <e38deacb-d261-24eb-8e91-b1faae4213ba@linux.vnet.ibm.com>
 Content-Transfer-Encoding: quoted-printable
 Subject: Re: [Qemu-devel] [qemu-s390x] [PATCH v3 1/7] s390x/pci: factor out
  endianess conversion
@@ -55,156 +59,104 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org
+To: Cornelia Huck <cohuck@redhat.com>, Pierre Morel <pmorel@linux.vnet.ibm.com>
+Cc: Thomas Huth <thuth@redhat.com>, pasic@linux.vnet.ibm.com, qemu-devel@nongnu.org, agraf@suse.de, borntraeger@de.ibm.com, Qemu-s390x list <qemu-s390x@nongnu.org>
 
 
 
-=E5=9C=A8 2017/11/27 =E4=B8=8B=E5=8D=887:13, Thomas Huth =E5=86=99=E9=81=93=
-:
-> On 27.11.2017 11:09, Yi Min Zhao wrote:
->>
->> =E5=9C=A8 2017/11/27 =E4=B8=8B=E5=8D=882:59, Thomas Huth =E5=86=99=E9=81=
+=E5=9C=A8 2017/11/28 =E4=B8=8A=E5=8D=8812:02, Cornelia Huck =E5=86=99=E9=81=
 =93:
->>> On 25.11.2017 14:49, Pierre Morel wrote:
->>>> On 24/11/2017 07:19, Yi Min Zhao wrote:
->>>>> =E5=9C=A8 2017/11/23 =E4=B8=8B=E5=8D=888:18, Thomas Huth =E5=86=99=E9=
-=81=93:
->>>>>> On 23.11.2017 13:07, Yi Min Zhao wrote:
->>>>>>> =E5=9C=A8 2017/11/23 =E4=B8=8B=E5=8D=886:33, Cornelia Huck =E5=86=
-=99=E9=81=93:
->>>>>>>> On Thu, 23 Nov 2017 11:25:10 +0100
->>>>>>>> Thomas Huth <thuth@redhat.com> wrote:
->>>>>>>>
->>>>>>>>> On 23.11.2017 11:08, Cornelia Huck wrote:
->>>>>>>>>> On Thu, 23 Nov 2017 11:01:23 +0100
->>>>>>>>>> Thomas Huth <thuth@redhat.com> wrote:
->>>>>>>>>>> On 23.11.2017 10:49, Cornelia Huck wrote:
->>>>>>>>>>>> On Thu, 23 Nov 2017 09:48:41 +0100
->>>>>>>>>>>> Thomas Huth <thuth@redhat.com> wrote:
->>>>>>>>>>>>> On 22.11.2017 23:05, Pierre Morel wrote:
->>>>>>>>> [...]
->>>>>>>>>>>>>> +/**
->>>>>>>>>>>>>> + * Swap data contained in s390x big endian registers to
->>>>>>>>>>>>>> little
->>>>>>>>>>>>>> endian
->>>>>>>>>>>>>> + * PCI bars.
->>>>>>>>>>>>>> + *
->>>>>>>>>>>>>> + * @ptr: a pointer to a uint64_t data field
->>>>>>>>>>>>>> + * @len: the length of the valid data, must be 1,2,4 or 8
->>>>>>>>>>>>>> + */
->>>>>>>>>>>>>> +static int zpci_endian_swap(uint64_t *ptr, uint8_t len)
->>>>>>>>>>>>>> +{
->>>>>>>>>>>>>> +=C2=A0=C2=A0=C2=A0 uint64_t data =3D *ptr;
->>>>>>>>>>>>>> +
->>>>>>>>>>>>>> +=C2=A0=C2=A0=C2=A0 switch (len) {
->>>>>>>>>>>>>> +=C2=A0=C2=A0=C2=A0 case 1:
->>>>>>>>>>>>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 break;
->>>>>>>>>>>>>> +=C2=A0=C2=A0=C2=A0 case 2:
->>>>>>>>>>>>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 data =3D bswap=
-16(data);
->>>>>>>>>>>>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 break;
->>>>>>>>>>>>>> +=C2=A0=C2=A0=C2=A0 case 4:
->>>>>>>>>>>>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 data =3D bswap=
-32(data);
->>>>>>>>>>>>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 break;
->>>>>>>>>>>>>> +=C2=A0=C2=A0=C2=A0 case 8:
->>>>>>>>>>>>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 data =3D bswap=
-64(data);
->>>>>>>>>>>>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 break;
->>>>>>>>>>>>>> +=C2=A0=C2=A0=C2=A0 default:
->>>>>>>>>>>>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 return -EINVAL=
-;
->>>>>>>>>>>>>> +=C2=A0=C2=A0=C2=A0 }
->>>>>>>>>>>>>> +=C2=A0=C2=A0=C2=A0 *ptr =3D data;
->>>>>>>>>>>>>> +=C2=A0=C2=A0=C2=A0 return 0;
->>>>>>>>>>>>>> +}
->>>>>>>>>>>>> While you're at it, I think that should rather be leXX_to_c=
-pu()
->>>>>>>>>>>>> instead
->>>>>>>>>>>>> of bswapXX() here,
->>>>>>>>>>>> I don't think that's correct, as this is supposed to swap BE
->>>>>>>>>>>> registers
->>>>>>>>>>>> to LE PCI bars.
->>>>>>>>>>> Yes, but for the CPU emulation, the registers are stored in t=
-he
->>>>>>>>>>> host's
->>>>>>>>>>> endianness in the CPUS390XState structure. Or why do we
->>>>>>>>>>> byte-swap them
->>>>>>>>>>> again with cpu_to_be64() during s390_store_status(), for exam=
-ple?
->>>>>>>>>> Gah, endian conversion is eating my brain...
->>>>>>>>>>
->>>>>>>>>> So, is the content we get BE or not? I thought in our last
->>>>>>>>>> discussion
->>>>>>>>>> we came to the conclusion that it is.
->>>>>>>>> data is read from / written to env->regs[r1], so this is host
->>>>>>>>> endian, as
->>>>>>>>> far as I know. PCI is little endian, so using le32_to_cpu() /
->>>>>>>>> cpu_to_le32() should IMHO be the right way to go here.
+> On Mon, 27 Nov 2017 16:53:04 +0100
+> Pierre Morel <pmorel@linux.vnet.ibm.com> wrote:
+>
+>> On 27/11/2017 16:30, Cornelia Huck wrote:
+>>> On Mon, 27 Nov 2017 16:24:08 +0100
+>>> Pierre Morel <pmorel@linux.vnet.ibm.com> wrote:
+>>>   =20
+>>>> On 27/11/2017 15:34, Cornelia Huck wrote:
+>>>>> On Mon, 27 Nov 2017 12:02:55 +0100
+>>>>> Cornelia Huck <cohuck@redhat.com> wrote:
+>>>>>      =20
+>>>>>> On Mon, 27 Nov 2017 07:59:36 +0100
+>>>>>> Thomas Huth <thuth@redhat.com> wrote:
+>>>>>>     =20
+>>>>>>> On 25.11.2017 14:49, Pierre Morel wrote:
+>>>>>>>> On 24/11/2017 07:19, Yi Min Zhao wrote:
 >>>>>>>>>
->>>>>>>>> By the way, if we want to use both, cpu_to_le and le_to_cpu,
->>>>>>>>> depending
->>>>>>>>> on whether we read from or write to PCI, we should maybe *not* =
-put
->>>>>>>>> this
->>>>>>>>> code into a separate function?
->>>>>>>> Yes, if your assessment is correct, we need two functions (I thi=
-nk
->>>>>>>> this
->>>>>>>> conversion is used in other places in later patches as well). Or=
- are
->>>>>>>> there mechanisms for that already available?
->>>>>>> I have a question, is the data in cpu->regs the guest's endianess=
-?
->>>>>> As far as I know, it's host endianness, so on x86 with TCG emulati=
-on,
->>>>>> it's little endian.
->>>>>>
->>>>>>> In our case, the guest is S390. Although the arch is big-endian, =
-the
->>>>>>> data in
->>>>>>> pcilg/stg instructions is little-endian.
->>>>>> PCI memory is always little endian, right.
->>>>>>
->>>>>>> Another question, does 'cpu' in cpu_to_le**() or le**_to_cpu()
->>>>>>> mean the
->>>>>>> host endianess?
->>>>>> Yes, the "cpu" in cpu_to_le or le_to_cpu means the host, indeed. I=
-t's
->>>>>> confusing :-/
->>>>>>
->>>>>>> If the answers to upper two questions are yes, we actually need
->>>>>>> handle
->>>>>>> two cases.
->>>>>>> 1) For pcilg, we need to translate the data to little-endian, thu=
-s
->>>>>>> cpu_to_le**().
->>>>>>> 2) For pcistg, we need to translate the data to host endianess, t=
-hus
->>>>>>> le**_to_cpu().
->>>>>> I think we've got to byte-swap if the host is big endian (s390x), =
-but
->>>>>> not if the host is little endian (x86 with TCG).
->>>> Here is my comprehension of this funny swapping:
->>>>
->>>> - TCG for a BE guest and a le host swap bytes because if we do (regi=
-ster
->>>> & 0x01) in the zPCI interception code it must work what ever the
->>>> endianess is.
->>> Uhhh, I might have missed that the value has already been byte-swappe=
-d
->>> once by TCG for env->regs[r1] ...
->> I want to ask a question. For this case, BE guest and LE host, is
->> env->regs[r1] in LE byte ordering?
-> Generally env->regs[] are in host byte order, so LE if the host is LE.
-> Not sure which byte-order is stored in the register by the guest,
-> though, since I don't have the zPCI spec ... so if the (BE) guest wrote
-> a LE value in the register, and TCG byte-swapped it again, the value is
-> suddenly BE again and thus we have to always byte-swap it again...?
-> Sorry, it's hard to say without having the spec available.
-Yes, your understanding is right. The guest is BE but the data in=20
-register for zPCI instruction is LE.
+>>>>>>>>> =E5=9C=A8 2017/11/23 =E4=B8=8B=E5=8D=888:18, Thomas Huth =E5=86=
+=99=E9=81=93:
+>>>>>>>>>> On 23.11.2017 13:07, Yi Min Zhao wrote:
+>>>>>>     =20
+>>>>>>>>>>> Another question, does 'cpu' in cpu_to_le**() or le**_to_cpu(=
+) mean the
+>>>>>>>>>>> host endianess?
+>>>>>>>>>> Yes, the "cpu" in cpu_to_le or le_to_cpu means the host, indee=
+d. It's
+>>>>>>>>>> confusing :-/
+>>>>>>>>>>          =20
+>>>>>>>>>>> If the answers to upper two questions are yes, we actually ne=
+ed handle
+>>>>>>>>>>> two cases.
+>>>>>>>>>>> 1) For pcilg, we need to translate the data to little-endian,=
+ thus
+>>>>>>>>>>> cpu_to_le**().
+>>>>>>>>>>> 2) For pcistg, we need to translate the data to host endianes=
+s, thus
+>>>>>>>>>>> le**_to_cpu().
+>>>>>>>>>> I think we've got to byte-swap if the host is big endian (s390=
+x), but
+>>>>>>>>>> not if the host is little endian (x86 with TCG).
+>>>>>>>> Here is my comprehension of this funny swapping:
+>>>>>>>>
+>>>>>>>> - TCG for a BE guest and a le host swap bytes because if we do (=
+register
+>>>>>>>> & 0x01) in the zPCI interception code it must work what ever the
+>>>>>>>> endianess is.
+>>>>>>> Uhhh, I might have missed that the value has already been byte-sw=
+apped
+>>>>>>> once by TCG for env->regs[r1] ...
+>>>>>>> Now I'm pretty much completely confused ... sorry for the noise i=
+f I was
+>>>>>>> wrong... I think it's best you ignore my comment for now (i.e. go=
+ with
+>>>>>>> bswapXX() instead of le_to_cpuXX()), and if we later wire up zPCI=
+ with
+>>>>>>> TCG, we still can fix this if necessary.
+>>>>>> I'll try my current pci/tcg patches on LPAR with this (or a v4) on=
+ top.
+>>>>>> If it works there (it doesn't yet on my laptop), we do have a
+>>>>>> endianness issue... (unfortunately, the reverse isn't true.)
+>>>>> It does not look too bad: I can get a nice enP1p0s0 device from a
+>>>>> virtio-net-pci with my tcg patches on my laptop (with these patches=
+ as
+>>>>> well, of course). So, endianness is likely mostly fine.
+>>>> On the Lpar and on the Laptop or only on the Lpar ?
+>>> Both :)
+>> That's great! :)
+> Btw, lspci says
 >
->   Thomas
+> 0001:00:00.0 Ethernet controller: Red Hat, Inc. Virtio network device
+>          Subsystem: Red Hat, Inc. Device 0001
+>          Physical Slot: 00000000
+>          Flags: bus master, fast devsel, latency 0
+>          I/O ports at <unassigned> [disabled]
+>          [virtual] Memory at 8001000000000000 (32-bit, non-prefetchable=
+) [size=3D4K]
+>          Memory at 8002000000000000 (64-bit, prefetchable) [size=3D16K]
+>          Expansion ROM at <unassigned> [disabled] [size=3D256K]
+>          Capabilities: [98] MSI-X: Enable+ Count=3D3 Masked-
+>          Capabilities: [84] Vendor Specific Information: VirtIO: <unkno=
+wn>
+>          Capabilities: [70] Vendor Specific Information: VirtIO: Notify
+>          Capabilities: [60] Vendor Specific Information: VirtIO: Device=
+Cfg
+>          Capabilities: [50] Vendor Specific Information: VirtIO: ISR
+>          Capabilities: [40] Vendor Specific Information: VirtIO: Common=
+Cfg
+>          Kernel driver in use: virtio-pci
+>
+> Does that look reasonable to you?
 >
 >
+Great! That means the data in env->register has been swapped.
+Thanks!
