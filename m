@@ -1,28 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37480)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51991)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alistair23@gmail.com>) id 1eJpHB-0003Xx-Tq
-	for qemu-devel@nongnu.org; Tue, 28 Nov 2017 18:26:54 -0500
+	(envelope-from <gomonovych@gmail.com>) id 1eJncQ-0002yI-Bk
+	for qemu-devel@nongnu.org; Tue, 28 Nov 2017 16:40:43 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alistair23@gmail.com>) id 1eJpHA-0005ss-VF
-	for qemu-devel@nongnu.org; Tue, 28 Nov 2017 18:26:53 -0500
-Received: from mail-wr0-x243.google.com ([2a00:1450:400c:c0c::243]:41068)
+	(envelope-from <gomonovych@gmail.com>) id 1eJncL-0001Jx-GC
+	for qemu-devel@nongnu.org; Tue, 28 Nov 2017 16:40:42 -0500
+Received: from mail-lf0-x244.google.com ([2a00:1450:4010:c07::244]:33040)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <alistair23@gmail.com>)
-	id 1eJpHA-0005sN-Oq
-	for qemu-devel@nongnu.org; Tue, 28 Nov 2017 18:26:52 -0500
-Received: by mail-wr0-x243.google.com with SMTP id z18so1702118wrb.8
-	for <qemu-devel@nongnu.org>; Tue, 28 Nov 2017 15:26:52 -0800 (PST)
-MIME-Version: 1.0
-Sender: alistair23@gmail.com
-In-Reply-To: <CAKmqyKMettqnEmxr2w5Z6o0Dn3gU5Pun8CbQm4VPj_0qXeO33w@mail.gmail.com>
-References: <cover.1508279421.git.alistair.francis@xilinx.com>
-	<CAKmqyKM4CsbVvfT5roqQOi+oVLCV=kN7mFxKeTSkiD_tBNA5Ng@mail.gmail.com>
-	<CAKmqyKMettqnEmxr2w5Z6o0Dn3gU5Pun8CbQm4VPj_0qXeO33w@mail.gmail.com>
-From: Alistair Francis <alistair.francis@xilinx.com>
-Date: Tue, 28 Nov 2017 15:26:20 -0800
-Message-ID: <CAKmqyKNVxfGFLiR6iuMdSkY-bN1eJyTaN1Mw3FO9+h9ObMa_tw@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH v3 0/5] Add a valid_cpu_types property
+	(Exim 4.71) (envelope-from <gomonovych@gmail.com>)
+	id 1eJncL-0001JH-8W
+	for qemu-devel@nongnu.org; Tue, 28 Nov 2017 16:40:37 -0500
+Received: by mail-lf0-x244.google.com with SMTP id 74so1531048lfs.0
+	for <qemu-devel@nongnu.org>; Tue, 28 Nov 2017 13:40:36 -0800 (PST)
+From: Vasyl Gomonovych <gomonovych@gmail.com>
+Date: Tue, 28 Nov 2017 22:40:27 +0100
+Message-Id: <1511905227-30292-1-git-send-email-gomonovych@gmail.com>
+Subject: [Qemu-devel] [PATCH] firmware: Use PTR_ERR_OR_ZERO()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,92 +24,36 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alistair Francis <alistair.francis@xilinx.com>, Peter Maydell <peter.maydell@linaro.org>
-Cc: "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>, Eduardo Habkost <ehabkost@redhat.com>, Marcel Apfelbaum <marcel@redhat.com>, Igor Mammedov <imammedo@redhat.com>, =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>
+To: somlo@cmu.edu, mst@redhat.com, qemu-devel@nongnu.org
+Cc: linux-kernel@vger.kernel.org, gomonovych@gmail.com
 
-On Tue, Nov 7, 2017 at 3:30 PM, Alistair Francis
-<alistair.francis@xilinx.com> wrote:
-> On Mon, Oct 23, 2017 at 12:26 AM, Alistair Francis <alistair23@gmail.com> wrote:
->> On Wed, Oct 18, 2017 at 12:31 AM, Alistair Francis
->> <alistair.francis@xilinx.com> wrote:
->>> There are numorous QEMU machines that only have a single or a handful of
->>> valid CPU options. To simplyfy the management of specificying which CPU
->>> is/isn't valid let's create a property that can be set in the machine
->>> init. We can then check to see if the user supplied CPU is in that list
->>> or not.
->>>
->>> I have added the valid_cpu_types for some ARM machines only at the
->>> moment.
->>>
->>> Here is what specifying the CPUs looks like now:
->>>
->>> $ aarch64-softmmu/qemu-system-aarch64 -M netduino2 -kernel ./u-boot.elf -nographic -cpu "cortex-m3" -S
->>> QEMU 2.10.50 monitor - type 'help' for more information
->>> (qemu) info cpus
->>> * CPU #0: thread_id=24175
->>> (qemu) q
->>>
->>> $ aarch64-softmmu/qemu-system-aarch64 -M netduino2 -kernel ./u-boot.elf -nographic -cpu "cortex-m4" -S
->>> QEMU 2.10.50 monitor - type 'help' for more information
->>> (qemu) q
->>>
->>> $ aarch64-softmmu/qemu-system-aarch64 -M netduino2 -kernel ./u-boot.elf -nographic -cpu "cortex-m5" -S
->>> qemu-system-aarch64: unable to find CPU model 'cortex-m5'
->>>
->>> $ aarch64-softmmu/qemu-system-aarch64 -M netduino2 -kernel ./u-boot.elf -nographic -cpu "cortex-a9" -S
->>> qemu-system-aarch64: Invalid CPU type: cortex-a9-arm-cpu
->>> The valid types are: cortex-m3-arm-cpu, cortex-m4-arm-cpu
->>
->> It looks like all the patches have been reviewed now. Can this go
->> through your tree Peter?
->
-> Ping!
+Fix ptr_ret.cocci warnings:
+drivers/firmware/efi/efi.c:610:8-14: WARNING: PTR_ERR_OR_ZERO can be used
 
-Ping^2
+Use PTR_ERR_OR_ZERO rather than if(IS_ERR(...)) + PTR_ERR
 
-Can this go through target-arm.next for 2.12?
+Generated by: scripts/coccinelle/api/ptr_ret.cocci
 
-Alistair
+Signed-off-by: Vasyl Gomonovych <gomonovych@gmail.com>
+---
+ drivers/firmware/qemu_fw_cfg.c | 4 +---
+ 1 file changed, 1 insertion(+), 3 deletions(-)
 
->
-> I'm happy to send a pull request if that helps. I have a slick signed key now :)
->
-> Alistair
->
->>
->> Thanks,
->> Alistair
->>
->>>
->>> V3:
->>>  - Make the varialbes static
->>> V2:
->>>  - Rebase
->>>  - Reorder patches
->>>  - Add a Raspberry Pi 2 CPU fix
->>> V1:
->>>  - Small fixes to prepare a series instead of RFC
->>>  - Add commit messages for the commits
->>>  - Expand the machine support to ARM machines
->>> RFC v2:
->>>  - Rebase on Igor's work
->>>  - Use more QEMUisms inside the code
->>>  - List the supported machines in a NULL terminated array
->>>
->>> Alistair Francis (5):
->>>   netduino2: Specify the valid CPUs
->>>   bcm2836: Use the Cortex-A7 instead of Cortex-A15
->>>   raspi: Specify the valid CPUs
->>>   xlnx-zcu102: Specify the valid CPUs
->>>   xilinx_zynq: Specify the valid CPUs
->>>
->>>  hw/arm/bcm2836.c     |  2 +-
->>>  hw/arm/netduino2.c   | 10 +++++++++-
->>>  hw/arm/raspi.c       |  7 +++++++
->>>  hw/arm/xilinx_zynq.c |  6 ++++++
->>>  hw/arm/xlnx-zcu102.c | 17 +++++++++++++++++
->>>  5 files changed, 40 insertions(+), 2 deletions(-)
->>>
->>> --
->>> 2.11.0
->>>
+diff --git a/drivers/firmware/qemu_fw_cfg.c b/drivers/firmware/qemu_fw_cfg.c
+index 5cfe39f7a45f..18489b6a696d 100644
+--- a/drivers/firmware/qemu_fw_cfg.c
++++ b/drivers/firmware/qemu_fw_cfg.c
+@@ -693,10 +693,8 @@ static int fw_cfg_cmdline_set(const char *arg, const struct kernel_param *kp)
+ 	 */
+ 	fw_cfg_cmdline_dev = platform_device_register_simple("fw_cfg",
+ 					PLATFORM_DEVID_NONE, res, processed);
+-	if (IS_ERR(fw_cfg_cmdline_dev))
+-		return PTR_ERR(fw_cfg_cmdline_dev);
+ 
+-	return 0;
++	return PTR_ERR_OR_ZERO(fw_cfg_cmdline_dev);
+ }
+ 
+ static int fw_cfg_cmdline_get(char *buf, const struct kernel_param *kp)
+-- 
+1.9.1
