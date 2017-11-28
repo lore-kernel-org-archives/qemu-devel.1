@@ -1,37 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58599)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39340)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vkaplans@redhat.com>) id 1eJmuU-0006Nr-SK
-	for qemu-devel@nongnu.org; Tue, 28 Nov 2017 15:55:20 -0500
+	(envelope-from <ehabkost@redhat.com>) id 1eJnCB-0003hr-AY
+	for qemu-devel@nongnu.org; Tue, 28 Nov 2017 16:13:36 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vkaplans@redhat.com>) id 1eJmuP-0000Zk-TN
-	for qemu-devel@nongnu.org; Tue, 28 Nov 2017 15:55:18 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:35542)
+	(envelope-from <ehabkost@redhat.com>) id 1eJnC7-00039N-8Y
+	for qemu-devel@nongnu.org; Tue, 28 Nov 2017 16:13:35 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:41664)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <vkaplans@redhat.com>) id 1eJmuP-0000ZF-Ky
-	for qemu-devel@nongnu.org; Tue, 28 Nov 2017 15:55:13 -0500
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
-	[10.5.11.12])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 830BC5F7AC
-	for <qemu-devel@nongnu.org>; Tue, 28 Nov 2017 20:55:12 +0000 (UTC)
-Received: from colo-mx.corp.redhat.com
-	(colo-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.21])
-	by smtp.corp.redhat.com (Postfix) with ESMTPS id 778D95FCA0
-	for <qemu-devel@nongnu.org>; Tue, 28 Nov 2017 20:55:12 +0000 (UTC)
-Date: Tue, 28 Nov 2017 15:55:12 -0500 (EST)
-From: Victor Kaplansky <vkaplans@redhat.com>
-Message-ID: <2120179840.47198762.1511902512131.JavaMail.zimbra@redhat.com>
-In-Reply-To: <20171128204444-mutt-send-email-mst@kernel.org>
-References: <20171128133123.17372-1-vkaplans@redhat.com>
-	<20171128195847-mutt-send-email-mst@kernel.org>
-	<1297312453.47152666.1511894059661.JavaMail.zimbra@redhat.com>
-	<20171128204444-mutt-send-email-mst@kernel.org>
+	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1eJnC6-00038x-VR
+	for qemu-devel@nongnu.org; Tue, 28 Nov 2017 16:13:31 -0500
+Date: Tue, 28 Nov 2017 19:13:26 -0200
+From: Eduardo Habkost <ehabkost@redhat.com>
+Message-ID: <20171128211326.GV3037@localhost.localdomain>
+References: <1511530010-511740-1-git-send-email-dplotnikov@virtuozzo.com>
+	<20171128195817.GA29077@localhost.localdomain>
+	<2cd31202-27c3-983f-85a9-6814ff504706@virtuozzo.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] vhost-user spec: Clarify policy on setting
- log_base
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <2cd31202-27c3-983f-85a9-6814ff504706@virtuozzo.com>
+Subject: Re: [Qemu-devel] [PATCH] i386: turn off l3-cache property by default
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -40,129 +28,82 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: qemu-devel@nongnu.org, Maxime Coquelin <maxime.coquelin@redhat.com>, Jason Wang <jasowang@redhat.com>
+To: "Denis V. Lunev" <den@virtuozzo.com>, "Longpeng (Mike)" <longpeng2@huawei.com>, "Michael S. Tsirkin" <mst@redhat.com>
+Cc: Denis Plotnikov <dplotnikov@virtuozzo.com>, pbonzini@redhat.com, rth@twiddle.net, qemu-devel@nongnu.org, rkagan@virtuozzo.com, Gonglei <arei.gonglei@huawei.com>, huangpeng <peter.huangpeng@huawei.com>, zhaoshenglong <zhaoshenglong@huawei.com>, herongguang.he@huawei.com
 
-> From: "Michael S. Tsirkin" <mst@redhat.com>
-> To: "Victor Kaplansky" <vkaplans@redhat.com>
-> Cc: qemu-devel@nongnu.org, "Maxime Coquelin" <maxime.coquelin@redhat.com>, "Jason Wang" <jasowang@redhat.com>
-> Sent: Tuesday, November 28, 2017 8:45:43 PM
-> Subject: Re: [PATCH] vhost-user spec: Clarify policy on setting log_base
-> 
-> On Tue, Nov 28, 2017 at 01:34:19PM -0500, Victor Kaplansky wrote:
-> > > From: "Michael S. Tsirkin" <mst@redhat.com>
-> > > To: "Victor Kaplansky" <vkaplans@redhat.com>
-> > > Cc: qemu-devel@nongnu.org, "Maxime Coquelin"
-> > > <maxime.coquelin@redhat.com>, "Jason Wang" <jasowang@redhat.com>
-> > > Sent: Tuesday, November 28, 2017 8:06:52 PM
-> > > Subject: Re: [PATCH] vhost-user spec: Clarify policy on setting log_base
-> > > 
-> > > On Tue, Nov 28, 2017 at 03:46:44PM +0200, Victor Kaplansky wrote:
-> > > > From: Victor Kaplansky <vkaplans@dell9020.localdomain>
-> > > > 
-> > > > If we allow qemu to change logging area after it was already
-> > > > established,
-> > > > it may require from the backend to acquire a lock on each access to
-> > > > the log_base, which has a potential quite a big performance hit.
-> > > > 
-> > > > Thus we would like to clarify in the spec, that qemu is not expected
-> > > > to resize or remap the logging area, and backend implementations
-> > > > can safely ignore subsequent requests to log_base modifications.
-> > > > 
-> > > > Signed-off-by: Victor Kaplansky <vkaplans@redhat.com>
-> > > > Suggested-by: Maxime Coquelin <maxime.coquelin@redhat.com>
-> > > 
-> > > I'm not sure we can do this.
-> > > 
-> > > 
-> > > Log resizing as a result of memory hotplug might force
-> > > log base changes.
-> > 
-> > I agree. Memory hotplug during live migration will cause a
-> > bunch of problems not only to dirty page logging, but to a
-> > regular backend function, because memory regions have to be
-> > redefined before descriptors pointing to the new memory
-> > arrive a backend. Which means, that in DPDK we must to
-> > guard by some kind of synchronization mechanism all accesses
-> > to guest2qemu memory translation. This will have an impact
-> > on the backend performace even with light-weighted RCU.
-> > 
-> > So, I propose to handle memory hot plug by stopping rings,
-> > then changing memory regions and log_base, and then re-enabling
-> > rings.
-> > 
-> > What do you say?
-> 
-> Why not have backend do this internally when it gets
-> the log_base message?
-> 
-> 
-> > 
-> > > 
-> > > Backends need to use something like
-> > > rcu to avoid need for locking.
-> > > 
-> > > Apropos I wonder whether it's a bug that vhost_dev_start
-> > > calls vhost_set_log_base after starting rings.
-> > 
-> > In vhost-user backend before vhost_user_set_log_base is called for first
-> > time, log_base is initialized to zero. Which causes backend (DPDK) to
-> > skip logging. Thus theoretically setting log_base on an active ring,
-> > may cause to skip single (very first) dirty logging. In the reality,
-> > it has very small chances to happen, since sending the response from
-> > the backend to qemu by a socket takes much longer then a time gap
-> > between reading log_base variable and using it.
-> 
-> I suspect it's worth fixing though.
-> 
+[CCing the people who were copied in the original patch that
+enabled l3cache]
 
-Yes, this case maybe not worth to bother, but I'm thinking about all
-other race conditions between the request handling thread and the data
-path in DPDK, and my conclusion is that we will have to add some general
-rcu guard between all requests and data path operations.
-I'll send a patch to DPDK.
+On Tue, Nov 28, 2017 at 11:20:27PM +0300, Denis V. Lunev wrote:
+> On 11/28/2017 10:58 PM, Eduardo Habkost wrote:
+> > Hi,
+> >
+> > On Fri, Nov 24, 2017 at 04:26:50PM +0300, Denis Plotnikov wrote:
+> >> Commit 14c985cffa "target-i386: present virtual L3 cache info for vcpus"
+> >> introduced and set by default exposing l3 to the guest.
+> >>
+> >> The motivation behind it was that in the Linux scheduler, when waking up
+> >> a task on a sibling CPU, the task was put onto the target CPU's runqueue
+> >> directly, without sending a reschedule IPI.  Reduction in the IPI count
+> >> led to performance gain.
+> >>
+> >> However, this isn't the whole story.  Once the task is on the target
+> >> CPU's runqueue, it may have to preempt the current task on that CPU, be
+> >> it the idle task putting the CPU to sleep or just another running task.
+> >> For that a reschedule IPI will have to be issued, too.  Only when that
+> >> other CPU is running a normal task for too little time, the fairness
+> >> constraints will prevent the preemption and thus the IPI.
+> >>
+> >> This boils down to the improvement being only achievable in workloads
+> >> with many actively switching tasks.  We had no access to the
+> >> (proprietary?) SAP HANA benchmark the commit referred to, but the
+> >> pattern is also reproduced with "perf bench sched messaging -g 1"
+> >> on 1 socket, 8 cores vCPU topology, we see indeed:
+> >>
+> >> l3-cache	#res IPI /s	#time / 10000 loops
+> >> off		560K		1.8 sec
+> >> on		40K		0.9 sec
+> >>
+> >> Now there's a downside: with L3 cache the Linux scheduler is more eager
+> >> to wake up tasks on sibling CPUs, resulting in unnecessary cross-vCPU
+> >> interactions and therefore exessive halts and IPIs.  E.g. "perf bench
+> >> sched pipe -i 100000" gives
+> >>
+> >> l3-cache	#res IPI /s	#HLT /s		#time /100000 loops
+> >> off		200 (no K)	230		0.2 sec
+> >> on		400K		330K		0.5 sec
+> >>
+> >> In a more realistic test, we observe 15% degradation in VM density
+> >> (measured as the number of VMs, each running Drupal CMS serving 2 http
+> >> requests per second to its main page, with 95%-percentile response
+> >> latency under 100 ms) with l3-cache=on.
+> >>
+> >> We think that mostly-idle scenario is more common in cloud and personal
+> >> usage, and should be optimized for by default; users of highly loaded
+> >> VMs should be able to tune them up themselves.
+> >>
+> > There's one thing I don't understand in your test case: if you
+> > just found out that Linux will behave worse if it assumes that
+> > the VCPUs are sharing a L3 cache, why are you configuring a
+> > 8-core VCPU topology explicitly?
+> >
+> > Do you still see a difference in the numbers if you use "-smp 8"
+> > with no "cores" and "threads" options?
+> >
+> This is quite simple. A lot of software licenses are bound to the amount
+> of CPU __sockets__. Thus it is mandatory in a lot of cases to set topology
+> with 1 socket/xx cores to reduce the amount of money necessary to
+> be paid for the software.
 
-Anyway, it may be worth to clean up things in qemu as well and
-avoid sending unnecessary requests to backend slave.
+In this case it looks like we're talking about the expected
+meaning of "cores=N".  My first interpretation would be that the
+user obviously want the guest to see the multiple cores sharing a
+L3 cache, because that's how real CPUs normally work.  But I see
+why you have different expectations.
 
-> 
-> > 
-> > > 
-> > > Same question for the iotlb callback.
-> > > 
-> > > 
-> > > 
-> > > 
-> > > > ---
-> > > >  docs/interop/vhost-user.txt | 6 ++++++
-> > > >  1 file changed, 6 insertions(+)
-> > > > 
-> > > > diff --git a/docs/interop/vhost-user.txt b/docs/interop/vhost-user.txt
-> > > > index 954771d0d8..7ab31e57ef 100644
-> > > > --- a/docs/interop/vhost-user.txt
-> > > > +++ b/docs/interop/vhost-user.txt
-> > > > @@ -257,6 +257,12 @@ Where addr is the guest physical address.
-> > > >  
-> > > >  Use atomic operations, as the log may be concurrently manipulated.
-> > > >  
-> > > > +Note that master is not expected to issue more than one
-> > > > VHOST_USER_SET_LOG_BASE
-> > > > +request before the rings are fully stopped by the master. Thus no
-> > > > modifications
-> > > > +to log_base address are allowed before the rings are restated and the
-> > > > client
-> > > > +can ignore all subsequent VHOST_USER_SET_LOG_BASE requests after the
-> > > > log_base
-> > > > +address has been established.
-> > > > +
-> > > >  Note that when logging modifications to the used ring (when
-> > > >  VHOST_VRING_F_LOG
-> > > >  is set for this ring), log_guest_addr should be used to calculate the
-> > > >  log
-> > > >  offset: the write to first byte of the used ring is logged at this
-> > > >  offset
-> > > >  from
-> > > > --
-> > > > 2.14.2
-> > > 
-> 
+Numbers on dedicated-pCPU scenarios would be helpful to guide the
+decision.  I wouldn't like to cause a performance regression for
+users that fine-tuned vCPU topology and set up CPU pinning.
+
+-- 
+Eduardo
