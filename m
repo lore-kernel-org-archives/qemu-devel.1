@@ -1,21 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47938)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48562)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1eJdgp-0004MF-WC
-	for qemu-devel@nongnu.org; Tue, 28 Nov 2017 06:04:36 -0500
+	(envelope-from <arei.gonglei@huawei.com>) id 1eJdjQ-0005DK-Ve
+	for qemu-devel@nongnu.org; Tue, 28 Nov 2017 06:07:17 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1eJdgk-0005Ae-Ae
-	for qemu-devel@nongnu.org; Tue, 28 Nov 2017 06:04:35 -0500
-Date: Tue, 28 Nov 2017 12:04:25 +0100
-From: Cornelia Huck <cohuck@redhat.com>
-Message-ID: <20171128120425.6fa912c1.cohuck@redhat.com>
-In-Reply-To: <1511816136-30068-4-git-send-email-walling@linux.vnet.ibm.com>
-References: <1511816136-30068-1-git-send-email-walling@linux.vnet.ibm.com>
-	<1511816136-30068-4-git-send-email-walling@linux.vnet.ibm.com>
+	(envelope-from <arei.gonglei@huawei.com>) id 1eJdjM-00069S-Gu
+	for qemu-devel@nongnu.org; Tue, 28 Nov 2017 06:07:16 -0500
+Received: from szxga03-in.huawei.com ([45.249.212.189]:4371)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_ARCFOUR_SHA1:16) (Exim 4.71)
+	(envelope-from <arei.gonglei@huawei.com>) id 1eJdjL-00068g-To
+	for qemu-devel@nongnu.org; Tue, 28 Nov 2017 06:07:12 -0500
+From: "Gonglei (Arei)" <arei.gonglei@huawei.com>
+Date: Tue, 28 Nov 2017 11:06:45 +0000
+Message-ID: <33183CC9F5247A488A2544077AF19020DA4A7E32@DGGEMA505-MBS.china.huawei.com>
+References: <1511859789-43680-1-git-send-email-arei.gonglei@huawei.com>
+	<1511859789-43680-4-git-send-email-arei.gonglei@huawei.com>
+	<6635d6fc-b924-b558-0fff-120a55ef81e9@redhat.com>
+	<33183CC9F5247A488A2544077AF19020DA4A7DC2@DGGEMA505-MBS.china.huawei.com>
+	<b98e2b09-35e7-47c2-b49f-982a09804b4f@redhat.com>
+In-Reply-To: <b98e2b09-35e7-47c2-b49f-982a09804b4f@redhat.com>
+Content-Language: zh-CN
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v1 3/5] s390-ccw: parse and set boot menu
- options
+Subject: Re: [Qemu-devel] [PATCH 3/4] cryptodev-vhost-user: add crypto
+ session handler
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,77 +32,34 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Collin L. Walling" <walling@linux.vnet.ibm.com>
-Cc: borntraeger@de.ibm.com, frankja@linux.vnet.ibm.com, qemu-s390x@nongnu.org, qemu-devel@nongnu.org
+To: Paolo Bonzini <pbonzini@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+Cc: "mst@redhat.com" <mst@redhat.com>, "Huangweidong (C)" <weidong.huang@huawei.com>, "stefanha@redhat.com" <stefanha@redhat.com>, "Zhoujian (jay)" <jianjay.zhou@huawei.com>, "pasic@linux.vnet.ibm.com" <pasic@linux.vnet.ibm.com>, longpeng <longpeng2@huawei.com>, "xin.zeng@intel.com" <xin.zeng@intel.com>, "roy.fan.zhang@intel.com" <roy.fan.zhang@intel.com>
 
-On Mon, 27 Nov 2017 15:55:34 -0500
-"Collin L. Walling" <walling@linux.vnet.ibm.com> wrote:
-
-> Set boot menu options for an s390 guest and store them in
-> the iplb. These options are set via the QEMU command line
-> option:
-> 
->     -boot menu=on|off[,splash-time=X]
-> 
-> or via the libvirt domain xml:
-> 
->     <os>
->       <bootmenu enable='yes|no' timeout='X'/>
->     </os>
-> 
-> Where X represents some positive integer representing
-> milliseconds.
-> 
-> Signed-off-by: Collin L. Walling <walling@linux.vnet.ibm.com>
-> Reviewed-by: Janosch Frank <frankja@linux.vnet.ibm.com>
-> ---
->  hw/s390x/ipl.c          | 23 +++++++++++++++++++++++
->  hw/s390x/ipl.h          |  8 ++++++--
->  pc-bios/s390-ccw/iplb.h |  8 ++++++--
->  3 files changed, 35 insertions(+), 4 deletions(-)
-> 
-> diff --git a/hw/s390x/ipl.c b/hw/s390x/ipl.c
-> index 0d06fc1..0ca9e37 100644
-> --- a/hw/s390x/ipl.c
-> +++ b/hw/s390x/ipl.c
-> @@ -23,6 +23,8 @@
->  #include "hw/s390x/ebcdic.h"
->  #include "ipl.h"
->  #include "qemu/error-report.h"
-> +#include "qemu/config-file.h"
-> +#include "qemu/cutils.h"
->  
->  #define KERN_IMAGE_START                0x010000UL
->  #define KERN_PARM_AREA                  0x010480UL
-> @@ -219,6 +221,23 @@ static Property s390_ipl_properties[] = {
->      DEFINE_PROP_END_OF_LIST(),
->  };
->  
-> +static void s390_ipl_set_boot_menu(uint8_t *boot_menu_enabled,
-> +                                   uint16_t *boot_menu_timeout)
-> +{
-> +    QemuOptsList *plist = qemu_find_opts("boot-opts");
-> +    QemuOpts *opts = QTAILQ_FIRST(&plist->head);
-> +    const char *p;
-> +    long result = 0;
-> +
-> +    *boot_menu_enabled = qemu_opt_get_bool(opts, "menu", false);
-
-This is already parsed in vl.c, isn't it? Can you simply check
-boot_menu?
-
-> +
-> +    if (*boot_menu_enabled) {
-> +        p = qemu_opt_get(opts, "splash-time");
-
-hw/nvram/fw_cfg.c parses splash-time as well, but I'm not sure if it is
-worth parsing it in vl.c as well.
-
-> +        qemu_strtol(p, NULL, 10, &result);
-> +        *boot_menu_timeout = result;
-> +    }
-> +}
-> +
->  static bool s390_gen_initial_iplb(S390IPLState *ipl)
->  {
->      DeviceState *dev_st;
+DQo+IC0tLS0tT3JpZ2luYWwgTWVzc2FnZS0tLS0tDQo+IEZyb206IFBhb2xvIEJvbnppbmkgW21h
+aWx0bzpwYm9uemluaUByZWRoYXQuY29tXQ0KPiBTZW50OiBUdWVzZGF5LCBOb3ZlbWJlciAyOCwg
+MjAxNyA2OjQ2IFBNDQo+IFRvOiBHb25nbGVpIChBcmVpKTsgcWVtdS1kZXZlbEBub25nbnUub3Jn
+DQo+IENjOiBtc3RAcmVkaGF0LmNvbTsgSHVhbmd3ZWlkb25nIChDKTsgc3RlZmFuaGFAcmVkaGF0
+LmNvbTsgWmhvdWppYW4NCj4gKGpheSk7IHBhc2ljQGxpbnV4LnZuZXQuaWJtLmNvbTsgbG9uZ3Bl
+bmc7IHhpbi56ZW5nQGludGVsLmNvbTsNCj4gcm95LmZhbi56aGFuZ0BpbnRlbC5jb20NCj4gU3Vi
+amVjdDogUmU6IFtQQVRDSCAzLzRdIGNyeXB0b2Rldi12aG9zdC11c2VyOiBhZGQgY3J5cHRvIHNl
+c3Npb24gaGFuZGxlcg0KPiANCj4gT24gMjgvMTEvMjAxNyAxMTo0MywgR29uZ2xlaSAoQXJlaSkg
+d3JvdGU6DQo+ID4+IEFzIGZhciBhcyBJIHVuZGVyc3RhbmQsIFZJUlRJT19DUllQVE9fQ0lQSEVS
+X0NSRUFURV9TRVNTSU9OIGlzIGNhbGxlZA0KPiBhcw0KPiA+PiBhIHJlc3VsdCBvZiBzZW5kaW5n
+IGEgbWVzc2FnZSBvbiB0aGUgY29udHJvbCB2aXJ0cXVldWUuDQo+ID4NCj4gPiBWSVJUSU9fQ1JZ
+UFRPX0NJUEhFUl9DUkVBVEVfU0VTU0lPTiBpcyBhIG1lc3NhZ2UgdHlwZSBvZiBjb250cm9sDQo+
+IHF1ZXVlLA0KPiA+IE1lYW5zIGNyZWF0aW5nIGEgc2Vzc2lvbiBmb3IgbmV4dCBjcnlwdG8gcmVx
+dWVzdHMuDQo+IA0KPiBPaywgc28gdGhlIG1lc3NhZ2UgZG9lcyBoYXZlIHRoZSBzYW1lIG1lYW5p
+bmcgYXMgdGhlIGNvbnRyb2wgcXVldWUNCj4gbWVzc2FnZS4gIFRoYW5rcyBmb3IgY29uZmlybWlu
+Zy4NCj4gDQo+ID4+IFdoeSBjYW4ndCB2aG9zdC11c2VyIGFsc28gcHJvY2VzcyBjcmVhdGUvZGVz
+dHJveSBzZXNzaW9uIG1lc3NhZ2VzIG9uIHRoZQ0KPiA+PiBjb250cm9sIHZpcnRxdWV1ZSwgaW5z
+dGVhZCBvZiBoYXZpbmcgZGV2aWNlLXNwZWNpZmljIG1lc3NhZ2VzIGluIHRoZQ0KPiA+PiBwcm90
+b2NvbD8NCj4gPg0KPiA+IFlvdSBtZWFuIHdlIGNhbiBzaGFyZSBjb250cm9sIHZpcnRxdWV1ZSB0
+byBEUERLIGFzIHdlbGw/IExpa2UgZGF0YSBxdWV1ZXM/DQo+IA0KPiBJIGRvbid0IGtub3cgOikg
+YnV0IHdoeSBub3Q/DQo+IA0KQ3VycmVudCB0aGVyZSBhcmUgdHdvIG1haW4gcmVhc29ucyBmb3Ig
+dGhpcyBkZXNpZ246DQoNCjEpIHdlIHNob3VsZCB1c2UgYW5vdGhlciBjcHUgdG8gcG9sbGluZyB0
+aGUgY29udHJvbCB2aXJ0cXVldWUsIHdoaWNoIGlzIGV4cGVuc2l2ZS4NCjIpIHdlIHNob3VsZCBj
+b3B5IHRoZSBsb2dpYyBvZiBwYXJzaW5nIGNvbnRyb2wgbWVzc2FnZSB0byBEUERLLCB3aGljaCBi
+cmVhaw0KIGN1cnJlbnQgbGF5ZXJlZCBhcmNoaXRlY3R1cmUgLg0KDQpJJ20gbm90IHN1cmUgaWYg
+dGhlcmUgYXJlIGFueSBvdGhlciBoaWRkZW4gaXNzdWVzIGZvciBmdXR1cmUgc2NhbGFiaWxpdHks
+IHN1Y2ggYXMNCnVzaW5nIFFlbXUgdG8gbWFuYWdlIHNvbWUgY29udHJvbCBtZXNzYWdlcywgYXZv
+aWRpbmcgRC1Eb3MgYXR0YWNrIGV0Yy4NCg0KVGhhbmtzLA0KLUdvbmdsZWkNCg==
