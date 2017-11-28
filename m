@@ -1,38 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33902)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34214)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mdroth@linux.vnet.ibm.com>) id 1eJp8E-0007Il-KE
-	for qemu-devel@nongnu.org; Tue, 28 Nov 2017 18:17:39 -0500
+	(envelope-from <frederic.konrad@adacore.com>) id 1eJp8p-00085H-Un
+	for qemu-devel@nongnu.org; Tue, 28 Nov 2017 18:18:16 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mdroth@linux.vnet.ibm.com>) id 1eJp8A-0001E7-BJ
-	for qemu-devel@nongnu.org; Tue, 28 Nov 2017 18:17:37 -0500
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:38470)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mdroth@linux.vnet.ibm.com>)
-	id 1eJp8A-0001DJ-34
-	for qemu-devel@nongnu.org; Tue, 28 Nov 2017 18:17:34 -0500
-Received: from pps.filterd (m0098409.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
-	vASNEQx4033730
-	for <qemu-devel@nongnu.org>; Tue, 28 Nov 2017 18:17:29 -0500
-Received: from e13.ny.us.ibm.com (e13.ny.us.ibm.com [129.33.205.203])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2ehfp3c7hg-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Tue, 28 Nov 2017 18:17:28 -0500
-Received: from localhost
-	by e13.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
-	Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <mdroth@linux.vnet.ibm.com>;
-	Tue, 28 Nov 2017 18:17:27 -0500
-Content-Type: text/plain; charset="utf-8"
+	(envelope-from <frederic.konrad@adacore.com>) id 1eJp8m-0001f6-2Q
+	for qemu-devel@nongnu.org; Tue, 28 Nov 2017 18:18:15 -0500
+Received: from mel.act-europe.fr ([194.98.77.210]:48984
+	helo=smtp.eu.adacore.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <frederic.konrad@adacore.com>)
+	id 1eJp8l-0001ei-Rl
+	for qemu-devel@nongnu.org; Tue, 28 Nov 2017 18:18:11 -0500
+References: <cover.1511908159.git.alistair.francis@xilinx.com>
+	<ee595cb7408c5fce0f2ad6d33b721c7ae1fed283.1511908159.git.alistair.francis@xilinx.com>
+From: KONRAD Frederic <frederic.konrad@adacore.com>
+Message-ID: <86f6cfaf-9686-d0ed-db2a-135c697e76ed@adacore.com>
+Date: Wed, 29 Nov 2017 00:18:09 +0100
 MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-From: Michael Roth <mdroth@linux.vnet.ibm.com>
-In-Reply-To: <20171122113014.2512-1-sameeh@daynix.com>
-References: <20171122113014.2512-1-sameeh@daynix.com>
-Date: Tue, 28 Nov 2017 17:17:17 -0600
-Message-Id: <151191103735.31225.17730405646233505006@sif>
-Subject: Re: [Qemu-devel] [PATCH] qga-win: VSS: Handle
- VSS_E_PROVIDER_ALREADY_REGISTERED error
+In-Reply-To: <ee595cb7408c5fce0f2ad6d33b721c7ae1fed283.1511908159.git.alistair.francis@xilinx.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH-2.12 v1 3/3] xilinx_spips: Use memset
+ instead of a for loop to zero registers
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -41,86 +31,52 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Sameeh Jubran <sameeh@daynix.com>, qemu-devel@nongnu.org
-Cc: Yan Vugenfirer <yan@daynix.com>
+To: Alistair Francis <alistair.francis@xilinx.com>
+Cc: qemu-devel@nongnu.org, edgar.iglesias@xilinx.com, edgar.iglesias@gmail.com, alistair23@gmail.com
 
-Quoting Sameeh Jubran (2017-11-22 05:30:14)
-> From: Sameeh Jubran <sjubran@redhat.com>
-> =
 
-> We can get VSS_E_PROVIDER_ALREADY_REGISTERED error if for some
-> reason the uninstall of qemu-ga didn't complete successfully.
-> In this case we can try to unregister the component service
-> and attempt to register it again.
-> =
 
-> Signed-off-by: Sameeh Jubran <sjubran@redhat.com>
-
-This might be reasonable either way, but I'm concerned with why the
-uninstall of the VSS provider is failing in the first place. Are
-you seeing this issue with uninstall->install of the MSI package?
-
-If so there's 2 cases I've noticed with that:
-
-a) the VSS_E_PROVIDER_ALREADY_REGISTERED issue when you do the install,
-   which currently requires you to run qemu-ga -s vss-uninstall separately
-   and then retrying. This one would get fixed with this patch
-b) the DllRegisterServer call just hangs indefinitely. This one wouldn't
-   get fixed with this patch and it seems to be the one I see more often on
-   Windows 7
-
-I don't yet know the root cause, but both issues seem to have gone away for
-me with this patch:
-
-diff --git a/qga/installer/qemu-ga.wxs b/qga/installer/qemu-ga.wxs
-index 5af11627f8..c76b7a39c5 100644
---- a/qga/installer/qemu-ga.wxs
-+++ b/qga/installer/qemu-ga.wxs
-@@ -81,7 +81,7 @@
-               Arguments=3D"-d"
-               >
-             </ServiceInstall>
--            <ServiceControl Id=3D"StartService" Start=3D"install" Stop=3D"=
-both" Remove=3D"uninstall" Name=3D"QEMU-GA" Wait=3D"no" />
-+            <ServiceControl Id=3D"StartService" Start=3D"install" Stop=3D"=
-both" Remove=3D"uninstall" Name=3D"QEMU-GA" Wait=3D"yes" />
-           </Component>
-           <?ifdef var.InstallVss?>
-           <Component Id=3D"qga_vss_dll" Guid=3D"{CB19C453-FABB-4BB1-ABAB-6=
-B74F687BFBB}">
-
-Does this help in your case as well?
-
+On 11/28/2017 11:31 PM, Alistair Francis wrote:
+> Use memset() instead of a for loop to zero all of the registers.
+> 
+> Signed-off-by: Alistair Francis <alistair.francis@xilinx.com>
 > ---
->  qga/vss-win32/install.cpp | 9 +++++++++
->  1 file changed, 9 insertions(+)
-> =
-
-> diff --git a/qga/vss-win32/install.cpp b/qga/vss-win32/install.cpp
-> index 51838eeb26..e7bc5e1d9d 100644
-> --- a/qga/vss-win32/install.cpp
-> +++ b/qga/vss-win32/install.cpp
-> @@ -443,6 +443,15 @@ STDAPI DllRegisterServer(void)
->                                       VSS_PROV_SOFTWARE,
->                                       const_cast<WCHAR*>(QGA_PROVIDER_VER=
-SION),
->                                       g_gProviderVersion);
-> +    if (hr =3D=3D (long int) VSS_E_PROVIDER_ALREADY_REGISTERED) {
-> +        DllUnregisterServer();
-> +        hr =3D pVssAdmin->RegisterProvider(g_gProviderId, CLSID_QGAVSSPr=
-ovider,
-> +                                     const_cast<WCHAR * >(QGA_PROVIDER_L=
-NAME),
-> +                                     VSS_PROV_SOFTWARE,
-> +                                     const_cast<WCHAR * >(QGA_PROVIDER_V=
-ERSION),
-> +                                     g_gProviderVersion);
-> +    }
+> 
+>   hw/ssi/xilinx_spips.c | 11 +++--------
+>   1 file changed, 3 insertions(+), 8 deletions(-)
+> 
+> diff --git a/hw/ssi/xilinx_spips.c b/hw/ssi/xilinx_spips.c
+> index 1a37f9c7f5..82436e2f69 100644
+> --- a/hw/ssi/xilinx_spips.c
+> +++ b/hw/ssi/xilinx_spips.c
+> @@ -330,10 +330,7 @@ static void xilinx_spips_reset(DeviceState *d)
+>   {
+>       XilinxSPIPS *s = XILINX_SPIPS(d);
+>   
+> -    int i;
+> -    for (i = 0; i < XLNX_SPIPS_R_MAX; i++) {
+> -        s->regs[i] = 0;
+> -    }
+> +    memset(s->regs, 0, sizeof(s->regs));
+>   
+>       fifo8_reset(&s->rx_fifo);
+>       fifo8_reset(&s->rx_fifo);
+> @@ -358,13 +355,11 @@ static void xilinx_spips_reset(DeviceState *d)
+>   static void xlnx_zynqmp_qspips_reset(DeviceState *d)
+>   {
+>       XlnxZynqMPQSPIPS *s = XLNX_ZYNQMP_QSPIPS(d);
+> -    int i;
+>   
+>       xilinx_spips_reset(d);
+>   
+> -    for (i = 0; i < XLNX_ZYNQMP_SPIPS_R_MAX; i++) {
+> -        s->regs[i] = 0;
+> -    }
+> +    memset(s->regs, 0, sizeof(s->regs));
 > +
->      if (FAILED(hr)) {
->          errmsg_dialog(hr, "RegisterProvider failed");
->      }
-> -- =
+>       fifo8_reset(&s->rx_fifo_g);
+>       fifo8_reset(&s->rx_fifo_g);
+>       fifo32_reset(&s->fifo_g);
+> 
 
-> 2.13.6
->=20
+Reviewed-by: KONRAD Frederic <frederic.konrad@adacore.com>
