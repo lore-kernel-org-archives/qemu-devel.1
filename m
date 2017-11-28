@@ -1,24 +1,52 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39296)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41841)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1eJZMy-0003Iu-1l
-	for qemu-devel@nongnu.org; Tue, 28 Nov 2017 01:27:49 -0500
+	(envelope-from <zyimin@linux.vnet.ibm.com>) id 1eJZaN-0006oy-HE
+	for qemu-devel@nongnu.org; Tue, 28 Nov 2017 01:41:40 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1eJZMu-0008Fk-Sg
-	for qemu-devel@nongnu.org; Tue, 28 Nov 2017 01:27:48 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:60772)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <famz@redhat.com>) id 1eJZMu-0008FG-IU
-	for qemu-devel@nongnu.org; Tue, 28 Nov 2017 01:27:44 -0500
-Date: Tue, 28 Nov 2017 14:27:39 +0800
-From: Fam Zheng <famz@redhat.com>
-Message-ID: <20171128062739.GE3242@lemon>
-References: <20171128044656.10592-1-linzhecheng@huawei.com>
+	(envelope-from <zyimin@linux.vnet.ibm.com>) id 1eJZaI-0004RM-Hg
+	for qemu-devel@nongnu.org; Tue, 28 Nov 2017 01:41:39 -0500
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:38130)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <zyimin@linux.vnet.ibm.com>)
+	id 1eJZaI-0004Qd-7Q
+	for qemu-devel@nongnu.org; Tue, 28 Nov 2017 01:41:34 -0500
+Received: from pps.filterd (m0098393.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
+	vAS6YuQL089554
+	for <qemu-devel@nongnu.org>; Tue, 28 Nov 2017 01:41:31 -0500
+Received: from e31.co.us.ibm.com (e31.co.us.ibm.com [32.97.110.149])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2eh1hgasr2-1
+	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Tue, 28 Nov 2017 01:41:31 -0500
+Received: from localhost
+	by e31.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <zyimin@linux.vnet.ibm.com>;
+	Mon, 27 Nov 2017 23:41:30 -0700
+References: <1511388334-16347-1-git-send-email-pmorel@linux.vnet.ibm.com>
+	<1511388334-16347-2-git-send-email-pmorel@linux.vnet.ibm.com>
+	<3acc6fdb-5638-97b2-2dc7-bce34d22cd1f@redhat.com>
+	<20171123104903.24424b40.cohuck@redhat.com>
+	<a3655016-0e6b-b80f-2282-f6efbff9e1f9@redhat.com>
+	<20171123110844.4649f3b1.cohuck@redhat.com>
+	<58a08c1d-3935-42e7-cdc0-7bc45c08d2d3@redhat.com>
+	<20171123113326.3b2c5281.cohuck@redhat.com>
+	<6ab0d29e-1af0-888a-c932-a0a294ea225d@linux.vnet.ibm.com>
+	<d59edb51-71ba-7b75-83df-e4be246d2fce@redhat.com>
+	<4000596f-d2a0-c32e-7683-7e074e8132e2@linux.vnet.ibm.com>
+	<37aa6eb3-cbdf-39af-2068-7d0e5949e601@linux.vnet.ibm.com>
+	<2ab76ab0-b20a-9eaf-cafb-195e1621edd6@redhat.com>
+	<fc028628-55ae-a9d5-d226-ae611d56fa0e@linux.vnet.ibm.com>
+	<29101b83-77c9-7a6f-e243-f4a856a1e609@redhat.com>
+From: Yi Min Zhao <zyimin@linux.vnet.ibm.com>
+Date: Tue, 28 Nov 2017 14:41:25 +0800
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20171128044656.10592-1-linzhecheng@huawei.com>
-Subject: Re: [Qemu-devel] [PATCH v4] thread: move detach_thread from
- creating thread to created thread
+In-Reply-To: <29101b83-77c9-7a6f-e243-f4a856a1e609@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Message-Id: <0d3a3b0f-d935-5350-6613-a4d3ca1d0bb8@linux.vnet.ibm.com>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [qemu-s390x] [PATCH v3 1/7] s390x/pci: factor out
+ endianess conversion
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,181 +55,156 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: linzhecheng <linzhecheng@huawei.com>
-Cc: qemu-devel@nongnu.org, aliguori@us.ibm.com, wangxinxin.wang@huawei.com, arei.gonglei@huawei.com, pbonzini@redhat.com
+To: Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org
 
-On Tue, 11/28 12:46, linzhecheng wrote:
-> If we create a thread with QEMU_THREAD_DETACHED mode, QEMU may get a segfault in a low probability.
-> 
-> The backtrace is:
-> #0  0x00007f46c60291d7 in __GI_raise (sig=sig@entry=6) at ../nptl/sysdeps/unix/sysv/linux/raise.c:56
-> #1  0x00007f46c602a8c8 in __GI_abort () at abort.c:90
-> #2  0x00000000008543c9 in PAT_abort ()
-> #3  0x000000000085140d in patchIllInsHandler ()
-> #4  <signal handler called>
-> #5  pthread_detach (th=139933037614848) at pthread_detach.c:50
-> #6  0x0000000000829759 in qemu_thread_create (thread=thread@entry=0x7ffdaa8205e0, name=name@entry=0x94d94a "io-task-worker", start_routine=start_routine@entry=0x7eb9a0 <qio_task_thread_worker>, 
->     arg=arg@entry=0x3f5cf70, mode=mode@entry=1) at util/qemu_thread_posix.c:512
-> #7  0x00000000007ebc96 in qio_task_run_in_thread (task=0x31db2c0, worker=worker@entry=0x7e7e40 <qio_channel_socket_connect_worker>, opaque=0xcd23380, destroy=0x7f1180 <qapi_free_SocketAddress>)
->     at io/task.c:141
-> #8  0x00000000007e7f33 in qio_channel_socket_connect_async (ioc=ioc@entry=0x626c0b0, addr=<optimized out>, callback=callback@entry=0x55e080 <qemu_chr_socket_connected>, opaque=opaque@entry=0x42862c0, 
->     destroy=destroy@entry=0x0) at io/channel_socket.c:194
-> #9  0x000000000055bdd1 in socket_reconnect_timeout (opaque=0x42862c0) at qemu_char.c:4744
-> #10 0x00007f46c72483b3 in g_timeout_dispatch () from /usr/lib64/libglib-2.0.so.0
-> #11 0x00007f46c724799a in g_main_context_dispatch () from /usr/lib64/libglib-2.0.so.0
-> #12 0x000000000076c646 in glib_pollfds_poll () at main_loop.c:228
-> #13 0x000000000076c6eb in os_host_main_loop_wait (timeout=348000000) at main_loop.c:273
-> #14 0x000000000076c815 in main_loop_wait (nonblocking=nonblocking@entry=0) at main_loop.c:521
-> #15 0x000000000056a511 in main_loop () at vl.c:2076
-> #16 0x0000000000420705 in main (argc=<optimized out>, argv=<optimized out>, envp=<optimized out>) at vl.c:4940
-> 
-> The root cause of this problem is a bug of glibc(version 2.17,the latest version has the same bug),
-> let's see what happened in glibc's code.
-> Here is the code slice of pthread_detach.c
-> 
-> 25 int
-> 26 pthread_detach (pthread_t th)
-> 27 {
-> 28  struct pthread *pd = (struct pthread *) th;
-> 29
-> 30  /* Make sure the descriptor is valid.  */
-> 31  if (INVALID_NOT_TERMINATED_TD_P (pd))
-> 32    /* Not a valid thread handle.  */
-> 34    return ESRCH;
-> 35
-> 36  int result = 0;
-> 37  /* Mark the thread as detached.  */
-> 38  if (atomic_compare_and_exchange_bool_acq (&pd->joinid, pd, NULL))
-> 39    {
-> 40      /* There are two possibilities here.  First, the thread might
-> 41	 already be detached.  In this case we return EINVAL.
-> 42	 Otherwise there might already be a waiter.  The standard does
-> 43	 not mention what happens in this case.  */
-> 44     if (IS_DETACHED (pd))
-> 45	 result = EINVAL;
-> 46    }
-> 47  else
-> 48    /* Check whether the thread terminated meanwhile.  In this case we
-> 49       will just free the TCB.  */
-> 50    if ((pd->cancelhandling & EXITING_BITMASK) != 0)
-> 51      /* Note that the code in __free_tcb makes sure each thread
-> 52	 control block is freed only once.  */
-> 53      __free_tcb (pd);
-> 54  return result;
-> 55}
-> 
-> QEMU get a segfault at line 50, becasue pd is an invalid address.
-> pd is still valid at line 38 when set pd->joinid = pd, at this moment,
-> created thread is just exiting(only keeps runing for a short time),
-> created thread is running in code of start_thread:
-> 
-> 404  /* If the thread is detached free the TCB.  */
-> 405  if (IS_DETACHED (pd))
-> 406    /* Free the TCB.  */
-> 407    __free_tcb (pd);
-> created thread found that pd is detached, so it freed pd, in this case,
-> pd became an invalid address.
-> 
-> I rewrite qemu_thread_create to move detach_thread from creating thread to created
-> to avoid this concurrency problem.
-> 
-> Change-Id: I2293d5be1526241cf58785d701b922f2ffc6491b
-> Signed-off-by: linzhecheng <linzhecheng@huawei.com>
-> 
-> diff --git a/include/qemu/thread-posix.h b/include/qemu/thread-posix.h
-> index f3f47e4..4c6dbb8 100644
-> --- a/include/qemu/thread-posix.h
-> +++ b/include/qemu/thread-posix.h
-> @@ -44,4 +44,12 @@ struct QemuThread {
->      pthread_t thread;
->  };
->  
-> +typedef struct {
-> +    void *(*start_routine)(void *);
-> +    void *arg;
-> +    char *name;
-> +    int mode;
-> +} QemuThreadArgs;
-> +
-> +
->  #endif
-> diff --git a/util/qemu-thread-posix.c b/util/qemu-thread-posix.c
-> index 7306475..e5bdb6b 100644
-> --- a/util/qemu-thread-posix.c
-> +++ b/util/qemu-thread-posix.c
-> @@ -489,6 +489,30 @@ static void qemu_thread_set_name(QemuThread *thread, const char *name)
->  #endif
->  }
->  
-> +static void *qemu_thread_start(void *args)
-> +{
-> +    QemuThreadArgs *qemu_thread_args;
-> +    void *ret;
-> +    QemuThread qemu_thread;
-> +
-> +    qemu_thread_args = args;
-> +    qemu_thread_get_self(&qemu_thread);
-> +
-> +    if (qemu_thread_args->name) {
-> +        qemu_thread_set_name(&qemu_thread, qemu_thread_args->name);
-> +        g_free(qemu_thread_args->name);
-> +    }
-> +
-> +    if (qemu_thread_args->mode == QEMU_THREAD_DETACHED) {
-> +        pthread_detach(qemu_thread.thread);
-> +    }
-> +    ret = qemu_thread_args->start_routine(qemu_thread_args->arg);
-> +
-> +    g_free(qemu_thread_args);
-> +    return ret;
-> +}
-> +
-> +
->  void qemu_thread_create(QemuThread *thread, const char *name,
->                         void *(*start_routine)(void*),
->                         void *arg, int mode)
-> @@ -496,6 +520,7 @@ void qemu_thread_create(QemuThread *thread, const char *name,
->      sigset_t set, oldset;
->      int err;
->      pthread_attr_t attr;
-> +    QemuThreadArgs *qemu_thread_args;
->  
->      err = pthread_attr_init(&attr);
->      if (err) {
-> @@ -505,20 +530,18 @@ void qemu_thread_create(QemuThread *thread, const char *name,
->      /* Leave signal handling to the iothread.  */
->      sigfillset(&set);
->      pthread_sigmask(SIG_SETMASK, &set, &oldset);
-> -    err = pthread_create(&thread->thread, &attr, start_routine, arg);
-> +
-> +    qemu_thread_args = g_new0(QemuThreadArgs, 1);
-> +    qemu_thread_args->mode = mode;
-> +    qemu_thread_args->name = name_threads ? g_strdup_printf("%s", name) : NULL;
-> +    qemu_thread_args->start_routine = start_routine;
-> +    qemu_thread_args->arg = arg;
-> +
-> +    err = pthread_create(&thread->thread, &attr,
-> +                         qemu_thread_start, qemu_thread_args);
->      if (err)
->          error_exit(err, __func__);
->  
-> -    if (name_threads) {
-> -        qemu_thread_set_name(thread, name);
-> -    }
-> -
-> -    if (mode == QEMU_THREAD_DETACHED) {
-> -        err = pthread_detach(thread->thread);
-> -        if (err) {
-> -            error_exit(err, __func__);
-> -        }
-> -    }
->      pthread_sigmask(SIG_SETMASK, &oldset, NULL);
->  
->      pthread_attr_destroy(&attr);
-> -- 
-> 1.8.3.1
-> 
-> 
-> 
 
-Reviewed-by: Fam Zheng <famz@redhat.com>
+
+=E5=9C=A8 2017/11/27 =E4=B8=8B=E5=8D=887:13, Thomas Huth =E5=86=99=E9=81=93=
+:
+> On 27.11.2017 11:09, Yi Min Zhao wrote:
+>>
+>> =E5=9C=A8 2017/11/27 =E4=B8=8B=E5=8D=882:59, Thomas Huth =E5=86=99=E9=81=
+=93:
+>>> On 25.11.2017 14:49, Pierre Morel wrote:
+>>>> On 24/11/2017 07:19, Yi Min Zhao wrote:
+>>>>> =E5=9C=A8 2017/11/23 =E4=B8=8B=E5=8D=888:18, Thomas Huth =E5=86=99=E9=
+=81=93:
+>>>>>> On 23.11.2017 13:07, Yi Min Zhao wrote:
+>>>>>>> =E5=9C=A8 2017/11/23 =E4=B8=8B=E5=8D=886:33, Cornelia Huck =E5=86=
+=99=E9=81=93:
+>>>>>>>> On Thu, 23 Nov 2017 11:25:10 +0100
+>>>>>>>> Thomas Huth <thuth@redhat.com> wrote:
+>>>>>>>>
+>>>>>>>>> On 23.11.2017 11:08, Cornelia Huck wrote:
+>>>>>>>>>> On Thu, 23 Nov 2017 11:01:23 +0100
+>>>>>>>>>> Thomas Huth <thuth@redhat.com> wrote:
+>>>>>>>>>>> On 23.11.2017 10:49, Cornelia Huck wrote:
+>>>>>>>>>>>> On Thu, 23 Nov 2017 09:48:41 +0100
+>>>>>>>>>>>> Thomas Huth <thuth@redhat.com> wrote:
+>>>>>>>>>>>>> On 22.11.2017 23:05, Pierre Morel wrote:
+>>>>>>>>> [...]
+>>>>>>>>>>>>>> +/**
+>>>>>>>>>>>>>> + * Swap data contained in s390x big endian registers to
+>>>>>>>>>>>>>> little
+>>>>>>>>>>>>>> endian
+>>>>>>>>>>>>>> + * PCI bars.
+>>>>>>>>>>>>>> + *
+>>>>>>>>>>>>>> + * @ptr: a pointer to a uint64_t data field
+>>>>>>>>>>>>>> + * @len: the length of the valid data, must be 1,2,4 or 8
+>>>>>>>>>>>>>> + */
+>>>>>>>>>>>>>> +static int zpci_endian_swap(uint64_t *ptr, uint8_t len)
+>>>>>>>>>>>>>> +{
+>>>>>>>>>>>>>> +=C2=A0=C2=A0=C2=A0 uint64_t data =3D *ptr;
+>>>>>>>>>>>>>> +
+>>>>>>>>>>>>>> +=C2=A0=C2=A0=C2=A0 switch (len) {
+>>>>>>>>>>>>>> +=C2=A0=C2=A0=C2=A0 case 1:
+>>>>>>>>>>>>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 break;
+>>>>>>>>>>>>>> +=C2=A0=C2=A0=C2=A0 case 2:
+>>>>>>>>>>>>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 data =3D bswap=
+16(data);
+>>>>>>>>>>>>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 break;
+>>>>>>>>>>>>>> +=C2=A0=C2=A0=C2=A0 case 4:
+>>>>>>>>>>>>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 data =3D bswap=
+32(data);
+>>>>>>>>>>>>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 break;
+>>>>>>>>>>>>>> +=C2=A0=C2=A0=C2=A0 case 8:
+>>>>>>>>>>>>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 data =3D bswap=
+64(data);
+>>>>>>>>>>>>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 break;
+>>>>>>>>>>>>>> +=C2=A0=C2=A0=C2=A0 default:
+>>>>>>>>>>>>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 return -EINVAL=
+;
+>>>>>>>>>>>>>> +=C2=A0=C2=A0=C2=A0 }
+>>>>>>>>>>>>>> +=C2=A0=C2=A0=C2=A0 *ptr =3D data;
+>>>>>>>>>>>>>> +=C2=A0=C2=A0=C2=A0 return 0;
+>>>>>>>>>>>>>> +}
+>>>>>>>>>>>>> While you're at it, I think that should rather be leXX_to_c=
+pu()
+>>>>>>>>>>>>> instead
+>>>>>>>>>>>>> of bswapXX() here,
+>>>>>>>>>>>> I don't think that's correct, as this is supposed to swap BE
+>>>>>>>>>>>> registers
+>>>>>>>>>>>> to LE PCI bars.
+>>>>>>>>>>> Yes, but for the CPU emulation, the registers are stored in t=
+he
+>>>>>>>>>>> host's
+>>>>>>>>>>> endianness in the CPUS390XState structure. Or why do we
+>>>>>>>>>>> byte-swap them
+>>>>>>>>>>> again with cpu_to_be64() during s390_store_status(), for exam=
+ple?
+>>>>>>>>>> Gah, endian conversion is eating my brain...
+>>>>>>>>>>
+>>>>>>>>>> So, is the content we get BE or not? I thought in our last
+>>>>>>>>>> discussion
+>>>>>>>>>> we came to the conclusion that it is.
+>>>>>>>>> data is read from / written to env->regs[r1], so this is host
+>>>>>>>>> endian, as
+>>>>>>>>> far as I know. PCI is little endian, so using le32_to_cpu() /
+>>>>>>>>> cpu_to_le32() should IMHO be the right way to go here.
+>>>>>>>>>
+>>>>>>>>> By the way, if we want to use both, cpu_to_le and le_to_cpu,
+>>>>>>>>> depending
+>>>>>>>>> on whether we read from or write to PCI, we should maybe *not* =
+put
+>>>>>>>>> this
+>>>>>>>>> code into a separate function?
+>>>>>>>> Yes, if your assessment is correct, we need two functions (I thi=
+nk
+>>>>>>>> this
+>>>>>>>> conversion is used in other places in later patches as well). Or=
+ are
+>>>>>>>> there mechanisms for that already available?
+>>>>>>> I have a question, is the data in cpu->regs the guest's endianess=
+?
+>>>>>> As far as I know, it's host endianness, so on x86 with TCG emulati=
+on,
+>>>>>> it's little endian.
+>>>>>>
+>>>>>>> In our case, the guest is S390. Although the arch is big-endian, =
+the
+>>>>>>> data in
+>>>>>>> pcilg/stg instructions is little-endian.
+>>>>>> PCI memory is always little endian, right.
+>>>>>>
+>>>>>>> Another question, does 'cpu' in cpu_to_le**() or le**_to_cpu()
+>>>>>>> mean the
+>>>>>>> host endianess?
+>>>>>> Yes, the "cpu" in cpu_to_le or le_to_cpu means the host, indeed. I=
+t's
+>>>>>> confusing :-/
+>>>>>>
+>>>>>>> If the answers to upper two questions are yes, we actually need
+>>>>>>> handle
+>>>>>>> two cases.
+>>>>>>> 1) For pcilg, we need to translate the data to little-endian, thu=
+s
+>>>>>>> cpu_to_le**().
+>>>>>>> 2) For pcistg, we need to translate the data to host endianess, t=
+hus
+>>>>>>> le**_to_cpu().
+>>>>>> I think we've got to byte-swap if the host is big endian (s390x), =
+but
+>>>>>> not if the host is little endian (x86 with TCG).
+>>>> Here is my comprehension of this funny swapping:
+>>>>
+>>>> - TCG for a BE guest and a le host swap bytes because if we do (regi=
+ster
+>>>> & 0x01) in the zPCI interception code it must work what ever the
+>>>> endianess is.
+>>> Uhhh, I might have missed that the value has already been byte-swappe=
+d
+>>> once by TCG for env->regs[r1] ...
+>> I want to ask a question. For this case, BE guest and LE host, is
+>> env->regs[r1] in LE byte ordering?
+> Generally env->regs[] are in host byte order, so LE if the host is LE.
+> Not sure which byte-order is stored in the register by the guest,
+> though, since I don't have the zPCI spec ... so if the (BE) guest wrote
+> a LE value in the register, and TCG byte-swapped it again, the value is
+> suddenly BE again and thus we have to always byte-swap it again...?
+> Sorry, it's hard to say without having the spec available.
+Yes, your understanding is right. The guest is BE but the data in=20
+register for zPCI instruction is LE.
+>
+>   Thomas
+>
+>
