@@ -1,21 +1,42 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49306)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49432)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1eJin3-0005lZ-0I
-	for qemu-devel@nongnu.org; Tue, 28 Nov 2017 11:31:22 -0500
+	(envelope-from <walling@linux.vnet.ibm.com>) id 1eJinX-0006BR-Ab
+	for qemu-devel@nongnu.org; Tue, 28 Nov 2017 11:31:52 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1eJin1-0000wq-N4
-	for qemu-devel@nongnu.org; Tue, 28 Nov 2017 11:31:21 -0500
-Date: Wed, 29 Nov 2017 00:30:59 +0800
-From: Fam Zheng <famz@redhat.com>
-Message-ID: <20171128163059.GI3242@lemon>
-References: <20171128154350.21504-1-kwolf@redhat.com>
-	<20171128154350.21504-4-kwolf@redhat.com>
+	(envelope-from <walling@linux.vnet.ibm.com>) id 1eJinR-00019E-Ho
+	for qemu-devel@nongnu.org; Tue, 28 Nov 2017 11:31:51 -0500
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:43556
+	helo=mx0a-001b2d01.pphosted.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <walling@linux.vnet.ibm.com>)
+	id 1eJinR-00018v-DA
+	for qemu-devel@nongnu.org; Tue, 28 Nov 2017 11:31:45 -0500
+Received: from pps.filterd (m0098416.ppops.net [127.0.0.1])
+	by mx0b-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
+	vASGT8UX061596
+	for <qemu-devel@nongnu.org>; Tue, 28 Nov 2017 11:31:42 -0500
+Received: from e18.ny.us.ibm.com (e18.ny.us.ibm.com [129.33.205.208])
+	by mx0b-001b2d01.pphosted.com with ESMTP id 2ehadb3f56-1
+	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Tue, 28 Nov 2017 11:31:31 -0500
+Received: from localhost
+	by e18.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <walling@linux.vnet.ibm.com>;
+	Tue, 28 Nov 2017 11:31:25 -0500
+References: <1511816136-30068-1-git-send-email-walling@linux.vnet.ibm.com>
+	<1511816136-30068-5-git-send-email-walling@linux.vnet.ibm.com>
+	<d007f7af-f15e-105c-7859-13b7141cf260@redhat.com>
+From: "Collin L. Walling" <walling@linux.vnet.ibm.com>
+Date: Tue, 28 Nov 2017 11:31:23 -0500
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20171128154350.21504-4-kwolf@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH for-2.11 3/4] coroutine: Cancel
- aio_co_schedule() on direct entry
+In-Reply-To: <d007f7af-f15e-105c-7859-13b7141cf260@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
+Content-Language: en-US
+Message-Id: <ff314c86-be4e-db08-aae8-40ef3e3e68d3@linux.vnet.ibm.com>
+Subject: Re: [Qemu-devel] [qemu-s390x] [PATCH v1 4/5] s390-ccw: interactive
+ boot menu for eckd dasd
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,139 +45,82 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Kevin Wolf <kwolf@redhat.com>
-Cc: qemu-block@nongnu.org, mreitz@redhat.com, stefanha@redhat.com, jcody@redhat.com, pbonzini@redhat.com, qemu-devel@nongnu.org
+To: Thomas Huth <thuth@redhat.com>, borntraeger@de.ibm.com, frankja@linux.vnet.ibm.com, qemu-s390x@nongnu.org, qemu-devel@nongnu.org
 
-On Tue, 11/28 16:43, Kevin Wolf wrote:
-> If a coroutine can be reentered from multiple possible sources, we need
-> to be careful in the case that two sources try to reenter it at the same
-> time.
-> 
-> There are two different cases where this can happen:
-> 
-> 1. A coroutine spawns multiple asynchronous jobs and waits for all of
->    them to complete. In this case, multiple reentries are expected and
->    the coroutine is probably looping around a yield, so entering it
->    twice is generally fine (but entering it just once after all jobs
->    have completed would be enough, too).
-> 
->    Exception: When the loop condition becomes false and the first
->    reenter already leaves the loop, we must not do a second reenter.
-> 
-> 2. A coroutine yields and provides multiple alternative ways to be
->    reentered. In this case, we must always only process the first
->    reenter.
-> 
-> Direct entry is not a problem. It requires that the AioContext locks for
-> the coroutine context are held, which means that the coroutine has
-> enough time to set some state that simply prevents the second caller
-> from reentering the coroutine, too.
-> 
-> Things get more interesting with aio_co_schedule() because the coroutine
-> may be scheduled before it is (directly) entered from a second place.
-> Then changing some state inside the coroutine doesn't help because it is
-> already scheduled and the state won't be checked again.
-> 
-> For this case, we'll cancel any pending aio_co_schedule() when the
-> coroutine is actually entered. Reentering it once is enough for all
-> cases explained above, and a requirement for part of them.
-> 
-> Signed-off-by: Kevin Wolf <kwolf@redhat.com>
-> ---
->  include/qemu/coroutine_int.h |  1 +
->  util/async.c                 | 15 ++++++++++++++-
->  util/qemu-coroutine.c        | 17 +++++++++++++++++
->  3 files changed, 32 insertions(+), 1 deletion(-)
-> 
-> diff --git a/include/qemu/coroutine_int.h b/include/qemu/coroutine_int.h
-> index cb98892bba..73fc35e54b 100644
-> --- a/include/qemu/coroutine_int.h
-> +++ b/include/qemu/coroutine_int.h
-> @@ -40,6 +40,7 @@ struct Coroutine {
->      CoroutineEntry *entry;
->      void *entry_arg;
->      Coroutine *caller;
-> +    AioContext *scheduled;
->  
->      /* Only used when the coroutine has terminated.  */
->      QSLIST_ENTRY(Coroutine) pool_next;
-> diff --git a/util/async.c b/util/async.c
-> index 0e1bd8780a..dc249e9404 100644
-> --- a/util/async.c
-> +++ b/util/async.c
-> @@ -372,6 +372,7 @@ static bool event_notifier_poll(void *opaque)
->  static void co_schedule_bh_cb(void *opaque)
->  {
->      AioContext *ctx = opaque;
-> +    AioContext *scheduled_ctx;
->      QSLIST_HEAD(, Coroutine) straight, reversed;
->  
->      QSLIST_MOVE_ATOMIC(&reversed, &ctx->scheduled_coroutines);
-> @@ -388,7 +389,16 @@ static void co_schedule_bh_cb(void *opaque)
->          QSLIST_REMOVE_HEAD(&straight, co_scheduled_next);
->          trace_aio_co_schedule_bh_cb(ctx, co);
->          aio_context_acquire(ctx);
-> -        qemu_coroutine_enter(co);
-> +        scheduled_ctx = atomic_mb_read(&co->scheduled);
-> +        if (scheduled_ctx == ctx) {
-> +            qemu_coroutine_enter(co);
-> +        } else {
-> +            /* This must be a cancelled aio_co_schedule() because the coroutine
-> +             * was already entered before this BH had a chance to run. If a
-> +             * coroutine is scheduled for two different AioContexts, something
-> +             * is very wrong. */
-> +            assert(scheduled_ctx == NULL);
-> +        }
->          aio_context_release(ctx);
->      }
->  }
-> @@ -438,6 +448,9 @@ fail:
->  void aio_co_schedule(AioContext *ctx, Coroutine *co)
->  {
->      trace_aio_co_schedule(ctx, co);
-> +
-> +    /* Set co->scheduled before the coroutine becomes visible in the list */
-> +    atomic_mb_set(&co->scheduled, ctx);
->      QSLIST_INSERT_HEAD_ATOMIC(&ctx->scheduled_coroutines,
->                                co, co_scheduled_next);
->      qemu_bh_schedule(ctx->co_schedule_bh);
-> diff --git a/util/qemu-coroutine.c b/util/qemu-coroutine.c
-> index d6095c1d5a..c515b3cb4a 100644
-> --- a/util/qemu-coroutine.c
-> +++ b/util/qemu-coroutine.c
-> @@ -122,6 +122,23 @@ void qemu_aio_coroutine_enter(AioContext *ctx, Coroutine *co)
->       */
->      smp_wmb();
->  
-> +    /* Make sure that a coroutine that can alternatively reentered from two
+On 11/28/2017 07:36 AM, Thomas Huth wrote:
+> On 27.11.2017 21:55, Collin L. Walling wrote:
+> [...] 
+>> +static void read_stage2(block_number_t s1b_block_nr, void **stage2_data)
+>> +{
+>> +    block_number_t s2_block_nr;
+>> +    BootEckdStage1b *s1b = (void *)sec;
+>> +    int i;
+>> +
+>> +    /* Get Stage1b data */
+>> +    memset(sec, FREE_SPACE_FILLER, sizeof(sec));
+>> +    read_block(s1b_block_nr, s1b, "Cannot read stage1b boot loader.");
+>> +
+>> +    /* Get Stage2 data */
+>> +    *stage2_data = (void *)s2_area;
+> I think you could also simply "return s2_area" at the end of the
+> function instead of using a pointer-to-a-pointer as parameter of the
+> function.
 
-"that can be"?
+Ideally I'd like to figure out some way to get rid of the s2_area and
+just read stage2 block-by-block (that way we're only using sec).
 
-> +     * different sources isn't reentered more than once when the first caller
-> +     * uses aio_co_schedule() and the other one enters to coroutine directly.
-> +     * This is achieved by cancelling the pending aio_co_schedule().
-> +     *
-> +     * The other way round, if aio_co_schedule() would be called after this
-> +     * point, this would be a problem, too, but in practice it doesn't happen
-> +     * because we're holding the AioContext lock here and aio_co_schedule()
-> +     * callers must do the same. This means that the coroutine just needs to
-> +     * prevent other callers from calling aio_co_schedule() before it yields
-> +     * (e.g. block job coroutines by setting job->busy = true).
-> +     *
-> +     * We still want to ensure that the second case doesn't happen, so reset
-> +     * co->scheduled only after setting co->caller to make the above check
-> +     * effective for the co_schedule_bh_cb() case. */
-> +    atomic_set(&co->scheduled, NULL);
+I'll play around with things here after I've taken care of the other
+suggestions.
 
-Looks like accesses to co->scheduled are fully protected by AioContext lock, why
-are atomic ops necessary? To catch bugs?
+[...]
 
-> +
->      ret = qemu_coroutine_switch(self, co, COROUTINE_ENTER);
->  
->      qemu_co_queue_run_restart(co);
-> -- 
-> 2.13.6
-> 
+>
+>> +#define KEYCODE_BACKSP '\177'
+>> +#define KEYCODE_ENTER  '\r'
+>> +
+>>   long write(int fd, const void *str, size_t len);
+>>   
+>>   static char _sccb[PAGE_SIZE] __attribute__((__aligned__(4096)));
+>> @@ -101,3 +106,130 @@ void sclp_get_loadparm_ascii(char *loadparm)
+>>           ebcdic_to_ascii((char *) sccb->loadparm, loadparm, 8);
+>>       }
+>>   }
+>> +
+>> +static void read(char **str)
+> Please avoid using names from the standard C-library, unless the
+> function is supposed to do the same (as the write() function here).
 
-Fam
+Thinking about it, I'm not sure if it would make sense for us to have a
+C-like read() function... perhaps it'd be best to rename it for now.
+
+[...]
+>> +    );
+>> +}
+>> +
+>> +static inline bool check_clock_int(void)
+>> +{
+>> +    uint16_t code;
+>> +
+>> +    consume_sclp_int();
+>> +
+>> +    asm volatile(
+>> +        "lh         1, 0x86(0,0)\n"
+>> +        "sth        1, %0"
+>> +        : "=r" (code)
+>> +    );
+> That way, you need r1 in the clobber list. But why don't you simply use
+> only "lh %0,0x86(0,0)\n" instead? Or simply do it without assembly:
+>
+>   code = *(volatile uint16_t *)0x86;
+
+This is new to me... thanks for showing me this :)
+
+>
+> ?
+[...]
+>   Thomas
+>
+Thanks for the review, Thomas.I've noted all other suggestions.
+
+-- 
+- Collin L Walling
