@@ -1,31 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57012)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57014)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1eJaVl-0007j4-0U
+	(envelope-from <bounces@canonical.com>) id 1eJaVl-0007j5-1E
 	for qemu-devel@nongnu.org; Tue, 28 Nov 2017 02:40:58 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1eJaVh-0004L5-RZ
+	(envelope-from <bounces@canonical.com>) id 1eJaVj-0004M0-RX
 	for qemu-devel@nongnu.org; Tue, 28 Nov 2017 02:40:57 -0500
-Received: from indium.canonical.com ([91.189.90.7]:47690)
+Received: from indium.canonical.com ([91.189.90.7]:47810)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1eJaVh-0004Kc-L0
-	for qemu-devel@nongnu.org; Tue, 28 Nov 2017 02:40:53 -0500
+	id 1eJaVj-0004LV-Kw
+	for qemu-devel@nongnu.org; Tue, 28 Nov 2017 02:40:55 -0500
 Received: from loganberry.canonical.com ([91.189.90.37])
 	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1eJaVf-0001ki-Ff
-	for <qemu-devel@nongnu.org>; Tue, 28 Nov 2017 07:40:51 +0000
+	id 1eJaVh-0001oK-OG
+	for <qemu-devel@nongnu.org>; Tue, 28 Nov 2017 07:40:53 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 638A92E80CE
-	for <qemu-devel@nongnu.org>; Tue, 28 Nov 2017 07:40:51 +0000 (UTC)
+	by loganberry.canonical.com (Postfix) with ESMTP id 620002E80D4
+	for <qemu-devel@nongnu.org>; Tue, 28 Nov 2017 07:40:53 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Tue, 28 Nov 2017 07:32:27 -0000
+Date: Tue, 28 Nov 2017 07:34:46 -0000
 From: ChristianEhrhardt <1716028@bugs.launchpad.net>
 Reply-To: Bug 1716028 <1716028@bugs.launchpad.net>
 Sender: bounces@canonical.com
 References: <150489404292.23034.16812601554685741285.malonedeb@wampee.canonical.com>
-Message-Id: <151185434720.20027.18212171615952266084.malone@chaenomeles.canonical.com>
+Message-Id: <151185448680.10912.11235623844809372044.malone@soybean.canonical.com>
 Errors-To: bounces@canonical.com
 Subject: [Qemu-devel] [Bug 1716028] Re: qemu 2.10 locks images with no
  feature flag
@@ -39,28 +39,13 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-Umm, the latter is the official way to go, but only in latter libvirt versi=
-ons.
-https://libvirt.org/git/?p=3Dlibvirt.git;a=3Dcommit;h=3D28907b0043fbf71085a=
-798372ab9c816ba043b93
-
-I'm adding a libvirt bug task for the bionic merge to pick that up
-"explicitly"
+Also on the qemu side this is "works as intended" and workarounds are docum=
+ented in this bug.
+So we should set that bug status as well - looking back given it was mostly=
+ a discussion I guess "opinion" is the best close status in this case.
 
 ** Changed in: qemu (Ubuntu)
-       Status: New =3D> Won't Fix
-
-** Also affects: libvirt (Ubuntu)
-   Importance: Undecided
-       Status: New
-
-** Changed in: libvirt (Ubuntu)
-       Status: New =3D> Triaged
-
-** Tags added: libvirt-18.04
-
-** Changed in: qemu
-       Status: New =3D> Opinion
+       Status: Won't Fix =3D> Opinion
 
 -- =
 
