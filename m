@@ -1,22 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52391)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55939)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1eJa8w-0001Er-FP
-	for qemu-devel@nongnu.org; Tue, 28 Nov 2017 02:17:23 -0500
+	(envelope-from <bounces@canonical.com>) id 1eJaQk-00069S-FW
+	for qemu-devel@nongnu.org; Tue, 28 Nov 2017 02:35:47 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1eJa8u-0001oI-TP
-	for qemu-devel@nongnu.org; Tue, 28 Nov 2017 02:17:22 -0500
-References: <20171128071409.21887-1-vsementsov@virtuozzo.com>
-	<20171128071409.21887-5-vsementsov@virtuozzo.com>
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Message-ID: <7d3d03ae-fa09-045d-620e-794560b279f3@virtuozzo.com>
-Date: Tue, 28 Nov 2017 10:17:08 +0300
+	(envelope-from <bounces@canonical.com>) id 1eJaQh-0001Fv-BT
+	for qemu-devel@nongnu.org; Tue, 28 Nov 2017 02:35:46 -0500
+Received: from indium.canonical.com ([91.189.90.7]:46578)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1eJaQh-0001Fl-4a
+	for qemu-devel@nongnu.org; Tue, 28 Nov 2017 02:35:43 -0500
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1eJaQe-0000B4-A4
+	for <qemu-devel@nongnu.org>; Tue, 28 Nov 2017 07:35:40 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 60C6D2E80C7
+	for <qemu-devel@nongnu.org>; Tue, 28 Nov 2017 07:35:39 +0000 (UTC)
 MIME-Version: 1.0
-In-Reply-To: <20171128071409.21887-5-vsementsov@virtuozzo.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
-Content-Language: en-US
-Subject: Re: [Qemu-devel] [PATCH 4/4] iotests: add dirty bitmap migration
- test
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Tue, 28 Nov 2017 07:26:20 -0000
+From: ChristianEhrhardt <1716028@bugs.launchpad.net>
+Reply-To: Bug 1716028 <1716028@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <150489404292.23034.16812601554685741285.malonedeb@wampee.canonical.com>
+Message-Id: <151185398071.11243.6963990622834653552.malone@soybean.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1716028] Re: qemu 2.10 locks images with no
+ feature flag
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,177 +37,108 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org, qemu-block@nongnu.org
-Cc: crosa@redhat.com, ehabkost@redhat.com, mreitz@redhat.com, kwolf@redhat.com, den@openvz.org
+To: qemu-devel@nongnu.org
 
-28.11.2017 10:14, Vladimir Sementsov-Ogievskiy wrote:
-> The test creates two vms (vm_a, vm_b), create dirty bitmap in
-> the first one, do several writes to corresponding device and
-> then migrate vm_a to vm_b with dirty bitmaps.
->
-> For now, only migration through shared storage for persistent
-> bitmaps is available, so it is tested here. Only offline variant
-> is tested for now (a kind of suspend-resume), as it is needed
-> to test that this case is successfully fixed by recent patch.
->
-> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-> ---
->   tests/qemu-iotests/169        | 82 +++++++++++++++++++++++++++++++++++++++++++
->   tests/qemu-iotests/169.out    |  5 +++
->   tests/qemu-iotests/group      |  1 +
->   tests/qemu-iotests/iotests.py |  7 +++-
->   4 files changed, 94 insertions(+), 1 deletion(-)
->   create mode 100755 tests/qemu-iotests/169
->   create mode 100644 tests/qemu-iotests/169.out
->
-> diff --git a/tests/qemu-iotests/169 b/tests/qemu-iotests/169
-> new file mode 100755
-> index 0000000000..a0f213b274
-> --- /dev/null
-> +++ b/tests/qemu-iotests/169
-> @@ -0,0 +1,82 @@
-> +#!/usr/bin/env python
-> +#
-> +# Tests for dirty bitmaps migration.
-> +#
-> +# Copyright (c) 2016-2017 Parallels International GmbH
-> +#
-> +# This program is free software; you can redistribute it and/or modify
-> +# it under the terms of the GNU General Public License as published by
-> +# the Free Software Foundation; either version 2 of the License, or
-> +# (at your option) any later version.
-> +#
-> +# This program is distributed in the hope that it will be useful,
-> +# but WITHOUT ANY WARRANTY; without even the implied warranty of
-> +# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-> +# GNU General Public License for more details.
-> +#
-> +# You should have received a copy of the GNU General Public License
-> +# along with this program.  If not, see <http://www.gnu.org/licenses/>.
-> +#
-> +
-> +import os
-> +import iotests
-> +import time
-> +from iotests import qemu_img
-> +
-> +disk = os.path.join(iotests.test_dir, 'disk')
-> +migfile = os.path.join(iotests.test_dir, 'migfile')
-> +
-> +class TestPersistentDirtyBitmapSuspendResume(iotests.QMPTestCase):
-> +
-> +    def tearDown(self):
-> +        self.vm_a.shutdown()
-> +        self.vm_b.shutdown()
-> +        os.remove(disk)
-> +        os.remove(migfile)
-> +
-> +    def setUp(self):
-> +        qemu_img('create', '-f', iotests.imgfmt, disk, '1M')
-> +
-> +        self.vm_a = iotests.VM(path_suffix='a').add_drive(disk)
-> +        self.vm_a.launch()
-> +
-> +        self.vm_b = iotests.VM(path_suffix='b').add_drive(disk)
-> +        self.vm_b.add_incoming("exec: cat '" + migfile + "'")
-> +
-> +    def test_migration_persistent_shared_offline(self):
-> +        """ A kind of suspend-resume """
-> +        granularity = 512
-> +        regions = [
-> +            { 'start': 0,           'count': 0x10000 },
-> +            { 'start': 0xf0000,     'count': 0x10000 },
-> +            { 'start': 0xa0201,     'count': 0x1000  }
-> +            ]
-> +
-> +        result = self.vm_a.qmp('block-dirty-bitmap-add', node='drive0',
-> +                               name='bitmap0', granularity=granularity,
-> +                               persistent=True, autoload=True)
-> +        self.assert_qmp(result, 'return', {});
-> +
-> +        for r in regions:
-> +            self.vm_a.hmp_qemu_io('drive0',
-> +                                  'write %d %d' % (r['start'], r['count']))
-> +
-> +        result = self.vm_a.qmp('x-debug-block-dirty-bitmap-sha256',
-> +                               node='drive0', name='bitmap0')
-> +        sha256 = result['return']['sha256']
-> +
-> +        result = self.vm_a.qmp('migrate', uri='exec:cat>' + migfile)
-> +        self.assert_qmp(result, 'return', {});
-> +        self.assertNotEqual(self.vm_a.event_wait("STOP"), None)
-> +        self.vm_a.shutdown()
-> +
-> +        self.vm_b.launch()
-> +        self.vm_b.event_wait("RESUME", timeout=10)
-> +
-> +        result = self.vm_b.qmp('x-debug-block-dirty-bitmap-sha256',
-> +                               node='drive0', name='bitmap0')
-> +        self.assert_qmp(result, 'return/sha256', sha256);
-> +
-> +
-> +if __name__ == '__main__':
-> +    iotests.main(supported_fmts=['qcow2'])
-> diff --git a/tests/qemu-iotests/169.out b/tests/qemu-iotests/169.out
-> new file mode 100644
-> index 0000000000..ae1213e6f8
-> --- /dev/null
-> +++ b/tests/qemu-iotests/169.out
-> @@ -0,0 +1,5 @@
-> +.
-> +----------------------------------------------------------------------
-> +Ran 1 tests
-> +
-> +OK
-> diff --git a/tests/qemu-iotests/group b/tests/qemu-iotests/group
-> index 3e688678dd..e879c7ebc7 100644
-> --- a/tests/qemu-iotests/group
-> +++ b/tests/qemu-iotests/group
-> @@ -169,6 +169,7 @@
->   162 auto quick
->   163 rw auto quick
->   165 rw auto quick
-> +169 rw auto quick
->   170 rw auto quick
->   171 rw auto quick
->   172 auto
-> diff --git a/tests/qemu-iotests/iotests.py b/tests/qemu-iotests/iotests.py
-> index 6f057904a9..ce029b51e2 100644
-> --- a/tests/qemu-iotests/iotests.py
-> +++ b/tests/qemu-iotests/iotests.py
+Note: Depending on the case you might also get lucky with "shareable"
+and/or "readonly" disk attributes.
 
-following chunks are extra ones, drop them, sorry for this garbage.
+-- =
 
-> @@ -430,6 +430,10 @@ def verify_platform(supported_oses=['linux']):
->       if True not in [sys.platform.startswith(x) for x in supported_oses]:
->           notrun('not suitable for this OS: %s' % sys.platform)
->   
-> +def verify_cache_mode(supported_cache_modes=[]):
-> +    if supported_cache_modes and (cachemode not in supported_cache_modes):
-> +        notrun('not suitable for this cache mode: %s' % cachemode)
-> +
->   def supports_quorum():
->       return 'quorum' in qemu_img_pipe('--help')
->   
-> @@ -438,7 +442,7 @@ def verify_quorum():
->       if not supports_quorum():
->           notrun('quorum support missing')
->   
-> -def main(supported_fmts=[], supported_oses=['linux']):
-> +def main(supported_fmts=[], supported_oses=['linux'], supported_cache_modes=[]):
->       '''Run tests'''
->   
->       global debug
-> @@ -455,6 +459,7 @@ def main(supported_fmts=[], supported_oses=['linux']):
->       verbosity = 1
->       verify_image_format(supported_fmts)
->       verify_platform(supported_oses)
-> +    verify_cache_mode(supported_cache_modes)
->   
->       # We need to filter out the time taken from the output so that qemu-iotest
->       # can reliably diff the results against master output.
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1716028
 
+Title:
+  qemu 2.10 locks images with no feature flag
 
--- 
-Best regards,
-Vladimir
+Status in QEMU:
+  Opinion
+Status in libvirt package in Ubuntu:
+  Triaged
+Status in qemu package in Ubuntu:
+  Opinion
+
+Bug description:
+  1) % lsb_release -rd
+  Description:	Ubuntu Artful Aardvark (development branch)
+  Release:	17.10
+
+  2) % apt-cache policy qemu-system-x86
+  qemu-system-x86:
+    Installed: 1:2.10~rc3+dfsg-0ubuntu1
+    Candidate: 1:2.10+dfsg-0ubuntu1
+    Version table:
+       1:2.10+dfsg-0ubuntu1 500
+          500 http://archive.ubuntu.com//ubuntu devel/main amd64 Packages
+   *** 1:2.10~rc3+dfsg-0ubuntu1 100
+          100 /var/lib/dpkg/status
+
+  3) qemu locks image files with no way to discover this feature nor how
+  to disable it
+
+  4) qemu provides a way to query if it supports image locking, and what
+  the default value is, and how to disable the locking via cli
+
+  qemu 2.10 now will lock image files and warn if an image is currently
+  locked.  This prevent qemu from running (and possibly corrupting said
+  image).
+
+  However, qemu does not provide any way to determine if a qemu binary
+  actually has this capability.  Normally behavior changing features are
+  exposed via some change to the qemu help menu or QMP/QAPI output of
+  capabilities.
+
+  I believe this slipped through since libvirt already does image
+  locking, but direct cli users will be caught by this change.
+
+  In particular, we have a use-case where we simulate multipath disks by
+  creating to disks which point to the same file which now breaks
+  without adding the 'file.locking=3Doff' to the -drive parameters;  which
+  is also completely undocumented and unexposed.
+
+  Some parts of the cli like -device allow querying of settable options
+  (qemu-system-x86 -device scsi_hd,?)  but nothing equivalent exists for
+  -drive parameters.
+
+  ProblemType: Bug
+  DistroRelease: Ubuntu 17.10
+  Package: qemu-system-x86 1:2.10~rc3+dfsg-0ubuntu1
+  ProcVersionSignature: Ubuntu 4.12.0-11.12-generic 4.12.5
+  Uname: Linux 4.12.0-11-generic x86_64
+  NonfreeKernelModules: zfs zunicode zavl zcommon znvpair
+  ApportVersion: 2.20.6-0ubuntu7
+  Architecture: amd64
+  Date: Fri Sep  8 12:56:53 2017
+  JournalErrors:
+   Hint: You are currently not seeing messages from other users and the sys=
+tem.
+         Users in groups 'adm', 'systemd-journal' can see all messages.
+         Pass -q to turn off this notice.
+   -- Logs begin at Mon 2017-01-30 11:56:02 CST, end at Fri 2017-09-08 12:5=
+6:46 CDT. --
+   -- No entries --
+  KvmCmdLine: COMMAND         STAT  EUID  RUID   PID  PPID %CPU COMMAND
+  MachineType: HP ProLiant DL360 Gen9
+  ProcEnviron:
+   TERM=3Dxterm
+   PATH=3D(custom, no user)
+   XDG_RUNTIME_DIR=3D<set>
+   LANG=3Den_US.UTF-8
+   SHELL=3D/bin/bash
+  ProcKernelCmdLine: BOOT_IMAGE=3D/vmlinuz-4.12.0-11-generic root=3DUUID=3D=
+45354276-e0c0-4bf6-9083-f130b89411cc ro --- console=3DttyS1,115200
+  SourcePackage: qemu
+  UpgradeStatus: No upgrade log present (probably fresh install)
+  dmi.bios.date: 03/05/2015
+  dmi.bios.vendor: HP
+  dmi.bios.version: P89
+  dmi.chassis.type: 23
+  dmi.chassis.vendor: HP
+  dmi.modalias: dmi:bvnHP:bvrP89:bd03/05/2015:svnHP:pnProLiantDL360Gen9:pvr=
+:cvnHP:ct23:cvr:
+  dmi.product.family: ProLiant
+  dmi.product.name: ProLiant DL360 Gen9
+  dmi.sys.vendor: HP
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1716028/+subscriptions
