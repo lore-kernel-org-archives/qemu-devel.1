@@ -1,20 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54701)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56474)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1eJj2Q-0005LX-9n
-	for qemu-devel@nongnu.org; Tue, 28 Nov 2017 11:47:15 -0500
+	(envelope-from <pbonzini@redhat.com>) id 1eJj6t-0006sU-VT
+	for qemu-devel@nongnu.org; Tue, 28 Nov 2017 11:51:53 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1eJj2P-0008PZ-GT
-	for qemu-devel@nongnu.org; Tue, 28 Nov 2017 11:47:14 -0500
+	(envelope-from <pbonzini@redhat.com>) id 1eJj6t-0002UN-5R
+	for qemu-devel@nongnu.org; Tue, 28 Nov 2017 11:51:52 -0500
 References: <20171128154350.21504-1-kwolf@redhat.com>
 	<20171128154350.21504-4-kwolf@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <e0b6d616-aa98-9269-a36c-33c6fcaa3dd4@redhat.com>
-Date: Tue, 28 Nov 2017 10:46:59 -0600
+	<9bd2921d-64c6-724c-0d80-b43e33f41817@redhat.com>
+	<20171128162850.GF3703@localhost.localdomain>
+	<20171128164210.GG25110@localhost.localdomain>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <73fda5ef-429b-1310-255f-0f37b7e3a325@redhat.com>
+Date: Tue, 28 Nov 2017 17:51:21 +0100
 MIME-Version: 1.0
-In-Reply-To: <20171128154350.21504-4-kwolf@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
+In-Reply-To: <20171128164210.GG25110@localhost.localdomain>
+Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: quoted-printable
 Subject: Re: [Qemu-devel] [PATCH for-2.11 3/4] coroutine: Cancel
  aio_co_schedule() on direct entry
 List-Id: <qemu-devel.nongnu.org>
@@ -25,65 +28,57 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
-Cc: famz@redhat.com, jcody@redhat.com, qemu-devel@nongnu.org, mreitz@redhat.com, stefanha@redhat.com, pbonzini@redhat.com
+To: Jeff Cody <jcody@redhat.com>, Kevin Wolf <kwolf@redhat.com>
+Cc: qemu-block@nongnu.org, mreitz@redhat.com, stefanha@redhat.com, famz@redhat.com, qemu-devel@nongnu.org
 
-On 11/28/2017 09:43 AM, Kevin Wolf wrote:
-> If a coroutine can be reentered from multiple possible sources, we need
-> to be careful in the case that two sources try to reenter it at the same
-> time.
-> 
+On 28/11/2017 17:42, Jeff Cody wrote:
+> On Tue, Nov 28, 2017 at 05:28:50PM +0100, Kevin Wolf wrote:
+>> Am 28.11.2017 um 17:14 hat Paolo Bonzini geschrieben:
+>>> On 28/11/2017 16:43, Kevin Wolf wrote:
+>>>> +    /* Make sure that a coroutine that can alternatively reentered =
+from two
+>>>> +     * different sources isn't reentered more than once when the fi=
+rst caller
+>>>> +     * uses aio_co_schedule() and the other one enters to coroutine=
+ directly.
+>>>> +     * This is achieved by cancelling the pending aio_co_schedule()=
+.
+>>>> +     *
+>>>> +     * The other way round, if aio_co_schedule() would be called af=
+ter this
+>>>> +     * point, this would be a problem, too, but in practice it does=
+n't happen
+>>>> +     * because we're holding the AioContext lock here and aio_co_sc=
+hedule()
+>>>> +     * callers must do the same.
+>>>
+>>> No, this is not true.  aio_co_schedule is thread-safe.
+>>
+>> Hm... With the reproducer we were specfically looking at
+>> qmp_block_job_cancel(), which does take the AioContext locks. But it
+>> might not be as universal as I thought.
+>>
+>> To be honest, I just wasn't sure what to do with this case anyway. It
+>> means that the coroutine is already running when someone else schedule=
+s
+>> it. We don't really know whether we have to enter it a second time or
+>> not.
+>>
+>> So if it can indeed happen in practice, we need to think a bit more
+>> about this.
+>=20
+> It would be nice if, on coroutine termination, we could unschedule all
+> pending executions for that coroutine.  I think use-after-free is the m=
+ain
+> concern for someone else calling aio_co_schedule() while the coroutine =
+is
+> currently running.
 
-> For this case, we'll cancel any pending aio_co_schedule() when the
-> coroutine is actually entered. Reentering it once is enough for all
-> cases explained above, and a requirement for part of them.
-> 
-> Signed-off-by: Kevin Wolf <kwolf@redhat.com>
-> ---
->   include/qemu/coroutine_int.h |  1 +
+Yes, terminating a scheduled coroutine is a bug; same for scheduling a
+terminated coroutine, both orders are wrong. However, "unscheduling" is
+not the solution; you would just be papering over the issue.
 
-> +++ b/util/qemu-coroutine.c
-> @@ -122,6 +122,23 @@ void qemu_aio_coroutine_enter(AioContext *ctx, Coroutine *co)
->        */
->       smp_wmb();
->   
-> +    /* Make sure that a coroutine that can alternatively reentered from two
+aio_co_schedule() on a running coroutine can only happen when the
+coroutine is going to yield soon.
 
-s/reentered/be reentered/
-
-> +     * different sources isn't reentered more than once when the first caller
-> +     * uses aio_co_schedule() and the other one enters to coroutine directly.
-
-s/enters to/enters the/
-
-> +     * This is achieved by cancelling the pending aio_co_schedule().
-> +     *
-> +     * The other way round, if aio_co_schedule() would be called after this
-> +     * point, this would be a problem, too, but in practice it doesn't happen
-
-s/this //
-
-> +     * because we're holding the AioContext lock here and aio_co_schedule()
-> +     * callers must do the same. This means that the coroutine just needs to
-> +     * prevent other callers from calling aio_co_schedule() before it yields
-> +     * (e.g. block job coroutines by setting job->busy = true).
-
-Is 'block job coroutines' the set of coroutines owned by 'block jobs', 
-or is it the verb that we are blocking all 'job coroutines'?  I don't 
-know if a wording tweak would help avoid ambiguity here.
-
-> +     *
-> +     * We still want to ensure that the second case doesn't happen, so reset
-> +     * co->scheduled only after setting co->caller to make the above check
-> +     * effective for the co_schedule_bh_cb() case. */
-> +    atomic_set(&co->scheduled, NULL);
-> +
->       ret = qemu_coroutine_switch(self, co, COROUTINE_ENTER);
->   
->       qemu_co_queue_run_restart(co);
-> 
-
--- 
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
+Paolo
