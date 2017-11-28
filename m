@@ -1,27 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46892)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47353)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1eJbls-0000ms-6r
-	for qemu-devel@nongnu.org; Tue, 28 Nov 2017 04:01:45 -0500
+	(envelope-from <arei.gonglei@huawei.com>) id 1eJbon-0001qc-L3
+	for qemu-devel@nongnu.org; Tue, 28 Nov 2017 04:04:42 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1eJblm-0008SB-Hd
-	for qemu-devel@nongnu.org; Tue, 28 Nov 2017 04:01:40 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:39362)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1eJblm-0008Rj-C7
-	for qemu-devel@nongnu.org; Tue, 28 Nov 2017 04:01:34 -0500
-References: <151127322955.6888.16198535123422076171.stgit@Misha-PC.lan02.inno>
-	<151127326409.6888.9209413226035587910.stgit@Misha-PC.lan02.inno>
-	<CABdb7372q-LntFhkDuurfWi2JakzZCM9xVxkEA=cqYMbKv_jGw@mail.gmail.com>
-	<CAFEAcA9Db5hB95KqZEjWgEhkX_gWZ+Za40B1hhbKQ5mop-WgbQ@mail.gmail.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <ba2ccf99-43f1-49ba-5fb8-3a3882477cea@redhat.com>
-Date: Tue, 28 Nov 2017 10:01:26 +0100
+	(envelope-from <arei.gonglei@huawei.com>) id 1eJbok-0001pj-Hd
+	for qemu-devel@nongnu.org; Tue, 28 Nov 2017 04:04:41 -0500
+Received: from szxga04-in.huawei.com ([45.249.212.190]:2819)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_ARCFOUR_SHA1:16) (Exim 4.71)
+	(envelope-from <arei.gonglei@huawei.com>) id 1eJboj-0001lK-U1
+	for qemu-devel@nongnu.org; Tue, 28 Nov 2017 04:04:38 -0500
+From: Gonglei <arei.gonglei@huawei.com>
+Date: Tue, 28 Nov 2017 17:03:05 +0800
+Message-ID: <1511859789-43680-1-git-send-email-arei.gonglei@huawei.com>
 MIME-Version: 1.0
-In-Reply-To: <CAFEAcA9Db5hB95KqZEjWgEhkX_gWZ+Za40B1hhbKQ5mop-WgbQ@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v3 05/45] windbg: added helper features
+Content-Type: text/plain
+Subject: [Qemu-devel] [PATCH 0/4] cryptodev: add vhost support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,26 +23,51 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>, Ladi Prosek <lprosek@redhat.com>
-Cc: Mihail Abakumov <mikhail.abakumov@ispras.ru>, Stefan Weil <sw@weilnetz.de>, qemu-devel <qemu-devel@nongnu.org>, Pavel Dovgalyuk <dovgaluk@ispras.ru>, Roman Kagan <rkagan@virtuozzo.com>, "Denis V. Lunev" <den@openvz.org>
+To: qemu-devel@nongnu.org
+Cc: mst@redhat.com, pbonzini@redhat.com, weidong.huang@huawei.com, stefanha@redhat.com, jianjay.zhou@huawei.com, pasic@linux.vnet.ibm.com, longpeng2@huawei.com, xin.zeng@intel.com, roy.fan.zhang@intel.com, Gonglei <arei.gonglei@huawei.com>
 
-On 28/11/2017 09:34, Peter Maydell wrote:
->>  #define FMT_ERR  "Error:%d"
->>
->>  #define UINT8_P(ptr) ((uint8_t *) (ptr))
->> -#define UINT32_P(ptr) ((uint32_t *) (ptr))
->> +#define UINT32_P(ptr) ((uint32_t *) (size_t) (ptr))
->>  #define PTR(var) UINT8_P(&var)
-> Hiding casts behind macros like this doesn't seem worthwhile
-> to me anyway -- all it's doing is obscuring what's going on.
-> And casting an arbitrary pointer to a uint32_t* is somewhat
-> alarming -- the alignment requirements may not be met.
-> Chances are high that code using that macro is not correct.
+I posted the RFC verion five months ago for DPDK
+vhost-crypto implmention, and now it's time to send
+the formal version. Because we need an user space scheme
+for better performance.
 
-And also, we already have ldb_p and ldl_*_p that do exactly what you
-want (and give you an opportunity to specify the intended endianness,
-probably little-endian).
+The vhost user crypto server side patches had been
+sent to DPDK community, pls see
 
-Thanks,
+[RFC PATCH 0/6] lib/librte_vhost: introduce new	vhost_user crypto backend support
+http://dpdk.org/ml/archives/dev/2017-November/081048.html
 
-Paolo
+You also can get virtio-crypto polling mode driver from:
+
+[PATCH] virtio: add new driver for crypto devices
+http://dpdk.org/ml/archives/dev/2017-November/081985.html
+
+
+Gonglei (4):
+  cryptodev: add vhost-user as a new cryptodev backend
+  cryptodev: add vhost support
+  cryptodev-vhost-user: add crypto session handler
+  cryptodev-vhost-user: set the key length
+
+ backends/Makefile.objs                |   4 +
+ backends/cryptodev-builtin.c          |   1 +
+ backends/cryptodev-vhost-user.c       | 381 ++++++++++++++++++++++++++++++++++
+ backends/cryptodev-vhost.c            | 297 ++++++++++++++++++++++++++
+ docs/interop/vhost-user.txt           |  19 ++
+ hw/virtio/vhost-user.c                |  89 ++++++++
+ hw/virtio/virtio-crypto.c             |  70 +++++++
+ include/hw/virtio/vhost-backend.h     |   8 +
+ include/hw/virtio/virtio-crypto.h     |   1 +
+ include/sysemu/cryptodev-vhost-user.h |  47 +++++
+ include/sysemu/cryptodev-vhost.h      | 154 ++++++++++++++
+ include/sysemu/cryptodev.h            |   8 +
+ qemu-options.hx                       |  21 ++
+ vl.c                                  |   4 +
+ 14 files changed, 1104 insertions(+)
+ create mode 100644 backends/cryptodev-vhost-user.c
+ create mode 100644 backends/cryptodev-vhost.c
+ create mode 100644 include/sysemu/cryptodev-vhost-user.h
+ create mode 100644 include/sysemu/cryptodev-vhost.h
+
+-- 
+1.8.3.1
