@@ -1,39 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36640)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37606)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <borntraeger@de.ibm.com>) id 1eJgT2-00073P-9N
-	for qemu-devel@nongnu.org; Tue, 28 Nov 2017 09:02:37 -0500
+	(envelope-from <lprosek@redhat.com>) id 1eJgYG-0000iw-Dt
+	for qemu-devel@nongnu.org; Tue, 28 Nov 2017 09:07:57 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <borntraeger@de.ibm.com>) id 1eJgSs-0001Mp-NQ
-	for qemu-devel@nongnu.org; Tue, 28 Nov 2017 09:02:32 -0500
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:42678)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <borntraeger@de.ibm.com>)
-	id 1eJgSs-0001Mc-FN
-	for qemu-devel@nongnu.org; Tue, 28 Nov 2017 09:02:22 -0500
-Received: from pps.filterd (m0098394.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
-	vASE1bsB109551
-	for <qemu-devel@nongnu.org>; Tue, 28 Nov 2017 09:02:19 -0500
-Received: from e06smtp15.uk.ibm.com (e06smtp15.uk.ibm.com [195.75.94.111])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2eh92y0h45-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Tue, 28 Nov 2017 09:02:19 -0500
-Received: from localhost
-	by e06smtp15.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
-	Only! Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <borntraeger@de.ibm.com>;
-	Tue, 28 Nov 2017 14:02:15 -0000
-References: <20171128134648.21530-1-cohuck@redhat.com>
-	<20171128134648.21530-2-cohuck@redhat.com>
-From: Christian Borntraeger <borntraeger@de.ibm.com>
-Date: Tue, 28 Nov 2017 15:02:13 +0100
+	(envelope-from <lprosek@redhat.com>) id 1eJgYC-0002uI-Ax
+	for qemu-devel@nongnu.org; Tue, 28 Nov 2017 09:07:56 -0500
+Received: from mail-vk0-f67.google.com ([209.85.213.67]:43557)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <lprosek@redhat.com>) id 1eJgYC-0002u3-73
+	for qemu-devel@nongnu.org; Tue, 28 Nov 2017 09:07:52 -0500
+Received: by mail-vk0-f67.google.com with SMTP id u84so59558vke.10
+	for <qemu-devel@nongnu.org>; Tue, 28 Nov 2017 06:07:52 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <20171128134648.21530-2-cohuck@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Message-Id: <9c8eb74b-ddc7-3fc6-d26f-efa5fea72fcc@de.ibm.com>
-Subject: Re: [Qemu-devel] [PATCH RFC 1/2] s390x/css: attach css bridge
+In-Reply-To: <151127332036.6888.3168353085464706816.stgit@Misha-PC.lan02.inno>
+References: <151127322955.6888.16198535123422076171.stgit@Misha-PC.lan02.inno>
+	<151127332036.6888.3168353085464706816.stgit@Misha-PC.lan02.inno>
+From: Ladi Prosek <lprosek@redhat.com>
+Date: Tue, 28 Nov 2017 15:07:51 +0100
+Message-ID: <CABdb737gR=_KhqLDb0Fv2Q63CB4GFrki3igTDMErCA8y+Gmq5w@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH v3 15/45] windbg: sized data buffer
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -42,34 +28,54 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Cornelia Huck <cohuck@redhat.com>, qemu-devel@nongnu.org, qemu-s390x@nongnu.org
-Cc: pmorel@linux.vnet.ibm.com, pasic@linux.vnet.ibm.com
+To: Mihail Abakumov <mikhail.abakumov@ispras.ru>
+Cc: qemu-devel <qemu-devel@nongnu.org>, sw@weilnetz.de, Pavel Dovgalyuk <dovgaluk@ispras.ru>, Roman Kagan <rkagan@virtuozzo.com>, Paolo Bonzini <pbonzini@redhat.com>, "Denis V. Lunev" <den@openvz.org>
 
-Looks good to me and is similar to the other devices (e.g. the IPL device)
-
-Reviewed-by: Christian Borntraeger <borntraeger@de.ibm.com>
-
-
-
-On 11/28/2017 02:46 PM, Cornelia Huck wrote:
-> Logically, the css bridge should be attached to the machine.
-> 
-> Signed-off-by: Cornelia Huck <cohuck@redhat.com>
+On Tue, Nov 21, 2017 at 3:08 PM, Mihail Abakumov
+<mikhail.abakumov@ispras.ru> wrote:
+> Defined useful sized data buffer. It contains pointer to data and size of this data. Also, defined some macros for init and free.
+>
+> Signed-off-by: Mihail Abakumov <mikhail.abakumov@ispras.ru>
+> Signed-off-by: Pavel Dovgalyuk <dovgaluk@ispras.ru>
+> Signed-off-by: Dmitriy Koltunov <koltunov@ispras.ru>
 > ---
->  hw/s390x/css-bridge.c | 2 ++
->  1 file changed, 2 insertions(+)
-> 
-> diff --git a/hw/s390x/css-bridge.c b/hw/s390x/css-bridge.c
-> index c4a9735d71..84d33eafc2 100644
-> --- a/hw/s390x/css-bridge.c
-> +++ b/hw/s390x/css-bridge.c
-> @@ -99,6 +99,8 @@ VirtualCssBus *virtual_css_bus_init(void)
-> 
->      /* Create bridge device */
->      dev = qdev_create(NULL, TYPE_VIRTUAL_CSS_BRIDGE);
-> +    object_property_add_child(qdev_get_machine(), TYPE_VIRTUAL_CSS_BRIDGE,
-> +                              OBJECT(dev), NULL);
->      qdev_init_nofail(dev);
-> 
->      /* Create bus on bridge device */
-> 
+>  include/exec/windbgstub-utils.h |   16 ++++++++++++++++
+>  1 file changed, 16 insertions(+)
+>
+> diff --git a/include/exec/windbgstub-utils.h b/include/exec/windbgstub-utils.h
+> index 6ce870beb1..b729cd604e 100755
+> --- a/include/exec/windbgstub-utils.h
+> +++ b/include/exec/windbgstub-utils.h
+> @@ -67,6 +67,22 @@ typedef struct PacketData {
+>      uint16_t extra_size;
+>  } PacketData;
+>
+> +typedef struct SizedBuf {
+> +    uint8_t *data;
+> +    size_t size;
+> +} SizedBuf;
+> +
+> +#define SBUF_INIT(buf, mem_ptr, len) do { \
+> +    buf.data = mem_ptr;                   \
+> +    buf.size = len;                       \
+> +} while (false)
+> +#define SBUF_MALLOC(buf, size) SBUF_INIT(buf, g_malloc0(size), size)
+> +#define SBUF_FREE(buf) do { \
+> +    g_free(buf.data);       \
+> +    buf.data = NULL;        \
+> +    buf.size = 0;           \
+> +} while (false)
+> +
+
+I don't think that this is necessary. These macros are used for ~240
+byte data structures and the points where they are allocated and freed
+are super close together.
+
+I'd just put them on the stack in the callers of kd_gen_exception_sc()
+and kd_gen_load_symbols_sc() (only one caller each) and remove this
+patch.
+
+>  InitedAddr *windbg_get_KPCR(void);
+>  InitedAddr *windbg_get_version(void);
+>
+>
