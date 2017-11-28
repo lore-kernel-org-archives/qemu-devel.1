@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33865)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33895)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1eJi3g-00050x-Fr
-	for qemu-devel@nongnu.org; Tue, 28 Nov 2017 10:44:29 -0500
+	(envelope-from <kwolf@redhat.com>) id 1eJi3l-00055j-Fe
+	for qemu-devel@nongnu.org; Tue, 28 Nov 2017 10:44:38 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1eJi3f-0005Xk-F0
-	for qemu-devel@nongnu.org; Tue, 28 Nov 2017 10:44:28 -0500
+	(envelope-from <kwolf@redhat.com>) id 1eJi3f-0005Xv-Op
+	for qemu-devel@nongnu.org; Tue, 28 Nov 2017 10:44:33 -0500
 From: Kevin Wolf <kwolf@redhat.com>
-Date: Tue, 28 Nov 2017 16:43:49 +0100
-Message-Id: <20171128154350.21504-4-kwolf@redhat.com>
+Date: Tue, 28 Nov 2017 16:43:48 +0100
+Message-Id: <20171128154350.21504-3-kwolf@redhat.com>
 In-Reply-To: <20171128154350.21504-1-kwolf@redhat.com>
 References: <20171128154350.21504-1-kwolf@redhat.com>
-Subject: [Qemu-devel] [PATCH for-2.11 3/4] coroutine: Cancel
- aio_co_schedule() on direct entry
+Subject: [Qemu-devel] [PATCH for-2.11 2/4] Revert "blockjob: do not allow
+ coroutine double entry or entry-after-completion"
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,125 +23,52 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org
 Cc: kwolf@redhat.com, mreitz@redhat.com, stefanha@redhat.com, jcody@redhat.com, pbonzini@redhat.com, famz@redhat.com, qemu-devel@nongnu.org
 
-If a coroutine can be reentered from multiple possible sources, we need
-to be careful in the case that two sources try to reenter it at the same
-time.
+This reverts commit 4afeffc8572f40d8844b946a30c00b10da4442b1.
 
-There are two different cases where this can happen:
-
-1. A coroutine spawns multiple asynchronous jobs and waits for all of
-   them to complete. In this case, multiple reentries are expected and
-   the coroutine is probably looping around a yield, so entering it
-   twice is generally fine (but entering it just once after all jobs
-   have completed would be enough, too).
-
-   Exception: When the loop condition becomes false and the first
-   reenter already leaves the loop, we must not do a second reenter.
-
-2. A coroutine yields and provides multiple alternative ways to be
-   reentered. In this case, we must always only process the first
-   reenter.
-
-Direct entry is not a problem. It requires that the AioContext locks for
-the coroutine context are held, which means that the coroutine has
-enough time to set some state that simply prevents the second caller
-from reentering the coroutine, too.
-
-Things get more interesting with aio_co_schedule() because the coroutine
-may be scheduled before it is (directly) entered from a second place.
-Then changing some state inside the coroutine doesn't help because it is
-already scheduled and the state won't be checked again.
-
-For this case, we'll cancel any pending aio_co_schedule() when the
-coroutine is actually entered. Reentering it once is enough for all
-cases explained above, and a requirement for part of them.
+This fixed the symptom of a bug rather than the root cause. Waking up a
+sleeping coroutine is generally fine, we just need to make it work
+correctly across AioContexts, which we'll do in a minute.
 
 Signed-off-by: Kevin Wolf <kwolf@redhat.com>
 ---
- include/qemu/coroutine_int.h |  1 +
- util/async.c                 | 15 ++++++++++++++-
- util/qemu-coroutine.c        | 17 +++++++++++++++++
- 3 files changed, 32 insertions(+), 1 deletion(-)
+ include/block/blockjob_int.h | 3 +--
+ blockjob.c                   | 7 ++-----
+ 2 files changed, 3 insertions(+), 7 deletions(-)
 
-diff --git a/include/qemu/coroutine_int.h b/include/qemu/coroutine_int.h
-index cb98892bba..73fc35e54b 100644
---- a/include/qemu/coroutine_int.h
-+++ b/include/qemu/coroutine_int.h
-@@ -40,6 +40,7 @@ struct Coroutine {
-     CoroutineEntry *entry;
-     void *entry_arg;
-     Coroutine *caller;
-+    AioContext *scheduled;
+diff --git a/include/block/blockjob_int.h b/include/block/blockjob_int.h
+index 43f3be2965..f13ad05c0d 100644
+--- a/include/block/blockjob_int.h
++++ b/include/block/blockjob_int.h
+@@ -143,8 +143,7 @@ void *block_job_create(const char *job_id, const BlockJobDriver *driver,
+  * @ns: How many nanoseconds to stop for.
+  *
+  * Put the job to sleep (assuming that it wasn't canceled) for @ns
+- * nanoseconds.  Canceling the job will not interrupt the wait, so the
+- * cancel will not process until the coroutine wakes up.
++ * nanoseconds.  Canceling the job will interrupt the wait immediately.
+  */
+ void block_job_sleep_ns(BlockJob *job, QEMUClockType type, int64_t ns);
  
-     /* Only used when the coroutine has terminated.  */
-     QSLIST_ENTRY(Coroutine) pool_next;
-diff --git a/util/async.c b/util/async.c
-index 0e1bd8780a..dc249e9404 100644
---- a/util/async.c
-+++ b/util/async.c
-@@ -372,6 +372,7 @@ static bool event_notifier_poll(void *opaque)
- static void co_schedule_bh_cb(void *opaque)
- {
-     AioContext *ctx = opaque;
-+    AioContext *scheduled_ctx;
-     QSLIST_HEAD(, Coroutine) straight, reversed;
- 
-     QSLIST_MOVE_ATOMIC(&reversed, &ctx->scheduled_coroutines);
-@@ -388,7 +389,16 @@ static void co_schedule_bh_cb(void *opaque)
-         QSLIST_REMOVE_HEAD(&straight, co_scheduled_next);
-         trace_aio_co_schedule_bh_cb(ctx, co);
-         aio_context_acquire(ctx);
--        qemu_coroutine_enter(co);
-+        scheduled_ctx = atomic_mb_read(&co->scheduled);
-+        if (scheduled_ctx == ctx) {
-+            qemu_coroutine_enter(co);
-+        } else {
-+            /* This must be a cancelled aio_co_schedule() because the coroutine
-+             * was already entered before this BH had a chance to run. If a
-+             * coroutine is scheduled for two different AioContexts, something
-+             * is very wrong. */
-+            assert(scheduled_ctx == NULL);
-+        }
-         aio_context_release(ctx);
+diff --git a/blockjob.c b/blockjob.c
+index ff9a614531..3a0c49137e 100644
+--- a/blockjob.c
++++ b/blockjob.c
+@@ -797,14 +797,11 @@ void block_job_sleep_ns(BlockJob *job, QEMUClockType type, int64_t ns)
+         return;
      }
+ 
+-    /* We need to leave job->busy set here, because when we have
+-     * put a coroutine to 'sleep', we have scheduled it to run in
+-     * the future.  We cannot enter that same coroutine again before
+-     * it wakes and runs, otherwise we risk double-entry or entry after
+-     * completion. */
++    job->busy = false;
+     if (!block_job_should_pause(job)) {
+         co_aio_sleep_ns(blk_get_aio_context(job->blk), type, ns);
+     }
++    job->busy = true;
+ 
+     block_job_pause_point(job);
  }
-@@ -438,6 +448,9 @@ fail:
- void aio_co_schedule(AioContext *ctx, Coroutine *co)
- {
-     trace_aio_co_schedule(ctx, co);
-+
-+    /* Set co->scheduled before the coroutine becomes visible in the list */
-+    atomic_mb_set(&co->scheduled, ctx);
-     QSLIST_INSERT_HEAD_ATOMIC(&ctx->scheduled_coroutines,
-                               co, co_scheduled_next);
-     qemu_bh_schedule(ctx->co_schedule_bh);
-diff --git a/util/qemu-coroutine.c b/util/qemu-coroutine.c
-index d6095c1d5a..c515b3cb4a 100644
---- a/util/qemu-coroutine.c
-+++ b/util/qemu-coroutine.c
-@@ -122,6 +122,23 @@ void qemu_aio_coroutine_enter(AioContext *ctx, Coroutine *co)
-      */
-     smp_wmb();
- 
-+    /* Make sure that a coroutine that can alternatively reentered from two
-+     * different sources isn't reentered more than once when the first caller
-+     * uses aio_co_schedule() and the other one enters to coroutine directly.
-+     * This is achieved by cancelling the pending aio_co_schedule().
-+     *
-+     * The other way round, if aio_co_schedule() would be called after this
-+     * point, this would be a problem, too, but in practice it doesn't happen
-+     * because we're holding the AioContext lock here and aio_co_schedule()
-+     * callers must do the same. This means that the coroutine just needs to
-+     * prevent other callers from calling aio_co_schedule() before it yields
-+     * (e.g. block job coroutines by setting job->busy = true).
-+     *
-+     * We still want to ensure that the second case doesn't happen, so reset
-+     * co->scheduled only after setting co->caller to make the above check
-+     * effective for the co_schedule_bh_cb() case. */
-+    atomic_set(&co->scheduled, NULL);
-+
-     ret = qemu_coroutine_switch(self, co, COROUTINE_ENTER);
- 
-     qemu_co_queue_run_restart(co);
 -- 
 2.13.6
