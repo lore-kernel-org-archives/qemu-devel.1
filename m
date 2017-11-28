@@ -1,25 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33455)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39039)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1eJm8N-0007Bj-JO
-	for qemu-devel@nongnu.org; Tue, 28 Nov 2017 15:05:36 -0500
+	(envelope-from <ehabkost@redhat.com>) id 1eJmKA-000225-8i
+	for qemu-devel@nongnu.org; Tue, 28 Nov 2017 15:17:47 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1eJm8M-0004Vs-ID
-	for qemu-devel@nongnu.org; Tue, 28 Nov 2017 15:05:35 -0500
-References: <20171113161446.2862-1-michael.nawrocki@gtri.gatech.edu>
-	<20171113161446.2862-2-michael.nawrocki@gtri.gatech.edu>
-	<CAFEAcA8FDoLRx+OCMwjUzYd-X3HX7Z77SUTmNbSB9YWYT77AcA@mail.gmail.com>
-	<CAFEAcA-JwUm5+N-Km1fZjuPYA81sMCekguchJiV59BvqjnPJOA@mail.gmail.com>
-	<b3a7006b-bf0d-f5f3-bf78-f18b38a014e7@gtri.gatech.edu>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <eb039f59-f43b-88c7-324e-31a336a8d433@redhat.com>
-Date: Tue, 28 Nov 2017 14:05:25 -0600
+	(envelope-from <ehabkost@redhat.com>) id 1eJmK8-0002sv-TA
+	for qemu-devel@nongnu.org; Tue, 28 Nov 2017 15:17:46 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:33074)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1eJmK8-0002sl-NP
+	for qemu-devel@nongnu.org; Tue, 28 Nov 2017 15:17:44 -0500
+Date: Tue, 28 Nov 2017 18:05:29 -0200
+From: Eduardo Habkost <ehabkost@redhat.com>
+Message-ID: <20171128200529.GS3037@localhost.localdomain>
+References: <1511530010-511740-1-git-send-email-dplotnikov@virtuozzo.com>
+	<20171128205345-mutt-send-email-mst@kernel.org>
+	<5837b412-d377-e7ac-9127-4990f8095a99@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <b3a7006b-bf0d-f5f3-bf78-f18b38a014e7@gtri.gatech.edu>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v3 1/3] Switch AMD CFI flash to use new
- MMIO API
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <5837b412-d377-e7ac-9127-4990f8095a99@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH] i386: turn off l3-cache property by default
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,60 +28,46 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Michael Nawrocki <michael.nawrocki@gtri.gatech.edu>, Peter Maydell <peter.maydell@linaro.org>
-Cc: Kevin Wolf <kwolf@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>, Qemu-block <qemu-block@nongnu.org>, Max Reitz <mreitz@redhat.com>
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: "Michael S. Tsirkin" <mst@redhat.com>, Denis Plotnikov <dplotnikov@virtuozzo.com>, rth@twiddle.net, rkagan@virtuozzo.com, den@virtuozzo.com, qemu-devel@nongnu.org
 
-On 11/28/2017 01:47 PM, Michael Nawrocki wrote:
->>> I suspect you'll find that the change of type for 'ret' here
->>> and the 'value' argument to pflash_write() will break compilation
->>> with PFLASH_DEBUG defined, because the type won't match the DPRINTF
->>> format strings any more.
->>>
->>> You could either fix up the format strings, or (since there's a
->>> wrapper function here anyway) leave the types of pflash_read()
->>> and pflash_write() alone and let the wrappers implicitly do
->>> the conversion between uint64_t and uint32_t.
->>
->> ...ah, just noticed that in patch 2 you want to add 8-byte
->> accesses. So you'll need to fix the format strings.
->>
->> thanks
->> -- PMM
->>
+On Tue, Nov 28, 2017 at 08:50:54PM +0100, Paolo Bonzini wrote:
+> On 28/11/2017 19:54, Michael S. Tsirkin wrote:
+> >> Now there's a downside: with L3 cache the Linux scheduler is more eager
+> >> to wake up tasks on sibling CPUs, resulting in unnecessary cross-vCPU
+> >> interactions and therefore exessive halts and IPIs.  E.g. "perf bench
+> >> sched pipe -i 100000" gives
+> >>
+> >> l3-cache	#res IPI /s	#HLT /s		#time /100000 loops
+> >> off		200 (no K)	230		0.2 sec
+> >> on		400K		330K		0.5 sec
+> >>
+> >> In a more realistic test, we observe 15% degradation in VM density
+> >> (measured as the number of VMs, each running Drupal CMS serving 2 http
+> >> requests per second to its main page, with 95%-percentile response
+> >> latency under 100 ms) with l3-cache=on.
+> >>
+> >> We think that mostly-idle scenario is more common in cloud and personal
+> >> usage, and should be optimized for by default; users of highly loaded
+> >> VMs should be able to tune them up themselves.
 > 
-> Yeah, it definitely doesn't compile with PFLASH_DEBUG defined. I'll 
-> update those format strings for the next revision.
+> Hi Denis,
+> 
+> thanks for the report.  I think there are two cases:
+> 
+> 1) The dedicated pCPU case: do you still get the performance degradation
+> with dedicated pCPUs?
+> 
+> 2) The non-dedicated pCPU case: do you still get the performance
+> degradation with threads=1?  If not, why do you have sibling vCPUs at
+> all, if you don't have a dedicated physical CPU for each vCPU?
 
-Better yet, please fix the PFLASH_DEBUG code to avoid bitrot in the 
-first place, by rewriting the bad pattern:
+I assume you mean cores=1,threads=1?
 
-/* #define PFLASH_DEBUG */
-#ifdef PFLASH_DEBUG
-#define DPRINTF(fmt, ...)                                   \
-do {                                                        \
-     fprintf(stderr, "PFLASH: " fmt , ## __VA_ARGS__);       \
-} while (0)
-#else
-#define DPRINTF(fmt, ...) do { } while (0)
-#endif
-
-into the good pattern:
-
-#ifdef PFLASH_DEBUG
-# define PFLASH_PRINT 1
-#else
-# define PFLASH_PRINT 0
-#endif
-#define DPRINTF(fmt, ...) \
-do { \
-   if (PFLASH_PRINT) { \
-     fprintf(stderr, "PFLASH: " fmt, ## __VA_ARGS__); \
-   }; \
-} while (0)
-
-or even better, using the trace infrastructure instead.
+Even if the pCPUs are dedicated, I would still like to see a
+comparison between cores=1,threads=1,l3-cache=off and
+cores=1,threads=1,l3-cache=off.  Maybe configuring cores > 1
+isn't really helpful in some use cases.
 
 -- 
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
+Eduardo
