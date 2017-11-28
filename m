@@ -1,24 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46962)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56647)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1eJXul-0006J2-Os
-	for qemu-devel@nongnu.org; Mon, 27 Nov 2017 23:54:36 -0500
+	(envelope-from <jcody@redhat.com>) id 1eJYfv-0008On-9B
+	for qemu-devel@nongnu.org; Tue, 28 Nov 2017 00:43:20 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1eJXui-00040N-N2
-	for qemu-devel@nongnu.org; Mon, 27 Nov 2017 23:54:35 -0500
-Date: Tue, 28 Nov 2017 15:54:16 +1100
-From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20171128045416.GM11775@umbus.fritz.box>
-References: <20171125151610.20547-1-ehabkost@redhat.com>
-	<20171125151610.20547-4-ehabkost@redhat.com>
-	<20171127015209.GB11775@umbus.fritz.box>
-	<20171128011243.GE3037@localhost.localdomain>
+	(envelope-from <jcody@redhat.com>) id 1eJYft-0007e7-Rf
+	for qemu-devel@nongnu.org; Tue, 28 Nov 2017 00:43:19 -0500
+Date: Tue, 28 Nov 2017 00:43:05 -0500
+From: Jeff Cody <jcody@redhat.com>
+Message-ID: <20171128054305.GP5399@localhost.localdomain>
+References: <20171123175747.2309-1-famz@redhat.com>
+	<20171127232909.GF4903@localhost.localdomain>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="N/GrjenRD+RJfyz+"
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20171128011243.GE3037@localhost.localdomain>
-Subject: Re: [Qemu-devel] [PATCH v2 3/6] ppc: e500: Allow only supported
- dynamic sysbus devices
+In-Reply-To: <20171127232909.GF4903@localhost.localdomain>
+Subject: Re: [Qemu-devel] [PATCH 0/1] block: Workaround for the iotests
+ errors
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,102 +24,148 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eduardo Habkost <ehabkost@redhat.com>
-Cc: qemu-devel@nongnu.org, jgross@suse.com, Thomas Huth <thuth@redhat.com>, sstabellini@kernel.org, Laszlo Ersek <lersek@redhat.com>, Marcel Apfelbaum <marcel@redhat.com>, Alexander Graf <agraf@suse.de>, qemu-ppc@nongnu.org
+To: Kevin Wolf <kwolf@redhat.com>
+Cc: Fam Zheng <famz@redhat.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>, pbonzini@redhat.com, Stefan Hajnoczi <stefanha@redhat.com>
+
+On Tue, Nov 28, 2017 at 12:29:09AM +0100, Kevin Wolf wrote:
+> Am 23.11.2017 um 18:57 hat Fam Zheng geschrieben:
+> > Jeff's block job patch made the latent drain bug visible, and I find this
+> > patch, which by itself also makes some sense, can hide it again. :) With it
+> > applied we are at least back to the ground where patchew's iotests (make
+> > docker-test-block@fedora) can pass.
+> > 
+> > The real bug is that in the middle of bdrv_parent_drained_end(), bs's parent
+> > list changes. One drained_end call before the mirror_exit() already did one
+> > blk_root_drained_end(), a second drained_end on an updated parent node can do
+> > another same blk_root_drained_end(), making it unbalanced with
+> > blk_root_drained_begin(). This is shown by the following three backtraces as
+> > captured by rr with a crashed "qemu-img commit", essentially the same as in
+> > the failed iotest 020:
+> 
+> My conclusion what really happens in 020 is that we have a graph like
+> this:
+> 
+>                              mirror target BB --+
+>                                                 |
+>                                                 v
+>     qemu-img BB -> mirror_top_bs -> overlay -> base
+> 
+> bdrv_drained_end(base) results in it being available for requests again,
+> so it calls bdrv_parent_drained_end() for overlay. While draining
+> itself, the mirror job completes and changes the BdrvChild between
+> mirror_top_bs and overlay (which is currently being drained) to point to
+> base instead. After returning, QLIST_FOREACH() continues to iterate the
+> parents of base instead of those of overlay, resulting in a second
+> blk_drained_end() for the mirror target BB.
+> 
+> This instance can be fixed relatively easily (see below) by using
+> QLIST_FOREACH_SAFE() instead.
+> 
+> However, I'm not sure if all problems with the graph change can be
+> solved this way and whether we can really allow graph changes while
+> iterating the graph for bdrv_drained_begin/end. Not allowing it would
+> require some more serious changes to the block jobs that delays their
+> completion until after bdrv_drain_end() has finished (not sure how to
+> even get a callback at that point...)
+> 
+
+That is at least part of what is causing the segfaults that I am still
+seeing (after your patch):
+
+We enter bdrv_drain_recurse(), and the BDS has been reaped:
 
 
---N/GrjenRD+RJfyz+
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+Thread 1 "qemu-img" received signal SIGSEGV, Segmentation fault.
+0x000000010014b56e in qemu_mutex_unlock (mutex=0x76767676767676d6) at util/qemu-thread-posix.c:92
+92          assert(mutex->initialized);
 
-On Mon, Nov 27, 2017 at 11:12:43PM -0200, Eduardo Habkost wrote:
-> On Mon, Nov 27, 2017 at 12:52:09PM +1100, David Gibson wrote:
-> > On Sat, Nov 25, 2017 at 01:16:07PM -0200, Eduardo Habkost wrote:
-> > > platform_bus_create_devtree() already rejects all dynamic sysbus
-> > > devices except TYPE_ETSEC_COMMON, so register it as the only
-> > > allowed dynamic sysbus device for the ppce500 machine-type.
-> > >=20
-> > > Cc: Alexander Graf <agraf@suse.de>
-> > > Cc: David Gibson <david@gibson.dropbear.id.au>
-> > > Cc: qemu-ppc@nongnu.org
-> > > Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
-> >=20
-> > Acked-by: David Gibson <david@gibson.dropbear.id.au>
->=20
-> Thanks!
->=20
-> >=20
-> > Do you need me to take this through my tree (for 2.12), or do you have
-> > another merge patch in mind?
->=20
-> As this patch requires patch 1/6 to be applied first and there
-> are patches touching other machines in this series, I can merge
-> this through my machine core tree if you don't mind.
+#0  0x000000010014b56e in qemu_mutex_unlock (mutex=0x76767676767676d6) at util/qemu-thread-posix.c:92
+#1  0x00000001001450bf in aio_context_release (ctx=0x7676767676767676) at util/async.c:507
+#2  0x000000010009d5c7 in bdrv_drain_recurse (bs=0x100843270, begin=false) at block/io.c:201
+#3  0x000000010009d949 in bdrv_drained_end (bs=0x100843270) at block/io.c:297
+#4  0x000000010002e705 in bdrv_child_cb_drained_end (child=0x100870c40) at block.c:822
+#5  0x000000010009cdc6 in bdrv_parent_drained_end (bs=0x100863b10) at block/io.c:60
+#6  0x000000010009d938 in bdrv_drained_end (bs=0x100863b10) at block/io.c:296
+#7  0x000000010009d9d5 in bdrv_drain (bs=0x100863b10) at block/io.c:322
+#8  0x000000010008c39c in blk_drain (blk=0x100881220) at block/block-backend.c:1523
+#9  0x000000010009a85e in mirror_drain (job=0x10088df50) at block/mirror.c:996
+#10 0x0000000100037eca in block_job_drain (job=0x10088df50) at blockjob.c:187
+#11 0x000000010003856d in block_job_finish_sync (job=0x10088df50, finish=0x100038926 <block_job_complete>, errp=0x7fffffffd1d8) at blockjob.c:378
+#12 0x0000000100038b80 in block_job_complete_sync (job=0x10088df50, errp=0x7fffffffd1d8) at blockjob.c:544
+#13 0x0000000100023de5 in run_block_job (job=0x10088df50, errp=0x7fffffffd1d8) at qemu-img.c:872
+#14 0x0000000100024305 in img_commit (argc=3, argv=0x7fffffffd390) at qemu-img.c:1034
+#15 0x000000010002ccd1 in main (argc=3, argv=0x7fffffffd390) at qemu-img.c:4763
 
-Sounds good, thanks.
 
->=20
-> >=20
-> > > ---
-> > > Changes series v1 -> v2:
-> > > * New patch added to series
-> > > ---
-> > >  hw/ppc/e500plat.c | 4 ++--
-> > >  1 file changed, 2 insertions(+), 2 deletions(-)
-> > >=20
-> > > diff --git a/hw/ppc/e500plat.c b/hw/ppc/e500plat.c
-> > > index 438118c29b..81d03e1038 100644
-> > > --- a/hw/ppc/e500plat.c
-> > > +++ b/hw/ppc/e500plat.c
-> > > @@ -12,6 +12,7 @@
-> > >  #include "qemu/osdep.h"
-> > >  #include "qemu-common.h"
-> > >  #include "e500.h"
-> > > +#include "hw/net/fsl_etsec/etsec.h"
-> > >  #include "hw/boards.h"
-> > >  #include "sysemu/device_tree.h"
-> > >  #include "sysemu/kvm.h"
-> > > @@ -64,8 +65,7 @@ static void e500plat_machine_init(MachineClass *mc)
-> > >      mc->desc =3D "generic paravirt e500 platform";
-> > >      mc->init =3D e500plat_init;
-> > >      mc->max_cpus =3D 32;
-> > > -    /*TODO: allow only sysbus devices that really work with this mac=
-hine */
-> > > -    machine_class_allow_dynamic_sysbus_dev(mc, TYPE_SYS_BUS_DEVICE);
-> > > +    machine_class_allow_dynamic_sysbus_dev(mc, TYPE_ETSEC_COMMON);
-> > >      mc->default_cpu_type =3D POWERPC_CPU_TYPE_NAME("e500v2_v30");
-> > >  }
-> > > =20
-> >=20
->=20
->=20
->=20
+(gdb) f 2
+#2  0x000000010009d5c7 in bdrv_drain_recurse (bs=0x100843270, begin=false) at block/io.c:201
+201         waited = BDRV_POLL_WHILE(bs, atomic_read(&bs->in_flight) > 0);
+(gdb) list
+196
+197         /* Ensure any pending metadata writes are submitted to bs->file.  */
+198         bdrv_drain_invoke(bs, begin);
+199
+200         /* Wait for drained requests to finish */
+201         waited = BDRV_POLL_WHILE(bs, atomic_read(&bs->in_flight) > 0);
+202
+203         QLIST_FOREACH_SAFE(child, &bs->children, next, tmp) {
+204             BlockDriverState *bs = child->bs;
+205             bool in_main_loop =
 
---=20
-David Gibson			| I'll have my music baroque, and my code
-david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
-				| _way_ _around_!
-http://www.ozlabs.org/~dgibson
 
---N/GrjenRD+RJfyz+
-Content-Type: application/pgp-signature; name="signature.asc"
+(gdb) p *bs
+$1 = {
+  open_flags = 8835232, 
+  read_only = true, 
+  encrypted = false, 
+  sg = false, 
+  probed = false, 
+  force_share = 56, 
+  implicit = 59, 
+  drv = 0x0, 
+  opaque = 0x0, 
+  aio_context = 0x7676767676767676, 
+  aio_notifiers = {
+    lh_first = 0x7676767676767676
+  }, 
+  [...]
 
------BEGIN PGP SIGNATURE-----
 
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAloc6/gACgkQbDjKyiDZ
-s5J5wQ/+K6k3BvUpJaGyyPBSf0gpzpCZCIx19yDg2no8vnOtZhfLjxNR+HMwohL1
-+Hy5gU+Twaisu/sCXcDnvX1enu6vQ0pdz1yenzvKly6BrMhn2oFBNpT7QhMedNYc
-4Hc6va0yAy4wAzAgFwVzZkHO7SM6berjUDro18P5Rew75e4mjJFVBaEBQtMhylWb
-Eurnv9bPx6AU6Q0iD8oyV2Tho40ftD5tuAYRFYfvBW8lI6qUelEb+HuujQ/FNMsx
-vNrPRNzZjloNmQBuyl7JhvuTuHriToTU7O0+Vw1sLvklNHxxZdceNptLotbeo5Yt
-jB4sKbMVMsbKmvNdS5zbW5Z8Arqiq5J2Sx0gC/lZr4A0vzQJFphNYwIp0OIxleSu
-ulkmrfMOiOvg2PJJANEUpIw8D84nB97iqXYkRQ3BhZA9+arVm8ltNfrZ4e7Z6QUh
-vxobb7I7uyKJgh+20UuYfUL//DOVMI3oHdViOpxMJFA8Ge87La+vlOz5DTcb57n+
-yBpuxsgOcaFB/UaP8ENHbWY2zVLzmhvlIRqycNd7ZV37yweulwgwDB5zgcM+zQir
-Pbkc6IEn0j3M/sS0sMsXVVaS4CQ14h4DMelzZk1z6ZqoqCKVwX6XOuxk8j2bY8qD
-sIaBOHJLGHCn9ZXEeg2l61uoFnN83maH9LO2kpwiAvfGJeuhVwI=
-=YCu3
------END PGP SIGNATURE-----
 
---N/GrjenRD+RJfyz+--
+
+> And the test cases that Jeff mentions still fail with this patch, too.
+> But at least it doesn't only make failure less likely by reducing the
+> window for a race condition, but seems to attack a real problem.
+> 
+> Kevin
+> 
+> 
+> diff --git a/block/io.c b/block/io.c
+> index 4fdf93a014..6773926fc1 100644
+> --- a/block/io.c
+> +++ b/block/io.c
+> @@ -42,9 +42,9 @@ static int coroutine_fn bdrv_co_do_pwrite_zeroes(BlockDriverState *bs,
+>  
+>  void bdrv_parent_drained_begin(BlockDriverState *bs)
+>  {
+> -    BdrvChild *c;
+> +    BdrvChild *c, *next;
+>  
+> -    QLIST_FOREACH(c, &bs->parents, next_parent) {
+> +    QLIST_FOREACH_SAFE(c, &bs->parents, next_parent, next) {
+>          if (c->role->drained_begin) {
+>              c->role->drained_begin(c);
+>          }
+> @@ -53,9 +53,9 @@ void bdrv_parent_drained_begin(BlockDriverState *bs)
+>  
+>  void bdrv_parent_drained_end(BlockDriverState *bs)
+>  {
+> -    BdrvChild *c;
+> +    BdrvChild *c, *next;
+>  
+> -    QLIST_FOREACH(c, &bs->parents, next_parent) {
+> +    QLIST_FOREACH_SAFE(c, &bs->parents, next_parent, next) {
+>          if (c->role->drained_end) {
+>              c->role->drained_end(c);
+>          }
+>
