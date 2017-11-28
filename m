@@ -1,24 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49688)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51605)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1eJUMr-0007f1-2R
-	for qemu-devel@nongnu.org; Mon, 27 Nov 2017 20:07:22 -0500
+	(envelope-from <ehabkost@redhat.com>) id 1eJUQW-0008WV-Vx
+	for qemu-devel@nongnu.org; Mon, 27 Nov 2017 20:11:10 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1eJUMn-0002Gx-SG
-	for qemu-devel@nongnu.org; Mon, 27 Nov 2017 20:07:21 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:49322)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1eJUMn-0002Fl-Im
-	for qemu-devel@nongnu.org; Mon, 27 Nov 2017 20:07:17 -0500
-Date: Mon, 27 Nov 2017 23:07:13 -0200
+	(envelope-from <ehabkost@redhat.com>) id 1eJUQT-00048C-Qd
+	for qemu-devel@nongnu.org; Mon, 27 Nov 2017 20:11:08 -0500
+Date: Mon, 27 Nov 2017 23:11:00 -0200
 From: Eduardo Habkost <ehabkost@redhat.com>
-Message-ID: <20171128010713.GC3037@localhost.localdomain>
-References: <20171127043517.22441-1-haozhong.zhang@intel.com>
-	<20171127043517.22441-2-haozhong.zhang@intel.com>
+Message-ID: <20171128011059.GD3037@localhost.localdomain>
+References: <20171125151610.20547-1-ehabkost@redhat.com>
+	<20171125151610.20547-4-ehabkost@redhat.com>
+	<20171125193119.39a3d62f@bahia.lan>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20171127043517.22441-2-haozhong.zhang@intel.com>
-Subject: Re: [Qemu-devel] [PATCH v3 1/3] hostmem-file: add "align" option
+In-Reply-To: <20171125193119.39a3d62f@bahia.lan>
+Subject: Re: [Qemu-devel] [PATCH v2 3/6] ppc: e500: Allow only supported
+ dynamic sysbus devices
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,212 +25,66 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Haozhong Zhang <haozhong.zhang@intel.com>
-Cc: qemu-devel@nongnu.org, Xiao Guangrong <guangrong.xiao@gmail.com>, Stefan Hajnoczi <stefanha@gmail.com>, Dan Williams <dan.j.williams@intel.com>, Igor Mammedov <imammedo@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Richard Henderson <rth@twiddle.net>
+To: Greg Kurz <groug@kaod.org>
+Cc: qemu-devel@nongnu.org, jgross@suse.com, Thomas Huth <thuth@redhat.com>, sstabellini@kernel.org, Alexander Graf <agraf@suse.de>, qemu-ppc@nongnu.org, Marcel Apfelbaum <marcel@redhat.com>, Laszlo Ersek <lersek@redhat.com>, David Gibson <david@gibson.dropbear.id.au>
 
-On Mon, Nov 27, 2017 at 12:35:15PM +0800, Haozhong Zhang wrote:
-> When mmap(2) the backend files, QEMU uses the host page size
-> (getpagesize(2)) by default as the alignment of mapping address.
-> However, some backends may require alignments different than the page
-> size. For example, mmap a device DAX (e.g., /dev/dax0.0) on Linux
-> kernel 4.13 to an address, which is 4K-aligned but not 2M-aligned,
-> fails with a kernel message like
+On Sat, Nov 25, 2017 at 07:31:19PM +0100, Greg Kurz wrote:
+> On Sat, 25 Nov 2017 13:16:07 -0200
+> Eduardo Habkost <ehabkost@redhat.com> wrote:
 > 
-> [617494.969768] dax dax0.0: qemu-system-x86: dax_mmap: fail, unaligned vma (0x7fa37c579000 - 0x7fa43c579000, 0x1fffff)
+> > platform_bus_create_devtree() already rejects all dynamic sysbus
+> > devices except TYPE_ETSEC_COMMON, so register it as the only
+> > allowed dynamic sysbus device for the ppce500 machine-type.
+> > 
 > 
-> Because there is no common approach to get such alignment requirement,
-> we add the 'align' option to 'memory-backend-file', so that users or
-> management utils, which have enough knowledge about the backend, can
-> specify a proper alignment via this option.
+> Maybe drop the code that rejects unsupported sysbus devices, but this
+> can be done in a followup patch.
+
+Yes, that's a good idea.  Probably an opportunity to provide a
+better API to handle dynamic sysbus devices.
+
 > 
-> Signed-off-by: Haozhong Zhang <haozhong.zhang@intel.com>
-
-The new option needs to be documented on qemu-options.hx.
-
-Except for that, the patch looks good to me.
-
-
-> ---
->  backends/hostmem-file.c | 41 ++++++++++++++++++++++++++++++++++++++++-
->  docs/nvdimm.txt         | 16 ++++++++++++++++
->  exec.c                  |  8 +++++++-
->  include/exec/memory.h   |  3 +++
->  memory.c                |  2 ++
->  numa.c                  |  2 +-
->  6 files changed, 69 insertions(+), 3 deletions(-)
+> Anyway,
 > 
-> diff --git a/backends/hostmem-file.c b/backends/hostmem-file.c
-> index e44c319915..e319ec1ad8 100644
-> --- a/backends/hostmem-file.c
-> +++ b/backends/hostmem-file.c
-> @@ -34,6 +34,7 @@ struct HostMemoryBackendFile {
->      bool share;
->      bool discard_data;
->      char *mem_path;
-> +    uint64_t align;
->  };
->  
->  static void
-> @@ -58,7 +59,7 @@ file_backend_memory_alloc(HostMemoryBackend *backend, Error **errp)
->          path = object_get_canonical_path(OBJECT(backend));
->          memory_region_init_ram_from_file(&backend->mr, OBJECT(backend),
->                                   path,
-> -                                 backend->size, fb->share,
-> +                                 backend->size, fb->align, fb->share,
->                                   fb->mem_path, errp);
->          g_free(path);
->      }
-> @@ -115,6 +116,40 @@ static void file_memory_backend_set_discard_data(Object *o, bool value,
->      MEMORY_BACKEND_FILE(o)->discard_data = value;
->  }
->  
-> +static void file_memory_backend_get_align(Object *o, Visitor *v,
-> +                                          const char *name, void *opaque,
-> +                                          Error **errp)
-> +{
-> +    HostMemoryBackendFile *fb = MEMORY_BACKEND_FILE(o);
-> +    uint64_t val = fb->align;
-> +
-> +    visit_type_size(v, name, &val, errp);
-> +}
-> +
-> +static void file_memory_backend_set_align(Object *o, Visitor *v,
-> +                                          const char *name, void *opaque,
-> +                                          Error **errp)
-> +{
-> +    HostMemoryBackend *backend = MEMORY_BACKEND(o);
-> +    HostMemoryBackendFile *fb = MEMORY_BACKEND_FILE(o);
-> +    Error *local_err = NULL;
-> +    uint64_t val;
-> +
-> +    if (host_memory_backend_mr_inited(backend)) {
-> +        error_setg(&local_err, "cannot change property value");
-> +        goto out;
-> +    }
-> +
-> +    visit_type_size(v, name, &val, &local_err);
-> +    if (local_err) {
-> +        goto out;
-> +    }
-> +    fb->align = val;
-> +
-> + out:
-> +    error_propagate(errp, local_err);
-> +}
-> +
->  static void file_backend_unparent(Object *obj)
->  {
->      HostMemoryBackend *backend = MEMORY_BACKEND(obj);
-> @@ -145,6 +180,10 @@ file_backend_class_init(ObjectClass *oc, void *data)
->      object_class_property_add_str(oc, "mem-path",
->          get_mem_path, set_mem_path,
->          &error_abort);
-> +    object_class_property_add(oc, "align", "int",
-> +        file_memory_backend_get_align,
-> +        file_memory_backend_set_align,
-> +        NULL, NULL, &error_abort);
->  }
->  
->  static void file_backend_instance_finalize(Object *o)
-> diff --git a/docs/nvdimm.txt b/docs/nvdimm.txt
-> index 2d9f8c0e8c..21249dd062 100644
-> --- a/docs/nvdimm.txt
-> +++ b/docs/nvdimm.txt
-> @@ -122,3 +122,19 @@ Note:
->       M >= size of RAM devices +
->            size of statically plugged vNVDIMM devices +
->            size of hotplugged vNVDIMM devices
-> +
-> +Alignment
-> +---------
-> +
-> +QEMU uses mmap(2) to maps vNVDIMM backends and aligns the mapping
-> +address to the page size (getpagesize(2)) by default. However, some
-> +types of backends may require an alignment different than the page
-> +size. In that case, QEMU v2.12.0 and later provide 'align' option to
-> +memory-backend-file to allow users to specify the proper alignment.
-> +
-> +For example, device dax require the 2 MB alignment, so we can use
-> +following QEMU command line options to use it (/dev/dax0.0) as the
-> +backend of vNVDIMM:
-> +
-> + -object memory-backend-file,id=mem1,share=on,mem-path=/dev/dax0.0,size=4G,align=2M
-> + -device nvdimm,id=nvdimm1,memdev=mem1
-> diff --git a/exec.c b/exec.c
-> index 03238a3449..90440efecd 100644
-> --- a/exec.c
-> +++ b/exec.c
-> @@ -1600,7 +1600,13 @@ static void *file_ram_alloc(RAMBlock *block,
->      void *area;
->  
->      block->page_size = qemu_fd_getpagesize(fd);
-> -    block->mr->align = block->page_size;
-> +    if (block->mr->align % block->page_size) {
-> +        error_setg(errp, "aligment 0x%" PRIx64
-> +                   " must be multiples of page size 0x%" PRIx64,
-> +                   block->mr->align, block->page_size);
-> +        return NULL;
-> +    }
-> +    block->mr->align = MAX(block->page_size, block->mr->align);
->  #if defined(__s390x__)
->      if (kvm_enabled()) {
->          block->mr->align = MAX(block->mr->align, QEMU_VMALLOC_ALIGN);
-> diff --git a/include/exec/memory.h b/include/exec/memory.h
-> index 5ed4042f87..a1be8b06d3 100644
-> --- a/include/exec/memory.h
-> +++ b/include/exec/memory.h
-> @@ -465,6 +465,8 @@ void memory_region_init_resizeable_ram(MemoryRegion *mr,
->   * @name: Region name, becomes part of RAMBlock name used in migration stream
->   *        must be unique within any device
->   * @size: size of the region.
-> + * @align: alignment of the region base address; if 0, the default alignment
-> + *         (getpagesize()) will be used.
->   * @share: %true if memory must be mmaped with the MAP_SHARED flag
->   * @path: the path in which to allocate the RAM.
->   * @errp: pointer to Error*, to store an error if it happens.
-> @@ -476,6 +478,7 @@ void memory_region_init_ram_from_file(MemoryRegion *mr,
->                                        struct Object *owner,
->                                        const char *name,
->                                        uint64_t size,
-> +                                      uint64_t align,
->                                        bool share,
->                                        const char *path,
->                                        Error **errp);
-> diff --git a/memory.c b/memory.c
-> index e26e5a3b1d..2c80656e39 100644
-> --- a/memory.c
-> +++ b/memory.c
-> @@ -1570,6 +1570,7 @@ void memory_region_init_ram_from_file(MemoryRegion *mr,
->                                        struct Object *owner,
->                                        const char *name,
->                                        uint64_t size,
-> +                                      uint64_t align,
->                                        bool share,
->                                        const char *path,
->                                        Error **errp)
-> @@ -1578,6 +1579,7 @@ void memory_region_init_ram_from_file(MemoryRegion *mr,
->      mr->ram = true;
->      mr->terminates = true;
->      mr->destructor = memory_region_destructor_ram;
-> +    mr->align = align;
->      mr->ram_block = qemu_ram_alloc_from_file(size, mr, share, path, errp);
->      mr->dirty_log_mask = tcg_enabled() ? (1 << DIRTY_MEMORY_CODE) : 0;
->  }
-> diff --git a/numa.c b/numa.c
-> index 7151b24d1c..b0fe22a60c 100644
-> --- a/numa.c
-> +++ b/numa.c
-> @@ -551,7 +551,7 @@ static void allocate_system_memory_nonnuma(MemoryRegion *mr, Object *owner,
->      if (mem_path) {
->  #ifdef __linux__
->          Error *err = NULL;
-> -        memory_region_init_ram_from_file(mr, owner, name, ram_size, false,
-> +        memory_region_init_ram_from_file(mr, owner, name, ram_size, 0, false,
->                                           mem_path, &err);
->          if (err) {
->              error_report_err(err);
-> -- 
-> 2.14.1
+> Reviewed-by: Greg Kurz <groug@kaod.org>
+
+Thanks!
+
+
+> 
+> > Cc: Alexander Graf <agraf@suse.de>
+> > Cc: David Gibson <david@gibson.dropbear.id.au>
+> > Cc: qemu-ppc@nongnu.org
+> > Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
+> > ---
+> > Changes series v1 -> v2:
+> > * New patch added to series
+> > ---
+> >  hw/ppc/e500plat.c | 4 ++--
+> >  1 file changed, 2 insertions(+), 2 deletions(-)
+> > 
+> > diff --git a/hw/ppc/e500plat.c b/hw/ppc/e500plat.c
+> > index 438118c29b..81d03e1038 100644
+> > --- a/hw/ppc/e500plat.c
+> > +++ b/hw/ppc/e500plat.c
+> > @@ -12,6 +12,7 @@
+> >  #include "qemu/osdep.h"
+> >  #include "qemu-common.h"
+> >  #include "e500.h"
+> > +#include "hw/net/fsl_etsec/etsec.h"
+> >  #include "hw/boards.h"
+> >  #include "sysemu/device_tree.h"
+> >  #include "sysemu/kvm.h"
+> > @@ -64,8 +65,7 @@ static void e500plat_machine_init(MachineClass *mc)
+> >      mc->desc = "generic paravirt e500 platform";
+> >      mc->init = e500plat_init;
+> >      mc->max_cpus = 32;
+> > -    /*TODO: allow only sysbus devices that really work with this machine */
+> > -    machine_class_allow_dynamic_sysbus_dev(mc, TYPE_SYS_BUS_DEVICE);
+> > +    machine_class_allow_dynamic_sysbus_dev(mc, TYPE_ETSEC_COMMON);
+> >      mc->default_cpu_type = POWERPC_CPU_TYPE_NAME("e500v2_v30");
+> >  }
+> >  
 > 
 
 -- 
