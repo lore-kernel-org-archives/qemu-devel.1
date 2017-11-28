@@ -1,25 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47841)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47844)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alistai@xilinx.com>) id 1eJoTR-00020I-Gv
+	(envelope-from <alistai@xilinx.com>) id 1eJoTR-00020K-Jw
 	for qemu-devel@nongnu.org; Tue, 28 Nov 2017 17:35:30 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alistai@xilinx.com>) id 1eJoTO-0006Pc-Cm
+	(envelope-from <alistai@xilinx.com>) id 1eJoTO-0006Pm-GP
 	for qemu-devel@nongnu.org; Tue, 28 Nov 2017 17:35:29 -0500
-Received: from mail-bl2nam02on0076.outbound.protection.outlook.com
-	([104.47.38.76]:53152
-	helo=NAM02-BL2-obe.outbound.protection.outlook.com)
+Received: from mail-sn1nam01on0056.outbound.protection.outlook.com
+	([104.47.32.56]:5839
+	helo=NAM01-SN1-obe.outbound.protection.outlook.com)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <alistai@xilinx.com>) id 1eJoTO-0006PL-3w
+	(Exim 4.71) (envelope-from <alistai@xilinx.com>) id 1eJoTO-0006PF-8Z
 	for qemu-devel@nongnu.org; Tue, 28 Nov 2017 17:35:26 -0500
 From: Alistair Francis <alistair.francis@xilinx.com>
-Date: Tue, 28 Nov 2017 14:31:11 -0800
-Message-ID: <058b3888cf0d40a3f29a156e1ed9cc27fd579548.1511908159.git.alistair.francis@xilinx.com>
-In-Reply-To: <cover.1511908159.git.alistair.francis@xilinx.com>
-References: <cover.1511908159.git.alistair.francis@xilinx.com>
+Date: Tue, 28 Nov 2017 14:31:07 -0800
+Message-ID: <cover.1511908159.git.alistair.francis@xilinx.com>
 MIME-Version: 1.0
 Content-Type: text/plain
-Subject: [Qemu-devel] [PATCH-2.12 v1 2/3] xilinx_spis: Set all of the reset
- values
+Subject: [Qemu-devel] [PATCH-2.12 v1 0/3] Update the reset values of the
+ Xilinx ZynqMP QSPI
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,112 +29,20 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org, edgar.iglesias@xilinx.com, edgar.iglesias@gmail.com
 Cc: alistair.francis@xilinx.com, alistair23@gmail.com
 
-Following the ZynqMP register spec let's ensure that all reset values
-are set.
+Update the reset values of the Xilinx ZynqMP QSPI device to match the
+resister spec here:
+https://www.xilinx.com/html_docs/registers/ug1087/ug1087-zynq-ultrascale-registers.html
 
-Signed-off-by: Alistair Francis <alistair.francis@xilinx.com>
----
+Based-on: 20171126231634.9531-14-frasse.iglesias@gmail.com
 
- hw/ssi/xilinx_spips.c         | 38 +++++++++++++++++++++++++++++++++-----
+Alistair Francis (3):
+  xilinx_spips: Update the QSPI Mod ID reset value
+  xilinx_spis: Set all of the reset values
+  xilinx_spips: Use memset instead of a for loop to zero registers
+
+ hw/ssi/xilinx_spips.c         | 48 ++++++++++++++++++++++++++++++++-----------
  include/hw/ssi/xilinx_spips.h |  2 +-
- 2 files changed, 34 insertions(+), 6 deletions(-)
+ 2 files changed, 37 insertions(+), 13 deletions(-)
 
-diff --git a/hw/ssi/xilinx_spips.c b/hw/ssi/xilinx_spips.c
-index 899db814ee..1a37f9c7f5 100644
---- a/hw/ssi/xilinx_spips.c
-+++ b/hw/ssi/xilinx_spips.c
-@@ -66,6 +66,7 @@
- 
- /* interrupt mechanism */
- #define R_INTR_STATUS       (0x04 / 4)
-+#define R_INTR_STATUS_RESET (0x104)
- #define R_INTR_EN           (0x08 / 4)
- #define R_INTR_DIS          (0x0C / 4)
- #define R_INTR_MASK         (0x10 / 4)
-@@ -102,6 +103,9 @@
- #define R_SLAVE_IDLE_COUNT  (0x24 / 4)
- #define R_TX_THRES          (0x28 / 4)
- #define R_RX_THRES          (0x2C / 4)
-+#define R_GPIO              (0x30 / 4)
-+#define R_LPBK_DLY_ADJ      (0x38 / 4)
-+#define R_LPBK_DLY_ADJ_RESET (0x33)
- #define R_TXD1              (0x80 / 4)
- #define R_TXD2              (0x84 / 4)
- #define R_TXD3              (0x88 / 4)
-@@ -137,11 +141,16 @@
- #define R_GQSPI_SELECT          (0x144 / 4)
-     FIELD(GQSPI_SELECT, GENERIC_QSPI_EN, 0, 1)
- #define R_GQSPI_ISR         (0x104 / 4)
-+#define R_GQSPI_ISR_RESET   (0xb84)
- #define R_GQSPI_IER         (0x108 / 4)
- #define R_GQSPI_IDR         (0x10c / 4)
- #define R_GQSPI_IMR         (0x110 / 4)
-+#define R_GQSPI_IMR_RESET   (0xfbe)
- #define R_GQSPI_TX_THRESH   (0x128 / 4)
- #define R_GQSPI_RX_THRESH   (0x12c / 4)
-+#define R_GQSPI_GPIO_THRESH (0x130 / 4)
-+#define R_GQSPI_LPBK_DLY_ADJ (0x138 / 4)
-+#define R_GQSPI_LPBK_DLY_ADJ_RESET (0x33)
- #define R_GQSPI_CNFG        (0x100 / 4)
-     FIELD(GQSPI_CNFG, MODE_EN, 30, 2)
-     FIELD(GQSPI_CNFG, GEN_FIFO_START_MODE, 29, 1)
-@@ -177,8 +186,16 @@
-     FIELD(GQSPI_GF_SNAPSHOT, EXPONENT, 9, 1)
-     FIELD(GQSPI_GF_SNAPSHOT, DATA_XFER, 8, 1)
-     FIELD(GQSPI_GF_SNAPSHOT, IMMEDIATE_DATA, 0, 8)
--#define R_GQSPI_MOD_ID        (0x168 / 4)
--#define R_GQSPI_MOD_ID_VALUE  0x010A0000
-+#define R_GQSPI_MOD_ID        (0x1fc / 4)
-+#define R_GQSPI_MOD_ID_RESET  (0x10a0000)
-+
-+#define R_QSPIDMA_DST_CTRL         (0x80c / 4)
-+#define R_QSPIDMA_DST_CTRL_RESET   (0x803ffa00)
-+#define R_QSPIDMA_DST_I_MASK       (0x820 / 4)
-+#define R_QSPIDMA_DST_I_MASK_RESET (0xfe)
-+#define R_QSPIDMA_DST_CTRL2        (0x824 / 4)
-+#define R_QSPIDMA_DST_CTRL2_RESET  (0x081bfff8)
-+
- /* size of TXRX FIFOs */
- #define RXFF_A          (128)
- #define TXFF_A          (128)
-@@ -351,11 +368,22 @@ static void xlnx_zynqmp_qspips_reset(DeviceState *d)
-     fifo8_reset(&s->rx_fifo_g);
-     fifo8_reset(&s->rx_fifo_g);
-     fifo32_reset(&s->fifo_g);
--    s->regs[R_GQSPI_TX_THRESH] = 1;
--    s->regs[R_GQSPI_RX_THRESH] = 1;
--    s->regs[R_GQSPI_GFIFO_THRESH] = 1;
-+    s->regs[R_INTR_STATUS] = R_INTR_STATUS_RESET;
-+    s->regs[R_GPIO] = 1;
-+    s->regs[R_LPBK_DLY_ADJ] = R_LPBK_DLY_ADJ_RESET;
-+    s->regs[R_GQSPI_GFIFO_THRESH] = 0x10;
-     s->regs[R_GQSPI_IMR] = GQSPI_IXR_MASK;
-     s->regs[R_MOD_ID] = 0x01090101;
-+    s->regs[R_GQSPI_ISR] = R_GQSPI_ISR_RESET;
-+    s->regs[R_GQSPI_IMR] = R_GQSPI_IMR_RESET;
-+    s->regs[R_GQSPI_TX_THRESH] = 1;
-+    s->regs[R_GQSPI_RX_THRESH] = 1;
-+    s->regs[R_GQSPI_GPIO_THRESH] = 1;
-+    s->regs[R_GQSPI_LPBK_DLY_ADJ] = R_GQSPI_LPBK_DLY_ADJ_RESET;
-+    s->regs[R_GQSPI_MOD_ID] = R_GQSPI_MOD_ID_RESET;
-+    s->regs[R_QSPIDMA_DST_CTRL] = R_QSPIDMA_DST_CTRL_RESET;
-+    s->regs[R_QSPIDMA_DST_I_MASK] = R_QSPIDMA_DST_I_MASK_RESET;
-+    s->regs[R_QSPIDMA_DST_CTRL2] = R_QSPIDMA_DST_CTRL2_RESET;
-     s->man_start_com_g = false;
-     s->gqspi_irqline = 0;
-     xlnx_zynqmp_qspips_update_ixr(s);
-diff --git a/include/hw/ssi/xilinx_spips.h b/include/hw/ssi/xilinx_spips.h
-index 75fc94ce5d..d398a4e81c 100644
---- a/include/hw/ssi/xilinx_spips.h
-+++ b/include/hw/ssi/xilinx_spips.h
-@@ -32,7 +32,7 @@
- typedef struct XilinxSPIPS XilinxSPIPS;
- 
- #define XLNX_SPIPS_R_MAX        (0x100 / 4)
--#define XLNX_ZYNQMP_SPIPS_R_MAX (0x200 / 4)
-+#define XLNX_ZYNQMP_SPIPS_R_MAX (0x830 / 4)
- 
- /* Bite off 4k chunks at a time */
- #define LQSPI_CACHE_SIZE 1024
 -- 
 2.14.1
