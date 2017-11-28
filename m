@@ -1,22 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37391)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46615)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1eJTf6-0005pp-Gb
-	for qemu-devel@nongnu.org; Mon, 27 Nov 2017 19:22:09 -0500
+	(envelope-from <bounces@canonical.com>) id 1eJUBi-00043o-61
+	for qemu-devel@nongnu.org; Mon, 27 Nov 2017 19:55:51 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1eJTf5-0005xS-HH
-	for qemu-devel@nongnu.org; Mon, 27 Nov 2017 19:22:08 -0500
-References: <20171123175747.2309-1-famz@redhat.com>
-	<20171127232909.GF4903@localhost.localdomain>
-From: John Snow <jsnow@redhat.com>
-Message-ID: <4ee33b29-be8c-249f-f578-31ec9c478bef@redhat.com>
-Date: Mon, 27 Nov 2017 19:21:54 -0500
+	(envelope-from <bounces@canonical.com>) id 1eJUBe-0004w6-9f
+	for qemu-devel@nongnu.org; Mon, 27 Nov 2017 19:55:50 -0500
+Received: from indium.canonical.com ([91.189.90.7]:39960)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1eJUBe-0004vd-3Q
+	for qemu-devel@nongnu.org; Mon, 27 Nov 2017 19:55:46 -0500
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1eJUBZ-0001Ps-TQ
+	for <qemu-devel@nongnu.org>; Tue, 28 Nov 2017 00:55:42 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 8D8342E80D8
+	for <qemu-devel@nongnu.org>; Tue, 28 Nov 2017 00:55:41 +0000 (UTC)
 MIME-Version: 1.0
-In-Reply-To: <20171127232909.GF4903@localhost.localdomain>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [Qemu-block] [PATCH 0/1] block: Workaround for the
- iotests errors
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Tue, 28 Nov 2017 00:41:50 -0000
+From: changlimin <changlimin@h3c.com>
+Reply-To: Bug 1401798 <1401798@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <20141212081522.22342.50676.malonedeb@gac.canonical.com>
+Message-Id: <151182971055.3145.5540142367406841235.launchpad@gac.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1401798] Re: Qemu 2.2.0 savevm crash.
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,109 +36,73 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Kevin Wolf <kwolf@redhat.com>, Fam Zheng <famz@redhat.com>
-Cc: qemu-block@nongnu.org, qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, pbonzini@redhat.com
+To: qemu-devel@nongnu.org
 
+** Changed in: qemu
+       Status: Incomplete =3D> Fix Released
 
+-- =
 
-On 11/27/2017 06:29 PM, Kevin Wolf wrote:
-> Am 23.11.2017 um 18:57 hat Fam Zheng geschrieben:
->> Jeff's block job patch made the latent drain bug visible, and I find this
->> patch, which by itself also makes some sense, can hide it again. :) With it
->> applied we are at least back to the ground where patchew's iotests (make
->> docker-test-block@fedora) can pass.
->>
->> The real bug is that in the middle of bdrv_parent_drained_end(), bs's parent
->> list changes. One drained_end call before the mirror_exit() already did one
->> blk_root_drained_end(), a second drained_end on an updated parent node can do
->> another same blk_root_drained_end(), making it unbalanced with
->> blk_root_drained_begin(). This is shown by the following three backtraces as
->> captured by rr with a crashed "qemu-img commit", essentially the same as in
->> the failed iotest 020:
-> 
-> My conclusion what really happens in 020 is that we have a graph like
-> this:
-> 
->                              mirror target BB --+
->                                                 |
->                                                 v
->     qemu-img BB -> mirror_top_bs -> overlay -> base
-> 
-> bdrv_drained_end(base) results in it being available for requests again,
-> so it calls bdrv_parent_drained_end() for overlay. While draining
-> itself, the mirror job completes and changes the BdrvChild between
-> mirror_top_bs and overlay (which is currently being drained) to point to
-> base instead. After returning, QLIST_FOREACH() continues to iterate the
-> parents of base instead of those of overlay, resulting in a second
-> blk_drained_end() for the mirror target BB.
-> 
-> This instance can be fixed relatively easily (see below) by using
-> QLIST_FOREACH_SAFE() instead.
-> 
-> However, I'm not sure if all problems with the graph change can be
-> solved this way and whether we can really allow graph changes while
-> iterating the graph for bdrv_drained_begin/end. Not allowing it would
-> require some more serious changes to the block jobs that delays their
-> completion until after bdrv_drain_end() has finished (not sure how to
-> even get a callback at that point...)
-> 
-> And the test cases that Jeff mentions still fail with this patch, too.
-> But at least it doesn't only make failure less likely by reducing the
-> window for a race condition, but seems to attack a real problem.
-> 
-> Kevin
-> 
-> 
-> diff --git a/block/io.c b/block/io.c
-> index 4fdf93a014..6773926fc1 100644
-> --- a/block/io.c
-> +++ b/block/io.c
-> @@ -42,9 +42,9 @@ static int coroutine_fn bdrv_co_do_pwrite_zeroes(BlockDriverState *bs,
->  
->  void bdrv_parent_drained_begin(BlockDriverState *bs)
->  {
-> -    BdrvChild *c;
-> +    BdrvChild *c, *next;
->  
-> -    QLIST_FOREACH(c, &bs->parents, next_parent) {
-> +    QLIST_FOREACH_SAFE(c, &bs->parents, next_parent, next) {
->          if (c->role->drained_begin) {
->              c->role->drained_begin(c);
->          }
-> @@ -53,9 +53,9 @@ void bdrv_parent_drained_begin(BlockDriverState *bs)
->  
->  void bdrv_parent_drained_end(BlockDriverState *bs)
->  {
-> -    BdrvChild *c;
-> +    BdrvChild *c, *next;
->  
-> -    QLIST_FOREACH(c, &bs->parents, next_parent) {
-> +    QLIST_FOREACH_SAFE(c, &bs->parents, next_parent, next) {
->          if (c->role->drained_end) {
->              c->role->drained_end(c);
->          }
-> 
-> 
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1401798
 
-With this patch applied to 5e19aed5, I see the following failures (still?):
+Title:
+  Qemu 2.2.0 savevm crash.
 
-raw:
-	055 (pause_job timeouts)
-	109 (apparently a discrepancy over whether busy should be true/false.)
+Status in QEMU:
+  Fix Released
 
-qcow2:
-	056 (hang),
-	087 (lacking crypto, normal for me)
-	141 (unexpected timeout/hang)
-	176 (SIGSEGV)
-	188 (lacking crypto, normal for me)
-	189 (lacking crypto, normal for me)
-	198 (lacking crypto, I guess this is normal now)
+Bug description:
+  qemu 2.1.2 is good.
 
+  (gdb) bt
+  #0  0x00007ffff4aae445 in raise () from /lib/x86_64-linux-gnu/libc.so.6
+  #1  0x00007ffff4ab1bab in abort () from /lib/x86_64-linux-gnu/libc.so.6
+  #2  0x0000555555997951 in qcow2_cache_find_entry_to_replace (c=3D0x555556=
+389780) at block/qcow2-cache.c:262
+  #3  0x0000555555997a1a in qcow2_cache_do_get (bs=3D0x5555563836f0, c=3D0x=
+555556389780, offset=3D1094713344, table=3D0x7fffffffc528, =
 
-I'm on my way to the gym for the evening, I will try to investigate
-later this evening. I'm not worried about 087, 188, 189 or 198.
+      read_from_disk=3Dtrue) at block/qcow2-cache.c:285
+  #4  0x0000555555997c45 in qcow2_cache_get (bs=3D0x5555563836f0, c=3D0x555=
+556389780, offset=3D1094713344, table=3D0x7fffffffc528)
+      at block/qcow2-cache.c:331
+  #5  0x0000555555991ca9 in l2_allocate (bs=3D0x5555563836f0, l1_index=3D1,=
+ table=3D0x7fffffffc5a0) at block/qcow2-cluster.c:247
+  #6  0x000055555599290c in get_cluster_table (bs=3D0x5555563836f0, offset=
+=3D549755813888, new_l2_table=3D0x7fffffffc610, =
 
-Anyway, as this micro-patchlet does fix observable problems with iotest 020;
+      new_l2_index=3D0x7fffffffc62c) at block/qcow2-cluster.c:620
+  #7  0x0000555555994213 in discard_single_l2 (bs=3D0x5555563836f0, offset=
+=3D549755813888, nb_clusters=3D156, type=3DQCOW2_DISCARD_NEVER, =
 
-Tested-by: John Snow <jsnow@redhat.com>
+      full_discard=3Dfalse) at block/qcow2-cluster.c:1425
+  #8  0x0000555555994491 in qcow2_discard_clusters (bs=3D0x5555563836f0, of=
+fset=3D549755813888, nb_sectors=3D638976, type=3DQCOW2_DISCARD_NEVER, =
+
+      full_discard=3Dfalse) at block/qcow2-cluster.c:1516
+  #9  0x00005555559965c8 in qcow2_snapshot_create (bs=3D0x5555563836f0, sn_=
+info=3D0x7fffffffc830) at block/qcow2-snapshot.c:441
+  #10 0x00005555559ad1ad in bdrv_snapshot_create (bs=3D0x5555563836f0, sn_i=
+nfo=3D0x7fffffffc830) at block/snapshot.c:167
+  #11 0x000055555565e90f in do_savevm (mon=3D0x555556992d20, qdict=3D0x5555=
+599d5c00) at /vms/qemu/qemu-2.2.0/savevm.c:1126
+
+  (gdb) show args
+  Argument list to give program being debugged when it is started is "-name=
+ u1404-01 -S -machine pc,accel=3Dkvm,usb=3Doff -m 1024 -smp 2,sockets=3D2,c=
+ores=3D1,threads=3D1 -no-user-config -nodefaults -monitor stdio -rtc base=
+=3Dutc -no-shutdown -device piix3-usb-uhci,id=3Dusb,bus=3Dpci.0,addr=3D0x1.=
+0x2 -device virtio-serial-pci,id=3Dvirtio-serial0,bus=3Dpci.0,addr=3D0x5 -d=
+rive file=3D/vms/images/u1404-01.img,if=3Dnone,id=3Ddrive-virtio-disk0,form=
+at=3Dqcow2,cache=3Ddirectsync -device virtio-blk-pci,scsi=3Doff,bus=3Dpci.0=
+,addr=3D0x4,drive=3Ddrive-virtio-disk0,id=3Dvirtio-disk0 -drive if=3Dnone,i=
+d=3Ddrive-ide0-1-0,readonly=3Don,format=3Draw -device ide-cd,bus=3Dide.1,un=
+it=3D0,drive=3Ddrive-ide0-1-0,id=3Dide0-1-0 -chardev pty,id=3Dcharserial0 -=
+device isa-serial,chardev=3Dcharserial0,id=3Dserial0 -device usb-tablet,id=
+=3Dinput0 -vnc 0.0.0.0:0 -device cirrus-vga,id=3Dvideo0,bus=3Dpci.0,addr=3D=
+0x2 -device virtio-balloon-pci,id=3Dballoon0,bus=3Dpci.0,addr=3D0x6".
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1401798/+subscriptions
