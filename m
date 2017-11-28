@@ -1,36 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35480)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39904)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1eJd2J-0002Z4-Uf
-	for qemu-devel@nongnu.org; Tue, 28 Nov 2017 05:22:44 -0500
+	(envelope-from <cohuck@redhat.com>) id 1eJdF5-0006z4-L2
+	for qemu-devel@nongnu.org; Tue, 28 Nov 2017 05:35:57 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1eJd2F-0007Dr-VI
-	for qemu-devel@nongnu.org; Tue, 28 Nov 2017 05:22:43 -0500
-Date: Tue, 28 Nov 2017 11:22:33 +0100
+	(envelope-from <cohuck@redhat.com>) id 1eJdF1-0003n5-PX
+	for qemu-devel@nongnu.org; Tue, 28 Nov 2017 05:35:55 -0500
+Date: Tue, 28 Nov 2017 11:35:46 +0100
 From: Cornelia Huck <cohuck@redhat.com>
-Message-ID: <20171128112233.0a1c8c04.cohuck@redhat.com>
-In-Reply-To: <c49e91f1-0f8a-8f6c-9784-21aa4623e2cf@linux.vnet.ibm.com>
-References: <20171121111825.17916-1-pasic@linux.vnet.ibm.com>
-	<594e1952-7097-0927-d913-d3b915df2305@linux.vnet.ibm.com>
-	<20171122172522.281cfb4b.cohuck@redhat.com>
-	<76f95c6f-641e-2fe0-73b4-3ab24fc1a93f@linux.vnet.ibm.com>
-	<20171124134650.46665791.cohuck@redhat.com>
-	<7eaa796e-7815-f943-58b5-ecb5a0bb252e@de.ibm.com>
-	<20171124142758.39d7726f.cohuck@redhat.com>
-	<131b311b-c262-3636-c7ee-1c59ee283823@de.ibm.com>
-	<1ddb44db-2c5c-d64f-56e0-e4582f82b572@linux.vnet.ibm.com>
-	<20171124171510.2343ccdf.cohuck@redhat.com>
-	<8c18df3e-92a0-f88f-6d24-e1df051c8138@linux.vnet.ibm.com>
-	<20171127135624.28052dc5.cohuck@redhat.com>
-	<57f95f61-b9d9-1341-78c7-259006cb5945@linux.vnet.ibm.com>
-	<20171127141929.1d692aad.cohuck@redhat.com>
-	<39cb6a69-7f32-80d4-214d-26e1e81a9fd7@linux.vnet.ibm.com>
-	<2933e058-0217-9696-2c52-613da8ba7a1c@linux.vnet.ibm.com>
-	<20171127175607.75bd999e.cohuck@redhat.com>
-	<c49e91f1-0f8a-8f6c-9784-21aa4623e2cf@linux.vnet.ibm.com>
+Message-ID: <20171128113546.7f3f2b38.cohuck@redhat.com>
+In-Reply-To: <1511816136-30068-1-git-send-email-walling@linux.vnet.ibm.com>
+References: <1511816136-30068-1-git-send-email-walling@linux.vnet.ibm.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [RFC PATCH 1/1] s390x/css: unresrict cssids
+Subject: Re: [Qemu-devel] [PATCH v1 0/5] (FIXED) Interactive Boot Menu for
+ DASD and SCSI Guests on s390x
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -39,29 +23,59 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Boris Fiuczynski <fiuczy@linux.vnet.ibm.com>
-Cc: Halil Pasic <pasic@linux.vnet.ibm.com>, Christian Borntraeger <borntraeger@de.ibm.com>, Shalini Chellathurai Saroja <shalini@linux.vnet.ibm.com>, qemu-devel@nongnu.org, qemu-s390x@nongnu.org, Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>
+To: "Collin L. Walling" <walling@linux.vnet.ibm.com>
+Cc: borntraeger@de.ibm.com, frankja@linux.vnet.ibm.com, qemu-s390x@nongnu.org, qemu-devel@nongnu.org
 
-On Tue, 28 Nov 2017 09:53:15 +0100
-Boris Fiuczynski <fiuczy@linux.vnet.ibm.com> wrote:
+On Mon, 27 Nov 2017 15:55:31 -0500
+"Collin L. Walling" <walling@linux.vnet.ibm.com> wrote:
 
-> On 11/27/2017 05:56 PM, Cornelia Huck wrote:
-> > Proposal 2: Export the default cssid as a machine property. If this
-> > property exists, it also implies that devices can be put into any css
-> > image (although it makes the most sense to put them into the default
-> > css image as indicated by the property). Can be made r/w later if it is
-> > too much for 2.12.  
-> Just as a side discussion:
-> I know of qom command query-machines but that does not seem to provide 
-> the information you suggest to use with proposal 2.
-> What qom command do you suggest to use for the introspection of the 
-> machine options access mode?
+> These patches implement a boot menu for ECKD DASD and SCSI guests on s390x. 
+> The menu will only appear if the disk has been configured for IPL with the 
+> zIPL tool and with the following QEMU command line options:
 > 
+>     -boot menu=on[,splash-time=X] and/or -machine loadparm='prompt'
+> 
+> or via the following libvirt domain xml:
+> 
+>     <os>
+>       <bootmenu enable='yes' timeout='X'/>
+>     </os>
+> 
+>     or
+> 	
+>     <disk>
+>       ...
+>       <boot order='1' loadparm='PROMPT'/>
+>     </disk>
+> 
+> Where X is some positive integer representing time in milliseconds.
+> 
+> Loadparm will override all boot options.
 
-Is qom-get what you are looking for?
+I have a bit of trouble parsing that last sentence: Do you mean a
+loadparm other than 'prompt' will disable the menu and just boot the
+specified entry, without any delay? (That's what would make most sense
+to me.)
 
-virsh # qemu-monitor-command vm1 --pretty '{ "execute": "qom-get", "arguments": { "path": "/machine/", "property": "accel"} }'
-{
-  "return": "kvm",
-  "id": "libvirt-18"
-}
+> 
+> Collin L. Walling (5):
+>   s390-ccw: update libc.h
+>   s390-ccw: ipl structs for eckd cdl/ldl
+>   s390-ccw: parse and set boot menu options
+>   s390-ccw: interactive boot menu for eckd dasd
+>   s390-ccw: interactive boot menu for scsi
+> 
+>  hw/s390x/ipl.c              |  23 +++++++
+>  hw/s390x/ipl.h              |   8 ++-
+>  pc-bios/s390-ccw/Makefile   |   2 +-
+>  pc-bios/s390-ccw/bootmap.c  | 110 ++++++++++++++++++++++++++++------
+>  pc-bios/s390-ccw/bootmap.h  |  73 +++++++++++++----------
+>  pc-bios/s390-ccw/iplb.h     |   8 ++-
+>  pc-bios/s390-ccw/libc.h     |  94 +++++++++++++++++++++++++++++
+>  pc-bios/s390-ccw/main.c     |  35 +++++------
+>  pc-bios/s390-ccw/menu.c     | 122 +++++++++++++++++++++++++++++++++++++
+>  pc-bios/s390-ccw/s390-ccw.h |   7 +++
+>  pc-bios/s390-ccw/sclp.c     | 142 +++++++++++++++++++++++++++++++++++++++++---
+>  11 files changed, 546 insertions(+), 78 deletions(-)
+>  create mode 100644 pc-bios/s390-ccw/menu.c
+> 
