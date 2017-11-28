@@ -1,22 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44009)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44025)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1eJgzJ-0004RE-80
-	for qemu-devel@nongnu.org; Tue, 28 Nov 2017 09:35:54 -0500
+	(envelope-from <pm215@archaic.org.uk>) id 1eJgzL-0004Sp-9N
+	for qemu-devel@nongnu.org; Tue, 28 Nov 2017 09:35:56 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1eJgzI-0003rM-57
-	for qemu-devel@nongnu.org; Tue, 28 Nov 2017 09:35:53 -0500
+	(envelope-from <pm215@archaic.org.uk>) id 1eJgzK-0003rx-1o
+	for qemu-devel@nongnu.org; Tue, 28 Nov 2017 09:35:55 -0500
 Received: from orth.archaic.org.uk ([2001:8b0:1d0::2]:38580)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <pm215@archaic.org.uk>)
-	id 1eJgzH-0003lI-TK
-	for qemu-devel@nongnu.org; Tue, 28 Nov 2017 09:35:52 -0500
+	id 1eJgzJ-0003lI-Qs
+	for qemu-devel@nongnu.org; Tue, 28 Nov 2017 09:35:53 -0500
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 28 Nov 2017 14:35:24 +0000
-Message-Id: <1511879725-9576-2-git-send-email-peter.maydell@linaro.org>
-In-Reply-To: <1511879725-9576-1-git-send-email-peter.maydell@linaro.org>
-References: <1511879725-9576-1-git-send-email-peter.maydell@linaro.org>
-Subject: [Qemu-devel] [PATCH 1/2] linux-user: Propagate siginfo_t through to
- handle_cpu_signal()
+Date: Tue, 28 Nov 2017 14:35:23 +0000
+Message-Id: <1511879725-9576-1-git-send-email-peter.maydell@linaro.org>
+Subject: [Qemu-devel] [PATCH 0/2] linux-user: Fix race between threads in
+ page_unprotect()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,142 +26,62 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: patches@linaro.org, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Riku Voipio <riku.voipio@iki.fi>, Laurent Vivier <laurent@vivier.eu>
 
-Currently all the architecture/OS specific cpu_signal_handler()
-functions call handle_cpu_signal() without passing it the
-siginfo_t. We're going to want that so we can look at the si_code
-to determine whether this is a SEGV_ACCERR access violation or
-some other kind of fault, so change the functions to pass through
-the pointer to the siginfo_t rather than just the si_addr value.
+If multiple guest threads in user-mode emulation write to a
+page which QEMU has marked read-only because of cached TCG
+translations, the threads can race in page_unprotect:
 
-Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
----
- accel/tcg/user-exec.c | 39 ++++++++++++++-------------------------
- 1 file changed, 14 insertions(+), 25 deletions(-)
+ * threads A & B both try to do a write to a page with code in it at
+   the same time (ie which we've made non-writeable, so SEGV)
+ * they race into the signal handler with this faulting address
+ * thread A happens to get to page_unprotect() first and takes the
+   mmap lock, so thread B sits waiting for it to be done
+ * A then finds the page, marks it PAGE_WRITE and mprotect()s it writable
+ * A can then continue OK (returns from signal handler to retry the
+   memory access)
+ * ...but when B gets the mmap lock it finds that the page is already
+   PAGE_WRITE, and so it exits page_unprotect() via the "not due to
+   protected translation" code path, and wrongly delivers the signal
+   to the guest rather than just retrying the access
 
-diff --git a/accel/tcg/user-exec.c b/accel/tcg/user-exec.c
-index f42285e..e8f26ff 100644
---- a/accel/tcg/user-exec.c
-+++ b/accel/tcg/user-exec.c
-@@ -57,12 +57,13 @@ static void cpu_exit_tb_from_sighandler(CPUState *cpu, sigset_t *old_set)
-    the effective address of the memory exception. 'is_write' is 1 if a
-    write caused the exception and otherwise 0'. 'old_set' is the
-    signal set which should be restored */
--static inline int handle_cpu_signal(uintptr_t pc, unsigned long address,
-+static inline int handle_cpu_signal(uintptr_t pc, siginfo_t *info,
-                                     int is_write, sigset_t *old_set)
- {
-     CPUState *cpu = current_cpu;
-     CPUClass *cc;
-     int ret;
-+    unsigned long address = (unsigned long)info->si_addr;
- 
-     /* We must handle PC addresses from two different sources:
-      * a call return address and a signal frame address.
-@@ -215,9 +216,8 @@ int cpu_signal_handler(int host_signum, void *pinfo,
- #endif
-     pc = EIP_sig(uc);
-     trapno = TRAP_sig(uc);
--    return handle_cpu_signal(pc, (unsigned long)info->si_addr,
--                             trapno == 0xe ?
--                             (ERROR_sig(uc) >> 1) & 1 : 0,
-+    return handle_cpu_signal(pc, info,
-+                             trapno == 0xe ? (ERROR_sig(uc) >> 1) & 1 : 0,
-                              &MASK_sig(uc));
- }
- 
-@@ -261,9 +261,8 @@ int cpu_signal_handler(int host_signum, void *pinfo,
- #endif
- 
-     pc = PC_sig(uc);
--    return handle_cpu_signal(pc, (unsigned long)info->si_addr,
--                             TRAP_sig(uc) == 0xe ?
--                             (ERROR_sig(uc) >> 1) & 1 : 0,
-+    return handle_cpu_signal(pc, info,
-+                             TRAP_sig(uc) == 0xe ? (ERROR_sig(uc) >> 1) & 1 : 0,
-                              &MASK_sig(uc));
- }
- 
-@@ -341,8 +340,7 @@ int cpu_signal_handler(int host_signum, void *pinfo,
-         is_write = 1;
-     }
- #endif
--    return handle_cpu_signal(pc, (unsigned long)info->si_addr,
--                             is_write, &uc->uc_sigmask);
-+    return handle_cpu_signal(pc, info, is_write, &uc->uc_sigmask);
- }
- 
- #elif defined(__alpha__)
-@@ -372,8 +370,7 @@ int cpu_signal_handler(int host_signum, void *pinfo,
-         is_write = 1;
-     }
- 
--    return handle_cpu_signal(pc, (unsigned long)info->si_addr,
--                             is_write, &uc->uc_sigmask);
-+    return handle_cpu_signal(pc, info, is_write, &uc->uc_sigmask);
- }
- #elif defined(__sparc__)
- 
-@@ -432,8 +429,7 @@ int cpu_signal_handler(int host_signum, void *pinfo,
-             break;
-         }
-     }
--    return handle_cpu_signal(pc, (unsigned long)info->si_addr,
--                             is_write, sigmask);
-+    return handle_cpu_signal(pc, info, is_write, sigmask);
- }
- 
- #elif defined(__arm__)
-@@ -466,9 +462,7 @@ int cpu_signal_handler(int host_signum, void *pinfo,
-      * later processor; on v5 we will always report this as a read).
-      */
-     is_write = extract32(uc->uc_mcontext.error_code, 11, 1);
--    return handle_cpu_signal(pc, (unsigned long)info->si_addr,
--                             is_write,
--                             &uc->uc_sigmask);
-+    return handle_cpu_signal(pc, info, is_write, &uc->uc_sigmask);
- }
- 
- #elif defined(__aarch64__)
-@@ -495,8 +489,7 @@ int cpu_signal_handler(int host_signum, void *pinfo, void *puc)
-                 /* Ignore bits 23 & 24, controlling indexing.  */
-                 || (insn & 0x3a400000) == 0x28000000); /* C3.3.7,14-16 */
- 
--    return handle_cpu_signal(pc, (uintptr_t)info->si_addr,
--                             is_write, &uc->uc_sigmask);
-+    return handle_cpu_signal(pc, info, is_write, &uc->uc_sigmask);
- }
- 
- #elif defined(__ia64)
-@@ -529,9 +522,7 @@ int cpu_signal_handler(int host_signum, void *pinfo, void *puc)
-     default:
-         break;
-     }
--    return handle_cpu_signal(ip, (unsigned long)info->si_addr,
--                             is_write,
--                             (sigset_t *)&uc->uc_sigmask);
-+    return handle_cpu_signal(ip, info, is_write, (sigset_t *)&uc->uc_sigmask);
- }
- 
- #elif defined(__s390__)
-@@ -583,8 +574,7 @@ int cpu_signal_handler(int host_signum, void *pinfo,
-         }
-         break;
-     }
--    return handle_cpu_signal(pc, (unsigned long)info->si_addr,
--                             is_write, &uc->uc_sigmask);
-+    return handle_cpu_signal(pc, info, is_write, &uc->uc_sigmask);
- }
- 
- #elif defined(__mips__)
-@@ -599,8 +589,7 @@ int cpu_signal_handler(int host_signum, void *pinfo,
- 
-     /* XXX: compute is_write */
-     is_write = 0;
--    return handle_cpu_signal(pc, (unsigned long)info->si_addr,
--                             is_write, &uc->uc_sigmask);
-+    return handle_cpu_signal(pc, info, is_write, &uc->uc_sigmask);
- }
- 
- #else
+In particular, this meant that trying to run 'javac' in user-mode
+emulation would fail with a spurious guest SIGSEGV.
+
+Handle this by making page_unprotect() assume that a call for a page
+which is already PAGE_WRITE is due to a race of this sort and return
+a "fault handled" indication.
+
+Since this would cause an infinite loop if we ever called
+page_unprotect() for some other kind of fault than "write failed due
+to bad access permissions", tighten the condition in
+handle_cpu_signal() to check the signal number and si_code, and add a
+comment so that if somebody does ever find themselves debugging an
+infinite loop of faults they have some clue about why.
+
+(The trick for identifying the correct setting for
+current_tb_invalidated for thread B (needed to handle the precise-SMC
+case) is due to Richard Henderson.  Paolo Bonzini suggested just
+relying on si_code rather than trying anything more complicated.)
+
+I'm slightly nervous about assuming that we get SEGV with SEGV_ACCERR
+on a write if and only if the page permissions are set to non-writeable
+(for instance https://www.mail-archive.com/tech@openbsd.org/msg40358.html
+is a surprisingly recent patch to fix this for OpenBSD/x86, and I
+would be unsurprised if QEMU usermode itself got the si_code wrong,
+and the Boehm gc code at https://github.com/ivmai/bdwgc/blob/master/os_dep.c#L3182
+is quite convoluted), but on the other hand we really ought in theory
+to be able to rely on si_code, and trying to handle this some other way
+gets pretty convoluted...
+
+thanks
+-- PMM
+
+Peter Maydell (2):
+  linux-user: Propagate siginfo_t through to handle_cpu_signal()
+  page_unprotect(): handle calls to pages that are PAGE_WRITE
+
+ accel/tcg/translate-all.c | 50 ++++++++++++++++++++++++++++-----------------
+ accel/tcg/user-exec.c     | 52 +++++++++++++++++++++++------------------------
+ 2 files changed, 57 insertions(+), 45 deletions(-)
+
 -- 
 2.7.4
