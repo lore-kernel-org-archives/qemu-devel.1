@@ -1,22 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38319)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40650)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1eJb7B-00042x-Qw
-	for qemu-devel@nongnu.org; Tue, 28 Nov 2017 03:19:41 -0500
+	(envelope-from <thuth@redhat.com>) id 1eJbL9-0008Fc-CO
+	for qemu-devel@nongnu.org; Tue, 28 Nov 2017 03:34:04 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1eJb7A-0002J5-D6
-	for qemu-devel@nongnu.org; Tue, 28 Nov 2017 03:19:37 -0500
-References: <20171012185916.22776-1-eblake@redhat.com>
-	<20171012185916.22776-3-eblake@redhat.com>
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Message-ID: <8ada11cb-5455-20ab-4a23-03f05f5c83c1@virtuozzo.com>
-Date: Tue, 28 Nov 2017 11:19:16 +0300
+	(envelope-from <thuth@redhat.com>) id 1eJbL6-0006g5-38
+	for qemu-devel@nongnu.org; Tue, 28 Nov 2017 03:34:03 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:46878)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1eJbL5-0006ff-Tq
+	for qemu-devel@nongnu.org; Tue, 28 Nov 2017 03:34:00 -0500
+References: <CAFEAcA-b9oDkPfZbntWfhWSv1HOnbUf75p_xB_tF74h_NBGPmw@mail.gmail.com>
+	<791b0b92-a232-bf63-bd12-0e663c19175c@redhat.com>
+From: Thomas Huth <thuth@redhat.com>
+Message-ID: <75400a80-c90c-8d8f-7823-f87c6e8a32d8@redhat.com>
+Date: Tue, 28 Nov 2017 09:33:52 +0100
 MIME-Version: 1.0
-In-Reply-To: <20171012185916.22776-3-eblake@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
+In-Reply-To: <791b0b92-a232-bf63-bd12-0e663c19175c@redhat.com>
+Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Subject: Re: [Qemu-devel] [PATCH v4 02/20] block: Switch passthrough drivers
- to .bdrv_co_block_status()
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] QEMU Summit 2017: minutes
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,224 +28,43 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org
-Cc: kwolf@redhat.com, famz@redhat.com, qemu-block@nongnu.org, Jeff Cody <jcody@redhat.com>, Max Reitz <mreitz@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, jsnow@redhat.com
+To: John Snow <jsnow@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, QEMU Developers <qemu-devel@nongnu.org>
 
-12.10.2017 21:58, Eric Blake wrote:
-> We are gradually moving away from sector-based interfaces, towards
-> byte-based.  Update the generic helpers, and all passthrough clients
-> (blkdebug, commit, mirror, throttle) accordingly.
->
-> Signed-off-by: Eric Blake <eblake@redhat.com>
->
-> ---
-> v4: rebase to interface tweak
-> v3: rebase to addition of throttle driver
-> v2: rebase to master, retitle while merging blkdebug, commit, and mirror
-> ---
->   include/block/block_int.h | 28 ++++++++++++++++------------
->   block/io.c                | 36 ++++++++++++++++++++----------------
->   block/blkdebug.c          | 20 +++++++++++---------
->   block/commit.c            |  2 +-
->   block/mirror.c            |  2 +-
->   block/throttle.c          |  2 +-
->   6 files changed, 50 insertions(+), 40 deletions(-)
->
-> diff --git a/include/block/block_int.h b/include/block/block_int.h
-> index 4153cd646d..7c8503f693 100644
-> --- a/include/block/block_int.h
-> +++ b/include/block/block_int.h
-> @@ -1018,23 +1018,27 @@ void bdrv_format_default_perms(BlockDriverState *bs, BdrvChild *c,
->                                  uint64_t *nperm, uint64_t *nshared);
->
->   /*
-> - * Default implementation for drivers to pass bdrv_co_get_block_status() to
-> + * Default implementation for drivers to pass bdrv_co_block_status() to
->    * their file.
->    */
-> -int64_t coroutine_fn bdrv_co_get_block_status_from_file(BlockDriverState *bs,
-> -                                                        int64_t sector_num,
-> -                                                        int nb_sectors,
-> -                                                        int *pnum,
-> -                                                        BlockDriverState **file);
-> +int coroutine_fn bdrv_co_block_status_from_file(BlockDriverState *bs,
-> +                                                bool want_zero,
-> +                                                int64_t offset,
-> +                                                int64_t bytes,
-> +                                                int64_t *pnum,
-> +                                                int64_t *map,
-> +                                                BlockDriverState **file);
->   /*
-> - * Default implementation for drivers to pass bdrv_co_get_block_status() to
-> + * Default implementation for drivers to pass bdrv_co_block_status() to
->    * their backing file.
->    */
-> -int64_t coroutine_fn bdrv_co_get_block_status_from_backing(BlockDriverState *bs,
-> -                                                           int64_t sector_num,
-> -                                                           int nb_sectors,
-> -                                                           int *pnum,
-> -                                                           BlockDriverState **file);
-> +int coroutine_fn bdrv_co_block_status_from_backing(BlockDriverState *bs,
-> +                                                   bool want_zero,
-> +                                                   int64_t offset,
-> +                                                   int64_t bytes,
-> +                                                   int64_t *pnum,
-> +                                                   int64_t *map,
-> +                                                   BlockDriverState **file);
->   const char *bdrv_get_parent_name(const BlockDriverState *bs);
->   void blk_dev_change_media_cb(BlockBackend *blk, bool load, Error **errp);
->   bool blk_dev_has_removable_media(BlockBackend *blk);
-> diff --git a/block/io.c b/block/io.c
-> index ef9ea44667..6a2a2e1484 100644
-> --- a/block/io.c
-> +++ b/block/io.c
-> @@ -1754,30 +1754,34 @@ typedef struct BdrvCoBlockStatusData {
->       bool done;
->   } BdrvCoBlockStatusData;
->
-> -int64_t coroutine_fn bdrv_co_get_block_status_from_file(BlockDriverState *bs,
-> -                                                        int64_t sector_num,
-> -                                                        int nb_sectors,
-> -                                                        int *pnum,
-> -                                                        BlockDriverState **file)
-> +int coroutine_fn bdrv_co_block_status_from_file(BlockDriverState *bs,
-> +                                                bool want_zero,
-> +                                                int64_t offset,
-> +                                                int64_t bytes,
-> +                                                int64_t *pnum,
-> +                                                int64_t *map,
-> +                                                BlockDriverState **file)
->   {
->       assert(bs->file && bs->file->bs);
-> -    *pnum = nb_sectors;
-> +    *pnum = bytes;
-> +    *map = offset;
->       *file = bs->file->bs;
-> -    return BDRV_BLOCK_RAW | BDRV_BLOCK_OFFSET_VALID |
-> -           (sector_num << BDRV_SECTOR_BITS);
-> +    return BDRV_BLOCK_RAW | BDRV_BLOCK_OFFSET_VALID;
->   }
->
-> -int64_t coroutine_fn bdrv_co_get_block_status_from_backing(BlockDriverState *bs,
-> -                                                           int64_t sector_num,
-> -                                                           int nb_sectors,
-> -                                                           int *pnum,
-> -                                                           BlockDriverState **file)
-> +int coroutine_fn bdrv_co_block_status_from_backing(BlockDriverState *bs,
-> +                                                   bool want_zero,
-> +                                                   int64_t offset,
-> +                                                   int64_t bytes,
-> +                                                   int64_t *pnum,
-> +                                                   int64_t *map,
-> +                                                   BlockDriverState **file)
->   {
->       assert(bs->backing && bs->backing->bs);
-> -    *pnum = nb_sectors;
-> +    *pnum = bytes;
-> +    *map = offset;
->       *file = bs->backing->bs;
-> -    return BDRV_BLOCK_RAW | BDRV_BLOCK_OFFSET_VALID |
-> -           (sector_num << BDRV_SECTOR_BITS);
-> +    return BDRV_BLOCK_RAW | BDRV_BLOCK_OFFSET_VALID;
->   }
+On 27.11.2017 23:03, John Snow wrote:
+> 
+> On 11/23/2017 11:31 AM, Peter Maydell wrote:
+[...]
+>> Continuous Integration:
+>>  * Christian Borntraeger: qemu-iotests have broken a lot, they should be
+>>    run before patches are merged
+> 
+> This, rather unfortunately, is a huge testing burden. I try to make sure
+> I do it for everything I submit, but for the volume of block patches it
+> really does rely CI. The more we add (to our pitifully sparse iotesting,
+> I might add) the longer it takes. Ensuring per-patch testing begins to
+> take prohibitively long.
+> 
+> Perhaps per-pull or per-merge becomes more feasible. Maybe if we do
+> implement a block-next amalgam we'd be able to batch our testing on a
+> weekly basis.
 
-hmm. not related question, but can you please explain, why we use such stubs
-instead of really call bdrv_co_block_status on bs->file->bs or 
-bs->backing->bs ?
+I think you block-layer folks should do at least run the qemu-iotests
+before sending a pull request to Peter. The iotests should really not be
+broken in upstream master.
 
->
->   /*
-> diff --git a/block/blkdebug.c b/block/blkdebug.c
-> index e21669979d..82c30357f8 100644
-> --- a/block/blkdebug.c
-> +++ b/block/blkdebug.c
-> @@ -627,15 +627,17 @@ static int coroutine_fn blkdebug_co_pdiscard(BlockDriverState *bs,
->       return bdrv_co_pdiscard(bs->file->bs, offset, bytes);
->   }
->
-> -static int64_t coroutine_fn blkdebug_co_get_block_status(
-> -    BlockDriverState *bs, int64_t sector_num, int nb_sectors, int *pnum,
-> -    BlockDriverState **file)
-> +static int coroutine_fn blkdebug_co_block_status(BlockDriverState *bs,
-> +                                                 bool want_zero,
-> +                                                 int64_t offset,
-> +                                                 int64_t bytes,
-> +                                                 int64_t *pnum,
-> +                                                 int64_t *map,
-> +                                                 BlockDriverState **file)
->   {
-> -    assert(QEMU_IS_ALIGNED(sector_num | nb_sectors,
-> -                           DIV_ROUND_UP(bs->bl.request_alignment,
-> -                                        BDRV_SECTOR_SIZE)));
-> -    return bdrv_co_get_block_status_from_file(bs, sector_num, nb_sectors,
-> -                                              pnum, file);
-> +    assert(QEMU_IS_ALIGNED(offset | bytes, bs->bl.request_alignment));
+>>  * Peter Maydell: If it isn't tested by "make check" then it isn't tested:
+>>    so if something is regularly regressing then it needs to be added to
+>>    "make check".
+> 
+> Is this tenable long term? We can't conceivably state that we will never
+> test things that aren't in "make check" -- we ought to have different
+> tiers, at least. The full testing suite should run for RC tags at least,
+> but it's not feasible (I think?) to run the entire battery of tests on
+> every commit... but that shouldn't stop us from running them /sometimes/...
 
-looks like this is obviously guaranteed by block layer, so no needs for 
-special
-function. and we can use
+We've already got "make check SPEED=slow" for running tests that take a
+lot of time. So maybe you could do that in the iotests as well, so that
+the normal, quick tests can be run during "make check" and the full
+iotest suite is only run during "make check SPEED=slow" ?
 
-.bdrv_co_block_status       = bdrv_co_block_status_from_backing
-
-like for other drivers.
-
-> +    return bdrv_co_block_status_from_file(bs, want_zero, offset, bytes,
-> +                                          pnum, map, file);
->   }
->
->   static void blkdebug_close(BlockDriverState *bs)
-> @@ -907,7 +909,7 @@ static BlockDriver bdrv_blkdebug = {
->       .bdrv_co_flush_to_disk  = blkdebug_co_flush,
->       .bdrv_co_pwrite_zeroes  = blkdebug_co_pwrite_zeroes,
->       .bdrv_co_pdiscard       = blkdebug_co_pdiscard,
-> -    .bdrv_co_get_block_status = blkdebug_co_get_block_status,
-> +    .bdrv_co_block_status   = blkdebug_co_block_status,
->
->       .bdrv_debug_event           = blkdebug_debug_event,
->       .bdrv_debug_breakpoint      = blkdebug_debug_breakpoint,
-> diff --git a/block/commit.c b/block/commit.c
-> index 5036eec434..ec0511bac7 100644
-> --- a/block/commit.c
-> +++ b/block/commit.c
-> @@ -265,7 +265,7 @@ static void bdrv_commit_top_child_perm(BlockDriverState *bs, BdrvChild *c,
->   static BlockDriver bdrv_commit_top = {
->       .format_name                = "commit_top",
->       .bdrv_co_preadv             = bdrv_commit_top_preadv,
-> -    .bdrv_co_get_block_status   = bdrv_co_get_block_status_from_backing,
-> +    .bdrv_co_block_status       = bdrv_co_block_status_from_backing,
->       .bdrv_refresh_filename      = bdrv_commit_top_refresh_filename,
->       .bdrv_close                 = bdrv_commit_top_close,
->       .bdrv_child_perm            = bdrv_commit_top_child_perm,
-> diff --git a/block/mirror.c b/block/mirror.c
-> index 307b6391a8..79739d063e 100644
-> --- a/block/mirror.c
-> +++ b/block/mirror.c
-> @@ -1094,7 +1094,7 @@ static BlockDriver bdrv_mirror_top = {
->       .bdrv_co_pwrite_zeroes      = bdrv_mirror_top_pwrite_zeroes,
->       .bdrv_co_pdiscard           = bdrv_mirror_top_pdiscard,
->       .bdrv_co_flush              = bdrv_mirror_top_flush,
-> -    .bdrv_co_get_block_status   = bdrv_co_get_block_status_from_backing,
-> +    .bdrv_co_block_status       = bdrv_co_block_status_from_backing,
->       .bdrv_refresh_filename      = bdrv_mirror_top_refresh_filename,
->       .bdrv_close                 = bdrv_mirror_top_close,
->       .bdrv_child_perm            = bdrv_mirror_top_child_perm,
-> diff --git a/block/throttle.c b/block/throttle.c
-> index 5bca76300f..76cd963a8c 100644
-> --- a/block/throttle.c
-> +++ b/block/throttle.c
-> @@ -224,7 +224,7 @@ static BlockDriver bdrv_throttle = {
->       .bdrv_reopen_prepare                =   throttle_reopen_prepare,
->       .bdrv_reopen_commit                 =   throttle_reopen_commit,
->       .bdrv_reopen_abort                  =   throttle_reopen_abort,
-> -    .bdrv_co_get_block_status           =   bdrv_co_get_block_status_from_file,
-> +    .bdrv_co_block_status               =   bdrv_co_block_status_from_file,
->
->       .is_filter                          =   true,
->   };
-
-conversion looks ok,
-Reviewed-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-
--- 
-Best regards,
-Vladimir
+ Thomas
