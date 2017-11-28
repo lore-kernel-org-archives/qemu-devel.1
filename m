@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46520)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46605)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1eJmZk-000104-Lr
-	for qemu-devel@nongnu.org; Tue, 28 Nov 2017 15:33:56 -0500
+	(envelope-from <david@redhat.com>) id 1eJmZq-000145-MY
+	for qemu-devel@nongnu.org; Tue, 28 Nov 2017 15:33:59 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1eJmZj-0003ke-Mn
-	for qemu-devel@nongnu.org; Tue, 28 Nov 2017 15:33:52 -0500
+	(envelope-from <david@redhat.com>) id 1eJmZq-0003pA-0F
+	for qemu-devel@nongnu.org; Tue, 28 Nov 2017 15:33:58 -0500
 From: David Hildenbrand <david@redhat.com>
-Date: Tue, 28 Nov 2017 21:33:18 +0100
-Message-Id: <20171128203326.6062-9-david@redhat.com>
+Date: Tue, 28 Nov 2017 21:33:20 +0100
+Message-Id: <20171128203326.6062-11-david@redhat.com>
 In-Reply-To: <20171128203326.6062-1-david@redhat.com>
 References: <20171128203326.6062-1-david@redhat.com>
-Subject: [Qemu-devel] [PATCH v1 for-2.12 08/15] s390x/tcg: io instructions
- don't need potential_page_fault()
+Subject: [Qemu-devel] [PATCH v1 for-2.12 10/15] s390x/tcg: use
+ program_interrupt_ra() in DIAG
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,96 +23,40 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-s390x@nongnu.org, qemu-devel@nongnu.org
 Cc: Christian Borntraeger <borntraeger@de.ibm.com>, Cornelia Huck <cohuck@redhat.com>, Richard Henderson <rth@twiddle.net>, Alexander Graf <agraf@suse.de>, David Hildenbrand <david@redhat.com>
 
-As we handle the retaddr in all cases properly now, we can drop it.
+Now we can drop the two save statements in the translate function.
 
 Signed-off-by: David Hildenbrand <david@redhat.com>
 ---
- target/s390x/translate.c | 10 ----------
- 1 file changed, 10 deletions(-)
+ target/s390x/misc_helper.c | 2 +-
+ target/s390x/translate.c   | 3 ---
+ 2 files changed, 1 insertion(+), 4 deletions(-)
 
+diff --git a/target/s390x/misc_helper.c b/target/s390x/misc_helper.c
+index 3c2b589f7b..154bde0481 100644
+--- a/target/s390x/misc_helper.c
++++ b/target/s390x/misc_helper.c
+@@ -101,7 +101,7 @@ void HELPER(diag)(CPUS390XState *env, uint32_t r1, uint32_t r3, uint32_t num)
+     }
+ 
+     if (r) {
+-        program_interrupt(env, PGM_SPECIFICATION, ILEN_AUTO);
++        program_interrupt_ra(env, PGM_SPECIFICATION, ILEN_AUTO, GETPC());
+     }
+ }
+ 
 diff --git a/target/s390x/translate.c b/target/s390x/translate.c
-index 85d0a6c3af..d0859c4bc7 100644
+index 76b222b0ce..cf8ffa217e 100644
 --- a/target/s390x/translate.c
 +++ b/target/s390x/translate.c
-@@ -4008,7 +4008,6 @@ static ExitStatus op_spx(DisasContext *s, DisasOps *o)
- static ExitStatus op_xsch(DisasContext *s, DisasOps *o)
- {
+@@ -2124,9 +2124,6 @@ static ExitStatus op_diag(DisasContext *s, DisasOps *o)
+     TCGv_i32 func_code = tcg_const_i32(get_field(s->fields, i2));
+ 
      check_privileged(s);
--    potential_page_fault(s);
-     gen_helper_xsch(cpu_env, regs[1]);
-     set_cc_static(s);
-     return NO_EXIT;
-@@ -4017,7 +4016,6 @@ static ExitStatus op_xsch(DisasContext *s, DisasOps *o)
- static ExitStatus op_csch(DisasContext *s, DisasOps *o)
- {
-     check_privileged(s);
--    potential_page_fault(s);
-     gen_helper_csch(cpu_env, regs[1]);
-     set_cc_static(s);
-     return NO_EXIT;
-@@ -4026,7 +4024,6 @@ static ExitStatus op_csch(DisasContext *s, DisasOps *o)
- static ExitStatus op_hsch(DisasContext *s, DisasOps *o)
- {
-     check_privileged(s);
--    potential_page_fault(s);
-     gen_helper_hsch(cpu_env, regs[1]);
-     set_cc_static(s);
-     return NO_EXIT;
-@@ -4035,7 +4032,6 @@ static ExitStatus op_hsch(DisasContext *s, DisasOps *o)
- static ExitStatus op_msch(DisasContext *s, DisasOps *o)
- {
-     check_privileged(s);
--    potential_page_fault(s);
-     gen_helper_msch(cpu_env, regs[1], o->in2);
-     set_cc_static(s);
-     return NO_EXIT;
-@@ -4044,7 +4040,6 @@ static ExitStatus op_msch(DisasContext *s, DisasOps *o)
- static ExitStatus op_rchp(DisasContext *s, DisasOps *o)
- {
-     check_privileged(s);
--    potential_page_fault(s);
-     gen_helper_rchp(cpu_env, regs[1]);
-     set_cc_static(s);
-     return NO_EXIT;
-@@ -4053,7 +4048,6 @@ static ExitStatus op_rchp(DisasContext *s, DisasOps *o)
- static ExitStatus op_rsch(DisasContext *s, DisasOps *o)
- {
-     check_privileged(s);
--    potential_page_fault(s);
-     gen_helper_rsch(cpu_env, regs[1]);
-     set_cc_static(s);
-     return NO_EXIT;
-@@ -4062,7 +4056,6 @@ static ExitStatus op_rsch(DisasContext *s, DisasOps *o)
- static ExitStatus op_ssch(DisasContext *s, DisasOps *o)
- {
-     check_privileged(s);
--    potential_page_fault(s);
-     gen_helper_ssch(cpu_env, regs[1], o->in2);
-     set_cc_static(s);
-     return NO_EXIT;
-@@ -4071,7 +4064,6 @@ static ExitStatus op_ssch(DisasContext *s, DisasOps *o)
- static ExitStatus op_stsch(DisasContext *s, DisasOps *o)
- {
-     check_privileged(s);
--    potential_page_fault(s);
-     gen_helper_stsch(cpu_env, regs[1], o->in2);
-     set_cc_static(s);
-     return NO_EXIT;
-@@ -4080,7 +4072,6 @@ static ExitStatus op_stsch(DisasContext *s, DisasOps *o)
- static ExitStatus op_tsch(DisasContext *s, DisasOps *o)
- {
-     check_privileged(s);
--    potential_page_fault(s);
-     gen_helper_tsch(cpu_env, regs[1], o->in2);
-     set_cc_static(s);
-     return NO_EXIT;
-@@ -4089,7 +4080,6 @@ static ExitStatus op_tsch(DisasContext *s, DisasOps *o)
- static ExitStatus op_chsc(DisasContext *s, DisasOps *o)
- {
-     check_privileged(s);
--    potential_page_fault(s);
-     gen_helper_chsc(cpu_env, o->in2);
-     set_cc_static(s);
-     return NO_EXIT;
+-    update_psw_addr(s);
+-    gen_op_calc_cc(s);
+-
+     gen_helper_diag(cpu_env, r1, r3, func_code);
+ 
+     tcg_temp_free_i32(func_code);
 -- 
 2.14.3
