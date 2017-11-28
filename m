@@ -1,24 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60943)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:32788)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1eJjGk-0008Uz-8V
-	for qemu-devel@nongnu.org; Tue, 28 Nov 2017 12:02:06 -0500
+	(envelope-from <jsnow@redhat.com>) id 1eJjGr-0000BW-L0
+	for qemu-devel@nongnu.org; Tue, 28 Nov 2017 12:02:13 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1eJjGg-0008B6-D5
-	for qemu-devel@nongnu.org; Tue, 28 Nov 2017 12:02:02 -0500
-References: <20171128154350.21504-1-kwolf@redhat.com>
-	<20171128154350.21504-2-kwolf@redhat.com>
-	<00b2dbda-e7a1-2fc4-b7ca-e60c0ef08a95@redhat.com>
-	<20171128163725.GG3703@localhost.localdomain>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <cf7eed9c-5047-fce8-f649-f8fb3310546b@redhat.com>
-Date: Tue, 28 Nov 2017 18:01:32 +0100
+	(envelope-from <jsnow@redhat.com>) id 1eJjGn-0008DS-QR
+	for qemu-devel@nongnu.org; Tue, 28 Nov 2017 12:02:09 -0500
+References: <20171128121055.6954-1-den@openvz.org>
+	<20171128160805.GE3703@localhost.localdomain>
+	<b5cb007b-7a6a-c8a0-b551-2efdc4b0cdac@openvz.org>
+From: John Snow <jsnow@redhat.com>
+Message-ID: <a92ce6e2-0d7d-8db2-e12f-418b77e8abd4@redhat.com>
+Date: Tue, 28 Nov 2017 12:01:57 -0500
 MIME-Version: 1.0
-In-Reply-To: <20171128163725.GG3703@localhost.localdomain>
+In-Reply-To: <b5cb007b-7a6a-c8a0-b551-2efdc4b0cdac@openvz.org>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH for-2.11 1/4] Revert "coroutine: abort if
- we try to schedule or enter a pending coroutine"
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH for 2.11 0/2] QEMU crashes with CD device
+ without media
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,53 +26,45 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Kevin Wolf <kwolf@redhat.com>
-Cc: qemu-block@nongnu.org, mreitz@redhat.com, stefanha@redhat.com, jcody@redhat.com, famz@redhat.com, qemu-devel@nongnu.org
+To: "Denis V. Lunev" <den@openvz.org>, Kevin Wolf <kwolf@redhat.com>
+Cc: qemu-devel@nongnu.org, qemu-stable@nongnu.org, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>
 
-On 28/11/2017 17:37, Kevin Wolf wrote:
+
+
+On 11/28/2017 11:29 AM, Denis V. Lunev wrote:
+> On 11/28/2017 07:08 PM, Kevin Wolf wrote:
+>> Am 28.11.2017 um 13:10 hat Denis V. Lunev geschrieben:
+>>> There are 2 cases I have spotted so far:
+>>> 1) IDE ATAPI read processing. Actually this was reported from field
+>>> 2) QEMU IO hmp command (found during evaluation of (1))
+>>>
+>>> SCSI code checks during access that blk_is_available(). These patches add
+>>> same checks on different code paths.
+>>>
+>>> Pls decide whether these patches should go through sub-system trees or via
+>>> block tree.
+>> Why does this always come up in the last minute? :-(
 >>
->> It can also conflict badly with another aio_co_schedule().  Your patch
->> here removes the assertion in this case, and patch 3 makes it easier t=
-o
->> get into the situation where two aio_co_schedule()s conflict with each
->> other.
-> I don't see how they conflict. If the second aio_co_schedule() comes
-> before the coroutine is actually entered, they are effectively simply
-> merged into a single one. Which is exactly what was intended.
+>> The real fix shouldn't be in the devices, but blk_aio_*() needs to
+>> handle empty drives gracefully. We already made a similar fix before the
+>> last release in commit 4da97120d, and I already didn't like it back
+>> then.
+>>
+>> Of course, we should have used the time to fix this properly, but as you
+>> can see, nothing has happened and we're running out of time again.
+>>
+>> Kevin
+> I see.
+> 
+> We have started ABRT report collection program a week ago. This
+> is the first result for QEMU from the real customer running
+> his own workload :(
+> 
+> What else can I say?
+> 
+> Den
+> 
 
-Suppose you have
-
-	ctx->scheduled_coroutines
-	  |
-	  '---> co
-                |
-                '---> NULL
-
-Then aio_co_schedule(ctx, co) does QSLIST_INSERT_HEAD_ATOMIC, which is
-
-	/* On entry, ctx->scheduled_coroutines =3D=3D co.  */
-	co->next =3D ctx->scheduled_coroutines
-	change ctx->scheduled_coroutines from co->next to co
-
-This results in a loop:
-=09
-	ctx->scheduled_coroutines
-	  |
-	  '---> co <-.
-                |    |
-                '----'
-
-This is an obvious hang due to list corruption.  In other more
-complicated cases it can skip a wakeup, which is a more subtle kind of
-hang.  You can also get memory corruption if the coroutine terminates
-(and is freed) before aio_co_schedule executes.
-
-Basically, once you do aio_co_schedule or aio_co_wake the coroutine is
-not any more yours.  It's owned by the context that will run it and you
-should not do anything with it.
-
-The same is true for co_aio_sleep_ns.  Just because in practice it works
-(and it seemed like a clever idea at the time) it doesn't mean it *is* a
-good idea...
-
-Paolo
+It's not your fault, it's mine for letting this go for a release. It's
+just unfortunate timing. I'm looking at (at least) the IDE portion of
+this and the underlying cause in block-backend today.
