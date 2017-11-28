@@ -1,23 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41546)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41794)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1eJiOq-0005S5-BV
-	for qemu-devel@nongnu.org; Tue, 28 Nov 2017 11:06:21 -0500
+	(envelope-from <jianfeng.tan@intel.com>) id 1eJiPW-00074D-P2
+	for qemu-devel@nongnu.org; Tue, 28 Nov 2017 11:07:03 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1eJiOp-0007M1-8R
-	for qemu-devel@nongnu.org; Tue, 28 Nov 2017 11:06:20 -0500
-References: <20171012185916.22776-1-eblake@redhat.com>
-	<20171012185916.22776-3-eblake@redhat.com>
-	<8ada11cb-5455-20ab-4a23-03f05f5c83c1@virtuozzo.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <8b3a8a5d-5835-859e-339c-87234622399f@redhat.com>
-Date: Tue, 28 Nov 2017 10:05:55 -0600
+	(envelope-from <jianfeng.tan@intel.com>) id 1eJiPR-0007kU-0y
+	for qemu-devel@nongnu.org; Tue, 28 Nov 2017 11:07:02 -0500
+Received: from mga11.intel.com ([192.55.52.93]:9644)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <jianfeng.tan@intel.com>)
+	id 1eJiPQ-0007i4-NC
+	for qemu-devel@nongnu.org; Tue, 28 Nov 2017 11:06:56 -0500
+References: <20171127142515.GA450@yliu-dev>
+	<411329b7-5164-c24e-2e5e-8cf25079c4b9@intel.com>
+	<f7tfu8zodu2.fsf@dhcp-25-97.bos.redhat.com>
+From: "Tan, Jianfeng" <jianfeng.tan@intel.com>
+Message-ID: <c424711c-6214-18cf-a494-17200abda76b@intel.com>
+Date: Wed, 29 Nov 2017 00:06:50 +0800
 MIME-Version: 1.0
-In-Reply-To: <8ada11cb-5455-20ab-4a23-03f05f5c83c1@virtuozzo.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v4 02/20] block: Switch passthrough drivers
- to .bdrv_co_block_status()
+In-Reply-To: <f7tfu8zodu2.fsf@dhcp-25-97.bos.redhat.com>
+Content-Type: text/plain; charset=windows-1252; format=flowed
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [dpdk-dev] [ovs-dev] [PATCH RFC] netdev-dpdk: Fix
+ device obtain mac address when received first packet in vhost type
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,107 +30,51 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, qemu-devel@nongnu.org
-Cc: kwolf@redhat.com, famz@redhat.com, qemu-block@nongnu.org, Jeff Cody <jcody@redhat.com>, Max Reitz <mreitz@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, jsnow@redhat.com
+To: Aaron Conole <aconole@redhat.com>
+Cc: Yuanhan Liu <yliu@fridaylinux.org>, Chen Hailin <chenhl@arraynetworks.com.cn>, "ovs-dev@openvswitch.org" <ovs-dev@openvswitch.org>, Maxime Coquelin <maxime.coquelin@redhat.com>, cloud <cloud@arraynetworks.com.cn>, qemu-devel <qemu-devel@nongnu.org>, dev <dev@dpdk.org>
 
-On 11/28/2017 02:19 AM, Vladimir Sementsov-Ogievskiy wrote:
-> 12.10.2017 21:58, Eric Blake wrote:
->> We are gradually moving away from sector-based interfaces, towards
->> byte-based.=C2=A0 Update the generic helpers, and all passthrough clie=
-nts
->> (blkdebug, commit, mirror, throttle) accordingly.
+
+
+On 11/28/2017 1:01 AM, Aaron Conole wrote:
+> "Tan, Jianfeng" <jianfeng.tan@intel.com> writes:
+>
+>> On 11/27/2017 10:27 PM, Yuanhan Liu wrote:
+>>> On Fri, Nov 24, 2017 at 05:59:09PM +0800, Chen Hailin wrote:
+>>>> Hi Aaron Conole && Jianfeng,
+>>>>
+>>>> The stp could not work in ovs-dpdk vhostuser.
+>>>> Because the attached vhost device doesn't have MAC address.
+>>>>
+>>>> Now we have two ways to solve this problem.
+>>>> 1. The vhost learns MAC address from packet like as my first patch.
+>>> I do agree with Aaron this is not the right way.
+>> I do think it should be the vswitch's responsibility to learn mac of
+>> vhost port.
 >>
->> Signed-off-by: Eric Blake <eblake@redhat.com>
+>> Except that it's the only feasible way without modifying the spec
+>> (yuanhan already makes it very clear below), we can treat the vswitch
+>> as a phsical switch, VM as a physical server, virtio/vhost port as a
+>> back-to-back connected NICs, the only way of the physical switch to
+>> know the mac of the NIC on the other side is ARP learning.
 >>
+>> Might I ask why you don't think it's a right way?
+> As a quick example, I think a malicious guest in a multi-tenant
+> environment could send traffic out to manipulate this feature into
+> learning an incorrect mac address.
 
->> BlockDriverState **file)
->> +int coroutine_fn bdrv_co_block_status_from_backing(BlockDriverState *=
-bs,
->> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0 bool want_zero,
->> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0 int64_t offset,
->> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0 int64_t bytes,
->> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0 int64_t *pnum,
->> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0 int64_t *map,
->> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0 BlockDriverState=20
->> **file)
->> =C2=A0 {
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 assert(bs->backing && bs->backing->bs);
->> -=C2=A0=C2=A0=C2=A0 *pnum =3D nb_sectors;
->> +=C2=A0=C2=A0=C2=A0 *pnum =3D bytes;
->> +=C2=A0=C2=A0=C2=A0 *map =3D offset;
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 *file =3D bs->backing->bs;
->> -=C2=A0=C2=A0=C2=A0 return BDRV_BLOCK_RAW | BDRV_BLOCK_OFFSET_VALID |
->> -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 (sector_=
-num << BDRV_SECTOR_BITS);
->> +=C2=A0=C2=A0=C2=A0 return BDRV_BLOCK_RAW | BDRV_BLOCK_OFFSET_VALID;
->> =C2=A0 }
->=20
-> hmm. not related question, but can you please explain, why we use such=20
-> stubs
-> instead of really call bdrv_co_block_status on bs->file->bs or=20
-> bs->backing->bs ?
->=20
+Instead, I think it's not right to stop such mac spoofing behavior 
+(suppose someone wants to have such an experiment in an overlay 
+networking). And it actually only affects one “LAN", instead of all "LANs".
 
-Returning BDRV_BLOCK_RAW is what tells io.c to call=20
-bdrv_co_block_status() on whatever got assigned into *file.  The two=20
-stubs make it so there are fewer conditionals in io.c; perhaps it could=20
-be reworked to avoid the stubs and have io.c have all the smarts when=20
-.bdrv_co_block_status is NULL, but as you say, that would be a separate=20
-patch (although it was Manos' work earlier this year that even created=20
-the common helper stubs rather than duplicating code in each callback in=20
-the first place).
+And it's usually not the switch's responsibility to detect mac spoofing 
+behavior IMHO.
 
+> To get this right requires doing deep packet inspection, and making sure
+> to only learn based on certain l2 traffic.
+>
 
->> +static int coroutine_fn blkdebug_co_block_status(BlockDriverState *bs=
-,
+Yes, should learn based on ARP packets. Your concern is the performance? 
+I suppose there is not to many such packets.
 
->> +=C2=A0=C2=A0=C2=A0 assert(QEMU_IS_ALIGNED(offset | bytes, bs->bl.requ=
-est_alignment));
->=20
-> looks like this is obviously guaranteed by block layer, so no needs for=
-=20
-> special
-> function. and we can use
->=20
-> .bdrv_co_block_status=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 =3D bdrv_co_b=
-lock_status_from_backing
->=20
-> like for other drivers.
->=20
-
-We could, but we don't want to.  The point of the blkdebug driver is to=20
-explicitly test that certain preconditions are being satisfied, so that=20
-even if the block layer in io.c changes, our iotests make sure that=20
-drivers are provided with certain guarantees.  In other words, the=20
-assert() added here is added value that we cannot stick in the common=20
-helper, but something that we want to keep associated with the blkdebug=20
-driver.
-
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
+Thanks,
+Jianfeng
