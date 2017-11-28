@@ -1,34 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:32812)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33260)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1eJeUI-00071X-LE
-	for qemu-devel@nongnu.org; Tue, 28 Nov 2017 06:55:43 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1eJeVC-0007Oh-Ov
+	for qemu-devel@nongnu.org; Tue, 28 Nov 2017 06:56:39 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1eJeUD-0000vC-N1
-	for qemu-devel@nongnu.org; Tue, 28 Nov 2017 06:55:42 -0500
-Received: from indium.canonical.com ([91.189.90.7]:35322)
+	(envelope-from <peter.maydell@linaro.org>) id 1eJeVC-0001LL-31
+	for qemu-devel@nongnu.org; Tue, 28 Nov 2017 06:56:38 -0500
+Received: from mail-oi0-x232.google.com ([2607:f8b0:4003:c06::232]:45515)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1eJeUD-0000v5-GD
-	for qemu-devel@nongnu.org; Tue, 28 Nov 2017 06:55:37 -0500
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1eJeUA-0000Su-Nc
-	for <qemu-devel@nongnu.org>; Tue, 28 Nov 2017 11:55:34 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id ACC692E80CC
-	for <qemu-devel@nongnu.org>; Tue, 28 Nov 2017 11:55:34 +0000 (UTC)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1eJeVB-0001Jx-T5
+	for qemu-devel@nongnu.org; Tue, 28 Nov 2017 06:56:38 -0500
+Received: by mail-oi0-x232.google.com with SMTP id v123so41686oif.12
+	for <qemu-devel@nongnu.org>; Tue, 28 Nov 2017 03:56:37 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Tue, 28 Nov 2017 11:46:46 -0000
-From: "Jeb E." <1734810@bugs.launchpad.net>
-Reply-To: Bug 1734810 <1734810@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <151184788907.20350.3674834740850334109.malonedeb@chaenomeles.canonical.com>
-Message-Id: <151186960699.3366.15082441461985850847.launchpad@gac.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1734810] Re: Windows guest virtual PC running
- abnormally slow
+In-Reply-To: <CADYoBw31C0Z2vp0S0ZFBOC6A3146wxtZWvzJabACkGh44ZwC0w@mail.gmail.com>
+References: <CADYoBw2dogvU6-3vChG4js0BNdyTPG8eDvMSRoU50eTX_9DdEQ@mail.gmail.com>
+	<MWHPR21MB01590CD596A992C93E01B5079E460@MWHPR21MB0159.namprd21.prod.outlook.com>
+	<CADYoBw1ksGDo26-PC4eMnyqxZQoZkXNLDeGoWfcRHs-SfTCJkw@mail.gmail.com>
+	<MWHPR21MB01591543E188B048145985709E470@MWHPR21MB0159.namprd21.prod.outlook.com>
+	<CADYoBw0RjiW2as9jGtPg92E8XK3KR+gM9C5vjC7HHsBauFn4ug@mail.gmail.com>
+	<CADYoBw19GifmUR=Rztkzzc-v3-zWR6frjiNb_wjzsevreAqPDQ@mail.gmail.com>
+	<CAFEAcA9_+wZJa7Ht6EHCCZYm+hrfdbjd9gUmVJPGgZ0yvbZOPA@mail.gmail.com>
+	<MWHPR21MB0480DE1F826056BC8377EE289E250@MWHPR21MB0480.namprd21.prod.outlook.com>
+	<CADYoBw31C0Z2vp0S0ZFBOC6A3146wxtZWvzJabACkGh44ZwC0w@mail.gmail.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Tue, 28 Nov 2017 11:56:16 +0000
+Message-ID: <CAFEAcA8iM_Qq=OMr_eo_MnUphzinrfhYNJtmuXx9nkK979H3Rg@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH] BCM2837 and machine raspi3
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,81 +36,23 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: bzt bzt <bztemail@gmail.com>
+Cc: Andrew Baumann <Andrew.Baumann@microsoft.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "qemu-arm@nongnu.org" <qemu-arm@nongnu.org>
 
-** Also affects: gnome-boxes
-   Importance: Undecided
-       Status: New
+On 28 November 2017 at 11:26, bzt bzt <bztemail@gmail.com> wrote:
+> (Although I have a question. I'm not sure what's the preferred
+> way to get MachineClass* object in bcm2836. Use a MachineState* cast on it's
+> Object* argument with MACHINE_GET_CLASS() or should I use the parameterless
+> qdev_get_machine() instead?)
 
-** Also affects: qemu
-   Importance: Undecided
-       Status: New
+bcm2836.c should be a self contained object, which its caller creates
+and configures. The MachineClass is the board model object, and the
+SoC object shouldn't have to access it. If there's something (like the
+CPU model string) that the SoC needs, the SoC object should have a
+property which the board model sets.
 
-** Also affects: spice-packages
-   Importance: Undecided
-       Status: New
+hw/arm/stm32f205_soc.c has an example of this (as do some of the
+other SoC objects -- 'git grep cpu-type hw/arm' should bring them up).
 
-** Also affects: kvm
-   Importance: Undecided
-       Status: New
-
-** Changed in: qemu
-       Status: New =3D> Confirmed
-
-** Changed in: spice-packages
-       Status: New =3D> Confirmed
-
-** Changed in: gnome-boxes (Ubuntu)
-       Status: New =3D> Confirmed
-
-** Also affects: libvirt
-   Importance: Undecided
-       Status: New
-
--- =
-
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1734810
-
-Title:
-  Windows guest virtual PC running abnormally slow
-
-Status in Boxes:
-  New
-Status in KVM:
-  New
-Status in libvirt:
-  New
-Status in QEMU:
-  Confirmed
-Status in spice related packages:
-  Confirmed
-Status in gnome-boxes package in Ubuntu:
-  Confirmed
-
-Bug description:
-  Guest systems running Windows 10 in a virtualized environment run
-  unacceptably slow, with no option in Boxes to offer the virtual
-  machine more (or less) cores from my physical CPU.
-
-  ProblemType: Bug
-  DistroRelease: Ubuntu 17.10
-  Package: gnome-boxes 3.26.1-1
-  ProcVersionSignature: Ubuntu 4.13.0-17.20-lowlatency 4.13.8
-  Uname: Linux 4.13.0-17-lowlatency x86_64
-  ApportVersion: 2.20.7-0ubuntu3.5
-  Architecture: amd64
-  CurrentDesktop: ubuntu:GNOME
-  Date: Tue Nov 28 00:37:11 2017
-  ProcEnviron:
-   TERM=3Dxterm-256color
-   PATH=3D(custom, no user)
-   XDG_RUNTIME_DIR=3D<set>
-   LANG=3Den_US.UTF-8
-   SHELL=3D/bin/bash
-  SourcePackage: gnome-boxes
-  UpgradeStatus: No upgrade log present (probably fresh install)
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/gnome-boxes/+bug/1734810/+subscriptions
+thanks
+-- PMM
