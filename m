@@ -1,33 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39172)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40319)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dan.j.williams@intel.com>) id 1eJkEH-0002yv-Uz
-	for qemu-devel@nongnu.org; Tue, 28 Nov 2017 13:03:42 -0500
+	(envelope-from <mst@redhat.com>) id 1eJkHk-0003sk-Mx
+	for qemu-devel@nongnu.org; Tue, 28 Nov 2017 13:07:12 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dan.j.williams@intel.com>) id 1eJkEC-0007vp-76
-	for qemu-devel@nongnu.org; Tue, 28 Nov 2017 13:03:33 -0500
-Received: from mail-ot0-x22f.google.com ([2607:f8b0:4003:c0f::22f]:37562)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <dan.j.williams@intel.com>)
-	id 1eJkEC-0007vY-1p
-	for qemu-devel@nongnu.org; Tue, 28 Nov 2017 13:03:28 -0500
-Received: by mail-ot0-x22f.google.com with SMTP id s4so666697ote.4
-	for <qemu-devel@nongnu.org>; Tue, 28 Nov 2017 10:03:27 -0800 (PST)
+	(envelope-from <mst@redhat.com>) id 1eJkHj-0000yC-QX
+	for qemu-devel@nongnu.org; Tue, 28 Nov 2017 13:07:08 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:39748)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1eJkHj-0000xa-J0
+	for qemu-devel@nongnu.org; Tue, 28 Nov 2017 13:07:07 -0500
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+	[10.5.11.15])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 8957FC0587F4
+	for <qemu-devel@nongnu.org>; Tue, 28 Nov 2017 18:07:06 +0000 (UTC)
+Date: Tue, 28 Nov 2017 20:06:52 +0200
+From: "Michael S. Tsirkin" <mst@redhat.com>
+Message-ID: <20171128195847-mutt-send-email-mst@kernel.org>
+References: <20171128133123.17372-1-vkaplans@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <336152896.34452750.1511527207457.JavaMail.zimbra@redhat.com>
-References: <1455443283.33337333.1500618150787.JavaMail.zimbra@redhat.com>
-	<86754966-281f-c3ed-938c-f009440de563@gmail.com>
-	<CAPcyv4iH==cqVAdd8i1y-8A6SuXU75OH1EZzgNMvtA21wfxPpQ@mail.gmail.com>
-	<ec5ff7c2-864e-5020-0aaa-6663e78e3756@gmail.com>
-	<1511288389.1080.14.camel@redhat.com>
-	<d1df875c-5b64-67d9-2b3c-4ec14c03b85b@gmail.com>
-	<CAPcyv4ip6m6e9Bh7weJNB3m3kpDpRkhHDZf0JYyr5UbkD41oLg@mail.gmail.com>
-	<654f8935-258e-22ef-fae4-3e14e91e8fae@redhat.com>
-	<336152896.34452750.1511527207457.JavaMail.zimbra@redhat.com>
-From: Dan Williams <dan.j.williams@intel.com>
-Date: Tue, 28 Nov 2017 10:03:25 -0800
-Message-ID: <CAPcyv4j6nk1cJFuG4DDA9JoNJe2d3rSskdFSUPu4aWzWX+JQeQ@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] KVM "fake DAX" flushing interface - discussion
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20171128133123.17372-1-vkaplans@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH] vhost-user spec: Clarify policy on setting
+ log_base
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,18 +33,60 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Pankaj Gupta <pagupta@redhat.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Rik van Riel <riel@redhat.com>, Xiao Guangrong <xiaoguangrong.eric@gmail.com>, Christoph Hellwig <hch@infradead.org>, Jan Kara <jack@suse.cz>, Stefan Hajnoczi <stefanha@redhat.com>, Stefan Hajnoczi <stefanha@gmail.com>, kvm-devel <kvm@vger.kernel.org>, Qemu Developers <qemu-devel@nongnu.org>, "linux-nvdimm@lists.01.org" <linux-nvdimm@ml01.01.org>, ross zwisler <ross.zwisler@linux.intel.com>, Kevin Wolf <kwolf@redhat.com>, Nitesh Narayan Lal <nilal@redhat.com>, Haozhong Zhang <haozhong.zhang@intel.com>, Ross Zwisler <ross.zwisler@intel.com>
+To: Victor Kaplansky <vkaplans@redhat.com>
+Cc: qemu-devel@nongnu.org, Maxime Coquelin <maxime.coquelin@redhat.com>, Jason Wang <jasowang@redhat.com>
 
-On Fri, Nov 24, 2017 at 4:40 AM, Pankaj Gupta <pagupta@redhat.com> wrote:
-[..]
-> 1] Expose vNVDIMM memory range to KVM guest.
->
->    - Add flag in ACPI NFIT table for this new memory type. Do we need NVDIMM spec
->      changes for this?
+On Tue, Nov 28, 2017 at 03:46:44PM +0200, Victor Kaplansky wrote:
+> From: Victor Kaplansky <vkaplans@dell9020.localdomain>
+> 
+> If we allow qemu to change logging area after it was already established,
+> it may require from the backend to acquire a lock on each access to
+> the log_base, which has a potential quite a big performance hit.
+> 
+> Thus we would like to clarify in the spec, that qemu is not expected
+> to resize or remap the logging area, and backend implementations
+> can safely ignore subsequent requests to log_base modifications.
+> 
+> Signed-off-by: Victor Kaplansky <vkaplans@redhat.com>
+> Suggested-by: Maxime Coquelin <maxime.coquelin@redhat.com>
 
-Not a flag, but a new "Address Range Type GUID". See section "5.2.25.2
-System Physical Address (SPA) Range Structure" in the ACPI 6.2A
-specification. Since it is a GUID we could define a Linux specific
-type for this case, but spec changes would allow non-Linux hypervisors
-to advertise a standard interface to guests.
+I'm not sure we can do this.
+
+
+Log resizing as a result of memory hotplug might force
+log base changes.
+
+Backends need to use something like
+rcu to avoid need for locking.
+
+Apropos I wonder whether it's a bug that vhost_dev_start
+calls vhost_set_log_base after starting rings.
+
+Same question for the iotlb callback.
+
+
+
+
+> ---
+>  docs/interop/vhost-user.txt | 6 ++++++
+>  1 file changed, 6 insertions(+)
+> 
+> diff --git a/docs/interop/vhost-user.txt b/docs/interop/vhost-user.txt
+> index 954771d0d8..7ab31e57ef 100644
+> --- a/docs/interop/vhost-user.txt
+> +++ b/docs/interop/vhost-user.txt
+> @@ -257,6 +257,12 @@ Where addr is the guest physical address.
+>  
+>  Use atomic operations, as the log may be concurrently manipulated.
+>  
+> +Note that master is not expected to issue more than one VHOST_USER_SET_LOG_BASE
+> +request before the rings are fully stopped by the master. Thus no modifications
+> +to log_base address are allowed before the rings are restated and the client
+> +can ignore all subsequent VHOST_USER_SET_LOG_BASE requests after the log_base
+> +address has been established.
+> +
+>  Note that when logging modifications to the used ring (when VHOST_VRING_F_LOG
+>  is set for this ring), log_guest_addr should be used to calculate the log
+>  offset: the write to first byte of the used ring is logged at this offset from
+> -- 
+> 2.14.2
