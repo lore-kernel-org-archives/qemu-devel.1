@@ -1,33 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33260)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33857)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1eJeVC-0007Oh-Ov
-	for qemu-devel@nongnu.org; Tue, 28 Nov 2017 06:56:39 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1eJeWp-0000a6-IF
+	for qemu-devel@nongnu.org; Tue, 28 Nov 2017 06:58:20 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1eJeVC-0001LL-31
-	for qemu-devel@nongnu.org; Tue, 28 Nov 2017 06:56:38 -0500
-Received: from mail-oi0-x232.google.com ([2607:f8b0:4003:c06::232]:45515)
+	(envelope-from <peter.maydell@linaro.org>) id 1eJeWo-0002FZ-Ng
+	for qemu-devel@nongnu.org; Tue, 28 Nov 2017 06:58:19 -0500
+Received: from mail-oi0-x22c.google.com ([2607:f8b0:4003:c06::22c]:44440)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1eJeVB-0001Jx-T5
-	for qemu-devel@nongnu.org; Tue, 28 Nov 2017 06:56:38 -0500
-Received: by mail-oi0-x232.google.com with SMTP id v123so41686oif.12
-	for <qemu-devel@nongnu.org>; Tue, 28 Nov 2017 03:56:37 -0800 (PST)
+	id 1eJeWo-0002FF-Iq
+	for qemu-devel@nongnu.org; Tue, 28 Nov 2017 06:58:18 -0500
+Received: by mail-oi0-x22c.google.com with SMTP id y71so46609oia.11
+	for <qemu-devel@nongnu.org>; Tue, 28 Nov 2017 03:58:18 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <CADYoBw31C0Z2vp0S0ZFBOC6A3146wxtZWvzJabACkGh44ZwC0w@mail.gmail.com>
-References: <CADYoBw2dogvU6-3vChG4js0BNdyTPG8eDvMSRoU50eTX_9DdEQ@mail.gmail.com>
-	<MWHPR21MB01590CD596A992C93E01B5079E460@MWHPR21MB0159.namprd21.prod.outlook.com>
-	<CADYoBw1ksGDo26-PC4eMnyqxZQoZkXNLDeGoWfcRHs-SfTCJkw@mail.gmail.com>
-	<MWHPR21MB01591543E188B048145985709E470@MWHPR21MB0159.namprd21.prod.outlook.com>
-	<CADYoBw0RjiW2as9jGtPg92E8XK3KR+gM9C5vjC7HHsBauFn4ug@mail.gmail.com>
-	<CADYoBw19GifmUR=Rztkzzc-v3-zWR6frjiNb_wjzsevreAqPDQ@mail.gmail.com>
-	<CAFEAcA9_+wZJa7Ht6EHCCZYm+hrfdbjd9gUmVJPGgZ0yvbZOPA@mail.gmail.com>
-	<MWHPR21MB0480DE1F826056BC8377EE289E250@MWHPR21MB0480.namprd21.prod.outlook.com>
-	<CADYoBw31C0Z2vp0S0ZFBOC6A3146wxtZWvzJabACkGh44ZwC0w@mail.gmail.com>
+In-Reply-To: <2323fa20-ea6e-7895-3a68-1dacf32dcab8@redhat.com>
+References: <20171128113204.22912-1-pbonzini@redhat.com>
+	<CAJ+F1CLzoyrtwG=iiB0_ocMGELrYY9-v_pm4AGaShFw3_CzHhQ@mail.gmail.com>
+	<2323fa20-ea6e-7895-3a68-1dacf32dcab8@redhat.com>
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 28 Nov 2017 11:56:16 +0000
-Message-ID: <CAFEAcA8iM_Qq=OMr_eo_MnUphzinrfhYNJtmuXx9nkK979H3Rg@mail.gmail.com>
+Date: Tue, 28 Nov 2017 11:57:57 +0000
+Message-ID: <CAFEAcA9=bjzkoidD=Rpymw4kwkG2_umOEd2GenwL87skj7jbUw@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH] BCM2837 and machine raspi3
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH] memfd: fix configure test
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,23 +31,33 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: bzt bzt <bztemail@gmail.com>
-Cc: Andrew Baumann <Andrew.Baumann@microsoft.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "qemu-arm@nongnu.org" <qemu-arm@nongnu.org>
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>, fweimer@redhat.com, QEMU <qemu-devel@nongnu.org>, Cole Robinson <crobinso@redhat.com>
 
-On 28 November 2017 at 11:26, bzt bzt <bztemail@gmail.com> wrote:
-> (Although I have a question. I'm not sure what's the preferred
-> way to get MachineClass* object in bcm2836. Use a MachineState* cast on it's
-> Object* argument with MACHINE_GET_CLASS() or should I use the parameterless
-> qdev_get_machine() instead?)
+On 28 November 2017 at 11:49, Paolo Bonzini <pbonzini@redhat.com> wrote:
+> On 28/11/2017 12:42, Marc-Andr=C3=A9 Lureau wrote:
+>> It is introduced by this commit, right?
+>> https://sourceware.org/git/?p=3Dglibc.git;a=3Dcommit;h=3D59d2cbb1fe4b860=
+1d5cbd359c3806973eab6c62d
+>>
+>> (I added Florian Weimer in cc)
+>>
+>> So it's not part of glibc release yet.
+>>
+>> Couldn't the declarations be put in sys/memfd.h like the man claimed
+>> it would be for > 1y?
+>
+> Yeah, that would have been better---certainly other software than QEMU
+> is likely to have a static memfd_create declaration, and polluting
+> sys/mman.h is going to trigger the same error.  However, at least
+> systemd seems to have changed the test to sys/mman.h
+> (https://github.com/systemd/systemd/pull/7468), so I think we should
+> follow their lead now
 
-bcm2836.c should be a self contained object, which its caller creates
-and configures. The MachineClass is the board model object, and the
-SoC object shouldn't have to access it. If there's something (like the
-CPU model string) that the SoC needs, the SoC object should have a
-property which the board model sets.
-
-hw/arm/stm32f205_soc.c has an example of this (as do some of the
-other SoC objects -- 'git grep cpu-type hw/arm' should bring them up).
+I don't see why systemd should control anything. If the documentation
+has been around for ages and there hasn't been a released glibc with
+the incorrect placement then the implementation in glibc should follow
+the documentation.
 
 thanks
 -- PMM
