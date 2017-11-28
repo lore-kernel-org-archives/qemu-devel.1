@@ -1,22 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52878)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54195)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1eJiyI-0002N3-N8
-	for qemu-devel@nongnu.org; Tue, 28 Nov 2017 11:42:59 -0500
+	(envelope-from <pbonzini@redhat.com>) id 1eJj1K-0004Qr-Em
+	for qemu-devel@nongnu.org; Tue, 28 Nov 2017 11:46:10 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1eJiyD-0006Kv-RU
-	for qemu-devel@nongnu.org; Tue, 28 Nov 2017 11:42:58 -0500
-Date: Tue, 28 Nov 2017 17:42:48 +0100
-From: Cornelia Huck <cohuck@redhat.com>
-Message-ID: <20171128174248.46b9624c.cohuck@redhat.com>
-In-Reply-To: <e88bef2f-ac0d-5a75-fe92-14ce821bc101@linux.vnet.ibm.com>
-References: <1511816136-30068-1-git-send-email-walling@linux.vnet.ibm.com>
-	<20171128113546.7f3f2b38.cohuck@redhat.com>
-	<e88bef2f-ac0d-5a75-fe92-14ce821bc101@linux.vnet.ibm.com>
+	(envelope-from <pbonzini@redhat.com>) id 1eJj1J-0007qN-Hj
+	for qemu-devel@nongnu.org; Tue, 28 Nov 2017 11:46:06 -0500
+References: <20171128154350.21504-1-kwolf@redhat.com>
+	<20171128154350.21504-4-kwolf@redhat.com>
+	<9bd2921d-64c6-724c-0d80-b43e33f41817@redhat.com>
+	<20171128162850.GF3703@localhost.localdomain>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <678f5030-926f-2cb5-80a6-629ee8f86c3f@redhat.com>
+Date: Tue, 28 Nov 2017 17:45:48 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [qemu-s390x] [PATCH v1 0/5] (FIXED) Interactive
- Boot Menu for DASD and SCSI Guests on s390x
+In-Reply-To: <20171128162850.GF3703@localhost.localdomain>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH for-2.11 3/4] coroutine: Cancel
+ aio_co_schedule() on direct entry
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,71 +27,49 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Collin L. Walling" <walling@linux.vnet.ibm.com>
-Cc: borntraeger@de.ibm.com, qemu-s390x@nongnu.org, qemu-devel@nongnu.org, frankja@linux.vnet.ibm.com
+To: Kevin Wolf <kwolf@redhat.com>
+Cc: qemu-block@nongnu.org, mreitz@redhat.com, stefanha@redhat.com, jcody@redhat.com, famz@redhat.com, qemu-devel@nongnu.org
 
-On Tue, 28 Nov 2017 11:35:16 -0500
-"Collin L. Walling" <walling@linux.vnet.ibm.com> wrote:
+On 28/11/2017 17:28, Kevin Wolf wrote:
+> To be honest, I just wasn't sure what to do with this case anyway. It
+> means that the coroutine is already running when someone else schedules
+> it. We don't really know whether we have to enter it a second time or
+> not.
+>
+> So if it can indeed happen in practice, we need to think a bit more
+> about this.
 
-> On 11/28/2017 05:35 AM, Cornelia Huck wrote:
-> > On Mon, 27 Nov 2017 15:55:31 -0500
-> > "Collin L. Walling" <walling@linux.vnet.ibm.com> wrote:
-> >  
-> >> These patches implement a boot menu for ECKD DASD and SCSI guests on s390x.
-> >> The menu will only appear if the disk has been configured for IPL with the
-> >> zIPL tool and with the following QEMU command line options:
-> >>
-> >>      -boot menu=on[,splash-time=X] and/or -machine loadparm='prompt'
-> >>
-> >> or via the following libvirt domain xml:
-> >>
-> >>      <os>
-> >>        <bootmenu enable='yes' timeout='X'/>
-> >>      </os>
-> >>
-> >>      or
-> >> 	
-> >>      <disk>
-> >>        ...
-> >>        <boot order='1' loadparm='PROMPT'/>
-> >>      </disk>
-> >>
-> >> Where X is some positive integer representing time in milliseconds.
-> >>
-> >> Loadparm will override all boot options.  
-> > I have a bit of trouble parsing that last sentence: Do you mean a
-> > loadparm other than 'prompt' will disable the menu and just boot the
-> > specified entry, without any delay? (That's what would make most sense
-> > to me.)  
-> 
-> Correct. If loadparm is given boot index, we simply boot that entry.
-> I like "a loadparm other than 'prompt' will disable the menu and just
-> boot the specified entry"... I hope you don't mind if I steal it ;)
+>>> This means that the coroutine just needs to
+>>> +     * prevent other callers from calling aio_co_schedule() before i=
+t yields
+>>> +     * (e.g. block job coroutines by setting job->busy =3D true).
+>>> +     *
+>>> +     * We still want to ensure that the second case doesn't happen, =
+so reset
+>>> +     * co->scheduled only after setting co->caller to make the above=
+ check
+>>> +     * effective for the co_schedule_bh_cb() case. */
+>>> +    atomic_set(&co->scheduled, NULL);
+>>
+>> This doesn't work.  The coroutine is still in the list, and if someone
+>> calls aio_co_schedule again now, any coroutines linked from "co" via
+>> co_scheduled_next are lost.
+>=20
+> Why would they? We still iterate the whole list in co_schedule_bh_cb(),
+> we just skip the single qemu_coroutine_enter().
 
-Not at all :)
+Because you modify co_scheduled_next (in QSLIST_INSERT_HEAD_ATOMIC)
+before it has been consumed.
 
-> 
-> >  
-> >> Collin L. Walling (5):
-> >>    s390-ccw: update libc.h
-> >>    s390-ccw: ipl structs for eckd cdl/ldl
-> >>    s390-ccw: parse and set boot menu options
-> >>    s390-ccw: interactive boot menu for eckd dasd
-> >>    s390-ccw: interactive boot menu for scsi
-> >>
-> >>   hw/s390x/ipl.c              |  23 +++++++
-> >>   hw/s390x/ipl.h              |   8 ++-
-> >>   pc-bios/s390-ccw/Makefile   |   2 +-
-> >>   pc-bios/s390-ccw/bootmap.c  | 110 ++++++++++++++++++++++++++++------
-> >>   pc-bios/s390-ccw/bootmap.h  |  73 +++++++++++++----------
-> >>   pc-bios/s390-ccw/iplb.h     |   8 ++-
-> >>   pc-bios/s390-ccw/libc.h     |  94 +++++++++++++++++++++++++++++
-> >>   pc-bios/s390-ccw/main.c     |  35 +++++------
-> >>   pc-bios/s390-ccw/menu.c     | 122 +++++++++++++++++++++++++++++++++++++
-> >>   pc-bios/s390-ccw/s390-ccw.h |   7 +++
-> >>   pc-bios/s390-ccw/sclp.c     | 142 +++++++++++++++++++++++++++++++++++++++++---
-> >>   11 files changed, 546 insertions(+), 78 deletions(-)
-> >>   create mode 100644 pc-bios/s390-ccw/menu.c
-> >>  
-> >  
-> 
+>> (Also, the AioContext lock is by design not protecting any state in
+>> AioContext itself; the AioContext lock is only protecting things that
+>> run in an AioContext but do not have their own lock).
+>=20
+> Such as the coroutine we want to enter, no?
+
+If you mean the Coroutine object then no, coroutines are entirely
+thread-safe.  All you need to do is: 1) re-enter them with aio_co_wake
+or aio_co_schedule after the first time you've entered them; 2) make
+sure you don't enter/schedule them twice.
+
+Paolo
