@@ -1,25 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50596)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52304)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <den@virtuozzo.com>) id 1eJkoN-0002Ff-J2
-	for qemu-devel@nongnu.org; Tue, 28 Nov 2017 13:40:52 -0500
+	(envelope-from <mst@redhat.com>) id 1eJkrk-0003ki-Vz
+	for qemu-devel@nongnu.org; Tue, 28 Nov 2017 13:44:21 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <den@virtuozzo.com>) id 1eJkoM-0005xC-KU
-	for qemu-devel@nongnu.org; Tue, 28 Nov 2017 13:40:51 -0500
-References: <20171128121055.6954-1-den@openvz.org>
-	<20171128160805.GE3703@localhost.localdomain>
-	<b5cb007b-7a6a-c8a0-b551-2efdc4b0cdac@openvz.org>
-	<a92ce6e2-0d7d-8db2-e12f-418b77e8abd4@redhat.com>
-	<CAFEAcA8Ak5FNNOSujRARVOL78n4v40W-ZfC4n4Bi6imMPJs_FQ@mail.gmail.com>
-From: "Denis V. Lunev" <den@openvz.org>
-Message-ID: <e49af3c9-8a7b-24d1-c4ad-4690185cb9a8@openvz.org>
-Date: Tue, 28 Nov 2017 21:40:36 +0300
+	(envelope-from <mst@redhat.com>) id 1eJkrh-0008TA-Mt
+	for qemu-devel@nongnu.org; Tue, 28 Nov 2017 13:44:21 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:41212)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1eJkrh-0008SU-Gt
+	for qemu-devel@nongnu.org; Tue, 28 Nov 2017 13:44:17 -0500
+Date: Tue, 28 Nov 2017 20:44:11 +0200
+From: "Michael S. Tsirkin" <mst@redhat.com>
+Message-ID: <20171128204351-mutt-send-email-mst@kernel.org>
+References: <20171127043517.22441-1-haozhong.zhang@intel.com>
 MIME-Version: 1.0
-In-Reply-To: <CAFEAcA8Ak5FNNOSujRARVOL78n4v40W-ZfC4n4Bi6imMPJs_FQ@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-Content-Language: en-US
-Subject: Re: [Qemu-devel] [PATCH for 2.11 0/2] QEMU crashes with CD device
- without media
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20171127043517.22441-1-haozhong.zhang@intel.com>
+Subject: Re: [Qemu-devel] [PATCH-for-2.12 v3 0/3] nvdimm: fixes for
+ (non-)dax backends
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,22 +27,43 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>, John Snow <jsnow@redhat.com>
-Cc: Kevin Wolf <kwolf@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, qemu-stable <qemu-stable@nongnu.org>
+To: Haozhong Zhang <haozhong.zhang@intel.com>
+Cc: qemu-devel@nongnu.org, Xiao Guangrong <guangrong.xiao@gmail.com>, Stefan Hajnoczi <stefanha@gmail.com>, Dan Williams <dan.j.williams@intel.com>, Eduardo Habkost <ehabkost@redhat.com>, Igor Mammedov <imammedo@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Richard Henderson <rth@twiddle.net>, Xiao Guangrong <xiaoguangrong.eric@gmail.com>
 
-On 11/28/2017 08:28 PM, Peter Maydell wrote:
-> On 28 November 2017 at 17:01, John Snow <jsnow@redhat.com> wrote:
->> It's not your fault, it's mine for letting this go for a release. It's
->> just unfortunate timing. I'm looking at (at least) the IDE portion of
->> this and the underlying cause in block-backend today.
-> If it's not a regression, and nobody reported it for the whole release
-> cycle, we might choose to not fix it in 2.11...
->
-> thanks
-> -- PMM
-may be this is related report
-https://patchwork.kernel.org/patch/9779795/
+On Mon, Nov 27, 2017 at 12:35:14PM +0800, Haozhong Zhang wrote:
+> Previous versions can be found at
+>   v2: https://lists.gnu.org/archive/html/qemu-devel/2017-06/msg01203.html
+>   v1: https://lists.gnu.org/archive/html/qemu-devel/2017-05/msg05919.html
+> 
+> Changes in v3:
+>  * Add an option 'align' to 'memory-backend-file' to address the
+>    failure when mmap device dax (patch 1).
+>  * Remove device dax check, which needs to access sysfs and may not
+>    work with SELinux.
+>  * Add a boolean option 'unarmed' to '-device nvdimm', which allows
+>    users to control the unarmed flag in guest ACPI NFIT. I don't make
+>    it as OnOffAuto, because of the remove of device dax check.
+>  * Document new options added by this patch series.
 
-Anyway, I will be fine with any decision.
+If you expect me to be the one to merge this, pls copy me
+on all patches.
 
-Den
+
+> Haozhong Zhang (3):
+>   hostmem-file: add "align" option
+>   nvdimm: add a macro for property "label-size"
+>   nvdimm: add 'unarmed' option
+> 
+>  backends/hostmem-file.c | 41 ++++++++++++++++++++++++++++++++++++++++-
+>  docs/nvdimm.txt         | 31 +++++++++++++++++++++++++++++++
+>  exec.c                  |  8 +++++++-
+>  hw/acpi/nvdimm.c        |  7 +++++++
+>  hw/mem/nvdimm.c         | 28 +++++++++++++++++++++++++++-
+>  include/exec/memory.h   |  3 +++
+>  include/hw/mem/nvdimm.h | 12 ++++++++++++
+>  memory.c                |  2 ++
+>  numa.c                  |  2 +-
+>  9 files changed, 130 insertions(+), 4 deletions(-)
+> 
+> -- 
+> 2.14.1
