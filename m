@@ -1,29 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40576)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41908)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1eJdHA-0008Fg-CQ
-	for qemu-devel@nongnu.org; Tue, 28 Nov 2017 05:38:08 -0500
+	(envelope-from <arei.gonglei@huawei.com>) id 1eJdMc-0001Pf-OQ
+	for qemu-devel@nongnu.org; Tue, 28 Nov 2017 05:43:43 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1eJdH7-0004b4-7q
-	for qemu-devel@nongnu.org; Tue, 28 Nov 2017 05:38:04 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:51960)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1eJdH7-0004ae-1B
-	for qemu-devel@nongnu.org; Tue, 28 Nov 2017 05:38:01 -0500
-Date: Tue, 28 Nov 2017 10:37:57 +0000
-From: Stefan Hajnoczi <stefanha@redhat.com>
-Message-ID: <20171128103757.GD17146@stefanha-x1.localdomain>
-References: <20171124183446.7308-1-ppandit@redhat.com>
-	<20171124183446.7308-2-ppandit@redhat.com>
-	<20171127111532.GI16527@stefanha-x1.localdomain>
-	<nycvar.YSQ.7.76.1711272251290.24944@wniryva>
-	<20171128101154.64b49cb0.cohuck@redhat.com>
+	(envelope-from <arei.gonglei@huawei.com>) id 1eJdMZ-00062t-J3
+	for qemu-devel@nongnu.org; Tue, 28 Nov 2017 05:43:42 -0500
+Received: from szxga01-in.huawei.com ([45.249.212.187]:4504)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_ARCFOUR_SHA1:16) (Exim 4.71)
+	(envelope-from <arei.gonglei@huawei.com>) id 1eJdMZ-00061x-0A
+	for qemu-devel@nongnu.org; Tue, 28 Nov 2017 05:43:39 -0500
+From: "Gonglei (Arei)" <arei.gonglei@huawei.com>
+Date: Tue, 28 Nov 2017 10:43:16 +0000
+Message-ID: <33183CC9F5247A488A2544077AF19020DA4A7DC2@DGGEMA505-MBS.china.huawei.com>
+References: <1511859789-43680-1-git-send-email-arei.gonglei@huawei.com>
+	<1511859789-43680-4-git-send-email-arei.gonglei@huawei.com>
+	<6635d6fc-b924-b558-0fff-120a55ef81e9@redhat.com>
+In-Reply-To: <6635d6fc-b924-b558-0fff-120a55ef81e9@redhat.com>
+Content-Language: zh-CN
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="eqp4TxRxnD4KrmFZ"
-Content-Disposition: inline
-In-Reply-To: <20171128101154.64b49cb0.cohuck@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v3 1/2] virtio: check VirtQueue Vring
- object is set
+Subject: Re: [Qemu-devel] [PATCH 3/4] cryptodev-vhost-user: add crypto
+ session handler
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,73 +30,37 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Cornelia Huck <cohuck@redhat.com>
-Cc: P J P <ppandit@redhat.com>, Qemu Developers <qemu-devel@nongnu.org>, zhangboxian <zhangboxian@huawei.com>, Paolo Bonzini <pbonzini@redhat.com>
+To: Paolo Bonzini <pbonzini@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+Cc: "mst@redhat.com" <mst@redhat.com>, "Huangweidong (C)" <weidong.huang@huawei.com>, "stefanha@redhat.com" <stefanha@redhat.com>, "Zhoujian (jay)" <jianjay.zhou@huawei.com>, "pasic@linux.vnet.ibm.com" <pasic@linux.vnet.ibm.com>, longpeng <longpeng2@huawei.com>, "xin.zeng@intel.com" <xin.zeng@intel.com>, "roy.fan.zhang@intel.com" <roy.fan.zhang@intel.com>
 
-
---eqp4TxRxnD4KrmFZ
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
-
-On Tue, Nov 28, 2017 at 10:11:54AM +0100, Cornelia Huck wrote:
-> On Mon, 27 Nov 2017 23:25:28 +0530 (IST)
-> P J P <ppandit@redhat.com> wrote:
-> > +-- On Mon, 27 Nov 2017, Stefan Hajnoczi wrote --+
-> > | > +    if (!vdev->vq[n].vring.num || !desc || !vdev->vq[n].vring.alig=
-n) {
-> > | ...
-> > |   vdev->vq[n].vring.desc =3D desc;
-> > |
-> > | Why !desc?
-> >=20
-> > virtio_queue_set_rings
-> >  virtio_init_region_cache
-> >    VirtQueue *vq =3D &vdev->vq[n];
-> >    ...
-> >    addr =3D vq->vring.desc;
-> >    if (!addr) {
-> >        return;
-> >    }
-> >=20
-> > These checks seem to be repeating all over. As mentioned earlier, could=
- these=20
-> > be collated in one place, maybe virtio_queue_get_num()?
-> >=20
-> >   int virtio_queue_get_num(VirtIODevice *vdev, int n)
-> >   {
-> >       VirtQueue *vq =3D &vdev->vq[n];
-> >=20
-> >       if (!vq->.vring.num
-> >            || !vq->vring.desc
-> >            || !vq->vring.align) {
-> >           return 0;  /* vq not set */
-> >       }
-> >=20
-> >       return vdev->vq[n].vring.num;
-> >   }
->=20
-> This is conflating different things:
-> - vq does not exist (num =3D=3D 0)
-> - vq is not setup by the guest (desc =3D=3D 0)
-> - vq has no valid alignment (which is only relevant for legacy)
-
-I agree.
-
-Stefan
-
---eqp4TxRxnD4KrmFZ
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEcBAEBAgAGBQJaHTyFAAoJEJykq7OBq3PIlegIAIRHoK+w0i5pfbjIkAkzd/l3
-ydhnCO43ORoXp8p3nkmM9OfY6PZxJtmIoCym2BMCm1yFjyZLfv4hL7OCSB8JIljE
-Hg42fqLF0TVSEaWxGFFEHvQI9nIge9xyExkDILuG0G/Dqhsjd/5ncjPL4ZgwGDOo
-xGRXTIDl0q9eJSrDBMy4mFoXFGCwJZ1SY2lnGM5jLptXXQ2QxcdOca6luxYa9MTC
-y72bf8F38KRm6sBH5VSqOdmmm63kb9auB7IfY1uRs9KLWazefO59qDdWb81KauLo
-qqO9D2f5FVRLP1hL9uceCfLPM72WXfqXM11RoLP3dOjJMHR+pAOlEYZkzC96cVY=
-=+pdT
------END PGP SIGNATURE-----
-
---eqp4TxRxnD4KrmFZ--
+DQo+IC0tLS0tT3JpZ2luYWwgTWVzc2FnZS0tLS0tDQo+IEZyb206IFBhb2xvIEJvbnppbmkgW21h
+aWx0bzpwYm9uemluaUByZWRoYXQuY29tXQ0KPiBTZW50OiBUdWVzZGF5LCBOb3ZlbWJlciAyOCwg
+MjAxNyA2OjAyIFBNDQo+IFRvOiBHb25nbGVpIChBcmVpKTsgcWVtdS1kZXZlbEBub25nbnUub3Jn
+DQo+IENjOiBtc3RAcmVkaGF0LmNvbTsgSHVhbmd3ZWlkb25nIChDKTsgc3RlZmFuaGFAcmVkaGF0
+LmNvbTsgWmhvdWppYW4NCj4gKGpheSk7IHBhc2ljQGxpbnV4LnZuZXQuaWJtLmNvbTsgbG9uZ3Bl
+bmc7IHhpbi56ZW5nQGludGVsLmNvbTsNCj4gcm95LmZhbi56aGFuZ0BpbnRlbC5jb20NCj4gU3Vi
+amVjdDogUmU6IFtQQVRDSCAzLzRdIGNyeXB0b2Rldi12aG9zdC11c2VyOiBhZGQgY3J5cHRvIHNl
+c3Npb24gaGFuZGxlcg0KPiANCj4gT24gMjgvMTEvMjAxNyAxMDowMywgR29uZ2xlaSB3cm90ZToN
+Cj4gPiBJbnRyb2R1Y2UgdHdvIHZob3N0LXVzZXIgbWVhc3NnZXM6DQo+IFZIT1NUX1VTRVJfQ1JF
+QVRFX0NSWVBUT19TRVNTSU9ODQo+ID4gYW5kIFZIT1NUX1VTRVJfQ0xPU0VfQ1JZUFRPX1NFU1NJ
+T04uIEF0IHRoaXMgcG9pbnQsIHRoZSBRRU1VIHNpZGUNCj4gPiBzdXBwb3J0IGNyeXB0byBvcGVy
+YXRpb24gaW4gY3J5cHRvZGV2IGhvc3QtdXNlciBiYWNrZW5kLg0KPiA+DQo+ID4gU2lnbmVkLW9m
+Zi1ieTogR29uZ2xlaSA8YXJlaS5nb25nbGVpQGh1YXdlaS5jb20+DQo+ID4gU2lnbmVkLW9mZi1i
+eTogTG9uZ3BlbmcoTWlrZSkgPGxvbmdwZW5nMkBodWF3ZWkuY29tPg0KPiA+IFNpZ25lZC1vZmYt
+Ynk6IFpob3VqaWFuIDxqaWFuamF5Lnpob3VAaHVhd2VpLmNvbT4NCj4gPiAtLS0NCj4gPiAgYmFj
+a2VuZHMvY3J5cHRvZGV2LXZob3N0LXVzZXIuYyAgIHwgNTAgKysrKysrKysrKysrKysrKystLS0t
+LQ0KPiA+ICBkb2NzL2ludGVyb3Avdmhvc3QtdXNlci50eHQgICAgICAgfCAxOSArKysrKysrKysN
+Cj4gPiAgaHcvdmlydGlvL3Zob3N0LXVzZXIuYyAgICAgICAgICAgIHwgODkNCj4gKysrKysrKysr
+KysrKysrKysrKysrKysrKysrKysrKysrKysrKysrDQo+ID4gIGluY2x1ZGUvaHcvdmlydGlvL3Zo
+b3N0LWJhY2tlbmQuaCB8ICA4ICsrKysNCj4gPiAgNCBmaWxlcyBjaGFuZ2VkLCAxNTUgaW5zZXJ0
+aW9ucygrKSwgMTEgZGVsZXRpb25zKC0pDQo+IA0KPiBBcyBmYXIgYXMgSSB1bmRlcnN0YW5kLCBW
+SVJUSU9fQ1JZUFRPX0NJUEhFUl9DUkVBVEVfU0VTU0lPTiBpcyBjYWxsZWQgYXMNCj4gYSByZXN1
+bHQgb2Ygc2VuZGluZyBhIG1lc3NhZ2Ugb24gdGhlIGNvbnRyb2wgdmlydHF1ZXVlLg0KPiANClZJ
+UlRJT19DUllQVE9fQ0lQSEVSX0NSRUFURV9TRVNTSU9OIGlzIGEgbWVzc2FnZSB0eXBlIG9mIGNv
+bnRyb2wgcXVldWUsDQpNZWFucyBjcmVhdGluZyBhIHNlc3Npb24gZm9yIG5leHQgY3J5cHRvIHJl
+cXVlc3RzLg0KDQo+IFdoeSBjYW4ndCB2aG9zdC11c2VyIGFsc28gcHJvY2VzcyBjcmVhdGUvZGVz
+dHJveSBzZXNzaW9uIG1lc3NhZ2VzIG9uIHRoZQ0KPiBjb250cm9sIHZpcnRxdWV1ZSwgaW5zdGVh
+ZCBvZiBoYXZpbmcgZGV2aWNlLXNwZWNpZmljIG1lc3NhZ2VzIGluIHRoZQ0KPiBwcm90b2NvbD8N
+Cj4gDQpZb3UgbWVhbiB3ZSBjYW4gc2hhcmUgY29udHJvbCB2aXJ0cXVldWUgdG8gRFBESyBhcyB3
+ZWxsPyBMaWtlIGRhdGEgcXVldWVzPw0KDQpNYXliZSBJIGRvbid0IGdldCB5b3VyIHBvaW50LiA6
+KA0KDQpUaGFua3MsDQotR29uZ2xlaQ0K
