@@ -1,22 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60712)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60724)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1eJaqe-0006wq-Bh
-	for qemu-devel@nongnu.org; Tue, 28 Nov 2017 03:02:33 -0500
+	(envelope-from <rkagan@virtuozzo.com>) id 1eJaqh-0006xm-4M
+	for qemu-devel@nongnu.org; Tue, 28 Nov 2017 03:02:40 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1eJaqZ-0003Ue-E5
-	for qemu-devel@nongnu.org; Tue, 28 Nov 2017 03:02:32 -0500
-References: <20171012185916.22776-1-eblake@redhat.com>
-	<20171012185916.22776-2-eblake@redhat.com>
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Message-ID: <c93fc092-bc8c-d293-a775-48301302a1f2@virtuozzo.com>
-Date: Tue, 28 Nov 2017 11:02:06 +0300
+	(envelope-from <rkagan@virtuozzo.com>) id 1eJaqc-0003WO-Hv
+	for qemu-devel@nongnu.org; Tue, 28 Nov 2017 03:02:35 -0500
+Received: from mail-he1eur01hn0217.outbound.protection.outlook.com
+	([104.47.0.217]:59585
+	helo=EUR01-HE1-obe.outbound.protection.outlook.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <rkagan@virtuozzo.com>)
+	id 1eJaqc-0003VV-5B
+	for qemu-devel@nongnu.org; Tue, 28 Nov 2017 03:02:30 -0500
+Date: Tue, 28 Nov 2017 11:02:13 +0300
+From: Roman Kagan <rkagan@virtuozzo.com>
+Message-ID: <20171128080213.GA12787@rkaganb.sw.ru>
+References: <20171127130518.26703-1-rkagan@virtuozzo.com>
+	<20171127130518.26703-3-rkagan@virtuozzo.com>
+	<A9252286-892F-40F4-9BE5-A9F92CC75DF9@skyportsystems.com>
 MIME-Version: 1.0
-In-Reply-To: <20171012185916.22776-2-eblake@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
-Content-Language: en-US
-Subject: Re: [Qemu-devel] [PATCH v4 01/20] block: Add
- .bdrv_co_block_status() callback
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
+In-Reply-To: <A9252286-892F-40F4-9BE5-A9F92CC75DF9@skyportsystems.com>
+Subject: Re: [Qemu-devel] [PATCH v2 2/2] vmgenid: use UUID property type
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,107 +32,18 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org
-Cc: kwolf@redhat.com, famz@redhat.com, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, jsnow@redhat.com
+To: Ben Warren <ben@skyportsystems.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, "Michael S. Tsirkin" <mst@redhat.com>, Igor Mammedov <imammedo@redhat.com>, Markus Armbruster <armbru@redhat.com>, =?iso-8859-1?Q?Marc-Andr=E9?= Lureau <marcandre.lureau@redhat.com>, "Denis V. Lunev" <den@openvz.org>, minyard@acm.org, "Daniel P. Berrange" <berrange@redhat.com>
 
-12.10.2017 21:58, Eric Blake wrote:
-> We are gradually moving away from sector-based interfaces, towards
-> byte-based. Now that the block layer exposes byte-based allocation,
-> it's time to tackle the drivers.  Add a new callback that operates
-> on as small as byte boundaries. Subsequent patches will then update
-> individual drivers, then finally remove .bdrv_co_get_block_status().
-> The old code now uses a goto in order to minimize churn at that later
-> removal.  Update documentation in this patch so that the later
-> removal can be a straight delete.
->
-> The new code also passes through the 'want_zero' hint, which will
-> allow subsequent patches to further optimize callers that only care
-> about how much of the image is allocated (mapping is false), rather
-> than full details about runs of zeroes and which offsets the
-> allocation actually maps to (mapping is true).
->
-> Note that most drivers give sector-aligned answers, except at
-> end-of-file, even when request_alignment is smaller than a sector.
-> However, bdrv_getlength() is sector-aligned (even though it gives a
-> byte answer), often by exceeding the actual file size.  If we were to
-> give back strict results, at least file-posix.c would report a
-> transition from DATA to HOLE at the end of a file even in the middle
-> of a sector, which can throw off callers; so we intentionally lie and
-> state that any partial sector at the end of a file has the same
-> status for the entire sector.  Maybe at some future day we can
-> report actual file size instead of rounding up, but not for this
-> series.
->
-> Signed-off-by: Eric Blake <eblake@redhat.com>
->
-> ---
-> v4: rebase to master
-> v3: no change
-> v2: improve alignment handling, ensure all iotests still pass
-> ---
->   include/block/block.h     |  9 ++++-----
->   include/block/block_int.h | 12 +++++++++---
->   block/io.c                | 30 +++++++++++++++++++++++++-----
->   3 files changed, 38 insertions(+), 13 deletions(-)
->
-> diff --git a/include/block/block.h b/include/block/block.h
-> index fbc21daf62..c5d6b2c933 100644
-> --- a/include/block/block.h
-> +++ b/include/block/block.h
-> @@ -136,11 +136,10 @@ typedef struct HDGeometry {
->    *                 that the block layer recompute the answer from the returned
->    *                 BDS; must be accompanied by just BDRV_BLOCK_OFFSET_VALID.
->    *
-> - * If BDRV_BLOCK_OFFSET_VALID is set, bits 9-62 (BDRV_BLOCK_OFFSET_MASK) of
-> - * the return value (old interface) or the entire map parameter (new
-> - * interface) represent the offset in the returned BDS that is allocated for
-> - * the corresponding raw data.  However, whether that offset actually
-> - * contains data also depends on BDRV_BLOCK_DATA, as follows:
-> + * If BDRV_BLOCK_OFFSET_VALID is set, the map parameter represents the
-> + * host offset within the returned BDS that is allocated for the
-> + * corresponding raw guest data.  However, whether that offset
-> + * actually contains data also depends on BDRV_BLOCK_DATA, as follows:
->    *
->    * DATA ZERO OFFSET_VALID
->    *  t    t        t       sectors read as zero, returned file is zero at offset
-> diff --git a/include/block/block_int.h b/include/block/block_int.h
-> index 4b9b23a08d..4153cd646d 100644
-> --- a/include/block/block_int.h
-> +++ b/include/block/block_int.h
-> @@ -206,13 +206,19 @@ struct BlockDriver {
->        * bdrv_is_allocated[_above].  The driver should answer only
->        * according to the current layer, and should not set
->        * BDRV_BLOCK_ALLOCATED, but may set BDRV_BLOCK_RAW.  See block.h
-> -     * for the meaning of _DATA, _ZERO, and _OFFSET_VALID.  The block
-> -     * layer guarantees input aligned to request_alignment, as well as
-> -     * non-NULL pnum and file.
-> +     * for the meaning of _DATA, _ZERO, and _OFFSET_VALID.  As a hint,
-> +     * the flag want_zero is true if the caller cares more about
-> +     * precise mappings (favor _OFFSET_VALID/_ZERO) or false for
-> +     * overall allocation (favor larger *pnum).  The block layer
-> +     * guarantees input aligned to request_alignment, as well as
-> +     * non-NULL pnum, map, and file.
->        */
->       int64_t coroutine_fn (*bdrv_co_get_block_status)(BlockDriverState *bs,
->           int64_t sector_num, int nb_sectors, int *pnum,
->           BlockDriverState **file);
-> +    int coroutine_fn (*bdrv_co_block_status)(BlockDriverState *bd,
+On Mon, Nov 27, 2017 at 08:38:41AM -0800, Ben Warren wrote:
+> It looks like you dropped Marc-Andr=E9 and my Reviewed-by lines.  Please =
+put them back.
 
-s/bd/bs
+Oops.  I thought that the amount of changes in the first patch was too
+big to keep the R-b; however, the second patch was basically the same so
+I should have put the R-b and save you extra work re-reviewing it.
+Sorry about that; hope the maintainer who will pick the patches will
+take care of R-b (unless I get more feedback that will make me respin the
+set).
 
-> +        bool want_zero, int64_t offset, int64_t bytes, int64_t *pnum,
-> +        int64_t *map, BlockDriverState **file);
->
->       /*
->        * Invalidate any cached meta-data.
-> diff --git a/block/io.c b/block/io.c
-> index e4caa4acf1..ef9ea44667 100644
-
-[...]
-
-Reviewed-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-
-
--- 
-Best regards,
-Vladimir
+Roman.
