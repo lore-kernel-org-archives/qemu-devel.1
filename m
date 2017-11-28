@@ -1,34 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57014)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58552)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1eJaVl-0007j5-1E
-	for qemu-devel@nongnu.org; Tue, 28 Nov 2017 02:40:58 -0500
+	(envelope-from <famz@redhat.com>) id 1eJaeP-0002jU-Dd
+	for qemu-devel@nongnu.org; Tue, 28 Nov 2017 02:49:54 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1eJaVj-0004M0-RX
-	for qemu-devel@nongnu.org; Tue, 28 Nov 2017 02:40:57 -0500
-Received: from indium.canonical.com ([91.189.90.7]:47810)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1eJaVj-0004LV-Kw
-	for qemu-devel@nongnu.org; Tue, 28 Nov 2017 02:40:55 -0500
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1eJaVh-0001oK-OG
-	for <qemu-devel@nongnu.org>; Tue, 28 Nov 2017 07:40:53 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 620002E80D4
-	for <qemu-devel@nongnu.org>; Tue, 28 Nov 2017 07:40:53 +0000 (UTC)
+	(envelope-from <famz@redhat.com>) id 1eJaeM-0007Mt-9V
+	for qemu-devel@nongnu.org; Tue, 28 Nov 2017 02:49:53 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:37594)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <famz@redhat.com>) id 1eJaeL-0007MY-W8
+	for qemu-devel@nongnu.org; Tue, 28 Nov 2017 02:49:50 -0500
+Date: Tue, 28 Nov 2017 15:49:46 +0800
+From: Fam Zheng <famz@redhat.com>
+Message-ID: <20171128074946.GG3242@lemon>
+References: <20171127124355.26015-1-rkagan@virtuozzo.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Tue, 28 Nov 2017 07:34:46 -0000
-From: ChristianEhrhardt <1716028@bugs.launchpad.net>
-Reply-To: Bug 1716028 <1716028@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <150489404292.23034.16812601554685741285.malonedeb@wampee.canonical.com>
-Message-Id: <151185448680.10912.11235623844809372044.malone@soybean.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1716028] Re: qemu 2.10 locks images with no
- feature flag
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20171127124355.26015-1-rkagan@virtuozzo.com>
+Subject: Re: [Qemu-devel] [PATCH v2] util: add is_equal to UUID API
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,113 +26,92 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Roman Kagan <rkagan@virtuozzo.com>
+Cc: qemu-devel@nongnu.org, Thomas Huth <thuth@redhat.com>, "Daniel P. Berrange" <berrange@redhat.com>, "Denis V. Lunev" <den@openvz.org>
 
-Also on the qemu side this is "works as intended" and workarounds are docum=
-ented in this bug.
-So we should set that bug status as well - looking back given it was mostly=
- a discussion I guess "opinion" is the best close status in this case.
+On Mon, 11/27 15:43, Roman Kagan wrote:
+> It's going to be useful, in particular, in VMBus code massively using
+> uuids aka GUIDs.
+> 
+> Signed-off-by: Roman Kagan <rkagan@virtuozzo.com>
+> ---
+> v1 -> v2:
+>  - drop dedicated testcase (for it was of no value) and incorporate
+>    is_null and is_equal assertions into uuid_generate testcase
+> 
+>  include/qemu/uuid.h | 2 ++
+>  tests/test-uuid.c   | 8 +++++++-
+>  util/uuid.c         | 7 ++++++-
+>  3 files changed, 15 insertions(+), 2 deletions(-)
+> 
+> diff --git a/include/qemu/uuid.h b/include/qemu/uuid.h
+> index afe4840296..09489ce5c5 100644
+> --- a/include/qemu/uuid.h
+> +++ b/include/qemu/uuid.h
+> @@ -48,6 +48,8 @@ void qemu_uuid_generate(QemuUUID *out);
+>  
+>  int qemu_uuid_is_null(const QemuUUID *uu);
+>  
+> +int qemu_uuid_is_equal(const QemuUUID *lhv, const QemuUUID *rhv);
+> +
+>  void qemu_uuid_unparse(const QemuUUID *uuid, char *out);
+>  
+>  char *qemu_uuid_unparse_strdup(const QemuUUID *uuid);
+> diff --git a/tests/test-uuid.c b/tests/test-uuid.c
+> index d3a2791fd4..22b4b0727d 100644
+> --- a/tests/test-uuid.c
+> +++ b/tests/test-uuid.c
+> @@ -93,12 +93,18 @@ static inline bool uuid_is_valid(QemuUUID *uuid)
+>  
+>  static void test_uuid_generate(void)
+>  {
+> +    QemuUUID uuid_not_null = { { {
+> +        0x58, 0x6e, 0xce, 0x27, 0x7f, 0x09, 0x41, 0xe0,
+> +        0x9e, 0x74, 0xe9, 0x01, 0x31, 0x7e, 0x9d, 0x42
+> +    } } };
+>      QemuUUID uuid;
+>      int i;
+>  
+>      for (i = 0; i < 100; ++i) {
+>          qemu_uuid_generate(&uuid);
+>          g_assert(uuid_is_valid(&uuid));
+> +        g_assert_false(qemu_uuid_is_null(&uuid));
+> +        g_assert_false(qemu_uuid_is_equal(&uuid_not_null, &uuid));
+>      }
+>  }
+>  
+> @@ -168,8 +174,8 @@ static void test_uuid_unparse_strdup(void)
+>  int main(int argc, char **argv)
+>  {
+>      g_test_init(&argc, &argv, NULL);
+> -    g_test_add_func("/uuid/generate", test_uuid_generate);
+>      g_test_add_func("/uuid/is_null", test_uuid_is_null);
+> +    g_test_add_func("/uuid/generate", test_uuid_generate);
+>      g_test_add_func("/uuid/parse", test_uuid_parse);
+>      g_test_add_func("/uuid/unparse", test_uuid_unparse);
+>      g_test_add_func("/uuid/unparse_strdup", test_uuid_unparse_strdup);
+> diff --git a/util/uuid.c b/util/uuid.c
+> index dd6b5fdf05..ebf06c049a 100644
+> --- a/util/uuid.c
+> +++ b/util/uuid.c
+> @@ -41,7 +41,12 @@ void qemu_uuid_generate(QemuUUID *uuid)
+>  int qemu_uuid_is_null(const QemuUUID *uu)
+>  {
+>      static QemuUUID null_uuid;
+> -    return memcmp(uu, &null_uuid, sizeof(QemuUUID)) == 0;
+> +    return qemu_uuid_is_equal(uu, &null_uuid);
+> +}
+> +
+> +int qemu_uuid_is_equal(const QemuUUID *lhv, const QemuUUID *rhv)
+> +{
+> +    return memcmp(lhv, rhv, sizeof(QemuUUID)) == 0;
+>  }
+>  
+>  void qemu_uuid_unparse(const QemuUUID *uuid, char *out)
+> -- 
+> 2.14.3
+> 
 
-** Changed in: qemu (Ubuntu)
-       Status: Won't Fix =3D> Opinion
+Thanks, queued. Will send a pull request once next release dev window opens.
 
--- =
-
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1716028
-
-Title:
-  qemu 2.10 locks images with no feature flag
-
-Status in QEMU:
-  Opinion
-Status in libvirt package in Ubuntu:
-  Triaged
-Status in qemu package in Ubuntu:
-  Opinion
-
-Bug description:
-  1) % lsb_release -rd
-  Description:	Ubuntu Artful Aardvark (development branch)
-  Release:	17.10
-
-  2) % apt-cache policy qemu-system-x86
-  qemu-system-x86:
-    Installed: 1:2.10~rc3+dfsg-0ubuntu1
-    Candidate: 1:2.10+dfsg-0ubuntu1
-    Version table:
-       1:2.10+dfsg-0ubuntu1 500
-          500 http://archive.ubuntu.com//ubuntu devel/main amd64 Packages
-   *** 1:2.10~rc3+dfsg-0ubuntu1 100
-          100 /var/lib/dpkg/status
-
-  3) qemu locks image files with no way to discover this feature nor how
-  to disable it
-
-  4) qemu provides a way to query if it supports image locking, and what
-  the default value is, and how to disable the locking via cli
-
-  qemu 2.10 now will lock image files and warn if an image is currently
-  locked.  This prevent qemu from running (and possibly corrupting said
-  image).
-
-  However, qemu does not provide any way to determine if a qemu binary
-  actually has this capability.  Normally behavior changing features are
-  exposed via some change to the qemu help menu or QMP/QAPI output of
-  capabilities.
-
-  I believe this slipped through since libvirt already does image
-  locking, but direct cli users will be caught by this change.
-
-  In particular, we have a use-case where we simulate multipath disks by
-  creating to disks which point to the same file which now breaks
-  without adding the 'file.locking=3Doff' to the -drive parameters;  which
-  is also completely undocumented and unexposed.
-
-  Some parts of the cli like -device allow querying of settable options
-  (qemu-system-x86 -device scsi_hd,?)  but nothing equivalent exists for
-  -drive parameters.
-
-  ProblemType: Bug
-  DistroRelease: Ubuntu 17.10
-  Package: qemu-system-x86 1:2.10~rc3+dfsg-0ubuntu1
-  ProcVersionSignature: Ubuntu 4.12.0-11.12-generic 4.12.5
-  Uname: Linux 4.12.0-11-generic x86_64
-  NonfreeKernelModules: zfs zunicode zavl zcommon znvpair
-  ApportVersion: 2.20.6-0ubuntu7
-  Architecture: amd64
-  Date: Fri Sep  8 12:56:53 2017
-  JournalErrors:
-   Hint: You are currently not seeing messages from other users and the sys=
-tem.
-         Users in groups 'adm', 'systemd-journal' can see all messages.
-         Pass -q to turn off this notice.
-   -- Logs begin at Mon 2017-01-30 11:56:02 CST, end at Fri 2017-09-08 12:5=
-6:46 CDT. --
-   -- No entries --
-  KvmCmdLine: COMMAND         STAT  EUID  RUID   PID  PPID %CPU COMMAND
-  MachineType: HP ProLiant DL360 Gen9
-  ProcEnviron:
-   TERM=3Dxterm
-   PATH=3D(custom, no user)
-   XDG_RUNTIME_DIR=3D<set>
-   LANG=3Den_US.UTF-8
-   SHELL=3D/bin/bash
-  ProcKernelCmdLine: BOOT_IMAGE=3D/vmlinuz-4.12.0-11-generic root=3DUUID=3D=
-45354276-e0c0-4bf6-9083-f130b89411cc ro --- console=3DttyS1,115200
-  SourcePackage: qemu
-  UpgradeStatus: No upgrade log present (probably fresh install)
-  dmi.bios.date: 03/05/2015
-  dmi.bios.vendor: HP
-  dmi.bios.version: P89
-  dmi.chassis.type: 23
-  dmi.chassis.vendor: HP
-  dmi.modalias: dmi:bvnHP:bvrP89:bd03/05/2015:svnHP:pnProLiantDL360Gen9:pvr=
-:cvnHP:ct23:cvr:
-  dmi.product.family: ProLiant
-  dmi.product.name: ProLiant DL360 Gen9
-  dmi.sys.vendor: HP
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1716028/+subscriptions
+Fam
