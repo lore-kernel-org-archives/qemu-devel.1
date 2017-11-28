@@ -1,21 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49645)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51273)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jcody@redhat.com>) id 1eJlnv-0005gZ-B8
-	for qemu-devel@nongnu.org; Tue, 28 Nov 2017 14:44:28 -0500
+	(envelope-from <Michael.Nawrocki@gtri.gatech.edu>)
+	id 1eJlqj-0007Cf-PF
+	for qemu-devel@nongnu.org; Tue, 28 Nov 2017 14:47:22 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jcody@redhat.com>) id 1eJlnu-00084h-DY
-	for qemu-devel@nongnu.org; Tue, 28 Nov 2017 14:44:27 -0500
-Date: Tue, 28 Nov 2017 14:44:13 -0500
-From: Jeff Cody <jcody@redhat.com>
-Message-ID: <20171128194413.GJ25110@localhost.localdomain>
-References: <20171012135313.227864-1-vsementsov@virtuozzo.com>
-	<d3b891f0-f9bd-5ced-5890-7e2f70ed1437@redhat.com>
-	<20171114050006.GD5399@localhost.localdomain>
+	(envelope-from <Michael.Nawrocki@gtri.gatech.edu>)
+	id 1eJlqh-0001jT-PO
+	for qemu-devel@nongnu.org; Tue, 28 Nov 2017 14:47:21 -0500
+Received: from relay2.gtri.gatech.edu ([130.207.199.168]:37290)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <Michael.Nawrocki@gtri.gatech.edu>)
+	id 1eJlqh-0001hN-LJ
+	for qemu-devel@nongnu.org; Tue, 28 Nov 2017 14:47:19 -0500
+References: <20171113161446.2862-1-michael.nawrocki@gtri.gatech.edu>
+	<20171113161446.2862-2-michael.nawrocki@gtri.gatech.edu>
+	<CAFEAcA8FDoLRx+OCMwjUzYd-X3HX7Z77SUTmNbSB9YWYT77AcA@mail.gmail.com>
+	<CAFEAcA-JwUm5+N-Km1fZjuPYA81sMCekguchJiV59BvqjnPJOA@mail.gmail.com>
+From: Michael Nawrocki <michael.nawrocki@gtri.gatech.edu>
+Message-ID: <b3a7006b-bf0d-f5f3-bf78-f18b38a014e7@gtri.gatech.edu>
+Date: Tue, 28 Nov 2017 14:47:15 -0500
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20171114050006.GD5399@localhost.localdomain>
-Subject: Re: [Qemu-devel] [PATCH v2 0/5] backup improvements part 1
+In-Reply-To: <CAFEAcA-JwUm5+N-Km1fZjuPYA81sMCekguchJiV59BvqjnPJOA@mail.gmail.com>
+Content-Type: text/plain; charset="utf-8"; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v3 1/3] Switch AMD CFI flash to use new
+ MMIO API
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,57 +34,53 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: John Snow <jsnow@redhat.com>
-Cc: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org, famz@redhat.com, kwolf@redhat.com, mreitz@redhat.com, stefanha@redhat.com, den@openvz.org
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, Qemu-block <qemu-block@nongnu.org>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
 
-On Tue, Nov 14, 2017 at 12:00:06AM -0500, Jeff Cody wrote:
-> On Mon, Nov 13, 2017 at 05:41:13PM -0500, John Snow wrote:
-> > Jeff, I think this ought to go through your tree, but I'll sign off on it.
-> > 
-> > Fam: Do you agree?
-> > 
-> > (Probably -next material, but I'm sending this email because I'm taking
-> > it out of my review queue and I don't want it to get lost.)
-> > 
-> > --js
-> > 
+On 11/23/2017 06:27 AM, Peter Maydell wrote:
+> On 23 November 2017 at 11:26, Peter Maydell <peter.maydell@linaro.org> wrote:
+>> On 13 November 2017 at 16:14, Mike Nawrocki
+>> <michael.nawrocki@gtri.gatech.edu> wrote:
+>>> Signed-off-by: Mike Nawrocki <michael.nawrocki@gtri.gatech.edu>
+>>> ---
+>>>   hw/block/pflash_cfi02.c | 97 +++++++++----------------------------------------
+>>>   1 file changed, 18 insertions(+), 79 deletions(-)
+>>>
+>>> diff --git a/hw/block/pflash_cfi02.c b/hw/block/pflash_cfi02.c
+>>> index c81ddd3a99..a81df913f6 100644
+>>> --- a/hw/block/pflash_cfi02.c
+>>> +++ b/hw/block/pflash_cfi02.c
+>>> @@ -138,12 +138,12 @@ static void pflash_timer (void *opaque)
+>>>       pfl->cmd = 0;
+>>>   }
+>>>
+>>> -static uint32_t pflash_read (pflash_t *pfl, hwaddr offset,
+>>> -                             int width, int be)
+>>> +static uint64_t pflash_read(pflash_t *pfl, hwaddr offset,
+>>> +                            int width, int be)
+>>>   {
+>>>       hwaddr boff;
+>>> -    uint32_t ret;
+>>>       uint8_t *p;
+>>> +    uint64_t ret;
+>>
+>> I suspect you'll find that the change of type for 'ret' here
+>> and the 'value' argument to pflash_write() will break compilation
+>> with PFLASH_DEBUG defined, because the type won't match the DPRINTF
+>> format strings any more.
+>>
+>> You could either fix up the format strings, or (since there's a
+>> wrapper function here anyway) leave the types of pflash_read()
+>> and pflash_write() alone and let the wrappers implicitly do
+>> the conversion between uint64_t and uint32_t.
 > 
-> Yes, I can bring in through my tree, unless Fam prefers to have it - I'll
-> pull it in via my block-next branch.
+> ...ah, just noticed that in patch 2 you want to add 8-byte
+> accesses. So you'll need to fix the format strings.
+> 
+> thanks
+> -- PMM
 > 
 
-Rather than keep this on my email queue:
-
-Applied to my block-next branch:
-
-git://github.com/codyprime/qemu-kvm-jtc block-next
-
--Jeff
-> 
-> > On 10/12/2017 09:53 AM, Vladimir Sementsov-Ogievskiy wrote:
-> > > Hi all. Here is a continuation of my "new backup architecture" series,
-> > > The very first part, but it is meaningful itself.
-> > > 
-> > > v2: rebase on master
-> > > 01: add test and fix bug
-> > > 02: move commit about NONE mode to this patch, add John's r-b (hope,
-> > >      you are OK with this tiny change)
-> > > 03: tiny refactor (John)
-> > > 04: improve commit message, add John's r-b
-> > > 05: add John's r-b
-> > > 
-> > > Vladimir Sementsov-Ogievskiy (5):
-> > >   hbitmap: add next_zero function
-> > >   backup: move from done_bitmap to copy_bitmap
-> > >   backup: init copy_bitmap from sync_bitmap for incremental
-> > >   backup: simplify non-dirty bits progress processing
-> > >   backup: use copy_bitmap in incremental backup
-> > > 
-> > >  include/block/dirty-bitmap.h |   1 +
-> > >  include/qemu/hbitmap.h       |   8 +++
-> > >  block/backup.c               | 118 ++++++++++++++++++++++++-------------------
-> > >  block/dirty-bitmap.c         |   5 ++
-> > >  tests/test-hbitmap.c         |  61 ++++++++++++++++++++++
-> > >  util/hbitmap.c               |  39 ++++++++++++++
-> > >  6 files changed, 180 insertions(+), 52 deletions(-)
-> > > 
+Yeah, it definitely doesn't compile with PFLASH_DEBUG defined. I'll 
+update those format strings for the next revision.
+Thanks!
