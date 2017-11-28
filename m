@@ -1,23 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57060)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58076)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1eJl1s-0007JT-Dt
-	for qemu-devel@nongnu.org; Tue, 28 Nov 2017 13:54:49 -0500
+	(envelope-from <mst@redhat.com>) id 1eJl5N-00012R-4k
+	for qemu-devel@nongnu.org; Tue, 28 Nov 2017 13:58:26 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1eJl1p-0005xK-Nu
-	for qemu-devel@nongnu.org; Tue, 28 Nov 2017 13:54:48 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:48390)
+	(envelope-from <mst@redhat.com>) id 1eJl5K-0007hn-GU
+	for qemu-devel@nongnu.org; Tue, 28 Nov 2017 13:58:25 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:43412)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1eJl1p-0005wo-Dl
-	for qemu-devel@nongnu.org; Tue, 28 Nov 2017 13:54:45 -0500
-Date: Tue, 28 Nov 2017 20:54:39 +0200
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1eJl5K-0007fk-7W
+	for qemu-devel@nongnu.org; Tue, 28 Nov 2017 13:58:22 -0500
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+	[10.5.11.15])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id E05EDC049D5F
+	for <qemu-devel@nongnu.org>; Tue, 28 Nov 2017 18:58:18 +0000 (UTC)
+Date: Tue, 28 Nov 2017 20:58:12 +0200
 From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <20171128205345-mutt-send-email-mst@kernel.org>
-References: <1511530010-511740-1-git-send-email-dplotnikov@virtuozzo.com>
+Message-ID: <20171128205806-mutt-send-email-mst@kernel.org>
+References: <20171102180310.24760-1-dgilbert@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <1511530010-511740-1-git-send-email-dplotnikov@virtuozzo.com>
-Subject: Re: [Qemu-devel] [PATCH] i386: turn off l3-cache property by default
+In-Reply-To: <20171102180310.24760-1-dgilbert@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH] ioapic/tracing: Remove last DPRINTFs
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,97 +32,99 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Denis Plotnikov <dplotnikov@virtuozzo.com>
-Cc: pbonzini@redhat.com, rth@twiddle.net, ehabkost@redhat.com, rkagan@virtuozzo.com, den@virtuozzo.com, qemu-devel@nongnu.org
+To: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>
+Cc: qemu-devel@nongnu.org, pbonzini@redhat.com, peterx@redhat.com
 
-On Fri, Nov 24, 2017 at 04:26:50PM +0300, Denis Plotnikov wrote:
-> Commit 14c985cffa "target-i386: present virtual L3 cache info for vcpus"
-> introduced and set by default exposing l3 to the guest.
+On Thu, Nov 02, 2017 at 06:03:10PM +0000, Dr. David Alan Gilbert (git) wrote:
+> From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
 > 
-> The motivation behind it was that in the Linux scheduler, when waking up
-> a task on a sibling CPU, the task was put onto the target CPU's runqueue
-> directly, without sending a reschedule IPI.  Reduction in the IPI count
-> led to performance gain.
+> Remove the last few DPRINTFs from hw/intc/ioapic.c and turn
+> them into tracing.  In one case it's a new trace, in the others
+> it's just adding a parameter to the existing traces.
 > 
-> However, this isn't the whole story.  Once the task is on the target
-> CPU's runqueue, it may have to preempt the current task on that CPU, be
-> it the idle task putting the CPU to sleep or just another running task.
-> For that a reschedule IPI will have to be issued, too.  Only when that
-> other CPU is running a normal task for too little time, the fairness
-> constraints will prevent the preemption and thus the IPI.
-> 
-> This boils down to the improvement being only achievable in workloads
-> with many actively switching tasks.  We had no access to the
-> (proprietary?) SAP HANA benchmark the commit referred to, but the
-> pattern is also reproduced with "perf bench sched messaging -g 1"
-> on 1 socket, 8 cores vCPU topology, we see indeed:
-> 
-> l3-cache	#res IPI /s	#time / 10000 loops
-> off		560K		1.8 sec
-> on		40K		0.9 sec
-> 
-> Now there's a downside: with L3 cache the Linux scheduler is more eager
-> to wake up tasks on sibling CPUs, resulting in unnecessary cross-vCPU
-> interactions and therefore exessive halts and IPIs.  E.g. "perf bench
-> sched pipe -i 100000" gives
-> 
-> l3-cache	#res IPI /s	#HLT /s		#time /100000 loops
-> off		200 (no K)	230		0.2 sec
-> on		400K		330K		0.5 sec
-> 
-> In a more realistic test, we observe 15% degradation in VM density
-> (measured as the number of VMs, each running Drupal CMS serving 2 http
-> requests per second to its main page, with 95%-percentile response
-> latency under 100 ms) with l3-cache=on.
-> 
-> We think that mostly-idle scenario is more common in cloud and personal
-> usage, and should be optimized for by default; users of highly loaded
-> VMs should be able to tune them up themselves.
-> 
-> So switch l3-cache off by default, and add a compat clause for the range
-> of machine types where it was on.
-> 
-> Signed-off-by: Denis Plotnikov <dplotnikov@virtuozzo.com>
-> Reviewed-by: Roman Kagan <rkagan@virtuozzo.com>
+> Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
 
-Pls add a new machine type so 2.11 can keep it on by
-default.
+Acked-by: Michael S. Tsirkin <mst@redhat.com>
 
 > ---
->  include/hw/i386/pc.h | 7 ++++++-
->  target/i386/cpu.c    | 2 +-
->  2 files changed, 7 insertions(+), 2 deletions(-)
+>  hw/intc/ioapic.c     | 17 +++--------------
+>  hw/intc/trace-events |  5 +++--
+>  2 files changed, 6 insertions(+), 16 deletions(-)
 > 
-> diff --git a/include/hw/i386/pc.h b/include/hw/i386/pc.h
-> index 087d184..1d2dcae 100644
-> --- a/include/hw/i386/pc.h
-> +++ b/include/hw/i386/pc.h
-> @@ -375,7 +375,12 @@ bool e820_get_entry(int, uint32_t, uint64_t *, uint64_t *);
->          .driver   = TYPE_X86_CPU,\
->          .property = "x-hv-max-vps",\
->          .value    = "0x40",\
-> -    },
-> +    },\
-> +    {\
-> +        .driver   = TYPE_X86_CPU,\
-> +        .property = "l3-cache",\
-> +        .value    = "on",\
-> +    },\
+> diff --git a/hw/intc/ioapic.c b/hw/intc/ioapic.c
+> index 37c4386ae3..36139a4db6 100644
+> --- a/hw/intc/ioapic.c
+> +++ b/hw/intc/ioapic.c
+> @@ -35,15 +35,6 @@
+>  #include "hw/i386/x86-iommu.h"
+>  #include "trace.h"
 >  
->  #define PC_COMPAT_2_9 \
->      HW_COMPAT_2_9 \
-> diff --git a/target/i386/cpu.c b/target/i386/cpu.c
-> index 1edcf29..95a51bd 100644
-> --- a/target/i386/cpu.c
-> +++ b/target/i386/cpu.c
-> @@ -4154,7 +4154,7 @@ static Property x86_cpu_properties[] = {
->      DEFINE_PROP_STRING("hv-vendor-id", X86CPU, hyperv_vendor_id),
->      DEFINE_PROP_BOOL("cpuid-0xb", X86CPU, enable_cpuid_0xb, true),
->      DEFINE_PROP_BOOL("lmce", X86CPU, enable_lmce, false),
-> -    DEFINE_PROP_BOOL("l3-cache", X86CPU, enable_l3_cache, true),
-> +    DEFINE_PROP_BOOL("l3-cache", X86CPU, enable_l3_cache, false),
->      DEFINE_PROP_BOOL("kvm-no-smi-migration", X86CPU, kvm_no_smi_migration,
->                       false),
->      DEFINE_PROP_BOOL("vmware-cpuid-freq", X86CPU, vmware_cpuid_freq, true),
+> -//#define DEBUG_IOAPIC
+> -
+> -#ifdef DEBUG_IOAPIC
+> -#define DPRINTF(fmt, ...)                                       \
+> -    do { printf("ioapic: " fmt , ## __VA_ARGS__); } while (0)
+> -#else
+> -#define DPRINTF(fmt, ...)
+> -#endif
+> -
+>  #define APIC_DELIVERY_MODE_SHIFT 8
+>  #define APIC_POLARITY_SHIFT 14
+>  #define APIC_TRIG_MODE_SHIFT 15
+> @@ -157,7 +148,7 @@ static void ioapic_set_irq(void *opaque, int vector, int level)
+>       * to GSI 2.  GSI maps to ioapic 1-1.  This is not
+>       * the cleanest way of doing it but it should work. */
+>  
+> -    DPRINTF("%s: %s vec %x\n", __func__, level ? "raise" : "lower", vector);
+> +    trace_ioapic_set_irq(vector, level);
+>      if (vector == 0) {
+>          vector = 2;
+>      }
+> @@ -290,11 +281,10 @@ ioapic_mem_read(void *opaque, hwaddr addr, unsigned int size)
+>                  }
+>              }
+>          }
+> -        DPRINTF("read: %08x = %08x\n", s->ioregsel, val);
+>          break;
+>      }
+>  
+> -    trace_ioapic_mem_read(addr, size, val);
+> +    trace_ioapic_mem_read(addr, s->ioregsel, size, val);
+>  
+>      return val;
+>  }
+> @@ -335,7 +325,7 @@ ioapic_mem_write(void *opaque, hwaddr addr, uint64_t val,
+>      int index;
+>  
+>      addr &= 0xff;
+> -    trace_ioapic_mem_write(addr, size, val);
+> +    trace_ioapic_mem_write(addr, s->ioregsel, size, val);
+>  
+>      switch (addr) {
+>      case IOAPIC_IOREGSEL:
+> @@ -345,7 +335,6 @@ ioapic_mem_write(void *opaque, hwaddr addr, uint64_t val,
+>          if (size != 4) {
+>              break;
+>          }
+> -        DPRINTF("write: %08x = %08" PRIx64 "\n", s->ioregsel, val);
+>          switch (s->ioregsel) {
+>          case IOAPIC_REG_ID:
+>              s->id = (val >> IOAPIC_ID_SHIFT) & IOAPIC_ID_MASK;
+> diff --git a/hw/intc/trace-events b/hw/intc/trace-events
+> index b86f242b0f..b298fac7c6 100644
+> --- a/hw/intc/trace-events
+> +++ b/hw/intc/trace-events
+> @@ -18,8 +18,9 @@ apic_mem_writel(uint64_t addr, uint32_t val) "0x%"PRIx64" = 0x%08x"
+>  ioapic_set_remote_irr(int n) "set remote irr for pin %d"
+>  ioapic_clear_remote_irr(int n, int vector) "clear remote irr for pin %d vector %d"
+>  ioapic_eoi_broadcast(int vector) "EOI broadcast for vector %d"
+> -ioapic_mem_read(uint8_t addr, uint8_t size, uint32_t val) "ioapic mem read addr 0x%"PRIx8" size 0x%"PRIx8" retval 0x%"PRIx32
+> -ioapic_mem_write(uint8_t addr, uint8_t size, uint32_t val) "ioapic mem write addr 0x%"PRIx8" size 0x%"PRIx8" val 0x%"PRIx32
+> +ioapic_mem_read(uint8_t addr, uint8_t regsel, uint8_t size, uint32_t val) "ioapic mem read addr 0x%"PRIx8" regsel: 0x%"PRIx8" size 0x%"PRIx8" retval 0x%"PRIx32
+> +ioapic_mem_write(uint8_t addr, uint8_t regsel, uint8_t size, uint32_t val) "ioapic mem write addr 0x%"PRIx8" regsel: 0x%"PRIx8" size 0x%"PRIx8" val 0x%"PRIx32
+> +ioapic_set_irq(int vector, int level) "vector: %d level: %d"
+>  
+>  # hw/intc/slavio_intctl.c
+>  slavio_intctl_mem_readl(uint32_t cpu, uint64_t addr, uint32_t ret) "read cpu %d reg 0x%"PRIx64" = 0x%x"
 > -- 
-> 2.7.4
+> 2.14.3
