@@ -1,19 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37789)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38995)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jcody@redhat.com>) id 1eK4ow-0004iv-BT
-	for qemu-devel@nongnu.org; Wed, 29 Nov 2017 11:02:53 -0500
+	(envelope-from <david@redhat.com>) id 1eK4rL-0005OZ-DF
+	for qemu-devel@nongnu.org; Wed, 29 Nov 2017 11:05:19 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jcody@redhat.com>) id 1eK4oq-00013i-SM
-	for qemu-devel@nongnu.org; Wed, 29 Nov 2017 11:02:46 -0500
-Date: Wed, 29 Nov 2017 11:02:28 -0500
-From: Jeff Cody <jcody@redhat.com>
-Message-ID: <20171129160228.GO25110@localhost.localdomain>
-References: <20171129155942.5646-1-mreitz@redhat.com>
+	(envelope-from <david@redhat.com>) id 1eK4rH-0002Ne-BH
+	for qemu-devel@nongnu.org; Wed, 29 Nov 2017 11:05:15 -0500
+References: <20171128203326.6062-1-david@redhat.com>
+	<20171128203326.6062-5-david@redhat.com>
+	<20171129161351.7908b6b0.cohuck@redhat.com>
+	<40e115a4-476b-4b0a-c151-3f708b9e0a80@redhat.com>
+	<20171129163501.1e83432c.cohuck@redhat.com>
+	<39bdd9f7-9510-48ab-9a17-1a53bcc7f029@redhat.com>
+	<20171129163908.38ae0bd9.cohuck@redhat.com>
+	<6e321ddc-0df5-d1f9-97c3-6372acf0fd33@redhat.com>
+	<20171129165752.1d2c151b.cohuck@redhat.com>
+From: David Hildenbrand <david@redhat.com>
+Message-ID: <a657c213-316d-1195-685b-7db264dc55db@redhat.com>
+Date: Wed, 29 Nov 2017 17:05:07 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20171129155942.5646-1-mreitz@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH for-2.12] iotests: Make 200 run on tmpfs
+In-Reply-To: <20171129165752.1d2c151b.cohuck@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v1 for-2.12 04/15] s390x/ioinst: pass the
+ retaddr to all IO instructions
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,36 +32,61 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Max Reitz <mreitz@redhat.com>
-Cc: qemu-block@nongnu.org, qemu-devel@nongnu.org, Kevin Wolf <kwolf@redhat.com>
+To: Cornelia Huck <cohuck@redhat.com>
+Cc: qemu-s390x@nongnu.org, qemu-devel@nongnu.org, Christian Borntraeger <borntraeger@de.ibm.com>, Richard Henderson <rth@twiddle.net>, Alexander Graf <agraf@suse.de>
 
-On Wed, Nov 29, 2017 at 04:59:42PM +0100, Max Reitz wrote:
-> 200 currently fails on tmpfs because it sets cache=none.  However,
-> without that (and aio=native), the test still works now and it fails
-> before Jeff's series (on fc7dbc119e0852a70dc9fa68bb41a318e49e4cd6).  So
-> we can probably remove it safely.
+On 29.11.2017 16:57, Cornelia Huck wrote:
+> On Wed, 29 Nov 2017 16:45:21 +0100
+> David Hildenbrand <david@redhat.com> wrote:
 > 
-> Signed-off-by: Max Reitz <mreitz@redhat.com>
+>> On 29.11.2017 16:39, Cornelia Huck wrote:
+>>> On Wed, 29 Nov 2017 16:38:03 +0100
+>>> David Hildenbrand <david@redhat.com> wrote:
+>>>   
+>>>> On 29.11.2017 16:35, Cornelia Huck wrote:  
+>>>>> On Wed, 29 Nov 2017 16:14:40 +0100
+>>>>> David Hildenbrand <david@redhat.com> wrote:
+>>>>>     
+>>>>>> On 29.11.2017 16:13, Cornelia Huck wrote:    
+>>>>>>> On Tue, 28 Nov 2017 21:33:14 +0100
+>>>>>>> David Hildenbrand <david@redhat.com> wrote:
+>>>>>>>       
+>>>>>>>> TCG needs the retaddr when injecting an interrupt. Let's just pass it
+>>>>>>>> along and use 0 for KVM. The value will be completely ignored for KVM.      
+>>>>>>>
+>>>>>>> Can we get a #define for that? Just to make it clear at a glance that
+>>>>>>> we're passing an ignored value and not some magic thing.      
+>>>>>>
+>>>>>> If you can come up with a good name, I can't :)    
+>>>>>
+>>>>> KVM_FAKE_RA
+>>>>> KVM_RA_UNUSED
+>>>>> KVM_RA_IGNORED
+>>>>>
+>>>>> ?
+>>>>>     
+>>>>
+>>>> KVM_RA ? (to keep lines short?)
+>>>>  
+>>>
+>>> That sounds too much like a magic value IMO (and not something that is
+>>> ignored).
+>>>   
+>>
+>> Passing 0 will actually also ignore it for TCG. So it is actually a
+>> magic value :) (just that more gets ignore din case of KVM ...)
+>>
+>> RA_NONE ?
+>>
+>>
+> 
+> RA_IGNORED?
+> 
 
-Reviewed-by: Jeff Cody <jcody@redhat.com>
+jap, will use that.
 
-> ---
->  tests/qemu-iotests/200 | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/tests/qemu-iotests/200 b/tests/qemu-iotests/200
-> index d8787ddb46..0e814c9b6c 100755
-> --- a/tests/qemu-iotests/200
-> +++ b/tests/qemu-iotests/200
-> @@ -60,7 +60,7 @@ qemu_comm_method="qmp"
->  _launch_qemu -device pci-bridge,id=bridge1,chassis_nr=1,bus=pci.0 \
->               -object iothread,id=iothread0 \
->               -device virtio-scsi-pci,bus=bridge1,addr=0x1f,id=scsi0,iothread=iothread0 \
-> -             -drive file="${TEST_IMG}",media=disk,if=none,cache=none,id=drive_sysdisk,aio=native,format=$IMGFMT \
-> +             -drive file="${TEST_IMG}",media=disk,if=none,id=drive_sysdisk,format=$IMGFMT \
->               -device scsi-hd,drive=drive_sysdisk,bus=scsi0.0,id=sysdisk,bootindex=0
->  h1=$QEMU_HANDLE
->  
-> -- 
-> 2.13.6
-> 
+-- 
+
+Thanks,
+
+David / dhildenb
