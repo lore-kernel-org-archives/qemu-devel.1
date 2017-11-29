@@ -1,21 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38938)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43736)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1eK1tC-0007hu-Ct
-	for qemu-devel@nongnu.org; Wed, 29 Nov 2017 07:55:04 -0500
+	(envelope-from <jcody@redhat.com>) id 1eK2Bm-0006GU-DK
+	for qemu-devel@nongnu.org; Wed, 29 Nov 2017 08:14:16 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1eK1tB-0000gR-M9
-	for qemu-devel@nongnu.org; Wed, 29 Nov 2017 07:54:58 -0500
-Date: Wed, 29 Nov 2017 13:54:39 +0100
-From: Kevin Wolf <kwolf@redhat.com>
-Message-ID: <20171129125439.GB3753@localhost.localdomain>
+	(envelope-from <jcody@redhat.com>) id 1eK2Bl-00007A-Ev
+	for qemu-devel@nongnu.org; Wed, 29 Nov 2017 08:14:10 -0500
+Date: Wed, 29 Nov 2017 08:13:58 -0500
+From: Jeff Cody <jcody@redhat.com>
+Message-ID: <20171129131358.GE18521@localhost.localdomain>
 References: <20171129102513.9153-1-pbonzini@redhat.com>
-	<20171129102513.9153-5-pbonzini@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20171129102513.9153-5-pbonzini@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH 4/4] blockjob: reimplement
- block_job_sleep_ns to allow cancellation
+In-Reply-To: <20171129102513.9153-1-pbonzini@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH 0/4] blockjob: reinstate
+ busy=false/busy=true in block_job_sleep_ns
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,43 +24,45 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: qemu-devel@nongnu.org, famz@redhat.com, qemu-block@nongnu.org, jcody@redhat.com
+Cc: qemu-devel@nongnu.org, famz@redhat.com, qemu-block@nongnu.org, kwolf@redhat.com
 
-Am 29.11.2017 um 11:25 hat Paolo Bonzini geschrieben:
-> This reverts the effects of commit 4afeffc857 ("blockjob: do not allow
-> coroutine double entry or entry-after-completion", 2017-11-21)
+On Wed, Nov 29, 2017 at 11:25:09AM +0100, Paolo Bonzini wrote:
+> In order to avoid reentering a scheduled coroutine this series uses
+> a QEMUTimer outside co_aio_sleep_ns.  The timer callback just calls
+> block_job_enter, and can be easily cancelled with timer_del.
 > 
-> This fixed the symptom of a bug rather than the root cause. Canceling the
-> wait on a sleeping blockjob coroutine is generally fine, we just need to
-> make it work correctly across AioContexts.  To do so, use a QEMUTimer
-> that calls block_job_enter.  Use a mutex to ensure that block_job_enter
-> synchronizes correctly with block_job_sleep_ns.
+> This fixes the outstanding issues with block jobs, without reverting
+> the new checks that Jeff added.
 > 
-> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
-> ---
->  blockjob.c                   | 57 +++++++++++++++++++++++++++++++++++---------
->  include/block/blockjob.h     |  5 +++-
->  include/block/blockjob_int.h |  4 ++--
->  3 files changed, 52 insertions(+), 14 deletions(-)
+> I have not run the full qemu-iotests suite, but the main affected
+> tests (030, 041, 055, 097, 176, 200) work fine.
 > 
-> diff --git a/blockjob.c b/blockjob.c
-> index 4d22b7d2fb..3fdaabbc1f 100644
-> --- a/blockjob.c
-> +++ b/blockjob.c
-> @@ -37,6 +37,26 @@
->  #include "qemu/timer.h"
->  #include "qapi-event.h"
->  
-> +/* Right now, this mutex is only needed to synchronize accesses to job->busy,
-> + * especially concurrent calls to block_job_enter.
-> + */
+> Paolo
+> 
+> Kevin Wolf (1):
+>   block: Expect graph changes in bdrv_parent_drained_begin/end
+> 
+> Paolo Bonzini (3):
+>   blockjob: remove clock argument from block_job_sleep_ns
+>   blockjob: introduce block_job_do_yield
+>   blockjob: reimplement block_job_sleep_ns to allow cancellation
+> 
+>  block/backup.c               |  4 +--
+>  block/commit.c               |  2 +-
+>  block/io.c                   |  8 ++---
+>  block/mirror.c               |  6 ++--
+>  block/stream.c               |  2 +-
+>  blockjob.c                   | 76 ++++++++++++++++++++++++++++++++++----------
+>  include/block/blockjob.h     |  5 ++-
+>  include/block/blockjob_int.h |  7 ++--
+>  tests/test-blockjob-txn.c    |  2 +-
+>  9 files changed, 79 insertions(+), 33 deletions(-)
+> 
+> -- 
+> 2.14.3
+>
 
-As discussed with Paolo on IRC, I'll replace the second line of this
-comment, which he had in a different place originally and became prone
-to misunderstanding now. The new version is:
 
-/* Right now, this mutex is only needed to synchronize accesses to job->busy,
- * such as concurrent calls to block_job_do_yield and block_job_enter.
- */
+For the series:
 
-Kevin
+Tested-By: Jeff Cody <jcody@redhat.com>
