@@ -1,19 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60450)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36184)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1eJtXr-000184-BC
-	for qemu-devel@nongnu.org; Tue, 28 Nov 2017 23:00:24 -0500
+	(envelope-from <mst@redhat.com>) id 1eJthV-0003ej-HC
+	for qemu-devel@nongnu.org; Tue, 28 Nov 2017 23:10:22 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1eJtXo-0001Vj-5p
-	for qemu-devel@nongnu.org; Tue, 28 Nov 2017 23:00:23 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:8938)
+	(envelope-from <mst@redhat.com>) id 1eJthQ-0007YA-SB
+	for qemu-devel@nongnu.org; Tue, 28 Nov 2017 23:10:21 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:32818)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <famz@redhat.com>) id 1eJtXn-0001Uz-Vt
-	for qemu-devel@nongnu.org; Tue, 28 Nov 2017 23:00:20 -0500
-From: Fam Zheng <famz@redhat.com>
-Date: Wed, 29 Nov 2017 12:00:13 +0800
-Message-Id: <20171129040013.11804-1-famz@redhat.com>
-Subject: [Qemu-devel] [PATCH qemu-web v2] Suggest qemu-web prefix in the
- introductory post
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1eJthQ-0007XC-Eo
+	for qemu-devel@nongnu.org; Tue, 28 Nov 2017 23:10:16 -0500
+Date: Wed, 29 Nov 2017 06:10:08 +0200
+From: "Michael S. Tsirkin" <mst@redhat.com>
+Message-ID: <20171129060910-mutt-send-email-mst@kernel.org>
+References: <1511859789-43680-1-git-send-email-arei.gonglei@huawei.com>
+	<1511859789-43680-4-git-send-email-arei.gonglei@huawei.com>
+	<6635d6fc-b924-b558-0fff-120a55ef81e9@redhat.com>
+	<33183CC9F5247A488A2544077AF19020DA4A7DC2@DGGEMA505-MBS.china.huawei.com>
+	<b98e2b09-35e7-47c2-b49f-982a09804b4f@redhat.com>
+	<33183CC9F5247A488A2544077AF19020DA4A7E32@DGGEMA505-MBS.china.huawei.com>
+	<3f0ed9b0-ff77-bb0f-c868-609abf0826b2@redhat.com>
+	<33183CC9F5247A488A2544077AF19020DA4A8D54@DGGEMA505-MBS.china.huawei.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <33183CC9F5247A488A2544077AF19020DA4A8D54@DGGEMA505-MBS.china.huawei.com>
+Subject: Re: [Qemu-devel] [PATCH 3/4] cryptodev-vhost-user: add crypto
+ session handler
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,33 +34,65 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: yu.ning@linux.intel.com, pbonzini@redhat.com, eblake@redhat.com
+To: "Gonglei (Arei)" <arei.gonglei@huawei.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "Huangweidong (C)" <weidong.huang@huawei.com>, "stefanha@redhat.com" <stefanha@redhat.com>, "Zhoujian (jay)" <jianjay.zhou@huawei.com>, "pasic@linux.vnet.ibm.com" <pasic@linux.vnet.ibm.com>, longpeng <longpeng2@huawei.com>, "xin.zeng@intel.com" <xin.zeng@intel.com>, "roy.fan.zhang@intel.com" <roy.fan.zhang@intel.com>, "jianfeng.tan@intel.com" <jianfeng.tan@intel.com>
 
-Chances are qemu-devel@nongnu.org patches only adding new files can be
-picked up by patchew and treated like a qemu.git patch. Patchew already
-ignores [qemu-web] patches, so suggest it in this article as well. (Are
-there better places to document this?)
+On Wed, Nov 29, 2017 at 02:33:59AM +0000, Gonglei (Arei) wrote:
+> 
+> > -----Original Message-----
+> > From: Paolo Bonzini [mailto:pbonzini@redhat.com]
+> > Sent: Tuesday, November 28, 2017 7:20 PM
+> > To: Gonglei (Arei); qemu-devel@nongnu.org
+> > Cc: mst@redhat.com; Huangweidong (C); stefanha@redhat.com; Zhoujian
+> > (jay); pasic@linux.vnet.ibm.com; longpeng; xin.zeng@intel.com;
+> > roy.fan.zhang@intel.com
+> > Subject: Re: [PATCH 3/4] cryptodev-vhost-user: add crypto session handler
+> > 
+> > On 28/11/2017 12:06, Gonglei (Arei) wrote:
+> > >>> You mean we can share control virtqueue to DPDK as well? Like data
+> > queues?
+> > >> I don't know :) but why not?
+> > >>
+> > > Current there are two main reasons for this design:
+> > >
+> > > 1) we should use another cpu to polling the control virtqueue, which is
+> > expensive.
+> > 
+> > IIRC DPDK also supports interrupt mode, doesn't it?  Is it possible to
+> > do interrupt mode for some virtqueues and poll mode for others?
+> > 
+> 
+> The intel guy Tan (Ccing) said to me:
+> 
+> " Interrupt mode for vhost-user is still not supported in current 
+> implementation. But we are evaluating the necessity now.
 
-Signed-off-by: Fam Zheng <famz@redhat.com>
----
- _posts/2017-02-04-the-new-qemu-website-is-up.md | 4 +++-
- 1 file changed, 3 insertions(+), 1 deletion(-)
+That's more or less a spec violation. Guest must get interrupts
+if it does not disable them. And it must notify host
+if host does not disable notifications.
 
-diff --git a/_posts/2017-02-04-the-new-qemu-website-is-up.md b/_posts/2017-02-04-the-new-qemu-website-is-up.md
-index 66d3181..1758436 100644
---- a/_posts/2017-02-04-the-new-qemu-website-is-up.md
-+++ b/_posts/2017-02-04-the-new-qemu-website-is-up.md
-@@ -19,7 +19,9 @@ and the source code for the website can be cloned from the
- repository.  Just like for any other project hosted by QEMU, the best way
- to propose or contribute a new change is by sending a patch through the
- [qemu-devel@nongnu.org](https://lists.nongnu.org/mailman/listinfo/qemu-devel)
--mailing list.
-+mailing list. (Add `[qemu-web PATCH]` to the subject so that CI will not be
-+confused with qemu.git patches. You can run `git config format.subjectprefix
-+'qemu-web PATCH'`, so that `git-send-email` command will do it for you.)
- 
- For example, if you would like to add a new screenshot to the homepage,
- you can clone the `qemu-web.git` repository, add a PNG file to the
--- 
-2.14.3
+> And yes, the mode (polling or interrupt) can be different for different 
+> queues."
+> 
+> > > 2) we should copy the logic of parsing control message to DPDK, which break
+> > >  current layered architecture .
+> > 
+> > But isn't it already a layering violation that you're adding *some*
+> > control messages to the vhost-user protocol?  I am not sure why only
+> > these two are necessary.
+> > 
+> Sorry, but I don't think this is layering violation, just like "vhost_net_set_mtu"
+> for vhost-net and "vhost_vsock_set_guest_cid_op" for vhost_vsock. They're all
+> device-specific messages. Aren't they?
+> 
+> Thanks,
+> -Gonglei
+> 
+> > Paolo
+> > 
+> > > I'm not sure if there are any other hidden issues for future scalability, such as
+> > > using Qemu to manage some control messages, avoiding D-Dos attack etc.
+> > >
+> > > Thanks,
+> > > -Gonglei
+> 
