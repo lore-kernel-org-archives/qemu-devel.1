@@ -1,25 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49420)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50713)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcel@redhat.com>) id 1eJzkq-0006Tf-Kb
-	for qemu-devel@nongnu.org; Wed, 29 Nov 2017 05:38:14 -0500
+	(envelope-from <ehabkost@redhat.com>) id 1eJzo4-0007Bl-Cr
+	for qemu-devel@nongnu.org; Wed, 29 Nov 2017 05:41:33 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcel@redhat.com>) id 1eJzkn-0001YO-Ez
-	for qemu-devel@nongnu.org; Wed, 29 Nov 2017 05:38:12 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:57846)
+	(envelope-from <ehabkost@redhat.com>) id 1eJzo1-0004IL-78
+	for qemu-devel@nongnu.org; Wed, 29 Nov 2017 05:41:32 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:8410)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <marcel@redhat.com>) id 1eJzkn-0001X9-5k
-	for qemu-devel@nongnu.org; Wed, 29 Nov 2017 05:38:09 -0500
-References: <20171129084628.12336-1-david@gibson.dropbear.id.au>
-	<20171129084628.12336-4-david@gibson.dropbear.id.au>
-From: Marcel Apfelbaum <marcel@redhat.com>
-Message-ID: <abaddfae-f0f0-cbe3-93b5-b2f102290725@redhat.com>
-Date: Wed, 29 Nov 2017 12:38:00 +0200
+	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1eJzo0-0004Hz-Sz
+	for qemu-devel@nongnu.org; Wed, 29 Nov 2017 05:41:29 -0500
+Date: Wed, 29 Nov 2017 08:41:22 -0200
+From: Eduardo Habkost <ehabkost@redhat.com>
+Message-ID: <20171129104122.GY3037@localhost.localdomain>
+References: <1511530010-511740-1-git-send-email-dplotnikov@virtuozzo.com>
+	<20171128195817.GA29077@localhost.localdomain>
+	<2cd31202-27c3-983f-85a9-6814ff504706@virtuozzo.com>
+	<20171128211326.GV3037@localhost.localdomain>
+	<5A1E43A6.1010607@huawei.com>
 MIME-Version: 1.0
-In-Reply-To: <20171129084628.12336-4-david@gibson.dropbear.id.au>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [for-2.12 3/7] pci: Fold pci_bus.h into pci.h
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <5A1E43A6.1010607@huawei.com>
+Subject: Re: [Qemu-devel] [PATCH] i386: turn off l3-cache property by default
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,477 +30,152 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Gibson <david@gibson.dropbear.id.au>, "Michael S . Tsirkin" <mst@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, Igor Mammedov <imammedo@redhat.com>
-Cc: qemu-devel@nongnu.org
+To: "Longpeng (Mike)" <longpeng2@huawei.com>
+Cc: "Denis V. Lunev" <den@virtuozzo.com>, "Michael S. Tsirkin" <mst@redhat.com>, Denis Plotnikov <dplotnikov@virtuozzo.com>, pbonzini@redhat.com, rth@twiddle.net, qemu-devel@nongnu.org, rkagan@virtuozzo.com, Gonglei <arei.gonglei@huawei.com>, huangpeng <peter.huangpeng@huawei.com>, zhaoshenglong <zhaoshenglong@huawei.com>, herongguang.he@huawei.com
 
-On 29/11/2017 10:46, David Gibson wrote:
-> include/hw/pci/pci_bus.h is now very small and can only safely be included
-> after hw/pci/pci.h.  So, just fold it into pci.h.
+On Wed, Nov 29, 2017 at 01:20:38PM +0800, Longpeng (Mike) wrote:
+> On 2017/11/29 5:13, Eduardo Habkost wrote:
+> > [CCing the people who were copied in the original patch that
+> > enabled l3cache]
+> > 
+> > On Tue, Nov 28, 2017 at 11:20:27PM +0300, Denis V. Lunev wrote:
+> >> On 11/28/2017 10:58 PM, Eduardo Habkost wrote:
+> >>> Hi,
+> >>>
+> >>> On Fri, Nov 24, 2017 at 04:26:50PM +0300, Denis Plotnikov wrote:
+> >>>> Commit 14c985cffa "target-i386: present virtual L3 cache info for vcpus"
+> >>>> introduced and set by default exposing l3 to the guest.
+> >>>>
+> >>>> The motivation behind it was that in the Linux scheduler, when waking up
+> >>>> a task on a sibling CPU, the task was put onto the target CPU's runqueue
+> >>>> directly, without sending a reschedule IPI.  Reduction in the IPI count
+> >>>> led to performance gain.
+> >>>>
+> >>>> However, this isn't the whole story.  Once the task is on the target
+> >>>> CPU's runqueue, it may have to preempt the current task on that CPU, be
+> >>>> it the idle task putting the CPU to sleep or just another running task.
+> >>>> For that a reschedule IPI will have to be issued, too.  Only when that
+> >>>> other CPU is running a normal task for too little time, the fairness
+> >>>> constraints will prevent the preemption and thus the IPI.
+> >>>>
+> 
+> Agree. :)
+> 
+> Our testing VM is Suse11 guest with idle=poll at that time and now I realize
+> that Suse11 has a BUG in its scheduler.
+> 
+> For REHL 7.3 or upstream kernel, in ttwu_queue_remote(), a RES IPI is issued if
+> rq->idle is not polling:
+> '''
+> static void ttwu_queue_remote(struct task_struct *p, int cpu)
+> {
+> 	struct rq *rq = cpu_rq(cpu);
+> 
+> 	if (llist_add(&p->wake_entry, &cpu_rq(cpu)->wake_list)) {
+> 		if (!set_nr_if_polling(rq->idle))
+> 			smp_send_reschedule(cpu);
+> 		else
+> 			trace_sched_wake_idle_without_ipi(cpu);
+> 	}
+> }
+> '''
+> 
+> But for Suse11, it does not check, it send a RES IPI unconditionally.
+
+So, does that mean no Linux guest benefits from the l3-cache=on
+default except SuSE 11 guests?
+
+
+> 
+> >>>> This boils down to the improvement being only achievable in workloads
+> >>>> with many actively switching tasks.  We had no access to the
+> >>>> (proprietary?) SAP HANA benchmark the commit referred to, but the
+> >>>> pattern is also reproduced with "perf bench sched messaging -g 1"
+> >>>> on 1 socket, 8 cores vCPU topology, we see indeed:
+> >>>>
+> >>>> l3-cache	#res IPI /s	#time / 10000 loops
+> >>>> off		560K		1.8 sec
+> >>>> on		40K		0.9 sec
+> >>>>
+> >>>> Now there's a downside: with L3 cache the Linux scheduler is more eager
+> >>>> to wake up tasks on sibling CPUs, resulting in unnecessary cross-vCPU
+> >>>> interactions and therefore exessive halts and IPIs.  E.g. "perf bench
+> >>>> sched pipe -i 100000" gives
+> >>>>
+> >>>> l3-cache	#res IPI /s	#HLT /s		#time /100000 loops
+> >>>> off		200 (no K)	230		0.2 sec
+> >>>> on		400K		330K		0.5 sec
+> >>>>
+> 
+> I guess this issue could be resolved by disable the SD_WAKE_AFFINE.
+> 
+> As Gonglei said:
+> 1. the L3 cache relates to the user experience.
+
+This is true, in a way: I have seen a fair share of user reports
+where they incorrectly blame the L3 cache absence or the L3 cache
+size for performance problems.
+
+> 2. the glibc would get the cache info by CPUID directly, and relates to the
+> memory performance.
+
+I'm interested in numbers that demonstrate that.
+
+> 
+> What's more, the L3 cache relates to the sched_domain which is important to the
+> (load) balancer when system is busy.
+> 
+> All this doesn't mean the patch is insignificant, I just think we should do more
+> research before decide. I'll do some tests, thanks. :)
+
+Yes, we need more data.  But if we find out that there are no
+cases where the l3-cache=on default actually improves
+performance, I will be willing to apply this patch.
+
+IMO, the long term solution is to make Linux guests not misbehave
+when we stop lying about the L3 cache.  Maybe we could provide a
+"IPIs are expensive, please avoid them" hint in the KVM CPUID
+leaf?
+
+> 
+> >>>> In a more realistic test, we observe 15% degradation in VM density
+> >>>> (measured as the number of VMs, each running Drupal CMS serving 2 http
+> >>>> requests per second to its main page, with 95%-percentile response
+> >>>> latency under 100 ms) with l3-cache=on.
+> >>>>
+> >>>> We think that mostly-idle scenario is more common in cloud and personal
+> >>>> usage, and should be optimized for by default; users of highly loaded
+> >>>> VMs should be able to tune them up themselves.
+> >>>>
+> >>> There's one thing I don't understand in your test case: if you
+> >>> just found out that Linux will behave worse if it assumes that
+> >>> the VCPUs are sharing a L3 cache, why are you configuring a
+> >>> 8-core VCPU topology explicitly?
+> >>>
+> >>> Do you still see a difference in the numbers if you use "-smp 8"
+> >>> with no "cores" and "threads" options?
+> >>>
+> >> This is quite simple. A lot of software licenses are bound to the amount
+> >> of CPU __sockets__. Thus it is mandatory in a lot of cases to set topology
+> >> with 1 socket/xx cores to reduce the amount of money necessary to
+> >> be paid for the software.
+> > 
+> > In this case it looks like we're talking about the expected
+> > meaning of "cores=N".  My first interpretation would be that the
+> > user obviously want the guest to see the multiple cores sharing a
+> > L3 cache, because that's how real CPUs normally work.  But I see
+> > why you have different expectations.
+> > 
+> > Numbers on dedicated-pCPU scenarios would be helpful to guide the
+> > decision.  I wouldn't like to cause a performance regression for
+> > users that fine-tuned vCPU topology and set up CPU pinning.
+> > 
+> 
+> 
+> -- 
+> Regards,
+> Longpeng(Mike)
 > 
 
-I don't get the benefit from merging the header files.
-I would go the other way around and find stuff specific
-to pci_bus and add it there, like the pci_bus_new*
-you touched in the prev patch.
-
-Maybe if *all* code files requiring pci.h would automatically
-need pci_bus.h would make sense, but I didn't check that.
-
-Thanks,
-Marcel
-
-
-> Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
-> ---
->   hw/acpi/pcihp.c                     |  1 -
->   hw/i386/acpi-build.c                |  1 -
->   hw/i386/amd_iommu.h                 |  1 -
->   hw/i386/intel_iommu.c               |  1 -
->   hw/i386/pc.c                        |  1 -
->   hw/isa/lpc_ich9.c                   |  1 -
->   hw/pci-bridge/dec.c                 |  1 -
->   hw/pci-bridge/pci_bridge_dev.c      |  1 -
->   hw/pci-bridge/pci_expander_bridge.c |  1 -
->   hw/pci-bridge/pcie_pci_bridge.c     |  1 -
->   hw/pci-host/apb.c                   |  1 -
->   hw/pci-host/prep.c                  |  1 -
->   hw/pci-host/versatile.c             |  1 -
->   hw/pci/pci.c                        |  1 -
->   hw/pci/pci_bridge.c                 |  1 -
->   hw/pci/pci_host.c                   |  1 -
->   hw/pci/pcie.c                       |  1 -
->   hw/pci/pcie_aer.c                   |  1 -
->   hw/pci/shpc.c                       |  1 -
->   hw/ppc/spapr_pci.c                  |  1 -
->   hw/s390x/s390-pci-bus.c             |  1 -
->   hw/sparc64/sun4u.c                  |  1 -
->   include/hw/i386/ich9.h              |  1 -
->   include/hw/pci/pci.h                | 44 ++++++++++++++++++++++++++++++++--
->   include/hw/pci/pci_bridge.h         |  1 -
->   include/hw/pci/pci_bus.h            | 47 -------------------------------------
->   include/hw/pci/pcie_port.h          |  1 -
->   27 files changed, 42 insertions(+), 74 deletions(-)
->   delete mode 100644 include/hw/pci/pci_bus.h
-> 
-> diff --git a/hw/acpi/pcihp.c b/hw/acpi/pcihp.c
-> index 7da51c0569..0da905ab3a 100644
-> --- a/hw/acpi/pcihp.c
-> +++ b/hw/acpi/pcihp.c
-> @@ -34,7 +34,6 @@
->   #include "sysemu/sysemu.h"
->   #include "exec/ioport.h"
->   #include "exec/address-spaces.h"
-> -#include "hw/pci/pci_bus.h"
->   #include "qapi/error.h"
->   #include "qom/qom-qobject.h"
->   
-> diff --git a/hw/i386/acpi-build.c b/hw/i386/acpi-build.c
-> index 73519ab3ac..bda5ef1307 100644
-> --- a/hw/i386/acpi-build.c
-> +++ b/hw/i386/acpi-build.c
-> @@ -51,7 +51,6 @@
->   #include "hw/acpi/piix4.h"
->   #include "hw/acpi/pcihp.h"
->   #include "hw/i386/ich9.h"
-> -#include "hw/pci/pci_bus.h"
->   #include "hw/pci-host/q35.h"
->   #include "hw/i386/x86-iommu.h"
->   
-> diff --git a/hw/i386/amd_iommu.h b/hw/i386/amd_iommu.h
-> index d370ae3549..b587f6b49f 100644
-> --- a/hw/i386/amd_iommu.h
-> +++ b/hw/i386/amd_iommu.h
-> @@ -27,7 +27,6 @@
->   #include "hw/sysbus.h"
->   #include "sysemu/dma.h"
->   #include "hw/i386/pc.h"
-> -#include "hw/pci/pci_bus.h"
->   #include "hw/i386/x86-iommu.h"
->   
->   /* Capability registers */
-> diff --git a/hw/i386/intel_iommu.c b/hw/i386/intel_iommu.c
-> index 3a5bb0bc2e..3ef4bfbe05 100644
-> --- a/hw/i386/intel_iommu.c
-> +++ b/hw/i386/intel_iommu.c
-> @@ -26,7 +26,6 @@
->   #include "exec/address-spaces.h"
->   #include "intel_iommu_internal.h"
->   #include "hw/pci/pci.h"
-> -#include "hw/pci/pci_bus.h"
->   #include "hw/i386/pc.h"
->   #include "hw/i386/apic-msidef.h"
->   #include "hw/boards.h"
-> diff --git a/hw/i386/pc.c b/hw/i386/pc.c
-> index c3afe5b7f1..5380a004be 100644
-> --- a/hw/i386/pc.c
-> +++ b/hw/i386/pc.c
-> @@ -31,7 +31,6 @@
->   #include "hw/block/fdc.h"
->   #include "hw/ide.h"
->   #include "hw/pci/pci.h"
-> -#include "hw/pci/pci_bus.h"
->   #include "hw/nvram/fw_cfg.h"
->   #include "hw/timer/hpet.h"
->   #include "hw/smbios/smbios.h"
-> diff --git a/hw/isa/lpc_ich9.c b/hw/isa/lpc_ich9.c
-> index ec3c9f7d0b..e77a4abb15 100644
-> --- a/hw/isa/lpc_ich9.c
-> +++ b/hw/isa/lpc_ich9.c
-> @@ -44,7 +44,6 @@
->   #include "hw/i386/ich9.h"
->   #include "hw/acpi/acpi.h"
->   #include "hw/acpi/ich9.h"
-> -#include "hw/pci/pci_bus.h"
->   #include "exec/address-spaces.h"
->   #include "sysemu/sysemu.h"
->   #include "qom/cpu.h"
-> diff --git a/hw/pci-bridge/dec.c b/hw/pci-bridge/dec.c
-> index 84492d5e5f..ae4b9697ed 100644
-> --- a/hw/pci-bridge/dec.c
-> +++ b/hw/pci-bridge/dec.c
-> @@ -29,7 +29,6 @@
->   #include "hw/pci/pci.h"
->   #include "hw/pci/pci_host.h"
->   #include "hw/pci/pci_bridge.h"
-> -#include "hw/pci/pci_bus.h"
->   
->   /* debug DEC */
->   //#define DEBUG_DEC
-> diff --git a/hw/pci-bridge/pci_bridge_dev.c b/hw/pci-bridge/pci_bridge_dev.c
-> index d56f6638c2..bc3c8d9f57 100644
-> --- a/hw/pci-bridge/pci_bridge_dev.c
-> +++ b/hw/pci-bridge/pci_bridge_dev.c
-> @@ -27,7 +27,6 @@
->   #include "hw/pci/shpc.h"
->   #include "hw/pci/slotid_cap.h"
->   #include "exec/memory.h"
-> -#include "hw/pci/pci_bus.h"
->   #include "hw/hotplug.h"
->   
->   #define TYPE_PCI_BRIDGE_DEV      "pci-bridge"
-> diff --git a/hw/pci-bridge/pci_expander_bridge.c b/hw/pci-bridge/pci_expander_bridge.c
-> index b2fa829e29..5652cf06e9 100644
-> --- a/hw/pci-bridge/pci_expander_bridge.c
-> +++ b/hw/pci-bridge/pci_expander_bridge.c
-> @@ -13,7 +13,6 @@
->   #include "qemu/osdep.h"
->   #include "qapi/error.h"
->   #include "hw/pci/pci.h"
-> -#include "hw/pci/pci_bus.h"
->   #include "hw/pci/pci_host.h"
->   #include "hw/pci/pci_bridge.h"
->   #include "hw/i386/pc.h"
-> diff --git a/hw/pci-bridge/pcie_pci_bridge.c b/hw/pci-bridge/pcie_pci_bridge.c
-> index a4d827c99d..f609a4fb32 100644
-> --- a/hw/pci-bridge/pcie_pci_bridge.c
-> +++ b/hw/pci-bridge/pcie_pci_bridge.c
-> @@ -10,7 +10,6 @@
->   #include "qemu/osdep.h"
->   #include "qapi/error.h"
->   #include "hw/pci/pci.h"
-> -#include "hw/pci/pci_bus.h"
->   #include "hw/pci/pci_bridge.h"
->   #include "hw/pci/msi.h"
->   #include "hw/pci/shpc.h"
-> diff --git a/hw/pci-host/apb.c b/hw/pci-host/apb.c
-> index 1df998443d..bf7c7b0079 100644
-> --- a/hw/pci-host/apb.c
-> +++ b/hw/pci-host/apb.c
-> @@ -32,7 +32,6 @@
->   #include "hw/pci/pci.h"
->   #include "hw/pci/pci_host.h"
->   #include "hw/pci/pci_bridge.h"
-> -#include "hw/pci/pci_bus.h"
->   #include "hw/pci-host/apb.h"
->   #include "sysemu/sysemu.h"
->   #include "exec/address-spaces.h"
-> diff --git a/hw/pci-host/prep.c b/hw/pci-host/prep.c
-> index 01f67f9db1..56920914c6 100644
-> --- a/hw/pci-host/prep.c
-> +++ b/hw/pci-host/prep.c
-> @@ -27,7 +27,6 @@
->   #include "qapi/error.h"
->   #include "hw/hw.h"
->   #include "hw/pci/pci.h"
-> -#include "hw/pci/pci_bus.h"
->   #include "hw/pci/pci_host.h"
->   #include "hw/i386/pc.h"
->   #include "hw/loader.h"
-> diff --git a/hw/pci-host/versatile.c b/hw/pci-host/versatile.c
-> index 8803ada925..b5bf4dce55 100644
-> --- a/hw/pci-host/versatile.c
-> +++ b/hw/pci-host/versatile.c
-> @@ -10,7 +10,6 @@
->   #include "qemu/osdep.h"
->   #include "hw/sysbus.h"
->   #include "hw/pci/pci.h"
-> -#include "hw/pci/pci_bus.h"
->   #include "hw/pci/pci_host.h"
->   #include "exec/address-spaces.h"
->   #include "qemu/log.h"
-> diff --git a/hw/pci/pci.c b/hw/pci/pci.c
-> index 232e7dacf8..6e11dc2fec 100644
-> --- a/hw/pci/pci.c
-> +++ b/hw/pci/pci.c
-> @@ -25,7 +25,6 @@
->   #include "hw/hw.h"
->   #include "hw/pci/pci.h"
->   #include "hw/pci/pci_bridge.h"
-> -#include "hw/pci/pci_bus.h"
->   #include "hw/pci/pci_host.h"
->   #include "monitor/monitor.h"
->   #include "net/net.h"
-> diff --git a/hw/pci/pci_bridge.c b/hw/pci/pci_bridge.c
-> index a47d257149..6a5072fcc6 100644
-> --- a/hw/pci/pci_bridge.c
-> +++ b/hw/pci/pci_bridge.c
-> @@ -31,7 +31,6 @@
->   
->   #include "qemu/osdep.h"
->   #include "hw/pci/pci_bridge.h"
-> -#include "hw/pci/pci_bus.h"
->   #include "qemu/range.h"
->   #include "qapi/error.h"
->   
-> diff --git a/hw/pci/pci_host.c b/hw/pci/pci_host.c
-> index 5eaa935cb5..3a26880f18 100644
-> --- a/hw/pci/pci_host.c
-> +++ b/hw/pci/pci_host.c
-> @@ -21,7 +21,6 @@
->   #include "qemu/osdep.h"
->   #include "hw/pci/pci.h"
->   #include "hw/pci/pci_host.h"
-> -#include "hw/pci/pci_bus.h"
->   #include "trace.h"
->   
->   /* debug PCI */
-> diff --git a/hw/pci/pcie.c b/hw/pci/pcie.c
-> index 32191f2a55..28ba4a0a72 100644
-> --- a/hw/pci/pcie.c
-> +++ b/hw/pci/pcie.c
-> @@ -25,7 +25,6 @@
->   #include "hw/pci/pcie.h"
->   #include "hw/pci/msix.h"
->   #include "hw/pci/msi.h"
-> -#include "hw/pci/pci_bus.h"
->   #include "hw/pci/pcie_regs.h"
->   #include "qemu/range.h"
->   
-> diff --git a/hw/pci/pcie_aer.c b/hw/pci/pcie_aer.c
-> index 97200742b4..171955195f 100644
-> --- a/hw/pci/pcie_aer.c
-> +++ b/hw/pci/pcie_aer.c
-> @@ -27,7 +27,6 @@
->   #include "hw/pci/pcie.h"
->   #include "hw/pci/msix.h"
->   #include "hw/pci/msi.h"
-> -#include "hw/pci/pci_bus.h"
->   #include "hw/pci/pcie_regs.h"
->   #include "qapi/error.h"
->   
-> diff --git a/hw/pci/shpc.c b/hw/pci/shpc.c
-> index 69fc14b218..7d25e5dc78 100644
-> --- a/hw/pci/shpc.c
-> +++ b/hw/pci/shpc.c
-> @@ -5,7 +5,6 @@
->   #include "qemu/error-report.h"
->   #include "hw/pci/shpc.h"
->   #include "hw/pci/pci.h"
-> -#include "hw/pci/pci_bus.h"
->   #include "hw/pci/msi.h"
->   
->   /* TODO: model power only and disabled slot states. */
-> diff --git a/hw/ppc/spapr_pci.c b/hw/ppc/spapr_pci.c
-> index 9262682116..4742cad64c 100644
-> --- a/hw/ppc/spapr_pci.c
-> +++ b/hw/ppc/spapr_pci.c
-> @@ -42,7 +42,6 @@
->   #include "qapi/qmp/qerror.h"
->   #include "hw/ppc/fdt.h"
->   #include "hw/pci/pci_bridge.h"
-> -#include "hw/pci/pci_bus.h"
->   #include "hw/pci/pci_ids.h"
->   #include "hw/ppc/spapr_drc.h"
->   #include "sysemu/device_tree.h"
-> diff --git a/hw/s390x/s390-pci-bus.c b/hw/s390x/s390-pci-bus.c
-> index 347329dd50..3a8894a36c 100644
-> --- a/hw/s390x/s390-pci-bus.c
-> +++ b/hw/s390x/s390-pci-bus.c
-> @@ -18,7 +18,6 @@
->   #include "cpu.h"
->   #include "s390-pci-bus.h"
->   #include "s390-pci-inst.h"
-> -#include "hw/pci/pci_bus.h"
->   #include "hw/pci/pci_bridge.h"
->   #include "hw/pci/msi.h"
->   #include "qemu/error-report.h"
-> diff --git a/hw/sparc64/sun4u.c b/hw/sparc64/sun4u.c
-> index 1672f256e7..078414388b 100644
-> --- a/hw/sparc64/sun4u.c
-> +++ b/hw/sparc64/sun4u.c
-> @@ -27,7 +27,6 @@
->   #include "cpu.h"
->   #include "hw/hw.h"
->   #include "hw/pci/pci.h"
-> -#include "hw/pci/pci_bus.h"
->   #include "hw/pci-host/apb.h"
->   #include "hw/i386/pc.h"
->   #include "hw/char/serial.h"
-> diff --git a/include/hw/i386/ich9.h b/include/hw/i386/ich9.h
-> index 673d13d28f..c613f85b11 100644
-> --- a/include/hw/i386/ich9.h
-> +++ b/include/hw/i386/ich9.h
-> @@ -12,7 +12,6 @@
->   #include "hw/pci/pci_bridge.h"
->   #include "hw/acpi/acpi.h"
->   #include "hw/acpi/ich9.h"
-> -#include "hw/pci/pci_bus.h"
->   
->   void ich9_lpc_set_irq(void *opaque, int irq_num, int level);
->   int ich9_lpc_map_irq(PCIDevice *pci_dev, int intx);
-> diff --git a/include/hw/pci/pci.h b/include/hw/pci/pci.h
-> index 870ebcfd4b..77d92a3dc4 100644
-> --- a/include/hw/pci/pci.h
-> +++ b/include/hw/pci/pci.h
-> @@ -392,12 +392,54 @@ typedef void (*pci_set_irq_fn)(void *opaque, int irq_num, int level);
->   typedef int (*pci_map_irq_fn)(PCIDevice *pci_dev, int irq_num);
->   typedef PCIINTxRoute (*pci_route_irq_fn)(void *opaque, int pin);
->   
-> +typedef AddressSpace *(*PCIIOMMUFunc)(PCIBus *, void *, int);
-> +
-> +/*
-> + * PCI Bus datastructures.
-> + */
-> +
->   #define TYPE_PCI_BUS "PCI"
->   #define PCI_BUS(obj) OBJECT_CHECK(PCIBus, (obj), TYPE_PCI_BUS)
->   #define PCI_BUS_CLASS(klass) OBJECT_CLASS_CHECK(PCIBusClass, (klass), TYPE_PCI_BUS)
->   #define PCI_BUS_GET_CLASS(obj) OBJECT_GET_CLASS(PCIBusClass, (obj), TYPE_PCI_BUS)
->   #define TYPE_PCIE_BUS "PCIE"
->   
-> +typedef struct PCIBusClass {
-> +    /*< private >*/
-> +    BusClass parent_class;
-> +    /*< public >*/
-> +
-> +    bool (*is_root)(PCIBus *bus);
-> +    int (*bus_num)(PCIBus *bus);
-> +    uint16_t (*numa_node)(PCIBus *bus);
-> +} PCIBusClass;
-> +
-> +struct PCIBus {
-> +    BusState qbus;
-> +    PCIIOMMUFunc iommu_fn;
-> +    void *iommu_opaque;
-> +    uint8_t devfn_min;
-> +    uint32_t slot_reserved_mask;
-> +    pci_set_irq_fn set_irq;
-> +    pci_map_irq_fn map_irq;
-> +    pci_route_irq_fn route_intx_to_irq;
-> +    void *irq_opaque;
-> +    PCIDevice *devices[PCI_SLOT_MAX * PCI_FUNC_MAX];
-> +    PCIDevice *parent_dev;
-> +    MemoryRegion *address_space_mem;
-> +    MemoryRegion *address_space_io;
-> +
-> +    QLIST_HEAD(, PCIBus) child; /* this will be replaced by qdev later */
-> +    QLIST_ENTRY(PCIBus) sibling;/* this will be replaced by qdev later */
-> +
-> +    /* The bus IRQ state is the logical OR of the connected devices.
-> +       Keep a count of the number of devices with raised IRQs.  */
-> +    int nirq;
-> +    int *irq_count;
-> +
-> +    Notifier machine_done;
-> +};
-> +
->   bool pci_bus_is_express(PCIBus *bus);
->   bool pci_bus_is_root(PCIBus *bus);
->   void pci_root_bus_new_inplace(PCIBus *bus, size_t bus_size, DeviceState *parent,
-> @@ -468,8 +510,6 @@ void pci_bus_get_w64_range(PCIBus *bus, Range *range);
->   
->   void pci_device_deassert_intx(PCIDevice *dev);
->   
-> -typedef AddressSpace *(*PCIIOMMUFunc)(PCIBus *, void *, int);
-> -
->   AddressSpace *pci_device_iommu_address_space(PCIDevice *dev);
->   void pci_setup_iommu(PCIBus *bus, PCIIOMMUFunc fn, void *opaque);
->   
-> diff --git a/include/hw/pci/pci_bridge.h b/include/hw/pci/pci_bridge.h
-> index 9b44ffd22a..454bb09951 100644
-> --- a/include/hw/pci/pci_bridge.h
-> +++ b/include/hw/pci/pci_bridge.h
-> @@ -27,7 +27,6 @@
->   #define QEMU_PCI_BRIDGE_H
->   
->   #include "hw/pci/pci.h"
-> -#include "hw/pci/pci_bus.h"
->   
->   typedef struct PCIBridgeWindows PCIBridgeWindows;
->   
-> diff --git a/include/hw/pci/pci_bus.h b/include/hw/pci/pci_bus.h
-> deleted file mode 100644
-> index b7da8f555b..0000000000
-> --- a/include/hw/pci/pci_bus.h
-> +++ /dev/null
-> @@ -1,47 +0,0 @@
-> -#ifndef QEMU_PCI_BUS_H
-> -#define QEMU_PCI_BUS_H
-> -
-> -/*
-> - * PCI Bus datastructures.
-> - *
-> - * Do not access the following members directly;
-> - * use accessor functions in pci.h
-> - */
-> -
-> -typedef struct PCIBusClass {
-> -    /*< private >*/
-> -    BusClass parent_class;
-> -    /*< public >*/
-> -
-> -    bool (*is_root)(PCIBus *bus);
-> -    int (*bus_num)(PCIBus *bus);
-> -    uint16_t (*numa_node)(PCIBus *bus);
-> -} PCIBusClass;
-> -
-> -struct PCIBus {
-> -    BusState qbus;
-> -    PCIIOMMUFunc iommu_fn;
-> -    void *iommu_opaque;
-> -    uint8_t devfn_min;
-> -    uint32_t slot_reserved_mask;
-> -    pci_set_irq_fn set_irq;
-> -    pci_map_irq_fn map_irq;
-> -    pci_route_irq_fn route_intx_to_irq;
-> -    void *irq_opaque;
-> -    PCIDevice *devices[PCI_SLOT_MAX * PCI_FUNC_MAX];
-> -    PCIDevice *parent_dev;
-> -    MemoryRegion *address_space_mem;
-> -    MemoryRegion *address_space_io;
-> -
-> -    QLIST_HEAD(, PCIBus) child; /* this will be replaced by qdev later */
-> -    QLIST_ENTRY(PCIBus) sibling;/* this will be replaced by qdev later */
-> -
-> -    /* The bus IRQ state is the logical OR of the connected devices.
-> -       Keep a count of the number of devices with raised IRQs.  */
-> -    int nirq;
-> -    int *irq_count;
-> -
-> -    Notifier machine_done;
-> -};
-> -
-> -#endif /* QEMU_PCI_BUS_H */
-> diff --git a/include/hw/pci/pcie_port.h b/include/hw/pci/pcie_port.h
-> index 0736014bfd..bda76d79e0 100644
-> --- a/include/hw/pci/pcie_port.h
-> +++ b/include/hw/pci/pcie_port.h
-> @@ -22,7 +22,6 @@
->   #define QEMU_PCIE_PORT_H
->   
->   #include "hw/pci/pci_bridge.h"
-> -#include "hw/pci/pci_bus.h"
->   
->   #define TYPE_PCIE_PORT "pcie-port"
->   #define PCIE_PORT(obj) OBJECT_CHECK(PCIEPort, (obj), TYPE_PCIE_PORT)
-> 
+-- 
+Eduardo
