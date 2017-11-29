@@ -1,21 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59228)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:32804)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ppandit@redhat.com>) id 1eK6Pe-0004VE-V9
-	for qemu-devel@nongnu.org; Wed, 29 Nov 2017 12:44:48 -0500
+	(envelope-from <richard.henderson@linaro.org>) id 1eK6XQ-0007ww-UZ
+	for qemu-devel@nongnu.org; Wed, 29 Nov 2017 12:52:49 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ppandit@redhat.com>) id 1eK6Pe-0001az-5z
-	for qemu-devel@nongnu.org; Wed, 29 Nov 2017 12:44:46 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:37858)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ppandit@redhat.com>) id 1eK6Pd-0001Zp-W7
-	for qemu-devel@nongnu.org; Wed, 29 Nov 2017 12:44:46 -0500
-From: P J P <ppandit@redhat.com>
-Date: Wed, 29 Nov 2017 23:14:28 +0530
-Message-Id: <20171129174428.27548-3-ppandit@redhat.com>
-In-Reply-To: <20171129174428.27548-1-ppandit@redhat.com>
-References: <20171129174428.27548-1-ppandit@redhat.com>
-Subject: [Qemu-devel] [PATCH v4 2/2] tests: add test to check VirtQueue
- object
+	(envelope-from <richard.henderson@linaro.org>) id 1eK6XM-0002WL-0G
+	for qemu-devel@nongnu.org; Wed, 29 Nov 2017 12:52:49 -0500
+Received: from mail-wm0-x242.google.com ([2a00:1450:400c:c09::242]:42749)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+	id 1eK6XL-0002VY-Om
+	for qemu-devel@nongnu.org; Wed, 29 Nov 2017 12:52:43 -0500
+Received: by mail-wm0-x242.google.com with SMTP id l141so8063689wmg.1
+	for <qemu-devel@nongnu.org>; Wed, 29 Nov 2017 09:52:43 -0800 (PST)
+References: <20171128203326.6062-1-david@redhat.com>
+	<20171128203326.6062-8-david@redhat.com>
+From: Richard Henderson <richard.henderson@linaro.org>
+Message-ID: <93989767-eceb-149b-e96f-309870d2a065@linaro.org>
+Date: Wed, 29 Nov 2017 17:52:40 +0000
+MIME-Version: 1.0
+In-Reply-To: <20171128203326.6062-8-david@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v1 for-2.12 07/15] s390x: handle exceptions
+ during s390_cpu_virt_mem_rw() correctly (TCG)
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,62 +32,24 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Qemu Developers <qemu-devel@nongnu.org>
-Cc: Cornelia Huck <cohuck@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, zhangboxian <zhangboxian@huawei.com>, Paolo Bonzini <pbonzini@redhat.com>, Prasad J Pandit <pjp@fedoraproject.org>
+To: David Hildenbrand <david@redhat.com>, qemu-s390x@nongnu.org, qemu-devel@nongnu.org
+Cc: Christian Borntraeger <borntraeger@de.ibm.com>, Cornelia Huck <cohuck@redhat.com>, Alexander Graf <agraf@suse.de>
 
-From: Prasad J Pandit <pjp@fedoraproject.org>
+On 11/28/2017 08:33 PM, David Hildenbrand wrote:
+> +void s390_cpu_virt_mem_handle_exc(S390CPU *cpu, uintptr_t ra)
+> +{
+> +    /* KVM will handle the interrupt automatically, TCG has to exit the TB */
+> +    #ifdef CONFIG_TCG
+> +    if (tcg_enabled()) {
+> +        if (ra) {
+> +            cpu_restore_state(CPU(cpu), ra);
+> +        }
+> +        cpu_loop_exit(CPU(cpu));
+> +    }
 
-An uninitialised VirtQueue object or one with Vring.align field
-set to zero(0) could lead to arithmetic exceptions. Add a unit
-test to validate it.
+In addition to everything else,
 
-Signed-off-by: Prasad J Pandit <pjp@fedoraproject.org>
----
- tests/virtio-blk-test.c | 25 +++++++++++++++++++++++++
- 1 file changed, 25 insertions(+)
+  cpu_loop_exit_restore(CPU(cpu), ra);
 
-diff --git a/tests/virtio-blk-test.c b/tests/virtio-blk-test.c
-index e6fb9bac87..45f368dcd9 100644
---- a/tests/virtio-blk-test.c
-+++ b/tests/virtio-blk-test.c
-@@ -674,6 +674,30 @@ static void pci_hotplug(void)
-     qtest_shutdown(qs);
- }
- 
-+/*
-+ * Check that setting the vring addr on a non-existent virtqueue does
-+ * not crash.
-+ */
-+static void test_nonexistent_virtqueue(void)
-+{
-+    QPCIBar bar0;
-+    QOSState *qs;
-+    QPCIDevice *dev;
-+
-+    qs = pci_test_start();
-+    dev = qpci_device_find(qs->pcibus, QPCI_DEVFN(4, 0));
-+    g_assert(dev != NULL);
-+
-+    qpci_device_enable(dev);
-+    bar0 = qpci_iomap(dev, 0, NULL);
-+
-+    qpci_io_writeb(dev, bar0, VIRTIO_PCI_QUEUE_SEL, 2);
-+    qpci_io_writel(dev, bar0, VIRTIO_PCI_QUEUE_PFN, 1);
-+
-+    g_free(dev);
-+    qtest_shutdown(qs);
-+}
-+
- static void mmio_basic(void)
- {
-     QVirtioMMIODevice *dev;
-@@ -724,6 +748,7 @@ int main(int argc, char **argv)
-         qtest_add_func("/virtio/blk/pci/basic", pci_basic);
-         qtest_add_func("/virtio/blk/pci/indirect", pci_indirect);
-         qtest_add_func("/virtio/blk/pci/config", pci_config);
-+        qtest_add_func("/virtio/blk/pci/nxvirtq", test_nonexistent_virtqueue);
-         if (strcmp(arch, "i386") == 0 || strcmp(arch, "x86_64") == 0) {
-             qtest_add_func("/virtio/blk/pci/msix", pci_msix);
-             qtest_add_func("/virtio/blk/pci/idx", pci_idx);
--- 
-2.13.6
+
+r~
