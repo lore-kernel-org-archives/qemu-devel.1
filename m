@@ -1,21 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58933)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58961)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <wei.w.wang@intel.com>) id 1eK35E-0001hw-K5
-	for qemu-devel@nongnu.org; Wed, 29 Nov 2017 09:11:31 -0500
+	(envelope-from <wei.w.wang@intel.com>) id 1eK35J-0001mJ-Fi
+	for qemu-devel@nongnu.org; Wed, 29 Nov 2017 09:11:35 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <wei.w.wang@intel.com>) id 1eK35A-00044M-JS
-	for qemu-devel@nongnu.org; Wed, 29 Nov 2017 09:11:28 -0500
+	(envelope-from <wei.w.wang@intel.com>) id 1eK35H-0004Cz-R3
+	for qemu-devel@nongnu.org; Wed, 29 Nov 2017 09:11:33 -0500
 Received: from mga01.intel.com ([192.55.52.88]:52215)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <wei.w.wang@intel.com>)
-	id 1eK35A-0003cm-3T
-	for qemu-devel@nongnu.org; Wed, 29 Nov 2017 09:11:24 -0500
+	id 1eK35H-0003cm-Df
+	for qemu-devel@nongnu.org; Wed, 29 Nov 2017 09:11:31 -0500
 From: Wei Wang <wei.w.wang@intel.com>
-Date: Wed, 29 Nov 2017 21:55:19 +0800
-Message-Id: <1511963726-34070-4-git-send-email-wei.w.wang@intel.com>
+Date: Wed, 29 Nov 2017 21:55:21 +0800
+Message-Id: <1511963726-34070-6-git-send-email-wei.w.wang@intel.com>
 In-Reply-To: <1511963726-34070-1-git-send-email-wei.w.wang@intel.com>
 References: <1511963726-34070-1-git-send-email-wei.w.wang@intel.com>
-Subject: [Qemu-devel] [PATCH v18 03/10] xbitmap: Introduce xbitmap
+Subject: [Qemu-devel] [PATCH v18 05/10] xbitmap: add more operations
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,434 +27,332 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: virtio-dev@lists.oasis-open.org, linux-kernel@vger.kernel.org, qemu-devel@nongnu.org, virtualization@lists.linux-foundation.org, kvm@vger.kernel.org, linux-mm@kvack.org, mst@redhat.com, mhocko@kernel.org, akpm@linux-foundation.org, mawilcox@microsoft.com
 Cc: david@redhat.com, penguin-kernel@I-love.SAKURA.ne.jp, cornelia.huck@de.ibm.com, mgorman@techsingularity.net, aarcange@redhat.com, amit.shah@redhat.com, pbonzini@redhat.com, willy@infradead.org, wei.w.wang@intel.com, liliang.opensource@gmail.com, yang.zhang.wz@gmail.com, quan.xu@aliyun.com, nilal@redhat.com, riel@redhat.com
 
-From: Matthew Wilcox <mawilcox@microsoft.com>
+This patch adds support to find next 1 or 0 bit in a xbmitmap range and
+clear a range of bits.
 
-The eXtensible Bitmap is a sparse bitmap representation which is
-efficient for set bits which tend to cluster.  It supports up to
-'unsigned long' worth of bits, and this commit adds the bare bones --
-xb_set_bit(), xb_clear_bit() and xb_test_bit().
+More possible optimizations to add in the future:
+1) xb_set_bit_range: set a range of bits.
+2) when searching a bit, if the bit is not found in the slot, move on to
+the next slot directly.
+3) add tags to help searching.
 
 Signed-off-by: Wei Wang <wei.w.wang@intel.com>
+Cc: Matthew Wilcox <mawilcox@microsoft.com>
+Cc: Andrew Morton <akpm@linux-foundation.org>
+Cc: Michal Hocko <mhocko@kernel.org>
+Cc: Michael S. Tsirkin <mst@redhat.com>
+Cc: Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>
+Suggested-by: Matthew Wilcox <mawilcox@microsoft.com>
 ---
- include/linux/radix-tree.h               |   2 +
- include/linux/xbitmap.h                  |  52 +++++++++
- lib/Makefile                             |   2 +-
- lib/radix-tree.c                         |  26 ++++-
- lib/xbitmap.c                            | 179 +++++++++++++++++++++++++++++++
- tools/testing/radix-tree/Makefile        |  12 ++-
- tools/testing/radix-tree/linux/xbitmap.h |   1 +
- tools/testing/radix-tree/main.c          |   4 +
- tools/testing/radix-tree/test.h          |   1 +
- 9 files changed, 275 insertions(+), 4 deletions(-)
- create mode 100644 include/linux/xbitmap.h
- create mode 100644 lib/xbitmap.c
- create mode 100644 tools/testing/radix-tree/linux/xbitmap.h
+ include/linux/xbitmap.h      |   8 +-
+ lib/xbitmap.c                | 180 +++++++++++++++++++++++++++++++++++++++++++
+ tools/include/linux/bitmap.h |  34 ++++++++
+ tools/include/linux/kernel.h |   2 +
+ 4 files changed, 223 insertions(+), 1 deletion(-)
 
-diff --git a/include/linux/radix-tree.h b/include/linux/radix-tree.h
-index 23a9c89..fe44f4b 100644
---- a/include/linux/radix-tree.h
-+++ b/include/linux/radix-tree.h
-@@ -315,6 +315,8 @@ void radix_tree_iter_delete(struct radix_tree_root *,
- 			struct radix_tree_iter *iter, void __rcu **slot);
- void *radix_tree_delete_item(struct radix_tree_root *, unsigned long, void *);
- void *radix_tree_delete(struct radix_tree_root *, unsigned long);
-+bool __radix_tree_delete(struct radix_tree_root *r, struct radix_tree_node *n,
-+				void **slot);
- void radix_tree_clear_tags(struct radix_tree_root *, struct radix_tree_node *,
- 			   void __rcu **slot);
- unsigned int radix_tree_gang_lookup(const struct radix_tree_root *,
 diff --git a/include/linux/xbitmap.h b/include/linux/xbitmap.h
-new file mode 100644
-index 0000000..ed75d87
---- /dev/null
+index b4d8375..eddf0d5e 100644
+--- a/include/linux/xbitmap.h
 +++ b/include/linux/xbitmap.h
-@@ -0,0 +1,52 @@
-+/*
-+ * eXtensible Bitmaps
-+ * Copyright (c) 2017 Microsoft Corporation <mawilcox@microsoft.com>
-+ *
-+ * This program is free software; you can redistribute it and/or
-+ * modify it under the terms of the GNU General Public License as
-+ * published by the Free Software Foundation; either version 2 of the
-+ * License, or (at your option) any later version.
-+ *
-+ * This program is distributed in the hope that it will be useful,
-+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+ * GNU General Public License for more details.
-+ *
-+ * eXtensible Bitmaps provide an unlimited-size sparse bitmap facility.
-+ * All bits are initially zero.
-+ */
-+
-+#include <linux/idr.h>
-+
-+struct xb {
-+	struct radix_tree_root xbrt;
-+};
-+
-+#define XB_INIT {							\
-+	.xbrt = RADIX_TREE_INIT(IDR_RT_MARKER | GFP_NOWAIT),		\
-+}
-+#define DEFINE_XB(name)		struct xb name = XB_INIT
-+
-+static inline void xb_init(struct xb *xb)
-+{
-+	INIT_RADIX_TREE(&xb->xbrt, IDR_RT_MARKER | GFP_NOWAIT);
-+}
-+
-+int xb_set_bit(struct xb *xb, unsigned long bit);
-+bool xb_test_bit(const struct xb *xb, unsigned long bit);
-+int xb_clear_bit(struct xb *xb, unsigned long bit);
-+
-+int xb_zero(struct xb *xb, unsigned long start, unsigned long nbits);
-+int xb_fill(struct xb *xb, unsigned long start, unsigned long nbits);
-+
-+static inline bool xb_empty(const struct xb *xb)
-+{
-+	return radix_tree_empty(&xb->xbrt);
-+}
-+
-+void xb_preload(gfp_t);
-+
-+static inline void xb_preload_end(void)
-+{
-+	preempt_enable();
-+}
-diff --git a/lib/Makefile b/lib/Makefile
-index d11c48e..08a8183 100644
---- a/lib/Makefile
-+++ b/lib/Makefile
-@@ -19,7 +19,7 @@ KCOV_INSTRUMENT_dynamic_debug.o := n
- 
- lib-y := ctype.o string.o vsprintf.o cmdline.o \
- 	 rbtree.o radix-tree.o dump_stack.o timerqueue.o\
--	 idr.o int_sqrt.o extable.o \
-+	 idr.o xbitmap.o int_sqrt.o extable.o \
- 	 sha1.o chacha20.o irq_regs.o argv_split.o \
- 	 flex_proportions.o ratelimit.o show_mem.o \
- 	 is_single_threaded.o plist.o decompress.o kobject_uevent.o \
-diff --git a/lib/radix-tree.c b/lib/radix-tree.c
-index c8d5556..7000ad6 100644
---- a/lib/radix-tree.c
-+++ b/lib/radix-tree.c
-@@ -78,6 +78,14 @@ static struct kmem_cache *radix_tree_node_cachep;
- #define IDA_PRELOAD_SIZE	(IDA_MAX_PATH * 2 - 1)
- 
- /*
-+ * The XB can go up to unsigned long, but also uses a bitmap.
-+ */
-+#define XB_INDEX_BITS		(BITS_PER_LONG - ilog2(IDA_BITMAP_BITS))
-+#define XB_MAX_PATH		(DIV_ROUND_UP(XB_INDEX_BITS, \
-+						RADIX_TREE_MAP_SHIFT))
-+#define XB_PRELOAD_SIZE		(XB_MAX_PATH * 2 - 1)
-+
-+/*
-  * Per-cpu pool of preloaded nodes
-  */
- struct radix_tree_preload {
-@@ -839,6 +847,8 @@ int __radix_tree_create(struct radix_tree_root *root, unsigned long index,
- 							offset, 0, 0);
- 			if (!child)
- 				return -ENOMEM;
-+			if (is_idr(root))
-+				all_tag_set(child, IDR_FREE);
- 			rcu_assign_pointer(*slot, node_to_entry(child));
- 			if (node)
- 				node->count++;
-@@ -1982,7 +1992,7 @@ void __radix_tree_delete_node(struct radix_tree_root *root,
- 	delete_node(root, node, update_node);
+@@ -33,8 +33,14 @@ static inline void xb_init(struct xb *xb)
  }
  
--static bool __radix_tree_delete(struct radix_tree_root *root,
-+bool __radix_tree_delete(struct radix_tree_root *root,
- 				struct radix_tree_node *node, void __rcu **slot)
+ int xb_set_bit(struct xb *xb, unsigned long bit);
++int xb_preload_and_set_bit(struct xb *xb, unsigned long bit, gfp_t gfp);
+ bool xb_test_bit(const struct xb *xb, unsigned long bit);
+-int xb_clear_bit(struct xb *xb, unsigned long bit);
++void xb_clear_bit(struct xb *xb, unsigned long bit);
++unsigned long xb_find_next_set_bit(struct xb *xb, unsigned long start,
++				   unsigned long end);
++unsigned long xb_find_next_zero_bit(struct xb *xb, unsigned long start,
++				    unsigned long end);
++void xb_clear_bit_range(struct xb *xb, unsigned long start, unsigned long end);
+ 
+ static inline bool xb_empty(const struct xb *xb)
  {
- 	void *old = rcu_dereference_raw(*slot);
-@@ -2135,6 +2145,20 @@ int ida_pre_get(struct ida *ida, gfp_t gfp)
- }
- EXPORT_SYMBOL(ida_pre_get);
- 
-+void xb_preload(gfp_t gfp)
-+{
-+	__radix_tree_preload(gfp, XB_PRELOAD_SIZE);
-+	if (!this_cpu_read(ida_bitmap)) {
-+		struct ida_bitmap *bitmap = kmalloc(sizeof(*bitmap), gfp);
-+
-+		if (!bitmap)
-+			return;
-+		bitmap = this_cpu_cmpxchg(ida_bitmap, NULL, bitmap);
-+		kfree(bitmap);
-+	}
-+}
-+EXPORT_SYMBOL(xb_preload);
-+
- void __rcu **idr_get_free_cmn(struct radix_tree_root *root,
- 			      struct radix_tree_iter *iter, gfp_t gfp,
- 			      unsigned long max)
 diff --git a/lib/xbitmap.c b/lib/xbitmap.c
-new file mode 100644
-index 0000000..2b547a73
---- /dev/null
+index 182aa29..816dd3e 100644
+--- a/lib/xbitmap.c
 +++ b/lib/xbitmap.c
-@@ -0,0 +1,179 @@
-+#include <linux/export.h>
-+#include <linux/xbitmap.h>
-+#include <linux/bitmap.h>
-+#include <linux/slab.h>
+@@ -3,6 +3,13 @@
+ #include <linux/bitmap.h>
+ #include <linux/slab.h>
+ 
++/*
++ * Developer notes: locks are required to gurantee there is no concurrent
++ * calls of xb_set_bit, xb_clear_bit, xb_clear_bit_range, xb_test_bit,
++ * xb_find_next_set_bit, or xb_find_next_clear_bit to operate on the same
++ * ida bitamp.
++ */
 +
-+/**
-+ *  xb_set_bit - set a bit in the xbitmap
+ /**
+  *  xb_set_bit - set a bit in the xbitmap
+  *  @xb: the xbitmap tree used to record the bit
+@@ -70,6 +77,28 @@ int xb_set_bit(struct xb *xb, unsigned long bit)
+ EXPORT_SYMBOL(xb_set_bit);
+ 
+ /**
++ *  xb_preload_and_set_bit - preload the memory and set a bit in the xbitmap
 + *  @xb: the xbitmap tree used to record the bit
 + *  @bit: index of the bit to set
 + *
-+ * This function is used to set a bit in the xbitmap. If the bitmap that @bit
-+ * resides in is not there, the per-cpu ida_bitmap will be taken.
-+ *
-+ * Returns: 0 on success. %-EAGAIN indicates that @bit was not set.
++ * A wrapper of the xb_preload() and xb_set_bit().
++ * Returns: 0 on success; -EAGAIN or -ENOMEM on error.
 + */
-+int xb_set_bit(struct xb *xb, unsigned long bit)
++int xb_preload_and_set_bit(struct xb *xb, unsigned long bit, gfp_t gfp)
 +{
-+	int err;
-+	unsigned long index = bit / IDA_BITMAP_BITS;
-+	struct radix_tree_root *root = &xb->xbrt;
-+	struct radix_tree_node *node;
-+	void **slot;
-+	struct ida_bitmap *bitmap;
-+	unsigned long ebit;
++	int ret = 0;
 +
-+	bit %= IDA_BITMAP_BITS;
-+	ebit = bit + 2;
++	if (!xb_preload(gfp))
++		return -ENOMEM;
 +
-+	err = __radix_tree_create(root, index, 0, &node, &slot);
-+	if (err)
-+		return err;
-+	bitmap = rcu_dereference_raw(*slot);
-+	if (radix_tree_exception(bitmap)) {
-+		unsigned long tmp = (unsigned long)bitmap;
++	ret = xb_set_bit(xb, bit);
++	xb_preload_end();
 +
-+		if (ebit < BITS_PER_LONG) {
-+			tmp |= 1UL << ebit;
-+			rcu_assign_pointer(*slot, (void *)tmp);
-+			return 0;
-+		}
-+		bitmap = this_cpu_xchg(ida_bitmap, NULL);
-+		if (!bitmap)
-+			return -EAGAIN;
-+		memset(bitmap, 0, sizeof(*bitmap));
-+		bitmap->bitmap[0] = tmp >> RADIX_TREE_EXCEPTIONAL_SHIFT;
-+		rcu_assign_pointer(*slot, bitmap);
-+	}
-+
-+	if (!bitmap) {
-+		if (ebit < BITS_PER_LONG) {
-+			bitmap = (void *)((1UL << ebit) |
-+					RADIX_TREE_EXCEPTIONAL_ENTRY);
-+			__radix_tree_replace(root, node, slot, bitmap, NULL);
-+			return 0;
-+		}
-+		bitmap = this_cpu_xchg(ida_bitmap, NULL);
-+		if (!bitmap)
-+			return -EAGAIN;
-+		memset(bitmap, 0, sizeof(*bitmap));
-+		__radix_tree_replace(root, node, slot, bitmap, NULL);
-+	}
-+
-+	__set_bit(bit, bitmap->bitmap);
-+	return 0;
++	return ret;
 +}
-+EXPORT_SYMBOL(xb_set_bit);
++EXPORT_SYMBOL(xb_preload_and_set_bit);
 +
 +/**
-+ * xb_clear_bit - clear a bit in the xbitmap
-+ * @xb: the xbitmap tree used to record the bit
-+ * @bit: index of the bit to clear
+  * xb_clear_bit - clear a bit in the xbitmap
+  * @xb: the xbitmap tree used to record the bit
+  * @bit: index of the bit to clear
+@@ -115,6 +144,56 @@ void xb_clear_bit(struct xb *xb, unsigned long bit)
+ EXPORT_SYMBOL(xb_clear_bit);
+ 
+ /**
++ * xb_clear_bit - clear a range of bits in the xbitmap
++ * @start: the start of the bit range, inclusive
++ * @end: the end of the bit range, inclusive
 + *
 + * This function is used to clear a bit in the xbitmap. If all the bits of the
 + * bitmap are 0, the bitmap will be freed.
 + */
-+int xb_clear_bit(struct xb *xb, unsigned long bit)
++void xb_clear_bit_range(struct xb *xb, unsigned long start, unsigned long end)
 +{
-+	unsigned long index = bit / IDA_BITMAP_BITS;
 +	struct radix_tree_root *root = &xb->xbrt;
 +	struct radix_tree_node *node;
 +	void **slot;
 +	struct ida_bitmap *bitmap;
-+	unsigned long ebit;
++	unsigned int nbits;
 +
-+	bit %= IDA_BITMAP_BITS;
-+	ebit = bit + 2;
++	for (; start < end; start = (start | (IDA_BITMAP_BITS - 1)) + 1) {
++		unsigned long index = start / IDA_BITMAP_BITS;
++		unsigned long bit = start % IDA_BITMAP_BITS;
 +
-+	bitmap = __radix_tree_lookup(root, index, &node, &slot);
-+	if (radix_tree_exception(bitmap)) {
-+		unsigned long tmp = (unsigned long)bitmap;
++		bitmap = __radix_tree_lookup(root, index, &node, &slot);
++		if (radix_tree_exception(bitmap)) {
++			unsigned long ebit = bit + 2;
++			unsigned long tmp = (unsigned long)bitmap;
 +
-+		if (ebit >= BITS_PER_LONG)
-+			return 0;
-+		tmp &= ~(1UL << ebit);
-+		if (tmp == RADIX_TREE_EXCEPTIONAL_ENTRY)
-+			__radix_tree_delete(root, node, slot);
-+		else
-+			rcu_assign_pointer(*slot, (void *)tmp);
-+		return 0;
++			nbits = min(end - start + 1, BITS_PER_LONG - ebit);
++
++			if (ebit >= BITS_PER_LONG)
++				continue;
++			bitmap_clear(&tmp, ebit, nbits);
++			if (tmp == RADIX_TREE_EXCEPTIONAL_ENTRY)
++				__radix_tree_delete(root, node, slot);
++			else
++				rcu_assign_pointer(*slot, (void *)tmp);
++		} else if (bitmap) {
++			nbits = min(end - start + 1, IDA_BITMAP_BITS - bit);
++
++			if (nbits != IDA_BITMAP_BITS)
++				bitmap_clear(bitmap->bitmap, bit, nbits);
++
++			if (nbits == IDA_BITMAP_BITS ||
++			    bitmap_empty(bitmap->bitmap, IDA_BITMAP_BITS)) {
++				kfree(bitmap);
++				__radix_tree_delete(root, node, slot);
++			}
++		}
 +	}
-+
-+	if (!bitmap)
-+		return 0;
-+
-+	__clear_bit(bit, bitmap->bitmap);
-+	if (bitmap_empty(bitmap->bitmap, IDA_BITMAP_BITS)) {
-+		kfree(bitmap);
-+		__radix_tree_delete(root, node, slot);
-+	}
-+
-+	return 0;
 +}
-+EXPORT_SYMBOL(xb_clear_bit);
++EXPORT_SYMBOL(xb_clear_bit_range);
 +
 +/**
-+ * xb_test_bit - test a bit in the xbitmap
-+ * @xb: the xbitmap tree used to record the bit
-+ * @bit: index of the bit to test
-+ *
-+ * This function is used to test a bit in the xbitmap.
-+ *
-+ * Returns: true if the bit is set, or false otherwise.
-+ */
-+bool xb_test_bit(const struct xb *xb, unsigned long bit)
+  * xb_test_bit - test a bit in the xbitmap
+  * @xb: the xbitmap tree used to record the bit
+  * @bit: index of the bit to test
+@@ -143,6 +222,80 @@ bool xb_test_bit(const struct xb *xb, unsigned long bit)
+ }
+ EXPORT_SYMBOL(xb_test_bit);
+ 
++static unsigned long xb_find_next_bit(struct xb *xb, unsigned long start,
++				      unsigned long end, bool set)
 +{
-+	unsigned long index = bit / IDA_BITMAP_BITS;
-+	const struct radix_tree_root *root = &xb->xbrt;
-+	struct ida_bitmap *bitmap = radix_tree_lookup(root, index);
++	struct radix_tree_root *root = &xb->xbrt;
++	struct radix_tree_node *node;
++	void **slot;
++	struct ida_bitmap *bmap;
++	unsigned long ret = end + 1;
 +
-+	bit %= IDA_BITMAP_BITS;
++	for (; start < end; start = (start | (IDA_BITMAP_BITS - 1)) + 1) {
++		unsigned long index = start / IDA_BITMAP_BITS;
++		unsigned long bit = start % IDA_BITMAP_BITS;
 +
-+	if (!bitmap)
-+		return false;
-+	if (radix_tree_exception(bitmap)) {
-+		bit += RADIX_TREE_EXCEPTIONAL_SHIFT;
-+		if (bit > BITS_PER_LONG)
-+			return false;
-+		return (unsigned long)bitmap & (1UL << bit);
++		bmap = __radix_tree_lookup(root, index, &node, &slot);
++		if (radix_tree_exception(bmap)) {
++			unsigned long tmp = (unsigned long)bmap;
++			unsigned long ebit = bit + 2;
++
++			if (ebit >= BITS_PER_LONG)
++				continue;
++			if (set)
++				ret = find_next_bit(&tmp, BITS_PER_LONG, ebit);
++			else
++				ret = find_next_zero_bit(&tmp, BITS_PER_LONG,
++							 ebit);
++			if (ret < BITS_PER_LONG)
++				return ret - 2 + IDA_BITMAP_BITS * index;
++		} else if (bmap) {
++			if (set)
++				ret = find_next_bit(bmap->bitmap,
++						    IDA_BITMAP_BITS, bit);
++			else
++				ret = find_next_zero_bit(bmap->bitmap,
++							 IDA_BITMAP_BITS, bit);
++			if (ret < IDA_BITMAP_BITS)
++				return ret + index * IDA_BITMAP_BITS;
++		} else if (!bmap && !set) {
++			return start;
++		}
 +	}
-+	return test_bit(bit, bitmap->bitmap);
++
++	return ret;
 +}
-+EXPORT_SYMBOL(xb_test_bit);
 +
-+#ifndef __KERNEL__
-+
-+static DEFINE_XB(xb1);
-+
-+void xbitmap_check_bit(unsigned long bit)
++/**
++ * xb_find_next_set_bit - find the next set bit in a range
++ * @xb: the xbitmap to search
++ * @start: the start of the range, inclusive
++ * @end: the end of the range, inclusive
++ *
++ * Returns: the index of the found bit, or @end + 1 if no such bit is found.
++ */
++unsigned long xb_find_next_set_bit(struct xb *xb, unsigned long start,
++				   unsigned long end)
 +{
-+	xb_preload(GFP_KERNEL);
-+	assert(!xb_test_bit(&xb1, bit));
-+	assert(xb_set_bit(&xb1, bit) == 0);
-+	assert(xb_test_bit(&xb1, bit));
-+	assert(xb_clear_bit(&xb1, bit) == 0);
-+	assert(xb_empty(&xb1));
-+	assert(xb_clear_bit(&xb1, bit) == 0);
-+	assert(xb_empty(&xb1));
-+	xb_preload_end();
++	return xb_find_next_bit(xb, start, end, 1);
 +}
++EXPORT_SYMBOL(xb_find_next_set_bit);
 +
-+void xbitmap_checks(void)
++/**
++ * xb_find_next_zero_bit - find the next zero bit in a range
++ * @xb: the xbitmap to search
++ * @start: the start of the range, inclusive
++ * @end: the end of the range, inclusive
++ *
++ * Returns: the index of the found bit, or @end + 1 if no such bit is found.
++ */
++unsigned long xb_find_next_zero_bit(struct xb *xb, unsigned long start,
++				    unsigned long end)
 +{
-+	xb_init(&xb1);
-+	xbitmap_check_bit(0);
-+	xbitmap_check_bit(30);
-+	xbitmap_check_bit(31);
-+	xbitmap_check_bit(1023);
-+	xbitmap_check_bit(1024);
-+	xbitmap_check_bit(1025);
-+	xbitmap_check_bit((1UL << 63) | (1UL << 24));
-+	xbitmap_check_bit((1UL << 63) | (1UL << 24) | 70);
++	return xb_find_next_bit(xb, start, end, 0);
 +}
++EXPORT_SYMBOL(xb_find_next_zero_bit);
 +
-+int __weak main(void)
+ #ifndef __KERNEL__
+ 
+ static DEFINE_XB(xb1);
+@@ -160,6 +313,31 @@ void xbitmap_check_bit(unsigned long bit)
+ 	xb_preload_end();
+ }
+ 
++static void xbitmap_check_bit_range(void)
 +{
-+	radix_tree_init();
-+	xbitmap_checks();
++	/* Set a range of bits */
++	assert(!xb_preload_and_set_bit(&xb1, 1060, GFP_KERNEL));
++	assert(!xb_preload_and_set_bit(&xb1, 1061, GFP_KERNEL));
++	assert(!xb_preload_and_set_bit(&xb1, 1064, GFP_KERNEL));
++	assert(!xb_preload_and_set_bit(&xb1, 1065, GFP_KERNEL));
++	assert(!xb_preload_and_set_bit(&xb1, 8180, GFP_KERNEL));
++	assert(!xb_preload_and_set_bit(&xb1, 8181, GFP_KERNEL));
++	assert(!xb_preload_and_set_bit(&xb1, 8190, GFP_KERNEL));
++	assert(!xb_preload_and_set_bit(&xb1, 8191, GFP_KERNEL));
++
++	/* Test a range of bits */
++	assert(xb_find_next_set_bit(&xb1, 0, 10000) == 1060);
++	assert(xb_find_next_zero_bit(&xb1, 1061, 10000) == 1062);
++	assert(xb_find_next_set_bit(&xb1, 1062, 10000) == 1064);
++	assert(xb_find_next_zero_bit(&xb1, 1065, 10000) == 1066);
++	assert(xb_find_next_set_bit(&xb1, 1066, 10000) == 8180);
++	assert(xb_find_next_zero_bit(&xb1, 8180, 10000) == 8182);
++	xb_clear_bit_range(&xb1, 0, 20000);
++	assert(xb_find_next_set_bit(&xb1, 0, 10000) == 10001);
++
++	assert(xb_find_next_zero_bit(&xb1, 20000, 30000) == 20000);
 +}
-+#endif
-diff --git a/tools/testing/radix-tree/Makefile b/tools/testing/radix-tree/Makefile
-index fa7ee36..34ece78 100644
---- a/tools/testing/radix-tree/Makefile
-+++ b/tools/testing/radix-tree/Makefile
-@@ -6,7 +6,8 @@ LDLIBS+= -lpthread -lurcu
- TARGETS = main idr-test multiorder
- CORE_OFILES := radix-tree.o idr.o linux.o test.o find_bit.o
- OFILES = main.o $(CORE_OFILES) regression1.o regression2.o regression3.o \
--	 tag_check.o multiorder.o idr-test.o iteration_check.o benchmark.o
-+	 tag_check.o multiorder.o idr-test.o iteration_check.o benchmark.o \
-+	 xbitmap.o
- 
- ifndef SHIFT
- 	SHIFT=3
-@@ -25,8 +26,11 @@ idr-test: idr-test.o $(CORE_OFILES)
- 
- multiorder: multiorder.o $(CORE_OFILES)
- 
-+xbitmap: xbitmap.o $(CORE_OFILES)
-+	$(CC) $(CFLAGS) $(LDFLAGS) $^ -o xbitmap
 +
- clean:
--	$(RM) $(TARGETS) *.o radix-tree.c idr.c generated/map-shift.h
-+	$(RM) $(TARGETS) *.o radix-tree.c idr.c xbitmap.c generated/map-shift.h
- 
- vpath %.c ../../lib
- 
-@@ -34,6 +38,7 @@ $(OFILES): Makefile *.h */*.h generated/map-shift.h \
- 	../../include/linux/*.h \
- 	../../include/asm/*.h \
- 	../../../include/linux/radix-tree.h \
-+	../../../include/linux/xbitmap.h \
- 	../../../include/linux/idr.h
- 
- radix-tree.c: ../../../lib/radix-tree.c
-@@ -42,6 +47,9 @@ radix-tree.c: ../../../lib/radix-tree.c
- idr.c: ../../../lib/idr.c
- 	sed -e 's/^static //' -e 's/__always_inline //' -e 's/inline //' < $< > $@
- 
-+xbitmap.c: ../../../lib/xbitmap.c
-+	sed -e 's/^static //' -e 's/__always_inline //' -e 's/inline //' < $< > $@
+ void xbitmap_checks(void)
+ {
+ 	xb_init(&xb1);
+@@ -171,6 +349,8 @@ void xbitmap_checks(void)
+ 	xbitmap_check_bit(1025);
+ 	xbitmap_check_bit((1UL << 63) | (1UL << 24));
+ 	xbitmap_check_bit((1UL << 63) | (1UL << 24) | 70);
 +
- .PHONY: mapshift
++	xbitmap_check_bit_range();
+ }
  
- mapshift:
-diff --git a/tools/testing/radix-tree/linux/xbitmap.h b/tools/testing/radix-tree/linux/xbitmap.h
-new file mode 100644
-index 0000000..61de214
---- /dev/null
-+++ b/tools/testing/radix-tree/linux/xbitmap.h
-@@ -0,0 +1 @@
-+#include "../../../../include/linux/xbitmap.h"
-diff --git a/tools/testing/radix-tree/main.c b/tools/testing/radix-tree/main.c
-index 257f3f8..d112363 100644
---- a/tools/testing/radix-tree/main.c
-+++ b/tools/testing/radix-tree/main.c
-@@ -326,6 +326,10 @@ static void single_thread_tests(bool long_run)
- 	rcu_barrier();
- 	printv(2, "after idr_checks: %d allocated, preempt %d\n",
- 		nr_allocated, preempt_count);
-+	xbitmap_checks();
-+	rcu_barrier();
-+	printv(2, "after xbitmap_checks: %d allocated, preempt %d\n",
-+			nr_allocated, preempt_count);
- 	big_gang_check(long_run);
- 	rcu_barrier();
- 	printv(2, "after big_gang_check: %d allocated, preempt %d\n",
-diff --git a/tools/testing/radix-tree/test.h b/tools/testing/radix-tree/test.h
-index d9c031d..8175d6b 100644
---- a/tools/testing/radix-tree/test.h
-+++ b/tools/testing/radix-tree/test.h
-@@ -38,6 +38,7 @@ void benchmark(void);
- void idr_checks(void);
- void ida_checks(void);
- void ida_thread_tests(void);
-+void xbitmap_checks(void);
+ int __weak main(void)
+diff --git a/tools/include/linux/bitmap.h b/tools/include/linux/bitmap.h
+index ca16027..8d0bc1b 100644
+--- a/tools/include/linux/bitmap.h
++++ b/tools/include/linux/bitmap.h
+@@ -37,6 +37,40 @@ static inline void bitmap_zero(unsigned long *dst, int nbits)
+ 	}
+ }
  
- struct item *
- item_tag_set(struct radix_tree_root *root, unsigned long index, int tag);
++static inline void __bitmap_clear(unsigned long *map, unsigned int start,
++				  int len)
++{
++	unsigned long *p = map + BIT_WORD(start);
++	const unsigned int size = start + len;
++	int bits_to_clear = BITS_PER_LONG - (start % BITS_PER_LONG);
++	unsigned long mask_to_clear = BITMAP_FIRST_WORD_MASK(start);
++
++	while (len - bits_to_clear >= 0) {
++		*p &= ~mask_to_clear;
++		len -= bits_to_clear;
++		bits_to_clear = BITS_PER_LONG;
++		mask_to_clear = ~0UL;
++		p++;
++	}
++	if (len) {
++		mask_to_clear &= BITMAP_LAST_WORD_MASK(size);
++		*p &= ~mask_to_clear;
++	}
++}
++
++static inline __always_inline void bitmap_clear(unsigned long *map,
++						unsigned int start,
++						unsigned int nbits)
++{
++	if (__builtin_constant_p(nbits) && nbits == 1)
++		__clear_bit(start, map);
++	else if (__builtin_constant_p(start & 7) && IS_ALIGNED(start, 8) &&
++		 __builtin_constant_p(nbits & 7) && IS_ALIGNED(nbits, 8))
++		memset((char *)map + start / 8, 0, nbits / 8);
++	else
++		__bitmap_clear(map, start, nbits);
++}
++
+ static inline void bitmap_fill(unsigned long *dst, unsigned int nbits)
+ {
+ 	unsigned int nlongs = BITS_TO_LONGS(nbits);
+diff --git a/tools/include/linux/kernel.h b/tools/include/linux/kernel.h
+index 0ad8844..3c992ae 100644
+--- a/tools/include/linux/kernel.h
++++ b/tools/include/linux/kernel.h
+@@ -13,6 +13,8 @@
+ #define UINT_MAX	(~0U)
+ #endif
+ 
++#define IS_ALIGNED(x, a)	(((x) & ((typeof(x))(a) - 1)) == 0)
++
+ #define DIV_ROUND_UP(n,d) (((n) + (d) - 1) / (d))
+ 
+ #define PERF_ALIGN(x, a)	__PERF_ALIGN_MASK(x, (typeof(x))(a)-1)
 -- 
 2.7.4
