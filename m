@@ -1,25 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34211)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36122)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <wlsaidhi@gmail.com>) id 1eJzAH-0005me-3o
-	for qemu-devel@nongnu.org; Wed, 29 Nov 2017 05:00:30 -0500
+	(envelope-from <ehabkost@redhat.com>) id 1eJzFB-0006zB-Op
+	for qemu-devel@nongnu.org; Wed, 29 Nov 2017 05:05:37 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <wlsaidhi@gmail.com>) id 1eJzAB-0005Kv-28
-	for qemu-devel@nongnu.org; Wed, 29 Nov 2017 05:00:25 -0500
-Received: from mail-lf0-x22f.google.com ([2a00:1450:4010:c07::22f]:44255)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <wlsaidhi@gmail.com>) id 1eJzAA-0005KG-Qs
-	for qemu-devel@nongnu.org; Wed, 29 Nov 2017 05:00:19 -0500
-Received: by mail-lf0-x22f.google.com with SMTP id x204so3137085lfa.11
-	for <qemu-devel@nongnu.org>; Wed, 29 Nov 2017 02:00:18 -0800 (PST)
+	(envelope-from <ehabkost@redhat.com>) id 1eJzF8-0001AM-Ep
+	for qemu-devel@nongnu.org; Wed, 29 Nov 2017 05:05:29 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:41494)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1eJzF8-00019R-5g
+	for qemu-devel@nongnu.org; Wed, 29 Nov 2017 05:05:26 -0500
+Date: Wed, 29 Nov 2017 08:05:19 -0200
+From: Eduardo Habkost <ehabkost@redhat.com>
+Message-ID: <20171129100519.GW3037@localhost.localdomain>
+References: <20171127043517.22441-1-haozhong.zhang@intel.com>
+	<20171127043517.22441-2-haozhong.zhang@intel.com>
+	<20171128010713.GC3037@localhost.localdomain>
+	<20171129003329.g562dwn233rftyty@hz-desktop>
 MIME-Version: 1.0
-In-Reply-To: <b36b0c95-4ddc-b818-522c-1bbec52138e8@adacore.com>
-References: <CAGC02hTe8SijuwrM0ZGg04=To0GBnPUrC23iKuc-pao65vAAUQ@mail.gmail.com>
-	<b36b0c95-4ddc-b818-522c-1bbec52138e8@adacore.com>
-From: william lin <wlsaidhi@gmail.com>
-Date: Wed, 29 Nov 2017 03:59:36 -0600
-Message-ID: <CAGC02hT7OvR1nbyD=AkOqPvxbNPz957=CPZsUxf1FJ73O8W52g@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [Bug 645662] x87 fpu emulation not accurate enough
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20171129003329.g562dwn233rftyty@hz-desktop>
+Subject: Re: [Qemu-devel] [PATCH v3 1/3] hostmem-file: add "align" option
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,55 +29,40 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: KONRAD Frederic <frederic.konrad@adacore.com>
-Cc: qemu-devel@nongnu.org
+To: qemu-devel@nongnu.org, Xiao Guangrong <guangrong.xiao@gmail.com>, Stefan Hajnoczi <stefanha@gmail.com>, Dan Williams <dan.j.williams@intel.com>, Igor Mammedov <imammedo@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Richard Henderson <rth@twiddle.net>, "Michael S. Tsirkin" <mst@redhat.com>
 
-Hi,
+On Wed, Nov 29, 2017 at 08:33:29AM +0800, Haozhong Zhang wrote:
+> On 11/27/17 23:07 -0200, Eduardo Habkost wrote:
+> > On Mon, Nov 27, 2017 at 12:35:15PM +0800, Haozhong Zhang wrote:
+> > > When mmap(2) the backend files, QEMU uses the host page size
+> > > (getpagesize(2)) by default as the alignment of mapping address.
+> > > However, some backends may require alignments different than the page
+> > > size. For example, mmap a device DAX (e.g., /dev/dax0.0) on Linux
+> > > kernel 4.13 to an address, which is 4K-aligned but not 2M-aligned,
+> > > fails with a kernel message like
+> > > 
+> > > [617494.969768] dax dax0.0: qemu-system-x86: dax_mmap: fail, unaligned vma (0x7fa37c579000 - 0x7fa43c579000, 0x1fffff)
+> > > 
+> > > Because there is no common approach to get such alignment requirement,
+> > > we add the 'align' option to 'memory-backend-file', so that users or
+> > > management utils, which have enough knowledge about the backend, can
+> > > specify a proper alignment via this option.
+> > > 
+> > > Signed-off-by: Haozhong Zhang <haozhong.zhang@intel.com>
+> > 
+> > The new option needs to be documented on qemu-options.hx.
+> 
+> will add in the next version.
 
-The goal of the project is to fix the bug. Sorry I should have been more
-clear.
+Note that there are patches on on machine-next that change the memory backend
+documentation.
 
-This bug has been around for 7+ years now. Qemu switched to softfloat and
-it did not fix this. I think its most likely caused by Qemu's internal
-representation not being accurate enough or accuracy lost during
-conversion. However this is basically what is given to us in the bug
-report, and I have not been able to make much progress past this point, so
-we are asking for help.
+See:
+  git://github.com/ehabkost/qemu.git machine-next
+  https://github.com/ehabkost/qemu/commit/869f7f61c557a46b46e41b5e38a61551d45b6d0d
 
-Will
+But the conflicts should be trivial to solve if you document the new option in
+a separate paragraph.
 
-
-
-On Nov 29, 2017 3:39 AM, "KONRAD Frederic" <frederic.konrad@adacore.com>
-wrote:
-
-Hi,
-
-I have the same problem here with some of our math testsuites.
-It's about some precision issue with trigonometric tests.
-
-I didn't had time to figure out what happen neither what is
-really going wrong. eg: trigonometric function or?
-
-A quick workaround is to use KVM when possible.
-
-Fred
-
-
-On 11/29/2017 09:34 AM, william lin wrote:
-
-> Hello,
->
-> I have been looking into this bug
-> <https://bugs.launchpad.net/qemu/+bug/645662> for a school project, and
->
-> after reproducing the bug and tracing through the code, I have run into a
-> wall trying to figure out the best way to approach this. If there is anyone
-> who is familiar with qemu's fpu and is willing, any tips or suggestions
-> will be fantastic.
->
-> Thanks,
->
-> Will & Wes
->
->
+-- 
+Eduardo
