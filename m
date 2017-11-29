@@ -1,32 +1,18 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47261)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58905)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1eJsvc-0006aT-It
-	for qemu-devel@nongnu.org; Tue, 28 Nov 2017 22:20:53 -0500
+	(envelope-from <famz@redhat.com>) id 1eJtT9-0007qo-1e
+	for qemu-devel@nongnu.org; Tue, 28 Nov 2017 22:55:32 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1eJsvX-00039C-Kj
-	for qemu-devel@nongnu.org; Tue, 28 Nov 2017 22:20:52 -0500
-Received: from indium.canonical.com ([91.189.90.7]:41262)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1eJsvX-00037n-EM
-	for qemu-devel@nongnu.org; Tue, 28 Nov 2017 22:20:47 -0500
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1eJsvS-0006qv-Qq
-	for <qemu-devel@nongnu.org>; Wed, 29 Nov 2017 03:20:43 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id A6BB42E80D7
-	for <qemu-devel@nongnu.org>; Wed, 29 Nov 2017 03:20:42 +0000 (UTC)
+	(envelope-from <famz@redhat.com>) id 1eJtT7-00076i-T6
+	for qemu-devel@nongnu.org; Tue, 28 Nov 2017 22:55:31 -0500
+Date: Wed, 29 Nov 2017 11:55:02 +0800
+From: Fam Zheng <famz@redhat.com>
+Message-ID: <20171129035502.GD8889@lemon>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Wed, 29 Nov 2017 03:10:43 -0000
-From: Timothy Pearson <kb9vqf@pearsoncomputing.net>
-Reply-To: Bug 1735049 <1735049@bugs.launchpad.net>
-Sender: bounces@canonical.com
-Message-Id: <151192504398.10243.14437635177032457733.malonedeb@wampee.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1735049] [NEW] Need MTTCG support for x86 guests
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Subject: [Qemu-devel] Block layer complexity: what to do to keep it under
+ control?
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,45 +22,85 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
+Cc: qemu-block@nongnu.org, pbonzini@redhat.com, jcody@redhat.com, kwolf@redhat.com, stefanha@redhat.com, mreitz@redhat.com, eblake@redhat.com, famz@redhat.com
 
-Public bug reported:
+Hi all,
 
-MTTCG support is notably absent for x86_64 guests.  The last Wiki update
-on MTTCG was back in 2015, and I am having some difficulty determining
-the current status of the underlying requirements to enable this feature
-on x86 hosts.
+As we move forwards with new features in the block layer, the chances of tricky
+bugs happening have been increasing alongside - block jobs, coroutines,
+throttling, AioContext, op blockers and image locking combined together make a
+large and complex picture that is hard to fully understand and work with. Some
+bugs we've encountered are quite challenging already.  Examples are:
 
-For instance, has support for strong-on-weak memory consistency been
-added into QEMU GIT at this point?
+- segfault in parallel blockjobs (iotest 30)
+  https://lists.gnu.org/archive/html/qemu-devel/2017-11/msg01144.html
 
-Thanks!
+- Intermittent hang of iotest 194 (bdrv_drain_all after non-shared storage
+  migration)
+  https://lists.gnu.org/archive/html/qemu-devel/2017-11/msg01626.html
 
-** Affects: qemu
-     Importance: Undecided
-         Status: New
+- Drainage in bdrv_replace_child_noperm()
+  https://lists.gnu.org/archive/html/qemu-devel/2017-11/msg00868.html
 
--- =
+- Regression from 2.8: stuck in bdrv_drain()
+  https://lists.gnu.org/archive/html/qemu-devel/2017-04/msg02193.html
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1735049
+So in principle, what should we do to make the block layer easy to understand,
+develop with and debug? I think we have opportunities in these aspects:
 
-Title:
-  Need MTTCG support for x86 guests
+- Documentation
 
-Status in QEMU:
-  New
+  There is no central developer doc about block layer, especially how all pieces
+  fit together. Having one will make it a lot easier for new contributors to
+  understand better. Of course, we're facing the old problem: the code is
+  moving, maintaining an updated document needs effort.
 
-Bug description:
-  MTTCG support is notably absent for x86_64 guests.  The last Wiki
-  update on MTTCG was back in 2015, and I am having some difficulty
-  determining the current status of the underlying requirements to
-  enable this feature on x86 hosts.
+  Idea: add ./doc/deve/block.txt?
 
-  For instance, has support for strong-on-weak memory consistency been
-  added into QEMU GIT at this point?
+- Tests
 
-  Thanks!
+  Writing tests is a great way not only to exercise code, verify new features
+  work as expected and catch regression bugs, but also a way to show how the
+  feature can be used. There is this trend that the QEMU user interface
+  gradually moves from high level commands and args to small and flexible
+  building blocks, therefore demostrating the usage in iotests is meaningful.
 
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1735049/+subscriptions
+  Idea: Add tests to simulate how libvirt uses block layer, or how we expect it
+  to. This would be a long term investment. We could reuse iotests, or create a
+  new test framework specifically, if it's easier (for example, use docker/vm
+  tests that just uses libvirt).
+
+  Idea: Patchew already tests the quick group of iotests for a few
+  formats/protocols, but we should really add it to "make check".
+
+- Simplified code, or more orthogonal/modularized architecture.
+
+  Each aspect of block layer is complex enough so isolating them as much as
+  possible is a reasonable approach to control the complexity. Block jobs and
+  throttling becoming block filters is a good example, we should identify more.
+
+  Idea: rethink event loops. Create coroutines ubiquitously (for example for
+  each fd handler, BH and timer), so that many nested aio_poll() can be removed.
+
+  Crazy idea: move the whole block layer to a vhost process, and implement
+  existing features differently, especially in terms of multi-threading (hint:
+  rust?).
+
+- Debuggability.
+
+  Working with backtraces when coroutine is used is pretty hard, it would be
+  nice if ./scripts/qemugdb/coroutine.py could work with core files (i.e.
+  without a process to debug), and trace back to co->caller automatically.
+
+  It's always useful to dump block graph. Maybe we should add a helper function
+  in block layer that dumps all node graphs in graphviz DOT format, and even
+  make it available in QMP as x-dump-block-graph?
+
+  Of course gdb scripts to dump various lists are also nice little things to
+  have.
+
+  Idea: write more ./scripts/qemugdb/<scriptlet>.py.
+
+More thoughts?
+
+Fam
