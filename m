@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41632)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41730)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1eK3ia-0006KV-PK
-	for qemu-devel@nongnu.org; Wed, 29 Nov 2017 09:52:10 -0500
+	(envelope-from <famz@redhat.com>) id 1eK3il-0006WE-Re
+	for qemu-devel@nongnu.org; Wed, 29 Nov 2017 09:52:21 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1eK3iZ-0006M8-Qg
-	for qemu-devel@nongnu.org; Wed, 29 Nov 2017 09:52:08 -0500
+	(envelope-from <famz@redhat.com>) id 1eK3ik-0006YF-Gk
+	for qemu-devel@nongnu.org; Wed, 29 Nov 2017 09:52:19 -0500
 From: Fam Zheng <famz@redhat.com>
-Date: Wed, 29 Nov 2017 22:49:54 +0800
-Message-Id: <20171129144956.11409-8-famz@redhat.com>
+Date: Wed, 29 Nov 2017 22:49:55 +0800
+Message-Id: <20171129144956.11409-9-famz@redhat.com>
 In-Reply-To: <20171129144956.11409-1-famz@redhat.com>
 References: <20171129144956.11409-1-famz@redhat.com>
-Subject: [Qemu-devel] [PATCH RFC 7/9] block: Switch to use AIO drained
- begin/end API
+Subject: [Qemu-devel] [PATCH RFC 8/9] block: Drop old drained_{begin,
+ end} callbacks
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,202 +23,239 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: qemu-block@nongnu.org, jcody@redhat.com, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, pbonzini@redhat.com, Stefan Hajnoczi <stefanha@redhat.com>, Fam Zheng <famz@redhat.com>
 
-Instead of the recursion of the "disable/enable external requests"
-operations on the graph, we switch to AioContext's API to disable/enable
-on the whole AioContext altogether. Strictly it is be a bit more than
-necessary, but as all drained sections are short, it is not a big
-problem.
-
-Drained end can just get away with that.  The other half of drained
-begin is to wait for requests, which we can do with BDRV_POLL_WHILE() in
-a loop.
-
 Signed-off-by: Fam Zheng <famz@redhat.com>
 ---
- block/io.c | 116 ++++++-------------------------------------------------------
- 1 file changed, 10 insertions(+), 106 deletions(-)
+ block.c                        | 24 ------------------------
+ block/block-backend.c          | 22 ----------------------
+ blockjob.c                     |  6 ------
+ include/block/block.h          | 16 ----------------
+ include/block/block_int.h      | 11 -----------
+ include/sysemu/block-backend.h |  8 --------
+ 6 files changed, 87 deletions(-)
 
-diff --git a/block/io.c b/block/io.c
-index 7f07972489..914037b21a 100644
---- a/block/io.c
-+++ b/block/io.c
-@@ -40,28 +40,6 @@
- static int coroutine_fn bdrv_co_do_pwrite_zeroes(BlockDriverState *bs,
-     int64_t offset, int bytes, BdrvRequestFlags flags);
- 
--void bdrv_parent_drained_begin(BlockDriverState *bs)
--{
--    BdrvChild *c;
--
--    QLIST_FOREACH(c, &bs->parents, next_parent) {
--        if (c->role->drained_begin) {
--            c->role->drained_begin(c);
--        }
--    }
--}
--
--void bdrv_parent_drained_end(BlockDriverState *bs)
--{
--    BdrvChild *c;
--
--    QLIST_FOREACH(c, &bs->parents, next_parent) {
--        if (c->role->drained_end) {
--            c->role->drained_end(c);
--        }
--    }
--}
--
- static void bdrv_merge_limits(BlockLimits *dst, const BlockLimits *src)
- {
-     dst->opt_transfer = MAX(dst->opt_transfer, src->opt_transfer);
-@@ -141,71 +119,6 @@ typedef struct {
-     bool begin;
- } BdrvCoDrainData;
- 
--static void coroutine_fn bdrv_drain_invoke_entry(void *opaque)
--{
--    BdrvCoDrainData *data = opaque;
--    BlockDriverState *bs = data->bs;
--
--    if (data->begin) {
--        bs->drv->bdrv_co_drain_begin(bs);
--    } else {
--        bs->drv->bdrv_co_drain_end(bs);
--    }
--
--    /* Set data->done before reading bs->wakeup.  */
--    atomic_mb_set(&data->done, true);
--    bdrv_wakeup(bs);
--}
--
--static void bdrv_drain_invoke(BlockDriverState *bs, bool begin)
--{
--    BdrvCoDrainData data = { .bs = bs, .done = false, .begin = begin};
--
--    if (!bs->drv || (begin && !bs->drv->bdrv_co_drain_begin) ||
--            (!begin && !bs->drv->bdrv_co_drain_end)) {
--        return;
--    }
--
--    data.co = qemu_coroutine_create(bdrv_drain_invoke_entry, &data);
--    bdrv_coroutine_enter(bs, data.co);
--    BDRV_POLL_WHILE(bs, !data.done);
--}
--
--static bool bdrv_drain_recurse(BlockDriverState *bs, bool begin)
--{
--    BdrvChild *child, *tmp;
--    bool waited;
--
--    /* Ensure any pending metadata writes are submitted to bs->file.  */
--    bdrv_drain_invoke(bs, begin);
--
--    /* Wait for drained requests to finish */
--    waited = BDRV_POLL_WHILE(bs, atomic_read(&bs->in_flight) > 0);
--
--    QLIST_FOREACH_SAFE(child, &bs->children, next, tmp) {
--        BlockDriverState *bs = child->bs;
--        bool in_main_loop =
--            qemu_get_current_aio_context() == qemu_get_aio_context();
--        assert(bs->refcnt > 0);
--        if (in_main_loop) {
--            /* In case the recursive bdrv_drain_recurse processes a
--             * block_job_defer_to_main_loop BH and modifies the graph,
--             * let's hold a reference to bs until we are done.
--             *
--             * IOThread doesn't have such a BH, and it is not safe to call
--             * bdrv_unref without BQL, so skip doing it there.
--             */
--            bdrv_ref(bs);
--        }
--        waited |= bdrv_drain_recurse(bs, begin);
--        if (in_main_loop) {
--            bdrv_unref(bs);
--        }
--    }
--
--    return waited;
--}
--
- static void bdrv_co_drain_bh_cb(void *opaque)
- {
-     BdrvCoDrainData *data = opaque;
-@@ -256,12 +169,13 @@ void bdrv_drained_begin(BlockDriverState *bs)
-         return;
-     }
- 
--    if (atomic_fetch_inc(&bs->quiesce_counter) == 0) {
--        aio_disable_external(bdrv_get_aio_context(bs));
--        bdrv_parent_drained_begin(bs);
-+    if (atomic_fetch_inc(&bs->quiesce_counter) > 0) {
-+        return;
-+    }
-+    aio_context_drained_begin(bdrv_get_aio_context(bs));
-+    while (BDRV_POLL_WHILE(bs, atomic_read(&bs->in_flight) > 0)) {
-+        /* Loop until no progress is made. */
-     }
--
--    bdrv_drain_recurse(bs, true);
+diff --git a/block.c b/block.c
+index 949f0dec11..4434441df5 100644
+--- a/block.c
++++ b/block.c
+@@ -810,18 +810,6 @@ static char *bdrv_child_get_parent_desc(BdrvChild *c)
+     return g_strdup(bdrv_get_device_or_node_name(parent));
  }
  
- void bdrv_drained_end(BlockDriverState *bs)
-@@ -275,9 +189,7 @@ void bdrv_drained_end(BlockDriverState *bs)
-         return;
-     }
+-static void bdrv_child_cb_drained_begin(BdrvChild *child)
+-{
+-    BlockDriverState *bs = child->opaque;
+-    bdrv_drained_begin(bs);
+-}
+-
+-static void bdrv_child_cb_drained_end(BdrvChild *child)
+-{
+-    BlockDriverState *bs = child->opaque;
+-    bdrv_drained_end(bs);
+-}
+-
+ static int bdrv_child_cb_inactivate(BdrvChild *child)
+ {
+     BlockDriverState *bs = child->opaque;
+@@ -887,8 +875,6 @@ static void bdrv_inherited_options(int *child_flags, QDict *child_options,
+ const BdrvChildRole child_file = {
+     .get_parent_desc = bdrv_child_get_parent_desc,
+     .inherit_options = bdrv_inherited_options,
+-    .drained_begin   = bdrv_child_cb_drained_begin,
+-    .drained_end     = bdrv_child_cb_drained_end,
+     .inactivate      = bdrv_child_cb_inactivate,
+ };
  
--    bdrv_parent_drained_end(bs);
--    bdrv_drain_recurse(bs, false);
--    aio_enable_external(bdrv_get_aio_context(bs));
-+    aio_context_drained_end(bdrv_get_aio_context(bs));
+@@ -909,8 +895,6 @@ static void bdrv_inherited_fmt_options(int *child_flags, QDict *child_options,
+ const BdrvChildRole child_format = {
+     .get_parent_desc = bdrv_child_get_parent_desc,
+     .inherit_options = bdrv_inherited_fmt_options,
+-    .drained_begin   = bdrv_child_cb_drained_begin,
+-    .drained_end     = bdrv_child_cb_drained_end,
+     .inactivate      = bdrv_child_cb_inactivate,
+ };
+ 
+@@ -1022,8 +1006,6 @@ const BdrvChildRole child_backing = {
+     .attach          = bdrv_backing_attach,
+     .detach          = bdrv_backing_detach,
+     .inherit_options = bdrv_backing_options,
+-    .drained_begin   = bdrv_child_cb_drained_begin,
+-    .drained_end     = bdrv_child_cb_drained_end,
+     .inactivate      = bdrv_child_cb_inactivate,
+     .update_filename = bdrv_backing_update_filename,
+ };
+@@ -1973,9 +1955,6 @@ static void bdrv_replace_child_noperm(BdrvChild *child,
+         assert(bdrv_get_aio_context(old_bs) == bdrv_get_aio_context(new_bs));
+     }
+     if (old_bs) {
+-        if (old_bs->quiesce_counter && child->role->drained_end) {
+-            child->role->drained_end(child);
+-        }
+         if (child->role->detach) {
+             child->role->detach(child);
+         }
+@@ -1986,9 +1965,6 @@ static void bdrv_replace_child_noperm(BdrvChild *child,
+ 
+     if (new_bs) {
+         QLIST_INSERT_HEAD(&new_bs->parents, child, next_parent);
+-        if (new_bs->quiesce_counter && child->role->drained_begin) {
+-            child->role->drained_begin(child);
+-        }
+ 
+         if (child->role->attach) {
+             child->role->attach(child);
+diff --git a/block/block-backend.c b/block/block-backend.c
+index baef8e7abc..05855ab767 100644
+--- a/block/block-backend.c
++++ b/block/block-backend.c
+@@ -68,7 +68,6 @@ struct BlockBackend {
+ 
+     NotifierList remove_bs_notifiers, insert_bs_notifiers;
+ 
+-    int quiesce_counter;
+     VMChangeStateEntry *vmsh;
+     bool force_allow_inactivate;
+ };
+@@ -245,9 +244,6 @@ static const BdrvChildRole child_root = {
+     .get_name           = blk_root_get_name,
+     .get_parent_desc    = blk_root_get_parent_desc,
+ 
+-    .drained_begin      = blk_root_drained_begin,
+-    .drained_end        = blk_root_drained_end,
+-
+     .activate           = blk_root_activate,
+     .inactivate         = blk_root_inactivate,
+ };
+@@ -887,11 +883,6 @@ void blk_set_dev_ops(BlockBackend *blk, const BlockDevOps *ops,
+ 
+     blk->dev_ops = ops;
+     blk->dev_opaque = opaque;
+-
+-    /* Are we currently quiesced? Should we enforce this right now? */
+-    if (blk->quiesce_counter && ops->drained_begin) {
+-        ops->drained_begin(opaque);
+-    }
  }
  
  /*
-@@ -324,14 +236,11 @@ void bdrv_drain_all_begin(void)
-     BdrvNextIterator it;
-     GSList *aio_ctxs = NULL, *ctx;
+@@ -2068,12 +2059,6 @@ static void blk_root_drained_begin(BdrvChild *child)
+ {
+     BlockBackend *blk = child->opaque;
  
--    block_job_pause_all();
+-    if (++blk->quiesce_counter == 1) {
+-        if (blk->dev_ops && blk->dev_ops->drained_begin) {
+-            blk->dev_ops->drained_begin(blk->dev_opaque);
+-        }
+-    }
 -
-     for (bs = bdrv_first(&it); bs; bs = bdrv_next(&it)) {
-         AioContext *aio_context = bdrv_get_aio_context(bs);
+     /* Note that blk->root may not be accessible here yet if we are just
+      * attaching to a BlockDriverState that is drained. Use child instead. */
  
-         aio_context_acquire(aio_context);
--        bdrv_parent_drained_begin(bs);
--        aio_disable_external(aio_context);
-+        aio_context_drained_begin(aio_context);
-         aio_context_release(aio_context);
+@@ -2085,14 +2070,7 @@ static void blk_root_drained_begin(BdrvChild *child)
+ static void blk_root_drained_end(BdrvChild *child)
+ {
+     BlockBackend *blk = child->opaque;
+-    assert(blk->quiesce_counter);
  
-         if (!g_slist_find(aio_ctxs, aio_context)) {
-@@ -347,14 +256,13 @@ void bdrv_drain_all_begin(void)
-      */
-     while (waited) {
-         waited = false;
+     assert(blk->public.throttle_group_member.io_limits_disabled);
+     atomic_dec(&blk->public.throttle_group_member.io_limits_disabled);
 -
-         for (ctx = aio_ctxs; ctx != NULL; ctx = ctx->next) {
-             AioContext *aio_context = ctx->data;
- 
-             aio_context_acquire(aio_context);
-             for (bs = bdrv_first(&it); bs; bs = bdrv_next(&it)) {
-                 if (aio_context == bdrv_get_aio_context(bs)) {
--                    waited |= bdrv_drain_recurse(bs, true);
-+                    waited |= BDRV_POLL_WHILE(bs, atomic_read(&bs->in_flight) > 0);
-                 }
-             }
-             aio_context_release(aio_context);
-@@ -373,13 +281,9 @@ void bdrv_drain_all_end(void)
-         AioContext *aio_context = bdrv_get_aio_context(bs);
- 
-         aio_context_acquire(aio_context);
--        aio_enable_external(aio_context);
--        bdrv_parent_drained_end(bs);
--        bdrv_drain_recurse(bs, false);
-+        aio_context_drained_end(aio_context);
-         aio_context_release(aio_context);
-     }
--
--    block_job_resume_all();
+-    if (--blk->quiesce_counter == 0) {
+-        if (blk->dev_ops && blk->dev_ops->drained_end) {
+-            blk->dev_ops->drained_end(blk->dev_opaque);
+-        }
+-    }
+ }
+diff --git a/blockjob.c b/blockjob.c
+index 86d060c89c..809111bf24 100644
+--- a/blockjob.c
++++ b/blockjob.c
+@@ -160,11 +160,6 @@ static void block_job_drained_end(void *opaque)
+     block_job_resume(job);
  }
  
- void bdrv_drain_all(void)
+-static const BlockDevOps block_job_dev_ops = {
+-    .drained_begin = block_job_drained_begin,
+-    .drained_end = block_job_drained_end,
+-};
+-
+ void block_job_unref(BlockJob *job)
+ {
+     if (--job->refcnt == 0) {
+@@ -680,7 +675,6 @@ void *block_job_create(const char *job_id, const BlockJobDriver *driver,
+     block_job_add_bdrv(job, "main node", bs, 0, BLK_PERM_ALL, &error_abort);
+     bs->job = job;
+ 
+-    blk_set_dev_ops(blk, &block_job_dev_ops, job);
+     aio_context_add_drain_ops(blk_get_aio_context(blk),
+                               block_job_drained_begin, block_job_drained_end,
+                               job);
+diff --git a/include/block/block.h b/include/block/block.h
+index c05cac57e5..df73e77200 100644
+--- a/include/block/block.h
++++ b/include/block/block.h
+@@ -579,22 +579,6 @@ int bdrv_probe_geometry(BlockDriverState *bs, HDGeometry *geo);
+ void bdrv_io_plug(BlockDriverState *bs);
+ void bdrv_io_unplug(BlockDriverState *bs);
+ 
+-/**
+- * bdrv_parent_drained_begin:
+- *
+- * Begin a quiesced section of all users of @bs. This is part of
+- * bdrv_drained_begin.
+- */
+-void bdrv_parent_drained_begin(BlockDriverState *bs);
+-
+-/**
+- * bdrv_parent_drained_end:
+- *
+- * End a quiesced section of all users of @bs. This is part of
+- * bdrv_drained_end.
+- */
+-void bdrv_parent_drained_end(BlockDriverState *bs);
+-
+ /**
+  * bdrv_drained_begin:
+  *
+diff --git a/include/block/block_int.h b/include/block/block_int.h
+index e107163594..8eed595682 100644
+--- a/include/block/block_int.h
++++ b/include/block/block_int.h
+@@ -535,17 +535,6 @@ struct BdrvChildRole {
+      * caller is responsible for freeing the memory. */
+     char *(*get_parent_desc)(BdrvChild *child);
+ 
+-    /*
+-     * If this pair of functions is implemented, the parent doesn't issue new
+-     * requests after returning from .drained_begin() until .drained_end() is
+-     * called.
+-     *
+-     * Note that this can be nested. If drained_begin() was called twice, new
+-     * I/O is allowed only after drained_end() was called twice, too.
+-     */
+-    void (*drained_begin)(BdrvChild *child);
+-    void (*drained_end)(BdrvChild *child);
+-
+     /* Notifies the parent that the child has been activated/inactivated (e.g.
+      * when migration is completing) and it can start/stop requesting
+      * permissions and doing I/O on it. */
+diff --git a/include/sysemu/block-backend.h b/include/sysemu/block-backend.h
+index c4e52a5fa3..9e81232a83 100644
+--- a/include/sysemu/block-backend.h
++++ b/include/sysemu/block-backend.h
+@@ -58,14 +58,6 @@ typedef struct BlockDevOps {
+      * Runs when the size changed (e.g. monitor command block_resize)
+      */
+     void (*resize_cb)(void *opaque);
+-    /*
+-     * Runs when the backend receives a drain request.
+-     */
+-    void (*drained_begin)(void *opaque);
+-    /*
+-     * Runs when the backend's last drain request ends.
+-     */
+-    void (*drained_end)(void *opaque);
+ } BlockDevOps;
+ 
+ /* This struct is embedded in (the private) BlockBackend struct and contains
 -- 
 2.14.3
