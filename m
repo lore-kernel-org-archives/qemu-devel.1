@@ -1,30 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38835)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38922)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ppandit@redhat.com>) id 1eJzLV-0001r0-1F
-	for qemu-devel@nongnu.org; Wed, 29 Nov 2017 05:12:01 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1eJzLa-0001vZ-Bb
+	for qemu-devel@nongnu.org; Wed, 29 Nov 2017 05:12:10 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ppandit@redhat.com>) id 1eJzLQ-0005ey-2r
-	for qemu-devel@nongnu.org; Wed, 29 Nov 2017 05:12:01 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:36186)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ppandit@redhat.com>) id 1eJzLP-0005eL-Qo
-	for qemu-devel@nongnu.org; Wed, 29 Nov 2017 05:11:56 -0500
-Date: Wed, 29 Nov 2017 15:41:45 +0530 (IST)
-From: P J P <ppandit@redhat.com>
-In-Reply-To: <20171128130012.1466d231.cohuck@redhat.com>
-Message-ID: <nycvar.YSQ.7.76.1711291445390.12405@wniryva>
-References: <20171124183446.7308-1-ppandit@redhat.com>
-	<20171124183446.7308-2-ppandit@redhat.com>
-	<20171127111532.GI16527@stefanha-x1.localdomain>
-	<nycvar.YSQ.7.76.1711272251290.24944@wniryva>
-	<20171128101154.64b49cb0.cohuck@redhat.com>
-	<20171128103757.GD17146@stefanha-x1.localdomain>
-	<nycvar.YSQ.7.76.1711281653440.1581@wniryva>
-	<20171128130012.1466d231.cohuck@redhat.com>
+	(envelope-from <peter.maydell@linaro.org>) id 1eJzLW-0005kl-IO
+	for qemu-devel@nongnu.org; Wed, 29 Nov 2017 05:12:06 -0500
+Received: from mail-oi0-x22b.google.com ([2607:f8b0:4003:c06::22b]:46906)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1eJzLW-0005k3-CT
+	for qemu-devel@nongnu.org; Wed, 29 Nov 2017 05:12:02 -0500
+Received: by mail-oi0-x22b.google.com with SMTP id t81so1998983oih.13
+	for <qemu-devel@nongnu.org>; Wed, 29 Nov 2017 02:12:02 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Subject: Re: [Qemu-devel] [PATCH v3 1/2] virtio: check VirtQueue Vring
- object is set
+In-Reply-To: <17d7270b-9016-face-5fba-c6e321e92d88@kaod.org>
+References: <20171019151249.13663-1-clg@kaod.org>
+	<17d7270b-9016-face-5fba-c6e321e92d88@kaod.org>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Wed, 29 Nov 2017 10:11:41 +0000
+Message-ID: <CAFEAcA-_7DVpck4wKsLSvpMdAZTKCFK+j3Q1F5OvAo2TT+5ZWw@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v5 0/8] aspeed: add a witherspoon-bmc
+ machine
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,93 +31,26 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Cornelia Huck <cohuck@redhat.com>
-Cc: Stefan Hajnoczi <stefanha@redhat.com>, Qemu Developers <qemu-devel@nongnu.org>, zhangboxian <zhangboxian@huawei.com>, Paolo Bonzini <pbonzini@redhat.com>
+To: =?UTF-8?Q?C=C3=A9dric_Le_Goater?= <clg@kaod.org>
+Cc: qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>, Andrew Jeffery <andrew@aj.id.au>, Joel Stanley <joel@jms.id.au>, =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>
 
-  Hello Cornelia,
+On 29 November 2017 at 09:58, C=C3=A9dric Le Goater <clg@kaod.org> wrote:
+> On 10/19/2017 05:12 PM, C=C3=A9dric Le Goater wrote:
+>>  - introduce a dummy ROM device to catch invalid writes
+>>  - removed 'ignore_memory_transaction_failures' on all Aspeed machines
+>
+> So that was a bad idea because old firwmares run load/store loops
+> beyond the address space to guess how much RAM the SoC has.
+>
+> I am wondering if it is possible to model the same behavior with
+> a MMIO region (of a correct size depending on the max ram size of
+> the SoC) and mapped beyond the RAM region to catch such accesses
+> and keep 'ignore_memory_transaction_failures' to false.
 
-+-- On Tue, 28 Nov 2017, Cornelia Huck wrote --+
-| What is "unfit for use"?
+Yeah, if the hardware genuinely ignores accesses to a particular
+region of the address space then you can model this with an
+appropriate background memory region. You just need to figure
+out what range of the address space it should apply to...
 
-Unfit for use because we see checks like
-
-  if (!virtio_queue_get_num(vdev, n)) {
-            continue;
-  ...
-  if (!vdev->vq[n].vring.num) {
-      return;
-
-'virtio_queue_set_rings' sets 'vring.desc' as
-
-  vdev->vq[n].vring.desc = desc;
-
-and calls virtio_init_region_cache(vdev, n);
-which returns if vq->vring.desc is zero(0).
-
-  addr = vq->vring.desc;
-  if (!addr) {
-      return;
-  }
-
-Same in virtio_queue_set_addr() -> virtio_queue_update_rings().
-
-It seems that for 'vq' instance to be useful, vring.num, vring.desc etc. 
-fields need to be set properly. Unless an unused/free 'vq' is being accessed 
-to set these fields.
-
-| I'm not quite sure what you want to achieve with this patch. I assume
-| you want to fix the issue that a guest may provide invalid values for
-| align etc. which can cause qemu to crash or behave badly.
-
-True. In the process I'm trying to figure out if a usable 'vq' instance could 
-be decided in once place, than having repeating checks, if possible.
-
-Ex. 'virtio_queue_update_rings' is called as
-
-virtio_queue_set_addr
- -> virtio_queue_update_rings
-
-virtio_queue_set_align
- -> virtio_queue_update_rings
-
-virtio_load
- for (i = 0; i < num; i++) {
-   if (vdev->vq[i].vring.desc) {
-   ...
-     virtio_queue_update_rings
-
-Of these, virtio_load checks that 'vring.desc' is non-zero(0). Current 
-patch adds couple checks to the other two callers above. And again,
-
-virtio_queue_update_rings would check
-
-    if (!vring->num || !vring->desc || !vring->align) {
-       /* not yet setup -> nothing to do */
-       return;
-    }
-
-| If so, you need to do different things for the different points above.
-| - The guest should not muck around with a non-existing queue (num == 0)
-|   in any case, so this should be fenced for any manipulation triggered
-|   by the guest.
-
-I guess done by !virtio_queue_get_num() check above?
-
-| - Processing a non-setup queue (desc == 0; also applies to the other
-|   buffers for virtio-1) should be skipped. However, _setting_ desc etc.
-|   to 0 from the guest is fine (as long as it follows the other
-|   constraints of the spec).
-
-Okay. Though its non-zero(0) value is preferred?
-
-| - Setting alignment to 0 only applies to legacy + virtio-mmio. I would
-|   not overengineer fencing this. A simple check in update_rings should
-|   be enough.
-
-Okay.x
-
-
-Thank you.
---
-Prasad J Pandit / Red Hat Product Security Team
-47AF CE69 3A90 54AA 9045 1053 DD13 3D32 FE5B 041F
+thanks
+-- PMM
