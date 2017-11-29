@@ -1,26 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49056)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49071)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1eK7RU-00010o-51
-	for qemu-devel@nongnu.org; Wed, 29 Nov 2017 13:50:45 -0500
+	(envelope-from <dgilbert@redhat.com>) id 1eK7RV-00011S-PT
+	for qemu-devel@nongnu.org; Wed, 29 Nov 2017 13:50:46 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1eK7RT-0001Rh-DJ
-	for qemu-devel@nongnu.org; Wed, 29 Nov 2017 13:50:44 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:34886)
+	(envelope-from <dgilbert@redhat.com>) id 1eK7RV-0001SD-1Q
+	for qemu-devel@nongnu.org; Wed, 29 Nov 2017 13:50:45 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:62398)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1eK7RT-0001RR-69
-	for qemu-devel@nongnu.org; Wed, 29 Nov 2017 13:50:43 -0500
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1eK7RU-0001Rt-Rg
+	for qemu-devel@nongnu.org; Wed, 29 Nov 2017 13:50:44 -0500
 Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
 	[10.5.11.13])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 3FE496146F
-	for <qemu-devel@nongnu.org>; Wed, 29 Nov 2017 18:50:42 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id E5F4B85547
+	for <qemu-devel@nongnu.org>; Wed, 29 Nov 2017 18:50:43 +0000 (UTC)
 From: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>
-Date: Wed, 29 Nov 2017 18:50:21 +0000
-Message-Id: <20171129185026.23632-3-dgilbert@redhat.com>
+Date: Wed, 29 Nov 2017 18:50:22 +0000
+Message-Id: <20171129185026.23632-4-dgilbert@redhat.com>
 In-Reply-To: <20171129185026.23632-1-dgilbert@redhat.com>
 References: <20171129185026.23632-1-dgilbert@redhat.com>
-Subject: [Qemu-devel] [RFC 2/7] vhost: Move log_dirty check
+Subject: [Qemu-devel] [RFC 3/7] vhost: New memory update functions
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,78 +34,83 @@ Cc: maxime.coquelin@redhat.com, mst@redhat.com
 
 From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
 
-Move the log_dirty check into vhost_section.
+vhost_update_mem will replace the existing update mechanism.
+They make use of the Flatview we have now to make the update simpler.
+This commit just adds the basic structure.
 
 Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
 ---
- hw/virtio/trace-events |  3 +++
- hw/virtio/vhost.c      | 20 +++++++++++++-------
- 2 files changed, 16 insertions(+), 7 deletions(-)
+ hw/virtio/vhost.c | 44 ++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 44 insertions(+)
 
-diff --git a/hw/virtio/trace-events b/hw/virtio/trace-events
-index 775461ae98..4a493bcd46 100644
---- a/hw/virtio/trace-events
-+++ b/hw/virtio/trace-events
-@@ -1,5 +1,8 @@
- # See docs/devel/tracing.txt for syntax documentation.
- 
-+# hw/virtio/vhost.c
-+vhost_section(const char *name, int r) "%s:%d"
-+
- # hw/virtio/virtio.c
- virtqueue_alloc_element(void *elem, size_t sz, unsigned in_num, unsigned out_num) "elem %p size %zd in_num %u out_num %u"
- virtqueue_fill(void *vq, const void *elem, unsigned int len, unsigned int idx) "vq %p elem %p len %u idx %u"
 diff --git a/hw/virtio/vhost.c b/hw/virtio/vhost.c
-index ddc42f0f93..938253d1e8 100644
+index 938253d1e8..c959a59fb3 100644
 --- a/hw/virtio/vhost.c
 +++ b/hw/virtio/vhost.c
-@@ -27,6 +27,7 @@
- #include "hw/virtio/virtio-access.h"
- #include "migration/blocker.h"
- #include "sysemu/dma.h"
-+#include "trace.h"
- 
- /* enabled until disconnected backend stabilizes */
- #define _VHOST_DEBUG 1
-@@ -567,18 +568,12 @@ static void vhost_set_memory(MemoryListener *listener,
-                                          memory_listener);
-     hwaddr start_addr = section->offset_within_address_space;
-     ram_addr_t size = int128_get64(section->size);
--    bool log_dirty =
--        memory_region_get_dirty_log_mask(section->mr) & ~(1 << DIRTY_MEMORY_MIGRATION);
-     int s = offsetof(struct vhost_memory, regions) +
-         (dev->mem->nregions + 1) * sizeof dev->mem->regions[0];
-     void *ram;
- 
-     dev->mem = g_realloc(dev->mem, s);
- 
--    if (log_dirty) {
--        add = false;
--    }
--
-     assert(size);
- 
-     /* Optimize no-change case. At least cirrus_vga does this a lot at this time. */
-@@ -611,8 +606,19 @@ static void vhost_set_memory(MemoryListener *listener,
- 
- static bool vhost_section(MemoryRegionSection *section)
- {
--    return memory_region_is_ram(section->mr) &&
-+    bool result;
-+    bool log_dirty = memory_region_get_dirty_log_mask(section->mr) &
-+                     ~(1 << DIRTY_MEMORY_MIGRATION);
-+    result = memory_region_is_ram(section->mr) &&
-         !memory_region_is_rom(section->mr);
-+
-+    /* Vhost doesn't handle any block which is doing dirty-tracking other
-+     * than migration; this typically fires on VGA areas.
-+     */
-+    result &= !log_dirty;
-+
-+    trace_vhost_section(section->mr->name, result);
-+    return result;
+@@ -629,6 +629,43 @@ static void vhost_begin(MemoryListener *listener)
+     dev->mem_changed_start_addr = -1;
  }
  
- static void vhost_begin(MemoryListener *listener)
++struct vhost_update_mem_tmp {
++    struct vhost_dev   *dev;
++    uint32_t nregions;
++    struct vhost_memory_region *regions;
++};
++
++/* Called for each MRS from vhost_update_mem */
++static int vhost_update_mem_cb(MemoryRegionSection *mrs, void *opaque)
++{
++    if (!vhost_section(mrs)) {
++        return 0;
++    }
++
++    /* TODO */
++    return 0;
++}
++
++static int vhost_update_mem(struct vhost_dev *dev)
++{
++    int res;
++    struct vhost_update_mem_tmp vtmp;
++    vtmp.regions = 0;
++    vtmp.nregions = 0;
++    vtmp.dev = dev;
++
++    res = address_space_iterate(&address_space_memory,
++                                vhost_update_mem_cb, &vtmp);
++    if (res) {
++        goto out;
++    }
++
++    /* TODO */
++out:
++    g_free(vtmp.regions);
++    return res;
++}
++
+ static void vhost_commit(MemoryListener *listener)
+ {
+     struct vhost_dev *dev = container_of(listener, struct vhost_dev,
+@@ -648,6 +685,10 @@ static void vhost_commit(MemoryListener *listener)
+         return;
+     }
+ 
++    if (vhost_update_mem(dev)) {
++        return;
++    }
++
+     if (dev->started) {
+         start_addr = dev->mem_changed_start_addr;
+         size = dev->mem_changed_end_addr - dev->mem_changed_start_addr + 1;
+@@ -1523,6 +1564,9 @@ int vhost_dev_start(struct vhost_dev *hdev, VirtIODevice *vdev)
+         goto fail_features;
+     }
+ 
++    if (vhost_update_mem(hdev)) {
++        goto fail_mem;
++    }
+     if (vhost_dev_has_iommu(hdev)) {
+         memory_listener_register(&hdev->iommu_listener, vdev->dma_as);
+     }
 -- 
 2.14.3
