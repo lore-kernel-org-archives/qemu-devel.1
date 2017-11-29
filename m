@@ -1,21 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52655)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55299)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1eK12V-0007QW-RG
-	for qemu-devel@nongnu.org; Wed, 29 Nov 2017 07:00:37 -0500
+	(envelope-from <bounces@canonical.com>) id 1eK1Cs-0002Mf-Dv
+	for qemu-devel@nongnu.org; Wed, 29 Nov 2017 07:11:15 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1eK12U-0006Xh-Np
-	for qemu-devel@nongnu.org; Wed, 29 Nov 2017 07:00:31 -0500
-Date: Wed, 29 Nov 2017 12:00:18 +0000
-From: Stefan Hajnoczi <stefanha@redhat.com>
-Message-ID: <20171129120018.GB2601@stefanha-x1.localdomain>
-References: <20171129035502.GD8889@lemon>
+	(envelope-from <bounces@canonical.com>) id 1eK1Cp-0002k0-6g
+	for qemu-devel@nongnu.org; Wed, 29 Nov 2017 07:11:14 -0500
+Received: from indium.canonical.com ([91.189.90.7]:53738)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1eK1Co-0002hq-W8
+	for qemu-devel@nongnu.org; Wed, 29 Nov 2017 07:11:11 -0500
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1eK1Co-0000y5-6r
+	for <qemu-devel@nongnu.org>; Wed, 29 Nov 2017 12:11:10 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 2EA782E8048
+	for <qemu-devel@nongnu.org>; Wed, 29 Nov 2017 12:11:10 +0000 (UTC)
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="24zk1gE8NUlDmwG9"
-Content-Disposition: inline
-In-Reply-To: <20171129035502.GD8889@lemon>
-Subject: Re: [Qemu-devel] Block layer complexity: what to do to keep it
- under control?
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Wed, 29 Nov 2017 11:56:34 -0000
+From: Daniel Berrange <1715186@bugs.launchpad.net>
+Reply-To: Bug 1715186 <1715186@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <150462661769.17099.11925025088141121020.malonedeb@gac.canonical.com>
+Message-Id: <151195659440.20128.9211415518194549869.malone@chaenomeles.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1715186] Re: websockets: Improve error messages
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,127 +36,82 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Fam Zheng <famz@redhat.com>
-Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, pbonzini@redhat.com, jcody@redhat.com, kwolf@redhat.com, mreitz@redhat.com, eblake@redhat.com
+To: qemu-devel@nongnu.org
+
+Will be included  for 2.11 in
+
+commit 3a3f8705962c8c8a47a9b981ffd5aab7274ad508
+Author: Daniel P. Berrange <berrange@redhat.com>
+Date:   Wed Sep 6 11:38:36 2017 +0100
+
+    io: include full error message in websocket handshake trace
+    =
+
+    When the websocket handshake fails it is useful to log the real
+    error message via the trace points for debugging purposes.
+    =
+
+    Fixes bug: #1715186
+    =
+
+    Reviewed-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
+    Signed-off-by: Daniel P. Berrange <berrange@redhat.com>
+
+commit f69a8bde29354493ff8aea64cc9cb3b531d16337
+Author: Daniel P. Berrange <berrange@redhat.com>
+Date:   Wed Sep 6 11:33:17 2017 +0100
+
+    io: send proper HTTP response for websocket errors
+    =
+
+    When any error occurs while processing the websockets handshake,
+    QEMU just terminates the connection abruptly. This is in violation
+    of the HTTP specs and does not help the client understand what they
+    did wrong. This is particularly bad when the client gives the wrong
+    path, as a "404 Not Found" would be very helpful.
+    =
+
+    Refactor the handshake code so that it always sends a response to
+    the client unless there was an I/O error.
+    =
+
+    Fixes bug: #1715186
+    =
+
+    Reviewed-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
+    Signed-off-by: Daniel P. Berrange <berrange@redhat.com>
 
 
---24zk1gE8NUlDmwG9
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+** Changed in: qemu
+       Status: New =3D> Fix Committed
 
-On Wed, Nov 29, 2017 at 11:55:02AM +0800, Fam Zheng wrote:
-> As we move forwards with new features in the block layer, the chances of =
-tricky
-> bugs happening have been increasing alongside - block jobs, coroutines,
-> throttling, AioContext, op blockers and image locking combined together m=
-ake a
-> large and complex picture that is hard to fully understand and work with.=
- Some
-> bugs we've encountered are quite challenging already.  Examples are:
->=20
-> - segfault in parallel blockjobs (iotest 30)
->   https://lists.gnu.org/archive/html/qemu-devel/2017-11/msg01144.html
->=20
-> - Intermittent hang of iotest 194 (bdrv_drain_all after non-shared storage
->   migration)
->   https://lists.gnu.org/archive/html/qemu-devel/2017-11/msg01626.html
->=20
-> - Drainage in bdrv_replace_child_noperm()
->   https://lists.gnu.org/archive/html/qemu-devel/2017-11/msg00868.html
->=20
-> - Regression from 2.8: stuck in bdrv_drain()
->   https://lists.gnu.org/archive/html/qemu-devel/2017-04/msg02193.html
->=20
-> So in principle, what should we do to make the block layer easy to unders=
-tand,
-> develop with and debug?
+-- =
 
-The assumptions that the code relies on are unclear so it's easy to
-introduce new bugs.
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1715186
 
-We are at a point where code review isn't finding certain bugs because
-no single person knows all the assumptions.  Previously the problem was
-contained because maintainers spotted problems before patches were
-merged.
+Title:
+  websockets: Improve error messages
 
-This is not primarily a documentation problem though.  We cannot
-document our way out of this because no single person (patch author or
-code reviewer) can know or check everything anymore due to the scale.
+Status in QEMU:
+  Fix Committed
 
-I think it's a (lack of) design problem because we have many incomplete
-abstractions like block jobs, IOThreads, block graph, image locking,
-etc.  They do not cover all possibly states and interactions today.
-Extending them leads to complex bugs.
+Bug description:
+  Since 2.9 / 07e95cd529af345fdeea230913f68eff5b925bb6 , whenever the
+  VNC websocket server finds an error with the incoming connection
+  request, it just closes the socket with no further information.
 
-A little progress has been made with defining higher-level APIs for
-block drivers and block jobs.  This way they either don't deal with
-low-level details of the concurrency and event loop models (e.g.
-bdrv_coroutine_enter()) or there is an interface that prompts them to
-integrate properly like bdrv_attach/detach_aio_context().
+  This makes figuring out what's wrong with the request nearly
+  impossible.
 
-Event loops and coroutines are good but they should not be used directly
-by block drivers and block jobs.  We need safe, high-level APIs that
-implement commonly-used operations.
+  I would be nice if:
 
-> - Documentation
->=20
->   There is no central developer doc about block layer, especially how all=
- pieces
->   fit together. Having one will make it a lot easier for new contributors=
- to
->   understand better. Of course, we're facing the old problem: the code is
->   moving, maintaining an updated document needs effort.
->=20
->   Idea: add ./doc/deve/block.txt?
+  * HTTP 400 were returned to the client, with an appropriate error message
+  * Maybe something written to the log as well?
 
-IOThreads and AioContexts are addressed here:
-docs/devel/multiple-iothreads.txt
+  Currently, I'm resorting to looking at my request and the websocket
+  source and hoping I can figure out what's wrong.
 
-The game has become significantly more complex than what the document
-describes.  It's lacking aio_co_wake() and aio_co_schedule() for
-example.
-
-> - Simplified code, or more orthogonal/modularized architecture.
->=20
->   Each aspect of block layer is complex enough so isolating them as much =
-as
->   possible is a reasonable approach to control the complexity. Block jobs=
- and
->   throttling becoming block filters is a good example, we should identify=
- more.
->=20
->   Idea: rethink event loops. Create coroutines ubiquitously (for example =
-for
->   each fd handler, BH and timer), so that many nested aio_poll() can be r=
-emoved.
->=20
->   Crazy idea: move the whole block layer to a vhost process, and implement
->   existing features differently, especially in terms of multi-threading (=
-hint:
->   rust?).
-
-A reimplementation will not solve the problem because:
-
-1. If it still has the same feature set and requirements then the level
-   of complexity will be comparable.
-
-2. We can reduce accidental (inessential) complexity by continuing the
-   various efforts around the block graph, block jobs, multi-queue block
-   layer with an eye towards higher level APIs.
-
---24zk1gE8NUlDmwG9
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEcBAEBAgAGBQJaHqFSAAoJEJykq7OBq3PI/EUH/2ReIk7SY9B/3MB4SYVe6GJb
-PfzdkuMpjx0j/4BGhbcW0BOlyibQFuJWFyVCFDP1E2OklEcHHhChMn/Lvy8BK/B0
-b0W5IA7gZWPeetg/VIZR7LJBAyiJs7Nr4tMWlgg0I+lrG67Pg0QrHYDbnfetBRUL
-+dZmog7I3L7bP1VmZlJYHgFBaLzX0UnXwaGT2k0kCMWL+WleefBRSuaK1jTpcaLK
-bH7QD2Id7GUtL8LeoIeS14DpnUYvnsdsOoEt1i7Z3RzmjTuvei85RIxoc30xqVRh
-Si5rt5HG/voWD2KP1K6XZrCF9ciZKcrVy7BTMIAbjF/L7B3g1uXBWm68FuIk38w=
-=Sbfu
------END PGP SIGNATURE-----
-
---24zk1gE8NUlDmwG9--
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1715186/+subscriptions
