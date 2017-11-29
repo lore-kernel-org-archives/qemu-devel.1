@@ -1,26 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51901)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57675)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <lprosek@redhat.com>) id 1eJwkK-0000fI-5J
-	for qemu-devel@nongnu.org; Wed, 29 Nov 2017 02:25:30 -0500
+	(envelope-from <longpeng2@huawei.com>) id 1eJwxb-0004H6-Me
+	for qemu-devel@nongnu.org; Wed, 29 Nov 2017 02:39:12 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <lprosek@redhat.com>) id 1eJwkG-0002td-Ud
-	for qemu-devel@nongnu.org; Wed, 29 Nov 2017 02:25:28 -0500
-Received: from mail-ua0-f180.google.com ([209.85.217.180]:37232)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <lprosek@redhat.com>) id 1eJwkG-0002sw-F7
-	for qemu-devel@nongnu.org; Wed, 29 Nov 2017 02:25:24 -0500
-Received: by mail-ua0-f180.google.com with SMTP id l36so2760256uae.4
-	for <qemu-devel@nongnu.org>; Tue, 28 Nov 2017 23:25:24 -0800 (PST)
+	(envelope-from <longpeng2@huawei.com>) id 1eJwxY-0002b5-IP
+	for qemu-devel@nongnu.org; Wed, 29 Nov 2017 02:39:11 -0500
+Received: from [45.249.212.32] (port=54194 helo=huawei.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <longpeng2@huawei.com>)
+	id 1eJwxY-0002Yp-7N
+	for qemu-devel@nongnu.org; Wed, 29 Nov 2017 02:39:08 -0500
+Message-ID: <5A1E63F2.5060309@huawei.com>
+Date: Wed, 29 Nov 2017 15:38:26 +0800
+From: "Longpeng (Mike)" <longpeng2@huawei.com>
 MIME-Version: 1.0
-In-Reply-To: <151127346143.6888.10589409888753299614.stgit@Misha-PC.lan02.inno>
-References: <151127322955.6888.16198535123422076171.stgit@Misha-PC.lan02.inno>
-	<151127346143.6888.10589409888753299614.stgit@Misha-PC.lan02.inno>
-From: Ladi Prosek <lprosek@redhat.com>
-Date: Wed, 29 Nov 2017 08:25:23 +0100
-Message-ID: <CABdb735ff0Fgom7vfGLuP7YpVscROFj2bni7c-2Y-KhOG1yAzQ@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH v3 40/45] windbg: implemented
- kd_api_read_msr and kd_api_write_msr
+References: <1511530010-511740-1-git-send-email-dplotnikov@virtuozzo.com>
+	<20171128195817.GA29077@localhost.localdomain>
+	<2cd31202-27c3-983f-85a9-6814ff504706@virtuozzo.com>
+	<20171128211326.GV3037@localhost.localdomain>
+	<5A1E43A6.1010607@huawei.com> <20171129060149.GD2374@rkaganip.lan>
+In-Reply-To: <20171129060149.GD2374@rkaganip.lan>
+Content-Type: text/plain; charset="ISO-8859-1"
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH] i386: turn off l3-cache property by default
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,386 +31,116 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Mihail Abakumov <mikhail.abakumov@ispras.ru>
-Cc: qemu-devel <qemu-devel@nongnu.org>, sw@weilnetz.de, Pavel Dovgalyuk <dovgaluk@ispras.ru>, Roman Kagan <rkagan@virtuozzo.com>, Paolo Bonzini <pbonzini@redhat.com>, "Denis V. Lunev" <den@openvz.org>
+To: Roman Kagan <rkagan@virtuozzo.com>
+Cc: Eduardo Habkost <ehabkost@redhat.com>, "Denis V. Lunev" <den@virtuozzo.com>, "Michael S. Tsirkin" <mst@redhat.com>, Denis Plotnikov <dplotnikov@virtuozzo.com>, pbonzini@redhat.com, rth@twiddle.net, qemu-devel@nongnu.org, Gonglei <arei.gonglei@huawei.com>
 
-On Tue, Nov 21, 2017 at 3:11 PM, Mihail Abakumov
-<mikhail.abakumov@ispras.ru> wrote:
-> Signed-off-by: Mihail Abakumov <mikhail.abakumov@ispras.ru>
-> Signed-off-by: Pavel Dovgalyuk <dovgaluk@ispras.ru>
-> Signed-off-by: Dmitriy Koltunov <koltunov@ispras.ru>
-> ---
->  include/exec/windbgstub-utils.h |    2
->  target/i386/windbgstub.c        |  319 +++++++++++++++++++++++++++++++++++++++
->  windbgstub.c                    |    8 +
->  3 files changed, 329 insertions(+)
->
-> diff --git a/include/exec/windbgstub-utils.h b/include/exec/windbgstub-utils.h
-> index bc5b6a8468..73d49b774d 100755
-> --- a/include/exec/windbgstub-utils.h
-> +++ b/include/exec/windbgstub-utils.h
-> @@ -100,6 +100,8 @@ void kd_api_write_io_space(CPUState *cpu, PacketData *pd);
->  void kd_api_read_physical_memory(CPUState *cpu, PacketData *pd);
->  void kd_api_write_physical_memory(CPUState *cpu, PacketData *pd);
->  void kd_api_get_version(CPUState *cpu, PacketData *pd);
-> +void kd_api_read_msr(CPUState *cpu, PacketData *pd);
-> +void kd_api_write_msr(CPUState *cpu, PacketData *pd);
->  void kd_api_unsupported(CPUState *cpu, PacketData *pd);
->
->  SizedBuf kd_gen_exception_sc(CPUState *cpu);
-> diff --git a/target/i386/windbgstub.c b/target/i386/windbgstub.c
-> index 43e6d45df9..735b2edd5f 100755
-> --- a/target/i386/windbgstub.c
-> +++ b/target/i386/windbgstub.c
-> @@ -1003,6 +1003,325 @@ void kd_api_write_control_space(CPUState *cpu, PacketData *pd)
->      stl_p(&mem->ActualBytesWritten, len);
->  }
->
-> +void kd_api_read_msr(CPUState *cpu, PacketData *pd)
-> +{
-> +    DBGKD_READ_WRITE_MSR *m64c = &pd->m64.u.ReadWriteMsr;
-> +    CPUArchState *env = cpu->env_ptr;
-> +
-> +    uint64_t val;
-> +
-> +    cpu_svm_check_intercept_param(env, SVM_EXIT_MSR, 0, 0);
-> +
-> +    switch ((uint32_t)env->regs[R_ECX]) {
-> +    case MSR_IA32_SYSENTER_CS:
-> +        val = env->sysenter_cs;
-> +        break;
-> +    case MSR_IA32_SYSENTER_ESP:
-> +        val = env->sysenter_esp;
-> +        break;
-> +    case MSR_IA32_SYSENTER_EIP:
-> +        val = env->sysenter_eip;
-> +        break;
-> +    case MSR_IA32_APICBASE:
-> +        val = cpu_get_apic_base(x86_env_get_cpu(env)->apic_state);
-> +        break;
-> +    case MSR_EFER:
-> +        val = env->efer;
-> +        break;
-> +    case MSR_STAR:
-> +        val = env->star;
-> +        break;
-> +    case MSR_PAT:
-> +        val = env->pat;
-> +        break;
-> +    case MSR_VM_HSAVE_PA:
-> +        val = env->vm_hsave;
-> +        break;
-> +    case MSR_IA32_PERF_STATUS:
-> +        /* tsc_increment_by_tick */
-> +        val = 1000ULL;
-> +        /* CPU multiplier */
-> +        val |= (((uint64_t)4ULL) << 40);
-> +        break;
-> +#ifdef TARGET_X86_64
-> +    case MSR_LSTAR:
-> +        val = env->lstar;
-> +        break;
-> +    case MSR_CSTAR:
-> +        val = env->cstar;
-> +        break;
-> +    case MSR_FMASK:
-> +        val = env->fmask;
-> +        break;
-> +    case MSR_FSBASE:
-> +        val = env->segs[R_FS].base;
-> +        break;
-> +    case MSR_GSBASE:
-> +        val = env->segs[R_GS].base;
-> +        break;
-> +    case MSR_KERNELGSBASE:
-> +        val = env->kernelgsbase;
-> +        break;
-> +    case MSR_TSC_AUX:
-> +        val = env->tsc_aux;
-> +        break;
-> +#endif
-> +    case MSR_MTRRphysBase(0):
-> +    case MSR_MTRRphysBase(1):
-> +    case MSR_MTRRphysBase(2):
-> +    case MSR_MTRRphysBase(3):
-> +    case MSR_MTRRphysBase(4):
-> +    case MSR_MTRRphysBase(5):
-> +    case MSR_MTRRphysBase(6):
-> +    case MSR_MTRRphysBase(7):
-> +        val = env->mtrr_var[((uint32_t)env->regs[R_ECX] -
-> +                             MSR_MTRRphysBase(0)) / 2].base;
-> +        break;
-> +    case MSR_MTRRphysMask(0):
-> +    case MSR_MTRRphysMask(1):
-> +    case MSR_MTRRphysMask(2):
-> +    case MSR_MTRRphysMask(3):
-> +    case MSR_MTRRphysMask(4):
-> +    case MSR_MTRRphysMask(5):
-> +    case MSR_MTRRphysMask(6):
-> +    case MSR_MTRRphysMask(7):
-> +        val = env->mtrr_var[((uint32_t)env->regs[R_ECX] -
-> +                             MSR_MTRRphysMask(0)) / 2].mask;
-> +        break;
-> +    case MSR_MTRRfix64K_00000:
-> +        val = env->mtrr_fixed[0];
-> +        break;
-> +    case MSR_MTRRfix16K_80000:
-> +    case MSR_MTRRfix16K_A0000:
-> +        val = env->mtrr_fixed[(uint32_t)env->regs[R_ECX] -
-> +                              MSR_MTRRfix16K_80000 + 1];
-> +        break;
-> +    case MSR_MTRRfix4K_C0000:
-> +    case MSR_MTRRfix4K_C8000:
-> +    case MSR_MTRRfix4K_D0000:
-> +    case MSR_MTRRfix4K_D8000:
-> +    case MSR_MTRRfix4K_E0000:
-> +    case MSR_MTRRfix4K_E8000:
-> +    case MSR_MTRRfix4K_F0000:
-> +    case MSR_MTRRfix4K_F8000:
-> +        val = env->mtrr_fixed[(uint32_t)env->regs[R_ECX] -
-> +                              MSR_MTRRfix4K_C0000 + 3];
-> +        break;
-> +    case MSR_MTRRdefType:
-> +        val = env->mtrr_deftype;
-> +        break;
-> +    case MSR_MTRRcap:
-> +        if (env->features[FEAT_1_EDX] & CPUID_MTRR) {
-> +            val = MSR_MTRRcap_VCNT | MSR_MTRRcap_FIXRANGE_SUPPORT |
-> +                MSR_MTRRcap_WC_SUPPORTED;
-> +        } else {
-> +            /* XXX: exception? */
-> +            val = 0;
-> +        }
-> +        break;
-> +    case MSR_MCG_CAP:
-> +        val = env->mcg_cap;
-> +        break;
-> +    case MSR_MCG_CTL:
-> +        if (env->mcg_cap & MCG_CTL_P) {
-> +            val = env->mcg_ctl;
-> +        } else {
-> +            val = 0;
-> +        }
-> +        break;
-> +    case MSR_MCG_STATUS:
-> +        val = env->mcg_status;
-> +        break;
-> +    case MSR_IA32_MISC_ENABLE:
-> +        val = env->msr_ia32_misc_enable;
-> +        break;
-> +    case MSR_IA32_BNDCFGS:
-> +        val = env->msr_bndcfgs;
-> +        break;
-> +    default:
-> +        if ((uint32_t)env->regs[R_ECX] >= MSR_MC0_CTL
-> +            && (uint32_t)env->regs[R_ECX] < MSR_MC0_CTL +
-> +            (4 * env->mcg_cap & 0xff)) {
-> +            uint32_t offset = (uint32_t)env->regs[R_ECX] - MSR_MC0_CTL;
-> +            val = env->mce_banks[offset];
-> +            break;
-> +        }
-> +        /* XXX: exception? */
-> +        val = 0;
-> +        break;
-> +    }
-> +
-> +    stq_p(&val, val);
-> +    m64c->DataValueLow  = UINT32_P(val)[0];
-> +    m64c->DataValueHigh = UINT32_P(val)[1];
-> +    pd->m64.ReturnStatus = STATUS_SUCCESS;
-> +}
-> +
-> +void kd_api_write_msr(CPUState *cpu, PacketData *pd)
-> +{
-> +    DBGKD_READ_WRITE_MSR *m64c = &pd->m64.u.ReadWriteMsr;
-> +    CPUArchState *env = cpu->env_ptr;
-> +
-> +    uint64_t val;
-> +
-> +    cpu_svm_check_intercept_param(env, SVM_EXIT_MSR, 1, 0);
-> +
-> +    val = m64c->DataValueLow | ((uint64_t) m64c->DataValueHigh) << 32;
-> +    val = ldq_p(&val);
-> +
-> +    switch ((uint32_t)env->regs[R_ECX]) {
-> +    case MSR_IA32_SYSENTER_CS:
-> +        env->sysenter_cs = val & 0xffff;
-> +        break;
-> +    case MSR_IA32_SYSENTER_ESP:
-> +        env->sysenter_esp = val;
-> +        break;
-> +    case MSR_IA32_SYSENTER_EIP:
-> +        env->sysenter_eip = val;
-> +        break;
-> +    case MSR_IA32_APICBASE:
-> +        cpu_set_apic_base(x86_env_get_cpu(env)->apic_state, val);
-> +        break;
-> +    case MSR_EFER:
-> +        {
-> +            uint64_t update_mask;
-> +
-> +            update_mask = 0;
-> +            if (env->features[FEAT_8000_0001_EDX] & CPUID_EXT2_SYSCALL) {
-> +                update_mask |= MSR_EFER_SCE;
-> +            }
-> +            if (env->features[FEAT_8000_0001_EDX] & CPUID_EXT2_LM) {
-> +                update_mask |= MSR_EFER_LME;
-> +            }
-> +            if (env->features[FEAT_8000_0001_EDX] & CPUID_EXT2_FFXSR) {
-> +                update_mask |= MSR_EFER_FFXSR;
-> +            }
-> +            if (env->features[FEAT_8000_0001_EDX] & CPUID_EXT2_NX) {
-> +                update_mask |= MSR_EFER_NXE;
-> +            }
-> +            if (env->features[FEAT_8000_0001_ECX] & CPUID_EXT3_SVM) {
-> +                update_mask |= MSR_EFER_SVME;
-> +            }
-> +            if (env->features[FEAT_8000_0001_EDX] & CPUID_EXT2_FFXSR) {
-> +                update_mask |= MSR_EFER_FFXSR;
-> +            }
-> +            cpu_load_efer(env, (env->efer & ~update_mask) |
-> +                          (val & update_mask));
-> +        }
-> +        break;
-> +    case MSR_STAR:
-> +        env->star = val;
-> +        break;
-> +    case MSR_PAT:
-> +        env->pat = val;
-> +        break;
-> +    case MSR_VM_HSAVE_PA:
-> +        env->vm_hsave = val;
-> +        break;
-> +#ifdef TARGET_X86_64
-> +    case MSR_LSTAR:
-> +        env->lstar = val;
-> +        break;
-> +    case MSR_CSTAR:
-> +        env->cstar = val;
-> +        break;
-> +    case MSR_FMASK:
-> +        env->fmask = val;
-> +        break;
-> +    case MSR_FSBASE:
-> +        env->segs[R_FS].base = val;
-> +        break;
-> +    case MSR_GSBASE:
-> +        env->segs[R_GS].base = val;
-> +        break;
-> +    case MSR_KERNELGSBASE:
-> +        env->kernelgsbase = val;
-> +        break;
-> +#endif
-> +    case MSR_MTRRphysBase(0):
-> +    case MSR_MTRRphysBase(1):
-> +    case MSR_MTRRphysBase(2):
-> +    case MSR_MTRRphysBase(3):
-> +    case MSR_MTRRphysBase(4):
-> +    case MSR_MTRRphysBase(5):
-> +    case MSR_MTRRphysBase(6):
-> +    case MSR_MTRRphysBase(7):
-> +        env->mtrr_var[((uint32_t)env->regs[R_ECX] -
-> +                       MSR_MTRRphysBase(0)) / 2].base = val;
-> +        break;
-> +    case MSR_MTRRphysMask(0):
-> +    case MSR_MTRRphysMask(1):
-> +    case MSR_MTRRphysMask(2):
-> +    case MSR_MTRRphysMask(3):
-> +    case MSR_MTRRphysMask(4):
-> +    case MSR_MTRRphysMask(5):
-> +    case MSR_MTRRphysMask(6):
-> +    case MSR_MTRRphysMask(7):
-> +        env->mtrr_var[((uint32_t)env->regs[R_ECX] -
-> +                       MSR_MTRRphysMask(0)) / 2].mask = val;
-> +        break;
-> +    case MSR_MTRRfix64K_00000:
-> +        env->mtrr_fixed[(uint32_t)env->regs[R_ECX] -
-> +                        MSR_MTRRfix64K_00000] = val;
-> +        break;
-> +    case MSR_MTRRfix16K_80000:
-> +    case MSR_MTRRfix16K_A0000:
-> +        env->mtrr_fixed[(uint32_t)env->regs[R_ECX] -
-> +                        MSR_MTRRfix16K_80000 + 1] = val;
-> +        break;
-> +    case MSR_MTRRfix4K_C0000:
-> +    case MSR_MTRRfix4K_C8000:
-> +    case MSR_MTRRfix4K_D0000:
-> +    case MSR_MTRRfix4K_D8000:
-> +    case MSR_MTRRfix4K_E0000:
-> +    case MSR_MTRRfix4K_E8000:
-> +    case MSR_MTRRfix4K_F0000:
-> +    case MSR_MTRRfix4K_F8000:
-> +        env->mtrr_fixed[(uint32_t)env->regs[R_ECX] -
-> +                        MSR_MTRRfix4K_C0000 + 3] = val;
-> +        break;
-> +    case MSR_MTRRdefType:
-> +        env->mtrr_deftype = val;
-> +        break;
-> +    case MSR_MCG_STATUS:
-> +        env->mcg_status = val;
-> +        break;
-> +    case MSR_MCG_CTL:
-> +        if ((env->mcg_cap & MCG_CTL_P)
-> +            && (val == 0 || val == ~(uint64_t)0)) {
-> +            env->mcg_ctl = val;
-> +        }
-> +        break;
-> +    case MSR_TSC_AUX:
-> +        env->tsc_aux = val;
-> +        break;
-> +    case MSR_IA32_MISC_ENABLE:
-> +        env->msr_ia32_misc_enable = val;
-> +        break;
-> +    case MSR_IA32_BNDCFGS:
-> +        /* FIXME: #GP if reserved bits are set.  */
-> +        /* FIXME: Extend highest implemented bit of linear address.  */
-> +        env->msr_bndcfgs = val;
-> +        cpu_sync_bndcs_hflags(env);
-> +        break;
-> +    default:
-> +        if ((uint32_t)env->regs[R_ECX] >= MSR_MC0_CTL
-> +            && (uint32_t)env->regs[R_ECX] < MSR_MC0_CTL +
-> +            (4 * env->mcg_cap & 0xff)) {
-> +            uint32_t offset = (uint32_t)env->regs[R_ECX] - MSR_MC0_CTL;
-> +            if ((offset & 0x3) != 0
-> +                || (val == 0 || val == ~(uint64_t)0)) {
-> +                env->mce_banks[offset] = val;
-> +            }
-> +            break;
-> +        }
-> +        /* XXX: exception? */
-> +        break;
-> +    }
-> +
-> +    pd->m64.ReturnStatus = STATUS_SUCCESS;
-> +}
-> +
 
-It looks like you copied most of this code from helper_rdmsr() and
-helper_wrmsr(). That's a bunch of duplicated non-trivial logic. Any
-chance it could be de-duped by having one call the other or
-introducing common helper functions?
 
->  bool windbg_on_load(void)
->  {
->      CPUState *cpu = qemu_get_cpu(0);
-> diff --git a/windbgstub.c b/windbgstub.c
-> index ddca290694..0268d0818e 100755
-> --- a/windbgstub.c
-> +++ b/windbgstub.c
-> @@ -197,6 +197,14 @@ static void windbg_process_manipulate_packet(ParsingContext *ctx)
->          kd_api_write_physical_memory(cpu, &ctx->data);
->          break;
->
-> +    case DbgKdReadMachineSpecificRegister:
-> +        kd_api_read_msr(cpu, &ctx->data);
-> +        break;
-> +
-> +    case DbgKdWriteMachineSpecificRegister:
-> +        kd_api_write_msr(cpu, &ctx->data);
-> +        break;
-> +
->      case DbgKdGetVersionApi:
->          kd_api_get_version(cpu, &ctx->data);
->          break;
->
+On 2017/11/29 14:01, Roman Kagan wrote:
+
+> On Wed, Nov 29, 2017 at 01:20:38PM +0800, Longpeng (Mike) wrote:
+>> On 2017/11/29 5:13, Eduardo Habkost wrote:
+>>
+>>> [CCing the people who were copied in the original patch that
+>>> enabled l3cache]
+>>>
+>>> On Tue, Nov 28, 2017 at 11:20:27PM +0300, Denis V. Lunev wrote:
+>>>> On 11/28/2017 10:58 PM, Eduardo Habkost wrote:
+>>>>> Hi,
+>>>>>
+>>>>> On Fri, Nov 24, 2017 at 04:26:50PM +0300, Denis Plotnikov wrote:
+>>>>>> Commit 14c985cffa "target-i386: present virtual L3 cache info for vcpus"
+>>>>>> introduced and set by default exposing l3 to the guest.
+>>>>>>
+>>>>>> The motivation behind it was that in the Linux scheduler, when waking up
+>>>>>> a task on a sibling CPU, the task was put onto the target CPU's runqueue
+>>>>>> directly, without sending a reschedule IPI.  Reduction in the IPI count
+>>>>>> led to performance gain.
+>>>>>>
+>>>>>> However, this isn't the whole story.  Once the task is on the target
+>>>>>> CPU's runqueue, it may have to preempt the current task on that CPU, be
+>>>>>> it the idle task putting the CPU to sleep or just another running task.
+>>>>>> For that a reschedule IPI will have to be issued, too.  Only when that
+>>>>>> other CPU is running a normal task for too little time, the fairness
+>>>>>> constraints will prevent the preemption and thus the IPI.
+>>>>>>
+>>
+>> Agree. :)
+>>
+>> Our testing VM is Suse11 guest with idle=poll at that time and now I realize
+>                                       ^^^^^^^^^
+> Oh, that's a whole lot of a difference!  I wish you mentioned that in
+> that patch.
+> 
+
+:( Sorry for missing that...
+
+>> that Suse11 has a BUG in its scheduler.
+>>
+>> For REHL 7.3 or upstream kernel, in ttwu_queue_remote(), a RES IPI is issued if
+>> rq->idle is not polling:
+>> '''
+>> static void ttwu_queue_remote(struct task_struct *p, int cpu)
+>> {
+>> 	struct rq *rq = cpu_rq(cpu);
+>>
+>> 	if (llist_add(&p->wake_entry, &cpu_rq(cpu)->wake_list)) {
+>> 		if (!set_nr_if_polling(rq->idle))
+>> 			smp_send_reschedule(cpu);
+>> 		else
+>> 			trace_sched_wake_idle_without_ipi(cpu);
+>> 	}
+>> }
+>> '''
+>>
+>> But for Suse11, it does not check, it send a RES IPI unconditionally.
+>>
+>>>>>> This boils down to the improvement being only achievable in workloads
+>>>>>> with many actively switching tasks.  We had no access to the
+>>>>>> (proprietary?) SAP HANA benchmark the commit referred to, but the
+>>>>>> pattern is also reproduced with "perf bench sched messaging -g 1"
+>>>>>> on 1 socket, 8 cores vCPU topology, we see indeed:
+>>>>>>
+>>>>>> l3-cache	#res IPI /s	#time / 10000 loops
+>>>>>> off		560K		1.8 sec
+>>>>>> on		40K		0.9 sec
+>>>>>>
+>>>>>> Now there's a downside: with L3 cache the Linux scheduler is more eager
+>>>>>> to wake up tasks on sibling CPUs, resulting in unnecessary cross-vCPU
+>>>>>> interactions and therefore exessive halts and IPIs.  E.g. "perf bench
+>>>>>> sched pipe -i 100000" gives
+>>>>>>
+>>>>>> l3-cache	#res IPI /s	#HLT /s		#time /100000 loops
+>>>>>> off		200 (no K)	230		0.2 sec
+>>>>>> on		400K		330K		0.5 sec
+>>>>>>
+>>
+>> I guess this issue could be resolved by disable the SD_WAKE_AFFINE.
+> 
+> But that requires extra tuning in the guest which is even less likely to
+> happen in the cloud case when VM admin != host admin.
+> 
+
+Ah, yep, that's a problem.
+
+>> As Gonglei said:
+>> 1. the L3 cache relates to the user experience.
+>> 2. the glibc would get the cache info by CPUID directly, and relates to the
+>> memory performance.
+>>
+>> What's more, the L3 cache relates to the sched_domain which is important to the
+>> (load) balancer when system is busy.
+>>
+>> All this doesn't mean the patch is insignificant, I just think we should do more
+>> research before decide. I'll do some tests, thanks. :)
+> 
+> Looking forward to it, thanks!
+
+> Roman.
+> 
+> 
+
+
+-- 
+Regards,
+Longpeng(Mike)
