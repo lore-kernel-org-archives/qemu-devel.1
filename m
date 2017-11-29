@@ -1,27 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34198)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35669)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bztemail@gmail.com>) id 1eJxAx-0006qt-Kd
-	for qemu-devel@nongnu.org; Wed, 29 Nov 2017 02:53:01 -0500
+	(envelope-from <lprosek@redhat.com>) id 1eJxDj-0000s5-S4
+	for qemu-devel@nongnu.org; Wed, 29 Nov 2017 02:55:53 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bztemail@gmail.com>) id 1eJxAw-0004Sn-JI
-	for qemu-devel@nongnu.org; Wed, 29 Nov 2017 02:52:59 -0500
+	(envelope-from <lprosek@redhat.com>) id 1eJxDf-0005rH-24
+	for qemu-devel@nongnu.org; Wed, 29 Nov 2017 02:55:51 -0500
+Received: from mail-ua0-f194.google.com ([209.85.217.194]:35207)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <lprosek@redhat.com>) id 1eJxDe-0005r3-U6
+	for qemu-devel@nongnu.org; Wed, 29 Nov 2017 02:55:46 -0500
+Received: by mail-ua0-f194.google.com with SMTP id l2so2807486uak.2
+	for <qemu-devel@nongnu.org>; Tue, 28 Nov 2017 23:55:46 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <MWHPR21MB0480A1F01D2CEF51E7CE21B09E3A0@MWHPR21MB0480.namprd21.prod.outlook.com>
-References: <CADYoBw2dogvU6-3vChG4js0BNdyTPG8eDvMSRoU50eTX_9DdEQ@mail.gmail.com>
-	<MWHPR21MB01590CD596A992C93E01B5079E460@MWHPR21MB0159.namprd21.prod.outlook.com>
-	<CADYoBw1ksGDo26-PC4eMnyqxZQoZkXNLDeGoWfcRHs-SfTCJkw@mail.gmail.com>
-	<MWHPR21MB01591543E188B048145985709E470@MWHPR21MB0159.namprd21.prod.outlook.com>
-	<CADYoBw0RjiW2as9jGtPg92E8XK3KR+gM9C5vjC7HHsBauFn4ug@mail.gmail.com>
-	<CADYoBw19GifmUR=Rztkzzc-v3-zWR6frjiNb_wjzsevreAqPDQ@mail.gmail.com>
-	<CAFEAcA9_+wZJa7Ht6EHCCZYm+hrfdbjd9gUmVJPGgZ0yvbZOPA@mail.gmail.com>
-	<MWHPR21MB0480DE1F826056BC8377EE289E250@MWHPR21MB0480.namprd21.prod.outlook.com>
-	<CADYoBw31C0Z2vp0S0ZFBOC6A3146wxtZWvzJabACkGh44ZwC0w@mail.gmail.com>
-	<MWHPR21MB0480A1F01D2CEF51E7CE21B09E3A0@MWHPR21MB0480.namprd21.prod.outlook.com>
-From: bzt bzt <bztemail@gmail.com>
-Date: Wed, 29 Nov 2017 08:52:54 +0100
-Message-ID: <CADYoBw1Ro5gxROvhCVXGv0=-Y8zXmGbKR3D6xOqhkb0zp__LkA@mail.gmail.com>
+In-Reply-To: <151127346810.6888.6227202235013087727.stgit@Misha-PC.lan02.inno>
+References: <151127322955.6888.16198535123422076171.stgit@Misha-PC.lan02.inno>
+	<151127346810.6888.6227202235013087727.stgit@Misha-PC.lan02.inno>
+From: Ladi Prosek <lprosek@redhat.com>
+Date: Wed, 29 Nov 2017 08:55:45 +0100
+Message-ID: <CABdb736bZVPBfJH2+rghbWKTNyUy7EZTJ6HiWhRKTP6cUhYFvQ@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH] BCM2837 and machine raspi3
+Subject: Re: [Qemu-devel] [PATCH v3 41/45] windbg: implemented
+ kd_api_search_memory
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,54 +29,100 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Andrew Baumann <Andrew.Baumann@microsoft.com>
-Cc: Peter Maydell <peter.maydell@linaro.org>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "qemu-arm@nongnu.org" <qemu-arm@nongnu.org>
+To: Mihail Abakumov <mikhail.abakumov@ispras.ru>
+Cc: qemu-devel <qemu-devel@nongnu.org>, sw@weilnetz.de, Pavel Dovgalyuk <dovgaluk@ispras.ru>, Roman Kagan <rkagan@virtuozzo.com>, Paolo Bonzini <pbonzini@redhat.com>, "Denis V. Lunev" <den@openvz.org>
 
-On Tue, Nov 28, 2017 at 6:54 PM, Andrew Baumann <
-Andrew.Baumann@microsoft.com> wrote:
-
-> > From: bzt bzt [mailto:bztemail@gmail.com]
-> > Sent: Tuesday, 28 November 2017 03:27
+On Tue, Nov 21, 2017 at 3:11 PM, Mihail Abakumov
+<mikhail.abakumov@ispras.ru> wrote:
+> Signed-off-by: Mihail Abakumov <mikhail.abakumov@ispras.ru>
+> Signed-off-by: Pavel Dovgalyuk <dovgaluk@ispras.ru>
+> Signed-off-by: Dmitriy Koltunov <koltunov@ispras.ru>
+> ---
+>  include/exec/windbgstub-utils.h |    1 +
+>  windbgstub-utils.c              |   33 +++++++++++++++++++++++++++++++++
+>  windbgstub.c                    |    4 ++++
+>  3 files changed, 38 insertions(+)
 >
-> > Yes, I agree. I've provided a parameterised version on Oct 24, which
-> does not
-> > have a separate bcm2837 implementation. Is that patch ok?
+> diff --git a/include/exec/windbgstub-utils.h b/include/exec/windbgstub-utils.h
+> index 73d49b774d..c2eb8a75a7 100755
+> --- a/include/exec/windbgstub-utils.h
+> +++ b/include/exec/windbgstub-utils.h
+> @@ -102,6 +102,7 @@ void kd_api_write_physical_memory(CPUState *cpu, PacketData *pd);
+>  void kd_api_get_version(CPUState *cpu, PacketData *pd);
+>  void kd_api_read_msr(CPUState *cpu, PacketData *pd);
+>  void kd_api_write_msr(CPUState *cpu, PacketData *pd);
+> +void kd_api_search_memory(CPUState *cpu, PacketData *pd);
+>  void kd_api_unsupported(CPUState *cpu, PacketData *pd);
 >
-> That patch was moving in the right direction, but I think there were two
-> problems with it. First, the right way to pass a parameter is via a
-> property field (as Peter explained). Second, IMO the parameter should be
-> the CPU model string to instantiate and not the Pi version number.
+>  SizedBuf kd_gen_exception_sc(CPUState *cpu);
+> diff --git a/windbgstub-utils.c b/windbgstub-utils.c
+> index 7ef301bac7..1f4590f338 100755
+> --- a/windbgstub-utils.c
+> +++ b/windbgstub-utils.c
+> @@ -261,6 +261,39 @@ void kd_api_get_version(CPUState *cpu, PacketData *pd)
+>      }
+>  }
 >
+> +void kd_api_search_memory(CPUState *cpu, PacketData *pd)
+> +{
+> +    DBGKD_SEARCH_MEMORY *m64c = &pd->m64.u.SearchMemory;
+> +    int s_len = MAX(ldq_p(&m64c->SearchLength), 1);
+> +    int p_len = MIN(ldl_p(&m64c->PatternLength), pd->extra_size);
+> +    target_ulong addr = ldq_p(&m64c->SearchAddress);
+> +    int size = MIN(s_len, 10);
+> +    uint8_t mem[size + p_len];
 
-Thanks!
+Is this allocation bounded by a reasonably small number? What's the
+maximum PatternLength?
 
+> +    int i, err;
+> +
+> +    pd->extra_size = 0;
+> +    pd->m64.ReturnStatus = STATUS_NO_MORE_ENTRIES;
+> +
+> +    while (s_len) {
+> +        err = cpu_memory_rw_debug(cpu, addr, mem, size + p_len, 0);
+> +        if (!err) {
+> +            for (i = 0; i < size; ++i) {
+> +                if (memcmp(mem + i, pd->extra, p_len) == 0) {
+> +                    stl_p(&m64c->FoundAddress, addr + i);
+> +                    pd->m64.ReturnStatus = STATUS_SUCCESS;
+> +                    return;
+> +                }
+> +            }
+> +        } else {
+> +            WINDBG_DEBUG("search_memory: No physical page mapped: " FMT_ADDR,
+> +                         addr);
+> +        }
+> +        s_len -= size;
+> +        addr += size;
+> +        size = MIN(s_len, 10);
+> +    }
+> +}
+> +
 
+Too bad that you can't use memmem(). This implementation screams
+O(N^2) to me. One of the things that can be improved later I guess.
+
+I would at least up the step from 10 to 1024 so we don't call
+cpu_memory_rw_debug() that often.
+
+>  void kd_api_unsupported(CPUState *cpu, PacketData *pd)
+>  {
+>      WINDBG_ERROR("Caught unimplemented api %s",
+> diff --git a/windbgstub.c b/windbgstub.c
+> index 0268d0818e..d35ff6ba96 100755
+> --- a/windbgstub.c
+> +++ b/windbgstub.c
+> @@ -212,6 +212,10 @@ static void windbg_process_manipulate_packet(ParsingContext *ctx)
+>      case DbgKdClearAllInternalBreakpointsApi:
+>          return;
 >
-> > Or should I wait
-> > for Alistair's patch (https://lists.gnu.org/
-> archive/html/qemu-devel/2017-
-> > 10/msg04153.html)?
->
-> Alistair's patch doesn't actually help you as far as I can see, since it
-> doesn't change what CPU bcm2836 instantiates. I think it just means that if
-> the user specifies a different CPU type they get an error rather than being
-> silently ignored.
->
-
-It does add the CPU model string, which can and should be used in bcm2836
-to decide which CPU to instatiate (regardless the method of passing that
-parameter). If I add yet another CPU model string, the two patch will be in
-conflict containing redundant information. Also I'm sure would raspi3 use
-different cpus, we should always instantiate the one the user specified.
-Although here is only one possible CPU model, still that seems to be the
-correct behavior. Don't get me wrong, I don't criticize, I just want to
-find the best solution. Setting the CPU model only once for each version
-seems right. I was thinking: if there's going to be a user specified CPU
-model string anyway, why not use that one?
-
-bzt
-
-
->
-> Andrew
+> +    case DbgKdSearchMemoryApi:
+> +        kd_api_search_memory(cpu, &ctx->data);
+> +        break;
+> +
+>      default:
+>          kd_api_unsupported(cpu, &ctx->data);
+>          break;
 >
