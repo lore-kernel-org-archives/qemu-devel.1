@@ -1,23 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54272)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54651)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1eK2pz-0001cn-HP
-	for qemu-devel@nongnu.org; Wed, 29 Nov 2017 08:55:44 -0500
+	(envelope-from <jcody@redhat.com>) id 1eK2qv-0002Ji-3n
+	for qemu-devel@nongnu.org; Wed, 29 Nov 2017 08:56:42 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1eK2py-0001eS-IX
-	for qemu-devel@nongnu.org; Wed, 29 Nov 2017 08:55:43 -0500
-Date: Wed, 29 Nov 2017 14:55:28 +0100
-From: Kevin Wolf <kwolf@redhat.com>
-Message-ID: <20171129135528.GD3753@localhost.localdomain>
+	(envelope-from <jcody@redhat.com>) id 1eK2qt-0002Cd-TI
+	for qemu-devel@nongnu.org; Wed, 29 Nov 2017 08:56:41 -0500
+Date: Wed, 29 Nov 2017 08:56:21 -0500
+From: Jeff Cody <jcody@redhat.com>
+Message-ID: <20171129135621.GM25110@localhost.localdomain>
 References: <20171129102513.9153-1-pbonzini@redhat.com>
-	<20171129102513.9153-2-pbonzini@redhat.com>
-	<20171129134408.GB4281@stefanha-x1.localdomain>
+	<20171129102513.9153-5-pbonzini@redhat.com>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="tqI+Z3u+9OQ7kwn0"
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20171129134408.GB4281@stefanha-x1.localdomain>
-Subject: Re: [Qemu-devel] [Qemu-block] [PATCH 1/4] block: Expect graph
- changes in bdrv_parent_drained_begin/end
+In-Reply-To: <20171129102513.9153-5-pbonzini@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH 4/4] blockjob: reimplement
+ block_job_sleep_ns to allow cancellation
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,120 +24,222 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefan Hajnoczi <stefanha@gmail.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org, famz@redhat.com, qemu-block@nongnu.org
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: qemu-devel@nongnu.org, famz@redhat.com, qemu-block@nongnu.org, kwolf@redhat.com
+
+On Wed, Nov 29, 2017 at 11:25:13AM +0100, Paolo Bonzini wrote:
+> This reverts the effects of commit 4afeffc857 ("blockjob: do not allow
+> coroutine double entry or entry-after-completion", 2017-11-21)
+> 
+> This fixed the symptom of a bug rather than the root cause. Canceling the
+> wait on a sleeping blockjob coroutine is generally fine, we just need to
+> make it work correctly across AioContexts.  To do so, use a QEMUTimer
+> that calls block_job_enter.  Use a mutex to ensure that block_job_enter
+> synchronizes correctly with block_job_sleep_ns.
+> 
+> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+> ---
+>  blockjob.c                   | 57 +++++++++++++++++++++++++++++++++++---------
+>  include/block/blockjob.h     |  5 +++-
+>  include/block/blockjob_int.h |  4 ++--
+>  3 files changed, 52 insertions(+), 14 deletions(-)
+> 
+> diff --git a/blockjob.c b/blockjob.c
+> index 4d22b7d2fb..3fdaabbc1f 100644
+> --- a/blockjob.c
+> +++ b/blockjob.c
+> @@ -37,6 +37,26 @@
+>  #include "qemu/timer.h"
+>  #include "qapi-event.h"
+>  
+> +/* Right now, this mutex is only needed to synchronize accesses to job->busy,
+> + * especially concurrent calls to block_job_enter.
+> + */
+
+See my comment on Kevin's comment
 
 
---tqI+Z3u+9OQ7kwn0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+> +static QemuMutex block_job_mutex;
+> +
+> +static void block_job_lock(void)
+> +{
+> +    qemu_mutex_lock(&block_job_mutex);
+> +}
+> +
+> +static void block_job_unlock(void)
+> +{
+> +    qemu_mutex_unlock(&block_job_mutex);
+> +}
+> +
+> +static void __attribute__((__constructor__)) block_job_init(void)
+> +{
+> +    qemu_mutex_init(&block_job_mutex);
+> +}
+> +
+>  static void block_job_event_cancelled(BlockJob *job);
+>  static void block_job_event_completed(BlockJob *job, const char *msg);
+>  
+> @@ -161,6 +181,7 @@ void block_job_unref(BlockJob *job)
+>          blk_unref(job->blk);
+>          error_free(job->blocker);
+>          g_free(job->id);
+> +        assert(!timer_pending(&job->sleep_timer));
+>          g_free(job);
+>      }
+>  }
+> @@ -287,6 +308,13 @@ static void coroutine_fn block_job_co_entry(void *opaque)
+>      job->driver->start(job);
+>  }
+>  
+> +static void block_job_sleep_timer_cb(void *opaque)
+> +{
+> +    BlockJob *job = opaque;
+> +
+> +    block_job_enter(job);
+> +}
+> +
+>  void block_job_start(BlockJob *job)
+>  {
+>      assert(job && !block_job_started(job) && job->paused &&
+> @@ -556,7 +584,7 @@ BlockJobInfo *block_job_query(BlockJob *job, Error **errp)
+>      info->type      = g_strdup(BlockJobType_str(job->driver->job_type));
+>      info->device    = g_strdup(job->id);
+>      info->len       = job->len;
+> -    info->busy      = job->busy;
+> +    info->busy      = atomic_read(&job->busy);
+>      info->paused    = job->pause_count > 0;
+>      info->offset    = job->offset;
+>      info->speed     = job->speed;
+> @@ -664,6 +692,9 @@ void *block_job_create(const char *job_id, const BlockJobDriver *driver,
+>      job->paused        = true;
+>      job->pause_count   = 1;
+>      job->refcnt        = 1;
+> +    aio_timer_init(qemu_get_aio_context(), &job->sleep_timer,
+> +                   QEMU_CLOCK_REALTIME, SCALE_NS,
+> +                   block_job_sleep_timer_cb, job);
+>  
+>      error_setg(&job->blocker, "block device is in use by block job: %s",
+>                 BlockJobType_str(driver->job_type));
+> @@ -729,9 +760,14 @@ static bool block_job_should_pause(BlockJob *job)
+>      return job->pause_count > 0;
+>  }
+>  
+> -static void block_job_do_yield(BlockJob *job)
+> +static void block_job_do_yield(BlockJob *job, uint64_t ns)
 
-Am 29.11.2017 um 14:44 hat Stefan Hajnoczi geschrieben:
-> On Wed, Nov 29, 2017 at 11:25:10AM +0100, Paolo Bonzini wrote:
-> > From: Kevin Wolf <kwolf@redhat.com>
-> >=20
-> > The .drained_begin/end callbacks can (directly or indirectly via
-> > aio_poll()) cause block nodes to be removed or the current BdrvChild to
-> > point to a different child node.
-> >=20
-> > Use QLIST_FOREACH_SAFE() to make sure we don't access invalid
-> > BlockDriverStates or accidentally continue iterating the parents of the
-> > new child node instead of the node we actually came from.
-> >=20
-> > Signed-off-by: Kevin Wolf <kwolf@redhat.com>
-> > Tested-by: Jeff Cody <jcody@redhat.com>
-> > Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
-> > Reviewed-by: Jeff Cody <jcody@redhat.com>
-> > ---
-> >  block/io.c | 8 ++++----
-> >  1 file changed, 4 insertions(+), 4 deletions(-)
-> >=20
-> > diff --git a/block/io.c b/block/io.c
-> > index 4fdf93a014..6773926fc1 100644
-> > --- a/block/io.c
-> > +++ b/block/io.c
-> > @@ -42,9 +42,9 @@ static int coroutine_fn bdrv_co_do_pwrite_zeroes(Bloc=
-kDriverState *bs,
-> > =20
-> >  void bdrv_parent_drained_begin(BlockDriverState *bs)
-> >  {
-> > -    BdrvChild *c;
-> > +    BdrvChild *c, *next;
-> > =20
-> > -    QLIST_FOREACH(c, &bs->parents, next_parent) {
-> > +    QLIST_FOREACH_SAFE(c, &bs->parents, next_parent, next) {
-> >          if (c->role->drained_begin) {
-> >              c->role->drained_begin(c);
-> >          }
-> > @@ -53,9 +53,9 @@ void bdrv_parent_drained_begin(BlockDriverState *bs)
-> > =20
-> >  void bdrv_parent_drained_end(BlockDriverState *bs)
-> >  {
-> > -    BdrvChild *c;
-> > +    BdrvChild *c, *next;
-> > =20
-> > -    QLIST_FOREACH(c, &bs->parents, next_parent) {
-> > +    QLIST_FOREACH_SAFE(c, &bs->parents, next_parent, next) {
-> >          if (c->role->drained_end) {
-> >              c->role->drained_end(c);
-> >          }
->=20
-> Hmm...not sure if this patch is enough.
+Maybe worth a comment that using '-1' on a uint64_t is by design, and not a
+bug, so this doesn't get 'fixed' in the future? 
 
-Depends on what you have in mind, but generally, no, it's certainly not
-enough to fix all bad things that can happen during drain...
+>  {
+> +    block_job_lock();
+> +    if (ns != -1) {
+> +        timer_mod(&job->sleep_timer, ns);
+> +    }
+>      job->busy = false;
+> +    block_job_unlock();
+>      qemu_coroutine_yield();
+>  
+>      /* Set by block_job_enter before re-entering the coroutine.  */
+> @@ -755,7 +791,7 @@ void coroutine_fn block_job_pause_point(BlockJob *job)
+>  
+>      if (block_job_should_pause(job) && !block_job_is_cancelled(job)) {
+>          job->paused = true;
+> -        block_job_do_yield(job);
+> +        block_job_do_yield(job, -1);
+>          job->paused = false;
+>      }
+>  
+> @@ -785,11 +821,16 @@ void block_job_enter(BlockJob *job)
+>          return;
+>      }
+>  
+> +    block_job_lock();
+>      if (job->busy) {
+> +        block_job_unlock();
+>          return;
+>      }
+>  
+> +    assert(!job->deferred_to_main_loop);
+> +    timer_del(&job->sleep_timer);
+>      job->busy = true;
+> +    block_job_unlock();
+>      aio_co_wake(job->co);
+>  }
+>  
+> @@ -807,14 +848,8 @@ void block_job_sleep_ns(BlockJob *job, int64_t ns)
+>          return;
+>      }
+>  
+> -    /* We need to leave job->busy set here, because when we have
+> -     * put a coroutine to 'sleep', we have scheduled it to run in
+> -     * the future.  We cannot enter that same coroutine again before
+> -     * it wakes and runs, otherwise we risk double-entry or entry after
+> -     * completion. */
+>      if (!block_job_should_pause(job)) {
+> -        co_aio_sleep_ns(blk_get_aio_context(job->blk),
+> -                        QEMU_CLOCK_REALTIME, ns);
+> +        block_job_do_yield(job, qemu_clock_get_ns(QEMU_CLOCK_REALTIME) + ns);
+>      }
+>  
+>      block_job_pause_point(job);
+> @@ -830,7 +865,7 @@ void block_job_yield(BlockJob *job)
+>      }
+>  
+>      if (!block_job_should_pause(job)) {
+> -        block_job_do_yield(job);
+> +        block_job_do_yield(job, -1);
+>      }
+>  
+>      block_job_pause_point(job);
+> diff --git a/include/block/blockjob.h b/include/block/blockjob.h
+> index 67c0968fa5..956f0d6819 100644
+> --- a/include/block/blockjob.h
+> +++ b/include/block/blockjob.h
+> @@ -77,7 +77,7 @@ typedef struct BlockJob {
+>      /**
+>       * Set to false by the job while the coroutine has yielded and may be
+>       * re-entered by block_job_enter().  There may still be I/O or event loop
+> -     * activity pending.
+> +     * activity pending.  Accessed under block_job_mutex (in blockjob.c).
+>       */
+>      bool busy;
+>  
+> @@ -135,6 +135,9 @@ typedef struct BlockJob {
+>       */
+>      int ret;
+>  
+> +    /** Timer that is used by @block_job_sleep_ns.  */
 
-> Thinking about this more, if this sub-graph changes then
-> .drained_begin() callbacks are not necessarily paired with
-> .drained_end() callbacks.
->=20
-> In other words, all of the following are possible:
->=20
-> 1. Only .drained_begin() is called
-> 2. .drained_begin() is called, then .drained_end()
-> 3. Only .drained_end() is called
+Maybe also add similar statement as above for busy:
 
-bdrv_replace_child_noperm() makes sure to call .drained_end() and
-=2Edrained_begin() depending on whether the old and new child node are
-currently drained. So I think this might actually work.
+       /* Accessed under block_job_mutex (in blockjob.c) */
 
-> It makes me wonder if we need to either:
->=20
-> Take references and ensure .drained_end() gets called if and only if
-> .drained_begin() was also called.
->=20
-> OR
->=20
-> Document that .drained_begin/end() calls may not be paired and audit
-> existing code to check that this is safe.
+> +    QEMUTimer sleep_timer;
+> +
+>      /** Non-NULL if this job is part of a transaction */
+>      BlockJobTxn *txn;
+>      QLIST_ENTRY(BlockJob) txn_list;
+> diff --git a/include/block/blockjob_int.h b/include/block/blockjob_int.h
+> index f7ab183a39..c9b23b0cc9 100644
+> --- a/include/block/blockjob_int.h
+> +++ b/include/block/blockjob_int.h
+> @@ -142,8 +142,8 @@ void *block_job_create(const char *job_id, const BlockJobDriver *driver,
+>   * @ns: How many nanoseconds to stop for.
+>   *
+>   * Put the job to sleep (assuming that it wasn't canceled) for @ns
+> - * %QEMU_CLOCK_REALTIME nanoseconds.  Canceling the job will not interrupt
+> - * the wait, so the cancel will not process until the coroutine wakes up.
+> + * %QEMU_CLOCK_REALTIME nanoseconds.  Canceling the job will immediately
+> + * interrupt the wait.
+>   */
+>  void block_job_sleep_ns(BlockJob *job, int64_t ns);
+>  
+> -- 
+> 2.14.3
+>
 
-How would the latter even possibly work? If the .drained_end is missing,
-the parent would never know that it can send new requests again. A
-missing .drained_begin could be ignored in the .drained_end callback,
-but it wouldn't be safe because the parent wouldn't actually stop to
-send new requests.
+My only concerns were regarding comments, and Kevin can fix them when
+applying if he wants.  So:
 
-Kevin
 
---tqI+Z3u+9OQ7kwn0
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQIcBAEBAgAGBQJaHrxQAAoJEH8JsnLIjy/Wq7QP/ixeiii6zTOlwMKR4/j5c7ol
-185kahNuHWtPyFCnacxEyFpKGwPX+DxNKiFEGp9YgLzsjWQFNSSjiyXm5TgHi/TI
-2RQgNNvhommT2zdKwmuxB/iNir4lod7Hx1jLJ0+QUFdzr/jN000M9iMBm0SFLnfi
-/zzIoLvC3MVDzed25D+d/PDua3mC94XtL5fglGdcp+MdQUlmsyFiOR2xMuAmAquF
-SAwy0qRHa2n9kzZMEsnzaE4ts2+vxtdmp8BAmTZLa6vOdA3gwGhZ1g9wM0SXgAuD
-5IuB/z5mAVNAtIgQiryQuLHuQq3i6jX7qmNeXKibFbL706vDTWPSTgXwO6/C9q4N
-bWm7R/Cm4f+YDKWOghF3UHYzcRcHj4fVNI/51jQyBdHluaCfrcgMOfxbXEMre0lY
-T+4gQwnPaYPvnylCPdr+ZlWaj7yTTH88Ro0+HQVnjRI20YkUkT8WPpCMdLCR1Np+
-16pnMSwxELjf+WBfyxLnxangGB+KlKETJwkxZpHLpQeXQ3zZ/bb/FrbMgxWI6M91
-gsxOq3AaTHnsLfI7hXzTuRreLs8M9bz2RJ5XwoBU+qibfkQyp4qykkDmcgxF2K1j
-pOPTfqu+rIRghF0HDbquM5zAQHRdP+7iPU+ds7QQmpk0a9Qr5+zTvgnrPXG6zvQY
-JfXffjPbI2lK5aQrdcpt
-=LIZY
------END PGP SIGNATURE-----
-
---tqI+Z3u+9OQ7kwn0--
+Reviewed-by: Jeff Cody <jcody@redhat.com>
