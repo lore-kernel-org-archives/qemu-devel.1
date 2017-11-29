@@ -1,34 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35041)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35225)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1eK1ji-0002k8-L1
-	for qemu-devel@nongnu.org; Wed, 29 Nov 2017 07:45:11 -0500
+	(envelope-from <berto@igalia.com>) id 1eK1kA-00030T-F4
+	for qemu-devel@nongnu.org; Wed, 29 Nov 2017 07:45:39 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1eK1jf-00056j-I7
-	for qemu-devel@nongnu.org; Wed, 29 Nov 2017 07:45:10 -0500
-Received: from indium.canonical.com ([91.189.90.7]:34848)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1eK1jf-00055e-BS
-	for qemu-devel@nongnu.org; Wed, 29 Nov 2017 07:45:07 -0500
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1eK1je-0007GB-Ae
-	for <qemu-devel@nongnu.org>; Wed, 29 Nov 2017 12:45:06 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 4C19F2E80C3
-	for <qemu-devel@nongnu.org>; Wed, 29 Nov 2017 12:45:06 +0000 (UTC)
+	(envelope-from <berto@igalia.com>) id 1eK1k7-0005P5-Ei
+	for qemu-devel@nongnu.org; Wed, 29 Nov 2017 07:45:38 -0500
+From: Alberto Garcia <berto@igalia.com>
+In-Reply-To: <20171129102513.9153-3-pbonzini@redhat.com>
+References: <20171129102513.9153-1-pbonzini@redhat.com>
+	<20171129102513.9153-3-pbonzini@redhat.com>
+Date: Wed, 29 Nov 2017 13:45:32 +0100
+Message-ID: <w51fu8xmexf.fsf@maestria.local.igalia.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Wed, 29 Nov 2017 12:31:41 -0000
-From: Thomas Huth <645662@bugs.launchpad.net>
-Reply-To: Bug 645662 <645662@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <20100923002702.20683.97345.malonedeb@soybean.canonical.com>
-Message-Id: <151195870152.20386.11174852486905428627.malone@chaenomeles.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 645662] Re: QEMU x87 emulation of trig and other
- complex ops is only at 64-bit precision, not 80-bit
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [Qemu-block] [PATCH 2/4] blockjob: remove clock
+ argument from block_job_sleep_ns
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,77 +23,16 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org
+Cc: kwolf@redhat.com, famz@redhat.com, qemu-block@nongnu.org
 
-Laurent Vivier recently started to adapt some of function from the
-"Previous" NeXT emulator for m68k, see e.g. this patch series here:
+On Wed 29 Nov 2017 11:25:11 AM CET, Paolo Bonzini wrote:
+> All callers are using QEMU_CLOCK_REALTIME, and it will not be possible to
+> support more than one clock when block_job_sleep_ns switches to a single
+> timer stored in the BlockJob struct.
+>
+> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 
- https://lists.gnu.org/archive/html/qemu-devel/2017-11/msg04454.html
+Reviewed-by: Alberto Garcia <berto@igalia.com>
 
-Not sure, but I think that could help to fix at least some of the
-missing functions.
-
--- =
-
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/645662
-
-Title:
-  QEMU x87 emulation of trig and other complex ops is only at 64-bit
-  precision, not 80-bit
-
-Status in QEMU:
-  Confirmed
-
-Bug description:
-  When doing the regression tests for Python 3.1.2 with Qemu 0.12.5, (Linux=
- version 2.6.26-2-686 (Debian 2.6.26-25lenny1)),
-  gcc (Debian 4.3.2-1.1) 4.3.2, Python compiled from sources within qemu,
-  3 math tests fail, apparently because the floating point unit is buggy. Q=
-meu was compiled from original sources
-  on Debian Lenny with kernel  2.6.34.6 from kernel.org, gcc  (Debian 4.3.2=
--1.1) 4.3. =
-
-
-  Regression testing errors:
-
-  test_cmath
-  test test_cmath failed -- Traceback (most recent call last):
-    File "/root/tools/python3/Python-3.1.2/Lib/test/test_cmath.py", line 36=
-4, in
-      self.fail(error_message)
-  AssertionError: acos0034: acos(complex(-1.0000000000000002, 0.0))
-  Expected: complex(3.141592653589793, -2.1073424255447014e-08)
-  Received: complex(3.141592653589793, -2.1073424338879928e-08)
-  Received value insufficiently close to expected value.
-
-  =
-
-  test_float
-  test test_float failed -- Traceback (most recent call last):
-    File "/root/tools/python3/Python-3.1.2/Lib/test/test_float.py", line 47=
-9, in
-      self.assertEqual(s, repr(float(s)))
-  AssertionError: '8.72293771110361e+25' !=3D '8.722937711103609e+25'
-
-  =
-
-  test_math
-  test test_math failed -- multiple errors occurred; run in verbose mode fo=
-r deta
-
-  =3D>
-
-  runtests.sh -v test_math
-
-  le01:~/tools/python3/Python-3.1.2# ./runtests.sh -v test_math
-  test_math BAD
-   1 BAD
-   0 GOOD
-   0 SKIPPED
-   1 total
-  le01:~/tools/python3/Python-3.1.2#
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/645662/+subscriptions
+Berto
