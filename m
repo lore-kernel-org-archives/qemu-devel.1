@@ -1,21 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54651)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54719)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jcody@redhat.com>) id 1eK2qv-0002Ji-3n
-	for qemu-devel@nongnu.org; Wed, 29 Nov 2017 08:56:42 -0500
+	(envelope-from <clg@kaod.org>) id 1eK2r6-0002dx-Au
+	for qemu-devel@nongnu.org; Wed, 29 Nov 2017 08:56:53 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jcody@redhat.com>) id 1eK2qt-0002Cd-TI
-	for qemu-devel@nongnu.org; Wed, 29 Nov 2017 08:56:41 -0500
-Date: Wed, 29 Nov 2017 08:56:21 -0500
-From: Jeff Cody <jcody@redhat.com>
-Message-ID: <20171129135621.GM25110@localhost.localdomain>
-References: <20171129102513.9153-1-pbonzini@redhat.com>
-	<20171129102513.9153-5-pbonzini@redhat.com>
+	(envelope-from <clg@kaod.org>) id 1eK2r0-0002Fn-JM
+	for qemu-devel@nongnu.org; Wed, 29 Nov 2017 08:56:52 -0500
+Received: from 3.mo2.mail-out.ovh.net ([46.105.58.226]:56294)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1eK2r0-0002Eu-Bu
+	for qemu-devel@nongnu.org; Wed, 29 Nov 2017 08:56:46 -0500
+Received: from player731.ha.ovh.net (b9.ovh.net [213.186.33.59])
+	by mo2.mail-out.ovh.net (Postfix) with ESMTP id C09A9CDC04
+	for <qemu-devel@nongnu.org>; Wed, 29 Nov 2017 14:56:44 +0100 (CET)
+References: <20171123132955.1261-1-clg@kaod.org>
+	<20171123132955.1261-11-clg@kaod.org>
+	<20171128063827.GP11775@umbus.fritz.box>
+	<e9b1f002-671b-7ba5-2b5b-34715d63585c@kaod.org>
+	<20171129045941.GH3023@umbus.fritz.box>
+From: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
+Message-ID: <512a0e63-43c1-bf8c-3060-66ab52bc054f@kaod.org>
+Date: Wed, 29 Nov 2017 14:56:39 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20171129102513.9153-5-pbonzini@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH 4/4] blockjob: reimplement
- block_job_sleep_ns to allow cancellation
+In-Reply-To: <20171129045941.GH3023@umbus.fritz.box>
+Content-Type: text/plain; charset=windows-1252
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH 10/25] spapr: add MMIO handlers for the
+ XIVE interrupt sources
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,222 +35,53 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: qemu-devel@nongnu.org, famz@redhat.com, qemu-block@nongnu.org, kwolf@redhat.com
+To: David Gibson <david@gibson.dropbear.id.au>
+Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, Benjamin Herrenschmidt <benh@kernel.crashing.org>
 
-On Wed, Nov 29, 2017 at 11:25:13AM +0100, Paolo Bonzini wrote:
-> This reverts the effects of commit 4afeffc857 ("blockjob: do not allow
-> coroutine double entry or entry-after-completion", 2017-11-21)
+>>>> +    switch (offset) {
+>>>> +    case 0:
+>>>> +        spapr_xive_source_eoi(xive, lisn);
+>>>
+>>> Hrm.  I don't love that you're dealing with clearing that LSI bit
+>>> here, but setting it at a different level.
+>>>
+>>> The state machines are doing my head in a bit, is there any way
+>>> you could derive the STATUS_SENT bit from the PQ bits?
+>>
+>> Yes. I should. 
+>>
+>> I am also lacking a guest driver to exercise these LSIs so I didn't
+>> pay a lot of attention to level interrupts. Any idea ?
 > 
-> This fixed the symptom of a bug rather than the root cause. Canceling the
-> wait on a sleeping blockjob coroutine is generally fine, we just need to
-> make it work correctly across AioContexts.  To do so, use a QEMUTimer
-> that calls block_job_enter.  Use a mutex to ensure that block_job_enter
-> synchronizes correctly with block_job_sleep_ns.
-> 
-> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
-> ---
->  blockjob.c                   | 57 +++++++++++++++++++++++++++++++++++---------
->  include/block/blockjob.h     |  5 +++-
->  include/block/blockjob_int.h |  4 ++--
->  3 files changed, 52 insertions(+), 14 deletions(-)
-> 
-> diff --git a/blockjob.c b/blockjob.c
-> index 4d22b7d2fb..3fdaabbc1f 100644
-> --- a/blockjob.c
-> +++ b/blockjob.c
-> @@ -37,6 +37,26 @@
->  #include "qemu/timer.h"
->  #include "qapi-event.h"
->  
-> +/* Right now, this mutex is only needed to synchronize accesses to job->busy,
-> + * especially concurrent calls to block_job_enter.
-> + */
+> How about an old-school emulated PCI device?  Maybe rtl8139?
 
-See my comment on Kevin's comment
+Perfect. The current model is working but I will see how I can 
+improve it to use the PQ bits instead.
 
+I also found a couple of issues on the way. 
 
-> +static QemuMutex block_job_mutex;
-> +
-> +static void block_job_lock(void)
-> +{
-> +    qemu_mutex_lock(&block_job_mutex);
-> +}
-> +
-> +static void block_job_unlock(void)
-> +{
-> +    qemu_mutex_unlock(&block_job_mutex);
-> +}
-> +
-> +static void __attribute__((__constructor__)) block_job_init(void)
-> +{
-> +    qemu_mutex_init(&block_job_mutex);
-> +}
-> +
->  static void block_job_event_cancelled(BlockJob *job);
->  static void block_job_event_completed(BlockJob *job, const char *msg);
->  
-> @@ -161,6 +181,7 @@ void block_job_unref(BlockJob *job)
->          blk_unref(job->blk);
->          error_free(job->blocker);
->          g_free(job->id);
-> +        assert(!timer_pending(&job->sleep_timer));
->          g_free(job);
->      }
->  }
-> @@ -287,6 +308,13 @@ static void coroutine_fn block_job_co_entry(void *opaque)
->      job->driver->start(job);
->  }
->  
-> +static void block_job_sleep_timer_cb(void *opaque)
-> +{
-> +    BlockJob *job = opaque;
-> +
-> +    block_job_enter(job);
-> +}
-> +
->  void block_job_start(BlockJob *job)
->  {
->      assert(job && !block_job_started(job) && job->paused &&
-> @@ -556,7 +584,7 @@ BlockJobInfo *block_job_query(BlockJob *job, Error **errp)
->      info->type      = g_strdup(BlockJobType_str(job->driver->job_type));
->      info->device    = g_strdup(job->id);
->      info->len       = job->len;
-> -    info->busy      = job->busy;
-> +    info->busy      = atomic_read(&job->busy);
->      info->paused    = job->pause_count > 0;
->      info->offset    = job->offset;
->      info->speed     = job->speed;
-> @@ -664,6 +692,9 @@ void *block_job_create(const char *job_id, const BlockJobDriver *driver,
->      job->paused        = true;
->      job->pause_count   = 1;
->      job->refcnt        = 1;
-> +    aio_timer_init(qemu_get_aio_context(), &job->sleep_timer,
-> +                   QEMU_CLOCK_REALTIME, SCALE_NS,
-> +                   block_job_sleep_timer_cb, job);
->  
->      error_setg(&job->blocker, "block device is in use by block job: %s",
->                 BlockJobType_str(driver->job_type));
-> @@ -729,9 +760,14 @@ static bool block_job_should_pause(BlockJob *job)
->      return job->pause_count > 0;
->  }
->  
-> -static void block_job_do_yield(BlockJob *job)
-> +static void block_job_do_yield(BlockJob *job, uint64_t ns)
+We do need the "#interrupt-cells" and "interrupt-controller" 
+properties. They are missing from the XIVE sPAPR specs but there
+is no other way to find the parent controller for the LSIs ... 
+I have re-asked the pHyp team to include them in the specs and 
+fixed the QEMU model.
+ 
+Linux thinks the interrupt type is an "edge" and not a "level" one :
+  
+  (initramfs) cat /proc/interrupts 
+             CPU0       
+   16:          0  XIVE-IPI    0 Edge      IPI
+   17:         14  XIVE-IRQ 4100 Edge      enp0s0
+   18:          0  XIVE-IRQ 4097 Edge      RAS_HOTPLUG
+   19:          0  XIVE-IRQ 4096 Edge      RAS_EPOW
+   20:         20  XIVE-IRQ 4098 Edge      hvc_console
 
-Maybe worth a comment that using '-1' on a uint64_t is by design, and not a
-bug, so this doesn't get 'fixed' in the future? 
+and XIVE complains :
 
->  {
-> +    block_job_lock();
-> +    if (ns != -1) {
-> +        timer_mod(&job->sleep_timer, ns);
-> +    }
->      job->busy = false;
-> +    block_job_unlock();
->      qemu_coroutine_yield();
->  
->      /* Set by block_job_enter before re-entering the coroutine.  */
-> @@ -755,7 +791,7 @@ void coroutine_fn block_job_pause_point(BlockJob *job)
->  
->      if (block_job_should_pause(job) && !block_job_is_cancelled(job)) {
->          job->paused = true;
-> -        block_job_do_yield(job);
-> +        block_job_do_yield(job, -1);
->          job->paused = false;
->      }
->  
-> @@ -785,11 +821,16 @@ void block_job_enter(BlockJob *job)
->          return;
->      }
->  
-> +    block_job_lock();
->      if (job->busy) {
-> +        block_job_unlock();
->          return;
->      }
->  
-> +    assert(!job->deferred_to_main_loop);
-> +    timer_del(&job->sleep_timer);
->      job->busy = true;
-> +    block_job_unlock();
->      aio_co_wake(job->co);
->  }
->  
-> @@ -807,14 +848,8 @@ void block_job_sleep_ns(BlockJob *job, int64_t ns)
->          return;
->      }
->  
-> -    /* We need to leave job->busy set here, because when we have
-> -     * put a coroutine to 'sleep', we have scheduled it to run in
-> -     * the future.  We cannot enter that same coroutine again before
-> -     * it wakes and runs, otherwise we risk double-entry or entry after
-> -     * completion. */
->      if (!block_job_should_pause(job)) {
-> -        co_aio_sleep_ns(blk_get_aio_context(job->blk),
-> -                        QEMU_CLOCK_REALTIME, ns);
-> +        block_job_do_yield(job, qemu_clock_get_ns(QEMU_CLOCK_REALTIME) + ns);
->      }
->  
->      block_job_pause_point(job);
-> @@ -830,7 +865,7 @@ void block_job_yield(BlockJob *job)
->      }
->  
->      if (!block_job_should_pause(job)) {
-> -        block_job_do_yield(job);
-> +        block_job_do_yield(job, -1);
->      }
->  
->      block_job_pause_point(job);
-> diff --git a/include/block/blockjob.h b/include/block/blockjob.h
-> index 67c0968fa5..956f0d6819 100644
-> --- a/include/block/blockjob.h
-> +++ b/include/block/blockjob.h
-> @@ -77,7 +77,7 @@ typedef struct BlockJob {
->      /**
->       * Set to false by the job while the coroutine has yielded and may be
->       * re-entered by block_job_enter().  There may still be I/O or event loop
-> -     * activity pending.
-> +     * activity pending.  Accessed under block_job_mutex (in blockjob.c).
->       */
->      bool busy;
->  
-> @@ -135,6 +135,9 @@ typedef struct BlockJob {
->       */
->      int ret;
->  
-> +    /** Timer that is used by @block_job_sleep_ns.  */
+  [    8.319970] xive: Interrupt 17 (HW 0x1004) type mismatch, Linux says Edge, FW says Level
 
-Maybe also add similar statement as above for busy:
+I am digging this one.
 
-       /* Accessed under block_job_mutex (in blockjob.c) */
+Thanks.
 
-> +    QEMUTimer sleep_timer;
-> +
->      /** Non-NULL if this job is part of a transaction */
->      BlockJobTxn *txn;
->      QLIST_ENTRY(BlockJob) txn_list;
-> diff --git a/include/block/blockjob_int.h b/include/block/blockjob_int.h
-> index f7ab183a39..c9b23b0cc9 100644
-> --- a/include/block/blockjob_int.h
-> +++ b/include/block/blockjob_int.h
-> @@ -142,8 +142,8 @@ void *block_job_create(const char *job_id, const BlockJobDriver *driver,
->   * @ns: How many nanoseconds to stop for.
->   *
->   * Put the job to sleep (assuming that it wasn't canceled) for @ns
-> - * %QEMU_CLOCK_REALTIME nanoseconds.  Canceling the job will not interrupt
-> - * the wait, so the cancel will not process until the coroutine wakes up.
-> + * %QEMU_CLOCK_REALTIME nanoseconds.  Canceling the job will immediately
-> + * interrupt the wait.
->   */
->  void block_job_sleep_ns(BlockJob *job, int64_t ns);
->  
-> -- 
-> 2.14.3
->
-
-My only concerns were regarding comments, and Kevin can fix them when
-applying if he wants.  So:
-
-
-Reviewed-by: Jeff Cody <jcody@redhat.com>
+C.
