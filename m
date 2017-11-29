@@ -1,23 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59301)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59717)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1eJvsA-00016M-KP
-	for qemu-devel@nongnu.org; Wed, 29 Nov 2017 01:29:31 -0500
+	(envelope-from <jcody@redhat.com>) id 1eJvt3-0001dF-2B
+	for qemu-devel@nongnu.org; Wed, 29 Nov 2017 01:30:26 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1eJvs5-0005EK-NF
-	for qemu-devel@nongnu.org; Wed, 29 Nov 2017 01:29:30 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:59584)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <famz@redhat.com>) id 1eJvs5-0005Dp-HA
-	for qemu-devel@nongnu.org; Wed, 29 Nov 2017 01:29:25 -0500
-Date: Wed, 29 Nov 2017 14:29:17 +0800
-From: Fam Zheng <famz@redhat.com>
-Message-ID: <20171129062916.GA12220@lemon>
-References: <2b5d04f3.523b.160064da4db.Coremail.15700157322@163.com>
+	(envelope-from <jcody@redhat.com>) id 1eJvt1-0005pj-QL
+	for qemu-devel@nongnu.org; Wed, 29 Nov 2017 01:30:25 -0500
+Date: Wed, 29 Nov 2017 01:30:06 -0500
+From: Jeff Cody <jcody@redhat.com>
+Message-ID: <20171129063006.GD18521@localhost.localdomain>
+References: <20171129035502.GD8889@lemon>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <2b5d04f3.523b.160064da4db.Coremail.15700157322@163.com>
-Subject: Re: [Qemu-devel] device_del fail
+In-Reply-To: <20171129035502.GD8889@lemon>
+Subject: Re: [Qemu-devel] Block layer complexity: what to do to keep it
+ under control?
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,22 +23,110 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Lying <15700157322@163.com>
-Cc: qemu-devel@nongnu.org
+To: Fam Zheng <famz@redhat.com>
+Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, pbonzini@redhat.com, kwolf@redhat.com, stefanha@redhat.com, mreitz@redhat.com, eblake@redhat.com
 
-On Wed, 11/29 13:43, Lying wrote:
-> Hello everybody, I encounter a error on my vm guest
-> I remove my device on my guest is failed, following is detail message.
-> I didn't add my audio device before running my guest, So i add audio with "device_add" after running
-> Then i can use it, so i remove it with "device_del", but when i do it again, i
-> can't use my audio device and cannot remove it.
+On Wed, Nov 29, 2017 at 11:55:02AM +0800, Fam Zheng wrote:
+> Hi all,
+> 
+> As we move forwards with new features in the block layer, the chances of tricky
+> bugs happening have been increasing alongside - block jobs, coroutines,
+> throttling, AioContext, op blockers and image locking combined together make a
+> large and complex picture that is hard to fully understand and work with. Some
+> bugs we've encountered are quite challenging already.  Examples are:
+> 
+> - segfault in parallel blockjobs (iotest 30)
+>   https://lists.gnu.org/archive/html/qemu-devel/2017-11/msg01144.html
+> 
+> - Intermittent hang of iotest 194 (bdrv_drain_all after non-shared storage
+>   migration)
+>   https://lists.gnu.org/archive/html/qemu-devel/2017-11/msg01626.html
+> 
+> - Drainage in bdrv_replace_child_noperm()
+>   https://lists.gnu.org/archive/html/qemu-devel/2017-11/msg00868.html
+> 
+> - Regression from 2.8: stuck in bdrv_drain()
+>   https://lists.gnu.org/archive/html/qemu-devel/2017-04/msg02193.html
+> 
+
+I agree, it seems the complexity is growing by quite a bit.
+
+> So in principle, what should we do to make the block layer easy to understand,
+> develop with and debug? I think we have opportunities in these aspects:
+> 
+> - Documentation
+> 
+>   There is no central developer doc about block layer, especially how all pieces
+>   fit together. Having one will make it a lot easier for new contributors to
+>   understand better. Of course, we're facing the old problem: the code is
+>   moving, maintaining an updated document needs effort.
+> 
+>   Idea: add ./doc/deve/block.txt?
+> 
+
+There are some bits of brilliance in what is already there; for instance,
+devel/atomics.txt is very thorough.  But I agree that a major piece missing
+is an overall design document, that provides the "why" to the "what".
+
+Even given the cost of maintaining a higher level design document, I
+think your suggestion here is probably the one that can help mitigate the
+complexity the most; the more we (developers) can keep a coherent design
+model in mind, the better we are able to do your _other_ suggestions: create
+effective tests, simplify code, and enhance debuggability.
+
+> - Tests
+> 
+>   Writing tests is a great way not only to exercise code, verify new features
+>   work as expected and catch regression bugs, but also a way to show how the
+>   feature can be used. There is this trend that the QEMU user interface
+>   gradually moves from high level commands and args to small and flexible
+>   building blocks, therefore demostrating the usage in iotests is meaningful.
+> 
+>   Idea: Add tests to simulate how libvirt uses block layer, or how we expect it
+>   to. This would be a long term investment. We could reuse iotests, or create a
+>   new test framework specifically, if it's easier (for example, use docker/vm
+>   tests that just uses libvirt).
+> 
+>   Idea: Patchew already tests the quick group of iotests for a few
+>   formats/protocols, but we should really add it to "make check".
+> 
+
+Perhaps higher level testing (like your example of how libvirt uses the
+block layer) is a good candidate for avocado?
 
 
-I haven't tried unplugging an audio device myself but in general PCI hot unplug
-needs guest cooperation so some infomation about guest is also helpful.  Which
-guest OS is this?
+> - Simplified code, or more orthogonal/modularized architecture.
+> 
+>   Each aspect of block layer is complex enough so isolating them as much as
+>   possible is a reasonable approach to control the complexity. Block jobs and
+>   throttling becoming block filters is a good example, we should identify more.
+> 
+>   Idea: rethink event loops. Create coroutines ubiquitously (for example for
+>   each fd handler, BH and timer), so that many nested aio_poll() can be removed.
+> 
+>   Crazy idea: move the whole block layer to a vhost process, and implement
+>   existing features differently, especially in terms of multi-threading (hint:
+>   rust?).
+> 
+> - Debuggability.
+> 
+>   Working with backtraces when coroutine is used is pretty hard, it would be
+>   nice if ./scripts/qemugdb/coroutine.py could work with core files (i.e.
+>   without a process to debug), and trace back to co->caller automatically.
+> 
 
-What are the exact commands that you used and what are the messages from
-host/guest when you device_del?
+IIRC, this used to work, right?
 
-Fam
+>   It's always useful to dump block graph. Maybe we should add a helper function
+>   in block layer that dumps all node graphs in graphviz DOT format, and even
+>   make it available in QMP as x-dump-block-graph?
+> 
+>   Of course gdb scripts to dump various lists are also nice little things to
+>   have.
+> 
+>   Idea: write more ./scripts/qemugdb/<scriptlet>.py.
+
+More qemugdb macros would be great, especially for dumping the block chain
+and making coroutines less opaque.
+
+-Jeff
