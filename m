@@ -1,25 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55742)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56213)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1eJr6h-0001eE-6p
-	for qemu-devel@nongnu.org; Tue, 28 Nov 2017 20:24:13 -0500
+	(envelope-from <famz@redhat.com>) id 1eJr7p-0002FB-MX
+	for qemu-devel@nongnu.org; Tue, 28 Nov 2017 20:25:22 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1eJr6d-0003Dv-8T
-	for qemu-devel@nongnu.org; Tue, 28 Nov 2017 20:24:11 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:36654)
+	(envelope-from <famz@redhat.com>) id 1eJr7l-0003rX-NE
+	for qemu-devel@nongnu.org; Tue, 28 Nov 2017 20:25:21 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:43386)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1eJr6d-0003Da-0w
-	for qemu-devel@nongnu.org; Tue, 28 Nov 2017 20:24:07 -0500
-Date: Wed, 29 Nov 2017 03:24:02 +0200
-From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <20171129032348-mutt-send-email-mst@kernel.org>
-References: <2e8c12f5242bcf755a33ee3a0e9ef94339d1808c.1510487579.git.tgolembi@redhat.com>
+	(Exim 4.71) (envelope-from <famz@redhat.com>) id 1eJr7l-0003rF-FI
+	for qemu-devel@nongnu.org; Tue, 28 Nov 2017 20:25:17 -0500
+Date: Wed, 29 Nov 2017 09:25:12 +0800
+From: Fam Zheng <famz@redhat.com>
+Message-ID: <20171129012511.GA8889@lemon>
+References: <151134740734.552.186654908491769740@bafd83ae6430>
+	<3d7b93b2-76b1-cfc4-f87b-8983a8439bb7@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <2e8c12f5242bcf755a33ee3a0e9ef94339d1808c.1510487579.git.tgolembi@redhat.com>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v3] virtio_balloon: include disk/file
- caches memory statistics
+In-Reply-To: <3d7b93b2-76b1-cfc4-f87b-8983a8439bb7@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH] Add a blog post about HAXM acceleration on
+ Windows
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,73 +28,33 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?utf-8?B?VG9tw6HFoSBHb2xlbWJpb3Zza8O9?= <tgolembi@redhat.com>
-Cc: linux-mm@kvack.org, virtio-dev@lists.oasis-open.org, qemu-devel@nongnu.org, kvm@vger.kernel.org, virtualization@lists.linux-foundation.org, Huang Ying <ying.huang@intel.com>, Gal Hammer <ghammer@redhat.com>, Jason Wang <jasowang@redhat.com>, Amnon Ilan <ailan@redhat.com>, Wei Wang <wei.w.wang@intel.com>, Shaohua Li <shli@fb.com>, Rik van Riel <riel@redhat.com>
+To: Eric Blake <eblake@redhat.com>
+Cc: qemu-devel@nongnu.org, no-reply@patchew.org, yu.ning@linux.intel.com, huth@tuxfamily.org, sw@weilnetz.de, yu.ning@intel.com, pbonzini@redhat.com, jsnow@redhat.com, patchew-devel@freelists.org
 
-On Sun, Nov 12, 2017 at 01:05:38PM +0100, Tom=C3=A1=C5=A1 Golembiovsk=C3=BD=
- wrote:
-> Add a new field VIRTIO_BALLOON_S_CACHES to virtio_balloon memory
-> statistics protocol. The value represents all disk/file caches.
->=20
-> In this case it corresponds to the sum of values
-> Buffers+Cached+SwapCached from /proc/meminfo.
->=20
-> Signed-off-by: Tom=C3=A1=C5=A1 Golembiovsk=C3=BD <tgolembi@redhat.com>
+On Tue, 11/28 13:57, Eric Blake wrote:
+> On 11/22/2017 04:43 AM, no-reply@patchew.org wrote:
+> > Hi,
+> > 
+> > This series failed automatic build test. Please find the testing commands and
+> > their output below. If you have docker installed, you can probably reproduce it
+> > locally.
+> > 
+> > Subject: [Qemu-devel] [PATCH] Add a blog post about HAXM acceleration on Windows
+> > Type: series
+> > Message-id: 1511338200-20417-1-git-send-email-yu.ning@linux.intel.com
+> 
+> Just now noticing this, but it's impressive that:
+> 
+> > Updating 3c8cf5a9c21ff8782164d1def7f44bd888713384
+> > Switched to a new branch 'test'
+> > 73987e06df Add a blog post about HAXM acceleration on Windows
+> 
+> the patch even applied, even though it wasn't against qemu.git!  Is it
+> possible to teach patchew to ignore patches against the website, as that is
+> maintained in a separate repository?
 
+This patch was supposed to have "[qemu-web PATCH]" or "[PATCH web]" in the
+subject. That way it wouldn't be processed by patchew. (I think that is in
+general a good way to state which repo the series is targeting at.)
 
-I parked this on vhost branch, part of linux next.
-
-> ---
->  drivers/virtio/virtio_balloon.c     | 4 ++++
->  include/uapi/linux/virtio_balloon.h | 3 ++-
->  2 files changed, 6 insertions(+), 1 deletion(-)
->=20
-> diff --git a/drivers/virtio/virtio_balloon.c b/drivers/virtio/virtio_ba=
-lloon.c
-> index f0b3a0b9d42f..d2bd13bbaf9f 100644
-> --- a/drivers/virtio/virtio_balloon.c
-> +++ b/drivers/virtio/virtio_balloon.c
-> @@ -244,11 +244,13 @@ static unsigned int update_balloon_stats(struct v=
-irtio_balloon *vb)
->  	struct sysinfo i;
->  	unsigned int idx =3D 0;
->  	long available;
-> +	unsigned long caches;
-> =20
->  	all_vm_events(events);
->  	si_meminfo(&i);
-> =20
->  	available =3D si_mem_available();
-> +	caches =3D global_node_page_state(NR_FILE_PAGES);
-> =20
->  #ifdef CONFIG_VM_EVENT_COUNTERS
->  	update_stat(vb, idx++, VIRTIO_BALLOON_S_SWAP_IN,
-> @@ -264,6 +266,8 @@ static unsigned int update_balloon_stats(struct vir=
-tio_balloon *vb)
->  				pages_to_bytes(i.totalram));
->  	update_stat(vb, idx++, VIRTIO_BALLOON_S_AVAIL,
->  				pages_to_bytes(available));
-> +	update_stat(vb, idx++, VIRTIO_BALLOON_S_CACHES,
-> +				pages_to_bytes(caches));
-> =20
->  	return idx;
->  }
-> diff --git a/include/uapi/linux/virtio_balloon.h b/include/uapi/linux/v=
-irtio_balloon.h
-> index 343d7ddefe04..4e8b8304b793 100644
-> --- a/include/uapi/linux/virtio_balloon.h
-> +++ b/include/uapi/linux/virtio_balloon.h
-> @@ -52,7 +52,8 @@ struct virtio_balloon_config {
->  #define VIRTIO_BALLOON_S_MEMFREE  4   /* Total amount of free memory *=
-/
->  #define VIRTIO_BALLOON_S_MEMTOT   5   /* Total amount of memory */
->  #define VIRTIO_BALLOON_S_AVAIL    6   /* Available memory as in /proc =
-*/
-> -#define VIRTIO_BALLOON_S_NR       7
-> +#define VIRTIO_BALLOON_S_CACHES   7   /* Disk caches */
-> +#define VIRTIO_BALLOON_S_NR       8
-> =20
->  /*
->   * Memory statistics structure.
-> --=20
-> 2.15.0
+Fam
