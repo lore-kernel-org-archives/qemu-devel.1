@@ -1,27 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45077)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47404)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1eJzb3-0001cK-5q
-	for qemu-devel@nongnu.org; Wed, 29 Nov 2017 05:28:06 -0500
+	(envelope-from <marcel@redhat.com>) id 1eJzgB-0004w1-W8
+	for qemu-devel@nongnu.org; Wed, 29 Nov 2017 05:33:25 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1eJzb2-0007LM-7p
-	for qemu-devel@nongnu.org; Wed, 29 Nov 2017 05:28:05 -0500
-Received: from mail-oi0-x22b.google.com ([2607:f8b0:4003:c06::22b]:43550)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1eJzb2-0007K0-3O
-	for qemu-devel@nongnu.org; Wed, 29 Nov 2017 05:28:04 -0500
-Received: by mail-oi0-x22b.google.com with SMTP id f69so2032598oig.10
-	for <qemu-devel@nongnu.org>; Wed, 29 Nov 2017 02:28:04 -0800 (PST)
+	(envelope-from <marcel@redhat.com>) id 1eJzg5-0003gS-Na
+	for qemu-devel@nongnu.org; Wed, 29 Nov 2017 05:33:24 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:60918)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <marcel@redhat.com>) id 1eJzg5-0003fk-3O
+	for qemu-devel@nongnu.org; Wed, 29 Nov 2017 05:33:17 -0500
+References: <20171129084628.12336-1-david@gibson.dropbear.id.au>
+	<20171129084628.12336-3-david@gibson.dropbear.id.au>
+From: Marcel Apfelbaum <marcel@redhat.com>
+Message-ID: <a2baf05a-96b3-8c2c-0893-cc77a4afcf94@redhat.com>
+Date: Wed, 29 Nov 2017 12:33:12 +0200
 MIME-Version: 1.0
-In-Reply-To: <CAGC02hT7OvR1nbyD=AkOqPvxbNPz957=CPZsUxf1FJ73O8W52g@mail.gmail.com>
-References: <CAGC02hTe8SijuwrM0ZGg04=To0GBnPUrC23iKuc-pao65vAAUQ@mail.gmail.com>
-	<b36b0c95-4ddc-b818-522c-1bbec52138e8@adacore.com>
-	<CAGC02hT7OvR1nbyD=AkOqPvxbNPz957=CPZsUxf1FJ73O8W52g@mail.gmail.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Wed, 29 Nov 2017 10:27:42 +0000
-Message-ID: <CAFEAcA8eDeKBnLW45=fPt3NeApMkvkiJzFEshvep_5qmwZKGXA@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [Bug 645662] x87 fpu emulation not accurate enough
+In-Reply-To: <20171129084628.12336-3-david@gibson.dropbear.id.au>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [for-2.12 2/7] pci: Move bridge data structures
+ from pci_bus.h to pci_bridge.h
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,53 +29,166 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: william lin <wlsaidhi@gmail.com>
-Cc: KONRAD Frederic <frederic.konrad@adacore.com>, QEMU Developers <qemu-devel@nongnu.org>
+To: David Gibson <david@gibson.dropbear.id.au>, "Michael S . Tsirkin" <mst@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, Igor Mammedov <imammedo@redhat.com>
+Cc: qemu-devel@nongnu.org
 
-On 29 November 2017 at 09:59, william lin <wlsaidhi@gmail.com> wrote:
-> This bug has been around for 7+ years now. Qemu switched to softfloat and
-> it did not fix this. I think its most likely caused by Qemu's internal
-> representation not being accurate enough or accuracy lost during
-> conversion. However this is basically what is given to us in the bug
-> report, and I have not been able to make much progress past this point, so
-> we are asking for help.
+On 29/11/2017 10:46, David Gibson wrote:
+> include/hw/pci/pci_bus.h contains several data structures related to PCI
+> bridges that aren't needed by most users of pci_bus.h.  We already have
+> a pci_bridge.h, so move them there.
+> 
+> Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
+> ---
+>   include/hw/pci-host/xilinx-pcie.h |  2 +-
+>   include/hw/pci/pci_bridge.h       | 48 ++++++++++++++++++++++++++++++++++++
+>   include/hw/pci/pci_bus.h          | 51 ++-------------------------------------
+>   3 files changed, 51 insertions(+), 50 deletions(-)
+> 
+> diff --git a/include/hw/pci-host/xilinx-pcie.h b/include/hw/pci-host/xilinx-pcie.h
+> index bec66b27c5..74c04dc9bb 100644
+> --- a/include/hw/pci-host/xilinx-pcie.h
+> +++ b/include/hw/pci-host/xilinx-pcie.h
+> @@ -23,7 +23,7 @@
+>   #include "hw/hw.h"
+>   #include "hw/sysbus.h"
+>   #include "hw/pci/pci.h"
+> -#include "hw/pci/pci_bus.h"
+> +#include "hw/pci/pci_bridge.h"
+>   #include "hw/pci/pcie_host.h"
+>   
+>   #define TYPE_XILINX_PCIE_HOST "xilinx-pcie-host"
+> diff --git a/include/hw/pci/pci_bridge.h b/include/hw/pci/pci_bridge.h
+> index 1acadc2c15..9b44ffd22a 100644
+> --- a/include/hw/pci/pci_bridge.h
+> +++ b/include/hw/pci/pci_bridge.h
+> @@ -27,6 +27,54 @@
+>   #define QEMU_PCI_BRIDGE_H
+>   
+>   #include "hw/pci/pci.h"
+> +#include "hw/pci/pci_bus.h"
+> +
+> +typedef struct PCIBridgeWindows PCIBridgeWindows;
+> +
+> +/*
+> + * Aliases for each of the address space windows that the bridge
+> + * can forward. Mapped into the bridge's parent's address space,
+> + * as subregions.
+> + */
+> +struct PCIBridgeWindows {
+> +    MemoryRegion alias_pref_mem;
+> +    MemoryRegion alias_mem;
+> +    MemoryRegion alias_io;
+> +    /*
+> +     * When bridge control VGA forwarding is enabled, bridges will
+> +     * provide positive decode on the PCI VGA defined I/O port and
+> +     * MMIO ranges.  When enabled forwarding is only qualified on the
+> +     * I/O and memory enable bits in the bridge command register.
+> +     */
+> +    MemoryRegion alias_vga[QEMU_PCI_VGA_NUM_REGIONS];
+> +};
+> +
+> +#define TYPE_PCI_BRIDGE "base-pci-bridge"
+> +#define PCI_BRIDGE(obj) OBJECT_CHECK(PCIBridge, (obj), TYPE_PCI_BRIDGE)
+> +
+> +struct PCIBridge {
+> +    /*< private >*/
+> +    PCIDevice parent_obj;
+> +    /*< public >*/
+> +
+> +    /* private member */
+> +    PCIBus sec_bus;
+> +    /*
+> +     * Memory regions for the bridge's address spaces.  These regions are not
+> +     * directly added to system_memory/system_io or its descendants.
+> +     * Bridge's secondary bus points to these, so that devices
+> +     * under the bridge see these regions as its address spaces.
+> +     * The regions are as large as the entire address space -
+> +     * they don't take into account any windows.
+> +     */
+> +    MemoryRegion address_space_mem;
+> +    MemoryRegion address_space_io;
+> +
+> +    PCIBridgeWindows *windows;
+> +
+> +    pci_map_irq_fn map_irq;
+> +    const char *bus_name;
+> +};
+>   
+>   #define PCI_BRIDGE_DEV_PROP_CHASSIS_NR "chassis_nr"
+>   #define PCI_BRIDGE_DEV_PROP_MSI        "msi"
+> diff --git a/include/hw/pci/pci_bus.h b/include/hw/pci/pci_bus.h
+> index bc34fd0017..b7da8f555b 100644
+> --- a/include/hw/pci/pci_bus.h
+> +++ b/include/hw/pci/pci_bus.h
+> @@ -2,10 +2,10 @@
+>   #define QEMU_PCI_BUS_H
+>   
+>   /*
+> - * PCI Bus and Bridge datastructures.
+> + * PCI Bus datastructures.
+>    *
+>    * Do not access the following members directly;
+> - * use accessor functions in pci.h, pci_bridge.h
+> + * use accessor functions in pci.h
+>    */
+>   
+>   typedef struct PCIBusClass {
+> @@ -44,51 +44,4 @@ struct PCIBus {
+>       Notifier machine_done;
+>   };
+>   
+> -typedef struct PCIBridgeWindows PCIBridgeWindows;
+> -
+> -/*
+> - * Aliases for each of the address space windows that the bridge
+> - * can forward. Mapped into the bridge's parent's address space,
+> - * as subregions.
+> - */
+> -struct PCIBridgeWindows {
+> -    MemoryRegion alias_pref_mem;
+> -    MemoryRegion alias_mem;
+> -    MemoryRegion alias_io;
+> -    /*
+> -     * When bridge control VGA forwarding is enabled, bridges will
+> -     * provide positive decode on the PCI VGA defined I/O port and
+> -     * MMIO ranges.  When enabled forwarding is only qualified on the
+> -     * I/O and memory enable bits in the bridge command register.
+> -     */
+> -    MemoryRegion alias_vga[QEMU_PCI_VGA_NUM_REGIONS];
+> -};
+> -
+> -#define TYPE_PCI_BRIDGE "base-pci-bridge"
+> -#define PCI_BRIDGE(obj) OBJECT_CHECK(PCIBridge, (obj), TYPE_PCI_BRIDGE)
+> -
+> -struct PCIBridge {
+> -    /*< private >*/
+> -    PCIDevice parent_obj;
+> -    /*< public >*/
+> -
+> -    /* private member */
+> -    PCIBus sec_bus;
+> -    /*
+> -     * Memory regions for the bridge's address spaces.  These regions are not
+> -     * directly added to system_memory/system_io or its descendants.
+> -     * Bridge's secondary bus points to these, so that devices
+> -     * under the bridge see these regions as its address spaces.
+> -     * The regions are as large as the entire address space -
+> -     * they don't take into account any windows.
+> -     */
+> -    MemoryRegion address_space_mem;
+> -    MemoryRegion address_space_io;
+> -
+> -    PCIBridgeWindows *windows;
+> -
+> -    pci_map_irq_fn map_irq;
+> -    const char *bus_name;
+> -};
+> -
+>   #endif /* QEMU_PCI_BUS_H */
+> 
 
-Looking at the bug, it seems like inaccuracies in the results of
-some of the transcendental operations (sin, cos, etc). This is
-almost certainly the because our implementations of these in
-target/i386/fpu_helper.c do this:
 
-void helper_fsin(CPUX86State *env)
-{
-    double fptemp = floatx80_to_double(env, ST0);
+Reviewed-by: Marcel Apfelbaum <marcel@redhat.com>
 
-    if ((fptemp > MAXTAN) || (fptemp < -MAXTAN)) {
-        env->fpus |= 0x400;
-    } else {
-        ST0 = double_to_floatx80(env, sin(fptemp));
-        env->fpus &= ~0x400;  /* C2 <-- 0 */
-        /* the above code is for |arg| < 2**53 only */
-    }
-}
-
-ie convert the 80-bit value in the emulated FPU to a host double,
-call the host libc sin() function and convert the resulting
-double to 80-bit.
-
-Fixing this to be bit-for-bit accurate will require that we
-write our own transcendental arithmetic functions that can handle
-80-bit precision, which is a bit of a hairy task. (Probably all the
-functions that call floatx80_to_double() would need to be rewritten.
-We currently use this approach for the "complicated" operations
-that the x87 provides but which softfloat doesn't: sin, cos,
-powers, logs, that sort of thing.)
-
-I was going to suggest that we borrow the code to do this from
-bochs, which does seem to have implemented complete software
-emulation of these complicated x87 instructions, but unfortunately
-the relevant files in bochs are under the softfloat-2b license, which
-isn't (by the QEMU project's reading of the license) compatible
-with the GPLv2 which we use :-(
-
-thanks
--- PMM
+Thanks,
+Marcel
