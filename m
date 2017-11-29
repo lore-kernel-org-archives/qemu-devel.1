@@ -1,16 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41449)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41511)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1eK3iC-0005WG-1S
-	for qemu-devel@nongnu.org; Wed, 29 Nov 2017 09:51:49 -0500
+	(envelope-from <famz@redhat.com>) id 1eK3iI-0005hF-Q2
+	for qemu-devel@nongnu.org; Wed, 29 Nov 2017 09:51:51 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1eK3iB-00063D-8o
-	for qemu-devel@nongnu.org; Wed, 29 Nov 2017 09:51:44 -0500
+	(envelope-from <famz@redhat.com>) id 1eK3iI-00067C-2t
+	for qemu-devel@nongnu.org; Wed, 29 Nov 2017 09:51:50 -0500
 From: Fam Zheng <famz@redhat.com>
-Date: Wed, 29 Nov 2017 22:49:50 +0800
-Message-Id: <20171129144956.11409-4-famz@redhat.com>
+Date: Wed, 29 Nov 2017 22:49:51 +0800
+Message-Id: <20171129144956.11409-5-famz@redhat.com>
 In-Reply-To: <20171129144956.11409-1-famz@redhat.com>
 References: <20171129144956.11409-1-famz@redhat.com>
-Subject: [Qemu-devel] [PATCH RFC 3/9] blockjob: Implement AioContext drain
+Subject: [Qemu-devel] [PATCH RFC 4/9] throttle: Implement AioContext drain
  ops
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
@@ -25,101 +25,78 @@ Cc: qemu-block@nongnu.org, jcody@redhat.com, Kevin Wolf <kwolf@redhat.com>, Max 
 
 Signed-off-by: Fam Zheng <famz@redhat.com>
 ---
- blockjob.c | 47 ++++++++++++++++++++++++++++++-----------------
- 1 file changed, 30 insertions(+), 17 deletions(-)
+ block/throttle.c | 34 +++++++++++++++++++++++++++-------
+ 1 file changed, 27 insertions(+), 7 deletions(-)
 
-diff --git a/blockjob.c b/blockjob.c
-index ff9a614531..86d060c89c 100644
---- a/blockjob.c
-+++ b/blockjob.c
-@@ -148,6 +148,23 @@ static void block_job_attached_aio_context(AioContext *new_context,
-                                            void *opaque);
- static void block_job_detach_aio_context(void *opaque);
+diff --git a/block/throttle.c b/block/throttle.c
+index 833175ac77..35b740e3de 100644
+--- a/block/throttle.c
++++ b/block/throttle.c
+@@ -70,6 +70,25 @@ fin:
+     return ret;
+ }
  
-+static void block_job_drained_begin(void *opaque)
++static void throttle_drained_begin(void *opaque)
 +{
-+    BlockJob *job = opaque;
-+    block_job_pause(job);
++    BlockDriverState *bs = opaque;
++    ThrottleGroupMember *tgm = bs->opaque;
++
++    if (atomic_fetch_inc(&tgm->io_limits_disabled) == 0) {
++        throttle_group_restart_tgm(tgm);
++    }
 +}
 +
-+static void block_job_drained_end(void *opaque)
++static void throttle_drained_end(void *opaque)
 +{
-+    BlockJob *job = opaque;
-+    block_job_resume(job);
++    BlockDriverState *bs = opaque;
++    ThrottleGroupMember *tgm = bs->opaque;
++
++    assert(tgm->io_limits_disabled);
++    atomic_dec(&tgm->io_limits_disabled);
 +}
 +
-+static const BlockDevOps block_job_dev_ops = {
-+    .drained_begin = block_job_drained_begin,
-+    .drained_end = block_job_drained_end,
-+};
-+
- void block_job_unref(BlockJob *job)
+ static int throttle_open(BlockDriverState *bs, QDict *options,
+                          int flags, Error **errp)
  {
-     if (--job->refcnt == 0) {
-@@ -157,6 +174,10 @@ void block_job_unref(BlockJob *job)
-         blk_remove_aio_context_notifier(job->blk,
-                                         block_job_attached_aio_context,
-                                         block_job_detach_aio_context, job);
-+        aio_context_del_drain_ops(blk_get_aio_context(job->blk),
-+                                  block_job_drained_begin,
-+                                  block_job_drained_end,
-+                                  job);
-         blk_unref(job->blk);
-         error_free(job->blocker);
-         g_free(job->id);
-@@ -170,6 +191,9 @@ static void block_job_attached_aio_context(AioContext *new_context,
+@@ -146,6 +165,9 @@ static int throttle_co_flush(BlockDriverState *bs)
+ static void throttle_detach_aio_context(BlockDriverState *bs)
  {
-     BlockJob *job = opaque;
+     ThrottleGroupMember *tgm = bs->opaque;
++    aio_context_del_drain_ops(bdrv_get_aio_context(bs),
++                              throttle_drained_begin, throttle_drained_end,
++                              bs);
+     throttle_group_detach_aio_context(tgm);
+ }
  
-+    aio_context_add_drain_ops(blk_get_aio_context(job->blk),
-+                              block_job_drained_begin, block_job_drained_end,
-+                              job);
-     if (job->driver->attached_aio_context) {
-         job->driver->attached_aio_context(job, new_context);
-     }
-@@ -192,6 +216,9 @@ static void block_job_detach_aio_context(void *opaque)
+@@ -153,6 +175,9 @@ static void throttle_attach_aio_context(BlockDriverState *bs,
+                                         AioContext *new_context)
  {
-     BlockJob *job = opaque;
+     ThrottleGroupMember *tgm = bs->opaque;
++    aio_context_add_drain_ops(new_context,
++                              throttle_drained_begin, throttle_drained_end,
++                              bs);
+     throttle_group_attach_aio_context(tgm, new_context);
+ }
  
-+    aio_context_del_drain_ops(blk_get_aio_context(job->blk),
-+                              block_job_drained_begin, block_job_drained_end,
-+                              job);
-     /* In case the job terminates during aio_poll()... */
-     block_job_ref(job);
+@@ -199,17 +224,12 @@ static bool throttle_recurse_is_first_non_filter(BlockDriverState *bs,
  
-@@ -217,23 +244,6 @@ static const BdrvChildRole child_job = {
-     .stay_at_node       = true,
- };
- 
--static void block_job_drained_begin(void *opaque)
--{
--    BlockJob *job = opaque;
--    block_job_pause(job);
--}
--
--static void block_job_drained_end(void *opaque)
--{
--    BlockJob *job = opaque;
--    block_job_resume(job);
--}
--
--static const BlockDevOps block_job_dev_ops = {
--    .drained_begin = block_job_drained_begin,
--    .drained_end = block_job_drained_end,
--};
--
- void block_job_remove_all_bdrv(BlockJob *job)
+ static void coroutine_fn throttle_co_drain_begin(BlockDriverState *bs)
  {
-     GSList *l;
-@@ -671,6 +681,9 @@ void *block_job_create(const char *job_id, const BlockJobDriver *driver,
-     bs->job = job;
+-    ThrottleGroupMember *tgm = bs->opaque;
+-    if (atomic_fetch_inc(&tgm->io_limits_disabled) == 0) {
+-        throttle_group_restart_tgm(tgm);
+-    }
++    throttle_drained_begin(bs);
+ }
  
-     blk_set_dev_ops(blk, &block_job_dev_ops, job);
-+    aio_context_add_drain_ops(blk_get_aio_context(blk),
-+                              block_job_drained_begin, block_job_drained_end,
-+                              job);
-     bdrv_op_unblock(bs, BLOCK_OP_TYPE_DATAPLANE, job->blocker);
+ static void coroutine_fn throttle_co_drain_end(BlockDriverState *bs)
+ {
+-    ThrottleGroupMember *tgm = bs->opaque;
+-    assert(tgm->io_limits_disabled);
+-    atomic_dec(&tgm->io_limits_disabled);
++    throttle_drained_end(bs);
+ }
  
-     QLIST_INSERT_HEAD(&block_jobs, job, job_list);
+ static BlockDriver bdrv_throttle = {
 -- 
 2.14.3
