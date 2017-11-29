@@ -1,41 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52583)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36403)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mdroth@linux.vnet.ibm.com>) id 1eJpps-0005t5-L7
-	for qemu-devel@nongnu.org; Tue, 28 Nov 2017 19:02:46 -0500
+	(envelope-from <haozhong.zhang@intel.com>) id 1eJqIL-0004Vs-5z
+	for qemu-devel@nongnu.org; Tue, 28 Nov 2017 19:32:10 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mdroth@linux.vnet.ibm.com>) id 1eJppn-0000nx-NA
-	for qemu-devel@nongnu.org; Tue, 28 Nov 2017 19:02:44 -0500
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:35802)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mdroth@linux.vnet.ibm.com>)
-	id 1eJppn-0000nG-ES
-	for qemu-devel@nongnu.org; Tue, 28 Nov 2017 19:02:39 -0500
-Received: from pps.filterd (m0098410.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
-	vASNx4kF040368
-	for <qemu-devel@nongnu.org>; Tue, 28 Nov 2017 19:02:36 -0500
-Received: from e31.co.us.ibm.com (e31.co.us.ibm.com [32.97.110.149])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2ehbb31bhj-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Tue, 28 Nov 2017 19:02:35 -0500
-Received: from localhost
-	by e31.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
-	Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <mdroth@linux.vnet.ibm.com>;
-	Tue, 28 Nov 2017 17:02:34 -0700
-Content-Type: text/plain; charset="utf-8"
+	(envelope-from <haozhong.zhang@intel.com>) id 1eJqIH-0000az-VK
+	for qemu-devel@nongnu.org; Tue, 28 Nov 2017 19:32:09 -0500
+Received: from mga14.intel.com ([192.55.52.115]:29243)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <haozhong.zhang@intel.com>)
+	id 1eJqIH-0000ZP-K8
+	for qemu-devel@nongnu.org; Tue, 28 Nov 2017 19:32:05 -0500
+Date: Wed, 29 Nov 2017 08:31:58 +0800
+From: Haozhong Zhang <haozhong.zhang@intel.com>
+Message-ID: <20171129003158.mn67hzoqwrzmhrvs@hz-desktop>
+References: <20171127043517.22441-1-haozhong.zhang@intel.com>
+	<20171127043517.22441-2-haozhong.zhang@intel.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-From: Michael Roth <mdroth@linux.vnet.ibm.com>
-In-Reply-To: <d90479e2-0d31-04d1-7b79-79778dd2a186@linux.vnet.ibm.com>
-References: <20171031204330.14803-1-danielhb@linux.vnet.ibm.com>
-	<20171031204330.14803-4-danielhb@linux.vnet.ibm.com>
-	<3d61a96b-7dc1-81fb-f42b-ee542ce713fa@redhat.com>
-	<d90479e2-0d31-04d1-7b79-79778dd2a186@linux.vnet.ibm.com>
-Date: Tue, 28 Nov 2017 18:02:16 -0600
-Message-Id: <151191373602.26332.3541141862368932878@sif>
-Subject: Re: [Qemu-devel] [Qemu-ppc] [PATCH v2 3/4] tests: ibm,
- configure-connector RTAS call implementation
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20171127043517.22441-2-haozhong.zhang@intel.com>
+Subject: Re: [Qemu-devel] [PATCH v3 1/3] hostmem-file: add "align" option
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -44,259 +28,206 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Daniel Henrique Barboza <danielhb@linux.vnet.ibm.com>, Laurent Vivier <lvivier@redhat.com>, qemu-devel@nongnu.org
-Cc: qemu-ppc@nongnu.org, david@gibson.dropbear.id.au
+To: qemu-devel@nongnu.org
+Cc: Xiao Guangrong <guangrong.xiao@gmail.com>, Stefan Hajnoczi <stefanha@gmail.com>, Dan Williams <dan.j.williams@intel.com>, Eduardo Habkost <ehabkost@redhat.com>, Igor Mammedov <imammedo@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Richard Henderson <rth@twiddle.net>, "Michael S. Tsirkin" <mst@redhat.com>
 
-Quoting Daniel Henrique Barboza (2017-11-09 06:35:30)
-> =
+copy mst
 
-> =
-
-> On 11/06/2017 03:46 PM, Laurent Vivier wrote:
-> > On 31/10/2017 21:43, Daniel Henrique Barboza wrote:
-> >> 'ibm,configure-connector' hypercall is used by the guest OS
-> >> to start the configuration of a given device, where the
-> >> machine configures the said device and all its sub-devices,
-> >> giving back FDTs to the caller for each sub-device.
-> >>
-> >> This hypercall is supposed to be called multiple times by the
-> >> guest OS until it returns RTAS_OUT_SUCESS (code 0), indicating
-> >> that the device is now properly configured and ready
-> >> to be used, or a return value < 0 when an error occurs.
-> >>
-> >> This patch implements the 'ibm,configure-connector' RTAS
-> >> hypercall in tests/libqos/rtas.c, with an extra test
-> >> case for it inside tests/rtas-tests.c.
-> >>
-> >> Signed-off-by: Daniel Henrique Barboza <danielhb@linux.vnet.ibm.com>
-> >> ---
-> >>   tests/libqos/rtas.c | 35 +++++++++++++++++++++++++++
-> >>   tests/libqos/rtas.h |  1 +
-> >>   tests/rtas-test.c   | 68 +++++++++++++++++++++++++++++++++++++++++++=
-++++++++++
-> >>   3 files changed, 104 insertions(+)
-> >>
-> >> diff --git a/tests/libqos/rtas.c b/tests/libqos/rtas.c
-> >> index ade572a84f..1cb9e2b495 100644
-> >> --- a/tests/libqos/rtas.c
-> >> +++ b/tests/libqos/rtas.c
-> >> @@ -184,3 +184,38 @@ int qrtas_set_indicator(QGuestAllocator *alloc, u=
-int32_t type, uint32_t idx,
-> >>   =
-
-> >>       return ret[0];
-> >>   }
-> >> +
-> >> +/*
-> >> + * ibm,configure-connector as defined by PAPR 2.7+, 13.5.3.5
-> >> + *
-> >> + * nargs =3D 2
-> >> + * nrets =3D 1
-> >> + *
-> >> + * args[0] and args[1] compose the 64 bit Work Area address.
-> >> + *
-> >> + * This call will configure not only the device reported in the first
-> >> + * offset of the Work Area but all of its siblingis as well, returning
-> >> + * the FDT of each configured sub-device as well as a return code
-> >> + * 'Next child', 'Next property' or 'Previous parent'. When the whole
-> >> + * configuration is done, 'Configuration completed' (0) is returned.
-> >> + *
-> >> + * configure-connector will always reply with status code 'Next child=
-'(2)
-> >> + * on the first successful call. The DRC configuration will be
-> >> + * completed when configure-connector returns status 0. Any return
-> >> + * status < 0 indicates an error.
-> >> + */
-> >> +int qrtas_ibm_configure_connector(QGuestAllocator *alloc, uintptr_t w=
-a_addr)
-> >> +{
-> >> +    uint32_t args[2], ret[1];
-> >> +    int res;
-> >> +
-> >> +    args[0] =3D (uint32_t)(wa_addr);
-> >> +    args[1] =3D (uint32_t)(wa_addr >> 32);
-> > This part looks strange to me. I agree it's what qemu does, but
-> > according to spec args[0] is "Address of work area" and args[1] "0 or
-> > address of additional page":
-> >
-> > Linux on Power Architecture Platform Reference
-> > Version 1.1
-> > 24 March 2016
-> >
-> > 13.5.3.5 ibm,configure-connector RTAS Call
-> > The =E2=80=9Cneed more memory=E2=80=9D status code, is similar in seman=
-tics to the =E2=80=9Ccall
-> > again=E2=80=9D status. However, on the next ibm,configure-connector cal=
-l, the OS
-> > will supply, via the Memory extent parameter, the address of another
-> > page of memory for RTAS to add to the work area in order for
-> > configuration to continue. On all other calls to ibm,configure-connector
-> > the contents of the Memory extent parameter should be 0.
-> =
-
-> Hmmmmm thinking about it, the reason why it works in QEMU is because
-> wa_addr >> 32 will always be zero, perhaps?
-
-It looks that way. At least with linux guests the "need more memory"
-handling remains unimplemented, so we only ever end up dealing with:
-
-  rc =3D rtas_call(cc_token, 2, 1, NULL, rtas_data_buf, NULL);
-
-which effectively sets args[1] to 0. Still worth fixing though of
-course.
-
-> =
-
-> At any rate, In this test, makes sense to leave args[1] to be set by the =
-
-> caller,
-> setting it to 0 in the non "need more memory" scenario.
-> =
-
-> =
-
-> >
-> >> +    res =3D qrtas_call(alloc, "ibm,configure-connector", 2, args, 1, =
-ret);
-> >> +    if (res !=3D 0) {
-> >> +        return -1;
-> >> +    }
-> >> +
-> >> +    return ret[0];
-> >> +}
-> >> diff --git a/tests/libqos/rtas.h b/tests/libqos/rtas.h
-> >> index 9dfa18f32b..35c44fb967 100644
-> >> --- a/tests/libqos/rtas.h
-> >> +++ b/tests/libqos/rtas.h
-> >> @@ -16,4 +16,5 @@ int qrtas_check_exception(QGuestAllocator *alloc, ui=
-nt32_t mask,
-> >>                             uint32_t buf_addr, uint32_t buf_len);
-> >>   int qrtas_set_indicator(QGuestAllocator *alloc, uint32_t type, uint3=
-2_t idx,
-> >>                           uint32_t new_state);
-> >> +int qrtas_ibm_configure_connector(QGuestAllocator *alloc, uintptr_t w=
-a_addr);
-> >>   #endif /* LIBQOS_RTAS_H */
-> >> diff --git a/tests/rtas-test.c b/tests/rtas-test.c
-> >> index 2c34b6e83c..b3538bf878 100644
-> >> --- a/tests/rtas-test.c
-> >> +++ b/tests/rtas-test.c
-> >> @@ -15,6 +15,8 @@
-> >>   #define SPAPR_DR_ALLOCATION_STATE_USABLE  1
-> >>   #define SPAPR_DR_ISOLATION_STATE_UNISOLATED 1
-> >>   =
-
-> >> +#define CC_WA_LEN 4096
-> >> +
-> >>   static void test_rtas_get_time_of_day(void)
-> >>   {
-> >>       QOSState *qs;
-> >> @@ -169,6 +171,70 @@ static void test_rtas_set_indicator(void)
-> >>       qtest_shutdown(qs);
-> >>   }
-> >>   =
-
-> >> +static void test_rtas_ibm_configure_connector(void)
-> >> +{
-> >> +    QOSState *qs;
-> >> +    uint64_t ret;
-> >> +    uintptr_t guest_buf_addr, guest_drc_addr;
-> >> +    uint32_t drc_index;
-> >> +    uint8_t *buf =3D g_malloc0(EVENT_LOG_LEN);
-> >> +
-> >> +    qs =3D qtest_spapr_boot("-machine pseries -cpu POWER8_v2.0 "
-> >> +                          "-smp 1,sockets=3D4,cores=3D1,threads=3D1,m=
-axcpus=3D4");
-> >> +
-> >> +    guest_buf_addr =3D guest_alloc(qs->alloc, EVENT_LOG_LEN * sizeof(=
-uint8_t));
-> >> +    qtest_qmp_device_add("power8_v2.0-spapr-cpu-core", "id-1",
-> >> +                         "'core-id':'1'");
-> >> +
-> >> +    ret =3D qrtas_check_exception(qs->alloc, EVENT_MASK_EPOW,
-> >> +                                guest_buf_addr, EVENT_LOG_LEN);
-> >> +
-> >> +    memread(guest_buf_addr, buf, EVENT_LOG_LEN);
-> >> +    guest_free(qs->alloc, guest_buf_addr);
-> >> +
-> >> +    g_assert_cmpint(ret, =3D=3D, 0);
-> >> +
-> >> +    /*
-> >> +     * Same 108 bytes offset magic used and explained in
-> >> +     * test_rtas_set_indicator.
-> >> +     */
-> >> +    drc_index =3D be32toh(*((uint32_t *)(buf + 108)));
-> >> +    g_free(buf);
-> >> +
-> >> +    ret =3D qrtas_set_indicator(qs->alloc, RTAS_SENSOR_TYPE_ALLOCATIO=
-N_STATE,
-> >> +                              drc_index, SPAPR_DR_ALLOCATION_STATE_US=
-ABLE);
-> >> +    g_assert_cmpint(ret, =3D=3D, 0);
-> >> +
-> >> +    ret =3D qrtas_set_indicator(qs->alloc, RTAS_SENSOR_TYPE_ISOLATION=
-_STATE,
-> >> +                              drc_index, SPAPR_DR_ISOLATION_STATE_UNI=
-SOLATED);
-> >> +    g_assert_cmpint(ret, =3D=3D, 0);
-> >> +
-> >> +    /*
-> >> +     * Call ibm,configure-connector to finish the hotplugged device
-> >> +     * configuration, putting its DRC into 'ready' state.
-> >> +     *
-> >> +     * We're not interested in the generated FDTs during the config
-> >> +     * process, thus we simply keep calling configure-connector
-> >> +     * until it returns SUCCESS(0) or an error.
-> >> +     *
-> >> +     * The full explanation logic behind this process can be found
-> >> +     * at PAPR 2.7+, 13.5.3.5.
-> >> +     */
-> >> +    guest_drc_addr =3D guest_alloc(qs->alloc, CC_WA_LEN * sizeof(uint=
-32_t));
-> > CC_WA_LEN is already 4096, why "* sizeof(uint32_t"?
-> > It must be aligned to a 4096 bytes boundaries.
-> =
-
-> Good catch. I'll fix it.
-> =
-
-> >
-> >> +    writel(guest_drc_addr, drc_index);
-> >> +    writel(guest_drc_addr + sizeof(uint32_t), 0)> +
-> >> +    do {
-> >> +        ret =3D qrtas_ibm_configure_connector(qs->alloc, guest_drc_ad=
-dr);
-> >> +    } while (ret > 0);
-> > I think it would be interesting to check the result of the call (return
-> > value, node name, property name,...)
-> >
-> > And you should also exit with error in the case of ret =3D=3D 5 (need m=
-ore
-> > memory).
-> >
-> >> +    guest_free(qs->alloc, guest_drc_addr);
-> >> +
-> >> +    g_assert_cmpint(ret, =3D=3D, 0);
-> >> +
-> >> +    qtest_shutdown(qs);
-> >> +}
-> >> +
-> >>   int main(int argc, char *argv[])
-> >>   {
-> >>       const char *arch =3D qtest_get_arch();
-> >> @@ -185,6 +251,8 @@ int main(int argc, char *argv[])
-> >>       qtest_add_func("rtas/rtas-check-exception-hotplug-event",
-> >>                      test_rtas_check_exception_hotplug_event);
-> >>       qtest_add_func("rtas/test_rtas_set_indicator", test_rtas_set_ind=
-icator);
-> >> +    qtest_add_func("rtas/test_rtas_ibm_configure_connector",
-> >> +                   test_rtas_ibm_configure_connector);
-> >>   =
-
-> >>       return g_test_run();
-> >>   }
-> >>
-> > Thanks,
-> > Laurent
-> >
->=20
+On 11/27/17 12:35 +0800, Haozhong Zhang wrote:
+> When mmap(2) the backend files, QEMU uses the host page size
+> (getpagesize(2)) by default as the alignment of mapping address.
+> However, some backends may require alignments different than the page
+> size. For example, mmap a device DAX (e.g., /dev/dax0.0) on Linux
+> kernel 4.13 to an address, which is 4K-aligned but not 2M-aligned,
+> fails with a kernel message like
+> 
+> [617494.969768] dax dax0.0: qemu-system-x86: dax_mmap: fail, unaligned vma (0x7fa37c579000 - 0x7fa43c579000, 0x1fffff)
+> 
+> Because there is no common approach to get such alignment requirement,
+> we add the 'align' option to 'memory-backend-file', so that users or
+> management utils, which have enough knowledge about the backend, can
+> specify a proper alignment via this option.
+> 
+> Signed-off-by: Haozhong Zhang <haozhong.zhang@intel.com>
+> ---
+>  backends/hostmem-file.c | 41 ++++++++++++++++++++++++++++++++++++++++-
+>  docs/nvdimm.txt         | 16 ++++++++++++++++
+>  exec.c                  |  8 +++++++-
+>  include/exec/memory.h   |  3 +++
+>  memory.c                |  2 ++
+>  numa.c                  |  2 +-
+>  6 files changed, 69 insertions(+), 3 deletions(-)
+> 
+> diff --git a/backends/hostmem-file.c b/backends/hostmem-file.c
+> index e44c319915..e319ec1ad8 100644
+> --- a/backends/hostmem-file.c
+> +++ b/backends/hostmem-file.c
+> @@ -34,6 +34,7 @@ struct HostMemoryBackendFile {
+>      bool share;
+>      bool discard_data;
+>      char *mem_path;
+> +    uint64_t align;
+>  };
+>  
+>  static void
+> @@ -58,7 +59,7 @@ file_backend_memory_alloc(HostMemoryBackend *backend, Error **errp)
+>          path = object_get_canonical_path(OBJECT(backend));
+>          memory_region_init_ram_from_file(&backend->mr, OBJECT(backend),
+>                                   path,
+> -                                 backend->size, fb->share,
+> +                                 backend->size, fb->align, fb->share,
+>                                   fb->mem_path, errp);
+>          g_free(path);
+>      }
+> @@ -115,6 +116,40 @@ static void file_memory_backend_set_discard_data(Object *o, bool value,
+>      MEMORY_BACKEND_FILE(o)->discard_data = value;
+>  }
+>  
+> +static void file_memory_backend_get_align(Object *o, Visitor *v,
+> +                                          const char *name, void *opaque,
+> +                                          Error **errp)
+> +{
+> +    HostMemoryBackendFile *fb = MEMORY_BACKEND_FILE(o);
+> +    uint64_t val = fb->align;
+> +
+> +    visit_type_size(v, name, &val, errp);
+> +}
+> +
+> +static void file_memory_backend_set_align(Object *o, Visitor *v,
+> +                                          const char *name, void *opaque,
+> +                                          Error **errp)
+> +{
+> +    HostMemoryBackend *backend = MEMORY_BACKEND(o);
+> +    HostMemoryBackendFile *fb = MEMORY_BACKEND_FILE(o);
+> +    Error *local_err = NULL;
+> +    uint64_t val;
+> +
+> +    if (host_memory_backend_mr_inited(backend)) {
+> +        error_setg(&local_err, "cannot change property value");
+> +        goto out;
+> +    }
+> +
+> +    visit_type_size(v, name, &val, &local_err);
+> +    if (local_err) {
+> +        goto out;
+> +    }
+> +    fb->align = val;
+> +
+> + out:
+> +    error_propagate(errp, local_err);
+> +}
+> +
+>  static void file_backend_unparent(Object *obj)
+>  {
+>      HostMemoryBackend *backend = MEMORY_BACKEND(obj);
+> @@ -145,6 +180,10 @@ file_backend_class_init(ObjectClass *oc, void *data)
+>      object_class_property_add_str(oc, "mem-path",
+>          get_mem_path, set_mem_path,
+>          &error_abort);
+> +    object_class_property_add(oc, "align", "int",
+> +        file_memory_backend_get_align,
+> +        file_memory_backend_set_align,
+> +        NULL, NULL, &error_abort);
+>  }
+>  
+>  static void file_backend_instance_finalize(Object *o)
+> diff --git a/docs/nvdimm.txt b/docs/nvdimm.txt
+> index 2d9f8c0e8c..21249dd062 100644
+> --- a/docs/nvdimm.txt
+> +++ b/docs/nvdimm.txt
+> @@ -122,3 +122,19 @@ Note:
+>       M >= size of RAM devices +
+>            size of statically plugged vNVDIMM devices +
+>            size of hotplugged vNVDIMM devices
+> +
+> +Alignment
+> +---------
+> +
+> +QEMU uses mmap(2) to maps vNVDIMM backends and aligns the mapping
+> +address to the page size (getpagesize(2)) by default. However, some
+> +types of backends may require an alignment different than the page
+> +size. In that case, QEMU v2.12.0 and later provide 'align' option to
+> +memory-backend-file to allow users to specify the proper alignment.
+> +
+> +For example, device dax require the 2 MB alignment, so we can use
+> +following QEMU command line options to use it (/dev/dax0.0) as the
+> +backend of vNVDIMM:
+> +
+> + -object memory-backend-file,id=mem1,share=on,mem-path=/dev/dax0.0,size=4G,align=2M
+> + -device nvdimm,id=nvdimm1,memdev=mem1
+> diff --git a/exec.c b/exec.c
+> index 03238a3449..90440efecd 100644
+> --- a/exec.c
+> +++ b/exec.c
+> @@ -1600,7 +1600,13 @@ static void *file_ram_alloc(RAMBlock *block,
+>      void *area;
+>  
+>      block->page_size = qemu_fd_getpagesize(fd);
+> -    block->mr->align = block->page_size;
+> +    if (block->mr->align % block->page_size) {
+> +        error_setg(errp, "aligment 0x%" PRIx64
+> +                   " must be multiples of page size 0x%" PRIx64,
+> +                   block->mr->align, block->page_size);
+> +        return NULL;
+> +    }
+> +    block->mr->align = MAX(block->page_size, block->mr->align);
+>  #if defined(__s390x__)
+>      if (kvm_enabled()) {
+>          block->mr->align = MAX(block->mr->align, QEMU_VMALLOC_ALIGN);
+> diff --git a/include/exec/memory.h b/include/exec/memory.h
+> index 5ed4042f87..a1be8b06d3 100644
+> --- a/include/exec/memory.h
+> +++ b/include/exec/memory.h
+> @@ -465,6 +465,8 @@ void memory_region_init_resizeable_ram(MemoryRegion *mr,
+>   * @name: Region name, becomes part of RAMBlock name used in migration stream
+>   *        must be unique within any device
+>   * @size: size of the region.
+> + * @align: alignment of the region base address; if 0, the default alignment
+> + *         (getpagesize()) will be used.
+>   * @share: %true if memory must be mmaped with the MAP_SHARED flag
+>   * @path: the path in which to allocate the RAM.
+>   * @errp: pointer to Error*, to store an error if it happens.
+> @@ -476,6 +478,7 @@ void memory_region_init_ram_from_file(MemoryRegion *mr,
+>                                        struct Object *owner,
+>                                        const char *name,
+>                                        uint64_t size,
+> +                                      uint64_t align,
+>                                        bool share,
+>                                        const char *path,
+>                                        Error **errp);
+> diff --git a/memory.c b/memory.c
+> index e26e5a3b1d..2c80656e39 100644
+> --- a/memory.c
+> +++ b/memory.c
+> @@ -1570,6 +1570,7 @@ void memory_region_init_ram_from_file(MemoryRegion *mr,
+>                                        struct Object *owner,
+>                                        const char *name,
+>                                        uint64_t size,
+> +                                      uint64_t align,
+>                                        bool share,
+>                                        const char *path,
+>                                        Error **errp)
+> @@ -1578,6 +1579,7 @@ void memory_region_init_ram_from_file(MemoryRegion *mr,
+>      mr->ram = true;
+>      mr->terminates = true;
+>      mr->destructor = memory_region_destructor_ram;
+> +    mr->align = align;
+>      mr->ram_block = qemu_ram_alloc_from_file(size, mr, share, path, errp);
+>      mr->dirty_log_mask = tcg_enabled() ? (1 << DIRTY_MEMORY_CODE) : 0;
+>  }
+> diff --git a/numa.c b/numa.c
+> index 7151b24d1c..b0fe22a60c 100644
+> --- a/numa.c
+> +++ b/numa.c
+> @@ -551,7 +551,7 @@ static void allocate_system_memory_nonnuma(MemoryRegion *mr, Object *owner,
+>      if (mem_path) {
+>  #ifdef __linux__
+>          Error *err = NULL;
+> -        memory_region_init_ram_from_file(mr, owner, name, ram_size, false,
+> +        memory_region_init_ram_from_file(mr, owner, name, ram_size, 0, false,
+>                                           mem_path, &err);
+>          if (err) {
+>              error_report_err(err);
+> -- 
+> 2.14.1
+> 
