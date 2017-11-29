@@ -1,17 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54607)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56099)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1eK4Gf-0003Ei-LY
-	for qemu-devel@nongnu.org; Wed, 29 Nov 2017 10:27:22 -0500
+	(envelope-from <eblake@redhat.com>) id 1eK4Kc-0006er-LO
+	for qemu-devel@nongnu.org; Wed, 29 Nov 2017 10:31:30 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1eK4Gc-0007kJ-CE
-	for qemu-devel@nongnu.org; Wed, 29 Nov 2017 10:27:21 -0500
-From: Kevin Wolf <kwolf@redhat.com>
-Date: Wed, 29 Nov 2017 16:26:28 +0100
-Message-Id: <20171129152628.14906-11-kwolf@redhat.com>
-In-Reply-To: <20171129152628.14906-1-kwolf@redhat.com>
-References: <20171129152628.14906-1-kwolf@redhat.com>
-Subject: [Qemu-devel] [PULL 10/10] block/nfs: fix nfs_client_open for
- filesize greater than 1TB
+	(envelope-from <eblake@redhat.com>) id 1eK4KZ-0000ra-FB
+	for qemu-devel@nongnu.org; Wed, 29 Nov 2017 10:31:26 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:43352)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1eK4KZ-0000rI-8W
+	for qemu-devel@nongnu.org; Wed, 29 Nov 2017 10:31:23 -0500
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+	[10.5.11.16])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 635D38047F
+	for <qemu-devel@nongnu.org>; Wed, 29 Nov 2017 15:31:22 +0000 (UTC)
+From: Eric Blake <eblake@redhat.com>
+Date: Wed, 29 Nov 2017 09:31:16 -0600
+Message-Id: <20171129153116.26243-1-eblake@redhat.com>
+Subject: [Qemu-devel] [qemu-web PATCH] Mention website maintainence under
+ Contribute
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -20,53 +28,28 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-block@nongnu.org
-Cc: kwolf@redhat.com, mreitz@redhat.com, peter.maydell@linaro.org, qemu-devel@nongnu.org
+To: qemu-devel@nongnu.org
+Cc: pbonzini@redhat.com, famz@redhat.com
 
-From: Peter Lieven <pl@kamp.de>
+Web (and other doc) updates are also valid contributions.
 
-DIV_ROUND_UP(st.st_size, BDRV_SECTOR_SIZE) was overflowing ret (int) if
-st.st_size is greater than 1TB.
-
-Cc: qemu-stable@nongnu.org
-Signed-off-by: Peter Lieven <pl@kamp.de>
-Message-id: 1511798407-31129-1-git-send-email-pl@kamp.de
-Signed-off-by: Max Reitz <mreitz@redhat.com>
+Suggested-by: Paolo Bonzini <pbonzini@redhat.com>
+Signed-off-by: Eric Blake <eblake@redhat.com>
 ---
- block/nfs.c | 7 +++----
- 1 file changed, 3 insertions(+), 4 deletions(-)
+ contribute.md | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
 
-diff --git a/block/nfs.c b/block/nfs.c
-index 337fcd9c84..effc8719b5 100644
---- a/block/nfs.c
-+++ b/block/nfs.c
-@@ -1,7 +1,7 @@
- /*
-  * QEMU Block driver for native access to files on NFS shares
-  *
-- * Copyright (c) 2014-2016 Peter Lieven <pl@kamp.de>
-+ * Copyright (c) 2014-2017 Peter Lieven <pl@kamp.de>
-  *
-  * Permission is hereby granted, free of charge, to any person obtaining a copy
-  * of this software and associated documentation files (the "Software"), to deal
-@@ -496,7 +496,7 @@ out:
- static int64_t nfs_client_open(NFSClient *client, QDict *options,
-                                int flags, int open_flags, Error **errp)
- {
--    int ret = -EINVAL;
-+    int64_t ret = -EINVAL;
-     QemuOpts *opts = NULL;
-     Error *local_err = NULL;
-     struct stat st;
-@@ -686,8 +686,7 @@ static QemuOptsList nfs_create_opts = {
- 
- static int nfs_file_create(const char *url, QemuOpts *opts, Error **errp)
- {
--    int ret = 0;
--    int64_t total_size = 0;
-+    int64_t ret, total_size;
-     NFSClient *client = g_new0(NFSClient, 1);
-     QDict *options = NULL;
- 
+diff --git a/contribute.md b/contribute.md
+index bf4a55d..88baee6 100644
+--- a/contribute.md
++++ b/contribute.md
+@@ -12,4 +12,6 @@ permalink: /contribute/
+ * Chat with the developers on IRC: irc.oftc.net, channel #qemu
+
+ * Read developer documentation: &ldquo;[Getting started for developers](https://wiki.qemu.org/Documentation/GettingStartedDevelopers)&rdquo;,
+-  &ldquo;[Contributor FAQ](https://wiki.qemu.org/Contribute/FAQ)&rdquo;, &ldquo;[How to submit a patch](https://wiki.qemu.org/Contribute/SubmitAPatch)&rdquo;
++  &ldquo;[Contributor FAQ](https://wiki.qemu.org/Contribute/FAQ)&rdquo;,
++  &ldquo;[How to submit a patch](https://wiki.qemu.org/Contribute/SubmitAPatch)&rdquo;,
++  &ldquo;[Improve the website](https://www.qemu.org/2017/02/04/the-new-qemu-website-is-up/)&rdquo;
 -- 
-2.13.6
+2.14.3
