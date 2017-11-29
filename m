@@ -1,26 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50346)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50718)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1eK2dm-0001Pf-H9
-	for qemu-devel@nongnu.org; Wed, 29 Nov 2017 08:43:12 -0500
+	(envelope-from <stefanha@gmail.com>) id 1eK2es-0001vV-VF
+	for qemu-devel@nongnu.org; Wed, 29 Nov 2017 08:44:15 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1eK2di-0005fr-5q
-	for qemu-devel@nongnu.org; Wed, 29 Nov 2017 08:43:06 -0500
-Received: from mout.kundenserver.de ([212.227.17.13]:52761)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1eK2dh-0005f5-RV
-	for qemu-devel@nongnu.org; Wed, 29 Nov 2017 08:43:02 -0500
-References: <20171123163538.31411-1-laurent@vivier.eu>
-	<CAFEAcA9+f2cgUUS00DXzF9a96evPRnxY5MTUZpe+OA3Trv84WA@mail.gmail.com>
-From: Laurent Vivier <laurent@vivier.eu>
-Message-ID: <e6dc192f-6fcd-f25d-d1db-983280c915f4@vivier.eu>
-Date: Wed, 29 Nov 2017 14:42:16 +0100
+	(envelope-from <stefanha@gmail.com>) id 1eK2ep-0006DB-RQ
+	for qemu-devel@nongnu.org; Wed, 29 Nov 2017 08:44:15 -0500
+Date: Wed, 29 Nov 2017 13:44:08 +0000
+From: Stefan Hajnoczi <stefanha@gmail.com>
+Message-ID: <20171129134408.GB4281@stefanha-x1.localdomain>
+References: <20171129102513.9153-1-pbonzini@redhat.com>
+	<20171129102513.9153-2-pbonzini@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <CAFEAcA9+f2cgUUS00DXzF9a96evPRnxY5MTUZpe+OA3Trv84WA@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH v2 0/5] target/m68k: implement 680x0 FPU
- (part 3)
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="dc+cDN39EJAMEtIO"
+Content-Disposition: inline
+In-Reply-To: <20171129102513.9153-2-pbonzini@redhat.com>
+Subject: Re: [Qemu-devel] [Qemu-block] [PATCH 1/4] block: Expect graph
+ changes in bdrv_parent_drained_begin/end
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,88 +25,100 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, Thomas Huth <huth@tuxfamily.org>, Aurelien Jarno <aurelien@aurel32.net>, Richard Henderson <rth@twiddle.net>
-
-Le 29/11/2017 à 13:49, Peter Maydell a écrit :
-> On 23 November 2017 at 16:35, Laurent Vivier <laurent@vivier.eu> wrote:
->> Implement fmod, frem, fscale, fgetman and fgetexp.
->>
->> Instead of using functions of libm (v1 of this series)
->> and converting between host long double and floatx80 type
->> the new version (v2) adds new floatx80 functions in softfloat.
->>
->> All the floatx80 functions are copied from "Previous",
->> the NeXT Computer Emulator, and written by Andreas Grabher.
-> 
-> Hi; what license is that code under? Can you provide
-> a link to the original sources that you're taking the
-> functions from, please?
-
-Hi,
-
-these functions come from:
-
-http://previous.alternative-system.com/
-
-http://svn.code.sf.net/p/previous/code/trunk/src/softfloat/softfloat.c
-
-This is also a modified softfloat, release 2b
-which is BSD license if I'm correct.
-
-Their softfloat files seem to come from MAME
-
-http://svn.code.sf.net/p/previous/code/trunk/src/softfloat/README.txt
-
-and MAME is GPL:
-http://mamedev.org/legal.html
-
-and Previous is a fork of Hatari (GPL), a fork of UAE (GPL)
-https://hatari.tuxfamily.org/index.html
-
-This code has also been copied to WinUAE (GPL), where softfloat has been
-copied from QEMU:
-https://github.com/tonioni/WinUAE/blob/master/softfloat/softfloat.cpp
-
-But I think the bad news comes later:
-
-all the other functions (sin, cos, tan, log, exp, ...) found in previous
-(softfloat_fpsp.c) are "derived" from NeXT library FPSP:
-
-http://svn.code.sf.net/p/previous/code/trunk/src/softfloat/softfloat_fpsp.c
-
-/*============================================================================
-
- This C source file is an extension to the SoftFloat IEC/IEEE Floating-point
- Arithmetic Package, Release 2a.
-
- Written by Andreas Grabher for Previous, NeXT Computer Emulator.
-
-=============================================================================*/
-...
-/*----------------------------------------------------------------------------
-| Algorithms for transcendental functions supported by MC68881 and MC68882
-| mathematical coprocessors. The functions are derived from FPSP library.
-*----------------------------------------------------------------------------*/
-
-FPSP library can be found:
-
-https://ftp.nice.ch/pub/next/developer/hardware/m68k/
-
-And the assembly source code is not free at all:
-
-https://ftp.nice.ch/pub/next/developer/hardware/m68k/_libFPSP.1.p2.N.s/l_fpsp.h
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: qemu-devel@nongnu.org, kwolf@redhat.com, famz@redhat.com, qemu-block@nongnu.org
 
 
-|		Copyright (C) Motorola, Inc. 1991
-|			All Rights Reserved
-|
-|	THIS IS UNPUBLISHED PROPRIETARY SOURCE CODE OF MOTOROLA
-|	The copyright notice above does not evidence any
-|	actual or intended publication of such source code.
+--dc+cDN39EJAMEtIO
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
+On Wed, Nov 29, 2017 at 11:25:10AM +0100, Paolo Bonzini wrote:
+> From: Kevin Wolf <kwolf@redhat.com>
+>=20
+> The .drained_begin/end callbacks can (directly or indirectly via
+> aio_poll()) cause block nodes to be removed or the current BdrvChild to
+> point to a different child node.
+>=20
+> Use QLIST_FOREACH_SAFE() to make sure we don't access invalid
+> BlockDriverStates or accidentally continue iterating the parents of the
+> new child node instead of the node we actually came from.
+>=20
+> Signed-off-by: Kevin Wolf <kwolf@redhat.com>
+> Tested-by: Jeff Cody <jcody@redhat.com>
+> Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
+> Reviewed-by: Jeff Cody <jcody@redhat.com>
+> ---
+>  block/io.c | 8 ++++----
+>  1 file changed, 4 insertions(+), 4 deletions(-)
+>=20
+> diff --git a/block/io.c b/block/io.c
+> index 4fdf93a014..6773926fc1 100644
+> --- a/block/io.c
+> +++ b/block/io.c
+> @@ -42,9 +42,9 @@ static int coroutine_fn bdrv_co_do_pwrite_zeroes(BlockD=
+riverState *bs,
+> =20
+>  void bdrv_parent_drained_begin(BlockDriverState *bs)
+>  {
+> -    BdrvChild *c;
+> +    BdrvChild *c, *next;
+> =20
+> -    QLIST_FOREACH(c, &bs->parents, next_parent) {
+> +    QLIST_FOREACH_SAFE(c, &bs->parents, next_parent, next) {
+>          if (c->role->drained_begin) {
+>              c->role->drained_begin(c);
+>          }
+> @@ -53,9 +53,9 @@ void bdrv_parent_drained_begin(BlockDriverState *bs)
+> =20
+>  void bdrv_parent_drained_end(BlockDriverState *bs)
+>  {
+> -    BdrvChild *c;
+> +    BdrvChild *c, *next;
+> =20
+> -    QLIST_FOREACH(c, &bs->parents, next_parent) {
+> +    QLIST_FOREACH_SAFE(c, &bs->parents, next_parent, next) {
+>          if (c->role->drained_end) {
+>              c->role->drained_end(c);
+>          }
 
-So I'm wondering what license apply to the C version found in "Previous".
+Hmm...not sure if this patch is enough.
 
-Thanks,
-Laurent
+Thinking about this more, if this sub-graph changes then
+=2Edrained_begin() callbacks are not necessarily paired with
+=2Edrained_end() callbacks.
+
+In other words, all of the following are possible:
+
+1. Only .drained_begin() is called
+2. .drained_begin() is called, then .drained_end()
+3. Only .drained_end() is called
+
+It makes me wonder if we need to either:
+
+Take references and ensure .drained_end() gets called if and only if
+=2Edrained_begin() was also called.
+
+OR
+
+Document that .drained_begin/end() calls may not be paired and audit
+existing code to check that this is safe.
+
+Stefan
+
+--dc+cDN39EJAMEtIO
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEcBAEBAgAGBQJaHrmoAAoJEJykq7OBq3PIe6IH/2Rl0SphRCv8BJV/A+Ozm+CB
+oLi3UrKms9JTAnGS0NKxpF4dxbuAkfayMcKXcwYcrzUOaMn8MMTcB3yyWOBBuEOq
+CJKh1o2MQbDniecFtrMgx2pTNMt6B6K9Z0s03ump12pBOUuXqvkbowSQ8l0T/tEi
+empchx4v5Stwf+SrJ21LsX+7B2HcBIq9XLpXUn7q8tsHqPYPTBhCnGd77Ui1TXOV
+ZmKLlAgytStjffe8y3hniT4WblOhjxfsCA6nbLCslwMxfg3+tI6M1kJj9vbuo7Fi
+CMPhgj7KwI6hP16tWx5H6QSWzEitG5m1cjgmeqGjfR0MZrdbRC6y4d8ZTo00CcA=
+=QYlT
+-----END PGP SIGNATURE-----
+
+--dc+cDN39EJAMEtIO--
