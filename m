@@ -1,22 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57385)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57767)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1eK30b-0007VV-LQ
-	for qemu-devel@nongnu.org; Wed, 29 Nov 2017 09:06:50 -0500
+	(envelope-from <stefanha@gmail.com>) id 1eK31e-00087h-6p
+	for qemu-devel@nongnu.org; Wed, 29 Nov 2017 09:07:51 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1eK30W-0000d6-N2
-	for qemu-devel@nongnu.org; Wed, 29 Nov 2017 09:06:41 -0500
-References: <20171128203326.6062-1-david@redhat.com>
-	<d43c646d-fd59-12a6-c7a8-7b5dfac0b9de@redhat.com>
-From: David Hildenbrand <david@redhat.com>
-Message-ID: <d8f73958-c138-c454-a52d-91f5874d7481@redhat.com>
-Date: Wed, 29 Nov 2017 15:06:33 +0100
+	(envelope-from <stefanha@gmail.com>) id 1eK31Y-0001Nk-3m
+	for qemu-devel@nongnu.org; Wed, 29 Nov 2017 09:07:46 -0500
+Date: Wed, 29 Nov 2017 14:07:37 +0000
+From: Stefan Hajnoczi <stefanha@gmail.com>
+Message-ID: <20171129140737.GE4281@stefanha-x1.localdomain>
+References: <20171129102513.9153-1-pbonzini@redhat.com>
+	<20171129102513.9153-5-pbonzini@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <d43c646d-fd59-12a6-c7a8-7b5dfac0b9de@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [qemu-s390x] [PATCH v1 for-2.12 00/15] s390x/tcg:
- cleanup and fix program interrupts
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="DqhR8hV3EnoxUkKN"
+Content-Disposition: inline
+In-Reply-To: <20171129102513.9153-5-pbonzini@redhat.com>
+Subject: Re: [Qemu-devel] [Qemu-block] [PATCH 4/4] blockjob: reimplement
+ block_job_sleep_ns to allow cancellation
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,40 +25,47 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>, qemu-s390x@nongnu.org, qemu-devel@nongnu.org
-Cc: Christian Borntraeger <borntraeger@de.ibm.com>, Cornelia Huck <cohuck@redhat.com>, Alexander Graf <agraf@suse.de>, Richard Henderson <rth@twiddle.net>
-
-On 29.11.2017 14:51, Thomas Huth wrote:
-> On 28.11.2017 21:33, David Hildenbrand wrote:
->> I have quite some patches on my queue for 2.12. (booting Fedora 26/27
->> guests, floating interrupts, machine checks, missing instructions ...)
->>
->> So let's start slowly :) This series gets rid of program_interrupt() and
->> potential_page_fault(). We now always properly restore the cpu state when
->> injecting/delivering a program interrupt. So there is no need to update
->> the state via potential_page_fault() anymore.
-> 
-> I think this series is basically a very good idea! But...
-> OK, this is kind of bike-shed-painting now, but since we're currently in
-> hard freeze anyway and got plenty of time for discussion:
-> Something that bothers me a little bit is the name of the new function
-> "program_interrupt_ra()" ... that would IMHO be OK if the old function
-> "program_interrupt" would still stay, but since that is removed and the
-> _ra function is the only generic way that is left to inject a program
-> interrupt, could we maybe name the new function somewhat nicer right
-> from the start? Something like "s390_program_interrupt" maybe (which is
-> similar to tcg_s390_program_interrupt and kvm_s390_program_interrupt
-> that we have already)?
-
-Sure I can do that, other opinions?
-
-> 
->  Thomas
-> 
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: qemu-devel@nongnu.org, kwolf@redhat.com, famz@redhat.com, qemu-block@nongnu.org
 
 
--- 
+--DqhR8hV3EnoxUkKN
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-Thanks,
+On Wed, Nov 29, 2017 at 11:25:13AM +0100, Paolo Bonzini wrote:
+> This reverts the effects of commit 4afeffc857 ("blockjob: do not allow
+> coroutine double entry or entry-after-completion", 2017-11-21)
+>=20
+> This fixed the symptom of a bug rather than the root cause. Canceling the
+> wait on a sleeping blockjob coroutine is generally fine, we just need to
+> make it work correctly across AioContexts.  To do so, use a QEMUTimer
+> that calls block_job_enter.  Use a mutex to ensure that block_job_enter
+> synchronizes correctly with block_job_sleep_ns.
+>=20
+> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+> ---
+>  blockjob.c                   | 57 +++++++++++++++++++++++++++++++++++---=
+------
+>  include/block/blockjob.h     |  5 +++-
+>  include/block/blockjob_int.h |  4 ++--
+>  3 files changed, 52 insertions(+), 14 deletions(-)
 
-David / dhildenb
+Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
+
+--DqhR8hV3EnoxUkKN
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEcBAEBAgAGBQJaHr8pAAoJEJykq7OBq3PI6u8H/1WTx4oPGrwuhDxI16ptLgHO
+D+lDBpuFd0bCevOddcN1OyMvEU5AIrop3sbopelNxFvqQtKWIqV6e9lqev4zkw9o
+o4ICIj3UWrVztQCJ589AytaHLIthEyOQ8CtMBOw21AtG8CXaxr20uKAX9CuPog4r
+9akN3/5T47jJWB+fTK3euQ02+VhwyEZvN6EQi+EQ7IfitkdihQYBfmjj0ZW+hvs9
+3IUnlrlhqmnARKkeXn5WDQ8uCH8ZwLNyYkcakYUN1cCbLsaI5aVzjZ0kZw6HuIoA
+RHjsrmxIo2i1jx9xo6qCIC82VxFpRRzz4PXVIcuRINykoINAB9ZphHeDSLMjBso=
+=icXJ
+-----END PGP SIGNATURE-----
+
+--DqhR8hV3EnoxUkKN--
