@@ -1,23 +1,18 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57086)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59204)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <rth7680@gmail.com>) id 1eK6Jq-0000io-2r
-	for qemu-devel@nongnu.org; Wed, 29 Nov 2017 12:38:46 -0500
+	(envelope-from <ppandit@redhat.com>) id 1eK6Pc-0004TZ-JB
+	for qemu-devel@nongnu.org; Wed, 29 Nov 2017 12:44:45 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <rth7680@gmail.com>) id 1eK6Jm-0002Di-TO
-	for qemu-devel@nongnu.org; Wed, 29 Nov 2017 12:38:46 -0500
-Sender: Richard Henderson <rth7680@gmail.com>
-References: <20171128203326.6062-1-david@redhat.com>
-	<20171128203326.6062-7-david@redhat.com>
-From: Richard Henderson <rth@twiddle.net>
-Message-ID: <2631fa24-62a9-3dc0-acde-7aeb2af06a7f@twiddle.net>
-Date: Wed, 29 Nov 2017 17:38:39 +0000
-MIME-Version: 1.0
-In-Reply-To: <20171128203326.6062-7-david@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v1 for-2.12 06/15] s390x/diag: pass the
- retaddr into handle_diag_308()
+	(envelope-from <ppandit@redhat.com>) id 1eK6PX-0001VD-PB
+	for qemu-devel@nongnu.org; Wed, 29 Nov 2017 12:44:44 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:56760)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <ppandit@redhat.com>) id 1eK6PX-0001TM-J6
+	for qemu-devel@nongnu.org; Wed, 29 Nov 2017 12:44:39 -0500
+From: P J P <ppandit@redhat.com>
+Date: Wed, 29 Nov 2017 23:14:26 +0530
+Message-Id: <20171129174428.27548-1-ppandit@redhat.com>
+Subject: [Qemu-devel] [PATCH v4 0/2] check VirtiQueue Vring objects
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,26 +21,27 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Hildenbrand <david@redhat.com>, qemu-s390x@nongnu.org, qemu-devel@nongnu.org
-Cc: Christian Borntraeger <borntraeger@de.ibm.com>, Cornelia Huck <cohuck@redhat.com>, Alexander Graf <agraf@suse.de>
+To: Qemu Developers <qemu-devel@nongnu.org>
+Cc: Cornelia Huck <cohuck@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, zhangboxian <zhangboxian@huawei.com>, Paolo Bonzini <pbonzini@redhat.com>, Prasad J Pandit <pjp@fedoraproject.org>
 
-On 11/28/2017 08:33 PM, David Hildenbrand wrote:
-> Needed to later drop potential_page_fault() from the diag TCG translate
-> function.
-> 
-> Convert program_interrupt() to program_interrupt_ra() directly, making
-> use of the passed address.
-> 
-> Signed-off-by: David Hildenbrand <david@redhat.com>
-> ---
->  target/s390x/diag.c        | 14 +++++++-------
->  target/s390x/internal.h    |  3 ++-
->  target/s390x/kvm.c         |  2 +-
->  target/s390x/misc_helper.c |  2 +-
->  4 files changed, 11 insertions(+), 10 deletions(-)
+From: Prasad J Pandit <pjp@fedoraproject.org>
 
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+Hello,
 
-Likewise wrt RA_IGNORED.
+A guest could attempt to use an uninitialised VirtQueue object
+or set Vring object with undue values, raising an unexpected
+exception in Qemu. This patch set fixes this issue and also adds
+a unit test to the suite.
 
-r~
+Thank you.
+--
+Prasad J Pandit (2):
+  virtio: check VirtQueue Vring object is set
+  tests: add test to check VirtQueue object
+
+ hw/virtio/virtio.c      | 14 +++++++++++---
+ tests/virtio-blk-test.c | 25 +++++++++++++++++++++++++
+ 2 files changed, 36 insertions(+), 3 deletions(-)
+
+--
+2.13.6
