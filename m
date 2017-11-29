@@ -1,21 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34630)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34808)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1eK4gL-0006oS-Pu
-	for qemu-devel@nongnu.org; Wed, 29 Nov 2017 10:53:54 -0500
+	(envelope-from <david@redhat.com>) id 1eK4h6-0007H0-21
+	for qemu-devel@nongnu.org; Wed, 29 Nov 2017 10:54:44 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1eK4gG-0004pu-S9
-	for qemu-devel@nongnu.org; Wed, 29 Nov 2017 10:53:53 -0500
-Date: Wed, 29 Nov 2017 16:53:41 +0100
-From: Cornelia Huck <cohuck@redhat.com>
-Message-ID: <20171129165341.3f084d4e.cohuck@redhat.com>
-In-Reply-To: <20171128203326.6062-14-david@redhat.com>
+	(envelope-from <david@redhat.com>) id 1eK4h0-00052O-10
+	for qemu-devel@nongnu.org; Wed, 29 Nov 2017 10:54:40 -0500
 References: <20171128203326.6062-1-david@redhat.com>
-	<20171128203326.6062-14-david@redhat.com>
+	<20171128203326.6062-8-david@redhat.com>
+	<20171129165049.1c446263.cohuck@redhat.com>
+From: David Hildenbrand <david@redhat.com>
+Message-ID: <77eab778-87d4-c16e-2407-5437f51c4b04@redhat.com>
+Date: Wed, 29 Nov 2017 16:54:30 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+In-Reply-To: <20171129165049.1c446263.cohuck@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v1 for-2.12 13/15] s390x/tcg: use
- program_interrupt_ra() in STSI
+Subject: Re: [Qemu-devel] [PATCH v1 for-2.12 07/15] s390x: handle exceptions
+ during s390_cpu_virt_mem_rw() correctly (TCG)
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,20 +26,106 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Hildenbrand <david@redhat.com>
+To: Cornelia Huck <cohuck@redhat.com>
 Cc: qemu-s390x@nongnu.org, qemu-devel@nongnu.org, Christian Borntraeger <borntraeger@de.ibm.com>, Richard Henderson <rth@twiddle.net>, Alexander Graf <agraf@suse.de>
 
-On Tue, 28 Nov 2017 21:33:23 +0100
-David Hildenbrand <david@redhat.com> wrote:
-
-> STSI needs some more love, but let's do one step at a time.
-
-Out of curiousity: What else do you want to do?
-
-> We can now drop potential_page_fault().
+> This looks a bit odd if you don't realize that kvm already handled the
+> exception. But I don't really have a better idea.
 > 
-> Signed-off-by: David Hildenbrand <david@redhat.com>
-> ---
->  target/s390x/misc_helper.c | 2 +-
->  target/s390x/translate.c   | 1 -
->  2 files changed, 1 insertion(+), 2 deletions(-)
+>>          }
+>>          return;
+>>      }
+> 
+>> @@ -645,9 +657,12 @@ void ioinst_handle_chsc(S390CPU *cpu, uint32_t ipb, uintptr_t ra)
+>>      if (!s390_cpu_virt_mem_write(cpu, addr + len, reg, res,
+>>                                   be16_to_cpu(res->len))) {
+>>          setcc(cpu, 0);    /* Command execution complete */
+>> +    } else {
+>> +        s390_cpu_virt_mem_handle_exc(cpu, ra);
+>>      }
+>>  }
+>>  
+>> +
+> 
+> unrelated whitespace
+
+ack, will drop.
+
+> 
+>>  #define SCHM_REG1_RES(_reg) (_reg & 0x000000000ffffffc)
+>>  #define SCHM_REG1_MBK(_reg) ((_reg & 0x00000000f0000000) >> 28)
+>>  #define SCHM_REG1_UPD(_reg) ((_reg & 0x0000000000000002) >> 1)
+>> diff --git a/target/s390x/mmu_helper.c b/target/s390x/mmu_helper.c
+>> index 31e3f3f415..39da9aeef4 100644
+>> --- a/target/s390x/mmu_helper.c
+>> +++ b/target/s390x/mmu_helper.c
+>> @@ -22,6 +22,7 @@
+>>  #include "internal.h"
+>>  #include "kvm_s390x.h"
+>>  #include "sysemu/kvm.h"
+>> +#include "exec/exec-all.h"
+>>  #include "trace.h"
+>>  #include "hw/s390x/storage-keys.h"
+>>  
+>> @@ -458,7 +459,7 @@ static int translate_pages(S390CPU *cpu, vaddr addr, int nr_pages,
+>>          }
+>>          if (!address_space_access_valid(&address_space_memory, pages[i],
+>>                                          TARGET_PAGE_SIZE, is_write)) {
+>> -            program_interrupt(env, PGM_ADDRESSING, ILEN_AUTO);
+>> +            trigger_pgm_exception(env, PGM_ADDRESSING, ILEN_AUTO);
+> 
+> Why did you change this?
+
+"For TCG, there was one case where a cpu loop exit was triggered. Fix
+that up."
+
+Wasn't worth a separate patch :)
+
+> 
+>>              return -EFAULT;
+>>          }
+>>          addr += TARGET_PAGE_SIZE;
+>> @@ -478,6 +479,9 @@ static int translate_pages(S390CPU *cpu, vaddr addr, int nr_pages,
+>>   *
+>>   * Copy from/to guest memory using logical addresses. Note that we inject a
+>>   * program interrupt in case there is an error while accessing the memory.
+>> + *
+>> + * This function will always return (also for TCG), make sure to call
+>> + * s390_cpu_virt_mem_handle_exc() to properly exit the CPU loop.
+>>   */
+>>  int s390_cpu_virt_mem_rw(S390CPU *cpu, vaddr laddr, uint8_t ar, void *hostbuf,
+>>                           int len, bool is_write)
+>> @@ -514,6 +518,19 @@ int s390_cpu_virt_mem_rw(S390CPU *cpu, vaddr laddr, uint8_t ar, void *hostbuf,
+>>      return ret;
+>>  }
+>>  
+>> +void s390_cpu_virt_mem_handle_exc(S390CPU *cpu, uintptr_t ra)
+>> +{
+>> +    /* KVM will handle the interrupt automatically, TCG has to exit the TB */
+>> +    #ifdef CONFIG_TCG
+> 
+> Please move the #ifdef/#endif to the beginning of the line.
+
+Oh, yes.
+
+> 
+>> +    if (tcg_enabled()) {
+>> +        if (ra) {
+>> +            cpu_restore_state(CPU(cpu), ra);
+>> +        }
+>> +        cpu_loop_exit(CPU(cpu));
+>> +    }
+>> +    #endif
+>> +}
+>> +
+>>  /**
+>>   * Translate a real address into a physical (absolute) address.
+>>   * @param raddr  the real address
+> 
+
+
+-- 
+
+Thanks,
+
+David / dhildenb
