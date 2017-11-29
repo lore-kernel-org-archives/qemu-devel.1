@@ -1,23 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46191)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46330)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1eK2MR-0002Aw-GQ
-	for qemu-devel@nongnu.org; Wed, 29 Nov 2017 08:25:12 -0500
+	(envelope-from <dgibson@ozlabs.org>) id 1eK2Mw-0002SC-NX
+	for qemu-devel@nongnu.org; Wed, 29 Nov 2017 08:25:43 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1eK2MO-0003Td-AC
-	for qemu-devel@nongnu.org; Wed, 29 Nov 2017 08:25:11 -0500
-Date: Wed, 29 Nov 2017 13:24:55 +0000
-From: Stefan Hajnoczi <stefanha@gmail.com>
-Message-ID: <20171129132455.GA4281@stefanha-x1.localdomain>
-References: <20171129035502.GD8889@lemon>
-	<20171129120018.GB2601@stefanha-x1.localdomain>
-	<7ccb7f4a-b576-349f-655c-f741ec3a0dff@redhat.com>
+	(envelope-from <dgibson@ozlabs.org>) id 1eK2Mv-0003iQ-EH
+	for qemu-devel@nongnu.org; Wed, 29 Nov 2017 08:25:42 -0500
+Received: from ozlabs.org ([2401:3900:2:1::2]:51517)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <dgibson@ozlabs.org>) id 1eK2Mu-0003fW-R8
+	for qemu-devel@nongnu.org; Wed, 29 Nov 2017 08:25:41 -0500
+Date: Thu, 30 Nov 2017 00:15:21 +1100
+From: David Gibson <david@gibson.dropbear.id.au>
+Message-ID: <20171129131521.GN3023@umbus.fritz.box>
+References: <20171129084628.12336-1-david@gibson.dropbear.id.au>
+	<20171129084628.12336-7-david@gibson.dropbear.id.au>
+	<9b0e9672-e0d7-53c3-9a42-ab3f6011b59b@redhat.com>
+	<20171129114109.GZ3037@localhost.localdomain>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="n8g4imXOkfNTN/H1"
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature"; boundary="rPgHZmYkQ+bUEpVC"
 Content-Disposition: inline
-In-Reply-To: <7ccb7f4a-b576-349f-655c-f741ec3a0dff@redhat.com>
-Subject: Re: [Qemu-devel] [Qemu-block] Block layer complexity: what to do to
- keep it under control?
+In-Reply-To: <20171129114109.GZ3037@localhost.localdomain>
+Subject: Re: [Qemu-devel] [for-2.12 6/7] pci: Eliminate redundant
+ PCIDevice::bus pointer
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,77 +31,77 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: Stefan Hajnoczi <stefanha@redhat.com>, Fam Zheng <famz@redhat.com>, kwolf@redhat.com, qemu-block@nongnu.org, qemu-devel@nongnu.org, mreitz@redhat.com
+To: Eduardo Habkost <ehabkost@redhat.com>
+Cc: Marcel Apfelbaum <marcel@redhat.com>, "Michael S . Tsirkin" <mst@redhat.com>, Igor Mammedov <imammedo@redhat.com>, qemu-devel@nongnu.org
 
 
---n8g4imXOkfNTN/H1
+--rPgHZmYkQ+bUEpVC
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Wed, Nov 29, 2017 at 01:24:46PM +0100, Paolo Bonzini wrote:
-> On 29/11/2017 13:00, Stefan Hajnoczi wrote:
-> > We are at a point where code review isn't finding certain bugs because
-> > no single person knows all the assumptions.  Previously the problem was
-> > contained because maintainers spotted problems before patches were
-> > merged.
+On Wed, Nov 29, 2017 at 09:41:09AM -0200, Eduardo Habkost wrote:
+> On Wed, Nov 29, 2017 at 12:54:04PM +0200, Marcel Apfelbaum wrote:
+> > On 29/11/2017 10:46, David Gibson wrote:
+> > > The bus pointer in PCIDevice is basically redundant with QOM informat=
+ion.
+> > > It's always initialized to the qdev_get_parent_bus(), the only differ=
+ence
+> > > is the type.
+> > >=20
+> > > Therefore this patch eliminates the field, instead creating a pci_get=
+_bus()
+> > > helper to do the type mangling to derive it conveniently from the QOM
+> > > Device object underneath.
+> > >=20
 > >=20
-> > This is not primarily a documentation problem though.  We cannot
-> > document our way out of this because no single person (patch author or
-> > code reviewer) can know or check everything anymore due to the scale.
 > >=20
-> > I think it's a (lack of) design problem because we have many incomplete
-> > abstractions like block jobs, IOThreads, block graph, image locking,
-> > etc.  They do not cover all possibly states and interactions today.
-> > Extending them leads to complex bugs.
+> > Hi David,
+> >=20
+> > I personally don't see why the caching of the bus bothers you.
+> > It makes the code a little easier to read, but indeed is a duplication
+> > of data; let's see what Michael has to say, is a matter of
+> > taste I suppose.
 >=20
-> I think the main interactions are:
->=20
-> 1) block graph modifications and drain.  This has always been a carnage.
->  Implementing BlockBackend isolation instead of drain would probably be
-> a starting point to fix it, because IIRC there are extremely few cases
-> where we really need "drain" semantics.
+> I'm all for removing duplication of data because it makes the
+> code less fragile.  We don't even take care of clearing
+> pci_dev->bus when the device is removed from the bus, so there's
+> a window between unplugging a device and actually freeing the
+> object where pci_dev->bus can become a dangling pointer.
 
-Yes, this is a big one.
+Right.  In some other things I'm working on I also got bitten by the
+fact that the PCI parent pointer wasn't initialized until realize()
+time, when I needed to get to the bus before that.
 
-> 2) block jobs and coroutines.  Block jobs were too clever about
-> coroutines.  Using a simplified API is going to fix this problem.
-> Ideally, if you're not in a coroutine "co", the only coroutine APIs you
-> should use on "co" are:
->=20
-> - aio_co_enter/qemu_coroutine_enter (start a coroutine, respectively on
-> another AioContext or this context);
->=20
-> - aio_co_schedule/aio_co_wake (restart a coroutine that has yielded,
-> respectively on a given AioContext or its own original.
->=20
-> 3) block jobs and drain.  This is related to (1) because drain can
-> terminate jobs and in turn that can cause block graph modifications.
-> I'm not even sure it's a separate issue.
->=20
->=20
-> Regarding documentation, the include file documentation is good for
-> coroutines and block jobs.  But it's bad for block graph modification
-> APIs, and even for coroutines + block jobs the docs/devel documentation
-> could be improved *and* it's ugly that we're not generating anything
-> readable from include file documentation, to go with docs/devel.
+As a rule I like to keep data normalized, because it's harder for
+things to get out of sync confusingly.  The fact that on modern
+hardware recalculating things is generally faster than the the extra
+cache footprint is just a bonus.
 
-We still need to be careful about block job completion code that runs in
-the main loop, too.  That has been a source of several bugs.
+--=20
+David Gibson			| I'll have my music baroque, and my code
+david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
+				| _way_ _around_!
+http://www.ozlabs.org/~dgibson
 
---n8g4imXOkfNTN/H1
+--rPgHZmYkQ+bUEpVC
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQEcBAEBAgAGBQJaHrUnAAoJEJykq7OBq3PIL/oH/j7tg2tQrjFNdB0ICCJDUQzA
-JOD+Wn+Xxxl9luG9ugV+z/TFMpkfMayjAMPcuLQhodzPEBAe8de4jTMFCW4mRUsx
-qYQ/N8XKN4uEGvwTJmhTlFENxYyr4cbeUwDqj/kg6SgEVj32+hQIBsEPezrHpaij
-Reg3VUtx8d+UEmNnq5UEPfcxT4cvzGVJ1KrN0lwuMp+8T7Zm9yecrS2xsoVrL3jH
-TsbdvqCrHKfl9p9dBQvTtr37oOf0YcTW1NG2M63VsRq4ctlwAr6sJhLfcAqdRZ9T
-+nfkyPoZ7eIhCEfOLA4re2meXw96Hb4GqC/KUfR6JApnwAcP4pHAWVNKDPNyPtI=
-=+kmk
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAloesucACgkQbDjKyiDZ
+s5LBhw//Yg0U0SxjkNsl4xFPRDss7x1gAGBsN2sq2116mbyq5+H6w2Z/fAdWIyT0
+3sZ9rx4smVDJktr8fJ4zvDp5gsYCqx9SbMZES7iIVy6s4q1zn4n32b4ApARgy4K4
+9kntnH3NTADuXoZUe+pb7lVyZiUgED9RymS34/bH34s/0eajVGhdTPyjtZjJFmtV
+DDKlH/sib3vxcrcki5JF57HMbbJWOqz/CUsJyhVN0iGwP/JRroT8xLCkgSHg41Va
+VP165yd/de9MxVUEUuwvdFnumkUt7XnL39hktruSZWxaFAn0nX8APopz/koM10kk
+Y8WYkoKLIqEbGe722gc/JSEl4PlfLuJvG6L9sqNxjf9Z+wRfAqipTKL4yt/6QmF9
+m3JJ38Pg+rkwvGQgwbbLtM83XbYOzNBY87JSCu8qI7Iq9tJE2B8V3atpdbGqfdqQ
+kcpOrL2PZswod8eJChPB1D30iZNfkJykz5GcDwzUCJMjCfM02Y6b+foqEDpFr65G
+uHApmF97dPwD8nUe85Bz68pkgXWNdORpf4La1YQjjQ3qH3v3t72zz9SeZJijTl9P
+ktA1rUAsn+fw7WeO6N6jkq6Py43Sv0jhwhrtoBc192vyA/P69KlXm7repuXYQzV0
+Ma57211gzuNiT+wLQ5cFR8FFebPMjEGx0YhxkVZ9HPfbNcaFKLE=
+=lwOk
 -----END PGP SIGNATURE-----
 
---n8g4imXOkfNTN/H1--
+--rPgHZmYkQ+bUEpVC--
