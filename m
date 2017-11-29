@@ -1,28 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52244)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52655)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <longpeng2@huawei.com>) id 1eK110-0006eA-Dg
-	for qemu-devel@nongnu.org; Wed, 29 Nov 2017 06:58:59 -0500
+	(envelope-from <stefanha@redhat.com>) id 1eK12V-0007QW-RG
+	for qemu-devel@nongnu.org; Wed, 29 Nov 2017 07:00:37 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <longpeng2@huawei.com>) id 1eK10w-0005qg-Dz
-	for qemu-devel@nongnu.org; Wed, 29 Nov 2017 06:58:58 -0500
-Received: from szxga04-in.huawei.com ([45.249.212.190]:2821)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_ARCFOUR_SHA1:16) (Exim 4.71)
-	(envelope-from <longpeng2@huawei.com>) id 1eK10v-0005nT-8k
-	for qemu-devel@nongnu.org; Wed, 29 Nov 2017 06:58:54 -0500
-Message-ID: <5A1EA0DB.60303@huawei.com>
-Date: Wed, 29 Nov 2017 19:58:19 +0800
-From: "Longpeng (Mike)" <longpeng2@huawei.com>
+	(envelope-from <stefanha@redhat.com>) id 1eK12U-0006Xh-Np
+	for qemu-devel@nongnu.org; Wed, 29 Nov 2017 07:00:31 -0500
+Date: Wed, 29 Nov 2017 12:00:18 +0000
+From: Stefan Hajnoczi <stefanha@redhat.com>
+Message-ID: <20171129120018.GB2601@stefanha-x1.localdomain>
+References: <20171129035502.GD8889@lemon>
 MIME-Version: 1.0
-References: <1511530010-511740-1-git-send-email-dplotnikov@virtuozzo.com>
-	<20171128195817.GA29077@localhost.localdomain>
-	<2cd31202-27c3-983f-85a9-6814ff504706@virtuozzo.com>
-	<20171128211326.GV3037@localhost.localdomain>
-	<5A1E43A6.1010607@huawei.com>
-	<20171129104122.GY3037@localhost.localdomain>
-In-Reply-To: <20171129104122.GY3037@localhost.localdomain>
-Content-Type: text/plain; charset="ISO-8859-1"
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] i386: turn off l3-cache property by default
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="24zk1gE8NUlDmwG9"
+Content-Disposition: inline
+In-Reply-To: <20171129035502.GD8889@lemon>
+Subject: Re: [Qemu-devel] Block layer complexity: what to do to keep it
+ under control?
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,195 +24,127 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eduardo Habkost <ehabkost@redhat.com>
-Cc: "Denis V. Lunev" <den@virtuozzo.com>, "Michael S. Tsirkin" <mst@redhat.com>, Denis Plotnikov <dplotnikov@virtuozzo.com>, pbonzini@redhat.com, rth@twiddle.net, qemu-devel@nongnu.org, rkagan@virtuozzo.com, Gonglei <arei.gonglei@huawei.com>, zhaoshenglong <zhaoshenglong@huawei.com>
+To: Fam Zheng <famz@redhat.com>
+Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, pbonzini@redhat.com, jcody@redhat.com, kwolf@redhat.com, mreitz@redhat.com, eblake@redhat.com
 
 
+--24zk1gE8NUlDmwG9
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-On 2017/11/29 18:41, Eduardo Habkost wrote:
+On Wed, Nov 29, 2017 at 11:55:02AM +0800, Fam Zheng wrote:
+> As we move forwards with new features in the block layer, the chances of =
+tricky
+> bugs happening have been increasing alongside - block jobs, coroutines,
+> throttling, AioContext, op blockers and image locking combined together m=
+ake a
+> large and complex picture that is hard to fully understand and work with.=
+ Some
+> bugs we've encountered are quite challenging already.  Examples are:
+>=20
+> - segfault in parallel blockjobs (iotest 30)
+>   https://lists.gnu.org/archive/html/qemu-devel/2017-11/msg01144.html
+>=20
+> - Intermittent hang of iotest 194 (bdrv_drain_all after non-shared storage
+>   migration)
+>   https://lists.gnu.org/archive/html/qemu-devel/2017-11/msg01626.html
+>=20
+> - Drainage in bdrv_replace_child_noperm()
+>   https://lists.gnu.org/archive/html/qemu-devel/2017-11/msg00868.html
+>=20
+> - Regression from 2.8: stuck in bdrv_drain()
+>   https://lists.gnu.org/archive/html/qemu-devel/2017-04/msg02193.html
+>=20
+> So in principle, what should we do to make the block layer easy to unders=
+tand,
+> develop with and debug?
 
-> On Wed, Nov 29, 2017 at 01:20:38PM +0800, Longpeng (Mike) wrote:
->> On 2017/11/29 5:13, Eduardo Habkost wrote:
->>> [CCing the people who were copied in the original patch that
->>> enabled l3cache]
->>>
->>> On Tue, Nov 28, 2017 at 11:20:27PM +0300, Denis V. Lunev wrote:
->>>> On 11/28/2017 10:58 PM, Eduardo Habkost wrote:
->>>>> Hi,
->>>>>
->>>>> On Fri, Nov 24, 2017 at 04:26:50PM +0300, Denis Plotnikov wrote:
->>>>>> Commit 14c985cffa "target-i386: present virtual L3 cache info for vcpus"
->>>>>> introduced and set by default exposing l3 to the guest.
->>>>>>
->>>>>> The motivation behind it was that in the Linux scheduler, when waking up
->>>>>> a task on a sibling CPU, the task was put onto the target CPU's runqueue
->>>>>> directly, without sending a reschedule IPI.  Reduction in the IPI count
->>>>>> led to performance gain.
->>>>>>
->>>>>> However, this isn't the whole story.  Once the task is on the target
->>>>>> CPU's runqueue, it may have to preempt the current task on that CPU, be
->>>>>> it the idle task putting the CPU to sleep or just another running task.
->>>>>> For that a reschedule IPI will have to be issued, too.  Only when that
->>>>>> other CPU is running a normal task for too little time, the fairness
->>>>>> constraints will prevent the preemption and thus the IPI.
->>>>>>
->>
->> Agree. :)
->>
->> Our testing VM is Suse11 guest with idle=poll at that time and now I realize
->> that Suse11 has a BUG in its scheduler.
->>
->> For REHL 7.3 or upstream kernel, in ttwu_queue_remote(), a RES IPI is issued if
->> rq->idle is not polling:
->> '''
->> static void ttwu_queue_remote(struct task_struct *p, int cpu)
->> {
->> 	struct rq *rq = cpu_rq(cpu);
->>
->> 	if (llist_add(&p->wake_entry, &cpu_rq(cpu)->wake_list)) {
->> 		if (!set_nr_if_polling(rq->idle))
->> 			smp_send_reschedule(cpu);
->> 		else
->> 			trace_sched_wake_idle_without_ipi(cpu);
->> 	}
->> }
->> '''
->>
->> But for Suse11, it does not check, it send a RES IPI unconditionally.
-> 
-> So, does that mean no Linux guest benefits from the l3-cache=on
-> default except SuSE 11 guests?
-> 
+The assumptions that the code relies on are unclear so it's easy to
+introduce new bugs.
 
-Not only that, there is another scenario:
+We are at a point where code review isn't finding certain bugs because
+no single person knows all the assumptions.  Previously the problem was
+contained because maintainers spotted problems before patches were
+merged.
 
-static void ttwu_queue(...)
-{
-	if (...two cpus NOT sharing L3-cache) {
-		...
-		ttwu_queue_remote(p, cpu, wake_flags);
-		return;
-	}
-	...
-	ttwu_do_activate(rq, p, wake_flags, &rf); <--*Here*
-	...
-}
+This is not primarily a documentation problem though.  We cannot
+document our way out of this because no single person (patch author or
+code reviewer) can know or check everything anymore due to the scale.
 
-In ttwu_do_activate(), there are also some opportunities with low probability to
-do not send RES IPI even if the target cpu isn't in IDLE polling state.
+I think it's a (lack of) design problem because we have many incomplete
+abstractions like block jobs, IOThreads, block graph, image locking,
+etc.  They do not cover all possibly states and interactions today.
+Extending them leads to complex bugs.
 
-> 
->>
->>>>>> This boils down to the improvement being only achievable in workloads
->>>>>> with many actively switching tasks.  We had no access to the
->>>>>> (proprietary?) SAP HANA benchmark the commit referred to, but the
->>>>>> pattern is also reproduced with "perf bench sched messaging -g 1"
->>>>>> on 1 socket, 8 cores vCPU topology, we see indeed:
->>>>>>
->>>>>> l3-cache	#res IPI /s	#time / 10000 loops
->>>>>> off		560K		1.8 sec
->>>>>> on		40K		0.9 sec
->>>>>>
->>>>>> Now there's a downside: with L3 cache the Linux scheduler is more eager
->>>>>> to wake up tasks on sibling CPUs, resulting in unnecessary cross-vCPU
->>>>>> interactions and therefore exessive halts and IPIs.  E.g. "perf bench
->>>>>> sched pipe -i 100000" gives
->>>>>>
->>>>>> l3-cache	#res IPI /s	#HLT /s		#time /100000 loops
->>>>>> off		200 (no K)	230		0.2 sec
->>>>>> on		400K		330K		0.5 sec
->>>>>>
->>
->> I guess this issue could be resolved by disable the SD_WAKE_AFFINE.
->>
->> As Gonglei said:
->> 1. the L3 cache relates to the user experience.
-> 
-> This is true, in a way: I have seen a fair share of user reports
-> where they incorrectly blame the L3 cache absence or the L3 cache
-> size for performance problems.
-> 
->> 2. the glibc would get the cache info by CPUID directly, and relates to the
->> memory performance.
-> 
-> I'm interested in numbers that demonstrate that.
-> 
+A little progress has been made with defining higher-level APIs for
+block drivers and block jobs.  This way they either don't deal with
+low-level details of the concurrency and event loop models (e.g.
+bdrv_coroutine_enter()) or there is an interface that prompts them to
+integrate properly like bdrv_attach/detach_aio_context().
 
-Sorry I have no numbers in hand currently :(
+Event loops and coroutines are good but they should not be used directly
+by block drivers and block jobs.  We need safe, high-level APIs that
+implement commonly-used operations.
 
-I'll do some tests these days, please give me some time.
+> - Documentation
+>=20
+>   There is no central developer doc about block layer, especially how all=
+ pieces
+>   fit together. Having one will make it a lot easier for new contributors=
+ to
+>   understand better. Of course, we're facing the old problem: the code is
+>   moving, maintaining an updated document needs effort.
+>=20
+>   Idea: add ./doc/deve/block.txt?
 
->>
->> What's more, the L3 cache relates to the sched_domain which is important to the
->> (load) balancer when system is busy.
->>
->> All this doesn't mean the patch is insignificant, I just think we should do more
->> research before decide. I'll do some tests, thanks. :)
-> 
-> Yes, we need more data.  But if we find out that there are no
-> cases where the l3-cache=on default actually improves
-> performance, I will be willing to apply this patch.
-> 
+IOThreads and AioContexts are addressed here:
+docs/devel/multiple-iothreads.txt
 
-That's a good thing if we find the truth, it's free. :)
+The game has become significantly more complex than what the document
+describes.  It's lacking aio_co_wake() and aio_co_schedule() for
+example.
 
-OTOH, I think we should notice that: Linux is designed on real hardware, maybe
-there're some other problems if QEMU lacks some related features. If we search
-'cpus_share_cache' in the Linux kernel, we can see that it's also used by Block
-Layer.
+> - Simplified code, or more orthogonal/modularized architecture.
+>=20
+>   Each aspect of block layer is complex enough so isolating them as much =
+as
+>   possible is a reasonable approach to control the complexity. Block jobs=
+ and
+>   throttling becoming block filters is a good example, we should identify=
+ more.
+>=20
+>   Idea: rethink event loops. Create coroutines ubiquitously (for example =
+for
+>   each fd handler, BH and timer), so that many nested aio_poll() can be r=
+emoved.
+>=20
+>   Crazy idea: move the whole block layer to a vhost process, and implement
+>   existing features differently, especially in terms of multi-threading (=
+hint:
+>   rust?).
 
-> IMO, the long term solution is to make Linux guests not misbehave
-> when we stop lying about the L3 cache.  Maybe we could provide a
-> "IPIs are expensive, please avoid them" hint in the KVM CPUID
-> leaf?
-> 
+A reimplementation will not solve the problem because:
 
-Good idea. :)
+1. If it still has the same feature set and requirements then the level
+   of complexity will be comparable.
 
-Maybe more PV features could be digged.
+2. We can reduce accidental (inessential) complexity by continuing the
+   various efforts around the block graph, block jobs, multi-queue block
+   layer with an eye towards higher level APIs.
 
->>
->>>>>> In a more realistic test, we observe 15% degradation in VM density
->>>>>> (measured as the number of VMs, each running Drupal CMS serving 2 http
->>>>>> requests per second to its main page, with 95%-percentile response
->>>>>> latency under 100 ms) with l3-cache=on.
->>>>>>
->>>>>> We think that mostly-idle scenario is more common in cloud and personal
->>>>>> usage, and should be optimized for by default; users of highly loaded
->>>>>> VMs should be able to tune them up themselves.
->>>>>>
->>>>> There's one thing I don't understand in your test case: if you
->>>>> just found out that Linux will behave worse if it assumes that
->>>>> the VCPUs are sharing a L3 cache, why are you configuring a
->>>>> 8-core VCPU topology explicitly?
->>>>>
->>>>> Do you still see a difference in the numbers if you use "-smp 8"
->>>>> with no "cores" and "threads" options?
->>>>>
->>>> This is quite simple. A lot of software licenses are bound to the amount
->>>> of CPU __sockets__. Thus it is mandatory in a lot of cases to set topology
->>>> with 1 socket/xx cores to reduce the amount of money necessary to
->>>> be paid for the software.
->>>
->>> In this case it looks like we're talking about the expected
->>> meaning of "cores=N".  My first interpretation would be that the
->>> user obviously want the guest to see the multiple cores sharing a
->>> L3 cache, because that's how real CPUs normally work.  But I see
->>> why you have different expectations.
->>>
->>> Numbers on dedicated-pCPU scenarios would be helpful to guide the
->>> decision.  I wouldn't like to cause a performance regression for
->>> users that fine-tuned vCPU topology and set up CPU pinning.
->>>
->>
->>
->> -- 
->> Regards,
->> Longpeng(Mike)
->>
-> 
+--24zk1gE8NUlDmwG9
+Content-Type: application/pgp-signature; name="signature.asc"
 
+-----BEGIN PGP SIGNATURE-----
 
--- 
-Regards,
-Longpeng(Mike)
+iQEcBAEBAgAGBQJaHqFSAAoJEJykq7OBq3PI/EUH/2ReIk7SY9B/3MB4SYVe6GJb
+PfzdkuMpjx0j/4BGhbcW0BOlyibQFuJWFyVCFDP1E2OklEcHHhChMn/Lvy8BK/B0
+b0W5IA7gZWPeetg/VIZR7LJBAyiJs7Nr4tMWlgg0I+lrG67Pg0QrHYDbnfetBRUL
++dZmog7I3L7bP1VmZlJYHgFBaLzX0UnXwaGT2k0kCMWL+WleefBRSuaK1jTpcaLK
+bH7QD2Id7GUtL8LeoIeS14DpnUYvnsdsOoEt1i7Z3RzmjTuvei85RIxoc30xqVRh
+Si5rt5HG/voWD2KP1K6XZrCF9ciZKcrVy7BTMIAbjF/L7B3g1uXBWm68FuIk38w=
+=Sbfu
+-----END PGP SIGNATURE-----
+
+--24zk1gE8NUlDmwG9--
