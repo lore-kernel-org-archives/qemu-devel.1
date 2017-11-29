@@ -1,17 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43768)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45077)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1eJzYc-000736-53
-	for qemu-devel@nongnu.org; Wed, 29 Nov 2017 05:25:35 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1eJzb3-0001cK-5q
+	for qemu-devel@nongnu.org; Wed, 29 Nov 2017 05:28:06 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1eJzYZ-00056T-1J
-	for qemu-devel@nongnu.org; Wed, 29 Nov 2017 05:25:34 -0500
-From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Wed, 29 Nov 2017 11:25:13 +0100
-Message-Id: <20171129102513.9153-5-pbonzini@redhat.com>
-In-Reply-To: <20171129102513.9153-1-pbonzini@redhat.com>
-References: <20171129102513.9153-1-pbonzini@redhat.com>
-Subject: [Qemu-devel] [PATCH 4/4] blockjob: reimplement block_job_sleep_ns
- to allow cancellation
+	(envelope-from <peter.maydell@linaro.org>) id 1eJzb2-0007LM-7p
+	for qemu-devel@nongnu.org; Wed, 29 Nov 2017 05:28:05 -0500
+Received: from mail-oi0-x22b.google.com ([2607:f8b0:4003:c06::22b]:43550)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1eJzb2-0007K0-3O
+	for qemu-devel@nongnu.org; Wed, 29 Nov 2017 05:28:04 -0500
+Received: by mail-oi0-x22b.google.com with SMTP id f69so2032598oig.10
+	for <qemu-devel@nongnu.org>; Wed, 29 Nov 2017 02:28:04 -0800 (PST)
+MIME-Version: 1.0
+In-Reply-To: <CAGC02hT7OvR1nbyD=AkOqPvxbNPz957=CPZsUxf1FJ73O8W52g@mail.gmail.com>
+References: <CAGC02hTe8SijuwrM0ZGg04=To0GBnPUrC23iKuc-pao65vAAUQ@mail.gmail.com>
+	<b36b0c95-4ddc-b818-522c-1bbec52138e8@adacore.com>
+	<CAGC02hT7OvR1nbyD=AkOqPvxbNPz957=CPZsUxf1FJ73O8W52g@mail.gmail.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Wed, 29 Nov 2017 10:27:42 +0000
+Message-ID: <CAFEAcA8eDeKBnLW45=fPt3NeApMkvkiJzFEshvep_5qmwZKGXA@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [Bug 645662] x87 fpu emulation not accurate enough
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -20,201 +30,53 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: famz@redhat.com, qemu-block@nongnu.org, kwolf@redhat.com, jcody@redhat.com
+To: william lin <wlsaidhi@gmail.com>
+Cc: KONRAD Frederic <frederic.konrad@adacore.com>, QEMU Developers <qemu-devel@nongnu.org>
 
-This reverts the effects of commit 4afeffc857 ("blockjob: do not allow
-coroutine double entry or entry-after-completion", 2017-11-21)
+On 29 November 2017 at 09:59, william lin <wlsaidhi@gmail.com> wrote:
+> This bug has been around for 7+ years now. Qemu switched to softfloat and
+> it did not fix this. I think its most likely caused by Qemu's internal
+> representation not being accurate enough or accuracy lost during
+> conversion. However this is basically what is given to us in the bug
+> report, and I have not been able to make much progress past this point, so
+> we are asking for help.
 
-This fixed the symptom of a bug rather than the root cause. Canceling the
-wait on a sleeping blockjob coroutine is generally fine, we just need to
-make it work correctly across AioContexts.  To do so, use a QEMUTimer
-that calls block_job_enter.  Use a mutex to ensure that block_job_enter
-synchronizes correctly with block_job_sleep_ns.
+Looking at the bug, it seems like inaccuracies in the results of
+some of the transcendental operations (sin, cos, etc). This is
+almost certainly the because our implementations of these in
+target/i386/fpu_helper.c do this:
 
-Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
----
- blockjob.c                   | 57 +++++++++++++++++++++++++++++++++++---------
- include/block/blockjob.h     |  5 +++-
- include/block/blockjob_int.h |  4 ++--
- 3 files changed, 52 insertions(+), 14 deletions(-)
+void helper_fsin(CPUX86State *env)
+{
+    double fptemp = floatx80_to_double(env, ST0);
 
-diff --git a/blockjob.c b/blockjob.c
-index 4d22b7d2fb..3fdaabbc1f 100644
---- a/blockjob.c
-+++ b/blockjob.c
-@@ -37,6 +37,26 @@
- #include "qemu/timer.h"
- #include "qapi-event.h"
- 
-+/* Right now, this mutex is only needed to synchronize accesses to job->busy,
-+ * especially concurrent calls to block_job_enter.
-+ */
-+static QemuMutex block_job_mutex;
-+
-+static void block_job_lock(void)
-+{
-+    qemu_mutex_lock(&block_job_mutex);
-+}
-+
-+static void block_job_unlock(void)
-+{
-+    qemu_mutex_unlock(&block_job_mutex);
-+}
-+
-+static void __attribute__((__constructor__)) block_job_init(void)
-+{
-+    qemu_mutex_init(&block_job_mutex);
-+}
-+
- static void block_job_event_cancelled(BlockJob *job);
- static void block_job_event_completed(BlockJob *job, const char *msg);
- 
-@@ -161,6 +181,7 @@ void block_job_unref(BlockJob *job)
-         blk_unref(job->blk);
-         error_free(job->blocker);
-         g_free(job->id);
-+        assert(!timer_pending(&job->sleep_timer));
-         g_free(job);
-     }
- }
-@@ -287,6 +308,13 @@ static void coroutine_fn block_job_co_entry(void *opaque)
-     job->driver->start(job);
- }
- 
-+static void block_job_sleep_timer_cb(void *opaque)
-+{
-+    BlockJob *job = opaque;
-+
-+    block_job_enter(job);
-+}
-+
- void block_job_start(BlockJob *job)
- {
-     assert(job && !block_job_started(job) && job->paused &&
-@@ -556,7 +584,7 @@ BlockJobInfo *block_job_query(BlockJob *job, Error **errp)
-     info->type      = g_strdup(BlockJobType_str(job->driver->job_type));
-     info->device    = g_strdup(job->id);
-     info->len       = job->len;
--    info->busy      = job->busy;
-+    info->busy      = atomic_read(&job->busy);
-     info->paused    = job->pause_count > 0;
-     info->offset    = job->offset;
-     info->speed     = job->speed;
-@@ -664,6 +692,9 @@ void *block_job_create(const char *job_id, const BlockJobDriver *driver,
-     job->paused        = true;
-     job->pause_count   = 1;
-     job->refcnt        = 1;
-+    aio_timer_init(qemu_get_aio_context(), &job->sleep_timer,
-+                   QEMU_CLOCK_REALTIME, SCALE_NS,
-+                   block_job_sleep_timer_cb, job);
- 
-     error_setg(&job->blocker, "block device is in use by block job: %s",
-                BlockJobType_str(driver->job_type));
-@@ -729,9 +760,14 @@ static bool block_job_should_pause(BlockJob *job)
-     return job->pause_count > 0;
- }
- 
--static void block_job_do_yield(BlockJob *job)
-+static void block_job_do_yield(BlockJob *job, uint64_t ns)
- {
-+    block_job_lock();
-+    if (ns != -1) {
-+        timer_mod(&job->sleep_timer, ns);
-+    }
-     job->busy = false;
-+    block_job_unlock();
-     qemu_coroutine_yield();
- 
-     /* Set by block_job_enter before re-entering the coroutine.  */
-@@ -755,7 +791,7 @@ void coroutine_fn block_job_pause_point(BlockJob *job)
- 
-     if (block_job_should_pause(job) && !block_job_is_cancelled(job)) {
-         job->paused = true;
--        block_job_do_yield(job);
-+        block_job_do_yield(job, -1);
-         job->paused = false;
-     }
- 
-@@ -785,11 +821,16 @@ void block_job_enter(BlockJob *job)
-         return;
-     }
- 
-+    block_job_lock();
-     if (job->busy) {
-+        block_job_unlock();
-         return;
-     }
- 
-+    assert(!job->deferred_to_main_loop);
-+    timer_del(&job->sleep_timer);
-     job->busy = true;
-+    block_job_unlock();
-     aio_co_wake(job->co);
- }
- 
-@@ -807,14 +848,8 @@ void block_job_sleep_ns(BlockJob *job, int64_t ns)
-         return;
-     }
- 
--    /* We need to leave job->busy set here, because when we have
--     * put a coroutine to 'sleep', we have scheduled it to run in
--     * the future.  We cannot enter that same coroutine again before
--     * it wakes and runs, otherwise we risk double-entry or entry after
--     * completion. */
-     if (!block_job_should_pause(job)) {
--        co_aio_sleep_ns(blk_get_aio_context(job->blk),
--                        QEMU_CLOCK_REALTIME, ns);
-+        block_job_do_yield(job, qemu_clock_get_ns(QEMU_CLOCK_REALTIME) + ns);
-     }
- 
-     block_job_pause_point(job);
-@@ -830,7 +865,7 @@ void block_job_yield(BlockJob *job)
-     }
- 
-     if (!block_job_should_pause(job)) {
--        block_job_do_yield(job);
-+        block_job_do_yield(job, -1);
-     }
- 
-     block_job_pause_point(job);
-diff --git a/include/block/blockjob.h b/include/block/blockjob.h
-index 67c0968fa5..956f0d6819 100644
---- a/include/block/blockjob.h
-+++ b/include/block/blockjob.h
-@@ -77,7 +77,7 @@ typedef struct BlockJob {
-     /**
-      * Set to false by the job while the coroutine has yielded and may be
-      * re-entered by block_job_enter().  There may still be I/O or event loop
--     * activity pending.
-+     * activity pending.  Accessed under block_job_mutex (in blockjob.c).
-      */
-     bool busy;
- 
-@@ -135,6 +135,9 @@ typedef struct BlockJob {
-      */
-     int ret;
- 
-+    /** Timer that is used by @block_job_sleep_ns.  */
-+    QEMUTimer sleep_timer;
-+
-     /** Non-NULL if this job is part of a transaction */
-     BlockJobTxn *txn;
-     QLIST_ENTRY(BlockJob) txn_list;
-diff --git a/include/block/blockjob_int.h b/include/block/blockjob_int.h
-index f7ab183a39..c9b23b0cc9 100644
---- a/include/block/blockjob_int.h
-+++ b/include/block/blockjob_int.h
-@@ -142,8 +142,8 @@ void *block_job_create(const char *job_id, const BlockJobDriver *driver,
-  * @ns: How many nanoseconds to stop for.
-  *
-  * Put the job to sleep (assuming that it wasn't canceled) for @ns
-- * %QEMU_CLOCK_REALTIME nanoseconds.  Canceling the job will not interrupt
-- * the wait, so the cancel will not process until the coroutine wakes up.
-+ * %QEMU_CLOCK_REALTIME nanoseconds.  Canceling the job will immediately
-+ * interrupt the wait.
-  */
- void block_job_sleep_ns(BlockJob *job, int64_t ns);
- 
--- 
-2.14.3
+    if ((fptemp > MAXTAN) || (fptemp < -MAXTAN)) {
+        env->fpus |= 0x400;
+    } else {
+        ST0 = double_to_floatx80(env, sin(fptemp));
+        env->fpus &= ~0x400;  /* C2 <-- 0 */
+        /* the above code is for |arg| < 2**53 only */
+    }
+}
+
+ie convert the 80-bit value in the emulated FPU to a host double,
+call the host libc sin() function and convert the resulting
+double to 80-bit.
+
+Fixing this to be bit-for-bit accurate will require that we
+write our own transcendental arithmetic functions that can handle
+80-bit precision, which is a bit of a hairy task. (Probably all the
+functions that call floatx80_to_double() would need to be rewritten.
+We currently use this approach for the "complicated" operations
+that the x87 provides but which softfloat doesn't: sin, cos,
+powers, logs, that sort of thing.)
+
+I was going to suggest that we borrow the code to do this from
+bochs, which does seem to have implemented complete software
+emulation of these complicated x87 instructions, but unfortunately
+the relevant files in bochs are under the softfloat-2b license, which
+isn't (by the QEMU project's reading of the license) compatible
+with the GPLv2 which we use :-(
+
+thanks
+-- PMM
