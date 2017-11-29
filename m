@@ -1,34 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59766)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60414)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1eK5UX-0002tT-Jr
-	for qemu-devel@nongnu.org; Wed, 29 Nov 2017 11:45:46 -0500
+	(envelope-from <berrange@redhat.com>) id 1eK5X5-0003si-Tr
+	for qemu-devel@nongnu.org; Wed, 29 Nov 2017 11:48:25 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1eK5UU-00066Z-Gh
-	for qemu-devel@nongnu.org; Wed, 29 Nov 2017 11:45:45 -0500
-Received: from indium.canonical.com ([91.189.90.7]:56610)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1eK5UU-00066D-6j
-	for qemu-devel@nongnu.org; Wed, 29 Nov 2017 11:45:42 -0500
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1eK5US-0006JP-9v
-	for <qemu-devel@nongnu.org>; Wed, 29 Nov 2017 16:45:40 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 418FC2E80C7
-	for <qemu-devel@nongnu.org>; Wed, 29 Nov 2017 16:45:40 +0000 (UTC)
+	(envelope-from <berrange@redhat.com>) id 1eK5X2-0007Ge-PB
+	for qemu-devel@nongnu.org; Wed, 29 Nov 2017 11:48:23 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:40394)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1eK5X2-0007GL-FM
+	for qemu-devel@nongnu.org; Wed, 29 Nov 2017 11:48:20 -0500
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+	[10.5.11.11])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 64E457F41D
+	for <qemu-devel@nongnu.org>; Wed, 29 Nov 2017 16:48:19 +0000 (UTC)
+Date: Wed, 29 Nov 2017 16:48:13 +0000
+From: "Daniel P. Berrange" <berrange@redhat.com>
+Message-ID: <20171129164813.GA3138@redhat.com>
+Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
+References: <20171030112112.6952-1-quintela@redhat.com>
+	<20171030112112.6952-6-quintela@redhat.com>
+	<20171103100746.GC20155@redhat.com> <873756pkca.fsf@secure.mitica>
+	<20171122125458.GE29565@redhat.com>
+	<20171122125840.GF29565@redhat.com> <87609t9gso.fsf@secure.laptop>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Wed, 29 Nov 2017 16:33:31 -0000
-From: Arno Wagner <645662@bugs.launchpad.net>
-Reply-To: Bug 645662 <645662@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <20100923002702.20683.97345.malonedeb@soybean.canonical.com>
-Message-Id: <151197321182.11140.3495959022669433136.malone@soybean.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 645662] Re: QEMU x87 emulation of trig and other
- complex ops is only at 64-bit precision, not 80-bit
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <87609t9gso.fsf@secure.laptop>
+Subject: Re: [Qemu-devel] [PATCH 5/6] migration: Now set the migration uri
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,78 +37,101 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Juan Quintela <quintela@redhat.com>
+Cc: lvivier@redhat.com, qemu-devel@nongnu.org, peterx@redhat.com, dgilbert@redhat.com
 
-That explains it. For most operations that approach works well as
-basically nobody uses the 80 bit formats directly anyways. Unfortunately
-asinh() is very badly conditioned in the region tested and it is not
-enough.
+On Wed, Nov 29, 2017 at 05:43:35PM +0100, Juan Quintela wrote:
+> "Daniel P. Berrange" <berrange@redhat.com> wrote:
+> > On Wed, Nov 22, 2017 at 12:54:58PM +0000, Daniel P. Berrange wrote:
+> >> On Wed, Nov 22, 2017 at 01:29:57PM +0100, Juan Quintela wrote:
+> >> > "Daniel P. Berrange" <berrange@redhat.com> wrote:
+> >> > > On Mon, Oct 30, 2017 at 12:21:11PM +0100, Juan Quintela wrote:
+> 
+> > > > This is bad as it is throwing away data that the original URI
+> >> > > had. In particular
+> >> > > you loose the 'ipv4=on|off' and 'ipv6=on|off' flags. If you need to keep the
+> >> > > original URI for later, then why not just keep the 'host_port' parameter that
+> >> > > was passed into this function instead of trying to reverse
+> >> > > engineeer the URI ?
+> >> > 
+> >> > I don't need the original uri anymore, this is the incoming side of
+> >> > migration, and we can only set that once, if migration fails, we need to
+> >> > restart qemu anymore.
+> >> > 
+> >> > I changed it to this:
+> >> > 
+> >> >             new_uri = g_strdup_printf("tcp:%s:%s%s%s", address->u.inet.host,
+> >> >                                       address->u.inet.port,
+> >> >                                       iaddr->has_ipv4 ? ",ipv4" : "",
+> >> >                                       iaddr->has_ipv6 ? ",ipv6" : "");
+> >> > 
+> >> > 
+> >> > Clearly, we don't care about the to= parameter.
+> >> > 
+> >> > The whole point of this exercise is that in destination, we use
+> >> > 
+> >> > -incoming tcp:0:0
+> >> > 
+> >> > and with the output of info migrate_parameters (uri) we are able to
+> >> > migrate to that place.  For rest of migration posibilities, there is no
+> >> > changes at all.
+> >> 
+> >> That doesn't work typically. When the incoming QEMU listens for connections,
+> >> by default it will listen on 0.0.0.0, or ::, so that's what the address
+> >> you're creating will contain.  You can't use 0.0.0.0 or :: in a connect()
+> >> call on the other side as that's a wildcard address that refers to "any 
+> >> valid IP address on the current host".
+> >> 
+> >> When you connect to the listening QEMU you need the actual IP address
+> >> of one (of the possibly many) NICs on the target host.  IOW, the only
+> >> time the listen address is useful is if you have told QEMU to listen on
+> >> a specific NIC's IP address, instead of the wildcard address.
+> >> 
+> >> This is the core reason why libvirt calls 'gethostname()' on the target
+> >> host to identify the primary IP address of the host, and uses that on the
+> >> source host to establish the connection.
+> >
+> > I should have said the port number info will still be useful (if you're
+> > using the dynamic port allocation), it is just the IP address that's not
+> > usable in general.
+> 
+> I gave up O:-)
+> 
+> I introduced tcp_port parameter, that is really what I wanted to know.
+> The test use case (the one that I am interested right now) is that I
+> do:
+> 
+> qemu-system-x86_64 ..... --incomping tcp:127.0.0.1:0
+> 
+> And I want to know the port that the destination gets to connect to it.
+> For migration, it don't really matters if we _also_ set the
+> address/ip/whatever it gets translated to, because it is not possible
+> right now to restart the migration incoming side (you need to restart
+> qemu for long and boring historic reasons).
+> 
+> So, I ended just adding:
+> 
+> +#
+> +# @tcp-port: Only used for tcp, to know what is the real port
+> +#                     (Since 2.12)
+>  #
+> 
+> And all the boilerplate code to access/setup this one.
+> 
+> BTW, I am not sure how  well the current code will work with a range of
+> ports, because we don't have a way to tell the source which one the
+> kernel/qemu decided to use O:-)
 
-A possible approach to fix this would be to use long double (128 bit)
-were available instead of just double and to document this limitation
-for double.
+Ultimately I think we need to be able to report a full list of
+SocketAddress structs representing the listening addresses, because
+we will eventually be listening on multiple distinct sockets. Currently
+if a hostname resolves to multiple IP addrs, we only listen on the first
+successful IP, but I have patches that fix this so we listen on multiple
+IPs....
 
--- =
-
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/645662
-
-Title:
-  QEMU x87 emulation of trig and other complex ops is only at 64-bit
-  precision, not 80-bit
-
-Status in QEMU:
-  Confirmed
-
-Bug description:
-  When doing the regression tests for Python 3.1.2 with Qemu 0.12.5, (Linux=
- version 2.6.26-2-686 (Debian 2.6.26-25lenny1)),
-  gcc (Debian 4.3.2-1.1) 4.3.2, Python compiled from sources within qemu,
-  3 math tests fail, apparently because the floating point unit is buggy. Q=
-meu was compiled from original sources
-  on Debian Lenny with kernel  2.6.34.6 from kernel.org, gcc  (Debian 4.3.2=
--1.1) 4.3. =
-
-
-  Regression testing errors:
-
-  test_cmath
-  test test_cmath failed -- Traceback (most recent call last):
-    File "/root/tools/python3/Python-3.1.2/Lib/test/test_cmath.py", line 36=
-4, in
-      self.fail(error_message)
-  AssertionError: acos0034: acos(complex(-1.0000000000000002, 0.0))
-  Expected: complex(3.141592653589793, -2.1073424255447014e-08)
-  Received: complex(3.141592653589793, -2.1073424338879928e-08)
-  Received value insufficiently close to expected value.
-
-  =
-
-  test_float
-  test test_float failed -- Traceback (most recent call last):
-    File "/root/tools/python3/Python-3.1.2/Lib/test/test_float.py", line 47=
-9, in
-      self.assertEqual(s, repr(float(s)))
-  AssertionError: '8.72293771110361e+25' !=3D '8.722937711103609e+25'
-
-  =
-
-  test_math
-  test test_math failed -- multiple errors occurred; run in verbose mode fo=
-r deta
-
-  =3D>
-
-  runtests.sh -v test_math
-
-  le01:~/tools/python3/Python-3.1.2# ./runtests.sh -v test_math
-  test_math BAD
-   1 BAD
-   0 GOOD
-   0 SKIPPED
-   1 total
-  le01:~/tools/python3/Python-3.1.2#
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/645662/+subscriptions
+Regards,
+Daniel
+-- 
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
