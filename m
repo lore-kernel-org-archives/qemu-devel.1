@@ -1,29 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42175)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49030)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1eK6y3-0000bt-9Q
-	for qemu-devel@nongnu.org; Wed, 29 Nov 2017 13:20:20 -0500
+	(envelope-from <dgilbert@redhat.com>) id 1eK7RR-00010d-O6
+	for qemu-devel@nongnu.org; Wed, 29 Nov 2017 13:50:42 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1eK6xy-0000GT-6t
-	for qemu-devel@nongnu.org; Wed, 29 Nov 2017 13:20:19 -0500
-Received: from mail-wm0-x241.google.com ([2a00:1450:400c:c09::241]:39909)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1eK6xx-0000Ff-Jh
-	for qemu-devel@nongnu.org; Wed, 29 Nov 2017 13:20:13 -0500
-Received: by mail-wm0-x241.google.com with SMTP id i11so7774162wmf.4
-	for <qemu-devel@nongnu.org>; Wed, 29 Nov 2017 10:20:13 -0800 (PST)
-References: <20171128203326.6062-1-david@redhat.com>
-	<20171128203326.6062-16-david@redhat.com>
-From: Richard Henderson <richard.henderson@linaro.org>
-Message-ID: <70687e74-b3fa-f397-3f5e-52aa1aedb9c7@linaro.org>
-Date: Wed, 29 Nov 2017 18:20:10 +0000
-MIME-Version: 1.0
-In-Reply-To: <20171128203326.6062-16-david@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v1 for-2.12 15/15] s390x/tcg: drop
- potential_page_fault()
+	(envelope-from <dgilbert@redhat.com>) id 1eK7RO-0001QS-Na
+	for qemu-devel@nongnu.org; Wed, 29 Nov 2017 13:50:41 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:34402)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1eK7RO-0001QD-Ga
+	for qemu-devel@nongnu.org; Wed, 29 Nov 2017 13:50:38 -0500
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+	[10.5.11.13])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 82430DF08
+	for <qemu-devel@nongnu.org>; Wed, 29 Nov 2017 18:50:36 +0000 (UTC)
+From: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>
+Date: Wed, 29 Nov 2017 18:50:19 +0000
+Message-Id: <20171129185026.23632-1-dgilbert@redhat.com>
+Subject: [Qemu-devel] [RFC 0/7] Rework vhost memory region updates
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,18 +27,43 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Hildenbrand <david@redhat.com>, qemu-s390x@nongnu.org, qemu-devel@nongnu.org
-Cc: Christian Borntraeger <borntraeger@de.ibm.com>, Cornelia Huck <cohuck@redhat.com>, Alexander Graf <agraf@suse.de>
+To: qemu-devel@nongnu.org, imammedo@redhat.com
+Cc: maxime.coquelin@redhat.com, mst@redhat.com
 
-On 11/28/2017 08:33 PM, David Hildenbrand wrote:
-> Only one user left, get rid of it so we don't get any new users.
-> 
-> Signed-off-by: David Hildenbrand <david@redhat.com>
-> ---
->  target/s390x/translate.c | 9 ++-------
->  1 file changed, 2 insertions(+), 7 deletions(-)
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
 
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+Hi,
+  This is an experimental set that reworks the way the vhost
+code handles changes in physical address space layout that
+came from a discussion with Igor.
 
+Instead of updating and trying to merge sections of address
+space on each add/remove callback, we wait until the commit phase
+and go through and rebuild a list by walking the Flatview of
+memory and end up producing an ordered list.
+We compare the list to the old list to trigger updates.
 
-r~
+Note, only very lightly tested so far, I'm just trying to see if it's
+the right shape.
+
+Igor, is this what you were intending?
+
+Dave
+
+Dr. David Alan Gilbert (7):
+  memory: address_space_iterate
+  vhost: Move log_dirty check
+  vhost: New memory update functions
+  vhost: update_mem_cb implementation
+  vhost: Compare new and old memory lists
+  vhost: Copy updated region data into device state
+  vhost: Remove vhost_set_memory and children
+
+ hw/virtio/trace-events |   8 +
+ hw/virtio/vhost.c      | 424 ++++++++++++++++++++++---------------------------
+ include/exec/memory.h  |  23 +++
+ memory.c               |  22 +++
+ 4 files changed, 241 insertions(+), 236 deletions(-)
+
+-- 
+2.14.3
