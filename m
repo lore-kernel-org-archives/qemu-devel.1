@@ -1,26 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53209)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53816)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1eK4Cj-0007z9-DO
-	for qemu-devel@nongnu.org; Wed, 29 Nov 2017 10:23:18 -0500
+	(envelope-from <eblake@redhat.com>) id 1eK4El-0000uh-SY
+	for qemu-devel@nongnu.org; Wed, 29 Nov 2017 10:25:24 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1eK4Cf-0006MU-CX
-	for qemu-devel@nongnu.org; Wed, 29 Nov 2017 10:23:17 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:26741)
+	(envelope-from <eblake@redhat.com>) id 1eK4Eh-0006zR-TU
+	for qemu-devel@nongnu.org; Wed, 29 Nov 2017 10:25:23 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:49490)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1eK4Cf-0006MF-4W
-	for qemu-devel@nongnu.org; Wed, 29 Nov 2017 10:23:13 -0500
-References: <1511958793-15217-1-git-send-email-mgamal@redhat.com>
-	<1511958793-15217-2-git-send-email-mgamal@redhat.com>
-From: Thomas Huth <thuth@redhat.com>
-Message-ID: <3d150416-0e72-9ae9-1871-bfdcb0f17ffe@redhat.com>
-Date: Wed, 29 Nov 2017 16:23:00 +0100
-MIME-Version: 1.0
-In-Reply-To: <1511958793-15217-2-git-send-email-mgamal@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH RESEND 1/2] x86_iommu: Move machine check
- to x86_iommu_realize()
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1eK4Eh-0006zE-Ng
+	for qemu-devel@nongnu.org; Wed, 29 Nov 2017 10:25:19 -0500
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+	[10.5.11.14])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id B1D6385A07
+	for <qemu-devel@nongnu.org>; Wed, 29 Nov 2017 15:25:18 +0000 (UTC)
+From: Eric Blake <eblake@redhat.com>
+Date: Wed, 29 Nov 2017 09:25:10 -0600
+Message-Id: <20171129152510.25833-1-eblake@redhat.com>
+Subject: [Qemu-devel] [PATCH] maint: Mention web site maintenance in README
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,107 +27,36 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Mohammed Gamal <mgamal@redhat.com>, qemu-devel@nongnu.org, mst@redhat.com, mjt@tls.msk.ru, lvivier@redhat.com
-Cc: peterx@redhat.com, ehabkost@redhat.com, pbonzini@redhat.com
+To: qemu-devel@nongnu.org
+Cc: pbonzini@redhat.com, famz@redhat.com
 
-On 29.11.2017 13:33, Mohammed Gamal wrote:
-> Instead of having the same error checks in vtd_realize()
-> and amdvi_realize(), move that over to the generic
-> x86_iommu_realize().
-> 
-> Reviewed-by: Peter Xu <peterx@redhat.com>
-> Reviewed-by: Eduardo Habkost <ehabkost@redhat.com>
-> Signed-off-by: Mohammed Gamal <mgamal@redhat.com>
-> ---
->  hw/i386/amd_iommu.c   | 13 ++-----------
->  hw/i386/intel_iommu.c | 13 ++-----------
->  hw/i386/x86-iommu.c   | 13 +++++++++++++
->  3 files changed, 17 insertions(+), 22 deletions(-)
-> 
-> diff --git a/hw/i386/amd_iommu.c b/hw/i386/amd_iommu.c
-> index ad8155c..1618282 100644
-> --- a/hw/i386/amd_iommu.c
-> +++ b/hw/i386/amd_iommu.c
-> @@ -1141,18 +1141,9 @@ static void amdvi_realize(DeviceState *dev, Error **err)
->      AMDVIState *s = AMD_IOMMU_DEVICE(dev);
->      X86IOMMUState *x86_iommu = X86_IOMMU_DEVICE(dev);
->      MachineState *ms = MACHINE(qdev_get_machine());
-> -    MachineClass *mc = MACHINE_GET_CLASS(ms);
-> -    PCMachineState *pcms =
-> -        PC_MACHINE(object_dynamic_cast(OBJECT(ms), TYPE_PC_MACHINE));
-> -    PCIBus *bus;
-> -
-> -    if (!pcms) {
-> -        error_setg(err, "Machine-type '%s' not supported by amd-iommu",
-> -                   mc->name);
-> -        return;
-> -    }
-> +    PCMachineState *pcms = PC_MACHINE(ms);
-> +    PCIBus *bus = pcms->bus;
->  
-> -    bus = pcms->bus;
->      s->iotlb = g_hash_table_new_full(amdvi_uint64_hash,
->                                       amdvi_uint64_equal, g_free, g_free);
->  
-> diff --git a/hw/i386/intel_iommu.c b/hw/i386/intel_iommu.c
-> index 3a5bb0b..0138b3b 100644
-> --- a/hw/i386/intel_iommu.c
-> +++ b/hw/i386/intel_iommu.c
-> @@ -3027,20 +3027,11 @@ static bool vtd_decide_config(IntelIOMMUState *s, Error **errp)
->  static void vtd_realize(DeviceState *dev, Error **errp)
->  {
->      MachineState *ms = MACHINE(qdev_get_machine());
-> -    MachineClass *mc = MACHINE_GET_CLASS(ms);
-> -    PCMachineState *pcms =
-> -        PC_MACHINE(object_dynamic_cast(OBJECT(ms), TYPE_PC_MACHINE));
-> -    PCIBus *bus;
-> +    PCMachineState *pcms = PC_MACHINE(ms);
-> +    PCIBus *bus = pcms->bus;
->      IntelIOMMUState *s = INTEL_IOMMU_DEVICE(dev);
->      X86IOMMUState *x86_iommu = X86_IOMMU_DEVICE(dev);
->  
-> -    if (!pcms) {
-> -        error_setg(errp, "Machine-type '%s' not supported by intel-iommu",
-> -                   mc->name);
-> -        return;
-> -    }
-> -
-> -    bus = pcms->bus;
->      x86_iommu->type = TYPE_INTEL;
->  
->      if (!vtd_decide_config(s, errp)) {
-> diff --git a/hw/i386/x86-iommu.c b/hw/i386/x86-iommu.c
-> index 293caf8..51de519 100644
-> --- a/hw/i386/x86-iommu.c
-> +++ b/hw/i386/x86-iommu.c
-> @@ -21,6 +21,8 @@
->  #include "hw/sysbus.h"
->  #include "hw/boards.h"
->  #include "hw/i386/x86-iommu.h"
-> +#include "hw/i386/pc.h"
-> +#include "qapi/error.h"
->  #include "qemu/error-report.h"
->  #include "trace.h"
->  
-> @@ -80,7 +82,18 @@ static void x86_iommu_realize(DeviceState *dev, Error **errp)
->  {
->      X86IOMMUState *x86_iommu = X86_IOMMU_DEVICE(dev);
->      X86IOMMUClass *x86_class = X86_IOMMU_GET_CLASS(dev);
-> +    MachineState *ms = MACHINE(qdev_get_machine());
-> +    MachineClass *mc = MACHINE_GET_CLASS(ms);
-> +    PCMachineState *pcms =
-> +        PC_MACHINE(object_dynamic_cast(OBJECT(ms), TYPE_PC_MACHINE));
->      QLIST_INIT(&x86_iommu->iec_notifiers);
-> +
-> +    if (!pcms) {
-> +        error_setg(errp, "Machine-type '%s' not supported by IOMMU",
-> +                   mc->name);
-> +        return;
-> +    }
-> +
->      if (x86_class->realize) {
->          x86_class->realize(dev, errp);
->      }
-> 
+Now that we have a website that accepts patches on the list, the
+main project should make it easier to find information about that
+process.
 
-Reviewed-by: Thomas Huth <thuth@redhat.com>
+Signed-off-by: Eric Blake <eblake@redhat.com>
+---
+
+Doc only, so it could go in -rc3 if we have a reason to slip it
+in this late; but I'm also fine if it waits for 2.12.
+
+ README | 4 ++++
+ 1 file changed, 4 insertions(+)
+
+diff --git a/README b/README
+index b92a07a61a..2c8e1c8cc4 100644
+--- a/README
++++ b/README
+@@ -68,6 +68,10 @@ the QEMU website
+   https://qemu.org/Contribute/SubmitAPatch
+   https://qemu.org/Contribute/TrivialPatches
+
++The QEMU website is also maintained under source control.
++
++  git clone git://git.qemu.org/qemu-web.git
++  https://www.qemu.org/2017/02/04/the-new-qemu-website-is-up/
+
+ Bug reporting
+ =============
+-- 
+2.14.3
