@@ -1,25 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37325)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43398)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1eJsVu-0007Qp-46
-	for qemu-devel@nongnu.org; Tue, 28 Nov 2017 21:54:19 -0500
+	(envelope-from <thuth@redhat.com>) id 1eJslY-0003IP-NL
+	for qemu-devel@nongnu.org; Tue, 28 Nov 2017 22:10:29 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1eJsVr-0003o7-2Y
-	for qemu-devel@nongnu.org; Tue, 28 Nov 2017 21:54:18 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:56480)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1eJsVq-0003nM-Sl
-	for qemu-devel@nongnu.org; Tue, 28 Nov 2017 21:54:15 -0500
-References: <20171129015851.16429-1-famz@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <7f5eac13-d29b-db32-56a5-afb799a35180@redhat.com>
-Date: Tue, 28 Nov 2017 20:54:09 -0600
+	(envelope-from <thuth@redhat.com>) id 1eJslT-0003q8-PK
+	for qemu-devel@nongnu.org; Tue, 28 Nov 2017 22:10:28 -0500
+References: <20171128203326.6062-1-david@redhat.com>
+	<20171128203326.6062-4-david@redhat.com>
+From: Thomas Huth <thuth@redhat.com>
+Message-ID: <927e4fc4-ebd4-98d6-bfcd-a44e06be23da@redhat.com>
+Date: Wed, 29 Nov 2017 04:10:16 +0100
 MIME-Version: 1.0
-In-Reply-To: <20171129015851.16429-1-famz@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
+In-Reply-To: <20171128203326.6062-4-david@redhat.com>
+Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH qemu-web] Suggest qemu-web prefix in the
- introductory post
+Subject: Re: [Qemu-devel] [qemu-s390x] [PATCH v1 for-2.12 03/15] s390x/tcg:
+ rip out dead tpi code
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,38 +25,19 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Fam Zheng <famz@redhat.com>, qemu-devel@nongnu.org
-Cc: yu.ning@linux.intel.com, pbonzini@redhat.com
+To: David Hildenbrand <david@redhat.com>, qemu-s390x@nongnu.org, qemu-devel@nongnu.org
+Cc: Christian Borntraeger <borntraeger@de.ibm.com>, Cornelia Huck <cohuck@redhat.com>, Alexander Graf <agraf@suse.de>, Richard Henderson <rth@twiddle.net>
 
-On 11/28/2017 07:58 PM, Fam Zheng wrote:
-> Chances are qemu-devel@nongnu.org patches only adding new files can be
-> picked up by patchew and treated like a qemu.git patch. Patchew already
-> ignores [qemu-web] patches, so suggest it in this article as well. (Are
-> there better places to document this?)
+On 28.11.2017 21:33, David Hildenbrand wrote:
+> It is broken and not even wired up. We'll add a new handler soon, but
+> that will live somewhere else.
 > 
-> Signed-off-by: Fam Zheng <famz@redhat.com>
+> Signed-off-by: David Hildenbrand <david@redhat.com>
 > ---
->   _posts/2017-02-04-the-new-qemu-website-is-up.md | 3 ++-
->   1 file changed, 2 insertions(+), 1 deletion(-)
-> 
-> diff --git a/_posts/2017-02-04-the-new-qemu-website-is-up.md b/_posts/2017-02-04-the-new-qemu-website-is-up.md
-> index 66d3181..c16053c 100644
-> --- a/_posts/2017-02-04-the-new-qemu-website-is-up.md
-> +++ b/_posts/2017-02-04-the-new-qemu-website-is-up.md
-> @@ -19,7 +19,8 @@ and the source code for the website can be cloned from the
->   repository.  Just like for any other project hosted by QEMU, the best way
->   to propose or contribute a new change is by sending a patch through the
->   [qemu-devel@nongnu.org](https://lists.nongnu.org/mailman/listinfo/qemu-devel)
-> -mailing list.
-> +mailing list. (Add `[qemu-web PATCH]` to the subject so that CI will not be
-> +confused with qemu.git patches.)
->   
+>  hw/s390x/css.c          |  6 ------
+>  include/hw/s390x/css.h  |  1 -
+>  target/s390x/internal.h |  1 -
+>  target/s390x/ioinst.c   | 26 --------------------------
+>  4 files changed, 34 deletions(-)
 
-I suggest mentioning that "git config format.subjectprefix 'qemu-web 
-PATCH"' will automate that process, so you don't have to think about it 
-when doing git send-email.
-
--- 
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
+Reviewed-by: Thomas Huth <thuth@redhat.com>
