@@ -1,17 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54237)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54183)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1eK4G0-0001mP-Bb
-	for qemu-devel@nongnu.org; Wed, 29 Nov 2017 10:26:41 -0500
+	(envelope-from <alex.williamson@redhat.com>) id 1eK4Fw-0001jP-Sa
+	for qemu-devel@nongnu.org; Wed, 29 Nov 2017 10:26:42 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1eK4Fw-0007Sl-J7
-	for qemu-devel@nongnu.org; Wed, 29 Nov 2017 10:26:40 -0500
-From: Kevin Wolf <kwolf@redhat.com>
-Date: Wed, 29 Nov 2017 16:26:18 +0100
-Message-Id: <20171129152628.14906-1-kwolf@redhat.com>
+	(envelope-from <alex.williamson@redhat.com>) id 1eK4Fv-0007SO-Rp
+	for qemu-devel@nongnu.org; Wed, 29 Nov 2017 10:26:36 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:43264)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <alex.williamson@redhat.com>)
+	id 1eK4Fv-0007Rg-Lb
+	for qemu-devel@nongnu.org; Wed, 29 Nov 2017 10:26:35 -0500
+Date: Wed, 29 Nov 2017 08:26:32 -0700
+From: Alex Williamson <alex.williamson@redhat.com>
+Message-ID: <20171129082632.0ba2f118@t450s.home>
+In-Reply-To: <20171122051552.3529-1-aik@ozlabs.ru>
+References: <20171122051552.3529-1-aik@ozlabs.ru>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 00/10] Block layer fixes for 2.11.0-rc3
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH qemu] vfio/spapr: Allow fallback to SPAPR
+ TCE IOMMU v1
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -20,70 +28,47 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-block@nongnu.org
-Cc: kwolf@redhat.com, mreitz@redhat.com, peter.maydell@linaro.org, qemu-devel@nongnu.org
+To: Alexey Kardashevskiy <aik@ozlabs.ru>
+Cc: qemu-devel@nongnu.org, David Gibson <david@gibson.dropbear.id.au>
 
-The following changes since commit e7b47c22e2df14d55e3e4426688c929bf8e3f7=
-fb:
+On Wed, 22 Nov 2017 16:15:52 +1100
+Alexey Kardashevskiy <aik@ozlabs.ru> wrote:
 
-  osdep.h: Make TIME_MAX handle different time_t types (2017-11-24 13:23:=
-36 +0000)
+> The vfio_iommu_spapr_tce driver always advertises v1 and v2 IOMMU support,
+> however PR KVM (a special version of KVM designed to work in
+> a paravirtualized system; these days used for nested virtualizaion) only
+> supports the "pseries" platform which does not support v2. Since there is
+> no way to choose the IOMMU version in QEMU, it fails to start.
 
-are available in the git repository at:
+Seems like the bug is then in advertising v2 support when it doesn't
+exist.  Isn't that a kernel bug?  Otherwise I think this is a long
+standing bug, since QEMU-2.7 and probably not 2.11 material this late
+into the freeze.  A "Fixes" tag would probably also be appropriate,
+identifying the commit where this was introduced (318f67ce1371) if it
+is a QEMU bug.  Thanks,
 
-  git://repo.or.cz/qemu/kevin.git tags/for-upstream
+Alex
 
-for you to fetch changes up to 5591c001a1056910afd903df3fc3c03f30746623:
-
-  Merge remote-tracking branch 'mreitz/tags/pull-block-2017-11-29' into q=
-ueue-block (2017-11-29 15:37:31 +0100)
-
-----------------------------------------------------------------
-Block layer patches for 2.11.0-rc3
-
-----------------------------------------------------------------
-Alberto Garcia (1):
-      blockjob: Remove the job from the list earlier in block_job_unref()
-
-Fam Zheng (2):
-      docs: Add image locking subsection
-      qemu-options: Mention locking option of file driver
-
-John Snow (1):
-      iotests: fix 075 and 078
-
-Kashyap Chamarthy (1):
-      QAPI & interop: Clarify events emitted by 'block-job-cancel'
-
-Kevin Wolf (2):
-      block: Expect graph changes in bdrv_parent_drained_begin/end
-      Merge remote-tracking branch 'mreitz/tags/pull-block-2017-11-29' in=
-to queue-block
-
-Paolo Bonzini (3):
-      blockjob: remove clock argument from block_job_sleep_ns
-      blockjob: introduce block_job_do_yield
-      blockjob: reimplement block_job_sleep_ns to allow cancellation
-
-Peter Lieven (1):
-      block/nfs: fix nfs_client_open for filesize greater than 1TB
-
- qapi/block-core.json                   |  6 +++
- include/block/blockjob.h               |  8 +++-
- include/block/blockjob_int.h           |  7 ++-
- block/backup.c                         |  4 +-
- block/commit.c                         |  2 +-
- block/io.c                             |  8 ++--
- block/mirror.c                         |  6 +--
- block/nfs.c                            |  7 ++-
- block/stream.c                         |  2 +-
- blockjob.c                             | 84 +++++++++++++++++++++++++++-=
-------
- tests/test-blockjob-txn.c              |  2 +-
- docs/interop/live-block-operations.rst | 50 ++++++++++++--------
- docs/qemu-block-drivers.texi           | 36 +++++++++++++++
- qemu-doc.texi                          |  1 +
- qemu-options.hx                        |  4 ++
- tests/qemu-iotests/075                 | 18 ++++----
- tests/qemu-iotests/078                 | 14 +++---
- 17 files changed, 187 insertions(+), 72 deletions(-)
+> This adds a fallback to the v1 IOMMU if v2 cannot be used.
+> 
+> Signed-off-by: Alexey Kardashevskiy <aik@ozlabs.ru>
+> ---
+>  hw/vfio/common.c | 5 +++++
+>  1 file changed, 5 insertions(+)
+> 
+> diff --git a/hw/vfio/common.c b/hw/vfio/common.c
+> index 7b2924c..cd81cc9 100644
+> --- a/hw/vfio/common.c
+> +++ b/hw/vfio/common.c
+> @@ -1040,6 +1040,11 @@ static int vfio_connect_container(VFIOGroup *group, AddressSpace *as,
+>              v2 ? VFIO_SPAPR_TCE_v2_IOMMU : VFIO_SPAPR_TCE_IOMMU;
+>          ret = ioctl(fd, VFIO_SET_IOMMU, container->iommu_type);
+>          if (ret) {
+> +            container->iommu_type = VFIO_SPAPR_TCE_IOMMU;
+> +            v2 = false;
+> +            ret = ioctl(fd, VFIO_SET_IOMMU, container->iommu_type);
+> +        }
+> +        if (ret) {
+>              error_setg_errno(errp, errno, "failed to set iommu for container");
+>              ret = -errno;
+>              goto free_container_exit;
