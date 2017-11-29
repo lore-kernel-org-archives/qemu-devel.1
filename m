@@ -1,22 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56361)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57084)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1eK1Ht-0004NM-6r
-	for qemu-devel@nongnu.org; Wed, 29 Nov 2017 07:16:26 -0500
+	(envelope-from <bounces@canonical.com>) id 1eK1MQ-00064W-5c
+	for qemu-devel@nongnu.org; Wed, 29 Nov 2017 07:21:07 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1eK1Hs-0005Wk-20
-	for qemu-devel@nongnu.org; Wed, 29 Nov 2017 07:16:25 -0500
-Date: Wed, 29 Nov 2017 12:16:11 +0000
-From: Stefan Hajnoczi <stefanha@redhat.com>
-Message-ID: <20171129121611.GC2601@stefanha-x1.localdomain>
-References: <20171129035502.GD8889@lemon>
-	<20171129063006.GD18521@localhost.localdomain>
+	(envelope-from <bounces@canonical.com>) id 1eK1MN-0006Om-09
+	for qemu-devel@nongnu.org; Wed, 29 Nov 2017 07:21:06 -0500
+Received: from indium.canonical.com ([91.189.90.7]:58194)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1eK1MM-0006Og-QC
+	for qemu-devel@nongnu.org; Wed, 29 Nov 2017 07:21:02 -0500
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1eK1ML-0002C8-EI
+	for <qemu-devel@nongnu.org>; Wed, 29 Nov 2017 12:21:01 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 7E39E2E8179
+	for <qemu-devel@nongnu.org>; Wed, 29 Nov 2017 12:21:00 +0000 (UTC)
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="uXxzq0nDebZQVNAZ"
-Content-Disposition: inline
-In-Reply-To: <20171129063006.GD18521@localhost.localdomain>
-Subject: Re: [Qemu-devel] Block layer complexity: what to do to keep it
- under control?
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Wed, 29 Nov 2017 12:14:42 -0000
+From: Daniel Berrange <1724477@bugs.launchpad.net>
+Reply-To: Bug 1724477 <1724477@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <150831284620.1599.14269987525342877867.malonedeb@soybean.canonical.com>
+Message-Id: <151195768303.3246.13908680600997103626.malone@gac.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1724477] Re: Build-in websocket broken since
+ v2.9.0-rc0
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,94 +37,65 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Jeff Cody <jcody@redhat.com>
-Cc: Fam Zheng <famz@redhat.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org, pbonzini@redhat.com, kwolf@redhat.com, mreitz@redhat.com, eblake@redhat.com
+To: qemu-devel@nongnu.org
+
+Key fixes for client interoperability coming in 2.11  include
 
 
---uXxzq0nDebZQVNAZ
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+6d5d23b00709510d55711661c7ca41408fd9934e io: cope with websock 'Connection'=
+ header having multiple values
+530ca60c16c83435d4becc9916d74fa43e003815 io: Attempt to send websocket clos=
+e messages to client
+268a53f50de795481dd73ffd0e0c1339ad3dc44b io: Reply to ping frames
+01af17fc002414ee1ac0800babfb0edc2bef1a7d io: Ignore websocket PING and PONG=
+ frames
+3a29640e2cbae9d47b89ffaf98ed358920eb6797 io: Allow empty websocket payload
+ff1300e626949fa9850b0f91dc5e8c2cb45b6a88 io: Add support for fragmented web=
+socket binary frames
+eefa3d8ef649f9055611361e2201cca49f8c3433 io: Small updates in preparation f=
+or websocket changes
+33badfd1e3735b877e41939100511c65572be6b9 io: use case insensitive check for=
+ Connection & Upgrade websock headers
+3a3f8705962c8c8a47a9b981ffd5aab7274ad508 io: include full error message in =
+websocket handshake trace
+f69a8bde29354493ff8aea64cc9cb3b531d16337 io: send proper HTTP response for =
+websocket errors
 
-On Wed, Nov 29, 2017 at 01:30:06AM -0500, Jeff Cody wrote:
-> On Wed, Nov 29, 2017 at 11:55:02AM +0800, Fam Zheng wrote:
-> > Hi all,
-> >=20
-> > As we move forwards with new features in the block layer, the chances o=
-f tricky
-> > bugs happening have been increasing alongside - block jobs, coroutines,
-> > throttling, AioContext, op blockers and image locking combined together=
- make a
-> > large and complex picture that is hard to fully understand and work wit=
-h. Some
-> > bugs we've encountered are quite challenging already.  Examples are:
-> >=20
-> > - segfault in parallel blockjobs (iotest 30)
-> >   https://lists.gnu.org/archive/html/qemu-devel/2017-11/msg01144.html
-> >=20
-> > - Intermittent hang of iotest 194 (bdrv_drain_all after non-shared stor=
-age
-> >   migration)
-> >   https://lists.gnu.org/archive/html/qemu-devel/2017-11/msg01626.html
-> >=20
-> > - Drainage in bdrv_replace_child_noperm()
-> >   https://lists.gnu.org/archive/html/qemu-devel/2017-11/msg00868.html
-> >=20
-> > - Regression from 2.8: stuck in bdrv_drain()
-> >   https://lists.gnu.org/archive/html/qemu-devel/2017-04/msg02193.html
-> >=20
->=20
-> I agree, it seems the complexity is growing by quite a bit.
->=20
-> > So in principle, what should we do to make the block layer easy to unde=
-rstand,
-> > develop with and debug? I think we have opportunities in these aspects:
-> >=20
-> > - Documentation
-> >=20
-> >   There is no central developer doc about block layer, especially how a=
-ll pieces
-> >   fit together. Having one will make it a lot easier for new contributo=
-rs to
-> >   understand better. Of course, we're facing the old problem: the code =
-is
-> >   moving, maintaining an updated document needs effort.
-> >=20
-> >   Idea: add ./doc/deve/block.txt?
-> >=20
->=20
-> There are some bits of brilliance in what is already there; for instance,
-> devel/atomics.txt is very thorough.  But I agree that a major piece missi=
-ng
-> is an overall design document, that provides the "why" to the "what".
 
-While the atomics documentation is good, atomics themselves have been a
-source of difficult bugs.
+** Changed in: qemu
+       Status: New =3D> Fix Committed
 
-They should be used as little as possible and only where they can be
-encapsulated in a composable abstraction (i.e. don't expect users of
-your abstraction to understand atomics).
+-- =
 
-Why?  They are damn hard to use.  None of us is capable of using them
-without introducing difficult bugs.
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1724477
 
-There is also a temptation to rely on implicit effects of other code
-(e.g. when you know there is a barrier in another function) for best
-performance.  That's a bad property for code to have because it becomes
-hard to change safely.
+Title:
+  Build-in websocket broken since v2.9.0-rc0
 
---uXxzq0nDebZQVNAZ
-Content-Type: application/pgp-signature; name="signature.asc"
+Status in QEMU:
+  Fix Committed
 
------BEGIN PGP SIGNATURE-----
+Bug description:
+  Since upgrading to 2.9.0, the qemu's build-in websocket was no longer
+  available.
 
-iQEcBAEBAgAGBQJaHqULAAoJEJykq7OBq3PIossIALjZjYr62hz9wvhCxa5Bcb0Y
-MYsi8uA8++uj3YXDN5K25Gl7yW2LElqHT5kFh0/FZhEwplFMlP1L11M6HgdzxzWg
-tfTe9OmRE9HbjfYz6TFEWyfEH8B8497My1RcRiZ51RwWTA6cLO/GdXJqDxJJp4ZI
-VDgjhQpHXLJloTzzSIiwpjrczi/PzJwj+5ToVewPIgNTdEkOeNdxmumEnNmqJpLF
-FFApXgE3K3W+rDUhd71I4dtgxTgHnsRsf7Hb+I4URlN7hC9QHmRmrY5TvMSbfBKP
-NDEquhNnmcxY0Dzw+SuXkAK69Qswsa20/I39/CZ48epjE/+5LZ7a4GzfO352ing=
-=lfOU
------END PGP SIGNATURE-----
+  Host: Ubuntu 16.04 LTS
+  Command-line: /bin/qemu-system-x86_64 -enable-kvm -vnc 0.0.0.0:8,websocket
 
---uXxzq0nDebZQVNAZ--
+  I have tested the following qemu versions:
+
+  master      Fail
+  2.10.1      Fail
+  2.9.1       Fail
+  2.9.0       Fail
+  2.9.0-rc3   Fail
+  2.9.0-rc0   Fail
+
+  2.8.1.1     Pass
+  2.7.1       Pass
+  2.6.2       Pass
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1724477/+subscriptions
