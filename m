@@ -1,26 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48214)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49648)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1eK0jy-0000dm-7D
-	for qemu-devel@nongnu.org; Wed, 29 Nov 2017 06:41:22 -0500
+	(envelope-from <cohuck@redhat.com>) id 1eK0qM-000349-KM
+	for qemu-devel@nongnu.org; Wed, 29 Nov 2017 06:47:59 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1eK0jt-0007h5-7Z
-	for qemu-devel@nongnu.org; Wed, 29 Nov 2017 06:41:22 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:56960)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1eK0js-0007gt-VG
-	for qemu-devel@nongnu.org; Wed, 29 Nov 2017 06:41:17 -0500
-Date: Wed, 29 Nov 2017 09:41:09 -0200
-From: Eduardo Habkost <ehabkost@redhat.com>
-Message-ID: <20171129114109.GZ3037@localhost.localdomain>
-References: <20171129084628.12336-1-david@gibson.dropbear.id.au>
-	<20171129084628.12336-7-david@gibson.dropbear.id.au>
-	<9b0e9672-e0d7-53c3-9a42-ab3f6011b59b@redhat.com>
+	(envelope-from <cohuck@redhat.com>) id 1eK0qH-0002EE-OP
+	for qemu-devel@nongnu.org; Wed, 29 Nov 2017 06:47:58 -0500
+Date: Wed, 29 Nov 2017 12:47:47 +0100
+From: Cornelia Huck <cohuck@redhat.com>
+Message-ID: <20171129124747.63c1359b.cohuck@redhat.com>
+In-Reply-To: <20171129081735.GR5859@bjsdjshi@linux.vnet.ibm.com>
+References: <20171128130758.67556-1-pasic@linux.vnet.ibm.com>
+	<20171129081735.GR5859@bjsdjshi@linux.vnet.ibm.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <9b0e9672-e0d7-53c3-9a42-ab3f6011b59b@redhat.com>
-Subject: Re: [Qemu-devel] [for-2.12 6/7] pci: Eliminate redundant
- PCIDevice::bus pointer
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [RFC PATCH v2 1/1] s390x/css: unrestrict cssids
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,35 +23,122 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Marcel Apfelbaum <marcel@redhat.com>
-Cc: David Gibson <david@gibson.dropbear.id.au>, "Michael S . Tsirkin" <mst@redhat.com>, Igor Mammedov <imammedo@redhat.com>, qemu-devel@nongnu.org
+To: Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>
+Cc: Halil Pasic <pasic@linux.vnet.ibm.com>, Boris Fiuczynski <fiuczy@linux.vnet.ibm.com>, Christian Borntraeger <borntraeger@de.ibm.com>, Shalini Chellathurai Saroja <shalini@linux.vnet.ibm.com>, qemu-devel@nongnu.org, qemu-s390x@nongnu.org
 
-On Wed, Nov 29, 2017 at 12:54:04PM +0200, Marcel Apfelbaum wrote:
-> On 29/11/2017 10:46, David Gibson wrote:
-> > The bus pointer in PCIDevice is basically redundant with QOM information.
-> > It's always initialized to the qdev_get_parent_bus(), the only difference
-> > is the type.
+On Wed, 29 Nov 2017 16:17:35 +0800
+Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com> wrote:
+
+> * Halil Pasic <pasic@linux.vnet.ibm.com> [2017-11-28 14:07:58 +0100]:
+> 
+> [...]
 > > 
-> > Therefore this patch eliminates the field, instead creating a pci_get_bus()
-> > helper to do the type mangling to derive it conveniently from the QOM
-> > Device object underneath.
-> > 
+> > The auto-generated bus ids are affected by both changes. We hope to not
+> > encounter any auto-generated bus ids in production as Libvirt is always
+> > explicit about the bus id.  Since 8ed179c937 ("s390x/css: catch section
+> > mismatch on load", 2017-05-18) the worst that can happen because the same
+> > device ended up having a different bus id is a cleanly failed migration.
+> > I find it hard to reason about the impact of changed auto-generated bus
+> > ids on migration for command line users as I don't know which rules is
+> > such an user supposed to follow.  
+> For this paragraph, Halil pointed to me a case that he is thinking of.
+> 1. VM configuration with 3 devices:
+>   -device virtio (e.g. virtio-blk-ccw,id=disk0)
+>   -device vfio-ccw (e.g. id=vfio0)
+>   -device virtio (e.g. virtio-rng-ccw,id=rng0)
+> 2. Start the vm.
+> 3. device_del vfio0
+> 4. migrate "exec:gzip -c > /tmp/tmp_vmstate.gz"
+> 5. modify cmd line from step 1 by removing the vfio0 device, and adding:
+>    -incoming "exec:gzip -c -d /tmp/tmp_vmstate.gz"
+> 
+> Let me list my test results here for everybody's reference.
+> 
+> W/o this patch
+> ==============
+> 
+> ------------+---------------+-------------
+>             | squashing off | squashing on
+> ------------+---------------+-------------
+>     auto id |        F      |     F
+> ------------+---------------+-------------
+> explicit id |        F      |     S
+> ------------+---------------+-------------
+> 
+> T1. squashing off + auto id
+>   qemu-system-s390x: vmstate: get_nullptr expected VMS_NULLPTR_MARKER
+>   qemu-system-s390x: Failed to load s390_css:css
+>   qemu-system-s390x: error while loading state for instance 0x0 of device 's390_css'
+>   qemu-system-s390x: load of migration failed: Invalid argument
+> [Fail due to css mismatch - there is no css 0 in the new vm.]
+> 
+> T2. squashing off + explicit given id
+>   qemu-system-s390x: vmstate: get_nullptr expected VMS_NULLPTR_MARKER
+>   qemu-system-s390x: Failed to load s390_css:css
+>   qemu-system-s390x: error while loading state for instance 0x0 of device 's390_css'
+>   qemu-system-s390x: load of migration failed: Invalid argument
+> [Fail due to css mismatch - there is no css 0 in the new vm.]
+
+Hmm... so should we even try to migrate an empty css 0? It only exists
+because we have created a device that we had to detach anyway because
+it was non-migrateable...
+
+[Probably no easy way to deal with this, though.]
+
+> 
+> T3. squashing on  + auto id
+>   qemu-system-s390x: Unknown savevm section or instance '/00.0.0003/virtio-rng' 0
+>   qemu-system-s390x: load of migration failed: Invalid argument
+> [Fail due to busid mismatch.]
+> 
+> T4. squashing on  + explicit given id
+>   Succeed.
+> 
+> With this patch
+> ===============
+> 
+> ------------+---------------+-------------
+>             | squashing off | squashing on
+> ------------+---------------+-------------
+>     auto id |        F      |     F
+> ------------+---------------+-------------
+> explicit id |        S'     |     S
+> ------------+---------------+-------------
+> 
+> T5. squashing off + auto id
+>   qemu-system-s390x: Unknown savevm section or instance '/fe.0.0003/virtio-rng' 0
+>   qemu-system-s390x: load of migration failed: Invalid argument
+> [Fail due to busid mismatch.]
+> 
+> T6. squashing off + explicit given id
+>   qemu-system-s390x: vmstate: get_nullptr expected VMS_NULLPTR_MARKER
+>   qemu-system-s390x: Failed to load s390_css:css
+>   qemu-system-s390x: error while loading state for instance 0x0 of device 's390_css'
+>   qemu-system-s390x: load of migration failed: Invalid argument
+> [Setting vfio-ccw.devno=non-fe.x.xxxx. (same as T1)
+>  Fail due to css mismatch - there is no css 0 in the new vm.]
+> 
+>   Succeed.
+> [Setting vfio-ccw.devno=fe.x.xxxx.]
+
+Don't you need to attach the vfio-ccw device later anyway? You have to
+detach it from the source before you migrate, and I'd expect it to be
+symmetric.
+
+> 
+> T7. squashing on  + auto id
+>   qemu-system-s390x: Unknown savevm section or instance '/00.0.0003/virtio-rng' 0
+>   qemu-system-s390x: load of migration failed: Invalid argument
+> [Fail due to busid mismatch.]
+> 
+> T8. squashing on  + explicit given id
+>   Succeed.
 > 
 > 
-> Hi David,
-> 
-> I personally don't see why the caching of the bus bothers you.
-> It makes the code a little easier to read, but indeed is a duplication
-> of data; let's see what Michael has to say, is a matter of
-> taste I suppose.
+> Notice:
+> The differences of the test results between w and w/o this patch are in
+> the "squashing off" cases. I think these are things that we can accept.
 
-I'm all for removing duplication of data because it makes the
-code less fragile.  We don't even take care of clearing
-pci_dev->bus when the device is removed from the bus, so there's
-a window between unplugging a device and actually freeing the
-object where pci_dev->bus can become a dangling pointer.
-
-Reviewed-by: Eduardo Habkost <ehabkost@redhat.com>
-
--- 
-Eduardo
+Yes, I think that makes sense. If you want reliable migration, you need
+to be specific with your ids. I'd just don't want us to break things
+explicitly.
