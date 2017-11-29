@@ -1,24 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34083)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35041)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1eK1hE-0001Lz-KI
-	for qemu-devel@nongnu.org; Wed, 29 Nov 2017 07:42:37 -0500
+	(envelope-from <bounces@canonical.com>) id 1eK1ji-0002k8-L1
+	for qemu-devel@nongnu.org; Wed, 29 Nov 2017 07:45:11 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1eK1hB-0004Ar-HY
-	for qemu-devel@nongnu.org; Wed, 29 Nov 2017 07:42:36 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:33710)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1eK1hB-0004AX-Ay
-	for qemu-devel@nongnu.org; Wed, 29 Nov 2017 07:42:33 -0500
-Date: Wed, 29 Nov 2017 20:42:17 +0800
-From: Peter Xu <peterx@redhat.com>
-Message-ID: <20171129124217.GB2949@xz-mi>
-References: <1511958793-15217-1-git-send-email-mgamal@redhat.com>
+	(envelope-from <bounces@canonical.com>) id 1eK1jf-00056j-I7
+	for qemu-devel@nongnu.org; Wed, 29 Nov 2017 07:45:10 -0500
+Received: from indium.canonical.com ([91.189.90.7]:34848)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1eK1jf-00055e-BS
+	for qemu-devel@nongnu.org; Wed, 29 Nov 2017 07:45:07 -0500
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1eK1je-0007GB-Ae
+	for <qemu-devel@nongnu.org>; Wed, 29 Nov 2017 12:45:06 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 4C19F2E80C3
+	for <qemu-devel@nongnu.org>; Wed, 29 Nov 2017 12:45:06 +0000 (UTC)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <1511958793-15217-1-git-send-email-mgamal@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH RESEND 0/2] x86_iommu: Fix segfault when
- starting on non-PCI machines
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Wed, 29 Nov 2017 12:31:41 -0000
+From: Thomas Huth <645662@bugs.launchpad.net>
+Reply-To: Bug 645662 <645662@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <20100923002702.20683.97345.malonedeb@soybean.canonical.com>
+Message-Id: <151195870152.20386.11174852486905428627.malone@chaenomeles.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 645662] Re: QEMU x87 emulation of trig and other
+ complex ops is only at 64-bit precision, not 80-bit
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,37 +37,77 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Mohammed Gamal <mgamal@redhat.com>
-Cc: qemu-devel@nongnu.org, mst@redhat.com, mjt@tls.msk.ru, lvivier@redhat.com, thuth@redhat.com, ehabkost@redhat.com, pbonzini@redhat.com
+To: qemu-devel@nongnu.org
 
-On Wed, Nov 29, 2017 at 01:33:11PM +0100, Mohammed Gamal wrote:
-> [Resending for the second time]
-> 
-> Starting qemu with
-> qemu-system-x86_64 -S -M isapc -device {amd|intel}-iommu
-> leads to a segfault. The code assume PCI bus is present and
-> tries to access the bus structure without checking.
-> 
-> The patch series moves the error checks from vtd_realize()
-> and amdvi_realize() to the generic x86_iommu_realize() and
-> adds a check for PCI bus presence.
+Laurent Vivier recently started to adapt some of function from the
+"Previous" NeXT emulator for m68k, see e.g. this patch series here:
 
-Yes, IMHO this is ok even for 2.11.  Michael, what do you think?
+ https://lists.gnu.org/archive/html/qemu-devel/2017-11/msg04454.html
 
-> 
-> 
-> Mohammed Gamal (2):
->   x86_iommu: Move machine check to x86_iommu_realize()
->   x86_iommu: check if machine has PCI bus
-> 
->  hw/i386/amd_iommu.c   | 13 ++-----------
->  hw/i386/intel_iommu.c | 13 ++-----------
->  hw/i386/x86-iommu.c   | 13 +++++++++++++
->  3 files changed, 17 insertions(+), 22 deletions(-)
-> 
-> -- 
-> 1.8.3.1
-> 
+Not sure, but I think that could help to fix at least some of the
+missing functions.
 
--- 
-Peter Xu
+-- =
+
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/645662
+
+Title:
+  QEMU x87 emulation of trig and other complex ops is only at 64-bit
+  precision, not 80-bit
+
+Status in QEMU:
+  Confirmed
+
+Bug description:
+  When doing the regression tests for Python 3.1.2 with Qemu 0.12.5, (Linux=
+ version 2.6.26-2-686 (Debian 2.6.26-25lenny1)),
+  gcc (Debian 4.3.2-1.1) 4.3.2, Python compiled from sources within qemu,
+  3 math tests fail, apparently because the floating point unit is buggy. Q=
+meu was compiled from original sources
+  on Debian Lenny with kernel  2.6.34.6 from kernel.org, gcc  (Debian 4.3.2=
+-1.1) 4.3. =
+
+
+  Regression testing errors:
+
+  test_cmath
+  test test_cmath failed -- Traceback (most recent call last):
+    File "/root/tools/python3/Python-3.1.2/Lib/test/test_cmath.py", line 36=
+4, in
+      self.fail(error_message)
+  AssertionError: acos0034: acos(complex(-1.0000000000000002, 0.0))
+  Expected: complex(3.141592653589793, -2.1073424255447014e-08)
+  Received: complex(3.141592653589793, -2.1073424338879928e-08)
+  Received value insufficiently close to expected value.
+
+  =
+
+  test_float
+  test test_float failed -- Traceback (most recent call last):
+    File "/root/tools/python3/Python-3.1.2/Lib/test/test_float.py", line 47=
+9, in
+      self.assertEqual(s, repr(float(s)))
+  AssertionError: '8.72293771110361e+25' !=3D '8.722937711103609e+25'
+
+  =
+
+  test_math
+  test test_math failed -- multiple errors occurred; run in verbose mode fo=
+r deta
+
+  =3D>
+
+  runtests.sh -v test_math
+
+  le01:~/tools/python3/Python-3.1.2# ./runtests.sh -v test_math
+  test_math BAD
+   1 BAD
+   0 GOOD
+   0 SKIPPED
+   1 total
+  le01:~/tools/python3/Python-3.1.2#
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/645662/+subscriptions
