@@ -1,18 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58824)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58855)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1eJy0u-00022J-8e
+	(envelope-from <dgibson@ozlabs.org>) id 1eJy0u-00022V-KJ
 	for qemu-devel@nongnu.org; Wed, 29 Nov 2017 03:46:41 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1eJy0r-0005d3-IN
-	for qemu-devel@nongnu.org; Wed, 29 Nov 2017 03:46:38 -0500
-Received: from ozlabs.org ([2401:3900:2:1::2]:43975)
+	(envelope-from <dgibson@ozlabs.org>) id 1eJy0r-0005d1-Hx
+	for qemu-devel@nongnu.org; Wed, 29 Nov 2017 03:46:40 -0500
+Received: from ozlabs.org ([103.22.144.67]:55203)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgibson@ozlabs.org>) id 1eJy0r-0005Z5-45
+	(Exim 4.71) (envelope-from <dgibson@ozlabs.org>) id 1eJy0q-0005ZF-PE
 	for qemu-devel@nongnu.org; Wed, 29 Nov 2017 03:46:37 -0500
 From: David Gibson <david@gibson.dropbear.id.au>
-Date: Wed, 29 Nov 2017 19:46:21 +1100
-Message-Id: <20171129084628.12336-1-david@gibson.dropbear.id.au>
-Subject: [Qemu-devel] [for-2.12 0/7] PCI cleanups
+Date: Wed, 29 Nov 2017 19:46:23 +1100
+Message-Id: <20171129084628.12336-3-david@gibson.dropbear.id.au>
+In-Reply-To: <20171129084628.12336-1-david@gibson.dropbear.id.au>
+References: <20171129084628.12336-1-david@gibson.dropbear.id.au>
+Subject: [Qemu-devel] [for-2.12 2/7] pci: Move bridge data structures from
+ pci_bus.h to pci_bridge.h
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,72 +27,157 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: "Michael S . Tsirkin" <mst@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, Marcel Apfelbaum <marcel@redhat.com>, Igor Mammedov <imammedo@redhat.com>
 Cc: qemu-devel@nongnu.org, David Gibson <david@gibson.dropbear.id.au>
 
-Here are a bunch of straightforward cleanups for the PCI code in
-qemu-2.12.  These came up while I was looking at various other things.
+include/hw/pci/pci_bus.h contains several data structures related to PCI
+bridges that aren't needed by most users of pci_bus.h.  We already have
+a pci_bridge.h, so move them there.
 
-David Gibson (7):
-  pci: Rename root bus initialization functions for clarity
-  pci: Move bridge data structures from pci_bus.h to pci_bridge.h
-  pci: Fold pci_bus.h into pci.h
-  pci: Simplify pci_bus_is_root()
-  pci: Add pci_dev_bus_num() helper
-  pci: Eliminate redundant PCIDevice::bus pointer
-  pci: Eliminate pci_find_primary_bus()
+Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
+---
+ include/hw/pci-host/xilinx-pcie.h |  2 +-
+ include/hw/pci/pci_bridge.h       | 48 ++++++++++++++++++++++++++++++++++++
+ include/hw/pci/pci_bus.h          | 51 ++-------------------------------------
+ 3 files changed, 51 insertions(+), 50 deletions(-)
 
- hw/acpi/pcihp.c                     |   5 +-
- hw/acpi/piix4.c                     |   7 +-
- hw/alpha/typhoon.c                  |   8 +-
- hw/i386/acpi-build.c                |   1 -
- hw/i386/amd_iommu.h                 |   1 -
- hw/i386/intel_iommu.c               |   1 -
- hw/i386/pc.c                        |   1 -
- hw/i386/pc_piix.c                   |   8 +-
- hw/i386/xen/xen_platform.c          |  12 +--
- hw/isa/lpc_ich9.c                   |  11 ++-
- hw/mips/gt64xxx_pci.c               |  12 +--
- hw/net/vmxnet3.c                    |   2 +-
- hw/pci-bridge/dec.c                 |   1 -
- hw/pci-bridge/pci_bridge_dev.c      |   1 -
- hw/pci-bridge/pci_expander_bridge.c |  28 +++----
- hw/pci-bridge/pcie_pci_bridge.c     |   1 -
- hw/pci-host/apb.c                   |  11 ++-
- hw/pci-host/bonito.c                |   8 +-
- hw/pci-host/gpex.c                  |   6 +-
- hw/pci-host/grackle.c               |  14 ++--
- hw/pci-host/piix.c                  |  14 ++--
- hw/pci-host/ppce500.c               |   6 +-
- hw/pci-host/prep.c                  |   5 +-
- hw/pci-host/q35.c                   |   7 +-
- hw/pci-host/uninorth.c              |  24 +++---
- hw/pci-host/versatile.c             |   9 +--
- hw/pci-host/xilinx-pcie.c           |   6 +-
- hw/pci/pci.c                        | 152 ++++++++++++++++--------------------
- hw/pci/pci_bridge.c                 |   7 +-
- hw/pci/pci_host.c                   |   1 -
- hw/pci/pcie.c                       |   6 +-
- hw/pci/pcie_aer.c                   |   5 +-
- hw/pci/shpc.c                       |   1 -
- hw/ppc/ppc4xx_pci.c                 |   6 +-
- hw/ppc/spapr_pci.c                  |  11 ++-
- hw/s390x/s390-pci-bus.c             |  19 +++--
- hw/scsi/megasas.c                   |   2 +-
- hw/scsi/mptsas.c                    |   2 +-
- hw/scsi/vmw_pvscsi.c                |   2 +-
- hw/sh4/sh_pci.c                     |  12 +--
- hw/sparc64/sun4u.c                  |   1 -
- hw/usb/hcd-xhci.c                   |   2 +-
- hw/vfio/pci.c                       |  10 +--
- hw/virtio/virtio-pci.c              |   4 +-
- hw/xen/xen_pt.c                     |  10 +--
- include/hw/i386/ich9.h              |   1 -
- include/hw/pci-host/xilinx-pcie.h   |   2 +-
- include/hw/pci/pci.h                |  94 +++++++++++++++++-----
- include/hw/pci/pci_bridge.h         |  47 +++++++++++
- include/hw/pci/pci_bus.h            |  94 ----------------------
- include/hw/pci/pcie_port.h          |   1 -
- include/hw/xen/xen_common.h         |   8 +-
- 52 files changed, 336 insertions(+), 374 deletions(-)
- delete mode 100644 include/hw/pci/pci_bus.h
-
+diff --git a/include/hw/pci-host/xilinx-pcie.h b/include/hw/pci-host/xilinx-pcie.h
+index bec66b27c5..74c04dc9bb 100644
+--- a/include/hw/pci-host/xilinx-pcie.h
++++ b/include/hw/pci-host/xilinx-pcie.h
+@@ -23,7 +23,7 @@
+ #include "hw/hw.h"
+ #include "hw/sysbus.h"
+ #include "hw/pci/pci.h"
+-#include "hw/pci/pci_bus.h"
++#include "hw/pci/pci_bridge.h"
+ #include "hw/pci/pcie_host.h"
+ 
+ #define TYPE_XILINX_PCIE_HOST "xilinx-pcie-host"
+diff --git a/include/hw/pci/pci_bridge.h b/include/hw/pci/pci_bridge.h
+index 1acadc2c15..9b44ffd22a 100644
+--- a/include/hw/pci/pci_bridge.h
++++ b/include/hw/pci/pci_bridge.h
+@@ -27,6 +27,54 @@
+ #define QEMU_PCI_BRIDGE_H
+ 
+ #include "hw/pci/pci.h"
++#include "hw/pci/pci_bus.h"
++
++typedef struct PCIBridgeWindows PCIBridgeWindows;
++
++/*
++ * Aliases for each of the address space windows that the bridge
++ * can forward. Mapped into the bridge's parent's address space,
++ * as subregions.
++ */
++struct PCIBridgeWindows {
++    MemoryRegion alias_pref_mem;
++    MemoryRegion alias_mem;
++    MemoryRegion alias_io;
++    /*
++     * When bridge control VGA forwarding is enabled, bridges will
++     * provide positive decode on the PCI VGA defined I/O port and
++     * MMIO ranges.  When enabled forwarding is only qualified on the
++     * I/O and memory enable bits in the bridge command register.
++     */
++    MemoryRegion alias_vga[QEMU_PCI_VGA_NUM_REGIONS];
++};
++
++#define TYPE_PCI_BRIDGE "base-pci-bridge"
++#define PCI_BRIDGE(obj) OBJECT_CHECK(PCIBridge, (obj), TYPE_PCI_BRIDGE)
++
++struct PCIBridge {
++    /*< private >*/
++    PCIDevice parent_obj;
++    /*< public >*/
++
++    /* private member */
++    PCIBus sec_bus;
++    /*
++     * Memory regions for the bridge's address spaces.  These regions are not
++     * directly added to system_memory/system_io or its descendants.
++     * Bridge's secondary bus points to these, so that devices
++     * under the bridge see these regions as its address spaces.
++     * The regions are as large as the entire address space -
++     * they don't take into account any windows.
++     */
++    MemoryRegion address_space_mem;
++    MemoryRegion address_space_io;
++
++    PCIBridgeWindows *windows;
++
++    pci_map_irq_fn map_irq;
++    const char *bus_name;
++};
+ 
+ #define PCI_BRIDGE_DEV_PROP_CHASSIS_NR "chassis_nr"
+ #define PCI_BRIDGE_DEV_PROP_MSI        "msi"
+diff --git a/include/hw/pci/pci_bus.h b/include/hw/pci/pci_bus.h
+index bc34fd0017..b7da8f555b 100644
+--- a/include/hw/pci/pci_bus.h
++++ b/include/hw/pci/pci_bus.h
+@@ -2,10 +2,10 @@
+ #define QEMU_PCI_BUS_H
+ 
+ /*
+- * PCI Bus and Bridge datastructures.
++ * PCI Bus datastructures.
+  *
+  * Do not access the following members directly;
+- * use accessor functions in pci.h, pci_bridge.h
++ * use accessor functions in pci.h
+  */
+ 
+ typedef struct PCIBusClass {
+@@ -44,51 +44,4 @@ struct PCIBus {
+     Notifier machine_done;
+ };
+ 
+-typedef struct PCIBridgeWindows PCIBridgeWindows;
+-
+-/*
+- * Aliases for each of the address space windows that the bridge
+- * can forward. Mapped into the bridge's parent's address space,
+- * as subregions.
+- */
+-struct PCIBridgeWindows {
+-    MemoryRegion alias_pref_mem;
+-    MemoryRegion alias_mem;
+-    MemoryRegion alias_io;
+-    /*
+-     * When bridge control VGA forwarding is enabled, bridges will
+-     * provide positive decode on the PCI VGA defined I/O port and
+-     * MMIO ranges.  When enabled forwarding is only qualified on the
+-     * I/O and memory enable bits in the bridge command register.
+-     */
+-    MemoryRegion alias_vga[QEMU_PCI_VGA_NUM_REGIONS];
+-};
+-
+-#define TYPE_PCI_BRIDGE "base-pci-bridge"
+-#define PCI_BRIDGE(obj) OBJECT_CHECK(PCIBridge, (obj), TYPE_PCI_BRIDGE)
+-
+-struct PCIBridge {
+-    /*< private >*/
+-    PCIDevice parent_obj;
+-    /*< public >*/
+-
+-    /* private member */
+-    PCIBus sec_bus;
+-    /*
+-     * Memory regions for the bridge's address spaces.  These regions are not
+-     * directly added to system_memory/system_io or its descendants.
+-     * Bridge's secondary bus points to these, so that devices
+-     * under the bridge see these regions as its address spaces.
+-     * The regions are as large as the entire address space -
+-     * they don't take into account any windows.
+-     */
+-    MemoryRegion address_space_mem;
+-    MemoryRegion address_space_io;
+-
+-    PCIBridgeWindows *windows;
+-
+-    pci_map_irq_fn map_irq;
+-    const char *bus_name;
+-};
+-
+ #endif /* QEMU_PCI_BUS_H */
 -- 
 2.14.3
