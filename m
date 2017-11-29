@@ -1,23 +1,14 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36444)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36784)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1eK4li-0002wZ-O0
-	for qemu-devel@nongnu.org; Wed, 29 Nov 2017 10:59:27 -0500
+	(envelope-from <mreitz@redhat.com>) id 1eK4m9-0003FV-8H
+	for qemu-devel@nongnu.org; Wed, 29 Nov 2017 10:59:54 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1eK4le-0007PE-R3
-	for qemu-devel@nongnu.org; Wed, 29 Nov 2017 10:59:26 -0500
-Date: Wed, 29 Nov 2017 16:59:17 +0100
-From: Cornelia Huck <cohuck@redhat.com>
-Message-ID: <20171129165917.0d163823.cohuck@redhat.com>
-In-Reply-To: <77eab778-87d4-c16e-2407-5437f51c4b04@redhat.com>
-References: <20171128203326.6062-1-david@redhat.com>
-	<20171128203326.6062-8-david@redhat.com>
-	<20171129165049.1c446263.cohuck@redhat.com>
-	<77eab778-87d4-c16e-2407-5437f51c4b04@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v1 for-2.12 07/15] s390x: handle exceptions
- during s390_cpu_virt_mem_rw() correctly (TCG)
+	(envelope-from <mreitz@redhat.com>) id 1eK4m8-0007kg-Hn
+	for qemu-devel@nongnu.org; Wed, 29 Nov 2017 10:59:53 -0500
+From: Max Reitz <mreitz@redhat.com>
+Date: Wed, 29 Nov 2017 16:59:42 +0100
+Message-Id: <20171129155942.5646-1-mreitz@redhat.com>
+Subject: [Qemu-devel] [PATCH for-2.12] iotests: Make 200 run on tmpfs
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,43 +17,31 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Hildenbrand <david@redhat.com>
-Cc: qemu-s390x@nongnu.org, qemu-devel@nongnu.org, Christian Borntraeger <borntraeger@de.ibm.com>, Richard Henderson <rth@twiddle.net>, Alexander Graf <agraf@suse.de>
+To: qemu-block@nongnu.org
+Cc: qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>, Jeff Cody <jcody@redhat.com>, Kevin Wolf <kwolf@redhat.com>
 
-On Wed, 29 Nov 2017 16:54:30 +0100
-David Hildenbrand <david@redhat.com> wrote:
+200 currently fails on tmpfs because it sets cache=none.  However,
+without that (and aio=native), the test still works now and it fails
+before Jeff's series (on fc7dbc119e0852a70dc9fa68bb41a318e49e4cd6).  So
+we can probably remove it safely.
 
+Signed-off-by: Max Reitz <mreitz@redhat.com>
+---
+ tests/qemu-iotests/200 | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-> >> diff --git a/target/s390x/mmu_helper.c b/target/s390x/mmu_helper.c
-> >> index 31e3f3f415..39da9aeef4 100644
-> >> --- a/target/s390x/mmu_helper.c
-> >> +++ b/target/s390x/mmu_helper.c
-> >> @@ -22,6 +22,7 @@
-> >>  #include "internal.h"
-> >>  #include "kvm_s390x.h"
-> >>  #include "sysemu/kvm.h"
-> >> +#include "exec/exec-all.h"
-> >>  #include "trace.h"
-> >>  #include "hw/s390x/storage-keys.h"
-> >>  
-> >> @@ -458,7 +459,7 @@ static int translate_pages(S390CPU *cpu, vaddr addr, int nr_pages,
-> >>          }
-> >>          if (!address_space_access_valid(&address_space_memory, pages[i],
-> >>                                          TARGET_PAGE_SIZE, is_write)) {
-> >> -            program_interrupt(env, PGM_ADDRESSING, ILEN_AUTO);
-> >> +            trigger_pgm_exception(env, PGM_ADDRESSING, ILEN_AUTO);  
-> > 
-> > Why did you change this?  
-> 
-> "For TCG, there was one case where a cpu loop exit was triggered. Fix
-> that up."
-> 
-> Wasn't worth a separate patch :)
-
-Well, maybe it is, to avoid dumb questions :)
-
-> 
-> >   
-> >>              return -EFAULT;
-> >>          }
-> >>          addr += TARGET_PAGE_SIZE;
+diff --git a/tests/qemu-iotests/200 b/tests/qemu-iotests/200
+index d8787ddb46..0e814c9b6c 100755
+--- a/tests/qemu-iotests/200
++++ b/tests/qemu-iotests/200
+@@ -60,7 +60,7 @@ qemu_comm_method="qmp"
+ _launch_qemu -device pci-bridge,id=bridge1,chassis_nr=1,bus=pci.0 \
+              -object iothread,id=iothread0 \
+              -device virtio-scsi-pci,bus=bridge1,addr=0x1f,id=scsi0,iothread=iothread0 \
+-             -drive file="${TEST_IMG}",media=disk,if=none,cache=none,id=drive_sysdisk,aio=native,format=$IMGFMT \
++             -drive file="${TEST_IMG}",media=disk,if=none,id=drive_sysdisk,format=$IMGFMT \
+              -device scsi-hd,drive=drive_sysdisk,bus=scsi0.0,id=sysdisk,bootindex=0
+ h1=$QEMU_HANDLE
+ 
+-- 
+2.13.6
