@@ -1,26 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54366)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54319)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1eK4G9-0002LD-Rz
-	for qemu-devel@nongnu.org; Wed, 29 Nov 2017 10:26:50 -0500
+	(envelope-from <kwolf@redhat.com>) id 1eK4G6-00024F-QY
+	for qemu-devel@nongnu.org; Wed, 29 Nov 2017 10:26:52 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1eK4G4-0007VF-4T
-	for qemu-devel@nongnu.org; Wed, 29 Nov 2017 10:26:49 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:52926)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1eK4G3-0007V8-VG
-	for qemu-devel@nongnu.org; Wed, 29 Nov 2017 10:26:44 -0500
-References: <1511958793-15217-1-git-send-email-mgamal@redhat.com>
-	<1511958793-15217-3-git-send-email-mgamal@redhat.com>
-From: Thomas Huth <thuth@redhat.com>
-Message-ID: <39e50952-4377-645b-5bde-5b8ea63d4cb7@redhat.com>
-Date: Wed, 29 Nov 2017 16:26:28 +0100
-MIME-Version: 1.0
-In-Reply-To: <1511958793-15217-3-git-send-email-mgamal@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH RESEND 2/2] x86_iommu: check if machine has
- PCI bus
+	(envelope-from <kwolf@redhat.com>) id 1eK4G5-0007W7-Uf
+	for qemu-devel@nongnu.org; Wed, 29 Nov 2017 10:26:46 -0500
+From: Kevin Wolf <kwolf@redhat.com>
+Date: Wed, 29 Nov 2017 16:26:23 +0100
+Message-Id: <20171129152628.14906-6-kwolf@redhat.com>
+In-Reply-To: <20171129152628.14906-1-kwolf@redhat.com>
+References: <20171129152628.14906-1-kwolf@redhat.com>
+Subject: [Qemu-devel] [PULL 05/10] blockjob: Remove the job from the list
+ earlier in block_job_unref()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,38 +20,44 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Mohammed Gamal <mgamal@redhat.com>, qemu-devel@nongnu.org, mst@redhat.com, mjt@tls.msk.ru, lvivier@redhat.com
-Cc: peterx@redhat.com, ehabkost@redhat.com, pbonzini@redhat.com
+To: qemu-block@nongnu.org
+Cc: kwolf@redhat.com, mreitz@redhat.com, peter.maydell@linaro.org, qemu-devel@nongnu.org
 
-On 29.11.2017 13:33, Mohammed Gamal wrote:
-> Starting qemu with
-> qemu-system-x86_64 -S -M isapc -device {amd|intel}-iommu
-> leads to a segfault. The code assume PCI bus is present and
-> tries to access the bus structure without checking.
-> 
-> Since Intel VT-d and AMDVI should only work with PCI, add a
-> check for PCI bus and return error if not present.
-> 
-> Reviewed-by: Peter Xu <peterx@redhat.com>
-> Reviewed-by: Eduardo Habkost <ehabkost@redhat.com>
-> Signed-off-by: Mohammed Gamal <mgamal@redhat.com>
-> ---
->  hw/i386/x86-iommu.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/hw/i386/x86-iommu.c b/hw/i386/x86-iommu.c
-> index 51de519..8a01a2d 100644
-> --- a/hw/i386/x86-iommu.c
-> +++ b/hw/i386/x86-iommu.c
-> @@ -88,7 +88,7 @@ static void x86_iommu_realize(DeviceState *dev, Error **errp)
->          PC_MACHINE(object_dynamic_cast(OBJECT(ms), TYPE_PC_MACHINE));
->      QLIST_INIT(&x86_iommu->iec_notifiers);
->  
-> -    if (!pcms) {
-> +    if (!pcms || !pcms->bus) {
->          error_setg(errp, "Machine-type '%s' not supported by IOMMU",
->                     mc->name);
->          return;
-> 
+From: Alberto Garcia <berto@igalia.com>
 
-Reviewed-by: Thomas Huth <thuth@redhat.com>
+When destroying a block job in block_job_unref() we should remove it
+from the job list before calling block_job_remove_all_bdrv().
+
+This is because removing the BDSs can trigger an aio_poll() and wake
+up other jobs that might attempt to use the block job list. If that
+happens the job we're currently destroying should not be in that list
+anymore.
+
+Signed-off-by: Alberto Garcia <berto@igalia.com>
+Signed-off-by: Kevin Wolf <kwolf@redhat.com>
+---
+ blockjob.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/blockjob.c b/blockjob.c
+index ff9a614531..2f0cc1528b 100644
+--- a/blockjob.c
++++ b/blockjob.c
+@@ -152,6 +152,7 @@ void block_job_unref(BlockJob *job)
+ {
+     if (--job->refcnt == 0) {
+         BlockDriverState *bs = blk_bs(job->blk);
++        QLIST_REMOVE(job, job_list);
+         bs->job = NULL;
+         block_job_remove_all_bdrv(job);
+         blk_remove_aio_context_notifier(job->blk,
+@@ -160,7 +161,6 @@ void block_job_unref(BlockJob *job)
+         blk_unref(job->blk);
+         error_free(job->blocker);
+         g_free(job->id);
+-        QLIST_REMOVE(job, job_list);
+         g_free(job);
+     }
+ }
+-- 
+2.13.6
