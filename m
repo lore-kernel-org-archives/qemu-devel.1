@@ -1,22 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54072)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58823)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <wlsaidhi@gmail.com>) id 1eJxqA-0007QL-9X
-	for qemu-devel@nongnu.org; Wed, 29 Nov 2017 03:35:35 -0500
+	(envelope-from <dgibson@ozlabs.org>) id 1eJy0u-00022E-8K
+	for qemu-devel@nongnu.org; Wed, 29 Nov 2017 03:46:41 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <wlsaidhi@gmail.com>) id 1eJxq9-0006H4-0F
-	for qemu-devel@nongnu.org; Wed, 29 Nov 2017 03:35:34 -0500
-Received: from mail-lf0-x22d.google.com ([2a00:1450:4010:c07::22d]:43880)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <wlsaidhi@gmail.com>) id 1eJxq8-0006GX-Oc
-	for qemu-devel@nongnu.org; Wed, 29 Nov 2017 03:35:32 -0500
-Received: by mail-lf0-x22d.google.com with SMTP id 94so2885161lfy.10
-	for <qemu-devel@nongnu.org>; Wed, 29 Nov 2017 00:35:32 -0800 (PST)
-MIME-Version: 1.0
-From: william lin <wlsaidhi@gmail.com>
-Date: Wed, 29 Nov 2017 02:34:50 -0600
-Message-ID: <CAGC02hTe8SijuwrM0ZGg04=To0GBnPUrC23iKuc-pao65vAAUQ@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: [Qemu-devel] [Bug 645662] x87 fpu emulation not accurate enough
+	(envelope-from <dgibson@ozlabs.org>) id 1eJy0r-0005cw-Hv
+	for qemu-devel@nongnu.org; Wed, 29 Nov 2017 03:46:38 -0500
+Received: from ozlabs.org ([2401:3900:2:1::2]:41551)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <dgibson@ozlabs.org>) id 1eJy0r-0005Z4-0q
+	for qemu-devel@nongnu.org; Wed, 29 Nov 2017 03:46:37 -0500
+From: David Gibson <david@gibson.dropbear.id.au>
+Date: Wed, 29 Nov 2017 19:46:25 +1100
+Message-Id: <20171129084628.12336-5-david@gibson.dropbear.id.au>
+In-Reply-To: <20171129084628.12336-1-david@gibson.dropbear.id.au>
+References: <20171129084628.12336-1-david@gibson.dropbear.id.au>
+Subject: [Qemu-devel] [for-2.12 4/7] pci: Simplify pci_bus_is_root()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,17 +23,134 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: "Michael S . Tsirkin" <mst@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, Marcel Apfelbaum <marcel@redhat.com>, Igor Mammedov <imammedo@redhat.com>
+Cc: qemu-devel@nongnu.org, David Gibson <david@gibson.dropbear.id.au>
 
-Hello,
+pci_bus_is_root() currently relies on a method in the PCIBusClass.
+But it's always known if a PCI bus is a root bus when we create it, so
+using a dynamic method is overkill.
 
-I have been looking into this bug
-<https://bugs.launchpad.net/qemu/+bug/645662> for a school project, and
-after reproducing the bug and tracing through the code, I have run into a
-wall trying to figure out the best way to approach this. If there is anyone
-who is familiar with qemu's fpu and is willing, any tips or suggestions
-will be fantastic.
+This replaces it with an IS_ROOT bit in a new flags field, which is set on
+root buses and otherwise clear.  As a bonus this removes the special
+is_root logic from pci_expander_bridge, since it already creates its bus
+as a root bus.
 
-Thanks,
+Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
+---
+ hw/pci-bridge/pci_expander_bridge.c |  6 ------
+ hw/pci/pci.c                        | 14 ++------------
+ include/hw/pci/pci.h                | 12 +++++++++++-
+ 3 files changed, 13 insertions(+), 19 deletions(-)
 
-Will & Wes
+diff --git a/hw/pci-bridge/pci_expander_bridge.c b/hw/pci-bridge/pci_expander_bridge.c
+index 5652cf06e9..11dfa9258e 100644
+--- a/hw/pci-bridge/pci_expander_bridge.c
++++ b/hw/pci-bridge/pci_expander_bridge.c
+@@ -65,11 +65,6 @@ static int pxb_bus_num(PCIBus *bus)
+     return pxb->bus_nr;
+ }
+ 
+-static bool pxb_is_root(PCIBus *bus)
+-{
+-    return true; /* by definition */
+-}
+-
+ static uint16_t pxb_bus_numa_node(PCIBus *bus)
+ {
+     PXBDev *pxb = convert_to_pxb(bus->parent_dev);
+@@ -82,7 +77,6 @@ static void pxb_bus_class_init(ObjectClass *class, void *data)
+     PCIBusClass *pbc = PCI_BUS_CLASS(class);
+ 
+     pbc->bus_num = pxb_bus_num;
+-    pbc->is_root = pxb_is_root;
+     pbc->numa_node = pxb_bus_numa_node;
+ }
+ 
+diff --git a/hw/pci/pci.c b/hw/pci/pci.c
+index 6e11dc2fec..5fab7f23b3 100644
+--- a/hw/pci/pci.c
++++ b/hw/pci/pci.c
+@@ -126,14 +126,9 @@ static void pci_bus_unrealize(BusState *qbus, Error **errp)
+     vmstate_unregister(NULL, &vmstate_pcibus, bus);
+ }
+ 
+-static bool pcibus_is_root(PCIBus *bus)
+-{
+-    return !bus->parent_dev;
+-}
+-
+ static int pcibus_num(PCIBus *bus)
+ {
+-    if (pcibus_is_root(bus)) {
++    if (pci_bus_is_root(bus)) {
+         return 0; /* pci host bridge */
+     }
+     return bus->parent_dev->config[PCI_SECONDARY_BUS];
+@@ -156,7 +151,6 @@ static void pci_bus_class_init(ObjectClass *klass, void *data)
+     k->unrealize = pci_bus_unrealize;
+     k->reset = pcibus_reset;
+ 
+-    pbc->is_root = pcibus_is_root;
+     pbc->bus_num = pcibus_num;
+     pbc->numa_node = pcibus_numa_node;
+ }
+@@ -385,6 +379,7 @@ static void pci_root_bus_init(PCIBus *bus, DeviceState *parent,
+     bus->slot_reserved_mask = 0x0;
+     bus->address_space_mem = address_space_mem;
+     bus->address_space_io = address_space_io;
++    bus->flags |= PCI_BUS_IS_ROOT;
+ 
+     /* host bridge */
+     QLIST_INIT(&bus->child);
+@@ -397,11 +392,6 @@ bool pci_bus_is_express(PCIBus *bus)
+     return object_dynamic_cast(OBJECT(bus), TYPE_PCIE_BUS);
+ }
+ 
+-bool pci_bus_is_root(PCIBus *bus)
+-{
+-    return PCI_BUS_GET_CLASS(bus)->is_root(bus);
+-}
+-
+ void pci_root_bus_new_inplace(PCIBus *bus, size_t bus_size, DeviceState *parent,
+                               const char *name,
+                               MemoryRegion *address_space_mem,
+diff --git a/include/hw/pci/pci.h b/include/hw/pci/pci.h
+index 77d92a3dc4..cbb3386207 100644
+--- a/include/hw/pci/pci.h
++++ b/include/hw/pci/pci.h
+@@ -404,6 +404,11 @@ typedef AddressSpace *(*PCIIOMMUFunc)(PCIBus *, void *, int);
+ #define PCI_BUS_GET_CLASS(obj) OBJECT_GET_CLASS(PCIBusClass, (obj), TYPE_PCI_BUS)
+ #define TYPE_PCIE_BUS "PCIE"
+ 
++enum PCIBusFlags {
++    /* This bus is the root of a PCI domain */
++    PCI_BUS_IS_ROOT                                         = 0x0001,
++};
++
+ typedef struct PCIBusClass {
+     /*< private >*/
+     BusClass parent_class;
+@@ -416,6 +421,7 @@ typedef struct PCIBusClass {
+ 
+ struct PCIBus {
+     BusState qbus;
++    enum PCIBusFlags flags;
+     PCIIOMMUFunc iommu_fn;
+     void *iommu_opaque;
+     uint8_t devfn_min;
+@@ -440,8 +446,12 @@ struct PCIBus {
+     Notifier machine_done;
+ };
+ 
++static inline bool pci_bus_is_root(PCIBus *bus)
++{
++    return !!(bus->flags & PCI_BUS_IS_ROOT);
++}
++
+ bool pci_bus_is_express(PCIBus *bus);
+-bool pci_bus_is_root(PCIBus *bus);
+ void pci_root_bus_new_inplace(PCIBus *bus, size_t bus_size, DeviceState *parent,
+                               const char *name,
+                               MemoryRegion *address_space_mem,
+-- 
+2.14.3
