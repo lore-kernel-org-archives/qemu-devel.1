@@ -1,28 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50118)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52244)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1eK0rm-0003g9-P9
-	for qemu-devel@nongnu.org; Wed, 29 Nov 2017 06:49:28 -0500
+	(envelope-from <longpeng2@huawei.com>) id 1eK110-0006eA-Dg
+	for qemu-devel@nongnu.org; Wed, 29 Nov 2017 06:58:59 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1eK0rh-0002iu-Pg
-	for qemu-devel@nongnu.org; Wed, 29 Nov 2017 06:49:26 -0500
-Received: from 1.mo2.mail-out.ovh.net ([46.105.63.121]:36298)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1eK0rh-0002iR-HJ
-	for qemu-devel@nongnu.org; Wed, 29 Nov 2017 06:49:21 -0500
-Received: from player692.ha.ovh.net (b7.ovh.net [213.186.33.57])
-	by mo2.mail-out.ovh.net (Postfix) with ESMTP id 10A79CEF02
-	for <qemu-devel@nongnu.org>; Wed, 29 Nov 2017 12:49:18 +0100 (CET)
-Date: Wed, 29 Nov 2017 12:49:04 +0100
-From: Greg Kurz <groug@kaod.org>
-Message-ID: <20171129124904.13a30582@bahia.lan>
-In-Reply-To: <20171123132955.1261-9-clg@kaod.org>
-References: <20171123132955.1261-1-clg@kaod.org>
-	<20171123132955.1261-9-clg@kaod.org>
+	(envelope-from <longpeng2@huawei.com>) id 1eK10w-0005qg-Dz
+	for qemu-devel@nongnu.org; Wed, 29 Nov 2017 06:58:58 -0500
+Received: from szxga04-in.huawei.com ([45.249.212.190]:2821)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_ARCFOUR_SHA1:16) (Exim 4.71)
+	(envelope-from <longpeng2@huawei.com>) id 1eK10v-0005nT-8k
+	for qemu-devel@nongnu.org; Wed, 29 Nov 2017 06:58:54 -0500
+Message-ID: <5A1EA0DB.60303@huawei.com>
+Date: Wed, 29 Nov 2017 19:58:19 +0800
+From: "Longpeng (Mike)" <longpeng2@huawei.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [Qemu-ppc] [PATCH 08/25] spapr: introduce a
- skeleton for the XIVE interrupt controller
+References: <1511530010-511740-1-git-send-email-dplotnikov@virtuozzo.com>
+	<20171128195817.GA29077@localhost.localdomain>
+	<2cd31202-27c3-983f-85a9-6814ff504706@virtuozzo.com>
+	<20171128211326.GV3037@localhost.localdomain>
+	<5A1E43A6.1010607@huawei.com>
+	<20171129104122.GY3037@localhost.localdomain>
+In-Reply-To: <20171129104122.GY3037@localhost.localdomain>
+Content-Type: text/plain; charset="ISO-8859-1"
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH] i386: turn off l3-cache property by default
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,358 +31,195 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?B?Q8OpZHJpYw==?= Le Goater <clg@kaod.org>
-Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, David Gibson <david@gibson.dropbear.id.au>, Benjamin Herrenschmidt <benh@kernel.crashing.org>
+To: Eduardo Habkost <ehabkost@redhat.com>
+Cc: "Denis V. Lunev" <den@virtuozzo.com>, "Michael S. Tsirkin" <mst@redhat.com>, Denis Plotnikov <dplotnikov@virtuozzo.com>, pbonzini@redhat.com, rth@twiddle.net, qemu-devel@nongnu.org, rkagan@virtuozzo.com, Gonglei <arei.gonglei@huawei.com>, zhaoshenglong <zhaoshenglong@huawei.com>
 
-On Thu, 23 Nov 2017 14:29:38 +0100
-C=C3=A9dric Le Goater <clg@kaod.org> wrote:
 
-> The XIVE interrupt controller uses a set of tables to redirect exception
-> from event sources to CPU threads. The Interrupt Virtualization Entry (IV=
-E)
-> table, also known as Event Assignment Structure (EAS), is one them.
->=20
-> The XIVE model is designed to make use of the full range of the IRQ
-> number space and does not use an offset like the XICS mode does.
-> Hence, the IVE table is directly indexed by the IRQ number.
->=20
-> The IVE stores Event Queue data associated with a source. The lookups
-> are performed when the source is configured or when an event is
-> triggered.
->=20
-> Signed-off-by: C=C3=A9dric Le Goater <clg@kaod.org>
-> ---
->  default-configs/ppc64-softmmu.mak |   1 +
->  hw/intc/Makefile.objs             |   1 +
->  hw/intc/spapr_xive.c              | 165 ++++++++++++++++++++++++++++++++=
-++++++
->  hw/intc/xive-internal.h           |  50 ++++++++++++
->  include/hw/ppc/spapr_xive.h       |  44 ++++++++++
->  5 files changed, 261 insertions(+)
->  create mode 100644 hw/intc/spapr_xive.c
->  create mode 100644 hw/intc/xive-internal.h
->  create mode 100644 include/hw/ppc/spapr_xive.h
->=20
-> diff --git a/default-configs/ppc64-softmmu.mak b/default-configs/ppc64-so=
-ftmmu.mak
-> index d1b3a6dd50f8..4a7f6a0696de 100644
-> --- a/default-configs/ppc64-softmmu.mak
-> +++ b/default-configs/ppc64-softmmu.mak
-> @@ -56,6 +56,7 @@ CONFIG_SM501=3Dy
->  CONFIG_XICS=3D$(CONFIG_PSERIES)
->  CONFIG_XICS_SPAPR=3D$(CONFIG_PSERIES)
->  CONFIG_XICS_KVM=3D$(call land,$(CONFIG_PSERIES),$(CONFIG_KVM))
-> +CONFIG_XIVE_SPAPR=3D$(CONFIG_PSERIES)
->  # For PReP
->  CONFIG_SERIAL_ISA=3Dy
->  CONFIG_MC146818RTC=3Dy
-> diff --git a/hw/intc/Makefile.objs b/hw/intc/Makefile.objs
-> index ae358569a155..49e13e7aeeee 100644
-> --- a/hw/intc/Makefile.objs
-> +++ b/hw/intc/Makefile.objs
-> @@ -35,6 +35,7 @@ obj-$(CONFIG_SH4) +=3D sh_intc.o
->  obj-$(CONFIG_XICS) +=3D xics.o
->  obj-$(CONFIG_XICS_SPAPR) +=3D xics_spapr.o
->  obj-$(CONFIG_XICS_KVM) +=3D xics_kvm.o
-> +obj-$(CONFIG_XIVE_SPAPR) +=3D spapr_xive.o
->  obj-$(CONFIG_POWERNV) +=3D xics_pnv.o
->  obj-$(CONFIG_ALLWINNER_A10_PIC) +=3D allwinner-a10-pic.o
->  obj-$(CONFIG_S390_FLIC) +=3D s390_flic.o
-> diff --git a/hw/intc/spapr_xive.c b/hw/intc/spapr_xive.c
-> new file mode 100644
-> index 000000000000..b2fc3007c85f
-> --- /dev/null
-> +++ b/hw/intc/spapr_xive.c
-> @@ -0,0 +1,165 @@
-> +/*
-> + * QEMU PowerPC sPAPR XIVE model
-> + *
-> + * Copyright (c) 2017, IBM Corporation.
-> + *
-> + * This program is free software; you can redistribute it and/or modify
-> + * it under the terms of the GNU General Public License, version 2, as
 
-version 2 or (at your option) any later version.
+On 2017/11/29 18:41, Eduardo Habkost wrote:
 
-> + * published by the Free Software Foundation.
-> + *
-> + * This program is distributed in the hope that it will be useful,
-> + * but WITHOUT ANY WARRANTY; without even the implied warranty of
-> + * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-> + * GNU General Public License for more details.
-> + *
-> + * You should have received a copy of the GNU General Public License
-> + * along with this program; if not, see <http://www.gnu.org/licenses/>.
-> + */
-> +#include "qemu/osdep.h"
-> +#include "qemu/log.h"
-> +#include "qapi/error.h"
-> +#include "target/ppc/cpu.h"
-> +#include "sysemu/cpus.h"
-> +#include "sysemu/dma.h"
-> +#include "monitor/monitor.h"
-> +#include "hw/ppc/spapr_xive.h"
-> +
-> +#include "xive-internal.h"
-> +
-> +/*
-> + * Main XIVE object
-> + */
-> +
-> +void spapr_xive_pic_print_info(sPAPRXive *xive, Monitor *mon)
-> +{
-> +    int i;
-> +
-> +    for (i =3D 0; i < xive->nr_irqs; i++) {
-> +        XiveIVE *ive =3D &xive->ivt[i];
-> +
-> +        if (!(ive->w & IVE_VALID)) {
-> +            continue;
-> +        }
-> +
-> +        monitor_printf(mon, "  %4x %s %08x %08x\n", i,
-> +                       ive->w & IVE_MASKED ? "M" : " ",
-> +                       (int) GETFIELD(IVE_EQ_INDEX, ive->w),
-> +                       (int) GETFIELD(IVE_EQ_DATA, ive->w));
-> +    }
-> +}
-> +
-> +void spapr_xive_reset(void *dev)
-> +{
-> +    sPAPRXive *xive =3D SPAPR_XIVE(dev);
-> +    int i;
-> +
-> +    /* Mask all valid IVEs in the IRQ number space. */
-> +    for (i =3D 0; i < xive->nr_irqs; i++) {
-> +        XiveIVE *ive =3D &xive->ivt[i];
-> +        if (ive->w & IVE_VALID) {
-> +            ive->w |=3D IVE_MASKED;
-> +        }
-> +    }
-> +}
-> +
-> +static void spapr_xive_realize(DeviceState *dev, Error **errp)
-> +{
-> +    sPAPRXive *xive =3D SPAPR_XIVE(dev);
-> +
-> +    if (!xive->nr_irqs) {
-> +        error_setg(errp, "Number of interrupt needs to be greater 0");
-> +        return;
-> +    }
-> +
-> +    /* Allocate the IVT (Interrupt Virtualization Table) */
-> +    xive->ivt =3D g_malloc0(xive->nr_irqs * sizeof(XiveIVE));
+> On Wed, Nov 29, 2017 at 01:20:38PM +0800, Longpeng (Mike) wrote:
+>> On 2017/11/29 5:13, Eduardo Habkost wrote:
+>>> [CCing the people who were copied in the original patch that
+>>> enabled l3cache]
+>>>
+>>> On Tue, Nov 28, 2017 at 11:20:27PM +0300, Denis V. Lunev wrote:
+>>>> On 11/28/2017 10:58 PM, Eduardo Habkost wrote:
+>>>>> Hi,
+>>>>>
+>>>>> On Fri, Nov 24, 2017 at 04:26:50PM +0300, Denis Plotnikov wrote:
+>>>>>> Commit 14c985cffa "target-i386: present virtual L3 cache info for vcpus"
+>>>>>> introduced and set by default exposing l3 to the guest.
+>>>>>>
+>>>>>> The motivation behind it was that in the Linux scheduler, when waking up
+>>>>>> a task on a sibling CPU, the task was put onto the target CPU's runqueue
+>>>>>> directly, without sending a reschedule IPI.  Reduction in the IPI count
+>>>>>> led to performance gain.
+>>>>>>
+>>>>>> However, this isn't the whole story.  Once the task is on the target
+>>>>>> CPU's runqueue, it may have to preempt the current task on that CPU, be
+>>>>>> it the idle task putting the CPU to sleep or just another running task.
+>>>>>> For that a reschedule IPI will have to be issued, too.  Only when that
+>>>>>> other CPU is running a normal task for too little time, the fairness
+>>>>>> constraints will prevent the preemption and thus the IPI.
+>>>>>>
+>>
+>> Agree. :)
+>>
+>> Our testing VM is Suse11 guest with idle=poll at that time and now I realize
+>> that Suse11 has a BUG in its scheduler.
+>>
+>> For REHL 7.3 or upstream kernel, in ttwu_queue_remote(), a RES IPI is issued if
+>> rq->idle is not polling:
+>> '''
+>> static void ttwu_queue_remote(struct task_struct *p, int cpu)
+>> {
+>> 	struct rq *rq = cpu_rq(cpu);
+>>
+>> 	if (llist_add(&p->wake_entry, &cpu_rq(cpu)->wake_list)) {
+>> 		if (!set_nr_if_polling(rq->idle))
+>> 			smp_send_reschedule(cpu);
+>> 		else
+>> 			trace_sched_wake_idle_without_ipi(cpu);
+>> 	}
+>> }
+>> '''
+>>
+>> But for Suse11, it does not check, it send a RES IPI unconditionally.
+> 
+> So, does that mean no Linux guest benefits from the l3-cache=on
+> default except SuSE 11 guests?
+> 
 
-Even if it isn't documented, AFAIK current recommended practice is to do:
+Not only that, there is another scenario:
 
-    xive->ivt =3D g_new0(XiveIVE, xive->nr_irqs);
+static void ttwu_queue(...)
+{
+	if (...two cpus NOT sharing L3-cache) {
+		...
+		ttwu_queue_remote(p, cpu, wake_flags);
+		return;
+	}
+	...
+	ttwu_do_activate(rq, p, wake_flags, &rf); <--*Here*
+	...
+}
 
-> +
-> +    qemu_register_reset(spapr_xive_reset, dev);
+In ttwu_do_activate(), there are also some opportunities with low probability to
+do not send RES IPI even if the target cpu isn't in IDLE polling state.
 
-Shouldn't you set dc->reset in spapr_xive_class_init() instead ?
+> 
+>>
+>>>>>> This boils down to the improvement being only achievable in workloads
+>>>>>> with many actively switching tasks.  We had no access to the
+>>>>>> (proprietary?) SAP HANA benchmark the commit referred to, but the
+>>>>>> pattern is also reproduced with "perf bench sched messaging -g 1"
+>>>>>> on 1 socket, 8 cores vCPU topology, we see indeed:
+>>>>>>
+>>>>>> l3-cache	#res IPI /s	#time / 10000 loops
+>>>>>> off		560K		1.8 sec
+>>>>>> on		40K		0.9 sec
+>>>>>>
+>>>>>> Now there's a downside: with L3 cache the Linux scheduler is more eager
+>>>>>> to wake up tasks on sibling CPUs, resulting in unnecessary cross-vCPU
+>>>>>> interactions and therefore exessive halts and IPIs.  E.g. "perf bench
+>>>>>> sched pipe -i 100000" gives
+>>>>>>
+>>>>>> l3-cache	#res IPI /s	#HLT /s		#time /100000 loops
+>>>>>> off		200 (no K)	230		0.2 sec
+>>>>>> on		400K		330K		0.5 sec
+>>>>>>
+>>
+>> I guess this issue could be resolved by disable the SD_WAKE_AFFINE.
+>>
+>> As Gonglei said:
+>> 1. the L3 cache relates to the user experience.
+> 
+> This is true, in a way: I have seen a fair share of user reports
+> where they incorrectly blame the L3 cache absence or the L3 cache
+> size for performance problems.
+> 
+>> 2. the glibc would get the cache info by CPUID directly, and relates to the
+>> memory performance.
+> 
+> I'm interested in numbers that demonstrate that.
+> 
 
-> +}
-> +
-> +static const VMStateDescription vmstate_spapr_xive_ive =3D {
-> +    .name =3D TYPE_SPAPR_XIVE "/ive",
-> +    .version_id =3D 1,
-> +    .minimum_version_id =3D 1,
-> +    .fields =3D (VMStateField []) {
-> +        VMSTATE_UINT64(w, XiveIVE),
-> +        VMSTATE_END_OF_LIST()
-> +    },
-> +};
-> +
-> +static bool vmstate_spapr_xive_needed(void *opaque)
-> +{
-> +    /* TODO check machine XIVE support */
-> +    return true;
-> +}
-> +
-> +static const VMStateDescription vmstate_spapr_xive =3D {
-> +    .name =3D TYPE_SPAPR_XIVE,
-> +    .version_id =3D 1,
-> +    .minimum_version_id =3D 1,
-> +    .needed =3D vmstate_spapr_xive_needed,
-> +    .fields =3D (VMStateField[]) {
-> +        VMSTATE_UINT32_EQUAL(nr_irqs, sPAPRXive, NULL),
-> +        VMSTATE_STRUCT_VARRAY_UINT32_ALLOC(ivt, sPAPRXive, nr_irqs, 1,
-> +                                           vmstate_spapr_xive_ive, XiveI=
-VE),
+Sorry I have no numbers in hand currently :(
 
-Hmm... this array is allocated at realize and this will cause
-the migration code to re-allocate it again with the same size,
-and leak memory IIUC.
+I'll do some tests these days, please give me some time.
 
-> +        VMSTATE_END_OF_LIST()
-> +    },
-> +};
-> +
-> +static Property spapr_xive_properties[] =3D {
-> +    DEFINE_PROP_UINT32("nr-irqs", sPAPRXive, nr_irqs, 0),
-> +    DEFINE_PROP_END_OF_LIST(),
-> +};
-> +
-> +static void spapr_xive_class_init(ObjectClass *klass, void *data)
-> +{
-> +    DeviceClass *dc =3D DEVICE_CLASS(klass);
-> +
-> +    dc->realize =3D spapr_xive_realize;
-> +    dc->props =3D spapr_xive_properties;
-> +    dc->desc =3D "sPAPR XIVE interrupt controller";
-> +    dc->vmsd =3D &vmstate_spapr_xive;
-> +}
-> +
-> +static const TypeInfo spapr_xive_info =3D {
-> +    .name =3D TYPE_SPAPR_XIVE,
-> +    .parent =3D TYPE_SYS_BUS_DEVICE,
-> +    .instance_size =3D sizeof(sPAPRXive),
-> +    .class_init =3D spapr_xive_class_init,
-> +};
-> +
-> +static void spapr_xive_register_types(void)
-> +{
-> +    type_register_static(&spapr_xive_info);
-> +}
-> +
-> +type_init(spapr_xive_register_types)
-> +
-> +XiveIVE *spapr_xive_get_ive(sPAPRXive *xive, uint32_t lisn)
-> +{
-> +    return lisn < xive->nr_irqs ? &xive->ivt[lisn] : NULL;
-> +}
-> +
-> +bool spapr_xive_irq_set(sPAPRXive *xive, uint32_t lisn)
-> +{
-> +    XiveIVE *ive =3D spapr_xive_get_ive(xive, lisn);
-> +
-> +    if (!ive) {
-> +        return false;
-> +    }
-> +
-> +    ive->w |=3D IVE_VALID;
-> +    return true;
-> +}
-> +
-> +bool spapr_xive_irq_unset(sPAPRXive *xive, uint32_t lisn)
-> +{
-> +    XiveIVE *ive =3D spapr_xive_get_ive(xive, lisn);
-> +
-> +    if (!ive) {
-> +        return false;
-> +    }
-> +
-> +    ive->w &=3D ~IVE_VALID;
-> +    return true;
-> +}
-> diff --git a/hw/intc/xive-internal.h b/hw/intc/xive-internal.h
-> new file mode 100644
-> index 000000000000..bea88d82992c
-> --- /dev/null
-> +++ b/hw/intc/xive-internal.h
-> @@ -0,0 +1,50 @@
-> +/*
-> + * QEMU PowerPC XIVE model
-> + *
-> + * Copyright 2016,2017 IBM Corporation.
-> + *
-> + * This program is free software; you can redistribute it and/or
-> + * modify it under the terms of the GNU General Public License
-> + * as published by the Free Software Foundation; either version
-> + * 2 of the License, or (at your option) any later version.
-> + */
-> +#ifndef _INTC_XIVE_INTERNAL_H
-> +#define _INTC_XIVE_INTERNAL_H
-> +
-> +/* Utilities to manipulate these (originaly from OPAL) */
-> +#define MASK_TO_LSH(m)          (__builtin_ffsl(m) - 1)
-> +#define GETFIELD(m, v)          (((v) & (m)) >> MASK_TO_LSH(m))
-> +#define SETFIELD(m, v, val)                             \
-> +        (((v) & ~(m)) | ((((typeof(v))(val)) << MASK_TO_LSH(m)) & (m)))
-> +
-> +#define PPC_BIT(bit)            (0x8000000000000000UL >> (bit))
-> +#define PPC_BIT32(bit)          (0x80000000UL >> (bit))
-> +#define PPC_BIT8(bit)           (0x80UL >> (bit))
-> +#define PPC_BITMASK(bs, be)     ((PPC_BIT(bs) - PPC_BIT(be)) | PPC_BIT(b=
-s))
-> +#define PPC_BITMASK32(bs, be)   ((PPC_BIT32(bs) - PPC_BIT32(be)) | \
-> +                                 PPC_BIT32(bs))
-> +
-> +/* IVE/EAS
-> + *
-> + * One per interrupt source. Targets that interrupt to a given EQ
-> + * and provides the corresponding logical interrupt number (EQ data)
-> + *
-> + * We also map this structure to the escalation descriptor inside
-> + * an EQ, though in that case the valid and masked bits are not used.
-> + */
-> +typedef struct XiveIVE {
-> +        /* Use a single 64-bit definition to make it easier to
-> +         * perform atomic updates
-> +         */
-> +        uint64_t        w;
-> +#define IVE_VALID       PPC_BIT(0)
-> +#define IVE_EQ_BLOCK    PPC_BITMASK(4, 7)        /* Destination EQ block=
-# */
-> +#define IVE_EQ_INDEX    PPC_BITMASK(8, 31)       /* Destination EQ index=
- */
-> +#define IVE_MASKED      PPC_BIT(32)              /* Masked */
-> +#define IVE_EQ_DATA     PPC_BITMASK(33, 63)      /* Data written to the =
-EQ */
-> +} XiveIVE;
-> +
-> +void spapr_xive_reset(void *dev);
-> +XiveIVE *spapr_xive_get_ive(sPAPRXive *xive, uint32_t lisn);
-> +
-> +#endif /* _INTC_XIVE_INTERNAL_H */
-> diff --git a/include/hw/ppc/spapr_xive.h b/include/hw/ppc/spapr_xive.h
-> new file mode 100644
-> index 000000000000..795b3f4ded7c
-> --- /dev/null
-> +++ b/include/hw/ppc/spapr_xive.h
-> @@ -0,0 +1,44 @@
-> +/*
-> + * QEMU PowerPC sPAPR XIVE model
-> + *
-> + * Copyright (c) 2017, IBM Corporation.
-> + *
-> + * This program is free software; you can redistribute it and/or modify
-> + * it under the terms of the GNU General Public License, version 2, as
-> + * published by the Free Software Foundation.
-> + *
-> + * This program is distributed in the hope that it will be useful,
-> + * but WITHOUT ANY WARRANTY; without even the implied warranty of
-> + * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-> + * GNU General Public License for more details.
-> + *
-> + * You should have received a copy of the GNU General Public License
-> + * along with this program; if not, see <http://www.gnu.org/licenses/>.
-> + */
-> +
-> +#ifndef PPC_SPAPR_XIVE_H
-> +#define PPC_SPAPR_XIVE_H
-> +
-> +#include <hw/sysbus.h>
-> +
-> +typedef struct sPAPRXive sPAPRXive;
-> +typedef struct XiveIVE XiveIVE;
-> +
-> +#define TYPE_SPAPR_XIVE "spapr-xive"
-> +#define SPAPR_XIVE(obj) OBJECT_CHECK(sPAPRXive, (obj), TYPE_SPAPR_XIVE)
-> +
-> +struct sPAPRXive {
-> +    SysBusDevice parent;
-> +
-> +    /* Properties */
-> +    uint32_t     nr_irqs;
-> +
-> +    /* XIVE internal tables */
-> +    XiveIVE      *ivt;
-> +};
-> +
-> +bool spapr_xive_irq_set(sPAPRXive *xive, uint32_t lisn);
-> +bool spapr_xive_irq_unset(sPAPRXive *xive, uint32_t lisn);
-> +void spapr_xive_pic_print_info(sPAPRXive *xive, Monitor *mon);
-> +
-> +#endif /* PPC_SPAPR_XIVE_H */
+>>
+>> What's more, the L3 cache relates to the sched_domain which is important to the
+>> (load) balancer when system is busy.
+>>
+>> All this doesn't mean the patch is insignificant, I just think we should do more
+>> research before decide. I'll do some tests, thanks. :)
+> 
+> Yes, we need more data.  But if we find out that there are no
+> cases where the l3-cache=on default actually improves
+> performance, I will be willing to apply this patch.
+> 
+
+That's a good thing if we find the truth, it's free. :)
+
+OTOH, I think we should notice that: Linux is designed on real hardware, maybe
+there're some other problems if QEMU lacks some related features. If we search
+'cpus_share_cache' in the Linux kernel, we can see that it's also used by Block
+Layer.
+
+> IMO, the long term solution is to make Linux guests not misbehave
+> when we stop lying about the L3 cache.  Maybe we could provide a
+> "IPIs are expensive, please avoid them" hint in the KVM CPUID
+> leaf?
+> 
+
+Good idea. :)
+
+Maybe more PV features could be digged.
+
+>>
+>>>>>> In a more realistic test, we observe 15% degradation in VM density
+>>>>>> (measured as the number of VMs, each running Drupal CMS serving 2 http
+>>>>>> requests per second to its main page, with 95%-percentile response
+>>>>>> latency under 100 ms) with l3-cache=on.
+>>>>>>
+>>>>>> We think that mostly-idle scenario is more common in cloud and personal
+>>>>>> usage, and should be optimized for by default; users of highly loaded
+>>>>>> VMs should be able to tune them up themselves.
+>>>>>>
+>>>>> There's one thing I don't understand in your test case: if you
+>>>>> just found out that Linux will behave worse if it assumes that
+>>>>> the VCPUs are sharing a L3 cache, why are you configuring a
+>>>>> 8-core VCPU topology explicitly?
+>>>>>
+>>>>> Do you still see a difference in the numbers if you use "-smp 8"
+>>>>> with no "cores" and "threads" options?
+>>>>>
+>>>> This is quite simple. A lot of software licenses are bound to the amount
+>>>> of CPU __sockets__. Thus it is mandatory in a lot of cases to set topology
+>>>> with 1 socket/xx cores to reduce the amount of money necessary to
+>>>> be paid for the software.
+>>>
+>>> In this case it looks like we're talking about the expected
+>>> meaning of "cores=N".  My first interpretation would be that the
+>>> user obviously want the guest to see the multiple cores sharing a
+>>> L3 cache, because that's how real CPUs normally work.  But I see
+>>> why you have different expectations.
+>>>
+>>> Numbers on dedicated-pCPU scenarios would be helpful to guide the
+>>> decision.  I wouldn't like to cause a performance regression for
+>>> users that fine-tuned vCPU topology and set up CPU pinning.
+>>>
+>>
+>>
+>> -- 
+>> Regards,
+>> Longpeng(Mike)
+>>
+> 
+
+
+-- 
+Regards,
+Longpeng(Mike)
