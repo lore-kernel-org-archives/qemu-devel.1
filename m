@@ -1,17 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54305)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54341)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1eK4G6-0001zg-1G
-	for qemu-devel@nongnu.org; Wed, 29 Nov 2017 10:26:47 -0500
+	(envelope-from <kwolf@redhat.com>) id 1eK4G8-0002Bh-1k
+	for qemu-devel@nongnu.org; Wed, 29 Nov 2017 10:26:49 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1eK4G4-0007VY-P0
-	for qemu-devel@nongnu.org; Wed, 29 Nov 2017 10:26:46 -0500
+	(envelope-from <kwolf@redhat.com>) id 1eK4G6-0007Wb-Tu
+	for qemu-devel@nongnu.org; Wed, 29 Nov 2017 10:26:48 -0500
 From: Kevin Wolf <kwolf@redhat.com>
-Date: Wed, 29 Nov 2017 16:26:22 +0100
-Message-Id: <20171129152628.14906-5-kwolf@redhat.com>
+Date: Wed, 29 Nov 2017 16:26:20 +0100
+Message-Id: <20171129152628.14906-3-kwolf@redhat.com>
 In-Reply-To: <20171129152628.14906-1-kwolf@redhat.com>
 References: <20171129152628.14906-1-kwolf@redhat.com>
-Subject: [Qemu-devel] [PULL 04/10] QAPI & interop: Clarify events emitted by
- 'block-job-cancel'
+Subject: [Qemu-devel] [PULL 02/10] docs: Add image locking subsection
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,139 +22,76 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org
 Cc: kwolf@redhat.com, mreitz@redhat.com, peter.maydell@linaro.org, qemu-devel@nongnu.org
 
-From: Kashyap Chamarthy <kchamart@redhat.com>
+From: Fam Zheng <famz@redhat.com>
 
-When you cancel an in-progress 'mirror' job (or "active `block-commit`")
-with QMP `block-job-cancel`, it emits the event: BLOCK_JOB_CANCELLED.
-However, when `block-job-cancel` is issued *after* `drive-mirror` has
-indicated (via the event BLOCK_JOB_READY) that the source and
-destination have reached synchronization:
+This documents the image locking feature and explains when and how
+related options can be used.
 
-    [...] # Snip `drive-mirror` invocation & outputs
-    {
-      "execute":"block-job-cancel",
-      "arguments":{
-        "device":"virtio0"
-      }
-    }
-
-    {"return": {}}
-
-It (`block-job-cancel`) will counterintuitively emit the event
-'BLOCK_JOB_COMPLETED':
-
-    {
-      "timestamp":{
-        "seconds":1510678024,
-        "microseconds":526240
-      },
-      "event":"BLOCK_JOB_COMPLETED",
-      "data":{
-        "device":"virtio0",
-        "len":41126400,
-        "offset":41126400,
-        "speed":0,
-        "type":"mirror"
-      }
-    }
-
-But this is expected behaviour, where the _COMPLETED event indicates
-that synchronization has successfully ended (and the destination now has
-a point-in-time copy, which is at the time of cancel).
-
-So add a small note to this effect in 'block-core.json'.  While at it,
-also update the "Live disk synchronization -- drive-mirror and
-blockdev-mirror" section in 'live-block-operations.rst'.
-
-(Thanks: Max Reitz for reminding me of this caveat on IRC.)
-
-Signed-off-by: Kashyap Chamarthy <kchamart@redhat.com>
-Reviewed-by: Eric Blake <eblake@redhat.com>
+Signed-off-by: Fam Zheng <famz@redhat.com>
 Signed-off-by: Kevin Wolf <kwolf@redhat.com>
 ---
- qapi/block-core.json                   |  6 ++++
- docs/interop/live-block-operations.rst | 50 ++++++++++++++++++++++------------
- 2 files changed, 38 insertions(+), 18 deletions(-)
+ docs/qemu-block-drivers.texi | 36 ++++++++++++++++++++++++++++++++++++
+ qemu-doc.texi                |  1 +
+ 2 files changed, 37 insertions(+)
 
-diff --git a/qapi/block-core.json b/qapi/block-core.json
-index 76bf50f813..dd763dcf87 100644
---- a/qapi/block-core.json
-+++ b/qapi/block-core.json
-@@ -2065,6 +2065,12 @@
- # BLOCK_JOB_CANCELLED event.  Before that happens the job is still visible when
- # enumerated using query-block-jobs.
- #
-+# Note that if you issue 'block-job-cancel' after 'drive-mirror' has indicated
-+# (via the event BLOCK_JOB_READY) that the source and destination are
-+# synchronized, then the event triggered by this command changes to
-+# BLOCK_JOB_COMPLETED, to indicate that the mirroring has ended and the
-+# destination now has a point-in-time copy tied to the time of the cancellation.
-+#
- # For streaming, the image file retains its backing file unless the streaming
- # operation happens to complete just as it is being cancelled.  A new streaming
- # operation can be started at a later time to finish copying all data from the
-diff --git a/docs/interop/live-block-operations.rst b/docs/interop/live-block-operations.rst
-index 5f0179749f..734252bc80 100644
---- a/docs/interop/live-block-operations.rst
-+++ b/docs/interop/live-block-operations.rst
-@@ -506,26 +506,40 @@ Again, given our familiar disk image chain::
+diff --git a/docs/qemu-block-drivers.texi b/docs/qemu-block-drivers.texi
+index 1cb1e55686..503c1847aa 100644
+--- a/docs/qemu-block-drivers.texi
++++ b/docs/qemu-block-drivers.texi
+@@ -785,6 +785,42 @@ warning: ssh server @code{ssh.example.com:22} does not support fsync
+ With sufficiently new versions of libssh2 and OpenSSH, @code{fsync} is
+ supported.
  
-     [A] <-- [B] <-- [C] <-- [D]
++@node disk_image_locking
++@subsection Disk image file locking
++
++By default, QEMU tries to protect image files from unexpected concurrent
++access, as long as it's supported by the block protocol driver and host
++operating system. If multiple QEMU processes (including QEMU emulators and
++utilities) try to open the same image with conflicting accessing modes, all but
++the first one will get an error.
++
++This feature is currently supported by the file protocol on Linux with the Open
++File Descriptor (OFD) locking API, and can be configured to fall back to POSIX
++locking if the POSIX host doesn't support Linux OFD locking.
++
++To explicitly enable image locking, specify "locking=on" in the file protocol
++driver options. If OFD locking is not possible, a warning will be printed and
++the POSIX locking API will be used. In this case there is a risk that the lock
++will get silently lost when doing hot plugging and block jobs, due to the
++shortcomings of the POSIX locking API.
++
++QEMU transparently handles lock handover during shared storage migration.  For
++shared virtual disk images between multiple VMs, the "share-rw" device option
++should be used.
++
++Alternatively, locking can be fully disabled by "locking=off" block device
++option. In the command line, the option is usually in the form of
++"file.locking=off" as the protocol driver is normally placed as a "file" child
++under a format driver. For example:
++
++@code{-blockdev driver=qcow2,file.filename=/path/to/image,file.locking=off,file.driver=file}
++
++To check if image locking is active, check the output of the "lslocks" command
++on host and see if there are locks held by the QEMU process on the image file.
++More than one byte could be locked by the QEMU instance, each byte of which
++reflects a particular permission that is acquired or protected by the running
++block driver.
++
+ @c man end
  
--The ``drive-mirror`` (and its newer equivalent ``blockdev-mirror``) allows
--you to copy data from the entire chain into a single target image (which
--can be located on a different host).
--
--Once a 'mirror' job has started, there are two possible actions while a
--``drive-mirror`` job is active:
--
--(1) Issuing the command ``block-job-cancel`` after it emits the event
--    ``BLOCK_JOB_CANCELLED``: will (after completing synchronization of
--    the content from the disk image chain to the target image, [E])
--    create a point-in-time (which is at the time of *triggering* the
--    cancel command) copy, contained in image [E], of the the entire disk
-+The ``drive-mirror`` (and its newer equivalent ``blockdev-mirror``)
-+allows you to copy data from the entire chain into a single target image
-+(which can be located on a different host), [E].
-+
-+.. note::
-+
-+    When you cancel an in-progress 'mirror' job *before* the source and
-+    target are synchronized, ``block-job-cancel`` will emit the event
-+    ``BLOCK_JOB_CANCELLED``.  However, note that if you cancel a
-+    'mirror' job *after* it has indicated (via the event
-+    ``BLOCK_JOB_READY``) that the source and target have reached
-+    synchronization, then the event emitted by ``block-job-cancel``
-+    changes to ``BLOCK_JOB_COMPLETED``.
-+
-+    Besides the 'mirror' job, the "active ``block-commit``" is the only
-+    other block device job that emits the event ``BLOCK_JOB_READY``.
-+    The rest of the block device jobs ('stream', "non-active
-+    ``block-commit``", and 'backup') end automatically.
-+
-+So there are two possible actions to take, after a 'mirror' job has
-+emitted the event ``BLOCK_JOB_READY``, indicating that the source and
-+target have reached synchronization:
-+
-+(1) Issuing the command ``block-job-cancel`` (after it emits the event
-+    ``BLOCK_JOB_COMPLETED``) will create a point-in-time (which is at
-+    the time of *triggering* the cancel command) copy of the entire disk
-     image chain (or only the top-most image, depending on the ``sync``
--    mode).
-+    mode), contained in the target image [E]. One use case for this is
-+    live VM migration with non-shared storage.
+ @ignore
+diff --git a/qemu-doc.texi b/qemu-doc.texi
+index 617254917d..db2351c746 100644
+--- a/qemu-doc.texi
++++ b/qemu-doc.texi
+@@ -405,6 +405,7 @@ encrypted disk images.
+ * disk_images_iscsi::         iSCSI LUNs
+ * disk_images_gluster::       GlusterFS disk images
+ * disk_images_ssh::           Secure Shell (ssh) disk images
++* disk_image_locking::        Disk image file locking
+ @end menu
  
--(2) Issuing the command ``block-job-complete`` after it emits the event
--    ``BLOCK_JOB_COMPLETED``: will, after completing synchronization of
--    the content, adjust the guest device (i.e. live QEMU) to point to
--    the target image, and, causing all the new writes from this point on
--    to happen there.  One use case for this is live storage migration.
-+(2) Issuing the command ``block-job-complete`` (after it emits the event
-+    ``BLOCK_JOB_COMPLETED``) will adjust the guest device (i.e. live
-+    QEMU) to point to the target image, [E], causing all the new writes
-+    from this point on to happen there.
- 
- About synchronization modes: The synchronization mode determines
- *which* part of the disk image chain will be copied to the target.
+ @node disk_images_quickstart
 -- 
 2.13.6
