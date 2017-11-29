@@ -1,26 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38502)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38835)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1eJzKu-0000r1-Jm
-	for qemu-devel@nongnu.org; Wed, 29 Nov 2017 05:11:29 -0500
+	(envelope-from <ppandit@redhat.com>) id 1eJzLV-0001r0-1F
+	for qemu-devel@nongnu.org; Wed, 29 Nov 2017 05:12:01 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1eJzKq-0005Ig-Kp
-	for qemu-devel@nongnu.org; Wed, 29 Nov 2017 05:11:24 -0500
-Received: from ozlabs.org ([103.22.144.67]:43801)
+	(envelope-from <ppandit@redhat.com>) id 1eJzLQ-0005ey-2r
+	for qemu-devel@nongnu.org; Wed, 29 Nov 2017 05:12:01 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:36186)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgibson@ozlabs.org>) id 1eJzKp-0005HQ-WC
-	for qemu-devel@nongnu.org; Wed, 29 Nov 2017 05:11:20 -0500
-Date: Wed, 29 Nov 2017 21:11:13 +1100
-From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20171129101113.GL3023@umbus.fritz.box>
-References: <20171129084628.12336-1-david@gibson.dropbear.id.au>
-	<151194617493.816.13426298875361921541@bafd83ae6430>
-	<20171129091847.GC12220@lemon>
+	(Exim 4.71) (envelope-from <ppandit@redhat.com>) id 1eJzLP-0005eL-Qo
+	for qemu-devel@nongnu.org; Wed, 29 Nov 2017 05:11:56 -0500
+Date: Wed, 29 Nov 2017 15:41:45 +0530 (IST)
+From: P J P <ppandit@redhat.com>
+In-Reply-To: <20171128130012.1466d231.cohuck@redhat.com>
+Message-ID: <nycvar.YSQ.7.76.1711291445390.12405@wniryva>
+References: <20171124183446.7308-1-ppandit@redhat.com>
+	<20171124183446.7308-2-ppandit@redhat.com>
+	<20171127111532.GI16527@stefanha-x1.localdomain>
+	<nycvar.YSQ.7.76.1711272251290.24944@wniryva>
+	<20171128101154.64b49cb0.cohuck@redhat.com>
+	<20171128103757.GD17146@stefanha-x1.localdomain>
+	<nycvar.YSQ.7.76.1711281653440.1581@wniryva>
+	<20171128130012.1466d231.cohuck@redhat.com>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="EEx6GiKZGZ1wKUra"
-Content-Disposition: inline
-In-Reply-To: <20171129091847.GC12220@lemon>
-Subject: Re: [Qemu-devel] [for-2.12 0/7] PCI cleanups
+Content-Type: text/plain; charset=US-ASCII
+Subject: Re: [Qemu-devel] [PATCH v3 1/2] virtio: check VirtQueue Vring
+ object is set
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,53 +33,93 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Fam Zheng <famz@redhat.com>
-Cc: qemu-devel@nongnu.org, ehabkost@redhat.com, mst@redhat.com, marcel@redhat.com, imammedo@redhat.com
+To: Cornelia Huck <cohuck@redhat.com>
+Cc: Stefan Hajnoczi <stefanha@redhat.com>, Qemu Developers <qemu-devel@nongnu.org>, zhangboxian <zhangboxian@huawei.com>, Paolo Bonzini <pbonzini@redhat.com>
+
+  Hello Cornelia,
+
++-- On Tue, 28 Nov 2017, Cornelia Huck wrote --+
+| What is "unfit for use"?
+
+Unfit for use because we see checks like
+
+  if (!virtio_queue_get_num(vdev, n)) {
+            continue;
+  ...
+  if (!vdev->vq[n].vring.num) {
+      return;
+
+'virtio_queue_set_rings' sets 'vring.desc' as
+
+  vdev->vq[n].vring.desc = desc;
+
+and calls virtio_init_region_cache(vdev, n);
+which returns if vq->vring.desc is zero(0).
+
+  addr = vq->vring.desc;
+  if (!addr) {
+      return;
+  }
+
+Same in virtio_queue_set_addr() -> virtio_queue_update_rings().
+
+It seems that for 'vq' instance to be useful, vring.num, vring.desc etc. 
+fields need to be set properly. Unless an unused/free 'vq' is being accessed 
+to set these fields.
+
+| I'm not quite sure what you want to achieve with this patch. I assume
+| you want to fix the issue that a guest may provide invalid values for
+| align etc. which can cause qemu to crash or behave badly.
+
+True. In the process I'm trying to figure out if a usable 'vq' instance could 
+be decided in once place, than having repeating checks, if possible.
+
+Ex. 'virtio_queue_update_rings' is called as
+
+virtio_queue_set_addr
+ -> virtio_queue_update_rings
+
+virtio_queue_set_align
+ -> virtio_queue_update_rings
+
+virtio_load
+ for (i = 0; i < num; i++) {
+   if (vdev->vq[i].vring.desc) {
+   ...
+     virtio_queue_update_rings
+
+Of these, virtio_load checks that 'vring.desc' is non-zero(0). Current 
+patch adds couple checks to the other two callers above. And again,
+
+virtio_queue_update_rings would check
+
+    if (!vring->num || !vring->desc || !vring->align) {
+       /* not yet setup -> nothing to do */
+       return;
+    }
+
+| If so, you need to do different things for the different points above.
+| - The guest should not muck around with a non-existing queue (num == 0)
+|   in any case, so this should be fenced for any manipulation triggered
+|   by the guest.
+
+I guess done by !virtio_queue_get_num() check above?
+
+| - Processing a non-setup queue (desc == 0; also applies to the other
+|   buffers for virtio-1) should be skipped. However, _setting_ desc etc.
+|   to 0 from the guest is fine (as long as it follows the other
+|   constraints of the spec).
+
+Okay. Though its non-zero(0) value is preferred?
+
+| - Setting alignment to 0 only applies to legacy + virtio-mmio. I would
+|   not overengineer fencing this. A simple check in update_rings should
+|   be enough.
+
+Okay.x
 
 
---EEx6GiKZGZ1wKUra
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
-
-On Wed, Nov 29, 2017 at 05:18:47PM +0800, Fam Zheng wrote:
-> On Wed, 11/29 01:02, no-reply@patchew.org wrote:
-> > /tmp/cc3Czn0R.s: Fatal error: can't write 3947 bytes to section .debug_=
-str of hw/arm/virt-acpi-build.o because: 'No space left on device'
->=20
-> Hmm, the host is shared and what I have is a normal user account, so ther=
-e is no
-> control over disk space availability.  Anyway this is completely unrelate=
-d to
-> this series. Sorry for the noise.
-
-Yeah, I'm afraid I've mostly been ignoring these build warnings,
-because s390's been failing a lot for reasons unrelated to the series.
-
---=20
-David Gibson			| I'll have my music baroque, and my code
-david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
-				| _way_ _around_!
-http://www.ozlabs.org/~dgibson
-
---EEx6GiKZGZ1wKUra
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAloeh74ACgkQbDjKyiDZ
-s5LlnBAA5dhNtUw25guDV3LUuyk4iTlgXxfAk5J/BbuDIRofTUnkibMjHNiwMLz/
-g02OQ4Cm/XDQ0smtfA+txukcpEqnG3H482Dl9SBfK6lzeXlslagf1qSsJRFx0JG/
-VcvKHZV9mFRWDhgonzwxeoveRcbX5zbqtbYwpGselXBqM0t/AUv3tXHjL60vOniV
-6R71Zi29+IlxO+XG/ozUsA8jKQhjousydosTGz4F3psc57IDqE/QlCoMPeMAfAO5
-EdbSJOdZReqXUsWcB+ZbJhavwmoEOhXsIn7xaTHsz9C1JSE0oIfRC4a28xV2fGFs
-cxHRKjyMp21HIBraXL59r/8UssjSMYxJ36Hw9f6XLN5+FcFLjUVKZiA1obKPSuPx
-lfl/BkHclrq6RSo+bFWuMSTY6bPKPHu94R2+bykwFo6OLdyfhixjiLfZBq3zWXlN
-droacxNZJ7IIBVQimv40Fp+CofpSU1jPMApQAZHPGBGfZUgvynutaJBmHCXYI/En
-1xzqiU1TWhmI2EmOFZymHukf992yYt/ldoaMl6yDiXEw+t4aUyJUW/y/Eh6Dled/
-YYEpciPStnTjg0X7/6sNaKCU1RMqjS/O2s1abFQEo+8lOIlThkpUeP8nTgRk7qhH
-S5s9KBZtKn+YvtlXAtgEgnLuKAlHDvnrWOiomsngVHxjadDSphQ=
-=C1Fl
------END PGP SIGNATURE-----
-
---EEx6GiKZGZ1wKUra--
+Thank you.
+--
+Prasad J Pandit / Red Hat Product Security Team
+47AF CE69 3A90 54AA 9045 1053 DD13 3D32 FE5B 041F
