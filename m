@@ -1,28 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39957)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40058)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcel@redhat.com>) id 1eK3ao-0002o5-2Q
-	for qemu-devel@nongnu.org; Wed, 29 Nov 2017 09:44:07 -0500
+	(envelope-from <cohuck@redhat.com>) id 1eK3b9-00030J-IF
+	for qemu-devel@nongnu.org; Wed, 29 Nov 2017 09:44:28 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcel@redhat.com>) id 1eK3al-0002q6-2b
-	for qemu-devel@nongnu.org; Wed, 29 Nov 2017 09:44:06 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:47240)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <marcel@redhat.com>) id 1eK3ak-0002pg-Sn
-	for qemu-devel@nongnu.org; Wed, 29 Nov 2017 09:44:03 -0500
-References: <20171129084628.12336-1-david@gibson.dropbear.id.au>
-	<20171129084628.12336-7-david@gibson.dropbear.id.au>
-	<9b0e9672-e0d7-53c3-9a42-ab3f6011b59b@redhat.com>
-	<20171129114109.GZ3037@localhost.localdomain>
-From: Marcel Apfelbaum <marcel@redhat.com>
-Message-ID: <970587d3-6aa9-af31-0c07-b2004fbfb5a5@redhat.com>
-Date: Wed, 29 Nov 2017 16:43:56 +0200
+	(envelope-from <cohuck@redhat.com>) id 1eK3b6-0002uK-Gy
+	for qemu-devel@nongnu.org; Wed, 29 Nov 2017 09:44:27 -0500
+Date: Wed, 29 Nov 2017 15:44:16 +0100
+From: Cornelia Huck <cohuck@redhat.com>
+Message-ID: <20171129154416.0edc2253.cohuck@redhat.com>
+In-Reply-To: <d8f73958-c138-c454-a52d-91f5874d7481@redhat.com>
+References: <20171128203326.6062-1-david@redhat.com>
+	<d43c646d-fd59-12a6-c7a8-7b5dfac0b9de@redhat.com>
+	<d8f73958-c138-c454-a52d-91f5874d7481@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20171129114109.GZ3037@localhost.localdomain>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [for-2.12 6/7] pci: Eliminate redundant
- PCIDevice::bus pointer
+Subject: Re: [Qemu-devel] [qemu-s390x] [PATCH v1 for-2.12 00/15] s390x/tcg:
+ cleanup and fix program interrupts
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,42 +25,34 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eduardo Habkost <ehabkost@redhat.com>
-Cc: David Gibson <david@gibson.dropbear.id.au>, "Michael S . Tsirkin" <mst@redhat.com>, Igor Mammedov <imammedo@redhat.com>, qemu-devel@nongnu.org
+To: David Hildenbrand <david@redhat.com>
+Cc: Thomas Huth <thuth@redhat.com>, qemu-s390x@nongnu.org, qemu-devel@nongnu.org, Christian Borntraeger <borntraeger@de.ibm.com>, Alexander Graf <agraf@suse.de>, Richard Henderson <rth@twiddle.net>
 
-On 29/11/2017 13:41, Eduardo Habkost wrote:
-> On Wed, Nov 29, 2017 at 12:54:04PM +0200, Marcel Apfelbaum wrote:
->> On 29/11/2017 10:46, David Gibson wrote:
->>> The bus pointer in PCIDevice is basically redundant with QOM information.
->>> It's always initialized to the qdev_get_parent_bus(), the only difference
->>> is the type.
->>>
->>> Therefore this patch eliminates the field, instead creating a pci_get_bus()
->>> helper to do the type mangling to derive it conveniently from the QOM
->>> Device object underneath.
->>>
->>
->>
->> Hi David,
->>
->> I personally don't see why the caching of the bus bothers you.
->> It makes the code a little easier to read, but indeed is a duplication
->> of data; let's see what Michael has to say, is a matter of
->> taste I suppose.
+On Wed, 29 Nov 2017 15:06:33 +0100
+David Hildenbrand <david@redhat.com> wrote:
+
+> On 29.11.2017 14:51, Thomas Huth wrote:
+> > On 28.11.2017 21:33, David Hildenbrand wrote:  
+> >> I have quite some patches on my queue for 2.12. (booting Fedora 26/27
+> >> guests, floating interrupts, machine checks, missing instructions ...)
+> >>
+> >> So let's start slowly :) This series gets rid of program_interrupt() and
+> >> potential_page_fault(). We now always properly restore the cpu state when
+> >> injecting/delivering a program interrupt. So there is no need to update
+> >> the state via potential_page_fault() anymore.  
+> > 
+> > I think this series is basically a very good idea! But...
+> > OK, this is kind of bike-shed-painting now, but since we're currently in
+> > hard freeze anyway and got plenty of time for discussion:
+> > Something that bothers me a little bit is the name of the new function
+> > "program_interrupt_ra()" ... that would IMHO be OK if the old function
+> > "program_interrupt" would still stay, but since that is removed and the
+> > _ra function is the only generic way that is left to inject a program
+> > interrupt, could we maybe name the new function somewhat nicer right
+> > from the start? Something like "s390_program_interrupt" maybe (which is
+> > similar to tcg_s390_program_interrupt and kvm_s390_program_interrupt
+> > that we have already)?  
 > 
-> I'm all for removing duplication of data because it makes the
-> code less fragile.  We don't even take care of clearing
-> pci_dev->bus when the device is removed from the bus, so there's
-> a window between unplugging a device and actually freeing the
-> object where pci_dev->bus can become a dangling pointer.
-> 
+> Sure I can do that, other opinions?
 
-This is a good point.
-
-Reviewed-by: Marcel Apfelbaum <marcel@redhat.com>
-
-Thanks,
-Marcel
-
-> Reviewed-by: Eduardo Habkost <ehabkost@redhat.com>
-> 
+Fine with me as well.
