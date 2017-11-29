@@ -1,28 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33390)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34211)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1eJz87-00052n-N4
-	for qemu-devel@nongnu.org; Wed, 29 Nov 2017 04:58:12 -0500
+	(envelope-from <wlsaidhi@gmail.com>) id 1eJzAH-0005me-3o
+	for qemu-devel@nongnu.org; Wed, 29 Nov 2017 05:00:30 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1eJz84-0003pV-LI
-	for qemu-devel@nongnu.org; Wed, 29 Nov 2017 04:58:11 -0500
-Received: from 2.mo2.mail-out.ovh.net ([188.165.53.149]:46182)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1eJz84-0003nO-ET
-	for qemu-devel@nongnu.org; Wed, 29 Nov 2017 04:58:08 -0500
-Received: from player731.ha.ovh.net (b9.ovh.net [213.186.33.59])
-	by mo2.mail-out.ovh.net (Postfix) with ESMTP id 78D08D3FB9
-	for <qemu-devel@nongnu.org>; Wed, 29 Nov 2017 10:58:06 +0100 (CET)
-References: <20171019151249.13663-1-clg@kaod.org>
-From: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
-Message-ID: <17d7270b-9016-face-5fba-c6e321e92d88@kaod.org>
-Date: Wed, 29 Nov 2017 10:58:00 +0100
+	(envelope-from <wlsaidhi@gmail.com>) id 1eJzAB-0005Kv-28
+	for qemu-devel@nongnu.org; Wed, 29 Nov 2017 05:00:25 -0500
+Received: from mail-lf0-x22f.google.com ([2a00:1450:4010:c07::22f]:44255)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <wlsaidhi@gmail.com>) id 1eJzAA-0005KG-Qs
+	for qemu-devel@nongnu.org; Wed, 29 Nov 2017 05:00:19 -0500
+Received: by mail-lf0-x22f.google.com with SMTP id x204so3137085lfa.11
+	for <qemu-devel@nongnu.org>; Wed, 29 Nov 2017 02:00:18 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <20171019151249.13663-1-clg@kaod.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v5 0/8] aspeed: add a witherspoon-bmc
- machine
+In-Reply-To: <b36b0c95-4ddc-b818-522c-1bbec52138e8@adacore.com>
+References: <CAGC02hTe8SijuwrM0ZGg04=To0GBnPUrC23iKuc-pao65vAAUQ@mail.gmail.com>
+	<b36b0c95-4ddc-b818-522c-1bbec52138e8@adacore.com>
+From: william lin <wlsaidhi@gmail.com>
+Date: Wed, 29 Nov 2017 03:59:36 -0600
+Message-ID: <CAGC02hT7OvR1nbyD=AkOqPvxbNPz957=CPZsUxf1FJ73O8W52g@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [Bug 645662] x87 fpu emulation not accurate enough
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,80 +28,55 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: qemu-arm@nongnu.org, qemu-devel@nongnu.org, Andrew Jeffery <andrew@aj.id.au>, Joel Stanley <joel@jms.id.au>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+To: KONRAD Frederic <frederic.konrad@adacore.com>
+Cc: qemu-devel@nongnu.org
 
-On 10/19/2017 05:12 PM, C=C3=A9dric Le Goater wrote:
+Hi,
+
+The goal of the project is to fix the bug. Sorry I should have been more
+clear.
+
+This bug has been around for 7+ years now. Qemu switched to softfloat and
+it did not fix this. I think its most likely caused by Qemu's internal
+representation not being accurate enough or accuracy lost during
+conversion. However this is basically what is given to us in the bug
+report, and I have not been able to make much progress past this point, so
+we are asking for help.
+
+Will
+
+
+
+On Nov 29, 2017 3:39 AM, "KONRAD Frederic" <frederic.konrad@adacore.com>
+wrote:
+
+Hi,
+
+I have the same problem here with some of our math testsuites.
+It's about some precision issue with trigonometric tests.
+
+I didn't had time to figure out what happen neither what is
+really going wrong. eg: trigonometric function or?
+
+A quick workaround is to use KVM when possible.
+
+Fred
+
+
+On 11/29/2017 09:34 AM, william lin wrote:
+
 > Hello,
->=20
-> This series adds a new Aspeed machine to emulate the BMC of a
-> Witherspoon system. It also extends the other Aspeed machines with I2C
-> devices and adds a simple model for the pca9552 LED blinker present on
-> the witherspoon board.
->=20
+>
+> I have been looking into this bug
+> <https://bugs.launchpad.net/qemu/+bug/645662> for a school project, and
+>
+> after reproducing the bug and tracing through the code, I have run into a
+> wall trying to figure out the best way to approach this. If there is anyone
+> who is familiar with qemu's fpu and is willing, any tips or suggestions
+> will be fantastic.
+>
 > Thanks,
->=20
-> C.
->=20
-> Changes since v4:
->=20
->  - use a ROM memory region
->=20
-> Changes since v3:
->=20
->  - introduce a dummy ROM device to catch invalid writes
->  - removed 'ignore_memory_transaction_failures' on all Aspeed machines
-
-So that was a bad idea because old firwmares run load/store loops
-beyond the address space to guess how much RAM the SoC has. =20
-
-I am wondering if it is possible to model the same behavior with
-a MMIO region (of a correct size depending on the max ram size of=20
-the SoC) and mapped beyond the RAM region to catch such accesses=20
-and keep 'ignore_memory_transaction_failures' to false.=20
- =20
-Thanks,
-
-C.
-
-
->  - reworked PCA9552 device :
->    . simpler I2C handles
->    . auto-increment support
->    . unit test
->=20
-> Changes since v2:
->=20
->  - removed comments on the I2C buffer size pf the PCA9552 device.
->  - removed 'ignore_memory_transaction_failures' flag on the
->    witherspoon machine.
->   =20
-> Changes since v1:
->=20
->  - introduced smbus_eeprom_init_one()
->=20
-> C=C3=A9dric Le Goater (8):
->   aspeed: use a ROM memory region to catch invalid writes
->   aspeed: remove ignore_memory_transaction_failures all boards
->   aspeed: add support for the witherspoon-bmc board
->   aspeed: add an I2C RTC device to all machines
->   smbus: add a smbus_eeprom_init_one() routine
->   aspeed: Add EEPROM I2C devices
->   misc: add pca9552 LED blinker model
->   aspeed: add the pc9552 chips to the witherspoon machine
->=20
->  default-configs/arm-softmmu.mak |   1 +
->  hw/arm/aspeed.c                 | 110 ++++++++++++++++-
->  hw/i2c/smbus_eeprom.c           |  16 ++-
->  hw/misc/Makefile.objs           |   1 +
->  hw/misc/pca9552.c               | 259 ++++++++++++++++++++++++++++++++=
-++++++++
->  include/hw/i2c/smbus.h          |   1 +
->  include/hw/misc/pca9552.h       |  33 +++++
->  tests/Makefile.include          |   2 +
->  tests/pca9552-test.c            | 131 ++++++++++++++++++++
->  9 files changed, 544 insertions(+), 10 deletions(-)
->  create mode 100644 hw/misc/pca9552.c
->  create mode 100644 include/hw/misc/pca9552.h
->  create mode 100644 tests/pca9552-test.c
->=20
+>
+> Will & Wes
+>
+>
