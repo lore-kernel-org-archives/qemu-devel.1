@@ -1,29 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38307)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38938)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1eK1qB-0006B4-OH
-	for qemu-devel@nongnu.org; Wed, 29 Nov 2017 07:51:52 -0500
+	(envelope-from <kwolf@redhat.com>) id 1eK1tC-0007hu-Ct
+	for qemu-devel@nongnu.org; Wed, 29 Nov 2017 07:55:04 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1eK1qB-00045k-1u
-	for qemu-devel@nongnu.org; Wed, 29 Nov 2017 07:51:51 -0500
-Received: from mail-ot0-x243.google.com ([2607:f8b0:4003:c0f::243]:37687)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1eK1qA-00045W-SY
-	for qemu-devel@nongnu.org; Wed, 29 Nov 2017 07:51:50 -0500
-Received: by mail-ot0-x243.google.com with SMTP id s4so2912146ote.4
-	for <qemu-devel@nongnu.org>; Wed, 29 Nov 2017 04:51:50 -0800 (PST)
+	(envelope-from <kwolf@redhat.com>) id 1eK1tB-0000gR-M9
+	for qemu-devel@nongnu.org; Wed, 29 Nov 2017 07:54:58 -0500
+Date: Wed, 29 Nov 2017 13:54:39 +0100
+From: Kevin Wolf <kwolf@redhat.com>
+Message-ID: <20171129125439.GB3753@localhost.localdomain>
+References: <20171129102513.9153-1-pbonzini@redhat.com>
+	<20171129102513.9153-5-pbonzini@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <f79f9db0-20c0-aeee-6283-f912131dc551@adacore.com>
-References: <CAGC02hTe8SijuwrM0ZGg04=To0GBnPUrC23iKuc-pao65vAAUQ@mail.gmail.com>
-	<b36b0c95-4ddc-b818-522c-1bbec52138e8@adacore.com>
-	<CAGC02hT7OvR1nbyD=AkOqPvxbNPz957=CPZsUxf1FJ73O8W52g@mail.gmail.com>
-	<CAFEAcA8eDeKBnLW45=fPt3NeApMkvkiJzFEshvep_5qmwZKGXA@mail.gmail.com>
-	<f79f9db0-20c0-aeee-6283-f912131dc551@adacore.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Wed, 29 Nov 2017 12:51:29 +0000
-Message-ID: <CAFEAcA_0-CczAFiFnKHVZWeoez6YLB6j0ffeoA=uK556U_NTOQ@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [Bug 645662] x87 fpu emulation not accurate enough
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20171129102513.9153-5-pbonzini@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH 4/4] blockjob: reimplement
+ block_job_sleep_ns to allow cancellation
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,20 +24,44 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: KONRAD Frederic <frederic.konrad@adacore.com>
-Cc: william lin <wlsaidhi@gmail.com>, QEMU Developers <qemu-devel@nongnu.org>
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: qemu-devel@nongnu.org, famz@redhat.com, qemu-block@nongnu.org, jcody@redhat.com
 
-On 29 November 2017 at 12:47, KONRAD Frederic
-<frederic.konrad@adacore.com> wrote:
-> Maybe a little hack might work for x86 on x86 though.
-> Something like hardcoding the helper with an inline assembly
-> code?
+Am 29.11.2017 um 11:25 hat Paolo Bonzini geschrieben:
+> This reverts the effects of commit 4afeffc857 ("blockjob: do not allow
+> coroutine double entry or entry-after-completion", 2017-11-21)
+> 
+> This fixed the symptom of a bug rather than the root cause. Canceling the
+> wait on a sleeping blockjob coroutine is generally fine, we just need to
+> make it work correctly across AioContexts.  To do so, use a QEMUTimer
+> that calls block_job_enter.  Use a mutex to ensure that block_job_enter
+> synchronizes correctly with block_job_sleep_ns.
+> 
+> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+> ---
+>  blockjob.c                   | 57 +++++++++++++++++++++++++++++++++++---------
+>  include/block/blockjob.h     |  5 +++-
+>  include/block/blockjob_int.h |  4 ++--
+>  3 files changed, 52 insertions(+), 14 deletions(-)
+> 
+> diff --git a/blockjob.c b/blockjob.c
+> index 4d22b7d2fb..3fdaabbc1f 100644
+> --- a/blockjob.c
+> +++ b/blockjob.c
+> @@ -37,6 +37,26 @@
+>  #include "qemu/timer.h"
+>  #include "qapi-event.h"
+>  
+> +/* Right now, this mutex is only needed to synchronize accesses to job->busy,
+> + * especially concurrent calls to block_job_enter.
+> + */
 
-The set of people who want to emulate x86 on x86 is surely
-even smaller than the already tiny set of people who want to
-emulate x86 at all. I don't think it makes sense to add
-inline assembly hacks for that: QEMU should (as far as
-is reasonably possible) behave the same on all hosts.
+As discussed with Paolo on IRC, I'll replace the second line of this
+comment, which he had in a different place originally and became prone
+to misunderstanding now. The new version is:
 
-thanks
--- PMM
+/* Right now, this mutex is only needed to synchronize accesses to job->busy,
+ * such as concurrent calls to block_job_do_yield and block_job_enter.
+ */
+
+Kevin
