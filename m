@@ -1,38 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59170)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60438)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mdroth@linux.vnet.ibm.com>) id 1eK81A-00030r-V2
-	for qemu-devel@nongnu.org; Wed, 29 Nov 2017 14:27:38 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1eK85N-0003pg-Md
+	for qemu-devel@nongnu.org; Wed, 29 Nov 2017 14:31:58 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mdroth@linux.vnet.ibm.com>) id 1eK817-00038d-Nr
-	for qemu-devel@nongnu.org; Wed, 29 Nov 2017 14:27:36 -0500
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:50536
-	helo=mx0a-001b2d01.pphosted.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mdroth@linux.vnet.ibm.com>)
-	id 1eK817-00038S-IO
-	for qemu-devel@nongnu.org; Wed, 29 Nov 2017 14:27:33 -0500
-Received: from pps.filterd (m0098414.ppops.net [127.0.0.1])
-	by mx0b-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
-	vATJNmG2035864
-	for <qemu-devel@nongnu.org>; Wed, 29 Nov 2017 14:27:29 -0500
-Received: from e11.ny.us.ibm.com (e11.ny.us.ibm.com [129.33.205.201])
-	by mx0b-001b2d01.pphosted.com with ESMTP id 2ej1pakmhm-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Wed, 29 Nov 2017 14:27:29 -0500
-Received: from localhost
-	by e11.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
-	Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <mdroth@linux.vnet.ibm.com>;
-	Wed, 29 Nov 2017 14:27:28 -0500
-Content-Type: text/plain; charset="utf-8"
+	(envelope-from <peter.maydell@linaro.org>) id 1eK85M-0004f4-Uf
+	for qemu-devel@nongnu.org; Wed, 29 Nov 2017 14:31:57 -0500
+Received: from mail-ot0-x233.google.com ([2607:f8b0:4003:c0f::233]:33155)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1eK85M-0004eH-Pd
+	for qemu-devel@nongnu.org; Wed, 29 Nov 2017 14:31:56 -0500
+Received: by mail-ot0-x233.google.com with SMTP id h9so4055020oti.0
+	for <qemu-devel@nongnu.org>; Wed, 29 Nov 2017 11:31:56 -0800 (PST)
 MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-From: Michael Roth <mdroth@linux.vnet.ibm.com>
-In-Reply-To: <151198293377.22232.18254151781840857503@sif>
+In-Reply-To: <151198363863.31225.2834489934392805913@sif>
 References: <151198269829.22232.14116010638342203089@sif>
 	<151198293377.22232.18254151781840857503@sif>
-Date: Wed, 29 Nov 2017 13:27:18 -0600
-Message-Id: <151198363863.31225.2834489934392805913@sif>
+	<151198363863.31225.2834489934392805913@sif>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Wed, 29 Nov 2017 19:31:35 +0000
+Message-ID: <CAFEAcA-hpu=sA5ng=T4sCHXi_VH5fjQn1ffq3Y0soOf7Vi6W5w@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
 Subject: Re: [Qemu-devel] [ANNOUNCE] QEMU 2.11.0-rc3 is now available
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
@@ -42,46 +30,14 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: peter.maydell@linaro.org
+To: Michael Roth <mdroth@linux.vnet.ibm.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 
-Quoting Michael Roth (2017-11-29 13:15:33)
-> Quoting Michael Roth (2017-11-29 13:11:38)
-> > Hello,
-> > =
+On 29 November 2017 at 19:27, Michael Roth <mdroth@linux.vnet.ibm.com> wrote:
+> Sorry, the 28th was the planned date for rc3, that should be December
+> 5th for the tentative final release date unless another RC is needed.
 
-> > On behalf of the QEMU Team, I'd like to announce the availability of the
-> > fourth release candidate for the QEMU 2.11 release.  This release is me=
-ant
-> > for testing purposes and should not be used in a production environment.
-> > =
+Oops, yes, got a week out of sync in my dates there :-)
 
-> >   http://download.qemu-project.org/qemu-2.11.0-rc3.tar.xz
-> >   http://download.qemu-project.org/qemu-2.11.0-rc3.tar.xz.sig
-> > =
-
-> > You can help improve the quality of the QEMU 2.11 release by testing th=
-is
-> > release and reporting bugs on Launchpad:
-> > =
-
-> >   https://bugs.launchpad.net/qemu/
-> > =
-
-> > The release plan, as well a documented known issues for release
-> > candidates, are available at:
-> > =
-
-> >   http://wiki.qemu.org/Planning/2.11
-> =
-
-> A note from the maintainer:
-> =
-
->  Hopefully this will be the final release candidate for 2.11, so
->  testing should concentrate on the fixes that went into this rc.
->  Unless we need to fix any showstopper bugs the plan is to make the
->  final release on the 28th.
-
-Sorry, the 28th was the planned date for rc3, that should be December
-5th for the tentative final release date unless another RC is needed.
+thanks
+-- PMM
