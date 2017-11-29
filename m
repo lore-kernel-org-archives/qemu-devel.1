@@ -1,21 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58855)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58883)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1eJy0u-00022V-KJ
-	for qemu-devel@nongnu.org; Wed, 29 Nov 2017 03:46:41 -0500
+	(envelope-from <dgibson@ozlabs.org>) id 1eJy0v-00022j-Ks
+	for qemu-devel@nongnu.org; Wed, 29 Nov 2017 03:46:42 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1eJy0r-0005d1-Hx
-	for qemu-devel@nongnu.org; Wed, 29 Nov 2017 03:46:40 -0500
-Received: from ozlabs.org ([103.22.144.67]:55203)
+	(envelope-from <dgibson@ozlabs.org>) id 1eJy0u-0005ih-B9
+	for qemu-devel@nongnu.org; Wed, 29 Nov 2017 03:46:41 -0500
+Received: from ozlabs.org ([103.22.144.67]:54079)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgibson@ozlabs.org>) id 1eJy0q-0005ZF-PE
-	for qemu-devel@nongnu.org; Wed, 29 Nov 2017 03:46:37 -0500
+	(Exim 4.71) (envelope-from <dgibson@ozlabs.org>) id 1eJy0t-0005dd-O6
+	for qemu-devel@nongnu.org; Wed, 29 Nov 2017 03:46:40 -0500
 From: David Gibson <david@gibson.dropbear.id.au>
-Date: Wed, 29 Nov 2017 19:46:23 +1100
-Message-Id: <20171129084628.12336-3-david@gibson.dropbear.id.au>
+Date: Wed, 29 Nov 2017 19:46:26 +1100
+Message-Id: <20171129084628.12336-6-david@gibson.dropbear.id.au>
 In-Reply-To: <20171129084628.12336-1-david@gibson.dropbear.id.au>
 References: <20171129084628.12336-1-david@gibson.dropbear.id.au>
-Subject: [Qemu-devel] [for-2.12 2/7] pci: Move bridge data structures from
- pci_bus.h to pci_bridge.h
+Subject: [Qemu-devel] [for-2.12 5/7] pci: Add pci_dev_bus_num() helper
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,157 +26,150 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: "Michael S . Tsirkin" <mst@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, Marcel Apfelbaum <marcel@redhat.com>, Igor Mammedov <imammedo@redhat.com>
 Cc: qemu-devel@nongnu.org, David Gibson <david@gibson.dropbear.id.au>
 
-include/hw/pci/pci_bus.h contains several data structures related to PCI
-bridges that aren't needed by most users of pci_bus.h.  We already have
-a pci_bridge.h, so move them there.
+A fair proportion of the users of pci_bus_num() want to get the bus
+number on a specific device, so first have to look up the bus from the
+device then call it.  This adds a helper to do that (since we're going
+to make looking up the bus slightly more verbose).
 
 Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
 ---
- include/hw/pci-host/xilinx-pcie.h |  2 +-
- include/hw/pci/pci_bridge.h       | 48 ++++++++++++++++++++++++++++++++++++
- include/hw/pci/pci_bus.h          | 51 ++-------------------------------------
- 3 files changed, 51 insertions(+), 50 deletions(-)
+ hw/pci/pcie_aer.c           | 2 +-
+ hw/s390x/s390-pci-bus.c     | 2 +-
+ hw/scsi/megasas.c           | 2 +-
+ hw/scsi/mptsas.c            | 2 +-
+ hw/xen/xen_pt.c             | 6 +++---
+ include/hw/pci/pci.h        | 5 +++++
+ include/hw/xen/xen_common.h | 8 ++++----
+ 7 files changed, 16 insertions(+), 11 deletions(-)
 
-diff --git a/include/hw/pci-host/xilinx-pcie.h b/include/hw/pci-host/xilinx-pcie.h
-index bec66b27c5..74c04dc9bb 100644
---- a/include/hw/pci-host/xilinx-pcie.h
-+++ b/include/hw/pci-host/xilinx-pcie.h
-@@ -23,7 +23,7 @@
- #include "hw/hw.h"
- #include "hw/sysbus.h"
- #include "hw/pci/pci.h"
--#include "hw/pci/pci_bus.h"
-+#include "hw/pci/pci_bridge.h"
- #include "hw/pci/pcie_host.h"
+diff --git a/hw/pci/pcie_aer.c b/hw/pci/pcie_aer.c
+index 171955195f..7688293edc 100644
+--- a/hw/pci/pcie_aer.c
++++ b/hw/pci/pcie_aer.c
+@@ -1024,7 +1024,7 @@ static int do_pcie_aer_inject_error(Monitor *mon,
+     }
+     details->id = id;
+     details->root_bus = pci_root_bus_path(dev);
+-    details->bus = pci_bus_num(dev->bus);
++    details->bus = pci_dev_bus_num(dev);
+     details->devfn = dev->devfn;
  
- #define TYPE_XILINX_PCIE_HOST "xilinx-pcie-host"
-diff --git a/include/hw/pci/pci_bridge.h b/include/hw/pci/pci_bridge.h
-index 1acadc2c15..9b44ffd22a 100644
---- a/include/hw/pci/pci_bridge.h
-+++ b/include/hw/pci/pci_bridge.h
-@@ -27,6 +27,54 @@
- #define QEMU_PCI_BRIDGE_H
+     return 0;
+diff --git a/hw/s390x/s390-pci-bus.c b/hw/s390x/s390-pci-bus.c
+index 3a8894a36c..1aecada271 100644
+--- a/hw/s390x/s390-pci-bus.c
++++ b/hw/s390x/s390-pci-bus.c
+@@ -691,7 +691,7 @@ static void s390_pcihost_hot_plug(HotplugHandler *hotplug_dev,
+             /* In the case the PCI device does not define an id */
+             /* we generate one based on the PCI address         */
+             dev->id = g_strdup_printf("auto_%02x:%02x.%01x",
+-                                      pci_bus_num(pdev->bus),
++                                      pci_dev_bus_num(pdev),
+                                       PCI_SLOT(pdev->devfn),
+                                       PCI_FUNC(pdev->devfn));
+         }
+diff --git a/hw/scsi/megasas.c b/hw/scsi/megasas.c
+index d5eae6239a..3e38e9e8aa 100644
+--- a/hw/scsi/megasas.c
++++ b/hw/scsi/megasas.c
+@@ -2372,7 +2372,7 @@ static void megasas_scsi_realize(PCIDevice *dev, Error **errp)
+     if (!s->sas_addr) {
+         s->sas_addr = ((NAA_LOCALLY_ASSIGNED_ID << 24) |
+                        IEEE_COMPANY_LOCALLY_ASSIGNED) << 36;
+-        s->sas_addr |= (pci_bus_num(dev->bus) << 16);
++        s->sas_addr |= (pci_dev_bus_num(dev) << 16);
+         s->sas_addr |= (PCI_SLOT(dev->devfn) << 8);
+         s->sas_addr |= PCI_FUNC(dev->devfn);
+     }
+diff --git a/hw/scsi/mptsas.c b/hw/scsi/mptsas.c
+index f6db1b0103..3f061f3f68 100644
+--- a/hw/scsi/mptsas.c
++++ b/hw/scsi/mptsas.c
+@@ -1312,7 +1312,7 @@ static void mptsas_scsi_realize(PCIDevice *dev, Error **errp)
+     if (!s->sas_addr) {
+         s->sas_addr = ((NAA_LOCALLY_ASSIGNED_ID << 24) |
+                        IEEE_COMPANY_LOCALLY_ASSIGNED) << 36;
+-        s->sas_addr |= (pci_bus_num(dev->bus) << 16);
++        s->sas_addr |= (pci_dev_bus_num(dev) << 16);
+         s->sas_addr |= (PCI_SLOT(dev->devfn) << 8);
+         s->sas_addr |= PCI_FUNC(dev->devfn);
+     }
+diff --git a/hw/xen/xen_pt.c b/hw/xen/xen_pt.c
+index 9bba717708..6236f0c391 100644
+--- a/hw/xen/xen_pt.c
++++ b/hw/xen/xen_pt.c
+@@ -73,7 +73,7 @@ void xen_pt_log(const PCIDevice *d, const char *f, ...)
  
- #include "hw/pci/pci.h"
-+#include "hw/pci/pci_bus.h"
-+
-+typedef struct PCIBridgeWindows PCIBridgeWindows;
-+
-+/*
-+ * Aliases for each of the address space windows that the bridge
-+ * can forward. Mapped into the bridge's parent's address space,
-+ * as subregions.
-+ */
-+struct PCIBridgeWindows {
-+    MemoryRegion alias_pref_mem;
-+    MemoryRegion alias_mem;
-+    MemoryRegion alias_io;
-+    /*
-+     * When bridge control VGA forwarding is enabled, bridges will
-+     * provide positive decode on the PCI VGA defined I/O port and
-+     * MMIO ranges.  When enabled forwarding is only qualified on the
-+     * I/O and memory enable bits in the bridge command register.
-+     */
-+    MemoryRegion alias_vga[QEMU_PCI_VGA_NUM_REGIONS];
-+};
-+
-+#define TYPE_PCI_BRIDGE "base-pci-bridge"
-+#define PCI_BRIDGE(obj) OBJECT_CHECK(PCIBridge, (obj), TYPE_PCI_BRIDGE)
-+
-+struct PCIBridge {
-+    /*< private >*/
-+    PCIDevice parent_obj;
-+    /*< public >*/
-+
-+    /* private member */
-+    PCIBus sec_bus;
-+    /*
-+     * Memory regions for the bridge's address spaces.  These regions are not
-+     * directly added to system_memory/system_io or its descendants.
-+     * Bridge's secondary bus points to these, so that devices
-+     * under the bridge see these regions as its address spaces.
-+     * The regions are as large as the entire address space -
-+     * they don't take into account any windows.
-+     */
-+    MemoryRegion address_space_mem;
-+    MemoryRegion address_space_io;
-+
-+    PCIBridgeWindows *windows;
-+
-+    pci_map_irq_fn map_irq;
-+    const char *bus_name;
-+};
+     va_start(ap, f);
+     if (d) {
+-        fprintf(stderr, "[%02x:%02x.%d] ", pci_bus_num(d->bus),
++        fprintf(stderr, "[%02x:%02x.%d] ", pci_dev_bus_num(d),
+                 PCI_SLOT(d->devfn), PCI_FUNC(d->devfn));
+     }
+     vfprintf(stderr, f, ap);
+@@ -711,7 +711,7 @@ static void xen_pt_destroy(PCIDevice *d) {
+         intx = xen_pt_pci_intx(s);
+         rc = xc_domain_unbind_pt_irq(xen_xc, xen_domid, machine_irq,
+                                      PT_IRQ_TYPE_PCI,
+-                                     pci_bus_num(d->bus),
++                                     pci_dev_bus_num(d),
+                                      PCI_SLOT(s->dev.devfn),
+                                      intx,
+                                      0 /* isa_irq */);
+@@ -867,7 +867,7 @@ static void xen_pt_realize(PCIDevice *d, Error **errp)
+         uint8_t e_intx = xen_pt_pci_intx(s);
  
- #define PCI_BRIDGE_DEV_PROP_CHASSIS_NR "chassis_nr"
- #define PCI_BRIDGE_DEV_PROP_MSI        "msi"
-diff --git a/include/hw/pci/pci_bus.h b/include/hw/pci/pci_bus.h
-index bc34fd0017..b7da8f555b 100644
---- a/include/hw/pci/pci_bus.h
-+++ b/include/hw/pci/pci_bus.h
-@@ -2,10 +2,10 @@
- #define QEMU_PCI_BUS_H
+         rc = xc_domain_bind_pt_pci_irq(xen_xc, xen_domid, machine_irq,
+-                                       pci_bus_num(d->bus),
++                                       pci_dev_bus_num(d),
+                                        PCI_SLOT(d->devfn),
+                                        e_intx);
+         if (rc < 0) {
+diff --git a/include/hw/pci/pci.h b/include/hw/pci/pci.h
+index cbb3386207..a490a2c7d4 100644
+--- a/include/hw/pci/pci.h
++++ b/include/hw/pci/pci.h
+@@ -488,6 +488,11 @@ PCIDevice *pci_nic_init_nofail(NICInfo *nd, PCIBus *rootbus,
+ PCIDevice *pci_vga_init(PCIBus *bus);
  
- /*
-- * PCI Bus and Bridge datastructures.
-+ * PCI Bus datastructures.
-  *
-  * Do not access the following members directly;
-- * use accessor functions in pci.h, pci_bridge.h
-+ * use accessor functions in pci.h
-  */
+ int pci_bus_num(PCIBus *s);
++static inline int pci_dev_bus_num(const PCIDevice *dev)
++{
++    return pci_bus_num(dev->bus);
++}
++
+ int pci_bus_numa_node(PCIBus *bus);
+ void pci_for_each_device(PCIBus *bus, int bus_num,
+                          void (*fn)(PCIBus *bus, PCIDevice *d, void *opaque),
+diff --git a/include/hw/xen/xen_common.h b/include/hw/xen/xen_common.h
+index 86c7f26106..64a978e4e0 100644
+--- a/include/hw/xen/xen_common.h
++++ b/include/hw/xen/xen_common.h
+@@ -542,10 +542,10 @@ static inline void xen_map_pcidev(domid_t dom,
+         return;
+     }
  
- typedef struct PCIBusClass {
-@@ -44,51 +44,4 @@ struct PCIBus {
-     Notifier machine_done;
- };
+-    trace_xen_map_pcidev(ioservid, pci_bus_num(pci_dev->bus),
++    trace_xen_map_pcidev(ioservid, pci_dev_bus_num(pci_dev),
+                          PCI_SLOT(pci_dev->devfn), PCI_FUNC(pci_dev->devfn));
+     xendevicemodel_map_pcidev_to_ioreq_server(xen_dmod, dom, ioservid, 0,
+-                                              pci_bus_num(pci_dev->bus),
++                                              pci_dev_bus_num(pci_dev),
+                                               PCI_SLOT(pci_dev->devfn),
+                                               PCI_FUNC(pci_dev->devfn));
+ }
+@@ -558,10 +558,10 @@ static inline void xen_unmap_pcidev(domid_t dom,
+         return;
+     }
  
--typedef struct PCIBridgeWindows PCIBridgeWindows;
--
--/*
-- * Aliases for each of the address space windows that the bridge
-- * can forward. Mapped into the bridge's parent's address space,
-- * as subregions.
-- */
--struct PCIBridgeWindows {
--    MemoryRegion alias_pref_mem;
--    MemoryRegion alias_mem;
--    MemoryRegion alias_io;
--    /*
--     * When bridge control VGA forwarding is enabled, bridges will
--     * provide positive decode on the PCI VGA defined I/O port and
--     * MMIO ranges.  When enabled forwarding is only qualified on the
--     * I/O and memory enable bits in the bridge command register.
--     */
--    MemoryRegion alias_vga[QEMU_PCI_VGA_NUM_REGIONS];
--};
--
--#define TYPE_PCI_BRIDGE "base-pci-bridge"
--#define PCI_BRIDGE(obj) OBJECT_CHECK(PCIBridge, (obj), TYPE_PCI_BRIDGE)
--
--struct PCIBridge {
--    /*< private >*/
--    PCIDevice parent_obj;
--    /*< public >*/
--
--    /* private member */
--    PCIBus sec_bus;
--    /*
--     * Memory regions for the bridge's address spaces.  These regions are not
--     * directly added to system_memory/system_io or its descendants.
--     * Bridge's secondary bus points to these, so that devices
--     * under the bridge see these regions as its address spaces.
--     * The regions are as large as the entire address space -
--     * they don't take into account any windows.
--     */
--    MemoryRegion address_space_mem;
--    MemoryRegion address_space_io;
--
--    PCIBridgeWindows *windows;
--
--    pci_map_irq_fn map_irq;
--    const char *bus_name;
--};
--
- #endif /* QEMU_PCI_BUS_H */
+-    trace_xen_unmap_pcidev(ioservid, pci_bus_num(pci_dev->bus),
++    trace_xen_unmap_pcidev(ioservid, pci_dev_bus_num(pci_dev),
+                            PCI_SLOT(pci_dev->devfn), PCI_FUNC(pci_dev->devfn));
+     xendevicemodel_unmap_pcidev_from_ioreq_server(xen_dmod, dom, ioservid, 0,
+-                                                  pci_bus_num(pci_dev->bus),
++                                                  pci_dev_bus_num(pci_dev),
+                                                   PCI_SLOT(pci_dev->devfn),
+                                                   PCI_FUNC(pci_dev->devfn));
+ }
 -- 
 2.14.3
