@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54319)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54383)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1eK4G6-00024F-QY
-	for qemu-devel@nongnu.org; Wed, 29 Nov 2017 10:26:52 -0500
+	(envelope-from <kwolf@redhat.com>) id 1eK4GA-0002P5-Tr
+	for qemu-devel@nongnu.org; Wed, 29 Nov 2017 10:26:53 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1eK4G5-0007W7-Uf
-	for qemu-devel@nongnu.org; Wed, 29 Nov 2017 10:26:46 -0500
+	(envelope-from <kwolf@redhat.com>) id 1eK4G9-0007Xi-Te
+	for qemu-devel@nongnu.org; Wed, 29 Nov 2017 10:26:50 -0500
 From: Kevin Wolf <kwolf@redhat.com>
-Date: Wed, 29 Nov 2017 16:26:23 +0100
-Message-Id: <20171129152628.14906-6-kwolf@redhat.com>
+Date: Wed, 29 Nov 2017 16:26:24 +0100
+Message-Id: <20171129152628.14906-7-kwolf@redhat.com>
 In-Reply-To: <20171129152628.14906-1-kwolf@redhat.com>
 References: <20171129152628.14906-1-kwolf@redhat.com>
-Subject: [Qemu-devel] [PULL 05/10] blockjob: Remove the job from the list
- earlier in block_job_unref()
+Subject: [Qemu-devel] [PULL 06/10] block: Expect graph changes in
+ bdrv_parent_drained_begin/end
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,41 +23,52 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org
 Cc: kwolf@redhat.com, mreitz@redhat.com, peter.maydell@linaro.org, qemu-devel@nongnu.org
 
-From: Alberto Garcia <berto@igalia.com>
+The .drained_begin/end callbacks can (directly or indirectly via
+aio_poll()) cause block nodes to be removed or the current BdrvChild to
+point to a different child node.
 
-When destroying a block job in block_job_unref() we should remove it
-from the job list before calling block_job_remove_all_bdrv().
+Use QLIST_FOREACH_SAFE() to make sure we don't access invalid
+BlockDriverStates or accidentally continue iterating the parents of the
+new child node instead of the node we actually came from.
 
-This is because removing the BDSs can trigger an aio_poll() and wake
-up other jobs that might attempt to use the block job list. If that
-happens the job we're currently destroying should not be in that list
-anymore.
-
-Signed-off-by: Alberto Garcia <berto@igalia.com>
+Signed-off-by: Kevin Wolf <kwolf@redhat.com>
+Tested-by: Jeff Cody <jcody@redhat.com>
+Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
+Reviewed-by: Jeff Cody <jcody@redhat.com>
+Reviewed-by: Alberto Garcia <berto@igalia.com>
+Reviewed-by: Fam Zheng <famz@redhat.com>
 Signed-off-by: Kevin Wolf <kwolf@redhat.com>
 ---
- blockjob.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ block/io.c | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
 
-diff --git a/blockjob.c b/blockjob.c
-index ff9a614531..2f0cc1528b 100644
---- a/blockjob.c
-+++ b/blockjob.c
-@@ -152,6 +152,7 @@ void block_job_unref(BlockJob *job)
+diff --git a/block/io.c b/block/io.c
+index 4fdf93a014..6773926fc1 100644
+--- a/block/io.c
++++ b/block/io.c
+@@ -42,9 +42,9 @@ static int coroutine_fn bdrv_co_do_pwrite_zeroes(BlockDriverState *bs,
+ 
+ void bdrv_parent_drained_begin(BlockDriverState *bs)
  {
-     if (--job->refcnt == 0) {
-         BlockDriverState *bs = blk_bs(job->blk);
-+        QLIST_REMOVE(job, job_list);
-         bs->job = NULL;
-         block_job_remove_all_bdrv(job);
-         blk_remove_aio_context_notifier(job->blk,
-@@ -160,7 +161,6 @@ void block_job_unref(BlockJob *job)
-         blk_unref(job->blk);
-         error_free(job->blocker);
-         g_free(job->id);
--        QLIST_REMOVE(job, job_list);
-         g_free(job);
-     }
- }
+-    BdrvChild *c;
++    BdrvChild *c, *next;
+ 
+-    QLIST_FOREACH(c, &bs->parents, next_parent) {
++    QLIST_FOREACH_SAFE(c, &bs->parents, next_parent, next) {
+         if (c->role->drained_begin) {
+             c->role->drained_begin(c);
+         }
+@@ -53,9 +53,9 @@ void bdrv_parent_drained_begin(BlockDriverState *bs)
+ 
+ void bdrv_parent_drained_end(BlockDriverState *bs)
+ {
+-    BdrvChild *c;
++    BdrvChild *c, *next;
+ 
+-    QLIST_FOREACH(c, &bs->parents, next_parent) {
++    QLIST_FOREACH_SAFE(c, &bs->parents, next_parent, next) {
+         if (c->role->drained_end) {
+             c->role->drained_end(c);
+         }
 -- 
 2.13.6
