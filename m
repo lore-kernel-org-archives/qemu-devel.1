@@ -1,34 +1,15 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42229)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43654)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jianfeng.tan@intel.com>) id 1eJzUd-0005CW-FG
-	for qemu-devel@nongnu.org; Wed, 29 Nov 2017 05:21:28 -0500
+	(envelope-from <pbonzini@redhat.com>) id 1eJzYV-0006vw-3i
+	for qemu-devel@nongnu.org; Wed, 29 Nov 2017 05:25:28 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jianfeng.tan@intel.com>) id 1eJzUY-0002lj-Jj
-	for qemu-devel@nongnu.org; Wed, 29 Nov 2017 05:21:27 -0500
-Received: from mga01.intel.com ([192.55.52.88]:15563)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <jianfeng.tan@intel.com>)
-	id 1eJzUY-0002kv-9i
-	for qemu-devel@nongnu.org; Wed, 29 Nov 2017 05:21:22 -0500
-References: <1511859789-43680-1-git-send-email-arei.gonglei@huawei.com>
-	<1511859789-43680-4-git-send-email-arei.gonglei@huawei.com>
-	<6635d6fc-b924-b558-0fff-120a55ef81e9@redhat.com>
-	<33183CC9F5247A488A2544077AF19020DA4A7DC2@DGGEMA505-MBS.china.huawei.com>
-	<b98e2b09-35e7-47c2-b49f-982a09804b4f@redhat.com>
-	<33183CC9F5247A488A2544077AF19020DA4A7E32@DGGEMA505-MBS.china.huawei.com>
-	<3f0ed9b0-ff77-bb0f-c868-609abf0826b2@redhat.com>
-	<33183CC9F5247A488A2544077AF19020DA4A8D54@DGGEMA505-MBS.china.huawei.com>
-	<20171129060910-mutt-send-email-mst@kernel.org>
-	<f06f4d8c-9dfb-1ce2-e3a8-d298573377f7@redhat.com>
-From: "Tan, Jianfeng" <jianfeng.tan@intel.com>
-Message-ID: <d43f0189-41ae-3573-38ea-f13452d7d5f3@intel.com>
-Date: Wed, 29 Nov 2017 18:21:17 +0800
-MIME-Version: 1.0
-In-Reply-To: <f06f4d8c-9dfb-1ce2-e3a8-d298573377f7@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 3/4] cryptodev-vhost-user: add crypto
- session handler
+	(envelope-from <pbonzini@redhat.com>) id 1eJzYU-000533-1I
+	for qemu-devel@nongnu.org; Wed, 29 Nov 2017 05:25:26 -0500
+From: Paolo Bonzini <pbonzini@redhat.com>
+Date: Wed, 29 Nov 2017 11:25:09 +0100
+Message-Id: <20171129102513.9153-1-pbonzini@redhat.com>
+Subject: [Qemu-devel] [PATCH 0/4] blockjob: reinstate busy=false/busy=true
+ in block_job_sleep_ns
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,36 +18,39 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, "Gonglei (Arei)" <arei.gonglei@huawei.com>
-Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "Huangweidong (C)" <weidong.huang@huawei.com>, "stefanha@redhat.com" <stefanha@redhat.com>, "Zhoujian (jay)" <jianjay.zhou@huawei.com>, "pasic@linux.vnet.ibm.com" <pasic@linux.vnet.ibm.com>, longpeng <longpeng2@huawei.com>, "xin.zeng@intel.com" <xin.zeng@intel.com>, "roy.fan.zhang@intel.com" <roy.fan.zhang@intel.com>
+To: qemu-devel@nongnu.org
+Cc: famz@redhat.com, qemu-block@nongnu.org, kwolf@redhat.com, jcody@redhat.com
 
+In order to avoid reentering a scheduled coroutine this series uses
+a QEMUTimer outside co_aio_sleep_ns.  The timer callback just calls
+block_job_enter, and can be easily cancelled with timer_del.
 
+This fixes the outstanding issues with block jobs, without reverting
+the new checks that Jeff added.
 
-On 11/29/2017 5:11 PM, Paolo Bonzini wrote:
-> On 29/11/2017 05:10, Michael S. Tsirkin wrote:
->>> " Interrupt mode for vhost-user is still not supported in current
->>> implementation. But we are evaluating the necessity now.
->> That's more or less a spec violation. Guest must get interrupts
->> if it does not disable them. And it must notify host
->> if host does not disable notifications.
+I have not run the full qemu-iotests suite, but the main affected
+tests (030, 041, 055, 097, 176, 200) work fine.
 
-By that, I mean the transmission from virtio to vhost, if virtio is not 
-actively sending packets, at vhost side, we can stop polling from that 
-vhost port (i.e., virtio); if VM wants to send packets, besides putting 
-packets on virtqueue, it also kicks the backend through pio/mmio.
+Paolo
 
-So no need to modify spec.
+Kevin Wolf (1):
+  block: Expect graph changes in bdrv_parent_drained_begin/end
 
-> I understood that as "the vhost-user server is always using poll mode
-> for the virtqueues" and cannot use e.g. ioeventfds.
+Paolo Bonzini (3):
+  blockjob: remove clock argument from block_job_sleep_ns
+  blockjob: introduce block_job_do_yield
+  blockjob: reimplement block_job_sleep_ns to allow cancellation
 
-We can change to work like this: stop polling, and wait for the eventfd, 
-and then get back to polling.
+ block/backup.c               |  4 +--
+ block/commit.c               |  2 +-
+ block/io.c                   |  8 ++---
+ block/mirror.c               |  6 ++--
+ block/stream.c               |  2 +-
+ blockjob.c                   | 76 ++++++++++++++++++++++++++++++++++----------
+ include/block/blockjob.h     |  5 ++-
+ include/block/blockjob_int.h |  7 ++--
+ tests/test-blockjob-txn.c    |  2 +-
+ 9 files changed, 79 insertions(+), 33 deletions(-)
 
-Thanks,
-Jianfeng
-
->
-> Thanks,
->
-> Paolo
+-- 
+2.14.3
