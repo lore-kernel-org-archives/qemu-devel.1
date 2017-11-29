@@ -1,40 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46496)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52030)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bharata@linux.vnet.ibm.com>) id 1eJu9W-0003FS-Vb
-	for qemu-devel@nongnu.org; Tue, 28 Nov 2017 23:39:20 -0500
+	(envelope-from <rkagan@virtuozzo.com>) id 1eJuQG-0007IW-Ag
+	for qemu-devel@nongnu.org; Tue, 28 Nov 2017 23:56:37 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bharata@linux.vnet.ibm.com>) id 1eJu9U-0000i3-V4
-	for qemu-devel@nongnu.org; Tue, 28 Nov 2017 23:39:19 -0500
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:48272
-	helo=mx0a-001b2d01.pphosted.com)
+	(envelope-from <rkagan@virtuozzo.com>) id 1eJuQB-0001ti-GM
+	for qemu-devel@nongnu.org; Tue, 28 Nov 2017 23:56:36 -0500
+Received: from mail-eopbgr10091.outbound.protection.outlook.com
+	([40.107.1.91]:13599
+	helo=EUR02-HE1-obe.outbound.protection.outlook.com)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <bharata@linux.vnet.ibm.com>)
-	id 1eJu9U-0000hy-OU
-	for qemu-devel@nongnu.org; Tue, 28 Nov 2017 23:39:16 -0500
-Received: from pps.filterd (m0098421.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
-	vAT4d7um083182
-	for <qemu-devel@nongnu.org>; Tue, 28 Nov 2017 23:39:13 -0500
-Received: from e06smtp10.uk.ibm.com (e06smtp10.uk.ibm.com [195.75.94.106])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2ehn3nj647-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Tue, 28 Nov 2017 23:39:13 -0500
-Received: from localhost
-	by e06smtp10.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
-	Only! Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <bharata@linux.vnet.ibm.com>;
-	Wed, 29 Nov 2017 04:39:11 -0000
-Date: Wed, 29 Nov 2017 10:09:04 +0530
-From: Bharata B Rao <bharata@linux.vnet.ibm.com>
-Reply-To: bharata@linux.vnet.ibm.com
-References: <20171128174310.15700-1-lvivier@redhat.com>
-	<1511913509.2513.2.camel@gmail.com>
+	(Exim 4.71) (envelope-from <rkagan@virtuozzo.com>)
+	id 1eJuQA-0001ss-Qe
+	for qemu-devel@nongnu.org; Tue, 28 Nov 2017 23:56:31 -0500
+Date: Wed, 29 Nov 2017 07:56:22 +0300
+From: Roman Kagan <rkagan@virtuozzo.com>
+Message-ID: <20171129045621.GA2374@rkaganip.lan>
+References: <1511530010-511740-1-git-send-email-dplotnikov@virtuozzo.com>
+	<20171128205345-mutt-send-email-mst@kernel.org>
+	<5837b412-d377-e7ac-9127-4990f8095a99@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <1511913509.2513.2.camel@gmail.com>
-Message-Id: <20171129043904.GA8600@in.ibm.com>
-Subject: Re: [Qemu-devel] [Qemu-ppc] [PATCH v2] pseries: fix TCG migration
+In-Reply-To: <5837b412-d377-e7ac-9127-4990f8095a99@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH] i386: turn off l3-cache property by default
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -43,44 +31,45 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Suraj Jitindar Singh <sjitindarsingh@gmail.com>
-Cc: Laurent Vivier <lvivier@redhat.com>, qemu-devel@nongnu.org, Daniel Henrique Barboza <danielhb@linux.vnet.ibm.com>, qemu-ppc@nongnu.org, David Gibson <david@gibson.dropbear.id.au>
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: "Michael S. Tsirkin" <mst@redhat.com>, Denis Plotnikov <dplotnikov@virtuozzo.com>, rth@twiddle.net, ehabkost@redhat.com, den@virtuozzo.com, qemu-devel@nongnu.org
 
-On Wed, Nov 29, 2017 at 10:58:29AM +1100, Suraj Jitindar Singh wrote:
-> On Tue, 2017-11-28 at 18:43 +0100, Laurent Vivier wrote:
-> > Migration of pseries is broken with TCG because
-> > QEMU tries to restore KVM MMU state unconditionally.
-> > 
-> > The result is a SIGSEGV in kvm_vm_ioctl():
-> > 
-> >   #0  kvm_vm_ioctl (s=0x0, type=-2146390353)
-> >       at qemu/accel/kvm/kvm-all.c:2032
-> >   #1  0x00000001003e3e2c in kvmppc_configure_v3_mmu (cpu=<optimized
-> > out>,
-> >       radix=<optimized out>, gtse=<optimized out>,
-> > proc_tbl=<optimized out>)
-> >       at qemu/target/ppc/kvm.c:396
-> >   #2  0x00000001002f8b88 in spapr_post_load (opaque=0x1019103c0,
-> >       version_id=<optimized out>) at qemu/hw/ppc/spapr.c:1578
-> >   #3  0x000000010059e4cc in vmstate_load_state (f=0x106230000,
-> >       vmsd=0x1009479e0 <vmstate_spapr>, opaque=0x1019103c0,
-> >       version_id=<optimized out>) at qemu/migration/vmstate.c:165
-> >   #4  0x00000001005987e0 in vmstate_load (f=<optimized out>,
-> > se=<optimized out>)
-> >       at qemu/migration/savevm.c:748
-> > 
-> > This patch fixes the problem by not calling the KVM function with the
-> > TCG mode.
-> > 
-> > Fixes: d39c90f5f3 ("spapr: Fix migration of Radix guests")
-> > Signed-off-by: Laurent Vivier <lvivier@redhat.com>
+On Tue, Nov 28, 2017 at 08:50:54PM +0100, Paolo Bonzini wrote:
+> On 28/11/2017 19:54, Michael S. Tsirkin wrote:
+> >> Now there's a downside: with L3 cache the Linux scheduler is more eager
+> >> to wake up tasks on sibling CPUs, resulting in unnecessary cross-vCPU
+> >> interactions and therefore exessive halts and IPIs.  E.g. "perf bench
+> >> sched pipe -i 100000" gives
+> >>
+> >> l3-cache	#res IPI /s	#HLT /s		#time /100000 loops
+> >> off		200 (no K)	230		0.2 sec
+> >> on		400K		330K		0.5 sec
+> >>
+> >> In a more realistic test, we observe 15% degradation in VM density
+> >> (measured as the number of VMs, each running Drupal CMS serving 2 http
+> >> requests per second to its main page, with 95%-percentile response
+> >> latency under 100 ms) with l3-cache=on.
+> >>
+> >> We think that mostly-idle scenario is more common in cloud and personal
+> >> usage, and should be optimized for by default; users of highly loaded
+> >> VMs should be able to tune them up themselves.
 > 
-> Ah, guess I never hit this because I never tested tcg migration with a
-> qemu compiled on a kvm enabled system. Nice catch :)
+> Hi Denis,
+> 
+> thanks for the report.  I think there are two cases:
+> 
+> 1) The dedicated pCPU case: do you still get the performance degradation
+> with dedicated pCPUs?
 
-Same here. In fact I had the kvm_enabled() check in the initial verions
-but removed later as kvmppc_configure_v3_mmu() was defined separately
-as nop for !CONFIG_KVM. But obviously the above combination wasn't covered.
+I wonder why dedicated pCPU would matter at all?  The behavior change is
+in the guest scheduler.
 
-Regards,
-Bharata.
+> 2) The non-dedicated pCPU case: do you still get the performance
+> degradation with threads=1?  If not, why do you have sibling vCPUs at
+> all, if you don't have a dedicated physical CPU for each vCPU?
+
+We have sibling vCPUs in terms of cores, not threads.  I.e. the
+configuration in the test was sockets=1,cores=8,threads=1.  Are you
+suggesting that it shouldn't be used without pCPU binding?
+
+Roman.
