@@ -1,32 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38073)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43588)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1eK0Lm-0001xK-9k
-	for qemu-devel@nongnu.org; Wed, 29 Nov 2017 06:16:23 -0500
+	(envelope-from <bounces@canonical.com>) id 1eK0Yb-0005yL-Bq
+	for qemu-devel@nongnu.org; Wed, 29 Nov 2017 06:29:38 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1eK0Lh-00061J-9Q
-	for qemu-devel@nongnu.org; Wed, 29 Nov 2017 06:16:22 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:41980)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <cohuck@redhat.com>) id 1eK0Lg-00060O-Vd
-	for qemu-devel@nongnu.org; Wed, 29 Nov 2017 06:16:17 -0500
-Date: Wed, 29 Nov 2017 12:16:09 +0100
-From: Cornelia Huck <cohuck@redhat.com>
-Message-ID: <20171129121609.61a03d36.cohuck@redhat.com>
-In-Reply-To: <nycvar.YSQ.7.76.1711291445390.12405@wniryva>
-References: <20171124183446.7308-1-ppandit@redhat.com>
-	<20171124183446.7308-2-ppandit@redhat.com>
-	<20171127111532.GI16527@stefanha-x1.localdomain>
-	<nycvar.YSQ.7.76.1711272251290.24944@wniryva>
-	<20171128101154.64b49cb0.cohuck@redhat.com>
-	<20171128103757.GD17146@stefanha-x1.localdomain>
-	<nycvar.YSQ.7.76.1711281653440.1581@wniryva>
-	<20171128130012.1466d231.cohuck@redhat.com>
-	<nycvar.YSQ.7.76.1711291445390.12405@wniryva>
+	(envelope-from <bounces@canonical.com>) id 1eK0YY-0006Us-5H
+	for qemu-devel@nongnu.org; Wed, 29 Nov 2017 06:29:37 -0500
+Received: from indium.canonical.com ([91.189.90.7]:40976)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1eK0YX-0006U4-Uj
+	for qemu-devel@nongnu.org; Wed, 29 Nov 2017 06:29:34 -0500
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1eK0YW-0001dh-74
+	for <qemu-devel@nongnu.org>; Wed, 29 Nov 2017 11:29:32 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 32ED12E80CC
+	for <qemu-devel@nongnu.org>; Wed, 29 Nov 2017 11:29:32 +0000 (UTC)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v3 1/2] virtio: check VirtQueue Vring
- object is set
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Wed, 29 Nov 2017 11:19:47 -0000
+From: Peter Maydell <peter.maydell@linaro.org>
+Reply-To: Bug 645662 <645662@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <20100923002702.20683.97345.malonedeb@soybean.canonical.com>
+Message-Id: <151195438769.20240.298943476282304594.malone@chaenomeles.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 645662] Re: Python 3.1.2 math errors with Qemu
+ 0.12.5
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,112 +37,89 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: P J P <ppandit@redhat.com>
-Cc: Stefan Hajnoczi <stefanha@redhat.com>, Qemu Developers <qemu-devel@nongnu.org>, zhangboxian <zhangboxian@huawei.com>, Paolo Bonzini <pbonzini@redhat.com>
+To: qemu-devel@nongnu.org
 
-On Wed, 29 Nov 2017 15:41:45 +0530 (IST)
-P J P <ppandit@redhat.com> wrote:
+softfloat deals with doing the basic IEEE ops (add, subtract, multiply,
+etc) at the correct 80 bit precision, but it doesn't provide
+implementations of the x87's more complex operations (sin, cos, log,
+etc), so QEMU is still doing those by converting from 80 bit to host
+double and using the host C math library routines. Fixing this would
+require writing hand-coded routines for all these operations, which is
+quite a tricky bit of work. (Sadly we can't just use the bochs
+implementations, because they're under the softfloat2b license which
+isn't GPL2 compatible.)
 
->   Hello Cornelia,
-> 
-> +-- On Tue, 28 Nov 2017, Cornelia Huck wrote --+
-> | What is "unfit for use"?
-> 
-> Unfit for use because we see checks like
-> 
->   if (!virtio_queue_get_num(vdev, n)) {
->             continue;
->   ...
->   if (!vdev->vq[n].vring.num) {
->       return;
-> 
-> 'virtio_queue_set_rings' sets 'vring.desc' as
-> 
->   vdev->vq[n].vring.desc = desc;
-> 
-> and calls virtio_init_region_cache(vdev, n);
-> which returns if vq->vring.desc is zero(0).
-> 
->   addr = vq->vring.desc;
->   if (!addr) {
->       return;
->   }
-> 
-> Same in virtio_queue_set_addr() -> virtio_queue_update_rings().
-> 
-> It seems that for 'vq' instance to be useful, vring.num, vring.desc etc. 
-> fields need to be set properly. Unless an unused/free 'vq' is being accessed 
-> to set these fields.
 
-I think the basic problem is still that you conflate two things:
-- vring.num, which cannot be flipped between 0 and !0 by the guest
-- vring.{desc,avail,used}, which can
+** Changed in: qemu
+       Status: Triaged =3D> Confirmed
 
-IOW, if vring.num == 0, the guest cannot manipulate the queue; if
-vring.desc == 0, the guest can. 
+** Summary changed:
 
-> 
-> | I'm not quite sure what you want to achieve with this patch. I assume
-> | you want to fix the issue that a guest may provide invalid values for
-> | align etc. which can cause qemu to crash or behave badly.
-> 
-> True. In the process I'm trying to figure out if a usable 'vq' instance could 
-> be decided in once place, than having repeating checks, if possible.
-> 
-> Ex. 'virtio_queue_update_rings' is called as
-> 
-> virtio_queue_set_addr
->  -> virtio_queue_update_rings  
-> 
-> virtio_queue_set_align
->  -> virtio_queue_update_rings  
-> 
-> virtio_load
->  for (i = 0; i < num; i++) {
->    if (vdev->vq[i].vring.desc) {
->    ...
->      virtio_queue_update_rings
-> 
-> Of these, virtio_load checks that 'vring.desc' is non-zero(0). Current 
-> patch adds couple checks to the other two callers above. And again,
-> 
-> virtio_queue_update_rings would check
-> 
->     if (!vring->num || !vring->desc || !vring->align) {
->        /* not yet setup -> nothing to do */
->        return;
->     }
+- Python 3.1.2 math errors with Qemu 0.12.5
++ QEMU x87 emulation of trig and other complex ops is only at 64-bit precis=
+ion, not 80-bit
 
-vring.num and vring.desc are really different things. You don't want
-the guest to do anything with the queue if vring.num == 0, while you
-just want to skip various processing if vring.desc == 0.
+-- =
 
-(virtio_load() does not need to care about vring.num, as it is not
-triggered by the guest.)
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/645662
 
-> 
-> | If so, you need to do different things for the different points above.
-> | - The guest should not muck around with a non-existing queue (num == 0)
-> |   in any case, so this should be fenced for any manipulation triggered
-> |   by the guest.
-> 
-> I guess done by !virtio_queue_get_num() check above?
+Title:
+  QEMU x87 emulation of trig and other complex ops is only at 64-bit
+  precision, not 80-bit
 
-Yes.
+Status in QEMU:
+  Confirmed
 
-> 
-> | - Processing a non-setup queue (desc == 0; also applies to the other
-> |   buffers for virtio-1) should be skipped. However, _setting_ desc etc.
-> |   to 0 from the guest is fine (as long as it follows the other
-> |   constraints of the spec).
-> 
-> Okay. Though its non-zero(0) value is preferred?
+Bug description:
+  When doing the regression tests for Python 3.1.2 with Qemu 0.12.5, (Linux=
+ version 2.6.26-2-686 (Debian 2.6.26-25lenny1)),
+  gcc (Debian 4.3.2-1.1) 4.3.2, Python compiled from sources within qemu,
+  3 math tests fail, apparently because the floating point unit is buggy. Q=
+meu was compiled from original sources
+  on Debian Lenny with kernel  2.6.34.6 from kernel.org, gcc  (Debian 4.3.2=
+-1.1) 4.3. =
 
-Many functions have a likely/unlikely check, setup routines excepted.
 
-> 
-> | - Setting alignment to 0 only applies to legacy + virtio-mmio. I would
-> |   not overengineer fencing this. A simple check in update_rings should
-> |   be enough.
-> 
-> Okay.x
+  Regression testing errors:
+
+  test_cmath
+  test test_cmath failed -- Traceback (most recent call last):
+    File "/root/tools/python3/Python-3.1.2/Lib/test/test_cmath.py", line 36=
+4, in
+      self.fail(error_message)
+  AssertionError: acos0034: acos(complex(-1.0000000000000002, 0.0))
+  Expected: complex(3.141592653589793, -2.1073424255447014e-08)
+  Received: complex(3.141592653589793, -2.1073424338879928e-08)
+  Received value insufficiently close to expected value.
+
+  =
+
+  test_float
+  test test_float failed -- Traceback (most recent call last):
+    File "/root/tools/python3/Python-3.1.2/Lib/test/test_float.py", line 47=
+9, in
+      self.assertEqual(s, repr(float(s)))
+  AssertionError: '8.72293771110361e+25' !=3D '8.722937711103609e+25'
+
+  =
+
+  test_math
+  test test_math failed -- multiple errors occurred; run in verbose mode fo=
+r deta
+
+  =3D>
+
+  runtests.sh -v test_math
+
+  le01:~/tools/python3/Python-3.1.2# ./runtests.sh -v test_math
+  test_math BAD
+   1 BAD
+   0 GOOD
+   0 SKIPPED
+   1 total
+  le01:~/tools/python3/Python-3.1.2#
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/645662/+subscriptions
