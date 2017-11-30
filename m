@@ -1,22 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59797)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33284)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1eKM4S-0005sE-H4
-	for qemu-devel@nongnu.org; Thu, 30 Nov 2017 05:27:57 -0500
+	(envelope-from <kwolf@redhat.com>) id 1eKM8I-0000IH-9b
+	for qemu-devel@nongnu.org; Thu, 30 Nov 2017 05:31:55 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1eKM4R-0004CT-CK
-	for qemu-devel@nongnu.org; Thu, 30 Nov 2017 05:27:56 -0500
-References: <20171012185916.22776-1-eblake@redhat.com>
-	<20171012185916.22776-13-eblake@redhat.com>
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Message-ID: <fd6ad85b-ea0c-0941-4402-4b8306a87533@virtuozzo.com>
-Date: Thu, 30 Nov 2017 13:27:42 +0300
+	(envelope-from <kwolf@redhat.com>) id 1eKM8H-00009U-Bp
+	for qemu-devel@nongnu.org; Thu, 30 Nov 2017 05:31:54 -0500
+Date: Thu, 30 Nov 2017 11:31:35 +0100
+From: Kevin Wolf <kwolf@redhat.com>
+Message-ID: <20171130103135.GA4039@localhost.localdomain>
+References: <20171129144956.11409-1-famz@redhat.com>
+	<20171129172546.GG3753@localhost.localdomain>
+	<20171130020359.GB16237@lemon>
 MIME-Version: 1.0
-In-Reply-To: <20171012185916.22776-13-eblake@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
-Content-Language: en-US
-Subject: Re: [Qemu-devel] [PATCH v4 12/20] qed: Switch to
- .bdrv_co_block_status()
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20171130020359.GB16237@lemon>
+Subject: Re: [Qemu-devel] [PATCH RFC 0/9] block: Rewrite block drain
+ begin/end
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,152 +25,71 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org
-Cc: kwolf@redhat.com, famz@redhat.com, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, jsnow@redhat.com
+To: Fam Zheng <famz@redhat.com>
+Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, jcody@redhat.com, Max Reitz <mreitz@redhat.com>, pbonzini@redhat.com, Stefan Hajnoczi <stefanha@redhat.com>
 
-12.10.2017 21:59, Eric Blake wrote:
-> We are gradually moving away from sector-based interfaces, towards
-> byte-based.  Update the qed driver accordingly, taking the opportunity
-> to inline qed_is_allocated_cb() into its lone caller (the callback
-> used to be important, until we switched qed to coroutines).  There is
-> no intent to optimize based on the want_zero flag for this format.
->
-> Signed-off-by: Eric Blake <eblake@redhat.com>
->
-> ---
-> v4: rebase to interface change, inline pointless callback
-> v3: no change
-> v2: rebase to mapping flag, fix mask in qed_is_allocated_cb
-> ---
->   block/qed.c | 84 +++++++++++++++++++++----------------------------------------
->   1 file changed, 28 insertions(+), 56 deletions(-)
->
-> diff --git a/block/qed.c b/block/qed.c
-> index 28e2ec89e8..cbab5b6f83 100644
-> --- a/block/qed.c
-> +++ b/block/qed.c
-> @@ -688,74 +688,46 @@ finish:
->       return ret;
->   }
->
-> -typedef struct {
-> -    BlockDriverState *bs;
-> -    Coroutine *co;
-> -    uint64_t pos;
-> -    int64_t status;
-> -    int *pnum;
-> -    BlockDriverState **file;
-> -} QEDIsAllocatedCB;
-> -
-> -/* Called with table_lock held.  */
-> -static void qed_is_allocated_cb(void *opaque, int ret, uint64_t offset, size_t len)
-> -{
-> -    QEDIsAllocatedCB *cb = opaque;
-> -    BDRVQEDState *s = cb->bs->opaque;
-> -    *cb->pnum = len / BDRV_SECTOR_SIZE;
-> -    switch (ret) {
-> -    case QED_CLUSTER_FOUND:
-> -        offset |= qed_offset_into_cluster(s, cb->pos);
-> -        cb->status = BDRV_BLOCK_DATA | BDRV_BLOCK_OFFSET_VALID | offset;
-> -        *cb->file = cb->bs->file->bs;
-> -        break;
-> -    case QED_CLUSTER_ZERO:
-> -        cb->status = BDRV_BLOCK_ZERO;
-> -        break;
-> -    case QED_CLUSTER_L2:
-> -    case QED_CLUSTER_L1:
-> -        cb->status = 0;
-> -        break;
-> -    default:
-> -        assert(ret < 0);
-> -        cb->status = ret;
-> -        break;
-> -    }
-> -
-> -    if (cb->co) {
-> -        aio_co_wake(cb->co);
-> -    }
-> -}
-> -
-> -static int64_t coroutine_fn bdrv_qed_co_get_block_status(BlockDriverState *bs,
-> -                                                 int64_t sector_num,
-> -                                                 int nb_sectors, int *pnum,
-> +static int coroutine_fn bdrv_qed_co_block_status(BlockDriverState *bs,
-> +                                                 bool want_zero,
-> +                                                 int64_t pos, int64_t bytes,
-> +                                                 int64_t *pnum, int64_t *map,
->                                                    BlockDriverState **file)
->   {
->       BDRVQEDState *s = bs->opaque;
-> -    size_t len = (size_t)nb_sectors * BDRV_SECTOR_SIZE;
-> -    QEDIsAllocatedCB cb = {
-> -        .bs = bs,
-> -        .pos = (uint64_t)sector_num * BDRV_SECTOR_SIZE,
-> -        .status = BDRV_BLOCK_OFFSET_MASK,
-> -        .pnum = pnum,
-> -        .file = file,
-> -    };
-> +    size_t len;
+Am 30.11.2017 um 03:03 hat Fam Zheng geschrieben:
+> On Wed, 11/29 18:25, Kevin Wolf wrote:
+> > Am 29.11.2017 um 15:49 hat Fam Zheng geschrieben:
+> > > While we look at the fixes for 2.11, I briefly prototyped this series
+> > > to see if it makes sense as a simplification of the drain API for
+> > > 2.12.
+> > > 
+> > > The idea is to let AioContext manage quiesce callbacks, then the block
+> > > layer only needs to do the in-flight request waiting. This lets us get
+> > > rid of the callback recursion (both up and down).
+> > 
+> > So essentially you don't drain individual nodes any more, but whole
+> > AioContexts. I have a feeeling that this would be a step in the wrong
+> > direction.
+> > 
+> > Not only would it completely bypass the path I/O requests take and
+> > potentially drain a lot more than is actually necessary, but it also
+> > requires that all nodes that are connected in a tree are in the same
+> > AioContext.
+> 
+> Yeah, good point. Initially I wanted to introduce a BlockGraph object
+> which manages the per-graph draining, (i.e. where to register the
+> drain callbacks), but I felt lazy and used AioContext.
+> 
+> Will that make it better?  BlockGraph would be a proper abstraction
+> and will not limit the API to one AioContext per tree.
 
-size_t len = bytes;
+There is only a single graph, so this would mean going back to global
+bdrv_drain_all() exclusively.
 
-with that:
-Reviewed-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+What you really mean is probably connected components in the graph, but
+do we really want to manage merging and splitting object representing
+connected components when a node is added or removed from the graph?
+Especially when that graph change occurs in a drain callback?
 
-> +    int status;
->       QEDRequest request = { .l2_table = NULL };
->       uint64_t offset;
->       int ret;
->
->       qemu_co_mutex_lock(&s->table_lock);
-> -    ret = qed_find_cluster(s, &request, cb.pos, &len, &offset);
-> -    qed_is_allocated_cb(&cb, ret, offset, len);
-> +    ret = qed_find_cluster(s, &request, pos, &len, &offset);
+You can also still easily introduce bugs where graph changes during a
+drain end up in nodes not being drained, possibly drained twice, you
+still access the next pointer of a deleted node or you accidentally
+switch to draining a different component.
 
-len is in-out parameter, you can't use it uninitialized.
+It's probably possible to get this right, but essentially you're just
+switching from iterating a tree to iterating a list. You get roughly the
+same set of problems that you have to consider as today, and getting it
+right should be about the same difficulty.
 
->
-> -    /* The callback was invoked immediately */
-> -    assert(cb.status != BDRV_BLOCK_OFFSET_MASK);
-> +    *pnum = len;
-> +    switch (ret) {
-> +    case QED_CLUSTER_FOUND:
-> +        *map = offset | qed_offset_into_cluster(s, pos);
-> +        status = BDRV_BLOCK_DATA | BDRV_BLOCK_OFFSET_VALID;
-> +        *file = bs->file->bs;
-> +        break;
-> +    case QED_CLUSTER_ZERO:
-> +        status = BDRV_BLOCK_ZERO;
-> +        break;
-> +    case QED_CLUSTER_L2:
-> +    case QED_CLUSTER_L1:
-> +        status = 0;
-> +        break;
-> +    default:
-> +        assert(ret < 0);
-> +        status = ret;
-> +        break;
-> +    }
->
->       qed_unref_l2_cache_entry(request.l2_table);
->       qemu_co_mutex_unlock(&s->table_lock);
->
-> -    return cb.status;
-> +    return status;
->   }
->
->   static BDRVQEDState *acb_to_s(QEDAIOCB *acb)
-> @@ -1595,7 +1567,7 @@ static BlockDriver bdrv_qed = {
->       .bdrv_child_perm          = bdrv_format_default_perms,
->       .bdrv_create              = bdrv_qed_create,
->       .bdrv_has_zero_init       = bdrv_has_zero_init_1,
-> -    .bdrv_co_get_block_status = bdrv_qed_co_get_block_status,
-> +    .bdrv_co_block_status     = bdrv_qed_co_block_status,
->       .bdrv_co_readv            = bdrv_qed_co_readv,
->       .bdrv_co_writev           = bdrv_qed_co_writev,
->       .bdrv_co_pwrite_zeroes    = bdrv_qed_co_pwrite_zeroes,
+> > And finally, I don't really think that the recursion is even a problem.
+> > The problem is with graph changes made by callbacks that drain allows to
+> > run. With your changes, it might be a bit easier to avoid that
+> > bdrv_drain() itself gets into trouble due to graph changes, but this
+> > doesn't solve the problem for any (possibly indirect) callers of
+> > bdrv_drain().
+> 
+> The recursion is the one big place that can be easily broken by graph changes,
+> fixing this doesn't make the situation any worse. We could still fix the
+> indirect callers by taking references or by introducing "ubiquitous coroutines".
 
+But hiding a bug in 80% of the cases where it shows isn't enough.
 
--- 
-Best regards,
-Vladimir
+I think the only real solution is to forbid graph changes until after
+any critical operation has completed. I haven't tried it out in
+practice, but I suppose we could use a CoMutex around them and take it
+in bdrv_drained_begin/end() and all other places that can get into
+trouble with graph changes.
+
+Kevin
