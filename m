@@ -1,30 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52068)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52584)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <aik@ozlabs.ru>) id 1eKIJt-00029i-IV
-	for qemu-devel@nongnu.org; Thu, 30 Nov 2017 01:27:38 -0500
+	(envelope-from <rkagan@virtuozzo.com>) id 1eKIKw-0002hG-LE
+	for qemu-devel@nongnu.org; Thu, 30 Nov 2017 01:28:43 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <aik@ozlabs.ru>) id 1eKIJq-0007nW-Fp
-	for qemu-devel@nongnu.org; Thu, 30 Nov 2017 01:27:37 -0500
-Received: from mail-io0-x244.google.com ([2607:f8b0:4001:c06::244]:40459)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <aik@ozlabs.ru>) id 1eKIJq-0007mq-9E
-	for qemu-devel@nongnu.org; Thu, 30 Nov 2017 01:27:34 -0500
-Received: by mail-io0-x244.google.com with SMTP id d21so6358323ioe.7
-	for <qemu-devel@nongnu.org>; Wed, 29 Nov 2017 22:27:34 -0800 (PST)
-References: <20171122073947.19325-1-aik@ozlabs.ru>
-	<20171129083624.134d46ce@t450s.home>
-	<f41f2faa-25f2-1c1d-a6e4-ba646fe6fb14@ozlabs.ru>
-	<20171129190520.012e51b5@t450s.home>
-From: Alexey Kardashevskiy <aik@ozlabs.ru>
-Message-ID: <f6726899-af89-219a-b533-6323223dcd65@ozlabs.ru>
-Date: Thu, 30 Nov 2017 17:27:28 +1100
+	(envelope-from <rkagan@virtuozzo.com>) id 1eKIKt-0000SA-BT
+	for qemu-devel@nongnu.org; Thu, 30 Nov 2017 01:28:42 -0500
+Received: from mail-db5eur01on0107.outbound.protection.outlook.com
+	([104.47.2.107]:37542
+	helo=EUR01-DB5-obe.outbound.protection.outlook.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <rkagan@virtuozzo.com>)
+	id 1eKIKs-0000Qk-Fr
+	for qemu-devel@nongnu.org; Thu, 30 Nov 2017 01:28:39 -0500
+Date: Thu, 30 Nov 2017 09:28:29 +0300
+From: Roman Kagan <rkagan@virtuozzo.com>
+Message-ID: <20171130062827.GA12690@rkaganip.lan>
+References: <1511530010-511740-1-git-send-email-dplotnikov@virtuozzo.com>
+	<20171128195817.GA29077@localhost.localdomain>
+	<2cd31202-27c3-983f-85a9-6814ff504706@virtuozzo.com>
+	<20171128211326.GV3037@localhost.localdomain>
+	<5A1E43A6.1010607@huawei.com>
+	<20171129104122.GY3037@localhost.localdomain>
+	<5A1EA0DB.60303@huawei.com> <20171129133524.GA2279@rkaganb.sw.ru>
+	<4ebcd22a-4c6c-8260-c94c-26810d6a24cd@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20171129190520.012e51b5@t450s.home>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-AU
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH qemu] vfio-pci: Remove unused fields from
- VFIOMSIXInfo
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <4ebcd22a-4c6c-8260-c94c-26810d6a24cd@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH] i386: turn off l3-cache property by default
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,60 +36,47 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alex Williamson <alex.williamson@redhat.com>
-Cc: qemu-devel@nongnu.org
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: "Longpeng (Mike)" <longpeng2@huawei.com>, Eduardo Habkost <ehabkost@redhat.com>, "Denis V. Lunev" <den@virtuozzo.com>, "Michael S. Tsirkin" <mst@redhat.com>, Denis Plotnikov <dplotnikov@virtuozzo.com>, rth@twiddle.net, qemu-devel@nongnu.org, Gonglei <arei.gonglei@huawei.com>, zhaoshenglong <zhaoshenglong@huawei.com>
 
-On 30/11/17 13:05, Alex Williamson wrote:
-> On Thu, 30 Nov 2017 12:56:09 +1100
-> Alexey Kardashevskiy <aik@ozlabs.ru> wrote:
+On Wed, Nov 29, 2017 at 06:15:05PM +0100, Paolo Bonzini wrote:
+> On 29/11/2017 14:35, Roman Kagan wrote:
+> >>
+> >>> IMO, the long term solution is to make Linux guests not misbehave
+> >>> when we stop lying about the L3 cache.  Maybe we could provide a
+> >>> "IPIs are expensive, please avoid them" hint in the KVM CPUID
+> >>> leaf?
+> > We already have it, it's the hypervisor bit ;)  Seriously, I'm unaware
+> > of hypervisors where IPIs aren't expensive.
+> > 
 > 
->> On 30/11/17 02:36, Alex Williamson wrote:
->>> On Wed, 22 Nov 2017 18:39:47 +1100
->>> Alexey Kardashevskiy <aik@ozlabs.ru> wrote:
->>>
->>> Missing reference to commit that made these fields unused.  A Fixes tag
->>> to that commit also seems appropriate.  An empty commit log is pretty
->>> much never justified.  
->>
->> Ah. Right, sorry. I could not find when it was used, looks like never.
+> In theory, AMD's AVIC should optimize IPIs to running vCPUs.  Amazon's
+> recently posted patches to disable HLT and MWAIT exits might tilt the
+> balance in favor of IPIs even for Intel APICv (where sending the IPI is
+> expensive, but receiving it isn't).
 > 
-> Nope, db0da029a185 vfio: Generalize region support
+> Being able to tie this to Amazon's other proposal, the "DEDICATED" CPUID
+> bit, would be nice.  My plan was to disable all three of MWAIT/HLT/PAUSE
+> when setting the dedicated bit.
 
-ah, right :( Repost?
+Yes the IPI cost can hopefully be mitigated in the case of dedicated and
+busy vCPUs.
 
+However, in the max density scenario this doesn't help.
 
-> 
->>> This also looks like 2.12 material.  Thanks,  
->>
->> Indeed 2.12.
->>
->>
->>>
->>> Alex
->>>   
->>>> Signed-off-by: Alexey Kardashevskiy <aik@ozlabs.ru>
->>>> ---
->>>>  hw/vfio/pci.h | 2 --
->>>>  1 file changed, 2 deletions(-)
->>>>
->>>> diff --git a/hw/vfio/pci.h b/hw/vfio/pci.h
->>>> index c5e168e..06dcf99 100644
->>>> --- a/hw/vfio/pci.h
->>>> +++ b/hw/vfio/pci.h
->>>> @@ -93,8 +93,6 @@ typedef struct VFIOMSIXInfo {
->>>>      uint16_t entries;
->>>>      uint32_t table_offset;
->>>>      uint32_t pba_offset;
->>>> -    MemoryRegion mmap_mem;
->>>> -    void *mmap;
->>>>      unsigned long *pending;
->>>>  } VFIOMSIXInfo;
->>>>    
->>>   
->>
->>
-> 
+Obviously, in the pipe benchmark scheduling the two ends of the pipe on
+different cores is detrimental for performance even on a physical
+machine; however, IIUC it was a conscious decision by the scheduler
+folks because it provides acceptable latency for mostly-idle systems and
+decent performance in more loaded cases.
 
+We wouldn't care about this pipe benchmark numbers per se, because the
+latencies are still good for practical purposes.  However, in case of
+virtual machines, this extra overhead of remote scheduling in the guest
+results in a slight -- circa 15% in our Drupal-based test -- increase of
+the host cpu consumption by vcpu threads.  That, in turn, makes the host
+cpu overcommit being reached with 15% less VMs (and, once overcommit is
+reached, the drupal response latency goes into the sky, so it's
+effectively a cut-off for density).
 
--- 
-Alexey
+Roman.
