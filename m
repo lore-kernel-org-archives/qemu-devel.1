@@ -1,26 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57639)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34611)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1eKG48-0004Dy-Us
-	for qemu-devel@nongnu.org; Wed, 29 Nov 2017 23:03:14 -0500
+	(envelope-from <dgibson@ozlabs.org>) id 1eKGIC-0000P6-LJ
+	for qemu-devel@nongnu.org; Wed, 29 Nov 2017 23:17:47 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1eKG45-0001Jg-Ps
-	for qemu-devel@nongnu.org; Wed, 29 Nov 2017 23:03:12 -0500
-Received: from ozlabs.org ([103.22.144.67]:39103)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgibson@ozlabs.org>) id 1eKG44-0001Ih-OI
-	for qemu-devel@nongnu.org; Wed, 29 Nov 2017 23:03:09 -0500
-Date: Thu, 30 Nov 2017 15:02:48 +1100
+	(envelope-from <dgibson@ozlabs.org>) id 1eKGIB-0002O7-41
+	for qemu-devel@nongnu.org; Wed, 29 Nov 2017 23:17:44 -0500
+Date: Thu, 30 Nov 2017 15:06:04 +1100
 From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20171130040248.GU3023@umbus.fritz.box>
-References: <20171129084628.12336-1-david@gibson.dropbear.id.au>
-	<20171129084628.12336-4-david@gibson.dropbear.id.au>
-	<abaddfae-f0f0-cbe3-93b5-b2f102290725@redhat.com>
+Message-ID: <20171130040604.GV3023@umbus.fritz.box>
+References: <20171123132955.1261-1-clg@kaod.org>
+	<20171123132955.1261-13-clg@kaod.org>
+	<20171129051110.GI3023@umbus.fritz.box>
+	<b0fd23cc-bc15-8023-69da-508ce5f6d0fe@kaod.org>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="bGopQmzlzQgFk3Fg"
+	protocol="application/pgp-signature"; boundary="HqPpMaT+a6TeY/Q4"
 Content-Disposition: inline
-In-Reply-To: <abaddfae-f0f0-cbe3-93b5-b2f102290725@redhat.com>
-Subject: Re: [Qemu-devel] [for-2.12 3/7] pci: Fold pci_bus.h into pci.h
+In-Reply-To: <b0fd23cc-bc15-8023-69da-508ce5f6d0fe@kaod.org>
+Subject: Re: [Qemu-devel] [PATCH 12/25] spapr: introduce a XIVE interrupt
+ presenter model
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,42 +27,85 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Marcel Apfelbaum <marcel@redhat.com>
-Cc: "Michael S . Tsirkin" <mst@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, Igor Mammedov <imammedo@redhat.com>, qemu-devel@nongnu.org
+To: =?iso-8859-1?Q?C=E9dric?= Le Goater <clg@kaod.org>
+Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, Benjamin Herrenschmidt <benh@kernel.crashing.org>
 
 
---bGopQmzlzQgFk3Fg
-Content-Type: text/plain; charset=us-ascii
+--HqPpMaT+a6TeY/Q4
+Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Wed, Nov 29, 2017 at 12:38:00PM +0200, Marcel Apfelbaum wrote:
-> On 29/11/2017 10:46, David Gibson wrote:
-> > include/hw/pci/pci_bus.h is now very small and can only safely be inclu=
-ded
-> > after hw/pci/pci.h.  So, just fold it into pci.h.
+On Wed, Nov 29, 2017 at 10:55:34AM +0100, C=E9dric Le Goater wrote:
+> On 11/29/2017 06:11 AM, David Gibson wrote:
+> > On Thu, Nov 23, 2017 at 02:29:42PM +0100, C=E9dric Le Goater wrote:
+> >> The XIVE interrupt presenter exposes a set of rings, also called
+> >> Thread Interrupt Management Areas (TIMA), to handle priority
+> >> management and interrupt acknowledgment among other things. There is
+> >> one ring per level of privilege, four in all. The one we are
+> >> interested in for the sPAPR machine is the OS ring.
+> >>
+> >> The TIMA is mapped at the same address for each CPU. 'current_cpu' is
+> >> used to retrieve the targeted interrupt presenter object holding the
+> >> cache data of the registers the model use.
+> >>
+> >> Signed-off-by: C=E9dric Le Goater <clg@kaod.org>
+> >> ---
+> >>  hw/intc/spapr_xive.c        | 271 +++++++++++++++++++++++++++++++++++=
++++++++++
+> >>  hw/intc/xive-internal.h     |  89 +++++++++++++++
+> >>  include/hw/ppc/spapr_xive.h |  11 ++
+> >>  3 files changed, 371 insertions(+)
+> >>
+> >> diff --git a/hw/intc/spapr_xive.c b/hw/intc/spapr_xive.c
+> >> index b1e3f8710cff..554b25e0884c 100644
+> >> --- a/hw/intc/spapr_xive.c
+> >> +++ b/hw/intc/spapr_xive.c
+> >> @@ -23,9 +23,166 @@
+> >>  #include "sysemu/dma.h"
+> >>  #include "monitor/monitor.h"
+> >>  #include "hw/ppc/spapr_xive.h"
+> >> +#include "hw/ppc/xics.h"
+> >> =20
+> >>  #include "xive-internal.h"
+> >> =20
+> >> +struct sPAPRXiveICP {
 > >=20
+> > I'd really prefer to avoid calling anything in xive "icp" to avoid
+> > confusion with xics.
 >=20
-> I don't get the benefit from merging the header files.
-> I would go the other way around and find stuff specific
-> to pci_bus and add it there, like the pci_bus_new*
-> you touched in the prev patch.
+> OK.=20
+>=20
+> The specs refers to the whole as an IVPE : Interrupt Virtualization=20
+> Presentation Engine. In our model, we use the TIMA cached values of=20
+> the OS ring and the qemu_irq for the CPU line.=20
+>=20
+> Would 'sPAPRXivePresenter' be fine ?
 
-Hrm.  Except the point of the earlier patch was that those are
-actually spoecific to root buses, so would really belong in say
-pci-host.h, rather than pci-bus.h.
+That'd be ok.  Or call if sPAPRIVPE.  Or even call it TIMA.  I'd be
+fine with any of those.
 
-A log of PCI stuff deals with interaction between the device and bus
-though, so it just seemed like more trouble than it was worth to go
-disentangling them properly.
+[snip]
+> >> +static uint64_t spapr_xive_tm_read(void *opaque, hwaddr offset, unsig=
+ned size)
+> >> +{
+> >> +    PowerPCCPU *cpu =3D POWERPC_CPU(current_cpu);
+> >=20
+> > So, strictly speaking this could be handled by setting each of the
+> > CPUs address spaces separately, to something with their own TIMA
+> > superimposed on address_space_memory.=20
+>=20
+> Ah. I didn't know we could do that.
 
-> Maybe if *all* code files requiring pci.h would automatically
-> need pci_bus.h would make sense, but I didn't check that.
+I think that should work from having seen the code before.  I haven't
+actually attempted it..
 
-Yeah, I don't think every user of pci.h needs pci_bus.h, although a
-fair few do as you can see from the diff.  Well, I guess it's up to
-Michael.  I'll be tolerably content either way - I'd say this is the
-least important patch of the series.
+> > What you have might be more practical though.
+>=20
+> well, you will see at the end of the patchset how cpu->intc is
+> assigned.
+
+[snip]
 
 --=20
 David Gibson			| I'll have my music baroque, and my code
@@ -72,24 +113,24 @@ david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
 				| _way_ _around_!
 http://www.ozlabs.org/~dgibson
 
---bGopQmzlzQgFk3Fg
+--HqPpMaT+a6TeY/Q4
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlofgucACgkQbDjKyiDZ
-s5KEnA//YB5ALYNRgdw1YxjIfMehyFPemPJSTwSE+9My3x/DtLQS3+XYiJL+cjtB
-BrSMkjAyBgT6Y+lAxiChl1+vizjmfZpwPJpnJsqEkrsNwJ/yrCq0hC29+5oQztkj
-nvy720g6tNQ3FH2HkNTUPnHbi/G61EG+Zlfhs2Uhqboj1RTivAbRr2jz2JiQHHpq
-KHjwJlTxyFR5QiXVBQAhJuooAzwnv/TF26lIB/MhZjVppKY9d1DwKQEnHHakPsRq
-nHYW2LyctWhDne7AtEUzqkPPveHaMx5/djYUpZ9WIivT/vQUarMnx+0cV8uSQ6jG
-ppGdxS5geAqyyFNlh8iTYQN+wdy4Pi4shEyXKyq4qjvyDVCgwViRqw32SS4wMQXB
-Y5AUxsMXQtA3MiNPLHciK4OYNygAnMKaF9ZRBzhbW1rRsW0USaqsaP5J4PhKFgkK
-Gb0wHPibFgEnErMrmMl/bYsLLs0ofx9Hl7+HhytBGOl7lhV0uUmupQcQOpq+xg3b
-fo/tJ9x1YKAfk319iKh8zap/1SzlQwtKlT7QSr3zmI9ladGe3xlhvFvlD7QIIsRH
-/94Q9yLr8qw+qEVX1FUhEaIwJvsLDxciB27AIwQM6MH1rSb90ymbcJ6AAKQVpuAy
-YXwPVrhs7HXQQGgoIKUgt7bJjMyxZsXTc8YqEQdDlPTCYl4673U=
-=Ca5m
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlofg6wACgkQbDjKyiDZ
+s5Ls7g/8DOctlVuAMr1vjil7O4FDp5OxIiF3Ye/yGy9p9+XTQ8ux7yS8g4O/Xhfp
+42WPfly0GoveHjMNgxt13ZJQ7AID+U032/mMh9lpeYVGKiWC+dSVRfq/fOLXAqKQ
+QiE8Wr54Uu5RZD7lH55KCAXpJqS10y3GFUHE1t9aKLWjczgfDMjoewVrbrA9YKAD
+3I+2QKF0OzE+aNJ4xwtwOAQLG84j3lyTNGnDoNq+4SjmqZ0SaDqMdEzchLFOiDUE
+5wHwsknBQGBUelxZ6d7qYgT0cIcY/WGO3BHPU48rBzcbOGdWGjr7+p7B0n8SqNTX
+ggesbtxwK5KJnv9u18iuD9sQyQ4vxBG8FF3dt8t7Zq3a/DETkevK9xH3eAj62Sd8
+q6YTcAfddRMc67mF+jPumd9F+MNk2WB+Xxvphc2MfVANr7IjqNZNExzukekyuTh0
+vcBTVcf/JVbzT7Py3YB4VRBCDNLZbpYZGr4rSD8mRtJwRjJNvM/9C+EivZFZcN+6
+3T3eYe1a8cX3MytCIlAQcz7Mi49COyHJJWTf3/Hby1wtbkCi7wdIIbkf6ZYoy1aq
+Lj48SbPiy3gDEc3uPudsNTWVWzFCoIHlcgwZbEivN1Rr4aydHFhs9Wc5CpKRLS8I
+MIWyhK2qReDETf2ZmHnjWXXMBCNHWpOdZtLXNZjMJEajVoZR7XQ=
+=F2+/
 -----END PGP SIGNATURE-----
 
---bGopQmzlzQgFk3Fg--
+--HqPpMaT+a6TeY/Q4--
