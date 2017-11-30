@@ -1,26 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42762)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45482)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <15700157322@163.com>) id 1eKKLD-0007md-VS
-	for qemu-devel@nongnu.org; Thu, 30 Nov 2017 03:37:14 -0500
+	(envelope-from <vsementsov@virtuozzo.com>) id 1eKKSF-0001IS-7l
+	for qemu-devel@nongnu.org; Thu, 30 Nov 2017 03:44:24 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <15700157322@163.com>) id 1eKKL7-0000jd-HL
-	for qemu-devel@nongnu.org; Thu, 30 Nov 2017 03:37:08 -0500
-Received: from m13-121.163.com ([220.181.13.121]:26659)
-	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <15700157322@163.com>) id 1eKKL5-0000hD-Tt
-	for qemu-devel@nongnu.org; Thu, 30 Nov 2017 03:37:01 -0500
-Date: Thu, 30 Nov 2017 16:36:54 +0800 (CST)
-From: Lying  <15700157322@163.com>
-In-Reply-To: <20171130023226.GC16237@lemon>
-References: <2b5d04f3.523b.160064da4db.Coremail.15700157322@163.com>
-	<20171129062916.GA12220@lemon>
-	<727e90ec.25b0.1600aabe963.Coremail.15700157322@163.com>
-	<20171130023226.GC16237@lemon>
+	(envelope-from <vsementsov@virtuozzo.com>) id 1eKKSE-0006eN-Ge
+	for qemu-devel@nongnu.org; Thu, 30 Nov 2017 03:44:23 -0500
+References: <20171012185916.22776-1-eblake@redhat.com>
+	<20171012185916.22776-5-eblake@redhat.com>
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Message-ID: <4cc1bece-19fe-4fc2-597c-da13202675e2@virtuozzo.com>
+Date: Thu, 30 Nov 2017 11:44:05 +0300
 MIME-Version: 1.0
-Message-ID: <5d860490.8271.1600c124f29.Coremail.15700157322@163.com>
-Content-Type: text/plain; charset=GBK
-Content-Transfer-Encoding: base64
-Subject: Re: [Qemu-devel] device_del fail
+In-Reply-To: <20171012185916.22776-5-eblake@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
+Content-Language: en-US
+Subject: Re: [Qemu-devel] [PATCH v4 04/20] gluster: Switch to
+ .bdrv_co_block_status()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,52 +25,28 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Fam Zheng <famz@redhat.com>
-Cc: qemu-devel@nongnu.org, Alex Williamson <alex.williamson@redhat.com>
+To: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org
+Cc: kwolf@redhat.com, famz@redhat.com, qemu-block@nongnu.org, Jeff Cody <jcody@redhat.com>, Max Reitz <mreitz@redhat.com>, jsnow@redhat.com
 
-aGVsbG8sIGkgdHJ5IGFnYWluIG9uIGFyY2ggTGludXggLCBhZnRlciBpIGFkZCBncHUsIGRpc3Bs
-YXkgaXMgbm90IGxpZ2h0LGZvbGxvd2luZyBtZXNzYWdlIGZyb20gImluZm8gcGNpIjoKICBCdXMg
-IDAsIGRldmljZSAgIDUsIGZ1bmN0aW9uIDA6CiAgICBWR0EgY29udHJvbGxlcjogUENJIGRldmlj
-ZSAxMGRlOjE0MDEKICAgICAgSVJRIDExLgogICAgICBCQVIwOiAzMiBiaXQgbWVtb3J5IGF0IDB4
-ZmZmZmZmZmZmZmZmZmZmZiBbMHgwMGZmZmZmZV0uCiAgICAgIEJBUjE6IDY0IGJpdCBwcmVmZXRj
-aGFibGUgbWVtb3J5IGF0IDB4ZmZmZmZmZmZmZmZmZmZmZiBbMHgwZmZmZmZmZV0uCiAgICAgIEJB
-UjM6IDY0IGJpdCBwcmVmZXRjaGFibGUgbWVtb3J5IGF0IDB4ZmZmZmZmZmZmZmZmZmZmZiBbMHgw
-MWZmZmZmZV0uCiAgICAgIEJBUjU6IEkvTyBhdCAweGZmZmZmZmZmZmZmZmZmZmYgWzB4MDA3ZV0u
-CiAgICAgIEJBUjY6IDMyIGJpdCBtZW1vcnkgYXQgMHhmZmZmZmZmZmZmZmZmZmZmIFsweDAwMDFm
-ZmZlXS4KICAgICAgaWQgImdwdTEiCiAgQnVzICAwLCBkZXZpY2UgICA2LCBmdW5jdGlvbiAwOgog
-ICAgQXVkaW8gY29udHJvbGxlcjogUENJIGRldmljZSAxMGRlOjBmYmEKICAgICAgSVJRIDEwLgog
-ICAgICBCQVIwOiAzMiBiaXQgbWVtb3J5IGF0IDB4M2U4MjAwMDAgWzB4M2U4MjNmZmZdLgogICAg
-ICBpZCAiZ3B1MiIKCgpUaGVuIGkgY29ubmVjdCB0aGF0IGd1ZXN0IHdpdGggc3NoOgpMYXN0IGxv
-Z2luOiBUaHUgTm92IDMwIDIyOjI5OjAzIDIwMTcoaXQncyBub3JtYWwpCgoKCgpBdCAyMDE3LTEx
-LTMwIDEwOjMyOjI2LCAiRmFtIFpoZW5nIiA8ZmFtekByZWRoYXQuY29tPiB3cm90ZToKPkxldCdz
-IGtlZXAgcWVtdS1kZXZlbEBub25nbnUub3JnIG9uIHRoZSBsaXN0IHNvIG90aGVyIHBlb3BsZSBj
-YW4gY2hpbWUgaW4uCj4KPk9uIFRodSwgMTEvMzAgMTA6MDUsIEx5aW5nIHdyb3RlOgo+IAo+PiBB
-dCAyMDE3LTExLTI5IDE0OjI5OjE3LCAiRmFtIFpoZW5nIiA8ZmFtekByZWRoYXQuY29tPiB3cm90
-ZToKPj4gPk9uIFdlZCwgMTEvMjkgMTM6NDMsIEx5aW5nIHdyb3RlOgo+PiA+PiBIZWxsbyBldmVy
-eWJvZHksIEkgZW5jb3VudGVyIGEgZXJyb3Igb24gbXkgdm0gZ3Vlc3QKPj4gPj4gSSByZW1vdmUg
-bXkgZGV2aWNlIG9uIG15IGd1ZXN0IGlzIGZhaWxlZCwgZm9sbG93aW5nIGlzIGRldGFpbCBtZXNz
-YWdlLgo+PiA+PiBJIGRpZG4ndCBhZGQgbXkgYXVkaW8gZGV2aWNlIGJlZm9yZSBydW5uaW5nIG15
-IGd1ZXN0LCBTbyBpIGFkZCBhdWRpbyB3aXRoICJkZXZpY2VfYWRkIiBhZnRlciBydW5uaW5nCj4+
-ID4+IFRoZW4gaSBjYW4gdXNlIGl0LCBzbyBpIHJlbW92ZSBpdCB3aXRoICJkZXZpY2VfZGVsIiwg
-YnV0IHdoZW4gaSBkbyBpdCBhZ2FpbiwgaQo+PiA+PiBjYW4ndCB1c2UgbXkgYXVkaW8gZGV2aWNl
-IGFuZCBjYW5ub3QgcmVtb3ZlIGl0Lgo+PiA+Cj4+ID4KPj4gPkkgaGF2ZW4ndCB0cmllZCB1bnBs
-dWdnaW5nIGFuIGF1ZGlvIGRldmljZSBteXNlbGYgYnV0IGluIGdlbmVyYWwgUENJIGhvdCB1bnBs
-dWcKPj4gPm5lZWRzIGd1ZXN0IGNvb3BlcmF0aW9uIHNvIHNvbWUgaW5mb21hdGlvbiBhYm91dCBn
-dWVzdCBpcyBhbHNvIGhlbHBmdWwuICBXaGljaAo+PiA+Z3Vlc3QgT1MgaXMgdGhpcz8KPj4gPgo+
-PiA+V2hhdCBhcmUgdGhlIGV4YWN0IGNvbW1hbmRzIHRoYXQgeW91IHVzZWQgYW5kIHdoYXQgYXJl
-IHRoZSBtZXNzYWdlcyBmcm9tCj4+ID5ob3N0L2d1ZXN0IHdoZW4geW91IGRldmljZV9kZWw/Cj4+
-ID4KPj4gCj4+ID5GYW0KPj4gCj4+IAo+PiBoZWxsbywgdGhhbmtzIGZvciB5b3VyIHJlcGx5LCBh
-bmQgaSdtIHNvcnJ5IHRoYXQgaSBub3Qgbm90aWNlIGF0IHllc3RlcmRheSAuCj4+IGZvbGxvd2lu
-ZyBpcyBteSBpbmZvcm1hdGlvbjoKPj4gICAgIGd1ZXN0IDogd2luZG93LTcKPj4gICAgIGhvc3Qg
-OiBVYnVudHUtMTYuMDQKPj4gICAgIHFlbXUgOiAyLjExLjAtcmMwCj4+ICAgICBsaWJ2aXJ0IDog
-My45Cj4+ICAgIHNlYWJpb3MgOiAxLjEwLjc0IChmcm9tIHFlbXUpCj4+IGV4YWN0IGNvbW1hbmRz
-Ogo+PiAgICAgYWRkOiJkZXZpY2VfYWRkIGRyaXZlcj12ZmlvLXBjaSxob3N0PTAyOjAwLjAseC12
-Z2E9b24sbXVsdGlmdW5jdGlvbj15ZXMsaWQ9Z3B1MSIKPj4gICAgIHJlbW92ZToiZGV2aWNlX2Rl
-bCBncHUxIgo+PiBhbmQgbm90IG1lc3NhZ2VzIHdoZW4gaSBydW5uaW5nIGRldmljZV9kZWwuIEJ1
-dCBpIGNhbiBzZWUgaXQgc3RpbGwgZXhpc3Qgd2hpbGUgcnVubmluZyBjb21tYW5kcyAiaW5mbyBw
-Y2kiCj4KPlByb2JhYmx5IHRoZSBndWVzdCBkaWRuJ3QgcmVzcG9uZCB0byB0aGUgaG90LXVucGx1
-ZyBldmVudC4gSW4geW91ciBvcmlnaW5hbAo+cXVlc3Rpb24geW91IHNhaWQgaXQgaXMgYW4gYXVk
-aW8gZGV2aWNlIGJ1dCB5b3VyIGNvbW1hbmQgc3VnZ2VzdHMgaXQgaXMgYSBHUFUKPmRldmljZS4g
-SSdtIG5vdCBzdXJlIFdpbmRvd3MgZHJpdmVyIGNhbiBoYW5kbGUgdGhpcy4gSGF2ZSB5b3UgdHJp
-ZWQgZGlmZmVyZW50Cj5ndWVzdHMsIHN1Y2ggYXMgTGludXg/Cj4KPkNjIEFsZXggd2hvIG1heSBr
-bm93IG1vcmUuCj4KPkZhbQo=
+12.10.2017 21:59, Eric Blake wrote:
+> We are gradually moving away from sector-based interfaces, towards
+> byte-based.  Update the gluster driver accordingly.
+>
+> In want_zero mode, we continue to report fine-grained hole
+> information (the caller wants as much mapping detail as possible);
+> but when not in that mode, the caller prefers larger *pnum and
+> merely cares about what offsets are allocated at this layer, rather
+> than where the holes live.  Since holes still read as zeroes at
+> this layer (rather than deferring to a backing layer), we can take
+> the shortcut of skipping find_allocation(), and merely state that
+> all bytes are allocated.
+>
+> Signed-off-by: Eric Blake <eblake@redhat.com>
+
+Reviewed-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+
+
+
+-- 
+Best regards,
+Vladimir
