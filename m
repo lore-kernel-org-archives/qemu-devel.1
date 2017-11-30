@@ -1,20 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56395)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56764)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1eKOTw-0006Ra-Ex
-	for qemu-devel@nongnu.org; Thu, 30 Nov 2017 08:02:30 -0500
+	(envelope-from <pbonzini@redhat.com>) id 1eKOV8-0007LW-Ve
+	for qemu-devel@nongnu.org; Thu, 30 Nov 2017 08:03:43 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1eKOTq-00085K-Jg
-	for qemu-devel@nongnu.org; Thu, 30 Nov 2017 08:02:24 -0500
+	(envelope-from <pbonzini@redhat.com>) id 1eKOV3-0000EI-2J
+	for qemu-devel@nongnu.org; Thu, 30 Nov 2017 08:03:38 -0500
 References: <1512031988-32490-1-git-send-email-thuth@redhat.com>
 	<1512031988-32490-4-git-send-email-thuth@redhat.com>
 	<CAFEAcA-LBOm=kHja3QJqOw-TT3GF9-i+wJfXdL-FU5NKimknzQ@mail.gmail.com>
 	<22aa483a-ede3-482d-88a9-ca1c03c37420@redhat.com>
-	<CAFEAcA_0W6AiBG_yqi_HAtZ5ChkOva3WWNRuQ6JbddVYH1sruA@mail.gmail.com>
+	<34115e36-ab8c-d828-d1a1-3ac7f32ae80b@redhat.com>
 From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <ebd7a7f7-00d2-fc5f-631f-f5d07571648b@redhat.com>
-Date: Thu, 30 Nov 2017 14:01:54 +0100
+Message-ID: <e55017f1-d9c9-4ae5-40dc-9842b41ebc1b@redhat.com>
+Date: Thu, 30 Nov 2017 14:03:09 +0100
 MIME-Version: 1.0
-In-Reply-To: <CAFEAcA_0W6AiBG_yqi_HAtZ5ChkOva3WWNRuQ6JbddVYH1sruA@mail.gmail.com>
+In-Reply-To: <34115e36-ab8c-d828-d1a1-3ac7f32ae80b@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
@@ -28,58 +28,30 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: Thomas Huth <thuth@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>, Anthony Green <green@moxielogic.com>, Laurent Vivier <laurent@vivier.eu>, qemu-arm <qemu-arm@nongnu.org>, Edgar Iglesias <edgar.iglesias@gmail.com>, Richard Henderson <rth@twiddle.net>
+To: Thomas Huth <thuth@redhat.com>, Peter Maydell <peter.maydell@linaro.org>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, Anthony Green <green@moxielogic.com>, Laurent Vivier <laurent@vivier.eu>, qemu-arm <qemu-arm@nongnu.org>, Edgar Iglesias <edgar.iglesias@gmail.com>, Richard Henderson <rth@twiddle.net>
 
-On 30/11/2017 13:51, Peter Maydell wrote:
-> On 30 November 2017 at 12:40, Paolo Bonzini <pbonzini@redhat.com> wrote:
->> On 30/11/2017 13:14, Peter Maydell wrote:
->>> On 30 November 2017 at 08:53, Thomas Huth <thuth@redhat.com> wrote:
->>>> +static const uint8_t kernel_mcf5208[] = {
->>>> +    0x41, 0xf9, 0xfc, 0x06, 0x00, 0x00,     /* lea 0xfc060000,%a0 */
->>>> +    0x10, 0x3c, 0x00, 0x54,                 /* move.b #'T',%d0 */
->>>> +    0x11, 0x7c, 0x00, 0x04, 0x00, 0x08,     /* move.b #4,8(%a0)     Enable TX */
->>>> +    0x11, 0x40, 0x00, 0x0c,                 /* move.b %d0,12(%a0)   Print 'T' */
->>>> +    0x60, 0xfa                              /* bra.s  loop */
->>>> +};
->>>
->>> This approach doesn't seem to be scalable to me -- are we
->>> really going to have 50 or more fragments of hand-coded hex in
->>> this file to cover the various board models?
->>>
->>> I'd much rather see us have a framework for being able
->>> to build test blobs from source using a cross compiler
->>> setup (and docker or similar so anybody can rebuild
->>> the test blobs). That will be much easier to maintain
->>> and easier to extend to having tests that test other
->>> parts of the board or other aspects of TCG emulation.
->>
->> It seems a bit overkill, as these snippets are ~16 bytes long.
+On 30/11/2017 13:51, Thomas Huth wrote:
+> The two micrablaze data arrays are completely different, since one is
+> big endian, the other is little, so I'd need to byte-swap the whole
+> array on the fly, too. Not sure whether it makes sense to add such
+> complex code just to safe 16 bytes of blob data...?
+
+*facepalm* :)
+
+>> Likewise, you could have just two copies of the code for all ARM boards
+>> that have a pl011 (or any other UART with a simple byte-long transmit
+>> register), one 32-bit and one 64-bit.
 > 
-> They're 16 bytes long because that's about the limit of
-> what you can do with this approach. The consequence is that
-> they barely test anything at all.
+> OK, having a patching mechanism in place likely makes sense as soon as
+> we want to include multiple ARM boards here. I can do that, but I'd
+> rather like to do it as a second step. It was already quite hard work to
+> come up with all these assembler snippets (from CPUs where I don't have
+> a clue of) and to determine which machines could be tested this way at
+> all, so I'd first like to wait and see whether this patch series is
+> acceptable at all or not, since Peter has objections.
 
-Certainly they are an awful test for boards, but they are a great smoke
-test for TCG changes that require modifications in all target/
-subdirectories.
-
-The infrastructure you want for integration tests is already provided by
-kvm-unit-tests, which satisfies at least bullets 2-4 from your list
-below (the first is unclear to me).
-
-Thanks,
+Given your remark on endianness then no, having one snippet per binary
+is enough.
 
 Paolo
-
-> A more sensible framework
-> would allow:
->  * better testing of TCG instructions more generally
->  * writing your test cases in C
->  * more interesting board dependent tests
->  * "integration test" setups like 'boot entire kernel'
->  * etc
-> 
-> thanks
-> -- PMM
-> 
