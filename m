@@ -1,27 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58811)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59797)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcel@redhat.com>) id 1eKM2H-0003Sa-04
-	for qemu-devel@nongnu.org; Thu, 30 Nov 2017 05:25:45 -0500
+	(envelope-from <vsementsov@virtuozzo.com>) id 1eKM4S-0005sE-H4
+	for qemu-devel@nongnu.org; Thu, 30 Nov 2017 05:27:57 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcel@redhat.com>) id 1eKM2C-0001av-To
-	for qemu-devel@nongnu.org; Thu, 30 Nov 2017 05:25:41 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:58400)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <marcel@redhat.com>) id 1eKM2C-0001aD-NT
-	for qemu-devel@nongnu.org; Thu, 30 Nov 2017 05:25:36 -0500
-References: <20171129084628.12336-1-david@gibson.dropbear.id.au>
-	<20171129084628.12336-4-david@gibson.dropbear.id.au>
-	<abaddfae-f0f0-cbe3-93b5-b2f102290725@redhat.com>
-	<20171130040248.GU3023@umbus.fritz.box>
-From: Marcel Apfelbaum <marcel@redhat.com>
-Message-ID: <b8c5519e-c829-dee0-782f-5777a722c9cd@redhat.com>
-Date: Thu, 30 Nov 2017 12:25:26 +0200
+	(envelope-from <vsementsov@virtuozzo.com>) id 1eKM4R-0004CT-CK
+	for qemu-devel@nongnu.org; Thu, 30 Nov 2017 05:27:56 -0500
+References: <20171012185916.22776-1-eblake@redhat.com>
+	<20171012185916.22776-13-eblake@redhat.com>
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Message-ID: <fd6ad85b-ea0c-0941-4402-4b8306a87533@virtuozzo.com>
+Date: Thu, 30 Nov 2017 13:27:42 +0300
 MIME-Version: 1.0
-In-Reply-To: <20171130040248.GU3023@umbus.fritz.box>
-Content-Type: text/plain; charset=windows-1252; format=flowed
-Content-Language: en-US
+In-Reply-To: <20171012185916.22776-13-eblake@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [for-2.12 3/7] pci: Fold pci_bus.h into pci.h
+Content-Language: en-US
+Subject: Re: [Qemu-devel] [PATCH v4 12/20] qed: Switch to
+ .bdrv_co_block_status()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,39 +25,152 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Gibson <david@gibson.dropbear.id.au>
-Cc: "Michael S . Tsirkin" <mst@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, Igor Mammedov <imammedo@redhat.com>, qemu-devel@nongnu.org
+To: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org
+Cc: kwolf@redhat.com, famz@redhat.com, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, jsnow@redhat.com
 
-On 30/11/2017 6:02, David Gibson wrote:
-> On Wed, Nov 29, 2017 at 12:38:00PM +0200, Marcel Apfelbaum wrote:
->> On 29/11/2017 10:46, David Gibson wrote:
->>> include/hw/pci/pci_bus.h is now very small and can only safely be included
->>> after hw/pci/pci.h.  So, just fold it into pci.h.
->>>
->>
->> I don't get the benefit from merging the header files.
->> I would go the other way around and find stuff specific
->> to pci_bus and add it there, like the pci_bus_new*
->> you touched in the prev patch.
-> 
-> Hrm.  Except the point of the earlier patch was that those are
-> actually spoecific to root buses, so would really belong in say
-> pci-host.h, rather than pci-bus.h.
-> 
-> A log of PCI stuff deals with interaction between the device and bus
-> though, so it just seemed like more trouble than it was worth to go
-> disentangling them properly.
-> 
->> Maybe if *all* code files requiring pci.h would automatically
->> need pci_bus.h would make sense, but I didn't check that.
-> 
-> Yeah, I don't think every user of pci.h needs pci_bus.h, although a
-> fair few do as you can see from the diff.  Well, I guess it's up to
-> Michael.  I'll be tolerably content either way - I'd say this is the
-> least important patch of the series.
-> 
+12.10.2017 21:59, Eric Blake wrote:
+> We are gradually moving away from sector-based interfaces, towards
+> byte-based.  Update the qed driver accordingly, taking the opportunity
+> to inline qed_is_allocated_cb() into its lone caller (the callback
+> used to be important, until we switched qed to coroutines).  There is
+> no intent to optimize based on the want_zero flag for this format.
+>
+> Signed-off-by: Eric Blake <eblake@redhat.com>
+>
+> ---
+> v4: rebase to interface change, inline pointless callback
+> v3: no change
+> v2: rebase to mapping flag, fix mask in qed_is_allocated_cb
+> ---
+>   block/qed.c | 84 +++++++++++++++++++++----------------------------------------
+>   1 file changed, 28 insertions(+), 56 deletions(-)
+>
+> diff --git a/block/qed.c b/block/qed.c
+> index 28e2ec89e8..cbab5b6f83 100644
+> --- a/block/qed.c
+> +++ b/block/qed.c
+> @@ -688,74 +688,46 @@ finish:
+>       return ret;
+>   }
+>
+> -typedef struct {
+> -    BlockDriverState *bs;
+> -    Coroutine *co;
+> -    uint64_t pos;
+> -    int64_t status;
+> -    int *pnum;
+> -    BlockDriverState **file;
+> -} QEDIsAllocatedCB;
+> -
+> -/* Called with table_lock held.  */
+> -static void qed_is_allocated_cb(void *opaque, int ret, uint64_t offset, size_t len)
+> -{
+> -    QEDIsAllocatedCB *cb = opaque;
+> -    BDRVQEDState *s = cb->bs->opaque;
+> -    *cb->pnum = len / BDRV_SECTOR_SIZE;
+> -    switch (ret) {
+> -    case QED_CLUSTER_FOUND:
+> -        offset |= qed_offset_into_cluster(s, cb->pos);
+> -        cb->status = BDRV_BLOCK_DATA | BDRV_BLOCK_OFFSET_VALID | offset;
+> -        *cb->file = cb->bs->file->bs;
+> -        break;
+> -    case QED_CLUSTER_ZERO:
+> -        cb->status = BDRV_BLOCK_ZERO;
+> -        break;
+> -    case QED_CLUSTER_L2:
+> -    case QED_CLUSTER_L1:
+> -        cb->status = 0;
+> -        break;
+> -    default:
+> -        assert(ret < 0);
+> -        cb->status = ret;
+> -        break;
+> -    }
+> -
+> -    if (cb->co) {
+> -        aio_co_wake(cb->co);
+> -    }
+> -}
+> -
+> -static int64_t coroutine_fn bdrv_qed_co_get_block_status(BlockDriverState *bs,
+> -                                                 int64_t sector_num,
+> -                                                 int nb_sectors, int *pnum,
+> +static int coroutine_fn bdrv_qed_co_block_status(BlockDriverState *bs,
+> +                                                 bool want_zero,
+> +                                                 int64_t pos, int64_t bytes,
+> +                                                 int64_t *pnum, int64_t *map,
+>                                                    BlockDriverState **file)
+>   {
+>       BDRVQEDState *s = bs->opaque;
+> -    size_t len = (size_t)nb_sectors * BDRV_SECTOR_SIZE;
+> -    QEDIsAllocatedCB cb = {
+> -        .bs = bs,
+> -        .pos = (uint64_t)sector_num * BDRV_SECTOR_SIZE,
+> -        .status = BDRV_BLOCK_OFFSET_MASK,
+> -        .pnum = pnum,
+> -        .file = file,
+> -    };
+> +    size_t len;
 
-Agreed,
+size_t len = bytes;
 
-Thanks,
-Marcel
+with that:
+Reviewed-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+
+> +    int status;
+>       QEDRequest request = { .l2_table = NULL };
+>       uint64_t offset;
+>       int ret;
+>
+>       qemu_co_mutex_lock(&s->table_lock);
+> -    ret = qed_find_cluster(s, &request, cb.pos, &len, &offset);
+> -    qed_is_allocated_cb(&cb, ret, offset, len);
+> +    ret = qed_find_cluster(s, &request, pos, &len, &offset);
+
+len is in-out parameter, you can't use it uninitialized.
+
+>
+> -    /* The callback was invoked immediately */
+> -    assert(cb.status != BDRV_BLOCK_OFFSET_MASK);
+> +    *pnum = len;
+> +    switch (ret) {
+> +    case QED_CLUSTER_FOUND:
+> +        *map = offset | qed_offset_into_cluster(s, pos);
+> +        status = BDRV_BLOCK_DATA | BDRV_BLOCK_OFFSET_VALID;
+> +        *file = bs->file->bs;
+> +        break;
+> +    case QED_CLUSTER_ZERO:
+> +        status = BDRV_BLOCK_ZERO;
+> +        break;
+> +    case QED_CLUSTER_L2:
+> +    case QED_CLUSTER_L1:
+> +        status = 0;
+> +        break;
+> +    default:
+> +        assert(ret < 0);
+> +        status = ret;
+> +        break;
+> +    }
+>
+>       qed_unref_l2_cache_entry(request.l2_table);
+>       qemu_co_mutex_unlock(&s->table_lock);
+>
+> -    return cb.status;
+> +    return status;
+>   }
+>
+>   static BDRVQEDState *acb_to_s(QEDAIOCB *acb)
+> @@ -1595,7 +1567,7 @@ static BlockDriver bdrv_qed = {
+>       .bdrv_child_perm          = bdrv_format_default_perms,
+>       .bdrv_create              = bdrv_qed_create,
+>       .bdrv_has_zero_init       = bdrv_has_zero_init_1,
+> -    .bdrv_co_get_block_status = bdrv_qed_co_get_block_status,
+> +    .bdrv_co_block_status     = bdrv_qed_co_block_status,
+>       .bdrv_co_readv            = bdrv_qed_co_readv,
+>       .bdrv_co_writev           = bdrv_qed_co_writev,
+>       .bdrv_co_pwrite_zeroes    = bdrv_qed_co_pwrite_zeroes,
+
+
+-- 
+Best regards,
+Vladimir
