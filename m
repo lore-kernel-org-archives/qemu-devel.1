@@ -1,30 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59054)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:32998)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1eKRWe-0007tz-Tv
-	for qemu-devel@nongnu.org; Thu, 30 Nov 2017 11:17:31 -0500
+	(envelope-from <wei.w.wang@intel.com>) id 1eKReL-0001zw-Pc
+	for qemu-devel@nongnu.org; Thu, 30 Nov 2017 11:25:25 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1eKRWb-0001eX-KZ
-	for qemu-devel@nongnu.org; Thu, 30 Nov 2017 11:17:24 -0500
-Received: from 4.mo6.mail-out.ovh.net ([87.98.184.159]:58223)
+	(envelope-from <wei.w.wang@intel.com>) id 1eKReI-0000lS-B0
+	for qemu-devel@nongnu.org; Thu, 30 Nov 2017 11:25:21 -0500
+Received: from mga07.intel.com ([134.134.136.100]:62398)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1eKRWb-0001dc-Az
-	for qemu-devel@nongnu.org; Thu, 30 Nov 2017 11:17:21 -0500
-Received: from player696.ha.ovh.net (b7.ovh.net [213.186.33.57])
-	by mo6.mail-out.ovh.net (Postfix) with ESMTP id C87FC120D71
-	for <qemu-devel@nongnu.org>; Thu, 30 Nov 2017 17:17:19 +0100 (CET)
-References: <20171123132955.1261-1-clg@kaod.org>
-	<20171123132955.1261-16-clg@kaod.org>
-	<20171130050049.GD3023@umbus.fritz.box>
-From: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
-Message-ID: <ccaf98b5-fbfb-6d0b-9929-9d84e7955ebc@kaod.org>
-Date: Thu, 30 Nov 2017 16:17:14 +0000
-MIME-Version: 1.0
-In-Reply-To: <20171130050049.GD3023@umbus.fritz.box>
-Content-Type: text/plain; charset=windows-1252
+	(Exim 4.71) (envelope-from <wei.w.wang@intel.com>)
+	id 1eKReH-0000gU-OT
+	for qemu-devel@nongnu.org; Thu, 30 Nov 2017 11:25:18 -0500
+From: "Wang, Wei W" <wei.w.wang@intel.com>
+Date: Thu, 30 Nov 2017 16:25:09 +0000
+Message-ID: <286AC319A985734F985F78AFA26841F739376336@shsmsx102.ccr.corp.intel.com>
+References: <1511963726-34070-1-git-send-email-wei.w.wang@intel.com>
+	<1511963726-34070-8-git-send-email-wei.w.wang@intel.com>
+	<201711301935.EHF86450.MSFLOOHFJtFOQV@I-love.SAKURA.ne.jp>
+In-Reply-To: <201711301935.EHF86450.MSFLOOHFJtFOQV@I-love.SAKURA.ne.jp>
 Content-Language: en-US
+Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 15/25] spapr: notify the CPU when the XIVE
- interrupt priority is more privileged
+MIME-Version: 1.0
+Subject: Re: [Qemu-devel] [PATCH v18 07/10] virtio-balloon:
+ VIRTIO_BALLOON_F_SG
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,188 +31,133 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Gibson <david@gibson.dropbear.id.au>
-Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, Benjamin Herrenschmidt <benh@kernel.crashing.org>
+To: Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>
+Cc: "virtio-dev@lists.oasis-open.org" <virtio-dev@lists.oasis-open.org>, "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "virtualization@lists.linux-foundation.org" <virtualization@lists.linux-foundation.org>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>, "linux-mm@kvack.org" <linux-mm@kvack.org>, "mst@redhat.com" <mst@redhat.com>, "mhocko@kernel.org" <mhocko@kernel.org>, "akpm@linux-foundation.org" <akpm@linux-foundation.org>, "mawilcox@microsoft.com" <mawilcox@microsoft.com>, "david@redhat.com" <david@redhat.com>, "cornelia.huck@de.ibm.com" <cornelia.huck@de.ibm.com>, "mgorman@techsingularity.net" <mgorman@techsingularity.net>, "aarcange@redhat.com" <aarcange@redhat.com>, "amit.shah@redhat.com" <amit.shah@redhat.com>, "pbonzini@redhat.com" <pbonzini@redhat.com>, "willy@infradead.org" <willy@infradead.org>, "liliang.opensource@gmail.com" <liliang.opensource@gmail.com>, "yang.zhang.wz@gmail.com" <yang.zhang.wz@gmail.com>, "quan.xu@aliyun.com" <quan.xu@aliyun.com>, "nilal@redhat.com" <nilal@redhat.com>, "riel@redhat.com" <riel@redhat.com>
 
-On 11/30/2017 05:00 AM, David Gibson wrote:
-> On Thu, Nov 23, 2017 at 02:29:45PM +0100, C=E9dric Le Goater wrote:
->> The Pending Interrupt Priority Register (PIPR) contains the priority
->> of the most favored pending notification. It is calculated from the
->> Interrupt Pending Buffer (IPB) which indicates a pending interrupt at
->> the priority corresponding to the bit number.
->>
->> If the PIPR is more favored (1) than the Current Processor Priority
->> Register (CPPR), the CPU interrupt line is raised and the EO bit of
->> the Notification Source Register is updated to notify the presence of
->> an exception for the O/S. The check needs to be done whenever the PIPR
->> or the CPPR is changed.
->>
->> Then, the O/S Exception is raised and the O/S acknowledges the
->> interrupt with a special read in the TIMA. If the EO bit of the
->> Notification Source Register (NSR) is set (and it should), the Current
->> Processor Priority Register (CPPR) takes the value of the Pending
->> Interrupt Priority Register (PIPR). The bit number in the Interrupt
->> Pending Buffer (IPB) corresponding to the priority of the pending
->> interrupt is reseted and so is the EO bit of the NSR.
->>
->> (1) numerically less than
->>
->> Signed-off-by: C=E9dric Le Goater <clg@kaod.org>
->> ---
->>  hw/intc/spapr_xive.c | 77 +++++++++++++++++++++++++++++++++++++++++++=
-++++++++-
->>  1 file changed, 76 insertions(+), 1 deletion(-)
->>
->> diff --git a/hw/intc/spapr_xive.c b/hw/intc/spapr_xive.c
->> index df14c5a88275..fead9c7031f3 100644
->> --- a/hw/intc/spapr_xive.c
->> +++ b/hw/intc/spapr_xive.c
->> @@ -39,9 +39,63 @@ struct sPAPRXiveICP {
->>      XiveEQ    eqt[XIVE_PRIORITY_MAX + 1];
->>  };
->> =20
->> +/* Convert a priority number to an Interrupt Pending Buffer (IPB)
->> + * register, which indicates a pending interrupt at the priority
->> + * corresponding to the bit number
->> + */
->> +static uint8_t priority_to_ipb(uint8_t priority)
->> +{
->> +    return priority > XIVE_PRIORITY_MAX ?
->> +        0 : 1 << (XIVE_PRIORITY_MAX - priority);
+On Thursday, November 30, 2017 6:36 PM, Tetsuo Handa wrote:
+> Wei Wang wrote:
+> > +static inline int xb_set_page(struct virtio_balloon *vb,
+> > +			       struct page *page,
+> > +			       unsigned long *pfn_min,
+> > +			       unsigned long *pfn_max)
+> > +{
+> > +	unsigned long pfn =3D page_to_pfn(page);
+> > +	int ret;
+> > +
+> > +	*pfn_min =3D min(pfn, *pfn_min);
+> > +	*pfn_max =3D max(pfn, *pfn_max);
+> > +
+> > +	do {
+> > +		ret =3D xb_preload_and_set_bit(&vb->page_xb, pfn,
+> > +					     GFP_NOWAIT | __GFP_NOWARN);
 >=20
-> Does handling out of bounds values here make sense, or should you just
-> assert() they're not passed in?
-
-Looking at the code, I think we could assert, yes. I need to=20
-check the SET_OS_PENDING command first.
-
->> +}
->> +
->> +/* Convert an Interrupt Pending Buffer (IPB) register to a Pending
->> + * Interrupt Priority Register (PIPR), which contains the priority of
->> + * the most favored pending notification.
->> + *
->> + * TODO:
->> + *
->> + *   PIPR is clamped to CPPR. So the value in the PIPR is:
->> + *
->> + *     v =3D leftmost_bit_of(ipb) (or 0xff);
->> + *     pipr =3D v < cppr ? v : cppr;
->> + *
->> + * Ben says: "which means it's never actually 0xff ... surprise !".
->> + * But, the CPPR can be set to 0xFF ... I am confused ...
+> It is a bit of pity that __GFP_NOWARN here is applied to only xb_preload(=
+).
+> Memory allocation by xb_set_bit() will after all emit warnings. Maybe
 >=20
-> A resolution to this would be nice..
-
-That's on my TODO list. Not a big issue.=20
-=20
->> + */
->> +static uint8_t ipb_to_pipr(uint8_t ibp)
->> +{
->> +    return ibp ? clz32((uint32_t)ibp << 24) : 0xff;
->> +}
->> +
->>  static uint64_t spapr_xive_icp_accept(sPAPRXiveICP *icp)
->>  {
->> -    return 0;
->> +    uint8_t nsr =3D icp->tima_os[TM_NSR];
->> +
->> +    qemu_irq_lower(icp->output);
->> +
->> +    if (icp->tima_os[TM_NSR] & TM_QW1_NSR_EO) {
->> +        uint8_t cppr =3D icp->tima_os[TM_PIPR];
->> +
->> +        icp->tima_os[TM_CPPR] =3D cppr;
->> +
->> +        /* Reset the pending buffer bit */
->> +        icp->tima_os[TM_IPB] &=3D ~priority_to_ipb(cppr);
+>   xb_init(&vb->page_xb);
+>   vb->page_xb.gfp_mask |=3D __GFP_NOWARN;
 >=20
-> What if multiple irqs of the same priority were queued?
+> is tolerable? Or, unconditionally apply __GFP_NOWARN at xb_init()?
+>=20
 
-When an interrupt is EOI'ed, the queue is scanned to check=20
-for any pending interrupts. If so, a replay is forced with=20
-a call to force_external_irq_replay()
 
-C.=20
+
+Please have a check this one: radix_tree_node_alloc()
+
+In our case, I think the code path goes to=20
+
+if (!gfpflags_allow_blocking(gfp_mask) && !in_interrupt()) {
+...
+ret =3D kmem_cache_alloc(radix_tree_node_cachep,
+                                       gfp_mask | __GFP_NOWARN);
+...
+goto out;
+}
+
+So I think the __GFP_NOWARN is already there.
+
+
+
+>   static inline void xb_init(struct xb *xb)
+>   {
+>           INIT_RADIX_TREE(&xb->xbrt, IDR_RT_MARKER | GFP_NOWAIT);
+>   }
+>=20
+> > +	} while (unlikely(ret =3D=3D -EAGAIN));
+> > +
+> > +	return ret;
+> > +}
+> > +
+>=20
+>=20
+>=20
+> > @@ -172,11 +283,18 @@ static unsigned fill_balloon(struct virtio_balloo=
+n
+> *vb, size_t num)
+> >  	vb->num_pfns =3D 0;
+> >
+> >  	while ((page =3D balloon_page_pop(&pages))) {
+> > +		if (use_sg) {
+> > +			if (xb_set_page(vb, page, &pfn_min, &pfn_max) < 0) {
+> > +				__free_page(page);
+> > +				break;
+>=20
+> You cannot "break;" without consuming all pages in "pages".
+
+
+Right, I think it should be "continue" here. Thanks.=20
 
 >=20
->> +        icp->tima_os[TM_PIPR] =3D ipb_to_pipr(icp->tima_os[TM_IPB]);
->> +
->> +        /* Drop Exception bit for OS */
->> +        icp->tima_os[TM_NSR] &=3D ~TM_QW1_NSR_EO;
->> +    }
->> +
->> +    return (nsr << 8) | icp->tima_os[TM_CPPR];
->> +}
->> +
->> +static void spapr_xive_icp_notify(sPAPRXiveICP *icp)
->> +{
->> +    if (icp->tima_os[TM_PIPR] < icp->tima_os[TM_CPPR]) {
->> +        icp->tima_os[TM_NSR] |=3D TM_QW1_NSR_EO;
->> +        qemu_irq_raise(icp->output);
->> +    }
->>  }
->> =20
->>  static void spapr_xive_icp_set_cppr(sPAPRXiveICP *icp, uint8_t cppr)
->> @@ -51,6 +105,9 @@ static void spapr_xive_icp_set_cppr(sPAPRXiveICP *i=
-cp, uint8_t cppr)
->>      }
->> =20
->>      icp->tima_os[TM_CPPR] =3D cppr;
->> +
->> +    /* CPPR has changed, inform the ICP which might raise an exceptio=
-n */
->> +    spapr_xive_icp_notify(icp);
->>  }
->> =20
->>  /*
->> @@ -224,6 +281,8 @@ static void spapr_xive_irq(sPAPRXive *xive, int li=
-sn)
->>      XiveEQ *eq;
->>      uint32_t eq_idx;
->>      uint8_t priority;
->> +    uint32_t server;
->> +    sPAPRXiveICP *icp;
->> =20
->>      ive =3D spapr_xive_get_ive(xive, lisn);
->>      if (!ive || !(ive->w & IVE_VALID)) {
->> @@ -253,6 +312,13 @@ static void spapr_xive_irq(sPAPRXive *xive, int l=
-isn)
->>          qemu_log_mask(LOG_UNIMP, "XIVE: !UCOND_NOTIFY not implemented=
-\n");
->>      }
->> =20
->> +    server =3D GETFIELD(EQ_W6_NVT_INDEX, eq->w6);
->> +    icp =3D spapr_xive_icp_get(xive, server);
->> +    if (!icp) {
->> +        qemu_log_mask(LOG_GUEST_ERROR, "XIVE: No ICP for server %d\n"=
-, server);
->> +        return;
->> +    }
->> +
->>      if (GETFIELD(EQ_W6_FORMAT_BIT, eq->w6) =3D=3D 0) {
->>          priority =3D GETFIELD(EQ_W7_F0_PRIORITY, eq->w7);
->> =20
->> @@ -260,9 +326,18 @@ static void spapr_xive_irq(sPAPRXive *xive, int l=
-isn)
->>          if (priority =3D=3D 0xff) {
->>              g_assert_not_reached();
->>          }
->> +
->> +        /* Update the IPB (Interrupt Pending Buffer) with the priorit=
-y
->> +         * of the new notification and inform the ICP, which will
->> +         * decide to raise the exception, or not, depending the CPPR.
->> +         */
->> +        icp->tima_os[TM_IPB] |=3D priority_to_ipb(priority);
->> +        icp->tima_os[TM_PIPR] =3D ipb_to_pipr(icp->tima_os[TM_IPB]);
->>      } else {
->>          qemu_log_mask(LOG_UNIMP, "XIVE: w7 format1 not implemented\n"=
-);
->>      }
->> +
->> +    spapr_xive_icp_notify(icp);
->>  }
->> =20
->>  /*
+> > +			}
+> > +		} else {
+> > +			set_page_pfns(vb, vb->pfns + vb->num_pfns, page);
+> > +		}
+> > +
+> >  		balloon_page_enqueue(&vb->vb_dev_info, page);
+> >
+> >  		vb->num_pfns +=3D VIRTIO_BALLOON_PAGES_PER_PAGE;
+> > -
+> > -		set_page_pfns(vb, vb->pfns + vb->num_pfns, page);
+> >  		vb->num_pages +=3D VIRTIO_BALLOON_PAGES_PER_PAGE;
+> >  		if (!virtio_has_feature(vb->vdev,
+> >
+> 	VIRTIO_BALLOON_F_DEFLATE_ON_OOM))
 >=20
+>=20
+>=20
+> > @@ -212,9 +334,12 @@ static unsigned leak_balloon(struct virtio_balloon
+> *vb, size_t num)
+> >  	struct page *page;
+> >  	struct balloon_dev_info *vb_dev_info =3D &vb->vb_dev_info;
+> >  	LIST_HEAD(pages);
+> > +	bool use_sg =3D virtio_has_feature(vb->vdev, VIRTIO_BALLOON_F_SG);
+>=20
+> You can pass use_sg as an argument to leak_balloon(). Then, you won't nee=
+d
+> to define leak_balloon_sg_oom(). Since xbitmap allocation does not use
+> __GFP_DIRECT_RECLAIM, it is safe to reuse leak_balloon() for OOM path.
+> Just be sure to pass use_sg =3D=3D false because memory allocation for us=
+e_sg =3D=3D
+> true likely fails when called from OOM path. (But trying use_sg =3D=3D tr=
+ue for
+> OOM path and then fallback to use_sg =3D=3D false is not bad?)
+>=20
+
+
+But once the SG mechanism is in use, we cannot use the non-SG mechanism, be=
+cause the interface between the guest and host is not the same for SG and n=
+on-SG. Methods to make the host support both mechanisms at the same time wo=
+uld complicate the interface and implementation.=20
+
+I also think the old non-SG mechanism should be deprecated to use since its=
+ implementation isn't perfect in some sense, e.g. it balloons pages using o=
+utbuf which implies that no changes are allowed to the balloon pages and th=
+is isn't true for ballooning. The new mechanism (SG) has changed it to use =
+inbuf.
+
+So I think using leak_balloon_sg_oom() would be better. Is there any reason=
+ that we couldn't use it?
+
+Best,
+Wei
