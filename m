@@ -1,26 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55279)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55324)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1eKRKr-0002WI-13
-	for qemu-devel@nongnu.org; Thu, 30 Nov 2017 11:05:19 -0500
+	(envelope-from <cohuck@redhat.com>) id 1eKRKx-0002Ym-3G
+	for qemu-devel@nongnu.org; Thu, 30 Nov 2017 11:05:28 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1eKRKh-0005EX-MP
-	for qemu-devel@nongnu.org; Thu, 30 Nov 2017 11:05:13 -0500
-References: <20171129144956.11409-1-famz@redhat.com>
-	<20171129172546.GG3753@localhost.localdomain>
-	<20171130020359.GB16237@lemon>
-	<20171130103135.GA4039@localhost.localdomain>
-	<20171130143430.GA24067@lemon>
-	<20171130151038.GE4039@localhost.localdomain>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <02559c3a-0de0-df8c-4324-d326715b1f86@redhat.com>
-Date: Thu, 30 Nov 2017 17:04:40 +0100
+	(envelope-from <cohuck@redhat.com>) id 1eKRKw-0005T1-7R
+	for qemu-devel@nongnu.org; Thu, 30 Nov 2017 11:05:19 -0500
+Date: Thu, 30 Nov 2017 17:05:08 +0100
+From: Cornelia Huck <cohuck@redhat.com>
+Message-ID: <20171130170508.402d426b.cohuck@redhat.com>
+In-Reply-To: <69cba44d-5126-4711-4be6-362cc2ce10d7@redhat.com>
+References: <1511816136-30068-1-git-send-email-walling@linux.vnet.ibm.com>
+	<1511816136-30068-4-git-send-email-walling@linux.vnet.ibm.com>
+	<47adadbb-04a5-a91b-9e61-861c905a520b@redhat.com>
+	<8ff918de-c3e3-14da-db46-3b220b00cc7f@linux.vnet.ibm.com>
+	<69cba44d-5126-4711-4be6-362cc2ce10d7@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20171130151038.GE4039@localhost.localdomain>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH RFC 0/9] block: Rewrite block drain
- begin/end
+Subject: Re: [Qemu-devel] [qemu-s390x] [PATCH v1 3/5] s390-ccw: parse and
+ set boot menu options
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,27 +27,39 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Kevin Wolf <kwolf@redhat.com>, Fam Zheng <famz@redhat.com>
-Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, jcody@redhat.com, Max Reitz <mreitz@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>
+To: David Hildenbrand <david@redhat.com>
+Cc: "Collin L. Walling" <walling@linux.vnet.ibm.com>, borntraeger@de.ibm.com, frankja@linux.vnet.ibm.com, qemu-s390x@nongnu.org, qemu-devel@nongnu.org
 
-On 30/11/2017 16:10, Kevin Wolf wrote:
->> Yes, I agree, but that (using CoMutex around graph change) requires
->> everything, especially the defer_to_main_loop_bh, runs in a coroutine
->> context, which is exactly what I mean by "introducing 'ubiquitous
->> coroutines'", because currently we don't have them.
-> Is it hard to do, though? Instead of using a BH to switch to the main
-> loop and outside of coroutine context, you could use aio_co_schedule()
-> and yield, which would leave you in the main loop, but still in
-> coroutine context.
+On Thu, 30 Nov 2017 16:52:37 +0100
+David Hildenbrand <david@redhat.com> wrote:
 
-Not that I think of, but just aio_co_schedule wouldn't work, because
-"the coroutine must have yielded unless ctx is the context in which the
-coroutine is running (i.e. the value of qemu_get_current_aio_context()
-from the coroutine itself)".
+> On 29.11.2017 23:33, Collin L. Walling wrote:
+> > On 11/29/2017 05:28 PM, David Hildenbrand wrote:  
+> >> On 27.11.2017 21:55, Collin L. Walling wrote:  
+> >>> Set boot menu options for an s390 guest and store them in
+> >>> the iplb. These options are set via the QEMU command line
+> >>> option:
+> >>>
+> >>>      -boot menu=on|off[,splash-time=X]
+> >>>
+> >>> or via the libvirt domain xml:
+> >>>
+> >>>      <os>
+> >>>        <bootmenu enable='yes|no' timeout='X'/>
+> >>>      </os>
+> >>>
+> >>> Where X represents some positive integer representing
+> >>> milliseconds.  
+> >> Aren't this properties usually contained in the zIPL block? (e.g.
+> >> written and configured by zipl)
+> >>  
+> > I believe the timeout value is nestled in there somewhere, yes.
+> > However it was requested that we control the boot menu timeout value
+> > via the Qemu command line instead. :)
+> >   
+> 
+> Wonder if it makes sense to always act like the zIPL loader (display
+> menu/timeout) but allow to overwrite it via cmd line.
+> 
 
-So you'd have to use a bottom half that calls aio_co_schedule.  But that
-would work.
-
-Paolo
-
-> Would this have any bad side effects I'm not aware of?
+I think that make quite a bit of sense.
