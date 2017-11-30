@@ -1,27 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35845)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39691)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <penguin-kernel@I-love.SAKURA.ne.jp>)
-	id 1eKMFR-0003QS-QP
-	for qemu-devel@nongnu.org; Thu, 30 Nov 2017 05:39:18 -0500
+	(envelope-from <dgilbert@redhat.com>) id 1eKMPm-0007Mv-VH
+	for qemu-devel@nongnu.org; Thu, 30 Nov 2017 05:50:00 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <penguin-kernel@I-love.SAKURA.ne.jp>)
-	id 1eKMFM-0007KG-TN
-	for qemu-devel@nongnu.org; Thu, 30 Nov 2017 05:39:17 -0500
-Received: from www262.sakura.ne.jp ([2001:e42:101:1:202:181:97:72]:28325)
+	(envelope-from <dgilbert@redhat.com>) id 1eKMPj-00019L-1V
+	for qemu-devel@nongnu.org; Thu, 30 Nov 2017 05:49:59 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:60654)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <penguin-kernel@I-love.SAKURA.ne.jp>)
-	id 1eKMFM-0007ID-1K
-	for qemu-devel@nongnu.org; Thu, 30 Nov 2017 05:39:12 -0500
-From: Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>
-References: <1511963726-34070-1-git-send-email-wei.w.wang@intel.com>
-	<1511963726-34070-8-git-send-email-wei.w.wang@intel.com>
-In-Reply-To: <1511963726-34070-8-git-send-email-wei.w.wang@intel.com>
-Message-Id: <201711301935.EHF86450.MSFLOOHFJtFOQV@I-love.SAKURA.ne.jp>
-Date: Thu, 30 Nov 2017 19:35:55 +0900
-Mime-Version: 1.0
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1eKMPi-00018U-O6
+	for qemu-devel@nongnu.org; Thu, 30 Nov 2017 05:49:54 -0500
+Date: Thu, 30 Nov 2017 10:49:45 +0000
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20171130104945.GB2248@work-vm>
+References: <20171108060130.3772-1-peterx@redhat.com>
+	<20171108060130.3772-6-peterx@redhat.com>
+MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Subject: Re: [Qemu-devel] [PATCH v18 07/10] virtio-balloon:
- VIRTIO_BALLOON_F_SG
+Content-Disposition: inline
+In-Reply-To: <20171108060130.3772-6-peterx@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v4 05/32] migration: implement
+ "postcopy-pause" src logic
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,108 +28,198 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: wei.w.wang@intel.com
-Cc: virtio-dev@lists.oasis-open.org, linux-kernel@vger.kernel.org, qemu-devel@nongnu.org, virtualization@lists.linux-foundation.org, kvm@vger.kernel.org, linux-mm@kvack.org, mst@redhat.com, mhocko@kernel.org, akpm@linux-foundation.org, mawilcox@microsoft.com, david@redhat.com, cornelia.huck@de.ibm.com, mgorman@techsingularity.net, aarcange@redhat.com, amit.shah@redhat.com, pbonzini@redhat.com, willy@infradead.org, liliang.opensource@gmail.com, yang.zhang.wz@gmail.com, quan.xu@aliyun.com, nilal@redhat.com, riel@redhat.com
+To: Peter Xu <peterx@redhat.com>
+Cc: qemu-devel@nongnu.org, Alexey Perevalov <a.perevalov@samsung.com>, "Daniel P . Berrange" <berrange@redhat.com>, Juan Quintela <quintela@redhat.com>, Andrea Arcangeli <aarcange@redhat.com>
 
-Wei Wang wrote:
-> +static inline int xb_set_page(struct virtio_balloon *vb,
-> +			       struct page *page,
-> +			       unsigned long *pfn_min,
-> +			       unsigned long *pfn_max)
+* Peter Xu (peterx@redhat.com) wrote:
+> Now when network down for postcopy, the source side will not fail the
+> migration. Instead we convert the status into this new paused state, and
+> we will try to wait for a rescue in the future.
+> 
+> If a recovery is detected, migration_thread() will reset its local
+> variables to prepare for that.
+> 
+> Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+
+That's still OK; you might want to consider reusing the 'pause_sem' that I
+added to MigrationStatus for the other pause case.
+
+Dave
+
+> Signed-off-by: Peter Xu <peterx@redhat.com>
+> ---
+>  migration/migration.c  | 98 +++++++++++++++++++++++++++++++++++++++++++++++---
+>  migration/migration.h  |  3 ++
+>  migration/trace-events |  1 +
+>  3 files changed, 98 insertions(+), 4 deletions(-)
+> 
+> diff --git a/migration/migration.c b/migration/migration.c
+> index dd270f8bc5..46e7ca36a4 100644
+> --- a/migration/migration.c
+> +++ b/migration/migration.c
+> @@ -1111,6 +1111,8 @@ static void migrate_fd_cleanup(void *opaque)
+>      }
+>      notifier_list_notify(&migration_state_notifiers, s);
+>      block_cleanup_parameters(s);
+> +
+> +    qemu_sem_destroy(&s->postcopy_pause_sem);
+>  }
+>  
+>  void migrate_set_error(MigrationState *s, const Error *error)
+> @@ -1267,6 +1269,7 @@ MigrationState *migrate_init(void)
+>      s->migration_thread_running = false;
+>      error_free(s->error);
+>      s->error = NULL;
+> +    qemu_sem_init(&s->postcopy_pause_sem, 0);
+>  
+>      migrate_set_state(&s->state, MIGRATION_STATUS_NONE, MIGRATION_STATUS_SETUP);
+>  
+> @@ -2159,6 +2162,80 @@ bool migrate_colo_enabled(void)
+>      return s->enabled_capabilities[MIGRATION_CAPABILITY_X_COLO];
+>  }
+>  
+> +typedef enum MigThrError {
+> +    /* No error detected */
+> +    MIG_THR_ERR_NONE = 0,
+> +    /* Detected error, but resumed successfully */
+> +    MIG_THR_ERR_RECOVERED = 1,
+> +    /* Detected fatal error, need to exit */
+> +    MIG_THR_ERR_FATAL = 2,
+> +} MigThrError;
+> +
+> +/*
+> + * We don't return until we are in a safe state to continue current
+> + * postcopy migration.  Returns MIG_THR_ERR_RECOVERED if recovered, or
+> + * MIG_THR_ERR_FATAL if unrecovery failure happened.
+> + */
+> +static MigThrError postcopy_pause(MigrationState *s)
 > +{
-> +	unsigned long pfn = page_to_pfn(page);
-> +	int ret;
+> +    assert(s->state == MIGRATION_STATUS_POSTCOPY_ACTIVE);
+> +    migrate_set_state(&s->state, MIGRATION_STATUS_POSTCOPY_ACTIVE,
+> +                      MIGRATION_STATUS_POSTCOPY_PAUSED);
 > +
-> +	*pfn_min = min(pfn, *pfn_min);
-> +	*pfn_max = max(pfn, *pfn_max);
+> +    /* Current channel is possibly broken. Release it. */
+> +    assert(s->to_dst_file);
+> +    qemu_file_shutdown(s->to_dst_file);
+> +    qemu_fclose(s->to_dst_file);
+> +    s->to_dst_file = NULL;
 > +
-> +	do {
-> +		ret = xb_preload_and_set_bit(&vb->page_xb, pfn,
-> +					     GFP_NOWAIT | __GFP_NOWARN);
-
-It is a bit of pity that __GFP_NOWARN here is applied to only xb_preload().
-Memory allocation by xb_set_bit() will after all emit warnings. Maybe
-
-  xb_init(&vb->page_xb);
-  vb->page_xb.gfp_mask |= __GFP_NOWARN;
-
-is tolerable? Or, unconditionally apply __GFP_NOWARN at xb_init()?
-
-  static inline void xb_init(struct xb *xb)
-  {
-          INIT_RADIX_TREE(&xb->xbrt, IDR_RT_MARKER | GFP_NOWAIT);
-  }
-
-> +	} while (unlikely(ret == -EAGAIN));
+> +    error_report("Detected IO failure for postcopy. "
+> +                 "Migration paused.");
 > +
-> +	return ret;
+> +    /*
+> +     * We wait until things fixed up. Then someone will setup the
+> +     * status back for us.
+> +     */
+> +    while (s->state == MIGRATION_STATUS_POSTCOPY_PAUSED) {
+> +        qemu_sem_wait(&s->postcopy_pause_sem);
+> +    }
+> +
+> +    trace_postcopy_pause_continued();
+> +
+> +    return MIG_THR_ERR_RECOVERED;
 > +}
 > +
-
-
-
-> @@ -172,11 +283,18 @@ static unsigned fill_balloon(struct virtio_balloon *vb, size_t num)
->  	vb->num_pfns = 0;
->  
->  	while ((page = balloon_page_pop(&pages))) {
-> +		if (use_sg) {
-> +			if (xb_set_page(vb, page, &pfn_min, &pfn_max) < 0) {
-> +				__free_page(page);
-> +				break;
-
-You cannot "break;" without consuming all pages in "pages".
-
-> +			}
-> +		} else {
-> +			set_page_pfns(vb, vb->pfns + vb->num_pfns, page);
-> +		}
+> +static MigThrError migration_detect_error(MigrationState *s)
+> +{
+> +    int ret;
 > +
->  		balloon_page_enqueue(&vb->vb_dev_info, page);
+> +    /* Try to detect any file errors */
+> +    ret = qemu_file_get_error(s->to_dst_file);
+> +
+> +    if (!ret) {
+> +        /* Everything is fine */
+> +        return MIG_THR_ERR_NONE;
+> +    }
+> +
+> +    if (s->state == MIGRATION_STATUS_POSTCOPY_ACTIVE && ret == -EIO) {
+> +        /*
+> +         * For postcopy, we allow the network to be down for a
+> +         * while. After that, it can be continued by a
+> +         * recovery phase.
+> +         */
+> +        return postcopy_pause(s);
+> +    } else {
+> +        /*
+> +         * For precopy (or postcopy with error outside IO), we fail
+> +         * with no time.
+> +         */
+> +        migrate_set_state(&s->state, s->state, MIGRATION_STATUS_FAILED);
+> +        trace_migration_thread_file_err();
+> +
+> +        /* Time to stop the migration, now. */
+> +        return MIG_THR_ERR_FATAL;
+> +    }
+> +}
+> +
+>  /*
+>   * Master migration thread on the source VM.
+>   * It drives the migration and pumps the data down the outgoing channel.
+> @@ -2183,6 +2260,7 @@ static void *migration_thread(void *opaque)
+>      /* The active state we expect to be in; ACTIVE or POSTCOPY_ACTIVE */
+>      enum MigrationStatus current_active_state = MIGRATION_STATUS_ACTIVE;
+>      bool enable_colo = migrate_colo_enabled();
+> +    MigThrError thr_error;
 >  
->  		vb->num_pfns += VIRTIO_BALLOON_PAGES_PER_PAGE;
-> -
-> -		set_page_pfns(vb, vb->pfns + vb->num_pfns, page);
->  		vb->num_pages += VIRTIO_BALLOON_PAGES_PER_PAGE;
->  		if (!virtio_has_feature(vb->vdev,
->  					VIRTIO_BALLOON_F_DEFLATE_ON_OOM))
-
-
-
-> @@ -212,9 +334,12 @@ static unsigned leak_balloon(struct virtio_balloon *vb, size_t num)
->  	struct page *page;
->  	struct balloon_dev_info *vb_dev_info = &vb->vb_dev_info;
->  	LIST_HEAD(pages);
-> +	bool use_sg = virtio_has_feature(vb->vdev, VIRTIO_BALLOON_F_SG);
-
-You can pass use_sg as an argument to leak_balloon(). Then, you won't
-need to define leak_balloon_sg_oom(). Since xbitmap allocation does not
-use __GFP_DIRECT_RECLAIM, it is safe to reuse leak_balloon() for OOM path.
-Just be sure to pass use_sg == false because memory allocation for
-use_sg == true likely fails when called from OOM path. (But trying
-use_sg == true for OOM path and then fallback to use_sg == false is not bad?)
-
-> +	unsigned long pfn_max = 0, pfn_min = ULONG_MAX;
+>      rcu_register_thread();
 >  
-> -	/* We can only do one array worth at a time. */
-> -	num = min(num, ARRAY_SIZE(vb->pfns));
-> +	/* Traditionally, we can only do one array worth at a time. */
-> +	if (!use_sg)
-> +		num = min(num, ARRAY_SIZE(vb->pfns));
+> @@ -2255,12 +2333,24 @@ static void *migration_thread(void *opaque)
+>              }
+>          }
 >  
->  	mutex_lock(&vb->balloon_lock);
->  	/* We can't release more pages than taken */
-
-
-
-> diff --git a/include/uapi/linux/virtio_balloon.h b/include/uapi/linux/virtio_balloon.h
-> index 343d7dd..37780a7 100644
-> --- a/include/uapi/linux/virtio_balloon.h
-> +++ b/include/uapi/linux/virtio_balloon.h
-> @@ -34,6 +34,7 @@
->  #define VIRTIO_BALLOON_F_MUST_TELL_HOST	0 /* Tell before reclaiming pages */
->  #define VIRTIO_BALLOON_F_STATS_VQ	1 /* Memory Stats virtqueue */
->  #define VIRTIO_BALLOON_F_DEFLATE_ON_OOM	2 /* Deflate balloon on OOM */
-> +#define VIRTIO_BALLOON_F_SG		3 /* Use sg instead of PFN lists */
-
-Want more explicit comment that PFN lists will be used on OOM and therefore
-the host side must be prepared for both sg and PFN lists even if negotiated?
+> -        if (qemu_file_get_error(s->to_dst_file)) {
+> -            migrate_set_state(&s->state, current_active_state,
+> -                              MIGRATION_STATUS_FAILED);
+> -            trace_migration_thread_file_err();
+> +        /*
+> +         * Try to detect any kind of failures, and see whether we
+> +         * should stop the migration now.
+> +         */
+> +        thr_error = migration_detect_error(s);
+> +        if (thr_error == MIG_THR_ERR_FATAL) {
+> +            /* Stop migration */
+>              break;
+> +        } else if (thr_error == MIG_THR_ERR_RECOVERED) {
+> +            /*
+> +             * Just recovered from a e.g. network failure, reset all
+> +             * the local variables. This is important to avoid
+> +             * breaking transferred_bytes and bandwidth calculation
+> +             */
+> +            initial_time = qemu_clock_get_ms(QEMU_CLOCK_REALTIME);
+> +            initial_bytes = 0;
+>          }
+> +
+>          current_time = qemu_clock_get_ms(QEMU_CLOCK_REALTIME);
+>          if (current_time >= initial_time + BUFFER_DELAY) {
+>              uint64_t transferred_bytes = qemu_ftell(s->to_dst_file) -
+> diff --git a/migration/migration.h b/migration/migration.h
+> index 6d36400975..36aaa13f50 100644
+> --- a/migration/migration.h
+> +++ b/migration/migration.h
+> @@ -156,6 +156,9 @@ struct MigrationState
+>      bool send_configuration;
+>      /* Whether we send section footer during migration */
+>      bool send_section_footer;
+> +
+> +    /* Needed by postcopy-pause state */
+> +    QemuSemaphore postcopy_pause_sem;
+>  };
+>  
+>  void migrate_set_state(int *state, int old_state, int new_state);
+> diff --git a/migration/trace-events b/migration/trace-events
+> index 6f29fcc686..da1c63a933 100644
+> --- a/migration/trace-events
+> +++ b/migration/trace-events
+> @@ -99,6 +99,7 @@ migration_thread_setup_complete(void) ""
+>  open_return_path_on_source(void) ""
+>  open_return_path_on_source_continue(void) ""
+>  postcopy_start(void) ""
+> +postcopy_pause_continued(void) ""
+>  postcopy_start_set_run(void) ""
+>  source_return_path_thread_bad_end(void) ""
+>  source_return_path_thread_end(void) ""
+> -- 
+> 2.13.6
+> 
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
