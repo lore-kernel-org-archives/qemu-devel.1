@@ -1,28 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37475)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40549)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <aik@ozlabs.ru>) id 1eKE5M-0002BG-7F
-	for qemu-devel@nongnu.org; Wed, 29 Nov 2017 20:56:22 -0500
+	(envelope-from <famz@redhat.com>) id 1eKECw-0004gd-Fd
+	for qemu-devel@nongnu.org; Wed, 29 Nov 2017 21:04:11 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <aik@ozlabs.ru>) id 1eKE5I-0004x7-5X
-	for qemu-devel@nongnu.org; Wed, 29 Nov 2017 20:56:20 -0500
-Received: from mail-pg0-x244.google.com ([2607:f8b0:400e:c05::244]:35836)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <aik@ozlabs.ru>) id 1eKE5H-0004wn-V5
-	for qemu-devel@nongnu.org; Wed, 29 Nov 2017 20:56:16 -0500
-Received: by mail-pg0-x244.google.com with SMTP id q20so2353665pgv.2
-	for <qemu-devel@nongnu.org>; Wed, 29 Nov 2017 17:56:15 -0800 (PST)
-References: <20171122073947.19325-1-aik@ozlabs.ru>
-	<20171129083624.134d46ce@t450s.home>
-From: Alexey Kardashevskiy <aik@ozlabs.ru>
-Message-ID: <f41f2faa-25f2-1c1d-a6e4-ba646fe6fb14@ozlabs.ru>
-Date: Thu, 30 Nov 2017 12:56:09 +1100
+	(envelope-from <famz@redhat.com>) id 1eKECv-0001LK-Ky
+	for qemu-devel@nongnu.org; Wed, 29 Nov 2017 21:04:10 -0500
+Date: Thu, 30 Nov 2017 10:03:59 +0800
+From: Fam Zheng <famz@redhat.com>
+Message-ID: <20171130020359.GB16237@lemon>
+References: <20171129144956.11409-1-famz@redhat.com>
+	<20171129172546.GG3753@localhost.localdomain>
 MIME-Version: 1.0
-In-Reply-To: <20171129083624.134d46ce@t450s.home>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-AU
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH qemu] vfio-pci: Remove unused fields from
- VFIOMSIXInfo
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20171129172546.GG3753@localhost.localdomain>
+Subject: Re: [Qemu-devel] [PATCH RFC 0/9] block: Rewrite block drain
+ begin/end
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,48 +24,45 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alex Williamson <alex.williamson@redhat.com>
-Cc: qemu-devel@nongnu.org
+To: Kevin Wolf <kwolf@redhat.com>
+Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, jcody@redhat.com, Max Reitz <mreitz@redhat.com>, pbonzini@redhat.com, Stefan Hajnoczi <stefanha@redhat.com>
 
-On 30/11/17 02:36, Alex Williamson wrote:
-> On Wed, 22 Nov 2017 18:39:47 +1100
-> Alexey Kardashevskiy <aik@ozlabs.ru> wrote:
+On Wed, 11/29 18:25, Kevin Wolf wrote:
+> Am 29.11.2017 um 15:49 hat Fam Zheng geschrieben:
+> > While we look at the fixes for 2.11, I briefly prototyped this series
+> > to see if it makes sense as a simplification of the drain API for
+> > 2.12.
+> > 
+> > The idea is to let AioContext manage quiesce callbacks, then the block
+> > layer only needs to do the in-flight request waiting. This lets us get
+> > rid of the callback recursion (both up and down).
 > 
-> Missing reference to commit that made these fields unused.  A Fixes tag
-> to that commit also seems appropriate.  An empty commit log is pretty
-> much never justified.
+> So essentially you don't drain individual nodes any more, but whole
+> AioContexts. I have a feeeling that this would be a step in the wrong
+> direction.
+> 
+> Not only would it completely bypass the path I/O requests take and
+> potentially drain a lot more than is actually necessary, but it also
+> requires that all nodes that are connected in a tree are in the same
+> AioContext.
 
-Ah. Right, sorry. I could not find when it was used, looks like never.
+Yeah, good point. Initially I wanted to introduce a BlockGraph object which
+manages the per-graph draining, (i.e. where to register the drain callbacks),
+but I felt lazy and used AioContext.
 
-
-> This also looks like 2.12 material.  Thanks,
-
-Indeed 2.12.
-
+Will that make it better?  BlockGraph would be a proper abstraction and will not
+limit the API to one AioContext per tree.
 
 > 
-> Alex
-> 
->> Signed-off-by: Alexey Kardashevskiy <aik@ozlabs.ru>
->> ---
->>  hw/vfio/pci.h | 2 --
->>  1 file changed, 2 deletions(-)
->>
->> diff --git a/hw/vfio/pci.h b/hw/vfio/pci.h
->> index c5e168e..06dcf99 100644
->> --- a/hw/vfio/pci.h
->> +++ b/hw/vfio/pci.h
->> @@ -93,8 +93,6 @@ typedef struct VFIOMSIXInfo {
->>      uint16_t entries;
->>      uint32_t table_offset;
->>      uint32_t pba_offset;
->> -    MemoryRegion mmap_mem;
->> -    void *mmap;
->>      unsigned long *pending;
->>  } VFIOMSIXInfo;
->>  
-> 
+> And finally, I don't really think that the recursion is even a problem.
+> The problem is with graph changes made by callbacks that drain allows to
+> run. With your changes, it might be a bit easier to avoid that
+> bdrv_drain() itself gets into trouble due to graph changes, but this
+> doesn't solve the problem for any (possibly indirect) callers of
+> bdrv_drain().
 
+The recursion is the one big place that can be easily broken by graph changes,
+fixing this doesn't make the situation any worse. We could still fix the
+indirect callers by taking references or by introducing "ubiquitous coroutines".
 
--- 
-Alexey
+Fam
