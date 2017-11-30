@@ -1,27 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43059)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44936)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1eKNjn-0005Rz-RY
-	for qemu-devel@nongnu.org; Thu, 30 Nov 2017 07:14:44 -0500
+	(envelope-from <vsementsov@virtuozzo.com>) id 1eKNrr-0007iR-Fe
+	for qemu-devel@nongnu.org; Thu, 30 Nov 2017 07:23:07 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1eKNjn-00042b-0p
-	for qemu-devel@nongnu.org; Thu, 30 Nov 2017 07:14:43 -0500
-Received: from mail-oi0-x244.google.com ([2607:f8b0:4003:c06::244]:37130)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1eKNjm-00042I-OY
-	for qemu-devel@nongnu.org; Thu, 30 Nov 2017 07:14:42 -0500
-Received: by mail-oi0-x244.google.com with SMTP id y75so4659334oie.4
-	for <qemu-devel@nongnu.org>; Thu, 30 Nov 2017 04:14:42 -0800 (PST)
+	(envelope-from <vsementsov@virtuozzo.com>) id 1eKNrq-0003PY-B8
+	for qemu-devel@nongnu.org; Thu, 30 Nov 2017 07:23:03 -0500
+References: <20171012185916.22776-1-eblake@redhat.com>
+	<20171012185916.22776-19-eblake@redhat.com>
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Message-ID: <2798892b-cd79-e958-9a26-5ff6ee9185fd@virtuozzo.com>
+Date: Thu, 30 Nov 2017 15:22:46 +0300
 MIME-Version: 1.0
-In-Reply-To: <1512031988-32490-4-git-send-email-thuth@redhat.com>
-References: <1512031988-32490-1-git-send-email-thuth@redhat.com>
-	<1512031988-32490-4-git-send-email-thuth@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Thu, 30 Nov 2017 12:14:21 +0000
-Message-ID: <CAFEAcA-LBOm=kHja3QJqOw-TT3GF9-i+wJfXdL-FU5NKimknzQ@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH for-2.12 3/7] tests/boot-serial-test: Add
- support for the mcf5208evb board
+In-Reply-To: <20171012185916.22776-19-eblake@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
+Content-Language: en-US
+Subject: Re: [Qemu-devel] [PATCH v4 18/20] vpc: Switch to
+ .bdrv_co_block_status()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,44 +25,120 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, Anthony Green <green@moxielogic.com>, Laurent Vivier <laurent@vivier.eu>, qemu-arm <qemu-arm@nongnu.org>, Edgar Iglesias <edgar.iglesias@gmail.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>
+To: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org
+Cc: kwolf@redhat.com, jsnow@redhat.com, famz@redhat.com, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>
 
-On 30 November 2017 at 08:53, Thomas Huth <thuth@redhat.com> wrote:
-> We can output a character quite easily here with some few lines of
-> assembly that we provide as a mini-kernel for this board.
+12.10.2017 21:59, Eric Blake wrote:
+> We are gradually moving away from sector-based interfaces, towards
+> byte-based.  Update the vpc driver accordingly.  Drop the now-unused
+> get_sector_offset().
 >
-> Signed-off-by: Thomas Huth <thuth@redhat.com>
+> Signed-off-by: Eric Blake <eblake@redhat.com>
+>
 > ---
->  tests/boot-serial-test.c | 10 ++++++++++
->  1 file changed, 10 insertions(+)
+> v4: rebase to interface tweak
+> v3: rebase to master
+> v2: drop get_sector_offset() [Kevin], rebase to mapping flag
+> ---
+>   block/vpc.c | 42 ++++++++++++++++++++++--------------------
+>   1 file changed, 22 insertions(+), 20 deletions(-)
 >
-> diff --git a/tests/boot-serial-test.c b/tests/boot-serial-test.c
-> index d997269..dd3828c 100644
-> --- a/tests/boot-serial-test.c
-> +++ b/tests/boot-serial-test.c
-> @@ -16,6 +16,14 @@
->  #include "qemu/osdep.h"
->  #include "libqtest.h"
+> diff --git a/block/vpc.c b/block/vpc.c
+> index 1576d7b595..4100ce1ed3 100644
+> --- a/block/vpc.c
+> +++ b/block/vpc.c
+> @@ -705,52 +705,54 @@ fail:
+>       return ret;
+>   }
 >
-> +static const uint8_t kernel_mcf5208[] = {
-> +    0x41, 0xf9, 0xfc, 0x06, 0x00, 0x00,     /* lea 0xfc060000,%a0 */
-> +    0x10, 0x3c, 0x00, 0x54,                 /* move.b #'T',%d0 */
-> +    0x11, 0x7c, 0x00, 0x04, 0x00, 0x08,     /* move.b #4,8(%a0)     Enable TX */
-> +    0x11, 0x40, 0x00, 0x0c,                 /* move.b %d0,12(%a0)   Print 'T' */
-> +    0x60, 0xfa                              /* bra.s  loop */
-> +};
+> -static int64_t coroutine_fn vpc_co_get_block_status(BlockDriverState *bs,
+> -        int64_t sector_num, int nb_sectors, int *pnum, BlockDriverState **file)
+> +static int coroutine_fn vpc_co_block_status(BlockDriverState *bs,
+> +                                            bool want_zero,
+> +                                            int64_t offset, int64_t bytes,
+> +                                            int64_t *pnum, int64_t *map,
+> +                                            BlockDriverState **file)
+>   {
+>       BDRVVPCState *s = bs->opaque;
+>       VHDFooter *footer = (VHDFooter*) s->footer_buf;
+> -    int64_t start, offset;
+> +    int64_t start, image_offset;
+>       bool allocated;
+> -    int64_t ret;
+> +    int ret;
+>       int n;
+>
+>       if (be32_to_cpu(footer->type) == VHD_FIXED) {
+> -        *pnum = nb_sectors;
+> +        *pnum = bytes;
+> +        *map = offset;
+>           *file = bs->file->bs;
+> -        return BDRV_BLOCK_RAW | BDRV_BLOCK_OFFSET_VALID |
+> -               (sector_num << BDRV_SECTOR_BITS);
+> +        return BDRV_BLOCK_RAW | BDRV_BLOCK_OFFSET_VALID;
+>       }
+>
+>       qemu_co_mutex_lock(&s->lock);
+>
+> -    offset = get_image_offset(bs, sector_num << BDRV_SECTOR_BITS, false, NULL);
+> -    start = offset;
+> -    allocated = (offset != -1);
+> +    image_offset = get_image_offset(bs, offset, false, NULL);
+> +    start = image_offset & BDRV_BLOCK_OFFSET_MASK;
 
-This approach doesn't seem to be scalable to me -- are we
-really going to have 50 or more fragments of hand-coded hex in
-this file to cover the various board models?
+why do you do so? round down to sector boundary? does it mean,
+that *map will corresponds not to offset, but to some previous byte?
 
-I'd much rather see us have a framework for being able
-to build test blobs from source using a cross compiler
-setup (and docker or similar so anybody can rebuild
-the test blobs). That will be much easier to maintain
-and easier to extend to having tests that test other
-parts of the board or other aspects of TCG emulation.
+> +    allocated = (image_offset != -1);
+>       *pnum = 0;
+>       ret = 0;
+>
+>       do {
+>           /* All sectors in a block are contiguous (without using the bitmap) */
+> -        n = ROUND_UP(sector_num + 1, s->block_size / BDRV_SECTOR_SIZE)
+> -          - sector_num;
+> -        n = MIN(n, nb_sectors);
+> +        n = ROUND_UP(offset + 1, s->block_size) - offset;
+> +        n = MIN(n, bytes);
+>
+>           *pnum += n;
+> -        sector_num += n;
+> -        nb_sectors -= n;
+> +        offset += n;
+> +        bytes -= n;
+>           /* *pnum can't be greater than one block for allocated
+>            * sectors since there is always a bitmap in between. */
+>           if (allocated) {
+>               *file = bs->file->bs;
+> -            ret = BDRV_BLOCK_DATA | BDRV_BLOCK_OFFSET_VALID | start;
+> +            *map = start;
+> +            ret = BDRV_BLOCK_DATA | BDRV_BLOCK_OFFSET_VALID;
+>               break;
+>           }
+> -        if (nb_sectors == 0) {
+> +        if (bytes == 0) {
+>               break;
+>           }
+> -        offset = get_image_offset(bs, sector_num << BDRV_SECTOR_BITS, false,
+> -                                  NULL);
+> +        image_offset = get_image_offset(bs, offset, false, NULL);
+>       } while (offset == -1);
 
-thanks
--- PMM
+image_offset here?
+
+>
+>       qemu_co_mutex_unlock(&s->lock);
+> @@ -1097,7 +1099,7 @@ static BlockDriver bdrv_vpc = {
+>
+>       .bdrv_co_preadv             = vpc_co_preadv,
+>       .bdrv_co_pwritev            = vpc_co_pwritev,
+> -    .bdrv_co_get_block_status   = vpc_co_get_block_status,
+> +    .bdrv_co_block_status       = vpc_co_block_status,
+>
+>       .bdrv_get_info          = vpc_get_info,
+>
+
+
+-- 
+Best regards,
+Vladimir
