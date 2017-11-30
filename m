@@ -1,23 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37068)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37369)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1eKNSk-0002FR-OT
-	for qemu-devel@nongnu.org; Thu, 30 Nov 2017 06:57:12 -0500
+	(envelope-from <david@redhat.com>) id 1eKNTb-0002oM-Me
+	for qemu-devel@nongnu.org; Thu, 30 Nov 2017 06:58:00 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1eKNSh-0007pV-N1
-	for qemu-devel@nongnu.org; Thu, 30 Nov 2017 06:57:06 -0500
+	(envelope-from <david@redhat.com>) id 1eKNTY-00086H-L7
+	for qemu-devel@nongnu.org; Thu, 30 Nov 2017 06:57:59 -0500
 References: <20171129202701.16117-1-david@redhat.com>
-	<20171129202701.16117-9-david@redhat.com>
-	<1690618c-ac06-8aa8-75ba-58fe95ab0d78@redhat.com>
+	<20171129202701.16117-12-david@redhat.com>
+	<072cfc9a-2be3-ab36-2a54-1113971b1566@redhat.com>
 From: David Hildenbrand <david@redhat.com>
-Message-ID: <d4a11905-f8a0-0c35-badb-64c613d89980@redhat.com>
-Date: Thu, 30 Nov 2017 12:57:00 +0100
+Message-ID: <bc75c08a-cf51-eb0e-881b-9a97445e242d@redhat.com>
+Date: Thu, 30 Nov 2017 12:57:53 +0100
 MIME-Version: 1.0
-In-Reply-To: <1690618c-ac06-8aa8-75ba-58fe95ab0d78@redhat.com>
+In-Reply-To: <072cfc9a-2be3-ab36-2a54-1113971b1566@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v2 for-2.12 08/16] s390x/tcg: don't exit
- the cpu loop in s390_cpu_virt_mem_rw()
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v2 for-2.12 11/16] s390x/tcg: use
+ s390_program_interrupt() in DIAG
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,52 +29,57 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: Thomas Huth <thuth@redhat.com>, qemu-s390x@nongnu.org, qemu-devel@nongnu.org
 Cc: Christian Borntraeger <borntraeger@de.ibm.com>, Cornelia Huck <cohuck@redhat.com>, Richard Henderson <rth@twiddle.net>, Alexander Graf <agraf@suse.de>
 
-On 30.11.2017 12:39, Thomas Huth wrote:
+On 30.11.2017 12:53, Thomas Huth wrote:
 > On 29.11.2017 21:26, David Hildenbrand wrote:
->> s390_cpu_virt_mem_rw() must always return, so callers can react on
->> an exception (e.g. see ioinst_handle_stcrw()).
+>> Now we can drop the two save statements in the translate function.
 >>
->> Therefore, using program_interrupt() is wrong. Fix that up.
->>
+>> Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 >> Signed-off-by: David Hildenbrand <david@redhat.com>
 >> ---
->>  target/s390x/mmu_helper.c | 2 +-
->>  1 file changed, 1 insertion(+), 1 deletion(-)
+>>  target/s390x/misc_helper.c | 2 +-
+>>  target/s390x/translate.c   | 3 ---
+>>  2 files changed, 1 insertion(+), 4 deletions(-)
 >>
->> diff --git a/target/s390x/mmu_helper.c b/target/s390x/mmu_helper.c
->> index dbe2f511f8..2c7f3d7d95 100644
->> --- a/target/s390x/mmu_helper.c
->> +++ b/target/s390x/mmu_helper.c
->> @@ -459,7 +459,7 @@ static int translate_pages(S390CPU *cpu, vaddr add=
-r, int nr_pages,
->>          }
->>          if (!address_space_access_valid(&address_space_memory, pages[=
-i],
->>                                          TARGET_PAGE_SIZE, is_write)) =
-{
->> -            program_interrupt(env, PGM_ADDRESSING, ILEN_AUTO);
->> +            trigger_pgm_exception(env, PGM_ADDRESSING, ILEN_AUTO);
->>              return -EFAULT;
->>          }
->>          addr +=3D TARGET_PAGE_SIZE;
->=20
-> Is that still right when running with KVM? I think the exception will
-> then silently be ignored instead?
+>> diff --git a/target/s390x/misc_helper.c b/target/s390x/misc_helper.c
+>> index 02654617b3..ee6179ef89 100644
+>> --- a/target/s390x/misc_helper.c
+>> +++ b/target/s390x/misc_helper.c
+>> @@ -101,7 +101,7 @@ void HELPER(diag)(CPUS390XState *env, uint32_t r1, uint32_t r3, uint32_t num)
+>>      }
+>>  
+>>      if (r) {
+>> -        program_interrupt(env, PGM_SPECIFICATION, ILEN_AUTO);
+>> +        s390_program_interrupt(env, PGM_SPECIFICATION, ILEN_AUTO, GETPC());
+>>      }
+>>  }
+>>  
+>> diff --git a/target/s390x/translate.c b/target/s390x/translate.c
+>> index 76b222b0ce..cf8ffa217e 100644
+>> --- a/target/s390x/translate.c
+>> +++ b/target/s390x/translate.c
+>> @@ -2124,9 +2124,6 @@ static ExitStatus op_diag(DisasContext *s, DisasOps *o)
+>>      TCGv_i32 func_code = tcg_const_i32(get_field(s->fields, i2));
+>>  
+>>      check_privileged(s);
+>> -    update_psw_addr(s);
+>> -    gen_op_calc_cc(s);
+>> -
+>>      gen_helper_diag(cpu_env, r1, r3, func_code);
+>>  
+>>      tcg_temp_free_i32(func_code);
+>>
+> 
+> Maybe merge it with patch 06/16 ?
+>
 
-Good point (for older KVM). And ugly.
+No, because this is tcg specific.
 
-if (kvm_enabled()) {
-	kvm_s390_program_interrupt...
-} else {
-	trigger_pgm_exception(env, PGM_ADDRESSING, ILEN_AUTO);
-}
 
->=20
 >  Thomas
->=20
+> 
 
 
---=20
+-- 
 
 Thanks,
 
