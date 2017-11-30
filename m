@@ -1,22 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50743)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53083)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1eKMr1-0001Ki-1c
-	for qemu-devel@nongnu.org; Thu, 30 Nov 2017 06:18:14 -0500
+	(envelope-from <imammedo@redhat.com>) id 1eKMvd-0005B6-Sa
+	for qemu-devel@nongnu.org; Thu, 30 Nov 2017 06:22:54 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1eKMr0-0002Yh-3W
-	for qemu-devel@nongnu.org; Thu, 30 Nov 2017 06:18:07 -0500
-References: <20171012185916.22776-1-eblake@redhat.com>
-	<20171012185916.22776-16-eblake@redhat.com>
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Message-ID: <4b6abc6d-5b38-8e19-51c6-a6d0065b7251@virtuozzo.com>
-Date: Thu, 30 Nov 2017 14:17:53 +0300
+	(envelope-from <imammedo@redhat.com>) id 1eKMva-0003iD-Of
+	for qemu-devel@nongnu.org; Thu, 30 Nov 2017 06:22:53 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:16462)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1eKMva-0003ci-J5
+	for qemu-devel@nongnu.org; Thu, 30 Nov 2017 06:22:50 -0500
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+	[10.5.11.14])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 0A16D80480
+	for <qemu-devel@nongnu.org>; Thu, 30 Nov 2017 11:22:49 +0000 (UTC)
+Date: Thu, 30 Nov 2017 12:22:45 +0100
+From: Igor Mammedov <imammedo@redhat.com>
+Message-ID: <20171130122245.7e713d2f@redhat.com>
+In-Reply-To: <20171129185026.23632-1-dgilbert@redhat.com>
+References: <20171129185026.23632-1-dgilbert@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20171012185916.22776-16-eblake@redhat.com>
-Content-Language: en-US
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH v4 15/20] vdi: Avoid bitrot of debugging
- code
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [RFC 0/7] Rework vhost memory region updates
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,21 +32,61 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org
-Cc: kwolf@redhat.com, famz@redhat.com, qemu-block@nongnu.org, Stefan Weil <sw@weilnetz.de>, Max Reitz <mreitz@redhat.com>, jsnow@redhat.com
+To: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>
+Cc: qemu-devel@nongnu.org, maxime.coquelin@redhat.com, mst@redhat.com
 
-12.10.2017 21:59, Eric Blake wrote:
-> Rework the debug define so that we always get -Wformat checking,
-> even when debugging is disabled.
->
-> Signed-off-by: Eric Blake <eblake@redhat.com>
-> Reviewed-by: Stefan Weil <sw@weilnetz.de>
-> Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+On Wed, 29 Nov 2017 18:50:19 +0000
+"Dr. David Alan Gilbert (git)" <dgilbert@redhat.com> wrote:
 
-Reviewed-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+> From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+> 
+> Hi,
+>   This is an experimental set that reworks the way the vhost
+> code handles changes in physical address space layout that
+> came from a discussion with Igor.
+Thanks for looking into it.
 
+ 
+> Instead of updating and trying to merge sections of address
+> space on each add/remove callback, we wait until the commit phase
+> and go through and rebuild a list by walking the Flatview of
+> memory and end up producing an ordered list.
+> We compare the list to the old list to trigger updates.
+> 
+> Note, only very lightly tested so far, I'm just trying to see if it's
+> the right shape.
+> 
+> Igor, is this what you were intending?
 
+I was thinking about a little less intrusive approach
 
--- 
-Best regards,
-Vladimir
+where vhost_region_add/del are modified to maintain
+sorted by GPA array of mem_sections, vhost_dev::mem is dropped
+altogether and vhost_memory_region array is build/used/freed
+on every vhost_commit().
+Maintaining sorted array should roughly cost us O(2 log n) if
+binary search is used.
+
+However I like your idea with iterator even more as it have
+potential to make it even faster O(n) if we get rid of
+quadratic and relatively complex vhost_update_compare_list().
+
+Pls, see comments on individual patches.
+
+> Dave
+> 
+> Dr. David Alan Gilbert (7):
+>   memory: address_space_iterate
+>   vhost: Move log_dirty check
+>   vhost: New memory update functions
+>   vhost: update_mem_cb implementation
+>   vhost: Compare new and old memory lists
+>   vhost: Copy updated region data into device state
+>   vhost: Remove vhost_set_memory and children
+> 
+>  hw/virtio/trace-events |   8 +
+>  hw/virtio/vhost.c      | 424 ++++++++++++++++++++++---------------------------
+>  include/exec/memory.h  |  23 +++
+>  memory.c               |  22 +++
+>  4 files changed, 241 insertions(+), 236 deletions(-)
+> 
