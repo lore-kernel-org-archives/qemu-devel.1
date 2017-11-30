@@ -1,23 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54480)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54555)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1eKPvL-00073U-P9
-	for qemu-devel@nongnu.org; Thu, 30 Nov 2017 09:34:52 -0500
+	(envelope-from <berto@igalia.com>) id 1eKPvq-0007Oy-T3
+	for qemu-devel@nongnu.org; Thu, 30 Nov 2017 09:35:22 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1eKPvH-0005AK-QC
-	for qemu-devel@nongnu.org; Thu, 30 Nov 2017 09:34:47 -0500
-Date: Thu, 30 Nov 2017 22:34:30 +0800
-From: Fam Zheng <famz@redhat.com>
-Message-ID: <20171130143430.GA24067@lemon>
-References: <20171129144956.11409-1-famz@redhat.com>
-	<20171129172546.GG3753@localhost.localdomain>
-	<20171130020359.GB16237@lemon>
-	<20171130103135.GA4039@localhost.localdomain>
+	(envelope-from <berto@igalia.com>) id 1eKPvm-0005sh-Es
+	for qemu-devel@nongnu.org; Thu, 30 Nov 2017 09:35:18 -0500
+From: Alberto Garcia <berto@igalia.com>
+In-Reply-To: <20171130122732.GB4039@localhost.localdomain>
+References: <cover.1511978000.git.berto@igalia.com>
+	<4011ffb0dd7f0a0a3e2cfe28223047c809761c90.1511978000.git.berto@igalia.com>
+	<20171130122732.GB4039@localhost.localdomain>
+Date: Thu, 30 Nov 2017 15:35:11 +0100
+Message-ID: <w514lpbj0m8.fsf@maestria.local.igalia.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20171130103135.GA4039@localhost.localdomain>
-Subject: Re: [Qemu-devel] [PATCH RFC 0/9] block: Rewrite block drain
- begin/end
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PATCH for-2.11 1/1] blockjob: Make
+ block_job_pause_all() keep a reference to the jobs
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,79 +25,61 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: Kevin Wolf <kwolf@redhat.com>
-Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, jcody@redhat.com, Max Reitz <mreitz@redhat.com>, pbonzini@redhat.com, Stefan Hajnoczi <stefanha@redhat.com>
+Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>, Jeff Cody <jcody@redhat.com>, Anton Nefedov <anton.nefedov@virtuozzo.com>
 
-On Thu, 11/30 11:31, Kevin Wolf wrote:
-> What you really mean is probably connected components in the graph, but
-> do we really want to manage merging and splitting object representing
-> connected components when a node is added or removed from the graph?
-> Especially when that graph change occurs in a drain callback?
-> 
-> You can also still easily introduce bugs where graph changes during a
-> drain end up in nodes not being drained, possibly drained twice, you
-> still access the next pointer of a deleted node or you accidentally
-> switch to draining a different component.
-> 
-> It's probably possible to get this right, but essentially you're just
-> switching from iterating a tree to iterating a list. You get roughly the
-> same set of problems that you have to consider as today, and getting it
-> right should be about the same difficulty.
+On Thu 30 Nov 2017 01:27:32 PM CET, Kevin Wolf wrote:
 
-Not quite. The essential idea is redo the drain begin/end in a correct way:
+>> Destroying a paused block job during bdrv_reopen_multiple() has two
+>> consequences:
+>> 
+>>    1) The references to the nodes involved in the job are released,
+>>       possibly destroying some of them. If those nodes were in the
+>>       reopen queue this would trigger the problem originally described
+>>       in commit 40840e419be, crashing QEMU.
+>
+> This specific problem could be avoided by making the BDS reference in
+> the reopen queue strong, i.e. bdrv_ref() in bdrv_reopen_queue_child()
+> and bdrv_unref() only at the end of bdrv_reopen_multiple().
 
-bdrv_drained_begin(bs):
-    1.a) stop all sources of new requests in the connected components, including
-        * aio_disable_external()
-        * stop QED timer
-        * stop block job
-    1.b) aio_poll() until:
-        * no request is in flight for bs
-        * no progress is made (any progress may generate new requests)
+That is correct.
 
-bdrv_drained_end(bs):
-    2.a) resume stopped sources of new requests
-    2.b) no need to do aio_poll() because the main loop will move on
+>>    2) At the end of bdrv_reopen_multiple(), bdrv_drain_all_end() would
+>>       not be doing all necessary bdrv_parent_drained_end() calls.
+>
+> If I understand correctly, you don't have a reproducer here.
 
-1.a) can be either done with either a graph recursion like now, or a list
-traversing if managed somewhere, like in this series. Or better, BlockGraph will
-be the manager. The rule is that these operations will not cause graph change,
-so it's an improvement.
+That's unfortunately not correct.
 
-1.b) doesn't need recursion IMO, only looking at bs->in_flight and the return
-value of aio_poll() should be enough.
+You can use the very test case that I mentioned in the commit message:
 
-For 2.a) if the drain begin/end callbacks are mananged in a list, it's easy to
-only call drained_end() for entries that got drained_begin() earlier, as shown
-in patch 2.
+   https://lists.gnu.org/archive/html/qemu-block/2017-11/msg00934.html
 
-> 
-> > > And finally, I don't really think that the recursion is even a problem.
-> > > The problem is with graph changes made by callbacks that drain allows to
-> > > run. With your changes, it might be a bit easier to avoid that
-> > > bdrv_drain() itself gets into trouble due to graph changes, but this
-> > > doesn't solve the problem for any (possibly indirect) callers of
-> > > bdrv_drain().
-> > 
-> > The recursion is the one big place that can be easily broken by graph changes,
-> > fixing this doesn't make the situation any worse. We could still fix the
-> > indirect callers by taking references or by introducing "ubiquitous coroutines".
-> 
-> But hiding a bug in 80% of the cases where it shows isn't enough.
+With that one, QEMU master crashes easily because of problem (1). If I
+hold strong references in the reopen queue as you mentioned, the test
+case hangs because of problem (2).
 
-I think they are separate bugs. And with the one that this series is fixing,
-others (bdrv_drain*() callers') may even not show up, because
-bdrv_drained_begin() crashed already.
+> It's certainly not a full solution because keeping a reference to a
+> block job does not prevent it from completing, but only from being
+> freed. Most block jobs do graph modifications, including dropping the
+> references to nodes, already when they complete, not only when they
+> are freed.
 
-> 
-> I think the only real solution is to forbid graph changes until after
-> any critical operation has completed. I haven't tried it out in
-> practice, but I suppose we could use a CoMutex around them and take it
-> in bdrv_drained_begin/end() and all other places that can get into
-> trouble with graph changes.
+Yes but the block job itself holds additional references (thanks to
+block_job_add_bdrv()).
 
-Yes, I agree, but that (using CoMutex around graph change) requires everything,
-especially the defer_to_main_loop_bh, runs in a coroutine context, which is
-exactly what I mean by "introducing 'ubiquitous coroutines'", because currently
-we don't have them.
+> Now, while the above might have sounded like we have an easy solution
+> in bdrv_reopen(), I see another problem that looks quite tough:
+>
+> 3) bdrv_reopen_queue() is a recursive operation that involves all
+>    children that inherited options. If the graph changes between the
+>    bdrv_reopen_queue() call and the end of bdrv_reopen_multiple(), the
+>    calculated options (and today possibly permissions) don't actually
+>    match the graph any more.
+>
+>    The requirement we really have is that between bdrv_reopen_queue()
+>    and bdrv_reopen_multiple() no graph changes are made. Calling
+>    bdrv_drain_all_begin() in bdrv_reopen_multiple() is too late.
 
-Fam
+Yes I agree that that should be the requirement.
+
+Berto
