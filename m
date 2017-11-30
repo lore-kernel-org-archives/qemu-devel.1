@@ -1,17 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34295)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35927)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1eKRhs-0005he-0b
-	for qemu-devel@nongnu.org; Thu, 30 Nov 2017 11:29:00 -0500
+	(envelope-from <cohuck@redhat.com>) id 1eKRlg-0000Zf-16
+	for qemu-devel@nongnu.org; Thu, 30 Nov 2017 11:33:01 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1eKRho-0003WM-Rn
-	for qemu-devel@nongnu.org; Thu, 30 Nov 2017 11:29:00 -0500
-From: David Hildenbrand <david@redhat.com>
-Date: Thu, 30 Nov 2017 17:27:44 +0100
-Message-Id: <20171130162744.25442-17-david@redhat.com>
-In-Reply-To: <20171130162744.25442-1-david@redhat.com>
-References: <20171130162744.25442-1-david@redhat.com>
-Subject: [Qemu-devel] [PATCH v3 for-2.12 16/16] s390x/tcg: drop
- potential_page_fault()
+	(envelope-from <cohuck@redhat.com>) id 1eKRlb-0005W7-2X
+	for qemu-devel@nongnu.org; Thu, 30 Nov 2017 11:32:56 -0500
+Date: Thu, 30 Nov 2017 17:32:43 +0100
+From: Cornelia Huck <cohuck@redhat.com>
+Message-ID: <20171130173243.61db4632.cohuck@redhat.com>
+In-Reply-To: <20171130140536.31164-1-cohuck@redhat.com>
+References: <20171130140536.31164-1-cohuck@redhat.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH] target/s390x: nuke DPRINTF in helper.c
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -20,44 +22,47 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-s390x@nongnu.org, qemu-devel@nongnu.org
-Cc: Christian Borntraeger <borntraeger@de.ibm.com>, Cornelia Huck <cohuck@redhat.com>, Richard Henderson <rth@twiddle.net>, Alexander Graf <agraf@suse.de>, Thomas Huth <thuth@redhat.com>, David Hildenbrand <david@redhat.com>
+To: qemu-devel@nongnu.org, qemu-s390x@nongnu.org
+Cc: rth@twiddle.net, agraf@suse.de, borntraeger@de.ibm.com, david@redhat.com, thuth@redhat.com
 
-Only one user left, get rid of it so we don't get any new users.
+On Thu, 30 Nov 2017 15:05:36 +0100
+Cornelia Huck <cohuck@redhat.com> wrote:
 
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
-Reviewed-by: Thomas Huth <thuth@redhat.com>
-Signed-off-by: David Hildenbrand <david@redhat.com>
----
- target/s390x/translate.c | 9 ++-------
- 1 file changed, 2 insertions(+), 7 deletions(-)
+> It is not used anywhere.
+> 
+> Signed-off-by: Cornelia Huck <cohuck@redhat.com>
+> ---
+>  target/s390x/helper.c | 18 ------------------
+>  1 file changed, 18 deletions(-)
+> 
+> diff --git a/target/s390x/helper.c b/target/s390x/helper.c
+> index 246ba20f0d..35d9741918 100644
+> --- a/target/s390x/helper.c
+> +++ b/target/s390x/helper.c
+> @@ -31,24 +31,6 @@
+>  #include "sysemu/sysemu.h"
+>  #endif
+>  
+> -//#define DEBUG_S390
+> -//#define DEBUG_S390_STDOUT
+> -
+> -#ifdef DEBUG_S390
+> -#ifdef DEBUG_S390_STDOUT
+> -#define DPRINTF(fmt, ...) \
+> -    do { fprintf(stderr, fmt, ## __VA_ARGS__); \
+> -         if (qemu_log_separate()) qemu_log(fmt, ##__VA_ARGS__); } while (0)
+> -#else
+> -#define DPRINTF(fmt, ...) \
+> -    do { qemu_log(fmt, ## __VA_ARGS__); } while (0)
+> -#endif
+> -#else
+> -#define DPRINTF(fmt, ...) \
+> -    do { } while (0)
+> -#endif
+> -
+> -
+>  #ifndef CONFIG_USER_ONLY
+>  void s390x_tod_timer(void *opaque)
+>  {
 
-diff --git a/target/s390x/translate.c b/target/s390x/translate.c
-index 1ce1390699..26cf993405 100644
---- a/target/s390x/translate.c
-+++ b/target/s390x/translate.c
-@@ -240,12 +240,6 @@ static void update_cc_op(DisasContext *s)
-     }
- }
- 
--static void potential_page_fault(DisasContext *s)
--{
--    update_psw_addr(s);
--    update_cc_op(s);
--}
--
- static inline uint64_t ld_code2(CPUS390XState *env, uint64_t pc)
- {
-     return (uint64_t)cpu_lduw_code(env, pc);
-@@ -2939,7 +2933,8 @@ static ExitStatus op_lpd(DisasContext *s, DisasOps *o)
- 
-     /* In a parallel context, stop the world and single step.  */
-     if (tb_cflags(s->tb) & CF_PARALLEL) {
--        potential_page_fault(s);
-+        update_psw_addr(s);
-+        update_cc_op(s);
-         gen_exception(EXCP_ATOMIC);
-         return EXIT_NORETURN;
-     }
--- 
-2.14.3
+Queued to s390-next.
