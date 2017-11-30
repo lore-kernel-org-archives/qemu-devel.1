@@ -1,21 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33705)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45112)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1eKBXE-0008KB-07
-	for qemu-devel@nongnu.org; Wed, 29 Nov 2017 18:12:56 -0500
+	(envelope-from <willy@infradead.org>) id 1eKDBj-0002CW-RZ
+	for qemu-devel@nongnu.org; Wed, 29 Nov 2017 19:58:52 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1eKBXD-0007Tl-5r
-	for qemu-devel@nongnu.org; Wed, 29 Nov 2017 18:12:55 -0500
-References: <20171129224421.18192-1-jsnow@redhat.com>
-	<691790b7-4e9f-ab9c-43eb-9f26a401ef02@redhat.com>
-From: John Snow <jsnow@redhat.com>
-Message-ID: <5b769683-c840-ff48-0e20-969f0cac4475@redhat.com>
-Date: Wed, 29 Nov 2017 18:12:46 -0500
+	(envelope-from <willy@infradead.org>) id 1eKDBg-00038Z-Mn
+	for qemu-devel@nongnu.org; Wed, 29 Nov 2017 19:58:51 -0500
+Received: from bombadil.infradead.org ([65.50.211.133]:44933)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <willy@infradead.org>) id 1eKDBg-0002ON-Gm
+	for qemu-devel@nongnu.org; Wed, 29 Nov 2017 19:58:48 -0500
+Date: Wed, 29 Nov 2017 16:58:17 -0800
+From: Matthew Wilcox <willy@infradead.org>
+Message-ID: <20171130005817.GA14785@bombadil.infradead.org>
+References: <1511963726-34070-1-git-send-email-wei.w.wang@intel.com>
+	<1511963726-34070-2-git-send-email-wei.w.wang@intel.com>
 MIME-Version: 1.0
-In-Reply-To: <691790b7-4e9f-ab9c-43eb-9f26a401ef02@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH] iotests: fix 197 for vpc
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1511963726-34070-2-git-send-email-wei.w.wang@intel.com>
+Subject: Re: [Qemu-devel] [PATCH v18 01/10] idr: add #include <linux/bug.h>
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,30 +27,23 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>, qemu-block@nongnu.org
-Cc: kwolf@redhat.com, ldoktor@redhat.com, qemu-devel@nongnu.org, mreitz@redhat.com
+To: Wei Wang <wei.w.wang@intel.com>
+Cc: virtio-dev@lists.oasis-open.org, linux-kernel@vger.kernel.org, qemu-devel@nongnu.org, virtualization@lists.linux-foundation.org, kvm@vger.kernel.org, linux-mm@kvack.org, mst@redhat.com, mhocko@kernel.org, akpm@linux-foundation.org, mawilcox@microsoft.com, david@redhat.com, penguin-kernel@I-love.SAKURA.ne.jp, cornelia.huck@de.ibm.com, mgorman@techsingularity.net, aarcange@redhat.com, amit.shah@redhat.com, pbonzini@redhat.com, liliang.opensource@gmail.com, yang.zhang.wz@gmail.com, quan.xu@aliyun.com, nilal@redhat.com, riel@redhat.com, Masahiro Yamada <yamada.masahiro@socionext.com>
 
+On Wed, Nov 29, 2017 at 09:55:17PM +0800, Wei Wang wrote:
+> The <linux/bug.h> was removed from radix-tree.h by the following commit:
+> f5bba9d11a256ad2a1c2f8e7fc6aabe6416b7890.
+> 
+> Since that commit, tools/testing/radix-tree/ couldn't pass compilation
+> due to: tools/testing/radix-tree/idr.c:17: undefined reference to
+> WARN_ON_ONCE. This patch adds the bug.h header to idr.h to solve the
+> issue.
 
+Thanks; I sent this same patch out yesterday.
 
-On 11/29/2017 06:02 PM, Eric Blake wrote:
-> On 11/29/2017 04:44 PM, John Snow wrote:
->> VPC has some difficulty creating geometries of particular size.
->> However, we can indeed force it to use a literal one, so let's
->> do that for the sake of test 197, which is testing some specific
->> offsets.
->>
->> Signed-off-by: John Snow <jsnow@redhat.com>
->> ---
->> =C2=A0 tests/qemu-iotests/197=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0 | 3 +++
->> =C2=A0 tests/qemu-iotests/common.filter | 3 ++-
->> =C2=A0 2 files changed, 5 insertions(+), 1 deletion(-)
->=20
-> Reviewed-by: Eric Blake <eblake@redhat.com>
->=20
-> [Does it show that I seldom run ./check -vpc?]
->=20
-
-True of all of us...
-
-Thanks!
+Unfortunately, you didn't cc the author of this breakage, Masahiro Yamada.
+I want to highlight that these kinds of header cleanups are risky,
+and very low reward.  I really don't want to see patches going all over
+the tree randomly touching header files.  If we've got a real problem
+to solve, then sure.  But I want to see a strong justification for any
+more header file cleanups.
