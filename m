@@ -1,29 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52162)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53093)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1eKOJy-0005Nn-LM
-	for qemu-devel@nongnu.org; Thu, 30 Nov 2017 07:52:07 -0500
+	(envelope-from <pmorel@linux.vnet.ibm.com>) id 1eKONS-0007qp-S9
+	for qemu-devel@nongnu.org; Thu, 30 Nov 2017 07:55:43 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1eKOJx-00086W-Rk
-	for qemu-devel@nongnu.org; Thu, 30 Nov 2017 07:52:06 -0500
-Received: from mail-ot0-x242.google.com ([2607:f8b0:4003:c0f::242]:39594)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1eKOJx-00085q-Mc
-	for qemu-devel@nongnu.org; Thu, 30 Nov 2017 07:52:05 -0500
-Received: by mail-ot0-x242.google.com with SMTP id v21so5997906oth.6
-	for <qemu-devel@nongnu.org>; Thu, 30 Nov 2017 04:52:05 -0800 (PST)
-MIME-Version: 1.0
-In-Reply-To: <22aa483a-ede3-482d-88a9-ca1c03c37420@redhat.com>
-References: <1512031988-32490-1-git-send-email-thuth@redhat.com>
-	<1512031988-32490-4-git-send-email-thuth@redhat.com>
-	<CAFEAcA-LBOm=kHja3QJqOw-TT3GF9-i+wJfXdL-FU5NKimknzQ@mail.gmail.com>
-	<22aa483a-ede3-482d-88a9-ca1c03c37420@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Thu, 30 Nov 2017 12:51:44 +0000
-Message-ID: <CAFEAcA_0W6AiBG_yqi_HAtZ5ChkOva3WWNRuQ6JbddVYH1sruA@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH for-2.12 3/7] tests/boot-serial-test: Add
- support for the mcf5208evb board
+	(envelope-from <pmorel@linux.vnet.ibm.com>) id 1eKONP-0003lR-Rg
+	for qemu-devel@nongnu.org; Thu, 30 Nov 2017 07:55:42 -0500
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:47992
+	helo=mx0a-001b2d01.pphosted.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pmorel@linux.vnet.ibm.com>)
+	id 1eKONP-0003kZ-MS
+	for qemu-devel@nongnu.org; Thu, 30 Nov 2017 07:55:39 -0500
+Received: from pps.filterd (m0098413.ppops.net [127.0.0.1])
+	by mx0b-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
+	vAUCsYeO042300
+	for <qemu-devel@nongnu.org>; Thu, 30 Nov 2017 07:55:35 -0500
+Received: from e06smtp10.uk.ibm.com (e06smtp10.uk.ibm.com [195.75.94.106])
+	by mx0b-001b2d01.pphosted.com with ESMTP id 2ejgrxx4k4-1
+	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Thu, 30 Nov 2017 07:55:35 -0500
+Received: from localhost
+	by e06smtp10.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	Only! Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <pmorel@linux.vnet.ibm.com>;
+	Thu, 30 Nov 2017 12:55:33 -0000
+From: Pierre Morel <pmorel@linux.vnet.ibm.com>
+Date: Thu, 30 Nov 2017 13:55:23 +0100
+Message-Id: <1512046530-17773-1-git-send-email-pmorel@linux.vnet.ibm.com>
+Subject: [Qemu-devel] [PATCH v4 0/7] s390x/pci: Improve zPCI to cover more
+ cases
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,42 +37,70 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: Thomas Huth <thuth@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>, Anthony Green <green@moxielogic.com>, Laurent Vivier <laurent@vivier.eu>, qemu-arm <qemu-arm@nongnu.org>, Edgar Iglesias <edgar.iglesias@gmail.com>, Richard Henderson <rth@twiddle.net>
+To: qemu-devel@nongnu.org
+Cc: cohuck@redhat.com, agraf@suse.de, borntraeger@de.ibm.com, zyimin@linux.vnet.ibm.com, mst@redhat.com, thuth@redhat.com, pasic@linux.vnet.ibm.com
 
-On 30 November 2017 at 12:40, Paolo Bonzini <pbonzini@redhat.com> wrote:
-> On 30/11/2017 13:14, Peter Maydell wrote:
->> On 30 November 2017 at 08:53, Thomas Huth <thuth@redhat.com> wrote:
->>> +static const uint8_t kernel_mcf5208[] = {
->>> +    0x41, 0xf9, 0xfc, 0x06, 0x00, 0x00,     /* lea 0xfc060000,%a0 */
->>> +    0x10, 0x3c, 0x00, 0x54,                 /* move.b #'T',%d0 */
->>> +    0x11, 0x7c, 0x00, 0x04, 0x00, 0x08,     /* move.b #4,8(%a0)     Enable TX */
->>> +    0x11, 0x40, 0x00, 0x0c,                 /* move.b %d0,12(%a0)   Print 'T' */
->>> +    0x60, 0xfa                              /* bra.s  loop */
->>> +};
->>
->> This approach doesn't seem to be scalable to me -- are we
->> really going to have 50 or more fragments of hand-coded hex in
->> this file to cover the various board models?
->>
->> I'd much rather see us have a framework for being able
->> to build test blobs from source using a cross compiler
->> setup (and docker or similar so anybody can rebuild
->> the test blobs). That will be much easier to maintain
->> and easier to extend to having tests that test other
->> parts of the board or other aspects of TCG emulation.
->
-> It seems a bit overkill, as these snippets are ~16 bytes long.
+This patch fixes the following BUG:
+Even a guest is able to detect virtio_pci device, the init function
+the Linux virtio_pci driver will hang because zPCI does not support
+the subregions used by virtio_pci.
 
-They're 16 bytes long because that's about the limit of
-what you can do with this approach. The consequence is that
-they barely test anything at all. A more sensible framework
-would allow:
- * better testing of TCG instructions more generally
- * writing your test cases in C
- * more interesting board dependent tests
- * "integration test" setups like 'boot entire kernel'
- * etc
+It follows that right now the PCI support is very limited
+(e.g. pass through of a host vfio device)
+To enable features like virtio-pci several modifications needs to be
+done.
 
-thanks
--- PMM
+As already stated above, Virtio-PCI uses subregions, which may eventually
+be discontinuous inside bars instead of a single flat region often used
+by real devices.
+The address offset being formerly calculated from the BAR base address
+must be adapted to the subregions instead of to the single region.
+
+This patch provides the new calculation for the three kind of BAR
+access, zPCI STORE, zPCI LOAD and zPCI STORE BLOCK done by zPCI.
+
+We use the opportunity to
+ - enhance the fault detection for zPCI STORE and LOAD,
+ - enhance the fault detection and to provide the maximum STORE BLOCK
+   block size, maxstbl, for zPCI STORE BLOCK
+ - factor out part of the code used to calculate the offset and
+   access the BARs,
+ - factor out the code for endianess conversion.
+
+
+Pierre Morel (7):
+  s390x/pci: factor out endianess conversion
+  s390x/pci: rework PCI STORE
+  s390x/pci: rework PCI LOAD
+  s390x/pci: rework PCI STORE BLOCK
+  s390x/pci: move the memory region read from pcilg
+  s390x/pci: move the memory region write from pcistg
+  s390x/pci: search for subregion inside the BARs
+
+ hw/s390x/s390-pci-bus.h  |   1 +
+ hw/s390x/s390-pci-inst.c | 251 ++++++++++++++++++++++++++++-------------------
+ hw/s390x/s390-pci-inst.h |   6 +-
+ 3 files changed, 158 insertions(+), 100 deletions(-)
+
+-- 
+2.7.4
+
+Changelog:
+
+from v3
+- added explanation why we always need to swap bytes
+- #define for BAR definitions (Conny)
+- renamed "other" to "subregion" (Thomas)
+- renamed label "addressing_error" to "specification_error" (Thomas)
+- added some comments to explain why testing states is not needed (Conny)
+
+from v2
+- rewording of comments, coding style.
+
+from v1
+- suppress fallthrough to PCI_ROM_SLOT to handle it in the default case.
+- reword most of the patch commit messages
+- add comments to the endianness conversion
+- reword somme comments inside the patches
+
+  
