@@ -1,22 +1,41 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46877)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47598)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1eKNxr-0003zi-6v
-	for qemu-devel@nongnu.org; Thu, 30 Nov 2017 07:29:16 -0500
+	(envelope-from <pasic@linux.vnet.ibm.com>) id 1eKO0t-0005e8-TT
+	for qemu-devel@nongnu.org; Thu, 30 Nov 2017 07:32:30 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1eKNxq-0005nX-CU
-	for qemu-devel@nongnu.org; Thu, 30 Nov 2017 07:29:15 -0500
-References: <20171012185916.22776-1-eblake@redhat.com>
-	<20171012185916.22776-21-eblake@redhat.com>
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Message-ID: <b12fe301-d2b3-815c-1484-2cf84668cdc6@virtuozzo.com>
-Date: Thu, 30 Nov 2017 15:29:02 +0300
+	(envelope-from <pasic@linux.vnet.ibm.com>) id 1eKO0q-0006v1-Jp
+	for qemu-devel@nongnu.org; Thu, 30 Nov 2017 07:32:23 -0500
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:40156)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pasic@linux.vnet.ibm.com>)
+	id 1eKO0q-0006uP-Bl
+	for qemu-devel@nongnu.org; Thu, 30 Nov 2017 07:32:20 -0500
+Received: from pps.filterd (m0098410.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
+	vAUCUTde111203
+	for <qemu-devel@nongnu.org>; Thu, 30 Nov 2017 07:32:19 -0500
+Received: from e06smtp13.uk.ibm.com (e06smtp13.uk.ibm.com [195.75.94.109])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2ejh09kyd4-1
+	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Thu, 30 Nov 2017 07:32:19 -0500
+Received: from localhost
+	by e06smtp13.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	Only! Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <pasic@linux.vnet.ibm.com>;
+	Thu, 30 Nov 2017 12:32:16 -0000
+References: <20171128130758.67556-1-pasic@linux.vnet.ibm.com>
+	<20171129133733.7fc11968.cohuck@redhat.com>
+	<6f7547b8-1346-53ce-3d80-6839c556d724@linux.vnet.ibm.com>
+	<20171129182900.409be40f.cohuck@redhat.com>
+From: Halil Pasic <pasic@linux.vnet.ibm.com>
+Date: Thu, 30 Nov 2017 13:32:12 +0100
 MIME-Version: 1.0
-In-Reply-To: <20171012185916.22776-21-eblake@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
+In-Reply-To: <20171129182900.409be40f.cohuck@redhat.com>
+Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Subject: Re: [Qemu-devel] [PATCH v4 20/20] block: Drop unused
- .bdrv_co_get_block_status()
+Content-Transfer-Encoding: 8bit
+Message-Id: <e8d586cf-99bd-3c72-0c39-44408295a744@linux.vnet.ibm.com>
+Subject: Re: [Qemu-devel] [RFC PATCH v2 1/1] s390x/css: unrestrict cssids
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,22 +44,171 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org
-Cc: kwolf@redhat.com, famz@redhat.com, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, jsnow@redhat.com
+To: Cornelia Huck <cohuck@redhat.com>
+Cc: Shalini Chellathurai Saroja <shalini@linux.vnet.ibm.com>, qemu-devel@nongnu.org, Christian Borntraeger <borntraeger@de.ibm.com>, qemu-s390x@nongnu.org, Boris Fiuczynski <fiuczy@linux.vnet.ibm.com>, Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>
 
-12.10.2017 21:59, Eric Blake wrote:
-> We are gradually moving away from sector-based interfaces, towards
-> byte-based.  Now that all drivers have been updated to provide the
-> byte-based .bdrv_co_block_status(), we can delete the sector-based
-> interface.
+
+
+On 11/29/2017 06:29 PM, Cornelia Huck wrote:
+[..]
+>>>> With this change, however, our schema for generating a css bus ids, if
+>>>> none is specified does not make much sense. Currently we start at cssid
+>>>> 0x0 for non-virtual devices and use the default css (without
+>>>> s390-squash-mcss exclusively) for virtual devices.  That means for
+>>>> non-virtual device the device would auto-magically end up non-visible for
+>>>> guests (which can't use the other channel subsystems).
+>>>>
+>>>> Thus let us also change the css bus id auto assignment algorithm,
+>>>> so that we first fill the default css, and then proceed to the
+>>>> next one (modulo MAX_CSSID).  
+>>>
+>>> Let's reword the previous two paragraphs:
+>>>
+>>> "At the same time, change our schema for generating css bus ids to put
+>>> both virtual and non-virtual devices into the default css (spilling
+>>> over into other css images, if needed) so that devices without a
+>>> specified id don't end up hidden to guests not supporting multiple
+>>> channel subsystems."
+>>>   
+>>
+>> What I don't like about your explanation is, that "so that devices without
+>> a specified id don't end up hidden to guests not supporting multiple channel 
+>> subsystems" is not necessarily true: if we spill the devices are going
+>> to end up hidden.
+> 
+> Let's make this "don't always end up hidden".
+
+I would prefer to go with this.
+
+
+At the same time, change our schema for generating css bus ids to put
+both virtual and non-virtual devices into the default css (spilling
+over into other css images, if needed). The intention is to deprecate
+s390-squash-mcss. Whit this change devices without a specified devno won't
+end up hidden to guests not supporting multiple channel subsystems, unless
+this can not be avoided (default css full).
+
+> 
+>>
+>>>>
+>>>> The adverse effect of getting rid of the restriction on migration should
+>>>> not be too severe.  Vfio-ccw devices are not live-migratable yet, and for
+>>>> virtual devices using the extra freedom would only make sense with the
+>>>> aforementioned guest support in place.
+>>>>
+>>>> The auto-generated bus ids are affected by both changes. We hope to not
+
+
+[..]
+>>
+>> I tired to be quite elaborate, because at some point of the v1
+>> discussion, you said if we are planting landmines you want them explained
+>> in the commit message. I'm not sure how this document file is supposed
+>> to be called, and look like. I think this stuff is relevant for
+>> the decision why is this patch a good one, and what are the trade-offs
+>> we make. Referencing to a document would be also OK with me.
+> 
+> I don't think there will be landmines left, no? Or do I misread?
 >
-> Signed-off-by: Eric Blake <eblake@redhat.com>
 
+The patch basically just got worse with changing the schema. If there
+were landmines they are still there. My original point was that it's
+bearable in practice, so that's why I had this short and vague ain't
+too bad formulation.
+ 
+>>
+>> Regarding the deprecation patch. It's already on the list as RFC. You
+>> have even commented on it. I intend to make a v2 once we know what are
+>> we going to do here.
+> 
+> This needs to be a patch series with a cover letter. Discussing in
+> multiple places is draining.
+> 
 
-Reviewed-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Can do. No problem for me.
 
+>>
+>>>>
+>>>> Signed-off-by: Halil Pasic <pasic@linux.vnet.ibm.com>
+>>>>
+>>>> ---
+>>>> Hi all!
+>>>>
+>>>> Moving the property to the machine turned out very ugly (IMHO).  Libvirt
+>>>> detects machine properties via query-command-line-options.  This is
+>>>> however decoupled from the existence of the actual property: one needs to
+>>>> touch util/qemu-config.c (see patch) so the property shows up.
+>>>> Furthermore this stuff is global. I've also noticed that the infamous
+>>>> s390-squash-mcss does not show up.  
+>>>
+>>> s390x-softmmu/qemu-system-s390x -machine s390-ccw-virtio,help
+>>>
+>>> shows it, as does qom-list on /machine.  
+>>
+>> For qom-list you need an instance. Libvirt probes such stuff using
+>> (btw probing is done with machine type none, and qom-list /machine
+>> should not list squash if we are running machine type none).
+>>
+>>>
+>>> Output of <qemu binary> --help is very haphazard anyway and you should
+>>> rely on the interfaces above.
+>>>   
+>>
+>> I disagree. AFAIK management software should probe using the
+>> query-command-line-options QMP command. Or am I missing something?
+>>
+>> I don't speak about the output of <qemu binary> --help here.
+> 
+> It's the same interface. It both over- and underreports. Querying the
+> actual object is the only way to get this reliable. If that is not
+> possible today, it needs to be implemented.
+>
 
+Sorry I did not look into how <qemu binary> --help is implemented. For
+what we are trying to accomplish here it's irrelevant. Wonder why did you
+have to bring this up and make the discussion even more complicated.
+ 
+>>
+>>>>
+>>>> On the other hand to get the property displayed by -machine
+>>>> s390-ccw-virtio,help one needs a setter on the property. So I have
+>>>> created a fake setter which produces an error each time called.  
+>>>
+>>> Yes, this is fugly. A css object would be a better place, but way too
+>>> much work for now.
+>>>   
+>>
+>> Actually not necessarily. We could simply put this at the virtual-css-bridge.
+>> I don't know if Libvirt would accept that though. The problem regarding
+>> virtual-css-bridge (and css object) was rw properties: we can't set a value
+>> for a property of the virtual-css-bridge on the command line. That was a
+>> problem for default-css or whatever but is completely fine for the read
+>> only property 'cssid-unrestricted'.
+>>
+>>>>
+>>>> I would strongly prefer putting back the property to the device level!  
+>>>
+>>> I continue to strongly oppose that. The device is entirely the wrong
+>>> level.
+>>>   
+>>
+>> I don't recall you ever explaining why. If it's completely wrong
+>> I would have expected Boris and also me being for long enough around
+>> to get it at least after the first hint.
+> 
+> Just once again: This is a property of the whole css/machine, not of
+> the individual device.
+> 
+> No more from me today.
+>
 
--- 
-Best regards,
-Vladimir
+Hope there is more form you coming today. :) I would like to know if
+I'm on the right track with the machine property. You did not comment
+on a couple of my points, among others this question. This libvirt
+may not be using the right interface for discovering machine properties,
+and the right interface may note even exist in QEMU just got me more
+insecure.
+
+Regards,
+Halil
+ 
