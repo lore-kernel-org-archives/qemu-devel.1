@@ -1,26 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35024)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35845)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <penguin-kernel@I-love.SAKURA.ne.jp>)
-	id 1eKMDT-0002V9-MO
-	for qemu-devel@nongnu.org; Thu, 30 Nov 2017 05:37:16 -0500
+	id 1eKMFR-0003QS-QP
+	for qemu-devel@nongnu.org; Thu, 30 Nov 2017 05:39:18 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
 	(envelope-from <penguin-kernel@I-love.SAKURA.ne.jp>)
-	id 1eKMDN-00055L-CV
-	for qemu-devel@nongnu.org; Thu, 30 Nov 2017 05:37:15 -0500
-Received: from www262.sakura.ne.jp ([2001:e42:101:1:202:181:97:72]:32211)
+	id 1eKMFM-0007KG-TN
+	for qemu-devel@nongnu.org; Thu, 30 Nov 2017 05:39:17 -0500
+Received: from www262.sakura.ne.jp ([2001:e42:101:1:202:181:97:72]:28325)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <penguin-kernel@I-love.SAKURA.ne.jp>)
-	id 1eKMDM-0002KQ-V1
-	for qemu-devel@nongnu.org; Thu, 30 Nov 2017 05:37:09 -0500
+	id 1eKMFM-0007ID-1K
+	for qemu-devel@nongnu.org; Thu, 30 Nov 2017 05:39:12 -0500
 From: Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>
 References: <1511963726-34070-1-git-send-email-wei.w.wang@intel.com>
-	<1511963726-34070-6-git-send-email-wei.w.wang@intel.com>
-In-Reply-To: <1511963726-34070-6-git-send-email-wei.w.wang@intel.com>
-Message-Id: <201711301934.CDC21800.FSLtJFFOOVQHMO@I-love.SAKURA.ne.jp>
-Date: Thu, 30 Nov 2017 19:34:10 +0900
+	<1511963726-34070-8-git-send-email-wei.w.wang@intel.com>
+In-Reply-To: <1511963726-34070-8-git-send-email-wei.w.wang@intel.com>
+Message-Id: <201711301935.EHF86450.MSFLOOHFJtFOQV@I-love.SAKURA.ne.jp>
+Date: Thu, 30 Nov 2017 19:35:55 +0900
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Subject: Re: [Qemu-devel] [PATCH v18 05/10] xbitmap: add more operations
+Subject: Re: [Qemu-devel] [PATCH v18 07/10] virtio-balloon:
+ VIRTIO_BALLOON_F_SG
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,84 +34,104 @@ To: wei.w.wang@intel.com
 Cc: virtio-dev@lists.oasis-open.org, linux-kernel@vger.kernel.org, qemu-devel@nongnu.org, virtualization@lists.linux-foundation.org, kvm@vger.kernel.org, linux-mm@kvack.org, mst@redhat.com, mhocko@kernel.org, akpm@linux-foundation.org, mawilcox@microsoft.com, david@redhat.com, cornelia.huck@de.ibm.com, mgorman@techsingularity.net, aarcange@redhat.com, amit.shah@redhat.com, pbonzini@redhat.com, willy@infradead.org, liliang.opensource@gmail.com, yang.zhang.wz@gmail.com, quan.xu@aliyun.com, nilal@redhat.com, riel@redhat.com
 
 Wei Wang wrote:
->  /**
-> + * xb_clear_bit - clear a range of bits in the xbitmap
-
-Name mismatch.
-
-> + * @start: the start of the bit range, inclusive
-> + * @end: the end of the bit range, inclusive
-> + *
-> + * This function is used to clear a bit in the xbitmap. If all the bits of the
-> + * bitmap are 0, the bitmap will be freed.
-> + */
-> +void xb_clear_bit_range(struct xb *xb, unsigned long start, unsigned long end)
+> +static inline int xb_set_page(struct virtio_balloon *vb,
+> +			       struct page *page,
+> +			       unsigned long *pfn_min,
+> +			       unsigned long *pfn_max)
 > +{
-> +	struct radix_tree_root *root = &xb->xbrt;
-> +	struct radix_tree_node *node;
-> +	void **slot;
-> +	struct ida_bitmap *bitmap;
-> +	unsigned int nbits;
+> +	unsigned long pfn = page_to_pfn(page);
+> +	int ret;
 > +
-> +	for (; start < end; start = (start | (IDA_BITMAP_BITS - 1)) + 1) {
-> +		unsigned long index = start / IDA_BITMAP_BITS;
-> +		unsigned long bit = start % IDA_BITMAP_BITS;
+> +	*pfn_min = min(pfn, *pfn_min);
+> +	*pfn_max = max(pfn, *pfn_max);
 > +
-> +		bitmap = __radix_tree_lookup(root, index, &node, &slot);
-> +		if (radix_tree_exception(bitmap)) {
-> +			unsigned long ebit = bit + 2;
-> +			unsigned long tmp = (unsigned long)bitmap;
-> +
-> +			nbits = min(end - start + 1, BITS_PER_LONG - ebit);
+> +	do {
+> +		ret = xb_preload_and_set_bit(&vb->page_xb, pfn,
+> +					     GFP_NOWAIT | __GFP_NOWARN);
 
-"nbits = min(end - start + 1," seems to expect that start == end is legal
-for clearing only 1 bit. But this function is no-op if start == end.
-Please clarify what "inclusive" intended.
+It is a bit of pity that __GFP_NOWARN here is applied to only xb_preload().
+Memory allocation by xb_set_bit() will after all emit warnings. Maybe
 
-> +
-> +			if (ebit >= BITS_PER_LONG)
-> +				continue;
+  xb_init(&vb->page_xb);
+  vb->page_xb.gfp_mask |= __GFP_NOWARN;
 
-(I don't understand how radix tree works, but generally this patchset looks fuzzy
-to me about boundary cases. Thus, I want to confirm that this is not an overlook.)
-Why is making "ebit >= BITS_PER_LONG" (e.g. start == 62) case a no-op correct?
-Aren't there bits which should have been cleared in this case?
+is tolerable? Or, unconditionally apply __GFP_NOWARN at xb_init()?
 
-> +			bitmap_clear(&tmp, ebit, nbits);
-> +			if (tmp == RADIX_TREE_EXCEPTIONAL_ENTRY)
-> +				__radix_tree_delete(root, node, slot);
-> +			else
-> +				rcu_assign_pointer(*slot, (void *)tmp);
-> +		} else if (bitmap) {
-> +			nbits = min(end - start + 1, IDA_BITMAP_BITS - bit);
+  static inline void xb_init(struct xb *xb)
+  {
+          INIT_RADIX_TREE(&xb->xbrt, IDR_RT_MARKER | GFP_NOWAIT);
+  }
+
+> +	} while (unlikely(ret == -EAGAIN));
 > +
-> +			if (nbits != IDA_BITMAP_BITS)
-> +				bitmap_clear(bitmap->bitmap, bit, nbits);
+> +	return ret;
+> +}
 > +
-> +			if (nbits == IDA_BITMAP_BITS ||
-> +			    bitmap_empty(bitmap->bitmap, IDA_BITMAP_BITS)) {
-> +				kfree(bitmap);
-> +				__radix_tree_delete(root, node, slot);
+
+
+
+> @@ -172,11 +283,18 @@ static unsigned fill_balloon(struct virtio_balloon *vb, size_t num)
+>  	vb->num_pfns = 0;
+>  
+>  	while ((page = balloon_page_pop(&pages))) {
+> +		if (use_sg) {
+> +			if (xb_set_page(vb, page, &pfn_min, &pfn_max) < 0) {
+> +				__free_page(page);
+> +				break;
+
+You cannot "break;" without consuming all pages in "pages".
+
 > +			}
+> +		} else {
+> +			set_page_pfns(vb, vb->pfns + vb->num_pfns, page);
 > +		}
-> +	}
-> +}
-
-
-
-> +static inline __always_inline void bitmap_clear(unsigned long *map,
-> +						unsigned int start,
-> +						unsigned int nbits)
-> +{
-> +	if (__builtin_constant_p(nbits) && nbits == 1)
-> +		__clear_bit(start, map);
-> +	else if (__builtin_constant_p(start & 7) && IS_ALIGNED(start, 8) &&
-> +		 __builtin_constant_p(nbits & 7) && IS_ALIGNED(nbits, 8))
-
-It looks strange to apply __builtin_constant_p test to variables after "& 7".
-
-> +		memset((char *)map + start / 8, 0, nbits / 8);
-> +	else
-> +		__bitmap_clear(map, start, nbits);
-> +}
 > +
+>  		balloon_page_enqueue(&vb->vb_dev_info, page);
+>  
+>  		vb->num_pfns += VIRTIO_BALLOON_PAGES_PER_PAGE;
+> -
+> -		set_page_pfns(vb, vb->pfns + vb->num_pfns, page);
+>  		vb->num_pages += VIRTIO_BALLOON_PAGES_PER_PAGE;
+>  		if (!virtio_has_feature(vb->vdev,
+>  					VIRTIO_BALLOON_F_DEFLATE_ON_OOM))
+
+
+
+> @@ -212,9 +334,12 @@ static unsigned leak_balloon(struct virtio_balloon *vb, size_t num)
+>  	struct page *page;
+>  	struct balloon_dev_info *vb_dev_info = &vb->vb_dev_info;
+>  	LIST_HEAD(pages);
+> +	bool use_sg = virtio_has_feature(vb->vdev, VIRTIO_BALLOON_F_SG);
+
+You can pass use_sg as an argument to leak_balloon(). Then, you won't
+need to define leak_balloon_sg_oom(). Since xbitmap allocation does not
+use __GFP_DIRECT_RECLAIM, it is safe to reuse leak_balloon() for OOM path.
+Just be sure to pass use_sg == false because memory allocation for
+use_sg == true likely fails when called from OOM path. (But trying
+use_sg == true for OOM path and then fallback to use_sg == false is not bad?)
+
+> +	unsigned long pfn_max = 0, pfn_min = ULONG_MAX;
+>  
+> -	/* We can only do one array worth at a time. */
+> -	num = min(num, ARRAY_SIZE(vb->pfns));
+> +	/* Traditionally, we can only do one array worth at a time. */
+> +	if (!use_sg)
+> +		num = min(num, ARRAY_SIZE(vb->pfns));
+>  
+>  	mutex_lock(&vb->balloon_lock);
+>  	/* We can't release more pages than taken */
+
+
+
+> diff --git a/include/uapi/linux/virtio_balloon.h b/include/uapi/linux/virtio_balloon.h
+> index 343d7dd..37780a7 100644
+> --- a/include/uapi/linux/virtio_balloon.h
+> +++ b/include/uapi/linux/virtio_balloon.h
+> @@ -34,6 +34,7 @@
+>  #define VIRTIO_BALLOON_F_MUST_TELL_HOST	0 /* Tell before reclaiming pages */
+>  #define VIRTIO_BALLOON_F_STATS_VQ	1 /* Memory Stats virtqueue */
+>  #define VIRTIO_BALLOON_F_DEFLATE_ON_OOM	2 /* Deflate balloon on OOM */
+> +#define VIRTIO_BALLOON_F_SG		3 /* Use sg instead of PFN lists */
+
+Want more explicit comment that PFN lists will be used on OOM and therefore
+the host side must be prepared for both sg and PFN lists even if negotiated?
