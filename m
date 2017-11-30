@@ -1,15 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48971)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49022)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1eKKat-0005AD-Jb
-	for qemu-devel@nongnu.org; Thu, 30 Nov 2017 03:53:20 -0500
+	(envelope-from <thuth@redhat.com>) id 1eKKaw-0005Ck-Hp
+	for qemu-devel@nongnu.org; Thu, 30 Nov 2017 03:53:23 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1eKKas-0006fm-J5
-	for qemu-devel@nongnu.org; Thu, 30 Nov 2017 03:53:19 -0500
+	(envelope-from <thuth@redhat.com>) id 1eKKav-0006l7-HL
+	for qemu-devel@nongnu.org; Thu, 30 Nov 2017 03:53:22 -0500
 From: Thomas Huth <thuth@redhat.com>
-Date: Thu, 30 Nov 2017 09:53:01 +0100
-Message-Id: <1512031988-32490-1-git-send-email-thuth@redhat.com>
-Subject: [Qemu-devel] [PATCH for-2.12 0/7] Test more machines and TCG CPUs
- automatically
+Date: Thu, 30 Nov 2017 09:53:03 +0100
+Message-Id: <1512031988-32490-3-git-send-email-thuth@redhat.com>
+In-Reply-To: <1512031988-32490-1-git-send-email-thuth@redhat.com>
+References: <1512031988-32490-1-git-send-email-thuth@redhat.com>
+Subject: [Qemu-devel] [PATCH for-2.12 2/7] tests/boot-serial-test: Add code
+ to allow to specify our own kernel or bios
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -21,32 +23,122 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: qemu-arm@nongnu.org, Richard Henderson <rth@twiddle.net>, Paolo Bonzini <pbonzini@redhat.com>, Laurent Vivier <laurent@vivier.eu>, Edgar Iglesias <edgar.iglesias@gmail.com>, Anthony Green <green@moxielogic.com>
 
-During the 2.11 development cycle, a bunch of ARM boards were broken
-completely, and nobody noticed it for a couple of weeks. Also a lot
-of TCG CPUs do not get any test coverage at all yet (especially since
-the old tests in the tests/tcg/ are still pretty much dead today).
-So we really should improve our testing in this area.
+QEMU only ships with some few firmware images, i.e. we can currently run
+the boot-serial test only on a very limited set of machines. But writing
+some characters to the default UART of a machine can often be done with
+some few lines of assembly, so we add the possibility to the boot-serial
+tester to use its own mini-kernels or mini-firmwares. We write such images
+then into a file that we can load with the "-kernel" or "-bios" parameter
+when we launch QEMU.
 
-This patch series now tries to improve the test coverage at least a
-little bit: The second patch adds the possibility to the boot-serial
-test to also load home-brew mini-kernels and firmware blobs, and the
-following patches then add some tests for various boards / CPUs with
-some few lines of self-made assembly.
+Signed-off-by: Thomas Huth <thuth@redhat.com>
+---
+ tests/Makefile.include   |  2 ++
+ tests/boot-serial-test.c | 54 +++++++++++++++++++++++++++++++++++++-----------
+ 2 files changed, 44 insertions(+), 12 deletions(-)
 
-Thomas Huth (7):
-  tests/boot-serial-test: Make sure that we check the timeout regularly
-  tests/boot-serial-test: Add code to allow to specify our own kernel or
-    bios
-  tests/boot-serial-test: Add support for the mcf5208evb board
-  tests/boot-serial-test: Add tests for microblaze boards
-  hw/moxie/moxiesim: Add support for loading a BIOS on moxiesim
-  tests/boot-serial-test: Add a test for the moxiesim machine
-  tests/boot-serial-test: Add support for the raspi2 machine
-
- hw/moxie/moxiesim.c      |  12 +++++-
- tests/Makefile.include   |   7 ++++
- tests/boot-serial-test.c | 106 ++++++++++++++++++++++++++++++++++++++++-------
- 3 files changed, 109 insertions(+), 16 deletions(-)
-
+diff --git a/tests/Makefile.include b/tests/Makefile.include
+index c002352..41ca44c 100644
+--- a/tests/Makefile.include
++++ b/tests/Makefile.include
+@@ -297,6 +297,8 @@ gcov-files-x86_64-y = $(subst i386-softmmu/,x86_64-softmmu/,$(gcov-files-i386-y)
+ 
+ check-qtest-alpha-y = tests/boot-serial-test$(EXESUF)
+ 
++check-qtest-m68k-y = tests/boot-serial-test$(EXESUF)
++
+ check-qtest-mips-y = tests/endianness-test$(EXESUF)
+ 
+ check-qtest-mips64-y = tests/endianness-test$(EXESUF)
+diff --git a/tests/boot-serial-test.c b/tests/boot-serial-test.c
+index fa4183d..d997269 100644
+--- a/tests/boot-serial-test.c
++++ b/tests/boot-serial-test.c
+@@ -7,9 +7,10 @@
+  * or later. See the COPYING file in the top-level directory.
+  *
+  * This test is used to check that the serial output of the firmware
+- * (that we provide for some machines) contains an expected string.
+- * Thus we check that the firmware still boots at least to a certain
+- * point and so we know that the machine is not completely broken.
++ * (that we provide for some machines) or some small mini-kernels that
++ * we provide here contains an expected string. Thus we check that the
++ * firmware/kernel still boots at least to a certain point and so we
++ * know that the machine is not completely broken.
+  */
+ 
+ #include "qemu/osdep.h"
+@@ -20,6 +21,9 @@ typedef struct testdef {
+     const char *machine;    /* Name of the machine */
+     const char *extra;      /* Additional parameters */
+     const char *expect;     /* Expected string in the serial output */
++    size_t codesize;        /* Size of the kernel or bios data */
++    const uint8_t *kernel;  /* Set in case we use our own mini kernel */
++    const uint8_t *bios;    /* Set in case we use our own mini bios */
+ } testdef_t;
+ 
+ static testdef_t tests[] = {
+@@ -72,26 +76,52 @@ done:
+ static void test_machine(const void *data)
+ {
+     const testdef_t *test = data;
+-    char tmpname[] = "/tmp/qtest-boot-serial-XXXXXX";
+-    int fd;
++    char serialtmp[] = "/tmp/qtest-boot-serial-sXXXXXX";
++    char codetmp[] = "/tmp/qtest-boot-serial-cXXXXXX";
++    const char *codeparam = "";
++    const uint8_t *code = NULL;
++    int ser_fd;
+ 
+-    fd = mkstemp(tmpname);
+-    g_assert(fd != -1);
++    ser_fd = mkstemp(serialtmp);
++    g_assert(ser_fd != -1);
++
++    if (test->kernel) {
++        code = test->kernel;
++        codeparam = "-kernel";
++    } else if (test->bios) {
++        code = test->bios;
++        codeparam = "-bios";
++    }
++
++    if (code) {
++        ssize_t wlen;
++        int code_fd;
++
++        code_fd = mkstemp(codetmp);
++        g_assert(code_fd != -1);
++        wlen = write(code_fd, code, test->codesize);
++        g_assert(wlen == test->codesize);
++        close(code_fd);
++    }
+ 
+     /*
+      * Make sure that this test uses tcg if available: It is used as a
+      * fast-enough smoketest for that.
+      */
+-    global_qtest = qtest_startf("-M %s,accel=tcg:kvm "
++    global_qtest = qtest_startf("%s %s -M %s,accel=tcg:kvm "
+                                 "-chardev file,id=serial0,path=%s "
+                                 "-no-shutdown -serial chardev:serial0 %s",
+-                                test->machine, tmpname, test->extra);
+-    unlink(tmpname);
++                                codeparam, code ? codetmp : "",
++                                test->machine, serialtmp, test->extra);
++    unlink(serialtmp);
++    if (code) {
++        unlink(codetmp);
++    }
+ 
+-    check_guest_output(test, fd);
++    check_guest_output(test, ser_fd);
+     qtest_quit(global_qtest);
+ 
+-    close(fd);
++    close(ser_fd);
+ }
+ 
+ int main(int argc, char *argv[])
 -- 
 1.8.3.1
