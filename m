@@ -1,26 +1,35 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56432)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56501)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1eKoKM-000661-Vl
-	for qemu-devel@nongnu.org; Fri, 01 Dec 2017 11:38:15 -0500
+	(envelope-from <prasad.singamsetty@oracle.com>) id 1eKoKS-0006B8-9H
+	for qemu-devel@nongnu.org; Fri, 01 Dec 2017 11:38:21 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1eKoKI-0004Oi-5o
-	for qemu-devel@nongnu.org; Fri, 01 Dec 2017 11:38:15 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:36948)
+	(envelope-from <prasad.singamsetty@oracle.com>) id 1eKoKN-0004Ro-95
+	for qemu-devel@nongnu.org; Fri, 01 Dec 2017 11:38:20 -0500
+Received: from aserp1050.oracle.com ([141.146.126.70]:46542)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1eKoKH-0004My-T6
-	for qemu-devel@nongnu.org; Fri, 01 Dec 2017 11:38:10 -0500
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
-	[10.5.11.16])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id E87F6C0050BB
-	for <qemu-devel@nongnu.org>; Fri,  1 Dec 2017 12:58:27 +0000 (UTC)
-From: Juan Quintela <quintela@redhat.com>
-Date: Fri,  1 Dec 2017 13:58:12 +0100
-Message-Id: <20171201125813.1437-6-quintela@redhat.com>
-In-Reply-To: <20171201125813.1437-1-quintela@redhat.com>
-References: <20171201125813.1437-1-quintela@redhat.com>
-Subject: [Qemu-devel] [PATCH v3 5/6] tests: Add migration xbzrle test
+	(Exim 4.71) (envelope-from <prasad.singamsetty@oracle.com>)
+	id 1eKoKM-0004Qa-L1
+	for qemu-devel@nongnu.org; Fri, 01 Dec 2017 11:38:15 -0500
+Received: from aserp1040.oracle.com (aserp1040.oracle.com [141.146.126.69])
+	by aserp1050.oracle.com (Sentrion-MTA-4.3.2/Sentrion-MTA-4.3.2) with
+	ESMTP id vAUIXxZw008543
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK)
+	for <qemu-devel@nongnu.org>; Thu, 30 Nov 2017 18:33:59 GMT
+References: <20171114231350.286025-1-prasad.singamsetty@oracle.com>
+	<20171114231350.286025-3-prasad.singamsetty@oracle.com>
+	<20171128193156-mutt-send-email-mst@kernel.org>
+	<cdbe8732-88fa-512e-481b-250abc18bf92@oracle.com>
+	<20171130032551.GA18017@xz-mi>
+From: Prasad Singamsetty <prasad.singamsetty@oracle.com>
+Message-ID: <367bb386-2885-2ea2-b766-d5bde2c79bcf@oracle.com>
+Date: Thu, 30 Nov 2017 10:33:50 -0800
+MIME-Version: 1.0
+In-Reply-To: <20171130032551.GA18017@xz-mi>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v1 2/2] intel-iommu: Extend address width
+ to 48 bits
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,113 +38,72 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: dgilbert@redhat.com, lvivier@redhat.com, peterx@redhat.com
+To: Peter Xu <peterx@redhat.com>
+Cc: ehabkost@redhat.com, "Michael S. Tsirkin" <mst@redhat.com>, konrad.wilk@oracle.com, qemu-devel@nongnu.org, imammedo@redhat.com, pbonzini@redhat.com, rth@twiddle.net
 
-Signed-off-by: Juan Quintela <quintela@redhat.com>
----
- tests/migration-test.c | 68 ++++++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 68 insertions(+)
 
-diff --git a/tests/migration-test.c b/tests/migration-test.c
-index 841c89e28a..41dee78a9a 100644
---- a/tests/migration-test.c
-+++ b/tests/migration-test.c
-@@ -410,6 +410,20 @@ static void deprecated_set_speed(QTestState *who, const char *value)
-     migrate_check_parameter(who, "max-bandwidth", value);
- }
- 
-+static void deprecated_set_cache_size(QTestState *who, const char *value)
-+{
-+    QDict *rsp;
-+    gchar *cmd;
-+
-+    cmd = g_strdup_printf("{ 'execute': 'migrate-set-cache-size',"
-+                          "'arguments': { 'value': %s } }", value);
-+    rsp = qtest_qmp(who, cmd);
-+    g_free(cmd);
-+    g_assert(qdict_haskey(rsp, "return"));
-+    QDECREF(rsp);
-+    migrate_check_parameter(who, "xbzrle-cache-size", value);
-+}
-+
- static void migrate_set_parameter(QTestState *who, const char *parameter,
-                                   const char *value)
- {
-@@ -424,6 +438,10 @@ static void migrate_set_parameter(QTestState *who, const char *parameter,
-         deprecated_set_speed(who, "12345");
-     }
- 
-+    if (strcmp(parameter, "xbzrle-cache-size") == 0) {
-+        deprecated_set_cache_size(who, "4096");
-+    }
-+
-     cmd = g_strdup_printf("{ 'execute': 'migrate-set-parameters',"
-                           "'arguments': { '%s': %s } }",
-                           parameter, value);
-@@ -673,6 +691,55 @@ static void test_precopy_tcp(void)
-     g_free(port);
- }
- 
-+static void test_xbzrle(const char *uri)
-+{
-+    QTestState *from, *to;
-+
-+    test_migrate_start(&from, &to, uri);
-+
-+    /* We want to pick a speed slow enough that the test completes
-+     * quickly, but that it doesn't complete precopy even on a slow
-+     * machine, so also set the downtime.
-+     */
-+    /* 100 ms */
-+    migrate_set_parameter(from, "downtime-limit", "1");
-+    /* 1MB/s slow*/
-+    migrate_set_parameter(from, "max-bandwidth", "1000000000");
-+
-+    migrate_set_parameter(from, "xbzrle-cache-size", "33554432");
-+
-+    migrate_set_capability(from, "xbzrle", "true");
-+    migrate_set_capability(to, "xbzrle", "true");
-+    /* Wait for the first serial output from the source */
-+    wait_for_serial("src_serial");
-+
-+    migrate(from, uri);
-+
-+    wait_for_migration_pass(from);
-+
-+    /* 300ms it should converge */
-+    migrate_set_parameter(from, "downtime-limit", "300");
-+
-+    if (!got_stop) {
-+        qtest_qmp_eventwait(from, "STOP");
-+    }
-+    qtest_qmp_eventwait(to, "RESUME");
-+
-+    wait_for_serial("dest_serial");
-+    wait_for_migration_complete(from);
-+
-+    test_migrate_end(from, to);
-+}
-+
-+static void test_xbzrle_unix(void)
-+{
-+    char *uri = g_strdup_printf("unix:%s/migsocket", tmpfs);
-+
-+    test_xbzrle(uri);
-+    g_free(uri);
-+}
-+
-+
- int main(int argc, char **argv)
- {
-     char template[] = "/tmp/migration-test-XXXXXX";
-@@ -695,6 +762,7 @@ int main(int argc, char **argv)
-     qtest_add_func("/migration/precopy/unix", test_precopy_unix);
-     qtest_add_func("/migration/precopy/tcp", test_precopy_tcp);
-     qtest_add_func("/migration/postcopy/unix", test_postcopy);
-+    qtest_add_func("/migration/xbzrle/unix", test_xbzrle_unix);
- 
-     ret = g_test_run();
- 
--- 
-2.14.3
+
+On 11/29/2017 7:25 PM, Peter Xu wrote:
+> On Wed, Nov 29, 2017 at 01:05:22PM -0800, Prasad Singamsetty wrote:
+>> Thanks Michael. Some comments below.
+>>
+>> On 11/28/2017 9:32 AM, Michael S. Tsirkin wrote:
+>>> On Tue, Nov 14, 2017 at 06:13:50PM -0500, prasad.singamsetty@oracle.com wrote:
+>>>> From: Prasad Singamsetty <prasad.singamsetty@oracle.com>
+>>>>
+>>>> The current implementation of Intel IOMMU code only supports 39 bits
+>>>> iova address width. This patch provides a new parameter (x-aw-bits)
+>>>> for intel-iommu to extend its address width to 48 bits but keeping the
+>>>> default the same (39 bits). The reason for not changing the default
+>>>> is to avoid potential compatibility problems
+>>>
+>>> You can change the default, just make it 39 for existing machine types.
+>>
+>> I think introducing a new machine type is not appropriate as this
+>> is an implementation limitation for the existing machine type.
+>> Currently q35 is the only machine type that supports intel-iommu.
+>> And we want to retain the current default behavior for q35 to avoid
+>> any new issues with live migration.
+> 
+> I guess "existing machine type" means e.g. pc-q35-2.11 and older ones,
+> rather than creating another machine type in parallel with q35.  So we
+> can set 48 bits as default on upcoming pc-q35-2.12 machines, while
+> keep the 39 bits on the old ones.
+> 
+> Please refer to include/hw/compat.h.
+
+Thanks Peter, for the clarification and pointer to this. I am still
+new to this but learning on how this works or how this is used in
+use cases like Live Migration.
+
+Are you suggesting that we change the default to 48 bits in the
+next release (2.12)?
+
+User need to specify an older machine type  (pc-q35-2.11 or older)
+to get the old default value of 39 bits. This still requires the
+patch I proposed to support compatibility for older releases
+except the introduction of the new property (x-aw-bits).
+
+
+> 
+>>
+>>>
+>>>> with live migration of
+>>>> intel-iommu enabled QEMU guest. The only valid values for 'x-aw-bits'
+>>>> parameter are 39 and 48.
+>>>
+>>> I'd rather make it a boolean then.
+>>
+>> Right. It seems Intel already has additional sizes supported so keeping
+>> it as an integer seems better.
+> 
+> Yes, considering that 5-level IOMMUs are coming (AFAIK).
+> 
+
+If we change the default value to 48 bits, I assume there is
+no need for this property and user is expected to use an
+older machine type based on the release to get the old
+default. Is this correct?
+
+Thanks.
+--Prasad
