@@ -1,21 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57504)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58132)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1eKOWk-00009D-6T
-	for qemu-devel@nongnu.org; Thu, 30 Nov 2017 08:05:26 -0500
+	(envelope-from <dgilbert@redhat.com>) id 1eKOY8-0001zV-Qi
+	for qemu-devel@nongnu.org; Thu, 30 Nov 2017 08:06:50 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1eKOWe-00015z-Rt
-	for qemu-devel@nongnu.org; Thu, 30 Nov 2017 08:05:17 -0500
-References: <20171012185916.22776-1-eblake@redhat.com>
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Message-ID: <c77f61fd-62ed-7c81-4017-c39470d979a1@virtuozzo.com>
-Date: Thu, 30 Nov 2017 16:04:55 +0300
+	(envelope-from <dgilbert@redhat.com>) id 1eKOY3-0002Gz-Mh
+	for qemu-devel@nongnu.org; Thu, 30 Nov 2017 08:06:44 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:46796)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1eKOY3-0002GA-DV
+	for qemu-devel@nongnu.org; Thu, 30 Nov 2017 08:06:39 -0500
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+	[10.5.11.15])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 81E0449016
+	for <qemu-devel@nongnu.org>; Thu, 30 Nov 2017 13:06:38 +0000 (UTC)
+Date: Thu, 30 Nov 2017 13:06:29 +0000
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20171130130628.GC3952@work-vm>
+References: <20171129185026.23632-1-dgilbert@redhat.com>
+	<20171130122245.7e713d2f@redhat.com>
+	<20171130120805.GA3952@work-vm>
+	<20171130134057.1d8ecc3e@redhat.com>
+	<20171130124720.GB3952@work-vm>
+	<20171130135820.69eb5715@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20171012185916.22776-1-eblake@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
-Content-Language: en-US
-Subject: Re: [Qemu-devel] [PATCH v4 00/20] add byte-based block_status
- driver callbacks
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20171130135820.69eb5715@redhat.com>
+Subject: Re: [Qemu-devel] [RFC 0/7] Rework vhost memory region updates
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,118 +37,126 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org
-Cc: kwolf@redhat.com, jsnow@redhat.com, famz@redhat.com, qemu-block@nongnu.org
+To: Igor Mammedov <imammedo@redhat.com>
+Cc: qemu-devel@nongnu.org, maxime.coquelin@redhat.com, mst@redhat.com
 
-Most of conversions looks fine, but it is not simple to prove the
-correctness, because we start to use internal driver logic on offsets
-and lengths, not aligned to sectors. And we can't imagine the
-consequences (at least, I can't and my r-b doesn't give the guarantee)
-of such change. It is like take some function and expand its scope of
-parameters.
+* Igor Mammedov (imammedo@redhat.com) wrote:
+> On Thu, 30 Nov 2017 12:47:20 +0000
+> "Dr. David Alan Gilbert" <dgilbert@redhat.com> wrote:
+> 
+> > * Igor Mammedov (imammedo@redhat.com) wrote:
+> > > On Thu, 30 Nov 2017 12:08:06 +0000
+> > > "Dr. David Alan Gilbert" <dgilbert@redhat.com> wrote:
+> > >   
+> > > > * Igor Mammedov (imammedo@redhat.com) wrote:  
+> > > > > On Wed, 29 Nov 2017 18:50:19 +0000
+> > > > > "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com> wrote:
+> > > > >     
+> > > > > > From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+> > > > > > 
+> > > > > > Hi,
+> > > > > >   This is an experimental set that reworks the way the vhost
+> > > > > > code handles changes in physical address space layout that
+> > > > > > came from a discussion with Igor.    
+> > > > > Thanks for looking into it.
+> > > > > 
+> > > > >      
+> > > > > > Instead of updating and trying to merge sections of address
+> > > > > > space on each add/remove callback, we wait until the commit phase
+> > > > > > and go through and rebuild a list by walking the Flatview of
+> > > > > > memory and end up producing an ordered list.
+> > > > > > We compare the list to the old list to trigger updates.
+> > > > > > 
+> > > > > > Note, only very lightly tested so far, I'm just trying to see if it's
+> > > > > > the right shape.
+> > > > > > 
+> > > > > > Igor, is this what you were intending?    
+> > > > > 
+> > > > > I was thinking about a little less intrusive approach
+> > > > > 
+> > > > > where vhost_region_add/del are modified to maintain
+> > > > > sorted by GPA array of mem_sections, vhost_dev::mem is dropped
+> > > > > altogether and vhost_memory_region array is build/used/freed
+> > > > > on every vhost_commit().
+> > > > > Maintaining sorted array should roughly cost us O(2 log n) if
+> > > > > binary search is used.
+> > > > > 
+> > > > > However I like your idea with iterator even more as it have
+> > > > > potential to make it even faster O(n) if we get rid of
+> > > > > quadratic and relatively complex vhost_update_compare_list().    
+> > > > 
+> > > > Note vhost_update_compare_list is complex,
+> > > > but it is O(n) - it's
+> > > > got nested loops, but the inner loop moves forward and oldi never
+> > > > gets reset back to zero.  
+> > > While skimming through patches I've overlooked it.
+> > > 
+> > > Anyways,
+> > > why memcmp(old_arr, new_arr) is not sufficient
+> > > to detect a change in memory map?  
+> > 
+> > It tells you that you've got a change, but doesn't give
+> > the start/end of the range that's changed, and those
+> > are used by vhost_commit to limit the work of
+> > vhost_verify_ring_mappings.
+> Isn't memmap list a sorted and
+>  dev->mem_changed_[start|end]_addr are the lowest|highest
+> addresses of whole map?
+> 
+> If it's, so wouldn't getting values directly from 
+> the 1st/last entries of array be sufficient?
 
-May be I'm too paranoiac. May be it would be good to align requests
-in bdrv_co_block_status to sectors at least for drivers which do not
-provide request_alignment. May be each patch should be reviewed by
-person, knowing that particular driver.
+THat wasn't my understanding from the existing code;
+my understanding was that changed_start_addr is set by
+vhost_region_add->vhost_set_memory when a new region is added
+(or removed) and is set to the limit of the section added.
+But perhaps I'm misunderstanding.
 
+(The logic in vhost_verify_ring_mappings doesn't make sense
+to me either though; if vhost_verify_ring_part_mapping returns 0
+on success, why is it doing   if (!r) { break; }  surely it
+should be  if (r) { break; })
 
+Dave
 
-12.10.2017 21:58, Eric Blake wrote:
-> There are patches floating around to add NBD_CMD_BLOCK_STATUS,
-> but NBD wants to report status on byte granularity (even if the
-> reporting will probably be naturally aligned to sectors or even
-> much higher levels).  I've therefore started the task of
-> converting our block status code to report at a byte granularity
-> rather than sectors.
->
-> Now that 2.11 is open, I'm rebasing/reposting the remaining patches.
->
-> The overall conversion currently looks like:
-> part 1: bdrv_is_allocated (merged, commit 51b0a488)
-> part 2: dirty-bitmap (merged, commit ca759622)
-> part 3: bdrv_get_block_status (v6 is posted [1], partially reviewed)
-> part 4: .bdrv_co_block_status (this series, v3 was here [2])
->
-> Available as a tag at:
-> git fetch git://repo.or.cz/qemu/ericb.git nbd-byte-callback-v4
->
-> Based-on: <20171012034720.11947-1-eblake@redhat.com>
-> ([PATCH v6 00/24] make bdrv_get_block_status byte-based)
->
-> Since v3:
-> - rebase to series 3 tweak in get_status interface
-> - further simplify qed code
-> - better documentation of optimization flag (s/mapping/want_zero/)
->
-> 001/20:[0033] [FC] 'block: Add .bdrv_co_block_status() callback'
-> 002/20:[0077] [FC] 'block: Switch passthrough drivers to .bdrv_co_block_status()'
-> 003/20:[0020] [FC] 'file-posix: Switch to .bdrv_co_block_status()'
-> 004/20:[0019] [FC] 'gluster: Switch to .bdrv_co_block_status()'
-> 005/20:[----] [--] 'iscsi: Switch cluster_sectors to byte-based'
-> 006/20:[----] [--] 'iscsi: Switch iscsi_allocmap_update() to byte-based'
-> 007/20:[0022] [FC] 'iscsi: Switch to .bdrv_co_block_status()'
-> 008/20:[0013] [FC] 'null: Switch to .bdrv_co_block_status()'
-> 009/20:[0017] [FC] 'parallels: Switch to .bdrv_co_block_status()'
-> 010/20:[0014] [FC] 'qcow: Switch to .bdrv_co_block_status()'
-> 011/20:[0019] [FC] 'qcow2: Switch to .bdrv_co_block_status()'
-> 012/20:[0086] [FC] 'qed: Switch to .bdrv_co_block_status()'
-> 013/20:[0015] [FC] 'raw: Switch to .bdrv_co_block_status()'
-> 014/20:[0011] [FC] 'sheepdog: Switch to .bdrv_co_block_status()'
-> 015/20:[----] [--] 'vdi: Avoid bitrot of debugging code'
-> 016/20:[0017] [FC] 'vdi: Switch to .bdrv_co_block_status()'
-> 017/20:[0013] [FC] 'vmdk: Switch to .bdrv_co_block_status()'
-> 018/20:[0019] [FC] 'vpc: Switch to .bdrv_co_block_status()'
-> 019/20:[0010] [FC] 'vvfat: Switch to .bdrv_co_block_status()'
-> 020/20:[0019] [FC] 'block: Drop unused .bdrv_co_get_block_status()'
->
-> Eric Blake (20):
->    block: Add .bdrv_co_block_status() callback
->    block: Switch passthrough drivers to .bdrv_co_block_status()
->    file-posix: Switch to .bdrv_co_block_status()
->    gluster: Switch to .bdrv_co_block_status()
->    iscsi: Switch cluster_sectors to byte-based
->    iscsi: Switch iscsi_allocmap_update() to byte-based
->    iscsi: Switch to .bdrv_co_block_status()
->    null: Switch to .bdrv_co_block_status()
->    parallels: Switch to .bdrv_co_block_status()
->    qcow: Switch to .bdrv_co_block_status()
->    qcow2: Switch to .bdrv_co_block_status()
->    qed: Switch to .bdrv_co_block_status()
->    raw: Switch to .bdrv_co_block_status()
->    sheepdog: Switch to .bdrv_co_block_status()
->    vdi: Avoid bitrot of debugging code
->    vdi: Switch to .bdrv_co_block_status()
->    vmdk: Switch to .bdrv_co_block_status()
->    vpc: Switch to .bdrv_co_block_status()
->    vvfat: Switch to .bdrv_co_block_status()
->    block: Drop unused .bdrv_co_get_block_status()
->
->   include/block/block.h     |   9 ++-
->   include/block/block_int.h |  43 +++++++------
->   block/io.c                |  80 +++++++++++-------------
->   block/blkdebug.c          |  20 +++---
->   block/commit.c            |   2 +-
->   block/file-posix.c        |  59 ++++++++++--------
->   block/gluster.c           |  67 +++++++++++---------
->   block/iscsi.c             | 154 +++++++++++++++++++++++++---------------------
->   block/mirror.c            |   2 +-
->   block/null.c              |  23 +++----
->   block/parallels.c         |  22 ++++---
->   block/qcow.c              |  27 ++++----
->   block/qcow2.c             |  24 ++++----
->   block/qed.c               |  84 +++++++++----------------
->   block/raw-format.c        |  16 ++---
->   block/sheepdog.c          |  26 ++++----
->   block/throttle.c          |   2 +-
->   block/vdi.c               |  45 +++++++-------
->   block/vmdk.c              |  28 ++++-----
->   block/vpc.c               |  42 +++++++------
->   block/vvfat.c             |  16 +++--
->   21 files changed, 404 insertions(+), 387 deletions(-)
->
-
-
--- 
-Best regards,
-Vladimir
+> 
+> 
+> > 
+> > Dave
+> > 
+> > > >   
+> > > > > Pls, see comments on individual patches.    
+> > > > 
+> > > > Thanks; I have fixed a couple of bugs since I posted, so I'm
+> > > > more interested in structure/shape.  Any good ideas how to test
+> > > > it are welcome.
+> > > > 
+> > > > Dave
+> > > >   
+> > > > >     
+> > > > > > Dave
+> > > > > > 
+> > > > > > Dr. David Alan Gilbert (7):
+> > > > > >   memory: address_space_iterate
+> > > > > >   vhost: Move log_dirty check
+> > > > > >   vhost: New memory update functions
+> > > > > >   vhost: update_mem_cb implementation
+> > > > > >   vhost: Compare new and old memory lists
+> > > > > >   vhost: Copy updated region data into device state
+> > > > > >   vhost: Remove vhost_set_memory and children
+> > > > > > 
+> > > > > >  hw/virtio/trace-events |   8 +
+> > > > > >  hw/virtio/vhost.c      | 424 ++++++++++++++++++++++---------------------------
+> > > > > >  include/exec/memory.h  |  23 +++
+> > > > > >  memory.c               |  22 +++
+> > > > > >  4 files changed, 241 insertions(+), 236 deletions(-)
+> > > > > >     
+> > > > >     
+> > > > --
+> > > > Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK  
+> > >   
+> > --
+> > Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+> 
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
