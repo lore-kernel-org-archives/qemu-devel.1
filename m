@@ -1,27 +1,39 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44134)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45803)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1eKFUB-0000fz-Mw
-	for qemu-devel@nongnu.org; Wed, 29 Nov 2017 22:26:04 -0500
+	(envelope-from <bjsdjshi@linux.vnet.ibm.com>) id 1eKFYE-0002Fc-FI
+	for qemu-devel@nongnu.org; Wed, 29 Nov 2017 22:30:15 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1eKFU8-0003Ah-JK
-	for qemu-devel@nongnu.org; Wed, 29 Nov 2017 22:26:03 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:59736)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1eKFU8-0003A5-E3
-	for qemu-devel@nongnu.org; Wed, 29 Nov 2017 22:26:00 -0500
-Date: Thu, 30 Nov 2017 11:25:51 +0800
-From: Peter Xu <peterx@redhat.com>
-Message-ID: <20171130032551.GA18017@xz-mi>
-References: <20171114231350.286025-1-prasad.singamsetty@oracle.com>
-	<20171114231350.286025-3-prasad.singamsetty@oracle.com>
-	<20171128193156-mutt-send-email-mst@kernel.org>
-	<cdbe8732-88fa-512e-481b-250abc18bf92@oracle.com>
+	(envelope-from <bjsdjshi@linux.vnet.ibm.com>) id 1eKFYA-0006y2-1d
+	for qemu-devel@nongnu.org; Wed, 29 Nov 2017 22:30:14 -0500
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:58244)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <bjsdjshi@linux.vnet.ibm.com>)
+	id 1eKFY9-0006vV-Ob
+	for qemu-devel@nongnu.org; Wed, 29 Nov 2017 22:30:09 -0500
+Received: from pps.filterd (m0098393.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
+	vAU3TMId018930
+	for <qemu-devel@nongnu.org>; Wed, 29 Nov 2017 22:30:05 -0500
+Received: from e37.co.us.ibm.com (e37.co.us.ibm.com [32.97.110.158])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2ej712egck-1
+	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Wed, 29 Nov 2017 22:30:05 -0500
+Received: from localhost
+	by e37.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <bjsdjshi@linux.vnet.ibm.com>;
+	Wed, 29 Nov 2017 20:30:04 -0700
+Date: Thu, 30 Nov 2017 11:29:58 +0800
+From: Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>
+References: <20171128130758.67556-1-pasic@linux.vnet.ibm.com>
+	<20171129081735.GR5859@bjsdjshi@linux.vnet.ibm.com>
+	<20171129124747.63c1359b.cohuck@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <cdbe8732-88fa-512e-481b-250abc18bf92@oracle.com>
-Subject: Re: [Qemu-devel] [PATCH v1 2/2] intel-iommu: Extend address width
- to 48 bits
+In-Reply-To: <20171129124747.63c1359b.cohuck@redhat.com>
+Message-Id: <20171130032958.GU5859@bjsdjshi@linux.vnet.ibm.com>
+Subject: Re: [Qemu-devel] [RFC PATCH v2 1/1] s390x/css: unrestrict cssids
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,49 +42,67 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Prasad Singamsetty <prasad.singamsetty@oracle.com>
-Cc: "Michael S. Tsirkin" <mst@redhat.com>, qemu-devel@nongnu.org, pbonzini@redhat.com, rth@twiddle.net, ehabkost@redhat.com, imammedo@redhat.com, konrad.wilk@oracle.com
+To: Cornelia Huck <cohuck@redhat.com>
+Cc: Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>, Halil Pasic <pasic@linux.vnet.ibm.com>, Boris Fiuczynski <fiuczy@linux.vnet.ibm.com>, Christian Borntraeger <borntraeger@de.ibm.com>, Shalini Chellathurai Saroja <shalini@linux.vnet.ibm.com>, qemu-devel@nongnu.org, qemu-s390x@nongnu.org
 
-On Wed, Nov 29, 2017 at 01:05:22PM -0800, Prasad Singamsetty wrote:
-> Thanks Michael. Some comments below.
-> 
-> On 11/28/2017 9:32 AM, Michael S. Tsirkin wrote:
-> > On Tue, Nov 14, 2017 at 06:13:50PM -0500, prasad.singamsetty@oracle.com wrote:
-> > > From: Prasad Singamsetty <prasad.singamsetty@oracle.com>
-> > > 
-> > > The current implementation of Intel IOMMU code only supports 39 bits
-> > > iova address width. This patch provides a new parameter (x-aw-bits)
-> > > for intel-iommu to extend its address width to 48 bits but keeping the
-> > > default the same (39 bits). The reason for not changing the default
-> > > is to avoid potential compatibility problems
+* Cornelia Huck <cohuck@redhat.com> [2017-11-29 12:47:47 +0100]:
+
+[...]
+
+> > With this patch
+> > ===============
 > > 
-> > You can change the default, just make it 39 for existing machine types.
+> > ------------+---------------+-------------
+> >             | squashing off | squashing on
+> > ------------+---------------+-------------
+> >     auto id |        F      |     F
+> > ------------+---------------+-------------
+> > explicit id |        S'     |     S
+> > ------------+---------------+-------------
+> > 
+> > T5. squashing off + auto id
+> >   qemu-system-s390x: Unknown savevm section or instance '/fe.0.0003/virtio-rng' 0
+> >   qemu-system-s390x: load of migration failed: Invalid argument
+> > [Fail due to busid mismatch.]
+> > 
+> > T6. squashing off + explicit given id
+> >   qemu-system-s390x: vmstate: get_nullptr expected VMS_NULLPTR_MARKER
+> >   qemu-system-s390x: Failed to load s390_css:css
+> >   qemu-system-s390x: error while loading state for instance 0x0 of device 's390_css'
+> >   qemu-system-s390x: load of migration failed: Invalid argument
+> > [Setting vfio-ccw.devno=non-fe.x.xxxx. (same as T1)
+> >  Fail due to css mismatch - there is no css 0 in the new vm.]
+> > 
+> >   Succeed.
+> > [Setting vfio-ccw.devno=fe.x.xxxx.]
 > 
-> I think introducing a new machine type is not appropriate as this
-> is an implementation limitation for the existing machine type.
-> Currently q35 is the only machine type that supports intel-iommu.
-> And we want to retain the current default behavior for q35 to avoid
-> any new issues with live migration.
-
-I guess "existing machine type" means e.g. pc-q35-2.11 and older ones,
-rather than creating another machine type in parallel with q35.  So we
-can set 48 bits as default on upcoming pc-q35-2.12 machines, while
-keep the 39 bits on the old ones.
-
-Please refer to include/hw/compat.h.
+> Don't you need to attach the vfio-ccw device later anyway? You have to
+> detach it from the source before you migrate, and I'd expect it to be
+> symmetric.
+Yes. After migrate, there is no problem to device_add the vfio-ccw
+device (id=vfio0,devno=fe.x.xxxx). The result (succeed for this case)
+does not change.
 
 > 
 > > 
-> > > with live migration of
-> > > intel-iommu enabled QEMU guest. The only valid values for 'x-aw-bits'
-> > > parameter are 39 and 48.
+> > T7. squashing on  + auto id
+> >   qemu-system-s390x: Unknown savevm section or instance '/00.0.0003/virtio-rng' 0
+> >   qemu-system-s390x: load of migration failed: Invalid argument
+> > [Fail due to busid mismatch.]
 > > 
-> > I'd rather make it a boolean then.
+> > T8. squashing on  + explicit given id
+> >   Succeed.
+> > 
+> > 
+> > Notice:
+> > The differences of the test results between w and w/o this patch are in
+> > the "squashing off" cases. I think these are things that we can accept.
 > 
-> Right. It seems Intel already has additional sizes supported so keeping
-> it as an integer seems better.
-
-Yes, considering that 5-level IOMMUs are coming (AFAIK).
+> Yes, I think that makes sense. If you want reliable migration, you need
+> to be specific with your ids. I'd just don't want us to break things
+> explicitly.
+> 
+Fair enough. Got the message.
 
 -- 
-Peter Xu
+Dong Jia Shi
