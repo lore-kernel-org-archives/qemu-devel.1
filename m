@@ -1,20 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41465)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44134)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1eKFMc-0006YT-8f
-	for qemu-devel@nongnu.org; Wed, 29 Nov 2017 22:18:15 -0500
+	(envelope-from <peterx@redhat.com>) id 1eKFUB-0000fz-Mw
+	for qemu-devel@nongnu.org; Wed, 29 Nov 2017 22:26:04 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1eKFMb-0006i4-Fa
-	for qemu-devel@nongnu.org; Wed, 29 Nov 2017 22:18:14 -0500
-Date: Thu, 30 Nov 2017 11:18:03 +0800
-From: Fam Zheng <famz@redhat.com>
-Message-ID: <20171130031803.GL16237@lemon>
-References: <20171123020832.8165-1-mreitz@redhat.com>
-	<20171123020832.8165-9-mreitz@redhat.com>
+	(envelope-from <peterx@redhat.com>) id 1eKFU8-0003Ah-JK
+	for qemu-devel@nongnu.org; Wed, 29 Nov 2017 22:26:03 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:59736)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1eKFU8-0003A5-E3
+	for qemu-devel@nongnu.org; Wed, 29 Nov 2017 22:26:00 -0500
+Date: Thu, 30 Nov 2017 11:25:51 +0800
+From: Peter Xu <peterx@redhat.com>
+Message-ID: <20171130032551.GA18017@xz-mi>
+References: <20171114231350.286025-1-prasad.singamsetty@oracle.com>
+	<20171114231350.286025-3-prasad.singamsetty@oracle.com>
+	<20171128193156-mutt-send-email-mst@kernel.org>
+	<cdbe8732-88fa-512e-481b-250abc18bf92@oracle.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20171123020832.8165-9-mreitz@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH 08/17] iotests: Skip 103 for refcount_bits=1
+In-Reply-To: <cdbe8732-88fa-512e-481b-250abc18bf92@oracle.com>
+Subject: Re: [Qemu-devel] [PATCH v1 2/2] intel-iommu: Extend address width
+ to 48 bits
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,26 +30,49 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Max Reitz <mreitz@redhat.com>
-Cc: qemu-block@nongnu.org, qemu-devel@nongnu.org, Kevin Wolf <kwolf@redhat.com>, John Snow <jsnow@redhat.com>
+To: Prasad Singamsetty <prasad.singamsetty@oracle.com>
+Cc: "Michael S. Tsirkin" <mst@redhat.com>, qemu-devel@nongnu.org, pbonzini@redhat.com, rth@twiddle.net, ehabkost@redhat.com, imammedo@redhat.com, konrad.wilk@oracle.com
 
-On Thu, 11/23 03:08, Max Reitz wrote:
-> Signed-off-by: Max Reitz <mreitz@redhat.com>
-> ---
->  tests/qemu-iotests/103 | 2 ++
->  1 file changed, 2 insertions(+)
+On Wed, Nov 29, 2017 at 01:05:22PM -0800, Prasad Singamsetty wrote:
+> Thanks Michael. Some comments below.
 > 
-> diff --git a/tests/qemu-iotests/103 b/tests/qemu-iotests/103
-> index ecbd8ebd71..d0cfab8844 100755
-> --- a/tests/qemu-iotests/103
-> +++ b/tests/qemu-iotests/103
-> @@ -40,6 +40,8 @@ trap "_cleanup; exit \$status" 0 1 2 3 15
->  _supported_fmt qcow2
->  _supported_proto file nfs
->  _supported_os Linux
-> +# Internal snapshots are (currently) impossible with refcount_bits=1
-> +_unsupported_imgopts 'refcount_bits=1[^0-9]'
+> On 11/28/2017 9:32 AM, Michael S. Tsirkin wrote:
+> > On Tue, Nov 14, 2017 at 06:13:50PM -0500, prasad.singamsetty@oracle.com wrote:
+> > > From: Prasad Singamsetty <prasad.singamsetty@oracle.com>
+> > > 
+> > > The current implementation of Intel IOMMU code only supports 39 bits
+> > > iova address width. This patch provides a new parameter (x-aw-bits)
+> > > for intel-iommu to extend its address width to 48 bits but keeping the
+> > > default the same (39 bits). The reason for not changing the default
+> > > is to avoid potential compatibility problems
+> > 
+> > You can change the default, just make it 39 for existing machine types.
+> 
+> I think introducing a new machine type is not appropriate as this
+> is an implementation limitation for the existing machine type.
+> Currently q35 is the only machine type that supports intel-iommu.
+> And we want to retain the current default behavior for q35 to avoid
+> any new issues with live migration.
 
-What is the "[^0-9]" part for?
+I guess "existing machine type" means e.g. pc-q35-2.11 and older ones,
+rather than creating another machine type in parallel with q35.  So we
+can set 48 bits as default on upcoming pc-q35-2.12 machines, while
+keep the 39 bits on the old ones.
 
-Fam
+Please refer to include/hw/compat.h.
+
+> 
+> > 
+> > > with live migration of
+> > > intel-iommu enabled QEMU guest. The only valid values for 'x-aw-bits'
+> > > parameter are 39 and 48.
+> > 
+> > I'd rather make it a boolean then.
+> 
+> Right. It seems Intel already has additional sizes supported so keeping
+> it as an integer seems better.
+
+Yes, considering that 5-level IOMMUs are coming (AFAIK).
+
+-- 
+Peter Xu
