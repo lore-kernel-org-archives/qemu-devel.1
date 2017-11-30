@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59808)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59951)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jcody@redhat.com>) id 1eKQEA-0001Ld-Cg
-	for qemu-devel@nongnu.org; Thu, 30 Nov 2017 09:54:15 -0500
+	(envelope-from <stefanha@redhat.com>) id 1eKQEY-0001dP-O0
+	for qemu-devel@nongnu.org; Thu, 30 Nov 2017 09:54:42 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jcody@redhat.com>) id 1eKQE9-0002TO-FO
-	for qemu-devel@nongnu.org; Thu, 30 Nov 2017 09:54:14 -0500
-Date: Thu, 30 Nov 2017 09:53:57 -0500
-From: Jeff Cody <jcody@redhat.com>
-Message-ID: <20171130145357.GA20944@localhost.localdomain>
-References: <cover.1511978000.git.berto@igalia.com>
-	<4011ffb0dd7f0a0a3e2cfe28223047c809761c90.1511978000.git.berto@igalia.com>
-	<20171130122732.GB4039@localhost.localdomain>
-	<w514lpbj0m8.fsf@maestria.local.igalia.com>
-	<20171130144335.GD4039@localhost.localdomain>
+	(envelope-from <stefanha@redhat.com>) id 1eKQEY-0002iP-1I
+	for qemu-devel@nongnu.org; Thu, 30 Nov 2017 09:54:38 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:45158)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1eKQEX-0002hp-Qa
+	for qemu-devel@nongnu.org; Thu, 30 Nov 2017 09:54:37 -0500
+Date: Thu, 30 Nov 2017 14:54:20 +0000
+From: Stefan Hajnoczi <stefanha@redhat.com>
+Message-ID: <20171130145420.GB15942@stefanha-x1.localdomain>
+References: <20171129174428.27548-1-ppandit@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="XF85m9dhOBO43t/C"
 Content-Disposition: inline
-In-Reply-To: <20171130144335.GD4039@localhost.localdomain>
-Subject: Re: [Qemu-devel] [PATCH for-2.11 1/1] blockjob: Make
- block_job_pause_all() keep a reference to the jobs
+In-Reply-To: <20171129174428.27548-1-ppandit@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v4 0/2] check VirtiQueue Vring objects
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,60 +27,54 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Kevin Wolf <kwolf@redhat.com>
-Cc: Alberto Garcia <berto@igalia.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>, Anton Nefedov <anton.nefedov@virtuozzo.com>
-
-On Thu, Nov 30, 2017 at 03:43:35PM +0100, Kevin Wolf wrote:
-> Am 30.11.2017 um 15:35 hat Alberto Garcia geschrieben:
-> > On Thu 30 Nov 2017 01:27:32 PM CET, Kevin Wolf wrote:
-> > 
-> > >> Destroying a paused block job during bdrv_reopen_multiple() has two
-> > >> consequences:
-> > >> 
-> > >>    1) The references to the nodes involved in the job are released,
-> > >>       possibly destroying some of them. If those nodes were in the
-> > >>       reopen queue this would trigger the problem originally described
-> > >>       in commit 40840e419be, crashing QEMU.
-> > >
-> > > This specific problem could be avoided by making the BDS reference in
-> > > the reopen queue strong, i.e. bdrv_ref() in bdrv_reopen_queue_child()
-> > > and bdrv_unref() only at the end of bdrv_reopen_multiple().
-> > 
-> > That is correct.
-> > 
-> > >>    2) At the end of bdrv_reopen_multiple(), bdrv_drain_all_end() would
-> > >>       not be doing all necessary bdrv_parent_drained_end() calls.
-> > >
-> > > If I understand correctly, you don't have a reproducer here.
-> > 
-> > That's unfortunately not correct.
-> > 
-> > You can use the very test case that I mentioned in the commit message:
-> > 
-> >    https://lists.gnu.org/archive/html/qemu-block/2017-11/msg00934.html
-> > 
-> > With that one, QEMU master crashes easily because of problem (1). If I
-> > hold strong references in the reopen queue as you mentioned, the test
-> > case hangs because of problem (2).
-> 
-> Ok, thanks. I'll try to play with this a bit myself later.
-> 
-
-Another data point: I'm able to reproduce that crash, by both increasing
-STREAM_BUFFER_SIZE as mentioned, and using the new test case, on -rc3.
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: Qemu Developers <qemu-devel@nongnu.org>, Cornelia Huck <cohuck@redhat.com>, zhangboxian <zhangboxian@huawei.com>, Paolo Bonzini <pbonzini@redhat.com>, Prasad J Pandit <pjp@fedoraproject.org>, P J P <ppandit@redhat.com>
 
 
-> > > It's certainly not a full solution because keeping a reference to a
-> > > block job does not prevent it from completing, but only from being
-> > > freed. Most block jobs do graph modifications, including dropping the
-> > > references to nodes, already when they complete, not only when they
-> > > are freed.
-> > 
-> > Yes but the block job itself holds additional references (thanks to
-> > block_job_add_bdrv()).
-> 
-> Mirror and commit call block_job_remove_all_bdrv() during their
-> completion. So yes, it does help for streaming, but not for all block
-> jobs.
-> 
-> Kevin
+--XF85m9dhOBO43t/C
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
+
+On Wed, Nov 29, 2017 at 11:14:26PM +0530, P J P wrote:
+> From: Prasad J Pandit <pjp@fedoraproject.org>
+
+Michael is the virtio maintainer.  I have added him to this email
+thread so the patch series can be merged.
+
+>=20
+> Hello,
+>=20
+> A guest could attempt to use an uninitialised VirtQueue object
+> or set Vring object with undue values, raising an unexpected
+> exception in Qemu. This patch set fixes this issue and also adds
+> a unit test to the suite.
+>=20
+> Thank you.
+> --
+> Prasad J Pandit (2):
+>   virtio: check VirtQueue Vring object is set
+>   tests: add test to check VirtQueue object
+>=20
+>  hw/virtio/virtio.c      | 14 +++++++++++---
+>  tests/virtio-blk-test.c | 25 +++++++++++++++++++++++++
+>  2 files changed, 36 insertions(+), 3 deletions(-)
+>=20
+> --
+> 2.13.6
+
+--XF85m9dhOBO43t/C
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEcBAEBAgAGBQJaIBucAAoJEJykq7OBq3PIEPkH/RtInoDEObjlTF8FLxRiY8vn
+5y94I+5YdJgIgiW0/qRPrwpcUk3ZUMI58PNtzvsf2s5GpSC32yA2gmy+sTyvZT4a
+WrjgSD1eqrfqi2PrhdRWNvs5nj6XaU1NRPYDtX+2HXYWKKi2yZPtDcbmO2nOLEpP
+agPmZECaL0STYccUo93QDBIF+qyKnDUOV2rlg0ylfv9imIOQjvxoxkYR7n/uhBg0
+Zq2y6NLlByhB1EB26WZx1JqHKe80HnASJ8o80zhoH5qwBeiEIA3lLEKAPSmNYY9g
+wDp17Zgg5pVGAeD4CdNaRRSI2+9J9cOFI5QBYbmOwfF3ttKKH+8ameeIkK1Y/Zw=
+=ZRRn
+-----END PGP SIGNATURE-----
+
+--XF85m9dhOBO43t/C--
