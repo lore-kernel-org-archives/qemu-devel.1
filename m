@@ -1,22 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46394)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53117)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1eKLXo-0008K4-Ki
-	for qemu-devel@nongnu.org; Thu, 30 Nov 2017 04:54:13 -0500
+	(envelope-from <yi.l.liu@linux.intel.com>) id 1eKLoO-0005VN-01
+	for qemu-devel@nongnu.org; Thu, 30 Nov 2017 05:11:27 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1eKLXk-0006Hb-M9
-	for qemu-devel@nongnu.org; Thu, 30 Nov 2017 04:54:12 -0500
-References: <20171129202701.16117-1-david@redhat.com>
-	<20171129202701.16117-6-david@redhat.com>
-From: Thomas Huth <thuth@redhat.com>
-Message-ID: <b6d7d5ea-3566-b62b-6931-7cdf4a2f5518@redhat.com>
-Date: Thu, 30 Nov 2017 10:54:03 +0100
+	(envelope-from <yi.l.liu@linux.intel.com>) id 1eKLoE-0005tQ-D8
+	for qemu-devel@nongnu.org; Thu, 30 Nov 2017 05:11:19 -0500
+Received: from mga05.intel.com ([192.55.52.43]:4877)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <yi.l.liu@linux.intel.com>)
+	id 1eKLoE-0005qx-4n
+	for qemu-devel@nongnu.org; Thu, 30 Nov 2017 05:11:10 -0500
+Date: Thu, 30 Nov 2017 17:54:35 +0800
+From: "Liu, Yi L" <yi.l.liu@linux.intel.com>
+Message-ID: <20171130095435.GC30936@sky-dev>
+References: <20171114231350.286025-1-prasad.singamsetty@oracle.com>
+	<20171114231350.286025-3-prasad.singamsetty@oracle.com>
+	<20171130052238.GB30936@sky-dev> <20171130091155.GH22901@xz-mi>
 MIME-Version: 1.0
-In-Reply-To: <20171129202701.16117-6-david@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v2 for-2.12 05/16] s390x/pci: pass the
- retaddr to all PCI instructions
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20171130091155.GH22901@xz-mi>
+Subject: Re: [Qemu-devel] [PATCH v1 2/2] intel-iommu: Extend address width
+ to 48 bits
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,25 +30,69 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Hildenbrand <david@redhat.com>, qemu-s390x@nongnu.org, qemu-devel@nongnu.org
-Cc: Christian Borntraeger <borntraeger@de.ibm.com>, Cornelia Huck <cohuck@redhat.com>, Richard Henderson <rth@twiddle.net>, Alexander Graf <agraf@suse.de>
+To: Peter Xu <peterx@redhat.com>
+Cc: ehabkost@redhat.com, mst@redhat.com, konrad.wilk@oracle.com, qemu-devel@nongnu.org, imammedo@redhat.com, pbonzini@redhat.com, prasad.singamsetty@oracle.com, rth@twiddle.net
 
-On 29.11.2017 21:26, David Hildenbrand wrote:
-> Once we wire up TCG, we will need the retaddr to correctly inject
-> program interrupts. As we want to get rid of the function
-> program_interrupt(), convert PCI code too.
+On Thu, Nov 30, 2017 at 05:11:55PM +0800, Peter Xu wrote:
+> On Thu, Nov 30, 2017 at 01:22:38PM +0800, Liu, Yi L wrote:
+> > On Tue, Nov 14, 2017 at 06:13:50PM -0500, prasad.singamsetty@oracle.com wrote:
+> > > From: Prasad Singamsetty <prasad.singamsetty@oracle.com>
+> > > 
+> > > The current implementation of Intel IOMMU code only supports 39 bits
+> > > iova address width. This patch provides a new parameter (x-aw-bits)
+> > > for intel-iommu to extend its address width to 48 bits but keeping the
+> > > default the same (39 bits). The reason for not changing the default
+> > > is to avoid potential compatibility problems with live migration of
+> > > intel-iommu enabled QEMU guest. The only valid values for 'x-aw-bits'
+> > > parameter are 39 and 48.
+> > > 
+> > > After enabling larger address width (48), we should be able to map
+> > > larger iova addresses in the guest. For example, a QEMU guest that
+> > > is configured with large memory ( >=1TB ). To check whether 48 bits
+> > 
+> > I didn't quite get your point here. Address width limits the iova range,
+> > but it doesn't limit the guest memory range. e.g. you can use 39 bit iova
+> > address to access a guest physical address larger than (2^39 - 1) as long
+> > as the guest 2nd level page table is well programmed. Only one exception,
+> > if you requires a continuous iova range(e.g. 2^39), it would be an issue.
+> > Not sure if this is the major motivation of your patch? However, I'm not
+> > against extend the address width to be 48 bits. Just need to make it clear
+> > here.
 > 
-> For KVM, we can simply use RA_IGNORED.
-> 
-> Convert program_interrupt() to s390_program_interrupt() directly, making
-> use of the passed address.
-> 
-> Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
-> Signed-off-by: David Hildenbrand <david@redhat.com>
-> ---
->  hw/s390x/s390-pci-inst.c | 83 +++++++++++++++++++++++++-----------------------
->  hw/s390x/s390-pci-inst.h | 16 ++++++----
->  target/s390x/kvm.c       | 14 ++++----
->  3 files changed, 59 insertions(+), 54 deletions(-)
+> One thing I can think of is the identity mapping. Say, when iommu=pt
+> is set in guest, meanwhile when PT capability is not supported from
+> hardware (here I mean, the emulated hardware, of course), guest kernel
+> will create one identity mapping to emulate the PT mode.
 
-Reviewed-by: Thomas Huth <thuth@redhat.com>
+True.
+ 
+> Current linux kernel's identity mapping should be a static 48 bits
+> mapping (it must cover the whole memory range of guest), so if we
+
+I suppose guest memory range depends on the AW reported by CPUID? Not sure
+if it is constantly 48 bits.
+
+> provide a 39 bits vIOMMU to the guest, AFAIU we'll fail at device
+> attaching to that identity domain of every single device that is
+> protected by that 39 bits vIOMMU (kernel will find that domain gaw is
+> bigger than vIOMMU supported gaw of that device).
+
+Yeah, this is a good argue. As it is 1:1 mapping, the translated address
+is limited all the same.
+
+> I do see no good fix for that, except boost the supported gaw to
+> bigger ones.
+
+How about defaultly expose cap.PT bit? In that case, there will no 1:1
+mapping in guest side. Translation is skipped. So the IOMMU AW won't
+limit the addressing.
+
+Regards,
+Yi L
+
+> 
+> Thanks,
+> 
+> -- 
+> Peter Xu
+> 
