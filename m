@@ -1,22 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33284)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35024)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1eKM8I-0000IH-9b
-	for qemu-devel@nongnu.org; Thu, 30 Nov 2017 05:31:55 -0500
+	(envelope-from <penguin-kernel@I-love.SAKURA.ne.jp>)
+	id 1eKMDT-0002V9-MO
+	for qemu-devel@nongnu.org; Thu, 30 Nov 2017 05:37:16 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1eKM8H-00009U-Bp
-	for qemu-devel@nongnu.org; Thu, 30 Nov 2017 05:31:54 -0500
-Date: Thu, 30 Nov 2017 11:31:35 +0100
-From: Kevin Wolf <kwolf@redhat.com>
-Message-ID: <20171130103135.GA4039@localhost.localdomain>
-References: <20171129144956.11409-1-famz@redhat.com>
-	<20171129172546.GG3753@localhost.localdomain>
-	<20171130020359.GB16237@lemon>
-MIME-Version: 1.0
+	(envelope-from <penguin-kernel@I-love.SAKURA.ne.jp>)
+	id 1eKMDN-00055L-CV
+	for qemu-devel@nongnu.org; Thu, 30 Nov 2017 05:37:15 -0500
+Received: from www262.sakura.ne.jp ([2001:e42:101:1:202:181:97:72]:32211)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <penguin-kernel@I-love.SAKURA.ne.jp>)
+	id 1eKMDM-0002KQ-V1
+	for qemu-devel@nongnu.org; Thu, 30 Nov 2017 05:37:09 -0500
+From: Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>
+References: <1511963726-34070-1-git-send-email-wei.w.wang@intel.com>
+	<1511963726-34070-6-git-send-email-wei.w.wang@intel.com>
+In-Reply-To: <1511963726-34070-6-git-send-email-wei.w.wang@intel.com>
+Message-Id: <201711301934.CDC21800.FSLtJFFOOVQHMO@I-love.SAKURA.ne.jp>
+Date: Thu, 30 Nov 2017 19:34:10 +0900
+Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20171130020359.GB16237@lemon>
-Subject: Re: [Qemu-devel] [PATCH RFC 0/9] block: Rewrite block drain
- begin/end
+Subject: Re: [Qemu-devel] [PATCH v18 05/10] xbitmap: add more operations
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,71 +29,88 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Fam Zheng <famz@redhat.com>
-Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, jcody@redhat.com, Max Reitz <mreitz@redhat.com>, pbonzini@redhat.com, Stefan Hajnoczi <stefanha@redhat.com>
+To: wei.w.wang@intel.com
+Cc: virtio-dev@lists.oasis-open.org, linux-kernel@vger.kernel.org, qemu-devel@nongnu.org, virtualization@lists.linux-foundation.org, kvm@vger.kernel.org, linux-mm@kvack.org, mst@redhat.com, mhocko@kernel.org, akpm@linux-foundation.org, mawilcox@microsoft.com, david@redhat.com, cornelia.huck@de.ibm.com, mgorman@techsingularity.net, aarcange@redhat.com, amit.shah@redhat.com, pbonzini@redhat.com, willy@infradead.org, liliang.opensource@gmail.com, yang.zhang.wz@gmail.com, quan.xu@aliyun.com, nilal@redhat.com, riel@redhat.com
 
-Am 30.11.2017 um 03:03 hat Fam Zheng geschrieben:
-> On Wed, 11/29 18:25, Kevin Wolf wrote:
-> > Am 29.11.2017 um 15:49 hat Fam Zheng geschrieben:
-> > > While we look at the fixes for 2.11, I briefly prototyped this series
-> > > to see if it makes sense as a simplification of the drain API for
-> > > 2.12.
-> > > 
-> > > The idea is to let AioContext manage quiesce callbacks, then the block
-> > > layer only needs to do the in-flight request waiting. This lets us get
-> > > rid of the callback recursion (both up and down).
-> > 
-> > So essentially you don't drain individual nodes any more, but whole
-> > AioContexts. I have a feeeling that this would be a step in the wrong
-> > direction.
-> > 
-> > Not only would it completely bypass the path I/O requests take and
-> > potentially drain a lot more than is actually necessary, but it also
-> > requires that all nodes that are connected in a tree are in the same
-> > AioContext.
-> 
-> Yeah, good point. Initially I wanted to introduce a BlockGraph object
-> which manages the per-graph draining, (i.e. where to register the
-> drain callbacks), but I felt lazy and used AioContext.
-> 
-> Will that make it better?  BlockGraph would be a proper abstraction
-> and will not limit the API to one AioContext per tree.
+Wei Wang wrote:
+>  /**
+> + * xb_clear_bit - clear a range of bits in the xbitmap
 
-There is only a single graph, so this would mean going back to global
-bdrv_drain_all() exclusively.
+Name mismatch.
 
-What you really mean is probably connected components in the graph, but
-do we really want to manage merging and splitting object representing
-connected components when a node is added or removed from the graph?
-Especially when that graph change occurs in a drain callback?
+> + * @start: the start of the bit range, inclusive
+> + * @end: the end of the bit range, inclusive
+> + *
+> + * This function is used to clear a bit in the xbitmap. If all the bits of the
+> + * bitmap are 0, the bitmap will be freed.
+> + */
+> +void xb_clear_bit_range(struct xb *xb, unsigned long start, unsigned long end)
+> +{
+> +	struct radix_tree_root *root = &xb->xbrt;
+> +	struct radix_tree_node *node;
+> +	void **slot;
+> +	struct ida_bitmap *bitmap;
+> +	unsigned int nbits;
+> +
+> +	for (; start < end; start = (start | (IDA_BITMAP_BITS - 1)) + 1) {
+> +		unsigned long index = start / IDA_BITMAP_BITS;
+> +		unsigned long bit = start % IDA_BITMAP_BITS;
+> +
+> +		bitmap = __radix_tree_lookup(root, index, &node, &slot);
+> +		if (radix_tree_exception(bitmap)) {
+> +			unsigned long ebit = bit + 2;
+> +			unsigned long tmp = (unsigned long)bitmap;
+> +
+> +			nbits = min(end - start + 1, BITS_PER_LONG - ebit);
 
-You can also still easily introduce bugs where graph changes during a
-drain end up in nodes not being drained, possibly drained twice, you
-still access the next pointer of a deleted node or you accidentally
-switch to draining a different component.
+"nbits = min(end - start + 1," seems to expect that start == end is legal
+for clearing only 1 bit. But this function is no-op if start == end.
+Please clarify what "inclusive" intended.
 
-It's probably possible to get this right, but essentially you're just
-switching from iterating a tree to iterating a list. You get roughly the
-same set of problems that you have to consider as today, and getting it
-right should be about the same difficulty.
+> +
+> +			if (ebit >= BITS_PER_LONG)
+> +				continue;
 
-> > And finally, I don't really think that the recursion is even a problem.
-> > The problem is with graph changes made by callbacks that drain allows to
-> > run. With your changes, it might be a bit easier to avoid that
-> > bdrv_drain() itself gets into trouble due to graph changes, but this
-> > doesn't solve the problem for any (possibly indirect) callers of
-> > bdrv_drain().
-> 
-> The recursion is the one big place that can be easily broken by graph changes,
-> fixing this doesn't make the situation any worse. We could still fix the
-> indirect callers by taking references or by introducing "ubiquitous coroutines".
+(I don't understand how radix tree works, but generally this patchset looks fuzzy
+to me about boundary cases. Thus, I want to confirm that this is not an overlook.)
+Why is making "ebit >= BITS_PER_LONG" (e.g. start == 62) case a no-op correct?
+Aren't there bits which should have been cleared in this case?
 
-But hiding a bug in 80% of the cases where it shows isn't enough.
+> +			bitmap_clear(&tmp, ebit, nbits);
+> +			if (tmp == RADIX_TREE_EXCEPTIONAL_ENTRY)
+> +				__radix_tree_delete(root, node, slot);
+> +			else
+> +				rcu_assign_pointer(*slot, (void *)tmp);
+> +		} else if (bitmap) {
+> +			nbits = min(end - start + 1, IDA_BITMAP_BITS - bit);
+> +
+> +			if (nbits != IDA_BITMAP_BITS)
+> +				bitmap_clear(bitmap->bitmap, bit, nbits);
+> +
+> +			if (nbits == IDA_BITMAP_BITS ||
+> +			    bitmap_empty(bitmap->bitmap, IDA_BITMAP_BITS)) {
+> +				kfree(bitmap);
+> +				__radix_tree_delete(root, node, slot);
+> +			}
+> +		}
+> +	}
+> +}
 
-I think the only real solution is to forbid graph changes until after
-any critical operation has completed. I haven't tried it out in
-practice, but I suppose we could use a CoMutex around them and take it
-in bdrv_drained_begin/end() and all other places that can get into
-trouble with graph changes.
 
-Kevin
+
+> +static inline __always_inline void bitmap_clear(unsigned long *map,
+> +						unsigned int start,
+> +						unsigned int nbits)
+> +{
+> +	if (__builtin_constant_p(nbits) && nbits == 1)
+> +		__clear_bit(start, map);
+> +	else if (__builtin_constant_p(start & 7) && IS_ALIGNED(start, 8) &&
+> +		 __builtin_constant_p(nbits & 7) && IS_ALIGNED(nbits, 8))
+
+It looks strange to apply __builtin_constant_p test to variables after "& 7".
+
+> +		memset((char *)map + start / 8, 0, nbits / 8);
+> +	else
+> +		__bitmap_clear(map, start, nbits);
+> +}
+> +
