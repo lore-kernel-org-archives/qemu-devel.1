@@ -1,20 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39793)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40388)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <deepa.srinivasan@oracle.com>) id 1eKp5J-0000V0-LB
-	for qemu-devel@nongnu.org; Fri, 01 Dec 2017 12:26:47 -0500
+	(envelope-from <wouter@grep.be>) id 1eKp6A-0001ls-2e
+	for Qemu-devel@nongnu.org; Fri, 01 Dec 2017 12:27:39 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <deepa.srinivasan@oracle.com>) id 1eKp5I-0004yU-8X
-	for qemu-devel@nongnu.org; Fri, 01 Dec 2017 12:26:45 -0500
+	(envelope-from <wouter@grep.be>) id 1eKp67-0005gd-FK
+	for Qemu-devel@nongnu.org; Fri, 01 Dec 2017 12:27:38 -0500
+Date: Thu, 30 Nov 2017 18:43:30 +0100
+From: Wouter Verhelst <w@uter.be>
+Message-ID: <20171130174330.GB3480@grep.be>
+References: <15f2fce6-00f4-0c1d-4ebe-d4ed7c5e7596@redhat.com>
+	<20171130153213.GB11253@grep.be>
+	<507b0c8e-d8be-9468-51cf-951dd897cc01@redhat.com>
+MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 10.3 \(3273\))
-From: Deepa Srinivasan <deepa.srinivasan@oracle.com>
-In-Reply-To: <1511456107-7081-1-git-send-email-deepa.srinivasan@oracle.com>
-Date: Fri, 1 Dec 2017 09:27:09 -0800
-Content-Transfer-Encoding: quoted-printable
-Message-Id: <29EF0C0C-64D0-4440-A8FF-99079E7D4703@oracle.com>
-References: <c4532ef7-6e05-d14a-21de-1b8381aa2112@redhat.com>
-	<1511456107-7081-1-git-send-email-deepa.srinivasan@oracle.com>
-Subject: Re: [Qemu-devel] [PATCH] block: Fix qemu crash when using scsi-block
+Content-Disposition: inline
+In-Reply-To: <507b0c8e-d8be-9468-51cf-951dd897cc01@redhat.com>
+Subject: Re: [Qemu-devel] RFC: Let NBD client request read-only mode
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,236 +24,79 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: stefanha@redhat.com, kwolf@redhat.com, mreitz@redhat.com, pbonzini@redhat.com, qemu-devel@nongnu.org, qemu-block@nongnu.org, mark.kanda@oracle.com
-Cc: Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>
+To: Eric Blake <eblake@redhat.com>
+Cc: nbd list <nbd@other.debian.org>, "Qemu-devel@nongnu.org" <Qemu-devel@nongnu.org>, qemu block <qemu-block@nongnu.org>
 
-Kevin, Paolo, Stefan,
+On Thu, Nov 30, 2017 at 10:00:46AM -0600, Eric Blake wrote:
+> On 11/30/2017 09:32 AM, Wouter Verhelst wrote:
+> > > A client that wants to be read-only, but which does not see server support
+> > > (in idea 1, the server did not advertise the bit; in idea 2, the server
+> > > replies with NBD_REP_ERR_UNSUP), does not have to do anything special (it is
+> > > always possible to do just reads to a read-write connection, and the server
+> > > may still set NBD_FLAG_READ_ONLY even without supporting the extension of
+> > > permitting a client-side request).  But such a client may, if it wants to be
+> > > nice to potential parallel writers on the same export, decide to disconnect
+> > > quickly (with NBD_OPT_ABORT or NBD_CMD_DISC as appropriate) rather than tie
+> > > up a read-write connection.
+> > 
+> > Indeed.
+> > 
+> > > I don't know which idea is more palatable.  We have a finite set of only 2^4
+> > > global handshake flags because it is a bitmask, where only 14 bits remain;
+> > > whereas we have almost 2^32 potential NBD_OPT_ values.  On the other hand,
+> > > using a global handshake flag means the server never shows any export as
+> > > writable; while with the NBD_OPT_ solution, a guest can get different
+> > > results for the sequence NBD_OPT_INFO, NBD_OPT_READ_ONLY, NBD_OPT_INFO.
+> > 
+> > It might additionally also be a good idea to add another data item to
+> > the NBD_OPT_INFO response which tells the client that it will be the
+> > only writer, but that there may be other readers.
+> > 
+> > That way, if a client sees that data item, it could go "oh, but I don't
+> > need to write -- here's an NBD_OPT_READ_ONLY for you".
+> 
+> There's also the question of inconsistent reads - normally, if a client is
+> the only reader, the client can cache data rather than having to re-read it
+> from the server; whereas if there is another writer in parallel, the client
+> SHOULD read data again rather than relying on the cache (since the other
+> writer may have changed data in the meantime) - so maybe having a way for
+> the server to report whether reads may be inconsistent, or even give an
+> error to NBD_OPT_GO unless the client requests (via NBD_OPT_READ_ONLY or
+> some other way) that the client is aware of the potential for
+> volatile/inconsistent reads.
 
-Are there any further comments on this patch? Can this patch be =
-committed?
+I'm wary of doing this.
 
-Thanks
-Deepa
+We can never guarantee 100% that there is no writer (some other process
+might write to the backend behind the server's back and it would have no
+way of knowing that).
 
-> On Nov 23, 2017, at 8:55 AM, Deepa Srinivasan =
-<deepa.srinivasan@oracle.com> wrote:
->=20
-> Starting qemu with the following arguments causes qemu to segfault:
-> ... -device lsi,id=3Dlsi0 -drive =
-file=3Discsi:<...>,format=3Draw,if=3Dnone,node-name=3D
-> iscsi1 -device scsi-block,bus=3Dlsi0.0,id=3D<...>,drive=3Discsi1
->=20
-> This patch fixes blk_aio_ioctl() so it does not pass stack addresses =
-to
-> blk_aio_ioctl_entry() which may be invoked after blk_aio_ioctl() =
-returns. More
-> details about the bug follow.
->=20
-> blk_aio_ioctl() invokes blk_aio_prwv() with blk_aio_ioctl_entry as the
-> coroutine parameter. blk_aio_prwv() ultimately calls aio_co_enter().
->=20
-> When blk_aio_ioctl() is executed from within a coroutine context (e.g.
-> iscsi_bh_cb()), aio_co_enter() adds the coroutine =
-(blk_aio_ioctl_entry) to
-> the current coroutine's wakeup queue. blk_aio_ioctl() then returns.
->=20
-> When blk_aio_ioctl_entry() executes later, it accesses an invalid =
-pointer:
-> ....
->    BlkRwCo *rwco =3D &acb->rwco;
->=20
->    rwco->ret =3D blk_co_ioctl(rwco->blk, rwco->offset,
->                             rwco->qiov->iov[0].iov_base);  <--- qiov =
-is
->                                                                 =
-invalid here
-> ...
->=20
-> In the case when blk_aio_ioctl() is called from a non-coroutine =
-context,
-> blk_aio_ioctl_entry() executes immediately. But if bdrv_co_ioctl() =
-calls
-> qemu_coroutine_yield(), blk_aio_ioctl() will return. When the =
-coroutine
-> execution is complete, control returns to blk_aio_ioctl_entry() after =
-the call
-> to blk_co_ioctl(). There is no invalid reference after this point, but =
-the
-> function is still holding on to invalid pointers.
->=20
-> The fix is to change blk_aio_prwv() to accept a void pointer for the =
-IO buffer
-> rather than a QEMUIOVector. blk_aio_prwv() passes this through in =
-BlkRwCo and the
-> coroutine function casts it to QEMUIOVector or uses the void pointer =
-directly.
->=20
-> Signed-off-by: Deepa Srinivasan <deepa.srinivasan@oracle.com>
-> Signed-off-by: Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>
-> Reviewed-by: Mark Kanda <mark.kanda@oracle.com>
-> ---
-> block/block-backend.c | 51 =
-+++++++++++++++++++++++++--------------------------
-> 1 file changed, 25 insertions(+), 26 deletions(-)
->=20
-> diff --git a/block/block-backend.c b/block/block-backend.c
-> index baef8e7..2d0d9b6 100644
-> --- a/block/block-backend.c
-> +++ b/block/block-backend.c
-> @@ -1140,7 +1140,7 @@ int coroutine_fn blk_co_pwritev(BlockBackend =
-*blk, int64_t offset,
-> typedef struct BlkRwCo {
->     BlockBackend *blk;
->     int64_t offset;
-> -    QEMUIOVector *qiov;
-> +    void *iobuf;
->     int ret;
->     BdrvRequestFlags flags;
-> } BlkRwCo;
-> @@ -1148,17 +1148,19 @@ typedef struct BlkRwCo {
-> static void blk_read_entry(void *opaque)
-> {
->     BlkRwCo *rwco =3D opaque;
-> +    QEMUIOVector *qiov =3D rwco->iobuf;
->=20
-> -    rwco->ret =3D blk_co_preadv(rwco->blk, rwco->offset, =
-rwco->qiov->size,
-> -                              rwco->qiov, rwco->flags);
-> +    rwco->ret =3D blk_co_preadv(rwco->blk, rwco->offset, qiov->size,
-> +                              qiov, rwco->flags);
-> }
->=20
-> static void blk_write_entry(void *opaque)
-> {
->     BlkRwCo *rwco =3D opaque;
-> +    QEMUIOVector *qiov =3D rwco->iobuf;
->=20
-> -    rwco->ret =3D blk_co_pwritev(rwco->blk, rwco->offset, =
-rwco->qiov->size,
-> -                               rwco->qiov, rwco->flags);
-> +    rwco->ret =3D blk_co_pwritev(rwco->blk, rwco->offset, qiov->size,
-> +                               qiov, rwco->flags);
-> }
->=20
-> static int blk_prw(BlockBackend *blk, int64_t offset, uint8_t *buf,
-> @@ -1178,7 +1180,7 @@ static int blk_prw(BlockBackend *blk, int64_t =
-offset, uint8_t *buf,
->     rwco =3D (BlkRwCo) {
->         .blk    =3D blk,
->         .offset =3D offset,
-> -        .qiov   =3D &qiov,
-> +        .iobuf  =3D &qiov,
->         .flags  =3D flags,
->         .ret    =3D NOT_DONE,
->     };
-> @@ -1275,7 +1277,7 @@ static void blk_aio_complete_bh(void *opaque)
-> }
->=20
-> static BlockAIOCB *blk_aio_prwv(BlockBackend *blk, int64_t offset, int =
-bytes,
-> -                                QEMUIOVector *qiov, CoroutineEntry =
-co_entry,
-> +                                void *iobuf, CoroutineEntry co_entry,
->                                 BdrvRequestFlags flags,
->                                 BlockCompletionFunc *cb, void *opaque)
-> {
-> @@ -1287,7 +1289,7 @@ static BlockAIOCB *blk_aio_prwv(BlockBackend =
-*blk, int64_t offset, int bytes,
->     acb->rwco =3D (BlkRwCo) {
->         .blk    =3D blk,
->         .offset =3D offset,
-> -        .qiov   =3D qiov,
-> +        .iobuf  =3D iobuf,
->         .flags  =3D flags,
->         .ret    =3D NOT_DONE,
->     };
-> @@ -1310,10 +1312,11 @@ static void blk_aio_read_entry(void *opaque)
-> {
->     BlkAioEmAIOCB *acb =3D opaque;
->     BlkRwCo *rwco =3D &acb->rwco;
-> +    QEMUIOVector *qiov =3D rwco->iobuf;
->=20
-> -    assert(rwco->qiov->size =3D=3D acb->bytes);
-> +    assert(qiov->size =3D=3D acb->bytes);
->     rwco->ret =3D blk_co_preadv(rwco->blk, rwco->offset, acb->bytes,
-> -                              rwco->qiov, rwco->flags);
-> +                              qiov, rwco->flags);
->     blk_aio_complete(acb);
-> }
->=20
-> @@ -1321,10 +1324,11 @@ static void blk_aio_write_entry(void *opaque)
-> {
->     BlkAioEmAIOCB *acb =3D opaque;
->     BlkRwCo *rwco =3D &acb->rwco;
-> +    QEMUIOVector *qiov =3D rwco->iobuf;
->=20
-> -    assert(!rwco->qiov || rwco->qiov->size =3D=3D acb->bytes);
-> +    assert(!qiov || qiov->size =3D=3D acb->bytes);
->     rwco->ret =3D blk_co_pwritev(rwco->blk, rwco->offset, acb->bytes,
-> -                               rwco->qiov, rwco->flags);
-> +                               qiov, rwco->flags);
->     blk_aio_complete(acb);
-> }
->=20
-> @@ -1453,8 +1457,10 @@ int blk_co_ioctl(BlockBackend *blk, unsigned =
-long int req, void *buf)
-> static void blk_ioctl_entry(void *opaque)
-> {
->     BlkRwCo *rwco =3D opaque;
-> +    QEMUIOVector *qiov =3D rwco->iobuf;
-> +
->     rwco->ret =3D blk_co_ioctl(rwco->blk, rwco->offset,
-> -                             rwco->qiov->iov[0].iov_base);
-> +                             qiov->iov[0].iov_base);
-> }
->=20
-> int blk_ioctl(BlockBackend *blk, unsigned long int req, void *buf)
-> @@ -1467,24 +1473,15 @@ static void blk_aio_ioctl_entry(void *opaque)
->     BlkAioEmAIOCB *acb =3D opaque;
->     BlkRwCo *rwco =3D &acb->rwco;
->=20
-> -    rwco->ret =3D blk_co_ioctl(rwco->blk, rwco->offset,
-> -                             rwco->qiov->iov[0].iov_base);
-> +    rwco->ret =3D blk_co_ioctl(rwco->blk, rwco->offset, rwco->iobuf);
-> +
->     blk_aio_complete(acb);
-> }
->=20
-> BlockAIOCB *blk_aio_ioctl(BlockBackend *blk, unsigned long int req, =
-void *buf,
->                           BlockCompletionFunc *cb, void *opaque)
-> {
-> -    QEMUIOVector qiov;
-> -    struct iovec iov;
-> -
-> -    iov =3D (struct iovec) {
-> -        .iov_base =3D buf,
-> -        .iov_len =3D 0,
-> -    };
-> -    qemu_iovec_init_external(&qiov, &iov, 1);
-> -
-> -    return blk_aio_prwv(blk, req, 0, &qiov, blk_aio_ioctl_entry, 0, =
-cb, opaque);
-> +    return blk_aio_prwv(blk, req, 0, buf, blk_aio_ioctl_entry, 0, cb, =
-opaque);
-> }
->=20
-> int blk_co_pdiscard(BlockBackend *blk, int64_t offset, int bytes)
-> @@ -1900,7 +1897,9 @@ int blk_truncate(BlockBackend *blk, int64_t =
-offset, PreallocMode prealloc,
-> static void blk_pdiscard_entry(void *opaque)
-> {
->     BlkRwCo *rwco =3D opaque;
-> -    rwco->ret =3D blk_co_pdiscard(rwco->blk, rwco->offset, =
-rwco->qiov->size);
-> +    QEMUIOVector *qiov =3D rwco->iobuf;
-> +
-> +    rwco->ret =3D blk_co_pdiscard(rwco->blk, rwco->offset, =
-qiov->size);
-> }
->=20
-> int blk_pdiscard(BlockBackend *blk, int64_t offset, int bytes)
-> --=20
-> 2.7.4
->=20
->=20
+Adding a message "there is another writer" would imply that the absense
+of that message means "there is no other writer", which would then be
+incorrect. As such, I don't think this is something we can properly cope
+with at the NBD level.
+
+With good arguments I could be convinced otherwise, however :-)
+
+> > I think it sounds reasonable enough, yes; but I also think there are a
+> > few other related situations that might be relevant enough to warrant
+> > thinking about more. I gave a few examples above, but maybe there are
+> > more? Dunno.
+> 
+> Okay, sounds like it warrants enough potential for conversation that I
+> should write it up as a patch, and the patch may need a new extension-
+> branch rather than going straight into mainline;
+
+Yeah, probably best to do that.
+
+> and I'll stick with idea 2 (NBD_OPT_READ_ONLY) rather than burning a
+> global handshake bit. I hope to give the documentation patch a shot in
+> the next few days.
+
+Thanks.
+
+-- 
+Could you people please use IRC like normal people?!?
+
+  -- Amaya Rodrigo Sastre, trying to quiet down the buzz in the DebConf 2008
+     Hacklab
