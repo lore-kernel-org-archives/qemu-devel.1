@@ -1,31 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49942)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51156)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1eKoEP-0000Cc-GX
-	for qemu-devel@nongnu.org; Fri, 01 Dec 2017 11:32:06 -0500
+	(envelope-from <aik@ozlabs.ru>) id 1eKoFX-0001R4-WD
+	for qemu-devel@nongnu.org; Fri, 01 Dec 2017 11:33:16 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1eKoEL-0007RC-9k
-	for qemu-devel@nongnu.org; Fri, 01 Dec 2017 11:32:05 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:56530)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1eKoEL-0007QE-1i
-	for qemu-devel@nongnu.org; Fri, 01 Dec 2017 11:32:01 -0500
-Date: Fri, 1 Dec 2017 12:43:38 +0800
-From: Peter Xu <peterx@redhat.com>
-Message-ID: <20171201044338.GB2712@xz-mi>
-References: <20171114231350.286025-1-prasad.singamsetty@oracle.com>
-	<20171114231350.286025-3-prasad.singamsetty@oracle.com>
-	<20171128193156-mutt-send-email-mst@kernel.org>
-	<cdbe8732-88fa-512e-481b-250abc18bf92@oracle.com>
-	<20171130032551.GA18017@xz-mi>
-	<367bb386-2885-2ea2-b766-d5bde2c79bcf@oracle.com>
-	<20171130205443-mutt-send-email-mst@kernel.org>
-	<fb9c086b-2b95-d09e-1c3f-d2274a347de6@oracle.com>
+	(envelope-from <aik@ozlabs.ru>) id 1eKoFT-0000Ji-Ss
+	for qemu-devel@nongnu.org; Fri, 01 Dec 2017 11:33:16 -0500
+Received: from mail-pl0-x243.google.com ([2607:f8b0:400e:c01::243]:34117)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <aik@ozlabs.ru>) id 1eKoFT-0000JE-NP
+	for qemu-devel@nongnu.org; Fri, 01 Dec 2017 11:33:11 -0500
+Received: by mail-pl0-x243.google.com with SMTP id d21so6546834pll.1
+	for <qemu-devel@nongnu.org>; Fri, 01 Dec 2017 08:33:11 -0800 (PST)
+References: <20171005055037.7767-1-aik@ozlabs.ru>
+	<20171005055037.7767-2-aik@ozlabs.ru>
+From: Alexey Kardashevskiy <aik@ozlabs.ru>
+Message-ID: <431ee02e-a73e-70c8-185d-43223c52c693@ozlabs.ru>
+Date: Fri, 1 Dec 2017 08:56:42 +1100
 MIME-Version: 1.0
+In-Reply-To: <20171005055037.7767-2-aik@ozlabs.ru>
 Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <fb9c086b-2b95-d09e-1c3f-d2274a347de6@oracle.com>
-Subject: Re: [Qemu-devel] [PATCH v1 2/2] intel-iommu: Extend address width
- to 48 bits
+Content-Language: en-AU
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH qemu v5 1/2] memory/iommu/vfio: Define
+ add_vfio_group() callback
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,81 +31,72 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Prasad Singamsetty <prasad.singamsetty@oracle.com>
-Cc: "Michael S. Tsirkin" <mst@redhat.com>, ehabkost@redhat.com, konrad.wilk@oracle.com, qemu-devel@nongnu.org, imammedo@redhat.com, pbonzini@redhat.com, rth@twiddle.net
+To: qemu-devel@nongnu.org
+Cc: qemu-ppc@nongnu.org, David Gibson <david@gibson.dropbear.id.au>, Alex Williamson <alex.williamson@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
 
-On Thu, Nov 30, 2017 at 11:12:48AM -0800, Prasad Singamsetty wrote:
+On 05/10/17 16:50, Alexey Kardashevskiy wrote:
+> The new callback will be called when a new VFIO IOMMU group is added.
 > 
+> This should cause no behavioral change, the next patch will.
 > 
-> On 11/30/2017 10:56 AM, Michael S. Tsirkin wrote:
-> > On Thu, Nov 30, 2017 at 10:33:50AM -0800, Prasad Singamsetty wrote:
-> > > 
-> > > 
-> > > On 11/29/2017 7:25 PM, Peter Xu wrote:
-> > > > On Wed, Nov 29, 2017 at 01:05:22PM -0800, Prasad Singamsetty wrote:
-> > > > > Thanks Michael. Some comments below.
-> > > > > 
-> > > > > On 11/28/2017 9:32 AM, Michael S. Tsirkin wrote:
-> > > > > > On Tue, Nov 14, 2017 at 06:13:50PM -0500, prasad.singamsetty@oracle.com wrote:
-> > > > > > > From: Prasad Singamsetty <prasad.singamsetty@oracle.com>
-> > > > > > > 
-> > > > > > > The current implementation of Intel IOMMU code only supports 39 bits
-> > > > > > > iova address width. This patch provides a new parameter (x-aw-bits)
-> > > > > > > for intel-iommu to extend its address width to 48 bits but keeping the
-> > > > > > > default the same (39 bits). The reason for not changing the default
-> > > > > > > is to avoid potential compatibility problems
-> > > > > > 
-> > > > > > You can change the default, just make it 39 for existing machine types.
-> > > > > 
-> > > > > I think introducing a new machine type is not appropriate as this
-> > > > > is an implementation limitation for the existing machine type.
-> > > > > Currently q35 is the only machine type that supports intel-iommu.
-> > > > > And we want to retain the current default behavior for q35 to avoid
-> > > > > any new issues with live migration.
-> > > > 
-> > > > I guess "existing machine type" means e.g. pc-q35-2.11 and older ones,
-> > > > rather than creating another machine type in parallel with q35.  So we
-> > > > can set 48 bits as default on upcoming pc-q35-2.12 machines, while
-> > > > keep the 39 bits on the old ones.
-> > > > 
-> > > > Please refer to include/hw/compat.h.
-> > > 
-> > > Thanks Peter, for the clarification and pointer to this. I am still
-> > > new to this but learning on how this works or how this is used in
-> > > use cases like Live Migration.
+> Signed-off-by: Alexey Kardashevskiy <aik@ozlabs.ru>
 
-You can refer to similar commit, like 048a2e8869.
 
-But, I think I was wrong - you should better do the addition to
-include/hw/i386/pc.h (see e.g. PC_COMPAT_2_10) rather than compat.h,
-since Intel vIOMMU is only used for PC machines.
+What about this one,  any conclusion yet?
 
-And... you may also need to create that PC_COMPAT_2_11 macro after
-2.11 is released.  For that you can refer to a6fd5b0e050a.
 
-Anyway, I think this "set default" work can be postponed after recent
-release, which can be a separate work besides current series.
-
-> > > 
-> > > Are you suggesting that we change the default to 48 bits in the
-> > > next release (2.12)?
-> > > 
-> > > User need to specify an older machine type  (pc-q35-2.11 or older)
-> > > to get the old default value of 39 bits. This still requires the
-> > > patch I proposed to support compatibility for older releases
-> > > except the introduction of the new property (x-aw-bits).
-> > 
-> > Yes. If you see a reason for users to limit it to 39 bits,
-> > we can make it a supported property (not starting
-> > with x-). If it's only for live migration, we can
-> > use a non-supported property (with x-).
-> I think it is only for Live Migration case, we need to
-> support the old default value of 39 bits.
+> ---
 > 
-> Do you see any need to keep a non-supported property?
-> It may be useful for developers.
+> This could be at the higher level - in MemoryRegionOps, makes sense?
+> 
+> ---
+>  include/exec/memory.h |  4 ++++
+>  hw/vfio/common.c      | 15 +++++++++++++++
+>  2 files changed, 19 insertions(+)
+> 
+> diff --git a/include/exec/memory.h b/include/exec/memory.h
+> index 5ed4042f87..64e0b4fc96 100644
+> --- a/include/exec/memory.h
+> +++ b/include/exec/memory.h
+> @@ -210,6 +210,10 @@ typedef struct IOMMUMemoryRegionClass {
+>                                  IOMMUNotifierFlag new_flags);
+>      /* Set this up to provide customized IOMMU replay function */
+>      void (*replay)(IOMMUMemoryRegion *iommu, IOMMUNotifier *notifier);
+> +
+> +    /* Notifies IOMMUMR about attached VFIO IOMMU group */
+> +    void (*add_vfio_group)(IOMMUMemoryRegion *iommu_mr, int vfio_kvm_fd,
+> +                           int groupfd);
+>  } IOMMUMemoryRegionClass;
+>  
+>  typedef struct CoalescedMemoryRange CoalescedMemoryRange;
+> diff --git a/hw/vfio/common.c b/hw/vfio/common.c
+> index 7b2924c0ef..9e861e0393 100644
+> --- a/hw/vfio/common.c
+> +++ b/hw/vfio/common.c
+> @@ -481,6 +481,21 @@ static void vfio_listener_region_add(MemoryListener *listener,
+>          VFIOGuestIOMMU *giommu;
+>          IOMMUMemoryRegion *iommu_mr = IOMMU_MEMORY_REGION(section->mr);
+>  
+> +#ifdef CONFIG_KVM
+> +        if (kvm_enabled()) {
+> +            VFIOGroup *group;
+> +            IOMMUMemoryRegionClass *imrc =
+> +                IOMMU_MEMORY_REGION_GET_CLASS(iommu_mr);
+> +
+> +            QLIST_FOREACH(group, &container->group_list, container_next) {
+> +                if (imrc->add_vfio_group) {
+> +                    imrc->add_vfio_group(iommu_mr, vfio_kvm_device_fd,
+> +                                         group->fd);
+> +                }
+> +            }
+> +        }
+> +#endif
+> +
+>          trace_vfio_listener_region_add_iommu(iova, end);
+>          /*
+>           * FIXME: For VFIO iommu types which have KVM acceleration to
+> 
 
-IMHO if it's for developers x-* would be good enough.  Thanks,
 
 -- 
-Peter Xu
+Alexey
