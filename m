@@ -1,32 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51283)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52127)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1eKOFY-000407-4n
-	for qemu-devel@nongnu.org; Thu, 30 Nov 2017 07:47:33 -0500
+	(envelope-from <thuth@redhat.com>) id 1eKOJk-0005AP-3u
+	for qemu-devel@nongnu.org; Thu, 30 Nov 2017 07:51:53 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1eKOFV-0008HR-1P
-	for qemu-devel@nongnu.org; Thu, 30 Nov 2017 07:47:32 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:50282)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1eKOFU-0008GM-Ov
-	for qemu-devel@nongnu.org; Thu, 30 Nov 2017 07:47:28 -0500
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
-	[10.5.11.16])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id E2017C034E16
-	for <qemu-devel@nongnu.org>; Thu, 30 Nov 2017 12:47:27 +0000 (UTC)
-Date: Thu, 30 Nov 2017 12:47:20 +0000
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20171130124720.GB3952@work-vm>
-References: <20171129185026.23632-1-dgilbert@redhat.com>
-	<20171130122245.7e713d2f@redhat.com>
-	<20171130120805.GA3952@work-vm>
-	<20171130134057.1d8ecc3e@redhat.com>
+	(envelope-from <thuth@redhat.com>) id 1eKOJj-0007dj-5X
+	for qemu-devel@nongnu.org; Thu, 30 Nov 2017 07:51:52 -0500
+References: <1512031988-32490-1-git-send-email-thuth@redhat.com>
+	<1512031988-32490-4-git-send-email-thuth@redhat.com>
+	<CAFEAcA-LBOm=kHja3QJqOw-TT3GF9-i+wJfXdL-FU5NKimknzQ@mail.gmail.com>
+	<22aa483a-ede3-482d-88a9-ca1c03c37420@redhat.com>
+From: Thomas Huth <thuth@redhat.com>
+Message-ID: <34115e36-ab8c-d828-d1a1-3ac7f32ae80b@redhat.com>
+Date: Thu, 30 Nov 2017 13:51:42 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20171130134057.1d8ecc3e@redhat.com>
-Subject: Re: [Qemu-devel] [RFC 0/7] Rework vhost memory region updates
+In-Reply-To: <22aa483a-ede3-482d-88a9-ca1c03c37420@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH for-2.12 3/7] tests/boot-serial-test: Add
+ support for the mcf5208evb board
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,97 +27,84 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Igor Mammedov <imammedo@redhat.com>
-Cc: qemu-devel@nongnu.org, maxime.coquelin@redhat.com, mst@redhat.com
+To: Paolo Bonzini <pbonzini@redhat.com>, Peter Maydell <peter.maydell@linaro.org>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, Anthony Green <green@moxielogic.com>, Laurent Vivier <laurent@vivier.eu>, qemu-arm <qemu-arm@nongnu.org>, Edgar Iglesias <edgar.iglesias@gmail.com>, Richard Henderson <rth@twiddle.net>
 
-* Igor Mammedov (imammedo@redhat.com) wrote:
-> On Thu, 30 Nov 2017 12:08:06 +0000
-> "Dr. David Alan Gilbert" <dgilbert@redhat.com> wrote:
-> 
-> > * Igor Mammedov (imammedo@redhat.com) wrote:
-> > > On Wed, 29 Nov 2017 18:50:19 +0000
-> > > "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com> wrote:
-> > >   
-> > > > From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-> > > > 
-> > > > Hi,
-> > > >   This is an experimental set that reworks the way the vhost
-> > > > code handles changes in physical address space layout that
-> > > > came from a discussion with Igor.  
-> > > Thanks for looking into it.
-> > > 
-> > >    
-> > > > Instead of updating and trying to merge sections of address
-> > > > space on each add/remove callback, we wait until the commit phase
-> > > > and go through and rebuild a list by walking the Flatview of
-> > > > memory and end up producing an ordered list.
-> > > > We compare the list to the old list to trigger updates.
-> > > > 
-> > > > Note, only very lightly tested so far, I'm just trying to see if it's
-> > > > the right shape.
-> > > > 
-> > > > Igor, is this what you were intending?  
-> > > 
-> > > I was thinking about a little less intrusive approach
-> > > 
-> > > where vhost_region_add/del are modified to maintain
-> > > sorted by GPA array of mem_sections, vhost_dev::mem is dropped
-> > > altogether and vhost_memory_region array is build/used/freed
-> > > on every vhost_commit().
-> > > Maintaining sorted array should roughly cost us O(2 log n) if
-> > > binary search is used.
-> > > 
-> > > However I like your idea with iterator even more as it have
-> > > potential to make it even faster O(n) if we get rid of
-> > > quadratic and relatively complex vhost_update_compare_list().  
-> > 
-> > Note vhost_update_compare_list is complex,
-> > but it is O(n) - it's
-> > got nested loops, but the inner loop moves forward and oldi never
-> > gets reset back to zero.
-> While skimming through patches I've overlooked it.
-> 
-> Anyways,
-> why memcmp(old_arr, new_arr) is not sufficient
-> to detect a change in memory map?
+On 30.11.2017 13:40, Paolo Bonzini wrote:
+> On 30/11/2017 13:14, Peter Maydell wrote:
+>> On 30 November 2017 at 08:53, Thomas Huth <thuth@redhat.com> wrote:
+>>> +static const uint8_t kernel_mcf5208[] =3D {
+>>> +    0x41, 0xf9, 0xfc, 0x06, 0x00, 0x00,     /* lea 0xfc060000,%a0 */
+>>> +    0x10, 0x3c, 0x00, 0x54,                 /* move.b #'T',%d0 */
+>>> +    0x11, 0x7c, 0x00, 0x04, 0x00, 0x08,     /* move.b #4,8(%a0)     =
+Enable TX */
+>>> +    0x11, 0x40, 0x00, 0x0c,                 /* move.b %d0,12(%a0)   =
+Print 'T' */
+>>> +    0x60, 0xfa                              /* bra.s  loop */
+>>> +};
+>>
+>> This approach doesn't seem to be scalable to me -- are we
+>> really going to have 50 or more fragments of hand-coded hex in
+>> this file to cover the various board models?
+>>
+>> I'd much rather see us have a framework for being able
+>> to build test blobs from source using a cross compiler
+>> setup (and docker or similar so anybody can rebuild
+>> the test blobs). That will be much easier to maintain
+>> and easier to extend to having tests that test other
+>> parts of the board or other aspects of TCG emulation.
+>=20
+> It seems a bit overkill, as these snippets are ~16 bytes long.
+>=20
+> However, it would be useful to have a basic patching mechanism so that
+> board descriptions could include a common hand-coded const array and
+> place an address at a given offset.  So you'd have
+>=20
+>     struct HexFirmware {
+>         int     patch_offset;
+>         short   patch_size;
+>         bool    patch_bigendian;
+>         uint8_t data[32];
+>     }
+>=20
+> and microblaze boards could have:
+>=20
+> struct HexFirmware kernel_microblaze =3D {
+>     .patch_offset    =3D 0,
+>     .patch_size      =3D 2,
+>     .patch_bigendian =3D false,
+>     .data =3D {
+>         0xaa, 0xaa, 0x00, 0xb0,                 /* imm   0x???? */
+>         0x00, 0x10, 0x60, 0x30,                 /* addik r3,r0,0x1000 *=
+/
+>         0x54, 0x00, 0x80, 0x30,                 /* addik r4,r0,'T' */
+>         0x00, 0x00, 0x83, 0xf0,                 /* sbi   r4,r3,0 */
+>         0xfc, 0xff, 0x00, 0xb8,                 /* bri   -4  loop */
+>     }
+> };
+>=20
+> ...
+>=20
+>     { "microblaze", "petalogix-s3adsp1800", "", "TT",
+>       kernel_microblaze, 0x8400 },
+>     { "microblazeel", "petalogix-ml605", "", "TT",
+>       kernel_microblaze, 0x83a0 },
 
-It tells you that you've got a change, but doesn't give
-the start/end of the range that's changed, and those
-are used by vhost_commit to limit the work of
-vhost_verify_ring_mappings.
+The two micrablaze data arrays are completely different, since one is
+big endian, the other is little, so I'd need to byte-swap the whole
+array on the fly, too. Not sure whether it makes sense to add such
+complex code just to safe 16 bytes of blob data...?
 
-Dave
+> Likewise, you could have just two copies of the code for all ARM boards
+> that have a pl011 (or any other UART with a simple byte-long transmit
+> register), one 32-bit and one 64-bit.
 
-> > 
-> > > Pls, see comments on individual patches.  
-> > 
-> > Thanks; I have fixed a couple of bugs since I posted, so I'm
-> > more interested in structure/shape.  Any good ideas how to test
-> > it are welcome.
-> > 
-> > Dave
-> > 
-> > >   
-> > > > Dave
-> > > > 
-> > > > Dr. David Alan Gilbert (7):
-> > > >   memory: address_space_iterate
-> > > >   vhost: Move log_dirty check
-> > > >   vhost: New memory update functions
-> > > >   vhost: update_mem_cb implementation
-> > > >   vhost: Compare new and old memory lists
-> > > >   vhost: Copy updated region data into device state
-> > > >   vhost: Remove vhost_set_memory and children
-> > > > 
-> > > >  hw/virtio/trace-events |   8 +
-> > > >  hw/virtio/vhost.c      | 424 ++++++++++++++++++++++---------------------------
-> > > >  include/exec/memory.h  |  23 +++
-> > > >  memory.c               |  22 +++
-> > > >  4 files changed, 241 insertions(+), 236 deletions(-)
-> > > >   
-> > >   
-> > --
-> > Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
-> 
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+OK, having a patching mechanism in place likely makes sense as soon as
+we want to include multiple ARM boards here. I can do that, but I'd
+rather like to do it as a second step. It was already quite hard work to
+come up with all these assembler snippets (from CPUs where I don't have
+a clue of) and to determine which machines could be tested this way at
+all, so I'd first like to wait and see whether this patch series is
+acceptable at all or not, since Peter has objections.
+
+ Thomas
