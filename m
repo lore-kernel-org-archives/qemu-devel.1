@@ -1,26 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39345)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39341)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1eKoSZ-0005cj-0O
+	(envelope-from <kwolf@redhat.com>) id 1eKoSY-0005ci-VY
 	for qemu-devel@nongnu.org; Fri, 01 Dec 2017 11:46:44 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1eKoSU-00059u-1F
+	(envelope-from <kwolf@redhat.com>) id 1eKoSU-00059d-0A
 	for qemu-devel@nongnu.org; Fri, 01 Dec 2017 11:46:43 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:47996)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1eKoST-000585-SG
-	for qemu-devel@nongnu.org; Fri, 01 Dec 2017 11:46:37 -0500
-Date: Fri, 1 Dec 2017 17:37:17 +0800
-From: Peter Xu <peterx@redhat.com>
-Message-ID: <20171201093717.GF2712@xz-mi>
-References: <20171108060130.3772-1-peterx@redhat.com>
-	<20171108060130.3772-17-peterx@redhat.com>
-	<20171130172147.GF3952@work-vm>
+Date: Thu, 30 Nov 2017 19:27:46 +0100
+From: Kevin Wolf <kwolf@redhat.com>
+Message-ID: <20171130182746.GF4039@localhost.localdomain>
+References: <20171130164401.29221-1-kwolf@redhat.com>
+	<ce174622-1df0-bf86-452e-280dd3f7e068@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20171130172147.GF3952@work-vm>
-Subject: Re: [Qemu-devel] [PATCH v4 16/32] migration: new message
- MIG_RP_MSG_RECV_BITMAP
+In-Reply-To: <ce174622-1df0-bf86-452e-280dd3f7e068@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH] block: Formats don't need CONSISTENT_READ
+ with NO_IO
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,43 +24,59 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Cc: qemu-devel@nongnu.org, Alexey Perevalov <a.perevalov@samsung.com>, "Daniel P . Berrange" <berrange@redhat.com>, Juan Quintela <quintela@redhat.com>, Andrea Arcangeli <aarcange@redhat.com>
+To: Eric Blake <eblake@redhat.com>
+Cc: qemu-block@nongnu.org, qemu-devel@nongnu.org, mreitz@redhat.com
 
-On Thu, Nov 30, 2017 at 05:21:48PM +0000, Dr. David Alan Gilbert wrote:
-> * Peter Xu (peterx@redhat.com) wrote:
-> > Introducing new return path message MIG_RP_MSG_RECV_BITMAP to send
-> > received bitmap of ramblock back to source.
+Am 30.11.2017 um 18:09 hat Eric Blake geschrieben:
+> On 11/30/2017 10:44 AM, Kevin Wolf wrote:
+> > Commit 1f4ad7d fixed 'qemu-img info' for raw images that are currently
+> > in use as a mirror target. It is not enough for image formats, though,
+> > as these still unconditionally request BLK_PERM_CONSISTENT_READ.
 > > 
-> > This is the reply message of MIG_CMD_RECV_BITMAP, it contains not only
-> > the header (including the ramblock name), and it was appended with the
-> > whole ramblock received bitmap on the destination side.
+> > As this permission is meaningless unless you do actual I/O on the image,
+> > drop the requirement and allow 'qemu-img info' even for image formats
+> > under conditions where BLK_PERM_CONSISTENT_READ can't be granted.
 > > 
-> > When the source receives such a reply message (MIG_RP_MSG_RECV_BITMAP),
-> > it parses it, convert it to the dirty bitmap by inverting the bits.
+> > Signed-off-by: Kevin Wolf <kwolf@redhat.com>
+> > ---
+> >   block.c | 6 +++++-
+> >   1 file changed, 5 insertions(+), 1 deletion(-)
 > > 
-> > One thing to mention is that, when we send the recv bitmap, we are doing
-> > these things in extra:
-> > 
-> > - converting the bitmap to little endian, to support when hosts are
-> >   using different endianess on src/dst.
-> > 
-> > - do proper alignment for 8 bytes, to support when hosts are using
-> >   different word size (32/64 bits) on src/dst.
-> > 
-> > Signed-off-by: Peter Xu <peterx@redhat.com>
 > 
-> (The comment on the receive side 'Add addings' is a bit odd!
-> The send side is much better); other than that:
+> > @@ -1936,7 +1938,9 @@ void bdrv_format_default_perms(BlockDriverState *bs, BdrvChild *c,
+> >           /* bs->file always needs to be consistent because of the metadata. We
+> >            * can never allow other users to resize or write to it. */
+> > -        perm |= BLK_PERM_CONSISTENT_READ;
+> > +        if (!(flags & BDRV_O_NO_IO)) {
+> > +            perm |= BLK_PERM_CONSISTENT_READ;
 > 
-> Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+> I thought BDRV_O_NO_IO only means we aren't doing I/O on guest-visible data,
+> but doesn't stop us from reading the metadata.  The comment is telling: if
+> we can read metadata, then we depend on CONSISTENT_READ for the metadata to
+> be stable (even if we don't care about guest data consistency).
 
-Ouch.  It was meant to be "Add paddings". :)
+Yes and no. The trouble is that at the file system level we have only a
+single bit to describe the consistency of the whole image throughout the
+whole block driver tree.
 
-I'll keep the r-b, though, with the fix.  Thanks,
+We forbid shared BLK_PERM_CONSISTENT_READ for mirror targets (which
+aren't fully populated yet) and intermediate nodes for commit (which
+expose corrupted data). Both scenarios are really about the data exposed
+at the format layer, the metadata stays completely consistent.
 
-> > +    /* Add addings */
-> > +    le_bitmap = bitmap_new(nbits + BITS_PER_LONG);
+The question is what we do with this as we propagate permissions down to
+the protocol layer. Strictly speaking, the file at the protocol layer is
+perfectly consistent, so we might not forbid BLK_PERM_CONSISTENT_READ
+there. But I think it's more useful to do it anyway so that image
+locking can prevent the typical case of another process that uses qcow2
+over file-posix again, where the file-posix node could in theory be
+considered consistent, but the qcow2 one wouldn't.
 
--- 
-Peter Xu
+In the end, this is just a pragmatic way to let 'qemu-img info' work
+while the image is a mirror target or intermediate node for commit, but
+to forbid cases where corrupted data is used.
+
+Or would you argue that either 'qemu-img info' shouldn't be working or
+reading corrupted data should be allowed in other processes?
+
+Kevin
