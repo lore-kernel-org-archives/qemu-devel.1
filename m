@@ -1,26 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57524)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59662)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1eKKt4-0000bR-Mi
-	for qemu-devel@nongnu.org; Thu, 30 Nov 2017 04:12:07 -0500
+	(envelope-from <ppandit@redhat.com>) id 1eKKxh-0002G8-Tc
+	for qemu-devel@nongnu.org; Thu, 30 Nov 2017 04:16:59 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1eKKt0-0005Qs-Mr
-	for qemu-devel@nongnu.org; Thu, 30 Nov 2017 04:12:06 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:19699)
+	(envelope-from <ppandit@redhat.com>) id 1eKKxe-0002j7-NG
+	for qemu-devel@nongnu.org; Thu, 30 Nov 2017 04:16:53 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:45538)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1eKKt0-0005QY-GG
-	for qemu-devel@nongnu.org; Thu, 30 Nov 2017 04:12:02 -0500
-Date: Thu, 30 Nov 2017 17:11:55 +0800
-From: Peter Xu <peterx@redhat.com>
-Message-ID: <20171130091155.GH22901@xz-mi>
-References: <20171114231350.286025-1-prasad.singamsetty@oracle.com>
-	<20171114231350.286025-3-prasad.singamsetty@oracle.com>
-	<20171130052238.GB30936@sky-dev>
+	(Exim 4.71) (envelope-from <ppandit@redhat.com>) id 1eKKxe-0002ic-HF
+	for qemu-devel@nongnu.org; Thu, 30 Nov 2017 04:16:50 -0500
+Date: Thu, 30 Nov 2017 14:46:32 +0530 (IST)
+From: P J P <ppandit@redhat.com>
+In-Reply-To: <20171129121609.61a03d36.cohuck@redhat.com>
+Message-ID: <nycvar.YSQ.7.76.1711301445190.2625@wniryva>
+References: <20171124183446.7308-1-ppandit@redhat.com>
+	<20171124183446.7308-2-ppandit@redhat.com>
+	<20171127111532.GI16527@stefanha-x1.localdomain>
+	<nycvar.YSQ.7.76.1711272251290.24944@wniryva>
+	<20171128101154.64b49cb0.cohuck@redhat.com>
+	<20171128103757.GD17146@stefanha-x1.localdomain>
+	<nycvar.YSQ.7.76.1711281653440.1581@wniryva>
+	<20171128130012.1466d231.cohuck@redhat.com>
+	<nycvar.YSQ.7.76.1711291445390.12405@wniryva>
+	<20171129121609.61a03d36.cohuck@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20171130052238.GB30936@sky-dev>
-Subject: Re: [Qemu-devel] [PATCH v1 2/2] intel-iommu: Extend address width
- to 48 bits
+Content-Type: text/plain; charset=US-ASCII
+Subject: Re: [Qemu-devel] [PATCH v3 1/2] virtio: check VirtQueue Vring
+ object is set
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,50 +35,20 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Liu, Yi L" <yi.l.liu@linux.intel.com>
-Cc: prasad.singamsetty@oracle.com, qemu-devel@nongnu.org, pbonzini@redhat.com, rth@twiddle.net, ehabkost@redhat.com, mst@redhat.com, imammedo@redhat.com, konrad.wilk@oracle.com
+To: Cornelia Huck <cohuck@redhat.com>
+Cc: Stefan Hajnoczi <stefanha@redhat.com>, Qemu Developers <qemu-devel@nongnu.org>, zhangboxian <zhangboxian@huawei.com>, Paolo Bonzini <pbonzini@redhat.com>
 
-On Thu, Nov 30, 2017 at 01:22:38PM +0800, Liu, Yi L wrote:
-> On Tue, Nov 14, 2017 at 06:13:50PM -0500, prasad.singamsetty@oracle.com wrote:
-> > From: Prasad Singamsetty <prasad.singamsetty@oracle.com>
-> > 
-> > The current implementation of Intel IOMMU code only supports 39 bits
-> > iova address width. This patch provides a new parameter (x-aw-bits)
-> > for intel-iommu to extend its address width to 48 bits but keeping the
-> > default the same (39 bits). The reason for not changing the default
-> > is to avoid potential compatibility problems with live migration of
-> > intel-iommu enabled QEMU guest. The only valid values for 'x-aw-bits'
-> > parameter are 39 and 48.
-> > 
-> > After enabling larger address width (48), we should be able to map
-> > larger iova addresses in the guest. For example, a QEMU guest that
-> > is configured with large memory ( >=1TB ). To check whether 48 bits
-> 
-> I didn't quite get your point here. Address width limits the iova range,
-> but it doesn't limit the guest memory range. e.g. you can use 39 bit iova
-> address to access a guest physical address larger than (2^39 - 1) as long
-> as the guest 2nd level page table is well programmed. Only one exception,
-> if you requires a continuous iova range(e.g. 2^39), it would be an issue.
-> Not sure if this is the major motivation of your patch? However, I'm not
-> against extend the address width to be 48 bits. Just need to make it clear
-> here.
++-- On Wed, 29 Nov 2017, Cornelia Huck wrote --+
+| I think the basic problem is still that you conflate two things:
+| - vring.num, which cannot be flipped between 0 and !0 by the guest
+| - vring.{desc,avail,used}, which can
+| 
+| IOW, if vring.num == 0, the guest cannot manipulate the queue; if
+| vring.desc == 0, the guest can. 
+| 
+| Many functions have a likely/unlikely check, setup routines excepted.
 
-One thing I can think of is the identity mapping. Say, when iommu=pt
-is set in guest, meanwhile when PT capability is not supported from
-hardware (here I mean, the emulated hardware, of course), guest kernel
-will create one identity mapping to emulate the PT mode.
-
-Current linux kernel's identity mapping should be a static 48 bits
-mapping (it must cover the whole memory range of guest), so if we
-provide a 39 bits vIOMMU to the guest, AFAIU we'll fail at device
-attaching to that identity domain of every single device that is
-protected by that 39 bits vIOMMU (kernel will find that domain gaw is
-bigger than vIOMMU supported gaw of that device).
-
-I do see no good fix for that, except boost the supported gaw to
-bigger ones.
-
-Thanks,
-
--- 
-Peter Xu
+Have sent a revised patch v4. Thank you.
+--
+Prasad J Pandit / Red Hat Product Security Team
+47AF CE69 3A90 54AA 9045 1053 DD13 3D32 FE5B 041F
