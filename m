@@ -1,29 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36967)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37585)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1eKQSe-0002LQ-1o
-	for qemu-devel@nongnu.org; Thu, 30 Nov 2017 10:09:13 -0500
+	(envelope-from <kwolf@redhat.com>) id 1eKQUF-0003Ov-GP
+	for qemu-devel@nongnu.org; Thu, 30 Nov 2017 10:10:57 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1eKQSZ-00062l-N7
-	for qemu-devel@nongnu.org; Thu, 30 Nov 2017 10:09:11 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:44650)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1eKQSZ-00060n-D4
-	for qemu-devel@nongnu.org; Thu, 30 Nov 2017 10:09:07 -0500
-Date: Thu, 30 Nov 2017 16:08:44 +0100
-From: Igor Mammedov <imammedo@redhat.com>
-Message-ID: <20171130160844.73470c50@redhat.com>
-In-Reply-To: <20171130130628.GC3952@work-vm>
-References: <20171129185026.23632-1-dgilbert@redhat.com>
-	<20171130122245.7e713d2f@redhat.com>
-	<20171130120805.GA3952@work-vm>
-	<20171130134057.1d8ecc3e@redhat.com>
-	<20171130124720.GB3952@work-vm>
-	<20171130135820.69eb5715@redhat.com>
-	<20171130130628.GC3952@work-vm>
+	(envelope-from <kwolf@redhat.com>) id 1eKQUE-0007ja-39
+	for qemu-devel@nongnu.org; Thu, 30 Nov 2017 10:10:51 -0500
+Date: Thu, 30 Nov 2017 16:10:38 +0100
+From: Kevin Wolf <kwolf@redhat.com>
+Message-ID: <20171130151038.GE4039@localhost.localdomain>
+References: <20171129144956.11409-1-famz@redhat.com>
+	<20171129172546.GG3753@localhost.localdomain>
+	<20171130020359.GB16237@lemon>
+	<20171130103135.GA4039@localhost.localdomain>
+	<20171130143430.GA24067@lemon>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [RFC 0/7] Rework vhost memory region updates
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20171130143430.GA24067@lemon>
+Subject: Re: [Qemu-devel] [PATCH RFC 0/9] block: Rewrite block drain
+ begin/end
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,108 +27,111 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Cc: maxime.coquelin@redhat.com, qemu-devel@nongnu.org, mst@redhat.com, groug@kaod.org
+To: Fam Zheng <famz@redhat.com>
+Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, jcody@redhat.com, Max Reitz <mreitz@redhat.com>, pbonzini@redhat.com, Stefan Hajnoczi <stefanha@redhat.com>
 
-On Thu, 30 Nov 2017 13:06:29 +0000
-"Dr. David Alan Gilbert" <dgilbert@redhat.com> wrote:
-
-> * Igor Mammedov (imammedo@redhat.com) wrote:
-> > On Thu, 30 Nov 2017 12:47:20 +0000
-> > "Dr. David Alan Gilbert" <dgilbert@redhat.com> wrote:
-> >   
-> > > * Igor Mammedov (imammedo@redhat.com) wrote:  
-> > > > On Thu, 30 Nov 2017 12:08:06 +0000
-> > > > "Dr. David Alan Gilbert" <dgilbert@redhat.com> wrote:
-> > > >     
-> > > > > * Igor Mammedov (imammedo@redhat.com) wrote:    
-> > > > > > On Wed, 29 Nov 2017 18:50:19 +0000
-> > > > > > "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com> wrote:
-> > > > > >       
-> > > > > > > From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-> > > > > > > 
-> > > > > > > Hi,
-> > > > > > >   This is an experimental set that reworks the way the vhost
-> > > > > > > code handles changes in physical address space layout that
-> > > > > > > came from a discussion with Igor.      
-> > > > > > Thanks for looking into it.
-> > > > > > 
-> > > > > >        
-> > > > > > > Instead of updating and trying to merge sections of address
-> > > > > > > space on each add/remove callback, we wait until the commit phase
-> > > > > > > and go through and rebuild a list by walking the Flatview of
-> > > > > > > memory and end up producing an ordered list.
-> > > > > > > We compare the list to the old list to trigger updates.
-> > > > > > > 
-> > > > > > > Note, only very lightly tested so far, I'm just trying to see if it's
-> > > > > > > the right shape.
-> > > > > > > 
-> > > > > > > Igor, is this what you were intending?      
-> > > > > > 
-> > > > > > I was thinking about a little less intrusive approach
-> > > > > > 
-> > > > > > where vhost_region_add/del are modified to maintain
-> > > > > > sorted by GPA array of mem_sections, vhost_dev::mem is dropped
-> > > > > > altogether and vhost_memory_region array is build/used/freed
-> > > > > > on every vhost_commit().
-> > > > > > Maintaining sorted array should roughly cost us O(2 log n) if
-> > > > > > binary search is used.
-> > > > > > 
-> > > > > > However I like your idea with iterator even more as it have
-> > > > > > potential to make it even faster O(n) if we get rid of
-> > > > > > quadratic and relatively complex vhost_update_compare_list().      
-> > > > > 
-> > > > > Note vhost_update_compare_list is complex,
-> > > > > but it is O(n) - it's
-> > > > > got nested loops, but the inner loop moves forward and oldi never
-> > > > > gets reset back to zero.    
-> > > > While skimming through patches I've overlooked it.
-> > > > 
-> > > > Anyways,
-> > > > why memcmp(old_arr, new_arr) is not sufficient
-> > > > to detect a change in memory map?    
-> > > 
-> > > It tells you that you've got a change, but doesn't give
-> > > the start/end of the range that's changed, and those
-> > > are used by vhost_commit to limit the work of
-> > > vhost_verify_ring_mappings.  
-> > Isn't memmap list a sorted and
-> >  dev->mem_changed_[start|end]_addr are the lowest|highest
-> > addresses of whole map?
+Am 30.11.2017 um 15:34 hat Fam Zheng geschrieben:
+> On Thu, 11/30 11:31, Kevin Wolf wrote:
+> > What you really mean is probably connected components in the graph, but
+> > do we really want to manage merging and splitting object representing
+> > connected components when a node is added or removed from the graph?
+> > Especially when that graph change occurs in a drain callback?
 > > 
-> > If it's, so wouldn't getting values directly from 
-> > the 1st/last entries of array be sufficient?  
+> > You can also still easily introduce bugs where graph changes during a
+> > drain end up in nodes not being drained, possibly drained twice, you
+> > still access the next pointer of a deleted node or you accidentally
+> > switch to draining a different component.
+> > 
+> > It's probably possible to get this right, but essentially you're just
+> > switching from iterating a tree to iterating a list. You get roughly the
+> > same set of problems that you have to consider as today, and getting it
+> > right should be about the same difficulty.
 > 
-> THat wasn't my understanding from the existing code;
-> my understanding was that changed_start_addr is set by
-> vhost_region_add->vhost_set_memory when a new region is added
-> (or removed) and is set to the limit of the section added.
-> But perhaps I'm misunderstanding.
-changed_*_addr is actually lower/upper bound of memory transaction
-and in practice it often includes several memory sections that
-get mapped during transaction (between begin - commit).
+> Not quite. The essential idea is redo the drain begin/end in a correct way:
+> 
+> bdrv_drained_begin(bs):
+>     1.a) stop all sources of new requests in the connected components, including
+>         * aio_disable_external()
+>         * stop QED timer
+>         * stop block job
+>     1.b) aio_poll() until:
+>         * no request is in flight for bs
+>         * no progress is made (any progress may generate new requests)
+> 
+> bdrv_drained_end(bs):
+>     2.a) resume stopped sources of new requests
+>     2.b) no need to do aio_poll() because the main loop will move on
+> 
+> 1.a) can be either done with either a graph recursion like now, or a list
+> traversing if managed somewhere, like in this series. Or better, BlockGraph will
+> be the manager. The rule is that these operations will not cause graph change,
+> so it's an improvement.
+> 
+> 1.b) doesn't need recursion IMO, only looking at bs->in_flight and the return
+> value of aio_poll() should be enough.
 
-but then again,
-  - how expensive vhost_verify_ring_mappings() is?
-  - do we really need optimization here (perhaps finding out changed range is more expensive)?
-  - how about calling vhost_verify_ring_mappings() unconditionally?
+The trouble is with 1.b), which can cause graph changes, including nodes
+being added to or removed from a connected component. This means that
+you can get nodes in the component for which 1.a) hasn't been executed,
+or nodes that are outside the component, but for which 1.a) has still
+been executed.
 
-> (The logic in vhost_verify_ring_mappings doesn't make sense
-> to me either though; if vhost_verify_ring_part_mapping returns 0
-> on success, why is it doing   if (!r) { break; }  surely it
-> should be  if (r) { break; })
-it looks like a bug (CCing Greg)
+You then need to compensate for that somehow, and basically execute 1.a)
+for any new nodes (otherwise you have nodes in the component that could
+still be issuing requests; skipping drained_end for them is not enough)
+and execute 2.*) for the removed ones.
 
-before (f1f9e6c5 vhost: adapt vhost_verify_ring_mappings() to virtio 1 ring layout)
-logic used to be
+> For 2.a) if the drain begin/end callbacks are mananged in a list, it's
+> easy to only call drained_end() for entries that got drained_begin()
+> earlier, as shown in patch 2.
 
-   if changed_*_addr doesn't contain ring
-      "IGNORE as we don't care"
-   
-   if changed_*_addr contain ring AND ring can't be mapped at the same place
-      ABORT
+Yes, but not draining them was a bug in the first place.
 
-with f1f9e6c5 we have 3 rings so on any of them following could happen
-   if "IGNORE as we don't care"
-     break => false success 
-     since it's possible that the remaining rings in vq do overlap and didn't get checked
+I'll give you that trying to separate 1.a) and 1.b) so that we have only
+a single BDRV_POLL_WHILE() after the most critical code, is an
+interesting idea. But as long as 1.b) can involve graph changes, it
+remains quite tricky.
+
+And of course, it can't solve the problem with graph changes in callers
+of bdrv_drained_begin/end because at least one BDRV_POLL_WHILE() will
+stay there that can cause graph changes.
+
+> > > > And finally, I don't really think that the recursion is even a problem.
+> > > > The problem is with graph changes made by callbacks that drain allows to
+> > > > run. With your changes, it might be a bit easier to avoid that
+> > > > bdrv_drain() itself gets into trouble due to graph changes, but this
+> > > > doesn't solve the problem for any (possibly indirect) callers of
+> > > > bdrv_drain().
+> > > 
+> > > The recursion is the one big place that can be easily broken by graph changes,
+> > > fixing this doesn't make the situation any worse. We could still fix the
+> > > indirect callers by taking references or by introducing "ubiquitous coroutines".
+> > 
+> > But hiding a bug in 80% of the cases where it shows isn't enough.
+> 
+> I think they are separate bugs. And with the one that this series is fixing,
+> others (bdrv_drain*() callers') may even not show up, because
+> bdrv_drained_begin() crashed already.
+> 
+> > 
+> > I think the only real solution is to forbid graph changes until after
+> > any critical operation has completed. I haven't tried it out in
+> > practice, but I suppose we could use a CoMutex around them and take it
+> > in bdrv_drained_begin/end() and all other places that can get into
+> > trouble with graph changes.
+> 
+> Yes, I agree, but that (using CoMutex around graph change) requires
+> everything, especially the defer_to_main_loop_bh, runs in a coroutine
+> context, which is exactly what I mean by "introducing 'ubiquitous
+> coroutines'", because currently we don't have them.
+
+Is it hard to do, though? Instead of using a BH to switch to the main
+loop and outside of coroutine context, you could use aio_co_schedule()
+and yield, which would leave you in the main loop, but still in
+coroutine context.
+
+Would this have any bad side effects I'm not aware of?
+
+I'm not sure about other places, of course. We'd have to check that.
+
+Kevin
