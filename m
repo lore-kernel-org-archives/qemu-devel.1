@@ -1,24 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50784)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52068)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1eKIGP-0000VO-HJ
-	for qemu-devel@nongnu.org; Thu, 30 Nov 2017 01:24:02 -0500
+	(envelope-from <aik@ozlabs.ru>) id 1eKIJt-00029i-IV
+	for qemu-devel@nongnu.org; Thu, 30 Nov 2017 01:27:38 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1eKIGK-0005Iq-IZ
-	for qemu-devel@nongnu.org; Thu, 30 Nov 2017 01:24:01 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:55488)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1eKIGK-0005HH-BF
-	for qemu-devel@nongnu.org; Thu, 30 Nov 2017 01:23:56 -0500
-Date: Thu, 30 Nov 2017 14:23:45 +0800
-From: Peter Xu <peterx@redhat.com>
-Message-ID: <20171130062345.GC22901@xz-mi>
-References: <20171129084628.12336-1-david@gibson.dropbear.id.au>
-	<20171129084628.12336-5-david@gibson.dropbear.id.au>
+	(envelope-from <aik@ozlabs.ru>) id 1eKIJq-0007nW-Fp
+	for qemu-devel@nongnu.org; Thu, 30 Nov 2017 01:27:37 -0500
+Received: from mail-io0-x244.google.com ([2607:f8b0:4001:c06::244]:40459)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <aik@ozlabs.ru>) id 1eKIJq-0007mq-9E
+	for qemu-devel@nongnu.org; Thu, 30 Nov 2017 01:27:34 -0500
+Received: by mail-io0-x244.google.com with SMTP id d21so6358323ioe.7
+	for <qemu-devel@nongnu.org>; Wed, 29 Nov 2017 22:27:34 -0800 (PST)
+References: <20171122073947.19325-1-aik@ozlabs.ru>
+	<20171129083624.134d46ce@t450s.home>
+	<f41f2faa-25f2-1c1d-a6e4-ba646fe6fb14@ozlabs.ru>
+	<20171129190520.012e51b5@t450s.home>
+From: Alexey Kardashevskiy <aik@ozlabs.ru>
+Message-ID: <f6726899-af89-219a-b533-6323223dcd65@ozlabs.ru>
+Date: Thu, 30 Nov 2017 17:27:28 +1100
 MIME-Version: 1.0
+In-Reply-To: <20171129190520.012e51b5@t450s.home>
 Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20171129084628.12336-5-david@gibson.dropbear.id.au>
-Subject: Re: [Qemu-devel] [for-2.12 4/7] pci: Simplify pci_bus_is_root()
+Content-Language: en-AU
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH qemu] vfio-pci: Remove unused fields from
+ VFIOMSIXInfo
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,28 +33,60 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Gibson <david@gibson.dropbear.id.au>
-Cc: "Michael S . Tsirkin" <mst@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, Marcel Apfelbaum <marcel@redhat.com>, Igor Mammedov <imammedo@redhat.com>, qemu-devel@nongnu.org
+To: Alex Williamson <alex.williamson@redhat.com>
+Cc: qemu-devel@nongnu.org
 
-On Wed, Nov 29, 2017 at 07:46:25PM +1100, David Gibson wrote:
+On 30/11/17 13:05, Alex Williamson wrote:
+> On Thu, 30 Nov 2017 12:56:09 +1100
+> Alexey Kardashevskiy <aik@ozlabs.ru> wrote:
+> 
+>> On 30/11/17 02:36, Alex Williamson wrote:
+>>> On Wed, 22 Nov 2017 18:39:47 +1100
+>>> Alexey Kardashevskiy <aik@ozlabs.ru> wrote:
+>>>
+>>> Missing reference to commit that made these fields unused.  A Fixes tag
+>>> to that commit also seems appropriate.  An empty commit log is pretty
+>>> much never justified.  
+>>
+>> Ah. Right, sorry. I could not find when it was used, looks like never.
+> 
+> Nope, db0da029a185 vfio: Generalize region support
 
-[...]
+ah, right :( Repost?
 
->  struct PCIBus {
->      BusState qbus;
-> +    enum PCIBusFlags flags;
->      PCIIOMMUFunc iommu_fn;
->      void *iommu_opaque;
->      uint8_t devfn_min;
-> @@ -440,8 +446,12 @@ struct PCIBus {
->      Notifier machine_done;
->  };
 
-I would prefer directly defining flags as uint64_t then it's more
-clear that it's a bitmask (enum let me think of only one flag will be
-set, but I may be wrong), but it's fine too to me.
+> 
+>>> This also looks like 2.12 material.  Thanks,  
+>>
+>> Indeed 2.12.
+>>
+>>
+>>>
+>>> Alex
+>>>   
+>>>> Signed-off-by: Alexey Kardashevskiy <aik@ozlabs.ru>
+>>>> ---
+>>>>  hw/vfio/pci.h | 2 --
+>>>>  1 file changed, 2 deletions(-)
+>>>>
+>>>> diff --git a/hw/vfio/pci.h b/hw/vfio/pci.h
+>>>> index c5e168e..06dcf99 100644
+>>>> --- a/hw/vfio/pci.h
+>>>> +++ b/hw/vfio/pci.h
+>>>> @@ -93,8 +93,6 @@ typedef struct VFIOMSIXInfo {
+>>>>      uint16_t entries;
+>>>>      uint32_t table_offset;
+>>>>      uint32_t pba_offset;
+>>>> -    MemoryRegion mmap_mem;
+>>>> -    void *mmap;
+>>>>      unsigned long *pending;
+>>>>  } VFIOMSIXInfo;
+>>>>    
+>>>   
+>>
+>>
+> 
 
-Reviewed-by: Peter Xu <peterx@redhat.com>
 
 -- 
-Peter Xu
+Alexey
