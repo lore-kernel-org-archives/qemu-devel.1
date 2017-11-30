@@ -1,41 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47598)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48512)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pasic@linux.vnet.ibm.com>) id 1eKO0t-0005e8-TT
-	for qemu-devel@nongnu.org; Thu, 30 Nov 2017 07:32:30 -0500
+	(envelope-from <thuth@redhat.com>) id 1eKO5g-0007cE-8H
+	for qemu-devel@nongnu.org; Thu, 30 Nov 2017 07:37:21 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pasic@linux.vnet.ibm.com>) id 1eKO0q-0006v1-Jp
-	for qemu-devel@nongnu.org; Thu, 30 Nov 2017 07:32:23 -0500
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:40156)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pasic@linux.vnet.ibm.com>)
-	id 1eKO0q-0006uP-Bl
-	for qemu-devel@nongnu.org; Thu, 30 Nov 2017 07:32:20 -0500
-Received: from pps.filterd (m0098410.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
-	vAUCUTde111203
-	for <qemu-devel@nongnu.org>; Thu, 30 Nov 2017 07:32:19 -0500
-Received: from e06smtp13.uk.ibm.com (e06smtp13.uk.ibm.com [195.75.94.109])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2ejh09kyd4-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Thu, 30 Nov 2017 07:32:19 -0500
-Received: from localhost
-	by e06smtp13.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
-	Only! Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <pasic@linux.vnet.ibm.com>;
-	Thu, 30 Nov 2017 12:32:16 -0000
-References: <20171128130758.67556-1-pasic@linux.vnet.ibm.com>
-	<20171129133733.7fc11968.cohuck@redhat.com>
-	<6f7547b8-1346-53ce-3d80-6839c556d724@linux.vnet.ibm.com>
-	<20171129182900.409be40f.cohuck@redhat.com>
-From: Halil Pasic <pasic@linux.vnet.ibm.com>
-Date: Thu, 30 Nov 2017 13:32:12 +0100
+	(envelope-from <thuth@redhat.com>) id 1eKO5f-00019T-50
+	for qemu-devel@nongnu.org; Thu, 30 Nov 2017 07:37:20 -0500
+References: <1512031988-32490-1-git-send-email-thuth@redhat.com>
+	<1512031988-32490-4-git-send-email-thuth@redhat.com>
+	<CAFEAcA-LBOm=kHja3QJqOw-TT3GF9-i+wJfXdL-FU5NKimknzQ@mail.gmail.com>
+From: Thomas Huth <thuth@redhat.com>
+Message-ID: <e56ccc1b-17fd-fc44-cc11-d63de2952c79@redhat.com>
+Date: Thu, 30 Nov 2017 13:37:09 +0100
 MIME-Version: 1.0
-In-Reply-To: <20171129182900.409be40f.cohuck@redhat.com>
+In-Reply-To: <CAFEAcA-LBOm=kHja3QJqOw-TT3GF9-i+wJfXdL-FU5NKimknzQ@mail.gmail.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Message-Id: <e8d586cf-99bd-3c72-0c39-44408295a744@linux.vnet.ibm.com>
-Subject: Re: [Qemu-devel] [RFC PATCH v2 1/1] s390x/css: unrestrict cssids
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH for-2.12 3/7] tests/boot-serial-test: Add
+ support for the mcf5208evb board
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -44,171 +26,80 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Cornelia Huck <cohuck@redhat.com>
-Cc: Shalini Chellathurai Saroja <shalini@linux.vnet.ibm.com>, qemu-devel@nongnu.org, Christian Borntraeger <borntraeger@de.ibm.com>, qemu-s390x@nongnu.org, Boris Fiuczynski <fiuczy@linux.vnet.ibm.com>, Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, Anthony Green <green@moxielogic.com>, Laurent Vivier <laurent@vivier.eu>, qemu-arm <qemu-arm@nongnu.org>, Edgar Iglesias <edgar.iglesias@gmail.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>
 
-
-
-On 11/29/2017 06:29 PM, Cornelia Huck wrote:
-[..]
->>>> With this change, however, our schema for generating a css bus ids, if
->>>> none is specified does not make much sense. Currently we start at cssid
->>>> 0x0 for non-virtual devices and use the default css (without
->>>> s390-squash-mcss exclusively) for virtual devices.  That means for
->>>> non-virtual device the device would auto-magically end up non-visible for
->>>> guests (which can't use the other channel subsystems).
->>>>
->>>> Thus let us also change the css bus id auto assignment algorithm,
->>>> so that we first fill the default css, and then proceed to the
->>>> next one (modulo MAX_CSSID).  
->>>
->>> Let's reword the previous two paragraphs:
->>>
->>> "At the same time, change our schema for generating css bus ids to put
->>> both virtual and non-virtual devices into the default css (spilling
->>> over into other css images, if needed) so that devices without a
->>> specified id don't end up hidden to guests not supporting multiple
->>> channel subsystems."
->>>   
+On 30.11.2017 13:14, Peter Maydell wrote:
+> On 30 November 2017 at 08:53, Thomas Huth <thuth@redhat.com> wrote:
+>> We can output a character quite easily here with some few lines of
+>> assembly that we provide as a mini-kernel for this board.
 >>
->> What I don't like about your explanation is, that "so that devices without
->> a specified id don't end up hidden to guests not supporting multiple channel 
->> subsystems" is not necessarily true: if we spill the devices are going
->> to end up hidden.
-> 
-> Let's make this "don't always end up hidden".
-
-I would prefer to go with this.
-
-
-At the same time, change our schema for generating css bus ids to put
-both virtual and non-virtual devices into the default css (spilling
-over into other css images, if needed). The intention is to deprecate
-s390-squash-mcss. Whit this change devices without a specified devno won't
-end up hidden to guests not supporting multiple channel subsystems, unless
-this can not be avoided (default css full).
-
-> 
+>> Signed-off-by: Thomas Huth <thuth@redhat.com>
+>> ---
+>>  tests/boot-serial-test.c | 10 ++++++++++
+>>  1 file changed, 10 insertions(+)
 >>
->>>>
->>>> The adverse effect of getting rid of the restriction on migration should
->>>> not be too severe.  Vfio-ccw devices are not live-migratable yet, and for
->>>> virtual devices using the extra freedom would only make sense with the
->>>> aforementioned guest support in place.
->>>>
->>>> The auto-generated bus ids are affected by both changes. We hope to not
+>> diff --git a/tests/boot-serial-test.c b/tests/boot-serial-test.c
+>> index d997269..dd3828c 100644
+>> --- a/tests/boot-serial-test.c
+>> +++ b/tests/boot-serial-test.c
+>> @@ -16,6 +16,14 @@
+>>  #include "qemu/osdep.h"
+>>  #include "libqtest.h"
+>>
+>> +static const uint8_t kernel_mcf5208[] =3D {
+>> +    0x41, 0xf9, 0xfc, 0x06, 0x00, 0x00,     /* lea 0xfc060000,%a0 */
+>> +    0x10, 0x3c, 0x00, 0x54,                 /* move.b #'T',%d0 */
+>> +    0x11, 0x7c, 0x00, 0x04, 0x00, 0x08,     /* move.b #4,8(%a0)     E=
+nable TX */
+>> +    0x11, 0x40, 0x00, 0x0c,                 /* move.b %d0,12(%a0)   P=
+rint 'T' */
+>> +    0x60, 0xfa                              /* bra.s  loop */
+>> +};
+>=20
+> This approach doesn't seem to be scalable to me -- are we
+> really going to have 50 or more fragments of hand-coded hex in
+> this file to cover the various board models?
 
+No, since this only works for certain few boards with these criteria:
 
-[..]
->>
->> I tired to be quite elaborate, because at some point of the v1
->> discussion, you said if we are planting landmines you want them explained
->> in the commit message. I'm not sure how this document file is supposed
->> to be called, and look like. I think this stuff is relevant for
->> the decision why is this patch a good one, and what are the trade-offs
->> we make. Referencing to a document would be also OK with me.
-> 
-> I don't think there will be landmines left, no? Or do I misread?
->
+1) There must be a way to load such small blobs either with -kernel or
+-bios. Many boards only support loading kernels in the ELF format, and
+we certainly don't want to encode the hex-dump of such a kernel here.
+Or some boards / CPUs also support -bios, but the entry point must be at
+the end of a large image, so that also does not make sense to include
+them here.
 
-The patch basically just got worse with changing the schema. If there
-were landmines they are still there. My original point was that it's
-bearable in practice, so that's why I had this short and vague ain't
-too bad formulation.
- 
->>
->> Regarding the deprecation patch. It's already on the list as RFC. You
->> have even commented on it. I intend to make a v2 once we know what are
->> we going to do here.
-> 
-> This needs to be a patch series with a cover letter. Discussing in
-> multiple places is draining.
-> 
+2) The UART must be usable with some few lines of assembly. That's also
+not always the case.
 
-Can do. No problem for me.
+So no, this is really not meant to scale to all boards, it's just meant
+to get at least some few more test coverage, especially while we're not
+having other test mechanisms in place yet. (e.g. how long are we talking
+about reviving tests/tcg/ again already? ... some attempts have been
+made to make it compilable again, but non of the patch series has been
+included yet so far)
 
->>
->>>>
->>>> Signed-off-by: Halil Pasic <pasic@linux.vnet.ibm.com>
->>>>
->>>> ---
->>>> Hi all!
->>>>
->>>> Moving the property to the machine turned out very ugly (IMHO).  Libvirt
->>>> detects machine properties via query-command-line-options.  This is
->>>> however decoupled from the existence of the actual property: one needs to
->>>> touch util/qemu-config.c (see patch) so the property shows up.
->>>> Furthermore this stuff is global. I've also noticed that the infamous
->>>> s390-squash-mcss does not show up.  
->>>
->>> s390x-softmmu/qemu-system-s390x -machine s390-ccw-virtio,help
->>>
->>> shows it, as does qom-list on /machine.  
->>
->> For qom-list you need an instance. Libvirt probes such stuff using
->> (btw probing is done with machine type none, and qom-list /machine
->> should not list squash if we are running machine type none).
->>
->>>
->>> Output of <qemu binary> --help is very haphazard anyway and you should
->>> rely on the interfaces above.
->>>   
->>
->> I disagree. AFAIK management software should probe using the
->> query-command-line-options QMP command. Or am I missing something?
->>
->> I don't speak about the output of <qemu binary> --help here.
-> 
-> It's the same interface. It both over- and underreports. Querying the
-> actual object is the only way to get this reliable. If that is not
-> possible today, it needs to be implemented.
->
+> I'd much rather see us have a framework for being able
+> to build test blobs from source using a cross compiler
+> setup (and docker or similar so anybody can rebuild
+> the test blobs). That will be much easier to maintain
+> and easier to extend to having tests that test other
+> parts of the board or other aspects of TCG emulation.
 
-Sorry I did not look into how <qemu binary> --help is implemented. For
-what we are trying to accomplish here it's irrelevant. Wonder why did you
-have to bring this up and make the discussion even more complicated.
- 
->>
->>>>
->>>> On the other hand to get the property displayed by -machine
->>>> s390-ccw-virtio,help one needs a setter on the property. So I have
->>>> created a fake setter which produces an error each time called.  
->>>
->>> Yes, this is fugly. A css object would be a better place, but way too
->>> much work for now.
->>>   
->>
->> Actually not necessarily. We could simply put this at the virtual-css-bridge.
->> I don't know if Libvirt would accept that though. The problem regarding
->> virtual-css-bridge (and css object) was rw properties: we can't set a value
->> for a property of the virtual-css-bridge on the command line. That was a
->> problem for default-css or whatever but is completely fine for the read
->> only property 'cssid-unrestricted'.
->>
->>>>
->>>> I would strongly prefer putting back the property to the device level!  
->>>
->>> I continue to strongly oppose that. The device is entirely the wrong
->>> level.
->>>   
->>
->> I don't recall you ever explaining why. If it's completely wrong
->> I would have expected Boris and also me being for long enough around
->> to get it at least after the first hint.
-> 
-> Just once again: This is a property of the whole css/machine, not of
-> the individual device.
-> 
-> No more from me today.
->
+I agree that this idea is way more flexible and could cover many more
+boards, but there are also things that need to be solved first:
+Not everybody has docker / cross-compilers installed or can use them, so
+we likely need a set of pre-build binary images somewhere. But we
+certainly don't want to include megabytes of blobs in the git repository
+... so this would need to go into an external repository instead. Then
+you likely can not include this in "make check" so easily anymore
+(unless you force everybody to check out the external repository with
+the git-submodule.sh script - but I really dislike this idea) ...
 
-Hope there is more form you coming today. :) I would like to know if
-I'm on the right track with the machine property. You did not comment
-on a couple of my points, among others this question. This libvirt
-may not be using the right interface for discovering machine properties,
-and the right interface may note even exist in QEMU just got me more
-insecure.
+So yes, we should have better test coverage for almost all machines if
+possible, but I don't see that this is happening soon or could be really
+tightly integrated into "make check". I.e. the boot-serial tester could
+fill at least parts of this gap, I think.
 
-Regards,
-Halil
- 
+ Thomas
