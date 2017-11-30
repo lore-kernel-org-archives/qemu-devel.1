@@ -1,22 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46143)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49520)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1eKSCv-0008C5-2U
-	for qemu-devel@nongnu.org; Thu, 30 Nov 2017 12:01:10 -0500
+	(envelope-from <eblake@redhat.com>) id 1eKSKp-00006x-IT
+	for qemu-devel@nongnu.org; Thu, 30 Nov 2017 12:09:19 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1eKSCr-00043X-2V
-	for qemu-devel@nongnu.org; Thu, 30 Nov 2017 12:01:05 -0500
-References: <20171130134159.9697-1-eblake@redhat.com>
-	<20171130140154.11161-1-eblake@redhat.com>
+	(envelope-from <eblake@redhat.com>) id 1eKSKo-0002BL-IS
+	for qemu-devel@nongnu.org; Thu, 30 Nov 2017 12:09:15 -0500
+References: <20171130164401.29221-1-kwolf@redhat.com>
 From: Eric Blake <eblake@redhat.com>
-Message-ID: <04c922b4-7287-61e7-1afc-4e64f39c52a5@redhat.com>
-Date: Thu, 30 Nov 2017 11:00:58 -0600
+Message-ID: <ce174622-1df0-bf86-452e-280dd3f7e068@redhat.com>
+Date: Thu, 30 Nov 2017 11:09:07 -0600
 MIME-Version: 1.0
-In-Reply-To: <20171130140154.11161-1-eblake@redhat.com>
+In-Reply-To: <20171130164401.29221-1-kwolf@redhat.com>
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 4/3] checkpatch: Enforce proper do/while
- (0) style
+Subject: Re: [Qemu-devel] [PATCH] block: Formats don't need CONSISTENT_READ
+ with NO_IO
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,37 +24,37 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: qemu-trivial@nongnu.org
+To: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
+Cc: qemu-devel@nongnu.org, mreitz@redhat.com
 
-On 11/30/2017 08:01 AM, Eric Blake wrote:
-> while (0) is only idiomatic in a macro definition, where the caller
-> will be supplying the trailing ';'.  Warn if the macro has a duplicate.
+On 11/30/2017 10:44 AM, Kevin Wolf wrote:
+> Commit 1f4ad7d fixed 'qemu-img info' for raw images that are currently
+> in use as a mirror target. It is not enough for image formats, though,
+> as these still unconditionally request BLK_PERM_CONSISTENT_READ.
 > 
-> Signed-off-by: Eric Blake <eblake@redhat.com>
+> As this permission is meaningless unless you do actual I/O on the image,
+> drop the requirement and allow 'qemu-img info' even for image formats
+> under conditions where BLK_PERM_CONSISTENT_READ can't be granted.
+> 
+> Signed-off-by: Kevin Wolf <kwolf@redhat.com>
 > ---
->   scripts/checkpatch.pl | 5 +++++
->   1 file changed, 5 insertions(+)
+>   block.c | 6 +++++-
+>   1 file changed, 5 insertions(+), 1 deletion(-)
 > 
-> diff --git a/scripts/checkpatch.pl b/scripts/checkpatch.pl
-> index 34df753571..acb66bff34 100755
-> --- a/scripts/checkpatch.pl
-> +++ b/scripts/checkpatch.pl
-> @@ -1622,6 +1622,11 @@ sub process {
->   			}
->   		}
-> 
-> +# 'while (0);' is odd; only macros should use while (0), without trailing ;
-> +		if ($line =~ /while\s*\(0\);/) {
 
-Should this also check for uses of 'while (false);' ?
+> @@ -1936,7 +1938,9 @@ void bdrv_format_default_perms(BlockDriverState *bs, BdrvChild *c,
+>   
+>           /* bs->file always needs to be consistent because of the metadata. We
+>            * can never allow other users to resize or write to it. */
+> -        perm |= BLK_PERM_CONSISTENT_READ;
+> +        if (!(flags & BDRV_O_NO_IO)) {
+> +            perm |= BLK_PERM_CONSISTENT_READ;
 
-Interestingly enough, we have an instance of 'do/while (false);' in 
-tests/vhost-user-bridge.c that is NOT in a macro, but is used for the 
-convenience of being able to 'break;' out early rather than using a 
-goto.  Similarly for chardev/char-serial.c using 'while (0);' outside of 
-a macro.  Those may be worth rewriting to use goto as separate patches 
-if we want to restrict ALL use of 'while \((0|false)\);'
+I thought BDRV_O_NO_IO only means we aren't doing I/O on guest-visible 
+data, but doesn't stop us from reading the metadata.  The comment is 
+telling: if we can read metadata, then we depend on CONSISTENT_READ for 
+the metadata to be stable (even if we don't care about guest data 
+consistency).
 
 -- 
 Eric Blake, Principal Software Engineer
