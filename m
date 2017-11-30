@@ -1,57 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41311)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41523)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <borntraeger@de.ibm.com>) id 1eKNf8-0002Bt-4g
-	for qemu-devel@nongnu.org; Thu, 30 Nov 2017 07:09:55 -0500
+	(envelope-from <vsementsov@virtuozzo.com>) id 1eKNfl-0002ZH-D5
+	for qemu-devel@nongnu.org; Thu, 30 Nov 2017 07:10:34 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <borntraeger@de.ibm.com>) id 1eKNf3-0006VC-54
-	for qemu-devel@nongnu.org; Thu, 30 Nov 2017 07:09:54 -0500
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:41576
-	helo=mx0a-001b2d01.pphosted.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <borntraeger@de.ibm.com>)
-	id 1eKNf2-0006Un-UH
-	for qemu-devel@nongnu.org; Thu, 30 Nov 2017 07:09:49 -0500
-Received: from pps.filterd (m0098414.ppops.net [127.0.0.1])
-	by mx0b-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
-	vAUC9LHp034768
-	for <qemu-devel@nongnu.org>; Thu, 30 Nov 2017 07:09:46 -0500
-Received: from e06smtp13.uk.ibm.com (e06smtp13.uk.ibm.com [195.75.94.109])
-	by mx0b-001b2d01.pphosted.com with ESMTP id 2ejh1a2t2t-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Thu, 30 Nov 2017 07:09:45 -0500
-Received: from localhost
-	by e06smtp13.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
-	Only! Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <borntraeger@de.ibm.com>;
-	Thu, 30 Nov 2017 12:09:43 -0000
-References: <20171121111825.17916-1-pasic@linux.vnet.ibm.com>
-	<20171127135624.28052dc5.cohuck@redhat.com>
-	<57f95f61-b9d9-1341-78c7-259006cb5945@linux.vnet.ibm.com>
-	<20171127141929.1d692aad.cohuck@redhat.com>
-	<39cb6a69-7f32-80d4-214d-26e1e81a9fd7@linux.vnet.ibm.com>
-	<2933e058-0217-9696-2c52-613da8ba7a1c@linux.vnet.ibm.com>
-	<20171127175607.75bd999e.cohuck@redhat.com>
-	<c49e91f1-0f8a-8f6c-9784-21aa4623e2cf@linux.vnet.ibm.com>
-	<20171128112233.0a1c8c04.cohuck@redhat.com>
-	<377c7bcb-403b-ed66-a9fd-07793c27ea5c@linux.vnet.ibm.com>
-	<20171128131448.551e16b7.cohuck@redhat.com>
-	<1d81d1c1-6f82-0261-51b4-1820a10431e6@de.ibm.com>
-	<99906104-4746-6474-554e-ac85bd20106d@linux.vnet.ibm.com>
-	<71ccf8b6-faa6-f4ac-3571-24bb59a0c498@de.ibm.com>
-	<20171128150107.4cc88a86.cohuck@redhat.com>
-	<13a85f8e-28c2-4780-76ad-361913a93d1b@de.ibm.com>
-	<20171128154514.026098dc.cohuck@redhat.com>
-	<a7cea411-3dcb-101e-8164-b214445750c2@de.ibm.com>
-	<20171130105036.3e0a0e25.cohuck@redhat.com>
-From: Christian Borntraeger <borntraeger@de.ibm.com>
-Date: Thu, 30 Nov 2017 13:09:40 +0100
+	(envelope-from <vsementsov@virtuozzo.com>) id 1eKNfk-0007Rf-4y
+	for qemu-devel@nongnu.org; Thu, 30 Nov 2017 07:10:33 -0500
+References: <20171113162053.58795-1-vsementsov@virtuozzo.com>
+	<01108daa-fed3-c142-bbd6-0ecc4c8b795d@redhat.com>
+	<cd0a2e5e-f788-0e5a-dec7-f428479f3b89@virtuozzo.com>
+	<8c61f43c-5f56-8c1b-a2fe-f954d34dc687@redhat.com>
+	<40392ab9-ec2a-30ed-ddab-a557682a4192@virtuozzo.com>
+	<4e4e28d7-aebc-4a86-e691-99afdcca27f5@redhat.com>
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Message-ID: <40da8b0d-8039-634c-f50e-1d6326d7fca5@virtuozzo.com>
+Date: Thu, 30 Nov 2017 15:10:14 +0300
 MIME-Version: 1.0
-In-Reply-To: <20171130105036.3e0a0e25.cohuck@redhat.com>
-Content-Type: text/plain; charset=utf-8
+In-Reply-To: <4e4e28d7-aebc-4a86-e691-99afdcca27f5@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: quoted-printable
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Message-Id: <37172833-de25-18b3-a96e-b6642ff92ac3@de.ibm.com>
-Subject: Re: [Qemu-devel] [RFC PATCH 1/1] s390x/css: unresrict cssids
+Subject: Re: [Qemu-devel] [PATCH for-2.12 0/4] qmp dirty bitmap API
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -60,134 +28,125 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Cornelia Huck <cohuck@redhat.com>
-Cc: Halil Pasic <pasic@linux.vnet.ibm.com>, Boris Fiuczynski <fiuczy@linux.vnet.ibm.com>, Shalini Chellathurai Saroja <shalini@linux.vnet.ibm.com>, qemu-s390x@nongnu.org, Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>, qemu-devel@nongnu.org
+To: John Snow <jsnow@redhat.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org
+Cc: kwolf@redhat.com, famz@redhat.com, armbru@redhat.com, mnestratov@virtuozzo.com, mreitz@redhat.com, nshirokovskiy@virtuozzo.com, stefanha@redhat.com, den@openvz.org, pbonzini@redhat.com
 
-
-
-On 11/30/2017 10:50 AM, Cornelia Huck wrote:
-> On Wed, 29 Nov 2017 19:51:23 +0100
-> Christian Borntraeger <borntraeger@de.ibm.com> wrote:
-> 
->> On 11/28/2017 03:45 PM, Cornelia Huck wrote:
->>> On Tue, 28 Nov 2017 15:17:49 +0100
->>> Christian Borntraeger <borntraeger@de.ibm.com> wrote:
->>>   
->>>> On 11/28/2017 03:01 PM, Cornelia Huck wrote:  
->>>>> On Tue, 28 Nov 2017 14:25:08 +0100
->>>>> Christian Borntraeger <borntraeger@de.ibm.com> wrote:  
->>>   
->>>>>> What I want now is to enable vfio-ccw for libvirt and Linux guests and for that
->>>>>> we need to lift the restriction of having vfio not in FE.    
+18.11.2017 00:35, John Snow wrote:
+>
+> On 11/17/2017 03:22 AM, Vladimir Sementsov-Ogievskiy wrote:
+>> 17.11.2017 06:10, John Snow wrote:
+>>> On 11/16/2017 03:17 AM, Vladimir Sementsov-Ogievskiy wrote:
+>>>> 16.11.2017 00:20, John Snow wrote:
+>>>>> On 11/13/2017 11:20 AM, Vladimir Sementsov-Ogievskiy wrote:
+>>>>>> Hi all.
+>>>>>>
+>>>>>> There are three qmp commands, needed to implement external backup AP=
+I.
+>>>>>>
+>>>>>> Using these three commands, client may do all needed bitmap
+>>>>>> management by
+>>>>>> hand:
+>>>>>>
+>>>>>> on backup start we need to do a transaction:
+>>>>>>  =C2=A0 {disable old bitmap, create new bitmap}
+>>>>>>
+>>>>>> on backup success:
+>>>>>>  =C2=A0 drop old bitmap
+>>>>>>
+>>>>>> on backup fail:
+>>>>>>  =C2=A0 enable old bitmap
+>>>>>>  =C2=A0 merge new bitmap to old bitmap
+>>>>>>  =C2=A0 drop new bitmap
+>>>>>>
+>>>>> Can you give me an example of how you expect these commands to be use=
+d,
+>>>>> and why they're required?
 >>>>>
->>>>> This, however, worries me. I don't really consider vfio-ccw ready for
->>>>> prime time yet. We still need to figure out path handling at the very
->>>>> least. And I'm still not sure that our non-handling of halt/clear won't
->>>>> cause major issues with e.g. a storage server error recovery.
->>>>>
->>>>> Can we flag vfio-ccw as experimental or such in libvirt?    
+>>>>> I'm a little weary about how error-prone these commands might be and =
+the
+>>>>> potential for incorrect usage seems... high. Why do we require them?
+>>>> It is needed for incremental backup. It looks like bad idea to export
+>>>> abdicate/reclaim functionality, it is simpler
+>>>> and clearer to allow user to merge/enable/disable bitmaps by hand.
 >>>>
->>>> We should have flagged vfio-ccw experimental in QEMU then.
->>>> e.g. by using x-vfio-ccw or whatever.I dont think we can do that
->>>> after the facts.  
->>>
->>> Yes, we should have done that... can't fix that now, unfortunately.
->>>   
+>>>> usage is like this:
 >>>>
->>>> I am not that deep into vfio-ccw, but I was under the impression that
->>>> the missing features should not affect the vfio interface that is
->>>> created by libvirt. After all this should just be a "-device vfio-ccw,....."
->>>> statement and some setup steps beforehand (unbind + setup of vfio-ccw)  
->>>
->>> The halt/clear stuff is highly unlikely to influence the configuration
->>> interface. I'm still not too clear about path handling, though. Will we
->>> need different modes (hypervisor managed vs. full passthrough? probably
->>> only passthrough)? What about pgid handling - do we need some kind of
->>> pgid manager? (Keep in mind that you get to set the pgid once. This has
->>> implications for e.g. reserve/release.)
->>>
->>> Also, what about devices other than ECKD DASD? Has there been any
->>> testing? Tapes should be interesting; the other interesting ccw devices
->>> are QDIO-based and I'm not sure we want to spend anything on supporting
->>> those.  
->>
->> DASD is probably the most important thing today, QDIO might never happen
->> (or very late).
-> 
-> One thing I'd find interesting about tapes is very long running channel
-> programs (like rewind) and how they interact with halt/clear. But yes,
-> I would think that DASD is the most important one in practice.
-> 
->> See my proposal below.
->>
->>>
->>> The interface is probably fine, but I'd like to get an idea about the
->>> path stuff (is the attachment spec that contains the pgid stuff
->>> publicly available, btw.?)
->>>   
+>>>> 1. we have dirty bitmap bitmap0 for incremental backup.
 >>>>
->>>> If your concern is the serviceability I think it would be valid for a RHEL
->>>> KVM to disable vfio-ccw in the kernel. Maybe we could even provide a config
->>>> for QEMU?  
+>>>> 2. prepare image fleecing (create temporary image with backing=3Dour_d=
+isk)
+>>>> 3. in qmp transaction:
+>>>>  =C2=A0=C2=A0=C2=A0 - disable bitmap0
+>>>>  =C2=A0=C2=A0=C2=A0 - create bitmap1
+>>>>  =C2=A0=C2=A0=C2=A0 - start image fleecing (backup sync=3Dnone our_dis=
+k -> temp_disk)
+>>> This could probably just be its own command, though:
 >>>
->>> It's fine just to turn off vfio-ccw in the kernel.
->>>   
->>>> PS: I learned from the PCI and CCW experience that I do not want
->>>> to upstream kernel/qemu code unless I have a working libvirt code that
->>>> shows that the thing will work.  
+>>> block-job-fleece node=3Dfoobar bitmap=3Dbitmap0 etc=3Detera etc=3Detera
 >>>
->>> Yes, I understand the wish to verify the interface, and I think it's a
->>> good idea. What I'm worried about is that this might be the precursor
->>> to a push to support it, and I don't think vfio-ccw is ready for that
->>> yet.
->>>   
->> FWIW, libvirt should not care if a device works in all cases or not because 
->> libvirt versions should work with all kind of QEMU/kernel combinations. 
->> Fencing in libvirt that the kernel part is not up to the task is making
->> me feel the same way as you when you see  the css-unrestricted property
->> at a device ;-)
-> 
-> I'm more worried about the political angle than the technical. If we
-> don't get pressure to support this too soon, I don't care that much
-> about experimental or not.
-> 
->> Having said that, I think that having vfio-ccw support has a value (and it
->> actually works for an unnamed test infrastructure). In addition to that I 
->> am much more likely to actually test this continuously if I have libvirt support.
-> 
-> Good to hear that it works for a non-Linux guest. Any plans to test
-> something like storage server failover?
-> 
-> [I'd really love to do something about the path handling stuff, but the
-> combination of scant documentation and scantier time works against me.]
-> 
+>>> Could handle forking the bitmap. I'm not sure what the arguments would
+>>> look like, but we could name the NBD export here, too. (Assuming the
+>>> server is already started and we just need to create the share.)
+>>>
+>>> Then, we can basically do what mirror does:
+>>>
+>>> (1) Cancel
+>>> (2) Complete
+>>>
+>>> Cancel would instruct QEMU to keep the bitmap changes (i.e. roll back),
+>>> and Complete would instruct QEMU to discard the changes.
+>>>
+>>> This way we don't need to expose commands like split or merge that will
+>>> almost always be dangerous to use over QMP.
+>>>
+>>> In fact, a fleecing job would be really convenient even without a
+>>> bitmap, because it'd still be nice to have a convenience command for it=
+.
+>>> Using an existing infrastructure and understood paradigm is just a bonu=
+s.
+>> 1. If I understand correctly, Kevin and Max said in their report in
+>> Prague about new block-job approach,
+>>  =C2=A0 using filter nodes, so I'm not sure that this is a good Idea to
+>> introduce now new old-style block-job, where we can
+>>  =C2=A0 do without it.
 >>
+> We could do without it, but it might be a lot better to have everything
+> wrapped up in a command that's easy to digest instead of releasing 10
+> smaller commands that have to be executed in a very specific way in
+> order to work correctly.
+>
+> I'm thinking about the complexity of error checking here with all the
+> smaller commands, versus error checking on a larger workflow we
+> understand and can quality test better.
+>
+> I'm not sure that filter nodes becoming the new normal for block jobs
+> precludes our ability to use the job-management API as a handle for
+> managing the lifetime of a long-running task like fleecing, but I'll
+> check with Max and Kevin about this.
+>
+>> 2. there is the following scenario: customers needs a possibility to
+>> create a backup of data changed since some
+>> point in time. So, maintaining several static and one (or several) activ
+>> bitmaps with a possiblity of merge some of them
+>> and create a backup using this merged bitmap may be convenient.
 >>
->> So what about the following: 
->>
->> 1. We will implement the libvirt support with either a or b:
->> a: if we find a solution to our "where to put the property" dispute use that to decide
->> if we can add vfio-ccw
->> b if not: just provide a patch that lifts the restriction without any property.
->> in libvirt blindy assume  that free assignment will work. old QEMUs will complain at
->> startup and  libvirt will print the QEMU error. This is similar to other situations 
->> where libvirt cannot fully bprobe  if the QEMU will work or not. (not having vfio-ccw
->> support in the kernel will certainly allow libvirt to reject this upfront)
-> 
-> I hope we end up with a solution that works for everyone...
-> 
->>
->> 2. at the same time we mark vfio-ccw experimental in the kernel to make clear
->>  that this is still work in progress
-> 
-> I'm not sure we can do that after the fact, but let's do it if we can.
+> I think the ability to copy bitmaps and issue differential backups would
+> be sufficient in all cases I could think of...
 
-I think we can change that. Its just a Kconfig dependency.
- 
->>
->> 3. (optional) we could even whitelist devices that work in a reasonable fashion (e.g.
->> do not whitelist qdio but whitelist DASD)
-> 
-> I think it's not quite that easy with vfio-ccw working at the
-> subchannel level.
-> 
+so, instead of keeping several static bitmaps with ability to merge them,
+you propose to keep several active bitmaps and copy them to make a backup?
+
+so, instead of new qmp command for merge, add new qmp command for copy?
+
+in case of static bitmaps, we can implement saving/loading them to the=20
+image to free RAM space,
+so it is better.
+
+or what do you propose for=C2=A0 [2] ?
+
+
+
+
+--=20
+Best regards,
+Vladimir
