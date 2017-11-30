@@ -1,32 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33130)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34697)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1eKqb4-0006lC-6f
-	for qemu-devel@nongnu.org; Fri, 01 Dec 2017 14:03:39 -0500
+	(envelope-from <zhang.zhanghailiang@huawei.com>) id 1eKqdn-0000kL-CP
+	for qemu-devel@nongnu.org; Fri, 01 Dec 2017 14:06:29 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1eKqb3-0007kV-9g
-	for qemu-devel@nongnu.org; Fri, 01 Dec 2017 14:03:38 -0500
-Received: from mail-ot0-x234.google.com ([2607:f8b0:4003:c0f::234]:41630)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1eKqb3-0007kA-3t
-	for qemu-devel@nongnu.org; Fri, 01 Dec 2017 14:03:37 -0500
-Received: by mail-ot0-x234.google.com with SMTP id b54so9869714otd.8
-	for <qemu-devel@nongnu.org>; Fri, 01 Dec 2017 11:03:36 -0800 (PST)
+	(envelope-from <zhang.zhanghailiang@huawei.com>) id 1eKqdh-0002oj-TH
+	for qemu-devel@nongnu.org; Fri, 01 Dec 2017 14:06:26 -0500
+Received: from szxga03-in.huawei.com ([45.249.212.189]:2245 helo=huawei.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <zhang.zhanghailiang@huawei.com>)
+	id 1eKqdg-0002Qa-Ua
+	for qemu-devel@nongnu.org; Fri, 01 Dec 2017 14:06:21 -0500
+From: Zhanghailiang <zhang.zhanghailiang@huawei.com>
+Date: Thu, 30 Nov 2017 19:03:10 +0000
+Message-ID: <D1BD20B5DB34024DA951CEEE6C4C5998B1B8CC82@DGGEMA501-MBX.china.huawei.com>
+Content-Language: zh-CN
 MIME-Version: 1.0
-In-Reply-To: <f67de9f9-dfe6-ae9a-d2ea-b4ae5e309757@redhat.com>
-References: <20171129035502.GD8889@lemon>
-	<20171129120018.GB2601@stefanha-x1.localdomain>
-	<20171130094709.GA20286@lemon>
-	<20171130141954.GC14748@stefanha-x1.localdomain>
-	<20171201101644.GB11092@lemon>
-	<20171201140833.GB12803@stefanha-x1.localdomain>
-	<f67de9f9-dfe6-ae9a-d2ea-b4ae5e309757@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri, 1 Dec 2017 19:03:15 +0000
-Message-ID: <CAFEAcA_9wnMkJ+BHjrU8Eb_0vQMK-cYyxtgtsoFN2OWpSHbsCw@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] Block layer complexity: what to do to keep it
- under control?
+Content-Type: text/plain; charset="gb2312"
+Content-Transfer-Encoding: base64
+Subject: [Qemu-devel] [BUG] Windows 7 got stuck easily while run PCMark10
+ application
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,29 +27,53 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: Stefan Hajnoczi <stefanha@redhat.com>, Fam Zheng <famz@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Jeff Cody <jcody@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>, Qemu-block <qemu-block@nongnu.org>, Max Reitz <mreitz@redhat.com>
+To: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "mst@redhat.com" <mst@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
+Cc: "Huangweidong (C)" <weidong.huang@huawei.com>, "Gonglei (Arei)" <arei.gonglei@huawei.com>, "wangxin (U)" <wangxinxin.wang@huawei.com>, Xiexiangyou <xiexiangyou@huawei.com>
 
-On 1 December 2017 at 17:03, Paolo Bonzini <pbonzini@redhat.com> wrote:
-> Same here.  Just like fixing the C code provides a good foundation for a
-> language switch, some more battle-tested code could be converted from
-> QEMU to Rust, in order to get familiar with it and probe whether the
-> benefits are real.  Maybe the memory API could be a good candidate; it
-> certainly would benefit from generics.
-
-At the moment I feel like betting the future of the project on
-Rust would be quite a courageous decision. On the other hand
-it might be interesting to look at prototyping to see what
-benefits it might bring. (One candidate I had in mind was the
-device API -- given that we have had quite a few buffer overruns
-in device code, converting some of the device models to Rust
-might cut off that particular security issue.)
-
-I agree with you that trying to tackle conversion without at
-least one developer with reasonably-expert Rust knowledge is
-likely to be fraught, though -- what you really need is to be
-able to design APIs which are idiomatic for the language, rather
-than the kind of thing you'd write in C but transliterated across...
-
-thanks
--- PMM
+SGmjrA0KDQpXZSBoaXQgYSBidWcgaW4gb3VyIHRlc3Qgd2hpbGUgcnVuIFBDTWFyayAxMCBpbiBh
+IHdpbmRvd3MgNyBWTSwNClRoZSBWTSBnb3Qgc3R1Y2sgYW5kIHRoZSB3YWxsY2xvY2sgd2FzIGhh
+bmcgYWZ0ZXIgc2V2ZXJhbCBtaW51dGVzIHJ1bm5pbmcNClBDTWFyayAxMCBpbiBpdC4NCkl0IGlz
+IHF1aXRlIGVhc2lseSB0byByZXByb2R1Y2UgdGhlIGJ1ZyB3aXRoIHRoZSB1cHN0cmVhbSBLVk0g
+YW5kIFFlbXUuDQoNCldlIGZvdW5kIHRoYXQgS1ZNIGNhbiBub3QgaW5qZWN0IGFueSBSVEMgaXJx
+IHRvIFZNIGFmdGVyIGl0IHdhcyBoYW5nLCBpdCBmYWlscyB0bw0KRGVsaXZlciBpcnEgaW4gaW9h
+cGljX3NldF9pcnEoKSBiZWNhdXNlIFJUQyBpcnEgaXMgc3RpbGwgcGVuZGluZyBpbiBpb2FwaWMt
+Pmlyci4NCg0Kc3RhdGljIGludCBpb2FwaWNfc2V0X2lycShzdHJ1Y3Qga3ZtX2lvYXBpYyAqaW9h
+cGljLCB1bnNpZ25lZCBpbnQgaXJxLA0KICAgICAgICAgICAgICAgICAgaW50IGlycV9sZXZlbCwg
+Ym9vbCBsaW5lX3N0YXR1cykNCnsNCqGtIKGtDQogICAgICAgICBpZiAoIWlycV9sZXZlbCkgew0K
+ICAgICAgICAgICAgICAgICAgaW9hcGljLT5pcnIgJj0gfm1hc2s7DQogICAgICAgICAgICAgICAg
+ICByZXQgPSAxOw0KICAgICAgICAgICAgICAgICAgZ290byBvdXQ7DQogICAgICAgICB9DQqhrSCh
+rQ0KICAgICAgICAgaWYgKChlZGdlICYmIG9sZF9pcnIgPT0gaW9hcGljLT5pcnIpIHx8DQogICAg
+ICAgICAgICAgKCFlZGdlICYmIGVudHJ5LmZpZWxkcy5yZW1vdGVfaXJyKSkgew0KICAgICAgICAg
+ICAgICAgICAgcmV0ID0gMDsNCiAgICAgICAgICAgICAgICAgIGdvdG8gb3V0Ow0KICAgICAgICAg
+fQ0KDQpBY2NvcmRpbmcgdG8gUlRDIHNwZWMsIGFmdGVyIFJUQyBpbmplY3RzIGEgSGlnaCBsZXZl
+bCBpcnEsIE9TIHdpbGwgcmVhZCBDTU9Toa9zDQpyZWdpc3RlciBDIHRvIHRvIGNsZWFyIHRoZSBp
+cnEgZmxhZywgYW5kIHB1bGwgZG93biB0aGUgaXJxIGVsZWN0cmljIHBpbi4NCg0KRm9yIFFlbXUs
+IHdlIHdpbGwgZW11bGF0ZSB0aGUgcmVhZGluZyBvcGVyYXRpb24gaW4gY21vc19pb3BvcnRfcmVh
+ZCgpLA0KYnV0IEd1ZXN0IE9TIHdpbGwgZmlyZSBhIHdyaXRlIG9wZXJhdGlvbiBiZWZvcmUgdG8g
+dGVsbCB3aGljaCByZWdpc3RlciB3aWxsIGJlIHJlYWQNCmFmdGVyIHRoaXMgd3JpdGUsIHdoZXJl
+IHdlIHVzZSBzLT5jbW9zX2luZGV4IHRvIHJlY29yZCB0aGUgZm9sbG93aW5nIHJlZ2lzdGVyIHRv
+IHJlYWQuDQoNCkJ1dCBpbiBvdXIgdGVzdCwgd2UgZm91bmQgdGhhdCB0aGVyZSBpcyBhIHBvc3Np
+YmxlIHNpdHVhdGlvbiB0aGF0IFZjcHUgZmFpbHMgdG8gcmVhZA0KUlRDX1JFR19DIHRvIGNsZWFy
+IGlycSwgVGhpcyBjb3VsZCBoYXBwZW5zIHdoaWxlIHR3byBWQ3B1cyBhcmUgd3JpdGluZy9yZWFk
+aW5nDQpyZWdpc3RlcnMgYXQgdGhlIHNhbWUgdGltZSwgZm9yIGV4YW1wbGUsIHZjcHUgMCBpcyB0
+cnlpbmcgdG8gcmVhZCBSVENfUkVHX0MsDQpzbyBpdCB3cml0ZSBSVENfUkVHX0MgZmlyc3QsIHdo
+ZXJlIHRoZSBzLT5jbW9zX2luZGV4IHdpbGwgYmUgUlRDX1JFR19DLA0KYnV0IGJlZm9yZSBpdCB0
+cmllcyB0byByZWFkIHJlZ2lzdGVyIEMsIGFub3RoZXIgdmNwdTEgaXMgZ29pbmcgdG8gcmVhZCBS
+VENfWUVBUiwNCml0IGNoYW5nZXMgcy0+Y21vc19pbmRleCB0byBSVENfWUVBUiBieSBhIHdyaXRp
+bmcgYWN0aW9uLg0KVGhlIG5leHQgb3BlcmF0aW9uIG9mIHZjcHUwIHdpbGwgYmUgbGVhZCB0byBy
+ZWFkIFJUQ19ZRUFSLCBJbiB0aGlzIGNhc2UsIHdlIHdpbGwgbWlzcw0KY2FsbGluZyBxZW11X2ly
+cV9sb3dlcihzLT5pcnEpIHRvIGNsZWFyIHRoZSBpcnEuIEFmdGVyIHRoaXMsIGt2bSB3aWxsIG5l
+dmVyIGluamVjdCBSVEMgaXJxLA0KYW5kIFdpbmRvd3MgVk0gd2lsbCBoYW5nLg0Kc3RhdGljIHZv
+aWQgY21vc19pb3BvcnRfd3JpdGUodm9pZCAqb3BhcXVlLCBod2FkZHIgYWRkciwNCiAgICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgIHVpbnQ2NF90IGRhdGEsIHVuc2lnbmVkIHNpemUpDQp7DQog
+ICAgUlRDU3RhdGUgKnMgPSBvcGFxdWU7DQoNCiAgICBpZiAoKGFkZHIgJiAxKSA9PSAwKSB7DQog
+ICAgICAgIHMtPmNtb3NfaW5kZXggPSBkYXRhICYgMHg3ZjsNCiAgICB9DQqhraGtDQpzdGF0aWMg
+dWludDY0X3QgY21vc19pb3BvcnRfcmVhZCh2b2lkICpvcGFxdWUsIGh3YWRkciBhZGRyLA0KICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgdW5zaWduZWQgc2l6ZSkNCnsNCiAgICBSVENT
+dGF0ZSAqcyA9IG9wYXF1ZTsNCiAgICBpbnQgcmV0Ow0KICAgIGlmICgoYWRkciAmIDEpID09IDAp
+IHsNCiAgICAgICAgcmV0dXJuIDB4ZmY7DQogICAgfSBlbHNlIHsNCiAgICAgICAgc3dpdGNoKHMt
+PmNtb3NfaW5kZXgpIHsNCg0KQWNjb3JkaW5nIHRvIENNT1Mgc3BlYywgoa5hbnkgd3JpdGUgdG8g
+UFJPVCAwMDcwaCBzaG91bGQgYmUgZm9sbG93ZWQgYnkgYW4gYWN0aW9uIHRvIFBST1QgMDA3MWgg
+b3IgdGhlIFJUQw0KV2lsbCBiZSBSVEMgd2lsbCBiZSBsZWZ0IGluIGFuIHVua25vd24gc3RhdGWh
+rywgYnV0IGl0IHNlZW1zIHRoYXQgd2UgY2FuIG5vdCBlbnN1cmUgdGhpcyBzZXF1ZW5jZSBpbiBx
+ZW11L2t2bS4NCg0KQW55IGlkZWFzID8NCg0KVGhhbmtzLA0KSGFpbGlhbmcNCg0KDQo=
