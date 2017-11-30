@@ -1,26 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42284)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42347)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1eKnlr-00067E-2h
-	for qemu-devel@nongnu.org; Fri, 01 Dec 2017 11:03:03 -0500
+	(envelope-from <thuth@redhat.com>) id 1eKnlt-00067J-Im
+	for qemu-devel@nongnu.org; Fri, 01 Dec 2017 11:03:04 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1eKnlH-0003Ct-TL
-	for qemu-devel@nongnu.org; Fri, 01 Dec 2017 11:02:35 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:51624)
+	(envelope-from <thuth@redhat.com>) id 1eKnlJ-0003GC-Oj
+	for qemu-devel@nongnu.org; Fri, 01 Dec 2017 11:02:37 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:51630)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1eKnlH-0003Bb-Mj
-	for qemu-devel@nongnu.org; Fri, 01 Dec 2017 11:01:59 -0500
-Date: Fri, 1 Dec 2017 16:56:35 +0800
-From: Peter Xu <peterx@redhat.com>
-Message-ID: <20171201085635.GD2712@xz-mi>
-References: <20171108060130.3772-1-peterx@redhat.com>
-	<20171108060130.3772-6-peterx@redhat.com>
-	<20171130104945.GB2248@work-vm>
+	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1eKnlI-0003Bd-MG
+	for qemu-devel@nongnu.org; Fri, 01 Dec 2017 11:02:00 -0500
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+	[10.5.11.11])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 6A9643D94F
+	for <qemu-devel@nongnu.org>; Thu, 30 Nov 2017 20:03:38 +0000 (UTC)
+References: <1512069303-16986-1-git-send-email-thuth@redhat.com>
+	<20171130193202.GE2248@work-vm>
+From: Thomas Huth <thuth@redhat.com>
+Message-ID: <334e895e-aa24-7dee-424e-b402dde823a4@redhat.com>
+Date: Thu, 30 Nov 2017 21:03:33 +0100
 MIME-Version: 1.0
+In-Reply-To: <20171130193202.GE2248@work-vm>
 Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20171130104945.GB2248@work-vm>
-Subject: Re: [Qemu-devel] [PATCH v4 05/32] migration: implement
- "postcopy-pause" src logic
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH for-2.12] hmp-commands: Remove the
+ deprecated usb_add and usb_del
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,33 +36,21 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Cc: qemu-devel@nongnu.org, Alexey Perevalov <a.perevalov@samsung.com>, "Daniel P . Berrange" <berrange@redhat.com>, Juan Quintela <quintela@redhat.com>, Andrea Arcangeli <aarcange@redhat.com>
+Cc: qemu-devel@nongnu.org, kraxel@redhat.com
 
-On Thu, Nov 30, 2017 at 10:49:45AM +0000, Dr. David Alan Gilbert wrote:
-> * Peter Xu (peterx@redhat.com) wrote:
-> > Now when network down for postcopy, the source side will not fail the
-> > migration. Instead we convert the status into this new paused state, and
-> > we will try to wait for a rescue in the future.
-> > 
-> > If a recovery is detected, migration_thread() will reset its local
-> > variables to prepare for that.
-> > 
-> > Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+On 30.11.2017 20:32, Dr. David Alan Gilbert wrote:
+> * Thomas Huth (thuth@redhat.com) wrote:
+>> It's easy to use device_add and device_del as replacement instead.
+>> The usb_add and usb_del commands are deprecated since QEMU 2.10,
+>> and nobody complained that they are still needed, so let's get rid
+>> of them now to make the HMP interface a little bit less overloaded.
+>>
+>> Signed-off-by: Thomas Huth <thuth@redhat.com>
 > 
-> That's still OK; you might want to consider reusing the 'pause_sem' that I
-> added to MigrationStatus for the other pause case.
+> Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+> 
+> Looks like you can kill off usb_device_delete_addr as well.
 
-Yes I can.  I am just a bit worried about how these two different
-features cross-affect each other.  Say, what if something tries to
-execute "migrate-continue" during a postcopy network failure?  IMHO it
-should not be allowed, but we don't yet have a protection so far.
+Right, well spotted! Thanks, I'll send a v2...
 
-So I would prefer to still separate these two semaphores.
-
-Though I found that I can move init/destroy of the two new semaphores
-(postcopy_pause_sem, postcopy_pause_rp_sem) into object init/destroy
-just like what we did for pause_sem, which seems to be cleaner.  I
-hope I can still keep your r-b if I do that small change.  Thanks,
-
--- 
-Peter Xu
+ Thomas
