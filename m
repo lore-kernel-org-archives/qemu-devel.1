@@ -1,34 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58132)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35214)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1eKOY8-0001zV-Qi
-	for qemu-devel@nongnu.org; Thu, 30 Nov 2017 08:06:50 -0500
+	(envelope-from <mreitz@redhat.com>) id 1eKOnZ-0007xM-8L
+	for qemu-devel@nongnu.org; Thu, 30 Nov 2017 08:22:47 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1eKOY3-0002Gz-Mh
-	for qemu-devel@nongnu.org; Thu, 30 Nov 2017 08:06:44 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:46796)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1eKOY3-0002GA-DV
-	for qemu-devel@nongnu.org; Thu, 30 Nov 2017 08:06:39 -0500
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
-	[10.5.11.15])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 81E0449016
-	for <qemu-devel@nongnu.org>; Thu, 30 Nov 2017 13:06:38 +0000 (UTC)
-Date: Thu, 30 Nov 2017 13:06:29 +0000
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20171130130628.GC3952@work-vm>
-References: <20171129185026.23632-1-dgilbert@redhat.com>
-	<20171130122245.7e713d2f@redhat.com>
-	<20171130120805.GA3952@work-vm>
-	<20171130134057.1d8ecc3e@redhat.com>
-	<20171130124720.GB3952@work-vm>
-	<20171130135820.69eb5715@redhat.com>
+	(envelope-from <mreitz@redhat.com>) id 1eKOnV-0001yc-Au
+	for qemu-devel@nongnu.org; Thu, 30 Nov 2017 08:22:40 -0500
+References: <20171123020832.8165-1-mreitz@redhat.com>
+	<20171123020832.8165-7-mreitz@redhat.com>
+	<20171130031646.GK16237@lemon>
+From: Max Reitz <mreitz@redhat.com>
+Message-ID: <3dcb2e5e-6fc8-67ff-6d89-239dd719506c@redhat.com>
+Date: Thu, 30 Nov 2017 14:22:18 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20171130135820.69eb5715@redhat.com>
-Subject: Re: [Qemu-devel] [RFC 0/7] Rework vhost memory region updates
+In-Reply-To: <20171130031646.GK16237@lemon>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="UV4798CCfSQwXqIJPe2sU5AxtSbhc7Gmr"
+Subject: Re: [Qemu-devel] [PATCH 06/17] iotests: Drop format-specific in
+ _filter_img_info
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,126 +26,152 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Igor Mammedov <imammedo@redhat.com>
-Cc: qemu-devel@nongnu.org, maxime.coquelin@redhat.com, mst@redhat.com
+To: Fam Zheng <famz@redhat.com>
+Cc: qemu-block@nongnu.org, qemu-devel@nongnu.org, Kevin Wolf <kwolf@redhat.com>, John Snow <jsnow@redhat.com>
 
-* Igor Mammedov (imammedo@redhat.com) wrote:
-> On Thu, 30 Nov 2017 12:47:20 +0000
-> "Dr. David Alan Gilbert" <dgilbert@redhat.com> wrote:
-> 
-> > * Igor Mammedov (imammedo@redhat.com) wrote:
-> > > On Thu, 30 Nov 2017 12:08:06 +0000
-> > > "Dr. David Alan Gilbert" <dgilbert@redhat.com> wrote:
-> > >   
-> > > > * Igor Mammedov (imammedo@redhat.com) wrote:  
-> > > > > On Wed, 29 Nov 2017 18:50:19 +0000
-> > > > > "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com> wrote:
-> > > > >     
-> > > > > > From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-> > > > > > 
-> > > > > > Hi,
-> > > > > >   This is an experimental set that reworks the way the vhost
-> > > > > > code handles changes in physical address space layout that
-> > > > > > came from a discussion with Igor.    
-> > > > > Thanks for looking into it.
-> > > > > 
-> > > > >      
-> > > > > > Instead of updating and trying to merge sections of address
-> > > > > > space on each add/remove callback, we wait until the commit phase
-> > > > > > and go through and rebuild a list by walking the Flatview of
-> > > > > > memory and end up producing an ordered list.
-> > > > > > We compare the list to the old list to trigger updates.
-> > > > > > 
-> > > > > > Note, only very lightly tested so far, I'm just trying to see if it's
-> > > > > > the right shape.
-> > > > > > 
-> > > > > > Igor, is this what you were intending?    
-> > > > > 
-> > > > > I was thinking about a little less intrusive approach
-> > > > > 
-> > > > > where vhost_region_add/del are modified to maintain
-> > > > > sorted by GPA array of mem_sections, vhost_dev::mem is dropped
-> > > > > altogether and vhost_memory_region array is build/used/freed
-> > > > > on every vhost_commit().
-> > > > > Maintaining sorted array should roughly cost us O(2 log n) if
-> > > > > binary search is used.
-> > > > > 
-> > > > > However I like your idea with iterator even more as it have
-> > > > > potential to make it even faster O(n) if we get rid of
-> > > > > quadratic and relatively complex vhost_update_compare_list().    
-> > > > 
-> > > > Note vhost_update_compare_list is complex,
-> > > > but it is O(n) - it's
-> > > > got nested loops, but the inner loop moves forward and oldi never
-> > > > gets reset back to zero.  
-> > > While skimming through patches I've overlooked it.
-> > > 
-> > > Anyways,
-> > > why memcmp(old_arr, new_arr) is not sufficient
-> > > to detect a change in memory map?  
-> > 
-> > It tells you that you've got a change, but doesn't give
-> > the start/end of the range that's changed, and those
-> > are used by vhost_commit to limit the work of
-> > vhost_verify_ring_mappings.
-> Isn't memmap list a sorted and
->  dev->mem_changed_[start|end]_addr are the lowest|highest
-> addresses of whole map?
-> 
-> If it's, so wouldn't getting values directly from 
-> the 1st/last entries of array be sufficient?
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--UV4798CCfSQwXqIJPe2sU5AxtSbhc7Gmr
+From: Max Reitz <mreitz@redhat.com>
+To: Fam Zheng <famz@redhat.com>
+Cc: qemu-block@nongnu.org, qemu-devel@nongnu.org,
+ Kevin Wolf <kwolf@redhat.com>, John Snow <jsnow@redhat.com>
+Message-ID: <3dcb2e5e-6fc8-67ff-6d89-239dd719506c@redhat.com>
+Subject: Re: [PATCH 06/17] iotests: Drop format-specific in _filter_img_info
+References: <20171123020832.8165-1-mreitz@redhat.com>
+ <20171123020832.8165-7-mreitz@redhat.com> <20171130031646.GK16237@lemon>
+In-Reply-To: <20171130031646.GK16237@lemon>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-THat wasn't my understanding from the existing code;
-my understanding was that changed_start_addr is set by
-vhost_region_add->vhost_set_memory when a new region is added
-(or removed) and is set to the limit of the section added.
-But perhaps I'm misunderstanding.
+On 2017-11-30 04:16, Fam Zheng wrote:
+> On Thu, 11/23 03:08, Max Reitz wrote:
+>> _filter_img_info should remove format-specific information, too.  We
+>> already have such a filter in _img_info, and it is very useful for
+>> query-block-named-block-nodes (etc.), too.
+>>
+>> However, in 198 we need that information (but we still want the rest o=
+f
+>> the filter), so make that filtering optional.  Note that "the rest of
+>> the filter" includes filtering of the test directory, so we can drop t=
+he
+>> _filter_testdir from 198 at the same time.
+>>
+>> Signed-off-by: Max Reitz <mreitz@redhat.com>
+>> ---
+>>  tests/qemu-iotests/198           |  6 ++++--
+>>  tests/qemu-iotests/common.filter | 29 ++++++++++++++++++++++++++++-
+>>  2 files changed, 32 insertions(+), 3 deletions(-)
+>>
+>> diff --git a/tests/qemu-iotests/198 b/tests/qemu-iotests/198
+>> index 34ef666381..a84a058396 100755
+>> --- a/tests/qemu-iotests/198
+>> +++ b/tests/qemu-iotests/198
+>> @@ -91,11 +91,13 @@ $QEMU_IO --object $SECRET0 --object $SECRET1 -c "r=
+ead -P 0x9 0 $size" --image-op
+>> =20
+>>  echo
+>>  echo "=3D=3D checking image base =3D=3D"
+>> -$QEMU_IMG info --image-opts $IMGSPECBASE | _filter_img_info | _filter=
+_testdir | sed -e "/^disk size:/ D"
+>> +$QEMU_IMG info --image-opts $IMGSPECBASE | _filter_img_info --format-=
+specific \
+>> +    | sed -e "/^disk size:/ D"
+>> =20
+>>  echo
+>>  echo "=3D=3D checking image layer =3D=3D"
+>> -$QEMU_IMG info --image-opts $IMGSPECLAYER | _filter_img_info | _filte=
+r_testdir | sed -e "/^disk size:/ D"
+>> +$QEMU_IMG info --image-opts $IMGSPECLAYER | _filter_img_info --format=
+-specific \
+>> +    | sed -e "/^disk size:/ D"
+>> =20
+>> =20
+>>  # success, all done
+>> diff --git a/tests/qemu-iotests/common.filter b/tests/qemu-iotests/com=
+mon.filter
+>> index d9237799e9..0c0e53fae7 100644
+>> --- a/tests/qemu-iotests/common.filter
+>> +++ b/tests/qemu-iotests/common.filter
+>> @@ -139,6 +139,15 @@ _filter_img_create()
+>> =20
+>>  _filter_img_info()
+>>  {
+>> +    if [[ "$1" =3D=3D "--format-specific" ]]; then
+>> +        local format_specific=3D1
+>> +        shift
+>> +    else
+>> +        local format_specific=3D0
+>> +    fi
+>> +
+>> +    discard=3D0
+>> +    regex_json_spec_start=3D'^ *"format-specific": \{'
+>>      sed -e "s#$IMGPROTO:$TEST_DIR#TEST_DIR#g" \
+>>          -e "s#$TEST_DIR#TEST_DIR#g" \
+>>          -e "s#$IMGFMT#IMGFMT#g" \
+>> @@ -159,7 +168,25 @@ _filter_img_info()
+>>          -e "/block_state_zero: \\(on\\|off\\)/d" \
+>>          -e "/log_size: [0-9]\\+/d" \
+>>          -e "s/iters: [0-9]\\+/iters: 1024/" \
+>> -        -e "s/uuid: [-a-f0-9]\\+/uuid: 00000000-0000-0000-0000-000000=
+000000/"
+>> +        -e "s/uuid: [-a-f0-9]\\+/uuid: 00000000-0000-0000-0000-000000=
+000000/" | \
+>> +    while IFS=3D'' read -r line; do
+>> +        if [[ $format_specific =3D=3D 1 ]]; then
+>> +            discard=3D0
+>> +        elif [[ $line =3D=3D "Format specific information:" ]]; then
+>> +            discard=3D1
+>> +        elif [[ $line =3D~ $regex_json_spec_start ]]; then
+>> +            discard=3D2
+>> +            regex_json_spec_end=3D"^${line%%[^ ]*}\\},? *$"
+>> +        fi
+>> +        if [[ $discard =3D=3D 0 ]]; then
+>> +            echo "$line"
+>> +        elif [[ $discard =3D=3D 1 && ! $line ]]; then
+>=20
+> s/\$line/"\$line"/ ?
+>=20
+>> +            echo
+>> +            discard=3D0
+>> +        elif [[ $discard =3D=3D 2 && $line =3D~ $regex_json_spec_end =
+]]; then
+>=20
+> Ditto.
 
-(The logic in vhost_verify_ring_mappings doesn't make sense
-to me either though; if vhost_verify_ring_part_mapping returns 0
-on success, why is it doing   if (!r) { break; }  surely it
-should be  if (r) { break; })
+It's in double brackets, so it should be fine.
 
-Dave
+(I just copied it from _img_info in common.rc, and that was reviewed by
+Eric, so I assume it's fine. :-))
 
-> 
-> 
-> > 
-> > Dave
-> > 
-> > > >   
-> > > > > Pls, see comments on individual patches.    
-> > > > 
-> > > > Thanks; I have fixed a couple of bugs since I posted, so I'm
-> > > > more interested in structure/shape.  Any good ideas how to test
-> > > > it are welcome.
-> > > > 
-> > > > Dave
-> > > >   
-> > > > >     
-> > > > > > Dave
-> > > > > > 
-> > > > > > Dr. David Alan Gilbert (7):
-> > > > > >   memory: address_space_iterate
-> > > > > >   vhost: Move log_dirty check
-> > > > > >   vhost: New memory update functions
-> > > > > >   vhost: update_mem_cb implementation
-> > > > > >   vhost: Compare new and old memory lists
-> > > > > >   vhost: Copy updated region data into device state
-> > > > > >   vhost: Remove vhost_set_memory and children
-> > > > > > 
-> > > > > >  hw/virtio/trace-events |   8 +
-> > > > > >  hw/virtio/vhost.c      | 424 ++++++++++++++++++++++---------------------------
-> > > > > >  include/exec/memory.h  |  23 +++
-> > > > > >  memory.c               |  22 +++
-> > > > > >  4 files changed, 241 insertions(+), 236 deletions(-)
-> > > > > >     
-> > > > >     
-> > > > --
-> > > > Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK  
-> > >   
-> > --
-> > Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
-> 
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+Max
+
+>> +            discard=3D0
+>> +        fi
+>> +    done
+>>  }
+>> =20
+>>  # filter out offsets and file names from qemu-img map; good for both
+>> --=20
+>> 2.13.6
+>>
+
+
+
+--UV4798CCfSQwXqIJPe2sU5AxtSbhc7Gmr
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQFGBAEBCAAwFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAlogBgoSHG1yZWl0ekBy
+ZWRoYXQuY29tAAoJEPQH2wBh1c9ASwAIALfm4rZpMjMjn+hg+InxkxyxTayn517L
+TflekYKHfuNZufArFdR5cnT9T4MNLRA5IxZKq/C9Eepj2/ll6rj3lb7pd0d/v0Bc
+kp1qysJ2LnSId0eeeuG0C0yhXSRjquRX3R5O9mS2SIDZa1orO72frLl8EDoimwSP
+Z/EH2AnNEsztdwSg1xFu+nPxPJ1Q36YsdSEzcwLXYcHeIyxyx7GnKtMR5oWsLeJ/
+5esMeTd8p1qqiZ2F8E5ME73K2Y6tmccFC09JYP57nBUl5ECj+dexlcu+vy8LGust
+G/r1yrLBUKFaSSnrsTcZtgA2gpMq6shb/pI2gre5Uy5XQgw+gk/WQ/U=
+=EkG/
+-----END PGP SIGNATURE-----
+
+--UV4798CCfSQwXqIJPe2sU5AxtSbhc7Gmr--
