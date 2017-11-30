@@ -1,27 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54955)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55232)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1eKoJR-0005Bf-T8
-	for qemu-devel@nongnu.org; Fri, 01 Dec 2017 11:37:21 -0500
+	(envelope-from <stefanha@redhat.com>) id 1eKoJd-0005NX-4M
+	for qemu-devel@nongnu.org; Fri, 01 Dec 2017 11:37:34 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1eKoJP-0003YL-3W
-	for qemu-devel@nongnu.org; Fri, 01 Dec 2017 11:37:17 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:35832)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1eKoJO-0003XN-RG
-	for qemu-devel@nongnu.org; Fri, 01 Dec 2017 11:37:14 -0500
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
-	[10.5.11.16])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id ED91D7E430
-	for <qemu-devel@nongnu.org>; Fri,  1 Dec 2017 12:58:29 +0000 (UTC)
-From: Juan Quintela <quintela@redhat.com>
-Date: Fri,  1 Dec 2017 13:58:13 +0100
-Message-Id: <20171201125813.1437-7-quintela@redhat.com>
-In-Reply-To: <20171201125813.1437-1-quintela@redhat.com>
-References: <20171201125813.1437-1-quintela@redhat.com>
-Subject: [Qemu-devel] [PATCH v3 6/6] [RFH] tests: Add migration compress
- threads tests
+	(envelope-from <stefanha@redhat.com>) id 1eKoJY-0003fi-3m
+	for qemu-devel@nongnu.org; Fri, 01 Dec 2017 11:37:29 -0500
+Date: Thu, 30 Nov 2017 16:09:22 +0000
+From: Stefan Hajnoczi <stefanha@redhat.com>
+Message-ID: <20171130160922.GB17703@stefanha-x1.localdomain>
+References: <20171129144956.11409-1-famz@redhat.com>
+	<20171129144956.11409-4-famz@redhat.com>
+MIME-Version: 1.0
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="kXdP64Ggrk/fb43R"
+Content-Disposition: inline
+In-Reply-To: <20171129144956.11409-4-famz@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH RFC 3/9] blockjob: Implement AioContext
+ drain ops
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,88 +25,52 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: dgilbert@redhat.com, lvivier@redhat.com, peterx@redhat.com
+To: Fam Zheng <famz@redhat.com>
+Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, jcody@redhat.com, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, pbonzini@redhat.com
 
-Yeap, it is still not working. trying to learn how to debug threads
-for guests running from the testt hardness.
 
-For some reason, compression is not working at the moment, test is
-disabled until I found why.
+--kXdP64Ggrk/fb43R
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-Signed-off-by: Juan Quintela <quintela@redhat.com>
----
- tests/migration-test.c | 51 ++++++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 51 insertions(+)
+On Wed, Nov 29, 2017 at 10:49:50PM +0800, Fam Zheng wrote:
+> Signed-off-by: Fam Zheng <famz@redhat.com>
+> ---
+>  blockjob.c | 47 ++++++++++++++++++++++++++++++-----------------
+>  1 file changed, 30 insertions(+), 17 deletions(-)
+>=20
+> diff --git a/blockjob.c b/blockjob.c
+> index ff9a614531..86d060c89c 100644
+> --- a/blockjob.c
+> +++ b/blockjob.c
+> @@ -148,6 +148,23 @@ static void block_job_attached_aio_context(AioContex=
+t *new_context,
+>                                             void *opaque);
+>  static void block_job_detach_aio_context(void *opaque);
+> =20
+> +static void block_job_drained_begin(void *opaque)
+> +{
+> +    BlockJob *job =3D opaque;
+> +    block_job_pause(job);
+> +}
 
-diff --git a/tests/migration-test.c b/tests/migration-test.c
-index 41dee78a9a..eab3b146a4 100644
---- a/tests/migration-test.c
-+++ b/tests/migration-test.c
-@@ -739,6 +739,54 @@ static void test_xbzrle_unix(void)
-     g_free(uri);
- }
- 
-+static void test_compress(const char *uri)
-+{
-+    QTestState *from, *to;
-+
-+    test_migrate_start(&from, &to, uri);
-+
-+    /* We want to pick a speed slow enough that the test completes
-+     * quickly, but that it doesn't complete precopy even on a slow
-+     * machine, so also set the downtime.
-+     */
-+    /* 100 ms */
-+    migrate_set_parameter(from, "downtime-limit", "1");
-+    /* 1MB/s slow*/
-+    migrate_set_parameter(from, "max-bandwidth", "100000000");
-+
-+    migrate_set_parameter(from, "compress-threads", "4");
-+    migrate_set_parameter(to, "decompress-threads", "3");
-+
-+    migrate_set_capability(from, "compress", "true");
-+    migrate_set_capability(to, "compress", "true");
-+    /* Wait for the first serial output from the source */
-+    wait_for_serial("src_serial");
-+
-+    migrate(from, uri);
-+
-+    wait_for_migration_pass(from);
-+
-+    /* 300ms it should converge */
-+    migrate_set_parameter(from, "downtime-limit", "300");
-+
-+    if (!got_stop) {
-+        qtest_qmp_eventwait(from, "STOP");
-+    }
-+    qtest_qmp_eventwait(to, "RESUME");
-+
-+    wait_for_serial("dest_serial");
-+    wait_for_migration_complete(from);
-+
-+    test_migrate_end(from, to);
-+}
-+
-+static void test_compress_unix(void)
-+{
-+    char *uri = g_strdup_printf("unix:%s/migsocket", tmpfs);
-+
-+    test_compress(uri);
-+    g_free(uri);
-+}
- 
- int main(int argc, char **argv)
- {
-@@ -763,6 +811,9 @@ int main(int argc, char **argv)
-     qtest_add_func("/migration/precopy/tcp", test_precopy_tcp);
-     qtest_add_func("/migration/postcopy/unix", test_postcopy);
-     qtest_add_func("/migration/xbzrle/unix", test_xbzrle_unix);
-+    if (0) {
-+        qtest_add_func("/migration/compress/unix", test_compress_unix);
-+    }
- 
-     ret = g_test_run();
- 
--- 
-2.14.3
+This is buggy because block_job_pause() increments a counter.  Remember
+the .drained_begin() semantics are that it can be called any number of
+times (see comment in previous patch)!
+
+--kXdP64Ggrk/fb43R
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEcBAEBAgAGBQJaIC0yAAoJEJykq7OBq3PI+xUH/RnHEhHjuOgcmXbM1yW0g7/s
+QpnUixzQWIwrddQ43DlFPpEw/rgm8XJ8eJSC91q0QnnOzn7Oq/vR+ZuvgH3AGnge
+azlBL744jNqMNz6+gKB04VgvcT69rnoV1cPf95SBJV1LwLdZa//sfkG3DpXRjfp5
+IVGOMNOdabdXJ0JIApvLa9ysfhGiIGeGYyn+nmV8U2NBhAmD+kFIVklRaJci26hC
+CIuxBi1CjWILHJIIpuAgxEjHIVjxx3HAA7rsKMDawpkTp621sR4Bk405q9UIyWUx
+SY5OoZzxSEPyzA1eEYPIK4wWwhxOMqRnTGLGV83fyi5z/J5McBm2UKc8MjzADdc=
+=uUEJ
+-----END PGP SIGNATURE-----
+
+--kXdP64Ggrk/fb43R--
