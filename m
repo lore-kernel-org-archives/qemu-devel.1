@@ -1,23 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40235)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40845)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1eKNbg-0000i0-Bk
-	for qemu-devel@nongnu.org; Thu, 30 Nov 2017 07:06:21 -0500
+	(envelope-from <dgilbert@redhat.com>) id 1eKNdc-0001av-Fz
+	for qemu-devel@nongnu.org; Thu, 30 Nov 2017 07:08:26 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1eKNbb-0003WM-DA
-	for qemu-devel@nongnu.org; Thu, 30 Nov 2017 07:06:20 -0500
-References: <20171129202701.16117-1-david@redhat.com>
-	<20171129202701.16117-8-david@redhat.com>
-	<51ed083c-b6d7-9954-9c17-2259156ed3fe@redhat.com>
-From: David Hildenbrand <david@redhat.com>
-Message-ID: <1a8b5c6e-e138-2799-058e-31547500ac08@redhat.com>
-Date: Thu, 30 Nov 2017 13:06:11 +0100
+	(envelope-from <dgilbert@redhat.com>) id 1eKNdX-0005BZ-I9
+	for qemu-devel@nongnu.org; Thu, 30 Nov 2017 07:08:20 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:6636)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1eKNdX-0005AW-BY
+	for qemu-devel@nongnu.org; Thu, 30 Nov 2017 07:08:15 -0500
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+	[10.5.11.16])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id A63A64900F
+	for <qemu-devel@nongnu.org>; Thu, 30 Nov 2017 12:08:14 +0000 (UTC)
+Date: Thu, 30 Nov 2017 12:08:06 +0000
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20171130120805.GA3952@work-vm>
+References: <20171129185026.23632-1-dgilbert@redhat.com>
+	<20171130122245.7e713d2f@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <51ed083c-b6d7-9954-9c17-2259156ed3fe@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v2 for-2.12 07/16] s390x: handle exceptions
- during s390_cpu_virt_mem_rw() correctly (TCG)
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20171130122245.7e713d2f@redhat.com>
+Subject: Re: [Qemu-devel] [RFC 0/7] Rework vhost memory region updates
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,143 +33,76 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>, qemu-s390x@nongnu.org, qemu-devel@nongnu.org
-Cc: Christian Borntraeger <borntraeger@de.ibm.com>, Cornelia Huck <cohuck@redhat.com>, Richard Henderson <rth@twiddle.net>, Alexander Graf <agraf@suse.de>
+To: Igor Mammedov <imammedo@redhat.com>
+Cc: qemu-devel@nongnu.org, maxime.coquelin@redhat.com, mst@redhat.com
 
-On 30.11.2017 12:01, Thomas Huth wrote:
-> On 29.11.2017 21:26, David Hildenbrand wrote:
->> s390_cpu_virt_mem_rw() must always return, so callers can react on
->> an exception (e.g. see ioinst_handle_stcrw()).
->>
->> However, for TCG we always have to exit the cpu loop (and restore the
->> cpu state before that) if we injected a program interrupt. So let's
->> introduce and use s390_cpu_virt_mem_handle_exc() in code that is not
->> purely KVM.
->>
->> Directly pass the retaddr we already have available in these functions=
-.
->>
->> Signed-off-by: David Hildenbrand <david@redhat.com>
->> ---
->>  hw/s390x/s390-pci-inst.c  |  7 +++++++
->>  target/s390x/cpu.h        |  1 +
->>  target/s390x/ioinst.c     | 20 +++++++++++++++++---
->>  target/s390x/mmu_helper.c | 14 ++++++++++++++
->>  4 files changed, 39 insertions(+), 3 deletions(-)
->>
->> diff --git a/hw/s390x/s390-pci-inst.c b/hw/s390x/s390-pci-inst.c
->> index 8123705dfd..6f41083244 100644
->> --- a/hw/s390x/s390-pci-inst.c
->> +++ b/hw/s390x/s390-pci-inst.c
->> @@ -163,6 +163,7 @@ int clp_service_call(S390CPU *cpu, uint8_t r2, uin=
-tptr_t ra)
->>      }
->> =20
->>      if (s390_cpu_virt_mem_read(cpu, env->regs[r2], r2, buffer, sizeof=
-(*reqh))) {
->> +        s390_cpu_virt_mem_handle_exc(cpu, ra);
->>          return 0;
->>      }
->>      reqh =3D (ClpReqHdr *)buffer;
->> @@ -174,6 +175,7 @@ int clp_service_call(S390CPU *cpu, uint8_t r2, uin=
-tptr_t ra)
->> =20
->>      if (s390_cpu_virt_mem_read(cpu, env->regs[r2], r2, buffer,
->>                                 req_len + sizeof(*resh))) {
->> +        s390_cpu_virt_mem_handle_exc(cpu, ra);
->>          return 0;
->>      }
->>      resh =3D (ClpRspHdr *)(buffer + req_len);
->> @@ -189,6 +191,7 @@ int clp_service_call(S390CPU *cpu, uint8_t r2, uin=
-tptr_t ra)
->> =20
->>      if (s390_cpu_virt_mem_read(cpu, env->regs[r2], r2, buffer,
->>                                 req_len + res_len)) {
->> +        s390_cpu_virt_mem_handle_exc(cpu, ra);
->>          return 0;
->>      }
-> [...]
->=20
-> Having to change all these spots is kind of ugly ... and I guess it wil=
-l also
-> be quite error-prone in the future (if someone is developing new code u=
-nder
-> KVM only and then forgets to add these handlers for TCG).
+* Igor Mammedov (imammedo@redhat.com) wrote:
+> On Wed, 29 Nov 2017 18:50:19 +0000
+> "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com> wrote:
+> 
+> > From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+> > 
+> > Hi,
+> >   This is an experimental set that reworks the way the vhost
+> > code handles changes in physical address space layout that
+> > came from a discussion with Igor.
+> Thanks for looking into it.
+> 
+>  
+> > Instead of updating and trying to merge sections of address
+> > space on each add/remove callback, we wait until the commit phase
+> > and go through and rebuild a list by walking the Flatview of
+> > memory and end up producing an ordered list.
+> > We compare the list to the old list to trigger updates.
+> > 
+> > Note, only very lightly tested so far, I'm just trying to see if it's
+> > the right shape.
+> > 
+> > Igor, is this what you were intending?
+> 
+> I was thinking about a little less intrusive approach
+> 
+> where vhost_region_add/del are modified to maintain
+> sorted by GPA array of mem_sections, vhost_dev::mem is dropped
+> altogether and vhost_memory_region array is build/used/freed
+> on every vhost_commit().
+> Maintaining sorted array should roughly cost us O(2 log n) if
+> binary search is used.
+> 
+> However I like your idea with iterator even more as it have
+> potential to make it even faster O(n) if we get rid of
+> quadratic and relatively complex vhost_update_compare_list().
 
-The good thing is, it won't break KVM but only TCG. And it has been
-broken in TCG for years now without anybody noticing it.
+Note vhost_update_compare_list is complex, but it is O(n) - it's
+got nested loops, but the inner loop moves forward and oldi never
+gets reset back to zero.
 
->=20
-> Can't you do that simply always at the end of s390_cpu_virt_mem_rw() in=
-stead,
-> when the function has been called in non-checking mode (i.e. hostbuf !=3D=
- NULL)?
-> Then we only need the extra-dance in places where we call the _check fu=
-nction?
+> Pls, see comments on individual patches.
 
-Oh god no, no such strange calling conventions from the same function.
+Thanks; I have fixed a couple of bugs since I posted, so I'm
+more interested in structure/shape.  Any good ideas how to test
+it are welcome.
 
->=20
->> @@ -212,9 +214,12 @@ void ioinst_handle_stcrw(S390CPU *cpu, uint32_t i=
-pb, uintptr_t ra)
->> =20
->>      if (s390_cpu_virt_mem_write(cpu, addr, ar, &crw, sizeof(crw)) =3D=
-=3D 0) {
->>          setcc(cpu, cc);
->> -    } else if (cc =3D=3D 0) {
->> -        /* Write failed: requeue CRW since STCRW is a suppressing ins=
-truction */
->> -        css_undo_stcrw(&crw);
->> +    } else {
->> +        if (cc =3D=3D 0) {
->> +            /* Write failed: requeue CRW since STCRW is suppressing *=
-/
->> +            css_undo_stcrw(&crw);
->> +        }
->> +        s390_cpu_virt_mem_handle_exc(cpu, ra);
->>      }
->>  }
->=20
-> That hunk would then need to do _check first and in case there is a fai=
-lure,
-> call css_undo_stcrw() before the s390_cpu_virt_mem_handle_exc() functio=
-n, I think.
+Dave
 
-I don't really like that. And there would be a possibility for a race.
-So a no from my side.
-
->=20
-> Alternatively, the s390_cpu_virt_mem_rw() function could get an additio=
-nal parameter
-> that points to a callback function which is used for "clean-up" right b=
-efore the
-> cpu_loop_exit ... and in this case the callback function would contain =
-the
-> css_undo_stcrw().
->=20
-> What do you think?
-
-I also thought about this, but adding two parameters to every call is
-even uglier. Not talking about having to construct special structs to
-pass through the data. Please not that the TPI handler I am about to
-introduce will also require to revert stuff in case there was an exceptio=
-n.
-
-Another option I thought about was checking in the caller if EXC_PGM has
-been set. But missing to add such a check is even easier.
-
-I'd prefer to keep it as is, but if there are other opinions/ideas,
-please speak up.
-
-Thanks for having a look!
-
->=20
->  Thomas
->=20
-
-
---=20
-
-Thanks,
-
-David / dhildenb
+> 
+> > Dave
+> > 
+> > Dr. David Alan Gilbert (7):
+> >   memory: address_space_iterate
+> >   vhost: Move log_dirty check
+> >   vhost: New memory update functions
+> >   vhost: update_mem_cb implementation
+> >   vhost: Compare new and old memory lists
+> >   vhost: Copy updated region data into device state
+> >   vhost: Remove vhost_set_memory and children
+> > 
+> >  hw/virtio/trace-events |   8 +
+> >  hw/virtio/vhost.c      | 424 ++++++++++++++++++++++---------------------------
+> >  include/exec/memory.h  |  23 +++
+> >  memory.c               |  22 +++
+> >  4 files changed, 241 insertions(+), 236 deletions(-)
+> > 
+> 
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
