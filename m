@@ -1,41 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58755)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42762)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <a175818323@gmail.com>) id 1eKJs1-0007F4-3G
-	for qemu-devel@nongnu.org; Thu, 30 Nov 2017 03:06:58 -0500
+	(envelope-from <15700157322@163.com>) id 1eKKLD-0007md-VS
+	for qemu-devel@nongnu.org; Thu, 30 Nov 2017 03:37:14 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <a175818323@gmail.com>) id 1eKJrz-0001e3-UV
-	for qemu-devel@nongnu.org; Thu, 30 Nov 2017 03:06:57 -0500
-Received: from mail-oi0-x231.google.com ([2607:f8b0:4003:c06::231]:44306)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <a175818323@gmail.com>)
-	id 1eKJrz-0001cL-OE
-	for qemu-devel@nongnu.org; Thu, 30 Nov 2017 03:06:55 -0500
-Received: by mail-oi0-x231.google.com with SMTP id k2so4264218oib.11
-	for <qemu-devel@nongnu.org>; Thu, 30 Nov 2017 00:06:55 -0800 (PST)
+	(envelope-from <15700157322@163.com>) id 1eKKL7-0000jd-HL
+	for qemu-devel@nongnu.org; Thu, 30 Nov 2017 03:37:08 -0500
+Received: from m13-121.163.com ([220.181.13.121]:26659)
+	by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <15700157322@163.com>) id 1eKKL5-0000hD-Tt
+	for qemu-devel@nongnu.org; Thu, 30 Nov 2017 03:37:01 -0500
+Date: Thu, 30 Nov 2017 16:36:54 +0800 (CST)
+From: Lying  <15700157322@163.com>
+In-Reply-To: <20171130023226.GC16237@lemon>
+References: <2b5d04f3.523b.160064da4db.Coremail.15700157322@163.com>
+	<20171129062916.GA12220@lemon>
+	<727e90ec.25b0.1600aabe963.Coremail.15700157322@163.com>
+	<20171130023226.GC16237@lemon>
 MIME-Version: 1.0
-In-Reply-To: <CAMxP3BQaWaoAAepffqmWcR07j_RTXcqo41RPXM=U2WoGmne3iw@mail.gmail.com>
-References: <20170726113222.52aad9a6@w520.home>
-	<CAMxP3BTFgwJtjh78hNBCoxBp1WsnZMZLsqzb3McqCq=-SX0a4g@mail.gmail.com>
-	<20170731234626.7664be18@w520.home>
-	<CAMxP3BTfMad-ycWHqmW+aVM7rv2CJSv-dmEFUveGBqAWvfbBjQ@mail.gmail.com>
-	<20170801090158.35d18f10@w520.home>
-	<CAMxP3BRkzXBRPZw9fpCu-w4Fusn6ng_knk1cAz=EDBAiw9UnqA@mail.gmail.com>
-	<20170807095224.5438ef8c@w520.home>
-	<20170808230043-mutt-send-email-mst@kernel.org>
-	<CAMxP3BR=WHKJxcWKH27dcC7DTKGD2y7r12teAUSmMkwp1VDafA@mail.gmail.com>
-	<20170822105659.75b5c7e0@w520.home>
-	<20170822205940-mutt-send-email-mst@kernel.org>
-	<CAMxP3BSNPjRZGOULZ0zKBq8v5Rqv9f5xasx+BD57c=oAS5tSWg@mail.gmail.com>
-	<20170829081305.7a2685c6@w520.home>
-	<CAMxP3BRFzyyHemEW-2DFRd7r9Py-bkjY7vQRNeBfuhN0XKupJQ@mail.gmail.com>
-	<20170830104304.4a0fca34@w520.home>
-	<CAMxP3BQaWaoAAepffqmWcR07j_RTXcqo41RPXM=U2WoGmne3iw@mail.gmail.com>
-From: Bob Chen <a175818323@gmail.com>
-Date: Thu, 30 Nov 2017 16:06:54 +0800
-Message-ID: <CAMxP3BRW_w7+CttE9VQiPaoDJiKP6y82ciXt4JNmEdXvhdw=AQ@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] =?utf-8?q?About_virtio_device_hotplug_in_Q35!_?=
-	=?utf-8?b?44CQ5aSW5Z+f6YKu5Lu2LuiwqOaFjuafpemYheOAkQ==?=
+Message-ID: <5d860490.8271.1600c124f29.Coremail.15700157322@163.com>
+Content-Type: text/plain; charset=GBK
+Content-Transfer-Encoding: base64
+Subject: Re: [Qemu-devel] device_del fail
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -44,57 +29,52 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alex Williamson <alex.williamson@redhat.com>
-Cc: "Michael S. Tsirkin" <mst@redhat.com>, Marcel Apfelbaum <marcel@redhat.com>, =?UTF-8?B?6ZmI5Y2a?= <chenbo02@meituan.com>, qemu-devel@nongnu.org
+To: Fam Zheng <famz@redhat.com>
+Cc: qemu-devel@nongnu.org, Alex Williamson <alex.williamson@redhat.com>
 
-Hi,
-
-After 3 months of work and investigation, and tedious mail discussions with
-Nvidia, I think some progress have been made, in terms of the
-GPUDirect(p2p) in virtual environment.
-
-The only remaining issue then, is the low bidirectional bandwidth between
-two sibling GPUs under the same PCIe switch.
-
-We expanded the tests to run on even more GPU cards, so the results seemed
-to be explicit now.
-
-
-P40 is OK, and its hardware topology on host is:
- \-[0000:00]-+-00.0  Intel Corporation Xeon E7 v4/Xeon E5 v4/Xeon E3
-v4/Xeon D DMI2
-             +-01.0-[03]----00.0  LSI Logic / Symbios Logic MegaRAID SAS-3
-3008 [Fury]
-             +-02.0-[04]----00.0  NVIDIA Corporation GP102GL [Tesla P40]
-             +-03.0-[02]----00.0  NVIDIA Corporation GP102GL [Tesla P40]
-
-
-M60, not OK, low bandwidth:
- \-[0000:00]-+-00.0  Intel Corporation Xeon E7 v4/Xeon E5 v4/Xeon E3
-v4/Xeon D DMI2
-             +-01.0-[06]----00.0  LSI Logic / Symbios Logic MegaRAID SAS-3
-3008 [Fury]
-             +-02.0-[07-0a]----00.0-[08-0a]--+-08.0-[09]----00.0  NVIDIA
-Corporation GM204GL [Tesla M60]
-             |                               \-10.0-[0a]----00.0  NVIDIA
-Corporation GM204GL [Tesla M60]
-
-
-V100, not OK, low bandwidth:
-\-[0000:00]-+-00.0  Intel Corporation Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon
-D DMI2
-             +-01.0-[01]--+-00.0  Mellanox Technologies MT27710 Family
-[ConnectX-4 Lx]
-             |            \-00.1  Mellanox Technologies MT27710 Family
-[ConnectX-4 Lx]
-             +-02.0-[02-05]----00.0-[03-05]--+-08.0-[04]----00.0  NVIDIA
-Corporation GV100 [Tesla V100 PCIe]
-             |                               \-10.0-[05]----00.0  NVIDIA
-Corporation GV100 [Tesla V100 PCIe]
-
-
-
-So what might be the actual effect of the PLX switch hardware for GPU data
-flow? Although it is not visible in guest OS.
-Nvidia tech-support guys are not familiar with virtualization. They asked
-us to consult the community first.
+aGVsbG8sIGkgdHJ5IGFnYWluIG9uIGFyY2ggTGludXggLCBhZnRlciBpIGFkZCBncHUsIGRpc3Bs
+YXkgaXMgbm90IGxpZ2h0LGZvbGxvd2luZyBtZXNzYWdlIGZyb20gImluZm8gcGNpIjoKICBCdXMg
+IDAsIGRldmljZSAgIDUsIGZ1bmN0aW9uIDA6CiAgICBWR0EgY29udHJvbGxlcjogUENJIGRldmlj
+ZSAxMGRlOjE0MDEKICAgICAgSVJRIDExLgogICAgICBCQVIwOiAzMiBiaXQgbWVtb3J5IGF0IDB4
+ZmZmZmZmZmZmZmZmZmZmZiBbMHgwMGZmZmZmZV0uCiAgICAgIEJBUjE6IDY0IGJpdCBwcmVmZXRj
+aGFibGUgbWVtb3J5IGF0IDB4ZmZmZmZmZmZmZmZmZmZmZiBbMHgwZmZmZmZmZV0uCiAgICAgIEJB
+UjM6IDY0IGJpdCBwcmVmZXRjaGFibGUgbWVtb3J5IGF0IDB4ZmZmZmZmZmZmZmZmZmZmZiBbMHgw
+MWZmZmZmZV0uCiAgICAgIEJBUjU6IEkvTyBhdCAweGZmZmZmZmZmZmZmZmZmZmYgWzB4MDA3ZV0u
+CiAgICAgIEJBUjY6IDMyIGJpdCBtZW1vcnkgYXQgMHhmZmZmZmZmZmZmZmZmZmZmIFsweDAwMDFm
+ZmZlXS4KICAgICAgaWQgImdwdTEiCiAgQnVzICAwLCBkZXZpY2UgICA2LCBmdW5jdGlvbiAwOgog
+ICAgQXVkaW8gY29udHJvbGxlcjogUENJIGRldmljZSAxMGRlOjBmYmEKICAgICAgSVJRIDEwLgog
+ICAgICBCQVIwOiAzMiBiaXQgbWVtb3J5IGF0IDB4M2U4MjAwMDAgWzB4M2U4MjNmZmZdLgogICAg
+ICBpZCAiZ3B1MiIKCgpUaGVuIGkgY29ubmVjdCB0aGF0IGd1ZXN0IHdpdGggc3NoOgpMYXN0IGxv
+Z2luOiBUaHUgTm92IDMwIDIyOjI5OjAzIDIwMTcoaXQncyBub3JtYWwpCgoKCgpBdCAyMDE3LTEx
+LTMwIDEwOjMyOjI2LCAiRmFtIFpoZW5nIiA8ZmFtekByZWRoYXQuY29tPiB3cm90ZToKPkxldCdz
+IGtlZXAgcWVtdS1kZXZlbEBub25nbnUub3JnIG9uIHRoZSBsaXN0IHNvIG90aGVyIHBlb3BsZSBj
+YW4gY2hpbWUgaW4uCj4KPk9uIFRodSwgMTEvMzAgMTA6MDUsIEx5aW5nIHdyb3RlOgo+IAo+PiBB
+dCAyMDE3LTExLTI5IDE0OjI5OjE3LCAiRmFtIFpoZW5nIiA8ZmFtekByZWRoYXQuY29tPiB3cm90
+ZToKPj4gPk9uIFdlZCwgMTEvMjkgMTM6NDMsIEx5aW5nIHdyb3RlOgo+PiA+PiBIZWxsbyBldmVy
+eWJvZHksIEkgZW5jb3VudGVyIGEgZXJyb3Igb24gbXkgdm0gZ3Vlc3QKPj4gPj4gSSByZW1vdmUg
+bXkgZGV2aWNlIG9uIG15IGd1ZXN0IGlzIGZhaWxlZCwgZm9sbG93aW5nIGlzIGRldGFpbCBtZXNz
+YWdlLgo+PiA+PiBJIGRpZG4ndCBhZGQgbXkgYXVkaW8gZGV2aWNlIGJlZm9yZSBydW5uaW5nIG15
+IGd1ZXN0LCBTbyBpIGFkZCBhdWRpbyB3aXRoICJkZXZpY2VfYWRkIiBhZnRlciBydW5uaW5nCj4+
+ID4+IFRoZW4gaSBjYW4gdXNlIGl0LCBzbyBpIHJlbW92ZSBpdCB3aXRoICJkZXZpY2VfZGVsIiwg
+YnV0IHdoZW4gaSBkbyBpdCBhZ2FpbiwgaQo+PiA+PiBjYW4ndCB1c2UgbXkgYXVkaW8gZGV2aWNl
+IGFuZCBjYW5ub3QgcmVtb3ZlIGl0Lgo+PiA+Cj4+ID4KPj4gPkkgaGF2ZW4ndCB0cmllZCB1bnBs
+dWdnaW5nIGFuIGF1ZGlvIGRldmljZSBteXNlbGYgYnV0IGluIGdlbmVyYWwgUENJIGhvdCB1bnBs
+dWcKPj4gPm5lZWRzIGd1ZXN0IGNvb3BlcmF0aW9uIHNvIHNvbWUgaW5mb21hdGlvbiBhYm91dCBn
+dWVzdCBpcyBhbHNvIGhlbHBmdWwuICBXaGljaAo+PiA+Z3Vlc3QgT1MgaXMgdGhpcz8KPj4gPgo+
+PiA+V2hhdCBhcmUgdGhlIGV4YWN0IGNvbW1hbmRzIHRoYXQgeW91IHVzZWQgYW5kIHdoYXQgYXJl
+IHRoZSBtZXNzYWdlcyBmcm9tCj4+ID5ob3N0L2d1ZXN0IHdoZW4geW91IGRldmljZV9kZWw/Cj4+
+ID4KPj4gCj4+ID5GYW0KPj4gCj4+IAo+PiBoZWxsbywgdGhhbmtzIGZvciB5b3VyIHJlcGx5LCBh
+bmQgaSdtIHNvcnJ5IHRoYXQgaSBub3Qgbm90aWNlIGF0IHllc3RlcmRheSAuCj4+IGZvbGxvd2lu
+ZyBpcyBteSBpbmZvcm1hdGlvbjoKPj4gICAgIGd1ZXN0IDogd2luZG93LTcKPj4gICAgIGhvc3Qg
+OiBVYnVudHUtMTYuMDQKPj4gICAgIHFlbXUgOiAyLjExLjAtcmMwCj4+ICAgICBsaWJ2aXJ0IDog
+My45Cj4+ICAgIHNlYWJpb3MgOiAxLjEwLjc0IChmcm9tIHFlbXUpCj4+IGV4YWN0IGNvbW1hbmRz
+Ogo+PiAgICAgYWRkOiJkZXZpY2VfYWRkIGRyaXZlcj12ZmlvLXBjaSxob3N0PTAyOjAwLjAseC12
+Z2E9b24sbXVsdGlmdW5jdGlvbj15ZXMsaWQ9Z3B1MSIKPj4gICAgIHJlbW92ZToiZGV2aWNlX2Rl
+bCBncHUxIgo+PiBhbmQgbm90IG1lc3NhZ2VzIHdoZW4gaSBydW5uaW5nIGRldmljZV9kZWwuIEJ1
+dCBpIGNhbiBzZWUgaXQgc3RpbGwgZXhpc3Qgd2hpbGUgcnVubmluZyBjb21tYW5kcyAiaW5mbyBw
+Y2kiCj4KPlByb2JhYmx5IHRoZSBndWVzdCBkaWRuJ3QgcmVzcG9uZCB0byB0aGUgaG90LXVucGx1
+ZyBldmVudC4gSW4geW91ciBvcmlnaW5hbAo+cXVlc3Rpb24geW91IHNhaWQgaXQgaXMgYW4gYXVk
+aW8gZGV2aWNlIGJ1dCB5b3VyIGNvbW1hbmQgc3VnZ2VzdHMgaXQgaXMgYSBHUFUKPmRldmljZS4g
+SSdtIG5vdCBzdXJlIFdpbmRvd3MgZHJpdmVyIGNhbiBoYW5kbGUgdGhpcy4gSGF2ZSB5b3UgdHJp
+ZWQgZGlmZmVyZW50Cj5ndWVzdHMsIHN1Y2ggYXMgTGludXg/Cj4KPkNjIEFsZXggd2hvIG1heSBr
+bm93IG1vcmUuCj4KPkZhbQo=
