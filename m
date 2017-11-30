@@ -1,29 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53083)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54514)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1eKMvd-0005B6-Sa
-	for qemu-devel@nongnu.org; Thu, 30 Nov 2017 06:22:54 -0500
+	(envelope-from <vsementsov@virtuozzo.com>) id 1eKMz4-0005zH-Hb
+	for qemu-devel@nongnu.org; Thu, 30 Nov 2017 06:26:27 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1eKMva-0003iD-Of
-	for qemu-devel@nongnu.org; Thu, 30 Nov 2017 06:22:53 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:16462)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1eKMva-0003ci-J5
-	for qemu-devel@nongnu.org; Thu, 30 Nov 2017 06:22:50 -0500
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
-	[10.5.11.14])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 0A16D80480
-	for <qemu-devel@nongnu.org>; Thu, 30 Nov 2017 11:22:49 +0000 (UTC)
-Date: Thu, 30 Nov 2017 12:22:45 +0100
-From: Igor Mammedov <imammedo@redhat.com>
-Message-ID: <20171130122245.7e713d2f@redhat.com>
-In-Reply-To: <20171129185026.23632-1-dgilbert@redhat.com>
-References: <20171129185026.23632-1-dgilbert@redhat.com>
+	(envelope-from <vsementsov@virtuozzo.com>) id 1eKMz3-0001wI-C1
+	for qemu-devel@nongnu.org; Thu, 30 Nov 2017 06:26:26 -0500
+References: <20171012185916.22776-1-eblake@redhat.com>
+	<20171012185916.22776-17-eblake@redhat.com>
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Message-ID: <9134df4a-480e-951f-b7ac-fe5be1a971a1@virtuozzo.com>
+Date: Thu, 30 Nov 2017 14:26:12 +0300
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+In-Reply-To: <20171012185916.22776-17-eblake@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [RFC 0/7] Rework vhost memory region updates
+Content-Language: en-US
+Subject: Re: [Qemu-devel] [PATCH v4 16/20] vdi: Switch to
+ .bdrv_co_block_status()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,61 +25,116 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>
-Cc: qemu-devel@nongnu.org, maxime.coquelin@redhat.com, mst@redhat.com
+To: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org
+Cc: kwolf@redhat.com, famz@redhat.com, qemu-block@nongnu.org, Stefan Weil <sw@weilnetz.de>, Max Reitz <mreitz@redhat.com>, jsnow@redhat.com
 
-On Wed, 29 Nov 2017 18:50:19 +0000
-"Dr. David Alan Gilbert (git)" <dgilbert@redhat.com> wrote:
+12.10.2017 21:59, Eric Blake wrote:
+> We are gradually moving away from sector-based interfaces, towards
+> byte-based.  Update the vdi driver accordingly.  Note that the
+> TODO is already covered (the block layer guarantees bounds of its
+> requests), and that we can remove the now-unused s->block_sectors.
+>
+> Signed-off-by: Eric Blake <eblake@redhat.com>
+>
+> ---
+> v4: rebase to interface tweak
+> v3: no change
+> v2: rebase to mapping flag
+> ---
+>   block/vdi.c | 33 +++++++++++++--------------------
+>   1 file changed, 13 insertions(+), 20 deletions(-)
+>
+> diff --git a/block/vdi.c b/block/vdi.c
+> index 6f83221ddc..b30886823d 100644
+> --- a/block/vdi.c
+> +++ b/block/vdi.c
+> @@ -171,8 +171,6 @@ typedef struct {
+>       uint32_t *bmap;
+>       /* Size of block (bytes). */
+>       uint32_t block_size;
+> -    /* Size of block (sectors). */
+> -    uint32_t block_sectors;
+>       /* First sector of block map. */
+>       uint32_t bmap_sector;
+>       /* VDI header (converted to host endianness). */
+> @@ -462,7 +460,6 @@ static int vdi_open(BlockDriverState *bs, QDict *options, int flags,
+>       bs->total_sectors = header.disk_size / SECTOR_SIZE;
+>
+>       s->block_size = header.block_size;
+> -    s->block_sectors = header.block_size / SECTOR_SIZE;
+>       s->bmap_sector = header.offset_bmap / SECTOR_SIZE;
+>       s->header = header;
+>
+> @@ -508,33 +505,29 @@ static int vdi_reopen_prepare(BDRVReopenState *state,
+>       return 0;
+>   }
+>
+> -static int64_t coroutine_fn vdi_co_get_block_status(BlockDriverState *bs,
+> -        int64_t sector_num, int nb_sectors, int *pnum, BlockDriverState **file)
+> +static int coroutine_fn vdi_co_block_status(BlockDriverState *bs,
+> +                                            bool want_zero,
+> +                                            int64_t offset, int64_t bytes,
+> +                                            int64_t *pnum, int64_t *map,
+> +                                            BlockDriverState **file)
+>   {
+> -    /* TODO: Check for too large sector_num (in bdrv_is_allocated or here). */
+>       BDRVVdiState *s = (BDRVVdiState *)bs->opaque;
+> -    size_t bmap_index = sector_num / s->block_sectors;
+> -    size_t sector_in_block = sector_num % s->block_sectors;
+> -    int n_sectors = s->block_sectors - sector_in_block;
+> +    size_t bmap_index = offset / s->block_size;
+> +    size_t index_in_block = offset % s->block_size;
+>       uint32_t bmap_entry = le32_to_cpu(s->bmap[bmap_index]);
+> -    uint64_t offset;
+>       int result;
+>
+> -    logout("%p, %" PRId64 ", %d, %p\n", bs, sector_num, nb_sectors, pnum);
+> -    if (n_sectors > nb_sectors) {
+> -        n_sectors = nb_sectors;
+> -    }
+> -    *pnum = n_sectors;
+> +    logout("%p, %" PRId64 ", %" PRId64 ", %p\n", bs, offset, bytes, pnum);
 
-> From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-> 
-> Hi,
->   This is an experimental set that reworks the way the vhost
-> code handles changes in physical address space layout that
-> came from a discussion with Igor.
-Thanks for looking into it.
+may be not bad to update message, as you changed numbers, like
 
- 
-> Instead of updating and trying to merge sections of address
-> space on each add/remove callback, we wait until the commit phase
-> and go through and rebuild a list by walking the Flatview of
-> memory and end up producing an ordered list.
-> We compare the list to the old list to trigger updates.
-> 
-> Note, only very lightly tested so far, I'm just trying to see if it's
-> the right shape.
-> 
-> Igor, is this what you were intending?
+logout("%p, offset %" PRId64 ", bytes %" PRId64 ", %p\n", bs, offset, bytes, pnum);
 
-I was thinking about a little less intrusive approach
+but for me it is ok as is too.
 
-where vhost_region_add/del are modified to maintain
-sorted by GPA array of mem_sections, vhost_dev::mem is dropped
-altogether and vhost_memory_region array is build/used/freed
-on every vhost_commit().
-Maintaining sorted array should roughly cost us O(2 log n) if
-binary search is used.
+> +    *pnum = MIN(s->block_size, bytes);
 
-However I like your idea with iterator even more as it have
-potential to make it even faster O(n) if we get rid of
-quadratic and relatively complex vhost_update_compare_list().
+looks like it should be MIN(s->block_size - index_in_block, bytes);
 
-Pls, see comments on individual patches.
+with that:
+Reviewed-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 
-> Dave
-> 
-> Dr. David Alan Gilbert (7):
->   memory: address_space_iterate
->   vhost: Move log_dirty check
->   vhost: New memory update functions
->   vhost: update_mem_cb implementation
->   vhost: Compare new and old memory lists
->   vhost: Copy updated region data into device state
->   vhost: Remove vhost_set_memory and children
-> 
->  hw/virtio/trace-events |   8 +
->  hw/virtio/vhost.c      | 424 ++++++++++++++++++++++---------------------------
->  include/exec/memory.h  |  23 +++
->  memory.c               |  22 +++
->  4 files changed, 241 insertions(+), 236 deletions(-)
-> 
+>       result = VDI_IS_ALLOCATED(bmap_entry);
+>       if (!result) {
+>           return 0;
+>       }
+>
+> -    offset = s->header.offset_data +
+> -                              (uint64_t)bmap_entry * s->block_size +
+> -                              sector_in_block * SECTOR_SIZE;
+> +    *map = s->header.offset_data + (uint64_t)bmap_entry * s->block_size +
+> +        index_in_block;
+>       *file = bs->file->bs;
+> -    return BDRV_BLOCK_DATA | BDRV_BLOCK_OFFSET_VALID | offset;
+> +    return BDRV_BLOCK_DATA | BDRV_BLOCK_OFFSET_VALID;
+>   }
+>
+>   static int coroutine_fn
+> @@ -902,7 +895,7 @@ static BlockDriver bdrv_vdi = {
+>       .bdrv_child_perm          = bdrv_format_default_perms,
+>       .bdrv_create = vdi_create,
+>       .bdrv_has_zero_init = bdrv_has_zero_init_1,
+> -    .bdrv_co_get_block_status = vdi_co_get_block_status,
+> +    .bdrv_co_block_status = vdi_co_block_status,
+>       .bdrv_make_empty = vdi_make_empty,
+>
+>       .bdrv_co_preadv     = vdi_co_preadv,
+
+
+-- 
+Best regards,
+Vladimir
