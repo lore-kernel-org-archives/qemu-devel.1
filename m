@@ -1,24 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42873)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43059)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1eKNjI-0004xK-HF
-	for qemu-devel@nongnu.org; Thu, 30 Nov 2017 07:14:13 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1eKNjn-0005Rz-RY
+	for qemu-devel@nongnu.org; Thu, 30 Nov 2017 07:14:44 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1eKNjC-0002J7-BM
-	for qemu-devel@nongnu.org; Thu, 30 Nov 2017 07:14:12 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:48182)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1eKNjC-0002Dh-2H
-	for qemu-devel@nongnu.org; Thu, 30 Nov 2017 07:14:06 -0500
-Date: Thu, 30 Nov 2017 12:13:57 +0000
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20171130121357.GD2248@work-vm>
-References: <20171108060130.3772-1-peterx@redhat.com>
-	<20171108060130.3772-9-peterx@redhat.com>
+	(envelope-from <peter.maydell@linaro.org>) id 1eKNjn-00042b-0p
+	for qemu-devel@nongnu.org; Thu, 30 Nov 2017 07:14:43 -0500
+Received: from mail-oi0-x244.google.com ([2607:f8b0:4003:c06::244]:37130)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1eKNjm-00042I-OY
+	for qemu-devel@nongnu.org; Thu, 30 Nov 2017 07:14:42 -0500
+Received: by mail-oi0-x244.google.com with SMTP id y75so4659334oie.4
+	for <qemu-devel@nongnu.org>; Thu, 30 Nov 2017 04:14:42 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20171108060130.3772-9-peterx@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v4 08/32] migration: allow send_rq to fail
+In-Reply-To: <1512031988-32490-4-git-send-email-thuth@redhat.com>
+References: <1512031988-32490-1-git-send-email-thuth@redhat.com>
+	<1512031988-32490-4-git-send-email-thuth@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Thu, 30 Nov 2017 12:14:21 +0000
+Message-ID: <CAFEAcA-LBOm=kHja3QJqOw-TT3GF9-i+wJfXdL-FU5NKimknzQ@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH for-2.12 3/7] tests/boot-serial-test: Add
+ support for the mcf5208evb board
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,123 +30,44 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Xu <peterx@redhat.com>
-Cc: qemu-devel@nongnu.org, Alexey Perevalov <a.perevalov@samsung.com>, "Daniel P . Berrange" <berrange@redhat.com>, Juan Quintela <quintela@redhat.com>, Andrea Arcangeli <aarcange@redhat.com>
+To: Thomas Huth <thuth@redhat.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, Anthony Green <green@moxielogic.com>, Laurent Vivier <laurent@vivier.eu>, qemu-arm <qemu-arm@nongnu.org>, Edgar Iglesias <edgar.iglesias@gmail.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>
 
-* Peter Xu (peterx@redhat.com) wrote:
-> We will not allow failures to happen when sending data from destination
-> to source via the return path. However it is possible that there can be
-> errors along the way.  This patch allows the migrate_send_rp_message()
-> to return error when it happens, and further extended it to
-> migrate_send_rp_req_pages().
-> 
-> Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
-> Signed-off-by: Peter Xu <peterx@redhat.com>
+On 30 November 2017 at 08:53, Thomas Huth <thuth@redhat.com> wrote:
+> We can output a character quite easily here with some few lines of
+> assembly that we provide as a mini-kernel for this board.
+>
+> Signed-off-by: Thomas Huth <thuth@redhat.com>
 > ---
->  migration/migration.c | 38 ++++++++++++++++++++++++++++++--------
->  migration/migration.h |  2 +-
->  2 files changed, 31 insertions(+), 9 deletions(-)
-> 
-> diff --git a/migration/migration.c b/migration/migration.c
-> index 8d93b891e3..db896233f6 100644
-> --- a/migration/migration.c
-> +++ b/migration/migration.c
-> @@ -199,17 +199,35 @@ static void deferred_incoming_migration(Error **errp)
->   * Send a message on the return channel back to the source
->   * of the migration.
->   */
-> -static void migrate_send_rp_message(MigrationIncomingState *mis,
-> -                                    enum mig_rp_message_type message_type,
-> -                                    uint16_t len, void *data)
-> +static int migrate_send_rp_message(MigrationIncomingState *mis,
-> +                                   enum mig_rp_message_type message_type,
-> +                                   uint16_t len, void *data)
->  {
-> +    int ret = 0;
-> +
->      trace_migrate_send_rp_message((int)message_type, len);
->      qemu_mutex_lock(&mis->rp_mutex);
-> +
-> +    /*
-> +     * It's possible that the file handle got lost due to network
-> +     * failures.
-> +     */
-> +    if (!mis->to_src_file) {
-> +        ret = -EIO;
-> +        goto error;
-> +    }
-> +
->      qemu_put_be16(mis->to_src_file, (unsigned int)message_type);
->      qemu_put_be16(mis->to_src_file, len);
->      qemu_put_buffer(mis->to_src_file, data, len);
->      qemu_fflush(mis->to_src_file);
-> +
-> +    /* It's possible that qemu file got error during sending */
-> +    ret = qemu_file_get_error(mis->to_src_file);
-> +
-> +error:
->      qemu_mutex_unlock(&mis->rp_mutex);
-> +    return ret;
->  }
->  
->  /* Request a range of pages from the source VM at the given
-> @@ -219,26 +237,30 @@ static void migrate_send_rp_message(MigrationIncomingState *mis,
->   *   Start: Address offset within the RB
->   *   Len: Length in bytes required - must be a multiple of pagesize
->   */
-> -void migrate_send_rp_req_pages(MigrationIncomingState *mis, const char *rbname,
-> -                               ram_addr_t start, size_t len)
-> +int migrate_send_rp_req_pages(MigrationIncomingState *mis, const char *rbname,
-> +                              ram_addr_t start, size_t len)
->  {
->      uint8_t bufc[12 + 1 + 255]; /* start (8), len (4), rbname up to 256 */
->      size_t msglen = 12; /* start + len */
-> +    int rbname_len;
-> +    enum mig_rp_message_type msg_type;
->  
->      *(uint64_t *)bufc = cpu_to_be64((uint64_t)start);
->      *(uint32_t *)(bufc + 8) = cpu_to_be32((uint32_t)len);
->  
->      if (rbname) {
-> -        int rbname_len = strlen(rbname);
-> +        rbname_len = strlen(rbname);
+>  tests/boot-serial-test.c | 10 ++++++++++
+>  1 file changed, 10 insertions(+)
+>
+> diff --git a/tests/boot-serial-test.c b/tests/boot-serial-test.c
+> index d997269..dd3828c 100644
+> --- a/tests/boot-serial-test.c
+> +++ b/tests/boot-serial-test.c
+> @@ -16,6 +16,14 @@
+>  #include "qemu/osdep.h"
+>  #include "libqtest.h"
+>
+> +static const uint8_t kernel_mcf5208[] = {
+> +    0x41, 0xf9, 0xfc, 0x06, 0x00, 0x00,     /* lea 0xfc060000,%a0 */
+> +    0x10, 0x3c, 0x00, 0x54,                 /* move.b #'T',%d0 */
+> +    0x11, 0x7c, 0x00, 0x04, 0x00, 0x08,     /* move.b #4,8(%a0)     Enable TX */
+> +    0x11, 0x40, 0x00, 0x0c,                 /* move.b %d0,12(%a0)   Print 'T' */
+> +    0x60, 0xfa                              /* bra.s  loop */
+> +};
 
-I don't think that move of the declaration of rbname_len is necessary;
-it's only msglen that you need to keep for longer.
+This approach doesn't seem to be scalable to me -- are we
+really going to have 50 or more fragments of hand-coded hex in
+this file to cover the various board models?
 
-Dave
+I'd much rather see us have a framework for being able
+to build test blobs from source using a cross compiler
+setup (and docker or similar so anybody can rebuild
+the test blobs). That will be much easier to maintain
+and easier to extend to having tests that test other
+parts of the board or other aspects of TCG emulation.
 
->          assert(rbname_len < 256);
->  
->          bufc[msglen++] = rbname_len;
->          memcpy(bufc + msglen, rbname, rbname_len);
->          msglen += rbname_len;
-> -        migrate_send_rp_message(mis, MIG_RP_MSG_REQ_PAGES_ID, msglen, bufc);
-> +        msg_type = MIG_RP_MSG_REQ_PAGES_ID;
->      } else {
-> -        migrate_send_rp_message(mis, MIG_RP_MSG_REQ_PAGES, msglen, bufc);
-> +        msg_type = MIG_RP_MSG_REQ_PAGES;
->      }
-> +
-> +    return migrate_send_rp_message(mis, msg_type, msglen, bufc);
->  }
->  
->  void qemu_start_incoming_migration(const char *uri, Error **errp)
-> diff --git a/migration/migration.h b/migration/migration.h
-> index ebb049f692..b63cdfbfdb 100644
-> --- a/migration/migration.h
-> +++ b/migration/migration.h
-> @@ -216,7 +216,7 @@ void migrate_send_rp_shut(MigrationIncomingState *mis,
->                            uint32_t value);
->  void migrate_send_rp_pong(MigrationIncomingState *mis,
->                            uint32_t value);
-> -void migrate_send_rp_req_pages(MigrationIncomingState *mis, const char* rbname,
-> +int migrate_send_rp_req_pages(MigrationIncomingState *mis, const char* rbname,
->                                ram_addr_t start, size_t len);
->  
->  #endif
-> -- 
-> 2.13.6
-> 
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+thanks
+-- PMM
