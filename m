@@ -1,26 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55847)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56728)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <willy@infradead.org>) id 1eKQ0W-0001cK-P6
-	for qemu-devel@nongnu.org; Thu, 30 Nov 2017 09:40:12 -0500
+	(envelope-from <mst@redhat.com>) id 1eKQ3m-00037W-1O
+	for qemu-devel@nongnu.org; Thu, 30 Nov 2017 09:43:31 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <willy@infradead.org>) id 1eKQ0N-0000h3-7J
-	for qemu-devel@nongnu.org; Thu, 30 Nov 2017 09:40:08 -0500
-Received: from bombadil.infradead.org ([65.50.211.133]:42228)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <willy@infradead.org>) id 1eKQ0M-0000gT-Tl
-	for qemu-devel@nongnu.org; Thu, 30 Nov 2017 09:39:59 -0500
-Date: Thu, 30 Nov 2017 06:39:52 -0800
-From: Matthew Wilcox <willy@infradead.org>
-Message-ID: <20171130143952.GB12684@bombadil.infradead.org>
-References: <1511963726-34070-1-git-send-email-wei.w.wang@intel.com>
-	<1511963726-34070-6-git-send-email-wei.w.wang@intel.com>
-	<201711301934.CDC21800.FSLtJFFOOVQHMO@I-love.SAKURA.ne.jp>
-	<201711302235.FAJ57385.OFJHOVQOFtMSFL@I-love.SAKURA.ne.jp>
+	(envelope-from <mst@redhat.com>) id 1eKQ3g-0003U7-DZ
+	for qemu-devel@nongnu.org; Thu, 30 Nov 2017 09:43:30 -0500
+Date: Thu, 30 Nov 2017 16:43:03 +0200
+From: "Michael S. Tsirkin" <mst@redhat.com>
+Message-ID: <20171130163902-mutt-send-email-mst@kernel.org>
+References: <20171130134159.9697-1-eblake@redhat.com>
+	<20171130134159.9697-4-eblake@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <201711302235.FAJ57385.OFJHOVQOFtMSFL@I-love.SAKURA.ne.jp>
-Subject: Re: [Qemu-devel] [PATCH v18 05/10] xbitmap: add more operations
+In-Reply-To: <20171130134159.9697-4-eblake@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH 3/3] maint: Fix macros with broken
+ 'do/while(0); ' usage
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,23 +24,40 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>
-Cc: wei.w.wang@intel.com, virtio-dev@lists.oasis-open.org, linux-kernel@vger.kernel.org, qemu-devel@nongnu.org, virtualization@lists.linux-foundation.org, kvm@vger.kernel.org, linux-mm@kvack.org, mst@redhat.com, mhocko@kernel.org, akpm@linux-foundation.org, mawilcox@microsoft.com, david@redhat.com, cornelia.huck@de.ibm.com, mgorman@techsingularity.net, aarcange@redhat.com, amit.shah@redhat.com, pbonzini@redhat.com, liliang.opensource@gmail.com, yang.zhang.wz@gmail.com, quan.xu@aliyun.com, nilal@redhat.com, riel@redhat.com
+To: Eric Blake <eblake@redhat.com>
+Cc: qemu-devel@nongnu.org, qemu-trivial@nongnu.org, Gerd Hoffmann <kraxel@redhat.com>, Alistair Francis <alistair@alistair23.me>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, "Edgar E. Iglesias" <edgar.iglesias@gmail.com>, Paolo Bonzini <pbonzini@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, Alexander Graf <agraf@suse.de>, Jason Wang <jasowang@redhat.com>, Subbaraya Sundeep <sundeep.lkml@gmail.com>, Stefan Berger <stefanb@linux.vnet.ibm.com>, Juan Quintela <quintela@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Christian Borntraeger <borntraeger@de.ibm.com>, Cornelia Huck <cohuck@redhat.com>, Richard Henderson <rth@twiddle.net>, Igor Mammedov <imammedo@redhat.com>, "open list:Block layer core" <qemu-block@nongnu.org>, "open list:Xilinx Zynq" <qemu-arm@nongnu.org>, "open list:New World" <qemu-ppc@nongnu.org>, "open list:S390" <qemu-s390x@nongnu.org>
 
-On Thu, Nov 30, 2017 at 10:35:03PM +0900, Tetsuo Handa wrote:
-> According to xb_set_bit(), it seems to me that we are trying to avoid memory allocation
-> for "struct ida_bitmap" when all set bits within a 1024-bits bitmap reside in the first
-> 61 bits.
+On Thu, Nov 30, 2017 at 07:41:59AM -0600, Eric Blake wrote:
+> The point of writing a macro embedded in a 'do { ... } while (0)'
+> loop is so that the macro can be used as a drop-in statement with
+> the caller supplying the trailing ';'.  Although our coding style
+> frowns on brace-less 'if':
+>   if (cond)
+>     statement;
+>   else
+>     something else;
+> the use of do/while (0) in a macro is absolutely essential for the
+> purpose of avoiding a syntax error on the 'else' - but it only works
+> if there is no trailing ';' in the macro (as the ';' in the code
+> calling the macro would then be a second statement and cause the
+> 'else' to not pair to the 'if').
+
+Shouldn't matter if everyone puts the statements in {}, right?
+
+> Many of the places touched in this code are examples of the ugly
+> bit-rotting debug print statements; cleaning those up is left as
+> a bite-sized task for another day.
 > 
-> But does such saving help? Is there characteristic bias that majority of set bits resides
-> in the first 61 bits, for "bit" is "unsigned long" which holds a page number (isn't it)?
-> If no such bias, wouldn't eliminating radix_tree_exception() case and always storing
-> "struct ida_bitmap" simplifies the code (and make the processing faster)?
+> Found mechanically via: $ git grep -B1 'while (0);' | grep -A1 \\\\
+> 
+> Signed-off-by: Eric Blake <eblake@redhat.com>
 
-It happens all the time.  The vast majority of users of the IDA set
-low bits.  Also, it's the first 62 bits -- going up to 63 bits with the
-XArray rewrite.
+We can't really rely on code still building for this to do the right
+thing, can we?  I did my best to look for uses and I think it's OK, so
 
-I do plan to redo the xbitmap on top of the XArray; I'm just trying to
-get the XArray merged first.  The IDA and xbitmap code will share much
-more code when that happens.
+Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
+
+but I'm not merging this.
+
+> -- 
+> 2.14.3
