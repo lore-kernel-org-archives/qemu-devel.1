@@ -1,35 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53184)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54435)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pmorel@linux.vnet.ibm.com>) id 1eKONb-0007vh-40
-	for qemu-devel@nongnu.org; Thu, 30 Nov 2017 07:55:54 -0500
+	(envelope-from <imammedo@redhat.com>) id 1eKOQC-0002Yh-4g
+	for qemu-devel@nongnu.org; Thu, 30 Nov 2017 07:58:33 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pmorel@linux.vnet.ibm.com>) id 1eKONY-0003qL-1f
-	for qemu-devel@nongnu.org; Thu, 30 Nov 2017 07:55:51 -0500
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:35964)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pmorel@linux.vnet.ibm.com>)
-	id 1eKONX-0003q2-Pq
-	for qemu-devel@nongnu.org; Thu, 30 Nov 2017 07:55:47 -0500
-Received: from pps.filterd (m0098404.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
-	vAUCs81t062016
-	for <qemu-devel@nongnu.org>; Thu, 30 Nov 2017 07:55:44 -0500
-Received: from e06smtp14.uk.ibm.com (e06smtp14.uk.ibm.com [195.75.94.110])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2ejh08c872-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Thu, 30 Nov 2017 07:55:44 -0500
-Received: from localhost
-	by e06smtp14.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
-	Only! Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <pmorel@linux.vnet.ibm.com>;
-	Thu, 30 Nov 2017 12:55:41 -0000
-From: Pierre Morel <pmorel@linux.vnet.ibm.com>
-Date: Thu, 30 Nov 2017 13:55:28 +0100
-In-Reply-To: <1512046530-17773-1-git-send-email-pmorel@linux.vnet.ibm.com>
-References: <1512046530-17773-1-git-send-email-pmorel@linux.vnet.ibm.com>
-Message-Id: <1512046530-17773-6-git-send-email-pmorel@linux.vnet.ibm.com>
-Subject: [Qemu-devel] [PATCH v4 5/7] s390x/pci: move the memory region read
- from pcilg
+	(envelope-from <imammedo@redhat.com>) id 1eKOQ9-0005Pt-4O
+	for qemu-devel@nongnu.org; Thu, 30 Nov 2017 07:58:32 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:47884)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1eKOQ8-0005PS-Qd
+	for qemu-devel@nongnu.org; Thu, 30 Nov 2017 07:58:29 -0500
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+	[10.5.11.12])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id BD0B47F41D
+	for <qemu-devel@nongnu.org>; Thu, 30 Nov 2017 12:58:27 +0000 (UTC)
+Date: Thu, 30 Nov 2017 13:58:20 +0100
+From: Igor Mammedov <imammedo@redhat.com>
+Message-ID: <20171130135820.69eb5715@redhat.com>
+In-Reply-To: <20171130124720.GB3952@work-vm>
+References: <20171129185026.23632-1-dgilbert@redhat.com>
+	<20171130122245.7e713d2f@redhat.com>
+	<20171130120805.GA3952@work-vm>
+	<20171130134057.1d8ecc3e@redhat.com>
+	<20171130124720.GB3952@work-vm>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [RFC 0/7] Rework vhost memory region updates
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -38,57 +36,109 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: cohuck@redhat.com, agraf@suse.de, borntraeger@de.ibm.com, zyimin@linux.vnet.ibm.com, mst@redhat.com, thuth@redhat.com, pasic@linux.vnet.ibm.com
+To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Cc: qemu-devel@nongnu.org, maxime.coquelin@redhat.com, mst@redhat.com
 
-Let's move the memory region read from pcilg into a dedicated function.
-This allows us to prepare a later patch.
+On Thu, 30 Nov 2017 12:47:20 +0000
+"Dr. David Alan Gilbert" <dgilbert@redhat.com> wrote:
 
-Signed-off-by: Pierre Morel <pmorel@linux.vnet.ibm.com>
-Reviewed-by: Yi Min Zhao <zyimin@linux.vnet.ibm.com>
-Reviewed-by: Thomas Huth <thuth@redhat.com>
----
- hw/s390x/s390-pci-inst.c | 15 +++++++++++----
- 1 file changed, 11 insertions(+), 4 deletions(-)
+> * Igor Mammedov (imammedo@redhat.com) wrote:
+> > On Thu, 30 Nov 2017 12:08:06 +0000
+> > "Dr. David Alan Gilbert" <dgilbert@redhat.com> wrote:
+> >   
+> > > * Igor Mammedov (imammedo@redhat.com) wrote:  
+> > > > On Wed, 29 Nov 2017 18:50:19 +0000
+> > > > "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com> wrote:
+> > > >     
+> > > > > From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+> > > > > 
+> > > > > Hi,
+> > > > >   This is an experimental set that reworks the way the vhost
+> > > > > code handles changes in physical address space layout that
+> > > > > came from a discussion with Igor.    
+> > > > Thanks for looking into it.
+> > > > 
+> > > >      
+> > > > > Instead of updating and trying to merge sections of address
+> > > > > space on each add/remove callback, we wait until the commit phase
+> > > > > and go through and rebuild a list by walking the Flatview of
+> > > > > memory and end up producing an ordered list.
+> > > > > We compare the list to the old list to trigger updates.
+> > > > > 
+> > > > > Note, only very lightly tested so far, I'm just trying to see if it's
+> > > > > the right shape.
+> > > > > 
+> > > > > Igor, is this what you were intending?    
+> > > > 
+> > > > I was thinking about a little less intrusive approach
+> > > > 
+> > > > where vhost_region_add/del are modified to maintain
+> > > > sorted by GPA array of mem_sections, vhost_dev::mem is dropped
+> > > > altogether and vhost_memory_region array is build/used/freed
+> > > > on every vhost_commit().
+> > > > Maintaining sorted array should roughly cost us O(2 log n) if
+> > > > binary search is used.
+> > > > 
+> > > > However I like your idea with iterator even more as it have
+> > > > potential to make it even faster O(n) if we get rid of
+> > > > quadratic and relatively complex vhost_update_compare_list().    
+> > > 
+> > > Note vhost_update_compare_list is complex,
+> > > but it is O(n) - it's
+> > > got nested loops, but the inner loop moves forward and oldi never
+> > > gets reset back to zero.  
+> > While skimming through patches I've overlooked it.
+> > 
+> > Anyways,
+> > why memcmp(old_arr, new_arr) is not sufficient
+> > to detect a change in memory map?  
+> 
+> It tells you that you've got a change, but doesn't give
+> the start/end of the range that's changed, and those
+> are used by vhost_commit to limit the work of
+> vhost_verify_ring_mappings.
+Isn't memmap list a sorted and
+ dev->mem_changed_[start|end]_addr are the lowest|highest
+addresses of whole map?
 
-diff --git a/hw/s390x/s390-pci-inst.c b/hw/s390x/s390-pci-inst.c
-index bab7353..c702e8d 100644
---- a/hw/s390x/s390-pci-inst.c
-+++ b/hw/s390x/s390-pci-inst.c
-@@ -345,13 +345,22 @@ static int zpci_endian_swap(uint64_t *ptr, uint8_t len)
-     return 0;
- }
- 
-+static MemTxResult zpci_read_bar(S390PCIBusDevice *pbdev, uint8_t pcias,
-+                                 uint64_t offset, uint64_t *data, uint8_t len)
-+{
-+    MemoryRegion *mr;
-+
-+    mr = pbdev->pdev->io_regions[pcias].memory;
-+    return memory_region_dispatch_read(mr, offset, data, len,
-+                                       MEMTXATTRS_UNSPECIFIED);
-+}
-+
- int pcilg_service_call(S390CPU *cpu, uint8_t r1, uint8_t r2)
- {
-     CPUS390XState *env = &cpu->env;
-     S390PCIBusDevice *pbdev;
-     uint64_t offset;
-     uint64_t data;
--    MemoryRegion *mr;
-     MemTxResult result;
-     uint8_t len;
-     uint32_t fh;
-@@ -402,9 +411,7 @@ int pcilg_service_call(S390CPU *cpu, uint8_t r1, uint8_t r2)
-             program_interrupt(env, PGM_OPERAND, 4);
-             return 0;
-         }
--        mr = pbdev->pdev->io_regions[pcias].memory;
--        result = memory_region_dispatch_read(mr, offset, &data, len,
--                                             MEMTXATTRS_UNSPECIFIED);
-+        result = zpci_read_bar(pbdev, pcias, offset, &data, len);
-         if (result != MEMTX_OK) {
-             program_interrupt(env, PGM_OPERAND, 4);
-             return 0;
--- 
-2.7.4
+If it's, so wouldn't getting values directly from 
+the 1st/last entries of array be sufficient?
+
+
+
+> 
+> Dave
+> 
+> > >   
+> > > > Pls, see comments on individual patches.    
+> > > 
+> > > Thanks; I have fixed a couple of bugs since I posted, so I'm
+> > > more interested in structure/shape.  Any good ideas how to test
+> > > it are welcome.
+> > > 
+> > > Dave
+> > >   
+> > > >     
+> > > > > Dave
+> > > > > 
+> > > > > Dr. David Alan Gilbert (7):
+> > > > >   memory: address_space_iterate
+> > > > >   vhost: Move log_dirty check
+> > > > >   vhost: New memory update functions
+> > > > >   vhost: update_mem_cb implementation
+> > > > >   vhost: Compare new and old memory lists
+> > > > >   vhost: Copy updated region data into device state
+> > > > >   vhost: Remove vhost_set_memory and children
+> > > > > 
+> > > > >  hw/virtio/trace-events |   8 +
+> > > > >  hw/virtio/vhost.c      | 424 ++++++++++++++++++++++---------------------------
+> > > > >  include/exec/memory.h  |  23 +++
+> > > > >  memory.c               |  22 +++
+> > > > >  4 files changed, 241 insertions(+), 236 deletions(-)
+> > > > >     
+> > > >     
+> > > --
+> > > Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK  
+> >   
+> --
+> Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
