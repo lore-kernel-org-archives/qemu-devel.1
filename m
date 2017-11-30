@@ -1,22 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57181)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57222)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1eKoL8-0006eW-9z
-	for qemu-devel@nongnu.org; Fri, 01 Dec 2017 11:39:03 -0500
+	(envelope-from <eblake@redhat.com>) id 1eKoLA-0006gs-DZ
+	for qemu-devel@nongnu.org; Fri, 01 Dec 2017 11:39:05 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1eKoL6-0004vr-0b
-	for qemu-devel@nongnu.org; Fri, 01 Dec 2017 11:39:02 -0500
-Date: Thu, 30 Nov 2017 16:22:34 +0000
-From: Stefan Hajnoczi <stefanha@redhat.com>
-Message-ID: <20171130162234.GC17703@stefanha-x1.localdomain>
-References: <20171128121055.6954-1-den@openvz.org>
-	<20171128121055.6954-2-den@openvz.org>
+	(envelope-from <eblake@redhat.com>) id 1eKoL9-0004yE-HY
+	for qemu-devel@nongnu.org; Fri, 01 Dec 2017 11:39:04 -0500
+References: <20171012185916.22776-1-eblake@redhat.com>
+	<20171012185916.22776-4-eblake@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <02501491-0802-3888-46c3-3a56c7ebec82@redhat.com>
+Date: Thu, 30 Nov 2017 14:40:54 -0600
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="8X7/QrJGcKSMr1RN"
-Content-Disposition: inline
-In-Reply-To: <20171128121055.6954-2-den@openvz.org>
-Subject: Re: [Qemu-devel] [PATCH 1/2] hmp: block qemu-io command for device
- without media
+In-Reply-To: <20171012185916.22776-4-eblake@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v4 03/20] file-posix: Switch to
+ .bdrv_co_block_status()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,42 +25,49 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Denis V. Lunev" <den@openvz.org>
-Cc: qemu-devel@nongnu.org, qemu-stable@nongnu.org, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Kevin Wolf <kwolf@redhat.com>
+To: qemu-devel@nongnu.org
+Cc: kwolf@redhat.com, jsnow@redhat.com, famz@redhat.com, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>
 
-
---8X7/QrJGcKSMr1RN
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
-
-On Tue, Nov 28, 2017 at 03:10:54PM +0300, Denis V. Lunev wrote:
-> In this case blk->bs =3D=3D NULL and the code will just crash. Emulate er=
-ror
-> on that path.
->=20
-> Signed-off-by: Denis V. Lunev <den@openvz.org>
-> CC: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-> CC: Kevin Wolf <kwolf@redhat.com>
-> CC: Stefan Hajnoczi <stefanha@redhat.com>
+On 10/12/2017 01:58 PM, Eric Blake wrote:
+> We are gradually moving away from sector-based interfaces, towards
+> byte-based.  Update the file protocol driver accordingly.
+> 
+> In want_zero mode, we continue to report fine-grained hole
+> information (the caller wants as much mapping detail as possible);
+> but when not in that mode, the caller prefers larger *pnum and
+> merely cares about what offsets are allocated at this layer, rather
+> than where the holes live.  Since holes still read as zeroes at
+> this layer (rather than deferring to a backing layer), we can take
+> the shortcut of skipping lseek(), and merely state that all bytes
+> are allocated.
+> 
+> Signed-off-by: Eric Blake <eblake@redhat.com>
+> 
 > ---
->  hmp.c | 3 +++
->  1 file changed, 3 insertions(+)
 
-Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
+> @@ -2154,39 +2156,46 @@ static int64_t coroutine_fn raw_co_get_block_status(BlockDriverState *bs,
+>           return ret;
+>       }
+> 
+> -    start = sector_num * BDRV_SECTOR_SIZE;
+>       total_size = bdrv_getlength(bs);
+>       if (total_size < 0) {
+>           return total_size;
+> -    } else if (start >= total_size) {
+> +    } else if (offset >= total_size) {
+>           *pnum = 0;
+>           return 0;
+> -    } else if (start + nb_sectors * BDRV_SECTOR_SIZE > total_size) {
+> -        nb_sectors = DIV_ROUND_UP(total_size - start, BDRV_SECTOR_SIZE);
+> +    } else if (offset + bytes > total_size) {
+> +        bytes = total_size - offset;
+>       }
 
---8X7/QrJGcKSMr1RN
-Content-Type: application/pgp-signature; name="signature.asc"
+I just realized: this is dead code. The block layer already checked 
+bdrv_getlength() and clamped values.  So, v5 will trim this and similar 
+redundant driver code.
 
------BEGIN PGP SIGNATURE-----
-
-iQEcBAEBAgAGBQJaIDBKAAoJEJykq7OBq3PICHMH/R5aIQHa3FEX/jVNtrhwvj+O
-ChQK9J1GCVcvT76WJChZFM1H0ZAgRXGa7l6tCPwavdvIfVjFWsS5ln7UBaHqBT7g
-xTywu2j+gGG6Am4IPhTFADzDd0OkwiM1T0uaQnNPLhqzY/Z2hOdmvfKug+FSsWDo
-DymQQ2NI3aMI9+Uc5beMErKRA/fs6talXEzypPQ6rTUc+UzOoI1c7443nvVr9ATH
-dh4Oix8NLjgSdb64yiOMYnqLThkFgrYQuj9pMyR7KcekyY+eey2vyCx7PHNiDn0o
-p9LbnPD97gxz7Xafy7o6bIAY0Skh+Ta8ro42sgyRiQvhNPSmlUEbkm7YVdPpcb4=
-=zO4X
------END PGP SIGNATURE-----
-
---8X7/QrJGcKSMr1RN--
+-- 
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
