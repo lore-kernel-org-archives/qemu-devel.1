@@ -1,27 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53117)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54879)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <yi.l.liu@linux.intel.com>) id 1eKLoO-0005VN-01
-	for qemu-devel@nongnu.org; Thu, 30 Nov 2017 05:11:27 -0500
+	(envelope-from <dgibson@ozlabs.org>) id 1eKLsn-00075x-JK
+	for qemu-devel@nongnu.org; Thu, 30 Nov 2017 05:15:54 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <yi.l.liu@linux.intel.com>) id 1eKLoE-0005tQ-D8
-	for qemu-devel@nongnu.org; Thu, 30 Nov 2017 05:11:19 -0500
-Received: from mga05.intel.com ([192.55.52.43]:4877)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <yi.l.liu@linux.intel.com>)
-	id 1eKLoE-0005qx-4n
-	for qemu-devel@nongnu.org; Thu, 30 Nov 2017 05:11:10 -0500
-Date: Thu, 30 Nov 2017 17:54:35 +0800
-From: "Liu, Yi L" <yi.l.liu@linux.intel.com>
-Message-ID: <20171130095435.GC30936@sky-dev>
-References: <20171114231350.286025-1-prasad.singamsetty@oracle.com>
-	<20171114231350.286025-3-prasad.singamsetty@oracle.com>
-	<20171130052238.GB30936@sky-dev> <20171130091155.GH22901@xz-mi>
+	(envelope-from <dgibson@ozlabs.org>) id 1eKLsh-0002WA-GP
+	for qemu-devel@nongnu.org; Thu, 30 Nov 2017 05:15:53 -0500
+Date: Thu, 30 Nov 2017 16:55:42 +1100
+From: David Gibson <david@gibson.dropbear.id.au>
+Message-ID: <20171130055542.GG3023@umbus.fritz.box>
+References: <20171123132955.1261-1-clg@kaod.org>
+	<20171123132955.1261-18-clg@kaod.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature"; boundary="ijywFOGgtBfiIjQx"
 Content-Disposition: inline
-In-Reply-To: <20171130091155.GH22901@xz-mi>
-Subject: Re: [Qemu-devel] [PATCH v1 2/2] intel-iommu: Extend address width
- to 48 bits
+In-Reply-To: <20171123132955.1261-18-clg@kaod.org>
+Subject: Re: [Qemu-devel] [PATCH 17/25] spapr: add a sPAPRXive object to the
+ machine
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,69 +25,162 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Xu <peterx@redhat.com>
-Cc: ehabkost@redhat.com, mst@redhat.com, konrad.wilk@oracle.com, qemu-devel@nongnu.org, imammedo@redhat.com, pbonzini@redhat.com, prasad.singamsetty@oracle.com, rth@twiddle.net
+To: =?iso-8859-1?Q?C=E9dric?= Le Goater <clg@kaod.org>
+Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, Benjamin Herrenschmidt <benh@kernel.crashing.org>
 
-On Thu, Nov 30, 2017 at 05:11:55PM +0800, Peter Xu wrote:
-> On Thu, Nov 30, 2017 at 01:22:38PM +0800, Liu, Yi L wrote:
-> > On Tue, Nov 14, 2017 at 06:13:50PM -0500, prasad.singamsetty@oracle.com wrote:
-> > > From: Prasad Singamsetty <prasad.singamsetty@oracle.com>
-> > > 
-> > > The current implementation of Intel IOMMU code only supports 39 bits
-> > > iova address width. This patch provides a new parameter (x-aw-bits)
-> > > for intel-iommu to extend its address width to 48 bits but keeping the
-> > > default the same (39 bits). The reason for not changing the default
-> > > is to avoid potential compatibility problems with live migration of
-> > > intel-iommu enabled QEMU guest. The only valid values for 'x-aw-bits'
-> > > parameter are 39 and 48.
-> > > 
-> > > After enabling larger address width (48), we should be able to map
-> > > larger iova addresses in the guest. For example, a QEMU guest that
-> > > is configured with large memory ( >=1TB ). To check whether 48 bits
-> > 
-> > I didn't quite get your point here. Address width limits the iova range,
-> > but it doesn't limit the guest memory range. e.g. you can use 39 bit iova
-> > address to access a guest physical address larger than (2^39 - 1) as long
-> > as the guest 2nd level page table is well programmed. Only one exception,
-> > if you requires a continuous iova range(e.g. 2^39), it would be an issue.
-> > Not sure if this is the major motivation of your patch? However, I'm not
-> > against extend the address width to be 48 bits. Just need to make it clear
-> > here.
-> 
-> One thing I can think of is the identity mapping. Say, when iommu=pt
-> is set in guest, meanwhile when PT capability is not supported from
-> hardware (here I mean, the emulated hardware, of course), guest kernel
-> will create one identity mapping to emulate the PT mode.
 
-True.
- 
-> Current linux kernel's identity mapping should be a static 48 bits
-> mapping (it must cover the whole memory range of guest), so if we
+--ijywFOGgtBfiIjQx
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-I suppose guest memory range depends on the AW reported by CPUID? Not sure
-if it is constantly 48 bits.
+On Thu, Nov 23, 2017 at 02:29:47PM +0100, C=E9dric Le Goater wrote:
+> The XIVE object is designed to be always available, so it is created
+> unconditionally on newer machines.
 
-> provide a 39 bits vIOMMU to the guest, AFAIU we'll fail at device
-> attaching to that identity domain of every single device that is
-> protected by that 39 bits vIOMMU (kernel will find that domain gaw is
-> bigger than vIOMMU supported gaw of that device).
+There doesn't actually seem to be anything dependent on machine
+version here.
 
-Yeah, this is a good argue. As it is 1:1 mapping, the translated address
-is limited all the same.
+> Depending on the configuration and
+> the guest capabilities, the CAS negotiation process will decide which
+> interrupt model to use, legacy or XIVE.
+>=20
+> The XIVE model makes use of the full range of the IRQ number space
+> because the IRQ numbers for the CPU IPIs are allocated in the range
+> below XICS_IRQ_BASE, which is unused by XICS.
 
-> I do see no good fix for that, except boost the supported gaw to
-> bigger ones.
+Ok.  And I take it 4096 is enough space for the XIVE IPIs for the
+forseeable future?
 
-How about defaultly expose cap.PT bit? In that case, there will no 1:1
-mapping in guest side. Translation is skipped. So the IOMMU AW won't
-limit the addressing.
+>=20
+> Signed-off-by: C=E9dric Le Goater <clg@kaod.org>
+> ---
+>  hw/ppc/spapr.c         | 34 ++++++++++++++++++++++++++++++++++
+>  include/hw/ppc/spapr.h |  2 ++
+>  2 files changed, 36 insertions(+)
+>=20
+> diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
+> index 5d3325ca3c88..0e0107c8272c 100644
+> --- a/hw/ppc/spapr.c
+> +++ b/hw/ppc/spapr.c
+> @@ -56,6 +56,7 @@
+>  #include "hw/ppc/spapr_vio.h"
+>  #include "hw/pci-host/spapr.h"
+>  #include "hw/ppc/xics.h"
+> +#include "hw/ppc/spapr_xive.h"
+>  #include "hw/pci/msi.h"
+> =20
+>  #include "hw/pci/pci.h"
+> @@ -204,6 +205,29 @@ static void xics_system_init(MachineState *machine, =
+int nr_irqs, Error **errp)
+>      }
+>  }
+> =20
+> +static sPAPRXive *spapr_xive_create(sPAPRMachineState *spapr, int nr_irq=
+s,
+> +                                    Error **errp)
+> +{
+> +    Error *local_err =3D NULL;
+> +    Object *obj;
+> +
+> +    obj =3D object_new(TYPE_SPAPR_XIVE);
+> +    object_property_add_child(OBJECT(spapr), "xive", obj, &error_abort);
+> +    object_property_set_int(obj, nr_irqs, "nr-irqs",  &local_err);
+> +    if (local_err) {
+> +        goto error;
+> +    }
+> +    object_property_set_bool(obj, true, "realized", &local_err);
+> +    if (local_err) {
+> +        goto error;
+> +    }
+> +
+> +    return SPAPR_XIVE(obj);
+> +error:
+> +    error_propagate(errp, local_err);
+> +    return NULL;
+> +}
+> +
+>  static int spapr_fixup_cpu_smt_dt(void *fdt, int offset, PowerPCCPU *cpu,
+>                                    int smt_threads)
+>  {
+> @@ -2360,6 +2384,16 @@ static void ppc_spapr_init(MachineState *machine)
+>      /* Set up Interrupt Controller before we create the VCPUs */
+>      xics_system_init(machine, XICS_IRQS_SPAPR, &error_fatal);
+> =20
+> +    /* We don't have KVM support yet, so check for irqchip=3Don */
+> +    if (kvm_enabled() && machine_kernel_irqchip_required(machine)) {
+> +        error_report("kernel_irqchip requested. no XIVE support");
 
-Regards,
-Yi L
+I think you want an actual exit(1) here, no?  error_report() will
+print an error but keep going.
 
-> 
-> Thanks,
-> 
-> -- 
-> Peter Xu
-> 
+> +    } else {
+> +        /* XIVE uses the full range of IRQ numbers. The CPU IPIs will
+> +         * use the range below XICS_IRQ_BASE, which is unused by XICS. */
+> +        spapr->xive =3D spapr_xive_create(spapr, XICS_IRQ_BASE + XICS_IR=
+QS_SPAPR,
+> +                                        &error_fatal);
+
+XICS_IRQ_BASE =3D=3D 4096, and XICS_IRQS_SPAPR (which we should rename at
+some point) =3D=3D 1024.
+
+So we have a total irq space of 5k, which is a bit odd.  I'd be ok
+with rounding it out to 8k for newer machines if that's useful.
+Sparse allocations in there might make life easier for getting
+consistent irq numbers without an "allocator" per se (because we can
+use different regions for VIO, PCI intx, MSI, etc. etc.).
+
+> +    }
+> +
+>      /* Set up containers for ibm,client-architecture-support negotiated =
+options
+>       */
+>      spapr->ov5 =3D spapr_ovec_new();
+> diff --git a/include/hw/ppc/spapr.h b/include/hw/ppc/spapr.h
+> index 9a3885593c86..90e2b0f6c678 100644
+> --- a/include/hw/ppc/spapr.h
+> +++ b/include/hw/ppc/spapr.h
+> @@ -14,6 +14,7 @@ struct sPAPRNVRAM;
+>  typedef struct sPAPREventLogEntry sPAPREventLogEntry;
+>  typedef struct sPAPREventSource sPAPREventSource;
+>  typedef struct sPAPRPendingHPT sPAPRPendingHPT;
+> +typedef struct sPAPRXive sPAPRXive;
+> =20
+>  #define HPTE64_V_HPTE_DIRTY     0x0000000000000040ULL
+>  #define SPAPR_ENTRY_POINT       0x100
+> @@ -127,6 +128,7 @@ struct sPAPRMachineState {
+>      MemoryHotplugState hotplug_memory;
+> =20
+>      const char *icp_type;
+> +    sPAPRXive  *xive;
+>  };
+> =20
+>  #define H_SUCCESS         0
+
+--=20
+David Gibson			| I'll have my music baroque, and my code
+david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
+				| _way_ _around_!
+http://www.ozlabs.org/~dgibson
+
+--ijywFOGgtBfiIjQx
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlofnVsACgkQbDjKyiDZ
+s5IxoA//XmcOcrO3G5Mtu1uutobLu089WXq3CRONcbD9bAppX33VQVCjaye6+DuT
+Cc9p3uVRnWddv5JjN/hQkeHTDV7aiCxNsH19e3tCTWG+E2U5LPHFjUEiVdKLFWD7
+Z2hXojDnw3Ohwit7DCHmwSPVI9kuHufPF0EmQBdAfuKt8OdTSz6GdhlVxuOye+Qa
+0WhOZsBXxw3WbN8+5AVQxr/w2zbPMJY+gkOh3claMKj1Q6YEsd/+GWixp/NAJaOf
+XYHp/4pOofCZMrFf1wXyBYvzEko1Nb+I+ZvZNAWeIl18RUDeZQ/xViyy4Q/i6Map
+KmGIEgf+PkXiF0krR7Mt0i3GVNwnKlRy+z6nwtThng874knFK/rYYK0CEJlpk2OL
+2938HmUCBVxn6uX0Nd+tjqVvO/RJWqHLKgCvfeGinh7PZ6ZjobOSj3qylMrMMZfA
+pT5bjDYeN3oy/lSd6sIICLy7R7eAA9yEcryXgeMfTtYm0RGE+mnyCA2VDRXr9B4H
+iPNVCLkDgDonGWQ09XExFcQYepJIXVcq0SFIRoDZ5ZiwHypqYB+AXLDd5jkBMc2B
+hO8ZqOVXIOsJkK4H92c51+Vnp7gc+V/AUHL9GPMSUPNLeX7zBQ2PPwIHAE6dQ7PQ
+M7gnRu8esDYfwxQtmkMwEYvXk6432Y2NroDY/uuKjSTWrLYV8tY=
+=rNpD
+-----END PGP SIGNATURE-----
+
+--ijywFOGgtBfiIjQx--
