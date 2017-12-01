@@ -1,17 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60455)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33480)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1eKng5-00084C-H1
-	for qemu-devel@nongnu.org; Fri, 01 Dec 2017 10:57:16 -0500
+	(envelope-from <pbonzini@redhat.com>) id 1eKngR-0000Mh-Tt
+	for qemu-devel@nongnu.org; Fri, 01 Dec 2017 10:57:42 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1eKneb-00016a-Cy
-	for qemu-devel@nongnu.org; Fri, 01 Dec 2017 10:56:37 -0500
-From: Eric Blake <eblake@redhat.com>
-Date: Thu, 30 Nov 2017 19:42:32 -0600
-Message-Id: <20171201014242.16877-11-eblake@redhat.com>
-In-Reply-To: <20171201014242.16877-1-eblake@redhat.com>
-References: <20171201014242.16877-1-eblake@redhat.com>
-Subject: [Qemu-devel] [PATCH v5 10/20] qcow: Switch to
- .bdrv_co_block_status()
+	(envelope-from <pbonzini@redhat.com>) id 1eKnfi-0002Sj-OW
+	for qemu-devel@nongnu.org; Fri, 01 Dec 2017 10:56:58 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:41424)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1eKnfi-0002QT-FV
+	for qemu-devel@nongnu.org; Fri, 01 Dec 2017 10:56:14 -0500
+References: <20171201151538.6844-1-farman@linux.vnet.ibm.com>
+	<20171201151538.6844-2-farman@linux.vnet.ibm.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <77147a49-b8b3-d94d-80ab-5ab279fbc8b9@redhat.com>
+Date: Fri, 1 Dec 2017 16:16:56 +0100
+MIME-Version: 1.0
+In-Reply-To: <20171201151538.6844-2-farman@linux.vnet.ibm.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH 1/1] vhost-scsi: add missing virtqueue_size
+ parameter
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -20,86 +29,40 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: kwolf@redhat.com, jsnow@redhat.com, famz@redhat.com, qemu-block@nongnu.org, vsementsov@virtuozzo.com, Max Reitz <mreitz@redhat.com>
+To: Eric Farman <farman@linux.vnet.ibm.com>, "Richard W . M . Jones" <rjones@redhat.com>, "Michael S . Tsirkin" <mst@redhat.com>
+Cc: Dariusz Stojaczyk <dariuszx.stojaczyk@intel.com>, Felipe Franciosi <felipe@nutanix.com>, qemu-devel@nongnu.org
 
-We are gradually moving away from sector-based interfaces, towards
-byte-based.  Update the qcow driver accordingly.  There is no
-intent to optimize based on the want_zero flag for this format.
+On 01/12/2017 16:15, Eric Farman wrote:
+> Commit 5c0919d02066 ("virtio-scsi: Add virtqueue_size parameter allowing
+> virtqueue size to be set.") introduced a new parameter to virtio-scsi.
+> Later, commit 920036106044 ("vhost-user-scsi: add missing virtqueue_size
+> param") added that parameter to the new vhost-user-scsi interface but
+> neglected the existing vhost-scsi interface it was built on.
+> 
+> Apply the same change to vhost-scsi, so that we can boot a guest with
+> a device defined.  This also avoids crashing a guest when hotplugging
+> a vhost-scsi device.
+> 
+> Signed-off-by: Eric Farman <farman@linux.vnet.ibm.com>
+> ---
+>  hw/scsi/vhost-scsi.c | 2 ++
+>  1 file changed, 2 insertions(+)
+> 
+> diff --git a/hw/scsi/vhost-scsi.c b/hw/scsi/vhost-scsi.c
+> index cd4ab05233..9c1bea8ff3 100644
+> --- a/hw/scsi/vhost-scsi.c
+> +++ b/hw/scsi/vhost-scsi.c
+> @@ -233,6 +233,8 @@ static Property vhost_scsi_properties[] = {
+>      DEFINE_PROP_STRING("wwpn", VirtIOSCSICommon, conf.wwpn),
+>      DEFINE_PROP_UINT32("boot_tpgt", VirtIOSCSICommon, conf.boot_tpgt, 0),
+>      DEFINE_PROP_UINT32("num_queues", VirtIOSCSICommon, conf.num_queues, 1),
+> +    DEFINE_PROP_UINT32("virtqueue_size", VirtIOSCSICommon, conf.virtqueue_size,
+> +                       128),
+>      DEFINE_PROP_UINT32("max_sectors", VirtIOSCSICommon, conf.max_sectors,
+>                         0xFFFF),
+>      DEFINE_PROP_UINT32("cmd_per_lun", VirtIOSCSICommon, conf.cmd_per_lun, 128),
+> 
 
-Signed-off-by: Eric Blake <eblake@redhat.com>
-Reviewed-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Queued, thanks.
 
----
-v5: no change
-v4: rebase to interface tweak
-v3: rebase to master
-v2: rebase to mapping flag
----
- block/qcow.c | 27 ++++++++++++++++-----------
- 1 file changed, 16 insertions(+), 11 deletions(-)
-
-diff --git a/block/qcow.c b/block/qcow.c
-index 9569deeaf0..f09661dc0c 100644
---- a/block/qcow.c
-+++ b/block/qcow.c
-@@ -513,23 +513,28 @@ static int get_cluster_offset(BlockDriverState *bs,
-     return 1;
- }
-
--static int64_t coroutine_fn qcow_co_get_block_status(BlockDriverState *bs,
--        int64_t sector_num, int nb_sectors, int *pnum, BlockDriverState **file)
-+static int coroutine_fn qcow_co_block_status(BlockDriverState *bs,
-+                                             bool want_zero,
-+                                             int64_t offset, int64_t bytes,
-+                                             int64_t *pnum, int64_t *map,
-+                                             BlockDriverState **file)
- {
-     BDRVQcowState *s = bs->opaque;
--    int index_in_cluster, n, ret;
-+    int index_in_cluster, ret;
-+    int64_t n;
-     uint64_t cluster_offset;
-
-     qemu_co_mutex_lock(&s->lock);
--    ret = get_cluster_offset(bs, sector_num << 9, 0, 0, 0, 0, &cluster_offset);
-+    ret = get_cluster_offset(bs, offset, 0, 0, 0, 0, &cluster_offset);
-     qemu_co_mutex_unlock(&s->lock);
-     if (ret < 0) {
-         return ret;
-     }
--    index_in_cluster = sector_num & (s->cluster_sectors - 1);
--    n = s->cluster_sectors - index_in_cluster;
--    if (n > nb_sectors)
--        n = nb_sectors;
-+    index_in_cluster = offset & (s->cluster_size - 1);
-+    n = s->cluster_size - index_in_cluster;
-+    if (n > bytes) {
-+        n = bytes;
-+    }
-     *pnum = n;
-     if (!cluster_offset) {
-         return 0;
-@@ -537,9 +542,9 @@ static int64_t coroutine_fn qcow_co_get_block_status(BlockDriverState *bs,
-     if ((cluster_offset & QCOW_OFLAG_COMPRESSED) || s->crypto) {
-         return BDRV_BLOCK_DATA;
-     }
--    cluster_offset |= (index_in_cluster << BDRV_SECTOR_BITS);
-+    *map = cluster_offset | index_in_cluster;
-     *file = bs->file->bs;
--    return BDRV_BLOCK_DATA | BDRV_BLOCK_OFFSET_VALID | cluster_offset;
-+    return BDRV_BLOCK_DATA | BDRV_BLOCK_OFFSET_VALID;
- }
-
- static int decompress_buffer(uint8_t *out_buf, int out_buf_size,
-@@ -1111,7 +1116,7 @@ static BlockDriver bdrv_qcow = {
-
-     .bdrv_co_readv          = qcow_co_readv,
-     .bdrv_co_writev         = qcow_co_writev,
--    .bdrv_co_get_block_status   = qcow_co_get_block_status,
-+    .bdrv_co_block_status   = qcow_co_block_status,
-
-     .bdrv_make_empty        = qcow_make_empty,
-     .bdrv_co_pwritev_compressed = qcow_co_pwritev_compressed,
--- 
-2.14.3
+Paolo
