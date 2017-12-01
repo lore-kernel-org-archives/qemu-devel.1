@@ -1,35 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44210)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47988)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pasic@linux.vnet.ibm.com>) id 1eKpCV-00089N-GH
-	for qemu-devel@nongnu.org; Fri, 01 Dec 2017 12:34:12 -0500
+	(envelope-from <pbonzini@redhat.com>) id 1eKpIZ-00057p-El
+	for qemu-devel@nongnu.org; Fri, 01 Dec 2017 12:40:28 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pasic@linux.vnet.ibm.com>) id 1eKpCR-0001JT-Bo
-	for qemu-devel@nongnu.org; Fri, 01 Dec 2017 12:34:11 -0500
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:59988
-	helo=mx0a-001b2d01.pphosted.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pasic@linux.vnet.ibm.com>)
-	id 1eKpCR-0001JA-5g
-	for qemu-devel@nongnu.org; Fri, 01 Dec 2017 12:34:07 -0500
-Received: from pps.filterd (m0098414.ppops.net [127.0.0.1])
-	by mx0b-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
-	vB1ENgaE143406
-	for <qemu-devel@nongnu.org>; Fri, 1 Dec 2017 09:31:54 -0500
-Received: from e06smtp14.uk.ibm.com (e06smtp14.uk.ibm.com [195.75.94.110])
-	by mx0b-001b2d01.pphosted.com with ESMTP id 2ek8p88yay-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Fri, 01 Dec 2017 09:31:54 -0500
-Received: from localhost
-	by e06smtp14.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
-	Only! Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <pasic@linux.vnet.ibm.com>;
-	Fri, 1 Dec 2017 14:31:52 -0000
-From: Halil Pasic <pasic@linux.vnet.ibm.com>
-Date: Fri,  1 Dec 2017 15:31:35 +0100
-In-Reply-To: <20171201143136.62497-1-pasic@linux.vnet.ibm.com>
-References: <20171201143136.62497-1-pasic@linux.vnet.ibm.com>
-Message-Id: <20171201143136.62497-3-pasic@linux.vnet.ibm.com>
-Subject: [Qemu-devel] [PATCH 2/3] s390x/css: advertise unrestricted cssids
+	(envelope-from <pbonzini@redhat.com>) id 1eKpIV-0006WN-Ad
+	for qemu-devel@nongnu.org; Fri, 01 Dec 2017 12:40:27 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:56406)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1eKpIV-0006Ui-1y
+	for qemu-devel@nongnu.org; Fri, 01 Dec 2017 12:40:23 -0500
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+	[10.5.11.16])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 0B8557F755
+	for <qemu-devel@nongnu.org>; Fri,  1 Dec 2017 17:40:22 +0000 (UTC)
+From: Paolo Bonzini <pbonzini@redhat.com>
+Date: Fri,  1 Dec 2017 18:40:18 +0100
+Message-Id: <20171201174018.6517-1-pbonzini@redhat.com>
+Subject: [Qemu-devel] [PATCH] qemu-pr-helper: miscellaneous fixes
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -38,53 +27,120 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Boris Fiuczynski <fiuczy@linux.vnet.ibm.com>, Cornelia Huck <cohuck@redhat.com>
-Cc: Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>, Christian Borntraeger <borntraeger@de.ibm.com>, Shalini Chellathurai Saroja <shalini@linux.vnet.ibm.com>, qemu-devel@nongnu.org, qemu-s390x@nongnu.org, Halil Pasic <pasic@linux.vnet.ibm.com>
+To: qemu-devel@nongnu.org
+Cc: dgilbert@redhat.com
 
-Let us advertise the changes introduced by "s390x/css: unrestrict cssids"
-to the management software (so it can tell are cssids unrestricted or
-restricted).
+1) Return a generic sense if TEST UNIT READY does not provide one;
 
-Signed-off-by: Halil Pasic <pasic@linux.vnet.ibm.com>
+2) Fix two mistakes in copying from the spec.
+
+Reported-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
+ include/scsi/utils.h  |  6 +++++-
+ scsi/qemu-pr-helper.c | 30 ++++++++++++++++++++++++++----
+ scsi/utils.c          | 10 ++++++++++
+ 3 files changed, 41 insertions(+), 5 deletions(-)
 
-Boris says having the property on the virtual-css-bridge is good form
-Libvirt PoV. @Shalini: could you verify that things work out fine
-(provided we get at least a preliminary blessing from Connie).
-
-Consider squashing into "s390x/css: unrestrict cssids".
----
- hw/s390x/css-bridge.c | 11 +++++++++++
- 1 file changed, 11 insertions(+)
-
-diff --git a/hw/s390x/css-bridge.c b/hw/s390x/css-bridge.c
-index c4a9735d71..c7e8998680 100644
---- a/hw/s390x/css-bridge.c
-+++ b/hw/s390x/css-bridge.c
-@@ -123,6 +123,11 @@ static Property virtual_css_bridge_properties[] = {
-     DEFINE_PROP_END_OF_LIST(),
- };
- 
-+static bool prop_get_true(Object *obj, Error **errp)
-+{
-+    return true;
-+}
-+
- static void virtual_css_bridge_class_init(ObjectClass *klass, void *data)
- {
-     HotplugHandlerClass *hc = HOTPLUG_HANDLER_CLASS(klass);
-@@ -131,6 +136,12 @@ static void virtual_css_bridge_class_init(ObjectClass *klass, void *data)
-     hc->unplug = ccw_device_unplug;
-     set_bit(DEVICE_CATEGORY_BRIDGE, dc->categories);
-     dc->props = virtual_css_bridge_properties;
-+    object_class_property_add_bool(klass, "cssid-unrestricted",
-+                                   prop_get_true, NULL, NULL);
-+    object_class_property_set_description(klass, "cssid-unrestricted",
-+            "A css device can use any  cssid, regardless whether virtual"
-+            " or not (read only, always true)",
-+            NULL);
+diff --git a/include/scsi/utils.h b/include/scsi/utils.h
+index 00a4bdb080..eb07e474ee 100644
+--- a/include/scsi/utils.h
++++ b/include/scsi/utils.h
+@@ -76,7 +76,11 @@ extern const struct SCSISense sense_code_LUN_FAILURE;
+ extern const struct SCSISense sense_code_LUN_COMM_FAILURE;
+ /* Command aborted, Overlapped Commands Attempted */
+ extern const struct SCSISense sense_code_OVERLAPPED_COMMANDS;
+-/* LUN not ready, Capacity data has changed */
++/* Medium error, Unrecovered read error */
++extern const struct SCSISense sense_code_READ_ERROR;
++/* LUN not ready, Cause not reportable */
++extern const struct SCSISense sense_code_NOT_READY;
++/* Unit attention, Capacity data has changed */
+ extern const struct SCSISense sense_code_CAPACITY_CHANGED;
+ /* Unit attention, SCSI bus reset */
+ extern const struct SCSISense sense_code_SCSI_BUS_RESET;
+diff --git a/scsi/qemu-pr-helper.c b/scsi/qemu-pr-helper.c
+index dd9785143b..9fe615c73c 100644
+--- a/scsi/qemu-pr-helper.c
++++ b/scsi/qemu-pr-helper.c
+@@ -314,6 +314,22 @@ static int is_mpath(int fd)
+     return !strncmp(tgt->target_type, "multipath", DM_MAX_TYPE_NAME);
  }
  
- static const TypeInfo virtual_css_bridge_info = {
++static SCSISense mpath_generic_sense(int r)
++{
++    switch (r) {
++    case MPATH_PR_SENSE_NOT_READY:
++         return SENSE_CODE(NOT_READY);
++    case MPATH_PR_SENSE_MEDIUM_ERROR:
++         return SENSE_CODE(READ_ERROR);
++    case MPATH_PR_SENSE_HARDWARE_ERROR:
++         return SENSE_CODE(TARGET_FAILURE);
++    case MPATH_PR_SENSE_ABORTED_COMMAND:
++         return SENSE_CODE(IO_ERROR);
++    default:
++         abort();
++    }
++}
++
+ static int mpath_reconstruct_sense(int fd, int r, uint8_t *sense)
+ {
+     switch (r) {
+@@ -329,7 +345,13 @@ static int mpath_reconstruct_sense(int fd, int r, uint8_t *sense)
+              */
+             uint8_t cdb[6] = { TEST_UNIT_READY };
+             int sz = 0;
+-            return do_sgio(fd, cdb, sense, NULL, &sz, SG_DXFER_NONE);
++            int r = do_sgio(fd, cdb, sense, NULL, &sz, SG_DXFER_NONE);
++
++            if (r != GOOD) {
++                return r;
++            }
++            scsi_build_sense(sense, mpath_generic_sense(r));
++            return CHECK_CONDITION;
+         }
+ 
+     case MPATH_PR_SENSE_UNIT_ATTENTION:
+@@ -449,7 +471,7 @@ static int multipath_pr_out(int fd, const uint8_t *cdb, uint8_t *sense,
+     memset(&paramp, 0, sizeof(paramp));
+     memcpy(&paramp.key, &param[0], 8);
+     memcpy(&paramp.sa_key, &param[8], 8);
+-    paramp.sa_flags = param[10];
++    paramp.sa_flags = param[20];
+     if (sz > PR_OUT_FIXED_PARAM_SIZE) {
+         size_t transportid_len;
+         int i, j;
+@@ -478,8 +500,8 @@ static int multipath_pr_out(int fd, const uint8_t *cdb, uint8_t *sense,
+                 j += offsetof(struct transportid, n_port_name[8]);
+                 i += 24;
+                 break;
+-            case 3:
+-            case 0x43:
++            case 5:
++            case 0x45:
+                 /* iSCSI transport.  */
+                 len = lduw_be_p(&param[i + 2]);
+                 if (len > 252 || (len & 3) || i + len + 4 > transportid_len) {
+diff --git a/scsi/utils.c b/scsi/utils.c
+index 5684951b12..e4182a9b09 100644
+--- a/scsi/utils.c
++++ b/scsi/utils.c
+@@ -211,6 +211,16 @@ const struct SCSISense sense_code_LUN_COMM_FAILURE = {
+     .key = ABORTED_COMMAND, .asc = 0x08, .ascq = 0x00
+ };
+ 
++/* Medium Error, Unrecovered read error */
++const struct SCSISense sense_code_READ_ERROR = {
++    .key = MEDIUM_ERROR, .asc = 0x11, .ascq = 0x00
++};
++
++/* Not ready, Cause not reportable */
++const struct SCSISense sense_code_NOT_READY = {
++    .key = NOT_READY, .asc = 0x04, .ascq = 0x00
++};
++
+ /* Unit attention, Capacity data has changed */
+ const struct SCSISense sense_code_CAPACITY_CHANGED = {
+     .key = UNIT_ATTENTION, .asc = 0x2a, .ascq = 0x09
 -- 
-2.13.5
+2.14.3
