@@ -1,22 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55232)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55411)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1eKoJd-0005NX-4M
-	for qemu-devel@nongnu.org; Fri, 01 Dec 2017 11:37:34 -0500
+	(envelope-from <quintela@redhat.com>) id 1eKoJi-0005UQ-Gr
+	for qemu-devel@nongnu.org; Fri, 01 Dec 2017 11:37:44 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1eKoJY-0003fi-3m
-	for qemu-devel@nongnu.org; Fri, 01 Dec 2017 11:37:29 -0500
-Date: Thu, 30 Nov 2017 16:09:22 +0000
-From: Stefan Hajnoczi <stefanha@redhat.com>
-Message-ID: <20171130160922.GB17703@stefanha-x1.localdomain>
-References: <20171129144956.11409-1-famz@redhat.com>
-	<20171129144956.11409-4-famz@redhat.com>
-MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="kXdP64Ggrk/fb43R"
-Content-Disposition: inline
-In-Reply-To: <20171129144956.11409-4-famz@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH RFC 3/9] blockjob: Implement AioContext
- drain ops
+	(envelope-from <quintela@redhat.com>) id 1eKoJe-0003lj-4I
+	for qemu-devel@nongnu.org; Fri, 01 Dec 2017 11:37:34 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:54634)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1eKoJd-0003kw-TY
+	for qemu-devel@nongnu.org; Fri, 01 Dec 2017 11:37:30 -0500
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+	[10.5.11.16])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 9CB822CE92F
+	for <qemu-devel@nongnu.org>; Fri,  1 Dec 2017 12:58:20 +0000 (UTC)
+From: Juan Quintela <quintela@redhat.com>
+Date: Fri,  1 Dec 2017 13:58:08 +0100
+Message-Id: <20171201125813.1437-2-quintela@redhat.com>
+In-Reply-To: <20171201125813.1437-1-quintela@redhat.com>
+References: <20171201125813.1437-1-quintela@redhat.com>
+Subject: [Qemu-devel] [PATCH v3 1/6] migration: free result string
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,52 +29,34 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Fam Zheng <famz@redhat.com>
-Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, jcody@redhat.com, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, pbonzini@redhat.com
+To: qemu-devel@nongnu.org
+Cc: dgilbert@redhat.com, lvivier@redhat.com, peterx@redhat.com
 
+Signed-off-by: Juan Quintela <quintela@redhat.com>
+Reported-by: Peter Xu <peterx@redhat.com>
+---
+ tests/migration-test.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
---kXdP64Ggrk/fb43R
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
-
-On Wed, Nov 29, 2017 at 10:49:50PM +0800, Fam Zheng wrote:
-> Signed-off-by: Fam Zheng <famz@redhat.com>
-> ---
->  blockjob.c | 47 ++++++++++++++++++++++++++++++-----------------
->  1 file changed, 30 insertions(+), 17 deletions(-)
->=20
-> diff --git a/blockjob.c b/blockjob.c
-> index ff9a614531..86d060c89c 100644
-> --- a/blockjob.c
-> +++ b/blockjob.c
-> @@ -148,6 +148,23 @@ static void block_job_attached_aio_context(AioContex=
-t *new_context,
->                                             void *opaque);
->  static void block_job_detach_aio_context(void *opaque);
-> =20
-> +static void block_job_drained_begin(void *opaque)
-> +{
-> +    BlockJob *job =3D opaque;
-> +    block_job_pause(job);
-> +}
-
-This is buggy because block_job_pause() increments a counter.  Remember
-the .drained_begin() semantics are that it can be called any number of
-times (see comment in previous patch)!
-
---kXdP64Ggrk/fb43R
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEcBAEBAgAGBQJaIC0yAAoJEJykq7OBq3PI+xUH/RnHEhHjuOgcmXbM1yW0g7/s
-QpnUixzQWIwrddQ43DlFPpEw/rgm8XJ8eJSC91q0QnnOzn7Oq/vR+ZuvgH3AGnge
-azlBL744jNqMNz6+gKB04VgvcT69rnoV1cPf95SBJV1LwLdZa//sfkG3DpXRjfp5
-IVGOMNOdabdXJ0JIApvLa9ysfhGiIGeGYyn+nmV8U2NBhAmD+kFIVklRaJci26hC
-CIuxBi1CjWILHJIIpuAgxEjHIVjxx3HAA7rsKMDawpkTp621sR4Bk405q9UIyWUx
-SY5OoZzxSEPyzA1eEYPIK4wWwhxOMqRnTGLGV83fyi5z/J5McBm2UKc8MjzADdc=
-=uUEJ
------END PGP SIGNATURE-----
-
---kXdP64Ggrk/fb43R--
+diff --git a/tests/migration-test.c b/tests/migration-test.c
+index be598d3257..799e24ebc6 100644
+--- a/tests/migration-test.c
++++ b/tests/migration-test.c
+@@ -358,13 +358,14 @@ static void migrate_check_parameter(QTestState *who, const char *parameter,
+                                     const char *value)
+ {
+     QDict *rsp, *rsp_return;
+-    const char *result;
++    char *result;
+ 
+     rsp = wait_command(who, "{ 'execute': 'query-migrate-parameters' }");
+     rsp_return = qdict_get_qdict(rsp, "return");
+     result = g_strdup_printf("%" PRId64,
+                              qdict_get_try_int(rsp_return,  parameter, -1));
+     g_assert_cmpstr(result, ==, value);
++    g_free(result);
+     QDECREF(rsp);
+ }
+ 
+-- 
+2.14.3
