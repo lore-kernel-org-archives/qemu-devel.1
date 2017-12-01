@@ -1,25 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54387)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54489)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1eKoIt-0004im-Pw
-	for qemu-devel@nongnu.org; Fri, 01 Dec 2017 11:36:51 -0500
+	(envelope-from <clg@kaod.org>) id 1eKoJ2-0004o3-6y
+	for qemu-devel@nongnu.org; Fri, 01 Dec 2017 11:36:53 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1eKoIr-0002wB-Vr
-	for qemu-devel@nongnu.org; Fri, 01 Dec 2017 11:36:43 -0500
-Date: Fri, 1 Dec 2017 14:08:33 +0000
-From: Stefan Hajnoczi <stefanha@redhat.com>
-Message-ID: <20171201140833.GB12803@stefanha-x1.localdomain>
-References: <20171129035502.GD8889@lemon>
-	<20171129120018.GB2601@stefanha-x1.localdomain>
-	<20171130094709.GA20286@lemon>
-	<20171130141954.GC14748@stefanha-x1.localdomain>
-	<20171201101644.GB11092@lemon>
+	(envelope-from <clg@kaod.org>) id 1eKoIx-000308-5a
+	for qemu-devel@nongnu.org; Fri, 01 Dec 2017 11:36:52 -0500
+Received: from 19.mo3.mail-out.ovh.net ([178.32.98.231]:45905)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1eKoIw-0002zN-TJ
+	for qemu-devel@nongnu.org; Fri, 01 Dec 2017 11:36:47 -0500
+Received: from player771.ha.ovh.net (b9.ovh.net [213.186.33.59])
+	by mo3.mail-out.ovh.net (Postfix) with ESMTP id 7AC25177C41
+	for <qemu-devel@nongnu.org>; Fri,  1 Dec 2017 17:36:45 +0100 (CET)
+References: <20171123132955.1261-14-clg@kaod.org>
+	<20171130043836.GB3023@umbus.fritz.box>
+	<52c97368-d50e-0b51-ec5d-7769d1df42d1@kaod.org>
+	<20171130233537.GA30161@umbus.fritz.box>
+From: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
+Message-ID: <c96bf1bf-b036-f5af-dfd5-c9d766e32eda@kaod.org>
+Date: Fri, 1 Dec 2017 17:36:39 +0100
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="OwLcNYc0lM97+oe1"
-Content-Disposition: inline
-In-Reply-To: <20171201101644.GB11092@lemon>
-Subject: Re: [Qemu-devel] Block layer complexity: what to do to keep it
- under control?
+In-Reply-To: <20171130233537.GA30161@umbus.fritz.box>
+Content-Type: text/plain; charset=windows-1252
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH 13/25] spapr: introduce the XIVE Event
+ Queues
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,179 +34,282 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Fam Zheng <famz@redhat.com>
-Cc: kwolf@redhat.com, qemu-block@nongnu.org, jcody@redhat.com, qemu-devel@nongnu.org, mreitz@redhat.com, pbonzini@redhat.com
+To: David Gibson <david@gibson.dropbear.id.au>
+Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, Benjamin Herrenschmidt <benh@kernel.crashing.org>
 
-
---OwLcNYc0lM97+oe1
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
-
-On Fri, Dec 01, 2017 at 06:16:44PM +0800, Fam Zheng wrote:
-> On Thu, 11/30 14:19, Stefan Hajnoczi wrote:
-> > On Thu, Nov 30, 2017 at 05:47:09PM +0800, Fam Zheng wrote:
-> > > On Wed, 11/29 12:00, Stefan Hajnoczi wrote:
-> > > > On Wed, Nov 29, 2017 at 11:55:02AM +0800, Fam Zheng wrote:
-> > > >=20
-> > > > Event loops and coroutines are good but they should not be used dir=
-ectly
-> > > > by block drivers and block jobs.  We need safe, high-level APIs that
-> > > > implement commonly-used operations.
-> > > >=20
-> > > > > - Documentation
-> > > > >=20
-> > > > >   There is no central developer doc about block layer, especially=
- how all pieces
-> > > > >   fit together. Having one will make it a lot easier for new cont=
-ributors to
-> > > > >   understand better. Of course, we're facing the old problem: the=
- code is
-> > > > >   moving, maintaining an updated document needs effort.
-> > > > >=20
-> > > > >   Idea: add ./doc/deve/block.txt?
-> > > >=20
-> > > > IOThreads and AioContexts are addressed here:
-> > > > docs/devel/multiple-iothreads.txt
-> > > >=20
-> > > > The game has become significantly more complex than what the docume=
-nt
-> > > > describes.  It's lacking aio_co_wake() and aio_co_schedule() for
-> > > > example.
-> > > >=20
-> > > > > - Simplified code, or more orthogonal/modularized architecture.
-> > > > >=20
-> > > > >   Each aspect of block layer is complex enough so isolating them =
-as much as
-> > > > >   possible is a reasonable approach to control the complexity. Bl=
-ock jobs and
-> > > > >   throttling becoming block filters is a good example, we should =
-identify more.
-> > > > >=20
-> > > > >   Idea: rethink event loops. Create coroutines ubiquitously (for =
-example for
-> > > > >   each fd handler, BH and timer), so that many nested aio_poll() =
-can be removed.
-> > > > >=20
-> > > > >   Crazy idea: move the whole block layer to a vhost process, and =
-implement
-> > > > >   existing features differently, especially in terms of multi-thr=
-eading (hint:
-> > > > >   rust?).
-> > > >=20
-> > > > A reimplementation will not solve the problem because:
-> > > >=20
-> > > > 1. If it still has the same feature set and requirements then the l=
-evel
-> > > >    of complexity will be comparable.
-> > > >=20
-> > > > 2. We can reduce accidental (inessential) complexity by continuing =
-the
-> > > >    various efforts around the block graph, block jobs, multi-queue =
-block
-> > > >    layer with an eye towards higher level APIs.
-> > >=20
-> > > Starting over is certainly not the motivation to do qemu-vhost, but i=
-t would be
-> > > an opportunity to use different async/concurrency paradigms if that i=
-s going to
-> > > happen. I think in current block layer, event loop + coroutine is a g=
-ood
-> > > combination, but having nested aio_poll()'s made it worse, then mixin=
-g IOThreads
-> > > in makes it a lot more complicated.
-> >=20
-> > Why alternative model are you thinking of?
+On 12/01/2017 12:35 AM, David Gibson wrote:
+> On Thu, Nov 30, 2017 at 02:06:27PM +0000, C=E9dric Le Goater wrote:
+>> On 11/30/2017 04:38 AM, David Gibson wrote:
+>>> On Thu, Nov 23, 2017 at 02:29:43PM +0100, C=E9dric Le Goater wrote:
+>>>> The Event Queue Descriptor (EQD) table, also known as Event Notifica=
+tion
+>>>> Descriptor (END), is one of the internal tables the XIVE interrupt
+>>>> controller uses to redirect exception from event sources to CPU
+>>>> threads.
+>>>>
+>>>> The EQD specifies on which Event Queue the event data should be post=
+ed
+>>>> when an exception occurs (later on pulled by the OS) and which serve=
+r
+>>>> (VPD in XIVE terminology) to notify. The Event Queue is a much more
+>>>> complex structure but we start with a simple model for the sPAPR
+>>>> machine.
+>>>
+>>> Just to clarify my understanding a server / VPD in XIVE would
+>>> typically correspond to a cpu - either real or virtual, yes?
+>>
+>> yes. VP for "virtual processor" and VPD for "virtual processor=20
+>> descriptor" which contains the XIVE interrupt state of the VP=20
+>> when not dispatched. It is still described in some documentation=20
+>> as an NVT : Notification Virtual Target. =20
+>>
+>> XIVE concepts were renamed at some time but the old name perdured.
+>> I am still struggling my way through all the names.
+>>
+>>
+>>>> There is one XiveEQ per priority and the model chooses to store them
+>>>> under the Xive Interrupt presenter model. It will be retrieved, just
+>>>> like for XICS, through the 'intc' object pointer of the CPU.
+>>>>
+>>>> The EQ indexing follows a simple pattern:
+>>>>
+>>>>        (server << 3) | (priority & 0x7)
+>>>>
+>>>> Signed-off-by: C=E9dric Le Goater <clg@kaod.org>
+>>>> ---
+>>>>  hw/intc/spapr_xive.c    | 56 ++++++++++++++++++++++++++++++++++++++=
++++++++++++
+>>>>  hw/intc/xive-internal.h | 50 ++++++++++++++++++++++++++++++++++++++=
++++++
+>>>>  2 files changed, 106 insertions(+)
+>>>>
+>>>> diff --git a/hw/intc/spapr_xive.c b/hw/intc/spapr_xive.c
+>>>> index 554b25e0884c..983317a6b3f6 100644
+>>>> --- a/hw/intc/spapr_xive.c
+>>>> +++ b/hw/intc/spapr_xive.c
+>>>> @@ -23,6 +23,7 @@
+>>>>  #include "sysemu/dma.h"
+>>>>  #include "monitor/monitor.h"
+>>>>  #include "hw/ppc/spapr_xive.h"
+>>>> +#include "hw/ppc/spapr.h"
+>>>>  #include "hw/ppc/xics.h"
+>>>> =20
+>>>>  #include "xive-internal.h"
+>>>> @@ -34,6 +35,8 @@ struct sPAPRXiveICP {
+>>>>      uint8_t   tima[TM_RING_COUNT * 0x10];
+>>>>      uint8_t   *tima_os;
+>>>>      qemu_irq  output;
+>>>> +
+>>>> +    XiveEQ    eqt[XIVE_PRIORITY_MAX + 1];
+>>>>  };
+>>>> =20
+>>>>  static uint64_t spapr_xive_icp_accept(sPAPRXiveICP *icp)
+>>>> @@ -183,6 +186,13 @@ static const MemoryRegionOps spapr_xive_tm_ops =
+=3D {
+>>>>      },
+>>>>  };
+>>>> =20
+>>>> +static sPAPRXiveICP *spapr_xive_icp_get(sPAPRXive *xive, int server=
+)
+>>>> +{
+>>>> +    PowerPCCPU *cpu =3D spapr_find_cpu(server);
+>>>> +
+>>>> +    return cpu ? SPAPR_XIVE_ICP(cpu->intc) : NULL;
+>>>> +}
+>>>> +
+>>>>  static void spapr_xive_irq(sPAPRXive *xive, int lisn)
+>>>>  {
+>>>> =20
+>>>> @@ -632,6 +642,8 @@ static void spapr_xive_icp_reset(void *dev)
+>>>>      sPAPRXiveICP *xicp =3D SPAPR_XIVE_ICP(dev);
+>>>> =20
+>>>>      memset(xicp->tima, 0, sizeof(xicp->tima));
+>>>> +
+>>>> +    memset(xicp->eqt, 0, sizeof(xicp->eqt));
+>>>>  }
+>>>> =20
+>>>>  static void spapr_xive_icp_realize(DeviceState *dev, Error **errp)
+>>>> @@ -683,6 +695,23 @@ static void spapr_xive_icp_init(Object *obj)
+>>>>      xicp->tima_os =3D &xicp->tima[TM_QW1_OS];
+>>>>  }
+>>>> =20
+>>>> +static const VMStateDescription vmstate_spapr_xive_icp_eq =3D {
+>>>> +    .name =3D TYPE_SPAPR_XIVE_ICP "/eq",
+>>>> +    .version_id =3D 1,
+>>>> +    .minimum_version_id =3D 1,
+>>>> +    .fields =3D (VMStateField []) {
+>>>> +        VMSTATE_UINT32(w0, XiveEQ),
+>>>> +        VMSTATE_UINT32(w1, XiveEQ),
+>>>> +        VMSTATE_UINT32(w2, XiveEQ),
+>>>> +        VMSTATE_UINT32(w3, XiveEQ),
+>>>> +        VMSTATE_UINT32(w4, XiveEQ),
+>>>> +        VMSTATE_UINT32(w5, XiveEQ),
+>>>> +        VMSTATE_UINT32(w6, XiveEQ),
+>>>> +        VMSTATE_UINT32(w7, XiveEQ),
+>>>
+>>> Wow.  Super descriptive field names there, but I guess that's not you=
+r fault.
+>>
+>> The defines in the "xive-internal.h" give a better view ...=20
+>>
+>>>> +        VMSTATE_END_OF_LIST()
+>>>> +    },
+>>>> +};
+>>>> +
+>>>>  static bool vmstate_spapr_xive_icp_needed(void *opaque)
+>>>>  {
+>>>>      /* TODO check machine XIVE support */
+>>>> @@ -696,6 +725,8 @@ static const VMStateDescription vmstate_spapr_xi=
+ve_icp =3D {
+>>>>      .needed =3D vmstate_spapr_xive_icp_needed,
+>>>>      .fields =3D (VMStateField[]) {
+>>>>          VMSTATE_BUFFER(tima, sPAPRXiveICP),
+>>>> +        VMSTATE_STRUCT_ARRAY(eqt, sPAPRXiveICP, (XIVE_PRIORITY_MAX =
++ 1), 1,
+>>>> +                             vmstate_spapr_xive_icp_eq, XiveEQ),
+>>>>          VMSTATE_END_OF_LIST()
+>>>>      },
+>>>>  };
+>>>> @@ -755,3 +786,28 @@ bool spapr_xive_irq_unset(sPAPRXive *xive, uint=
+32_t lisn)
+>>>>      ive->w &=3D ~IVE_VALID;
+>>>>      return true;
+>>>>  }
+>>>> +
+>>>> +/*
+>>>> + * Use a simple indexing for the EQs.
+>>>
+>>> Is this server+priority encoding architected anywhere? =20
+>>
+>> no. This is a model shortcut.
+>>
+>>> Otherwise, why not use separate parameters?
+>>
+>> yes. spapr_xive_get_eq() could use separate parameters and it would
+>> shorten the some of the hcalls.
+>>
+>> The result is stored in a single field of the IVE, EQ_INDEX. So I will=
+=20
+>> still need mangle/demangle routines but these could be simple macros.
+>> I will look at it.
 >=20
-> To utilize whatever is offered in the different language. In particular I=
-'ve
-> heard good things about rust (without programming it myself) that doing
-> concurrency correctly is easier with it. We'll probably lose all the good=
- bits
-> about coroutine (unlike what is special in Go), but I expects using simpl=
-er
-> concurrency models (IOW threads only) can lead to simpler code. (I have no
-> problem with coroutine excpet the debuggability problem I pointed out, wh=
-ich
-> hopefully can be solved by writing more gdb extensions.)
-
-[A long rant here but I hope it contains useful points.]
-
-Rust's threading model is 1:1.  Besides mutexes it also has channels
-(looks similar to Go and communicating sequential processes-style
-channels).
-
-It is probably not feasible to make each I/O request a thread (i.e. 1M
-IOPS means creating/destroying 1M threads/sec).  There would have to be
-some machinery like a request queue and a thread pool to process
-requests.  That way requests can be held before those that are ready to
-be executed can run as threads.  Hmm...this sounds similar to what we
-have.
-
-The important thing is this:
-
-Coroutines with a single event loop (current model in QEMU) are simpler
-than threads.  Why?  Because coroutine code is atomic with respect to
-other coroutines in the same event loop.  Only yield points or nested
-event loops allow other coroutines to execute.  That means less explicit
-synchronization is necessary.
-
-When the block layer goes multiqueue this advantage will be lost and
-coroutine code will have to synchronize explicitly just like threaded
-code.  Coroutines will remain lighter weight than threads and will allow
-M:N threading to be configured via IOThreads.
-
-I'm not hopeful that dropping coroutines helps and I don't see that Rust
-brings anything new to the table here.  I do like other aspects of Rust
-and am open to using it for new code.
-
-What I'm getting at is that the essential complexity of a parallel I/O
-engine with a runtime reconfigurable graph, background operations, and
-non-trivial disk image file formats sets a certain floor (minimum)
-complexity.  The consequence is that our code needs to handle
-concurrency and this is where we fall down today.
-
-Switching programming language will not reduce complexity below this
-floor.  We'd have to abandon features in order to reduce complexity.
-"Let's start from scratch" attempts often hope to do this but ultimately
-users don't want to lose features.
-
-We need to think through the corner cases we've been hitting and in the
-process of fixing them we should consider if simplified interfaces/APIs
-with less concurrency would allow us to write better code at the expense
-of less control and performance in cases where we don't need it.
-
-That means insulate block jobs and drivers as much as possible.  Don't
-make them use low-level primitives.  Make them use high-level APIs where
-the concurrency is baked in and as safe as we can make it without giving
-up performance.
-
-> Another thing about rust is it can call into C code so maybe the change c=
-an be
-> done incrementally like suggested by Dan in his libvirt discussion about =
-using
-> Go:
+> Hm, ok.  So it's architected in the sense that you're using the
+> encoding from the EQ_INDEX field throughout.  That's could be a
+> reasonable choice, I can't really tell yet.
 >=20
-> https://www.redhat.com/archives/libvir-list/2017-November/msg00528.html
+> On the other hand, it might be easier to read if we use server and
+> priority as separate parameters until the point we actually encode
+> into the EQ_INDEX field.
 
-Max's qcow2 in Rust driver didn't make me very optimistic about mixed C
-and Rust.  Putting a Rust layer on top of C looks sane.  I don't think
-you can mix C and Rust side-by-side without a lot of duplication and
-boilerplate, but my knowledge is limited to looking at Max's qcow2
-driver.
+In the architecture, the EQ_INDEX field contains an index to an=20
+Event Queue Descriptor and the Event Queue Descriptor has a=20
+EQ_W6_NVT_INDEX field pointing to an Notification Virtual Target.
+So there are two extra tables for the EQs and for the NVTs
+used by the HW.
 
---OwLcNYc0lM97+oe1
-Content-Type: application/pgp-signature; name="signature.asc"
+In the sPAPR model, an EQ array is stored under the sPAPRXiveNVT=20
+object which is stored under the ->intc pointer of the CPUState=20
+object
 
------BEGIN PGP SIGNATURE-----
+So the EQ_INDEX field is really taking a shortcut, encoding=20
+the cpu number and the priority to find an EQ, and the=20
+EQ_W6_NVT_INDEX field holds a value which is the cpu number.
+But at the end, we save two tables.=20
 
-iQEcBAEBAgAGBQJaIWJhAAoJEJykq7OBq3PI7wsH/i5KnzIViRC5rn6O84rfc2+x
-PZF1CBTqCCbiCrGf7prjFOnLhVzhhaCKMiA7ZpM1+Akq0GqMh8Nv+AFEGYyEIx/h
-azAZXPU38eLo3KEUk1wqgFDXHXwY6qmI58a7hy3R3ohhxQJVL8zOr44ZxOWRzFNI
-48642jh8KVe3SWsFTjqgzZ62YSCcmK0Uz1s7g1aJBPy4hyG6aki45zVkBMiW85SB
-gYEMMibxJ9efQ2ejhWhcayKaIxMfOsLYzZPESgqVXnpCjj14UFRznYACP9T94l2a
-RbHizA2jzbPTpvi0vdJa7dFOySCfPK2dcLduxu8rcJHbMCC46UsTzKdzU3ozdC8=
-=c+sF
------END PGP SIGNATURE-----
+C.
 
---OwLcNYc0lM97+oe1--
+
+>=20
+>>
+>>>> + */
+>>>> +XiveEQ *spapr_xive_get_eq(sPAPRXive *xive, uint32_t eq_idx)
+>>>> +{
+>>>> +    int priority =3D eq_idx & 0x7;
+>>>> +    sPAPRXiveICP *xicp =3D spapr_xive_icp_get(xive, eq_idx >> 3);
+>>>> +
+>>>> +    return xicp ? &xicp->eqt[priority] : NULL;
+>>>> +}
+>>>> +
+>>>> +bool spapr_xive_eq_for_server(sPAPRXive *xive, uint32_t server,
+>>>> +                              uint8_t priority, uint32_t *out_eq_id=
+x)
+>>>> +{
+>>>> +    if (priority > XIVE_PRIORITY_MAX) {
+>>>> +        return false;
+>>>> +    }
+>>>> +
+>>>> +    if (out_eq_idx) {
+>>>> +        *out_eq_idx =3D (server << 3) | (priority & 0x7);
+>>>> +    }
+>>>> +
+>>>> +    return true;
+>>>> +}
+>>>> diff --git a/hw/intc/xive-internal.h b/hw/intc/xive-internal.h
+>>>> index 7d329f203a9b..c3949671aa03 100644
+>>>> --- a/hw/intc/xive-internal.h
+>>>> +++ b/hw/intc/xive-internal.h
+>>>> @@ -131,9 +131,59 @@ typedef struct XiveIVE {
+>>>>  #define IVE_EQ_DATA     PPC_BITMASK(33, 63)      /* Data written to=
+ the EQ */
+>>>>  } XiveIVE;
+>>>> =20
+>>>> +/* EQ */
+>>>> +typedef struct XiveEQ {
+>>>> +        uint32_t        w0;
+>>>> +#define EQ_W0_VALID             PPC_BIT32(0)
+>>>> +#define EQ_W0_ENQUEUE           PPC_BIT32(1)
+>>>> +#define EQ_W0_UCOND_NOTIFY      PPC_BIT32(2)
+>>>> +#define EQ_W0_BACKLOG           PPC_BIT32(3)
+>>>> +#define EQ_W0_PRECL_ESC_CTL     PPC_BIT32(4)
+>>>> +#define EQ_W0_ESCALATE_CTL      PPC_BIT32(5)
+>>>> +#define EQ_W0_END_OF_INTR       PPC_BIT32(6)
+>>>> +#define EQ_W0_QSIZE             PPC_BITMASK32(12, 15)
+>>>> +#define EQ_W0_SW0               PPC_BIT32(16)
+>>>> +#define EQ_W0_FIRMWARE          EQ_W0_SW0 /* Owned by FW */
+>>>> +#define EQ_QSIZE_4K             0
+>>>> +#define EQ_QSIZE_64K            4
+>>>> +#define EQ_W0_HWDEP             PPC_BITMASK32(24, 31)
+>>>> +        uint32_t        w1;
+>>>> +#define EQ_W1_ESn               PPC_BITMASK32(0, 1)
+>>>> +#define EQ_W1_ESn_P             PPC_BIT32(0)
+>>>> +#define EQ_W1_ESn_Q             PPC_BIT32(1)
+>>>> +#define EQ_W1_ESe               PPC_BITMASK32(2, 3)
+>>>> +#define EQ_W1_ESe_P             PPC_BIT32(2)
+>>>> +#define EQ_W1_ESe_Q             PPC_BIT32(3)
+>>>> +#define EQ_W1_GENERATION        PPC_BIT32(9)
+>>>> +#define EQ_W1_PAGE_OFF          PPC_BITMASK32(10, 31)
+>>>> +        uint32_t        w2;
+>>>> +#define EQ_W2_MIGRATION_REG     PPC_BITMASK32(0, 3)
+>>>> +#define EQ_W2_OP_DESC_HI        PPC_BITMASK32(4, 31)
+>>>> +        uint32_t        w3;
+>>>> +#define EQ_W3_OP_DESC_LO        PPC_BITMASK32(0, 31)
+>>>> +        uint32_t        w4;
+>>>> +#define EQ_W4_ESC_EQ_BLOCK      PPC_BITMASK32(4, 7)
+>>>> +#define EQ_W4_ESC_EQ_INDEX      PPC_BITMASK32(8, 31)
+>>>> +        uint32_t        w5;
+>>>> +#define EQ_W5_ESC_EQ_DATA       PPC_BITMASK32(1, 31)
+>>>> +        uint32_t        w6;
+>>>> +#define EQ_W6_FORMAT_BIT        PPC_BIT32(8)
+>>>> +#define EQ_W6_NVT_BLOCK         PPC_BITMASK32(9, 12)
+>>>> +#define EQ_W6_NVT_INDEX         PPC_BITMASK32(13, 31)
+>>>> +        uint32_t        w7;
+>>>> +#define EQ_W7_F0_IGNORE         PPC_BIT32(0)
+>>>> +#define EQ_W7_F0_BLK_GROUPING   PPC_BIT32(1)
+>>>> +#define EQ_W7_F0_PRIORITY       PPC_BITMASK32(8, 15)
+>>>> +#define EQ_W7_F1_WAKEZ          PPC_BIT32(0)
+>>>> +#define EQ_W7_F1_LOG_SERVER_ID  PPC_BITMASK32(1, 31)
+>>>> +} XiveEQ;
+>>>> +
+>>>>  #define XIVE_PRIORITY_MAX  7
+>>>> =20
+>>>>  void spapr_xive_reset(void *dev);
+>>>>  XiveIVE *spapr_xive_get_ive(sPAPRXive *xive, uint32_t lisn);
+>>>> +XiveEQ *spapr_xive_get_eq(sPAPRXive *xive, uint32_t idx);
+>>>> +bool spapr_xive_eq_for_server(sPAPRXive *xive, uint32_t server, uin=
+t8_t prio,
+>>>> +                              uint32_t *out_eq_idx);
+>>>> =20
+>>>>  #endif /* _INTC_XIVE_INTERNAL_H */
+>>>
+>>
+>=20
