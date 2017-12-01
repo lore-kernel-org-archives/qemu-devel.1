@@ -1,20 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34302)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35892)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1eKnQ3-0002VB-NM
-	for qemu-devel@nongnu.org; Fri, 01 Dec 2017 10:41:16 -0500
+	(envelope-from <famz@redhat.com>) id 1eKnQy-0003GK-Nb
+	for qemu-devel@nongnu.org; Fri, 01 Dec 2017 10:42:10 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1eKnPX-0005lt-5c
-	for qemu-devel@nongnu.org; Fri, 01 Dec 2017 10:40:03 -0500
-Date: Fri, 1 Dec 2017 16:39:22 +0100
-From: Cornelia Huck <cohuck@redhat.com>
-Message-ID: <20171201163922.4839624e.cohuck@redhat.com>
-In-Reply-To: <1512046530-17773-1-git-send-email-pmorel@linux.vnet.ibm.com>
-References: <1512046530-17773-1-git-send-email-pmorel@linux.vnet.ibm.com>
+	(envelope-from <famz@redhat.com>) id 1eKnQI-0006xX-JW
+	for qemu-devel@nongnu.org; Fri, 01 Dec 2017 10:41:00 -0500
+Date: Fri, 1 Dec 2017 23:00:03 +0800
+From: Fam Zheng <famz@redhat.com>
+Message-ID: <20171201150003.GD11092@lemon>
+References: <20171129035502.GD8889@lemon>
+	<20171129120018.GB2601@stefanha-x1.localdomain>
+	<20171130094709.GA20286@lemon>
+	<20171130141954.GC14748@stefanha-x1.localdomain>
+	<20171201101644.GB11092@lemon>
+	<20171201140833.GB12803@stefanha-x1.localdomain>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v4 0/7] s390x/pci: Improve zPCI to cover
- more cases
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20171201140833.GB12803@stefanha-x1.localdomain>
+Subject: Re: [Qemu-devel] Block layer complexity: what to do to keep it
+ under control?
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,53 +28,50 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Pierre Morel <pmorel@linux.vnet.ibm.com>
-Cc: qemu-devel@nongnu.org, agraf@suse.de, borntraeger@de.ibm.com, zyimin@linux.vnet.ibm.com, mst@redhat.com, thuth@redhat.com, pasic@linux.vnet.ibm.com, qemu-s390x@nongnu.org
+To: Stefan Hajnoczi <stefanha@redhat.com>
+Cc: kwolf@redhat.com, qemu-block@nongnu.org, jcody@redhat.com, qemu-devel@nongnu.org, mreitz@redhat.com, pbonzini@redhat.com
 
-On Thu, 30 Nov 2017 13:55:23 +0100
-Pierre Morel <pmorel@linux.vnet.ibm.com> wrote:
+On Fri, 12/01 14:08, Stefan Hajnoczi wrote:
+> What I'm getting at is that the essential complexity of a parallel I/O
+> engine with a runtime reconfigurable graph, background operations, and
+> non-trivial disk image file formats sets a certain floor (minimum)
+> complexity.  The consequence is that our code needs to handle
+> concurrency and this is where we fall down today.
 
-> This patch fixes the following BUG:
-> Even a guest is able to detect virtio_pci device, the init function
-> the Linux virtio_pci driver will hang because zPCI does not support
-> the subregions used by virtio_pci.
+I think complexity comes from too many (incomplete) abstractions going together,
+and there is no simple core mechanism to coordinate them. Specifically, there is
+no elegant synchronization interface between graph reconfiguration (control path
+operation) and I/O (data path operation), and background operations have no
+clear modeling (block jobs are not first class citizen in our event loop, they
+are just specially purposed coroutines). If we redesign from the ground up, we
+can hopefully model better and draw more "rigorous" lines between different
+parts of the picture, or we can use a simpler design, such as "everything is a
+block node in the graph".
+
 > 
-> It follows that right now the PCI support is very limited
-> (e.g. pass through of a host vfio device)
-> To enable features like virtio-pci several modifications needs to be
-> done.
+> Switching programming language will not reduce complexity below this
+> floor.  We'd have to abandon features in order to reduce complexity.
+> "Let's start from scratch" attempts often hope to do this but ultimately
+> users don't want to lose features.
+
+The complexity can be hidden with a higher level abstraction in exchange of full
+control and extreme performance, that is probably the real difference to expect
+by changing the programming language. I don't believe "start from scratch" is a
+way to fix the old system, there will always be bugs, it's just different, and
+it's extremely hard to do it fully compatible with the old implementation.
+
 > 
-> As already stated above, Virtio-PCI uses subregions, which may eventually
-> be discontinuous inside bars instead of a single flat region often used
-> by real devices.
-> The address offset being formerly calculated from the BAR base address
-> must be adapted to the subregions instead of to the single region.
+> We need to think through the corner cases we've been hitting and in the
+> process of fixing them we should consider if simplified interfaces/APIs
+> with less concurrency would allow us to write better code at the expense
+> of less control and performance in cases where we don't need it.
 > 
-> This patch provides the new calculation for the three kind of BAR
-> access, zPCI STORE, zPCI LOAD and zPCI STORE BLOCK done by zPCI.
-> 
-> We use the opportunity to
->  - enhance the fault detection for zPCI STORE and LOAD,
->  - enhance the fault detection and to provide the maximum STORE BLOCK
->    block size, maxstbl, for zPCI STORE BLOCK
->  - factor out part of the code used to calculate the offset and
->    access the BARs,
->  - factor out the code for endianess conversion.
-> 
-> 
-> Pierre Morel (7):
->   s390x/pci: factor out endianess conversion
->   s390x/pci: rework PCI STORE
->   s390x/pci: rework PCI LOAD
->   s390x/pci: rework PCI STORE BLOCK
->   s390x/pci: move the memory region read from pcilg
->   s390x/pci: move the memory region write from pcistg
->   s390x/pci: search for subregion inside the BARs
-> 
->  hw/s390x/s390-pci-bus.h  |   1 +
->  hw/s390x/s390-pci-inst.c | 251 ++++++++++++++++++++++++++++-------------------
->  hw/s390x/s390-pci-inst.h |   6 +-
->  3 files changed, 158 insertions(+), 100 deletions(-)
+> That means insulate block jobs and drivers as much as possible.  Don't
+> make them use low-level primitives.  Make them use high-level APIs where
+> the concurrency is baked in and as safe as we can make it without giving
+> up performance.
 > 
 
-Thanks, queued to s390-next.
+Yes, we should take this step sooner rather than later.
+
+Fam
