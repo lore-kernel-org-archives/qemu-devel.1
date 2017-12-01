@@ -1,22 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60779)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59215)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <arei.gonglei@huawei.com>) id 1eKneu-0008Mf-Pl
+	(envelope-from <eblake@redhat.com>) id 1eKndz-0007V2-PD
 	for qemu-devel@nongnu.org; Fri, 01 Dec 2017 10:56:03 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <arei.gonglei@huawei.com>) id 1eKne3-0000dY-Jp
-	for qemu-devel@nongnu.org; Fri, 01 Dec 2017 10:55:23 -0500
-Received: from [45.249.212.35] (port=47027 helo=huawei.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <arei.gonglei@huawei.com>)
-	id 1eKne2-0000Uc-PB
-	for qemu-devel@nongnu.org; Fri, 01 Dec 2017 10:54:31 -0500
-From: Gonglei <arei.gonglei@huawei.com>
-Date: Fri, 1 Dec 2017 23:53:47 +0800
-Message-ID: <1512143627-103300-1-git-send-email-arei.gonglei@huawei.com>
-MIME-Version: 1.0
-Content-Type: text/plain
-Subject: [Qemu-devel] [PATCH] rtc: fix windows guest hang problem when
- Reading RTC_REG_C is overwritten
+	(envelope-from <eblake@redhat.com>) id 1eKnd2-0007v9-3f
+	for qemu-devel@nongnu.org; Fri, 01 Dec 2017 10:54:27 -0500
+From: Eric Blake <eblake@redhat.com>
+Date: Thu, 30 Nov 2017 19:42:25 -0600
+Message-Id: <20171201014242.16877-4-eblake@redhat.com>
+In-Reply-To: <20171201014242.16877-1-eblake@redhat.com>
+References: <20171201014242.16877-1-eblake@redhat.com>
+Subject: [Qemu-devel] [PATCH v5 03/20] file-posix: Switch to
+ .bdrv_co_block_status()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,169 +21,140 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: pbonzini@redhat.com, weidong.huang@huawei.com, wangxinxin.wang@huawei.com, zhang.zhanghailiang@huawei.com, Gonglei <arei.gonglei@huawei.com>
+Cc: kwolf@redhat.com, jsnow@redhat.com, famz@redhat.com, qemu-block@nongnu.org, vsementsov@virtuozzo.com, Max Reitz <mreitz@redhat.com>
 
-We hit a bug in our test while run PCMark 10 in a windows 7 VM,
-The VM got stuck and the wallclock was hang after several minutes running
-PCMark 10 in it.
-It is quite easily to reproduce the bug with the upstream KVM and Qemu.
+We are gradually moving away from sector-based interfaces, towards
+byte-based.  Update the file protocol driver accordingly.
 
-We found that KVM can not inject any RTC irq to VM after it was hang, it fails to
-Deliver irq in ioapic_set_irq() because RTC irq is still pending in ioapic->irr.
+In want_zero mode, we continue to report fine-grained hole
+information (the caller wants as much mapping detail as possible);
+but when not in that mode, the caller prefers larger *pnum and
+merely cares about what offsets are allocated at this layer, rather
+than where the holes live.  Since holes still read as zeroes at
+this layer (rather than deferring to a backing layer), we can take
+the shortcut of skipping lseek(), and merely state that all bytes
+are allocated.
 
-static int ioapic_set_irq(struct kvm_ioapic *ioapic, unsigned int irq,
-                  int irq_level, bool line_status)
-{
-...
-         if (!irq_level) {
-                  ioapic->irr &= ~mask;
-                  ret = 1;
-                  goto out;
-         }
-...
-         if ((edge && old_irr == ioapic->irr) ||
-             (!edge && entry.fields.remote_irr)) {
-                  ret = 0;
-                  goto out;
-         }
+We can also drop redundant bounds checks that are already
+guaranteed by the block layer.
 
-According to RTC spec, after RTC injects a High level irq, OS will read CMOS's
-register C to to clear the irq flag, and pull down the irq electric pin.
+Signed-off-by: Eric Blake <eblake@redhat.com>
 
-For Qemu, we will emulate the reading operation in cmos_ioport_read(),
-but Guest OS will fire a write operation before to tell which register will be read
-after this write, where we use s->cmos_index to record the following register to read.
-
-But in our test, we found that there is a possible situation that Vcpu fails to read
-RTC_REG_C to clear irq, This could happens while two VCpus are writing/reading
-registers at the same time, for example, vcpu 0 is trying to read RTC_REG_C,
-so it write RTC_REG_C first, where the s->cmos_index will be RTC_REG_C,
-but before it tries to read register C, another vcpu1 is going to read RTC_YEAR,
-it changes s->cmos_index to RTC_YEAR by a writing action.
-The next operation of vcpu0 will be lead to read RTC_YEAR, In this case, we will miss
-calling qemu_irq_lower(s->irq) to clear the irq. After this, kvm will never inject RTC irq,
-and Windows VM will hang.
-
-Let's add a global variable to record the status of accessing RTC_REG_C to
-avoid the issue.
-
-Tested by Windows guests with PCMark benchmark.
-
-Signed-off-by: Gonglei <arei.gonglei@huawei.com>
 ---
- hw/timer/mc146818rtc.c | 65 +++++++++++++++++++++++++++++++++++---------------
- 1 file changed, 46 insertions(+), 19 deletions(-)
+v5: drop redundant code
+v4: tweak commit message [Fam], rebase to interface tweak
+v3: no change
+v2: tweak comment, add mapping support
+---
+ block/file-posix.c | 62 +++++++++++++++++++++++++-----------------------------
+ 1 file changed, 29 insertions(+), 33 deletions(-)
 
-diff --git a/hw/timer/mc146818rtc.c b/hw/timer/mc146818rtc.c
-index 7764be2..c7702e7 100644
---- a/hw/timer/mc146818rtc.c
-+++ b/hw/timer/mc146818rtc.c
-@@ -98,6 +98,9 @@ static void rtc_set_cmos(RTCState *s, const struct tm *tm);
- static inline int rtc_from_bcd(RTCState *s, int a);
- static uint64_t get_next_alarm(RTCState *s);
- 
-+/* Used to indicate that RTC_REG_C is about to be accessed */
-+bool ready_to_access_rtc_reg_c;
-+
- static inline bool rtc_running(RTCState *s)
- {
-     return (!(s->cmos_data[RTC_REG_B] & REG_B_SET) &&
-@@ -473,6 +476,10 @@ static void cmos_ioport_write(void *opaque, hwaddr addr,
- 
-     if ((addr & 1) == 0) {
-         s->cmos_index = data & 0x7f;
-+
-+        if (s->cmos_index == RTC_REG_C) {
-+            ready_to_access_rtc_reg_c = true;
-+        }
-     } else {
-         CMOS_DPRINTF("cmos: write index=0x%02x val=0x%02" PRIx64 "\n",
-                      s->cmos_index, data);
-@@ -575,6 +582,8 @@ static void cmos_ioport_write(void *opaque, hwaddr addr,
-             check_update_timer(s);
-             break;
-         case RTC_REG_C:
-+            ready_to_access_rtc_reg_c = false;
-+            break;
-         case RTC_REG_D:
-             /* cannot write to them */
-             break;
-@@ -702,6 +711,32 @@ static int update_in_progress(RTCState *s)
-     return 0;
+diff --git a/block/file-posix.c b/block/file-posix.c
+index 36ee89e940..e847c7cdd9 100644
+--- a/block/file-posix.c
++++ b/block/file-posix.c
+@@ -2128,25 +2128,24 @@ static int find_allocation(BlockDriverState *bs, off_t start,
  }
- 
-+static int cmos_ioport_read_rtc_reg_c(RTCState *s)
-+{
-+    int ret;
-+
-+    ret = s->cmos_data[RTC_REG_C];
-+    qemu_irq_lower(s->irq);
-+    s->cmos_data[RTC_REG_C] = 0x00;
-+    if (ret & (REG_C_UF | REG_C_AF)) {
-+        check_update_timer(s);
-+    }
-+
-+    if (s->irq_coalesced &&
-+            (s->cmos_data[RTC_REG_B] & REG_B_PIE) &&
-+            s->irq_reinject_on_ack_count < RTC_REINJECT_ON_ACK_COUNT) {
-+        s->irq_reinject_on_ack_count++;
-+        s->cmos_data[RTC_REG_C] |= REG_C_IRQF | REG_C_PF;
-+        DPRINTF_C("cmos: injecting on ack\n");
-+        if (rtc_policy_slew_deliver_irq(s)) {
-+            s->irq_coalesced--;
-+            DPRINTF_C("cmos: coalesced irqs decreased to %d\n",
-+                      s->irq_coalesced);
-+        }
-+    }
-+    return ret;
-+}
-+
- static uint64_t cmos_ioport_read(void *opaque, hwaddr addr,
-                                  unsigned size)
+
+ /*
+- * Returns the allocation status of the specified sectors.
++ * Returns the allocation status of the specified offset.
+  *
+- * If 'sector_num' is beyond the end of the disk image the return value is 0
+- * and 'pnum' is set to 0.
++ * The block layer guarantees 'offset' and 'bytes' are within bounds.
+  *
+- * 'pnum' is set to the number of sectors (including and immediately following
+- * the specified sector) that are known to be in the same
++ * 'pnum' is set to the number of bytes (including and immediately following
++ * the specified offset) that are known to be in the same
+  * allocated/unallocated state.
+  *
+- * 'nb_sectors' is the max value 'pnum' should be set to.  If nb_sectors goes
+- * beyond the end of the disk image it will be clamped.
++ * 'bytes' is the max value 'pnum' should be set to.
+  */
+-static int64_t coroutine_fn raw_co_get_block_status(BlockDriverState *bs,
+-                                                    int64_t sector_num,
+-                                                    int nb_sectors, int *pnum,
+-                                                    BlockDriverState **file)
++static int coroutine_fn raw_co_block_status(BlockDriverState *bs,
++                                            bool want_zero,
++                                            int64_t offset,
++                                            int64_t bytes, int64_t *pnum,
++                                            int64_t *map,
++                                            BlockDriverState **file)
  {
-@@ -710,6 +745,15 @@ static uint64_t cmos_ioport_read(void *opaque, hwaddr addr,
-     if ((addr & 1) == 0) {
-         return 0xff;
+-    off_t start, data = 0, hole = 0;
+-    int64_t total_size;
++    off_t data = 0, hole = 0;
+     int ret;
+
+     ret = fd_open(bs);
+@@ -2154,39 +2153,36 @@ static int64_t coroutine_fn raw_co_get_block_status(BlockDriverState *bs,
+         return ret;
+     }
+
+-    start = sector_num * BDRV_SECTOR_SIZE;
+-    total_size = bdrv_getlength(bs);
+-    if (total_size < 0) {
+-        return total_size;
+-    } else if (start >= total_size) {
+-        *pnum = 0;
+-        return 0;
+-    } else if (start + nb_sectors * BDRV_SECTOR_SIZE > total_size) {
+-        nb_sectors = DIV_ROUND_UP(total_size - start, BDRV_SECTOR_SIZE);
++    if (!want_zero) {
++        *pnum = bytes;
++        *map = offset;
++        *file = bs;
++        return BDRV_BLOCK_DATA | BDRV_BLOCK_OFFSET_VALID;
+     }
+
+-    ret = find_allocation(bs, start, &data, &hole);
++    ret = find_allocation(bs, offset, &data, &hole);
+     if (ret == -ENXIO) {
+         /* Trailing hole */
+-        *pnum = nb_sectors;
++        *pnum = bytes;
+         ret = BDRV_BLOCK_ZERO;
+     } else if (ret < 0) {
+         /* No info available, so pretend there are no holes */
+-        *pnum = nb_sectors;
++        *pnum = bytes;
+         ret = BDRV_BLOCK_DATA;
+-    } else if (data == start) {
+-        /* On a data extent, compute sectors to the end of the extent,
++    } else if (data == offset) {
++        /* On a data extent, compute bytes to the end of the extent,
+          * possibly including a partial sector at EOF. */
+-        *pnum = MIN(nb_sectors, DIV_ROUND_UP(hole - start, BDRV_SECTOR_SIZE));
++        *pnum = MIN(bytes, hole - offset);
+         ret = BDRV_BLOCK_DATA;
      } else {
-+        /*
-+         * It indicate that the cmos_index for RTC_REG_C is overwritten
-+         * if the condition is met, we should execute read RTC_REG_C manually.
-+         */
-+        if (ready_to_access_rtc_reg_c && s->cmos_index != RTC_REG_C) {
-+            cmos_ioport_read_rtc_reg_c(s);
-+            ready_to_access_rtc_reg_c = false;
-+        }
-+
-         switch(s->cmos_index) {
- 	case RTC_IBM_PS2_CENTURY_BYTE:
-             s->cmos_index = RTC_CENTURY;
-@@ -736,25 +780,8 @@ static uint64_t cmos_ioport_read(void *opaque, hwaddr addr,
-             }
-             break;
-         case RTC_REG_C:
--            ret = s->cmos_data[s->cmos_index];
--            qemu_irq_lower(s->irq);
--            s->cmos_data[RTC_REG_C] = 0x00;
--            if (ret & (REG_C_UF | REG_C_AF)) {
--                check_update_timer(s);
--            }
--
--            if(s->irq_coalesced &&
--                    (s->cmos_data[RTC_REG_B] & REG_B_PIE) &&
--                    s->irq_reinject_on_ack_count < RTC_REINJECT_ON_ACK_COUNT) {
--                s->irq_reinject_on_ack_count++;
--                s->cmos_data[RTC_REG_C] |= REG_C_IRQF | REG_C_PF;
--                DPRINTF_C("cmos: injecting on ack\n");
--                if (rtc_policy_slew_deliver_irq(s)) {
--                    s->irq_coalesced--;
--                    DPRINTF_C("cmos: coalesced irqs decreased to %d\n",
--                              s->irq_coalesced);
--                }
--            }
-+            ret = cmos_ioport_read_rtc_reg_c(s);
-+            ready_to_access_rtc_reg_c = false;
-             break;
-         default:
-             ret = s->cmos_data[s->cmos_index];
+-        /* On a hole, compute sectors to the beginning of the next extent.  */
+-        assert(hole == start);
+-        *pnum = MIN(nb_sectors, (data - start) / BDRV_SECTOR_SIZE);
++        /* On a hole, compute bytes to the beginning of the next extent.  */
++        assert(hole == offset);
++        *pnum = MIN(bytes, data - offset);
+         ret = BDRV_BLOCK_ZERO;
+     }
++    *map = offset;
+     *file = bs;
+-    return ret | BDRV_BLOCK_OFFSET_VALID | start;
++    return ret | BDRV_BLOCK_OFFSET_VALID;
+ }
+
+ static coroutine_fn BlockAIOCB *raw_aio_pdiscard(BlockDriverState *bs,
+@@ -2280,7 +2276,7 @@ BlockDriver bdrv_file = {
+     .bdrv_close = raw_close,
+     .bdrv_create = raw_create,
+     .bdrv_has_zero_init = bdrv_has_zero_init_1,
+-    .bdrv_co_get_block_status = raw_co_get_block_status,
++    .bdrv_co_block_status = raw_co_block_status,
+     .bdrv_co_pwrite_zeroes = raw_co_pwrite_zeroes,
+
+     .bdrv_co_preadv         = raw_co_preadv,
 -- 
-1.8.3.1
+2.14.3
