@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53213)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53270)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1eKqIw-0006HG-P7
-	for qemu-devel@nongnu.org; Fri, 01 Dec 2017 13:44:56 -0500
+	(envelope-from <pm215@archaic.org.uk>) id 1eKqIy-0006OQ-Tf
+	for qemu-devel@nongnu.org; Fri, 01 Dec 2017 13:44:57 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1eKqIv-00033p-Fz
-	for qemu-devel@nongnu.org; Fri, 01 Dec 2017 13:44:54 -0500
+	(envelope-from <pm215@archaic.org.uk>) id 1eKqIy-00035O-2r
+	for qemu-devel@nongnu.org; Fri, 01 Dec 2017 13:44:56 -0500
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri,  1 Dec 2017 18:44:38 +0000
-Message-Id: <1512153879-5291-7-git-send-email-peter.maydell@linaro.org>
+Date: Fri,  1 Dec 2017 18:44:37 +0000
+Message-Id: <1512153879-5291-6-git-send-email-peter.maydell@linaro.org>
 In-Reply-To: <1512153879-5291-1-git-send-email-peter.maydell@linaro.org>
 References: <1512153879-5291-1-git-send-email-peter.maydell@linaro.org>
-Subject: [Qemu-devel] [PATCH 6/7] target/arm: Factor MPU lookup code out of
- get_phys_addr_pmsav8()
+Subject: [Qemu-devel] [PATCH 5/7] target/arm: Create new
+ arm_v7m_mmu_idx_for_secstate_and_priv()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,185 +23,58 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-arm@nongnu.org, qemu-devel@nongnu.org
 Cc: Richard Henderson <rth@twiddle.net>, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
 
-For the TT instruction we're going to need to do an MPU lookup that
-also tells us which MPU region the access hit. This requires us
-to do the MPU lookup without first doing the SAU security access
-check, so pull the MPU lookup parts of get_phys_addr_pmsav8()
-out into their own function.
-
-The TT instruction also needs to know the MPU region number which
-the lookup hit, so provide this information to the caller of the
-MPU lookup code, even though get_phys_addr_pmsav8() doesn't
-need to know it.
+The TT instruction is going to need to look up the MMU index
+for a specified security and privilege state. Refactor the
+existing arm_v7m_mmu_idx_for_secstate() into a version that
+lets you specify the privilege state and one that uses the
+current state of the CPU.
 
 Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 ---
- target/arm/helper.c | 130 +++++++++++++++++++++++++++++++---------------------
- 1 file changed, 79 insertions(+), 51 deletions(-)
+ target/arm/cpu.h | 21 ++++++++++++++++-----
+ 1 file changed, 16 insertions(+), 5 deletions(-)
 
-diff --git a/target/arm/helper.c b/target/arm/helper.c
-index 14ab1f4..be8d797 100644
---- a/target/arm/helper.c
-+++ b/target/arm/helper.c
-@@ -9351,67 +9351,28 @@ static void v8m_security_lookup(CPUARMState *env, uint32_t address,
+diff --git a/target/arm/cpu.h b/target/arm/cpu.h
+index d228fe6..1f414fd 100644
+--- a/target/arm/cpu.h
++++ b/target/arm/cpu.h
+@@ -2334,14 +2334,16 @@ static inline int arm_mmu_idx_to_el(ARMMMUIdx mmu_idx)
      }
  }
  
--static bool get_phys_addr_pmsav8(CPUARMState *env, uint32_t address,
--                                 MMUAccessType access_type, ARMMMUIdx mmu_idx,
--                                 hwaddr *phys_ptr, MemTxAttrs *txattrs,
--                                 int *prot, uint32_t *fsr)
-+static bool pmsav8_mpu_lookup(CPUARMState *env, uint32_t address,
-+                              MMUAccessType access_type, ARMMMUIdx mmu_idx,
-+                              hwaddr *phys_ptr, MemTxAttrs *txattrs,
-+                              int *prot, uint32_t *fsr, uint32_t *mregion)
+-/* Return the MMU index for a v7M CPU in the specified security state */
+-static inline ARMMMUIdx arm_v7m_mmu_idx_for_secstate(CPUARMState *env,
+-                                                     bool secstate)
++/* Return the MMU index for a v7M CPU in the specified security and
++ * privilege state
++ */
++static inline ARMMMUIdx arm_v7m_mmu_idx_for_secstate_and_priv(CPUARMState *env,
++                                                              bool secstate,
++                                                              bool priv)
  {
-+    /* Perform a PMSAv8 MPU lookup (without also doing the SAU check
-+     * that a full phys-to-virt translation does).
-+     * mregion is (if not NULL) set to the region number which matched,
-+     * or -1 if no region number is returned (MPU off, address did not
-+     * hit a region, address hit in multiple regions).
-+     */
-     ARMCPU *cpu = arm_env_get_cpu(env);
-     bool is_user = regime_is_user(env, mmu_idx);
-     uint32_t secure = regime_is_secure(env, mmu_idx);
-     int n;
-     int matchregion = -1;
-     bool hit = false;
--    V8M_SAttributes sattrs = {};
+-    int el = arm_current_el(env);
+     ARMMMUIdx mmu_idx = ARM_MMU_IDX_M;
  
-     *phys_ptr = address;
-     *prot = 0;
--
--    if (arm_feature(env, ARM_FEATURE_M_SECURITY)) {
--        v8m_security_lookup(env, address, access_type, mmu_idx, &sattrs);
--        if (access_type == MMU_INST_FETCH) {
--            /* Instruction fetches always use the MMU bank and the
--             * transaction attribute determined by the fetch address,
--             * regardless of CPU state. This is painful for QEMU
--             * to handle, because it would mean we need to encode
--             * into the mmu_idx not just the (user, negpri) information
--             * for the current security state but also that for the
--             * other security state, which would balloon the number
--             * of mmu_idx values needed alarmingly.
--             * Fortunately we can avoid this because it's not actually
--             * possible to arbitrarily execute code from memory with
--             * the wrong security attribute: it will always generate
--             * an exception of some kind or another, apart from the
--             * special case of an NS CPU executing an SG instruction
--             * in S&NSC memory. So we always just fail the translation
--             * here and sort things out in the exception handler
--             * (including possibly emulating an SG instruction).
--             */
--            if (sattrs.ns != !secure) {
--                *fsr = sattrs.nsc ? M_FAKE_FSR_NSC_EXEC : M_FAKE_FSR_SFAULT;
--                return true;
--            }
--        } else {
--            /* For data accesses we always use the MMU bank indicated
--             * by the current CPU state, but the security attributes
--             * might downgrade a secure access to nonsecure.
--             */
--            if (sattrs.ns) {
--                txattrs->secure = false;
--            } else if (!secure) {
--                /* NS access to S memory must fault.
--                 * Architecturally we should first check whether the
--                 * MPU information for this address indicates that we
--                 * are doing an unaligned access to Device memory, which
--                 * should generate a UsageFault instead. QEMU does not
--                 * currently check for that kind of unaligned access though.
--                 * If we added it we would need to do so as a special case
--                 * for M_FAKE_FSR_SFAULT in arm_v7m_cpu_do_interrupt().
--                 */
--                *fsr = M_FAKE_FSR_SFAULT;
--                return true;
--            }
--        }
-+    if (mregion) {
-+        *mregion = -1;
+-    if (el != 0) {
++    if (priv) {
+         mmu_idx |= 1;
      }
  
-     /* Unlike the ARM ARM pseudocode, we don't need to check whether this
-@@ -9500,12 +9461,79 @@ static bool get_phys_addr_pmsav8(CPUARMState *env, uint32_t address,
-         /* We don't need to look the attribute up in the MAIR0/MAIR1
-          * registers because that only tells us about cacheability.
-          */
-+        if (mregion) {
-+            *mregion = matchregion;
-+        }
-     }
- 
-     *fsr = 0x00d; /* Permission fault */
-     return !(*prot & (1 << access_type));
+@@ -2356,6 +2358,15 @@ static inline ARMMMUIdx arm_v7m_mmu_idx_for_secstate(CPUARMState *env,
+     return mmu_idx;
  }
  
-+
-+static bool get_phys_addr_pmsav8(CPUARMState *env, uint32_t address,
-+                                 MMUAccessType access_type, ARMMMUIdx mmu_idx,
-+                                 hwaddr *phys_ptr, MemTxAttrs *txattrs,
-+                                 int *prot, uint32_t *fsr)
++/* Return the MMU index for a v7M CPU in the specified security state */
++static inline ARMMMUIdx arm_v7m_mmu_idx_for_secstate(CPUARMState *env,
++                                                     bool secstate)
 +{
-+    uint32_t secure = regime_is_secure(env, mmu_idx);
-+    V8M_SAttributes sattrs = {};
++    bool priv = arm_current_el(env) != 0;
 +
-+    if (arm_feature(env, ARM_FEATURE_M_SECURITY)) {
-+        v8m_security_lookup(env, address, access_type, mmu_idx, &sattrs);
-+        if (access_type == MMU_INST_FETCH) {
-+            /* Instruction fetches always use the MMU bank and the
-+             * transaction attribute determined by the fetch address,
-+             * regardless of CPU state. This is painful for QEMU
-+             * to handle, because it would mean we need to encode
-+             * into the mmu_idx not just the (user, negpri) information
-+             * for the current security state but also that for the
-+             * other security state, which would balloon the number
-+             * of mmu_idx values needed alarmingly.
-+             * Fortunately we can avoid this because it's not actually
-+             * possible to arbitrarily execute code from memory with
-+             * the wrong security attribute: it will always generate
-+             * an exception of some kind or another, apart from the
-+             * special case of an NS CPU executing an SG instruction
-+             * in S&NSC memory. So we always just fail the translation
-+             * here and sort things out in the exception handler
-+             * (including possibly emulating an SG instruction).
-+             */
-+            if (sattrs.ns != !secure) {
-+                *fsr = sattrs.nsc ? M_FAKE_FSR_NSC_EXEC : M_FAKE_FSR_SFAULT;
-+                *phys_ptr = address;
-+                *prot = 0;
-+                return true;
-+            }
-+        } else {
-+            /* For data accesses we always use the MMU bank indicated
-+             * by the current CPU state, but the security attributes
-+             * might downgrade a secure access to nonsecure.
-+             */
-+            if (sattrs.ns) {
-+                txattrs->secure = false;
-+            } else if (!secure) {
-+                /* NS access to S memory must fault.
-+                 * Architecturally we should first check whether the
-+                 * MPU information for this address indicates that we
-+                 * are doing an unaligned access to Device memory, which
-+                 * should generate a UsageFault instead. QEMU does not
-+                 * currently check for that kind of unaligned access though.
-+                 * If we added it we would need to do so as a special case
-+                 * for M_FAKE_FSR_SFAULT in arm_v7m_cpu_do_interrupt().
-+                 */
-+                *fsr = M_FAKE_FSR_SFAULT;
-+                *phys_ptr = address;
-+                *prot = 0;
-+                return true;
-+            }
-+        }
-+    }
-+
-+    return pmsav8_mpu_lookup(env, address, access_type, mmu_idx, phys_ptr,
-+                             txattrs, prot, fsr, NULL);
++    return arm_v7m_mmu_idx_for_secstate_and_priv(env, secstate, priv);
 +}
 +
- static bool get_phys_addr_pmsav5(CPUARMState *env, uint32_t address,
-                                  MMUAccessType access_type, ARMMMUIdx mmu_idx,
-                                  hwaddr *phys_ptr, int *prot, uint32_t *fsr)
+ /* Determine the current mmu_idx to use for normal loads/stores */
+ static inline int cpu_mmu_index(CPUARMState *env, bool ifetch)
+ {
 -- 
 2.7.4
