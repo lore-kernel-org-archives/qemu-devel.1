@@ -1,26 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48192)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50203)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1eKnpv-0001RT-21
-	for qemu-devel@nongnu.org; Fri, 01 Dec 2017 11:06:50 -0500
+	(envelope-from <yi.l.liu@linux.intel.com>) id 1eKnru-0003nQ-Sz
+	for qemu-devel@nongnu.org; Fri, 01 Dec 2017 11:09:51 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1eKnpq-0002PX-Rb
-	for qemu-devel@nongnu.org; Fri, 01 Dec 2017 11:06:46 -0500
-Received: from 5.mo3.mail-out.ovh.net ([87.98.178.36]:56225)
+	(envelope-from <yi.l.liu@linux.intel.com>) id 1eKnrI-00046W-Eu
+	for qemu-devel@nongnu.org; Fri, 01 Dec 2017 11:08:50 -0500
+Received: from mga11.intel.com ([192.55.52.93]:25311)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1eKnpq-0002NE-Ba
-	for qemu-devel@nongnu.org; Fri, 01 Dec 2017 11:06:42 -0500
-Received: from player771.ha.ovh.net (b9.ovh.net [213.186.33.59])
-	by mo3.mail-out.ovh.net (Postfix) with ESMTP id B60FE177DC1
-	for <qemu-devel@nongnu.org>; Fri,  1 Dec 2017 17:06:40 +0100 (CET)
-From: =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>
-Date: Fri,  1 Dec 2017 17:06:04 +0100
-Message-Id: <20171201160604.15265-6-clg@kaod.org>
-In-Reply-To: <20171201160604.15265-1-clg@kaod.org>
-References: <20171201160604.15265-1-clg@kaod.org>
+	(Exim 4.71) (envelope-from <yi.l.liu@linux.intel.com>)
+	id 1eKnrH-00042h-Fb
+	for qemu-devel@nongnu.org; Fri, 01 Dec 2017 11:08:12 -0500
+Date: Fri, 1 Dec 2017 19:23:01 +0800
+From: "Liu, Yi L" <yi.l.liu@linux.intel.com>
+Message-ID: <20171201112301.GB31366@sky-dev>
+References: <20171114231350.286025-1-prasad.singamsetty@oracle.com>
+	<20171114231350.286025-2-prasad.singamsetty@oracle.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH 5/5] spapr: introduce a spapr_qirq() helper
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20171114231350.286025-2-prasad.singamsetty@oracle.com>
+Subject: Re: [Qemu-devel] [PATCH v1 1/2] intel-iommu: Redefine macros to
+ enable supporting 48 bit address width
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,187 +29,272 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, David Gibson <david@gibson.dropbear.id.au>, Greg Kurz <groug@kaod.org>
-Cc: =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>
+To: prasad.singamsetty@oracle.com
+Cc: qemu-devel@nongnu.org, pbonzini@redhat.com, rth@twiddle.net, ehabkost@redhat.com, mst@redhat.com, imammedo@redhat.com, peterx@redhat.com, konrad.wilk@oracle.com
 
-xics_get_qirq() is only used by the sPAPR machine. Let's move it there
-and change its name to reflect its scope. It will be useful for XIVE
-support which will use its own set of qirqs.
+On Tue, Nov 14, 2017 at 06:13:49PM -0500, prasad.singamsetty@oracle.com wrote:
+> From: Prasad Singamsetty <prasad.singamsetty@oracle.com>
+> 
+> The current implementation of Intel IOMMU code only supports 39 bits
+> host/iova address width so number of macros use hard coded values based
+> on that. This patch is to redefine them so they can be used with
+> variable address widths. This patch doesn't add any new functionality
+> but enables adding support for 48 bit address width.
+> 
+> Signed-off-by: Prasad Singamsetty <prasad.singamsety@oracle.com>
+> ---
+>  hw/i386/intel_iommu.c          | 54 ++++++++++++++++++++++++------------------
+>  hw/i386/intel_iommu_internal.h | 34 +++++++++++++++++++-------
+>  include/hw/i386/intel_iommu.h  |  6 +++--
+>  3 files changed, 61 insertions(+), 33 deletions(-)
+> 
+> diff --git a/hw/i386/intel_iommu.c b/hw/i386/intel_iommu.c
+> index 3a5bb0bc2e..53b3bf244d 100644
+> --- a/hw/i386/intel_iommu.c
+> +++ b/hw/i386/intel_iommu.c
+> @@ -523,7 +523,7 @@ static inline dma_addr_t vtd_ce_get_slpt_base(VTDContextEntry *ce)
+>  
+>  static inline uint64_t vtd_get_slpte_addr(uint64_t slpte)
+>  {
+> -    return slpte & VTD_SL_PT_BASE_ADDR_MASK;
+> +    return slpte & VTD_SL_PT_BASE_ADDR_MASK(VTD_HOST_ADDRESS_WIDTH);
+>  }
+>  
+>  /* Whether the pte indicates the address of the page frame */
+> @@ -624,19 +624,12 @@ static inline bool vtd_iova_range_check(uint64_t iova, VTDContextEntry *ce)
+>      return !(iova & ~(vtd_iova_limit(ce) - 1));
+>  }
+>  
+> -static const uint64_t vtd_paging_entry_rsvd_field[] = {
+> -    [0] = ~0ULL,
+> -    /* For not large page */
+> -    [1] = 0x800ULL | ~(VTD_HAW_MASK | VTD_SL_IGN_COM),
+> -    [2] = 0x800ULL | ~(VTD_HAW_MASK | VTD_SL_IGN_COM),
+> -    [3] = 0x800ULL | ~(VTD_HAW_MASK | VTD_SL_IGN_COM),
+> -    [4] = 0x880ULL | ~(VTD_HAW_MASK | VTD_SL_IGN_COM),
+> -    /* For large page */
+> -    [5] = 0x800ULL | ~(VTD_HAW_MASK | VTD_SL_IGN_COM),
+> -    [6] = 0x1ff800ULL | ~(VTD_HAW_MASK | VTD_SL_IGN_COM),
+> -    [7] = 0x3ffff800ULL | ~(VTD_HAW_MASK | VTD_SL_IGN_COM),
+> -    [8] = 0x880ULL | ~(VTD_HAW_MASK | VTD_SL_IGN_COM),
+> -};
+> +/*
+> + * Rsvd field masks for spte:
+> + *     Index [1] to [4] 4k pages
+> + *     Index [5] to [8] large pages
+> + */
+> +static uint64_t vtd_paging_entry_rsvd_field[9];
+>  
+>  static bool vtd_slpte_nonzero_rsvd(uint64_t slpte, uint32_t level)
+>  {
+> @@ -874,7 +867,7 @@ static int vtd_dev_to_context_entry(IntelIOMMUState *s, uint8_t bus_num,
+>          return -VTD_FR_ROOT_ENTRY_P;
+>      }
+>  
+> -    if (re.rsvd || (re.val & VTD_ROOT_ENTRY_RSVD)) {
+> +    if (re.rsvd || (re.val & VTD_ROOT_ENTRY_RSVD(VTD_HOST_ADDRESS_WIDTH))) {
+>          trace_vtd_re_invalid(re.rsvd, re.val);
+>          return -VTD_FR_ROOT_ENTRY_RSVD;
+>      }
+> @@ -891,7 +884,7 @@ static int vtd_dev_to_context_entry(IntelIOMMUState *s, uint8_t bus_num,
+>      }
+>  
+>      if ((ce->hi & VTD_CONTEXT_ENTRY_RSVD_HI) ||
+> -        (ce->lo & VTD_CONTEXT_ENTRY_RSVD_LO)) {
+> +               (ce->lo & VTD_CONTEXT_ENTRY_RSVD_LO(VTD_HOST_ADDRESS_WIDTH))) {
+>          trace_vtd_ce_invalid(ce->hi, ce->lo);
+>          return -VTD_FR_CONTEXT_ENTRY_RSVD;
+>      }
+> @@ -1207,7 +1200,7 @@ static void vtd_root_table_setup(IntelIOMMUState *s)
+>  {
+>      s->root = vtd_get_quad_raw(s, DMAR_RTADDR_REG);
+>      s->root_extended = s->root & VTD_RTADDR_RTT;
+> -    s->root &= VTD_RTADDR_ADDR_MASK;
+> +    s->root &= VTD_RTADDR_ADDR_MASK(VTD_HOST_ADDRESS_WIDTH);
+>  
+>      trace_vtd_reg_dmar_root(s->root, s->root_extended);
+>  }
+> @@ -1223,7 +1216,7 @@ static void vtd_interrupt_remap_table_setup(IntelIOMMUState *s)
+>      uint64_t value = 0;
+>      value = vtd_get_quad_raw(s, DMAR_IRTA_REG);
+>      s->intr_size = 1UL << ((value & VTD_IRTA_SIZE_MASK) + 1);
+> -    s->intr_root = value & VTD_IRTA_ADDR_MASK;
+> +    s->intr_root = value & VTD_IRTA_ADDR_MASK(VTD_HOST_ADDRESS_WIDTH);
+>      s->intr_eime = value & VTD_IRTA_EIME;
+>  
+>      /* Notify global invalidation */
+> @@ -1479,7 +1472,7 @@ static void vtd_handle_gcmd_qie(IntelIOMMUState *s, bool en)
+>      trace_vtd_inv_qi_enable(en);
+>  
+>      if (en) {
+> -        s->iq = iqa_val & VTD_IQA_IQA_MASK;
+> +        s->iq = iqa_val & VTD_IQA_IQA_MASK(VTD_HOST_ADDRESS_WIDTH);
+>          /* 2^(x+8) entries */
+>          s->iq_size = 1UL << ((iqa_val & VTD_IQA_QS) + 8);
+>          s->qi_enabled = true;
+> @@ -2772,12 +2765,12 @@ static void vtd_address_space_unmap(VTDAddressSpace *as, IOMMUNotifier *n)
+>       * VT-d spec), otherwise we need to consider overflow of 64 bits.
+>       */
+>  
+> -    if (end > VTD_ADDRESS_SIZE) {
+> +    if (end > VTD_ADDRESS_SIZE(VTD_HOST_ADDRESS_WIDTH)) {
+>          /*
+>           * Don't need to unmap regions that is bigger than the whole
+>           * VT-d supported address space size
+>           */
+> -        end = VTD_ADDRESS_SIZE;
+> +        end = VTD_ADDRESS_SIZE(VTD_HOST_ADDRESS_WIDTH);
+>      }
+>  
+>      assert(start <= end);
+> @@ -2866,6 +2859,7 @@ static void vtd_iommu_replay(IOMMUMemoryRegion *iommu_mr, IOMMUNotifier *n)
+>  static void vtd_init(IntelIOMMUState *s)
+>  {
+>      X86IOMMUState *x86_iommu = X86_IOMMU_DEVICE(s);
+> +    uint8_t aw_bits = VTD_HOST_ADDRESS_WIDTH;
+>  
+>      memset(s->csr, 0, DMAR_REG_SIZE);
+>      memset(s->wmask, 0, DMAR_REG_SIZE);
+> @@ -2882,10 +2876,24 @@ static void vtd_init(IntelIOMMUState *s)
+>      s->qi_enabled = false;
+>      s->iq_last_desc_type = VTD_INV_DESC_NONE;
+>      s->next_frcd_reg = 0;
+> -    s->cap = VTD_CAP_FRO | VTD_CAP_NFR | VTD_CAP_ND | VTD_CAP_MGAW |
+> -             VTD_CAP_SAGAW | VTD_CAP_MAMV | VTD_CAP_PSI | VTD_CAP_SLLPS;
+> +    s->cap = VTD_CAP_FRO | VTD_CAP_NFR | VTD_CAP_ND |
+> +             VTD_CAP_MAMV | VTD_CAP_PSI | VTD_CAP_SLLPS |
+> +             VTD_CAP_SAGAW_39bit | VTD_CAP_MGAW(VTD_HOST_ADDRESS_WIDTH);
 
-Signed-off-by: C=C3=A9dric Le Goater <clg@kaod.org>
-Reviewed-by: David Gibson <david@gibson.dropbear.id.au>
----
+should the SAGAW also be corresponding to the MGAW config instead of
+being static VTD_CAP_SAGAW_39bit?
 
- Changes since initial XIVE patchset :
-=20
- - s/spapr_irq_get_qirq/spapr_qirq/
-
- hw/intc/xics.c              | 12 ------------
- hw/ppc/spapr.c              | 11 +++++++++++
- hw/ppc/spapr_events.c       | 12 +++++-------
- hw/ppc/spapr_pci.c          |  2 +-
- include/hw/pci-host/spapr.h |  2 +-
- include/hw/ppc/spapr.h      |  1 +
- include/hw/ppc/spapr_vio.h  |  2 +-
- include/hw/ppc/xics.h       |  1 -
- 8 files changed, 20 insertions(+), 23 deletions(-)
-
-diff --git a/hw/intc/xics.c b/hw/intc/xics.c
-index 700f6baa1395..e73e623e3b53 100644
---- a/hw/intc/xics.c
-+++ b/hw/intc/xics.c
-@@ -713,18 +713,6 @@ static const TypeInfo xics_fabric_info =3D {
- /*
-  * Exported functions
-  */
--qemu_irq xics_get_qirq(XICSFabric *xi, int irq)
--{
--    XICSFabricClass *xic =3D XICS_FABRIC_GET_CLASS(xi);
--    ICSState *ics =3D xic->ics_get(xi, irq);
--
--    if (ics) {
--        return ics->qirqs[irq - ics->offset];
--    }
--
--    return NULL;
--}
--
- ICPState *xics_icp_get(XICSFabric *xi, int server)
- {
-     XICSFabricClass *xic =3D XICS_FABRIC_GET_CLASS(xi);
-diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-index 5e4192aee8fe..36a8e662a92b 100644
---- a/hw/ppc/spapr.c
-+++ b/hw/ppc/spapr.c
-@@ -3677,6 +3677,17 @@ void spapr_irq_free(sPAPRMachineState *spapr, int =
-irq, int num)
-     }
- }
-=20
-+qemu_irq spapr_qirq(sPAPRMachineState *spapr, int irq)
-+{
-+    ICSState *ics =3D spapr->ics;
-+
-+    if (ics_valid_irq(ics, irq)) {
-+        return ics->qirqs[irq - ics->offset];
-+    }
-+
-+    return NULL;
-+}
-+
- static void spapr_pic_print_info(InterruptStatsProvider *obj,
-                                  Monitor *mon)
- {
-diff --git a/hw/ppc/spapr_events.c b/hw/ppc/spapr_events.c
-index cead596f3e7a..7dc87fc7bd77 100644
---- a/hw/ppc/spapr_events.c
-+++ b/hw/ppc/spapr_events.c
-@@ -472,9 +472,8 @@ static void spapr_powerdown_req(Notifier *n, void *op=
-aque)
-=20
-     rtas_event_log_queue(spapr, entry);
-=20
--    qemu_irq_pulse(xics_get_qirq(XICS_FABRIC(spapr),
--                                 rtas_event_log_to_irq(spapr,
--                                                       RTAS_LOG_TYPE_EPO=
-W)));
-+    qemu_irq_pulse(spapr_qirq(spapr,
-+                   rtas_event_log_to_irq(spapr, RTAS_LOG_TYPE_EPOW)));
- }
-=20
- static void spapr_hotplug_req_event(uint8_t hp_id, uint8_t hp_action,
-@@ -556,9 +555,8 @@ static void spapr_hotplug_req_event(uint8_t hp_id, ui=
-nt8_t hp_action,
-=20
-     rtas_event_log_queue(spapr, entry);
-=20
--    qemu_irq_pulse(xics_get_qirq(XICS_FABRIC(spapr),
--                                 rtas_event_log_to_irq(spapr,
--                                                       RTAS_LOG_TYPE_HOT=
-PLUG)));
-+    qemu_irq_pulse(spapr_qirq(spapr,
-+                   rtas_event_log_to_irq(spapr, RTAS_LOG_TYPE_HOTPLUG)))=
-;
- }
-=20
- void spapr_hotplug_req_add_by_index(sPAPRDRConnector *drc)
-@@ -678,7 +676,7 @@ static void check_exception(PowerPCCPU *cpu, sPAPRMac=
-hineState *spapr,
-                 spapr_event_sources_get_source(spapr->event_sources, i);
-=20
-             g_assert(source->enabled);
--            qemu_irq_pulse(xics_get_qirq(XICS_FABRIC(spapr), source->irq=
-));
-+            qemu_irq_pulse(spapr_qirq(spapr, source->irq));
-         }
-     }
-=20
-diff --git a/hw/ppc/spapr_pci.c b/hw/ppc/spapr_pci.c
-index e0ef77a480e5..39134f0ef0a3 100644
---- a/hw/ppc/spapr_pci.c
-+++ b/hw/ppc/spapr_pci.c
-@@ -723,7 +723,7 @@ static void spapr_msi_write(void *opaque, hwaddr addr=
-,
-=20
-     trace_spapr_pci_msi_write(addr, data, irq);
-=20
--    qemu_irq_pulse(xics_get_qirq(XICS_FABRIC(spapr), irq));
-+    qemu_irq_pulse(spapr_qirq(spapr, irq));
- }
-=20
- static const MemoryRegionOps spapr_msi_ops =3D {
-diff --git a/include/hw/pci-host/spapr.h b/include/hw/pci-host/spapr.h
-index 38470b2f0e5c..0fae4fc6a4e5 100644
---- a/include/hw/pci-host/spapr.h
-+++ b/include/hw/pci-host/spapr.h
-@@ -108,7 +108,7 @@ static inline qemu_irq spapr_phb_lsi_qirq(struct sPAP=
-RPHBState *phb, int pin)
- {
-     sPAPRMachineState *spapr =3D SPAPR_MACHINE(qdev_get_machine());
-=20
--    return xics_get_qirq(XICS_FABRIC(spapr), phb->lsi_table[pin].irq);
-+    return spapr_qirq(spapr, phb->lsi_table[pin].irq);
- }
-=20
- PCIHostState *spapr_create_phb(sPAPRMachineState *spapr, int index);
-diff --git a/include/hw/ppc/spapr.h b/include/hw/ppc/spapr.h
-index 895f48471ee9..6b8e04c78771 100644
---- a/include/hw/ppc/spapr.h
-+++ b/include/hw/ppc/spapr.h
-@@ -712,5 +712,6 @@ int spapr_irq_alloc(sPAPRMachineState *spapr, int irq=
-_hint, bool lsi,
- int spapr_irq_alloc_block(sPAPRMachineState *spapr, int num, bool lsi,
-                           bool align, Error **errp);
- void spapr_irq_free(sPAPRMachineState *spapr, int irq, int num);
-+qemu_irq spapr_qirq(sPAPRMachineState *spapr, int irq);
-=20
- #endif /* HW_SPAPR_H */
-diff --git a/include/hw/ppc/spapr_vio.h b/include/hw/ppc/spapr_vio.h
-index 2e9685a5d900..e8b006d18f4e 100644
---- a/include/hw/ppc/spapr_vio.h
-+++ b/include/hw/ppc/spapr_vio.h
-@@ -87,7 +87,7 @@ static inline qemu_irq spapr_vio_qirq(VIOsPAPRDevice *d=
-ev)
- {
-     sPAPRMachineState *spapr =3D SPAPR_MACHINE(qdev_get_machine());
-=20
--    return xics_get_qirq(XICS_FABRIC(spapr), dev->irq);
-+    return spapr_qirq(spapr, dev->irq);
- }
-=20
- static inline bool spapr_vio_dma_valid(VIOsPAPRDevice *dev, uint64_t tad=
-dr,
-diff --git a/include/hw/ppc/xics.h b/include/hw/ppc/xics.h
-index 0b67abbbb9d8..6cebff47a7d4 100644
---- a/include/hw/ppc/xics.h
-+++ b/include/hw/ppc/xics.h
-@@ -183,7 +183,6 @@ typedef struct XICSFabricClass {
-=20
- void spapr_dt_xics(int nr_servers, void *fdt, uint32_t phandle);
-=20
--qemu_irq xics_get_qirq(XICSFabric *xi, int irq);
- ICPState *xics_icp_get(XICSFabric *xi, int server);
-=20
- /* Internal XICS interfaces */
---=20
-2.13.6
+Regards,
+Yi L
+>      s->ecap = VTD_ECAP_QI | VTD_ECAP_IRO;
+>  
+> +    /*
+> +     * Rsvd field masks for spte
+> +     */
+> +    vtd_paging_entry_rsvd_field[0] = ~0ULL;
+> +    vtd_paging_entry_rsvd_field[1] = VTD_SPTE_PAGE_L1_RSVD_MASK(aw_bits);
+> +    vtd_paging_entry_rsvd_field[2] = VTD_SPTE_PAGE_L2_RSVD_MASK(aw_bits);
+> +    vtd_paging_entry_rsvd_field[3] = VTD_SPTE_PAGE_L3_RSVD_MASK(aw_bits);
+> +    vtd_paging_entry_rsvd_field[4] = VTD_SPTE_PAGE_L4_RSVD_MASK(aw_bits);
+> +    vtd_paging_entry_rsvd_field[5] = VTD_SPTE_LPAGE_L1_RSVD_MASK(aw_bits);
+> +    vtd_paging_entry_rsvd_field[6] = VTD_SPTE_LPAGE_L2_RSVD_MASK(aw_bits);
+> +    vtd_paging_entry_rsvd_field[7] = VTD_SPTE_LPAGE_L3_RSVD_MASK(aw_bits);
+> +    vtd_paging_entry_rsvd_field[8] = VTD_SPTE_LPAGE_L4_RSVD_MASK(aw_bits);
+> +
+>      if (x86_iommu->intr_supported) {
+>          s->ecap |= VTD_ECAP_IR | VTD_ECAP_MHMV;
+>          if (s->intr_eim == ON_OFF_AUTO_ON) {
+> diff --git a/hw/i386/intel_iommu_internal.h b/hw/i386/intel_iommu_internal.h
+> index 0e73a65bf2..77e4a9833a 100644
+> --- a/hw/i386/intel_iommu_internal.h
+> +++ b/hw/i386/intel_iommu_internal.h
+> @@ -172,10 +172,10 @@
+>  
+>  /* RTADDR_REG */
+>  #define VTD_RTADDR_RTT              (1ULL << 11)
+> -#define VTD_RTADDR_ADDR_MASK        (VTD_HAW_MASK ^ 0xfffULL)
+> +#define VTD_RTADDR_ADDR_MASK(aw)    (VTD_HAW_MASK(aw) ^ 0xfffULL)
+>  
+>  /* IRTA_REG */
+> -#define VTD_IRTA_ADDR_MASK          (VTD_HAW_MASK ^ 0xfffULL)
+> +#define VTD_IRTA_ADDR_MASK(aw)      (VTD_HAW_MASK(aw) ^ 0xfffULL)
+>  #define VTD_IRTA_EIME               (1ULL << 11)
+>  #define VTD_IRTA_SIZE_MASK          (0xfULL)
+>  
+> @@ -198,8 +198,8 @@
+>  #define VTD_DOMAIN_ID_MASK          ((1UL << VTD_DOMAIN_ID_SHIFT) - 1)
+>  #define VTD_CAP_ND                  (((VTD_DOMAIN_ID_SHIFT - 4) / 2) & 7ULL)
+>  #define VTD_MGAW                    39  /* Maximum Guest Address Width */
+> -#define VTD_ADDRESS_SIZE            (1ULL << VTD_MGAW)
+> -#define VTD_CAP_MGAW                (((VTD_MGAW - 1) & 0x3fULL) << 16)
+> +#define VTD_ADDRESS_SIZE(aw)        (1ULL << (aw))
+> +#define VTD_CAP_MGAW(aw)            ((((aw) - 1) & 0x3fULL) << 16)
+>  #define VTD_MAMV                    18ULL
+>  #define VTD_CAP_MAMV                (VTD_MAMV << 48)
+>  #define VTD_CAP_PSI                 (1ULL << 39)
+> @@ -219,7 +219,7 @@
+>  #define VTD_IQT_QT(val)             (((val) >> 4) & 0x7fffULL)
+>  
+>  /* IQA_REG */
+> -#define VTD_IQA_IQA_MASK            (VTD_HAW_MASK ^ 0xfffULL)
+> +#define VTD_IQA_IQA_MASK(aw)        (VTD_HAW_MASK(aw) ^ 0xfffULL)
+>  #define VTD_IQA_QS                  0x7ULL
+>  
+>  /* IQH_REG */
+> @@ -373,6 +373,24 @@ typedef union VTDInvDesc VTDInvDesc;
+>  #define VTD_INV_DESC_DEVICE_IOTLB_RSVD_HI 0xffeULL
+>  #define VTD_INV_DESC_DEVICE_IOTLB_RSVD_LO 0xffff0000ffe0fff8
+>  
+> +/* Rsvd field masks for spte */
+> +#define VTD_SPTE_PAGE_L1_RSVD_MASK(aw) \
+> +        (0x800ULL | ~(VTD_HAW_MASK(aw) | VTD_SL_IGN_COM))
+> +#define VTD_SPTE_PAGE_L2_RSVD_MASK(aw) \
+> +        (0x800ULL | ~(VTD_HAW_MASK(aw) | VTD_SL_IGN_COM))
+> +#define VTD_SPTE_PAGE_L3_RSVD_MASK(aw) \
+> +        (0x800ULL | ~(VTD_HAW_MASK(aw) | VTD_SL_IGN_COM))
+> +#define VTD_SPTE_PAGE_L4_RSVD_MASK(aw) \
+> +        (0x880ULL | ~(VTD_HAW_MASK(aw) | VTD_SL_IGN_COM))
+> +#define VTD_SPTE_LPAGE_L1_RSVD_MASK(aw) \
+> +        (0x800ULL | ~(VTD_HAW_MASK(aw) | VTD_SL_IGN_COM))
+> +#define VTD_SPTE_LPAGE_L2_RSVD_MASK(aw) \
+> +        (0x1ff800ULL | ~(VTD_HAW_MASK(aw) | VTD_SL_IGN_COM))
+> +#define VTD_SPTE_LPAGE_L3_RSVD_MASK(aw) \
+> +        (0x3ffff800ULL | ~(VTD_HAW_MASK(aw) | VTD_SL_IGN_COM))
+> +#define VTD_SPTE_LPAGE_L4_RSVD_MASK(aw) \
+> +        (0x880ULL | ~(VTD_HAW_MASK(aw) | VTD_SL_IGN_COM))
+> +
+>  /* Information about page-selective IOTLB invalidate */
+>  struct VTDIOTLBPageInvInfo {
+>      uint16_t domain_id;
+> @@ -403,7 +421,7 @@ typedef struct VTDRootEntry VTDRootEntry;
+>  #define VTD_ROOT_ENTRY_CTP          (~0xfffULL)
+>  
+>  #define VTD_ROOT_ENTRY_NR           (VTD_PAGE_SIZE / sizeof(VTDRootEntry))
+> -#define VTD_ROOT_ENTRY_RSVD         (0xffeULL | ~VTD_HAW_MASK)
+> +#define VTD_ROOT_ENTRY_RSVD(aw)     (0xffeULL | ~VTD_HAW_MASK(aw))
+>  
+>  /* Masks for struct VTDContextEntry */
+>  /* lo */
+> @@ -415,7 +433,7 @@ typedef struct VTDRootEntry VTDRootEntry;
+>  #define VTD_CONTEXT_TT_PASS_THROUGH (2ULL << 2)
+>  /* Second Level Page Translation Pointer*/
+>  #define VTD_CONTEXT_ENTRY_SLPTPTR   (~0xfffULL)
+> -#define VTD_CONTEXT_ENTRY_RSVD_LO   (0xff0ULL | ~VTD_HAW_MASK)
+> +#define VTD_CONTEXT_ENTRY_RSVD_LO(aw) (0xff0ULL | ~VTD_HAW_MASK(aw))
+>  /* hi */
+>  #define VTD_CONTEXT_ENTRY_AW        7ULL /* Adjusted guest-address-width */
+>  #define VTD_CONTEXT_ENTRY_DID(val)  (((val) >> 8) & VTD_DOMAIN_ID_MASK)
+> @@ -439,7 +457,7 @@ typedef struct VTDRootEntry VTDRootEntry;
+>  #define VTD_SL_RW_MASK              3ULL
+>  #define VTD_SL_R                    1ULL
+>  #define VTD_SL_W                    (1ULL << 1)
+> -#define VTD_SL_PT_BASE_ADDR_MASK    (~(VTD_PAGE_SIZE - 1) & VTD_HAW_MASK)
+> +#define VTD_SL_PT_BASE_ADDR_MASK(aw) (~(VTD_PAGE_SIZE - 1) & VTD_HAW_MASK(aw))
+>  #define VTD_SL_IGN_COM              0xbff0000000000000ULL
+>  
+>  #endif
+> diff --git a/include/hw/i386/intel_iommu.h b/include/hw/i386/intel_iommu.h
+> index ac15e6be14..372b06df45 100644
+> --- a/include/hw/i386/intel_iommu.h
+> +++ b/include/hw/i386/intel_iommu.h
+> @@ -46,8 +46,10 @@
+>  #define VTD_SID_TO_DEVFN(sid)       ((sid) & 0xff)
+>  
+>  #define DMAR_REG_SIZE               0x230
+> -#define VTD_HOST_ADDRESS_WIDTH      39
+> -#define VTD_HAW_MASK                ((1ULL << VTD_HOST_ADDRESS_WIDTH) - 1)
+> +#define VTD_HOST_AW_39BIT           39
+> +#define VTD_HOST_AW_48BIT           48
+> +#define VTD_HOST_ADDRESS_WIDTH      VTD_HOST_AW_39BIT
+> +#define VTD_HAW_MASK(aw)            ((1ULL << (aw)) - 1)
+>  
+>  #define DMAR_REPORT_F_INTR          (1)
+>  
+> -- 
+> 2.14.0-rc1
+> 
+> 
