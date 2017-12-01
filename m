@@ -1,27 +1,44 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41698)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42738)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1eKoVa-0000O4-Hd
-	for qemu-devel@nongnu.org; Fri, 01 Dec 2017 11:49:51 -0500
+	(envelope-from <pasic@linux.vnet.ibm.com>) id 1eKoX4-0001Y5-9m
+	for qemu-devel@nongnu.org; Fri, 01 Dec 2017 11:51:23 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1eKoVW-0000Ww-Iz
-	for qemu-devel@nongnu.org; Fri, 01 Dec 2017 11:49:50 -0500
-Received: from mail-wm0-x22c.google.com ([2a00:1450:400c:c09::22c]:42332)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1eKoVW-0000WX-Bs
-	for qemu-devel@nongnu.org; Fri, 01 Dec 2017 11:49:46 -0500
-Received: by mail-wm0-x22c.google.com with SMTP id l141so4653621wmg.1
-	for <qemu-devel@nongnu.org>; Fri, 01 Dec 2017 08:49:46 -0800 (PST)
-Date: Fri, 1 Dec 2017 12:40:51 +0000
-From: Stefan Hajnoczi <stefanha@gmail.com>
-Message-ID: <20171201124051.GK23501@stefanha-x1.localdomain>
-References: <cover.1511317952.git.maozy.fnst@cn.fujitsu.com>
-	<2882e72d795e04cbe2120f569d551aef2467ac60.1511317952.git.maozy.fnst@cn.fujitsu.com>
+	(envelope-from <pasic@linux.vnet.ibm.com>) id 1eKoX0-0001zn-AP
+	for qemu-devel@nongnu.org; Fri, 01 Dec 2017 11:51:22 -0500
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:52938
+	helo=mx0a-001b2d01.pphosted.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pasic@linux.vnet.ibm.com>)
+	id 1eKoX0-0001z6-56
+	for qemu-devel@nongnu.org; Fri, 01 Dec 2017 11:51:18 -0500
+Received: from pps.filterd (m0098417.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
+	vB1EYvv8019489
+	for <qemu-devel@nongnu.org>; Fri, 1 Dec 2017 09:38:38 -0500
+Received: from e06smtp12.uk.ibm.com (e06smtp12.uk.ibm.com [195.75.94.108])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2ek7denmcy-1
+	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Fri, 01 Dec 2017 09:38:37 -0500
+Received: from localhost
+	by e06smtp12.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	Only! Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <pasic@linux.vnet.ibm.com>;
+	Fri, 1 Dec 2017 14:38:36 -0000
+References: <20171128130758.67556-1-pasic@linux.vnet.ibm.com>
+	<20171129133733.7fc11968.cohuck@redhat.com>
+	<6f7547b8-1346-53ce-3d80-6839c556d724@linux.vnet.ibm.com>
+	<20171129182900.409be40f.cohuck@redhat.com>
+	<e8d586cf-99bd-3c72-0c39-44408295a744@linux.vnet.ibm.com>
+	<20171130143256.2b8d93ba.cohuck@redhat.com>
+From: Halil Pasic <pasic@linux.vnet.ibm.com>
+Date: Fri, 1 Dec 2017 15:38:34 +0100
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="4wkndigzIeYF6Hbg"
-Content-Disposition: inline
-In-Reply-To: <2882e72d795e04cbe2120f569d551aef2467ac60.1511317952.git.maozy.fnst@cn.fujitsu.com>
-Subject: Re: [Qemu-devel] [PATCH v4 1/4] hw/block/nvme: Convert to realize
+In-Reply-To: <20171130143256.2b8d93ba.cohuck@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Message-Id: <94447c83-5ce8-78d5-d4e1-a017efccc297@linux.vnet.ibm.com>
+Subject: Re: [Qemu-devel] [RFC PATCH v2 1/1] s390x/css: unrestrict cssids
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,43 +47,35 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Mao Zhongyi <maozy.fnst@cn.fujitsu.com>
-Cc: qemu-devel@nongnu.org, Keith Busch <keith.busch@intel.com>, Kevin Wolf <kwolf@redhat.com>, John Snow <jsnow@redhat.com>, Markus Armbruster <armbru@redhat.com>, Max Reitz <mreitz@redhat.com>
+To: Cornelia Huck <cohuck@redhat.com>
+Cc: Shalini Chellathurai Saroja <shalini@linux.vnet.ibm.com>, qemu-devel@nongnu.org, Christian Borntraeger <borntraeger@de.ibm.com>, qemu-s390x@nongnu.org, Boris Fiuczynski <fiuczy@linux.vnet.ibm.com>, Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>
 
 
---4wkndigzIeYF6Hbg
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
 
-On Wed, Nov 22, 2017 at 11:08:43AM +0800, Mao Zhongyi wrote:
-> Convert nvme_init() to realize and rename it to nvme_realize().
->=20
-> Cc: John Snow <jsnow@redhat.com>
-> Cc: Keith Busch <keith.busch@intel.com>
-> Cc: Kevin Wolf <kwolf@redhat.com>
-> Cc: Max Reitz <mreitz@redhat.com>
-> Cc: Markus Armbruster <armbru@redhat.com>
->=20
-> Signed-off-by: Mao Zhongyi <maozy.fnst@cn.fujitsu.com>
-> ---
->  hw/block/nvme.c | 18 ++++++++++--------
->  1 file changed, 10 insertions(+), 8 deletions(-)
+On 11/30/2017 02:32 PM, Cornelia Huck wrote:
+> On Thu, 30 Nov 2017 13:32:12 +0100
+> Halil Pasic <pasic@linux.vnet.ibm.com> wrote:
+> 
+> (...)
+> 
+> Before I spend way too much time on this:
+> 
+> Is the proposed machine-property interface usable from a libvirt POV?
+> IOW, can we go with this now and fix the ugliness later (probably via a
+> generic overhaul of the interface)?
+> 
 
-Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
+I've talked to Boris and Christian yesterday, and we agreed putting
+the read only property to the virtual-css-bridge. It's kind of the
+'css object' variant all seemed quite happy with, and since the property
+is read only, not user creatable is not a problem.
 
---4wkndigzIeYF6Hbg
-Content-Type: application/pgp-signature; name="signature.asc"
+Thus, from our perspective, this question is regarded obsolete at
+the moment (this may change, should you turn out to be against having
+the property at the virtual-css-bridge).
 
------BEGIN PGP SIGNATURE-----
+I've just sent a series named 'unrestrict cssids related patches'.
+Could you please have a look?
 
-iQEcBAEBAgAGBQJaIU3TAAoJEJykq7OBq3PIMFsH/jiq6I48VwZKbJ5o2jSPoCpQ
-UoAuThswci8A7IYcfWhi0oW7k4trKRwUdDKoF1U86lB81m1UWvKHX5COwIuXZ7ci
-vHdcl2eTjUuMRe23rdgB2lJquwWIcXG//c17GnP9NPKUyTOWGVthJilDZys+ezrO
-MZNNdBq5cQXDlwXp0O4a40W6yEAOsbH5FOptI3lYicdRc2k6IQZ4x+8rsuKKItic
-6D0ICQFLF/d5TSXXCZ3O3SdmFVQz+ED8/ck5iKSyKTZ/wQ1dkrhY6bhwG78xpNht
-aq7CqyzIzBkG8ncBJBIzbwNObiPa5o4LyBYi3bubRVVgsWY5Pkzbjb55JlWamnI=
-=yzlt
------END PGP SIGNATURE-----
-
---4wkndigzIeYF6Hbg--
+Regards,
+Halil
