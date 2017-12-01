@@ -1,14 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55229)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56445)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1eKqNB-0001tg-1A
-	for qemu-devel@nongnu.org; Fri, 01 Dec 2017 13:49:18 -0500
+	(envelope-from <pm215@archaic.org.uk>) id 1eKqPX-0004IZ-9V
+	for qemu-devel@nongnu.org; Fri, 01 Dec 2017 13:51:46 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1eKqNA-0005mp-50
-	for qemu-devel@nongnu.org; Fri, 01 Dec 2017 13:49:17 -0500
+	(envelope-from <pm215@archaic.org.uk>) id 1eKqPW-0006q6-ID
+	for qemu-devel@nongnu.org; Fri, 01 Dec 2017 13:51:43 -0500
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri,  1 Dec 2017 18:44:32 +0000
-Message-Id: <1512153879-5291-1-git-send-email-peter.maydell@linaro.org>
-Subject: [Qemu-devel] [PATCH 0/7] armv8m: Implement TT, and other bugfixes
+Date: Fri,  1 Dec 2017 18:51:35 +0000
+Message-Id: <1512154296-5652-2-git-send-email-peter.maydell@linaro.org>
+In-Reply-To: <1512154296-5652-1-git-send-email-peter.maydell@linaro.org>
+References: <1512154296-5652-1-git-send-email-peter.maydell@linaro.org>
+Subject: [Qemu-devel] [PATCH 1/2] nvic: Make nvic_sysreg_ns_ops work with
+ any MemoryRegion
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -18,45 +21,58 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-arm@nongnu.org, qemu-devel@nongnu.org
-Cc: Richard Henderson <rth@twiddle.net>, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
+Cc: patches@linaro.org, Richard Henderson <rth@twiddle.net>, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, Paolo Bonzini <pbonzini@redhat.com>
 
-The main aim of this patchseries is to implement the new-for-v8M
-TT/TTT/TTA/TTAT instructions (which take an address and do an
-MPU/SAU lookup and tell you the security state and access
-permissions for the address).
+Generalize nvic_sysreg_ns_ops so that we can pass it an
+arbitrary MemoryRegion which it will use as the underlying
+register implementation to apply the NS-alias behaviour
+to. We'll want this so we can do the same with systick.
 
-The first part of the series is some smaller bugfixes that
-I noticed along the way, followed by a bit of refactoring
-before finally implementing TT in the last patch.
+Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+---
+ hw/intc/armv7m_nvic.c | 10 +++++++---
+ 1 file changed, 7 insertions(+), 3 deletions(-)
 
-(Notably, patch 4 splits the existing MNegPri and MSNegPri
-MMU indexes into two new indexes each -- when I originally
-added them I hadn't realized that "negative execution priority"
-was orthogonal to "user vs privileged", rather than implying
-privileged. This brings us up to 8 MMU indexes, but that
-should not cost us any more than having 7, so it seems a
-better approach than a more convoluted other option (which
-you can find briefly described in the patch 4 commit message).
-
-thanks
--- PMM
-
-Peter Maydell (7):
-  target/arm: Handle SPSEL and current stack being out of sync in
-    MSP/PSP reads
-  target/arm: Allow explicit writes to CONTROL.SPSEL in Handler mode
-  target/arm: Add missing M profile case to regime_is_user()
-  target/arm: Split M profile MNegPri mmu index into user and priv
-  target/arm: Create new arm_v7m_mmu_idx_for_secstate_and_priv()
-  target/arm: Factor MPU lookup code out of get_phys_addr_pmsav8()
-  target/arm: Implement TT instruction
-
- target/arm/cpu.h       |  68 ++++++++-----
- target/arm/helper.h    |   2 +
- target/arm/internals.h |   6 +-
- target/arm/helper.c    | 268 +++++++++++++++++++++++++++++++++++++------------
- target/arm/translate.c |  37 ++++++-
- 5 files changed, 289 insertions(+), 92 deletions(-)
-
+diff --git a/hw/intc/armv7m_nvic.c b/hw/intc/armv7m_nvic.c
+index 5d9c883..63f2743 100644
+--- a/hw/intc/armv7m_nvic.c
++++ b/hw/intc/armv7m_nvic.c
+@@ -1786,10 +1786,12 @@ static MemTxResult nvic_sysreg_ns_write(void *opaque, hwaddr addr,
+                                         uint64_t value, unsigned size,
+                                         MemTxAttrs attrs)
+ {
++    MemoryRegion *mr = opaque;
++
+     if (attrs.secure) {
+         /* S accesses to the alias act like NS accesses to the real region */
+         attrs.secure = 0;
+-        return nvic_sysreg_write(opaque, addr, value, size, attrs);
++        return memory_region_dispatch_write(mr, addr, value, size, attrs);
+     } else {
+         /* NS attrs are RAZ/WI for privileged, and BusFault for user */
+         if (attrs.user) {
+@@ -1803,10 +1805,12 @@ static MemTxResult nvic_sysreg_ns_read(void *opaque, hwaddr addr,
+                                        uint64_t *data, unsigned size,
+                                        MemTxAttrs attrs)
+ {
++    MemoryRegion *mr = opaque;
++
+     if (attrs.secure) {
+         /* S accesses to the alias act like NS accesses to the real region */
+         attrs.secure = 0;
+-        return nvic_sysreg_read(opaque, addr, data, size, attrs);
++        return memory_region_dispatch_read(mr, addr, data, size, attrs);
+     } else {
+         /* NS attrs are RAZ/WI for privileged, and BusFault for user */
+         if (attrs.user) {
+@@ -2075,7 +2079,7 @@ static void armv7m_nvic_realize(DeviceState *dev, Error **errp)
+ 
+     if (arm_feature(&s->cpu->env, ARM_FEATURE_V8)) {
+         memory_region_init_io(&s->sysreg_ns_mem, OBJECT(s),
+-                              &nvic_sysreg_ns_ops, s,
++                              &nvic_sysreg_ns_ops, &s->sysregmem,
+                               "nvic_sysregs_ns", 0x1000);
+         memory_region_add_subregion(&s->container, 0x20000, &s->sysreg_ns_mem);
+     }
 -- 
 2.7.4
