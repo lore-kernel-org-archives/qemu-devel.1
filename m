@@ -1,23 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38814)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39032)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1eKo4w-0007kl-Od
-	for qemu-devel@nongnu.org; Fri, 01 Dec 2017 11:23:08 -0500
+	(envelope-from <peterx@redhat.com>) id 1eKo56-0007vH-4r
+	for qemu-devel@nongnu.org; Fri, 01 Dec 2017 11:23:25 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1eKo3w-0004yg-4s
-	for qemu-devel@nongnu.org; Fri, 01 Dec 2017 11:22:18 -0500
-Date: Fri, 1 Dec 2017 13:41:31 +0100
-From: Kevin Wolf <kwolf@redhat.com>
-Message-ID: <20171201124131.GD4147@localhost.localdomain>
-References: <20171130164401.29221-1-kwolf@redhat.com>
-	<ce174622-1df0-bf86-452e-280dd3f7e068@redhat.com>
-	<20171130182746.GF4039@localhost.localdomain>
-	<cb98da75-ca77-edce-6384-d612380e4e3c@redhat.com>
+	(envelope-from <peterx@redhat.com>) id 1eKo4E-0005N8-3U
+	for qemu-devel@nongnu.org; Fri, 01 Dec 2017 11:22:28 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:54534)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1eKo4D-0005LW-RB
+	for qemu-devel@nongnu.org; Fri, 01 Dec 2017 11:21:33 -0500
+Date: Fri, 1 Dec 2017 18:23:51 +0800
+From: Peter Xu <peterx@redhat.com>
+Message-ID: <20171201102351.GG2712@xz-mi>
+References: <20171108060130.3772-1-peterx@redhat.com>
+	<20171130200053.GF2248@work-vm>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <cb98da75-ca77-edce-6384-d612380e4e3c@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH] block: Formats don't need CONSISTENT_READ
- with NO_IO
+In-Reply-To: <20171130200053.GF2248@work-vm>
+Subject: Re: [Qemu-devel] [PATCH v4 00/32] Migration: postcopy failure
+ recovery
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,95 +28,62 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>
-Cc: qemu-block@nongnu.org, qemu-devel@nongnu.org, mreitz@redhat.com
+To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, "Daniel P. Berrange" <berrange@redhat.com>, Fam Zheng <famz@redhat.com>, Eric Blake <eblake@redhat.com>
+Cc: qemu-devel@nongnu.org, Alexey Perevalov <a.perevalov@samsung.com>, Juan Quintela <quintela@redhat.com>, Andrea Arcangeli <aarcange@redhat.com>
 
-Am 30.11.2017 um 20:05 hat Eric Blake geschrieben:
-> On 11/30/2017 12:27 PM, Kevin Wolf wrote:
-> > > > @@ -1936,7 +1938,9 @@ void bdrv_format_default_perms(BlockDriverState *bs, BdrvChild *c,
-> > > >            /* bs->file always needs to be consistent because of the metadata. We
-> > > >             * can never allow other users to resize or write to it. */
-> > > > -        perm |= BLK_PERM_CONSISTENT_READ;
-> > > > +        if (!(flags & BDRV_O_NO_IO)) {
-> > > > +            perm |= BLK_PERM_CONSISTENT_READ;
-> > > 
-> > > I thought BDRV_O_NO_IO only means we aren't doing I/O on guest-visible data,
-> > > but doesn't stop us from reading the metadata.  The comment is telling: if
-> > > we can read metadata, then we depend on CONSISTENT_READ for the metadata to
-> > > be stable (even if we don't care about guest data consistency).
-> > 
-> > Yes and no. The trouble is that at the file system level we have only a
-> > single bit to describe the consistency of the whole image throughout the
-> > whole block driver tree.
-> > 
-> > We forbid shared BLK_PERM_CONSISTENT_READ for mirror targets (which
-> > aren't fully populated yet) and intermediate nodes for commit (which
-> > expose corrupted data). Both scenarios are really about the data exposed
-> > at the format layer, the metadata stays completely consistent.
+On Thu, Nov 30, 2017 at 08:00:54PM +0000, Dr. David Alan Gilbert wrote:
+> * Peter Xu (peterx@redhat.com) wrote:
+> > Tree is pushed here for better reference and testing:
+> >   github.com/xzpeter postcopy-recovery-support
 > 
-> I guess it is the block of writes/resizes that prevents metadata from
-> getting inconsistent; CONSISTENT_READ does indeed make more sense if
-> interpreted solely in light of will the guest read consistent data
-> (and not will the format layer see consistent contents from the
-> protocol layer).
+> Hi Peter,
+>   Do you have a git with this code + your OOB world in?
+> I'd like to play with doing recovery and see what happens;
+> I still worry a bit about whether the (potentially hung) main loop
+> is needed for the new incoming connection to be accepted by the
+> destination.
 
-Yes, that's what the write/resize locks are meant for.
+Good question...
 
-Consistent read is more about "this image may not contain the useful
-data you're expecting".
+I'd say I thought it was okay.  The reason is that as long as we run
+migrate-incoming command using run-oob=true, it'll be run in iothread,
+and our iothread implementation has this in iothread_run():
 
-> > The question is what we do with this as we propagate permissions down to
-> > the protocol layer. Strictly speaking, the file at the protocol layer is
-> > perfectly consistent, so we might not forbid BLK_PERM_CONSISTENT_READ
-> > there. But I think it's more useful to do it anyway so that image
-> > locking can prevent the typical case of another process that uses qcow2
-> > over file-posix again, where the file-posix node could in theory be
-> > considered consistent, but the qcow2 one wouldn't.
-> 
-> Does that mean we need two separate permission bits, one for whether
-> the guest-visible data is consistent, and one for whether the metadata
-> is consistent? But as I mentioned above, blocking writes should mean
-> that no one else is messing with metadata.
+    g_main_context_push_thread_default(iothread->worker_context);
 
-Even this works only in the simple case of format over protocol.
+This _should_ mean that from now on NULL context will be replaced with
+iothread->worker_context (which is the monitor context, rather than
+main thread any more) mostly (I say mostly because there are corner
+cases that glib won't use this thread-local var but still the global
+one, though it should not be our case I guess).
 
-I think this becomes pretty clear when you think of the (admittedly
-unlikely) case of nested qcow2. Then you need at least a bit per layer,
-one for the guest-visible data, one for the top-level qcow2 metadata and
-another one for the second qcow2 metadata.
+I tried to confirm this by breaking at the entry of function
+socket_accept_incoming_migration() on destination side.  Sadly, I was
+wrong.  It's still running in main().
 
-> > In the end, this is just a pragmatic way to let 'qemu-img info' work
-> > while the image is a mirror target or intermediate node for commit, but
-> > to forbid cases where corrupted data is used.
-> > 
-> > Or would you argue that either 'qemu-img info' shouldn't be working or
-> > reading corrupted data should be allowed in other processes?
-> 
-> Having qemu-img info work on a mirror target makes sense; as you pointed
-> out, the metadata flushed to disk is consistent (may have leaked clusters,
-> but not broken image) at any given point by the writer (it has to be, since
-> the writer has to be able to recover the image if there is an abrupt
-> restart).
+I found that the problem is that g_source_attach() implementation is
+still using the g_main_context_default() rather than
+g_main_context_get_thread_default() for the cases where context=NULL
+is passed in.  I don't know whether this is a glib bug:
 
-Exactly, that's the reasoning.
+g_source_attach (GSource      *source,
+		 GMainContext *context)
+{
+  guint result = 0;
+  ...
+  if (!context)
+    context = g_main_context_default ();
+  ...
+}
 
-> And a second reader can still manage to see inconsistent data
-> when reading two separate clusters if the timing is just right, regardless
-> of whether the first writer is always able to see consistent data.  So to
-> some extent, it's a measure of how risky is the action? qemu-img info is
-> read-only, and most of the time will just work; it is very hard to get to
-> the rare race condition where two consecutive reads raced with a parallel
-> writer combine to result in incorrect interpretation of the data by the
-> reader.
+I'm CCing some more people who may know better on glib than me.
 
-This again is more about the write permission. You still need 'qemu-img
-info -U' because there is a concurrent writer, so you have to
-acknowledge the risk you're mentioning.
+For now, I think a simple solution can be that, we just call
+g_main_context_get_thread_default() explicitly for QIO code.  But also
+I'd like to see how other people think too.
 
-> I'm not opposed to your patch, but am trying to make sure that I'm not
-> overlooking any problem before giving R-b.  Maybe it's just that the
-> comment needs updating in v2.
+I'll prepare one branch soon, including the two series (postcopy
+recovery + oob), after the solution is settled down.  Thanks,
 
-Do you have a suggestion for the comment?
-
-Kevin
+-- 
+Peter Xu
