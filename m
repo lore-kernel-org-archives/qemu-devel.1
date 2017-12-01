@@ -1,17 +1,18 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57549)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58331)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1eKnd1-0006gD-Sh
-	for qemu-devel@nongnu.org; Fri, 01 Dec 2017 10:54:27 -0500
+	(envelope-from <eblake@redhat.com>) id 1eKndW-000755-ND
+	for qemu-devel@nongnu.org; Fri, 01 Dec 2017 10:54:33 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1eKncS-0007MU-Gn
-	for qemu-devel@nongnu.org; Fri, 01 Dec 2017 10:53:27 -0500
+	(envelope-from <eblake@redhat.com>) id 1eKnco-0007gv-Fb
+	for qemu-devel@nongnu.org; Fri, 01 Dec 2017 10:53:58 -0500
 From: Eric Blake <eblake@redhat.com>
-Date: Thu, 30 Nov 2017 19:42:36 -0600
-Message-Id: <20171201014242.16877-15-eblake@redhat.com>
-In-Reply-To: <20171201014242.16877-1-eblake@redhat.com>
-References: <20171201014242.16877-1-eblake@redhat.com>
-Subject: [Qemu-devel] [PATCH v5 14/20] sheepdog: Switch to
- .bdrv_co_block_status()
+Date: Thu, 30 Nov 2017 19:42:22 -0600
+Message-Id: <20171201014242.16877-1-eblake@redhat.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PATCH v5 00/20] add byte-based block_status driver
+ callbacks
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -21,93 +22,103 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: kwolf@redhat.com, jsnow@redhat.com, famz@redhat.com, qemu-block@nongnu.org, vsementsov@virtuozzo.com, Hitoshi Mitake <mitake.hitoshi@lab.ntt.co.jp>, Liu Yuan <namei.unix@gmail.com>, Jeff Cody <jcody@redhat.com>, Max Reitz <mreitz@redhat.com>, "open list:Sheepdog" <sheepdog@lists.wpkg.org>
+Cc: kwolf@redhat.com, jsnow@redhat.com, famz@redhat.com, qemu-block@nongnu.org, vsementsov@virtuozzo.com
 
-We are gradually moving away from sector-based interfaces, towards
-byte-based.  Update the sheepdog driver accordingly.
+There are patches floating around to add NBD_CMD_BLOCK_STATUS,
+but NBD wants to report status on byte granularity (even if the
+reporting will probably be naturally aligned to sectors or even
+much higher levels).  I've therefore started the task of
+converting our block status code to report at a byte granularity
+rather than sectors.
 
-Signed-off-by: Eric Blake <eblake@redhat.com>
-Reviewed-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+These patches have been around for a while, but it's time to
+finish it now that 2.12 is nearly open for patches.
 
----
-v5: no change
-v4: update to interface tweak
-v3: no change
-v2: rebase to mapping flag
----
- block/sheepdog.c | 26 +++++++++++++-------------
- 1 file changed, 13 insertions(+), 13 deletions(-)
+The overall conversion currently looks like:
+part 1: bdrv_is_allocated (merged, commit 51b0a488, 2.10)
+part 2: dirty-bitmap (merged, commit ca759622, 2.11)
+part 3: bdrv_get_block_status (merged, commit f0a9c18f, 2.11)
+part 4: .bdrv_co_block_status (this series, v4 was here [1])
 
-diff --git a/block/sheepdog.c b/block/sheepdog.c
-index 696a71442a..0af8b07892 100644
---- a/block/sheepdog.c
-+++ b/block/sheepdog.c
-@@ -2988,19 +2988,19 @@ static coroutine_fn int sd_co_pdiscard(BlockDriverState *bs, int64_t offset,
-     return acb.ret;
- }
+[1] https://lists.gnu.org/archive/html/qemu-devel/2017-10/msg02940.html
 
--static coroutine_fn int64_t
--sd_co_get_block_status(BlockDriverState *bs, int64_t sector_num, int nb_sectors,
--                       int *pnum, BlockDriverState **file)
-+static coroutine_fn int
-+sd_co_block_status(BlockDriverState *bs, bool want_zero, int64_t offset,
-+                   int64_t bytes, int64_t *pnum, int64_t *map,
-+                   BlockDriverState **file)
- {
-     BDRVSheepdogState *s = bs->opaque;
-     SheepdogInode *inode = &s->inode;
-     uint32_t object_size = (UINT32_C(1) << inode->block_size_shift);
--    uint64_t offset = sector_num * BDRV_SECTOR_SIZE;
-     unsigned long start = offset / object_size,
--                  end = DIV_ROUND_UP((sector_num + nb_sectors) *
--                                     BDRV_SECTOR_SIZE, object_size);
-+                  end = DIV_ROUND_UP(offset + bytes, object_size);
-     unsigned long idx;
--    int64_t ret = BDRV_BLOCK_DATA | BDRV_BLOCK_OFFSET_VALID | offset;
-+    *map = offset;
-+    int ret = BDRV_BLOCK_DATA | BDRV_BLOCK_OFFSET_VALID;
+Available as a tag at:
+git fetch git://repo.or.cz/qemu/ericb.git nbd-byte-callback-v5
 
-     for (idx = start; idx < end; idx++) {
-         if (inode->data_vdi_id[idx] == 0) {
-@@ -3017,9 +3017,9 @@ sd_co_get_block_status(BlockDriverState *bs, int64_t sector_num, int nb_sectors,
-         }
-     }
+Since v4:
+- rebase to master
+- fix several bugs found by Vladimir
+- drop some redundant code
+- assert that the drivers make progress (returning success must have
+a non-zero value stored in *pnum)
 
--    *pnum = (idx - start) * object_size / BDRV_SECTOR_SIZE;
--    if (*pnum > nb_sectors) {
--        *pnum = nb_sectors;
-+    *pnum = (idx - start) * object_size;
-+    if (*pnum > bytes) {
-+        *pnum = bytes;
-     }
-     if (ret > 0 && ret & BDRV_BLOCK_OFFSET_VALID) {
-         *file = bs;
-@@ -3097,7 +3097,7 @@ static BlockDriver bdrv_sheepdog = {
-     .bdrv_co_writev = sd_co_writev,
-     .bdrv_co_flush_to_disk  = sd_co_flush_to_disk,
-     .bdrv_co_pdiscard = sd_co_pdiscard,
--    .bdrv_co_get_block_status = sd_co_get_block_status,
-+    .bdrv_co_block_status   = sd_co_block_status,
+001/20:[0009] [FC] 'block: Add .bdrv_co_block_status() callback'
+002/20:[----] [-C] 'block: Switch passthrough drivers to .bdrv_co_block_s=
+tatus()'
+003/20:[0019] [FC] 'file-posix: Switch to .bdrv_co_block_status()'
+004/20:[0019] [FC] 'gluster: Switch to .bdrv_co_block_status()'
+005/20:[----] [--] 'iscsi: Switch cluster_sectors to byte-based'
+006/20:[----] [--] 'iscsi: Switch iscsi_allocmap_update() to byte-based'
+007/20:[0005] [FC] 'iscsi: Switch to .bdrv_co_block_status()'
+008/20:[0002] [FC] 'null: Switch to .bdrv_co_block_status()'
+009/20:[----] [-C] 'parallels: Switch to .bdrv_co_block_status()'
+010/20:[----] [--] 'qcow: Switch to .bdrv_co_block_status()'
+011/20:[----] [--] 'qcow2: Switch to .bdrv_co_block_status()'
+012/20:[0002] [FC] 'qed: Switch to .bdrv_co_block_status()'
+013/20:[----] [--] 'raw: Switch to .bdrv_co_block_status()'
+014/20:[----] [--] 'sheepdog: Switch to .bdrv_co_block_status()'
+015/20:[----] [--] 'vdi: Avoid bitrot of debugging code'
+016/20:[0002] [FC] 'vdi: Switch to .bdrv_co_block_status()'
+017/20:[0010] [FC] 'vmdk: Switch to .bdrv_co_block_status()'
+018/20:[0007] [FC] 'vpc: Switch to .bdrv_co_block_status()'
+019/20:[----] [--] 'vvfat: Switch to .bdrv_co_block_status()'
+020/20:[----] [-C] 'block: Drop unused .bdrv_co_get_block_status()'
 
-     .bdrv_snapshot_create   = sd_snapshot_create,
-     .bdrv_snapshot_goto     = sd_snapshot_goto,
-@@ -3133,7 +3133,7 @@ static BlockDriver bdrv_sheepdog_tcp = {
-     .bdrv_co_writev = sd_co_writev,
-     .bdrv_co_flush_to_disk  = sd_co_flush_to_disk,
-     .bdrv_co_pdiscard = sd_co_pdiscard,
--    .bdrv_co_get_block_status = sd_co_get_block_status,
-+    .bdrv_co_block_status   = sd_co_block_status,
+Eric Blake (20):
+  block: Add .bdrv_co_block_status() callback
+  block: Switch passthrough drivers to .bdrv_co_block_status()
+  file-posix: Switch to .bdrv_co_block_status()
+  gluster: Switch to .bdrv_co_block_status()
+  iscsi: Switch cluster_sectors to byte-based
+  iscsi: Switch iscsi_allocmap_update() to byte-based
+  iscsi: Switch to .bdrv_co_block_status()
+  null: Switch to .bdrv_co_block_status()
+  parallels: Switch to .bdrv_co_block_status()
+  qcow: Switch to .bdrv_co_block_status()
+  qcow2: Switch to .bdrv_co_block_status()
+  qed: Switch to .bdrv_co_block_status()
+  raw: Switch to .bdrv_co_block_status()
+  sheepdog: Switch to .bdrv_co_block_status()
+  vdi: Avoid bitrot of debugging code
+  vdi: Switch to .bdrv_co_block_status()
+  vmdk: Switch to .bdrv_co_block_status()
+  vpc: Switch to .bdrv_co_block_status()
+  vvfat: Switch to .bdrv_co_block_status()
+  block: Drop unused .bdrv_co_get_block_status()
 
-     .bdrv_snapshot_create   = sd_snapshot_create,
-     .bdrv_snapshot_goto     = sd_snapshot_goto,
-@@ -3169,7 +3169,7 @@ static BlockDriver bdrv_sheepdog_unix = {
-     .bdrv_co_writev = sd_co_writev,
-     .bdrv_co_flush_to_disk  = sd_co_flush_to_disk,
-     .bdrv_co_pdiscard = sd_co_pdiscard,
--    .bdrv_co_get_block_status = sd_co_get_block_status,
-+    .bdrv_co_block_status   = sd_co_block_status,
+ include/block/block.h     |   9 ++-
+ include/block/block_int.h |  45 +++++++------
+ block/io.c                |  81 +++++++++++-------------
+ block/blkdebug.c          |  20 +++---
+ block/commit.c            |   2 +-
+ block/file-posix.c        |  62 +++++++++---------
+ block/gluster.c           |  70 ++++++++++-----------
+ block/iscsi.c             | 157 ++++++++++++++++++++++++----------------=
+------
+ block/mirror.c            |   2 +-
+ block/null.c              |  23 +++----
+ block/parallels.c         |  22 ++++---
+ block/qcow.c              |  27 ++++----
+ block/qcow2.c             |  24 +++----
+ block/qed.c               |  84 +++++++++----------------
+ block/raw-format.c        |  16 ++---
+ block/sheepdog.c          |  26 ++++----
+ block/throttle.c          |   2 +-
+ block/vdi.c               |  45 +++++++------
+ block/vmdk.c              |  38 +++++------
+ block/vpc.c               |  43 ++++++-------
+ block/vvfat.c             |  16 +++--
+ 21 files changed, 398 insertions(+), 416 deletions(-)
 
-     .bdrv_snapshot_create   = sd_snapshot_create,
-     .bdrv_snapshot_goto     = sd_snapshot_goto,
--- 
+--=20
 2.14.3
