@@ -1,28 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39923)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42115)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <prasad.singamsetty@oracle.com>) id 1eKps1-0004nw-Ob
-	for qemu-devel@nongnu.org; Fri, 01 Dec 2017 13:17:07 -0500
+	(envelope-from <alistair23@gmail.com>) id 1eKpwO-0000x3-Vy
+	for qemu-devel@nongnu.org; Fri, 01 Dec 2017 13:21:38 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <prasad.singamsetty@oracle.com>) id 1eKprw-0002QZ-Hw
-	for qemu-devel@nongnu.org; Fri, 01 Dec 2017 13:17:05 -0500
-Received: from userp1040.oracle.com ([156.151.31.81]:38942)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <prasad.singamsetty@oracle.com>)
-	id 1eKprw-0002Os-3u
-	for qemu-devel@nongnu.org; Fri, 01 Dec 2017 13:17:00 -0500
-References: <20171114231350.286025-1-prasad.singamsetty@oracle.com>
-	<20171114231350.286025-2-prasad.singamsetty@oracle.com>
-	<20171201112301.GB31366@sky-dev>
-From: Prasad Singamsetty <prasad.singamsetty@oracle.com>
-Message-ID: <9dc1a1d0-10b1-5dfa-e680-e2d606694fb2@oracle.com>
-Date: Fri, 1 Dec 2017 10:15:45 -0800
+	(envelope-from <alistair23@gmail.com>) id 1eKpwM-0005mp-Uw
+	for qemu-devel@nongnu.org; Fri, 01 Dec 2017 13:21:36 -0500
+Received: from mail-wr0-x243.google.com ([2a00:1450:400c:c0c::243]:41295)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <alistair23@gmail.com>)
+	id 1eKpwM-0005m3-Js
+	for qemu-devel@nongnu.org; Fri, 01 Dec 2017 13:21:34 -0500
+Received: by mail-wr0-x243.google.com with SMTP id z18so11063407wrb.8
+	for <qemu-devel@nongnu.org>; Fri, 01 Dec 2017 10:21:34 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <20171201112301.GB31366@sky-dev>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v1 1/2] intel-iommu: Redefine macros to
- enable supporting 48 bit address width
+Sender: alistair23@gmail.com
+In-Reply-To: <CAAYMZQtOBdq=z98Neu7Lh=GU3Gqoqukc-YLCEtv-wv8hPwgOVQ@mail.gmail.com>
+References: <cover.1511908159.git.alistair.francis@xilinx.com>
+	<058b3888cf0d40a3f29a156e1ed9cc27fd579548.1511908159.git.alistair.francis@xilinx.com>
+	<CAAYMZQtOBdq=z98Neu7Lh=GU3Gqoqukc-YLCEtv-wv8hPwgOVQ@mail.gmail.com>
+From: Alistair Francis <alistair.francis@xilinx.com>
+Date: Fri, 1 Dec 2017 10:21:02 -0800
+Message-ID: <CAKmqyKNkv=OhQfyzPZ68qxDn5j3Yj7nx5TPNFFFXr4wAAXh6dg@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH-2.12 v1 2/3] xilinx_spis: Set all of the
+ reset values
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,291 +32,157 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Liu, Yi L" <yi.l.liu@linux.intel.com>
-Cc: qemu-devel@nongnu.org, pbonzini@redhat.com, rth@twiddle.net, ehabkost@redhat.com, mst@redhat.com, imammedo@redhat.com, peterx@redhat.com, konrad.wilk@oracle.com
+To: francisco iglesias <frasse.iglesias@gmail.com>
+Cc: Alistair Francis <alistair.francis@xilinx.com>, "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>, Edgar Iglesias <edgar.iglesias@xilinx.com>, Edde <edgar.iglesias@gmail.com>
 
-
-
-On 12/1/2017 3:23 AM, Liu, Yi L wrote:
-> On Tue, Nov 14, 2017 at 06:13:49PM -0500, prasad.singamsetty@oracle.com wrote:
->> From: Prasad Singamsetty <prasad.singamsetty@oracle.com>
+On Wed, Nov 29, 2017 at 2:03 PM, francisco iglesias
+<frasse.iglesias@gmail.com> wrote:
+>
+>
+> On 28 November 2017 at 23:31, Alistair Francis <alistair.francis@xilinx.com>
+> wrote:
+>
+> Dear Alistair,
+>
+> There is a typo in the commit message:
+> s/xilinx_spis/xilinx_spips/
+>
+>> Following the ZynqMP register spec let's ensure that all reset values
+>> are set.
 >>
->> The current implementation of Intel IOMMU code only supports 39 bits
->> host/iova address width so number of macros use hard coded values based
->> on that. This patch is to redefine them so they can be used with
->> variable address widths. This patch doesn't add any new functionality
->> but enables adding support for 48 bit address width.
->>
->> Signed-off-by: Prasad Singamsetty <prasad.singamsety@oracle.com>
+>> Signed-off-by: Alistair Francis <alistair.francis@xilinx.com>
 >> ---
->>   hw/i386/intel_iommu.c          | 54 ++++++++++++++++++++++++------------------
->>   hw/i386/intel_iommu_internal.h | 34 +++++++++++++++++++-------
->>   include/hw/i386/intel_iommu.h  |  6 +++--
->>   3 files changed, 61 insertions(+), 33 deletions(-)
 >>
->> diff --git a/hw/i386/intel_iommu.c b/hw/i386/intel_iommu.c
->> index 3a5bb0bc2e..53b3bf244d 100644
->> --- a/hw/i386/intel_iommu.c
->> +++ b/hw/i386/intel_iommu.c
->> @@ -523,7 +523,7 @@ static inline dma_addr_t vtd_ce_get_slpt_base(VTDContextEntry *ce)
->>   
->>   static inline uint64_t vtd_get_slpte_addr(uint64_t slpte)
->>   {
->> -    return slpte & VTD_SL_PT_BASE_ADDR_MASK;
->> +    return slpte & VTD_SL_PT_BASE_ADDR_MASK(VTD_HOST_ADDRESS_WIDTH);
->>   }
->>   
->>   /* Whether the pte indicates the address of the page frame */
->> @@ -624,19 +624,12 @@ static inline bool vtd_iova_range_check(uint64_t iova, VTDContextEntry *ce)
->>       return !(iova & ~(vtd_iova_limit(ce) - 1));
->>   }
->>   
->> -static const uint64_t vtd_paging_entry_rsvd_field[] = {
->> -    [0] = ~0ULL,
->> -    /* For not large page */
->> -    [1] = 0x800ULL | ~(VTD_HAW_MASK | VTD_SL_IGN_COM),
->> -    [2] = 0x800ULL | ~(VTD_HAW_MASK | VTD_SL_IGN_COM),
->> -    [3] = 0x800ULL | ~(VTD_HAW_MASK | VTD_SL_IGN_COM),
->> -    [4] = 0x880ULL | ~(VTD_HAW_MASK | VTD_SL_IGN_COM),
->> -    /* For large page */
->> -    [5] = 0x800ULL | ~(VTD_HAW_MASK | VTD_SL_IGN_COM),
->> -    [6] = 0x1ff800ULL | ~(VTD_HAW_MASK | VTD_SL_IGN_COM),
->> -    [7] = 0x3ffff800ULL | ~(VTD_HAW_MASK | VTD_SL_IGN_COM),
->> -    [8] = 0x880ULL | ~(VTD_HAW_MASK | VTD_SL_IGN_COM),
->> -};
->> +/*
->> + * Rsvd field masks for spte:
->> + *     Index [1] to [4] 4k pages
->> + *     Index [5] to [8] large pages
->> + */
->> +static uint64_t vtd_paging_entry_rsvd_field[9];
->>   
->>   static bool vtd_slpte_nonzero_rsvd(uint64_t slpte, uint32_t level)
->>   {
->> @@ -874,7 +867,7 @@ static int vtd_dev_to_context_entry(IntelIOMMUState *s, uint8_t bus_num,
->>           return -VTD_FR_ROOT_ENTRY_P;
->>       }
->>   
->> -    if (re.rsvd || (re.val & VTD_ROOT_ENTRY_RSVD)) {
->> +    if (re.rsvd || (re.val & VTD_ROOT_ENTRY_RSVD(VTD_HOST_ADDRESS_WIDTH))) {
->>           trace_vtd_re_invalid(re.rsvd, re.val);
->>           return -VTD_FR_ROOT_ENTRY_RSVD;
->>       }
->> @@ -891,7 +884,7 @@ static int vtd_dev_to_context_entry(IntelIOMMUState *s, uint8_t bus_num,
->>       }
->>   
->>       if ((ce->hi & VTD_CONTEXT_ENTRY_RSVD_HI) ||
->> -        (ce->lo & VTD_CONTEXT_ENTRY_RSVD_LO)) {
->> +               (ce->lo & VTD_CONTEXT_ENTRY_RSVD_LO(VTD_HOST_ADDRESS_WIDTH))) {
->>           trace_vtd_ce_invalid(ce->hi, ce->lo);
->>           return -VTD_FR_CONTEXT_ENTRY_RSVD;
->>       }
->> @@ -1207,7 +1200,7 @@ static void vtd_root_table_setup(IntelIOMMUState *s)
->>   {
->>       s->root = vtd_get_quad_raw(s, DMAR_RTADDR_REG);
->>       s->root_extended = s->root & VTD_RTADDR_RTT;
->> -    s->root &= VTD_RTADDR_ADDR_MASK;
->> +    s->root &= VTD_RTADDR_ADDR_MASK(VTD_HOST_ADDRESS_WIDTH);
->>   
->>       trace_vtd_reg_dmar_root(s->root, s->root_extended);
->>   }
->> @@ -1223,7 +1216,7 @@ static void vtd_interrupt_remap_table_setup(IntelIOMMUState *s)
->>       uint64_t value = 0;
->>       value = vtd_get_quad_raw(s, DMAR_IRTA_REG);
->>       s->intr_size = 1UL << ((value & VTD_IRTA_SIZE_MASK) + 1);
->> -    s->intr_root = value & VTD_IRTA_ADDR_MASK;
->> +    s->intr_root = value & VTD_IRTA_ADDR_MASK(VTD_HOST_ADDRESS_WIDTH);
->>       s->intr_eime = value & VTD_IRTA_EIME;
->>   
->>       /* Notify global invalidation */
->> @@ -1479,7 +1472,7 @@ static void vtd_handle_gcmd_qie(IntelIOMMUState *s, bool en)
->>       trace_vtd_inv_qi_enable(en);
->>   
->>       if (en) {
->> -        s->iq = iqa_val & VTD_IQA_IQA_MASK;
->> +        s->iq = iqa_val & VTD_IQA_IQA_MASK(VTD_HOST_ADDRESS_WIDTH);
->>           /* 2^(x+8) entries */
->>           s->iq_size = 1UL << ((iqa_val & VTD_IQA_QS) + 8);
->>           s->qi_enabled = true;
->> @@ -2772,12 +2765,12 @@ static void vtd_address_space_unmap(VTDAddressSpace *as, IOMMUNotifier *n)
->>        * VT-d spec), otherwise we need to consider overflow of 64 bits.
->>        */
->>   
->> -    if (end > VTD_ADDRESS_SIZE) {
->> +    if (end > VTD_ADDRESS_SIZE(VTD_HOST_ADDRESS_WIDTH)) {
->>           /*
->>            * Don't need to unmap regions that is bigger than the whole
->>            * VT-d supported address space size
->>            */
->> -        end = VTD_ADDRESS_SIZE;
->> +        end = VTD_ADDRESS_SIZE(VTD_HOST_ADDRESS_WIDTH);
->>       }
->>   
->>       assert(start <= end);
->> @@ -2866,6 +2859,7 @@ static void vtd_iommu_replay(IOMMUMemoryRegion *iommu_mr, IOMMUNotifier *n)
->>   static void vtd_init(IntelIOMMUState *s)
->>   {
->>       X86IOMMUState *x86_iommu = X86_IOMMU_DEVICE(s);
->> +    uint8_t aw_bits = VTD_HOST_ADDRESS_WIDTH;
->>   
->>       memset(s->csr, 0, DMAR_REG_SIZE);
->>       memset(s->wmask, 0, DMAR_REG_SIZE);
->> @@ -2882,10 +2876,24 @@ static void vtd_init(IntelIOMMUState *s)
->>       s->qi_enabled = false;
->>       s->iq_last_desc_type = VTD_INV_DESC_NONE;
->>       s->next_frcd_reg = 0;
->> -    s->cap = VTD_CAP_FRO | VTD_CAP_NFR | VTD_CAP_ND | VTD_CAP_MGAW |
->> -             VTD_CAP_SAGAW | VTD_CAP_MAMV | VTD_CAP_PSI | VTD_CAP_SLLPS;
->> +    s->cap = VTD_CAP_FRO | VTD_CAP_NFR | VTD_CAP_ND |
->> +             VTD_CAP_MAMV | VTD_CAP_PSI | VTD_CAP_SLLPS |
->> +             VTD_CAP_SAGAW_39bit | VTD_CAP_MGAW(VTD_HOST_ADDRESS_WIDTH);
-> 
-> should the SAGAW also be corresponding to the MGAW config instead of
-> being static VTD_CAP_SAGAW_39bit?
-
-Correct. It is changed in 2/2 patch.
-
-@@ -2878,21 +2884,24 @@ static void vtd_init(IntelIOMMUState *s)
-      s->next_frcd_reg = 0;
-      s->cap = VTD_CAP_FRO | VTD_CAP_NFR | VTD_CAP_ND |
-               VTD_CAP_MAMV | VTD_CAP_PSI | VTD_CAP_SLLPS |
--             VTD_CAP_SAGAW_39bit | VTD_CAP_MGAW(VTD_HOST_ADDRESS_WIDTH);
-+             VTD_CAP_SAGAW_39bit | VTD_CAP_MGAW(s->aw_bits);
-+    if (s->aw_bits == VTD_HOST_AW_48BIT) {
-+        s->cap |= VTD_CAP_SAGAW_48bit;
-+    }
-
-Regards,
---Prasad
-
-> 
-> Regards,
-> Yi L
->>       s->ecap = VTD_ECAP_QI | VTD_ECAP_IRO;
->>   
->> +    /*
->> +     * Rsvd field masks for spte
->> +     */
->> +    vtd_paging_entry_rsvd_field[0] = ~0ULL;
->> +    vtd_paging_entry_rsvd_field[1] = VTD_SPTE_PAGE_L1_RSVD_MASK(aw_bits);
->> +    vtd_paging_entry_rsvd_field[2] = VTD_SPTE_PAGE_L2_RSVD_MASK(aw_bits);
->> +    vtd_paging_entry_rsvd_field[3] = VTD_SPTE_PAGE_L3_RSVD_MASK(aw_bits);
->> +    vtd_paging_entry_rsvd_field[4] = VTD_SPTE_PAGE_L4_RSVD_MASK(aw_bits);
->> +    vtd_paging_entry_rsvd_field[5] = VTD_SPTE_LPAGE_L1_RSVD_MASK(aw_bits);
->> +    vtd_paging_entry_rsvd_field[6] = VTD_SPTE_LPAGE_L2_RSVD_MASK(aw_bits);
->> +    vtd_paging_entry_rsvd_field[7] = VTD_SPTE_LPAGE_L3_RSVD_MASK(aw_bits);
->> +    vtd_paging_entry_rsvd_field[8] = VTD_SPTE_LPAGE_L4_RSVD_MASK(aw_bits);
+>>  hw/ssi/xilinx_spips.c         | 38 +++++++++++++++++++++++++++++++++-----
+>>  include/hw/ssi/xilinx_spips.h |  2 +-
+>>  2 files changed, 34 insertions(+), 6 deletions(-)
+>>
+>> diff --git a/hw/ssi/xilinx_spips.c b/hw/ssi/xilinx_spips.c
+>> index 899db814ee..1a37f9c7f5 100644
+>> --- a/hw/ssi/xilinx_spips.c
+>> +++ b/hw/ssi/xilinx_spips.c
+>> @@ -66,6 +66,7 @@
+>>
+>>  /* interrupt mechanism */
+>>  #define R_INTR_STATUS       (0x04 / 4)
+>> +#define R_INTR_STATUS_RESET (0x104)
+>>  #define R_INTR_EN           (0x08 / 4)
+>>  #define R_INTR_DIS          (0x0C / 4)
+>>  #define R_INTR_MASK         (0x10 / 4)
+>> @@ -102,6 +103,9 @@
+>>  #define R_SLAVE_IDLE_COUNT  (0x24 / 4)
+>>  #define R_TX_THRES          (0x28 / 4)
+>>  #define R_RX_THRES          (0x2C / 4)
+>> +#define R_GPIO              (0x30 / 4)
+>> +#define R_LPBK_DLY_ADJ      (0x38 / 4)
+>> +#define R_LPBK_DLY_ADJ_RESET (0x33)
+>>  #define R_TXD1              (0x80 / 4)
+>>  #define R_TXD2              (0x84 / 4)
+>>  #define R_TXD3              (0x88 / 4)
+>> @@ -137,11 +141,16 @@
+>>  #define R_GQSPI_SELECT          (0x144 / 4)
+>>      FIELD(GQSPI_SELECT, GENERIC_QSPI_EN, 0, 1)
+>>  #define R_GQSPI_ISR         (0x104 / 4)
+>> +#define R_GQSPI_ISR_RESET   (0xb84)
+>>  #define R_GQSPI_IER         (0x108 / 4)
+>>  #define R_GQSPI_IDR         (0x10c / 4)
+>>  #define R_GQSPI_IMR         (0x110 / 4)
+>> +#define R_GQSPI_IMR_RESET   (0xfbe)
+>>  #define R_GQSPI_TX_THRESH   (0x128 / 4)
+>>  #define R_GQSPI_RX_THRESH   (0x12c / 4)
+>> +#define R_GQSPI_GPIO_THRESH (0x130 / 4)
+>> +#define R_GQSPI_LPBK_DLY_ADJ (0x138 / 4)
+>> +#define R_GQSPI_LPBK_DLY_ADJ_RESET (0x33)
+>>  #define R_GQSPI_CNFG        (0x100 / 4)
+>>      FIELD(GQSPI_CNFG, MODE_EN, 30, 2)
+>>      FIELD(GQSPI_CNFG, GEN_FIFO_START_MODE, 29, 1)
+>> @@ -177,8 +186,16 @@
+>>      FIELD(GQSPI_GF_SNAPSHOT, EXPONENT, 9, 1)
+>>      FIELD(GQSPI_GF_SNAPSHOT, DATA_XFER, 8, 1)
+>>      FIELD(GQSPI_GF_SNAPSHOT, IMMEDIATE_DATA, 0, 8)
+>> -#define R_GQSPI_MOD_ID        (0x168 / 4)
+>> -#define R_GQSPI_MOD_ID_VALUE  0x010A0000
+>> +#define R_GQSPI_MOD_ID        (0x1fc / 4)
+>> +#define R_GQSPI_MOD_ID_RESET  (0x10a0000)
+>>
 >> +
->>       if (x86_iommu->intr_supported) {
->>           s->ecap |= VTD_ECAP_IR | VTD_ECAP_MHMV;
->>           if (s->intr_eim == ON_OFF_AUTO_ON) {
->> diff --git a/hw/i386/intel_iommu_internal.h b/hw/i386/intel_iommu_internal.h
->> index 0e73a65bf2..77e4a9833a 100644
->> --- a/hw/i386/intel_iommu_internal.h
->> +++ b/hw/i386/intel_iommu_internal.h
->> @@ -172,10 +172,10 @@
->>   
->>   /* RTADDR_REG */
->>   #define VTD_RTADDR_RTT              (1ULL << 11)
->> -#define VTD_RTADDR_ADDR_MASK        (VTD_HAW_MASK ^ 0xfffULL)
->> +#define VTD_RTADDR_ADDR_MASK(aw)    (VTD_HAW_MASK(aw) ^ 0xfffULL)
->>   
->>   /* IRTA_REG */
->> -#define VTD_IRTA_ADDR_MASK          (VTD_HAW_MASK ^ 0xfffULL)
->> +#define VTD_IRTA_ADDR_MASK(aw)      (VTD_HAW_MASK(aw) ^ 0xfffULL)
->>   #define VTD_IRTA_EIME               (1ULL << 11)
->>   #define VTD_IRTA_SIZE_MASK          (0xfULL)
->>   
->> @@ -198,8 +198,8 @@
->>   #define VTD_DOMAIN_ID_MASK          ((1UL << VTD_DOMAIN_ID_SHIFT) - 1)
->>   #define VTD_CAP_ND                  (((VTD_DOMAIN_ID_SHIFT - 4) / 2) & 7ULL)
->>   #define VTD_MGAW                    39  /* Maximum Guest Address Width */
->> -#define VTD_ADDRESS_SIZE            (1ULL << VTD_MGAW)
->> -#define VTD_CAP_MGAW                (((VTD_MGAW - 1) & 0x3fULL) << 16)
->> +#define VTD_ADDRESS_SIZE(aw)        (1ULL << (aw))
->> +#define VTD_CAP_MGAW(aw)            ((((aw) - 1) & 0x3fULL) << 16)
->>   #define VTD_MAMV                    18ULL
->>   #define VTD_CAP_MAMV                (VTD_MAMV << 48)
->>   #define VTD_CAP_PSI                 (1ULL << 39)
->> @@ -219,7 +219,7 @@
->>   #define VTD_IQT_QT(val)             (((val) >> 4) & 0x7fffULL)
->>   
->>   /* IQA_REG */
->> -#define VTD_IQA_IQA_MASK            (VTD_HAW_MASK ^ 0xfffULL)
->> +#define VTD_IQA_IQA_MASK(aw)        (VTD_HAW_MASK(aw) ^ 0xfffULL)
->>   #define VTD_IQA_QS                  0x7ULL
->>   
->>   /* IQH_REG */
->> @@ -373,6 +373,24 @@ typedef union VTDInvDesc VTDInvDesc;
->>   #define VTD_INV_DESC_DEVICE_IOTLB_RSVD_HI 0xffeULL
->>   #define VTD_INV_DESC_DEVICE_IOTLB_RSVD_LO 0xffff0000ffe0fff8
->>   
->> +/* Rsvd field masks for spte */
->> +#define VTD_SPTE_PAGE_L1_RSVD_MASK(aw) \
->> +        (0x800ULL | ~(VTD_HAW_MASK(aw) | VTD_SL_IGN_COM))
->> +#define VTD_SPTE_PAGE_L2_RSVD_MASK(aw) \
->> +        (0x800ULL | ~(VTD_HAW_MASK(aw) | VTD_SL_IGN_COM))
->> +#define VTD_SPTE_PAGE_L3_RSVD_MASK(aw) \
->> +        (0x800ULL | ~(VTD_HAW_MASK(aw) | VTD_SL_IGN_COM))
->> +#define VTD_SPTE_PAGE_L4_RSVD_MASK(aw) \
->> +        (0x880ULL | ~(VTD_HAW_MASK(aw) | VTD_SL_IGN_COM))
->> +#define VTD_SPTE_LPAGE_L1_RSVD_MASK(aw) \
->> +        (0x800ULL | ~(VTD_HAW_MASK(aw) | VTD_SL_IGN_COM))
->> +#define VTD_SPTE_LPAGE_L2_RSVD_MASK(aw) \
->> +        (0x1ff800ULL | ~(VTD_HAW_MASK(aw) | VTD_SL_IGN_COM))
->> +#define VTD_SPTE_LPAGE_L3_RSVD_MASK(aw) \
->> +        (0x3ffff800ULL | ~(VTD_HAW_MASK(aw) | VTD_SL_IGN_COM))
->> +#define VTD_SPTE_LPAGE_L4_RSVD_MASK(aw) \
->> +        (0x880ULL | ~(VTD_HAW_MASK(aw) | VTD_SL_IGN_COM))
+>> +#define R_QSPIDMA_DST_CTRL         (0x80c / 4)
+>> +#define R_QSPIDMA_DST_CTRL_RESET   (0x803ffa00)
+>> +#define R_QSPIDMA_DST_I_MASK       (0x820 / 4)
+>> +#define R_QSPIDMA_DST_I_MASK_RESET (0xfe)
+>> +#define R_QSPIDMA_DST_CTRL2        (0x824 / 4)
+>> +#define R_QSPIDMA_DST_CTRL2_RESET  (0x081bfff8)
 >> +
->>   /* Information about page-selective IOTLB invalidate */
->>   struct VTDIOTLBPageInvInfo {
->>       uint16_t domain_id;
->> @@ -403,7 +421,7 @@ typedef struct VTDRootEntry VTDRootEntry;
->>   #define VTD_ROOT_ENTRY_CTP          (~0xfffULL)
->>   
->>   #define VTD_ROOT_ENTRY_NR           (VTD_PAGE_SIZE / sizeof(VTDRootEntry))
->> -#define VTD_ROOT_ENTRY_RSVD         (0xffeULL | ~VTD_HAW_MASK)
->> +#define VTD_ROOT_ENTRY_RSVD(aw)     (0xffeULL | ~VTD_HAW_MASK(aw))
->>   
->>   /* Masks for struct VTDContextEntry */
->>   /* lo */
->> @@ -415,7 +433,7 @@ typedef struct VTDRootEntry VTDRootEntry;
->>   #define VTD_CONTEXT_TT_PASS_THROUGH (2ULL << 2)
->>   /* Second Level Page Translation Pointer*/
->>   #define VTD_CONTEXT_ENTRY_SLPTPTR   (~0xfffULL)
->> -#define VTD_CONTEXT_ENTRY_RSVD_LO   (0xff0ULL | ~VTD_HAW_MASK)
->> +#define VTD_CONTEXT_ENTRY_RSVD_LO(aw) (0xff0ULL | ~VTD_HAW_MASK(aw))
->>   /* hi */
->>   #define VTD_CONTEXT_ENTRY_AW        7ULL /* Adjusted guest-address-width */
->>   #define VTD_CONTEXT_ENTRY_DID(val)  (((val) >> 8) & VTD_DOMAIN_ID_MASK)
->> @@ -439,7 +457,7 @@ typedef struct VTDRootEntry VTDRootEntry;
->>   #define VTD_SL_RW_MASK              3ULL
->>   #define VTD_SL_R                    1ULL
->>   #define VTD_SL_W                    (1ULL << 1)
->> -#define VTD_SL_PT_BASE_ADDR_MASK    (~(VTD_PAGE_SIZE - 1) & VTD_HAW_MASK)
->> +#define VTD_SL_PT_BASE_ADDR_MASK(aw) (~(VTD_PAGE_SIZE - 1) & VTD_HAW_MASK(aw))
->>   #define VTD_SL_IGN_COM              0xbff0000000000000ULL
->>   
->>   #endif
->> diff --git a/include/hw/i386/intel_iommu.h b/include/hw/i386/intel_iommu.h
->> index ac15e6be14..372b06df45 100644
->> --- a/include/hw/i386/intel_iommu.h
->> +++ b/include/hw/i386/intel_iommu.h
->> @@ -46,8 +46,10 @@
->>   #define VTD_SID_TO_DEVFN(sid)       ((sid) & 0xff)
->>   
->>   #define DMAR_REG_SIZE               0x230
->> -#define VTD_HOST_ADDRESS_WIDTH      39
->> -#define VTD_HAW_MASK                ((1ULL << VTD_HOST_ADDRESS_WIDTH) - 1)
->> +#define VTD_HOST_AW_39BIT           39
->> +#define VTD_HOST_AW_48BIT           48
->> +#define VTD_HOST_ADDRESS_WIDTH      VTD_HOST_AW_39BIT
->> +#define VTD_HAW_MASK(aw)            ((1ULL << (aw)) - 1)
->>   
->>   #define DMAR_REPORT_F_INTR          (1)
->>   
->> -- 
->> 2.14.0-rc1
+>>  /* size of TXRX FIFOs */
+>>  #define RXFF_A          (128)
+>>  #define TXFF_A          (128)
+>> @@ -351,11 +368,22 @@ static void xlnx_zynqmp_qspips_reset(DeviceState *d)
+>>      fifo8_reset(&s->rx_fifo_g);
+>>      fifo8_reset(&s->rx_fifo_g);
+>>      fifo32_reset(&s->fifo_g);
+>> -    s->regs[R_GQSPI_TX_THRESH] = 1;
+>> -    s->regs[R_GQSPI_RX_THRESH] = 1;
+>> -    s->regs[R_GQSPI_GFIFO_THRESH] = 1;
+>> +    s->regs[R_INTR_STATUS] = R_INTR_STATUS_RESET;
+>> +    s->regs[R_GPIO] = 1;
+>>
+>> +    s->regs[R_LPBK_DLY_ADJ] = R_LPBK_DLY_ADJ_RESET;
+>> +    s->regs[R_GQSPI_GFIFO_THRESH] = 0x10;
+>>      s->regs[R_GQSPI_IMR] = GQSPI_IXR_MASK;
+>
+>
+> Also, above row will be overriden below so maybe we should remove it?
+
+Yes, we should. I'll remove it.
+
+>
+>>
+>>      s->regs[R_MOD_ID] = 0x01090101;
+>> +    s->regs[R_GQSPI_ISR] = R_GQSPI_ISR_RESET;
+>
+>
+> To be noted, above row will also be overriden by
+> xlnx_zynqmp_qspips_update_ixr below but maybe it is good to have for
+> consistency (you can decide).
+
+Ah, good point. I'll remove this one as well.
+
+Alistair
+
+>
+> Best regards,
+> Francisco Iglesias
+>
+>
+>>
+>> +    s->regs[R_GQSPI_IMR] = R_GQSPI_IMR_RESET;
+>> +    s->regs[R_GQSPI_TX_THRESH] = 1;
+>> +    s->regs[R_GQSPI_RX_THRESH] = 1;
+>> +    s->regs[R_GQSPI_GPIO_THRESH] = 1;
+>>
+>> +    s->regs[R_GQSPI_LPBK_DLY_ADJ] = R_GQSPI_LPBK_DLY_ADJ_RESET;
+>> +    s->regs[R_GQSPI_MOD_ID] = R_GQSPI_MOD_ID_RESET;
+>> +    s->regs[R_QSPIDMA_DST_CTRL] = R_QSPIDMA_DST_CTRL_RESET;
+>> +    s->regs[R_QSPIDMA_DST_I_MASK] = R_QSPIDMA_DST_I_MASK_RESET;
+>> +    s->regs[R_QSPIDMA_DST_CTRL2] = R_QSPIDMA_DST_CTRL2_RESET;
+>>      s->man_start_com_g = false;
+>>      s->gqspi_irqline = 0;
+>>      xlnx_zynqmp_qspips_update_ixr(s);
+>> diff --git a/include/hw/ssi/xilinx_spips.h b/include/hw/ssi/xilinx_spips.h
+>> index 75fc94ce5d..d398a4e81c 100644
+>> --- a/include/hw/ssi/xilinx_spips.h
+>> +++ b/include/hw/ssi/xilinx_spips.h
+>> @@ -32,7 +32,7 @@
+>>  typedef struct XilinxSPIPS XilinxSPIPS;
+>>
+>>  #define XLNX_SPIPS_R_MAX        (0x100 / 4)
+>> -#define XLNX_ZYNQMP_SPIPS_R_MAX (0x200 / 4)
+>> +#define XLNX_ZYNQMP_SPIPS_R_MAX (0x830 / 4)
+>>
+>>  /* Bite off 4k chunks at a time */
+>>  #define LQSPI_CACHE_SIZE 1024
+>> --
+>> 2.14.1
 >>
 >>
+>
