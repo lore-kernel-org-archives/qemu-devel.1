@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59193)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44413)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <klim.kireev@virtuozzo.com>) id 1eKu7j-0003jd-0a
-	for qemu-devel@nongnu.org; Fri, 01 Dec 2017 17:49:36 -0500
+	(envelope-from <eblake@redhat.com>) id 1eKufh-0007IX-A0
+	for qemu-devel@nongnu.org; Fri, 01 Dec 2017 18:24:44 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <klim.kireev@virtuozzo.com>) id 1eKu7i-0004nq-5h
-	for qemu-devel@nongnu.org; Fri, 01 Dec 2017 17:49:35 -0500
-From: Klim Kireev <klim.kireev@virtuozzo.com>
-Date: Sat, 2 Dec 2017 01:49:09 +0300
-Message-ID: <20171201224909.9373-1-klim.kireev@virtuozzo.com>
+	(envelope-from <eblake@redhat.com>) id 1eKufe-00045O-52
+	for qemu-devel@nongnu.org; Fri, 01 Dec 2017 18:24:41 -0500
+From: Eric Blake <eblake@redhat.com>
+Date: Fri,  1 Dec 2017 17:24:26 -0600
+Message-Id: <20171201232433.25193-1-eblake@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: [Qemu-devel] [PATCH v2] qemu-img: add the simplest format
- recognition
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PATCH v2 0/7] macro do/while (0) cleanup
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -20,85 +20,76 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: kwolf@redhat.com, mreitz@redhat.com, qemu-block@nongnu.org, qemu-devel@nongnu.org
-Cc: den@openvz.org, vsementsov@virtuozzo.com, klim.kireev@virtuozzo.com
+To: qemu-devel@nongnu.org
+Cc: armbru@redhat.com, qemu-trivial@nongnu.org, pbonzini@redhat.com
 
-Now, if you type something like
+Noticed this by chance in the tests/ directory, so I broadened
+it to a grep of the entire code base.  I suspect^wKNOW many of
+the bad macros were the victims of copy-and-paste from some
+other bad location (particularly given how many bit-rotten
+debug print macros were involved).
 
-qemu-img create disk.qcow2 1G
-or
-qemu-img dd if=/dev/sda of=disk.qcow2
+https://wiki.qemu.org/BiteSizedTasks#Bitrot_prevention is still
+left for someone else, for another day.
 
-it creates a raw image and if you need you should
-manually specify an image format with -f qcow2. It would
-be more convenient if it could be detected from an extension.
+In v2:
+- add review tags
+- audit that the maint patch has no semantic change (all callers
+were indeed supplying ';' at the macro call-sites)
+- improved commit messages
+- more patches for some additional cleanups
+- tighten the checkpatch rule to also flag 'while (false);'
 
-This patch adds a simple heuristic to recognize the image format
-for qcow, qcow2, vmdk, vhdx, vdi
+Eric Blake (7):
+  net: Drop unusual use of do { } while (0);
+  mips: Tweak location of ';' in macros
+  chardev: Use goto/label instead of do/break/while(0)
+  chardev: Clean up previous patch indentation
+  tests: Avoid 'do/while(false);' in vhost-user-bridge
+  maint: Fix macros with broken 'do/while(0);' usage
+  checkpatch: Enforce proper do/while (0) style
 
-It warns users about guessed format and informs them about '-f' option.
+ tests/acpi-utils.h         |  8 ++---
+ ui/sdl_zoom_template.h     |  8 ++---
+ audio/paaudio.c            |  4 +--
+ chardev/char-serial.c      | 75 ++++++++++++++++++++++++----------------=
+------
+ hw/adc/stm32f2xx_adc.c     |  2 +-
+ hw/block/m25p80.c          |  2 +-
+ hw/char/cadence_uart.c     |  2 +-
+ hw/char/stm32f2xx_usart.c  |  2 +-
+ hw/display/cg3.c           |  2 +-
+ hw/display/dpcd.c          |  2 +-
+ hw/display/xlnx_dp.c       |  2 +-
+ hw/dma/pl330.c             |  2 +-
+ hw/dma/xlnx-zynq-devcfg.c  |  2 +-
+ hw/dma/xlnx_dpdma.c        |  2 +-
+ hw/i2c/i2c-ddc.c           |  2 +-
+ hw/misc/auxbus.c           |  2 +-
+ hw/misc/macio/mac_dbdma.c  |  4 +--
+ hw/misc/mmio_interface.c   |  2 +-
+ hw/misc/stm32f2xx_syscfg.c |  2 +-
+ hw/misc/zynq_slcr.c        |  2 +-
+ hw/net/cadence_gem.c       |  2 +-
+ hw/net/pcnet.c             | 20 ++++++-------
+ hw/ssi/mss-spi.c           |  2 +-
+ hw/ssi/stm32f2xx_spi.c     |  2 +-
+ hw/ssi/xilinx_spi.c        |  2 +-
+ hw/ssi/xilinx_spips.c      |  2 +-
+ hw/timer/a9gtimer.c        |  2 +-
+ hw/timer/cadence_ttc.c     |  2 +-
+ hw/timer/mss-timer.c       |  2 +-
+ hw/timer/stm32f2xx_timer.c |  2 +-
+ hw/tpm/tpm_passthrough.c   |  2 +-
+ hw/tpm/tpm_tis.c           |  2 +-
+ migration/rdma.c           |  2 +-
+ target/arm/translate-a64.c |  2 +-
+ target/mips/msa_helper.c   | 34 +++++++++++----------
+ target/s390x/kvm.c         |  2 +-
+ tests/tcg/test-mmap.c      |  2 +-
+ tests/vhost-user-bridge.c  |  6 ++--
+ scripts/checkpatch.pl      |  5 ++++
+ 39 files changed, 119 insertions(+), 105 deletions(-)
 
-Signed-off-by: Klim Kireev <klim.kireev@virtuozzo.com>
----
- qemu-img.c | 21 +++++++++++++++++++--
- 1 file changed, 19 insertions(+), 2 deletions(-)
-
-diff --git a/qemu-img.c b/qemu-img.c
-index 02a6e27beb..ac1adf1582 100644
---- a/qemu-img.c
-+++ b/qemu-img.c
-@@ -421,11 +421,22 @@ static int64_t cvtnum(const char *s)
-     return value;
- }
- 
-+static const char *get_format(const char *filename)
-+{
-+    const char *fmt = strrchr(filename, '.');
-+    if (fmt == NULL || bdrv_find_format(++fmt) == NULL) {
-+        fmt = "raw";
-+    }
-+    printf("!!! %s format was detected.\n"
-+           "!!! If you meant another format, specify it with -f.\n", fmt);
-+    return fmt;
-+}
-+
- static int img_create(int argc, char **argv)
- {
-     int c;
-     uint64_t img_size = -1;
--    const char *fmt = "raw";
-+    const char *fmt = NULL;
-     const char *base_fmt = NULL;
-     const char *filename;
-     const char *base_filename = NULL;
-@@ -496,6 +507,9 @@ static int img_create(int argc, char **argv)
- 
-     /* Get the filename */
-     filename = (optind < argc) ? argv[optind] : NULL;
-+    if (fmt == NULL) {
-+        fmt = get_format(filename);
-+    }
-     if (options && has_help_option(options)) {
-         g_free(options);
-         return print_block_option_help(filename, fmt);
-@@ -4181,7 +4195,7 @@ static int img_dd(int argc, char **argv)
-     Error *local_err = NULL;
-     bool image_opts = false;
-     int c, i;
--    const char *out_fmt = "raw";
-+    const char *out_fmt = NULL;
-     const char *fmt = NULL;
-     int64_t size = 0;
-     int64_t block_count = 0, out_pos, in_pos;
-@@ -4308,6 +4322,9 @@ static int img_dd(int argc, char **argv)
-         goto out;
-     }
- 
-+    if (out_fmt == NULL) {
-+        out_fmt = get_format(out.filename);
-+    }
-     drv = bdrv_find_format(out_fmt);
-     if (!drv) {
-         error_report("Unknown file format");
--- 
-2.13.6
+--=20
+2.14.3
