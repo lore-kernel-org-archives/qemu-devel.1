@@ -1,17 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44928)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46767)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1eKugG-0007jg-4R
-	for qemu-devel@nongnu.org; Fri, 01 Dec 2017 18:25:19 -0500
+	(envelope-from <eblake@redhat.com>) id 1eKujX-0001dk-K3
+	for qemu-devel@nongnu.org; Fri, 01 Dec 2017 18:28:41 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1eKugD-0004js-M9
-	for qemu-devel@nongnu.org; Fri, 01 Dec 2017 18:25:15 -0500
+	(envelope-from <eblake@redhat.com>) id 1eKujW-0008OY-Mi
+	for qemu-devel@nongnu.org; Fri, 01 Dec 2017 18:28:39 -0500
+References: <20171201224909.9373-1-klim.kireev@virtuozzo.com>
 From: Eric Blake <eblake@redhat.com>
-Date: Fri,  1 Dec 2017 17:24:32 -0600
-Message-Id: <20171201232433.25193-7-eblake@redhat.com>
-In-Reply-To: <20171201232433.25193-1-eblake@redhat.com>
-References: <20171201232433.25193-1-eblake@redhat.com>
-Subject: [Qemu-devel] [PATCH v2 6/7] maint: Fix macros with broken
- 'do/while(0); ' usage
+Message-ID: <c18c4367-e605-9deb-cbf9-d3fea4b631f5@redhat.com>
+Date: Fri, 1 Dec 2017 17:28:29 -0600
+MIME-Version: 1.0
+In-Reply-To: <20171201224909.9373-1-klim.kireev@virtuozzo.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="NEinXnB4jcvA6d3DhaAdx0jRAxBhoTVS0"
+Subject: Re: [Qemu-devel] [PATCH v2] qemu-img: add the simplest format
+ recognition
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -20,585 +24,99 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: armbru@redhat.com, qemu-trivial@nongnu.org, pbonzini@redhat.com, Gerd Hoffmann <kraxel@redhat.com>, Alistair Francis <alistair@alistair23.me>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, "Edgar E. Iglesias" <edgar.iglesias@gmail.com>, Peter Maydell <peter.maydell@linaro.org>, Alexander Graf <agraf@suse.de>, Jason Wang <jasowang@redhat.com>, Subbaraya Sundeep <sundeep.lkml@gmail.com>, Stefan Berger <stefanb@linux.vnet.ibm.com>, Juan Quintela <quintela@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Christian Borntraeger <borntraeger@de.ibm.com>, Cornelia Huck <cohuck@redhat.com>, Richard Henderson <rth@twiddle.net>, "Michael S. Tsirkin" <mst@redhat.com>, Igor Mammedov <imammedo@redhat.com>, "open list:Block layer core" <qemu-block@nongnu.org>, "open list:Xilinx Zynq" <qemu-arm@nongnu.org>, "open list:New World" <qemu-ppc@nongnu.org>, "open list:S390" <qemu-s390x@nongnu.org>
+To: Klim Kireev <klim.kireev@virtuozzo.com>, kwolf@redhat.com, mreitz@redhat.com, qemu-block@nongnu.org, qemu-devel@nongnu.org
+Cc: den@openvz.org, vsementsov@virtuozzo.com
 
-The point of writing a macro embedded in a 'do { ... } while (0)'
-loop (particularly if the macro has multiple statements or would
-otherwise end with an 'if' statement) is so that the macro can be
-used as a drop-in statement with the caller supplying the
-trailing ';'.  Although our coding style frowns on brace-less 'if':
-  if (cond)
-    statement;
-  else
-    something else;
-that is the classic case where failure to use do/while(0) wrapping
-would cause the 'else' to pair with any embedded 'if' in the macro
-rather than the intended outer 'if'.  But conversely, if the macro
-includes an embedded ';', then the same brace-less coding style
-would now have two statements, making the 'else' a syntax error
-rather than pairing with the outer 'if'.  Thus, even though our
-coding style with required braces is not impacted, ending a macro
-with ';' makes our code harder to port to projects that use
-brace-less styles.
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--NEinXnB4jcvA6d3DhaAdx0jRAxBhoTVS0
+From: Eric Blake <eblake@redhat.com>
+To: Klim Kireev <klim.kireev@virtuozzo.com>, kwolf@redhat.com,
+ mreitz@redhat.com, qemu-block@nongnu.org, qemu-devel@nongnu.org
+Cc: den@openvz.org, vsementsov@virtuozzo.com
+Message-ID: <c18c4367-e605-9deb-cbf9-d3fea4b631f5@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v2] qemu-img: add the simplest format
+ recognition
+References: <20171201224909.9373-1-klim.kireev@virtuozzo.com>
+In-Reply-To: <20171201224909.9373-1-klim.kireev@virtuozzo.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-The change should have no semantic impact.  I was not able to
-fully compile-test all of the changes (as some of them are
-examples of the ugly bit-rotting debug print statements that are
-completely elided by default, and I didn't want to recompile
-with the necessary -D witnesses - cleaning those up is left as a
-bite-sized task for another day); I did, however, audit that for
-all files touched, all callers of the changed macros DID supply
-a trailing ';' at the callsite, and did not appear to be used
-as part of a brace-less conditional.
+On 12/01/2017 04:49 PM, Klim Kireev wrote:
+> Now, if you type something like
+>=20
+> qemu-img create disk.qcow2 1G
+> or
+> qemu-img dd if=3D/dev/sda of=3Ddisk.qcow2
+>=20
+> it creates a raw image and if you need you should
+> manually specify an image format with -f qcow2. It would
+> be more convenient if it could be detected from an extension.
+>=20
+> This patch adds a simple heuristic to recognize the image format
+> for qcow, qcow2, vmdk, vhdx, vdi
+>=20
+> It warns users about guessed format and informs them about '-f' option.=
 
-Found mechanically via: $ git grep -B1 'while (0);' | grep -A1 \\\\
+>=20
+> Signed-off-by: Klim Kireev <klim.kireev@virtuozzo.com>
+> ---
+>  qemu-img.c | 21 +++++++++++++++++++--
+>  1 file changed, 19 insertions(+), 2 deletions(-)
+>=20
+> diff --git a/qemu-img.c b/qemu-img.c
+> index 02a6e27beb..ac1adf1582 100644
+> --- a/qemu-img.c
+> +++ b/qemu-img.c
+> @@ -421,11 +421,22 @@ static int64_t cvtnum(const char *s)
+>      return value;
+>  }
+> =20
+> +static const char *get_format(const char *filename)
+> +{
+> +    const char *fmt =3D strrchr(filename, '.');
+> +    if (fmt =3D=3D NULL || bdrv_find_format(++fmt) =3D=3D NULL) {
+> +        fmt =3D "raw";
+> +    }
+> +    printf("!!! %s format was detected.\n"
 
-Signed-off-by: Eric Blake <eblake@redhat.com>
-Acked-by: Cornelia Huck <cohuck@redhat.com>
-Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
-Acked-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
----
- tests/acpi-utils.h         | 8 ++++----
- ui/sdl_zoom_template.h     | 8 ++++----
- audio/paaudio.c            | 4 ++--
- hw/adc/stm32f2xx_adc.c     | 2 +-
- hw/block/m25p80.c          | 2 +-
- hw/char/cadence_uart.c     | 2 +-
- hw/char/stm32f2xx_usart.c  | 2 +-
- hw/display/cg3.c           | 2 +-
- hw/display/dpcd.c          | 2 +-
- hw/display/xlnx_dp.c       | 2 +-
- hw/dma/pl330.c             | 2 +-
- hw/dma/xlnx-zynq-devcfg.c  | 2 +-
- hw/dma/xlnx_dpdma.c        | 2 +-
- hw/i2c/i2c-ddc.c           | 2 +-
- hw/misc/auxbus.c           | 2 +-
- hw/misc/macio/mac_dbdma.c  | 4 ++--
- hw/misc/mmio_interface.c   | 2 +-
- hw/misc/stm32f2xx_syscfg.c | 2 +-
- hw/misc/zynq_slcr.c        | 2 +-
- hw/net/cadence_gem.c       | 2 +-
- hw/ssi/mss-spi.c           | 2 +-
- hw/ssi/stm32f2xx_spi.c     | 2 +-
- hw/ssi/xilinx_spi.c        | 2 +-
- hw/ssi/xilinx_spips.c      | 2 +-
- hw/timer/a9gtimer.c        | 2 +-
- hw/timer/cadence_ttc.c     | 2 +-
- hw/timer/mss-timer.c       | 2 +-
- hw/timer/stm32f2xx_timer.c | 2 +-
- hw/tpm/tpm_passthrough.c   | 2 +-
- hw/tpm/tpm_tis.c           | 2 +-
- migration/rdma.c           | 2 +-
- target/arm/translate-a64.c | 2 +-
- target/s390x/kvm.c         | 2 +-
- tests/tcg/test-mmap.c      | 2 +-
- 34 files changed, 42 insertions(+), 42 deletions(-)
+Assumed, not detected.  (We didn't read the file, because we're creating
+it; we're assuming a format based on the file name, not its contents,
+and detection tends to imply a contents-based check).
 
-diff --git a/tests/acpi-utils.h b/tests/acpi-utils.h
-index d5ca5b6238..ac52abd0dd 100644
---- a/tests/acpi-utils.h
-+++ b/tests/acpi-utils.h
-@@ -32,7 +32,7 @@ typedef struct {
-     do {                                        \
-         memread(addr, &field, sizeof(field));   \
-         addr += sizeof(field);                  \
--    } while (0);
-+    } while (0)
+> +           "!!! If you meant another format, specify it with -f.\n", f=
+mt);
 
- #define ACPI_READ_ARRAY_PTR(arr, length, addr)  \
-     do {                                        \
-@@ -40,7 +40,7 @@ typedef struct {
-         for (idx = 0; idx < length; ++idx) {    \
-             ACPI_READ_FIELD(arr[idx], addr);    \
-         }                                       \
--    } while (0);
-+    } while (0)
+Not our usual error reporting style; the !!! is yelling at the user, and
+we tend to avoid trailing '.'.  printf() goes to stdout, but the message
+should go to stderr(); you really want to use warn_report().
 
- #define ACPI_READ_ARRAY(arr, addr)                               \
-     ACPI_READ_ARRAY_PTR(arr, sizeof(arr) / sizeof(arr[0]), addr)
-@@ -56,7 +56,7 @@ typedef struct {
-         ACPI_READ_FIELD((table)->oem_revision, addr);            \
-         ACPI_READ_ARRAY((table)->asl_compiler_id, addr);         \
-         ACPI_READ_FIELD((table)->asl_compiler_revision, addr);   \
--    } while (0);
-+    } while (0)
+I suggest:
 
- #define ACPI_ASSERT_CMP(actual, expected) do { \
-     char ACPI_ASSERT_CMP_str[5] = {}; \
-@@ -77,7 +77,7 @@ typedef struct {
-         ACPI_READ_FIELD((field).bit_offset, addr);   \
-         ACPI_READ_FIELD((field).access_width, addr); \
-         ACPI_READ_FIELD((field).address, addr);      \
--    } while (0);
-+    } while (0)
+warn_report("No format specified with -f, assuming %s.", fmt);
+
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
 
 
- uint8_t acpi_calc_checksum(const uint8_t *data, int len);
-diff --git a/ui/sdl_zoom_template.h b/ui/sdl_zoom_template.h
-index 3bb508b51e..6a424adfb4 100644
---- a/ui/sdl_zoom_template.h
-+++ b/ui/sdl_zoom_template.h
-@@ -34,22 +34,22 @@
- #define setRed(r, pcolor) do { \
-     *pcolor = ((*pcolor) & (~(dpf->Rmask))) + \
-               (((r) & (dpf->Rmask >> dpf->Rshift)) << dpf->Rshift); \
--} while (0);
-+} while (0)
+--NEinXnB4jcvA6d3DhaAdx0jRAxBhoTVS0
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
 
- #define setGreen(g, pcolor) do { \
-     *pcolor = ((*pcolor) & (~(dpf->Gmask))) + \
-               (((g) & (dpf->Gmask >> dpf->Gshift)) << dpf->Gshift); \
--} while (0);
-+} while (0)
+-----BEGIN PGP SIGNATURE-----
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
 
- #define setBlue(b, pcolor) do { \
-     *pcolor = ((*pcolor) & (~(dpf->Bmask))) + \
-               (((b) & (dpf->Bmask >> dpf->Bshift)) << dpf->Bshift); \
--} while (0);
-+} while (0)
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAloh5Z0ACgkQp6FrSiUn
+Q2oSMgf+Lh3x+Q4JDHfIgP9kLRxd+xTZl5B5dy4zc8ECEd2WdJsNcuPeyUBcbAHE
+LRRZjgTMKZ8VcutsSGBJ9mpAR+fKqPUzV0DGMyXtciDzW74JwMbI+wHWOpEQSjqj
+FTGClHo+QtuRBjMPIJxcYxtMXHhvvZ2QEUbSyC+RBdw0NMFOZWekegyL3EP+t8NJ
+pnqeu0Kwtcgu1oSiBuhY187AvCk+Ty52GoBNv8/UlgIopfABbyIOO23WnXiM2Zmi
++iz69XCqPFec28OYkf96x2ERbS/p9CMmgC9B00Um69wDkJ19pCpLEytt0A21yPUC
+F7S2mnE9ZkRuPVHhJJg2AiG250ZzNw==
+=1syM
+-----END PGP SIGNATURE-----
 
- #define setAlpha(a, pcolor) do { \
-     *pcolor = ((*pcolor) & (~(dpf->Amask))) + \
-               (((a) & (dpf->Amask >> dpf->Ashift)) << dpf->Ashift); \
--} while (0);
-+} while (0)
-
- static void glue(sdl_zoom_rgb, BPP)(SDL_Surface *src, SDL_Surface *dst, int smooth,
-                                    SDL_Rect *dst_rect)
-diff --git a/audio/paaudio.c b/audio/paaudio.c
-index 65beb6f010..2a35e6f82c 100644
---- a/audio/paaudio.c
-+++ b/audio/paaudio.c
-@@ -89,7 +89,7 @@ static inline int PA_STREAM_IS_GOOD(pa_stream_state_t x)
-             }                                                   \
-             goto label;                                         \
-         }                                                       \
--    } while (0);
-+    } while (0)
-
- #define CHECK_DEAD_GOTO(c, stream, rerror, label)                       \
-     do {                                                                \
-@@ -107,7 +107,7 @@ static inline int PA_STREAM_IS_GOOD(pa_stream_state_t x)
-             }                                                           \
-             goto label;                                                 \
-         }                                                               \
--    } while (0);
-+    } while (0)
-
- static int qpa_simple_read (PAVoiceIn *p, void *data, size_t length, int *rerror)
- {
-diff --git a/hw/adc/stm32f2xx_adc.c b/hw/adc/stm32f2xx_adc.c
-index 90fe9de299..13f31ad2f7 100644
---- a/hw/adc/stm32f2xx_adc.c
-+++ b/hw/adc/stm32f2xx_adc.c
-@@ -37,7 +37,7 @@
-     if (STM_ADC_ERR_DEBUG >= lvl) { \
-         qemu_log("%s: " fmt, __func__, ## args); \
-     } \
--} while (0);
-+} while (0)
-
- #define DB_PRINT(fmt, args...) DB_PRINT_L(1, fmt, ## args)
-
-diff --git a/hw/block/m25p80.c b/hw/block/m25p80.c
-index a2438b9ed2..62b5221bde 100644
---- a/hw/block/m25p80.c
-+++ b/hw/block/m25p80.c
-@@ -40,7 +40,7 @@
-         fprintf(stderr,  ": %s: ", __func__); \
-         fprintf(stderr, ## __VA_ARGS__); \
-     } \
--} while (0);
-+} while (0)
-
- /* Fields for FlashPartInfo->flags */
-
-diff --git a/hw/char/cadence_uart.c b/hw/char/cadence_uart.c
-index 6143494060..fbdbd463bb 100644
---- a/hw/char/cadence_uart.c
-+++ b/hw/char/cadence_uart.c
-@@ -33,7 +33,7 @@
- #define DB_PRINT(...) do { \
-     fprintf(stderr,  ": %s: ", __func__); \
-     fprintf(stderr, ## __VA_ARGS__); \
--    } while (0);
-+    } while (0)
- #else
-     #define DB_PRINT(...)
- #endif
-diff --git a/hw/char/stm32f2xx_usart.c b/hw/char/stm32f2xx_usart.c
-index 268e435338..07b462d4b6 100644
---- a/hw/char/stm32f2xx_usart.c
-+++ b/hw/char/stm32f2xx_usart.c
-@@ -34,7 +34,7 @@
-     if (STM_USART_ERR_DEBUG >= lvl) { \
-         qemu_log("%s: " fmt, __func__, ## args); \
-     } \
--} while (0);
-+} while (0)
-
- #define DB_PRINT(fmt, args...) DB_PRINT_L(1, fmt, ## args)
-
-diff --git a/hw/display/cg3.c b/hw/display/cg3.c
-index e069c4484c..cafd9f47ef 100644
---- a/hw/display/cg3.c
-+++ b/hw/display/cg3.c
-@@ -63,7 +63,7 @@
-     if (DEBUG_CG3) { \
-         printf("CG3: " fmt , ## __VA_ARGS__); \
-     } \
--} while (0);
-+} while (0)
-
- #define TYPE_CG3 "cgthree"
- #define CG3(obj) OBJECT_CHECK(CG3State, (obj), TYPE_CG3)
-diff --git a/hw/display/dpcd.c b/hw/display/dpcd.c
-index ce92ff6e2a..943002bee5 100644
---- a/hw/display/dpcd.c
-+++ b/hw/display/dpcd.c
-@@ -39,7 +39,7 @@
-     if (DEBUG_DPCD) {                                                          \
-         qemu_log("dpcd: " fmt, ## __VA_ARGS__);                                \
-     }                                                                          \
--} while (0);
-+} while (0)
-
- #define DPCD_READABLE_AREA                      0x600
-
-diff --git a/hw/display/xlnx_dp.c b/hw/display/xlnx_dp.c
-index 561f828e7a..ead4e1a0e4 100644
---- a/hw/display/xlnx_dp.c
-+++ b/hw/display/xlnx_dp.c
-@@ -34,7 +34,7 @@
-     if (DEBUG_DP) {                                                            \
-         qemu_log("xlnx_dp: " fmt , ## __VA_ARGS__);                            \
-     }                                                                          \
--} while (0);
-+} while (0)
-
- /*
-  * Register offset for DP.
-diff --git a/hw/dma/pl330.c b/hw/dma/pl330.c
-index 32cf8399b8..d071049233 100644
---- a/hw/dma/pl330.c
-+++ b/hw/dma/pl330.c
-@@ -29,7 +29,7 @@
-     if (PL330_ERR_DEBUG >= lvl) {\
-         fprintf(stderr, "PL330: %s:" fmt, __func__, ## args);\
-     } \
--} while (0);
-+} while (0)
-
- #define DB_PRINT(fmt, args...) DB_PRINT_L(1, fmt, ## args)
-
-diff --git a/hw/dma/xlnx-zynq-devcfg.c b/hw/dma/xlnx-zynq-devcfg.c
-index 3b10523430..12bb2e3716 100644
---- a/hw/dma/xlnx-zynq-devcfg.c
-+++ b/hw/dma/xlnx-zynq-devcfg.c
-@@ -43,7 +43,7 @@
-     if (XLNX_ZYNQ_DEVCFG_ERR_DEBUG) { \
-         qemu_log("%s: " fmt, __func__, ## args); \
-     } \
--} while (0);
-+} while (0)
-
- REG32(CTRL, 0x00)
-     FIELD(CTRL,     FORCE_RST,          31,  1) /* Not supported, wr ignored */
-diff --git a/hw/dma/xlnx_dpdma.c b/hw/dma/xlnx_dpdma.c
-index 8ceb21ddb3..077c7da9cc 100644
---- a/hw/dma/xlnx_dpdma.c
-+++ b/hw/dma/xlnx_dpdma.c
-@@ -34,7 +34,7 @@
-     if (DEBUG_DPDMA) {                                                         \
-         qemu_log("xlnx_dpdma: " fmt , ## __VA_ARGS__);                         \
-     }                                                                          \
--} while (0);
-+} while (0)
-
- /*
-  * Registers offset for DPDMA.
-diff --git a/hw/i2c/i2c-ddc.c b/hw/i2c/i2c-ddc.c
-index 6b92e95c73..199dac9e41 100644
---- a/hw/i2c/i2c-ddc.c
-+++ b/hw/i2c/i2c-ddc.c
-@@ -30,7 +30,7 @@
-     if (DEBUG_I2CDDC) {                                                        \
-         qemu_log("i2c-ddc: " fmt , ## __VA_ARGS__);                            \
-     }                                                                          \
--} while (0);
-+} while (0)
-
- /* Structure defining a monitor's characteristics in a
-  * readable format: this should be passed to build_edid_blob()
-diff --git a/hw/misc/auxbus.c b/hw/misc/auxbus.c
-index 1182745044..b4cacd664b 100644
---- a/hw/misc/auxbus.c
-+++ b/hw/misc/auxbus.c
-@@ -40,7 +40,7 @@
-     if (DEBUG_AUX) {                                                           \
-         qemu_log("aux: " fmt , ## __VA_ARGS__);                                \
-     }                                                                          \
--} while (0);
-+} while (0)
-
- #define TYPE_AUXTOI2C "aux-to-i2c-bridge"
- #define AUXTOI2C(obj) OBJECT_CHECK(AUXTOI2CState, (obj), TYPE_AUXTOI2C)
-diff --git a/hw/misc/macio/mac_dbdma.c b/hw/misc/macio/mac_dbdma.c
-index 0eddf2e700..1b2a69b3ef 100644
---- a/hw/misc/macio/mac_dbdma.c
-+++ b/hw/misc/macio/mac_dbdma.c
-@@ -52,7 +52,7 @@
-     if (DEBUG_DBDMA) { \
-         printf("DBDMA: " fmt , ## __VA_ARGS__); \
-     } \
--} while (0);
-+} while (0)
-
- #define DBDMA_DPRINTFCH(ch, fmt, ...) do { \
-     if (DEBUG_DBDMA) { \
-@@ -60,7 +60,7 @@
-             printf("DBDMA[%02x]: " fmt , (ch)->channel, ## __VA_ARGS__); \
-         } \
-     } \
--} while (0);
-+} while (0)
-
- /*
-  */
-diff --git a/hw/misc/mmio_interface.c b/hw/misc/mmio_interface.c
-index 894e9801cb..3b0e2039a3 100644
---- a/hw/misc/mmio_interface.c
-+++ b/hw/misc/mmio_interface.c
-@@ -39,7 +39,7 @@ static uint64_t mmio_interface_counter;
-     if (DEBUG_MMIO_INTERFACE) {                                                \
-         qemu_log("mmio_interface: 0x%" PRIX64 ": " fmt, s->id, ## __VA_ARGS__);\
-     }                                                                          \
--} while (0);
-+} while (0)
-
- static void mmio_interface_init(Object *obj)
- {
-diff --git a/hw/misc/stm32f2xx_syscfg.c b/hw/misc/stm32f2xx_syscfg.c
-index 7c45833d09..7f10195862 100644
---- a/hw/misc/stm32f2xx_syscfg.c
-+++ b/hw/misc/stm32f2xx_syscfg.c
-@@ -34,7 +34,7 @@
-     if (STM_SYSCFG_ERR_DEBUG >= lvl) { \
-         qemu_log("%s: " fmt, __func__, ## args); \
-     } \
--} while (0);
-+} while (0)
-
- #define DB_PRINT(fmt, args...) DB_PRINT_L(1, fmt, ## args)
-
-diff --git a/hw/misc/zynq_slcr.c b/hw/misc/zynq_slcr.c
-index 44304d48be..d6bdd027ef 100644
---- a/hw/misc/zynq_slcr.c
-+++ b/hw/misc/zynq_slcr.c
-@@ -30,7 +30,7 @@
-             fprintf(stderr,  ": %s: ", __func__); \
-             fprintf(stderr, ## __VA_ARGS__); \
-         } \
--    } while (0);
-+    } while (0)
-
- #define XILINX_LOCK_KEY 0x767b
- #define XILINX_UNLOCK_KEY 0xdf0d
-diff --git a/hw/net/cadence_gem.c b/hw/net/cadence_gem.c
-index 3943187572..0fa4b0dc44 100644
---- a/hw/net/cadence_gem.c
-+++ b/hw/net/cadence_gem.c
-@@ -34,7 +34,7 @@
- #define DB_PRINT(...) do { \
-     fprintf(stderr,  ": %s: ", __func__); \
-     fprintf(stderr, ## __VA_ARGS__); \
--    } while (0);
-+    } while (0)
- #else
-     #define DB_PRINT(...)
- #endif
-diff --git a/hw/ssi/mss-spi.c b/hw/ssi/mss-spi.c
-index d60daba882..185e1a3920 100644
---- a/hw/ssi/mss-spi.c
-+++ b/hw/ssi/mss-spi.c
-@@ -35,7 +35,7 @@
-     if (MSS_SPI_ERR_DEBUG >= lvl) { \
-         qemu_log("%s: " fmt "\n", __func__, ## args); \
-     } \
--} while (0);
-+} while (0)
-
- #define DB_PRINT(fmt, args...) DB_PRINT_L(1, fmt, ## args)
-
-diff --git a/hw/ssi/stm32f2xx_spi.c b/hw/ssi/stm32f2xx_spi.c
-index 26a1b4ddf5..69514da9fb 100644
---- a/hw/ssi/stm32f2xx_spi.c
-+++ b/hw/ssi/stm32f2xx_spi.c
-@@ -35,7 +35,7 @@
-     if (STM_SPI_ERR_DEBUG >= lvl) { \
-         qemu_log("%s: " fmt, __func__, ## args); \
-     } \
--} while (0);
-+} while (0)
-
- #define DB_PRINT(fmt, args...) DB_PRINT_L(1, fmt, ## args)
-
-diff --git a/hw/ssi/xilinx_spi.c b/hw/ssi/xilinx_spi.c
-index 33482f04de..83585bc8b2 100644
---- a/hw/ssi/xilinx_spi.c
-+++ b/hw/ssi/xilinx_spi.c
-@@ -36,7 +36,7 @@
- #define DB_PRINT(...) do { \
-     fprintf(stderr,  ": %s: ", __func__); \
-     fprintf(stderr, ## __VA_ARGS__); \
--    } while (0);
-+    } while (0)
- #else
-     #define DB_PRINT(...)
- #endif
-diff --git a/hw/ssi/xilinx_spips.c b/hw/ssi/xilinx_spips.c
-index ef56d35f2c..c070393dc9 100644
---- a/hw/ssi/xilinx_spips.c
-+++ b/hw/ssi/xilinx_spips.c
-@@ -43,7 +43,7 @@
-         fprintf(stderr,  ": %s: ", __func__); \
-         fprintf(stderr, ## __VA_ARGS__); \
-     } \
--} while (0);
-+} while (0)
-
- /* config register */
- #define R_CONFIG            (0x00 / 4)
-diff --git a/hw/timer/a9gtimer.c b/hw/timer/a9gtimer.c
-index ce1dc63911..96d534d8a8 100644
---- a/hw/timer/a9gtimer.c
-+++ b/hw/timer/a9gtimer.c
-@@ -37,7 +37,7 @@
-         fprintf(stderr,  ": %s: ", __func__); \
-         fprintf(stderr, ## __VA_ARGS__); \
-     } \
--} while (0);
-+} while (0)
-
- #define DB_PRINT(...) DB_PRINT_L(0, ## __VA_ARGS__)
-
-diff --git a/hw/timer/cadence_ttc.c b/hw/timer/cadence_ttc.c
-index 5e65fdb5a0..10056407ab 100644
---- a/hw/timer/cadence_ttc.c
-+++ b/hw/timer/cadence_ttc.c
-@@ -24,7 +24,7 @@
- #define DB_PRINT(...) do { \
-     fprintf(stderr,  ": %s: ", __func__); \
-     fprintf(stderr, ## __VA_ARGS__); \
--    } while (0);
-+    } while (0)
- #else
-     #define DB_PRINT(...)
- #endif
-diff --git a/hw/timer/mss-timer.c b/hw/timer/mss-timer.c
-index 60f1213a3b..4f814572e2 100644
---- a/hw/timer/mss-timer.c
-+++ b/hw/timer/mss-timer.c
-@@ -36,7 +36,7 @@
-     if (MSS_TIMER_ERR_DEBUG >= lvl) { \
-         qemu_log("%s: " fmt "\n", __func__, ## args); \
-     } \
--} while (0);
-+} while (0)
-
- #define DB_PRINT(fmt, args...) DB_PRINT_L(1, fmt, ## args)
-
-diff --git a/hw/timer/stm32f2xx_timer.c b/hw/timer/stm32f2xx_timer.c
-index e5f5e14a90..58fc7b1188 100644
---- a/hw/timer/stm32f2xx_timer.c
-+++ b/hw/timer/stm32f2xx_timer.c
-@@ -34,7 +34,7 @@
-     if (STM_TIMER_ERR_DEBUG >= lvl) { \
-         qemu_log("%s: " fmt, __func__, ## args); \
-     } \
--} while (0);
-+} while (0)
-
- #define DB_PRINT(fmt, args...) DB_PRINT_L(1, fmt, ## args)
-
-diff --git a/hw/tpm/tpm_passthrough.c b/hw/tpm/tpm_passthrough.c
-index c440aff4b2..b8253b338d 100644
---- a/hw/tpm/tpm_passthrough.c
-+++ b/hw/tpm/tpm_passthrough.c
-@@ -39,7 +39,7 @@
-     if (DEBUG_TPM) { \
-         fprintf(stderr, fmt, ## __VA_ARGS__); \
-     } \
--} while (0);
-+} while (0)
-
- #define TYPE_TPM_PASSTHROUGH "tpm-passthrough"
- #define TPM_PASSTHROUGH(obj) \
-diff --git a/hw/tpm/tpm_tis.c b/hw/tpm/tpm_tis.c
-index 42d647d363..6e08cc2033 100644
---- a/hw/tpm/tpm_tis.c
-+++ b/hw/tpm/tpm_tis.c
-@@ -105,7 +105,7 @@ struct TPMState {
-     if (DEBUG_TIS) { \
-         printf(fmt, ## __VA_ARGS__); \
-     } \
--} while (0);
-+} while (0)
-
- /* tis registers */
- #define TPM_TIS_REG_ACCESS                0x00
-diff --git a/migration/rdma.c b/migration/rdma.c
-index ca56594328..9d5a424011 100644
---- a/migration/rdma.c
-+++ b/migration/rdma.c
-@@ -88,7 +88,7 @@ static uint32_t known_capabilities = RDMA_CAPABILITY_PIN_ALL;
-             } \
-             return rdma->error_state; \
-         } \
--    } while (0);
-+    } while (0)
-
- /*
-  * A work request ID is 64-bits and we split up these bits
-diff --git a/target/arm/translate-a64.c b/target/arm/translate-a64.c
-index 625ef2dfd2..89ffd33e87 100644
---- a/target/arm/translate-a64.c
-+++ b/target/arm/translate-a64.c
-@@ -400,7 +400,7 @@ static void unallocated_encoding(DisasContext *s)
-                       "at pc=%016" PRIx64 "\n",                          \
-                       __FILE__, __LINE__, insn, s->pc - 4);              \
-         unallocated_encoding(s);                                         \
--    } while (0);
-+    } while (0)
-
- static void init_tmp_a64_array(DisasContext *s)
- {
-diff --git a/target/s390x/kvm.c b/target/s390x/kvm.c
-index b03f583032..06d06010a4 100644
---- a/target/s390x/kvm.c
-+++ b/target/s390x/kvm.c
-@@ -58,7 +58,7 @@
-     if (DEBUG_KVM) {                          \
-         fprintf(stderr, fmt, ## __VA_ARGS__); \
-     }                                         \
--} while (0);
-+} while (0)
-
- #define kvm_vm_check_mem_attr(s, attr) \
-     kvm_vm_check_attr(s, KVM_S390_VM_MEM_CTRL, attr)
-diff --git a/tests/tcg/test-mmap.c b/tests/tcg/test-mmap.c
-index 3982fa2c72..cdefadfa4c 100644
---- a/tests/tcg/test-mmap.c
-+++ b/tests/tcg/test-mmap.c
-@@ -39,7 +39,7 @@ do                                                             \
-     fprintf (stderr, "FAILED at %s:%d\n", __FILE__, __LINE__); \
-     exit (EXIT_FAILURE);                                       \
-   }                                                            \
--} while (0);
-+} while (0)
-
- unsigned char *dummybuf;
- static unsigned int pagesize;
--- 
-2.14.3
+--NEinXnB4jcvA6d3DhaAdx0jRAxBhoTVS0--
