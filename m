@@ -1,25 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47353)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49556)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1eKnWr-0000KM-PP
-	for qemu-devel@nongnu.org; Fri, 01 Dec 2017 10:48:22 -0500
+	(envelope-from <s1seetee@linux.vnet.ibm.com>) id 1eKnYA-00021x-1k
+	for qemu-devel@nongnu.org; Fri, 01 Dec 2017 10:49:15 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1eKnWP-0007WN-JY
-	for qemu-devel@nongnu.org; Fri, 01 Dec 2017 10:47:05 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:35778)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1eKnWP-0007VB-5j
-	for qemu-devel@nongnu.org; Fri, 01 Dec 2017 10:46:37 -0500
-Date: Thu, 30 Nov 2017 18:40:59 +0000
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20171130184058.GG3952@work-vm>
-References: <20171108060130.3772-1-peterx@redhat.com>
-	<20171108060130.3772-21-peterx@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20171108060130.3772-21-peterx@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v4 20/32] migration: synchronize dirty
- bitmap for resume
+	(envelope-from <s1seetee@linux.vnet.ibm.com>) id 1eKnXW-00012S-Gx
+	for qemu-devel@nongnu.org; Fri, 01 Dec 2017 10:48:26 -0500
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:46352
+	helo=mx0a-001b2d01.pphosted.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <s1seetee@linux.vnet.ibm.com>)
+	id 1eKnXW-00011c-8m
+	for qemu-devel@nongnu.org; Fri, 01 Dec 2017 10:47:46 -0500
+Received: from pps.filterd (m0098417.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
+	vB1BOGse006258
+	for <qemu-devel@nongnu.org>; Fri, 1 Dec 2017 06:24:20 -0500
+Received: from e06smtp14.uk.ibm.com (e06smtp14.uk.ibm.com [195.75.94.110])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2ek3vsej8a-1
+	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Fri, 01 Dec 2017 06:24:20 -0500
+Received: from localhost
+	by e06smtp14.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	Only! Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <s1seetee@linux.vnet.ibm.com>;
+	Fri, 1 Dec 2017 11:24:18 -0000
+From: Seeteena Thoufeek <s1seetee@linux.vnet.ibm.com>
+Date: Fri,  1 Dec 2017 16:54:09 +0530
+Message-Id: <1512127449-11114-1-git-send-email-s1seetee@linux.vnet.ibm.com>
+Subject: [Qemu-devel] [PATCH v1] spapr.c: Update qemu's maxcpus for pseries
+ machine.
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,175 +37,47 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Xu <peterx@redhat.com>
-Cc: qemu-devel@nongnu.org, Alexey Perevalov <a.perevalov@samsung.com>, "Daniel P . Berrange" <berrange@redhat.com>, Juan Quintela <quintela@redhat.com>, Andrea Arcangeli <aarcange@redhat.com>
+To: david@gibson.dropbear.id.au, agraf@suse.de, qemu-ppc@nongnu.org, qemu-devel@nongnu.org
+Cc: s1seetee@linux.vnet.ibm.com
 
-* Peter Xu (peterx@redhat.com) wrote:
-> This patch implements the first part of core RAM resume logic for
-> postcopy. ram_resume_prepare() is provided for the work.
-> 
-> When the migration is interrupted by network failure, the dirty bitmap
-> on the source side will be meaningless, because even the dirty bit is
-> cleared, it is still possible that the sent page was lost along the way
-> to destination. Here instead of continue the migration with the old
-> dirty bitmap on source, we ask the destination side to send back its
-> received bitmap, then invert it to be our initial dirty bitmap.
-> 
-> The source side send thread will issue the MIG_CMD_RECV_BITMAP requests,
-> once per ramblock, to ask for the received bitmap. On destination side,
-> MIG_RP_MSG_RECV_BITMAP will be issued, along with the requested bitmap.
-> Data will be received on the return-path thread of source, and the main
-> migration thread will be notified when all the ramblock bitmaps are
-> synchronized.
-> 
-> Signed-off-by: Peter Xu <peterx@redhat.com>
+Need to adjust the max cpus supported number from error message since
+it was conflicting with KVM's.
 
-Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+Steps to Reproduce:
+1.boot up with
+"-smp 64,maxcpus=102464,cores=8,threads=1,sockets=8"
 
-> ---
->  migration/migration.c  |  3 +++
->  migration/migration.h  |  1 +
->  migration/ram.c        | 47 +++++++++++++++++++++++++++++++++++++++++++++++
->  migration/trace-events |  4 ++++
->  4 files changed, 55 insertions(+)
-> 
-> diff --git a/migration/migration.c b/migration/migration.c
-> index 4dc34ed8ce..5b1fbe5b98 100644
-> --- a/migration/migration.c
-> +++ b/migration/migration.c
-> @@ -2843,6 +2843,7 @@ static void migration_instance_finalize(Object *obj)
->      g_free(params->tls_hostname);
->      g_free(params->tls_creds);
->      qemu_sem_destroy(&ms->pause_sem);
-> +    qemu_sem_destroy(&ms->rp_state.rp_sem);
->  }
->  
->  static void migration_instance_init(Object *obj)
-> @@ -2871,6 +2872,8 @@ static void migration_instance_init(Object *obj)
->      params->has_x_multifd_channels = true;
->      params->has_x_multifd_page_count = true;
->      params->has_xbzrle_cache_size = true;
-> +
-> +    qemu_sem_init(&ms->rp_state.rp_sem, 0);
->  }
->  
->  /*
-> diff --git a/migration/migration.h b/migration/migration.h
-> index 11fbfebba1..82dd7d9820 100644
-> --- a/migration/migration.h
-> +++ b/migration/migration.h
-> @@ -108,6 +108,7 @@ struct MigrationState
->          QEMUFile     *from_dst_file;
->          QemuThread    rp_thread;
->          bool          error;
-> +        QemuSemaphore rp_sem;
->      } rp_state;
->  
->      double mbps;
-> diff --git a/migration/ram.c b/migration/ram.c
-> index b30c669476..49627ca9fc 100644
-> --- a/migration/ram.c
-> +++ b/migration/ram.c
-> @@ -49,6 +49,7 @@
->  #include "qemu/rcu_queue.h"
->  #include "migration/colo.h"
->  #include "migration/block.h"
-> +#include "savevm.h"
->  
->  /***********************************************************/
->  /* ram save/restore */
-> @@ -3049,6 +3050,38 @@ static bool ram_has_postcopy(void *opaque)
->      return migrate_postcopy_ram();
->  }
->  
-> +/* Sync all the dirty bitmap with destination VM.  */
-> +static int ram_dirty_bitmap_sync_all(MigrationState *s, RAMState *rs)
-> +{
-> +    RAMBlock *block;
-> +    QEMUFile *file = s->to_dst_file;
-> +    int ramblock_count = 0;
-> +
-> +    trace_ram_dirty_bitmap_sync_start();
-> +
-> +    RAMBLOCK_FOREACH(block) {
-> +        qemu_savevm_send_recv_bitmap(file, block->idstr);
-> +        trace_ram_dirty_bitmap_request(block->idstr);
-> +        ramblock_count++;
-> +    }
-> +
-> +    trace_ram_dirty_bitmap_sync_wait();
-> +
-> +    /* Wait until all the ramblocks' dirty bitmap synced */
-> +    while (ramblock_count--) {
-> +        qemu_sem_wait(&s->rp_state.rp_sem);
-> +    }
-> +
-> +    trace_ram_dirty_bitmap_sync_complete();
-> +
-> +    return 0;
-> +}
-> +
-> +static void ram_dirty_bitmap_reload_notify(MigrationState *s)
-> +{
-> +    qemu_sem_post(&s->rp_state.rp_sem);
-> +}
-> +
->  /*
->   * Read the received bitmap, revert it as the initial dirty bitmap.
->   * This is only used when the postcopy migration is paused but wants
-> @@ -3123,12 +3156,25 @@ int ram_dirty_bitmap_reload(MigrationState *s, RAMBlock *block)
->  
->      trace_ram_dirty_bitmap_reload_complete(block->idstr);
->  
-> +    /*
-> +     * We succeeded to sync bitmap for current ramblock. If this is
-> +     * the last one to sync, we need to notify the main send thread.
-> +     */
-> +    ram_dirty_bitmap_reload_notify(s);
-> +
->      ret = 0;
->  out:
->      free(le_bitmap);
->      return ret;
->  }
->  
-> +static int ram_resume_prepare(MigrationState *s, void *opaque)
-> +{
-> +    RAMState *rs = *(RAMState **)opaque;
-> +
-> +    return ram_dirty_bitmap_sync_all(s, rs);
-> +}
-> +
->  static SaveVMHandlers savevm_ram_handlers = {
->      .save_setup = ram_save_setup,
->      .save_live_iterate = ram_save_iterate,
-> @@ -3140,6 +3186,7 @@ static SaveVMHandlers savevm_ram_handlers = {
->      .save_cleanup = ram_save_cleanup,
->      .load_setup = ram_load_setup,
->      .load_cleanup = ram_load_cleanup,
-> +    .resume_prepare = ram_resume_prepare,
->  };
->  
->  void ram_mig_init(void)
-> diff --git a/migration/trace-events b/migration/trace-events
-> index eadabf03e8..804f18d492 100644
-> --- a/migration/trace-events
-> +++ b/migration/trace-events
-> @@ -82,8 +82,12 @@ ram_load_postcopy_loop(uint64_t addr, int flags) "@%" PRIx64 " %x"
->  ram_postcopy_send_discard_bitmap(void) ""
->  ram_save_page(const char *rbname, uint64_t offset, void *host) "%s: offset: 0x%" PRIx64 " host: %p"
->  ram_save_queue_pages(const char *rbname, size_t start, size_t len) "%s: start: 0x%zx len: 0x%zx"
-> +ram_dirty_bitmap_request(char *str) "%s"
->  ram_dirty_bitmap_reload_begin(char *str) "%s"
->  ram_dirty_bitmap_reload_complete(char *str) "%s"
-> +ram_dirty_bitmap_sync_start(void) ""
-> +ram_dirty_bitmap_sync_wait(void) ""
-> +ram_dirty_bitmap_sync_complete(void) ""
->  
->  # migration/migration.c
->  await_return_path_close_on_source_close(void) ""
-> -- 
-> 2.13.6
-> 
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+qemu-kvm: Number of SMP CPUs requested (102464) exceeds max CPUs
+supported by machine 'pseries-rhel7.4.0alt' (1024)
+
+2. On KVM machine it shows
+
+boot up with
+"-m 6G,maxmem=300G,slots=256 -smp 64,maxcpus=1024,cores=8,threads=1
+,sockets=128"
+
+Number of hotpluggable cpus requested (1024) exceeds the maximum cpus
+ supported by KVM (240)
+
+It seemed that 1024 was useless since KVM only support 240 so far.
+Hence,we need to adjust it to an reasonable value 240.
+
+Signed-off-by: Seeteena Thoufeek <s1seetee@linux.vnet.ibm.com>
+---
+ hw/ppc/spapr.c | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
+index 9efddea..c753254 100644
+--- a/hw/ppc/spapr.c
++++ b/hw/ppc/spapr.c
+@@ -3691,6 +3691,7 @@ static const TypeInfo spapr_machine_info = {
+         if (latest) {                                                \
+             mc->alias = "pseries";                                   \
+             mc->is_default = 1;                                      \
++            mc->max_cpus = 240;                                      \
+         }                                                            \
+     }                                                                \
+     static void spapr_machine_##suffix##_instance_init(Object *obj)  \
+-- 
+1.8.3.1
