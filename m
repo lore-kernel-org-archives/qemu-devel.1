@@ -1,30 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50120)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51470)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <aik@ozlabs.ru>) id 1eKpMQ-0008TU-4d
-	for qemu-devel@nongnu.org; Fri, 01 Dec 2017 12:44:27 -0500
+	(envelope-from <arei.gonglei@huawei.com>) id 1eKpOC-00027e-JT
+	for qemu-devel@nongnu.org; Fri, 01 Dec 2017 12:46:17 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <aik@ozlabs.ru>) id 1eKpMM-0001Mp-0o
-	for qemu-devel@nongnu.org; Fri, 01 Dec 2017 12:44:26 -0500
-Received: from mail-pl0-x243.google.com ([2607:f8b0:400e:c01::243]:37151)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <aik@ozlabs.ru>) id 1eKpML-0001LU-PH
-	for qemu-devel@nongnu.org; Fri, 01 Dec 2017 12:44:21 -0500
-Received: by mail-pl0-x243.google.com with SMTP id v41so6648365plg.4
-	for <qemu-devel@nongnu.org>; Fri, 01 Dec 2017 09:44:21 -0800 (PST)
-References: <20171005055037.7767-1-aik@ozlabs.ru>
-	<20171005055037.7767-2-aik@ozlabs.ru>
-	<431ee02e-a73e-70c8-185d-43223c52c693@ozlabs.ru>
-	<20171130160929.7fb2b027@t450s.home>
-From: Alexey Kardashevskiy <aik@ozlabs.ru>
-Message-ID: <dff8e7d0-0e4c-3e17-5d05-4c8055b51e7c@ozlabs.ru>
-Date: Fri, 1 Dec 2017 11:04:30 +1100
+	(envelope-from <arei.gonglei@huawei.com>) id 1eKpO8-0004YH-GP
+	for qemu-devel@nongnu.org; Fri, 01 Dec 2017 12:46:16 -0500
+Received: from szxga03-in.huawei.com ([45.249.212.189]:2244 helo=huawei.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <arei.gonglei@huawei.com>)
+	id 1eKpO7-0004Qk-Tt
+	for qemu-devel@nongnu.org; Fri, 01 Dec 2017 12:46:12 -0500
+From: "Gonglei (Arei)" <arei.gonglei@huawei.com>
+Date: Fri, 1 Dec 2017 17:45:57 +0000
+Message-ID: <etPan.5a219554.1a0113f4.4983@localhost>
+References: <D1BD20B5DB34024DA951CEEE6C4C5998B1B8CC82@DGGEMA501-MBX.china.huawei.com>
+	<33183CC9F5247A488A2544077AF19020DA4ADB8C@DGGEMA505-MBS.china.huawei.com>,
+	<d4d9a0a9-b136-7320-d1e1-36a4c3cffccc@redhat.com>
+In-Reply-To: <d4d9a0a9-b136-7320-d1e1-36a4c3cffccc@redhat.com>
+Content-Language: zh-CN
 MIME-Version: 1.0
-In-Reply-To: <20171130160929.7fb2b027@t450s.home>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-AU
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH qemu v5 1/2] memory/iommu/vfio: Define
- add_vfio_group() callback
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+Subject: [Qemu-devel] =?utf-8?b?562U5aSNOiBbQlVHXSBXaW5kb3dzIDcgZ290IHN0?=
+ =?utf-8?q?uck_easily_while_run_PCMark10_application?=
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,104 +31,27 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alex Williamson <alex.williamson@redhat.com>
-Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org, David Gibson <david@gibson.dropbear.id.au>, Paolo Bonzini <pbonzini@redhat.com>
+To: Paolo Bonzini <pbonzini@redhat.com>, Zhanghailiang <zhang.zhanghailiang@huawei.com>, qemu-devel <qemu-devel@nongnu.org>, "Michael S. Tsirkin" <mst@redhat.com>
+Cc: "Huangweidong (C)" <weidong.huang@huawei.com>, "wangxin (U)" <wangxinxin.wang@huawei.com>, Xiexiangyou <xiexiangyou@huawei.com>
 
-On 01/12/17 10:09, Alex Williamson wrote:
-> On Fri, 1 Dec 2017 08:56:42 +1100
-> Alexey Kardashevskiy <aik@ozlabs.ru> wrote:
-> 
->> On 05/10/17 16:50, Alexey Kardashevskiy wrote:
->>> The new callback will be called when a new VFIO IOMMU group is added.
->>>
->>> This should cause no behavioral change, the next patch will.
->>>
->>> Signed-off-by: Alexey Kardashevskiy <aik@ozlabs.ru>  
->>
->>
->> What about this one,  any conclusion yet?
-> 
-> Patchew reported that if failed to build and you never replied with an
-> explanation, so I haven't looked at it.
-
-Well, this ping was more for David as he is supposedly rethingking it...
-
-> 
->>> ---
->>>
->>> This could be at the higher level - in MemoryRegionOps, makes sense?
->>>
->>> ---
->>>  include/exec/memory.h |  4 ++++
->>>  hw/vfio/common.c      | 15 +++++++++++++++
->>>  2 files changed, 19 insertions(+)
->>>
->>> diff --git a/include/exec/memory.h b/include/exec/memory.h
->>> index 5ed4042f87..64e0b4fc96 100644
->>> --- a/include/exec/memory.h
->>> +++ b/include/exec/memory.h
->>> @@ -210,6 +210,10 @@ typedef struct IOMMUMemoryRegionClass {
->>>                                  IOMMUNotifierFlag new_flags);
->>>      /* Set this up to provide customized IOMMU replay function */
->>>      void (*replay)(IOMMUMemoryRegion *iommu, IOMMUNotifier *notifier);
->>> +
->>> +    /* Notifies IOMMUMR about attached VFIO IOMMU group */
->>> +    void (*add_vfio_group)(IOMMUMemoryRegion *iommu_mr, int vfio_kvm_fd,
->>> +                           int groupfd);
-> 
-> If there's an "add" why is there no remove?
-
-Because I do not have use for it now and I doubt there will be any ever.
-"add" attaches an IOMMU group to a DMA window in KVM, and I cannot imagine
-if we ever want to detach a group _and_ keep using it.
-
-
-> Clearly a vfio specific callback is pretty much a failure as far as
-> abstraction and layering is concerned.
-
-
-This was one of the things I wanted David to discuss with you as he clearly
-did not like another abstraction violation:
-https://patchwork.kernel.org/patch/9853981/
-
-
-
-
-> 
->>>  } IOMMUMemoryRegionClass;
->>>  
->>>  typedef struct CoalescedMemoryRange CoalescedMemoryRange;
->>> diff --git a/hw/vfio/common.c b/hw/vfio/common.c
->>> index 7b2924c0ef..9e861e0393 100644
->>> --- a/hw/vfio/common.c
->>> +++ b/hw/vfio/common.c
->>> @@ -481,6 +481,21 @@ static void vfio_listener_region_add(MemoryListener *listener,
->>>          VFIOGuestIOMMU *giommu;
->>>          IOMMUMemoryRegion *iommu_mr = IOMMU_MEMORY_REGION(section->mr);
->>>  
->>> +#ifdef CONFIG_KVM
->>> +        if (kvm_enabled()) {
->>> +            VFIOGroup *group;
->>> +            IOMMUMemoryRegionClass *imrc =
->>> +                IOMMU_MEMORY_REGION_GET_CLASS(iommu_mr);
->>> +
->>> +            QLIST_FOREACH(group, &container->group_list, container_next) {
->>> +                if (imrc->add_vfio_group) {
->>> +                    imrc->add_vfio_group(iommu_mr, vfio_kvm_device_fd,
->>> +                                         group->fd);
->>> +                }
->>> +            }
->>> +        }
->>> +#endif
->>> +
->>>          trace_vfio_listener_region_add_iommu(iova, end);
->>>          /*
->>>           * FIXME: For VFIO iommu types which have KVM acceleration to
->>>   
->>
->>
-> 
-
-
--- 
-Alexey
+SSBhbHNvIHRoaW5rIGl0J3Mgd2luZG93cyBidWcsIHRoZSBwcm9ibGVtIGlzIHRoYXQgaXQgZG9l
+c24ndCBvY2N1ciBvbiB4ZW4gcGxhdGZvcm0uIEFuZCB0aGVyZSBhcmUgc29tZSBvdGhlciB3b3Jr
+cyBuZWVkIHRvIGJlIGRvbmUgd2hpbGUgcmVhZGluZyBSRUdfQy4gU28gSSB3cm90ZSB0aGF0IHBh
+dGNoLg0KDQpUaGFua3MsDQpHb25nbGVpDQrlj5Hku7bkurrvvJpQYW9sbyBCb256aW5pDQrmlLbk
+u7bkurrvvJrpvprno4os5byg5rW35LquLHFlbXUtZGV2ZWwsTWljaGFlbCBTLiBUc2lya2luDQrm
+ioTpgIHvvJrpu4TkvJ/moIss546L5qyjLOiwouelpeaciQ0K5pe26Ze077yaMjAxNy0xMi0wMiAw
+MToxMDowOA0K5Li76aKYOlJlOiBbQlVHXSBXaW5kb3dzIDcgZ290IHN0dWNrIGVhc2lseSB3aGls
+ZSBydW4gUENNYXJrMTAgYXBwbGljYXRpb24NCg0KT24gMDEvMTIvMjAxNyAwODowOCwgR29uZ2xl
+aSAoQXJlaSkgd3JvdGU6DQo+IEZpcnN0IHdyaXRlIHRvIDB4NzAsIGNtb3NfaW5kZXggPSAweGMg
+JiAweDdmID0gMHhjDQo+ICAgICAgICBDUFUgMC9LVk0tMTU1NjYga3ZtX3BpbzogcGlvX3dyaXRl
+IGF0IDB4NzAgc2l6ZSAxIGNvdW50IDEgdmFsIDB4Yz4gU2Vjb25kIHdyaXRlIHRvIDB4NzAsIGNt
+b3NfaW5kZXggPSAweDg2ICYgMHg3ZiA9IDB4Nj4gICAgICAgIENQVSAxL0tWTS0xNTU2NyBrdm1f
+cGlvOiBwaW9fd3JpdGUgYXQgMHg3MCBzaXplIDEgY291bnQgMSB2YWwgMHg4Nj4gdmNwdTAgcmVh
+ZCAweDYgYmVjYXVzZSBjbW9zX2luZGV4IGlzIDB4NiBub3c6PiAgICAgICAgQ1BVIDAvS1ZNLTE1
+NTY2IGt2bV9waW86IHBpb19yZWFkIGF0IDB4NzEgc2l6ZSAxIGNvdW50IDEgdmFsIDB4Nj4gdmNw
+dTEgcmVhZCAweDY6PiAgICAgICAgQ1BVIDEvS1ZNLTE1NTY3IGt2bV9waW86IHBpb19yZWFkIGF0
+IDB4NzEgc2l6ZSAxIGNvdW50IDEgdmFsIDB4Ng0KVGhpcyBzZWVtcyB0byBiZSBhIFdpbmRvd3Mg
+YnVnLiAgVGhlIGVhc2llc3Qgd29ya2Fyb3VuZCB0aGF0IEkNCmNhbiB0aGluayBvZiBpcyB0byBj
+bGVhciB0aGUgaW50ZXJydXB0cyBhbHJlYWR5IHdoZW4gMHhjIGlzIHdyaXR0ZW4sDQp3aXRob3V0
+IHdhaXRpbmcgZm9yIHRoZSByZWFkIChiZWNhdXNlIFJFR19DIGNhbiBvbmx5IGJlIHJlYWQpLg0K
+DQpXaGF0IGRvIHlvdSB0aGluaz8NCg0KVGhhbmtzLA0KDQpQYW9sbw0K
