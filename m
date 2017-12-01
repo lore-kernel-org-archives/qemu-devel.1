@@ -1,29 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42654)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43011)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1eKnm7-0006HH-Tb
-	for qemu-devel@nongnu.org; Fri, 01 Dec 2017 11:03:19 -0500
+	(envelope-from <kwolf@redhat.com>) id 1eKnmL-0006WG-Qn
+	for qemu-devel@nongnu.org; Fri, 01 Dec 2017 11:03:32 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1eKnlX-0003ft-41
-	for qemu-devel@nongnu.org; Fri, 01 Dec 2017 11:02:51 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:57320)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1eKnlW-0003eB-SD
-	for qemu-devel@nongnu.org; Fri, 01 Dec 2017 11:02:15 -0500
-Date: Thu, 30 Nov 2017 20:56:50 +0200
-From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <20171130205443-mutt-send-email-mst@kernel.org>
-References: <20171114231350.286025-1-prasad.singamsetty@oracle.com>
-	<20171114231350.286025-3-prasad.singamsetty@oracle.com>
-	<20171128193156-mutt-send-email-mst@kernel.org>
-	<cdbe8732-88fa-512e-481b-250abc18bf92@oracle.com>
-	<20171130032551.GA18017@xz-mi>
-	<367bb386-2885-2ea2-b766-d5bde2c79bcf@oracle.com>
+	(envelope-from <kwolf@redhat.com>) id 1eKnlt-0004W4-Qd
+	for qemu-devel@nongnu.org; Fri, 01 Dec 2017 11:03:05 -0500
+Date: Fri, 1 Dec 2017 17:00:54 +0100
+From: Kevin Wolf <kwolf@redhat.com>
+Message-ID: <20171201160054.GG4147@localhost.localdomain>
+References: <20171201014242.16877-1-eblake@redhat.com>
+	<20171201014242.16877-4-eblake@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <367bb386-2885-2ea2-b766-d5bde2c79bcf@oracle.com>
-Subject: Re: [Qemu-devel] [PATCH v1 2/2] intel-iommu: Extend address width
- to 48 bits
+In-Reply-To: <20171201014242.16877-4-eblake@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v5 03/20] file-posix: Switch to
+ .bdrv_co_block_status()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,83 +24,134 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Prasad Singamsetty <prasad.singamsetty@oracle.com>
-Cc: Peter Xu <peterx@redhat.com>, ehabkost@redhat.com, konrad.wilk@oracle.com, qemu-devel@nongnu.org, imammedo@redhat.com, pbonzini@redhat.com, rth@twiddle.net
+To: Eric Blake <eblake@redhat.com>
+Cc: qemu-devel@nongnu.org, jsnow@redhat.com, famz@redhat.com, qemu-block@nongnu.org, vsementsov@virtuozzo.com, Max Reitz <mreitz@redhat.com>
 
-On Thu, Nov 30, 2017 at 10:33:50AM -0800, Prasad Singamsetty wrote:
+Am 01.12.2017 um 02:42 hat Eric Blake geschrieben:
+> We are gradually moving away from sector-based interfaces, towards
+> byte-based.  Update the file protocol driver accordingly.
 > 
+> In want_zero mode, we continue to report fine-grained hole
+> information (the caller wants as much mapping detail as possible);
+> but when not in that mode, the caller prefers larger *pnum and
+> merely cares about what offsets are allocated at this layer, rather
+> than where the holes live.  Since holes still read as zeroes at
+> this layer (rather than deferring to a backing layer), we can take
+> the shortcut of skipping lseek(), and merely state that all bytes
+> are allocated.
 > 
-> On 11/29/2017 7:25 PM, Peter Xu wrote:
-> > On Wed, Nov 29, 2017 at 01:05:22PM -0800, Prasad Singamsetty wrote:
-> > > Thanks Michael. Some comments below.
-> > > 
-> > > On 11/28/2017 9:32 AM, Michael S. Tsirkin wrote:
-> > > > On Tue, Nov 14, 2017 at 06:13:50PM -0500, prasad.singamsetty@oracle.com wrote:
-> > > > > From: Prasad Singamsetty <prasad.singamsetty@oracle.com>
-> > > > > 
-> > > > > The current implementation of Intel IOMMU code only supports 39 bits
-> > > > > iova address width. This patch provides a new parameter (x-aw-bits)
-> > > > > for intel-iommu to extend its address width to 48 bits but keeping the
-> > > > > default the same (39 bits). The reason for not changing the default
-> > > > > is to avoid potential compatibility problems
-> > > > 
-> > > > You can change the default, just make it 39 for existing machine types.
-> > > 
-> > > I think introducing a new machine type is not appropriate as this
-> > > is an implementation limitation for the existing machine type.
-> > > Currently q35 is the only machine type that supports intel-iommu.
-> > > And we want to retain the current default behavior for q35 to avoid
-> > > any new issues with live migration.
-> > 
-> > I guess "existing machine type" means e.g. pc-q35-2.11 and older ones,
-> > rather than creating another machine type in parallel with q35.  So we
-> > can set 48 bits as default on upcoming pc-q35-2.12 machines, while
-> > keep the 39 bits on the old ones.
-> > 
-> > Please refer to include/hw/compat.h.
+> We can also drop redundant bounds checks that are already
+> guaranteed by the block layer.
 > 
-> Thanks Peter, for the clarification and pointer to this. I am still
-> new to this but learning on how this works or how this is used in
-> use cases like Live Migration.
+> Signed-off-by: Eric Blake <eblake@redhat.com>
 > 
-> Are you suggesting that we change the default to 48 bits in the
-> next release (2.12)?
+> ---
+> v5: drop redundant code
+> v4: tweak commit message [Fam], rebase to interface tweak
+> v3: no change
+> v2: tweak comment, add mapping support
+> ---
+>  block/file-posix.c | 62 +++++++++++++++++++++++++-----------------------------
+>  1 file changed, 29 insertions(+), 33 deletions(-)
 > 
-> User need to specify an older machine type  (pc-q35-2.11 or older)
-> to get the old default value of 39 bits. This still requires the
-> patch I proposed to support compatibility for older releases
-> except the introduction of the new property (x-aw-bits).
+> diff --git a/block/file-posix.c b/block/file-posix.c
+> index 36ee89e940..e847c7cdd9 100644
+> --- a/block/file-posix.c
+> +++ b/block/file-posix.c
+> @@ -2128,25 +2128,24 @@ static int find_allocation(BlockDriverState *bs, off_t start,
+>  }
+> 
+>  /*
+> - * Returns the allocation status of the specified sectors.
+> + * Returns the allocation status of the specified offset.
+>   *
+> - * If 'sector_num' is beyond the end of the disk image the return value is 0
+> - * and 'pnum' is set to 0.
+> + * The block layer guarantees 'offset' and 'bytes' are within bounds.
+>   *
+> - * 'pnum' is set to the number of sectors (including and immediately following
+> - * the specified sector) that are known to be in the same
+> + * 'pnum' is set to the number of bytes (including and immediately following
+> + * the specified offset) that are known to be in the same
+>   * allocated/unallocated state.
+>   *
+> - * 'nb_sectors' is the max value 'pnum' should be set to.  If nb_sectors goes
+> - * beyond the end of the disk image it will be clamped.
+> + * 'bytes' is the max value 'pnum' should be set to.
+>   */
+> -static int64_t coroutine_fn raw_co_get_block_status(BlockDriverState *bs,
+> -                                                    int64_t sector_num,
+> -                                                    int nb_sectors, int *pnum,
+> -                                                    BlockDriverState **file)
+> +static int coroutine_fn raw_co_block_status(BlockDriverState *bs,
+> +                                            bool want_zero,
+> +                                            int64_t offset,
+> +                                            int64_t bytes, int64_t *pnum,
+> +                                            int64_t *map,
+> +                                            BlockDriverState **file)
+>  {
+> -    off_t start, data = 0, hole = 0;
+> -    int64_t total_size;
+> +    off_t data = 0, hole = 0;
+>      int ret;
+> 
+>      ret = fd_open(bs);
+> @@ -2154,39 +2153,36 @@ static int64_t coroutine_fn raw_co_get_block_status(BlockDriverState *bs,
+>          return ret;
+>      }
+> 
+> -    start = sector_num * BDRV_SECTOR_SIZE;
+> -    total_size = bdrv_getlength(bs);
+> -    if (total_size < 0) {
+> -        return total_size;
+> -    } else if (start >= total_size) {
+> -        *pnum = 0;
+> -        return 0;
+> -    } else if (start + nb_sectors * BDRV_SECTOR_SIZE > total_size) {
+> -        nb_sectors = DIV_ROUND_UP(total_size - start, BDRV_SECTOR_SIZE);
+> +    if (!want_zero) {
+> +        *pnum = bytes;
+> +        *map = offset;
+> +        *file = bs;
+> +        return BDRV_BLOCK_DATA | BDRV_BLOCK_OFFSET_VALID;
+>      }
 
-Yes. If you see a reason for users to limit it to 39 bits,
-we can make it a supported property (not starting
-with x-). If it's only for live migration, we can
-use a non-supported property (with x-).
+The documentation for want_zero in io.c is:
 
-> 
-> > 
-> > > 
-> > > > 
-> > > > > with live migration of
-> > > > > intel-iommu enabled QEMU guest. The only valid values for 'x-aw-bits'
-> > > > > parameter are 39 and 48.
-> > > > 
-> > > > I'd rather make it a boolean then.
-> > > 
-> > > Right. It seems Intel already has additional sizes supported so keeping
-> > > it as an integer seems better.
-> > 
-> > Yes, considering that 5-level IOMMUs are coming (AFAIK).
-> > 
-> 
-> If we change the default value to 48 bits, I assume there is
-> no need for this property and user is expected to use an
-> older machine type based on the release to get the old
-> default. Is this correct?
-> 
-> Thanks.
-> --Prasad
+ * If 'want_zero' is true, the caller is querying for mapping purposes,
+ * and the result should include BDRV_BLOCK_OFFSET_VALID and
+ * BDRV_BLOCK_ZERO where possible; otherwise, the result may omit those
+ * bits particularly if it allows for a larger value in 'pnum'.
+
+Do we need to include BDRV_BLOCK_DATA there? Otherwise this shortcut
+would be wrong because BDRV_BLOCK_DATA always needs to be exact, even for
+want_zero = false.
+
+At first I expected that we want bdrv_is_allocated() to indicate holes
+in raw files, but that's already not true today, so I now think this is
+a matter of tweaking the documentation rather than removing the
+shortcut.
 
 
-No, users use an older machine type to get migration from old
-machine types. If someone might actually want 39 bit for
-some reason, we need it as a supported property.
+While I'm looking at documentation, commit e88ae2264 had this:
+
+ * BDRV_BLOCK_ALLOCATED: the content of the block is determined by this
+ *                       layer (as opposed to the backing file)
+
+With this semantics, always returning BDRV_BLOCK_ALLOCATED (and
+therefore bdrv_is_allocated() == true) for raw file is correct. Your
+recent commit 4c41cb4 changed it into:
+
+ * BDRV_BLOCK_ALLOCATED: the content of the block is determined by this
+ *                       layer (short for DATA || ZERO), set by block layer
+
+Its commit message also talks about doing this "for convenience". This
+is not true. There are code paths that set ZERO after ALLOCATED has
+already been decided. ALLOCATED was introduced to distinguish a ZERO
+coming from the driver and a ZERO derived in io.c because the latter
+doesn't tell us about the allocation status (see commit e88ae2264).
+
+So this documentation should be tweaked as well (possibly just reverting
+4c41cb4 for BDRV_BLOCK_ALLOCATED).
+
+Kevin
