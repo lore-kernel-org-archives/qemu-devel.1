@@ -1,26 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51315)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51412)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1eKoj8-0004Wq-Cx
-	for qemu-devel@nongnu.org; Fri, 01 Dec 2017 12:03:51 -0500
+	(envelope-from <mst@redhat.com>) id 1eKojD-0004ax-O6
+	for qemu-devel@nongnu.org; Fri, 01 Dec 2017 12:04:01 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1eKoj7-00036c-FA
-	for qemu-devel@nongnu.org; Fri, 01 Dec 2017 12:03:50 -0500
-References: <20171129035502.GD8889@lemon>
-	<20171129120018.GB2601@stefanha-x1.localdomain>
-	<20171130094709.GA20286@lemon>
-	<20171130141954.GC14748@stefanha-x1.localdomain>
-	<20171201101644.GB11092@lemon>
-	<20171201140833.GB12803@stefanha-x1.localdomain>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <f67de9f9-dfe6-ae9a-d2ea-b4ae5e309757@redhat.com>
-Date: Fri, 1 Dec 2017 18:03:24 +0100
+	(envelope-from <mst@redhat.com>) id 1eKojC-0003E9-Ii
+	for qemu-devel@nongnu.org; Fri, 01 Dec 2017 12:03:55 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:40446)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1eKojC-0003DN-Ag
+	for qemu-devel@nongnu.org; Fri, 01 Dec 2017 12:03:54 -0500
+Date: Fri, 1 Dec 2017 19:03:46 +0200
+From: "Michael S. Tsirkin" <mst@redhat.com>
+Message-ID: <20171201190325-mutt-send-email-mst@kernel.org>
+References: <20171114231350.286025-1-prasad.singamsetty@oracle.com>
+	<20171114231350.286025-3-prasad.singamsetty@oracle.com>
+	<20171128193156-mutt-send-email-mst@kernel.org>
+	<cdbe8732-88fa-512e-481b-250abc18bf92@oracle.com>
+	<20171130032551.GA18017@xz-mi>
+	<367bb386-2885-2ea2-b766-d5bde2c79bcf@oracle.com>
+	<20171130205443-mutt-send-email-mst@kernel.org>
+	<fb9c086b-2b95-d09e-1c3f-d2274a347de6@oracle.com>
+	<20171201044338.GB2712@xz-mi>
+	<736c9e99-0d17-6122-0460-805148567e9d@oracle.com>
 MIME-Version: 1.0
-In-Reply-To: <20171201140833.GB12803@stefanha-x1.localdomain>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="Gu60LdBM8NoO4JX3NDjxId4KlkPBI0MGu"
-Subject: Re: [Qemu-devel] Block layer complexity: what to do to keep it
- under control?
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <736c9e99-0d17-6122-0460-805148567e9d@oracle.com>
+Subject: Re: [Qemu-devel] [PATCH v1 2/2] intel-iommu: Extend address width
+ to 48 bits
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,126 +36,100 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefan Hajnoczi <stefanha@redhat.com>, Fam Zheng <famz@redhat.com>
-Cc: kwolf@redhat.com, qemu-block@nongnu.org, jcody@redhat.com, qemu-devel@nongnu.org, mreitz@redhat.com
+To: Prasad Singamsetty <prasad.singamsetty@oracle.com>
+Cc: Peter Xu <peterx@redhat.com>, ehabkost@redhat.com, konrad.wilk@oracle.com, qemu-devel@nongnu.org, imammedo@redhat.com, pbonzini@redhat.com, rth@twiddle.net
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---Gu60LdBM8NoO4JX3NDjxId4KlkPBI0MGu
-From: Paolo Bonzini <pbonzini@redhat.com>
-To: Stefan Hajnoczi <stefanha@redhat.com>, Fam Zheng <famz@redhat.com>
-Cc: kwolf@redhat.com, qemu-block@nongnu.org, jcody@redhat.com,
- qemu-devel@nongnu.org, mreitz@redhat.com
-Message-ID: <f67de9f9-dfe6-ae9a-d2ea-b4ae5e309757@redhat.com>
-Subject: Re: [Qemu-devel] Block layer complexity: what to do to keep it under
- control?
-References: <20171129035502.GD8889@lemon>
- <20171129120018.GB2601@stefanha-x1.localdomain>
- <20171130094709.GA20286@lemon>
- <20171130141954.GC14748@stefanha-x1.localdomain>
- <20171201101644.GB11092@lemon>
- <20171201140833.GB12803@stefanha-x1.localdomain>
-In-Reply-To: <20171201140833.GB12803@stefanha-x1.localdomain>
-Content-Type: text/plain; charset=windows-1252
-Content-Transfer-Encoding: quoted-printable
+On Fri, Dec 01, 2017 at 09:02:30AM -0800, Prasad Singamsetty wrote:
+> 
+> 
+> On 11/30/2017 8:43 PM, Peter Xu wrote:
+> > On Thu, Nov 30, 2017 at 11:12:48AM -0800, Prasad Singamsetty wrote:
+> > > 
+> > > 
+> > > On 11/30/2017 10:56 AM, Michael S. Tsirkin wrote:
+> > > > On Thu, Nov 30, 2017 at 10:33:50AM -0800, Prasad Singamsetty wrote:
+> > > > > 
+> > > > > 
+> > > > > On 11/29/2017 7:25 PM, Peter Xu wrote:
+> > > > > > On Wed, Nov 29, 2017 at 01:05:22PM -0800, Prasad Singamsetty wrote:
+> > > > > > > Thanks Michael. Some comments below.
+> > > > > > > 
+> > > > > > > On 11/28/2017 9:32 AM, Michael S. Tsirkin wrote:
+> > > > > > > > On Tue, Nov 14, 2017 at 06:13:50PM -0500, prasad.singamsetty@oracle.com wrote:
+> > > > > > > > > From: Prasad Singamsetty <prasad.singamsetty@oracle.com>
+> > > > > > > > > 
+> > > > > > > > > The current implementation of Intel IOMMU code only supports 39 bits
+> > > > > > > > > iova address width. This patch provides a new parameter (x-aw-bits)
+> > > > > > > > > for intel-iommu to extend its address width to 48 bits but keeping the
+> > > > > > > > > default the same (39 bits). The reason for not changing the default
+> > > > > > > > > is to avoid potential compatibility problems
+> > > > > > > > 
+> > > > > > > > You can change the default, just make it 39 for existing machine types.
+> > > > > > > 
+> > > > > > > I think introducing a new machine type is not appropriate as this
+> > > > > > > is an implementation limitation for the existing machine type.
+> > > > > > > Currently q35 is the only machine type that supports intel-iommu.
+> > > > > > > And we want to retain the current default behavior for q35 to avoid
+> > > > > > > any new issues with live migration.
+> > > > > > 
+> > > > > > I guess "existing machine type" means e.g. pc-q35-2.11 and older ones,
+> > > > > > rather than creating another machine type in parallel with q35.  So we
+> > > > > > can set 48 bits as default on upcoming pc-q35-2.12 machines, while
+> > > > > > keep the 39 bits on the old ones.
+> > > > > > 
+> > > > > > Please refer to include/hw/compat.h.
+> > > > > 
+> > > > > Thanks Peter, for the clarification and pointer to this. I am still
+> > > > > new to this but learning on how this works or how this is used in
+> > > > > use cases like Live Migration.
+> > 
+> > You can refer to similar commit, like 048a2e8869.
+> > 
+> > But, I think I was wrong - you should better do the addition to
+> > include/hw/i386/pc.h (see e.g. PC_COMPAT_2_10) rather than compat.h,
+> > since Intel vIOMMU is only used for PC machines.
+> 
+> Thanks, Peter. That sounds good. We can add the compatibility
+> default value to PC_COMPAT_2_11. How does it work for older
+> machine types like PC_COMPAT_2_10 and older?
 
-Just my 2 cents on the language topic, as in general I agree completely
-with Stefan.
+It's inherited.
 
-On 01/12/2017 15:08, Stefan Hajnoczi wrote:
-> Rust's threading model is 1:1.  Besides mutexes it also has channels
-> (looks similar to Go and communicating sequential processes-style
-> channels).
->=20
-> It is probably not feasible to make each I/O request a thread (i.e. 1M
-> IOPS means creating/destroying 1M threads/sec).  There would have to be=
-
-> some machinery like a request queue and a thread pool to process
-> requests.  That way requests can be held before those that are ready to=
-
-> be executed can run as threads.  Hmm...this sounds similar to what we
-> have.
-
-Yes, we would probably use coroutines anyway even if using Rust
-(wrapping them in a Rust library).
-
-There could still be important gains in readability and type-safety, for
-example if the type checker could guarantee that internal qcow2
-functions are called with a lock taken.  I'm afraid however that this
-would require much stronger Rust knowledge than we can acquire quickly,
-and that we would end up with just as much technical debt (without even
-realizing it).
-
-Luckily, several benefits don't require a full rewrite or language switch=
-:
-
-- readability from RAII-style code.  If this is important enough, we
-could actually use GCC __attribute__((cleanup)) or, heaven forbid,
-slowly introduce C++ in QEMU's code base.
-
-- compile-time checks.  For this we can also use clang's
--Wthread-safety.  (GCC doesn't have it yet).
-
-- lack of templates/generics; for example commit 2bb5c936c5 ("curl: do
-not do aio_poll when waiting for a free CURLState", 2017-05-16)
-open-codes a "CoQueue that's protected by a QemuMutex rather than a
-CoMutex"; templates would provide an elegant solution without code
-duplication.  Generics could also be used to decouple abstract data
-types from the block layer and to unit-test them easily (e.g.
-Graph<BlockDriverState, BdrvChildRole>), but: 1) it may be just my very
-limited knowledge of the BDS graph code; 2) we couldn't do this anyway
-without first understanding the deficiencies of our C implementation
-(for example with respect to missing bdrv_ref/unref).
-
-In all cases, the lessons that we learn fixing the C code or slowly
-including a little bit of C++ _could_ help with a later larger-scale swit=
-ch.
-
-> The important thing is this:
->=20
-> Coroutines with a single event loop (current model in QEMU) are simpler=
-
-> than threads.  Why?  Because coroutine code is atomic with respect to
-> other coroutines in the same event loop.  Only yield points or nested
-> event loops allow other coroutines to execute.  That means less explici=
-t
-> synchronization is necessary.
->=20
-> When the block layer goes multiqueue this advantage will be lost and
-> coroutine code will have to synchronize explicitly just like threaded
-> code.  Coroutines will remain lighter weight than threads and will allo=
-w
-> M:N threading to be configured via IOThreads.
->=20
-> I'm not hopeful that dropping coroutines helps and I don't see that Rus=
-t
-> brings anything new to the table here.  I do like other aspects of Rust=
-
-> and am open to using it for new code.
-
-Same here.  Just like fixing the C code provides a good foundation for a
-language switch, some more battle-tested code could be converted from
-QEMU to Rust, in order to get familiar with it and probe whether the
-benefits are real.  Maybe the memory API could be a good candidate; it
-certainly would benefit from generics.
-
-Paolo
-
-
---Gu60LdBM8NoO4JX3NDjxId4KlkPBI0MGu
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEE8TM4V0tmI4mGbHaCv/vSX3jHroMFAlohi18ACgkQv/vSX3jH
-roNaHgf+MLcQ5TKbCXXcRuf1yaQggT2O282CYrtNOj5T0Pcd5HPXYCt3EETcouRS
-fhovCiKg+UE4fch4se3fO0+xDscjDvcGa3tRTkxNIRumhwSPvYkaAOhKi4ySg5mn
-sS17YvNgLJEaNoSLaQjzFpC6pui3KStnzvsyAgn2vIpMItlDWp8T1EG+MbBKL0QE
-ToCxIpL8V57ceyNrZ1VVbXM3cewyeJQvnPOfwqUcwq5b2wtWP97LyC2sy3FpMhWZ
-Cx4136YGpSLSj6r9MGC26pg3VUNjc/+COLA9lVqPa50SUjvRVZxcWuz32NGScqKB
-ivcq1RcWZESz7gHCqlyUqUfKVIhJDg==
-=Na6r
------END PGP SIGNATURE-----
-
---Gu60LdBM8NoO4JX3NDjxId4KlkPBI0MGu--
+> > 
+> > And... you may also need to create that PC_COMPAT_2_11 macro after
+> > 2.11 is released.  For that you can refer to a6fd5b0e050a.
+> > 
+> > Anyway, I think this "set default" work can be postponed after recent
+> > release, which can be a separate work besides current series.
+> 
+> OK. To be clear, are you suggesting that we can change the default
+> value to 48 bits as a separate patch and not include it with the
+> current patch set?
+> 
+> > 
+> > > > > 
+> > > > > Are you suggesting that we change the default to 48 bits in the
+> > > > > next release (2.12)?
+> > > > > 
+> > > > > User need to specify an older machine type  (pc-q35-2.11 or older)
+> > > > > to get the old default value of 39 bits. This still requires the
+> > > > > patch I proposed to support compatibility for older releases
+> > > > > except the introduction of the new property (x-aw-bits).
+> > > > 
+> > > > Yes. If you see a reason for users to limit it to 39 bits,
+> > > > we can make it a supported property (not starting
+> > > > with x-). If it's only for live migration, we can
+> > > > use a non-supported property (with x-).
+> > > I think it is only for Live Migration case, we need to
+> > > support the old default value of 39 bits.
+> > > 
+> > > Do you see any need to keep a non-supported property?
+> > > It may be useful for developers.
+> > 
+> > IMHO if it's for developers x-* would be good enough.  Thanks,
+> > 
+> 
+> Sounds good.
+> 
+> Thanks.
+> --Prasad
