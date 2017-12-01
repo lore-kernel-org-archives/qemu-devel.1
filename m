@@ -1,28 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51156)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51765)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <aik@ozlabs.ru>) id 1eKoFX-0001R4-WD
-	for qemu-devel@nongnu.org; Fri, 01 Dec 2017 11:33:16 -0500
+	(envelope-from <quintela@redhat.com>) id 1eKoGL-0002KH-JJ
+	for qemu-devel@nongnu.org; Fri, 01 Dec 2017 11:34:06 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <aik@ozlabs.ru>) id 1eKoFT-0000Ji-Ss
-	for qemu-devel@nongnu.org; Fri, 01 Dec 2017 11:33:16 -0500
-Received: from mail-pl0-x243.google.com ([2607:f8b0:400e:c01::243]:34117)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <aik@ozlabs.ru>) id 1eKoFT-0000JE-NP
-	for qemu-devel@nongnu.org; Fri, 01 Dec 2017 11:33:11 -0500
-Received: by mail-pl0-x243.google.com with SMTP id d21so6546834pll.1
-	for <qemu-devel@nongnu.org>; Fri, 01 Dec 2017 08:33:11 -0800 (PST)
-References: <20171005055037.7767-1-aik@ozlabs.ru>
-	<20171005055037.7767-2-aik@ozlabs.ru>
-From: Alexey Kardashevskiy <aik@ozlabs.ru>
-Message-ID: <431ee02e-a73e-70c8-185d-43223c52c693@ozlabs.ru>
-Date: Fri, 1 Dec 2017 08:56:42 +1100
-MIME-Version: 1.0
-In-Reply-To: <20171005055037.7767-2-aik@ozlabs.ru>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-AU
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH qemu v5 1/2] memory/iommu/vfio: Define
- add_vfio_group() callback
+	(envelope-from <quintela@redhat.com>) id 1eKoGG-0000qC-MJ
+	for qemu-devel@nongnu.org; Fri, 01 Dec 2017 11:34:05 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:60982)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1eKoGG-0000pF-EB
+	for qemu-devel@nongnu.org; Fri, 01 Dec 2017 11:34:00 -0500
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+	[10.5.11.11])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 34122820FF
+	for <qemu-devel@nongnu.org>; Fri,  1 Dec 2017 12:57:58 +0000 (UTC)
+From: Juan Quintela <quintela@redhat.com>
+Date: Fri,  1 Dec 2017 13:57:50 +0100
+Message-Id: <20171201125750.1372-3-quintela@redhat.com>
+In-Reply-To: <20171201125750.1372-1-quintela@redhat.com>
+References: <20171201125750.1372-1-quintela@redhat.com>
+Subject: [Qemu-devel] [PATCH v3 2/2] migration: Set the migration tcp port
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,71 +30,135 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: qemu-ppc@nongnu.org, David Gibson <david@gibson.dropbear.id.au>, Alex Williamson <alex.williamson@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
+Cc: dgilbert@redhat.com, lvivier@redhat.com, peterx@redhat.com
 
-On 05/10/17 16:50, Alexey Kardashevskiy wrote:
-> The new callback will be called when a new VFIO IOMMU group is added.
-> 
-> This should cause no behavioral change, the next patch will.
-> 
-> Signed-off-by: Alexey Kardashevskiy <aik@ozlabs.ru>
+We can set the port parameter as zero.  This patch lets us know what
+port the system was choosen for us.  Now we can migrate to this place.
 
+Signed-off-by: Juan Quintela <quintela@redhat.com>
 
-What about this one,  any conclusion yet?
+--
 
+This was migrate_set_uri(), but as we only need the tcp_port, change
+to that one.
+---
+ migration/migration.c | 10 ++++++++++
+ migration/migration.h |  2 ++
+ migration/socket.c    | 35 ++++++++++++++++++++++++++++++-----
+ 3 files changed, 42 insertions(+), 5 deletions(-)
 
-> ---
-> 
-> This could be at the higher level - in MemoryRegionOps, makes sense?
-> 
-> ---
->  include/exec/memory.h |  4 ++++
->  hw/vfio/common.c      | 15 +++++++++++++++
->  2 files changed, 19 insertions(+)
-> 
-> diff --git a/include/exec/memory.h b/include/exec/memory.h
-> index 5ed4042f87..64e0b4fc96 100644
-> --- a/include/exec/memory.h
-> +++ b/include/exec/memory.h
-> @@ -210,6 +210,10 @@ typedef struct IOMMUMemoryRegionClass {
->                                  IOMMUNotifierFlag new_flags);
->      /* Set this up to provide customized IOMMU replay function */
->      void (*replay)(IOMMUMemoryRegion *iommu, IOMMUNotifier *notifier);
-> +
-> +    /* Notifies IOMMUMR about attached VFIO IOMMU group */
-> +    void (*add_vfio_group)(IOMMUMemoryRegion *iommu_mr, int vfio_kvm_fd,
-> +                           int groupfd);
->  } IOMMUMemoryRegionClass;
->  
->  typedef struct CoalescedMemoryRange CoalescedMemoryRange;
-> diff --git a/hw/vfio/common.c b/hw/vfio/common.c
-> index 7b2924c0ef..9e861e0393 100644
-> --- a/hw/vfio/common.c
-> +++ b/hw/vfio/common.c
-> @@ -481,6 +481,21 @@ static void vfio_listener_region_add(MemoryListener *listener,
->          VFIOGuestIOMMU *giommu;
->          IOMMUMemoryRegion *iommu_mr = IOMMU_MEMORY_REGION(section->mr);
->  
-> +#ifdef CONFIG_KVM
-> +        if (kvm_enabled()) {
-> +            VFIOGroup *group;
-> +            IOMMUMemoryRegionClass *imrc =
-> +                IOMMU_MEMORY_REGION_GET_CLASS(iommu_mr);
-> +
-> +            QLIST_FOREACH(group, &container->group_list, container_next) {
-> +                if (imrc->add_vfio_group) {
-> +                    imrc->add_vfio_group(iommu_mr, vfio_kvm_device_fd,
-> +                                         group->fd);
-> +                }
-> +            }
-> +        }
-> +#endif
-> +
->          trace_vfio_listener_region_add_iommu(iova, end);
->          /*
->           * FIXME: For VFIO iommu types which have KVM acceleration to
-> 
-
-
+diff --git a/migration/migration.c b/migration/migration.c
+index abc02d4efd..b3e396a382 100644
+--- a/migration/migration.c
++++ b/migration/migration.c
+@@ -240,6 +240,16 @@ void migrate_send_rp_req_pages(MigrationIncomingState *mis, const char *rbname,
+     }
+ }
+ 
++void migrate_set_port(const uint16_t port, Error **errp)
++{
++    MigrateSetParameters p = {
++        .has_tcp_port = true,
++        .tcp_port = port,
++    };
++
++    qmp_migrate_set_parameters(&p, errp);
++}
++
+ void qemu_start_incoming_migration(const char *uri, Error **errp)
+ {
+     const char *p;
+diff --git a/migration/migration.h b/migration/migration.h
+index 663415fe48..53153a9eca 100644
+--- a/migration/migration.h
++++ b/migration/migration.h
+@@ -210,4 +210,6 @@ void migrate_send_rp_pong(MigrationIncomingState *mis,
+ void migrate_send_rp_req_pages(MigrationIncomingState *mis, const char* rbname,
+                               ram_addr_t start, size_t len);
+ 
++void migrate_set_port(const uint16_t port, Error **errp);
++
+ #endif
+diff --git a/migration/socket.c b/migration/socket.c
+index 3a8232dd2d..248a798543 100644
+--- a/migration/socket.c
++++ b/migration/socket.c
+@@ -15,6 +15,7 @@
+  */
+ 
+ #include "qemu/osdep.h"
++#include "qemu/cutils.h"
+ 
+ #include "qemu-common.h"
+ #include "qemu/error-report.h"
+@@ -162,17 +163,24 @@ out:
+ }
+ 
+ 
+-static void socket_start_incoming_migration(SocketAddress *saddr,
+-                                            Error **errp)
++static SocketAddress *socket_start_incoming_migration(SocketAddress *saddr,
++                                                      Error **errp)
+ {
+     QIOChannelSocket *listen_ioc = qio_channel_socket_new();
++    SocketAddress *address;
+ 
+     qio_channel_set_name(QIO_CHANNEL(listen_ioc),
+                          "migration-socket-listener");
+ 
+     if (qio_channel_socket_listen_sync(listen_ioc, saddr, errp) < 0) {
+         object_unref(OBJECT(listen_ioc));
+-        return;
++        return NULL;
++    }
++
++    address = qio_channel_socket_get_local_address(listen_ioc, errp);
++    if (address < 0) {
++        object_unref(OBJECT(listen_ioc));
++        return NULL;
+     }
+ 
+     qio_channel_add_watch(QIO_CHANNEL(listen_ioc),
+@@ -180,14 +188,28 @@ static void socket_start_incoming_migration(SocketAddress *saddr,
+                           socket_accept_incoming_migration,
+                           listen_ioc,
+                           (GDestroyNotify)object_unref);
++    return address;
+ }
+ 
+ void tcp_start_incoming_migration(const char *host_port, Error **errp)
+ {
+     Error *err = NULL;
+     SocketAddress *saddr = tcp_build_address(host_port, &err);
++
+     if (!err) {
+-        socket_start_incoming_migration(saddr, &err);
++        SocketAddress *address = socket_start_incoming_migration(saddr, &err);
++
++        if (address) {
++            unsigned long long port;
++
++            if (parse_uint_full(address->u.inet.port, &port, 10) < 0) {
++                error_setg(errp, "error parsing port in '%s'",
++                           address->u.inet.port);
++            } else {
++                migrate_set_port(port, errp);
++            }
++            qapi_free_SocketAddress(address);
++        }
+     }
+     qapi_free_SocketAddress(saddr);
+     error_propagate(errp, err);
+@@ -196,6 +218,9 @@ void tcp_start_incoming_migration(const char *host_port, Error **errp)
+ void unix_start_incoming_migration(const char *path, Error **errp)
+ {
+     SocketAddress *saddr = unix_build_address(path);
+-    socket_start_incoming_migration(saddr, errp);
++    SocketAddress *address;
++
++    address = socket_start_incoming_migration(saddr, errp);
++    qapi_free_SocketAddress(address);
+     qapi_free_SocketAddress(saddr);
+ }
 -- 
-Alexey
+2.14.3
