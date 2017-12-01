@@ -1,35 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45698)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45934)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <farman@linux.vnet.ibm.com>) id 1eKq4D-0000Kx-UX
-	for qemu-devel@nongnu.org; Fri, 01 Dec 2017 13:29:42 -0500
+	(envelope-from <eblake@redhat.com>) id 1eKq4o-0000x5-DG
+	for qemu-devel@nongnu.org; Fri, 01 Dec 2017 13:30:19 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <farman@linux.vnet.ibm.com>) id 1eKq49-0001bb-Ni
-	for qemu-devel@nongnu.org; Fri, 01 Dec 2017 13:29:41 -0500
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:37284)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <farman@linux.vnet.ibm.com>)
-	id 1eKq49-0001bM-Eg
-	for qemu-devel@nongnu.org; Fri, 01 Dec 2017 13:29:37 -0500
-Received: from pps.filterd (m0098399.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
-	vB1FFOD6059267
-	for <qemu-devel@nongnu.org>; Fri, 1 Dec 2017 10:15:48 -0500
-Received: from e06smtp15.uk.ibm.com (e06smtp15.uk.ibm.com [195.75.94.111])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2ek86jd4hr-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Fri, 01 Dec 2017 10:15:47 -0500
-Received: from localhost
-	by e06smtp15.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
-	Only! Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <farman@linux.vnet.ibm.com>;
-	Fri, 1 Dec 2017 15:15:45 -0000
-From: Eric Farman <farman@linux.vnet.ibm.com>
-Date: Fri,  1 Dec 2017 16:15:38 +0100
-In-Reply-To: <20171201151538.6844-1-farman@linux.vnet.ibm.com>
-References: <20171201151538.6844-1-farman@linux.vnet.ibm.com>
-Message-Id: <20171201151538.6844-2-farman@linux.vnet.ibm.com>
-Subject: [Qemu-devel] [PATCH 1/1] vhost-scsi: add missing virtqueue_size
- parameter
+	(envelope-from <eblake@redhat.com>) id 1eKq4g-0001vV-4f
+	for qemu-devel@nongnu.org; Fri, 01 Dec 2017 13:30:13 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:47322)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1eKq4f-0001tS-VQ
+	for qemu-devel@nongnu.org; Fri, 01 Dec 2017 13:30:10 -0500
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+	[10.5.11.15])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 3230B5AFD9
+	for <qemu-devel@nongnu.org>; Fri,  1 Dec 2017 18:30:09 +0000 (UTC)
+References: <20171201125813.1437-1-quintela@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <4c899960-36f2-0f0f-bc21-08693f472ba2@redhat.com>
+Date: Fri, 1 Dec 2017 12:30:00 -0600
+MIME-Version: 1.0
+In-Reply-To: <20171201125813.1437-1-quintela@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v3 0/6] Add make check tests for Migration
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -38,36 +33,20 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>, "Richard W . M . Jones" <rjones@redhat.com>, "Michael S . Tsirkin" <mst@redhat.com>
-Cc: Dariusz Stojaczyk <dariuszx.stojaczyk@intel.com>, Felipe Franciosi <felipe@nutanix.com>, qemu-devel@nongnu.org, Eric Farman <farman@linux.vnet.ibm.com>
+To: Juan Quintela <quintela@redhat.com>, qemu-devel@nongnu.org
+Cc: lvivier@redhat.com, dgilbert@redhat.com, peterx@redhat.com
 
-Commit 5c0919d02066 ("virtio-scsi: Add virtqueue_size parameter allowing
-virtqueue size to be set.") introduced a new parameter to virtio-scsi.
-Later, commit 920036106044 ("vhost-user-scsi: add missing virtqueue_size
-param") added that parameter to the new vhost-user-scsi interface but
-neglected the existing vhost-scsi interface it was built on.
+On 12/01/2017 06:58 AM, Juan Quintela wrote:
+> Hi
+> 
+> This is on top of my info_migrate series.
 
-Apply the same change to vhost-scsi, so that we can boot a guest with
-a device defined.  This also avoids crashing a guest when hotplugging
-a vhost-scsi device.
+Let patchew know about it:
 
-Signed-off-by: Eric Farman <farman@linux.vnet.ibm.com>
----
- hw/scsi/vhost-scsi.c | 2 ++
- 1 file changed, 2 insertions(+)
+Based-on: <20171201125750.1372-1-quintela@redhat.com>
+([PATCH v3 0/2] Improve info migrate output on destination)
 
-diff --git a/hw/scsi/vhost-scsi.c b/hw/scsi/vhost-scsi.c
-index cd4ab05233..9c1bea8ff3 100644
---- a/hw/scsi/vhost-scsi.c
-+++ b/hw/scsi/vhost-scsi.c
-@@ -233,6 +233,8 @@ static Property vhost_scsi_properties[] = {
-     DEFINE_PROP_STRING("wwpn", VirtIOSCSICommon, conf.wwpn),
-     DEFINE_PROP_UINT32("boot_tpgt", VirtIOSCSICommon, conf.boot_tpgt, 0),
-     DEFINE_PROP_UINT32("num_queues", VirtIOSCSICommon, conf.num_queues, 1),
-+    DEFINE_PROP_UINT32("virtqueue_size", VirtIOSCSICommon, conf.virtqueue_size,
-+                       128),
-     DEFINE_PROP_UINT32("max_sectors", VirtIOSCSICommon, conf.max_sectors,
-                        0xFFFF),
-     DEFINE_PROP_UINT32("cmd_per_lun", VirtIOSCSICommon, conf.cmd_per_lun, 128),
 -- 
-2.13.5
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
