@@ -1,26 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39713)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41176)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1eKrgZ-0006KT-Je
-	for qemu-devel@nongnu.org; Fri, 01 Dec 2017 15:13:25 -0500
+	(envelope-from <mreitz@redhat.com>) id 1eKrjQ-0008To-VC
+	for qemu-devel@nongnu.org; Fri, 01 Dec 2017 15:16:22 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1eKrgT-00036d-7J
-	for qemu-devel@nongnu.org; Fri, 01 Dec 2017 15:13:20 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:36736)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mreitz@redhat.com>) id 1eKrgS-00034q-UN
-	for qemu-devel@nongnu.org; Fri, 01 Dec 2017 15:13:17 -0500
-References: <20171116223527.4499-1-danielhb@linux.vnet.ibm.com>
-	<20171116223527.4499-3-danielhb@linux.vnet.ibm.com>
+	(envelope-from <mreitz@redhat.com>) id 1eKrjQ-0005Ns-3e
+	for qemu-devel@nongnu.org; Fri, 01 Dec 2017 15:16:20 -0500
+References: <20171116173810.16457-1-crosa@redhat.com>
+	<20171116173810.16457-2-crosa@redhat.com>
+	<a5c42ab2-f384-4768-6e07-30814789ef5c@redhat.com>
+	<efb77a22-77c4-9671-744e-5713ae727959@redhat.com>
 From: Max Reitz <mreitz@redhat.com>
-Message-ID: <6892975f-87d7-a348-ce21-739fdff4b25e@redhat.com>
-Date: Fri, 1 Dec 2017 21:13:03 +0100
+Message-ID: <422c4428-4807-5132-f8ec-ec5d5ffb5509@redhat.com>
+Date: Fri, 1 Dec 2017 21:16:11 +0100
 MIME-Version: 1.0
-In-Reply-To: <20171116223527.4499-3-danielhb@linux.vnet.ibm.com>
+In-Reply-To: <efb77a22-77c4-9671-744e-5713ae727959@redhat.com>
 Content-Type: multipart/signed; micalg=pgp-sha256;
 	protocol="application/pgp-signature";
-	boundary="oPv96hmiFqH5UFfxvrvAXnPUUg7RIW0CR"
-Subject: Re: [Qemu-devel] [PATCH v3 2/2] tests/qemu-iotests: adding
- savevm/loadvm with postcopy flag test
+	boundary="qrbSGhBi80NaP76cMq3lDHa3I0fE7vrs9"
+Subject: Re: [Qemu-devel] [Qemu-block] [PATCH 01/10] qemu-iotests: make
+ execution of tests agnostic to test type
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,245 +27,91 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Daniel Henrique Barboza <danielhb@linux.vnet.ibm.com>, qemu-devel@nongnu.org
-Cc: Kevin Wolf <kwolf@redhat.com>, Cleber Rosa <crosa@redhat.com>
+To: Cleber Rosa <crosa@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org
+Cc: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
 
 This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---oPv96hmiFqH5UFfxvrvAXnPUUg7RIW0CR
+--qrbSGhBi80NaP76cMq3lDHa3I0fE7vrs9
 From: Max Reitz <mreitz@redhat.com>
-To: Daniel Henrique Barboza <danielhb@linux.vnet.ibm.com>,
+To: Cleber Rosa <crosa@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
  qemu-devel@nongnu.org
-Cc: Kevin Wolf <kwolf@redhat.com>, Cleber Rosa <crosa@redhat.com>
-Message-ID: <6892975f-87d7-a348-ce21-739fdff4b25e@redhat.com>
-Subject: Re: [PATCH v3 2/2] tests/qemu-iotests: adding savevm/loadvm with
- postcopy flag test
-References: <20171116223527.4499-1-danielhb@linux.vnet.ibm.com>
- <20171116223527.4499-3-danielhb@linux.vnet.ibm.com>
-In-Reply-To: <20171116223527.4499-3-danielhb@linux.vnet.ibm.com>
+Cc: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
+Message-ID: <422c4428-4807-5132-f8ec-ec5d5ffb5509@redhat.com>
+Subject: Re: [Qemu-devel] [Qemu-block] [PATCH 01/10] qemu-iotests: make
+ execution of tests agnostic to test type
+References: <20171116173810.16457-1-crosa@redhat.com>
+ <20171116173810.16457-2-crosa@redhat.com>
+ <a5c42ab2-f384-4768-6e07-30814789ef5c@redhat.com>
+ <efb77a22-77c4-9671-744e-5713ae727959@redhat.com>
+In-Reply-To: <efb77a22-77c4-9671-744e-5713ae727959@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
 
-On 2017-11-16 23:35, Daniel Henrique Barboza wrote:
-> This patch implements a test case for the scenario that was failing
-> prior to the patch "migration/ram.c: do not set 'postcopy_running' in
-> POSTCOPY_INCOMING_END".
+On 2017-11-17 14:15, Cleber Rosa wrote:
 >=20
-> This new test file 198 was derived from the test file 181 authored
-> by Kevin Wolf.
 >=20
-> CC: Kevin Wolf <kwolf@redhat.com>
-> CC: Max Reitz <mreitz@redhat.com>
-> CC: Cleber Rosa <crosa@redhat.com>
-> Signed-off-by: Daniel Henrique Barboza <danielhb@linux.vnet.ibm.com>
->=20
-> ---
-> I CCed Cleber Rosa because this patch was developed at the same
-> time his patch series "[PATCH 00/10] I/O tests cleanups" hit the
-> mailing list. Most of the cleanups/fixes he made in the series was
-> done in this new test as well.
->=20
->  tests/qemu-iotests/198     | 110 +++++++++++++++++++++++++++++++++++++=
-++++++++
->  tests/qemu-iotests/198.out |  20 +++++++++
->  tests/qemu-iotests/group   |   1 +
->  3 files changed, 131 insertions(+)
->  create mode 100755 tests/qemu-iotests/198
->  create mode 100644 tests/qemu-iotests/198.out
+> On 11/17/2017 02:25 AM, Paolo Bonzini wrote:
+>> On 16/11/2017 18:38, Cleber Rosa wrote:
+>>> check makes a distinction on how it runs Python based tests.  The
+>>> current approach is inconsistent because:
+>>>
+>>> 1) a large number of Python tests are already set as executable files=
 
-Looks good overall, just two nitpicks below.
+>>> (eg: 030, 040, 041, 044, 045, 055, 056, 057, 065, 093, 118, 147, 149,=
 
->=20
-> diff --git a/tests/qemu-iotests/198 b/tests/qemu-iotests/198
-> new file mode 100755
-> index 0000000000..786e37fc95
-> --- /dev/null
-> +++ b/tests/qemu-iotests/198
-> @@ -0,0 +1,110 @@
-> +#!/bin/bash
-> +#
-> +# Test savevm and loadvm after live migration with postcopy flag
-> +#
-> +# Copyright (C) 2017, IBM Corporation.
-> +#
-> +# This file is derived from tests/qemu-iotests/181 by Kevin Wolf
-> +#
-> +# This program is free software; you can redistribute it and/or modify=
-
-> +# it under the terms of the GNU General Public License as published by=
-
-> +# the Free Software Foundation; either version 2 of the License, or
-> +# (at your option) any later version.
-> +#
-> +# This program is distributed in the hope that it will be useful,
-> +# but WITHOUT ANY WARRANTY; without even the implied warranty of
-> +# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-> +# GNU General Public License for more details.
-> +#
-> +# You should have received a copy of the GNU General Public License
-> +# along with this program.  If not, see <http://www.gnu.org/licenses/>=
+>>> 155, 165 and 194)
+>>>
+>>> 2) a smaller number of Python tests are not set as executable files
+>>>
+>>> 3) the true purpose of a shebang line is to make a file executable,
+>>> while it currently is used (inconsistently) as a test type flag
+>>>
+>>> 4) the same logic could in theory be applied to shell based tests,
+>>> that is, if first line contains a shell shebang, run it with
+>>> "$SHELL $test_file", but it'd be pointless
+>>>
+>>> IMO, there's no value in the distinction that check makes.  Dropping
+>>> this distinction makes the interface simpler: check requires an
+>>> executable file.
+>>>
+>>> Signed-off-by: Cleber Rosa <crosa@redhat.com>
+>>
+>> This is quirky, but I think it makes sense to obey the configure
+>> script's chosen Python interpreter.  Unlike /bin/sh or /bin/bash, ther=
+e
+>> can be many Python interpreters on a system and the user may not want
+>> the one in /usr/bin/python (think of old RHEL with software collection=
+s,
+>> even though our use of Python is generally portable to older versions)=
 =2E
-> +#
-> +# Creator/Owner : danielhb@linux.vnet.ibm.com
-> +
-> +seq=3D`basename $0`
-> +echo "QA output created by $seq"
-> +
-> +status=3D1	# failure is the default!
-> +
-> +MIG_SOCKET=3D"${TEST_DIR}/migrate"
-> +
-> +# get standard environment, filters and checks
-> +. ./common.rc
-> +. ./common.filter
-> +. ./common.qemu
-> +
-> +_cleanup()
-> +{
-> +    rm -f "${MIG_SOCKET}"
-> +    _cleanup_test_img
-> +    _cleanup_qemu
-> +}
-> +trap "_cleanup; exit \$status" 0 1 2 3 15
-> +
-> +_supported_fmt qcow2
-> +_supported_proto generic
-> +_supported_os Linux
-> +
-> +size=3D64M
-> +_make_test_img $size
-> +
-> +echo
-> +echo =3D=3D=3D Starting VMs =3D=3D=3D
-> +echo
-> +
-> +qemu_comm_method=3D"monitor"
-> +
-> +if [ "$IMGOPTSSYNTAX" =3D "true" ]; then
-> +    _launch_qemu \
-> +        -drive "${TEST_IMG}",cache=3D${CACHEMODE},id=3Ddisk
-> +else
-> +    _launch_qemu \
-> +        -drive file=3D"${TEST_IMG}",cache=3D${CACHEMODE},driver=3D$IMG=
-FMT,id=3Ddisk
-> +fi
-> +src=3D$QEMU_HANDLE
-> +
-> +if [ "$IMGOPTSSYNTAX" =3D "true" ]; then
-> +    _launch_qemu \
-> +        -drive "${TEST_IMG}",cache=3D${CACHEMODE},id=3Ddisk \
-> +        -incoming "unix:${MIG_SOCKET}"
-> +else
-> +    _launch_qemu \
-> +        -drive file=3D"${TEST_IMG}",cache=3D${CACHEMODE},driver=3D$IMG=
-FMT,id=3Ddisk \
-> +        -incoming "unix:${MIG_SOCKET}"
-> +fi
-> +dest=3D$QEMU_HANDLE
-> +
-> +echo
-> +echo =3D=3D=3D Set \'migrate_set_capability postcopy-ram on\' and migr=
-ate =3D=3D=3D
-> +echo
-> +
-> +silent=3Dyes
-> +_send_qemu_cmd $dest 'migrate_set_capability postcopy-ram on' "(qemu)"=
+>>
+>=20
+> Yes, that's a valid point.  Looking at it closer, we usually get "pytho=
+n
+> -B" from configure, so this changes the behavior (can plague the
+> developer box with .pyc files).
 
-> +_send_qemu_cmd $src 'migrate_set_capability postcopy-ram on' "(qemu)"
-> +_send_qemu_cmd $src "migrate -d unix:${MIG_SOCKET}" "(qemu)"
-> +
-> +QEMU_COMM_TIMEOUT=3D1 qemu_cmd_repeat=3D10 silent=3Dyes \
-> +    _send_qemu_cmd $src "info migrate" "completed\|failed"
-> +silent=3Dyes _send_qemu_cmd $src "" "(qemu)"
-
-Would it make sense to query the migration status non-silently here,
-too, so that the test output would verify that it has actually succeeded?=
-
-
-(I suppose the savevm/loadvm coming up next would fail if the migration
-failed, but maybe if it's easy enough...)
-
-> +
-> +echo
-> +echo =3D=3D=3D On destination, execute savevm and loadvm =3D=3D=3D
-> +echo
-> +
-> +silent=3D
-> +_send_qemu_cmd $dest 'savevm state1"' "(qemu)"
-> +_send_qemu_cmd $dest 'loadvm state1"' "(qemu)"
-
-Any specific reason why the snapshot name has a trailing double quote?
+Not just that, the most important thing is that you get python2 on
+systems where /usr/bin/python points to python3 (i.e., Arch).
 
 Max
 
-> +
-> +echo
-> +echo =3D=3D=3D Shut down and check image =3D=3D=3D
-> +echo
-> +
-> +_send_qemu_cmd $src 'quit' ""
-> +_send_qemu_cmd $dest 'quit' ""
-> +wait=3D1 _cleanup_qemu
-> +
-> +_check_test_img
-> +
-> +# success, all done
-> +echo "*** done"
-> +status=3D0
-> diff --git a/tests/qemu-iotests/198.out b/tests/qemu-iotests/198.out
-> new file mode 100644
-> index 0000000000..6c27303857
-> --- /dev/null
-> +++ b/tests/qemu-iotests/198.out
-> @@ -0,0 +1,20 @@
-> +QA output created by 198
-> +Formatting 'TEST_DIR/t.IMGFMT', fmt=3DIMGFMT size=3D67108864
-> +
-> +=3D=3D=3D Starting VMs =3D=3D=3D
-> +
-> +
-> +=3D=3D=3D Set 'migrate_set_capability postcopy-ram on' and migrate =3D=
-=3D=3D
-> +
-> +
-> +=3D=3D=3D On destination, execute savevm and loadvm =3D=3D=3D
-> +
-> +(qemu) savevm state1"
-> +(qemu) loadvm state1"
-> +
-> +=3D=3D=3D Shut down and check image =3D=3D=3D
-> +
-> +(qemu) quit
-> +(qemu) quit
-> +No errors were found on the image.
-> +*** done
-> diff --git a/tests/qemu-iotests/group b/tests/qemu-iotests/group
-> index 24e5ad1b79..84d082bc38 100644
-> --- a/tests/qemu-iotests/group
-> +++ b/tests/qemu-iotests/group
-> @@ -194,3 +194,4 @@
->  194 rw auto migration quick
->  195 rw auto quick
->  197 rw auto quick
-> +198 rw auto migration
->=20
 
-
-
---oPv96hmiFqH5UFfxvrvAXnPUUg7RIW0CR
+--qrbSGhBi80NaP76cMq3lDHa3I0fE7vrs9
 Content-Type: application/pgp-signature; name="signature.asc"
 Content-Description: OpenPGP digital signature
 Content-Disposition: attachment; filename="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQFGBAEBCAAwFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAloht88SHG1yZWl0ekBy
-ZWRoYXQuY29tAAoJEPQH2wBh1c9AeoMH/1XiyEc86mVPTH1nYCpl4F0559L8RLiP
-15klPOPfvzjOJVF+yzDLc++rWSdHWBc6GyIjF+lWpJ0YFyeRBpOA0iIu4B0Bwfni
-W5KyfRn0diFcFjS6/3euQ7Xz3O9JHHCI4eg/K1LzCPNprvKCz6Op2eB9TVtoecvW
-tPtbLLtidPE6eFNZPV52IHa+VgBhu7Rid2En1hUhOduxqL7FqLTlAgskStLYGJT+
-+bQdd9mpTwDJVXcfujujImB91GKb/4pzuZu1gCMs1/oYfS2CjEh9HCbxG6b4rrBd
-Cx9g0FpbrEtTSNMQVI8d9Y+9WTDN6TWL9EwmZQJUKQiS4KMg4zny/5g=
-=JCif
+iQFGBAEBCAAwFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAlohuIsSHG1yZWl0ekBy
+ZWRoYXQuY29tAAoJEPQH2wBh1c9AW0QIAIcu3tG9DPMWluN04nCkFoMgYJpuSKEl
+Fgtmx4d5AlaeZ/BDju1bETuRDoykyz2QRdmRH1bkDIldATIfZxXs3DLWuXUrrhX+
+vzwibEk5EAO5WJ1MJcLgzwPh9TTQzuBAwITvXQwSVStfH4W27NBYthEMkdbMX4Lv
+xkMzgvbWkE3MopWNKIZstJhs2yO+tmVVLsjrQB3nWGzxM65g+Xfc5+e4f4VOU4PF
+DPCf8Ok3MEv3vBywoY1++4nYIVu3RP9qxUNQkenqcYDDok+FMsdiaqbA+r2hhKeZ
+XXe24GpdZjzaADWl8sLEBWX1qW5mjAj+2MVyu61yy+TbfbqYTZ+lGco=
+=ceB7
 -----END PGP SIGNATURE-----
 
---oPv96hmiFqH5UFfxvrvAXnPUUg7RIW0CR--
+--qrbSGhBi80NaP76cMq3lDHa3I0fE7vrs9--
