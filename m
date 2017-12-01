@@ -1,22 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47312)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49023)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1eKrsa-0000MP-N2
-	for qemu-devel@nongnu.org; Fri, 01 Dec 2017 15:25:49 -0500
+	(envelope-from <mreitz@redhat.com>) id 1eKrvp-0002vT-Sd
+	for qemu-devel@nongnu.org; Fri, 01 Dec 2017 15:29:10 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1eKrsZ-00010L-IP
-	for qemu-devel@nongnu.org; Fri, 01 Dec 2017 15:25:48 -0500
+	(envelope-from <mreitz@redhat.com>) id 1eKrvp-0003M2-1W
+	for qemu-devel@nongnu.org; Fri, 01 Dec 2017 15:29:09 -0500
 References: <20171116173810.16457-1-crosa@redhat.com>
-	<20171116173810.16457-4-crosa@redhat.com>
+	<20171116173810.16457-5-crosa@redhat.com>
 From: Max Reitz <mreitz@redhat.com>
-Message-ID: <7819fc24-60cd-fe5b-130a-d5dd0dbe664d@redhat.com>
-Date: Fri, 1 Dec 2017 21:25:40 +0100
+Message-ID: <b6d17acb-d48c-d319-86fb-bfc6fc89af4f@redhat.com>
+Date: Fri, 1 Dec 2017 21:28:58 +0100
 MIME-Version: 1.0
-In-Reply-To: <20171116173810.16457-4-crosa@redhat.com>
+In-Reply-To: <20171116173810.16457-5-crosa@redhat.com>
 Content-Type: multipart/signed; micalg=pgp-sha256;
 	protocol="application/pgp-signature";
-	boundary="iC1J5GnBKPvL3Se7xOaLtI98dVvnTsRMm"
-Subject: Re: [Qemu-devel] [PATCH 03/10] qemu-iotests: be strict with
- expected output
+	boundary="qhORqXXjUmpS4pVUvkMrNOGr6S5Iag9vc"
+Subject: Re: [Qemu-devel] [PATCH 04/10] qemu-iotests: include (source)
+ filters from common.rc
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,67 +29,50 @@ To: Cleber Rosa <crosa@redhat.com>, qemu-devel@nongnu.org
 Cc: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
 
 This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---iC1J5GnBKPvL3Se7xOaLtI98dVvnTsRMm
+--qhORqXXjUmpS4pVUvkMrNOGr6S5Iag9vc
 From: Max Reitz <mreitz@redhat.com>
 To: Cleber Rosa <crosa@redhat.com>, qemu-devel@nongnu.org
 Cc: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
-Message-ID: <7819fc24-60cd-fe5b-130a-d5dd0dbe664d@redhat.com>
-Subject: Re: [PATCH 03/10] qemu-iotests: be strict with expected output
+Message-ID: <b6d17acb-d48c-d319-86fb-bfc6fc89af4f@redhat.com>
+Subject: Re: [PATCH 04/10] qemu-iotests: include (source) filters from
+ common.rc
 References: <20171116173810.16457-1-crosa@redhat.com>
- <20171116173810.16457-4-crosa@redhat.com>
-In-Reply-To: <20171116173810.16457-4-crosa@redhat.com>
+ <20171116173810.16457-5-crosa@redhat.com>
+In-Reply-To: <20171116173810.16457-5-crosa@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
 
 On 2017-11-16 18:38, Cleber Rosa wrote:
-> The contract between runner (check) and test is one that accepts some
-> minor differences in the expcted output, as the comparison method
-> employed is a "diff -w".
+> There's an explicit dependency from common.rc on common.filters, that
+> is, it consumes functions defined there.  Just like common.config is
+> included in common.rc, it makes sense to also sense common.filter.
 >=20
-> This is an exception to a clearer and more straightforward rule of
-> just requiring the generated output to be *equal* (and not similar) to
-> the recorded expected output.
->=20
-> Let's drop this exception and make things more predictable.
-
-But this has been a conscious choice, as your very patch shows.
-checkpatch yields 48 trailing whitespace errors, which is exactly what
-the -w is for.
-
-Also, I can't apply it because the 061.out hunks have been line-wrapped
-by the \r for some reason.
-
-Max
-
+> This drops the requirement on individual tests to include
+> common.filter, reducing the amount of boiler plate code (while still
+> making the comment found on almost every test "get standard
+> environment, filters and checks" accurate.
 >=20
 > Signed-off-by: Cleber Rosa <crosa@redhat.com>
 > ---
->  tests/qemu-iotests/026.out | 92 +++++++++++++++++++++++---------------=
---------
->  tests/qemu-iotests/049.out |  4 +-
->  tests/qemu-iotests/061.out |  4 +-
->  tests/qemu-iotests/104.out |  2 +-
->  tests/qemu-iotests/109.out | 44 +++++++++++-----------
->  tests/qemu-iotests/175.out |  2 +-
->  tests/qemu-iotests/check   |  4 +-
->  7 files changed, 76 insertions(+), 76 deletions(-)
+
+Reviewed-by: Max Reitz <mreitz@redhat.com>
 
 
---iC1J5GnBKPvL3Se7xOaLtI98dVvnTsRMm
+--qhORqXXjUmpS4pVUvkMrNOGr6S5Iag9vc
 Content-Type: application/pgp-signature; name="signature.asc"
 Content-Description: OpenPGP digital signature
 Content-Disposition: attachment; filename="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQFGBAEBCAAwFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAlohusQSHG1yZWl0ekBy
-ZWRoYXQuY29tAAoJEPQH2wBh1c9AzsMIAJjUkc2t+Ly8MXh1iRICYfZaaHPqc7nD
-L2dbgSwbI9LtcTmx15Gj0JSXs4aArVpkShA++AWcyCjyTAOCHJRwLpl+yTJzu5QI
-mvrsZ87YcRAGm2KzKNjPgihMfMk/cZ25pwhnH0lnWcE+p6xeyVco+0107K0/T9gP
-Nb8dz/C9Vpg7cWboi7dMrG4LzYZkZcILGCzkGFDGcVepCkYI+Dv/jD2rgU5qJdyf
-ww0GmVTrXXGMIlI3QKCpSB1FphgZWKIHlqM/buA5bltvD+8BL7+wv4aP/X//E8wk
-IJ6ciYnvZCCVA1W+hj9pUbKsSbWScLDVIRY6sFbfQIeqFMuQZRuX57w=
-=u/rA
+iQFGBAEBCAAwFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAlohu4oSHG1yZWl0ekBy
+ZWRoYXQuY29tAAoJEPQH2wBh1c9AhSwH/0Z8tnyLo4GE/tEeYn5KOhhNulfUzphL
++B2uEAh3myoZ4WnSbXedTi+wyPs8P7rrN5H9RS/1jfEn6ZKvEOQekofMe625jxKN
+mAAZvEQUwM3G7uqCE8cDnm0E6hlU1Cd748NofMIJUQgAF7ZCAUTSfMSFBsn/7kAy
+RlTX2AoDoFpy1R2elD9g6ujKvJseWxx4t7bgGs68vNLCCiT+g5cfTgsIVnb8k9lU
+N57mLDXsH6P+8ezCqGKT9Uy/sj9zPpr+M6GlaKRpx/9XRxth5B+UGjOPXzdZOLMB
+wzKSTIjwI7CKCh+7pGdYIqdOD6yU4tqr6bMb4MFOO0aYOzV9XMSrbhw=
+=Gfd5
 -----END PGP SIGNATURE-----
 
---iC1J5GnBKPvL3Se7xOaLtI98dVvnTsRMm--
+--qhORqXXjUmpS4pVUvkMrNOGr6S5Iag9vc--
