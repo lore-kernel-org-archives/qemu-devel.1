@@ -1,25 +1,24 @@
-Received: from eggs.gnu.org ([208.118.235.92]:53418)
+Received: from eggs.gnu.org ([208.118.235.92]:54553)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <arei.gonglei@huawei.com>) id 1eKo0T-0003h8-UE
-	for qemu-devel@nongnu.org; Fri, 01 Dec 2017 11:19:09 -0500
+	(envelope-from <dgilbert@redhat.com>) id 1eKo1D-0004ey-04
+	for qemu-devel@nongnu.org; Fri, 01 Dec 2017 11:19:33 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <arei.gonglei@huawei.com>) id 1eKnyq-0007GV-3E
-	for qemu-devel@nongnu.org; Fri, 01 Dec 2017 11:17:41 -0500
-Received: from szxga01-in.huawei.com ([45.249.212.187]:4520)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_ARCFOUR_SHA1:16) (Exim 4.71)
-	(envelope-from <arei.gonglei@huawei.com>) id 1eKnyn-00079i-UO
-	for qemu-devel@nongnu.org; Fri, 01 Dec 2017 11:15:59 -0500
-From: "Gonglei (Arei)" <arei.gonglei@huawei.com>
-Date: Fri, 1 Dec 2017 07:08:21 +0000
-Message-ID: <33183CC9F5247A488A2544077AF19020DA4ADB8C@DGGEMA505-MBS.china.huawei.com>
-References: <D1BD20B5DB34024DA951CEEE6C4C5998B1B8CC82@DGGEMA501-MBX.china.huawei.com>
-In-Reply-To: <D1BD20B5DB34024DA951CEEE6C4C5998B1B8CC82@DGGEMA501-MBX.china.huawei.com>
-Content-Language: zh-CN
+	(envelope-from <dgilbert@redhat.com>) id 1eKnzW-0008CJ-3w
+	for qemu-devel@nongnu.org; Fri, 01 Dec 2017 11:18:25 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:36310)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1eKnzT-00085A-Bc
+	for qemu-devel@nongnu.org; Fri, 01 Dec 2017 11:16:40 -0500
+Date: Fri, 1 Dec 2017 10:19:09 +0000
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20171201101908.GA2318@work-vm>
+References: <20171129185026.23632-1-dgilbert@redhat.com>
+	<20171201100220.GE23501@stefanha-x1.localdomain>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="gb2312"
-Content-Transfer-Encoding: base64
-Subject: Re: [Qemu-devel] [BUG] Windows 7 got stuck easily while run
- PCMark10 application
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20171201100220.GE23501@stefanha-x1.localdomain>
+Subject: Re: [Qemu-devel] [RFC 0/7] Rework vhost memory region updates
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,106 +27,49 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Zhanghailiang <zhang.zhanghailiang@huawei.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "mst@redhat.com" <mst@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
-Cc: "Huangweidong (C)" <weidong.huang@huawei.com>, "wangxin (U)" <wangxinxin.wang@huawei.com>, Xiexiangyou <xiexiangyou@huawei.com>
+To: Stefan Hajnoczi <stefanha@gmail.com>
+Cc: qemu-devel@nongnu.org, imammedo@redhat.com, maxime.coquelin@redhat.com, mst@redhat.com
 
-UGxzIHNlZSB0aGUgdHJhY2Ugb2Yga3ZtX3BpbzoNCg0KICAgICAgIENQVSAxL0tWTS0xNTU2NyBb
-MDAzXSAuLi4uIDIwOTMxMS43NjI1Nzk6IGt2bV9waW86IHBpb19yZWFkIGF0IDB4NzAgc2l6ZSAx
-IGNvdW50IDEgdmFsIDB4ZmYNCiAgICAgICBDUFUgMS9LVk0tMTU1NjcgWzAwM10gLi4uLiAyMDkz
-MTEuNzYyNTgyOiBrdm1fcGlvOiBwaW9fd3JpdGUgYXQgMHg3MCBzaXplIDEgY291bnQgMSB2YWwg
-MHg4OQ0KICAgICAgIENQVSAxL0tWTS0xNTU2NyBbMDAzXSAuLi4uIDIwOTMxMS43NjI1OTA6IGt2
-bV9waW86IHBpb19yZWFkIGF0IDB4NzEgc2l6ZSAxIGNvdW50IDEgdmFsIDB4MTcNCiAgICAgICBD
-UFUgMC9LVk0tMTU1NjYgWzAwNV0gLi4uLiAyMDkzMTEuNzYyNjExOiBrdm1fcGlvOiBwaW9fd3Jp
-dGUgYXQgMHg3MCBzaXplIDEgY291bnQgMSB2YWwgMHhjDQogICAgICAgQ1BVIDEvS1ZNLTE1NTY3
-IFswMDNdIC4uLi4gMjA5MzExLjc2MjYxNToga3ZtX3BpbzogcGlvX3JlYWQgYXQgMHg3MCBzaXpl
-IDEgY291bnQgMSB2YWwgMHhmZg0KICAgICAgIENQVSAxL0tWTS0xNTU2NyBbMDAzXSAuLi4uIDIw
-OTMxMS43NjI2MTk6IGt2bV9waW86IHBpb193cml0ZSBhdCAweDcwIHNpemUgMSBjb3VudCAxIHZh
-bCAweDg4DQogICAgICAgQ1BVIDEvS1ZNLTE1NTY3IFswMDNdIC4uLi4gMjA5MzExLjc2MjYyNzog
-a3ZtX3BpbzogcGlvX3JlYWQgYXQgMHg3MSBzaXplIDEgY291bnQgMSB2YWwgMHgxMg0KICAgICAg
-IENQVSAwL0tWTS0xNTU2NiBbMDA1XSAuLi4uIDIwOTMxMS43NjI2MzI6IGt2bV9waW86IHBpb19y
-ZWFkIGF0IDB4NzEgc2l6ZSAxIGNvdW50IDEgdmFsIDB4MTINCiAgICAgICBDUFUgMS9LVk0tMTU1
-NjcgWzAwM10gLi4uLiAyMDkzMTEuNzYyNjMzOiBrdm1fcGlvOiBwaW9fcmVhZCBhdCAweDcwIHNp
-emUgMSBjb3VudCAxIHZhbCAweGZmDQogICAgICAgQ1BVIDAvS1ZNLTE1NTY2IFswMDVdIC4uLi4g
-MjA5MzExLjc2MjYzNDoga3ZtX3BpbzogcGlvX3dyaXRlIGF0IDB4NzAgc2l6ZSAxIGNvdW50IDEg
-dmFsIDB4YyAgICAgICAgICAgPC0tLSBGaXJzdGx5IHdyaXRlIHRvIDB4NzAsIGNtb19pbmRleCA9
-IDB4YyAmIDB4N2YgPSAweGMNCiAgICAgICBDUFUgMS9LVk0tMTU1NjcgWzAwM10gLi4uLiAyMDkz
-MTEuNzYyNjM2OiBrdm1fcGlvOiBwaW9fd3JpdGUgYXQgMHg3MCBzaXplIDEgY291bnQgMSB2YWwg
-MHg4NiAgICAgICA8LS0gU2Vjb25kbHkgd3JpdGUgdG8gMHg3MCwgY21vX2luZGV4ID0gMHg4NiAm
-IDB4N2YgPSAweDYsIGNvdmVyIHRoZSBjbW9faW5kZXggcmVzdWx0IG9mIGZpcnN0IHRpbWUNCiAg
-ICAgICBDUFUgMC9LVk0tMTU1NjYgWzAwNV0gLi4uLiAyMDkzMTEuNzYyNjQxOiBrdm1fcGlvOiBw
-aW9fcmVhZCBhdCAweDcxIHNpemUgMSBjb3VudCAxIHZhbCAweDYgICAgICA8LS0gIHZjcHUwIHJl
-YWQgMHg2IGJlY2F1c2UgY21vX2luZGV4IGlzIDB4NiBub3cNCiAgICAgICBDUFUgMS9LVk0tMTU1
-NjcgWzAwM10gLi4uLiAyMDkzMTEuNzYyNjQ0OiBrdm1fcGlvOiBwaW9fcmVhZCBhdCAweDcxIHNp
-emUgMSBjb3VudCAxIHZhbCAweDYgICAgIDwtICB2Y3B1MSByZWFkIDB4Ng0KICAgICAgIENQVSAx
-L0tWTS0xNTU2NyBbMDAzXSAuLi4uIDIwOTMxMS43NjI2NDk6IGt2bV9waW86IHBpb19yZWFkIGF0
-IDB4NzAgc2l6ZSAxIGNvdW50IDEgdmFsIDB4ZmYNCiAgICAgICBDUFUgMS9LVk0tMTU1NjcgWzAw
-M10gLi4uLiAyMDkzMTEuNzYyNjY5OiBrdm1fcGlvOiBwaW9fd3JpdGUgYXQgMHg3MCBzaXplIDEg
-Y291bnQgMSB2YWwgMHg4Nw0KICAgICAgIENQVSAxL0tWTS0xNTU2NyBbMDAzXSAuLi4uIDIwOTMx
-MS43NjI2Nzg6IGt2bV9waW86IHBpb19yZWFkIGF0IDB4NzEgc2l6ZSAxIGNvdW50IDEgdmFsIDB4
-MQ0KICAgICAgIENQVSAxL0tWTS0xNTU2NyBbMDAzXSAuLi4uIDIwOTMxMS43NjI2ODM6IGt2bV9w
-aW86IHBpb19yZWFkIGF0IDB4NzAgc2l6ZSAxIGNvdW50IDEgdmFsIDB4ZmYNCiAgICAgICBDUFUg
-MS9LVk0tMTU1NjcgWzAwM10gLi4uLiAyMDkzMTEuNzYyNjg2OiBrdm1fcGlvOiBwaW9fd3JpdGUg
-YXQgMHg3MCBzaXplIDEgY291bnQgMSB2YWwgMHg4NA0KICAgICAgIENQVSAxL0tWTS0xNTU2NyBb
-MDAzXSAuLi4uIDIwOTMxMS43NjI2OTM6IGt2bV9waW86IHBpb19yZWFkIGF0IDB4NzEgc2l6ZSAx
-IGNvdW50IDEgdmFsIDB4MTANCiAgICAgICBDUFUgMS9LVk0tMTU1NjcgWzAwM10gLi4uLiAyMDkz
-MTEuNzYyNjk5OiBrdm1fcGlvOiBwaW9fcmVhZCBhdCAweDcwIHNpemUgMSBjb3VudCAxIHZhbCAw
-eGZmDQogICAgICAgQ1BVIDEvS1ZNLTE1NTY3IFswMDNdIC4uLi4gMjA5MzExLjc2MjcwMjoga3Zt
-X3BpbzogcGlvX3dyaXRlIGF0IDB4NzAgc2l6ZSAxIGNvdW50IDEgdmFsIDB4ODINCiAgICAgICBD
-UFUgMS9LVk0tMTU1NjcgWzAwM10gLi4uLiAyMDkzMTEuNzYyNzA5OiBrdm1fcGlvOiBwaW9fcmVh
-ZCBhdCAweDcxIHNpemUgMSBjb3VudCAxIHZhbCAweDI1DQogICAgICAgQ1BVIDEvS1ZNLTE1NTY3
-IFswMDNdIC4uLi4gMjA5MzExLjc2MjcxNDoga3ZtX3BpbzogcGlvX3JlYWQgYXQgMHg3MCBzaXpl
-IDEgY291bnQgMSB2YWwgMHhmZg0KICAgICAgIENQVSAxL0tWTS0xNTU2NyBbMDAzXSAuLi4uIDIw
-OTMxMS43NjI3MTc6IGt2bV9waW86IHBpb193cml0ZSBhdCAweDcwIHNpemUgMSBjb3VudCAxIHZh
-bCAweDgwDQoNCg0KUmVnYXJkcywNCi1Hb25nbGVpDQoNCkZyb206IFpoYW5naGFpbGlhbmcNClNl
-bnQ6IEZyaWRheSwgRGVjZW1iZXIgMDEsIDIwMTcgMzowMyBBTQ0KVG86IHFlbXUtZGV2ZWxAbm9u
-Z251Lm9yZzsgbXN0QHJlZGhhdC5jb207IFBhb2xvIEJvbnppbmkNCkNjOiBIdWFuZ3dlaWRvbmcg
-KEMpOyBHb25nbGVpIChBcmVpKTsgd2FuZ3hpbiAoVSk7IFhpZXhpYW5neW91DQpTdWJqZWN0OiBb
-QlVHXSBXaW5kb3dzIDcgZ290IHN0dWNrIGVhc2lseSB3aGlsZSBydW4gUENNYXJrMTAgYXBwbGlj
-YXRpb24NCg0KSGmjrA0KDQpXZSBoaXQgYSBidWcgaW4gb3VyIHRlc3Qgd2hpbGUgcnVuIFBDTWFy
-ayAxMCBpbiBhIHdpbmRvd3MgNyBWTSwNClRoZSBWTSBnb3Qgc3R1Y2sgYW5kIHRoZSB3YWxsY2xv
-Y2sgd2FzIGhhbmcgYWZ0ZXIgc2V2ZXJhbCBtaW51dGVzIHJ1bm5pbmcNClBDTWFyayAxMCBpbiBp
-dC4NCkl0IGlzIHF1aXRlIGVhc2lseSB0byByZXByb2R1Y2UgdGhlIGJ1ZyB3aXRoIHRoZSB1cHN0
-cmVhbSBLVk0gYW5kIFFlbXUuDQoNCldlIGZvdW5kIHRoYXQgS1ZNIGNhbiBub3QgaW5qZWN0IGFu
-eSBSVEMgaXJxIHRvIFZNIGFmdGVyIGl0IHdhcyBoYW5nLCBpdCBmYWlscyB0bw0KRGVsaXZlciBp
-cnEgaW4gaW9hcGljX3NldF9pcnEoKSBiZWNhdXNlIFJUQyBpcnEgaXMgc3RpbGwgcGVuZGluZyBp
-biBpb2FwaWMtPmlyci4NCg0Kc3RhdGljIGludCBpb2FwaWNfc2V0X2lycShzdHJ1Y3Qga3ZtX2lv
-YXBpYyAqaW9hcGljLCB1bnNpZ25lZCBpbnQgaXJxLA0KICAgICAgICAgICAgICAgICAgaW50IGly
-cV9sZXZlbCwgYm9vbCBsaW5lX3N0YXR1cykNCnsNCqGtIKGtDQogICAgICAgICBpZiAoIWlycV9s
-ZXZlbCkgew0KICAgICAgICAgICAgICAgICAgaW9hcGljLT5pcnIgJj0gfm1hc2s7DQogICAgICAg
-ICAgICAgICAgICByZXQgPSAxOw0KICAgICAgICAgICAgICAgICAgZ290byBvdXQ7DQogICAgICAg
-ICB9DQqhrSChrQ0KICAgICAgICAgaWYgKChlZGdlICYmIG9sZF9pcnIgPT0gaW9hcGljLT5pcnIp
-IHx8DQogICAgICAgICAgICAgKCFlZGdlICYmIGVudHJ5LmZpZWxkcy5yZW1vdGVfaXJyKSkgew0K
-ICAgICAgICAgICAgICAgICAgcmV0ID0gMDsNCiAgICAgICAgICAgICAgICAgIGdvdG8gb3V0Ow0K
-ICAgICAgICAgfQ0KDQpBY2NvcmRpbmcgdG8gUlRDIHNwZWMsIGFmdGVyIFJUQyBpbmplY3RzIGEg
-SGlnaCBsZXZlbCBpcnEsIE9TIHdpbGwgcmVhZCBDTU9Toa9zDQpyZWdpc3RlciBDIHRvIHRvIGNs
-ZWFyIHRoZSBpcnEgZmxhZywgYW5kIHB1bGwgZG93biB0aGUgaXJxIGVsZWN0cmljIHBpbi4NCg0K
-Rm9yIFFlbXUsIHdlIHdpbGwgZW11bGF0ZSB0aGUgcmVhZGluZyBvcGVyYXRpb24gaW4gY21vc19p
-b3BvcnRfcmVhZCgpLA0KYnV0IEd1ZXN0IE9TIHdpbGwgZmlyZSBhIHdyaXRlIG9wZXJhdGlvbiBi
-ZWZvcmUgdG8gdGVsbCB3aGljaCByZWdpc3RlciB3aWxsIGJlIHJlYWQNCmFmdGVyIHRoaXMgd3Jp
-dGUsIHdoZXJlIHdlIHVzZSBzLT5jbW9zX2luZGV4IHRvIHJlY29yZCB0aGUgZm9sbG93aW5nIHJl
-Z2lzdGVyIHRvIHJlYWQuDQoNCkJ1dCBpbiBvdXIgdGVzdCwgd2UgZm91bmQgdGhhdCB0aGVyZSBp
-cyBhIHBvc3NpYmxlIHNpdHVhdGlvbiB0aGF0IFZjcHUgZmFpbHMgdG8gcmVhZA0KUlRDX1JFR19D
-IHRvIGNsZWFyIGlycSwgVGhpcyBjb3VsZCBoYXBwZW5zIHdoaWxlIHR3byBWQ3B1cyBhcmUgd3Jp
-dGluZy9yZWFkaW5nDQpyZWdpc3RlcnMgYXQgdGhlIHNhbWUgdGltZSwgZm9yIGV4YW1wbGUsIHZj
-cHUgMCBpcyB0cnlpbmcgdG8gcmVhZCBSVENfUkVHX0MsDQpzbyBpdCB3cml0ZSBSVENfUkVHX0Mg
-Zmlyc3QsIHdoZXJlIHRoZSBzLT5jbW9zX2luZGV4IHdpbGwgYmUgUlRDX1JFR19DLA0KYnV0IGJl
-Zm9yZSBpdCB0cmllcyB0byByZWFkIHJlZ2lzdGVyIEMsIGFub3RoZXIgdmNwdTEgaXMgZ29pbmcg
-dG8gcmVhZCBSVENfWUVBUiwNCml0IGNoYW5nZXMgcy0+Y21vc19pbmRleCB0byBSVENfWUVBUiBi
-eSBhIHdyaXRpbmcgYWN0aW9uLg0KVGhlIG5leHQgb3BlcmF0aW9uIG9mIHZjcHUwIHdpbGwgYmUg
-bGVhZCB0byByZWFkIFJUQ19ZRUFSLCBJbiB0aGlzIGNhc2UsIHdlIHdpbGwgbWlzcw0KY2FsbGlu
-ZyBxZW11X2lycV9sb3dlcihzLT5pcnEpIHRvIGNsZWFyIHRoZSBpcnEuIEFmdGVyIHRoaXMsIGt2
-bSB3aWxsIG5ldmVyIGluamVjdCBSVEMgaXJxLA0KYW5kIFdpbmRvd3MgVk0gd2lsbCBoYW5nLg0K
-c3RhdGljIHZvaWQgY21vc19pb3BvcnRfd3JpdGUodm9pZCAqb3BhcXVlLCBod2FkZHIgYWRkciwN
-CiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIHVpbnQ2NF90IGRhdGEsIHVuc2lnbmVkIHNp
-emUpDQp7DQogICAgUlRDU3RhdGUgKnMgPSBvcGFxdWU7DQoNCiAgICBpZiAoKGFkZHIgJiAxKSA9
-PSAwKSB7DQogICAgICAgIHMtPmNtb3NfaW5kZXggPSBkYXRhICYgMHg3ZjsNCiAgICB9DQqhraGt
-DQpzdGF0aWMgdWludDY0X3QgY21vc19pb3BvcnRfcmVhZCh2b2lkICpvcGFxdWUsIGh3YWRkciBh
-ZGRyLA0KICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgdW5zaWduZWQgc2l6ZSkNCnsN
-CiAgICBSVENTdGF0ZSAqcyA9IG9wYXF1ZTsNCiAgICBpbnQgcmV0Ow0KICAgIGlmICgoYWRkciAm
-IDEpID09IDApIHsNCiAgICAgICAgcmV0dXJuIDB4ZmY7DQogICAgfSBlbHNlIHsNCiAgICAgICAg
-c3dpdGNoKHMtPmNtb3NfaW5kZXgpIHsNCg0KQWNjb3JkaW5nIHRvIENNT1Mgc3BlYywgoa5hbnkg
-d3JpdGUgdG8gUFJPVCAwMDcwaCBzaG91bGQgYmUgZm9sbG93ZWQgYnkgYW4gYWN0aW9uIHRvIFBS
-T1QgMDA3MWggb3IgdGhlIFJUQw0KV2lsbCBiZSBSVEMgd2lsbCBiZSBsZWZ0IGluIGFuIHVua25v
-d24gc3RhdGWhrywgYnV0IGl0IHNlZW1zIHRoYXQgd2UgY2FuIG5vdCBlbnN1cmUgdGhpcyBzZXF1
-ZW5jZSBpbiBxZW11L2t2bS4NCg0KQW55IGlkZWFzID8NCg0KVGhhbmtzLA0KSGFpbGlhbmcNCg0K
-DQo=
+* Stefan Hajnoczi (stefanha@gmail.com) wrote:
+> On Wed, Nov 29, 2017 at 06:50:19PM +0000, Dr. David Alan Gilbert (git) wrote:
+> > From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+> > 
+> > Hi,
+> >   This is an experimental set that reworks the way the vhost
+> > code handles changes in physical address space layout that
+> > came from a discussion with Igor.
+> > 
+> > Instead of updating and trying to merge sections of address
+> > space on each add/remove callback, we wait until the commit phase
+> > and go through and rebuild a list by walking the Flatview of
+> > memory and end up producing an ordered list.
+> > We compare the list to the old list to trigger updates.
+> > 
+> > Note, only very lightly tested so far, I'm just trying to see if it's
+> > the right shape.
+> 
+> The cover letter doesn't mention why this change is necessary.  It would
+> be helpful to know :).
+
+The hope was to simplify it, and in particular make it easier for me
+to add the bits I needed for postcopy support;  in the current code it
+does a fairly complex merge procedure on each section ad/del call and
+doesn't keep the structures in order.   Trying to add any more rules to
+that just makes it more and more complex.
+
+The hope is that this is simpler because we just do a linear walk of the
+set of sections, which means any merging just happens with the top
+element, and also the list is in order that's easier to work with.
+Then it should be easier for me to add the postcopy stuff which needs
+to do some hugepage merging.
+
+(Bizarrely, after having rewritten the code from scratch completely
+differently, the LoC is within a few lines of each other)
+
+Dave
+
+> Stefan
+
+
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
