@@ -1,15 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56491)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56747)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard@rpsys.net>) id 1eKncP-00062y-V4
-	for qemu-devel@nongnu.org; Fri, 01 Dec 2017 10:53:28 -0500
+	(envelope-from <pasic@linux.vnet.ibm.com>) id 1eKncY-00069B-Hy
+	for qemu-devel@nongnu.org; Fri, 01 Dec 2017 10:53:38 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard@rpsys.net>) id 1eKnbn-0006ap-Iv
-	for qemu-devel@nongnu.org; Fri, 01 Dec 2017 10:52:49 -0500
-From: Richard Purdie <richard.purdie@linuxfoundation.org>
-Date: Fri,  1 Dec 2017 15:49:07 +0000
-Message-Id: <1512143347-20128-1-git-send-email-richard.purdie@linuxfoundation.org>
-Subject: [Qemu-devel] [PATCH v2] target/ppc: Fix system lockups caused by
- interrupt_request state corruption
+	(envelope-from <pasic@linux.vnet.ibm.com>) id 1eKnbv-0006la-Oi
+	for qemu-devel@nongnu.org; Fri, 01 Dec 2017 10:52:58 -0500
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:57444
+	helo=mx0a-001b2d01.pphosted.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pasic@linux.vnet.ibm.com>)
+	id 1eKnbv-0006ky-G8
+	for qemu-devel@nongnu.org; Fri, 01 Dec 2017 10:52:19 -0500
+Received: from pps.filterd (m0098421.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
+	vB1EUn7L112554
+	for <qemu-devel@nongnu.org>; Fri, 1 Dec 2017 09:31:52 -0500
+Received: from e06smtp14.uk.ibm.com (e06smtp14.uk.ibm.com [195.75.94.110])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2ek8wk824s-1
+	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Fri, 01 Dec 2017 09:31:51 -0500
+Received: from localhost
+	by e06smtp14.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	Only! Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <pasic@linux.vnet.ibm.com>;
+	Fri, 1 Dec 2017 14:31:48 -0000
+From: Halil Pasic <pasic@linux.vnet.ibm.com>
+Date: Fri,  1 Dec 2017 15:31:33 +0100
+Message-Id: <20171201143136.62497-1-pasic@linux.vnet.ibm.com>
+Subject: [Qemu-devel] [PATCH 0/3] unrestrict cssids related patches
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -18,115 +36,33 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org, david@gibson.dropbear.id.au
-Cc: qemu-ppc@nongnu.org, Richard Purdie <richard.purdie@linuxfoundation.org>
+To: Boris Fiuczynski <fiuczy@linux.vnet.ibm.com>, Cornelia Huck <cohuck@redhat.com>
+Cc: Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>, Christian Borntraeger <borntraeger@de.ibm.com>, Shalini Chellathurai Saroja <shalini@linux.vnet.ibm.com>, qemu-devel@nongnu.org, qemu-s390x@nongnu.org, Halil Pasic <pasic@linux.vnet.ibm.com>
 
-Occasionally in Linux guests on x86_64 we're seeing logs like:
+Hi all!
 
-ppc_set_irq: 0x55b4e0d562f0 n_IRQ 8 level 1 => pending 00000100req 00000004
+This serises is a follow up of:
+* [RFC PATCH v2 1/1] s390x/css: unrestrict cssids
+* [RFC PATCH 1/1] s390x: deprecate s390-squash-mcss
 
-when they should read:
+See the commit messages and cover letters of the individual
+patches for more details.
 
-ppc_set_irq: 0x55b4e0d562f0 n_IRQ 8 level 1 => pending 00000100req 00000002
+Halil Pasic (3):
+  s390x/css: unrestrict cssids
+  s390x/css: advertise unrestricted cssids
+  s390x: deprecate s390-squash-mcss machine prop
 
-The "00000004" is CPU_INTERRUPT_EXITTB yet the code calls
-cpu_interrupt(cs, CPU_INTERRUPT_HARD) ("00000002") in this function
-just before the log message. Something is causing the HARD bit setting
-to get lost.
+ hw/s390x/3270-ccw.c        |  2 +-
+ hw/s390x/css-bridge.c      | 11 +++++++++++
+ hw/s390x/css.c             | 28 ++++------------------------
+ hw/s390x/s390-ccw.c        |  2 +-
+ hw/s390x/s390-virtio-ccw.c |  7 +++++--
+ hw/s390x/virtio-ccw.c      |  2 +-
+ include/hw/s390x/css.h     | 12 ++++--------
+ qemu-doc.texi              |  8 ++++++++
+ qemu-options.hx            |  8 +++++++-
+ 9 files changed, 42 insertions(+), 38 deletions(-)
 
-The knock on effect of losing that bit is the decrementer timer interrupts
-don't get delivered which causes the guest to sit idle in its idle handler
-and 'hang'.
-
-The issue occurs due to races from code which sets CPU_INTERRUPT_EXITTB.
-
-Rather than poking directly into cs->interrupt_request, that code needs to:
-
-a) hold BQL
-b) use the cpu_interrupt() helper
-
-This patch fixes the call sites to do this, fixing the hang.
-
-Signed-off-by: Richard Purdie <richard.purdie@linuxfoundation.org>
----
- target/ppc/excp_helper.c | 16 +++++++++++++---
- target/ppc/helper_regs.h | 10 ++++++++--
- 2 files changed, 21 insertions(+), 5 deletions(-)
-
-v2: Fixes a compile issue with master and ensures BQL is held in one case
-where it potentially wasn't.
-
-diff --git a/target/ppc/excp_helper.c b/target/ppc/excp_helper.c
-index e6009e7..8040277 100644
---- a/target/ppc/excp_helper.c
-+++ b/target/ppc/excp_helper.c
-@@ -207,7 +207,13 @@ static inline void powerpc_excp(PowerPCCPU *cpu, int excp_model, int excp)
-                         "Entering checkstop state\n");
-             }
-             cs->halted = 1;
--            cs->interrupt_request |= CPU_INTERRUPT_EXITTB;
-+            if (!qemu_mutex_iothread_locked()) {
-+                qemu_mutex_lock_iothread();
-+                cpu_interrupt(cs, CPU_INTERRUPT_EXITTB);
-+                qemu_mutex_unlock_iothread();
-+            } else {
-+                cpu_interrupt(cs, CPU_INTERRUPT_EXITTB);
-+            }
-         }
-         if (env->msr_mask & MSR_HVB) {
-             /* ISA specifies HV, but can be delivered to guest with HV clear
-@@ -940,7 +946,9 @@ void helper_store_msr(CPUPPCState *env, target_ulong val)
- 
-     if (excp != 0) {
-         CPUState *cs = CPU(ppc_env_get_cpu(env));
--        cs->interrupt_request |= CPU_INTERRUPT_EXITTB;
-+        qemu_mutex_lock_iothread();
-+        cpu_interrupt(cs, CPU_INTERRUPT_EXITTB);
-+        qemu_mutex_unlock_iothread();
-         raise_exception(env, excp);
-     }
- }
-@@ -995,7 +1003,9 @@ static inline void do_rfi(CPUPPCState *env, target_ulong nip, target_ulong msr)
-     /* No need to raise an exception here,
-      * as rfi is always the last insn of a TB
-      */
--    cs->interrupt_request |= CPU_INTERRUPT_EXITTB;
-+    qemu_mutex_lock_iothread();
-+    cpu_interrupt(cs, CPU_INTERRUPT_EXITTB);
-+    qemu_mutex_unlock_iothread();
- 
-     /* Reset the reservation */
-     env->reserve_addr = -1;
-diff --git a/target/ppc/helper_regs.h b/target/ppc/helper_regs.h
-index 2627a70..0beaad5 100644
---- a/target/ppc/helper_regs.h
-+++ b/target/ppc/helper_regs.h
-@@ -20,6 +20,8 @@
- #ifndef HELPER_REGS_H
- #define HELPER_REGS_H
- 
-+#include "qemu/main-loop.h"
-+
- /* Swap temporary saved registers with GPRs */
- static inline void hreg_swap_gpr_tgpr(CPUPPCState *env)
- {
-@@ -114,11 +116,15 @@ static inline int hreg_store_msr(CPUPPCState *env, target_ulong value,
-     }
-     if (((value >> MSR_IR) & 1) != msr_ir ||
-         ((value >> MSR_DR) & 1) != msr_dr) {
--        cs->interrupt_request |= CPU_INTERRUPT_EXITTB;
-+        qemu_mutex_lock_iothread();
-+        cpu_interrupt(cs, CPU_INTERRUPT_EXITTB);
-+        qemu_mutex_unlock_iothread();
-     }
-     if ((env->mmu_model & POWERPC_MMU_BOOKE) &&
-         ((value >> MSR_GS) & 1) != msr_gs) {
--        cs->interrupt_request |= CPU_INTERRUPT_EXITTB;
-+        qemu_mutex_lock_iothread();
-+        cpu_interrupt(cs, CPU_INTERRUPT_EXITTB);
-+        qemu_mutex_unlock_iothread();
-     }
-     if (unlikely((env->flags & POWERPC_FLAG_TGPR) &&
-                  ((value ^ env->msr) & (1 << MSR_TGPR)))) {
 -- 
-2.7.4
+2.13.5
