@@ -1,16 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60057)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60448)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1eKneV-0007vJ-CF
-	for qemu-devel@nongnu.org; Fri, 01 Dec 2017 10:56:18 -0500
+	(envelope-from <eblake@redhat.com>) id 1eKnei-00084A-2T
+	for qemu-devel@nongnu.org; Fri, 01 Dec 2017 10:56:41 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1eKndo-0000KJ-07
-	for qemu-devel@nongnu.org; Fri, 01 Dec 2017 10:54:59 -0500
+	(envelope-from <eblake@redhat.com>) id 1eKne5-0000fO-JY
+	for qemu-devel@nongnu.org; Fri, 01 Dec 2017 10:55:11 -0500
 From: Eric Blake <eblake@redhat.com>
-Date: Thu, 30 Nov 2017 19:42:33 -0600
-Message-Id: <20171201014242.16877-12-eblake@redhat.com>
+Date: Thu, 30 Nov 2017 19:42:24 -0600
+Message-Id: <20171201014242.16877-3-eblake@redhat.com>
 In-Reply-To: <20171201014242.16877-1-eblake@redhat.com>
 References: <20171201014242.16877-1-eblake@redhat.com>
-Subject: [Qemu-devel] [PATCH v5 11/20] qcow2: Switch to
+Subject: [Qemu-devel] [PATCH v5 02/20] block: Switch passthrough drivers to
  .bdrv_co_block_status()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
@@ -21,86 +21,205 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: kwolf@redhat.com, jsnow@redhat.com, famz@redhat.com, qemu-block@nongnu.org, vsementsov@virtuozzo.com, Max Reitz <mreitz@redhat.com>
+Cc: kwolf@redhat.com, jsnow@redhat.com, famz@redhat.com, qemu-block@nongnu.org, vsementsov@virtuozzo.com, Max Reitz <mreitz@redhat.com>, Jeff Cody <jcody@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>
 
 We are gradually moving away from sector-based interfaces, towards
-byte-based.  Update the qcow2 driver accordingly.
-
-For now, we are ignoring the 'want_zero' hint.  However, it should
-be relatively straightforward to honor the hint as a way to return
-larger *pnum values when we have consecutive clusters with the same
-data/zero status but which differ only in having non-consecutive
-mappings.
+byte-based.  Update the generic helpers, and all passthrough clients
+(blkdebug, commit, mirror, throttle) accordingly.
 
 Signed-off-by: Eric Blake <eblake@redhat.com>
 Reviewed-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 
 ---
-v5: no change
-v4: update to interface tweak
-v3: no change
-v2: rebase to mapping flag
+v5: rebase to master
+v4: rebase to interface tweak
+v3: rebase to addition of throttle driver
+v2: rebase to master, retitle while merging blkdebug, commit, and mirror
 ---
- block/qcow2.c | 24 +++++++++++++-----------
- 1 file changed, 13 insertions(+), 11 deletions(-)
+ include/block/block_int.h | 28 ++++++++++++++++------------
+ block/io.c                | 36 ++++++++++++++++++++----------------
+ block/blkdebug.c          | 20 +++++++++++---------
+ block/commit.c            |  2 +-
+ block/mirror.c            |  2 +-
+ block/throttle.c          |  2 +-
+ 6 files changed, 50 insertions(+), 40 deletions(-)
 
-diff --git a/block/qcow2.c b/block/qcow2.c
-index 1914a940e5..642fa3bc8f 100644
---- a/block/qcow2.c
-+++ b/block/qcow2.c
-@@ -1637,32 +1637,34 @@ static void qcow2_join_options(QDict *options, QDict *old_options)
-     }
+diff --git a/include/block/block_int.h b/include/block/block_int.h
+index 071263c40f..980333c671 100644
+--- a/include/block/block_int.h
++++ b/include/block/block_int.h
+@@ -1027,23 +1027,27 @@ void bdrv_format_default_perms(BlockDriverState *bs, BdrvChild *c,
+                                uint64_t *nperm, uint64_t *nshared);
+
+ /*
+- * Default implementation for drivers to pass bdrv_co_get_block_status() to
++ * Default implementation for drivers to pass bdrv_co_block_status() to
+  * their file.
+  */
+-int64_t coroutine_fn bdrv_co_get_block_status_from_file(BlockDriverState *bs,
+-                                                        int64_t sector_num,
+-                                                        int nb_sectors,
+-                                                        int *pnum,
+-                                                        BlockDriverState **file);
++int coroutine_fn bdrv_co_block_status_from_file(BlockDriverState *bs,
++                                                bool want_zero,
++                                                int64_t offset,
++                                                int64_t bytes,
++                                                int64_t *pnum,
++                                                int64_t *map,
++                                                BlockDriverState **file);
+ /*
+- * Default implementation for drivers to pass bdrv_co_get_block_status() to
++ * Default implementation for drivers to pass bdrv_co_block_status() to
+  * their backing file.
+  */
+-int64_t coroutine_fn bdrv_co_get_block_status_from_backing(BlockDriverState *bs,
+-                                                           int64_t sector_num,
+-                                                           int nb_sectors,
+-                                                           int *pnum,
+-                                                           BlockDriverState **file);
++int coroutine_fn bdrv_co_block_status_from_backing(BlockDriverState *bs,
++                                                   bool want_zero,
++                                                   int64_t offset,
++                                                   int64_t bytes,
++                                                   int64_t *pnum,
++                                                   int64_t *map,
++                                                   BlockDriverState **file);
+ const char *bdrv_get_parent_name(const BlockDriverState *bs);
+ void blk_dev_change_media_cb(BlockBackend *blk, bool load, Error **errp);
+ bool blk_dev_has_removable_media(BlockBackend *blk);
+diff --git a/block/io.c b/block/io.c
+index 5967f3a298..49d299b7e3 100644
+--- a/block/io.c
++++ b/block/io.c
+@@ -1798,30 +1798,34 @@ typedef struct BdrvCoBlockStatusData {
+     bool done;
+ } BdrvCoBlockStatusData;
+
+-int64_t coroutine_fn bdrv_co_get_block_status_from_file(BlockDriverState *bs,
+-                                                        int64_t sector_num,
+-                                                        int nb_sectors,
+-                                                        int *pnum,
+-                                                        BlockDriverState **file)
++int coroutine_fn bdrv_co_block_status_from_file(BlockDriverState *bs,
++                                                bool want_zero,
++                                                int64_t offset,
++                                                int64_t bytes,
++                                                int64_t *pnum,
++                                                int64_t *map,
++                                                BlockDriverState **file)
+ {
+     assert(bs->file && bs->file->bs);
+-    *pnum = nb_sectors;
++    *pnum = bytes;
++    *map = offset;
+     *file = bs->file->bs;
+-    return BDRV_BLOCK_RAW | BDRV_BLOCK_OFFSET_VALID |
+-           (sector_num << BDRV_SECTOR_BITS);
++    return BDRV_BLOCK_RAW | BDRV_BLOCK_OFFSET_VALID;
  }
 
--static int64_t coroutine_fn qcow2_co_get_block_status(BlockDriverState *bs,
--        int64_t sector_num, int nb_sectors, int *pnum, BlockDriverState **file)
-+static int coroutine_fn qcow2_co_block_status(BlockDriverState *bs,
-+                                              bool want_zero,
-+                                              int64_t offset, int64_t count,
-+                                              int64_t *pnum, int64_t *map,
-+                                              BlockDriverState **file)
+-int64_t coroutine_fn bdrv_co_get_block_status_from_backing(BlockDriverState *bs,
+-                                                           int64_t sector_num,
+-                                                           int nb_sectors,
+-                                                           int *pnum,
+-                                                           BlockDriverState **file)
++int coroutine_fn bdrv_co_block_status_from_backing(BlockDriverState *bs,
++                                                   bool want_zero,
++                                                   int64_t offset,
++                                                   int64_t bytes,
++                                                   int64_t *pnum,
++                                                   int64_t *map,
++                                                   BlockDriverState **file)
  {
-     BDRVQcow2State *s = bs->opaque;
-     uint64_t cluster_offset;
-     int index_in_cluster, ret;
-     unsigned int bytes;
--    int64_t status = 0;
-+    int status = 0;
-
--    bytes = MIN(INT_MAX, nb_sectors * BDRV_SECTOR_SIZE);
-+    bytes = MIN(INT_MAX, count);
-     qemu_co_mutex_lock(&s->lock);
--    ret = qcow2_get_cluster_offset(bs, sector_num << BDRV_SECTOR_BITS, &bytes,
--                                   &cluster_offset);
-+    ret = qcow2_get_cluster_offset(bs, offset, &bytes, &cluster_offset);
-     qemu_co_mutex_unlock(&s->lock);
-     if (ret < 0) {
-         return ret;
-     }
-
--    *pnum = bytes >> BDRV_SECTOR_BITS;
+     assert(bs->backing && bs->backing->bs);
+-    *pnum = nb_sectors;
 +    *pnum = bytes;
++    *map = offset;
+     *file = bs->backing->bs;
+-    return BDRV_BLOCK_RAW | BDRV_BLOCK_OFFSET_VALID |
+-           (sector_num << BDRV_SECTOR_BITS);
++    return BDRV_BLOCK_RAW | BDRV_BLOCK_OFFSET_VALID;
+ }
 
-     if (cluster_offset != 0 && ret != QCOW2_CLUSTER_COMPRESSED &&
-         !s->crypto) {
--        index_in_cluster = sector_num & (s->cluster_sectors - 1);
--        cluster_offset |= (index_in_cluster << BDRV_SECTOR_BITS);
-+        index_in_cluster = offset & (s->cluster_size - 1);
-+        *map = cluster_offset | index_in_cluster;
-         *file = bs->file->bs;
--        status |= BDRV_BLOCK_OFFSET_VALID | cluster_offset;
-+        status |= BDRV_BLOCK_OFFSET_VALID;
-     }
-     if (ret == QCOW2_CLUSTER_ZERO_PLAIN || ret == QCOW2_CLUSTER_ZERO_ALLOC) {
-         status |= BDRV_BLOCK_ZERO;
-@@ -4355,7 +4357,7 @@ BlockDriver bdrv_qcow2 = {
-     .bdrv_child_perm      = bdrv_format_default_perms,
-     .bdrv_create        = qcow2_create,
-     .bdrv_has_zero_init = bdrv_has_zero_init_1,
--    .bdrv_co_get_block_status = qcow2_co_get_block_status,
-+    .bdrv_co_block_status = qcow2_co_block_status,
+ /*
+diff --git a/block/blkdebug.c b/block/blkdebug.c
+index e21669979d..82c30357f8 100644
+--- a/block/blkdebug.c
++++ b/block/blkdebug.c
+@@ -627,15 +627,17 @@ static int coroutine_fn blkdebug_co_pdiscard(BlockDriverState *bs,
+     return bdrv_co_pdiscard(bs->file->bs, offset, bytes);
+ }
 
-     .bdrv_co_preadv         = qcow2_co_preadv,
-     .bdrv_co_pwritev        = qcow2_co_pwritev,
+-static int64_t coroutine_fn blkdebug_co_get_block_status(
+-    BlockDriverState *bs, int64_t sector_num, int nb_sectors, int *pnum,
+-    BlockDriverState **file)
++static int coroutine_fn blkdebug_co_block_status(BlockDriverState *bs,
++                                                 bool want_zero,
++                                                 int64_t offset,
++                                                 int64_t bytes,
++                                                 int64_t *pnum,
++                                                 int64_t *map,
++                                                 BlockDriverState **file)
+ {
+-    assert(QEMU_IS_ALIGNED(sector_num | nb_sectors,
+-                           DIV_ROUND_UP(bs->bl.request_alignment,
+-                                        BDRV_SECTOR_SIZE)));
+-    return bdrv_co_get_block_status_from_file(bs, sector_num, nb_sectors,
+-                                              pnum, file);
++    assert(QEMU_IS_ALIGNED(offset | bytes, bs->bl.request_alignment));
++    return bdrv_co_block_status_from_file(bs, want_zero, offset, bytes,
++                                          pnum, map, file);
+ }
+
+ static void blkdebug_close(BlockDriverState *bs)
+@@ -907,7 +909,7 @@ static BlockDriver bdrv_blkdebug = {
+     .bdrv_co_flush_to_disk  = blkdebug_co_flush,
+     .bdrv_co_pwrite_zeroes  = blkdebug_co_pwrite_zeroes,
+     .bdrv_co_pdiscard       = blkdebug_co_pdiscard,
+-    .bdrv_co_get_block_status = blkdebug_co_get_block_status,
++    .bdrv_co_block_status   = blkdebug_co_block_status,
+
+     .bdrv_debug_event           = blkdebug_debug_event,
+     .bdrv_debug_breakpoint      = blkdebug_debug_breakpoint,
+diff --git a/block/commit.c b/block/commit.c
+index c5327551ce..ae2a5ddba2 100644
+--- a/block/commit.c
++++ b/block/commit.c
+@@ -265,7 +265,7 @@ static void bdrv_commit_top_child_perm(BlockDriverState *bs, BdrvChild *c,
+ static BlockDriver bdrv_commit_top = {
+     .format_name                = "commit_top",
+     .bdrv_co_preadv             = bdrv_commit_top_preadv,
+-    .bdrv_co_get_block_status   = bdrv_co_get_block_status_from_backing,
++    .bdrv_co_block_status       = bdrv_co_block_status_from_backing,
+     .bdrv_refresh_filename      = bdrv_commit_top_refresh_filename,
+     .bdrv_close                 = bdrv_commit_top_close,
+     .bdrv_child_perm            = bdrv_commit_top_child_perm,
+diff --git a/block/mirror.c b/block/mirror.c
+index c9badc1203..f5bf620942 100644
+--- a/block/mirror.c
++++ b/block/mirror.c
+@@ -1094,7 +1094,7 @@ static BlockDriver bdrv_mirror_top = {
+     .bdrv_co_pwrite_zeroes      = bdrv_mirror_top_pwrite_zeroes,
+     .bdrv_co_pdiscard           = bdrv_mirror_top_pdiscard,
+     .bdrv_co_flush              = bdrv_mirror_top_flush,
+-    .bdrv_co_get_block_status   = bdrv_co_get_block_status_from_backing,
++    .bdrv_co_block_status       = bdrv_co_block_status_from_backing,
+     .bdrv_refresh_filename      = bdrv_mirror_top_refresh_filename,
+     .bdrv_close                 = bdrv_mirror_top_close,
+     .bdrv_child_perm            = bdrv_mirror_top_child_perm,
+diff --git a/block/throttle.c b/block/throttle.c
+index 833175ac77..d1324e7a9f 100644
+--- a/block/throttle.c
++++ b/block/throttle.c
+@@ -239,7 +239,7 @@ static BlockDriver bdrv_throttle = {
+     .bdrv_reopen_prepare                =   throttle_reopen_prepare,
+     .bdrv_reopen_commit                 =   throttle_reopen_commit,
+     .bdrv_reopen_abort                  =   throttle_reopen_abort,
+-    .bdrv_co_get_block_status           =   bdrv_co_get_block_status_from_file,
++    .bdrv_co_block_status               =   bdrv_co_block_status_from_file,
+
+     .bdrv_co_drain_begin                =   throttle_co_drain_begin,
+     .bdrv_co_drain_end                  =   throttle_co_drain_end,
 -- 
 2.14.3
