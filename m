@@ -1,25 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37668)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39286)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1eKp0S-0003TP-Lr
-	for qemu-devel@nongnu.org; Fri, 01 Dec 2017 12:21:46 -0500
+	(envelope-from <willy@infradead.org>) id 1eKp46-0007tm-Jr
+	for qemu-devel@nongnu.org; Fri, 01 Dec 2017 12:25:31 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1eKp0R-0001c7-6d
-	for qemu-devel@nongnu.org; Fri, 01 Dec 2017 12:21:44 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:39278)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1eKp0Q-0001aq-Ny
-	for qemu-devel@nongnu.org; Fri, 01 Dec 2017 12:21:43 -0500
-Date: Fri, 1 Dec 2017 17:21:33 +0000
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20171201172133.GC2318@work-vm>
-References: <20171108060130.3772-1-peterx@redhat.com>
-	<20171108060130.3772-29-peterx@redhat.com>
+	(envelope-from <willy@infradead.org>) id 1eKp43-00048s-Ue
+	for qemu-devel@nongnu.org; Fri, 01 Dec 2017 12:25:30 -0500
+Received: from bombadil.infradead.org ([65.50.211.133]:59442)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <willy@infradead.org>) id 1eKp43-00047V-8J
+	for qemu-devel@nongnu.org; Fri, 01 Dec 2017 12:25:27 -0500
+Date: Fri, 1 Dec 2017 09:25:19 -0800
+From: Matthew Wilcox <willy@infradead.org>
+Message-ID: <20171201172519.GA27192@bombadil.infradead.org>
+References: <1511963726-34070-1-git-send-email-wei.w.wang@intel.com>
+	<1511963726-34070-6-git-send-email-wei.w.wang@intel.com>
+	<201711301934.CDC21800.FSLtJFFOOVQHMO@I-love.SAKURA.ne.jp>
+	<5A210C96.8050208@intel.com>
+	<201712012202.BDE13557.MJFQLtOOHVOFSF@I-love.SAKURA.ne.jp>
+	<286AC319A985734F985F78AFA26841F739376DA1@shsmsx102.ccr.corp.intel.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20171108060130.3772-29-peterx@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v4 28/32] migration: allow migrate_incoming
- for paused VM
+In-Reply-To: <286AC319A985734F985F78AFA26841F739376DA1@shsmsx102.ccr.corp.intel.com>
+Subject: Re: [Qemu-devel] [PATCH v18 05/10] xbitmap: add more operations
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,183 +31,17 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Xu <peterx@redhat.com>
-Cc: qemu-devel@nongnu.org, Alexey Perevalov <a.perevalov@samsung.com>, "Daniel P . Berrange" <berrange@redhat.com>, Juan Quintela <quintela@redhat.com>, Andrea Arcangeli <aarcange@redhat.com>
+To: "Wang, Wei W" <wei.w.wang@intel.com>
+Cc: Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>, "virtio-dev@lists.oasis-open.org" <virtio-dev@lists.oasis-open.org>, "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "virtualization@lists.linux-foundation.org" <virtualization@lists.linux-foundation.org>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>, "linux-mm@kvack.org" <linux-mm@kvack.org>, "mst@redhat.com" <mst@redhat.com>, "mhocko@kernel.org" <mhocko@kernel.org>, "akpm@linux-foundation.org" <akpm@linux-foundation.org>, "mawilcox@microsoft.com" <mawilcox@microsoft.com>, "david@redhat.com" <david@redhat.com>, "cornelia.huck@de.ibm.com" <cornelia.huck@de.ibm.com>, "mgorman@techsingularity.net" <mgorman@techsingularity.net>, "aarcange@redhat.com" <aarcange@redhat.com>, "amit.shah@redhat.com" <amit.shah@redhat.com>, "pbonzini@redhat.com" <pbonzini@redhat.com>, "liliang.opensource@gmail.com" <liliang.opensource@gmail.com>, "yang.zhang.wz@gmail.com" <yang.zhang.wz@gmail.com>, "quan.xu@aliyun.com" <quan.xu@aliyun.com>, "nilal@redhat.com" <nilal@redhat.com>, "riel@redhat.com" <riel@redhat.com>
 
-* Peter Xu (peterx@redhat.com) wrote:
-> migrate_incoming command is previously only used when we were providing
-> "-incoming defer" in the command line, to defer the incoming migration
-> channel creation.
+On Fri, Dec 01, 2017 at 03:09:08PM +0000, Wang, Wei W wrote:
+> On Friday, December 1, 2017 9:02 PM, Tetsuo Handa wrote:
+> > If start == end is legal,
+> > 
+> >    for (; start < end; start = (start | (IDA_BITMAP_BITS - 1)) + 1) {
+> > 
+> > makes this loop do nothing because 10 < 10 is false.
 > 
-> However there is similar requirement when we are paused during postcopy
-> migration. The old incoming channel might have been destroyed already.
-> We may need another new channel for the recovery to happen.
-> 
-> This patch leveraged the same interface, but allows the user to specify
-> incoming migration channel even for paused postcopy.
-> 
-> Meanwhile, now migration listening ports are always detached manually
-> using the tag, rather than using return values of dispatchers.
-> 
-> Signed-off-by: Peter Xu <peterx@redhat.com>
+> How about "start <= end "?
 
-I think this patch is OK now, except for that top level question I've asked
-against 00 about how the new incoming ever gets to start up.
-
-Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
-
-> ---
->  migration/exec.c       |  2 +-
->  migration/fd.c         |  2 +-
->  migration/migration.c  | 58 +++++++++++++++++++++++++++++++++++++++++++-------
->  migration/socket.c     |  4 +---
->  migration/trace-events |  2 ++
->  5 files changed, 55 insertions(+), 13 deletions(-)
-> 
-> diff --git a/migration/exec.c b/migration/exec.c
-> index a0796c2c70..9d20d10899 100644
-> --- a/migration/exec.c
-> +++ b/migration/exec.c
-> @@ -49,7 +49,7 @@ static gboolean exec_accept_incoming_migration(QIOChannel *ioc,
->  {
->      migration_channel_process_incoming(ioc);
->      object_unref(OBJECT(ioc));
-> -    return G_SOURCE_REMOVE;
-> +    return G_SOURCE_CONTINUE;
->  }
->  
->  /*
-> diff --git a/migration/fd.c b/migration/fd.c
-> index 7ead2f26cc..54b36888e2 100644
-> --- a/migration/fd.c
-> +++ b/migration/fd.c
-> @@ -49,7 +49,7 @@ static gboolean fd_accept_incoming_migration(QIOChannel *ioc,
->  {
->      migration_channel_process_incoming(ioc);
->      object_unref(OBJECT(ioc));
-> -    return G_SOURCE_REMOVE;
-> +    return G_SOURCE_CONTINUE;
->  }
->  
->  /*
-> diff --git a/migration/migration.c b/migration/migration.c
-> index a4cdedcde8..9b7fc56ed8 100644
-> --- a/migration/migration.c
-> +++ b/migration/migration.c
-> @@ -179,6 +179,17 @@ void migration_incoming_state_destroy(void)
->      qemu_event_reset(&mis->main_thread_load_event);
->  }
->  
-> +static bool migrate_incoming_detach_listen(MigrationIncomingState *mis)
-> +{
-> +    if (mis->listen_task_tag) {
-> +        /* Never fail */
-> +        g_source_remove(mis->listen_task_tag);
-> +        mis->listen_task_tag = 0;
-> +        return true;
-> +    }
-> +    return false;
-> +}
-> +
->  static void migrate_generate_event(int new_state)
->  {
->      if (migrate_use_events()) {
-> @@ -463,10 +474,9 @@ void migration_fd_process_incoming(QEMUFile *f)
->  
->      /*
->       * When reach here, we should not need the listening port any
-> -     * more. We'll detach the listening task soon, let's reset the
-> -     * listen task tag.
-> +     * more.  Detach the listening port explicitly.
->       */
-> -    mis->listen_task_tag = 0;
-> +    migrate_incoming_detach_listen(mis);
->  }
->  
->  void migration_ioc_process_incoming(QIOChannel *ioc)
-> @@ -1422,14 +1432,46 @@ void qmp_migrate_incoming(const char *uri, Error **errp)
->  {
->      Error *local_err = NULL;
->      static bool once = true;
-> +    MigrationIncomingState *mis = migration_incoming_get_current();
-> +
->  
-> -    if (!deferred_incoming) {
-> -        error_setg(errp, "For use with '-incoming defer'");
-> +    if (mis->state == MIGRATION_STATUS_POSTCOPY_PAUSED) {
-> +        if (mis->listen_task_tag) {
-> +            error_setg(errp, "We already have a listening port!");
-> +            return;
-> +        } else {
-> +            /*
-> +            * We are in postcopy-paused state, and we don't have
-> +            * listening port.  It's very possible that the old
-> +            * listening port is already gone, so we allow to create a
-> +            * new one.
-> +            *
-> +            * NOTE: RDMA migration currently does not really use
-> +            * listen_task_tag for now, so even if listen_task_tag is
-> +            * zero, RDMA can still have its accept port listening.
-> +            * However, RDMA is not supported by postcopy at all (yet), so
-> +            * we are safe here.
-> +            */
-> +            trace_migrate_incoming_recover();
-> +        }
-> +    } else if (deferred_incoming) {
-> +        /*
-> +         * We don't need recovery, but we possibly has a deferred
-> +         * incoming parameter, this allows us to manually specify
-> +         * incoming port once.
-> +         */
-> +        if (!once) {
-> +            error_setg(errp, "The incoming migration has already been started");
-> +            return;
-> +        } else {
-> +            /* PASS */
-> +            trace_migrate_incoming_deferred();
-> +        }
-> +    } else {
-> +        error_setg(errp, "Migrate-incoming is only allowed for either "
-> +                   "deferred incoming, or postcopy paused stage.");
->          return;
->      }
-> -    if (!once) {
-> -        error_setg(errp, "The incoming migration has already been started");
-> -    }
->  
->      qemu_start_incoming_migration(uri, &local_err);
->  
-> diff --git a/migration/socket.c b/migration/socket.c
-> index e8f3325155..54095a80a0 100644
-> --- a/migration/socket.c
-> +++ b/migration/socket.c
-> @@ -155,10 +155,8 @@ out:
->      if (migration_has_all_channels()) {
->          /* Close listening socket as its no longer needed */
->          qio_channel_close(ioc, NULL);
-> -        return G_SOURCE_REMOVE;
-> -    } else {
-> -        return G_SOURCE_CONTINUE;
->      }
-> +    return G_SOURCE_CONTINUE;
->  }
->  
->  
-> diff --git a/migration/trace-events b/migration/trace-events
-> index 98c2e4de58..65b1c7e459 100644
-> --- a/migration/trace-events
-> +++ b/migration/trace-events
-> @@ -136,6 +136,8 @@ process_incoming_migration_co_end(int ret, int ps) "ret=%d postcopy-state=%d"
->  process_incoming_migration_co_postcopy_end_main(void) ""
->  migration_set_incoming_channel(void *ioc, const char *ioctype) "ioc=%p ioctype=%s"
->  migration_set_outgoing_channel(void *ioc, const char *ioctype, const char *hostname)  "ioc=%p ioctype=%s hostname=%s"
-> +migrate_incoming_deferred(void) ""
-> +migrate_incoming_recover(void) ""
->  
->  # migration/rdma.c
->  qemu_rdma_accept_incoming_migration(void) ""
-> -- 
-> 2.13.6
-> 
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+Don't ask Tetsuo for his opinion, write some userspace code that uses it.
