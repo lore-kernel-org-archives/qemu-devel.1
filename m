@@ -1,31 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49931)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53132)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <lvivier@redhat.com>) id 1eKqCV-0008TY-H4
-	for qemu-devel@nongnu.org; Fri, 01 Dec 2017 13:38:16 -0500
+	(envelope-from <pm215@archaic.org.uk>) id 1eKqIu-0006Et-02
+	for qemu-devel@nongnu.org; Fri, 01 Dec 2017 13:44:52 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <lvivier@redhat.com>) id 1eKqCS-0007ed-74
-	for qemu-devel@nongnu.org; Fri, 01 Dec 2017 13:38:15 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:50734)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <lvivier@redhat.com>) id 1eKqCS-0007ds-1B
-	for qemu-devel@nongnu.org; Fri, 01 Dec 2017 13:38:12 -0500
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
-	[10.5.11.15])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 870EFA8F4
-	for <qemu-devel@nongnu.org>; Fri,  1 Dec 2017 18:38:10 +0000 (UTC)
-References: <20171201125813.1437-1-quintela@redhat.com>
-	<4c899960-36f2-0f0f-bc21-08693f472ba2@redhat.com>
-From: Laurent Vivier <lvivier@redhat.com>
-Message-ID: <34b2798c-9e32-1ae6-943e-afaa621c39c8@redhat.com>
-Date: Fri, 1 Dec 2017 19:38:04 +0100
-MIME-Version: 1.0
-In-Reply-To: <4c899960-36f2-0f0f-bc21-08693f472ba2@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v3 0/6] Add make check tests for Migration
+	(envelope-from <pm215@archaic.org.uk>) id 1eKqIt-00032J-6U
+	for qemu-devel@nongnu.org; Fri, 01 Dec 2017 13:44:51 -0500
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Fri,  1 Dec 2017 18:44:33 +0000
+Message-Id: <1512153879-5291-2-git-send-email-peter.maydell@linaro.org>
+In-Reply-To: <1512153879-5291-1-git-send-email-peter.maydell@linaro.org>
+References: <1512153879-5291-1-git-send-email-peter.maydell@linaro.org>
+Subject: [Qemu-devel] [PATCH 1/7] target/arm: Handle SPSEL and current stack
+ being out of sync in MSP/PSP reads
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,21 +20,54 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>, Juan Quintela <quintela@redhat.com>, qemu-devel@nongnu.org
-Cc: dgilbert@redhat.com, peterx@redhat.com
+To: qemu-arm@nongnu.org, qemu-devel@nongnu.org
+Cc: Richard Henderson <rth@twiddle.net>, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
 
-On 01/12/2017 19:30, Eric Blake wrote:
-> On 12/01/2017 06:58 AM, Juan Quintela wrote:
->> Hi
->>
->> This is on top of my info_migrate series.
-> 
-> Let patchew know about it:
-> 
-> Based-on: <20171201125750.1372-1-quintela@redhat.com>
-> ([PATCH v3 0/2] Improve info migrate output on destination)
+For v8M it is possible for the CONTROL.SPSEL bit value and the
+current stack to be out of sync. This means we need to update
+the checks used in reads and writes of the PSP and MSP special
+registers to use v7m_using_psp() rather than directly checking
+the SPSEL bit in the control register.
 
-Is this tag documented somewhere?
+Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+---
+ target/arm/helper.c | 10 ++++------
+ 1 file changed, 4 insertions(+), 6 deletions(-)
 
-Thanks,
-Laurent
+diff --git a/target/arm/helper.c b/target/arm/helper.c
+index 91a9300..88394d4 100644
+--- a/target/arm/helper.c
++++ b/target/arm/helper.c
+@@ -9953,11 +9953,9 @@ uint32_t HELPER(v7m_mrs)(CPUARMState *env, uint32_t reg)
+ 
+     switch (reg) {
+     case 8: /* MSP */
+-        return (env->v7m.control[env->v7m.secure] & R_V7M_CONTROL_SPSEL_MASK) ?
+-            env->v7m.other_sp : env->regs[13];
++        return v7m_using_psp(env) ? env->v7m.other_sp : env->regs[13];
+     case 9: /* PSP */
+-        return (env->v7m.control[env->v7m.secure] & R_V7M_CONTROL_SPSEL_MASK) ?
+-            env->regs[13] : env->v7m.other_sp;
++        return v7m_using_psp(env) ? env->regs[13] : env->v7m.other_sp;
+     case 16: /* PRIMASK */
+         return env->v7m.primask[env->v7m.secure];
+     case 17: /* BASEPRI */
+@@ -10059,14 +10057,14 @@ void HELPER(v7m_msr)(CPUARMState *env, uint32_t maskreg, uint32_t val)
+         }
+         break;
+     case 8: /* MSP */
+-        if (env->v7m.control[env->v7m.secure] & R_V7M_CONTROL_SPSEL_MASK) {
++        if (v7m_using_psp(env)) {
+             env->v7m.other_sp = val;
+         } else {
+             env->regs[13] = val;
+         }
+         break;
+     case 9: /* PSP */
+-        if (env->v7m.control[env->v7m.secure] & R_V7M_CONTROL_SPSEL_MASK) {
++        if (v7m_using_psp(env)) {
+             env->regs[13] = val;
+         } else {
+             env->v7m.other_sp = val;
+-- 
+2.7.4
