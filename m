@@ -1,17 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53260)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53272)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1eKqIy-0006MB-En
-	for qemu-devel@nongnu.org; Fri, 01 Dec 2017 13:44:57 -0500
+	(envelope-from <pm215@archaic.org.uk>) id 1eKqIy-0006OW-VB
+	for qemu-devel@nongnu.org; Fri, 01 Dec 2017 13:44:58 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1eKqIw-00034Y-SQ
-	for qemu-devel@nongnu.org; Fri, 01 Dec 2017 13:44:56 -0500
+	(envelope-from <pm215@archaic.org.uk>) id 1eKqIx-000359-QI
+	for qemu-devel@nongnu.org; Fri, 01 Dec 2017 13:44:57 -0500
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri,  1 Dec 2017 18:44:36 +0000
-Message-Id: <1512153879-5291-5-git-send-email-peter.maydell@linaro.org>
+Date: Fri,  1 Dec 2017 18:44:39 +0000
+Message-Id: <1512153879-5291-8-git-send-email-peter.maydell@linaro.org>
 In-Reply-To: <1512153879-5291-1-git-send-email-peter.maydell@linaro.org>
 References: <1512153879-5291-1-git-send-email-peter.maydell@linaro.org>
-Subject: [Qemu-devel] [PATCH 4/7] target/arm: Split M profile MNegPri mmu
- index into user and priv
+Subject: [Qemu-devel] [PATCH 7/7] target/arm: Implement TT instruction
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,231 +22,203 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-arm@nongnu.org, qemu-devel@nongnu.org
 Cc: Richard Henderson <rth@twiddle.net>, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
 
-For M profile, we currently have an mmu index MNegPri for
-"requested execution priority negative". This fails to
-distinguish "requested execution priority negative, privileged"
-from "requested execution priority negative, usermode", but
-the two can return different results for MPU lookups. Fix this
-by splitting MNegPri into MNegPriPriv and MNegPriUser, and
-similarly for the Secure equivalent MSNegPri.
-
-This takes us from 6 M profile MMU modes to 8, which means
-we need to bump NB_MMU_MODES; this is OK since the point
-where we are forced to reduce TLB sizes is 9 MMU modes.
-
-(It would in theory be possible to stick with 6 MMU indexes:
-{mpu-disabled,user,privileged} x {secure,nonsecure} since
-in the MPU-disabled case the result of an MPU lookup is
-always the same for both user and privileged code. However
-we would then need to rework the TB flags handling to put
-user/priv into the TB flags separately from the mmuidx.
-Adding an extra couple of mmu indexes is simpler.)
+Implement the TT instruction which queries the security
+state and access permissions of a memory location.
 
 Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 ---
- target/arm/cpu.h       | 49 ++++++++++++++++++++++++++++---------------------
- target/arm/internals.h |  6 ++++--
- target/arm/helper.c    | 14 ++++++++++----
- target/arm/translate.c |  8 ++++++--
- 4 files changed, 48 insertions(+), 29 deletions(-)
+ target/arm/helper.h    |   2 +
+ target/arm/helper.c    | 108 +++++++++++++++++++++++++++++++++++++++++++++++++
+ target/arm/translate.c |  29 ++++++++++++-
+ 3 files changed, 138 insertions(+), 1 deletion(-)
 
-diff --git a/target/arm/cpu.h b/target/arm/cpu.h
-index 89d49cd..d228fe6 100644
---- a/target/arm/cpu.h
-+++ b/target/arm/cpu.h
-@@ -112,7 +112,7 @@ enum {
- #define ARM_CPU_VIRQ 2
- #define ARM_CPU_VFIQ 3
+diff --git a/target/arm/helper.h b/target/arm/helper.h
+index 439d228..066729e 100644
+--- a/target/arm/helper.h
++++ b/target/arm/helper.h
+@@ -66,6 +66,8 @@ DEF_HELPER_2(v7m_mrs, i32, env, i32)
+ DEF_HELPER_2(v7m_bxns, void, env, i32)
+ DEF_HELPER_2(v7m_blxns, void, env, i32)
  
--#define NB_MMU_MODES 7
-+#define NB_MMU_MODES 8
- /* ARM-specific extra insn start words:
-  * 1: Conditional execution bits
-  * 2: Partial exception syndrome for data aborts
-@@ -2226,13 +2226,13 @@ static inline bool arm_excp_unmasked(CPUState *cs, unsigned int excp_idx,
-  * They have the following different MMU indexes:
-  *  User
-  *  Privileged
-- *  Execution priority negative (this is like privileged, but the
-- *  MPU HFNMIENA bit means that it may have different access permission
-- *  check results to normal privileged code, so can't share a TLB).
-+ *  User, execution priority negative (ie the MPU HFNMIENA bit may apply)
-+ *  Privileged, execution priority negative (ditto)
-  * If the CPU supports the v8M Security Extension then there are also:
-  *  Secure User
-  *  Secure Privileged
-- *  Secure, execution priority negative
-+ *  Secure User, execution priority negative
-+ *  Secure Privileged, execution priority negative
-  *
-  * The ARMMMUIdx and the mmu index value used by the core QEMU TLB code
-  * are not quite the same -- different CPU types (most notably M profile
-@@ -2251,6 +2251,8 @@ static inline bool arm_excp_unmasked(CPUState *cs, unsigned int excp_idx,
-  * The constant names here are patterned after the general style of the names
-  * of the AT/ATS operations.
-  * The values used are carefully arranged to make mmu_idx => EL lookup easy.
-+ * For M profile we arrange them to have a bit for priv, a bit for negpri
-+ * and a bit for secure.
-  */
- #define ARM_MMU_IDX_A 0x10 /* A profile */
- #define ARM_MMU_IDX_NOTLB 0x20 /* does not have a TLB */
-@@ -2269,10 +2271,12 @@ typedef enum ARMMMUIdx {
-     ARMMMUIdx_S2NS = 6 | ARM_MMU_IDX_A,
-     ARMMMUIdx_MUser = 0 | ARM_MMU_IDX_M,
-     ARMMMUIdx_MPriv = 1 | ARM_MMU_IDX_M,
--    ARMMMUIdx_MNegPri = 2 | ARM_MMU_IDX_M,
--    ARMMMUIdx_MSUser = 3 | ARM_MMU_IDX_M,
--    ARMMMUIdx_MSPriv = 4 | ARM_MMU_IDX_M,
--    ARMMMUIdx_MSNegPri = 5 | ARM_MMU_IDX_M,
-+    ARMMMUIdx_MUserNegPri = 2 | ARM_MMU_IDX_M,
-+    ARMMMUIdx_MPrivNegPri = 3 | ARM_MMU_IDX_M,
-+    ARMMMUIdx_MSUser = 4 | ARM_MMU_IDX_M,
-+    ARMMMUIdx_MSPriv = 5 | ARM_MMU_IDX_M,
-+    ARMMMUIdx_MSUserNegPri = 6 | ARM_MMU_IDX_M,
-+    ARMMMUIdx_MSPrivNegPri = 7 | ARM_MMU_IDX_M,
-     /* Indexes below here don't have TLBs and are used only for AT system
-      * instructions or for the first stage of an S12 page table walk.
-      */
-@@ -2293,10 +2297,12 @@ typedef enum ARMMMUIdxBit {
-     ARMMMUIdxBit_S2NS = 1 << 6,
-     ARMMMUIdxBit_MUser = 1 << 0,
-     ARMMMUIdxBit_MPriv = 1 << 1,
--    ARMMMUIdxBit_MNegPri = 1 << 2,
--    ARMMMUIdxBit_MSUser = 1 << 3,
--    ARMMMUIdxBit_MSPriv = 1 << 4,
--    ARMMMUIdxBit_MSNegPri = 1 << 5,
-+    ARMMMUIdxBit_MUserNegPri = 1 << 2,
-+    ARMMMUIdxBit_MPrivNegPri = 1 << 3,
-+    ARMMMUIdxBit_MSUser = 1 << 4,
-+    ARMMMUIdxBit_MSPriv = 1 << 5,
-+    ARMMMUIdxBit_MSUserNegPri = 1 << 6,
-+    ARMMMUIdxBit_MSPrivNegPri = 1 << 7,
- } ARMMMUIdxBit;
- 
- #define MMU_USER_IDX 0
-@@ -2322,8 +2328,7 @@ static inline int arm_mmu_idx_to_el(ARMMMUIdx mmu_idx)
-     case ARM_MMU_IDX_A:
-         return mmu_idx & 3;
-     case ARM_MMU_IDX_M:
--        return (mmu_idx == ARMMMUIdx_MUser || mmu_idx == ARMMMUIdx_MSUser)
--            ? 0 : 1;
-+        return mmu_idx & 1;
-     default:
-         g_assert_not_reached();
-     }
-@@ -2334,16 +2339,18 @@ static inline ARMMMUIdx arm_v7m_mmu_idx_for_secstate(CPUARMState *env,
-                                                      bool secstate)
- {
-     int el = arm_current_el(env);
--    ARMMMUIdx mmu_idx;
-+    ARMMMUIdx mmu_idx = ARM_MMU_IDX_M;
- 
--    if (el == 0) {
--        mmu_idx = secstate ? ARMMMUIdx_MSUser : ARMMMUIdx_MUser;
--    } else {
--        mmu_idx = secstate ? ARMMMUIdx_MSPriv : ARMMMUIdx_MPriv;
-+    if (el != 0) {
-+        mmu_idx |= 1;
-     }
- 
-     if (armv7m_nvic_neg_prio_requested(env->nvic, secstate)) {
--        mmu_idx = secstate ? ARMMMUIdx_MSNegPri : ARMMMUIdx_MNegPri;
-+        mmu_idx |= 2;
-+    }
++DEF_HELPER_3(v7m_tt, i32, env, i32, i32)
 +
-+    if (secstate) {
-+        mmu_idx |= 4;
-     }
- 
-     return mmu_idx;
-diff --git a/target/arm/internals.h b/target/arm/internals.h
-index d9cc75e..aa9c91b 100644
---- a/target/arm/internals.h
-+++ b/target/arm/internals.h
-@@ -544,15 +544,17 @@ static inline bool regime_is_secure(CPUARMState *env, ARMMMUIdx mmu_idx)
-     case ARMMMUIdx_S1NSE1:
-     case ARMMMUIdx_S1E2:
-     case ARMMMUIdx_S2NS:
-+    case ARMMMUIdx_MPrivNegPri:
-+    case ARMMMUIdx_MUserNegPri:
-     case ARMMMUIdx_MPriv:
--    case ARMMMUIdx_MNegPri:
-     case ARMMMUIdx_MUser:
-         return false;
-     case ARMMMUIdx_S1E3:
-     case ARMMMUIdx_S1SE0:
-     case ARMMMUIdx_S1SE1:
-+    case ARMMMUIdx_MSPrivNegPri:
-+    case ARMMMUIdx_MSUserNegPri:
-     case ARMMMUIdx_MSPriv:
--    case ARMMMUIdx_MSNegPri:
-     case ARMMMUIdx_MSUser:
-         return true;
-     default:
+ DEF_HELPER_4(access_check_cp_reg, void, env, ptr, i32, i32)
+ DEF_HELPER_3(set_cp_reg, void, env, ptr, i32)
+ DEF_HELPER_2(get_cp_reg, i32, env, ptr)
 diff --git a/target/arm/helper.c b/target/arm/helper.c
-index c4c8d5a..14ab1f4 100644
+index be8d797..5368ad8 100644
 --- a/target/arm/helper.c
 +++ b/target/arm/helper.c
-@@ -7856,11 +7856,13 @@ static inline uint32_t regime_el(CPUARMState *env, ARMMMUIdx mmu_idx)
-     case ARMMMUIdx_S1SE1:
-     case ARMMMUIdx_S1NSE0:
-     case ARMMMUIdx_S1NSE1:
-+    case ARMMMUIdx_MPrivNegPri:
-+    case ARMMMUIdx_MUserNegPri:
-     case ARMMMUIdx_MPriv:
--    case ARMMMUIdx_MNegPri:
-     case ARMMMUIdx_MUser:
-+    case ARMMMUIdx_MSPrivNegPri:
-+    case ARMMMUIdx_MSUserNegPri:
-     case ARMMMUIdx_MSPriv:
--    case ARMMMUIdx_MSNegPri:
-     case ARMMMUIdx_MSUser:
-         return 1;
-     default:
-@@ -7883,8 +7885,10 @@ static inline bool regime_translation_disabled(CPUARMState *env,
-                 (R_V7M_MPU_CTRL_ENABLE_MASK | R_V7M_MPU_CTRL_HFNMIENA_MASK)) {
-         case R_V7M_MPU_CTRL_ENABLE_MASK:
-             /* Enabled, but not for HardFault and NMI */
--            return mmu_idx == ARMMMUIdx_MNegPri ||
--                mmu_idx == ARMMMUIdx_MSNegPri;
-+            return mmu_idx == ARMMMUIdx_MUserNegPri ||
-+                mmu_idx == ARMMMUIdx_MPrivNegPri ||
-+                mmu_idx == ARMMMUIdx_MSUserNegPri ||
-+                mmu_idx == ARMMMUIdx_MSPrivNegPri;
-         case R_V7M_MPU_CTRL_ENABLE_MASK | R_V7M_MPU_CTRL_HFNMIENA_MASK:
-             /* Enabled for all cases */
-             return false;
-@@ -8017,6 +8021,8 @@ static inline bool regime_is_user(CPUARMState *env, ARMMMUIdx mmu_idx)
-     case ARMMMUIdx_S1NSE0:
-     case ARMMMUIdx_MUser:
-     case ARMMMUIdx_MSUser:
-+    case ARMMMUIdx_MUserNegPri:
-+    case ARMMMUIdx_MSUserNegPri:
-         return true;
-     default:
-         return false;
+@@ -5947,6 +5947,28 @@ void HELPER(v7m_blxns)(CPUARMState *env, uint32_t dest)
+     g_assert_not_reached();
+ }
+ 
++uint32_t HELPER(v7m_tt)(CPUARMState *env, uint32_t addr, uint32_t op)
++{
++    /* The TT instructions can be used by unprivileged code, but in
++     * user-only emulation we don't have the MPU.
++     * Luckily since we know we are NonSecure unprivileged (and that in
++     * turn means that the A flag wasn't specified), all the bits in the
++     * register must be zero:
++     *  IREGION: 0 because IRVALID is 0
++     *  IRVALID: 0 because NS
++     *  S: 0 because NS
++     *  NSRW: 0 because NS
++     *  NSR: 0 because NS
++     *  RW: 0 because unpriv and A flag not set
++     *  R: 0 because unpriv and A flag not set
++     *  SRVALID: 0 because NS
++     *  MRVALID: 0 because unpriv and A flag not set
++     *  SREGION: 0 becaus SRVALID is 0
++     *  MREGION: 0 because MRVALID is 0
++     */
++    return 0;
++}
++
+ void switch_mode(CPUARMState *env, int mode)
+ {
+     ARMCPU *cpu = arm_env_get_cpu(env);
+@@ -10143,6 +10165,92 @@ void HELPER(v7m_msr)(CPUARMState *env, uint32_t maskreg, uint32_t val)
+     }
+ }
+ 
++uint32_t HELPER(v7m_tt)(CPUARMState *env, uint32_t addr, uint32_t op)
++{
++    /* Implement the TT instruction. op is bits [7:6] of the insn. */
++    bool forceunpriv = op & 1;
++    bool alt = op & 2;
++    V8M_SAttributes sattrs = {};
++    uint32_t tt_resp;
++    bool r, rw, nsr, nsrw, mrvalid;
++    int prot;
++    MemTxAttrs attrs = {};
++    hwaddr phys_addr;
++    uint32_t fsr;
++    ARMMMUIdx mmu_idx;
++    uint32_t mregion;
++    bool targetpriv;
++    bool targetsec = env->v7m.secure;
++
++    /* Work out what the security state and privilege level we're
++     * interested in is...
++     */
++    if (alt) {
++        targetsec = !targetsec;
++    }
++
++    if (forceunpriv) {
++        targetpriv = false;
++    } else {
++        targetpriv = arm_v7m_is_handler_mode(env) ||
++            !(env->v7m.control[targetsec] & R_V7M_CONTROL_NPRIV_MASK);
++    }
++
++    /* ...and then figure out which MMU index this is */
++    mmu_idx = arm_v7m_mmu_idx_for_secstate_and_priv(env, targetsec, targetpriv);
++
++    /* We know that the MPU and SAU don't care about the access type
++     * for our purposes beyond that we don't want to claim to be
++     * an insn fetch, so we arbitrarily call this a read.
++     */
++
++    /* MPU region info only available for privileged or if
++     * inspecting the other MPU state.
++     */
++    if (arm_current_el(env) != 0 || alt) {
++        /* We can ignore the return value as prot is always set */
++        pmsav8_mpu_lookup(env, addr, MMU_DATA_LOAD, mmu_idx,
++                          &phys_addr, &attrs, &prot, &fsr, &mregion);
++        if (mregion == -1) {
++            mrvalid = false;
++            mregion = 0;
++        } else {
++            mrvalid = true;
++        }
++        r = prot & PAGE_READ;
++        rw = prot & PAGE_WRITE;
++    } else {
++        r = false;
++        rw = false;
++        mrvalid = false;
++        mregion = 0;
++    }
++
++    if (env->v7m.secure) {
++        v8m_security_lookup(env, addr, MMU_DATA_LOAD, mmu_idx, &sattrs);
++        nsr = sattrs.ns && r;
++        nsrw = sattrs.ns && rw;
++    } else {
++        sattrs.ns = true;
++        nsr = false;
++        nsrw = false;
++    }
++
++    tt_resp = (sattrs.iregion << 24) |
++        (sattrs.irvalid << 23) |
++        ((!sattrs.ns) << 22) |
++        (nsrw << 21) |
++        (nsr << 20) |
++        (rw << 19) |
++        (r << 18) |
++        (sattrs.srvalid << 17) |
++        (mrvalid << 16) |
++        (sattrs.sregion << 8) |
++        mregion;
++
++    return tt_resp;
++}
++
+ #endif
+ 
+ void HELPER(dc_zva)(CPUARMState *env, uint64_t vaddr_in)
 diff --git a/target/arm/translate.c b/target/arm/translate.c
-index 4afb0c8..6df4d90 100644
+index 6df4d90..002055b 100644
 --- a/target/arm/translate.c
 +++ b/target/arm/translate.c
-@@ -159,12 +159,16 @@ static inline int get_a32_user_mem_index(DisasContext *s)
-         return arm_to_core_mmu_idx(ARMMMUIdx_S1SE0);
-     case ARMMMUIdx_MUser:
-     case ARMMMUIdx_MPriv:
--    case ARMMMUIdx_MNegPri:
-         return arm_to_core_mmu_idx(ARMMMUIdx_MUser);
-+    case ARMMMUIdx_MUserNegPri:
-+    case ARMMMUIdx_MPrivNegPri:
-+        return arm_to_core_mmu_idx(ARMMMUIdx_MUserNegPri);
-     case ARMMMUIdx_MSUser:
-     case ARMMMUIdx_MSPriv:
--    case ARMMMUIdx_MSNegPri:
-         return arm_to_core_mmu_idx(ARMMMUIdx_MSUser);
-+    case ARMMMUIdx_MSUserNegPri:
-+    case ARMMMUIdx_MSPrivNegPri:
-+        return arm_to_core_mmu_idx(ARMMMUIdx_MSUserNegPri);
-     case ARMMMUIdx_S2NS:
-     default:
-         g_assert_not_reached();
+@@ -9810,7 +9810,7 @@ static int disas_thumb2_insn(DisasContext *s, uint32_t insn)
+         if (insn & (1 << 22)) {
+             /* 0b1110_100x_x1xx_xxxx_xxxx_xxxx_xxxx_xxxx
+              * - load/store doubleword, load/store exclusive, ldacq/strel,
+-             *   table branch.
++             *   table branch, TT.
+              */
+             if (insn == 0xe97fe97f && arm_dc_feature(s, ARM_FEATURE_M) &&
+                 arm_dc_feature(s, ARM_FEATURE_V8)) {
+@@ -9887,8 +9887,35 @@ static int disas_thumb2_insn(DisasContext *s, uint32_t insn)
+             } else if ((insn & (1 << 23)) == 0) {
+                 /* 0b1110_1000_010x_xxxx_xxxx_xxxx_xxxx_xxxx
+                  * - load/store exclusive word
++                 * - TT (v8M only)
+                  */
+                 if (rs == 15) {
++                    if (!(insn & (1 << 20)) &&
++                        arm_dc_feature(s, ARM_FEATURE_M) &&
++                        arm_dc_feature(s, ARM_FEATURE_V8)) {
++                        /* 0b1110_1000_0100_xxxx_1111_xxxx_xxxx_xxxx
++                         *  - TT (v8M only)
++                         */
++                        bool alt = insn & (1 << 7);
++                        TCGv_i32 addr, op, ttresp;
++
++                        if ((insn & 0x3f) || rd == 13 || rd == 15 || rn == 15) {
++                            /* we UNDEF for these UNPREDICTABLE cases */
++                            goto illegal_op;
++                        }
++
++                        if (alt && !s->v8m_secure) {
++                            goto illegal_op;
++                        }
++
++                        addr = load_reg(s, rn);
++                        op = tcg_const_i32(extract32(insn, 6, 2));
++                        ttresp = tcg_temp_new_i32();
++                        gen_helper_v7m_tt(ttresp, cpu_env, addr, op);
++                        tcg_temp_free_i32(addr);
++                        tcg_temp_free_i32(op);
++                        store_reg(s, rd, ttresp);
++                    }
+                     goto illegal_op;
+                 }
+                 addr = tcg_temp_local_new_i32();
 -- 
 2.7.4
