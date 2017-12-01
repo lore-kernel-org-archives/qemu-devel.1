@@ -1,23 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54941)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54974)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1eKooA-0000xN-Aq
-	for qemu-devel@nongnu.org; Fri, 01 Dec 2017 12:09:05 -0500
+	(envelope-from <mst@redhat.com>) id 1eKooD-00010U-LI
+	for qemu-devel@nongnu.org; Fri, 01 Dec 2017 12:09:06 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1eKoo9-0007AF-Bd
-	for qemu-devel@nongnu.org; Fri, 01 Dec 2017 12:09:02 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:35012)
+	(envelope-from <mst@redhat.com>) id 1eKooB-0007DL-Uf
+	for qemu-devel@nongnu.org; Fri, 01 Dec 2017 12:09:05 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:44760)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1eKoo9-00079c-4v
-	for qemu-devel@nongnu.org; Fri, 01 Dec 2017 12:09:01 -0500
-Date: Fri, 1 Dec 2017 19:08:53 +0200
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1eKooB-0007CQ-O2
+	for qemu-devel@nongnu.org; Fri, 01 Dec 2017 12:09:03 -0500
+Date: Fri, 1 Dec 2017 19:09:00 +0200
 From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <1512148088-28733-7-git-send-email-mst@redhat.com>
+Message-ID: <1512148088-28733-8-git-send-email-mst@redhat.com>
 References: <1512148088-28733-1-git-send-email-mst@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 In-Reply-To: <1512148088-28733-1-git-send-email-mst@redhat.com>
-Subject: [Qemu-devel] [PULL 6/7] virtio: check VirtQueue Vring object is set
+Subject: [Qemu-devel] [PULL 7/7] pc: fix crash on attempted cpu unplug
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,69 +27,48 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Peter Maydell <peter.maydell@linaro.org>, Prasad J Pandit <pjp@fedoraproject.org>, Zhangboxian <zhangboxian@huawei.com>, Stefan Hajnoczi <stefanha@redhat.com>, Cornelia Huck <cohuck@redhat.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>, Igor Mammedov <imammedo@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>
 
-From: Prasad J Pandit <pjp@fedoraproject.org>
+From: Igor Mammedov <imammedo@redhat.com>
 
-A guest could attempt to use an uninitialised VirtQueue object
-or unset Vring.align leading to a arithmetic exception. Add check
-to avoid it.
+when qemu is started with '-no-acpi' CLI option, an attempt
+to unplug a CPU using device_del results in null pointer
+dereference at:
 
-Reported-by: Zhangboxian <zhangboxian@huawei.com>
-Signed-off-by: Prasad J Pandit <pjp@fedoraproject.org>
+  #0 object_get_class
+  #1 pc_machine_device_unplug_request_cb
+  #2 qmp_marshal_device_del
+
+which is caused by pcms->acpi_dev == NULL due to ACPI support
+being disabled.
+
+Considering that ACPI support is necessary for unplug to work,
+check that it's enabled and fail unplug request gracefully
+if no acpi device were found.
+
+Signed-off-by: Igor Mammedov <imammedo@redhat.com>
+Reviewed-by: Eduardo Habkost <ehabkost@redhat.com>
 Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
 Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
-Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
-Reviewed-by: Cornelia Huck <cohuck@redhat.com>
 ---
- hw/virtio/virtio.c | 14 +++++++++++---
- 1 file changed, 11 insertions(+), 3 deletions(-)
+ hw/i386/pc.c | 5 +++++
+ 1 file changed, 5 insertions(+)
 
-diff --git a/hw/virtio/virtio.c b/hw/virtio/virtio.c
-index 703e672..ad564b0 100644
---- a/hw/virtio/virtio.c
-+++ b/hw/virtio/virtio.c
-@@ -182,7 +182,7 @@ void virtio_queue_update_rings(VirtIODevice *vdev, int n)
- {
-     VRing *vring = &vdev->vq[n].vring;
+diff --git a/hw/i386/pc.c b/hw/i386/pc.c
+index c3afe5b..186545d 100644
+--- a/hw/i386/pc.c
++++ b/hw/i386/pc.c
+@@ -1842,6 +1842,11 @@ static void pc_cpu_unplug_request_cb(HotplugHandler *hotplug_dev,
+     X86CPU *cpu = X86_CPU(dev);
+     PCMachineState *pcms = PC_MACHINE(hotplug_dev);
  
--    if (!vring->desc) {
-+    if (!vring->num || !vring->desc || !vring->align) {
-         /* not yet setup -> nothing to do */
-         return;
-     }
-@@ -1414,6 +1414,9 @@ void virtio_config_modern_writel(VirtIODevice *vdev,
- 
- void virtio_queue_set_addr(VirtIODevice *vdev, int n, hwaddr addr)
- {
-+    if (!vdev->vq[n].vring.num) {
-+        return;
++    if (!pcms->acpi_dev) {
++        error_setg(&local_err, "CPU hot unplug not supported without ACPI");
++        goto out;
 +    }
-     vdev->vq[n].vring.desc = addr;
-     virtio_queue_update_rings(vdev, n);
- }
-@@ -1426,6 +1429,9 @@ hwaddr virtio_queue_get_addr(VirtIODevice *vdev, int n)
- void virtio_queue_set_rings(VirtIODevice *vdev, int n, hwaddr desc,
-                             hwaddr avail, hwaddr used)
- {
-+    if (!vdev->vq[n].vring.num) {
-+        return;
-+    }
-     vdev->vq[n].vring.desc = desc;
-     vdev->vq[n].vring.avail = avail;
-     vdev->vq[n].vring.used = used;
-@@ -1494,8 +1500,10 @@ void virtio_queue_set_align(VirtIODevice *vdev, int n, int align)
-      */
-     assert(k->has_variable_vring_alignment);
- 
--    vdev->vq[n].vring.align = align;
--    virtio_queue_update_rings(vdev, n);
-+    if (align) {
-+        vdev->vq[n].vring.align = align;
-+        virtio_queue_update_rings(vdev, n);
-+    }
- }
- 
- static bool virtio_queue_notify_aio_vq(VirtQueue *vq)
++
+     pc_find_cpu_slot(MACHINE(pcms), cpu->apic_id, &idx);
+     assert(idx != -1);
+     if (idx == 0) {
 -- 
 MST
