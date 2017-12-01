@@ -1,27 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36677)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37668)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1eKozO-0002GT-In
-	for qemu-devel@nongnu.org; Fri, 01 Dec 2017 12:20:39 -0500
+	(envelope-from <dgilbert@redhat.com>) id 1eKp0S-0003TP-Lr
+	for qemu-devel@nongnu.org; Fri, 01 Dec 2017 12:21:46 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1eKozL-0008UM-TS
-	for qemu-devel@nongnu.org; Fri, 01 Dec 2017 12:20:38 -0500
-Received: from 17.mo4.mail-out.ovh.net ([46.105.41.16]:43088)
+	(envelope-from <dgilbert@redhat.com>) id 1eKp0R-0001c7-6d
+	for qemu-devel@nongnu.org; Fri, 01 Dec 2017 12:21:44 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:39278)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1eKozL-0008G5-MR
-	for qemu-devel@nongnu.org; Fri, 01 Dec 2017 12:20:35 -0500
-Received: from player159.ha.ovh.net (gw6.ovh.net [213.251.189.206])
-	by mo4.mail-out.ovh.net (Postfix) with ESMTP id 7CA33111EB7
-	for <qemu-devel@nongnu.org>; Fri,  1 Dec 2017 18:20:27 +0100 (CET)
-Date: Fri, 1 Dec 2017 18:20:14 +0100
-From: Greg Kurz <groug@kaod.org>
-Message-ID: <20171201182014.44b0602e@bahia.lan>
-In-Reply-To: <1512127449-11114-1-git-send-email-s1seetee@linux.vnet.ibm.com>
-References: <1512127449-11114-1-git-send-email-s1seetee@linux.vnet.ibm.com>
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1eKp0Q-0001aq-Ny
+	for qemu-devel@nongnu.org; Fri, 01 Dec 2017 12:21:43 -0500
+Date: Fri, 1 Dec 2017 17:21:33 +0000
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20171201172133.GC2318@work-vm>
+References: <20171108060130.3772-1-peterx@redhat.com>
+	<20171108060130.3772-29-peterx@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [Qemu-ppc] [PATCH v1] spapr.c: Update qemu's
- maxcpus for pseries machine.
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20171108060130.3772-29-peterx@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v4 28/32] migration: allow migrate_incoming
+ for paused VM
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,69 +28,183 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Seeteena Thoufeek <s1seetee@linux.vnet.ibm.com>
-Cc: david@gibson.dropbear.id.au, agraf@suse.de, qemu-ppc@nongnu.org, qemu-devel@nongnu.org
+To: Peter Xu <peterx@redhat.com>
+Cc: qemu-devel@nongnu.org, Alexey Perevalov <a.perevalov@samsung.com>, "Daniel P . Berrange" <berrange@redhat.com>, Juan Quintela <quintela@redhat.com>, Andrea Arcangeli <aarcange@redhat.com>
 
-On Fri,  1 Dec 2017 16:54:09 +0530
-Seeteena Thoufeek <s1seetee@linux.vnet.ibm.com> wrote:
-
-> Need to adjust the max cpus supported number from error message since
-> it was conflicting with KVM's.
+* Peter Xu (peterx@redhat.com) wrote:
+> migrate_incoming command is previously only used when we were providing
+> "-incoming defer" in the command line, to defer the incoming migration
+> channel creation.
 > 
-> Steps to Reproduce:
-> 1.boot up with
-> "-smp 64,maxcpus=102464,cores=8,threads=1,sockets=8"
+> However there is similar requirement when we are paused during postcopy
+> migration. The old incoming channel might have been destroyed already.
+> We may need another new channel for the recovery to happen.
 > 
-> qemu-kvm: Number of SMP CPUs requested (102464) exceeds max CPUs
-> supported by machine 'pseries-rhel7.4.0alt' (1024)
+> This patch leveraged the same interface, but allows the user to specify
+> incoming migration channel even for paused postcopy.
 > 
-
-The above error message was dumped by commit c0dd10991903 (authored by
-you apparently). Now it should be:
-
-Invalid SMP CPUs 102464. The max CPUs supported by
- machine 'pseries-rhel7.4.0alt' is 1024
-
-> 2. On KVM machine it shows
+> Meanwhile, now migration listening ports are always detached manually
+> using the tag, rather than using return values of dispatchers.
 > 
-> boot up with
-> "-m 6G,maxmem=300G,slots=256 -smp 64,maxcpus=1024,cores=8,threads=1
-> ,sockets=128"
-> 
-> Number of hotpluggable cpus requested (1024) exceeds the maximum cpus
->  supported by KVM (240)
-> 
-> It seemed that 1024 was useless since KVM only support 240 so far.
+> Signed-off-by: Peter Xu <peterx@redhat.com>
 
-This is the limit imposed by KVM, which is basically the number of
-CPUs on the host system. On some bigger systems, it can be up to
-1536 AFAIK.
+I think this patch is OK now, except for that top level question I've asked
+against 00 about how the new incoming ever gets to start up.
 
-The machine limit is a different beast and someone could legitimately
-run a fully emulated guest (TCG) with 1024 CPUs.
+Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
 
-Hence it really doesn't make sense to hardcode the KVM value from your
-system into QEMU.
-
-> Hence,we need to adjust it to an reasonable value 240.
-> 
-> Signed-off-by: Seeteena Thoufeek <s1seetee@linux.vnet.ibm.com>
 > ---
->  hw/ppc/spapr.c | 1 +
->  1 file changed, 1 insertion(+)
+>  migration/exec.c       |  2 +-
+>  migration/fd.c         |  2 +-
+>  migration/migration.c  | 58 +++++++++++++++++++++++++++++++++++++++++++-------
+>  migration/socket.c     |  4 +---
+>  migration/trace-events |  2 ++
+>  5 files changed, 55 insertions(+), 13 deletions(-)
 > 
-> diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-> index 9efddea..c753254 100644
-> --- a/hw/ppc/spapr.c
-> +++ b/hw/ppc/spapr.c
-> @@ -3691,6 +3691,7 @@ static const TypeInfo spapr_machine_info = {
->          if (latest) {                                                \
->              mc->alias = "pseries";                                   \
->              mc->is_default = 1;                                      \
-> +            mc->max_cpus = 240;                                      \
-
-BTW, this isn't the right place: the limit is set in spapr_machine_class_init()
-
->          }                                                            \
->      }                                                                \
->      static void spapr_machine_##suffix##_instance_init(Object *obj)  \
+> diff --git a/migration/exec.c b/migration/exec.c
+> index a0796c2c70..9d20d10899 100644
+> --- a/migration/exec.c
+> +++ b/migration/exec.c
+> @@ -49,7 +49,7 @@ static gboolean exec_accept_incoming_migration(QIOChannel *ioc,
+>  {
+>      migration_channel_process_incoming(ioc);
+>      object_unref(OBJECT(ioc));
+> -    return G_SOURCE_REMOVE;
+> +    return G_SOURCE_CONTINUE;
+>  }
+>  
+>  /*
+> diff --git a/migration/fd.c b/migration/fd.c
+> index 7ead2f26cc..54b36888e2 100644
+> --- a/migration/fd.c
+> +++ b/migration/fd.c
+> @@ -49,7 +49,7 @@ static gboolean fd_accept_incoming_migration(QIOChannel *ioc,
+>  {
+>      migration_channel_process_incoming(ioc);
+>      object_unref(OBJECT(ioc));
+> -    return G_SOURCE_REMOVE;
+> +    return G_SOURCE_CONTINUE;
+>  }
+>  
+>  /*
+> diff --git a/migration/migration.c b/migration/migration.c
+> index a4cdedcde8..9b7fc56ed8 100644
+> --- a/migration/migration.c
+> +++ b/migration/migration.c
+> @@ -179,6 +179,17 @@ void migration_incoming_state_destroy(void)
+>      qemu_event_reset(&mis->main_thread_load_event);
+>  }
+>  
+> +static bool migrate_incoming_detach_listen(MigrationIncomingState *mis)
+> +{
+> +    if (mis->listen_task_tag) {
+> +        /* Never fail */
+> +        g_source_remove(mis->listen_task_tag);
+> +        mis->listen_task_tag = 0;
+> +        return true;
+> +    }
+> +    return false;
+> +}
+> +
+>  static void migrate_generate_event(int new_state)
+>  {
+>      if (migrate_use_events()) {
+> @@ -463,10 +474,9 @@ void migration_fd_process_incoming(QEMUFile *f)
+>  
+>      /*
+>       * When reach here, we should not need the listening port any
+> -     * more. We'll detach the listening task soon, let's reset the
+> -     * listen task tag.
+> +     * more.  Detach the listening port explicitly.
+>       */
+> -    mis->listen_task_tag = 0;
+> +    migrate_incoming_detach_listen(mis);
+>  }
+>  
+>  void migration_ioc_process_incoming(QIOChannel *ioc)
+> @@ -1422,14 +1432,46 @@ void qmp_migrate_incoming(const char *uri, Error **errp)
+>  {
+>      Error *local_err = NULL;
+>      static bool once = true;
+> +    MigrationIncomingState *mis = migration_incoming_get_current();
+> +
+>  
+> -    if (!deferred_incoming) {
+> -        error_setg(errp, "For use with '-incoming defer'");
+> +    if (mis->state == MIGRATION_STATUS_POSTCOPY_PAUSED) {
+> +        if (mis->listen_task_tag) {
+> +            error_setg(errp, "We already have a listening port!");
+> +            return;
+> +        } else {
+> +            /*
+> +            * We are in postcopy-paused state, and we don't have
+> +            * listening port.  It's very possible that the old
+> +            * listening port is already gone, so we allow to create a
+> +            * new one.
+> +            *
+> +            * NOTE: RDMA migration currently does not really use
+> +            * listen_task_tag for now, so even if listen_task_tag is
+> +            * zero, RDMA can still have its accept port listening.
+> +            * However, RDMA is not supported by postcopy at all (yet), so
+> +            * we are safe here.
+> +            */
+> +            trace_migrate_incoming_recover();
+> +        }
+> +    } else if (deferred_incoming) {
+> +        /*
+> +         * We don't need recovery, but we possibly has a deferred
+> +         * incoming parameter, this allows us to manually specify
+> +         * incoming port once.
+> +         */
+> +        if (!once) {
+> +            error_setg(errp, "The incoming migration has already been started");
+> +            return;
+> +        } else {
+> +            /* PASS */
+> +            trace_migrate_incoming_deferred();
+> +        }
+> +    } else {
+> +        error_setg(errp, "Migrate-incoming is only allowed for either "
+> +                   "deferred incoming, or postcopy paused stage.");
+>          return;
+>      }
+> -    if (!once) {
+> -        error_setg(errp, "The incoming migration has already been started");
+> -    }
+>  
+>      qemu_start_incoming_migration(uri, &local_err);
+>  
+> diff --git a/migration/socket.c b/migration/socket.c
+> index e8f3325155..54095a80a0 100644
+> --- a/migration/socket.c
+> +++ b/migration/socket.c
+> @@ -155,10 +155,8 @@ out:
+>      if (migration_has_all_channels()) {
+>          /* Close listening socket as its no longer needed */
+>          qio_channel_close(ioc, NULL);
+> -        return G_SOURCE_REMOVE;
+> -    } else {
+> -        return G_SOURCE_CONTINUE;
+>      }
+> +    return G_SOURCE_CONTINUE;
+>  }
+>  
+>  
+> diff --git a/migration/trace-events b/migration/trace-events
+> index 98c2e4de58..65b1c7e459 100644
+> --- a/migration/trace-events
+> +++ b/migration/trace-events
+> @@ -136,6 +136,8 @@ process_incoming_migration_co_end(int ret, int ps) "ret=%d postcopy-state=%d"
+>  process_incoming_migration_co_postcopy_end_main(void) ""
+>  migration_set_incoming_channel(void *ioc, const char *ioctype) "ioc=%p ioctype=%s"
+>  migration_set_outgoing_channel(void *ioc, const char *ioctype, const char *hostname)  "ioc=%p ioctype=%s hostname=%s"
+> +migrate_incoming_deferred(void) ""
+> +migrate_incoming_recover(void) ""
+>  
+>  # migration/rdma.c
+>  qemu_rdma_accept_incoming_migration(void) ""
+> -- 
+> 2.13.6
+> 
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
