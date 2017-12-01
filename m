@@ -1,26 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50325)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51426)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1eKnYe-0002aV-8o
-	for qemu-devel@nongnu.org; Fri, 01 Dec 2017 10:50:07 -0500
+	(envelope-from <kwolf@redhat.com>) id 1eKnZO-0003AT-8m
+	for qemu-devel@nongnu.org; Fri, 01 Dec 2017 10:50:24 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1eKnXv-0001fy-03
-	for qemu-devel@nongnu.org; Fri, 01 Dec 2017 10:48:56 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:37950)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1eKnXu-0001cF-KK
-	for qemu-devel@nongnu.org; Fri, 01 Dec 2017 10:48:10 -0500
-Date: Fri, 1 Dec 2017 16:39:25 +0800
-From: Peter Xu <peterx@redhat.com>
-Message-ID: <20171201083925.GC2712@xz-mi>
-References: <20171108060130.3772-1-peterx@redhat.com>
-	<20171108060130.3772-2-peterx@redhat.com>
-	<20171130102437.GA2248@work-vm>
+	(envelope-from <kwolf@redhat.com>) id 1eKnYk-00034H-Ux
+	for qemu-devel@nongnu.org; Fri, 01 Dec 2017 10:49:42 -0500
+Date: Fri, 1 Dec 2017 16:24:43 +0100
+From: Kevin Wolf <kwolf@redhat.com>
+Message-ID: <20171201152443.GF4147@localhost.localdomain>
+References: <20171201014242.16877-1-eblake@redhat.com>
+	<20171201014242.16877-2-eblake@redhat.com>
+	<20171201144047.GE4147@localhost.localdomain>
+	<c2bde291-63d7-d94c-aac7-d894fa2a5218@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20171130102437.GA2248@work-vm>
-Subject: Re: [Qemu-devel] [PATCH v4 01/32] migration: better error handling
- with QEMUFile
+In-Reply-To: <c2bde291-63d7-d94c-aac7-d894fa2a5218@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v5 01/20] block: Add
+ .bdrv_co_block_status() callback
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,163 +26,97 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Cc: qemu-devel@nongnu.org, Alexey Perevalov <a.perevalov@samsung.com>, "Daniel P . Berrange" <berrange@redhat.com>, Juan Quintela <quintela@redhat.com>, Andrea Arcangeli <aarcange@redhat.com>
+To: Eric Blake <eblake@redhat.com>
+Cc: qemu-devel@nongnu.org, jsnow@redhat.com, famz@redhat.com, qemu-block@nongnu.org, vsementsov@virtuozzo.com, Stefan Hajnoczi <stefanha@redhat.com>, Max Reitz <mreitz@redhat.com>
 
-On Thu, Nov 30, 2017 at 10:24:38AM +0000, Dr. David Alan Gilbert wrote:
-> * Peter Xu (peterx@redhat.com) wrote:
-> > If the postcopy down due to some reason, we can always see this on dst:
+Am 01.12.2017 um 16:03 hat Eric Blake geschrieben:
+> On 12/01/2017 08:40 AM, Kevin Wolf wrote:
+> > > Note that most drivers give sector-aligned answers, except at
+> > > end-of-file, even when request_alignment is smaller than a sector.
+> > > However, bdrv_getlength() is sector-aligned (even though it gives a
+> > > byte answer), often by exceeding the actual file size.  If we were to
+> > > give back strict results, at least file-posix.c would report a
+> > > transition from DATA to HOLE at the end of a file even in the middle
+> > > of a sector, which can throw off callers; so we intentionally lie and
+> > > state that any partial sector at the end of a file has the same
+> > > status for the entire sector.  Maybe at some future day we can
+> > > report actual file size instead of rounding up, but not for this
+> > > series.
 > > 
-> >   qemu-system-x86_64: RP: Received invalid message 0x0000 length 0x0000
+> > In what way does this throw off callers in practice?
+> 
+> Several iotests failed if I didn't do that (it's been a few months, so the
+> details are a bit fuzzy).  I think the biggest problem is that because we
+> round the size up in bdrv_getlength(), but CANNOT access those rounded
+> bytes, then reporting the status of those bytes as a hole (which is the only
+> sane thing that file-posix can do) can cause grief when the rest of the
+> sector (which we CAN access) is data.
+
+Does this indicate caller bugs? If they call byte-based
+bdrv_co_block_status(), they should surely be able to handle this
+situation in theory?
+
+> > The rounding will lead to strange effects, and I'm not sure that dealing
+> > with them is any easier than fixing the callers. Imagine an image file
+> > like this (very small example, file size 384 bytes):
 > > 
-> > However in most cases that's not the real issue. The problem is that
-> > qemu_get_be16() has no way to show whether the returned data is valid or
-> > not, and we are _always_ assuming it is valid. That's possibly not wise.
+> >      0    128      384  512
+> >      |    |        |    |
+> >      +----+--------+----+
+> >      |Hole|  Data  |    |
+> >      +----+--------+----+
+> >                    |
+> >                    EOF
+> 
+> Unlikely.  Holes are at least a sector in size on all known filesystems that
+> have holes; that's also true for qcow2 format.  The only non-sector-aligned
+> hole that you can encounter in practice is at EOF.
+
+Yes, probably not going to happen on file-posix. But I wouldn't bet
+money that it's the same for all of the other protocols.
+
+Wasn't one of the reasons for this series that NBD actually allows byte
+granularity block status in its protocol? Which means that an NBD server
+could expose something like this. Of course, in practice the server is
+backed by something, too, so this situation is very unlikely, but
+strictly speaking we wouldn't be able to work with all compliant
+servers.
+
+> > bdrv_co_block_status(offset=0, bytes=512) returns 512 bytes of HOLE.
+> > bdrv_co_block_status(offset=128, bytes=512) returns 384 bytes of DATA.
+> > bdrv_co_block_status(offset=384, bytes=512) returns 128 bytes of HOLE.
 > > 
-> > The best approach to solve this would be: refactoring QEMUFile interface
-> > to allow the APIs to return error if there is. However it needs quite a
-> > bit of work and testing. For now, let's explicitly check the validity
-> > first before using the data in all places for qemu_get_*().
+> > This is not only contradictory, but the first one is almost begging for
+> > data corruption because it returns HOLE for a region that actually
+> > contains data.
+> 
+> I agree that it would be confusing, if it were possible.  But in practice it
+> is not possible.
+> 
 > > 
-> > This patch tries to fix most of the cases I can see. Only if we are with
-> > this, can we make sure we are processing the valid data, and also can we
-> > make sure we can capture the channel down events correctly.
-> > 
-> > Signed-off-by: Peter Xu <peterx@redhat.com>
-> > ---
-> >  migration/migration.c |  5 +++++
-> >  migration/ram.c       | 26 ++++++++++++++++++++++----
-> >  migration/savevm.c    | 40 ++++++++++++++++++++++++++++++++++++++--
-> >  3 files changed, 65 insertions(+), 6 deletions(-)
-> > 
-> > diff --git a/migration/migration.c b/migration/migration.c
-> > index c0206023d7..eae34d0524 100644
-> > --- a/migration/migration.c
-> > +++ b/migration/migration.c
-> > @@ -1708,6 +1708,11 @@ static void *source_return_path_thread(void *opaque)
-> >          header_type = qemu_get_be16(rp);
-> >          header_len = qemu_get_be16(rp);
-> >  
-> > +        if (qemu_file_get_error(rp)) {
-> > +            mark_source_rp_bad(ms);
-> > +            goto out;
-> > +        }
-> > +
-> >          if (header_type >= MIG_RP_MSG_MAX ||
-> >              header_type == MIG_RP_MSG_INVALID) {
-> >              error_report("RP: Received invalid message 0x%04x length 0x%04x",
-> > diff --git a/migration/ram.c b/migration/ram.c
-> > index 8620aa400a..960c726ff2 100644
-> > --- a/migration/ram.c
-> > +++ b/migration/ram.c
-> > @@ -2687,7 +2687,7 @@ static int ram_load_postcopy(QEMUFile *f)
-> >      void *last_host = NULL;
-> >      bool all_zero = false;
-> >  
-> > -    while (!ret && !(flags & RAM_SAVE_FLAG_EOS)) {
-> > +    while (!(flags & RAM_SAVE_FLAG_EOS)) {
+> > The only excuse I can imagine is that we say that this can never happen
+> > because drivers use 512 byte granularity anyway. But why are we
+> > introducing the new interface then? I don't think this semantics is
+> > compatible with a bytes-based driver interface.
 > 
-> I still think you need to keep the !ret && - see below;
-> anyway, there's no harm in keeping it!
+> Really, the ONLY boundary that is unlikely to ever be 512-byte aligned is at
+> EOF - and we wouldn't even need to do any rounding if bdrv_getlength()
+> didn't round.
 
-Fair enough; I'll keep it no matter what. :-)
+Yes, bdrv_getlength() needs to be converted sooner or later, too.
 
-> 
-> >          ram_addr_t addr;
-> >          void *host = NULL;
-> >          void *page_buffer = NULL;
-> > @@ -2696,6 +2696,16 @@ static int ram_load_postcopy(QEMUFile *f)
-> >          uint8_t ch;
-> >  
-> >          addr = qemu_get_be64(f);
-> > +
-> > +        /*
-> > +         * If qemu file error, we should stop here, and then "addr"
-> > +         * may be invalid
-> > +         */
-> > +        ret = qemu_file_get_error(f);
-> > +        if (ret) {
-> > +            break;
-> > +        }
-> > +
-> >          flags = addr & ~TARGET_PAGE_MASK;
-> >          addr &= TARGET_PAGE_MASK;
-> >  
-> > @@ -2776,6 +2786,13 @@ static int ram_load_postcopy(QEMUFile *f)
-> >              error_report("Unknown combination of migration flags: %#x"
-> >                           " (postcopy mode)", flags);
-> >              ret = -EINVAL;
+> One thing I _can_ do: it is ALWAYS valid to report a partial sector as data.
+> It may pessimize the code slightly, but while rounding the size of a hole up
+> can be wrong if the rounding covers data but the caller getting the rounded
+> data treats that data as 0, rounding the size of data up will never
+> misbehave because the caller will just read the literal zeroes.  So I will
+> tweak the code to make sure that if any rounding takes place, that either
+> the driver already set BDRV_BLOCK_EOF (all further bytes also read as zero),
+> or else report the rounded region as data.  (I thought I could get away with
+> only io.c setting BDRV_BLOCK_EOF; but it sounds like setting it in the
+> drivers will be helpful).
 
-[1]
+This looks safer and definitely gives me a better feeling about the
+rounding.
 
-> > +            break;
-> 
-> This 'break' breaks from the switch, but doesn't break the loop and
-> because you remove dthe !ret && from the top, the loop keeps going when
-> it shouldn't.
-
-Ah yes I missed this one, thanks.
-
-What I should have written here is a "goto out", and also I should add
-that "out" label at the end.  I think after this single change current
-patch should be fine.
-
-However I understand that you would prefer me to check the ret every
-time.  IMHO it's a matter of taste.  I would prefer current way to do
-things since I see it awkward to keep checking against (!ret) possibly
-multiple times even we already know it's non-zero (especially when the
-failure happens at the beginning of the loop block).  But for this
-patch, I can follow yours (since you asked for twice already :).
-
-> 
-> > +        }
-> > +
-> > +        /* Detect for any possible file errors */
-> > +        if (qemu_file_get_error(f)) {
-> > +            ret = qemu_file_get_error(f);
-> > +            break;
-> >          }
-> 
-> This is all simpler if you just leave the !ret && at the top, and then
-> make this:
->   if (!ret) {
->       ret = qemu_file_get_error(f);
->   }
-
-Sure.
-
-(So to show what I meant: if we failed at [1] above we still need to
- check this, which is unecessary imho)
-
-> 
-> >  
-> >          if (place_needed) {
-> 
-> Make that
-> 
->       if (!ret && place_needed) {
-
-Will do.
-
-(same here if we failed at [1], actually we don't need to check the
- ret value so many times)
-
-> 
-> > @@ -2789,9 +2806,10 @@ static int ram_load_postcopy(QEMUFile *f)
-> >                  ret = postcopy_place_page(mis, place_dest,
-> >                                            place_source, block);
-> >              }
-> > -        }
-> > -        if (!ret) {
-> > -            ret = qemu_file_get_error(f);
-> > +
-> > +            if (ret) {
-> > +                break;
-> > +            }
-> 
-> And with the !ret check at the top this goes again.
-
-Yes, will remove it.  Thanks!
-
--- 
-Peter Xu
+Kevin
