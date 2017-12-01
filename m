@@ -1,20 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52088)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52079)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1eKoGg-0002ce-7X
+	(envelope-from <quintela@redhat.com>) id 1eKoGg-0002ca-5p
 	for qemu-devel@nongnu.org; Fri, 01 Dec 2017 11:34:27 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1eKoGb-00012s-5W
+	(envelope-from <quintela@redhat.com>) id 1eKoGb-00012o-5e
 	for qemu-devel@nongnu.org; Fri, 01 Dec 2017 11:34:26 -0500
-Date: Fri, 1 Dec 2017 11:37:13 +0100
-From: Cornelia Huck <cohuck@redhat.com>
-Message-ID: <20171201113713.6fa73d1a.cohuck@redhat.com>
-In-Reply-To: <1512046530-17773-3-git-send-email-pmorel@linux.vnet.ibm.com>
-References: <1512046530-17773-1-git-send-email-pmorel@linux.vnet.ibm.com>
-	<1512046530-17773-3-git-send-email-pmorel@linux.vnet.ibm.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v4 2/7] s390x/pci: rework PCI STORE
+Received: from mx1.redhat.com ([209.132.183.28]:60506)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1eKoGa-00011r-QU
+	for qemu-devel@nongnu.org; Fri, 01 Dec 2017 11:34:21 -0500
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+	[10.5.11.11])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 84485C0586A2
+	for <qemu-devel@nongnu.org>; Fri,  1 Dec 2017 12:57:56 +0000 (UTC)
+From: Juan Quintela <quintela@redhat.com>
+Date: Fri,  1 Dec 2017 13:57:49 +0100
+Message-Id: <20171201125750.1372-2-quintela@redhat.com>
+In-Reply-To: <20171201125750.1372-1-quintela@redhat.com>
+References: <20171201125750.1372-1-quintela@redhat.com>
+Subject: [Qemu-devel] [PATCH v3 1/2] migration: Create tcp_port parameter
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,41 +29,155 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Pierre Morel <pmorel@linux.vnet.ibm.com>
-Cc: qemu-devel@nongnu.org, agraf@suse.de, borntraeger@de.ibm.com, zyimin@linux.vnet.ibm.com, mst@redhat.com, thuth@redhat.com, pasic@linux.vnet.ibm.com, qemu-s390x@nongnu.org
+To: qemu-devel@nongnu.org
+Cc: dgilbert@redhat.com, lvivier@redhat.com, peterx@redhat.com
 
-On Thu, 30 Nov 2017 13:55:25 +0100
-Pierre Morel <pmorel@linux.vnet.ibm.com> wrote:
+It will be used to store the uri tcp_port parameter.  This is the only
+parameter than can change and we can need to be able to connect to it.
 
-> Enhance the fault detection, correction of the fault reporting.
-> 
-> Signed-off-by: Pierre Morel <pmorel@linux.vnet.ibm.com>
-> Reviewed-by: Yi Min Zhao <zyimin@linux.vnet.ibm.com>
-> ---
->  hw/s390x/s390-pci-inst.c | 42 +++++++++++++++++++++++++-----------------
->  hw/s390x/s390-pci-inst.h |  4 ++++
->  2 files changed, 29 insertions(+), 17 deletions(-)
-> 
+Signed-off-by: Juan Quintela <quintela@redhat.com>
 
-> @@ -493,9 +497,13 @@ int pcistg_service_call(S390CPU *cpu, uint8_t r1, uint8_t r2)
->          break;
->      }
->  
-> -    data = env->regs[r1];
-> -    if (pcias < 6) {
-> -        if ((8 - (offset & 0x7)) < len) {
-> +    switch (pcias) {
-> +        /* A ZPCI PCI card may use any BAR from BAR 0 to BAR 5 */
-> +    case ZPCI_IO_BAR_MIN ... ZPCI_IO_BAR_MAX:
+--
 
-Will make this
+This used to be uri parameter, but it has so many troubles to
+reproduce that it don't just make sense.
+---
+ hmp.c                 |  7 +++++++
+ migration/migration.c | 10 ++++++++++
+ qapi/migration.json   | 19 ++++++++++++++++---
+ 3 files changed, 33 insertions(+), 3 deletions(-)
 
-case ZPCI_IO_BAR_MIN...ZPCI_IO_BAR_MAX:
-
-> +        /* Check length:
-> +         * A length of 0 is invalid and length should not cross a double word
-> +         */
-> +        if (!len || (len > (8 - (offset & 0x7)))) {
->              program_interrupt(env, PGM_OPERAND, 4);
->              return 0;
->          }
+diff --git a/hmp.c b/hmp.c
+index 1727c9c003..6387d6d517 100644
+--- a/hmp.c
++++ b/hmp.c
+@@ -345,6 +345,9 @@ void hmp_info_migrate_parameters(Monitor *mon, const QDict *qdict)
+         monitor_printf(mon, "%s: %" PRIu64 "\n",
+             MigrationParameter_str(MIGRATION_PARAMETER_XBZRLE_CACHE_SIZE),
+             params->xbzrle_cache_size);
++        monitor_printf(mon, "%s: %d\n",
++            MigrationParameter_str(MIGRATION_PARAMETER_TCP_PORT),
++            params->tcp_port);
+     }
+ 
+     qapi_free_MigrationParameters(params);
+@@ -1659,6 +1662,10 @@ void hmp_migrate_set_parameter(Monitor *mon, const QDict *qdict)
+         }
+         p->xbzrle_cache_size = cache_size;
+         break;
++    case MIGRATION_PARAMETER_TCP_PORT:
++        p->has_tcp_port = true;
++        visit_type_uint16(v, param, &p->tcp_port, &err);
++        break;
+     default:
+         assert(0);
+     }
+diff --git a/migration/migration.c b/migration/migration.c
+index 19917a4b5b..abc02d4efd 100644
+--- a/migration/migration.c
++++ b/migration/migration.c
+@@ -517,6 +517,8 @@ MigrationParameters *qmp_query_migrate_parameters(Error **errp)
+     params->x_multifd_page_count = s->parameters.x_multifd_page_count;
+     params->has_xbzrle_cache_size = true;
+     params->xbzrle_cache_size = s->parameters.xbzrle_cache_size;
++    params->has_tcp_port = true;
++    params->tcp_port = s->parameters.tcp_port;
+ 
+     return params;
+ }
+@@ -884,6 +886,9 @@ static void migrate_params_test_apply(MigrateSetParameters *params,
+     if (params->has_xbzrle_cache_size) {
+         dest->xbzrle_cache_size = params->xbzrle_cache_size;
+     }
++    if (params->has_tcp_port) {
++        dest->tcp_port = params->tcp_port;
++    }
+ }
+ 
+ static void migrate_params_apply(MigrateSetParameters *params, Error **errp)
+@@ -956,6 +961,9 @@ static void migrate_params_apply(MigrateSetParameters *params, Error **errp)
+         s->parameters.xbzrle_cache_size = params->xbzrle_cache_size;
+         xbzrle_cache_resize(params->xbzrle_cache_size, errp);
+     }
++    if (params->has_tcp_port) {
++        s->parameters.tcp_port = params->tcp_port;
++    }
+ }
+ 
+ void qmp_migrate_set_parameters(MigrateSetParameters *params, Error **errp)
+@@ -2422,6 +2430,8 @@ static Property migration_properties[] = {
+     DEFINE_PROP_SIZE("xbzrle-cache-size", MigrationState,
+                       parameters.xbzrle_cache_size,
+                       DEFAULT_MIGRATE_XBZRLE_CACHE_SIZE),
++    DEFINE_PROP_UINT16("x-tcp-port", MigrationState,
++                       parameters.tcp_port, 0),
+ 
+     /* Migration capabilities */
+     DEFINE_PROP_MIG_CAP("x-xbzrle", MIGRATION_CAPABILITY_XBZRLE),
+diff --git a/qapi/migration.json b/qapi/migration.json
+index 4cd3d13158..e2a1d86216 100644
+--- a/qapi/migration.json
++++ b/qapi/migration.json
+@@ -488,6 +488,9 @@
+ #                     and a power of 2
+ #                     (Since 2.11)
+ #
++# @tcp-port: Only used for tcp, to know what is the real port
++#                     (Since 2.12)
++#
+ # Since: 2.4
+ ##
+ { 'enum': 'MigrationParameter',
+@@ -496,7 +499,7 @@
+            'tls-creds', 'tls-hostname', 'max-bandwidth',
+            'downtime-limit', 'x-checkpoint-delay', 'block-incremental',
+            'x-multifd-channels', 'x-multifd-page-count',
+-           'xbzrle-cache-size' ] }
++           'xbzrle-cache-size', 'tcp-port' ] }
+ 
+ ##
+ # @MigrateSetParameters:
+@@ -564,6 +567,10 @@
+ #                     needs to be a multiple of the target page size
+ #                     and a power of 2
+ #                     (Since 2.11)
++#
++# @tcp-port: Only used for tcp, to know what is the real port
++#                     (Since 2.12)
++#
+ # Since: 2.4
+ ##
+ # TODO either fuse back into MigrationParameters, or make
+@@ -582,7 +589,8 @@
+             '*block-incremental': 'bool',
+             '*x-multifd-channels': 'int',
+             '*x-multifd-page-count': 'int',
+-            '*xbzrle-cache-size': 'size' } }
++            '*xbzrle-cache-size': 'size' ,
++            '*tcp-port': 'uint16'} }
+ 
+ ##
+ # @migrate-set-parameters:
+@@ -665,6 +673,10 @@
+ #                     needs to be a multiple of the target page size
+ #                     and a power of 2
+ #                     (Since 2.11)
++#
++# @tcp-port: Only used for tcp, to know what is the real port
++#                     (Since 2.12)
++#
+ # Since: 2.4
+ ##
+ { 'struct': 'MigrationParameters',
+@@ -681,7 +693,8 @@
+             '*block-incremental': 'bool' ,
+             '*x-multifd-channels': 'uint8',
+             '*x-multifd-page-count': 'uint32',
+-            '*xbzrle-cache-size': 'size' } }
++            '*xbzrle-cache-size': 'size',
++            '*tcp-port': 'uint16'} }
+ 
+ ##
+ # @query-migrate-parameters:
+-- 
+2.14.3
