@@ -1,25 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55282)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55564)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1eKnbi-0004yJ-EI
-	for qemu-devel@nongnu.org; Fri, 01 Dec 2017 10:52:52 -0500
+	(envelope-from <armbru@redhat.com>) id 1eKnbs-0005DS-Tg
+	for qemu-devel@nongnu.org; Fri, 01 Dec 2017 10:52:56 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1eKnau-0005Ah-NO
-	for qemu-devel@nongnu.org; Fri, 01 Dec 2017 10:52:06 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:35976)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1eKnau-00057t-6C
-	for qemu-devel@nongnu.org; Fri, 01 Dec 2017 10:51:16 -0500
-Date: Fri, 1 Dec 2017 17:14:52 +0200
-From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <20171201171105-mutt-send-email-mst@kernel.org>
-References: <20171123140206.3911-1-marcandre.lureau@redhat.com>
-	<20171123140206.3911-4-marcandre.lureau@redhat.com>
+	(envelope-from <armbru@redhat.com>) id 1eKnav-0005Cw-EZ
+	for qemu-devel@nongnu.org; Fri, 01 Dec 2017 10:52:16 -0500
+From: Markus Armbruster <armbru@redhat.com>
+References: <20171130134159.9697-1-eblake@redhat.com>
+	<20171130140154.11161-1-eblake@redhat.com>
+	<04c922b4-7287-61e7-1afc-4e64f39c52a5@redhat.com>
+Date: Fri, 01 Dec 2017 08:31:29 +0100
+In-Reply-To: <04c922b4-7287-61e7-1afc-4e64f39c52a5@redhat.com> (Eric Blake's
+	message of "Thu, 30 Nov 2017 11:00:58 -0600")
+Message-ID: <87o9ni52ge.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-In-Reply-To: <20171123140206.3911-4-marcandre.lureau@redhat.com>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v8 3/5] fw_cfg: do DMA read operation
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PATCH 4/3] checkpatch: Enforce proper do/while
+ (0) style
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,316 +25,44 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?iso-8859-1?Q?Marc-Andr=E9?= Lureau <marcandre.lureau@redhat.com>
-Cc: linux-kernel@vger.kernel.org, somlo@cmu.edu, xiaolong.ye@intel.com, qemu-devel@nongnu.org
+To: Eric Blake <eblake@redhat.com>
+Cc: qemu-devel@nongnu.org, qemu-trivial@nongnu.org
 
-On Thu, Nov 23, 2017 at 03:02:04PM +0100, Marc-Andr=E9 Lureau wrote:
-> Modify fw_cfg_read_blob() to use DMA if the device supports it.
-> Return errors, because the operation may fail.
->=20
-> The DMA operation is expected to run synchronously with today qemu,
-> but the specification states that it may become async, so we run
-> "control" field check in a loop for eventual changes.
->=20
-> We may want to switch all the *buf addresses to use only kmalloc'ed
-> buffers (instead of using stack/image addresses with dma=3Dfalse).
->=20
-> Signed-off-by: Marc-Andr=E9 Lureau <marcandre.lureau@redhat.com>
-> ---
->  drivers/firmware/qemu_fw_cfg.c | 147 +++++++++++++++++++++++++++++++++=
-+++-----
->  1 file changed, 130 insertions(+), 17 deletions(-)
->=20
-> diff --git a/drivers/firmware/qemu_fw_cfg.c b/drivers/firmware/qemu_fw_=
-cfg.c
-> index 740df0df2260..b7b5c88a3422 100644
-> --- a/drivers/firmware/qemu_fw_cfg.c
-> +++ b/drivers/firmware/qemu_fw_cfg.c
-> @@ -33,6 +33,8 @@
->  #include <linux/slab.h>
->  #include <linux/io.h>
->  #include <linux/ioport.h>
-> +#include <linux/delay.h>
-> +#include <linux/dma-mapping.h>
-> =20
->  MODULE_AUTHOR("Gabriel L. Somlo <somlo@cmu.edu>");
->  MODULE_DESCRIPTION("QEMU fw_cfg sysfs support");
-> @@ -43,12 +45,25 @@ MODULE_LICENSE("GPL");
->  #define FW_CFG_ID         0x01
->  #define FW_CFG_FILE_DIR   0x19
-> =20
-> +#define FW_CFG_VERSION_DMA     0x02
-> +#define FW_CFG_DMA_CTL_ERROR   0x01
-> +#define FW_CFG_DMA_CTL_READ    0x02
-> +#define FW_CFG_DMA_CTL_SKIP    0x04
-> +#define FW_CFG_DMA_CTL_SELECT  0x08
-> +#define FW_CFG_DMA_CTL_WRITE   0x10
-> +
->  /* size in bytes of fw_cfg signature */
->  #define FW_CFG_SIG_SIZE 4
-> =20
->  /* fw_cfg "file name" is up to 56 characters (including terminating nu=
-l) */
->  #define FW_CFG_MAX_FILE_PATH 56
-> =20
-> +/* platform device for dma mapping */
-> +static struct device *dev;
-> +
-> +/* fw_cfg revision attribute, in /sys/firmware/qemu_fw_cfg top-level d=
-ir. */
-> +static u32 fw_cfg_rev;
-> +
->  /* fw_cfg file directory entry type */
->  struct fw_cfg_file {
->  	u32 size;
-> @@ -57,6 +72,12 @@ struct fw_cfg_file {
->  	char name[FW_CFG_MAX_FILE_PATH];
->  };
-> =20
-> +struct fw_cfg_dma {
-> +	u32 control;
-> +	u32 length;
-> +	u64 address;
-> +} __packed;
-> +
->  /* fw_cfg device i/o register addresses */
->  static bool fw_cfg_is_mmio;
->  static phys_addr_t fw_cfg_p_base;
-> @@ -75,12 +96,86 @@ static inline u16 fw_cfg_sel_endianness(u16 key)
->  	return fw_cfg_is_mmio ? cpu_to_be16(key) : cpu_to_le16(key);
->  }
-> =20
-> +static inline bool fw_cfg_dma_enabled(void)
-> +{
-> +	return fw_cfg_rev & FW_CFG_VERSION_DMA && fw_cfg_reg_dma;
-> +}
-> +
-> +/* qemu fw_cfg device is sync today, but spec says it may become async=
- */
-> +static void fw_cfg_wait_for_control(struct fw_cfg_dma *d, dma_addr_t d=
-ma)
-> +{
-> +	do {
-> +		dma_sync_single_for_cpu(dev, dma, sizeof(*d), DMA_FROM_DEVICE);
-> +		if ((be32_to_cpu(d->control) & ~FW_CFG_DMA_CTL_ERROR) =3D=3D 0)
-> +			return;
-> +
-> +		usleep_range(50, 100);
-> +	} while (true);
-> +}
-> +
-> +static ssize_t fw_cfg_dma_transfer(void *address, u32 length, u32 cont=
-rol)
-> +{
-> +	dma_addr_t dma_addr =3D 0;
-> +	struct fw_cfg_dma *d =3D NULL;
-> +	dma_addr_t dma;
-> +	ssize_t ret =3D length;
-> +	enum dma_data_direction dir =3D
-> +		(control & FW_CFG_DMA_CTL_READ ? DMA_FROM_DEVICE : 0);
-> +
-> +	if (address && length) {
-> +		dma_addr =3D dma_map_single(dev, address, length, dir);
-> +		if (dma_mapping_error(NULL, dma_addr)) {
-> +			WARN(1, "%s: failed to map address\n", __func__);
-> +			return -EFAULT;
-> +		}
-> +	}
-> +
-> +	d =3D kmalloc(sizeof(*d), GFP_KERNEL);
-> +	if (!d) {
-> +		ret =3D -ENOMEM;
-> +		goto end;
-> +	}
-> +
-> +	*d =3D (struct fw_cfg_dma) {
-> +		.address =3D cpu_to_be64(dma_addr),
-> +		.length =3D cpu_to_be32(length),
-> +		.control =3D cpu_to_be32(control)
-> +	};
-> +
-> +	dma =3D dma_map_single(dev, d, sizeof(*d), DMA_BIDIRECTIONAL);
-> +	if (dma_mapping_error(NULL, dma)) {
-> +		WARN(1, "%s: failed to map fw_cfg_dma\n", __func__);
-> +		ret =3D -EFAULT;
-> +		goto end;
-> +	}
-> +
-> +	iowrite32be((u64)dma >> 32, fw_cfg_reg_dma);
-> +	iowrite32be(dma, fw_cfg_reg_dma + 4);
-> +
-> +	fw_cfg_wait_for_control(d, dma);
-> +
-> +	if (be32_to_cpu(d->control) & FW_CFG_DMA_CTL_ERROR) {
-> +		ret =3D -EIO;
-> +	}
-> +
-> +	dma_unmap_single(dev, dma, sizeof(*d), DMA_BIDIRECTIONAL);
-> +
-> +end:
-> +	kfree(d);
-> +	if (dma_addr)
-> +		dma_unmap_single(dev, dma_addr, length, dir);
-> +
-> +	return ret;
-> +}
-> +
->  /* read chunk of given fw_cfg blob (caller responsible for sanity-chec=
-k) */
-> -static inline void fw_cfg_read_blob(u16 key,
-> -				    void *buf, loff_t pos, size_t count)
-> +static ssize_t fw_cfg_read_blob(u16 key,
-> +				void *buf, loff_t pos, size_t count,
-> +				bool dma)
->  {
->  	u32 glk =3D -1U;
->  	acpi_status status;
-> +	ssize_t ret =3D count;
-> =20
->  	/* If we have ACPI, ensure mutual exclusion against any potential
->  	 * device access by the firmware, e.g. via AML methods:
-> @@ -90,17 +185,36 @@ static inline void fw_cfg_read_blob(u16 key,
->  		/* Should never get here */
->  		WARN(1, "fw_cfg_read_blob: Failed to lock ACPI!\n");
->  		memset(buf, 0, count);
-> -		return;
-> +		return -EINVAL;
->  	}
-> =20
->  	mutex_lock(&fw_cfg_dev_lock);
-> -	iowrite16(fw_cfg_sel_endianness(key), fw_cfg_reg_ctrl);
-> -	while (pos-- > 0)
-> -		ioread8(fw_cfg_reg_data);
-> -	ioread8_rep(fw_cfg_reg_data, buf, count);
-> +	if (dma && fw_cfg_dma_enabled()) {
-> +		if (pos =3D=3D 0) {
-> +			ret =3D fw_cfg_dma_transfer(buf, count, key << 16
-> +						  | FW_CFG_DMA_CTL_SELECT
-> +						  | FW_CFG_DMA_CTL_READ);
-> +		} else {
-> +			iowrite16(fw_cfg_sel_endianness(key), fw_cfg_reg_ctrl);
-> +			ret =3D fw_cfg_dma_transfer(NULL, pos, FW_CFG_DMA_CTL_SKIP);
-> +			if (ret < 0)
-> +				goto end;
-> +			ret =3D fw_cfg_dma_transfer(buf, count,
-> +						  FW_CFG_DMA_CTL_READ);
-> +		}
-> +	} else {
-> +		iowrite16(fw_cfg_sel_endianness(key), fw_cfg_reg_ctrl);
-> +		while (pos-- > 0)
-> +			ioread8(fw_cfg_reg_data);
-> +		ioread8_rep(fw_cfg_reg_data, buf, count);
-> +	}
-> +
-> +end:
->  	mutex_unlock(&fw_cfg_dev_lock);
-> =20
->  	acpi_release_global_lock(glk);
-> +
-> +	return ret;
->  }
-> =20
->  /* clean up fw_cfg device i/o */
-> @@ -192,7 +306,7 @@ static int fw_cfg_do_platform_probe(struct platform=
-_device *pdev)
->  #endif
-> =20
->  	/* verify fw_cfg device signature */
-> -	fw_cfg_read_blob(FW_CFG_SIGNATURE, sig, 0, FW_CFG_SIG_SIZE);
-> +	fw_cfg_read_blob(FW_CFG_SIGNATURE, sig, 0, FW_CFG_SIG_SIZE, false);
->  	if (memcmp(sig, "QEMU", FW_CFG_SIG_SIZE) !=3D 0) {
->  		fw_cfg_io_cleanup();
->  		return -ENODEV;
-> @@ -201,9 +315,6 @@ static int fw_cfg_do_platform_probe(struct platform=
-_device *pdev)
->  	return 0;
->  }
-> =20
-> -/* fw_cfg revision attribute, in /sys/firmware/qemu_fw_cfg top-level d=
-ir. */
-> -static u32 fw_cfg_rev;
-> -
->  static ssize_t fw_cfg_showrev(struct kobject *k, struct attribute *a, =
-char *buf)
->  {
->  	return sprintf(buf, "%u\n", fw_cfg_rev);
-> @@ -351,8 +462,7 @@ static ssize_t fw_cfg_sysfs_read_raw(struct file *f=
-ilp, struct kobject *kobj,
->  	if (count > entry->f.size - pos)
->  		count =3D entry->f.size - pos;
-> =20
-> -	fw_cfg_read_blob(entry->f.select, buf, pos, count);
-> -	return count;
-> +	return fw_cfg_read_blob(entry->f.select, buf, pos, count, true);
->  }
-> =20
->  static struct bin_attribute fw_cfg_sysfs_attr_raw =3D {
-> @@ -505,7 +615,7 @@ static int fw_cfg_register_dir_entries(void)
->  	struct fw_cfg_file *dir;
->  	size_t dir_size;
-> =20
-> -	fw_cfg_read_blob(FW_CFG_FILE_DIR, &count, 0, sizeof(count));
-> +	fw_cfg_read_blob(FW_CFG_FILE_DIR, &count, 0, sizeof(count), false);
->  	count =3D be32_to_cpu(count);
->  	dir_size =3D count * sizeof(struct fw_cfg_file);
-> =20
-> @@ -513,7 +623,7 @@ static int fw_cfg_register_dir_entries(void)
->  	if (!dir)
->  		return -ENOMEM;
-> =20
-> -	fw_cfg_read_blob(FW_CFG_FILE_DIR, dir, sizeof(count), dir_size);
-> +	fw_cfg_read_blob(FW_CFG_FILE_DIR, dir, sizeof(count), dir_size, true)=
-;
-> =20
->  	for (i =3D 0; i < count; i++) {
->  		dir[i].size =3D be32_to_cpu(dir[i].size);
-> @@ -544,9 +654,10 @@ static int fw_cfg_sysfs_probe(struct platform_devi=
-ce *pdev)
->  	 * one fw_cfg device exist system-wide, so if one was already found
->  	 * earlier, we might as well stop here.
->  	 */
-> -	if (fw_cfg_sel_ko)
-> +	if (dev)
->  		return -EBUSY;
-> =20
-> +	dev =3D &pdev->dev;
->  	/* create by_key and by_name subdirs of /sys/firmware/qemu_fw_cfg/ */
->  	err =3D -ENOMEM;
->  	fw_cfg_sel_ko =3D kobject_create_and_add("by_key", fw_cfg_top_ko);
+Eric Blake <eblake@redhat.com> writes:
 
-I am not at all sure holding onto device like this without a reference
-is safe.
+> On 11/30/2017 08:01 AM, Eric Blake wrote:
+>> while (0) is only idiomatic in a macro definition, where the caller
+>> will be supplying the trailing ';'.  Warn if the macro has a duplicate.
+>>
+>> Signed-off-by: Eric Blake <eblake@redhat.com>
+>> ---
+>>   scripts/checkpatch.pl | 5 +++++
+>>   1 file changed, 5 insertions(+)
+>>
+>> diff --git a/scripts/checkpatch.pl b/scripts/checkpatch.pl
+>> index 34df753571..acb66bff34 100755
+>> --- a/scripts/checkpatch.pl
+>> +++ b/scripts/checkpatch.pl
+>> @@ -1622,6 +1622,11 @@ sub process {
+>>   			}
+>>   		}
+>>
+>> +# 'while (0);' is odd; only macros should use while (0), without trailing ;
+>> +		if ($line =~ /while\s*\(0\);/) {
+>
+> Should this also check for uses of 'while (false);' ?
 
-Please propagate device pointer from all callers instead.
+Do we think it's likely to occur?
 
-> @@ -562,7 +673,7 @@ static int fw_cfg_sysfs_probe(struct platform_devic=
-e *pdev)
->  		goto err_probe;
-> =20
->  	/* get revision number, add matching top-level attribute */
-> -	fw_cfg_read_blob(FW_CFG_ID, &fw_cfg_rev, 0, sizeof(fw_cfg_rev));
-> +	fw_cfg_read_blob(FW_CFG_ID, &fw_cfg_rev, 0, sizeof(fw_cfg_rev), false=
-);
->  	fw_cfg_rev =3D le32_to_cpu(fw_cfg_rev);
->  	err =3D sysfs_create_file(fw_cfg_top_ko, &fw_cfg_rev_attr.attr);
->  	if (err)
-> @@ -587,6 +698,7 @@ static int fw_cfg_sysfs_probe(struct platform_devic=
-e *pdev)
->  err_name:
->  	fw_cfg_kobj_cleanup(fw_cfg_sel_ko);
->  err_sel:
-> +	dev =3D NULL;
->  	return err;
->  }
-> =20
-> @@ -598,6 +710,7 @@ static int fw_cfg_sysfs_remove(struct platform_devi=
-ce *pdev)
->  	fw_cfg_io_cleanup();
->  	fw_cfg_kset_unregister_recursive(fw_cfg_fname_kset);
->  	fw_cfg_kobj_cleanup(fw_cfg_sel_ko);
-> +	dev =3D NULL;
->  	return 0;
->  }
-> =20
-> --=20
-> 2.15.0.277.ga3d2ad2c43
+> Interestingly enough, we have an instance of 'do/while (false);' in
+> tests/vhost-user-bridge.c that is NOT in a macro, but is used for the
+> convenience of being able to 'break;' out early rather than using a
+> goto.  Similarly for chardev/char-serial.c using 'while (0);' outside
+> of a macro.
+
+That "cure" merely adds gratuitous cleverness to the "disease".
+
+>              Those may be worth rewriting to use goto as separate
+> patches if we want to restrict ALL use of 'while \((0|false)\);'
+
+I'd support that.
