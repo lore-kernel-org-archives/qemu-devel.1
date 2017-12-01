@@ -1,26 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53885)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54805)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1eKnvL-0006r2-8Y
-	for qemu-devel@nongnu.org; Fri, 01 Dec 2017 11:13:44 -0500
+	(envelope-from <dgilbert@redhat.com>) id 1eKnvz-0007TP-MI
+	for qemu-devel@nongnu.org; Fri, 01 Dec 2017 11:14:46 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1eKnuc-0007a0-QY
-	for qemu-devel@nongnu.org; Fri, 01 Dec 2017 11:12:23 -0500
-Received: from ozlabs.org ([2401:3900:2:1::2]:57151)
+	(envelope-from <dgilbert@redhat.com>) id 1eKnvD-00006j-JX
+	for qemu-devel@nongnu.org; Fri, 01 Dec 2017 11:13:03 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:37936)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgibson@ozlabs.org>) id 1eKnub-0007Se-3k
-	for qemu-devel@nongnu.org; Fri, 01 Dec 2017 11:11:38 -0500
-Date: Fri, 1 Dec 2017 15:25:10 +1100
-From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20171201042510.GH30161@umbus.fritz.box>
-References: <20171129084628.12336-1-david@gibson.dropbear.id.au>
-	<20171129084628.12336-5-david@gibson.dropbear.id.au>
-	<20171130062345.GC22901@xz-mi>
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1eKnvD-0008Vu-3L
+	for qemu-devel@nongnu.org; Fri, 01 Dec 2017 11:12:15 -0500
+Date: Fri, 1 Dec 2017 12:34:32 +0000
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20171201123431.GB3101@work-vm>
+References: <20171108060130.3772-1-peterx@redhat.com>
+	<20171108060130.3772-31-peterx@redhat.com>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="tcC6YSqBgqqkz7Sb"
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20171130062345.GC22901@xz-mi>
-Subject: Re: [Qemu-devel] [for-2.12 4/7] pci: Simplify pci_bus_is_root()
+In-Reply-To: <20171108060130.3772-31-peterx@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v4 30/32] migration: delay the
+ postcopy-active state switch
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,72 +29,72 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: Peter Xu <peterx@redhat.com>
-Cc: "Michael S . Tsirkin" <mst@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, Marcel Apfelbaum <marcel@redhat.com>, Igor Mammedov <imammedo@redhat.com>, qemu-devel@nongnu.org
+Cc: qemu-devel@nongnu.org, Alexey Perevalov <a.perevalov@samsung.com>, "Daniel P . Berrange" <berrange@redhat.com>, Juan Quintela <quintela@redhat.com>, Andrea Arcangeli <aarcange@redhat.com>
 
+* Peter Xu (peterx@redhat.com) wrote:
+> Switch the state until we try to start the VM on destination side.  The
+> problem is that without doing this we may have a very small window that
+> we'll be in such a state:
+> 
+> - dst VM is in postcopy-active state,
+> - main thread is handling MIG_CMD_PACKAGED message, which loads all the
+>   device states,
+> - ram load thread is reading memory data from source.
+> 
+> Then if we failed at this point when reading the migration stream we'll
+> also switch to postcopy-paused state, but that is not what we want.  If
+> device states failed to load, we should fail the migration directly
+> instead of pause.
+> 
+> Postponing the state switch to the point when we have already loaded the
+> devices' states and been ready to start running destination VM.
+> 
+> Signed-off-by: Peter Xu <peterx@redhat.com>
 
---tcC6YSqBgqqkz7Sb
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+If it's the only way, then this is OK; but I'd prefer you use a separate
+flag somewhere to let you know this, because this means that
+POSTCOPY_ACTIVE on the destination happens at a different point that it
+does on the source (and changing it on the source I think will break
+lots of things).
+Can't you use the PostcopyState value and check if it's in
+POSTCOPY_INCOMING_RUNNING?
 
-On Thu, Nov 30, 2017 at 02:23:45PM +0800, Peter Xu wrote:
-> On Wed, Nov 29, 2017 at 07:46:25PM +1100, David Gibson wrote:
->=20
-> [...]
->=20
-> >  struct PCIBus {
-> >      BusState qbus;
-> > +    enum PCIBusFlags flags;
-> >      PCIIOMMUFunc iommu_fn;
-> >      void *iommu_opaque;
-> >      uint8_t devfn_min;
-> > @@ -440,8 +446,12 @@ struct PCIBus {
-> >      Notifier machine_done;
-> >  };
->=20
-> I would prefer directly defining flags as uint64_t then it's more
-> clear that it's a bitmask (enum let me think of only one flag will be
-> set, but I may be wrong), but it's fine too to me.
+Dave
 
-In most languages an enum would only allow one value to be set, but C
-enums are weird - they're basically just a funny way of defining
-integer constants.
-
-I'm not particularly bothered either way: using the enum type makes it
-clear the right set of constants to use with this field, using an int
-makes it clearer that bit flags can be set.  So both options are
-slightly misleading in different ways.
-
-If there's another vote for uint64_t over using the enum, I'll change
-it.
-
-> Reviewed-by: Peter Xu <peterx@redhat.com>
->=20
-
---=20
-David Gibson			| I'll have my music baroque, and my code
-david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
-				| _way_ _around_!
-http://www.ozlabs.org/~dgibson
-
---tcC6YSqBgqqkz7Sb
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlog2aUACgkQbDjKyiDZ
-s5L3EA/+KmWzRWeVn78I/oib6iLj57gHpRjvnFVT3loKaNpqVAjXIomxG2O3+iux
-5cuIXifTNBCCk9SIiZLTT4vWIQD5zI0v3aky7OCEuCq3/dbbCjXBB7Jnl9vSMq++
-Hhmau3KlZ+b8Rl4i0fF/92p3W1H/k4yamPN2ob+b5uW1oDj56Z85vhexOR+7aJL1
-iZxl/beW361wNHL6P9scaB6pBm1IeUpDSrdg55T9lPrCG55iHQMGz74jyKKBtbYO
-hVnQeo5JlZG2HqIT6khE71wTHOrz5zzeUlanOh0YE39v+KisNttnAD6E71ciFPpc
-E5S9ILGEhO/Z8/ro4wyOpGGZXRb0YDHlosLpo1EG9yxR7kziVK2xkysdUMjvYipP
-2Bp4/2HN95dBbcGwtnKuuPo0A0E2kdXFLMrSmh9SLMA8dAyLuy7AELGvt17Lm5bM
-DX31sRAmeK1mj8EvZfjHT/k+ZdJkfJmZ33T65+Sj5WPU8EquHcnQSmZ0ivC2AYMx
-qA8DcXTmJ3Ed2avHNtk44EKAZ4fMCLPWw0n1LoGFR0Awa905kIEnrnIexj/t/ZW4
-UXEBsic8brXJV2cTBoqjFIKA1DVo4q9mFmnndB6vqNphrLzErTYpvRXD5nnSxi7E
-fAbk9bz8flOuTz9EAuXIRsYw6rHPeLzWAOHL2ItzvFmFma9yv3Q=
-=5tte
------END PGP SIGNATURE-----
-
---tcC6YSqBgqqkz7Sb--
+> ---
+>  migration/savevm.c | 10 ++++++++--
+>  1 file changed, 8 insertions(+), 2 deletions(-)
+> 
+> diff --git a/migration/savevm.c b/migration/savevm.c
+> index bc87b0e5b1..3bc792e320 100644
+> --- a/migration/savevm.c
+> +++ b/migration/savevm.c
+> @@ -1584,8 +1584,6 @@ static void *postcopy_ram_listen_thread(void *opaque)
+>      QEMUFile *f = mis->from_src_file;
+>      int load_res;
+>  
+> -    migrate_set_state(&mis->state, MIGRATION_STATUS_ACTIVE,
+> -                                   MIGRATION_STATUS_POSTCOPY_ACTIVE);
+>      qemu_sem_post(&mis->listen_thread_sem);
+>      trace_postcopy_ram_listen_thread_start();
+>  
+> @@ -1748,6 +1746,14 @@ static int loadvm_postcopy_handle_run(MigrationIncomingState *mis)
+>          return -1;
+>      }
+>  
+> +    /*
+> +     * Declare that we are in postcopy now.  We should already have
+> +     * all the device states loaded ready when reach here, and also
+> +     * the ram load thread running.
+> +     */
+> +    migrate_set_state(&mis->state, MIGRATION_STATUS_ACTIVE,
+> +                                   MIGRATION_STATUS_POSTCOPY_ACTIVE);
+> +
+>      data = g_new(HandleRunBhData, 1);
+>      data->bh = qemu_bh_new(loadvm_postcopy_handle_run_bh, data);
+>      qemu_bh_schedule(data->bh);
+> -- 
+> 2.13.6
+> 
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
