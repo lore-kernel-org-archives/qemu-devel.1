@@ -1,34 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59864)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34133)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <danielhb@linux.vnet.ibm.com>) id 1eKou8-0005xh-Vk
-	for qemu-devel@nongnu.org; Fri, 01 Dec 2017 12:15:15 -0500
+	(envelope-from <stefanha@gmail.com>) id 1eKowC-0007hV-7Q
+	for qemu-devel@nongnu.org; Fri, 01 Dec 2017 12:17:23 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <danielhb@linux.vnet.ibm.com>) id 1eKou3-0003lM-7w
-	for qemu-devel@nongnu.org; Fri, 01 Dec 2017 12:15:12 -0500
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:44156
-	helo=mx0a-001b2d01.pphosted.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <danielhb@linux.vnet.ibm.com>)
-	id 1eKou3-0003jy-30
-	for qemu-devel@nongnu.org; Fri, 01 Dec 2017 12:15:07 -0500
-Received: from pps.filterd (m0098421.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
-	vB1HEsjq036749
-	for <qemu-devel@nongnu.org>; Fri, 1 Dec 2017 12:15:06 -0500
-Received: from e16.ny.us.ibm.com (e16.ny.us.ibm.com [129.33.205.206])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2ek8wkfmek-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Fri, 01 Dec 2017 12:15:05 -0500
-Received: from localhost
-	by e16.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
-	Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <danielhb@linux.vnet.ibm.com>;
-	Fri, 1 Dec 2017 12:15:04 -0500
-From: Daniel Henrique Barboza <danielhb@linux.vnet.ibm.com>
-Date: Fri,  1 Dec 2017 15:14:45 -0200
-Message-Id: <20171201171445.11679-1-danielhb@linux.vnet.ibm.com>
-Subject: [Qemu-devel] [PATCH v1] qmp.c: system_wakeup: adding
- RUN_STATE_SUSPENDED check before proceeding
+	(envelope-from <stefanha@gmail.com>) id 1eKowB-0006Ae-Ck
+	for qemu-devel@nongnu.org; Fri, 01 Dec 2017 12:17:20 -0500
+Date: Fri, 1 Dec 2017 09:45:38 +0000
+From: Stefan Hajnoczi <stefanha@gmail.com>
+Message-ID: <20171201094538.GD23501@stefanha-x1.localdomain>
+References: <20171129224421.18192-1-jsnow@redhat.com>
+MIME-Version: 1.0
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="veXX9dWIonWZEC6h"
+Content-Disposition: inline
+In-Reply-To: <20171129224421.18192-1-jsnow@redhat.com>
+Subject: Re: [Qemu-devel] [Qemu-block] [PATCH] iotests: fix 197 for vpc
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,72 +23,56 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Daniel Henrique Barboza <danielhb@linux.vnet.ibm.com>, Markus Armbruster <armbru@redhat.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>
+To: John Snow <jsnow@redhat.com>
+Cc: qemu-block@nongnu.org, kwolf@redhat.com, ldoktor@redhat.com, qemu-devel@nongnu.org, mreitz@redhat.com
 
-The qmp/hmp command 'system_wakeup' is simply a direct call to
-'qemu_system_wakeup_request' from vl.c. This function verifies if
-runstate is SUSPENDED and if the wake up reason is valid before
-proceeding. However, no error or warning is thrown if any of those
-pre-requirements isn't met.
 
-This leads to situations such as the one described in
-https://github.com/open-power-host-os/qemu/issues/31, where one
-can induce the OS to be suspended by using pm-suspend (via
-dompmsuspend, for example) but for some reason the machine failed to
-go to the SUSPENDED runstate, staying at runstate RUNNING. The user
-then tries to wake up the guest using system_wakeup (or dompmwakeup),
-no error is thrown but nothing happened either because the wake up
-wasn't fired at all. In the end, the user is left with a guest that
-is dormant and believing that system_wakeup isn't working.
+--veXX9dWIonWZEC6h
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-This patch changes qmp_system_wakeup to make the runstate verification
-before proceeding to call qemu_system_wakeup_request, firing up
-an error message if the user tries to wake up a machine that
-isn't in SUSPENDED state. The change isn't made inside
-qemu_system_wakeup_request because it is used in migration,
-ACPI and others where this usage might be valid. This patch
-by no means fixes the situation described above, but it can direct
-the user/management closer to the real problem.
+On Wed, Nov 29, 2017 at 05:44:21PM -0500, John Snow wrote:
+> VPC has some difficulty creating geometries of particular size.
+> However, we can indeed force it to use a literal one, so let's
+> do that for the sake of test 197, which is testing some specific
+> offsets.
+>=20
+> Signed-off-by: John Snow <jsnow@redhat.com>
+> ---
+>  tests/qemu-iotests/197           | 3 +++
+>  tests/qemu-iotests/common.filter | 3 ++-
+>  2 files changed, 5 insertions(+), 1 deletion(-)
+>=20
+> diff --git a/tests/qemu-iotests/197 b/tests/qemu-iotests/197
+> index 887eb4f496..e1292689c1 100755
+> --- a/tests/qemu-iotests/197
+> +++ b/tests/qemu-iotests/197
+> @@ -60,6 +60,9 @@ echo '=3D=3D=3D Copy-on-read =3D=3D=3D'
+>  echo
+> =20
+>  # Prep the images
+> +if [ "$IMGFMT" =3D "vpc" ]; then
+> +    IMGOPTS=3D$(_optstr_add "$IMGOPTS" "force_size")
+> +fi
 
-Signed-off-by: Daniel Henrique Barboza <danielhb@linux.vnet.ibm.com>
-CC: Markus Armbruster <armbru@redhat.com>
-CC: Dr. David Alan Gilbert <dgilbert@redhat.com>
----
- hmp.c | 4 +++-
- qmp.c | 5 +++++
- 2 files changed, 8 insertions(+), 1 deletion(-)
+It would be nice to include a comment in the code instead of the commit
+description so anyone reading knows why vpc is special-cased here.
 
-diff --git a/hmp.c b/hmp.c
-index 35a7041824..2c2326a00e 100644
---- a/hmp.c
-+++ b/hmp.c
-@@ -1158,7 +1158,9 @@ void hmp_cont(Monitor *mon, const QDict *qdict)
- 
- void hmp_system_wakeup(Monitor *mon, const QDict *qdict)
- {
--    qmp_system_wakeup(NULL);
-+    Error *err = NULL;
-+    qmp_system_wakeup(&err);
-+    hmp_handle_error(mon, &err);
- }
- 
- void hmp_nmi(Monitor *mon, const QDict *qdict)
-diff --git a/qmp.c b/qmp.c
-index e8c303116a..9b8f99f225 100644
---- a/qmp.c
-+++ b/qmp.c
-@@ -206,6 +206,11 @@ void qmp_cont(Error **errp)
- 
- void qmp_system_wakeup(Error **errp)
- {
-+    if (!runstate_check(RUN_STATE_SUSPENDED)) {
-+        error_setg(errp,
-+                   "Unable to wake up: guest is not in suspended state");
-+        return;
-+    }
-     qemu_system_wakeup_request(QEMU_WAKEUP_REASON_OTHER);
- }
- 
--- 
-2.13.6
+Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
+
+--veXX9dWIonWZEC6h
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEcBAEBAgAGBQJaISTCAAoJEJykq7OBq3PIVToH/ArUgOS43uVkUfJ6gSqB1JDN
+jVstFRIpEVrQtO7V5WofnNfVy/+btnj1kHwNNaJDHxuTATEFgBc/8HwIpWdrom8B
+R7KDzcVfhUm4Zn6RI7tYra0Zf0bP5G9aFco4/z0hjomVLzmHCSuJUp+7+1HpSwH6
+EBExJJkMEiu2cTpzQ/89s4UbRhUqGFMgXCOg/+HDt1OuV+kbDtuXkSXTq6mIu8R/
+CwabL5fCnj9NHnzaDoQyAqF8eAirk722qkZgERnxvRjP7IxgBQzko7Xd7aesnJG0
+cxakC/dx+kr7mBq9MEGzL/WbfqsaTSRRoJecFzp0lfzlLXV/EslULTCOKv0zmQc=
+=SVl1
+-----END PGP SIGNATURE-----
+
+--veXX9dWIonWZEC6h--
