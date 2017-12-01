@@ -1,21 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38302)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40098)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1eKnSG-0004Q4-Ko
-	for qemu-devel@nongnu.org; Fri, 01 Dec 2017 10:43:53 -0500
+	(envelope-from <stefanha@gmail.com>) id 1eKnTD-0005f4-Ch
+	for qemu-devel@nongnu.org; Fri, 01 Dec 2017 10:44:23 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1eKnRc-0000XU-1e
-	for qemu-devel@nongnu.org; Fri, 01 Dec 2017 10:42:20 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:38922)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1eKnRb-0000TV-1Z
-	for qemu-devel@nongnu.org; Fri, 01 Dec 2017 10:41:39 -0500
-From: Igor Mammedov <imammedo@redhat.com>
-Date: Fri,  1 Dec 2017 15:22:55 +0100
-Message-Id: <1512138175-185428-1-git-send-email-imammedo@redhat.com>
-In-Reply-To: <20171129185026.23632-1-dgilbert@redhat.com>
-References: <20171129185026.23632-1-dgilbert@redhat.com>
-Subject: [Qemu-devel] [RFC] vhost: check if ring mapping is still valid when
- building memmap
+	(envelope-from <stefanha@gmail.com>) id 1eKnSX-0001rp-5c
+	for qemu-devel@nongnu.org; Fri, 01 Dec 2017 10:43:19 -0500
+Date: Fri, 1 Dec 2017 10:13:21 +0000
+From: Stefan Hajnoczi <stefanha@gmail.com>
+Message-ID: <20171201101321.GG23501@stefanha-x1.localdomain>
+References: <20171129102513.9153-1-pbonzini@redhat.com>
+	<20171129102513.9153-2-pbonzini@redhat.com>
+	<20171129134408.GB4281@stefanha-x1.localdomain>
+	<20171129135528.GD3753@localhost.localdomain>
+MIME-Version: 1.0
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="Cp3Cp8fzgozWLBWL"
+Content-Disposition: inline
+In-Reply-To: <20171129135528.GD3753@localhost.localdomain>
+Subject: Re: [Qemu-devel] [Qemu-block] [PATCH 1/4] block: Expect graph
+ changes in bdrv_parent_drained_begin/end
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,381 +27,121 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: dgilbert@redhat.com, mst@redhat.com, groug@kaod.org, stefanha@gmail.com
+To: Kevin Wolf <kwolf@redhat.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org, famz@redhat.com, qemu-block@nongnu.org
 
-vhost_verify_ring_mappings() were used to verify that
-rings are still accessible and related memory hasn't
-been moved after flatview is updated.
 
-It were doing checks by mapping ring's GPA+len and
-checking that HVA hasn't changed with new memory map.
-To avoid maybe expensive mapping call, we were
-identifying address range that changed and were doing
-mapping only if ring were in changed range.
+--Cp3Cp8fzgozWLBWL
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-However it's no neccessary to perform ringi's GPA
-mapping as we already have it's current HVA and all
-we need is to verify that ring's GPA translates to
-the same HVA in updated flatview.
+On Wed, Nov 29, 2017 at 02:55:28PM +0100, Kevin Wolf wrote:
+> Am 29.11.2017 um 14:44 hat Stefan Hajnoczi geschrieben:
+> > On Wed, Nov 29, 2017 at 11:25:10AM +0100, Paolo Bonzini wrote:
+> > > From: Kevin Wolf <kwolf@redhat.com>
+> > >=20
+> > > The .drained_begin/end callbacks can (directly or indirectly via
+> > > aio_poll()) cause block nodes to be removed or the current BdrvChild =
+to
+> > > point to a different child node.
+> > >=20
+> > > Use QLIST_FOREACH_SAFE() to make sure we don't access invalid
+> > > BlockDriverStates or accidentally continue iterating the parents of t=
+he
+> > > new child node instead of the node we actually came from.
+> > >=20
+> > > Signed-off-by: Kevin Wolf <kwolf@redhat.com>
+> > > Tested-by: Jeff Cody <jcody@redhat.com>
+> > > Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
+> > > Reviewed-by: Jeff Cody <jcody@redhat.com>
+> > > ---
+> > >  block/io.c | 8 ++++----
+> > >  1 file changed, 4 insertions(+), 4 deletions(-)
+> > >=20
+> > > diff --git a/block/io.c b/block/io.c
+> > > index 4fdf93a014..6773926fc1 100644
+> > > --- a/block/io.c
+> > > +++ b/block/io.c
+> > > @@ -42,9 +42,9 @@ static int coroutine_fn bdrv_co_do_pwrite_zeroes(Bl=
+ockDriverState *bs,
+> > > =20
+> > >  void bdrv_parent_drained_begin(BlockDriverState *bs)
+> > >  {
+> > > -    BdrvChild *c;
+> > > +    BdrvChild *c, *next;
+> > > =20
+> > > -    QLIST_FOREACH(c, &bs->parents, next_parent) {
+> > > +    QLIST_FOREACH_SAFE(c, &bs->parents, next_parent, next) {
+> > >          if (c->role->drained_begin) {
+> > >              c->role->drained_begin(c);
+> > >          }
+> > > @@ -53,9 +53,9 @@ void bdrv_parent_drained_begin(BlockDriverState *bs)
+> > > =20
+> > >  void bdrv_parent_drained_end(BlockDriverState *bs)
+> > >  {
+> > > -    BdrvChild *c;
+> > > +    BdrvChild *c, *next;
+> > > =20
+> > > -    QLIST_FOREACH(c, &bs->parents, next_parent) {
+> > > +    QLIST_FOREACH_SAFE(c, &bs->parents, next_parent, next) {
+> > >          if (c->role->drained_end) {
+> > >              c->role->drained_end(c);
+> > >          }
+> >=20
+> > Hmm...not sure if this patch is enough.
+>=20
+> Depends on what you have in mind, but generally, no, it's certainly not
+> enough to fix all bad things that can happen during drain...
+>=20
+> > Thinking about this more, if this sub-graph changes then
+> > .drained_begin() callbacks are not necessarily paired with
+> > .drained_end() callbacks.
+> >=20
+> > In other words, all of the following are possible:
+> >=20
+> > 1. Only .drained_begin() is called
+> > 2. .drained_begin() is called, then .drained_end()
+> > 3. Only .drained_end() is called
+>=20
+> bdrv_replace_child_noperm() makes sure to call .drained_end() and
+> .drained_begin() depending on whether the old and new child node are
+> currently drained. So I think this might actually work.
+>=20
+> > It makes me wonder if we need to either:
+> >=20
+> > Take references and ensure .drained_end() gets called if and only if
+> > .drained_begin() was also called.
+> >=20
+> > OR
+> >=20
+> > Document that .drained_begin/end() calls may not be paired and audit
+> > existing code to check that this is safe.
+>=20
+> How would the latter even possibly work? If the .drained_end is missing,
+> the parent would never know that it can send new requests again. A
+> missing .drained_begin could be ignored in the .drained_end callback,
+> but it wouldn't be safe because the parent wouldn't actually stop to
+> send new requests.
 
-That could be done during time when we are building
-vhost memmap where vhost_update_mem_cb() already maps
-every RAM MemoryRegionSection to get section HVA. This
-fact can be used to check that ring belongs to the same
-MemoryRegion in the same place, like this:
+Yesterday I looked at a similar issue in Fam's new RFC that moves
+=2Edrained_begin()/.drained_end() to AioContext.  I came to the conclusion
+that while it's easy to implement unmatched begin/end calls (as we do
+today) it's not possible to get useful semantics out of them :).  So we
+have to ensure the the begin/end calls match.
 
-  hva_ring_offset = GPA(ring) - GPA(MemoryRegionSection)
-  ring_hva == HVA(MemoryRegionSection) + hva_ring_offset
+--Cp3Cp8fzgozWLBWL
+Content-Type: application/pgp-signature; name="signature.asc"
 
-Doing this would allow us to drop ~100LOC of code which
-figures out changed memory range and avoid calling not
-needed reverse vhost_memory_map(is_write=true) which is
-overkill for the task at hand.
+-----BEGIN PGP SIGNATURE-----
 
-Signed-off-by: Igor Mammedov <imammedo@redhat.com>
----
-PS:
-   should be applied on top of David's series
+iQEcBAEBAgAGBQJaIStBAAoJEJykq7OBq3PIhw8H/R89L442kPurz1WYtKlMDrCz
+M59AYrOZCrA/szDGPMSGoCFZnLRkqSEuYpbu1nijD9lZLPk139PAo9RLXuvhnz2v
+paPiDYPrD9VuAVavwylGQz5DnZXCE7bMECdpsscGc8g5Ssde/p3N6bXBKgp4T6EN
+mmyY+9HLtLTdwDqAY7PfV4UqsgnUwOOecZ08kzBGhzt6djPKfET0CNFn8XxY5isA
+FVPsPkSpOPbr7aYBTJRFLrpf+uHndKJ01QqRp/QL6dLLfGrnle9d0TaRL7WjnzqA
+1w0SPdlK01YfNKuRXTLzYmAWVTQ9D3rD84lcCOIXkeIvPi27z6LFBpsqbCcAEPw=
+=is/5
+-----END PGP SIGNATURE-----
 
----
- include/hw/virtio/vhost.h |   2 -
- hw/virtio/vhost.c         | 195 ++++++++++++++--------------------------------
- 2 files changed, 57 insertions(+), 140 deletions(-)
-
-diff --git a/include/hw/virtio/vhost.h b/include/hw/virtio/vhost.h
-index 467dc77..fc4af5c 100644
---- a/include/hw/virtio/vhost.h
-+++ b/include/hw/virtio/vhost.h
-@@ -68,8 +68,6 @@ struct vhost_dev {
-     uint64_t log_size;
-     Error *migration_blocker;
-     bool memory_changed;
--    hwaddr mem_changed_start_addr;
--    hwaddr mem_changed_end_addr;
-     const VhostOps *vhost_ops;
-     void *opaque;
-     struct vhost_log *log;
-diff --git a/hw/virtio/vhost.c b/hw/virtio/vhost.c
-index 5b9a7d7..026bac3 100644
---- a/hw/virtio/vhost.c
-+++ b/hw/virtio/vhost.c
-@@ -296,35 +296,43 @@ static void vhost_memory_unmap(struct vhost_dev *dev, void *buffer,
-     }
- }
- 
--static int vhost_verify_ring_part_mapping(struct vhost_dev *dev,
--                                          void *part,
--                                          uint64_t part_addr,
--                                          uint64_t part_size,
--                                          uint64_t start_addr,
--                                          uint64_t size)
-+static int vhost_verify_ring_part_mapping(void *ring_hva,
-+                                          uint64_t ring_gpa,
-+                                          uint64_t ring_size,
-+                                          void *reg_hva,
-+                                          uint64_t reg_gpa,
-+                                          uint64_t reg_size)
- {
--    hwaddr l;
--    void *p;
--    int r = 0;
-+    uint64_t hva_ring_offset;
-+    uint64_t ring_last = range_get_last(ring_gpa, ring_size);
-+    uint64_t reg_last = range_get_last(reg_gpa, reg_size);
- 
--    if (!ranges_overlap(start_addr, size, part_addr, part_size)) {
-+    /* start check from the end so that the rest of checks
-+     * are done when whole ring is in merged sections range
-+     */
-+    if (ring_last < reg_last || ring_gpa > reg_last) {
-         return 0;
-     }
--    l = part_size;
--    p = vhost_memory_map(dev, part_addr, &l, 1);
--    if (!p || l != part_size) {
--        r = -ENOMEM;
-+
-+    /* check that whole ring's is mapped */
-+    if (range_get_last(ring_gpa, ring_size) >
-+        range_get_last(reg_gpa, reg_size)) {
-+        return -EBUSY;
-     }
--    if (p != part) {
--        r = -EBUSY;
-+
-+    /* check that ring's MemoryRegion wasn't replaced */
-+    hva_ring_offset = ring_gpa - reg_gpa;
-+    if (ring_hva != reg_hva + hva_ring_offset) {
-+        return -ENOMEM;
-     }
--    vhost_memory_unmap(dev, p, l, 0, 0);
--    return r;
-+
-+    return 0;
- }
- 
- static int vhost_verify_ring_mappings(struct vhost_dev *dev,
--                                      uint64_t start_addr,
--                                      uint64_t size)
-+                                      void *reg_hva,
-+                                      uint64_t reg_gpa,
-+                                      uint64_t reg_size)
- {
-     int i, j;
-     int r = 0;
-@@ -338,23 +346,26 @@ static int vhost_verify_ring_mappings(struct vhost_dev *dev,
-         struct vhost_virtqueue *vq = dev->vqs + i;
- 
-         j = 0;
--        r = vhost_verify_ring_part_mapping(dev, vq->desc, vq->desc_phys,
--                                           vq->desc_size, start_addr, size);
--        if (!r) {
-+        r = vhost_verify_ring_part_mapping(
-+                vq->desc, vq->desc_phys, vq->desc_size,
-+                reg_hva, reg_gpa, reg_size);
-+        if (r) {
-             break;
-         }
- 
-         j++;
--        r = vhost_verify_ring_part_mapping(dev, vq->avail, vq->avail_phys,
--                                           vq->avail_size, start_addr, size);
--        if (!r) {
-+        r = vhost_verify_ring_part_mapping(
-+                vq->desc, vq->desc_phys, vq->desc_size,
-+                reg_hva, reg_gpa, reg_size);
-+        if (r) {
-             break;
-         }
- 
-         j++;
--        r = vhost_verify_ring_part_mapping(dev, vq->used, vq->used_phys,
--                                           vq->used_size, start_addr, size);
--        if (!r) {
-+        r = vhost_verify_ring_part_mapping(
-+                vq->desc, vq->desc_phys, vq->desc_size,
-+                reg_hva, reg_gpa, reg_size);
-+        if (r) {
-             break;
-         }
-     }
-@@ -384,24 +395,18 @@ static bool vhost_section(MemoryRegionSection *section)
-     return result;
- }
- 
--static void vhost_begin(MemoryListener *listener)
--{
--    struct vhost_dev *dev = container_of(listener, struct vhost_dev,
--                                         memory_listener);
--    dev->mem_changed_end_addr = 0;
--    dev->mem_changed_start_addr = -1;
--}
--
- struct vhost_update_mem_tmp {
-     struct vhost_dev   *dev;
-     uint32_t nregions;
-     struct vhost_memory_region *regions;
- };
- 
-+
- /* Called for each MRS from vhost_update_mem */
- static int vhost_update_mem_cb(MemoryRegionSection *mrs, void *opaque)
- {
-     struct vhost_update_mem_tmp *vtmp = opaque;
-+    struct vhost_dev   *dev = vtmp->dev;
-     struct vhost_memory_region *cur_vmr;
-     bool need_add = true;
-     uint64_t mrs_size;
-@@ -416,8 +421,7 @@ static int vhost_update_mem_cb(MemoryRegionSection *mrs, void *opaque)
-     mrs_host = (uintptr_t)memory_region_get_ram_ptr(mrs->mr) +
-                          mrs->offset_within_region;
- 
--    trace_vhost_update_mem_cb(mrs->mr->name, mrs_gpa, mrs_size,
--                              (uint64_t)mrs_host);
-+    trace_vhost_update_mem_cb(mrs->mr->name, mrs_gpa, mrs_size, mrs_host);
- 
-     if (vtmp->nregions) {
-         /* Since we already have at least one region, lets see if
-@@ -459,85 +463,19 @@ static int vhost_update_mem_cb(MemoryRegionSection *mrs, void *opaque)
-         cur_vmr->flags_padding = 0;
-     }
- 
--    return 0;
--}
--
--static bool vhost_update_compare_list(struct vhost_dev *dev,
--                                      struct vhost_update_mem_tmp *vtmp,
--                                      hwaddr *change_start, hwaddr *change_end)
--{
--    uint32_t oldi, newi;
--    *change_start = 0;
--    *change_end = 0;
--
--    for (newi = 0, oldi = 0; newi < vtmp->nregions; newi++) {
--        struct vhost_memory_region *newr = &vtmp->regions[newi];
--        hwaddr newr_last = range_get_last(newr->guest_phys_addr,
--                                          newr->memory_size);
--        trace_vhost_update_compare_list_loopn(newi, oldi,
--                                        newr->guest_phys_addr,
--                                        newr->memory_size);
--        bool whole_change = true;
--        while (oldi < dev->mem->nregions) {
--            struct vhost_memory_region *oldr = &dev->mem->regions[oldi];
--            hwaddr oldr_last = range_get_last(oldr->guest_phys_addr,
--                                          oldr->memory_size);
--            trace_vhost_update_compare_list_loopo(newi, oldi,
--                                        oldr->guest_phys_addr,
--                                        oldr->memory_size);
--            if (newr->guest_phys_addr == oldr->guest_phys_addr &&
--                newr->memory_size == oldr->memory_size) {
--                /* Match in GPA and size, but it could be different
--                 * in host address or flags
--                 */
--                whole_change = newr->userspace_addr != oldr->userspace_addr ||
--                               newr->flags_padding != oldr->flags_padding;
--                oldi++;
--                break; /* inner old loop */
--            }
--            /* There's a difference - need to figure out what */
--            if (oldr_last < newr->guest_phys_addr) {
--                /* There used to be a region before us that's gone */
--                *change_start = MIN(*change_start, oldr->guest_phys_addr);
--                *change_end = MAX(*change_end, oldr_last);
--                oldi++;
--                continue; /* inner old loop */
--            }
--            if (oldr->guest_phys_addr > newr_last) {
--                /* We've passed all the old mappings that could have overlapped
--                 * this one
--                 */
--                break; /* Inner old loop */
--            }
--            /* Overlap case */
--            *change_start = MIN(*change_start,
--                                MIN(oldr->guest_phys_addr,
--                                    newr->guest_phys_addr));
--            *change_end = MAX(*change_end,
--                                MAX(oldr_last, newr_last));
--            whole_change = false;
--            /* There might be more old mappings that overlap */
--            oldi++;
--        }
--        if (whole_change) {
--            /* No old region to compare against, this must be a change */
--            *change_start = MIN(*change_start, newr->guest_phys_addr);
--            *change_end = MAX(*change_end, newr_last);
--        }
-+    if (dev->started &&
-+        vhost_verify_ring_mappings(dev, (void *)mrs_host, mrs_gpa, mrs_size)) {
-+        abort();
-     }
- 
--    return *change_start || *change_end;
-+    return 0;
- }
- 
- static int vhost_update_mem(struct vhost_dev *dev)
- {
-     int res;
--    struct vhost_update_mem_tmp vtmp;
--    hwaddr change_start, change_end;
--    bool need_update;
--    vtmp.regions = 0;
--    vtmp.nregions = 0;
--    vtmp.dev = dev;
-+    size_t mem_size;
-+    struct vhost_update_mem_tmp vtmp = {.dev = dev};
- 
-     res = address_space_iterate(&address_space_memory,
-                                 vhost_update_mem_cb, &vtmp);
-@@ -545,24 +483,17 @@ static int vhost_update_mem(struct vhost_dev *dev)
-         goto out;
-     }
- 
--    need_update = vhost_update_compare_list(dev, &vtmp,
--                                            &change_start, &change_end);
--    trace_vhost_update_mem_comparison(need_update,
--                                      (uint64_t)change_start,
--                                      (uint64_t)change_end);
--    if (need_update) {
--        /* Update the main regions list from our tmp */
--        size_t mem_size = offsetof(struct vhost_memory, regions) +
--            (vtmp.nregions + 1) * sizeof dev->mem->regions[0];
-+    mem_size = offsetof(struct vhost_memory, regions) +
-+               (vtmp.nregions + 1) * sizeof dev->mem->regions[0];
- 
-+    if(vtmp.nregions != dev->mem->nregions ||
-+       memcmp(vtmp.regions, dev->mem->regions, mem_size)) {
-+        /* Update the main regions list from our tmp */
-         dev->mem = g_realloc(dev->mem, mem_size);
-         dev->mem->nregions = vtmp.nregions;
-         memcpy(dev->mem->regions, vtmp.regions,
-                vtmp.nregions * sizeof dev->mem->regions[0]);
-         used_memslots = vtmp.nregions;
--
--        dev->mem_changed_start_addr = change_start;
--        dev->mem_changed_end_addr = change_end;
-     }
- 
- out:
-@@ -574,8 +505,6 @@ static void vhost_commit(MemoryListener *listener)
- {
-     struct vhost_dev *dev = container_of(listener, struct vhost_dev,
-                                          memory_listener);
--    hwaddr start_addr = 0;
--    ram_addr_t size = 0;
-     uint64_t log_size;
-     int r;
- 
-@@ -585,22 +514,11 @@ static void vhost_commit(MemoryListener *listener)
-     if (!dev->started) {
-         return;
-     }
--    if (dev->mem_changed_start_addr > dev->mem_changed_end_addr) {
--        return;
--    }
- 
-     if (vhost_update_mem(dev)) {
-         return;
-     }
- 
--    if (dev->started) {
--        start_addr = dev->mem_changed_start_addr;
--        size = dev->mem_changed_end_addr - dev->mem_changed_start_addr + 1;
--
--        r = vhost_verify_ring_mappings(dev, start_addr, size);
--        assert(r >= 0);
--    }
--
-     if (!dev->log_enabled) {
-         r = dev->vhost_ops->vhost_set_mem_table(dev, dev->mem);
-         if (r < 0) {
-@@ -1235,7 +1153,6 @@ int vhost_dev_init(struct vhost_dev *hdev, void *opaque,
-     hdev->features = features;
- 
-     hdev->memory_listener = (MemoryListener) {
--        .begin = vhost_begin,
-         .commit = vhost_commit,
-         .region_add = vhost_region_add,
-         .region_del = vhost_region_del,
-@@ -1458,7 +1375,6 @@ int vhost_dev_start(struct vhost_dev *hdev, VirtIODevice *vdev)
-     /* should only be called after backend is connected */
-     assert(hdev->vhost_ops);
- 
--    hdev->started = true;
-     hdev->vdev = vdev;
- 
-     r = vhost_dev_set_features(hdev, hdev->log_enabled);
-@@ -1469,6 +1385,9 @@ int vhost_dev_start(struct vhost_dev *hdev, VirtIODevice *vdev)
-     if (vhost_update_mem(hdev)) {
-         goto fail_mem;
-     }
-+
-+    hdev->started = true;
-+
-     if (vhost_dev_has_iommu(hdev)) {
-         memory_listener_register(&hdev->iommu_listener, vdev->dma_as);
-     }
--- 
-2.7.4
+--Cp3Cp8fzgozWLBWL--
