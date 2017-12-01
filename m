@@ -1,26 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57703)
+Received: from eggs.gnu.org ([208.118.235.92]:53418)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <yi.l.liu@linux.intel.com>) id 1eKnyJ-0001eZ-Or
-	for qemu-devel@nongnu.org; Fri, 01 Dec 2017 11:17:01 -0500
+	(envelope-from <arei.gonglei@huawei.com>) id 1eKo0T-0003h8-UE
+	for qemu-devel@nongnu.org; Fri, 01 Dec 2017 11:19:09 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <yi.l.liu@linux.intel.com>) id 1eKnxH-0004hw-Au
-	for qemu-devel@nongnu.org; Fri, 01 Dec 2017 11:15:26 -0500
-Received: from mga02.intel.com ([134.134.136.20]:50565)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <yi.l.liu@linux.intel.com>)
-	id 1eKnxG-0004du-FJ
-	for qemu-devel@nongnu.org; Fri, 01 Dec 2017 11:14:23 -0500
-Date: Fri, 1 Dec 2017 19:29:52 +0800
-From: "Liu, Yi L" <yi.l.liu@linux.intel.com>
-Message-ID: <20171201112952.GC31366@sky-dev>
-References: <20171114231350.286025-1-prasad.singamsetty@oracle.com>
-	<20171114231350.286025-3-prasad.singamsetty@oracle.com>
+	(envelope-from <arei.gonglei@huawei.com>) id 1eKnyq-0007GV-3E
+	for qemu-devel@nongnu.org; Fri, 01 Dec 2017 11:17:41 -0500
+Received: from szxga01-in.huawei.com ([45.249.212.187]:4520)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_ARCFOUR_SHA1:16) (Exim 4.71)
+	(envelope-from <arei.gonglei@huawei.com>) id 1eKnyn-00079i-UO
+	for qemu-devel@nongnu.org; Fri, 01 Dec 2017 11:15:59 -0500
+From: "Gonglei (Arei)" <arei.gonglei@huawei.com>
+Date: Fri, 1 Dec 2017 07:08:21 +0000
+Message-ID: <33183CC9F5247A488A2544077AF19020DA4ADB8C@DGGEMA505-MBS.china.huawei.com>
+References: <D1BD20B5DB34024DA951CEEE6C4C5998B1B8CC82@DGGEMA501-MBX.china.huawei.com>
+In-Reply-To: <D1BD20B5DB34024DA951CEEE6C4C5998B1B8CC82@DGGEMA501-MBX.china.huawei.com>
+Content-Language: zh-CN
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20171114231350.286025-3-prasad.singamsetty@oracle.com>
-Subject: Re: [Qemu-devel] [PATCH v1 2/2] intel-iommu: Extend address width
- to 48 bits
+Content-Type: text/plain; charset="gb2312"
+Content-Transfer-Encoding: base64
+Subject: Re: [Qemu-devel] [BUG] Windows 7 got stuck easily while run
+ PCMark10 application
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,444 +28,106 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: prasad.singamsetty@oracle.com
-Cc: qemu-devel@nongnu.org, pbonzini@redhat.com, rth@twiddle.net, ehabkost@redhat.com, mst@redhat.com, imammedo@redhat.com, peterx@redhat.com, konrad.wilk@oracle.com
+To: Zhanghailiang <zhang.zhanghailiang@huawei.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "mst@redhat.com" <mst@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
+Cc: "Huangweidong (C)" <weidong.huang@huawei.com>, "wangxin (U)" <wangxinxin.wang@huawei.com>, Xiexiangyou <xiexiangyou@huawei.com>
 
-On Tue, Nov 14, 2017 at 06:13:50PM -0500, prasad.singamsetty@oracle.com wrote:
-> From: Prasad Singamsetty <prasad.singamsetty@oracle.com>
-> 
-> The current implementation of Intel IOMMU code only supports 39 bits
-> iova address width. This patch provides a new parameter (x-aw-bits)
-> for intel-iommu to extend its address width to 48 bits but keeping the
-> default the same (39 bits). The reason for not changing the default
-> is to avoid potential compatibility problems with live migration of
-> intel-iommu enabled QEMU guest. The only valid values for 'x-aw-bits'
-> parameter are 39 and 48.
-> 
-> After enabling larger address width (48), we should be able to map
-> larger iova addresses in the guest. For example, a QEMU guest that
-> is configured with large memory ( >=1TB ). To check whether 48 bits
-> aw is enabled, we can grep in the guest dmesg output with line:
-> "DMAR: Host address width 48".
-> 
-> Signed-off-by: Prasad Singamsetty <prasad.singamsety@oracle.com>
-
-Prasad,
-
-Have you tested the scenario with physical device assigned to a guest?
-
-Regards,
-Yi L
-> ---
->  hw/i386/acpi-build.c           |   3 +-
->  hw/i386/intel_iommu.c          | 101 ++++++++++++++++++++++++-----------------
->  hw/i386/intel_iommu_internal.h |   9 ++--
->  include/hw/i386/intel_iommu.h  |   1 +
->  4 files changed, 65 insertions(+), 49 deletions(-)
-> 
-> diff --git a/hw/i386/acpi-build.c b/hw/i386/acpi-build.c
-> index 73519ab3ac..537957c89a 100644
-> --- a/hw/i386/acpi-build.c
-> +++ b/hw/i386/acpi-build.c
-> @@ -2460,6 +2460,7 @@ build_dmar_q35(GArray *table_data, BIOSLinker *linker)
->      AcpiDmarDeviceScope *scope = NULL;
->      /* Root complex IOAPIC use one path[0] only */
->      size_t ioapic_scope_size = sizeof(*scope) + sizeof(scope->path[0]);
-> +    IntelIOMMUState *intel_iommu = INTEL_IOMMU_DEVICE(iommu);
->  
->      assert(iommu);
->      if (iommu->intr_supported) {
-> @@ -2467,7 +2468,7 @@ build_dmar_q35(GArray *table_data, BIOSLinker *linker)
->      }
->  
->      dmar = acpi_data_push(table_data, sizeof(*dmar));
-> -    dmar->host_address_width = VTD_HOST_ADDRESS_WIDTH - 1;
-> +    dmar->host_address_width = intel_iommu->aw_bits - 1;
->      dmar->flags = dmar_flags;
->  
->      /* DMAR Remapping Hardware Unit Definition structure */
-> diff --git a/hw/i386/intel_iommu.c b/hw/i386/intel_iommu.c
-> index 53b3bf244d..c2380fdfdc 100644
-> --- a/hw/i386/intel_iommu.c
-> +++ b/hw/i386/intel_iommu.c
-> @@ -521,9 +521,9 @@ static inline dma_addr_t vtd_ce_get_slpt_base(VTDContextEntry *ce)
->      return ce->lo & VTD_CONTEXT_ENTRY_SLPTPTR;
->  }
->  
-> -static inline uint64_t vtd_get_slpte_addr(uint64_t slpte)
-> +static inline uint64_t vtd_get_slpte_addr(uint64_t slpte, uint8_t aw)
->  {
-> -    return slpte & VTD_SL_PT_BASE_ADDR_MASK(VTD_HOST_ADDRESS_WIDTH);
-> +    return slpte & VTD_SL_PT_BASE_ADDR_MASK(aw);
->  }
->  
->  /* Whether the pte indicates the address of the page frame */
-> @@ -608,20 +608,21 @@ static inline bool vtd_ce_type_check(X86IOMMUState *x86_iommu,
->      return true;
->  }
->  
-> -static inline uint64_t vtd_iova_limit(VTDContextEntry *ce)
-> +static inline uint64_t vtd_iova_limit(VTDContextEntry *ce, uint8_t aw)
->  {
->      uint32_t ce_agaw = vtd_ce_get_agaw(ce);
-> -    return 1ULL << MIN(ce_agaw, VTD_MGAW);
-> +    return 1ULL << MIN(ce_agaw, aw);
->  }
->  
->  /* Return true if IOVA passes range check, otherwise false. */
-> -static inline bool vtd_iova_range_check(uint64_t iova, VTDContextEntry *ce)
-> +static inline bool vtd_iova_range_check(uint64_t iova, VTDContextEntry *ce,
-> +                                        uint8_t aw)
->  {
->      /*
->       * Check if @iova is above 2^X-1, where X is the minimum of MGAW
->       * in CAP_REG and AW in context-entry.
->       */
-> -    return !(iova & ~(vtd_iova_limit(ce) - 1));
-> +    return !(iova & ~(vtd_iova_limit(ce, aw) - 1));
->  }
->  
->  /*
-> @@ -669,7 +670,7 @@ static VTDBus *vtd_find_as_from_bus_num(IntelIOMMUState *s, uint8_t bus_num)
->   */
->  static int vtd_iova_to_slpte(VTDContextEntry *ce, uint64_t iova, bool is_write,
->                               uint64_t *slptep, uint32_t *slpte_level,
-> -                             bool *reads, bool *writes)
-> +                             bool *reads, bool *writes, uint8_t aw_bits)
->  {
->      dma_addr_t addr = vtd_ce_get_slpt_base(ce);
->      uint32_t level = vtd_ce_get_level(ce);
-> @@ -677,7 +678,7 @@ static int vtd_iova_to_slpte(VTDContextEntry *ce, uint64_t iova, bool is_write,
->      uint64_t slpte;
->      uint64_t access_right_check;
->  
-> -    if (!vtd_iova_range_check(iova, ce)) {
-> +    if (!vtd_iova_range_check(iova, ce, aw_bits)) {
->          trace_vtd_err_dmar_iova_overflow(iova);
->          return -VTD_FR_ADDR_BEYOND_MGAW;
->      }
-> @@ -714,7 +715,7 @@ static int vtd_iova_to_slpte(VTDContextEntry *ce, uint64_t iova, bool is_write,
->              *slpte_level = level;
->              return 0;
->          }
-> -        addr = vtd_get_slpte_addr(slpte);
-> +        addr = vtd_get_slpte_addr(slpte, aw_bits);
->          level--;
->      }
->  }
-> @@ -732,11 +733,12 @@ typedef int (*vtd_page_walk_hook)(IOMMUTLBEntry *entry, void *private);
->   * @read: whether parent level has read permission
->   * @write: whether parent level has write permission
->   * @notify_unmap: whether we should notify invalid entries
-> + * @aw: maximum address width
->   */
->  static int vtd_page_walk_level(dma_addr_t addr, uint64_t start,
->                                 uint64_t end, vtd_page_walk_hook hook_fn,
-> -                               void *private, uint32_t level,
-> -                               bool read, bool write, bool notify_unmap)
-> +                               void *private, uint32_t level, bool read,
-> +                               bool write, bool notify_unmap, uint8_t aw)
->  {
->      bool read_cur, write_cur, entry_valid;
->      uint32_t offset;
-> @@ -783,7 +785,7 @@ static int vtd_page_walk_level(dma_addr_t addr, uint64_t start,
->              entry.target_as = &address_space_memory;
->              entry.iova = iova & subpage_mask;
->              /* NOTE: this is only meaningful if entry_valid == true */
-> -            entry.translated_addr = vtd_get_slpte_addr(slpte);
-> +            entry.translated_addr = vtd_get_slpte_addr(slpte, aw);
->              entry.addr_mask = ~subpage_mask;
->              entry.perm = IOMMU_ACCESS_FLAG(read_cur, write_cur);
->              if (!entry_valid && !notify_unmap) {
-> @@ -803,10 +805,10 @@ static int vtd_page_walk_level(dma_addr_t addr, uint64_t start,
->                  trace_vtd_page_walk_skip_perm(iova, iova_next);
->                  goto next;
->              }
-> -            ret = vtd_page_walk_level(vtd_get_slpte_addr(slpte), iova,
-> +            ret = vtd_page_walk_level(vtd_get_slpte_addr(slpte, aw), iova,
->                                        MIN(iova_next, end), hook_fn, private,
->                                        level - 1, read_cur, write_cur,
-> -                                      notify_unmap);
-> +                                      notify_unmap, aw);
->              if (ret < 0) {
->                  return ret;
->              }
-> @@ -827,25 +829,26 @@ next:
->   * @end: IOVA range end address (start <= addr < end)
->   * @hook_fn: the hook that to be called for each detected area
->   * @private: private data for the hook function
-> + * @aw: maximum address width
->   */
->  static int vtd_page_walk(VTDContextEntry *ce, uint64_t start, uint64_t end,
->                           vtd_page_walk_hook hook_fn, void *private,
-> -                         bool notify_unmap)
-> +                         bool notify_unmap, uint8_t aw)
->  {
->      dma_addr_t addr = vtd_ce_get_slpt_base(ce);
->      uint32_t level = vtd_ce_get_level(ce);
->  
-> -    if (!vtd_iova_range_check(start, ce)) {
-> +    if (!vtd_iova_range_check(start, ce, aw)) {
->          return -VTD_FR_ADDR_BEYOND_MGAW;
->      }
->  
-> -    if (!vtd_iova_range_check(end, ce)) {
-> +    if (!vtd_iova_range_check(end, ce, aw)) {
->          /* Fix end so that it reaches the maximum */
-> -        end = vtd_iova_limit(ce);
-> +        end = vtd_iova_limit(ce, aw);
->      }
->  
->      return vtd_page_walk_level(addr, start, end, hook_fn, private,
-> -                               level, true, true, notify_unmap);
-> +                               level, true, true, notify_unmap, aw);
->  }
->  
->  /* Map a device to its corresponding domain (context-entry) */
-> @@ -867,7 +870,7 @@ static int vtd_dev_to_context_entry(IntelIOMMUState *s, uint8_t bus_num,
->          return -VTD_FR_ROOT_ENTRY_P;
->      }
->  
-> -    if (re.rsvd || (re.val & VTD_ROOT_ENTRY_RSVD(VTD_HOST_ADDRESS_WIDTH))) {
-> +    if (re.rsvd || (re.val & VTD_ROOT_ENTRY_RSVD(s->aw_bits))) {
->          trace_vtd_re_invalid(re.rsvd, re.val);
->          return -VTD_FR_ROOT_ENTRY_RSVD;
->      }
-> @@ -884,7 +887,7 @@ static int vtd_dev_to_context_entry(IntelIOMMUState *s, uint8_t bus_num,
->      }
->  
->      if ((ce->hi & VTD_CONTEXT_ENTRY_RSVD_HI) ||
-> -               (ce->lo & VTD_CONTEXT_ENTRY_RSVD_LO(VTD_HOST_ADDRESS_WIDTH))) {
-> +               (ce->lo & VTD_CONTEXT_ENTRY_RSVD_LO(s->aw_bits))) {
->          trace_vtd_ce_invalid(ce->hi, ce->lo);
->          return -VTD_FR_CONTEXT_ENTRY_RSVD;
->      }
-> @@ -1166,7 +1169,7 @@ static bool vtd_do_iommu_translate(VTDAddressSpace *vtd_as, PCIBus *bus,
->      }
->  
->      ret_fr = vtd_iova_to_slpte(&ce, addr, is_write, &slpte, &level,
-> -                               &reads, &writes);
-> +                               &reads, &writes, s->aw_bits);
->      if (ret_fr) {
->          ret_fr = -ret_fr;
->          if (is_fpd_set && vtd_is_qualified_fault(ret_fr)) {
-> @@ -1183,7 +1186,7 @@ static bool vtd_do_iommu_translate(VTDAddressSpace *vtd_as, PCIBus *bus,
->                       access_flags, level);
->  out:
->      entry->iova = addr & page_mask;
-> -    entry->translated_addr = vtd_get_slpte_addr(slpte) & page_mask;
-> +    entry->translated_addr = vtd_get_slpte_addr(slpte, s->aw_bits) & page_mask;
->      entry->addr_mask = ~page_mask;
->      entry->perm = access_flags;
->      return true;
-> @@ -1200,7 +1203,7 @@ static void vtd_root_table_setup(IntelIOMMUState *s)
->  {
->      s->root = vtd_get_quad_raw(s, DMAR_RTADDR_REG);
->      s->root_extended = s->root & VTD_RTADDR_RTT;
-> -    s->root &= VTD_RTADDR_ADDR_MASK(VTD_HOST_ADDRESS_WIDTH);
-> +    s->root &= VTD_RTADDR_ADDR_MASK(s->aw_bits);
->  
->      trace_vtd_reg_dmar_root(s->root, s->root_extended);
->  }
-> @@ -1216,7 +1219,7 @@ static void vtd_interrupt_remap_table_setup(IntelIOMMUState *s)
->      uint64_t value = 0;
->      value = vtd_get_quad_raw(s, DMAR_IRTA_REG);
->      s->intr_size = 1UL << ((value & VTD_IRTA_SIZE_MASK) + 1);
-> -    s->intr_root = value & VTD_IRTA_ADDR_MASK(VTD_HOST_ADDRESS_WIDTH);
-> +    s->intr_root = value & VTD_IRTA_ADDR_MASK(s->aw_bits);
->      s->intr_eime = value & VTD_IRTA_EIME;
->  
->      /* Notify global invalidation */
-> @@ -1392,7 +1395,7 @@ static void vtd_iotlb_page_invalidate_notify(IntelIOMMUState *s,
->          if (!ret && domain_id == VTD_CONTEXT_ENTRY_DID(ce.hi)) {
->              vtd_page_walk(&ce, addr, addr + (1 << am) * VTD_PAGE_SIZE,
->                            vtd_page_invalidate_notify_hook,
-> -                          (void *)&vtd_as->iommu, true);
-> +                          (void *)&vtd_as->iommu, true, s->aw_bits);
->          }
->      }
->  }
-> @@ -1472,7 +1475,7 @@ static void vtd_handle_gcmd_qie(IntelIOMMUState *s, bool en)
->      trace_vtd_inv_qi_enable(en);
->  
->      if (en) {
-> -        s->iq = iqa_val & VTD_IQA_IQA_MASK(VTD_HOST_ADDRESS_WIDTH);
-> +        s->iq = iqa_val & VTD_IQA_IQA_MASK(s->aw_bits);
->          /* 2^(x+8) entries */
->          s->iq_size = 1UL << ((iqa_val & VTD_IQA_QS) + 8);
->          s->qi_enabled = true;
-> @@ -2403,6 +2406,8 @@ static Property vtd_properties[] = {
->      DEFINE_PROP_ON_OFF_AUTO("eim", IntelIOMMUState, intr_eim,
->                              ON_OFF_AUTO_AUTO),
->      DEFINE_PROP_BOOL("x-buggy-eim", IntelIOMMUState, buggy_eim, false),
-> +    DEFINE_PROP_UINT8("x-aw-bits", IntelIOMMUState, aw_bits,
-> +                      VTD_HOST_ADDRESS_WIDTH),
->      DEFINE_PROP_BOOL("caching-mode", IntelIOMMUState, caching_mode, FALSE),
->      DEFINE_PROP_END_OF_LIST(),
->  };
-> @@ -2758,6 +2763,7 @@ static void vtd_address_space_unmap(VTDAddressSpace *as, IOMMUNotifier *n)
->      hwaddr size;
->      hwaddr start = n->start;
->      hwaddr end = n->end;
-> +    IntelIOMMUState *s = as->iommu_state;
->  
->      /*
->       * Note: all the codes in this function has a assumption that IOVA
-> @@ -2765,12 +2771,12 @@ static void vtd_address_space_unmap(VTDAddressSpace *as, IOMMUNotifier *n)
->       * VT-d spec), otherwise we need to consider overflow of 64 bits.
->       */
->  
-> -    if (end > VTD_ADDRESS_SIZE(VTD_HOST_ADDRESS_WIDTH)) {
-> +    if (end > VTD_ADDRESS_SIZE(s->aw_bits)) {
->          /*
->           * Don't need to unmap regions that is bigger than the whole
->           * VT-d supported address space size
->           */
-> -        end = VTD_ADDRESS_SIZE(VTD_HOST_ADDRESS_WIDTH);
-> +        end = VTD_ADDRESS_SIZE(s->aw_bits);
->      }
->  
->      assert(start <= end);
-> @@ -2782,9 +2788,9 @@ static void vtd_address_space_unmap(VTDAddressSpace *as, IOMMUNotifier *n)
->           * suite the minimum available mask.
->           */
->          int n = 64 - clz64(size);
-> -        if (n > VTD_MGAW) {
-> +        if (n > s->aw_bits) {
->              /* should not happen, but in case it happens, limit it */
-> -            n = VTD_MGAW;
-> +            n = s->aw_bits;
->          }
->          size = 1ULL << n;
->      }
-> @@ -2844,7 +2850,8 @@ static void vtd_iommu_replay(IOMMUMemoryRegion *iommu_mr, IOMMUNotifier *n)
->                                    PCI_FUNC(vtd_as->devfn),
->                                    VTD_CONTEXT_ENTRY_DID(ce.hi),
->                                    ce.hi, ce.lo);
-> -        vtd_page_walk(&ce, 0, ~0ULL, vtd_replay_hook, (void *)n, false);
-> +        vtd_page_walk(&ce, 0, ~0ULL, vtd_replay_hook, (void *)n, false,
-> +                      s->aw_bits);
->      } else {
->          trace_vtd_replay_ce_invalid(bus_n, PCI_SLOT(vtd_as->devfn),
->                                      PCI_FUNC(vtd_as->devfn));
-> @@ -2859,7 +2866,6 @@ static void vtd_iommu_replay(IOMMUMemoryRegion *iommu_mr, IOMMUNotifier *n)
->  static void vtd_init(IntelIOMMUState *s)
->  {
->      X86IOMMUState *x86_iommu = X86_IOMMU_DEVICE(s);
-> -    uint8_t aw_bits = VTD_HOST_ADDRESS_WIDTH;
->  
->      memset(s->csr, 0, DMAR_REG_SIZE);
->      memset(s->wmask, 0, DMAR_REG_SIZE);
-> @@ -2878,21 +2884,24 @@ static void vtd_init(IntelIOMMUState *s)
->      s->next_frcd_reg = 0;
->      s->cap = VTD_CAP_FRO | VTD_CAP_NFR | VTD_CAP_ND |
->               VTD_CAP_MAMV | VTD_CAP_PSI | VTD_CAP_SLLPS |
-> -             VTD_CAP_SAGAW_39bit | VTD_CAP_MGAW(VTD_HOST_ADDRESS_WIDTH);
-> +             VTD_CAP_SAGAW_39bit | VTD_CAP_MGAW(s->aw_bits);
-> +    if (s->aw_bits == VTD_HOST_AW_48BIT) {
-> +        s->cap |= VTD_CAP_SAGAW_48bit;
-> +    }
->      s->ecap = VTD_ECAP_QI | VTD_ECAP_IRO;
->  
->      /*
->       * Rsvd field masks for spte
->       */
->      vtd_paging_entry_rsvd_field[0] = ~0ULL;
-> -    vtd_paging_entry_rsvd_field[1] = VTD_SPTE_PAGE_L1_RSVD_MASK(aw_bits);
-> -    vtd_paging_entry_rsvd_field[2] = VTD_SPTE_PAGE_L2_RSVD_MASK(aw_bits);
-> -    vtd_paging_entry_rsvd_field[3] = VTD_SPTE_PAGE_L3_RSVD_MASK(aw_bits);
-> -    vtd_paging_entry_rsvd_field[4] = VTD_SPTE_PAGE_L4_RSVD_MASK(aw_bits);
-> -    vtd_paging_entry_rsvd_field[5] = VTD_SPTE_LPAGE_L1_RSVD_MASK(aw_bits);
-> -    vtd_paging_entry_rsvd_field[6] = VTD_SPTE_LPAGE_L2_RSVD_MASK(aw_bits);
-> -    vtd_paging_entry_rsvd_field[7] = VTD_SPTE_LPAGE_L3_RSVD_MASK(aw_bits);
-> -    vtd_paging_entry_rsvd_field[8] = VTD_SPTE_LPAGE_L4_RSVD_MASK(aw_bits);
-> +    vtd_paging_entry_rsvd_field[1] = VTD_SPTE_PAGE_L1_RSVD_MASK(s->aw_bits);
-> +    vtd_paging_entry_rsvd_field[2] = VTD_SPTE_PAGE_L2_RSVD_MASK(s->aw_bits);
-> +    vtd_paging_entry_rsvd_field[3] = VTD_SPTE_PAGE_L3_RSVD_MASK(s->aw_bits);
-> +    vtd_paging_entry_rsvd_field[4] = VTD_SPTE_PAGE_L4_RSVD_MASK(s->aw_bits);
-> +    vtd_paging_entry_rsvd_field[5] = VTD_SPTE_LPAGE_L1_RSVD_MASK(s->aw_bits);
-> +    vtd_paging_entry_rsvd_field[6] = VTD_SPTE_LPAGE_L2_RSVD_MASK(s->aw_bits);
-> +    vtd_paging_entry_rsvd_field[7] = VTD_SPTE_LPAGE_L3_RSVD_MASK(s->aw_bits);
-> +    vtd_paging_entry_rsvd_field[8] = VTD_SPTE_LPAGE_L4_RSVD_MASK(s->aw_bits);
->  
->      if (x86_iommu->intr_supported) {
->          s->ecap |= VTD_ECAP_IR | VTD_ECAP_MHMV;
-> @@ -3029,6 +3038,14 @@ static bool vtd_decide_config(IntelIOMMUState *s, Error **errp)
->          }
->      }
->  
-> +    /* Currently only address widths supported are 39 and 48 bits */
-> +    if ((s->aw_bits != VTD_HOST_AW_39BIT) &&
-> +        (s->aw_bits != VTD_HOST_AW_48BIT)) {
-> +        error_setg(errp, "Supported values for x-aw-bits are: %d, %d",
-> +                   VTD_HOST_AW_39BIT, VTD_HOST_AW_48BIT);
-> +        return false;
-> +    }
-> +
->      return true;
->  }
->  
-> diff --git a/hw/i386/intel_iommu_internal.h b/hw/i386/intel_iommu_internal.h
-> index 77e4a9833a..d084099ed9 100644
-> --- a/hw/i386/intel_iommu_internal.h
-> +++ b/hw/i386/intel_iommu_internal.h
-> @@ -131,7 +131,7 @@
->  #define VTD_TLB_DID(val)            (((val) >> 32) & VTD_DOMAIN_ID_MASK)
->  
->  /* IVA_REG */
-> -#define VTD_IVA_ADDR(val)       ((val) & ~0xfffULL & ((1ULL << VTD_MGAW) - 1))
-> +#define VTD_IVA_ADDR(val)       ((val) & ~0xfffULL)
->  #define VTD_IVA_AM(val)         ((val) & 0x3fULL)
->  
->  /* GCMD_REG */
-> @@ -197,7 +197,6 @@
->  #define VTD_DOMAIN_ID_SHIFT         16  /* 16-bit domain id for 64K domains */
->  #define VTD_DOMAIN_ID_MASK          ((1UL << VTD_DOMAIN_ID_SHIFT) - 1)
->  #define VTD_CAP_ND                  (((VTD_DOMAIN_ID_SHIFT - 4) / 2) & 7ULL)
-> -#define VTD_MGAW                    39  /* Maximum Guest Address Width */
->  #define VTD_ADDRESS_SIZE(aw)        (1ULL << (aw))
->  #define VTD_CAP_MGAW(aw)            ((((aw) - 1) & 0x3fULL) << 16)
->  #define VTD_MAMV                    18ULL
-> @@ -213,7 +212,6 @@
->  #define VTD_CAP_SAGAW_39bit         (0x2ULL << VTD_CAP_SAGAW_SHIFT)
->   /* 48-bit AGAW, 4-level page-table */
->  #define VTD_CAP_SAGAW_48bit         (0x4ULL << VTD_CAP_SAGAW_SHIFT)
-> -#define VTD_CAP_SAGAW               VTD_CAP_SAGAW_39bit
->  
->  /* IQT_REG */
->  #define VTD_IQT_QT(val)             (((val) >> 4) & 0x7fffULL)
-> @@ -252,7 +250,7 @@
->  #define VTD_FRCD_SID_MASK       0xffffULL
->  #define VTD_FRCD_SID(val)       ((val) & VTD_FRCD_SID_MASK)
->  /* For the low 64-bit of 128-bit */
-> -#define VTD_FRCD_FI(val)        ((val) & (((1ULL << VTD_MGAW) - 1) ^ 0xfffULL))
-> +#define VTD_FRCD_FI(val)        ((val) & ~0xfffULL)
->  
->  /* DMA Remapping Fault Conditions */
->  typedef enum VTDFaultReason {
-> @@ -360,8 +358,7 @@ typedef union VTDInvDesc VTDInvDesc;
->  #define VTD_INV_DESC_IOTLB_DOMAIN       (2ULL << 4)
->  #define VTD_INV_DESC_IOTLB_PAGE         (3ULL << 4)
->  #define VTD_INV_DESC_IOTLB_DID(val)     (((val) >> 16) & VTD_DOMAIN_ID_MASK)
-> -#define VTD_INV_DESC_IOTLB_ADDR(val)    ((val) & ~0xfffULL & \
-> -                                         ((1ULL << VTD_MGAW) - 1))
-> +#define VTD_INV_DESC_IOTLB_ADDR(val)    ((val) & ~0xfffULL)
->  #define VTD_INV_DESC_IOTLB_AM(val)      ((val) & 0x3fULL)
->  #define VTD_INV_DESC_IOTLB_RSVD_LO      0xffffffff0000ff00ULL
->  #define VTD_INV_DESC_IOTLB_RSVD_HI      0xf80ULL
-> diff --git a/include/hw/i386/intel_iommu.h b/include/hw/i386/intel_iommu.h
-> index 372b06df45..45ec8919b6 100644
-> --- a/include/hw/i386/intel_iommu.h
-> +++ b/include/hw/i386/intel_iommu.h
-> @@ -304,6 +304,7 @@ struct IntelIOMMUState {
->      bool intr_eime;                 /* Extended interrupt mode enabled */
->      OnOffAuto intr_eim;             /* Toggle for EIM cabability */
->      bool buggy_eim;                 /* Force buggy EIM unless eim=off */
-> +    uint8_t aw_bits;                /* Host/IOVA address width (in bits) */
->  };
->  
->  /* Find the VTD Address space associated with the given bus pointer,
-> -- 
-> 2.14.0-rc1
-> 
-> 
+UGxzIHNlZSB0aGUgdHJhY2Ugb2Yga3ZtX3BpbzoNCg0KICAgICAgIENQVSAxL0tWTS0xNTU2NyBb
+MDAzXSAuLi4uIDIwOTMxMS43NjI1Nzk6IGt2bV9waW86IHBpb19yZWFkIGF0IDB4NzAgc2l6ZSAx
+IGNvdW50IDEgdmFsIDB4ZmYNCiAgICAgICBDUFUgMS9LVk0tMTU1NjcgWzAwM10gLi4uLiAyMDkz
+MTEuNzYyNTgyOiBrdm1fcGlvOiBwaW9fd3JpdGUgYXQgMHg3MCBzaXplIDEgY291bnQgMSB2YWwg
+MHg4OQ0KICAgICAgIENQVSAxL0tWTS0xNTU2NyBbMDAzXSAuLi4uIDIwOTMxMS43NjI1OTA6IGt2
+bV9waW86IHBpb19yZWFkIGF0IDB4NzEgc2l6ZSAxIGNvdW50IDEgdmFsIDB4MTcNCiAgICAgICBD
+UFUgMC9LVk0tMTU1NjYgWzAwNV0gLi4uLiAyMDkzMTEuNzYyNjExOiBrdm1fcGlvOiBwaW9fd3Jp
+dGUgYXQgMHg3MCBzaXplIDEgY291bnQgMSB2YWwgMHhjDQogICAgICAgQ1BVIDEvS1ZNLTE1NTY3
+IFswMDNdIC4uLi4gMjA5MzExLjc2MjYxNToga3ZtX3BpbzogcGlvX3JlYWQgYXQgMHg3MCBzaXpl
+IDEgY291bnQgMSB2YWwgMHhmZg0KICAgICAgIENQVSAxL0tWTS0xNTU2NyBbMDAzXSAuLi4uIDIw
+OTMxMS43NjI2MTk6IGt2bV9waW86IHBpb193cml0ZSBhdCAweDcwIHNpemUgMSBjb3VudCAxIHZh
+bCAweDg4DQogICAgICAgQ1BVIDEvS1ZNLTE1NTY3IFswMDNdIC4uLi4gMjA5MzExLjc2MjYyNzog
+a3ZtX3BpbzogcGlvX3JlYWQgYXQgMHg3MSBzaXplIDEgY291bnQgMSB2YWwgMHgxMg0KICAgICAg
+IENQVSAwL0tWTS0xNTU2NiBbMDA1XSAuLi4uIDIwOTMxMS43NjI2MzI6IGt2bV9waW86IHBpb19y
+ZWFkIGF0IDB4NzEgc2l6ZSAxIGNvdW50IDEgdmFsIDB4MTINCiAgICAgICBDUFUgMS9LVk0tMTU1
+NjcgWzAwM10gLi4uLiAyMDkzMTEuNzYyNjMzOiBrdm1fcGlvOiBwaW9fcmVhZCBhdCAweDcwIHNp
+emUgMSBjb3VudCAxIHZhbCAweGZmDQogICAgICAgQ1BVIDAvS1ZNLTE1NTY2IFswMDVdIC4uLi4g
+MjA5MzExLjc2MjYzNDoga3ZtX3BpbzogcGlvX3dyaXRlIGF0IDB4NzAgc2l6ZSAxIGNvdW50IDEg
+dmFsIDB4YyAgICAgICAgICAgPC0tLSBGaXJzdGx5IHdyaXRlIHRvIDB4NzAsIGNtb19pbmRleCA9
+IDB4YyAmIDB4N2YgPSAweGMNCiAgICAgICBDUFUgMS9LVk0tMTU1NjcgWzAwM10gLi4uLiAyMDkz
+MTEuNzYyNjM2OiBrdm1fcGlvOiBwaW9fd3JpdGUgYXQgMHg3MCBzaXplIDEgY291bnQgMSB2YWwg
+MHg4NiAgICAgICA8LS0gU2Vjb25kbHkgd3JpdGUgdG8gMHg3MCwgY21vX2luZGV4ID0gMHg4NiAm
+IDB4N2YgPSAweDYsIGNvdmVyIHRoZSBjbW9faW5kZXggcmVzdWx0IG9mIGZpcnN0IHRpbWUNCiAg
+ICAgICBDUFUgMC9LVk0tMTU1NjYgWzAwNV0gLi4uLiAyMDkzMTEuNzYyNjQxOiBrdm1fcGlvOiBw
+aW9fcmVhZCBhdCAweDcxIHNpemUgMSBjb3VudCAxIHZhbCAweDYgICAgICA8LS0gIHZjcHUwIHJl
+YWQgMHg2IGJlY2F1c2UgY21vX2luZGV4IGlzIDB4NiBub3cNCiAgICAgICBDUFUgMS9LVk0tMTU1
+NjcgWzAwM10gLi4uLiAyMDkzMTEuNzYyNjQ0OiBrdm1fcGlvOiBwaW9fcmVhZCBhdCAweDcxIHNp
+emUgMSBjb3VudCAxIHZhbCAweDYgICAgIDwtICB2Y3B1MSByZWFkIDB4Ng0KICAgICAgIENQVSAx
+L0tWTS0xNTU2NyBbMDAzXSAuLi4uIDIwOTMxMS43NjI2NDk6IGt2bV9waW86IHBpb19yZWFkIGF0
+IDB4NzAgc2l6ZSAxIGNvdW50IDEgdmFsIDB4ZmYNCiAgICAgICBDUFUgMS9LVk0tMTU1NjcgWzAw
+M10gLi4uLiAyMDkzMTEuNzYyNjY5OiBrdm1fcGlvOiBwaW9fd3JpdGUgYXQgMHg3MCBzaXplIDEg
+Y291bnQgMSB2YWwgMHg4Nw0KICAgICAgIENQVSAxL0tWTS0xNTU2NyBbMDAzXSAuLi4uIDIwOTMx
+MS43NjI2Nzg6IGt2bV9waW86IHBpb19yZWFkIGF0IDB4NzEgc2l6ZSAxIGNvdW50IDEgdmFsIDB4
+MQ0KICAgICAgIENQVSAxL0tWTS0xNTU2NyBbMDAzXSAuLi4uIDIwOTMxMS43NjI2ODM6IGt2bV9w
+aW86IHBpb19yZWFkIGF0IDB4NzAgc2l6ZSAxIGNvdW50IDEgdmFsIDB4ZmYNCiAgICAgICBDUFUg
+MS9LVk0tMTU1NjcgWzAwM10gLi4uLiAyMDkzMTEuNzYyNjg2OiBrdm1fcGlvOiBwaW9fd3JpdGUg
+YXQgMHg3MCBzaXplIDEgY291bnQgMSB2YWwgMHg4NA0KICAgICAgIENQVSAxL0tWTS0xNTU2NyBb
+MDAzXSAuLi4uIDIwOTMxMS43NjI2OTM6IGt2bV9waW86IHBpb19yZWFkIGF0IDB4NzEgc2l6ZSAx
+IGNvdW50IDEgdmFsIDB4MTANCiAgICAgICBDUFUgMS9LVk0tMTU1NjcgWzAwM10gLi4uLiAyMDkz
+MTEuNzYyNjk5OiBrdm1fcGlvOiBwaW9fcmVhZCBhdCAweDcwIHNpemUgMSBjb3VudCAxIHZhbCAw
+eGZmDQogICAgICAgQ1BVIDEvS1ZNLTE1NTY3IFswMDNdIC4uLi4gMjA5MzExLjc2MjcwMjoga3Zt
+X3BpbzogcGlvX3dyaXRlIGF0IDB4NzAgc2l6ZSAxIGNvdW50IDEgdmFsIDB4ODINCiAgICAgICBD
+UFUgMS9LVk0tMTU1NjcgWzAwM10gLi4uLiAyMDkzMTEuNzYyNzA5OiBrdm1fcGlvOiBwaW9fcmVh
+ZCBhdCAweDcxIHNpemUgMSBjb3VudCAxIHZhbCAweDI1DQogICAgICAgQ1BVIDEvS1ZNLTE1NTY3
+IFswMDNdIC4uLi4gMjA5MzExLjc2MjcxNDoga3ZtX3BpbzogcGlvX3JlYWQgYXQgMHg3MCBzaXpl
+IDEgY291bnQgMSB2YWwgMHhmZg0KICAgICAgIENQVSAxL0tWTS0xNTU2NyBbMDAzXSAuLi4uIDIw
+OTMxMS43NjI3MTc6IGt2bV9waW86IHBpb193cml0ZSBhdCAweDcwIHNpemUgMSBjb3VudCAxIHZh
+bCAweDgwDQoNCg0KUmVnYXJkcywNCi1Hb25nbGVpDQoNCkZyb206IFpoYW5naGFpbGlhbmcNClNl
+bnQ6IEZyaWRheSwgRGVjZW1iZXIgMDEsIDIwMTcgMzowMyBBTQ0KVG86IHFlbXUtZGV2ZWxAbm9u
+Z251Lm9yZzsgbXN0QHJlZGhhdC5jb207IFBhb2xvIEJvbnppbmkNCkNjOiBIdWFuZ3dlaWRvbmcg
+KEMpOyBHb25nbGVpIChBcmVpKTsgd2FuZ3hpbiAoVSk7IFhpZXhpYW5neW91DQpTdWJqZWN0OiBb
+QlVHXSBXaW5kb3dzIDcgZ290IHN0dWNrIGVhc2lseSB3aGlsZSBydW4gUENNYXJrMTAgYXBwbGlj
+YXRpb24NCg0KSGmjrA0KDQpXZSBoaXQgYSBidWcgaW4gb3VyIHRlc3Qgd2hpbGUgcnVuIFBDTWFy
+ayAxMCBpbiBhIHdpbmRvd3MgNyBWTSwNClRoZSBWTSBnb3Qgc3R1Y2sgYW5kIHRoZSB3YWxsY2xv
+Y2sgd2FzIGhhbmcgYWZ0ZXIgc2V2ZXJhbCBtaW51dGVzIHJ1bm5pbmcNClBDTWFyayAxMCBpbiBp
+dC4NCkl0IGlzIHF1aXRlIGVhc2lseSB0byByZXByb2R1Y2UgdGhlIGJ1ZyB3aXRoIHRoZSB1cHN0
+cmVhbSBLVk0gYW5kIFFlbXUuDQoNCldlIGZvdW5kIHRoYXQgS1ZNIGNhbiBub3QgaW5qZWN0IGFu
+eSBSVEMgaXJxIHRvIFZNIGFmdGVyIGl0IHdhcyBoYW5nLCBpdCBmYWlscyB0bw0KRGVsaXZlciBp
+cnEgaW4gaW9hcGljX3NldF9pcnEoKSBiZWNhdXNlIFJUQyBpcnEgaXMgc3RpbGwgcGVuZGluZyBp
+biBpb2FwaWMtPmlyci4NCg0Kc3RhdGljIGludCBpb2FwaWNfc2V0X2lycShzdHJ1Y3Qga3ZtX2lv
+YXBpYyAqaW9hcGljLCB1bnNpZ25lZCBpbnQgaXJxLA0KICAgICAgICAgICAgICAgICAgaW50IGly
+cV9sZXZlbCwgYm9vbCBsaW5lX3N0YXR1cykNCnsNCqGtIKGtDQogICAgICAgICBpZiAoIWlycV9s
+ZXZlbCkgew0KICAgICAgICAgICAgICAgICAgaW9hcGljLT5pcnIgJj0gfm1hc2s7DQogICAgICAg
+ICAgICAgICAgICByZXQgPSAxOw0KICAgICAgICAgICAgICAgICAgZ290byBvdXQ7DQogICAgICAg
+ICB9DQqhrSChrQ0KICAgICAgICAgaWYgKChlZGdlICYmIG9sZF9pcnIgPT0gaW9hcGljLT5pcnIp
+IHx8DQogICAgICAgICAgICAgKCFlZGdlICYmIGVudHJ5LmZpZWxkcy5yZW1vdGVfaXJyKSkgew0K
+ICAgICAgICAgICAgICAgICAgcmV0ID0gMDsNCiAgICAgICAgICAgICAgICAgIGdvdG8gb3V0Ow0K
+ICAgICAgICAgfQ0KDQpBY2NvcmRpbmcgdG8gUlRDIHNwZWMsIGFmdGVyIFJUQyBpbmplY3RzIGEg
+SGlnaCBsZXZlbCBpcnEsIE9TIHdpbGwgcmVhZCBDTU9Toa9zDQpyZWdpc3RlciBDIHRvIHRvIGNs
+ZWFyIHRoZSBpcnEgZmxhZywgYW5kIHB1bGwgZG93biB0aGUgaXJxIGVsZWN0cmljIHBpbi4NCg0K
+Rm9yIFFlbXUsIHdlIHdpbGwgZW11bGF0ZSB0aGUgcmVhZGluZyBvcGVyYXRpb24gaW4gY21vc19p
+b3BvcnRfcmVhZCgpLA0KYnV0IEd1ZXN0IE9TIHdpbGwgZmlyZSBhIHdyaXRlIG9wZXJhdGlvbiBi
+ZWZvcmUgdG8gdGVsbCB3aGljaCByZWdpc3RlciB3aWxsIGJlIHJlYWQNCmFmdGVyIHRoaXMgd3Jp
+dGUsIHdoZXJlIHdlIHVzZSBzLT5jbW9zX2luZGV4IHRvIHJlY29yZCB0aGUgZm9sbG93aW5nIHJl
+Z2lzdGVyIHRvIHJlYWQuDQoNCkJ1dCBpbiBvdXIgdGVzdCwgd2UgZm91bmQgdGhhdCB0aGVyZSBp
+cyBhIHBvc3NpYmxlIHNpdHVhdGlvbiB0aGF0IFZjcHUgZmFpbHMgdG8gcmVhZA0KUlRDX1JFR19D
+IHRvIGNsZWFyIGlycSwgVGhpcyBjb3VsZCBoYXBwZW5zIHdoaWxlIHR3byBWQ3B1cyBhcmUgd3Jp
+dGluZy9yZWFkaW5nDQpyZWdpc3RlcnMgYXQgdGhlIHNhbWUgdGltZSwgZm9yIGV4YW1wbGUsIHZj
+cHUgMCBpcyB0cnlpbmcgdG8gcmVhZCBSVENfUkVHX0MsDQpzbyBpdCB3cml0ZSBSVENfUkVHX0Mg
+Zmlyc3QsIHdoZXJlIHRoZSBzLT5jbW9zX2luZGV4IHdpbGwgYmUgUlRDX1JFR19DLA0KYnV0IGJl
+Zm9yZSBpdCB0cmllcyB0byByZWFkIHJlZ2lzdGVyIEMsIGFub3RoZXIgdmNwdTEgaXMgZ29pbmcg
+dG8gcmVhZCBSVENfWUVBUiwNCml0IGNoYW5nZXMgcy0+Y21vc19pbmRleCB0byBSVENfWUVBUiBi
+eSBhIHdyaXRpbmcgYWN0aW9uLg0KVGhlIG5leHQgb3BlcmF0aW9uIG9mIHZjcHUwIHdpbGwgYmUg
+bGVhZCB0byByZWFkIFJUQ19ZRUFSLCBJbiB0aGlzIGNhc2UsIHdlIHdpbGwgbWlzcw0KY2FsbGlu
+ZyBxZW11X2lycV9sb3dlcihzLT5pcnEpIHRvIGNsZWFyIHRoZSBpcnEuIEFmdGVyIHRoaXMsIGt2
+bSB3aWxsIG5ldmVyIGluamVjdCBSVEMgaXJxLA0KYW5kIFdpbmRvd3MgVk0gd2lsbCBoYW5nLg0K
+c3RhdGljIHZvaWQgY21vc19pb3BvcnRfd3JpdGUodm9pZCAqb3BhcXVlLCBod2FkZHIgYWRkciwN
+CiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIHVpbnQ2NF90IGRhdGEsIHVuc2lnbmVkIHNp
+emUpDQp7DQogICAgUlRDU3RhdGUgKnMgPSBvcGFxdWU7DQoNCiAgICBpZiAoKGFkZHIgJiAxKSA9
+PSAwKSB7DQogICAgICAgIHMtPmNtb3NfaW5kZXggPSBkYXRhICYgMHg3ZjsNCiAgICB9DQqhraGt
+DQpzdGF0aWMgdWludDY0X3QgY21vc19pb3BvcnRfcmVhZCh2b2lkICpvcGFxdWUsIGh3YWRkciBh
+ZGRyLA0KICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgdW5zaWduZWQgc2l6ZSkNCnsN
+CiAgICBSVENTdGF0ZSAqcyA9IG9wYXF1ZTsNCiAgICBpbnQgcmV0Ow0KICAgIGlmICgoYWRkciAm
+IDEpID09IDApIHsNCiAgICAgICAgcmV0dXJuIDB4ZmY7DQogICAgfSBlbHNlIHsNCiAgICAgICAg
+c3dpdGNoKHMtPmNtb3NfaW5kZXgpIHsNCg0KQWNjb3JkaW5nIHRvIENNT1Mgc3BlYywgoa5hbnkg
+d3JpdGUgdG8gUFJPVCAwMDcwaCBzaG91bGQgYmUgZm9sbG93ZWQgYnkgYW4gYWN0aW9uIHRvIFBS
+T1QgMDA3MWggb3IgdGhlIFJUQw0KV2lsbCBiZSBSVEMgd2lsbCBiZSBsZWZ0IGluIGFuIHVua25v
+d24gc3RhdGWhrywgYnV0IGl0IHNlZW1zIHRoYXQgd2UgY2FuIG5vdCBlbnN1cmUgdGhpcyBzZXF1
+ZW5jZSBpbiBxZW11L2t2bS4NCg0KQW55IGlkZWFzID8NCg0KVGhhbmtzLA0KSGFpbGlhbmcNCg0K
+DQo=
