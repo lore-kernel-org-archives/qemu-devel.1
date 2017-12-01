@@ -1,18 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58331)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58561)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1eKndW-000755-ND
-	for qemu-devel@nongnu.org; Fri, 01 Dec 2017 10:54:33 -0500
+	(envelope-from <eblake@redhat.com>) id 1eKnde-00079Y-MK
+	for qemu-devel@nongnu.org; Fri, 01 Dec 2017 10:54:54 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1eKnco-0007gv-Fb
-	for qemu-devel@nongnu.org; Fri, 01 Dec 2017 10:53:58 -0500
+	(envelope-from <eblake@redhat.com>) id 1eKnco-0007gm-Al
+	for qemu-devel@nongnu.org; Fri, 01 Dec 2017 10:54:06 -0500
 From: Eric Blake <eblake@redhat.com>
-Date: Thu, 30 Nov 2017 19:42:22 -0600
-Message-Id: <20171201014242.16877-1-eblake@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v5 00/20] add byte-based block_status driver
- callbacks
+Date: Thu, 30 Nov 2017 19:42:38 -0600
+Message-Id: <20171201014242.16877-17-eblake@redhat.com>
+In-Reply-To: <20171201014242.16877-1-eblake@redhat.com>
+References: <20171201014242.16877-1-eblake@redhat.com>
+Subject: [Qemu-devel] [PATCH v5 16/20] vdi: Switch to .bdrv_co_block_status()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,103 +20,100 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: kwolf@redhat.com, jsnow@redhat.com, famz@redhat.com, qemu-block@nongnu.org, vsementsov@virtuozzo.com
+Cc: kwolf@redhat.com, jsnow@redhat.com, famz@redhat.com, qemu-block@nongnu.org, vsementsov@virtuozzo.com, Stefan Weil <sw@weilnetz.de>, Max Reitz <mreitz@redhat.com>
 
-There are patches floating around to add NBD_CMD_BLOCK_STATUS,
-but NBD wants to report status on byte granularity (even if the
-reporting will probably be naturally aligned to sectors or even
-much higher levels).  I've therefore started the task of
-converting our block status code to report at a byte granularity
-rather than sectors.
+We are gradually moving away from sector-based interfaces, towards
+byte-based.  Update the vdi driver accordingly.  Note that the
+TODO is already covered (the block layer guarantees bounds of its
+requests), and that we can remove the now-unused s->block_sectors.
 
-These patches have been around for a while, but it's time to
-finish it now that 2.12 is nearly open for patches.
+Signed-off-by: Eric Blake <eblake@redhat.com>
+Reviewed-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 
-The overall conversion currently looks like:
-part 1: bdrv_is_allocated (merged, commit 51b0a488, 2.10)
-part 2: dirty-bitmap (merged, commit ca759622, 2.11)
-part 3: bdrv_get_block_status (merged, commit f0a9c18f, 2.11)
-part 4: .bdrv_co_block_status (this series, v4 was here [1])
+---
+v5: fix pnum when offset rounded down to block_size [Vladimir]
+v4: rebase to interface tweak
+v3: no change
+v2: rebase to mapping flag
+---
+ block/vdi.c | 33 +++++++++++++--------------------
+ 1 file changed, 13 insertions(+), 20 deletions(-)
 
-[1] https://lists.gnu.org/archive/html/qemu-devel/2017-10/msg02940.html
+diff --git a/block/vdi.c b/block/vdi.c
+index 6f83221ddc..f309562d36 100644
+--- a/block/vdi.c
++++ b/block/vdi.c
+@@ -171,8 +171,6 @@ typedef struct {
+     uint32_t *bmap;
+     /* Size of block (bytes). */
+     uint32_t block_size;
+-    /* Size of block (sectors). */
+-    uint32_t block_sectors;
+     /* First sector of block map. */
+     uint32_t bmap_sector;
+     /* VDI header (converted to host endianness). */
+@@ -462,7 +460,6 @@ static int vdi_open(BlockDriverState *bs, QDict *options, int flags,
+     bs->total_sectors = header.disk_size / SECTOR_SIZE;
 
-Available as a tag at:
-git fetch git://repo.or.cz/qemu/ericb.git nbd-byte-callback-v5
+     s->block_size = header.block_size;
+-    s->block_sectors = header.block_size / SECTOR_SIZE;
+     s->bmap_sector = header.offset_bmap / SECTOR_SIZE;
+     s->header = header;
 
-Since v4:
-- rebase to master
-- fix several bugs found by Vladimir
-- drop some redundant code
-- assert that the drivers make progress (returning success must have
-a non-zero value stored in *pnum)
+@@ -508,33 +505,29 @@ static int vdi_reopen_prepare(BDRVReopenState *state,
+     return 0;
+ }
 
-001/20:[0009] [FC] 'block: Add .bdrv_co_block_status() callback'
-002/20:[----] [-C] 'block: Switch passthrough drivers to .bdrv_co_block_s=
-tatus()'
-003/20:[0019] [FC] 'file-posix: Switch to .bdrv_co_block_status()'
-004/20:[0019] [FC] 'gluster: Switch to .bdrv_co_block_status()'
-005/20:[----] [--] 'iscsi: Switch cluster_sectors to byte-based'
-006/20:[----] [--] 'iscsi: Switch iscsi_allocmap_update() to byte-based'
-007/20:[0005] [FC] 'iscsi: Switch to .bdrv_co_block_status()'
-008/20:[0002] [FC] 'null: Switch to .bdrv_co_block_status()'
-009/20:[----] [-C] 'parallels: Switch to .bdrv_co_block_status()'
-010/20:[----] [--] 'qcow: Switch to .bdrv_co_block_status()'
-011/20:[----] [--] 'qcow2: Switch to .bdrv_co_block_status()'
-012/20:[0002] [FC] 'qed: Switch to .bdrv_co_block_status()'
-013/20:[----] [--] 'raw: Switch to .bdrv_co_block_status()'
-014/20:[----] [--] 'sheepdog: Switch to .bdrv_co_block_status()'
-015/20:[----] [--] 'vdi: Avoid bitrot of debugging code'
-016/20:[0002] [FC] 'vdi: Switch to .bdrv_co_block_status()'
-017/20:[0010] [FC] 'vmdk: Switch to .bdrv_co_block_status()'
-018/20:[0007] [FC] 'vpc: Switch to .bdrv_co_block_status()'
-019/20:[----] [--] 'vvfat: Switch to .bdrv_co_block_status()'
-020/20:[----] [-C] 'block: Drop unused .bdrv_co_get_block_status()'
+-static int64_t coroutine_fn vdi_co_get_block_status(BlockDriverState *bs,
+-        int64_t sector_num, int nb_sectors, int *pnum, BlockDriverState **file)
++static int coroutine_fn vdi_co_block_status(BlockDriverState *bs,
++                                            bool want_zero,
++                                            int64_t offset, int64_t bytes,
++                                            int64_t *pnum, int64_t *map,
++                                            BlockDriverState **file)
+ {
+-    /* TODO: Check for too large sector_num (in bdrv_is_allocated or here). */
+     BDRVVdiState *s = (BDRVVdiState *)bs->opaque;
+-    size_t bmap_index = sector_num / s->block_sectors;
+-    size_t sector_in_block = sector_num % s->block_sectors;
+-    int n_sectors = s->block_sectors - sector_in_block;
++    size_t bmap_index = offset / s->block_size;
++    size_t index_in_block = offset % s->block_size;
+     uint32_t bmap_entry = le32_to_cpu(s->bmap[bmap_index]);
+-    uint64_t offset;
+     int result;
 
-Eric Blake (20):
-  block: Add .bdrv_co_block_status() callback
-  block: Switch passthrough drivers to .bdrv_co_block_status()
-  file-posix: Switch to .bdrv_co_block_status()
-  gluster: Switch to .bdrv_co_block_status()
-  iscsi: Switch cluster_sectors to byte-based
-  iscsi: Switch iscsi_allocmap_update() to byte-based
-  iscsi: Switch to .bdrv_co_block_status()
-  null: Switch to .bdrv_co_block_status()
-  parallels: Switch to .bdrv_co_block_status()
-  qcow: Switch to .bdrv_co_block_status()
-  qcow2: Switch to .bdrv_co_block_status()
-  qed: Switch to .bdrv_co_block_status()
-  raw: Switch to .bdrv_co_block_status()
-  sheepdog: Switch to .bdrv_co_block_status()
-  vdi: Avoid bitrot of debugging code
-  vdi: Switch to .bdrv_co_block_status()
-  vmdk: Switch to .bdrv_co_block_status()
-  vpc: Switch to .bdrv_co_block_status()
-  vvfat: Switch to .bdrv_co_block_status()
-  block: Drop unused .bdrv_co_get_block_status()
+-    logout("%p, %" PRId64 ", %d, %p\n", bs, sector_num, nb_sectors, pnum);
+-    if (n_sectors > nb_sectors) {
+-        n_sectors = nb_sectors;
+-    }
+-    *pnum = n_sectors;
++    logout("%p, %" PRId64 ", %" PRId64 ", %p\n", bs, offset, bytes, pnum);
++    *pnum = MIN(s->block_size - index_in_block, bytes);
+     result = VDI_IS_ALLOCATED(bmap_entry);
+     if (!result) {
+         return 0;
+     }
 
- include/block/block.h     |   9 ++-
- include/block/block_int.h |  45 +++++++------
- block/io.c                |  81 +++++++++++-------------
- block/blkdebug.c          |  20 +++---
- block/commit.c            |   2 +-
- block/file-posix.c        |  62 +++++++++---------
- block/gluster.c           |  70 ++++++++++-----------
- block/iscsi.c             | 157 ++++++++++++++++++++++++----------------=
-------
- block/mirror.c            |   2 +-
- block/null.c              |  23 +++----
- block/parallels.c         |  22 ++++---
- block/qcow.c              |  27 ++++----
- block/qcow2.c             |  24 +++----
- block/qed.c               |  84 +++++++++----------------
- block/raw-format.c        |  16 ++---
- block/sheepdog.c          |  26 ++++----
- block/throttle.c          |   2 +-
- block/vdi.c               |  45 +++++++------
- block/vmdk.c              |  38 +++++------
- block/vpc.c               |  43 ++++++-------
- block/vvfat.c             |  16 +++--
- 21 files changed, 398 insertions(+), 416 deletions(-)
+-    offset = s->header.offset_data +
+-                              (uint64_t)bmap_entry * s->block_size +
+-                              sector_in_block * SECTOR_SIZE;
++    *map = s->header.offset_data + (uint64_t)bmap_entry * s->block_size +
++        index_in_block;
+     *file = bs->file->bs;
+-    return BDRV_BLOCK_DATA | BDRV_BLOCK_OFFSET_VALID | offset;
++    return BDRV_BLOCK_DATA | BDRV_BLOCK_OFFSET_VALID;
+ }
 
---=20
+ static int coroutine_fn
+@@ -902,7 +895,7 @@ static BlockDriver bdrv_vdi = {
+     .bdrv_child_perm          = bdrv_format_default_perms,
+     .bdrv_create = vdi_create,
+     .bdrv_has_zero_init = bdrv_has_zero_init_1,
+-    .bdrv_co_get_block_status = vdi_co_get_block_status,
++    .bdrv_co_block_status = vdi_co_block_status,
+     .bdrv_make_empty = vdi_make_empty,
+
+     .bdrv_co_preadv     = vdi_co_preadv,
+-- 
 2.14.3
