@@ -1,24 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40098)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43788)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1eKnTD-0005f4-Ch
-	for qemu-devel@nongnu.org; Fri, 01 Dec 2017 10:44:23 -0500
+	(envelope-from <eblake@redhat.com>) id 1eKnV4-0007L2-Lg
+	for qemu-devel@nongnu.org; Fri, 01 Dec 2017 10:45:53 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1eKnSX-0001rp-5c
-	for qemu-devel@nongnu.org; Fri, 01 Dec 2017 10:43:19 -0500
-Date: Fri, 1 Dec 2017 10:13:21 +0000
-From: Stefan Hajnoczi <stefanha@gmail.com>
-Message-ID: <20171201101321.GG23501@stefanha-x1.localdomain>
-References: <20171129102513.9153-1-pbonzini@redhat.com>
-	<20171129102513.9153-2-pbonzini@redhat.com>
-	<20171129134408.GB4281@stefanha-x1.localdomain>
-	<20171129135528.GD3753@localhost.localdomain>
+	(envelope-from <eblake@redhat.com>) id 1eKnUH-0004SI-C5
+	for qemu-devel@nongnu.org; Fri, 01 Dec 2017 10:45:14 -0500
+References: <20171201014242.16877-1-eblake@redhat.com>
+	<20171201014242.16877-2-eblake@redhat.com>
+	<20171201144047.GE4147@localhost.localdomain>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <c2bde291-63d7-d94c-aac7-d894fa2a5218@redhat.com>
+Date: Fri, 1 Dec 2017 09:03:14 -0600
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="Cp3Cp8fzgozWLBWL"
-Content-Disposition: inline
-In-Reply-To: <20171129135528.GD3753@localhost.localdomain>
-Subject: Re: [Qemu-devel] [Qemu-block] [PATCH 1/4] block: Expect graph
- changes in bdrv_parent_drained_begin/end
+In-Reply-To: <20171201144047.GE4147@localhost.localdomain>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v5 01/20] block: Add
+ .bdrv_co_block_status() callback
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,120 +27,122 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: Kevin Wolf <kwolf@redhat.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org, famz@redhat.com, qemu-block@nongnu.org
+Cc: qemu-devel@nongnu.org, jsnow@redhat.com, famz@redhat.com, qemu-block@nongnu.org, vsementsov@virtuozzo.com, Stefan Hajnoczi <stefanha@redhat.com>, Max Reitz <mreitz@redhat.com>
 
+On 12/01/2017 08:40 AM, Kevin Wolf wrote:
+>> Note that most drivers give sector-aligned answers, except at
+>> end-of-file, even when request_alignment is smaller than a sector.
+>> However, bdrv_getlength() is sector-aligned (even though it gives a
+>> byte answer), often by exceeding the actual file size.  If we were to
+>> give back strict results, at least file-posix.c would report a
+>> transition from DATA to HOLE at the end of a file even in the middle
+>> of a sector, which can throw off callers; so we intentionally lie and
+>> state that any partial sector at the end of a file has the same
+>> status for the entire sector.  Maybe at some future day we can
+>> report actual file size instead of rounding up, but not for this
+>> series.
+> 
+> In what way does this throw off callers in practice?
+> 
 
---Cp3Cp8fzgozWLBWL
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+Several iotests failed if I didn't do that (it's been a few months, so 
+the details are a bit fuzzy).  I think the biggest problem is that 
+because we round the size up in bdrv_getlength(), but CANNOT access 
+those rounded bytes, then reporting the status of those bytes as a hole 
+(which is the only sane thing that file-posix can do) can cause grief 
+when the rest of the sector (which we CAN access) is data.
 
-On Wed, Nov 29, 2017 at 02:55:28PM +0100, Kevin Wolf wrote:
-> Am 29.11.2017 um 14:44 hat Stefan Hajnoczi geschrieben:
-> > On Wed, Nov 29, 2017 at 11:25:10AM +0100, Paolo Bonzini wrote:
-> > > From: Kevin Wolf <kwolf@redhat.com>
-> > >=20
-> > > The .drained_begin/end callbacks can (directly or indirectly via
-> > > aio_poll()) cause block nodes to be removed or the current BdrvChild =
-to
-> > > point to a different child node.
-> > >=20
-> > > Use QLIST_FOREACH_SAFE() to make sure we don't access invalid
-> > > BlockDriverStates or accidentally continue iterating the parents of t=
-he
-> > > new child node instead of the node we actually came from.
-> > >=20
-> > > Signed-off-by: Kevin Wolf <kwolf@redhat.com>
-> > > Tested-by: Jeff Cody <jcody@redhat.com>
-> > > Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
-> > > Reviewed-by: Jeff Cody <jcody@redhat.com>
-> > > ---
-> > >  block/io.c | 8 ++++----
-> > >  1 file changed, 4 insertions(+), 4 deletions(-)
-> > >=20
-> > > diff --git a/block/io.c b/block/io.c
-> > > index 4fdf93a014..6773926fc1 100644
-> > > --- a/block/io.c
-> > > +++ b/block/io.c
-> > > @@ -42,9 +42,9 @@ static int coroutine_fn bdrv_co_do_pwrite_zeroes(Bl=
-ockDriverState *bs,
-> > > =20
-> > >  void bdrv_parent_drained_begin(BlockDriverState *bs)
-> > >  {
-> > > -    BdrvChild *c;
-> > > +    BdrvChild *c, *next;
-> > > =20
-> > > -    QLIST_FOREACH(c, &bs->parents, next_parent) {
-> > > +    QLIST_FOREACH_SAFE(c, &bs->parents, next_parent, next) {
-> > >          if (c->role->drained_begin) {
-> > >              c->role->drained_begin(c);
-> > >          }
-> > > @@ -53,9 +53,9 @@ void bdrv_parent_drained_begin(BlockDriverState *bs)
-> > > =20
-> > >  void bdrv_parent_drained_end(BlockDriverState *bs)
-> > >  {
-> > > -    BdrvChild *c;
-> > > +    BdrvChild *c, *next;
-> > > =20
-> > > -    QLIST_FOREACH(c, &bs->parents, next_parent) {
-> > > +    QLIST_FOREACH_SAFE(c, &bs->parents, next_parent, next) {
-> > >          if (c->role->drained_end) {
-> > >              c->role->drained_end(c);
-> > >          }
-> >=20
-> > Hmm...not sure if this patch is enough.
->=20
-> Depends on what you have in mind, but generally, no, it's certainly not
-> enough to fix all bad things that can happen during drain...
->=20
-> > Thinking about this more, if this sub-graph changes then
-> > .drained_begin() callbacks are not necessarily paired with
-> > .drained_end() callbacks.
-> >=20
-> > In other words, all of the following are possible:
-> >=20
-> > 1. Only .drained_begin() is called
-> > 2. .drained_begin() is called, then .drained_end()
-> > 3. Only .drained_end() is called
->=20
-> bdrv_replace_child_noperm() makes sure to call .drained_end() and
-> .drained_begin() depending on whether the old and new child node are
-> currently drained. So I think this might actually work.
->=20
-> > It makes me wonder if we need to either:
-> >=20
-> > Take references and ensure .drained_end() gets called if and only if
-> > .drained_begin() was also called.
-> >=20
-> > OR
-> >=20
-> > Document that .drained_begin/end() calls may not be paired and audit
-> > existing code to check that this is safe.
->=20
-> How would the latter even possibly work? If the .drained_end is missing,
-> the parent would never know that it can send new requests again. A
-> missing .drained_begin could be ignored in the .drained_end callback,
-> but it wouldn't be safe because the parent wouldn't actually stop to
-> send new requests.
+> The rounding will lead to strange effects, and I'm not sure that dealing
+> with them is any easier than fixing the callers. Imagine an image file
+> like this (very small example, file size 384 bytes):
+> 
+>      0    128      384  512
+>      |    |        |    |
+>      +----+--------+----+
+>      |Hole|  Data  |    |
+>      +----+--------+----+
+>                    |
+>                    EOF
 
-Yesterday I looked at a similar issue in Fam's new RFC that moves
-=2Edrained_begin()/.drained_end() to AioContext.  I came to the conclusion
-that while it's easy to implement unmatched begin/end calls (as we do
-today) it's not possible to get useful semantics out of them :).  So we
-have to ensure the the begin/end calls match.
+Unlikely.  Holes are at least a sector in size on all known filesystems 
+that have holes; that's also true for qcow2 format.  The only 
+non-sector-aligned hole that you can encounter in practice is at EOF.
 
---Cp3Cp8fzgozWLBWL
-Content-Type: application/pgp-signature; name="signature.asc"
+> 
+> bdrv_co_block_status(offset=0, bytes=512) returns 512 bytes of HOLE.
+> bdrv_co_block_status(offset=128, bytes=512) returns 384 bytes of DATA.
+> bdrv_co_block_status(offset=384, bytes=512) returns 128 bytes of HOLE.
+> 
+> This is not only contradictory, but the first one is almost begging for
+> data corruption because it returns HOLE for a region that actually
+> contains data.
 
------BEGIN PGP SIGNATURE-----
+I agree that it would be confusing, if it were possible.  But in 
+practice it is not possible.
 
-iQEcBAEBAgAGBQJaIStBAAoJEJykq7OBq3PIhw8H/R89L442kPurz1WYtKlMDrCz
-M59AYrOZCrA/szDGPMSGoCFZnLRkqSEuYpbu1nijD9lZLPk139PAo9RLXuvhnz2v
-paPiDYPrD9VuAVavwylGQz5DnZXCE7bMECdpsscGc8g5Ssde/p3N6bXBKgp4T6EN
-mmyY+9HLtLTdwDqAY7PfV4UqsgnUwOOecZ08kzBGhzt6djPKfET0CNFn8XxY5isA
-FVPsPkSpOPbr7aYBTJRFLrpf+uHndKJ01QqRp/QL6dLLfGrnle9d0TaRL7WjnzqA
-1w0SPdlK01YfNKuRXTLzYmAWVTQ9D3rD84lcCOIXkeIvPi27z6LFBpsqbCcAEPw=
-=is/5
------END PGP SIGNATURE-----
+> 
+> The only excuse I can imagine is that we say that this can never happen
+> because drivers use 512 byte granularity anyway. But why are we
+> introducing the new interface then? I don't think this semantics is
+> compatible with a bytes-based driver interface.
 
---Cp3Cp8fzgozWLBWL--
+Really, the ONLY boundary that is unlikely to ever be 512-byte aligned 
+is at EOF - and we wouldn't even need to do any rounding if 
+bdrv_getlength() didn't round.
+
+One thing I _can_ do: it is ALWAYS valid to report a partial sector as 
+data. It may pessimize the code slightly, but while rounding the size of 
+a hole up can be wrong if the rounding covers data but the caller 
+getting the rounded data treats that data as 0, rounding the size of 
+data up will never misbehave because the caller will just read the 
+literal zeroes.  So I will tweak the code to make sure that if any 
+rounding takes place, that either the driver already set BDRV_BLOCK_EOF 
+(all further bytes also read as zero), or else report the rounded region 
+as data.  (I thought I could get away with only io.c setting 
+BDRV_BLOCK_EOF; but it sounds like setting it in the drivers will be 
+helpful).
+
+> 
+>> We also add an assertion that any driver using the new callback will
+>> make progress (the only time pnum will be 0 is if the block layer
+>> already handled an out-of-bounds request, or if there is an error).
+>>
+>> Signed-off-by: Eric Blake <eblake@redhat.com>
+>>
+>> +    ret = bs->drv->bdrv_co_block_status(bs, want_zero, aligned_offset,
+>> +                                        aligned_bytes, pnum, &local_map,
+>> +                                        &local_file);
+>> +    if (ret < 0) {
+>> +        *pnum = 0;
+>> +        goto out;
+>> +    }
+>> +    assert(*pnum); /* The block driver must make progress */
+
+I debated about combining this assert...
+
+>> +
+>> +    /*
+>> +     * total_size is always sector-aligned, by sometimes exceeding actual
+>> +     * file size. Expand pnum if it lands mid-sector due to end-of-file.
+>> +     */
+>> +    if (QEMU_ALIGN_UP(*pnum + aligned_offset,
+> 
+> aligned_offset + *pnum wouldn be the more conventional order.
+
+Sure.
+
+> 
+>> +                      BDRV_SECTOR_SIZE) == total_size) {
+>> +        *pnum = total_size - aligned_offset;
+>> +    }
+>> +refine:
+>>       /*
+>>        * The driver's result must be a multiple of request_alignment.
+>>        * Clamp pnum and adjust map to original request.
+
+...with these, but it would trigger on at least vmdk (see patch 17/20)
+
+-- 
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
