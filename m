@@ -1,24 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33815)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35540)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1eKngp-0000YF-50
-	for qemu-devel@nongnu.org; Fri, 01 Dec 2017 10:57:58 -0500
+	(envelope-from <eblake@redhat.com>) id 1eKngv-0001ln-GA
+	for qemu-devel@nongnu.org; Fri, 01 Dec 2017 10:58:08 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1eKnfi-0002Rz-BV
-	for qemu-devel@nongnu.org; Fri, 01 Dec 2017 10:56:52 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:41420)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1eKnfi-0002QU-0T
-	for qemu-devel@nongnu.org; Fri, 01 Dec 2017 10:56:14 -0500
-Date: Fri, 1 Dec 2017 16:39:28 +0200
-From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <20171201163813-mutt-send-email-mst@kernel.org>
-References: <20171201055832.8392-1-fangying1@huawei.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20171201055832.8392-1-fangying1@huawei.com>
-Subject: Re: [Qemu-devel] [PATCH v4] vhost: Don't abort when vhost-user
- connection is lost during migration
+	(envelope-from <eblake@redhat.com>) id 1eKngE-0003Uz-EJ
+	for qemu-devel@nongnu.org; Fri, 01 Dec 2017 10:57:29 -0500
+From: Eric Blake <eblake@redhat.com>
+Date: Thu, 30 Nov 2017 19:42:28 -0600
+Message-Id: <20171201014242.16877-7-eblake@redhat.com>
+In-Reply-To: <20171201014242.16877-1-eblake@redhat.com>
+References: <20171201014242.16877-1-eblake@redhat.com>
+Subject: [Qemu-devel] [PATCH v5 06/20] iscsi: Switch iscsi_allocmap_update()
+ to byte-based
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,62 +20,226 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: fangying <fangying1@huawei.com>
-Cc: qemu-devel@nongnu.org, quintela@redhat.com, marcandre.lureau@redhat.com
+To: qemu-devel@nongnu.org
+Cc: kwolf@redhat.com, jsnow@redhat.com, famz@redhat.com, qemu-block@nongnu.org, vsementsov@virtuozzo.com, Ronnie Sahlberg <ronniesahlberg@gmail.com>, Paolo Bonzini <pbonzini@redhat.com>, Peter Lieven <pl@kamp.de>, Max Reitz <mreitz@redhat.com>
 
-On Fri, Dec 01, 2017 at 01:58:32PM +0800, fangying wrote:
-> QEMU will abort when vhost-user process is restarted during migration
-> when vhost_log_global_start/stop is called. The reason is clear that
-> vhost_dev_set_log returns -1 because network connection is lost.
-> 
-> To handle this situation, let's cancel migration by setting migrate
-> state to failure and report it to user.
+We are gradually converting to byte-based interfaces, as they are
+easier to reason about than sector-based.  Convert all uses of
+the allocmap (no semantic change).  Callers that already had bytes
+available are simpler, and callers that now scale to bytes will be
+easier to switch to byte-based in the future.
 
-In fact I don't see this as the right way to fix it. Backend is dead so why
-not just proceed with migration? We just need to make sure we re-send
-migration data on re-connect.
+Signed-off-by: Eric Blake <eblake@redhat.com>
+Acked-by: Paolo Bonzini <pbonzini@redhat.com>
 
-> ---
->  hw/virtio/vhost.c | 12 ++++++++++--
->  1 file changed, 10 insertions(+), 2 deletions(-)
-> 
-> diff --git a/hw/virtio/vhost.c b/hw/virtio/vhost.c
-> index ddc42f0..92725f7 100644
-> --- a/hw/virtio/vhost.c
-> +++ b/hw/virtio/vhost.c
-> @@ -26,6 +26,8 @@
->  #include "hw/virtio/virtio-bus.h"
->  #include "hw/virtio/virtio-access.h"
->  #include "migration/blocker.h"
-> +#include "migration/migration.h"
-> +#include "migration/qemu-file.h"
->  #include "sysemu/dma.h"
->  
->  /* enabled until disconnected backend stabilizes */
-> @@ -885,7 +887,10 @@ static void vhost_log_global_start(MemoryListener *listener)
->  
->      r = vhost_migration_log(listener, true);
->      if (r < 0) {
-> -        abort();
-> +        error_report("Failed to start vhost dirty log");
-> +        if (migrate_get_current()->migration_thread_running) {
-> +            qemu_file_set_error(migrate_get_current()->to_dst_file, -ECHILD);
-> +        }
->      }
->  }
->  
-> @@ -895,7 +900,10 @@ static void vhost_log_global_stop(MemoryListener *listener)
->  
->      r = vhost_migration_log(listener, false);
->      if (r < 0) {
-> -        abort();
-> +        error_report("Failed to stop vhost dirty log");
-> +        if (migrate_get_current()->migration_thread_running) {
-> +            qemu_file_set_error(migrate_get_current()->to_dst_file, -ECHILD);
-> +        }
->      }
->  }
->  
-> -- 
-> 1.8.3.1
-> 
+---
+v3-v5: no change
+v2: rebase to count/bytes rename
+---
+ block/iscsi.c | 90 +++++++++++++++++++++++++++++------------------------------
+ 1 file changed, 44 insertions(+), 46 deletions(-)
+
+diff --git a/block/iscsi.c b/block/iscsi.c
+index 8f903d8370..4896d50d6e 100644
+--- a/block/iscsi.c
++++ b/block/iscsi.c
+@@ -455,24 +455,22 @@ static int iscsi_allocmap_init(IscsiLun *iscsilun, int open_flags)
+ }
+
+ static void
+-iscsi_allocmap_update(IscsiLun *iscsilun, int64_t sector_num,
+-                      int nb_sectors, bool allocated, bool valid)
++iscsi_allocmap_update(IscsiLun *iscsilun, int64_t offset,
++                      int64_t bytes, bool allocated, bool valid)
+ {
+     int64_t cl_num_expanded, nb_cls_expanded, cl_num_shrunk, nb_cls_shrunk;
+-    int cluster_sectors = iscsilun->cluster_size >> BDRV_SECTOR_BITS;
+
+     if (iscsilun->allocmap == NULL) {
+         return;
+     }
+     /* expand to entirely contain all affected clusters */
+-    assert(cluster_sectors);
+-    cl_num_expanded = sector_num / cluster_sectors;
+-    nb_cls_expanded = DIV_ROUND_UP(sector_num + nb_sectors,
+-                                   cluster_sectors) - cl_num_expanded;
++    assert(iscsilun->cluster_size);
++    cl_num_expanded = offset / iscsilun->cluster_size;
++    nb_cls_expanded = DIV_ROUND_UP(offset + bytes, iscsilun->cluster_size)
++        - cl_num_expanded;
+     /* shrink to touch only completely contained clusters */
+-    cl_num_shrunk = DIV_ROUND_UP(sector_num, cluster_sectors);
+-    nb_cls_shrunk = (sector_num + nb_sectors) / cluster_sectors
+-                      - cl_num_shrunk;
++    cl_num_shrunk = DIV_ROUND_UP(offset, iscsilun->cluster_size);
++    nb_cls_shrunk = (offset + bytes) / iscsilun->cluster_size - cl_num_shrunk;
+     if (allocated) {
+         bitmap_set(iscsilun->allocmap, cl_num_expanded, nb_cls_expanded);
+     } else {
+@@ -495,26 +493,26 @@ iscsi_allocmap_update(IscsiLun *iscsilun, int64_t sector_num,
+ }
+
+ static void
+-iscsi_allocmap_set_allocated(IscsiLun *iscsilun, int64_t sector_num,
+-                             int nb_sectors)
++iscsi_allocmap_set_allocated(IscsiLun *iscsilun, int64_t offset,
++                             int64_t bytes)
+ {
+-    iscsi_allocmap_update(iscsilun, sector_num, nb_sectors, true, true);
++    iscsi_allocmap_update(iscsilun, offset, bytes, true, true);
+ }
+
+ static void
+-iscsi_allocmap_set_unallocated(IscsiLun *iscsilun, int64_t sector_num,
+-                               int nb_sectors)
++iscsi_allocmap_set_unallocated(IscsiLun *iscsilun, int64_t offset,
++                               int64_t bytes)
+ {
+     /* Note: if cache.direct=on the fifth argument to iscsi_allocmap_update
+      * is ignored, so this will in effect be an iscsi_allocmap_set_invalid.
+      */
+-    iscsi_allocmap_update(iscsilun, sector_num, nb_sectors, false, true);
++    iscsi_allocmap_update(iscsilun, offset, bytes, false, true);
+ }
+
+-static void iscsi_allocmap_set_invalid(IscsiLun *iscsilun, int64_t sector_num,
+-                                       int nb_sectors)
++static void iscsi_allocmap_set_invalid(IscsiLun *iscsilun, int64_t offset,
++                                       int64_t bytes)
+ {
+-    iscsi_allocmap_update(iscsilun, sector_num, nb_sectors, false, false);
++    iscsi_allocmap_update(iscsilun, offset, bytes, false, false);
+ }
+
+ static void iscsi_allocmap_invalidate(IscsiLun *iscsilun)
+@@ -528,34 +526,30 @@ static void iscsi_allocmap_invalidate(IscsiLun *iscsilun)
+ }
+
+ static inline bool
+-iscsi_allocmap_is_allocated(IscsiLun *iscsilun, int64_t sector_num,
+-                            int nb_sectors)
++iscsi_allocmap_is_allocated(IscsiLun *iscsilun, int64_t offset,
++                            int64_t bytes)
+ {
+     unsigned long size;
+     if (iscsilun->allocmap == NULL) {
+         return true;
+     }
+     assert(iscsilun->cluster_size);
+-    size = DIV_ROUND_UP(sector_num + nb_sectors,
+-                        iscsilun->cluster_size >> BDRV_SECTOR_BITS);
++    size = DIV_ROUND_UP(offset + bytes, iscsilun->cluster_size);
+     return !(find_next_bit(iscsilun->allocmap, size,
+-                           sector_num * BDRV_SECTOR_SIZE /
+-                           iscsilun->cluster_size) == size);
++                           offset / iscsilun->cluster_size) == size);
+ }
+
+ static inline bool iscsi_allocmap_is_valid(IscsiLun *iscsilun,
+-                                           int64_t sector_num, int nb_sectors)
++                                           int64_t offset, int64_t bytes)
+ {
+     unsigned long size;
+     if (iscsilun->allocmap_valid == NULL) {
+         return false;
+     }
+     assert(iscsilun->cluster_size);
+-    size = DIV_ROUND_UP(sector_num + nb_sectors,
+-                        iscsilun->cluster_size >> BDRV_SECTOR_BITS);
++    size = DIV_ROUND_UP(offset + bytes, iscsilun->cluster_size);
+     return (find_next_zero_bit(iscsilun->allocmap_valid, size,
+-                               sector_num * BDRV_SECTOR_SIZE /
+-                               iscsilun->cluster_size) == size);
++                               offset / iscsilun->cluster_size) == size);
+ }
+
+ static int coroutine_fn
+@@ -637,12 +631,14 @@ retry:
+     }
+
+     if (iTask.status != SCSI_STATUS_GOOD) {
+-        iscsi_allocmap_set_invalid(iscsilun, sector_num, nb_sectors);
++        iscsi_allocmap_set_invalid(iscsilun, sector_num * BDRV_SECTOR_SIZE,
++                                   nb_sectors * BDRV_SECTOR_SIZE);
+         r = iTask.err_code;
+         goto out_unlock;
+     }
+
+-    iscsi_allocmap_set_allocated(iscsilun, sector_num, nb_sectors);
++    iscsi_allocmap_set_allocated(iscsilun, sector_num * BDRV_SECTOR_SIZE,
++                                 nb_sectors * BDRV_SECTOR_SIZE);
+
+ out_unlock:
+     qemu_mutex_unlock(&iscsilun->mutex);
+@@ -737,9 +733,11 @@ retry:
+     }
+
+     if (ret & BDRV_BLOCK_ZERO) {
+-        iscsi_allocmap_set_unallocated(iscsilun, sector_num, *pnum);
++        iscsi_allocmap_set_unallocated(iscsilun, sector_num * BDRV_SECTOR_SIZE,
++                                       *pnum * BDRV_SECTOR_SIZE);
+     } else {
+-        iscsi_allocmap_set_allocated(iscsilun, sector_num, *pnum);
++        iscsi_allocmap_set_allocated(iscsilun, sector_num * BDRV_SECTOR_SIZE,
++                                     *pnum * BDRV_SECTOR_SIZE);
+     }
+
+     if (*pnum > nb_sectors) {
+@@ -777,15 +775,19 @@ static int coroutine_fn iscsi_co_readv(BlockDriverState *bs,
+     /* if cache.direct is off and we have a valid entry in our allocation map
+      * we can skip checking the block status and directly return zeroes if
+      * the request falls within an unallocated area */
+-    if (iscsi_allocmap_is_valid(iscsilun, sector_num, nb_sectors) &&
+-        !iscsi_allocmap_is_allocated(iscsilun, sector_num, nb_sectors)) {
++    if (iscsi_allocmap_is_valid(iscsilun, sector_num * BDRV_SECTOR_SIZE,
++                                nb_sectors * BDRV_SECTOR_SIZE) &&
++        !iscsi_allocmap_is_allocated(iscsilun, sector_num * BDRV_SECTOR_SIZE,
++                                     nb_sectors * BDRV_SECTOR_SIZE)) {
+             qemu_iovec_memset(iov, 0, 0x00, iov->size);
+             return 0;
+     }
+
+     if (nb_sectors >= ISCSI_CHECKALLOC_THRES &&
+-        !iscsi_allocmap_is_valid(iscsilun, sector_num, nb_sectors) &&
+-        !iscsi_allocmap_is_allocated(iscsilun, sector_num, nb_sectors)) {
++        !iscsi_allocmap_is_valid(iscsilun, sector_num * BDRV_SECTOR_SIZE,
++                                 nb_sectors * BDRV_SECTOR_SIZE) &&
++        !iscsi_allocmap_is_allocated(iscsilun, sector_num * BDRV_SECTOR_SIZE,
++                                     nb_sectors * BDRV_SECTOR_SIZE)) {
+         int pnum;
+         BlockDriverState *file;
+         /* check the block status from the beginning of the cluster
+@@ -1154,8 +1156,7 @@ retry:
+         goto out_unlock;
+     }
+
+-    iscsi_allocmap_set_invalid(iscsilun, offset >> BDRV_SECTOR_BITS,
+-                               bytes >> BDRV_SECTOR_BITS);
++    iscsi_allocmap_set_invalid(iscsilun, offset, bytes);
+
+ out_unlock:
+     qemu_mutex_unlock(&iscsilun->mutex);
+@@ -1253,18 +1254,15 @@ retry:
+     }
+
+     if (iTask.status != SCSI_STATUS_GOOD) {
+-        iscsi_allocmap_set_invalid(iscsilun, offset >> BDRV_SECTOR_BITS,
+-                                   bytes >> BDRV_SECTOR_BITS);
++        iscsi_allocmap_set_invalid(iscsilun, offset, bytes);
+         r = iTask.err_code;
+         goto out_unlock;
+     }
+
+     if (flags & BDRV_REQ_MAY_UNMAP) {
+-        iscsi_allocmap_set_invalid(iscsilun, offset >> BDRV_SECTOR_BITS,
+-                                   bytes >> BDRV_SECTOR_BITS);
++        iscsi_allocmap_set_invalid(iscsilun, offset, bytes);
+     } else {
+-        iscsi_allocmap_set_allocated(iscsilun, offset >> BDRV_SECTOR_BITS,
+-                                     bytes >> BDRV_SECTOR_BITS);
++        iscsi_allocmap_set_allocated(iscsilun, offset, bytes);
+     }
+
+ out_unlock:
+-- 
+2.14.3
