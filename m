@@ -1,20 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58937)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59688)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berto@igalia.com>) id 1eKpZ6-00041W-Jm
-	for qemu-devel@nongnu.org; Fri, 01 Dec 2017 12:57:33 -0500
+	(envelope-from <eblake@redhat.com>) id 1eKpbO-0006Oy-8p
+	for qemu-devel@nongnu.org; Fri, 01 Dec 2017 12:59:55 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berto@igalia.com>) id 1eKpZ5-0004uy-Ua
-	for qemu-devel@nongnu.org; Fri, 01 Dec 2017 12:57:32 -0500
-From: Alberto Garcia <berto@igalia.com>
-In-Reply-To: <20171120201004.14999-4-mreitz@redhat.com>
-References: <20171120201004.14999-1-mreitz@redhat.com>
-	<20171120201004.14999-4-mreitz@redhat.com>
-Date: Fri, 01 Dec 2017 16:18:04 +0100
-Message-ID: <w51efoe79zn.fsf@maestria.local.igalia.com>
+	(envelope-from <eblake@redhat.com>) id 1eKpbN-0006V7-AY
+	for qemu-devel@nongnu.org; Fri, 01 Dec 2017 12:59:54 -0500
+References: <20171130164750.47320-1-vsementsov@virtuozzo.com>
+	<20171130164750.47320-2-vsementsov@virtuozzo.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <2f4391f0-bbe1-07d9-83eb-82672c5583a9@redhat.com>
+Date: Fri, 1 Dec 2017 11:59:46 -0600
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH v7 for-2.12 03/25] block: Add
- BDS.backing_overridden
+In-Reply-To: <20171130164750.47320-2-vsementsov@virtuozzo.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH 1/2] qcow2: add overlap check for bitmap
+ directory
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,24 +25,58 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org
-Cc: qemu-devel@nongnu.org, Kevin Wolf <kwolf@redhat.com>, Eric Blake <eblake@redhat.com>, John Snow <jsnow@redhat.com>
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org
+Cc: kwolf@redhat.com, mreitz@redhat.com, "Daniel P. Berrange" <berrange@redhat.com>
 
-On Mon 20 Nov 2017 09:09:42 PM CET, Max Reitz wrote:
-> If the backing file is overridden, this most probably does change the
-> guest-visible data of a BDS. Therefore, we will need to consider this in
-> bdrv_refresh_filename().
->
-> Adding a new field to the BDS is not nice, but it is very simple and
-> exactly keeps track of whether the backing file has been overridden.
->
-> This commit adds a FIXME which will be remedied by a follow-up commit.
-> Until then, the respective piece of code will not result in any behavior
-> that is worse than what we currently have.
->
-> Signed-off-by: Max Reitz <mreitz@redhat.com>
-> Reviewed-by: Eric Blake <eblake@redhat.com>
+[adding Dan in cc]
 
-Reviewed-by: Alberto Garcia <berto@igalia.com>
+On 11/30/2017 10:47 AM, Vladimir Sementsov-Ogievskiy wrote:
+> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+> ---
+>   block/qcow2.h          |  7 +++++--
+>   block/qcow2-refcount.c | 12 ++++++++++++
+>   block/qcow2.c          |  6 ++++++
+>   3 files changed, 23 insertions(+), 2 deletions(-)
+> 
 
-Berto
+Does the LUKS encryption header need similar overlap protection checks?
+
+> diff --git a/block/qcow2.h b/block/qcow2.h
+> index 6f0ff15dd0..8f226a3609 100644
+> --- a/block/qcow2.h
+> +++ b/block/qcow2.h
+
+> +++ b/block/qcow2-refcount.c
+> @@ -2585,6 +2585,18 @@ int qcow2_check_metadata_overlap(BlockDriverState *bs, int ign, int64_t offset,
+>           }
+>       }
+>   
+> +    if ((chk & QCOW2_OL_BITMAP_DIRECTORY) &&
+> +        (s->autoclear_features & QCOW2_AUTOCLEAR_BITMAPS))
+> +    {
+> +        /* update_ext_header_and_dir_in_place firstly drop autoclear flag,
+> +         * so it will not fail */
+
+Wording is awkward, how about:
+
+The autoclear flag was previously dropped by 
+update_ext_header_and_dir_in_place, so this will not fail
+
+but I'm not sure if that is the intended meaning.
+
+> +        if (overlaps_with(s->bitmap_directory_offset,
+> +                          s->bitmap_directory_size))
+> +        {
+> +            return QCOW2_OL_BITMAP_DIRECTORY;
+> +        }
+> +    }
+> +
+>       return 0;
+>   }
+
+Do we need to add/update any iotests to cover this?
+
+-- 
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
