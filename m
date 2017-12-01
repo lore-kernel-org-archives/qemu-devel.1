@@ -1,26 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33480)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33815)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1eKngR-0000Mh-Tt
-	for qemu-devel@nongnu.org; Fri, 01 Dec 2017 10:57:42 -0500
+	(envelope-from <mst@redhat.com>) id 1eKngp-0000YF-50
+	for qemu-devel@nongnu.org; Fri, 01 Dec 2017 10:57:58 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1eKnfi-0002Sj-OW
-	for qemu-devel@nongnu.org; Fri, 01 Dec 2017 10:56:58 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:41424)
+	(envelope-from <mst@redhat.com>) id 1eKnfi-0002Rz-BV
+	for qemu-devel@nongnu.org; Fri, 01 Dec 2017 10:56:52 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:41420)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1eKnfi-0002QT-FV
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1eKnfi-0002QU-0T
 	for qemu-devel@nongnu.org; Fri, 01 Dec 2017 10:56:14 -0500
-References: <20171201151538.6844-1-farman@linux.vnet.ibm.com>
-	<20171201151538.6844-2-farman@linux.vnet.ibm.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <77147a49-b8b3-d94d-80ab-5ab279fbc8b9@redhat.com>
-Date: Fri, 1 Dec 2017 16:16:56 +0100
+Date: Fri, 1 Dec 2017 16:39:28 +0200
+From: "Michael S. Tsirkin" <mst@redhat.com>
+Message-ID: <20171201163813-mutt-send-email-mst@kernel.org>
+References: <20171201055832.8392-1-fangying1@huawei.com>
 MIME-Version: 1.0
-In-Reply-To: <20171201151538.6844-2-farman@linux.vnet.ibm.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 1/1] vhost-scsi: add missing virtqueue_size
- parameter
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20171201055832.8392-1-fangying1@huawei.com>
+Subject: Re: [Qemu-devel] [PATCH v4] vhost: Don't abort when vhost-user
+ connection is lost during migration
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,40 +27,62 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Farman <farman@linux.vnet.ibm.com>, "Richard W . M . Jones" <rjones@redhat.com>, "Michael S . Tsirkin" <mst@redhat.com>
-Cc: Dariusz Stojaczyk <dariuszx.stojaczyk@intel.com>, Felipe Franciosi <felipe@nutanix.com>, qemu-devel@nongnu.org
+To: fangying <fangying1@huawei.com>
+Cc: qemu-devel@nongnu.org, quintela@redhat.com, marcandre.lureau@redhat.com
 
-On 01/12/2017 16:15, Eric Farman wrote:
-> Commit 5c0919d02066 ("virtio-scsi: Add virtqueue_size parameter allowing
-> virtqueue size to be set.") introduced a new parameter to virtio-scsi.
-> Later, commit 920036106044 ("vhost-user-scsi: add missing virtqueue_size
-> param") added that parameter to the new vhost-user-scsi interface but
-> neglected the existing vhost-scsi interface it was built on.
+On Fri, Dec 01, 2017 at 01:58:32PM +0800, fangying wrote:
+> QEMU will abort when vhost-user process is restarted during migration
+> when vhost_log_global_start/stop is called. The reason is clear that
+> vhost_dev_set_log returns -1 because network connection is lost.
 > 
-> Apply the same change to vhost-scsi, so that we can boot a guest with
-> a device defined.  This also avoids crashing a guest when hotplugging
-> a vhost-scsi device.
-> 
-> Signed-off-by: Eric Farman <farman@linux.vnet.ibm.com>
+> To handle this situation, let's cancel migration by setting migrate
+> state to failure and report it to user.
+
+In fact I don't see this as the right way to fix it. Backend is dead so why
+not just proceed with migration? We just need to make sure we re-send
+migration data on re-connect.
+
 > ---
->  hw/scsi/vhost-scsi.c | 2 ++
->  1 file changed, 2 insertions(+)
+>  hw/virtio/vhost.c | 12 ++++++++++--
+>  1 file changed, 10 insertions(+), 2 deletions(-)
 > 
-> diff --git a/hw/scsi/vhost-scsi.c b/hw/scsi/vhost-scsi.c
-> index cd4ab05233..9c1bea8ff3 100644
-> --- a/hw/scsi/vhost-scsi.c
-> +++ b/hw/scsi/vhost-scsi.c
-> @@ -233,6 +233,8 @@ static Property vhost_scsi_properties[] = {
->      DEFINE_PROP_STRING("wwpn", VirtIOSCSICommon, conf.wwpn),
->      DEFINE_PROP_UINT32("boot_tpgt", VirtIOSCSICommon, conf.boot_tpgt, 0),
->      DEFINE_PROP_UINT32("num_queues", VirtIOSCSICommon, conf.num_queues, 1),
-> +    DEFINE_PROP_UINT32("virtqueue_size", VirtIOSCSICommon, conf.virtqueue_size,
-> +                       128),
->      DEFINE_PROP_UINT32("max_sectors", VirtIOSCSICommon, conf.max_sectors,
->                         0xFFFF),
->      DEFINE_PROP_UINT32("cmd_per_lun", VirtIOSCSICommon, conf.cmd_per_lun, 128),
+> diff --git a/hw/virtio/vhost.c b/hw/virtio/vhost.c
+> index ddc42f0..92725f7 100644
+> --- a/hw/virtio/vhost.c
+> +++ b/hw/virtio/vhost.c
+> @@ -26,6 +26,8 @@
+>  #include "hw/virtio/virtio-bus.h"
+>  #include "hw/virtio/virtio-access.h"
+>  #include "migration/blocker.h"
+> +#include "migration/migration.h"
+> +#include "migration/qemu-file.h"
+>  #include "sysemu/dma.h"
+>  
+>  /* enabled until disconnected backend stabilizes */
+> @@ -885,7 +887,10 @@ static void vhost_log_global_start(MemoryListener *listener)
+>  
+>      r = vhost_migration_log(listener, true);
+>      if (r < 0) {
+> -        abort();
+> +        error_report("Failed to start vhost dirty log");
+> +        if (migrate_get_current()->migration_thread_running) {
+> +            qemu_file_set_error(migrate_get_current()->to_dst_file, -ECHILD);
+> +        }
+>      }
+>  }
+>  
+> @@ -895,7 +900,10 @@ static void vhost_log_global_stop(MemoryListener *listener)
+>  
+>      r = vhost_migration_log(listener, false);
+>      if (r < 0) {
+> -        abort();
+> +        error_report("Failed to stop vhost dirty log");
+> +        if (migrate_get_current()->migration_thread_running) {
+> +            qemu_file_set_error(migrate_get_current()->to_dst_file, -ECHILD);
+> +        }
+>      }
+>  }
+>  
+> -- 
+> 1.8.3.1
 > 
-
-Queued, thanks.
-
-Paolo
