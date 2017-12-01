@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44413)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44438)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1eKufh-0007IX-A0
+	(envelope-from <eblake@redhat.com>) id 1eKufj-0007JA-Vd
 	for qemu-devel@nongnu.org; Fri, 01 Dec 2017 18:24:44 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1eKufe-00045O-52
-	for qemu-devel@nongnu.org; Fri, 01 Dec 2017 18:24:41 -0500
+	(envelope-from <eblake@redhat.com>) id 1eKufj-00048h-7M
+	for qemu-devel@nongnu.org; Fri, 01 Dec 2017 18:24:43 -0500
 From: Eric Blake <eblake@redhat.com>
-Date: Fri,  1 Dec 2017 17:24:26 -0600
-Message-Id: <20171201232433.25193-1-eblake@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v2 0/7] macro do/while (0) cleanup
+Date: Fri,  1 Dec 2017 17:24:27 -0600
+Message-Id: <20171201232433.25193-2-eblake@redhat.com>
+In-Reply-To: <20171201232433.25193-1-eblake@redhat.com>
+References: <20171201232433.25193-1-eblake@redhat.com>
+Subject: [Qemu-devel] [PATCH v2 1/7] net: Drop unusual use of do { } while
+ (0);
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -21,75 +21,89 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: armbru@redhat.com, qemu-trivial@nongnu.org, pbonzini@redhat.com
+Cc: armbru@redhat.com, qemu-trivial@nongnu.org, pbonzini@redhat.com, Jason Wang <jasowang@redhat.com>
 
-Noticed this by chance in the tests/ directory, so I broadened
-it to a grep of the entire code base.  I suspect^wKNOW many of
-the bad macros were the victims of copy-and-paste from some
-other bad location (particularly given how many bit-rotten
-debug print macros were involved).
+For a couple of macros in pcnet.c, we have to provide a new scope
+to avoid compiler warnings about declarations in the middle of a
+switch statement that aren't in a sub-scope.  But use of
+'do { ... } while (0);' merely to provide that new scope is arcane
+overkill, compared to just using '{ ... }'.
 
-https://wiki.qemu.org/BiteSizedTasks#Bitrot_prevention is still
-left for someone else, for another day.
+Signed-off-by: Eric Blake <eblake@redhat.com>
+Reviewed-by: Thomas Huth <thuth@redhat.com>
+---
+ hw/net/pcnet.c | 20 ++++++++++----------
+ 1 file changed, 10 insertions(+), 10 deletions(-)
 
-In v2:
-- add review tags
-- audit that the maint patch has no semantic change (all callers
-were indeed supplying ';' at the macro call-sites)
-- improved commit messages
-- more patches for some additional cleanups
-- tighten the checkpatch rule to also flag 'while (false);'
-
-Eric Blake (7):
-  net: Drop unusual use of do { } while (0);
-  mips: Tweak location of ';' in macros
-  chardev: Use goto/label instead of do/break/while(0)
-  chardev: Clean up previous patch indentation
-  tests: Avoid 'do/while(false);' in vhost-user-bridge
-  maint: Fix macros with broken 'do/while(0);' usage
-  checkpatch: Enforce proper do/while (0) style
-
- tests/acpi-utils.h         |  8 ++---
- ui/sdl_zoom_template.h     |  8 ++---
- audio/paaudio.c            |  4 +--
- chardev/char-serial.c      | 75 ++++++++++++++++++++++++----------------=
-------
- hw/adc/stm32f2xx_adc.c     |  2 +-
- hw/block/m25p80.c          |  2 +-
- hw/char/cadence_uart.c     |  2 +-
- hw/char/stm32f2xx_usart.c  |  2 +-
- hw/display/cg3.c           |  2 +-
- hw/display/dpcd.c          |  2 +-
- hw/display/xlnx_dp.c       |  2 +-
- hw/dma/pl330.c             |  2 +-
- hw/dma/xlnx-zynq-devcfg.c  |  2 +-
- hw/dma/xlnx_dpdma.c        |  2 +-
- hw/i2c/i2c-ddc.c           |  2 +-
- hw/misc/auxbus.c           |  2 +-
- hw/misc/macio/mac_dbdma.c  |  4 +--
- hw/misc/mmio_interface.c   |  2 +-
- hw/misc/stm32f2xx_syscfg.c |  2 +-
- hw/misc/zynq_slcr.c        |  2 +-
- hw/net/cadence_gem.c       |  2 +-
- hw/net/pcnet.c             | 20 ++++++-------
- hw/ssi/mss-spi.c           |  2 +-
- hw/ssi/stm32f2xx_spi.c     |  2 +-
- hw/ssi/xilinx_spi.c        |  2 +-
- hw/ssi/xilinx_spips.c      |  2 +-
- hw/timer/a9gtimer.c        |  2 +-
- hw/timer/cadence_ttc.c     |  2 +-
- hw/timer/mss-timer.c       |  2 +-
- hw/timer/stm32f2xx_timer.c |  2 +-
- hw/tpm/tpm_passthrough.c   |  2 +-
- hw/tpm/tpm_tis.c           |  2 +-
- migration/rdma.c           |  2 +-
- target/arm/translate-a64.c |  2 +-
- target/mips/msa_helper.c   | 34 +++++++++++----------
- target/s390x/kvm.c         |  2 +-
- tests/tcg/test-mmap.c      |  2 +-
- tests/vhost-user-bridge.c  |  6 ++--
- scripts/checkpatch.pl      |  5 ++++
- 39 files changed, 119 insertions(+), 105 deletions(-)
-
---=20
+diff --git a/hw/net/pcnet.c b/hw/net/pcnet.c
+index 654455355f..641bf2fd88 100644
+--- a/hw/net/pcnet.c
++++ b/hw/net/pcnet.c
+@@ -455,32 +455,32 @@ static inline void pcnet_rmd_store(PCNetState *s, struct pcnet_RMD *rmd,
+ #define CHECK_RMD(ADDR,RES) do {                \
+     switch (BCR_SWSTYLE(s)) {                   \
+     case 0x00:                                  \
+-        do {                                    \
++        {                                       \
+             uint16_t rda[4];                    \
+             s->phys_mem_read(s->dma_opaque, (ADDR), \
+                 (void *)&rda[0], sizeof(rda), 0); \
+             (RES) |= (rda[2] & 0xf000)!=0xf000; \
+             (RES) |= (rda[3] & 0xf000)!=0x0000; \
+-        } while (0);                            \
++        }                                       \
+         break;                                  \
+     case 0x01:                                  \
+     case 0x02:                                  \
+-        do {                                    \
++        {                                       \
+             uint32_t rda[4];                    \
+             s->phys_mem_read(s->dma_opaque, (ADDR), \
+                 (void *)&rda[0], sizeof(rda), 0); \
+             (RES) |= (rda[1] & 0x0000f000L)!=0x0000f000L; \
+             (RES) |= (rda[2] & 0x0000f000L)!=0x00000000L; \
+-        } while (0);                            \
++        }                                       \
+         break;                                  \
+     case 0x03:                                  \
+-        do {                                    \
++        {                                       \
+             uint32_t rda[4];                    \
+             s->phys_mem_read(s->dma_opaque, (ADDR), \
+                 (void *)&rda[0], sizeof(rda), 0); \
+             (RES) |= (rda[0] & 0x0000f000L)!=0x00000000L; \
+             (RES) |= (rda[1] & 0x0000f000L)!=0x0000f000L; \
+-        } while (0);                            \
++        }                                       \
+         break;                                  \
+     }                                           \
+ } while (0)
+@@ -488,22 +488,22 @@ static inline void pcnet_rmd_store(PCNetState *s, struct pcnet_RMD *rmd,
+ #define CHECK_TMD(ADDR,RES) do {                \
+     switch (BCR_SWSTYLE(s)) {                   \
+     case 0x00:                                  \
+-        do {                                    \
++        {                                       \
+             uint16_t xda[4];                    \
+             s->phys_mem_read(s->dma_opaque, (ADDR), \
+                 (void *)&xda[0], sizeof(xda), 0); \
+             (RES) |= (xda[2] & 0xf000)!=0xf000; \
+-        } while (0);                            \
++        }                                       \
+         break;                                  \
+     case 0x01:                                  \
+     case 0x02:                                  \
+     case 0x03:                                  \
+-        do {                                    \
++        {                                       \
+             uint32_t xda[4];                    \
+             s->phys_mem_read(s->dma_opaque, (ADDR), \
+                 (void *)&xda[0], sizeof(xda), 0); \
+             (RES) |= (xda[1] & 0x0000f000L)!=0x0000f000L; \
+-        } while (0);                            \
++        }                                       \
+         break;                                  \
+     }                                           \
+ } while (0)
+-- 
 2.14.3
