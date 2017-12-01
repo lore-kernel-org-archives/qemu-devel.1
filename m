@@ -1,16 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58561)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59432)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1eKnde-00079Y-MK
-	for qemu-devel@nongnu.org; Fri, 01 Dec 2017 10:54:54 -0500
+	(envelope-from <eblake@redhat.com>) id 1eKne6-0007aX-2r
+	for qemu-devel@nongnu.org; Fri, 01 Dec 2017 10:55:18 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1eKnco-0007gm-Al
-	for qemu-devel@nongnu.org; Fri, 01 Dec 2017 10:54:06 -0500
+	(envelope-from <eblake@redhat.com>) id 1eKndZ-00005K-4C
+	for qemu-devel@nongnu.org; Fri, 01 Dec 2017 10:54:34 -0500
 From: Eric Blake <eblake@redhat.com>
-Date: Thu, 30 Nov 2017 19:42:38 -0600
-Message-Id: <20171201014242.16877-17-eblake@redhat.com>
+Date: Thu, 30 Nov 2017 19:42:27 -0600
+Message-Id: <20171201014242.16877-6-eblake@redhat.com>
 In-Reply-To: <20171201014242.16877-1-eblake@redhat.com>
 References: <20171201014242.16877-1-eblake@redhat.com>
-Subject: [Qemu-devel] [PATCH v5 16/20] vdi: Switch to .bdrv_co_block_status()
+Subject: [Qemu-devel] [PATCH v5 05/20] iscsi: Switch cluster_sectors to
+ byte-based
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -20,100 +21,160 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: kwolf@redhat.com, jsnow@redhat.com, famz@redhat.com, qemu-block@nongnu.org, vsementsov@virtuozzo.com, Stefan Weil <sw@weilnetz.de>, Max Reitz <mreitz@redhat.com>
+Cc: kwolf@redhat.com, jsnow@redhat.com, famz@redhat.com, qemu-block@nongnu.org, vsementsov@virtuozzo.com, Ronnie Sahlberg <ronniesahlberg@gmail.com>, Paolo Bonzini <pbonzini@redhat.com>, Peter Lieven <pl@kamp.de>, Max Reitz <mreitz@redhat.com>
 
-We are gradually moving away from sector-based interfaces, towards
-byte-based.  Update the vdi driver accordingly.  Note that the
-TODO is already covered (the block layer guarantees bounds of its
-requests), and that we can remove the now-unused s->block_sectors.
+We are gradually converting to byte-based interfaces, as they are
+easier to reason about than sector-based.  Convert all uses of
+the cluster size in sectors, along with adding assertions that we
+are not dividing by zero.
+
+Improve some comment grammar while in the area.
 
 Signed-off-by: Eric Blake <eblake@redhat.com>
-Reviewed-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Acked-by: Paolo Bonzini <pbonzini@redhat.com>
 
 ---
-v5: fix pnum when offset rounded down to block_size [Vladimir]
-v4: rebase to interface tweak
-v3: no change
-v2: rebase to mapping flag
+v2-v5: no change
 ---
- block/vdi.c | 33 +++++++++++++--------------------
- 1 file changed, 13 insertions(+), 20 deletions(-)
+ block/iscsi.c | 56 +++++++++++++++++++++++++++++++++++---------------------
+ 1 file changed, 35 insertions(+), 21 deletions(-)
 
-diff --git a/block/vdi.c b/block/vdi.c
-index 6f83221ddc..f309562d36 100644
---- a/block/vdi.c
-+++ b/block/vdi.c
-@@ -171,8 +171,6 @@ typedef struct {
-     uint32_t *bmap;
-     /* Size of block (bytes). */
-     uint32_t block_size;
--    /* Size of block (sectors). */
--    uint32_t block_sectors;
-     /* First sector of block map. */
-     uint32_t bmap_sector;
-     /* VDI header (converted to host endianness). */
-@@ -462,7 +460,6 @@ static int vdi_open(BlockDriverState *bs, QDict *options, int flags,
-     bs->total_sectors = header.disk_size / SECTOR_SIZE;
-
-     s->block_size = header.block_size;
--    s->block_sectors = header.block_size / SECTOR_SIZE;
-     s->bmap_sector = header.offset_bmap / SECTOR_SIZE;
-     s->header = header;
-
-@@ -508,33 +505,29 @@ static int vdi_reopen_prepare(BDRVReopenState *state,
-     return 0;
- }
-
--static int64_t coroutine_fn vdi_co_get_block_status(BlockDriverState *bs,
--        int64_t sector_num, int nb_sectors, int *pnum, BlockDriverState **file)
-+static int coroutine_fn vdi_co_block_status(BlockDriverState *bs,
-+                                            bool want_zero,
-+                                            int64_t offset, int64_t bytes,
-+                                            int64_t *pnum, int64_t *map,
-+                                            BlockDriverState **file)
+diff --git a/block/iscsi.c b/block/iscsi.c
+index 4683f3b244..8f903d8370 100644
+--- a/block/iscsi.c
++++ b/block/iscsi.c
+@@ -84,7 +84,7 @@ typedef struct IscsiLun {
+     unsigned long *allocmap;
+     unsigned long *allocmap_valid;
+     long allocmap_size;
+-    int cluster_sectors;
++    int cluster_size;
+     bool use_16_for_rw;
+     bool write_protected;
+     bool lbpme;
+@@ -427,9 +427,10 @@ static int iscsi_allocmap_init(IscsiLun *iscsilun, int open_flags)
  {
--    /* TODO: Check for too large sector_num (in bdrv_is_allocated or here). */
-     BDRVVdiState *s = (BDRVVdiState *)bs->opaque;
--    size_t bmap_index = sector_num / s->block_sectors;
--    size_t sector_in_block = sector_num % s->block_sectors;
--    int n_sectors = s->block_sectors - sector_in_block;
-+    size_t bmap_index = offset / s->block_size;
-+    size_t index_in_block = offset % s->block_size;
-     uint32_t bmap_entry = le32_to_cpu(s->bmap[bmap_index]);
--    uint64_t offset;
-     int result;
+     iscsi_allocmap_free(iscsilun);
 
--    logout("%p, %" PRId64 ", %d, %p\n", bs, sector_num, nb_sectors, pnum);
--    if (n_sectors > nb_sectors) {
--        n_sectors = nb_sectors;
--    }
--    *pnum = n_sectors;
-+    logout("%p, %" PRId64 ", %" PRId64 ", %p\n", bs, offset, bytes, pnum);
-+    *pnum = MIN(s->block_size - index_in_block, bytes);
-     result = VDI_IS_ALLOCATED(bmap_entry);
-     if (!result) {
-         return 0;
++    assert(iscsilun->cluster_size);
+     iscsilun->allocmap_size =
+-        DIV_ROUND_UP(sector_lun2qemu(iscsilun->num_blocks, iscsilun),
+-                     iscsilun->cluster_sectors);
++        DIV_ROUND_UP(iscsilun->num_blocks * iscsilun->block_size,
++                     iscsilun->cluster_size);
+
+     iscsilun->allocmap = bitmap_try_new(iscsilun->allocmap_size);
+     if (!iscsilun->allocmap) {
+@@ -437,7 +438,7 @@ static int iscsi_allocmap_init(IscsiLun *iscsilun, int open_flags)
      }
 
--    offset = s->header.offset_data +
--                              (uint64_t)bmap_entry * s->block_size +
--                              sector_in_block * SECTOR_SIZE;
-+    *map = s->header.offset_data + (uint64_t)bmap_entry * s->block_size +
-+        index_in_block;
-     *file = bs->file->bs;
--    return BDRV_BLOCK_DATA | BDRV_BLOCK_OFFSET_VALID | offset;
-+    return BDRV_BLOCK_DATA | BDRV_BLOCK_OFFSET_VALID;
+     if (open_flags & BDRV_O_NOCACHE) {
+-        /* in case that cache.direct = on all allocmap entries are
++        /* when cache.direct = on all allocmap entries are
+          * treated as invalid to force a relookup of the block
+          * status on every read request */
+         return 0;
+@@ -458,17 +459,19 @@ iscsi_allocmap_update(IscsiLun *iscsilun, int64_t sector_num,
+                       int nb_sectors, bool allocated, bool valid)
+ {
+     int64_t cl_num_expanded, nb_cls_expanded, cl_num_shrunk, nb_cls_shrunk;
++    int cluster_sectors = iscsilun->cluster_size >> BDRV_SECTOR_BITS;
+
+     if (iscsilun->allocmap == NULL) {
+         return;
+     }
+     /* expand to entirely contain all affected clusters */
+-    cl_num_expanded = sector_num / iscsilun->cluster_sectors;
++    assert(cluster_sectors);
++    cl_num_expanded = sector_num / cluster_sectors;
+     nb_cls_expanded = DIV_ROUND_UP(sector_num + nb_sectors,
+-                                   iscsilun->cluster_sectors) - cl_num_expanded;
++                                   cluster_sectors) - cl_num_expanded;
+     /* shrink to touch only completely contained clusters */
+-    cl_num_shrunk = DIV_ROUND_UP(sector_num, iscsilun->cluster_sectors);
+-    nb_cls_shrunk = (sector_num + nb_sectors) / iscsilun->cluster_sectors
++    cl_num_shrunk = DIV_ROUND_UP(sector_num, cluster_sectors);
++    nb_cls_shrunk = (sector_num + nb_sectors) / cluster_sectors
+                       - cl_num_shrunk;
+     if (allocated) {
+         bitmap_set(iscsilun->allocmap, cl_num_expanded, nb_cls_expanded);
+@@ -532,9 +535,12 @@ iscsi_allocmap_is_allocated(IscsiLun *iscsilun, int64_t sector_num,
+     if (iscsilun->allocmap == NULL) {
+         return true;
+     }
+-    size = DIV_ROUND_UP(sector_num + nb_sectors, iscsilun->cluster_sectors);
++    assert(iscsilun->cluster_size);
++    size = DIV_ROUND_UP(sector_num + nb_sectors,
++                        iscsilun->cluster_size >> BDRV_SECTOR_BITS);
+     return !(find_next_bit(iscsilun->allocmap, size,
+-                           sector_num / iscsilun->cluster_sectors) == size);
++                           sector_num * BDRV_SECTOR_SIZE /
++                           iscsilun->cluster_size) == size);
+ }
+
+ static inline bool iscsi_allocmap_is_valid(IscsiLun *iscsilun,
+@@ -544,9 +550,12 @@ static inline bool iscsi_allocmap_is_valid(IscsiLun *iscsilun,
+     if (iscsilun->allocmap_valid == NULL) {
+         return false;
+     }
+-    size = DIV_ROUND_UP(sector_num + nb_sectors, iscsilun->cluster_sectors);
++    assert(iscsilun->cluster_size);
++    size = DIV_ROUND_UP(sector_num + nb_sectors,
++                        iscsilun->cluster_size >> BDRV_SECTOR_BITS);
+     return (find_next_zero_bit(iscsilun->allocmap_valid, size,
+-                               sector_num / iscsilun->cluster_sectors) == size);
++                               sector_num * BDRV_SECTOR_SIZE /
++                               iscsilun->cluster_size) == size);
  }
 
  static int coroutine_fn
-@@ -902,7 +895,7 @@ static BlockDriver bdrv_vdi = {
-     .bdrv_child_perm          = bdrv_format_default_perms,
-     .bdrv_create = vdi_create,
-     .bdrv_has_zero_init = bdrv_has_zero_init_1,
--    .bdrv_co_get_block_status = vdi_co_get_block_status,
-+    .bdrv_co_block_status = vdi_co_block_status,
-     .bdrv_make_empty = vdi_make_empty,
+@@ -781,16 +790,21 @@ static int coroutine_fn iscsi_co_readv(BlockDriverState *bs,
+         BlockDriverState *file;
+         /* check the block status from the beginning of the cluster
+          * containing the start sector */
+-        int64_t ret = iscsi_co_get_block_status(bs,
+-                          sector_num - sector_num % iscsilun->cluster_sectors,
+-                          BDRV_REQUEST_MAX_SECTORS, &pnum, &file);
++        int cluster_sectors = iscsilun->cluster_size >> BDRV_SECTOR_BITS;
++        int head;
++        int64_t ret;
++
++        assert(cluster_sectors);
++        head = sector_num % cluster_sectors;
++        ret = iscsi_co_get_block_status(bs, sector_num - head,
++                                        BDRV_REQUEST_MAX_SECTORS, &pnum,
++                                        &file);
+         if (ret < 0) {
+             return ret;
+         }
+         /* if the whole request falls into an unallocated area we can avoid
+-         * to read and directly return zeroes instead */
+-        if (ret & BDRV_BLOCK_ZERO &&
+-            pnum >= nb_sectors + sector_num % iscsilun->cluster_sectors) {
++         * reading and directly return zeroes instead */
++        if (ret & BDRV_BLOCK_ZERO && pnum >= nb_sectors + head) {
+             qemu_iovec_memset(iov, 0, 0x00, iov->size);
+             return 0;
+         }
+@@ -1930,8 +1944,8 @@ static int iscsi_open(BlockDriverState *bs, QDict *options, int flags,
+      * reasonable size */
+     if (iscsilun->bl.opt_unmap_gran * iscsilun->block_size >= 4 * 1024 &&
+         iscsilun->bl.opt_unmap_gran * iscsilun->block_size <= 16 * 1024 * 1024) {
+-        iscsilun->cluster_sectors = (iscsilun->bl.opt_unmap_gran *
+-                                     iscsilun->block_size) >> BDRV_SECTOR_BITS;
++        iscsilun->cluster_size = iscsilun->bl.opt_unmap_gran *
++            iscsilun->block_size;
+         if (iscsilun->lbprz) {
+             ret = iscsi_allocmap_init(iscsilun, bs->open_flags);
+         }
+@@ -2137,7 +2151,7 @@ static int iscsi_get_info(BlockDriverState *bs, BlockDriverInfo *bdi)
+     IscsiLun *iscsilun = bs->opaque;
+     bdi->unallocated_blocks_are_zero = iscsilun->lbprz;
+     bdi->can_write_zeroes_with_unmap = iscsilun->lbprz && iscsilun->lbp.lbpws;
+-    bdi->cluster_size = iscsilun->cluster_sectors * BDRV_SECTOR_SIZE;
++    bdi->cluster_size = iscsilun->cluster_size;
+     return 0;
+ }
 
-     .bdrv_co_preadv     = vdi_co_preadv,
 -- 
 2.14.3
