@@ -1,24 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47950)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48087)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1eKnpn-0001In-8O
-	for qemu-devel@nongnu.org; Fri, 01 Dec 2017 11:06:43 -0500
+	(envelope-from <clg@kaod.org>) id 1eKnpr-0001OD-RL
+	for qemu-devel@nongnu.org; Fri, 01 Dec 2017 11:06:46 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1eKnpl-0002Hz-7K
-	for qemu-devel@nongnu.org; Fri, 01 Dec 2017 11:06:39 -0500
-Date: Fri, 1 Dec 2017 15:10:15 +1100
-From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20171201041015.GE30161@umbus.fritz.box>
-References: <20171123132955.1261-1-clg@kaod.org>
-	<20171123132955.1261-15-clg@kaod.org>
-	<20171130044922.GC3023@umbus.fritz.box>
-	<36b5b7a1-63f1-30ac-0fa6-a22b49df065f@kaod.org>
+	(envelope-from <clg@kaod.org>) id 1eKnpl-0002Hh-1E
+	for qemu-devel@nongnu.org; Fri, 01 Dec 2017 11:06:43 -0500
+Received: from 11.mo3.mail-out.ovh.net ([87.98.184.158]:54103)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1eKnpk-0002Fo-QP
+	for qemu-devel@nongnu.org; Fri, 01 Dec 2017 11:06:36 -0500
+Received: from player771.ha.ovh.net (b9.ovh.net [213.186.33.59])
+	by mo3.mail-out.ovh.net (Postfix) with ESMTP id 8E9B4177DAB
+	for <qemu-devel@nongnu.org>; Fri,  1 Dec 2017 17:06:35 +0100 (CET)
+From: =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>
+Date: Fri,  1 Dec 2017 17:06:03 +0100
+Message-Id: <20171201160604.15265-5-clg@kaod.org>
+In-Reply-To: <20171201160604.15265-1-clg@kaod.org>
+References: <20171201160604.15265-1-clg@kaod.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="HeFlAV5LIbMFYYuh"
-Content-Disposition: inline
-In-Reply-To: <36b5b7a1-63f1-30ac-0fa6-a22b49df065f@kaod.org>
-Subject: Re: [Qemu-devel] [PATCH 14/25] spapr: push the XIVE EQ data in OS
- event queue
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PATCH 4/5] spapr: introduce a spapr_irq_set_lsi()
+ helper
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,143 +30,67 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?iso-8859-1?Q?C=E9dric?= Le Goater <clg@kaod.org>
-Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, Benjamin Herrenschmidt <benh@kernel.crashing.org>
+To: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, David Gibson <david@gibson.dropbear.id.au>, Greg Kurz <groug@kaod.org>
+Cc: =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>
 
+It will make synchronisation easier with the XIVE interrupt mode when
+available. The 'irq' parameter refers to the global IRQ number space.
 
---HeFlAV5LIbMFYYuh
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+Signed-off-by: C=C3=A9dric Le Goater <clg@kaod.org>
+Reviewed-by: David Gibson <david@gibson.dropbear.id.au>
+---
 
-On Thu, Nov 30, 2017 at 02:16:30PM +0000, C=E9dric Le Goater wrote:
-> On 11/30/2017 04:49 AM, David Gibson wrote:
-> > On Thu, Nov 23, 2017 at 02:29:44PM +0100, C=E9dric Le Goater wrote:
-> >> If a triggered event is let through, the Event Queue data defined in t=
-he
-> >> associated IVE is pushed in the in-memory event queue. The latter is a
-> >> circular buffer provided by the OS using the H_INT_SET_QUEUE_CONFIG hc=
-all,
-> >> one per server and priority couple. It is composed of Event Queue entr=
-ies
-> >> which are 4 bytes long, the first bit being a 'generation' bit and the=
- 31
-> >> following bits the EQ Data field.
-> >>
-> >> The EQ Data field provides a way to set an invariant logical event sou=
-rce
-> >> number for an IRQ. It is set with the H_INT_SET_SOURCE_CONFIG hcall.
-> >>
-> >> Signed-off-by: C=E9dric Le Goater <clg@kaod.org>
-> >> ---
-> >>  hw/intc/spapr_xive.c | 67 +++++++++++++++++++++++++++++++++++++++++++=
-+++++++++
-> >>  1 file changed, 67 insertions(+)
-> >>
-> >> diff --git a/hw/intc/spapr_xive.c b/hw/intc/spapr_xive.c
-> >> index 983317a6b3f6..df14c5a88275 100644
-> >> --- a/hw/intc/spapr_xive.c
-> >> +++ b/hw/intc/spapr_xive.c
-> >> @@ -193,9 +193,76 @@ static sPAPRXiveICP *spapr_xive_icp_get(sPAPRXive=
- *xive, int server)
-> >>      return cpu ? SPAPR_XIVE_ICP(cpu->intc) : NULL;
-> >>  }
-> >> =20
-> >> +static void spapr_xive_eq_push(XiveEQ *eq, uint32_t data)
-> >> +{
-> >> +    uint64_t qaddr_base =3D (((uint64_t)(eq->w2 & 0x0fffffff)) << 32)=
- | eq->w3;
-> >> +    uint32_t qsize =3D GETFIELD(EQ_W0_QSIZE, eq->w0);
-> >> +    uint32_t qindex =3D GETFIELD(EQ_W1_PAGE_OFF, eq->w1);
-> >> +    uint32_t qgen =3D GETFIELD(EQ_W1_GENERATION, eq->w1);
-> >> +
-> >> +    uint64_t qaddr =3D qaddr_base + (qindex << 2);
-> >> +    uint32_t qdata =3D cpu_to_be32((qgen << 31) | (data & 0x7fffffff)=
-);
-> >> +    uint32_t qentries =3D 1 << (qsize + 10);
-> >> +
-> >> +    if (dma_memory_write(&address_space_memory, qaddr, &qdata, sizeof=
-(qdata))) {
-> >=20
-> > This suggests that uint32_t data contains guest endian data, which it
-> > generally shouldn't.  Better to use stl_be_dma() (or whatever is
-> > appropriate for the endianness of the data field.
->=20
-> There are no requirement on the endianness of the data field and=20
-> it is just stored in the IVE in the hcall H_INT_SET_SOURCE_CONFIG.=20
-> So the guest can pass whatever it likes. =20
+ Changes since initial XIVE patchset:
+=20
+ - s/spapr_irq_set/spapr_irq_set_lsi/
 
-Hm, ok.  Guest endian (or at least, not definitively host-endian) data
-in a plain uint32_t makes me uncomfortable.  Could we use char data[4]
-instead, to make it clear it's a byte-ordered buffer, rather than a
-number as far as the XIVE is concerned.
+ hw/ppc/spapr.c | 14 +++++++++++---
+ 1 file changed, 11 insertions(+), 3 deletions(-)
 
-Hm.. except that doesn't quite work, because the hardware must define
-which end that generation bit ends up in...
-
-> >> +        qemu_log_mask(LOG_GUEST_ERROR, "%s: failed to write EQ data @=
-0x%"
-> >> +                      HWADDR_PRIx "\n", __func__, qaddr);
-> >> +        return;
-> >> +    }
-> >> +
-> >> +    qindex =3D (qindex + 1) % qentries;
-> >> +    if (qindex =3D=3D 0) {
-> >> +        qgen ^=3D 1;
-> >> +        eq->w1 =3D SETFIELD(EQ_W1_GENERATION, eq->w1, qgen);
-> >> +    }
-> >> +    eq->w1 =3D SETFIELD(EQ_W1_PAGE_OFF, eq->w1, qindex);
-> >> +}
-> >> +
-> >>  static void spapr_xive_irq(sPAPRXive *xive, int lisn)
-> >>  {
-> >> +    XiveIVE *ive;
-> >> +    XiveEQ *eq;
-> >> +    uint32_t eq_idx;
-> >> +    uint8_t priority;
-> >> +
-> >> +    ive =3D spapr_xive_get_ive(xive, lisn);
-> >> +    if (!ive || !(ive->w & IVE_VALID)) {
-> >> +        qemu_log_mask(LOG_GUEST_ERROR, "XIVE: invalid LISN %d\n", lis=
-n);
-> >=20
-> > As mentioned on other patches, I'm a little concerned by these
-> > guest-triggerable logs.  I guess the LOG_GUEST_ERROR mask will save
-> > us, though.
->=20
-> I want to track 'invalid' interrupts but I haven't seen these show up=20
-> in my tests. I agree there are a little too much and some could just=20
-> be asserts.
-
-Uh.. I don't think many can be assert()s.  assert() is only
-appropriate if it being tripped definitely indicates a bug in qemu.
-Nearly all these qemu_log()s I've seen can be tripped by the guest
-doing something bad, which absolutely should not assert() qemu.
-
+diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
+index f6e72f686c34..5e4192aee8fe 100644
+--- a/hw/ppc/spapr.c
++++ b/hw/ppc/spapr.c
+@@ -3579,6 +3579,14 @@ static int ics_find_free_block(ICSState *ics, int =
+num, int alignnum)
+     return -1;
+ }
+=20
++/*
++ * Allocate the IRQ number and set the IRQ type, LSI or MSI
++ */
++static void spapr_irq_set_lsi(sPAPRMachineState *spapr, int irq, bool ls=
+i)
++{
++    ics_set_irq_type(spapr->ics, irq - spapr->ics->offset, lsi);
++}
++
+ int spapr_irq_alloc(sPAPRMachineState *spapr, int irq_hint, bool lsi,
+                     Error **errp)
+ {
+@@ -3603,7 +3611,7 @@ int spapr_irq_alloc(sPAPRMachineState *spapr, int i=
+rq_hint, bool lsi,
+         irq +=3D ics->offset;
+     }
+=20
+-    ics_set_irq_type(ics, irq - ics->offset, lsi);
++    spapr_irq_set_lsi(spapr, irq, lsi);
+     trace_spapr_irq_alloc(irq);
+=20
+     return irq;
+@@ -3642,10 +3650,10 @@ int spapr_irq_alloc_block(sPAPRMachineState *spap=
+r, int num, bool lsi,
+         return -1;
+     }
+=20
++    first +=3D ics->offset;
+     for (i =3D first; i < first + num; ++i) {
+-        ics_set_irq_type(ics, i, lsi);
++        spapr_irq_set_lsi(spapr, i, lsi);
+     }
+-    first +=3D ics->offset;
+=20
+     trace_spapr_irq_alloc_block(first, num, lsi, align);
+=20
 --=20
-David Gibson			| I'll have my music baroque, and my code
-david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
-				| _way_ _around_!
-http://www.ozlabs.org/~dgibson
-
---HeFlAV5LIbMFYYuh
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlog1icACgkQbDjKyiDZ
-s5KdXxAA4iphGhM7PBt3VlvNKW2PGOmaXwvITmdvlJaxi0HftqGRINlYRr06AwqL
-yksAtCIYee2HaHTsdPAeuLcDcJ/+/1EeV8PH6Eng+njASu4lFs7QqY6bFc2Aahtt
-jMFH/932SMKFEnw260U3XSywQCbaNs6v3x1pyccjtcPG8YWQputNC9iseQYwe1Yo
-a/cP+rZdamjFE9SjgU5Qn0dF24/hE9FcftOCyFuleC174huG+zsUFk0oxDQc7Erm
-1IdJYo1NPlUvvOAC/VLMthks1Su7Art7jx0nGIpIwxph6PseSm8vuApe5yQDen3Q
-ZRr67XWxDKm3p4YcBecKIfX+ryUjSTKHM2K9X/ESMP2wLTHqrJ52OHgWjgGsM335
-3yfREBkjYnSNWngLlYboOb1jR4B9CazKl3uPEJtNsuDD8oznlTlacS3j99t3uBRM
-p835odLSmKnHEGqFzpDzWFPaphpKih6Wli5NDWxrnb//xZZyKLeAyF6nQ462bSxu
-vJ7g1kphG0zRGyW2cqoZcn5VOAwbJA4ZdugURqlSdipNYZb1J5seIffpPW3d8nU4
-kJrb0s5KOXF3K+Yslxug1CjbUQSfwJjgUZ6+3bsMHvImNo+XlpOguMVXqil9Rk1R
-m6POouwZ9I9i8oCqx6bn/WvlOBY/9OR2wSQUIn7OYnJ8UObxKIc=
-=nElm
------END PGP SIGNATURE-----
-
---HeFlAV5LIbMFYYuh--
+2.13.6
