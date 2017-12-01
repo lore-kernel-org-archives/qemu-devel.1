@@ -1,24 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47937)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47956)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1eKnpm-0001IN-Qs
+	(envelope-from <dgibson@ozlabs.org>) id 1eKnpn-0001It-BT
 	for qemu-devel@nongnu.org; Fri, 01 Dec 2017 11:06:40 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1eKnpl-0002I7-7j
-	for qemu-devel@nongnu.org; Fri, 01 Dec 2017 11:06:38 -0500
-Date: Fri, 1 Dec 2017 15:17:17 +1100
+	(envelope-from <dgibson@ozlabs.org>) id 1eKnpl-0002IG-8C
+	for qemu-devel@nongnu.org; Fri, 01 Dec 2017 11:06:39 -0500
+Date: Fri, 1 Dec 2017 15:03:01 +1100
 From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20171201041717.GG30161@umbus.fritz.box>
+Message-ID: <20171201040301.GD30161@umbus.fritz.box>
 References: <20171123132955.1261-1-clg@kaod.org>
-	<20171123132955.1261-18-clg@kaod.org>
-	<20171130055542.GG3023@umbus.fritz.box>
-	<f0a75998-97c0-218d-0473-78788dab1f3a@kaod.org>
+	<20171123132955.1261-13-clg@kaod.org>
+	<20171129051110.GI3023@umbus.fritz.box>
+	<b0fd23cc-bc15-8023-69da-508ce5f6d0fe@kaod.org>
+	<20171130040604.GV3023@umbus.fritz.box>
+	<d35fe0fe-ae4a-3bba-ac74-ea07701d331b@kaod.org>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="L+ofChggJdETEG3Y"
+	protocol="application/pgp-signature"; boundary="4zI0WCX1RcnW9Hbu"
 Content-Disposition: inline
-In-Reply-To: <f0a75998-97c0-218d-0473-78788dab1f3a@kaod.org>
-Subject: Re: [Qemu-devel] [PATCH 17/25] spapr: add a sPAPRXive object to the
- machine
+In-Reply-To: <d35fe0fe-ae4a-3bba-ac74-ea07701d331b@kaod.org>
+Subject: Re: [Qemu-devel] [PATCH 12/25] spapr: introduce a XIVE interrupt
+ presenter model
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,63 +30,92 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: =?iso-8859-1?Q?C=E9dric?= Le Goater <clg@kaod.org>
-Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, Benjamin Herrenschmidt <benh@kernel.crashing.org>, Greg Kurz <groug@kaod.org>
+Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, Benjamin Herrenschmidt <benh@kernel.crashing.org>
 
 
---L+ofChggJdETEG3Y
+--4zI0WCX1RcnW9Hbu
 Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Thu, Nov 30, 2017 at 03:38:46PM +0000, C=E9dric Le Goater wrote:
-> >> +    } else {
-> >> +        /* XIVE uses the full range of IRQ numbers. The CPU IPIs will
-> >> +         * use the range below XICS_IRQ_BASE, which is unused by XICS=
-=2E */
-> >> +        spapr->xive =3D spapr_xive_create(spapr, XICS_IRQ_BASE + XICS=
-_IRQS_SPAPR,
-> >> +                                        &error_fatal);
+On Thu, Nov 30, 2017 at 01:44:51PM +0000, C=E9dric Le Goater wrote:
+> On 11/30/2017 04:06 AM, David Gibson wrote:
+> > On Wed, Nov 29, 2017 at 10:55:34AM +0100, C=E9dric Le Goater wrote:
+> >> On 11/29/2017 06:11 AM, David Gibson wrote:
+> >>> On Thu, Nov 23, 2017 at 02:29:42PM +0100, C=E9dric Le Goater wrote:
+> >>>> The XIVE interrupt presenter exposes a set of rings, also called
+> >>>> Thread Interrupt Management Areas (TIMA), to handle priority
+> >>>> management and interrupt acknowledgment among other things. There is
+> >>>> one ring per level of privilege, four in all. The one we are
+> >>>> interested in for the sPAPR machine is the OS ring.
+> >>>>
+> >>>> The TIMA is mapped at the same address for each CPU. 'current_cpu' is
+> >>>> used to retrieve the targeted interrupt presenter object holding the
+> >>>> cache data of the registers the model use.
+> >>>>
+> >>>> Signed-off-by: C=E9dric Le Goater <clg@kaod.org>
+> >>>> ---
+> >>>>  hw/intc/spapr_xive.c        | 271 +++++++++++++++++++++++++++++++++=
++++++++++++
+> >>>>  hw/intc/xive-internal.h     |  89 +++++++++++++++
+> >>>>  include/hw/ppc/spapr_xive.h |  11 ++
+> >>>>  3 files changed, 371 insertions(+)
+> >>>>
+> >>>> diff --git a/hw/intc/spapr_xive.c b/hw/intc/spapr_xive.c
+> >>>> index b1e3f8710cff..554b25e0884c 100644
+> >>>> --- a/hw/intc/spapr_xive.c
+> >>>> +++ b/hw/intc/spapr_xive.c
+> >>>> @@ -23,9 +23,166 @@
+> >>>>  #include "sysemu/dma.h"
+> >>>>  #include "monitor/monitor.h"
+> >>>>  #include "hw/ppc/spapr_xive.h"
+> >>>> +#include "hw/ppc/xics.h"
+> >>>> =20
+> >>>>  #include "xive-internal.h"
+> >>>> =20
+> >>>> +struct sPAPRXiveICP {
+> >>>
+> >>> I'd really prefer to avoid calling anything in xive "icp" to avoid
+> >>> confusion with xics.
+> >>
+> >> OK.=20
+> >>
+> >> The specs refers to the whole as an IVPE : Interrupt Virtualization=20
+> >> Presentation Engine. In our model, we use the TIMA cached values of=20
+> >> the OS ring and the qemu_irq for the CPU line.=20
+> >>
+> >> Would 'sPAPRXivePresenter' be fine ?
 > >=20
-> > XICS_IRQ_BASE =3D=3D 4096, and XICS_IRQS_SPAPR (which we should rename =
-at
-> > some point) =3D=3D 1024.
+> > That'd be ok.  Or call if sPAPRIVPE.  Or even call it TIMA.  I'd be
+> > fine with any of those.
 >=20
-> BTW, why XICS_IRQ_BASE =3D=3D 4096 ? I could not find a reason for
-> this offset.
+> In this model, I am making a lot of shortcuts in the XIVE concepts
+> (which I don't master completely yet ...)=20
+>=20
+> The IVPE is the part of the overall controller doing the interrupt=20
+> presentation.
+>=20
+> The TIMA refers to the MMIO region in which the thread interrupt=20
+> management is done.=20
+>=20
+> The XIVE structure that contains the 'virtual processor' interrupt=20
+> state is the NVT: Notification Virtual Target. An index to an NVT=20
+> is stored in the EQs to do the routing. I did not introduce the NVT=20
+> in sPAPRXive because it's rather big, 128 bytes, and we don't need=20
+> much of it (NSR, CPPR, PIPR, IPB) but we could use a shorten one.
+>=20
+> So I think sPAPRXiveNVT, or sPAPRXiveVP (VP for virtual processor)
+> would be better names.
 
-It's basically arbitrary.  Possible I copied the value used in
-practice on a PowerVM system of the time, but I don't recall for sure.
+Ok.  I prefer sPAPRXiveNVT of these two.
 
-> > So we have a total irq space of 5k, which is a bit odd.  I'd be ok
-> > with rounding it out to 8k for newer machines if that's useful.
 >=20
-> ok. and using a machine class value to maintain compatibility. That=20
-> would be useful if we allocate more PHBs.=20
+> We will need more of the NVT structure to support the hcalls=20
+> doing the set and the get of the address of the Reporting Cache=20
+> line (H_INT_{S,G}ET_OS_REPORTING_LINE). We can extend it when=20
+> time comes. =20
 >=20
-> > Sparse allocations in there might make life easier for getting
-> > consistent irq numbers without an "allocator" per se (because we can
-> > use different regions for VIO, PCI intx, MSI, etc. etc.).
->=20
-> So, do you think we should modify the IRQ allocator routines to be=20
-> able to segment the IRQ number space and let devices specify the
-> range they want to use ?
-
-No, I'm suggesting *eliminating* the IRQ allocator routines (except
-for backwards compat) and having devices "just know" their irq numbers
-based on their own device number and the portion of the overall irq
-space they're supposed to live in.
-
-PCI MSI is an exception, obviously, it will need some sort of runtime
-allocation.
-
-> That would be useful for the PHB LSIs. The starting IRQ for the PHB
-> could be aligned on some value depending on the PHB index, first=20
-> would come the LSI interrupts and then the MSIs which are allocated=20
-> later on by the guest. We would have predictable values.
->=20
-> Thanks,
->=20
-> C.=20
+> C.
 >=20
 
 --=20
@@ -93,24 +124,24 @@ david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
 				| _way_ _around_!
 http://www.ozlabs.org/~dgibson
 
---L+ofChggJdETEG3Y
+--4zI0WCX1RcnW9Hbu
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlog180ACgkQbDjKyiDZ
-s5KHIw/9HJQXrdkuNZ5yFV+uGKHjwPLH2VqJ2b3kQWRdTvTwyNBwIWee091RO4tJ
-Z3hfVYQYJQmWqlb6qumJTFuWJvvxuQ09LVh3pfgYGJy1mKc7KHsHuL7Cj5kLLTyr
-Q9XXUV+fR+hqQVnNS+ee1m1J2g/7hHLsh0cwFuKQ5GTAijbjS3il7Vj/hG5eJzJY
-QYzfRRFE22Q+VINvtOkaAS3cWDt5p9xlCqyiXCcdNYa27GPY1R9PmQ1lsMx25TvE
-A5Cx1878Sdxp1wmgGSgA183qIEPHjfPL/08DzSFaOg0EJqnptR37Ki43748Ye03y
-QUsJYuzixFyK2qHxJ0oCxF8XF3e72rjZi2dC1s9MvmvaNF2neyVajSesoAyN1374
-lNcV0BkXQrvPZEOu8hInyuKv+WxuV6i5nh/SdXIyflMYLg/mEyKPNXV70YzN/7K5
-QuDE9Do+v8QUGr+u/vevuFY5oyrz/l3NxnJbR+agIGu+ulxER0CLxI7vHiwYhm3E
-dL7fewPDlpcFMWLPp9G+fVqo80Twt1sA3sn5/a8SavxC3KEnu07StaXOyGY1H1Yc
-73cwrx++bZbZQEDeq6y0L/d/g0SNVyAFxtnEhOAIKs/p7seHLqvXIEfk0//+tbzH
-d3a+CIYhjuj4sWUOLn4rIfMapI0BC5ZrTghJrC5SnWlX/2OXCnQ=
-=9lBV
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlog1HQACgkQbDjKyiDZ
+s5KksRAAsDd2ALvm+kFheCGiqWi2gFAU1jZQPDICGLzyfZIF5MSRrorOwcZ7naTH
+vNTemWQ/aGHbky1eL06mAYKuNlGqYzIpYbwLDlfoRYzkhEMMigqjvNSfhg+Uzgi1
+s3gjUt0Enl5DjI4UkQUl2k490qptdDoSwFZICTvjg4YQalzT0ItlKSycKuKXJLZU
+jAHqmfbUq6pTrqzJ715122dVQgmJkDXloTqGxn9Eu2e/E5jcOspokAXzR/aLrz5Q
+tv4Fm74j1sjzqXnVEFMXWkUQ6wvMj73qzmJXXUAEf2IqFmVlTjMTqm2/IeIKIr+u
+hqGENYZP/QFxuyjAclAAhjQtcmUzEC4fyVPaE5CQ3P/3O8no9sM2tiwlrI+fCx1y
+67g7WAWe2gDVQv2MFuRqsBJevxT87uKbggOvkBeFP0cBpMe6H55vJKadK7DdayUq
+lnvOD3sbxh1gTHmzm+0b+PA6Iwl16hdsfKqOtxg7ivMI3LLTwU0FHMNIlRsNh70t
+6dc9paTyvRA6rkydnnwGceDO2p6EHkLbQt+JqZACfp+Cu7TnECnxx5y/CNIwzgAW
+c56z+g3E8cWV1IeZ3Chym4NryZ2D7p1uHNWQC7ooRuXUZDgguwFiOJdleocgRIyg
+zBAPcZTFipHmXo9pY1vlBdjfaVe+VKtVIV8l+pUkDAyPulHQ7ck=
+=dJeH
 -----END PGP SIGNATURE-----
 
---L+ofChggJdETEG3Y--
+--4zI0WCX1RcnW9Hbu--
