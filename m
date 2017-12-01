@@ -1,26 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52079)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53462)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1eKoGg-0002ca-5p
-	for qemu-devel@nongnu.org; Fri, 01 Dec 2017 11:34:27 -0500
+	(envelope-from <stefanha@gmail.com>) id 1eKoI4-00043V-R3
+	for qemu-devel@nongnu.org; Fri, 01 Dec 2017 11:35:53 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1eKoGb-00012o-5e
-	for qemu-devel@nongnu.org; Fri, 01 Dec 2017 11:34:26 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:60506)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1eKoGa-00011r-QU
-	for qemu-devel@nongnu.org; Fri, 01 Dec 2017 11:34:21 -0500
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
-	[10.5.11.11])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 84485C0586A2
-	for <qemu-devel@nongnu.org>; Fri,  1 Dec 2017 12:57:56 +0000 (UTC)
-From: Juan Quintela <quintela@redhat.com>
-Date: Fri,  1 Dec 2017 13:57:49 +0100
-Message-Id: <20171201125750.1372-2-quintela@redhat.com>
-In-Reply-To: <20171201125750.1372-1-quintela@redhat.com>
-References: <20171201125750.1372-1-quintela@redhat.com>
-Subject: [Qemu-devel] [PATCH v3 1/2] migration: Create tcp_port parameter
+	(envelope-from <stefanha@gmail.com>) id 1eKoI3-0002HB-Vm
+	for qemu-devel@nongnu.org; Fri, 01 Dec 2017 11:35:52 -0500
+Received: from mail-wr0-x22e.google.com ([2a00:1450:400c:c0c::22e]:45377)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1eKoI3-0002GU-Nm
+	for qemu-devel@nongnu.org; Fri, 01 Dec 2017 11:35:51 -0500
+Received: by mail-wr0-x22e.google.com with SMTP id h1so10704047wre.12
+	for <qemu-devel@nongnu.org>; Fri, 01 Dec 2017 08:35:51 -0800 (PST)
+Date: Fri, 1 Dec 2017 10:44:54 +0000
+From: Stefan Hajnoczi <stefanha@gmail.com>
+Message-ID: <20171201104454.GI23501@stefanha-x1.localdomain>
+References: <20171127043517.22441-1-haozhong.zhang@intel.com>
+	<20171127043517.22441-4-haozhong.zhang@intel.com>
+MIME-Version: 1.0
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="u/L2/WlOHZg+YGU4"
+Content-Disposition: inline
+In-Reply-To: <20171127043517.22441-4-haozhong.zhang@intel.com>
+Subject: Re: [Qemu-devel] [PATCH v3 3/3] nvdimm: add 'unarmed' option
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,155 +30,57 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: dgilbert@redhat.com, lvivier@redhat.com, peterx@redhat.com
+To: Haozhong Zhang <haozhong.zhang@intel.com>
+Cc: qemu-devel@nongnu.org, Xiao Guangrong <guangrong.xiao@gmail.com>, Dan Williams <dan.j.williams@intel.com>, Xiao Guangrong <xiaoguangrong.eric@gmail.com>, "Michael S. Tsirkin" <mst@redhat.com>, Igor Mammedov <imammedo@redhat.com>
 
-It will be used to store the uri tcp_port parameter.  This is the only
-parameter than can change and we can need to be able to connect to it.
 
-Signed-off-by: Juan Quintela <quintela@redhat.com>
+--u/L2/WlOHZg+YGU4
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
---
+On Mon, Nov 27, 2017 at 12:35:17PM +0800, Haozhong Zhang wrote:
+> @@ -312,6 +315,10 @@ nvdimm_build_structure_memdev(GArray *structures, De=
+viceState *dev)
+> =20
+>      /* Only one interleave for PMEM. */
+>      nfit_memdev->interleave_ways =3D cpu_to_le16(1);
+> +
+> +    if (nvdimm->unarmed) {
+> +        nfit_memdev->flags |=3D ACPI_NFIT_MEM_NOT_ARMED;
 
-This used to be uri parameter, but it has so many troubles to
-reproduce that it don't just make sense.
----
- hmp.c                 |  7 +++++++
- migration/migration.c | 10 ++++++++++
- qapi/migration.json   | 19 ++++++++++++++++---
- 3 files changed, 33 insertions(+), 3 deletions(-)
+Missing cpu_to_le16()?
 
-diff --git a/hmp.c b/hmp.c
-index 1727c9c003..6387d6d517 100644
---- a/hmp.c
-+++ b/hmp.c
-@@ -345,6 +345,9 @@ void hmp_info_migrate_parameters(Monitor *mon, const QDict *qdict)
-         monitor_printf(mon, "%s: %" PRIu64 "\n",
-             MigrationParameter_str(MIGRATION_PARAMETER_XBZRLE_CACHE_SIZE),
-             params->xbzrle_cache_size);
-+        monitor_printf(mon, "%s: %d\n",
-+            MigrationParameter_str(MIGRATION_PARAMETER_TCP_PORT),
-+            params->tcp_port);
-     }
- 
-     qapi_free_MigrationParameters(params);
-@@ -1659,6 +1662,10 @@ void hmp_migrate_set_parameter(Monitor *mon, const QDict *qdict)
-         }
-         p->xbzrle_cache_size = cache_size;
-         break;
-+    case MIGRATION_PARAMETER_TCP_PORT:
-+        p->has_tcp_port = true;
-+        visit_type_uint16(v, param, &p->tcp_port, &err);
-+        break;
-     default:
-         assert(0);
-     }
-diff --git a/migration/migration.c b/migration/migration.c
-index 19917a4b5b..abc02d4efd 100644
---- a/migration/migration.c
-+++ b/migration/migration.c
-@@ -517,6 +517,8 @@ MigrationParameters *qmp_query_migrate_parameters(Error **errp)
-     params->x_multifd_page_count = s->parameters.x_multifd_page_count;
-     params->has_xbzrle_cache_size = true;
-     params->xbzrle_cache_size = s->parameters.xbzrle_cache_size;
-+    params->has_tcp_port = true;
-+    params->tcp_port = s->parameters.tcp_port;
- 
-     return params;
- }
-@@ -884,6 +886,9 @@ static void migrate_params_test_apply(MigrateSetParameters *params,
-     if (params->has_xbzrle_cache_size) {
-         dest->xbzrle_cache_size = params->xbzrle_cache_size;
-     }
-+    if (params->has_tcp_port) {
-+        dest->tcp_port = params->tcp_port;
-+    }
- }
- 
- static void migrate_params_apply(MigrateSetParameters *params, Error **errp)
-@@ -956,6 +961,9 @@ static void migrate_params_apply(MigrateSetParameters *params, Error **errp)
-         s->parameters.xbzrle_cache_size = params->xbzrle_cache_size;
-         xbzrle_cache_resize(params->xbzrle_cache_size, errp);
-     }
-+    if (params->has_tcp_port) {
-+        s->parameters.tcp_port = params->tcp_port;
-+    }
- }
- 
- void qmp_migrate_set_parameters(MigrateSetParameters *params, Error **errp)
-@@ -2422,6 +2430,8 @@ static Property migration_properties[] = {
-     DEFINE_PROP_SIZE("xbzrle-cache-size", MigrationState,
-                       parameters.xbzrle_cache_size,
-                       DEFAULT_MIGRATE_XBZRLE_CACHE_SIZE),
-+    DEFINE_PROP_UINT16("x-tcp-port", MigrationState,
-+                       parameters.tcp_port, 0),
- 
-     /* Migration capabilities */
-     DEFINE_PROP_MIG_CAP("x-xbzrle", MIGRATION_CAPABILITY_XBZRLE),
-diff --git a/qapi/migration.json b/qapi/migration.json
-index 4cd3d13158..e2a1d86216 100644
---- a/qapi/migration.json
-+++ b/qapi/migration.json
-@@ -488,6 +488,9 @@
- #                     and a power of 2
- #                     (Since 2.11)
- #
-+# @tcp-port: Only used for tcp, to know what is the real port
-+#                     (Since 2.12)
-+#
- # Since: 2.4
- ##
- { 'enum': 'MigrationParameter',
-@@ -496,7 +499,7 @@
-            'tls-creds', 'tls-hostname', 'max-bandwidth',
-            'downtime-limit', 'x-checkpoint-delay', 'block-incremental',
-            'x-multifd-channels', 'x-multifd-page-count',
--           'xbzrle-cache-size' ] }
-+           'xbzrle-cache-size', 'tcp-port' ] }
- 
- ##
- # @MigrateSetParameters:
-@@ -564,6 +567,10 @@
- #                     needs to be a multiple of the target page size
- #                     and a power of 2
- #                     (Since 2.11)
-+#
-+# @tcp-port: Only used for tcp, to know what is the real port
-+#                     (Since 2.12)
-+#
- # Since: 2.4
- ##
- # TODO either fuse back into MigrationParameters, or make
-@@ -582,7 +589,8 @@
-             '*block-incremental': 'bool',
-             '*x-multifd-channels': 'int',
-             '*x-multifd-page-count': 'int',
--            '*xbzrle-cache-size': 'size' } }
-+            '*xbzrle-cache-size': 'size' ,
-+            '*tcp-port': 'uint16'} }
- 
- ##
- # @migrate-set-parameters:
-@@ -665,6 +673,10 @@
- #                     needs to be a multiple of the target page size
- #                     and a power of 2
- #                     (Since 2.11)
-+#
-+# @tcp-port: Only used for tcp, to know what is the real port
-+#                     (Since 2.12)
-+#
- # Since: 2.4
- ##
- { 'struct': 'MigrationParameters',
-@@ -681,7 +693,8 @@
-             '*block-incremental': 'bool' ,
-             '*x-multifd-channels': 'uint8',
-             '*x-multifd-page-count': 'uint32',
--            '*xbzrle-cache-size': 'size' } }
-+            '*xbzrle-cache-size': 'size',
-+            '*tcp-port': 'uint16'} }
- 
- ##
- # @query-migrate-parameters:
--- 
-2.14.3
+> +static void nvdimm_set_unarmed(Object *obj, bool value, Error **errp)
+> +{
+> +    NVDIMMDevice *nvdimm =3D NVDIMM(obj);
+> +    Error *local_err =3D NULL;
+> +
+> +    if (memory_region_size(&nvdimm->nvdimm_mr)) {
+> +        error_setg(&local_err, "cannot change property value");
+
+This error message does not explain why the value cannot be changed.  I
+guess this is checking if the device has been realized.
+
+Please call qdev_prop_set_after_realize() instead:
+
+  if (memory_region_size(&nvdimm->nvdimm_mr)) {
+      qdev_prop_set_after_realize(DEVICE(obj), "unarmed", &local_err);
+      goto out;
+  }
+
+--u/L2/WlOHZg+YGU4
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEcBAEBAgAGBQJaITKmAAoJEJykq7OBq3PIu20IAKSbwaEPTHvGT8EsjBeUaUIA
+6u+H07qNjoEVraD7L4hyDYe8760SKDRKE4Wpk0DG/ZnslWm1GN6TO2mQzqHFGteF
+7O0LFWUNfX4EbUfWc66JaxYu0rOUvpBxQNDlA+ziz5KdjLRXRhdHmMMw6i471pRW
+UXjkzCGHNFLCntie/l1Sh37wRdGwQ9hOKNYJLl5P4j1kfyG3XAA6Arh0GPoD9uVP
+S5ov/898Zsw/n8HJ9p1MdBlY2bpX2WczYpnc3GICeEWFl9CFp8DO8NfETJqVmf9F
+kKrEIcA2suxFVSIq3wCBdp+PJQKJrQ8bN5DbWSd1hbYlelI91oUS05kG6TcEMlU=
+=me79
+-----END PGP SIGNATURE-----
+
+--u/L2/WlOHZg+YGU4--
