@@ -1,31 +1,35 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45105)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45698)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1eKq30-0007ZX-J7
-	for qemu-devel@nongnu.org; Fri, 01 Dec 2017 13:28:27 -0500
+	(envelope-from <farman@linux.vnet.ibm.com>) id 1eKq4D-0000Kx-UX
+	for qemu-devel@nongnu.org; Fri, 01 Dec 2017 13:29:42 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1eKq2z-0001BX-Cs
-	for qemu-devel@nongnu.org; Fri, 01 Dec 2017 13:28:26 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:37958)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1eKq2z-0001BM-6G
-	for qemu-devel@nongnu.org; Fri, 01 Dec 2017 13:28:25 -0500
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
-	[10.5.11.12])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 4090BC04AC43
-	for <qemu-devel@nongnu.org>; Fri,  1 Dec 2017 18:28:24 +0000 (UTC)
-References: <20171201125750.1372-1-quintela@redhat.com>
-	<20171201125750.1372-2-quintela@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <3e95592d-4846-bb91-961d-03ca10e3ae18@redhat.com>
-Date: Fri, 1 Dec 2017 12:28:20 -0600
-MIME-Version: 1.0
-In-Reply-To: <20171201125750.1372-2-quintela@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v3 1/2] migration: Create tcp_port parameter
+	(envelope-from <farman@linux.vnet.ibm.com>) id 1eKq49-0001bb-Ni
+	for qemu-devel@nongnu.org; Fri, 01 Dec 2017 13:29:41 -0500
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:37284)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <farman@linux.vnet.ibm.com>)
+	id 1eKq49-0001bM-Eg
+	for qemu-devel@nongnu.org; Fri, 01 Dec 2017 13:29:37 -0500
+Received: from pps.filterd (m0098399.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
+	vB1FFOD6059267
+	for <qemu-devel@nongnu.org>; Fri, 1 Dec 2017 10:15:48 -0500
+Received: from e06smtp15.uk.ibm.com (e06smtp15.uk.ibm.com [195.75.94.111])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2ek86jd4hr-1
+	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Fri, 01 Dec 2017 10:15:47 -0500
+Received: from localhost
+	by e06smtp15.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	Only! Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <farman@linux.vnet.ibm.com>;
+	Fri, 1 Dec 2017 15:15:45 -0000
+From: Eric Farman <farman@linux.vnet.ibm.com>
+Date: Fri,  1 Dec 2017 16:15:38 +0100
+In-Reply-To: <20171201151538.6844-1-farman@linux.vnet.ibm.com>
+References: <20171201151538.6844-1-farman@linux.vnet.ibm.com>
+Message-Id: <20171201151538.6844-2-farman@linux.vnet.ibm.com>
+Subject: [Qemu-devel] [PATCH 1/1] vhost-scsi: add missing virtqueue_size
+ parameter
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,74 +38,36 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Juan Quintela <quintela@redhat.com>, qemu-devel@nongnu.org
-Cc: lvivier@redhat.com, dgilbert@redhat.com, peterx@redhat.com
+To: Paolo Bonzini <pbonzini@redhat.com>, "Richard W . M . Jones" <rjones@redhat.com>, "Michael S . Tsirkin" <mst@redhat.com>
+Cc: Dariusz Stojaczyk <dariuszx.stojaczyk@intel.com>, Felipe Franciosi <felipe@nutanix.com>, qemu-devel@nongnu.org, Eric Farman <farman@linux.vnet.ibm.com>
 
-On 12/01/2017 06:57 AM, Juan Quintela wrote:
-> It will be used to store the uri tcp_port parameter.  This is the only
-> parameter than can change and we can need to be able to connect to it.
-> 
-> Signed-off-by: Juan Quintela <quintela@redhat.com>
-> 
-> --
-> 
+Commit 5c0919d02066 ("virtio-scsi: Add virtqueue_size parameter allowing
+virtqueue size to be set.") introduced a new parameter to virtio-scsi.
+Later, commit 920036106044 ("vhost-user-scsi: add missing virtqueue_size
+param") added that parameter to the new vhost-user-scsi interface but
+neglected the existing vhost-scsi interface it was built on.
 
-> @@ -2422,6 +2430,8 @@ static Property migration_properties[] = {
->       DEFINE_PROP_SIZE("xbzrle-cache-size", MigrationState,
->                         parameters.xbzrle_cache_size,
->                         DEFAULT_MIGRATE_XBZRLE_CACHE_SIZE),
-> +    DEFINE_PROP_UINT16("x-tcp-port", MigrationState,
-> +                       parameters.tcp_port, 0),
+Apply the same change to vhost-scsi, so that we can boot a guest with
+a device defined.  This also avoids crashing a guest when hotplugging
+a vhost-scsi device.
 
-Why is this one experimental when others are not,
+Signed-off-by: Eric Farman <farman@linux.vnet.ibm.com>
+---
+ hw/scsi/vhost-scsi.c | 2 ++
+ 1 file changed, 2 insertions(+)
 
->   
->       /* Migration capabilities */
->       DEFINE_PROP_MIG_CAP("x-xbzrle", MIGRATION_CAPABILITY_XBZRLE),
-> diff --git a/qapi/migration.json b/qapi/migration.json
-> index 4cd3d13158..e2a1d86216 100644
-> --- a/qapi/migration.json
-> +++ b/qapi/migration.json
-> @@ -488,6 +488,9 @@
->   #                     and a power of 2
->   #                     (Since 2.11)
->   #
-> +# @tcp-port: Only used for tcp, to know what is the real port
-
-s/what is the real port/what the real port is/
-
-> +#                     (Since 2.12)
-> +#
-
-Especially since it is not experimental here?
-
-> @@ -564,6 +567,10 @@
->   #                     needs to be a multiple of the target page size
->   #                     and a power of 2
->   #                     (Since 2.11)
-> +#
-> +# @tcp-port: Only used for tcp, to know what is the real port
-
-same wording tweak
-
-> +#                     (Since 2.12)
-> +#
->   # Since: 2.4
->   ##
->   # TODO either fuse back into MigrationParameters, or make
-> @@ -582,7 +589,8 @@
->               '*block-incremental': 'bool',
->               '*x-multifd-channels': 'int',
->               '*x-multifd-page-count': 'int',
-> -            '*xbzrle-cache-size': 'size' } }
-> +            '*xbzrle-cache-size': 'size' ,
-
-the space before comma looks unusual (although it's harmless)
-
-> +            '*tcp-port': 'uint16'} }
-
-
+diff --git a/hw/scsi/vhost-scsi.c b/hw/scsi/vhost-scsi.c
+index cd4ab05233..9c1bea8ff3 100644
+--- a/hw/scsi/vhost-scsi.c
++++ b/hw/scsi/vhost-scsi.c
+@@ -233,6 +233,8 @@ static Property vhost_scsi_properties[] = {
+     DEFINE_PROP_STRING("wwpn", VirtIOSCSICommon, conf.wwpn),
+     DEFINE_PROP_UINT32("boot_tpgt", VirtIOSCSICommon, conf.boot_tpgt, 0),
+     DEFINE_PROP_UINT32("num_queues", VirtIOSCSICommon, conf.num_queues, 1),
++    DEFINE_PROP_UINT32("virtqueue_size", VirtIOSCSICommon, conf.virtqueue_size,
++                       128),
+     DEFINE_PROP_UINT32("max_sectors", VirtIOSCSICommon, conf.max_sectors,
+                        0xFFFF),
+     DEFINE_PROP_UINT32("cmd_per_lun", VirtIOSCSICommon, conf.cmd_per_lun, 128),
 -- 
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
+2.13.5
