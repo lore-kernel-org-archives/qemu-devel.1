@@ -1,27 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51333)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53885)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1eKnt7-0004sm-1T
-	for qemu-devel@nongnu.org; Fri, 01 Dec 2017 11:11:31 -0500
+	(envelope-from <dgibson@ozlabs.org>) id 1eKnvL-0006r2-8Y
+	for qemu-devel@nongnu.org; Fri, 01 Dec 2017 11:13:44 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1eKnsJ-0004zg-8F
-	for qemu-devel@nongnu.org; Fri, 01 Dec 2017 11:10:04 -0500
-Received: from 1.mo4.mail-out.ovh.net ([178.33.248.196]:46158)
+	(envelope-from <dgibson@ozlabs.org>) id 1eKnuc-0007a0-QY
+	for qemu-devel@nongnu.org; Fri, 01 Dec 2017 11:12:23 -0500
+Received: from ozlabs.org ([2401:3900:2:1::2]:57151)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1eKnsI-0004yk-Uj
-	for qemu-devel@nongnu.org; Fri, 01 Dec 2017 11:09:15 -0500
-Received: from player694.ha.ovh.net (b7.ovh.net [213.186.33.57])
-	by mo4.mail-out.ovh.net (Postfix) with ESMTP id EF796112272
-	for <qemu-devel@nongnu.org>; Fri,  1 Dec 2017 11:11:36 +0100 (CET)
-Date: Fri, 1 Dec 2017 11:11:22 +0100
-From: Greg Kurz <groug@kaod.org>
-Message-ID: <20171201111122.25e43169@bahia.lan>
-In-Reply-To: <20171201054125.25749-1-david@gibson.dropbear.id.au>
-References: <20171201054125.25749-1-david@gibson.dropbear.id.au>
+	(Exim 4.71) (envelope-from <dgibson@ozlabs.org>) id 1eKnub-0007Se-3k
+	for qemu-devel@nongnu.org; Fri, 01 Dec 2017 11:11:38 -0500
+Date: Fri, 1 Dec 2017 15:25:10 +1100
+From: David Gibson <david@gibson.dropbear.id.au>
+Message-ID: <20171201042510.GH30161@umbus.fritz.box>
+References: <20171129084628.12336-1-david@gibson.dropbear.id.au>
+	<20171129084628.12336-5-david@gibson.dropbear.id.au>
+	<20171130062345.GC22901@xz-mi>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH for-2.11] spapr: Include "pre-plugged"
- DIMMS in ram size calculation at reset
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature"; boundary="tcC6YSqBgqqkz7Sb"
+Content-Disposition: inline
+In-Reply-To: <20171130062345.GC22901@xz-mi>
+Subject: Re: [Qemu-devel] [for-2.12 4/7] pci: Simplify pci_bus_is_root()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,64 +29,73 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Gibson <david@gibson.dropbear.id.au>
-Cc: lvivier@redhat.com, spopovyc@redhat.com, qemu-ppc@nongnu.org, qemu-devel@nongnu.org
+To: Peter Xu <peterx@redhat.com>
+Cc: "Michael S . Tsirkin" <mst@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, Marcel Apfelbaum <marcel@redhat.com>, Igor Mammedov <imammedo@redhat.com>, qemu-devel@nongnu.org
 
-On Fri,  1 Dec 2017 16:41:25 +1100
-David Gibson <david@gibson.dropbear.id.au> wrote:
-> At guest reset time, we allocate a hash page table (HPT) for the guest
-> based on the guest's RAM size.  If dynamic HPT resizing is not available we
-> use the maximum RAM size, if it is we use the current RAM size.
-> 
-> But the "current RAM size" calculation is incorrect - we just use the
-> "base" ram_size from the machine structure.  This doesn't include any
-> pluggable DIMMs that are already plugged at reset time.
-> 
-> This means that if you try to start a 'pseries' machine with a DIMM
-> specified on the command line that's much larger than the "base" RAM size,
-> then the guest will get a woefully inadequate HPT.  This can lead to a
-> guest freeze during boot as it runs out of HPT space during initial MMU
-> setup.
-> 
-> Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
-> ---
 
-Yeah I could easily reproduce the issue with:
+--tcC6YSqBgqqkz7Sb
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
--m 256M,maxmem=9G,slots=1 \
--object memory-backend-ram,id=ram0,size=8G \
--device pc-dimm,id=dimm0,memdev=ram0
+On Thu, Nov 30, 2017 at 02:23:45PM +0800, Peter Xu wrote:
+> On Wed, Nov 29, 2017 at 07:46:25PM +1100, David Gibson wrote:
+>=20
+> [...]
+>=20
+> >  struct PCIBus {
+> >      BusState qbus;
+> > +    enum PCIBusFlags flags;
+> >      PCIIOMMUFunc iommu_fn;
+> >      void *iommu_opaque;
+> >      uint8_t devfn_min;
+> > @@ -440,8 +446,12 @@ struct PCIBus {
+> >      Notifier machine_done;
+> >  };
+>=20
+> I would prefer directly defining flags as uint64_t then it's more
+> clear that it's a bitmask (enum let me think of only one flag will be
+> set, but I may be wrong), but it's fine too to me.
 
-and this patch indeed fixes the issue.
+In most languages an enum would only allow one value to be set, but C
+enums are weird - they're basically just a funny way of defining
+integer constants.
 
-BTW, we already had a similar miscalculation of the current RAM size in
-h_resize_hpt_prepare() that was addressed with commit db50f280cf5f7. Maybe
-worth consolidating the calculation in some helper ?
+I'm not particularly bothered either way: using the enum type makes it
+clear the right set of constants to use with this field, using an int
+makes it clearer that bit flags can be set.  So both options are
+slightly misleading in different ways.
 
-Anyway,
+If there's another vote for uint64_t over using the enum, I'll change
+it.
 
-Reviewed-by: Greg Kurz <groug@kaod.org>
+> Reviewed-by: Peter Xu <peterx@redhat.com>
+>=20
 
-and
+--=20
+David Gibson			| I'll have my music baroque, and my code
+david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
+				| _way_ _around_!
+http://www.ozlabs.org/~dgibson
 
-Tested-by: Greg Kurz <groug@kaod.org>
+--tcC6YSqBgqqkz7Sb
+Content-Type: application/pgp-signature; name="signature.asc"
 
->  hw/ppc/spapr.c | 5 ++++-
->  1 file changed, 4 insertions(+), 1 deletion(-)
-> 
-> diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-> index a471de6cab..1ac7eb0f8c 100644
-> --- a/hw/ppc/spapr.c
-> +++ b/hw/ppc/spapr.c
-> @@ -1386,7 +1386,10 @@ void spapr_setup_hpt_and_vrma(sPAPRMachineState *spapr)
->              && !spapr_ovec_test(spapr->ov5_cas, OV5_HPT_RESIZE))) {
->          hpt_shift = spapr_hpt_shift_for_ramsize(MACHINE(spapr)->maxram_size);
->      } else {
-> -        hpt_shift = spapr_hpt_shift_for_ramsize(MACHINE(spapr)->ram_size);
-> +        uint64_t current_ram_size;
-> +
-> +        current_ram_size = MACHINE(spapr)->ram_size + get_plugged_memory_size();
-> +        hpt_shift = spapr_hpt_shift_for_ramsize(current_ram_size);
->      }
->      spapr_reallocate_hpt(spapr, hpt_shift, &error_fatal);
->  
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlog2aUACgkQbDjKyiDZ
+s5L3EA/+KmWzRWeVn78I/oib6iLj57gHpRjvnFVT3loKaNpqVAjXIomxG2O3+iux
+5cuIXifTNBCCk9SIiZLTT4vWIQD5zI0v3aky7OCEuCq3/dbbCjXBB7Jnl9vSMq++
+Hhmau3KlZ+b8Rl4i0fF/92p3W1H/k4yamPN2ob+b5uW1oDj56Z85vhexOR+7aJL1
+iZxl/beW361wNHL6P9scaB6pBm1IeUpDSrdg55T9lPrCG55iHQMGz74jyKKBtbYO
+hVnQeo5JlZG2HqIT6khE71wTHOrz5zzeUlanOh0YE39v+KisNttnAD6E71ciFPpc
+E5S9ILGEhO/Z8/ro4wyOpGGZXRb0YDHlosLpo1EG9yxR7kziVK2xkysdUMjvYipP
+2Bp4/2HN95dBbcGwtnKuuPo0A0E2kdXFLMrSmh9SLMA8dAyLuy7AELGvt17Lm5bM
+DX31sRAmeK1mj8EvZfjHT/k+ZdJkfJmZ33T65+Sj5WPU8EquHcnQSmZ0ivC2AYMx
+qA8DcXTmJ3Ed2avHNtk44EKAZ4fMCLPWw0n1LoGFR0Awa905kIEnrnIexj/t/ZW4
+UXEBsic8brXJV2cTBoqjFIKA1DVo4q9mFmnndB6vqNphrLzErTYpvRXD5nnSxi7E
+fAbk9bz8flOuTz9EAuXIRsYw6rHPeLzWAOHL2ItzvFmFma9yv3Q=
+=5tte
+-----END PGP SIGNATURE-----
+
+--tcC6YSqBgqqkz7Sb--
