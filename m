@@ -1,24 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34697)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37218)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <zhang.zhanghailiang@huawei.com>) id 1eKqdn-0000kL-CP
-	for qemu-devel@nongnu.org; Fri, 01 Dec 2017 14:06:29 -0500
+	(envelope-from <mreitz@redhat.com>) id 1eKqjC-0006Ag-Tt
+	for qemu-devel@nongnu.org; Fri, 01 Dec 2017 14:12:03 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <zhang.zhanghailiang@huawei.com>) id 1eKqdh-0002oj-TH
-	for qemu-devel@nongnu.org; Fri, 01 Dec 2017 14:06:26 -0500
-Received: from szxga03-in.huawei.com ([45.249.212.189]:2245 helo=huawei.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <zhang.zhanghailiang@huawei.com>)
-	id 1eKqdg-0002Qa-Ua
-	for qemu-devel@nongnu.org; Fri, 01 Dec 2017 14:06:21 -0500
-From: Zhanghailiang <zhang.zhanghailiang@huawei.com>
-Date: Thu, 30 Nov 2017 19:03:10 +0000
-Message-ID: <D1BD20B5DB34024DA951CEEE6C4C5998B1B8CC82@DGGEMA501-MBX.china.huawei.com>
-Content-Language: zh-CN
+	(envelope-from <mreitz@redhat.com>) id 1eKqjC-0007hI-3u
+	for qemu-devel@nongnu.org; Fri, 01 Dec 2017 14:12:02 -0500
+References: <20171109154049.42386-1-vsementsov@virtuozzo.com>
+	<20171109154049.42386-2-vsementsov@virtuozzo.com>
+From: Max Reitz <mreitz@redhat.com>
+Message-ID: <f6ca4eb8-45b7-9169-b98e-dbb2cc69209f@redhat.com>
+Date: Fri, 1 Dec 2017 20:11:48 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset="gb2312"
-Content-Transfer-Encoding: base64
-Subject: [Qemu-devel] [BUG] Windows 7 got stuck easily while run PCMark10
- application
+In-Reply-To: <20171109154049.42386-2-vsementsov@virtuozzo.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="irjQMWRKlrDW6iGOU5HkpdxCxieLTLqDs"
+Subject: Re: [Qemu-devel] [PATCH 1/2] nbd/server: add additional assert to
+ nbd_export_put
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,53 +25,51 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "mst@redhat.com" <mst@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
-Cc: "Huangweidong (C)" <weidong.huang@huawei.com>, "Gonglei (Arei)" <arei.gonglei@huawei.com>, "wangxin (U)" <wangxinxin.wang@huawei.com>, Xiexiangyou <xiexiangyou@huawei.com>
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org
+Cc: eblake@redhat.com, pbonzini@redhat.com, kwolf@redhat.com, armbru@redhat.com, den@openvz.org
 
-SGmjrA0KDQpXZSBoaXQgYSBidWcgaW4gb3VyIHRlc3Qgd2hpbGUgcnVuIFBDTWFyayAxMCBpbiBh
-IHdpbmRvd3MgNyBWTSwNClRoZSBWTSBnb3Qgc3R1Y2sgYW5kIHRoZSB3YWxsY2xvY2sgd2FzIGhh
-bmcgYWZ0ZXIgc2V2ZXJhbCBtaW51dGVzIHJ1bm5pbmcNClBDTWFyayAxMCBpbiBpdC4NCkl0IGlz
-IHF1aXRlIGVhc2lseSB0byByZXByb2R1Y2UgdGhlIGJ1ZyB3aXRoIHRoZSB1cHN0cmVhbSBLVk0g
-YW5kIFFlbXUuDQoNCldlIGZvdW5kIHRoYXQgS1ZNIGNhbiBub3QgaW5qZWN0IGFueSBSVEMgaXJx
-IHRvIFZNIGFmdGVyIGl0IHdhcyBoYW5nLCBpdCBmYWlscyB0bw0KRGVsaXZlciBpcnEgaW4gaW9h
-cGljX3NldF9pcnEoKSBiZWNhdXNlIFJUQyBpcnEgaXMgc3RpbGwgcGVuZGluZyBpbiBpb2FwaWMt
-Pmlyci4NCg0Kc3RhdGljIGludCBpb2FwaWNfc2V0X2lycShzdHJ1Y3Qga3ZtX2lvYXBpYyAqaW9h
-cGljLCB1bnNpZ25lZCBpbnQgaXJxLA0KICAgICAgICAgICAgICAgICAgaW50IGlycV9sZXZlbCwg
-Ym9vbCBsaW5lX3N0YXR1cykNCnsNCqGtIKGtDQogICAgICAgICBpZiAoIWlycV9sZXZlbCkgew0K
-ICAgICAgICAgICAgICAgICAgaW9hcGljLT5pcnIgJj0gfm1hc2s7DQogICAgICAgICAgICAgICAg
-ICByZXQgPSAxOw0KICAgICAgICAgICAgICAgICAgZ290byBvdXQ7DQogICAgICAgICB9DQqhrSCh
-rQ0KICAgICAgICAgaWYgKChlZGdlICYmIG9sZF9pcnIgPT0gaW9hcGljLT5pcnIpIHx8DQogICAg
-ICAgICAgICAgKCFlZGdlICYmIGVudHJ5LmZpZWxkcy5yZW1vdGVfaXJyKSkgew0KICAgICAgICAg
-ICAgICAgICAgcmV0ID0gMDsNCiAgICAgICAgICAgICAgICAgIGdvdG8gb3V0Ow0KICAgICAgICAg
-fQ0KDQpBY2NvcmRpbmcgdG8gUlRDIHNwZWMsIGFmdGVyIFJUQyBpbmplY3RzIGEgSGlnaCBsZXZl
-bCBpcnEsIE9TIHdpbGwgcmVhZCBDTU9Toa9zDQpyZWdpc3RlciBDIHRvIHRvIGNsZWFyIHRoZSBp
-cnEgZmxhZywgYW5kIHB1bGwgZG93biB0aGUgaXJxIGVsZWN0cmljIHBpbi4NCg0KRm9yIFFlbXUs
-IHdlIHdpbGwgZW11bGF0ZSB0aGUgcmVhZGluZyBvcGVyYXRpb24gaW4gY21vc19pb3BvcnRfcmVh
-ZCgpLA0KYnV0IEd1ZXN0IE9TIHdpbGwgZmlyZSBhIHdyaXRlIG9wZXJhdGlvbiBiZWZvcmUgdG8g
-dGVsbCB3aGljaCByZWdpc3RlciB3aWxsIGJlIHJlYWQNCmFmdGVyIHRoaXMgd3JpdGUsIHdoZXJl
-IHdlIHVzZSBzLT5jbW9zX2luZGV4IHRvIHJlY29yZCB0aGUgZm9sbG93aW5nIHJlZ2lzdGVyIHRv
-IHJlYWQuDQoNCkJ1dCBpbiBvdXIgdGVzdCwgd2UgZm91bmQgdGhhdCB0aGVyZSBpcyBhIHBvc3Np
-YmxlIHNpdHVhdGlvbiB0aGF0IFZjcHUgZmFpbHMgdG8gcmVhZA0KUlRDX1JFR19DIHRvIGNsZWFy
-IGlycSwgVGhpcyBjb3VsZCBoYXBwZW5zIHdoaWxlIHR3byBWQ3B1cyBhcmUgd3JpdGluZy9yZWFk
-aW5nDQpyZWdpc3RlcnMgYXQgdGhlIHNhbWUgdGltZSwgZm9yIGV4YW1wbGUsIHZjcHUgMCBpcyB0
-cnlpbmcgdG8gcmVhZCBSVENfUkVHX0MsDQpzbyBpdCB3cml0ZSBSVENfUkVHX0MgZmlyc3QsIHdo
-ZXJlIHRoZSBzLT5jbW9zX2luZGV4IHdpbGwgYmUgUlRDX1JFR19DLA0KYnV0IGJlZm9yZSBpdCB0
-cmllcyB0byByZWFkIHJlZ2lzdGVyIEMsIGFub3RoZXIgdmNwdTEgaXMgZ29pbmcgdG8gcmVhZCBS
-VENfWUVBUiwNCml0IGNoYW5nZXMgcy0+Y21vc19pbmRleCB0byBSVENfWUVBUiBieSBhIHdyaXRp
-bmcgYWN0aW9uLg0KVGhlIG5leHQgb3BlcmF0aW9uIG9mIHZjcHUwIHdpbGwgYmUgbGVhZCB0byBy
-ZWFkIFJUQ19ZRUFSLCBJbiB0aGlzIGNhc2UsIHdlIHdpbGwgbWlzcw0KY2FsbGluZyBxZW11X2ly
-cV9sb3dlcihzLT5pcnEpIHRvIGNsZWFyIHRoZSBpcnEuIEFmdGVyIHRoaXMsIGt2bSB3aWxsIG5l
-dmVyIGluamVjdCBSVEMgaXJxLA0KYW5kIFdpbmRvd3MgVk0gd2lsbCBoYW5nLg0Kc3RhdGljIHZv
-aWQgY21vc19pb3BvcnRfd3JpdGUodm9pZCAqb3BhcXVlLCBod2FkZHIgYWRkciwNCiAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgIHVpbnQ2NF90IGRhdGEsIHVuc2lnbmVkIHNpemUpDQp7DQog
-ICAgUlRDU3RhdGUgKnMgPSBvcGFxdWU7DQoNCiAgICBpZiAoKGFkZHIgJiAxKSA9PSAwKSB7DQog
-ICAgICAgIHMtPmNtb3NfaW5kZXggPSBkYXRhICYgMHg3ZjsNCiAgICB9DQqhraGtDQpzdGF0aWMg
-dWludDY0X3QgY21vc19pb3BvcnRfcmVhZCh2b2lkICpvcGFxdWUsIGh3YWRkciBhZGRyLA0KICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgdW5zaWduZWQgc2l6ZSkNCnsNCiAgICBSVENT
-dGF0ZSAqcyA9IG9wYXF1ZTsNCiAgICBpbnQgcmV0Ow0KICAgIGlmICgoYWRkciAmIDEpID09IDAp
-IHsNCiAgICAgICAgcmV0dXJuIDB4ZmY7DQogICAgfSBlbHNlIHsNCiAgICAgICAgc3dpdGNoKHMt
-PmNtb3NfaW5kZXgpIHsNCg0KQWNjb3JkaW5nIHRvIENNT1Mgc3BlYywgoa5hbnkgd3JpdGUgdG8g
-UFJPVCAwMDcwaCBzaG91bGQgYmUgZm9sbG93ZWQgYnkgYW4gYWN0aW9uIHRvIFBST1QgMDA3MWgg
-b3IgdGhlIFJUQw0KV2lsbCBiZSBSVEMgd2lsbCBiZSBsZWZ0IGluIGFuIHVua25vd24gc3RhdGWh
-rywgYnV0IGl0IHNlZW1zIHRoYXQgd2UgY2FuIG5vdCBlbnN1cmUgdGhpcyBzZXF1ZW5jZSBpbiBx
-ZW11L2t2bS4NCg0KQW55IGlkZWFzID8NCg0KVGhhbmtzLA0KSGFpbGlhbmcNCg0KDQo=
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--irjQMWRKlrDW6iGOU5HkpdxCxieLTLqDs
+From: Max Reitz <mreitz@redhat.com>
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+ qemu-block@nongnu.org, qemu-devel@nongnu.org
+Cc: eblake@redhat.com, pbonzini@redhat.com, kwolf@redhat.com,
+ armbru@redhat.com, den@openvz.org
+Message-ID: <f6ca4eb8-45b7-9169-b98e-dbb2cc69209f@redhat.com>
+Subject: Re: [PATCH 1/2] nbd/server: add additional assert to nbd_export_put
+References: <20171109154049.42386-1-vsementsov@virtuozzo.com>
+ <20171109154049.42386-2-vsementsov@virtuozzo.com>
+In-Reply-To: <20171109154049.42386-2-vsementsov@virtuozzo.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+
+On 2017-11-09 16:40, Vladimir Sementsov-Ogievskiy wrote:
+> This place is not obvious, nbd_export_close may theoretically reduce
+> refcount to 0. It may happen if someone calls nbd_export_put on named
+> export not through nbd_export_set_name when refcount is 1.
+>=20
+> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+> ---
+>  nbd/server.c | 1 +
+>  1 file changed, 1 insertion(+)
+Reviewed-by: Max Reitz <mreitz@redhat.com>
+
+
+--irjQMWRKlrDW6iGOU5HkpdxCxieLTLqDs
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQFGBAEBCAAwFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAlohqXQSHG1yZWl0ekBy
+ZWRoYXQuY29tAAoJEPQH2wBh1c9A9Z4H/1iwUav54BVTA93wip8/gGaCcH4l5tKb
+Bk+OFs+GlyVcHj++GT8ZE5MAoP0EywNHczIJgMJrseqtEH6urNrK4uBjheKJqhpz
+8hqpRuI8JenBNFz8KYq6qQvoGZjxhpeCsKVBoBi9oxrvydBVpbfJ1luidph535Ws
+p+nvv+f575kbYEUqm2qbU1duCbvU8ANwbmNrcsYSiQH5kVBmCcuzaOSjYGyjci03
+juN3qnXsTAHEzvpGEBaYRc3rhDzbDdt5wX+gAgP5C03ujPkpGUo2Jybvgi2DOA6W
+PIrIsZB0dGhINFTvPImD7w11FVe/nKprhu4QC3zhhu8tZJZ9UsyZUgI=
+=yfEz
+-----END PGP SIGNATURE-----
+
+--irjQMWRKlrDW6iGOU5HkpdxCxieLTLqDs--
