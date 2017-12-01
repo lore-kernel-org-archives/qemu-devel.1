@@ -1,21 +1,35 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40388)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44210)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <wouter@grep.be>) id 1eKp6A-0001ls-2e
-	for Qemu-devel@nongnu.org; Fri, 01 Dec 2017 12:27:39 -0500
+	(envelope-from <pasic@linux.vnet.ibm.com>) id 1eKpCV-00089N-GH
+	for qemu-devel@nongnu.org; Fri, 01 Dec 2017 12:34:12 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <wouter@grep.be>) id 1eKp67-0005gd-FK
-	for Qemu-devel@nongnu.org; Fri, 01 Dec 2017 12:27:38 -0500
-Date: Thu, 30 Nov 2017 18:43:30 +0100
-From: Wouter Verhelst <w@uter.be>
-Message-ID: <20171130174330.GB3480@grep.be>
-References: <15f2fce6-00f4-0c1d-4ebe-d4ed7c5e7596@redhat.com>
-	<20171130153213.GB11253@grep.be>
-	<507b0c8e-d8be-9468-51cf-951dd897cc01@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <507b0c8e-d8be-9468-51cf-951dd897cc01@redhat.com>
-Subject: Re: [Qemu-devel] RFC: Let NBD client request read-only mode
+	(envelope-from <pasic@linux.vnet.ibm.com>) id 1eKpCR-0001JT-Bo
+	for qemu-devel@nongnu.org; Fri, 01 Dec 2017 12:34:11 -0500
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:59988
+	helo=mx0a-001b2d01.pphosted.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pasic@linux.vnet.ibm.com>)
+	id 1eKpCR-0001JA-5g
+	for qemu-devel@nongnu.org; Fri, 01 Dec 2017 12:34:07 -0500
+Received: from pps.filterd (m0098414.ppops.net [127.0.0.1])
+	by mx0b-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
+	vB1ENgaE143406
+	for <qemu-devel@nongnu.org>; Fri, 1 Dec 2017 09:31:54 -0500
+Received: from e06smtp14.uk.ibm.com (e06smtp14.uk.ibm.com [195.75.94.110])
+	by mx0b-001b2d01.pphosted.com with ESMTP id 2ek8p88yay-1
+	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Fri, 01 Dec 2017 09:31:54 -0500
+Received: from localhost
+	by e06smtp14.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	Only! Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <pasic@linux.vnet.ibm.com>;
+	Fri, 1 Dec 2017 14:31:52 -0000
+From: Halil Pasic <pasic@linux.vnet.ibm.com>
+Date: Fri,  1 Dec 2017 15:31:35 +0100
+In-Reply-To: <20171201143136.62497-1-pasic@linux.vnet.ibm.com>
+References: <20171201143136.62497-1-pasic@linux.vnet.ibm.com>
+Message-Id: <20171201143136.62497-3-pasic@linux.vnet.ibm.com>
+Subject: [Qemu-devel] [PATCH 2/3] s390x/css: advertise unrestricted cssids
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,79 +38,53 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>
-Cc: nbd list <nbd@other.debian.org>, "Qemu-devel@nongnu.org" <Qemu-devel@nongnu.org>, qemu block <qemu-block@nongnu.org>
+To: Boris Fiuczynski <fiuczy@linux.vnet.ibm.com>, Cornelia Huck <cohuck@redhat.com>
+Cc: Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>, Christian Borntraeger <borntraeger@de.ibm.com>, Shalini Chellathurai Saroja <shalini@linux.vnet.ibm.com>, qemu-devel@nongnu.org, qemu-s390x@nongnu.org, Halil Pasic <pasic@linux.vnet.ibm.com>
 
-On Thu, Nov 30, 2017 at 10:00:46AM -0600, Eric Blake wrote:
-> On 11/30/2017 09:32 AM, Wouter Verhelst wrote:
-> > > A client that wants to be read-only, but which does not see server support
-> > > (in idea 1, the server did not advertise the bit; in idea 2, the server
-> > > replies with NBD_REP_ERR_UNSUP), does not have to do anything special (it is
-> > > always possible to do just reads to a read-write connection, and the server
-> > > may still set NBD_FLAG_READ_ONLY even without supporting the extension of
-> > > permitting a client-side request).  But such a client may, if it wants to be
-> > > nice to potential parallel writers on the same export, decide to disconnect
-> > > quickly (with NBD_OPT_ABORT or NBD_CMD_DISC as appropriate) rather than tie
-> > > up a read-write connection.
-> > 
-> > Indeed.
-> > 
-> > > I don't know which idea is more palatable.  We have a finite set of only 2^4
-> > > global handshake flags because it is a bitmask, where only 14 bits remain;
-> > > whereas we have almost 2^32 potential NBD_OPT_ values.  On the other hand,
-> > > using a global handshake flag means the server never shows any export as
-> > > writable; while with the NBD_OPT_ solution, a guest can get different
-> > > results for the sequence NBD_OPT_INFO, NBD_OPT_READ_ONLY, NBD_OPT_INFO.
-> > 
-> > It might additionally also be a good idea to add another data item to
-> > the NBD_OPT_INFO response which tells the client that it will be the
-> > only writer, but that there may be other readers.
-> > 
-> > That way, if a client sees that data item, it could go "oh, but I don't
-> > need to write -- here's an NBD_OPT_READ_ONLY for you".
-> 
-> There's also the question of inconsistent reads - normally, if a client is
-> the only reader, the client can cache data rather than having to re-read it
-> from the server; whereas if there is another writer in parallel, the client
-> SHOULD read data again rather than relying on the cache (since the other
-> writer may have changed data in the meantime) - so maybe having a way for
-> the server to report whether reads may be inconsistent, or even give an
-> error to NBD_OPT_GO unless the client requests (via NBD_OPT_READ_ONLY or
-> some other way) that the client is aware of the potential for
-> volatile/inconsistent reads.
+Let us advertise the changes introduced by "s390x/css: unrestrict cssids"
+to the management software (so it can tell are cssids unrestricted or
+restricted).
 
-I'm wary of doing this.
+Signed-off-by: Halil Pasic <pasic@linux.vnet.ibm.com>
+---
 
-We can never guarantee 100% that there is no writer (some other process
-might write to the backend behind the server's back and it would have no
-way of knowing that).
+Boris says having the property on the virtual-css-bridge is good form
+Libvirt PoV. @Shalini: could you verify that things work out fine
+(provided we get at least a preliminary blessing from Connie).
 
-Adding a message "there is another writer" would imply that the absense
-of that message means "there is no other writer", which would then be
-incorrect. As such, I don't think this is something we can properly cope
-with at the NBD level.
+Consider squashing into "s390x/css: unrestrict cssids".
+---
+ hw/s390x/css-bridge.c | 11 +++++++++++
+ 1 file changed, 11 insertions(+)
 
-With good arguments I could be convinced otherwise, however :-)
-
-> > I think it sounds reasonable enough, yes; but I also think there are a
-> > few other related situations that might be relevant enough to warrant
-> > thinking about more. I gave a few examples above, but maybe there are
-> > more? Dunno.
-> 
-> Okay, sounds like it warrants enough potential for conversation that I
-> should write it up as a patch, and the patch may need a new extension-
-> branch rather than going straight into mainline;
-
-Yeah, probably best to do that.
-
-> and I'll stick with idea 2 (NBD_OPT_READ_ONLY) rather than burning a
-> global handshake bit. I hope to give the documentation patch a shot in
-> the next few days.
-
-Thanks.
-
+diff --git a/hw/s390x/css-bridge.c b/hw/s390x/css-bridge.c
+index c4a9735d71..c7e8998680 100644
+--- a/hw/s390x/css-bridge.c
++++ b/hw/s390x/css-bridge.c
+@@ -123,6 +123,11 @@ static Property virtual_css_bridge_properties[] = {
+     DEFINE_PROP_END_OF_LIST(),
+ };
+ 
++static bool prop_get_true(Object *obj, Error **errp)
++{
++    return true;
++}
++
+ static void virtual_css_bridge_class_init(ObjectClass *klass, void *data)
+ {
+     HotplugHandlerClass *hc = HOTPLUG_HANDLER_CLASS(klass);
+@@ -131,6 +136,12 @@ static void virtual_css_bridge_class_init(ObjectClass *klass, void *data)
+     hc->unplug = ccw_device_unplug;
+     set_bit(DEVICE_CATEGORY_BRIDGE, dc->categories);
+     dc->props = virtual_css_bridge_properties;
++    object_class_property_add_bool(klass, "cssid-unrestricted",
++                                   prop_get_true, NULL, NULL);
++    object_class_property_set_description(klass, "cssid-unrestricted",
++            "A css device can use any  cssid, regardless whether virtual"
++            " or not (read only, always true)",
++            NULL);
+ }
+ 
+ static const TypeInfo virtual_css_bridge_info = {
 -- 
-Could you people please use IRC like normal people?!?
-
-  -- Amaya Rodrigo Sastre, trying to quiet down the buzz in the DebConf 2008
-     Hacklab
+2.13.5
