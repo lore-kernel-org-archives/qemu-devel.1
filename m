@@ -1,16 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40537)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41145)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1eKqqH-0004Ng-HL
-	for qemu-devel@nongnu.org; Fri, 01 Dec 2017 14:19:22 -0500
+	(envelope-from <mreitz@redhat.com>) id 1eKqs5-0006DR-TZ
+	for qemu-devel@nongnu.org; Fri, 01 Dec 2017 14:21:15 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1eKqqG-000327-Ac
-	for qemu-devel@nongnu.org; Fri, 01 Dec 2017 14:19:21 -0500
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri,  1 Dec 2017 18:51:36 +0000
-Message-Id: <1512154296-5652-3-git-send-email-peter.maydell@linaro.org>
-In-Reply-To: <1512154296-5652-1-git-send-email-peter.maydell@linaro.org>
-References: <1512154296-5652-1-git-send-email-peter.maydell@linaro.org>
-Subject: [Qemu-devel] [PATCH 2/2] nvic: Make systick banked
+	(envelope-from <mreitz@redhat.com>) id 1eKqs4-00041d-Px
+	for qemu-devel@nongnu.org; Fri, 01 Dec 2017 14:21:13 -0500
+References: <20171109154049.42386-1-vsementsov@virtuozzo.com>
+	<20171109154049.42386-3-vsementsov@virtuozzo.com>
+From: Max Reitz <mreitz@redhat.com>
+Message-ID: <7f6f4e9a-16c1-9c57-55ac-ef30eb06f24b@redhat.com>
+Date: Fri, 1 Dec 2017 20:21:02 +0100
+MIME-Version: 1.0
+In-Reply-To: <20171109154049.42386-3-vsementsov@virtuozzo.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="RXQCbf4G07jr63vWJuGibJ7T5vL4LXL7B"
+Subject: Re: [Qemu-devel] [PATCH 2/2] qmp: add nbd-server-remove
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -19,184 +24,161 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-arm@nongnu.org, qemu-devel@nongnu.org
-Cc: patches@linaro.org, Richard Henderson <rth@twiddle.net>, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, Paolo Bonzini <pbonzini@redhat.com>
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org
+Cc: eblake@redhat.com, pbonzini@redhat.com, kwolf@redhat.com, armbru@redhat.com, den@openvz.org
 
-For the v8M security extension, there should be two systick
-devices, which use separate banked systick exceptions. The
-register interface is banked in the same way as for other
-banked registers, including the existence of an NS alias
-region for secure code to access the nonsecure timer.
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--RXQCbf4G07jr63vWJuGibJ7T5vL4LXL7B
+From: Max Reitz <mreitz@redhat.com>
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+ qemu-block@nongnu.org, qemu-devel@nongnu.org
+Cc: eblake@redhat.com, pbonzini@redhat.com, kwolf@redhat.com,
+ armbru@redhat.com, den@openvz.org
+Message-ID: <7f6f4e9a-16c1-9c57-55ac-ef30eb06f24b@redhat.com>
+Subject: Re: [PATCH 2/2] qmp: add nbd-server-remove
+References: <20171109154049.42386-1-vsementsov@virtuozzo.com>
+ <20171109154049.42386-3-vsementsov@virtuozzo.com>
+In-Reply-To: <20171109154049.42386-3-vsementsov@virtuozzo.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
----
- include/hw/intc/armv7m_nvic.h |  4 ++-
- hw/intc/armv7m_nvic.c         | 81 ++++++++++++++++++++++++++++++++++++-------
- 2 files changed, 72 insertions(+), 13 deletions(-)
+On 2017-11-09 16:40, Vladimir Sementsov-Ogievskiy wrote:
+> Add command for export removing. It is needed for cases when we
+> don't want to keep export after the operation on it was completed.
+> The other example is temporary node, created with blockdev-add.
+> If we want to delete it we should firstly remove corresponding
+> NBD export.
+>=20
+> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+> ---
+>  qapi/block.json | 20 ++++++++++++++++++++
+>  blockdev-nbd.c  | 27 +++++++++++++++++++++++++++
+>  2 files changed, 47 insertions(+)
 
-diff --git a/include/hw/intc/armv7m_nvic.h b/include/hw/intc/armv7m_nvic.h
-index ac7997c..8bc2911 100644
---- a/include/hw/intc/armv7m_nvic.h
-+++ b/include/hw/intc/armv7m_nvic.h
-@@ -78,13 +78,15 @@ typedef struct NVICState {
- 
-     MemoryRegion sysregmem;
-     MemoryRegion sysreg_ns_mem;
-+    MemoryRegion systickmem;
-+    MemoryRegion systick_ns_mem;
-     MemoryRegion container;
- 
-     uint32_t num_irq;
-     qemu_irq excpout;
-     qemu_irq sysresetreq;
- 
--    SysTickState systick;
-+    SysTickState systick[M_REG_NUM_BANKS];
- } NVICState;
- 
- #endif
-diff --git a/hw/intc/armv7m_nvic.c b/hw/intc/armv7m_nvic.c
-index 63f2743..5cb44f4 100644
---- a/hw/intc/armv7m_nvic.c
-+++ b/hw/intc/armv7m_nvic.c
-@@ -1827,6 +1827,36 @@ static const MemoryRegionOps nvic_sysreg_ns_ops = {
-     .endianness = DEVICE_NATIVE_ENDIAN,
- };
- 
-+static MemTxResult nvic_systick_write(void *opaque, hwaddr addr,
-+                                      uint64_t value, unsigned size,
-+                                      MemTxAttrs attrs)
-+{
-+    NVICState *s = opaque;
-+    MemoryRegion *mr;
-+
-+    /* Direct the access to the correct systick */
-+    mr = sysbus_mmio_get_region(SYS_BUS_DEVICE(&s->systick[attrs.secure]), 0);
-+    return memory_region_dispatch_write(mr, addr, value, size, attrs);
-+}
-+
-+static MemTxResult nvic_systick_read(void *opaque, hwaddr addr,
-+                                     uint64_t *data, unsigned size,
-+                                     MemTxAttrs attrs)
-+{
-+    NVICState *s = opaque;
-+    MemoryRegion *mr;
-+
-+    /* Direct the access to the correct systick */
-+    mr = sysbus_mmio_get_region(SYS_BUS_DEVICE(&s->systick[attrs.secure]), 0);
-+    return memory_region_dispatch_read(mr, addr, data, size, attrs);
-+}
-+
-+static const MemoryRegionOps nvic_systick_ops = {
-+    .read_with_attrs = nvic_systick_read,
-+    .write_with_attrs = nvic_systick_write,
-+    .endianness = DEVICE_NATIVE_ENDIAN,
-+};
-+
- static int nvic_post_load(void *opaque, int version_id)
- {
-     NVICState *s = opaque;
-@@ -2005,17 +2035,16 @@ static void nvic_systick_trigger(void *opaque, int n, int level)
-         /* SysTick just asked us to pend its exception.
-          * (This is different from an external interrupt line's
-          * behaviour.)
--         * TODO: when we implement the banked systicks we must make
--         * this pend the correct banked exception.
-+         * n == 0 : NonSecure systick
-+         * n == 1 : Secure systick
-          */
--        armv7m_nvic_set_pending(s, ARMV7M_EXCP_SYSTICK, false);
-+        armv7m_nvic_set_pending(s, ARMV7M_EXCP_SYSTICK, n);
-     }
- }
- 
- static void armv7m_nvic_realize(DeviceState *dev, Error **errp)
- {
-     NVICState *s = NVIC(dev);
--    SysBusDevice *systick_sbd;
-     Error *err = NULL;
-     int regionlen;
- 
-@@ -2032,15 +2061,30 @@ static void armv7m_nvic_realize(DeviceState *dev, Error **errp)
-     /* include space for internal exception vectors */
-     s->num_irq += NVIC_FIRST_IRQ;
- 
--    object_property_set_bool(OBJECT(&s->systick), true, "realized", &err);
-+    object_property_set_bool(OBJECT(&s->systick[M_REG_NS]), true,
-+                             "realized", &err);
-     if (err != NULL) {
-         error_propagate(errp, err);
-         return;
-     }
--    systick_sbd = SYS_BUS_DEVICE(&s->systick);
--    sysbus_connect_irq(systick_sbd, 0,
-+    sysbus_connect_irq(SYS_BUS_DEVICE(&s->systick[M_REG_NS]), 0,
-                        qdev_get_gpio_in_named(dev, "systick-trigger", 0));
- 
-+    if (arm_feature(&s->cpu->env, ARM_FEATURE_M_SECURITY)) {
-+        object_initialize(&s->systick[M_REG_S], sizeof(s->systick[M_REG_NS]),
-+                          TYPE_SYSTICK);
-+        qdev_set_parent_bus(DEVICE(&s->systick[M_REG_S]), sysbus_get_default());
-+
-+        object_property_set_bool(OBJECT(&s->systick[M_REG_S]), true,
-+                                 "realized", &err);
-+        if (err != NULL) {
-+            error_propagate(errp, err);
-+            return;
-+        }
-+        sysbus_connect_irq(SYS_BUS_DEVICE(&s->systick[M_REG_S]), 0,
-+                           qdev_get_gpio_in_named(dev, "systick-trigger", 1));
-+    }
-+
-     /* The NVIC and System Control Space (SCS) starts at 0xe000e000
-      * and looks like this:
-      *  0x004 - ICTR
-@@ -2073,15 +2117,24 @@ static void armv7m_nvic_realize(DeviceState *dev, Error **errp)
-     memory_region_init_io(&s->sysregmem, OBJECT(s), &nvic_sysreg_ops, s,
-                           "nvic_sysregs", 0x1000);
-     memory_region_add_subregion(&s->container, 0, &s->sysregmem);
-+
-+    memory_region_init_io(&s->systickmem, OBJECT(s),
-+                          &nvic_systick_ops, s,
-+                          "nvic_systick", 0xe0);
-+
-     memory_region_add_subregion_overlap(&s->container, 0x10,
--                                        sysbus_mmio_get_region(systick_sbd, 0),
--                                        1);
-+                                        &s->systickmem, 1);
- 
-     if (arm_feature(&s->cpu->env, ARM_FEATURE_V8)) {
-         memory_region_init_io(&s->sysreg_ns_mem, OBJECT(s),
-                               &nvic_sysreg_ns_ops, &s->sysregmem,
-                               "nvic_sysregs_ns", 0x1000);
-         memory_region_add_subregion(&s->container, 0x20000, &s->sysreg_ns_mem);
-+        memory_region_init_io(&s->systick_ns_mem, OBJECT(s),
-+                              &nvic_sysreg_ns_ops, &s->systickmem,
-+                              "nvic_systick_ns", 0xe0);
-+        memory_region_add_subregion_overlap(&s->container, 0x20010,
-+                                            &s->systick_ns_mem, 1);
-     }
- 
-     sysbus_init_mmio(SYS_BUS_DEVICE(dev), &s->container);
-@@ -2099,12 +2152,16 @@ static void armv7m_nvic_instance_init(Object *obj)
-     NVICState *nvic = NVIC(obj);
-     SysBusDevice *sbd = SYS_BUS_DEVICE(obj);
- 
--    object_initialize(&nvic->systick, sizeof(nvic->systick), TYPE_SYSTICK);
--    qdev_set_parent_bus(DEVICE(&nvic->systick), sysbus_get_default());
-+    object_initialize(&nvic->systick[M_REG_NS],
-+                      sizeof(nvic->systick[M_REG_NS]), TYPE_SYSTICK);
-+    qdev_set_parent_bus(DEVICE(&nvic->systick[M_REG_NS]), sysbus_get_default());
-+    /* We can't initialize the secure systick here, as we don't know
-+     * yet if we need it.
-+     */
- 
-     sysbus_init_irq(sbd, &nvic->excpout);
-     qdev_init_gpio_out_named(dev, &nvic->sysresetreq, "SYSRESETREQ", 1);
--    qdev_init_gpio_in_named(dev, nvic_systick_trigger, "systick-trigger", 1);
-+    qdev_init_gpio_in_named(dev, nvic_systick_trigger, "systick-trigger", 2);
- }
- 
- static void armv7m_nvic_class_init(ObjectClass *klass, void *data)
--- 
-2.7.4
+Code looks good, just some documentation remarks:
+
+> diff --git a/qapi/block.json b/qapi/block.json
+> index f093fa3f27..1827940717 100644
+> --- a/qapi/block.json
+> +++ b/qapi/block.json
+> @@ -223,6 +223,26 @@
+>  { 'command': 'nbd-server-add', 'data': {'device': 'str', '*writable': =
+'bool'} }
+> =20
+>  ##
+> +# @nbd-server-remove:
+> +#
+> +# Stop exporting block node through QEMU's embedded NBD server.
+
+s/exporting block node/exporting a block node/
+
+> +#
+> +# @device: The device name or node name of the exported node. Should b=
+e equal
+> +#          to @device parameter for corresponding nbd-server-add comma=
+nd call.
+
+s/Should/Must/
+
+This is indeed not the name of the node, but it is just the export name.
+ Maybe the comment should more clearly say so (e.g. omit the first
+sentence and change the second to "The export name, i.e. what has been
+given to nbd-server-add as @device" or something).
+
+> +#
+> +# @force: Whether active connections to the export should be closed. I=
+f this
+> +#         parameter is false the export is only removed from named exp=
+orts list,
+> +#         so new connetions are impossible and it would be freed after=
+ all
+
+*connections
+
+> +#         clients are disconnected (default false).
+> +#
+> +# Returns: error if the server is not running or the device is not mar=
+ked for
+> +#          export.
+
+Maybe "[...] or there is no such NBD export."
+
+(Because you can have a node attached to a device, specify the node name
+for nbd-server-add and then you can't remove the export with the device
+name even though technically that block device is exported)
+
+Max
+
+> +#
+> +# Since: 2.12
+> +##
+> +{ 'command': 'nbd-server-remove', 'data': {'device': 'str', '*force': =
+'bool'} }
+> +
+> +##
+>  # @nbd-server-stop:
+>  #
+>  # Stop QEMU's embedded NBD server, and unregister all devices previous=
+ly
+> diff --git a/blockdev-nbd.c b/blockdev-nbd.c
+> index 28f551a7b0..5f66951c33 100644
+> --- a/blockdev-nbd.c
+> +++ b/blockdev-nbd.c
+> @@ -203,6 +203,33 @@ void qmp_nbd_server_add(const char *device, bool h=
+as_writable, bool writable,
+>      nbd_export_put(exp);
+>  }
+> =20
+> +void qmp_nbd_server_remove(const char *device, bool has_force, bool fo=
+rce,
+> +                           Error **errp)
+> +{
+> +    NBDExport *exp;
+> +
+> +    if (!nbd_server) {
+> +        error_setg(errp, "NBD server not running");
+> +        return;
+> +    }
+> +
+> +    exp =3D nbd_export_find(device);
+> +    if (exp =3D=3D NULL) {
+> +        error_setg(errp, "'%s' is not exported", device);
+> +        return;
+> +    }
+> +
+> +    if (!has_force) {
+> +        force =3D false;
+> +    }
+> +
+> +    if (force) {
+> +        nbd_export_close(exp);
+> +    } else {
+> +        nbd_export_set_name(exp, NULL);
+> +    }
+> +}
+> +
+>  void qmp_nbd_server_stop(Error **errp)
+>  {
+>      nbd_export_close_all();
+>=20
+
+
+
+--RXQCbf4G07jr63vWJuGibJ7T5vL4LXL7B
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQFGBAEBCAAwFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAlohq54SHG1yZWl0ekBy
+ZWRoYXQuY29tAAoJEPQH2wBh1c9AemQH/2IMnSKSQh1kkIUL7Zh5cg+CgM3nYMPS
+dB7pvTq6Xb6uRfmJp9zEQBISvVlzGF65n9Kssjwl+evNYZWiZhfplLxNfvOuKnbU
+oCI8RN/w2wIy3igCCz+hj8tAolAu4ZacgyRBRrrFRDCSAiu0mfVc8n6IgFaCMYDv
+kOBlxmTsavoIq/6jyjSn5eFsfz4khGC/u5yZ3dg3xcCZVWAwya0Av0H6LvxXtAa8
+NShu+QwunPFDkjFjpmEHFH0sLTCVGAcOxID0uhjDtGuEF7/oPPrqKc1P1YD4BTqa
+rQaReO7iF3U+v1ilU2zuQY+/+mbIy9frTnqYSOH/e4tXZ8H+w9UFdZs=
+=o6VF
+-----END PGP SIGNATURE-----
+
+--RXQCbf4G07jr63vWJuGibJ7T5vL4LXL7B--
