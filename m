@@ -1,34 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44931)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47549)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pasic@linux.vnet.ibm.com>) id 1eKnnY-0007pe-Oe
-	for qemu-devel@nongnu.org; Fri, 01 Dec 2017 11:04:28 -0500
+	(envelope-from <glaubitz@physik.fu-berlin.de>) id 1eKnpV-000115-Mw
+	for qemu-devel@nongnu.org; Fri, 01 Dec 2017 11:06:26 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pasic@linux.vnet.ibm.com>) id 1eKnnH-0007M3-UL
-	for qemu-devel@nongnu.org; Fri, 01 Dec 2017 11:04:20 -0500
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:34630)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pasic@linux.vnet.ibm.com>)
-	id 1eKnnH-0007Kp-HY
-	for qemu-devel@nongnu.org; Fri, 01 Dec 2017 11:04:03 -0500
-Received: from pps.filterd (m0098410.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
-	vB1ETOIF070902
-	for <qemu-devel@nongnu.org>; Fri, 1 Dec 2017 09:31:56 -0500
-Received: from e06smtp13.uk.ibm.com (e06smtp13.uk.ibm.com [195.75.94.109])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2ek86kjrcb-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Fri, 01 Dec 2017 09:31:55 -0500
-Received: from localhost
-	by e06smtp13.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
-	Only! Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <pasic@linux.vnet.ibm.com>;
-	Fri, 1 Dec 2017 14:31:52 -0000
-From: Halil Pasic <pasic@linux.vnet.ibm.com>
-Date: Fri,  1 Dec 2017 15:31:34 +0100
-In-Reply-To: <20171201143136.62497-1-pasic@linux.vnet.ibm.com>
-References: <20171201143136.62497-1-pasic@linux.vnet.ibm.com>
-Message-Id: <20171201143136.62497-2-pasic@linux.vnet.ibm.com>
-Subject: [Qemu-devel] [PATCH 1/3] s390x/css: unrestrict cssids
+	(envelope-from <glaubitz@physik.fu-berlin.de>) id 1eKnpS-0001tI-7G
+	for qemu-devel@nongnu.org; Fri, 01 Dec 2017 11:06:21 -0500
+References: <87po7zrq65.fsf@fifthhorseman.net>
+	<f5f44f70-d274-e7a6-618e-8906f58a9073@physik.fu-berlin.de>
+	<871ske63pu.fsf@linux-m68k.org>
+From: John Paul Adrian Glaubitz <glaubitz@physik.fu-berlin.de>
+Message-ID: <de4243ee-f6c3-dd52-ca58-8e5a83f2e18d@physik.fu-berlin.de>
+Date: Fri, 1 Dec 2017 13:22:20 +0100
+MIME-Version: 1.0
+In-Reply-To: <871ske63pu.fsf@linux-m68k.org>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] /usr/bin/m4: internal error detected
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,227 +25,33 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Boris Fiuczynski <fiuczy@linux.vnet.ibm.com>, Cornelia Huck <cohuck@redhat.com>
-Cc: Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>, Christian Borntraeger <borntraeger@de.ibm.com>, Shalini Chellathurai Saroja <shalini@linux.vnet.ibm.com>, qemu-devel@nongnu.org, qemu-s390x@nongnu.org, Halil Pasic <pasic@linux.vnet.ibm.com>
+To: Andreas Schwab <schwab@linux-m68k.org>
+Cc: Daniel Kahn Gillmor <dkg@fifthhorseman.net>, bug-m4@gnu.org, debian-superh@lists.debian.org, libc-alpha@sourceware.org, QEMU Developers <qemu-devel@nongnu.org>
 
-The default css 0xfe is currently restricted to virtual subchannel
-devices. The hope when the decision was made was, that non-virtual
-subchannel devices will come around when guests can exploit multiple
-channel subsystems. Since current guests don't do that, the pain of the
-partitioned (cssid) namespace outweighs the gain.
+On 12/01/2017 01:18 PM, Andreas Schwab wrote:
+>> This isn't a bug in m4 or anything architecture-specific, it's a regression
+>> that was introduced by an upstream change in glibc [1] and mainly affects
+>> qemu-user which we are using for m68k and sh4 [2].
+> 
+> It's a bug in qemu-linux-user, which ignores CLONE_VFORK, turning vfork
+> into fork.  This breaks the expected semantics of vfork (VM sharing and
+> blocking the child until exec).
 
-The default css 0xfe is currently restricted to virtual subchannel
-devices. The hope when the decision was made was, that non-virtual
-subchannel devices will come around when guest can exploit multiple
-channel subsystems. Since the guests generally don't do, the pain
-of the partitioned (cssid) namespace outweighs the gain.
+Yes, I wasn't really arguing that it's a bug in QEMU as Adhemerval had already
+explained. The problem was just that apparently resolving the issue in
+QEMU isn't trivial as Peter Maydell mentioned in [1].
 
-Let us remove the corresponding restrictions (virtual devices
-can be put only in 0xfe and non-virtual devices in any css except
-the 0xfe -- while s390-squash-mcss then remaps everything to cssid 0).
+That's why I was looking for a workaround. However, I have re-tested Florian's
+patch and it works for me now, it didn't when I tested it for the first time.
 
-At the same time, change our schema for generating css bus ids to put
-both virtual and non-virtual devices into the default css (spilling over
-into other css images, if needed). The intention is to deprecate
-s390-squash-mcss. Whit this change devices without a specified devno
-won't end up hidden to guests not supporting multiple channel subsystems,
-unless this can not be avoided (default css full).
+So, we have a workaround for the time being until the bug is resolved in QEMU.
 
-Deprecaton of s390-squash-mcss and indicating the changes via QMP is
-expected to follow soon (as separate commits).
+Adrian
 
-The adverse effect of getting rid of the restriction on migration should
-not be too severe.  Vfio-ccw devices are not live-migratable yet, and for
-virtual devices using the extra freedom would only make sense with the
-aforementioned guest support in place.
+> [1] https://bugs.launchpad.net/qemu/+bug/1673976
 
-The auto-generated bus ids are affected by both changes. We hope to not
-encounter any auto-generated bus ids in production as Libvirt is always
-explicit about the bus id.  Since 8ed179c937 ("s390x/css: catch section
-mismatch on load", 2017-05-18) the worst that can happen because the same
-device ended up having a different bus id is a cleanly failed migration.
-I find it hard to reason about the impact of changed auto-generated bus
-ids on migration for command line users as I don't know which rules is
-such an user supposed to follow.
-
-Another pain-point is down- or upgrade of QEMU for command line users.
-The old way and the new way of doing vfio-ccw are mutually incompatible.
-Libvirt is only going to support the new way, so for libvirt users, the
-possible problems at QEMU downgrade are the following. If a domain
-contains virtual devices placed into a css different than 0xfe the domain
-will refuse to start with a QEMU not having this patch. Putting devices
-into a css different that 0xfe however won't make much sense in the near
-future (guest support). Libvirt will refuse to do vfio-ccw with a QEMU
-not having this patch. This is business as usual.
-
-Signed-off-by: Halil Pasic <pasic@linux.vnet.ibm.com>
-
----
-Hi!
-
-I've factored out the announcing via QMP interface stuff to ease review.
-I would not mind the two being squashed together before this hits main,
-as I would much prefer having the two as one (atomic) change. But the
-second part turned out so controversial, that splitting is expected to
-benefit the review process.
-
-v2 -> v3:
-* factored out announcing into a separate patch
-* reworded commit message
-* removed outdated comment about squash
-
-v1 -> v2:
-* changed ccw bus id generation too (see commit message)
-* moved the property to the machine (see cover letter)
-* added a description to the property
----
- hw/s390x/3270-ccw.c        |  2 +-
- hw/s390x/css.c             | 28 ++++------------------------
- hw/s390x/s390-ccw.c        |  2 +-
- hw/s390x/s390-virtio-ccw.c |  1 -
- hw/s390x/virtio-ccw.c      |  2 +-
- include/hw/s390x/css.h     | 12 ++++--------
- 6 files changed, 11 insertions(+), 36 deletions(-)
-
-diff --git a/hw/s390x/3270-ccw.c b/hw/s390x/3270-ccw.c
-index 081e3ef6f4..3af13ea027 100644
---- a/hw/s390x/3270-ccw.c
-+++ b/hw/s390x/3270-ccw.c
-@@ -104,7 +104,7 @@ static void emulated_ccw_3270_realize(DeviceState *ds, Error **errp)
-     SubchDev *sch;
-     Error *err = NULL;
- 
--    sch = css_create_sch(cdev->devno, true, cbus->squash_mcss, errp);
-+    sch = css_create_sch(cdev->devno, cbus->squash_mcss, errp);
-     if (!sch) {
-         return;
-     }
-diff --git a/hw/s390x/css.c b/hw/s390x/css.c
-index f6b5c807cd..cd26f32050 100644
---- a/hw/s390x/css.c
-+++ b/hw/s390x/css.c
-@@ -2370,22 +2370,12 @@ const PropertyInfo css_devid_ro_propinfo = {
-     .get = get_css_devid,
- };
- 
--SubchDev *css_create_sch(CssDevId bus_id, bool is_virtual, bool squash_mcss,
--                         Error **errp)
-+SubchDev *css_create_sch(CssDevId bus_id, bool squash_mcss, Error **errp)
- {
-     uint16_t schid = 0;
-     SubchDev *sch;
- 
-     if (bus_id.valid) {
--        if (is_virtual != (bus_id.cssid == VIRTUAL_CSSID)) {
--            error_setg(errp, "cssid %hhx not valid for %s devices",
--                       bus_id.cssid,
--                       (is_virtual ? "virtual" : "non-virtual"));
--            return NULL;
--        }
--    }
--
--    if (bus_id.valid) {
-         if (squash_mcss) {
-             bus_id.cssid = channel_subsys.default_cssid;
-         } else if (!channel_subsys.css[bus_id.cssid]) {
-@@ -2396,19 +2386,8 @@ SubchDev *css_create_sch(CssDevId bus_id, bool is_virtual, bool squash_mcss,
-                                            bus_id.devid, &schid, errp)) {
-             return NULL;
-         }
--    } else if (squash_mcss || is_virtual) {
--        bus_id.cssid = channel_subsys.default_cssid;
--
--        if (!css_find_free_subch_and_devno(bus_id.cssid, &bus_id.ssid,
--                                           &bus_id.devid, &schid, errp)) {
--            return NULL;
--        }
-     } else {
--        for (bus_id.cssid = 0; bus_id.cssid < MAX_CSSID; ++bus_id.cssid) {
--            if (bus_id.cssid == VIRTUAL_CSSID) {
--                continue;
--            }
--
-+        for (bus_id.cssid = channel_subsys.default_cssid;;) {
-             if (!channel_subsys.css[bus_id.cssid]) {
-                 css_create_css_image(bus_id.cssid, false);
-             }
-@@ -2418,7 +2397,8 @@ SubchDev *css_create_sch(CssDevId bus_id, bool is_virtual, bool squash_mcss,
-                                                 NULL)) {
-                 break;
-             }
--            if (bus_id.cssid == MAX_CSSID) {
-+            bus_id.cssid = (bus_id.cssid + 1) % MAX_CSSID;
-+            if (bus_id.cssid == channel_subsys.default_cssid) {
-                 error_setg(errp, "Virtual channel subsystem is full!");
-                 return NULL;
-             }
-diff --git a/hw/s390x/s390-ccw.c b/hw/s390x/s390-ccw.c
-index 0ef232ec27..4a9d4d2534 100644
---- a/hw/s390x/s390-ccw.c
-+++ b/hw/s390x/s390-ccw.c
-@@ -77,7 +77,7 @@ static void s390_ccw_realize(S390CCWDevice *cdev, char *sysfsdev, Error **errp)
-         goto out_err_propagate;
-     }
- 
--    sch = css_create_sch(ccw_dev->devno, false, cbus->squash_mcss, &err);
-+    sch = css_create_sch(ccw_dev->devno, cbus->squash_mcss, &err);
-     if (!sch) {
-         goto out_mdevid_free;
-     }
-diff --git a/hw/s390x/s390-virtio-ccw.c b/hw/s390x/s390-virtio-ccw.c
-index 6a57f94197..4d65a50334 100644
---- a/hw/s390x/s390-virtio-ccw.c
-+++ b/hw/s390x/s390-virtio-ccw.c
-@@ -302,7 +302,6 @@ static void ccw_init(MachineState *machine)
-     /*
-      * Non mcss-e enabled guests only see the devices from the default
-      * css, which is determined by the value of the squash_mcss property.
--     * Note: we must not squash non virtual devices to css 0xFE.
-      */
-     if (css_bus->squash_mcss) {
-         ret = css_create_css_image(0, true);
-diff --git a/hw/s390x/virtio-ccw.c b/hw/s390x/virtio-ccw.c
-index 184515ce94..3dd902a664 100644
---- a/hw/s390x/virtio-ccw.c
-+++ b/hw/s390x/virtio-ccw.c
-@@ -701,7 +701,7 @@ static void virtio_ccw_device_realize(VirtioCcwDevice *dev, Error **errp)
-     SubchDev *sch;
-     Error *err = NULL;
- 
--    sch = css_create_sch(ccw_dev->devno, true, cbus->squash_mcss, errp);
-+    sch = css_create_sch(ccw_dev->devno, cbus->squash_mcss, errp);
-     if (!sch) {
-         return;
-     }
-diff --git a/include/hw/s390x/css.h b/include/hw/s390x/css.h
-index ab6ebe66b5..53c270a216 100644
---- a/include/hw/s390x/css.h
-+++ b/include/hw/s390x/css.h
-@@ -272,12 +272,9 @@ extern const PropertyInfo css_devid_ro_propinfo;
-  * default css image for it.
-  * If @p bus_id is valid, and @p squash_mcss is false, verify that it is
-  * not already in use, and find a free devno for it.
-- * If @p bus_id is not valid, and if either @p squash_mcss or @p is_virtual
-- * is true, find a free subchannel id and device number across all
-- * subchannel sets from the default css image.
-- * If @p bus_id is not valid, and if both @p squash_mcss and @p is_virtual
-- * are false, find a non-full css image and find a free subchannel id and
-- * device number across all subchannel sets from it.
-+ * If @p bus_id is not valid find a free subchannel id and device number
-+ * across all subchannel sets and all css images starting from the default
-+ * css image.
-  *
-  * If either of the former actions succeed, allocate a subchannel structure,
-  * initialise it with the bus id, subchannel id and device number, register
-@@ -286,8 +283,7 @@ extern const PropertyInfo css_devid_ro_propinfo;
-  * The caller becomes owner of the returned subchannel structure and
-  * is responsible for unregistering and freeing it.
-  */
--SubchDev *css_create_sch(CssDevId bus_id, bool is_virtual, bool squash_mcss,
--                         Error **errp);
-+SubchDev *css_create_sch(CssDevId bus_id, bool squash_mcss, Error **errp);
- 
- /** Turn on css migration */
- void css_register_vmstate(void);
 -- 
-2.13.5
+  .''`.  John Paul Adrian Glaubitz
+: :' :  Debian Developer - glaubitz@debian.org
+`. `'   Freie Universitaet Berlin - glaubitz@physik.fu-berlin.de
+   `-    GPG: 62FF 8A75 84E0 2956 9546  0006 7426 3B37 F5B5 F913
