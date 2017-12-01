@@ -1,20 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47560)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47747)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <glaubitz@physik.fu-berlin.de>) id 1eKnpV-00011E-Qn
-	for qemu-devel@nongnu.org; Fri, 01 Dec 2017 11:06:26 -0500
+	(envelope-from <clg@kaod.org>) id 1eKnpf-0001Ae-Id
+	for qemu-devel@nongnu.org; Fri, 01 Dec 2017 11:06:32 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <glaubitz@physik.fu-berlin.de>) id 1eKnpT-0001vg-7n
-	for qemu-devel@nongnu.org; Fri, 01 Dec 2017 11:06:21 -0500
-References: <87po7zrq65.fsf@fifthhorseman.net>
-From: John Paul Adrian Glaubitz <glaubitz@physik.fu-berlin.de>
-Message-ID: <f5f44f70-d274-e7a6-618e-8906f58a9073@physik.fu-berlin.de>
-Date: Fri, 1 Dec 2017 10:51:11 +0100
+	(envelope-from <clg@kaod.org>) id 1eKnpZ-000261-Em
+	for qemu-devel@nongnu.org; Fri, 01 Dec 2017 11:06:29 -0500
+Received: from 12.mo3.mail-out.ovh.net ([188.165.41.191]:37022)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1eKnpZ-0001rx-6G
+	for qemu-devel@nongnu.org; Fri, 01 Dec 2017 11:06:25 -0500
+Received: from player771.ha.ovh.net (b9.ovh.net [213.186.33.59])
+	by mo3.mail-out.ovh.net (Postfix) with ESMTP id 6AD97177DAE
+	for <qemu-devel@nongnu.org>; Fri,  1 Dec 2017 17:06:16 +0100 (CET)
+From: =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>
+Date: Fri,  1 Dec 2017 17:05:59 +0100
+Message-Id: <20171201160604.15265-1-clg@kaod.org>
 MIME-Version: 1.0
-In-Reply-To: <87po7zrq65.fsf@fifthhorseman.net>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] /usr/bin/m4: internal error detected
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PATCH 0/5] spapr: preliminary cleanups before
+ introducing XIVE
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,41 +28,41 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Daniel Kahn Gillmor <dkg@fifthhorseman.net>, bug-m4@gnu.org
-Cc: debian-superh@lists.debian.org, libc-alpha@sourceware.org, QEMU Developers <qemu-devel@nongnu.org>
+To: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, David Gibson <david@gibson.dropbear.id.au>, Greg Kurz <groug@kaod.org>
+Cc: =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>
 
-Hi Daniel!
+Hello,
 
-On 12/01/2017 06:08 AM, Daniel Kahn Gillmor wrote:
-> ------------
-> Copying file po/Makefile.in.in
-> Copying file po/Makevars.template
-> qemu: Unsupported syscall: -1
-> m4: ../sysdeps/unix/sysv/linux/spawni.c:366: __spawnix: Assertion `ec >= 0' failed.
-> /usr/bin/m4: internal error detected; please report this bug to <bug-m4@gnu.org>: Aborted
-> -----------
-
-This isn't a bug in m4 or anything architecture-specific, it's a regression
-that was introduced by an upstream change in glibc [1] and mainly affects
-qemu-user which we are using for m68k and sh4 [2].
-
-While the change in glibc is most certainly correct (I don't have enough
-background knowledge to comment on that), it broke qemu-user for everyone
-and so far there is no possible fix in sight.
-
-I am CC'ing this to libc-alpha in the hope that someone from glibc upstream
-might give us a tip on how to resolve the issue. Not being able to use qemu-user
-anymore is quite a deal breaker because lots of people use qemu-user for
-debugging issues on foreign architectures which is now no longer possible.
+These are initial patches of the XIVE patchset which prepare ground
+for the integration of the XIVE model.
 
 Thanks,
-Adrian
 
-> [1] https://sourceware.org/git/?p=glibc.git;a=commit;h=4b4d4056bb154603f36c6f8845757c1012758158
-> [2] https://bugs.launchpad.net/qemu/+bug/1673976
+C.
 
--- 
-  .''`.  John Paul Adrian Glaubitz
-: :' :  Debian Developer - glaubitz@debian.org
-`. `'   Freie Universitaet Berlin - glaubitz@physik.fu-berlin.de
-   `-    GPG: 62FF 8A75 84E0 2956 9546  0006 7426 3B37 F5B5 F913
+C=C3=A9dric Le Goater (5):
+  ppc/xics: introduce an icp_create() helper
+  ppc/xics: assign of the CPU 'intc' pointer under the core
+  spapr: move the IRQ allocation routines under the machine
+  spapr: introduce a spapr_irq_set_lsi() helper
+  spapr: introduce a spapr_qirq() helper
+
+ hw/intc/trace-events        |   4 --
+ hw/intc/xics.c              |  34 ++++++-----
+ hw/intc/xics_spapr.c        | 114 -------------------------------------
+ hw/ppc/pnv_core.c           |  10 +---
+ hw/ppc/spapr.c              | 133 ++++++++++++++++++++++++++++++++++++++=
+++++++
+ hw/ppc/spapr_cpu_core.c     |  14 +----
+ hw/ppc/spapr_events.c       |  16 +++---
+ hw/ppc/spapr_pci.c          |  10 ++--
+ hw/ppc/spapr_vio.c          |   2 +-
+ hw/ppc/trace-events         |   4 ++
+ include/hw/pci-host/spapr.h |   2 +-
+ include/hw/ppc/spapr.h      |   7 +++
+ include/hw/ppc/spapr_vio.h  |   2 +-
+ include/hw/ppc/xics.h       |   8 +--
+ 14 files changed, 187 insertions(+), 173 deletions(-)
+
+--=20
+2.13.6
