@@ -1,34 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49483)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50120)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1eKpLL-0007eR-6M
-	for qemu-devel@nongnu.org; Fri, 01 Dec 2017 12:43:20 -0500
+	(envelope-from <aik@ozlabs.ru>) id 1eKpMQ-0008TU-4d
+	for qemu-devel@nongnu.org; Fri, 01 Dec 2017 12:44:27 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1eKpLK-0000Wz-7h
-	for qemu-devel@nongnu.org; Fri, 01 Dec 2017 12:43:19 -0500
-Received: from indium.canonical.com ([91.189.90.7]:51954)
+	(envelope-from <aik@ozlabs.ru>) id 1eKpMM-0001Mp-0o
+	for qemu-devel@nongnu.org; Fri, 01 Dec 2017 12:44:26 -0500
+Received: from mail-pl0-x243.google.com ([2607:f8b0:400e:c01::243]:37151)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1eKpLK-0000WR-12
-	for qemu-devel@nongnu.org; Fri, 01 Dec 2017 12:43:18 -0500
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1eKb1E-0004CB-AY
-	for <qemu-devel@nongnu.org>; Fri, 01 Dec 2017 02:25:36 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 4EF8E2E80C8
-	for <qemu-devel@nongnu.org>; Fri,  1 Dec 2017 02:25:36 +0000 (UTC)
+	(Exim 4.71) (envelope-from <aik@ozlabs.ru>) id 1eKpML-0001LU-PH
+	for qemu-devel@nongnu.org; Fri, 01 Dec 2017 12:44:21 -0500
+Received: by mail-pl0-x243.google.com with SMTP id v41so6648365plg.4
+	for <qemu-devel@nongnu.org>; Fri, 01 Dec 2017 09:44:21 -0800 (PST)
+References: <20171005055037.7767-1-aik@ozlabs.ru>
+	<20171005055037.7767-2-aik@ozlabs.ru>
+	<431ee02e-a73e-70c8-185d-43223c52c693@ozlabs.ru>
+	<20171130160929.7fb2b027@t450s.home>
+From: Alexey Kardashevskiy <aik@ozlabs.ru>
+Message-ID: <dff8e7d0-0e4c-3e17-5d05-4c8055b51e7c@ozlabs.ru>
+Date: Fri, 1 Dec 2017 11:04:30 +1100
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Fri, 01 Dec 2017 02:16:07 -0000
-From: Hu Jun <1735576@bugs.launchpad.net>
-Reply-To: Bug 1735576 <1735576@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <151208334189.10571.827872595239738257.malonedeb@soybean.canonical.com>
-Message-Id: <151209456712.10735.3502057465607304506.malone@soybean.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1735576] Re: Support more than 4G memory for
- guest with Intel HAXM acceleration
+In-Reply-To: <20171130160929.7fb2b027@t450s.home>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-AU
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH qemu v5 1/2] memory/iommu/vfio: Define
+ add_vfio_group() callback
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,53 +33,104 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Alex Williamson <alex.williamson@redhat.com>
+Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org, David Gibson <david@gibson.dropbear.id.au>, Paolo Bonzini <pbonzini@redhat.com>
 
-update:
-according to haxm dev, they will submit a patch for qemu side of work;
+On 01/12/17 10:09, Alex Williamson wrote:
+> On Fri, 1 Dec 2017 08:56:42 +1100
+> Alexey Kardashevskiy <aik@ozlabs.ru> wrote:
+> 
+>> On 05/10/17 16:50, Alexey Kardashevskiy wrote:
+>>> The new callback will be called when a new VFIO IOMMU group is added.
+>>>
+>>> This should cause no behavioral change, the next patch will.
+>>>
+>>> Signed-off-by: Alexey Kardashevskiy <aik@ozlabs.ru>  
+>>
+>>
+>> What about this one,  any conclusion yet?
+> 
+> Patchew reported that if failed to build and you never replied with an
+> explanation, so I haven't looked at it.
 
--- =
+Well, this ping was more for David as he is supposedly rethingking it...
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1735576
+> 
+>>> ---
+>>>
+>>> This could be at the higher level - in MemoryRegionOps, makes sense?
+>>>
+>>> ---
+>>>  include/exec/memory.h |  4 ++++
+>>>  hw/vfio/common.c      | 15 +++++++++++++++
+>>>  2 files changed, 19 insertions(+)
+>>>
+>>> diff --git a/include/exec/memory.h b/include/exec/memory.h
+>>> index 5ed4042f87..64e0b4fc96 100644
+>>> --- a/include/exec/memory.h
+>>> +++ b/include/exec/memory.h
+>>> @@ -210,6 +210,10 @@ typedef struct IOMMUMemoryRegionClass {
+>>>                                  IOMMUNotifierFlag new_flags);
+>>>      /* Set this up to provide customized IOMMU replay function */
+>>>      void (*replay)(IOMMUMemoryRegion *iommu, IOMMUNotifier *notifier);
+>>> +
+>>> +    /* Notifies IOMMUMR about attached VFIO IOMMU group */
+>>> +    void (*add_vfio_group)(IOMMUMemoryRegion *iommu_mr, int vfio_kvm_fd,
+>>> +                           int groupfd);
+> 
+> If there's an "add" why is there no remove?
 
-Title:
-  Support more than 4G memory for guest with Intel HAXM acceleration
+Because I do not have use for it now and I doubt there will be any ever.
+"add" attaches an IOMMU group to a DMA window in KVM, and I cannot imagine
+if we ever want to detach a group _and_ keep using it.
 
-Status in QEMU:
-  New
 
-Bug description:
-  setup:
+> Clearly a vfio specific callback is pretty much a failure as far as
+> abstraction and layering is concerned.
 
-  host: windows 7 professional 64bit
-  guest: centos 7
-  qemu 2.10.92
-  haxm 6.2.1
 
-  issue: when assign 4096M or more memory to the guest, I got following err=
-or message:
-  E:\qemuvm\vm-svr>qemu-system-x86_64 -accel hax -hda centos-1.vdi -m 4096
-  HAX is working and emulator runs in fast virt mode.
-  Failed to allocate 0 memory
-  hax_transaction_commit: Failed mapping @0x0000000000000000+0xc0000000 fla=
-gs 00
-  hax_transaction_commit: Failed mapping @0x0000000100000000+0x40000000 fla=
-gs 00
-  VCPU shutdown request
-  VCPU shutdown request
-  if I change memory to 4095M, guest VM boot up without issue
+This was one of the things I wanted David to discuss with you as he clearly
+did not like another abstraction violation:
+https://patchwork.kernel.org/patch/9853981/
 
-  E:\qemuvm\vm-svr>qemu-system-x86_64 -accel hax -hda centos-1.vdi -m 4095
-  HAX is working and emulator runs in fast virt mode.
 
-  =
 
-  This is known limitation, I already raised a request on HAXM github site =
-for fix this: https://github.com/intel/haxm/issues/13, and it got accepted =
-will be fixed in next haxm release; however it seems there is also qemu sid=
-e work (according to haxm dev), so I raise this for qemu side fix;
 
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1735576/+subscriptions
+> 
+>>>  } IOMMUMemoryRegionClass;
+>>>  
+>>>  typedef struct CoalescedMemoryRange CoalescedMemoryRange;
+>>> diff --git a/hw/vfio/common.c b/hw/vfio/common.c
+>>> index 7b2924c0ef..9e861e0393 100644
+>>> --- a/hw/vfio/common.c
+>>> +++ b/hw/vfio/common.c
+>>> @@ -481,6 +481,21 @@ static void vfio_listener_region_add(MemoryListener *listener,
+>>>          VFIOGuestIOMMU *giommu;
+>>>          IOMMUMemoryRegion *iommu_mr = IOMMU_MEMORY_REGION(section->mr);
+>>>  
+>>> +#ifdef CONFIG_KVM
+>>> +        if (kvm_enabled()) {
+>>> +            VFIOGroup *group;
+>>> +            IOMMUMemoryRegionClass *imrc =
+>>> +                IOMMU_MEMORY_REGION_GET_CLASS(iommu_mr);
+>>> +
+>>> +            QLIST_FOREACH(group, &container->group_list, container_next) {
+>>> +                if (imrc->add_vfio_group) {
+>>> +                    imrc->add_vfio_group(iommu_mr, vfio_kvm_device_fd,
+>>> +                                         group->fd);
+>>> +                }
+>>> +            }
+>>> +        }
+>>> +#endif
+>>> +
+>>>          trace_vfio_listener_region_add_iommu(iova, end);
+>>>          /*
+>>>           * FIXME: For VFIO iommu types which have KVM acceleration to
+>>>   
+>>
+>>
+> 
+
+
+-- 
+Alexey
