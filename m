@@ -1,28 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35554)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48086)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1eKwdy-0003pV-QL
-	for qemu-devel@nongnu.org; Fri, 01 Dec 2017 20:31:03 -0500
+	(envelope-from <zhang.zhanghailiang@huawei.com>) id 1eKzF5-00065t-2H
+	for qemu-devel@nongnu.org; Fri, 01 Dec 2017 23:17:32 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1eKwdx-0002MH-EL
-	for qemu-devel@nongnu.org; Fri, 01 Dec 2017 20:31:02 -0500
-Received: from ozlabs.org ([2401:3900:2:1::2]:52197)
+	(envelope-from <zhang.zhanghailiang@huawei.com>) id 1eKzF0-00088k-4W
+	for qemu-devel@nongnu.org; Fri, 01 Dec 2017 23:17:31 -0500
+Received: from [45.249.212.32] (port=58123 helo=huawei.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgibson@ozlabs.org>) id 1eKwdw-0002Jv-L8
-	for qemu-devel@nongnu.org; Fri, 01 Dec 2017 20:31:01 -0500
-Date: Sat, 2 Dec 2017 11:59:20 +1100
-From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20171202005920.GB2130@umbus.fritz.box>
-References: <20171129084628.12336-1-david@gibson.dropbear.id.au>
-	<20171129084628.12336-4-david@gibson.dropbear.id.au>
-	<abaddfae-f0f0-cbe3-93b5-b2f102290725@redhat.com>
-	<20171130040248.GU3023@umbus.fritz.box>
-	<20171201182840-mutt-send-email-mst@kernel.org>
+	(Exim 4.71) (envelope-from <zhang.zhanghailiang@huawei.com>)
+	id 1eKzEz-00084y-ON
+	for qemu-devel@nongnu.org; Fri, 01 Dec 2017 23:17:26 -0500
+References: <D1BD20B5DB34024DA951CEEE6C4C5998B1B8CC82@DGGEMA501-MBX.china.huawei.com>
+	<33183CC9F5247A488A2544077AF19020DA4ADB8C@DGGEMA505-MBS.china.huawei.com>
+	<d4d9a0a9-b136-7320-d1e1-36a4c3cffccc@redhat.com>
+	<etPan.5a219554.1a0113f4.4983@localhost>
+	<425502fd-5f04-88a1-4f2a-d9ac3a3c0580@redhat.com>
+From: Hailiang Zhang <zhang.zhanghailiang@huawei.com>
+Message-ID: <5A221E36.3050900@huawei.com>
+Date: Sat, 2 Dec 2017 11:29:58 +0800
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="i0/AhcQY5QxfSsSZ"
-Content-Disposition: inline
-In-Reply-To: <20171201182840-mutt-send-email-mst@kernel.org>
-Subject: Re: [Qemu-devel] [for-2.12 3/7] pci: Fold pci_bus.h into pci.h
+In-Reply-To: <425502fd-5f04-88a1-4f2a-d9ac3a3c0580@redhat.com>
+Content-Type: text/plain; charset="utf-8"; format=flowed
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel]
+ =?utf-8?b?562U5aSNOiBbQlVHXSBXaW5kb3dzIDcgZ290IHN0?=
+ =?utf-8?q?uck_easily_while_run_PCMark10_application?=
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,76 +33,77 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: Marcel Apfelbaum <marcel@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, Igor Mammedov <imammedo@redhat.com>, qemu-devel@nongnu.org
+To: Paolo Bonzini <pbonzini@redhat.com>, "Gonglei (Arei)" <arei.gonglei@huawei.com>, qemu-devel <qemu-devel@nongnu.org>, "Michael S.
+	Tsirkin" <mst@redhat.com>
+Cc: "Huangweidong (C)" <weidong.huang@huawei.com>, "wangxin (U)" <wangxinxin.wang@huawei.com>, Xiexiangyou <xiexiangyou@huawei.com>
 
+On 2017/12/2 2:37, Paolo Bonzini wrote:
+> On 01/12/2017 18:45, Gonglei (Arei) wrote:
+>> I also think it's windows bug, the problem is that it doesn't occur on
+>> xen platform.
+> It's a race, it may just be that RTC PIO is faster in Xen because it's
+> implemented in the hypervisor.
 
---i0/AhcQY5QxfSsSZ
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+No, In Xen, it does not has such problem because it injects the RTC irq w=
+ithout
+checking whether its previous irq been cleared or not, which we do has su=
+ch checking
+in KVM.
 
-On Fri, Dec 01, 2017 at 06:29:39PM +0200, Michael S. Tsirkin wrote:
-> On Thu, Nov 30, 2017 at 03:02:48PM +1100, David Gibson wrote:
-> > On Wed, Nov 29, 2017 at 12:38:00PM +0200, Marcel Apfelbaum wrote:
-> > > On 29/11/2017 10:46, David Gibson wrote:
-> > > > include/hw/pci/pci_bus.h is now very small and can only safely be i=
-ncluded
-> > > > after hw/pci/pci.h.  So, just fold it into pci.h.
-> > > >=20
-> > >=20
-> > > I don't get the benefit from merging the header files.
-> > > I would go the other way around and find stuff specific
-> > > to pci_bus and add it there, like the pci_bus_new*
-> > > you touched in the prev patch.
-> >=20
-> > Hrm.  Except the point of the earlier patch was that those are
-> > actually spoecific to root buses, so would really belong in say
-> > pci-host.h, rather than pci-bus.h.
-> >=20
-> > A log of PCI stuff deals with interaction between the device and bus
-> > though, so it just seemed like more trouble than it was worth to go
-> > disentangling them properly.
-> >=20
-> > > Maybe if *all* code files requiring pci.h would automatically
-> > > need pci_bus.h would make sense, but I didn't check that.
-> >=20
-> > Yeah, I don't think every user of pci.h needs pci_bus.h, although a
-> > fair few do as you can see from the diff.  Well, I guess it's up to
-> > Michael.  I'll be tolerably content either way - I'd say this is the
-> > least important patch of the series.
->=20
-> I'm inclined to agree with Marcel also because it's lots of noise for no
-> real win.  The next patch depends on this one. I skipped this and next
-> one, pls feel free to repost next one.
+static int ioapic_set_irq(struct kvm_ioapic *ioapic, unsigned int irq,
+         int irq_level, bool line_status)
+{
+    ... ...
+     if (!irq_level) {
+         ioapic->irr &=3D ~mask; -->clear the RTC irq in irr, Or we will =
+can not inject RTC irq.
+         ret =3D 1;
+         goto out;
+     }
 
-Ok, will do.  Is the tree you've merged the others to public
-somewhere, so I can rebase on it?
+I agree that we move the operation of clearing RTC irq from cmos_ioport_r=
+ead() to
+cmos_ioport_write() to ensure the action been done.
 
---=20
-David Gibson			| I'll have my music baroque, and my code
-david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
-				| _way_ _around_!
-http://www.ozlabs.org/~dgibson
+Thanks,
+Hailiang
 
---i0/AhcQY5QxfSsSZ
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAloh+uYACgkQbDjKyiDZ
-s5K8URAAp8afVUiKXqwy9jTlfQhKP2i/BFWRgMySZLV4823UPCmwGcLYeLeybFlb
-cVgFm7XeQ/iQAgcEepQ738ngHhMgWwgVfnu4zve151B0du1urrj12r+1bgogAv6o
-EPyq+u7TKgp2mPmdpjqQb+rWiD6mjFYAjVtbfzQ8Gup0QPEK3HzMey6b88GMiuaC
-4zBsCfa6WcT8WHTpRETnK0A5iTYSu4WSl6v95+vJssymNZvfOFGb3SWqVUxrJ70w
-GQ+jKK/vLVNT1V+H5t8GDyri6+i3BJPQPB0XSW9tMNo5qgbX4BwfRrtfGVQJ6jmQ
-GLSdkdnMXtPDI1ODNEJke9Tgt2BZ+ubknYtth1GrXHDDm6tWnYO6iXzXiElW+9E0
-h37Rx2j4xrvZQz/NCxvwYsMBCvacjR6r7kNwjIabXTMocT+xTQS4uegrh+Yw8rpz
-/Cs78dGyGHjXt4aZ+3tEw2KeDFI13mikgPihi8eehj75807yAk3fm6diBxo0p+U7
-zFPTLVHVKhvxRusaE3O/o3OqSIYfrU3FIWoiuita7+sSg6z7hovd9K5JiI4/M1Pk
-VZIwLEZRzvTSJe3fCr8kSzagdgLh9ofGlvls7+6pLgUozJxK7h0ZaTO9/AiJACCO
-AevYgZO+soB3A9h4Fy/q5e4mD7iiWvZStXCtPM0MBjwhnNUvTps=
-=s8l1
------END PGP SIGNATURE-----
-
---i0/AhcQY5QxfSsSZ--
+> I will try reporting it to Microsoft.
+>
+> Thanks,
+>
+> Paolo
+>
+>> Thanks,
+>> Gonglei
+>> *=E5=8F=91=E4=BB=B6=E4=BA=BA=EF=BC=9A*Paolo Bonzini
+>> *=E6=94=B6=E4=BB=B6=E4=BA=BA=EF=BC=9A*=E9=BE=9A=E7=A3=8A,=E5=BC=A0=E6=B5=
+=B7=E4=BA=AE,qemu-devel,Michael S. Tsirkin
+>> *=E6=8A=84=E9=80=81=EF=BC=9A*=E9=BB=84=E4=BC=9F=E6=A0=8B,=E7=8E=8B=E6=AC=
+=A3,=E8=B0=A2=E7=A5=A5=E6=9C=89
+>> *=E6=97=B6=E9=97=B4=EF=BC=9A*2017-12-02 01:10:08
+>> *=E4=B8=BB=E9=A2=98:*Re: [BUG] Windows 7 got stuck easily while run PC=
+Mark10 application
+>>
+>> On 01/12/2017 08:08, Gonglei (Arei) wrote:
+>>> First write to 0x70, cmos_index =3D 0xc & 0x7f =3D 0xc
+>>>         CPU 0/KVM-15566 kvm_pio: pio_write at 0x70 size 1 count 1 val=
+ 0xc> Second write to 0x70, cmos_index =3D 0x86 & 0x7f =3D 0x6>        CP=
+U 1/KVM-15567 kvm_pio: pio_write at 0x70 size 1 count 1 val 0x86> vcpu0 r=
+ead 0x6 because cmos_index is 0x6 now:>        CPU 0/KVM-15566 kvm_pio: p=
+io_read at 0x71 size 1 count 1 val 0x6> vcpu1
+>> read 0x6:>        CPU 1/KVM-15567 kvm_pio: pio_read at 0x71 size 1 cou=
+nt
+>> 1 val 0x6
+>> This seems to be a Windows bug.  The easiest workaround that I
+>> can think of is to clear the interrupts already when 0xc is written,
+>> without waiting for the read (because REG_C can only be read).
+>>
+>> What do you think?
+>>
+>> Thanks,
+>>
+>> Paolo
+>
+> .
+>
