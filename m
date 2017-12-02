@@ -1,27 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39946)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42410)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <benh@kernel.crashing.org>) id 1eL8rV-0005tZ-Rs
-	for qemu-devel@nongnu.org; Sat, 02 Dec 2017 09:33:50 -0500
+	(envelope-from <clg@kaod.org>) id 1eL8wS-00079m-M6
+	for qemu-devel@nongnu.org; Sat, 02 Dec 2017 09:38:57 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <benh@kernel.crashing.org>) id 1eL8rQ-0001S6-Vw
-	for qemu-devel@nongnu.org; Sat, 02 Dec 2017 09:33:49 -0500
-Message-ID: <1512225215.2224.59.camel@kernel.crashing.org>
-From: Benjamin Herrenschmidt <benh@kernel.crashing.org>
-Date: Sat, 02 Dec 2017 08:33:35 -0600
-In-Reply-To: <20171130042857.GA3023@umbus.fritz.box>
+	(envelope-from <clg@kaod.org>) id 1eL8wO-0006ca-PR
+	for qemu-devel@nongnu.org; Sat, 02 Dec 2017 09:38:56 -0500
+Received: from 7.mo3.mail-out.ovh.net ([46.105.57.200]:34779)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1eL8wO-0006bS-Iw
+	for qemu-devel@nongnu.org; Sat, 02 Dec 2017 09:38:52 -0500
+Received: from player732.ha.ovh.net (b9.ovh.net [213.186.33.59])
+	by mo3.mail-out.ovh.net (Postfix) with ESMTP id F2D97175BA0
+	for <qemu-devel@nongnu.org>; Sat,  2 Dec 2017 15:38:50 +0100 (CET)
 References: <20171123132955.1261-1-clg@kaod.org>
-	<20171123132955.1261-11-clg@kaod.org>
-	<20171128063827.GP11775@umbus.fritz.box>
-	<e9b1f002-671b-7ba5-2b5b-34715d63585c@kaod.org>
-	<20171129045941.GH3023@umbus.fritz.box>
-	<512a0e63-43c1-bf8c-3060-66ab52bc054f@kaod.org>
-	<c620afca-f6df-b3ed-8317-c805ec66b31b@kaod.org>
-	<20171130042857.GA3023@umbus.fritz.box>
-Content-Type: text/plain; charset="UTF-8"
-Mime-Version: 1.0
+	<20171123132955.1261-12-clg@kaod.org>
+	<20171128064034.GQ11775@umbus.fritz.box>
+	<1512224666.2224.52.camel@kernel.crashing.org>
+From: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
+Message-ID: <ed946d89-61a0-7ef7-29a1-105a64a8e3f2@kaod.org>
+Date: Sat, 2 Dec 2017 15:38:44 +0100
+MIME-Version: 1.0
+In-Reply-To: <1512224666.2224.52.camel@kernel.crashing.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 10/25] spapr: add MMIO handlers for the
- XIVE interrupt sources
+Subject: Re: [Qemu-devel] [PATCH 11/25] spapr: describe the XIVE interrupt
+ source flags
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,40 +34,39 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Gibson <david@gibson.dropbear.id.au>, =?ISO-8859-1?Q?C=E9dric?= Le Goater <clg@kaod.org>
-Cc: "list@suse.de:PowerPC" <qemu-ppc@nongnu.org>, qemu-devel@nongnu.org
+To: Benjamin Herrenschmidt <benh@kernel.crashing.org>, David Gibson <david@gibson.dropbear.id.au>
+Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org
 
-On Thu, 2017-11-30 at 15:28 +1100, David Gibson wrote:
+On 12/02/2017 03:24 PM, Benjamin Herrenschmidt wrote:
+> On Tue, 2017-11-28 at 17:40 +1100, David Gibson wrote:
+>>> @@ -368,6 +368,10 @@ static void spapr_xive_realize(DeviceState *dev, Error **errp)
+>>>      /* Allocate the IVT (Interrupt Virtualization Table) */
+>>>      xive->ivt = g_malloc0(xive->nr_irqs * sizeof(XiveIVE));
+>>>  
+>>> +    /* All sources are emulated under the XIVE object and share the
+>>> +     * same characteristic */
+>>> +    xive->flags = XIVE_SRC_TRIGGER;
+>>
+>> You never actually use this field.  And since it always has the same
+>> value, is there a point to storing it?
 > 
-> How does this work at the hardware level?  Presumbly the actual
-> hardware components don't communicate with the XIVE to request edge or
-> level.  So how does it know?  Specific ranges for LSIs?  If that we
-> should probably do the same.
+> Some HW sources don't have it, so with pass-through maybe...
 
-So the source controller and the IVE are separate. The source
-controller sends an internal MMIO to the IVE for "translating" the
-event into a queue etc...
+Hmm, yes. So, the current design for sPAPR handles all sources 
+under the same XIVE object with a global memory region for all 
+the ESBs. 
 
-The IVE only see "events" which are effectively state transitions of
-the P bit of the source.
+The first RFC had a mechanism to register source objects into 
+the XIVE main one, allocating the IRQs per source and mapping 
+the ESBs in the overall region. A bit like OPAL does. I then 
+simplified for the sake of clarity and merged everything under 
+the same XIVE object. 
 
-The LSI vs MSI difference is thus entirely a property of the source
-HW.
+Shall I reintroduce multiples sources support ? and provide a 
+default one for IPIs and virtual devices of the machine. 
 
-All the XIVE "Generic" built-in sources (the ones you can trigger with
-an MMIO, which we use in KVM for all the IPIs and virtual interrupts)
-are MSIs.
+Thanks,
 
-You find 2 kind of blocks of LSIs in the chip, the one PSI block which
-has a handful or two of LSI sources for random "stuff" (LPC
-interrupt(s), i2c interrupts etc..) and the LSI blocks which are in
-each PHB.
+C. 
 
-So the PHB has basically two different bits of logic, one for LSIs and
-one for MSIs. Their HW state machine is different.
-
-In fact in the PHB and the PSI, I think, there's even an MMIO backdoor
-register that allows you to see the "state" of the LSI (asserted).
-
-Cheers,
-Ben.
+ 
