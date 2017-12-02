@@ -1,21 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52529)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35554)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1eKw7K-0001lq-4J
-	for qemu-devel@nongnu.org; Fri, 01 Dec 2017 19:57:21 -0500
+	(envelope-from <dgibson@ozlabs.org>) id 1eKwdy-0003pV-QL
+	for qemu-devel@nongnu.org; Fri, 01 Dec 2017 20:31:03 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1eKw7F-0004uX-VM
-	for qemu-devel@nongnu.org; Fri, 01 Dec 2017 19:57:18 -0500
-Date: Fri, 1 Dec 2017 23:37:13 +1100
+	(envelope-from <dgibson@ozlabs.org>) id 1eKwdx-0002MH-EL
+	for qemu-devel@nongnu.org; Fri, 01 Dec 2017 20:31:02 -0500
+Received: from ozlabs.org ([2401:3900:2:1::2]:52197)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <dgibson@ozlabs.org>) id 1eKwdw-0002Jv-L8
+	for qemu-devel@nongnu.org; Fri, 01 Dec 2017 20:31:01 -0500
+Date: Sat, 2 Dec 2017 11:59:20 +1100
 From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20171201123713.GA2130@umbus.fritz.box>
-References: <1512127449-11114-1-git-send-email-s1seetee@linux.vnet.ibm.com>
+Message-ID: <20171202005920.GB2130@umbus.fritz.box>
+References: <20171129084628.12336-1-david@gibson.dropbear.id.au>
+	<20171129084628.12336-4-david@gibson.dropbear.id.au>
+	<abaddfae-f0f0-cbe3-93b5-b2f102290725@redhat.com>
+	<20171130040248.GU3023@umbus.fritz.box>
+	<20171201182840-mutt-send-email-mst@kernel.org>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="NzB8fVQJ5HfG6fxh"
+	protocol="application/pgp-signature"; boundary="i0/AhcQY5QxfSsSZ"
 Content-Disposition: inline
-In-Reply-To: <1512127449-11114-1-git-send-email-s1seetee@linux.vnet.ibm.com>
-Subject: Re: [Qemu-devel] [PATCH v1] spapr.c: Update qemu's maxcpus for
- pseries machine.
+In-Reply-To: <20171201182840-mutt-send-email-mst@kernel.org>
+Subject: Re: [Qemu-devel] [for-2.12 3/7] pci: Fold pci_bus.h into pci.h
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,70 +31,51 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Seeteena Thoufeek <s1seetee@linux.vnet.ibm.com>
-Cc: agraf@suse.de, qemu-ppc@nongnu.org, qemu-devel@nongnu.org
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: Marcel Apfelbaum <marcel@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, Igor Mammedov <imammedo@redhat.com>, qemu-devel@nongnu.org
 
 
---NzB8fVQJ5HfG6fxh
+--i0/AhcQY5QxfSsSZ
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Fri, Dec 01, 2017 at 04:54:09PM +0530, Seeteena Thoufeek wrote:
-> Need to adjust the max cpus supported number from error message since
-> it was conflicting with KVM's.
+On Fri, Dec 01, 2017 at 06:29:39PM +0200, Michael S. Tsirkin wrote:
+> On Thu, Nov 30, 2017 at 03:02:48PM +1100, David Gibson wrote:
+> > On Wed, Nov 29, 2017 at 12:38:00PM +0200, Marcel Apfelbaum wrote:
+> > > On 29/11/2017 10:46, David Gibson wrote:
+> > > > include/hw/pci/pci_bus.h is now very small and can only safely be i=
+ncluded
+> > > > after hw/pci/pci.h.  So, just fold it into pci.h.
+> > > >=20
+> > >=20
+> > > I don't get the benefit from merging the header files.
+> > > I would go the other way around and find stuff specific
+> > > to pci_bus and add it there, like the pci_bus_new*
+> > > you touched in the prev patch.
+> >=20
+> > Hrm.  Except the point of the earlier patch was that those are
+> > actually spoecific to root buses, so would really belong in say
+> > pci-host.h, rather than pci-bus.h.
+> >=20
+> > A log of PCI stuff deals with interaction between the device and bus
+> > though, so it just seemed like more trouble than it was worth to go
+> > disentangling them properly.
+> >=20
+> > > Maybe if *all* code files requiring pci.h would automatically
+> > > need pci_bus.h would make sense, but I didn't check that.
+> >=20
+> > Yeah, I don't think every user of pci.h needs pci_bus.h, although a
+> > fair few do as you can see from the diff.  Well, I guess it's up to
+> > Michael.  I'll be tolerably content either way - I'd say this is the
+> > least important patch of the series.
 >=20
-> Steps to Reproduce:
-> 1.boot up with
-> "-smp 64,maxcpus=3D102464,cores=3D8,threads=3D1,sockets=3D8"
->=20
-> qemu-kvm: Number of SMP CPUs requested (102464) exceeds max CPUs
-> supported by machine 'pseries-rhel7.4.0alt' (1024)
->=20
-> 2. On KVM machine it shows
->=20
-> boot up with
-> "-m 6G,maxmem=3D300G,slots=3D256 -smp 64,maxcpus=3D1024,cores=3D8,threads=
-=3D1
-> ,sockets=3D128"
->=20
-> Number of hotpluggable cpus requested (1024) exceeds the maximum cpus
->  supported by KVM (240)
->=20
-> It seemed that 1024 was useless since KVM only support 240 so far.
-> Hence,we need to adjust it to an reasonable value 240.
->=20
-> Signed-off-by: Seeteena Thoufeek <s1seetee@linux.vnet.ibm.com>
+> I'm inclined to agree with Marcel also because it's lots of noise for no
+> real win.  The next patch depends on this one. I skipped this and next
+> one, pls feel free to repost next one.
 
-This has been written without adequate thought and investigation.
-
-First, in upstream code there's nothing wrong with having different
-limits in qemu and kernel - the can both vary depending on various
-factors.  Secondly, the 240 limit doesn't come from the kernel
-upstream - only in RHEL.
-
-Third, it doesn't even come from the kernel in RHEL - the downstream
-qemu lies about the kernel limit.
-
-I'm in the process of fixing this correctly, I expect to have
-something on Monday.
-
-> ---
->  hw/ppc/spapr.c | 1 +
->  1 file changed, 1 insertion(+)
->=20
-> diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-> index 9efddea..c753254 100644
-> --- a/hw/ppc/spapr.c
-> +++ b/hw/ppc/spapr.c
-> @@ -3691,6 +3691,7 @@ static const TypeInfo spapr_machine_info =3D {
->          if (latest) {                                                \
->              mc->alias =3D "pseries";                                   \
->              mc->is_default =3D 1;                                      \
-> +            mc->max_cpus =3D 240;                                      \
->          }                                                            \
->      }                                                                \
->      static void spapr_machine_##suffix##_instance_init(Object *obj)  \
+Ok, will do.  Is the tree you've merged the others to public
+somewhere, so I can rebase on it?
 
 --=20
 David Gibson			| I'll have my music baroque, and my code
@@ -95,24 +83,24 @@ david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
 				| _way_ _around_!
 http://www.ozlabs.org/~dgibson
 
---NzB8fVQJ5HfG6fxh
+--i0/AhcQY5QxfSsSZ
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlohTPYACgkQbDjKyiDZ
-s5LephAA2Eg/1fhQBp59jFPu9aFtBTb/M+wKdvEoHP9uWA6of80zMoDcBcF5Xw+K
-ID4t1Q4wPuEiikj5p14CXDJizOUlm4HHNoN4k4jIGG6I/ipd2zaqZdWadjK/ptYB
-LqdHD2PCCdeu9Uphi2qsoA89Y/X00Jt1kIcSROQwsY3xhYR9X48DI+KXWEnxdyzZ
-xL1uIgQ0SIoL2cgSrvou2AFoAmI6i1UBBsx6HvpZq0EPhlt9DAVS51ymwpbk4yb6
-SaujqLCwrjXDytnBre9z73KwjaqNdM7Cimkl+zUvavMheCrYKXKpFgqFPRuabwkF
-Iq5dcyfKsHnGyqfDUHBXLjTQoyDhPYrgFW8XjbFJQ8nXmU2IKfuhtfaFmmOiZuJt
-jrgRchrHAB4bclAcJI6SCutqZt3BeY1cmlvA1WFKh74/YjrugU9YHIUU9drJz8AF
-UMxd7n7no/aYxy9qk5+zGRlDVO1e4Ia9DmB26dh++647KWTKm5rUpzK0eFqpEB5B
-FvkBKxhhNvOCxgwEb+UuI99h3I5k4ZpqFxH0gaSsV9KCUgQfl7es3rAAuxuI/r+F
-5MgMDIYnaCw9lttnpRqP+TCdcJCAbnAvlUkXTUpB2pv24CDbN+EsDX6mZUCN/R7/
-Jyk8NjeVOd1nBMiT7RfPzvyOtsKgfsPJUvkt37z9YRd5P8dPtm8=
-=4vbO
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAloh+uYACgkQbDjKyiDZ
+s5K8URAAp8afVUiKXqwy9jTlfQhKP2i/BFWRgMySZLV4823UPCmwGcLYeLeybFlb
+cVgFm7XeQ/iQAgcEepQ738ngHhMgWwgVfnu4zve151B0du1urrj12r+1bgogAv6o
+EPyq+u7TKgp2mPmdpjqQb+rWiD6mjFYAjVtbfzQ8Gup0QPEK3HzMey6b88GMiuaC
+4zBsCfa6WcT8WHTpRETnK0A5iTYSu4WSl6v95+vJssymNZvfOFGb3SWqVUxrJ70w
+GQ+jKK/vLVNT1V+H5t8GDyri6+i3BJPQPB0XSW9tMNo5qgbX4BwfRrtfGVQJ6jmQ
+GLSdkdnMXtPDI1ODNEJke9Tgt2BZ+ubknYtth1GrXHDDm6tWnYO6iXzXiElW+9E0
+h37Rx2j4xrvZQz/NCxvwYsMBCvacjR6r7kNwjIabXTMocT+xTQS4uegrh+Yw8rpz
+/Cs78dGyGHjXt4aZ+3tEw2KeDFI13mikgPihi8eehj75807yAk3fm6diBxo0p+U7
+zFPTLVHVKhvxRusaE3O/o3OqSIYfrU3FIWoiuita7+sSg6z7hovd9K5JiI4/M1Pk
+VZIwLEZRzvTSJe3fCr8kSzagdgLh9ofGlvls7+6pLgUozJxK7h0ZaTO9/AiJACCO
+AevYgZO+soB3A9h4Fy/q5e4mD7iiWvZStXCtPM0MBjwhnNUvTps=
+=s8l1
 -----END PGP SIGNATURE-----
 
---NzB8fVQJ5HfG6fxh--
+--i0/AhcQY5QxfSsSZ--
