@@ -1,25 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53650)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42603)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1eLDUl-00016r-To
-	for qemu-devel@nongnu.org; Sat, 02 Dec 2017 14:30:41 -0500
+	(envelope-from <keno@juliacomputing.com>) id 1eLF7I-0002WG-6G
+	for qemu-devel@nongnu.org; Sat, 02 Dec 2017 16:14:33 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1eLDUh-0004pX-EM
-	for qemu-devel@nongnu.org; Sat, 02 Dec 2017 14:30:39 -0500
-Received: from 9.mo179.mail-out.ovh.net ([46.105.76.148]:47376)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1eLDUh-0004dc-3d
-	for qemu-devel@nongnu.org; Sat, 02 Dec 2017 14:30:35 -0500
-Received: from player755.ha.ovh.net (b9.ovh.net [213.186.33.59])
-	by mo179.mail-out.ovh.net (Postfix) with ESMTP id 4B9F78263C
-	for <qemu-devel@nongnu.org>; Sat,  2 Dec 2017 20:30:23 +0100 (CET)
-From: Greg Kurz <groug@kaod.org>
-Date: Sat, 02 Dec 2017 20:30:11 +0100
-Message-ID: <151224301160.13812.16487624528793386353.stgit@bahia.lan>
+	(envelope-from <keno@juliacomputing.com>) id 1eLF7G-0005KK-Go
+	for qemu-devel@nongnu.org; Sat, 02 Dec 2017 16:14:32 -0500
+Received: from mail-qt0-x22f.google.com ([2607:f8b0:400d:c0d::22f]:41857)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <keno@juliacomputing.com>)
+	id 1eLF7G-0005JN-7D
+	for qemu-devel@nongnu.org; Sat, 02 Dec 2017 16:14:30 -0500
+Received: by mail-qt0-x22f.google.com with SMTP id i40so17119783qti.8
+	for <qemu-devel@nongnu.org>; Sat, 02 Dec 2017 13:14:29 -0800 (PST)
+Date: Sat, 2 Dec 2017 16:14:25 -0500
+From: Keno Fischer <keno@juliacomputing.com>
+Message-ID: <20171202211425.GA13189@juliacomputing.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH] spapr: fix LSI interrupt specifiers in the
- device tree
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Subject: [Qemu-devel] [PATCH] 9pfs: Correctly handle cancelled requests
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,121 +28,139 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: qemu-ppc@nongnu.org, David Gibson <david@gibson.dropbear.id.au>, Cedric Le Goater <clg@kaod.org>
+Cc: groug@kaod.org, aneesh.kumar@linux.vnet.ibm.com
 
-PAPR 2.7 C.6.9.1.2 describes the "#interrupt-cells" property of the
-PowerPC External Interrupt Source Controller node as follows:
+ # Background
 
-=E2=80=9C#interrupt-cells=E2=80=9D
+I was investigating spurious, non-deterministic EINTR returns from
+various 9p file system operations in a Linux guest served from the
+qemu 9p server.
 
-  Standard property name to define the number of cells in an interrupt-
-  specifier within an interrupt domain.
+ ## EINTR, ERESTARTSYS and the linux kernel
 
-  prop-encoded-array: An integer, encoded as with encode-int, that denote=
-s
-  the number of cells required to represent an interrupt specifier in its
-  child nodes.
+When a signal arrives that the Linux kernel needs to deliver to user-space
+while a given thread is blocked (in the 9p case waiting for a reply to its
+request in 9p_client_rpc -> wait_event_interruptible), it asks whatever
+driver is currently running to abort its current operation (in the 9p case
+causing the submission of a TFLUSH message) and return to user space.
+In these situations, the error message reported is generally ERESTARTSYS.
+If the userspace processes specified SA_RESTART, this means that the
+system call will get restarted upon completion of the signal handler
+delivery (assuming the signal handler doesn't modify the process state
+in complicated ways not relevant here). If SA_RESTART is not specified,
+ERESTARTSYS gets translated to EINTR and user space is expected to handle
+the restart itself.
 
-  The value of this property for the PowerPC External Interrupt option sh=
-all
-  be 2. Thus all interrupt specifiers (as used in the standard =E2=80=9Ci=
-nterrupts=E2=80=9D
-  property) shall consist of two cells, each containing an integer encode=
-d
-  as with encode-int. The first integer represents the interrupt number t=
-he
-  second integer is the trigger code: 0 for edge triggered, 1 for level
-  triggered.
+ ## The 9p TFLISH command
 
-This patch adds a second cell to the interrupt specifier stored in the
-"interrupts" property of PCI device nodes. This property only exists if
-the Interrupt Pin register is set, ie, the interrupt is level, the extra
-cell is hence set to 1.
+The 9p TFLUSH commands requests that the server abort an ongoing operation.
+The man page [1] specifies:
 
-This also fixes the interrupt specifiers in the "interrupt-map" property
-of the PHB node, that were setting the second cell to 8 (confusion with
-IRQ_TYPE_LEVEL_LOW ?) instead of 1.
+```
+If it recognizes oldtag as the tag of a pending transaction, it should abort any
+pending response and discard that tag.
+[...]
+When the client sends a Tflush, it must wait to receive the corresponding Rflush
+before reusing oldtag for subsequent messages. If a response to the flushed request
+is received before the Rflush, the client must honor the response as if it had not
+been flushed, since the completed request may signify a state change in the server
+```
 
-While here, let's introduce defines for the interrupt specifier trigger
-code, and patch other users in spapr.
+In particular, this means that the server must not send a reply with the orignal
+tag in response to the cancellation request, because the client is obligated
+to interpret such a reply as a coincidental reply to the original request.
 
-Signed-off-by: Greg Kurz <groug@kaod.org>
+ # The bug
+
+When qemu receives a TFlush request, it sets the `cancelled` flag on the relevant
+pdu. This flag is periodically checked, e.g. in `v9fs_co_name_to_path`, and if
+set, the operation is aborted and the error is set to EINTR. However, the server
+then violates the spec, by returning to the client an Rerror response, rather
+than discarding the message entirely. As a result, the client is required
+to assume that said Rerror response is a result of the original request, not
+a result of the cancellation and thus passes the EINTR error back to user space.
+This is not the worst thing it could do, however as discussed above, the correct
+error code would have been ERESTARTSYS, such that user space programs with
+SA_RESTART set get correctly restarted upon completion of the signal handler.
+Instead, such programs get spurious EINTR results that they were not expecting
+to handle.
+
+It should be noted that there are plenty of user space programs that do not
+set SA_RESTART and do not correctly handle EINTR either. However, that is then
+a userspace bug. It should also be noted that this bug has been mitigated by
+a recent commit to the Linux kernel [2], which essentially prevents the kernel
+from sending Tflush requests unless the process is about to die (in which case
+the process likely doesn't care about the response). Nevertheless, for older
+kernels and to comply with the spec, I believe this change is beneficial.
+
+ # Implementation
+
+The fix is fairly simple, just skipping notification of a reply if
+the pdu was previously cancelled. I also added a new trace event to distinguish
+operations that caused an error reply from those that were cancelled.
+
+One complication is that we only omit sending the message on EINTR errors in
+order to avoid confusing the rest of the code (which may assume that a
+client knows about a fid if it sucessfully passed it off to pud_complete
+without checking for cancellation status). This does mean that if the server
+acts upon the cancellation flag, it always needs to set err to EINTR. I believe
+this is true of the current code.
+
+[1] https://9fans.github.io/plan9port/man/man9/flush.html
+[2] https://github.com/torvalds/linux/commit/9523feac272ccad2ad8186ba4fcc89103754de52
+
+Signed-off-by: Keno Fischer <keno@juliacomputing.com>
 ---
+ hw/9pfs/9p.c         | 17 +++++++++++++++++
+ hw/9pfs/trace-events |  1 +
+ 2 files changed, 18 insertions(+)
 
-This fixes /proc/interrupts in linux guests where LSIs appear as
-Edge instead of Level.
----
- hw/ppc/spapr_events.c  |    2 +-
- hw/ppc/spapr_pci.c     |    4 +++-
- hw/ppc/spapr_vio.c     |    3 ++-
- include/hw/ppc/spapr.h |    3 +++
- 4 files changed, 9 insertions(+), 3 deletions(-)
-
-diff --git a/hw/ppc/spapr_events.c b/hw/ppc/spapr_events.c
-index e377fc7ddea2..4bcb98f948ea 100644
---- a/hw/ppc/spapr_events.c
-+++ b/hw/ppc/spapr_events.c
-@@ -283,7 +283,7 @@ void spapr_dt_events(sPAPRMachineState *spapr, void *=
-fdt)
-         }
-=20
-         interrupts[0] =3D cpu_to_be32(source->irq);
--        interrupts[1] =3D 0;
-+        interrupts[1] =3D SPAPR_DT_INTERRUPT_IDENTIFIER_EDGE;
-=20
-         _FDT(node_offset =3D fdt_add_subnode(fdt, event_sources, source_=
-name));
-         _FDT(fdt_setprop(fdt, node_offset, "interrupts", interrupts,
-diff --git a/hw/ppc/spapr_pci.c b/hw/ppc/spapr_pci.c
-index 5a3122a9f9f9..91fedbf0929c 100644
---- a/hw/ppc/spapr_pci.c
-+++ b/hw/ppc/spapr_pci.c
-@@ -1231,6 +1231,8 @@ static void spapr_populate_pci_child_dt(PCIDevice *=
-dev, void *fdt, int offset,
-     if (pci_default_read_config(dev, PCI_INTERRUPT_PIN, 1)) {
-         _FDT(fdt_setprop_cell(fdt, offset, "interrupts",
-                  pci_default_read_config(dev, PCI_INTERRUPT_PIN, 1)));
-+        _FDT(fdt_appendprop_cell(fdt, offset, "interrupts",
-+                                 SPAPR_DT_INTERRUPT_IDENTIFIER_LEVEL));
-     }
-=20
-     if (!is_bridge) {
-@@ -2122,7 +2124,7 @@ int spapr_populate_pci_dt(sPAPRPHBState *phb,
-             irqmap[3] =3D cpu_to_be32(j+1);
-             irqmap[4] =3D cpu_to_be32(xics_phandle);
-             irqmap[5] =3D cpu_to_be32(phb->lsi_table[lsi_num].irq);
--            irqmap[6] =3D cpu_to_be32(0x8);
-+            irqmap[6] =3D cpu_to_be32(SPAPR_DT_INTERRUPT_IDENTIFIER_LEVE=
-L);
-         }
-     }
-     /* Write interrupt map */
-diff --git a/hw/ppc/spapr_vio.c b/hw/ppc/spapr_vio.c
-index ea3bc8bd9e21..29a17651a17c 100644
---- a/hw/ppc/spapr_vio.c
-+++ b/hw/ppc/spapr_vio.c
-@@ -126,7 +126,8 @@ static int vio_make_devnode(VIOsPAPRDevice *dev,
-     }
-=20
-     if (dev->irq) {
--        uint32_t ints_prop[] =3D {cpu_to_be32(dev->irq), 0};
-+        uint32_t ints_prop[] =3D { cpu_to_be32(dev->irq),
-+                                 SPAPR_DT_INTERRUPT_IDENTIFIER_EDGE };
-=20
-         ret =3D fdt_setprop(fdt, node_off, "interrupts", ints_prop,
-                           sizeof(ints_prop));
-diff --git a/include/hw/ppc/spapr.h b/include/hw/ppc/spapr.h
-index 9d21ca9bde3a..8f6298bde59b 100644
---- a/include/hw/ppc/spapr.h
-+++ b/include/hw/ppc/spapr.h
-@@ -590,6 +590,9 @@ void spapr_load_rtas(sPAPRMachineState *spapr, void *=
-fdt, hwaddr addr);
-=20
- #define RTAS_EVENT_SCAN_RATE    1
-=20
-+#define SPAPR_DT_INTERRUPT_IDENTIFIER_EDGE  0
-+#define SPAPR_DT_INTERRUPT_IDENTIFIER_LEVEL 1
+diff --git a/hw/9pfs/9p.c b/hw/9pfs/9p.c
+index 710cd91..46f406b 100644
+--- a/hw/9pfs/9p.c
++++ b/hw/9pfs/9p.c
+@@ -648,6 +648,22 @@ static void coroutine_fn pdu_complete(V9fsPDU *pdu, ssize_t len)
+     V9fsState *s = pdu->s;
+     int ret;
+ 
++    /*
++     * The 9p spec requires that successfully cancelled pdus receive no reply.
++     * Sending a reply would confuse clients because they would
++     * assume that any EINTR is the actual result of the operation,
++     * rather than a consequence of the cancellation. However, if
++     * the operation completed (succesfully or with an error other
++     * than caused be cancellation), we do send out that reply, both
++     * for efficiency and to avoid confusing the rest of the state machine
++     * that assumes passing a non-error here will mean a successful
++     * transmission of the reply.
++     */
++    if (pdu->cancelled && len == -EINTR) {
++        trace_v9fs_rcancel(pdu->tag, pdu->id);
++        goto out_wakeup;
++    }
 +
- typedef struct sPAPRTCETable sPAPRTCETable;
-=20
- #define TYPE_SPAPR_TCE_TABLE "spapr-tce-table"
+     if (len < 0) {
+         int err = -len;
+         len = 7;
+@@ -690,6 +706,7 @@ static void coroutine_fn pdu_complete(V9fsPDU *pdu, ssize_t len)
+ out_notify:
+     pdu->s->transport->push_and_notify(pdu);
+ 
++out_wakeup:
+     /* Now wakeup anybody waiting in flush for this request */
+     if (!qemu_co_queue_next(&pdu->complete)) {
+         pdu_free(pdu);
+diff --git a/hw/9pfs/trace-events b/hw/9pfs/trace-events
+index 08a4abf..1aee350 100644
+--- a/hw/9pfs/trace-events
++++ b/hw/9pfs/trace-events
+@@ -1,6 +1,7 @@
+ # See docs/devel/tracing.txt for syntax documentation.
+ 
+ # hw/9pfs/virtio-9p.c
++v9fs_rcancel(uint16_t tag, uint8_t id) "tag %d id %d"
+ v9fs_rerror(uint16_t tag, uint8_t id, int err) "tag %d id %d err %d"
+ v9fs_version(uint16_t tag, uint8_t id, int32_t msize, char* version) "tag %d id %d msize %d version %s"
+ v9fs_version_return(uint16_t tag, uint8_t id, int32_t msize, char* version) "tag %d id %d msize %d version %s"
+-- 
+2.8.1
