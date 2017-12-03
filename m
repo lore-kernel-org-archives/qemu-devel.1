@@ -1,29 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56553)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56629)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <penguin-kernel@I-love.SAKURA.ne.jp>)
-	id 1eLJTq-0007sW-LK
-	for qemu-devel@nongnu.org; Sat, 02 Dec 2017 20:54:07 -0500
+	(envelope-from <bounces@canonical.com>) id 1eLLut-0005dr-Nw
+	for qemu-devel@nongnu.org; Sat, 02 Dec 2017 23:30:12 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <penguin-kernel@I-love.SAKURA.ne.jp>)
-	id 1eLJTl-0000ca-Qx
-	for qemu-devel@nongnu.org; Sat, 02 Dec 2017 20:54:06 -0500
-Received: from www262.sakura.ne.jp ([2001:e42:101:1:202:181:97:72]:13212)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <penguin-kernel@I-love.SAKURA.ne.jp>)
-	id 1eLJTl-0000av-Ae
-	for qemu-devel@nongnu.org; Sat, 02 Dec 2017 20:54:01 -0500
-From: Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>
-References: <201711301934.CDC21800.FSLtJFFOOVQHMO@I-love.SAKURA.ne.jp>
-	<5A210C96.8050208@intel.com>
-	<201712012202.BDE13557.MJFQLtOOHVOFSF@I-love.SAKURA.ne.jp>
-	<286AC319A985734F985F78AFA26841F739376DA1@shsmsx102.ccr.corp.intel.com>
-	<20171201172519.GA27192@bombadil.infradead.org>
-In-Reply-To: <20171201172519.GA27192@bombadil.infradead.org>
-Message-Id: <201712031050.IAC64520.QVLFFOOJOSFtHM@I-love.SAKURA.ne.jp>
-Date: Sun, 3 Dec 2017 10:50:42 +0900
-Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Subject: Re: [Qemu-devel] [PATCH v18 05/10] xbitmap: add more operations
+	(envelope-from <bounces@canonical.com>) id 1eLLup-0007P5-PK
+	for qemu-devel@nongnu.org; Sat, 02 Dec 2017 23:30:11 -0500
+Received: from indium.canonical.com ([91.189.90.7]:45128)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1eLLup-0007Oj-JD
+	for qemu-devel@nongnu.org; Sat, 02 Dec 2017 23:30:07 -0500
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1eLLul-0002mu-6m
+	for <qemu-devel@nongnu.org>; Sun, 03 Dec 2017 04:30:03 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 7C8D02E81A6
+	for <qemu-devel@nongnu.org>; Sun,  3 Dec 2017 04:29:53 +0000 (UTC)
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Sun, 03 Dec 2017 04:17:20 -0000
+From: Launchpad Bug Tracker <1318474@bugs.launchpad.net>
+Reply-To: Bug 1318474 <1318474@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <20140512042017.23765.60559.malonedeb@wampee.canonical.com>
+Message-Id: <151227464100.17805.10388382583617973860.malone@loganberry.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1318474] Re: QEMU update causes Windows
+ reactivation
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,23 +37,39 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: willy@infradead.org, wei.w.wang@intel.com
-Cc: virtio-dev@lists.oasis-open.org, linux-kernel@vger.kernel.org, qemu-devel@nongnu.org, virtualization@lists.linux-foundation.org, kvm@vger.kernel.org, linux-mm@kvack.org, mst@redhat.com, mhocko@kernel.org, akpm@linux-foundation.org, mawilcox@microsoft.com, david@redhat.com, cornelia.huck@de.ibm.com, mgorman@techsingularity.net, aarcange@redhat.com, amit.shah@redhat.com, pbonzini@redhat.com, liliang.opensource@gmail.com, yang.zhang.wz@gmail.com, quan.xu@aliyun.com, nilal@redhat.com, riel@redhat.com
+To: qemu-devel@nongnu.org
 
-Matthew Wilcox wrote:
-> On Fri, Dec 01, 2017 at 03:09:08PM +0000, Wang, Wei W wrote:
-> > On Friday, December 1, 2017 9:02 PM, Tetsuo Handa wrote:
-> > > If start == end is legal,
-> > > 
-> > >    for (; start < end; start = (start | (IDA_BITMAP_BITS - 1)) + 1) {
-> > > 
-> > > makes this loop do nothing because 10 < 10 is false.
-> > 
-> > How about "start <= end "?
-> 
-> Don't ask Tetsuo for his opinion, write some userspace code that uses it.
-> 
+[Expired for QEMU because there has been no activity for 60 days.]
 
-Please be sure to prepare for "end == -1UL" case, for "start < end" will become
-true when "start = (start | (IDA_BITMAP_BITS - 1)) + 1" made "start == 0" due to
-overflow.
+** Changed in: qemu
+       Status: Incomplete =3D> Expired
+
+-- =
+
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1318474
+
+Title:
+  QEMU update causes Windows reactivation
+
+Status in QEMU:
+  Expired
+
+Bug description:
+  After updating QEMU the guest OS's detect new hardware. As a result
+  any Windows OS sees it as a significant change in hardware and require
+  a reactivation.
+
+  Host OS: Ubuntu 14.04 64-bit
+
+  Guest OS's:
+  Windows Server 2003 R2 Enterprise
+  Windows Server 2008 R2 Enterprise
+  Windows Server 2008 R2 Web
+  Windows Server 2008 R2 Data Center
+
+  QEMU version: 2.0.0
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1318474/+subscriptions
