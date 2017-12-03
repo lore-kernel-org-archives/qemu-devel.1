@@ -1,34 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56633)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33608)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1eLLut-0005dt-VW
-	for qemu-devel@nongnu.org; Sat, 02 Dec 2017 23:30:12 -0500
+	(envelope-from <mst@redhat.com>) id 1eLMKQ-0005oe-6G
+	for qemu-devel@nongnu.org; Sat, 02 Dec 2017 23:56:35 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1eLLus-0007Po-My
-	for qemu-devel@nongnu.org; Sat, 02 Dec 2017 23:30:12 -0500
-Received: from indium.canonical.com ([91.189.90.7]:45402)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1eLLus-0007PU-H3
-	for qemu-devel@nongnu.org; Sat, 02 Dec 2017 23:30:10 -0500
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1eLLuq-0002n5-6K
-	for <qemu-devel@nongnu.org>; Sun, 03 Dec 2017 04:30:08 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id F3CD22E8224
-	for <qemu-devel@nongnu.org>; Sun,  3 Dec 2017 04:29:55 +0000 (UTC)
+	(envelope-from <mst@redhat.com>) id 1eLMKN-0008GR-5S
+	for qemu-devel@nongnu.org; Sat, 02 Dec 2017 23:56:34 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:43698)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1eLMKM-0008Dv-VE
+	for qemu-devel@nongnu.org; Sat, 02 Dec 2017 23:56:31 -0500
+Date: Sun, 3 Dec 2017 06:56:27 +0200
+From: "Michael S. Tsirkin" <mst@redhat.com>
+Message-ID: <20171203064856-mutt-send-email-mst@kernel.org>
+References: <1512148088-28733-1-git-send-email-mst@redhat.com>
+	<CAFEAcA-B7nMNTj6+HOSu=qUzaK3+Me83v_OG04=a2W4MU-KziA@mail.gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+In-Reply-To: <CAFEAcA-B7nMNTj6+HOSu=qUzaK3+Me83v_OG04=a2W4MU-KziA@mail.gmail.com>
 Content-Transfer-Encoding: quoted-printable
-Date: Sun, 03 Dec 2017 04:17:20 -0000
-From: Launchpad Bug Tracker <700276@bugs.launchpad.net>
-Reply-To: Bug 700276 <700276@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <20110108115227.15680.52990.malonedeb@soybean.canonical.com>
-Message-Id: <151227464022.17805.16937348162228205220.malone@loganberry.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 700276] Re: QEMU crashed when GDB request a big
- size variable information
+Subject: Re: [Qemu-devel] [PULL 0/7] pc, pci, virtio: fixes for rc3
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,70 +28,73 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 
-[Expired for QEMU because there has been no activity for 60 days.]
+On Fri, Dec 01, 2017 at 06:05:25PM +0000, Peter Maydell wrote:
+> On 1 December 2017 at 17:08, Michael S. Tsirkin <mst@redhat.com> wrote:
+> > The following changes since commit c11d61271b9e6e7a1f0479ef1ca8fb55fa=
+457a62:
+> >
+> >   Update version for v2.11.0-rc3 release (2017-11-29 17:59:34 +0000)
+> >
+> > are available in the git repository at:
+> >
+> >   git://git.kernel.org/pub/scm/virt/kvm/mst/qemu.git tags/for_upstrea=
+m
+> >
+> > for you to fetch changes up to 75ba2ddb188fa07c3442446766782036e3085c=
+ba:
+> >
+> >   pc: fix crash on attempted cpu unplug (2017-12-01 19:05:58 +0200)
+> >
+> > ----------------------------------------------------------------
+> > pc, pci, virtio: fixes for rc3
+> >
+> > A bunch of fixes all over the place.
+> >
+> > Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
+> >
+> > ----------------------------------------------------------------
+>=20
+> You can't send fixes for rc3 2 days after rc3 has been tagged :-)
 
-** Changed in: qemu
-       Status: Incomplete =3D> Expired
+Bad wording. I meant they are for bugs present in rc3.
 
--- =
+> > Chao Gao (1):
+> >       i386/msi: Correct mask of destination ID in MSI address
+> >
+> > Greg Kurz (1):
+> >       vhost: fix error check in vhost_verify_ring_mappings()
+> >
+> > Igor Mammedov (1):
+> >       pc: fix crash on attempted cpu unplug
+> >
+> > Marc-Andr=E9 Lureau (1):
+> >       dump-guest-memory.py: fix No symbol "vmcoreinfo_find"
+> >
+> > Maxime Coquelin (2):
+> >       virtio: Add queue interface to restore avail index from vring u=
+sed index
+> >       vhost: restore avail index from vring used index on disconnecti=
+on
+> >
+> > Prasad J Pandit (1):
+> >       virtio: check VirtQueue Vring object is set
+>=20
+> Are any of these so important that we would absolutely refuse
+> to release without the fixes (ie they justify rolling an rc4
+> that we would otherwise not have needed) ?
+>=20
+> thanks
+> -- PMM
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/700276
+The msi one is less important it just happened to be queued a while ago
+and I didn't want to rebase all testing. Others are crashers but they
+don't affect everyone. So I wouldn't be sure, but there's also a
+security fix in there, so yes, I suspect we are better off with rc4, and
+if we do I think including others is justified (except maybe the msi
+one, if you feel strongly I'll rebase and drop it).
 
-Title:
-  QEMU crashed when GDB request a big size variable information
-
-Status in QEMU:
-  Expired
-
-Bug description:
-  Hello,
-  My host is Fedora 13. My QEMU version is 0.13.0, I use QEMU with GDB to d=
-ebug Linux kernel(Version 2.6.36.2).
-
-  I use QEMU like this:"qemu -s -S -kernel build/arch/i386/boot/bzImage -hd=
-a /dev/zero"
-  When GDB connected with QEMU, and use gdb command print to look big size =
-variable, the qemu is crash down. for example, when I look a task_struct va=
-riable 'init_task'(print init_task ), the qemu produce the below message an=
-d exit.
-
-  *** stack smashing detected ***: qemu terminated
-  =3D=3D=3D=3D=3D=3D=3D Backtrace: =3D=3D=3D=3D=3D=3D=3D=3D=3D
-  /lib/libc.so.6(__fortify_fail+0x4d)[0x78a31d]
-  /lib/libc.so.6[0x78a2ca]
-  qemu[0x8059e21]
-  qemu[0x805a0cf]
-  qemu[0x80d12a1]
-  qemu[0x8189cb8]
-  qemu[0x818c3b0]
-  /lib/libc.so.6(__libc_start_main+0xe6)[0x6a8cc6]
-  ...............
-  adbf7000-adbf8000 rw-p 00000000 00:00 0 =
-
-  adbf8000-ae3f8000 rw-p 00000000 00:00 0 =
-
-  ae3f8000-ae742000 rw-p 00000000 00:00 0 =
-
-  ae742000-ae762000 rw-p 00000000 00:00 0 =
-
-  ae762000-ae764000 rw-p 00000000 00:00 0 =
-
-  ae764000-ae784000 rw-p 00000000 00:00 0 =
-
-  ae784000-ae786000 rw-p 00000000 00:00 0 =
-
-  ae786000-b6786000 rw-p 00000000 00:00 0 =
-
-  b6786000-b7894000 rw-p 00000000 00:00 0 =
-
-  b78aa000-b78ab000 rw-p 00000000 00:00 0 =
-
-  bfe95000-bfeaa000 rw-p 00000000 00:00 0          [stack]
-  =E5=B7=B2=E6=94=BE=E5=BC=83 (core dumped)
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/700276/+subscriptions
+--=20
+MST
