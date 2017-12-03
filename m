@@ -1,23 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44394)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47501)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mdavidsaver@gmail.com>) id 1eLbbh-0006CS-RM
-	for qemu-devel@nongnu.org; Sun, 03 Dec 2017 16:15:29 -0500
+	(envelope-from <bounces@canonical.com>) id 1eLbqa-0004lg-8D
+	for qemu-devel@nongnu.org; Sun, 03 Dec 2017 16:30:49 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mdavidsaver@gmail.com>) id 1eLbbf-0001Ak-3t
-	for qemu-devel@nongnu.org; Sun, 03 Dec 2017 16:15:25 -0500
-References: <cover.1511731946.git.mdavidsaver@gmail.com>
-	<f16023f8456fc137647cd6c60d5e2138d8a9afa2.1511731946.git.mdavidsaver@gmail.com>
-	<20171130051315.GF3023@umbus.fritz.box>
-From: Michael Davidsaver <mdavidsaver@gmail.com>
-Message-ID: <b0ded63a-f654-94c4-4fef-3cdbf7764a97@gmail.com>
-Date: Sun, 3 Dec 2017 15:15:10 -0600
+	(envelope-from <bounces@canonical.com>) id 1eLbqX-0000pa-2e
+	for qemu-devel@nongnu.org; Sun, 03 Dec 2017 16:30:48 -0500
+Received: from indium.canonical.com ([91.189.90.7]:52092)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1eLbqW-0000om-Pw
+	for qemu-devel@nongnu.org; Sun, 03 Dec 2017 16:30:45 -0500
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1eLbqR-0002nI-Kn
+	for <qemu-devel@nongnu.org>; Sun, 03 Dec 2017 21:30:39 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 59E3A2E80CC
+	for <qemu-devel@nongnu.org>; Sun,  3 Dec 2017 21:30:39 +0000 (UTC)
 MIME-Version: 1.0
-In-Reply-To: <20171130051315.GF3023@umbus.fritz.box>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="qDlFAW7cOEabgRqPJjofV4081G8P36TQp"
-Subject: Re: [Qemu-devel] [PATCH 05/17] timer: generalize Dallas/Maxim RTC
- i2c devices
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Sun, 03 Dec 2017 21:24:14 -0000
+From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+Reply-To: Bug 1715715 <1715715@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <150480734842.32058.3488330551186130563.malonedeb@soybean.canonical.com>
+Message-Id: <151233625490.10571.16733267927991220851.malone@soybean.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1715715] Re: [qemu-ppc] Segfault when booting
+ from HD after MacOS9 install
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,835 +37,131 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Gibson <david@gibson.dropbear.id.au>
-Cc: Alexander Graf <agraf@suse.de>, qemu-devel@nongnu.org, qemu-ppc@nongnu.org
+To: qemu-devel@nongnu.org
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---qDlFAW7cOEabgRqPJjofV4081G8P36TQp
-From: Michael Davidsaver <mdavidsaver@gmail.com>
-To: David Gibson <david@gibson.dropbear.id.au>
-Cc: Alexander Graf <agraf@suse.de>, qemu-devel@nongnu.org, qemu-ppc@nongnu.org
-Message-ID: <b0ded63a-f654-94c4-4fef-3cdbf7764a97@gmail.com>
-Subject: Re: [PATCH 05/17] timer: generalize Dallas/Maxim RTC i2c devices
-References: <cover.1511731946.git.mdavidsaver@gmail.com>
- <f16023f8456fc137647cd6c60d5e2138d8a9afa2.1511731946.git.mdavidsaver@gmail.com>
- <20171130051315.GF3023@umbus.fritz.box>
-In-Reply-To: <20171130051315.GF3023@umbus.fritz.box>
-Content-Type: text/plain; charset=windows-1252
-Content-Transfer-Encoding: quoted-printable
+I've just tested MacOS 9.2.1 as part of my QEMU pre-release testing and
+it works fine for me with latest QEMU git and the following command
+line:
 
-On 11/29/2017 11:13 PM, David Gibson wrote:
-> On Sun, Nov 26, 2017 at 03:59:03PM -0600, Michael Davidsaver wrote:
->> Support for: ds1307, ds1337, ds1338, ds1339,
->> ds1340, ds1375, ds1388, and ds3231.
->>
->> Tested with ds1338 and ds1375.
->>
->> Signed-off-by: Michael Davidsaver <mdavidsaver@gmail.com>
->=20
-> I certainly like the idea of consolidating this code, but reviewing to
-> see that the new code really is a generalization of the old is
-> something I won't have time for for a while.
->=20
-> Also, hw/timer is not within my purview so it'll probably need to go
-> another path to merge.
+qemu-system-ppc -M mac99 -m 256 -drive
+file=3Dos921.qcow2,format=3Dqcow2,media=3Ddisk -net nic,model=3Drtl8139 -net
+user
 
-Could you be a bit more explicit about what, if anything, I need to do
-to move this forward?
+Note that the QEMU mac99 machine now defaults to using the sungem device
+which should give out-of-the-box networking for supported OS 9 and OS X
+versions, including 9.2.1 as you mention, if you simply specify "-net
+nic,model=3Dsungem -net user" instead. Otherwise you will need to make
+sure that the rtl8139 MacOS 9 drivers have been installed inside the
+guest.
 
+If that doesn't help then does it work if you disable spice and/or
+reduce the size of the disk image? Many older OSs will struggle to read
+disks that are 128G in size so you may find that your image is corrupted
+- perhaps try using something around 4G instead?
 
->> ---
->>  default-configs/arm-softmmu.mak |   2 +-
->>  hw/timer/Makefile.objs          |   2 +-
->>  hw/timer/ds-rtc-i2c.c           | 461 +++++++++++++++++++++++++++++++=
-+++++++++
->>  hw/timer/ds1338.c               | 239 ---------------------
->>  4 files changed, 463 insertions(+), 241 deletions(-)
->>  create mode 100644 hw/timer/ds-rtc-i2c.c
->>  delete mode 100644 hw/timer/ds1338.c
->>
->> diff --git a/default-configs/arm-softmmu.mak b/default-configs/arm-sof=
-tmmu.mak
->> index d37edc4312..b857823681 100644
->> --- a/default-configs/arm-softmmu.mak
->> +++ b/default-configs/arm-softmmu.mak
->> @@ -31,7 +31,7 @@ CONFIG_SMC91C111=3Dy
->>  CONFIG_ALLWINNER_EMAC=3Dy
->>  CONFIG_IMX_FEC=3Dy
->>  CONFIG_FTGMAC100=3Dy
->> -CONFIG_DS1338=3Dy
->> +CONFIG_DSRTCI2C=3Dy
->>  CONFIG_PFLASH_CFI01=3Dy
->>  CONFIG_PFLASH_CFI02=3Dy
->>  CONFIG_MICRODRIVE=3Dy
->> diff --git a/hw/timer/Makefile.objs b/hw/timer/Makefile.objs
->> index 8c19eac3b6..290015ebec 100644
->> --- a/hw/timer/Makefile.objs
->> +++ b/hw/timer/Makefile.objs
->> @@ -3,7 +3,7 @@ common-obj-$(CONFIG_ARM_MPTIMER) +=3D arm_mptimer.o
->>  common-obj-$(CONFIG_ARM_V7M) +=3D armv7m_systick.o
->>  common-obj-$(CONFIG_A9_GTIMER) +=3D a9gtimer.o
->>  common-obj-$(CONFIG_CADENCE) +=3D cadence_ttc.o
->> -common-obj-$(CONFIG_DS1338) +=3D ds1338.o
->> +common-obj-$(CONFIG_DSRTCI2C) +=3D ds-rtc-i2c.o
->>  common-obj-$(CONFIG_HPET) +=3D hpet.o
->>  common-obj-$(CONFIG_I8254) +=3D i8254_common.o i8254.o
->>  common-obj-$(CONFIG_M48T59) +=3D m48t59.o
->> diff --git a/hw/timer/ds-rtc-i2c.c b/hw/timer/ds-rtc-i2c.c
->> new file mode 100644
->> index 0000000000..ad2f8f2a68
->> --- /dev/null
->> +++ b/hw/timer/ds-rtc-i2c.c
->> @@ -0,0 +1,461 @@
->> +/* Emulation of various Dallas/Maxim RTCs accessed via I2C bus
->> + *
->> + * Copyright (c) 2017 Michael Davidsaver
->> + * Copyright (c) 2009 CodeSourcery
->> + *
->> + * Authors: Michael Davidsaver
->> + *          Paul Brook
->> + *
->> + * This work is licensed under the terms of the GNU GPL, version 2.  =
-See
->> + * the LICENSE file in the top-level directory.
->> + *
->> + * Models real time read/set and NVRAM.
->> + * Does not model alarms, or control/status registers.
->> + *
->> + * Generalized register map is:
->> + *   [Current time]
->> + *   [Alarm settings] (optional)
->> + *   [Control/Status] (optional)
->> + *   [Non-volatile memory] (optional)
->> + *
->> + * The current time registers are almost always the same,
->> + * with the exception being that some have a CENTURY bit
->> + * in the month register.
->> + */
->> +#include "qemu/osdep.h"
->> +#include "qemu/log.h"
->> +#include "qemu/timer.h"
->> +#include "qemu/bcd.h"
->> +#include "hw/hw.h"
->> +#include "hw/registerfields.h"
->> +#include "hw/i2c/i2c.h"
->> +#include "sysemu/qtest.h"
->> +#include "qemu/error-report.h"
->> +
->> +/* #define DEBUG_DSRTC */
->> +
->> +#ifdef DEBUG_DSRTC
->> +#define DPRINTK(FMT, ...) info_report(TYPE_DSRTC " : " FMT, ## __VA_A=
-RGS__)
->> +#else
->> +#define DPRINTK(FMT, ...) do {} while (0)
->> +#endif
->> +
->> +#define LOG(MSK, FMT, ...) qemu_log_mask(MSK, TYPE_DSRTC " : " FMT "\=
-n", \
->> +                            ## __VA_ARGS__)
->> +
->> +#define DSRTC_REGSIZE (0x40)
->> +
->> +/* values stored in BCD */
->> +/* 00-59 */
->> +#define R_SEC   (0x0)
->> +/* 00-59 */
->> +#define R_MIN   (0x1)
->> +#define R_HOUR  (0x2)
->> +/* 1-7 */
->> +#define R_WDAY  (0x3)
->> +/* 0-31 */
->> +#define R_DATE  (0x4)
->> +#define R_MONTH (0x5)
->> +/* 0-99 */
->> +#define R_YEAR  (0x6)
->> +
->> +/* use 12 hour mode when set */
->> +FIELD(HOUR, SET12, 6, 1)
->> +/* 00-23 */
->> +FIELD(HOUR, HOUR24, 0, 6)
->> +FIELD(HOUR, AMPM, 5, 1)
->> +/* 1-12 (not 0-11!) */
->> +FIELD(HOUR, HOUR12, 0, 5)
->> +
->> +/* 1-12 */
->> +FIELD(MONTH, MONTH, 0, 5)
->> +FIELD(MONTH, CENTURY, 7, 1)
->> +
->> +typedef struct DSRTCInfo {
->> +    /* if bit 7 of the Month register is set after Y2K */
->> +    bool has_century;
->> +    /* address of first non-volatile memory cell.
->> +     * nv_start >=3D reg_end means no NV memory.
->> +     */
->> +    uint8_t nv_start;
->> +    /* total size of register range.  When address counter rolls over=
-=2E */
->> +    uint8_t reg_size;
->> +} DSRTCInfo;
->> +
->> +typedef struct DSRTCState {
->> +    I2CSlave parent_obj;
->> +
->> +    const DSRTCInfo *info;
->> +
->> +    qemu_irq alarm_irq;
->> +
->> +    /* register address counter */
->> +    uint8_t addr;
->> +    /* when writing, whether the address has been sent */
->> +    bool addrd;
->> +
->> +    int64_t time_offset;
->> +    int8_t wday_offset;
->> +
->> +    uint8_t regs[DSRTC_REGSIZE];
->> +} DSRTCState;
->> +
->> +typedef struct DSRTCClass {
->> +    I2CSlaveClass parent_class;
->> +
->> +    const DSRTCInfo *info;
->> +} DSRTCClass;
->> +
->> +#define TYPE_DSRTC "ds-rtc-i2c"
->> +#define DSRTC(obj) OBJECT_CHECK(DSRTCState, (obj), TYPE_DSRTC)
->> +#define DSRTC_GET_CLASS(obj) \
->> +    OBJECT_GET_CLASS(DSRTCClass, obj, TYPE_DSRTC)
->> +#define DSRTC_CLASS(klass) \
->> +    OBJECT_CLASS_CHECK(DSRTCClass, klass, TYPE_DSRTC)
->> +
->> +static const VMStateDescription vmstate_dsrtc =3D {
->> +    .name =3D TYPE_DSRTC,
->> +    .version_id =3D 1,
->> +    .minimum_version_id =3D 1,
->> +    .fields =3D (VMStateField[]) {
->> +        VMSTATE_I2C_SLAVE(parent_obj, DSRTCState),
->> +        VMSTATE_INT64(time_offset, DSRTCState),
->> +        VMSTATE_INT8_V(wday_offset, DSRTCState, 2),
->> +        VMSTATE_UINT8_ARRAY(regs, DSRTCState, DSRTC_REGSIZE),
->> +        VMSTATE_UINT8(addr, DSRTCState),
->> +        VMSTATE_BOOL(addrd, DSRTCState),
->> +        VMSTATE_END_OF_LIST()
->> +    }
->> +};
->> +
->> +static void dsrtc_reset(DeviceState *device);
->> +
->> +/* update current time registers */
->> +static
->> +void dsrtc_latch(DSRTCState *ds)
->> +{
->> +    struct tm now;
->> +    bool use12;
->> +
->> +    qemu_get_timedate(&now, ds->time_offset);
->> +
->> +    DPRINTK("Current Time %3u/%2u/%u %2u:%2u:%2u (wday %u)",
->> +            now.tm_year, now.tm_mon, now.tm_mday,
->> +            now.tm_hour, now.tm_min, now.tm_sec,
->> +            now.tm_wday);
->> +
->> +    use12 =3D ARRAY_FIELD_EX32(ds->regs, HOUR, SET12);
->> +
->> +    /* ensure unused bits are zero */
->> +    memset(ds->regs, 0, R_YEAR + 1);
->> +
->> +    ds->regs[R_SEC] =3D to_bcd(now.tm_sec);
->> +    ds->regs[R_MIN] =3D to_bcd(now.tm_min);
->> +
->> +    if (!use12) {
->> +        /* 24 hour (0-23) */
->> +        ARRAY_FIELD_DP32(ds->regs, HOUR, HOUR24, to_bcd(now.tm_hour))=
-;
->> +    } else {
->> +        /* 12 hour am/pm (1-12) */
->> +        ARRAY_FIELD_DP32(ds->regs, HOUR, SET12, 1);
->> +        ARRAY_FIELD_DP32(ds->regs, HOUR, AMPM, now.tm_hour >=3D 12u);=
+-- =
 
->> +        ARRAY_FIELD_DP32(ds->regs, HOUR, HOUR12,
->> +                         to_bcd(1u + (now.tm_hour % 12u)));
->> +    }
->> +
->> +    ds->regs[R_WDAY] =3D (now.tm_wday + ds->wday_offset) % 7u + 1u;
->> +    ds->regs[R_DATE] =3D to_bcd(now.tm_mday);
->> +
->> +    ARRAY_FIELD_DP32(ds->regs, MONTH, MONTH, to_bcd(now.tm_mon + 1));=
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1715715
 
->> +    if (ds->info->has_century) {
->> +        ARRAY_FIELD_DP32(ds->regs, MONTH, CENTURY, now.tm_year >=3D 1=
-00u);
->> +    }
->> +
->> +    ds->regs[R_YEAR] =3D to_bcd(now.tm_year % 100u);
->> +
->> +    DPRINTK("Latched time");
->> +}
->> +
->> +/* call after guest writes to current time registers
->> + * to re-compute our offset from host time.
->> + */
->> +static
->> +void dsrtc_update(DSRTCState *ds)
->> +{
->> +    int user_wday;
->> +    struct tm now;
->> +
->> +    now.tm_sec =3D from_bcd(ds->regs[R_SEC]);
->> +    now.tm_min =3D from_bcd(ds->regs[R_MIN]);
->> +
->> +    if (ARRAY_FIELD_EX32(ds->regs, HOUR, SET12)) {
->> +        /* 12 hour (1-12) */
->> +        now.tm_hour =3D from_bcd(ARRAY_FIELD_EX32(ds->regs, HOUR, HOU=
-R12)) - 1u;
->> +        if (ARRAY_FIELD_EX32(ds->regs, HOUR, AMPM)) {
->> +            now.tm_hour +=3D 12;
->> +        }
->> +
->> +    } else {
->> +        /* 23 hour (0-23) */
->> +        now.tm_hour =3D from_bcd(ARRAY_FIELD_EX32(ds->regs, HOUR, HOU=
-R24));
->> +    }
->> +
->> +    now.tm_wday =3D from_bcd(ds->regs[R_WDAY]) - 1u;
->> +    now.tm_mday =3D from_bcd(ds->regs[R_DATE]);
->> +    now.tm_mon =3D from_bcd(ARRAY_FIELD_EX32(ds->regs, MONTH, MONTH))=
- - 1;
->> +
->> +    now.tm_year =3D from_bcd(ds->regs[R_YEAR]);
->> +    if (ARRAY_FIELD_EX32(ds->regs, MONTH, CENTURY) || !ds->info->has_=
-century) {
->> +        now.tm_year +=3D 100;
->> +    }
->> +
->> +    DPRINTK("New Time %3u/%2u/%u %2u:%2u:%2u (wday %u)",
->> +            now.tm_year, now.tm_mon, now.tm_mday,
->> +            now.tm_hour, now.tm_min, now.tm_sec,
->> +            now.tm_wday);
->> +
->> +    /* round trip to get real wday_offset based on time delta */
->> +    user_wday =3D now.tm_wday;
->> +    ds->time_offset =3D qemu_timedate_diff(&now);
->> +    /* race possible if we run at midnight
->> +     * TODO: make qemu_timedate_diff() calculate wday offset as well?=
+Title:
+  [qemu-ppc] Segfault when booting from HD after MacOS9 install
 
->> +     */
->> +    qemu_get_timedate(&now, ds->time_offset);
->> +    /* calculate wday_offset to achieve guest requested wday */
->> +    ds->wday_offset =3D user_wday - now.tm_wday;
->> +
->> +    DPRINTK("Update offset =3D %" PRId64 ", wday_offset =3D %d",
->> +            ds->time_offset, ds->wday_offset);
->> +}
->> +
->> +static
->> +void dsrtc_advance(DSRTCState *ds)
->> +{
->> +    ds->addr =3D (ds->addr + 1) % ds->info->reg_size;
->> +    if (ds->addr =3D=3D 0) {
->> +        /* latch time on roll over */
->> +        dsrtc_latch(ds);
->> +    }
->> +}
->> +
->> +static
->> +int dsrtc_event(I2CSlave *s, enum i2c_event event)
->> +{
->> +    DSRTCState *ds =3D DSRTC(s);
->> +
->> +    switch (event) {
->> +    case I2C_START_SEND:
->> +        ds->addrd =3D false;
->> +        /* fall through */
->> +    case I2C_START_RECV:
->> +        dsrtc_latch(ds);
->> +        /* fall through */
->> +    case I2C_FINISH:
->> +        DPRINTK("Event %d", (int)event);
->> +        /* fall through */
->> +    case I2C_NACK:
->> +        break;
->> +    }
->> +    return 0;
->> +}
->> +
->> +static
->> +int dsrtc_recv(I2CSlave *s)
->> +{
->> +    DSRTCState *ds =3D DSRTC(s);
->> +    int ret =3D 0;
->> +
->> +    ret =3D ds->regs[ds->addr];
->> +
->> +    if (ds->addr > R_YEAR && ds->addr < ds->info->nv_start) {
->> +        LOG(LOG_UNIMP, "Read from unimplemented (%02x) %02x", ds->add=
-r, ret);
->> +    }
->> +
->> +    DPRINTK("Recv (%02x) %02x", ds->addr, ret);
->> +
->> +    dsrtc_advance(ds);
->> +
->> +    return ret;
->> +}
->> +
->> +static
->> +int dsrtc_send(I2CSlave *s, uint8_t data)
->> +{
->> +    DSRTCState *ds =3D DSRTC(s);
->> +
->> +    if (!ds->addrd) {
->> +        if (data =3D=3D 0xff && qtest_enabled()) {
->> +            /* allow test runner to zero offsets */
->> +            DPRINTK("Testing reset");
->> +            dsrtc_reset(DEVICE(s));
->> +            return 0;
->> +        }
->> +        ds->addr =3D data % DSRTC_REGSIZE;
->> +        ds->addrd =3D true;
->> +        DPRINTK("Set address pointer %02x", data);
->> +        return 0;
->> +    }
->> +
->> +    DPRINTK("Send (%02x) %02x", ds->addr, data);
->> +
->> +    if (ds->addr <=3D R_YEAR) {
->> +        ds->regs[ds->addr] =3D data;
->> +        dsrtc_update(ds);
->> +
->> +    } else if (ds->addr >=3D ds->info->nv_start) {
->> +        ds->regs[ds->addr] =3D data;
->> +
->> +    } else {
->> +        LOG(LOG_UNIMP, "Register not modeled");
->> +    }
->> +
->> +    dsrtc_advance(ds);
->> +
->> +    return 0;
->> +}
->> +
->> +static
->> +void dsrtc_reset(DeviceState *device)
->> +{
->> +    DSRTCState *ds =3D DSRTC(device);
->> +
->> +    memset(ds->regs, 0, sizeof(ds->regs));
->> +
->> +    ds->addr =3D 0;
->> +    ds->addrd =3D false;
->> +    ds->time_offset =3D 0;
->> +    ds->wday_offset =3D 0;
->> +
->> +    DPRINTK("Reset");
->> +}
->> +
->> +static
->> +void dsrtc_realize(DeviceState *device, Error **errp)
->> +{
->> +    DSRTCState *ds =3D DSRTC(device);
->> +    DSRTCClass *r =3D DSRTC_GET_CLASS(device);
->> +
->> +    ds->info =3D r->info;
->> +
->> +    /* Alarms not yet implemented, but allow
->> +     * board code to wire up the alarm interrupt
->> +     * output anyway.
->> +     */
->> +    qdev_init_gpio_out(device, &ds->alarm_irq, 1);
->> +}
->> +
->> +static
->> +void dsrtc_class_init(ObjectClass *klass, void *data)
->> +{
->> +    DeviceClass *dc =3D DEVICE_CLASS(klass);
->> +    I2CSlaveClass *k =3D I2C_SLAVE_CLASS(klass);
->> +    DSRTCClass *r =3D DSRTC_CLASS(klass);
->> +
->> +    r->info =3D data;
->> +
->> +    k->event =3D &dsrtc_event;
->> +    k->recv =3D &dsrtc_recv;
->> +    k->send =3D &dsrtc_send;
->> +
->> +    dc->vmsd =3D &vmstate_dsrtc;
->> +    dc->realize =3D dsrtc_realize;
->> +    dc->reset =3D dsrtc_reset;
->> +    dc->user_creatable =3D true;
->> +}
->> +
->> +static
->> +const TypeInfo ds_rtc_base_type =3D {
->> +    .abstract =3D true,
->> +    .name =3D TYPE_DSRTC,
->> +    .parent =3D TYPE_I2C_SLAVE,
->> +    .instance_size =3D sizeof(DSRTCState),
->> +};
->> +
->> +#define DSRTC_CONFIG(NAME) \
->> +static const TypeInfo NAME##_type =3D { \
->> +    .name =3D #NAME, \
->> +    .parent =3D TYPE_DSRTC, \
->> +    .class_size =3D sizeof(I2CSlaveClass), \
->> +    .class_init =3D dsrtc_class_init, \
->> +    .class_data =3D (void *)&NAME##_info, \
->> +};
->> +
->> +/* ds3231 - alarms, no eeprom */
->> +static const DSRTCInfo ds3231_info =3D {
->> +    .has_century =3D true,
->> +    .nv_start    =3D 0x13, /* no nv memory */
->> +    .reg_size    =3D 0x13,
->> +};
->> +DSRTC_CONFIG(ds3231)
->> +
->> +/* only model block 0 (RTC), blocks 1,2 (eeprom) not modeled.
->> + * blocks have different i2c addresses
->> + */
->> +static const DSRTCInfo ds1388_info =3D {
->> +    .has_century =3D false,
->> +    .nv_start    =3D 0x0d,
->> +    .reg_size    =3D 0x0d,
->> +};
->> +DSRTC_CONFIG(ds1388)
->> +
->> +/* alarms, eeprom */
->> +static const DSRTCInfo ds1375_info =3D {
->> +    .has_century =3D true,
->> +    .nv_start    =3D 0x10,
->> +    .reg_size    =3D 0x20,
->> +};
->> +DSRTC_CONFIG(ds1375)
->> +
->> +/* no alarms, no eeprom */
->> +static const DSRTCInfo ds1340_info =3D {
->> +    .has_century =3D false,
->> +    .nv_start    =3D 0x10,
->> +    .reg_size    =3D 0x10,
->> +};
->> +DSRTC_CONFIG(ds1340)
->> +
->> +/* alarms, no eeprom */
->> +static const DSRTCInfo ds1339_info =3D {
->> +    .has_century =3D false,
->> +    .nv_start    =3D 0x11,
->> +    .reg_size    =3D 0x11,
->> +};
->> +DSRTC_CONFIG(ds1339)
->> +
->> +/* no alarms, eeprom */
->> +static const DSRTCInfo ds1338_info =3D {
->> +    .has_century =3D false,
->> +    .nv_start    =3D 0x08,
->> +    .reg_size    =3D 0x40,
->> +};
->> +DSRTC_CONFIG(ds1338)
->> +
->> +/* alarms, no eeprom */
->> +static const DSRTCInfo ds1337_info =3D {
->> +    .has_century =3D true,
->> +    .nv_start    =3D 0x10,
->> +    .reg_size    =3D 0x10,
->> +};
->> +DSRTC_CONFIG(ds1337)
->> +
->> +/* ds1307 registers are identical to ds1338 */
->> +static
->> +const TypeInfo ds1307_type =3D {
->> +    .name =3D "ds1307",
->> +    .parent =3D "ds1338",
->> +};
->> +
->> +static void ds_rtc_i2c_register(void)
->> +{
->> +    type_register_static(&ds_rtc_base_type);
->> +    type_register_static(&ds3231_type);
->> +    type_register_static(&ds1388_type);
->> +    type_register_static(&ds1375_type);
->> +    type_register_static(&ds1340_type);
->> +    type_register_static(&ds1339_type);
->> +    type_register_static(&ds1338_type);
->> +    type_register_static(&ds1337_type);
->> +    type_register_static(&ds1307_type);
->> +}
->> +
->> +type_init(ds_rtc_i2c_register)
->> diff --git a/hw/timer/ds1338.c b/hw/timer/ds1338.c
->> deleted file mode 100644
->> index 3849b74a68..0000000000
->> --- a/hw/timer/ds1338.c
->> +++ /dev/null
->> @@ -1,239 +0,0 @@
->> -/*
->> - * MAXIM DS1338 I2C RTC+NVRAM
->> - *
->> - * Copyright (c) 2009 CodeSourcery.
->> - * Written by Paul Brook
->> - *
->> - * This code is licensed under the GNU GPL v2.
->> - *
->> - * Contributions after 2012-01-13 are licensed under the terms of the=
+Status in QEMU:
+  New
 
->> - * GNU GPL, version 2 or (at your option) any later version.
->> - */
->> -
->> -#include "qemu/osdep.h"
->> -#include "qemu-common.h"
->> -#include "hw/i2c/i2c.h"
->> -#include "qemu/bcd.h"
->> -
->> -/* Size of NVRAM including both the user-accessible area and the
->> - * secondary register area.
->> - */
->> -#define NVRAM_SIZE 64
->> -
->> -/* Flags definitions */
->> -#define SECONDS_CH 0x80
->> -#define HOURS_12   0x40
->> -#define HOURS_PM   0x20
->> -#define CTRL_OSF   0x20
->> -
->> -#define TYPE_DS1338 "ds1338"
->> -#define DS1338(obj) OBJECT_CHECK(DS1338State, (obj), TYPE_DS1338)
->> -
->> -typedef struct DS1338State {
->> -    I2CSlave parent_obj;
->> -
->> -    int64_t offset;
->> -    uint8_t wday_offset;
->> -    uint8_t nvram[NVRAM_SIZE];
->> -    int32_t ptr;
->> -    bool addr_byte;
->> -} DS1338State;
->> -
->> -static const VMStateDescription vmstate_ds1338 =3D {
->> -    .name =3D "ds1338",
->> -    .version_id =3D 2,
->> -    .minimum_version_id =3D 1,
->> -    .fields =3D (VMStateField[]) {
->> -        VMSTATE_I2C_SLAVE(parent_obj, DS1338State),
->> -        VMSTATE_INT64(offset, DS1338State),
->> -        VMSTATE_UINT8_V(wday_offset, DS1338State, 2),
->> -        VMSTATE_UINT8_ARRAY(nvram, DS1338State, NVRAM_SIZE),
->> -        VMSTATE_INT32(ptr, DS1338State),
->> -        VMSTATE_BOOL(addr_byte, DS1338State),
->> -        VMSTATE_END_OF_LIST()
->> -    }
->> -};
->> -
->> -static void capture_current_time(DS1338State *s)
->> -{
->> -    /* Capture the current time into the secondary registers
->> -     * which will be actually read by the data transfer operation.
->> -     */
->> -    struct tm now;
->> -    qemu_get_timedate(&now, s->offset);
->> -    s->nvram[0] =3D to_bcd(now.tm_sec);
->> -    s->nvram[1] =3D to_bcd(now.tm_min);
->> -    if (s->nvram[2] & HOURS_12) {
->> -        int tmp =3D now.tm_hour;
->> -        if (tmp % 12 =3D=3D 0) {
->> -            tmp +=3D 12;
->> -        }
->> -        if (tmp <=3D 12) {
->> -            s->nvram[2] =3D HOURS_12 | to_bcd(tmp);
->> -        } else {
->> -            s->nvram[2] =3D HOURS_12 | HOURS_PM | to_bcd(tmp - 12);
->> -        }
->> -    } else {
->> -        s->nvram[2] =3D to_bcd(now.tm_hour);
->> -    }
->> -    s->nvram[3] =3D (now.tm_wday + s->wday_offset) % 7 + 1;
->> -    s->nvram[4] =3D to_bcd(now.tm_mday);
->> -    s->nvram[5] =3D to_bcd(now.tm_mon + 1);
->> -    s->nvram[6] =3D to_bcd(now.tm_year - 100);
->> -}
->> -
->> -static void inc_regptr(DS1338State *s)
->> -{
->> -    /* The register pointer wraps around after 0x3F; wraparound
->> -     * causes the current time/date to be retransferred into
->> -     * the secondary registers.
->> -     */
->> -    s->ptr =3D (s->ptr + 1) & (NVRAM_SIZE - 1);
->> -    if (!s->ptr) {
->> -        capture_current_time(s);
->> -    }
->> -}
->> -
->> -static int ds1338_event(I2CSlave *i2c, enum i2c_event event)
->> -{
->> -    DS1338State *s =3D DS1338(i2c);
->> -
->> -    switch (event) {
->> -    case I2C_START_RECV:
->> -        /* In h/w, capture happens on any START condition, not just a=
+Bug description:
+  I created an empty 128G qcow2 image and booted from a Mac OS 9.2.1
+  Install CD, in which I was able to install the OS successfully to the
+  hard drive. Upon reboot, this time from the hard drive directly, qemu-
+  system-ppc segfaults. Host system is Ubuntu 16.04.2 with latest qemu
+  commit.
 
->> -         * START_RECV, but there is no need to actually capture on
->> -         * START_SEND, because the guest can't get at that data
->> -         * without going through a START_RECV which would overwrite i=
-t.
->> -         */
->> -        capture_current_time(s);
->> -        break;
->> -    case I2C_START_SEND:
->> -        s->addr_byte =3D true;
->> -        break;
->> -    default:
->> -        break;
->> -    }
->> -
->> -    return 0;
->> -}
->> -
->> -static int ds1338_recv(I2CSlave *i2c)
->> -{
->> -    DS1338State *s =3D DS1338(i2c);
->> -    uint8_t res;
->> -
->> -    res  =3D s->nvram[s->ptr];
->> -    inc_regptr(s);
->> -    return res;
->> -}
->> -
->> -static int ds1338_send(I2CSlave *i2c, uint8_t data)
->> -{
->> -    DS1338State *s =3D DS1338(i2c);
->> -
->> -    if (s->addr_byte) {
->> -        s->ptr =3D data & (NVRAM_SIZE - 1);
->> -        s->addr_byte =3D false;
->> -        return 0;
->> -    }
->> -    if (s->ptr < 7) {
->> -        /* Time register. */
->> -        struct tm now;
->> -        qemu_get_timedate(&now, s->offset);
->> -        switch(s->ptr) {
->> -        case 0:
->> -            /* TODO: Implement CH (stop) bit.  */
->> -            now.tm_sec =3D from_bcd(data & 0x7f);
->> -            break;
->> -        case 1:
->> -            now.tm_min =3D from_bcd(data & 0x7f);
->> -            break;
->> -        case 2:
->> -            if (data & HOURS_12) {
->> -                int tmp =3D from_bcd(data & (HOURS_PM - 1));
->> -                if (data & HOURS_PM) {
->> -                    tmp +=3D 12;
->> -                }
->> -                if (tmp % 12 =3D=3D 0) {
->> -                    tmp -=3D 12;
->> -                }
->> -                now.tm_hour =3D tmp;
->> -            } else {
->> -                now.tm_hour =3D from_bcd(data & (HOURS_12 - 1));
->> -            }
->> -            break;
->> -        case 3:
->> -            {
->> -                /* The day field is supposed to contain a value in
->> -                   the range 1-7. Otherwise behavior is undefined.
->> -                 */
->> -                int user_wday =3D (data & 7) - 1;
->> -                s->wday_offset =3D (user_wday - now.tm_wday + 7) % 7;=
+  qemu --version reports "2.10.50 (v2.10.0-244-gb07d1c2-dirty)", but I
+  used git commit b07d1c2f5607489d4d4a6a65ce36a3e896ac065e and built
+  with "./configure --target-list=3Dppc-softmmu --enable-debug --disable-
+  strip".
 
->> -            }
->> -            break;
->> -        case 4:
->> -            now.tm_mday =3D from_bcd(data & 0x3f);
->> -            break;
->> -        case 5:
->> -            now.tm_mon =3D from_bcd(data & 0x1f) - 1;
->> -            break;
->> -        case 6:
->> -            now.tm_year =3D from_bcd(data) + 100;
->> -            break;
->> -        }
->> -        s->offset =3D qemu_timedate_diff(&now);
->> -    } else if (s->ptr =3D=3D 7) {
->> -        /* Control register. */
->> -
->> -        /* Ensure bits 2, 3 and 6 will read back as zero. */
->> -        data &=3D 0xB3;
->> -
->> -        /* Attempting to write the OSF flag to logic 1 leaves the
->> -           value unchanged. */
->> -        data =3D (data & ~CTRL_OSF) | (data & s->nvram[s->ptr] & CTRL=
-_OSF);
->> -
->> -        s->nvram[s->ptr] =3D data;
->> -    } else {
->> -        s->nvram[s->ptr] =3D data;
->> -    }
->> -    inc_regptr(s);
->> -    return 0;
->> -}
->> -
->> -static void ds1338_reset(DeviceState *dev)
->> -{
->> -    DS1338State *s =3D DS1338(dev);
->> -
->> -    /* The clock is running and synchronized with the host */
->> -    s->offset =3D 0;
->> -    s->wday_offset =3D 0;
->> -    memset(s->nvram, 0, NVRAM_SIZE);
->> -    s->ptr =3D 0;
->> -    s->addr_byte =3D false;
->> -}
->> -
->> -static void ds1338_class_init(ObjectClass *klass, void *data)
->> -{
->> -    DeviceClass *dc =3D DEVICE_CLASS(klass);
->> -    I2CSlaveClass *k =3D I2C_SLAVE_CLASS(klass);
->> -
->> -    k->event =3D ds1338_event;
->> -    k->recv =3D ds1338_recv;
->> -    k->send =3D ds1338_send;
->> -    dc->reset =3D ds1338_reset;
->> -    dc->vmsd =3D &vmstate_ds1338;
->> -}
->> -
->> -static const TypeInfo ds1338_info =3D {
->> -    .name          =3D TYPE_DS1338,
->> -    .parent        =3D TYPE_I2C_SLAVE,
->> -    .instance_size =3D sizeof(DS1338State),
->> -    .class_init    =3D ds1338_class_init,
->> -};
->> -
->> -static void ds1338_register_types(void)
->> -{
->> -    type_register_static(&ds1338_info);
->> -}
->> -
->> -type_init(ds1338_register_types)
->=20
+  Here is the command-line arguments:
 
+  qemu-system-ppc -boot c -g 1024x768x32 -M mac99 -m 256 -prom-env
+  'auto-boot?=3Dtrue' -prom-env 'boot-args=3D-v' -prom-env 'vga-ndrv?=3Dtru=
+e'
+  -drive file=3D../os9.img,format=3Draw,media=3Dcdrom -drive
+  file=3DMacOS9.qcow2,format=3Dqcow2,media=3Ddisk -spice
+  port=3D5901,password=3DXXX -net nic,model=3Drtl8139 -net user -monitor st=
+dio
 
+  And the GDB backtrace:
 
---qDlFAW7cOEabgRqPJjofV4081G8P36TQp
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
+  Program terminated with signal SIGSEGV, Segmentation fault.
+  #0  0x0000559065fe7d3a in timer_mod (ts=3D0x0, expire_time=3D888960717010=
+) at util/qemu-timer.c:462
+  462         timer_mod_ns(ts, expire_time * ts->scale);
+  [Current thread is 1 (Thread 0x7f60e43cb700 (LWP 9853))]
+  (gdb) bt
+  #0  0x0000559065fe7d3a in timer_mod (ts=3D0x0, expire_time=3D888960717010=
+) at util/qemu-timer.c:462
+  #1  0x0000559065d63769 in openpic_tmr_set_tmr (tmr=3D0x5590676fa7e0, val=
+=3D96, enabled=3Dtrue) at hw/intc/openpic.c:861
+  #2  0x0000559065d63995 in openpic_tmr_write (opaque=3D0x5590676f71f0, add=
+r=3D16, val=3D96, len=3D4) at hw/intc/openpic.c:912
+  #3  0x0000559065b02811 in memory_region_write_accessor (mr=3D0x5590676f77=
+10, addr=3D32, value=3D0x7f60e43c7da8, size=3D4, shift=3D0, mask=3D42949672=
+95, attrs=3D...) at /home/bp/qemu/memory.c:529
+  #4  0x0000559065b02a29 in access_with_adjusted_size (addr=3D32, value=3D0=
+x7f60e43c7da8, size=3D1, access_size_min=3D4, access_size_max=3D4, access=
+=3D0x559065b02727 <memory_region_write_accessor>, mr=3D0x5590676f7710, attr=
+s=3D...) at /home/bp/qemu/memory.c:595
+  #5  0x0000559065b051eb in memory_region_dispatch_write (mr=3D0x5590676f77=
+10, addr=3D32, data=3D96, size=3D1, attrs=3D...) at /home/bp/qemu/memory.c:=
+1337
+  #6  0x0000559065aa3a36 in address_space_write_continue (as=3D0x559067614d=
+90, addr=3D2147750160, attrs=3D..., buf=3D0x7f60e43c7ed0 "`_'\310`\177", le=
+n=3D1, addr1=3D32, l=3D1, mr=3D0x5590676f7710) at /home/bp/qemu/exec.c:2942
+  #7  0x0000559065aa3b84 in address_space_write (as=3D0x559067614d90, addr=
+=3D2147750160, attrs=3D..., buf=3D0x7f60e43c7ed0 "`_'\310`\177", len=3D1) a=
+t /home/bp/qemu/exec.c:2987
+  #8  0x0000559065aa2ec0 in subpage_write (opaque=3D0x7f60c8275fc0, addr=3D=
+272, value=3D96, len=3D1, attrs=3D...) at /home/bp/qemu/exec.c:2565
+  #9  0x0000559065b02906 in memory_region_write_with_attrs_accessor (mr=3D0=
+x7f60c8275fc0, addr=3D272, value=3D0x7f60e43c7fc8, size=3D1, shift=3D0, mas=
+k=3D255, attrs=3D...) at /home/bp/qemu/memory.c:555
+  #10 0x0000559065b029d3 in access_with_adjusted_size (addr=3D272, value=3D=
+0x7f60e43c7fc8, size=3D1, access_size_min=3D1, access_size_max=3D8, access=
+=3D0x559065b02818 <memory_region_write_with_attrs_accessor>, mr=3D0x7f60c82=
+75fc0, attrs=3D...) at /home/bp/qemu/memory.c:590
+  #11 0x0000559065b0523a in memory_region_dispatch_write (mr=3D0x7f60c8275f=
+c0, addr=3D272, data=3D96, size=3D1, attrs=3D...) at /home/bp/qemu/memory.c=
+:1344
+  #12 0x0000559065b175db in io_writex (env=3D0x7f60e43d42a0, iotlbentry=3D0=
+x7f60e43e8130, mmu_idx=3D3, val=3D96, addr=3D2147750160, retaddr=3D14005415=
+8295744, size=3D1) at /home/bp/qemu/accel/tcg/cputlb.c:807
+  #13 0x0000559065b18055 in io_writeb (env=3D0x7f60e43d42a0, mmu_idx=3D3, i=
+ndex=3D65, val=3D96 '`', addr=3D2147750160, retaddr=3D140054158295744) at /=
+home/bp/qemu/softmmu_template.h:265
+  #14 0x0000559065b181ea in helper_ret_stb_mmu (env=3D0x7f60e43d42a0, addr=
+=3D2147750160, val=3D96 '`', oi=3D3, retaddr=3D140054158295744) at /home/bp=
+/qemu/softmmu_template.h:300
+  #15 0x00007f60e65ac2c0 in code_gen_buffer ()
+  #16 0x0000559065b1ff26 in cpu_tb_exec (cpu=3D0x7f60e43cc010, itb=3D0x7f60=
+e65ac5c0 <code_gen_buffer+935318>) at /home/bp/qemu/accel/tcg/cpu-exec.c:166
+  #17 0x0000559065b20bfd in cpu_loop_exec_tb (cpu=3D0x7f60e43cc010, tb=3D0x=
+7f60e65ac5c0 <code_gen_buffer+935318>, last_tb=3D0x7f60e43c8678, tb_exit=3D=
+0x7f60e43c8674) at /home/bp/qemu/accel/tcg/cpu-exec.c:578
+  #18 0x0000559065b20eed in cpu_exec (cpu=3D0x7f60e43cc010) at /home/bp/qem=
+u/accel/tcg/cpu-exec.c:676
+  #19 0x0000559065aebc3d in tcg_cpu_exec (cpu=3D0x7f60e43cc010) at /home/bp=
+/qemu/cpus.c:1270
+  #20 0x0000559065aebe64 in qemu_tcg_rr_cpu_thread_fn (arg=3D0x7f60e43cc010=
+) at /home/bp/qemu/cpus.c:1365
+  #21 0x00007f60f56f06ba in start_thread (arg=3D0x7f60e43cb700) at pthread_=
+create.c:333
+  #22 0x00007f60f542682d in clone () at ../sysdeps/unix/sysv/linux/x86_64/c=
+lone.S:109
 
------BEGIN PGP SIGNATURE-----
+  Any idea what is going on?
 
-iQIzBAEBCAAdFiEEYyRdrpxuENu06SOrlAHmyz1/GOoFAlokaV8ACgkQlAHmyz1/
-GOpTFA/+J5iOsqRInARap5MLsdoGksGe6pP374hsSBJGXLHkwh6HjBohCYyd3ltY
-KToSde74ySK/QmdWTiqOjYEJFdm+6iNUofhkZTthvexHAWoCtO9M5X/tfEL1ooOl
-x1yoW4/jpdUutrThVSsDP2a34ni+3Pqpo9z/yG0Y0gYQ1iyQhb1d/ThZccMCNxKe
-Loe0nAGuGzPsciCPX+Y+2ucVjsl0hKbTAanqFHlXZLXOIMN+rGK/hb59vOKztg6p
-Gx+zJpKIt9XEq+2xJI0nppKDJFoAH9EUxqGvGW1YIAs3GXKyL/oMORxI4xMz0WZE
-VeOD84Y+FbI1b3vF2FseKYpa5yt74gP4ijEMjOoc58FVO2RFHz3krHB6xzXwIJTK
-mTzvEGFTnN4Z6FeYgfYWA3jBbDj61rHGsBRtHbWpDOvB4UuT/p3GqdGI9NJQWycH
-mkR1vp5/lEl1ZFM/Yx5yUAZ+MUlbYLZ0woLV1B/ZQVfRKN9og+NgW5vn2xDqhbdS
-PI1iK90aPX/dpsgj71VgRTVQ3uBTrX2bZhblUq+rthMGfhok2GCDi6vCnaHUVJIv
-fYCzW6QiI3kjY91JgTzAUhIPee/zdZbojJHjhPy7yuJPa3hDjS182pJ7aENCLuhe
-+5glqzkxjU9Skr9Ad6fSZPO4rd7ShC5YoqGKugeowhc3woe18dQ=
-=5fp3
------END PGP SIGNATURE-----
-
---qDlFAW7cOEabgRqPJjofV4081G8P36TQp--
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1715715/+subscriptions
