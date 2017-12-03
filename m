@@ -1,28 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34729)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42937)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1eLWl5-0006bN-Tg
-	for qemu-devel@nongnu.org; Sun, 03 Dec 2017 11:04:48 -0500
+	(envelope-from <rjones@redhat.com>) id 1eLZVp-0008HD-CB
+	for qemu-devel@nongnu.org; Sun, 03 Dec 2017 14:01:14 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1eLWl1-0002WT-06
-	for qemu-devel@nongnu.org; Sun, 03 Dec 2017 11:04:47 -0500
-Received: from mail-pg0-x232.google.com ([2607:f8b0:400e:c05::232]:40780)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1eLWl0-0002WL-P9
-	for qemu-devel@nongnu.org; Sun, 03 Dec 2017 11:04:42 -0500
-Received: by mail-pg0-x232.google.com with SMTP id k15so6529067pgr.7
-	for <qemu-devel@nongnu.org>; Sun, 03 Dec 2017 08:04:42 -0800 (PST)
-References: <1512153879-5291-1-git-send-email-peter.maydell@linaro.org>
-	<1512153879-5291-8-git-send-email-peter.maydell@linaro.org>
-From: Richard Henderson <richard.henderson@linaro.org>
-Message-ID: <b647f571-fffb-1f40-9bf4-74d1f97fc8f8@linaro.org>
-Date: Sun, 3 Dec 2017 08:04:38 -0800
+	(envelope-from <rjones@redhat.com>) id 1eLZVo-0004SQ-G6
+	for qemu-devel@nongnu.org; Sun, 03 Dec 2017 14:01:13 -0500
+Date: Sun, 3 Dec 2017 19:01:03 +0000
+From: "Richard W.M. Jones" <rjones@redhat.com>
+Message-ID: <20171203190103.GG2450@redhat.com>
+References: <20171109165939.23154-1-eblake@redhat.com>
+	<20171109165939.23154-4-eblake@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <1512153879-5291-8-git-send-email-peter.maydell@linaro.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 7/7] target/arm: Implement TT instruction
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20171109165939.23154-4-eblake@redhat.com>
+Subject: Re: [Qemu-devel] [PULL 3/8] nbd-client: Refuse read-only client
+ with BDRV_O_RDWR
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,22 +24,39 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>, qemu-arm@nongnu.org, qemu-devel@nongnu.org
-Cc: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>
+To: Eric Blake <eblake@redhat.com>
+Cc: qemu-devel@nongnu.org, Kevin Wolf <kwolf@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, qemu-stable@nongnu.org, "open list:Network Block Dev..." <qemu-block@nongnu.org>, Max Reitz <mreitz@redhat.com>
 
-On 12/01/2017 10:44 AM, Peter Maydell wrote:
-> Implement the TT instruction which queries the security
-> state and access permissions of a memory location.
+On Thu, Nov 09, 2017 at 10:59:34AM -0600, Eric Blake wrote:
+> The NBD spec says that clients should not try to write/trim to
+> an export advertised as read-only by the server.  But we failed
+> to check that, and would allow the block layer to use NBD with
+> BDRV_O_RDWR even when the server is read-only, which meant we
+> were depending on the server sending a proper EPERM failure for
+> various commands, and also exposes a leaky abstraction: using
+> qemu-io in read-write mode would succeed on 'w -z 0 0' because
+> of local short-circuiting logic, but 'w 0 0' would send a
+> request over the wire (where it then depends on the server, and
+> fails at least for qemu-nbd but might pass for other NBD
+> implementations).
 > 
-> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
-> ---
->  target/arm/helper.h    |   2 +
->  target/arm/helper.c    | 108 +++++++++++++++++++++++++++++++++++++++++++++++++
->  target/arm/translate.c |  29 ++++++++++++-
->  3 files changed, 138 insertions(+), 1 deletion(-)
+> With this patch, a client MUST request read-only mode to access
+> a server that is doing a read-only export, or else it will get
+> a message like:
+> 
+> can't open device nbd://localhost:10809/foo: request for write access conflicts with read-only export
 
+Nice one!
 
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+This caught 3 bugs in the nbdkit test suite where we were opening the
+connection for write to a read-only server instance, and it happened
+to work because the test did not write anything.
 
+Rich.
 
-r~
+-- 
+Richard Jones, Virtualization Group, Red Hat http://people.redhat.com/~rjones
+Read my programming and virtualization blog: http://rwmj.wordpress.com
+Fedora Windows cross-compiler. Compile Windows programs, test, and
+build Windows installers. Over 100 libraries supported.
+http://fedoraproject.org/wiki/MinGW
