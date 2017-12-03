@@ -1,41 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59638)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37661)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <danielhb@linux.vnet.ibm.com>) id 1eLadh-0001nb-DH
-	for qemu-devel@nongnu.org; Sun, 03 Dec 2017 15:13:27 -0500
+	(envelope-from <pbonzini@redhat.com>) id 1eLb5z-0003oJ-Px
+	for qemu-devel@nongnu.org; Sun, 03 Dec 2017 15:42:41 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <danielhb@linux.vnet.ibm.com>) id 1eLade-0000Hd-3x
-	for qemu-devel@nongnu.org; Sun, 03 Dec 2017 15:13:25 -0500
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:57586)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <danielhb@linux.vnet.ibm.com>)
-	id 1eLadd-0000H7-Qw
-	for qemu-devel@nongnu.org; Sun, 03 Dec 2017 15:13:22 -0500
-Received: from pps.filterd (m0098399.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
-	vB3KBg18094998
-	for <qemu-devel@nongnu.org>; Sun, 3 Dec 2017 15:13:18 -0500
-Received: from e33.co.us.ibm.com (e33.co.us.ibm.com [32.97.110.151])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2emgjqddwq-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Sun, 03 Dec 2017 15:13:17 -0500
-Received: from localhost
-	by e33.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
-	Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <danielhb@linux.vnet.ibm.com>;
-	Sun, 3 Dec 2017 13:13:16 -0700
-References: <20171116223527.4499-1-danielhb@linux.vnet.ibm.com>
-	<20171116223527.4499-3-danielhb@linux.vnet.ibm.com>
-	<6892975f-87d7-a348-ce21-739fdff4b25e@redhat.com>
-From: Daniel Henrique Barboza <danielhb@linux.vnet.ibm.com>
-Date: Sun, 3 Dec 2017 18:13:10 -0200
+	(envelope-from <pbonzini@redhat.com>) id 1eLb5u-0005dy-Pi
+	for qemu-devel@nongnu.org; Sun, 03 Dec 2017 15:42:39 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:50028)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1eLb5u-0005bf-FG
+	for qemu-devel@nongnu.org; Sun, 03 Dec 2017 15:42:34 -0500
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+	[10.5.11.15])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id EF268883A2
+	for <qemu-devel@nongnu.org>; Sun,  3 Dec 2017 20:42:32 +0000 (UTC)
+Received: from colo-mx.corp.redhat.com
+	(colo-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.20])
+	by smtp.corp.redhat.com (Postfix) with ESMTPS id E3D095D6A6
+	for <qemu-devel@nongnu.org>; Sun,  3 Dec 2017 20:42:32 +0000 (UTC)
+Date: Sun, 3 Dec 2017 15:42:32 -0500 (EST)
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <1094325642.24124012.1512333752059.JavaMail.zimbra@redhat.com>
+In-Reply-To: <20171201200044.GF3101@work-vm>
+References: <20171201174018.6517-1-pbonzini@redhat.com>
+	<20171201200044.GF3101@work-vm>
 MIME-Version: 1.0
-In-Reply-To: <6892975f-87d7-a348-ce21-739fdff4b25e@redhat.com>
-Content-Language: en-US
-Message-Id: <86ab3a7c-bb8c-5dc6-8f26-995bcf07ef0a@linux.vnet.ibm.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v3 2/2] tests/qemu-iotests: adding
- savevm/loadvm with postcopy flag test
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
+Subject: [Qemu-devel] R: Re: [PATCH] qemu-pr-helper: miscellaneous fixes
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -44,239 +37,138 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Max Reitz <mreitz@redhat.com>, qemu-devel@nongnu.org
-Cc: Kevin Wolf <kwolf@redhat.com>, Cleber Rosa <crosa@redhat.com>
-
-Hi Max,
-
-On 12/01/2017 06:13 PM, Max Reitz wrote:
-> On 2017-11-16 23:35, Daniel Henrique Barboza wrote:
->> This patch implements a test case for the scenario that was failing
->> prior to the patch "migration/ram.c: do not set 'postcopy_running' in
->> POSTCOPY_INCOMING_END".
->>
->> This new test file 198 was derived from the test file 181 authored
->> by Kevin Wolf.
->>
->> CC: Kevin Wolf <kwolf@redhat.com>
->> CC: Max Reitz <mreitz@redhat.com>
->> CC: Cleber Rosa <crosa@redhat.com>
->> Signed-off-by: Daniel Henrique Barboza <danielhb@linux.vnet.ibm.com>
->>
->> ---
->> I CCed Cleber Rosa because this patch was developed at the same
->> time his patch series "[PATCH 00/10] I/O tests cleanups" hit the
->> mailing list. Most of the cleanups/fixes he made in the series was
->> done in this new test as well.
->>
->>   tests/qemu-iotests/198     | 110 +++++++++++++++++++++++++++++++++++=
-++++++++++
->>   tests/qemu-iotests/198.out |  20 +++++++++
->>   tests/qemu-iotests/group   |   1 +
->>   3 files changed, 131 insertions(+)
->>   create mode 100755 tests/qemu-iotests/198
->>   create mode 100644 tests/qemu-iotests/198.out
-> Looks good overall, just two nitpicks below.
->
->> diff --git a/tests/qemu-iotests/198 b/tests/qemu-iotests/198
->> new file mode 100755
->> index 0000000000..786e37fc95
->> --- /dev/null
->> +++ b/tests/qemu-iotests/198
->> @@ -0,0 +1,110 @@
->> +#!/bin/bash
->> +#
->> +# Test savevm and loadvm after live migration with postcopy flag
->> +#
->> +# Copyright (C) 2017, IBM Corporation.
->> +#
->> +# This file is derived from tests/qemu-iotests/181 by Kevin Wolf
->> +#
->> +# This program is free software; you can redistribute it and/or modif=
-y
->> +# it under the terms of the GNU General Public License as published b=
-y
->> +# the Free Software Foundation; either version 2 of the License, or
->> +# (at your option) any later version.
->> +#
->> +# This program is distributed in the hope that it will be useful,
->> +# but WITHOUT ANY WARRANTY; without even the implied warranty of
->> +# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
->> +# GNU General Public License for more details.
->> +#
->> +# You should have received a copy of the GNU General Public License
->> +# along with this program.  If not, see <http://www.gnu.org/licenses/=
->.
->> +#
->> +# Creator/Owner : danielhb@linux.vnet.ibm.com
->> +
->> +seq=3D`basename $0`
->> +echo "QA output created by $seq"
->> +
->> +status=3D1	# failure is the default!
->> +
->> +MIG_SOCKET=3D"${TEST_DIR}/migrate"
->> +
->> +# get standard environment, filters and checks
->> +. ./common.rc
->> +. ./common.filter
->> +. ./common.qemu
->> +
->> +_cleanup()
->> +{
->> +    rm -f "${MIG_SOCKET}"
->> +    _cleanup_test_img
->> +    _cleanup_qemu
->> +}
->> +trap "_cleanup; exit \$status" 0 1 2 3 15
->> +
->> +_supported_fmt qcow2
->> +_supported_proto generic
->> +_supported_os Linux
->> +
->> +size=3D64M
->> +_make_test_img $size
->> +
->> +echo
->> +echo =3D=3D=3D Starting VMs =3D=3D=3D
->> +echo
->> +
->> +qemu_comm_method=3D"monitor"
->> +
->> +if [ "$IMGOPTSSYNTAX" =3D "true" ]; then
->> +    _launch_qemu \
->> +        -drive "${TEST_IMG}",cache=3D${CACHEMODE},id=3Ddisk
->> +else
->> +    _launch_qemu \
->> +        -drive file=3D"${TEST_IMG}",cache=3D${CACHEMODE},driver=3D$IM=
-GFMT,id=3Ddisk
->> +fi
->> +src=3D$QEMU_HANDLE
->> +
->> +if [ "$IMGOPTSSYNTAX" =3D "true" ]; then
->> +    _launch_qemu \
->> +        -drive "${TEST_IMG}",cache=3D${CACHEMODE},id=3Ddisk \
->> +        -incoming "unix:${MIG_SOCKET}"
->> +else
->> +    _launch_qemu \
->> +        -drive file=3D"${TEST_IMG}",cache=3D${CACHEMODE},driver=3D$IM=
-GFMT,id=3Ddisk \
->> +        -incoming "unix:${MIG_SOCKET}"
->> +fi
->> +dest=3D$QEMU_HANDLE
->> +
->> +echo
->> +echo =3D=3D=3D Set \'migrate_set_capability postcopy-ram on\' and mig=
-rate =3D=3D=3D
->> +echo
->> +
->> +silent=3Dyes
->> +_send_qemu_cmd $dest 'migrate_set_capability postcopy-ram on' "(qemu)=
-"
->> +_send_qemu_cmd $src 'migrate_set_capability postcopy-ram on' "(qemu)"
->> +_send_qemu_cmd $src "migrate -d unix:${MIG_SOCKET}" "(qemu)"
->> +
->> +QEMU_COMM_TIMEOUT=3D1 qemu_cmd_repeat=3D10 silent=3Dyes \
->> +    _send_qemu_cmd $src "info migrate" "completed\|failed"
->> +silent=3Dyes _send_qemu_cmd $src "" "(qemu)"
-> Would it make sense to query the migration status non-silently here,
-> too, so that the test output would verify that it has actually succeede=
-d?
->
-> (I suppose the savevm/loadvm coming up next would fail if the migration
-> failed, but maybe if it's easy enough...)
-
-Not exactly non-silently, but we can do something like this:
+To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Cc: qemu-devel@nongnu.org
 
 
-echo
-echo =3D=3D=3D Check if migration was successful =3D=3D=3D
-echo
+----- Dr. David Alan Gilbert <dgilbert@redhat.com> ha scritto:
+> * Paolo Bonzini (pbonzini@redhat.com) wrote:
+> > 1) Return a generic sense if TEST UNIT READY does not provide one;
+> > 
+> > 2) Fix two mistakes in copying from the spec.
+> > 
+> > Reported-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+> > Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+> 
+> Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+> 
+> (Is there a separate fix to the scsi_target_send_command sense
+> comment?)
 
-QEMU_COMM_TIMEOUT=3D1 silent=3Dyes \
- =C2=A0=C2=A0=C2=A0 _send_qemu_cmd $src "info migrate" "completed"
-silent=3Dyes _send_qemu_cmd $src "" "(qemu)"
+That will be in 2.12 only.
 
+Paolo
 
-If migration failed, the test will fail with timeout error waiting for=20
-"completed"
-prior to savevm. What do you think?
-
-
->
->> +
->> +echo
->> +echo =3D=3D=3D On destination, execute savevm and loadvm =3D=3D=3D
->> +echo
->> +
->> +silent=3D
->> +_send_qemu_cmd $dest 'savevm state1"' "(qemu)"
->> +_send_qemu_cmd $dest 'loadvm state1"' "(qemu)"
-> Any specific reason why the snapshot name has a trailing double quote?
-
-No reason, just an ugly that slipped by. I'll remove it in the next versi=
-on.
-
-
-
-Thanks,
-
-
-Daniel
-
-
->
-> Max
->
->> +
->> +echo
->> +echo =3D=3D=3D Shut down and check image =3D=3D=3D
->> +echo
->> +
->> +_send_qemu_cmd $src 'quit' ""
->> +_send_qemu_cmd $dest 'quit' ""
->> +wait=3D1 _cleanup_qemu
->> +
->> +_check_test_img
->> +
->> +# success, all done
->> +echo "*** done"
->> +status=3D0
->> diff --git a/tests/qemu-iotests/198.out b/tests/qemu-iotests/198.out
->> new file mode 100644
->> index 0000000000..6c27303857
->> --- /dev/null
->> +++ b/tests/qemu-iotests/198.out
->> @@ -0,0 +1,20 @@
->> +QA output created by 198
->> +Formatting 'TEST_DIR/t.IMGFMT', fmt=3DIMGFMT size=3D67108864
->> +
->> +=3D=3D=3D Starting VMs =3D=3D=3D
->> +
->> +
->> +=3D=3D=3D Set 'migrate_set_capability postcopy-ram on' and migrate =3D=
-=3D=3D
->> +
->> +
->> +=3D=3D=3D On destination, execute savevm and loadvm =3D=3D=3D
->> +
->> +(qemu) savevm state1"
->> +(qemu) loadvm state1"
->> +
->> +=3D=3D=3D Shut down and check image =3D=3D=3D
->> +
->> +(qemu) quit
->> +(qemu) quit
->> +No errors were found on the image.
->> +*** done
->> diff --git a/tests/qemu-iotests/group b/tests/qemu-iotests/group
->> index 24e5ad1b79..84d082bc38 100644
->> --- a/tests/qemu-iotests/group
->> +++ b/tests/qemu-iotests/group
->> @@ -194,3 +194,4 @@
->>   194 rw auto migration quick
->>   195 rw auto quick
->>   197 rw auto quick
->> +198 rw auto migration
->>
->
+> Dave
+> 
+> > ---
+> >  include/scsi/utils.h  |  6 +++++-
+> >  scsi/qemu-pr-helper.c | 30 ++++++++++++++++++++++++++----
+> >  scsi/utils.c          | 10 ++++++++++
+> >  3 files changed, 41 insertions(+), 5 deletions(-)
+> > 
+> > diff --git a/include/scsi/utils.h b/include/scsi/utils.h
+> > index 00a4bdb080..eb07e474ee 100644
+> > --- a/include/scsi/utils.h
+> > +++ b/include/scsi/utils.h
+> > @@ -76,7 +76,11 @@ extern const struct SCSISense sense_code_LUN_FAILURE;
+> >  extern const struct SCSISense sense_code_LUN_COMM_FAILURE;
+> >  /* Command aborted, Overlapped Commands Attempted */
+> >  extern const struct SCSISense sense_code_OVERLAPPED_COMMANDS;
+> > -/* LUN not ready, Capacity data has changed */
+> > +/* Medium error, Unrecovered read error */
+> > +extern const struct SCSISense sense_code_READ_ERROR;
+> > +/* LUN not ready, Cause not reportable */
+> > +extern const struct SCSISense sense_code_NOT_READY;
+> > +/* Unit attention, Capacity data has changed */
+> >  extern const struct SCSISense sense_code_CAPACITY_CHANGED;
+> >  /* Unit attention, SCSI bus reset */
+> >  extern const struct SCSISense sense_code_SCSI_BUS_RESET;
+> > diff --git a/scsi/qemu-pr-helper.c b/scsi/qemu-pr-helper.c
+> > index dd9785143b..9fe615c73c 100644
+> > --- a/scsi/qemu-pr-helper.c
+> > +++ b/scsi/qemu-pr-helper.c
+> > @@ -314,6 +314,22 @@ static int is_mpath(int fd)
+> >      return !strncmp(tgt->target_type, "multipath", DM_MAX_TYPE_NAME);
+> >  }
+> >  
+> > +static SCSISense mpath_generic_sense(int r)
+> > +{
+> > +    switch (r) {
+> > +    case MPATH_PR_SENSE_NOT_READY:
+> > +         return SENSE_CODE(NOT_READY);
+> > +    case MPATH_PR_SENSE_MEDIUM_ERROR:
+> > +         return SENSE_CODE(READ_ERROR);
+> > +    case MPATH_PR_SENSE_HARDWARE_ERROR:
+> > +         return SENSE_CODE(TARGET_FAILURE);
+> > +    case MPATH_PR_SENSE_ABORTED_COMMAND:
+> > +         return SENSE_CODE(IO_ERROR);
+> > +    default:
+> > +         abort();
+> > +    }
+> > +}
+> > +
+> >  static int mpath_reconstruct_sense(int fd, int r, uint8_t *sense)
+> >  {
+> >      switch (r) {
+> > @@ -329,7 +345,13 @@ static int mpath_reconstruct_sense(int fd, int r, uint8_t *sense)
+> >               */
+> >              uint8_t cdb[6] = { TEST_UNIT_READY };
+> >              int sz = 0;
+> > -            return do_sgio(fd, cdb, sense, NULL, &sz, SG_DXFER_NONE);
+> > +            int r = do_sgio(fd, cdb, sense, NULL, &sz, SG_DXFER_NONE);
+> > +
+> > +            if (r != GOOD) {
+> > +                return r;
+> > +            }
+> > +            scsi_build_sense(sense, mpath_generic_sense(r));
+> > +            return CHECK_CONDITION;
+> >          }
+> >  
+> >      case MPATH_PR_SENSE_UNIT_ATTENTION:
+> > @@ -449,7 +471,7 @@ static int multipath_pr_out(int fd, const uint8_t *cdb, uint8_t *sense,
+> >      memset(&paramp, 0, sizeof(paramp));
+> >      memcpy(&paramp.key, &param[0], 8);
+> >      memcpy(&paramp.sa_key, &param[8], 8);
+> > -    paramp.sa_flags = param[10];
+> > +    paramp.sa_flags = param[20];
+> >      if (sz > PR_OUT_FIXED_PARAM_SIZE) {
+> >          size_t transportid_len;
+> >          int i, j;
+> > @@ -478,8 +500,8 @@ static int multipath_pr_out(int fd, const uint8_t *cdb, uint8_t *sense,
+> >                  j += offsetof(struct transportid, n_port_name[8]);
+> >                  i += 24;
+> >                  break;
+> > -            case 3:
+> > -            case 0x43:
+> > +            case 5:
+> > +            case 0x45:
+> >                  /* iSCSI transport.  */
+> >                  len = lduw_be_p(&param[i + 2]);
+> >                  if (len > 252 || (len & 3) || i + len + 4 > transportid_len) {
+> > diff --git a/scsi/utils.c b/scsi/utils.c
+> > index 5684951b12..e4182a9b09 100644
+> > --- a/scsi/utils.c
+> > +++ b/scsi/utils.c
+> > @@ -211,6 +211,16 @@ const struct SCSISense sense_code_LUN_COMM_FAILURE = {
+> >      .key = ABORTED_COMMAND, .asc = 0x08, .ascq = 0x00
+> >  };
+> >  
+> > +/* Medium Error, Unrecovered read error */
+> > +const struct SCSISense sense_code_READ_ERROR = {
+> > +    .key = MEDIUM_ERROR, .asc = 0x11, .ascq = 0x00
+> > +};
+> > +
+> > +/* Not ready, Cause not reportable */
+> > +const struct SCSISense sense_code_NOT_READY = {
+> > +    .key = NOT_READY, .asc = 0x04, .ascq = 0x00
+> > +};
+> > +
+> >  /* Unit attention, Capacity data has changed */
+> >  const struct SCSISense sense_code_CAPACITY_CHANGED = {
+> >      .key = UNIT_ATTENTION, .asc = 0x2a, .ascq = 0x09
+> > -- 
+> > 2.14.3
+> > 
+> --
+> Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
