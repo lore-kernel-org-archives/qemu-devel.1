@@ -1,33 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56631)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56633)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1eLLut-0005ds-OY
+	(envelope-from <bounces@canonical.com>) id 1eLLut-0005dt-VW
 	for qemu-devel@nongnu.org; Sat, 02 Dec 2017 23:30:12 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1eLLup-0007PA-Q3
-	for qemu-devel@nongnu.org; Sat, 02 Dec 2017 23:30:11 -0500
-Received: from indium.canonical.com ([91.189.90.7]:45124)
+	(envelope-from <bounces@canonical.com>) id 1eLLus-0007Po-My
+	for qemu-devel@nongnu.org; Sat, 02 Dec 2017 23:30:12 -0500
+Received: from indium.canonical.com ([91.189.90.7]:45402)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1eLLup-0007Oi-JD
-	for qemu-devel@nongnu.org; Sat, 02 Dec 2017 23:30:07 -0500
+	id 1eLLus-0007PU-H3
+	for qemu-devel@nongnu.org; Sat, 02 Dec 2017 23:30:10 -0500
 Received: from loganberry.canonical.com ([91.189.90.37])
 	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1eLLuk-0002nO-Hh
-	for <qemu-devel@nongnu.org>; Sun, 03 Dec 2017 04:30:02 +0000
+	id 1eLLuq-0002n5-6K
+	for <qemu-devel@nongnu.org>; Sun, 03 Dec 2017 04:30:08 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 1488A2E818D
-	for <qemu-devel@nongnu.org>; Sun,  3 Dec 2017 04:29:53 +0000 (UTC)
+	by loganberry.canonical.com (Postfix) with ESMTP id F3CD22E8224
+	for <qemu-devel@nongnu.org>; Sun,  3 Dec 2017 04:29:55 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Sun, 03 Dec 2017 04:17:21 -0000
-From: Launchpad Bug Tracker <1321684@bugs.launchpad.net>
-Reply-To: Bug 1321684 <1321684@bugs.launchpad.net>
+Date: Sun, 03 Dec 2017 04:17:20 -0000
+From: Launchpad Bug Tracker <700276@bugs.launchpad.net>
+Reply-To: Bug 700276 <700276@bugs.launchpad.net>
 Sender: bounces@canonical.com
-References: <20140521095526.18906.33297.malonedeb@wampee.canonical.com>
-Message-Id: <151227464173.17805.10803693513478356807.malone@loganberry.canonical.com>
+References: <20110108115227.15680.52990.malonedeb@soybean.canonical.com>
+Message-Id: <151227464022.17805.16937348162228205220.malone@loganberry.canonical.com>
 Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1321684] Re: block_stream command stalls
+Subject: [Qemu-devel] [Bug 700276] Re: QEMU crashed when GDB request a big
+ size variable information
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -47,80 +48,59 @@ To: qemu-devel@nongnu.org
 
 You received this bug notification because you are a member of qemu-
 devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1321684
+https://bugs.launchpad.net/bugs/700276
 
 Title:
-  block_stream command stalls
+  QEMU crashed when GDB request a big size variable information
 
 Status in QEMU:
   Expired
 
 Bug description:
-  block_stream command stalls near finishing.
-  I tried 1.7.1, 2.0.0 and the master versions. All of them stalled.
-  But the 1.1.2 could finish the job.
+  Hello,
+  My host is Fedora 13. My QEMU version is 0.13.0, I use QEMU with GDB to d=
+ebug Linux kernel(Version 2.6.36.2).
 
-  Here is how to reproduce it:
+  I use QEMU like this:"qemu -s -S -kernel build/arch/i386/boot/bzImage -hd=
+a /dev/zero"
+  When GDB connected with QEMU, and use gdb command print to look big size =
+variable, the qemu is crash down. for example, when I look a task_struct va=
+riable 'init_task'(print init_task ), the qemu produce the below message an=
+d exit.
 
-  $ sudo $QEMU \
-  -enable-kvm  -cpu qemu64  -m 1024  \
-  -monitor stdio \
-  -drive file=3D./i1,if=3Dnone,id=3Ddrive_0,cache=3Dnone,aio=3Dnative -devi=
-ce virtio-blk-pci,drive=3Ddrive_0,bus=3Dpci.0,addr=3D0x5 \
+  *** stack smashing detected ***: qemu terminated
+  =3D=3D=3D=3D=3D=3D=3D Backtrace: =3D=3D=3D=3D=3D=3D=3D=3D=3D
+  /lib/libc.so.6(__fortify_fail+0x4d)[0x78a31d]
+  /lib/libc.so.6[0x78a2ca]
+  qemu[0x8059e21]
+  qemu[0x805a0cf]
+  qemu[0x80d12a1]
+  qemu[0x8189cb8]
+  qemu[0x818c3b0]
+  /lib/libc.so.6(__libc_start_main+0xe6)[0x6a8cc6]
+  ...............
+  adbf7000-adbf8000 rw-p 00000000 00:00 0 =
 
-  QEMU 2.0.50 monitor - type 'help' for more information
-  (qemu) VNC server running on `127.0.0.1:5900'
-  (qemu) snapshot_blkdev drive_0 s1
-  Formatting 's1', fmt=3Dqcow2 size=3D26843545600 backing_file=3D'./i1' bac=
-king_fmt=3D'qcow2' encryption=3Doff cluster_size=3D65536 lazy_refcounts=3Do=
-ff =
+  adbf8000-ae3f8000 rw-p 00000000 00:00 0 =
 
-  (qemu) block_stream drive_0 =
+  ae3f8000-ae742000 rw-p 00000000 00:00 0 =
 
-  (qemu) info block-jobs =
+  ae742000-ae762000 rw-p 00000000 00:00 0 =
 
-  Streaming device drive_0: Completed 400818176 of 26843545600 bytes, speed=
- limit 0 bytes/s
-  (qemu) info block-jobs =
+  ae762000-ae764000 rw-p 00000000 00:00 0 =
 
-  Streaming device drive_0: Completed 904396800 of 26843545600 bytes, speed=
- limit 0 bytes/s
-  (qemu) info block-jobs =
+  ae764000-ae784000 rw-p 00000000 00:00 0 =
 
-  Streaming device drive_0: Completed 23401070592 of 26843545600 bytes, spe=
-ed limit 0 bytes/s
-  (qemu) info block-jobs =
+  ae784000-ae786000 rw-p 00000000 00:00 0 =
 
-  Streaming device drive_0: Completed 26513768448 of 26843545600 bytes, spe=
-ed limit 0 bytes/s
-  (qemu) main-loop: WARNING: I/O thread spun for 1000 iterations
-  info block-jobs =
+  ae786000-b6786000 rw-p 00000000 00:00 0 =
 
-  Streaming device drive_0: Completed 26841513984 of 26843545600 bytes, spe=
-ed limit 0 bytes/s
-  (qemu) info block-jobs =
+  b6786000-b7894000 rw-p 00000000 00:00 0 =
 
-  Streaming device drive_0: Completed 26841513984 of 26843545600 bytes, spe=
-ed limit 0 bytes/s
-  (qemu) info block-jobs =
+  b78aa000-b78ab000 rw-p 00000000 00:00 0 =
 
-  Streaming device drive_0: Completed 26841513984 of 26843545600 bytes, spe=
-ed limit 0 bytes/s
-
-  #### here, the progress stopped at 26841513984 ####
-
-  =
-
-  $ qemu-img info i1 =
-
-  image: i1
-  file format: qcow2
-  virtual size: 25G (26843545600 bytes)
-  disk size: 1.0G
-  cluster_size: 2097152
-  Format specific information:
-      compat: 1.1
-      lazy refcounts: false
+  bfe95000-bfeaa000 rw-p 00000000 00:00 0          [stack]
+  =E5=B7=B2=E6=94=BE=E5=BC=83 (core dumped)
 
 To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1321684/+subscriptions
+https://bugs.launchpad.net/qemu/+bug/700276/+subscriptions
