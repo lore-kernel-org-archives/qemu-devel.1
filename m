@@ -1,31 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47501)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49606)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1eLbqa-0004lg-8D
-	for qemu-devel@nongnu.org; Sun, 03 Dec 2017 16:30:49 -0500
+	(envelope-from <bounces@canonical.com>) id 1eLdx1-0006N4-2K
+	for qemu-devel@nongnu.org; Sun, 03 Dec 2017 18:45:36 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1eLbqX-0000pa-2e
-	for qemu-devel@nongnu.org; Sun, 03 Dec 2017 16:30:48 -0500
-Received: from indium.canonical.com ([91.189.90.7]:52092)
+	(envelope-from <bounces@canonical.com>) id 1eLdwy-0003aa-04
+	for qemu-devel@nongnu.org; Sun, 03 Dec 2017 18:45:35 -0500
+Received: from indium.canonical.com ([91.189.90.7]:36088)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1eLbqW-0000om-Pw
-	for qemu-devel@nongnu.org; Sun, 03 Dec 2017 16:30:45 -0500
+	id 1eLdwx-0003aD-JF
+	for qemu-devel@nongnu.org; Sun, 03 Dec 2017 18:45:31 -0500
 Received: from loganberry.canonical.com ([91.189.90.37])
 	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1eLbqR-0002nI-Kn
-	for <qemu-devel@nongnu.org>; Sun, 03 Dec 2017 21:30:39 +0000
+	id 1eLdww-0004rl-Jw
+	for <qemu-devel@nongnu.org>; Sun, 03 Dec 2017 23:45:30 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 59E3A2E80CC
-	for <qemu-devel@nongnu.org>; Sun,  3 Dec 2017 21:30:39 +0000 (UTC)
+	by loganberry.canonical.com (Postfix) with ESMTP id 8D4B42E804B
+	for <qemu-devel@nongnu.org>; Sun,  3 Dec 2017 23:45:30 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Sun, 03 Dec 2017 21:24:14 -0000
-From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+Date: Sun, 03 Dec 2017 23:37:10 -0000
+From: Brad Parker <1715715@bugs.launchpad.net>
 Reply-To: Bug 1715715 <1715715@bugs.launchpad.net>
 Sender: bounces@canonical.com
 References: <150480734842.32058.3488330551186130563.malonedeb@soybean.canonical.com>
-Message-Id: <151233625490.10571.16733267927991220851.malone@soybean.canonical.com>
+Message-Id: <151234423011.3145.16369734545335934571.malone@gac.canonical.com>
 Errors-To: bounces@canonical.com
 Subject: [Qemu-devel] [Bug 1715715] Re: [qemu-ppc] Segfault when booting
  from HD after MacOS9 install
@@ -39,25 +39,24 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-I've just tested MacOS 9.2.1 as part of my QEMU pre-release testing and
-it works fine for me with latest QEMU git and the following command
-line:
+I just tried the latest git and it actually boots fine with your
+command... so I guess whatever issue I was having (the null dereference
+in the timer code I pasted above) must have been fixed... however I've
+noticed another issue with a different command that causes the bootup to
+hang:
 
-qemu-system-ppc -M mac99 -m 256 -drive
-file=3Dos921.qcow2,format=3Dqcow2,media=3Ddisk -net nic,model=3Drtl8139 -net
-user
+qemu-system-ppc -boot c -g 1024x768x32 -M mac99 -m 256 -prom-env 'auto-
+boot?=3Dtrue' -prom-env 'boot-args=3D-v' -prom-env 'vga-ndrv?=3Dtrue' -drive
+file=3Dos9.2.1.iso,format=3Draw,media=3Dcdrom -drive
+file=3Dos921.qcow2,format=3Dqcow2,media=3Ddisk -spice port=3D5901,password=
+=3DXXX
+-net nic,model=3Dsungem -net user -monitor stdio
 
-Note that the QEMU mac99 machine now defaults to using the sungem device
-which should give out-of-the-box networking for supported OS 9 and OS X
-versions, including 9.2.1 as you mention, if you simply specify "-net
-nic,model=3Dsungem -net user" instead. Otherwise you will need to make
-sure that the rtl8139 MacOS 9 drivers have been installed inside the
-guest.
-
-If that doesn't help then does it work if you disable spice and/or
-reduce the size of the disk image? Many older OSs will struggle to read
-disks that are 128G in size so you may find that your image is corrupted
-- perhaps try using something around 4G instead?
+This hangs at bootup at "Trying hd:,\\:tbxi" and never progresses any
+further. If I remove the cdrom then it boots fine... however, simply
+adding the cdrom to your working command, it still works there... not
+sure what's going on, but thanks for the help. I have something that
+works now.
 
 -- =
 
