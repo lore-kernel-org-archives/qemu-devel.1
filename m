@@ -1,21 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40300)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47924)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcandre.lureau@gmail.com>) id 1eLV8D-0007WW-PG
-	for qemu-devel@nongnu.org; Sun, 03 Dec 2017 09:20:34 -0500
+	(envelope-from <richard.henderson@linaro.org>) id 1eLVjA-0004B9-9M
+	for qemu-devel@nongnu.org; Sun, 03 Dec 2017 09:58:45 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcandre.lureau@gmail.com>) id 1eLV8C-0003mp-PT
-	for qemu-devel@nongnu.org; Sun, 03 Dec 2017 09:20:33 -0500
+	(envelope-from <richard.henderson@linaro.org>) id 1eLVj7-0005lD-Bd
+	for qemu-devel@nongnu.org; Sun, 03 Dec 2017 09:58:44 -0500
+Received: from mail-pf0-x241.google.com ([2607:f8b0:400e:c00::241]:42329)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+	id 1eLVj7-0005kN-6D
+	for qemu-devel@nongnu.org; Sun, 03 Dec 2017 09:58:41 -0500
+Received: by mail-pf0-x241.google.com with SMTP id d23so6712160pfe.9
+	for <qemu-devel@nongnu.org>; Sun, 03 Dec 2017 06:58:40 -0800 (PST)
+References: <1512153879-5291-1-git-send-email-peter.maydell@linaro.org>
+	<1512153879-5291-2-git-send-email-peter.maydell@linaro.org>
+From: Richard Henderson <richard.henderson@linaro.org>
+Message-ID: <37cb7baa-223a-2fc1-7eca-16cac60ba390@linaro.org>
+Date: Sun, 3 Dec 2017 06:58:36 -0800
 MIME-Version: 1.0
-In-Reply-To: <20171201232433.25193-5-eblake@redhat.com>
-References: <20171201232433.25193-1-eblake@redhat.com>
-	<20171201232433.25193-5-eblake@redhat.com>
-From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
-Date: Sun, 3 Dec 2017 15:20:30 +0100
-Message-ID: <CAJ+F1C+F-pHW2RAMZHAEizSG6-E3mf+6sUe7r3GAoGsq5fUUMA@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v2 4/7] chardev: Clean up previous patch
- indentation
+In-Reply-To: <1512153879-5291-2-git-send-email-peter.maydell@linaro.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH 1/7] target/arm: Handle SPSEL and current
+ stack being out of sync in MSP/PSP reads
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,135 +32,22 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>
-Cc: QEMU <qemu-devel@nongnu.org>, qemu trival <qemu-trivial@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>, Markus Armbruster <armbru@redhat.com>
+To: Peter Maydell <peter.maydell@linaro.org>, qemu-arm@nongnu.org, qemu-devel@nongnu.org
+Cc: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>
 
-On Sat, Dec 2, 2017 at 12:24 AM, Eric Blake <eblake@redhat.com> wrote:
-> The previous patch left in an extra scope layer for ease of
-> review; time to remove it.  No semantic change.
->
-> Signed-off-by: Eric Blake <eblake@redhat.com>
->
+On 12/01/2017 10:44 AM, Peter Maydell wrote:
+> For v8M it is possible for the CONTROL.SPSEL bit value and the
+> current stack to be out of sync. This means we need to update
+> the checks used in reads and writes of the PSP and MSP special
+> registers to use v7m_using_psp() rather than directly checking
+> the SPSEL bit in the control register.
+> 
+> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+> ---
+>  target/arm/helper.c | 10 ++++------
+>  1 file changed, 4 insertions(+), 6 deletions(-)
 
-Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
-
-
- ---
->  chardev/char-serial.c | 66 +++++++++++++++++++++++++--------------------=
-------
->  1 file changed, 32 insertions(+), 34 deletions(-)
->
-> diff --git a/chardev/char-serial.c b/chardev/char-serial.c
-> index 10162f9fa3..93392c528c 100644
-> --- a/chardev/char-serial.c
-> +++ b/chardev/char-serial.c
-> @@ -71,66 +71,64 @@ static void tty_serial_init(int fd, int speed,
->      }
->
->      speed =3D speed * 10 / 11;
-> -    {
-> -        check_speed(50);
-> -        check_speed(75);
-> -        check_speed(110);
-> -        check_speed(134);
-> -        check_speed(150);
-> -        check_speed(200);
-> -        check_speed(300);
-> -        check_speed(600);
-> -        check_speed(1200);
-> -        check_speed(1800);
-> -        check_speed(2400);
-> -        check_speed(4800);
-> -        check_speed(9600);
-> -        check_speed(19200);
-> -        check_speed(38400);
-> -        /* Non-Posix values follow. They may be unsupported on some syst=
-ems. */
-> -        check_speed(57600);
-> -        check_speed(115200);
-> +    check_speed(50);
-> +    check_speed(75);
-> +    check_speed(110);
-> +    check_speed(134);
-> +    check_speed(150);
-> +    check_speed(200);
-> +    check_speed(300);
-> +    check_speed(600);
-> +    check_speed(1200);
-> +    check_speed(1800);
-> +    check_speed(2400);
-> +    check_speed(4800);
-> +    check_speed(9600);
-> +    check_speed(19200);
-> +    check_speed(38400);
-> +    /* Non-Posix values follow. They may be unsupported on some systems.=
- */
-> +    check_speed(57600);
-> +    check_speed(115200);
->  #ifdef B230400
-> -        check_speed(230400);
-> +    check_speed(230400);
->  #endif
->  #ifdef B460800
-> -        check_speed(460800);
-> +    check_speed(460800);
->  #endif
->  #ifdef B500000
-> -        check_speed(500000);
-> +    check_speed(500000);
->  #endif
->  #ifdef B576000
-> -        check_speed(576000);
-> +    check_speed(576000);
->  #endif
->  #ifdef B921600
-> -        check_speed(921600);
-> +    check_speed(921600);
->  #endif
->  #ifdef B1000000
-> -        check_speed(1000000);
-> +    check_speed(1000000);
->  #endif
->  #ifdef B1152000
-> -        check_speed(1152000);
-> +    check_speed(1152000);
->  #endif
->  #ifdef B1500000
-> -        check_speed(1500000);
-> +    check_speed(1500000);
->  #endif
->  #ifdef B2000000
-> -        check_speed(2000000);
-> +    check_speed(2000000);
->  #endif
->  #ifdef B2500000
-> -        check_speed(2500000);
-> +    check_speed(2500000);
->  #endif
->  #ifdef B3000000
-> -        check_speed(3000000);
-> +    check_speed(3000000);
->  #endif
->  #ifdef B3500000
-> -        check_speed(3500000);
-> +    check_speed(3500000);
->  #endif
->  #ifdef B4000000
-> -        check_speed(4000000);
-> +    check_speed(4000000);
->  #endif
-> -        spd =3D B115200;
-> -    }
-> +    spd =3D B115200;
->
->  #undef check_speed
->   done:
-> --
-> 2.14.3
->
->
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 
 
-
---=20
-Marc-Andr=C3=A9 Lureau
+r~
