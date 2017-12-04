@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60155)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60187)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1eLqHI-0006Bk-9F
-	for qemu-devel@nongnu.org; Mon, 04 Dec 2017 07:55:22 -0500
+	(envelope-from <david@redhat.com>) id 1eLqHL-0006Dq-25
+	for qemu-devel@nongnu.org; Mon, 04 Dec 2017 07:55:24 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1eLqHC-0000D3-IH
-	for qemu-devel@nongnu.org; Mon, 04 Dec 2017 07:55:20 -0500
+	(envelope-from <david@redhat.com>) id 1eLqHG-0000Hm-RO
+	for qemu-devel@nongnu.org; Mon, 04 Dec 2017 07:55:23 -0500
 From: David Hildenbrand <david@redhat.com>
-Date: Mon,  4 Dec 2017 13:55:01 +0100
-Message-Id: <20171204125505.29203-2-david@redhat.com>
+Date: Mon,  4 Dec 2017 13:55:03 +0100
+Message-Id: <20171204125505.29203-4-david@redhat.com>
 In-Reply-To: <20171204125505.29203-1-david@redhat.com>
 References: <20171204125505.29203-1-david@redhat.com>
-Subject: [Qemu-devel] [PATCH v1 for-2.12 1/5] s390x/kvm: factor out
- build_channel_report_mcic() into cpu.h
+Subject: [Qemu-devel] [PATCH v1 for-2.12 3/5] s390x/tcg: implement SET CLOCK
+ PROGRAMMABLE FIELD
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,93 +23,83 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-s390x@nongnu.org, qemu-devel@nongnu.org
 Cc: Christian Borntraeger <borntraeger@de.ibm.com>, Cornelia Huck <cohuck@redhat.com>, Richard Henderson <rth@twiddle.net>, Alexander Graf <agraf@suse.de>, Thomas Huth <thuth@redhat.com>, David Hildenbrand <david@redhat.com>
 
-We'll need it later on in two places. Refactor it to just indicate the
-valid bit. While at it, introduce a define for the used CR14 bit (we'll
-also need later on).
+Needed for machine check handling inside Linux (when restoring registers).
+
+Except for SIGP and machine checks, we don't make use of the register
+yet. Suficient for now.
 
 Signed-off-by: David Hildenbrand <david@redhat.com>
 ---
- target/s390x/cpu.h | 20 ++++++++++++++++++++
- target/s390x/kvm.c | 25 ++-----------------------
- 2 files changed, 22 insertions(+), 23 deletions(-)
+ target/s390x/helper.h      |  1 +
+ target/s390x/insn-data.def |  2 ++
+ target/s390x/misc_helper.c | 11 +++++++++++
+ target/s390x/translate.c   |  7 +++++++
+ 4 files changed, 21 insertions(+)
 
-diff --git a/target/s390x/cpu.h b/target/s390x/cpu.h
-index 9cfbbbac04..4d3e7920f5 100644
---- a/target/s390x/cpu.h
-+++ b/target/s390x/cpu.h
-@@ -351,6 +351,9 @@ extern const struct VMStateDescription vmstate_s390_cpu;
- #define CR0_CPU_TIMER_SC        0x0000000000000400ULL
- #define CR0_SERVICE_SC          0x0000000000000200ULL
+diff --git a/target/s390x/helper.h b/target/s390x/helper.h
+index 9459b73c73..0281c286b8 100644
+--- a/target/s390x/helper.h
++++ b/target/s390x/helper.h
+@@ -127,6 +127,7 @@ DEF_HELPER_3(load_psw, noreturn, env, i64, i64)
+ DEF_HELPER_FLAGS_2(spx, TCG_CALL_NO_RWG, void, env, i64)
+ DEF_HELPER_FLAGS_1(stck, TCG_CALL_NO_RWG_SE, i64, env)
+ DEF_HELPER_FLAGS_2(sckc, TCG_CALL_NO_RWG, void, env, i64)
++DEF_HELPER_FLAGS_1(sckpf, TCG_CALL_NO_RWG, void, env)
+ DEF_HELPER_FLAGS_1(stckc, TCG_CALL_NO_RWG, i64, env)
+ DEF_HELPER_FLAGS_2(spt, TCG_CALL_NO_RWG, void, env, i64)
+ DEF_HELPER_FLAGS_1(stpt, TCG_CALL_NO_RWG, i64, env)
+diff --git a/target/s390x/insn-data.def b/target/s390x/insn-data.def
+index 16e27c8a35..8c2541f545 100644
+--- a/target/s390x/insn-data.def
++++ b/target/s390x/insn-data.def
+@@ -999,6 +999,8 @@
+     C(0xb204, SCK,     S,     Z,   0, 0, 0, 0, 0, 0)
+ /* SET CLOCK COMPARATOR */
+     C(0xb206, SCKC,    S,     Z,   0, m2_64, 0, 0, sckc, 0)
++/* SET CLOCK PROGRAMMABLE FIELD */
++    C(0x0107, SCKPF,   E,     Z,   0, 0, 0, 0, sckpf, 0)
+ /* SET CPU TIMER */
+     C(0xb208, SPT,     S,     Z,   0, m2_64, 0, 0, spt, 0)
+ /* SET PREFIX */
+diff --git a/target/s390x/misc_helper.c b/target/s390x/misc_helper.c
+index 6d766ce1e7..2c6ab329fb 100644
+--- a/target/s390x/misc_helper.c
++++ b/target/s390x/misc_helper.c
+@@ -146,6 +146,17 @@ void HELPER(sckc)(CPUS390XState *env, uint64_t time)
+     timer_mod(env->tod_timer, env->tod_basetime + time);
+ }
  
-+/* Control register 14 bits */
-+#define CR14_CHANNEL_REPORT_SC  0x0000000010000000ULL
-+
- /* MMU */
- #define MMU_PRIMARY_IDX         0
- #define MMU_SECONDARY_IDX       1
-@@ -674,6 +677,23 @@ struct sysib_322 {
- #define MCIC_VB_CT 0x0000000000020000ULL
- #define MCIC_VB_CC 0x0000000000010000ULL
- 
-+static inline uint64_t s390_build_validity_mcic(void)
++/* Set Tod Programmable Field */
++void HELPER(sckpf)(CPUS390XState *env)
 +{
-+    uint64_t mcic;
++    uint32_t val = env->regs[0];
 +
-+    /* indicate all valid bits (no damage) */
-+    mcic = MCIC_VB_WP | MCIC_VB_MS | MCIC_VB_PM | MCIC_VB_IA | MCIC_VB_FP |
-+           MCIC_VB_GR | MCIC_VB_CR | MCIC_VB_ST | MCIC_VB_AR | MCIC_VB_PR |
-+           MCIC_VB_FC | MCIC_VB_CT | MCIC_VB_CC;
-+    if (s390_has_feat(S390_FEAT_VECTOR)) {
-+        mcic |= MCIC_VB_VR;
++    if (val & 0xffff0000UL) {
++        s390_program_interrupt(env, PGM_SPECIFICATION, 2, GETPC());
 +    }
-+    if (s390_has_feat(S390_FEAT_GUARDED_STORAGE)) {
-+        mcic |= MCIC_VB_GS;
-+    }
-+    return mcic;
++    env->todpr = val;
 +}
 +
- 
- /* cpu.c */
- int s390_get_clock(uint8_t *tod_high, uint64_t *tod_low);
-diff --git a/target/s390x/kvm.c b/target/s390x/kvm.c
-index 97c45d5537..9b8b59f2a2 100644
---- a/target/s390x/kvm.c
-+++ b/target/s390x/kvm.c
-@@ -1852,33 +1852,12 @@ void kvm_s390_io_interrupt(uint16_t subchannel_id,
-     kvm_s390_floating_interrupt(&irq);
- }
- 
--static uint64_t build_channel_report_mcic(void)
--{
--    uint64_t mcic;
--
--    /* subclass: indicate channel report pending */
--    mcic = MCIC_SC_CP |
--    /* subclass modifiers: none */
--    /* storage errors: none */
--    /* validity bits: no damage */
--        MCIC_VB_WP | MCIC_VB_MS | MCIC_VB_PM | MCIC_VB_IA | MCIC_VB_FP |
--        MCIC_VB_GR | MCIC_VB_CR | MCIC_VB_ST | MCIC_VB_AR | MCIC_VB_PR |
--        MCIC_VB_FC | MCIC_VB_CT | MCIC_VB_CC;
--    if (s390_has_feat(S390_FEAT_VECTOR)) {
--        mcic |= MCIC_VB_VR;
--    }
--    if (s390_has_feat(S390_FEAT_GUARDED_STORAGE)) {
--        mcic |= MCIC_VB_GS;
--    }
--    return mcic;
--}
--
- void kvm_s390_crw_mchk(void)
+ /* Store Clock Comparator */
+ uint64_t HELPER(stckc)(CPUS390XState *env)
  {
-     struct kvm_s390_irq irq = {
-         .type = KVM_S390_MCHK,
--        .u.mchk.cr14 = 1 << 28,
--        .u.mchk.mcic = build_channel_report_mcic(),
-+        .u.mchk.cr14 = CR14_CHANNEL_REPORT_SC,
-+        .u.mchk.mcic = s390_build_validity_mcic() | MCIC_SC_CP,
-     };
-     kvm_s390_floating_interrupt(&irq);
+diff --git a/target/s390x/translate.c b/target/s390x/translate.c
+index 26cf993405..48b031894a 100644
+--- a/target/s390x/translate.c
++++ b/target/s390x/translate.c
+@@ -3922,6 +3922,13 @@ static ExitStatus op_sckc(DisasContext *s, DisasOps *o)
+     return NO_EXIT;
  }
+ 
++static ExitStatus op_sckpf(DisasContext *s, DisasOps *o)
++{
++    check_privileged(s);
++    gen_helper_sckpf(cpu_env);
++    return NO_EXIT;
++}
++
+ static ExitStatus op_stckc(DisasContext *s, DisasOps *o)
+ {
+     check_privileged(s);
 -- 
 2.14.3
