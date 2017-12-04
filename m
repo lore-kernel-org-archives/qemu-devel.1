@@ -1,34 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46421)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47884)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1eLpQu-0006Tl-C0
-	for qemu-devel@nongnu.org; Mon, 04 Dec 2017 07:01:20 -0500
+	(envelope-from <yang.zhong@intel.com>) id 1eLpTm-0000ol-3y
+	for qemu-devel@nongnu.org; Mon, 04 Dec 2017 07:04:11 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1eLpQo-0001Td-Hp
-	for qemu-devel@nongnu.org; Mon, 04 Dec 2017 07:01:12 -0500
-Received: from indium.canonical.com ([91.189.90.7]:38476)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1eLpQo-0001T3-CB
-	for qemu-devel@nongnu.org; Mon, 04 Dec 2017 07:01:06 -0500
-Received: from chaenomeles.canonical.com ([91.189.89.119])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1eLpQl-0005mM-3T
-	for <qemu-devel@nongnu.org>; Mon, 04 Dec 2017 12:01:03 +0000
-Received: from chaenomeles.canonical.com (localhost [IPv6:::1])
-	by chaenomeles.canonical.com (Postfix) with ESMTPS id 12C636807D4
-	for <qemu-devel@nongnu.org>; Mon,  4 Dec 2017 12:01:03 +0000 (UTC)
+	(envelope-from <yang.zhong@intel.com>) id 1eLpTi-0002iy-An
+	for qemu-devel@nongnu.org; Mon, 04 Dec 2017 07:04:10 -0500
+Received: from mga05.intel.com ([192.55.52.43]:4422)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <yang.zhong@intel.com>)
+	id 1eLpTi-0002hb-0O
+	for qemu-devel@nongnu.org; Mon, 04 Dec 2017 07:04:06 -0500
+Date: Mon, 4 Dec 2017 20:03:22 +0800
+From: Yang Zhong <yang.zhong@intel.com>
+Message-ID: <20171204120322.GA32151@yangzhon-Virtual>
+References: <1511505030-3669-1-git-send-email-yang.zhong@intel.com>
+	<5A1A5C6E.9060409@huawei.com>
+	<20171201105622.GB26237@yangzhon-Virtual>
+	<74cccd14-e485-90d4-82d9-03355c05faca@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Mon, 04 Dec 2017 12:01:02 -0000
-From: Launchpad Bug Tracker <1736042@bugs.launchpad.net>
-Reply-To: Bug 1736042 <1736042@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <151234883142.11175.15433643697954166633.malonedeb@soybean.canonical.com>
-Message-Id: <151238886290.20280.10767099388397565837.launchpad@chaenomeles.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1736042] [NEW] qemu-system-x86_64 does not boot
- image reliably
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <74cccd14-e485-90d4-82d9-03355c05faca@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v3] rcu: reduce more than 7MB heap memory
+ by malloc_trim()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,41 +31,55 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Paolo Bonzini <pbonzini@redhat.com>, zhaoshenglong@huawei.com, stefanha@redhat.com
+Cc: qemu-devel@nongnu.org, weidong.huang@huawei.com, arei.gonglei@huawei.com, liujunjie23@huawei.com, wangxinxin.wang@huawei.com, stone.xulei@huawei.com, zhang.zhanghailiang@huawei.com, berrange@redhat.com
 
-You have been subscribed to a public bug:
+On Fri, Dec 01, 2017 at 01:52:49PM +0100, Paolo Bonzini wrote:
+> On 01/12/2017 11:56, Yang Zhong wrote:
+> >   This issue should be caused by much times of system call by malloc_trim(),
+> >   Shannon's test script include 60 scsi disks and 31 ioh3420 devices. We need 
+> >   trade-off between VM perforamance and memory optimization. Whether below 
+> >   method is suitable?
+> > 
+> >   int num=1;
+> >   ......
+> > 
+> >   #if defined(CONFIG_MALLOC_TRIM)
+> >         if(!(num++%5))
+> >         {
+> >              malloc_trim(4 * 1024 * 1024);
+> >         }
+> >   #endif
+> >  
+> >   Any comments are welcome! Thanks a lot!
+> 
+> Indeed something like this will do, perhaps only trim once per second?
+> 
+  Hello Paolo,
 
-Booting image as root user with following command works randomly.
+  Thanks for comments!
+  If we do trim once per second, maybe the frequency is a little high, what'e
+  more, we need maintain one timer to call this, this also cost cpu resource.
 
-./qemu-system-x86_64 -enable-kvm -curses -smp cpus=3D4 -m 8192
-/root/ructfe2917_g.qcow2
+  I added the log and did the test here with my test qemu command, when VM bootup,
+  which did more than 600 times free operations and 9 times memory trim in rcu 
+  thread. If i use our ClearContainer qemu command, the memory trim will down 
+  to 6 times. As for Shannon's test command, the malloc trim number will abosultly 
+  increse.
 
-Most of the time it ends up on "800x600 Graphic mode"(been stuck there
-even for 4 hours before killed), but 1 out of ~20 it boots image
-correctly(and instantly).
+  In my above method, the trim is only executed in the multiple of 5, which will
+  reduce trim times and do not heavily impact VM bootup performance. 
 
-This is visible in v2.5.0 build from sources, v2.5.0 from Ubuntu Xenial
-and v2.1.2 from Debian Jessie.
+  I also want to use synchronize_rcu() and free() to replace call_rcu(), but this
+  method serialize to malloc() and free(), which will reduce VM performance.
 
-The image in question was converted from vmdk using:
+  The ultimate aim is to reduce trim system call during the VM bootup and running.
+  It's appreciated that if you have better suggestions.
 
-qemu-img convert -O qcow2 file.vmdk file.qcow2
+  Regards,
 
-The image contains Ubuntu with grub.
+  Yang
 
-I can provide debug logs, but will need guidance how to enable them(and
-what logs are necessary).
-
-As a side note, it seems that booting is more certain after
-connecting(or mounting) partition using qemu-nbd/mount.
-
-** Affects: qemu
-     Importance: Undecided
-         Status: New
-
--- =
-
-qemu-system-x86_64 does not boot image reliably
-https://bugs.launchpad.net/bugs/1736042
-You received this bug notification because you are a member of qemu-devel-m=
-l, which is subscribed to QEMU.
+> Thanks,
+> 
+> Paolo
