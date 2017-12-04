@@ -1,23 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34267)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34596)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1eLvQh-0007wD-Bk
-	for qemu-devel@nongnu.org; Mon, 04 Dec 2017 13:25:24 -0500
+	(envelope-from <mreitz@redhat.com>) id 1eLvRX-0008Po-NJ
+	for qemu-devel@nongnu.org; Mon, 04 Dec 2017 13:26:16 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1eLvQg-0002nl-6L
-	for qemu-devel@nongnu.org; Mon, 04 Dec 2017 13:25:23 -0500
+	(envelope-from <mreitz@redhat.com>) id 1eLvRW-0003OW-QN
+	for qemu-devel@nongnu.org; Mon, 04 Dec 2017 13:26:15 -0500
 References: <20171120201004.14999-1-mreitz@redhat.com>
-	<20171120201004.14999-22-mreitz@redhat.com>
-	<w51shcq30wc.fsf@maestria.local.igalia.com>
+	<20171120201004.14999-25-mreitz@redhat.com>
+	<w51k1y2307y.fsf@maestria.local.igalia.com>
 From: Max Reitz <mreitz@redhat.com>
-Message-ID: <ff4ca1cc-b489-1c4e-8686-1c250e88065f@redhat.com>
-Date: Mon, 4 Dec 2017 19:25:09 +0100
+Message-ID: <bcbf0021-4fcd-26d0-e05c-cd3e35608988@redhat.com>
+Date: Mon, 4 Dec 2017 19:26:02 +0100
 MIME-Version: 1.0
-In-Reply-To: <w51shcq30wc.fsf@maestria.local.igalia.com>
+In-Reply-To: <w51k1y2307y.fsf@maestria.local.igalia.com>
 Content-Type: multipart/signed; micalg=pgp-sha256;
 	protocol="application/pgp-signature";
-	boundary="CNDhINIcTDt3KgcthqK707HXlTvPR3HHT"
-Subject: Re: [Qemu-devel] [PATCH v7 for-2.12 21/25] block: Purify
- .bdrv_refresh_filename()
+	boundary="TlpQCUgBAujUHGiVElfcQ5StlVn1eqAjR"
+Subject: Re: [Qemu-devel] [PATCH v7 for-2.12 24/25] block/curl: Implement
+ bdrv_refresh_filename()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,87 +30,71 @@ To: Alberto Garcia <berto@igalia.com>, qemu-block@nongnu.org
 Cc: qemu-devel@nongnu.org, Kevin Wolf <kwolf@redhat.com>, Eric Blake <eblake@redhat.com>, John Snow <jsnow@redhat.com>
 
 This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---CNDhINIcTDt3KgcthqK707HXlTvPR3HHT
+--TlpQCUgBAujUHGiVElfcQ5StlVn1eqAjR
 From: Max Reitz <mreitz@redhat.com>
 To: Alberto Garcia <berto@igalia.com>, qemu-block@nongnu.org
 Cc: qemu-devel@nongnu.org, Kevin Wolf <kwolf@redhat.com>,
  Eric Blake <eblake@redhat.com>, John Snow <jsnow@redhat.com>
-Message-ID: <ff4ca1cc-b489-1c4e-8686-1c250e88065f@redhat.com>
-Subject: Re: [PATCH v7 for-2.12 21/25] block: Purify .bdrv_refresh_filename()
+Message-ID: <bcbf0021-4fcd-26d0-e05c-cd3e35608988@redhat.com>
+Subject: Re: [PATCH v7 for-2.12 24/25] block/curl: Implement
+ bdrv_refresh_filename()
 References: <20171120201004.14999-1-mreitz@redhat.com>
- <20171120201004.14999-22-mreitz@redhat.com>
- <w51shcq30wc.fsf@maestria.local.igalia.com>
-In-Reply-To: <w51shcq30wc.fsf@maestria.local.igalia.com>
+ <20171120201004.14999-25-mreitz@redhat.com>
+ <w51k1y2307y.fsf@maestria.local.igalia.com>
+In-Reply-To: <w51k1y2307y.fsf@maestria.local.igalia.com>
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
 
-On 2017-12-04 17:37, Alberto Garcia wrote:
-> On Mon 20 Nov 2017 09:10:00 PM CET, Max Reitz wrote:
->> -static void blkdebug_refresh_filename(BlockDriverState *bs, QDict *op=
-tions)
->> +static void blkdebug_refresh_filename(BlockDriverState *bs)
->>  {
->>      BDRVBlkdebugState *s =3D bs->opaque;
->> -    QDict *opts;
->>      const QDictEntry *e;
->> -    bool force_json =3D false;
->> -
->> -    for (e =3D qdict_first(options); e; e =3D qdict_next(options, e))=
- {
->> -        if (strcmp(qdict_entry_key(e), "config") &&
->> -            strcmp(qdict_entry_key(e), "x-image"))
->> -        {
->> -            force_json =3D true;
->> -            break;
->> -        }
->> -    }
->> +    int ret;
+On 2017-12-04 17:51, Alberto Garcia wrote:
+> On Mon 20 Nov 2017 09:10:03 PM CET, Max Reitz wrote:
+>> Signed-off-by: Max Reitz <mreitz@redhat.com>
+>> ---
+>>  block/curl.c | 18 ++++++++++++++++++
+>>  1 file changed, 18 insertions(+)
+>>
+>> diff --git a/block/curl.c b/block/curl.c
+>> index 11318a9a29..fe57223fda 100644
+>> --- a/block/curl.c
+>> +++ b/block/curl.c
+>> @@ -957,6 +957,20 @@ static int64_t curl_getlength(BlockDriverState *b=
+s)
+>>      return s->len;
+>>  }
 >> =20
->> -    if (force_json && !bs->file->bs->full_open_options) {
->> -        /* The config file cannot be recreated, so creating a plain f=
-ilename
->> -         * is impossible */
->> +    if (!bs->file->bs->exact_filename[0]) {
->>          return;
->>      }
->> =20
->> -    if (!force_json && bs->file->bs->exact_filename[0]) {
->> -        int ret =3D snprintf(bs->exact_filename, sizeof(bs->exact_fil=
-ename),
->> -                           "blkdebug:%s:%s", s->config_file ?: "",
->> -                           bs->file->bs->exact_filename);
->> -        if (ret >=3D sizeof(bs->exact_filename)) {
->> -            /* An overflow makes the filename unusable, so do not rep=
-ort any */
->> -            bs->exact_filename[0] =3D 0;
->> +    for (e =3D qdict_first(bs->full_open_options); e;
->> +         e =3D qdict_next(bs->full_open_options, e))
+>> +static void curl_refresh_filename(BlockDriverState *bs)
+>> +{
+>> +    BDRVCURLState *s =3D bs->opaque;
+>> +
+>> +    if (!s->sslverify || s->cookie ||
+>> +        s->username || s->password || s->proxyusername || s->proxypas=
+sword)
 >> +    {
->> +        if (strcmp(qdict_entry_key(e), "config") &&
->> +            strcmp(qdict_entry_key(e), "image") &&
 >=20
-> Shouldn't this be "x-image" ?
+> Is !s->sslverify negative because that setting is true by default?
 
-Er, yes.  It should.
+Yes, exactly.  If it's false, you'd need to override it (and you can't
+do that through a plain filename).
+
+Thanks for reviewing, again. :-)
 
 Max
 
 
---CNDhINIcTDt3KgcthqK707HXlTvPR3HHT
+--TlpQCUgBAujUHGiVElfcQ5StlVn1eqAjR
 Content-Type: application/pgp-signature; name="signature.asc"
 Content-Description: OpenPGP digital signature
 Content-Disposition: attachment; filename="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQFGBAEBCAAwFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAlolkwUSHG1yZWl0ekBy
-ZWRoYXQuY29tAAoJEPQH2wBh1c9AgjwH+wcAHF5EEiH9oR5e60z1yVA2eRXOeaM3
-f96O8BXgIYobQn/ZTYC735VwnhMNCKvG91G6w9A9Yl2innPTwKYoVh2MY7VUzhqo
-d8q3h8kGe87hmZeCzdZrdbG8+jlKrgFVke3GFDtrKfBfa9XWVu6Z+QkD9/6cwEZr
-BZ/7gk7vw/O3/DCXDPBCq08gfqcpg532ktqgxwACd/hg4DV+Nmb/eFIBnWjVRC+v
-z+2Q6OMMbSDOvkKL0ELH+PrFVnLPQqlZ+7SZjDh96da8cAOPZgojqhZ0yZe5xZBL
-pIoE12Vd2inxJP1GrpHMjvtpHydmrmey0Lx+sjj+sFkfTszxTB2lUT8=
-=6d2U
+iQFGBAEBCAAwFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAlolkzoSHG1yZWl0ekBy
+ZWRoYXQuY29tAAoJEPQH2wBh1c9ARCkH/Rjpf4dYwXYI2fQITN4h7sUk/KQ8S0JU
+7U1481+LfRA1ZtUTydV5CyMCUy+5HjvUWUVi61ZRe5W7H7/1v+IK4BPAVeYYoCzq
+qZ1n2PBavMu9orf2l0587Gll4JRI+zqmjzo9rdHf8Xs9Njelp8ZDLqo6Qir1ZQI2
+GQPgjFqDPa4INBQyj+pzqeAH6VYiGasjatnuqWEO80MjcIIdGmkhrehjhDHj68ud
+3FgBqq4oKHRp9b/ZH2gSPp8CIDrTwBo3Tdm5rUnjrf3rewzgWJYtM+OgvhLM+/Gm
+7tCE18+lJ2kOpMHaAz+oSCMK8Bv7yF0HHpfxUQzuE66tCD4wWkg2Bbc=
+=6OJX
 -----END PGP SIGNATURE-----
 
---CNDhINIcTDt3KgcthqK707HXlTvPR3HHT--
+--TlpQCUgBAujUHGiVElfcQ5StlVn1eqAjR--
