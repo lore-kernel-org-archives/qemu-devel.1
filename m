@@ -1,23 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41574)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42939)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1eLtGx-00015s-Sp
-	for qemu-devel@nongnu.org; Mon, 04 Dec 2017 11:07:16 -0500
+	(envelope-from <benh@kernel.crashing.org>) id 1eLtJa-0003Fu-Dc
+	for qemu-devel@nongnu.org; Mon, 04 Dec 2017 11:09:58 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1eLtGt-0003Zv-2n
-	for qemu-devel@nongnu.org; Mon, 04 Dec 2017 11:07:11 -0500
-Date: Mon, 4 Dec 2017 17:07:01 +0100
-From: Cornelia Huck <cohuck@redhat.com>
-Message-ID: <20171204170701.3488f00d.cohuck@redhat.com>
-In-Reply-To: <f237126d-0815-8433-6ef7-1c1ba2e5a956@linux.vnet.ibm.com>
-References: <20171201143136.62497-1-pasic@linux.vnet.ibm.com>
-	<20171201143136.62497-3-pasic@linux.vnet.ibm.com>
-	<20171204121511.0abe9ca2.cohuck@redhat.com>
-	<f237126d-0815-8433-6ef7-1c1ba2e5a956@linux.vnet.ibm.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+	(envelope-from <benh@kernel.crashing.org>) id 1eLtJW-00065R-47
+	for qemu-devel@nongnu.org; Mon, 04 Dec 2017 11:09:54 -0500
+Message-ID: <1512403760.2224.81.camel@kernel.crashing.org>
+From: Benjamin Herrenschmidt <benh@kernel.crashing.org>
+Date: Mon, 04 Dec 2017 10:09:20 -0600
+In-Reply-To: <20171204011754.GH2130@umbus.fritz.box>
+References: <20171123132955.1261-1-clg@kaod.org>
+	<20171123132955.1261-16-clg@kaod.org>
+	<20171130050049.GD3023@umbus.fritz.box>
+	<1512225658.2224.66.camel@kernel.crashing.org>
+	<20171204011754.GH2130@umbus.fritz.box>
+Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 2/3] s390x/css: advertise unrestricted
- cssids
+Subject: Re: [Qemu-devel] [PATCH 15/25] spapr: notify the CPU when the XIVE
+ interrupt priority is more privileged
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,82 +27,115 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Halil Pasic <pasic@linux.vnet.ibm.com>
-Cc: Shalini Chellathurai Saroja <shalini@linux.vnet.ibm.com>, qemu-devel@nongnu.org, Christian Borntraeger <borntraeger@de.ibm.com>, qemu-s390x@nongnu.org, Boris Fiuczynski <fiuczy@linux.vnet.ibm.com>, Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>
+To: David Gibson <david@gibson.dropbear.id.au>
+Cc: =?ISO-8859-1?Q?C=E9dric?= Le Goater <clg@kaod.org>, qemu-ppc@nongnu.org, qemu-devel@nongnu.org
 
-On Mon, 4 Dec 2017 16:07:27 +0100
-Halil Pasic <pasic@linux.vnet.ibm.com> wrote:
-
-> On 12/04/2017 12:15 PM, Cornelia Huck wrote:
-> > On Fri,  1 Dec 2017 15:31:35 +0100
-> > Halil Pasic <pasic@linux.vnet.ibm.com> wrote:
-> >   
-> >> Let us advertise the changes introduced by "s390x/css: unrestrict cssids"
-> >> to the management software (so it can tell are cssids unrestricted or
-> >> restricted).
-> >>
-> >> Signed-off-by: Halil Pasic <pasic@linux.vnet.ibm.com>
-> >> ---
-> >>
-> >> Boris says having the property on the virtual-css-bridge is good form
-> >> Libvirt PoV. @Shalini: could you verify that things work out fine
-> >> (provided we get at least a preliminary blessing from Connie).
-> >>
-> >> Consider squashing into "s390x/css: unrestrict cssids".
-> >> ---
-> >>  hw/s390x/css-bridge.c | 11 +++++++++++
-> >>  1 file changed, 11 insertions(+)
-> >>
-> >> diff --git a/hw/s390x/css-bridge.c b/hw/s390x/css-bridge.c
-> >> index c4a9735d71..c7e8998680 100644
-> >> --- a/hw/s390x/css-bridge.c
-> >> +++ b/hw/s390x/css-bridge.c
-> >> @@ -123,6 +123,11 @@ static Property virtual_css_bridge_properties[] = {
-> >>      DEFINE_PROP_END_OF_LIST(),
-> >>  };
-> >>  
-> >> +static bool prop_get_true(Object *obj, Error **errp)
-> >> +{
-> >> +    return true;
-> >> +}
-> >> +
-> >>  static void virtual_css_bridge_class_init(ObjectClass *klass, void *data)
-> >>  {
-> >>      HotplugHandlerClass *hc = HOTPLUG_HANDLER_CLASS(klass);
-> >> @@ -131,6 +136,12 @@ static void virtual_css_bridge_class_init(ObjectClass *klass, void *data)
-> >>      hc->unplug = ccw_device_unplug;
-> >>      set_bit(DEVICE_CATEGORY_BRIDGE, dc->categories);
-> >>      dc->props = virtual_css_bridge_properties;
-> >> +    object_class_property_add_bool(klass, "cssid-unrestricted",
-> >> +                                   prop_get_true, NULL, NULL);
-> >> +    object_class_property_set_description(klass, "cssid-unrestricted",
-> >> +            "A css device can use any  cssid, regardless whether virtual"  
+On Mon, 2017-12-04 at 12:17 +1100, David Gibson wrote:
+> On Sat, Dec 02, 2017 at 08:40:58AM -0600, Benjamin Herrenschmidt wrote:
+> > On Thu, 2017-11-30 at 16:00 +1100, David Gibson wrote:
+> > > 
+> > > >  static uint64_t spapr_xive_icp_accept(sPAPRXiveICP *icp)
+> > > >  {
+> > > > -    return 0;
+> > > > +    uint8_t nsr = icp->tima_os[TM_NSR];
+> > > > +
+> > > > +    qemu_irq_lower(icp->output);
+> > > > +
+> > > > +    if (icp->tima_os[TM_NSR] & TM_QW1_NSR_EO) {
+> > > > +        uint8_t cppr = icp->tima_os[TM_PIPR];
+> > > > +
+> > > > +        icp->tima_os[TM_CPPR] = cppr;
+> > > > +
+> > > > +        /* Reset the pending buffer bit */
+> > > > +        icp->tima_os[TM_IPB] &= ~priority_to_ipb(cppr);
+> > > 
+> > > What if multiple irqs of the same priority were queued?
 > > 
-> > extra space -----------------------------^
-> >   
+> > It's the job of the OS to handle that case by consuming from the queue
+> > until it's empty. There is an MMIO the guest can use if it wants to
+> > that can set the IPB bits back to 1 for a given priority. Otherwise in
+> > Linux we just have a SW way to force a replay.
 > 
-> Nod.
-> 
-> >> +            " or not (read only, always true)",  
-> 
-> Do we need "." here ----------------------------^ ?
+> Ok, so "accept" is effectively saying the OS is accepting all
+> interrupts from that queue, right?
 
-None of the other descs do that.
+It's whatever you want it to mean. It's simply a test & clear on the
+prio bit. From a HW standpoint, you could have multiple queues or just
+set an internal SW flag to go chck again later etc...
 
 > 
-> >> +            NULL);
-> >>  }
-> >>  
-> >>  static const TypeInfo virtual_css_bridge_info = {  
 > > 
-> > Looks reasonable. If this works as expected, I'll squash it into the
-> > previous patch.
-> >   
+> > > > +        icp->tima_os[TM_PIPR] = ipb_to_pipr(icp->tima_os[TM_IPB]);
+> > > > +
+> > > > +        /* Drop Exception bit for OS */
+> > > > +        icp->tima_os[TM_NSR] &= ~TM_QW1_NSR_EO;
+> > > > +    }
+> > > > +
+> > > > +    return (nsr << 8) | icp->tima_os[TM_CPPR];
+> > > > +}
+> > > > +
+> > > > +static void spapr_xive_icp_notify(sPAPRXiveICP *icp)
+> > > > +{
+> > > > +    if (icp->tima_os[TM_PIPR] < icp->tima_os[TM_CPPR]) {
+> > > > +        icp->tima_os[TM_NSR] |= TM_QW1_NSR_EO;
+> > > > +        qemu_irq_raise(icp->output);
+> > > > +    }
+> > > >  }
+> > > >  
+> > > >  static void spapr_xive_icp_set_cppr(sPAPRXiveICP *icp, uint8_t cppr)
+> > > > @@ -51,6 +105,9 @@ static void spapr_xive_icp_set_cppr(sPAPRXiveICP *icp, uint8_t cppr)
+> > > >      }
+> > > >  
+> > > >      icp->tima_os[TM_CPPR] = cppr;
+> > > > +
+> > > > +    /* CPPR has changed, inform the ICP which might raise an exception */
+> > > > +    spapr_xive_icp_notify(icp);
+> > > >  }
+> > > >  
+> > > >  /*
+> > > > @@ -224,6 +281,8 @@ static void spapr_xive_irq(sPAPRXive *xive, int lisn)
+> > > >      XiveEQ *eq;
+> > > >      uint32_t eq_idx;
+> > > >      uint8_t priority;
+> > > > +    uint32_t server;
+> > > > +    sPAPRXiveICP *icp;
+> > > >  
+> > > >      ive = spapr_xive_get_ive(xive, lisn);
+> > > >      if (!ive || !(ive->w & IVE_VALID)) {
+> > > > @@ -253,6 +312,13 @@ static void spapr_xive_irq(sPAPRXive *xive, int lisn)
+> > > >          qemu_log_mask(LOG_UNIMP, "XIVE: !UCOND_NOTIFY not implemented\n");
+> > > >      }
+> > > >  
+> > > > +    server = GETFIELD(EQ_W6_NVT_INDEX, eq->w6);
+> > > > +    icp = spapr_xive_icp_get(xive, server);
+> > > > +    if (!icp) {
+> > > > +        qemu_log_mask(LOG_GUEST_ERROR, "XIVE: No ICP for server %d\n", server);
+> > > > +        return;
+> > > > +    }
+> > > > +
+> > > >      if (GETFIELD(EQ_W6_FORMAT_BIT, eq->w6) == 0) {
+> > > >          priority = GETFIELD(EQ_W7_F0_PRIORITY, eq->w7);
+> > > >  
+> > > > @@ -260,9 +326,18 @@ static void spapr_xive_irq(sPAPRXive *xive, int lisn)
+> > > >          if (priority == 0xff) {
+> > > >              g_assert_not_reached();
+> > > >          }
+> > > > +
+> > > > +        /* Update the IPB (Interrupt Pending Buffer) with the priority
+> > > > +         * of the new notification and inform the ICP, which will
+> > > > +         * decide to raise the exception, or not, depending the CPPR.
+> > > > +         */
+> > > > +        icp->tima_os[TM_IPB] |= priority_to_ipb(priority);
+> > > > +        icp->tima_os[TM_PIPR] = ipb_to_pipr(icp->tima_os[TM_IPB]);
+> > > >      } else {
+> > > >          qemu_log_mask(LOG_UNIMP, "XIVE: w7 format1 not implemented\n");
+> > > >      }
+> > > > +
+> > > > +    spapr_xive_icp_notify(icp);
+> > > >  }
+> > > >  
+> > > >  /*
+> > > 
+> > > 
 > 
-> I've just asked Shalini to verify the libvirt perspective.
 > 
-> Supposed we verify this works as expected, I read I don't have to spin
-> a v2 and you are going to fix the issues found yourself. Right?
-
-I'd prefer a v2 that I can simply apply. Let's wait for some more
-acks/r-bs.
