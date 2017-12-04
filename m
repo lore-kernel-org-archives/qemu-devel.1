@@ -1,15 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39473)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40097)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard@rpsys.net>) id 1eLzBp-0003jn-7F
-	for qemu-devel@nongnu.org; Mon, 04 Dec 2017 17:26:18 -0500
+	(envelope-from <richard.purdie@linuxfoundation.org>)
+	id 1eLzEJ-0005Ze-FN
+	for qemu-devel@nongnu.org; Mon, 04 Dec 2017 17:28:52 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard@rpsys.net>) id 1eLzBo-0005De-5F
-	for qemu-devel@nongnu.org; Mon, 04 Dec 2017 17:26:17 -0500
+	(envelope-from <richard.purdie@linuxfoundation.org>)
+	id 1eLzEI-0006uz-JP
+	for qemu-devel@nongnu.org; Mon, 04 Dec 2017 17:28:51 -0500
+Message-ID: <1512426516.862.222.camel@linuxfoundation.org>
 From: Richard Purdie <richard.purdie@linuxfoundation.org>
-Date: Mon,  4 Dec 2017 22:25:43 +0000
-Message-Id: <1512426343-18938-1-git-send-email-richard.purdie@linuxfoundation.org>
-Subject: [Qemu-devel] [PATCH v3] target/ppc: Fix system lockups caused by
- interrupt_request state corruption
+Date: Mon, 04 Dec 2017 22:28:36 +0000
+In-Reply-To: <20171204014422.GJ2130@umbus.fritz.box>
+References: <1512143347-20128-1-git-send-email-richard.purdie@linuxfoundation.org>
+	<20171204010040.GF2130@umbus.fritz.box>
+	<20171204014422.GJ2130@umbus.fritz.box>
+Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [Qemu-ppc] [PATCH v2] target/ppc: Fix system
+ lockups caused by interrupt_request state corruption
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -18,125 +27,82 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org, david@gibson.dropbear.id.au
-Cc: qemu-ppc@nongnu.org, Richard Purdie <richard.purdie@linuxfoundation.org>
+To: David Gibson <david@gibson.dropbear.id.au>
+Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org
 
-Occasionally in Linux guests on x86_64 we're seeing logs like:
+On Mon, 2017-12-04 at 12:44 +1100, David Gibson wrote:
+> On Mon, Dec 04, 2017 at 12:00:40PM +1100, David Gibson wrote:
+> >=20
+> > On Fri, Dec 01, 2017 at 03:49:07PM +0000, Richard Purdie wrote:
+> > >=20
+> > > Occasionally in Linux guests on x86_64 we're seeing logs like:
+> > >=20
+> > > ppc_set_irq: 0x55b4e0d562f0 n_IRQ 8 level 1 =3D> pending
+> > > 00000100req 00000004
+> > >=20
+> > > when they should read:
+> > >=20
+> > > ppc_set_irq: 0x55b4e0d562f0 n_IRQ 8 level 1 =3D> pending
+> > > 00000100req 00000002
+> > >=20
+> > > The "00000004" is CPU_INTERRUPT_EXITTB yet the code calls
+> > > cpu_interrupt(cs, CPU_INTERRUPT_HARD) ("00000002") in this
+> > > function
+> > > just before the log message. Something is causing the HARD bit
+> > > setting
+> > > to get lost.
+> > >=20
+> > > The knock on effect of losing that bit is the decrementer timer
+> > > interrupts
+> > > don't get delivered which causes the guest to sit idle in its
+> > > idle handler
+> > > and 'hang'.
+> > >=20
+> > > The issue occurs due to races from code which sets
+> > > CPU_INTERRUPT_EXITTB.
+> > >=20
+> > > Rather than poking directly into cs->interrupt_request, that code
+> > > needs to:
+> > >=20
+> > > a) hold BQL
+> > > b) use the cpu_interrupt() helper
+> > >=20
+> > > This patch fixes the call sites to do this, fixing the hang.
+> > >=20
+> > > Signed-off-by: Richard Purdie <richard.purdie@linuxfoundation.org
+> > > >
+> > I strongly suspect there's a better way to do this long term - a
+> > lot
+> > of that old ppc TCG code is really crufty.=C2=A0=C2=A0But as best I c=
+an tell,
+> > this is certainly a fix over what we had.=C2=A0=C2=A0So, applied to
+> > ppc-for-2.11.
+> I take that back.=C2=A0=C2=A0Running make check with this patch results=
+ in:
+>=20
+> =C2=A0 GTESTER check-qtest-ppc64
+> **
+> ERROR:/home/dwg/src/qemu/cpus.c:1582:qemu_mutex_lock_iothread:
+> assertion failed: (!qemu_mutex_iothread_locked())
+> Broken pipe
+> qemu-system-ppc64: RP: Received invalid message 0x0000 length 0x0000
+> GTester: last random seed: R02S895b0f4813776bf68c147bf987e73f7b
+> make: *** [/home/dwg/src/qemu/tests/Makefile.include:852: check-
+> qtest-ppc64] Error 1
+>=20
+> So, I've reverted it.
 
-ppc_set_irq: 0x55b4e0d562f0 n_IRQ 8 level 1 => pending 00000100req 00000004
+Sorry about that. I tried to stress the code paths and no issues showed
+up in our testing but hadn't realised those tests existed.
 
-when they should read:
+Given there do seem to be mixed locked and unlocked code paths I've
+taken a different approach and sent a v3 which passes those tests.
 
-ppc_set_irq: 0x55b4e0d562f0 n_IRQ 8 level 1 => pending 00000100req 00000002
+I do agree with you that there is probably a better way but that would
+need someone with a better understanding of the bigger picture than I
+have. This patch does stop our image tests locking up so does seem to
+fix a valid/real problem which people can run into.
 
-The "00000004" is CPU_INTERRUPT_EXITTB yet the code calls
-cpu_interrupt(cs, CPU_INTERRUPT_HARD) ("00000002") in this function
-just before the log message. Something is causing the HARD bit setting
-to get lost.
+Cheers,
 
-The knock on effect of losing that bit is the decrementer timer interrupts
-don't get delivered which causes the guest to sit idle in its idle handler
-and 'hang'.
-
-The issue occurs due to races from code which sets CPU_INTERRUPT_EXITTB.
-
-Rather than poking directly into cs->interrupt_request, that code needs to:
-
-a) hold BQL
-b) use the cpu_interrupt() helper
-
-This patch fixes the call sites to do this, fixing the hang. The calls
-are made from a variety of contexts so a helper function is added to handle
-the necessary locking. This can likely be improved and optimised in the future
-but it ensures the code is correct and doesn't lockup as it stands today.
-
-Signed-off-by: Richard Purdie <richard.purdie@linuxfoundation.org>
----
- target/ppc/excp_helper.c |  7 +++----
- target/ppc/helper_regs.h | 17 +++++++++++++++--
- 2 files changed, 18 insertions(+), 6 deletions(-)
-
-v3: Fix make check failures
-v2: Fixes a compile issue with master and ensures BQL is held in one case
-where it potentially wasn't.
-
-
-diff --git a/target/ppc/excp_helper.c b/target/ppc/excp_helper.c
-index e6009e70e5..37d2410726 100644
---- a/target/ppc/excp_helper.c
-+++ b/target/ppc/excp_helper.c
-@@ -207,7 +207,7 @@ static inline void powerpc_excp(PowerPCCPU *cpu, int excp_model, int excp)
-                         "Entering checkstop state\n");
-             }
-             cs->halted = 1;
--            cs->interrupt_request |= CPU_INTERRUPT_EXITTB;
-+            cpu_interrupt_exittb(cs);
-         }
-         if (env->msr_mask & MSR_HVB) {
-             /* ISA specifies HV, but can be delivered to guest with HV clear
-@@ -940,7 +940,7 @@ void helper_store_msr(CPUPPCState *env, target_ulong val)
- 
-     if (excp != 0) {
-         CPUState *cs = CPU(ppc_env_get_cpu(env));
--        cs->interrupt_request |= CPU_INTERRUPT_EXITTB;
-+        cpu_interrupt_exittb(cs);
-         raise_exception(env, excp);
-     }
- }
-@@ -995,8 +995,7 @@ static inline void do_rfi(CPUPPCState *env, target_ulong nip, target_ulong msr)
-     /* No need to raise an exception here,
-      * as rfi is always the last insn of a TB
-      */
--    cs->interrupt_request |= CPU_INTERRUPT_EXITTB;
--
-+    cpu_interrupt_exittb(cs);
-     /* Reset the reservation */
-     env->reserve_addr = -1;
- 
-diff --git a/target/ppc/helper_regs.h b/target/ppc/helper_regs.h
-index 2627a70176..84fd30c2db 100644
---- a/target/ppc/helper_regs.h
-+++ b/target/ppc/helper_regs.h
-@@ -20,6 +20,8 @@
- #ifndef HELPER_REGS_H
- #define HELPER_REGS_H
- 
-+#include "qemu/main-loop.h"
-+
- /* Swap temporary saved registers with GPRs */
- static inline void hreg_swap_gpr_tgpr(CPUPPCState *env)
- {
-@@ -96,6 +98,17 @@ static inline void hreg_compute_hflags(CPUPPCState *env)
-     env->hflags |= env->hflags_nmsr;
- }
- 
-+static inline void cpu_interrupt_exittb(CPUState *cs)
-+{
-+    if (!qemu_mutex_iothread_locked()) {
-+        qemu_mutex_lock_iothread();
-+        cpu_interrupt(cs, CPU_INTERRUPT_EXITTB);
-+        qemu_mutex_unlock_iothread();
-+    } else {
-+        cpu_interrupt(cs, CPU_INTERRUPT_EXITTB);
-+    }
-+}
-+
- static inline int hreg_store_msr(CPUPPCState *env, target_ulong value,
-                                  int alter_hv)
- {
-@@ -114,11 +127,11 @@ static inline int hreg_store_msr(CPUPPCState *env, target_ulong value,
-     }
-     if (((value >> MSR_IR) & 1) != msr_ir ||
-         ((value >> MSR_DR) & 1) != msr_dr) {
--        cs->interrupt_request |= CPU_INTERRUPT_EXITTB;
-+        cpu_interrupt_exittb(cs);
-     }
-     if ((env->mmu_model & POWERPC_MMU_BOOKE) &&
-         ((value >> MSR_GS) & 1) != msr_gs) {
--        cs->interrupt_request |= CPU_INTERRUPT_EXITTB;
-+        cpu_interrupt_exittb(cs);
-     }
-     if (unlikely((env->flags & POWERPC_FLAG_TGPR) &&
-                  ((value ^ env->msr) & (1 << MSR_TGPR)))) {
--- 
-2.14.1
+Richard
