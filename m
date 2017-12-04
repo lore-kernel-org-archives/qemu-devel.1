@@ -1,20 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54288)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55425)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berto@igalia.com>) id 1eLtk3-0004dp-W6
-	for qemu-devel@nongnu.org; Mon, 04 Dec 2017 11:37:16 -0500
+	(envelope-from <berto@igalia.com>) id 1eLtnJ-0006eJ-Ij
+	for qemu-devel@nongnu.org; Mon, 04 Dec 2017 11:40:38 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berto@igalia.com>) id 1eLtk3-0004yO-8I
-	for qemu-devel@nongnu.org; Mon, 04 Dec 2017 11:37:16 -0500
+	(envelope-from <berto@igalia.com>) id 1eLtnG-0006Fp-GY
+	for qemu-devel@nongnu.org; Mon, 04 Dec 2017 11:40:37 -0500
 From: Alberto Garcia <berto@igalia.com>
-In-Reply-To: <20171120201004.14999-22-mreitz@redhat.com>
+In-Reply-To: <20171120201004.14999-23-mreitz@redhat.com>
 References: <20171120201004.14999-1-mreitz@redhat.com>
-	<20171120201004.14999-22-mreitz@redhat.com>
-Date: Mon, 04 Dec 2017 17:37:07 +0100
-Message-ID: <w51shcq30wc.fsf@maestria.local.igalia.com>
+	<20171120201004.14999-23-mreitz@redhat.com>
+Date: Mon, 04 Dec 2017 17:40:24 +0100
+Message-ID: <w51po7u30qv.fsf@maestria.local.igalia.com>
 MIME-Version: 1.0
 Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH v7 for-2.12 21/25] block: Purify
- .bdrv_refresh_filename()
+Subject: Re: [Qemu-devel] [PATCH v7 for-2.12 22/25] block: Do not copy
+ exact_filename from format file
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,45 +26,14 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org
 Cc: qemu-devel@nongnu.org, Kevin Wolf <kwolf@redhat.com>, Eric Blake <eblake@redhat.com>, John Snow <jsnow@redhat.com>
 
-On Mon 20 Nov 2017 09:10:00 PM CET, Max Reitz wrote:
-> -static void blkdebug_refresh_filename(BlockDriverState *bs, QDict *options)
-> +static void blkdebug_refresh_filename(BlockDriverState *bs)
->  {
->      BDRVBlkdebugState *s = bs->opaque;
-> -    QDict *opts;
->      const QDictEntry *e;
-> -    bool force_json = false;
-> -
-> -    for (e = qdict_first(options); e; e = qdict_next(options, e)) {
-> -        if (strcmp(qdict_entry_key(e), "config") &&
-> -            strcmp(qdict_entry_key(e), "x-image"))
-> -        {
-> -            force_json = true;
-> -            break;
-> -        }
-> -    }
-> +    int ret;
->  
-> -    if (force_json && !bs->file->bs->full_open_options) {
-> -        /* The config file cannot be recreated, so creating a plain filename
-> -         * is impossible */
-> +    if (!bs->file->bs->exact_filename[0]) {
->          return;
->      }
->  
-> -    if (!force_json && bs->file->bs->exact_filename[0]) {
-> -        int ret = snprintf(bs->exact_filename, sizeof(bs->exact_filename),
-> -                           "blkdebug:%s:%s", s->config_file ?: "",
-> -                           bs->file->bs->exact_filename);
-> -        if (ret >= sizeof(bs->exact_filename)) {
-> -            /* An overflow makes the filename unusable, so do not report any */
-> -            bs->exact_filename[0] = 0;
-> +    for (e = qdict_first(bs->full_open_options); e;
-> +         e = qdict_next(bs->full_open_options, e))
-> +    {
-> +        if (strcmp(qdict_entry_key(e), "config") &&
-> +            strcmp(qdict_entry_key(e), "image") &&
+On Mon 20 Nov 2017 09:10:01 PM CET, Max Reitz wrote:
+> If the a format BDS's file BDS is in turn a format BDS, we cannot simply
+> use the same filename, because when opening a BDS tree based on a
+> filename alone, qemu will create only one format node on top of one
+> protocol node (disregarding a potential backing file).
+>
+> Signed-off-by: Max Reitz <mreitz@redhat.com>
 
-Shouldn't this be "x-image" ?
+Reviewed-by: Alberto Garcia <berto@igalia.com>
 
 Berto
