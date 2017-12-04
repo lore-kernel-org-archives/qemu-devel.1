@@ -1,26 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36913)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39455)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1eLig8-0001HW-Pq
-	for qemu-devel@nongnu.org; Sun, 03 Dec 2017 23:48:30 -0500
+	(envelope-from <dgibson@ozlabs.org>) id 1eLiuK-0006em-RF
+	for qemu-devel@nongnu.org; Mon, 04 Dec 2017 00:03:10 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1eLig5-0002Yl-Me
-	for qemu-devel@nongnu.org; Sun, 03 Dec 2017 23:48:28 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:54066)
+	(envelope-from <dgibson@ozlabs.org>) id 1eLiuH-0007iS-Nm
+	for qemu-devel@nongnu.org; Mon, 04 Dec 2017 00:03:08 -0500
+Received: from ozlabs.org ([103.22.144.67]:56641)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1eLig5-0002YJ-Dk
-	for qemu-devel@nongnu.org; Sun, 03 Dec 2017 23:48:25 -0500
-Date: Mon, 4 Dec 2017 12:48:13 +0800
-From: Peter Xu <peterx@redhat.com>
-Message-ID: <20171204044813.GD7916@xz-mi>
-References: <20171108060130.3772-1-peterx@redhat.com>
-	<20171108060130.3772-32-peterx@redhat.com>
-	<20171201165327.GB2318@work-vm>
+	(Exim 4.71) (envelope-from <dgibson@ozlabs.org>) id 1eLiuH-0007hM-3k
+	for qemu-devel@nongnu.org; Mon, 04 Dec 2017 00:03:05 -0500
+Date: Mon, 4 Dec 2017 15:40:20 +1100
+From: David Gibson <david@gibson.dropbear.id.au>
+Message-ID: <20171204044020.GM2130@umbus.fritz.box>
+References: <20171129084628.12336-1-david@gibson.dropbear.id.au>
+	<20171129084628.12336-4-david@gibson.dropbear.id.au>
+	<abaddfae-f0f0-cbe3-93b5-b2f102290725@redhat.com>
+	<20171130040248.GU3023@umbus.fritz.box>
+	<20171201182840-mutt-send-email-mst@kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature"; boundary="+2GlJm56SCtLHYlr"
 Content-Disposition: inline
-In-Reply-To: <20171201165327.GB2318@work-vm>
-Subject: Re: [Qemu-devel] [PATCH v4 31/32] migration,
- qmp: new command "migrate-pause"
+In-Reply-To: <20171201182840-mutt-send-email-mst@kernel.org>
+Subject: Re: [Qemu-devel] [for-2.12 3/7] pci: Fold pci_bus.h into pci.h
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,99 +31,76 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Cc: qemu-devel@nongnu.org, Alexey Perevalov <a.perevalov@samsung.com>, "Daniel P . Berrange" <berrange@redhat.com>, Juan Quintela <quintela@redhat.com>, Andrea Arcangeli <aarcange@redhat.com>
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: Marcel Apfelbaum <marcel@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, Igor Mammedov <imammedo@redhat.com>, qemu-devel@nongnu.org
 
-On Fri, Dec 01, 2017 at 04:53:28PM +0000, Dr. David Alan Gilbert wrote:
-> * Peter Xu (peterx@redhat.com) wrote:
-> > It is used to manually trigger the postcopy pause state.  It works just
-> > like when we found the migration stream failed during postcopy, but
-> > provide an explicit way for user in case of misterious socket hangs.
-> > 
-> > Signed-off-by: Peter Xu <peterx@redhat.com>
-> 
-> Can we change the name to something like 'migrate-disconnect' - pause
-> is a bit easy to confuse with other things and this is really more
-> an explicit network disconnect (Is it worth just making it a flag to
-> migrate-cancel?)
 
-Then I would prefer to reuse the migrate_cancel command.  
+--+2GlJm56SCtLHYlr
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-Actually this reminded me about what would happen now if someone on
-src VM sends a "migrate_cancel" during postcopy active.  It should
-crash the VM, right?
+On Fri, Dec 01, 2017 at 06:29:39PM +0200, Michael S. Tsirkin wrote:
+> On Thu, Nov 30, 2017 at 03:02:48PM +1100, David Gibson wrote:
+> > On Wed, Nov 29, 2017 at 12:38:00PM +0200, Marcel Apfelbaum wrote:
+> > > On 29/11/2017 10:46, David Gibson wrote:
+> > > > include/hw/pci/pci_bus.h is now very small and can only safely be i=
+ncluded
+> > > > after hw/pci/pci.h.  So, just fold it into pci.h.
+> > > >=20
+> > >=20
+> > > I don't get the benefit from merging the header files.
+> > > I would go the other way around and find stuff specific
+> > > to pci_bus and add it there, like the pci_bus_new*
+> > > you touched in the prev patch.
+> >=20
+> > Hrm.  Except the point of the earlier patch was that those are
+> > actually spoecific to root buses, so would really belong in say
+> > pci-host.h, rather than pci-bus.h.
+> >=20
+> > A log of PCI stuff deals with interaction between the device and bus
+> > though, so it just seemed like more trouble than it was worth to go
+> > disentangling them properly.
+> >=20
+> > > Maybe if *all* code files requiring pci.h would automatically
+> > > need pci_bus.h would make sense, but I didn't check that.
+> >=20
+> > Yeah, I don't think every user of pci.h needs pci_bus.h, although a
+> > fair few do as you can see from the diff.  Well, I guess it's up to
+> > Michael.  I'll be tolerably content either way - I'd say this is the
+> > least important patch of the series.
+>=20
+> I'm inclined to agree with Marcel also because it's lots of noise for no
+> real win.  The next patch depends on this one. I skipped this and next
+> one, pls feel free to repost next one.
 
-Considering above, I'm thinking whether we should just make it a
-default behavior that when do migrate_cancel during postcopy-active we
-just do a pause instead of real cancel. After all it cannot re-start
-the VM any more on source, so IMHO a real cancel does not mean much
-here.  More importantly, what if someone wants to manually trigger
-this pause but accidentally forgot to type that new flag (say,
--D[isconnect])?  It'll crash the VM directly.
+Ok, will do.  I have some other cleanups in mind, so if I can finish
+them time, I'll fold them in as well.
 
-What do you think?
+--=20
+David Gibson			| I'll have my music baroque, and my code
+david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
+				| _way_ _around_!
+http://www.ozlabs.org/~dgibson
 
-> 
-> 
-> > ---
-> >  migration/migration.c | 18 ++++++++++++++++++
-> >  qapi/migration.json   | 22 ++++++++++++++++++++++
-> >  2 files changed, 40 insertions(+)
-> > 
-> > diff --git a/migration/migration.c b/migration/migration.c
-> > index 536a771803..30348a5e27 100644
-> > --- a/migration/migration.c
-> > +++ b/migration/migration.c
-> > @@ -1485,6 +1485,24 @@ void qmp_migrate_incoming(const char *uri, Error **errp)
-> >      once = false;
-> >  }
-> >  
-> > +void qmp_migrate_pause(Error **errp)
-> > +{
-> > +    int ret;
-> > +    MigrationState *ms = migrate_get_current();
-> > +
-> > +    if (ms->state != MIGRATION_STATUS_POSTCOPY_ACTIVE) {
-> > +        error_setg(errp, "Migration pause is currently only allowed during"
-> > +                   " an active postcopy phase.");
-> > +        return;
-> > +    }
-> > +
-> > +    ret = qemu_file_shutdown(ms->to_dst_file);
-> > +
-> > +    if (ret) {
-> > +        error_setg(errp, "Failed to pause migration stream.");
-> > +    }
-> > +}
-> > +
-> >  bool migration_is_blocked(Error **errp)
-> >  {
-> >      if (qemu_savevm_state_blocked(errp)) {
-> > diff --git a/qapi/migration.json b/qapi/migration.json
-> > index 4a3eff62f1..52901f7e2e 100644
-> > --- a/qapi/migration.json
-> > +++ b/qapi/migration.json
-> > @@ -1074,6 +1074,28 @@
-> >  { 'command': 'migrate-incoming', 'data': {'uri': 'str' } }
-> >  
-> >  ##
-> > +# @migrate-pause:
-> > +#
-> > +# Pause an migration.  Currently it can only pause a postcopy
-> > +# migration.  Pausing a precopy migration is not supported yet.
-> > +#
-> > +# It is mostly used as a manual way to trigger the postcopy paused
-> > +# state when the network sockets hang due to some reason, so that we
-> > +# can try a recovery afterward.
-> 
-> Can we say this explicitly;
-> 'Force closes the migration connection to trigger the postcopy paused
->  state when the network sockets hang due to some reason, so that we
-> can try a recovery afterwards'
+--+2GlJm56SCtLHYlr
+Content-Type: application/pgp-signature; name="signature.asc"
 
-Sure!  I'll just see where I should properly put these sentences.
+-----BEGIN PGP SIGNATURE-----
 
-Thanks,
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlok0a4ACgkQbDjKyiDZ
+s5I1qxAAt+2Haf+k15rHgP8kOGkkLGlbip1W7D8pNN3yV23Paln55qB8RNVtKLkd
+wvy2Z7ew6nLv5CoqvSVj4xuiyGS6HEDQ/1N7sfzsuvs72qzDwV5LppyOYki6sykV
+oDjNLn7DSkg7gDggsnx7l/YhpfAivW8H+mCkKXZsaLEwruH1dxIc6UKt6+bR0YoQ
+vpCa+ybfQuFZWg4wFTL6cB5yrxcnPQsdSNIio0Cvb1jR7imdHBjpj13egHGBCrPR
+lVyzDISaP5jGsK/WYnF0JS0DG/n0/W4/eFoAe9kHeKo33SbDPDMMXTv5+wYlx8+U
+0DoXoPqNW9D5n7lZGUOyx7/UMUHKgMOcckoccW09XQXytotlKm7UsHb+Yu4dSNOi
+tOcm033ala25ka4m0Nn/EmTGgIY1FecZTBIJ3U/MisxaK5G2smSMrRDcswg6ZlCk
+jb7wMZKcF/71K+MnoB9Dgznjsrlrd+8Z6uQPGZibuAy6788Kbv41AQax7YeM55Xd
+k5wiOy1805L8WuYPtVWD/8jRoamUGH48p5bcIYYazNCTS+aBecSgfYaowjMx2Zdi
+g5KjQnOsvG7muQCCNCCsEe31KTlECL77gs8M9c/nIJ/joc4yGD0kePnymXvG7Wg3
+sXSWCNw1NiDICkx7qyDu8SH4oxekj1jzVqkZ4peI5AU7FwXVT7E=
+=iSMl
+-----END PGP SIGNATURE-----
 
--- 
-Peter Xu
+--+2GlJm56SCtLHYlr--
