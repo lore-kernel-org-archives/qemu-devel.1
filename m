@@ -1,21 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35403)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38218)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1eLu9y-0007V7-0c
-	for qemu-devel@nongnu.org; Mon, 04 Dec 2017 12:04:05 -0500
+	(envelope-from <dgilbert@redhat.com>) id 1eLuGP-0003ew-Vq
+	for qemu-devel@nongnu.org; Mon, 04 Dec 2017 12:10:43 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1eLu9u-0001Vk-3h
-	for qemu-devel@nongnu.org; Mon, 04 Dec 2017 12:04:02 -0500
-Date: Mon, 4 Dec 2017 18:03:49 +0100
-From: Cornelia Huck <cohuck@redhat.com>
-Message-ID: <20171204180349.379dd02e.cohuck@redhat.com>
-In-Reply-To: <20171204125505.29203-2-david@redhat.com>
-References: <20171204125505.29203-1-david@redhat.com>
-	<20171204125505.29203-2-david@redhat.com>
+	(envelope-from <dgilbert@redhat.com>) id 1eLuGL-0005EK-V0
+	for qemu-devel@nongnu.org; Mon, 04 Dec 2017 12:10:41 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:42796)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1eLuGL-0005Dh-Lk
+	for qemu-devel@nongnu.org; Mon, 04 Dec 2017 12:10:37 -0500
+Date: Mon, 4 Dec 2017 17:10:29 +0000
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20171204171028.GG2420@work-vm>
+References: <20171108060130.3772-1-peterx@redhat.com>
+	<20171108060130.3772-32-peterx@redhat.com>
+	<20171201165327.GB2318@work-vm> <20171204044813.GD7916@xz-mi>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v1 for-2.12 1/5] s390x/kvm: factor out
- build_channel_report_mcic() into cpu.h
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20171204044813.GD7916@xz-mi>
+Subject: Re: [Qemu-devel] [PATCH v4 31/32] migration,
+ qmp: new command "migrate-pause"
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,114 +29,115 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Hildenbrand <david@redhat.com>
-Cc: qemu-s390x@nongnu.org, qemu-devel@nongnu.org, Christian Borntraeger <borntraeger@de.ibm.com>, Richard Henderson <rth@twiddle.net>, Alexander Graf <agraf@suse.de>, Thomas Huth <thuth@redhat.com>
+To: Peter Xu <peterx@redhat.com>
+Cc: qemu-devel@nongnu.org, Alexey Perevalov <a.perevalov@samsung.com>, "Daniel P . Berrange" <berrange@redhat.com>, Juan Quintela <quintela@redhat.com>, Andrea Arcangeli <aarcange@redhat.com>
 
-On Mon,  4 Dec 2017 13:55:01 +0100
-David Hildenbrand <david@redhat.com> wrote:
-
-> We'll need it later on in two places. Refactor it to just indicate the
-> valid bit. While at it, introduce a define for the used CR14 bit (we'll
-
-s/valid bit/validity bits/
-
-> also need later on).
+* Peter Xu (peterx@redhat.com) wrote:
+> On Fri, Dec 01, 2017 at 04:53:28PM +0000, Dr. David Alan Gilbert wrote:
+> > * Peter Xu (peterx@redhat.com) wrote:
+> > > It is used to manually trigger the postcopy pause state.  It works just
+> > > like when we found the migration stream failed during postcopy, but
+> > > provide an explicit way for user in case of misterious socket hangs.
+> > > 
+> > > Signed-off-by: Peter Xu <peterx@redhat.com>
+> > 
+> > Can we change the name to something like 'migrate-disconnect' - pause
+> > is a bit easy to confuse with other things and this is really more
+> > an explicit network disconnect (Is it worth just making it a flag to
+> > migrate-cancel?)
 > 
-> Signed-off-by: David Hildenbrand <david@redhat.com>
-> ---
->  target/s390x/cpu.h | 20 ++++++++++++++++++++
->  target/s390x/kvm.c | 25 ++-----------------------
->  2 files changed, 22 insertions(+), 23 deletions(-)
+> Then I would prefer to reuse the migrate_cancel command.  
 > 
-> diff --git a/target/s390x/cpu.h b/target/s390x/cpu.h
-> index 9cfbbbac04..4d3e7920f5 100644
-> --- a/target/s390x/cpu.h
-> +++ b/target/s390x/cpu.h
-> @@ -351,6 +351,9 @@ extern const struct VMStateDescription vmstate_s390_cpu;
->  #define CR0_CPU_TIMER_SC        0x0000000000000400ULL
->  #define CR0_SERVICE_SC          0x0000000000000200ULL
->  
-> +/* Control register 14 bits */
-> +#define CR14_CHANNEL_REPORT_SC  0x0000000010000000ULL
-> +
->  /* MMU */
->  #define MMU_PRIMARY_IDX         0
->  #define MMU_SECONDARY_IDX       1
-> @@ -674,6 +677,23 @@ struct sysib_322 {
->  #define MCIC_VB_CT 0x0000000000020000ULL
->  #define MCIC_VB_CC 0x0000000000010000ULL
->  
-> +static inline uint64_t s390_build_validity_mcic(void)
-> +{
-> +    uint64_t mcic;
-> +
-> +    /* indicate all valid bits (no damage) */
+> Actually this reminded me about what would happen now if someone on
+> src VM sends a "migrate_cancel" during postcopy active.  It should
+> crash the VM, right?
+> 
+> Considering above, I'm thinking whether we should just make it a
+> default behavior that when do migrate_cancel during postcopy-active we
+> just do a pause instead of real cancel. After all it cannot re-start
+> the VM any more on source, so IMHO a real cancel does not mean much
+> here.  More importantly, what if someone wants to manually trigger
+> this pause but accidentally forgot to type that new flag (say,
+> -D[isconnect])?  It'll crash the VM directly.
+> 
+> What do you think?
 
-s/valid/validity/
+Yes, that's OK, just be careful about race conditions between the
+states,  for example what happens if you do a cancel and you enter
+migrate_fd_cancel in postcopy-active, but before you can actually
+cancel you end up completing, or the opposite where you do a
+migrate-start-postcopy almost immediately before migrade-cancel;
+do you get to cancel in teh active or postcopy-active state?
 
-> +    mcic = MCIC_VB_WP | MCIC_VB_MS | MCIC_VB_PM | MCIC_VB_IA | MCIC_VB_FP |
-> +           MCIC_VB_GR | MCIC_VB_CR | MCIC_VB_ST | MCIC_VB_AR | MCIC_VB_PR |
-> +           MCIC_VB_FC | MCIC_VB_CT | MCIC_VB_CC;
-> +    if (s390_has_feat(S390_FEAT_VECTOR)) {
-> +        mcic |= MCIC_VB_VR;
-> +    }
-> +    if (s390_has_feat(S390_FEAT_GUARDED_STORAGE)) {
-> +        mcic |= MCIC_VB_GS;
-> +    }
-> +    return mcic;
-> +}
-> +
 
-Not sure why this should go into cpu.h - isn't there a better header
-for it?
+> 
+> > 
+> > 
+> > > ---
+> > >  migration/migration.c | 18 ++++++++++++++++++
+> > >  qapi/migration.json   | 22 ++++++++++++++++++++++
+> > >  2 files changed, 40 insertions(+)
+> > > 
+> > > diff --git a/migration/migration.c b/migration/migration.c
+> > > index 536a771803..30348a5e27 100644
+> > > --- a/migration/migration.c
+> > > +++ b/migration/migration.c
+> > > @@ -1485,6 +1485,24 @@ void qmp_migrate_incoming(const char *uri, Error **errp)
+> > >      once = false;
+> > >  }
+> > >  
+> > > +void qmp_migrate_pause(Error **errp)
+> > > +{
+> > > +    int ret;
+> > > +    MigrationState *ms = migrate_get_current();
+> > > +
+> > > +    if (ms->state != MIGRATION_STATUS_POSTCOPY_ACTIVE) {
+> > > +        error_setg(errp, "Migration pause is currently only allowed during"
+> > > +                   " an active postcopy phase.");
+> > > +        return;
+> > > +    }
+> > > +
+> > > +    ret = qemu_file_shutdown(ms->to_dst_file);
+> > > +
+> > > +    if (ret) {
+> > > +        error_setg(errp, "Failed to pause migration stream.");
+> > > +    }
+> > > +}
+> > > +
+> > >  bool migration_is_blocked(Error **errp)
+> > >  {
+> > >      if (qemu_savevm_state_blocked(errp)) {
+> > > diff --git a/qapi/migration.json b/qapi/migration.json
+> > > index 4a3eff62f1..52901f7e2e 100644
+> > > --- a/qapi/migration.json
+> > > +++ b/qapi/migration.json
+> > > @@ -1074,6 +1074,28 @@
+> > >  { 'command': 'migrate-incoming', 'data': {'uri': 'str' } }
+> > >  
+> > >  ##
+> > > +# @migrate-pause:
+> > > +#
+> > > +# Pause an migration.  Currently it can only pause a postcopy
+> > > +# migration.  Pausing a precopy migration is not supported yet.
+> > > +#
+> > > +# It is mostly used as a manual way to trigger the postcopy paused
+> > > +# state when the network sockets hang due to some reason, so that we
+> > > +# can try a recovery afterward.
+> > 
+> > Can we say this explicitly;
+> > 'Force closes the migration connection to trigger the postcopy paused
+> >  state when the network sockets hang due to some reason, so that we
+> > can try a recovery afterwards'
+> 
+> Sure!  I'll just see where I should properly put these sentences.
 
->  
->  /* cpu.c */
->  int s390_get_clock(uint8_t *tod_high, uint64_t *tod_low);
-> diff --git a/target/s390x/kvm.c b/target/s390x/kvm.c
-> index 97c45d5537..9b8b59f2a2 100644
-> --- a/target/s390x/kvm.c
-> +++ b/target/s390x/kvm.c
-> @@ -1852,33 +1852,12 @@ void kvm_s390_io_interrupt(uint16_t subchannel_id,
->      kvm_s390_floating_interrupt(&irq);
->  }
->  
-> -static uint64_t build_channel_report_mcic(void)
-> -{
-> -    uint64_t mcic;
-> -
-> -    /* subclass: indicate channel report pending */
-> -    mcic = MCIC_SC_CP |
-> -    /* subclass modifiers: none */
-> -    /* storage errors: none */
+Thanks.
 
-I find these additional comments quite useful - can they be preserved
-in any way?
+Dave
 
-> -    /* validity bits: no damage */
-> -        MCIC_VB_WP | MCIC_VB_MS | MCIC_VB_PM | MCIC_VB_IA | MCIC_VB_FP |
-> -        MCIC_VB_GR | MCIC_VB_CR | MCIC_VB_ST | MCIC_VB_AR | MCIC_VB_PR |
-> -        MCIC_VB_FC | MCIC_VB_CT | MCIC_VB_CC;
-> -    if (s390_has_feat(S390_FEAT_VECTOR)) {
-> -        mcic |= MCIC_VB_VR;
-> -    }
-> -    if (s390_has_feat(S390_FEAT_GUARDED_STORAGE)) {
-> -        mcic |= MCIC_VB_GS;
-> -    }
-> -    return mcic;
-> -}
-> -
->  void kvm_s390_crw_mchk(void)
->  {
->      struct kvm_s390_irq irq = {
->          .type = KVM_S390_MCHK,
-> -        .u.mchk.cr14 = 1 << 28,
-> -        .u.mchk.mcic = build_channel_report_mcic(),
-> +        .u.mchk.cr14 = CR14_CHANNEL_REPORT_SC,
-
-I like this new define.
-
-> +        .u.mchk.mcic = s390_build_validity_mcic() | MCIC_SC_CP,
->      };
->      kvm_s390_floating_interrupt(&irq);
->  }
+> Thanks,
+> 
+> -- 
+> Peter Xu
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
