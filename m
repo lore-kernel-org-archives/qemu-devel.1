@@ -1,17 +1,15 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51190)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51220)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1eLrJp-0008BV-SR
-	for qemu-devel@nongnu.org; Mon, 04 Dec 2017 09:02:05 -0500
+	(envelope-from <david@redhat.com>) id 1eLrJs-0008OT-K1
+	for qemu-devel@nongnu.org; Mon, 04 Dec 2017 09:02:08 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1eLrJm-0006n8-4o
-	for qemu-devel@nongnu.org; Mon, 04 Dec 2017 09:02:01 -0500
+	(envelope-from <david@redhat.com>) id 1eLrJj-0006l2-2C
+	for qemu-devel@nongnu.org; Mon, 04 Dec 2017 09:02:04 -0500
 From: David Hildenbrand <david@redhat.com>
-Date: Mon,  4 Dec 2017 15:01:42 +0100
-Message-Id: <20171204140150.20483-2-david@redhat.com>
-In-Reply-To: <20171204140150.20483-1-david@redhat.com>
-References: <20171204140150.20483-1-david@redhat.com>
-Subject: [Qemu-devel] [PATCH v1 for-2.12 1/9] s390x/tcg: ALSI/ALSGI are
- atomic with interlocked-acccess facility 1
+Date: Mon,  4 Dec 2017 15:01:41 +0100
+Message-Id: <20171204140150.20483-1-david@redhat.com>
+Subject: [Qemu-devel] [PATCH v1 for-2.12 0/9] s390x/tcg: facilitites and
+ instructions
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -21,31 +19,64 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-s390x@nongnu.org, qemu-devel@nongnu.org
-Cc: Christian Borntraeger <borntraeger@de.ibm.com>, Cornelia Huck <cohuck@redhat.com>, Richard Henderson <rth@twiddle.net>, Alexander Graf <agraf@suse.de>, Thomas Huth <thuth@redhat.com>, David Hildenbrand <david@redhat.com>
+Cc: Christian Borntraeger <borntraeger@de.ibm.com>, Cornelia Huck <cohuck@redhat.com>, Richard Henderson <rth@twiddle.net>, Alexander Graf <agraf@suse.de>, Thomas Huth <thuth@redhat.com>
 
-We can simply reuse our ASI implementation. Only the way CC is
-calculated differs.
+Wire up some io instructions and implement new facilitites. Make sure
+to take care of MTTCG when it comes to atomic operations.
 
-Signed-off-by: David Hildenbrand <david@redhat.com>
----
- target/s390x/insn-data.def | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+As we are now able to install/boot a Fedora 26/27 as well as an upstream
+kernel compiled for z12, let's bump up the QEMU cpu model to a very
+stripped down version of a z12 (with missing base features). Take care
+of backwards compatibility (as we defined the QEMU model as
+migration-safe).
 
-diff --git a/target/s390x/insn-data.def b/target/s390x/insn-data.def
-index 57f2e5133f..166ee7c80b 100644
---- a/target/s390x/insn-data.def
-+++ b/target/s390x/insn-data.def
-@@ -70,9 +70,9 @@
-     C(0xc20b, ALFI,    RIL_a, EI,  r1, i2_32u, new, r1_32, add, addu32)
-     C(0xc20a, ALGFI,   RIL_a, EI,  r1, i2_32u, r1, 0, add, addu64)
- /* ADD LOGICAL WITH SIGNED IMMEDIATE */
--    C(0xeb6e, ALSI,    SIY,   GIE, m1_32u, i2, new, m1_32, add, addu32)
-+    D(0xeb6e, ALSI,    SIY,   GIE, la1, i2, new, 0, asi, addu32, MO_TEUL)
-     C(0xecda, ALHSIK,  RIE_d, DO,  r3, i2, new, r1_32, add, addu32)
--    C(0xeb7e, ALGSI,   SIY,   GIE, m1_64, i2, new, m1_64, add, addu64)
-+    D(0xeb7e, ALGSI,   SIY,   GIE, la1, i2, new, 0, asi, addu64, MO_TEQ)
-     C(0xecdb, ALGHSIK, RIE_d, DO,  r3, i2, r1, 0, add, addu64)
- /* ADD LOGICAL WITH SIGNED IMMEDIATE HIGH */
-     C(0xcc0a, ALSIH,   RIL_a, HW,  r1_sr32, i2, new, r1_32h, add, addu32)
+Try it yourself: https://github.com/davidhildenbrand/qemu.git s390x-queue
+
+This branch is based on https://github.com/cohuck/qemu.git s390x-next
+and contains other patches sent previously, especially
+- s390x/tcg: CCW hotplug support
+- cpus: make pause_all_cpus() play with SMP on single threaded TCG
+- cpu-exec: fix missed CPU kick during interrupt injection
+
+$ baseurl=https://ftp-stud.hs-esslingen.de/pub/fedora-secondary/releases/27/Server/s390x/os/
+$ wget ${baseurl}/images/kernel.img
+$ wget ${baseurl}/images/initrd.img
+$ qemu-img create -f qcow2 guest-tcg.qcow2 8G
+$ qemu-system-s390x \
+    -nographic -machine s390-ccw-virtio -m 2048 \
+    --accel tcg,thread=multi -smp 4,maxcpus=4 \
+    -hda guest-tcg.qcow2 \
+    -kernel kernel.img \
+    -initrd initrd.img \
+    --append "TERM=linux inst.repo=${baseurl}/ ip=dhcp inst.geoloc=0"
+
+Please note that we still have problems with floating interrupts. I have
+already patches and will send them out soon, once the current set of
+patches have been reviewed and picked up. So if you run into problems,
+try with -smp 1.
+
+
+David Hildenbrand (9):
+  s390x/tcg: ALSI/ALSGI are atomic with interlocked-acccess facility 1
+  s390x/tcg: implement Interlocked-Access Facility 2
+  s390x/tcg: wire up SET ADDRESS LIMIT
+  s390x/tcg: wire up SET CHANNEL MONITOR
+  s390x/tcg: Implement STORE CHANNEL PATH STATUS
+  s390x/tcg: Implement SIGA instruction
+  s390x/tcg: implement extract-CPU-time facility
+  s390x/tcg: we already implement the Set-Program-Parameter facility
+  s390x: change the QEMU cpu model to a stripped down z12
+
+ hw/s390x/s390-virtio-ccw.c  |  6 +++
+ target/s390x/cpu.h          |  3 ++
+ target/s390x/cpu_models.c   | 97 +++++++++++++++++++-------------------------
+ target/s390x/cpu_models.h   |  1 +
+ target/s390x/gen-features.c | 87 ++++++++++++++++++++++++++++++++++++++++
+ target/s390x/helper.h       |  2 +
+ target/s390x/insn-data.def  | 22 ++++++----
+ target/s390x/misc_helper.c  | 18 +++++++++
+ target/s390x/translate.c    | 98 +++++++++++++++++++++++++++++++++++++++++++++
+ 9 files changed, 270 insertions(+), 64 deletions(-)
+
 -- 
 2.14.3
