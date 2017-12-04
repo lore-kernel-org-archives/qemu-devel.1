@@ -1,19 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51459)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51464)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <samuel.thibault@ens-lyon.org>) id 1eLsUc-0007Og-0P
-	for qemu-devel@nongnu.org; Mon, 04 Dec 2017 10:17:14 -0500
+	(envelope-from <samuel.thibault@ens-lyon.org>) id 1eLsUc-0007Om-7C
+	for qemu-devel@nongnu.org; Mon, 04 Dec 2017 10:17:15 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <samuel.thibault@ens-lyon.org>) id 1eLsUX-0003Z8-SZ
-	for qemu-devel@nongnu.org; Mon, 04 Dec 2017 10:17:13 -0500
-Received: from mail2-relais-roc.national.inria.fr ([192.134.164.83]:3091)
+	(envelope-from <samuel.thibault@ens-lyon.org>) id 1eLsUX-0003Z7-SY
+	for qemu-devel@nongnu.org; Mon, 04 Dec 2017 10:17:14 -0500
+Received: from mail3-relais-sop.national.inria.fr ([192.134.164.104]:62349)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <samuel.thibault@ens-lyon.org>)
-	id 1eLsUX-0003XJ-Iq
+	id 1eLsUX-0003XI-Iw
 	for qemu-devel@nongnu.org; Mon, 04 Dec 2017 10:17:09 -0500
 From: Samuel Thibault <samuel.thibault@ens-lyon.org>
-Date: Mon,  4 Dec 2017 16:17:04 +0100
-Message-Id: <20171204151705.26028-1-samuel.thibault@ens-lyon.org>
-Subject: [Qemu-devel] [PULL 0/1] baum braille device update
+Date: Mon,  4 Dec 2017 16:17:05 +0100
+Message-Id: <20171204151705.26028-2-samuel.thibault@ens-lyon.org>
+In-Reply-To: <20171204151705.26028-1-samuel.thibault@ens-lyon.org>
+References: <20171204151705.26028-1-samuel.thibault@ens-lyon.org>
+Subject: [Qemu-devel] [PULL 1/1] baum: Truncate braille device size to 84x1
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,25 +27,39 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Samuel Thibault <samuel.thibault@ens-lyon.org>, peter.maydell@linaro.org
 
-warning: redirection vers https://people.debian.org/~sthibault/qemu.git/
-The following changes since commit 7edaf99759017d3e175e37cffc3536e86a3bd380:
+Baum device bigger than 84 do not actually exist, some guest drivers
+would be upset by such sizes.
 
-  Merge remote-tracking branch 'remotes/thibault/tags/samuel-thibault' into staging (2017-11-13 13:54:59 +0000)
-
-are available in the Git repository at:
-
-  http://people.debian.org/~sthibault/qemu.git tags/samuel-thibault
-
-for you to fetch changes up to 15405525fce773d43e7e5cabc2b9ac4b9d4d7672:
-
-  baum: Truncate braille device size to 84x1 (2017-12-03 19:35:50 +0100)
-
-----------------------------------------------------------------
-baum updates
-
-----------------------------------------------------------------
-Samuel Thibault (1):
-      baum: Truncate braille device size to 84x1
-
+Signed-off-by: Samuel Thibault <samuel.thibault@ens-lyon.org>
+---
  chardev/baum.c | 8 +++++++-
  1 file changed, 7 insertions(+), 1 deletion(-)
+
+diff --git a/chardev/baum.c b/chardev/baum.c
+index 67fd783a59..78b0c87625 100644
+--- a/chardev/baum.c
++++ b/chardev/baum.c
+@@ -1,7 +1,7 @@
+ /*
+  * QEMU Baum Braille Device
+  *
+- * Copyright (c) 2008, 2010-2011, 2016 Samuel Thibault
++ * Copyright (c) 2008, 2010-2011, 2016-2017 Samuel Thibault
+  *
+  * Permission is hereby granted, free of charge, to any person obtaining a copy
+  * of this software and associated documentation files (the "Software"), to deal
+@@ -239,6 +239,12 @@ static int baum_deferred_init(BaumChardev *baum)
+         brlapi_perror("baum: brlapi__getDisplaySize");
+         return 0;
+     }
++    if (baum->y > 1) {
++        baum->y = 1;
++    }
++    if (baum->x > 84) {
++        baum->x = 84;
++    }
+ 
+     con = qemu_console_lookup_by_index(0);
+     if (con && qemu_console_is_graphic(con)) {
+-- 
+2.15.0
