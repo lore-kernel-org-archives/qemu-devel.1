@@ -1,22 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44592)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44587)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1eLfw3-0006VU-DR
+	(envelope-from <dgibson@ozlabs.org>) id 1eLfw3-0006VS-4I
 	for qemu-devel@nongnu.org; Sun, 03 Dec 2017 20:52:44 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1eLfw2-0000d5-3c
+	(envelope-from <dgibson@ozlabs.org>) id 1eLfw2-0000cy-3M
 	for qemu-devel@nongnu.org; Sun, 03 Dec 2017 20:52:43 -0500
-Date: Mon, 4 Dec 2017 12:44:22 +1100
+Date: Mon, 4 Dec 2017 12:20:29 +1100
 From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20171204014422.GJ2130@umbus.fritz.box>
-References: <1512143347-20128-1-git-send-email-richard.purdie@linuxfoundation.org>
-	<20171204010040.GF2130@umbus.fritz.box>
+Message-ID: <20171204012029.GI2130@umbus.fritz.box>
+References: <20171123132955.1261-1-clg@kaod.org>
+	<20171123132955.1261-15-clg@kaod.org>
+	<20171130044922.GC3023@umbus.fritz.box>
+	<36b5b7a1-63f1-30ac-0fa6-a22b49df065f@kaod.org>
+	<20171201041015.GE30161@umbus.fritz.box>
+	<1512225938.2224.69.camel@kernel.crashing.org>
+	<1512225979.2224.70.camel@au1.ibm.com>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="zOcTNEe3AzgCmdo9"
+	protocol="application/pgp-signature"; boundary="ZY5CS28jBCfb727c"
 Content-Disposition: inline
-In-Reply-To: <20171204010040.GF2130@umbus.fritz.box>
-Subject: Re: [Qemu-devel] [Qemu-ppc] [PATCH v2] target/ppc: Fix system
- lockups caused by interrupt_request state corruption
+In-Reply-To: <1512225979.2224.70.camel@au1.ibm.com>
+Subject: Re: [Qemu-devel] [PATCH 14/25] spapr: push the XIVE EQ data in OS
+ event queue
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,68 +30,33 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Richard Purdie <richard.purdie@linuxfoundation.org>
-Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org
+To: Benjamin Herrenschmidt <benh@au1.ibm.com>
+Cc: =?iso-8859-1?Q?C=E9dric?= Le Goater <clg@kaod.org>, qemu-ppc@nongnu.org, qemu-devel@nongnu.org
 
 
---zOcTNEe3AzgCmdo9
+--ZY5CS28jBCfb727c
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Mon, Dec 04, 2017 at 12:00:40PM +1100, David Gibson wrote:
-> On Fri, Dec 01, 2017 at 03:49:07PM +0000, Richard Purdie wrote:
-> > Occasionally in Linux guests on x86_64 we're seeing logs like:
+On Sat, Dec 02, 2017 at 08:46:19AM -0600, Benjamin Herrenschmidt wrote:
+> On Sat, 2017-12-02 at 08:45 -0600, Benjamin Herrenschmidt wrote:
+> > On Fri, 2017-12-01 at 15:10 +1100, David Gibson wrote:
+> > >=20
+> > > Hm, ok.  Guest endian (or at least, not definitively host-endian) data
+> > > in a plain uint32_t makes me uncomfortable.  Could we use char data[4]
+> > > instead, to make it clear it's a byte-ordered buffer, rather than a
+> > > number as far as the XIVE is concerned.
+> > >=20
+> > > Hm.. except that doesn't quite work, because the hardware must define
+> > > which end that generation bit ends up in...
 > >=20
-> > ppc_set_irq: 0x55b4e0d562f0 n_IRQ 8 level 1 =3D> pending 00000100req 00=
-000004
-> >=20
-> > when they should read:
-> >=20
-> > ppc_set_irq: 0x55b4e0d562f0 n_IRQ 8 level 1 =3D> pending 00000100req 00=
-000002
-> >=20
-> > The "00000004" is CPU_INTERRUPT_EXITTB yet the code calls
-> > cpu_interrupt(cs, CPU_INTERRUPT_HARD) ("00000002") in this function
-> > just before the log message. Something is causing the HARD bit setting
-> > to get lost.
-> >=20
-> > The knock on effect of losing that bit is the decrementer timer interru=
-pts
-> > don't get delivered which causes the guest to sit idle in its idle hand=
-ler
-> > and 'hang'.
-> >=20
-> > The issue occurs due to races from code which sets CPU_INTERRUPT_EXITTB.
-> >=20
-> > Rather than poking directly into cs->interrupt_request, that code needs=
- to:
-> >=20
-> > a) hold BQL
-> > b) use the cpu_interrupt() helper
-> >=20
-> > This patch fixes the call sites to do this, fixing the hang.
-> >=20
-> > Signed-off-by: Richard Purdie <richard.purdie@linuxfoundation.org>
+> > It also needs to be written atomically. Just say it's big endian.
 >=20
-> I strongly suspect there's a better way to do this long term - a lot
-> of that old ppc TCG code is really crufty.  But as best I can tell,
-> this is certainly a fix over what we had.  So, applied to
-> ppc-for-2.11.
+> Also the guest reads it using be32_to_cpup...
 
-I take that back.  Running make check with this patch results in:
-
-  GTESTER check-qtest-ppc64
-**
-ERROR:/home/dwg/src/qemu/cpus.c:1582:qemu_mutex_lock_iothread: assertion fa=
-iled: (!qemu_mutex_iothread_locked())
-Broken pipe
-qemu-system-ppc64: RP: Received invalid message 0x0000 length 0x0000
-GTester: last random seed: R02S895b0f4813776bf68c147bf987e73f7b
-make: *** [/home/dwg/src/qemu/tests/Makefile.include:852: check-qtest-ppc64=
-] Error 1
-
-So, I've reverted it.
+Ok.  Definitely should be treated as BE and read/written with the be32
+DMA helper functions.
 
 --=20
 David Gibson			| I'll have my music baroque, and my code
@@ -94,24 +64,24 @@ david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
 				| _way_ _around_!
 http://www.ozlabs.org/~dgibson
 
---zOcTNEe3AzgCmdo9
+--ZY5CS28jBCfb727c
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlokqHQACgkQbDjKyiDZ
-s5KQzQ/9HPeFoOGb24YXTc0LPt65fipGOHKs0twTuHFmEt3uNK1NXSBpGpiQZVzr
-qKy9QM3C3zeZoSRT6Y3ZcUIxVSPoEvNCeI77r8uE5htEEw04+yWrY256/HkowXnx
-Bw2PNb4H3RxcV/2xaQ4qKHanyTDZtdmFpT+tFhpFeVWtT1LqkDTygAs4WapiaalT
-d9PrhpW0wPlv638jyZt8e7W3FF9REd9vrtCdWMYqAkMVmgbmPyH2fep0CCZ8Zxyw
-B/VPu8JB5f4kysDM/TLXGpBBLuat8BnjPCgx1VzbodTpiBVuZgjh6wbkhfXzH5/k
-lsiGe5E5SNVrEQpurAKu+FZ0TsUkOkiEAqlymL4e4N339IGdMQ7FZy8pckajN672
-KHji3bRiXCtNIOiuYEMxvIBbbGOpTQfvL/MjU+SDW1klGneP64Dk1cwnNv9HwNk+
-jPSdLMMlhX6OUZ4UEMUwuBZ095LW+5NhxxqIqXqsg0ySb0dCSbOdwubWEzrQNdjt
-A2SHQuONr4KzZq0jZRAfP0LnMcStBTXONDo/vaW2m02WClu4EOqwjhp83xJ+Y+S0
-64yx05FvOYU+aeNNJxtlxT77DgjPWxT17mPtHTMiOgGzKxCbr1YMR4WOzH8BVfzY
-R3dpGvCLebINmu6bbdv/D9fv94cQkup3ChC1t9OmE5L2PTGy5Z4=
-=93x1
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlokot0ACgkQbDjKyiDZ
+s5I+Pg//ULFqFeGKqWfeky16NUwkHTj7Yeck9v73HEUkkLHRpoLWtvKqsZnvTgV0
+BVdgTinIOZg6VsrCiuF9kHkLxV6WsnlE2wF+KP7EnM0e7wDx9At5rFUuFjPhQK4C
+6PbkFWheL/qjUuV2S4kHdrYB0Ae+c66XOHiJUwaKroOkByR9HQpSf754KBeh27+2
+iKHtIRd+PcO/t7eNpQdOVqIQlypgD+HO7kIhLZ6chuqBxzp+2LmdIbSSW4b4tm/M
+JaCpzrnkPMFAiz+t7833fKGmDETwDKm1h4WgHgkL9qcxddktRMoVvexSunO1a95i
+2ix0AJHJqAOSOLD+toK3N359c3UU8b94kNIwh4UHjADlDcoD/aC0K1MRkyErZ2dK
+MuMEUGGvEhA2A1bhinb0WbLkfDNjMM7S7cgQEdeUQZVSEASpk48XaU191LnyYrtW
+qYq72dfCUsn/YZkO0iDEanHDsORw80xmc1qA5pWrZqbea3YUiJwo7HarL265SMqx
+ZZk+0nygX1iQRNKntA5twW+Spsvm1a+Mpf5dlJNviwB/dxgxRUD+6hRXft8pRPoY
+UraSSyXTH149dbIfuCZfA8qAKn3E/tYbnbQvJmo2u4cRwDZwjU+TEZqOkLhoNWQ7
+dOB/f2FZuKZ8V1B7ylD53rJPJiKEOyVjaT9FYtqmCJegm1m+DOU=
+=75DD
 -----END PGP SIGNATURE-----
 
---zOcTNEe3AzgCmdo9--
+--ZY5CS28jBCfb727c--
