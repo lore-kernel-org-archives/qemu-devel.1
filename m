@@ -1,34 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34931)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36079)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1eLywB-00031r-6A
-	for qemu-devel@nongnu.org; Mon, 04 Dec 2017 17:10:08 -0500
+	(envelope-from <jsnow@redhat.com>) id 1eLz1m-0006rj-6i
+	for qemu-devel@nongnu.org; Mon, 04 Dec 2017 17:15:54 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1eLyw6-0006Ck-6S
-	for qemu-devel@nongnu.org; Mon, 04 Dec 2017 17:10:07 -0500
-Received: from indium.canonical.com ([91.189.90.7]:49216)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1eLyw6-0006CE-0C
-	for qemu-devel@nongnu.org; Mon, 04 Dec 2017 17:10:02 -0500
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1eLyw3-0000Nx-Bi
-	for <qemu-devel@nongnu.org>; Mon, 04 Dec 2017 22:09:59 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 578B12E8074
-	for <qemu-devel@nongnu.org>; Mon,  4 Dec 2017 22:09:59 +0000 (UTC)
+	(envelope-from <jsnow@redhat.com>) id 1eLz1l-0008Ek-7C
+	for qemu-devel@nongnu.org; Mon, 04 Dec 2017 17:15:54 -0500
+References: <20171109141631.25688-1-vsementsov@virtuozzo.com>
+	<8ade3dfe-ec27-a096-5d09-9e694f03935a@redhat.com>
+From: John Snow <jsnow@redhat.com>
+Message-ID: <a254716c-2762-3a1c-d4c4-d3abb23f7207@redhat.com>
+Date: Mon, 4 Dec 2017 17:15:45 -0500
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Mon, 04 Dec 2017 22:00:05 -0000
-From: Thomas Huth <1497204@bugs.launchpad.net>
-Reply-To: Bug 1497204 <1497204@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <20150918100158.14067.83526.malonedeb@chaenomeles.canonical.com>
-Message-Id: <151242480593.20350.9310664195498532528.malone@chaenomeles.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1497204] Re: qemu-system-s390x: no SMP support
- without KVM
+In-Reply-To: <8ade3dfe-ec27-a096-5d09-9e694f03935a@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [Qemu-block] [PATCH] blockdev-backup: enable
+ non-root nodes for backup
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,98 +25,24 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Max Reitz <mreitz@redhat.com>, Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org
+Cc: kwolf@redhat.com, den@openvz.org, armbru@redhat.com
 
-QEMU v2.11 has now experimental SMP support (see
-https://wiki.qemu.org/ChangeLog/2.11#s390 ... commit has been made here:
-https://git.qemu.org/?p=3Dqemu.git;a=3Dcommitdiff;h=3D11b0079cec6b1f46ba76c=
- ).
 
-** Changed in: qemu
-       Status: New =3D> Fix Committed
 
--- =
+On 12/01/2017 02:41 PM, Max Reitz wrote:
+> ((By the way, I don't suppose that's how it should work...  But I don't
+> suppose that we want propagation of dirtying towards the BDS roots, do
+> we? :-/))
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1497204
+I have never really satisfactorily explained to myself what bitmaps on
+intermediate notes truly represent or mean.
 
-Title:
-  qemu-system-s390x: no SMP support without KVM
+The simple case is "This layer itself serviced a write request."
 
-Status in QEMU:
-  Fix Committed
+If that information is not necessarily meaningful, I'm not sure that's a
+problem except in configuration.
 
-Bug description:
-  It seems SMP support is not implemented for s390x target, at least
-  when not running under KVM. There is also no error message when
-  starting qemu, it just fails when the kernel tries to bring up the
-  CPUs:
 
-  $ qemu-system-s390x -nographic -smp 8 -kernel s390x/kernel.debian =
-
-  [    0.003309] Initializing cgroup subsys cpuset
-  [    0.004183] Initializing cgroup subsys cpu
-  [    0.004263] Initializing cgroup subsys cpuacct
-  [    0.004493] Linux version 3.16.0-4-s390x (debian-kernel@lists.debian.o=
-rg) (gcc version 4.8.4 (Debian 4.8.4-1) ) #1 SMP Debian 3.16.7-ckt9-2 (2015=
--04-13)
-  [    0.005816] setup: Linux is running under KVM in 64-bit mode
-  [    0.007231] setup: Max memory size: 128MB
-  [    0.032383] Zone ranges:
-  [    0.034115]   DMA      [mem 0x00000000-0x7fffffff]
-  [    0.034652]   Normal   empty
-  [    0.034686] Movable zone start for each node
-  [    0.034737] Early memory node ranges
-  [    0.034847]   node   0: [mem 0x00000000-0x07ffffff]
-  [    0.047489] PERCPU: Embedded 12 pages/cpu @0000000007f29000 s17920 r81=
-92 d23040 u49152
-  [    0.049613] Built 1 zonelists in Zone order, mobility grouping on.  To=
-tal pages: 32320
-  [    0.049802] Kernel command line: =
-
-  [    0.053715] PID hash table entries: 512 (order: 0, 4096 bytes)
-  [    0.053993] Dentry cache hash table entries: 16384 (order: 5, 131072 b=
-ytes)
-  [    0.054330] Inode-cache hash table entries: 8192 (order: 4, 65536 byte=
-s)
-  [    0.061216] Memory: 115912K/131072K available (5701K kernel code, 847K=
- rwdata, 2512K rodata, 452K init, 776K bss, 15160K reserved)
-  [    0.062432] Write protected kernel read-only data: 0x100000 - 0x905fff
-  [    0.068906] Hierarchical RCU implementation.
-  [    0.068934]  CONFIG_RCU_FANOUT set to non-default value of 32
-  [    0.068953]  RCU dyntick-idle grace-period acceleration is enabled.
-  [    0.068989]  RCU restricting CPUs from NR_CPUS=3D32 to nr_cpu_ids=3D9.
-  [    0.069045] RCU: Adjusting geometry for rcu_fanout_leaf=3D16, nr_cpu_i=
-ds=3D9
-  [    0.070043] NR_IRQS:260
-  [    0.094273] console [ttyS1] enabled
-  [    0.095630] pid_max: default: 32768 minimum: 301
-  [    0.097792] Security Framework initialized
-  [    0.100624] AppArmor: AppArmor disabled by boot time parameter
-  [    0.100677] Yama: disabled by default; enable with sysctl kernel.yama.*
-  [    0.102466] Mount-cache hash table entries: 512 (order: 0, 4096 bytes)
-  [    0.102556] Mountpoint-cache hash table entries: 512 (order: 0, 4096 b=
-ytes)
-  [    0.116828] Initializing cgroup subsys memory
-  [    0.117460] Initializing cgroup subsys devices
-  [    0.117678] Initializing cgroup subsys freezer
-  [    0.118080] Initializing cgroup subsys net_cls
-  [    0.118267] Initializing cgroup subsys blkio
-  [    0.118393] Initializing cgroup subsys perf_event
-  [    0.118477] Initializing cgroup subsys net_prio
-  [    0.119176] ftrace: allocating 17140 entries in 67 pages
-  XXX unknown sigp: 0xb
-  XXX unknown sigp: 0xb
-  XXX unknown sigp: 0xb
-  [...]
-  XXX unknown sigp: 0xb
-  [    0.211835] cpu: 8 configured CPUs, 0 standby CPUs
-  XXX unknown sigp: 0xb
-  XXX unknown sigp: 0xb
-  [endless stream of messages continues until qemu is killed]
-
-  The XXX message is printed by qemu FWIW.
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1497204/+subscriptions
+...Now, if you wanted to talk about bitmaps that associate with a
+Backend instead of a Node...
