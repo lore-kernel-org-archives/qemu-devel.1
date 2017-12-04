@@ -1,22 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52904)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52952)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1eLmHf-000667-3I
-	for qemu-devel@nongnu.org; Mon, 04 Dec 2017 03:39:28 -0500
+	(envelope-from <dgibson@ozlabs.org>) id 1eLmHi-00066K-3L
+	for qemu-devel@nongnu.org; Mon, 04 Dec 2017 03:39:31 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1eLmHe-0000YQ-25
-	for qemu-devel@nongnu.org; Mon, 04 Dec 2017 03:39:27 -0500
-Date: Mon, 4 Dec 2017 18:52:08 +1100
+	(envelope-from <dgibson@ozlabs.org>) id 1eLmHe-0000Yd-2z
+	for qemu-devel@nongnu.org; Mon, 04 Dec 2017 03:39:30 -0500
+Date: Mon, 4 Dec 2017 18:56:16 +1100
 From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20171204075208.GT2130@umbus.fritz.box>
+Message-ID: <20171204075616.GV2130@umbus.fritz.box>
 References: <20171123132955.1261-1-clg@kaod.org>
-	<20171123132955.1261-22-clg@kaod.org>
+	<20171123132955.1261-24-clg@kaod.org>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="X9hp/qFlD/MyfJCu"
+	protocol="application/pgp-signature"; boundary="zvmqw4jX2vbPsMQB"
 Content-Disposition: inline
-In-Reply-To: <20171123132955.1261-22-clg@kaod.org>
-Subject: Re: [Qemu-devel] [PATCH 21/25] spapr: introduce a helper to map the
- XIVE memory regions
+In-Reply-To: <20171123132955.1261-24-clg@kaod.org>
+Subject: Re: [Qemu-devel] [PATCH 23/25] spapr: toggle the ICP depending on
+ the selected interrupt mode
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,97 +29,146 @@ To: =?iso-8859-1?Q?C=E9dric?= Le Goater <clg@kaod.org>
 Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, Benjamin Herrenschmidt <benh@kernel.crashing.org>
 
 
---X9hp/qFlD/MyfJCu
+--zvmqw4jX2vbPsMQB
 Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Thu, Nov 23, 2017 at 02:29:51PM +0100, C=E9dric Le Goater wrote:
-> When the XIVE interrupt mode is activated, the machine needs to expose
-> to the guest the MMIO regions use by the controller :
+On Thu, Nov 23, 2017 at 02:29:53PM +0100, C=E9dric Le Goater wrote:
+> Each interrupt mode has its own specific interrupt presenter object,
+> that we store under the CPU object, one for XICS and one for XIVE. The
+> active presenter, corresponding to the current interrupt mode, is
+> simply selected with a lookup on the children of the CPU.
 >=20
->   - Event State Buffer (ESB)
->   - Thread Interrupt Management Area (TIMA)
->=20
-> Migration will also need to reflect the current interrupt mode in use.
+> Migration and CPU hotplug also need to reflect the current interrupt
+> mode in use.
 >=20
 > Signed-off-by: C=E9dric Le Goater <clg@kaod.org>
 > ---
->  hw/intc/spapr_xive_hcall.c  | 14 ++++++++++++++
->  hw/ppc/spapr.c              |  5 +++++
->  include/hw/ppc/spapr_xive.h |  1 +
->  3 files changed, 20 insertions(+)
+>  hw/ppc/spapr.c                  | 21 ++++++++++++++++++++-
+>  hw/ppc/spapr_cpu_core.c         | 31 +++++++++++++++++++++++++++++++
+>  include/hw/ppc/spapr_cpu_core.h |  1 +
+>  3 files changed, 52 insertions(+), 1 deletion(-)
 >=20
-> diff --git a/hw/intc/spapr_xive_hcall.c b/hw/intc/spapr_xive_hcall.c
-> index 60c6c9f4be8f..ba217144878e 100644
-> --- a/hw/intc/spapr_xive_hcall.c
-> +++ b/hw/intc/spapr_xive_hcall.c
-> @@ -933,3 +933,17 @@ void spapr_xive_populate(sPAPRMachineState *spapr, i=
-nt nr_servers,
->      _FDT(fdt_setprop(fdt, 0, "ibm,plat-res-int-priorities",
->                       plat_res_int_priorities, sizeof(plat_res_int_priori=
-ties)));
->  }
-> +
-> +void spapr_xive_mmio_map(sPAPRMachineState *spapr)
-> +{
-> +    sPAPRXive *xive =3D spapr->xive;
-> +
-> +    /* ESBs */
-> +    sysbus_mmio_map(SYS_BUS_DEVICE(xive), 0, xive->esb_base);
-> +
-> +    /* Thread Management Interrupt Areas */
-> +    /* TODO: Only map the OS TIMA for the moment. Mapping the whole
-> +     * region needs some rework in the handlers */
-> +    sysbus_mmio_map(SYS_BUS_DEVICE(xive), 1,
-> +                    xive->tm_base + (1 << xive->tm_shift));
-
-You probably shouldn't be exposing the user TIMA in the DT if you're
-only allowing the OS TIME to be mapped.
-
-> +}
 > diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-> index 3a62369883cc..734706c18cb3 100644
+> index a91ec1c0751a..b7389dbdf5ca 100644
 > --- a/hw/ppc/spapr.c
 > +++ b/hw/ppc/spapr.c
-> @@ -1132,6 +1132,7 @@ static void *spapr_build_fdt(sPAPRMachineState *spa=
-pr,
+> @@ -1128,8 +1128,10 @@ static void *spapr_build_fdt(sPAPRMachineState *sp=
+apr,
+> =20
+>      /* /interrupt controller */
+>      if (!spapr_ovec_test(spapr->ov5_cas, OV5_XIVE_EXPLOIT)) {
+> +        spapr_cpu_core_set_icp(spapr->icp_type);
+>          spapr_dt_xics(xics_max_server_number(), fdt, PHANDLE_XICP);
 >      } else {
+> +        spapr_cpu_core_set_icp(TYPE_SPAPR_XIVE_ICP);
+
+Again you shouldn't have non-DT side-effects from spapr_build_fdt().
+
 >          /* Populate device tree for XIVE */
 >          spapr_xive_populate(spapr, xics_max_server_number(), fdt, PHANDL=
 E_XICP);
-> +        spapr_xive_mmio_map(spapr);
-
-This doesn't belong here, spapr_build_fdt() should _just_ build the
-fdt, not have side effects on the actual device state.
-
+>          spapr_xive_mmio_map(spapr);
+> @@ -1615,6 +1617,7 @@ static int spapr_post_load(void *opaque, int versio=
+n_id)
 >      }
 > =20
->      ret =3D spapr_populate_memory(spapr, fdt);
-> @@ -1613,6 +1614,10 @@ static int spapr_post_load(void *opaque, int versi=
-on_id)
->          }
+>      if (spapr_ovec_test(spapr->ov5_cas, OV5_XIVE_EXPLOIT)) {
+> +        spapr_cpu_core_set_icp(TYPE_SPAPR_XIVE_ICP);
+>          spapr_xive_mmio_map(spapr);
 >      }
 > =20
-> +    if (spapr_ovec_test(spapr->ov5_cas, OV5_XIVE_EXPLOIT)) {
-> +        spapr_xive_mmio_map(spapr);
+> @@ -3610,7 +3613,7 @@ static ICPState *spapr_icp_get(XICSFabric *xi, int =
+vcpu_id)
+>  Object *spapr_icp_create(sPAPRMachineState *spapr, CPUState *cs, Error *=
+*errp)
+>  {
+>      Error *local_err =3D NULL;
+> -    Object *obj;
+> +    Object *obj, *obj_xive;
+> =20
+>      obj =3D icp_create(cs, spapr->icp_type, XICS_FABRIC(spapr), &local_e=
+rr);
+>      if (local_err) {
+> @@ -3618,6 +3621,22 @@ Object *spapr_icp_create(sPAPRMachineState *spapr,=
+ CPUState *cs, Error **errp)
+>          return NULL;
+>      }
+> =20
+> +    /* Add a XIVE interrupt presenter. The machine will switch the CPU
+> +     * ICP depending on the interrupt model negotiated at CAS time.
+> +     */
+> +    obj_xive =3D icp_create(cs, TYPE_SPAPR_XIVE_ICP, XICS_FABRIC(spapr),
+> +                          &local_err);
+
+You shouldn't be using icp_create() a xics function, for xive.
+
+> +    if (local_err) {
+> +        object_unparent(obj);
+> +        error_propagate(errp, local_err);
+> +        return NULL;
 > +    }
 > +
->      return err;
+> +    /* when hotplugged, the CPU should have the correct ICP */
+> +    if (spapr_ovec_test(spapr->ov5_cas, OV5_XIVE_EXPLOIT)) {
+> +        return obj_xive;
+> +    }
+> +
+>      return obj;
 >  }
 > =20
-> diff --git a/include/hw/ppc/spapr_xive.h b/include/hw/ppc/spapr_xive.h
-> index f6d4bf26e06a..88355f7eb643 100644
-> --- a/include/hw/ppc/spapr_xive.h
-> +++ b/include/hw/ppc/spapr_xive.h
-> @@ -84,5 +84,6 @@ typedef struct sPAPRMachineState sPAPRMachineState;
->  void spapr_xive_hcall_init(sPAPRMachineState *spapr);
->  void spapr_xive_populate(sPAPRMachineState *spapr, int nr_servers, void =
-*fdt,
->                           uint32_t phandle);
-> +void spapr_xive_mmio_map(sPAPRMachineState *spapr);
+> diff --git a/hw/ppc/spapr_cpu_core.c b/hw/ppc/spapr_cpu_core.c
+> index 61a9850e688b..b0e39270f262 100644
+> --- a/hw/ppc/spapr_cpu_core.c
+> +++ b/hw/ppc/spapr_cpu_core.c
+> @@ -257,3 +257,34 @@ static const TypeInfo spapr_cpu_core_type_infos[] =
+=3D {
+>  };
 > =20
->  #endif /* PPC_SPAPR_XIVE_H */
+>  DEFINE_TYPES(spapr_cpu_core_type_infos)
+> +
+> +typedef struct ForeachFindICPArgs {
+> +    const char *icp_type;
+> +    Object *icp;
+> +} ForeachFindICPArgs;
+> +
+> +static int spapr_cpu_core_find_icp(Object *child, void *opaque)
+> +{
+> +    ForeachFindICPArgs *args =3D opaque;
+> +
+> +    if (object_dynamic_cast(child, args->icp_type)) {
+> +        args->icp =3D child;
+> +    }
+> +
+> +    return args->icp !=3D NULL;
+> +}
+> +
+> +void spapr_cpu_core_set_icp(const char *icp_type)
+> +{
+> +    CPUState *cs;
+> +
+> +    CPU_FOREACH(cs) {
+> +        ForeachFindICPArgs args =3D { icp_type, NULL };
+> +        PowerPCCPU *cpu =3D POWERPC_CPU(cs);
+> +
+> +        object_child_foreach(OBJECT(cs), spapr_cpu_core_find_icp, &args);
+> +        g_assert(args.icp);
+> +
+> +        cpu->intc =3D args.icp;
+> +    }
+> +}
+> diff --git a/include/hw/ppc/spapr_cpu_core.h b/include/hw/ppc/spapr_cpu_c=
+ore.h
+> index f2d48d6a6786..a657dfb8863c 100644
+> --- a/include/hw/ppc/spapr_cpu_core.h
+> +++ b/include/hw/ppc/spapr_cpu_core.h
+> @@ -38,4 +38,5 @@ typedef struct sPAPRCPUCoreClass {
+>  } sPAPRCPUCoreClass;
+> =20
+>  const char *spapr_get_cpu_core_type(const char *cpu_type);
+> +void spapr_cpu_core_set_icp(const char *icp_type);
+>  #endif
 
 --=20
 David Gibson			| I'll have my music baroque, and my code
@@ -127,24 +176,24 @@ david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
 				| _way_ _around_!
 http://www.ozlabs.org/~dgibson
 
---X9hp/qFlD/MyfJCu
+--zvmqw4jX2vbPsMQB
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlok/qgACgkQbDjKyiDZ
-s5JNAA/7Bo8TOzSBjOu4BemhYEltuxNvmYVtOf0Zkk68b+Vftp3TSzLCz9oIJlpI
-T//QdO1LCrkUkdBAixIwsdB6YSJVxfREAExgDfNsiEK+H24vSlkM52ayKcvlJvBQ
-wChPfxgLQ5U9NcQia3smSivG7edqFCl9JmM//RwILMsPkVlgpqq6k7oVSmZRanNt
-DkK2x5TxYX2en9OCahIiOng2tUM9d11ju7m47fG6dbc7KWO1dyczL37J7h7Eru2i
-ZP38dUuyDSD/vcK1qpmAP6Dfoirxp8elRXiy+EbcR4T+670R51uMWaVvlBSfQSCD
-xoWYmV6Qrt4K8eUvW4Oe2tF3+P+0OoXa70NeS7zYEu7YSkPYnkvKqneLEq7F7sye
-dXVt3SsdVj+cSNx3bNDkSLm7BlrqV6Sf/MH3YVzgAcR/ctMmQbm7zMyLMRd6XhL/
-gKYXyPan0wwlhZZsiFnOEntXLyt59Q8Su8yNRwuQEglSeAJfoYM8tDkTP/ApiumB
-b1Y4dAaNhoIyIimfB8j2pU56JXMW66LZQW89ZUpsO9Qe8UuqcNP3Rjfwj5Z5n6KR
-n+MgQZxE4kFhBi9eqsECD3A/eGFKy33Jgw6MqxxLKr/ovltNcHYpUsnmIuGQl1wP
-51TxAH98/JOeK7F4RiBmKRItjNbA97Ww5rQDLa8bsKL6oqZ43eI=
-=RJhl
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlok/6AACgkQbDjKyiDZ
+s5IsmhAAvLd+kkiS0K5u2GjtDqeXj/E0squr4DEMKSlnhfRjWqr6ouUMLsK0gQwC
+VjbBpbJckpqbosZx9E81tsMwpNlKCWZheKRxLA+vbAPF0QITwT9nBIX65Rgz3h5m
+uvZM/j9I3+MKj76iZ33sVe5gaBnHRMRGz/IkYfTummfgqA+0kKMQXhcJTgeMR2jl
+eMmp953XDBUQN/AFNWokCKI4ySKkpBoqcBP9IBToTgeRka2D58Mq+RnVbPRiXaXp
+L89RMzbDn1QdrpZWGd6s4d5cbmGcOpZH2c4VMjPtIDm5hd3sX4hvSyDiyVtmCU/6
+4ALyNgbMsBX+bosYqgpIu5Hktrki1uwc8JqwIl9h1ys+C9Xy61yBRH1cT25TnE1g
+fxBfF0EE6xVy0RrXAtf6WU3TfZe3tXFuMaSbQqLaStbnsOjYyE3uxxaPa0veJ1bP
+2soa437Y22I9+qxswos5yZF82dWkv8gj2aan7On9Ihj/pkIZVXR2vpjgNvEQ+urv
+gZ0CG4PsQnTdkPbhFinCpMpPNNW7HI56wGa96TMci+x9USqxF2dLglABOHiuhZBz
+J7u1edcrT3vQLhHPi8UpiQBXYVBON5htrjgGeRtxboj2rliqrz/+a2tko1qAA4qm
+mF+KfoBZXbA6V4mHrUpLbzkGw9FeBK84zdglkC2iRnrP2Qp+SEg=
+=TgIe
 -----END PGP SIGNATURE-----
 
---X9hp/qFlD/MyfJCu--
+--zvmqw4jX2vbPsMQB--
