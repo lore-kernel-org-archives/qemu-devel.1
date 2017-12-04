@@ -1,24 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40097)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41284)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.purdie@linuxfoundation.org>)
-	id 1eLzEJ-0005Ze-FN
-	for qemu-devel@nongnu.org; Mon, 04 Dec 2017 17:28:52 -0500
+	(envelope-from <jsnow@redhat.com>) id 1eLzHn-0007lc-4t
+	for qemu-devel@nongnu.org; Mon, 04 Dec 2017 17:32:28 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.purdie@linuxfoundation.org>)
-	id 1eLzEI-0006uz-JP
-	for qemu-devel@nongnu.org; Mon, 04 Dec 2017 17:28:51 -0500
-Message-ID: <1512426516.862.222.camel@linuxfoundation.org>
-From: Richard Purdie <richard.purdie@linuxfoundation.org>
-Date: Mon, 04 Dec 2017 22:28:36 +0000
-In-Reply-To: <20171204014422.GJ2130@umbus.fritz.box>
-References: <1512143347-20128-1-git-send-email-richard.purdie@linuxfoundation.org>
-	<20171204010040.GF2130@umbus.fritz.box>
-	<20171204014422.GJ2130@umbus.fritz.box>
-Content-Type: text/plain; charset="UTF-8"
-Mime-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [Qemu-ppc] [PATCH v2] target/ppc: Fix system
- lockups caused by interrupt_request state corruption
+	(envelope-from <jsnow@redhat.com>) id 1eLzHl-0008Mh-TP
+	for qemu-devel@nongnu.org; Mon, 04 Dec 2017 17:32:27 -0500
+References: <1509551048-129830-1-git-send-email-anton.nefedov@virtuozzo.com>
+From: John Snow <jsnow@redhat.com>
+Message-ID: <51f11f12-3cd1-2db0-8969-1c5b2cdcdae4@redhat.com>
+Date: Mon, 4 Dec 2017 17:32:16 -0500
+MIME-Version: 1.0
+In-Reply-To: <1509551048-129830-1-git-send-email-anton.nefedov@virtuozzo.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [Qemu-block] [PATCH v5 00/15] qcow2: space
+ preallocation and COW improvements
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,82 +24,108 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Gibson <david@gibson.dropbear.id.au>
-Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org
+To: Anton Nefedov <anton.nefedov@virtuozzo.com>, qemu-devel@nongnu.org
+Cc: kwolf@redhat.com, den@virtuozzo.com, qemu-block@nongnu.org, mreitz@redhat.com
 
-On Mon, 2017-12-04 at 12:44 +1100, David Gibson wrote:
-> On Mon, Dec 04, 2017 at 12:00:40PM +1100, David Gibson wrote:
-> >=20
-> > On Fri, Dec 01, 2017 at 03:49:07PM +0000, Richard Purdie wrote:
-> > >=20
-> > > Occasionally in Linux guests on x86_64 we're seeing logs like:
-> > >=20
-> > > ppc_set_irq: 0x55b4e0d562f0 n_IRQ 8 level 1 =3D> pending
-> > > 00000100req 00000004
-> > >=20
-> > > when they should read:
-> > >=20
-> > > ppc_set_irq: 0x55b4e0d562f0 n_IRQ 8 level 1 =3D> pending
-> > > 00000100req 00000002
-> > >=20
-> > > The "00000004" is CPU_INTERRUPT_EXITTB yet the code calls
-> > > cpu_interrupt(cs, CPU_INTERRUPT_HARD) ("00000002") in this
-> > > function
-> > > just before the log message. Something is causing the HARD bit
-> > > setting
-> > > to get lost.
-> > >=20
-> > > The knock on effect of losing that bit is the decrementer timer
-> > > interrupts
-> > > don't get delivered which causes the guest to sit idle in its
-> > > idle handler
-> > > and 'hang'.
-> > >=20
-> > > The issue occurs due to races from code which sets
-> > > CPU_INTERRUPT_EXITTB.
-> > >=20
-> > > Rather than poking directly into cs->interrupt_request, that code
-> > > needs to:
-> > >=20
-> > > a) hold BQL
-> > > b) use the cpu_interrupt() helper
-> > >=20
-> > > This patch fixes the call sites to do this, fixing the hang.
-> > >=20
-> > > Signed-off-by: Richard Purdie <richard.purdie@linuxfoundation.org
-> > > >
-> > I strongly suspect there's a better way to do this long term - a
-> > lot
-> > of that old ppc TCG code is really crufty.=C2=A0=C2=A0But as best I c=
-an tell,
-> > this is certainly a fix over what we had.=C2=A0=C2=A0So, applied to
-> > ppc-for-2.11.
-> I take that back.=C2=A0=C2=A0Running make check with this patch results=
- in:
->=20
-> =C2=A0 GTESTER check-qtest-ppc64
-> **
-> ERROR:/home/dwg/src/qemu/cpus.c:1582:qemu_mutex_lock_iothread:
-> assertion failed: (!qemu_mutex_iothread_locked())
-> Broken pipe
-> qemu-system-ppc64: RP: Received invalid message 0x0000 length 0x0000
-> GTester: last random seed: R02S895b0f4813776bf68c147bf987e73f7b
-> make: *** [/home/dwg/src/qemu/tests/Makefile.include:852: check-
-> qtest-ppc64] Error 1
->=20
-> So, I've reverted it.
+Friendly ping; this has gone over 30 days without a reply on the list. I
+recommend rebasing and trying again after 2.11 hits.
 
-Sorry about that. I tried to stress the code paths and no issues showed
-up in our testing but hadn't realised those tests existed.
+Thanks,
+--John
 
-Given there do seem to be mixed locked and unlocked code paths I've
-taken a different approach and sent a v3 which passes those tests.
-
-I do agree with you that there is probably a better way but that would
-need someone with a better understanding of the bigger picture than I
-have. This patch does stop our image tests locking up so does seem to
-fix a valid/real problem which people can run into.
-
-Cheers,
-
-Richard
+On 11/01/2017 11:43 AM, Anton Nefedov wrote:
+> v5: rebased, patches slightly reordered;
+>     cluster allocation (to avoid writing zero-buffers)
+>     now goes before an optional ahead preallocation
+> 
+> v4: http://lists.nongnu.org/archive/html/qemu-devel/2017-08/msg00109.html
+> 
+> This pull request is to improve a few performance problems of qcow2 format:
+> 
+>   1. non cluster-aligned write requests (to unallocated clusters) explicitly
+>      pad data with zeroes if there is no backing data.
+>      Resulting increase in ops number and potential cluster fragmentation
+>      (on the host file) is already solved by:
+>        ee22a9d qcow2: Merge the writing of the COW regions with the guest data
+>      However, in case of zero COW regions, that can be avoided at all
+>      but the whole clusters are preallocated and zeroed in a single
+>      efficient write_zeroes() operation
+> 
+>   2. moreover, efficient write_zeroes() operation can be used to preallocate
+>      space megabytes (*configurable number) ahead which gives noticeable
+>      improvement on some storage types (e.g. distributed storage)
+>      where the space allocation operation might be expensive)
+> 
+>   3. this will also allow to enable simultaneous writes to the same unallocated
+>      cluster after the space has been allocated & zeroed but before
+>      the first data is written and the cluster is linked to L2.
+>      (Not included in this patchset).
+> 
+> Efficient write_zeroes usually implies that the blocks are not actually
+> written to but only reserved and marked as zeroed by the storage.
+> In this patchset, file-posix driver is marked as supporting this operation
+> if it supports (/configured to support) fallocate() operation.
+> 
+> Existing bdrv_write_zeroes() falls back to writing zero buffers if
+> write_zeroes is not supported by the driver.
+> A new flag (BDRV_REQ_ALLOCATE) is introduced to avoid that but return ENOTSUP.
+> Such allocate requests are also implemented to possibly overlap with the
+> other requests. No wait is performed but an error returned in such case as well.
+> So the operation should be considered advisory and a fallback scenario still
+> handled by the caller (in this case, qcow2 driver).
+> 
+> Anton Nefedov (12):
+>   mirror: inherit supported write/zero flags
+>   blkverify: set supported write/zero flags
+>   block: introduce BDRV_REQ_ALLOCATE flag
+>   block: treat BDRV_REQ_ALLOCATE as serialising
+>   file-posix: support BDRV_REQ_ALLOCATE
+>   block: support BDRV_REQ_ALLOCATE in passthrough drivers
+>   qcow2: move is_zero() up
+>   qcow2: skip writing zero buffers to empty COW areas
+>   qcow2: set inactive flag
+>   qcow2: do not zero out clusters if already preallocated
+>   iotest 198: test BDRV_REQ_ALLOCATE
+>   iotest 134: test cluster-misaligned encrypted write
+> 
+> Denis V. Lunev (2):
+>   qcow2: preallocation at image expand
+>   qcow2: truncate preallocated space
+> 
+> Pavel Butsykin (1):
+>   qcow2: check space leak at the end of the image
+> 
+>  block/qcow2.h                      |  18 ++++
+>  include/block/block.h              |   6 +-
+>  include/block/block_int.h          |   2 +-
+>  block/blkdebug.c                   |   3 +-
+>  block/blkverify.c                  |   9 ++
+>  block/file-posix.c                 |   8 ++
+>  block/io.c                         |  47 +++++++--
+>  block/mirror.c                     |   5 +
+>  block/qcow2-cluster.c              |  14 ++-
+>  block/qcow2-refcount.c             |   7 ++
+>  block/qcow2.c                      | 202 +++++++++++++++++++++++++++++++++----
+>  block/raw-format.c                 |   3 +-
+>  block/trace-events                 |   1 +
+>  qemu-options.hx                    |   4 +
+>  tests/qemu-iotests/026.out         |  94 +++++++++++++----
+>  tests/qemu-iotests/026.out.nocache |  94 +++++++++++++----
+>  tests/qemu-iotests/029.out         |   5 +-
+>  tests/qemu-iotests/060             |   2 +-
+>  tests/qemu-iotests/060.out         |  13 ++-
+>  tests/qemu-iotests/061.out         |   5 +-
+>  tests/qemu-iotests/066             |   2 +-
+>  tests/qemu-iotests/066.out         |   9 +-
+>  tests/qemu-iotests/098.out         |   7 +-
+>  tests/qemu-iotests/108.out         |   5 +-
+>  tests/qemu-iotests/112.out         |   5 +-
+>  tests/qemu-iotests/134             |   9 ++
+>  tests/qemu-iotests/134.out         |  10 ++
+>  tests/qemu-iotests/198             | 146 +++++++++++++++++++++++++++
+>  tests/qemu-iotests/198.out         |  50 +++++++++
+>  tests/qemu-iotests/group           |   1 +
+>  30 files changed, 693 insertions(+), 93 deletions(-)
+>  create mode 100755 tests/qemu-iotests/198
+>  create mode 100644 tests/qemu-iotests/198.out
+> 
