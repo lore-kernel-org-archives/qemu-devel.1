@@ -1,28 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39455)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44681)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1eLiuK-0006em-RF
-	for qemu-devel@nongnu.org; Mon, 04 Dec 2017 00:03:10 -0500
+	(envelope-from <wei.w.wang@intel.com>) id 1eLjRi-0006xl-4N
+	for qemu-devel@nongnu.org; Mon, 04 Dec 2017 00:37:39 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1eLiuH-0007iS-Nm
-	for qemu-devel@nongnu.org; Mon, 04 Dec 2017 00:03:08 -0500
-Received: from ozlabs.org ([103.22.144.67]:56641)
+	(envelope-from <wei.w.wang@intel.com>) id 1eLjRe-0006tU-Vy
+	for qemu-devel@nongnu.org; Mon, 04 Dec 2017 00:37:38 -0500
+Received: from mga09.intel.com ([134.134.136.24]:44304)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgibson@ozlabs.org>) id 1eLiuH-0007hM-3k
-	for qemu-devel@nongnu.org; Mon, 04 Dec 2017 00:03:05 -0500
-Date: Mon, 4 Dec 2017 15:40:20 +1100
-From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20171204044020.GM2130@umbus.fritz.box>
-References: <20171129084628.12336-1-david@gibson.dropbear.id.au>
-	<20171129084628.12336-4-david@gibson.dropbear.id.au>
-	<abaddfae-f0f0-cbe3-93b5-b2f102290725@redhat.com>
-	<20171130040248.GU3023@umbus.fritz.box>
-	<20171201182840-mutt-send-email-mst@kernel.org>
+	(Exim 4.71) (envelope-from <wei.w.wang@intel.com>)
+	id 1eLjRe-0006sj-Mt
+	for qemu-devel@nongnu.org; Mon, 04 Dec 2017 00:37:34 -0500
+Message-ID: <5A24DF90.5070401@intel.com>
+Date: Mon, 04 Dec 2017 13:39:28 +0800
+From: Wei Wang <wei.w.wang@intel.com>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="+2GlJm56SCtLHYlr"
-Content-Disposition: inline
-In-Reply-To: <20171201182840-mutt-send-email-mst@kernel.org>
-Subject: Re: [Qemu-devel] [for-2.12 3/7] pci: Fold pci_bus.h into pci.h
+References: <1511963726-34070-1-git-send-email-wei.w.wang@intel.com>
+	<1511963726-34070-11-git-send-email-wei.w.wang@intel.com>
+	<20171201173951-mutt-send-email-mst@kernel.org>
+In-Reply-To: <20171201173951-mutt-send-email-mst@kernel.org>
+Content-Type: text/plain; charset=windows-1252; format=flowed
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v18 10/10] virtio-balloon: don't report
+ free pages when page poisoning is enabled
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,75 +31,68 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: Marcel Apfelbaum <marcel@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, Igor Mammedov <imammedo@redhat.com>, qemu-devel@nongnu.org
+Cc: virtio-dev@lists.oasis-open.org, linux-kernel@vger.kernel.org, qemu-devel@nongnu.org, virtualization@lists.linux-foundation.org, kvm@vger.kernel.org, linux-mm@kvack.org, mhocko@kernel.org, akpm@linux-foundation.org, mawilcox@microsoft.com, david@redhat.com, penguin-kernel@I-love.SAKURA.ne.jp, cornelia.huck@de.ibm.com, mgorman@techsingularity.net, aarcange@redhat.com, amit.shah@redhat.com, pbonzini@redhat.com, willy@infradead.org, liliang.opensource@gmail.com, yang.zhang.wz@gmail.com, quan.xu@aliyun.com, nilal@redhat.com, riel@redhat.com
+
+On 12/01/2017 11:49 PM, Michael S. Tsirkin wrote:
+> On Wed, Nov 29, 2017 at 09:55:26PM +0800, Wei Wang wrote:
+>> The guest free pages should not be discarded by the live migration thread
+>> when page poisoning is enabled with PAGE_POISONING_NO_SANITY=n, because
+>> skipping the transfer of such poisoned free pages will trigger false
+>> positive when new pages are allocated and checked on the destination.
+>> This patch skips the reporting of free pages in the above case.
+>>
+>> Reported-by: Michael S. Tsirkin <mst@redhat.com>
+>> Signed-off-by: Wei Wang <wei.w.wang@intel.com>
+>> Cc: Michal Hocko <mhocko@suse.com>
+>> ---
+>>   drivers/virtio/virtio_balloon.c | 4 +++-
+>>   1 file changed, 3 insertions(+), 1 deletion(-)
+>>
+>> diff --git a/drivers/virtio/virtio_balloon.c b/drivers/virtio/virtio_balloon.c
+>> index 035bd3a..6ac4cff 100644
+>> --- a/drivers/virtio/virtio_balloon.c
+>> +++ b/drivers/virtio/virtio_balloon.c
+>> @@ -652,7 +652,9 @@ static void report_free_page(struct work_struct *work)
+>>   	/* Start by sending the obtained cmd id to the host with an outbuf */
+>>   	send_one_desc(vb, vb->free_page_vq, virt_to_phys(&vb->start_cmd_id),
+>>   		      sizeof(uint32_t), false, true, false);
+>> -	walk_free_mem_block(vb, 0, &virtio_balloon_send_free_pages);
+>> +	if (!(page_poisoning_enabled() &&
+>> +	    !IS_ENABLED(CONFIG_PAGE_POISONING_NO_SANITY)))
+>> +		walk_free_mem_block(vb, 0, &virtio_balloon_send_free_pages);
+>>   	/*
+>>   	 * End by sending the stop id to the host with an outbuf. Use the
+>>   	 * non-batching mode here to trigger a kick after adding the stop id.
+> PAGE_POISONING_ZERO is actually OK.
+
+I think the 0-filled pages still need to be sent. If the host on the 
+destination doesn't use PAGE_POISONING_ZERO, then the pages it offers to 
+the guest on the destination may have non-0 values.
 
 
---+2GlJm56SCtLHYlr
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
 
-On Fri, Dec 01, 2017 at 06:29:39PM +0200, Michael S. Tsirkin wrote:
-> On Thu, Nov 30, 2017 at 03:02:48PM +1100, David Gibson wrote:
-> > On Wed, Nov 29, 2017 at 12:38:00PM +0200, Marcel Apfelbaum wrote:
-> > > On 29/11/2017 10:46, David Gibson wrote:
-> > > > include/hw/pci/pci_bus.h is now very small and can only safely be i=
-ncluded
-> > > > after hw/pci/pci.h.  So, just fold it into pci.h.
-> > > >=20
-> > >=20
-> > > I don't get the benefit from merging the header files.
-> > > I would go the other way around and find stuff specific
-> > > to pci_bus and add it there, like the pci_bus_new*
-> > > you touched in the prev patch.
-> >=20
-> > Hrm.  Except the point of the earlier patch was that those are
-> > actually spoecific to root buses, so would really belong in say
-> > pci-host.h, rather than pci-bus.h.
-> >=20
-> > A log of PCI stuff deals with interaction between the device and bus
-> > though, so it just seemed like more trouble than it was worth to go
-> > disentangling them properly.
-> >=20
-> > > Maybe if *all* code files requiring pci.h would automatically
-> > > need pci_bus.h would make sense, but I didn't check that.
-> >=20
-> > Yeah, I don't think every user of pci.h needs pci_bus.h, although a
-> > fair few do as you can see from the diff.  Well, I guess it's up to
-> > Michael.  I'll be tolerably content either way - I'd say this is the
-> > least important patch of the series.
->=20
-> I'm inclined to agree with Marcel also because it's lots of noise for no
-> real win.  The next patch depends on this one. I skipped this and next
-> one, pls feel free to repost next one.
+>
+> But I really would prefer it that we still send pages to host,
+> otherwise debugging becomes much harder.
+>
+> And it does not have to be completely useless, even though
+> you can not discard them as they would be zero-filled then.
+>
+> How about a config field telling host what should be there in the free
+> pages? This way even though host can not discard them, host can send
+> them out without reading them, still a win.
+>
+>
 
-Ok, will do.  I have some other cleanups in mind, so if I can finish
-them time, I'll fold them in as well.
+OK, but I think we would need two 32-bit config registers:
 
---=20
-David Gibson			| I'll have my music baroque, and my code
-david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
-				| _way_ _around_!
-http://www.ozlabs.org/~dgibson
+__u32 page_poison_val; // stores the PAGE_POISON VALUE, but it couldn't 
+indicate if page poisoning is in use
 
---+2GlJm56SCtLHYlr
-Content-Type: application/pgp-signature; name="signature.asc"
+__u32 special_features; // set bit 0 to indicate page poisoning is in use
 
------BEGIN PGP SIGNATURE-----
+#define VIRTIO_BALLOON_SF_PAGE_POISON (1 << 0)
 
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlok0a4ACgkQbDjKyiDZ
-s5I1qxAAt+2Haf+k15rHgP8kOGkkLGlbip1W7D8pNN3yV23Paln55qB8RNVtKLkd
-wvy2Z7ew6nLv5CoqvSVj4xuiyGS6HEDQ/1N7sfzsuvs72qzDwV5LppyOYki6sykV
-oDjNLn7DSkg7gDggsnx7l/YhpfAivW8H+mCkKXZsaLEwruH1dxIc6UKt6+bR0YoQ
-vpCa+ybfQuFZWg4wFTL6cB5yrxcnPQsdSNIio0Cvb1jR7imdHBjpj13egHGBCrPR
-lVyzDISaP5jGsK/WYnF0JS0DG/n0/W4/eFoAe9kHeKo33SbDPDMMXTv5+wYlx8+U
-0DoXoPqNW9D5n7lZGUOyx7/UMUHKgMOcckoccW09XQXytotlKm7UsHb+Yu4dSNOi
-tOcm033ala25ka4m0Nn/EmTGgIY1FecZTBIJ3U/MisxaK5G2smSMrRDcswg6ZlCk
-jb7wMZKcF/71K+MnoB9Dgznjsrlrd+8Z6uQPGZibuAy6788Kbv41AQax7YeM55Xd
-k5wiOy1805L8WuYPtVWD/8jRoamUGH48p5bcIYYazNCTS+aBecSgfYaowjMx2Zdi
-g5KjQnOsvG7muQCCNCCsEe31KTlECL77gs8M9c/nIJ/joc4yGD0kePnymXvG7Wg3
-sXSWCNw1NiDICkx7qyDu8SH4oxekj1jzVqkZ4peI5AU7FwXVT7E=
-=iSMl
------END PGP SIGNATURE-----
 
---+2GlJm56SCtLHYlr--
+Best,
+Wei
