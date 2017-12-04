@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51384)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51510)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1eLrK7-0000rw-S8
-	for qemu-devel@nongnu.org; Mon, 04 Dec 2017 09:02:24 -0500
+	(envelope-from <david@redhat.com>) id 1eLrKL-0001P2-0z
+	for qemu-devel@nongnu.org; Mon, 04 Dec 2017 09:02:37 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1eLrK7-0006wk-6U
-	for qemu-devel@nongnu.org; Mon, 04 Dec 2017 09:02:19 -0500
+	(envelope-from <david@redhat.com>) id 1eLrKE-0006zU-RT
+	for qemu-devel@nongnu.org; Mon, 04 Dec 2017 09:02:32 -0500
 From: David Hildenbrand <david@redhat.com>
-Date: Mon,  4 Dec 2017 15:01:47 +0100
-Message-Id: <20171204140150.20483-7-david@redhat.com>
+Date: Mon,  4 Dec 2017 15:01:48 +0100
+Message-Id: <20171204140150.20483-8-david@redhat.com>
 In-Reply-To: <20171204140150.20483-1-david@redhat.com>
 References: <20171204140150.20483-1-david@redhat.com>
-Subject: [Qemu-devel] [PATCH v1 for-2.12 6/9] s390x/tcg: Implement SIGA
- instruction
+Subject: [Qemu-devel] [PATCH v1 for-2.12 7/9] s390x/tcg: implement
+ extract-CPU-time facility
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,49 +23,97 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-s390x@nongnu.org, qemu-devel@nongnu.org
 Cc: Christian Borntraeger <borntraeger@de.ibm.com>, Cornelia Huck <cohuck@redhat.com>, Richard Henderson <rth@twiddle.net>, Alexander Graf <agraf@suse.de>, Thomas Huth <thuth@redhat.com>, David Hildenbrand <david@redhat.com>
 
-I have no idea what that instruction does, but KVM seems to suppress it,
-setting cc=3 (and as it seems to be an io instruction, it should be
-protected). Let's do the same for TCG, so we're at least equal.
+It only provies the EXTRACT CPU TIME instruction. We can reuse the stpt
+helper, which calculates the CPU timer value.
 
-(it is used in the kernel for qdio, I wasn't even able to find the real
- name of that instruction)
+As the instruction is not priviledged, but we don't have a CPU timer
+value in case of linux user, we simply fake the CPU timer to be 0.
 
 Signed-off-by: David Hildenbrand <david@redhat.com>
 ---
- target/s390x/insn-data.def | 1 +
- target/s390x/translate.c   | 8 ++++++++
- 2 files changed, 9 insertions(+)
+ target/s390x/cpu_models.c  |  1 +
+ target/s390x/insn-data.def |  2 ++
+ target/s390x/translate.c   | 36 ++++++++++++++++++++++++++++++++++++
+ 3 files changed, 39 insertions(+)
 
+diff --git a/target/s390x/cpu_models.c b/target/s390x/cpu_models.c
+index 94d24e423d..0be037eac1 100644
+--- a/target/s390x/cpu_models.c
++++ b/target/s390x/cpu_models.c
+@@ -834,6 +834,7 @@ static void add_qemu_cpu_model_features(S390FeatBitmap fbm)
+         S390_FEAT_STORE_CLOCK_FAST,
+         S390_FEAT_MOVE_WITH_OPTIONAL_SPEC,
+         S390_FEAT_ETF3_ENH,
++        S390_FEAT_EXTRACT_CPU_TIME,
+         S390_FEAT_COMPARE_AND_SWAP_AND_STORE,
+         S390_FEAT_COMPARE_AND_SWAP_AND_STORE_2,
+         S390_FEAT_GENERAL_INSTRUCTIONS_EXT,
 diff --git a/target/s390x/insn-data.def b/target/s390x/insn-data.def
-index c7353e7f11..f7b66b0091 100644
+index f7b66b0091..5e33bd27ff 100644
 --- a/target/s390x/insn-data.def
 +++ b/target/s390x/insn-data.def
-@@ -1056,6 +1056,7 @@
-     C(0xb238, RSCH,    S,     Z,   0, 0, 0, 0, rsch, 0)
-     C(0xb237, SAL,     S,     Z,   0, 0, 0, 0, sal, 0)
-     C(0xb23c, SCHM,    S,     Z,   0, insn, 0, 0, schm, 0)
-+    C(0xb274, SIGA,    S,     Z,   0, 0, 0, 0, siga, 0)
-     C(0xb23a, STCPS,   S,     Z,   0, 0, 0, 0, stcps, 0)
-     C(0xb233, SSCH,    S,     Z,   0, insn, 0, 0, ssch, 0)
-     C(0xb239, STCRW,   S,     Z,   0, insn, 0, 0, stcrw, 0)
+@@ -369,6 +369,8 @@
+     C(0xb24f, EAR,     RRE,   Z,   0, 0, new, r1_32, ear, 0)
+ /* EXTRACT CPU ATTRIBUTE */
+     C(0xeb4c, ECAG,    RSY_a, GIE, 0, a2, r1, 0, ecag, 0)
++/* EXTRACT CPU TIME */
++    C(0xc801, ECTG,    SSF,   ECT, 0, 0, 0, 0, ectg, 0)
+ /* EXTRACT FPC */
+     C(0xb38c, EFPC,    RRE,   Z,   0, 0, new, r1_32, efpc, 0)
+ /* EXTRACT PSW */
 diff --git a/target/s390x/translate.c b/target/s390x/translate.c
-index 5c2432678c..1e4079464a 100644
+index 1e4079464a..e0f55fc8e9 100644
 --- a/target/s390x/translate.c
 +++ b/target/s390x/translate.c
-@@ -4102,6 +4102,14 @@ static ExitStatus op_schm(DisasContext *s, DisasOps *o)
+@@ -3887,6 +3887,41 @@ static ExitStatus op_spm(DisasContext *s, DisasOps *o)
      return NO_EXIT;
  }
  
-+static ExitStatus op_siga(DisasContext *s, DisasOps *o)
++static ExitStatus op_ectg(DisasContext *s, DisasOps *o)
 +{
-+    check_privileged(s);
-+    /* From KVM code: Not provided, set CC = 3 for subchannel not operational */
-+    gen_op_movi_cc(s, 3);
++    int b1 = get_field(s->fields, b1);
++    int d1 = get_field(s->fields, d1);
++    int b2 = get_field(s->fields, b2);
++    int d2 = get_field(s->fields, d2);
++    int r3 = get_field(s->fields, r3);
++    TCGv_i64 tmp = tcg_temp_new_i64();
++
++    /* fetch all operands first */
++    o->in1 = tcg_temp_new_i64();
++    tcg_gen_addi_i64(o->in1, regs[b1], d1);
++    o->in2 = tcg_temp_new_i64();
++    tcg_gen_addi_i64(o->in2, regs[b2], d2);
++    o->addr1 = get_address(s, 0, r3, 0);
++
++    /* load the third operand into r3 before modifying anything */
++    tcg_gen_qemu_ld64(regs[r3], o->addr1, get_mem_index(s));
++
++#ifndef CONFIG_USER_ONLY
++    /* subtract CPU timer from first operand and store in GR0 */
++    gen_helper_stpt(tmp, cpu_env);
++    tcg_gen_sub_i64(regs[0], o->in1, tmp);
++#else
++    /* we don't have a CPU timer, fake value 0 */
++    tcg_gen_mov_i64(regs[0], o->in1);
++#endif
++
++    /* store second operand in GR1 */
++    tcg_gen_mov_i64(regs[1], o->in2);
++
++    tcg_temp_free_i64(tmp);
 +    return NO_EXIT;
 +}
 +
- static ExitStatus op_stcps(DisasContext *s, DisasOps *o)
+ #ifndef CONFIG_USER_ONLY
+ static ExitStatus op_spka(DisasContext *s, DisasOps *o)
  {
-     check_privileged(s);
+@@ -5639,6 +5674,7 @@ enum DisasInsnEnum {
+ #define FAC_MSA3        S390_FEAT_MSA_EXT_3 /* msa-extension-3 facility */
+ #define FAC_MSA4        S390_FEAT_MSA_EXT_4 /* msa-extension-4 facility */
+ #define FAC_MSA5        S390_FEAT_MSA_EXT_5 /* msa-extension-5 facility */
++#define FAC_ECT         S390_FEAT_EXTRACT_CPU_TIME
+ 
+ static const DisasInsn insn_info[] = {
+ #include "insn-data.def"
 -- 
 2.14.3
