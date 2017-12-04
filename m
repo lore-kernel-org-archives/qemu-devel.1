@@ -1,23 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38281)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38877)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1eLz75-00012z-9j
-	for qemu-devel@nongnu.org; Mon, 04 Dec 2017 17:21:24 -0500
+	(envelope-from <mreitz@redhat.com>) id 1eLz9S-0002iC-Jr
+	for qemu-devel@nongnu.org; Mon, 04 Dec 2017 17:23:51 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1eLz74-00028z-Ck
-	for qemu-devel@nongnu.org; Mon, 04 Dec 2017 17:21:23 -0500
-References: <20171109141631.25688-1-vsementsov@virtuozzo.com>
-	<8ade3dfe-ec27-a096-5d09-9e694f03935a@redhat.com>
-	<a254716c-2762-3a1c-d4c4-d3abb23f7207@redhat.com>
+	(envelope-from <mreitz@redhat.com>) id 1eLz9P-00040j-FJ
+	for qemu-devel@nongnu.org; Mon, 04 Dec 2017 17:23:50 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:37998)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <mreitz@redhat.com>) id 1eLz9P-0003zr-6T
+	for qemu-devel@nongnu.org; Mon, 04 Dec 2017 17:23:47 -0500
+References: <20171204151741.14485-1-danielhb@linux.vnet.ibm.com>
+	<20171204151741.14485-2-danielhb@linux.vnet.ibm.com>
 From: Max Reitz <mreitz@redhat.com>
-Message-ID: <a4757a98-0492-311a-2086-d2a95418d8ec@redhat.com>
-Date: Mon, 4 Dec 2017 23:21:10 +0100
+Message-ID: <8435b741-1bfc-fbe8-baa8-00bc98e60e0f@redhat.com>
+Date: Mon, 4 Dec 2017 23:23:42 +0100
 MIME-Version: 1.0
-In-Reply-To: <a254716c-2762-3a1c-d4c4-d3abb23f7207@redhat.com>
+In-Reply-To: <20171204151741.14485-2-danielhb@linux.vnet.ibm.com>
 Content-Type: multipart/signed; micalg=pgp-sha256;
 	protocol="application/pgp-signature";
-	boundary="eneSWQEeO8TeFifH9LBOoinvAKdVEbEHN"
-Subject: Re: [Qemu-devel] [Qemu-block] [PATCH] blockdev-backup: enable
- non-root nodes for backup
+	boundary="kMOLh1Xupxla6rdaUeCqXQ8QQgpAT7iI1"
+Subject: Re: [Qemu-devel] [PATCH v4 1/1] tests/qemu-iotests: adding
+ savevm/loadvm with postcopy flag test
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,83 +29,139 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: John Snow <jsnow@redhat.com>, Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org
-Cc: kwolf@redhat.com, den@openvz.org, armbru@redhat.com
+To: Daniel Henrique Barboza <danielhb@linux.vnet.ibm.com>, qemu-devel@nongnu.org
+Cc: Kevin Wolf <kwolf@redhat.com>, Cleber Rosa <crosa@redhat.com>
 
 This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---eneSWQEeO8TeFifH9LBOoinvAKdVEbEHN
+--kMOLh1Xupxla6rdaUeCqXQ8QQgpAT7iI1
 From: Max Reitz <mreitz@redhat.com>
-To: John Snow <jsnow@redhat.com>,
- Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
- qemu-devel@nongnu.org, qemu-block@nongnu.org
-Cc: kwolf@redhat.com, den@openvz.org, armbru@redhat.com
-Message-ID: <a4757a98-0492-311a-2086-d2a95418d8ec@redhat.com>
-Subject: Re: [Qemu-block] [PATCH] blockdev-backup: enable non-root nodes for
- backup
-References: <20171109141631.25688-1-vsementsov@virtuozzo.com>
- <8ade3dfe-ec27-a096-5d09-9e694f03935a@redhat.com>
- <a254716c-2762-3a1c-d4c4-d3abb23f7207@redhat.com>
-In-Reply-To: <a254716c-2762-3a1c-d4c4-d3abb23f7207@redhat.com>
+To: Daniel Henrique Barboza <danielhb@linux.vnet.ibm.com>,
+ qemu-devel@nongnu.org
+Cc: Kevin Wolf <kwolf@redhat.com>, Cleber Rosa <crosa@redhat.com>
+Message-ID: <8435b741-1bfc-fbe8-baa8-00bc98e60e0f@redhat.com>
+Subject: Re: [PATCH v4 1/1] tests/qemu-iotests: adding savevm/loadvm with
+ postcopy flag test
+References: <20171204151741.14485-1-danielhb@linux.vnet.ibm.com>
+ <20171204151741.14485-2-danielhb@linux.vnet.ibm.com>
+In-Reply-To: <20171204151741.14485-2-danielhb@linux.vnet.ibm.com>
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
 
-On 2017-12-04 23:15, John Snow wrote:
+On 2017-12-04 16:17, Daniel Henrique Barboza wrote:
+> This patch implements a test case for the scenario that was failing
+> prior to the patch "migration/ram.c: do not set 'postcopy_running' in
+> POSTCOPY_INCOMING_END", commit acab30b85d.
 >=20
+> This new test file 201 was derived from the test file 181 authored
+> by Kevin Wolf.
 >=20
-> On 12/01/2017 02:41 PM, Max Reitz wrote:
->> ((By the way, I don't suppose that's how it should work...  But I don'=
-t
->> suppose that we want propagation of dirtying towards the BDS roots, do=
+> CC: Kevin Wolf <kwolf@redhat.com>
+> CC: Max Reitz <mreitz@redhat.com>
+> CC: Cleber Rosa <crosa@redhat.com>
+> Signed-off-by: Daniel Henrique Barboza <danielhb@linux.vnet.ibm.com>
+> ---
+>  tests/qemu-iotests/201     | 116 +++++++++++++++++++++++++++++++++++++=
+++++++++
+>  tests/qemu-iotests/201.out |  23 +++++++++
+>  tests/qemu-iotests/group   |   1 +
+>  3 files changed, 140 insertions(+)
+>  create mode 100755 tests/qemu-iotests/201
+>  create mode 100644 tests/qemu-iotests/201.out
+>=20
+> diff --git a/tests/qemu-iotests/201 b/tests/qemu-iotests/201
+> new file mode 100755
+> index 0000000000..9b6e23bbfc
+> --- /dev/null
+> +++ b/tests/qemu-iotests/201
+> @@ -0,0 +1,116 @@
+> +#!/bin/bash
+> +#
+> +# Test savevm and loadvm after live migration with postcopy flag
+> +#
+> +# Copyright (C) 2017, IBM Corporation.
+> +#
+> +# This file is derived from tests/qemu-iotests/181 by Kevin Wolf
+> +#
+> +# This program is free software; you can redistribute it and/or modify=
 
->> we? :-/))
->=20
-> I have never really satisfactorily explained to myself what bitmaps on
-> intermediate notes truly represent or mean.
->=20
-> The simple case is "This layer itself serviced a write request."
->=20
-> If that information is not necessarily meaningful, I'm not sure that's =
-a
-> problem except in configuration.
->=20
->=20
-> ...Now, if you wanted to talk about bitmaps that associate with a
-> Backend instead of a Node...
+> +# it under the terms of the GNU General Public License as published by=
 
-But it's not about bitmaps on intermediate nodes, quite the opposite.
-It's about bitmaps on roots but write requests happening on intermediate
-nodes.
+> +# the Free Software Foundation; either version 2 of the License, or
+> +# (at your option) any later version.
+> +#
+> +# This program is distributed in the hope that it will be useful,
+> +# but WITHOUT ANY WARRANTY; without even the implied warranty of
+> +# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+> +# GNU General Public License for more details.
+> +#
+> +# You should have received a copy of the GNU General Public License
+> +# along with this program.  If not, see <http://www.gnu.org/licenses/>=
+=2E
+> +
+> +seq=3D`basename $0`
+> +echo "QA output created by $seq"
+> +
+> +status=3D1	# failure is the default!
+> +
+> +MIG_SOCKET=3D"${TEST_DIR}/migrate"
+> +
+> +# get standard environment, filters and checks
+> +. ./common.rc
+> +. ./common.filter
+> +. ./common.qemu
+> +
+> +_cleanup()
+> +{
+> +    rm -f "${MIG_SOCKET}"
+> +    _cleanup_test_img
+> +    _cleanup_qemu
+> +}
+> +trap "_cleanup; exit \$status" 0 1 2 3 15
+> +
+> +_supported_fmt qcow2
+> +_supported_proto generic
+> +_supported_os Linux
 
-Say you have a node I and two filter nodes A and B using it (and they
-are OK with shared writers).  There is a dirty bitmap on A.
+Sorry, I had to unqueue the patch again, because I only just saw there's
+something like
 
-Now when a write request goes through B, I will obviously have changed,
-and because A and B are filters, so will A.  But the dirty bitmap on A
-will still be clean.
+> # Internal snapshots are (currently) impossible with refcount_bits=3D1 =
+                                                                         =
+                                                                         =
+                     =20
+> _unsupported_imgopts 'refcount_bits=3D1[^0-9]'
 
-My example was that when you run a mirror over A, you won't see dirtying
-from B.  So you can't e.g. add a throttle driver between a mirror job
-and the node you want to mirror, because the dirty bitmap on the
-throttle driver will not be affected by accesses to the actual node.
+missing here (taken from 080).
+
+(Without that, the test fails with
+ $ ./check -T -qcow2 -o refcount_bits=3D1 201
+)
+
+I could have added it myself, but that seemed a bit too much of a change
+to me...
 
 Max
 
+> +
+> +size=3D64M
+> +_make_test_img $size
 
---eneSWQEeO8TeFifH9LBOoinvAKdVEbEHN
+
+--kMOLh1Xupxla6rdaUeCqXQ8QQgpAT7iI1
 Content-Type: application/pgp-signature; name="signature.asc"
 Content-Description: OpenPGP digital signature
 Content-Disposition: attachment; filename="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQFGBAEBCAAwFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAlolylYSHG1yZWl0ekBy
-ZWRoYXQuY29tAAoJEPQH2wBh1c9A3VUIAKyBkzGv+HaOHYJ46Q/jh7ItDUn4s7Lv
-SBtTTp3MEvq34RWB5QC8gMPtz/edrz9zFZtH+cLJvD93D3gf+r1W4Vqkk1DoyCEE
-aK5rGUXN6WF9gtG6qXCC39t0nckCYp1AqrmQ3yQfzyaXCeVuNMh/En1OA/9EkypE
-myqbFELEKI1KfDLdZYzJsACvJVcfkwJf4bysWtb9h2eR66Cz21PSZXIJdpJ5UiFH
-opkeF1bHVHAxiPsLYnk+YcC7qL9cTXAfSUyZHESFUDSN7gou0U2/2S1crqtMSS83
-XRvLNPA6ZgQ/jEzwVcbmY06RvKhlWCf7ZrBdIya5gW/53QhYltH+imM=
-=lKG6
+iQFGBAEBCAAwFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAlolyu8SHG1yZWl0ekBy
+ZWRoYXQuY29tAAoJEPQH2wBh1c9AhysH/0v57O3KhYVKrU20WOKuc3g5AWEBOCCN
+MBmRx8LOMUuOw88oXIWBJXjO+qPeHTDIQiq43p6sEhNruOS5QwOX8mJD09PmUPT4
+TuwRrvrtNAx4Q1AZ3USOSd5cQNGMqBIfBDd7oQdrh6xC1nlYQJY63nu0i7iT6lAj
+wMntNwxugVOuStNSyXXVTIw9oWYDzgJepUQ3mShjZlnc0ai2VHHULewCcdAyU75a
+NLTZmmUdWn3ipzMLekqJVg+WLyQX8R+kuQHUwr9rkDLJ8Q2O0MU8bn/aig/irxnY
+NrgmjRD8X052R7kDsEQ6bAJiFtt8g1XZR4qyHQ6cZKuWhsD5i3fBxrc=
+=Gha7
 -----END PGP SIGNATURE-----
 
---eneSWQEeO8TeFifH9LBOoinvAKdVEbEHN--
+--kMOLh1Xupxla6rdaUeCqXQ8QQgpAT7iI1--
