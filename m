@@ -1,21 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33904)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34297)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1eLu5x-0002se-9A
-	for qemu-devel@nongnu.org; Mon, 04 Dec 2017 11:59:54 -0500
+	(envelope-from <david@redhat.com>) id 1eLu6h-0003YI-9x
+	for qemu-devel@nongnu.org; Mon, 04 Dec 2017 12:00:40 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1eLu5s-0007FV-FK
-	for qemu-devel@nongnu.org; Mon, 04 Dec 2017 11:59:53 -0500
-References: <A6478011-CD5E-4FDF-A212-6D9BB0E70028@mykolab.com>
-From: John Snow <jsnow@redhat.com>
-Message-ID: <0fdf8830-4202-59f4-59c0-a99506cde4d9@redhat.com>
-Date: Mon, 4 Dec 2017 11:59:45 -0500
+	(envelope-from <david@redhat.com>) id 1eLu6d-0007ry-FN
+	for qemu-devel@nongnu.org; Mon, 04 Dec 2017 12:00:39 -0500
+References: <20171204125505.29203-1-david@redhat.com>
+	<20171204175651.4acffb4e.cohuck@redhat.com>
+From: David Hildenbrand <david@redhat.com>
+Message-ID: <748a102a-cc55-b4d7-e18d-f65a144f5d9f@redhat.com>
+Date: Mon, 4 Dec 2017 18:00:31 +0100
 MIME-Version: 1.0
-In-Reply-To: <A6478011-CD5E-4FDF-A212-6D9BB0E70028@mykolab.com>
+In-Reply-To: <20171204175651.4acffb4e.cohuck@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] mmap(2) returns MAP_FAILED, not NULL,
- on failure
+Subject: Re: [Qemu-devel] [PATCH v1 for-2.12 0/5] s390x/tcg: CCW hotplug
+ support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,30 +25,32 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Michael McConville <mmcco@mykolab.com>, qemu-devel@nongnu.org
-Cc: qemu-trivial@nongnu.org
+To: Cornelia Huck <cohuck@redhat.com>
+Cc: qemu-s390x@nongnu.org, qemu-devel@nongnu.org, Christian Borntraeger <borntraeger@de.ibm.com>, Richard Henderson <rth@twiddle.net>, Alexander Graf <agraf@suse.de>, Thomas Huth <thuth@redhat.com>
 
-
-
-On 12/01/2017 01:31 PM, Michael McConville wrote:
-> Signed-off-by: Michael McConville <mmcco@mykolab.com>
-> ---
->  hw/i386/xen/xen-mapcache.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
+On 04.12.2017 17:56, Cornelia Huck wrote:
+> On Mon,  4 Dec 2017 13:55:00 +0100
+> David Hildenbrand <david@redhat.com> wrote:
 > 
-> diff --git a/hw/i386/xen/xen-mapcache.c b/hw/i386/xen/xen-mapcache.c
-> index baab93b614..efa35dc6e0 100644
-> --- a/hw/i386/xen/xen-mapcache.c
-> +++ b/hw/i386/xen/xen-mapcache.c
-> @@ -199,7 +199,7 @@ static void xen_remap_bucket(MapCacheEntry *entry,
->           */
->          vaddr_base = mmap(vaddr, size, PROT_READ | PROT_WRITE,
->                            MAP_ANON | MAP_SHARED, -1, 0);
-> -        if (vaddr_base == NULL) {
-> +        if (vaddr_base == MAP_FAILED) {
->              perror("mmap");
->              exit(-1);
->          }
+>> Hotplugging a ccw device currently fails due to different reasons.
+>>
+>> 1. The stored machine check information is partially wrong.
+>> 2. The TOD programmable field cannot be restored.
+>> 3. STCRW cannot get executed.
+>>
+>> With these patches, I am able to sucessfully hotplug e.g. virtio-rng by
+>> issuing "device_add virtio-rng-ccw,id=rng0" to a Linux guest.
 > 
+> Thank you for taking care of my unpublished todo list ;)
+> 
+> Does device_del also work?
 
-Reviewed-by: John Snow <jsnow@redhat.com>
+I did a very quick test and it seemed to work. (I remember seeing
+notifications in dmesg)
+
+
+-- 
+
+Thanks,
+
+David / dhildenb
