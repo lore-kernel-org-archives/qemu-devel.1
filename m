@@ -1,28 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41437)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41851)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1eLuOb-0006g4-MA
-	for qemu-devel@nongnu.org; Mon, 04 Dec 2017 12:19:10 -0500
+	(envelope-from <cohuck@redhat.com>) id 1eLuQ9-0007Qo-AR
+	for qemu-devel@nongnu.org; Mon, 04 Dec 2017 12:20:46 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1eLuOa-0001Xd-V1
-	for qemu-devel@nongnu.org; Mon, 04 Dec 2017 12:19:09 -0500
-Received: from mail-ot0-x230.google.com ([2607:f8b0:4003:c0f::230]:33208)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1eLuOa-0001XV-PE
-	for qemu-devel@nongnu.org; Mon, 04 Dec 2017 12:19:08 -0500
-Received: by mail-ot0-x230.google.com with SMTP id h9so15383548oti.0
-	for <qemu-devel@nongnu.org>; Mon, 04 Dec 2017 09:19:08 -0800 (PST)
+	(envelope-from <cohuck@redhat.com>) id 1eLuQ6-0002VC-3t
+	for qemu-devel@nongnu.org; Mon, 04 Dec 2017 12:20:45 -0500
+Date: Mon, 4 Dec 2017 18:20:33 +0100
+From: Cornelia Huck <cohuck@redhat.com>
+Message-ID: <20171204182033.7e700dec.cohuck@redhat.com>
+In-Reply-To: <20171204125505.29203-3-david@redhat.com>
+References: <20171204125505.29203-1-david@redhat.com>
+	<20171204125505.29203-3-david@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <CAFEAcA_yWQqGAzDuaPZo9vgwVywq9QazToVy7CYncVvSfhxDKw@mail.gmail.com>
-References: <1512148088-28733-1-git-send-email-mst@redhat.com>
-	<CAFEAcA-B7nMNTj6+HOSu=qUzaK3+Me83v_OG04=a2W4MU-KziA@mail.gmail.com>
-	<20171203064856-mutt-send-email-mst@kernel.org>
-	<CAFEAcA_yWQqGAzDuaPZo9vgwVywq9QazToVy7CYncVvSfhxDKw@mail.gmail.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon, 4 Dec 2017 17:18:47 +0000
-Message-ID: <CAFEAcA8Q5DFEEY5kH=dKESPpXuP1xHaSvKJ2SefJLLd1T3VBPA@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PULL 0/7] pc, pci, virtio: fixes for rc3
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v1 for-2.12 2/5] s390x/tcg: fix and cleanup
+ mcck injection
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,38 +24,82 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
+To: David Hildenbrand <david@redhat.com>
+Cc: qemu-s390x@nongnu.org, qemu-devel@nongnu.org, Christian Borntraeger <borntraeger@de.ibm.com>, Richard Henderson <rth@twiddle.net>, Alexander Graf <agraf@suse.de>, Thomas Huth <thuth@redhat.com>
 
-On 4 December 2017 at 10:16, Peter Maydell <peter.maydell@linaro.org> wrote:
-> On 3 December 2017 at 04:56, Michael S. Tsirkin <mst@redhat.com> wrote:
->> On Fri, Dec 01, 2017 at 06:05:25PM +0000, Peter Maydell wrote:
->>> Are any of these so important that we would absolutely refuse
->>> to release without the fixes (ie they justify rolling an rc4
->>> that we would otherwise not have needed) ?
->
->> The msi one is less important it just happened to be queued a while ago
->> and I didn't want to rebase all testing. Others are crashers but they
->> don't affect everyone. So I wouldn't be sure, but there's also a
->> security fix in there, so yes, I suspect we are better off with rc4, and
->> if we do I think including others is justified (except maybe the msi
->> one, if you feel strongly I'll rebase and drop it).
->
-> The bar has to be set quite high here, because if it turns out
-> that there are problems with a bug fix then we are out of time
-> to rework or revert it. And the more fixes we throw in at the
-> last minute, even if they're individually simple, the more
-> likely that one of them turns out to have unexpected consequences.
->
-> So: were any of these bugs present in the 2.10 release? If so,
-> that strongly argues for not trying to fix them at this point.
->
-> With all of these patches plus David Gibson's, that would be
-> 10 new patches in rc4. That is definitely more than would be
-> ideal.
+On Mon,  4 Dec 2017 13:55:02 +0100
+David Hildenbrand <david@redhat.com> wrote:
 
-After some discussion on IRC we decided that these should go in.
+> The architecture mode indication wasn't stored. The split of certain
+> 64bit fields was unnecessary. Also, the complete clock comparator, not
+> just bit 0-55 (starting at byte 1) was stored.
+> 
+> We now generate a proper MCIC via the same helper we use for KVM.
+> 
+> While at it, also get rid of two local variables. There is be more to
+> clean up, but we will change the other parts later on either way.
+> 
+> Signed-off-by: David Hildenbrand <david@redhat.com>
+> ---
+>  target/s390x/excp_helper.c | 18 ++++++++----------
+>  target/s390x/internal.h    |  6 +++---
+>  2 files changed, 11 insertions(+), 13 deletions(-)
+> 
+> diff --git a/target/s390x/excp_helper.c b/target/s390x/excp_helper.c
+> index d831537544..840cf7641a 100644
+> --- a/target/s390x/excp_helper.c
+> +++ b/target/s390x/excp_helper.c
+> @@ -369,7 +369,6 @@ static void do_io_interrupt(CPUS390XState *env)
+>  static void do_mchk_interrupt(CPUS390XState *env)
+>  {
+>      S390CPU *cpu = s390_env_get_cpu(env);
+> -    uint64_t mask, addr;
+>      LowCore *lowcore;
+>      MchkQueue *q;
+>      int i;
 
-Thanks for the further information; pull applied to master.
+[BTW, there's also a CR 14 check in here that probably could use the
+new #define.]
 
--- PMM
+> @@ -395,6 +394,9 @@ static void do_mchk_interrupt(CPUS390XState *env)
+>  
+>      lowcore = cpu_map_lowcore(env);
+>  
+> +    /* we are always in z/Architecture mode */
+> +    lowcore->ar_access_id = 1;
+> +
+>      for (i = 0; i < 16; i++) {
+>          lowcore->floating_pt_save_area[i] = cpu_to_be64(get_freg(env, i)->ll);
+>          lowcore->gpregs_save_area[i] = cpu_to_be64(env->regs[i]);
+> @@ -404,17 +406,12 @@ static void do_mchk_interrupt(CPUS390XState *env)
+>      lowcore->prefixreg_save_area = cpu_to_be32(env->psa);
+>      lowcore->fpt_creg_save_area = cpu_to_be32(env->fpc);
+>      lowcore->tod_progreg_save_area = cpu_to_be32(env->todpr);
+> -    lowcore->cpu_timer_save_area[0] = cpu_to_be32(env->cputm >> 32);
+> -    lowcore->cpu_timer_save_area[1] = cpu_to_be32((uint32_t)env->cputm);
+> -    lowcore->clock_comp_save_area[0] = cpu_to_be32(env->ckc >> 32);
+> -    lowcore->clock_comp_save_area[1] = cpu_to_be32((uint32_t)env->ckc);
+> +    lowcore->cpu_timer_save_area = cpu_to_be64(env->cputm);
+> +    lowcore->clock_comp_save_area = cpu_to_be64(env->ckc >> 8);
+>  
+> -    lowcore->mcck_interruption_code[0] = cpu_to_be32(0x00400f1d);
+> -    lowcore->mcck_interruption_code[1] = cpu_to_be32(0x40330000);
+> +    lowcore->mcic = cpu_to_be64(s390_build_validity_mcic() | MCIC_SC_CP);
+
+Hm... I'm not sure that is a good idea (the nature of the helper, not
+that you remove the magic values).
+
+This function is called do_mchk_interrupt(), which sounds like a more
+generic thing. Maybe we need to enhance the machine check code to save
+the mcic etc. somewhere (after it has been generated) and just inject
+it here? Similar to what the kernel does.
+
+If you want to avoid rework, just add a TODO here?
+
+>      lowcore->mcck_old_psw.mask = cpu_to_be64(get_psw_mask(env));
+>      lowcore->mcck_old_psw.addr = cpu_to_be64(env->psw.addr);
+> -    mask = be64_to_cpu(lowcore->mcck_new_psw.mask);
+> -    addr = be64_to_cpu(lowcore->mcck_new_psw.addr);
+>  
+>      cpu_unmap_lowcore(lowcore);
+>  
