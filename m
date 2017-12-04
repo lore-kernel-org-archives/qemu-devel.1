@@ -1,33 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51884)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53719)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <danielhb@linux.vnet.ibm.com>) id 1eLsVP-00008B-TY
-	for qemu-devel@nongnu.org; Mon, 04 Dec 2017 10:18:09 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1eLsZS-0003DR-0C
+	for qemu-devel@nongnu.org; Mon, 04 Dec 2017 10:22:19 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <danielhb@linux.vnet.ibm.com>) id 1eLsVK-000468-AZ
-	for qemu-devel@nongnu.org; Mon, 04 Dec 2017 10:18:03 -0500
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:48244)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <danielhb@linux.vnet.ibm.com>)
-	id 1eLsVK-00045y-03
-	for qemu-devel@nongnu.org; Mon, 04 Dec 2017 10:17:58 -0500
-Received: from pps.filterd (m0098410.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
-	vB4FGMSL083659
-	for <qemu-devel@nongnu.org>; Mon, 4 Dec 2017 10:17:55 -0500
-Received: from e34.co.us.ibm.com (e34.co.us.ibm.com [32.97.110.152])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2en7xbk4r5-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Mon, 04 Dec 2017 10:17:54 -0500
-Received: from localhost
-	by e34.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
-	Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <danielhb@linux.vnet.ibm.com>;
-	Mon, 4 Dec 2017 08:17:53 -0700
-From: Daniel Henrique Barboza <danielhb@linux.vnet.ibm.com>
-Date: Mon,  4 Dec 2017 13:17:40 -0200
-Message-Id: <20171204151741.14485-1-danielhb@linux.vnet.ibm.com>
-Subject: [Qemu-devel] [PATCH v4 0/1] savevm/loadvm with postcopy flag
- qemu-iotest
+	(envelope-from <peter.maydell@linaro.org>) id 1eLsZN-0006es-Qm
+	for qemu-devel@nongnu.org; Mon, 04 Dec 2017 10:22:13 -0500
+Received: from mail-ot0-x229.google.com ([2607:f8b0:4003:c0f::229]:34356)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1eLsZN-0006eZ-KV
+	for qemu-devel@nongnu.org; Mon, 04 Dec 2017 10:22:09 -0500
+Received: by mail-ot0-x229.google.com with SMTP id o23so15012694otd.1
+	for <qemu-devel@nongnu.org>; Mon, 04 Dec 2017 07:22:09 -0800 (PST)
+MIME-Version: 1.0
+In-Reply-To: <20171204151705.26028-1-samuel.thibault@ens-lyon.org>
+References: <20171204151705.26028-1-samuel.thibault@ens-lyon.org>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Mon, 4 Dec 2017 15:21:48 +0000
+Message-ID: <CAFEAcA9CYSCJtGjRPQonyA8jvMZ6VBaWbGtrnJ7y6mJEbERMHg@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PULL 0/1] baum braille device update
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,25 +28,34 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Daniel Henrique Barboza <danielhb@linux.vnet.ibm.com>
+To: Samuel Thibault <samuel.thibault@ens-lyon.org>
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 
-Changes from v3:
-- rebased with master - file name changed from 198 to 201
-- removed Creator/owner information (it can be retrieved with git)
-- added a migration successful check before executing savevm
-- removed a trailing double comma in the snapshot name
+On 4 December 2017 at 15:17, Samuel Thibault
+<samuel.thibault@ens-lyon.org> wrote:
+> warning: redirection vers https://people.debian.org/~sthibault/qemu.git/
+> The following changes since commit 7edaf99759017d3e175e37cffc3536e86a3bd380:
+>
+>   Merge remote-tracking branch 'remotes/thibault/tags/samuel-thibault' into staging (2017-11-13 13:54:59 +0000)
+>
+> are available in the Git repository at:
+>
+>   http://people.debian.org/~sthibault/qemu.git tags/samuel-thibault
+>
+> for you to fetch changes up to 15405525fce773d43e7e5cabc2b9ac4b9d4d7672:
+>
+>   baum: Truncate braille device size to 84x1 (2017-12-03 19:35:50 +0100)
+>
+> ----------------------------------------------------------------
+> baum updates
+>
+> ----------------------------------------------------------------
+> Samuel Thibault (1):
+>       baum: Truncate braille device size to 84x1
 
+Hi. Is this pull request intended for 2.11? We're currently
+in freeze for that and only taking "absolutely release critical"
+bug fixes...
 
-Daniel Henrique Barboza (1):
-  tests/qemu-iotests: adding savevm/loadvm with postcopy flag test
-
- tests/qemu-iotests/201     | 116 +++++++++++++++++++++++++++++++++++++++++++++
- tests/qemu-iotests/201.out |  23 +++++++++
- tests/qemu-iotests/group   |   1 +
- 3 files changed, 140 insertions(+)
- create mode 100755 tests/qemu-iotests/201
- create mode 100644 tests/qemu-iotests/201.out
-
--- 
-2.13.6
+thanks
+-- PMM
