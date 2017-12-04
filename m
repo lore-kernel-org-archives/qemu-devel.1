@@ -1,28 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43134)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43715)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <samuel.thibault@ens-lyon.org>) id 1eLtKC-0003g3-2I
-	for qemu-devel@nongnu.org; Mon, 04 Dec 2017 11:10:33 -0500
+	(envelope-from <cohuck@redhat.com>) id 1eLtLD-0004dK-0w
+	for qemu-devel@nongnu.org; Mon, 04 Dec 2017 11:11:44 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <samuel.thibault@ens-lyon.org>) id 1eLtK7-0006bk-Qd
-	for qemu-devel@nongnu.org; Mon, 04 Dec 2017 11:10:32 -0500
-Received: from mail3-relais-sop.national.inria.fr ([192.134.164.104]:10290)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <samuel.thibault@ens-lyon.org>)
-	id 1eLtK7-0006Zu-G4
-	for qemu-devel@nongnu.org; Mon, 04 Dec 2017 11:10:27 -0500
-Date: Mon, 4 Dec 2017 17:10:24 +0100
-From: Samuel Thibault <samuel.thibault@gnu.org>
-Message-ID: <20171204161024.q2ttajkuyl24j5af@var.youpi.perso.aquilenet.fr>
-References: <20171204151705.26028-1-samuel.thibault@ens-lyon.org>
-	<CAFEAcA9CYSCJtGjRPQonyA8jvMZ6VBaWbGtrnJ7y6mJEbERMHg@mail.gmail.com>
-	<20171204152645.fy5grsjjn5hedvko@var.youpi.perso.aquilenet.fr>
-	<CAFEAcA_g9_qVh+7qaZSenjnCxe53jYkVRGTJF47-oN1wukGS3A@mail.gmail.com>
+	(envelope-from <cohuck@redhat.com>) id 1eLtL8-00075O-P8
+	for qemu-devel@nongnu.org; Mon, 04 Dec 2017 11:11:34 -0500
+Date: Mon, 4 Dec 2017 17:11:24 +0100
+From: Cornelia Huck <cohuck@redhat.com>
+Message-ID: <20171204171124.4d877b22.cohuck@redhat.com>
+In-Reply-To: <1108d0e7-318b-354f-31da-95d5efb8193c@linux.vnet.ibm.com>
+References: <20171201143136.62497-1-pasic@linux.vnet.ibm.com>
+	<20171201143136.62497-4-pasic@linux.vnet.ibm.com>
+	<20171204122859.1a4fcd21.cohuck@redhat.com>
+	<1108d0e7-318b-354f-31da-95d5efb8193c@linux.vnet.ibm.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <CAFEAcA_g9_qVh+7qaZSenjnCxe53jYkVRGTJF47-oN1wukGS3A@mail.gmail.com>
-Subject: Re: [Qemu-devel] [PULL 0/1] baum braille device update
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH 3/3] s390x: deprecate s390-squash-mcss
+ machine prop
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,37 +26,66 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
+To: Halil Pasic <pasic@linux.vnet.ibm.com>
+Cc: Boris Fiuczynski <fiuczy@linux.vnet.ibm.com>, Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>, Christian Borntraeger <borntraeger@de.ibm.com>, Shalini Chellathurai Saroja <shalini@linux.vnet.ibm.com>, qemu-devel@nongnu.org, qemu-s390x@nongnu.org
 
-Peter Maydell, on lun. 04 déc. 2017 15:36:32 +0000, wrote:
-> On 4 December 2017 at 15:26, Samuel Thibault <samuel.thibault@gnu.org> wrote:
-> > Peter Maydell, on lun. 04 déc. 2017 15:21:48 +0000, wrote:
-> >> On 4 December 2017 at 15:17, Samuel Thibault
-> >> <samuel.thibault@ens-lyon.org> wrote:
-> >> > ----------------------------------------------------------------
-> >> > Samuel Thibault (1):
-> >> >       baum: Truncate braille device size to 84x1
-> >>
-> >> Hi. Is this pull request intended for 2.11?
-> >
-> > If possible, yes.
-> >
-> >> We're currently in freeze for that and only taking "absolutely release
-> >> critical" bug fixes...
-> >
-> > Ok, as you wish.
-> >
-> > It's a relatively corner case: a friend of mine does have a 88-cell
-> > braille display, and can not use it with guests by running qemu
-> > -usbdevice braille due to this bug.
+On Mon, 4 Dec 2017 16:32:16 +0100
+Halil Pasic <pasic@linux.vnet.ibm.com> wrote:
+
+> On 12/04/2017 12:28 PM, Cornelia Huck wrote:
+> > On Fri,  1 Dec 2017 15:31:36 +0100
+> > Halil Pasic <pasic@linux.vnet.ibm.com> wrote:
+
+> >> diff --git a/hw/s390x/s390-virtio-ccw.c b/hw/s390x/s390-virtio-ccw.c
+> >> index 4d65a50334..3796f666e6 100644
+> >> --- a/hw/s390x/s390-virtio-ccw.c
+> >> +++ b/hw/s390x/s390-virtio-ccw.c
+> >> @@ -553,6 +553,10 @@ static inline void machine_set_squash_mcss(Object *obj, bool value,
+> >>      S390CcwMachineState *ms = S390_CCW_MACHINE(obj);
+> >>  
+> >>      ms->s390_squash_mcss = value;
+> >> +    if (ms->s390_squash_mcss) {
+> >> +        warn_report("The machine property 's390-squash-mcss' is deprecated"
+> >> +                    " (obsoleted by lifting the cssid restrictions).");  
+> > 
+> > Too bad that we can't warn when this is explicitly set to false - OTOH
+> > I don't really expect anyone doing that.
+> >   
 > 
-> Mmm. Looking at the code for baum.c for 2.10, this isn't a
-> regression from 2.10 or a security issue, which is what it
-> would need to be for us to want to put this in at this point.
+> I did not really dig deep. It may be possible, but I had other priorities,
+> and was not sure if it's worth (as I also don't expect it being set to false
+> explicit in the wild).
 
-Ah, ok, nevermind then, it'll have to wait.
+It's not worth spending any more time on this.
 
-Sorry I didn't know that.
+> 
+> >> +    }
+> >>  }
+> >>  
+> >>  static inline void s390_machine_initfn(Object *obj)
 
-Samuel
+(...)
+
+> > Looks sane. We should put a note into the 2.12 changelog as well.
+> >   
+> 
+> I agree. Who would be responsible for updating the changelog. I'm not
+> familiar with that process yet. To be honest, I wouldn't mind having
+> the changelog notice in your writing style. Guess would be better for
+> everyone ;).
+
+Just a one-liner once we have the 2.12 changelog page.
+
+> 
+> There are also other things we identified as TODOs:
+> * Updating https://wiki.qemu.org/Features/Channel_I/O_Passthrough
+> (@Dong Jia, could you take this one)
+> * In tree and/or on wiki documentation which is up-to-date and
+> more verbose than commit messages are supposed to be (and Dong
+> Jia's write-up could be incorporated to). I see this one as
+> lower prio though. Any volunteers?
+
+Long-ish things with links etc. should probably go into the wiki.
+
+Anyway, feel free to go ahead (it's a wiki :) We can always change
+things later on.
