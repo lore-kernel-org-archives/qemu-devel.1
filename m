@@ -1,25 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40166)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40241)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <iank@fsf.org>) id 1eLxcq-0008PB-E8
-	for qemu-devel@nongnu.org; Mon, 04 Dec 2017 15:46:05 -0500
+	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1eLxcy-0008V8-GT
+	for qemu-devel@nongnu.org; Mon, 04 Dec 2017 15:46:13 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <iank@fsf.org>) id 1eLxcn-0006aH-Ba
-	for qemu-devel@nongnu.org; Mon, 04 Dec 2017 15:46:04 -0500
-Received: from li.iankelling.org ([72.14.176.105]:58734
-	helo=mail.iankelling.org)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <iank@fsf.org>) id 1eLxcn-0006a2-3T
-	for qemu-devel@nongnu.org; Mon, 04 Dec 2017 15:46:01 -0500
-References: <87bmjeqn1s.fsf@fsf.org>
-	<fbff6cd8-e3b8-3baa-b54d-87ce385061d6@redhat.com>
-From: Ian Kelling <iank@fsf.org>
-In-reply-to: <fbff6cd8-e3b8-3baa-b54d-87ce385061d6@redhat.com>
-Date: Mon, 04 Dec 2017 15:45:59 -0500
-Message-ID: <87a7yyql14.fsf@fsf.org>
+	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1eLxcv-0006en-ES
+	for qemu-devel@nongnu.org; Mon, 04 Dec 2017 15:46:12 -0500
+Received: from chuckie.co.uk ([82.165.15.123]:37376
+	helo=s16892447.onlinehome-server.info)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <mark.cave-ayland@ilande.co.uk>)
+	id 1eLxcv-0006ZJ-73
+	for qemu-devel@nongnu.org; Mon, 04 Dec 2017 15:46:09 -0500
+References: <20171122063250.7674-1-jcd@tribudubois.net>
+	<3d54e331-07f3-dd43-e2b6-aded54ccaf6f@ilande.co.uk>
+	<3a7ef463-a4ff-bc54-e250-705660bd078a@tribudubois.net>
+From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+Message-ID: <08a193ea-f995-6daa-c1db-8df0ab695a9a@ilande.co.uk>
+Date: Mon, 4 Dec 2017 20:45:52 +0000
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] qemu-devel archive search was missing some
- messages but it's fixed now
+In-Reply-To: <3a7ef463-a4ff-bc54-e250-705660bd078a@tribudubois.net>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-GB
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH] Remove MemoryRegionSection check code from
+ sparc_cpu_get_phys_page_debug()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,67 +32,38 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Laszlo Ersek <lersek@redhat.com>
-Cc: qemu-devel@nongnu.org
+To: Jean-Christophe DUBOIS <jcd@tribudubois.net>, qemu-devel@nongnu.org
+Cc: Artyom Tarasenko <atar4qemu@gmail.com>
 
-Laszlo Ersek <lersek@redhat.com> writes:
+On 27/11/17 20:19, Jean-Christophe DUBOIS wrote:
 
-> Hello Ian,
->
-> On 12/04/17 21:02, Ian Kelling wrote:
->
->> General thoughts about the archive: I'm looking forward to us upgrading
->> to mailman 3 at some point which will bring an improved archive
->> interface.
->
-> Do you mean HyperKitty?
+> Hello Mark,
+> 
+> Did you get any second opinion on this?
+> 
+> Also do you need me to resend the patch with the SPARC keyword in the 
+> patch subject line?
 
-Yes.
+Hi Jean-Christophe,
 
->
-> Will you seek out community feedback on it first?
+Apologies for the delay as I've been fairly busy with my day job. I 
+believe Artyom is away at the moment which is why I haven't written a 
+reply, but AFAICT there are 2 options:
 
-Yes, of course. And I expect the old interface to continue to exist
-alongside it indefinitely.
+1) Remove the MemoryRegion check (as per your patch)
 
->
->> Of course, you can always download the archive and search it
->> on your local computer.
->
-> The one HyperKitty instance that I can readily look at is:
->
-> https://lists.fedoraproject.org/archives/list/devel@lists.fedoraproject.org/
->
-> It only offers the following download options:
->
-> - "Past 30 days (mbox)"
-> - "This month (mbox)"
-> - "Entire archive (mbox)"
->
-> Maybe it's configurable site by site, but I find this lacking compared
-> to: "download whichever month you want, in isolation", which is offered
-> by mailman2:
->
-> ftp://lists.gnu.org/qemu-devel/
->
-> If someone needs it all, the latter remains easy to script with wget,
-> for example.
->
-> (Back to my original point -- judged similarly from the fedora devel
-> archive, I find HyperKitty hardly usable for normal reading, and I think
-> it will completely fail for patch series threads and the discussions
-> under them. HyperKitty is a step towards social media in my opinion, and
-> as such inappropriate for development lists (again, IMO). I'm happy to
-> learn otherwise, of course -- are there good counter-examples where
-> HyperKitty has worked out fine, for archiving email-based patch traffic
-> and development discussion?)
->
-> NB: my opinion on this likely doesn't matter, as I'm not a heavy
-> qemu-devel contributor.
+2) Change dump_mmu() to call cpu_sparc_get_phys_page() directly
 
-And you've given some reasons why :)
+I'm mildly leaning towards 1) since there doesn't seem to be equivalent 
+code in other architectures, however the tree is currently in freeze for 
+the upcoming 2.11 release so that's where most people's free time is 
+currently being spent.
 
--- 
-Ian Kelling | Senior Systems Administrator, Free Software Foundation
-GPG Key: B125 F60B 7B28 7FF6 A2B7  DF8F 170A F0E2 9542 95DF
-https://fsf.org | https://gnu.org
+Once I can confirm the correct approach, I'm keen to get this into the 
+2.12 tree early so there is plenty of time to spot any regressions 
+during the next development cycle.
+
+
+ATB,
+
+Mark.
