@@ -1,20 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48697)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48723)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1eLpWS-0001wm-M6
-	for qemu-devel@nongnu.org; Mon, 04 Dec 2017 07:06:57 -0500
+	(envelope-from <berrange@redhat.com>) id 1eLpWm-0002K8-Cs
+	for qemu-devel@nongnu.org; Mon, 04 Dec 2017 07:07:17 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1eLpWR-0004G0-RJ
-	for qemu-devel@nongnu.org; Mon, 04 Dec 2017 07:06:56 -0500
-Date: Mon, 4 Dec 2017 13:06:46 +0100
-From: Kevin Wolf <kwolf@redhat.com>
-Message-ID: <20171204120646.GB872@localhost.localdomain>
-References: <20171201234943.14695-1-klim.kireev@virtuozzo.com>
+	(envelope-from <berrange@redhat.com>) id 1eLpWj-0004Hx-6w
+	for qemu-devel@nongnu.org; Mon, 04 Dec 2017 07:07:16 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:57638)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1eLpWj-0004Hl-04
+	for qemu-devel@nongnu.org; Mon, 04 Dec 2017 07:07:13 -0500
+Date: Mon, 4 Dec 2017 12:07:05 +0000
+From: "Daniel P. Berrange" <berrange@redhat.com>
+Message-ID: <20171204120705.GE20203@redhat.com>
+Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
+References: <1511505030-3669-1-git-send-email-yang.zhong@intel.com>
+	<5A1A5C6E.9060409@huawei.com>
+	<20171201105622.GB26237@yangzhon-Virtual>
+	<74cccd14-e485-90d4-82d9-03355c05faca@redhat.com>
+	<20171204120322.GA32151@yangzhon-Virtual>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20171201234943.14695-1-klim.kireev@virtuozzo.com>
-Subject: Re: [Qemu-devel] [PATCH v3] qemu-img: add the simplest format
- recognition
+In-Reply-To: <20171204120322.GA32151@yangzhon-Virtual>
+Subject: Re: [Qemu-devel] [PATCH v3] rcu: reduce more than 7MB heap memory
+ by malloc_trim()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,44 +32,60 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Klim Kireev <klim.kireev@virtuozzo.com>
-Cc: mreitz@redhat.com, qemu-block@nongnu.org, qemu-devel@nongnu.org, den@openvz.org, vsementsov@virtuozzo.com
+To: Yang Zhong <yang.zhong@intel.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, zhaoshenglong@huawei.com, stefanha@redhat.com, qemu-devel@nongnu.org, weidong.huang@huawei.com, arei.gonglei@huawei.com, liujunjie23@huawei.com, wangxinxin.wang@huawei.com, stone.xulei@huawei.com, zhang.zhanghailiang@huawei.com
 
-Am 02.12.2017 um 00:49 hat Klim Kireev geschrieben:
-> Now, if you type something like
+On Mon, Dec 04, 2017 at 08:03:22PM +0800, Yang Zhong wrote:
+> On Fri, Dec 01, 2017 at 01:52:49PM +0100, Paolo Bonzini wrote:
+> > On 01/12/2017 11:56, Yang Zhong wrote:
+> > >   This issue should be caused by much times of system call by malloc_trim(),
+> > >   Shannon's test script include 60 scsi disks and 31 ioh3420 devices. We need 
+> > >   trade-off between VM perforamance and memory optimization. Whether below 
+> > >   method is suitable?
+> > > 
+> > >   int num=1;
+> > >   ......
+> > > 
+> > >   #if defined(CONFIG_MALLOC_TRIM)
+> > >         if(!(num++%5))
+> > >         {
+> > >              malloc_trim(4 * 1024 * 1024);
+> > >         }
+> > >   #endif
+> > >  
+> > >   Any comments are welcome! Thanks a lot!
+> > 
+> > Indeed something like this will do, perhaps only trim once per second?
+> > 
+>   Hello Paolo,
 > 
-> qemu-img create disk.qcow2 1G
-> or
-> qemu-img dd if=/dev/sda of=disk.qcow2
+>   Thanks for comments!
+>   If we do trim once per second, maybe the frequency is a little high, what'e
+>   more, we need maintain one timer to call this, this also cost cpu resource.
 > 
-> it creates a raw image and if you need you should
-> manually specify an image format with -f qcow2. It would
-> be more convenient if it could be assumed from an extension.
+>   I added the log and did the test here with my test qemu command, when VM bootup,
+>   which did more than 600 times free operations and 9 times memory trim in rcu 
+>   thread. If i use our ClearContainer qemu command, the memory trim will down 
+>   to 6 times. As for Shannon's test command, the malloc trim number will abosultly 
+>   increse.
 > 
-> This patch adds a simple heuristic to recognize the image format
-> for qcow, qcow2, vmdk, vhdx, vdi
+>   In my above method, the trim is only executed in the multiple of 5, which will
+>   reduce trim times and do not heavily impact VM bootup performance. 
 > 
-> It warns users about guessed format and informs them about '-f' option.
+>   I also want to use synchronize_rcu() and free() to replace call_rcu(), but this
+>   method serialize to malloc() and free(), which will reduce VM performance.
 > 
-> Signed-off-by: Klim Kireev <klim.kireev@virtuozzo.com>
+>   The ultimate aim is to reduce trim system call during the VM bootup and running.
+>   It's appreciated that if you have better suggestions.
 
-This is an incompatible change.
+Does configuring QEMU to use tcmalloc or jemalloc instead of glibc's malloc
+give you the performance & menmory usage that you require? If so, it might
+not be worth bothering to hack around problems in glibc's malloc at all.
 
-If we want to go there, we must introduce a deprecation warning now
-without any other change in behaviour. We need to warn users for two
-releases that the behaviour will change in the future, and only then we
-can switch over (i.e. in qemu 2.14 the earliest if we introduce the
-warning in 2.12).
 
-I'm not sure if we even want to automatically guess the format from the
-filename, or if a warning/error would be enough even in the long term.
-
-The behaviour I have in mind is like this:
-
-* qemu-img create x.raw 4G            => works, possibly warning
-* qemu-img create -f raw x.raw 4G     => works
-* qemu-img create x.qcow2 4G          => error, need -f for non-raw
-* qemu-img create -f qcow2 x.qcow2 4G => works
-* qemu-img create -f raw x.qcow2 4G   => works, possibly warning
-
-Kevin
+Regards,
+Daniel
+-- 
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
