@@ -1,28 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58206)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33520)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1eLsnh-00011i-Sq
-	for qemu-devel@nongnu.org; Mon, 04 Dec 2017 10:36:58 -0500
+	(envelope-from <famz@redhat.com>) id 1eLsvF-0005ce-IC
+	for qemu-devel@nongnu.org; Mon, 04 Dec 2017 10:44:47 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1eLsne-0004sV-2i
-	for qemu-devel@nongnu.org; Mon, 04 Dec 2017 10:36:57 -0500
-Received: from mail-oi0-x234.google.com ([2607:f8b0:4003:c06::234]:46944)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1eLsnd-0004rj-Sz
-	for qemu-devel@nongnu.org; Mon, 04 Dec 2017 10:36:54 -0500
-Received: by mail-oi0-x234.google.com with SMTP id t81so11938719oih.13
-	for <qemu-devel@nongnu.org>; Mon, 04 Dec 2017 07:36:53 -0800 (PST)
+	(envelope-from <famz@redhat.com>) id 1eLsvC-0001Ss-9W
+	for qemu-devel@nongnu.org; Mon, 04 Dec 2017 10:44:45 -0500
+Date: Mon, 4 Dec 2017 23:44:36 +0800
+From: Fam Zheng <famz@redhat.com>
+Message-ID: <20171204154436.GC10628@lemon>
+References: <1512254273-7567-1-git-send-email-shravan2x@utexas.edu>
 MIME-Version: 1.0
-In-Reply-To: <20171204152645.fy5grsjjn5hedvko@var.youpi.perso.aquilenet.fr>
-References: <20171204151705.26028-1-samuel.thibault@ens-lyon.org>
-	<CAFEAcA9CYSCJtGjRPQonyA8jvMZ6VBaWbGtrnJ7y6mJEbERMHg@mail.gmail.com>
-	<20171204152645.fy5grsjjn5hedvko@var.youpi.perso.aquilenet.fr>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon, 4 Dec 2017 15:36:32 +0000
-Message-ID: <CAFEAcA_g9_qVh+7qaZSenjnCxe53jYkVRGTJF47-oN1wukGS3A@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PULL 0/1] baum braille device update
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1512254273-7567-1-git-send-email-shravan2x@utexas.edu>
+Subject: Re: [Qemu-devel] [PATCH] qemu-img: Fixed grammatical error in
+ dump_human_image_check
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,41 +23,35 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Samuel Thibault <samuel.thibault@gnu.org>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
+To: Shravan Rajinikanth <shravan2x@utexas.edu>
+Cc: qemu-devel@nongnu.org, qemu-trivial@nongnu.org
 
-On 4 December 2017 at 15:26, Samuel Thibault <samuel.thibault@gnu.org> wrot=
-e:
-> Hello,
->
-> Peter Maydell, on lun. 04 d=C3=A9c. 2017 15:21:48 +0000, wrote:
->> On 4 December 2017 at 15:17, Samuel Thibault
->> <samuel.thibault@ens-lyon.org> wrote:
->> > ----------------------------------------------------------------
->> > Samuel Thibault (1):
->> >       baum: Truncate braille device size to 84x1
->>
->> Hi. Is this pull request intended for 2.11?
->
-> If possible, yes.
->
->> We're currently in freeze for that and only taking "absolutely release
->> critical" bug fixes...
->
-> Ok, as you wish.
->
-> It's a relatively corner case: a friend of mine does have a 88-cell
-> braille display, and can not use it with guests by running qemu
-> -usbdevice braille due to this bug.
+On Sat, 12/02 14:37, Shravan Rajinikanth wrote:
+> Signed-off-by: Shravan Rajinikanth <shravan2x@utexas.edu>
+> ---
+>  qemu-img.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/qemu-img.c b/qemu-img.c
+> index 68b375f..bea9268 100644
+> --- a/qemu-img.c
+> +++ b/qemu-img.c
+> @@ -580,7 +580,7 @@ static void dump_human_image_check(ImageCheck *check, bool quiet)
+>          if (check->leaks) {
+>              qprintf(quiet,
+>                      "\n%" PRId64 " leaked clusters were found on the image.\n"
+> -                    "This means waste of disk space, but no harm to data.\n",
+> +                    "This means disk space is wasted, but data is safe.\n",
 
-Mmm. Looking at the code for baum.c for 2.10, this isn't a
-regression from 2.10 or a security issue, which is what it
-would need to be for us to want to put this in at this point.
+To me both versions seem fine, could you explain the grammatical error in the
+old message?
 
-Also, looking in my mail archives I couldn't find where
-this patch was initially posted on the list for review. Our
-process is that all patches have to be posted for review first,
-they can't just go straight into a pull request.
+Fam
 
-thanks
--- PMM
+>                      check->leaks);
+>          }
+>  
+> -- 
+> 2.7.4
+> 
+> 
