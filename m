@@ -1,17 +1,14 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52573)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58032)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1eLrNE-0004ip-Gh
-	for qemu-devel@nongnu.org; Mon, 04 Dec 2017 09:05:33 -0500
+	(envelope-from <pm215@archaic.org.uk>) id 1eLrdV-00054o-MT
+	for qemu-devel@nongnu.org; Mon, 04 Dec 2017 09:22:27 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1eLrN8-00089X-C6
-	for qemu-devel@nongnu.org; Mon, 04 Dec 2017 09:05:32 -0500
-From: David Hildenbrand <david@redhat.com>
-Date: Mon,  4 Dec 2017 15:05:11 +0100
-Message-Id: <20171204140511.20779-1-david@redhat.com>
-In-Reply-To: <20171204140150.20483-1-david@redhat.com>
-References: <20171204140150.20483-1-david@redhat.com>
-Subject: [Qemu-devel] [PATCH v1 for-2.12 01/10] s390x/tcg: ASI/ASGI are
- atomic with interlocked-acccess facility 1
+	(envelope-from <pm215@archaic.org.uk>) id 1eLrdU-0000PI-RV
+	for qemu-devel@nongnu.org; Mon, 04 Dec 2017 09:22:21 -0500
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Mon,  4 Dec 2017 14:22:11 +0000
+Message-Id: <1512397331-15238-1-git-send-email-peter.maydell@linaro.org>
+Subject: [Qemu-devel] [PATCH] linux-user: Fix locking order in fork_start()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -20,62 +17,44 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-s390x@nongnu.org, qemu-devel@nongnu.org
-Cc: Christian Borntraeger <borntraeger@de.ibm.com>, Cornelia Huck <cohuck@redhat.com>, Richard Henderson <rth@twiddle.net>, Alexander Graf <agraf@suse.de>, David Hildenbrand <david@redhat.com>
+To: qemu-devel@nongnu.org
+Cc: qemu-stable@nongnu.org, patches@linaro.org, Riku Voipio <riku.voipio@iki.fi>, Laurent Vivier <laurent@vivier.eu>
 
-The semantics of these operations changed. Let's implement them just
-like LOAD AND ADD, so they are atomic.
+Our locking order is that the tb lock should be taken
+inside the mmap_lock, but fork_start() grabs locks the
+other way around. This means that if a heavily multithreaded
+guest process (such as Java) calls fork() it can deadlock,
+with the thread that called fork() stuck in fork_start()
+with the tb lock and waiting for the mmap lock, but some
+other thread in tb_find() with the mmap lock and waiting
+for the tb lock. The cpu_list_lock() should also always be
+taken last, not first.
 
-This fixes random crashes when booting a Linux kernel compiled for
-z196+ with SMP + MTTCG.
+Fix this by making fork_start() grab the locks in the
+right order. The order in which we drop locks doesn't
+matter, so we leave fork_end() the way it is.
 
-Signed-off-by: David Hildenbrand <david@redhat.com>
+Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+Cc: qemu-stable@nongnu.org
 ---
+ linux-user/main.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-Whoops, forgot to include this patch as the first one.
-
- target/s390x/insn-data.def |  4 ++--
- target/s390x/translate.c   | 11 +++++++++++
- 2 files changed, 13 insertions(+), 2 deletions(-)
-
-diff --git a/target/s390x/insn-data.def b/target/s390x/insn-data.def
-index 43ab1963c8..57f2e5133f 100644
---- a/target/s390x/insn-data.def
-+++ b/target/s390x/insn-data.def
-@@ -39,10 +39,10 @@
-     C(0xb9d8, AHHLR,   RRF_a, HW,  r2_sr32, r3, new, r1_32h, add, adds32)
- /* ADD IMMEDIATE */
-     C(0xc209, AFI,     RIL_a, EI,  r1, i2, new, r1_32, add, adds32)
--    C(0xeb6a, ASI,     SIY,   GIE, m1_32s, i2, new, m1_32, add, adds32)
-+    D(0xeb6a, ASI,     SIY,   GIE, la1, i2, new, 0, asi, adds32, MO_TESL)
-     C(0xecd8, AHIK,    RIE_d, DO,  r3, i2, new, r1_32, add, adds32)
-     C(0xc208, AGFI,    RIL_a, EI,  r1, i2, r1, 0, add, adds64)
--    C(0xeb7a, AGSI,    SIY,   GIE, m1_64, i2, new, m1_64, add, adds64)
-+    D(0xeb7a, AGSI,    SIY,   GIE, la1, i2, new, 0, asi, adds64, MO_TEQ)
-     C(0xecd9, AGHIK,   RIE_d, DO,  r3, i2, r1, 0, add, adds64)
- /* ADD IMMEDIATE HIGH */
-     C(0xcc08, AIH,     RIL_a, HW,  r1_sr32, i2, new, r1_32h, add, adds32)
-diff --git a/target/s390x/translate.c b/target/s390x/translate.c
-index 5e051fdd03..79d2ee650c 100644
---- a/target/s390x/translate.c
-+++ b/target/s390x/translate.c
-@@ -1364,6 +1364,17 @@ static ExitStatus op_addc(DisasContext *s, DisasOps *o)
-     return NO_EXIT;
+diff --git a/linux-user/main.c b/linux-user/main.c
+index 6286661..146ee3e 100644
+--- a/linux-user/main.c
++++ b/linux-user/main.c
+@@ -128,9 +128,9 @@ int cpu_get_pic_interrupt(CPUX86State *env)
+ /* Make sure everything is in a consistent state for calling fork().  */
+ void fork_start(void)
+ {
+-    cpu_list_lock();
+-    qemu_mutex_lock(&tb_ctx.tb_lock);
+     mmap_fork_start();
++    qemu_mutex_lock(&tb_ctx.tb_lock);
++    cpu_list_lock();
  }
  
-+static ExitStatus op_asi(DisasContext *s, DisasOps *o)
-+{
-+    o->in1 = tcg_temp_new_i64();
-+    /* Perform the atomic addition in memory. */
-+    tcg_gen_atomic_fetch_add_i64(o->in1, o->addr1, o->in2, get_mem_index(s),
-+                                 s->insn->data);
-+    /* However, we need to recompute the addition for setting CC.  */
-+    tcg_gen_add_i64(o->out, o->in1, o->in2);
-+    return NO_EXIT;
-+}
-+
- static ExitStatus op_aeb(DisasContext *s, DisasOps *o)
- {
-     gen_helper_aeb(o->out, cpu_env, o->in1, o->in2);
+ void fork_end(int child)
 -- 
-2.14.3
+2.7.4
