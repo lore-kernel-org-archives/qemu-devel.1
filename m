@@ -1,22 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34297)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34568)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1eLu6h-0003YI-9x
-	for qemu-devel@nongnu.org; Mon, 04 Dec 2017 12:00:40 -0500
+	(envelope-from <kwolf@redhat.com>) id 1eLu7R-0004CX-VJ
+	for qemu-devel@nongnu.org; Mon, 04 Dec 2017 12:01:27 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1eLu6d-0007ry-FN
-	for qemu-devel@nongnu.org; Mon, 04 Dec 2017 12:00:39 -0500
-References: <20171204125505.29203-1-david@redhat.com>
-	<20171204175651.4acffb4e.cohuck@redhat.com>
-From: David Hildenbrand <david@redhat.com>
-Message-ID: <748a102a-cc55-b4d7-e18d-f65a144f5d9f@redhat.com>
-Date: Mon, 4 Dec 2017 18:00:31 +0100
-MIME-Version: 1.0
-In-Reply-To: <20171204175651.4acffb4e.cohuck@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v1 for-2.12 0/5] s390x/tcg: CCW hotplug
- support
+	(envelope-from <kwolf@redhat.com>) id 1eLu7O-0008EG-3z
+	for qemu-devel@nongnu.org; Mon, 04 Dec 2017 12:01:26 -0500
+From: Kevin Wolf <kwolf@redhat.com>
+Date: Mon,  4 Dec 2017 18:01:02 +0100
+Message-Id: <20171204170103.13973-2-kwolf@redhat.com>
+In-Reply-To: <20171204170103.13973-1-kwolf@redhat.com>
+References: <20171204170103.13973-1-kwolf@redhat.com>
+Subject: [Qemu-devel] [PULL 1/1] blockjob: Make block_job_pause_all() keep a
+ reference to the jobs
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,32 +20,77 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Cornelia Huck <cohuck@redhat.com>
-Cc: qemu-s390x@nongnu.org, qemu-devel@nongnu.org, Christian Borntraeger <borntraeger@de.ibm.com>, Richard Henderson <rth@twiddle.net>, Alexander Graf <agraf@suse.de>, Thomas Huth <thuth@redhat.com>
+To: qemu-block@nongnu.org
+Cc: kwolf@redhat.com, peter.maydell@linaro.org, berto@igalia.com, qemu-devel@nongnu.org
 
-On 04.12.2017 17:56, Cornelia Huck wrote:
-> On Mon,  4 Dec 2017 13:55:00 +0100
-> David Hildenbrand <david@redhat.com> wrote:
-> 
->> Hotplugging a ccw device currently fails due to different reasons.
->>
->> 1. The stored machine check information is partially wrong.
->> 2. The TOD programmable field cannot be restored.
->> 3. STCRW cannot get executed.
->>
->> With these patches, I am able to sucessfully hotplug e.g. virtio-rng by
->> issuing "device_add virtio-rng-ccw,id=rng0" to a Linux guest.
-> 
-> Thank you for taking care of my unpublished todo list ;)
-> 
-> Does device_del also work?
+From: Alberto Garcia <berto@igalia.com>
 
-I did a very quick test and it seemed to work. (I remember seeing
-notifications in dmesg)
+Starting from commit 40840e419be31e6a32e6ea24511c74b389d5e0e4 we are
+pausing all block jobs during bdrv_reopen_multiple() to prevent any of
+them from finishing and removing nodes from the graph while they are
+being reopened.
 
+It turns out that pausing a block job doesn't necessarily prevent it
+from finishing: a paused block job can still run its exit function
+from the main loop and call block_job_completed(). The mirror block
+job in particular always goes to the main loop while it is paused (by
+virtue of the bdrv_drained_begin() call in mirror_run()).
 
+Destroying a paused block job during bdrv_reopen_multiple() has two
+consequences:
+
+   1) The references to the nodes involved in the job are released,
+      possibly destroying some of them. If those nodes were in the
+      reopen queue this would trigger the problem originally described
+      in commit 40840e419be, crashing QEMU.
+
+   2) At the end of bdrv_reopen_multiple(), bdrv_drain_all_end() would
+      not be doing all necessary bdrv_parent_drained_end() calls.
+
+I can reproduce problem 1) easily with iotest 030 by increasing
+STREAM_BUFFER_SIZE from 512KB to 8MB in block/stream.c, or by tweaking
+the iotest like in this example:
+
+   https://lists.gnu.org/archive/html/qemu-block/2017-11/msg00934.html
+
+This patch keeps an additional reference to all block jobs between
+block_job_pause_all() and block_job_resume_all(), guaranteeing that
+they are kept alive.
+
+Signed-off-by: Alberto Garcia <berto@igalia.com>
+Signed-off-by: Kevin Wolf <kwolf@redhat.com>
+---
+ blockjob.c | 7 +++++--
+ 1 file changed, 5 insertions(+), 2 deletions(-)
+
+diff --git a/blockjob.c b/blockjob.c
+index 0ed50b953b..715c2c2680 100644
+--- a/blockjob.c
++++ b/blockjob.c
+@@ -730,6 +730,7 @@ void block_job_pause_all(void)
+         AioContext *aio_context = blk_get_aio_context(job->blk);
+ 
+         aio_context_acquire(aio_context);
++        block_job_ref(job);
+         block_job_pause(job);
+         aio_context_release(aio_context);
+     }
+@@ -808,12 +809,14 @@ void coroutine_fn block_job_pause_point(BlockJob *job)
+ 
+ void block_job_resume_all(void)
+ {
+-    BlockJob *job = NULL;
+-    while ((job = block_job_next(job))) {
++    BlockJob *job, *next;
++
++    QLIST_FOREACH_SAFE(job, &block_jobs, job_list, next) {
+         AioContext *aio_context = blk_get_aio_context(job->blk);
+ 
+         aio_context_acquire(aio_context);
+         block_job_resume(job);
++        block_job_unref(job);
+         aio_context_release(aio_context);
+     }
+ }
 -- 
-
-Thanks,
-
-David / dhildenb
+2.13.6
