@@ -1,23 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34596)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37037)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1eLvRX-0008Po-NJ
-	for qemu-devel@nongnu.org; Mon, 04 Dec 2017 13:26:16 -0500
+	(envelope-from <david@redhat.com>) id 1eLvcX-0004Rs-93
+	for qemu-devel@nongnu.org; Mon, 04 Dec 2017 13:37:38 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1eLvRW-0003OW-QN
-	for qemu-devel@nongnu.org; Mon, 04 Dec 2017 13:26:15 -0500
-References: <20171120201004.14999-1-mreitz@redhat.com>
-	<20171120201004.14999-25-mreitz@redhat.com>
-	<w51k1y2307y.fsf@maestria.local.igalia.com>
-From: Max Reitz <mreitz@redhat.com>
-Message-ID: <bcbf0021-4fcd-26d0-e05c-cd3e35608988@redhat.com>
-Date: Mon, 4 Dec 2017 19:26:02 +0100
+	(envelope-from <david@redhat.com>) id 1eLvcQ-0000CW-Ql
+	for qemu-devel@nongnu.org; Mon, 04 Dec 2017 13:37:34 -0500
+References: <20171204125505.29203-1-david@redhat.com>
+	<20171204125505.29203-6-david@redhat.com>
+	<20171204182244.2b789717.cohuck@redhat.com>
+	<8904d9e3-990f-46e1-49d1-9d37533d025e@redhat.com>
+	<20171204185352.39f2b131.cohuck@redhat.com>
+	<51a752c1-994e-e57a-8fce-1e2afcc2092c@redhat.com>
+	<20171204185833.64a68453.cohuck@redhat.com>
+From: David Hildenbrand <david@redhat.com>
+Message-ID: <e33bd227-4cb2-2e9b-9ebd-e498ec4aafe7@redhat.com>
+Date: Mon, 4 Dec 2017 19:37:26 +0100
 MIME-Version: 1.0
-In-Reply-To: <w51k1y2307y.fsf@maestria.local.igalia.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="TlpQCUgBAujUHGiVElfcQ5StlVn1eqAjR"
-Subject: Re: [Qemu-devel] [PATCH v7 for-2.12 24/25] block/curl: Implement
- bdrv_refresh_filename()
+In-Reply-To: <20171204185833.64a68453.cohuck@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v1 for-2.12 5/5] s390x/tcg: wire up STORE
+ CHANNEL REPORT WORD
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,75 +30,53 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alberto Garcia <berto@igalia.com>, qemu-block@nongnu.org
-Cc: qemu-devel@nongnu.org, Kevin Wolf <kwolf@redhat.com>, Eric Blake <eblake@redhat.com>, John Snow <jsnow@redhat.com>
+To: Cornelia Huck <cohuck@redhat.com>
+Cc: qemu-s390x@nongnu.org, qemu-devel@nongnu.org, Christian Borntraeger <borntraeger@de.ibm.com>, Richard Henderson <rth@twiddle.net>, Alexander Graf <agraf@suse.de>, Thomas Huth <thuth@redhat.com>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---TlpQCUgBAujUHGiVElfcQ5StlVn1eqAjR
-From: Max Reitz <mreitz@redhat.com>
-To: Alberto Garcia <berto@igalia.com>, qemu-block@nongnu.org
-Cc: qemu-devel@nongnu.org, Kevin Wolf <kwolf@redhat.com>,
- Eric Blake <eblake@redhat.com>, John Snow <jsnow@redhat.com>
-Message-ID: <bcbf0021-4fcd-26d0-e05c-cd3e35608988@redhat.com>
-Subject: Re: [PATCH v7 for-2.12 24/25] block/curl: Implement
- bdrv_refresh_filename()
-References: <20171120201004.14999-1-mreitz@redhat.com>
- <20171120201004.14999-25-mreitz@redhat.com>
- <w51k1y2307y.fsf@maestria.local.igalia.com>
-In-Reply-To: <w51k1y2307y.fsf@maestria.local.igalia.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-
-On 2017-12-04 17:51, Alberto Garcia wrote:
-> On Mon 20 Nov 2017 09:10:03 PM CET, Max Reitz wrote:
->> Signed-off-by: Max Reitz <mreitz@redhat.com>
->> ---
->>  block/curl.c | 18 ++++++++++++++++++
->>  1 file changed, 18 insertions(+)
+On 04.12.2017 18:58, Cornelia Huck wrote:
+> On Mon, 4 Dec 2017 18:56:00 +0100
+> David Hildenbrand <david@redhat.com> wrote:
+> 
+>> On 04.12.2017 18:53, Cornelia Huck wrote:
+>>> On Mon, 4 Dec 2017 18:34:36 +0100
+>>> David Hildenbrand <david@redhat.com> wrote:
+>>>   
+>>>> On 04.12.2017 18:22, Cornelia Huck wrote:  
+>>>>> On Mon,  4 Dec 2017 13:55:05 +0100
+>>>>> David Hildenbrand <david@redhat.com> wrote:
+>>>>>     
+>>>>>> We somehow missed that, new kernels require it.    
+>>>>>
+>>>>> Why _new_ kernels? I think we have unconditionally issued stcrw since
+>>>>> back in 2.2?    
+>>>>
+>>>> Okay, the problem is then rather related to my setup. No ccw devices ->
+>>>> no stcrw.
+>>>>
+>>>> How could we ever add ccw devices to a TCG guest then?  
+>>>
+>>> Hotplug never worked before your patches. Coldplug does not create
+>>> machine checks and thus does not trigger the guest to do STCRW. (Only
+>>> STSCH, in keeping with "all channel I/O acronyms look the same".)
+>>>   
 >>
->> diff --git a/block/curl.c b/block/curl.c
->> index 11318a9a29..fe57223fda 100644
->> --- a/block/curl.c
->> +++ b/block/curl.c
->> @@ -957,6 +957,20 @@ static int64_t curl_getlength(BlockDriverState *b=
-s)
->>      return s->len;
->>  }
->> =20
->> +static void curl_refresh_filename(BlockDriverState *bs)
->> +{
->> +    BDRVCURLState *s =3D bs->opaque;
->> +
->> +    if (!s->sslverify || s->cookie ||
->> +        s->username || s->password || s->proxyusername || s->proxypas=
-sword)
->> +    {
->=20
-> Is !s->sslverify negative because that setting is true by default?
+>> But booting Fedora 26/27 without any involved hotplugs (therefore
+>> machine checks) triggers a STCRW.
+>>
+>> That's how I originally found it. (I started playing with machine checks
+>> after I had fedora 26/27 running)
+>>
+> 
+> Confused. Do you have a backtrace? (Guest/host)
+> 
 
-Yes, exactly.  If it's false, you'd need to override it (and you can't
-do that through a plain filename).
+Unfortunately not. Strange, I just tried to reproduce but can't trigger
+it. Maybe aside effect from the other BUGs I have been fixing :)
 
-Thanks for reviewing, again. :-)
+So I'll just rephrase this to "CRW machine check handling requires STCRW."
 
-Max
+-- 
 
+Thanks,
 
---TlpQCUgBAujUHGiVElfcQ5StlVn1eqAjR
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQFGBAEBCAAwFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAlolkzoSHG1yZWl0ekBy
-ZWRoYXQuY29tAAoJEPQH2wBh1c9ARCkH/Rjpf4dYwXYI2fQITN4h7sUk/KQ8S0JU
-7U1481+LfRA1ZtUTydV5CyMCUy+5HjvUWUVi61ZRe5W7H7/1v+IK4BPAVeYYoCzq
-qZ1n2PBavMu9orf2l0587Gll4JRI+zqmjzo9rdHf8Xs9Njelp8ZDLqo6Qir1ZQI2
-GQPgjFqDPa4INBQyj+pzqeAH6VYiGasjatnuqWEO80MjcIIdGmkhrehjhDHj68ud
-3FgBqq4oKHRp9b/ZH2gSPp8CIDrTwBo3Tdm5rUnjrf3rewzgWJYtM+OgvhLM+/Gm
-7tCE18+lJ2kOpMHaAz+oSCMK8Bv7yF0HHpfxUQzuE66tCD4wWkg2Bbc=
-=6OJX
------END PGP SIGNATURE-----
-
---TlpQCUgBAujUHGiVElfcQ5StlVn1eqAjR--
+David / dhildenb
