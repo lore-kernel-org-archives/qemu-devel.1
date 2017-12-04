@@ -1,24 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42939)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43134)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <benh@kernel.crashing.org>) id 1eLtJa-0003Fu-Dc
-	for qemu-devel@nongnu.org; Mon, 04 Dec 2017 11:09:58 -0500
+	(envelope-from <samuel.thibault@ens-lyon.org>) id 1eLtKC-0003g3-2I
+	for qemu-devel@nongnu.org; Mon, 04 Dec 2017 11:10:33 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <benh@kernel.crashing.org>) id 1eLtJW-00065R-47
-	for qemu-devel@nongnu.org; Mon, 04 Dec 2017 11:09:54 -0500
-Message-ID: <1512403760.2224.81.camel@kernel.crashing.org>
-From: Benjamin Herrenschmidt <benh@kernel.crashing.org>
-Date: Mon, 04 Dec 2017 10:09:20 -0600
-In-Reply-To: <20171204011754.GH2130@umbus.fritz.box>
-References: <20171123132955.1261-1-clg@kaod.org>
-	<20171123132955.1261-16-clg@kaod.org>
-	<20171130050049.GD3023@umbus.fritz.box>
-	<1512225658.2224.66.camel@kernel.crashing.org>
-	<20171204011754.GH2130@umbus.fritz.box>
-Content-Type: text/plain; charset="UTF-8"
-Mime-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 15/25] spapr: notify the CPU when the XIVE
- interrupt priority is more privileged
+	(envelope-from <samuel.thibault@ens-lyon.org>) id 1eLtK7-0006bk-Qd
+	for qemu-devel@nongnu.org; Mon, 04 Dec 2017 11:10:32 -0500
+Received: from mail3-relais-sop.national.inria.fr ([192.134.164.104]:10290)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <samuel.thibault@ens-lyon.org>)
+	id 1eLtK7-0006Zu-G4
+	for qemu-devel@nongnu.org; Mon, 04 Dec 2017 11:10:27 -0500
+Date: Mon, 4 Dec 2017 17:10:24 +0100
+From: Samuel Thibault <samuel.thibault@gnu.org>
+Message-ID: <20171204161024.q2ttajkuyl24j5af@var.youpi.perso.aquilenet.fr>
+References: <20171204151705.26028-1-samuel.thibault@ens-lyon.org>
+	<CAFEAcA9CYSCJtGjRPQonyA8jvMZ6VBaWbGtrnJ7y6mJEbERMHg@mail.gmail.com>
+	<20171204152645.fy5grsjjn5hedvko@var.youpi.perso.aquilenet.fr>
+	<CAFEAcA_g9_qVh+7qaZSenjnCxe53jYkVRGTJF47-oN1wukGS3A@mail.gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <CAFEAcA_g9_qVh+7qaZSenjnCxe53jYkVRGTJF47-oN1wukGS3A@mail.gmail.com>
+Subject: Re: [Qemu-devel] [PULL 0/1] baum braille device update
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,115 +31,37 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Gibson <david@gibson.dropbear.id.au>
-Cc: =?ISO-8859-1?Q?C=E9dric?= Le Goater <clg@kaod.org>, qemu-ppc@nongnu.org, qemu-devel@nongnu.org
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 
-On Mon, 2017-12-04 at 12:17 +1100, David Gibson wrote:
-> On Sat, Dec 02, 2017 at 08:40:58AM -0600, Benjamin Herrenschmidt wrote:
-> > On Thu, 2017-11-30 at 16:00 +1100, David Gibson wrote:
-> > > 
-> > > >  static uint64_t spapr_xive_icp_accept(sPAPRXiveICP *icp)
-> > > >  {
-> > > > -    return 0;
-> > > > +    uint8_t nsr = icp->tima_os[TM_NSR];
-> > > > +
-> > > > +    qemu_irq_lower(icp->output);
-> > > > +
-> > > > +    if (icp->tima_os[TM_NSR] & TM_QW1_NSR_EO) {
-> > > > +        uint8_t cppr = icp->tima_os[TM_PIPR];
-> > > > +
-> > > > +        icp->tima_os[TM_CPPR] = cppr;
-> > > > +
-> > > > +        /* Reset the pending buffer bit */
-> > > > +        icp->tima_os[TM_IPB] &= ~priority_to_ipb(cppr);
-> > > 
-> > > What if multiple irqs of the same priority were queued?
-> > 
-> > It's the job of the OS to handle that case by consuming from the queue
-> > until it's empty. There is an MMIO the guest can use if it wants to
-> > that can set the IPB bits back to 1 for a given priority. Otherwise in
-> > Linux we just have a SW way to force a replay.
+Peter Maydell, on lun. 04 déc. 2017 15:36:32 +0000, wrote:
+> On 4 December 2017 at 15:26, Samuel Thibault <samuel.thibault@gnu.org> wrote:
+> > Peter Maydell, on lun. 04 déc. 2017 15:21:48 +0000, wrote:
+> >> On 4 December 2017 at 15:17, Samuel Thibault
+> >> <samuel.thibault@ens-lyon.org> wrote:
+> >> > ----------------------------------------------------------------
+> >> > Samuel Thibault (1):
+> >> >       baum: Truncate braille device size to 84x1
+> >>
+> >> Hi. Is this pull request intended for 2.11?
+> >
+> > If possible, yes.
+> >
+> >> We're currently in freeze for that and only taking "absolutely release
+> >> critical" bug fixes...
+> >
+> > Ok, as you wish.
+> >
+> > It's a relatively corner case: a friend of mine does have a 88-cell
+> > braille display, and can not use it with guests by running qemu
+> > -usbdevice braille due to this bug.
 > 
-> Ok, so "accept" is effectively saying the OS is accepting all
-> interrupts from that queue, right?
+> Mmm. Looking at the code for baum.c for 2.10, this isn't a
+> regression from 2.10 or a security issue, which is what it
+> would need to be for us to want to put this in at this point.
 
-It's whatever you want it to mean. It's simply a test & clear on the
-prio bit. From a HW standpoint, you could have multiple queues or just
-set an internal SW flag to go chck again later etc...
+Ah, ok, nevermind then, it'll have to wait.
 
-> 
-> > 
-> > > > +        icp->tima_os[TM_PIPR] = ipb_to_pipr(icp->tima_os[TM_IPB]);
-> > > > +
-> > > > +        /* Drop Exception bit for OS */
-> > > > +        icp->tima_os[TM_NSR] &= ~TM_QW1_NSR_EO;
-> > > > +    }
-> > > > +
-> > > > +    return (nsr << 8) | icp->tima_os[TM_CPPR];
-> > > > +}
-> > > > +
-> > > > +static void spapr_xive_icp_notify(sPAPRXiveICP *icp)
-> > > > +{
-> > > > +    if (icp->tima_os[TM_PIPR] < icp->tima_os[TM_CPPR]) {
-> > > > +        icp->tima_os[TM_NSR] |= TM_QW1_NSR_EO;
-> > > > +        qemu_irq_raise(icp->output);
-> > > > +    }
-> > > >  }
-> > > >  
-> > > >  static void spapr_xive_icp_set_cppr(sPAPRXiveICP *icp, uint8_t cppr)
-> > > > @@ -51,6 +105,9 @@ static void spapr_xive_icp_set_cppr(sPAPRXiveICP *icp, uint8_t cppr)
-> > > >      }
-> > > >  
-> > > >      icp->tima_os[TM_CPPR] = cppr;
-> > > > +
-> > > > +    /* CPPR has changed, inform the ICP which might raise an exception */
-> > > > +    spapr_xive_icp_notify(icp);
-> > > >  }
-> > > >  
-> > > >  /*
-> > > > @@ -224,6 +281,8 @@ static void spapr_xive_irq(sPAPRXive *xive, int lisn)
-> > > >      XiveEQ *eq;
-> > > >      uint32_t eq_idx;
-> > > >      uint8_t priority;
-> > > > +    uint32_t server;
-> > > > +    sPAPRXiveICP *icp;
-> > > >  
-> > > >      ive = spapr_xive_get_ive(xive, lisn);
-> > > >      if (!ive || !(ive->w & IVE_VALID)) {
-> > > > @@ -253,6 +312,13 @@ static void spapr_xive_irq(sPAPRXive *xive, int lisn)
-> > > >          qemu_log_mask(LOG_UNIMP, "XIVE: !UCOND_NOTIFY not implemented\n");
-> > > >      }
-> > > >  
-> > > > +    server = GETFIELD(EQ_W6_NVT_INDEX, eq->w6);
-> > > > +    icp = spapr_xive_icp_get(xive, server);
-> > > > +    if (!icp) {
-> > > > +        qemu_log_mask(LOG_GUEST_ERROR, "XIVE: No ICP for server %d\n", server);
-> > > > +        return;
-> > > > +    }
-> > > > +
-> > > >      if (GETFIELD(EQ_W6_FORMAT_BIT, eq->w6) == 0) {
-> > > >          priority = GETFIELD(EQ_W7_F0_PRIORITY, eq->w7);
-> > > >  
-> > > > @@ -260,9 +326,18 @@ static void spapr_xive_irq(sPAPRXive *xive, int lisn)
-> > > >          if (priority == 0xff) {
-> > > >              g_assert_not_reached();
-> > > >          }
-> > > > +
-> > > > +        /* Update the IPB (Interrupt Pending Buffer) with the priority
-> > > > +         * of the new notification and inform the ICP, which will
-> > > > +         * decide to raise the exception, or not, depending the CPPR.
-> > > > +         */
-> > > > +        icp->tima_os[TM_IPB] |= priority_to_ipb(priority);
-> > > > +        icp->tima_os[TM_PIPR] = ipb_to_pipr(icp->tima_os[TM_IPB]);
-> > > >      } else {
-> > > >          qemu_log_mask(LOG_UNIMP, "XIVE: w7 format1 not implemented\n");
-> > > >      }
-> > > > +
-> > > > +    spapr_xive_icp_notify(icp);
-> > > >  }
-> > > >  
-> > > >  /*
-> > > 
-> > > 
-> 
-> 
+Sorry I didn't know that.
+
+Samuel
