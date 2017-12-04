@@ -1,26 +1,15 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38877)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39473)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1eLz9S-0002iC-Jr
-	for qemu-devel@nongnu.org; Mon, 04 Dec 2017 17:23:51 -0500
+	(envelope-from <richard@rpsys.net>) id 1eLzBp-0003jn-7F
+	for qemu-devel@nongnu.org; Mon, 04 Dec 2017 17:26:18 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1eLz9P-00040j-FJ
-	for qemu-devel@nongnu.org; Mon, 04 Dec 2017 17:23:50 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:37998)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mreitz@redhat.com>) id 1eLz9P-0003zr-6T
-	for qemu-devel@nongnu.org; Mon, 04 Dec 2017 17:23:47 -0500
-References: <20171204151741.14485-1-danielhb@linux.vnet.ibm.com>
-	<20171204151741.14485-2-danielhb@linux.vnet.ibm.com>
-From: Max Reitz <mreitz@redhat.com>
-Message-ID: <8435b741-1bfc-fbe8-baa8-00bc98e60e0f@redhat.com>
-Date: Mon, 4 Dec 2017 23:23:42 +0100
-MIME-Version: 1.0
-In-Reply-To: <20171204151741.14485-2-danielhb@linux.vnet.ibm.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="kMOLh1Xupxla6rdaUeCqXQ8QQgpAT7iI1"
-Subject: Re: [Qemu-devel] [PATCH v4 1/1] tests/qemu-iotests: adding
- savevm/loadvm with postcopy flag test
+	(envelope-from <richard@rpsys.net>) id 1eLzBo-0005De-5F
+	for qemu-devel@nongnu.org; Mon, 04 Dec 2017 17:26:17 -0500
+From: Richard Purdie <richard.purdie@linuxfoundation.org>
+Date: Mon,  4 Dec 2017 22:25:43 +0000
+Message-Id: <1512426343-18938-1-git-send-email-richard.purdie@linuxfoundation.org>
+Subject: [Qemu-devel] [PATCH v3] target/ppc: Fix system lockups caused by
+ interrupt_request state corruption
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,139 +18,125 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Daniel Henrique Barboza <danielhb@linux.vnet.ibm.com>, qemu-devel@nongnu.org
-Cc: Kevin Wolf <kwolf@redhat.com>, Cleber Rosa <crosa@redhat.com>
+To: qemu-devel@nongnu.org, david@gibson.dropbear.id.au
+Cc: qemu-ppc@nongnu.org, Richard Purdie <richard.purdie@linuxfoundation.org>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---kMOLh1Xupxla6rdaUeCqXQ8QQgpAT7iI1
-From: Max Reitz <mreitz@redhat.com>
-To: Daniel Henrique Barboza <danielhb@linux.vnet.ibm.com>,
- qemu-devel@nongnu.org
-Cc: Kevin Wolf <kwolf@redhat.com>, Cleber Rosa <crosa@redhat.com>
-Message-ID: <8435b741-1bfc-fbe8-baa8-00bc98e60e0f@redhat.com>
-Subject: Re: [PATCH v4 1/1] tests/qemu-iotests: adding savevm/loadvm with
- postcopy flag test
-References: <20171204151741.14485-1-danielhb@linux.vnet.ibm.com>
- <20171204151741.14485-2-danielhb@linux.vnet.ibm.com>
-In-Reply-To: <20171204151741.14485-2-danielhb@linux.vnet.ibm.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+Occasionally in Linux guests on x86_64 we're seeing logs like:
 
-On 2017-12-04 16:17, Daniel Henrique Barboza wrote:
-> This patch implements a test case for the scenario that was failing
-> prior to the patch "migration/ram.c: do not set 'postcopy_running' in
-> POSTCOPY_INCOMING_END", commit acab30b85d.
->=20
-> This new test file 201 was derived from the test file 181 authored
-> by Kevin Wolf.
->=20
-> CC: Kevin Wolf <kwolf@redhat.com>
-> CC: Max Reitz <mreitz@redhat.com>
-> CC: Cleber Rosa <crosa@redhat.com>
-> Signed-off-by: Daniel Henrique Barboza <danielhb@linux.vnet.ibm.com>
-> ---
->  tests/qemu-iotests/201     | 116 +++++++++++++++++++++++++++++++++++++=
-++++++++
->  tests/qemu-iotests/201.out |  23 +++++++++
->  tests/qemu-iotests/group   |   1 +
->  3 files changed, 140 insertions(+)
->  create mode 100755 tests/qemu-iotests/201
->  create mode 100644 tests/qemu-iotests/201.out
->=20
-> diff --git a/tests/qemu-iotests/201 b/tests/qemu-iotests/201
-> new file mode 100755
-> index 0000000000..9b6e23bbfc
-> --- /dev/null
-> +++ b/tests/qemu-iotests/201
-> @@ -0,0 +1,116 @@
-> +#!/bin/bash
-> +#
-> +# Test savevm and loadvm after live migration with postcopy flag
-> +#
-> +# Copyright (C) 2017, IBM Corporation.
-> +#
-> +# This file is derived from tests/qemu-iotests/181 by Kevin Wolf
-> +#
-> +# This program is free software; you can redistribute it and/or modify=
+ppc_set_irq: 0x55b4e0d562f0 n_IRQ 8 level 1 => pending 00000100req 00000004
 
-> +# it under the terms of the GNU General Public License as published by=
+when they should read:
 
-> +# the Free Software Foundation; either version 2 of the License, or
-> +# (at your option) any later version.
-> +#
-> +# This program is distributed in the hope that it will be useful,
-> +# but WITHOUT ANY WARRANTY; without even the implied warranty of
-> +# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-> +# GNU General Public License for more details.
-> +#
-> +# You should have received a copy of the GNU General Public License
-> +# along with this program.  If not, see <http://www.gnu.org/licenses/>=
-=2E
-> +
-> +seq=3D`basename $0`
-> +echo "QA output created by $seq"
-> +
-> +status=3D1	# failure is the default!
-> +
-> +MIG_SOCKET=3D"${TEST_DIR}/migrate"
-> +
-> +# get standard environment, filters and checks
-> +. ./common.rc
-> +. ./common.filter
-> +. ./common.qemu
-> +
-> +_cleanup()
-> +{
-> +    rm -f "${MIG_SOCKET}"
-> +    _cleanup_test_img
-> +    _cleanup_qemu
-> +}
-> +trap "_cleanup; exit \$status" 0 1 2 3 15
-> +
-> +_supported_fmt qcow2
-> +_supported_proto generic
-> +_supported_os Linux
+ppc_set_irq: 0x55b4e0d562f0 n_IRQ 8 level 1 => pending 00000100req 00000002
 
-Sorry, I had to unqueue the patch again, because I only just saw there's
-something like
+The "00000004" is CPU_INTERRUPT_EXITTB yet the code calls
+cpu_interrupt(cs, CPU_INTERRUPT_HARD) ("00000002") in this function
+just before the log message. Something is causing the HARD bit setting
+to get lost.
 
-> # Internal snapshots are (currently) impossible with refcount_bits=3D1 =
-                                                                         =
-                                                                         =
-                     =20
-> _unsupported_imgopts 'refcount_bits=3D1[^0-9]'
+The knock on effect of losing that bit is the decrementer timer interrupts
+don't get delivered which causes the guest to sit idle in its idle handler
+and 'hang'.
 
-missing here (taken from 080).
+The issue occurs due to races from code which sets CPU_INTERRUPT_EXITTB.
 
-(Without that, the test fails with
- $ ./check -T -qcow2 -o refcount_bits=3D1 201
-)
+Rather than poking directly into cs->interrupt_request, that code needs to:
 
-I could have added it myself, but that seemed a bit too much of a change
-to me...
+a) hold BQL
+b) use the cpu_interrupt() helper
 
-Max
+This patch fixes the call sites to do this, fixing the hang. The calls
+are made from a variety of contexts so a helper function is added to handle
+the necessary locking. This can likely be improved and optimised in the future
+but it ensures the code is correct and doesn't lockup as it stands today.
 
-> +
-> +size=3D64M
-> +_make_test_img $size
+Signed-off-by: Richard Purdie <richard.purdie@linuxfoundation.org>
+---
+ target/ppc/excp_helper.c |  7 +++----
+ target/ppc/helper_regs.h | 17 +++++++++++++++--
+ 2 files changed, 18 insertions(+), 6 deletions(-)
+
+v3: Fix make check failures
+v2: Fixes a compile issue with master and ensures BQL is held in one case
+where it potentially wasn't.
 
 
---kMOLh1Xupxla6rdaUeCqXQ8QQgpAT7iI1
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQFGBAEBCAAwFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAlolyu8SHG1yZWl0ekBy
-ZWRoYXQuY29tAAoJEPQH2wBh1c9AhysH/0v57O3KhYVKrU20WOKuc3g5AWEBOCCN
-MBmRx8LOMUuOw88oXIWBJXjO+qPeHTDIQiq43p6sEhNruOS5QwOX8mJD09PmUPT4
-TuwRrvrtNAx4Q1AZ3USOSd5cQNGMqBIfBDd7oQdrh6xC1nlYQJY63nu0i7iT6lAj
-wMntNwxugVOuStNSyXXVTIw9oWYDzgJepUQ3mShjZlnc0ai2VHHULewCcdAyU75a
-NLTZmmUdWn3ipzMLekqJVg+WLyQX8R+kuQHUwr9rkDLJ8Q2O0MU8bn/aig/irxnY
-NrgmjRD8X052R7kDsEQ6bAJiFtt8g1XZR4qyHQ6cZKuWhsD5i3fBxrc=
-=Gha7
------END PGP SIGNATURE-----
-
---kMOLh1Xupxla6rdaUeCqXQ8QQgpAT7iI1--
+diff --git a/target/ppc/excp_helper.c b/target/ppc/excp_helper.c
+index e6009e70e5..37d2410726 100644
+--- a/target/ppc/excp_helper.c
++++ b/target/ppc/excp_helper.c
+@@ -207,7 +207,7 @@ static inline void powerpc_excp(PowerPCCPU *cpu, int excp_model, int excp)
+                         "Entering checkstop state\n");
+             }
+             cs->halted = 1;
+-            cs->interrupt_request |= CPU_INTERRUPT_EXITTB;
++            cpu_interrupt_exittb(cs);
+         }
+         if (env->msr_mask & MSR_HVB) {
+             /* ISA specifies HV, but can be delivered to guest with HV clear
+@@ -940,7 +940,7 @@ void helper_store_msr(CPUPPCState *env, target_ulong val)
+ 
+     if (excp != 0) {
+         CPUState *cs = CPU(ppc_env_get_cpu(env));
+-        cs->interrupt_request |= CPU_INTERRUPT_EXITTB;
++        cpu_interrupt_exittb(cs);
+         raise_exception(env, excp);
+     }
+ }
+@@ -995,8 +995,7 @@ static inline void do_rfi(CPUPPCState *env, target_ulong nip, target_ulong msr)
+     /* No need to raise an exception here,
+      * as rfi is always the last insn of a TB
+      */
+-    cs->interrupt_request |= CPU_INTERRUPT_EXITTB;
+-
++    cpu_interrupt_exittb(cs);
+     /* Reset the reservation */
+     env->reserve_addr = -1;
+ 
+diff --git a/target/ppc/helper_regs.h b/target/ppc/helper_regs.h
+index 2627a70176..84fd30c2db 100644
+--- a/target/ppc/helper_regs.h
++++ b/target/ppc/helper_regs.h
+@@ -20,6 +20,8 @@
+ #ifndef HELPER_REGS_H
+ #define HELPER_REGS_H
+ 
++#include "qemu/main-loop.h"
++
+ /* Swap temporary saved registers with GPRs */
+ static inline void hreg_swap_gpr_tgpr(CPUPPCState *env)
+ {
+@@ -96,6 +98,17 @@ static inline void hreg_compute_hflags(CPUPPCState *env)
+     env->hflags |= env->hflags_nmsr;
+ }
+ 
++static inline void cpu_interrupt_exittb(CPUState *cs)
++{
++    if (!qemu_mutex_iothread_locked()) {
++        qemu_mutex_lock_iothread();
++        cpu_interrupt(cs, CPU_INTERRUPT_EXITTB);
++        qemu_mutex_unlock_iothread();
++    } else {
++        cpu_interrupt(cs, CPU_INTERRUPT_EXITTB);
++    }
++}
++
+ static inline int hreg_store_msr(CPUPPCState *env, target_ulong value,
+                                  int alter_hv)
+ {
+@@ -114,11 +127,11 @@ static inline int hreg_store_msr(CPUPPCState *env, target_ulong value,
+     }
+     if (((value >> MSR_IR) & 1) != msr_ir ||
+         ((value >> MSR_DR) & 1) != msr_dr) {
+-        cs->interrupt_request |= CPU_INTERRUPT_EXITTB;
++        cpu_interrupt_exittb(cs);
+     }
+     if ((env->mmu_model & POWERPC_MMU_BOOKE) &&
+         ((value >> MSR_GS) & 1) != msr_gs) {
+-        cs->interrupt_request |= CPU_INTERRUPT_EXITTB;
++        cpu_interrupt_exittb(cs);
+     }
+     if (unlikely((env->flags & POWERPC_FLAG_TGPR) &&
+                  ((value ^ env->msr) & (1 << MSR_TGPR)))) {
+-- 
+2.14.1
