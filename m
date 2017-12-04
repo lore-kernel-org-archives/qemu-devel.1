@@ -1,25 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54646)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56355)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1eLv0y-0002Fg-Cy
-	for qemu-devel@nongnu.org; Mon, 04 Dec 2017 12:58:49 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1eLv6E-0007oa-T7
+	for qemu-devel@nongnu.org; Mon, 04 Dec 2017 13:04:15 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1eLv0u-0006sU-Eg
-	for qemu-devel@nongnu.org; Mon, 04 Dec 2017 12:58:48 -0500
-Date: Mon, 4 Dec 2017 18:58:33 +0100
-From: Cornelia Huck <cohuck@redhat.com>
-Message-ID: <20171204185833.64a68453.cohuck@redhat.com>
-In-Reply-To: <51a752c1-994e-e57a-8fce-1e2afcc2092c@redhat.com>
-References: <20171204125505.29203-1-david@redhat.com>
-	<20171204125505.29203-6-david@redhat.com>
-	<20171204182244.2b789717.cohuck@redhat.com>
-	<8904d9e3-990f-46e1-49d1-9d37533d025e@redhat.com>
-	<20171204185352.39f2b131.cohuck@redhat.com>
-	<51a752c1-994e-e57a-8fce-1e2afcc2092c@redhat.com>
+	(envelope-from <peter.maydell@linaro.org>) id 1eLv6D-0001OA-V6
+	for qemu-devel@nongnu.org; Mon, 04 Dec 2017 13:04:14 -0500
+Received: from mail-ot0-x241.google.com ([2607:f8b0:4003:c0f::241]:44708)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1eLv6D-0001No-Q0
+	for qemu-devel@nongnu.org; Mon, 04 Dec 2017 13:04:13 -0500
+Received: by mail-ot0-x241.google.com with SMTP id d27so15512588ote.11
+	for <qemu-devel@nongnu.org>; Mon, 04 Dec 2017 10:04:13 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v1 for-2.12 5/5] s390x/tcg: wire up STORE
- CHANNEL REPORT WORD
+In-Reply-To: <20171204170103.13973-1-kwolf@redhat.com>
+References: <20171204170103.13973-1-kwolf@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Mon, 4 Dec 2017 18:03:52 +0000
+Message-ID: <CAFEAcA8UmT24ZJNTzwvhFQx_e9r3EXKWpRbFvjc817KfkBDB-A@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PULL 0/1] Block layer patch for 2.11.0-rc4
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,40 +28,32 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Hildenbrand <david@redhat.com>
-Cc: qemu-s390x@nongnu.org, qemu-devel@nongnu.org, Christian Borntraeger <borntraeger@de.ibm.com>, Richard Henderson <rth@twiddle.net>, Alexander Graf <agraf@suse.de>, Thomas Huth <thuth@redhat.com>
+To: Kevin Wolf <kwolf@redhat.com>
+Cc: Qemu-block <qemu-block@nongnu.org>, Alberto Garcia <berto@igalia.com>, QEMU Developers <qemu-devel@nongnu.org>
 
-On Mon, 4 Dec 2017 18:56:00 +0100
-David Hildenbrand <david@redhat.com> wrote:
+On 4 December 2017 at 17:01, Kevin Wolf <kwolf@redhat.com> wrote:
+> The following changes since commit 495566ec38817e6625294e6909cffb4de040c8e7:
+>
+>   Merge remote-tracking branch 'remotes/dgibson/tags/ppc-for-2.11-20171204' into staging (2017-12-04 11:27:53 +0000)
+>
+> are available in the git repository at:
+>
+>   git://repo.or.cz/qemu/kevin.git tags/for-upstream
+>
+> for you to fetch changes up to 3d5d319e1221082974711af1d09d82f0755c1698:
+>
+>   blockjob: Make block_job_pause_all() keep a reference to the jobs (2017-12-04 17:44:51 +0100)
+>
+> ----------------------------------------------------------------
+> Block layer patches for 2.11.0-rc4
+>
+> ----------------------------------------------------------------
+> Alberto Garcia (1):
+>       blockjob: Make block_job_pause_all() keep a reference to the jobs
+>
+>  blockjob.c | 7 +++++--
+>  1 file changed, 5 insertions(+), 2 deletions(-)
 
-> On 04.12.2017 18:53, Cornelia Huck wrote:
-> > On Mon, 4 Dec 2017 18:34:36 +0100
-> > David Hildenbrand <david@redhat.com> wrote:
-> >   
-> >> On 04.12.2017 18:22, Cornelia Huck wrote:  
-> >>> On Mon,  4 Dec 2017 13:55:05 +0100
-> >>> David Hildenbrand <david@redhat.com> wrote:
-> >>>     
-> >>>> We somehow missed that, new kernels require it.    
-> >>>
-> >>> Why _new_ kernels? I think we have unconditionally issued stcrw since
-> >>> back in 2.2?    
-> >>
-> >> Okay, the problem is then rather related to my setup. No ccw devices ->
-> >> no stcrw.
-> >>
-> >> How could we ever add ccw devices to a TCG guest then?  
-> > 
-> > Hotplug never worked before your patches. Coldplug does not create
-> > machine checks and thus does not trigger the guest to do STCRW. (Only
-> > STSCH, in keeping with "all channel I/O acronyms look the same".)
-> >   
-> 
-> But booting Fedora 26/27 without any involved hotplugs (therefore
-> machine checks) triggers a STCRW.
-> 
-> That's how I originally found it. (I started playing with machine checks
-> after I had fedora 26/27 running)
-> 
+Applied, thanks.
 
-Confused. Do you have a backtrace? (Guest/host)
+-- PMM
