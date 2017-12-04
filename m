@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60187)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60234)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1eLqHL-0006Dq-25
-	for qemu-devel@nongnu.org; Mon, 04 Dec 2017 07:55:24 -0500
+	(envelope-from <david@redhat.com>) id 1eLqHN-0006Fx-2p
+	for qemu-devel@nongnu.org; Mon, 04 Dec 2017 07:55:25 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1eLqHG-0000Hm-RO
-	for qemu-devel@nongnu.org; Mon, 04 Dec 2017 07:55:23 -0500
+	(envelope-from <david@redhat.com>) id 1eLqHJ-0000JB-5N
+	for qemu-devel@nongnu.org; Mon, 04 Dec 2017 07:55:24 -0500
 From: David Hildenbrand <david@redhat.com>
-Date: Mon,  4 Dec 2017 13:55:03 +0100
-Message-Id: <20171204125505.29203-4-david@redhat.com>
+Date: Mon,  4 Dec 2017 13:55:04 +0100
+Message-Id: <20171204125505.29203-5-david@redhat.com>
 In-Reply-To: <20171204125505.29203-1-david@redhat.com>
 References: <20171204125505.29203-1-david@redhat.com>
-Subject: [Qemu-devel] [PATCH v1 for-2.12 3/5] s390x/tcg: implement SET CLOCK
- PROGRAMMABLE FIELD
+Subject: [Qemu-devel] [PATCH v1 for-2.12 4/5] s390x/tcg: indicate value of
+ TODPR in STCKE
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,83 +23,41 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-s390x@nongnu.org, qemu-devel@nongnu.org
 Cc: Christian Borntraeger <borntraeger@de.ibm.com>, Cornelia Huck <cohuck@redhat.com>, Richard Henderson <rth@twiddle.net>, Alexander Graf <agraf@suse.de>, Thomas Huth <thuth@redhat.com>, David Hildenbrand <david@redhat.com>
 
-Needed for machine check handling inside Linux (when restoring registers).
-
-Except for SIGP and machine checks, we don't make use of the register
-yet. Suficient for now.
+We were not yet using the value of the TOD Programmable Register.
 
 Signed-off-by: David Hildenbrand <david@redhat.com>
 ---
- target/s390x/helper.h      |  1 +
- target/s390x/insn-data.def |  2 ++
- target/s390x/misc_helper.c | 11 +++++++++++
- target/s390x/translate.c   |  7 +++++++
- 4 files changed, 21 insertions(+)
+ target/s390x/translate.c | 5 +++++
+ 1 file changed, 5 insertions(+)
 
-diff --git a/target/s390x/helper.h b/target/s390x/helper.h
-index 9459b73c73..0281c286b8 100644
---- a/target/s390x/helper.h
-+++ b/target/s390x/helper.h
-@@ -127,6 +127,7 @@ DEF_HELPER_3(load_psw, noreturn, env, i64, i64)
- DEF_HELPER_FLAGS_2(spx, TCG_CALL_NO_RWG, void, env, i64)
- DEF_HELPER_FLAGS_1(stck, TCG_CALL_NO_RWG_SE, i64, env)
- DEF_HELPER_FLAGS_2(sckc, TCG_CALL_NO_RWG, void, env, i64)
-+DEF_HELPER_FLAGS_1(sckpf, TCG_CALL_NO_RWG, void, env)
- DEF_HELPER_FLAGS_1(stckc, TCG_CALL_NO_RWG, i64, env)
- DEF_HELPER_FLAGS_2(spt, TCG_CALL_NO_RWG, void, env, i64)
- DEF_HELPER_FLAGS_1(stpt, TCG_CALL_NO_RWG, i64, env)
-diff --git a/target/s390x/insn-data.def b/target/s390x/insn-data.def
-index 16e27c8a35..8c2541f545 100644
---- a/target/s390x/insn-data.def
-+++ b/target/s390x/insn-data.def
-@@ -999,6 +999,8 @@
-     C(0xb204, SCK,     S,     Z,   0, 0, 0, 0, 0, 0)
- /* SET CLOCK COMPARATOR */
-     C(0xb206, SCKC,    S,     Z,   0, m2_64, 0, 0, sckc, 0)
-+/* SET CLOCK PROGRAMMABLE FIELD */
-+    C(0x0107, SCKPF,   E,     Z,   0, 0, 0, 0, sckpf, 0)
- /* SET CPU TIMER */
-     C(0xb208, SPT,     S,     Z,   0, m2_64, 0, 0, spt, 0)
- /* SET PREFIX */
-diff --git a/target/s390x/misc_helper.c b/target/s390x/misc_helper.c
-index 6d766ce1e7..2c6ab329fb 100644
---- a/target/s390x/misc_helper.c
-+++ b/target/s390x/misc_helper.c
-@@ -146,6 +146,17 @@ void HELPER(sckc)(CPUS390XState *env, uint64_t time)
-     timer_mod(env->tod_timer, env->tod_basetime + time);
- }
- 
-+/* Set Tod Programmable Field */
-+void HELPER(sckpf)(CPUS390XState *env)
-+{
-+    uint32_t val = env->regs[0];
-+
-+    if (val & 0xffff0000UL) {
-+        s390_program_interrupt(env, PGM_SPECIFICATION, 2, GETPC());
-+    }
-+    env->todpr = val;
-+}
-+
- /* Store Clock Comparator */
- uint64_t HELPER(stckc)(CPUS390XState *env)
- {
 diff --git a/target/s390x/translate.c b/target/s390x/translate.c
-index 26cf993405..48b031894a 100644
+index 48b031894a..8da8610839 100644
 --- a/target/s390x/translate.c
 +++ b/target/s390x/translate.c
-@@ -3922,6 +3922,13 @@ static ExitStatus op_sckc(DisasContext *s, DisasOps *o)
-     return NO_EXIT;
- }
- 
-+static ExitStatus op_sckpf(DisasContext *s, DisasOps *o)
-+{
-+    check_privileged(s);
-+    gen_helper_sckpf(cpu_env);
-+    return NO_EXIT;
-+}
-+
- static ExitStatus op_stckc(DisasContext *s, DisasOps *o)
+@@ -3897,7 +3897,10 @@ static ExitStatus op_stcke(DisasContext *s, DisasOps *o)
  {
-     check_privileged(s);
+     TCGv_i64 c1 = tcg_temp_new_i64();
+     TCGv_i64 c2 = tcg_temp_new_i64();
++    TCGv_i64 todpr = tcg_temp_new_i64();
+     gen_helper_stck(c1, cpu_env);
++    /* 16 bit value store in an uint32_t (only valid bits set) */
++    tcg_gen_ld32u_i64(todpr, cpu_env, offsetof(CPUS390XState, todpr));
+     /* Shift the 64-bit value into its place as a zero-extended
+        104-bit value.  Note that "bit positions 64-103 are always
+        non-zero so that they compare differently to STCK"; we set
+@@ -3905,11 +3908,13 @@ static ExitStatus op_stcke(DisasContext *s, DisasOps *o)
+     tcg_gen_shli_i64(c2, c1, 56);
+     tcg_gen_shri_i64(c1, c1, 8);
+     tcg_gen_ori_i64(c2, c2, 0x10000);
++    tcg_gen_or_i64(c2, c2, todpr);
+     tcg_gen_qemu_st64(c1, o->in2, get_mem_index(s));
+     tcg_gen_addi_i64(o->in2, o->in2, 8);
+     tcg_gen_qemu_st64(c2, o->in2, get_mem_index(s));
+     tcg_temp_free_i64(c1);
+     tcg_temp_free_i64(c2);
++    tcg_temp_free_i64(todpr);
+     /* ??? We don't implement clock states.  */
+     gen_op_movi_cc(s, 0);
+     return NO_EXIT;
 -- 
 2.14.3
