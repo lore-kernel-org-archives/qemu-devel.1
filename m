@@ -1,29 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57727)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59034)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1eLoOD-0006Wh-H9
-	for qemu-devel@nongnu.org; Mon, 04 Dec 2017 05:54:22 -0500
+	(envelope-from <stefanha@gmail.com>) id 1eLoR6-0008AQ-KP
+	for qemu-devel@nongnu.org; Mon, 04 Dec 2017 05:57:22 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1eLoO8-0007Ba-Fk
-	for qemu-devel@nongnu.org; Mon, 04 Dec 2017 05:54:21 -0500
-Received: from 8.mo2.mail-out.ovh.net ([188.165.52.147]:43368)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1eLoO8-00078V-5S
-	for qemu-devel@nongnu.org; Mon, 04 Dec 2017 05:54:16 -0500
-Received: from player718.ha.ovh.net (b6.ovh.net [213.186.33.56])
-	by mo2.mail-out.ovh.net (Postfix) with ESMTP id 8700FD4A66
-	for <qemu-devel@nongnu.org>; Mon,  4 Dec 2017 11:54:07 +0100 (CET)
-Date: Mon, 4 Dec 2017 11:53:52 +0100
-From: Greg Kurz <groug@kaod.org>
-Message-ID: <20171204115352.76b44f56@bahia.lan>
-In-Reply-To: <20171202233735.GD2130@umbus.fritz.box>
-References: <151224301160.13812.16487624528793386353.stgit@bahia.lan>
-	<20171202233735.GD2130@umbus.fritz.box>
+	(envelope-from <stefanha@gmail.com>) id 1eLoR5-0000TH-8R
+	for qemu-devel@nongnu.org; Mon, 04 Dec 2017 05:57:20 -0500
+Received: from mail-wm0-x235.google.com ([2a00:1450:400c:c09::235]:41530)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1eLoR4-0000Sq-TI
+	for qemu-devel@nongnu.org; Mon, 04 Dec 2017 05:57:19 -0500
+Received: by mail-wm0-x235.google.com with SMTP id g75so4998668wme.0
+	for <qemu-devel@nongnu.org>; Mon, 04 Dec 2017 02:57:18 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	boundary="Sig_/96CQn2kozeWHSFsw0uZwriy";
-	protocol="application/pgp-signature"
-Subject: Re: [Qemu-devel] [PATCH] spapr: fix LSI interrupt specifiers in the
- device tree
+From: Stefan Hajnoczi <stefanha@gmail.com>
+Date: Mon, 4 Dec 2017 10:57:16 +0000
+Message-ID: <CAJSP0QXCydk4+vU55wUf--mh_XHkAA4QXte_KB=bLm8XbLA04w@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] CFP deadline extended for FOSDEM18 Virt & IaaS Devroom
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,173 +26,173 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Gibson <david@gibson.dropbear.id.au>
-Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org, Cedric Le Goater <clg@kaod.org>
+To: qemu-devel <qemu-devel@nongnu.org>, kvm <kvm@vger.kernel.org>, "libvir-list@redhat.com" <libvir-list@redhat.com>
 
---Sig_/96CQn2kozeWHSFsw0uZwriy
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
+The call for papers for the Virtualization and IaaS Devroom at
+FOSDEM18 is extended until December 7 midnight UTC. All other dates
+remain the same as you can read below.
 
-On Sun, 3 Dec 2017 10:37:35 +1100
-David Gibson <david@gibson.dropbear.id.au> wrote:
+On behalf of oVirt and the Xen Project, we are excited to announce that the
+call for proposals is now open for the Virtualization & IaaS devroom at the
+upcoming FOSDEM 2018, to be hosted on February 3 and 4, 2017.
 
-> On Sat, Dec 02, 2017 at 08:30:11PM +0100, Greg Kurz wrote:
-> > PAPR 2.7 C.6.9.1.2 describes the "#interrupt-cells" property of the
-> > PowerPC External Interrupt Source Controller node as follows:
-> >=20
-> > =E2=80=9C#interrupt-cells=E2=80=9D
-> >=20
-> >   Standard property name to define the number of cells in an interrupt-
-> >   specifier within an interrupt domain.
-> >=20
-> >   prop-encoded-array: An integer, encoded as with encode-int, that deno=
-tes
-> >   the number of cells required to represent an interrupt specifier in i=
-ts
-> >   child nodes.
-> >=20
-> >   The value of this property for the PowerPC External Interrupt option =
-shall
-> >   be 2. Thus all interrupt specifiers (as used in the standard =E2=80=
-=9Cinterrupts=E2=80=9D
-> >   property) shall consist of two cells, each containing an integer enco=
-ded
-> >   as with encode-int. The first integer represents the interrupt number=
- the
-> >   second integer is the trigger code: 0 for edge triggered, 1 for level
-> >   triggered.
-> >=20
-> > This patch adds a second cell to the interrupt specifier stored in the
-> > "interrupts" property of PCI device nodes. This property only exists if
-> > the Interrupt Pin register is set, ie, the interrupt is level, the extra
-> > cell is hence set to 1. =20
->=20
-> Nack.  This format of interrupt specifier is only needed for things
-> wired directly to the xics.  The PCI INTx interrupts aren't - they go
-> through the interrupt nexus in the PHB.  The interrupt-map is intended
-> to remap the simple 1,2,3,4 for INTA..INTD to xics interrupt specifiers.
->=20
+This year will mark FOSDEM=E2=80=99s 18th anniversary as one of the longest=
+-running
+free and open source software developer events, attracting thousands of
+developers and users from all over the world. FOSDEM will be held once
+again in Brussels, Belgium, on February 3 & 4, 2018.
 
-Indeed you're right... and the =E2=80=9C#interrupt-cells=E2=80=9D property =
-of the PHB
-is set to 1, ie, the interrupt specifier format in the child PCI isn't
-expected to have an extra cell... This should have rung a bell :)
+This devroom is a collaborative effort, and is organized by dedicated folks
+from projects such as OpenStack, Xen Project,, oVirt, QEMU, and
+Foreman. We would like to invite all those who are involved in these fields
+to submit your proposals by December 1st, 2017.
 
-> > This also fixes the interrupt specifiers in the "interrupt-map" property
-> > of the PHB node, that were setting the second cell to 8 (confusion with
-> > IRQ_TYPE_LEVEL_LOW ?) instead of 1. =20
->=20
-> Fixing that is correct, though I think.  As might be the changes in
-> other places I'll have to check.
->=20
-> > While here, let's introduce defines for the interrupt specifier trigger
-> > code, and patch other users in spapr.
-> >=20
-> > Signed-off-by: Greg Kurz <groug@kaod.org> =20
->=20
->=20
-> > ---
-> >=20
-> > This fixes /proc/interrupts in linux guests where LSIs appear as
-> > Edge instead of Level.
-> > ---
-> >  hw/ppc/spapr_events.c  |    2 +-
-> >  hw/ppc/spapr_pci.c     |    4 +++-
-> >  hw/ppc/spapr_vio.c     |    3 ++-
-> >  include/hw/ppc/spapr.h |    3 +++
-> >  4 files changed, 9 insertions(+), 3 deletions(-)
-> >=20
-> > diff --git a/hw/ppc/spapr_events.c b/hw/ppc/spapr_events.c
-> > index e377fc7ddea2..4bcb98f948ea 100644
-> > --- a/hw/ppc/spapr_events.c
-> > +++ b/hw/ppc/spapr_events.c
-> > @@ -283,7 +283,7 @@ void spapr_dt_events(sPAPRMachineState *spapr, void=
- *fdt)
-> >          }
-> > =20
-> >          interrupts[0] =3D cpu_to_be32(source->irq);
-> > -        interrupts[1] =3D 0;
-> > +        interrupts[1] =3D SPAPR_DT_INTERRUPT_IDENTIFIER_EDGE;
-> > =20
-> >          _FDT(node_offset =3D fdt_add_subnode(fdt, event_sources, sourc=
-e_name));
-> >          _FDT(fdt_setprop(fdt, node_offset, "interrupts", interrupts,
-> > diff --git a/hw/ppc/spapr_pci.c b/hw/ppc/spapr_pci.c
-> > index 5a3122a9f9f9..91fedbf0929c 100644
-> > --- a/hw/ppc/spapr_pci.c
-> > +++ b/hw/ppc/spapr_pci.c
-> > @@ -1231,6 +1231,8 @@ static void spapr_populate_pci_child_dt(PCIDevice=
- *dev, void *fdt, int offset,
-> >      if (pci_default_read_config(dev, PCI_INTERRUPT_PIN, 1)) {
-> >          _FDT(fdt_setprop_cell(fdt, offset, "interrupts",
-> >                   pci_default_read_config(dev, PCI_INTERRUPT_PIN, 1)));
-> > +        _FDT(fdt_appendprop_cell(fdt, offset, "interrupts",
-> > +                                 SPAPR_DT_INTERRUPT_IDENTIFIER_LEVEL));
-> >      }
-> > =20
-> >      if (!is_bridge) {
-> > @@ -2122,7 +2124,7 @@ int spapr_populate_pci_dt(sPAPRPHBState *phb,
-> >              irqmap[3] =3D cpu_to_be32(j+1);
-> >              irqmap[4] =3D cpu_to_be32(xics_phandle);
-> >              irqmap[5] =3D cpu_to_be32(phb->lsi_table[lsi_num].irq);
-> > -            irqmap[6] =3D cpu_to_be32(0x8);
-> > +            irqmap[6] =3D cpu_to_be32(SPAPR_DT_INTERRUPT_IDENTIFIER_LE=
-VEL);
-> >          }
-> >      }
-> >      /* Write interrupt map */
-> > diff --git a/hw/ppc/spapr_vio.c b/hw/ppc/spapr_vio.c
-> > index ea3bc8bd9e21..29a17651a17c 100644
-> > --- a/hw/ppc/spapr_vio.c
-> > +++ b/hw/ppc/spapr_vio.c
-> > @@ -126,7 +126,8 @@ static int vio_make_devnode(VIOsPAPRDevice *dev,
-> >      }
-> > =20
-> >      if (dev->irq) {
-> > -        uint32_t ints_prop[] =3D {cpu_to_be32(dev->irq), 0};
-> > +        uint32_t ints_prop[] =3D { cpu_to_be32(dev->irq),
-> > +                                 SPAPR_DT_INTERRUPT_IDENTIFIER_EDGE };
-> > =20
-> >          ret =3D fdt_setprop(fdt, node_off, "interrupts", ints_prop,
-> >                            sizeof(ints_prop));
-> > diff --git a/include/hw/ppc/spapr.h b/include/hw/ppc/spapr.h
-> > index 9d21ca9bde3a..8f6298bde59b 100644
-> > --- a/include/hw/ppc/spapr.h
-> > +++ b/include/hw/ppc/spapr.h
-> > @@ -590,6 +590,9 @@ void spapr_load_rtas(sPAPRMachineState *spapr, void=
- *fdt, hwaddr addr);
-> > =20
-> >  #define RTAS_EVENT_SCAN_RATE    1
-> > =20
-> > +#define SPAPR_DT_INTERRUPT_IDENTIFIER_EDGE  0
-> > +#define SPAPR_DT_INTERRUPT_IDENTIFIER_LEVEL 1
-> > +
-> >  typedef struct sPAPRTCETable sPAPRTCETable;
-> > =20
-> >  #define TYPE_SPAPR_TCE_TABLE "spapr-tce-table"
-> >  =20
->=20
+About the Devroom
 
+The Virtualization & IaaS devroom will feature session topics such as open
+source hypervisors and virtual machine managers such as Xen Project, KVM,
+bhyve, and VirtualBox, and Infrastructure-as-a-Service projects such as
+Apache CloudStack, OpenStack, oVirt, QEMU, OpenNebula, and Ganeti.
 
---Sig_/96CQn2kozeWHSFsw0uZwriy
-Content-Type: application/pgp-signature
-Content-Description: OpenPGP digital signature
+This devroom will host presentations that focus on topics of shared
+interest, such as KVM; libvirt; shared storage; virtualized networking;
+cloud security; clustering and high availability; interfacing with multiple
+hypervisors; hyperconverged deployments; and scaling across hundreds or
+thousands of servers.
 
------BEGIN PGP SIGNATURE-----
+Presentations in this devroom will be aimed at developers working on these
+platforms who are looking to collaborate and improve shared infrastructure
+or solve common problems. We seek topics that encourage dialog between
+projects and continued work post-FOSDEM.
 
-iQIzBAEBCAAdFiEEtIKLr5QxQM7yo0kQcdTV5YIvc9YFAlolKUAACgkQcdTV5YIv
-c9b00A/7BACCg/5G3Rsrm/rPRxDohpGNL/6eJG4kzNCUozZZ3cyXrF+8gHGixsyN
-zyYjdQSjt1XBYUhYVHET2OxoIurj7n8ZF/juOmKXf0AxfnkLHthG5s9OAULbXeSG
-feaDz07c4K+rstJuoRQY/8GTghInfer8En7eQGczx2y/8LI35nK6O+dFAlUaxg/a
-L1bEhswK7sbOe075rYC/1Wb2Ou4hngiynXYU6VhbJisl2aL42EQXfBxtpeKn2GNd
-7OxGtM7fMTDJVLmF+bk/gS7HsE36sFyYt6O/20seCmdLMLo38ACgkYrYkc0laEA8
-BD1M6Ubw9AC0rO/6Bzb88abaZmX6AvFlc0WI9EZRxVGSPhgeshFqGPtVMTdc5Y9/
-ng9Y7k02U81DorL+O+jTMtB6+nsZ2LZKUUUfc4Ma1IB6DDohK9BiIqanQouoo4Xu
-sg2eA/v6e4KZOjZNC1Ae1NQ4kvhYT6JJtc2Z+f/1NH8vFbMrcoqbaHHP6oSjfh7W
-oJt1qFAjMIk9nziIidh6RUWktjz+uVuim1ud0rNQgsNRaEm9iBt2Vwgc+1q9+2YD
-3Q24pfZIJd/mX9aG9wCpxmW75wFhv5nxnINTfFIVNnUYerWebEjvM2rEug3w7mba
-9gbserrBFqq0KbtRdBUCYNUMp0LmgSOKJM2uRi1F9+G4Q3ig2R8=
-=9WRK
------END PGP SIGNATURE-----
+Important Dates
 
---Sig_/96CQn2kozeWHSFsw0uZwriy--
+Submission deadline: 07 December 2017
+Acceptance notifications: 14 December 2017
+Final schedule announcement: 21 December 2017
+Devroom: 03 and 04 February 2018 (two days- different rooms)
+
+Submit Your Proposal
+
+All submissions must be made via the Pentabarf event planning site[1]. If
+you have not used Pentabarf before, you will need to create an account. If
+you submitted proposals for FOSDEM in previous years, you can use your
+existing account.
+
+After creating the account, select Create Event to start the submission
+process. Make sure to select Virtualization and IaaS devroom from the Track
+list. Please fill out all the required fields, and provide a meaningful
+abstract and description of your proposed session.
+
+Submission Guidelines
+
+We expect more proposals than we can possibly accept, so it is vitally
+important that you submit your proposal on or before the deadline. Late
+submissions are unlikely to be considered.
+
+All presentation slots are 45 minutes, with 35 minutes planned for
+presentations, and 10 minutes for Q&A.
+
+All presentations will be recorded and made available under Creative
+Commons licenses. In the Submission notes field, please indicate that you
+agree that your presentation will be licensed under the CC-By-SA-4.0 or
+CC-By-4.0 license and that you agree to have your presentation recorded.
+For example:
+
+"If my presentation is accepted for FOSDEM, I hereby agree to license all
+recordings, slides, and other associated materials under the Creative
+Commons Attribution Share-Alike 4.0 International License. Sincerely,
+<NAME>."
+
+In the Submission notes field, please also confirm that if your talk is
+accepted, you will be able to attend FOSDEM and deliver your presentation.
+We will not consider proposals from prospective speakers who are unsure
+whether they will be able to secure funds for travel and lodging to attend
+FOSDEM. (Sadly, we are not able to offer travel funding for prospective
+speakers.)
+
+Speaker Mentoring Program
+
+As a part of the rising efforts to grow our communities and encourage a
+diverse and inclusive conference ecosystem, we're happy to announce that
+we'll be offering mentoring for new speakers. Our mentors can help you with
+tasks such as reviewing your abstract, reviewing your presentation outline
+or slides, or practicing your talk with you.
+
+You may apply to the mentoring program as a newcomer speaker if you:
+
+Never presented before or
+Presented only lightning talks or
+Presented full-length talks at small meetups (<50 ppl)
+
+Submission Guidelines
+
+Mentored presentations will have 25-minute slots, where 20 minutes will
+include the presentation and 5 minutes will be reserved for questions.
+
+The number of newcomer session slots is limited, so we will probably not be
+able to accept all applications.
+
+You must submit your talk and abstract to apply for the mentoring program,
+our mentors are volunteering their time and will happily provide feedback
+but won't write your presentation for you!
+
+If you are experiencing problems with Pentabarf, the proposal submission
+interface, or have other questions, you can email our devroom mailing
+list[2] and we will try to help you.
+
+How to Apply
+
+In addition to agreeing to video recording and confirming that you can
+attend FOSDEM in case your session is accepted, please write "speaker
+mentoring program application" in the "Submission notes" field, and list
+any prior speaking experience or other relevant information for your
+application.
+
+Call for Mentors
+
+Interested in mentoring newcomer speakers? We'd love to have your help!
+Please email iaas-virt-devroom at lists.fosdem.org with a short speaker
+biography and any specific fields of expertise (for example, KVM,
+OpenStack, storage, etc.) so that we can match you with a newcomer speaker
+from a similar field. Estimated time investment can be as low as a 5-10
+hours in total, usually distributed weekly or bi-weekly.
+
+Never mentored a newcomer speaker but interested to try? As the mentoring
+program coordinator, email Brian Proffitt[3] and he will be happy to answer
+your questions!
+
+Code of Conduct
+
+Following the release of the updated code of conduct for FOSDEM, we'd like
+to remind all speakers and attendees that all of the presentations and
+discussions in our devroom are held under the guidelines set in the CoC and
+we expect attendees, speakers, and volunteers to follow the CoC at all
+times.
+
+If you submit a proposal and it is accepted, you will be required to
+confirm that you accept the FOSDEM CoC. If you have any questions about the
+CoC or wish to have one of the devroom organizers review your presentation
+slides or any other content for CoC compliance, please email us and we will
+do our best to assist you.
+
+Call for Volunteers
+
+We are also looking for volunteers to help run the devroom. We need
+assistance watching time for the speakers, and helping with video for the
+devroom. Please contact me, Brian Proffitt, for more information.
+
+Questions?
+
+If you have any questions about this devroom, please send your questions to
+our devroom mailing list. You can also subscribe to the list to receive
+updates about important dates, session announcements, and to connect with
+other attendees.
+
+See you all at FOSDEM!
+
+[1] https://penta.fosdem.org/submission/FOSDEM18
+
+[2] iaas-virt-devroom at lists.fosdem.org
+
+[3] bkp at redhat.com
