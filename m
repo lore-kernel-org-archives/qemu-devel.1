@@ -1,33 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34955)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36327)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1eLf7u-00062m-Uf
-	for qemu-devel@nongnu.org; Sun, 03 Dec 2017 20:00:55 -0500
+	(envelope-from <dgibson@ozlabs.org>) id 1eLfF2-0008Cr-4t
+	for qemu-devel@nongnu.org; Sun, 03 Dec 2017 20:08:20 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1eLf7r-0005mf-SQ
-	for qemu-devel@nongnu.org; Sun, 03 Dec 2017 20:00:55 -0500
-Received: from indium.canonical.com ([91.189.90.7]:44046)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1eLf7r-0005mW-Mj
-	for qemu-devel@nongnu.org; Sun, 03 Dec 2017 20:00:51 -0500
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1eLf7o-0002BV-HT
-	for <qemu-devel@nongnu.org>; Mon, 04 Dec 2017 01:00:48 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 704DC2E8069
-	for <qemu-devel@nongnu.org>; Mon,  4 Dec 2017 01:00:48 +0000 (UTC)
+	(envelope-from <dgibson@ozlabs.org>) id 1eLfEy-0000Mo-V4
+	for qemu-devel@nongnu.org; Sun, 03 Dec 2017 20:08:16 -0500
+Date: Mon, 4 Dec 2017 12:00:40 +1100
+From: David Gibson <david@gibson.dropbear.id.au>
+Message-ID: <20171204010040.GF2130@umbus.fritz.box>
+References: <1512143347-20128-1-git-send-email-richard.purdie@linuxfoundation.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Mon, 04 Dec 2017 00:53:51 -0000
-From: tezeb <1736042@bugs.launchpad.net>
-Reply-To: Bug 1736042 <1736042@bugs.launchpad.net>
-Sender: bounces@canonical.com
-Message-Id: <151234883142.11175.15433643697954166633.malonedeb@soybean.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1736042] [NEW] qemu-system-x86_64 does not boot
- image reliably
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature"; boundary="s5/bjXLgkIwAv6Hi"
+Content-Disposition: inline
+In-Reply-To: <1512143347-20128-1-git-send-email-richard.purdie@linuxfoundation.org>
+Subject: Re: [Qemu-devel] [Qemu-ppc] [PATCH v2] target/ppc: Fix system
+ lockups caused by interrupt_request state corruption
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,74 +24,161 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Richard Purdie <richard.purdie@linuxfoundation.org>
+Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org
 
-Public bug reported:
 
-Booting image as root user with following command works randomly.
+--s5/bjXLgkIwAv6Hi
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-./qemu-system-x86_64 -enable-kvm -curses -smp cpus=3D4 -m 8192
-/root/ructfe2917_g.qcow2
+On Fri, Dec 01, 2017 at 03:49:07PM +0000, Richard Purdie wrote:
+> Occasionally in Linux guests on x86_64 we're seeing logs like:
+>=20
+> ppc_set_irq: 0x55b4e0d562f0 n_IRQ 8 level 1 =3D> pending 00000100req 0000=
+0004
+>=20
+> when they should read:
+>=20
+> ppc_set_irq: 0x55b4e0d562f0 n_IRQ 8 level 1 =3D> pending 00000100req 0000=
+0002
+>=20
+> The "00000004" is CPU_INTERRUPT_EXITTB yet the code calls
+> cpu_interrupt(cs, CPU_INTERRUPT_HARD) ("00000002") in this function
+> just before the log message. Something is causing the HARD bit setting
+> to get lost.
+>=20
+> The knock on effect of losing that bit is the decrementer timer interrupts
+> don't get delivered which causes the guest to sit idle in its idle handler
+> and 'hang'.
+>=20
+> The issue occurs due to races from code which sets CPU_INTERRUPT_EXITTB.
+>=20
+> Rather than poking directly into cs->interrupt_request, that code needs t=
+o:
+>=20
+> a) hold BQL
+> b) use the cpu_interrupt() helper
+>=20
+> This patch fixes the call sites to do this, fixing the hang.
+>=20
+> Signed-off-by: Richard Purdie <richard.purdie@linuxfoundation.org>
 
-Most of the time it ends up on "800x600 Graphic mode"(been stuck there
-even for 4 hours before killed), but 1 out of ~20 it boots image
-correctly(and instantly).
+I strongly suspect there's a better way to do this long term - a lot
+of that old ppc TCG code is really crufty.  But as best I can tell,
+this is certainly a fix over what we had.  So, applied to ppc-for-2.11.
 
-This is visible in v2.5.0 build from sources, v2.5.0 from Ubuntu Xenial
-and v2.1.2 from Debian Jessie.
+> ---
+>  target/ppc/excp_helper.c | 16 +++++++++++++---
+>  target/ppc/helper_regs.h | 10 ++++++++--
+>  2 files changed, 21 insertions(+), 5 deletions(-)
+>=20
+> v2: Fixes a compile issue with master and ensures BQL is held in one case
+> where it potentially wasn't.
+>=20
+> diff --git a/target/ppc/excp_helper.c b/target/ppc/excp_helper.c
+> index e6009e7..8040277 100644
+> --- a/target/ppc/excp_helper.c
+> +++ b/target/ppc/excp_helper.c
+> @@ -207,7 +207,13 @@ static inline void powerpc_excp(PowerPCCPU *cpu, int=
+ excp_model, int excp)
+>                          "Entering checkstop state\n");
+>              }
+>              cs->halted =3D 1;
+> -            cs->interrupt_request |=3D CPU_INTERRUPT_EXITTB;
+> +            if (!qemu_mutex_iothread_locked()) {
+> +                qemu_mutex_lock_iothread();
+> +                cpu_interrupt(cs, CPU_INTERRUPT_EXITTB);
+> +                qemu_mutex_unlock_iothread();
+> +            } else {
+> +                cpu_interrupt(cs, CPU_INTERRUPT_EXITTB);
+> +            }
+>          }
+>          if (env->msr_mask & MSR_HVB) {
+>              /* ISA specifies HV, but can be delivered to guest with HV c=
+lear
+> @@ -940,7 +946,9 @@ void helper_store_msr(CPUPPCState *env, target_ulong =
+val)
+> =20
+>      if (excp !=3D 0) {
+>          CPUState *cs =3D CPU(ppc_env_get_cpu(env));
+> -        cs->interrupt_request |=3D CPU_INTERRUPT_EXITTB;
+> +        qemu_mutex_lock_iothread();
+> +        cpu_interrupt(cs, CPU_INTERRUPT_EXITTB);
+> +        qemu_mutex_unlock_iothread();
+>          raise_exception(env, excp);
+>      }
+>  }
+> @@ -995,7 +1003,9 @@ static inline void do_rfi(CPUPPCState *env, target_u=
+long nip, target_ulong msr)
+>      /* No need to raise an exception here,
+>       * as rfi is always the last insn of a TB
+>       */
+> -    cs->interrupt_request |=3D CPU_INTERRUPT_EXITTB;
+> +    qemu_mutex_lock_iothread();
+> +    cpu_interrupt(cs, CPU_INTERRUPT_EXITTB);
+> +    qemu_mutex_unlock_iothread();
+> =20
+>      /* Reset the reservation */
+>      env->reserve_addr =3D -1;
+> diff --git a/target/ppc/helper_regs.h b/target/ppc/helper_regs.h
+> index 2627a70..0beaad5 100644
+> --- a/target/ppc/helper_regs.h
+> +++ b/target/ppc/helper_regs.h
+> @@ -20,6 +20,8 @@
+>  #ifndef HELPER_REGS_H
+>  #define HELPER_REGS_H
+> =20
+> +#include "qemu/main-loop.h"
+> +
+>  /* Swap temporary saved registers with GPRs */
+>  static inline void hreg_swap_gpr_tgpr(CPUPPCState *env)
+>  {
+> @@ -114,11 +116,15 @@ static inline int hreg_store_msr(CPUPPCState *env, =
+target_ulong value,
+>      }
+>      if (((value >> MSR_IR) & 1) !=3D msr_ir ||
+>          ((value >> MSR_DR) & 1) !=3D msr_dr) {
+> -        cs->interrupt_request |=3D CPU_INTERRUPT_EXITTB;
+> +        qemu_mutex_lock_iothread();
+> +        cpu_interrupt(cs, CPU_INTERRUPT_EXITTB);
+> +        qemu_mutex_unlock_iothread();
+>      }
+>      if ((env->mmu_model & POWERPC_MMU_BOOKE) &&
+>          ((value >> MSR_GS) & 1) !=3D msr_gs) {
+> -        cs->interrupt_request |=3D CPU_INTERRUPT_EXITTB;
+> +        qemu_mutex_lock_iothread();
+> +        cpu_interrupt(cs, CPU_INTERRUPT_EXITTB);
+> +        qemu_mutex_unlock_iothread();
+>      }
+>      if (unlikely((env->flags & POWERPC_FLAG_TGPR) &&
+>                   ((value ^ env->msr) & (1 << MSR_TGPR)))) {
 
-The image in question was converted from vmdk using:
+--=20
+David Gibson			| I'll have my music baroque, and my code
+david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
+				| _way_ _around_!
+http://www.ozlabs.org/~dgibson
 
-qemu-img convert -O qcow2 file.vmdk file.qcow2
+--s5/bjXLgkIwAv6Hi
+Content-Type: application/pgp-signature; name="signature.asc"
 
-The image contains Ubuntu with grub.
+-----BEGIN PGP SIGNATURE-----
 
-I can provide debug logs, but will need guidance how to enable them(and
-what logs are necessary).
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAloknjUACgkQbDjKyiDZ
+s5KmERAAqQNAsVGrWH/n5sUpOu0LauowUCaoH0l8F9SNM5f6xDCEvehAEqQjwX+u
+bB+o6hbLAqyxFQ7O/WuOUXoeYpUtn1cV9jY7awwJqnHPIop0c+j2o1pNHbsUMlRg
+F5FaEsbAVMLXdS23UA+bYAycTcv5xbx0e8GTemjfdgNKALvurqXBL89gWheu0UWb
+WOJrk5boQ38iwlc0zlXU3PQ8PrTH2XLL0GeLQc+k7j3iPNwUt+MBXc5Izfpk6NKi
+3J9+/5bP3gf34JEJAwn8b5xMc9ocMSD0Bxw3uaiP/GpFdZpGPqgoud8qTpSUZ0MG
+5L1HXmM9s6PU90Gd4qLRRn+eGrzqjXl3KvwXrMCHGIB74+q4esxR7HOtlC3oM6w8
+5AFqX/xLDlLsxiKrOLJrmYtIzoVNgVZqJAMWYqMqg39nLbsAr84D0p3c6Td/juwP
+FRdYAzguy1pP4Vc8dG+odxvFupJVlnUCE9nWhUnSg1evAEI7KtDXyy79U3hhz50J
+P2jWbbdSyQJLWbvO14o/FBfSFKz7x35AeWOaT3BBX8rj45ienkPbDoBoF5tQE/54
+VfqIVwfNtYi4RQWtwx/Z9Cx5josdtWVpD2FD51pBrj7bbD+GTM1bS7AD7n81BI/x
+5kAmlXFuXkX8HHsIcpZZZDcjoaIGKoqk2VukKNUPxQnBnG8aal0=
+=Iy7X
+-----END PGP SIGNATURE-----
 
-As a side note, it seems that booting is more certain after
-connecting(or mounting) partition using qemu-nbd/mount.
-
-** Affects: qemu
-     Importance: Undecided
-         Status: New
-
--- =
-
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1736042
-
-Title:
-  qemu-system-x86_64 does not boot image reliably
-
-Status in QEMU:
-  New
-
-Bug description:
-  Booting image as root user with following command works randomly.
-
-  ./qemu-system-x86_64 -enable-kvm -curses -smp cpus=3D4 -m 8192
-  /root/ructfe2917_g.qcow2
-
-  Most of the time it ends up on "800x600 Graphic mode"(been stuck there
-  even for 4 hours before killed), but 1 out of ~20 it boots image
-  correctly(and instantly).
-
-  This is visible in v2.5.0 build from sources, v2.5.0 from Ubuntu
-  Xenial and v2.1.2 from Debian Jessie.
-
-  The image in question was converted from vmdk using:
-
-  qemu-img convert -O qcow2 file.vmdk file.qcow2
-
-  The image contains Ubuntu with grub.
-
-  I can provide debug logs, but will need guidance how to enable
-  them(and what logs are necessary).
-
-  As a side note, it seems that booting is more certain after
-  connecting(or mounting) partition using qemu-nbd/mount.
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1736042/+subscriptions
+--s5/bjXLgkIwAv6Hi--
