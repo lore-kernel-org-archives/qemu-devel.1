@@ -1,23 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33746)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36096)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1eMGAy-0001x8-1y
-	for qemu-devel@nongnu.org; Tue, 05 Dec 2017 11:34:32 -0500
+	(envelope-from <stefanha@redhat.com>) id 1eMGIJ-0005zx-Vy
+	for qemu-devel@nongnu.org; Tue, 05 Dec 2017 11:42:08 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1eMGAu-0008OJ-4R
-	for qemu-devel@nongnu.org; Tue, 05 Dec 2017 11:34:32 -0500
-References: <20171204140150.20483-1-david@redhat.com>
-	<20171204140150.20483-10-david@redhat.com>
-	<20171205162408.31ccdf1f.cohuck@redhat.com>
-From: David Hildenbrand <david@redhat.com>
-Message-ID: <977ac4ff-331d-ad0c-9e30-4fbb80bc539d@redhat.com>
-Date: Tue, 5 Dec 2017 17:34:23 +0100
+	(envelope-from <stefanha@redhat.com>) id 1eMGIG-00037J-2I
+	for qemu-devel@nongnu.org; Tue, 05 Dec 2017 11:42:08 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:45788)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1eMGIF-00036r-P2
+	for qemu-devel@nongnu.org; Tue, 05 Dec 2017 11:42:03 -0500
+Date: Tue, 5 Dec 2017 16:41:54 +0000
+From: Stefan Hajnoczi <stefanha@redhat.com>
+Message-ID: <20171205164154.GD6712@stefanha-x1.localdomain>
+References: <1512444796-30615-1-git-send-email-wei.w.wang@intel.com>
+	<1512444796-30615-3-git-send-email-wei.w.wang@intel.com>
+	<20171205145950.GF31150@stefanha-x1.localdomain>
+	<20171205174833-mutt-send-email-mst@kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <20171205162408.31ccdf1f.cohuck@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v1 for-2.12 9/9] s390x: change the QEMU cpu
- model to a stripped down z12
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="T7mxYSe680VjQnyC"
+Content-Disposition: inline
+In-Reply-To: <20171205174833-mutt-send-email-mst@kernel.org>
+Subject: Re: [Qemu-devel] [virtio-dev] [PATCH v3 2/7] vhost-pci-net: add
+ vhost-pci-net
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,80 +31,68 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Cornelia Huck <cohuck@redhat.com>
-Cc: qemu-s390x@nongnu.org, qemu-devel@nongnu.org, Christian Borntraeger <borntraeger@de.ibm.com>, Richard Henderson <rth@twiddle.net>, Alexander Graf <agraf@suse.de>, Thomas Huth <thuth@redhat.com>
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: Wei Wang <wei.w.wang@intel.com>, virtio-dev@lists.oasis-open.org, qemu-devel@nongnu.org, marcandre.lureau@redhat.com, jasowang@redhat.com, pbonzini@redhat.com, jan.kiszka@siemens.com, avi.cohen@huawei.com, zhiyong.yang@intel.com
 
-On 05.12.2017 16:24, Cornelia Huck wrote:
-> On Mon,  4 Dec 2017 15:01:50 +0100
-> David Hildenbrand <david@redhat.com> wrote:
-> 
->> We are good enough to boot upstream Linux kernels / Fedora 26/27. That
->> should be suficient for now.
-> 
-> s/suficient/sufficient/
-> 
->>
->> As the QEMU CPU model is migration safe, let's add compatibility code.
->> Generate the feature list to reduce the trouble of messing things up in the
->> future.
-> 
-> So we can mess up things effortlessly? :)
 
-See, what I care about :P
+--T7mxYSe680VjQnyC
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-s/trouble/chance/
+On Tue, Dec 05, 2017 at 05:55:45PM +0200, Michael S. Tsirkin wrote:
+> On Tue, Dec 05, 2017 at 02:59:50PM +0000, Stefan Hajnoczi wrote:
+> > On Tue, Dec 05, 2017 at 11:33:11AM +0800, Wei Wang wrote:
+> > > Add the vhost-pci-net device emulation. The device uses bar 2 to expo=
+se
+> > > the remote VM's memory to the guest. The first 4KB of the the bar area
+> > > stores the metadata which describes the remote memory and vring info.
+> >=20
+> > This device looks like the beginning of a new "vhost-pci" virtio device
+> > type.  There are layering violations:
+> >=20
+> > 1. This has nothing to do with virtio-net or networking, it's purely
+> >    vhost-pci.  Why is it called vhost-pci-net instead of vhost-pci?
+> >=20
+> > 2. VirtIODevice does not know about PCI.  It should work over virtio-ccw
+> >    or virtio-mmio.  This patch talks about BARs inside a VirtIODevice so
+> >    there is a problem here.
+>=20
+> I think the point is how memory is exposed to another guest.  This
+> device exposes it as a pci bar. I don't think e.g. ccw can do this,
+> it's all hypercall-based.
 
-> 
->>
->> Signed-off-by: David Hildenbrand <david@redhat.com>
->> ---
->>  hw/s390x/s390-virtio-ccw.c  |   6 +++
->>  target/s390x/cpu.h          |   3 ++
->>  target/s390x/cpu_models.c   | 100 ++++++++++++++++++--------------------------
->>  target/s390x/cpu_models.h   |   1 +
->>  target/s390x/gen-features.c |  87 ++++++++++++++++++++++++++++++++++++++
->>  5 files changed, 138 insertions(+), 59 deletions(-)
->>
->> diff --git a/hw/s390x/s390-virtio-ccw.c b/hw/s390x/s390-virtio-ccw.c
->> index a23b8aec9f..edd18b7fac 100644
->> --- a/hw/s390x/s390-virtio-ccw.c
->> +++ b/hw/s390x/s390-virtio-ccw.c
->> @@ -721,6 +721,9 @@ bool css_migration_enabled(void)
->>  
->>  static void ccw_machine_2_12_instance_options(MachineState *machine)
->>  {
->> +    const S390FeatBitmap qemu_cpu_feat = { S390_FEAT_LIST_QEMU_V2_12 };
->> +
->> +    s390_set_qemu_cpu_model(0x2827, 12, 2, qemu_cpu_feat);
-> 
-> Does this want a comment?
+Yes, that's why the BAR issue needs to be discussed.
 
-Yes, will add comments to both.
-[...]
->> +
->> +    /* TCG emulates some features that can usually not be enabled with
->> +     * the emulated machine generation. Make sure they can be enabled
->> +     * when using the QEMU model by adding them to full_feat. We have
->> +     * to copy the definition to do that.
->> +     */
->> +    memcpy(&s390_qemu_cpu_def, def, sizeof(s390_qemu_cpu_def));
->> +    bitmap_or(s390_qemu_cpu_def.full_feat, s390_qemu_cpu_def.full_feat,
->> +              qemu_max_cpu_feat, S390_FEAT_MAX);
->> +
-> 
-> So is this the place to e.g. enable zpci? Or does this need to go into
-> the feature definitions?
+In terms of the patches, the clean way to do it is for the
+vhost-pci device to have a memory region that is not called "BAR".  The
+virtio-pci transport can expose it as a BAR but the device doesn't need
+to know about it.  Other transports that support memory mapping could
+then work with this device too.
 
-It will go into target/s390x/gen-features.c under:
+The VIRTIO specification needs to capture this transport requirement
+somehow too so it's clear that the vhost device can only run over
+transports that support memory mapping.
 
-1. "qemu_V2_12" if you want it to always be active with "-cpu qemu"
-2. "qemu_MAX" if you only want to be able to enable it via "-cpu
-qemu,zpci=on"
+That said, it's not clear to me why the vhost-pci device is a VIRTIO
+device.  It doesn't use virtqueues or the configuration space.  It only
+uses the vhost-user chardev and the mapped memory.  Isn't it better to
+make it a PCI device?
 
-Thanks!
+Stefan
 
--- 
+--T7mxYSe680VjQnyC
+Content-Type: application/pgp-signature; name="signature.asc"
 
-Thanks,
+-----BEGIN PGP SIGNATURE-----
 
-David / dhildenb
+iQEcBAEBAgAGBQJaJsxRAAoJEJykq7OBq3PIIwEH/0iqAkapVKinvBtujwumJlD5
+Ml9DOrjQC5RtLQjk3JdkQVGAzUpEPojsD2Om5wL4kvBlTjqFwxLpUpd+sjCt2C/u
+VCOCe1//T+dBnCrz+SOXCRPrDgG2baCCrUFRjdMLVF4dlNglWVZMk7TIUozxcNeC
+VUA9EjPpsV0NNXe9qpHuaUC5xYxStrwgCBa6tZETDeK1D8f3WxM672uKCo+Dulq2
+E8sV0LkWG0llo+QrBlQ/LCDUt185P2quPfGOBpqk2boW9dd5WepkoRudnxcusGHT
+M/cQL8m6WIBZ4MdB30xoAuQRY8UxjerNST67SmcwzKQcq19o0owlaAUt9XEVDw8=
+=cizm
+-----END PGP SIGNATURE-----
+
+--T7mxYSe680VjQnyC--
