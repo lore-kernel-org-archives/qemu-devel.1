@@ -1,22 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46710)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49041)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <yang.zhong@intel.com>) id 1eM6nj-0000ho-Ff
-	for qemu-devel@nongnu.org; Tue, 05 Dec 2017 01:33:56 -0500
+	(envelope-from <famz@redhat.com>) id 1eM70M-0004jV-7D
+	for qemu-devel@nongnu.org; Tue, 05 Dec 2017 01:46:59 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <yang.zhong@intel.com>) id 1eM6ng-00043s-Bl
-	for qemu-devel@nongnu.org; Tue, 05 Dec 2017 01:33:55 -0500
-Received: from mga14.intel.com ([192.55.52.115]:24816)
+	(envelope-from <famz@redhat.com>) id 1eM70J-0000hC-47
+	for qemu-devel@nongnu.org; Tue, 05 Dec 2017 01:46:58 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:52544)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <yang.zhong@intel.com>)
-	id 1eM6ng-00041y-1B
-	for qemu-devel@nongnu.org; Tue, 05 Dec 2017 01:33:52 -0500
-Date: Tue, 5 Dec 2017 14:33:13 +0800
-From: Yang Zhong <yang.zhong@intel.com>
-Message-ID: <20171205063313.GB4102@yangzhon-Virtual>
+	(Exim 4.71) (envelope-from <famz@redhat.com>) id 1eM70I-0000gK-Tp
+	for qemu-devel@nongnu.org; Tue, 05 Dec 2017 01:46:55 -0500
+Date: Tue, 5 Dec 2017 14:46:35 +0800
+From: Fam Zheng <famz@redhat.com>
+Message-ID: <20171205064635.GB31705@lemon>
+References: <20171129084628.12336-1-david@gibson.dropbear.id.au>
+	<151194617493.816.13426298875361921541@bafd83ae6430>
+	<20171129091847.GC12220@lemon>
+	<20171205064753-mutt-send-email-mst@kernel.org>
+	<20171205050558.GA31705@lemon>
+	<20171205051151.GF3057@umbus.fritz.box>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Subject: [Qemu-devel] About the light VM solution!
+In-Reply-To: <20171205051151.GF3057@umbus.fritz.box>
+Subject: Re: [Qemu-devel] [for-2.12 0/7] PCI cleanups
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,21 +31,37 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: pbonzini@redhat.com, stefanha@redhat.com, berrange@redhat.com
-Cc: qemu-devel@nongnu.org
+To: David Gibson <david@gibson.dropbear.id.au>
+Cc: "Michael S. Tsirkin" <mst@redhat.com>, marcel@redhat.com, imammedo@redhat.com, qemu-devel@nongnu.org, ehabkost@redhat.com
 
-Hello all,
+On Tue, 12/05 16:11, David Gibson wrote:
+> On Tue, Dec 05, 2017 at 01:05:58PM +0800, Fam Zheng wrote:
+> > On Tue, 12/05 06:49, Michael S. Tsirkin wrote:
+> > > On Wed, Nov 29, 2017 at 05:18:47PM +0800, Fam Zheng wrote:
+> > > > On Wed, 11/29 01:02, no-reply@patchew.org wrote:
+> > > > > /tmp/cc3Czn0R.s: Fatal error: can't write 3947 bytes to section .debug_str of hw/arm/virt-acpi-build.o because: 'No space left on device'
+> > > > 
+> > > > Hmm, the host is shared and what I have is a normal user account, so there is no
+> > > > control over disk space availability.  Anyway this is completely unrelated to
+> > > > this series. Sorry for the noise.
+> > > > 
+> > > > Fam
+> > > 
+> > > Could you disable this until you have the time to detect disk full
+> > > errors?  You are training people to ignore this bot, not a good thing.
+> > > 
+> > 
+> > Thanks for the suggestion. I've added a string match to the notification
+> > condition. The problem is disk is only one factor, I dream of an AI that can be
+> > trained to tell which errors are geniune bugs of the patch and which are
+> > environment failures... :)
+> 
+> Another approach would be to have a "known good" build that runs every
+> so often.  If the known good build fails, the bot disables itself (and
+> tells you to investigate).  Obviously there are ways that could not
+> work as well, but it should catch a fair range of spurious failures.
 
-As you know, AWS has decided to switch to KVM in their clouds. This news make almost all
-china CSPs(clouds service provider) pay more attention on KVM/Qemu, especially light VM
-solution.
+Interesting idea, yes. A slightly simplified way is to test the "base" of the
+series and only report errors if the base can pass.
 
-Below are intel solution for light VM, qemu-lite.
-http://events.linuxfoundation.org/sites/events/files/slides/Light%20weight%20virtualization%20with%20QEMU%26KVM_0.pdf
-
-My question is whether community has some plan to implement light VM or alternative solutions? If no, whether our 
-qemu-lite solution is suitable for upstream again? Many thanks!
-
-Regards,
-
-Yang
+Fam
