@@ -1,26 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43285)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44108)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1eMEhX-0006nY-4K
-	for qemu-devel@nongnu.org; Tue, 05 Dec 2017 10:00:14 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1eMEjN-0007lh-UR
+	for qemu-devel@nongnu.org; Tue, 05 Dec 2017 10:02:07 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1eMEhU-0007t8-2d
-	for qemu-devel@nongnu.org; Tue, 05 Dec 2017 10:00:03 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:55444)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1eMEhT-0007su-S0
-	for qemu-devel@nongnu.org; Tue, 05 Dec 2017 10:00:00 -0500
-Date: Tue, 5 Dec 2017 14:59:50 +0000
-From: Stefan Hajnoczi <stefanha@redhat.com>
-Message-ID: <20171205145950.GF31150@stefanha-x1.localdomain>
-References: <1512444796-30615-1-git-send-email-wei.w.wang@intel.com>
-	<1512444796-30615-3-git-send-email-wei.w.wang@intel.com>
+	(envelope-from <peter.maydell@linaro.org>) id 1eMEjJ-0000uk-A9
+	for qemu-devel@nongnu.org; Tue, 05 Dec 2017 10:01:58 -0500
+Received: from mail-ot0-x233.google.com ([2607:f8b0:4003:c0f::233]:36383)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1eMEjJ-0000ug-5K
+	for qemu-devel@nongnu.org; Tue, 05 Dec 2017 10:01:53 -0500
+Received: by mail-ot0-x233.google.com with SMTP id d5so467889oti.3
+	for <qemu-devel@nongnu.org>; Tue, 05 Dec 2017 07:01:52 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="b8GWCKCLzrXbuNet"
-Content-Disposition: inline
-In-Reply-To: <1512444796-30615-3-git-send-email-wei.w.wang@intel.com>
-Subject: Re: [Qemu-devel] [virtio-dev] [PATCH v3 2/7] vhost-pci-net: add
- vhost-pci-net
+In-Reply-To: <ed43c37b-712a-ea16-85d8-3baee67c560c@redhat.com>
+References: <CAFEAcA_ffAw2jz9Sp-hxi_ZvdVjCYynk_0Lk2zFOSCMqCpHgxA@mail.gmail.com>
+	<ed43c37b-712a-ea16-85d8-3baee67c560c@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Tue, 5 Dec 2017 15:01:31 +0000
+Message-ID: <CAFEAcA9mzeVNxn0HfQOnx4_K2mnb+1JaY9ryY5Ju3oieHMnyCw@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] deadlock in rcu_init_lock() in usermode emulation
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,49 +29,32 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Wei Wang <wei.w.wang@intel.com>
-Cc: virtio-dev@lists.oasis-open.org, qemu-devel@nongnu.org, mst@redhat.com, marcandre.lureau@redhat.com, jasowang@redhat.com, pbonzini@redhat.com, jan.kiszka@siemens.com, avi.cohen@huawei.com, zhiyong.yang@intel.com
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 
+On 5 December 2017 at 13:19, Paolo Bonzini <pbonzini@redhat.com> wrote:
+> Probably the best solution is to add start_exclusive/end_exclusive
+> respectively at the beginning and the end of fork_start and fork_end.
+> This is safer in general, as it ensures that the disappeared child
+> threads were quiescent.
+>
+> In fact, I wonder if fork_start/fork_end still need to "take all
+> mutexes" (in pthread_atfork style) if we do
+> start_exclusive/end_exclusive in fork_start and fork_end(0).  You don't
+> even need to reinitialize the mutexes, meaning that mmap_fork_start and
+> mmap_fork_end should go as well.
+>
+> The list of locks that are "assured not taken" within
+> start_exclusive/end_exclusive (currently: rcu_read_lock, tb_lock,
+> mmap_lock) should probably be documented in fork_start/fork_end.
 
---b8GWCKCLzrXbuNet
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+How does start_exclusive() assure that mmap_lock and tb_lock
+aren't taken? It ensures that no other thread is between
+cpu_exec_start and cpu_exec_end, but we don't (can't) do the work of
+do_syscall() inside an exec-start/end section, and do_syscall()
+codepaths can take the mmap lock and the tb lock (eg target_mmap()
+will take the mmap lock and then call tb_invalidate_phys_range()
+which takes the tb lock).
 
-On Tue, Dec 05, 2017 at 11:33:11AM +0800, Wei Wang wrote:
-> Add the vhost-pci-net device emulation. The device uses bar 2 to expose
-> the remote VM's memory to the guest. The first 4KB of the the bar area
-> stores the metadata which describes the remote memory and vring info.
-
-This device looks like the beginning of a new "vhost-pci" virtio device
-type.  There are layering violations:
-
-1. This has nothing to do with virtio-net or networking, it's purely
-   vhost-pci.  Why is it called vhost-pci-net instead of vhost-pci?
-
-2. VirtIODevice does not know about PCI.  It should work over virtio-ccw
-   or virtio-mmio.  This patch talks about BARs inside a VirtIODevice so
-   there is a problem here.
-
-I'm concerned that there is no clear architecture and elements of the
-virtio architecture are being mixed up with no justification.
-
-Can you explain what you're trying to do?
-
-Please post a specification for the vhost-pci device so the operation of
-the device can be discussed and is clear to reviewers.
-
---b8GWCKCLzrXbuNet
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEcBAEBAgAGBQJaJrRlAAoJEJykq7OBq3PIr8oIAL9fkM0VEJZbz2roTJ17VgcZ
-hpgtTU+8d82HsSNHgalej+rdrFifJsrWKq5ToPlRedAwJGl451JJfjle+Dlg3jOx
-l9QFc6pGFn+TGgb4ZyFQsBx5asH24LfEeV1qh7JYj/QuhyND90+0HEft/Ok1O2ri
-9Dfc3oIuldFIV5uXnYC77XtBgCBBf9KRkHnTP6EV0nHcd/Hr2NTEC1YTVtXb+B40
-56V+hGHvd/RugegV3zz0rddtYkklNiIy0gSMc256VSkXMiyJrqxkdgV+x86lTlsw
-lVnKGitlyWp1cOSx59+JF0VXtvlxIVTwgFhsNCbYHX+K1x0HATP44uWgxGFPFRA=
-=P5eL
------END PGP SIGNATURE-----
-
---b8GWCKCLzrXbuNet--
+thanks
+-- PMM
