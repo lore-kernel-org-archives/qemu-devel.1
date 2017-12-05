@@ -1,25 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53191)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55775)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1eMFkJ-00050j-5O
-	for qemu-devel@nongnu.org; Tue, 05 Dec 2017 11:07:00 -0500
+	(envelope-from <clg@kaod.org>) id 1eMFpb-0008ST-Hj
+	for qemu-devel@nongnu.org; Tue, 05 Dec 2017 11:12:28 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1eMFkG-0004bv-1N
-	for qemu-devel@nongnu.org; Tue, 05 Dec 2017 11:06:59 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:37804)
+	(envelope-from <clg@kaod.org>) id 1eMFpY-0006uP-B2
+	for qemu-devel@nongnu.org; Tue, 05 Dec 2017 11:12:27 -0500
+Received: from 6.mo69.mail-out.ovh.net ([46.105.50.107]:47248)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1eMFkF-0004bW-R5
-	for qemu-devel@nongnu.org; Tue, 05 Dec 2017 11:06:55 -0500
-Date: Tue, 5 Dec 2017 16:06:46 +0000
-From: Stefan Hajnoczi <stefanha@redhat.com>
-Message-ID: <20171205160646.GJ31150@stefanha-x1.localdomain>
-References: <1512444796-30615-1-git-send-email-wei.w.wang@intel.com>
+	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1eMFpY-0006tm-3k
+	for qemu-devel@nongnu.org; Tue, 05 Dec 2017 11:12:24 -0500
+Received: from player699.ha.ovh.net (gw6.ovh.net [213.251.189.206])
+	by mo69.mail-out.ovh.net (Postfix) with ESMTP id 8FFD84CD17
+	for <qemu-devel@nongnu.org>; Tue,  5 Dec 2017 17:12:20 +0100 (CET)
+References: <20171123132955.1261-1-clg@kaod.org>
+	<20171123132955.1261-20-clg@kaod.org>
+	<20171201040115.GC30161@umbus.fritz.box>
+	<02120b7e-cd8b-af61-7d35-8289253828f6@kaod.org>
+	<20171205070004.GL3057@umbus.fritz.box>
+From: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
+Message-ID: <c62c6198-28bb-c11c-d9d1-d8a27e28515f@kaod.org>
+Date: Tue, 5 Dec 2017 16:12:14 +0000
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="iRjOs3ViPWHdlw/I"
-Content-Disposition: inline
-In-Reply-To: <1512444796-30615-1-git-send-email-wei.w.wang@intel.com>
-Subject: Re: [Qemu-devel] [virtio-dev] [PATCH v3 0/7] Vhost-pci for inter-VM
- communication
+In-Reply-To: <20171205070004.GL3057@umbus.fritz.box>
+Content-Type: text/plain; charset=windows-1252
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH 19/25] spapr: add hcalls support for the
+ XIVE interrupt mode
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,58 +35,106 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Wei Wang <wei.w.wang@intel.com>
-Cc: virtio-dev@lists.oasis-open.org, qemu-devel@nongnu.org, mst@redhat.com, marcandre.lureau@redhat.com, jasowang@redhat.com, pbonzini@redhat.com, jan.kiszka@siemens.com, avi.cohen@huawei.com, zhiyong.yang@intel.com
+To: David Gibson <david@gibson.dropbear.id.au>
+Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, Benjamin Herrenschmidt <benh@kernel.crashing.org>
+
+[ ... ] 
+
+>>>> +static bool priority_is_valid(uint32_t priority)
+>>>> +{
+>>>> +    int i;
+>>>> +
+>>>> +    for (i = 0; i < ARRAY_SIZE(reserved_priorities) / 2; i++) {
+>>>> +        uint32_t base  = reserved_priorities[2 * i];
+>>>> +        uint32_t count = reserved_priorities[2 * i + 1];
+>>>> +
+>>>> +        if (priority >= base && priority < base + count) {
+>>>> +            qemu_log_mask(LOG_GUEST_ERROR, "%s: priority %d is reserved\n",
+>>>> +                          __func__, priority);
+>>>> +            return false;
+>>>> +        }
+>>>> +    }
+>>>> +
+>>>> +    return true;
+>>>> +}
+>>>
+>>> This seems like overkill.  Aren't there only 0..7 levels supported in
+>>> hardware, in which case a one byte bitmap will suffice to store the
+>>> reserved levels.
+>>
+>> I was trying the use the same array that will be exposed in the device
+>> tree in the "ibm,plat-res-int-priorities" property, defined as 
+>> follow in PAPR:
+>>
+>> 	property name that designates to the client program that the
+>> 	platform has reserved one or more interrupt priorities for its
+>> 	own use.
+>> 	
+>> 	prop-encoded-value: one or more (interrupt priority, range)
+>> 	pairs, where interrupt priority is a single cell hexidec- imal
+>> 	number between 0x00 and 0xFF, and range is an integer encoded as
+>> 	with encode-int that represents the number of contiguous
+>> 	interrupt priorities that have been reserved by the platform for
+>> 	its internal use.
+>>
+>>
+>> But I agree, it's a bit overkill to check for 0..7 levels ...
+> 
+> Ok, I do see the point here.  Hmm.. not sure where best to go with
+> this.  One source of data is always good, and this is probably less
+> complex than deriving the DT list from a bitmap.
+> 
+> On the other hand I am wary these days of over-generalizing, since it
+> can lead to nightmares for migration consistency.
+
+I should be able to simplify by using one array of valid priorities
+for the guest, and from that build the array of reserved priorities 
+for the platform. 
+ 
+[ ... ]
+
+>>>> +    mmio_base = (uint64_t)xive->esb_base + (1ull << xive->esb_shift) * lisn;
+>>>
+>>> Hrm.. why was xive->esb_base not already a u64?
+>>
+>> its an 'hwaddr'. Yes I can remove it.
+> 
+> Right.  mmio_base should be a hwaddr too, so you shouldn't need a cast.
+
+yes.
+
+[ ... ]
+
+>>> What does the availability of SRC_TRIGGER (and INT_ESB) depend on? 
+>>
+>> The CPU revision. But we won't introduce XIVE exploitation mode on 
+>> anything else than DD2.0 which has full XIVE support. Even STORE_EOI 
+>> that we should be adding.
+> 
+> Hrm.  Host CPU?  That's a problem - if guest visible properties like
+> this vary with the host CPU, migration breaks.
+> 
+>>
+>>> If it varies with host capabilities, that's going to be real pain for
+>>> migration.
+>>
+>> Yes. I am not aware of any future extension but I agree this is
+>> something we need to keep an eye on.
+> 
+> I'm not talking about future extension, I'm meaning right now.
+
+I think Ben has answered these questions.
+
+[ ... ] 
+
+>> On that topic, could we include the PPC_BIT* macros somewhere under ppc ? 
+> 
+> Uh, sure, why not. target/ppc/cpu.h seems the logical place.
+
+I will send a preliminary patch for 2.12 then.
 
 
---iRjOs3ViPWHdlw/I
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+Thanks,
 
-On Tue, Dec 05, 2017 at 11:33:09AM +0800, Wei Wang wrote:
-> Vhost-pci is a point-to-point based inter-VM communication solution. This
-> patch series implements the vhost-pci-net device setup and emulation. The
-> device is implemented as a virtio device, and it is set up via the
-> vhost-user protocol to get the neessary info (e.g the memory info of the
-> remote VM, vring info).
->=20
-> Currently, only the fundamental functions are implemented. More features,
-> such as MQ and live migration, will be updated in the future.
->=20
-> The DPDK PMD of vhost-pci has been posted to the dpdk mailinglist here:
-> http://dpdk.org/ml/archives/dev/2017-November/082615.html
->=20
-> v2->v3 changes:
-> 1) static device creation: instead of creating and hot-plugging the
->    device when receiving a vhost-user msg, the device is not created
->    via the qemu booting command line.
-> 2) remove vqs: rq and ctrlq are removed in this version.
->     - receive vq: the receive vq is not needed anymore. The PMD directly
->                   shares the remote txq and rxq - grab from remote txq to
->                   receive packets, and put to rxq to send packets.
->     - ctrlq: the ctrlq is replaced by the first 4KB metadata area of the
->              device Bar-2.
-> 3) simpler implementation: the entire implementation has been tailored
->    from ~1800 LOC to ~850 LOC.
 
-Please write qtest test cases for vhost-pci.  See
-tests/virtio-net-test.c and tests/vhost-user-test.c for examples.
-
-Stefan
-
---iRjOs3ViPWHdlw/I
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEcBAEBAgAGBQJaJsQWAAoJEJykq7OBq3PITK4H/RltWGVrnTUMECEUNVSXnNs1
-kv1jbxIAy8hRpAvQXxazocpQjNqxUsq3otu7hz0+mXcemlMQ+YsZtnbldamlDbt6
-PfPxh7E3dnU56iO+CLuKsVexlbB7SBahCvE2/dMD370Gc9CryBkjFLxCki2J55et
-S2NzxzDquFst2otumsFOxzZUGq9+QH0CWeEShhQ7IY01g7n15hU4QabGwSFlM3jn
-xm/7SUURcSlSbfYelol+8NgX8vTe5asf4ToNRok3nuuZjOL0conw4Rsj2GAKtpQD
-QqpbAv5tMH9pdVTDsfWNMysJ8//ezGT2S2YrEDCBvEFjpOfy4Mhl79OlC+derdg=
-=vz3y
------END PGP SIGNATURE-----
-
---iRjOs3ViPWHdlw/I--
+C.
