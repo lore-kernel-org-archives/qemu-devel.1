@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54751)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54705)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1eMAg8-0002a6-OF
-	for qemu-devel@nongnu.org; Tue, 05 Dec 2017 05:42:21 -0500
+	(envelope-from <stefanha@redhat.com>) id 1eMAg5-0002X2-E1
+	for qemu-devel@nongnu.org; Tue, 05 Dec 2017 05:42:23 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1eMAg7-0002gZ-RJ
-	for qemu-devel@nongnu.org; Tue, 05 Dec 2017 05:42:20 -0500
+	(envelope-from <stefanha@redhat.com>) id 1eMAg0-0002dk-Hl
+	for qemu-devel@nongnu.org; Tue, 05 Dec 2017 05:42:17 -0500
 From: Stefan Hajnoczi <stefanha@redhat.com>
-Date: Tue,  5 Dec 2017 10:41:38 +0000
-Message-Id: <20171205104141.28882-7-stefanha@redhat.com>
+Date: Tue,  5 Dec 2017 10:41:36 +0000
+Message-Id: <20171205104141.28882-5-stefanha@redhat.com>
 In-Reply-To: <20171205104141.28882-1-stefanha@redhat.com>
 References: <20171205104141.28882-1-stefanha@redhat.com>
-Subject: [Qemu-devel] [PATCH 6/9] block: drop unused
- BlockDirtyBitmapState->aio_context field
+Subject: [Qemu-devel] [PATCH 4/9] block: don't keep AioContext acquired
+ after blockdev_backup_prepare()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,60 +23,112 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: John Snow <jsnow@redhat.com>, qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>
 
-The dirty bitmap actions in qmp_transaction have not used AioContext
-since the dirty bitmap locking discipline was introduced in commit
-2119882c7eb7e2c612b24fc0c8d86f5887d6f1c3 ("block: introduce
-dirty_bitmap_mutex").  Remove the unused field.
-
 Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
 ---
- blockdev.c | 13 -------------
- 1 file changed, 13 deletions(-)
+ blockdev.c | 44 ++++++++++++++++++++++++++++++++++----------
+ 1 file changed, 34 insertions(+), 10 deletions(-)
 
 diff --git a/blockdev.c b/blockdev.c
-index 6332a249ea..e865ae4873 100644
+index 5a56a1abf2..d7ad76416e 100644
 --- a/blockdev.c
 +++ b/blockdev.c
-@@ -2049,7 +2049,6 @@ typedef struct BlockDirtyBitmapState {
+@@ -1936,7 +1936,6 @@ typedef struct BlockdevBackupState {
      BlkActionState common;
-     BdrvDirtyBitmap *bitmap;
      BlockDriverState *bs;
+     BlockJob *job;
 -    AioContext *aio_context;
-     HBitmap *backup;
-     bool prepared;
- } BlockDirtyBitmapState;
-@@ -2128,7 +2127,6 @@ static void block_dirty_bitmap_clear_prepare(BlkActionState *common,
+ } BlockdevBackupState;
+ 
+ static BlockJob *do_blockdev_backup(BlockdevBackup *backup, BlockJobTxn *txn,
+@@ -1947,6 +1946,7 @@ static void blockdev_backup_prepare(BlkActionState *common, Error **errp)
+     BlockdevBackupState *state = DO_UPCAST(BlockdevBackupState, common, common);
+     BlockdevBackup *backup;
+     BlockDriverState *bs, *target;
++    AioContext *aio_context;
+     Error *local_err = NULL;
+ 
+     assert(common->action->type == TRANSACTION_ACTION_KIND_BLOCKDEV_BACKUP);
+@@ -1962,29 +1962,39 @@ static void blockdev_backup_prepare(BlkActionState *common, Error **errp)
+         return;
      }
  
-     bdrv_clear_dirty_bitmap(state->bitmap, &state->backup);
 -    /* AioContext is released in .clean() */
- }
- 
- static void block_dirty_bitmap_clear_abort(BlkActionState *common)
-@@ -2149,16 +2147,6 @@ static void block_dirty_bitmap_clear_commit(BlkActionState *common)
-     hbitmap_free(state->backup);
- }
- 
--static void block_dirty_bitmap_clear_clean(BlkActionState *common)
--{
--    BlockDirtyBitmapState *state = DO_UPCAST(BlockDirtyBitmapState,
--                                             common, common);
--
--    if (state->aio_context) {
--        aio_context_release(state->aio_context);
--    }
--}
--
- static void abort_prepare(BlkActionState *common, Error **errp)
- {
-     error_setg(errp, "Transaction aborted using Abort action");
-@@ -2219,7 +2207,6 @@ static const BlkActionOps actions[] = {
-         .prepare = block_dirty_bitmap_clear_prepare,
-         .commit = block_dirty_bitmap_clear_commit,
-         .abort = block_dirty_bitmap_clear_abort,
--        .clean = block_dirty_bitmap_clear_clean,
+-    state->aio_context = bdrv_get_aio_context(bs);
+-    if (state->aio_context != bdrv_get_aio_context(target)) {
+-        state->aio_context = NULL;
++    aio_context = bdrv_get_aio_context(bs);
++    if (aio_context != bdrv_get_aio_context(target)) {
+         error_setg(errp, "Backup between two IO threads is not implemented");
+         return;
      }
- };
+-    aio_context_acquire(state->aio_context);
++    aio_context_acquire(aio_context);
+     state->bs = bs;
++
++    /* Paired with .clean() */
+     bdrv_drained_begin(state->bs);
  
+     state->job = do_blockdev_backup(backup, common->block_job_txn, &local_err);
+     if (local_err) {
+         error_propagate(errp, local_err);
+-        return;
++        goto out;
+     }
++
++out:
++    aio_context_release(aio_context);
+ }
+ 
+ static void blockdev_backup_commit(BlkActionState *common)
+ {
+     BlockdevBackupState *state = DO_UPCAST(BlockdevBackupState, common, common);
++    AioContext *aio_context;
++
++    aio_context = bdrv_get_aio_context(state->bs);
++    aio_context_acquire(aio_context);
++
+     assert(state->job);
+     block_job_start(state->job);
++
++    aio_context_release(aio_context);
+ }
+ 
+ static void blockdev_backup_abort(BlkActionState *common)
+@@ -1992,18 +2002,32 @@ static void blockdev_backup_abort(BlkActionState *common)
+     BlockdevBackupState *state = DO_UPCAST(BlockdevBackupState, common, common);
+ 
+     if (state->job) {
++        AioContext *aio_context;
++
++        aio_context = bdrv_get_aio_context(state->bs);
++        aio_context_acquire(aio_context);
++
+         block_job_cancel_sync(state->job);
++
++        aio_context_release(aio_context);
+     }
+ }
+ 
+ static void blockdev_backup_clean(BlkActionState *common)
+ {
+     BlockdevBackupState *state = DO_UPCAST(BlockdevBackupState, common, common);
++    AioContext *aio_context;
+ 
+-    if (state->aio_context) {
+-        bdrv_drained_end(state->bs);
+-        aio_context_release(state->aio_context);
++    if (!state->bs) {
++        return;
+     }
++
++    aio_context = bdrv_get_aio_context(state->bs);
++    aio_context_acquire(aio_context);
++
++    bdrv_drained_end(state->bs);
++
++    aio_context_release(aio_context);
+ }
+ 
+ typedef struct BlockDirtyBitmapState {
 -- 
 2.14.3
