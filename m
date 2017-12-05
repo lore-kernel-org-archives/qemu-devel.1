@@ -1,29 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40558)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40611)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1eMGaC-0006ET-IZ
-	for qemu-devel@nongnu.org; Tue, 05 Dec 2017 12:00:37 -0500
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1eMGaO-0006M0-Ua
+	for qemu-devel@nongnu.org; Tue, 05 Dec 2017 12:00:49 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1eMGa8-0002rY-FG
-	for qemu-devel@nongnu.org; Tue, 05 Dec 2017 12:00:36 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:43888)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <cohuck@redhat.com>) id 1eMGa8-0002rH-6X
-	for qemu-devel@nongnu.org; Tue, 05 Dec 2017 12:00:32 -0500
-Date: Tue, 5 Dec 2017 18:00:10 +0100
-From: Cornelia Huck <cohuck@redhat.com>
-Message-ID: <20171205180010.6aad232f.cohuck@redhat.com>
-In-Reply-To: <20171205184533-mutt-send-email-mst@kernel.org>
-References: <1512444796-30615-1-git-send-email-wei.w.wang@intel.com>
-	<1512444796-30615-3-git-send-email-wei.w.wang@intel.com>
-	<20171205145950.GF31150@stefanha-x1.localdomain>
-	<20171205174833-mutt-send-email-mst@kernel.org>
-	<20171205164154.GD6712@stefanha-x1.localdomain>
-	<20171205184533-mutt-send-email-mst@kernel.org>
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1eMGaO-0002u5-8M
+	for qemu-devel@nongnu.org; Tue, 05 Dec 2017 12:00:49 -0500
+Received: from mail-qt0-x242.google.com ([2607:f8b0:400d:c0d::242]:43918)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1eMGaO-0002u1-3o
+	for qemu-devel@nongnu.org; Tue, 05 Dec 2017 12:00:48 -0500
+Received: by mail-qt0-x242.google.com with SMTP id w10so2323492qtb.10
+	for <qemu-devel@nongnu.org>; Tue, 05 Dec 2017 09:00:47 -0800 (PST)
+Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
+	<philippe.mathieu.daude@gmail.com>
+From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
+Date: Tue,  5 Dec 2017 14:00:12 -0300
+Message-Id: <20171205170013.22337-2-f4bug@amsat.org>
+In-Reply-To: <20171205170013.22337-1-f4bug@amsat.org>
+References: <20171205170013.22337-1-f4bug@amsat.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [virtio-dev] [PATCH v3 2/7] vhost-pci-net: add
- vhost-pci-net
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Subject: [Qemu-devel] [PATCH 1/2] target/sh4: add missing tcg_temp_free() in
+ gen_conditional_jump()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,65 +34,37 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: Stefan Hajnoczi <stefanha@redhat.com>, virtio-dev@lists.oasis-open.org, avi.cohen@huawei.com, zhiyong.yang@intel.com, jan.kiszka@siemens.com, jasowang@redhat.com, qemu-devel@nongnu.org, Wei Wang <wei.w.wang@intel.com>, marcandre.lureau@redhat.com, pbonzini@redhat.com
+To: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, Aurelien Jarno <aurelien@aurel32.net>
+Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, qemu-devel@nongnu.org, Richard Henderson <rth@twiddle.net>, Vladimir Prus <vladimir.prus@gmail.com>, "Edgar E . Iglesias" <edgar.iglesias@gmail.com>
 
-On Tue, 5 Dec 2017 18:53:29 +0200
-"Michael S. Tsirkin" <mst@redhat.com> wrote:
+missed in c55497ecb8c.
 
-> On Tue, Dec 05, 2017 at 04:41:54PM +0000, Stefan Hajnoczi wrote:
-> > On Tue, Dec 05, 2017 at 05:55:45PM +0200, Michael S. Tsirkin wrote:  
-> > > On Tue, Dec 05, 2017 at 02:59:50PM +0000, Stefan Hajnoczi wrote:  
-> > > > On Tue, Dec 05, 2017 at 11:33:11AM +0800, Wei Wang wrote:  
-> > > > > Add the vhost-pci-net device emulation. The device uses bar 2 to expose
-> > > > > the remote VM's memory to the guest. The first 4KB of the the bar area
-> > > > > stores the metadata which describes the remote memory and vring info.  
-> > > > 
-> > > > This device looks like the beginning of a new "vhost-pci" virtio device
-> > > > type.  There are layering violations:
-> > > > 
-> > > > 1. This has nothing to do with virtio-net or networking, it's purely
-> > > >    vhost-pci.  Why is it called vhost-pci-net instead of vhost-pci?
-> > > > 
-> > > > 2. VirtIODevice does not know about PCI.  It should work over virtio-ccw
-> > > >    or virtio-mmio.  This patch talks about BARs inside a VirtIODevice so
-> > > >    there is a problem here.  
-> > > 
-> > > I think the point is how memory is exposed to another guest.  This
-> > > device exposes it as a pci bar. I don't think e.g. ccw can do this,
-> > > it's all hypercall-based.  
-> > 
-> > Yes, that's why the BAR issue needs to be discussed.
-> > 
-> > In terms of the patches, the clean way to do it is for the
-> > vhost-pci device to have a memory region that is not called "BAR".  The
-> > virtio-pci transport can expose it as a BAR but the device doesn't need
-> > to know about it.  Other transports that support memory mapping could
-> > then work with this device too.  
-> 
-> True, though mmio is pretty much a legacy transport at this point
-> at least from qemu perspective as arm devs don't seem to be working
-> on virtio 1.0 support in qemu. So I am not sure how much
-> of a priority should transport isolation be.
+Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+---
+ target/sh4/translate.c | 5 ++++-
+ 1 file changed, 4 insertions(+), 1 deletion(-)
 
-I currently don't see an easy way to make this work via ccw, FWIW. We
-would need a dedicated mechanism for it, and I'm not sure what the gain
-would be.
-
-> 
-> > The VIRTIO specification needs to capture this transport requirement
-> > somehow too so it's clear that the vhost device can only run over
-> > transports that support memory mapping.
-> > 
-> > That said, it's not clear to me why the vhost-pci device is a VIRTIO
-> > device.  It doesn't use virtqueues or the configuration space.  It only
-> > uses the vhost-user chardev and the mapped memory.  Isn't it better to
-> > make it a PCI device?
-> > 
-> > Stefan  
-> 
-> Seems similar enough to me, except The roles of device and driver are
-> reversed here.
-> 
-
-But will anything other than pci ever make use of this?
+diff --git a/target/sh4/translate.c b/target/sh4/translate.c
+index 703020fe87..5aeaabdd8d 100644
+--- a/target/sh4/translate.c
++++ b/target/sh4/translate.c
+@@ -322,13 +322,16 @@ static void gen_delayed_conditional_jump(DisasContext * ctx)
+         gen_jump(ctx);
+ 
+         gen_set_label(l1);
+-        return;
++        goto done;
+     }
+ 
+     tcg_gen_brcondi_i32(TCG_COND_NE, ds, 0, l1);
+     gen_goto_tb(ctx, 1, ctx->pc + 2);
+     gen_set_label(l1);
+     gen_jump(ctx);
++
++done:
++    tcg_temp_free(ds);
+ }
+ 
+ static inline void gen_load_fpr64(DisasContext *ctx, TCGv_i64 t, int reg)
+-- 
+2.15.1
