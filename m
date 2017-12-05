@@ -1,44 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50421)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53322)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanb@linux.vnet.ibm.com>) id 1eMKGv-0005Em-I3
-	for qemu-devel@nongnu.org; Tue, 05 Dec 2017 15:56:58 -0500
+	(envelope-from <alex.williamson@redhat.com>) id 1eMKSt-0001tp-0Q
+	for qemu-devel@nongnu.org; Tue, 05 Dec 2017 16:09:20 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanb@linux.vnet.ibm.com>) id 1eMKGr-0001nY-LP
-	for qemu-devel@nongnu.org; Tue, 05 Dec 2017 15:56:57 -0500
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:41336
-	helo=mx0a-001b2d01.pphosted.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <stefanb@linux.vnet.ibm.com>)
-	id 1eMKGr-0001nM-FP
-	for qemu-devel@nongnu.org; Tue, 05 Dec 2017 15:56:53 -0500
-Received: from pps.filterd (m0098416.ppops.net [127.0.0.1])
-	by mx0b-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
-	vB5KumPl056964
-	for <qemu-devel@nongnu.org>; Tue, 5 Dec 2017 15:56:51 -0500
-Received: from e32.co.us.ibm.com (e32.co.us.ibm.com [32.97.110.150])
-	by mx0b-001b2d01.pphosted.com with ESMTP id 2ep2j1h18r-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Tue, 05 Dec 2017 15:56:51 -0500
-Received: from localhost
-	by e32.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
-	Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <stefanb@linux.vnet.ibm.com>;
-	Tue, 5 Dec 2017 13:56:50 -0700
-References: <1510696349-5151-1-git-send-email-stefanb@linux.vnet.ibm.com>
-	<1510696349-5151-2-git-send-email-stefanb@linux.vnet.ibm.com>
-	<CAJ+F1CKE1-ApZ9MF2njB-0yiaszqJFZPVTfGQHg0YYgsuhwhnw@mail.gmail.com>
-	<d670c086-f0f8-8906-795e-80345ec8475a@linux.vnet.ibm.com>
-	<CAJ+F1C+4Ab_+DpUNbEf+kZPZ=T26tA0tNxQD4JWpc1+mmiKK-A@mail.gmail.com>
-	<1510736731.4383.4.camel@intel.com>
-From: Stefan Berger <stefanb@linux.vnet.ibm.com>
-Date: Tue, 5 Dec 2017 15:56:46 -0500
+	(envelope-from <alex.williamson@redhat.com>) id 1eMKSp-0005rO-Rt
+	for qemu-devel@nongnu.org; Tue, 05 Dec 2017 16:09:18 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:40028)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <alex.williamson@redhat.com>)
+	id 1eMKSp-0005qo-Jv
+	for qemu-devel@nongnu.org; Tue, 05 Dec 2017 16:09:15 -0500
+From: Alex Williamson <alex.williamson@redhat.com>
+Date: Tue, 05 Dec 2017 14:09:07 -0700
+Message-ID: <20171205205409.5348.53070.stgit@gimli.home>
 MIME-Version: 1.0
-In-Reply-To: <1510736731.4383.4.camel@intel.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Message-Id: <24cf3bb4-546d-0566-cffa-1b863d387db3@linux.vnet.ibm.com>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v3 for-2.11 1/3] tpm_emulator: Add a
- caching layer for the TPM Established flag
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+Subject: [Qemu-devel] [PATCH for-2.11] vfio: Fix vfio-kvm group registration
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -47,45 +25,48 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Valluri, Amarnath" <amarnath.valluri@intel.com>, "marcandre.lureau@gmail.com" <marcandre.lureau@gmail.com>
-Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+To: qemu-devel@nongnu.org
+Cc: eric.auger@redhat.com, aik@ozlabs.ru
 
-On 11/15/2017 04:05 AM, Valluri, Amarnath wrote:
-> On Wed, 2017-11-15 at 04:47 +0100, Marc-Andr=C3=A9 Lureau wrote:
->> Hi
->>
->> On Wed, Nov 15, 2017 at 2:16 AM, Stefan Berger
->> <stefanb@linux.vnet.ibm.com> wrote:
->>> On 11/14/2017 06:40 PM, Marc-Andr=C3=A9 Lureau wrote:
->>>>
->>>> Hi
->>>>
->>>> On Tue, Nov 14, 2017 at 10:52 PM, Stefan Berger
->>>> <stefanb@linux.vnet.ibm.com> wrote:
->>>>>
->>>>> Add a caching layer for the TPM established flag so that we
->>>>> don't
->>>>> need to go to the emulator every time the flag is read by
->>>>> accessing
->>>>> the REG_ACCESS register.
->>>> What's the impact? Isn't this just a "small" optimization? Iotw,
->>>> why
->>>> is this for-2.11?
->>> The TIS has a register that contains this flag and that's being
->>> polled quite
->>> frequently. So it generates a lot of traffic to the emulator. This
->>> caching
->>> layer gets rid of most of the traffic.
->> I didn't notice any problem when doing my tests, I guess Amarnath
->> niether. perhaps it's best to delay for after 2.11.
-> Yes, I could see there is little frequent(21 calls to backend) to get
-> establish flag, and this patch will help to avoid them. But i still
-> agree with Marc and tag this as "small" optimization.
+Commit 8c37faa475f3 ("vfio-pci, ppc64/spapr: Reorder group-to-container
+attaching") moved registration of groups with the vfio-kvm device from
+vfio_get_group() to vfio_connect_container(), but it missed the case
+where a group is attached to an existing container and takes an early
+exit.  Perhaps this is a less common case on ppc64/spapr, but on x86
+(without viommu) all groups are connected to the same container and
+thus only the first group gets registered with the vfio-kvm device.
+This becomes a problem if we then hot-unplug the devices associated
+with that first group and we end up with KVM being misinformed about
+any vfio connections that might remain.  Fix by including the call to
+vfio_kvm_device_add_group() in this early exit path.
 
-Can you review it so we have it ready for 2.12?
+Fixes: 8c37faa475f3 ("vfio-pci, ppc64/spapr: Reorder group-to-container attaching")
+Cc: qemu-stable@nongnu.org # qemu-2.10+
+Signed-off-by: Alex Williamson <alex.williamson@redhat.com>
+---
 
-   Thanks,
-       Stefan
+This bug also existed in QEMU 2.10, but I think the fix is sufficiently
+obvious (famous last words) to propose for 2.11 at this late date.  If
+the first group is hot unplugged then KVM may revert to code emulation
+that assumes no non-coherent DMA is present on some systems.  Also for
+KVMGT, if the vGPU is not the first device registered, then the
+notifier to enable linkages to KVM would not be called.  Please review.
+Thanks,
 
->
-> - Amarnath
+Alex
+
+ hw/vfio/common.c |    1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/hw/vfio/common.c b/hw/vfio/common.c
+index 7b2924c0ef19..7007878e345e 100644
+--- a/hw/vfio/common.c
++++ b/hw/vfio/common.c
+@@ -968,6 +968,7 @@ static int vfio_connect_container(VFIOGroup *group, AddressSpace *as,
+         if (!ioctl(group->fd, VFIO_GROUP_SET_CONTAINER, &container->fd)) {
+             group->container = container;
+             QLIST_INSERT_HEAD(&container->group_list, group, container_next);
++            vfio_kvm_device_add_group(group);
+             return 0;
+         }
+     }
