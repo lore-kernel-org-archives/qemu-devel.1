@@ -1,39 +1,41 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59695)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60466)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bjsdjshi@linux.vnet.ibm.com>) id 1eM63r-00084e-2L
-	for qemu-devel@nongnu.org; Tue, 05 Dec 2017 00:46:32 -0500
+	(envelope-from <bjsdjshi@linux.vnet.ibm.com>) id 1eM67O-0001Rj-Ll
+	for qemu-devel@nongnu.org; Tue, 05 Dec 2017 00:50:11 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bjsdjshi@linux.vnet.ibm.com>) id 1eM63n-00067H-Py
-	for qemu-devel@nongnu.org; Tue, 05 Dec 2017 00:46:31 -0500
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:42098
-	helo=mx0a-001b2d01.pphosted.com)
+	(envelope-from <bjsdjshi@linux.vnet.ibm.com>) id 1eM67M-0007m7-3G
+	for qemu-devel@nongnu.org; Tue, 05 Dec 2017 00:50:10 -0500
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:53270)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <bjsdjshi@linux.vnet.ibm.com>)
-	id 1eM63n-000670-JU
-	for qemu-devel@nongnu.org; Tue, 05 Dec 2017 00:46:27 -0500
-Received: from pps.filterd (m0098420.ppops.net [127.0.0.1])
-	by mx0b-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
-	vB55iBNh013517
-	for <qemu-devel@nongnu.org>; Tue, 5 Dec 2017 00:46:24 -0500
-Received: from e11.ny.us.ibm.com (e11.ny.us.ibm.com [129.33.205.201])
-	by mx0b-001b2d01.pphosted.com with ESMTP id 2ene0qqdth-1
+	id 1eM67L-0007lr-QE
+	for qemu-devel@nongnu.org; Tue, 05 Dec 2017 00:50:08 -0500
+Received: from pps.filterd (m0098404.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
+	vB55nP7d103495
+	for <qemu-devel@nongnu.org>; Tue, 5 Dec 2017 00:50:03 -0500
+Received: from e16.ny.us.ibm.com (e16.ny.us.ibm.com [129.33.205.206])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2enndf8f18-1
 	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Tue, 05 Dec 2017 00:46:23 -0500
+	for <qemu-devel@nongnu.org>; Tue, 05 Dec 2017 00:50:02 -0500
 Received: from localhost
-	by e11.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	by e16.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
 	Violators will be prosecuted
 	for <qemu-devel@nongnu.org> from <bjsdjshi@linux.vnet.ibm.com>;
-	Tue, 5 Dec 2017 00:46:22 -0500
-Date: Tue, 5 Dec 2017 13:46:15 +0800
+	Tue, 5 Dec 2017 00:50:01 -0500
+Date: Tue, 5 Dec 2017 13:49:56 +0800
 From: Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>
 References: <20171201143136.62497-1-pasic@linux.vnet.ibm.com>
-	<20171201143136.62497-2-pasic@linux.vnet.ibm.com>
+	<20171201143136.62497-3-pasic@linux.vnet.ibm.com>
+	<20171204121511.0abe9ca2.cohuck@redhat.com>
+	<f237126d-0815-8433-6ef7-1c1ba2e5a956@linux.vnet.ibm.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20171201143136.62497-2-pasic@linux.vnet.ibm.com>
-Message-Id: <20171205054615.GX5859@bjsdjshi@linux.vnet.ibm.com>
-Subject: Re: [Qemu-devel] [PATCH 1/3] s390x/css: unrestrict cssids
+In-Reply-To: <f237126d-0815-8433-6ef7-1c1ba2e5a956@linux.vnet.ibm.com>
+Message-Id: <20171205054956.GY5859@bjsdjshi@linux.vnet.ibm.com>
+Subject: Re: [Qemu-devel] [PATCH 2/3] s390x/css: advertise unrestricted
+ cssids
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -43,169 +45,80 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: Halil Pasic <pasic@linux.vnet.ibm.com>
-Cc: Boris Fiuczynski <fiuczy@linux.vnet.ibm.com>, Cornelia Huck <cohuck@redhat.com>, Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>, Christian Borntraeger <borntraeger@de.ibm.com>, Shalini Chellathurai Saroja <shalini@linux.vnet.ibm.com>, qemu-devel@nongnu.org, qemu-s390x@nongnu.org
+Cc: Cornelia Huck <cohuck@redhat.com>, Shalini Chellathurai Saroja <shalini@linux.vnet.ibm.com>, qemu-devel@nongnu.org, Christian Borntraeger <borntraeger@de.ibm.com>, qemu-s390x@nongnu.org, Boris Fiuczynski <fiuczy@linux.vnet.ibm.com>, Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>
 
-* Halil Pasic <pasic@linux.vnet.ibm.com> [2017-12-01 15:31:34 +0100]:
+* Halil Pasic <pasic@linux.vnet.ibm.com> [2017-12-04 16:07:27 +0100]:
 
-[...]
-
-No comment for the message part.
-
-The code looks good to me. So after squashing with patch #2:
-Reviewed-by: Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>
-
-> ---
->  hw/s390x/3270-ccw.c        |  2 +-
->  hw/s390x/css.c             | 28 ++++------------------------
->  hw/s390x/s390-ccw.c        |  2 +-
->  hw/s390x/s390-virtio-ccw.c |  1 -
->  hw/s390x/virtio-ccw.c      |  2 +-
->  include/hw/s390x/css.h     | 12 ++++--------
->  6 files changed, 11 insertions(+), 36 deletions(-)
 > 
-> diff --git a/hw/s390x/3270-ccw.c b/hw/s390x/3270-ccw.c
-> index 081e3ef6f4..3af13ea027 100644
-> --- a/hw/s390x/3270-ccw.c
-> +++ b/hw/s390x/3270-ccw.c
-> @@ -104,7 +104,7 @@ static void emulated_ccw_3270_realize(DeviceState *ds, Error **errp)
->      SubchDev *sch;
->      Error *err = NULL;
 > 
-> -    sch = css_create_sch(cdev->devno, true, cbus->squash_mcss, errp);
-> +    sch = css_create_sch(cdev->devno, cbus->squash_mcss, errp);
->      if (!sch) {
->          return;
->      }
-> diff --git a/hw/s390x/css.c b/hw/s390x/css.c
-> index f6b5c807cd..cd26f32050 100644
-> --- a/hw/s390x/css.c
-> +++ b/hw/s390x/css.c
-> @@ -2370,22 +2370,12 @@ const PropertyInfo css_devid_ro_propinfo = {
->      .get = get_css_devid,
->  };
+> On 12/04/2017 12:15 PM, Cornelia Huck wrote:
+> > On Fri,  1 Dec 2017 15:31:35 +0100
+> > Halil Pasic <pasic@linux.vnet.ibm.com> wrote:
+> > 
+> >> Let us advertise the changes introduced by "s390x/css: unrestrict cssids"
+> >> to the management software (so it can tell are cssids unrestricted or
+> >> restricted).
+> >>
+> >> Signed-off-by: Halil Pasic <pasic@linux.vnet.ibm.com>
+> >> ---
+> >>
+> >> Boris says having the property on the virtual-css-bridge is good form
+> >> Libvirt PoV. @Shalini: could you verify that things work out fine
+> >> (provided we get at least a preliminary blessing from Connie).
+> >>
+> >> Consider squashing into "s390x/css: unrestrict cssids".
+> >> ---
+> >>  hw/s390x/css-bridge.c | 11 +++++++++++
+> >>  1 file changed, 11 insertions(+)
+> >>
+> >> diff --git a/hw/s390x/css-bridge.c b/hw/s390x/css-bridge.c
+> >> index c4a9735d71..c7e8998680 100644
+> >> --- a/hw/s390x/css-bridge.c
+> >> +++ b/hw/s390x/css-bridge.c
+> >> @@ -123,6 +123,11 @@ static Property virtual_css_bridge_properties[] = {
+> >>      DEFINE_PROP_END_OF_LIST(),
+> >>  };
+> >>  
+> >> +static bool prop_get_true(Object *obj, Error **errp)
+> >> +{
+> >> +    return true;
+> >> +}
+> >> +
+> >>  static void virtual_css_bridge_class_init(ObjectClass *klass, void *data)
+> >>  {
+> >>      HotplugHandlerClass *hc = HOTPLUG_HANDLER_CLASS(klass);
+> >> @@ -131,6 +136,12 @@ static void virtual_css_bridge_class_init(ObjectClass *klass, void *data)
+> >>      hc->unplug = ccw_device_unplug;
+> >>      set_bit(DEVICE_CATEGORY_BRIDGE, dc->categories);
+> >>      dc->props = virtual_css_bridge_properties;
+> >> +    object_class_property_add_bool(klass, "cssid-unrestricted",
+> >> +                                   prop_get_true, NULL, NULL);
+> >> +    object_class_property_set_description(klass, "cssid-unrestricted",
+> >> +            "A css device can use any  cssid, regardless whether virtual"
+> > 
+> > extra space -----------------------------^
+> > 
 > 
-> -SubchDev *css_create_sch(CssDevId bus_id, bool is_virtual, bool squash_mcss,
-> -                         Error **errp)
-> +SubchDev *css_create_sch(CssDevId bus_id, bool squash_mcss, Error **errp)
->  {
->      uint16_t schid = 0;
->      SubchDev *sch;
+> Nod.
 > 
->      if (bus_id.valid) {
-> -        if (is_virtual != (bus_id.cssid == VIRTUAL_CSSID)) {
-> -            error_setg(errp, "cssid %hhx not valid for %s devices",
-> -                       bus_id.cssid,
-> -                       (is_virtual ? "virtual" : "non-virtual"));
-> -            return NULL;
-> -        }
-> -    }
-> -
-> -    if (bus_id.valid) {
->          if (squash_mcss) {
->              bus_id.cssid = channel_subsys.default_cssid;
->          } else if (!channel_subsys.css[bus_id.cssid]) {
-> @@ -2396,19 +2386,8 @@ SubchDev *css_create_sch(CssDevId bus_id, bool is_virtual, bool squash_mcss,
->                                             bus_id.devid, &schid, errp)) {
->              return NULL;
->          }
-> -    } else if (squash_mcss || is_virtual) {
-> -        bus_id.cssid = channel_subsys.default_cssid;
-> -
-> -        if (!css_find_free_subch_and_devno(bus_id.cssid, &bus_id.ssid,
-> -                                           &bus_id.devid, &schid, errp)) {
-> -            return NULL;
-> -        }
->      } else {
-> -        for (bus_id.cssid = 0; bus_id.cssid < MAX_CSSID; ++bus_id.cssid) {
-> -            if (bus_id.cssid == VIRTUAL_CSSID) {
-> -                continue;
-> -            }
-> -
-> +        for (bus_id.cssid = channel_subsys.default_cssid;;) {
->              if (!channel_subsys.css[bus_id.cssid]) {
->                  css_create_css_image(bus_id.cssid, false);
->              }
-> @@ -2418,7 +2397,8 @@ SubchDev *css_create_sch(CssDevId bus_id, bool is_virtual, bool squash_mcss,
->                                                  NULL)) {
->                  break;
->              }
-> -            if (bus_id.cssid == MAX_CSSID) {
-> +            bus_id.cssid = (bus_id.cssid + 1) % MAX_CSSID;
-> +            if (bus_id.cssid == channel_subsys.default_cssid) {
->                  error_setg(errp, "Virtual channel subsystem is full!");
->                  return NULL;
->              }
-> diff --git a/hw/s390x/s390-ccw.c b/hw/s390x/s390-ccw.c
-> index 0ef232ec27..4a9d4d2534 100644
-> --- a/hw/s390x/s390-ccw.c
-> +++ b/hw/s390x/s390-ccw.c
-> @@ -77,7 +77,7 @@ static void s390_ccw_realize(S390CCWDevice *cdev, char *sysfsdev, Error **errp)
->          goto out_err_propagate;
->      }
+> >> +            " or not (read only, always true)",
 > 
-> -    sch = css_create_sch(ccw_dev->devno, false, cbus->squash_mcss, &err);
-> +    sch = css_create_sch(ccw_dev->devno, cbus->squash_mcss, &err);
->      if (!sch) {
->          goto out_mdevid_free;
->      }
-> diff --git a/hw/s390x/s390-virtio-ccw.c b/hw/s390x/s390-virtio-ccw.c
-> index 6a57f94197..4d65a50334 100644
-> --- a/hw/s390x/s390-virtio-ccw.c
-> +++ b/hw/s390x/s390-virtio-ccw.c
-> @@ -302,7 +302,6 @@ static void ccw_init(MachineState *machine)
->      /*
->       * Non mcss-e enabled guests only see the devices from the default
->       * css, which is determined by the value of the squash_mcss property.
-> -     * Note: we must not squash non virtual devices to css 0xFE.
->       */
->      if (css_bus->squash_mcss) {
->          ret = css_create_css_image(0, true);
-> diff --git a/hw/s390x/virtio-ccw.c b/hw/s390x/virtio-ccw.c
-> index 184515ce94..3dd902a664 100644
-> --- a/hw/s390x/virtio-ccw.c
-> +++ b/hw/s390x/virtio-ccw.c
-> @@ -701,7 +701,7 @@ static void virtio_ccw_device_realize(VirtioCcwDevice *dev, Error **errp)
->      SubchDev *sch;
->      Error *err = NULL;
+> Do we need "." here ----------------------------^ ?
 > 
-> -    sch = css_create_sch(ccw_dev->devno, true, cbus->squash_mcss, errp);
-> +    sch = css_create_sch(ccw_dev->devno, cbus->squash_mcss, errp);
->      if (!sch) {
->          return;
->      }
-> diff --git a/include/hw/s390x/css.h b/include/hw/s390x/css.h
-> index ab6ebe66b5..53c270a216 100644
-> --- a/include/hw/s390x/css.h
-> +++ b/include/hw/s390x/css.h
-> @@ -272,12 +272,9 @@ extern const PropertyInfo css_devid_ro_propinfo;
->   * default css image for it.
->   * If @p bus_id is valid, and @p squash_mcss is false, verify that it is
->   * not already in use, and find a free devno for it.
-> - * If @p bus_id is not valid, and if either @p squash_mcss or @p is_virtual
-> - * is true, find a free subchannel id and device number across all
-> - * subchannel sets from the default css image.
-> - * If @p bus_id is not valid, and if both @p squash_mcss and @p is_virtual
-> - * are false, find a non-full css image and find a free subchannel id and
-> - * device number across all subchannel sets from it.
-> + * If @p bus_id is not valid find a free subchannel id and device number
-> + * across all subchannel sets and all css images starting from the default
-> + * css image.
->   *
->   * If either of the former actions succeed, allocate a subchannel structure,
->   * initialise it with the bus id, subchannel id and device number, register
-> @@ -286,8 +283,7 @@ extern const PropertyInfo css_devid_ro_propinfo;
->   * The caller becomes owner of the returned subchannel structure and
->   * is responsible for unregistering and freeing it.
->   */
-> -SubchDev *css_create_sch(CssDevId bus_id, bool is_virtual, bool squash_mcss,
-> -                         Error **errp);
-> +SubchDev *css_create_sch(CssDevId bus_id, bool squash_mcss, Error **errp);
+> >> +            NULL);
+> >>  }
+> >>  
+> >>  static const TypeInfo virtual_css_bridge_info = {
+> > 
+> > Looks reasonable. If this works as expected, I'll squash it into the
+> > previous patch.
+> > 
 > 
->  /** Turn on css migration */
->  void css_register_vmstate(void);
-> -- 
-> 2.13.5
+> I've just asked Shalini to verify the libvirt perspective.
 > 
+> Supposed we verify this works as expected, I read I don't have to spin
+> a v2 and you are going to fix the issues found yourself. Right?
+Supposed this works as expected, you have my r-b. ;)
 
 -- 
 Dong Jia Shi
