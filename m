@@ -1,34 +1,39 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45087)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47375)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanb@linux.vnet.ibm.com>) id 1eMJws-0003OC-MJ
-	for qemu-devel@nongnu.org; Tue, 05 Dec 2017 15:36:17 -0500
+	(envelope-from <stefanb@linux.vnet.ibm.com>) id 1eMK66-000150-13
+	for qemu-devel@nongnu.org; Tue, 05 Dec 2017 15:45:47 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanb@linux.vnet.ibm.com>) id 1eMJwq-0001Pw-6G
-	for qemu-devel@nongnu.org; Tue, 05 Dec 2017 15:36:14 -0500
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:46466)
+	(envelope-from <stefanb@linux.vnet.ibm.com>) id 1eMK61-0005Py-4Z
+	for qemu-devel@nongnu.org; Tue, 05 Dec 2017 15:45:46 -0500
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:59634
+	helo=mx0a-001b2d01.pphosted.com)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <stefanb@linux.vnet.ibm.com>)
-	id 1eMJwp-0001PJ-U5
-	for qemu-devel@nongnu.org; Tue, 05 Dec 2017 15:36:12 -0500
-Received: from pps.filterd (m0098393.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
-	vB5KY89A071401
-	for <qemu-devel@nongnu.org>; Tue, 5 Dec 2017 15:36:08 -0500
-Received: from e13.ny.us.ibm.com (e13.ny.us.ibm.com [129.33.205.203])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2enya31vvy-1
+	id 1eMK60-0005OD-UC
+	for qemu-devel@nongnu.org; Tue, 05 Dec 2017 15:45:41 -0500
+Received: from pps.filterd (m0098416.ppops.net [127.0.0.1])
+	by mx0b-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
+	vB5Ki6eh024002
+	for <qemu-devel@nongnu.org>; Tue, 5 Dec 2017 15:45:40 -0500
+Received: from e36.co.us.ibm.com (e36.co.us.ibm.com [32.97.110.154])
+	by mx0b-001b2d01.pphosted.com with ESMTP id 2ep2j1gkx4-1
 	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Tue, 05 Dec 2017 15:36:08 -0500
+	for <qemu-devel@nongnu.org>; Tue, 05 Dec 2017 15:45:39 -0500
 Received: from localhost
-	by e13.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	by e36.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
 	Violators will be prosecuted
 	for <qemu-devel@nongnu.org> from <stefanb@linux.vnet.ibm.com>;
-	Tue, 5 Dec 2017 15:36:06 -0500
-From: Stefan Berger <stefanb@linux.vnet.ibm.com>
-Date: Tue,  5 Dec 2017 15:35:53 -0500
-In-Reply-To: <1512506153-8011-1-git-send-email-stefanb@linux.vnet.ibm.com>
+	Tue, 5 Dec 2017 13:45:38 -0700
 References: <1512506153-8011-1-git-send-email-stefanb@linux.vnet.ibm.com>
-Message-Id: <1512506153-8011-3-git-send-email-stefanb@linux.vnet.ibm.com>
-Subject: [Qemu-devel] [PATCH 2/2] tpm_spapr: Support suspend and resume
+From: Stefan Berger <stefanb@linux.vnet.ibm.com>
+Date: Tue, 5 Dec 2017 15:45:34 -0500
+MIME-Version: 1.0
+In-Reply-To: <1512506153-8011-1-git-send-email-stefanb@linux.vnet.ibm.com>
+Content-Type: text/plain; charset=windows-1252; format=flowed
+Content-Transfer-Encoding: 7bit
+Message-Id: <6e60d979-30c9-700c-9958-e4fbafd96d49@linux.vnet.ibm.com>
+Subject: Re: [Qemu-devel] [PATCH 0/2] Add vTPM emulator supportfor ppc64
+ platform
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -38,100 +43,54 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: marcandre.lureau@redhat.com, qemu-ppc@nongnu.org, clg@kaod.org, lo1@us.ibm.com, James.Bottomley@HansenPartnership.com, Stefan Berger <stefanb@linux.vnet.ibm.com>
+Cc: lo1@us.ibm.com, James.Bottomley@HansenPartnership.com, qemu-ppc@nongnu.org, clg@kaod.org, marcandre.lureau@redhat.com
 
-Signed-off-by: Stefan Berger <stefanb@linux.vnet.ibm.com>
----
- hw/tpm/tpm_spapr.c | 61 ++++++++++++++++++++++++++++++++++++++++++++++++++----
- 1 file changed, 57 insertions(+), 4 deletions(-)
+On 12/05/2017 03:35 PM, Stefan Berger wrote:
+> The following series of patches adds vTPM emulator support for the
+> ppc64 platform (pSeries).
+>
+> It can be tested as follows with swtpm/libtpms:
+>
+> #> swtpm socket --tpmstate dir=/tmp/mytpm1 \
+> 	--ctrl type=unixio,path=/tmp/mytpm1/ctrl.sock \
+> 	--log level=2
+>
+> If TPM 2 is desired, add --tpm2 as parameter to the above
+> and use the latest tpm2-preview branches of libtpms and swtpm.
+>
+> In another terminal start QEMU:
+>
+> #> sudo ./ppc64-softmmu/qemu-system-ppc64 -m 1024 \
+> 	-monitor stdio -vnc :12 -vga std \
+> 	--chardev socket,id=chrtpm,path=/tmp/mytpm1/ctrl.sock \
+> 	-tpmdev emulator,id=tpm0,chardev=chrtpm \
+> 	-device tpm-spapr,tpmdev=tpm0 \
+> 	-L /tmp -bios boot_rom.bin \
+> 	myimage.raw
+>
+> Links:
+>   - libtpms: https://github.com/stefanberger/libtpms/wiki
+>   - swtpm: https://github.com/stefanberger/swtpm/wiki
 
-diff --git a/hw/tpm/tpm_spapr.c b/hw/tpm/tpm_spapr.c
-index 909aeeb..e145697 100644
---- a/hw/tpm/tpm_spapr.c
-+++ b/hw/tpm/tpm_spapr.c
-@@ -248,9 +248,8 @@ static int tpm_spapr_do_crq(struct VIOsPAPRDevice *dev, uint8_t *crq_data)
-     return 0;
- }
- 
--static void tpm_spapr_request_completed(TPMIf *ti)
-+static void _tpm_spapr_request_completed(SPAPRvTPMState *s)
- {
--    SPAPRvTPMState *s = VIO_SPAPR_VTPM_DEVICE(ti);
-     tpm_spapr_crq *crq = &s->crq;
-     uint32_t len;
-     int rc;
-@@ -278,6 +277,13 @@ static void tpm_spapr_request_completed(TPMIf *ti)
-     }
- }
- 
-+static void tpm_spapr_request_completed(TPMIf *ti)
-+{
-+    SPAPRvTPMState *s = VIO_SPAPR_VTPM_DEVICE(ti);
-+
-+    _tpm_spapr_request_completed(s);
-+}
-+
- static int tpm_spapr_do_startup_tpm(SPAPRvTPMState *s, size_t buffersize)
- {
-     return tpm_backend_startup_tpm(s->be_driver, buffersize);
-@@ -310,9 +316,56 @@ static enum TPMVersion tpm_spapr_get_version(TPMIf *ti)
-     return tpm_backend_get_tpm_version(s->be_driver);
- }
- 
-+/* persistent state handling */
-+
-+static int tpm_spapr_pre_save(void *opaque)
-+{
-+    SPAPRvTPMState *s = opaque;
-+
-+    /*
-+     * Synchronize with backend completion.
-+     */
-+    tpm_backend_wait_cmd_completed(s->be_driver);
-+
-+    /*
-+     * we cannot deliver the results to the VM (in state
-+     * SPAPR_VTPM_STATE_EXECUTION) since DMA would touch VM memory
-+     */
-+
-+    return 0;
-+}
-+
-+static int tpm_spapr_post_load(void *opaque,
-+                               int version_id __attribute__((unused)))
-+{
-+    SPAPRvTPMState *s = opaque;
-+
-+    if (s->state == SPAPR_VTPM_STATE_EXECUTION) {
-+        /*
-+         * now we can deliver the results to the VM via DMA
-+         */
-+        _tpm_spapr_request_completed(s);
-+    }
-+
-+    return 0;
-+}
-+
- static const VMStateDescription vmstate_spapr_vtpm = {
--    .name = "tpm_spapr",
--    .unmigratable = 1,
-+    .name = "tpm-spapr",
-+    .version_id = 1,
-+    .minimum_version_id = 0,
-+    .minimum_version_id_old = 0,
-+    .pre_save = tpm_spapr_pre_save,
-+    .post_load = tpm_spapr_post_load,
-+    .fields = (VMStateField[]) {
-+        VMSTATE_BUFFER(crq.raw, SPAPRvTPMState),
-+        VMSTATE_UINT64(vdev.crq.qladdr, SPAPRvTPMState),
-+        VMSTATE_UINT32(vdev.crq.qsize, SPAPRvTPMState),
-+        VMSTATE_UINT32(vdev.crq.qnext, SPAPRvTPMState),
-+        VMSTATE_UINT8(state, SPAPRvTPMState),
-+        VMSTATE_BUFFER(buffer, SPAPRvTPMState),
-+        VMSTATE_END_OF_LIST(),
-+    }
- };
- 
- static Property tpm_spapr_properties[] = {
--- 
-2.5.5
+The migration patch builds on a series of previous patches. These and 
+this series of patches can be found in my working branch:
+
+https://github.com/stefanberger/qemu-tpm/commits/tpm-next+
+
+
+>
+> Regards,
+>      Stefan
+>
+>
+> Stefan Berger (2):
+>    tpm_spapr: Support TPM for ppc64 using CRQ based interface
+>    tpm_spapr: Support suspend and resume
+>
+>   hw/tpm/Makefile.objs |   1 +
+>   hw/tpm/tpm_spapr.c   | 433 +++++++++++++++++++++++++++++++++++++++++++++++++++
+>   include/sysemu/tpm.h |   3 +
+>   qapi/tpm.json        |   5 +-
+>   4 files changed, 440 insertions(+), 2 deletions(-)
+>   create mode 100644 hw/tpm/tpm_spapr.c
+>
