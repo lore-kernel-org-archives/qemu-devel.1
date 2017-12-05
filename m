@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40288)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41035)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <benh@kernel.crashing.org>) id 1eMEYe-0006XJ-OG
-	for qemu-devel@nongnu.org; Tue, 05 Dec 2017 09:50:53 -0500
+	(envelope-from <eblake@redhat.com>) id 1eMEc3-0000wW-VD
+	for qemu-devel@nongnu.org; Tue, 05 Dec 2017 09:54:24 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <benh@kernel.crashing.org>) id 1eMEYa-0003g6-QK
-	for qemu-devel@nongnu.org; Tue, 05 Dec 2017 09:50:52 -0500
-Message-ID: <1512485426.2224.95.camel@kernel.crashing.org>
-From: Benjamin Herrenschmidt <benh@kernel.crashing.org>
-Date: Tue, 05 Dec 2017 08:50:26 -0600
-In-Reply-To: <20171205070004.GL3057@umbus.fritz.box>
-References: <20171123132955.1261-1-clg@kaod.org>
-	<20171123132955.1261-20-clg@kaod.org>
-	<20171201040115.GC30161@umbus.fritz.box>
-	<02120b7e-cd8b-af61-7d35-8289253828f6@kaod.org>
-	<20171205070004.GL3057@umbus.fritz.box>
-Content-Type: text/plain; charset="UTF-8"
-Mime-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 19/25] spapr: add hcalls support for the
- XIVE interrupt mode
+	(envelope-from <eblake@redhat.com>) id 1eMEc0-0005Nd-2X
+	for qemu-devel@nongnu.org; Tue, 05 Dec 2017 09:54:24 -0500
+References: <20171201143136.62497-1-pasic@linux.vnet.ibm.com>
+	<20171201143136.62497-4-pasic@linux.vnet.ibm.com>
+	<927acf90-4a00-3fa2-9bf3-e34afc6be199@redhat.com>
+	<f892b02d-58b6-bb81-439c-f9177259f013@linux.vnet.ibm.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <71010746-2491-ae85-be6b-bf8b265924db@redhat.com>
+Date: Tue, 5 Dec 2017 08:54:15 -0600
+MIME-Version: 1.0
+In-Reply-To: <f892b02d-58b6-bb81-439c-f9177259f013@linux.vnet.ibm.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="mcEcdpAvnCUQNXmxxseGapJ0oUx8Sc4MR"
+Subject: Re: [Qemu-devel] [qemu-s390x] [PATCH 3/3] s390x: deprecate
+ s390-squash-mcss machine prop
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,40 +27,78 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Gibson <david@gibson.dropbear.id.au>, =?ISO-8859-1?Q?C=E9dric?= Le Goater <clg@kaod.org>
-Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org
+To: Halil Pasic <pasic@linux.vnet.ibm.com>, Thomas Huth <thuth@redhat.com>, Boris Fiuczynski <fiuczy@linux.vnet.ibm.com>, Cornelia Huck <cohuck@redhat.com>
+Cc: Shalini Chellathurai Saroja <shalini@linux.vnet.ibm.com>, Christian Borntraeger <borntraeger@de.ibm.com>, qemu-s390x@nongnu.org, Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>, qemu-devel@nongnu.org
 
-On Tue, 2017-12-05 at 18:00 +1100, David Gibson wrote:
-> > The CPU revision. But we won't introduce XIVE exploitation mode on 
-> > anything else than DD2.0 which has full XIVE support. Even STORE_EOI 
-> > that we should be adding.
-> 
-> Hrm.  Host CPU?  That's a problem - if guest visible properties like
-> this vary with the host CPU, migration breaks.
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--mcEcdpAvnCUQNXmxxseGapJ0oUx8Sc4MR
+From: Eric Blake <eblake@redhat.com>
+To: Halil Pasic <pasic@linux.vnet.ibm.com>, Thomas Huth <thuth@redhat.com>,
+ Boris Fiuczynski <fiuczy@linux.vnet.ibm.com>,
+ Cornelia Huck <cohuck@redhat.com>
+Cc: Shalini Chellathurai Saroja <shalini@linux.vnet.ibm.com>,
+ Christian Borntraeger <borntraeger@de.ibm.com>, qemu-s390x@nongnu.org,
+ Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>, qemu-devel@nongnu.org
+Message-ID: <71010746-2491-ae85-be6b-bf8b265924db@redhat.com>
+Subject: Re: [Qemu-devel] [qemu-s390x] [PATCH 3/3] s390x: deprecate
+ s390-squash-mcss machine prop
+References: <20171201143136.62497-1-pasic@linux.vnet.ibm.com>
+ <20171201143136.62497-4-pasic@linux.vnet.ibm.com>
+ <927acf90-4a00-3fa2-9bf3-e34afc6be199@redhat.com>
+ <f892b02d-58b6-bb81-439c-f9177259f013@linux.vnet.ibm.com>
+In-Reply-To: <f892b02d-58b6-bb81-439c-f9177259f013@linux.vnet.ibm.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-I don't think this is going to be a problem in practice. The
-availability of trigger comes from OPAL but in practice, all virtual
-interrupts are going to support it always, only some of the HW
-originated ones (PCIe MSIs for example and LSIs) won't. And we don't
-migrate with PCIe devices passed through.
+On 12/05/2017 06:05 AM, Halil Pasic wrote:
 
-So the guest need the info, but we should be ok with migration from P9
-DD2.0 onwards. Nobody sane cares about P9 DD1.0.
+> Good catch! Regarding omitting the machine name, I was surprised that
+> it works, but it does. Our documentation is a bit strange on this: we
+> document the machine name as non-optional:
+> "-machine [type=3D]name[,prop=3Dvalue[,...]]"
+> but then use -machine prop=3Dvalue in the deprecation section (that's
+> with no name).
 
-Any future chip will have to ensure that we don't lose that property in
-HW least we lost migration, but that would break AIX too so I'm
-reasonably confident the HW guys will get that right ;-)
+QemuOpts at their "finest".  If it sees the first hunk as a value
+without an =3D, then that value is fed to type=3Dname; but you are also f=
+ree
+to make the first hunk be an explicit name=3Dvalue (whether type=3Dname o=
+r
+prop=3Dvalue), at which point it is up to the backend whether type can be=
 
-> > 
-> > > If it varies with host capabilities, that's going to be real pain for
-> > > migration.
-> > 
-> > Yes. I am not aware of any future extension but I agree this is
-> > something we need to keep an eye on.
-> 
-> I'm not talking about future extension, I'm meaning right now.
+omitted.  So in this case, '-machine prop=3Dvalue' manages to work just
+fine, and it's a question of how you would convey that information in
+the --help documentation.
 
-No, no issue right now.
+>=20
+> Since the documentation doesn't make it clear that the property is
+> existent only for the s390-ccw-virtio family of the machines I think
+> being your suggestion has a lot of charm. @Connie: do you agree to
+> removing the machine name (type)?
+>=20
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
 
-Cheers,
-Ben.
+
+--mcEcdpAvnCUQNXmxxseGapJ0oUx8Sc4MR
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlomsxcACgkQp6FrSiUn
+Q2pdyQf/c9JufRCZPMyaknN5kylIiTX6MpJRIbB//KA0bL4DHW2fy+x7orKK+F/B
+KUwbFkH1YxY6ONmJQAY5QuVlZXvIc/gIsagtEx1pKS6xFQ7bSJBwNcVO07ZUgveI
+qffUX/cbtdx5lThbg7Ww9P2z+5/ZZwezymWUx0ccnAl7TikRJ2R7Fw47UjNR2U+0
+okmpqael1j/S1tBrM5uN/UHr724+ImTU2HfmX6IBo3794/ikS59mFaDiY59l2d9h
+4OuLm9qz8vUy0m3XLOf4nLywXOlnc3LtDXP06oUaJmlAEB1xWEmX0ySzVHLnzJWV
+utkBJdalVMzBIjlVfTzPYYuFZCmx4Q==
+=iC8p
+-----END PGP SIGNATURE-----
+
+--mcEcdpAvnCUQNXmxxseGapJ0oUx8Sc4MR--
