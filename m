@@ -1,24 +1,15 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36284)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44108)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1eMF6h-0002eh-DK
-	for qemu-devel@nongnu.org; Tue, 05 Dec 2017 10:26:04 -0500
+	(envelope-from <imammedo@redhat.com>) id 1eMFM3-0005sC-3B
+	for qemu-devel@nongnu.org; Tue, 05 Dec 2017 10:41:56 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1eMF6c-0000NN-ER
-	for qemu-devel@nongnu.org; Tue, 05 Dec 2017 10:26:03 -0500
-References: <20171201143136.62497-1-pasic@linux.vnet.ibm.com>
-	<20171201143136.62497-3-pasic@linux.vnet.ibm.com>
-	<012d3c95-a552-9bfb-38c4-f1bab1bea854@redhat.com>
-	<c5a418db-a68b-52b6-7569-4b1bfd33dbbb@linux.vnet.ibm.com>
-From: Thomas Huth <thuth@redhat.com>
-Message-ID: <50f3b271-963e-a8c0-1728-a09950af177d@redhat.com>
-Date: Tue, 5 Dec 2017 16:25:52 +0100
-MIME-Version: 1.0
-In-Reply-To: <c5a418db-a68b-52b6-7569-4b1bfd33dbbb@linux.vnet.ibm.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [qemu-s390x] [PATCH 2/3] s390x/css: advertise
- unrestricted cssids
+	(envelope-from <imammedo@redhat.com>) id 1eMFLz-0000hh-2j
+	for qemu-devel@nongnu.org; Tue, 05 Dec 2017 10:41:55 -0500
+From: Igor Mammedov <imammedo@redhat.com>
+Date: Tue,  5 Dec 2017 16:41:17 +0100
+Message-Id: <1512488477-209071-1-git-send-email-imammedo@redhat.com>
+Subject: [Qemu-devel] [PATCH 2.12] spapr: replace numa_get_node() with
+ lookup in pc-dimm list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,78 +18,275 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Halil Pasic <pasic@linux.vnet.ibm.com>, Boris Fiuczynski <fiuczy@linux.vnet.ibm.com>, Cornelia Huck <cohuck@redhat.com>
-Cc: Shalini Chellathurai Saroja <shalini@linux.vnet.ibm.com>, qemu-devel@nongnu.org, Christian Borntraeger <borntraeger@de.ibm.com>, qemu-s390x@nongnu.org, Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>
+To: qemu-devel@nongnu.org
+Cc: david@gibson.dropbear.id.au, agraf@suse.de, ehabkost@redhat.com, qemu-ppc@nongnu.org
 
-On 05.12.2017 11:08, Halil Pasic wrote:
->=20
->=20
-> On 12/05/2017 09:28 AM, Thomas Huth wrote:
->> On 01.12.2017 15:31, Halil Pasic wrote:
->>> Let us advertise the changes introduced by "s390x/css: unrestrict css=
-ids"
->>> to the management software (so it can tell are cssids unrestricted or
->>> restricted).
->>>
->>> Signed-off-by: Halil Pasic <pasic@linux.vnet.ibm.com>
->>> ---
->>>
->>> Boris says having the property on the virtual-css-bridge is good form
->>> Libvirt PoV. @Shalini: could you verify that things work out fine
->>> (provided we get at least a preliminary blessing from Connie).
->>>
->>> Consider squashing into "s390x/css: unrestrict cssids".
->>> ---
->>>  hw/s390x/css-bridge.c | 11 +++++++++++
->>>  1 file changed, 11 insertions(+)
->>>
->>> diff --git a/hw/s390x/css-bridge.c b/hw/s390x/css-bridge.c
->>> index c4a9735d71..c7e8998680 100644
->>> --- a/hw/s390x/css-bridge.c
->>> +++ b/hw/s390x/css-bridge.c
->>> @@ -123,6 +123,11 @@ static Property virtual_css_bridge_properties[] =
-=3D {
->>>      DEFINE_PROP_END_OF_LIST(),
->>>  };
->>> =20
->>> +static bool prop_get_true(Object *obj, Error **errp)
->>> +{
->>> +    return true;
->>> +}
->>> +
->>>  static void virtual_css_bridge_class_init(ObjectClass *klass, void *=
-data)
->>>  {
->>>      HotplugHandlerClass *hc =3D HOTPLUG_HANDLER_CLASS(klass);
->>> @@ -131,6 +136,12 @@ static void virtual_css_bridge_class_init(Object=
-Class *klass, void *data)
->>>      hc->unplug =3D ccw_device_unplug;
->>>      set_bit(DEVICE_CATEGORY_BRIDGE, dc->categories);
->>>      dc->props =3D virtual_css_bridge_properties;
->>> +    object_class_property_add_bool(klass, "cssid-unrestricted",
->>> +                                   prop_get_true, NULL, NULL);
->>> +    object_class_property_set_description(klass, "cssid-unrestricted=
-",
->>> +            "A css device can use any  cssid, regardless whether vir=
-tual"
->>> +            " or not (read only, always true)",
->>
->> I'd maybe remove the "always true" in the description here, since that
->> might create wrong assumptions with regards to future versions or lead
->> to bad code in the upper layers. If someone reads "always true", they
->> simply might omit the check of the value of this property. If we then
->> ever want to change it to "false" again, we're in trouble (sure, we
->> could simply completely remove the property again, but we have to
->> remember to do that instead of setting it to false ... so let's better
->> play safe right now already, ok?)
->>
->>  Thomas
->>
->=20
-> Libvirt intends to check for the existence of the property and ignore
-> it's value.
-OK, I wasn't aware of the fact that libvirt normally only checks for the
-presence, but not for the value. Then yes, please keep the "always true"
-in the comment.
+SPAPR is the last user of numa_get_node() and a bunch of
+supporting code to maintain numa_info[x].addr list.
 
- Thomas
+Get LMB node id from pc-dimm list, which allows to
+remove ~80LOC maintaining dynamic address range
+lookup list.
+
+It also removes pc-dimm dependency on numa_[un]set_mem_node_id()
+and makes pc-dimms a sole source of information about which
+node it belongs to and removes duplicate data from global
+numa_info.
+
+Signed-off-by: Igor Mammedov <imammedo@redhat.com>
+---
+Beside making code simpler, my interest in simplification
+lies in allowing calling parse_numa_opts() multiple times,
+without complex cleanups in case NUMA config is changed
+since startup.
+
+PS:
+build tested only
+---
+ include/sysemu/numa.h | 10 ------
+ hw/mem/pc-dimm.c      |  2 --
+ hw/ppc/spapr.c        | 29 +++++++++++++++-
+ numa.c                | 94 ---------------------------------------------------
+ 4 files changed, 28 insertions(+), 107 deletions(-)
+
+diff --git a/include/sysemu/numa.h b/include/sysemu/numa.h
+index 5c6df28..b354521 100644
+--- a/include/sysemu/numa.h
++++ b/include/sysemu/numa.h
+@@ -10,17 +10,10 @@
+ extern int nb_numa_nodes;   /* Number of NUMA nodes */
+ extern bool have_numa_distance;
+ 
+-struct numa_addr_range {
+-    ram_addr_t mem_start;
+-    ram_addr_t mem_end;
+-    QLIST_ENTRY(numa_addr_range) entry;
+-};
+-
+ struct node_info {
+     uint64_t node_mem;
+     struct HostMemoryBackend *node_memdev;
+     bool present;
+-    QLIST_HEAD(, numa_addr_range) addr; /* List to store address ranges */
+     uint8_t distance[MAX_NODES];
+ };
+ 
+@@ -33,9 +26,6 @@ extern NodeInfo numa_info[MAX_NODES];
+ void parse_numa_opts(MachineState *ms);
+ void query_numa_node_mem(NumaNodeMem node_mem[]);
+ extern QemuOptsList qemu_numa_opts;
+-void numa_set_mem_node_id(ram_addr_t addr, uint64_t size, uint32_t node);
+-void numa_unset_mem_node_id(ram_addr_t addr, uint64_t size, uint32_t node);
+-uint32_t numa_get_node(ram_addr_t addr, Error **errp);
+ void numa_legacy_auto_assign_ram(MachineClass *mc, NodeInfo *nodes,
+                                  int nb_nodes, ram_addr_t size);
+ void numa_default_auto_assign_ram(MachineClass *mc, NodeInfo *nodes,
+diff --git a/hw/mem/pc-dimm.c b/hw/mem/pc-dimm.c
+index 66eace5..6e74b61 100644
+--- a/hw/mem/pc-dimm.c
++++ b/hw/mem/pc-dimm.c
+@@ -109,7 +109,6 @@ void pc_dimm_memory_plug(DeviceState *dev, MemoryHotplugState *hpms,
+ 
+     memory_region_add_subregion(&hpms->mr, addr - hpms->base, mr);
+     vmstate_register_ram(vmstate_mr, dev);
+-    numa_set_mem_node_id(addr, memory_region_size(mr), dimm->node);
+ 
+ out:
+     error_propagate(errp, local_err);
+@@ -122,7 +121,6 @@ void pc_dimm_memory_unplug(DeviceState *dev, MemoryHotplugState *hpms,
+     PCDIMMDeviceClass *ddc = PC_DIMM_GET_CLASS(dimm);
+     MemoryRegion *vmstate_mr = ddc->get_vmstate_memory_region(dimm);
+ 
+-    numa_unset_mem_node_id(dimm->addr, memory_region_size(mr), dimm->node);
+     memory_region_del_subregion(&hpms->mr, mr);
+     vmstate_unregister_ram(vmstate_mr, dev);
+ }
+diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
+index 9efddea..8de0b5b 100644
+--- a/hw/ppc/spapr.c
++++ b/hw/ppc/spapr.c
+@@ -641,6 +641,26 @@ static void spapr_populate_cpus_dt_node(void *fdt, sPAPRMachineState *spapr)
+ 
+ }
+ 
++static uint32_t spapr_pc_dimm_node(MemoryDeviceInfoList *list, ram_addr_t addr)
++{
++    MemoryDeviceInfoList *info;
++
++    for (info = list; info; info = info->next) {
++        MemoryDeviceInfo *value = info->value;
++
++        if (value && value->type == MEMORY_DEVICE_INFO_KIND_DIMM) {
++            PCDIMMDeviceInfo *pcdimm_info = value->u.dimm.data;
++
++            if (pcdimm_info->addr >= addr &&
++                addr < (pcdimm_info->addr + pcdimm_info->size)) {
++                return pcdimm_info->node;
++            }
++        }
++    }
++
++    return -1;
++}
++
+ /*
+  * Adds ibm,dynamic-reconfiguration-memory node.
+  * Refer to docs/specs/ppc-spapr-hotplug.txt for the documentation
+@@ -658,6 +678,7 @@ static int spapr_populate_drconf_memory(sPAPRMachineState *spapr, void *fdt)
+                        lmb_size;
+     uint32_t *int_buf, *cur_index, buf_len;
+     int nr_nodes = nb_numa_nodes ? nb_numa_nodes : 1;
++    MemoryDeviceInfoList *dimms = NULL;
+ 
+     /*
+      * Don't create the node if there is no hotpluggable memory
+@@ -692,6 +713,11 @@ static int spapr_populate_drconf_memory(sPAPRMachineState *spapr, void *fdt)
+         goto out;
+     }
+ 
++    if (hotplug_lmb_start) {
++        MemoryDeviceInfoList **prev = &dimms;
++        qmp_pc_dimm_device_list(qdev_get_machine(), &prev);
++    }
++
+     /* ibm,dynamic-memory */
+     int_buf[0] = cpu_to_be32(nr_lmbs);
+     cur_index++;
+@@ -709,7 +735,7 @@ static int spapr_populate_drconf_memory(sPAPRMachineState *spapr, void *fdt)
+             dynamic_memory[1] = cpu_to_be32(addr & 0xffffffff);
+             dynamic_memory[2] = cpu_to_be32(spapr_drc_index(drc));
+             dynamic_memory[3] = cpu_to_be32(0); /* reserved */
+-            dynamic_memory[4] = cpu_to_be32(numa_get_node(addr, NULL));
++            dynamic_memory[4] = cpu_to_be32(spapr_pc_dimm_node(dimms, addr));
+             if (memory_region_present(get_system_memory(), addr)) {
+                 dynamic_memory[5] = cpu_to_be32(SPAPR_LMB_FLAGS_ASSIGNED);
+             } else {
+@@ -732,6 +758,7 @@ static int spapr_populate_drconf_memory(sPAPRMachineState *spapr, void *fdt)
+ 
+         cur_index += SPAPR_DR_LMB_LIST_ENTRY_SIZE;
+     }
++    qapi_free_MemoryDeviceInfoList(dimms);
+     ret = fdt_setprop(fdt, offset, "ibm,dynamic-memory", int_buf, buf_len);
+     if (ret < 0) {
+         goto out;
+diff --git a/numa.c b/numa.c
+index 7151b24..98fa9a4 100644
+--- a/numa.c
++++ b/numa.c
+@@ -55,92 +55,6 @@ int nb_numa_nodes;
+ bool have_numa_distance;
+ NodeInfo numa_info[MAX_NODES];
+ 
+-void numa_set_mem_node_id(ram_addr_t addr, uint64_t size, uint32_t node)
+-{
+-    struct numa_addr_range *range;
+-
+-    /*
+-     * Memory-less nodes can come here with 0 size in which case,
+-     * there is nothing to do.
+-     */
+-    if (!size) {
+-        return;
+-    }
+-
+-    range = g_malloc0(sizeof(*range));
+-    range->mem_start = addr;
+-    range->mem_end = addr + size - 1;
+-    QLIST_INSERT_HEAD(&numa_info[node].addr, range, entry);
+-}
+-
+-void numa_unset_mem_node_id(ram_addr_t addr, uint64_t size, uint32_t node)
+-{
+-    struct numa_addr_range *range, *next;
+-
+-    QLIST_FOREACH_SAFE(range, &numa_info[node].addr, entry, next) {
+-        if (addr == range->mem_start && (addr + size - 1) == range->mem_end) {
+-            QLIST_REMOVE(range, entry);
+-            g_free(range);
+-            return;
+-        }
+-    }
+-}
+-
+-static void numa_set_mem_ranges(void)
+-{
+-    int i;
+-    ram_addr_t mem_start = 0;
+-
+-    /*
+-     * Deduce start address of each node and use it to store
+-     * the address range info in numa_info address range list
+-     */
+-    for (i = 0; i < nb_numa_nodes; i++) {
+-        numa_set_mem_node_id(mem_start, numa_info[i].node_mem, i);
+-        mem_start += numa_info[i].node_mem;
+-    }
+-}
+-
+-/*
+- * Check if @addr falls under NUMA @node.
+- */
+-static bool numa_addr_belongs_to_node(ram_addr_t addr, uint32_t node)
+-{
+-    struct numa_addr_range *range;
+-
+-    QLIST_FOREACH(range, &numa_info[node].addr, entry) {
+-        if (addr >= range->mem_start && addr <= range->mem_end) {
+-            return true;
+-        }
+-    }
+-    return false;
+-}
+-
+-/*
+- * Given an address, return the index of the NUMA node to which the
+- * address belongs to.
+- */
+-uint32_t numa_get_node(ram_addr_t addr, Error **errp)
+-{
+-    uint32_t i;
+-
+-    /* For non NUMA configurations, check if the addr falls under node 0 */
+-    if (!nb_numa_nodes) {
+-        if (numa_addr_belongs_to_node(addr, 0)) {
+-            return 0;
+-        }
+-    }
+-
+-    for (i = 0; i < nb_numa_nodes; i++) {
+-        if (numa_addr_belongs_to_node(addr, i)) {
+-            return i;
+-        }
+-    }
+-
+-    error_setg(errp, "Address 0x" RAM_ADDR_FMT " doesn't belong to any "
+-                "NUMA node", addr);
+-    return -1;
+-}
+ 
+ static void parse_numa_node(MachineState *ms, NumaNodeOptions *node,
+                             Error **errp)
+@@ -497,12 +411,6 @@ void parse_numa_opts(MachineState *ms)
+             exit(1);
+         }
+ 
+-        for (i = 0; i < nb_numa_nodes; i++) {
+-            QLIST_INIT(&numa_info[i].addr);
+-        }
+-
+-        numa_set_mem_ranges();
+-
+         /* QEMU needs at least all unique node pair distances to build
+          * the whole NUMA distance table. QEMU treats the distance table
+          * as symmetric by default, i.e. distance A->B == distance B->A.
+@@ -522,8 +430,6 @@ void parse_numa_opts(MachineState *ms)
+             /* Validation succeeded, now fill in any missing distances. */
+             complete_init_numa_distance();
+         }
+-    } else {
+-        numa_set_mem_node_id(0, ram_size, 0);
+     }
+ }
+ 
+-- 
+2.7.4
