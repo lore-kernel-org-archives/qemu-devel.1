@@ -1,34 +1,41 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53937)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54211)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <andreas.grabher@cable.vol.at>) id 1eMHEp-0006UK-Gf
-	for qemu-devel@nongnu.org; Tue, 05 Dec 2017 12:42:43 -0500
+	(envelope-from <danielhb@linux.vnet.ibm.com>) id 1eMIwr-00045p-DT
+	for qemu-devel@nongnu.org; Tue, 05 Dec 2017 14:32:10 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <andreas.grabher@cable.vol.at>) id 1eMHEm-0004Ou-7k
-	for qemu-devel@nongnu.org; Tue, 05 Dec 2017 12:42:35 -0500
-Received: from rmisp-mx-out4.tele.net ([194.183.132.22]:40045)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <andreas.grabher@cable.vol.at>)
-	id 1eMHEl-0004LG-Mp
-	for qemu-devel@nongnu.org; Tue, 05 Dec 2017 12:42:32 -0500
-Mime-Version: 1.0 (Mac OS X Mail 7.3 \(1878.6\))
-From: Andreas Grabher <andreas.grabher@cable.vol.at>
-In-Reply-To: <1d262914-ffca-85c2-71da-2ef6184cd7e1@vivier.eu>
-Date: Tue, 5 Dec 2017 18:42:14 +0100
-Message-Id: <713F2EE1-A420-4DAC-A4E3-ED7A0CC6C0E5@cable.vol.at>
-References: <20171123163538.31411-1-laurent@vivier.eu>
-	<CAFEAcA9+f2cgUUS00DXzF9a96evPRnxY5MTUZpe+OA3Trv84WA@mail.gmail.com>
-	<e6dc192f-6fcd-f25d-d1db-983280c915f4@vivier.eu>
-	<CAFEAcA9uOJ5i-XbK5zbxgFBSvu=kQ6p99EA-CyhrSTKtx+CF9A@mail.gmail.com>
-	<e90eaeb0-19d4-659c-9007-5b0e18d87d9a@tuxfamily.org>
-	<629dc696-a5e7-4b94-f964-0e9fdd7cf511@vivier.eu>
-	<13637ee3-544f-11cc-4ee7-a27af2c91173@tuxfamily.org>
-	<CAGC02hQ1RhaHC2rhFecjvCK4oGF0qMQpr6558XiWMXaUSvTq9g@mail.gmail.com>
-	<1d262914-ffca-85c2-71da-2ef6184cd7e1@vivier.eu>
-Content-Type: text/plain;
-	charset=iso-8859-1
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v2 0/5] target/m68k: implement 680x0 FPU
- (part 3)
+	(envelope-from <danielhb@linux.vnet.ibm.com>) id 1eMIwm-000384-VR
+	for qemu-devel@nongnu.org; Tue, 05 Dec 2017 14:32:09 -0500
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:44146)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <danielhb@linux.vnet.ibm.com>)
+	id 1eMIwm-00037P-LV
+	for qemu-devel@nongnu.org; Tue, 05 Dec 2017 14:32:04 -0500
+Received: from pps.filterd (m0098399.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
+	vB5JSYGO008918
+	for <qemu-devel@nongnu.org>; Tue, 5 Dec 2017 14:32:01 -0500
+Received: from e35.co.us.ibm.com (e35.co.us.ibm.com [32.97.110.153])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2eny1qrjb1-1
+	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Tue, 05 Dec 2017 14:32:01 -0500
+Received: from localhost
+	by e35.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <danielhb@linux.vnet.ibm.com>;
+	Tue, 5 Dec 2017 12:32:00 -0700
+References: <20171204151741.14485-1-danielhb@linux.vnet.ibm.com>
+	<20171204151741.14485-2-danielhb@linux.vnet.ibm.com>
+	<20171205180612.GB2969@work-vm>
+From: Daniel Henrique Barboza <danielhb@linux.vnet.ibm.com>
+Date: Tue, 5 Dec 2017 17:31:53 -0200
+MIME-Version: 1.0
+In-Reply-To: <20171205180612.GB2969@work-vm>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
+Content-Language: en-US
+Message-Id: <3b62cb3c-11d4-6215-1e14-b1abb9ba59d5@linux.vnet.ibm.com>
+Subject: Re: [Qemu-devel] [PATCH v4 1/1] tests/qemu-iotests: adding
+ savevm/loadvm with postcopy flag test
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,329 +44,215 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Laurent Vivier <laurent@vivier.eu>
-Cc: william lin <wlsaidhi@gmail.com>, Thomas Huth <huth@tuxfamily.org>, Peter Maydell <peter.maydell@linaro.org>, QEMU Developers <qemu-devel@nongnu.org>, Aurelien Jarno <aurelien@aurel32.net>, Richard Henderson <rth@twiddle.net>
+To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Cc: Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, qemu-devel@nongnu.org, Cleber Rosa <crosa@redhat.com>
 
 
-Am 05.12.2017 um 10:46 schrieb Laurent Vivier <laurent@vivier.eu>:
 
-> Le 05/12/2017 =E0 09:56, william lin a =E9crit :
->> On Wed, Nov 29, 2017 at 9:19 AM, Thomas Huth <huth@tuxfamily.org
->> <mailto:huth@tuxfamily.org>> wrote:
->>=20
->>    On 29.11.2017 15:17, Laurent Vivier wrote:
->>> Le 29/11/2017 =E0 15:08, Thomas Huth a =E9crit :
->>>> On 29.11.2017 14:59, Peter Maydell wrote:
->>>>> On 29 November 2017 at 13:42, Laurent Vivier <laurent@vivier.eu
->>    <mailto:laurent@vivier.eu>> wrote:
->>>>>> these functions come from:
->>>>>>=20
->>>>>> http://previous.alternative-system.com/
->>    <http://previous.alternative-system.com/>
->>>>>>=20
->>>>>>=20
->>    =
-http://svn.code.sf.net/p/previous/code/trunk/src/softfloat/softfloat.c
->>    =
-<http://svn.code.sf.net/p/previous/code/trunk/src/softfloat/softfloat.c>
->>>>>>=20
->>>>>> This is also a modified softfloat, release 2b
->>>>>> which is BSD license if I'm correct.
->>>>>=20
->>>>> We can't use softfloat2b code (the part of the license that goes
->>>>> "USE OF THIS SOFTWARE IS RESTRICTED TO PERSONS
->>>>> AND ORGANIZATIONS [...] WHO FURTHERMORE EFFECTIVELY INDEMNIFY JOHN
->>>>> HAUSER AND THE INTERNATIONAL COMPUTER SCIENCE INSTITUTE" isn't
->>>>> GPL compatible).
->>>>>=20
->>>>> We can use softfloat2a code, which doesn't have that indemnity
->>    clause.
->>>>=20
->>>> Sigh. That's why WinUAE and Hatari immediately switched back to
->>>> softfloat2a (derived from QEMU) after we've identified the problem
->>>> there. Looks like the Previous folks forgot to do that step, too =
-:-(
->>>>=20
->>>>>> This code has also been copied to WinUAE (GPL), where softfloat
->>    has been
->>>>>> copied from QEMU:
->>>>>>=20
->>    =
-https://github.com/tonioni/WinUAE/blob/master/softfloat/softfloat.cpp =
-<https://github.com/tonioni/WinUAE/blob/master/softfloat/softfloat.cpp>
->>>>>=20
->>>>> Yes, lots of projects used the softfloat2b code without realising
->>>>> it wasn't GPL compatible (including QEMU -- we had a painful job
->>>>> to fix things up and convert to the 2a codebase a while back).
->>>>>=20
->>>>>> But I think the bad news comes later:
->>>>>>=20
->>>>>> all the other functions (sin, cos, tan, log, exp, ...) found in
->>    previous
->>>>>> (softfloat_fpsp.c) are "derived" from NeXT library FPSP:
->>>>>>=20
->>>>>>=20
->>    =
-http://svn.code.sf.net/p/previous/code/trunk/src/softfloat/softfloat_fpsp.=
-c
->>    =
-<http://svn.code.sf.net/p/previous/code/trunk/src/softfloat/softfloat_fpsp=
-.c>
->>>>>>=20
->>>>>>=20
->>    =
-/*=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D
->>>>>>=20
->>>>>>   This C source file is an extension to the SoftFloat IEC/IEEE
->>    Floating-point
->>>>>>   Arithmetic Package, Release 2a.
->>>>>>=20
->>>>>>   Written by Andreas Grabher for Previous, NeXT Computer =
-Emulator.
->>>>>>=20
->>>>>>=20
->>    =
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D*/
->>>>>> ...
->>>>>>=20
->>    =
-/*------------------------------------------------------------------------=
-----
->>>>>> | Algorithms for transcendental functions supported by MC68881
->>    and MC68882
->>>>>> | mathematical coprocessors. The functions are derived from
->>    FPSP library.
->>>>>>=20
->>    =
-*-------------------------------------------------------------------------=
----*/
->>>>>>=20
->>>>>> FPSP library can be found:
->>>>>>=20
->>>>>> https://ftp.nice.ch/pub/next/developer/hardware/m68k/
->>    <https://ftp.nice.ch/pub/next/developer/hardware/m68k/>
->>>>>>=20
->>>>>> And the assembly source code is not free at all:
->>>>>>=20
->>>>>>=20
->>    =
-https://ftp.nice.ch/pub/next/developer/hardware/m68k/_libFPSP.1.p2.N.s/l_f=
-psp.h
->>    =
-<https://ftp.nice.ch/pub/next/developer/hardware/m68k/_libFPSP.1.p2.N.s/l_=
-fpsp.h>
->>>>>>=20
->>>>>>=20
->>>>>> |               Copyright (C) Motorola, Inc. 1991
->>>>>> |                       All Rights Reserved
->>>>>> |
->>>>>> |       THIS IS UNPUBLISHED PROPRIETARY SOURCE CODE OF MOTOROLA
->>>>>> |       The copyright notice above does not evidence any
->>>>>> |       actual or intended publication of such source code.
->>>>>>=20
->>>>>>=20
->>>>>> So I'm wondering what license apply to the C version found in
->>    "Previous".
->>>>>=20
->>>>> Good question. It's clearly not copied code (since the FPSP
->>    library is
->>>>> all native m68k assembly), but presumably it's the same algorithms
->>>>> transliterated into C...
->>>>=20
->>>> There also seem to be other versions of that library available, =
-e.g.:
->>>>=20
->>>>=20
->>    =
-https://ftp.netbsd.org/pub/NetBSD/NetBSD-current/src/sys/arch/m68k/fpsp/l_=
-fpsp.h
->>    =
-<https://ftp.netbsd.org/pub/NetBSD/NetBSD-current/src/sys/arch/m68k/fpsp/l=
-_fpsp.h>
->>>>=20
->>>> Maybe Andreas (now on CC: ) could clarify which version he used / =
-how
->>>> the C sources were developed?
->>>=20
->>> Thank you Thomas,
->>>=20
->>> This seems to be the same code re-licensed to:
->>>=20
->>> MOTOROLA MICROPROCESSOR & MEMORY TECHNOLOGY GROUP
->>> M68000 Hi-Performance Microprocessor Division
->>> M68040 Software Package
->>>=20
->>> M68040 Software Package Copyright (c) 1993, 1994 Motorola Inc.
->>> All rights reserved.
->>>=20
->>> THE SOFTWARE is provided on an "AS IS" basis and without warranty.
->>> To the maximum extent permitted by applicable law,
->>> MOTOROLA DISCLAIMS ALL WARRANTIES WHETHER EXPRESS OR IMPLIED,
->>> INCLUDING IMPLIED WARRANTIES OF MERCHANTABILITY OR FITNESS FOR A
->>> PARTICULAR PURPOSE and any warranty against infringement with
->>> regard to the SOFTWARE (INCLUDING ANY MODIFIED VERSIONS THEREOF)
->>> and any accompanying written materials.
->>>=20
->>> To the maximum extent permitted by applicable law,
->>> IN NO EVENT SHALL MOTOROLA BE LIABLE FOR ANY DAMAGES WHATSOEVER
->>> (INCLUDING WITHOUT LIMITATION, DAMAGES FOR LOSS OF BUSINESS
->>> PROFITS, BUSINESS INTERRUPTION, LOSS OF BUSINESS INFORMATION, OR
->>> OTHER PECUNIARY LOSS) ARISING OF THE USE OR INABILITY TO USE THE
->>> SOFTWARE.  Motorola assumes no responsibility for the maintenance
->>> and support of the SOFTWARE.
->>>=20
->>> You are hereby granted a copyright license to use, modify, and
->>> distribute the SOFTWARE so long as this entire notice is retained
->>> without alteration in any modified and/or redistributed versions,
->>> and that such modified versions are clearly identified as such.
->>> No licenses are granted by implication, estoppel or otherwise
->>> under any patents or trademarks of Motorola, Inc.
->>=20
->>    IANAL, but to me that sounds like it is compatible to the GPL, so =
-I
->>    think there should not be a problem if the C sources are based on =
-these
->>    assembler sources?
->>=20
->>     Thomas
->>=20
->>=20
->>=20
->>=20
->> After looking into all these files, I noticed that the previous code:
->>=20
->> =
-http://svn.code.sf.net/p/previous/code/trunk/src/softfloat/softfloat_fpsp.=
-c
->>=20
->> uses SoftFloat 2b code for the helper functions:
->> =
-http://svn.code.sf.net/p/previous/code/trunk/src/softfloat/softfloat.h
->>=20
->> I'm not familiar with licensing but to me it appears that Andreas =
-Grabher
->> has his code as an extension to the wrong release of SoftFloat.
->>=20
->>>>>>=20
->> =
-/*=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D
->>>>>>=20
->>>>>>   This C source file is an extension to the SoftFloat IEC/IEEE=20
->>>>>> Floating-point
->>>>>>   Arithmetic Package, Release 2a.
->>>>>>=20
->>>>>>   Written by Andreas Grabher for Previous, NeXT Computer =
-Emulator.
->>>>>>=20
->>>>>>=20
->> =
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D*/
->>>>>> ...
->>>>>>=20
->> =
-/*------------------------------------------------------------------------=
-----
->>>>>> | Algorithms for transcendental functions supported by MC68881 =
-and
->> MC68882
->>>>>> | mathematical coprocessors. The functions are derived from FPSP
->> library.
->>>>>>=20
->> =
-*-------------------------------------------------------------------------=
----*/
->>=20
->> So we can't use these C code directly as it uses helpers from 2b.
->> However, would it be=20
->> ok to write our own set of C code along with the necessary helpers =
-using
->> the C and asm=20
->> code as reference? (would be part of 2a)
->=20
-> I've ported all the functions written by Andreas to QEMU/softfloat 2a
-> and it doesn't need any helpers from 2b.
->=20
-> What we need to know is what is the license of his code and if it has
-> been written based on the NetBSD code (BSD license) or from the =
-libFPSP
-> (proprietary code) [but I think the code is the same...]
->=20
-> Thanks,
-> Laurent
+On 12/05/2017 04:06 PM, Dr. David Alan Gilbert wrote:
+> * Daniel Henrique Barboza (danielhb@linux.vnet.ibm.com) wrote:
+>> This patch implements a test case for the scenario that was failing
+>> prior to the patch "migration/ram.c: do not set 'postcopy_running' in
+>> POSTCOPY_INCOMING_END", commit acab30b85d.
+>>
+>> This new test file 201 was derived from the test file 181 authored
+>> by Kevin Wolf.
+> The test is interesting because it enables postcopy but never triggers
+> postcopy entry (using migrate_start_postcopy).  Still it's a good path
+> to check.
+>
+> It will fail to enable postcopy on older linux hosts or non-linux hosts
+> that don't have userfault though; I'm not sure how your test fails
+> with that.
+Hmmm I am not sure either. I have tested it with Travis and it passed 
+all tests,
+including a claimed Mac OS environment. Not sure if that counts.
+
+I'll see if I can get this tested on a Windows env to see how this test 
+fails.
 
 
-AFAIK SoftFloat 2a and 2b are identical, except for the license headers. =
-So i don't see any need to rewrite any code. Just replace the headers.
+Daniel
 
-I did translate the FPSP functions from this release of NetBSD:
-
-|	$NetBSD: copyright.s,v 1.2 1994/10/26 07:48:57 cgd Exp $
-
-.text
-.ascii	"MOTOROLA MICROPROCESSOR & MEMORY TECHNOLOGY GROUP\n"
-.ascii	"M68000 Hi-Performance Microprocessor Division\n"
-.ascii	"M68040 Software Package\n"
-.ascii	"\n"
-.ascii	"M68040 Software Package Copyright (c) 1993, 1994 Motorola =
-Inc.\n"
-.ascii	"All rights reserved.\n"
-.ascii	"\n"
-.ascii	"THE SOFTWARE is provided on an \"AS IS\" basis and without =
-warranty.\n"
-.ascii	"To the maximum extent permitted by applicable law,\n"
-.ascii	"MOTOROLA DISCLAIMS ALL WARRANTIES WHETHER EXPRESS OR =
-IMPLIED,\n"
-.ascii	"INCLUDING IMPLIED WARRANTIES OF MERCHANTABILITY OR FITNESS FOR =
-A\n"
-.ascii	"PARTICULAR PURPOSE and any warranty against infringement =
-with\n"
-.ascii	"regard to the SOFTWARE (INCLUDING ANY MODIFIED VERSIONS =
-THEREOF)\n"
-.ascii	"and any accompanying written materials. \n"
-.ascii	"\n"
-.ascii	"To the maximum extent permitted by applicable law,\n"
-.ascii	"IN NO EVENT SHALL MOTOROLA BE LIABLE FOR ANY DAMAGES =
-WHATSOEVER\n"
-.ascii	"(INCLUDING WITHOUT LIMITATION, DAMAGES FOR LOSS OF BUSINESS\n"
-.ascii	"PROFITS, BUSINESS INTERRUPTION, LOSS OF BUSINESS INFORMATION, =
-OR\n"
-.ascii	"OTHER PECUNIARY LOSS) ARISING OF THE USE OR INABILITY TO USE =
-THE\n"
-.ascii	"SOFTWARE.  Motorola assumes no responsibility for the =
-maintenance\n"
-.ascii	"and support of the SOFTWARE.  \n"
-.ascii	"\n"
-.ascii	"You are hereby granted a copyright license to use, modify, =
-and\n"
-.ascii	"distribute the SOFTWARE so long as this entire notice is =
-retained\n"
-.ascii	"without alteration in any modified and/or redistributed =
-versions,\n"
-.ascii	"and that such modified versions are clearly identified as =
-such.\n"
-.ascii	"No licenses are granted by implication, estoppel or =
-otherwise\n"
-.ascii	"under any patents or trademarks of Motorola, Inc.\n"
-
-
-Anyway i still think we generally violate some copyrights just by =
-emulating the 68k. I can't imagine we are allowed to copy Motorola's CPU =
-design in software and give it away. In its 68030 and 68040 users's =
-manuals it tells:
-
-"... Motorola does not assume any liability arising out of the =
-application or use of any product or circuit described herein; neither =
-does it convey any license under its patent rights nor the rights of =
-others. ..."=20=
+>
+> Dave
+>
+>> CC: Kevin Wolf <kwolf@redhat.com>
+>> CC: Max Reitz <mreitz@redhat.com>
+>> CC: Cleber Rosa <crosa@redhat.com>
+>> Signed-off-by: Daniel Henrique Barboza <danielhb@linux.vnet.ibm.com>
+>> ---
+>>   tests/qemu-iotests/201     | 116 +++++++++++++++++++++++++++++++++++++++++++++
+>>   tests/qemu-iotests/201.out |  23 +++++++++
+>>   tests/qemu-iotests/group   |   1 +
+>>   3 files changed, 140 insertions(+)
+>>   create mode 100755 tests/qemu-iotests/201
+>>   create mode 100644 tests/qemu-iotests/201.out
+>>
+>> diff --git a/tests/qemu-iotests/201 b/tests/qemu-iotests/201
+>> new file mode 100755
+>> index 0000000000..9b6e23bbfc
+>> --- /dev/null
+>> +++ b/tests/qemu-iotests/201
+>> @@ -0,0 +1,116 @@
+>> +#!/bin/bash
+>> +#
+>> +# Test savevm and loadvm after live migration with postcopy flag
+>> +#
+>> +# Copyright (C) 2017, IBM Corporation.
+>> +#
+>> +# This file is derived from tests/qemu-iotests/181 by Kevin Wolf
+>> +#
+>> +# This program is free software; you can redistribute it and/or modify
+>> +# it under the terms of the GNU General Public License as published by
+>> +# the Free Software Foundation; either version 2 of the License, or
+>> +# (at your option) any later version.
+>> +#
+>> +# This program is distributed in the hope that it will be useful,
+>> +# but WITHOUT ANY WARRANTY; without even the implied warranty of
+>> +# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+>> +# GNU General Public License for more details.
+>> +#
+>> +# You should have received a copy of the GNU General Public License
+>> +# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+>> +
+>> +seq=`basename $0`
+>> +echo "QA output created by $seq"
+>> +
+>> +status=1	# failure is the default!
+>> +
+>> +MIG_SOCKET="${TEST_DIR}/migrate"
+>> +
+>> +# get standard environment, filters and checks
+>> +. ./common.rc
+>> +. ./common.filter
+>> +. ./common.qemu
+>> +
+>> +_cleanup()
+>> +{
+>> +    rm -f "${MIG_SOCKET}"
+>> +    _cleanup_test_img
+>> +    _cleanup_qemu
+>> +}
+>> +trap "_cleanup; exit \$status" 0 1 2 3 15
+>> +
+>> +_supported_fmt qcow2
+>> +_supported_proto generic
+>> +_supported_os Linux
+>> +
+>> +size=64M
+>> +_make_test_img $size
+>> +
+>> +echo
+>> +echo === Starting VMs ===
+>> +echo
+>> +
+>> +qemu_comm_method="monitor"
+>> +
+>> +if [ "$IMGOPTSSYNTAX" = "true" ]; then
+>> +    _launch_qemu \
+>> +        -drive "${TEST_IMG}",cache=${CACHEMODE},id=disk
+>> +else
+>> +    _launch_qemu \
+>> +        -drive file="${TEST_IMG}",cache=${CACHEMODE},driver=$IMGFMT,id=disk
+>> +fi
+>> +src=$QEMU_HANDLE
+>> +
+>> +if [ "$IMGOPTSSYNTAX" = "true" ]; then
+>> +    _launch_qemu \
+>> +        -drive "${TEST_IMG}",cache=${CACHEMODE},id=disk \
+>> +        -incoming "unix:${MIG_SOCKET}"
+>> +else
+>> +    _launch_qemu \
+>> +        -drive file="${TEST_IMG}",cache=${CACHEMODE},driver=$IMGFMT,id=disk \
+>> +        -incoming "unix:${MIG_SOCKET}"
+>> +fi
+>> +dest=$QEMU_HANDLE
+>> +
+>> +echo
+>> +echo === Set \'migrate_set_capability postcopy-ram on\' and migrate ===
+>> +echo
+>> +
+>> +silent=yes
+>> +_send_qemu_cmd $dest 'migrate_set_capability postcopy-ram on' "(qemu)"
+>> +_send_qemu_cmd $src 'migrate_set_capability postcopy-ram on' "(qemu)"
+>> +_send_qemu_cmd $src "migrate -d unix:${MIG_SOCKET}" "(qemu)"
+>> +
+>> +QEMU_COMM_TIMEOUT=1 qemu_cmd_repeat=10 silent=yes \
+>> +    _send_qemu_cmd $src "info migrate" "completed\|failed"
+>> +silent=yes _send_qemu_cmd $src "" "(qemu)"
+>> +
+>> +echo
+>> +echo === Check if migration was successful ===
+>> +echo
+>> +
+>> +QEMU_COMM_TIMEOUT=1 silent=yes \
+>> +    _send_qemu_cmd $src "info migrate" "completed"
+>> +silent=yes _send_qemu_cmd $src "" "(qemu)"
+>> +
+>> +echo
+>> +echo === On destination, execute savevm and loadvm ===
+>> +echo
+>> +
+>> +silent=
+>> +_send_qemu_cmd $dest 'savevm state1' "(qemu)"
+>> +_send_qemu_cmd $dest 'loadvm state1' "(qemu)"
+>> +
+>> +echo
+>> +echo === Shut down and check image ===
+>> +echo
+>> +
+>> +_send_qemu_cmd $src 'quit' ""
+>> +_send_qemu_cmd $dest 'quit' ""
+>> +wait=1 _cleanup_qemu
+>> +
+>> +_check_test_img
+>> +
+>> +# success, all done
+>> +echo "*** done"
+>> +status=0
+>> diff --git a/tests/qemu-iotests/201.out b/tests/qemu-iotests/201.out
+>> new file mode 100644
+>> index 0000000000..9faf06f996
+>> --- /dev/null
+>> +++ b/tests/qemu-iotests/201.out
+>> @@ -0,0 +1,23 @@
+>> +QA output created by 201
+>> +Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=67108864
+>> +
+>> +=== Starting VMs ===
+>> +
+>> +
+>> +=== Set 'migrate_set_capability postcopy-ram on' and migrate ===
+>> +
+>> +
+>> +=== Check if migration was successful ===
+>> +
+>> +
+>> +=== On destination, execute savevm and loadvm ===
+>> +
+>> +(qemu) savevm state1
+>> +(qemu) loadvm state1
+>> +
+>> +=== Shut down and check image ===
+>> +
+>> +(qemu) quit
+>> +(qemu) quit
+>> +No errors were found on the image.
+>> +*** done
+>> diff --git a/tests/qemu-iotests/group b/tests/qemu-iotests/group
+>> index 3e688678dd..c16bc2c5e2 100644
+>> --- a/tests/qemu-iotests/group
+>> +++ b/tests/qemu-iotests/group
+>> @@ -197,3 +197,4 @@
+>>   197 rw auto quick
+>>   198 rw auto
+>>   200 rw auto
+>> +201 rw auto migration
+>> -- 
+>> 2.13.6
+>>
+>>
+> --
+> Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+>
