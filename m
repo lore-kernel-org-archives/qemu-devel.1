@@ -1,31 +1,43 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38260)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39885)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1eM7m0-0005zB-DS
-	for qemu-devel@nongnu.org; Tue, 05 Dec 2017 02:36:13 -0500
+	(envelope-from <bjsdjshi@linux.vnet.ibm.com>) id 1eM7sl-0008S5-FK
+	for qemu-devel@nongnu.org; Tue, 05 Dec 2017 02:43:12 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1eM7lv-0006co-DW
-	for qemu-devel@nongnu.org; Tue, 05 Dec 2017 02:36:12 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:36838)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1eM7lv-0006cT-4D
-	for qemu-devel@nongnu.org; Tue, 05 Dec 2017 02:36:07 -0500
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
-	[10.5.11.13])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 59E8E37E7A
-	for <qemu-devel@nongnu.org>; Tue,  5 Dec 2017 07:36:05 +0000 (UTC)
-Date: Tue, 5 Dec 2017 15:36:01 +0800
-From: Peter Xu <peterx@redhat.com>
-Message-ID: <20171205073601.GC2925@xz-mi>
-References: <20171201125813.1437-1-quintela@redhat.com>
-	<20171201125813.1437-3-quintela@redhat.com>
+	(envelope-from <bjsdjshi@linux.vnet.ibm.com>) id 1eM7sg-0001L4-FP
+	for qemu-devel@nongnu.org; Tue, 05 Dec 2017 02:43:11 -0500
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:52912
+	helo=mx0a-001b2d01.pphosted.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <bjsdjshi@linux.vnet.ibm.com>)
+	id 1eM7sg-0001Kr-9Q
+	for qemu-devel@nongnu.org; Tue, 05 Dec 2017 02:43:06 -0500
+Received: from pps.filterd (m0098413.ppops.net [127.0.0.1])
+	by mx0b-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
+	vB57dQ0I058333
+	for <qemu-devel@nongnu.org>; Tue, 5 Dec 2017 02:43:05 -0500
+Received: from e14.ny.us.ibm.com (e14.ny.us.ibm.com [129.33.205.204])
+	by mx0b-001b2d01.pphosted.com with ESMTP id 2enpk31xb9-1
+	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Tue, 05 Dec 2017 02:43:04 -0500
+Received: from localhost
+	by e14.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <bjsdjshi@linux.vnet.ibm.com>;
+	Tue, 5 Dec 2017 02:43:04 -0500
+Date: Tue, 5 Dec 2017 15:43:00 +0800
+From: Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>
+References: <20171201143136.62497-1-pasic@linux.vnet.ibm.com>
+	<20171201143136.62497-4-pasic@linux.vnet.ibm.com>
+	<20171204122859.1a4fcd21.cohuck@redhat.com>
+	<1108d0e7-318b-354f-31da-95d5efb8193c@linux.vnet.ibm.com>
+	<20171204171124.4d877b22.cohuck@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20171201125813.1437-3-quintela@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v3 2/6] tests: migration test deprecated
- commands
+In-Reply-To: <20171204171124.4d877b22.cohuck@redhat.com>
+Message-Id: <20171205074300.GZ5859@bjsdjshi@linux.vnet.ibm.com>
+Subject: Re: [Qemu-devel] [PATCH 3/3] s390x: deprecate s390-squash-mcss
+ machine prop
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,96 +46,47 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Juan Quintela <quintela@redhat.com>
-Cc: qemu-devel@nongnu.org, dgilbert@redhat.com, lvivier@redhat.com
+To: Cornelia Huck <cohuck@redhat.com>
+Cc: Halil Pasic <pasic@linux.vnet.ibm.com>, Boris Fiuczynski <fiuczy@linux.vnet.ibm.com>, Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>, Christian Borntraeger <borntraeger@de.ibm.com>, Shalini Chellathurai Saroja <shalini@linux.vnet.ibm.com>, qemu-devel@nongnu.org, qemu-s390x@nongnu.org
 
-On Fri, Dec 01, 2017 at 01:58:09PM +0100, Juan Quintela wrote:
-> We now test the deprecated commands everytime that we test the new
-> commands.  This makes unnecesary to add tests for deprecated commands.
+* Cornelia Huck <cohuck@redhat.com> [2017-12-04 17:11:24 +0100]:
+
+[...]
+
+This one looks good to me too, so:
+Reviewed-by: Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>
+
 > 
-> Signed-off-by: Juan Quintela <quintela@redhat.com>
-> ---
->  tests/migration-test.c | 32 ++++++++++++++++++++++++++++----
->  1 file changed, 28 insertions(+), 4 deletions(-)
+> (...)
 > 
-> diff --git a/tests/migration-test.c b/tests/migration-test.c
-> index 799e24ebc6..51f49c74e9 100644
-> --- a/tests/migration-test.c
-> +++ b/tests/migration-test.c
-> @@ -369,7 +369,7 @@ static void migrate_check_parameter(QTestState *who, const char *parameter,
->      QDECREF(rsp);
->  }
->  
-> -static void migrate_set_downtime(QTestState *who, const double value)
-> +static void deprecated_set_downtime(QTestState *who, const double value)
->  {
->      QDict *rsp;
->      gchar *cmd;
-> @@ -388,7 +388,7 @@ static void migrate_set_downtime(QTestState *who, const double value)
->      g_free(expected);
->  }
->  
-> -static void migrate_set_speed(QTestState *who, const char *value)
-> +static void deprecated_set_speed(QTestState *who, const char *value)
->  {
->      QDict *rsp;
->      gchar *cmd;
-> @@ -402,6 +402,30 @@ static void migrate_set_speed(QTestState *who, const char *value)
->      migrate_check_parameter(who, "max-bandwidth", value);
->  }
->  
-> +static void migrate_set_parameter(QTestState *who, const char *parameter,
-> +                                  const char *value)
-> +{
-> +    QDict *rsp;
-> +    gchar *cmd;
-> +
-> +    if (strcmp(parameter, "downtime-limit") == 0) {
-> +        deprecated_set_downtime(who, 0.12345);
-> +    }
-> +
-> +    if (strcmp(parameter, "max-bandwidth") == 0) {
-> +        deprecated_set_speed(who, "12345");
-> +    }
-
-I'm fine with current approach, but I would really prefer to put them
-all into a standalone test, by just calling them one by one with some
-specific numbers and that's all.
-
-(luckily we only have two deprecated commands and limited tests,
- otherwise extra commands will be M*N, say "number of deprecated
- command" * "number of test mirations")
-
-Thanks,
-
-> +
-> +    cmd = g_strdup_printf("{ 'execute': 'migrate-set-parameters',"
-> +                          "'arguments': { '%s': %s } }",
-> +                          parameter, value);
-> +    rsp = qtest_qmp(who, cmd);
-> +    g_free(cmd);
-> +    g_assert(qdict_haskey(rsp, "return"));
-> +    QDECREF(rsp);
-> +    migrate_check_parameter(who, parameter, value);
-> +}
-> +
->  static void migrate_set_capability(QTestState *who, const char *capability,
->                                     const char *value)
->  {
-> @@ -530,8 +554,8 @@ static void test_migrate(void)
->       * quickly, but that it doesn't complete precopy even on a slow
->       * machine, so also set the downtime.
->       */
-> -    migrate_set_speed(from, "100000000");
-> -    migrate_set_downtime(from, 0.001);
-> +    migrate_set_parameter(from, "max-bandwidth", "100000000");
-> +    migrate_set_parameter(from, "downtime-limit", "1");
->  
->      /* Wait for the first serial output from the source */
->      wait_for_serial("src_serial");
-> -- 
-> 2.14.3
+> > > Looks sane. We should put a note into the 2.12 changelog as well.
+> > >   
+> > 
+> > I agree. Who would be responsible for updating the changelog. I'm not
+> > familiar with that process yet. To be honest, I wouldn't mind having
+> > the changelog notice in your writing style. Guess would be better for
+> > everyone ;).
 > 
+> Just a one-liner once we have the 2.12 changelog page.
+> 
+> > 
+> > There are also other things we identified as TODOs:
+> > * Updating https://wiki.qemu.org/Features/Channel_I/O_Passthrough
+> > (@Dong Jia, could you take this one)
+Ok. Will do soon.
+
+> > * In tree and/or on wiki documentation which is up-to-date and
+> > more verbose than commit messages are supposed to be (and Dong
+> > Jia's write-up could be incorporated to). I see this one as
+> > lower prio though. Any volunteers?
+> 
+> Long-ish things with links etc. should probably go into the wiki.
+> 
+> Anyway, feel free to go ahead (it's a wiki :) We can always change
+> things later on.
+> 
+Let me update the wiki based on my understanding (and style :) firstly,
+then you can login and improve it as you wish.
 
 -- 
-Peter Xu
+Dong Jia Shi
