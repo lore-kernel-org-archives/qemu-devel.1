@@ -1,20 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34838)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36771)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1eM6DJ-00062x-5Z
-	for qemu-devel@nongnu.org; Tue, 05 Dec 2017 00:56:18 -0500
+	(envelope-from <yang.zhong@intel.com>) id 1eM6IM-0003yj-ES
+	for qemu-devel@nongnu.org; Tue, 05 Dec 2017 01:01:31 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1eM6DI-00038G-7O
-	for qemu-devel@nongnu.org; Tue, 05 Dec 2017 00:56:17 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:47772)
+	(envelope-from <yang.zhong@intel.com>) id 1eM6IJ-0006Cg-O7
+	for qemu-devel@nongnu.org; Tue, 05 Dec 2017 01:01:30 -0500
+Received: from mga05.intel.com ([192.55.52.43]:13915)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1eM6DH-00037g-Vd
-	for qemu-devel@nongnu.org; Tue, 05 Dec 2017 00:56:16 -0500
-From: Peter Xu <peterx@redhat.com>
-Date: Tue,  5 Dec 2017 13:52:00 +0800
-Message-Id: <20171205055200.16305-27-peterx@redhat.com>
-In-Reply-To: <20171205055200.16305-1-peterx@redhat.com>
-References: <20171205055200.16305-1-peterx@redhat.com>
-Subject: [Qemu-devel] [RFC v5 26/26] tests: qmp-test: add oob test
+	(Exim 4.71) (envelope-from <yang.zhong@intel.com>)
+	id 1eM6IJ-0006BR-Fy
+	for qemu-devel@nongnu.org; Tue, 05 Dec 2017 01:01:27 -0500
+Date: Tue, 5 Dec 2017 14:00:47 +0800
+From: Yang Zhong <yang.zhong@intel.com>
+Message-ID: <20171205060047.GA4102@yangzhon-Virtual>
+References: <1511505030-3669-1-git-send-email-yang.zhong@intel.com>
+	<5A1A5C6E.9060409@huawei.com>
+	<20171201105622.GB26237@yangzhon-Virtual>
+	<74cccd14-e485-90d4-82d9-03355c05faca@redhat.com>
+	<20171204120322.GA32151@yangzhon-Virtual>
+	<5A253EF5.6040300@huawei.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <5A253EF5.6040300@huawei.com>
+Subject: Re: [Qemu-devel] [PATCH v3] rcu: reduce more than 7MB heap memory
+ by malloc_trim()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,97 +33,73 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Stefan Hajnoczi <shajnocz@redhat.com>, "Daniel P . Berrange" <berrange@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Fam Zheng <famz@redhat.com>, Juan Quintela <quintela@redhat.com>, mdroth@linux.vnet.ibm.com, peterx@redhat.com, Eric Blake <eblake@redhat.com>, Laurent Vivier <lvivier@redhat.com>, Markus Armbruster <armbru@redhat.com>, marcandre.lureau@redhat.com, "Dr . David Alan Gilbert" <dgilbert@redhat.com>
+To: Shannon Zhao <zhaoshenglong@huawei.com>, pbonzini@redhat.com, stefanha@redhat.com, berrange@redhat.com
+Cc: qemu-devel@nongnu.org, weidong.huang@huawei.com, arei.gonglei@huawei.com, liujunjie23@huawei.com, wangxinxin.wang@huawei.com, stone.xulei@huawei.com, yang.zhong@intel.com
 
-Test the new OOB capability.  Here we used the new "x-oob-test" command.
-Firstly, we send a lock=true and oob=false command to hang the main
-thread.  Then send another lock=false and oob=true command (which will
-be run inside parser this time) to free that hanged command.
+On Mon, Dec 04, 2017 at 08:26:29PM +0800, Shannon Zhao wrote:
+> Hi Yang,
+> 
+> On 2017/12/4 20:03, Yang Zhong wrote:
+> > On Fri, Dec 01, 2017 at 01:52:49PM +0100, Paolo Bonzini wrote:
+> >> > On 01/12/2017 11:56, Yang Zhong wrote:
+> >>> > >   This issue should be caused by much times of system call by malloc_trim(),
+> >>> > >   Shannon's test script include 60 scsi disks and 31 ioh3420 devices. We need 
+> >>> > >   trade-off between VM perforamance and memory optimization. Whether below 
+> >>> > >   method is suitable?
+> >>> > > 
+> >>> > >   int num=1;
+> >>> > >   ......
+> >>> > > 
+> >>> > >   #if defined(CONFIG_MALLOC_TRIM)
+> >>> > >         if(!(num++%5))
+> >>> > >         {
+> >>> > >              malloc_trim(4 * 1024 * 1024);
+> >>> > >         }
+> >>> > >   #endif
+> >>> > >  
+> >>> > >   Any comments are welcome! Thanks a lot!
+> >> > 
+> >> > Indeed something like this will do, perhaps only trim once per second?
+> >> > 
+> >   Hello Paolo,
+> > 
+> >   Thanks for comments!
+> >   If we do trim once per second, maybe the frequency is a little high, what'e
+> >   more, we need maintain one timer to call this, this also cost cpu resource.
+> > 
+> >   I added the log and did the test here with my test qemu command, when VM bootup,
+> >   which did more than 600 times free operations and 9 times memory trim in rcu 
+> >   thread. If i use our ClearContainer qemu command, the memory trim will down 
+> >   to 6 times. As for Shannon's test command, the malloc trim number will abosultly 
+> >   increse.
+> > 
+> >   In my above method, the trim is only executed in the multiple of 5, which will
+> >   reduce trim times and do not heavily impact VM bootup performance. 
+> > 
+> >   I also want to use synchronize_rcu() and free() to replace call_rcu(), but this
+> >   method serialize to malloc() and free(), which will reduce VM performance.
+> > 
+> >   The ultimate aim is to reduce trim system call during the VM bootup and running.
+> >   It's appreciated that if you have better suggestions.
+> 
+> Maybe we can provide a QMP command or something else for user to trim
+> the heap manually like the kernel sysfs interface
+> /proc/sys/vm/drop_caches which provides an interface for user to drop
+> the caches.
+> So let user to decide whether it needs to trim the heap.
+>
+  Hello Shannon,
 
-Signed-off-by: Peter Xu <peterx@redhat.com>
----
- tests/qmp-test.c | 61 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 61 insertions(+)
+  Thanks for your comments!
+  This is also a good solution by QMP interface, but this is only suitable for few VMs.
+  If there are millions of VMs in CSP(clouds of provider), it is very hard to operate.
+  Thanks!
 
-diff --git a/tests/qmp-test.c b/tests/qmp-test.c
-index 729ec59b0a..bb12122a4e 100644
---- a/tests/qmp-test.c
-+++ b/tests/qmp-test.c
-@@ -157,6 +157,66 @@ static void test_qmp_protocol(void)
-     qtest_end();
- }
+  Regards,
+
+  Yang     
+
  
-+/* Tests for Out-Of-Band support. */
-+static void test_qmp_oob(void)
-+{
-+    QDict *resp;
-+    int acks = 0;
-+    const char *cmd_id;
-+
-+    global_qtest = qtest_init_without_qmp_handshake(common_args);
-+
-+    /* Ignore the greeting message. */
-+    resp = qmp_receive();
-+    g_assert(qdict_get_qdict(resp, "QMP"));
-+    QDECREF(resp);
-+
-+    /* Try a fake capability, it should fail. */
-+    resp = qmp("{ 'execute': 'qmp_capabilities', "
-+               "  'arguments': { 'enable': [ 'cap-does-not-exist' ] } }");
-+    g_assert(qdict_haskey(resp, "error"));
-+
-+    /* Now, enable OOB in current QMP session, it should success. */
-+    resp = qmp("{ 'execute': 'qmp_capabilities', "
-+               "  'arguments': { 'enable': [ 'oob' ] } }");
-+    g_assert(qdict_haskey(resp, "return"));
-+
-+    /*
-+     * Try any command that does not support OOB but with OOB flag. We
-+     * should get failure.
-+     */
-+    resp = qmp("{ 'execute': 'query-cpus',"
-+               "  'control': { 'run-oob': true } }");
-+    g_assert(qdict_haskey(resp, "error"));
-+
-+    /*
-+     * Firstly send the "x-oob-test" command with lock=true and
-+     * oob=false, it should hang the dispatcher and main thread;
-+     * later, we send another lock=false with oob=true to continue
-+     * that thread processing.  Finally we should receive replies from
-+     * both commands.
-+     */
-+    qmp_async("{ 'execute': 'x-oob-test',"
-+              "  'arguments': { 'lock': true }, "
-+              "  'id': 'lock-cmd'}");
-+    qmp_async("{ 'execute': 'x-oob-test', "
-+              "  'arguments': { 'lock': false }, "
-+              "  'control': { 'run-oob': true }, "
-+              "  'id': 'unlock-cmd' }");
-+
-+    /* Ignore all events.  Wait for 2 acks */
-+    while (acks < 2) {
-+        resp = qmp_receive();
-+        cmd_id = qdict_get_str(resp, "id");
-+        if (!g_strcmp0(cmd_id, "lock-cmd") ||
-+            !g_strcmp0(cmd_id, "unlock-cmd")) {
-+            acks++;
-+        }
-+    }
-+
-+    qtest_end();
-+}
-+
- static int query_error_class(const char *cmd)
- {
-     static struct {
-@@ -335,6 +395,7 @@ int main(int argc, char *argv[])
-     g_test_init(&argc, &argv, NULL);
- 
-     qtest_add_func("qmp/protocol", test_qmp_protocol);
-+    qtest_add_func("qmp/oob", test_qmp_oob);
-     qmp_schema_init(&schema);
-     add_query_tests(&schema);
- 
--- 
-2.14.3
+> Thanks,
+> -- 
+> Shannon
