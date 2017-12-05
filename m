@@ -1,22 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36379)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37277)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1eMMCK-000777-9X
-	for qemu-devel@nongnu.org; Tue, 05 Dec 2017 18:00:26 -0500
+	(envelope-from <jsnow@redhat.com>) id 1eMMDw-00088X-Fa
+	for qemu-devel@nongnu.org; Tue, 05 Dec 2017 18:02:01 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1eMMCJ-00036H-5g
-	for qemu-devel@nongnu.org; Tue, 05 Dec 2017 18:00:20 -0500
+	(envelope-from <jsnow@redhat.com>) id 1eMMDv-00044S-Ne
+	for qemu-devel@nongnu.org; Tue, 05 Dec 2017 18:02:00 -0500
 References: <20171128071409.21887-1-vsementsov@virtuozzo.com>
-	<20171128071409.21887-2-vsementsov@virtuozzo.com>
+	<20171128071409.21887-3-vsementsov@virtuozzo.com>
 From: John Snow <jsnow@redhat.com>
-Message-ID: <a2f85b2d-783e-db97-2aa2-907ce170ff17@redhat.com>
-Date: Tue, 5 Dec 2017 18:00:10 -0500
+Message-ID: <d6d5f688-d8dc-63e0-eab2-ef81032ceb92@redhat.com>
+Date: Tue, 5 Dec 2017 18:01:53 -0500
 MIME-Version: 1.0
-In-Reply-To: <20171128071409.21887-2-vsementsov@virtuozzo.com>
+In-Reply-To: <20171128071409.21887-3-vsementsov@virtuozzo.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [Qemu-block] [PATCH 1/4] qcow2-bitmap: add
- qcow2_reopen_bitmaps_rw_hint()
+Subject: Re: [Qemu-devel] [Qemu-block] [PATCH 2/4] qcow2: handle reopening
+ bitmaps on bdrv_invalidate_cache
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,76 +31,39 @@ Cc: kwolf@redhat.com, ehabkost@redhat.com, mreitz@redhat.com, crosa@redhat.com, 
 
 
 On 11/28/2017 02:14 AM, Vladimir Sementsov-Ogievskiy wrote:
-> Add version of qcow2_reopen_bitmaps_rw, which do the same work but
-> also return a hint about was header updated or not. This will be
-> used in the following fix for bitmaps reloading after migration.
+> Consider migration with shared storage. Persistent bitmaps are stored
+> on bdrv_inactivate. Then, on destination
+> process_incoming_migration_bh() calls bdrv_invalidate_cache_all() which
+> leads to qcow2_load_autoloading_dirty_bitmaps() which fails if bitmaps
+> are already loaded on destination start. In this case we should call
+> qcow2_reopen_bitmaps_rw instead.
 > 
 > Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 > ---
->  block/qcow2.h        |  2 ++
->  block/qcow2-bitmap.c | 15 ++++++++++++++-
->  2 files changed, 16 insertions(+), 1 deletion(-)
+>  block/qcow2.c | 8 +++++++-
+>  1 file changed, 7 insertions(+), 1 deletion(-)
 > 
-> diff --git a/block/qcow2.h b/block/qcow2.h
-> index 6f0ff15dd0..40fa5b7cfe 100644
-> --- a/block/qcow2.h
-> +++ b/block/qcow2.h
-> @@ -667,6 +667,8 @@ int qcow2_check_bitmaps_refcounts(BlockDriverState *bs, BdrvCheckResult *res,
->                                    void **refcount_table,
->                                    int64_t *refcount_table_size);
->  bool qcow2_load_autoloading_dirty_bitmaps(BlockDriverState *bs, Error **errp);
-> +int qcow2_reopen_bitmaps_rw_hint(BlockDriverState *bs, bool *header_updated,
-> +                                 Error **errp);
->  int qcow2_reopen_bitmaps_rw(BlockDriverState *bs, Error **errp);
->  void qcow2_store_persistent_dirty_bitmaps(BlockDriverState *bs, Error **errp);
->  int qcow2_reopen_bitmaps_ro(BlockDriverState *bs, Error **errp);
-> diff --git a/block/qcow2-bitmap.c b/block/qcow2-bitmap.c
-> index f45e46cfbd..6c80dcda69 100644
-> --- a/block/qcow2-bitmap.c
-> +++ b/block/qcow2-bitmap.c
-> @@ -1002,7 +1002,8 @@ fail:
->      return false;
->  }
->  
-> -int qcow2_reopen_bitmaps_rw(BlockDriverState *bs, Error **errp)
-> +int qcow2_reopen_bitmaps_rw_hint(BlockDriverState *bs, bool *header_updated,
-> +                                 Error **errp)
->  {
->      BDRVQcow2State *s = bs->opaque;
->      Qcow2BitmapList *bm_list;
-> @@ -1010,6 +1011,10 @@ int qcow2_reopen_bitmaps_rw(BlockDriverState *bs, Error **errp)
->      GSList *ro_dirty_bitmaps = NULL;
->      int ret = 0;
->  
-> +    if (header_updated != NULL) {
-> +        *header_updated = false;
-> +    }
-> +
->      if (s->nb_bitmaps == 0) {
->          /* No bitmaps - nothing to do */
->          return 0;
-> @@ -1053,6 +1058,9 @@ int qcow2_reopen_bitmaps_rw(BlockDriverState *bs, Error **errp)
->              error_setg_errno(errp, -ret, "Can't update bitmap directory");
->              goto out;
->          }
-> +        if (header_updated != NULL) {
-> +            *header_updated = true;
-> +        }
->          g_slist_foreach(ro_dirty_bitmaps, set_readonly_helper, false);
+> diff --git a/block/qcow2.c b/block/qcow2.c
+> index 1914a940e5..f5f205e1b7 100644
+> --- a/block/qcow2.c
+> +++ b/block/qcow2.c
+> @@ -1450,7 +1450,13 @@ static int qcow2_do_open(BlockDriverState *bs, QDict *options, int flags,
+>          s->autoclear_features &= QCOW2_AUTOCLEAR_MASK;
 >      }
 >  
-> @@ -1063,6 +1071,11 @@ out:
->      return ret;
->  }
->  
-> +int qcow2_reopen_bitmaps_rw(BlockDriverState *bs, Error **errp)
-> +{
-> +    return qcow2_reopen_bitmaps_rw_hint(bs, NULL, errp);
-> +}
-> +
->  /* store_bitmap_data()
->   * Store bitmap to image, filling bitmap table accordingly.
->   */
+> -    if (qcow2_load_autoloading_dirty_bitmaps(bs, &local_err)) {
+> +    if (bdrv_has_readonly_bitmaps(bs)) {
+> +        if (!bdrv_is_read_only(bs) && !(bdrv_get_flags(bs) & BDRV_O_INACTIVE)) {
+> +            bool header_updated = false;
+> +            qcow2_reopen_bitmaps_rw_hint(bs, &header_updated, &local_err);
+> +            update_header = update_header && !header_updated;
+> +        }
+> +    } else if (qcow2_load_autoloading_dirty_bitmaps(bs, &local_err)) {
+>          update_header = false;
+>      }
+>      if (local_err != NULL) {
 > 
 
-Reviewed-by: John Snow <jsnow@redhat.com>
+It sounds right to me, but I'm going to ask for eyes from Kevin or Max.
+
+Acked-by: John Snow <jsnow@redhat.com>
