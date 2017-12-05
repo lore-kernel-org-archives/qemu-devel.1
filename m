@@ -1,22 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52471)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56216)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1eM8nA-0006OH-GV
-	for qemu-devel@nongnu.org; Tue, 05 Dec 2017 03:41:32 -0500
+	(envelope-from <wlsaidhi@gmail.com>) id 1eM92E-0004OB-Qg
+	for qemu-devel@nongnu.org; Tue, 05 Dec 2017 03:57:04 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1eM8n5-0000d0-Ks
-	for qemu-devel@nongnu.org; Tue, 05 Dec 2017 03:41:28 -0500
-References: <20171201143136.62497-1-pasic@linux.vnet.ibm.com>
-	<20171201143136.62497-4-pasic@linux.vnet.ibm.com>
-From: Thomas Huth <thuth@redhat.com>
-Message-ID: <927acf90-4a00-3fa2-9bf3-e34afc6be199@redhat.com>
-Date: Tue, 5 Dec 2017 09:41:18 +0100
+	(envelope-from <wlsaidhi@gmail.com>) id 1eM92C-0000dp-Qd
+	for qemu-devel@nongnu.org; Tue, 05 Dec 2017 03:57:02 -0500
+Received: from mail-lf0-x22f.google.com ([2a00:1450:4010:c07::22f]:33305)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <wlsaidhi@gmail.com>) id 1eM92C-0000d9-DR
+	for qemu-devel@nongnu.org; Tue, 05 Dec 2017 03:57:00 -0500
+Received: by mail-lf0-x22f.google.com with SMTP id 74so22360401lfs.0
+	for <qemu-devel@nongnu.org>; Tue, 05 Dec 2017 00:56:59 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <20171201143136.62497-4-pasic@linux.vnet.ibm.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [qemu-s390x] [PATCH 3/3] s390x: deprecate
- s390-squash-mcss machine prop
+In-Reply-To: <13637ee3-544f-11cc-4ee7-a27af2c91173@tuxfamily.org>
+References: <20171123163538.31411-1-laurent@vivier.eu>
+	<CAFEAcA9+f2cgUUS00DXzF9a96evPRnxY5MTUZpe+OA3Trv84WA@mail.gmail.com>
+	<e6dc192f-6fcd-f25d-d1db-983280c915f4@vivier.eu>
+	<CAFEAcA9uOJ5i-XbK5zbxgFBSvu=kQ6p99EA-CyhrSTKtx+CF9A@mail.gmail.com>
+	<e90eaeb0-19d4-659c-9007-5b0e18d87d9a@tuxfamily.org>
+	<629dc696-a5e7-4b94-f964-0e9fdd7cf511@vivier.eu>
+	<13637ee3-544f-11cc-4ee7-a27af2c91173@tuxfamily.org>
+From: william lin <wlsaidhi@gmail.com>
+Date: Tue, 5 Dec 2017 02:56:17 -0600
+Message-ID: <CAGC02hQ1RhaHC2rhFecjvCK4oGF0qMQpr6558XiWMXaUSvTq9g@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v2 0/5] target/m68k: implement 680x0 FPU
+ (part 3)
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,31 +35,204 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Halil Pasic <pasic@linux.vnet.ibm.com>, Boris Fiuczynski <fiuczy@linux.vnet.ibm.com>, Cornelia Huck <cohuck@redhat.com>
-Cc: Shalini Chellathurai Saroja <shalini@linux.vnet.ibm.com>, qemu-devel@nongnu.org, Christian Borntraeger <borntraeger@de.ibm.com>, qemu-s390x@nongnu.org, Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>
+To: Thomas Huth <huth@tuxfamily.org>
+Cc: Laurent Vivier <laurent@vivier.eu>, Peter Maydell <peter.maydell@linaro.org>, Andreas Grabher <andreas.grabher@cable.vol.at>, QEMU Developers <qemu-devel@nongnu.org>, Aurelien Jarno <aurelien@aurel32.net>, Richard Henderson <rth@twiddle.net>
 
-On 01.12.2017 15:31, Halil Pasic wrote:
-> With the cssids unrestricted (commit <COMMIT HERE> "s390x/css: unrestrict
-> cssids") the s390-squash-mcss machine property should not be used.
-> Actually libvirt never supported this, so the expectation is that
-> removing it should be pretty painless.  But let's play nice and deprecate
-> it first.
-> 
-> Signed-off-by: Halil Pasic <pasic@linux.vnet.ibm.com>
-> ---
-[...]
-> diff --git a/qemu-doc.texi b/qemu-doc.texi
-> index db2351c746..874432d87c 100644
-> --- a/qemu-doc.texi
-> +++ b/qemu-doc.texi
-> @@ -2501,6 +2501,14 @@ enabled via the ``-machine usb=on'' argument.
->  
->  The ``-nodefconfig`` argument is a synonym for ``-no-user-config``.
->  
-> +@subsection -machine virtio-ccw,s390-squash-mcss=on|off (since 2.12.0)
+On Wed, Nov 29, 2017 at 9:19 AM, Thomas Huth <huth@tuxfamily.org> wrote:
 
-The machine is called "s390-ccw-virtio", not "virtio-ccw". Anyway, I
-think you could also rather omit the machine name here (since it is the
-default) and just write "-machine s390-squash-mcss=on|off".
+> On 29.11.2017 15:17, Laurent Vivier wrote:
+> > Le 29/11/2017 =C3=A0 15:08, Thomas Huth a =C3=A9crit :
+> >> On 29.11.2017 14:59, Peter Maydell wrote:
+> >>> On 29 November 2017 at 13:42, Laurent Vivier <laurent@vivier.eu>
+> wrote:
+> >>>> these functions come from:
+> >>>>
+> >>>> http://previous.alternative-system.com/
+> >>>>
+> >>>> http://svn.code.sf.net/p/previous/code/trunk/src/
+> softfloat/softfloat.c
+> >>>>
+> >>>> This is also a modified softfloat, release 2b
+> >>>> which is BSD license if I'm correct.
+> >>>
+> >>> We can't use softfloat2b code (the part of the license that goes
+> >>> "USE OF THIS SOFTWARE IS RESTRICTED TO PERSONS
+> >>> AND ORGANIZATIONS [...] WHO FURTHERMORE EFFECTIVELY INDEMNIFY JOHN
+> >>> HAUSER AND THE INTERNATIONAL COMPUTER SCIENCE INSTITUTE" isn't
+> >>> GPL compatible).
+> >>>
+> >>> We can use softfloat2a code, which doesn't have that indemnity clause=
+.
+> >>
+> >> Sigh. That's why WinUAE and Hatari immediately switched back to
+> >> softfloat2a (derived from QEMU) after we've identified the problem
+> >> there. Looks like the Previous folks forgot to do that step, too :-(
+> >>
+> >>>> This code has also been copied to WinUAE (GPL), where softfloat has
+> been
+> >>>> copied from QEMU:
+> >>>> https://github.com/tonioni/WinUAE/blob/master/softfloat/softfloat.cp=
+p
+> >>>
+> >>> Yes, lots of projects used the softfloat2b code without realising
+> >>> it wasn't GPL compatible (including QEMU -- we had a painful job
+> >>> to fix things up and convert to the 2a codebase a while back).
+> >>>
+> >>>> But I think the bad news comes later:
+> >>>>
+> >>>> all the other functions (sin, cos, tan, log, exp, ...) found in
+> previous
+> >>>> (softfloat_fpsp.c) are "derived" from NeXT library FPSP:
+> >>>>
+> >>>> http://svn.code.sf.net/p/previous/code/trunk/src/
+> softfloat/softfloat_fpsp.c
+> >>>>
+> >>>> /*=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+> =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+> >>>>
+> >>>>  This C source file is an extension to the SoftFloat IEC/IEEE
+> Floating-point
+> >>>>  Arithmetic Package, Release 2a.
+> >>>>
+> >>>>  Written by Andreas Grabher for Previous, NeXT Computer Emulator.
+> >>>>
+> >>>> =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+> =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D*/
+> >>>> ...
+> >>>> /*----------------------------------------------------------
+> ------------------
+> >>>> | Algorithms for transcendental functions supported by MC68881 and
+> MC68882
+> >>>> | mathematical coprocessors. The functions are derived from FPSP
+> library.
+> >>>> *-----------------------------------------------------------
+> -----------------*/
+> >>>>
+> >>>> FPSP library can be found:
+> >>>>
+> >>>> https://ftp.nice.ch/pub/next/developer/hardware/m68k/
+> >>>>
+> >>>> And the assembly source code is not free at all:
+> >>>>
+> >>>> https://ftp.nice.ch/pub/next/developer/hardware/m68k/_
+> libFPSP.1.p2.N.s/l_fpsp.h
+> >>>>
+> >>>>
+> >>>> |               Copyright (C) Motorola, Inc. 1991
+> >>>> |                       All Rights Reserved
+> >>>> |
+> >>>> |       THIS IS UNPUBLISHED PROPRIETARY SOURCE CODE OF MOTOROLA
+> >>>> |       The copyright notice above does not evidence any
+> >>>> |       actual or intended publication of such source code.
+> >>>>
+> >>>>
+> >>>> So I'm wondering what license apply to the C version found in
+> "Previous".
+> >>>
+> >>> Good question. It's clearly not copied code (since the FPSP library i=
+s
+> >>> all native m68k assembly), but presumably it's the same algorithms
+> >>> transliterated into C...
+> >>
+> >> There also seem to be other versions of that library available, e.g.:
+> >>
+> >> https://ftp.netbsd.org/pub/NetBSD/NetBSD-current/src/sys/
+> arch/m68k/fpsp/l_fpsp.h
+> >>
+> >> Maybe Andreas (now on CC: ) could clarify which version he used / how
+> >> the C sources were developed?
+> >
+> > Thank you Thomas,
+> >
+> > This seems to be the same code re-licensed to:
+> >
+> > MOTOROLA MICROPROCESSOR & MEMORY TECHNOLOGY GROUP
+> > M68000 Hi-Performance Microprocessor Division
+> > M68040 Software Package
+> >
+> > M68040 Software Package Copyright (c) 1993, 1994 Motorola Inc.
+> > All rights reserved.
+> >
+> > THE SOFTWARE is provided on an "AS IS" basis and without warranty.
+> > To the maximum extent permitted by applicable law,
+> > MOTOROLA DISCLAIMS ALL WARRANTIES WHETHER EXPRESS OR IMPLIED,
+> > INCLUDING IMPLIED WARRANTIES OF MERCHANTABILITY OR FITNESS FOR A
+> > PARTICULAR PURPOSE and any warranty against infringement with
+> > regard to the SOFTWARE (INCLUDING ANY MODIFIED VERSIONS THEREOF)
+> > and any accompanying written materials.
+> >
+> > To the maximum extent permitted by applicable law,
+> > IN NO EVENT SHALL MOTOROLA BE LIABLE FOR ANY DAMAGES WHATSOEVER
+> > (INCLUDING WITHOUT LIMITATION, DAMAGES FOR LOSS OF BUSINESS
+> > PROFITS, BUSINESS INTERRUPTION, LOSS OF BUSINESS INFORMATION, OR
+> > OTHER PECUNIARY LOSS) ARISING OF THE USE OR INABILITY TO USE THE
+> > SOFTWARE.  Motorola assumes no responsibility for the maintenance
+> > and support of the SOFTWARE.
+> >
+> > You are hereby granted a copyright license to use, modify, and
+> > distribute the SOFTWARE so long as this entire notice is retained
+> > without alteration in any modified and/or redistributed versions,
+> > and that such modified versions are clearly identified as such.
+> > No licenses are granted by implication, estoppel or otherwise
+> > under any patents or trademarks of Motorola, Inc.
+>
+> IANAL, but to me that sounds like it is compatible to the GPL, so I
+> think there should not be a problem if the C sources are based on these
+> assembler sources?
+>
+>  Thomas
+>
+>
 
- Thomas
+
+After looking into all these files, I noticed that the previous code:
+
+http://svn.code.sf.net/p/previous/code/trunk/src/softfloat/softfloat_fpsp.c
+
+uses SoftFloat 2b code for the helper functions:
+http://svn.code.sf.net/p/previous/code/trunk/src/softfloat/softfloat.h
+
+I'm not familiar with licensing but to me it appears that Andreas Grabher
+has his code as an extension to the wrong release of SoftFloat.
+
+>>>>
+/*=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D
+>>>>
+>>>>  This C source file is an extension to the SoftFloat IEC/IEEE
+>>>> Floating-point
+>>>>  Arithmetic Package, Release 2a.
+>>>>
+>>>>  Written by Andreas Grabher for Previous, NeXT Computer Emulator.
+>>>>
+>>>>
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D*/
+>>>> ...
+>>>>
+/*-------------------------------------------------------------------------=
+---
+>>>> | Algorithms for transcendental functions supported by MC68881 and
+MC68882
+>>>> | mathematical coprocessors. The functions are derived from FPSP
+library.
+>>>>
+*--------------------------------------------------------------------------=
+--*/
+
+So we can't use these C code directly as it uses helpers from 2b. However,
+would it be
+ok to write our own set of C code along with the necessary helpers using
+the C and asm
+code as reference? (would be part of 2a)
+
+William
+(https://lists.gnu.org/archive/html/qemu-devel/2017-11/msg05422.html)
