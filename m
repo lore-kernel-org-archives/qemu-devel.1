@@ -1,30 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44359)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47377)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1eM8Bd-0006kw-G3
-	for qemu-devel@nongnu.org; Tue, 05 Dec 2017 03:02:46 -0500
+	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1eM8QR-0004SS-8l
+	for qemu-devel@nongnu.org; Tue, 05 Dec 2017 03:18:00 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1eM8Ba-0001EZ-DF
-	for qemu-devel@nongnu.org; Tue, 05 Dec 2017 03:02:41 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:8613)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1eM8Ba-0001EO-3u
-	for qemu-devel@nongnu.org; Tue, 05 Dec 2017 03:02:38 -0500
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
-	[10.5.11.15])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 23CB8C058EC2
-	for <qemu-devel@nongnu.org>; Tue,  5 Dec 2017 08:02:37 +0000 (UTC)
-Date: Tue, 5 Dec 2017 16:02:30 +0800
-From: Peter Xu <peterx@redhat.com>
-Message-ID: <20171205080230.GD2925@xz-mi>
-References: <20171201125750.1372-1-quintela@redhat.com>
-	<20171201125750.1372-2-quintela@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20171201125750.1372-2-quintela@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v3 1/2] migration: Create tcp_port parameter
+	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1eM8QO-0006rD-2K
+	for qemu-devel@nongnu.org; Tue, 05 Dec 2017 03:17:59 -0500
+Received: from chuckie.co.uk ([82.165.15.123]:38184
+	helo=s16892447.onlinehome-server.info)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <mark.cave-ayland@ilande.co.uk>)
+	id 1eM8QN-0006ps-PJ
+	for qemu-devel@nongnu.org; Tue, 05 Dec 2017 03:17:55 -0500
+From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+Date: Tue,  5 Dec 2017 08:17:39 +0000
+Message-Id: <20171205081744.6563-1-mark.cave-ayland@ilande.co.uk>
+Subject: [Qemu-devel] [PATCHv2 0/5] net: introduce common net_crc32() and
+ net_crc32_le() functions
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,170 +24,36 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Juan Quintela <quintela@redhat.com>
-Cc: qemu-devel@nongnu.org, dgilbert@redhat.com, lvivier@redhat.com
+To: qemu-devel@nongnu.org, jasowang@redhat.com, sw@weilnetz.de
 
-On Fri, Dec 01, 2017 at 01:57:49PM +0100, Juan Quintela wrote:
-> It will be used to store the uri tcp_port parameter.  This is the only
-> parameter than can change and we can need to be able to connect to it.
-> 
-> Signed-off-by: Juan Quintela <quintela@redhat.com>
-> 
-> --
-> 
-> This used to be uri parameter, but it has so many troubles to
-> reproduce that it don't just make sense.
-> ---
->  hmp.c                 |  7 +++++++
->  migration/migration.c | 10 ++++++++++
->  qapi/migration.json   | 19 ++++++++++++++++---
->  3 files changed, 33 insertions(+), 3 deletions(-)
-> 
-> diff --git a/hmp.c b/hmp.c
-> index 1727c9c003..6387d6d517 100644
-> --- a/hmp.c
-> +++ b/hmp.c
-> @@ -345,6 +345,9 @@ void hmp_info_migrate_parameters(Monitor *mon, const QDict *qdict)
->          monitor_printf(mon, "%s: %" PRIu64 "\n",
->              MigrationParameter_str(MIGRATION_PARAMETER_XBZRLE_CACHE_SIZE),
->              params->xbzrle_cache_size);
-> +        monitor_printf(mon, "%s: %d\n",
-> +            MigrationParameter_str(MIGRATION_PARAMETER_TCP_PORT),
-> +            params->tcp_port);
->      }
->  
->      qapi_free_MigrationParameters(params);
-> @@ -1659,6 +1662,10 @@ void hmp_migrate_set_parameter(Monitor *mon, const QDict *qdict)
->          }
->          p->xbzrle_cache_size = cache_size;
->          break;
-> +    case MIGRATION_PARAMETER_TCP_PORT:
-> +        p->has_tcp_port = true;
-> +        visit_type_uint16(v, param, &p->tcp_port, &err);
+Whilst trying to debug a CRC32 endian issue for NIC multicast hash lookups, it
+struck me that it would make sense to have a common set of standard ethernet
+CRC32 functions (both little and big endian variants) in net.c.
 
-Should we allow user to set this parameter?  Or it's just used for
-query, only?  (AFAIU from next patch, this is only used for query)
+The first two patches introduce the relevant functions while the last 3 patches
+switch the pcnet, eepro100 and sunhme drivers over to use them, allowing us to remove
+their private implementations.
 
-> +        break;
->      default:
->          assert(0);
->      }
-> diff --git a/migration/migration.c b/migration/migration.c
-> index 19917a4b5b..abc02d4efd 100644
-> --- a/migration/migration.c
-> +++ b/migration/migration.c
-> @@ -517,6 +517,8 @@ MigrationParameters *qmp_query_migrate_parameters(Error **errp)
->      params->x_multifd_page_count = s->parameters.x_multifd_page_count;
->      params->has_xbzrle_cache_size = true;
->      params->xbzrle_cache_size = s->parameters.xbzrle_cache_size;
-> +    params->has_tcp_port = true;
-> +    params->tcp_port = s->parameters.tcp_port;
->  
->      return params;
->  }
-> @@ -884,6 +886,9 @@ static void migrate_params_test_apply(MigrateSetParameters *params,
->      if (params->has_xbzrle_cache_size) {
->          dest->xbzrle_cache_size = params->xbzrle_cache_size;
->      }
-> +    if (params->has_tcp_port) {
-> +        dest->tcp_port = params->tcp_port;
-> +    }
->  }
->  
->  static void migrate_params_apply(MigrateSetParameters *params, Error **errp)
-> @@ -956,6 +961,9 @@ static void migrate_params_apply(MigrateSetParameters *params, Error **errp)
->          s->parameters.xbzrle_cache_size = params->xbzrle_cache_size;
->          xbzrle_cache_resize(params->xbzrle_cache_size, errp);
->      }
-> +    if (params->has_tcp_port) {
-> +        s->parameters.tcp_port = params->tcp_port;
-> +    }
->  }
->  
->  void qmp_migrate_set_parameters(MigrateSetParameters *params, Error **errp)
-> @@ -2422,6 +2430,8 @@ static Property migration_properties[] = {
->      DEFINE_PROP_SIZE("xbzrle-cache-size", MigrationState,
->                        parameters.xbzrle_cache_size,
->                        DEFAULT_MIGRATE_XBZRLE_CACHE_SIZE),
-> +    DEFINE_PROP_UINT16("x-tcp-port", MigrationState,
-> +                       parameters.tcp_port, 0),
+Signed-off-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
 
-Same question here...  If it's only for querying, why allow user to
-specify it?
+v2:
+- Add sumhme net_crc32_le() conversion
 
-Thanks,
 
->  
->      /* Migration capabilities */
->      DEFINE_PROP_MIG_CAP("x-xbzrle", MIGRATION_CAPABILITY_XBZRLE),
-> diff --git a/qapi/migration.json b/qapi/migration.json
-> index 4cd3d13158..e2a1d86216 100644
-> --- a/qapi/migration.json
-> +++ b/qapi/migration.json
-> @@ -488,6 +488,9 @@
->  #                     and a power of 2
->  #                     (Since 2.11)
->  #
-> +# @tcp-port: Only used for tcp, to know what is the real port
-> +#                     (Since 2.12)
-> +#
->  # Since: 2.4
->  ##
->  { 'enum': 'MigrationParameter',
-> @@ -496,7 +499,7 @@
->             'tls-creds', 'tls-hostname', 'max-bandwidth',
->             'downtime-limit', 'x-checkpoint-delay', 'block-incremental',
->             'x-multifd-channels', 'x-multifd-page-count',
-> -           'xbzrle-cache-size' ] }
-> +           'xbzrle-cache-size', 'tcp-port' ] }
->  
->  ##
->  # @MigrateSetParameters:
-> @@ -564,6 +567,10 @@
->  #                     needs to be a multiple of the target page size
->  #                     and a power of 2
->  #                     (Since 2.11)
-> +#
-> +# @tcp-port: Only used for tcp, to know what is the real port
-> +#                     (Since 2.12)
-> +#
->  # Since: 2.4
->  ##
->  # TODO either fuse back into MigrationParameters, or make
-> @@ -582,7 +589,8 @@
->              '*block-incremental': 'bool',
->              '*x-multifd-channels': 'int',
->              '*x-multifd-page-count': 'int',
-> -            '*xbzrle-cache-size': 'size' } }
-> +            '*xbzrle-cache-size': 'size' ,
-> +            '*tcp-port': 'uint16'} }
->  
->  ##
->  # @migrate-set-parameters:
-> @@ -665,6 +673,10 @@
->  #                     needs to be a multiple of the target page size
->  #                     and a power of 2
->  #                     (Since 2.11)
-> +#
-> +# @tcp-port: Only used for tcp, to know what is the real port
-> +#                     (Since 2.12)
-> +#
->  # Since: 2.4
->  ##
->  { 'struct': 'MigrationParameters',
-> @@ -681,7 +693,8 @@
->              '*block-incremental': 'bool' ,
->              '*x-multifd-channels': 'uint8',
->              '*x-multifd-page-count': 'uint32',
-> -            '*xbzrle-cache-size': 'size' } }
-> +            '*xbzrle-cache-size': 'size',
-> +            '*tcp-port': 'uint16'} }
->  
->  ##
->  # @query-migrate-parameters:
-> -- 
-> 2.14.3
-> 
+Mark Cave-Ayland (5):
+  net: move CRC32 calculation from compute_mcast_idx() into its own
+    net_crc32() function
+  net: introduce net_crc32_le() function
+  pcnet: switch lnc_mchash() over to use net_crc32_le()
+  eepro100: switch e100_compute_mcast_idx() over to use net_crc32()
+  sunhme: switch sunhme_receive() over to use net_crc32_le()
+
+ hw/net/eepro100.c | 19 +------------------
+ hw/net/pcnet.c    | 16 +---------------
+ hw/net/sunhme.c   | 25 +------------------------
+ include/net/net.h |  5 ++++-
+ net/net.c         | 38 +++++++++++++++++++++++++++++++++-----
+ 5 files changed, 40 insertions(+), 63 deletions(-)
 
 -- 
-Peter Xu
+2.11.0
