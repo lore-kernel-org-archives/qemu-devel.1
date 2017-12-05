@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54574)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54728)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1eMAfu-0002EE-Kq
-	for qemu-devel@nongnu.org; Tue, 05 Dec 2017 05:42:07 -0500
+	(envelope-from <stefanha@redhat.com>) id 1eMAg6-0002YA-M0
+	for qemu-devel@nongnu.org; Tue, 05 Dec 2017 05:42:19 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1eMAfp-0002QX-OQ
-	for qemu-devel@nongnu.org; Tue, 05 Dec 2017 05:42:06 -0500
+	(envelope-from <stefanha@redhat.com>) id 1eMAg5-0002fy-Iy
+	for qemu-devel@nongnu.org; Tue, 05 Dec 2017 05:42:18 -0500
 From: Stefan Hajnoczi <stefanha@redhat.com>
-Date: Tue,  5 Dec 2017 10:41:35 +0000
-Message-Id: <20171205104141.28882-4-stefanha@redhat.com>
+Date: Tue,  5 Dec 2017 10:41:37 +0000
+Message-Id: <20171205104141.28882-6-stefanha@redhat.com>
 In-Reply-To: <20171205104141.28882-1-stefanha@redhat.com>
 References: <20171205104141.28882-1-stefanha@redhat.com>
-Subject: [Qemu-devel] [PATCH 3/9] block: don't keep AioContext acquired
- after drive_backup_prepare()
+Subject: [Qemu-devel] [PATCH 5/9] block: don't keep AioContext acquired
+ after internal_snapshot_prepare()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,30 +25,30 @@ Cc: John Snow <jsnow@redhat.com>, qemu-block@nongnu.org, Kevin Wolf <kwolf@redha
 
 Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
 ---
- blockdev.c | 42 ++++++++++++++++++++++++++++++++++--------
- 1 file changed, 34 insertions(+), 8 deletions(-)
+ blockdev.c | 47 +++++++++++++++++++++++++++++++----------------
+ 1 file changed, 31 insertions(+), 16 deletions(-)
 
 diff --git a/blockdev.c b/blockdev.c
-index 3b598f8f0e..5a56a1abf2 100644
+index d7ad76416e..6332a249ea 100644
 --- a/blockdev.c
 +++ b/blockdev.c
-@@ -1845,7 +1845,6 @@ static void external_snapshot_clean(BlkActionState *common)
- typedef struct DriveBackupState {
+@@ -1454,7 +1454,6 @@ struct BlkActionState {
+ typedef struct InternalSnapshotState {
      BlkActionState common;
      BlockDriverState *bs;
 -    AioContext *aio_context;
-     BlockJob *job;
- } DriveBackupState;
- 
-@@ -1857,6 +1856,7 @@ static void drive_backup_prepare(BlkActionState *common, Error **errp)
-     DriveBackupState *state = DO_UPCAST(DriveBackupState, common, common);
-     BlockDriverState *bs;
-     DriveBackup *backup;
+     QEMUSnapshotInfo sn;
+     bool created;
+ } InternalSnapshotState;
+@@ -1485,6 +1484,7 @@ static void internal_snapshot_prepare(BlkActionState *common,
+     qemu_timeval tv;
+     BlockdevSnapshotInternal *internal;
+     InternalSnapshotState *state;
 +    AioContext *aio_context;
-     Error *local_err = NULL;
+     int ret1;
  
-     assert(common->action->type == TRANSACTION_ACTION_KIND_DRIVE_BACKUP);
-@@ -1867,24 +1867,36 @@ static void drive_backup_prepare(BlkActionState *common, Error **errp)
+     g_assert(common->action->type ==
+@@ -1506,32 +1506,33 @@ static void internal_snapshot_prepare(BlkActionState *common,
          return;
      }
  
@@ -57,60 +57,104 @@ index 3b598f8f0e..5a56a1abf2 100644
 -    aio_context_acquire(state->aio_context);
 +    aio_context = bdrv_get_aio_context(bs);
 +    aio_context_acquire(aio_context);
+ 
+     state->bs = bs;
 +
 +    /* Paired with .clean() */
      bdrv_drained_begin(bs);
-+
-     state->bs = bs;
  
-     state->job = do_drive_backup(backup, common->block_job_txn, &local_err);
+     if (bdrv_op_is_blocked(bs, BLOCK_OP_TYPE_INTERNAL_SNAPSHOT, errp)) {
+-        return;
++        goto out;
+     }
+ 
+     if (bdrv_is_read_only(bs)) {
+         error_setg(errp, "Device '%s' is read only", device);
+-        return;
++        goto out;
+     }
+ 
+     if (!bdrv_can_snapshot(bs)) {
+         error_setg(errp, "Block format '%s' used by device '%s' "
+                    "does not support internal snapshots",
+                    bs->drv->format_name, device);
+-        return;
++        goto out;
+     }
+ 
+     if (!strlen(name)) {
+         error_setg(errp, "Name is empty");
+-        return;
++        goto out;
+     }
+ 
+     /* check whether a snapshot with name exist */
+@@ -1539,12 +1540,12 @@ static void internal_snapshot_prepare(BlkActionState *common,
+                                             &local_err);
      if (local_err) {
          error_propagate(errp, local_err);
 -        return;
 +        goto out;
+     } else if (ret) {
+         error_setg(errp,
+                    "Snapshot with name '%s' already exists on device '%s'",
+                    name, device);
+-        return;
++        goto out;
      }
+ 
+     /* 3. take the snapshot */
+@@ -1560,11 +1561,14 @@ static void internal_snapshot_prepare(BlkActionState *common,
+         error_setg_errno(errp, -ret1,
+                          "Failed to create snapshot '%s' on device '%s'",
+                          name, device);
+-        return;
++        goto out;
+     }
+ 
+     /* 4. succeed, mark a snapshot is created */
+     state->created = true;
 +
 +out:
 +    aio_context_release(aio_context);
  }
  
- static void drive_backup_commit(BlkActionState *common)
- {
-     DriveBackupState *state = DO_UPCAST(DriveBackupState, common, common);
+ static void internal_snapshot_abort(BlkActionState *common)
+@@ -1573,12 +1577,16 @@ static void internal_snapshot_abort(BlkActionState *common)
+                              DO_UPCAST(InternalSnapshotState, common, common);
+     BlockDriverState *bs = state->bs;
+     QEMUSnapshotInfo *sn = &state->sn;
 +    AioContext *aio_context;
-+
+     Error *local_error = NULL;
+ 
+     if (!state->created) {
+         return;
+     }
+ 
 +    aio_context = bdrv_get_aio_context(state->bs);
 +    aio_context_acquire(aio_context);
 +
-     assert(state->job);
-     block_job_start(state->job);
+     if (bdrv_snapshot_delete(bs, sn->id_str, sn->name, &local_error) < 0) {
+         error_reportf_err(local_error,
+                           "Failed to delete snapshot with id '%s' and "
+@@ -1586,19 +1594,26 @@ static void internal_snapshot_abort(BlkActionState *common)
+                           sn->id_str, sn->name,
+                           bdrv_get_device_name(bs));
+     }
 +
 +    aio_context_release(aio_context);
  }
  
- static void drive_backup_abort(BlkActionState *common)
-@@ -1892,18 +1904,32 @@ static void drive_backup_abort(BlkActionState *common)
-     DriveBackupState *state = DO_UPCAST(DriveBackupState, common, common);
- 
-     if (state->job) {
-+        AioContext *aio_context;
-+
-+        aio_context = bdrv_get_aio_context(state->bs);
-+        aio_context_acquire(aio_context);
-+
-         block_job_cancel_sync(state->job);
-+
-+        aio_context_release(aio_context);
-     }
- }
- 
- static void drive_backup_clean(BlkActionState *common)
+ static void internal_snapshot_clean(BlkActionState *common)
  {
-     DriveBackupState *state = DO_UPCAST(DriveBackupState, common, common);
+     InternalSnapshotState *state = DO_UPCAST(InternalSnapshotState,
+                                              common, common);
 +    AioContext *aio_context;
  
 -    if (state->aio_context) {
--        bdrv_drained_end(state->bs);
+-        if (state->bs) {
+-            bdrv_drained_end(state->bs);
+-        }
 -        aio_context_release(state->aio_context);
 +    if (!state->bs) {
 +        return;
@@ -124,6 +168,6 @@ index 3b598f8f0e..5a56a1abf2 100644
 +    aio_context_release(aio_context);
  }
  
- typedef struct BlockdevBackupState {
+ /* external snapshot private data */
 -- 
 2.14.3
