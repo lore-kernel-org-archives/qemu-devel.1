@@ -1,26 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58331)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36001)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1eMKku-0001w4-FR
-	for qemu-devel@nongnu.org; Tue, 05 Dec 2017 16:27:57 -0500
+	(envelope-from <jsnow@redhat.com>) id 1eMMBj-0006iH-NV
+	for qemu-devel@nongnu.org; Tue, 05 Dec 2017 17:59:44 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1eMKkr-0005qu-8L
-	for qemu-devel@nongnu.org; Tue, 05 Dec 2017 16:27:56 -0500
-Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
-	<philippe.mathieu.daude@gmail.com>
-References: <1512153879-5291-1-git-send-email-peter.maydell@linaro.org>
-	<1512153879-5291-7-git-send-email-peter.maydell@linaro.org>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <f51fdabd-f0bb-80f0-ece2-75fd2a514778@amsat.org>
-Date: Tue, 5 Dec 2017 18:27:49 -0300
+	(envelope-from <jsnow@redhat.com>) id 1eMMBi-0002aR-Sh
+	for qemu-devel@nongnu.org; Tue, 05 Dec 2017 17:59:43 -0500
+References: <20171128071409.21887-1-vsementsov@virtuozzo.com>
+	<20171128071409.21887-4-vsementsov@virtuozzo.com>
+From: John Snow <jsnow@redhat.com>
+Message-ID: <59dccfee-7c47-61d0-40a0-b67f0b7fd8cf@redhat.com>
+Date: Tue, 5 Dec 2017 17:59:33 -0500
 MIME-Version: 1.0
-In-Reply-To: <1512153879-5291-7-git-send-email-peter.maydell@linaro.org>
+In-Reply-To: <20171128071409.21887-4-vsementsov@virtuozzo.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH 6/7] target/arm: Factor MPU lookup code out
- of get_phys_addr_pmsav8()
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [Qemu-block] [PATCH 3/4] scripts/qemu.py: tiny
+ enhancement for event_wiat
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,193 +25,60 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>, qemu-arm@nongnu.org, qemu-devel@nongnu.org
-Cc: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, Richard Henderson <rth@twiddle.net>
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org
+Cc: kwolf@redhat.com, ehabkost@redhat.com, mreitz@redhat.com, crosa@redhat.com, den@openvz.org
 
-On 12/01/2017 03:44 PM, Peter Maydell wrote:
-> For the TT instruction we're going to need to do an MPU lookup that
-> also tells us which MPU region the access hit. This requires us
-> to do the MPU lookup without first doing the SAU security access
-> check, so pull the MPU lookup parts of get_phys_addr_pmsav8()
-> out into their own function.
+
+
+On 11/28/2017 02:14 AM, Vladimir Sementsov-Ogievskiy wrote:
+> - add comment
+> - allow int timeout and disallow bool (which has special
+>   meaning for pull_event())
+> - remove unreachable 'return None'
 > 
-> The TT instruction also needs to know the MPU region number which
-> the lookup hit, so provide this information to the caller of the
-> MPU lookup code, even though get_phys_addr_pmsav8() doesn't
-> need to know it.
-> 
-> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
-
-Elegant refactor!
-
-Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
-
+> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 > ---
->  target/arm/helper.c | 130 +++++++++++++++++++++++++++++++---------------------
->  1 file changed, 79 insertions(+), 51 deletions(-)
+>  scripts/qemu.py | 10 +++++++---
+>  1 file changed, 7 insertions(+), 3 deletions(-)
 > 
-> diff --git a/target/arm/helper.c b/target/arm/helper.c
-> index 14ab1f4..be8d797 100644
-> --- a/target/arm/helper.c
-> +++ b/target/arm/helper.c
-> @@ -9351,67 +9351,28 @@ static void v8m_security_lookup(CPUARMState *env, uint32_t address,
->      }
->  }
+> diff --git a/scripts/qemu.py b/scripts/qemu.py
+> index 9bfdf6d37d..8763335254 100644
+> --- a/scripts/qemu.py
+> +++ b/scripts/qemu.py
+> @@ -291,7 +291,13 @@ class QEMUMachine(object):
+>          branch processing on match's value None
+>             {"foo": {"bar": 1}} matches {"foo": None}
+>             {"foo": {"bar": 1}} does not matches {"foo": {"baz": None}}
+> +
+> +        @raise QMPTimeoutError: If timeout period elapses.
+> +        @raise QMPConnectError: If some other error occurred.
+>          '''
+> +
+> +        assert isinstance(timeout, float) or isinstance(timeout, int)
+> +
+>          def event_match(event, match=None):
+>              if match is None:
+>                  return True
+> @@ -316,13 +322,11 @@ class QEMUMachine(object):
 >  
-> -static bool get_phys_addr_pmsav8(CPUARMState *env, uint32_t address,
-> -                                 MMUAccessType access_type, ARMMMUIdx mmu_idx,
-> -                                 hwaddr *phys_ptr, MemTxAttrs *txattrs,
-> -                                 int *prot, uint32_t *fsr)
-> +static bool pmsav8_mpu_lookup(CPUARMState *env, uint32_t address,
-> +                              MMUAccessType access_type, ARMMMUIdx mmu_idx,
-> +                              hwaddr *phys_ptr, MemTxAttrs *txattrs,
-> +                              int *prot, uint32_t *fsr, uint32_t *mregion)
->  {
-> +    /* Perform a PMSAv8 MPU lookup (without also doing the SAU check
-> +     * that a full phys-to-virt translation does).
-> +     * mregion is (if not NULL) set to the region number which matched,
-> +     * or -1 if no region number is returned (MPU off, address did not
-> +     * hit a region, address hit in multiple regions).
-> +     */
->      ARMCPU *cpu = arm_env_get_cpu(env);
->      bool is_user = regime_is_user(env, mmu_idx);
->      uint32_t secure = regime_is_secure(env, mmu_idx);
->      int n;
->      int matchregion = -1;
->      bool hit = false;
-> -    V8M_SAttributes sattrs = {};
+>          # Poll for new events
+>          while True:
+> -            event = self._qmp.pull_event(wait=timeout)
+> +            event = self._qmp.pull_event(wait=float(timeout))
+
+Before this patch you *could* ask for no timeout, and this would block
+waiting for an event. After, you can't.
+
+Are you making the argument that it is *never* correct to ask for no
+timeout?
+
+>              if (event['event'] == name) and event_match(event, match):
+>                  return event
+>              self._events.append(event)
 >  
->      *phys_ptr = address;
->      *prot = 0;
+> -        return None
 > -
-> -    if (arm_feature(env, ARM_FEATURE_M_SECURITY)) {
-> -        v8m_security_lookup(env, address, access_type, mmu_idx, &sattrs);
-> -        if (access_type == MMU_INST_FETCH) {
-> -            /* Instruction fetches always use the MMU bank and the
-> -             * transaction attribute determined by the fetch address,
-> -             * regardless of CPU state. This is painful for QEMU
-> -             * to handle, because it would mean we need to encode
-> -             * into the mmu_idx not just the (user, negpri) information
-> -             * for the current security state but also that for the
-> -             * other security state, which would balloon the number
-> -             * of mmu_idx values needed alarmingly.
-> -             * Fortunately we can avoid this because it's not actually
-> -             * possible to arbitrarily execute code from memory with
-> -             * the wrong security attribute: it will always generate
-> -             * an exception of some kind or another, apart from the
-> -             * special case of an NS CPU executing an SG instruction
-> -             * in S&NSC memory. So we always just fail the translation
-> -             * here and sort things out in the exception handler
-> -             * (including possibly emulating an SG instruction).
-> -             */
-> -            if (sattrs.ns != !secure) {
-> -                *fsr = sattrs.nsc ? M_FAKE_FSR_NSC_EXEC : M_FAKE_FSR_SFAULT;
-> -                return true;
-> -            }
-> -        } else {
-> -            /* For data accesses we always use the MMU bank indicated
-> -             * by the current CPU state, but the security attributes
-> -             * might downgrade a secure access to nonsecure.
-> -             */
-> -            if (sattrs.ns) {
-> -                txattrs->secure = false;
-> -            } else if (!secure) {
-> -                /* NS access to S memory must fault.
-> -                 * Architecturally we should first check whether the
-> -                 * MPU information for this address indicates that we
-> -                 * are doing an unaligned access to Device memory, which
-> -                 * should generate a UsageFault instead. QEMU does not
-> -                 * currently check for that kind of unaligned access though.
-> -                 * If we added it we would need to do so as a special case
-> -                 * for M_FAKE_FSR_SFAULT in arm_v7m_cpu_do_interrupt().
-> -                 */
-> -                *fsr = M_FAKE_FSR_SFAULT;
-> -                return true;
-> -            }
-> -        }
-> +    if (mregion) {
-> +        *mregion = -1;
->      }
->  
->      /* Unlike the ARM ARM pseudocode, we don't need to check whether this
-> @@ -9500,12 +9461,79 @@ static bool get_phys_addr_pmsav8(CPUARMState *env, uint32_t address,
->          /* We don't need to look the attribute up in the MAIR0/MAIR1
->           * registers because that only tells us about cacheability.
->           */
-> +        if (mregion) {
-> +            *mregion = matchregion;
-> +        }
->      }
->  
->      *fsr = 0x00d; /* Permission fault */
->      return !(*prot & (1 << access_type));
->  }
->  
-> +
-> +static bool get_phys_addr_pmsav8(CPUARMState *env, uint32_t address,
-> +                                 MMUAccessType access_type, ARMMMUIdx mmu_idx,
-> +                                 hwaddr *phys_ptr, MemTxAttrs *txattrs,
-> +                                 int *prot, uint32_t *fsr)
-> +{
-> +    uint32_t secure = regime_is_secure(env, mmu_idx);
-> +    V8M_SAttributes sattrs = {};
-> +
-> +    if (arm_feature(env, ARM_FEATURE_M_SECURITY)) {
-> +        v8m_security_lookup(env, address, access_type, mmu_idx, &sattrs);
-> +        if (access_type == MMU_INST_FETCH) {
-> +            /* Instruction fetches always use the MMU bank and the
-> +             * transaction attribute determined by the fetch address,
-> +             * regardless of CPU state. This is painful for QEMU
-> +             * to handle, because it would mean we need to encode
-> +             * into the mmu_idx not just the (user, negpri) information
-> +             * for the current security state but also that for the
-> +             * other security state, which would balloon the number
-> +             * of mmu_idx values needed alarmingly.
-> +             * Fortunately we can avoid this because it's not actually
-> +             * possible to arbitrarily execute code from memory with
-> +             * the wrong security attribute: it will always generate
-> +             * an exception of some kind or another, apart from the
-> +             * special case of an NS CPU executing an SG instruction
-> +             * in S&NSC memory. So we always just fail the translation
-> +             * here and sort things out in the exception handler
-> +             * (including possibly emulating an SG instruction).
-> +             */
-> +            if (sattrs.ns != !secure) {
-> +                *fsr = sattrs.nsc ? M_FAKE_FSR_NSC_EXEC : M_FAKE_FSR_SFAULT;
-> +                *phys_ptr = address;
-> +                *prot = 0;
-> +                return true;
-> +            }
-> +        } else {
-> +            /* For data accesses we always use the MMU bank indicated
-> +             * by the current CPU state, but the security attributes
-> +             * might downgrade a secure access to nonsecure.
-> +             */
-> +            if (sattrs.ns) {
-> +                txattrs->secure = false;
-> +            } else if (!secure) {
-> +                /* NS access to S memory must fault.
-> +                 * Architecturally we should first check whether the
-> +                 * MPU information for this address indicates that we
-> +                 * are doing an unaligned access to Device memory, which
-> +                 * should generate a UsageFault instead. QEMU does not
-> +                 * currently check for that kind of unaligned access though.
-> +                 * If we added it we would need to do so as a special case
-> +                 * for M_FAKE_FSR_SFAULT in arm_v7m_cpu_do_interrupt().
-> +                 */
-> +                *fsr = M_FAKE_FSR_SFAULT;
-> +                *phys_ptr = address;
-> +                *prot = 0;
-> +                return true;
-> +            }
-> +        }
-> +    }
-> +
-> +    return pmsav8_mpu_lookup(env, address, access_type, mmu_idx, phys_ptr,
-> +                             txattrs, prot, fsr, NULL);
-> +}
-> +
->  static bool get_phys_addr_pmsav5(CPUARMState *env, uint32_t address,
->                                   MMUAccessType access_type, ARMMMUIdx mmu_idx,
->                                   hwaddr *phys_ptr, int *prot, uint32_t *fsr)
+>      def get_log(self):
+>          '''
+>          After self.shutdown or failed qemu execution, this returns the output
 > 
