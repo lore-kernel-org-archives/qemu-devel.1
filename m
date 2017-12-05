@@ -1,32 +1,15 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54184)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54448)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1eMAen-0001TF-3J
-	for qemu-devel@nongnu.org; Tue, 05 Dec 2017 05:40:58 -0500
+	(envelope-from <stefanha@redhat.com>) id 1eMAfl-00023r-Q4
+	for qemu-devel@nongnu.org; Tue, 05 Dec 2017 05:41:58 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1eMAei-0001OD-6R
-	for qemu-devel@nongnu.org; Tue, 05 Dec 2017 05:40:57 -0500
-Received: from indium.canonical.com ([91.189.90.7]:57526)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1eMAei-0001O5-02
-	for qemu-devel@nongnu.org; Tue, 05 Dec 2017 05:40:52 -0500
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1eMAeg-0001m1-SX
-	for <qemu-devel@nongnu.org>; Tue, 05 Dec 2017 10:40:50 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id CCDB82E80C3
-	for <qemu-devel@nongnu.org>; Tue,  5 Dec 2017 10:40:50 +0000 (UTC)
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Tue, 05 Dec 2017 10:32:55 -0000
-From: Rooney <1736376@bugs.launchpad.net>
-Reply-To: Bug 1736376 <1736376@bugs.launchpad.net>
-Sender: bounces@canonical.com
-Message-Id: <151246997532.20350.210206455230339629.malonedeb@chaenomeles.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1736376] [NEW] CVE-2017-7471 repeated?
+	(envelope-from <stefanha@redhat.com>) id 1eMAfk-0002MB-TD
+	for qemu-devel@nongnu.org; Tue, 05 Dec 2017 05:41:57 -0500
+From: Stefan Hajnoczi <stefanha@redhat.com>
+Date: Tue,  5 Dec 2017 10:41:32 +0000
+Message-Id: <20171205104141.28882-1-stefanha@redhat.com>
+Subject: [Qemu-devel] [PATCH 0/9] blockdev: fix QMP 'transaction' with
+ IOThreads
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,47 +19,60 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
+Cc: John Snow <jsnow@redhat.com>, qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>
 
-Public bug reported:
+(This is for QEMU 2.12 because this bug is not -rc4 critical)
 
-In the hw/9pfs/9p-proxy.c file I can see the following which is changed
-because of CVE-2017-7471 in the hw/9pfs/9p-local.c. I might be wrong but
-I guess that should be changed as well.
+Previously AioContext was held across QMP 'transaction' in an attempt to
+achieve bdrv_drained_begin/end() semantics.  Nowadays we have
+bdrv_drained_begin/end() and the AioContext lock just protects state.
+Therefore there is no reason to hold AioContext across
+.prepare/.commit/.abort/.clean() anymore.
 
-if(dir_path){
-v9fs_path_sprintf(target,"%s/%s",dir_path->data,name);
-}
-else{
-v9fs_path_sprintf(target,"%s",name);
-}
+Besides being cleanup-worthy, holding AioContext also exposes a bug:
+BDRV_POLL_WHILE() doesn't support recursive AioContext locking and will hang if
+depth > 1.  This is easy to trigger by submitting a transaction with 2 actions
+that touch two drives assigned to an IOThread.  The IOThread's AioContext will
+be locked twice and BDRV_POLL_WHILE() will hang.
 
-** Affects: qemu
-     Importance: Undecided
-         Status: New
+BDRV_POLL_WHILE() is best fixed by eliminating the AioContext lock entirely in
+favor of fine-grained locking.  I discussed some fixes for BDRV_POLL_WHILE()
+with Paolo but we came to the conclusion that it will just add complexity when
+we really want to stop using AioContext locking.
 
--- =
+Summary:
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1736376
+ * Patch 1 fixes missing AioContext lock protection
 
-Title:
-  CVE-2017-7471 repeated?
+ * Patches 2-6 clean up excessive AioContext locked regions in QMP
+   'transaction' to solve the hang
 
-Status in QEMU:
-  New
+ * Patches 7-9 add a qemu-iotests test case and the necessary infrastructure
 
-Bug description:
-  In the hw/9pfs/9p-proxy.c file I can see the following which is
-  changed because of CVE-2017-7471 in the hw/9pfs/9p-local.c. I might be
-  wrong but I guess that should be changed as well.
+Stefan Hajnoczi (9):
+  blockdev: hold AioContext for bdrv_unref() in
+    external_snapshot_clean()
+  block: don't keep AioContext acquired after
+    external_snapshot_prepare()
+  block: don't keep AioContext acquired after drive_backup_prepare()
+  block: don't keep AioContext acquired after blockdev_backup_prepare()
+  block: don't keep AioContext acquired after
+    internal_snapshot_prepare()
+  block: drop unused BlockDirtyBitmapState->aio_context field
+  iothread: add iothread_by_id() API
+  blockdev: add x-blockdev-set-iothread testing command
+  qemu-iotests: add 202 external snapshots IOThread test
 
-  if(dir_path){
-  v9fs_path_sprintf(target,"%s/%s",dir_path->data,name);
-  }
-  else{
-  v9fs_path_sprintf(target,"%s",name);
-  }
+ qapi/block-core.json       |  36 +++++++
+ include/sysemu/iothread.h  |   1 +
+ blockdev.c                 | 258 +++++++++++++++++++++++++++++++++------------
+ iothread.c                 |   7 ++
+ tests/qemu-iotests/202     |  95 +++++++++++++++++
+ tests/qemu-iotests/202.out |  11 ++
+ tests/qemu-iotests/group   |   1 +
+ 7 files changed, 339 insertions(+), 70 deletions(-)
+ create mode 100755 tests/qemu-iotests/202
+ create mode 100644 tests/qemu-iotests/202.out
 
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1736376/+subscriptions
+-- 
+2.14.3
