@@ -1,21 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50960)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50992)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1eM76m-00081a-Qh
-	for qemu-devel@nongnu.org; Tue, 05 Dec 2017 01:53:42 -0500
+	(envelope-from <peterx@redhat.com>) id 1eM76t-00087E-Nw
+	for qemu-devel@nongnu.org; Tue, 05 Dec 2017 01:53:44 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1eM76l-0003QI-Pc
-	for qemu-devel@nongnu.org; Tue, 05 Dec 2017 01:53:36 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:36476)
+	(envelope-from <peterx@redhat.com>) id 1eM76s-0003Vi-Mo
+	for qemu-devel@nongnu.org; Tue, 05 Dec 2017 01:53:43 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:51254)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1eM76l-0003Pz-GL
-	for qemu-devel@nongnu.org; Tue, 05 Dec 2017 01:53:35 -0500
+	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1eM76s-0003UM-DT
+	for qemu-devel@nongnu.org; Tue, 05 Dec 2017 01:53:42 -0500
 From: Peter Xu <peterx@redhat.com>
-Date: Tue,  5 Dec 2017 14:52:45 +0800
-Message-Id: <20171205065307.21853-7-peterx@redhat.com>
+Date: Tue,  5 Dec 2017 14:52:47 +0800
+Message-Id: <20171205065307.21853-9-peterx@redhat.com>
 In-Reply-To: <20171205065307.21853-1-peterx@redhat.com>
 References: <20171205065307.21853-1-peterx@redhat.com>
-Subject: [Qemu-devel] [PATCH v5 06/28] migration: allow dst vm pause on
- postcopy
+Subject: [Qemu-devel] [PATCH v5 08/28] migration: allow send_rq to fail
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,170 +26,103 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Andrea Arcangeli <aarcange@redhat.com>, "Daniel P . Berrange" <berrange@redhat.com>, Juan Quintela <quintela@redhat.com>, Alexey Perevalov <a.perevalov@samsung.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>, peterx@redhat.com
 
-When there is IO error on the incoming channel (e.g., network down),
-instead of bailing out immediately, we allow the dst vm to switch to the
-new POSTCOPY_PAUSE state. Currently it is still simple - it waits the
-new semaphore, until someone poke it for another attempt.
-
-One note is that here on ram loading thread we cannot detect the
-POSTCOPY_ACTIVE state, but we need to detect the more specific
-POSTCOPY_INCOMING_RUNNING state, to make sure we have already loaded all
-the device states.
+We will not allow failures to happen when sending data from destination
+to source via the return path. However it is possible that there can be
+errors along the way.  This patch allows the migrate_send_rp_message()
+to return error when it happens, and further extended it to
+migrate_send_rp_req_pages().
 
 Signed-off-by: Peter Xu <peterx@redhat.com>
 ---
- migration/migration.c  |  1 +
- migration/migration.h  |  3 +++
- migration/savevm.c     | 63 ++++++++++++++++++++++++++++++++++++++++++++++++--
- migration/trace-events |  2 ++
- 4 files changed, 67 insertions(+), 2 deletions(-)
+ migration/migration.c | 35 ++++++++++++++++++++++++++++-------
+ migration/migration.h |  2 +-
+ 2 files changed, 29 insertions(+), 8 deletions(-)
 
 diff --git a/migration/migration.c b/migration/migration.c
-index f69a48ac63..6f0d48bbed 100644
+index 0dfbbe5673..e3ce22dce4 100644
 --- a/migration/migration.c
 +++ b/migration/migration.c
-@@ -150,6 +150,7 @@ MigrationIncomingState *migration_incoming_get_current(void)
-         memset(&mis_current, 0, sizeof(MigrationIncomingState));
-         qemu_mutex_init(&mis_current.rp_mutex);
-         qemu_event_init(&mis_current.main_thread_load_event, false);
-+        qemu_sem_init(&mis_current.postcopy_pause_sem_dst, 0);
-         once = true;
-     }
-     return &mis_current;
-diff --git a/migration/migration.h b/migration/migration.h
-index 36aaa13f50..55894ecb79 100644
---- a/migration/migration.h
-+++ b/migration/migration.h
-@@ -61,6 +61,9 @@ struct MigrationIncomingState {
-     /* The coroutine we should enter (back) after failover */
-     Coroutine *migration_incoming_co;
-     QemuSemaphore colo_incoming_sem;
-+
-+    /* notify PAUSED postcopy incoming migrations to try to continue */
-+    QemuSemaphore postcopy_pause_sem_dst;
- };
- 
- MigrationIncomingState *migration_incoming_get_current(void);
-diff --git a/migration/savevm.c b/migration/savevm.c
-index 8814793255..1e5fc4f332 100644
---- a/migration/savevm.c
-+++ b/migration/savevm.c
-@@ -1529,8 +1529,8 @@ static int loadvm_postcopy_ram_handle_discard(MigrationIncomingState *mis,
+@@ -199,17 +199,35 @@ static void deferred_incoming_migration(Error **errp)
+  * Send a message on the return channel back to the source
+  * of the migration.
   */
- static void *postcopy_ram_listen_thread(void *opaque)
+-static void migrate_send_rp_message(MigrationIncomingState *mis,
+-                                    enum mig_rp_message_type message_type,
+-                                    uint16_t len, void *data)
++static int migrate_send_rp_message(MigrationIncomingState *mis,
++                                   enum mig_rp_message_type message_type,
++                                   uint16_t len, void *data)
  {
--    QEMUFile *f = opaque;
-     MigrationIncomingState *mis = migration_incoming_get_current();
-+    QEMUFile *f = mis->from_src_file;
-     int load_res;
- 
-     migrate_set_state(&mis->state, MIGRATION_STATUS_ACTIVE,
-@@ -1544,6 +1544,14 @@ static void *postcopy_ram_listen_thread(void *opaque)
-      */
-     qemu_file_set_blocking(f, true);
-     load_res = qemu_loadvm_state_main(f, mis);
++    int ret = 0;
++
+     trace_migrate_send_rp_message((int)message_type, len);
+     qemu_mutex_lock(&mis->rp_mutex);
 +
 +    /*
-+     * This is tricky, but, mis->from_src_file can change after it
-+     * returns, when postcopy recovery happened. In the future, we may
-+     * want a wrapper for the QEMUFile handle.
++     * It's possible that the file handle got lost due to network
++     * failures.
 +     */
-+    f = mis->from_src_file;
-+
-     /* And non-blocking again so we don't block in any cleanup */
-     qemu_file_set_blocking(f, false);
- 
-@@ -1626,7 +1634,7 @@ static int loadvm_postcopy_handle_listen(MigrationIncomingState *mis)
-     /* Start up the listening thread and wait for it to signal ready */
-     qemu_sem_init(&mis->listen_thread_sem, 0);
-     qemu_thread_create(&mis->listen_thread, "postcopy/listen",
--                       postcopy_ram_listen_thread, mis->from_src_file,
-+                       postcopy_ram_listen_thread, NULL,
-                        QEMU_THREAD_DETACHED);
-     qemu_sem_wait(&mis->listen_thread_sem);
-     qemu_sem_destroy(&mis->listen_thread_sem);
-@@ -2011,11 +2019,44 @@ void qemu_loadvm_state_cleanup(void)
-     }
- }
- 
-+/* Return true if we should continue the migration, or false. */
-+static bool postcopy_pause_incoming(MigrationIncomingState *mis)
-+{
-+    trace_postcopy_pause_incoming();
-+
-+    migrate_set_state(&mis->state, MIGRATION_STATUS_POSTCOPY_ACTIVE,
-+                      MIGRATION_STATUS_POSTCOPY_PAUSED);
-+
-+    assert(mis->from_src_file);
-+    qemu_file_shutdown(mis->from_src_file);
-+    qemu_fclose(mis->from_src_file);
-+    mis->from_src_file = NULL;
-+
-+    assert(mis->to_src_file);
-+    qemu_file_shutdown(mis->to_src_file);
-+    qemu_mutex_lock(&mis->rp_mutex);
-+    qemu_fclose(mis->to_src_file);
-+    mis->to_src_file = NULL;
-+    qemu_mutex_unlock(&mis->rp_mutex);
-+
-+    error_report("Detected IO failure for postcopy. "
-+                 "Migration paused.");
-+
-+    while (mis->state == MIGRATION_STATUS_POSTCOPY_PAUSED) {
-+        qemu_sem_wait(&mis->postcopy_pause_sem_dst);
++    if (!mis->to_src_file) {
++        ret = -EIO;
++        goto error;
 +    }
 +
-+    trace_postcopy_pause_incoming_continued();
+     qemu_put_be16(mis->to_src_file, (unsigned int)message_type);
+     qemu_put_be16(mis->to_src_file, len);
+     qemu_put_buffer(mis->to_src_file, data, len);
+     qemu_fflush(mis->to_src_file);
 +
-+    return true;
-+}
++    /* It's possible that qemu file got error during sending */
++    ret = qemu_file_get_error(mis->to_src_file);
 +
- static int qemu_loadvm_state_main(QEMUFile *f, MigrationIncomingState *mis)
- {
-     uint8_t section_type;
-     int ret = 0;
- 
-+retry:
-     while (true) {
-         section_type = qemu_get_byte(f);
- 
-@@ -2060,6 +2101,24 @@ static int qemu_loadvm_state_main(QEMUFile *f, MigrationIncomingState *mis)
- out:
-     if (ret < 0) {
-         qemu_file_set_error(f, ret);
-+
-+        /*
-+         * Detect whether it is:
-+         *
-+         * 1. postcopy running (after receiving all device data, which
-+         *    must be in POSTCOPY_INCOMING_RUNNING state.  Note that
-+         *    POSTCOPY_INCOMING_LISTENING is still not enough, it's
-+         *    still receiving device states).
-+         * 2. network failure (-EIO)
-+         *
-+         * If so, we try to wait for a recovery.
-+         */
-+        if (postcopy_state_get() == POSTCOPY_INCOMING_RUNNING &&
-+            ret == -EIO && postcopy_pause_incoming(mis)) {
-+            /* Reset f to point to the newly created channel */
-+            f = mis->from_src_file;
-+            goto retry;
-+        }
-     }
-     return ret;
++error:
+     qemu_mutex_unlock(&mis->rp_mutex);
++    return ret;
  }
-diff --git a/migration/trace-events b/migration/trace-events
-index da1c63a933..bed1646cd6 100644
---- a/migration/trace-events
-+++ b/migration/trace-events
-@@ -100,6 +100,8 @@ open_return_path_on_source(void) ""
- open_return_path_on_source_continue(void) ""
- postcopy_start(void) ""
- postcopy_pause_continued(void) ""
-+postcopy_pause_incoming(void) ""
-+postcopy_pause_incoming_continued(void) ""
- postcopy_start_set_run(void) ""
- source_return_path_thread_bad_end(void) ""
- source_return_path_thread_end(void) ""
+ 
+ /* Request a range of pages from the source VM at the given
+@@ -219,11 +237,12 @@ static void migrate_send_rp_message(MigrationIncomingState *mis,
+  *   Start: Address offset within the RB
+  *   Len: Length in bytes required - must be a multiple of pagesize
+  */
+-void migrate_send_rp_req_pages(MigrationIncomingState *mis, const char *rbname,
+-                               ram_addr_t start, size_t len)
++int migrate_send_rp_req_pages(MigrationIncomingState *mis, const char *rbname,
++                              ram_addr_t start, size_t len)
+ {
+     uint8_t bufc[12 + 1 + 255]; /* start (8), len (4), rbname up to 256 */
+     size_t msglen = 12; /* start + len */
++    enum mig_rp_message_type msg_type;
+ 
+     *(uint64_t *)bufc = cpu_to_be64((uint64_t)start);
+     *(uint32_t *)(bufc + 8) = cpu_to_be32((uint32_t)len);
+@@ -235,10 +254,12 @@ void migrate_send_rp_req_pages(MigrationIncomingState *mis, const char *rbname,
+         bufc[msglen++] = rbname_len;
+         memcpy(bufc + msglen, rbname, rbname_len);
+         msglen += rbname_len;
+-        migrate_send_rp_message(mis, MIG_RP_MSG_REQ_PAGES_ID, msglen, bufc);
++        msg_type = MIG_RP_MSG_REQ_PAGES_ID;
+     } else {
+-        migrate_send_rp_message(mis, MIG_RP_MSG_REQ_PAGES, msglen, bufc);
++        msg_type = MIG_RP_MSG_REQ_PAGES;
+     }
++
++    return migrate_send_rp_message(mis, msg_type, msglen, bufc);
+ }
+ 
+ void qemu_start_incoming_migration(const char *uri, Error **errp)
+diff --git a/migration/migration.h b/migration/migration.h
+index ebb049f692..b63cdfbfdb 100644
+--- a/migration/migration.h
++++ b/migration/migration.h
+@@ -216,7 +216,7 @@ void migrate_send_rp_shut(MigrationIncomingState *mis,
+                           uint32_t value);
+ void migrate_send_rp_pong(MigrationIncomingState *mis,
+                           uint32_t value);
+-void migrate_send_rp_req_pages(MigrationIncomingState *mis, const char* rbname,
++int migrate_send_rp_req_pages(MigrationIncomingState *mis, const char* rbname,
+                               ram_addr_t start, size_t len);
+ 
+ #endif
 -- 
 2.14.3
