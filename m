@@ -1,20 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51520)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51602)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1eM77k-0000TM-Kq
-	for qemu-devel@nongnu.org; Tue, 05 Dec 2017 01:54:37 -0500
+	(envelope-from <peterx@redhat.com>) id 1eM77q-0000ZJ-O1
+	for qemu-devel@nongnu.org; Tue, 05 Dec 2017 01:54:47 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1eM77g-0003uZ-KK
-	for qemu-devel@nongnu.org; Tue, 05 Dec 2017 01:54:36 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:52484)
+	(envelope-from <peterx@redhat.com>) id 1eM77p-0003yW-Sh
+	for qemu-devel@nongnu.org; Tue, 05 Dec 2017 01:54:42 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:55810)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1eM77g-0003u8-E1
-	for qemu-devel@nongnu.org; Tue, 05 Dec 2017 01:54:32 -0500
+	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1eM77p-0003y7-Mc
+	for qemu-devel@nongnu.org; Tue, 05 Dec 2017 01:54:41 -0500
 From: Peter Xu <peterx@redhat.com>
-Date: Tue,  5 Dec 2017 14:53:00 +0800
-Message-Id: <20171205065307.21853-22-peterx@redhat.com>
+Date: Tue,  5 Dec 2017 14:53:02 +0800
+Message-Id: <20171205065307.21853-24-peterx@redhat.com>
 In-Reply-To: <20171205065307.21853-1-peterx@redhat.com>
 References: <20171205065307.21853-1-peterx@redhat.com>
-Subject: [Qemu-devel] [PATCH v5 21/28] migration: setup ramstate for resume
+Subject: [Qemu-devel] [PATCH v5 23/28] migration: free SocketAddress where
+ allocated
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,83 +27,48 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Andrea Arcangeli <aarcange@redhat.com>, "Daniel P . Berrange" <berrange@redhat.com>, Juan Quintela <quintela@redhat.com>, Alexey Perevalov <a.perevalov@samsung.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>, peterx@redhat.com
 
-After we updated the dirty bitmaps of ramblocks, we also need to update
-the critical fields in RAMState to make sure it is ready for a resume.
+Freeing the SocketAddress struct in socket_start_incoming_migration is
+slightly confusing. Let's free the address in the same context where we
+allocated it.
 
 Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
 Signed-off-by: Peter Xu <peterx@redhat.com>
 ---
- migration/ram.c        | 37 ++++++++++++++++++++++++++++++++++++-
- migration/trace-events |  1 +
- 2 files changed, 37 insertions(+), 1 deletion(-)
+ migration/socket.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/migration/ram.c b/migration/ram.c
-index 8fa47a0353..358d229721 100644
---- a/migration/ram.c
-+++ b/migration/ram.c
-@@ -2250,6 +2250,33 @@ static int ram_init_all(RAMState **rsp)
-     return 0;
+diff --git a/migration/socket.c b/migration/socket.c
+index dee869044a..4879f11e0f 100644
+--- a/migration/socket.c
++++ b/migration/socket.c
+@@ -172,7 +172,6 @@ static void socket_start_incoming_migration(SocketAddress *saddr,
+ 
+     if (qio_channel_socket_listen_sync(listen_ioc, saddr, errp) < 0) {
+         object_unref(OBJECT(listen_ioc));
+-        qapi_free_SocketAddress(saddr);
+         return;
+     }
+ 
+@@ -181,7 +180,6 @@ static void socket_start_incoming_migration(SocketAddress *saddr,
+                           socket_accept_incoming_migration,
+                           listen_ioc,
+                           (GDestroyNotify)object_unref);
+-    qapi_free_SocketAddress(saddr);
  }
  
-+static void ram_state_resume_prepare(RAMState *rs)
-+{
-+    RAMBlock *block;
-+    long pages = 0;
-+
-+    /*
-+     * Postcopy is not using xbzrle/compression, so no need for that.
-+     * Also, since source are already halted, we don't need to care
-+     * about dirty page logging as well.
-+     */
-+
-+    RAMBLOCK_FOREACH(block) {
-+        pages += bitmap_count_one(block->bmap,
-+                                  block->used_length >> TARGET_PAGE_BITS);
-+    }
-+
-+    /* This may not be aligned with current bitmaps. Recalculate. */
-+    rs->migration_dirty_pages = pages;
-+
-+    rs->last_seen_block = NULL;
-+    rs->last_sent_block = NULL;
-+    rs->last_page = 0;
-+    rs->last_version = ram_list.version;
-+
-+    trace_ram_state_resume_prepare(pages);
-+}
-+
- /*
-  * Each of ram_save_setup, ram_save_iterate and ram_save_complete has
-  * long-running RCU critical section.  When rcu-reclaims in the code
-@@ -3178,8 +3205,16 @@ out:
- static int ram_resume_prepare(MigrationState *s, void *opaque)
+ void tcp_start_incoming_migration(const char *host_port, Error **errp)
+@@ -192,10 +190,12 @@ void tcp_start_incoming_migration(const char *host_port, Error **errp)
+         socket_start_incoming_migration(saddr, &err);
+     }
+     error_propagate(errp, err);
++    qapi_free_SocketAddress(saddr);
+ }
+ 
+ void unix_start_incoming_migration(const char *path, Error **errp)
  {
-     RAMState *rs = *(RAMState **)opaque;
-+    int ret;
- 
--    return ram_dirty_bitmap_sync_all(s, rs);
-+    ret = ram_dirty_bitmap_sync_all(s, rs);
-+    if (ret) {
-+        return ret;
-+    }
-+
-+    ram_state_resume_prepare(rs);
-+
-+    return 0;
+     SocketAddress *saddr = unix_build_address(path);
+     socket_start_incoming_migration(saddr, errp);
++    qapi_free_SocketAddress(saddr);
  }
- 
- static SaveVMHandlers savevm_ram_handlers = {
-diff --git a/migration/trace-events b/migration/trace-events
-index 804f18d492..98c2e4de58 100644
---- a/migration/trace-events
-+++ b/migration/trace-events
-@@ -88,6 +88,7 @@ ram_dirty_bitmap_reload_complete(char *str) "%s"
- ram_dirty_bitmap_sync_start(void) ""
- ram_dirty_bitmap_sync_wait(void) ""
- ram_dirty_bitmap_sync_complete(void) ""
-+ram_state_resume_prepare(long v) "%ld"
- 
- # migration/migration.c
- await_return_path_close_on_source_close(void) ""
 -- 
 2.14.3
