@@ -1,20 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33500)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33597)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1eM6AF-00038V-6u
-	for qemu-devel@nongnu.org; Tue, 05 Dec 2017 00:53:08 -0500
+	(envelope-from <peterx@redhat.com>) id 1eM6AQ-0003Jc-Do
+	for qemu-devel@nongnu.org; Tue, 05 Dec 2017 00:53:19 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1eM6AC-0001gG-Lm
-	for qemu-devel@nongnu.org; Tue, 05 Dec 2017 00:53:07 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:46538)
+	(envelope-from <peterx@redhat.com>) id 1eM6AP-0001u2-JH
+	for qemu-devel@nongnu.org; Tue, 05 Dec 2017 00:53:18 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:60576)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1eM6AC-0001eM-Ew
-	for qemu-devel@nongnu.org; Tue, 05 Dec 2017 00:53:04 -0500
+	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1eM6AP-0001tJ-Cu
+	for qemu-devel@nongnu.org; Tue, 05 Dec 2017 00:53:17 -0500
 From: Peter Xu <peterx@redhat.com>
-Date: Tue,  5 Dec 2017 13:51:42 +0800
-Message-Id: <20171205055200.16305-9-peterx@redhat.com>
+Date: Tue,  5 Dec 2017 13:51:43 +0800
+Message-Id: <20171205055200.16305-10-peterx@redhat.com>
 In-Reply-To: <20171205055200.16305-1-peterx@redhat.com>
 References: <20171205055200.16305-1-peterx@redhat.com>
-Subject: [Qemu-devel] [RFC v5 08/26] monitor: let mon_list be tail queue
+Subject: [Qemu-devel] [RFC v5 09/26] monitor: create monitor dedicate
+ iothread
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,56 +27,90 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Stefan Hajnoczi <shajnocz@redhat.com>, "Daniel P . Berrange" <berrange@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Fam Zheng <famz@redhat.com>, Juan Quintela <quintela@redhat.com>, mdroth@linux.vnet.ibm.com, peterx@redhat.com, Eric Blake <eblake@redhat.com>, Laurent Vivier <lvivier@redhat.com>, Markus Armbruster <armbru@redhat.com>, marcandre.lureau@redhat.com, "Dr . David Alan Gilbert" <dgilbert@redhat.com>
 
-It was QLIST.  I want to use this list to do monitor priority job later,
-which need tail insertion ability.  So switching to a tail queue.
+Create one IOThread for the monitors, prepared to handle all the
+input/output IOs using existing iothread framework.
 
-Reviewed-by: Fam Zheng <famz@redhat.com>
 Signed-off-by: Peter Xu <peterx@redhat.com>
 ---
- monitor.c | 10 +++++-----
- 1 file changed, 5 insertions(+), 5 deletions(-)
+ monitor.c | 32 ++++++++++++++++++++++++++++++++
+ 1 file changed, 32 insertions(+)
 
 diff --git a/monitor.c b/monitor.c
-index ac5313023b..a70ab5606b 100644
+index a70ab5606b..6b60f6d91b 100644
 --- a/monitor.c
 +++ b/monitor.c
-@@ -205,7 +205,7 @@ struct Monitor {
-     void *password_opaque;
-     mon_cmd_t *cmd_table;
-     QLIST_HEAD(,mon_fd_t) fds;
--    QLIST_ENTRY(Monitor) entry;
-+    QTAILQ_ENTRY(Monitor) entry;
+@@ -76,6 +76,7 @@
+ #include "qmp-introspect.h"
+ #include "sysemu/qtest.h"
+ #include "sysemu/cpus.h"
++#include "sysemu/iothread.h"
+ #include "qemu/cutils.h"
+ #include "qapi/qmp/dispatch.h"
+ 
+@@ -208,6 +209,12 @@ struct Monitor {
+     QTAILQ_ENTRY(Monitor) entry;
  };
  
++struct MonitorGlobal {
++    IOThread *mon_iothread;
++};
++
++static struct MonitorGlobal mon_global;
++
  /* QMP checker flags */
-@@ -214,7 +214,7 @@ struct Monitor {
- /* Protects mon_list, monitor_event_state.  */
- static QemuMutex monitor_lock;
+ #define QMP_ACCEPT_UNKNOWNS 1
  
--static QLIST_HEAD(mon_list, Monitor) mon_list;
-+static QTAILQ_HEAD(mon_list, Monitor) mon_list;
- static QLIST_HEAD(mon_fdsets, MonFdset) mon_fdsets;
- static int mon_refcount;
+@@ -4034,12 +4041,24 @@ static void sortcmdlist(void)
+     qsort((void *)info_cmds, array_num, elem_size, compare_mon_cmd);
+ }
  
-@@ -415,7 +415,7 @@ static void monitor_qapi_event_emit(QAPIEvent event, QDict *qdict)
-     Monitor *mon;
++static GMainContext *monitor_io_context_get(void)
++{
++    return iothread_get_g_main_context(mon_global.mon_iothread);
++}
++
++static void monitor_iothread_init(void)
++{
++    mon_global.mon_iothread = iothread_create("mon_iothread",
++                                              &error_abort);
++}
++
+ void monitor_init_globals(void)
+ {
+     monitor_init_qmp_commands();
+     monitor_qapi_event_init();
+     sortcmdlist();
+     qemu_mutex_init(&monitor_lock);
++    monitor_iothread_init();
+ }
  
-     trace_monitor_protocol_event_emit(event, qdict);
--    QLIST_FOREACH(mon, &mon_list, entry) {
-+    QTAILQ_FOREACH(mon, &mon_list, entry) {
-         if (monitor_is_qmp(mon)
-             && mon->qmp.commands != &qmp_cap_negotiation_commands) {
-             monitor_json_emitter(mon, QOBJECT(qdict));
-@@ -4118,8 +4118,8 @@ void monitor_cleanup(void)
+ /* These functions just adapt the readline interface in a typesafe way.  We
+@@ -4117,6 +4136,16 @@ void monitor_cleanup(void)
+ {
      Monitor *mon, *next;
  
++    /*
++     * We need to explicitly stop the iothread (but not destroy it),
++     * cleanup the monitor resources, then destroy the iothread.  See
++     * again on the glib bug mentioned in 2b316774f6 for a reason.
++     *
++     * TODO: the bug is fixed in glib 2.28, so we can remove this hack
++     * as long as we won't support glib versions older than it.
++     */
++    iothread_stop(mon_global.mon_iothread);
++
      qemu_mutex_lock(&monitor_lock);
--    QLIST_FOREACH_SAFE(mon, &mon_list, entry, next) {
--        QLIST_REMOVE(mon, entry);
-+    QTAILQ_FOREACH_SAFE(mon, &mon_list, entry, next) {
-+        QTAILQ_REMOVE(&mon_list, mon, entry);
-         monitor_data_destroy(mon);
+     QTAILQ_FOREACH_SAFE(mon, &mon_list, entry, next) {
+         QTAILQ_REMOVE(&mon_list, mon, entry);
+@@ -4124,6 +4153,9 @@ void monitor_cleanup(void)
          g_free(mon);
      }
+     qemu_mutex_unlock(&monitor_lock);
++
++    iothread_destroy(mon_global.mon_iothread);
++    mon_global.mon_iothread = NULL;
+ }
+ 
+ QemuOptsList qemu_mon_opts = {
 -- 
 2.14.3
