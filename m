@@ -1,21 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33597)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33645)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1eM6AQ-0003Jc-Do
-	for qemu-devel@nongnu.org; Tue, 05 Dec 2017 00:53:19 -0500
+	(envelope-from <peterx@redhat.com>) id 1eM6AW-0003P8-4h
+	for qemu-devel@nongnu.org; Tue, 05 Dec 2017 00:53:25 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1eM6AP-0001u2-JH
-	for qemu-devel@nongnu.org; Tue, 05 Dec 2017 00:53:18 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:60576)
+	(envelope-from <peterx@redhat.com>) id 1eM6AV-0001wD-2R
+	for qemu-devel@nongnu.org; Tue, 05 Dec 2017 00:53:24 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:57696)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1eM6AP-0001tJ-Cu
-	for qemu-devel@nongnu.org; Tue, 05 Dec 2017 00:53:17 -0500
+	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1eM6AU-0001vk-QE
+	for qemu-devel@nongnu.org; Tue, 05 Dec 2017 00:53:22 -0500
 From: Peter Xu <peterx@redhat.com>
-Date: Tue,  5 Dec 2017 13:51:43 +0800
-Message-Id: <20171205055200.16305-10-peterx@redhat.com>
+Date: Tue,  5 Dec 2017 13:51:44 +0800
+Message-Id: <20171205055200.16305-11-peterx@redhat.com>
 In-Reply-To: <20171205055200.16305-1-peterx@redhat.com>
 References: <20171205055200.16305-1-peterx@redhat.com>
-Subject: [Qemu-devel] [RFC v5 09/26] monitor: create monitor dedicate
- iothread
+Subject: [Qemu-devel] [RFC v5 10/26] monitor: allow to use IO thread for
+ parsing
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,90 +27,121 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Stefan Hajnoczi <shajnocz@redhat.com>, "Daniel P . Berrange" <berrange@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Fam Zheng <famz@redhat.com>, Juan Quintela <quintela@redhat.com>, mdroth@linux.vnet.ibm.com, peterx@redhat.com, Eric Blake <eblake@redhat.com>, Laurent Vivier <lvivier@redhat.com>, Markus Armbruster <armbru@redhat.com>, marcandre.lureau@redhat.com, "Dr . David Alan Gilbert" <dgilbert@redhat.com>
 
-Create one IOThread for the monitors, prepared to handle all the
-input/output IOs using existing iothread framework.
+For each Monitor, add one field "use_io_thr" to show whether it will be
+using the dedicated monitor IO thread to handle input/output.  When set,
+monitor IO parsing work will be offloaded to dedicated monitor IO
+thread, rather than the original main loop thread.
 
+This only works for QMP.  HMP will always be run on main loop thread.
+
+Currently we're still keeping use_io_thr to off always.  Will turn it on
+later at some point.
+
+One thing to mention is that we cannot set use_io_thr for every QMP
+monitors.  The problem is that MUXed typed chardevs may not work well
+with it now. When MUX is used, frontend of chardev can be the monitor
+plus something else.  The only thing we know would be safe to be run
+outside main thread so far is the monitor frontend. All the rest of the
+frontends should still be run in main thread only.
+
+Reviewed-by: Fam Zheng <famz@redhat.com>
 Signed-off-by: Peter Xu <peterx@redhat.com>
 ---
- monitor.c | 32 ++++++++++++++++++++++++++++++++
- 1 file changed, 32 insertions(+)
+ monitor.c | 38 ++++++++++++++++++++++++++++++--------
+ 1 file changed, 30 insertions(+), 8 deletions(-)
 
 diff --git a/monitor.c b/monitor.c
-index a70ab5606b..6b60f6d91b 100644
+index 6b60f6d91b..e8f5a586e4 100644
 --- a/monitor.c
 +++ b/monitor.c
-@@ -76,6 +76,7 @@
- #include "qmp-introspect.h"
- #include "sysemu/qtest.h"
- #include "sysemu/cpus.h"
-+#include "sysemu/iothread.h"
- #include "qemu/cutils.h"
- #include "qapi/qmp/dispatch.h"
+@@ -191,6 +191,7 @@ struct Monitor {
+     int flags;
+     int suspend_cnt;
+     bool skip_flush;
++    bool use_io_thr;
  
-@@ -208,6 +209,12 @@ struct Monitor {
-     QTAILQ_ENTRY(Monitor) entry;
- };
+     QemuMutex out_lock;
+     QString *outbuf;
+@@ -575,7 +576,8 @@ static void monitor_qapi_event_init(void)
  
-+struct MonitorGlobal {
-+    IOThread *mon_iothread;
-+};
-+
-+static struct MonitorGlobal mon_global;
-+
- /* QMP checker flags */
- #define QMP_ACCEPT_UNKNOWNS 1
+ static void handle_hmp_command(Monitor *mon, const char *cmdline);
  
-@@ -4034,12 +4041,24 @@ static void sortcmdlist(void)
-     qsort((void *)info_cmds, array_num, elem_size, compare_mon_cmd);
+-static void monitor_data_init(Monitor *mon, bool skip_flush)
++static void monitor_data_init(Monitor *mon, bool skip_flush,
++                              bool use_io_thr)
+ {
+     memset(mon, 0, sizeof(Monitor));
+     qemu_mutex_init(&mon->out_lock);
+@@ -583,6 +585,7 @@ static void monitor_data_init(Monitor *mon, bool skip_flush)
+     /* Use *mon_cmds by default. */
+     mon->cmd_table = mon_cmds;
+     mon->skip_flush = skip_flush;
++    mon->use_io_thr = use_io_thr;
  }
  
-+static GMainContext *monitor_io_context_get(void)
-+{
-+    return iothread_get_g_main_context(mon_global.mon_iothread);
-+}
-+
-+static void monitor_iothread_init(void)
-+{
-+    mon_global.mon_iothread = iothread_create("mon_iothread",
-+                                              &error_abort);
-+}
-+
- void monitor_init_globals(void)
- {
-     monitor_init_qmp_commands();
-     monitor_qapi_event_init();
-     sortcmdlist();
-     qemu_mutex_init(&monitor_lock);
-+    monitor_iothread_init();
- }
+ static void monitor_data_destroy(Monitor *mon)
+@@ -603,7 +606,7 @@ char *qmp_human_monitor_command(const char *command_line, bool has_cpu_index,
+     char *output = NULL;
+     Monitor *old_mon, hmp;
  
- /* These functions just adapt the readline interface in a typesafe way.  We
-@@ -4117,6 +4136,16 @@ void monitor_cleanup(void)
- {
-     Monitor *mon, *next;
+-    monitor_data_init(&hmp, true);
++    monitor_data_init(&hmp, true, false);
  
-+    /*
-+     * We need to explicitly stop the iothread (but not destroy it),
-+     * cleanup the monitor resources, then destroy the iothread.  See
-+     * again on the glib bug mentioned in 2b316774f6 for a reason.
-+     *
-+     * TODO: the bug is fixed in glib 2.28, so we can remove this hack
-+     * as long as we won't support glib versions older than it.
-+     */
-+    iothread_stop(mon_global.mon_iothread);
-+
-     qemu_mutex_lock(&monitor_lock);
-     QTAILQ_FOREACH_SAFE(mon, &mon_list, entry, next) {
-         QTAILQ_REMOVE(&mon_list, mon, entry);
-@@ -4124,6 +4153,9 @@ void monitor_cleanup(void)
-         g_free(mon);
+     old_mon = cur_mon;
+     cur_mon = &hmp;
+@@ -4104,8 +4107,9 @@ void error_vprintf_unless_qmp(const char *fmt, va_list ap)
+ void monitor_init(Chardev *chr, int flags)
+ {
+     Monitor *mon = g_malloc(sizeof(*mon));
++    GMainContext *context;
+ 
+-    monitor_data_init(mon, false);
++    monitor_data_init(mon, false, false);
+ 
+     qemu_chr_fe_init(&mon->chr, chr, &error_abort);
+     mon->flags = flags;
+@@ -4117,19 +4121,37 @@ void monitor_init(Chardev *chr, int flags)
+         monitor_read_command(mon, 0);
      }
-     qemu_mutex_unlock(&monitor_lock);
+ 
++    if (mon->use_io_thr) {
++        /*
++         * When use_io_thr is set, we use the global shared dedicated
++         * IO thread for this monitor to handle input/output.
++         */
++        context = monitor_io_context_get();
++        /* We should have inited globals before reaching here. */
++        assert(context);
++    } else {
++        /* The default main loop, which is the main thread */
++        context = NULL;
++    }
 +
-+    iothread_destroy(mon_global.mon_iothread);
-+    mon_global.mon_iothread = NULL;
++    /*
++     * Add the monitor before running it (which is triggered by
++     * qemu_chr_fe_set_handlers), otherwise one monitor may find
++     * itself not on the mon_list when running.
++     */
++    qemu_mutex_lock(&monitor_lock);
++    QTAILQ_INSERT_HEAD(&mon_list, mon, entry);
++    qemu_mutex_unlock(&monitor_lock);
++
+     if (monitor_is_qmp(mon)) {
+         qemu_chr_fe_set_handlers(&mon->chr, monitor_can_read, monitor_qmp_read,
+-                                 monitor_qmp_event, NULL, mon, NULL, true);
++                                 monitor_qmp_event, NULL, mon, context, true);
+         qemu_chr_fe_set_echo(&mon->chr, true);
+         json_message_parser_init(&mon->qmp.parser, handle_qmp_command, mon);
+     } else {
+         qemu_chr_fe_set_handlers(&mon->chr, monitor_can_read, monitor_read,
+                                  monitor_event, NULL, mon, NULL, true);
+     }
+-
+-    qemu_mutex_lock(&monitor_lock);
+-    QLIST_INSERT_HEAD(&mon_list, mon, entry);
+-    qemu_mutex_unlock(&monitor_lock);
  }
  
- QemuOptsList qemu_mon_opts = {
+ void monitor_cleanup(void)
 -- 
 2.14.3
