@@ -1,17 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54705)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54846)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1eMAg5-0002X2-E1
-	for qemu-devel@nongnu.org; Tue, 05 Dec 2017 05:42:23 -0500
+	(envelope-from <stefanha@redhat.com>) id 1eMAgI-0002k5-JA
+	for qemu-devel@nongnu.org; Tue, 05 Dec 2017 05:42:31 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1eMAg0-0002dk-Hl
-	for qemu-devel@nongnu.org; Tue, 05 Dec 2017 05:42:17 -0500
+	(envelope-from <stefanha@redhat.com>) id 1eMAgH-0002l4-Rm
+	for qemu-devel@nongnu.org; Tue, 05 Dec 2017 05:42:30 -0500
 From: Stefan Hajnoczi <stefanha@redhat.com>
-Date: Tue,  5 Dec 2017 10:41:36 +0000
-Message-Id: <20171205104141.28882-5-stefanha@redhat.com>
+Date: Tue,  5 Dec 2017 10:41:39 +0000
+Message-Id: <20171205104141.28882-8-stefanha@redhat.com>
 In-Reply-To: <20171205104141.28882-1-stefanha@redhat.com>
 References: <20171205104141.28882-1-stefanha@redhat.com>
-Subject: [Qemu-devel] [PATCH 4/9] block: don't keep AioContext acquired
- after blockdev_backup_prepare()
+Subject: [Qemu-devel] [PATCH 7/9] iothread: add iothread_by_id() API
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,112 +22,41 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: John Snow <jsnow@redhat.com>, qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>
 
+Encapsulate IOThread QOM object lookup so that callers don't need to
+know how and where IOThread objects live.
+
 Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
 ---
- blockdev.c | 44 ++++++++++++++++++++++++++++++++++----------
- 1 file changed, 34 insertions(+), 10 deletions(-)
+ include/sysemu/iothread.h | 1 +
+ iothread.c                | 7 +++++++
+ 2 files changed, 8 insertions(+)
 
-diff --git a/blockdev.c b/blockdev.c
-index 5a56a1abf2..d7ad76416e 100644
---- a/blockdev.c
-+++ b/blockdev.c
-@@ -1936,7 +1936,6 @@ typedef struct BlockdevBackupState {
-     BlkActionState common;
-     BlockDriverState *bs;
-     BlockJob *job;
--    AioContext *aio_context;
- } BlockdevBackupState;
+diff --git a/include/sysemu/iothread.h b/include/sysemu/iothread.h
+index 110329b2b4..55de1715c7 100644
+--- a/include/sysemu/iothread.h
++++ b/include/sysemu/iothread.h
+@@ -42,6 +42,7 @@ typedef struct {
+    OBJECT_CHECK(IOThread, obj, TYPE_IOTHREAD)
  
- static BlockJob *do_blockdev_backup(BlockdevBackup *backup, BlockJobTxn *txn,
-@@ -1947,6 +1946,7 @@ static void blockdev_backup_prepare(BlkActionState *common, Error **errp)
-     BlockdevBackupState *state = DO_UPCAST(BlockdevBackupState, common, common);
-     BlockdevBackup *backup;
-     BlockDriverState *bs, *target;
-+    AioContext *aio_context;
-     Error *local_err = NULL;
- 
-     assert(common->action->type == TRANSACTION_ACTION_KIND_BLOCKDEV_BACKUP);
-@@ -1962,29 +1962,39 @@ static void blockdev_backup_prepare(BlkActionState *common, Error **errp)
-         return;
-     }
- 
--    /* AioContext is released in .clean() */
--    state->aio_context = bdrv_get_aio_context(bs);
--    if (state->aio_context != bdrv_get_aio_context(target)) {
--        state->aio_context = NULL;
-+    aio_context = bdrv_get_aio_context(bs);
-+    if (aio_context != bdrv_get_aio_context(target)) {
-         error_setg(errp, "Backup between two IO threads is not implemented");
-         return;
-     }
--    aio_context_acquire(state->aio_context);
-+    aio_context_acquire(aio_context);
-     state->bs = bs;
-+
-+    /* Paired with .clean() */
-     bdrv_drained_begin(state->bs);
- 
-     state->job = do_blockdev_backup(backup, common->block_job_txn, &local_err);
-     if (local_err) {
-         error_propagate(errp, local_err);
--        return;
-+        goto out;
-     }
-+
-+out:
-+    aio_context_release(aio_context);
- }
- 
- static void blockdev_backup_commit(BlkActionState *common)
+ char *iothread_get_id(IOThread *iothread);
++IOThread *iothread_by_id(const char *id);
+ AioContext *iothread_get_aio_context(IOThread *iothread);
+ void iothread_stop_all(void);
+ GMainContext *iothread_get_g_main_context(IOThread *iothread);
+diff --git a/iothread.c b/iothread.c
+index 27a4288578..e7b93e02a3 100644
+--- a/iothread.c
++++ b/iothread.c
+@@ -380,3 +380,10 @@ void iothread_destroy(IOThread *iothread)
  {
-     BlockdevBackupState *state = DO_UPCAST(BlockdevBackupState, common, common);
-+    AioContext *aio_context;
-+
-+    aio_context = bdrv_get_aio_context(state->bs);
-+    aio_context_acquire(aio_context);
-+
-     assert(state->job);
-     block_job_start(state->job);
-+
-+    aio_context_release(aio_context);
+     object_unparent(OBJECT(iothread));
  }
- 
- static void blockdev_backup_abort(BlkActionState *common)
-@@ -1992,18 +2002,32 @@ static void blockdev_backup_abort(BlkActionState *common)
-     BlockdevBackupState *state = DO_UPCAST(BlockdevBackupState, common, common);
- 
-     if (state->job) {
-+        AioContext *aio_context;
 +
-+        aio_context = bdrv_get_aio_context(state->bs);
-+        aio_context_acquire(aio_context);
-+
-         block_job_cancel_sync(state->job);
-+
-+        aio_context_release(aio_context);
-     }
- }
- 
- static void blockdev_backup_clean(BlkActionState *common)
- {
-     BlockdevBackupState *state = DO_UPCAST(BlockdevBackupState, common, common);
-+    AioContext *aio_context;
- 
--    if (state->aio_context) {
--        bdrv_drained_end(state->bs);
--        aio_context_release(state->aio_context);
-+    if (!state->bs) {
-+        return;
-     }
-+
-+    aio_context = bdrv_get_aio_context(state->bs);
-+    aio_context_acquire(aio_context);
-+
-+    bdrv_drained_end(state->bs);
-+
-+    aio_context_release(aio_context);
- }
- 
- typedef struct BlockDirtyBitmapState {
++/* Lookup IOThread by its id.  Only finds user-created objects, not internal
++ * iothread_create() objects. */
++IOThread *iothread_by_id(const char *id)
++{
++    return IOTHREAD(object_resolve_path_type(id, TYPE_IOTHREAD, NULL));
++}
 -- 
 2.14.3
