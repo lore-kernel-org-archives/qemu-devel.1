@@ -1,24 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37279)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38900)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1eM4Tj-0001fh-BU
-	for qemu-devel@nongnu.org; Mon, 04 Dec 2017 23:05:08 -0500
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1eM4c7-0004x8-5V
+	for qemu-devel@nongnu.org; Mon, 04 Dec 2017 23:13:51 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1eM4Tg-00010m-4b
-	for qemu-devel@nongnu.org; Mon, 04 Dec 2017 23:05:07 -0500
-Date: Tue, 5 Dec 2017 14:38:51 +1100
-From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20171205033851.GE3057@umbus.fritz.box>
-References: <20171123132955.1261-1-clg@kaod.org>
-	<20171123132955.1261-21-clg@kaod.org>
-	<20171204074953.GS2130@umbus.fritz.box>
-	<cfcc553e-c283-a152-c26b-3452a4597324@kaod.org>
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1eM4c3-0006IY-TL
+	for qemu-devel@nongnu.org; Mon, 04 Dec 2017 23:13:47 -0500
+Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
+	<philippe.mathieu.daude@gmail.com>
+References: <1512154296-5652-1-git-send-email-peter.maydell@linaro.org>
+	<1512154296-5652-3-git-send-email-peter.maydell@linaro.org>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Message-ID: <b8fdafd1-d8d8-056f-681e-d5469dc79edd@amsat.org>
+Date: Tue, 5 Dec 2017 01:13:39 -0300
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="BZaMRJmqxGScZ8Mx"
-Content-Disposition: inline
-In-Reply-To: <cfcc553e-c283-a152-c26b-3452a4597324@kaod.org>
-Subject: Re: [Qemu-devel] [PATCH 20/25] spapr: add device tree support for
- the XIVE interrupt mode
+In-Reply-To: <1512154296-5652-3-git-send-email-peter.maydell@linaro.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [Qemu-arm] [PATCH 2/2] nvic: Make systick banked
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,235 +28,203 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?iso-8859-1?Q?C=E9dric?= Le Goater <clg@kaod.org>
-Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, Benjamin Herrenschmidt <benh@kernel.crashing.org>
+To: Peter Maydell <peter.maydell@linaro.org>, qemu-arm@nongnu.org, qemu-devel@nongnu.org
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, patches@linaro.org
 
+Hi Peter,
 
---BZaMRJmqxGScZ8Mx
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+On 12/01/2017 03:51 PM, Peter Maydell wrote:
+> For the v8M security extension, there should be two systick
+> devices, which use separate banked systick exceptions. The
+> register interface is banked in the same way as for other
+> banked registers, including the existence of an NS alias
+> region for secure code to access the nonsecure timer.
+> 
+> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+> ---
+>  include/hw/intc/armv7m_nvic.h |  4 ++-
+>  hw/intc/armv7m_nvic.c         | 81 ++++++++++++++++++++++++++++++++++++-------
+>  2 files changed, 72 insertions(+), 13 deletions(-)
+> 
+> diff --git a/include/hw/intc/armv7m_nvic.h b/include/hw/intc/armv7m_nvic.h
+> index ac7997c..8bc2911 100644
+> --- a/include/hw/intc/armv7m_nvic.h
+> +++ b/include/hw/intc/armv7m_nvic.h
+> @@ -78,13 +78,15 @@ typedef struct NVICState {
+>  
+>      MemoryRegion sysregmem;
+>      MemoryRegion sysreg_ns_mem;
+> +    MemoryRegion systickmem;
+> +    MemoryRegion systick_ns_mem;
+>      MemoryRegion container;
+>  
+>      uint32_t num_irq;
+>      qemu_irq excpout;
+>      qemu_irq sysresetreq;
+>  
+> -    SysTickState systick;
+> +    SysTickState systick[M_REG_NUM_BANKS];
+>  } NVICState;
+>  
+>  #endif
+> diff --git a/hw/intc/armv7m_nvic.c b/hw/intc/armv7m_nvic.c
+> index 63f2743..5cb44f4 100644
+> --- a/hw/intc/armv7m_nvic.c
+> +++ b/hw/intc/armv7m_nvic.c
+> @@ -1827,6 +1827,36 @@ static const MemoryRegionOps nvic_sysreg_ns_ops = {
+>      .endianness = DEVICE_NATIVE_ENDIAN,
+>  };
+>  
+> +static MemTxResult nvic_systick_write(void *opaque, hwaddr addr,
+> +                                      uint64_t value, unsigned size,
+> +                                      MemTxAttrs attrs)
+> +{
+> +    NVICState *s = opaque;
+> +    MemoryRegion *mr;
+> +
+> +    /* Direct the access to the correct systick */
+> +    mr = sysbus_mmio_get_region(SYS_BUS_DEVICE(&s->systick[attrs.secure]), 0);
+> +    return memory_region_dispatch_write(mr, addr, value, size, attrs);
+> +}
+> +
+> +static MemTxResult nvic_systick_read(void *opaque, hwaddr addr,
+> +                                     uint64_t *data, unsigned size,
+> +                                     MemTxAttrs attrs)
+> +{
+> +    NVICState *s = opaque;
+> +    MemoryRegion *mr;
+> +
+> +    /* Direct the access to the correct systick */
+> +    mr = sysbus_mmio_get_region(SYS_BUS_DEVICE(&s->systick[attrs.secure]), 0);
+> +    return memory_region_dispatch_read(mr, addr, data, size, attrs);
+> +}
+> +
+> +static const MemoryRegionOps nvic_systick_ops = {
+> +    .read_with_attrs = nvic_systick_read,
+> +    .write_with_attrs = nvic_systick_write,
+> +    .endianness = DEVICE_NATIVE_ENDIAN,
+> +};
+> +
+>  static int nvic_post_load(void *opaque, int version_id)
+>  {
+>      NVICState *s = opaque;
+> @@ -2005,17 +2035,16 @@ static void nvic_systick_trigger(void *opaque, int n, int level)
+>          /* SysTick just asked us to pend its exception.
+>           * (This is different from an external interrupt line's
+>           * behaviour.)
+> -         * TODO: when we implement the banked systicks we must make
+> -         * this pend the correct banked exception.
+> +         * n == 0 : NonSecure systick
+> +         * n == 1 : Secure systick
+>           */
+> -        armv7m_nvic_set_pending(s, ARMV7M_EXCP_SYSTICK, false);
+> +        armv7m_nvic_set_pending(s, ARMV7M_EXCP_SYSTICK, n);
+>      }
+>  }
+>  
+>  static void armv7m_nvic_realize(DeviceState *dev, Error **errp)
+>  {
+>      NVICState *s = NVIC(dev);
+> -    SysBusDevice *systick_sbd;
+>      Error *err = NULL;
+>      int regionlen;
+>  
+> @@ -2032,15 +2061,30 @@ static void armv7m_nvic_realize(DeviceState *dev, Error **errp)
+>      /* include space for internal exception vectors */
+>      s->num_irq += NVIC_FIRST_IRQ;
+>  
+> -    object_property_set_bool(OBJECT(&s->systick), true, "realized", &err);
+> +    object_property_set_bool(OBJECT(&s->systick[M_REG_NS]), true,
+> +                             "realized", &err);
+>      if (err != NULL) {
+>          error_propagate(errp, err);
+>          return;
+>      }
+> -    systick_sbd = SYS_BUS_DEVICE(&s->systick);
+> -    sysbus_connect_irq(systick_sbd, 0,
+> +    sysbus_connect_irq(SYS_BUS_DEVICE(&s->systick[M_REG_NS]), 0,
+>                         qdev_get_gpio_in_named(dev, "systick-trigger", 0));
+>  
+> +    if (arm_feature(&s->cpu->env, ARM_FEATURE_M_SECURITY)) {
+> +        object_initialize(&s->systick[M_REG_S], sizeof(s->systick[M_REG_NS]),
+> +                          TYPE_SYSTICK);
+> +        qdev_set_parent_bus(DEVICE(&s->systick[M_REG_S]), sysbus_get_default());
 
-On Mon, Dec 04, 2017 at 05:19:03PM +0100, C=E9dric Le Goater wrote:
-> On 12/04/2017 08:49 AM, David Gibson wrote:
-> > On Thu, Nov 23, 2017 at 02:29:50PM +0100, C=E9dric Le Goater wrote:
-> >> The XIVE interface for the guest is described in the device tree under
-> >> the "interrupt-controller" node. A couple of new properties are
-> >> specific to XIVE :
-> >>
-> >>  - "reg"
-> >>
-> >>    contains the base address and size of the thread interrupt
-> >>    managnement areas (TIMA), also called rings, for the User level and
-> >>    for the Guest OS level. Only the Guest OS level is taken into
-> >>    account today.
-> >>
-> >>  - "ibm,xive-eq-sizes"
-> >>
-> >>    the size of the event queues. One cell per size supported, contains
-> >>    log2 of size, in ascending order.
-> >>
-> >>  - "ibm,xive-lisn-ranges"
-> >>
-> >>    the interrupt numbers ranges assigned to the guest. These are
-> >>    allocated using a simple bitmap.
-> >>
-> >> and also under the root node :
-> >>
-> >>  - "ibm,plat-res-int-priorities"
-> >>
-> >>    contains a list of priorities that the hypervisor has reserved for
-> >>    its own use. Simulate ranges as defined by the PowerVM Hypervisor.
-> >>
-> >> When the XIVE interrupt mode is activated after the CAS negotiation,
-> >> the machine will perform a reboot to rebuild the device tree.
-> >>
-> >> Signed-off-by: C=E9dric Le Goater <clg@kaod.org>
-> >> ---
-> >>  hw/intc/spapr_xive_hcall.c  | 50 ++++++++++++++++++++++++++++++++++++=
-+++++++++
-> >>  hw/ppc/spapr.c              |  7 ++++++-
-> >>  hw/ppc/spapr_hcall.c        |  6 ++++++
-> >>  include/hw/ppc/spapr_xive.h |  2 ++
-> >>  4 files changed, 64 insertions(+), 1 deletion(-)
-> >>
-> >> diff --git a/hw/intc/spapr_xive_hcall.c b/hw/intc/spapr_xive_hcall.c
-> >> index 676fe0e2d5c7..60c6c9f4be8f 100644
-> >> --- a/hw/intc/spapr_xive_hcall.c
-> >> +++ b/hw/intc/spapr_xive_hcall.c
-> >> @@ -883,3 +883,53 @@ void spapr_xive_hcall_init(sPAPRMachineState *spa=
-pr)
-> >>      spapr_register_hypercall(H_INT_SYNC, h_int_sync);
-> >>      spapr_register_hypercall(H_INT_RESET, h_int_reset);
-> >>  }
-> >> +
-> >> +void spapr_xive_populate(sPAPRMachineState *spapr, int nr_servers,
-> >> +                         void *fdt, uint32_t phandle)
-> >=20
-> > Call it spapr_dt_xive() please, I'm trying to standardize on that
-> > pattern for functions creating DT pieces.
->=20
-> OK. And what about the first argument : sPAPRMachineState *spapr=20
-> or sPAPRXive *xive ? I tend to prefer the first option because
-> it's related to the interface with the guest, like the hcalls.
+I got stuck here some time wondering why you init the S systick in this
+realize(), then continue and read your comment in
+armv7m_nvic_instance_init() and it made sens. I'm tempted to add a
+similar comment here.
 
-Yes, using the MachineState as the first parameter is fine.
+> +
+> +        object_property_set_bool(OBJECT(&s->systick[M_REG_S]), true,
+> +                                 "realized", &err);
+> +        if (err != NULL) {
+> +            error_propagate(errp, err);
+> +            return;
+> +        }
+> +        sysbus_connect_irq(SYS_BUS_DEVICE(&s->systick[M_REG_S]), 0,
+> +                           qdev_get_gpio_in_named(dev, "systick-trigger", 1));
+> +    }
+> +
+>      /* The NVIC and System Control Space (SCS) starts at 0xe000e000
+>       * and looks like this:
+>       *  0x004 - ICTR
+> @@ -2073,15 +2117,24 @@ static void armv7m_nvic_realize(DeviceState *dev, Error **errp)
+>      memory_region_init_io(&s->sysregmem, OBJECT(s), &nvic_sysreg_ops, s,
+>                            "nvic_sysregs", 0x1000);
+>      memory_region_add_subregion(&s->container, 0, &s->sysregmem);
+> +
+> +    memory_region_init_io(&s->systickmem, OBJECT(s),
+> +                          &nvic_systick_ops, s,
+> +                          "nvic_systick", 0xe0);
+> +
+>      memory_region_add_subregion_overlap(&s->container, 0x10,
+> -                                        sysbus_mmio_get_region(systick_sbd, 0),
+> -                                        1);
+> +                                        &s->systickmem, 1);
+>  
+>      if (arm_feature(&s->cpu->env, ARM_FEATURE_V8)) {
+>          memory_region_init_io(&s->sysreg_ns_mem, OBJECT(s),
+>                                &nvic_sysreg_ns_ops, &s->sysregmem,
+>                                "nvic_sysregs_ns", 0x1000);
+>          memory_region_add_subregion(&s->container, 0x20000, &s->sysreg_ns_mem);
+> +        memory_region_init_io(&s->systick_ns_mem, OBJECT(s),
+> +                              &nvic_sysreg_ns_ops, &s->systickmem,
+> +                              "nvic_systick_ns", 0xe0);
+> +        memory_region_add_subregion_overlap(&s->container, 0x20010,
+> +                                            &s->systick_ns_mem, 1);
+>      }
+>  
+>      sysbus_init_mmio(SYS_BUS_DEVICE(dev), &s->container);
+> @@ -2099,12 +2152,16 @@ static void armv7m_nvic_instance_init(Object *obj)
+>      NVICState *nvic = NVIC(obj);
+>      SysBusDevice *sbd = SYS_BUS_DEVICE(obj);
+>  
+> -    object_initialize(&nvic->systick, sizeof(nvic->systick), TYPE_SYSTICK);
+> -    qdev_set_parent_bus(DEVICE(&nvic->systick), sysbus_get_default());
+> +    object_initialize(&nvic->systick[M_REG_NS],
+> +                      sizeof(nvic->systick[M_REG_NS]), TYPE_SYSTICK);
+> +    qdev_set_parent_bus(DEVICE(&nvic->systick[M_REG_NS]), sysbus_get_default());
+> +    /* We can't initialize the secure systick here, as we don't know
+> +     * yet if we need it.
+> +     */
+>  
+>      sysbus_init_irq(sbd, &nvic->excpout);
+>      qdev_init_gpio_out_named(dev, &nvic->sysresetreq, "SYSRESETREQ", 1);
+> -    qdev_init_gpio_in_named(dev, nvic_systick_trigger, "systick-trigger", 1);
+> +    qdev_init_gpio_in_named(dev, nvic_systick_trigger, "systick-trigger", 2);
 
->=20
-> >=20
-> >> +{
-> >> +    sPAPRXive *xive =3D spapr->xive;
-> >> +    int node;
-> >> +    uint64_t timas[2 * 2];
-> >> +    uint32_t lisn_ranges[] =3D {
-> >> +        cpu_to_be32(0),
-> >> +        cpu_to_be32(nr_servers),
-> >> +    };
-> >> +    uint32_t eq_sizes[] =3D {
-> >> +        cpu_to_be32(12), /* 4K */
-> >> +        cpu_to_be32(16), /* 64K */
-> >> +        cpu_to_be32(21), /* 2M */
-> >> +        cpu_to_be32(24), /* 16M */
-> >> +    };
-> >> +    uint32_t plat_res_int_priorities[ARRAY_SIZE(reserved_priorities)];
-> >> +    int i;
-> >> +
-> >> +    for (i =3D 0; i < ARRAY_SIZE(plat_res_int_priorities); i++) {
-> >> +        plat_res_int_priorities[i] =3D cpu_to_be32(reserved_prioritie=
-s[i]);
-> >> +    }
-> >> +
-> >> +    /* Thread Interrupt Management Areas : User and OS */
-> >> +    for (i =3D 0; i < 2; i++) {
-> >> +        timas[i * 2] =3D cpu_to_be64(xive->tm_base + i * (1 << xive->=
-tm_shift));
-> >> +        timas[i * 2 + 1] =3D cpu_to_be64(1 << xive->tm_shift);
-> >> +    }
-> >> +
-> >> +    _FDT(node =3D fdt_add_subnode(fdt, 0, "interrupt-controller"));
-> >=20
-> > You need a unit address here matching the reg property.
->=20
-> Indeed. I didn't notice. Curiously it was taking the first address=20
-> specified in the reg property of the node.
+Using this #define helps (me) while reviewing:
 
-I'm guessing that's SLOF's intervention.
+    qdev_init_gpio_in_named(dev, nvic_systick_trigger,
+                            "systick-trigger", M_REG_NUM_BANKS);
 
->=20
-> >> +
-> >> +    _FDT(fdt_setprop_string(fdt, node, "name", "interrupt-controller"=
-));
-> >=20
-> > You don't need to set name properties explicitly for flattened trees.
->=20
-> OK.
->=20
-> Thanks,
->=20
-> C.=20
->=20
->=20
->=20
-> >> +    _FDT(fdt_setprop_string(fdt, node, "device_type", "power-ivpe"));
-> >> +    _FDT(fdt_setprop(fdt, node, "reg", timas, sizeof(timas)));
-> >> +
-> >> +    _FDT(fdt_setprop_string(fdt, node, "compatible", "ibm,power-ivpe"=
-));
-> >> +    _FDT(fdt_setprop(fdt, node, "ibm,xive-eq-sizes", eq_sizes,
-> >> +                     sizeof(eq_sizes)));
-> >> +    _FDT(fdt_setprop(fdt, node, "ibm,xive-lisn-ranges", lisn_ranges,
-> >> +                     sizeof(lisn_ranges)));
-> >> +
-> >> +    /* For SLOF */
-> >> +    _FDT(fdt_setprop_cell(fdt, node, "linux,phandle", phandle));
-> >> +    _FDT(fdt_setprop_cell(fdt, node, "phandle", phandle));
-> >> +
-> >> +    /* top properties */
-> >> +    _FDT(fdt_setprop(fdt, 0, "ibm,plat-res-int-priorities",
-> >> +                     plat_res_int_priorities, sizeof(plat_res_int_pri=
-orities)));
-> >> +}
-> >> diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-> >> index 8b15c0b500d0..3a62369883cc 100644
-> >> --- a/hw/ppc/spapr.c
-> >> +++ b/hw/ppc/spapr.c
-> >> @@ -1127,7 +1127,12 @@ static void *spapr_build_fdt(sPAPRMachineState =
-*spapr,
-> >>      _FDT(fdt_setprop_cell(fdt, 0, "#size-cells", 2));
-> >> =20
-> >>      /* /interrupt controller */
-> >> -    spapr_dt_xics(xics_max_server_number(), fdt, PHANDLE_XICP);
-> >> +    if (!spapr_ovec_test(spapr->ov5_cas, OV5_XIVE_EXPLOIT)) {
-> >> +        spapr_dt_xics(xics_max_server_number(), fdt, PHANDLE_XICP);
-> >> +    } else {
-> >> +        /* Populate device tree for XIVE */
-> >> +        spapr_xive_populate(spapr, xics_max_server_number(), fdt, PHA=
-NDLE_XICP);
-> >> +    }
-> >> =20
-> >>      ret =3D spapr_populate_memory(spapr, fdt);
-> >>      if (ret < 0) {
-> >> diff --git a/hw/ppc/spapr_hcall.c b/hw/ppc/spapr_hcall.c
-> >> index be22a6b2895f..e2a1665beee9 100644
-> >> --- a/hw/ppc/spapr_hcall.c
-> >> +++ b/hw/ppc/spapr_hcall.c
-> >> @@ -1646,6 +1646,12 @@ static target_ulong h_client_architecture_suppo=
-rt(PowerPCCPU *cpu,
-> >>              (spapr_h_cas_compose_response(spapr, args[1], args[2],
-> >>                                            ov5_updates) !=3D 0);
-> >>      }
-> >> +
-> >> +    /* We need to rebuild the device tree for XIVE, generate a reset =
-*/
-> >> +    if (!spapr->cas_reboot) {
-> >> +        spapr->cas_reboot =3D spapr_ovec_test(ov5_updates, OV5_XIVE_E=
-XPLOIT);
-> >> +    }
-> >> +
-> >>      spapr_ovec_cleanup(ov5_updates);
-> >> =20
-> >>      if (spapr->cas_reboot) {
-> >> diff --git a/include/hw/ppc/spapr_xive.h b/include/hw/ppc/spapr_xive.h
-> >> index 3f822220647f..f6d4bf26e06a 100644
-> >> --- a/include/hw/ppc/spapr_xive.h
-> >> +++ b/include/hw/ppc/spapr_xive.h
-> >> @@ -82,5 +82,7 @@ void spapr_xive_icp_pic_print_info(sPAPRXiveICP *xic=
-p, Monitor *mon);
-> >>  typedef struct sPAPRMachineState sPAPRMachineState;
-> >> =20
-> >>  void spapr_xive_hcall_init(sPAPRMachineState *spapr);
-> >> +void spapr_xive_populate(sPAPRMachineState *spapr, int nr_servers, vo=
-id *fdt,
-> >> +                         uint32_t phandle);
-> >> =20
-> >>  #endif /* PPC_SPAPR_XIVE_H */
-> >=20
->=20
+One more line but you are still under a 100 diffstat series ;)
 
---=20
-David Gibson			| I'll have my music baroque, and my code
-david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
-				| _way_ _around_!
-http://www.ozlabs.org/~dgibson
+Anyway:
+Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 
---BZaMRJmqxGScZ8Mx
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlomFMkACgkQbDjKyiDZ
-s5JuHRAA3pXppnCJc0J5X74UAkIk/f4YqLwJonBZPCpPICqIceAxOvFDLS3iPndD
-7XemKqjeab8/Dfv5zhlqLdz1dhr9KtqYUhNgKA+Inq5E+LkW0wDHuPDsrLCKqy0o
-39hO2cTrERFc1u+iJxdSrKyB/G4o1teTntFzmpbDg5cvmPiAG0M/JO0MpLw/1qZL
-y830NcSgyy2F17Npbmpt9diFx4HcqDr2zF52xnOZHdA07wb/iRpqmCsUa8uoMODA
-xh2JK10qX9wMQplf+QzMW1ipje4reH2CooLWTrjPnDXYPoGutJ+KtDVcdoUAi6Jp
-rcrbr/F91YziycYTxh8f4+FmPQAhFkfDkNx5RvB/8RcsRiPY0+Qk8wK/HWSwXJCo
-3meEUwQoRWfmahonivD1NIBRb0MWVuwWavQklIEeGHFRdGGNYNKKPi1O9vI74p3+
-g1peL+zmPc4qCzsoRKzzkd41FvpOQSZ6j8F5HRi/K15HJf5CpQ8fQF3rrtTXZl2G
-NXr9u0K/R40WaLMoOYrE/M7/65VBhuHLYLpi48msEewBLbVwYfCf2euvgPSviDpu
-I0U1m9YFRpeIM8AEcENBiBWf4Eu8tSPo2DPIRNqnn0ChQJ2u6ylxBNDgoDNGrdg8
-sncXjIAnAQF3VUqM2fhLLzrJejT76TmXnbDIEkzSpf/7qUrnLSw=
-=l2Q+
------END PGP SIGNATURE-----
-
---BZaMRJmqxGScZ8Mx--
+>  }
+>  
+>  static void armv7m_nvic_class_init(ObjectClass *klass, void *data)
+> 
