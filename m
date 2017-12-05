@@ -1,17 +1,35 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54863)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60078)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1eMAgJ-0002lK-On
-	for qemu-devel@nongnu.org; Tue, 05 Dec 2017 05:42:33 -0500
+	(envelope-from <clg@kaod.org>) id 1eMAw2-0007sd-GW
+	for qemu-devel@nongnu.org; Tue, 05 Dec 2017 05:58:47 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1eMAgI-0002lk-Ha
-	for qemu-devel@nongnu.org; Tue, 05 Dec 2017 05:42:31 -0500
-From: Stefan Hajnoczi <stefanha@redhat.com>
-Date: Tue,  5 Dec 2017 10:41:41 +0000
-Message-Id: <20171205104141.28882-10-stefanha@redhat.com>
-In-Reply-To: <20171205104141.28882-1-stefanha@redhat.com>
-References: <20171205104141.28882-1-stefanha@redhat.com>
-Subject: [Qemu-devel] [PATCH 9/9] qemu-iotests: add 202 external snapshots
- IOThread test
+	(envelope-from <clg@kaod.org>) id 1eMAvy-0001gG-Kp
+	for qemu-devel@nongnu.org; Tue, 05 Dec 2017 05:58:46 -0500
+Received: from 3.mo68.mail-out.ovh.net ([46.105.58.60]:51665)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1eMAvy-0001d7-F2
+	for qemu-devel@nongnu.org; Tue, 05 Dec 2017 05:58:42 -0500
+Received: from player698.ha.ovh.net (b7.ovh.net [213.186.33.57])
+	by mo68.mail-out.ovh.net (Postfix) with ESMTP id 13E4FA627A
+	for <qemu-devel@nongnu.org>; Tue,  5 Dec 2017 11:58:29 +0100 (CET)
+References: <20171123132955.1261-1-clg@kaod.org>
+	<20171123132955.1261-15-clg@kaod.org>
+	<20171130044922.GC3023@umbus.fritz.box>
+	<36b5b7a1-63f1-30ac-0fa6-a22b49df065f@kaod.org>
+	<20171201041015.GE30161@umbus.fritz.box>
+	<1512225938.2224.69.camel@kernel.crashing.org>
+	<1512225979.2224.70.camel@au1.ibm.com>
+	<20171204012029.GI2130@umbus.fritz.box>
+From: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
+Message-ID: <5590f7f8-f2f8-f404-d6bc-a28a04853c3b@kaod.org>
+Date: Tue, 5 Dec 2017 10:58:23 +0000
+MIME-Version: 1.0
+In-Reply-To: <20171204012029.GI2130@umbus.fritz.box>
+Content-Type: text/plain; charset=windows-1252
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH 14/25] spapr: push the XIVE EQ data in OS
+ event queue
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -20,149 +38,42 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: John Snow <jsnow@redhat.com>, qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>
+To: David Gibson <david@gibson.dropbear.id.au>, Benjamin Herrenschmidt <benh@au1.ibm.com>
+Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org
 
-QMP 'transaction' blockdev-snapshot-sync with multiple disks in an
-IOThread is an untested code path.  Several bugs have been found in
-connection with this command.  This patch adds a test case to prevent
-future regressions.
+On 12/04/2017 01:20 AM, David Gibson wrote:
+> On Sat, Dec 02, 2017 at 08:46:19AM -0600, Benjamin Herrenschmidt wrote:
+>> On Sat, 2017-12-02 at 08:45 -0600, Benjamin Herrenschmidt wrote:
+>>> On Fri, 2017-12-01 at 15:10 +1100, David Gibson wrote:
+>>>>
+>>>> Hm, ok.  Guest endian (or at least, not definitively host-endian) data
+>>>> in a plain uint32_t makes me uncomfortable.  Could we use char data[4]
+>>>> instead, to make it clear it's a byte-ordered buffer, rather than a
+>>>> number as far as the XIVE is concerned.
+>>>>
+>>>> Hm.. except that doesn't quite work, because the hardware must define
+>>>> which end that generation bit ends up in...
+>>>
+>>> It also needs to be written atomically. Just say it's big endian.
+>>
+>> Also the guest reads it using be32_to_cpup...
+> 
+> Ok.  Definitely should be treated as BE and read/written with the be32
+> DMA helper functions.
+> 
 
-Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
----
- tests/qemu-iotests/202     | 95 ++++++++++++++++++++++++++++++++++++++++++++++
- tests/qemu-iotests/202.out | 11 ++++++
- tests/qemu-iotests/group   |  1 +
- 3 files changed, 107 insertions(+)
- create mode 100755 tests/qemu-iotests/202
- create mode 100644 tests/qemu-iotests/202.out
+hmm, the stl_be_dma does not return errors but dma_memory_write()
+does. 
 
-diff --git a/tests/qemu-iotests/202 b/tests/qemu-iotests/202
-new file mode 100755
-index 0000000000..581ca34d79
---- /dev/null
-+++ b/tests/qemu-iotests/202
-@@ -0,0 +1,95 @@
-+#!/usr/bin/env python
-+#
-+# Copyright (C) 2017 Red Hat, Inc.
-+#
-+# This program is free software; you can redistribute it and/or modify
-+# it under the terms of the GNU General Public License as published by
-+# the Free Software Foundation; either version 2 of the License, or
-+# (at your option) any later version.
-+#
-+# This program is distributed in the hope that it will be useful,
-+# but WITHOUT ANY WARRANTY; without even the implied warranty of
-+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+# GNU General Public License for more details.
-+#
-+# You should have received a copy of the GNU General Public License
-+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
-+#
-+# Creator/Owner: Stefan Hajnoczi <stefanha@redhat.com>
-+#
-+# Check that QMP 'transaction' blockdev-snapshot-sync with multiple drives on a
-+# single IOThread completes successfully.  This particular command triggered a
-+# hang due to recursive AioContext locking and BDRV_POLL_WHILE().  Protect
-+# against regressions.
-+
-+import iotests
-+
-+iotests.verify_image_format(supported_fmts=['qcow2'])
-+iotests.verify_platform(['linux'])
-+
-+with iotests.FilePath('disk0.img') as disk0_img_path, \
-+     iotests.FilePath('disk1.img') as disk1_img_path, \
-+     iotests.FilePath('disk0-snap.img') as disk0_snap_img_path, \
-+     iotests.FilePath('disk1-snap.img') as disk1_snap_img_path, \
-+     iotests.VM() as vm:
-+
-+    img_size = '10M'
-+    iotests.qemu_img_pipe('create', '-f', iotests.imgfmt, disk0_img_path, img_size)
-+    iotests.qemu_img_pipe('create', '-f', iotests.imgfmt, disk1_img_path, img_size)
-+
-+    iotests.log('Launching VM...')
-+    vm.launch()
-+
-+    iotests.log('Adding IOThread...')
-+    iotests.log(vm.qmp('object-add',
-+                       qom_type='iothread',
-+                       id='iothread0'))
-+
-+    iotests.log('Adding blockdevs...')
-+    iotests.log(vm.qmp('blockdev-add',
-+                       driver=iotests.imgfmt,
-+                       node_name='disk0',
-+                       file={
-+                           'driver': 'file',
-+                           'filename': disk0_img_path,
-+                       }))
-+    iotests.log(vm.qmp('blockdev-add',
-+                       driver=iotests.imgfmt,
-+                       node_name='disk1',
-+                       file={
-+                           'driver': 'file',
-+                           'filename': disk1_img_path,
-+                       }))
-+
-+    iotests.log('Setting iothread...')
-+    iotests.log(vm.qmp('x-blockdev-set-iothread',
-+                       node_name='disk0',
-+                       iothread='iothread0'))
-+    iotests.log(vm.qmp('x-blockdev-set-iothread',
-+                       node_name='disk1',
-+                       iothread='iothread0'))
-+
-+    iotests.log('Creating external snapshots...')
-+    iotests.log(vm.qmp(
-+                  'transaction',
-+                  actions=[
-+                      {
-+                          'data': {
-+                              'node-name': 'disk0',
-+                              'snapshot-file': disk0_snap_img_path,
-+                              'snapshot-node-name': 'disk0-snap',
-+                              'mode': 'absolute-paths',
-+                              'format': iotests.imgfmt,
-+                          },
-+                          'type': 'blockdev-snapshot-sync'
-+                      }, {
-+                          'data': {
-+                              'node-name': 'disk1',
-+                              'snapshot-file': disk1_snap_img_path,
-+                              'snapshot-node-name': 'disk1-snap',
-+                              'mode': 'absolute-paths',
-+                              'format': iotests.imgfmt
-+                          },
-+                          'type': 'blockdev-snapshot-sync'
-+                      }
-+                  ]))
-diff --git a/tests/qemu-iotests/202.out b/tests/qemu-iotests/202.out
-new file mode 100644
-index 0000000000..d5ea374e17
---- /dev/null
-+++ b/tests/qemu-iotests/202.out
-@@ -0,0 +1,11 @@
-+Launching VM...
-+Adding IOThread...
-+{u'return': {}}
-+Adding blockdevs...
-+{u'return': {}}
-+{u'return': {}}
-+Setting iothread...
-+{u'return': {}}
-+{u'return': {}}
-+Creating external snapshots...
-+{u'return': {}}
-diff --git a/tests/qemu-iotests/group b/tests/qemu-iotests/group
-index 3e688678dd..d0ee1e2e55 100644
---- a/tests/qemu-iotests/group
-+++ b/tests/qemu-iotests/group
-@@ -197,3 +197,4 @@
- 197 rw auto quick
- 198 rw auto
- 200 rw auto
-+202 rw auto quick
--- 
-2.14.3
+    static inline void st##_sname##_##_end##_dma(AddressSpace *as,      \
+                                                 dma_addr_t addr,       \
+                                                 uint##_bits##_t val)   \
+    {                                                                   \
+        val = cpu_to_##_end##_bits(val);                                \
+        dma_memory_write(as, addr, &val, (_bits) / 8);                  \
+    }
+
+These macros seem to be only used by spapr_vio and nvram. I can probably 
+change them.
+
+C.
