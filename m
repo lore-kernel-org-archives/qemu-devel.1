@@ -1,25 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46366)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47392)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1eM5As-0001ji-F4
-	for qemu-devel@nongnu.org; Mon, 04 Dec 2017 23:49:43 -0500
+	(envelope-from <no-reply@patchew.org>) id 1eM5Ej-0003qR-QZ
+	for qemu-devel@nongnu.org; Mon, 04 Dec 2017 23:53:43 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1eM5Ap-0002T1-Al
-	for qemu-devel@nongnu.org; Mon, 04 Dec 2017 23:49:42 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:43590)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1eM5Ap-0002Sd-46
-	for qemu-devel@nongnu.org; Mon, 04 Dec 2017 23:49:39 -0500
-Date: Tue, 5 Dec 2017 06:49:05 +0200
-From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <20171205064753-mutt-send-email-mst@kernel.org>
-References: <20171129084628.12336-1-david@gibson.dropbear.id.au>
-	<151194617493.816.13426298875361921541@bafd83ae6430>
-	<20171129091847.GC12220@lemon>
+	(envelope-from <no-reply@patchew.org>) id 1eM5Eg-0004fv-Mr
+	for qemu-devel@nongnu.org; Mon, 04 Dec 2017 23:53:41 -0500
+Resent-Message-Id: <E1eM5Eg-0004fv-Mr@eggs.gnu.org>
+Received: from sender-of-o52.zoho.com ([135.84.80.217]:21344)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
+	id 1eM5Eg-0004fa-E3
+	for qemu-devel@nongnu.org; Mon, 04 Dec 2017 23:53:38 -0500
+Reply-To: <qemu-devel@nongnu.org>
+Message-ID: <151244958413.1032.6304671302840280210@bafd83ae6430>
+In-Reply-To: <20171205044844.3597-1-richard.henderson@linaro.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20171129091847.GC12220@lemon>
-Subject: Re: [Qemu-devel] [for-2.12 0/7] PCI cleanups
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+From: no-reply@patchew.org
+Date: Mon, 4 Dec 2017 20:53:04 -0800 (PST)
+Subject: Re: [Qemu-devel] [PATCH v2] linux-user: Use *at functions instead
+ of caching interp_prefix contents
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,18 +29,67 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Fam Zheng <famz@redhat.com>
-Cc: qemu-devel@nongnu.org, david@gibson.dropbear.id.au, ehabkost@redhat.com, marcel@redhat.com, imammedo@redhat.com
+To: richard.henderson@linaro.org
+Cc: famz@redhat.com, qemu-devel@nongnu.org, peter.maydell@linaro.org, rth@twiddle.net
 
-On Wed, Nov 29, 2017 at 05:18:47PM +0800, Fam Zheng wrote:
-> On Wed, 11/29 01:02, no-reply@patchew.org wrote:
-> > /tmp/cc3Czn0R.s: Fatal error: can't write 3947 bytes to section .debug_str of hw/arm/virt-acpi-build.o because: 'No space left on device'
-> 
-> Hmm, the host is shared and what I have is a normal user account, so there is no
-> control over disk space availability.  Anyway this is completely unrelated to
-> this series. Sorry for the noise.
-> 
-> Fam
-
-Could you disable this until you have the time to detect disk full
-errors?  You are training people to ignore this bot, not a good thing.
+SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
+LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKU3ViamVjdDogW1FlbXUt
+ZGV2ZWxdIFtQQVRDSCB2Ml0gbGludXgtdXNlcjogVXNlICphdCBmdW5jdGlvbnMgaW5zdGVhZCBv
+ZiBjYWNoaW5nIGludGVycF9wcmVmaXggY29udGVudHMKVHlwZTogc2VyaWVzCk1lc3NhZ2UtaWQ6
+IDIwMTcxMjA1MDQ0ODQ0LjM1OTctMS1yaWNoYXJkLmhlbmRlcnNvbkBsaW5hcm8ub3JnCgo9PT0g
+VEVTVCBTQ1JJUFQgQkVHSU4gPT09CiMhL2Jpbi9iYXNoCgpCQVNFPWJhc2UKbj0xCnRvdGFsPSQo
+Z2l0IGxvZyAtLW9uZWxpbmUgJEJBU0UuLiB8IHdjIC1sKQpmYWlsZWQ9MAoKZ2l0IGNvbmZpZyAt
+LWxvY2FsIGRpZmYucmVuYW1lbGltaXQgMApnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVz
+IFRydWUKCmNvbW1pdHM9IiQoZ2l0IGxvZyAtLWZvcm1hdD0lSCAtLXJldmVyc2UgJEJBU0UuLiki
+CmZvciBjIGluICRjb21taXRzOyBkbwogICAgZWNobyAiQ2hlY2tpbmcgUEFUQ0ggJG4vJHRvdGFs
+OiAkKGdpdCBsb2cgLW4gMSAtLWZvcm1hdD0lcyAkYykuLi4iCiAgICBpZiAhIGdpdCBzaG93ICRj
+IC0tZm9ybWF0PWVtYWlsIHwgLi9zY3JpcHRzL2NoZWNrcGF0Y2gucGwgLS1tYWlsYmFjayAtOyB0
+aGVuCiAgICAgICAgZmFpbGVkPTEKICAgICAgICBlY2hvCiAgICBmaQogICAgbj0kKChuKzEpKQpk
+b25lCgpleGl0ICRmYWlsZWQKPT09IFRFU1QgU0NSSVBUIEVORCA9PT0KClVwZGF0aW5nIDNjOGNm
+NWE5YzIxZmY4NzgyMTY0ZDFkZWY3ZjQ0YmQ4ODg3MTMzODQKRnJvbSBodHRwczovL2dpdGh1Yi5j
+b20vcGF0Y2hldy1wcm9qZWN0L3FlbXUKIHQgW3RhZyB1cGRhdGVdICAgICAgICAgICAgcGF0Y2hl
+dy8xNTEwMDg3NjExLTE4NTEtMS1naXQtc2VuZC1lbWFpbC1jb3RhQGJyYWFwLm9yZyAtPiBwYXRj
+aGV3LzE1MTAwODc2MTEtMTg1MS0xLWdpdC1zZW5kLWVtYWlsLWNvdGFAYnJhYXAub3JnCiB0IFt0
+YWcgdXBkYXRlXSAgICAgICAgICAgIHBhdGNoZXcvMTUxMjE1NDI5Ni01NjUyLTEtZ2l0LXNlbmQt
+ZW1haWwtcGV0ZXIubWF5ZGVsbEBsaW5hcm8ub3JnIC0+IHBhdGNoZXcvMTUxMjE1NDI5Ni01NjUy
+LTEtZ2l0LXNlbmQtZW1haWwtcGV0ZXIubWF5ZGVsbEBsaW5hcm8ub3JnCiAqIFtuZXcgdGFnXSAg
+ICAgICAgICAgICAgIHBhdGNoZXcvMjAxNzEyMDUwNDQ4NDQuMzU5Ny0xLXJpY2hhcmQuaGVuZGVy
+c29uQGxpbmFyby5vcmcgLT4gcGF0Y2hldy8yMDE3MTIwNTA0NDg0NC4zNTk3LTEtcmljaGFyZC5o
+ZW5kZXJzb25AbGluYXJvLm9yZwpTd2l0Y2hlZCB0byBhIG5ldyBicmFuY2ggJ3Rlc3QnCjg4Yjg2
+ODFkNTcgbGludXgtdXNlcjogVXNlICphdCBmdW5jdGlvbnMgaW5zdGVhZCBvZiBjYWNoaW5nIGlu
+dGVycF9wcmVmaXggY29udGVudHMKCj09PSBPVVRQVVQgQkVHSU4gPT09CkNoZWNraW5nIFBBVENI
+IDEvMTogbGludXgtdXNlcjogVXNlICphdCBmdW5jdGlvbnMgaW5zdGVhZCBvZiBjYWNoaW5nIGlu
+dGVycF9wcmVmaXggY29udGVudHMuLi4KRVJST1I6IGRvIG5vdCB1c2UgYXNzaWdubWVudCBpbiBp
+ZiBjb25kaXRpb24KIzEzNTogRklMRTogbGludXgtdXNlci9zeXNjYWxsLmM6ODI4NzoKKyAgICAg
+ICAgICAgIGlmICghKGZuID0gbG9ja191c2VyX3N0cmluZyhhcmcyKSkpCgpFUlJPUjogYnJhY2Vz
+IHt9IGFyZSBuZWNlc3NhcnkgZm9yIGFsbCBhcm1zIG9mIHRoaXMgc3RhdGVtZW50CiMxMzU6IEZJ
+TEU6IGxpbnV4LXVzZXIvc3lzY2FsbC5jOjgyODc6CisgICAgICAgICAgICBpZiAoIShmbiA9IGxv
+Y2tfdXNlcl9zdHJpbmcoYXJnMikpKQpbLi4uXQoKRVJST1I6IGRvIG5vdCB1c2UgYXNzaWdubWVu
+dCBpbiBpZiBjb25kaXRpb24KIzE2MDogRklMRTogbGludXgtdXNlci9zeXNjYWxsLmM6ODMxNToK
+KyAgICAgICAgaWYgKCEoZm4gPSBsb2NrX3VzZXJfc3RyaW5nKGFyZzEpKSkgewoKRVJST1I6IGRv
+IG5vdCB1c2UgYXNzaWdubWVudCBpbiBpZiBjb25kaXRpb24KIzE4MzogRklMRTogbGludXgtdXNl
+ci9zeXNjYWxsLmM6ODMzNToKKyAgICAgICAgaWYgKCEoZm4gPSBsb2NrX3VzZXJfc3RyaW5nKGFy
+ZzIpKSkgewoKRVJST1I6IGRvIG5vdCB1c2UgYXNzaWdubWVudCBpbiBpZiBjb25kaXRpb24KIzMx
+NTogRklMRTogbGludXgtdXNlci9zeXNjYWxsLmM6OTczODoKKyAgICAgICAgaWYgKCEoZm4gPSBs
+b2NrX3VzZXJfc3RyaW5nKGFyZzEpKSkgewoKRVJST1I6IGRvIG5vdCB1c2UgYXNzaWdubWVudCBp
+biBpZiBjb25kaXRpb24KIzMzODogRklMRTogbGludXgtdXNlci9zeXNjYWxsLmM6OTc1ODoKKyAg
+ICAgICAgaWYgKCEoZm4gPSBsb2NrX3VzZXJfc3RyaW5nKGFyZzEpKSkgewoKRVJST1I6IGRvIG5v
+dCB1c2UgYXNzaWdubWVudCBpbiBpZiBjb25kaXRpb24KIzM2NDogRklMRTogbGludXgtdXNlci9z
+eXNjYWxsLmM6MTA4NTM6CisgICAgICAgIGlmICghKGZuID0gbG9ja191c2VyX3N0cmluZyhhcmcx
+KSkpIHsKCkVSUk9SOiBkbyBub3QgdXNlIGFzc2lnbm1lbnQgaW4gaWYgY29uZGl0aW9uCiMzODk6
+IEZJTEU6IGxpbnV4LXVzZXIvc3lzY2FsbC5jOjEwODc1OgorICAgICAgICBpZiAoIShmbiA9IGxv
+Y2tfdXNlcl9zdHJpbmcoYXJnMSkpKSB7CgpFUlJPUjogZG8gbm90IHVzZSBhc3NpZ25tZW50IGlu
+IGlmIGNvbmRpdGlvbgojNDE1OiBGSUxFOiBsaW51eC11c2VyL3N5c2NhbGwuYzoxMDkwOToKKyAg
+ICAgICAgaWYgKCEoZm4gPSBsb2NrX3VzZXJfc3RyaW5nKGFyZzIpKSkKCkVSUk9SOiBicmFjZXMg
+e30gYXJlIG5lY2Vzc2FyeSBmb3IgYWxsIGFybXMgb2YgdGhpcyBzdGF0ZW1lbnQKIzQxNTogRklM
+RTogbGludXgtdXNlci9zeXNjYWxsLmM6MTA5MDk6CisgICAgICAgIGlmICghKGZuID0gbG9ja191
+c2VyX3N0cmluZyhhcmcyKSkpClsuLi5dCgpFUlJPUjogZG8gbm90IHVzZSBhc3NpZ25tZW50IGlu
+IGlmIGNvbmRpdGlvbgojNDM5OiBGSUxFOiBsaW51eC11c2VyL3N5c2NhbGwuYzoxMTkyMDoKKyAg
+ICAgICAgICAgICAgICBpZiAoIShmbiA9IGxvY2tfdXNlcl9zdHJpbmcoYXJnMikpKSB7Cgp0b3Rh
+bDogMTEgZXJyb3JzLCAwIHdhcm5pbmdzLCA0MTkgbGluZXMgY2hlY2tlZAoKWW91ciBwYXRjaCBo
+YXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJyb3Jz
+CmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1haW50YWluZXIsIHNlZQpD
+SEVDS1BBVENIIGluIE1BSU5UQUlORVJTLgoKPT09IE9VVFBVVCBFTkQgPT09CgpUZXN0IGNvbW1h
+bmQgZXhpdGVkIHdpdGggY29kZTogMQoKCi0tLQpFbWFpbCBnZW5lcmF0ZWQgYXV0b21hdGljYWxs
+eSBieSBQYXRjaGV3IFtodHRwOi8vcGF0Y2hldy5vcmcvXS4KUGxlYXNlIHNlbmQgeW91ciBmZWVk
+YmFjayB0byBwYXRjaGV3LWRldmVsQGZyZWVsaXN0cy5vcmc=
