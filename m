@@ -1,26 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46090)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46635)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1eMEog-0003bh-O3
-	for qemu-devel@nongnu.org; Tue, 05 Dec 2017 10:07:27 -0500
+	(envelope-from <berto@igalia.com>) id 1eMEqy-0005PY-G7
+	for qemu-devel@nongnu.org; Tue, 05 Dec 2017 10:09:49 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1eMEod-0003OS-H2
-	for qemu-devel@nongnu.org; Tue, 05 Dec 2017 10:07:26 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:40366)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1eMEod-0003OI-AY
-	for qemu-devel@nongnu.org; Tue, 05 Dec 2017 10:07:23 -0500
-References: <CAFEAcA_ffAw2jz9Sp-hxi_ZvdVjCYynk_0Lk2zFOSCMqCpHgxA@mail.gmail.com>
-	<ed43c37b-712a-ea16-85d8-3baee67c560c@redhat.com>
-	<CAFEAcA9mzeVNxn0HfQOnx4_K2mnb+1JaY9ryY5Ju3oieHMnyCw@mail.gmail.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <595f05b7-a61d-fc05-6621-b4f55fff28a7@redhat.com>
-Date: Tue, 5 Dec 2017 16:07:20 +0100
+	(envelope-from <berto@igalia.com>) id 1eMEqv-0004Kj-9H
+	for qemu-devel@nongnu.org; Tue, 05 Dec 2017 10:09:48 -0500
+From: Alberto Garcia <berto@igalia.com>
+In-Reply-To: <1511196664-85304-2-git-send-email-anton.nefedov@virtuozzo.com>
+References: <1511196664-85304-1-git-send-email-anton.nefedov@virtuozzo.com>
+	<1511196664-85304-2-git-send-email-anton.nefedov@virtuozzo.com>
+Date: Tue, 05 Dec 2017 16:09:07 +0100
+Message-ID: <w51shcp5i0c.fsf@maestria.local.igalia.com>
 MIME-Version: 1.0
-In-Reply-To: <CAFEAcA9mzeVNxn0HfQOnx4_K2mnb+1JaY9ryY5Ju3oieHMnyCw@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] deadlock in rcu_init_lock() in usermode emulation
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [Qemu-block] [PATCH 1/7] qapi: add unmap to
+ BlockDeviceStats
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,35 +23,79 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
+To: Anton Nefedov <anton.nefedov@virtuozzo.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org
+Cc: kwolf@redhat.com, den@virtuozzo.com, armbru@redhat.com, mreitz@redhat.com, pbonzini@redhat.com
 
-On 05/12/2017 16:01, Peter Maydell wrote:
-> On 5 December 2017 at 13:19, Paolo Bonzini <pbonzini@redhat.com> wrote:
->> Probably the best solution is to add start_exclusive/end_exclusive
->> respectively at the beginning and the end of fork_start and fork_end.
->> This is safer in general, as it ensures that the disappeared child
->> threads were quiescent.
->>
->> In fact, I wonder if fork_start/fork_end still need to "take all
->> mutexes" (in pthread_atfork style) if we do
->> start_exclusive/end_exclusive in fork_start and fork_end(0).  You don't
->> even need to reinitialize the mutexes, meaning that mmap_fork_start and
->> mmap_fork_end should go as well.
->>
->> The list of locks that are "assured not taken" within
->> start_exclusive/end_exclusive (currently: rcu_read_lock, tb_lock,
->> mmap_lock) should probably be documented in fork_start/fork_end.
-> 
-> How does start_exclusive() assure that mmap_lock and tb_lock
-> aren't taken? It ensures that no other thread is between
-> cpu_exec_start and cpu_exec_end, but we don't (can't) do the work of
-> do_syscall() inside an exec-start/end section, and do_syscall()
-> codepaths can take the mmap lock and the tb lock (eg target_mmap()
-> will take the mmap lock and then call tb_invalidate_phys_range()
-> which takes the tb lock).
+On Mon 20 Nov 2017 05:50:58 PM CET, Anton Nefedov wrote:
+> Signed-off-by: Anton Nefedov <anton.nefedov@virtuozzo.com>
+> Reviewed-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+> ---
+>  qapi/block-core.json       | 20 ++++++++++++++++++++
+>  include/block/accounting.h |  1 +
+>  block/qapi.c               |  6 ++++++
+>  3 files changed, 27 insertions(+)
+>
+> diff --git a/qapi/block-core.json b/qapi/block-core.json
+> index 76bf50f..ba2705d 100644
+> --- a/qapi/block-core.json
+> +++ b/qapi/block-core.json
+> @@ -730,6 +730,23 @@
+>  # @timed_stats: Statistics specific to the set of previously defined
+>  #               intervals of time (Since 2.5)
+>  #
+> +# @unmap_bytes: The number of bytes unmapped by the device (Since 2.12)
+> +#
+> +# @unmap_operations: The number of unmap operations performed by the device
+> +#                    (Since 2.12)
+> +#
+> +# @unmap_total_time_ns: Total time spent on unmap operations in nano-seconds
+> +#                       (Since 2.12)
+> +#
+> +# @unmap_merged: Number of unmap requests that have been merged into another
+> +#                request (Since 2.12)
+> +#
+> +# @failed_unmap_operations: The number of failed unmap operations performed
+> +#                           by the device (Since 2.12)
+> +#
+> +# @invalid_unmap_operations: The number of invalid unmap operations performed
+> +#                            by the device (Since 2.12)
+> +#
+>  # Since: 0.14.0
 
-You're right of course---I'm not very well versed in user-mode
-emulation.  But it should still fix the bug.
+Admittedtly this is just a style issue and I don't know what others
+think, but wouldn't it be nicer if the documentation of new fields is
+located together with the existing ones?
 
-Paolo
+E.g
+
+ @rd_bytes
+ @wr_bytes
++@unmap_bytes
+ @rd_operations
+ @wr_operations
+ @flush_operations
++@unmap_operations
+
+[...]
+
+ @failed_rd_operations
+ @failed_wr_operations
+ @failed_flush_operations
++@failed_unmap_operations
+
+etc.
+
+>      ds->rd_bytes = stats->nr_bytes[BLOCK_ACCT_READ];
+>      ds->wr_bytes = stats->nr_bytes[BLOCK_ACCT_WRITE];
+> +    ds->unmap_bytes = stats->nr_bytes[BLOCK_ACCT_UNMAP];
+>      ds->rd_operations = stats->nr_ops[BLOCK_ACCT_READ];
+>      ds->wr_operations = stats->nr_ops[BLOCK_ACCT_WRITE];
+> +    ds->unmap_operations = stats->nr_ops[BLOCK_ACCT_UNMAP];
+
+Essentially like this :)
+
+The patch is fine with me either way.
+
+Reviewed-by: Alberto Garcia <berto@igalia.com>
+
+Berto
