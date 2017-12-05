@@ -1,21 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41284)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40358)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1eLzHn-0007lc-4t
-	for qemu-devel@nongnu.org; Mon, 04 Dec 2017 17:32:28 -0500
+	(envelope-from <jsnow@redhat.com>) id 1eM1PZ-0000gn-7k
+	for qemu-devel@nongnu.org; Mon, 04 Dec 2017 19:48:38 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1eLzHl-0008Mh-TP
-	for qemu-devel@nongnu.org; Mon, 04 Dec 2017 17:32:27 -0500
-References: <1509551048-129830-1-git-send-email-anton.nefedov@virtuozzo.com>
+	(envelope-from <jsnow@redhat.com>) id 1eM1PY-0006NB-8o
+	for qemu-devel@nongnu.org; Mon, 04 Dec 2017 19:48:37 -0500
+References: <20171109141631.25688-1-vsementsov@virtuozzo.com>
+	<8ade3dfe-ec27-a096-5d09-9e694f03935a@redhat.com>
+	<a254716c-2762-3a1c-d4c4-d3abb23f7207@redhat.com>
+	<a4757a98-0492-311a-2086-d2a95418d8ec@redhat.com>
 From: John Snow <jsnow@redhat.com>
-Message-ID: <51f11f12-3cd1-2db0-8969-1c5b2cdcdae4@redhat.com>
-Date: Mon, 4 Dec 2017 17:32:16 -0500
+Message-ID: <6372bf9a-b80b-f4c7-33fa-88f35e3062db@redhat.com>
+Date: Mon, 4 Dec 2017 19:48:27 -0500
 MIME-Version: 1.0
-In-Reply-To: <1509551048-129830-1-git-send-email-anton.nefedov@virtuozzo.com>
+In-Reply-To: <a4757a98-0492-311a-2086-d2a95418d8ec@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [Qemu-block] [PATCH v5 00/15] qcow2: space
- preallocation and COW improvements
+Subject: Re: [Qemu-devel] [Qemu-block] [PATCH] blockdev-backup: enable
+ non-root nodes for backup
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,108 +27,71 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Anton Nefedov <anton.nefedov@virtuozzo.com>, qemu-devel@nongnu.org
-Cc: kwolf@redhat.com, den@virtuozzo.com, qemu-block@nongnu.org, mreitz@redhat.com
+To: Max Reitz <mreitz@redhat.com>, Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org
+Cc: kwolf@redhat.com, den@openvz.org, armbru@redhat.com
 
-Friendly ping; this has gone over 30 days without a reply on the list. I
-recommend rebasing and trying again after 2.11 hits.
 
-Thanks,
---John
 
-On 11/01/2017 11:43 AM, Anton Nefedov wrote:
-> v5: rebased, patches slightly reordered;
->     cluster allocation (to avoid writing zero-buffers)
->     now goes before an optional ahead preallocation
+On 12/04/2017 05:21 PM, Max Reitz wrote:
+> On 2017-12-04 23:15, John Snow wrote:
+>>
+>>
+>> On 12/01/2017 02:41 PM, Max Reitz wrote:
+>>> ((By the way, I don't suppose that's how it should work...  But I don't
+>>> suppose that we want propagation of dirtying towards the BDS roots, do
+>>> we? :-/))
+>>
+>> I have never really satisfactorily explained to myself what bitmaps on
+>> intermediate notes truly represent or mean.
+>>
+>> The simple case is "This layer itself serviced a write request."
+>>
+>> If that information is not necessarily meaningful, I'm not sure that's a
+>> problem except in configuration.
+>>
+>>
+>> ...Now, if you wanted to talk about bitmaps that associate with a
+>> Backend instead of a Node...
 > 
-> v4: http://lists.nongnu.org/archive/html/qemu-devel/2017-08/msg00109.html
+> But it's not about bitmaps on intermediate nodes, quite the opposite.
+> It's about bitmaps on roots but write requests happening on intermediate
+> nodes.
 > 
-> This pull request is to improve a few performance problems of qcow2 format:
+
+Oh, I see what you're saying. It magically doesn't really change my
+opinion, by coincidence!
+
+> Say you have a node I and two filter nodes A and B using it (and they
+> are OK with shared writers).  There is a dirty bitmap on A.
 > 
->   1. non cluster-aligned write requests (to unallocated clusters) explicitly
->      pad data with zeroes if there is no backing data.
->      Resulting increase in ops number and potential cluster fragmentation
->      (on the host file) is already solved by:
->        ee22a9d qcow2: Merge the writing of the COW regions with the guest data
->      However, in case of zero COW regions, that can be avoided at all
->      but the whole clusters are preallocated and zeroed in a single
->      efficient write_zeroes() operation
+> Now when a write request goes through B, I will obviously have changed,
+> and because A and B are filters, so will A.  But the dirty bitmap on A
+> will still be clean.
 > 
->   2. moreover, efficient write_zeroes() operation can be used to preallocate
->      space megabytes (*configurable number) ahead which gives noticeable
->      improvement on some storage types (e.g. distributed storage)
->      where the space allocation operation might be expensive)
+> My example was that when you run a mirror over A, you won't see dirtying
+> from B.  So you can't e.g. add a throttle driver between a mirror job
+> and the node you want to mirror, because the dirty bitmap on the
+> throttle driver will not be affected by accesses to the actual node.
 > 
->   3. this will also allow to enable simultaneous writes to the same unallocated
->      cluster after the space has been allocated & zeroed but before
->      the first data is written and the cluster is linked to L2.
->      (Not included in this patchset).
+> Max
 > 
-> Efficient write_zeroes usually implies that the blocks are not actually
-> written to but only reserved and marked as zeroed by the storage.
-> In this patchset, file-posix driver is marked as supporting this operation
-> if it supports (/configured to support) fallocate() operation.
-> 
-> Existing bdrv_write_zeroes() falls back to writing zero buffers if
-> write_zeroes is not supported by the driver.
-> A new flag (BDRV_REQ_ALLOCATE) is introduced to avoid that but return ENOTSUP.
-> Such allocate requests are also implemented to possibly overlap with the
-> other requests. No wait is performed but an error returned in such case as well.
-> So the operation should be considered advisory and a fallback scenario still
-> handled by the caller (in this case, qcow2 driver).
-> 
-> Anton Nefedov (12):
->   mirror: inherit supported write/zero flags
->   blkverify: set supported write/zero flags
->   block: introduce BDRV_REQ_ALLOCATE flag
->   block: treat BDRV_REQ_ALLOCATE as serialising
->   file-posix: support BDRV_REQ_ALLOCATE
->   block: support BDRV_REQ_ALLOCATE in passthrough drivers
->   qcow2: move is_zero() up
->   qcow2: skip writing zero buffers to empty COW areas
->   qcow2: set inactive flag
->   qcow2: do not zero out clusters if already preallocated
->   iotest 198: test BDRV_REQ_ALLOCATE
->   iotest 134: test cluster-misaligned encrypted write
-> 
-> Denis V. Lunev (2):
->   qcow2: preallocation at image expand
->   qcow2: truncate preallocated space
-> 
-> Pavel Butsykin (1):
->   qcow2: check space leak at the end of the image
-> 
->  block/qcow2.h                      |  18 ++++
->  include/block/block.h              |   6 +-
->  include/block/block_int.h          |   2 +-
->  block/blkdebug.c                   |   3 +-
->  block/blkverify.c                  |   9 ++
->  block/file-posix.c                 |   8 ++
->  block/io.c                         |  47 +++++++--
->  block/mirror.c                     |   5 +
->  block/qcow2-cluster.c              |  14 ++-
->  block/qcow2-refcount.c             |   7 ++
->  block/qcow2.c                      | 202 +++++++++++++++++++++++++++++++++----
->  block/raw-format.c                 |   3 +-
->  block/trace-events                 |   1 +
->  qemu-options.hx                    |   4 +
->  tests/qemu-iotests/026.out         |  94 +++++++++++++----
->  tests/qemu-iotests/026.out.nocache |  94 +++++++++++++----
->  tests/qemu-iotests/029.out         |   5 +-
->  tests/qemu-iotests/060             |   2 +-
->  tests/qemu-iotests/060.out         |  13 ++-
->  tests/qemu-iotests/061.out         |   5 +-
->  tests/qemu-iotests/066             |   2 +-
->  tests/qemu-iotests/066.out         |   9 +-
->  tests/qemu-iotests/098.out         |   7 +-
->  tests/qemu-iotests/108.out         |   5 +-
->  tests/qemu-iotests/112.out         |   5 +-
->  tests/qemu-iotests/134             |   9 ++
->  tests/qemu-iotests/134.out         |  10 ++
->  tests/qemu-iotests/198             | 146 +++++++++++++++++++++++++++
->  tests/qemu-iotests/198.out         |  50 +++++++++
->  tests/qemu-iotests/group           |   1 +
->  30 files changed, 693 insertions(+), 93 deletions(-)
->  create mode 100755 tests/qemu-iotests/198
->  create mode 100644 tests/qemu-iotests/198.out
-> 
+
+Well, in this case I would say that a root BDS is not really any
+different from an intermediate one and can't really know what's going on
+in the world outside.
+
+At least, I think that's how we model it right now -- we pretend that we
+can record the activity of an entire drive graph by putting the bitmap
+on the root-most node we can get a hold of and assuming that all writes
+are going to go through us.
+
+Clearly this is increasingly false the more we modularise the block graph.
+
+
+*uhm*
+
+
+I would say that a bitmap attached to a BlockBackend should behave in
+the way you say: writes to any children should change the bitmap here.
+
+bitmaps attached to nodes shouldn't worry about such things.
