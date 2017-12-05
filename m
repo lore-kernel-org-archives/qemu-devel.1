@@ -1,25 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35689)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39434)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1eMB9N-0004at-K9
-	for qemu-devel@nongnu.org; Tue, 05 Dec 2017 06:12:37 -0500
+	(envelope-from <mikhail.abakumov@ispras.ru>) id 1eMBOV-0003a2-TU
+	for qemu-devel@nongnu.org; Tue, 05 Dec 2017 06:28:12 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1eMB9J-00077A-I9
-	for qemu-devel@nongnu.org; Tue, 05 Dec 2017 06:12:33 -0500
-Received: from mail-ot0-x243.google.com ([2607:f8b0:4003:c0f::243]:34504)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1eMB9J-00075N-Cz
-	for qemu-devel@nongnu.org; Tue, 05 Dec 2017 06:12:29 -0500
-Received: by mail-ot0-x243.google.com with SMTP id o23so17529923otd.1
-	for <qemu-devel@nongnu.org>; Tue, 05 Dec 2017 03:12:29 -0800 (PST)
+	(envelope-from <mikhail.abakumov@ispras.ru>) id 1eMBOR-0005VN-1i
+	for qemu-devel@nongnu.org; Tue, 05 Dec 2017 06:28:11 -0500
+Received: from mail.ispras.ru ([83.149.199.45]:60822)
+	by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <mikhail.abakumov@ispras.ru>) id 1eMBOQ-0005Te-Q7
+	for qemu-devel@nongnu.org; Tue, 05 Dec 2017 06:28:06 -0500
 MIME-Version: 1.0
-In-Reply-To: <20171205052501.13414-1-david@gibson.dropbear.id.au>
-References: <20171205052501.13414-1-david@gibson.dropbear.id.au>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 5 Dec 2017 11:12:08 +0000
-Message-ID: <CAFEAcA94gYou8UEgUMt4DwT7AxKbBj0mC9360UHqgZtGJ4Ss-w@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PULL 0/1] ppc-for-2.11 queue 20171205
+Content-Type: text/plain; charset=UTF-8;
+ format=flowed
+Date: Tue, 05 Dec 2017 14:28:02 +0300
+From: Mihail Abakumov <mikhail.abakumov@ispras.ru>
+In-Reply-To: <CABdb737B1Ldxr0KPtnrLAJpLgC9=BgE-qQ8a3BeL7DM=ydR9ow@mail.gmail.com>
+References: <151127322955.6888.16198535123422076171.stgit@Misha-PC.lan02.inno>
+	<151127349122.6888.9523124333246477608.stgit@Misha-PC.lan02.inno>
+	<CABdb737B1Ldxr0KPtnrLAJpLgC9=BgE-qQ8a3BeL7DM=ydR9ow@mail.gmail.com>
+Message-ID: <0f244258e4250ad6e1e8c096c1fca65f@ispras.ru>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v3 45/45] windbg: implemented
+ kd_api_get_context_ex and kd_api_set_context_ex
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,39 +30,60 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Gibson <david@gibson.dropbear.id.au>
-Cc: Alexander Graf <agraf@suse.de>, Greg Kurz <groug@kaod.org>, "qemu-ppc@nongnu.org" <qemu-ppc@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>
+To: Ladi Prosek <lprosek@redhat.com>
+Cc: qemu-devel <qemu-devel@nongnu.org>, sw@weilnetz.de, Pavel Dovgalyuk <dovgaluk@ispras.ru>, Roman Kagan <rkagan@virtuozzo.com>, Paolo Bonzini <pbonzini@redhat.com>, "Denis V. Lunev" <den@openvz.org>
 
-On 5 December 2017 at 05:25, David Gibson <david@gibson.dropbear.id.au> wrote:
-> The following changes since commit 2a4c7e839101a52f7bf9ba4dd64e466518565352:
->
->   Merge remote-tracking branch 'remotes/kevin/tags/for-upstream' into staging (2017-12-04 17:19:04 +0000)
->
-> are available in the Git repository at:
->
->   git://github.com/dgibson/qemu.git tags/ppc-for-2.11-20171205
->
-> for you to fetch changes up to 044897ef4a22af89aecb8df509477beba0a2e0ce:
->
->   target/ppc: Fix system lockups caused by interrupt_request state corruption (2017-12-05 12:28:42 +1100)
->
-> ----------------------------------------------------------------
-> ppc patch queue 2017-12-05
->
-> Alas, this is yet another fix for ppc that I think it's worth
-> squeezing into 2.11.  It's a really ugly fix for some pretty ugly
-> code, but it does seem to address a real problem.  It's also a problem
-> that's appeared relatively recently, since it was either created by,
-> or made much easier to trigger by, by the merge of MTTCG.
->
-> ----------------------------------------------------------------
-> Richard Purdie (1):
->       target/ppc: Fix system lockups caused by interrupt_request state corruption
->
->  target/ppc/excp_helper.c |  7 +++----
->  target/ppc/helper_regs.h | 17 +++++++++++++++--
->  2 files changed, 18 insertions(+), 6 deletions(-)
+Ladi Prosek =D0=BF=D0=B8=D1=81=D0=B0=D0=BB 2017-11-28 15:44:
+> On Tue, Nov 21, 2017 at 3:11 PM, Mihail Abakumov
+> <mikhail.abakumov@ispras.ru> wrote:
+> [...]
+>> diff --git a/windbgstub.c b/windbgstub.c
+>> index 36372c0ea5..3bcf6a8cbb 100755
+>> --- a/windbgstub.c
+>> +++ b/windbgstub.c
+>> @@ -224,6 +224,14 @@ static void=20
+>> windbg_process_manipulate_packet(ParsingContext *ctx)
+>>          kd_api_query_memory(cpu, &ctx->data);
+>>          break;
+>>=20
+>> +    case DbgKdGetContextExApi:
+>> +        kd_api_get_context_ex(cpu, &ctx->data);
+>> +        break;
+>> +
+>> +    case DbgKdSetContextExApi:
+>> +        kd_api_set_context_ex(cpu, &ctx->data);
+>> +        break;
+>> +
+>>      default:
+>>          kd_api_unsupported(cpu, &ctx->data);
+>>          break;
+>> @@ -262,12 +270,12 @@ static void=20
+>> windbg_process_control_packet(ParsingContext *ctx)
+>>=20
+>>      case PACKET_TYPE_KD_RESET:
+>>      {
+>> -        SizedBuf buf =3D kd_gen_load_symbols_sc(qemu_get_cpu(0));
+>> +        windbg_send_control_packet(ctx->packet.PacketType);
+>> +        windbg_state->ctrl_packet_id =3D INITIAL_PACKET_ID;
+>=20
+> You didn't mention it in the cover email so I'd like to be sure. This
+> is what fixed the initial handshake so it works without -b now, is
+> that correct? Thanks!
+>=20
+Yes. It seems for me more logical to send a response first, then a state=20
+packet.
+Apparently, before that I made a typo. Now Windbg connects immediately,=20
+and
+for stopping it is necessary to press ctrl+break. But now the option=20
+'-b' does
+not work in the old version.
 
-Applied, thanks.
-
--- PMM
+>> +        SizedBuf buf =3D kd_gen_load_symbols_sc(qemu_get_cpu(0));
+>>          windbg_send_data_packet(buf.data, buf.size,
+>>                                  PACKET_TYPE_KD_STATE_CHANGE64);
+>> -        windbg_send_control_packet(ctx->packet.PacketType);
+>> -        windbg_state->ctrl_packet_id =3D INITIAL_PACKET_ID;
+>>          SBUF_FREE(buf);
+>>          break;
+>>      }
+>>=20
