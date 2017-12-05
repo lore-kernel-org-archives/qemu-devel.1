@@ -1,28 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60896)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33746)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1eMG7p-00083x-Ax
-	for qemu-devel@nongnu.org; Tue, 05 Dec 2017 11:31:18 -0500
+	(envelope-from <david@redhat.com>) id 1eMGAy-0001x8-1y
+	for qemu-devel@nongnu.org; Tue, 05 Dec 2017 11:34:32 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1eMG7k-000792-GB
-	for qemu-devel@nongnu.org; Tue, 05 Dec 2017 11:31:17 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:36996)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1eMG7k-00078l-7R
-	for qemu-devel@nongnu.org; Tue, 05 Dec 2017 11:31:12 -0500
-Date: Tue, 5 Dec 2017 16:31:09 +0000
-From: Stefan Hajnoczi <stefanha@redhat.com>
-Message-ID: <20171205163109.GC6712@stefanha-x1.localdomain>
-References: <20171205063313.GB4102@yangzhon-Virtual>
-	<20171205120623.GB31150@stefanha-x1.localdomain>
-	<5f9f2835-5811-3ee0-9049-0d2cddc08958@redhat.com>
-	<CAJSP0QVn0Uq_XO-22cz1JzbgEaFfwwX9yXBk1eKKkMfknADFmQ@mail.gmail.com>
-	<876e5376-d729-72d7-3c04-3c6f52b745de@redhat.com>
+	(envelope-from <david@redhat.com>) id 1eMGAu-0008OJ-4R
+	for qemu-devel@nongnu.org; Tue, 05 Dec 2017 11:34:32 -0500
+References: <20171204140150.20483-1-david@redhat.com>
+	<20171204140150.20483-10-david@redhat.com>
+	<20171205162408.31ccdf1f.cohuck@redhat.com>
+From: David Hildenbrand <david@redhat.com>
+Message-ID: <977ac4ff-331d-ad0c-9e30-4fbb80bc539d@redhat.com>
+Date: Tue, 5 Dec 2017 17:34:23 +0100
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="z4+8/lEcDcG5Ke9S"
-Content-Disposition: inline
-In-Reply-To: <876e5376-d729-72d7-3c04-3c6f52b745de@redhat.com>
-Subject: Re: [Qemu-devel] About the light VM solution!
+In-Reply-To: <20171205162408.31ccdf1f.cohuck@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v1 for-2.12 9/9] s390x: change the QEMU cpu
+ model to a stripped down z12
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,73 +26,80 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: Stefan Hajnoczi <stefanha@gmail.com>, Yang Zhong <yang.zhong@intel.com>, qemu-devel <qemu-devel@nongnu.org>
+To: Cornelia Huck <cohuck@redhat.com>
+Cc: qemu-s390x@nongnu.org, qemu-devel@nongnu.org, Christian Borntraeger <borntraeger@de.ibm.com>, Richard Henderson <rth@twiddle.net>, Alexander Graf <agraf@suse.de>, Thomas Huth <thuth@redhat.com>
 
+On 05.12.2017 16:24, Cornelia Huck wrote:
+> On Mon,  4 Dec 2017 15:01:50 +0100
+> David Hildenbrand <david@redhat.com> wrote:
+> 
+>> We are good enough to boot upstream Linux kernels / Fedora 26/27. That
+>> should be suficient for now.
+> 
+> s/suficient/sufficient/
+> 
+>>
+>> As the QEMU CPU model is migration safe, let's add compatibility code.
+>> Generate the feature list to reduce the trouble of messing things up in the
+>> future.
+> 
+> So we can mess up things effortlessly? :)
 
---z4+8/lEcDcG5Ke9S
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+See, what I care about :P
 
-On Tue, Dec 05, 2017 at 03:00:10PM +0100, Paolo Bonzini wrote:
-> On 05/12/2017 14:47, Stefan Hajnoczi wrote:
-> > On Tue, Dec 5, 2017 at 1:35 PM, Paolo Bonzini <pbonzini@redhat.com> wro=
-te:
-> >> On 05/12/2017 13:06, Stefan Hajnoczi wrote:
-> >>> On Tue, Dec 05, 2017 at 02:33:13PM +0800, Yang Zhong wrote:
-> >>>> As you know, AWS has decided to switch to KVM in their clouds. This =
-news make almost all
-> >>>> china CSPs(clouds service provider) pay more attention on KVM/Qemu, =
-especially light VM
-> >>>> solution.
-> >>>>
-> >>>> Below are intel solution for light VM, qemu-lite.
-> >>>> http://events.linuxfoundation.org/sites/events/files/slides/Light%20=
-weight%20virtualization%20with%20QEMU%26KVM_0.pdf
-> >>>>
-> >>>> My question is whether community has some plan to implement light VM=
- or alternative solutions? If no, whether our
-> >>>> qemu-lite solution is suitable for upstream again? Many thanks!
-> >>>
-> >>> What caused a lot of discussion and held back progress was the approa=
-ch
-> >>> that was taken.  The basic philosophy seems to be bypassing or
-> >>> special-casing components in order to avoid slow operations.  This
-> >>> requires special QEMU, firmware, and/or guest kernel binaries and cau=
-ses
-> >>> extra work for the management stack, distributions, and testers.
-> >>
-> >> I think having a special firmware (be it qboot or a special-purpose
-> >> SeaBIOS) is acceptable.
-> >=20
-> > The work Marc Mari Barcelo did in 2015 showed that SeaBIOS can boot
-> > guests quickly.  The guest kernel was entered in <35 milliseconds
-> > IIRC.  Why is special firmware necessary?
->=20
-> I thought that wasn't the "conventional" SeaBIOS, but rather one with
-> reduced configuration options, but I may be remembering wrong.
+s/trouble/chance/
 
-Marc didn't spend much time on optimizing SeaBIOS, he used the build
-options that were suggested.  An extra flag can be added in
-qemu_preinit() to skip slow init that's unnecessary on optimized
-machines.  That would allow a single SeaBIOS binary to run both full and
-lite systems.
+> 
+>>
+>> Signed-off-by: David Hildenbrand <david@redhat.com>
+>> ---
+>>  hw/s390x/s390-virtio-ccw.c  |   6 +++
+>>  target/s390x/cpu.h          |   3 ++
+>>  target/s390x/cpu_models.c   | 100 ++++++++++++++++++--------------------------
+>>  target/s390x/cpu_models.h   |   1 +
+>>  target/s390x/gen-features.c |  87 ++++++++++++++++++++++++++++++++++++++
+>>  5 files changed, 138 insertions(+), 59 deletions(-)
+>>
+>> diff --git a/hw/s390x/s390-virtio-ccw.c b/hw/s390x/s390-virtio-ccw.c
+>> index a23b8aec9f..edd18b7fac 100644
+>> --- a/hw/s390x/s390-virtio-ccw.c
+>> +++ b/hw/s390x/s390-virtio-ccw.c
+>> @@ -721,6 +721,9 @@ bool css_migration_enabled(void)
+>>  
+>>  static void ccw_machine_2_12_instance_options(MachineState *machine)
+>>  {
+>> +    const S390FeatBitmap qemu_cpu_feat = { S390_FEAT_LIST_QEMU_V2_12 };
+>> +
+>> +    s390_set_qemu_cpu_model(0x2827, 12, 2, qemu_cpu_feat);
+> 
+> Does this want a comment?
 
-Stefan
+Yes, will add comments to both.
+[...]
+>> +
+>> +    /* TCG emulates some features that can usually not be enabled with
+>> +     * the emulated machine generation. Make sure they can be enabled
+>> +     * when using the QEMU model by adding them to full_feat. We have
+>> +     * to copy the definition to do that.
+>> +     */
+>> +    memcpy(&s390_qemu_cpu_def, def, sizeof(s390_qemu_cpu_def));
+>> +    bitmap_or(s390_qemu_cpu_def.full_feat, s390_qemu_cpu_def.full_feat,
+>> +              qemu_max_cpu_feat, S390_FEAT_MAX);
+>> +
+> 
+> So is this the place to e.g. enable zpci? Or does this need to go into
+> the feature definitions?
 
---z4+8/lEcDcG5Ke9S
-Content-Type: application/pgp-signature; name="signature.asc"
+It will go into target/s390x/gen-features.c under:
 
------BEGIN PGP SIGNATURE-----
+1. "qemu_V2_12" if you want it to always be active with "-cpu qemu"
+2. "qemu_MAX" if you only want to be able to enable it via "-cpu
+qemu,zpci=on"
 
-iQEcBAEBAgAGBQJaJsnNAAoJEJykq7OBq3PI5QIH/315micZ0b9vrbuBdNYnYM/U
-jBu6t8BCd+1RUlT+Zib0z5rdPJFY8xKaebUTabOd4plFUGzLOlZbgdv/jvaOUY5t
-x9BbsmEiw5MSfi5PMIBZM+aucRNIbw+LHftRQKVG0+6r30QhQDVtRuU7cPMHz0se
-Z79tsZ5L9cEgHIBaIByzKxOYN9Z1CSb/DleblxR+JN4jquHiO/1IE+uT/gA0RA/Q
-SHgmMpNaGkxVOvXti5h/QIuII/mIo5LfkzHuOEhOxly37HNoyKqB3saVdCSJMFlR
-N3lAa77Sa/l+68iRwFyldwxNI42ijm7+vtupSGddsSFrIZUB+gK3Um9SdMEoZuQ=
-=w5Ym
------END PGP SIGNATURE-----
+Thanks!
 
---z4+8/lEcDcG5Ke9S--
+-- 
+
+Thanks,
+
+David / dhildenb
