@@ -1,20 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46635)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51935)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berto@igalia.com>) id 1eMEqy-0005PY-G7
-	for qemu-devel@nongnu.org; Tue, 05 Dec 2017 10:09:49 -0500
+	(envelope-from <sw@weilnetz.de>) id 1eMEwH-0000UW-1t
+	for qemu-devel@nongnu.org; Tue, 05 Dec 2017 10:16:19 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berto@igalia.com>) id 1eMEqv-0004Kj-9H
-	for qemu-devel@nongnu.org; Tue, 05 Dec 2017 10:09:48 -0500
-From: Alberto Garcia <berto@igalia.com>
-In-Reply-To: <1511196664-85304-2-git-send-email-anton.nefedov@virtuozzo.com>
-References: <1511196664-85304-1-git-send-email-anton.nefedov@virtuozzo.com>
-	<1511196664-85304-2-git-send-email-anton.nefedov@virtuozzo.com>
-Date: Tue, 05 Dec 2017 16:09:07 +0100
-Message-ID: <w51shcp5i0c.fsf@maestria.local.igalia.com>
+	(envelope-from <sw@weilnetz.de>) id 1eMEvG-0007th-1O
+	for qemu-devel@nongnu.org; Tue, 05 Dec 2017 10:15:14 -0500
+Received: from smtp.mail.uni-mannheim.de ([134.155.96.80]:47983)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <sw@weilnetz.de>) id 1eMEvE-0007q1-5l
+	for qemu-devel@nongnu.org; Tue, 05 Dec 2017 10:14:13 -0500
+References: <20171205081744.6563-1-mark.cave-ayland@ilande.co.uk>
+	<20171205081744.6563-5-mark.cave-ayland@ilande.co.uk>
+From: Stefan Weil <sw@weilnetz.de>
+Message-ID: <2d28f37d-0a34-6a78-4955-d0012a8152c3@weilnetz.de>
+Date: Tue, 5 Dec 2017 16:13:53 +0100
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [Qemu-block] [PATCH 1/7] qapi: add unmap to
- BlockDeviceStats
+In-Reply-To: <20171205081744.6563-5-mark.cave-ayland@ilande.co.uk>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
+Content-Language: en-GB
+Subject: Re: [Qemu-devel] [PATCHv2 4/5] eepro100: switch
+ e100_compute_mcast_idx() over to use net_crc32()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,79 +29,54 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Anton Nefedov <anton.nefedov@virtuozzo.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org
-Cc: kwolf@redhat.com, den@virtuozzo.com, armbru@redhat.com, mreitz@redhat.com, pbonzini@redhat.com
+To: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, qemu-devel@nongnu.org, jasowang@redhat.com, Eric Blake <eblake@redhat.com>
 
-On Mon 20 Nov 2017 05:50:58 PM CET, Anton Nefedov wrote:
-> Signed-off-by: Anton Nefedov <anton.nefedov@virtuozzo.com>
-> Reviewed-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Am 05.12.2017 um 09:17 schrieb Mark Cave-Ayland:
+> Signed-off-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
 > ---
->  qapi/block-core.json       | 20 ++++++++++++++++++++
->  include/block/accounting.h |  1 +
->  block/qapi.c               |  6 ++++++
->  3 files changed, 27 insertions(+)
+>  hw/net/eepro100.c | 19 +------------------
+>  1 file changed, 1 insertion(+), 18 deletions(-)
 >
-> diff --git a/qapi/block-core.json b/qapi/block-core.json
-> index 76bf50f..ba2705d 100644
-> --- a/qapi/block-core.json
-> +++ b/qapi/block-core.json
-> @@ -730,6 +730,23 @@
->  # @timed_stats: Statistics specific to the set of previously defined
->  #               intervals of time (Since 2.5)
->  #
-> +# @unmap_bytes: The number of bytes unmapped by the device (Since 2.12)
-> +#
-> +# @unmap_operations: The number of unmap operations performed by the device
-> +#                    (Since 2.12)
-> +#
-> +# @unmap_total_time_ns: Total time spent on unmap operations in nano-seconds
-> +#                       (Since 2.12)
-> +#
-> +# @unmap_merged: Number of unmap requests that have been merged into another
-> +#                request (Since 2.12)
-> +#
-> +# @failed_unmap_operations: The number of failed unmap operations performed
-> +#                           by the device (Since 2.12)
-> +#
-> +# @invalid_unmap_operations: The number of invalid unmap operations performed
-> +#                            by the device (Since 2.12)
-> +#
->  # Since: 0.14.0
+> diff --git a/hw/net/eepro100.c b/hw/net/eepro100.c
+> index 1c0def555b..4fe94b7471 100644
+> --- a/hw/net/eepro100.c
+> +++ b/hw/net/eepro100.c
+> @@ -327,26 +327,9 @@ static const uint16_t eepro100_mdi_mask[] = {
+>  
+>  static E100PCIDeviceInfo *eepro100_get_class(EEPRO100State *s);
+>  
+> -/* From FreeBSD (locally modified). */
+>  static unsigned e100_compute_mcast_idx(const uint8_t *ep)
+>  {
+> -    uint32_t crc;
+> -    int carry, i, j;
+> -    uint8_t b;
+> -
+> -    crc = 0xffffffff;
+> -    for (i = 0; i < 6; i++) {
+> -        b = *ep++;
+> -        for (j = 0; j < 8; j++) {
+> -            carry = ((crc & 0x80000000L) ? 1 : 0) ^ (b & 0x01);
+> -            crc <<= 1;
+> -            b >>= 1;
+> -            if (carry) {
+> -                crc = ((crc ^ POLYNOMIAL) | carry);
+> -            }
+> -        }
+> -    }
+> -    return (crc & BITS(7, 2)) >> 2;
+> +    return (net_crc32(ep, 6) & BITS(7, 2)) >> 2;
+>  }
+>  
+>  /* Read a 16 bit control/status (CSR) register. */
 
-Admittedtly this is just a style issue and I don't know what others
-think, but wouldn't it be nicer if the documentation of new fields is
-located together with the existing ones?
 
-E.g
+What about eliminating the intermediate function e100_compute_mcast_idx (and function lnc_mchash, too)?
+You did that for lnc_mchash, and I think that is cleaner and saves some lines of code.
 
- @rd_bytes
- @wr_bytes
-+@unmap_bytes
- @rd_operations
- @wr_operations
- @flush_operations
-+@unmap_operations
+With or without that minor change:
 
-[...]
+Reviewed-by: Stefan Weil <sw@weilnetz.de>
 
- @failed_rd_operations
- @failed_wr_operations
- @failed_flush_operations
-+@failed_unmap_operations
-
-etc.
-
->      ds->rd_bytes = stats->nr_bytes[BLOCK_ACCT_READ];
->      ds->wr_bytes = stats->nr_bytes[BLOCK_ACCT_WRITE];
-> +    ds->unmap_bytes = stats->nr_bytes[BLOCK_ACCT_UNMAP];
->      ds->rd_operations = stats->nr_ops[BLOCK_ACCT_READ];
->      ds->wr_operations = stats->nr_ops[BLOCK_ACCT_WRITE];
-> +    ds->unmap_operations = stats->nr_ops[BLOCK_ACCT_UNMAP];
-
-Essentially like this :)
-
-The patch is fine with me either way.
-
-Reviewed-by: Alberto Garcia <berto@igalia.com>
-
-Berto
+Regards
+Stefan
