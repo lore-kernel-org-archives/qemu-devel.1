@@ -1,24 +1,45 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50622)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52373)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1eMBzn-00080e-Bk
-	for qemu-devel@nongnu.org; Tue, 05 Dec 2017 07:06:49 -0500
+	(envelope-from <pasic@linux.vnet.ibm.com>) id 1eMC6H-0002Xh-Ch
+	for qemu-devel@nongnu.org; Tue, 05 Dec 2017 07:13:26 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1eMBzk-0008Um-Mq
-	for qemu-devel@nongnu.org; Tue, 05 Dec 2017 07:06:43 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:32948)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1eMBzk-0008US-Fw
-	for qemu-devel@nongnu.org; Tue, 05 Dec 2017 07:06:40 -0500
-Date: Tue, 5 Dec 2017 12:06:23 +0000
-From: Stefan Hajnoczi <stefanha@redhat.com>
-Message-ID: <20171205120623.GB31150@stefanha-x1.localdomain>
-References: <20171205063313.GB4102@yangzhon-Virtual>
+	(envelope-from <pasic@linux.vnet.ibm.com>) id 1eMC6D-0003bd-Ik
+	for qemu-devel@nongnu.org; Tue, 05 Dec 2017 07:13:25 -0500
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:54598)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pasic@linux.vnet.ibm.com>)
+	id 1eMC6D-0003bK-AH
+	for qemu-devel@nongnu.org; Tue, 05 Dec 2017 07:13:21 -0500
+Received: from pps.filterd (m0098410.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
+	vB5C8YSf051832
+	for <qemu-devel@nongnu.org>; Tue, 5 Dec 2017 07:13:17 -0500
+Received: from e06smtp13.uk.ibm.com (e06smtp13.uk.ibm.com [195.75.94.109])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2ensh4e23s-1
+	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Tue, 05 Dec 2017 07:13:17 -0500
+Received: from localhost
+	by e06smtp13.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	Only! Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <pasic@linux.vnet.ibm.com>;
+	Tue, 5 Dec 2017 12:13:14 -0000
+References: <20171201143136.62497-1-pasic@linux.vnet.ibm.com>
+	<20171201143136.62497-4-pasic@linux.vnet.ibm.com>
+	<20171204122859.1a4fcd21.cohuck@redhat.com>
+	<1108d0e7-318b-354f-31da-95d5efb8193c@linux.vnet.ibm.com>
+	<20171204171124.4d877b22.cohuck@redhat.com>
+	<20171205074300.GZ5859@bjsdjshi@linux.vnet.ibm.com>
+	<20171205074810.GA5859@bjsdjshi@linux.vnet.ibm.com>
+From: Halil Pasic <pasic@linux.vnet.ibm.com>
+Date: Tue, 5 Dec 2017 13:13:11 +0100
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="R3G7APHDIzY6R/pk"
-Content-Disposition: inline
-In-Reply-To: <20171205063313.GB4102@yangzhon-Virtual>
-Subject: Re: [Qemu-devel] About the light VM solution!
+In-Reply-To: <20171205074810.GA5859@bjsdjshi@linux.vnet.ibm.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Message-Id: <dd45272e-01c7-a49b-f8cd-b10746da5752@linux.vnet.ibm.com>
+Subject: Re: [Qemu-devel] [PATCH 3/3] s390x: deprecate s390-squash-mcss
+ machine prop
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,68 +48,25 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Yang Zhong <yang.zhong@intel.com>
-Cc: pbonzini@redhat.com, berrange@redhat.com, qemu-devel@nongnu.org
+To: Cornelia Huck <cohuck@redhat.com>, Boris Fiuczynski <fiuczy@linux.vnet.ibm.com>, Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>, Christian Borntraeger <borntraeger@de.ibm.com>, Shalini Chellathurai Saroja <shalini@linux.vnet.ibm.com>, qemu-devel@nongnu.org, qemu-s390x@nongnu.org
 
 
---R3G7APHDIzY6R/pk
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
 
-On Tue, Dec 05, 2017 at 02:33:13PM +0800, Yang Zhong wrote:
-> As you know, AWS has decided to switch to KVM in their clouds. This news =
-make almost all
-> china CSPs(clouds service provider) pay more attention on KVM/Qemu, espec=
-ially light VM
-> solution.
->=20
-> Below are intel solution for light VM, qemu-lite.
-> http://events.linuxfoundation.org/sites/events/files/slides/Light%20weigh=
-t%20virtualization%20with%20QEMU%26KVM_0.pdf
->=20
-> My question is whether community has some plan to implement light VM or a=
-lternative solutions? If no, whether our=20
-> qemu-lite solution is suitable for upstream again? Many thanks!
+On 12/05/2017 08:48 AM, Dong Jia Shi wrote:
+> * Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com> [2017-12-05 15:43:00 +0800]:
+> 
+>> * Cornelia Huck <cohuck@redhat.com> [2017-12-04 17:11:24 +0100]:
+>>
+>> [...]
+>>
+>> This one looks good to me too, so:
+>> Reviewed-by: Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>
+>>
+> BTW, since we are deprecating s390-squash-mcss, I think any more
+> improment on it (e.g. more accurate and helpful hint message) is not
+> worthy. So I will not send such pathes in future, if nobody disagrees.
+> 
 
-Booting VMs faster is appreciated upstream.  I think there is interest
-in patches that further this goal and hope you have time to contribute.
+Makes sense to me.
 
-What caused a lot of discussion and held back progress was the approach
-that was taken.  The basic philosophy seems to be bypassing or
-special-casing components in order to avoid slow operations.  This
-requires special QEMU, firmware, and/or guest kernel binaries and causes
-extra work for the management stack, distributions, and testers.  It is
-preferrable to have just one binary and no special configuration
-settings.
-
-I think patches are more likely to be merged with the following
-approach:
-1. Benchmark or profile to find slow operations.
-2. Perform an experiment to see if bypassing the operations improves
-   performance.  If no, go back to step 1.
-3. Investigate the slow operation to see if it can be optimized or
-   skipped completely based on run-time knowledge.  This means no
-   special '-lite' binaries or new config options.
-4. Implement patches to do this, retest, and send them upstream.
-
-My view is that qemu-lite only got to Step 2 in some cases.  Going to
-Step 4 is more work but the result will be easier to merge.
-
-Stefan
-
---R3G7APHDIzY6R/pk
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEcBAEBAgAGBQJaJou/AAoJEJykq7OBq3PINzUH/1yRauqRJTGl/DRf+NU1lri0
-Not32pRuODZlBZI+DqWFrQqQcOozYf3ruNXpFZW0QTAEn5oGl3UOeYaYxJaVk6Ub
-VHnG7LoYhkoGSkQ1zmNUbA6dB1k7x4dMEh/VoDmuDVI3GqpU9OmdW7OrN0lf16Em
-zO+gIMne8WGLgGrQGFca3f+ReemtUshhdEgiSixGfR2u4zsVG+TO/ztTnkDiujgT
-zpFgDhN/6+stouISgSGUAjFWNTdCudbfCOIu8DqpQKBJerqXOahExv4qxgMvbnRG
-xfft4kf02X0zGKkCl39+z/bTcycjTtxd2PF6yipXtwpN9K2TE1/WAkThiokM6yE=
-=uXT+
------END PGP SIGNATURE-----
-
---R3G7APHDIzY6R/pk--
+Halil
