@@ -1,24 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48830)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49298)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1eMDS9-0006HY-5P
-	for qemu-devel@nongnu.org; Tue, 05 Dec 2017 08:40:05 -0500
+	(envelope-from <famz@redhat.com>) id 1eMDUM-0007Q7-0q
+	for qemu-devel@nongnu.org; Tue, 05 Dec 2017 08:42:22 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1eMDS3-0003xm-Ml
-	for qemu-devel@nongnu.org; Tue, 05 Dec 2017 08:40:05 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:44316)
+	(envelope-from <famz@redhat.com>) id 1eMDUG-0004cf-GR
+	for qemu-devel@nongnu.org; Tue, 05 Dec 2017 08:42:22 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:58756)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1eMDS3-0003xd-GX
-	for qemu-devel@nongnu.org; Tue, 05 Dec 2017 08:39:59 -0500
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
-	[10.5.11.15])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id A1F3B5D9F5
-	for <qemu-devel@nongnu.org>; Tue,  5 Dec 2017 13:39:58 +0000 (UTC)
-From: Stefan Hajnoczi <stefanha@redhat.com>
-Date: Tue,  5 Dec 2017 13:39:54 +0000
-Message-Id: <20171205133954.31006-1-stefanha@redhat.com>
-Subject: [Qemu-devel] [PATCH] qdev: drop unused #include "sysemu/iothread.h"
+	(Exim 4.71) (envelope-from <famz@redhat.com>) id 1eMDUG-0004cE-AS
+	for qemu-devel@nongnu.org; Tue, 05 Dec 2017 08:42:16 -0500
+Date: Tue, 5 Dec 2017 21:42:07 +0800
+From: Fam Zheng <famz@redhat.com>
+Message-ID: <20171205134207.GD31705@lemon>
+References: <20171129084628.12336-1-david@gibson.dropbear.id.au>
+	<151194617493.816.13426298875361921541@bafd83ae6430>
+	<20171129091847.GC12220@lemon>
+	<20171205064753-mutt-send-email-mst@kernel.org>
+	<20171205050558.GA31705@lemon>
+	<20171205051151.GF3057@umbus.fritz.box>
+	<20171205064635.GB31705@lemon>
+	<20171205130636.GN3057@umbus.fritz.box>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20171205130636.GN3057@umbus.fritz.box>
+Subject: Re: [Qemu-devel] [for-2.12 0/7] PCI cleanups
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,28 +33,22 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Stefan Hajnoczi <stefanha@redhat.com>
+To: David Gibson <david@gibson.dropbear.id.au>
+Cc: "Michael S. Tsirkin" <mst@redhat.com>, marcel@redhat.com, imammedo@redhat.com, qemu-devel@nongnu.org, ehabkost@redhat.com
 
-Commit 1351d1ec89eabebc9fdff20451a62c413d7accc1 ("qdev: drop iothread
-property type") forgot to remove this include.
+On Wed, 12/06 00:06, David Gibson wrote:
+> > > Another approach would be to have a "known good" build that runs every
+> > > so often.  If the known good build fails, the bot disables itself (and
+> > > tells you to investigate).  Obviously there are ways that could not
+> > > work as well, but it should catch a fair range of spurious failures.
+> > 
+> > Interesting idea, yes. A slightly simplified way is to test the "base" of the
+> > series and only report errors if the base can pass.
+> 
+> Right.  I think that would catch even more cases, but means doing the
+> "base" build every time, which might slow things down significantly.
 
-Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
----
- hw/core/qdev-properties-system.c | 1 -
- 1 file changed, 1 deletion(-)
+Every time when a test on topic branch failed, but not necessarily when it
+passed, which is not that bad.
 
-diff --git a/hw/core/qdev-properties-system.c b/hw/core/qdev-properties-system.c
-index ec10da7424..e6a697c39a 100644
---- a/hw/core/qdev-properties-system.c
-+++ b/hw/core/qdev-properties-system.c
-@@ -21,7 +21,6 @@
- #include "net/hub.h"
- #include "qapi/visitor.h"
- #include "chardev/char-fe.h"
--#include "sysemu/iothread.h"
- 
- static void get_pointer(Object *obj, Visitor *v, Property *prop,
-                         char *(*print)(void *ptr),
--- 
-2.14.3
+Fam
