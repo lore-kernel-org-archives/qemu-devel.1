@@ -1,21 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51667)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51714)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1eM77y-0000gL-Bk
-	for qemu-devel@nongnu.org; Tue, 05 Dec 2017 01:54:51 -0500
+	(envelope-from <peterx@redhat.com>) id 1eM781-0000jH-An
+	for qemu-devel@nongnu.org; Tue, 05 Dec 2017 01:54:58 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1eM77x-000411-GO
-	for qemu-devel@nongnu.org; Tue, 05 Dec 2017 01:54:50 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:54444)
+	(envelope-from <peterx@redhat.com>) id 1eM780-00042S-D5
+	for qemu-devel@nongnu.org; Tue, 05 Dec 2017 01:54:53 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:52666)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1eM77x-00040n-BG
-	for qemu-devel@nongnu.org; Tue, 05 Dec 2017 01:54:49 -0500
+	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1eM780-000421-4B
+	for qemu-devel@nongnu.org; Tue, 05 Dec 2017 01:54:52 -0500
 From: Peter Xu <peterx@redhat.com>
-Date: Tue,  5 Dec 2017 14:53:04 +0800
-Message-Id: <20171205065307.21853-26-peterx@redhat.com>
+Date: Tue,  5 Dec 2017 14:53:05 +0800
+Message-Id: <20171205065307.21853-27-peterx@redhat.com>
 In-Reply-To: <20171205065307.21853-1-peterx@redhat.com>
 References: <20171205065307.21853-1-peterx@redhat.com>
-Subject: [Qemu-devel] [PATCH v5 25/28] io: let watcher of the channel run in
- same ctx
+Subject: [Qemu-devel] [PATCH v5 26/28] migration: allow migrate_cancel to
+ pause postcopy
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,32 +27,88 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Andrea Arcangeli <aarcange@redhat.com>, "Daniel P . Berrange" <berrange@redhat.com>, Juan Quintela <quintela@redhat.com>, Alexey Perevalov <a.perevalov@samsung.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>, peterx@redhat.com
 
-Per-thread gcontext is only used in IOThread (please refer to callers of
-g_main_context_push_thread_default), so this patch only affects anything
-that will be run in an IOThread.  It lets the watcher object be run in
-the same context as the caller that added the watcher.
+It was allowed in the past to even cancel a postcopy migration, but it
+does not really make sense, and no one should be using it, since
+cancelling a migration during postcopy means crashing the VM at no time.
 
-This patch is critical to make sure that migration stream accept()
-procedure will also be run in the monitor IOThread rather than the
-default main thread, so it can survive even if main thread hangs.
+Let's just use re-use this command as a way to pause the postcopy
+migration when we detected that we are in postcopy migration.  This can
+be used when we want to trigger the postcopy recovery manually.
 
 Signed-off-by: Peter Xu <peterx@redhat.com>
 ---
- io/channel.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ hmp-commands.hx       |  8 ++++++--
+ migration/migration.c | 18 +++++++++++++++++-
+ qapi/migration.json   |  3 ++-
+ 3 files changed, 25 insertions(+), 4 deletions(-)
 
-diff --git a/io/channel.c b/io/channel.c
-index ec4b86de7c..d6018ddfb6 100644
---- a/io/channel.c
-+++ b/io/channel.c
-@@ -312,7 +312,7 @@ guint qio_channel_add_watch(QIOChannel *ioc,
+diff --git a/hmp-commands.hx b/hmp-commands.hx
+index ffcdc34652..32fdd52212 100644
+--- a/hmp-commands.hx
++++ b/hmp-commands.hx
+@@ -952,14 +952,18 @@ ETEXI
+         .name       = "migrate_cancel",
+         .args_type  = "",
+         .params     = "",
+-        .help       = "cancel the current VM migration",
++        .help       = "cancel the current VM precopy migration, or "
++                      "pause the migration if it's in postcopy state, "
++                      "so that a postcopy recovery can be carried out later.",
+         .cmd        = hmp_migrate_cancel,
+     },
  
-     g_source_set_callback(source, (GSourceFunc)func, user_data, notify);
+ STEXI
+ @item migrate_cancel
+ @findex migrate_cancel
+-Cancel the current VM migration.
++If during a precopy, this command cancels the migration.  If during
++postcopy, this command pauses the migration (so that a postcopy
++recovery can be carried out afterward).
+ ETEXI
  
--    id = g_source_attach(source, NULL);
-+    id = g_source_attach(source, g_main_context_get_thread_default());
-     g_source_unref(source);
+     {
+diff --git a/migration/migration.c b/migration/migration.c
+index 8762fad9be..0c1a783df2 100644
+--- a/migration/migration.c
++++ b/migration/migration.c
+@@ -1535,7 +1535,23 @@ void qmp_migrate(const char *uri, bool has_blk, bool blk,
  
-     return id;
+ void qmp_migrate_cancel(Error **errp)
+ {
+-    migrate_fd_cancel(migrate_get_current());
++    MigrationState *ms = migrate_get_current();
++    int ret;
++
++    if (ms->state == MIGRATION_STATUS_POSTCOPY_ACTIVE) {
++        /*
++         * Cancelling a postcopy migration does not really make sense.
++         * Here instead we pause the migration only, so another
++         * recovery can take place if needed.
++         */
++        ret = qemu_file_shutdown(ms->to_dst_file);
++        if (ret) {
++            error_setg(errp, "Failed to pause migration stream.");
++        }
++        return;
++    }
++
++    migrate_fd_cancel(ms);
+ }
+ 
+ void qmp_migrate_continue(MigrationStatus state, Error **errp)
+diff --git a/qapi/migration.json b/qapi/migration.json
+index 5dfac0681d..e15bb516cd 100644
+--- a/qapi/migration.json
++++ b/qapi/migration.json
+@@ -881,7 +881,8 @@
+ ##
+ # @migrate_cancel:
+ #
+-# Cancel the current executing migration process.
++# Cancel the current executing migration process for precopy.  For
++# postcopy, it'll pause the migration instead.
+ #
+ # Returns: nothing on success
+ #
 -- 
 2.14.3
