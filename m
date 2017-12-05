@@ -1,24 +1,41 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45861)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50062)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1eMBhe-0006fT-0d
-	for qemu-devel@nongnu.org; Tue, 05 Dec 2017 06:47:59 -0500
+	(envelope-from <pasic@linux.vnet.ibm.com>) id 1eMBya-0006YB-Ew
+	for qemu-devel@nongnu.org; Tue, 05 Dec 2017 07:05:31 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1eMBhc-0005o8-Tv
-	for qemu-devel@nongnu.org; Tue, 05 Dec 2017 06:47:58 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:37124)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <marcandre.lureau@redhat.com>)
-	id 1eMBhc-0005ni-Lc
-	for qemu-devel@nongnu.org; Tue, 05 Dec 2017 06:47:56 -0500
-From: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
-Date: Tue,  5 Dec 2017 12:47:29 +0100
-Message-Id: <20171205114729.10089-5-marcandre.lureau@redhat.com>
-In-Reply-To: <20171205114729.10089-1-marcandre.lureau@redhat.com>
-References: <20171205114729.10089-1-marcandre.lureau@redhat.com>
+	(envelope-from <pasic@linux.vnet.ibm.com>) id 1eMByZ-0007bo-5F
+	for qemu-devel@nongnu.org; Tue, 05 Dec 2017 07:05:28 -0500
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:60282)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pasic@linux.vnet.ibm.com>)
+	id 1eMByY-0007bb-ON
+	for qemu-devel@nongnu.org; Tue, 05 Dec 2017 07:05:27 -0500
+Received: from pps.filterd (m0098399.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
+	vB5C4bnY134179
+	for <qemu-devel@nongnu.org>; Tue, 5 Dec 2017 07:05:22 -0500
+Received: from e06smtp13.uk.ibm.com (e06smtp13.uk.ibm.com [195.75.94.109])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2enu28gc1h-1
+	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Tue, 05 Dec 2017 07:05:20 -0500
+Received: from localhost
+	by e06smtp13.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	Only! Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <pasic@linux.vnet.ibm.com>;
+	Tue, 5 Dec 2017 12:05:14 -0000
+References: <20171201143136.62497-1-pasic@linux.vnet.ibm.com>
+	<20171201143136.62497-4-pasic@linux.vnet.ibm.com>
+	<927acf90-4a00-3fa2-9bf3-e34afc6be199@redhat.com>
+From: Halil Pasic <pasic@linux.vnet.ibm.com>
+Date: Tue, 5 Dec 2017 13:05:11 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v9 4/4] fw_cfg: write vmcoreinfo details
+In-Reply-To: <927acf90-4a00-3fa2-9bf3-e34afc6be199@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Message-Id: <f892b02d-58b6-bb81-439c-f9177259f013@linux.vnet.ibm.com>
+Subject: Re: [Qemu-devel] [qemu-s390x] [PATCH 3/3] s390x: deprecate
+ s390-squash-mcss machine prop
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,155 +44,50 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: linux-kernel@vger.kernel.org
-Cc: qemu-devel@nongnu.org, somlo@cmu.edu, xiaolong.ye@intel.com, bhe@redhat.com, mst@redhat.com, =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
+To: Thomas Huth <thuth@redhat.com>, Boris Fiuczynski <fiuczy@linux.vnet.ibm.com>, Cornelia Huck <cohuck@redhat.com>
+Cc: Shalini Chellathurai Saroja <shalini@linux.vnet.ibm.com>, Christian Borntraeger <borntraeger@de.ibm.com>, qemu-s390x@nongnu.org, Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>, qemu-devel@nongnu.org
 
-If the "etc/vmcoreinfo" fw_cfg file is present and we are not running
-the kdump kernel, write the addr/size of the vmcoreinfo ELF note.
 
-Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
-Reviewed-by: Gabriel Somlo <somlo@cmu.edu>
----
- drivers/firmware/qemu_fw_cfg.c | 82 ++++++++++++++++++++++++++++++++++++=
-+++++-
- 1 file changed, 81 insertions(+), 1 deletion(-)
 
-diff --git a/drivers/firmware/qemu_fw_cfg.c b/drivers/firmware/qemu_fw_cf=
-g.c
-index e261d9254b29..61af1c0a640d 100644
---- a/drivers/firmware/qemu_fw_cfg.c
-+++ b/drivers/firmware/qemu_fw_cfg.c
-@@ -35,6 +35,8 @@
- #include <linux/ioport.h>
- #include <linux/delay.h>
- #include <linux/dma-mapping.h>
-+#include <linux/crash_core.h>
-+#include <linux/crash_dump.h>
-=20
- MODULE_AUTHOR("Gabriel L. Somlo <somlo@cmu.edu>");
- MODULE_DESCRIPTION("QEMU fw_cfg sysfs support");
-@@ -58,6 +60,8 @@ MODULE_LICENSE("GPL");
- /* fw_cfg "file name" is up to 56 characters (including terminating nul)=
- */
- #define FW_CFG_MAX_FILE_PATH 56
-=20
-+#define VMCOREINFO_FORMAT_ELF 0x1
-+
- /* fw_cfg revision attribute, in /sys/firmware/qemu_fw_cfg top-level dir=
-. */
- static u32 fw_cfg_rev;
-=20
-@@ -119,7 +123,8 @@ static ssize_t fw_cfg_dma_transfer(struct device *dev=
-,
- 	dma_addr_t dma;
- 	ssize_t ret =3D length;
- 	enum dma_data_direction dir =3D
--		(control & FW_CFG_DMA_CTL_READ ? DMA_FROM_DEVICE : 0);
-+		(control & FW_CFG_DMA_CTL_READ ? DMA_FROM_DEVICE : 0) |
-+		(control & FW_CFG_DMA_CTL_WRITE ? DMA_TO_DEVICE : 0);
-=20
- 	if (address && length) {
- 		dma_addr =3D dma_map_single(dev, address, length, dir);
-@@ -216,6 +221,48 @@ static ssize_t fw_cfg_read_blob(struct device *dev, =
-u16 key,
- 	return ret;
- }
-=20
-+#ifdef CONFIG_CRASH_CORE
-+/* write chunk of given fw_cfg blob (caller responsible for sanity-check=
-) */
-+static ssize_t fw_cfg_write_blob(struct device *dev, u16 key,
-+				 void *buf, loff_t pos, size_t count)
-+{
-+	u32 glk =3D -1U;
-+	acpi_status status;
-+	ssize_t ret =3D count;
-+
-+	/* If we have ACPI, ensure mutual exclusion against any potential
-+	 * device access by the firmware, e.g. via AML methods:
-+	 */
-+	status =3D acpi_acquire_global_lock(ACPI_WAIT_FOREVER, &glk);
-+	if (ACPI_FAILURE(status) && status !=3D AE_NOT_CONFIGURED) {
-+		/* Should never get here */
-+		WARN(1, "%s: Failed to lock ACPI!\n", __func__);
-+		memset(buf, 0, count);
-+		return -EINVAL;
-+	}
-+
-+	mutex_lock(&fw_cfg_dev_lock);
-+	if (pos =3D=3D 0) {
-+		ret =3D fw_cfg_dma_transfer(dev, buf, count, key << 16
-+					  | FW_CFG_DMA_CTL_SELECT
-+					  | FW_CFG_DMA_CTL_WRITE);
-+	} else {
-+		iowrite16(fw_cfg_sel_endianness(key), fw_cfg_reg_ctrl);
-+		ret =3D fw_cfg_dma_transfer(dev, NULL, pos, FW_CFG_DMA_CTL_SKIP);
-+		if (ret < 0)
-+			goto end;
-+		ret =3D fw_cfg_dma_transfer(dev, buf, count, FW_CFG_DMA_CTL_WRITE);
-+	}
-+
-+end:
-+	mutex_unlock(&fw_cfg_dev_lock);
-+
-+	acpi_release_global_lock(glk);
-+
-+	return ret;
-+}
-+#endif /* CONFIG_CRASH_CORE */
-+
- /* clean up fw_cfg device i/o */
- static void fw_cfg_io_cleanup(void)
- {
-@@ -335,6 +382,32 @@ struct fw_cfg_sysfs_entry {
- 	struct device *dev;
- };
-=20
-+#ifdef CONFIG_CRASH_CORE
-+static ssize_t write_vmcoreinfo(struct device *dev, const struct fw_cfg_=
-file *f)
-+{
-+	struct vmci {
-+		__le16 host_format;
-+		__le16 guest_format;
-+		__le32 size;
-+		__le64 paddr;
-+	} __packed;
-+	static struct vmci data;
-+	ssize_t ret;
-+
-+	data =3D (struct vmci) {
-+		.guest_format =3D cpu_to_le16(VMCOREINFO_FORMAT_ELF),
-+		.size =3D cpu_to_le32(VMCOREINFO_NOTE_SIZE),
-+		.paddr =3D cpu_to_le64(paddr_vmcoreinfo_note())
-+	};
-+	/* spare ourself reading host format support for now since we
-+	 * don't know what else to format - host may ignore ours
-+	 */
-+	ret =3D fw_cfg_write_blob(dev, f->select, &data, 0, sizeof(struct vmci)=
-);
-+
-+	return ret;
-+}
-+#endif /* CONFIG_CRASH_CORE */
-+
- /* get fw_cfg_sysfs_entry from kobject member */
- static inline struct fw_cfg_sysfs_entry *to_entry(struct kobject *kobj)
- {
-@@ -575,6 +648,13 @@ static int fw_cfg_register_file(struct device *dev, =
-const struct fw_cfg_file *f)
- 	int err;
- 	struct fw_cfg_sysfs_entry *entry;
-=20
-+#ifdef CONFIG_CRASH_CORE
-+	if (strcmp(f->name, "etc/vmcoreinfo") =3D=3D 0 && !is_kdump_kernel()) {
-+		if (write_vmcoreinfo(dev, f) < 0)
-+			pr_warn("fw_cfg: failed to write vmcoreinfo");
-+	}
-+#endif
-+
- 	/* allocate new entry */
- 	entry =3D kzalloc(sizeof(*entry), GFP_KERNEL);
- 	if (!entry)
---=20
-2.15.0.277.ga3d2ad2c43
+On 12/05/2017 09:41 AM, Thomas Huth wrote:
+> On 01.12.2017 15:31, Halil Pasic wrote:
+>> With the cssids unrestricted (commit <COMMIT HERE> "s390x/css: unrestrict
+>> cssids") the s390-squash-mcss machine property should not be used.
+>> Actually libvirt never supported this, so the expectation is that
+>> removing it should be pretty painless.  But let's play nice and deprecate
+>> it first.
+>>
+>> Signed-off-by: Halil Pasic <pasic@linux.vnet.ibm.com>
+>> ---
+> [...]
+>> diff --git a/qemu-doc.texi b/qemu-doc.texi
+>> index db2351c746..874432d87c 100644
+>> --- a/qemu-doc.texi
+>> +++ b/qemu-doc.texi
+>> @@ -2501,6 +2501,14 @@ enabled via the ``-machine usb=on'' argument.
+>>  
+>>  The ``-nodefconfig`` argument is a synonym for ``-no-user-config``.
+>>  
+>> +@subsection -machine virtio-ccw,s390-squash-mcss=on|off (since 2.12.0)
+> 
+> The machine is called "s390-ccw-virtio", not "virtio-ccw". Anyway, I
+> think you could also rather omit the machine name here (since it is the
+> default) and just write "-machine s390-squash-mcss=on|off".
+> 
+>  Thomas
+> 
+
+Good catch! Regarding omitting the machine name, I was surprised that
+it works, but it does. Our documentation is a bit strange on this: we
+document the machine name as non-optional:
+"-machine [type=]name[,prop=value[,...]]"
+but then use -machine prop=value in the deprecation section (that's
+with no name).
+
+Since the documentation doesn't make it clear that the property is
+existent only for the s390-ccw-virtio family of the machines I think
+being your suggestion has a lot of charm. @Connie: do you agree to
+removing the machine name (type)?
+
+Thanks!
+Halil
