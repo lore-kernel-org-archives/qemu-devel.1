@@ -1,36 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47663)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47920)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <danielhb@linux.vnet.ibm.com>) id 1eMDNj-0002Wi-B8
-	for qemu-devel@nongnu.org; Tue, 05 Dec 2017 08:35:41 -0500
+	(envelope-from <pbonzini@redhat.com>) id 1eMDOI-0003AU-7y
+	for qemu-devel@nongnu.org; Tue, 05 Dec 2017 08:36:07 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <danielhb@linux.vnet.ibm.com>) id 1eMDNd-0001XG-Qc
-	for qemu-devel@nongnu.org; Tue, 05 Dec 2017 08:35:30 -0500
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:40502
-	helo=mx0a-001b2d01.pphosted.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <danielhb@linux.vnet.ibm.com>)
-	id 1eMDNd-0001X5-L2
-	for qemu-devel@nongnu.org; Tue, 05 Dec 2017 08:35:25 -0500
-Received: from pps.filterd (m0098414.ppops.net [127.0.0.1])
-	by mx0b-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
-	vB5DY0DS043983
-	for <qemu-devel@nongnu.org>; Tue, 5 Dec 2017 08:35:22 -0500
-Received: from e14.ny.us.ibm.com (e14.ny.us.ibm.com [129.33.205.204])
-	by mx0b-001b2d01.pphosted.com with ESMTP id 2ensv8rtm7-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Tue, 05 Dec 2017 08:35:22 -0500
-Received: from localhost
-	by e14.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
-	Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <danielhb@linux.vnet.ibm.com>;
-	Tue, 5 Dec 2017 08:35:21 -0500
-From: Daniel Henrique Barboza <danielhb@linux.vnet.ibm.com>
-Date: Tue,  5 Dec 2017 11:35:08 -0200
-In-Reply-To: <20171205133508.15061-1-danielhb@linux.vnet.ibm.com>
-References: <20171205133508.15061-1-danielhb@linux.vnet.ibm.com>
-Message-Id: <20171205133508.15061-2-danielhb@linux.vnet.ibm.com>
-Subject: [Qemu-devel] [PATCH v5 1/1] tests/qemu-iotests: adding
- savevm/loadvm with postcopy flag test
+	(envelope-from <pbonzini@redhat.com>) id 1eMDOC-00020S-Ho
+	for qemu-devel@nongnu.org; Tue, 05 Dec 2017 08:36:06 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:40460)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1eMDOC-0001zR-8S
+	for qemu-devel@nongnu.org; Tue, 05 Dec 2017 08:36:00 -0500
+References: <20171205063313.GB4102@yangzhon-Virtual>
+	<20171205120623.GB31150@stefanha-x1.localdomain>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <5f9f2835-5811-3ee0-9049-0d2cddc08958@redhat.com>
+Date: Tue, 5 Dec 2017 14:35:42 +0100
+MIME-Version: 1.0
+In-Reply-To: <20171205120623.GB31150@stefanha-x1.localdomain>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="3CHhvF1VGqv3pRDer6af0HaTu5kDDxJAi"
+Subject: Re: [Qemu-devel] About the light VM solution!
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -39,191 +28,101 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Daniel Henrique Barboza <danielhb@linux.vnet.ibm.com>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, Cleber Rosa <crosa@redhat.com>
+To: Stefan Hajnoczi <stefanha@redhat.com>, Yang Zhong <yang.zhong@intel.com>
+Cc: berrange@redhat.com, qemu-devel@nongnu.org
 
-This patch implements a test case for the scenario that was failing
-prior to the patch "migration/ram.c: do not set 'postcopy_running' in
-POSTCOPY_INCOMING_END", commit acab30b85d.
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--3CHhvF1VGqv3pRDer6af0HaTu5kDDxJAi
+From: Paolo Bonzini <pbonzini@redhat.com>
+To: Stefan Hajnoczi <stefanha@redhat.com>, Yang Zhong <yang.zhong@intel.com>
+Cc: berrange@redhat.com, qemu-devel@nongnu.org
+Message-ID: <5f9f2835-5811-3ee0-9049-0d2cddc08958@redhat.com>
+Subject: Re: About the light VM solution!
+References: <20171205063313.GB4102@yangzhon-Virtual>
+ <20171205120623.GB31150@stefanha-x1.localdomain>
+In-Reply-To: <20171205120623.GB31150@stefanha-x1.localdomain>
+Content-Type: text/plain; charset=windows-1252
+Content-Transfer-Encoding: quoted-printable
 
-This new test file 201 was derived from the test file 181 authored
-by Kevin Wolf.
+On 05/12/2017 13:06, Stefan Hajnoczi wrote:
+> On Tue, Dec 05, 2017 at 02:33:13PM +0800, Yang Zhong wrote:
+>> As you know, AWS has decided to switch to KVM in their clouds. This ne=
+ws make almost all
+>> china CSPs(clouds service provider) pay more attention on KVM/Qemu, es=
+pecially light VM
+>> solution.
+>>
+>> Below are intel solution for light VM, qemu-lite.
+>> http://events.linuxfoundation.org/sites/events/files/slides/Light%20we=
+ight%20virtualization%20with%20QEMU%26KVM_0.pdf
+>>
+>> My question is whether community has some plan to implement light VM o=
+r alternative solutions? If no, whether our=20
+>> qemu-lite solution is suitable for upstream again? Many thanks!
+>=20
+> What caused a lot of discussion and held back progress was the approach=
 
-CC: Kevin Wolf <kwolf@redhat.com>
-CC: Max Reitz <mreitz@redhat.com>
-CC: Cleber Rosa <crosa@redhat.com>
-Signed-off-by: Daniel Henrique Barboza <danielhb@linux.vnet.ibm.com>
----
- tests/qemu-iotests/201     | 120 +++++++++++++++++++++++++++++++++++++++++++++
- tests/qemu-iotests/201.out |  23 +++++++++
- tests/qemu-iotests/group   |   1 +
- 3 files changed, 144 insertions(+)
- create mode 100755 tests/qemu-iotests/201
- create mode 100644 tests/qemu-iotests/201.out
+> that was taken.  The basic philosophy seems to be bypassing or
+> special-casing components in order to avoid slow operations.  This
+> requires special QEMU, firmware, and/or guest kernel binaries and cause=
+s
+> extra work for the management stack, distributions, and testers.
 
-diff --git a/tests/qemu-iotests/201 b/tests/qemu-iotests/201
-new file mode 100755
-index 0000000000..11f640f5df
---- /dev/null
-+++ b/tests/qemu-iotests/201
-@@ -0,0 +1,120 @@
-+#!/bin/bash
-+#
-+# Test savevm and loadvm after live migration with postcopy flag
-+#
-+# Copyright (C) 2017, IBM Corporation.
-+#
-+# This file is derived from tests/qemu-iotests/181 by Kevin Wolf
-+#
-+# This program is free software; you can redistribute it and/or modify
-+# it under the terms of the GNU General Public License as published by
-+# the Free Software Foundation; either version 2 of the License, or
-+# (at your option) any later version.
-+#
-+# This program is distributed in the hope that it will be useful,
-+# but WITHOUT ANY WARRANTY; without even the implied warranty of
-+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+# GNU General Public License for more details.
-+#
-+# You should have received a copy of the GNU General Public License
-+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
-+
-+seq=`basename $0`
-+echo "QA output created by $seq"
-+
-+status=1	# failure is the default!
-+
-+MIG_SOCKET="${TEST_DIR}/migrate"
-+
-+# get standard environment, filters and checks
-+. ./common.rc
-+. ./common.filter
-+. ./common.qemu
-+
-+_cleanup()
-+{
-+    rm -f "${MIG_SOCKET}"
-+    _cleanup_test_img
-+    _cleanup_qemu
-+}
-+trap "_cleanup; exit \$status" 0 1 2 3 15
-+
-+_supported_fmt qcow2
-+_supported_proto generic
-+_supported_os Linux
-+
-+# Internal snapshots are (currently) impossible with refcount_bits=1
-+# This was taken from test 080
-+_unsupported_imgopts 'refcount_bits=1[^0-9]'
-+
-+size=64M
-+_make_test_img $size
-+
-+echo
-+echo === Starting VMs ===
-+echo
-+
-+qemu_comm_method="monitor"
-+
-+if [ "$IMGOPTSSYNTAX" = "true" ]; then
-+    _launch_qemu \
-+        -drive "${TEST_IMG}",cache=${CACHEMODE},id=disk
-+else
-+    _launch_qemu \
-+        -drive file="${TEST_IMG}",cache=${CACHEMODE},driver=$IMGFMT,id=disk
-+fi
-+src=$QEMU_HANDLE
-+
-+if [ "$IMGOPTSSYNTAX" = "true" ]; then
-+    _launch_qemu \
-+        -drive "${TEST_IMG}",cache=${CACHEMODE},id=disk \
-+        -incoming "unix:${MIG_SOCKET}"
-+else
-+    _launch_qemu \
-+        -drive file="${TEST_IMG}",cache=${CACHEMODE},driver=$IMGFMT,id=disk \
-+        -incoming "unix:${MIG_SOCKET}"
-+fi
-+dest=$QEMU_HANDLE
-+
-+echo
-+echo === Set \'migrate_set_capability postcopy-ram on\' and migrate ===
-+echo
-+
-+silent=yes
-+_send_qemu_cmd $dest 'migrate_set_capability postcopy-ram on' "(qemu)"
-+_send_qemu_cmd $src 'migrate_set_capability postcopy-ram on' "(qemu)"
-+_send_qemu_cmd $src "migrate -d unix:${MIG_SOCKET}" "(qemu)"
-+
-+QEMU_COMM_TIMEOUT=1 qemu_cmd_repeat=10 silent=yes \
-+    _send_qemu_cmd $src "info migrate" "completed\|failed"
-+silent=yes _send_qemu_cmd $src "" "(qemu)"
-+
-+echo
-+echo === Check if migration was successful ===
-+echo
-+
-+QEMU_COMM_TIMEOUT=1 silent=yes \
-+    _send_qemu_cmd $src "info migrate" "completed"
-+silent=yes _send_qemu_cmd $src "" "(qemu)"
-+
-+echo
-+echo === On destination, execute savevm and loadvm ===
-+echo
-+
-+silent=
-+_send_qemu_cmd $dest 'savevm state1' "(qemu)"
-+_send_qemu_cmd $dest 'loadvm state1' "(qemu)"
-+
-+echo
-+echo === Shut down and check image ===
-+echo
-+
-+_send_qemu_cmd $src 'quit' ""
-+_send_qemu_cmd $dest 'quit' ""
-+wait=1 _cleanup_qemu
-+
-+_check_test_img
-+
-+# success, all done
-+echo "*** done"
-+status=0
-diff --git a/tests/qemu-iotests/201.out b/tests/qemu-iotests/201.out
-new file mode 100644
-index 0000000000..9faf06f996
---- /dev/null
-+++ b/tests/qemu-iotests/201.out
-@@ -0,0 +1,23 @@
-+QA output created by 201
-+Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=67108864
-+
-+=== Starting VMs ===
-+
-+
-+=== Set 'migrate_set_capability postcopy-ram on' and migrate ===
-+
-+
-+=== Check if migration was successful ===
-+
-+
-+=== On destination, execute savevm and loadvm ===
-+
-+(qemu) savevm state1
-+(qemu) loadvm state1
-+
-+=== Shut down and check image ===
-+
-+(qemu) quit
-+(qemu) quit
-+No errors were found on the image.
-+*** done
-diff --git a/tests/qemu-iotests/group b/tests/qemu-iotests/group
-index 3e688678dd..c16bc2c5e2 100644
---- a/tests/qemu-iotests/group
-+++ b/tests/qemu-iotests/group
-@@ -197,3 +197,4 @@
- 197 rw auto quick
- 198 rw auto
- 200 rw auto
-+201 rw auto migration
--- 
-2.13.6
+I think having a special firmware (be it qboot or a special-purpose
+SeaBIOS) is acceptable.
+
+So is having a special QEMU binary with fewer runtime dependencies,
+though that should only be a stopgap measure; the real solution is to
+modularize e.g. the UI and audio subsystems to remove runtime
+dependencies from the QEMU binary itself.
+
+I agree with Stefan however that there should be no special machine
+types or kernels.
+
+Referring to your slides, the remaining points for fast boot are:
+
+* parallelize VCPU initialization: do you have patches? :)
+
+* q35-lite: any other machine options that have not been merged yet?
+
+* SeaBIOS+Option ROM: can you take new numbers with DMA-based option
+ROM, or with qboot?
+
+* guest kernel: my proposal to make Linux a multiboot kernel has been
+nacked upstream, but Oracle is working on supporting Xen PVH binaries in
+QEMU.  These are very similar to multiboot and in particular they're
+uncompressed.
+
+For memory consumption, 2.11 should have improved things already thanks
+to shared FlatViews.  Your malloc_trim patch should also be merged in 2.1=
+2.
+
+So are things really that bad?  Almost all "qemu-lite" patches that have
+been proposed upstream have been accepted.
+
+Only mmap-ing the kernel into the guest is not going to be accepted, but
+maybe you can look into replacing stdio with open+mmap in load_linux and
+load_multiboot, for both the kernel and the initrd.  This should save a
+few milliseconds too.
+
+Paolo
+
+
+--3CHhvF1VGqv3pRDer6af0HaTu5kDDxJAi
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEE8TM4V0tmI4mGbHaCv/vSX3jHroMFAlomoLEACgkQv/vSX3jH
+roOXAAgAhuzHnphCfvV/yyZYC1BONrvE8dK8/Gd6rIkeqqH26KYKXCffDiQPDxC2
+rRBHDpKq61wcecjQ+cXjPQJ5ebJMhd3hpjlMepOyse8lEMMDyPCMpOBGMwXdpOQy
+BWf36DpZ/SgVeqvkLpDw+zt0j1/DXZBe2EDWj1Xx4GEjV4eKdE5poXbM0FxjbWFD
+N8bxmbO2JZ3PvRZQRNOJxP3iBivhBMEGZKmfuqLBe6o/rq5dYnXmgg1z8HVrwMUK
+8AZo7/G69kUBx/trIE3eVbgCMy4LsER210BeU0g+OAMLz6FC5ECuA4QMOSCxTi0N
+UEJC5qECivtJK8uXWDCk1PQi2ZfYeg==
+=yUIq
+-----END PGP SIGNATURE-----
+
+--3CHhvF1VGqv3pRDer6af0HaTu5kDDxJAi--
