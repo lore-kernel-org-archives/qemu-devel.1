@@ -1,43 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41292)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44359)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bjsdjshi@linux.vnet.ibm.com>) id 1eM7xn-0002mM-UV
-	for qemu-devel@nongnu.org; Tue, 05 Dec 2017 02:48:24 -0500
+	(envelope-from <peterx@redhat.com>) id 1eM8Bd-0006kw-G3
+	for qemu-devel@nongnu.org; Tue, 05 Dec 2017 03:02:46 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bjsdjshi@linux.vnet.ibm.com>) id 1eM7xj-0002wD-Uq
-	for qemu-devel@nongnu.org; Tue, 05 Dec 2017 02:48:23 -0500
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:58268)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <bjsdjshi@linux.vnet.ibm.com>)
-	id 1eM7xj-0002w1-Lw
-	for qemu-devel@nongnu.org; Tue, 05 Dec 2017 02:48:19 -0500
-Received: from pps.filterd (m0098396.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
-	vB57mGpv095647
-	for <qemu-devel@nongnu.org>; Tue, 5 Dec 2017 02:48:17 -0500
-Received: from e11.ny.us.ibm.com (e11.ny.us.ibm.com [129.33.205.201])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2enq42gq27-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Tue, 05 Dec 2017 02:48:16 -0500
-Received: from localhost
-	by e11.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
-	Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <bjsdjshi@linux.vnet.ibm.com>;
-	Tue, 5 Dec 2017 02:48:15 -0500
-Date: Tue, 5 Dec 2017 15:48:10 +0800
-From: Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>
-References: <20171201143136.62497-1-pasic@linux.vnet.ibm.com>
-	<20171201143136.62497-4-pasic@linux.vnet.ibm.com>
-	<20171204122859.1a4fcd21.cohuck@redhat.com>
-	<1108d0e7-318b-354f-31da-95d5efb8193c@linux.vnet.ibm.com>
-	<20171204171124.4d877b22.cohuck@redhat.com>
-	<20171205074300.GZ5859@bjsdjshi@linux.vnet.ibm.com>
+	(envelope-from <peterx@redhat.com>) id 1eM8Ba-0001EZ-DF
+	for qemu-devel@nongnu.org; Tue, 05 Dec 2017 03:02:41 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:8613)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1eM8Ba-0001EO-3u
+	for qemu-devel@nongnu.org; Tue, 05 Dec 2017 03:02:38 -0500
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+	[10.5.11.15])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 23CB8C058EC2
+	for <qemu-devel@nongnu.org>; Tue,  5 Dec 2017 08:02:37 +0000 (UTC)
+Date: Tue, 5 Dec 2017 16:02:30 +0800
+From: Peter Xu <peterx@redhat.com>
+Message-ID: <20171205080230.GD2925@xz-mi>
+References: <20171201125750.1372-1-quintela@redhat.com>
+	<20171201125750.1372-2-quintela@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20171205074300.GZ5859@bjsdjshi@linux.vnet.ibm.com>
-Message-Id: <20171205074810.GA5859@bjsdjshi@linux.vnet.ibm.com>
-Subject: Re: [Qemu-devel] [PATCH 3/3] s390x: deprecate s390-squash-mcss
- machine prop
+In-Reply-To: <20171201125750.1372-2-quintela@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v3 1/2] migration: Create tcp_port parameter
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -46,22 +33,170 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Cornelia Huck <cohuck@redhat.com>, Halil Pasic <pasic@linux.vnet.ibm.com>, Boris Fiuczynski <fiuczy@linux.vnet.ibm.com>, Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>, Christian Borntraeger <borntraeger@de.ibm.com>, Shalini Chellathurai Saroja <shalini@linux.vnet.ibm.com>, qemu-devel@nongnu.org, qemu-s390x@nongnu.org
+To: Juan Quintela <quintela@redhat.com>
+Cc: qemu-devel@nongnu.org, dgilbert@redhat.com, lvivier@redhat.com
 
-* Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com> [2017-12-05 15:43:00 +0800]:
+On Fri, Dec 01, 2017 at 01:57:49PM +0100, Juan Quintela wrote:
+> It will be used to store the uri tcp_port parameter.  This is the only
+> parameter than can change and we can need to be able to connect to it.
+> 
+> Signed-off-by: Juan Quintela <quintela@redhat.com>
+> 
+> --
+> 
+> This used to be uri parameter, but it has so many troubles to
+> reproduce that it don't just make sense.
+> ---
+>  hmp.c                 |  7 +++++++
+>  migration/migration.c | 10 ++++++++++
+>  qapi/migration.json   | 19 ++++++++++++++++---
+>  3 files changed, 33 insertions(+), 3 deletions(-)
+> 
+> diff --git a/hmp.c b/hmp.c
+> index 1727c9c003..6387d6d517 100644
+> --- a/hmp.c
+> +++ b/hmp.c
+> @@ -345,6 +345,9 @@ void hmp_info_migrate_parameters(Monitor *mon, const QDict *qdict)
+>          monitor_printf(mon, "%s: %" PRIu64 "\n",
+>              MigrationParameter_str(MIGRATION_PARAMETER_XBZRLE_CACHE_SIZE),
+>              params->xbzrle_cache_size);
+> +        monitor_printf(mon, "%s: %d\n",
+> +            MigrationParameter_str(MIGRATION_PARAMETER_TCP_PORT),
+> +            params->tcp_port);
+>      }
+>  
+>      qapi_free_MigrationParameters(params);
+> @@ -1659,6 +1662,10 @@ void hmp_migrate_set_parameter(Monitor *mon, const QDict *qdict)
+>          }
+>          p->xbzrle_cache_size = cache_size;
+>          break;
+> +    case MIGRATION_PARAMETER_TCP_PORT:
+> +        p->has_tcp_port = true;
+> +        visit_type_uint16(v, param, &p->tcp_port, &err);
 
-> * Cornelia Huck <cohuck@redhat.com> [2017-12-04 17:11:24 +0100]:
-> 
-> [...]
-> 
-> This one looks good to me too, so:
-> Reviewed-by: Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>
-> 
-BTW, since we are deprecating s390-squash-mcss, I think any more
-improment on it (e.g. more accurate and helpful hint message) is not
-worthy. So I will not send such pathes in future, if nobody disagrees.
+Should we allow user to set this parameter?  Or it's just used for
+query, only?  (AFAIU from next patch, this is only used for query)
 
-[...]
+> +        break;
+>      default:
+>          assert(0);
+>      }
+> diff --git a/migration/migration.c b/migration/migration.c
+> index 19917a4b5b..abc02d4efd 100644
+> --- a/migration/migration.c
+> +++ b/migration/migration.c
+> @@ -517,6 +517,8 @@ MigrationParameters *qmp_query_migrate_parameters(Error **errp)
+>      params->x_multifd_page_count = s->parameters.x_multifd_page_count;
+>      params->has_xbzrle_cache_size = true;
+>      params->xbzrle_cache_size = s->parameters.xbzrle_cache_size;
+> +    params->has_tcp_port = true;
+> +    params->tcp_port = s->parameters.tcp_port;
+>  
+>      return params;
+>  }
+> @@ -884,6 +886,9 @@ static void migrate_params_test_apply(MigrateSetParameters *params,
+>      if (params->has_xbzrle_cache_size) {
+>          dest->xbzrle_cache_size = params->xbzrle_cache_size;
+>      }
+> +    if (params->has_tcp_port) {
+> +        dest->tcp_port = params->tcp_port;
+> +    }
+>  }
+>  
+>  static void migrate_params_apply(MigrateSetParameters *params, Error **errp)
+> @@ -956,6 +961,9 @@ static void migrate_params_apply(MigrateSetParameters *params, Error **errp)
+>          s->parameters.xbzrle_cache_size = params->xbzrle_cache_size;
+>          xbzrle_cache_resize(params->xbzrle_cache_size, errp);
+>      }
+> +    if (params->has_tcp_port) {
+> +        s->parameters.tcp_port = params->tcp_port;
+> +    }
+>  }
+>  
+>  void qmp_migrate_set_parameters(MigrateSetParameters *params, Error **errp)
+> @@ -2422,6 +2430,8 @@ static Property migration_properties[] = {
+>      DEFINE_PROP_SIZE("xbzrle-cache-size", MigrationState,
+>                        parameters.xbzrle_cache_size,
+>                        DEFAULT_MIGRATE_XBZRLE_CACHE_SIZE),
+> +    DEFINE_PROP_UINT16("x-tcp-port", MigrationState,
+> +                       parameters.tcp_port, 0),
+
+Same question here...  If it's only for querying, why allow user to
+specify it?
+
+Thanks,
+
+>  
+>      /* Migration capabilities */
+>      DEFINE_PROP_MIG_CAP("x-xbzrle", MIGRATION_CAPABILITY_XBZRLE),
+> diff --git a/qapi/migration.json b/qapi/migration.json
+> index 4cd3d13158..e2a1d86216 100644
+> --- a/qapi/migration.json
+> +++ b/qapi/migration.json
+> @@ -488,6 +488,9 @@
+>  #                     and a power of 2
+>  #                     (Since 2.11)
+>  #
+> +# @tcp-port: Only used for tcp, to know what is the real port
+> +#                     (Since 2.12)
+> +#
+>  # Since: 2.4
+>  ##
+>  { 'enum': 'MigrationParameter',
+> @@ -496,7 +499,7 @@
+>             'tls-creds', 'tls-hostname', 'max-bandwidth',
+>             'downtime-limit', 'x-checkpoint-delay', 'block-incremental',
+>             'x-multifd-channels', 'x-multifd-page-count',
+> -           'xbzrle-cache-size' ] }
+> +           'xbzrle-cache-size', 'tcp-port' ] }
+>  
+>  ##
+>  # @MigrateSetParameters:
+> @@ -564,6 +567,10 @@
+>  #                     needs to be a multiple of the target page size
+>  #                     and a power of 2
+>  #                     (Since 2.11)
+> +#
+> +# @tcp-port: Only used for tcp, to know what is the real port
+> +#                     (Since 2.12)
+> +#
+>  # Since: 2.4
+>  ##
+>  # TODO either fuse back into MigrationParameters, or make
+> @@ -582,7 +589,8 @@
+>              '*block-incremental': 'bool',
+>              '*x-multifd-channels': 'int',
+>              '*x-multifd-page-count': 'int',
+> -            '*xbzrle-cache-size': 'size' } }
+> +            '*xbzrle-cache-size': 'size' ,
+> +            '*tcp-port': 'uint16'} }
+>  
+>  ##
+>  # @migrate-set-parameters:
+> @@ -665,6 +673,10 @@
+>  #                     needs to be a multiple of the target page size
+>  #                     and a power of 2
+>  #                     (Since 2.11)
+> +#
+> +# @tcp-port: Only used for tcp, to know what is the real port
+> +#                     (Since 2.12)
+> +#
+>  # Since: 2.4
+>  ##
+>  { 'struct': 'MigrationParameters',
+> @@ -681,7 +693,8 @@
+>              '*block-incremental': 'bool' ,
+>              '*x-multifd-channels': 'uint8',
+>              '*x-multifd-page-count': 'uint32',
+> -            '*xbzrle-cache-size': 'size' } }
+> +            '*xbzrle-cache-size': 'size',
+> +            '*tcp-port': 'uint16'} }
+>  
+>  ##
+>  # @query-migrate-parameters:
+> -- 
+> 2.14.3
+> 
 
 -- 
-Dong Jia Shi
+Peter Xu
