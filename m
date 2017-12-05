@@ -1,27 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57339)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60779)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1eMJCg-0003PV-7v
-	for qemu-devel@nongnu.org; Tue, 05 Dec 2017 14:48:31 -0500
+	(envelope-from <dgilbert@redhat.com>) id 1eMJMJ-0005Sj-Qx
+	for qemu-devel@nongnu.org; Tue, 05 Dec 2017 14:58:28 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1eMJCb-00031z-Cf
-	for qemu-devel@nongnu.org; Tue, 05 Dec 2017 14:48:30 -0500
-Received: from 6.mo177.mail-out.ovh.net ([46.105.51.249]:56884)
+	(envelope-from <dgilbert@redhat.com>) id 1eMJMF-0007Uc-SY
+	for qemu-devel@nongnu.org; Tue, 05 Dec 2017 14:58:27 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:42086)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1eMJCb-0002ye-5o
-	for qemu-devel@nongnu.org; Tue, 05 Dec 2017 14:48:25 -0500
-Received: from player779.ha.ovh.net (b9.ovh.net [213.186.33.59])
-	by mo177.mail-out.ovh.net (Postfix) with ESMTP id 626128FE4F
-	for <qemu-devel@nongnu.org>; Tue,  5 Dec 2017 20:48:15 +0100 (CET)
-Date: Tue, 5 Dec 2017 20:48:05 +0100
-From: Greg Kurz <groug@kaod.org>
-Message-ID: <20171205204805.0f854dc8@bahia.lan>
-In-Reply-To: <20171205122740.15005-1-lvivier@redhat.com>
-References: <20171205122740.15005-1-lvivier@redhat.com>
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1eMJMF-0007T2-Ff
+	for qemu-devel@nongnu.org; Tue, 05 Dec 2017 14:58:23 -0500
+Date: Tue, 5 Dec 2017 19:58:16 +0000
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20171205195816.GH2405@work-vm>
+References: <1511426872-13980-1-git-send-email-jianjay.zhou@huawei.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] migration: fix analyze-migration.py script
- with radix table
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1511426872-13980-1-git-send-email-jianjay.zhou@huawei.com>
+Subject: Re: [Qemu-devel] [PATCH] docs/devel/migration.txt: keep functions
+ consistent with the code
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,50 +27,87 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Laurent Vivier <lvivier@redhat.com>
-Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org, David Gibson <david@gibson.dropbear.id.au>, Bharata B Rao <bharata@linux.vnet.ibm.com>, Juan Quintela <quintela@redhat.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>
+To: Jay Zhou <jianjay.zhou@huawei.com>, berrange@redhat.com
+Cc: qemu-devel@nongnu.org, quintela@redhat.com, weidong.huang@huawei.com, wangxinxin.wang@huawei.com
 
-On Tue,  5 Dec 2017 13:27:40 +0100
-Laurent Vivier <lvivier@redhat.com> wrote:
+* Jay Zhou (jianjay.zhou@huawei.com) wrote:
+> Since the commit 11808bb0c422134bf09119f4aa22c59b0ce84bf3 removed
+> the put_buffer callback and using an iovec based write handler instead,
+> the docs should be sync with the code too.
+> 
+> Signed-off-by: Jay Zhou <jianjay.zhou@huawei.com>
 
-> Since commit 3a38429748 ("Add a "no HPT" encoding to HTAB migration stream")
-> the HTAB migration stream contains a header set to "-1", meaning there
-> is no HPT. Teach analyze-migration.py to ignore the section in this case.
-> 
-> Without this fix, the script fails with a dump from a POWER9 guest:
-> 
-> Traceback (most recent call last):
->   File "./qemu/scripts/analyze-migration.py", line 602, in <module>
->     dump.read(dump_memory = args.memory)
->   File "./qemu/scripts/analyze-migration.py", line 539, in read
->     section.read()
->   File "./qemu/scripts/analyze-migration.py", line 250, in read
->     self.file.readvar(n_valid * self.HASH_PTE_SIZE_64)
->   File "./qemu/scripts/analyze-migration.py", line 64, in readvar
->     raise Exception("Unexpected end of %s at 0x%x" % (self.filename, self.file.tell()))
-> Exception: Unexpected end of migrate.dump at 0x1d4763ba
-> 
-> Fixes: 3a38429748 ("Add a "no HPT" encoding to HTAB migration stream")
-> Signed-off-by: Laurent Vivier <lvivier@redhat.com>
+Lets check with Dan (added to cc) since he wrote 11808bb;
+it might be best just to rever to migration/qemu-file.h for an
+explanation of each function.
+
+Dave
+
+
 > ---
-
-Reviewed-by: Greg Kurz <groug@kaod.org>
-
->  scripts/analyze-migration.py | 4 ++++
->  1 file changed, 4 insertions(+)
+>  docs/devel/migration.txt | 31 ++++++++++++++++++-------------
+>  1 file changed, 18 insertions(+), 13 deletions(-)
 > 
-> diff --git a/scripts/analyze-migration.py b/scripts/analyze-migration.py
-> index 14553876a2..88ff4adb30 100755
-> --- a/scripts/analyze-migration.py
-> +++ b/scripts/analyze-migration.py
-> @@ -234,6 +234,10 @@ class HTABSection(object):
+> diff --git a/docs/devel/migration.txt b/docs/devel/migration.txt
+> index 4030703..e7b08c9 100644
+> --- a/docs/devel/migration.txt
+> +++ b/docs/devel/migration.txt
+> @@ -52,26 +52,31 @@ QEMU uses a QEMUFile abstraction to be able to do migration.  Any type
+>  of migration that wants to use QEMU infrastructure has to create a
+>  QEMUFile with:
 >  
->          header = self.file.read32()
+> -QEMUFile *qemu_fopen_ops(void *opaque,
+> -                         QEMUFilePutBufferFunc *put_buffer,
+> -                         QEMUFileGetBufferFunc *get_buffer,
+> -                         QEMUFileCloseFunc *close);
+> +typedef struct QEMUFileOps {
+> +    QEMUFileGetBufferFunc *get_buffer;
+> +    QEMUFileCloseFunc *close;
+> +    QEMUFileSetBlocking *set_blocking;
+> +    QEMUFileWritevBufferFunc *writev_buffer;
+> +    QEMURetPathFunc *get_return_path;
+> +    QEMUFileShutdownFunc *shut_down;
+> +} QEMUFileOps;
 >  
-> +        if (header == -1):
-> +            # "no HPT" encoding
-> +            return
+> -The functions have the following functionality:
+> +QEMUFile *qemu_fopen_ops(void *opaque, const QEMUFileOps *ops);
+>  
+> -This function writes a chunk of data to a file at the given position.
+> -The pos argument can be ignored if the file is only used for
+> -streaming.  The handler should try to write all of the data it can.
+> +The main functions of QEMUFileOps have the following functionality:
+>  
+> -typedef int (QEMUFilePutBufferFunc)(void *opaque, const uint8_t *buf,
+> -                                    int64_t pos, int size);
+> +This function writes an iovec to file. The handler must write all
+> +of the data or return a negative errno value.
 > +
->          if (header > 0):
->              # First section, just the hash shift
->              return
+> +typedef ssize_t (QEMUFileWritevBufferFunc)(void *opaque, struct iovec *iov,
+> +                                           int iovcnt, int64_t pos);
+>  
+>  Read a chunk of data from a file at the given position.  The pos argument
+>  can be ignored if the file is only be used for streaming.  The number of
+>  bytes actually read should be returned.
+>  
+> -typedef int (QEMUFileGetBufferFunc)(void *opaque, uint8_t *buf,
+> -                                    int64_t pos, int size);
+> +typedef ssize_t (QEMUFileGetBufferFunc)(void *opaque, uint8_t *buf,
+> +                                        int64_t pos, int size);
+>  
+>  Close a file and return an error code.
+>  
+> @@ -80,7 +85,7 @@ typedef int (QEMUFileCloseFunc)(void *opaque);
+>  You can use any internal state that you need using the opaque void *
+>  pointer that is passed to all functions.
+>  
+> -The important functions for us are put_buffer()/get_buffer() that
+> +The important functions for us are writev_buffer()/get_buffer() that
+>  allow to write/read a buffer into the QEMUFile.
+>  
+>  === How to save the state of one device ===
+> -- 
+> 1.8.3.1
+> 
+> 
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
