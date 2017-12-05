@@ -1,33 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42223)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43111)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1eMD4V-0002P6-14
-	for qemu-devel@nongnu.org; Tue, 05 Dec 2017 08:15:45 -0500
+	(envelope-from <pbonzini@redhat.com>) id 1eMD81-0004e2-OG
+	for qemu-devel@nongnu.org; Tue, 05 Dec 2017 08:19:19 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1eMD4R-0008NG-MJ
-	for qemu-devel@nongnu.org; Tue, 05 Dec 2017 08:15:39 -0500
-Received: from indium.canonical.com ([91.189.90.7]:41052)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1eMD4R-0008Ma-GZ
-	for qemu-devel@nongnu.org; Tue, 05 Dec 2017 08:15:35 -0500
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1eMD4P-0003J1-Ei
-	for <qemu-devel@nongnu.org>; Tue, 05 Dec 2017 13:15:33 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 667A22E8050
-	for <qemu-devel@nongnu.org>; Tue,  5 Dec 2017 13:15:33 +0000 (UTC)
+	(envelope-from <pbonzini@redhat.com>) id 1eMD7y-0001cQ-J6
+	for qemu-devel@nongnu.org; Tue, 05 Dec 2017 08:19:17 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:57950)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1eMD7y-0001bt-Cg
+	for qemu-devel@nongnu.org; Tue, 05 Dec 2017 08:19:14 -0500
+References: <CAFEAcA_ffAw2jz9Sp-hxi_ZvdVjCYynk_0Lk2zFOSCMqCpHgxA@mail.gmail.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <ed43c37b-712a-ea16-85d8-3baee67c560c@redhat.com>
+Date: Tue, 5 Dec 2017 14:19:10 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+In-Reply-To: <CAFEAcA_ffAw2jz9Sp-hxi_ZvdVjCYynk_0Lk2zFOSCMqCpHgxA@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
-Date: Tue, 05 Dec 2017 13:10:23 -0000
-From: Greg Kurz <groug@kaod.org>
-Reply-To: Bug 1736376 <1736376@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <151246997532.20350.210206455230339629.malonedeb@chaenomeles.canonical.com>
-Message-Id: <151247942341.20315.10691487242582165378.malone@chaenomeles.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1736376] Re: CVE-2017-7471 repeated?
+Subject: Re: [Qemu-devel] deadlock in rcu_init_lock() in usermode emulation
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,44 +27,38 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Peter Maydell <peter.maydell@linaro.org>, QEMU Developers <qemu-devel@nongnu.org>
 
-When using the proxy backend, all accesses to the host filesystem are
-handled by an external process running in a chroot() jail. No need to
-bother about paths in this case.
+On 04/12/2017 18:13, Peter Maydell wrote:
+> Hi; in https://bugs.linaro.org/show_bug.cgi?id=3D3259 comment 27
+> Stuart provides backtraces of a deadlock in user-mode in the RCU
+> code.
+>=20
+> How should this deadlock be broken ?
 
-CVE-2017-7471 is only applicable to the local backend, because accesses
-are handled by QEMU directly in this case.
+Summing up:
 
+- fork thread: has mmap_lock, waits for rcu_sync_lock
 
-** Changed in: qemu
-       Status: New =3D> Invalid
+- RCU thread: has rcu_sync_lock, waits for rcu_read_(un)lock
 
-** CVE added: https://cve.mitre.org/cgi-bin/cvename.cgi?name=3D2017-7471
+- another CPU thread: in RCU critical section, waits for mmap_lock
 
--- =
+Probably the best solution is to add start_exclusive/end_exclusive
+respectively at the beginning and the end of fork_start and fork_end.
+This is safer in general, as it ensures that the disappeared child
+threads were quiescent.
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1736376
+In fact, I wonder if fork_start/fork_end still need to "take all
+mutexes" (in pthread_atfork style) if we do
+start_exclusive/end_exclusive in fork_start and fork_end(0).  You don't
+even need to reinitialize the mutexes, meaning that mmap_fork_start and
+mmap_fork_end should go as well.
 
-Title:
-  CVE-2017-7471 repeated?
+The list of locks that are "assured not taken" within
+start_exclusive/end_exclusive (currently: rcu_read_lock, tb_lock,
+mmap_lock) should probably be documented in fork_start/fork_end.
 
-Status in QEMU:
-  Invalid
+Thanks,
 
-Bug description:
-  In the hw/9pfs/9p-proxy.c file I can see the following which is
-  changed because of CVE-2017-7471 in the hw/9pfs/9p-local.c. I might be
-  wrong but I guess that should be changed as well.
-
-  if(dir_path){
-  v9fs_path_sprintf(target,"%s/%s",dir_path->data,name);
-  }
-  else{
-  v9fs_path_sprintf(target,"%s",name);
-  }
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1736376/+subscriptions
+Paolo
