@@ -1,31 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33913)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39030)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.williamson@redhat.com>) id 1eMd6z-0004Re-4y
-	for qemu-devel@nongnu.org; Wed, 06 Dec 2017 12:03:58 -0500
+	(envelope-from <pradeep.jagadeesh@huawei.com>) id 1eMdFH-0001fi-H5
+	for qemu-devel@nongnu.org; Wed, 06 Dec 2017 12:12:37 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.williamson@redhat.com>) id 1eMd6w-0001bS-0h
-	for qemu-devel@nongnu.org; Wed, 06 Dec 2017 12:03:57 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:42136)
+	(envelope-from <pradeep.jagadeesh@huawei.com>) id 1eMdFC-0001LJ-IX
+	for qemu-devel@nongnu.org; Wed, 06 Dec 2017 12:12:31 -0500
+Received: from lhrrgout.huawei.com ([194.213.3.17]:33226 helo=huawei.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <alex.williamson@redhat.com>)
-	id 1eMd6v-0001ae-Po
-	for qemu-devel@nongnu.org; Wed, 06 Dec 2017 12:03:53 -0500
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
-	[10.5.11.12])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id EBC47356EC
-	for <qemu-devel@nongnu.org>; Wed,  6 Dec 2017 17:03:52 +0000 (UTC)
-From: Alex Williamson <alex.williamson@redhat.com>
-Date: Wed, 06 Dec 2017 10:03:49 -0700
-Message-ID: <20171206170259.24842.81054.stgit@gimli.home>
-In-Reply-To: <20171206170019.24842.47488.stgit@gimli.home>
-References: <20171206170019.24842.47488.stgit@gimli.home>
+	(Exim 4.71) (envelope-from <pradeep.jagadeesh@huawei.com>)
+	id 1eMdFC-0001KE-CK
+	for qemu-devel@nongnu.org; Wed, 06 Dec 2017 12:12:26 -0500
+References: <1506954812-6552-1-git-send-email-pradeep.jagadeesh@huawei.com>
+	<20171206170705.37cda561@bahia.lan>
+	<9a0067d4-100b-b3eb-d38e-a99ab885e215@huawei.com>
+	<84bafe13-7e56-4aa5-cf48-edadd9c2d579@redhat.com>
+From: Pradeep Jagadeesh <pradeep.jagadeesh@huawei.com>
+Message-ID: <bc7a364b-03a0-529a-870f-340daca26afb@huawei.com>
+Date: Wed, 6 Dec 2017 18:12:13 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+In-Reply-To: <84bafe13-7e56-4aa5-cf48-edadd9c2d579@redhat.com>
+Content-Type: text/plain; charset="utf-8"; format=flowed
 Content-Transfer-Encoding: 7bit
-Subject: [Qemu-devel] [PULL for-2.11 1/1] vfio: Fix vfio-kvm group
- registration
+Subject: Re: [Qemu-devel] [PATCH v13 0/6] fsdev: qmp interface for io
+ throttling
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,41 +31,40 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Eric Blake <eblake@redhat.com>, Greg Kurz <groug@kaod.org>, Pradeep
+	Jagadeesh <pradeepkiruvale@gmail.com>
+Cc: alberto garcia <berto@igalia.com>, Markus Armbruster <armbru@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Manos Pitsidianakis <el13635@mail.ntua.gr>, jani kokkonen <jani.kokkonen@huawei.com>, qemu-devel@nongnu.org
 
-Commit 8c37faa475f3 ("vfio-pci, ppc64/spapr: Reorder group-to-container
-attaching") moved registration of groups with the vfio-kvm device from
-vfio_get_group() to vfio_connect_container(), but it missed the case
-where a group is attached to an existing container and takes an early
-exit.  Perhaps this is a less common case on ppc64/spapr, but on x86
-(without viommu) all groups are connected to the same container and
-thus only the first group gets registered with the vfio-kvm device.
-This becomes a problem if we then hot-unplug the devices associated
-with that first group and we end up with KVM being misinformed about
-any vfio connections that might remain.  Fix by including the call to
-vfio_kvm_device_add_group() in this early exit path.
+On 12/6/2017 5:49 PM, Eric Blake wrote:
+> On 12/06/2017 10:15 AM, Pradeep Jagadeesh wrote:
+>
+>>> I didn't have time to follow the thread, but it's been a month without
+>>> activity... where do we stand now ? I've merged I/O throttle for fsdev
+>>> in 2.9, is there a chance we get the QMP/HMP part in 2.12 ?
+>>
+>> Hi Greg,
+>>
+>> Yes, I am waiting for Eric's reply. Because there were some issues when
+>> I merged code with Manos's throttlelimits code. So, I am waiting to see
+>> how to go about it. It needs some changes to reuse in fsdev/blk qmp
+>> code. I am very much would like to push qmp code upstream.
+>
+> We missed the window of opportunity to unify any differences in
+> interfaces between what Manos added in 2.11 and your code, now that 2.11
+> is at -rc4.  That means we are stuck with two slightly different
+> interface; although it would still be nice to have glue code that can
+> convert into and out of a preferred form, so that the bulk of the code
+> can be common operations on the preferred struct.
+>
+> At this point, I don't know what additional information you want from
+> myself or Markus on the interface front; it may be easier to post a
+> rebased v14 and tackle it from there (even if it means our interface is
+> still in a state of churn).
+Thanks for the quick reply. The problem is with the block devices 
+code.So I was thinking to pull out those patches and just go ahead with 
+the fsdev. I can directly use Manos code directly without any changes in 
+fsdev case.So, I would like to go ahead and post v14 patches.
 
-Fixes: 8c37faa475f3 ("vfio-pci, ppc64/spapr: Reorder group-to-container attaching")
-Cc: qemu-stable@nongnu.org # qemu-2.10+
-Reviewed-by: Alexey Kardashevskiy <aik@ozlabs.ru>
-Reviewed-by: Peter Xu <peterx@redhat.com>
-Tested-by: Peter Xu <peterx@redhat.com>
-Reviewed-by: Eric Auger <eric.auger@redhat.com>
-Tested-by: Eric Auger <eric.auger@redhat.com>
-Signed-off-by: Alex Williamson <alex.williamson@redhat.com>
----
- hw/vfio/common.c |    1 +
- 1 file changed, 1 insertion(+)
-
-diff --git a/hw/vfio/common.c b/hw/vfio/common.c
-index 7b2924c0ef19..7007878e345e 100644
---- a/hw/vfio/common.c
-+++ b/hw/vfio/common.c
-@@ -968,6 +968,7 @@ static int vfio_connect_container(VFIOGroup *group, AddressSpace *as,
-         if (!ioctl(group->fd, VFIO_GROUP_SET_CONTAINER, &container->fd)) {
-             group->container = container;
-             QLIST_INSERT_HEAD(&container->group_list, group, container_next);
-+            vfio_kvm_device_add_group(group);
-             return 0;
-         }
-     }
+Regards,
+Pradeep
+>
