@@ -1,35 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55803)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57247)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <danielhb@linux.vnet.ibm.com>) id 1eMYPb-0005ta-Cs
-	for qemu-devel@nongnu.org; Wed, 06 Dec 2017 07:02:56 -0500
+	(envelope-from <david@redhat.com>) id 1eMYRE-0006uz-If
+	for qemu-devel@nongnu.org; Wed, 06 Dec 2017 07:04:41 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <danielhb@linux.vnet.ibm.com>) id 1eMYPW-00057q-Dn
-	for qemu-devel@nongnu.org; Wed, 06 Dec 2017 07:02:51 -0500
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:60654)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <danielhb@linux.vnet.ibm.com>)
-	id 1eMYPW-00057I-56
-	for qemu-devel@nongnu.org; Wed, 06 Dec 2017 07:02:46 -0500
-Received: from pps.filterd (m0098394.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
-	vB6C246d028451
-	for <qemu-devel@nongnu.org>; Wed, 6 Dec 2017 07:02:43 -0500
-Received: from e11.ny.us.ibm.com (e11.ny.us.ibm.com [129.33.205.201])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2epdy17rrt-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Wed, 06 Dec 2017 07:02:42 -0500
-Received: from localhost
-	by e11.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
-	Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <danielhb@linux.vnet.ibm.com>;
-	Wed, 6 Dec 2017 07:02:41 -0500
-From: Daniel Henrique Barboza <danielhb@linux.vnet.ibm.com>
-Date: Wed,  6 Dec 2017 10:02:17 -0200
-In-Reply-To: <20171206120217.11392-1-danielhb@linux.vnet.ibm.com>
-References: <20171206120217.11392-1-danielhb@linux.vnet.ibm.com>
-Message-Id: <20171206120217.11392-4-danielhb@linux.vnet.ibm.com>
-Subject: [Qemu-devel] [PATCH 3/3] qga: update guest-suspend-ram and
- guest-suspend-hybrid descriptions
+	(envelope-from <david@redhat.com>) id 1eMYR9-0006Tk-IT
+	for qemu-devel@nongnu.org; Wed, 06 Dec 2017 07:04:32 -0500
+References: <20171206120000.63822-1-borntraeger@de.ibm.com>
+From: David Hildenbrand <david@redhat.com>
+Message-ID: <0b60c788-0470-1fa0-390c-472d75aef0dc@redhat.com>
+Date: Wed, 6 Dec 2017 13:04:23 +0100
+MIME-Version: 1.0
+In-Reply-To: <20171206120000.63822-1-borntraeger@de.ibm.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH/RFC] s390x: split memory into 4TB chunks
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -38,49 +23,65 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: armbru@redhat.com, dgilbert@redhat.com, mdroth@linux.vnet.ibm.com, Daniel Henrique Barboza <danielhb@linux.vnet.ibm.com>
+To: Christian Borntraeger <borntraeger@de.ibm.com>, Cornelia Huck <cohuck@redhat.com>
+Cc: qemu-devel <qemu-devel@nongnu.org>, qemu-s390x <qemu-s390x@nongnu.org>, Halil Pasic <pasic@linux.vnet.ibm.com>, Alexander Graf <agraf@suse.de>, Thomas Huth <thuth@redhat.com>, Richard Henderson <rth@twiddle.net>
 
-This patch updates the descriptions of 'guest-suspend-ram' and
-'guest-suspend-hybrid' to mention that both commands relies now
-on the existence of 'system_wakeup' and also on the proper support
-for wake up from suspend, retrieved by the QMP command
-'query-wakeup-from-suspend-support'.
+On 06.12.2017 13:00, Christian Borntraeger wrote:
+> KVM does not allow memory regions > KVM_MEM_MAX_NR_PAGES, basically
+> limiting the memory per slot to 7.999TB. Lets split the base memory
+> into 4TB chunks to allow go beyond 8TB for a guest. With that (and
+> optimistic overcommitment in the kernel) I was able to start  a 59TB
+> guest on a 1TB system.
+> 
+> Signed-off-by: Christian Borntraeger <borntraeger@de.ibm.com>
+> ---
+>  hw/s390x/s390-virtio-ccw.c | 20 +++++++++++++++++---
+>  1 file changed, 17 insertions(+), 3 deletions(-)
+> 
+> diff --git a/hw/s390x/s390-virtio-ccw.c b/hw/s390x/s390-virtio-ccw.c
+> index 8425534..6735bbb 100644
+> --- a/hw/s390x/s390-virtio-ccw.c
+> +++ b/hw/s390x/s390-virtio-ccw.c
+> @@ -157,11 +157,25 @@ static void virtio_ccw_register_hcalls(void)
+>  static void s390_memory_init(ram_addr_t mem_size)
+>  {
+>      MemoryRegion *sysmem = get_system_memory();
+> -    MemoryRegion *ram = g_new(MemoryRegion, 1);
+> +    ram_addr_t chunk, offset;
+> +    gchar *name;
+>  
+>      /* allocate RAM for core */
+> -    memory_region_allocate_system_memory(ram, NULL, "s390.ram", mem_size);
+> -    memory_region_add_subregion(sysmem, 0, ram);
+> +    offset = 0;
+> +    while (mem_size) {
+> +        MemoryRegion *ram = g_new(MemoryRegion, 1);
+> +        chunk = mem_size;
+> +        /* KVM does not allow memslots >= 8 TB. Lets split into 4TB chunks */> +        if (chunk > 4UL * 1024 * 1024 * 1024 * 1024) {
+> +            chunk = 4UL * 1024 * 1024 * 1024 * 1024;
+> +        }
+> +        name = g_strdup_printf("s390.ram[0x%lx]", offset);
+> +        memory_region_allocate_system_memory(ram, NULL, name, chunk);
+> +        memory_region_add_subregion(sysmem, offset, ram);
+> +        mem_size -= chunk;
+> +        offset += chunk;
+> +        g_free(name);
+> +    }
+>  
+>      /* Initialize storage key device */
+>      s390_skeys_init();
+> 
 
-Signed-off-by: Daniel Henrique Barboza <danielhb@linux.vnet.ibm.com>
----
- qga/qapi-schema.json | 12 ++++++++----
- 1 file changed, 8 insertions(+), 4 deletions(-)
+This will most certainly break migration, no?
 
-diff --git a/qga/qapi-schema.json b/qga/qapi-schema.json
-index 17884c7c70..d64ada304b 100644
---- a/qga/qapi-schema.json
-+++ b/qga/qapi-schema.json
-@@ -566,8 +566,10 @@
- # package installed in the guest.
- #
- # IMPORTANT: guest-suspend-ram requires QEMU to support the 'system_wakeup'
--# command.  Thus, it's *required* to query QEMU for the presence of the
--# 'system_wakeup' command before issuing guest-suspend-ram.
-+# command and the guest to support wake up from suspend. Thus, it's
-+# *required* to query QEMU for the presence of the 'system_wakeup' command
-+# and to verify that wake up from suspend is enabled using
-+# 'query-wakeup-from-suspend-support' before issuing guest-suspend-ram.
- #
- # This command does NOT return a response on success. There are two options
- # to check for success:
-@@ -593,8 +595,10 @@
- # This command requires the pm-utils package to be installed in the guest.
- #
- # IMPORTANT: guest-suspend-hybrid requires QEMU to support the 'system_wakeup'
--# command.  Thus, it's *required* to query QEMU for the presence of the
--# 'system_wakeup' command before issuing guest-suspend-hybrid.
-+# command and the guest to support wake up from suspend. Thus, it's
-+# *required* to query QEMU for the presence of the 'system_wakeup' command
-+# and to verify that wake up from suspend is enabled using
-+# 'query-wakeup-from-suspend-support' before issuing guest-suspend-hybrid.
- #
- # This command does NOT return a response on success. There are two options
- # to check for success:
+1. I remember the name being used for migration, I might be wrong.
+2. Migration of guests > 4TB is certainly broken ;)
+
+I wonder if this should rather be handled in the kvm_slot code.
+(silently create an manage two slots)
+
 -- 
-2.13.6
+
+Thanks,
+
+David / dhildenb
