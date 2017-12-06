@@ -1,25 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35703)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36189)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1eMUph-0003FA-IL
-	for qemu-devel@nongnu.org; Wed, 06 Dec 2017 03:13:34 -0500
+	(envelope-from <eric.auger@redhat.com>) id 1eMUqh-0003j5-OP
+	for qemu-devel@nongnu.org; Wed, 06 Dec 2017 03:14:36 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1eMUpe-0003eS-Cf
-	for qemu-devel@nongnu.org; Wed, 06 Dec 2017 03:13:33 -0500
-Received: from 7.mo177.mail-out.ovh.net ([46.105.61.149]:36428)
+	(envelope-from <eric.auger@redhat.com>) id 1eMUqe-0004LS-J5
+	for qemu-devel@nongnu.org; Wed, 06 Dec 2017 03:14:35 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:46122)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1eMUpe-0003df-6F
-	for qemu-devel@nongnu.org; Wed, 06 Dec 2017 03:13:30 -0500
-Received: from player779.ha.ovh.net (b9.ovh.net [213.186.33.59])
-	by mo177.mail-out.ovh.net (Postfix) with ESMTP id BF5EA90265
-	for <qemu-devel@nongnu.org>; Wed,  6 Dec 2017 09:13:28 +0100 (CET)
-From: Greg Kurz <groug@kaod.org>
-Date: Wed, 06 Dec 2017 09:13:16 +0100
-Message-ID: <151254799678.27605.10670816153836184660.stgit@bahia.lan>
+	(Exim 4.71) (envelope-from <eric.auger@redhat.com>)
+	id 1eMUqe-0004Kq-Bs
+	for qemu-devel@nongnu.org; Wed, 06 Dec 2017 03:14:32 -0500
+References: <20171205205409.5348.53070.stgit@gimli.home>
+From: Auger Eric <eric.auger@redhat.com>
+Message-ID: <6844c413-0a0c-d6b9-91bd-2805299e268b@redhat.com>
+Date: Wed, 6 Dec 2017 09:14:25 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v3] spapr: fix LSI interrupt specifiers in the
- device tree
+In-Reply-To: <20171205205409.5348.53070.stgit@gimli.home>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH for-2.11] vfio: Fix vfio-kvm group
+ registration
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,126 +28,68 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: qemu-ppc@nongnu.org, David Gibson <david@gibson.dropbear.id.au>, Cedric Le Goater <clg@kaod.org>
+To: Alex Williamson <alex.williamson@redhat.com>, qemu-devel@nongnu.org
+Cc: aik@ozlabs.ru
 
-LoPAPR 1.1 B.6.9.1.2 describes the "#interrupt-cells" property of the
-PowerPC External Interrupt Source Controller node as follows:
+Hi Alex,
 
-=E2=80=9C#interrupt-cells=E2=80=9D
+On 05/12/17 22:09, Alex Williamson wrote:
+> Commit 8c37faa475f3 ("vfio-pci, ppc64/spapr: Reorder group-to-container
+> attaching") moved registration of groups with the vfio-kvm device from
+> vfio_get_group() to vfio_connect_container(), but it missed the case
+> where a group is attached to an existing container and takes an early
+> exit.  Perhaps this is a less common case on ppc64/spapr, but on x86
+> (without viommu) all groups are connected to the same container and
+> thus only the first group gets registered with the vfio-kvm device.
+> This becomes a problem if we then hot-unplug the devices associated
+> with that first group and we end up with KVM being misinformed about
+> any vfio connections that might remain.  Fix by including the call to
+> vfio_kvm_device_add_group() in this early exit path.
+> 
+> Fixes: 8c37faa475f3 ("vfio-pci, ppc64/spapr: Reorder group-to-container attaching")
+> Cc: qemu-stable@nongnu.org # qemu-2.10+
+> Signed-off-by: Alex Williamson <alex.williamson@redhat.com>
 
-  Standard property name to define the number of cells in an interrupt-
-  specifier within an interrupt domain.
+Reviewed-by: Eric Auger <eric.auger@redhat.com>
+Tested-by: Eric Auger <eric.auger@redhat.com>
 
-  prop-encoded-array: An integer, encoded as with encode-int, that denote=
-s
-  the number of cells required to represent an interrupt specifier in its
-  child nodes.
+Tested on arm64 Gigabyte HW with hot-detach of the 2 X540T2 PFs
 
-  The value of this property for the PowerPC External Interrupt option sh=
-all
-  be 2. Thus all interrupt specifiers (as used in the standard =E2=80=9Ci=
-nterrupts=E2=80=9D
-  property) shall consist of two cells, each containing an integer encode=
-d
-  as with encode-int. The first integer represents the interrupt number t=
-he
-  second integer is the trigger code: 0 for edge triggered, 1 for level
-  triggered.
+I don't have the "2017-12-06T08:02:07.535373Z qemu-system-aarch64:
+Failed to remove group 24 from KVM VFIO device: No such file or
+directory" anymore when detaching the second PF.
 
-This patch fixes the interrupt specifiers in the "interrupt-map" property
-of the PHB node, that were setting the second cell to 8 (confusion with
-IRQ_TYPE_LEVEL_LOW ?) instead of 1.
+Thanks
 
-VIO devices and RTAS event sources use the same format for interrupt
-specifiers: while here, we introduce a common helper to handle the
-encoding details.
+Eric
 
-Signed-off-by: Greg Kurz <groug@kaod.org>
-Reviewed-by: C=C3=A9dric Le Goater <clg@kaod.org>
-Tested-by: C=C3=A9dric Le Goater <clg@kaod.org>
---
-v3: - reference public LoPAPR instead of internal PAPR+ in changelog
-    - change helper name to spapr_dt_xics_irq()
 
-v2: - drop the erroneous changes to the "interrupts" prop in PCI device n=
-odes
-    - introduce a common helper to encode interrupt specifiers
----
- hw/ppc/spapr_events.c  |    3 +--
- hw/ppc/spapr_pci.c     |    3 +--
- hw/ppc/spapr_vio.c     |    3 ++-
- include/hw/ppc/spapr.h |   10 ++++++++++
- 4 files changed, 14 insertions(+), 5 deletions(-)
-
-diff --git a/hw/ppc/spapr_events.c b/hw/ppc/spapr_events.c
-index 7dc87fc7bd77..c7a64e6b8dd3 100644
---- a/hw/ppc/spapr_events.c
-+++ b/hw/ppc/spapr_events.c
-@@ -282,8 +282,7 @@ void spapr_dt_events(sPAPRMachineState *spapr, void *=
-fdt)
-             continue;
-         }
-=20
--        interrupts[0] =3D cpu_to_be32(source->irq);
--        interrupts[1] =3D 0;
-+        spapr_dt_xics_irq(interrupts, source->irq, false);
-=20
-         _FDT(node_offset =3D fdt_add_subnode(fdt, event_sources, source_=
-name));
-         _FDT(fdt_setprop(fdt, node_offset, "interrupts", interrupts,
-diff --git a/hw/ppc/spapr_pci.c b/hw/ppc/spapr_pci.c
-index 39134f0ef0a3..88797b3d3622 100644
---- a/hw/ppc/spapr_pci.c
-+++ b/hw/ppc/spapr_pci.c
-@@ -2121,8 +2121,7 @@ int spapr_populate_pci_dt(sPAPRPHBState *phb,
-             irqmap[2] =3D 0;
-             irqmap[3] =3D cpu_to_be32(j+1);
-             irqmap[4] =3D cpu_to_be32(xics_phandle);
--            irqmap[5] =3D cpu_to_be32(phb->lsi_table[lsi_num].irq);
--            irqmap[6] =3D cpu_to_be32(0x8);
-+            spapr_dt_xics_irq(&irqmap[5], phb->lsi_table[lsi_num].irq, t=
-rue);
-         }
-     }
-     /* Write interrupt map */
-diff --git a/hw/ppc/spapr_vio.c b/hw/ppc/spapr_vio.c
-index bb7ed2c537b0..472dd6f33a96 100644
---- a/hw/ppc/spapr_vio.c
-+++ b/hw/ppc/spapr_vio.c
-@@ -126,8 +126,9 @@ static int vio_make_devnode(VIOsPAPRDevice *dev,
-     }
-=20
-     if (dev->irq) {
--        uint32_t ints_prop[] =3D {cpu_to_be32(dev->irq), 0};
-+        uint32_t ints_prop[2];
-=20
-+        spapr_dt_xics_irq(ints_prop, dev->irq, false);
-         ret =3D fdt_setprop(fdt, node_off, "interrupts", ints_prop,
-                           sizeof(ints_prop));
-         if (ret < 0) {
-diff --git a/include/hw/ppc/spapr.h b/include/hw/ppc/spapr.h
-index 6b8e04c78771..14757b805e84 100644
---- a/include/hw/ppc/spapr.h
-+++ b/include/hw/ppc/spapr.h
-@@ -590,6 +590,16 @@ void spapr_load_rtas(sPAPRMachineState *spapr, void =
-*fdt, hwaddr addr);
-=20
- #define RTAS_EVENT_SCAN_RATE    1
-=20
-+/* This helper should be used to encode interrupt specifiers when the re=
-lated
-+ * "interrupt-controller" node has its "#interrupt-cells" property set t=
-o 2 (ie,
-+ * VIO devices, RTAS event sources and PHBs).
-+ */
-+static inline void spapr_dt_xics_irq(uint32_t *intspec, int irq, bool is=
-_lsi)
-+{
-+    intspec[0] =3D cpu_to_be32(irq);
-+    intspec[1] =3D is_lsi ? cpu_to_be32(1) : 0;
-+}
-+
- typedef struct sPAPRTCETable sPAPRTCETable;
-=20
- #define TYPE_SPAPR_TCE_TABLE "spapr-tce-table"
+> ---
+> 
+> This bug also existed in QEMU 2.10, but I think the fix is sufficiently
+> obvious (famous last words) to propose for 2.11 at this late date.  If
+> the first group is hot unplugged then KVM may revert to code emulation
+> that assumes no non-coherent DMA is present on some systems.  Also for
+> KVMGT, if the vGPU is not the first device registered, then the
+> notifier to enable linkages to KVM would not be called.  Please review.
+> Thanks,
+> 
+> Alex
+> 
+>  hw/vfio/common.c |    1 +
+>  1 file changed, 1 insertion(+)
+> 
+> diff --git a/hw/vfio/common.c b/hw/vfio/common.c
+> index 7b2924c0ef19..7007878e345e 100644
+> --- a/hw/vfio/common.c
+> +++ b/hw/vfio/common.c
+> @@ -968,6 +968,7 @@ static int vfio_connect_container(VFIOGroup *group, AddressSpace *as,
+>          if (!ioctl(group->fd, VFIO_GROUP_SET_CONTAINER, &container->fd)) {
+>              group->container = container;
+>              QLIST_INSERT_HEAD(&container->group_list, group, container_next);
+> +            vfio_kvm_device_add_group(group);
+>              return 0;
+>          }
+>      }
+> 
+> 
