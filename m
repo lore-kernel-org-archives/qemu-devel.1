@@ -1,22 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41522)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43547)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1eMbYq-00024o-9U
-	for qemu-devel@nongnu.org; Wed, 06 Dec 2017 10:24:37 -0500
+	(envelope-from <alex.bennee@linaro.org>) id 1eMbdE-0004oJ-AU
+	for qemu-devel@nongnu.org; Wed, 06 Dec 2017 10:29:09 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1eMbYn-0008Fo-2y
-	for qemu-devel@nongnu.org; Wed, 06 Dec 2017 10:24:36 -0500
-References: <20171204125505.29203-1-david@redhat.com>
-	<20171204125505.29203-5-david@redhat.com>
-From: Thomas Huth <thuth@redhat.com>
-Message-ID: <b0cfb45c-791b-b1f9-c486-258a4d8fb532@redhat.com>
-Date: Wed, 6 Dec 2017 16:24:25 +0100
+	(envelope-from <alex.bennee@linaro.org>) id 1eMbdB-0004dT-4L
+	for qemu-devel@nongnu.org; Wed, 06 Dec 2017 10:29:08 -0500
+Received: from mail-wr0-x241.google.com ([2a00:1450:400c:c0c::241]:35178)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+	id 1eMbdA-0004d3-Sz
+	for qemu-devel@nongnu.org; Wed, 06 Dec 2017 10:29:05 -0500
+Received: by mail-wr0-x241.google.com with SMTP id g53so4335555wra.2
+	for <qemu-devel@nongnu.org>; Wed, 06 Dec 2017 07:29:04 -0800 (PST)
+From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
+Date: Wed,  6 Dec 2017 15:28:45 +0000
+Message-Id: <20171206152845.8215-1-alex.bennee@linaro.org>
 MIME-Version: 1.0
-In-Reply-To: <20171204125505.29203-5-david@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v1 for-2.12 4/5] s390x/tcg: indicate value
- of TODPR in STCKE
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Subject: [Qemu-devel] [PATCH for 2.11] target/sh4/translate.c: fix TCG leak
+ during gusa sequence
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,49 +28,35 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Hildenbrand <david@redhat.com>, qemu-s390x@nongnu.org, qemu-devel@nongnu.org
-Cc: Cornelia Huck <cohuck@redhat.com>, Richard Henderson <rth@twiddle.net>
+To: peter.maydell@linaro.org
+Cc: qemu-devel@nongnu.org, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, qemu-stable@nongnu.org, Aurelien Jarno <aurelien@aurel32.net>
 
-On 04.12.2017 13:55, David Hildenbrand wrote:
-> We were not yet using the value of the TOD Programmable Register.
-> 
-> Signed-off-by: David Hildenbrand <david@redhat.com>
-> ---
->  target/s390x/translate.c | 5 +++++
->  1 file changed, 5 insertions(+)
-> 
-> diff --git a/target/s390x/translate.c b/target/s390x/translate.c
-> index 48b031894a..8da8610839 100644
-> --- a/target/s390x/translate.c
-> +++ b/target/s390x/translate.c
-> @@ -3897,7 +3897,10 @@ static ExitStatus op_stcke(DisasContext *s, DisasOps *o)
->  {
->      TCGv_i64 c1 = tcg_temp_new_i64();
->      TCGv_i64 c2 = tcg_temp_new_i64();
-> +    TCGv_i64 todpr = tcg_temp_new_i64();
->      gen_helper_stck(c1, cpu_env);
-> +    /* 16 bit value store in an uint32_t (only valid bits set) */
-> +    tcg_gen_ld32u_i64(todpr, cpu_env, offsetof(CPUS390XState, todpr));
->      /* Shift the 64-bit value into its place as a zero-extended
->         104-bit value.  Note that "bit positions 64-103 are always
->         non-zero so that they compare differently to STCK"; we set
-> @@ -3905,11 +3908,13 @@ static ExitStatus op_stcke(DisasContext *s, DisasOps *o)
->      tcg_gen_shli_i64(c2, c1, 56);
->      tcg_gen_shri_i64(c1, c1, 8);
->      tcg_gen_ori_i64(c2, c2, 0x10000);
-> +    tcg_gen_or_i64(c2, c2, todpr);
->      tcg_gen_qemu_st64(c1, o->in2, get_mem_index(s));
->      tcg_gen_addi_i64(o->in2, o->in2, 8);
->      tcg_gen_qemu_st64(c2, o->in2, get_mem_index(s));
->      tcg_temp_free_i64(c1);
->      tcg_temp_free_i64(c2);
-> +    tcg_temp_free_i64(todpr);
->      /* ??? We don't implement clock states.  */
->      gen_op_movi_cc(s, 0);
->      return NO_EXIT;
-> 
+This fixes bug #1735384 while running java under qemu-sh4. When debug
+was enabled it showed a problem with TCG temps. Once fixed I was able
+to run java -version normally.
 
-IANATE (I am not a TCG expert), but as far as I can see, this seems to
-be correct.
+Reported-by: John Paul Adrian Glaubitz <glaubitz@physik.fu-berlin.de>
+Suggested-by: Richard Henderson <richard.henderson@linaro.org>
+Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+Tested-by: John Paul Adrian Glaubitz <glaubitz@physik.fu-berlin.de>
+Cc: qemu-stable@nongnu.org
+---
+ target/sh4/translate.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-Reviewed-by: Thomas Huth <thuth@redhat.com>
+diff --git a/target/sh4/translate.c b/target/sh4/translate.c
+index 703020fe87..b4b5c822d0 100644
+--- a/target/sh4/translate.c
++++ b/target/sh4/translate.c
+@@ -2189,7 +2189,7 @@ static int decode_gusa(DisasContext *ctx, CPUSH4State *env, int *pmax_insns)
+     }
+ 
+     /* If op_src is not a valid register, then op_arg was a constant.  */
+-    if (op_src < 0) {
++    if (op_src < 0 && !TCGV_IS_UNUSED(op_arg)) {
+         tcg_temp_free_i32(op_arg);
+     }
+ 
+-- 
+2.15.1
