@@ -1,23 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39763)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41556)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1eMXvr-0006Wm-TI
-	for qemu-devel@nongnu.org; Wed, 06 Dec 2017 06:32:08 -0500
+	(envelope-from <darren.kenny@oracle.com>) id 1eMXyl-0000Js-CI
+	for qemu-devel@nongnu.org; Wed, 06 Dec 2017 06:35:08 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1eMXvq-0007tP-Sl
-	for qemu-devel@nongnu.org; Wed, 06 Dec 2017 06:32:07 -0500
-Date: Wed, 6 Dec 2017 11:31:55 +0000
-From: Stefan Hajnoczi <stefanha@redhat.com>
-Message-ID: <20171206113155.GB12584@stefanha-x1.localdomain>
-References: <20171205104141.28882-1-stefanha@redhat.com>
-	<20171205104141.28882-2-stefanha@redhat.com>
-	<f69659d6-0bae-b510-3cd5-435e8fd4838a@redhat.com>
+	(envelope-from <darren.kenny@oracle.com>) id 1eMXyh-0001H3-AV
+	for qemu-devel@nongnu.org; Wed, 06 Dec 2017 06:35:07 -0500
+Received: from aserp2120.oracle.com ([141.146.126.78]:59300)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <darren.kenny@oracle.com>)
+	id 1eMXyh-0001FP-0Z
+	for qemu-devel@nongnu.org; Wed, 06 Dec 2017 06:35:03 -0500
+Date: Wed, 6 Dec 2017 11:34:42 +0000
+From: Darren Kenny <darren.kenny@oracle.com>
+Message-ID: <20171206113442.fjcpuwdfwx6brdkb@starbug-vm.ie.oracle.com>
+References: <20171206112116.29413-1-ppandit@redhat.com>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="RASg3xLB4tUQ4RcS"
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Disposition: inline
-In-Reply-To: <f69659d6-0bae-b510-3cd5-435e8fd4838a@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH 1/9] blockdev: hold AioContext for
- bdrv_unref() in external_snapshot_clean()
+In-Reply-To: <20171206112116.29413-1-ppandit@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH] scsi: check current request object before
+ use
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,75 +28,75 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>
-Cc: qemu-devel@nongnu.org, Kevin Wolf <kwolf@redhat.com>, John Snow <jsnow@redhat.com>, qemu-block@nongnu.org
+To: P J P <ppandit@redhat.com>
+Cc: Qemu Developers <qemu-devel@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>, Zhangboxian <zhangboxian@huawei.com>, Prasad J Pandit <pjp@fedoraproject.org>
 
+Are both tests for NULL necessary, the second one would seem to
+suffice - but also the first check changes whether esp_dma_done()
+would get called or not here:
 
---RASg3xLB4tUQ4RcS
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+  276     if (s->async_len == 0) {
+  277         scsi_req_continue(s->current_req);
+  278         /* If there is still data to be read from the device then
+  279            complete the DMA operation immediately.  Otherwise defer
+  280            until the scsi layer has completed.  */
+  281         if (to_device || s->dma_left != 0 || s->ti_size == 0) {
+  282             return;
+  283         }
+  284     }
+  285 
+  286     /* Partially filled a scsi buffer. Complete immediately.  */
+  287     esp_dma_done(s);
 
-On Tue, Dec 05, 2017 at 08:36:32AM -0600, Eric Blake wrote:
-> On 12/05/2017 04:41 AM, Stefan Hajnoczi wrote:
-> > bdrv_unref() requires the AioContext lock because bdrv_flush() uses
-> > BDRV_POLL_WHILE(), which assumes the AioContext is currently held.  If
-> > BDRV_POLL_WHILE() runs without AioContext held the
-> > pthread_mutex_unlock() call in aio_context_release() fails.
-> >=20
-> > This patch moves bdrv_unref() into the AioContext locked region to solve
-> > the following pthread_mutex_unlock() failure:
-> >=20
-> >   #0  0x00007f566181969b in raise () at /lib64/libc.so.6
-> >   #1  0x00007f566181b3b1 in abort () at /lib64/libc.so.6
-> >   #2  0x00005592cd590458 in error_exit (err=3D<optimized out>, msg=3Dms=
-g@entry=3D0x5592cdaf6d60 <__func__.23977> "qemu_mutex_unlock") at util/qemu=
--thread-posix.c:36
-> >   #3  0x00005592cd96e738 in qemu_mutex_unlock (mutex=3Dmutex@entry=3D0x=
-5592ce9505e0) at util/qemu-thread-posix.c:96
-> >   #4  0x00005592cd969b69 in aio_context_release (ctx=3Dctx@entry=3D0x55=
-92ce950580) at util/async.c:507
-> >   #5  0x00005592cd8ead78 in bdrv_flush (bs=3Dbs@entry=3D0x5592cfa87210)=
- at block/io.c:2478
-> >   #6  0x00005592cd89df30 in bdrv_close (bs=3D0x5592cfa87210) at block.c=
-:3207
-> >   #7  0x00005592cd89df30 in bdrv_delete (bs=3D0x5592cfa87210) at block.=
-c:3395
-> >   #8  0x00005592cd89df30 in bdrv_unref (bs=3D0x5592cfa87210) at block.c=
-:4418
-> >   #9  0x00005592cd6b7f86 in qmp_transaction (dev_list=3D<optimized out>=
-, has_props=3D<optimized out>, props=3D<optimized out>, errp=3Derrp@entry=
-=3D0x7ffe4a1fc9d8) at blockdev.c:2308
-> >=20
-> > Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
-> > ---
-> >  blockdev.c | 2 +-
-> >  1 file changed, 1 insertion(+), 1 deletion(-)
->=20
-> Reviewed-by: Eric Blake <eblake@redhat.com>
->=20
-> I know the series is too big/late for 2.11, but is this one patch worth
-> having?
+I don't know the SCSI code well enough to know if it is correct to
+change this, so just pointing it out in case someone else might.
 
-This fix is not critical for 2.11.  The bug shouldn't be triggered under
-normal circumstances.
+Thanks,
 
-The bug was exposed while developing qemu-iotests 202, which uses
-unconventional commands (blockdev-add to create BDSes with no -drive or
-BlockBackend).
+Darren.
 
---RASg3xLB4tUQ4RcS
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEcBAEBAgAGBQJaJ9UrAAoJEJykq7OBq3PIJw8IAKnz2CfgKBUkSLr1aE4BdytX
-c1KmpcSTCU+q8gqFI0/5xpaLBfvpdLZR4x6dKxZ5JXDZG2eYQlzTeC0atGkvzpAB
-+4imK/65G7f7mzPqjlTnIhQmPCWRULyA5Syq7IeNXfN/py2/Lw4Z4dOSraqkhGPf
-lyKHbk9CmYgWGTqs+nyKILSR1cbKuWK5HILqcDkcvJZU0x3ngoB8bIusYs6dxpDE
-MOpNrbb/absAV2yfO4UFSJAoLZFWEEOr53pPGF2bwvGAYC0EOZddjv51WnSxjMNT
-wcGeFVSRUvVXU0r91mx2SyH6XfDrZSpM3XnTVleAWmpzhIU5Hg5CJiwX8LHdL00=
-=ngn3
------END PGP SIGNATURE-----
-
---RASg3xLB4tUQ4RcS--
+On Wed, Dec 06, 2017 at 04:51:16PM +0530, P J P wrote:
+>From: Prasad J Pandit <pjp@fedoraproject.org>
+>
+>During a dma access, SCSIRequest object 'current_req' could be
+>null, leading to a null pointer dereference. Add check to avoid
+>it.
+>
+>Reported-by: Zhangboxian <zhangboxian@huawei.com>
+>Signed-off-by: Prasad J Pandit <pjp@fedoraproject.org>
+>---
+> hw/scsi/esp.c      | 2 +-
+> hw/scsi/scsi-bus.c | 3 +++
+> 2 files changed, 4 insertions(+), 1 deletion(-)
+>
+>diff --git a/hw/scsi/esp.c b/hw/scsi/esp.c
+>index ee586e7d6c..0c6925a708 100644
+>--- a/hw/scsi/esp.c
+>+++ b/hw/scsi/esp.c
+>@@ -273,7 +273,7 @@ static void esp_do_dma(ESPState *s)
+>         s->ti_size += len;
+>     else
+>         s->ti_size -= len;
+>-    if (s->async_len == 0) {
+>+    if (s->current_req && s->async_len == 0) {
+>         scsi_req_continue(s->current_req);
+>         /* If there is still data to be read from the device then
+>            complete the DMA operation immediately.  Otherwise defer
+>diff --git a/hw/scsi/scsi-bus.c b/hw/scsi/scsi-bus.c
+>index 977f7bce1f..ac64a239e9 100644
+>--- a/hw/scsi/scsi-bus.c
+>+++ b/hw/scsi/scsi-bus.c
+>@@ -1338,6 +1338,9 @@ void scsi_req_unref(SCSIRequest *req)
+>    will start the next chunk or complete the command.  */
+> void scsi_req_continue(SCSIRequest *req)
+> {
+>+    if (!req) {
+>+        return;
+>+    }
+>     if (req->io_canceled) {
+>         trace_scsi_req_continue_canceled(req->dev->id, req->lun, req->tag);
+>         return;
+>-- 
+>2.13.6
+>
+>
