@@ -1,21 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34985)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37484)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1eMVov-0004zT-QV
-	for qemu-devel@nongnu.org; Wed, 06 Dec 2017 04:16:51 -0500
+	(envelope-from <arei.gonglei@huawei.com>) id 1eMVu6-0008Ox-NN
+	for qemu-devel@nongnu.org; Wed, 06 Dec 2017 04:22:11 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1eMVou-0007Oy-FR
-	for qemu-devel@nongnu.org; Wed, 06 Dec 2017 04:16:49 -0500
-Date: Wed, 6 Dec 2017 19:44:54 +1100
-From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20171206084454.GU3057@umbus.fritz.box>
-References: <151254799678.27605.10670816153836184660.stgit@bahia.lan>
+	(envelope-from <arei.gonglei@huawei.com>) id 1eMVu3-0002IO-IJ
+	for qemu-devel@nongnu.org; Wed, 06 Dec 2017 04:22:10 -0500
+Received: from [45.249.212.255] (port=36729 helo=huawei.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <arei.gonglei@huawei.com>)
+	id 1eMVu3-0002EI-6N
+	for qemu-devel@nongnu.org; Wed, 06 Dec 2017 04:22:07 -0500
+From: "Gonglei (Arei)" <arei.gonglei@huawei.com>
+Date: Wed, 6 Dec 2017 09:21:55 +0000
+Message-ID: <33183CC9F5247A488A2544077AF19020DA4CA201@DGGEMA505-MBS.china.huawei.com>
+References: <20171205063313.GB4102@yangzhon-Virtual>
+	<20171205120623.GB31150@stefanha-x1.localdomain>
+	<5f9f2835-5811-3ee0-9049-0d2cddc08958@redhat.com>
+	<CAJSP0QVn0Uq_XO-22cz1JzbgEaFfwwX9yXBk1eKKkMfknADFmQ@mail.gmail.com>
+	<876e5376-d729-72d7-3c04-3c6f52b745de@redhat.com>
+	<20171205163109.GC6712@stefanha-x1.localdomain>
+In-Reply-To: <20171205163109.GC6712@stefanha-x1.localdomain>
+Content-Language: zh-CN
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="+k4Drb7WGefOwc9B"
-Content-Disposition: inline
-In-Reply-To: <151254799678.27605.10670816153836184660.stgit@bahia.lan>
-Subject: Re: [Qemu-devel] [PATCH v3] spapr: fix LSI interrupt specifiers in
- the device tree
+Subject: Re: [Qemu-devel] About the light VM solution!
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,77 +33,69 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Greg Kurz <groug@kaod.org>
-Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org, Cedric Le Goater <clg@kaod.org>
+To: Stefan Hajnoczi <stefanha@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
+Cc: Yang Zhong <yang.zhong@intel.com>, Stefan Hajnoczi <stefanha@gmail.com>, qemu-devel <qemu-devel@nongnu.org>
 
 
---+k4Drb7WGefOwc9B
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
-
-On Wed, Dec 06, 2017 at 09:13:16AM +0100, Greg Kurz wrote:
-> LoPAPR 1.1 B.6.9.1.2 describes the "#interrupt-cells" property of the
-> PowerPC External Interrupt Source Controller node as follows:
+> -----Original Message-----
+> From: Qemu-devel
+> [mailto:qemu-devel-bounces+arei.gonglei=3Dhuawei.com@nongnu.org] On
+> Behalf Of Stefan Hajnoczi
+> Sent: Wednesday, December 06, 2017 12:31 AM
+> To: Paolo Bonzini
+> Cc: Yang Zhong; Stefan Hajnoczi; qemu-devel
+> Subject: Re: [Qemu-devel] About the light VM solution!
 >=20
-> =E2=80=9C#interrupt-cells=E2=80=9D
+> On Tue, Dec 05, 2017 at 03:00:10PM +0100, Paolo Bonzini wrote:
+> > On 05/12/2017 14:47, Stefan Hajnoczi wrote:
+> > > On Tue, Dec 5, 2017 at 1:35 PM, Paolo Bonzini <pbonzini@redhat.com>
+> wrote:
+> > >> On 05/12/2017 13:06, Stefan Hajnoczi wrote:
+> > >>> On Tue, Dec 05, 2017 at 02:33:13PM +0800, Yang Zhong wrote:
+> > >>>> As you know, AWS has decided to switch to KVM in their clouds. Thi=
+s
+> news make almost all
+> > >>>> china CSPs(clouds service provider) pay more attention on KVM/Qemu=
+,
+> especially light VM
+> > >>>> solution.
+> > >>>>
+> > >>>> Below are intel solution for light VM, qemu-lite.
+> > >>>>
+> http://events.linuxfoundation.org/sites/events/files/slides/Light%20weigh=
+t%2
+> 0virtualization%20with%20QEMU%26KVM_0.pdf
+> > >>>>
+> > >>>> My question is whether community has some plan to implement light
+> VM or alternative solutions? If no, whether our
+> > >>>> qemu-lite solution is suitable for upstream again? Many thanks!
+> > >>>
+> > >>> What caused a lot of discussion and held back progress was the appr=
+oach
+> > >>> that was taken.  The basic philosophy seems to be bypassing or
+> > >>> special-casing components in order to avoid slow operations.  This
+> > >>> requires special QEMU, firmware, and/or guest kernel binaries and
+> causes
+> > >>> extra work for the management stack, distributions, and testers.
+> > >>
+> > >> I think having a special firmware (be it qboot or a special-purpose
+> > >> SeaBIOS) is acceptable.
+> > >
+> > > The work Marc Mari Barcelo did in 2015 showed that SeaBIOS can boot
+> > > guests quickly.  The guest kernel was entered in <35 milliseconds
+> > > IIRC.  Why is special firmware necessary?
+> >
+> > I thought that wasn't the "conventional" SeaBIOS, but rather one with
+> > reduced configuration options, but I may be remembering wrong.
 >=20
->   Standard property name to define the number of cells in an interrupt-
->   specifier within an interrupt domain.
+> Marc didn't spend much time on optimizing SeaBIOS, he used the build
+> options that were suggested.  An extra flag can be added in
+> qemu_preinit() to skip slow init that's unnecessary on optimized
+> machines.  That would allow a single SeaBIOS binary to run both full and
+> lite systems.
 >=20
->   prop-encoded-array: An integer, encoded as with encode-int, that denotes
->   the number of cells required to represent an interrupt specifier in its
->   child nodes.
->=20
->   The value of this property for the PowerPC External Interrupt option sh=
-all
->   be 2. Thus all interrupt specifiers (as used in the standard =E2=80=9Ci=
-nterrupts=E2=80=9D
->   property) shall consist of two cells, each containing an integer encoded
->   as with encode-int. The first integer represents the interrupt number t=
-he
->   second integer is the trigger code: 0 for edge triggered, 1 for level
->   triggered.
->=20
-> This patch fixes the interrupt specifiers in the "interrupt-map" property
-> of the PHB node, that were setting the second cell to 8 (confusion with
-> IRQ_TYPE_LEVEL_LOW ?) instead of 1.
->=20
-> VIO devices and RTAS event sources use the same format for interrupt
-> specifiers: while here, we introduce a common helper to handle the
-> encoding details.
->=20
-> Signed-off-by: Greg Kurz <groug@kaod.org>
-> Reviewed-by: C=C3=A9dric Le Goater <clg@kaod.org>
-> Tested-by: C=C3=A9dric Le Goater <clg@kaod.org>
+What's options do you remember? Stefan. Or any links about that
+thread? I'm Interesting with this topic.
 
-Applied to ppc-for-2.12.  This has been wrong forever, so I don't
-think we need to rush it into 2.11.
-
---=20
-David Gibson			| I'll have my music baroque, and my code
-david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
-				| _way_ _around_!
-http://www.ozlabs.org/~dgibson
-
---+k4Drb7WGefOwc9B
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlonrgMACgkQbDjKyiDZ
-s5K5hA/9FLEdHu3qrFjMTEUZvlg3effAAkn1JXsBp6wAejIhxfIOXZxHGvbOB6iq
-Io2GLexDZTRmgNHOjV2iOY6yyQeIccrr20SM35sb5WuDJBbj+cUS1GgD2KytjVM+
-FmG219Ev6g2/mDTyOY47f1kFnEGXD29ESEdBAwl4kgccZMKeTdYdgKZbRiMZEjkl
-r2DCCQdj3WhLu5Su3b9iBqn762g39xXHTUkoSN7eYJwaiSnghuHKjyXpK7wzhyrx
-0AGjEf3h8Bl1xXHTsluxMC9gdVFPG3XhKYwKgvd8g+MJqlf22gGtq2NuA/qypTgi
-+iI1QTksMHBqzmjJVZkcoKpfEq4FnoZnntalPeRlGMC7Ou0tN6Nlk5je2v1Lumnw
-3F/ZZFKZUWO6qdwVLTajs+ZvnczIoYpgH5s6BgT+eMHVwod7GxtNzpqjAxpt6RDu
-UNzSdHJFgbFMUmOG6+pU+xABKIA2J0mPtoYM3PGJ8ixrboYXyAolPW8WXbabcYPe
-c2Vo+JypoAFRRs5v+l/mWtP+yZQcrTf8sRHl3fjy4NiySL/YAftQBdMeFPeNFz/D
-wRw41zz9O3I2e+HQXwFDm2F7xYGRzw68pAhHQX8InrkkCSA6gxng0x0a3bRzuwQN
-Syxx7LmYiOR83qVqerLqmvU9OuAKGs3iL5/sGUH99RxJ+gyE8/Y=
-=3FDz
------END PGP SIGNATURE-----
-
---+k4Drb7WGefOwc9B--
+Thanks,
+-Gonglei
