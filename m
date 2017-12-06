@@ -1,26 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39112)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43257)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pradeep.jagadeesh@huawei.com>) id 1eMcM5-0003Mm-SE
-	for qemu-devel@nongnu.org; Wed, 06 Dec 2017 11:15:31 -0500
+	(envelope-from <armbru@redhat.com>) id 1eMcUB-0007NB-R4
+	for qemu-devel@nongnu.org; Wed, 06 Dec 2017 11:23:52 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pradeep.jagadeesh@huawei.com>) id 1eMcLz-0003dC-RO
-	for qemu-devel@nongnu.org; Wed, 06 Dec 2017 11:15:29 -0500
-Received: from lhrrgout.huawei.com ([194.213.3.17]:33216 helo=huawei.com)
+	(envelope-from <armbru@redhat.com>) id 1eMcU9-0002Ob-4u
+	for qemu-devel@nongnu.org; Wed, 06 Dec 2017 11:23:51 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:53804)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pradeep.jagadeesh@huawei.com>)
-	id 1eMcLz-0003Yt-H1
-	for qemu-devel@nongnu.org; Wed, 06 Dec 2017 11:15:23 -0500
-References: <1506954812-6552-1-git-send-email-pradeep.jagadeesh@huawei.com>
-	<20171206170705.37cda561@bahia.lan>
-From: Pradeep Jagadeesh <pradeep.jagadeesh@huawei.com>
-Message-ID: <9a0067d4-100b-b3eb-d38e-a99ab885e215@huawei.com>
-Date: Wed, 6 Dec 2017 17:15:12 +0100
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1eMcU8-0002Nh-Rg
+	for qemu-devel@nongnu.org; Wed, 06 Dec 2017 11:23:49 -0500
+From: Markus Armbruster <armbru@redhat.com>
+References: <20170911110623.24981-1-marcandre.lureau@redhat.com>
+	<20170911110623.24981-5-marcandre.lureau@redhat.com>
+Date: Wed, 06 Dec 2017 17:23:43 +0100
+In-Reply-To: <20170911110623.24981-5-marcandre.lureau@redhat.com>
+	(=?utf-8?Q?=22Marc-Andr=C3=A9?=
+	Lureau"'s message of "Mon, 11 Sep 2017 13:05:37 +0200")
+Message-ID: <87mv2vx1tc.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-In-Reply-To: <20171206170705.37cda561@bahia.lan>
-Content-Type: text/plain; charset="windows-1252"; format=flowed
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v13 0/6] fsdev: qmp interface for io
- throttling
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v3 04/50] qapi: add 'if' to top-level
+ expressions
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,133 +30,90 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Greg Kurz <groug@kaod.org>, Pradeep Jagadeesh <pradeepkiruvale@gmail.com>
-Cc: eric blake <eblake@redhat.com>, alberto garcia <berto@igalia.com>, Markus Armbruster <armbru@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Manos Pitsidianakis <el13635@mail.ntua.gr>, jani
-	kokkonen <jani.kokkonen@huawei.com>, qemu-devel@nongnu.org
+To: =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>
+Cc: qemu-devel@nongnu.org, Michael Roth <mdroth@linux.vnet.ibm.com>
 
-On 12/6/2017 5:07 PM, Greg Kurz wrote:
-> On Mon,  2 Oct 2017 10:33:26 -0400
-> Pradeep Jagadeesh <pradeepkiruvale@gmail.com> wrote:
->
->> These patches provide the qmp interface, to query the io throttle
->> status of the all fsdev devices that are present in a vm.
->> also, it provides an interface to set the io throttle parameters of a
->> fsdev to a required value. Some of the patches also remove the
->> duplicate code that was present in block and fsdev files.
->>
->
-> Hi Pradeep,
->
-> I didn't have time to follow the thread, but it's been a month without
-> activity... where do we stand now ? I've merged I/O throttle for fsdev
-> in 2.9, is there a chance we get the QMP/HMP part in 2.12 ?
+Second thoughts...
 
-Hi Greg,
+Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com> writes:
 
-Yes, I am waiting for Eric's reply. Because there were some issues when 
-I merged code with Manos's throttlelimits code. So, I am waiting to see 
-how to go about it. It needs some changes to reuse in fsdev/blk qmp 
-code. I am very much would like to push qmp code upstream.
+> Accept 'if' key in top-level elements, accepted as string or list of
+> string type. The following patches will modify the test visitor to
+> check the value is correctly saved, and generate #if/#endif code (as a
+> single #if/endif line or a series for a list).
+>
+> Example of 'if' key:
+> { 'struct': 'TestIfStruct', 'data': { 'foo': 'int' },
+>   'if': 'defined(TEST_IF_STRUCT)' }
+>
+> The generated code is for now *unconditional*. Later patches generate
+> the conditionals.
+>
+> A following patch for qapi-code-gen.txt will provide more complete
+> documentation for 'if' usage.
+>
+> Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+> ---
+>  scripts/qapi.py                         | 35 +++++++++++++++++++++++++++=
+------
+>  tests/test-qmp-commands.c               |  6 ++++++
+>  tests/qapi-schema/qapi-schema-test.json | 20 +++++++++++++++++++
+>  tests/qapi-schema/qapi-schema-test.out  | 22 +++++++++++++++++++++
+>  4 files changed, 77 insertions(+), 6 deletions(-)
+>
+> diff --git a/scripts/qapi.py b/scripts/qapi.py
+> index 62dc52ed6e..20c1abf915 100644
+> --- a/scripts/qapi.py
+> +++ b/scripts/qapi.py
+> @@ -639,6 +639,26 @@ def add_name(name, info, meta, implicit=3DFalse):
+>      all_names[name] =3D meta
+>=20=20
+>=20=20
+> +def check_if(expr, info):
+> +
+> +    def check_if_str(ifcond, info):
+> +        if ifcond =3D=3D '':
+> +            raise QAPISemError(info, "'if' condition '' makes no sense")
+> +
+> +    ifcond =3D expr['if']
+> +    if isinstance(ifcond, str):
+> +        check_if_str(ifcond, info)
+> +    elif (isinstance(ifcond, list)
+> +          and all(isinstance(elt, str) for elt in ifcond)):
+> +        if ifcond =3D=3D []:
+> +            raise QAPISemError(info, "'if' condition [] is useless")
+> +        for elt in ifcond:
+> +            check_if_str(elt, info)
+> +    else:
+> +        raise QAPISemError(
+> +            info, "'if' condition must be a string or a list of strings")
+> +
+> +
 
-Regards,
-Pradeep
->
-> Cheers,
->
-> --
-> Greg
->
->> Pradeep Jagadeesh (6):
->>   throttle: factor out duplicate code
->>   qmp: Use ThrottleLimits structure
->>   qmp: factor out throttle code to reuse code
->>   hmp: create a throttle initialization function for code reuse
->>   fsdev: QMP interface for throttling
->>   fsdev: hmp interface for throttling
->>
->>  Makefile                        |   3 +-
->>  blockdev.c                      |  97 ++-------------------------
->>  fsdev/qemu-fsdev-dummy.c        |  11 +++
->>  fsdev/qemu-fsdev-throttle.c     | 144 ++++++++++++++++++++++++++--------------
->>  fsdev/qemu-fsdev-throttle.h     |   9 ++-
->>  fsdev/qemu-fsdev.c              |  30 +++++++++
->>  hmp-commands-info.hx            |  18 +++++
->>  hmp-commands.hx                 |  19 ++++++
->>  hmp.c                           |  81 ++++++++++++++++++++--
->>  hmp.h                           |   4 ++
->>  include/qemu/throttle-options.h |   3 +
->>  include/qemu/throttle.h         |   4 +-
->>  include/qemu/typedefs.h         |   1 +
->>  monitor.c                       |   5 ++
->>  qapi-schema.json                |   4 ++
->>  qapi/block-core.json            |  75 +--------------------
->>  qapi/fsdev.json                 |  94 ++++++++++++++++++++++++++
->>  qmp.c                           |  14 ++++
->>  util/throttle.c                 |  70 +++++++++++++++++++
->>  19 files changed, 462 insertions(+), 224 deletions(-)
->>  create mode 100644 qapi/fsdev.json
->>
->> v0 -> v1:
->>  Addressed comments from Eric Blake, Greg Kurz and Daniel P.Berrange
->>  Mainly renaming the functions and removing the redundant code.
->>
->> v1 -> v2:
->>  Addressed comments from Eric Blake and Greg Kurz.
->>  As per the suggestion I split the patches into smaller patches.
->>  Removed some more duplicate code.
->>
->> v2 -> v3:
->>  Addresssed comments from Alberto Garcia.
->>  Changed the comment from block to iothrottle in the iothrottle.json
->>  Added the dummy functions in qemu-fsdev-dummy.c to address the compilation
->>  issues that were observed.
->>
->> v3 -> v4:
->>  Addressed comments from Eric Blake and Greg Kurz
->>  Re-ordered the patches
->>  Added the dummy functions in qmp.c to address the cross compilation issues
->>
->> v4 -> v5:
->>   Addressed comments from Eric Blake and Greg Kurz
->>   Split the fsdev qmp patch into hmp and qmp related patches
->>   Moved the common functionalities to throttle.c instead of creating
->>   a new file
->>
->> v5 -> v6:
->>   Addressed comments from Greg Kurz and Markus Armbruster
->>   Split the commits to specific to hmp and throttle as suggested by Greg
->>   Moved ThrottleConfig typedef to qemu/typedefs.h
->>   Addressed compilation issue on FreeBSD by adding flags in qmp.c
->>
->> v6 -> v7:
->>   Addressed comments from Albert Garcia and Dr. David Alan Gilbert
->>   Fixed the hmp-commands-info.hx and hmp-commands.hx as per Dr. David's
->>   comments.
->>   Fixed the bug with the hmp fsdev_set_io_throttle and info fsdev_iothrottle
->>
->> v7 -> v8:
->>   Addressed comments from Markus Armbruster and Eric Blake
->>   Removed unwanted headers from qmp-fsdev-throttle.h
->>
->> v8 -> v9:
->>   Addressed comments from Markus Armbruster and Eric Blake
->>   Removed the iothrottle.json and pushed the iothrottle struct to
->>   block-core.json
->>
->> v9 -> v10:
->>   Addressed comments from Albert Garcia
->>   Fixed issue related to dynamically passing throttle configuration
->>   Removed some unused code
->>
->> v10 -> v11:
->>   Addressed the comments from Markus Armbruster and Eric Blake
->>   Rebased the patches over 2.10
->>
->> v11 -> v12:
->>   Addressed comments by Manos Pitsidiankis
->>   Moved back the device id to the fsdeviothrottle structure
->>
->> v12 -> v13:
->>   Addressed comments by Manos Pitsidiankis
->>   Replaced the throttle config strings with the macros
->
+Slightly terser:
+
+   def check_if(expr, info):
+
+       def check_if_str(ifcond, info):
+           if not isinstance(ifcond, str):
+               raise QAPISemError(
+                   info, "'if' condition must be a string or a list of stri=
+ngs")
+           if ifcond =3D=3D '':
+               raise QAPISemError(info, "'if' condition '' makes no sense")
+
+       ifcond =3D expr['if']
+       if isinstance(ifcond, list):
+           if ifcond =3D=3D []:
+               raise QAPISemError(info, "'if' condition [] is useless")
+           for elt in ifcond:
+               check_if_str(elt, info)
+       else:
+           check_if_str(ifcond, info)
+
+Can slot this in on commit.
+
+>  def check_type(info, source, value, allow_array=3DFalse,
+>                 allow_dict=3DFalse, allow_optional=3DFalse,
+>                 allow_metas=3D[]):
+[...]
