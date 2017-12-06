@@ -1,16 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52601)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52660)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1eMayy-0000js-G8
-	for qemu-devel@nongnu.org; Wed, 06 Dec 2017 09:47:33 -0500
+	(envelope-from <stefanha@redhat.com>) id 1eMaz5-0000yU-7L
+	for qemu-devel@nongnu.org; Wed, 06 Dec 2017 09:47:40 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1eMayx-0004CE-Qg
-	for qemu-devel@nongnu.org; Wed, 06 Dec 2017 09:47:32 -0500
+	(envelope-from <stefanha@redhat.com>) id 1eMayz-0004Cs-3D
+	for qemu-devel@nongnu.org; Wed, 06 Dec 2017 09:47:39 -0500
 From: Stefan Hajnoczi <stefanha@redhat.com>
-Date: Wed,  6 Dec 2017 14:45:48 +0000
-Message-Id: <20171206144550.22295-8-stefanha@redhat.com>
+Date: Wed,  6 Dec 2017 14:45:49 +0000
+Message-Id: <20171206144550.22295-9-stefanha@redhat.com>
 In-Reply-To: <20171206144550.22295-1-stefanha@redhat.com>
 References: <20171206144550.22295-1-stefanha@redhat.com>
-Subject: [Qemu-devel] [PATCH v2 7/9] iothread: add iothread_by_id() API
+Subject: [Qemu-devel] [PATCH v2 8/9] blockdev: add x-blockdev-set-iothread
+ testing command
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,41 +23,124 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: qemu-block@nongnu.org, John Snow <jsnow@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>
 
-Encapsulate IOThread QOM object lookup so that callers don't need to
-know how and where IOThread objects live.
+Currently there is no easy way for iotests to ensure that a BDS is bound
+to a particular IOThread.  Normally the virtio-blk device calls
+blk_set_aio_context() when dataplane is enabled during guest driver
+initialization.  This never happens in iotests since -machine
+accel=qtest means there is no guest activity (including device driver
+initialization).
+
+This patch adds a QMP command to explicitly assign IOThreads in test
+cases.  See qapi/block-core.json for a description of the command.
 
 Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
 ---
- include/sysemu/iothread.h | 1 +
- iothread.c                | 7 +++++++
- 2 files changed, 8 insertions(+)
+ qapi/block-core.json | 36 ++++++++++++++++++++++++++++++++++++
+ blockdev.c           | 41 +++++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 77 insertions(+)
 
-diff --git a/include/sysemu/iothread.h b/include/sysemu/iothread.h
-index 110329b2b4..55de1715c7 100644
---- a/include/sysemu/iothread.h
-+++ b/include/sysemu/iothread.h
-@@ -42,6 +42,7 @@ typedef struct {
-    OBJECT_CHECK(IOThread, obj, TYPE_IOTHREAD)
- 
- char *iothread_get_id(IOThread *iothread);
-+IOThread *iothread_by_id(const char *id);
- AioContext *iothread_get_aio_context(IOThread *iothread);
- void iothread_stop_all(void);
- GMainContext *iothread_get_g_main_context(IOThread *iothread);
-diff --git a/iothread.c b/iothread.c
-index 27a4288578..e7b93e02a3 100644
---- a/iothread.c
-+++ b/iothread.c
-@@ -380,3 +380,10 @@ void iothread_destroy(IOThread *iothread)
- {
-     object_unparent(OBJECT(iothread));
- }
+diff --git a/qapi/block-core.json b/qapi/block-core.json
+index dd763dcf87..741d6c4367 100644
+--- a/qapi/block-core.json
++++ b/qapi/block-core.json
+@@ -3949,3 +3949,39 @@
+   'data' : { 'parent': 'str',
+              '*child': 'str',
+              '*node': 'str' } }
 +
-+/* Lookup IOThread by its id.  Only finds user-created objects, not internal
-+ * iothread_create() objects. */
-+IOThread *iothread_by_id(const char *id)
++##
++# @x-blockdev-set-iothread:
++#
++# Move @node and its children into the @iothread.  If @iothread is null then
++# move @node and its children into the main loop.
++#
++# The node must not be attached to a BlockBackend.
++#
++# @node-name: the name of the block driver node
++#
++# @iothread: the name of the IOThread object or null for the main loop
++#
++# Note: this command is experimental and intended for test cases that need
++# control over IOThreads only.
++#
++# Since: 2.12
++#
++# Example:
++#
++# 1. Move a node into an IOThread
++# -> { "execute": "x-blockdev-set-iothread",
++#      "arguments": { "node-name": "disk1",
++#                     "iothread": "iothread0" } }
++# <- { "return": {} }
++#
++# 2. Move a node into the main loop
++# -> { "execute": "x-blockdev-set-iothread",
++#      "arguments": { "node-name": "disk1",
++#                     "iothread": null } }
++# <- { "return": {} }
++#
++##
++{ 'command': 'x-blockdev-set-iothread',
++  'data' : { 'node-name': 'str',
++             'iothread': 'StrOrNull' } }
+diff --git a/blockdev.c b/blockdev.c
+index e865ae4873..f75c01f664 100644
+--- a/blockdev.c
++++ b/blockdev.c
+@@ -45,6 +45,7 @@
+ #include "qapi/qmp/qerror.h"
+ #include "qapi/qobject-output-visitor.h"
+ #include "sysemu/sysemu.h"
++#include "sysemu/iothread.h"
+ #include "block/block_int.h"
+ #include "qmp-commands.h"
+ #include "block/trace.h"
+@@ -4129,6 +4130,46 @@ BlockJobInfoList *qmp_query_block_jobs(Error **errp)
+     return head;
+ }
+ 
++void qmp_x_blockdev_set_iothread(const char *node_name, StrOrNull *iothread,
++                                 Error **errp)
 +{
-+    return IOTHREAD(object_resolve_path_type(id, TYPE_IOTHREAD, NULL));
++    AioContext *old_context;
++    AioContext *new_context;
++    BlockDriverState *bs;
++
++    bs = bdrv_find_node(node_name);
++    if (!bs) {
++        error_setg(errp, "Cannot find node %s", node_name);
++        return;
++    }
++
++    /* If we want to allow more extreme test scenarios this guard could be
++     * removed.  For now it protects against accidents. */
++    if (bdrv_has_blk(bs)) {
++        error_setg(errp, "Node %s is in use", node_name);
++        return;
++    }
++
++    if (iothread->type == QTYPE_QSTRING) {
++        IOThread *obj = iothread_by_id(iothread->u.s);
++        if (!obj) {
++            error_setg(errp, "Cannot find iothread %s", iothread->u.s);
++            return;
++        }
++
++        new_context = iothread_get_aio_context(obj);
++    } else {
++        new_context = qemu_get_aio_context();
++    }
++
++    old_context = bdrv_get_aio_context(bs);
++    aio_context_acquire(old_context);
++
++    bdrv_set_aio_context(bs, new_context);
++
++    aio_context_release(old_context);
 +}
++
+ QemuOptsList qemu_common_drive_opts = {
+     .name = "drive",
+     .head = QTAILQ_HEAD_INITIALIZER(qemu_common_drive_opts.head),
 -- 
 2.14.3
