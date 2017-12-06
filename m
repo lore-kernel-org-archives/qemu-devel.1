@@ -1,34 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44186)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57648)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1eMSza-0002BL-FR
-	for qemu-devel@nongnu.org; Wed, 06 Dec 2017 01:15:39 -0500
+	(envelope-from <groug@kaod.org>) id 1eMTW7-0004IR-Do
+	for qemu-devel@nongnu.org; Wed, 06 Dec 2017 01:49:16 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1eMSzX-0003Zv-7T
-	for qemu-devel@nongnu.org; Wed, 06 Dec 2017 01:15:38 -0500
-Received: from indium.canonical.com ([91.189.90.7]:60802)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1eMSzW-0003ZD-Ta
-	for qemu-devel@nongnu.org; Wed, 06 Dec 2017 01:15:35 -0500
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1eMSzW-0006bl-5e
-	for <qemu-devel@nongnu.org>; Wed, 06 Dec 2017 06:15:34 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 0EB062E80CB
-	for <qemu-devel@nongnu.org>; Wed,  6 Dec 2017 06:15:34 +0000 (UTC)
+	(envelope-from <groug@kaod.org>) id 1eMTW3-0001nH-HQ
+	for qemu-devel@nongnu.org; Wed, 06 Dec 2017 01:49:15 -0500
+Received: from 7.mo177.mail-out.ovh.net ([46.105.61.149]:43734)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1eMTW3-0001mT-A4
+	for qemu-devel@nongnu.org; Wed, 06 Dec 2017 01:49:11 -0500
+Received: from player779.ha.ovh.net (b9.ovh.net [213.186.33.59])
+	by mo177.mail-out.ovh.net (Postfix) with ESMTP id 928428FF6A
+	for <qemu-devel@nongnu.org>; Wed,  6 Dec 2017 07:49:09 +0100 (CET)
+Date: Wed, 6 Dec 2017 07:49:04 +0100
+From: Greg Kurz <groug@kaod.org>
+Message-ID: <20171206074904.14da15f6@bahia.lan>
+In-Reply-To: <20171206002544.GQ3057@umbus.fritz.box>
+References: <151239850618.30749.18071098158203257789.stgit@bahia.lan>
+	<20171206002544.GQ3057@umbus.fritz.box>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Wed, 06 Dec 2017 06:02:50 -0000
-From: Patrick Schweiger <1736655@bugs.launchpad.net>
-Reply-To: Bug 1736655 <1736655@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <151253983521.3178.4021889730911467554.malonedeb@gac.canonical.com>
-Message-Id: <151254017052.20686.10767430685606657838.launchpad@chaenomeles.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1736655] Re: 2k3/xp guests w/virtio-net randomly
- DHCP fail on boot
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	boundary="Sig_/rt4Dww8XBnH0d0R2ZABQq3x";
+	protocol="application/pgp-signature"
+Subject: Re: [Qemu-devel] [PATCH v2] spapr: fix LSI interrupt specifiers in
+ the device tree
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,191 +32,86 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: David Gibson <david@gibson.dropbear.id.au>
+Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org, Cedric Le Goater <clg@kaod.org>
 
-** Description changed:
+--Sig_/rt4Dww8XBnH0d0R2ZABQq3x
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
 
-  Host:
-  Debian GNU/Linux 9 with Linux 4.13.0-0.bpo.1-amd64
-  QEMU 2.10.1
-  =
+On Wed, 6 Dec 2017 11:25:44 +1100
+David Gibson <david@gibson.dropbear.id.au> wrote:
 
-  Guest:
-  Windows 2003 Standard SP2 (x64)
-  Windows XP SP3 (i386)
-  =
+> On Mon, Dec 04, 2017 at 03:41:46PM +0100, Greg Kurz wrote:
+> > PAPR 2.7 C.6.9.1.2 describes the "#interrupt-cells" property of the
+> > PowerPC External Interrupt Source Controller node as follows:
+> >=20
+> > =E2=80=9C#interrupt-cells=E2=80=9D
+> >=20
+> >   Standard property name to define the number of cells in an interrupt-
+> >   specifier within an interrupt domain.
+> >=20
+> >   prop-encoded-array: An integer, encoded as with encode-int, that deno=
+tes
+> >   the number of cells required to represent an interrupt specifier in i=
+ts
+> >   child nodes.
+> >=20
+> >   The value of this property for the PowerPC External Interrupt option =
+shall
+> >   be 2. Thus all interrupt specifiers (as used in the standard =E2=80=
+=9Cinterrupts=E2=80=9D
+> >   property) shall consist of two cells, each containing an integer enco=
+ded
+> >   as with encode-int. The first integer represents the interrupt number=
+ the
+> >   second integer is the trigger code: 0 for edge triggered, 1 for level
+> >   triggered.
+> >=20
+> > This patch fixes the interrupt specifiers in the "interrupt-map" proper=
+ty
+> > of the PHB node, that were setting the second cell to 8 (confusion with
+> > IRQ_TYPE_LEVEL_LOW ?) instead of 1.
+> >=20
+> > VIO devices and RTAS event sources use the same format for interrupt
+> > specifiers: while here, we introduce a common helper to handle the
+> > encoding details.
+> >=20
+> > Signed-off-by: Greg Kurz <groug@kaod.org>
+> > Reviewed-by: C=C3=A9dric Le Goater <clg@kaod.org>
+> > Tested-by: C=C3=A9dric Le Goater <clg@kaod.org> =20
+>=20
+> Looks good, but I'd request two minor changes.
+>=20
+> 1) Please reference LoPAPR instead of the internal PAPR, since other
+> people can't see it.
+>=20
+> 2) Change the helper's name to spapr_dt_xics_irq(), for both brevity
+> and specificity.
+>=20
 
-  QEMU command line:
-  http://cfp.vim-cn.com/cbdF3
-  =
+Sure, I'll do that. Thanks!
 
-  Description:
-  After upgrading from QEMU 2.8 to 2.10.1, my Windows 2003 x64 and Windows =
-XP guests with "virtio-net-pci" NIC would randomly fail to aquire DHCP addr=
-ess on boot. When it fails, cycle disable/enable the connection in Control =
-Panel could make it connect successfully. As an immediate workaround, I swi=
-tched to the RTL8139 NIC which works fine. Further investigation showed tha=
-t manually reverting commit '4a3f03ba8dbf53fce36d0c1dd5d0cc0f340fe5f3' on t=
-op of 2.10.1 "fixed" the problem.
-  =
 
-  Here are the test results:
-- git branch 4a3f03b: 25 boots, 8 failures
-- git branch 39f099e: 60 boots, 0 failure
-+ git branch 97cd965: 17 boots, 5 failures  (Feb 18)
-+ git branch 77424a4: 27 boots, 0 failure   (Jan 09)
-+ git branch c25d97c: 7 boots, 2 failures   (Feb 01)
-+ git branch 4a3f03b: 25 boots, 8 failures  (Jan 19)
-+ git branch 39f099e: 60 boots, 0 failure   (Jan 18)
-  2.10.1 with revert: 194 boots, 0 failure
+--Sig_/rt4Dww8XBnH0d0R2ZABQq3x
+Content-Type: application/pgp-signature
+Content-Description: OpenPGP digital signature
 
-** Description changed:
+-----BEGIN PGP SIGNATURE-----
 
-  Host:
-  Debian GNU/Linux 9 with Linux 4.13.0-0.bpo.1-amd64
-  QEMU 2.10.1
-  =
+iQIzBAEBCAAdFiEEtIKLr5QxQM7yo0kQcdTV5YIvc9YFAlonkuAACgkQcdTV5YIv
+c9a2gw/+M2Z8wJKuCRX/kuf8qnzBp/Glr09cEykr/pq5oUkRH997EDDLC/oIwiK1
+RusR4jAyO+K4GHSAdhN9A7XULxH93/PPiGBGG9ilQ5NWWez09w5g8J1nZjPi8XLj
+8YLp1bPALbtoNjFXWcmDAhZgFqA9AfAISACuCqAA2qHVu6eCjuL0TUNT8vkp1f/n
+lOD16KqhtbpxhmqJB1K+RcEgEL7WeMgnkH+xTfhtt1Ga4P2YiQ6APha3XkOWuZAn
+hV0IGAbs8J5z1n6MayHHeQuUUVydpfhdYIYC2uX5YwiP9YKOy80Ar6CuawizitrM
+dRt1N2AEVS/lTSkSZbR5stvp6G7S8LaHdksD2+CYdvFFzkUEk2kyaHk6C+YV2/bf
+YeHXksq+4fsMIDOX/Knn4+sno0J3mBpK02dkRcwLWxXTJ/RPy4JEn9H1PA4R/WtH
+VHFBmc+4n+Ba8zkg9CIpY8taGYzbBesZqPmo7gg6vw2/beEBwJGNQi+gDKSsQlhG
+gQ77STMv0hb+x651UuftwV+aGS7PVrtYmxZCT9dUJvc4XYyXq66EOsr0wP/GvMSY
+0jOaRdtHa5keucoSTHPHiF9DuMS2U9aqr9GJcbz64PgoSVR8t+rbC610stYATTz7
+4WXAxhdLuOhHqRuAOrOBmQMIZPG94KenvkXktjxIoDiZEyJKODg=
+=ONoE
+-----END PGP SIGNATURE-----
 
-  Guest:
-  Windows 2003 Standard SP2 (x64)
-  Windows XP SP3 (i386)
-  =
-
-  QEMU command line:
-  http://cfp.vim-cn.com/cbdF3
-  =
-
-  Description:
-  After upgrading from QEMU 2.8 to 2.10.1, my Windows 2003 x64 and Windows =
-XP guests with "virtio-net-pci" NIC would randomly fail to aquire DHCP addr=
-ess on boot. When it fails, cycle disable/enable the connection in Control =
-Panel could make it connect successfully. As an immediate workaround, I swi=
-tched to the RTL8139 NIC which works fine. Further investigation showed tha=
-t manually reverting commit '4a3f03ba8dbf53fce36d0c1dd5d0cc0f340fe5f3' on t=
-op of 2.10.1 "fixed" the problem.
-  =
-
-- Here are the test results:
-+ Here are the bisect test results:
-  git branch 97cd965: 17 boots, 5 failures  (Feb 18)
-  git branch 77424a4: 27 boots, 0 failure   (Jan 09)
-  git branch c25d97c: 7 boots, 2 failures   (Feb 01)
-  git branch 4a3f03b: 25 boots, 8 failures  (Jan 19)
-  git branch 39f099e: 60 boots, 0 failure   (Jan 18)
-  2.10.1 with revert: 194 boots, 0 failure
-
-** Description changed:
-
-  Host:
-  Debian GNU/Linux 9 with Linux 4.13.0-0.bpo.1-amd64
-  QEMU 2.10.1
-  =
-
-  Guest:
-  Windows 2003 Standard SP2 (x64)
-  Windows XP SP3 (i386)
-  =
-
-  QEMU command line:
-  http://cfp.vim-cn.com/cbdF3
-  =
-
-  Description:
-  After upgrading from QEMU 2.8 to 2.10.1, my Windows 2003 x64 and Windows =
-XP guests with "virtio-net-pci" NIC would randomly fail to aquire DHCP addr=
-ess on boot. When it fails, cycle disable/enable the connection in Control =
-Panel could make it connect successfully. As an immediate workaround, I swi=
-tched to the RTL8139 NIC which works fine. Further investigation showed tha=
-t manually reverting commit '4a3f03ba8dbf53fce36d0c1dd5d0cc0f340fe5f3' on t=
-op of 2.10.1 "fixed" the problem.
-  =
-
-  Here are the bisect test results:
-  git branch 97cd965: 17 boots, 5 failures  (Feb 18)
-  git branch 77424a4: 27 boots, 0 failure   (Jan 09)
-  git branch c25d97c: 7 boots, 2 failures   (Feb 01)
-  git branch 4a3f03b: 25 boots, 8 failures  (Jan 19)
-  git branch 39f099e: 60 boots, 0 failure   (Jan 18)
-  2.10.1 with revert: 194 boots, 0 failure
-+ 2.10.1 without revert: 4 boots, 3 failures
-
-** Description changed:
-
-  Host:
-  Debian GNU/Linux 9 with Linux 4.13.0-0.bpo.1-amd64
-  QEMU 2.10.1
-  =
-
-  Guest:
-  Windows 2003 Standard SP2 (x64)
-  Windows XP SP3 (i386)
-  =
-
-  QEMU command line:
-  http://cfp.vim-cn.com/cbdF3
-  =
-
-  Description:
-  After upgrading from QEMU 2.8 to 2.10.1, my Windows 2003 x64 and Windows =
-XP guests with "virtio-net-pci" NIC would randomly fail to aquire DHCP addr=
-ess on boot. When it fails, cycle disable/enable the connection in Control =
-Panel could make it connect successfully. As an immediate workaround, I swi=
-tched to the RTL8139 NIC which works fine. Further investigation showed tha=
-t manually reverting commit '4a3f03ba8dbf53fce36d0c1dd5d0cc0f340fe5f3' on t=
-op of 2.10.1 "fixed" the problem.
-  =
-
-  Here are the bisect test results:
-  git branch 97cd965: 17 boots, 5 failures  (Feb 18)
-  git branch 77424a4: 27 boots, 0 failure   (Jan 09)
-  git branch c25d97c: 7 boots, 2 failures   (Feb 01)
-  git branch 4a3f03b: 25 boots, 8 failures  (Jan 19)
-  git branch 39f099e: 60 boots, 0 failure   (Jan 18)
-  2.10.1 with revert: 194 boots, 0 failure
-- 2.10.1 without revert: 4 boots, 3 failures
-+ 2.10.1 without revert: 30 boots, 4 failures
-
--- =
-
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1736655
-
-Title:
-  2k3/xp guests w/virtio-net randomly DHCP fail on boot
-
-Status in QEMU:
-  New
-
-Bug description:
-  Host:
-  Debian GNU/Linux 9 with Linux 4.13.0-0.bpo.1-amd64
-  QEMU 2.10.1
-
-  Guest:
-  Windows 2003 Standard SP2 (x64)
-  Windows XP SP3 (i386)
-
-  QEMU command line:
-  http://cfp.vim-cn.com/cbdF3
-
-  Description:
-  After upgrading from QEMU 2.8 to 2.10.1, my Windows 2003 x64 and Windows =
-XP guests with "virtio-net-pci" NIC would randomly fail to aquire DHCP addr=
-ess on boot. When it fails, cycle disable/enable the connection in Control =
-Panel could make it connect successfully. As an immediate workaround, I swi=
-tched to the RTL8139 NIC which works fine. Further investigation showed tha=
-t manually reverting commit '4a3f03ba8dbf53fce36d0c1dd5d0cc0f340fe5f3' on t=
-op of 2.10.1 "fixed" the problem.
-
-  Here are the bisect test results:
-  git branch 97cd965: 17 boots, 5 failures  (Feb 18)
-  git branch 77424a4: 27 boots, 0 failure   (Jan 09)
-  git branch c25d97c: 7 boots, 2 failures   (Feb 01)
-  git branch 4a3f03b: 25 boots, 8 failures  (Jan 19)
-  git branch 39f099e: 60 boots, 0 failure   (Jan 18)
-  2.10.1 with revert: 194 boots, 0 failure
-  2.10.1 without revert: 30 boots, 4 failures
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1736655/+subscriptions
+--Sig_/rt4Dww8XBnH0d0R2ZABQq3x--
