@@ -1,24 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:32988)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33408)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1eMXfP-0006Vo-8i
-	for qemu-devel@nongnu.org; Wed, 06 Dec 2017 06:15:08 -0500
+	(envelope-from <frederic.konrad@adacore.com>) id 1eMXgH-00071f-PD
+	for qemu-devel@nongnu.org; Wed, 06 Dec 2017 06:16:02 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1eMXfK-0003fQ-VO
-	for qemu-devel@nongnu.org; Wed, 06 Dec 2017 06:15:07 -0500
-Date: Wed, 6 Dec 2017 22:14:49 +1100
-From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20171206111449.GF3057@umbus.fritz.box>
-References: <cover.1511731946.git.mdavidsaver@gmail.com>
-	<f16023f8456fc137647cd6c60d5e2138d8a9afa2.1511731946.git.mdavidsaver@gmail.com>
-	<20171130051315.GF3023@umbus.fritz.box>
-	<b0ded63a-f654-94c4-4fef-3cdbf7764a97@gmail.com>
+	(envelope-from <frederic.konrad@adacore.com>) id 1eMXgD-0004i7-SN
+	for qemu-devel@nongnu.org; Wed, 06 Dec 2017 06:16:01 -0500
+Received: from mel.act-europe.fr ([2a02:2ab8:224:1::a0a:d2]:56316
+	helo=smtp.eu.adacore.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <frederic.konrad@adacore.com>)
+	id 1eMXgD-0004ge-Lr
+	for qemu-devel@nongnu.org; Wed, 06 Dec 2017 06:15:57 -0500
+References: <CAGC02hTe8SijuwrM0ZGg04=To0GBnPUrC23iKuc-pao65vAAUQ@mail.gmail.com>
+	<b36b0c95-4ddc-b818-522c-1bbec52138e8@adacore.com>
+	<CAGC02hT7OvR1nbyD=AkOqPvxbNPz957=CPZsUxf1FJ73O8W52g@mail.gmail.com>
+	<CAFEAcA8eDeKBnLW45=fPt3NeApMkvkiJzFEshvep_5qmwZKGXA@mail.gmail.com>
+	<f79f9db0-20c0-aeee-6283-f912131dc551@adacore.com>
+	<CAFEAcA_0-CczAFiFnKHVZWeoez6YLB6j0ffeoA=uK556U_NTOQ@mail.gmail.com>
+	<9f64271d-7847-b44b-2bba-b0b49926bcfd@adacore.com>
+	<7b448f9c-0ad2-aa5a-e76d-ce434abf57b9@redhat.com>
+From: KONRAD Frederic <frederic.konrad@adacore.com>
+Message-ID: <a963af28-4a7f-6159-c18e-cfe8e861cebf@adacore.com>
+Date: Wed, 6 Dec 2017 12:15:52 +0100
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="py13wRIzy9nU46ee"
-Content-Disposition: inline
-In-Reply-To: <b0ded63a-f654-94c4-4fef-3cdbf7764a97@gmail.com>
-Subject: Re: [Qemu-devel] [PATCH 05/17] timer: generalize Dallas/Maxim RTC
- i2c devices
+In-Reply-To: <7b448f9c-0ad2-aa5a-e76d-ce434abf57b9@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [Bug 645662] x87 fpu emulation not accurate enough
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,76 +36,57 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Michael Davidsaver <mdavidsaver@gmail.com>
-Cc: Alexander Graf <agraf@suse.de>, qemu-devel@nongnu.org, qemu-ppc@nongnu.org
+To: Thomas Huth <thuth@redhat.com>, Peter Maydell <peter.maydell@linaro.org>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, william lin <wlsaidhi@gmail.com>
 
 
---py13wRIzy9nU46ee
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
 
-On Sun, Dec 03, 2017 at 03:15:10PM -0600, Michael Davidsaver wrote:
-> On 11/29/2017 11:13 PM, David Gibson wrote:
-> > On Sun, Nov 26, 2017 at 03:59:03PM -0600, Michael Davidsaver wrote:
-> >> Support for: ds1307, ds1337, ds1338, ds1339,
-> >> ds1340, ds1375, ds1388, and ds3231.
-> >>
-> >> Tested with ds1338 and ds1375.
-> >>
-> >> Signed-off-by: Michael Davidsaver <mdavidsaver@gmail.com>
-> >=20
-> > I certainly like the idea of consolidating this code, but reviewing to
-> > see that the new code really is a generalization of the old is
-> > something I won't have time for for a while.
-> >=20
-> > Also, hw/timer is not within my purview so it'll probably need to go
-> > another path to merge.
->=20
-> Could you be a bit more explicit about what, if anything, I need to do
-> to move this forward?
+On 11/29/2017 04:32 PM, Thomas Huth wrote:
+> On 29.11.2017 16:20, KONRAD Frederic wrote:
+>>
+>>
+>> On 11/29/2017 01:51 PM, Peter Maydell wrote:
+>>> On 29 November 2017 at 12:47, KONRAD Frederic
+>>> <frederic.konrad@adacore.com> wrote:
+>>>> Maybe a little hack might work for x86 on x86 though.
+>>>> Something like hardcoding the helper with an inline assembly
+>>>> code?
+>>>
+>>> The set of people who want to emulate x86 on x86 is surely
+>>> even smaller than the already tiny set of people who want to
+>>> emulate x86 at all. I don't think it makes sense to add
+>>> inline assembly hacks for that: QEMU should (as far as
+>>> is reasonably possible) behave the same on all hosts.
+>>>
+>>
+>> Sure it was a first step suggestion.
+> 
+> FYI, there is some code in WinUAE / Previous which might be usable, see
+> e.g. WinUAE sources here:
+> 
+> https://github.com/tonioni/WinUAE/blob/master/softfloat/softfloat_fpsp.cpp
+> 
+> But the code is targetted for m68k only so far, so it likely needs some
+> work, and we're currently discussing whether it's feasible to include it
+> into QEMU at all, see this thread here:
+> 
+> https://lists.gnu.org/archive/html/qemu-devel/2017-11/msg05342.html
+> 
+>   Thomas
+> 
 
-Ugh.. that's pretty tough, since ds1338 doesn't have an activate
-maintainer.  You can look at the git history for some possible
-candidates of people to ask about it, but it hasn't been touched much
-in quite a while.
+oops.
 
-One approach that could help is to re-order so that your testing
-rework goes before the change to ds1338.  If your new generalization
-can pass the same set of tests as the original ds1338 code, that's at
-least a good start on being convincing that it's a true superset of
-the previous functionality.
+Hi Thomas sorry missed this mail.
 
-The other approach is to do the rework in a rather longer series of
-patches.  Start by simply moving ds1338.c, then do a mechanical
-replacement of the names within it, then start generalizing and
-altering.  That's a lot of work for you, but it makes it much easier
-to review each step
+I saw this thread, I'm not sure if m68k use the 80bits
+arithmetic either.
 
---=20
-David Gibson			| I'll have my music baroque, and my code
-david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
-				| _way_ _around_!
-http://www.ozlabs.org/~dgibson
+BTW why don't we just use the long double cosl / sinl in the
+helper?
 
---py13wRIzy9nU46ee
-Content-Type: application/pgp-signature; name="signature.asc"
+It seems to me it can just fix the bug here (on linux host at
+least, I think windows doesn't support them). We just lack the
+long double <-> FloatX80 conversions here.
 
------BEGIN PGP SIGNATURE-----
-
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlon0SkACgkQbDjKyiDZ
-s5Lrpw/+PXDN4d/Rd/5k3gVNRWaDpb9FbXWu/UXdex8UBMA5o8dsx0Hy6phLknc+
-K/Ml54qhSQ3gepr+DQkS/DM1sHxchBwZv/nf0JLXL0rex4AKWiXWzzbn43iAi0UF
-VS2nIJFj8/tuxlxQeHdqlLEmXMFSh17MqH45MW+tJ/m7ewcstTwX2VFtTbK8Z+oB
-jMmFgc8PWd8qS2Ba5DzNUhv2UtaqvadBgppgneNM1L5z18GOQcZolDU8XdacjW6q
-QvPTC499ZpIRT4iQwrzjxMGSNNEHJIRXtLvlo8NRUt7PAxN6EGJk8NKVaD+MYHDJ
-pDVyppsmC4tpTC0zN/k69wYVyLfSrQS49NWkOg8/akr2RCtI5HcqPpkea5JnYLSS
-YqxYDVsy+L5Xu1pKCnKBBR7OcM4j26xAZYq5XMtHWkeoOnF5QpkJPGir6aAjBjMr
-46Qd5oIMZ3/vdKVrfUAnl3TI5Tv/CyNOGlh1/uR7UTkZbi/QQJd1FzdPd646zWlw
-ZNQhlNEApyaFMhVphNCMbrS/kTOt4KyM3bzKGsxn7sG00nhcdJMHq4SXGNFnu8We
-tbA5XczmtSU/kZeltQaAZ8n7G4wwTM4td64hTL2nQmZMHUZMip+ptdXwWCWgSc+K
-MHLPDRYHow1igF92T2PZYNW2UMd3Rcr7IDtR8/p07YRNiq6fWl4=
-=RsCO
------END PGP SIGNATURE-----
-
---py13wRIzy9nU46ee--
+Fred
