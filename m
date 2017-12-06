@@ -1,25 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36189)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37444)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eric.auger@redhat.com>) id 1eMUqh-0003j5-OP
-	for qemu-devel@nongnu.org; Wed, 06 Dec 2017 03:14:36 -0500
+	(envelope-from <groug@kaod.org>) id 1eMUt3-0005cq-BA
+	for qemu-devel@nongnu.org; Wed, 06 Dec 2017 03:17:02 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eric.auger@redhat.com>) id 1eMUqe-0004LS-J5
-	for qemu-devel@nongnu.org; Wed, 06 Dec 2017 03:14:35 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:46122)
+	(envelope-from <groug@kaod.org>) id 1eMUt0-0005t2-7X
+	for qemu-devel@nongnu.org; Wed, 06 Dec 2017 03:17:01 -0500
+Received: from 9.mo177.mail-out.ovh.net ([46.105.72.238]:60282)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eric.auger@redhat.com>)
-	id 1eMUqe-0004Kq-Bs
-	for qemu-devel@nongnu.org; Wed, 06 Dec 2017 03:14:32 -0500
-References: <20171205205409.5348.53070.stgit@gimli.home>
-From: Auger Eric <eric.auger@redhat.com>
-Message-ID: <6844c413-0a0c-d6b9-91bd-2805299e268b@redhat.com>
-Date: Wed, 6 Dec 2017 09:14:25 +0100
+	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1eMUt0-0005sk-1U
+	for qemu-devel@nongnu.org; Wed, 06 Dec 2017 03:16:58 -0500
+Received: from player779.ha.ovh.net (b9.ovh.net [213.186.33.59])
+	by mo177.mail-out.ovh.net (Postfix) with ESMTP id A7E7090221
+	for <qemu-devel@nongnu.org>; Wed,  6 Dec 2017 09:16:56 +0100 (CET)
+From: Greg Kurz <groug@kaod.org>
+Date: Wed, 06 Dec 2017 09:16:52 +0100
+Message-ID: <151254821213.27903.10774600450833875601.stgit@bahia.lan>
 MIME-Version: 1.0
-In-Reply-To: <20171205205409.5348.53070.stgit@gimli.home>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH for-2.11] vfio: Fix vfio-kvm group
- registration
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PATCH] spapr_events: drop bogus cell from
+ "interrupt-ranges" property
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,68 +28,54 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alex Williamson <alex.williamson@redhat.com>, qemu-devel@nongnu.org
-Cc: aik@ozlabs.ru
+To: qemu-devel@nongnu.org
+Cc: qemu-ppc@nongnu.org, David Gibson <david@gibson.dropbear.id.au>, Cedric Le Goater <clg@kaod.org>, Michael Roth <mdroth@linux.vnet.ibm.com>
 
-Hi Alex,
+According to LoPAPR 1.1 B.6.12, the "/event-sources" node has an "interru=
+pt-
+ranges" property, the format of which is described in B.6.9.1.2 as follow=
+s:
 
-On 05/12/17 22:09, Alex Williamson wrote:
-> Commit 8c37faa475f3 ("vfio-pci, ppc64/spapr: Reorder group-to-container
-> attaching") moved registration of groups with the vfio-kvm device from
-> vfio_get_group() to vfio_connect_container(), but it missed the case
-> where a group is attached to an existing container and takes an early
-> exit.  Perhaps this is a less common case on ppc64/spapr, but on x86
-> (without viommu) all groups are connected to the same container and
-> thus only the first group gets registered with the vfio-kvm device.
-> This becomes a problem if we then hot-unplug the devices associated
-> with that first group and we end up with KVM being misinformed about
-> any vfio connections that might remain.  Fix by including the call to
-> vfio_kvm_device_add_group() in this early exit path.
-> 
-> Fixes: 8c37faa475f3 ("vfio-pci, ppc64/spapr: Reorder group-to-container attaching")
-> Cc: qemu-stable@nongnu.org # qemu-2.10+
-> Signed-off-by: Alex Williamson <alex.williamson@redhat.com>
+=E2=80=9Cinterrupt-ranges=E2=80=9D
+ Standard property name that defines the interrupt number(s) and range(s)
+ handled by this unit.
 
-Reviewed-by: Eric Auger <eric.auger@redhat.com>
-Tested-by: Eric Auger <eric.auger@redhat.com>
+ prop-encoded-array: List of (int-number, range) specifications.
 
-Tested on arm64 Gigabyte HW with hot-detach of the 2 X540T2 PFs
+ Int-number is encoded as with encode-int.
+ Range is encoded as with encode-int.
 
-I don't have the "2017-12-06T08:02:07.535373Z qemu-system-aarch64:
-Failed to remove group 24 from KVM VFIO device: No such file or
-directory" anymore when detaching the second PF.
+ The first entry in this list shall contain the int-number associated wit=
+h
+ the first =E2=80=9Creg=E2=80=9D property entry. The int-num-ber is the v=
+alue representing
+ the interrupt source as would appear in the PowerPC External Interrupt
+ Architecture XISR. The range shall be the number of sequential interrupt
+ numbers which this unit can generate.
 
-Thanks
+There's no such thing as a cell count at the end of the array, like the
+one introduced by commit ffbb1705a33d in QEMU 2.8. It doesn't seem it had
+any impact on existing guests and I couldn't find any related workaround
+in linux. So, let's just drop the bogus lines.
 
-Eric
+Signed-off-by: Greg Kurz <groug@kaod.org>
+---
+ hw/ppc/spapr_events.c |    3 ---
+ 1 file changed, 3 deletions(-)
 
-
-> ---
-> 
-> This bug also existed in QEMU 2.10, but I think the fix is sufficiently
-> obvious (famous last words) to propose for 2.11 at this late date.  If
-> the first group is hot unplugged then KVM may revert to code emulation
-> that assumes no non-coherent DMA is present on some systems.  Also for
-> KVMGT, if the vGPU is not the first device registered, then the
-> notifier to enable linkages to KVM would not be called.  Please review.
-> Thanks,
-> 
-> Alex
-> 
->  hw/vfio/common.c |    1 +
->  1 file changed, 1 insertion(+)
-> 
-> diff --git a/hw/vfio/common.c b/hw/vfio/common.c
-> index 7b2924c0ef19..7007878e345e 100644
-> --- a/hw/vfio/common.c
-> +++ b/hw/vfio/common.c
-> @@ -968,6 +968,7 @@ static int vfio_connect_container(VFIOGroup *group, AddressSpace *as,
->          if (!ioctl(group->fd, VFIO_GROUP_SET_CONTAINER, &container->fd)) {
->              group->container = container;
->              QLIST_INSERT_HEAD(&container->group_list, group, container_next);
-> +            vfio_kvm_device_add_group(group);
->              return 0;
->          }
->      }
-> 
-> 
+diff --git a/hw/ppc/spapr_events.c b/hw/ppc/spapr_events.c
+index c7a64e6b8dd3..86836f0626dc 100644
+--- a/hw/ppc/spapr_events.c
++++ b/hw/ppc/spapr_events.c
+@@ -292,9 +292,6 @@ void spapr_dt_events(sPAPRMachineState *spapr, void *=
+fdt)
+         irq_ranges[count++] =3D cpu_to_be32(1);
+     }
+=20
+-    irq_ranges[count] =3D cpu_to_be32(count);
+-    count++;
+-
+     _FDT((fdt_setprop(fdt, event_sources, "interrupt-controller", NULL, =
+0)));
+     _FDT((fdt_setprop_cell(fdt, event_sources, "#interrupt-cells", 2)));
+     _FDT((fdt_setprop(fdt, event_sources, "interrupt-ranges",
