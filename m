@@ -1,19 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57897)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60965)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <edgar@xilinx.com>) id 1eMczk-0005Pw-Bg
-	for qemu-devel@nongnu.org; Wed, 06 Dec 2017 11:56:32 -0500
+	(envelope-from <eblake@redhat.com>) id 1eMd4s-0001la-VC
+	for qemu-devel@nongnu.org; Wed, 06 Dec 2017 12:01:50 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <edgar@xilinx.com>) id 1eMczj-0004k0-Dp
-	for qemu-devel@nongnu.org; Wed, 06 Dec 2017 11:56:28 -0500
-Date: Wed, 6 Dec 2017 23:56:07 +0700
-From: "Edgar E. Iglesias" <edgar.iglesias@xilinx.com>
-Message-ID: <20171206165607.GB1971@toto>
-References: <cover.1508261326.git.alistair.francis@xilinx.com>
+	(envelope-from <eblake@redhat.com>) id 1eMd4r-0000Ia-Vz
+	for qemu-devel@nongnu.org; Wed, 06 Dec 2017 12:01:47 -0500
+References: <20171117150556.16947-1-eblake@redhat.com>
+	<20171117150556.16947-4-eblake@redhat.com>
+	<151257931348.8987.3352482385411558267@sif>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <5743a286-4f94-1944-55eb-955191d0bf18@redhat.com>
+Date: Wed, 6 Dec 2017 11:01:34 -0600
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Disposition: inline
-In-Reply-To: <cover.1508261326.git.alistair.francis@xilinx.com>
-Subject: Re: [Qemu-devel] [PATCH v4 0/8]  Add the ZynqMP PMU and IPI
+In-Reply-To: <151257931348.8987.3352482385411558267@sif>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="h3VTav11BkWNeTSRLCeSXB6XuilTeDwJ7"
+Subject: Re: [Qemu-devel] [PULL 3/4] nbd/client: Don't hard-disconnect on
+ ESHUTDOWN from server
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,78 +26,99 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alistair Francis <alistair.francis@xilinx.com>
-Cc: qemu-devel@nongnu.org, edgar.iglesias@gmail.com, alistair23@gmail.com, qemu-arm@nongnu.org
+To: Michael Roth <mdroth@linux.vnet.ibm.com>, qemu-devel@nongnu.org
+Cc: Paolo Bonzini <pbonzini@redhat.com>, qemu-stable@nongnu.org, "open list:Network Block Dev..." <qemu-block@nongnu.org>
 
-On Tue, Oct 17, 2017 at 10:29:41AM -0700, Alistair Francis wrote:
-> This series adds the ZynqMP Power Management Unit (PMU) machine with basic
-> functionality.
-> 
-> The machine only has the
->  - CPU
->  - Memory
->  - Interrupt controller
->  - IPI device
-> 
-> connected, but that is enough to run some of the ROM and firmware
-> code on the machine
-> 
-> The series also adds the IPI device and connects it to the ZynqMP ARM
-> side and the ZynqMP PMU. These IPI devices don't connect between the ARM
-> and MicroBlaze instances though.
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--h3VTav11BkWNeTSRLCeSXB6XuilTeDwJ7
+From: Eric Blake <eblake@redhat.com>
+To: Michael Roth <mdroth@linux.vnet.ibm.com>, qemu-devel@nongnu.org
+Cc: Paolo Bonzini <pbonzini@redhat.com>, qemu-stable@nongnu.org,
+ "open list:Network Block Dev..." <qemu-block@nongnu.org>
+Message-ID: <5743a286-4f94-1944-55eb-955191d0bf18@redhat.com>
+Subject: Re: [Qemu-devel] [PULL 3/4] nbd/client: Don't hard-disconnect on
+ ESHUTDOWN from server
+References: <20171117150556.16947-1-eblake@redhat.com>
+ <20171117150556.16947-4-eblake@redhat.com>
+ <151257931348.8987.3352482385411558267@sif>
+In-Reply-To: <151257931348.8987.3352482385411558267@sif>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+
+On 12/06/2017 10:55 AM, Michael Roth wrote:
+> Quoting Eric Blake (2017-11-17 09:05:55)
+>> The NBD spec says that a server may fail any transmission request
+>> with ESHUTDOWN when it is apparent that no further request from
+>> the client can be successfully honored.  The client is supposed
+>> to then initiate a soft shutdown (wait for all remaining in-flight
+>> requests to be answered, then send NBD_CMD_DISC).  However, since
+>> qemu's server never uses ESHUTDOWN errors, this code was mostly
+>> untested since its introduction in commit b6f5d3b5.
+>>
+>> More recently, I learned that nbdkit as the NBD server is able to
+>> send ESHUTDOWN errors, so I finally tested this code, and noticed
+>> that our client was special-casing ESHUTDOWN to cause a hard
+>> shutdown (immediate disconnect, with no NBD_CMD_DISC), but only
+>> if the server sends this error as a simple reply.  Further
+>> investigation found that commit d2febedb introduced a regression
+>> where structured replies behave differently than simple replies -
+>> but that the structured reply behavior is more in line with the
+>> spec (even if we still lack code in nbd-client.c to properly quit
+>> sending further requests).  So this patch reverts the portion of
+>> b6f5d3b5 that introduced an improper hard-disconnect special-case
+>> at the lower level, and leaves the future enhancement of a nicer
+>> soft-disconnect at the higher level for another day.
+>>
+>> CC: qemu-stable@nongnu.org
+>=20
+> Since 2.10.x lacks d2febedb, the patch would look something like:
+>=20
+> diff --git a/nbd/client.c b/nbd/client.c
+> index 4caff77119..f04e95542f 100644
+> --- a/nbd/client.c
+> +++ b/nbd/client.c
+> @@ -945,12 +945,6 @@ ssize_t nbd_receive_reply(QIOChannel *ioc, NBDRepl=
+y *reply, Error **errp)
+>      reply->handle =3D ldq_be_p(buf + 8);
+> =20
+>      reply->error =3D nbd_errno_to_system_errno(reply->error);
+> -
+> -    if (reply->error =3D=3D ESHUTDOWN) {
+> -        /* This works even on mingw which lacks a native ESHUTDOWN */
+> -        error_setg(errp, "server shutting down");
+> -        return -EINVAL;
+> -    }
+>      trace_nbd_receive_reply(magic, reply->error, reply->handle);
+> =20
+>      if (magic !=3D NBD_REPLY_MAGIC) {
+>=20
+> If that seems reasonable I can apply it as such.
+
+Your backport looks correct to me; thanks.
+
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
 
 
-Thanks Alistair,
+--h3VTav11BkWNeTSRLCeSXB6XuilTeDwJ7
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
 
-I've merged this into mb-next for 2.12.
-Reviewed-by: Edgar E. Iglesias <edgar.iglesias@xilinx.com>
+-----BEGIN PGP SIGNATURE-----
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
 
-Best regards,
-Edgar
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlooIm4ACgkQp6FrSiUn
+Q2qUHgf+KdEKPSJIFtZDtAgcmTylp8dG6LRwNMwrxexgLpvZ4R4A40K/BFDFQ9v4
+2q6KWGJgXf2wIXK6sfr1DVa6tHt6Irsqe0ZRzJ1UFJSR547PiP7pSiQbH3kRN62M
+aVlhtFtIXU/rsjJKPBP2bxPaiwp/UURnORN3NGrF47pS81k8rOUYjsEcol3c4koc
+iT92VgxwEjm8F9HLFUPz7ofFtsNtGkDjVxU5+2hcULT/1j7rOdY6P5DHJrCOn8OQ
+GhqUtIsh2Ol99ikiwSJmgne+224UOPJezqZYaevcHgFSgsrspfdvh4cOIsU8ceuB
+Q07yyIkpmM9TPe+obg/fPdPnXfSJYg==
+=4sEZ
+-----END PGP SIGNATURE-----
 
-
-> 
-> V4:
->  - Rename the ZCU102 machine to just ZynqMP
->  - Rename the PMC SoC to "xlnx,zynqmp-pmu-soc"
->  - Move the IPI device to the machine instead of the SoC
-> V3:
->  - Add the interrupt controller
->  - Replace some of the error_fatals with errp
->  - Fix the PMU CPU name
-> 
-> 
-> Alistair Francis (8):
->   xlnx-zynqmp-pmu: Initial commit of the ZynqMP PMU
->   xlnx-zynqmp-pmu: Add the CPU and memory
->   aarch64-softmmu.mak: Use an ARM specific config
->   xlnx-pmu-iomod-intc: Add the PMU Interrupt controller
->   xlnx-zynqmp-pmu: Connect the PMU interrupt controller
->   xlnx-zynqmp-ipi: Initial version of the Xilinx IPI device
->   xlnx-zynqmp-pmu: Connect the IPI device to the PMU
->   xlnx-zynqmp: Connect the IPI device to the ZynqMP SoC
-> 
->  default-configs/aarch64-softmmu.mak    |   1 +
->  default-configs/microblaze-softmmu.mak |   1 +
->  hw/arm/Makefile.objs                   |   2 +-
->  hw/arm/xlnx-zynqmp.c                   |  14 +
->  hw/display/Makefile.objs               |   2 +-
->  hw/dma/Makefile.objs                   |   2 +-
->  hw/intc/Makefile.objs                  |   2 +
->  hw/intc/xlnx-pmu-iomod-intc.c          | 554 +++++++++++++++++++++++++++++++++
->  hw/intc/xlnx-zynqmp-ipi.c              | 377 ++++++++++++++++++++++
->  hw/microblaze/Makefile.objs            |   1 +
->  hw/microblaze/xlnx-zynqmp-pmu.c        | 204 ++++++++++++
->  include/hw/arm/xlnx-zynqmp.h           |   2 +
->  include/hw/intc/xlnx-pmu-iomod-intc.h  |  58 ++++
->  include/hw/intc/xlnx-zynqmp-ipi.h      |  57 ++++
->  14 files changed, 1274 insertions(+), 3 deletions(-)
->  create mode 100644 hw/intc/xlnx-pmu-iomod-intc.c
->  create mode 100644 hw/intc/xlnx-zynqmp-ipi.c
->  create mode 100644 hw/microblaze/xlnx-zynqmp-pmu.c
->  create mode 100644 include/hw/intc/xlnx-pmu-iomod-intc.h
->  create mode 100644 include/hw/intc/xlnx-zynqmp-ipi.h
-> 
-> -- 
-> 2.11.0
-> 
+--h3VTav11BkWNeTSRLCeSXB6XuilTeDwJ7--
