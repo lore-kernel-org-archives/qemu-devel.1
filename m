@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43257)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45223)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1eMcUB-0007NB-R4
-	for qemu-devel@nongnu.org; Wed, 06 Dec 2017 11:23:52 -0500
+	(envelope-from <stefanha@gmail.com>) id 1eMcXo-0000Oh-3o
+	for qemu-devel@nongnu.org; Wed, 06 Dec 2017 11:27:37 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1eMcU9-0002Ob-4u
-	for qemu-devel@nongnu.org; Wed, 06 Dec 2017 11:23:51 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:53804)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1eMcU8-0002Nh-Rg
-	for qemu-devel@nongnu.org; Wed, 06 Dec 2017 11:23:49 -0500
-From: Markus Armbruster <armbru@redhat.com>
-References: <20170911110623.24981-1-marcandre.lureau@redhat.com>
-	<20170911110623.24981-5-marcandre.lureau@redhat.com>
-Date: Wed, 06 Dec 2017 17:23:43 +0100
-In-Reply-To: <20170911110623.24981-5-marcandre.lureau@redhat.com>
-	(=?utf-8?Q?=22Marc-Andr=C3=A9?=
-	Lureau"'s message of "Mon, 11 Sep 2017 13:05:37 +0200")
-Message-ID: <87mv2vx1tc.fsf@dusky.pond.sub.org>
+	(envelope-from <stefanha@gmail.com>) id 1eMcXm-0004VH-Nm
+	for qemu-devel@nongnu.org; Wed, 06 Dec 2017 11:27:36 -0500
+Received: from mail-wr0-x22d.google.com ([2a00:1450:400c:c0c::22d]:34578)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1eMcXm-0004UT-E0
+	for qemu-devel@nongnu.org; Wed, 06 Dec 2017 11:27:34 -0500
+Received: by mail-wr0-x22d.google.com with SMTP id y21so4540785wrc.1
+	for <qemu-devel@nongnu.org>; Wed, 06 Dec 2017 08:27:34 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v3 04/50] qapi: add 'if' to top-level
- expressions
+In-Reply-To: <286AC319A985734F985F78AFA26841F73937B57F@shsmsx102.ccr.corp.intel.com>
+References: <1512444796-30615-1-git-send-email-wei.w.wang@intel.com>
+	<20171206134957.GD12584@stefanha-x1.localdomain>
+	<286AC319A985734F985F78AFA26841F73937B57F@shsmsx102.ccr.corp.intel.com>
+From: Stefan Hajnoczi <stefanha@gmail.com>
+Date: Wed, 6 Dec 2017 16:27:32 +0000
+Message-ID: <CAJSP0QWugAKQy6hYEJfy_XHEg-Q2swAzZMNcWBqn-r9Yi7yiEg@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [virtio-dev] [PATCH v3 0/7] Vhost-pci for inter-VM
+ communication
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,90 +30,74 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>
-Cc: qemu-devel@nongnu.org, Michael Roth <mdroth@linux.vnet.ibm.com>
+To: "Wang, Wei W" <wei.w.wang@intel.com>
+Cc: Stefan Hajnoczi <stefanha@redhat.com>, "virtio-dev@lists.oasis-open.org" <virtio-dev@lists.oasis-open.org>, "mst@redhat.com" <mst@redhat.com>, "Yang, Zhiyong" <zhiyong.yang@intel.com>, "jan.kiszka@siemens.com" <jan.kiszka@siemens.com>, "jasowang@redhat.com" <jasowang@redhat.com>, "avi.cohen@huawei.com" <avi.cohen@huawei.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "marcandre.lureau@redhat.com" <marcandre.lureau@redhat.com>, "pbonzini@redhat.com" <pbonzini@redhat.com>
 
-Second thoughts...
-
-Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com> writes:
-
-> Accept 'if' key in top-level elements, accepted as string or list of
-> string type. The following patches will modify the test visitor to
-> check the value is correctly saved, and generate #if/#endif code (as a
-> single #if/endif line or a series for a list).
+On Wed, Dec 6, 2017 at 4:09 PM, Wang, Wei W <wei.w.wang@intel.com> wrote:
+> On Wednesday, December 6, 2017 9:50 PM, Stefan Hajnoczi wrote:
+>> On Tue, Dec 05, 2017 at 11:33:09AM +0800, Wei Wang wrote:
+>> > Vhost-pci is a point-to-point based inter-VM communication solution.
+>> > This patch series implements the vhost-pci-net device setup and
+>> > emulation. The device is implemented as a virtio device, and it is set
+>> > up via the vhost-user protocol to get the neessary info (e.g the
+>> > memory info of the remote VM, vring info).
+>> >
+>> > Currently, only the fundamental functions are implemented. More
+>> > features, such as MQ and live migration, will be updated in the future.
+>> >
+>> > The DPDK PMD of vhost-pci has been posted to the dpdk mailinglist here:
+>> > http://dpdk.org/ml/archives/dev/2017-November/082615.html
+>>
+>> I have asked questions about the scope of this feature.  In particular, I think
+>> it's best to support all device types rather than just virtio-net.  Here is a
+>> design document that shows how this can be achieved.
+>>
+>> What I'm proposing is different from the current approach:
+>> 1. It's a PCI adapter (see below for justification) 2. The vhost-user protocol is
+>> exposed by the device (not handled 100% in
+>>    QEMU).  Ultimately I think your approach would also need to do this.
+>>
+>> I'm not implementing this and not asking you to implement it.  Let's just use
+>> this for discussion so we can figure out what the final vhost-pci will look like.
+>>
+>> Please let me know what you think, Wei, Michael, and others.
+>>
 >
-> Example of 'if' key:
-> { 'struct': 'TestIfStruct', 'data': { 'foo': 'int' },
->   'if': 'defined(TEST_IF_STRUCT)' }
+> Thanks for sharing the thoughts. If I understand it correctly, the key difference is that this approach tries to relay every vhost-user msg to the guest. I'm not sure about the benefits of doing this.
+> To make data plane (i.e. driver to send/receive packets) work, I think, mostly, the memory info and vring info are enough. Other things like callfd, kickfd don't need to be sent to the guest, they are needed by QEMU only for the eventfd and irqfd setup.
+
+Handling the vhost-user protocol inside QEMU and exposing a different
+interface to the guest makes the interface device-specific.  This will
+cause extra work to support new devices (vhost-user-scsi,
+vhost-user-blk).  It also makes development harder because you might
+have to learn 3 separate specifications to debug the system (virtio,
+vhost-user, vhost-pci-net).
+
+If vhost-user is mapped to a PCI device then these issues are solved.
+
+>> vhost-pci is a PCI adapter instead of a virtio device to allow doorbells and
+>> interrupts to be connected to the virtio device in the master VM in the most
+>> efficient way possible.  This means the Vring call doorbell can be an
+>> ioeventfd that signals an irqfd inside the host kernel without host userspace
+>> involvement.  The Vring kick interrupt can be an irqfd that is signalled by the
+>> master VM's virtqueue ioeventfd.
+>>
 >
-> The generated code is for now *unconditional*. Later patches generate
-> the conditionals.
 >
-> A following patch for qapi-code-gen.txt will provide more complete
-> documentation for 'if' usage.
+> This looks the same as the implementation of inter-VM notification in v2:
+> https://www.mail-archive.com/qemu-devel@nongnu.org/msg450005.html
+> which is fig. 4 here: https://github.com/wei-w-wang/vhost-pci-discussion/blob/master/vhost-pci-rfc2.0.pdf
 >
-> Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
-> ---
->  scripts/qapi.py                         | 35 +++++++++++++++++++++++++++=
-------
->  tests/test-qmp-commands.c               |  6 ++++++
->  tests/qapi-schema/qapi-schema-test.json | 20 +++++++++++++++++++
->  tests/qapi-schema/qapi-schema-test.out  | 22 +++++++++++++++++++++
->  4 files changed, 77 insertions(+), 6 deletions(-)
->
-> diff --git a/scripts/qapi.py b/scripts/qapi.py
-> index 62dc52ed6e..20c1abf915 100644
-> --- a/scripts/qapi.py
-> +++ b/scripts/qapi.py
-> @@ -639,6 +639,26 @@ def add_name(name, info, meta, implicit=3DFalse):
->      all_names[name] =3D meta
->=20=20
->=20=20
-> +def check_if(expr, info):
-> +
-> +    def check_if_str(ifcond, info):
-> +        if ifcond =3D=3D '':
-> +            raise QAPISemError(info, "'if' condition '' makes no sense")
-> +
-> +    ifcond =3D expr['if']
-> +    if isinstance(ifcond, str):
-> +        check_if_str(ifcond, info)
-> +    elif (isinstance(ifcond, list)
-> +          and all(isinstance(elt, str) for elt in ifcond)):
-> +        if ifcond =3D=3D []:
-> +            raise QAPISemError(info, "'if' condition [] is useless")
-> +        for elt in ifcond:
-> +            check_if_str(elt, info)
-> +    else:
-> +        raise QAPISemError(
-> +            info, "'if' condition must be a string or a list of strings")
-> +
-> +
+> When the vhost-pci driver kicks its tx, the host signals the irqfd of virtio-net's rx. I think this has already bypassed the host userspace (thanks to the fast mmio implementation)
 
-Slightly terser:
+Yes, I think the irqfd <-> ioeventfd mapping is good.  Perhaps it even
+makes sense to implement a special fused_irq_ioevent_fd in the host
+kernel to bypass the need for a kernel thread to read the eventfd so
+that an interrupt can be injected (i.e. to make the operation
+synchronous).
 
-   def check_if(expr, info):
-
-       def check_if_str(ifcond, info):
-           if not isinstance(ifcond, str):
-               raise QAPISemError(
-                   info, "'if' condition must be a string or a list of stri=
-ngs")
-           if ifcond =3D=3D '':
-               raise QAPISemError(info, "'if' condition '' makes no sense")
-
-       ifcond =3D expr['if']
-       if isinstance(ifcond, list):
-           if ifcond =3D=3D []:
-               raise QAPISemError(info, "'if' condition [] is useless")
-           for elt in ifcond:
-               check_if_str(elt, info)
-       else:
-           check_if_str(ifcond, info)
-
-Can slot this in on commit.
-
->  def check_type(info, source, value, allow_array=3DFalse,
->                 allow_dict=3DFalse, allow_optional=3DFalse,
->                 allow_metas=3D[]):
-[...]
+Is the tx virtqueue in your inter-VM notification v2 series a real
+virtqueue that gets used?  Or is it just a dummy virtqueue that you're
+using for the ioeventfd doorbell?  It looks like vpnet_handle_vq() is
+empty so it's really just a dummy.  The actual virtqueue is in the
+vhost-user master guest memory.
