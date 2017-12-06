@@ -1,17 +1,15 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50687)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50663)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1eMXKO-0001n8-G0
-	for qemu-devel@nongnu.org; Wed, 06 Dec 2017 05:53:26 -0500
+	(envelope-from <kwolf@redhat.com>) id 1eMXKN-0001mM-I4
+	for qemu-devel@nongnu.org; Wed, 06 Dec 2017 05:53:29 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1eMXKN-0006aN-Fl
-	for qemu-devel@nongnu.org; Wed, 06 Dec 2017 05:53:24 -0500
+	(envelope-from <kwolf@redhat.com>) id 1eMXKM-0006a7-ST
+	for qemu-devel@nongnu.org; Wed, 06 Dec 2017 05:53:23 -0500
 From: Kevin Wolf <kwolf@redhat.com>
-Date: Wed,  6 Dec 2017 11:53:04 +0100
-Message-Id: <20171206105309.3468-2-kwolf@redhat.com>
-In-Reply-To: <20171206105309.3468-1-kwolf@redhat.com>
-References: <20171206105309.3468-1-kwolf@redhat.com>
-Subject: [Qemu-devel] [PATCH v2 1/6] block: Make bdrv_drain_invoke()
- recursive
+Date: Wed,  6 Dec 2017 11:53:03 +0100
+Message-Id: <20171206105309.3468-1-kwolf@redhat.com>
+Subject: [Qemu-devel] [PATCH v2 0/6] block: Fix BlockDriver callbacks in
+ bdrv_drain_all_begin()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,95 +21,31 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org
 Cc: kwolf@redhat.com, pbonzini@redhat.com, famz@redhat.com, qemu-devel@nongnu.org, qemu-stable@nongnu.org
 
-This change separates bdrv_drain_invoke(), which calls the BlockDriver
-drain callbacks, from bdrv_drain_recurse(). Instead, the function
-performs its own recursion now.
+I was looking into the drain functions in order to develop them a bit in
+the direction that Fam suggested, to unify the code between bdrv_drain()
+and bdrv_drain_all() a bit more, and maybe to find a place to take
+coroutine locks for graph changes.
 
-One reason for this is that bdrv_drain_recurse() can be called multiple
-times by bdrv_drain_all_begin(), but the callbacks may only be called
-once. The separation is necessary to fix this bug.
+The first thing I found is a bug in bdrv_drain_all(), so I'm already
+sending this part before I have made much progress with my actual plan.
 
-The other reason is that we intend to go to a model where we call all
-driver callbacks first, and only then start polling. This is not fully
-achieved yet with this patch, as bdrv_drain_invoke() contains a
-BDRV_POLL_WHILE() loop for the block driver callbacks, which can still
-call callbacks for any unrelated event. It's a step in this direction
-anyway.
+v2:
+- Added patches 5 and 6 [Paolo]
+- Fixed commit message of patch 1 [Eric]
 
-Cc: qemu-stable@nongnu.org
-Signed-off-by: Kevin Wolf <kwolf@redhat.com>
----
- block/io.c | 14 +++++++++++---
- 1 file changed, 11 insertions(+), 3 deletions(-)
+Kevin Wolf (6):
+  block: Make bdrv_drain_invoke() recursive
+  block: Call .drain_begin only once in bdrv_drain_all_begin()
+  test-bdrv-drain: Test BlockDriver callbacks for drain
+  block: bdrv_drain_recurse(): Remove unused begin parameter
+  block: Don't wait for requests in bdrv_drain*_end()
+  block: Unify order in drain functions
 
-diff --git a/block/io.c b/block/io.c
-index 6773926fc1..096468b761 100644
---- a/block/io.c
-+++ b/block/io.c
-@@ -175,8 +175,10 @@ static void coroutine_fn bdrv_drain_invoke_entry(void *opaque)
-     bdrv_wakeup(bs);
- }
- 
-+/* Recursively call BlockDriver.bdrv_co_drain_begin/end callbacks */
- static void bdrv_drain_invoke(BlockDriverState *bs, bool begin)
- {
-+    BdrvChild *child, *tmp;
-     BdrvCoDrainData data = { .bs = bs, .done = false, .begin = begin};
- 
-     if (!bs->drv || (begin && !bs->drv->bdrv_co_drain_begin) ||
-@@ -187,6 +189,10 @@ static void bdrv_drain_invoke(BlockDriverState *bs, bool begin)
-     data.co = qemu_coroutine_create(bdrv_drain_invoke_entry, &data);
-     bdrv_coroutine_enter(bs, data.co);
-     BDRV_POLL_WHILE(bs, !data.done);
-+
-+    QLIST_FOREACH_SAFE(child, &bs->children, next, tmp) {
-+        bdrv_drain_invoke(child->bs, begin);
-+    }
- }
- 
- static bool bdrv_drain_recurse(BlockDriverState *bs, bool begin)
-@@ -194,9 +200,6 @@ static bool bdrv_drain_recurse(BlockDriverState *bs, bool begin)
-     BdrvChild *child, *tmp;
-     bool waited;
- 
--    /* Ensure any pending metadata writes are submitted to bs->file.  */
--    bdrv_drain_invoke(bs, begin);
--
-     /* Wait for drained requests to finish */
-     waited = BDRV_POLL_WHILE(bs, atomic_read(&bs->in_flight) > 0);
- 
-@@ -279,6 +282,7 @@ void bdrv_drained_begin(BlockDriverState *bs)
-         bdrv_parent_drained_begin(bs);
-     }
- 
-+    bdrv_drain_invoke(bs, true);
-     bdrv_drain_recurse(bs, true);
- }
- 
-@@ -294,6 +298,7 @@ void bdrv_drained_end(BlockDriverState *bs)
-     }
- 
-     bdrv_parent_drained_end(bs);
-+    bdrv_drain_invoke(bs, false);
-     bdrv_drain_recurse(bs, false);
-     aio_enable_external(bdrv_get_aio_context(bs));
- }
-@@ -372,6 +377,8 @@ void bdrv_drain_all_begin(void)
-             aio_context_acquire(aio_context);
-             for (bs = bdrv_first(&it); bs; bs = bdrv_next(&it)) {
-                 if (aio_context == bdrv_get_aio_context(bs)) {
-+                    /* FIXME Calling this multiple times is wrong */
-+                    bdrv_drain_invoke(bs, true);
-                     waited |= bdrv_drain_recurse(bs, true);
-                 }
-             }
-@@ -393,6 +400,7 @@ void bdrv_drain_all_end(void)
-         aio_context_acquire(aio_context);
-         aio_enable_external(aio_context);
-         bdrv_parent_drained_end(bs);
-+        bdrv_drain_invoke(bs, false);
-         bdrv_drain_recurse(bs, false);
-         aio_context_release(aio_context);
-     }
+ block/io.c              |  31 +++++++----
+ tests/test-bdrv-drain.c | 137 ++++++++++++++++++++++++++++++++++++++++++++++++
+ tests/Makefile.include  |   2 +
+ 3 files changed, 159 insertions(+), 11 deletions(-)
+ create mode 100644 tests/test-bdrv-drain.c
+
 -- 
 2.13.6
