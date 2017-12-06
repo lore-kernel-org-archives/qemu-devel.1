@@ -1,31 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33732)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33743)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1eMThX-00080r-Jp
-	for qemu-devel@nongnu.org; Wed, 06 Dec 2017 02:01:04 -0500
+	(envelope-from <bounces@canonical.com>) id 1eMThZ-00081a-6k
+	for qemu-devel@nongnu.org; Wed, 06 Dec 2017 02:01:11 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1eMThV-00084f-0v
-	for qemu-devel@nongnu.org; Wed, 06 Dec 2017 02:01:03 -0500
-Received: from indium.canonical.com ([91.189.90.7]:57198)
+	(envelope-from <bounces@canonical.com>) id 1eMThU-00083z-Fz
+	for qemu-devel@nongnu.org; Wed, 06 Dec 2017 02:01:05 -0500
+Received: from indium.canonical.com ([91.189.90.7]:57112)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1eMThU-00083n-QH
+	id 1eMThU-00083T-9F
 	for qemu-devel@nongnu.org; Wed, 06 Dec 2017 02:01:00 -0500
 Received: from loganberry.canonical.com ([91.189.90.37])
 	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1eMThT-0006rJ-0P
-	for <qemu-devel@nongnu.org>; Wed, 06 Dec 2017 07:00:59 +0000
+	id 1eMThQ-0006t4-Rp
+	for <qemu-devel@nongnu.org>; Wed, 06 Dec 2017 07:00:56 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id E52FE2E80D5
-	for <qemu-devel@nongnu.org>; Wed,  6 Dec 2017 07:00:58 +0000 (UTC)
+	by loganberry.canonical.com (Postfix) with ESMTP id C0F662E80D7
+	for <qemu-devel@nongnu.org>; Wed,  6 Dec 2017 07:00:56 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Wed, 06 Dec 2017 06:48:29 -0000
+Date: Wed, 06 Dec 2017 06:47:56 -0000
 From: ChristianEhrhardt <1736655@bugs.launchpad.net>
 Reply-To: Bug 1736655 <1736655@bugs.launchpad.net>
 Sender: bounces@canonical.com
 References: <151253983521.3178.4021889730911467554.malonedeb@gac.canonical.com>
-Message-Id: <151254290988.11366.18335395112988684603.malone@soybean.canonical.com>
+Message-Id: <151254287611.10784.2031964653947260440.malone@wampee.canonical.com>
 Errors-To: bounces@canonical.com
 Subject: [Qemu-devel] [Bug 1736655] Re: 2k3/xp guests w/virtio-net randomly
  DHCP fail on boot
@@ -39,16 +39,28 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-Well I see you already opened it against upstream - sorry (too early for me=
-) - great.
-Adding an Ubuntu task then to track potential fixes to take eventually.
+Hi Patrick,
+thank you so much for the report and your help to make Ubuntu better.
+Also for all the bisecting that is very helpful.
 
-** Also affects: qemu (Ubuntu)
-   Importance: Undecided
-       Status: New
+While backporting the change itself would be very trivial we need to
+find what the final solution has to be first.
 
-** Changed in: qemu (Ubuntu)
-       Status: New =3D> Incomplete
+I checked latest upstream which is about to release 2.11 these days and the=
+re was not related change.
+- no revert to this commit
+- no other major disabling/fixes for ioeventfd in these cases
+
+That would imply that this is an issue unknown to upstream - and that means=
+ that we need to make it known there to not end up carrying a Delta forever=
+ and deriving more and more.
+So we should bring it up there and find a solution for everyone.
+
+First of all let me try if I can reproduce it over here, then we can decide=
+ on next steps.
+Very likely one of them would be to report it to upstream as well - which s=
+ince you have a great bug description already they track Launchpad I can ea=
+sily do for you by adding a bug Task.
 
 -- =
 
