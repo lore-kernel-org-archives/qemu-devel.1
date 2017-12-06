@@ -1,33 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48534)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58863)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1eMP5m-0004I8-Nl
-	for qemu-devel@nongnu.org; Tue, 05 Dec 2017 21:05:47 -0500
+	(envelope-from <dianchen.tdc@gmail.com>) id 1eMPSq-0003Vw-TF
+	for qemu-devel@nongnu.org; Tue, 05 Dec 2017 21:29:37 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1eMP5h-0008Au-Oe
-	for qemu-devel@nongnu.org; Tue, 05 Dec 2017 21:05:46 -0500
-Received: from indium.canonical.com ([91.189.90.7]:48340)
+	(envelope-from <dianchen.tdc@gmail.com>) id 1eMPSq-0002F5-3j
+	for qemu-devel@nongnu.org; Tue, 05 Dec 2017 21:29:36 -0500
+Received: from mail-oi0-x244.google.com ([2607:f8b0:4003:c06::244]:45482)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1eMP5h-00089f-IZ
-	for qemu-devel@nongnu.org; Tue, 05 Dec 2017 21:05:41 -0500
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1eMP5e-0002cp-Lu
-	for <qemu-devel@nongnu.org>; Wed, 06 Dec 2017 02:05:38 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 9EBD02E80C3
-	for <qemu-devel@nongnu.org>; Wed,  6 Dec 2017 02:05:38 +0000 (UTC)
+	(Exim 4.71) (envelope-from <dianchen.tdc@gmail.com>)
+	id 1eMPSp-0002EY-QB
+	for qemu-devel@nongnu.org; Tue, 05 Dec 2017 21:29:36 -0500
+Received: by mail-oi0-x244.google.com with SMTP id x20so1619461oix.12
+	for <qemu-devel@nongnu.org>; Tue, 05 Dec 2017 18:29:35 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Wed, 06 Dec 2017 01:57:57 -0000
-From: Nathan Rennie-Waldock <1670509@bugs.launchpad.net>
-Reply-To: Bug 1670509 <1670509@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <20170306224936.27687.97076.malonedeb@gac.canonical.com>
-Message-Id: <151252547814.3366.539152234273246245.malone@gac.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1670509] Re: sgabios outputs incorrect video modes
+From: =?UTF-8?B?55Sw5q6/6Iej?= <dianchen.tdc@gmail.com>
+Date: Wed, 6 Dec 2017 10:29:34 +0800
+Message-ID: <CABkJTM4RL4cZ0euYX7d8xPd7ozrN76nr0rafut0LBJmZWFD+Vw@mail.gmail.com>
+Content-Type: multipart/mixed; boundary="001a11408d96e1e667055fa2b870"
+Subject: [Qemu-devel] [PATCH] input: free InputEvent when it can't be
+ inserted into a full kdb queue
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,47 +28,73 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
+Cc: icymemo@gmail.com, quan.xu0@gmail.com
 
-Any chance of getting this patch included?
-I've deleted the incorrect patch and attached the correct one (taken from Q=
-EMU's sgabios repo).
+--001a11408d96e1e667055fa2b870
+Content-Type: text/plain; charset="UTF-8"
 
-** Patch removed: "0001-SGABIOS-fix-wrong-video-attrs-for-int-10h-ah-13h.pa=
-tch"
-   https://bugs.launchpad.net/ubuntu/+source/sgabios/+bug/1670509/+attachme=
-nt/4834118/+files/0001-SGABIOS-fix-wrong-video-attrs-for-int-10h-ah-13h.pat=
-ch
+>From e8c03f405c2112428e79bb82064c7b7743d0cc86 Mon Sep 17 00:00:00 2001
+From: Tian Dianchen <dianchen.tdc@gmail.com>
+Date: Tue, 5 Dec 2017 14:03:53 +0800
+Subject: [PATCH] input: free InputEvent when it can't be inserted into a
+full
+ kdb queue
 
-** Patch added: "0001-SGABIOS-fix-wrong-video-attrs-for-int-10h-ah-13h.patc=
-h"
-   https://bugs.launchpad.net/ubuntu/+source/sgabios/+bug/1670509/+attachme=
-nt/5019029/+files/0001-SGABIOS-fix-wrong-video-attrs-for-int-10h-ah-13h.pat=
-ch
+When the kdb queue is full, the evt can't be placed in it, so it should
+be released to free the memory.
 
--- =
+Impact: Without this limit vnc clients can exhaust host memory by keep
+sending keyboard events when kdb queue is full.
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1670509
+Reviewed-by: Zhang Chao <icymemo@gmail.com>
+Reviewed-by: Quan Xu <quan.xu0@gmail.com>
+Signed-off-by: Tian Dianchen <dianchen.tdc@gmail.com>
+---
+ ui/input.c | 2 ++
+ 1 file changed, 2 insertions(+)
 
-Title:
-  sgabios outputs incorrect video modes
+diff --git a/ui/input.c b/ui/input.c
+index 3e2d324..e5b78aa 100644
+--- a/ui/input.c
++++ b/ui/input.c
+@@ -421,6 +421,8 @@ void qemu_input_event_send_key(QemuConsole *src,
+KeyValue *key, bool down)
+     } else if (queue_count < queue_limit) {
+         qemu_input_queue_event(&kbd_queue, src, evt);
+         qemu_input_queue_sync(&kbd_queue);
++    } else {
++        qapi_free_InputEvent(evt);
+     }
+ }
 
-Status in QEMU:
-  New
-Status in sgabios package in Ubuntu:
-  Confirmed
+-- 
+1.8.3.1
 
-Bug description:
-  When run with a bootstrap loader that uses int 0x10 with 0x1301 in
-  %ax, incorrect video modes are output to the serial port.  I believe
-  the VGA image will be correct.  This might also affect the returned
-  values for some interrupts.
+--001a11408d96e1e667055fa2b870
+Content-Type: application/octet-stream;
+	name="0001-input-free-InputEvent-when-it-can-t-be-inserted-into.patch"
+Content-Disposition: attachment;
+	filename="0001-input-free-InputEvent-when-it-can-t-be-inserted-into.patch"
+Content-Transfer-Encoding: base64
+X-Attachment-Id: f_jaufjxnl0
 
-  This is caused because the set_cursor_position routine fails to save
-  and restore %bx.
-
-  I'm working on a fix for this.
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1670509/+subscriptions
+RnJvbSBlOGMwM2Y0MDVjMjExMjQyOGU3OWJiODIwNjRjN2I3NzQzZDBjYzg2IE1vbiBTZXAgMTcg
+MDA6MDA6MDAgMjAwMQpGcm9tOiBUaWFuIERpYW5jaGVuIDxkaWFuY2hlbi50ZGNAZ21haWwuY29t
+PgpEYXRlOiBUdWUsIDUgRGVjIDIwMTcgMTQ6MDM6NTMgKzA4MDAKU3ViamVjdDogW1BBVENIXSBp
+bnB1dDogZnJlZSBJbnB1dEV2ZW50IHdoZW4gaXQgY2FuJ3QgYmUgaW5zZXJ0ZWQgaW50byBhIGZ1
+bGwKIGtkYiBxdWV1ZQoKV2hlbiB0aGUga2RiIHF1ZXVlIGlzIGZ1bGwsIHRoZSBldnQgY2FuJ3Qg
+YmUgcGxhY2VkIGluIGl0LCBzbyBpdCBzaG91bGQKYmUgcmVsZWFzZWQgdG8gZnJlZSB0aGUgbWVt
+b3J5LgoKSW1wYWN0OiBXaXRob3V0IHRoaXMgbGltaXQgdm5jIGNsaWVudHMgY2FuIGV4aGF1c3Qg
+aG9zdCBtZW1vcnkgYnkga2VlcApzZW5kaW5nIGtleWJvYXJkIGV2ZW50cyB3aGVuIGtkYiBxdWV1
+ZSBpcyBmdWxsLgoKUmV2aWV3ZWQtYnk6IFpoYW5nIENoYW8gPGljeW1lbW9AZ21haWwuY29tPgpS
+ZXZpZXdlZC1ieTogUXVhbiBYdSA8cXVhbi54dTBAZ21haWwuY29tPgpTaWduZWQtb2ZmLWJ5OiBU
+aWFuIERpYW5jaGVuIDxkaWFuY2hlbi50ZGNAZ21haWwuY29tPgotLS0KIHVpL2lucHV0LmMgfCAy
+ICsrCiAxIGZpbGUgY2hhbmdlZCwgMiBpbnNlcnRpb25zKCspCgpkaWZmIC0tZ2l0IGEvdWkvaW5w
+dXQuYyBiL3VpL2lucHV0LmMKaW5kZXggM2UyZDMyNC4uZTViNzhhYSAxMDA2NDQKLS0tIGEvdWkv
+aW5wdXQuYworKysgYi91aS9pbnB1dC5jCkBAIC00MjEsNiArNDIxLDggQEAgdm9pZCBxZW11X2lu
+cHV0X2V2ZW50X3NlbmRfa2V5KFFlbXVDb25zb2xlICpzcmMsIEtleVZhbHVlICprZXksIGJvb2wg
+ZG93bikKICAgICB9IGVsc2UgaWYgKHF1ZXVlX2NvdW50IDwgcXVldWVfbGltaXQpIHsKICAgICAg
+ICAgcWVtdV9pbnB1dF9xdWV1ZV9ldmVudCgma2JkX3F1ZXVlLCBzcmMsIGV2dCk7CiAgICAgICAg
+IHFlbXVfaW5wdXRfcXVldWVfc3luYygma2JkX3F1ZXVlKTsKKyAgICB9IGVsc2UgeworICAgICAg
+ICBxYXBpX2ZyZWVfSW5wdXRFdmVudChldnQpOwogICAgIH0KIH0KIAotLSAKMS44LjMuMQoK
+--001a11408d96e1e667055fa2b870--
