@@ -1,23 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38881)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39763)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1eMXtS-0005P1-4j
-	for qemu-devel@nongnu.org; Wed, 06 Dec 2017 06:29:38 -0500
+	(envelope-from <stefanha@redhat.com>) id 1eMXvr-0006Wm-TI
+	for qemu-devel@nongnu.org; Wed, 06 Dec 2017 06:32:08 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1eMXtR-0006gV-6M
-	for qemu-devel@nongnu.org; Wed, 06 Dec 2017 06:29:38 -0500
-Date: Wed, 6 Dec 2017 11:29:26 +0000
+	(envelope-from <stefanha@redhat.com>) id 1eMXvq-0007tP-Sl
+	for qemu-devel@nongnu.org; Wed, 06 Dec 2017 06:32:07 -0500
+Date: Wed, 6 Dec 2017 11:31:55 +0000
 From: Stefan Hajnoczi <stefanha@redhat.com>
-Message-ID: <20171206112926.GA12584@stefanha-x1.localdomain>
+Message-ID: <20171206113155.GB12584@stefanha-x1.localdomain>
 References: <20171205104141.28882-1-stefanha@redhat.com>
-	<20171205104141.28882-9-stefanha@redhat.com>
-	<3d097c24-26d0-ded1-a750-58c5750298a8@redhat.com>
+	<20171205104141.28882-2-stefanha@redhat.com>
+	<f69659d6-0bae-b510-3cd5-435e8fd4838a@redhat.com>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="bg08WKrSYDhXBjb5"
+	protocol="application/pgp-signature"; boundary="RASg3xLB4tUQ4RcS"
 Content-Disposition: inline
-In-Reply-To: <3d097c24-26d0-ded1-a750-58c5750298a8@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH 8/9] blockdev: add x-blockdev-set-iothread
- testing command
+In-Reply-To: <f69659d6-0bae-b510-3cd5-435e8fd4838a@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH 1/9] blockdev: hold AioContext for
+ bdrv_unref() in external_snapshot_clean()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,57 +30,71 @@ To: Eric Blake <eblake@redhat.com>
 Cc: qemu-devel@nongnu.org, Kevin Wolf <kwolf@redhat.com>, John Snow <jsnow@redhat.com>, qemu-block@nongnu.org
 
 
---bg08WKrSYDhXBjb5
+--RASg3xLB4tUQ4RcS
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Tue, Dec 05, 2017 at 08:40:42AM -0600, Eric Blake wrote:
+On Tue, Dec 05, 2017 at 08:36:32AM -0600, Eric Blake wrote:
 > On 12/05/2017 04:41 AM, Stefan Hajnoczi wrote:
-> > +##
-> > +# @x-blockdev-set-iothread:
-> > +#
-> > +# Move @node and its children into the @iothread.  If @iothread is emp=
-ty then
-> > +# move @node and its children into the main loop.
-> > +#
-> > +# The node must not be attached to a BlockBackend.
-> > +#
-> > +# @node-name: the name of the block driver node
-> > +#
-> > +# @iothread: the name of the IOThread object
-> > +#
+> > bdrv_unref() requires the AioContext lock because bdrv_flush() uses
+> > BDRV_POLL_WHILE(), which assumes the AioContext is currently held.  If
+> > BDRV_POLL_WHILE() runs without AioContext held the
+> > pthread_mutex_unlock() call in aio_context_release() fails.
+> >=20
+> > This patch moves bdrv_unref() into the AioContext locked region to solve
+> > the following pthread_mutex_unlock() failure:
+> >=20
+> >   #0  0x00007f566181969b in raise () at /lib64/libc.so.6
+> >   #1  0x00007f566181b3b1 in abort () at /lib64/libc.so.6
+> >   #2  0x00005592cd590458 in error_exit (err=3D<optimized out>, msg=3Dms=
+g@entry=3D0x5592cdaf6d60 <__func__.23977> "qemu_mutex_unlock") at util/qemu=
+-thread-posix.c:36
+> >   #3  0x00005592cd96e738 in qemu_mutex_unlock (mutex=3Dmutex@entry=3D0x=
+5592ce9505e0) at util/qemu-thread-posix.c:96
+> >   #4  0x00005592cd969b69 in aio_context_release (ctx=3Dctx@entry=3D0x55=
+92ce950580) at util/async.c:507
+> >   #5  0x00005592cd8ead78 in bdrv_flush (bs=3Dbs@entry=3D0x5592cfa87210)=
+ at block/io.c:2478
+> >   #6  0x00005592cd89df30 in bdrv_close (bs=3D0x5592cfa87210) at block.c=
+:3207
+> >   #7  0x00005592cd89df30 in bdrv_delete (bs=3D0x5592cfa87210) at block.=
+c:3395
+> >   #8  0x00005592cd89df30 in bdrv_unref (bs=3D0x5592cfa87210) at block.c=
+:4418
+> >   #9  0x00005592cd6b7f86 in qmp_transaction (dev_list=3D<optimized out>=
+, has_props=3D<optimized out>, props=3D<optimized out>, errp=3Derrp@entry=
+=3D0x7ffe4a1fc9d8) at blockdev.c:2308
+> >=20
+> > Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
+> > ---
+> >  blockdev.c | 2 +-
+> >  1 file changed, 1 insertion(+), 1 deletion(-)
 >=20
-> > +# 2. Move a node into the main loop
-> > +# -> { "execute": "x-blockdev-set-iothread",
-> > +#      "arguments": { "node-name": "disk1",
-> > +#                     "iothread": "" } }
+> Reviewed-by: Eric Blake <eblake@redhat.com>
 >=20
-> Eww. Special casing of the empty string.  Would it be better design to
-> have iothread be optional, and to omit it to move a node into the main
-> loop?  Or use the StrOrNull type to allow JSON null instead of "" to
-> mean the main loop?
+> I know the series is too big/late for 2.11, but is this one patch worth
+> having?
 
-I deliberated about this and chose the empty string because it has
-special meaning in other QMP commands too.  But I agree that it's ugly.
+This fix is not critical for 2.11.  The bug shouldn't be triggered under
+normal circumstances.
 
-StrOrNull is cleaner than using the empty string.  Making it optional
-feels strange to me so I'll switch to StrOrNull.
+The bug was exposed while developing qemu-iotests 202, which uses
+unconventional commands (blockdev-add to create BDSes with no -drive or
+BlockBackend).
 
-Stefan
-
---bg08WKrSYDhXBjb5
+--RASg3xLB4tUQ4RcS
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQEcBAEBAgAGBQJaJ9SWAAoJEJykq7OBq3PIFaoH/0mFJZliGrNTo3Z3nrdd7suy
-xBMjVNHssma9Bz7xy/i6QVTwIloZ0jqviwwodZAds9XEAqtgFRfSeDCGA5ONwfxx
-dWtknCioyMoTRxa0c9DiEWlmDqrcw7kNF7DPIUvdyJfdtR95adFdLpWFWlh5eloX
-WQ25TI6c3m/BroIcZ+IiK7r3O9jUNT9qI/PV6ZGhh6BwEkzElwTlTfUpTJnOLqOg
-h40iBgMZZHvj/iTE/llUM/gqp7sz+aq7sjPnKXpGMNzBId0yFe0WuWPzyj/Naqrq
-9SaqKb+W1B03Byu3oJ7pEgiy6grEq0eYPQ1H1ukc+QefvzcZVd740OEjFV7LOvU=
-=CvFx
+iQEcBAEBAgAGBQJaJ9UrAAoJEJykq7OBq3PIJw8IAKnz2CfgKBUkSLr1aE4BdytX
+c1KmpcSTCU+q8gqFI0/5xpaLBfvpdLZR4x6dKxZ5JXDZG2eYQlzTeC0atGkvzpAB
++4imK/65G7f7mzPqjlTnIhQmPCWRULyA5Syq7IeNXfN/py2/Lw4Z4dOSraqkhGPf
+lyKHbk9CmYgWGTqs+nyKILSR1cbKuWK5HILqcDkcvJZU0x3ngoB8bIusYs6dxpDE
+MOpNrbb/absAV2yfO4UFSJAoLZFWEEOr53pPGF2bwvGAYC0EOZddjv51WnSxjMNT
+wcGeFVSRUvVXU0r91mx2SyH6XfDrZSpM3XnTVleAWmpzhIU5Hg5CJiwX8LHdL00=
+=ngn3
 -----END PGP SIGNATURE-----
 
---bg08WKrSYDhXBjb5--
+--RASg3xLB4tUQ4RcS--
