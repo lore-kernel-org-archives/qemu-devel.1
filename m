@@ -1,35 +1,36 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48835)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48841)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mdroth@linux.vnet.ibm.com>) id 1eMfC7-0008PL-Pn
-	for qemu-devel@nongnu.org; Wed, 06 Dec 2017 14:17:26 -0500
+	(envelope-from <mdroth@linux.vnet.ibm.com>) id 1eMfC8-0008RM-4Z
+	for qemu-devel@nongnu.org; Wed, 06 Dec 2017 14:17:27 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mdroth@linux.vnet.ibm.com>) id 1eMfC4-0000DC-JB
-	for qemu-devel@nongnu.org; Wed, 06 Dec 2017 14:17:23 -0500
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:38646)
+	(envelope-from <mdroth@linux.vnet.ibm.com>) id 1eMfC4-0000DZ-OZ
+	for qemu-devel@nongnu.org; Wed, 06 Dec 2017 14:17:24 -0500
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:42822
+	helo=mx0a-001b2d01.pphosted.com)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <mdroth@linux.vnet.ibm.com>)
-	id 1eMfC4-0000C5-9K
+	id 1eMfC4-0000Cs-Hf
 	for qemu-devel@nongnu.org; Wed, 06 Dec 2017 14:17:20 -0500
-Received: from pps.filterd (m0098410.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
-	vB6JF6JO111434
-	for <qemu-devel@nongnu.org>; Wed, 6 Dec 2017 14:17:19 -0500
-Received: from e15.ny.us.ibm.com (e15.ny.us.ibm.com [129.33.205.205])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2epm1wf6s4-1
+Received: from pps.filterd (m0098419.ppops.net [127.0.0.1])
+	by mx0b-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
+	vB6JE4Vr112571
+	for <qemu-devel@nongnu.org>; Wed, 6 Dec 2017 14:17:20 -0500
+Received: from e34.co.us.ibm.com (e34.co.us.ibm.com [32.97.110.152])
+	by mx0b-001b2d01.pphosted.com with ESMTP id 2epm58y102-1
 	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Wed, 06 Dec 2017 14:17:18 -0500
+	for <qemu-devel@nongnu.org>; Wed, 06 Dec 2017 14:17:19 -0500
 Received: from localhost
-	by e15.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	by e34.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
 	Violators will be prosecuted
 	for <qemu-devel@nongnu.org> from <mdroth@linux.vnet.ibm.com>;
-	Wed, 6 Dec 2017 14:17:17 -0500
+	Wed, 6 Dec 2017 12:17:19 -0700
 From: Michael Roth <mdroth@linux.vnet.ibm.com>
-Date: Wed,  6 Dec 2017 13:16:09 -0600
+Date: Wed,  6 Dec 2017 13:16:11 -0600
 In-Reply-To: <20171206191648.18208-1-mdroth@linux.vnet.ibm.com>
 References: <20171206191648.18208-1-mdroth@linux.vnet.ibm.com>
-Message-Id: <20171206191648.18208-17-mdroth@linux.vnet.ibm.com>
-Subject: [Qemu-devel] [PATCH 16/55] memory: Alloc dispatch tree where
- topology is generared
+Message-Id: <20171206191648.18208-19-mdroth@linux.vnet.ibm.com>
+Subject: [Qemu-devel] [PATCH 18/55] memory: Share FlatView's and dispatch
+ trees between address spaces
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -43,59 +44,125 @@ Cc: qemu-stable@nongnu.org, Alexey Kardashevskiy <aik@ozlabs.ru>, Paolo Bonzini 
 
 From: Alexey Kardashevskiy <aik@ozlabs.ru>
 
-This is to make next patches simpler.
+This allows sharing flat views between address spaces (AS) when
+the same root memory region is used when creating a new address space.
+This is done by walking through all ASes and caching one FlatView per
+a physical root MR (i.e. not aliased).
+
+This removes search for duplicates from address_space_init_shareable() as
+FlatViews are shared elsewhere and keeping as::ref_count correct seems
+an unnecessary and useless complication.
+
+This should cause no change and memory use or boot time yet.
 
 Signed-off-by: Alexey Kardashevskiy <aik@ozlabs.ru>
-Message-Id: <20170921085110.25598-11-aik@ozlabs.ru>
+Message-Id: <20170921085110.25598-13-aik@ozlabs.ru>
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
-(cherry picked from commit 9bf561e36cf8fed9565011a19ba9ea0100e1811e)
+(cherry picked from commit 967dc9b1194a9281124b2e1ce67b6c3359a2138f)
 Signed-off-by: Michael Roth <mdroth@linux.vnet.ibm.com>
 ---
- memory.c | 18 +++++++++---------
- 1 file changed, 9 insertions(+), 9 deletions(-)
+ memory.c | 56 +++++++++++++++++++++++++++++++++++++++++++++-----------
+ 1 file changed, 45 insertions(+), 11 deletions(-)
 
 diff --git a/memory.c b/memory.c
-index 7972235a06..8034520148 100644
+index 1f58d29755..f0c864206a 100644
 --- a/memory.c
 +++ b/memory.c
-@@ -742,6 +742,7 @@ static MemoryRegion *memory_region_get_flatview_root(MemoryRegion *mr)
- /* Render a memory topology into a list of disjoint absolute ranges. */
- static FlatView *generate_memory_topology(MemoryRegion *mr)
- {
-+    int i;
-     FlatView *view;
+@@ -47,6 +47,8 @@ static QTAILQ_HEAD(memory_listeners, MemoryListener) memory_listeners
+ static QTAILQ_HEAD(, AddressSpace) address_spaces
+     = QTAILQ_HEAD_INITIALIZER(address_spaces);
  
-     view = flatview_new(mr);
-@@ -752,6 +753,14 @@ static FlatView *generate_memory_topology(MemoryRegion *mr)
-     }
-     flatview_simplify(view);
- 
-+    view->dispatch = address_space_dispatch_new(view);
-+    for (i = 0; i < view->nr; i++) {
-+        MemoryRegionSection mrs =
-+            section_from_flat_range(&view->ranges[i], view);
-+        flatview_add_to_dispatch(view, &mrs);
-+    }
-+    address_space_dispatch_compact(view->dispatch);
++static GHashTable *flat_views;
 +
+ typedef struct AddrRange AddrRange;
+ 
+ /*
+@@ -760,6 +762,7 @@ static FlatView *generate_memory_topology(MemoryRegion *mr)
+         flatview_add_to_dispatch(view, &mrs);
+     }
+     address_space_dispatch_compact(view->dispatch);
++    g_hash_table_replace(flat_views, mr, view);
+ 
      return view;
  }
+@@ -929,11 +932,47 @@ static void address_space_update_topology_pass(AddressSpace *as,
+     }
+ }
  
-@@ -925,15 +934,6 @@ static void address_space_update_topology(AddressSpace *as)
+-static void address_space_update_topology(AddressSpace *as)
++static void flatviews_init(void)
++{
++    if (flat_views) {
++        return;
++    }
++
++    flat_views = g_hash_table_new_full(g_direct_hash, g_direct_equal, NULL,
++                                       (GDestroyNotify) flatview_unref);
++}
++
++static void flatviews_reset(void)
++{
++    AddressSpace *as;
++
++    if (flat_views) {
++        g_hash_table_unref(flat_views);
++        flat_views = NULL;
++    }
++    flatviews_init();
++
++    /* Render unique FVs */
++    QTAILQ_FOREACH(as, &address_spaces, address_spaces_link) {
++        MemoryRegion *physmr = memory_region_get_flatview_root(as->root);
++
++        if (g_hash_table_lookup(flat_views, physmr)) {
++            continue;
++        }
++
++        generate_memory_topology(physmr);
++    }
++}
++
++static void address_space_set_flatview(AddressSpace *as)
+ {
      FlatView *old_view = address_space_get_flatview(as);
-     MemoryRegion *physmr = memory_region_get_flatview_root(old_view->root);
-     FlatView *new_view = generate_memory_topology(physmr);
--    int i;
--
--    new_view->dispatch = address_space_dispatch_new(new_view);
--    for (i = 0; i < new_view->nr; i++) {
--        MemoryRegionSection mrs =
--            section_from_flat_range(&new_view->ranges[i], new_view);
--        flatview_add_to_dispatch(new_view, &mrs);
--    }
--    address_space_dispatch_compact(new_view->dispatch);
+-    MemoryRegion *physmr = memory_region_get_flatview_root(old_view->root);
+-    FlatView *new_view = generate_memory_topology(physmr);
++    MemoryRegion *physmr = memory_region_get_flatview_root(as->root);
++    FlatView *new_view = g_hash_table_lookup(flat_views, physmr);
++
++    assert(new_view);
++
++    flatview_ref(new_view);
  
      if (!QTAILQ_EMPTY(&as->listeners)) {
          address_space_update_topology_pass(as, old_view, new_view, false);
+@@ -969,10 +1008,12 @@ void memory_region_transaction_commit(void)
+     --memory_region_transaction_depth;
+     if (!memory_region_transaction_depth) {
+         if (memory_region_update_pending) {
++            flatviews_reset();
++
+             MEMORY_LISTENER_CALL_GLOBAL(begin, Forward);
+ 
+             QTAILQ_FOREACH(as, &address_spaces, address_spaces_link) {
+-                address_space_update_topology(as);
++                address_space_set_flatview(as);
+                 address_space_update_ioeventfds(as);
+             }
+             memory_region_update_pending = false;
+@@ -2695,13 +2736,6 @@ AddressSpace *address_space_init_shareable(MemoryRegion *root, const char *name)
+ {
+     AddressSpace *as;
+ 
+-    QTAILQ_FOREACH(as, &address_spaces, address_spaces_link) {
+-        if (root == as->root && as->malloced) {
+-            as->ref_count++;
+-            return as;
+-        }
+-    }
+-
+     as = g_malloc0(sizeof *as);
+     address_space_init(as, root, name);
+     as->malloced = true;
 -- 
 2.11.0
