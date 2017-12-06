@@ -1,26 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34297)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34984)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mikhail.abakumov@ispras.ru>) id 1eMVn1-0004If-D7
-	for qemu-devel@nongnu.org; Wed, 06 Dec 2017 04:14:52 -0500
+	(envelope-from <dgibson@ozlabs.org>) id 1eMVov-0004zS-Pw
+	for qemu-devel@nongnu.org; Wed, 06 Dec 2017 04:16:50 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mikhail.abakumov@ispras.ru>) id 1eMVmy-0006PA-5K
-	for qemu-devel@nongnu.org; Wed, 06 Dec 2017 04:14:51 -0500
-Received: from mail.ispras.ru ([83.149.199.45]:33992)
-	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mikhail.abakumov@ispras.ru>) id 1eMVmx-0006OY-OK
-	for qemu-devel@nongnu.org; Wed, 06 Dec 2017 04:14:48 -0500
+	(envelope-from <dgibson@ozlabs.org>) id 1eMVou-0007Oq-Ej
+	for qemu-devel@nongnu.org; Wed, 06 Dec 2017 04:16:49 -0500
+Date: Wed, 6 Dec 2017 19:47:09 +1100
+From: David Gibson <david@gibson.dropbear.id.au>
+Message-ID: <20171206084709.GV3057@umbus.fritz.box>
+References: <151254821213.27903.10774600450833875601.stgit@bahia.lan>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8;
- format=flowed
-Date: Wed, 06 Dec 2017 12:14:46 +0300
-From: Mihail Abakumov <mikhail.abakumov@ispras.ru>
-In-Reply-To: <CABdb736ZwzjKDTZsKYqRtiqCVzKG8qEQKOubv6=oNDCwCDUe_A@mail.gmail.com>
-References: <151127322955.6888.16198535123422076171.stgit@Misha-PC.lan02.inno>
-	<151128141659.525.3916037556813470751@bafd83ae6430>
-	<CABdb736ZwzjKDTZsKYqRtiqCVzKG8qEQKOubv6=oNDCwCDUe_A@mail.gmail.com>
-Message-ID: <bcb83e92ef84c5fdeb929872033af3d3@ispras.ru>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v3 00/45] Windbg supporting
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature"; boundary="Ln+iIw7POnzHEEo5"
+Content-Disposition: inline
+In-Reply-To: <151254821213.27903.10774600450833875601.stgit@bahia.lan>
+Subject: Re: [Qemu-devel] [PATCH] spapr_events: drop bogus cell from
+ "interrupt-ranges" property
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,129 +24,92 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Ladi Prosek <lprosek@redhat.com>
-Cc: qemu-devel <qemu-devel@nongnu.org>, sw@weilnetz.de, Pavel Dovgalyuk <dovgaluk@ispras.ru>, Roman Kagan <rkagan@virtuozzo.com>, Paolo Bonzini <pbonzini@redhat.com>, "Denis V. Lunev" <den@openvz.org>
+To: Greg Kurz <groug@kaod.org>
+Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org, Cedric Le Goater <clg@kaod.org>, Michael Roth <mdroth@linux.vnet.ibm.com>
 
-Ladi Prosek =D0=BF=D0=B8=D1=81=D0=B0=D0=BB 2017-11-29 11:23:
-> On Tue, Nov 21, 2017 at 3:07 PM, Mihail Abakumov
-> <mikhail.abakumov@ispras.ru> wrote:
->> An update of:
->>=20
->>         v1:=20
->> https://lists.nongnu.org/archive/html/qemu-devel/2017-09/msg07092.html
->>=20
->> We made the debugger module WinDbg (like GDB) for QEMU. This is the=20
->> replacement of the remote stub in Windows kernel. Used for remote=20
->> Windows kernel debugging without debugging mode.
->>=20
->> WinDbg is a multipurpose debugger for the Microsoft Windows computer=20
->> operating system, distributed by Microsoft. Recent versions of WinDbg=20
->> have been and are being distributed as part of the free Debugging=20
->> Tools for Windows suite.
->>=20
->> How to start debugging QEMU using WinDbg:
->>   Run QEMU with next option:
->>     -windbg pipe:<name>
->>   QEMU will start and pause for waiting WinDbg connection.
->>   Run WinDbg with next options:
->>     -b -k com:pipe,baud=3D115200,port=3D\\.\pipe\<name>,resets=3D0
->>   Wait for debugger connect to kernel.
->>=20
->> Note: You can add Symbol Search Path in WinDbg such as=20
->> srv*c:\tmp*http://msdl.microsoft.com/download/symbols.
->>=20
->> How it works:
->> The WinDbg debugger has the possibility of connecting to a remote=20
->> debug service (Kdsrv.exe) in the Windows kernel. Therefore, it is=20
->> possible to connect to the guest system running in the QEMU emulator.=20
->> Kernel debugging is possible only with the enabled debugging mode, may=
-=20
->> change at the same time. Our module of WinDbg debugger for QEMU is an=20
->> alternative of the remote debugging service in the kernel. Thus, the=20
->> debugger connects to the debugging module, not to the kernel of the=20
->> operating system. The module obtains all the necessary information=20
->> answering debugger requests from the QEMU emulator. At the same time=20
->> for debugging there is no need to enable debugging mode in the kernel.=
-=20
->> This leads to hidden debugging. Our module supports all features of=20
->> WinDbg regarding remote debugging, besides interception of events and=20
->> exceptions. Only i386 is supported now.
->>=20
->> Changed in v3:
->>=20
->>  - Add a support of the new api functions from the WinDbg v10.
->>=20
->> Changed in v2:
->>=20
->>  - Move target specific code in the 'target/' directory. (Alistair=20
->> Francis)
->>  - Change 'kd_api_fill_memory'. Made a fill of memory by line=20
->> segments. Before that, a full array was immediately collected and=20
->> written in RAM. (Ladi Prosek)
->>  - Change 'kd_api_search_memory'. Made a search for memory by line=20
->> segments. (Ladi Prosek)
->>  - Change ld* to st* where it needs. (Ladi Prosek)
->>  - Add a additional check of input arguments in 'windbg_read_context'=20
->> and 'windbg_read_ks_regs'. (Ladi Prosek)
->>  - Fix typos. (Ladi Prosek)
->>  - Add a fliping back 'windbg_state->is_loaded' after reset VM.
->>  - Add a check to disabled kvm. It is supported yet. (Ladi Prosek)
->>  - Add a check to device in windbg option. Only pipe is supporting=20
->> now. (Alistair Francis)
->>  - Add a check to 'ifdef' WINDBG_DEBUG_ON before define it. (Alistair=20
->> Francis)
->>  - Replace printf to qemu_log. (Alistair Francis)
->>  - Fix build on s390x host. (patchew)
->>  - Fix code style error. (patchew)
->=20
->=20
-> Thanks, v3 is working with a Win10 windbg for me!
->=20
-> A few things I noticed during my testing (Win7 32-bit guest):
->=20
-> * Windbg prints:
->=20
->   ReadVirtual: 827403d0 not properly sign extended
->=20
-> after connecting. That's likely a bug hiding somewhere.
->=20
 
-This is due to the fact that the cpu_memory_rw_debug function cannot
-return the required memory region. No physical page mapped.
+--Ln+iIw7POnzHEEo5
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-> * lm prints only nt and a bunch of unloaded crash dump modules. This
-> doesn't look expected and blocks what I believe is the most common way
-> of initiating debugging which is setting a breakpoint on a specific
-> driver function. Additionally, after rebooting the guest, lm prints
-> only nt, nothing else. Do you see the same thing?
+On Wed, Dec 06, 2017 at 09:16:52AM +0100, Greg Kurz wrote:
+1;5002;0c> According to LoPAPR 1.1 B.6.12, the "/event-sources" node has an=
+ "interrupt-
+> ranges" property, the format of which is described in B.6.9.1.2 as follow=
+s:
+>=20
+> =E2=80=9Cinterrupt-ranges=E2=80=9D
+>  Standard property name that defines the interrupt number(s) and range(s)
+>  handled by this unit.
+>=20
+>  prop-encoded-array: List of (int-number, range) specifications.
+>=20
+>  Int-number is encoded as with encode-int.
+>  Range is encoded as with encode-int.
+>=20
+>  The first entry in this list shall contain the int-number associated with
+>  the first =E2=80=9Creg=E2=80=9D property entry. The int-num-ber is the v=
+alue representing
+>  the interrupt source as would appear in the PowerPC External Interrupt
+>  Architecture XISR. The range shall be the number of sequential interrupt
+>  numbers which this unit can generate.
+>=20
+> There's no such thing as a cell count at the end of the array, like the
+> one introduced by commit ffbb1705a33d in QEMU 2.8. It doesn't seem it had
+> any impact on existing guests and I couldn't find any related workaround
+> in linux. So, let's just drop the bogus lines.
+>=20
+> Signed-off-by: Greg Kurz <groug@kaod.org>
 
-Yes, the same.
+That does indeed seem bogus.  Applied to ppc-for-2.12.
 
+> ---
+>  hw/ppc/spapr_events.c |    3 ---
+>  1 file changed, 3 deletions(-)
 >=20
->   kd> lm
->   start    end        module name
->   8260b000 82a1d000   nt         (pdb symbols)          C:\Program
-> Files (x86)\Windows
-> Kits\10\Debuggers\x64\sym\ntkrpamp.pdb\684DA42A30CC450F81C535B4D18944B1=
-2\ntkrpamp.pdb
+> diff --git a/hw/ppc/spapr_events.c b/hw/ppc/spapr_events.c
+> index c7a64e6b8dd3..86836f0626dc 100644
+> --- a/hw/ppc/spapr_events.c
+> +++ b/hw/ppc/spapr_events.c
+> @@ -292,9 +292,6 @@ void spapr_dt_events(sPAPRMachineState *spapr, void *=
+fdt)
+>          irq_ranges[count++] =3D cpu_to_be32(1);
+>      }
+> =20
+> -    irq_ranges[count] =3D cpu_to_be32(count);
+> -    count++;
+> -
+>      _FDT((fdt_setprop(fdt, event_sources, "interrupt-controller", NULL, =
+0)));
+>      _FDT((fdt_setprop_cell(fdt, event_sources, "#interrupt-cells", 2)));
+>      _FDT((fdt_setprop(fdt, event_sources, "interrupt-ranges",
 >=20
->   Unloaded modules:
->   869da000 869e7000   crashdmp.sys
->   869e7000 869f2000   dump_ataport.sys
->   869f2000 869fb000   dump_atapi.sys
->   86800000 86811000   dump_dumpfve.sys
->=20
-> * It seems to work on a Linux host as well! Still ok to keep it
-> limited to pipe: for now, especially if you don't test on Linux.
->=20
-> * Wondering about the legal aspects of copying code from winnt.h. I'll
-> let others confirm that it's ok.
->=20
-> I have replied to some of the patches with comments.
->=20
-> Thank you!
-> Ladi
 
 --=20
-Thanks,
-Mihail
+David Gibson			| I'll have my music baroque, and my code
+david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
+				| _way_ _around_!
+http://www.ozlabs.org/~dgibson
+
+--Ln+iIw7POnzHEEo5
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlonro0ACgkQbDjKyiDZ
+s5K5RhAAkkehIIGrld+WMW316hcoBoSjuTus4gmDpm0etFolEPbiWlSbABIS16ZD
+7WdDs9xPB+QnK4RyRDyqS8CtCQ7WrvCaUbk3SFqt/l6lw+8yJBXtP4Rb9svnp4+2
+KgA4w7lQuNjLLByO4LJ0lxOeHnSB+bLcJVt9pJD8jg+pOdY398VdgatQq5WLm4b9
+qybonTPAs5QAHReowe4UWBM6SPWYACgeDoW6DekbhyPD5Fl2RjioQQrcoSNs9unX
+Q1DRHgEDEmMn6WuZU2WVNyhM3Uc38yzAt5Jh5O1I7s4tB1pfRfgWHbSu3fwIj6nF
+aID1XeZTF7kbKd3s4UQ5OJ+unGFWSnQw+O9BvJkpPhxqU4gL3aNiy3TyCHKuD85G
+Z/Z8C82F3TANeswPcfWjY5YRproqKd7iGWtNEh+N5Dj/cbUr0WCdZRhXvEJSVai6
+6/Kr1yYJF3z3tCuk2coLzLRl5mbu6lLk5mJewDuzR3j7yQeHsLYPOlGJXvAWSHFs
+3t3AqYIQ+vNhjQvdHsutAfqc6XktP9Cn0vhkpuQt7LlukH8YFO1OKv4pg5NTR1EP
+1aqHgLiZhB2M+Jx+Ql3C5PHBlW4Ai3sWGgNtpMKtXcTvTc1qnhFupPDjnF/QHzT/
+Clcxlb72QGlvyNMXvwIOHwY9rViuCZ0FTxxDHEDtlZOH0ZHDKsQ=
+=lm8z
+-----END PGP SIGNATURE-----
+
+--Ln+iIw7POnzHEEo5--
