@@ -1,26 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46625)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48450)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1eMhmr-0005la-DO
-	for qemu-devel@nongnu.org; Wed, 06 Dec 2017 17:03:30 -0500
+	(envelope-from <jsnow@redhat.com>) id 1eMht6-0007xz-U6
+	for qemu-devel@nongnu.org; Wed, 06 Dec 2017 17:09:58 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1eMhmq-0000qN-Ea
-	for qemu-devel@nongnu.org; Wed, 06 Dec 2017 17:03:29 -0500
-Received: from mail-oi0-x241.google.com ([2607:f8b0:4003:c06::241]:44163)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1eMhmq-0000pa-7r
-	for qemu-devel@nongnu.org; Wed, 06 Dec 2017 17:03:28 -0500
-Received: by mail-oi0-x241.google.com with SMTP id l6so3603447oih.11
-	for <qemu-devel@nongnu.org>; Wed, 06 Dec 2017 14:03:28 -0800 (PST)
+	(envelope-from <jsnow@redhat.com>) id 1eMht5-0007P8-CM
+	for qemu-devel@nongnu.org; Wed, 06 Dec 2017 17:09:56 -0500
+References: <1511196664-85304-1-git-send-email-anton.nefedov@virtuozzo.com>
+	<1511196664-85304-3-git-send-email-anton.nefedov@virtuozzo.com>
+	<w51po7t5hgh.fsf@maestria.local.igalia.com>
+	<1a1334cc-8fae-03bc-b0be-70ee4b8c4ac0@virtuozzo.com>
+From: John Snow <jsnow@redhat.com>
+Message-ID: <beeaf694-b8d2-bac7-a94d-da7f57cc1748@redhat.com>
+Date: Wed, 6 Dec 2017 17:09:46 -0500
 MIME-Version: 1.0
-In-Reply-To: <20171206200346.116537-2-brijesh.singh@amd.com>
-References: <20171206200346.116537-1-brijesh.singh@amd.com>
-	<20171206200346.116537-2-brijesh.singh@amd.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Wed, 6 Dec 2017 22:03:06 +0000
-Message-ID: <CAFEAcA8UvBopec1ammRML+fgh36YLfRyg2wsgmzesmAUFy8H3w@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH v5 01/23] memattrs: add debug attribute
+In-Reply-To: <1a1334cc-8fae-03bc-b0be-70ee4b8c4ac0@virtuozzo.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [Qemu-block] [PATCH 2/7] ide: account UNMAP (TRIM)
+ operations
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,44 +27,150 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Brijesh Singh <brijesh.singh@amd.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, Alistair Francis <alistair.francis@xilinx.com>, Christian Borntraeger <borntraeger@de.ibm.com>, Cornelia Huck <cornelia.huck@de.ibm.com>, "Daniel P . Berrange" <berrange@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, "Edgar E . Iglesias" <edgar.iglesias@xilinx.com>, Eduardo Habkost <ehabkost@redhat.com>, Eric Blake <eblake@redhat.com>, kvm-devel <kvm@vger.kernel.org>, Marcel Apfelbaum <marcel@redhat.com>, Markus Armbruster <armbru@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Richard Henderson <richard.henderson@linaro.org>, Richard Henderson <rth@twiddle.net>, Stefan Hajnoczi <stefanha@gmail.com>, Thomas Lendacky <Thomas.Lendacky@amd.com>, Borislav Petkov <bp@suse.de>
+To: Anton Nefedov <anton.nefedov@virtuozzo.com>, Alberto Garcia <berto@igalia.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org
+Cc: kwolf@redhat.com, den@virtuozzo.com, armbru@redhat.com, mreitz@redhat.com, pbonzini@redhat.com
 
-On 6 December 2017 at 20:03, Brijesh Singh <brijesh.singh@amd.com> wrote:
-> The debug attribute will be set when qemu attempts to access the guest
-> memory for debug (e.g memory access from gdbstub, memory dump commands
-> etc).
->
-> When guest memory is encrypted, the debug access will need to go through
-> the memory encryption APIs.
->
-> Cc: Alistair Francis <alistair.francis@xilinx.com>
-> Cc: Peter Maydell <peter.maydell@linaro.org>
-> Cc: Edgar E. Iglesias" <edgar.iglesias@xilinx.com>
-> Cc: Richard Henderson <richard.henderson@linaro.org>
-> Cc: Paolo Bonzini <pbonzini@redhat.com>
-> Signed-off-by: Brijesh Singh <brijesh.singh@amd.com>
-> ---
->  include/exec/memattrs.h | 4 ++++
->  1 file changed, 4 insertions(+)
->
-> diff --git a/include/exec/memattrs.h b/include/exec/memattrs.h
-> index d4a16420984b..721362e06292 100644
-> --- a/include/exec/memattrs.h
-> +++ b/include/exec/memattrs.h
-> @@ -37,6 +37,8 @@ typedef struct MemTxAttrs {
->      unsigned int user:1;
->      /* Requester ID (for MSI for example) */
->      unsigned int requester_id:16;
-> +    /* Debug memory access for encrypted guest */
-> +    unsigned int debug:1;
->  } MemTxAttrs;
 
-Can we have some more detailed semantics for this please?
-For instance, if a device gets a debug=1 transaction
-should it refuse to do things like read-clears-bits
-semantics or other side-effects you wouldn't expect
-of debugger accesses?
 
-thanks
--- PMM
+On 12/05/2017 12:14 PM, Anton Nefedov wrote:
+>=20
+>=20
+> On 5/12/2017 6:21 PM, Alberto Garcia wrote:
+>> On Mon 20 Nov 2017 05:50:59 PM CET, Anton Nefedov wrote:
+>>> Signed-off-by: Anton Nefedov <anton.nefedov@virtuozzo.com>
+>>> Reviewed-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+>>> ---
+>>> =C2=A0 hw/ide/core.c | 12 ++++++++++++
+>>> =C2=A0 1 file changed, 12 insertions(+)
+>>>
+>>> diff --git a/hw/ide/core.c b/hw/ide/core.c
+>>> index 471d0c9..2e4dea7 100644
+>>> --- a/hw/ide/core.c
+>>> +++ b/hw/ide/core.c
+>>> @@ -389,6 +389,7 @@ typedef struct TrimAIOCB {
+>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 QEMUIOVector *qiov;
+>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 BlockAIOCB *aiocb;
+>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 int i, j;
+>>> +=C2=A0=C2=A0=C2=A0 BlockAcctCookie acct;
+>>> =C2=A0 } TrimAIOCB;
+>>> =C2=A0 =C2=A0 static void trim_aio_cancel(BlockAIOCB *acb)
+>>> @@ -426,6 +427,14 @@ static void ide_trim_bh_cb(void *opaque)
+>>> =C2=A0 static void ide_issue_trim_cb(void *opaque, int ret)
+>>> =C2=A0 {
+>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 TrimAIOCB *iocb =3D opaque;
+>>> +=C2=A0=C2=A0=C2=A0 if (iocb->i >=3D 0) {
+>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 if (ret >=3D 0) {
+>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 b=
+lock_acct_done(blk_get_stats(iocb->blk), &iocb->acct);
+>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 } else {
+>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 b=
+lock_acct_failed(blk_get_stats(iocb->blk), &iocb->acct);
+>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 }
+>>> +=C2=A0=C2=A0=C2=A0 }
+>>
+>> This part looks fine, but don't you also need to account for invalid
+>> requests (in ide_dma_cb() or somewhere else) ?
+>>
+
+not ide_dma_cb this time, because the command does not use ATA registers
+as input, see below :(
+
+>> Berto
+>>
+>=20
+> Good point; in fact, the TRIM sector range is never checked.
+> (well it should be, down at the block layer, and then counted as error)=
+.
+>=20
+> The motivation was:
+>=20
+> =C2=A0=C2=A0=C2=A0 commit d66168ed687325aa6d338ce3a3cff18ce3098ed6
+> =C2=A0=C2=A0=C2=A0 Author: Michael Tokarev <mjt@tls.msk.ru>
+> =C2=A0=C2=A0=C2=A0 Date:=C2=A0=C2=A0 Wed Aug 13 11:23:31 2014 +0400
+>=20
+> =C2=A0=C2=A0=C2=A0 ide: only constrain read/write requests to drive siz=
+e, not other types
+>=20
+> =C2=A0=C2=A0=C2=A0 Commit 58ac321135a introduced a check to ide dma pro=
+cessing which
+> =C2=A0=C2=A0=C2=A0 constrains all requests to drive size.=C2=A0 However=
+, apparently, some
+> =C2=A0=C2=A0=C2=A0 valid requests (like TRIM) does not fit in this cons=
+traint, and
+> =C2=A0=C2=A0=C2=A0 fails in 2.1.=C2=A0 So check the range only for read=
+s and writes.
+>=20
+
+I wound up at the same commit. The problem here is that the TRIM command
+does not issue contiguous LBA+count requests in the same way using the
+ATA registers like DMA R/W functions do, but instead works a bit more
+like DMA commands in that it transmits a list of regions separately.
+
+Kevin pointed this out in 2014:
+
+https://lists.gnu.org/archive/html/qemu-devel/2014-08/msg02012.html
+
+"I can't give you a clear answer, but it all depends on the value of
+sector_num. This is the contents of the LBA registers and unused for
+TRIM (spec says it's reserved, so we shouldn't be looking at it)."
+
+He's right! This means the LBA/Count registers are undefined when we're
+using TRIM in ide_dma_cb.
+
+So, you have two things you can do:
+
+(1) Modify ide_sector_start_dma to start accounting for TRIM early, and
+then continue to mark it failed/complete where you do, but you'll need
+to add in a new error case in ide_issue_trim_cb to check the range and
+abort the job. We do not need to preprocess the entire "list" of TRIM
+regions upfront as we are within our rights to process some of them
+before aborting.
+
+(2) Continue to start accounting where you do, per-region, which keeps
+trim requests "per chunk", but add the error range checking almost
+immediately after, if this is useful for statistical purposes. It will
+look a little funny to start accounting and then immediately and
+synchronously mark it invalid, but that's probably the most accurate thin=
+g.
+
+I'm basing this off of the ATA8-AC3 spec, which defines the command
+"DATA SET MANAGEMENT - 06h, DMA":
+
+> If the Trim bit is set to one and:
+> a) the device detects an invalid LBA Range Entry; or
+> b) count is greater than IDENTIFY DEVICE data word 105 (see 7.16.7.55),
+> then the device shall return command aborted.
+> A device may trim one or more LBA Range Entries before it returns
+command aborted. See table 209.
+
+ATA8-ACS3 section  seems pretty clear to me that we *may* abort the
+command if we detect an "invalid LBA Range Entry" which is defined in
+3.1.40 as:
+
+"3.1.40 Invalid LBA Range: A range of LBAs that contains one or more
+invalid LBAs."
+
+which references 3.1.39:
+
+3.1.39 Invalid LBA: An LBA that is greater than or equal to the largest
+value reported in IDENTIFY
+DEVICE data words 60..61 (see 7.16.7.22), IDENTIFY DEVICE data words
+100..103
+(see 7.16.7.53), or IDENTIFY DEVICE data words 230..233 (see 7.16.7.88).
+
+Of course, we only know if a range could possibly be invalid by the time
+we actually process it in ide_issue_trim_cb.
+
+>=20
+> It seems like the removed check was at the wrong place (trim request ha=
+s
+> to be parsed first to get offset and nbytes).
+> Probably it should be put to ide_issue_trim_cb() instead.
+>=20
+> cc John (should have done it earlier)
+>=20
+
+Hi!
+
+> /Anton
+>=20
