@@ -1,33 +1,15 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50970)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51726)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pasic@linux.vnet.ibm.com>) id 1eMawz-0006Xr-3B
-	for qemu-devel@nongnu.org; Wed, 06 Dec 2017 09:45:32 -0500
+	(envelope-from <stefanha@redhat.com>) id 1eMaxh-00071N-Ha
+	for qemu-devel@nongnu.org; Wed, 06 Dec 2017 09:46:17 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pasic@linux.vnet.ibm.com>) id 1eMaww-0002Hr-1P
-	for qemu-devel@nongnu.org; Wed, 06 Dec 2017 09:45:29 -0500
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:52822
-	helo=mx0a-001b2d01.pphosted.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pasic@linux.vnet.ibm.com>)
-	id 1eMawv-0002HV-JD
-	for qemu-devel@nongnu.org; Wed, 06 Dec 2017 09:45:25 -0500
-Received: from pps.filterd (m0098413.ppops.net [127.0.0.1])
-	by mx0b-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
-	vB6Ej6J9013127
-	for <qemu-devel@nongnu.org>; Wed, 6 Dec 2017 09:45:23 -0500
-Received: from e06smtp13.uk.ibm.com (e06smtp13.uk.ibm.com [195.75.94.109])
-	by mx0b-001b2d01.pphosted.com with ESMTP id 2eph2cpgrp-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Wed, 06 Dec 2017 09:45:21 -0500
-Received: from localhost
-	by e06smtp13.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
-	Only! Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <pasic@linux.vnet.ibm.com>;
-	Wed, 6 Dec 2017 14:44:43 -0000
-From: Halil Pasic <pasic@linux.vnet.ibm.com>
-Date: Wed,  6 Dec 2017 15:44:36 +0100
-Message-Id: <20171206144438.28908-1-pasic@linux.vnet.ibm.com>
-Subject: [Qemu-devel] [PATCH v2 0/2] unrestrict cssids related patches
+	(envelope-from <stefanha@redhat.com>) id 1eMaxb-00038G-UW
+	for qemu-devel@nongnu.org; Wed, 06 Dec 2017 09:46:13 -0500
+From: Stefan Hajnoczi <stefanha@redhat.com>
+Date: Wed,  6 Dec 2017 14:45:41 +0000
+Message-Id: <20171206144550.22295-1-stefanha@redhat.com>
+Subject: [Qemu-devel] [PATCH v2 0/9] blockdev: fix QMP 'transaction' with
+ IOThreads
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,33 +18,64 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Cornelia Huck <cohuck@redhat.com>
-Cc: Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>, Shalini Chellathurai Saroja <shalini@linux.vnet.ibm.com>, Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org, qemu-s390x@nongnu.org, Halil Pasic <pasic@linux.vnet.ibm.com>
+To: qemu-devel@nongnu.org
+Cc: qemu-block@nongnu.org, John Snow <jsnow@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>
 
-See the commit messages and cover letters of the individual
-patches for more details.
+v2:
+ * Use StrOrNull for x-blockdev-set-iothread iothread argument [eblake]
 
-v1 -> v2:
-* Squashed advertising via property into #1 
-* Fixed commit message for #1 
-* Dropped machine name in the doc and changed
-  how the 'deprecated' warning works
-* Added acks and r-b's when appropriate
+(This is for QEMU 2.12 because this bug is not -rc4 critical)
 
-Halil Pasic (2):
-  s390x/css: unrestrict cssids
-  s390x: deprecate s390-squash-mcss machine prop
+Previously AioContext was held across QMP 'transaction' in an attempt to
+achieve bdrv_drained_begin/end() semantics.  Nowadays we have
+bdrv_drained_begin/end() and the AioContext lock just protects state.
+Therefore there is no reason to hold AioContext across
+.prepare/.commit/.abort/.clean() anymore.
 
- hw/s390x/3270-ccw.c        |  2 +-
- hw/s390x/css-bridge.c      | 11 +++++++++++
- hw/s390x/css.c             | 28 ++++------------------------
- hw/s390x/s390-ccw.c        |  2 +-
- hw/s390x/s390-virtio-ccw.c |  8 ++++++--
- hw/s390x/virtio-ccw.c      |  2 +-
- include/hw/s390x/css.h     | 12 ++++--------
- qemu-doc.texi              |  8 ++++++++
- qemu-options.hx            |  8 +++++++-
- 9 files changed, 43 insertions(+), 38 deletions(-)
+Besides being cleanup-worthy, holding AioContext also exposes a bug:
+BDRV_POLL_WHILE() doesn't support recursive AioContext locking and will hang if
+depth > 1.  This is easy to trigger by submitting a transaction with 2 actions
+that touch two drives assigned to an IOThread.  The IOThread's AioContext will
+be locked twice and BDRV_POLL_WHILE() will hang.
+
+BDRV_POLL_WHILE() is best fixed by eliminating the AioContext lock entirely in
+favor of fine-grained locking.  I discussed some fixes for BDRV_POLL_WHILE()
+with Paolo but we came to the conclusion that it will just add complexity when
+we really want to stop using AioContext locking.
+
+Summary:
+
+ * Patch 1 fixes missing AioContext lock protection
+
+ * Patches 2-6 clean up excessive AioContext locked regions in QMP
+   'transaction' to solve the hang
+
+ * Patches 7-9 add a qemu-iotests test case and the necessary infrastructure
+
+Stefan Hajnoczi (9):
+  blockdev: hold AioContext for bdrv_unref() in
+    external_snapshot_clean()
+  block: don't keep AioContext acquired after
+    external_snapshot_prepare()
+  block: don't keep AioContext acquired after drive_backup_prepare()
+  block: don't keep AioContext acquired after blockdev_backup_prepare()
+  block: don't keep AioContext acquired after
+    internal_snapshot_prepare()
+  block: drop unused BlockDirtyBitmapState->aio_context field
+  iothread: add iothread_by_id() API
+  blockdev: add x-blockdev-set-iothread testing command
+  qemu-iotests: add 202 external snapshots IOThread test
+
+ qapi/block-core.json       |  36 +++++++
+ include/sysemu/iothread.h  |   1 +
+ blockdev.c                 | 258 +++++++++++++++++++++++++++++++++------------
+ iothread.c                 |   7 ++
+ tests/qemu-iotests/202     |  95 +++++++++++++++++
+ tests/qemu-iotests/202.out |  11 ++
+ tests/qemu-iotests/group   |   1 +
+ 7 files changed, 339 insertions(+), 70 deletions(-)
+ create mode 100755 tests/qemu-iotests/202
+ create mode 100644 tests/qemu-iotests/202.out
 
 -- 
-2.13.5
+2.14.3
