@@ -1,15 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52475)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54045)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1eMYKl-0001PV-2a
-	for qemu-devel@nongnu.org; Wed, 06 Dec 2017 06:57:51 -0500
+	(envelope-from <borntraeger@de.ibm.com>) id 1eMYNA-0003Tf-MI
+	for qemu-devel@nongnu.org; Wed, 06 Dec 2017 07:00:21 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1eMYKk-0000tJ-8Y
-	for qemu-devel@nongnu.org; Wed, 06 Dec 2017 06:57:51 -0500
-From: "Daniel P. Berrange" <berrange@redhat.com>
-Date: Wed,  6 Dec 2017 11:57:26 +0000
-Message-Id: <20171206115726.5237-1-berrange@redhat.com>
-Subject: [Qemu-devel] [PATCH] qemu-io: fix EOF Ctrl-D handling in qemu-io
- readline code
+	(envelope-from <borntraeger@de.ibm.com>) id 1eMYN0-0002bv-TK
+	for qemu-devel@nongnu.org; Wed, 06 Dec 2017 07:00:20 -0500
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:58902
+	helo=mx0a-001b2d01.pphosted.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <borntraeger@de.ibm.com>)
+	id 1eMYN0-0002a1-Nn
+	for qemu-devel@nongnu.org; Wed, 06 Dec 2017 07:00:10 -0500
+Received: from pps.filterd (m0098414.ppops.net [127.0.0.1])
+	by mx0b-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
+	vB6BxFR8004167
+	for <qemu-devel@nongnu.org>; Wed, 6 Dec 2017 07:00:08 -0500
+Received: from e06smtp14.uk.ibm.com (e06smtp14.uk.ibm.com [195.75.94.110])
+	by mx0b-001b2d01.pphosted.com with ESMTP id 2epdk6860x-1
+	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Wed, 06 Dec 2017 07:00:07 -0500
+Received: from localhost
+	by e06smtp14.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	Only! Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <borntraeger@de.ibm.com>;
+	Wed, 6 Dec 2017 12:00:05 -0000
+From: Christian Borntraeger <borntraeger@de.ibm.com>
+Date: Wed,  6 Dec 2017 13:00:00 +0100
+Message-Id: <20171206120000.63822-1-borntraeger@de.ibm.com>
+Subject: [Qemu-devel] [PATCH/RFC] s390x: split memory into 4TB chunks
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -18,40 +36,52 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, "Daniel P. Berrange" <berrange@redhat.com>
+To: Cornelia Huck <cohuck@redhat.com>
+Cc: qemu-devel <qemu-devel@nongnu.org>, qemu-s390x <qemu-s390x@nongnu.org>, Halil Pasic <pasic@linux.vnet.ibm.com>, Alexander Graf <agraf@suse.de>, Thomas Huth <thuth@redhat.com>, David Hildenbrand <david@redhat.com>, Richard Henderson <rth@twiddle.net>, Christian Borntraeger <borntraeger@de.ibm.com>
 
-qemu-io puts the TTY into non-canonical mode, which means no EOF processing is
-done and thus getchar() will never return the EOF constant. Instead we have to
-check for an explicit Ctrl-D, aka  0x4, to detect EOF and exit the qemu-io
-shell. This fixes the regression that prevented Ctrl-D from triggering an exit
-of qemu-io that has existed since readline was first added in
+KVM does not allow memory regions > KVM_MEM_MAX_NR_PAGES, basically
+limiting the memory per slot to 7.999TB. Lets split the base memory
+into 4TB chunks to allow go beyond 8TB for a guest. With that (and
+optimistic overcommitment in the kernel) I was able to start  a 59TB
+guest on a 1TB system.
 
-  commit 0cf17e181798063c3824c8200ba46f25f54faa1a
-  Author: Stefan Hajnoczi <stefanha@redhat.com>
-  Date:   Thu Nov 14 11:54:17 2013 +0100
-
-    qemu-io: use readline.c
-
-Signed-off-by: Daniel P. Berrange <berrange@redhat.com>
+Signed-off-by: Christian Borntraeger <borntraeger@de.ibm.com>
 ---
- qemu-io.c | 4 +++-
- 1 file changed, 3 insertions(+), 1 deletion(-)
+ hw/s390x/s390-virtio-ccw.c | 20 +++++++++++++++++---
+ 1 file changed, 17 insertions(+), 3 deletions(-)
 
-diff --git a/qemu-io.c b/qemu-io.c
-index c70bde3eb1..2ea0bfbaf8 100644
---- a/qemu-io.c
-+++ b/qemu-io.c
-@@ -322,7 +322,9 @@ static char *fetchline_readline(void)
-     readline_start(readline_state, get_prompt(), 0, readline_func, &line);
-     while (!line) {
-         int ch = getchar();
--        if (ch == EOF) {
-+        /* In non-canon tty mode we get 0x4 (Ctrl-D), not the stdio "EOF"
-+         * constant */
-+        if (ch == 0x4) {
-             break;
-         }
-         readline_handle_byte(readline_state, ch);
+diff --git a/hw/s390x/s390-virtio-ccw.c b/hw/s390x/s390-virtio-ccw.c
+index 8425534..6735bbb 100644
+--- a/hw/s390x/s390-virtio-ccw.c
++++ b/hw/s390x/s390-virtio-ccw.c
+@@ -157,11 +157,25 @@ static void virtio_ccw_register_hcalls(void)
+ static void s390_memory_init(ram_addr_t mem_size)
+ {
+     MemoryRegion *sysmem = get_system_memory();
+-    MemoryRegion *ram = g_new(MemoryRegion, 1);
++    ram_addr_t chunk, offset;
++    gchar *name;
+ 
+     /* allocate RAM for core */
+-    memory_region_allocate_system_memory(ram, NULL, "s390.ram", mem_size);
+-    memory_region_add_subregion(sysmem, 0, ram);
++    offset = 0;
++    while (mem_size) {
++        MemoryRegion *ram = g_new(MemoryRegion, 1);
++        chunk = mem_size;
++        /* KVM does not allow memslots >= 8 TB. Lets split into 4TB chunks */
++        if (chunk > 4UL * 1024 * 1024 * 1024 * 1024) {
++            chunk = 4UL * 1024 * 1024 * 1024 * 1024;
++        }
++        name = g_strdup_printf("s390.ram[0x%lx]", offset);
++        memory_region_allocate_system_memory(ram, NULL, name, chunk);
++        memory_region_add_subregion(sysmem, offset, ram);
++        mem_size -= chunk;
++        offset += chunk;
++        g_free(name);
++    }
+ 
+     /* Initialize storage key device */
+     s390_skeys_init();
 -- 
-2.14.3
+2.9.4
