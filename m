@@ -1,27 +1,15 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53988)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33342)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1eMdhh-0003Hg-76
-	for qemu-devel@nongnu.org; Wed, 06 Dec 2017 12:41:54 -0500
+	(envelope-from <stefanha@redhat.com>) id 1eMdto-0008P7-9U
+	for qemu-devel@nongnu.org; Wed, 06 Dec 2017 12:54:25 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1eMdhc-0007yc-CT
-	for qemu-devel@nongnu.org; Wed, 06 Dec 2017 12:41:53 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:43930)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1eMdhc-0007xZ-6E
-	for qemu-devel@nongnu.org; Wed, 06 Dec 2017 12:41:48 -0500
-From: Markus Armbruster <armbru@redhat.com>
-References: <20170911110623.24981-1-marcandre.lureau@redhat.com>
-	<20170911110623.24981-9-marcandre.lureau@redhat.com>
-Date: Wed, 06 Dec 2017 18:41:42 +0100
-In-Reply-To: <20170911110623.24981-9-marcandre.lureau@redhat.com>
-	(=?utf-8?Q?=22Marc-Andr=C3=A9?=
-	Lureau"'s message of "Mon, 11 Sep 2017 13:05:41 +0200")
-Message-ID: <878tefvjmx.fsf@dusky.pond.sub.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v3 08/50] qapi: mcgen() shouldn't indent #
- lines
+	(envelope-from <stefanha@redhat.com>) id 1eMdtn-0001fl-Cc
+	for qemu-devel@nongnu.org; Wed, 06 Dec 2017 12:54:24 -0500
+From: Stefan Hajnoczi <stefanha@redhat.com>
+Date: Wed,  6 Dec 2017 17:54:14 +0000
+Message-Id: <20171206175414.27666-1-stefanha@redhat.com>
+Subject: [Qemu-devel] [PATCH] block: avoid recursive AioContext acquire in
+ bdrv_inactivate_all()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,49 +18,70 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>
-Cc: qemu-devel@nongnu.org, Michael Roth <mdroth@linux.vnet.ibm.com>
+To: qemu-devel@nongnu.org
+Cc: qemu-stable@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, qemu-block@nongnu.org
 
-Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com> writes:
+From: Paolo Bonzini <pbonzini@redhat.com>
 
-> Skip preprocessor lines when adding indentation, since that would
-> likely result in invalid code.
->
-> Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
-> ---
->  scripts/qapi.py | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
->
-> diff --git a/scripts/qapi.py b/scripts/qapi.py
-> index f2b5a7e131..2a8e60e975 100644
-> --- a/scripts/qapi.py
-> +++ b/scripts/qapi.py
-> @@ -1862,7 +1862,7 @@ def cgen(code, **kwds):
->      if indent_level:
->          indent =3D genindent(indent_level)
->          # re.subn() lacks flags support before Python 2.7, use re.compil=
-e()
-> -        raw =3D re.subn(re.compile(r'^.', re.MULTILINE),
-> +        raw =3D re.subn(re.compile(r'^[^#\n].', re.MULTILINE),
->                        indent + r'\g<0>', raw)
->          raw =3D raw[0]
->      return re.sub(re.escape(eatspace) + r' *', '', raw)
+BDRV_POLL_WHILE() does not support recursive AioContext locking.  It
+only releases the AioContext lock once regardless of how many times the
+caller has acquired it.  This results in a hang since the IOThread does
+not make progress while the AioContext is still locked.
 
-Old: we want to indent all non-empty lines.  Such a line starts with a
-character other than newline, matched by '.'.  Replace that character by
-indent + the character.
+The following steps trigger the hang:
 
-New regexp: we want to indent all non-empty lines not starting with '#'.
-Such a line starts with a character other than newline and '#', matched
-by '[^#\n]'.  But there's a '.' afterwards, and therefore we don't match
-*any* lines consisting of just one character:
+  $ qemu-system-x86_64 -M accel=kvm -m 1G -cpu host \
+                       -object iothread,id=iothread0 \
+                       -device virtio-scsi-pci,iothread=iothread0 \
+                       -drive if=none,id=drive0,file=test.img,format=raw \
+                       -device scsi-hd,drive=drive0 \
+                       -drive if=none,id=drive1,file=test.img,format=raw \
+                       -device scsi-hd,drive=drive1
+  $ qemu-system-x86_64 ...same options... \
+                       -incoming tcp::1234
+  (qemu) migrate tcp:127.0.0.1:1234
+  ...hang...
 
-    >>> cgen('a\n')
-    'a\n'
+Tested-by: Stefan Hajnoczi <stefanha@redhat.com>
+Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+---
+ block.c | 14 +++++++++++---
+ 1 file changed, 11 insertions(+), 3 deletions(-)
 
-I think you should drop the '.'.
-
-Alternatively, use a negative lookahead assertion:
-
-        raw =3D re.subn(re.compile(r'^(?!(#|$))', re.MULTILINE),
-                      indent, raw)
+diff --git a/block.c b/block.c
+index 9a1a0d1e73..1c37ce4554 100644
+--- a/block.c
++++ b/block.c
+@@ -4320,9 +4320,15 @@ int bdrv_inactivate_all(void)
+     BdrvNextIterator it;
+     int ret = 0;
+     int pass;
++    GSList *aio_ctxs = NULL, *ctx;
+ 
+     for (bs = bdrv_first(&it); bs; bs = bdrv_next(&it)) {
+-        aio_context_acquire(bdrv_get_aio_context(bs));
++        AioContext *aio_context = bdrv_get_aio_context(bs);
++
++        if (!g_slist_find(aio_ctxs, aio_context)) {
++            aio_ctxs = g_slist_prepend(aio_ctxs, aio_context);
++            aio_context_acquire(aio_context);
++        }
+     }
+ 
+     /* We do two passes of inactivation. The first pass calls to drivers'
+@@ -4340,9 +4346,11 @@ int bdrv_inactivate_all(void)
+     }
+ 
+ out:
+-    for (bs = bdrv_first(&it); bs; bs = bdrv_next(&it)) {
+-        aio_context_release(bdrv_get_aio_context(bs));
++    for (ctx = aio_ctxs; ctx != NULL; ctx = ctx->next) {
++        AioContext *aio_context = ctx->data;
++        aio_context_release(aio_context);
+     }
++    g_slist_free(aio_ctxs);
+ 
+     return ret;
+ }
+-- 
+2.14.3
