@@ -1,27 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40819)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40828)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <wei.w.wang@intel.com>) id 1eMWyh-0007ZH-Ni
-	for qemu-devel@nongnu.org; Wed, 06 Dec 2017 05:31:00 -0500
+	(envelope-from <shameerali.kolothum.thodi@huawei.com>)
+	id 1eMWyi-0007ZJ-7K
+	for qemu-devel@nongnu.org; Wed, 06 Dec 2017 05:31:01 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <wei.w.wang@intel.com>) id 1eMWyc-00086Y-Vx
-	for qemu-devel@nongnu.org; Wed, 06 Dec 2017 05:30:59 -0500
-Received: from mga04.intel.com ([192.55.52.120]:42463)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <wei.w.wang@intel.com>)
-	id 1eMWyc-00084x-Me
-	for qemu-devel@nongnu.org; Wed, 06 Dec 2017 05:30:54 -0500
-Message-ID: <5A27C752.2050906@intel.com>
-Date: Wed, 06 Dec 2017 18:32:50 +0800
-From: Wei Wang <wei.w.wang@intel.com>
+	(envelope-from <shameerali.kolothum.thodi@huawei.com>)
+	id 1eMWyh-00088u-5b
+	for qemu-devel@nongnu.org; Wed, 06 Dec 2017 05:31:00 -0500
+From: Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>
+Date: Wed, 6 Dec 2017 10:30:33 +0000
+Message-ID: <5FC3163CFD30C246ABAA99954A238FA838622618@FRAEML521-MBX.china.huawei.com>
+References: <1510622154-17224-1-git-send-email-zhuyijun@huawei.com>
+	<1510622154-17224-2-git-send-email-zhuyijun@huawei.com>
+	<20171114084735.68e87546@t450s.home>
+	<5FC3163CFD30C246ABAA99954A238FA83845EDBF@FRAEML521-MBX.china.huawei.com>
+	<20171115112513.3c035023@t450s.home>
+	<5FC3163CFD30C246ABAA99954A238FA8384704C0@FRAEML521-MBX.china.huawei.com>
+	<20171120085745.0147df5c@t450s.home>
+Content-Language: en-US
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
-References: <1512444796-30615-1-git-send-email-wei.w.wang@intel.com>
-	<1512444796-30615-6-git-send-email-wei.w.wang@intel.com>
-	<20171205160020.GH31150@stefanha-x1.localdomain>
-In-Reply-To: <20171205160020.GH31150@stefanha-x1.localdomain>
-Content-Type: text/plain; charset=windows-1252; format=flowed
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [virtio-dev] Re: [PATCH v3 5/7] vhost-user:
- VHOST_USER_SET_VHOST_PCI msg
+Subject: Re: [Qemu-devel] [RFC 1/5] hw/vfio: Add function for getting
+ reserved_region of device iommu group
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,40 +31,69 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefan Hajnoczi <stefanha@redhat.com>
-Cc: virtio-dev@lists.oasis-open.org, qemu-devel@nongnu.org, mst@redhat.com, marcandre.lureau@redhat.com, jasowang@redhat.com, pbonzini@redhat.com, jan.kiszka@siemens.com, avi.cohen@huawei.com, zhiyong.yang@intel.com
+To: Alex Williamson <alex.williamson@redhat.com>
+Cc: "eric.auger@redhat.com" <eric.auger@redhat.com>, Zhuyijun <zhuyijun@huawei.com>, "qemu-arm@nongnu.org" <qemu-arm@nongnu.org>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "peter.maydell@linaro.org" <peter.maydell@linaro.org>, Zhaoshenglong <zhaoshenglong@huawei.com>, Linuxarm <linuxarm@huawei.com>
 
-On 12/06/2017 12:00 AM, Stefan Hajnoczi wrote:
-> On Tue, Dec 05, 2017 at 11:33:14AM +0800, Wei Wang wrote:
->> Add a new vhost-uer protocol msg, VHOST_USER_SET_VHOST_PCI. This msg is
->> used to signal the vhost-pci device to start/stop working.
->>
->> Signed-off-by: Wei Wang <wei.w.wang@intel.com>
->> ---
->>   hw/net/vhost_net.c                | 37 +++++++++++++++++++++++++++++++++++++
->>   hw/virtio/vhost-pci-slave.c       |  2 +-
->>   hw/virtio/vhost-user.c            | 17 +++++++++++++++++
->>   hw/virtio/vhost.c                 |  7 +++++++
->>   include/hw/virtio/vhost-backend.h |  2 ++
->>   include/hw/virtio/vhost-user.h    |  2 ++
->>   include/hw/virtio/vhost.h         |  2 ++
->>   include/net/vhost_net.h           |  2 ++
->>   8 files changed, 70 insertions(+), 1 deletion(-)
-> New protocol messages must be documented in docs/interop/vhost-user.txt.
+Hi Alex,
 
-OK, I'll add it to the doc after the discussion.
+> -----Original Message-----
+> From: Shameerali Kolothum Thodi
+> Sent: Monday, November 20, 2017 4:31 PM
+> To: 'Alex Williamson' <alex.williamson@redhat.com>
+> Cc: eric.auger@redhat.com; Zhuyijun <zhuyijun@huawei.com>; qemu-
+> arm@nongnu.org; qemu-devel@nongnu.org; peter.maydell@linaro.org;
+> Zhaoshenglong <zhaoshenglong@huawei.com>; Linuxarm
+> <linuxarm@huawei.com>
+> Subject: RE: [Qemu-devel] [RFC 1/5] hw/vfio: Add function for getting
+> reserved_region of device iommu group
+[...]
+> > > > And sysfs is a good interface if the user wants to use it to
+> > > > configure the VM in a way that's compatible with a device.  For
+> > > > instance, in your case, a user could evaluate these reserved
+> > > > regions across all devices in a system, or even across an entire
+> > > > cluster, and instantiate the VM with a memory map compatible with
+> > > > hotplugging any of those evaluated devices (QEMU implementation of
+> allowing the user to do this TBD).
+> > > > Having the vfio device evaluate these reserved regions only helps
+> > > > in the cold-plug case.  So the proposed solution is limited in
+> > > > scope and doesn't address similar needs on other platforms.  There
+> > > > is value to verifying that a device's IOVA space is compatible
+> > > > with a VM memory map and modifying the memory map on cold-plug or
+> > > > rejecting the device on hot-plug, but isn't that why we have an
+> > > > ioctl within vfio to expose information about the IOMMU?  Why take
+> > > > the path of allowing QEMU to rummage through sysfs files outside
+> > > > of vfio, implying additional security and access concerns, rather
+> > > > than filling the gap within the vifo API?
+> > >
+> > > Thanks Alex for the explanation.
+> > >
+> > > I came across this patch[1] from Eric where he introduced the IOCTL
+> > interface to
+> > > retrieve the reserved regions. It looks like this can be reworked to
+> > accommodate
+> > > the above requirement.
+> >
+> > I don't think we need a new ioctl for this, nor do I think that
+> > describing the holes is the correct approach.  The existing
+> > VFIO_IOMMU_GET_INFO ioctl can be extended to support capability
+> > chains, as we've done for VFIO_DEVICE_GET_REGION_INFO.
+>=20
+> Right, as far as I can see the above mentioned patch is doing exactly the=
+ same,
+> extending the VFIO_IOMMU_GET_INFO ioctl with capability chain.
+>=20
+> > IMO, we should try to
+> > describe the available fixed IOVA regions which are available for
+> > mapping rather than describing various holes within the address space
+> > which are unavailable.  The latter method always fails to describe the
+> > end of the mappable IOVA space and gets bogged down in trying to
+> > classify the types of holes that might exist.  Thanks,
+>=20
 
->
-> Why is a new message needed?  I'm not sure why it is specific to
-> vhost-pci.
+I was going through this and noticed that it is possible to have multiple=20
+iommu domains associated with a container. If that's true, is it safe to
+make the assumption that all the domains will have the same iova
+geometry or not?
 
-Yes, it might be useful for other vhost-user slave implementations. 
-Probably we can name it "VHOST_USER_SET_SLAVE"?
-The message is used to "link up" or "link down" the slave device. For 
-example, when virtio-net leaves, it sends a "VHOST_USER_SET_SLAVE" msg 
-to the salve to link down the slave device.
-(a similar msg is VHOST_USER_SET_VRING_ENABLE, but that is for virtqueue 
-enable/disable, not for a device level enable/disable)
-
-Best,
-Wei
+Thanks,
+Shameer
