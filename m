@@ -1,25 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53396)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55061)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1eMcpK-0008T8-PU
-	for qemu-devel@nongnu.org; Wed, 06 Dec 2017 11:45:44 -0500
+	(envelope-from <eblake@redhat.com>) id 1eMctU-0001Qj-Mj
+	for qemu-devel@nongnu.org; Wed, 06 Dec 2017 11:50:01 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1eMcpG-0006MM-LU
-	for qemu-devel@nongnu.org; Wed, 06 Dec 2017 11:45:42 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:1650)
+	(envelope-from <eblake@redhat.com>) id 1eMctQ-0000yq-Ks
+	for qemu-devel@nongnu.org; Wed, 06 Dec 2017 11:50:00 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:49418)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1eMcpG-0006Ku-C6
-	for qemu-devel@nongnu.org; Wed, 06 Dec 2017 11:45:38 -0500
-Date: Wed, 6 Dec 2017 18:45:28 +0200
-From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <20171206184432-mutt-send-email-mst@kernel.org>
-References: <CGME20171206130624eucas1p1f73fd4cf613eaf3ce4ce6918c807f8e1@eucas1p1.samsung.com>
-	<1512565578-12078-1-git-send-email-i.maximets@samsung.com>
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1eMctQ-0000xz-CG
+	for qemu-devel@nongnu.org; Wed, 06 Dec 2017 11:49:56 -0500
+References: <1506954812-6552-1-git-send-email-pradeep.jagadeesh@huawei.com>
+	<20171206170705.37cda561@bahia.lan>
+	<9a0067d4-100b-b3eb-d38e-a99ab885e215@huawei.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <84bafe13-7e56-4aa5-cf48-edadd9c2d579@redhat.com>
+Date: Wed, 6 Dec 2017 10:49:47 -0600
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1512565578-12078-1-git-send-email-i.maximets@samsung.com>
-Subject: Re: [Qemu-devel] [PATCH] vhost: fix crash on virtio_error while
- device stop
+In-Reply-To: <9a0067d4-100b-b3eb-d38e-a99ab885e215@huawei.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="JrdqrJdNQTihS4PlMSFAFIw2n4OH4F8d2"
+Subject: Re: [Qemu-devel] [PATCH v13 0/6] fsdev: qmp interface for io
+ throttling
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,113 +30,79 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Ilya Maximets <i.maximets@samsung.com>
-Cc: qemu-devel@nongnu.org, Marc-Andre Lureau <marcandre.lureau@redhat.com>, Heetae Ahn <heetae82.ahn@samsung.com>, Maxime Coquelin <maxime.coquelin@redhat.com>
+To: Pradeep Jagadeesh <pradeep.jagadeesh@huawei.com>, Greg Kurz <groug@kaod.org>, Pradeep Jagadeesh <pradeepkiruvale@gmail.com>
+Cc: alberto garcia <berto@igalia.com>, Markus Armbruster <armbru@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Manos Pitsidianakis <el13635@mail.ntua.gr>, jani kokkonen <jani.kokkonen@huawei.com>, qemu-devel@nongnu.org
 
-On Wed, Dec 06, 2017 at 04:06:18PM +0300, Ilya Maximets wrote:
-> In case virtio error occured after vhost_dev_close(), qemu will crash
-> in nested cleanup while checking IOMMU flag because dev->vdev already
-> set to zero and resources are already freed.
-> 
-> Example:
-> 
-> Program received signal SIGSEGV, Segmentation fault.
-> vhost_virtqueue_stop at hw/virtio/vhost.c:1155
-> 
->     #0  vhost_virtqueue_stop at hw/virtio/vhost.c:1155
->     #1  vhost_dev_stop at hw/virtio/vhost.c:1594
->     #2  vhost_net_stop_one at hw/net/vhost_net.c:289
->     #3  vhost_net_stop at hw/net/vhost_net.c:368
-> 
->             Nested call to vhost_net_stop(). First time was at #14.
-> 
->     #4  virtio_net_vhost_status at hw/net/virtio-net.c:180
->     #5  virtio_net_set_status (status=79) at hw/net/virtio-net.c:254
->     #6  virtio_set_status at hw/virtio/virtio.c:1146
->     #7  virtio_error at hw/virtio/virtio.c:2455
-> 
->         virtqueue_get_head() failed here.
-> 
->     #8  virtqueue_get_head at hw/virtio/virtio.c:543
->     #9  virtqueue_drop_all at hw/virtio/virtio.c:984
->     #10 virtio_net_drop_tx_queue_data at hw/net/virtio-net.c:240
->     #11 virtio_bus_set_host_notifier at hw/virtio/virtio-bus.c:297
->     #12 vhost_dev_disable_notifiers at hw/virtio/vhost.c:1431
-> 
->         vhost_dev_stop() was executed here. dev->vdev == NULL now.
-> 
->     #13 vhost_net_stop_one at hw/net/vhost_net.c:290
->     #14 vhost_net_stop at hw/net/vhost_net.c:368
->     #15 virtio_net_vhost_status at hw/net/virtio-net.c:180
->     #16 virtio_net_set_status (status=15) at hw/net/virtio-net.c:254
->     #17 qmp_set_link ("hostnet0", up=false) at net/net.c:1430
->     #18 chr_closed_bh at net/vhost-user.c:214
->     #19 aio_bh_call at util/async.c:90
->     #20 aio_bh_poll at util/async.c:118
->     #21 aio_dispatch at util/aio-posix.c:429
->     #22 aio_ctx_dispatch at util/async.c:261
->     #23 g_main_context_dispatch
->     #24 glib_pollfds_poll at util/main-loop.c:213
->     #25 os_host_main_loop_wait at util/main-loop.c:261
->     #26 main_loop_wait at util/main-loop.c:515
->     #27 main_loop () at vl.c:1917
->     #28 main at vl.c:4795
-> 
-> Above backtrace captured from qemu crash on vhost disconnect while
-> virtio driver in guest was in failed state.
-> 
-> We can just add checking for 'vdev' in 'vhost_dev_has_iommu()' but
-> it will assert further trying to free already freed ioeventfds. The
-> real problem is that we're allowing nested calls to 'vhost_net_stop'.
-> 
-> This patch is aimed to forbid nested calls to 'vhost_net_stop' to avoid
-> any possible double frees and segmentation faults doue to using of
-> already freed resources by setting 'vhost_started' flag to zero prior
-> to 'vhost_net_stop' call.
-> 
-> Signed-off-by: Ilya Maximets <i.maximets@samsung.com>
-> ---
-> 
-> This issue was already addressed more than a year ago by the following
-> patch: https://lists.gnu.org/archive/html/qemu-devel/2016-03/msg06732.html
-> but it was dropped without review due to not yet implemented re-connection
-> of vhost-user. Re-connection implementation lately fixed most of the
-> nested calls, but few of them still exists. For example, above backtrace
-> captured after 'virtqueue_get_head()' failure on vhost-user disconnection.
-> 
->  hw/net/virtio-net.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/hw/net/virtio-net.c b/hw/net/virtio-net.c
-> index 38674b0..4d95a18 100644
-> --- a/hw/net/virtio-net.c
-> +++ b/hw/net/virtio-net.c
-> @@ -177,8 +177,8 @@ static void virtio_net_vhost_status(VirtIONet *n, uint8_t status)
->              n->vhost_started = 0;
->          }
->      } else {
-> -        vhost_net_stop(vdev, n->nic->ncs, queues);
->          n->vhost_started = 0;
-> +        vhost_net_stop(vdev, n->nic->ncs, queues);
->      }
->  }
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--JrdqrJdNQTihS4PlMSFAFIw2n4OH4F8d2
+From: Eric Blake <eblake@redhat.com>
+To: Pradeep Jagadeesh <pradeep.jagadeesh@huawei.com>,
+ Greg Kurz <groug@kaod.org>, Pradeep Jagadeesh <pradeepkiruvale@gmail.com>
+Cc: alberto garcia <berto@igalia.com>, Markus Armbruster <armbru@redhat.com>,
+ "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
+ Manos Pitsidianakis <el13635@mail.ntua.gr>,
+ jani kokkonen <jani.kokkonen@huawei.com>, qemu-devel@nongnu.org
+Message-ID: <84bafe13-7e56-4aa5-cf48-edadd9c2d579@redhat.com>
+Subject: Re: [PATCH v13 0/6] fsdev: qmp interface for io throttling
+References: <1506954812-6552-1-git-send-email-pradeep.jagadeesh@huawei.com>
+ <20171206170705.37cda561@bahia.lan>
+ <9a0067d4-100b-b3eb-d38e-a99ab885e215@huawei.com>
+In-Reply-To: <9a0067d4-100b-b3eb-d38e-a99ab885e215@huawei.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-Well the wider context is
+On 12/06/2017 10:15 AM, Pradeep Jagadeesh wrote:
+
+>> I didn't have time to follow the thread, but it's been a month without=
+
+>> activity... where do we stand now ? I've merged I/O throttle for fsdev=
+
+>> in 2.9, is there a chance we get the QMP/HMP part in 2.12 ?
+>=20
+> Hi Greg,
+>=20
+> Yes, I am waiting for Eric's reply. Because there were some issues when=
+
+> I merged code with Manos's throttlelimits code. So, I am waiting to see=
+
+> how to go about it. It needs some changes to reuse in fsdev/blk qmp
+> code. I am very much would like to push qmp code upstream.
+
+We missed the window of opportunity to unify any differences in
+interfaces between what Manos added in 2.11 and your code, now that 2.11
+is at -rc4.  That means we are stuck with two slightly different
+interface; although it would still be nice to have glue code that can
+convert into and out of a preferred form, so that the bulk of the code
+can be common operations on the preferred struct.
+
+At this point, I don't know what additional information you want from
+myself or Markus on the interface front; it may be easier to post a
+rebased v14 and tackle it from there (even if it means our interface is
+still in a state of churn).
+
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
 
 
-        n->vhost_started = 1;
-        r = vhost_net_start(vdev, n->nic->ncs, queues);
-        if (r < 0) {
-            error_report("unable to start vhost net: %d: "
-                         "falling back on userspace virtio", -r);
-            n->vhost_started = 0;
-        }
-    } else {
-        vhost_net_stop(vdev, n->nic->ncs, queues);
-        n->vhost_started = 0;
+--JrdqrJdNQTihS4PlMSFAFIw2n4OH4F8d2
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
 
-So we set it to 1 before start, we should clear after stop.
+-----BEGIN PGP SIGNATURE-----
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
 
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlooH6sACgkQp6FrSiUn
+Q2p9ngf/RDvx2I/xKqJr/9Suj0GkYsyxDeOkjo+ExOSbXQYN/PHfVM2BqLMgp0I6
+ufmiSG43c8L2+6BrDEcaLSrLto/PDqEGj5IQXhYbUTF0Sqj1KltI2S/FTvgkHnVO
+F4kQqZ9J5DEGBuumRfSQTGf1mR64lxVXgTyVM37bbTYiFlNenfao/+uLD9TCh8+T
+eNE5KTEsbA4PBhJvmv9x/HgpxtAVL/zqLuwQCllCBeozbFqOYqnzpWeU3xwnSwx4
+Xv+ohCQQPbObhsT45JpJpOE8fh5bmDjEmCYe9e3V4igkZHN3EOFjemXawaqbtoqa
+K2YIKi7Hhot+XKKinuItfJI73L+/BA==
+=bGz9
+-----END PGP SIGNATURE-----
 
-> -- 
-> 2.7.4
+--JrdqrJdNQTihS4PlMSFAFIw2n4OH4F8d2--
