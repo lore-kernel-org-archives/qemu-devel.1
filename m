@@ -1,21 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50577)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50561)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <longpeng2@huawei.com>) id 1eMUHh-0005ZB-9C
-	for qemu-devel@nongnu.org; Wed, 06 Dec 2017 02:38:26 -0500
-Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <longpeng2@huawei.com>) id 1eMUHe-0007MF-0e
+	(envelope-from <longpeng2@huawei.com>) id 1eMUHg-0005Z6-FM
 	for qemu-devel@nongnu.org; Wed, 06 Dec 2017 02:38:25 -0500
-Received: from szxga05-in.huawei.com ([45.249.212.191]:2740)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_ARCFOUR_SHA1:16) (Exim 4.71)
-	(envelope-from <longpeng2@huawei.com>) id 1eMUHd-0007Ki-E1
+Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
+	(envelope-from <longpeng2@huawei.com>) id 1eMUHd-0007Lo-Br
+	for qemu-devel@nongnu.org; Wed, 06 Dec 2017 02:38:24 -0500
+Received: from [45.249.212.32] (port=53138 helo=huawei.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <longpeng2@huawei.com>)
+	id 1eMUHd-0007KV-0r
 	for qemu-devel@nongnu.org; Wed, 06 Dec 2017 02:38:21 -0500
 From: "Longpeng(Mike)" <longpeng2@huawei.com>
-Date: Wed, 6 Dec 2017 15:37:18 +0800
-Message-ID: <1512545840-10256-1-git-send-email-longpeng2@huawei.com>
+Date: Wed, 6 Dec 2017 15:37:20 +0800
+Message-ID: <1512545840-10256-3-git-send-email-longpeng2@huawei.com>
+In-Reply-To: <1512545840-10256-1-git-send-email-longpeng2@huawei.com>
+References: <1512545840-10256-1-git-send-email-longpeng2@huawei.com>
 MIME-Version: 1.0
 Content-Type: text/plain
-Subject: [Qemu-devel] [v22 0/2] virtio-crypto: virtio crypto device
- specification
+Subject: [Qemu-devel] [v22 2/2] virtio-crypto: Add conformance clauses
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,90 +29,64 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org, virtio-dev@lists.oasis-open.org
 Cc: luonengjun@huawei.com, mst@redhat.com, cornelia.huck@de.ibm.com, stefanha@redhat.com, denglingli@chinamobile.com, Jani.Kokkonen@huawei.com, Ola.Liljedahl@arm.com, Varun.Sethi@freescale.com, xin.zeng@intel.com, brian.a.keating@intel.com, liang.j.ma@intel.com, john.griffin@intel.com, weidong.huang@huawei.com, agraf@suse.de, jasowang@redhat.com, vincent.jardin@6wind.com, arei.gonglei@huawei.com, pasic@linux.vnet.ibm.com, wangxinxin.wang@huawei.com, jianjay.zhou@huawei.com, "Longpeng(Mike)" <longpeng2@huawei.com>
 
-This is the specification about the new virtio crypto device.
+From: Gonglei <arei.gonglei@huawei.com>
 
+Add the conformance targets and clauses for
+virtio-crypto device.
+
+Signed-off-by: Gonglei <arei.gonglei@huawei.com>
+Signed-off-by: Zhoujian <jianjay.zhou@huawei.com>
+Signed-off-by: Longpeng(Mike) <longpeng2@huawei.com>
 ---
-v22 -> v21
- - fix some typos and grammar fixes [Halil, Stefan]
- - reorder names in alphabetical order [Stefan]
- - redescribe the date format [Halil]
+ conformance.tex | 29 +++++++++++++++++++++++++++++
+ 1 file changed, 29 insertions(+)
 
-v21 -> v20
- - rename 'queue_id' to 'reserved' [Halil]
- - redescribe the format of the structures which using 'union'
-   in the previous version [Halil]
-
-v20 -> v19
- - fix some typos and grammar fixes [Halil]
- - make queue_id reserved [Halil]
- - remove 'Steps of Operation'
-
-v19 -> v18:
- - fix some typos and grammar fixes [Stefan, Halil]
- - rename VIRTIO_CRYPTO_F_STATELESS_MODE to VIRTIO_CRYPTO_F_MUX_MODE
- - describe the VIRTIO_CRYPTO_STATUS in detial. [Halil]
- - refactor and redescribe the controlq/dataq request's format
-   of mux mode. [Halil]
- - other small fixes. [Halil]
-
-v18 -> v17:
- - fix many English grammar problems suggested by Stefan, Thanks a lot!
-
-v17 -> v16:
- - Some grammar fixes [Stefan, Halil, Michael]
- - add a section named "Supported crypto services" in order to explain bit
-   numbers and valuse clearly. [Halil, Cornelia]
- - avoid word reptition [Halil]
- - rename non-session mode to stateless mode [Halil]
- - change descriptions for all elements in struct virtio_crypto_config [Halil]
- - add Halil as a reviewer in the ackonwledgement part, thanks for his work.
- - other fixes here and there.
-
-Changes since v15:
- - use feature bits for non-session mode in order to keep compatibility with
-   pre-existing code. [Halil & Michael]
- - introduce VIRTIO_CRYPTO_F_ NON_SESSION_MODE feature bit to control all other
-   non-session mode feature bits.
- - fix some typos. [Stefan]
- - introduce struct virtio_crypto_op_data_req_mux to support both session
-   and non-session based crypto operations and keep compatibility with
-   pre-existing code.
-
-Changes since v14:
- - drop VIRTIO_CRYPTO_S_STARTED status [Halil & Cornelia]
- - correct a sentence about dataqueue and controlq in the first paragraph. 
-[Halil]
- - change a MAY to MUST about max_dataqueues. [Halil]
- - add non-session mode support
-   a) add four features for different crypto services to identify wheather 
-support session mode.
-   b) rewrite some
-
-For pervious versions of virtio crypto spec, Pls see:
-
-[v18]:
-https://www.mail-archive.com/qemu-devel@nongnu.org/msg444897.html
-
-[v14]:
-https://lists.gnu.org/archive/html/qemu-devel/2016-11/msg02212.html
-
-[v13]:
-https://lists.gnu.org/archive/html/qemu-devel/2016-10/msg07348.html
-
-For more information, please see:
- http://qemu-project.org/Features/VirtioCrypto
-
----
-Gonglei (2):
-  virtio-crypto: Add virtio crypto device specification
-  virtio-crypto: Add conformance clauses
-
- acknowledgements.tex |    4 +
- conformance.tex      |   29 +
- content.tex          |    2 +
- virtio-crypto.tex    | 1510 ++++++++++++++++++++++++++++++++++++++++++++++++++
- 4 files changed, 1545 insertions(+)
- create mode 100644 virtio-crypto.tex
-
+diff --git a/conformance.tex b/conformance.tex
+index f59e360..cf5f1ac 100644
+--- a/conformance.tex
++++ b/conformance.tex
+@@ -146,6 +146,21 @@ An SCSI host driver MUST conform to the following normative statements:
+ \item \ref{drivernormative:Device Types / SCSI Host Device / Device Operation / Device Operation: eventq}
+ \end{itemize}
+ 
++\subsection{Crypto Driver Conformance}\label{sec:Conformance / Driver Conformance / Crypto Driver Conformance}
++
++A Crypto driver MUST conform to the following normative statements:
++
++\begin{itemize}
++\item \ref{drivernormative:Device Types / Crypto Device / Device configuration layout}
++\item \ref{drivernormative:Device Types / Crypto Device / Device Initialization}
++\item \ref{drivernormative:Device Types / Crypto Device / Device Operation / Control Virtqueue / Session operation / Session operation: create session}
++\item \ref{drivernormative:Device Types / Crypto Device / Device Operation / Control Virtqueue / Session operation / Session operation: destroy session}
++\item \ref{drivernormative:Device Types / Crypto Device / Device Operation / HASH Service operation}
++\item \ref{drivernormative:Device Types / Crypto Device / Device Operation / MAC Service operation}
++\item \ref{drivernormative:Device Types / Crypto Device / Device Operation / Symmetric algorithms Operation}
++\item \ref{drivernormative:Device Types / Crypto Device / Device Operation / AEAD Service operation}
++\end{itemize}
++
+ \section{Device Conformance}\label{sec:Conformance / Device Conformance}
+ 
+ A device MUST conform to the following normative statements:
+@@ -267,6 +282,20 @@ An SCSI host device MUST conform to the following normative statements:
+ \item \ref{devicenormative:Device Types / SCSI Host Device / Device Operation / Device Operation: eventq}
+ \end{itemize}
+ 
++\subsection{Crypto Device Conformance}\label{sec:Conformance / Device Conformance / Crypto Device Conformance}
++
++A Crypto device MUST conform to the following normative statements:
++
++\begin{itemize}
++\item \ref{devicenormative:Device Types / Crypto Device / Device configuration layout}
++\item \ref{devicenormative:Device Types / Crypto Device / Device Operation / Control Virtqueue / Session operation / Session operation: create session}
++\item \ref{devicenormative:Device Types / Crypto Device / Device Operation / Control Virtqueue / Session operation / Session operation: destroy session}
++\item \ref{devicenormative:Device Types / Crypto Device / Device Operation / HASH Service operation}
++\item \ref{devicenormative:Device Types / Crypto Device / Device Operation / MAC Service operation}
++\item \ref{devicenormative:Device Types / Crypto Device / Device Operation / Symmetric algorithms Operation}
++\item \ref{devicenormative:Device Types / Crypto Device / Device Operation / AEAD Service operation}
++\end{itemize}
++
+ \section{Legacy Interface: Transitional Device and
+ Transitional Driver Conformance}\label{sec:Conformance / Legacy
+ Interface: Transitional Device and 
 -- 
 1.8.3.1
