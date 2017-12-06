@@ -1,21 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59513)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45953)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <i.maximets@samsung.com>) id 1eMZPJ-0007oC-Ae
-	for qemu-devel@nongnu.org; Wed, 06 Dec 2017 08:06:43 -0500
+	(envelope-from <imxikangjie@gmail.com>) id 1eMU8I-00022i-DC
+	for qemu-devel@nongnu.org; Wed, 06 Dec 2017 02:28:43 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <i.maximets@samsung.com>) id 1eMZPE-0001C6-BV
-	for qemu-devel@nongnu.org; Wed, 06 Dec 2017 08:06:37 -0500
-Received: from mailout1.w1.samsung.com ([210.118.77.11]:46952)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <i.maximets@samsung.com>)
-	id 1eMZPD-00018q-Rt
-	for qemu-devel@nongnu.org; Wed, 06 Dec 2017 08:06:32 -0500
-From: Ilya Maximets <i.maximets@samsung.com>
-Date: Wed, 06 Dec 2017 16:06:18 +0300
-Message-id: <1512565578-12078-1-git-send-email-i.maximets@samsung.com>
-References: <CGME20171206130624eucas1p1f73fd4cf613eaf3ce4ce6918c807f8e1@eucas1p1.samsung.com>
-Subject: [Qemu-devel] [PATCH] vhost: fix crash on virtio_error while device
- stop
+	(envelope-from <imxikangjie@gmail.com>) id 1eMU8H-00013Z-EJ
+	for qemu-devel@nongnu.org; Wed, 06 Dec 2017 02:28:42 -0500
+Received: from mail-qt0-x22d.google.com ([2607:f8b0:400d:c0d::22d]:44556)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <imxikangjie@gmail.com>)
+	id 1eMU8H-00013K-AB
+	for qemu-devel@nongnu.org; Wed, 06 Dec 2017 02:28:41 -0500
+Received: by mail-qt0-x22d.google.com with SMTP id m59so6766350qte.11
+	for <qemu-devel@nongnu.org>; Tue, 05 Dec 2017 23:28:41 -0800 (PST)
+MIME-Version: 1.0
+From: Kangjie Xi <imxikangjie@gmail.com>
+Date: Wed, 6 Dec 2017 15:28:40 +0800
+Message-ID: <CAJqJJggWTki8i_U7xr2oRSFR4sZt4eK5hRO+B55iOYVMyfGwDg@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: [Qemu-devel] About [PULL 20/25] block: Guard against NULL bs->drv
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,95 +26,43 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Michael S . Tsirkin" <mst@redhat.com>
-Cc: qemu-devel@nongnu.org, Marc-Andre Lureau <marcandre.lureau@redhat.com>, Heetae Ahn <heetae82.ahn@samsung.com>, Maxime Coquelin <maxime.coquelin@redhat.com>, Ilya Maximets <i.maximets@samsung.com>
+To: kwolf@redhat.com, qemu-devel@nongnu.org
 
-In case virtio error occured after vhost_dev_close(), qemu will crash
-in nested cleanup while checking IOMMU flag because dev->vdev already
-set to zero and resources are already freed.
+Hi,
 
-Example:
+I encountered a qemu-nbd segfault, finally I found it was caused by
+NULL bs-drv,  which is located in block/io.c function bdrv_co_flush
+line 2377:
 
-Program received signal SIGSEGV, Segmentation fault.
-vhost_virtqueue_stop at hw/virtio/vhost.c:1155
+https://git.qemu.org/?p=qemu.git;a=blob;f=block/io.c;h=4fdf93a0144fa4761a14b8cc6b2a9a6b6e5d5bec;hb=d470ad42acfc73c45d3e8ed5311a491160b4c100#l2377
 
-    #0  vhost_virtqueue_stop at hw/virtio/vhost.c:1155
-    #1  vhost_dev_stop at hw/virtio/vhost.c:1594
-    #2  vhost_net_stop_one at hw/net/vhost_net.c:289
-    #3  vhost_net_stop at hw/net/vhost_net.c:368
+It is before the patch at line 2402, so the patch needs to be updated
+to fix NULL bs-drv at line 2337.
 
-            Nested call to vhost_net_stop(). First time was at #14.
+https://lists.gnu.org/archive/html/qemu-devel/2017-11/msg03425.html
 
-    #4  virtio_net_vhost_status at hw/net/virtio-net.c:180
-    #5  virtio_net_set_status (status=79) at hw/net/virtio-net.c:254
-    #6  virtio_set_status at hw/virtio/virtio.c:1146
-    #7  virtio_error at hw/virtio/virtio.c:2455
+> @@ -2373,6 +2399,12 @@ int coroutine_fn bdrv_co_flush(BlockDriverState *bs)
+>      }
+>
+>      BLKDBG_EVENT(bs->file, BLKDBG_FLUSH_TO_DISK);
+> +    if (!bs->drv) {
+> +        /* bs->drv->bdrv_co_flush() might have ejected the BDS
+> +         * (even in case of apparent success) */
+> +        ret = -ENOMEDIUM;
+> +        goto out;
+> +    }
+>      if (bs->drv->bdrv_co_flush_to_disk) {
+>          ret = bs->drv->bdrv_co_flush_to_disk(bs);
+>      } else if (bs->drv->bdrv_aio_flush) {
 
-        virtqueue_get_head() failed here.
+I have tested the latest qemu-2.11.0-rc2 and I am sure the qemu-nbd
+segfault is caused by NULL bs-drv in block/io.c line 2337.
 
-    #8  virtqueue_get_head at hw/virtio/virtio.c:543
-    #9  virtqueue_drop_all at hw/virtio/virtio.c:984
-    #10 virtio_net_drop_tx_queue_data at hw/net/virtio-net.c:240
-    #11 virtio_bus_set_host_notifier at hw/virtio/virtio-bus.c:297
-    #12 vhost_dev_disable_notifiers at hw/virtio/vhost.c:1431
+kernel: qemu-nbd[18768]: segfault at f8 ip 000055a24f7536a7 sp
+00007f59b1137a40 error 4 in qemu-nbd[55a24f6d1000+188000]
 
-        vhost_dev_stop() was executed here. dev->vdev == NULL now.
+However I have no methods to reproduce the segfault manually, the
+qemu-nbd segfaut just occurs in my server cluster every week.
 
-    #13 vhost_net_stop_one at hw/net/vhost_net.c:290
-    #14 vhost_net_stop at hw/net/vhost_net.c:368
-    #15 virtio_net_vhost_status at hw/net/virtio-net.c:180
-    #16 virtio_net_set_status (status=15) at hw/net/virtio-net.c:254
-    #17 qmp_set_link ("hostnet0", up=false) at net/net.c:1430
-    #18 chr_closed_bh at net/vhost-user.c:214
-    #19 aio_bh_call at util/async.c:90
-    #20 aio_bh_poll at util/async.c:118
-    #21 aio_dispatch at util/aio-posix.c:429
-    #22 aio_ctx_dispatch at util/async.c:261
-    #23 g_main_context_dispatch
-    #24 glib_pollfds_poll at util/main-loop.c:213
-    #25 os_host_main_loop_wait at util/main-loop.c:261
-    #26 main_loop_wait at util/main-loop.c:515
-    #27 main_loop () at vl.c:1917
-    #28 main at vl.c:4795
-
-Above backtrace captured from qemu crash on vhost disconnect while
-virtio driver in guest was in failed state.
-
-We can just add checking for 'vdev' in 'vhost_dev_has_iommu()' but
-it will assert further trying to free already freed ioeventfds. The
-real problem is that we're allowing nested calls to 'vhost_net_stop'.
-
-This patch is aimed to forbid nested calls to 'vhost_net_stop' to avoid
-any possible double frees and segmentation faults doue to using of
-already freed resources by setting 'vhost_started' flag to zero prior
-to 'vhost_net_stop' call.
-
-Signed-off-by: Ilya Maximets <i.maximets@samsung.com>
----
-
-This issue was already addressed more than a year ago by the following
-patch: https://lists.gnu.org/archive/html/qemu-devel/2016-03/msg06732.html
-but it was dropped without review due to not yet implemented re-connection
-of vhost-user. Re-connection implementation lately fixed most of the
-nested calls, but few of them still exists. For example, above backtrace
-captured after 'virtqueue_get_head()' failure on vhost-user disconnection.
-
- hw/net/virtio-net.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/hw/net/virtio-net.c b/hw/net/virtio-net.c
-index 38674b0..4d95a18 100644
---- a/hw/net/virtio-net.c
-+++ b/hw/net/virtio-net.c
-@@ -177,8 +177,8 @@ static void virtio_net_vhost_status(VirtIONet *n, uint8_t status)
-             n->vhost_started = 0;
-         }
-     } else {
--        vhost_net_stop(vdev, n->nic->ncs, queues);
-         n->vhost_started = 0;
-+        vhost_net_stop(vdev, n->nic->ncs, queues);
-     }
- }
- 
--- 
-2.7.4
+Thanks
+-Kangjie
