@@ -1,36 +1,36 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49130)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49296)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mdroth@linux.vnet.ibm.com>) id 1eMfCI-0000XZ-8k
-	for qemu-devel@nongnu.org; Wed, 06 Dec 2017 14:17:35 -0500
+	(envelope-from <mdroth@linux.vnet.ibm.com>) id 1eMfCO-0000cm-4K
+	for qemu-devel@nongnu.org; Wed, 06 Dec 2017 14:17:41 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mdroth@linux.vnet.ibm.com>) id 1eMfCF-0000Rn-3a
-	for qemu-devel@nongnu.org; Wed, 06 Dec 2017 14:17:34 -0500
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:48070
+	(envelope-from <mdroth@linux.vnet.ibm.com>) id 1eMfCK-0000Yw-U8
+	for qemu-devel@nongnu.org; Wed, 06 Dec 2017 14:17:40 -0500
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:49028
 	helo=mx0a-001b2d01.pphosted.com)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <mdroth@linux.vnet.ibm.com>)
-	id 1eMfCE-0000RD-UX
-	for qemu-devel@nongnu.org; Wed, 06 Dec 2017 14:17:31 -0500
+	id 1eMfCK-0000YM-Nf
+	for qemu-devel@nongnu.org; Wed, 06 Dec 2017 14:17:36 -0500
 Received: from pps.filterd (m0098416.ppops.net [127.0.0.1])
 	by mx0b-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
-	vB6JEDJd024690
-	for <qemu-devel@nongnu.org>; Wed, 6 Dec 2017 14:17:30 -0500
-Received: from e14.ny.us.ibm.com (e14.ny.us.ibm.com [129.33.205.204])
-	by mx0b-001b2d01.pphosted.com with ESMTP id 2epm4y6tjm-1
+	vB6JE8ib024327
+	for <qemu-devel@nongnu.org>; Wed, 6 Dec 2017 14:17:36 -0500
+Received: from e31.co.us.ibm.com (e31.co.us.ibm.com [32.97.110.149])
+	by mx0b-001b2d01.pphosted.com with ESMTP id 2epm4y6tpb-1
 	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Wed, 06 Dec 2017 14:17:30 -0500
+	for <qemu-devel@nongnu.org>; Wed, 06 Dec 2017 14:17:36 -0500
 Received: from localhost
-	by e14.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	by e31.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
 	Violators will be prosecuted
 	for <qemu-devel@nongnu.org> from <mdroth@linux.vnet.ibm.com>;
-	Wed, 6 Dec 2017 14:17:29 -0500
+	Wed, 6 Dec 2017 12:17:35 -0700
 From: Michael Roth <mdroth@linux.vnet.ibm.com>
-Date: Wed,  6 Dec 2017 13:16:19 -0600
+Date: Wed,  6 Dec 2017 13:15:55 -0600
 In-Reply-To: <20171206191648.18208-1-mdroth@linux.vnet.ibm.com>
 References: <20171206191648.18208-1-mdroth@linux.vnet.ibm.com>
-Message-Id: <20171206191648.18208-27-mdroth@linux.vnet.ibm.com>
-Subject: [Qemu-devel] [PATCH 26/55] exec: simplify
- address_space_get_iotlb_entry
+Message-Id: <20171206191648.18208-3-mdroth@linux.vnet.ibm.com>
+Subject: [Qemu-devel] [PATCH 02/55] hw/usb/bus: Remove bad object_unparent()
+ from usb_try_create_simple()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -40,78 +40,68 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: qemu-stable@nongnu.org, Peter Xu <peterx@redhat.com>, Maxime Coquelin <maxime.coquelin@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
+Cc: qemu-stable@nongnu.org, Thomas Huth <thuth@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>
 
-From: Peter Xu <peterx@redhat.com>
+From: Thomas Huth <thuth@redhat.com>
 
-This patch let address_space_get_iotlb_entry() to use the newly
-introduced page_mask parameter in flatview_do_translate(). Then we
-will be sure the IOTLB can be aligned to page mask, also we should
-nicely support huge pages now when introducing a764040.
+Valgrind detects an invalid read operation when hot-plugging of an
+USB device fails:
 
-Fixes: a764040 ("exec: abstract address_space_do_translate()")
-Signed-off-by: Peter Xu <peterx@redhat.com>
-Signed-off-by: Maxime Coquelin <maxime.coquelin@redhat.com>
-Acked-by: Michael S. Tsirkin <mst@redhat.com>
-Message-Id: <20171010094247.10173-3-maxime.coquelin@redhat.com>
-Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
-(cherry picked from commit 076a93d7972c9c1e3839d2f65edc32568a2cce93)
+$ valgrind x86_64-softmmu/qemu-system-x86_64 -device usb-ehci -nographic -S
+==30598== Memcheck, a memory error detector
+==30598== Copyright (C) 2002-2015, and GNU GPL'd, by Julian Seward et al.
+==30598== Using Valgrind-3.12.0 and LibVEX; rerun with -h for copyright info
+==30598== Command: x86_64-softmmu/qemu-system-x86_64 -device usb-ehci -nographic -S
+==30598==
+QEMU 2.10.50 monitor - type 'help' for more information
+(qemu) device_add usb-tablet
+(qemu) device_add usb-tablet
+(qemu) device_add usb-tablet
+(qemu) device_add usb-tablet
+(qemu) device_add usb-tablet
+(qemu) device_add usb-tablet
+==30598== Invalid read of size 8
+==30598==    at 0x60EF50: object_unparent (object.c:445)
+==30598==    by 0x580F0D: usb_try_create_simple (bus.c:346)
+==30598==    by 0x581BEB: usb_claim_port (bus.c:451)
+==30598==    by 0x582310: usb_qdev_realize (bus.c:257)
+==30598==    by 0x4CB399: device_set_realized (qdev.c:914)
+==30598==    by 0x60E26D: property_set_bool (object.c:1886)
+==30598==    by 0x61235E: object_property_set_qobject (qom-qobject.c:27)
+==30598==    by 0x61000F: object_property_set_bool (object.c:1162)
+==30598==    by 0x4567C3: qdev_device_add (qdev-monitor.c:630)
+==30598==    by 0x456D52: qmp_device_add (qdev-monitor.c:807)
+==30598==    by 0x470A99: hmp_device_add (hmp.c:1933)
+==30598==    by 0x3679C3: handle_hmp_command (monitor.c:3123)
+
+The object_unparent() here is not necessary anymore since commit
+69382d8b3e8600b3 ("qdev: Fix object reference leak in case device.realize()
+fails"), so let's remove it now.
+
+Suggested-by: Paolo Bonzini <pbonzini@redhat.com>
+Signed-off-by: Thomas Huth <thuth@redhat.com>
+Message-id: 1506526106-30971-1-git-send-email-thuth@redhat.com
+Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
+(cherry picked from commit f3b2bea3c76ba9283b957f1373e7cebdbf863059)
 Signed-off-by: Michael Roth <mdroth@linux.vnet.ibm.com>
 ---
- exec.c | 31 ++++++++++---------------------
- 1 file changed, 10 insertions(+), 21 deletions(-)
+ hw/usb/bus.c | 4 +---
+ 1 file changed, 1 insertion(+), 3 deletions(-)
 
-diff --git a/exec.c b/exec.c
-index 2fd65dc3f2..9a7600eb17 100644
---- a/exec.c
-+++ b/exec.c
-@@ -557,14 +557,14 @@ IOMMUTLBEntry address_space_get_iotlb_entry(AddressSpace *as, hwaddr addr,
-                                             bool is_write)
- {
-     MemoryRegionSection section;
--    hwaddr xlat, plen;
-+    hwaddr xlat, page_mask;
- 
--    /* Try to get maximum page mask during translation. */
--    plen = (hwaddr)-1;
--
--    /* This can never be MMIO. */
--    section = flatview_do_translate(address_space_to_flatview(as), addr,
--                                    &xlat, &plen, NULL, is_write, false, &as);
-+    /*
-+     * This can never be MMIO, and we don't really care about plen,
-+     * but page mask.
-+     */
-+    section = flatview_do_translate(address_space_to_flatview(as), addr, &xlat,
-+                                    NULL, &page_mask, is_write, false, &as);
- 
-     /* Illegal translation */
-     if (section.mr == &io_mem_unassigned) {
-@@ -575,22 +575,11 @@ IOMMUTLBEntry address_space_get_iotlb_entry(AddressSpace *as, hwaddr addr,
-     xlat += section.offset_within_address_space -
-         section.offset_within_region;
- 
--    if (plen == (hwaddr)-1) {
--        /*
--         * We use default page size here. Logically it only happens
--         * for identity mappings.
--         */
--        plen = TARGET_PAGE_SIZE;
--    }
--
--    /* Convert to address mask */
--    plen -= 1;
--
-     return (IOMMUTLBEntry) {
-         .target_as = as,
--        .iova = addr & ~plen,
--        .translated_addr = xlat & ~plen,
--        .addr_mask = plen,
-+        .iova = addr & ~page_mask,
-+        .translated_addr = xlat & ~page_mask,
-+        .addr_mask = page_mask,
-         /* IOTLBs are for DMAs, and DMA only allows on RAMs. */
-         .perm = IOMMU_RW,
-     };
+diff --git a/hw/usb/bus.c b/hw/usb/bus.c
+index d910f849e7..e56dc3348a 100644
+--- a/hw/usb/bus.c
++++ b/hw/usb/bus.c
+@@ -341,9 +341,7 @@ static USBDevice *usb_try_create_simple(USBBus *bus, const char *name,
+     object_property_set_bool(OBJECT(dev), true, "realized", &err);
+     if (err) {
+         error_propagate(errp, err);
+-        error_prepend(errp, "Failed to initialize USB device '%s': ",
+-                      name);
+-        object_unparent(OBJECT(dev));
++        error_prepend(errp, "Failed to initialize USB device '%s': ", name);
+         return NULL;
+     }
+     return dev;
 -- 
 2.11.0
