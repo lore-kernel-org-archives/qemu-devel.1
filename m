@@ -1,36 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39413)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42305)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1eMUxA-0007p5-47
-	for qemu-devel@nongnu.org; Wed, 06 Dec 2017 03:21:17 -0500
+	(envelope-from <kwolf@redhat.com>) id 1eMV3Y-00035m-5u
+	for qemu-devel@nongnu.org; Wed, 06 Dec 2017 03:27:53 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1eMUx6-00080a-VH
-	for qemu-devel@nongnu.org; Wed, 06 Dec 2017 03:21:16 -0500
-Received: from mout.kundenserver.de ([212.227.17.24]:52166)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1eMUx6-0007zu-KV
-	for qemu-devel@nongnu.org; Wed, 06 Dec 2017 03:21:12 -0500
-References: <20171123163538.31411-1-laurent@vivier.eu>
-	<CAFEAcA9+f2cgUUS00DXzF9a96evPRnxY5MTUZpe+OA3Trv84WA@mail.gmail.com>
-	<e6dc192f-6fcd-f25d-d1db-983280c915f4@vivier.eu>
-	<CAFEAcA9uOJ5i-XbK5zbxgFBSvu=kQ6p99EA-CyhrSTKtx+CF9A@mail.gmail.com>
-	<e90eaeb0-19d4-659c-9007-5b0e18d87d9a@tuxfamily.org>
-	<629dc696-a5e7-4b94-f964-0e9fdd7cf511@vivier.eu>
-	<13637ee3-544f-11cc-4ee7-a27af2c91173@tuxfamily.org>
-	<CAGC02hQ1RhaHC2rhFecjvCK4oGF0qMQpr6558XiWMXaUSvTq9g@mail.gmail.com>
-	<1d262914-ffca-85c2-71da-2ef6184cd7e1@vivier.eu>
-	<713F2EE1-A420-4DAC-A4E3-ED7A0CC6C0E5@cable.vol.at>
-	<dc357e6c-ded2-63c3-6ca8-f13b25ce9e5c@vivier.eu>
-	<CAGC02hR9tgwb2ZWHgSZGo09zXc+pM-syC-jOAVk=K9k39ExX1g@mail.gmail.com>
-From: Laurent Vivier <laurent@vivier.eu>
-Message-ID: <94157a5d-4173-efaa-10eb-f47106431002@vivier.eu>
-Date: Wed, 6 Dec 2017 09:20:45 +0100
+	(envelope-from <kwolf@redhat.com>) id 1eMV3T-0003Js-9P
+	for qemu-devel@nongnu.org; Wed, 06 Dec 2017 03:27:52 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:50888)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <kwolf@redhat.com>) id 1eMV3T-0003Ix-2p
+	for qemu-devel@nongnu.org; Wed, 06 Dec 2017 03:27:47 -0500
+Date: Wed, 6 Dec 2017 09:27:43 +0100
+From: Kevin Wolf <kwolf@redhat.com>
+Message-ID: <20171206082743.GB4207@localhost.localdomain>
+References: <20171204151741.14485-1-danielhb@linux.vnet.ibm.com>
+	<20171204151741.14485-2-danielhb@linux.vnet.ibm.com>
+	<20171205180612.GB2969@work-vm>
+	<3b62cb3c-11d4-6215-1e14-b1abb9ba59d5@linux.vnet.ibm.com>
 MIME-Version: 1.0
-In-Reply-To: <CAGC02hR9tgwb2ZWHgSZGo09zXc+pM-syC-jOAVk=K9k39ExX1g@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH v2 0/5] target/m68k: implement 680x0 FPU
- (part 3)
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <3b62cb3c-11d4-6215-1e14-b1abb9ba59d5@linux.vnet.ibm.com>
+Subject: Re: [Qemu-devel] [PATCH v4 1/1] tests/qemu-iotests: adding
+ savevm/loadvm with postcopy flag test
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -39,96 +30,34 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: william lin <wlsaidhi@gmail.com>
-Cc: Andreas Grabher <andreas.grabher@cable.vol.at>, Thomas Huth <huth@tuxfamily.org>, Peter Maydell <peter.maydell@linaro.org>, QEMU Developers <qemu-devel@nongnu.org>, Aurelien Jarno <aurelien@aurel32.net>, Richard Henderson <rth@twiddle.net>
+To: Daniel Henrique Barboza <danielhb@linux.vnet.ibm.com>
+Cc: "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Max Reitz <mreitz@redhat.com>, qemu-devel@nongnu.org, Cleber Rosa <crosa@redhat.com>
 
-Le 05/12/2017 à 22:24, william lin a écrit :
+Am 05.12.2017 um 20:31 hat Daniel Henrique Barboza geschrieben:
+> On 12/05/2017 04:06 PM, Dr. David Alan Gilbert wrote:
+> > * Daniel Henrique Barboza (danielhb@linux.vnet.ibm.com) wrote:
+> > > This patch implements a test case for the scenario that was failing
+> > > prior to the patch "migration/ram.c: do not set 'postcopy_running' in
+> > > POSTCOPY_INCOMING_END", commit acab30b85d.
+> > > 
+> > > This new test file 201 was derived from the test file 181 authored
+> > > by Kevin Wolf.
+> > The test is interesting because it enables postcopy but never triggers
+> > postcopy entry (using migrate_start_postcopy).  Still it's a good path
+> > to check.
+> > 
+> > It will fail to enable postcopy on older linux hosts or non-linux hosts
+> > that don't have userfault though; I'm not sure how your test fails
+> > with that.
+> Hmmm I am not sure either. I have tested it with Travis and it passed all
+> tests,
+> including a claimed Mac OS environment. Not sure if that counts.
 > 
-> 
-> On Tue, Dec 5, 2017 at 2:01 PM, Laurent Vivier <laurent@vivier.eu
-> <mailto:laurent@vivier.eu>> wrote:
-> 
->     Le 05/12/2017 à 18:42, Andreas Grabher a écrit :
->     >
->     > Am 05.12.2017 um 10:46 schrieb Laurent Vivier <laurent@vivier.eu <mailto:laurent@vivier.eu>
->     > <mailto:laurent@vivier.eu <mailto:laurent@vivier.eu>>>:
->     >
->     >> Le 05/12/2017 à 09:56, william lin a écrit :
->     >>> On Wed, Nov 29, 2017 at 9:19 AM, Thomas Huth <huth@tuxfamily.org
->     <mailto:huth@tuxfamily.org>
->     >>> <mailto:huth@tuxfamily.org <mailto:huth@tuxfamily.org>>
->     >>> <mailto:huth@tuxfamily.org <mailto:huth@tuxfamily.org>>> wrote:
->     >>>
->     >>>    On 29.11.2017 15:17, Laurent Vivier wrote:
-...
->     >>>
->     >>> So we can't use these C code directly as it uses helpers from 2b.
->     >>> However, would it be 
->     >>> ok to write our own set of C code along with the necessary
->     helpers using
->     >>> the C and asm 
->     >>> code as reference? (would be part of 2a)
->     >>
->     >> I've ported all the functions written by Andreas to QEMU/softfloat 2a
->     >> and it doesn't need any helpers from 2b.
->     >>
->     >> What we need to know is what is the license of his code and if it has
->     >> been written based on the NetBSD code (BSD license) or from the
->     libFPSP
->     >> (proprietary code) [but I think the code is the same...]
->     >>
->     >> Thanks,
->     >> Laurent
-> 
-> 
-> The functions we are looking for in particular are the transcendental
-> and trig functions
-> for floatx80. (sin, cos, twotox, etc..)
-> 
-> For some context:
-> We need and implementation of those  functions for x86 as it currently
-> converts floatx80 to
-> double before calling into glibc and then converting back to floatx80.
-> This results 
-> in inaccuracies for calculations that use x87 instructions for
-> intermediate operations.
-> (https://bugs.launchpad.net/qemu/+bug/645662)
-> 
-> 
-> I searched through the archive and found your code for this patch:
-> 
-> https://lists.gnu.org/archive/html/qemu-devel/2017-01/msg03766.html
-> 
-> ...
-> 
-> +void HELPER(sincos_FP0_FP1)(CPUM68KState *env)
-> +{
-> +    floatx80 res;
-> +    long double val, valsin, valcos;
-> +
-> +    val = floatx80_to_ldouble(FP0_to_floatx80(env));
-> +
-> +    sincosl(val, &valsin, &valcos);
-> +    res = ldouble_to_floatx80(valsin);
-> +    floatx80_to_FP0(env, res);
-> +    res = ldouble_to_floatx80(valcos);
-> +    floatx80_to_FP1(env, res);
-> +}
-> 
-> ...
-> 
-> In relation to the bug, this implementation would provide more accurate 
-> results, but not be consistent with actual x87 hardware.
-> 
-> If these are not the code you are referring to, then can you please
-> point to us the 
-> correct ones?
+> I'll see if I can get this tested on a Windows env to see how this test
+> fails.
 
-The code ported from "previous" to QEMU can be found here:
+qemu-iotests is basically Linux-only and we don't even try to keep
+things portable. If it works on Windows, that's more by accident than
+intentional.
 
-https://github.com/vivier/qemu-m68k/blob/m68k-dev/fpu/softfloat.c#L7422
-
-but it needs some more polishing.
-
-Thanks,
-Laurent
+Kevin
