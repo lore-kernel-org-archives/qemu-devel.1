@@ -1,26 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35512)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37053)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1eMbMl-0000C1-ND
-	for qemu-devel@nongnu.org; Wed, 06 Dec 2017 10:12:12 -0500
+	(envelope-from <david@redhat.com>) id 1eMbPf-0002qA-SF
+	for qemu-devel@nongnu.org; Wed, 06 Dec 2017 10:15:08 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1eMbMf-0006Zp-Pn
-	for qemu-devel@nongnu.org; Wed, 06 Dec 2017 10:12:07 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:58716)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1eMbMf-0006Ze-J7
-	for qemu-devel@nongnu.org; Wed, 06 Dec 2017 10:12:01 -0500
-Date: Wed, 6 Dec 2017 15:11:55 +0000
-From: Stefan Hajnoczi <stefanha@redhat.com>
-Message-ID: <20171206151155.GC22757@stefanha-x1.localdomain>
-References: <20171205063313.GB4102@yangzhon-Virtual>
-	<20171205120623.GB31150@stefanha-x1.localdomain>
-	<5f9f2835-5811-3ee0-9049-0d2cddc08958@redhat.com>
+	(envelope-from <david@redhat.com>) id 1eMbPb-0000Wa-U9
+	for qemu-devel@nongnu.org; Wed, 06 Dec 2017 10:15:07 -0500
+References: <20171204125505.29203-1-david@redhat.com>
+	<20171204125505.29203-4-david@redhat.com>
+	<b25586af-43e2-4ad1-f426-cd1de59610ce@redhat.com>
+From: David Hildenbrand <david@redhat.com>
+Message-ID: <f2b7bb3d-3bf2-3d9e-f7ac-1201c149125f@redhat.com>
+Date: Wed, 6 Dec 2017 16:15:00 +0100
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="DSayHWYpDlRfCAAQ"
-Content-Disposition: inline
-In-Reply-To: <5f9f2835-5811-3ee0-9049-0d2cddc08958@redhat.com>
-Subject: Re: [Qemu-devel] About the light VM solution!
+In-Reply-To: <b25586af-43e2-4ad1-f426-cd1de59610ce@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v1 for-2.12 3/5] s390x/tcg: implement SET
+ CLOCK PROGRAMMABLE FIELD
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,51 +26,42 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Yang Zhong <yang.zhong@intel.com>
-Cc: berrange@redhat.com, qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>
+To: Thomas Huth <thuth@redhat.com>, qemu-s390x@nongnu.org, qemu-devel@nongnu.org
+Cc: Cornelia Huck <cohuck@redhat.com>, Richard Henderson <rth@twiddle.net>
+
+On 06.12.2017 16:10, Thomas Huth wrote:
+> On 04.12.2017 13:55, David Hildenbrand wrote:
+>> Needed for machine check handling inside Linux (when restoring registers).
+>>
+>> Except for SIGP and machine checks, we don't make use of the register
+>> yet. Suficient for now.
+>>
+>> Signed-off-by: David Hildenbrand <david@redhat.com>
+>> ---
+> [...]
+>> diff --git a/target/s390x/misc_helper.c b/target/s390x/misc_helper.c
+>> index 6d766ce1e7..2c6ab329fb 100644
+>> --- a/target/s390x/misc_helper.c
+>> +++ b/target/s390x/misc_helper.c
+>> @@ -146,6 +146,17 @@ void HELPER(sckc)(CPUS390XState *env, uint64_t time)
+>>      timer_mod(env->tod_timer, env->tod_basetime + time);
+>>  }
+>>  
+>> +/* Set Tod Programmable Field */
+>> +void HELPER(sckpf)(CPUS390XState *env)
+>> +{
+>> +    uint32_t val = env->regs[0];
+>> +
+>> +    if (val & 0xffff0000UL) {
+> 
+> I think you could drop the "UL" suffix here.
+> 
+
+Indeed, we should be fine as long as this fits into an int thanks!
 
 
---DSayHWYpDlRfCAAQ
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+-- 
 
-On Tue, Dec 05, 2017 at 02:35:42PM +0100, Paolo Bonzini wrote:
-> On 05/12/2017 13:06, Stefan Hajnoczi wrote:
-> > On Tue, Dec 05, 2017 at 02:33:13PM +0800, Yang Zhong wrote:
-> Referring to your slides, the remaining points for fast boot are:
->=20
-> * parallelize VCPU initialization: do you have patches? :)
->=20
-> * q35-lite: any other machine options that have not been merged yet?
->=20
-> * SeaBIOS+Option ROM: can you take new numbers with DMA-based option
-> ROM, or with qboot?
->=20
-> * guest kernel: my proposal to make Linux a multiboot kernel has been
-> nacked upstream, but Oracle is working on supporting Xen PVH binaries in
-> QEMU.  These are very similar to multiboot and in particular they're
-> uncompressed.
+Thanks,
 
-By the way, sending a separate patch series for each optimization is
-good.  That way patches requiring more discussion don't hold up patches
-that could be applied immediately.  It also makes reviewing and
-understanding performance results easier since there is only one change.
-
-Stefan
-
---DSayHWYpDlRfCAAQ
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEcBAEBAgAGBQJaKAi7AAoJEJykq7OBq3PI0yUH/RMgge9S6qaZodYQaKxswUXL
-alGxW2Jd/JaIK9Tom1j0vCrLymVI5tCAuPr+t46miQDP8w1JSm+WzpNa4tGMNxk0
-1vH+o67T9rogBaDmAQR4yVAScEo6xWSwGJzTXjzIVS2SqlHlTWwh3Q5GEoxmYnbx
-KBZhd6qTAF48fsgKFdwq4V+iRT5S9HscbYBzCqhyB/vPGabf3Iqrh3lP4yVQJe9e
-sz7sXrvA81C9zEO2sMYx/cu1UCYRUZz+03gfeOqbXbbetTlGUNyfIqe+v0Rp7xCW
-y3pTnUjIGiTSwkSI723Sd8VpurHUieSkHpfSxdJ3P0BNCP65BvfZ9+CaLbaWkfc=
-=ZYfM
------END PGP SIGNATURE-----
-
---DSayHWYpDlRfCAAQ--
+David / dhildenb
