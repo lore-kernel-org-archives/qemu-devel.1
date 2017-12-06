@@ -1,25 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42073)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45389)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1eMW2m-0007Cq-Ae
-	for qemu-devel@nongnu.org; Wed, 06 Dec 2017 04:31:10 -0500
+	(envelope-from <lprosek@redhat.com>) id 1eMW9T-0003gf-Th
+	for qemu-devel@nongnu.org; Wed, 06 Dec 2017 04:38:05 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1eMW2i-00010Y-8Z
-	for qemu-devel@nongnu.org; Wed, 06 Dec 2017 04:31:08 -0500
-Received: from mail-wm0-x242.google.com ([2a00:1450:400c:c09::242]:46166)
+	(envelope-from <lprosek@redhat.com>) id 1eMW9P-0006Rx-0k
+	for qemu-devel@nongnu.org; Wed, 06 Dec 2017 04:38:03 -0500
+Received: from mail-ua0-f196.google.com ([209.85.217.196]:43552)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1eMW2i-000103-22
-	for qemu-devel@nongnu.org; Wed, 06 Dec 2017 04:31:04 -0500
-Received: by mail-wm0-x242.google.com with SMTP id r78so6017641wme.5
-	for <qemu-devel@nongnu.org>; Wed, 06 Dec 2017 01:31:03 -0800 (PST)
-From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
-Date: Wed,  6 Dec 2017 09:30:50 +0000
-Message-Id: <20171206093050.25308-1-alex.bennee@linaro.org>
+	(Exim 4.71) (envelope-from <lprosek@redhat.com>) id 1eMW9O-0006Rm-SO
+	for qemu-devel@nongnu.org; Wed, 06 Dec 2017 04:37:58 -0500
+Received: by mail-ua0-f196.google.com with SMTP id e10so2363474uah.10
+	for <qemu-devel@nongnu.org>; Wed, 06 Dec 2017 01:37:58 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [RFC PATCH] target/sh4/translate.c: fix TCG leak
- during gusa sequence
+In-Reply-To: <60c91bd3021b2e98e2a6c24d28509476@ispras.ru>
+References: <151127322955.6888.16198535123422076171.stgit@Misha-PC.lan02.inno>
+	<151127345586.6888.4109654104815822158.stgit@Misha-PC.lan02.inno>
+	<CABdb736HfN5GK1QZX4vsDKSUr_fGHXX9SA-gd85PdA20Duys3Q@mail.gmail.com>
+	<60c91bd3021b2e98e2a6c24d28509476@ispras.ru>
+From: Ladi Prosek <lprosek@redhat.com>
+Date: Wed, 6 Dec 2017 10:37:57 +0100
+Message-ID: <CABdb7347AvjOUQHGhyOpzx3p8rNmBiTkuH+=UjMc2EaD8WzsEw@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v3 39/45] windbg: implemented
+ kd_api_get_version
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,32 +32,109 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: 1735384@bugs.launchpad.net, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, Aurelien Jarno <aurelien@aurel32.net>
+To: Mihail Abakumov <mikhail.abakumov@ispras.ru>
+Cc: qemu-devel <qemu-devel@nongnu.org>, sw@weilnetz.de, Pavel Dovgalyuk <dovgaluk@ispras.ru>, Roman Kagan <rkagan@virtuozzo.com>, Paolo Bonzini <pbonzini@redhat.com>, "Denis V. Lunev" <den@openvz.org>
 
-This fixes bug #1735384 while running java under qemu-sh4. When debug
-was enabled it showed a problem with TCG temps. Once fixed I was able
-to run java -version normally.
+On Wed, Dec 6, 2017 at 10:00 AM, Mihail Abakumov
+<mikhail.abakumov@ispras.ru> wrote:
+> Ladi Prosek =D0=BF=D0=B8=D1=81=D0=B0=D0=BB 2017-11-29 11:14:
+>
+>> On Tue, Nov 21, 2017 at 3:10 PM, Mihail Abakumov
+>> <mikhail.abakumov@ispras.ru> wrote:
+>>>
+>>> Signed-off-by: Mihail Abakumov <mikhail.abakumov@ispras.ru>
+>>> Signed-off-by: Pavel Dovgalyuk <dovgaluk@ispras.ru>
+>>> Signed-off-by: Dmitriy Koltunov <koltunov@ispras.ru>
+>>> ---
+>>>  include/exec/windbgstub-utils.h |    1 +
+>>>  windbgstub-utils.c              |   22 ++++++++++++++++++++++
+>>>  windbgstub.c                    |    4 ++++
+>>>  3 files changed, 27 insertions(+)
+>>>
+>>> diff --git a/include/exec/windbgstub-utils.h
+>>> b/include/exec/windbgstub-utils.h
+>>> index be48f69f40..bc5b6a8468 100755
+>>> --- a/include/exec/windbgstub-utils.h
+>>> +++ b/include/exec/windbgstub-utils.h
+>>> @@ -99,6 +99,7 @@ void kd_api_read_io_space(CPUState *cpu, PacketData
+>>> *pd);
+>>>  void kd_api_write_io_space(CPUState *cpu, PacketData *pd);
+>>>  void kd_api_read_physical_memory(CPUState *cpu, PacketData *pd);
+>>>  void kd_api_write_physical_memory(CPUState *cpu, PacketData *pd);
+>>> +void kd_api_get_version(CPUState *cpu, PacketData *pd);
+>>>  void kd_api_unsupported(CPUState *cpu, PacketData *pd);
+>>>
+>>>  SizedBuf kd_gen_exception_sc(CPUState *cpu);
+>>> diff --git a/windbgstub-utils.c b/windbgstub-utils.c
+>>> index 6708e62798..7ef301bac7 100755
+>>> --- a/windbgstub-utils.c
+>>> +++ b/windbgstub-utils.c
+>>> @@ -239,6 +239,28 @@ void kd_api_write_physical_memory(CPUState *cpu,
+>>> PacketData *pd)
+>>>      stl_p(&mem->ActualBytesWritten, len);
+>>>  }
+>>>
+>>> +void kd_api_get_version(CPUState *cpu, PacketData *pd)
+>>> +{
+>>> +    DBGKD_GET_VERSION64 *kdver;
+>>> +    int err =3D cpu_memory_rw_debug(cpu, version.addr, PTR(pd->m64) +
+>>> 0x10,
+>>> +                                  sizeof(DBGKD_MANIPULATE_STATE64) -
+>>> 0x10, 0);
+>>> +    if (!err) {
+>>> +        kdver =3D (DBGKD_GET_VERSION64 *) (PTR(pd->m64) + 0x10);
+>>> +
+>>> +        stw_p(&kdver->MajorVersion, kdver->MajorVersion);
+>>> +        stw_p(&kdver->MinorVersion, kdver->MinorVersion);
+>>> +        stw_p(&kdver->Flags, kdver->Flags);
+>>> +        stw_p(&kdver->MachineType, kdver->MachineType);
+>>> +        stw_p(&kdver->Unused[0], kdver->Unused[0]);
+>>> +        sttul_p(&kdver->KernBase, kdver->KernBase);
+>>> +        sttul_p(&kdver->PsLoadedModuleList, kdver->PsLoadedModuleList)=
+;
+>>> +        sttul_p(&kdver->DebuggerDataList, kdver->DebuggerDataList);
+>>> +    } else {
+>>> +        pd->m64.ReturnStatus =3D STATUS_UNSUCCESSFUL;
+>>
+>>
+>> The ReturnStatus field must be written using st* as well. You have
+>> this direct write in many functions.
+>>
+>
+> I'm doing stl_p for status before sending of packet in the
+> 'windbg_process_manipulate_packet',
+> because this is a global field of structure. Is that bad?
 
-Reported-by: John Paul Adrian Glaubitz <glaubitz@physik.fu-berlin.de>
-Suggested-by: Richard Henderson <richard.henderson@linaro.org>
-Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
----
- target/sh4/translate.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+I see. Technically it's probably ok, as long as you make sure that the
+field is always aligned. But having the field hold two representations
+of the value depending on where exactly in the program you are is not
+good style. Imagine debugging it, looking at the contents of the
+structure, and not being sure if you're looking at the host or guest
+byte order. Plus everybody reading the code will be confused just like
+me :)
 
-diff --git a/target/sh4/translate.c b/target/sh4/translate.c
-index 703020fe87..b4b5c822d0 100644
---- a/target/sh4/translate.c
-+++ b/target/sh4/translate.c
-@@ -2189,7 +2189,7 @@ static int decode_gusa(DisasContext *ctx, CPUSH4State *env, int *pmax_insns)
-     }
- 
-     /* If op_src is not a valid register, then op_arg was a constant.  */
--    if (op_src < 0) {
-+    if (op_src < 0 && !TCGV_IS_UNUSED(op_arg)) {
-         tcg_temp_free_i32(op_arg);
-     }
- 
--- 
-2.15.1
+>>> +        WINDBG_ERROR("get_version: " FMT_ERR, err);
+>>> +    }
+>>> +}
+>>> +
+>>>  void kd_api_unsupported(CPUState *cpu, PacketData *pd)
+>>>  {
+>>>      WINDBG_ERROR("Caught unimplemented api %s",
+>>> diff --git a/windbgstub.c b/windbgstub.c
+>>> index 72324ae53d..ddca290694 100755
+>>> --- a/windbgstub.c
+>>> +++ b/windbgstub.c
+>>> @@ -197,6 +197,10 @@ static void
+>>> windbg_process_manipulate_packet(ParsingContext *ctx)
+>>>          kd_api_write_physical_memory(cpu, &ctx->data);
+>>>          break;
+>>>
+>>> +    case DbgKdGetVersionApi:
+>>> +        kd_api_get_version(cpu, &ctx->data);
+>>> +        break;
+>>> +
+>>>      case DbgKdClearAllInternalBreakpointsApi:
+>>>          return;
+>>>
+>>>
+>
