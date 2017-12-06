@@ -1,27 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45223)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48787)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1eMcXo-0000Oh-3o
-	for qemu-devel@nongnu.org; Wed, 06 Dec 2017 11:27:37 -0500
+	(envelope-from <armbru@redhat.com>) id 1eMceb-0004QH-Iv
+	for qemu-devel@nongnu.org; Wed, 06 Dec 2017 11:34:39 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1eMcXm-0004VH-Nm
-	for qemu-devel@nongnu.org; Wed, 06 Dec 2017 11:27:36 -0500
-Received: from mail-wr0-x22d.google.com ([2a00:1450:400c:c0c::22d]:34578)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1eMcXm-0004UT-E0
-	for qemu-devel@nongnu.org; Wed, 06 Dec 2017 11:27:34 -0500
-Received: by mail-wr0-x22d.google.com with SMTP id y21so4540785wrc.1
-	for <qemu-devel@nongnu.org>; Wed, 06 Dec 2017 08:27:34 -0800 (PST)
+	(envelope-from <armbru@redhat.com>) id 1eMceY-0000gL-Uq
+	for qemu-devel@nongnu.org; Wed, 06 Dec 2017 11:34:37 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:34626)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1eMceY-0000db-Mm
+	for qemu-devel@nongnu.org; Wed, 06 Dec 2017 11:34:34 -0500
+From: Markus Armbruster <armbru@redhat.com>
+References: <20170911110623.24981-1-marcandre.lureau@redhat.com>
+	<20170911110623.24981-6-marcandre.lureau@redhat.com>
+Date: Wed, 06 Dec 2017 17:34:27 +0100
+In-Reply-To: <20170911110623.24981-6-marcandre.lureau@redhat.com>
+	(=?utf-8?Q?=22Marc-Andr=C3=A9?=
+	Lureau"'s message of "Mon, 11 Sep 2017 13:05:38 +0200")
+Message-ID: <87lgifx1bg.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-In-Reply-To: <286AC319A985734F985F78AFA26841F73937B57F@shsmsx102.ccr.corp.intel.com>
-References: <1512444796-30615-1-git-send-email-wei.w.wang@intel.com>
-	<20171206134957.GD12584@stefanha-x1.localdomain>
-	<286AC319A985734F985F78AFA26841F73937B57F@shsmsx102.ccr.corp.intel.com>
-From: Stefan Hajnoczi <stefanha@gmail.com>
-Date: Wed, 6 Dec 2017 16:27:32 +0000
-Message-ID: <CAJSP0QWugAKQy6hYEJfy_XHEg-Q2swAzZMNcWBqn-r9Yi7yiEg@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [virtio-dev] [PATCH v3 0/7] Vhost-pci for inter-VM
- communication
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v3 05/50] qapi: add tests for invalid 'if'
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,74 +29,155 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Wang, Wei W" <wei.w.wang@intel.com>
-Cc: Stefan Hajnoczi <stefanha@redhat.com>, "virtio-dev@lists.oasis-open.org" <virtio-dev@lists.oasis-open.org>, "mst@redhat.com" <mst@redhat.com>, "Yang, Zhiyong" <zhiyong.yang@intel.com>, "jan.kiszka@siemens.com" <jan.kiszka@siemens.com>, "jasowang@redhat.com" <jasowang@redhat.com>, "avi.cohen@huawei.com" <avi.cohen@huawei.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "marcandre.lureau@redhat.com" <marcandre.lureau@redhat.com>, "pbonzini@redhat.com" <pbonzini@redhat.com>
+To: =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>
+Cc: qemu-devel@nongnu.org, Michael Roth <mdroth@linux.vnet.ibm.com>
 
-On Wed, Dec 6, 2017 at 4:09 PM, Wang, Wei W <wei.w.wang@intel.com> wrote:
-> On Wednesday, December 6, 2017 9:50 PM, Stefan Hajnoczi wrote:
->> On Tue, Dec 05, 2017 at 11:33:09AM +0800, Wei Wang wrote:
->> > Vhost-pci is a point-to-point based inter-VM communication solution.
->> > This patch series implements the vhost-pci-net device setup and
->> > emulation. The device is implemented as a virtio device, and it is set
->> > up via the vhost-user protocol to get the neessary info (e.g the
->> > memory info of the remote VM, vring info).
->> >
->> > Currently, only the fundamental functions are implemented. More
->> > features, such as MQ and live migration, will be updated in the future.
->> >
->> > The DPDK PMD of vhost-pci has been posted to the dpdk mailinglist here:
->> > http://dpdk.org/ml/archives/dev/2017-November/082615.html
->>
->> I have asked questions about the scope of this feature.  In particular, I think
->> it's best to support all device types rather than just virtio-net.  Here is a
->> design document that shows how this can be achieved.
->>
->> What I'm proposing is different from the current approach:
->> 1. It's a PCI adapter (see below for justification) 2. The vhost-user protocol is
->> exposed by the device (not handled 100% in
->>    QEMU).  Ultimately I think your approach would also need to do this.
->>
->> I'm not implementing this and not asking you to implement it.  Let's just use
->> this for discussion so we can figure out what the final vhost-pci will look like.
->>
->> Please let me know what you think, Wei, Michael, and others.
->>
+Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com> writes:
+
+> Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+
+This tests error conditions added in the previous commit.  I recommend
+squashing the two together.
+
+> ---
+>  tests/Makefile.include                   | 3 +++
+>  tests/qapi-schema/bad-if-empty-list.err  | 1 +
+>  tests/qapi-schema/bad-if-empty-list.exit | 1 +
+>  tests/qapi-schema/bad-if-empty-list.json | 3 +++
+>  tests/qapi-schema/bad-if-empty-list.out  | 0
+>  tests/qapi-schema/bad-if-empty.err       | 1 +
+>  tests/qapi-schema/bad-if-empty.exit      | 1 +
+>  tests/qapi-schema/bad-if-empty.json      | 3 +++
+>  tests/qapi-schema/bad-if-empty.out       | 0
+>  tests/qapi-schema/bad-if.err             | 1 +
+>  tests/qapi-schema/bad-if.exit            | 1 +
+>  tests/qapi-schema/bad-if.json            | 3 +++
+>  tests/qapi-schema/bad-if.out             | 0
+>  13 files changed, 18 insertions(+)
+>  create mode 100644 tests/qapi-schema/bad-if-empty-list.err
+>  create mode 100644 tests/qapi-schema/bad-if-empty-list.exit
+>  create mode 100644 tests/qapi-schema/bad-if-empty-list.json
+>  create mode 100644 tests/qapi-schema/bad-if-empty-list.out
+>  create mode 100644 tests/qapi-schema/bad-if-empty.err
+>  create mode 100644 tests/qapi-schema/bad-if-empty.exit
+>  create mode 100644 tests/qapi-schema/bad-if-empty.json
+>  create mode 100644 tests/qapi-schema/bad-if-empty.out
+>  create mode 100644 tests/qapi-schema/bad-if.err
+>  create mode 100644 tests/qapi-schema/bad-if.exit
+>  create mode 100644 tests/qapi-schema/bad-if.json
+>  create mode 100644 tests/qapi-schema/bad-if.out
 >
-> Thanks for sharing the thoughts. If I understand it correctly, the key difference is that this approach tries to relay every vhost-user msg to the guest. I'm not sure about the benefits of doing this.
-> To make data plane (i.e. driver to send/receive packets) work, I think, mostly, the memory info and vring info are enough. Other things like callfd, kickfd don't need to be sent to the guest, they are needed by QEMU only for the eventfd and irqfd setup.
+> diff --git a/tests/Makefile.include b/tests/Makefile.include
+> index fae5715e9c..8dac7c9083 100644
+> --- a/tests/Makefile.include
+> +++ b/tests/Makefile.include
+> @@ -402,6 +402,9 @@ qapi-schema +=3D args-unknown.json
+>  qapi-schema +=3D bad-base.json
+>  qapi-schema +=3D bad-data.json
+>  qapi-schema +=3D bad-ident.json
+> +qapi-schema +=3D bad-if.json
+> +qapi-schema +=3D bad-if-empty.json
+> +qapi-schema +=3D bad-if-empty-list.json
+>  qapi-schema +=3D bad-type-bool.json
+>  qapi-schema +=3D bad-type-dict.json
+>  qapi-schema +=3D bad-type-int.json
+> diff --git a/tests/qapi-schema/bad-if-empty-list.err b/tests/qapi-schema/=
+bad-if-empty-list.err
+> new file mode 100644
+> index 0000000000..75fe6497bc
+> --- /dev/null
+> +++ b/tests/qapi-schema/bad-if-empty-list.err
+> @@ -0,0 +1 @@
+> +tests/qapi-schema/bad-if-empty-list.json:2: 'if' condition [] is useless
+> diff --git a/tests/qapi-schema/bad-if-empty-list.exit b/tests/qapi-schema=
+/bad-if-empty-list.exit
+> new file mode 100644
+> index 0000000000..d00491fd7e
+> --- /dev/null
+> +++ b/tests/qapi-schema/bad-if-empty-list.exit
+> @@ -0,0 +1 @@
+> +1
+> diff --git a/tests/qapi-schema/bad-if-empty-list.json b/tests/qapi-schema=
+/bad-if-empty-list.json
+> new file mode 100644
+> index 0000000000..94f2eb8670
+> --- /dev/null
+> +++ b/tests/qapi-schema/bad-if-empty-list.json
+> @@ -0,0 +1,3 @@
+> +# check empty 'if' list
+> +{ 'struct': 'TestIfStruct', 'data': { 'foo': 'int' },
+> +  'if': [] }
+> diff --git a/tests/qapi-schema/bad-if-empty-list.out b/tests/qapi-schema/=
+bad-if-empty-list.out
+> new file mode 100644
+> index 0000000000..e69de29bb2
 
-Handling the vhost-user protocol inside QEMU and exposing a different
-interface to the guest makes the interface device-specific.  This will
-cause extra work to support new devices (vhost-user-scsi,
-vhost-user-blk).  It also makes development harder because you might
-have to learn 3 separate specifications to debug the system (virtio,
-vhost-user, vhost-pci-net).
+This covers "'if' condition [] is useless".
 
-If vhost-user is mapped to a PCI device then these issues are solved.
+> diff --git a/tests/qapi-schema/bad-if-empty.err b/tests/qapi-schema/bad-i=
+f-empty.err
+> new file mode 100644
+> index 0000000000..358bdc3e51
+> --- /dev/null
+> +++ b/tests/qapi-schema/bad-if-empty.err
+> @@ -0,0 +1 @@
+> +tests/qapi-schema/bad-if-empty.json:2: 'if' condition '' makes no sense
+> diff --git a/tests/qapi-schema/bad-if-empty.exit b/tests/qapi-schema/bad-=
+if-empty.exit
+> new file mode 100644
+> index 0000000000..d00491fd7e
+> --- /dev/null
+> +++ b/tests/qapi-schema/bad-if-empty.exit
+> @@ -0,0 +1 @@
+> +1
+> diff --git a/tests/qapi-schema/bad-if-empty.json b/tests/qapi-schema/bad-=
+if-empty.json
+> new file mode 100644
+> index 0000000000..fe1dd4eca6
+> --- /dev/null
+> +++ b/tests/qapi-schema/bad-if-empty.json
+> @@ -0,0 +1,3 @@
+> +# check empty 'if'
+> +{ 'struct': 'TestIfStruct', 'data': { 'foo': 'int' },
+> +  'if': '' }
+> diff --git a/tests/qapi-schema/bad-if-empty.out b/tests/qapi-schema/bad-i=
+f-empty.out
+> new file mode 100644
+> index 0000000000..e69de29bb2
 
->> vhost-pci is a PCI adapter instead of a virtio device to allow doorbells and
->> interrupts to be connected to the virtio device in the master VM in the most
->> efficient way possible.  This means the Vring call doorbell can be an
->> ioeventfd that signals an irqfd inside the host kernel without host userspace
->> involvement.  The Vring kick interrupt can be an irqfd that is signalled by the
->> master VM's virtqueue ioeventfd.
->>
->
->
-> This looks the same as the implementation of inter-VM notification in v2:
-> https://www.mail-archive.com/qemu-devel@nongnu.org/msg450005.html
-> which is fig. 4 here: https://github.com/wei-w-wang/vhost-pci-discussion/blob/master/vhost-pci-rfc2.0.pdf
->
-> When the vhost-pci driver kicks its tx, the host signals the irqfd of virtio-net's rx. I think this has already bypassed the host userspace (thanks to the fast mmio implementation)
+This covers "'if' condition '' makes no sense", not wrapped in a list.
 
-Yes, I think the irqfd <-> ioeventfd mapping is good.  Perhaps it even
-makes sense to implement a special fused_irq_ioevent_fd in the host
-kernel to bypass the need for a kernel thread to read the eventfd so
-that an interrupt can be injected (i.e. to make the operation
-synchronous).
+> diff --git a/tests/qapi-schema/bad-if.err b/tests/qapi-schema/bad-if.err
+> new file mode 100644
+> index 0000000000..c2e3f5f44c
+> --- /dev/null
+> +++ b/tests/qapi-schema/bad-if.err
+> @@ -0,0 +1 @@
+> +tests/qapi-schema/bad-if.json:2: 'if' condition must be a string or a li=
+st of strings
+> diff --git a/tests/qapi-schema/bad-if.exit b/tests/qapi-schema/bad-if.exit
+> new file mode 100644
+> index 0000000000..d00491fd7e
+> --- /dev/null
+> +++ b/tests/qapi-schema/bad-if.exit
+> @@ -0,0 +1 @@
+> +1
+> diff --git a/tests/qapi-schema/bad-if.json b/tests/qapi-schema/bad-if.json
+> new file mode 100644
+> index 0000000000..3edd1a0bf2
+> --- /dev/null
+> +++ b/tests/qapi-schema/bad-if.json
+> @@ -0,0 +1,3 @@
+> +# check invalid 'if' type
+> +{ 'struct': 'TestIfStruct', 'data': { 'foo': 'int' },
+> +  'if': { 'value': 'defined(TEST_IF_STRUCT)' } }
+> diff --git a/tests/qapi-schema/bad-if.out b/tests/qapi-schema/bad-if.out
+> new file mode 100644
+> index 0000000000..e69de29bb2
 
-Is the tx virtqueue in your inter-VM notification v2 series a real
-virtqueue that gets used?  Or is it just a dummy virtqueue that you're
-using for the ioeventfd doorbell?  It looks like vpnet_handle_vq() is
-empty so it's really just a dummy.  The actual virtqueue is in the
-vhost-user master guest memory.
+This covers "'if' condition must be a string or a list of strings", not
+wrapped in a list.
+
+Not covered: the two not wrapped in a list cases wrapped in a list.
+However, I figure this is good enough as is, thus
+Reviewed-by: Markus Armbruster <armbru@redhat.com>
