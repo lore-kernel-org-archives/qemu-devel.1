@@ -1,41 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36286)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37383)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <borntraeger@de.ibm.com>) id 1eMYbi-0004wb-NF
-	for qemu-devel@nongnu.org; Wed, 06 Dec 2017 07:15:23 -0500
+	(envelope-from <marcel@redhat.com>) id 1eMYe1-000736-MJ
+	for qemu-devel@nongnu.org; Wed, 06 Dec 2017 07:17:49 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <borntraeger@de.ibm.com>) id 1eMYbc-0005xs-Jz
-	for qemu-devel@nongnu.org; Wed, 06 Dec 2017 07:15:22 -0500
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:37554)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <borntraeger@de.ibm.com>)
-	id 1eMYbc-0005wG-CI
-	for qemu-devel@nongnu.org; Wed, 06 Dec 2017 07:15:16 -0500
-Received: from pps.filterd (m0098410.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
-	vB6CDtG7143402
-	for <qemu-devel@nongnu.org>; Wed, 6 Dec 2017 07:15:12 -0500
-Received: from e06smtp11.uk.ibm.com (e06smtp11.uk.ibm.com [195.75.94.107])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2epgc683ad-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Wed, 06 Dec 2017 07:15:12 -0500
-Received: from localhost
-	by e06smtp11.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
-	Only! Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <borntraeger@de.ibm.com>;
-	Wed, 6 Dec 2017 12:15:09 -0000
-References: <20171206120000.63822-1-borntraeger@de.ibm.com>
-	<0b60c788-0470-1fa0-390c-472d75aef0dc@redhat.com>
-	<8c5f5393-9191-fdae-e852-196163d42d50@de.ibm.com>
-	<48792114-6784-249d-0e5f-3b1f1ace7a75@redhat.com>
-From: Christian Borntraeger <borntraeger@de.ibm.com>
-Date: Wed, 6 Dec 2017 13:15:04 +0100
+	(envelope-from <marcel@redhat.com>) id 1eMYdz-0007xK-Nj
+	for qemu-devel@nongnu.org; Wed, 06 Dec 2017 07:17:45 -0500
+References: <20171205171706.23947-1-ybettan@redhat.com>
+From: Marcel Apfelbaum <marcel@redhat.com>
+Message-ID: <00a58be5-78ba-ffea-b2f7-4da5df1c7006@redhat.com>
+Date: Wed, 6 Dec 2017 14:17:17 +0200
 MIME-Version: 1.0
-In-Reply-To: <48792114-6784-249d-0e5f-3b1f1ace7a75@redhat.com>
-Content-Type: text/plain; charset=utf-8
+In-Reply-To: <20171205171706.23947-1-ybettan@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Message-Id: <c040f027-54a5-f7d3-0406-e06fd1064fa6@de.ibm.com>
-Subject: Re: [Qemu-devel] [PATCH/RFC] s390x: split memory into 4TB chunks
+Subject: Re: [Qemu-devel] [PATCH V3] pci: removed the is_express field since
+ a uniform interface was inserted
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -44,84 +24,268 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Hildenbrand <david@redhat.com>, Cornelia Huck <cohuck@redhat.com>
-Cc: qemu-devel <qemu-devel@nongnu.org>, qemu-s390x <qemu-s390x@nongnu.org>, Halil Pasic <pasic@linux.vnet.ibm.com>, Alexander Graf <agraf@suse.de>, Thomas Huth <thuth@redhat.com>, Richard Henderson <rth@twiddle.net>, Paolo Bonzini <pbonzini@redhat.com>
+To: Yoni Bettan <ybettan@redhat.com>, qemu-devel@nongnu.org
+Cc: f4bug@amsat.org, "Michael S. Tsirkin" <mst@redhat.com>, Keith Busch <keith.busch@intel.com>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, Dmitry Fleytman <dmitry@daynix.com>, Jason Wang <jasowang@redhat.com>, Paul Burton <paul.burton@mips.com>, Paolo Bonzini <pbonzini@redhat.com>, Hannes Reinecke <hare@suse.com>, Gerd Hoffmann <kraxel@redhat.com>, Alex Williamson <alex.williamson@redhat.com>, "open list:nvme" <qemu-block@nongnu.org>
 
+Hi Yoni,
 
-
-On 12/06/2017 01:12 PM, David Hildenbrand wrote:
-> On 06.12.2017 13:06, Christian Borntraeger wrote:
->>
->>
->> On 12/06/2017 01:04 PM, David Hildenbrand wrote:
->>> On 06.12.2017 13:00, Christian Borntraeger wrote:
->>>> KVM does not allow memory regions > KVM_MEM_MAX_NR_PAGES, basically
->>>> limiting the memory per slot to 7.999TB. Lets split the base memory
->>>> into 4TB chunks to allow go beyond 8TB for a guest. With that (and
->>>> optimistic overcommitment in the kernel) I was able to start  a 59TB
->>>> guest on a 1TB system.
->>>>
->>>> Signed-off-by: Christian Borntraeger <borntraeger@de.ibm.com>
->>>> ---
->>>>  hw/s390x/s390-virtio-ccw.c | 20 +++++++++++++++++---
->>>>  1 file changed, 17 insertions(+), 3 deletions(-)
->>>>
->>>> diff --git a/hw/s390x/s390-virtio-ccw.c b/hw/s390x/s390-virtio-ccw.c
->>>> index 8425534..6735bbb 100644
->>>> --- a/hw/s390x/s390-virtio-ccw.c
->>>> +++ b/hw/s390x/s390-virtio-ccw.c
->>>> @@ -157,11 +157,25 @@ static void virtio_ccw_register_hcalls(void)
->>>>  static void s390_memory_init(ram_addr_t mem_size)
->>>>  {
->>>>      MemoryRegion *sysmem = get_system_memory();
->>>> -    MemoryRegion *ram = g_new(MemoryRegion, 1);
->>>> +    ram_addr_t chunk, offset;
->>>> +    gchar *name;
->>>>  
->>>>      /* allocate RAM for core */
->>>> -    memory_region_allocate_system_memory(ram, NULL, "s390.ram", mem_size);
->>>> -    memory_region_add_subregion(sysmem, 0, ram);
->>>> +    offset = 0;
->>>> +    while (mem_size) {
->>>> +        MemoryRegion *ram = g_new(MemoryRegion, 1);
->>>> +        chunk = mem_size;
->>>> +        /* KVM does not allow memslots >= 8 TB. Lets split into 4TB chunks */> +        if (chunk > 4UL * 1024 * 1024 * 1024 * 1024) {
->>>> +            chunk = 4UL * 1024 * 1024 * 1024 * 1024;
->>>> +        }
->>>> +        name = g_strdup_printf("s390.ram[0x%lx]", offset);
->>>> +        memory_region_allocate_system_memory(ram, NULL, name, chunk);
->>>> +        memory_region_add_subregion(sysmem, offset, ram);
->>>> +        mem_size -= chunk;
->>>> +        offset += chunk;
->>>> +        g_free(name);
->>>> +    }
->>>>  
->>>>      /* Initialize storage key device */
->>>>      s390_skeys_init();
->>>>
->>>
->>> This will most certainly break migration, no?
->>
->> Probably yes. Thats why the patch has RFC. I was looking for ideas.
+On 05/12/2017 19:17, Yoni Bettan wrote:
+>          * according to Eduardo Habkost's commit
+>            fd3b02c8896d597dd8b9e053dec579cf0386aee1
 > 
-> As other architectures might also run into this problem, wonder if
+>          * since all PCIEs now implement INTERFACE_PCIE_DEVICE we
+>            don't need this field anymore
 > 
-> a) bumping up KVM_MEM_MAX_NR_PAGES makes sense.
+>          * Devices that where only INTERFACE_PCIE_DEVICE (is_express == 1)
+>            or
+>            devices that where only INTERFACE_CONVENTIONAL_PCI_DEVICE (is_express == 0)
+>            where not affected by the change
+> 
+>            The only devices that were affected are those that are hybrid and also
+>            had (is_express == 1) - therefor only:
+>              - hw/vfio/pci.c
+>              - hw/usb/hcd-xhci.c
+> 
+>            For both I made sure that QEMU_PCI_CAP_EXPRESS is on
+> 
+> Signed-off-by: Yoni Bettan <ybettan@redhat.com>
+> ---
+>   docs/pcie_pci_bridge.txt           | 2 +-
+>   hw/block/nvme.c                    | 1 -
+>   hw/net/e1000e.c                    | 1 -
+>   hw/pci-bridge/pcie_pci_bridge.c    | 1 -
+>   hw/pci-bridge/pcie_root_port.c     | 1 -
+>   hw/pci-bridge/xio3130_downstream.c | 1 -
+>   hw/pci-bridge/xio3130_upstream.c   | 1 -
+>   hw/pci-host/xilinx-pcie.c          | 1 -
+>   hw/pci/pci.c                       | 4 +++-
+>   hw/scsi/megasas.c                  | 4 ----
+>   hw/usb/hcd-xhci.c                  | 7 ++++++-
+>   hw/vfio/pci.c                      | 3 ++-
+>   include/hw/pci/pci.h               | 3 ---
+>   13 files changed, 12 insertions(+), 18 deletions(-)
+> 
+> diff --git a/docs/pcie_pci_bridge.txt b/docs/pcie_pci_bridge.txt
+> index 5a4203f97c..ab35ebf3ca 100644
+> --- a/docs/pcie_pci_bridge.txt
+> +++ b/docs/pcie_pci_bridge.txt
+> @@ -110,5 +110,5 @@ To enable device hot-plug into the bridge on Linux there're 3 ways:
+>   Implementation
+>   ==============
+>   The PCIE-PCI bridge is based on PCI-PCI bridge, but also accumulates PCI Express
+> -features as a PCI Express device (is_express=1).
+> +features as a PCI Express device.
+>   
+> diff --git a/hw/block/nvme.c b/hw/block/nvme.c
+> index 441e21ed1f..9325bc0911 100644
+> --- a/hw/block/nvme.c
+> +++ b/hw/block/nvme.c
+> @@ -1087,7 +1087,6 @@ static void nvme_class_init(ObjectClass *oc, void *data)
+>       pc->vendor_id = PCI_VENDOR_ID_INTEL;
+>       pc->device_id = 0x5845;
+>       pc->revision = 2;
+> -    pc->is_express = 1;
+>   
+>       set_bit(DEVICE_CATEGORY_STORAGE, dc->categories);
+>       dc->desc = "Non-Volatile Memory Express";
+> diff --git a/hw/net/e1000e.c b/hw/net/e1000e.c
+> index f1af279e8d..c360f0d8c9 100644
+> --- a/hw/net/e1000e.c
+> +++ b/hw/net/e1000e.c
+> @@ -675,7 +675,6 @@ static void e1000e_class_init(ObjectClass *class, void *data)
+>       c->revision = 0;
+>       c->romfile = "efi-e1000e.rom";
+>       c->class_id = PCI_CLASS_NETWORK_ETHERNET;
+> -    c->is_express = 1;
+>   
+>       dc->desc = "Intel 82574L GbE Controller";
+>       dc->reset = e1000e_qdev_reset;
+> diff --git a/hw/pci-bridge/pcie_pci_bridge.c b/hw/pci-bridge/pcie_pci_bridge.c
+> index a4d827c99d..b7d9ebbec2 100644
+> --- a/hw/pci-bridge/pcie_pci_bridge.c
+> +++ b/hw/pci-bridge/pcie_pci_bridge.c
+> @@ -169,7 +169,6 @@ static void pcie_pci_bridge_class_init(ObjectClass *klass, void *data)
+>       DeviceClass *dc = DEVICE_CLASS(klass);
+>       HotplugHandlerClass *hc = HOTPLUG_HANDLER_CLASS(klass);
+>   
+> -    k->is_express = 1;
+>       k->is_bridge = 1;
+>       k->vendor_id = PCI_VENDOR_ID_REDHAT;
+>       k->device_id = PCI_DEVICE_ID_REDHAT_PCIE_BRIDGE;
+> diff --git a/hw/pci-bridge/pcie_root_port.c b/hw/pci-bridge/pcie_root_port.c
+> index 9b6e4ce512..45f9e8cd4a 100644
+> --- a/hw/pci-bridge/pcie_root_port.c
+> +++ b/hw/pci-bridge/pcie_root_port.c
+> @@ -145,7 +145,6 @@ static void rp_class_init(ObjectClass *klass, void *data)
+>       DeviceClass *dc = DEVICE_CLASS(klass);
+>       PCIDeviceClass *k = PCI_DEVICE_CLASS(klass);
+>   
+> -    k->is_express = 1;
+>       k->is_bridge = 1;
+>       k->config_write = rp_write_config;
+>       k->realize = rp_realize;
+> diff --git a/hw/pci-bridge/xio3130_downstream.c b/hw/pci-bridge/xio3130_downstream.c
+> index 1e09d2afb7..613a0d6bb7 100644
+> --- a/hw/pci-bridge/xio3130_downstream.c
+> +++ b/hw/pci-bridge/xio3130_downstream.c
+> @@ -177,7 +177,6 @@ static void xio3130_downstream_class_init(ObjectClass *klass, void *data)
+>       DeviceClass *dc = DEVICE_CLASS(klass);
+>       PCIDeviceClass *k = PCI_DEVICE_CLASS(klass);
+>   
+> -    k->is_express = 1;
+>       k->is_bridge = 1;
+>       k->config_write = xio3130_downstream_write_config;
+>       k->realize = xio3130_downstream_realize;
+> diff --git a/hw/pci-bridge/xio3130_upstream.c b/hw/pci-bridge/xio3130_upstream.c
+> index 227997ce46..d4645bddee 100644
+> --- a/hw/pci-bridge/xio3130_upstream.c
+> +++ b/hw/pci-bridge/xio3130_upstream.c
+> @@ -148,7 +148,6 @@ static void xio3130_upstream_class_init(ObjectClass *klass, void *data)
+>       DeviceClass *dc = DEVICE_CLASS(klass);
+>       PCIDeviceClass *k = PCI_DEVICE_CLASS(klass);
+>   
+> -    k->is_express = 1;
+>       k->is_bridge = 1;
+>       k->config_write = xio3130_upstream_write_config;
+>       k->realize = xio3130_upstream_realize;
+> diff --git a/hw/pci-host/xilinx-pcie.c b/hw/pci-host/xilinx-pcie.c
+> index 7659253090..a4ca3ba30f 100644
+> --- a/hw/pci-host/xilinx-pcie.c
+> +++ b/hw/pci-host/xilinx-pcie.c
+> @@ -298,7 +298,6 @@ static void xilinx_pcie_root_class_init(ObjectClass *klass, void *data)
+>       k->device_id = 0x7021;
+>       k->revision = 0;
+>       k->class_id = PCI_CLASS_BRIDGE_HOST;
+> -    k->is_express = true;
+>       k->is_bridge = true;
+>       k->init = xilinx_pcie_root_init;
+>       k->exit = pci_bridge_exitfn;
+> diff --git a/hw/pci/pci.c b/hw/pci/pci.c
+> index b2d139bd9a..6b5676b0f4 100644
+> --- a/hw/pci/pci.c
+> +++ b/hw/pci/pci.c
+> @@ -2014,12 +2014,14 @@ static void pci_qdev_realize(DeviceState *qdev, Error **errp)
+>   {
+>       PCIDevice *pci_dev = (PCIDevice *)qdev;
+>       PCIDeviceClass *pc = PCI_DEVICE_GET_CLASS(pci_dev);
+> +    ObjectClass *klass = OBJECT_CLASS(pc);
+>       Error *local_err = NULL;
+>       PCIBus *bus;
+>       bool is_default_rom;
+>   
+>       /* initialize cap_present for pci_is_express() and pci_config_size() */
+> -    if (pc->is_express) {
+> +    if (object_class_dynamic_cast(klass, INTERFACE_PCIE_DEVICE) &&
+> +       !object_class_dynamic_cast(klass, INTERFACE_CONVENTIONAL_PCI_DEVICE)) {
+>           pci_dev->cap_present |= QEMU_PCI_CAP_EXPRESS;
+>       }
+>   
+> diff --git a/hw/scsi/megasas.c b/hw/scsi/megasas.c
+> index d5eae6239a..ee51feda59 100644
+> --- a/hw/scsi/megasas.c
+> +++ b/hw/scsi/megasas.c
+> @@ -2447,7 +2447,6 @@ typedef struct MegasasInfo {
+>       uint16_t subsystem_id;
+>       int ioport_bar;
+>       int mmio_bar;
+> -    bool is_express;
+>       int osts;
+>       const VMStateDescription *vmsd;
+>       Property *props;
+> @@ -2465,7 +2464,6 @@ static struct MegasasInfo megasas_devices[] = {
+>           .ioport_bar = 2,
+>           .mmio_bar = 0,
+>           .osts = MFI_1078_RM | 1,
+> -        .is_express = false,
+>           .vmsd = &vmstate_megasas_gen1,
+>           .props = megasas_properties_gen1,
+>           .interfaces = (InterfaceInfo[]) {
+> @@ -2482,7 +2480,6 @@ static struct MegasasInfo megasas_devices[] = {
+>           .ioport_bar = 0,
+>           .mmio_bar = 1,
+>           .osts = MFI_GEN2_RM,
+> -        .is_express = true,
+>           .vmsd = &vmstate_megasas_gen2,
+>           .props = megasas_properties_gen2,
+>           .interfaces = (InterfaceInfo[]) {
+> @@ -2506,7 +2503,6 @@ static void megasas_class_init(ObjectClass *oc, void *data)
+>       pc->subsystem_vendor_id = PCI_VENDOR_ID_LSI_LOGIC;
+>       pc->subsystem_id = info->subsystem_id;
+>       pc->class_id = PCI_CLASS_STORAGE_RAID;
+> -    pc->is_express = info->is_express;
+>       e->mmio_bar = info->mmio_bar;
+>       e->ioport_bar = info->ioport_bar;
+>       e->osts = info->osts;
+> diff --git a/hw/usb/hcd-xhci.c b/hw/usb/hcd-xhci.c
+> index af3a9d88de..2e4dd71248 100644
+> --- a/hw/usb/hcd-xhci.c
+> +++ b/hw/usb/hcd-xhci.c
+> @@ -3649,6 +3649,11 @@ static Property xhci_properties[] = {
+>       DEFINE_PROP_END_OF_LIST(),
+>   };
+>   
+> +static void xhci_instance_init(Object *obj)
+> +{
+> +    PCI_DEVICE(obj)->cap_present |= QEMU_PCI_CAP_EXPRESS;
+> +}
+> +
+>   static void xhci_class_init(ObjectClass *klass, void *data)
+>   {
+>       PCIDeviceClass *k = PCI_DEVICE_CLASS(klass);
+> @@ -3661,7 +3666,6 @@ static void xhci_class_init(ObjectClass *klass, void *data)
+>       k->realize      = usb_xhci_realize;
+>       k->exit         = usb_xhci_exit;
+>       k->class_id     = PCI_CLASS_SERIAL_USB;
+> -    k->is_express   = 1;
+>   }
+>   
+>   static const TypeInfo xhci_info = {
+> @@ -3669,6 +3673,7 @@ static const TypeInfo xhci_info = {
+>       .parent        = TYPE_PCI_DEVICE,
+>       .instance_size = sizeof(XHCIState),
+>       .class_init    = xhci_class_init,
+> +    .instance_init = xhci_instance_init,
+>       .abstract      = true,
+>       .interfaces = (InterfaceInfo[]) {
+>           { INTERFACE_PCIE_DEVICE },
+> diff --git a/hw/vfio/pci.c b/hw/vfio/pci.c
+> index c977ee327f..afad0c002f 100644
+> --- a/hw/vfio/pci.c
+> +++ b/hw/vfio/pci.c
+> @@ -2972,6 +2972,8 @@ static void vfio_instance_init(Object *obj)
+>       vdev->host.function = ~0U;
+>   
+>       vdev->nv_gpudirect_clique = 0xFF;
+> +
+> +    pci_dev->cap_present |= QEMU_PCI_CAP_EXPRESS;
+>   }
+>   
+>   static Property vfio_pci_dev_properties[] = {
+> @@ -3026,7 +3028,6 @@ static void vfio_pci_dev_class_init(ObjectClass *klass, void *data)
+>       pdc->exit = vfio_exitfn;
+>       pdc->config_read = vfio_pci_read_config;
+>       pdc->config_write = vfio_pci_write_config;
+> -    pdc->is_express = 1; /* We might be */
+>   }
+>   
+>   static const TypeInfo vfio_pci_dev_info = {
+> diff --git a/include/hw/pci/pci.h b/include/hw/pci/pci.h
+> index 8d02a0a383..a27be85111 100644
+> --- a/include/hw/pci/pci.h
+> +++ b/include/hw/pci/pci.h
+> @@ -236,9 +236,6 @@ typedef struct PCIDeviceClass {
+>        */
+>       int is_bridge;
+>   
+> -    /* pcie stuff */
+> -    int is_express;   /* is this device pci express? */
+> -
+>       /* rom bar */
+>       const char *romfile;
+>   } PCIDeviceClass;
+> 
 
-The original limitation comes from the fact that this define is used to limit
-the number of bits in the dirty bitmap as some architectures do not provide
-bitops beyond 2^32.
+Reviewed-by: Marcel Apfelbaum <marcel@redhat.com>
 
-> b) as I said, transparently handle it in kvm slot handling code.
-
-adding Paolo to check what he thinks.
-> 
->>>
->>> 1. I remember the name being used for migration, I might be wrong.
->>> 2. Migration of guests > 4TB is certainly broken ;)
->>>
->>> I wonder if this should rather be handled in the kvm_slot code.
->>> (silently create an manage two slots)
->>
-> 
-> 
+Thanks,
+Marcel
