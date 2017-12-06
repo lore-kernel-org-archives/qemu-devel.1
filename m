@@ -1,25 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53119)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55427)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alistai@xilinx.com>) id 1eMi9u-0000Ue-9M
-	for qemu-devel@nongnu.org; Wed, 06 Dec 2017 17:27:19 -0500
+	(envelope-from <aurelien@aurel32.net>) id 1eMiFw-0004YV-Mk
+	for qemu-devel@nongnu.org; Wed, 06 Dec 2017 17:33:33 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alistai@xilinx.com>) id 1eMi9q-0002OT-Uz
-	for qemu-devel@nongnu.org; Wed, 06 Dec 2017 17:27:18 -0500
-Received: from mail-bl2nam02on0071.outbound.protection.outlook.com
-	([104.47.38.71]:50336
-	helo=NAM02-BL2-obe.outbound.protection.outlook.com)
+	(envelope-from <aurelien@aurel32.net>) id 1eMiFv-0005qg-As
+	for qemu-devel@nongnu.org; Wed, 06 Dec 2017 17:33:32 -0500
+Received: from hall.aurel32.net ([2001:bc8:30d7:100::1]:49466)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <alistai@xilinx.com>) id 1eMi9q-0002O9-OJ
-	for qemu-devel@nongnu.org; Wed, 06 Dec 2017 17:27:14 -0500
-From: Alistair Francis <alistair.francis@xilinx.com>
-Date: Wed, 6 Dec 2017 14:22:50 -0800
-Message-ID: <08c0ac2d39768dcabb83ebe186cafdf18360151a.1512598866.git.alistair.francis@xilinx.com>
-In-Reply-To: <cover.1512598866.git.alistair.francis@xilinx.com>
-References: <cover.1512598866.git.alistair.francis@xilinx.com>
+	(Exim 4.71) (envelope-from <aurelien@aurel32.net>)
+	id 1eMiFv-0005pw-46
+	for qemu-devel@nongnu.org; Wed, 06 Dec 2017 17:33:31 -0500
+Date: Wed, 6 Dec 2017 23:33:27 +0100
+From: Aurelien Jarno <aurelien@aurel32.net>
+Message-ID: <20171206223327.GB16343@aurel32.net>
+References: <20171206093050.25308-1-alex.bennee@linaro.org>
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: [Qemu-devel] [PATCH-2.12 v2 3/3] xilinx_spips: Use memset instead
- of a for loop to zero registers
+Content-Type: text/plain; charset=iso-8859-15
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
+In-Reply-To: <20171206093050.25308-1-alex.bennee@linaro.org>
+Subject: Re: [Qemu-devel] [RFC PATCH] target/sh4/translate.c: fix TCG leak
+ during gusa sequence
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,50 +29,40 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org, edgar.iglesias@xilinx.com, edgar.iglesias@gmail.com
-Cc: alistair.francis@xilinx.com, alistair23@gmail.com, frasse.iglesias@gmail.com, frederic.konrad@adacore.com
+To: Alex =?iso-8859-15?Q?Benn=E9e?= <alex.bennee@linaro.org>
+Cc: qemu-devel@nongnu.org, 1735384@bugs.launchpad.net
 
-Use memset() instead of a for loop to zero all of the registers.
+On 2017-12-06 09:30, Alex Benn=E9e wrote:
+> This fixes bug #1735384 while running java under qemu-sh4. When debug
+> was enabled it showed a problem with TCG temps. Once fixed I was able
+> to run java -version normally.
+>=20
+> Reported-by: John Paul Adrian Glaubitz <glaubitz@physik.fu-berlin.de>
+> Suggested-by: Richard Henderson <richard.henderson@linaro.org>
+> Signed-off-by: Alex Benn=E9e <alex.bennee@linaro.org>
+> ---
+>  target/sh4/translate.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+>=20
+> diff --git a/target/sh4/translate.c b/target/sh4/translate.c
+> index 703020fe87..b4b5c822d0 100644
+> --- a/target/sh4/translate.c
+> +++ b/target/sh4/translate.c
+> @@ -2189,7 +2189,7 @@ static int decode_gusa(DisasContext *ctx, CPUSH4Sta=
+te *env, int *pmax_insns)
+>      }
+> =20
+>      /* If op_src is not a valid register, then op_arg was a constant.  */
+> -    if (op_src < 0) {
+> +    if (op_src < 0 && !TCGV_IS_UNUSED(op_arg)) {
+>          tcg_temp_free_i32(op_arg);
+>      }
 
-Signed-off-by: Alistair Francis <alistair.francis@xilinx.com>
-Reviewed-by: KONRAD Frederic <frederic.konrad@adacore.com>
-Reviewed-by: Francisco Iglesias <frasse.iglesias@gmail.com>
----
+I guess this happens when trying to match the exchange pattern, so this
+looks correct to me.
 
- hw/ssi/xilinx_spips.c | 11 +++--------
- 1 file changed, 3 insertions(+), 8 deletions(-)
+Reviewed-by: Aurelien Jarno <aurelien@aurel32.net>
 
-diff --git a/hw/ssi/xilinx_spips.c b/hw/ssi/xilinx_spips.c
-index b8182cfd74..59d42bfce7 100644
---- a/hw/ssi/xilinx_spips.c
-+++ b/hw/ssi/xilinx_spips.c
-@@ -329,10 +329,7 @@ static void xilinx_spips_reset(DeviceState *d)
- {
-     XilinxSPIPS *s = XILINX_SPIPS(d);
- 
--    int i;
--    for (i = 0; i < XLNX_SPIPS_R_MAX; i++) {
--        s->regs[i] = 0;
--    }
-+    memset(s->regs, 0, sizeof(s->regs));
- 
-     fifo8_reset(&s->rx_fifo);
-     fifo8_reset(&s->rx_fifo);
-@@ -357,13 +354,11 @@ static void xilinx_spips_reset(DeviceState *d)
- static void xlnx_zynqmp_qspips_reset(DeviceState *d)
- {
-     XlnxZynqMPQSPIPS *s = XLNX_ZYNQMP_QSPIPS(d);
--    int i;
- 
-     xilinx_spips_reset(d);
- 
--    for (i = 0; i < XLNX_ZYNQMP_SPIPS_R_MAX; i++) {
--        s->regs[i] = 0;
--    }
-+    memset(s->regs, 0, sizeof(s->regs));
-+
-     fifo8_reset(&s->rx_fifo_g);
-     fifo8_reset(&s->rx_fifo_g);
-     fifo32_reset(&s->fifo_g);
--- 
-2.14.1
+--=20
+Aurelien Jarno                          GPG: 4096R/1DDD8C9B
+aurelien@aurel32.net                 http://www.aurel32.net
