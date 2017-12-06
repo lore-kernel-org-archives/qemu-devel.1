@@ -1,28 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39030)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39703)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pradeep.jagadeesh@huawei.com>) id 1eMdFH-0001fi-H5
-	for qemu-devel@nongnu.org; Wed, 06 Dec 2017 12:12:37 -0500
+	(envelope-from <armbru@redhat.com>) id 1eMdGX-0002R8-6S
+	for qemu-devel@nongnu.org; Wed, 06 Dec 2017 12:13:50 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pradeep.jagadeesh@huawei.com>) id 1eMdFC-0001LJ-IX
-	for qemu-devel@nongnu.org; Wed, 06 Dec 2017 12:12:31 -0500
-Received: from lhrrgout.huawei.com ([194.213.3.17]:33226 helo=huawei.com)
+	(envelope-from <armbru@redhat.com>) id 1eMdGS-0002bw-Kh
+	for qemu-devel@nongnu.org; Wed, 06 Dec 2017 12:13:49 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:40112)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pradeep.jagadeesh@huawei.com>)
-	id 1eMdFC-0001KE-CK
-	for qemu-devel@nongnu.org; Wed, 06 Dec 2017 12:12:26 -0500
-References: <1506954812-6552-1-git-send-email-pradeep.jagadeesh@huawei.com>
-	<20171206170705.37cda561@bahia.lan>
-	<9a0067d4-100b-b3eb-d38e-a99ab885e215@huawei.com>
-	<84bafe13-7e56-4aa5-cf48-edadd9c2d579@redhat.com>
-From: Pradeep Jagadeesh <pradeep.jagadeesh@huawei.com>
-Message-ID: <bc7a364b-03a0-529a-870f-340daca26afb@huawei.com>
-Date: Wed, 6 Dec 2017 18:12:13 +0100
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1eMdGS-0002ZE-CR
+	for qemu-devel@nongnu.org; Wed, 06 Dec 2017 12:13:44 -0500
+From: Markus Armbruster <armbru@redhat.com>
+References: <20170911110623.24981-1-marcandre.lureau@redhat.com>
+	<20170911110623.24981-7-marcandre.lureau@redhat.com>
+Date: Wed, 06 Dec 2017 18:13:39 +0100
+In-Reply-To: <20170911110623.24981-7-marcandre.lureau@redhat.com>
+	(=?utf-8?Q?=22Marc-Andr=C3=A9?=
+	Lureau"'s message of "Mon, 11 Sep 2017 13:05:39 +0200")
+Message-ID: <87h8t3wzi4.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-In-Reply-To: <84bafe13-7e56-4aa5-cf48-edadd9c2d579@redhat.com>
-Content-Type: text/plain; charset="utf-8"; format=flowed
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v13 0/6] fsdev: qmp interface for io
- throttling
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v3 06/50] qapi: pass 'if' condition into
+ QAPISchemaEntity objects
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,40 +30,111 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>, Greg Kurz <groug@kaod.org>, Pradeep
-	Jagadeesh <pradeepkiruvale@gmail.com>
-Cc: alberto garcia <berto@igalia.com>, Markus Armbruster <armbru@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Manos Pitsidianakis <el13635@mail.ntua.gr>, jani kokkonen <jani.kokkonen@huawei.com>, qemu-devel@nongnu.org
+To: =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>
+Cc: qemu-devel@nongnu.org, Michael Roth <mdroth@linux.vnet.ibm.com>
 
-On 12/6/2017 5:49 PM, Eric Blake wrote:
-> On 12/06/2017 10:15 AM, Pradeep Jagadeesh wrote:
->
->>> I didn't have time to follow the thread, but it's been a month without
->>> activity... where do we stand now ? I've merged I/O throttle for fsdev
->>> in 2.9, is there a chance we get the QMP/HMP part in 2.12 ?
->>
->> Hi Greg,
->>
->> Yes, I am waiting for Eric's reply. Because there were some issues when
->> I merged code with Manos's throttlelimits code. So, I am waiting to see
->> how to go about it. It needs some changes to reuse in fsdev/blk qmp
->> code. I am very much would like to push qmp code upstream.
->
-> We missed the window of opportunity to unify any differences in
-> interfaces between what Manos added in 2.11 and your code, now that 2.11
-> is at -rc4.  That means we are stuck with two slightly different
-> interface; although it would still be nice to have glue code that can
-> convert into and out of a preferred form, so that the bulk of the code
-> can be common operations on the preferred struct.
->
-> At this point, I don't know what additional information you want from
-> myself or Markus on the interface front; it may be easier to post a
-> rebased v14 and tackle it from there (even if it means our interface is
-> still in a state of churn).
-Thanks for the quick reply. The problem is with the block devices 
-code.So I was thinking to pull out those patches and just go ahead with 
-the fsdev. I can directly use Manos code directly without any changes in 
-fsdev case.So, I would like to go ahead and post v14 patches.
+Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com> writes:
 
-Regards,
-Pradeep
+> Built-in objects remain unconditional.  Explicitly defined objects
+> use the condition specified in the schema.  Implicitly defined
+> objects inherit their condition from their users.  For most of them,
+> there is exactly one user, so the condition to use is obvious.  The
+> exception is the wrapper types generated for simple union variants,
+> which can be shared by any number of simple unions.  The tight
+> condition would be the disjunction of the conditions of these simple
+> unions.  For now, use wrapped type's condition instead.  Much
+
+the wrapped type's
+
+> simpler and good enough for now.
 >
+> Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+> ---
+>  scripts/qapi.py | 89 ++++++++++++++++++++++++++++++++++++---------------=
+------
+>  1 file changed, 57 insertions(+), 32 deletions(-)
+>
+> diff --git a/scripts/qapi.py b/scripts/qapi.py
+> index 20c1abf915..0f55caa18d 100644
+> --- a/scripts/qapi.py
+> +++ b/scripts/qapi.py
+> @@ -1000,7 +1000,7 @@ def check_exprs(exprs):
+>  #
+>=20=20
+>  class QAPISchemaEntity(object):
+> -    def __init__(self, name, info, doc):
+> +    def __init__(self, name, info, doc, ifcond=3DNone):
+>          assert isinstance(name, str)
+>          self.name =3D name
+>          # For explicitly defined entities, info points to the (explicit)
+> @@ -1010,6 +1010,7 @@ class QAPISchemaEntity(object):
+>          # such place).
+>          self.info =3D info
+>          self.doc =3D doc
+> +        self.ifcond =3D ifcond
+>=20=20
+>      def c_name(self):
+>          return c_name(self.name)
+> @@ -1126,8 +1127,8 @@ class QAPISchemaBuiltinType(QAPISchemaType):
+>=20=20
+>=20=20
+>  class QAPISchemaEnumType(QAPISchemaType):
+> -    def __init__(self, name, info, doc, values, prefix):
+> -        QAPISchemaType.__init__(self, name, info, doc)
+> +    def __init__(self, name, info, doc, ifcond, values, prefix):
+> +        QAPISchemaType.__init__(self, name, info, doc, ifcond)
+>          for v in values:
+>              assert isinstance(v, QAPISchemaMember)
+>              v.set_owner(name)
+> @@ -1162,7 +1163,7 @@ class QAPISchemaEnumType(QAPISchemaType):
+>=20=20
+>  class QAPISchemaArrayType(QAPISchemaType):
+>      def __init__(self, name, info, element_type):
+> -        QAPISchemaType.__init__(self, name, info, None)
+> +        QAPISchemaType.__init__(self, name, info, None, None)
+>          assert isinstance(element_type, str)
+>          self._element_type_name =3D element_type
+>          self.element_type =3D None
+> @@ -1170,6 +1171,7 @@ class QAPISchemaArrayType(QAPISchemaType):
+>      def check(self, schema):
+>          self.element_type =3D schema.lookup_type(self._element_type_name)
+>          assert self.element_type
+> +        self.ifcond =3D self.element_type.ifcond
+>=20=20
+>      def is_implicit(self):
+>          return True
+
+In my review of v2, I wrote:
+
+    This is subtler than it looks on first glance.
+
+    All the other entities set self.ifcond in their constructor to the true
+    value passed in as argument.
+
+    QAPISchemaArrayType doesn't take such an argument.  Instead, it inherits
+    its .ifcond from its .element_type.  However, .element_type isn't known
+    at construction time if it's a forward reference.  We therefore delay
+    setting it until .check() time.  You do the same for .ifcond (no
+    choice).
+
+    Before .check(), .ifcond is None, because the constructor sets it that
+    way: it calls QAPISchemaType.__init__() without passing a ifcond
+    argument, which then sets self.ifcond to its default argument None.
+
+    Pitfall: accessing ent.ifcond before ent.check() works *except* when ent
+    is an array type.  Hmm.
+
+The problem is of course more general.  We commonly initialize
+attributes to None in .init(), then set their real value in .check().
+Accessing the attribute before .check() yields None.  If we're lucky,
+the code that accesses the attribute prematurely chokes on None.
+
+It won't for .ifcond, because None is a legitimate value.
+
+Perhaps we should leave such attributes undefined until .check().  What
+do you think?  No need to tie that idea to this series, though.
+
+[...]
+
+With the commit message tidied up:
+Reviewed-by: Markus Armbruster <armbru@redhat.com>
