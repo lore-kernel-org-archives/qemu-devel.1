@@ -1,32 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39967)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41843)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <yang.zhong@intel.com>) id 1eMVyw-0003Ea-Ue
-	for qemu-devel@nongnu.org; Wed, 06 Dec 2017 04:27:11 -0500
+	(envelope-from <vsementsov@virtuozzo.com>) id 1eMW2E-0006mc-OH
+	for qemu-devel@nongnu.org; Wed, 06 Dec 2017 04:30:40 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <yang.zhong@intel.com>) id 1eMVyt-0006Bd-PF
-	for qemu-devel@nongnu.org; Wed, 06 Dec 2017 04:27:10 -0500
-Received: from mga06.intel.com ([134.134.136.31]:13745)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <yang.zhong@intel.com>)
-	id 1eMVyt-0006A3-F0
-	for qemu-devel@nongnu.org; Wed, 06 Dec 2017 04:27:07 -0500
-Date: Wed, 6 Dec 2017 17:26:25 +0800
-From: Yang Zhong <yang.zhong@intel.com>
-Message-ID: <20171206092625.GA19639@yangzhon-Virtual>
-References: <1511505030-3669-1-git-send-email-yang.zhong@intel.com>
-	<5A1A5C6E.9060409@huawei.com>
-	<20171201105622.GB26237@yangzhon-Virtual>
-	<74cccd14-e485-90d4-82d9-03355c05faca@redhat.com>
-	<20171204120322.GA32151@yangzhon-Virtual>
-	<5A253EF5.6040300@huawei.com>
-	<20171205060047.GA4102@yangzhon-Virtual>
-	<024fd897-a16a-f69e-94dc-07affb3ef724@redhat.com>
+	(envelope-from <vsementsov@virtuozzo.com>) id 1eMW2A-0000dL-D2
+	for qemu-devel@nongnu.org; Wed, 06 Dec 2017 04:30:34 -0500
+References: <20171128071409.21887-1-vsementsov@virtuozzo.com>
+	<20171128071409.21887-4-vsementsov@virtuozzo.com>
+	<59dccfee-7c47-61d0-40a0-b67f0b7fd8cf@redhat.com>
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Message-ID: <f0b9ce3e-0912-d6ee-ff7c-c5254a3f8103@virtuozzo.com>
+Date: Wed, 6 Dec 2017 12:30:09 +0300
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <024fd897-a16a-f69e-94dc-07affb3ef724@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v3] rcu: reduce more than 7MB heap memory
- by malloc_trim()
+In-Reply-To: <59dccfee-7c47-61d0-40a0-b67f0b7fd8cf@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
+Content-Language: en-US
+Subject: Re: [Qemu-devel] [Qemu-block] [PATCH 3/4] scripts/qemu.py: tiny
+ enhancement for event_wiat
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,88 +26,67 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>, stefanha@redhat.com, berrange@redhat.com
-Cc: qemu-devel@nongnu.org, weidong.huang@huawei.com, arei.gonglei@huawei.com, liujunjie23@huawei.com, wangxinxin.wang@huawei.com, stone.xulei@huawei.com, yang.zhong@intel.com, zhaoshenglong@huawei.com
+To: John Snow <jsnow@redhat.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org
+Cc: kwolf@redhat.com, ehabkost@redhat.com, mreitz@redhat.com, crosa@redhat.com, den@openvz.org
 
-On Tue, Dec 05, 2017 at 03:10:23PM +0100, Paolo Bonzini wrote:
-> On 05/12/2017 07:00, Yang Zhong wrote:
-> > On Mon, Dec 04, 2017 at 08:26:29PM +0800, Shannon Zhao wrote:
-> >> Hi Yang,
-> >>
-> >> On 2017/12/4 20:03, Yang Zhong wrote:
-> >>> On Fri, Dec 01, 2017 at 01:52:49PM +0100, Paolo Bonzini wrote:
-> >>>>> On 01/12/2017 11:56, Yang Zhong wrote:
-> >>>>>>>   This issue should be caused by much times of system call by malloc_trim(),
-> >>>>>>>   Shannon's test script include 60 scsi disks and 31 ioh3420 devices. We need 
-> >>>>>>>   trade-off between VM perforamance and memory optimization. Whether below 
-> >>>>>>>   method is suitable?
-> >>>>>>>
-> >>>>>>>   int num=1;
-> >>>>>>>   ......
-> >>>>>>>
-> >>>>>>>   #if defined(CONFIG_MALLOC_TRIM)
-> >>>>>>>         if(!(num++%5))
-> >>>>>>>         {
-> >>>>>>>              malloc_trim(4 * 1024 * 1024);
-> >>>>>>>         }
-> >>>>>>>   #endif
-> >>>>>>>  
-> >>>>>>>   Any comments are welcome! Thanks a lot!
-> >>>>>
-> >>>>> Indeed something like this will do, perhaps only trim once per second?
-> >>>>>
-> >>>   Hello Paolo,
-> >>>
-> >>>   Thanks for comments!
-> >>>   If we do trim once per second, maybe the frequency is a little high, what'e
-> >>>   more, we need maintain one timer to call this, this also cost cpu resource.
-> >>>
-> >>>   I added the log and did the test here with my test qemu command, when VM bootup,
-> >>>   which did more than 600 times free operations and 9 times memory trim in rcu 
-> >>>   thread. If i use our ClearContainer qemu command, the memory trim will down 
-> >>>   to 6 times. As for Shannon's test command, the malloc trim number will abosultly 
-> >>>   increse.
-> >>>
-> >>>   In my above method, the trim is only executed in the multiple of 5, which will
-> >>>   reduce trim times and do not heavily impact VM bootup performance. 
-> >>>
-> >>>   I also want to use synchronize_rcu() and free() to replace call_rcu(), but this
-> >>>   method serialize to malloc() and free(), which will reduce VM performance.
-> >>>
-> >>>   The ultimate aim is to reduce trim system call during the VM bootup and running.
-> >>>   It's appreciated that if you have better suggestions.
-> >>
-> >> Maybe we can provide a QMP command or something else for user to trim
-> >> the heap manually like the kernel sysfs interface
-> >> /proc/sys/vm/drop_caches which provides an interface for user to drop
-> >> the caches.
-> >> So let user to decide whether it needs to trim the heap.
-> >>
-> >   Hello Shannon,
-> > 
-> >   Thanks for your comments!
-> >   This is also a good solution by QMP interface, but this is only suitable for few VMs.
-> >   If there are millions of VMs in CSP(clouds of provider), it is very hard to operate.
-> >   Thanks!
-> 
-> I agree, we only need to tweak the conditions under which malloc_trim is
-> called.
-> 
+06.12.2017 01:59, John Snow wrote:
+>
+> On 11/28/2017 02:14 AM, Vladimir Sementsov-Ogievskiy wrote:
+>> - add comment
+>> - allow int timeout and disallow bool (which has special
+>>    meaning for pull_event())
+>> - remove unreachable 'return None'
+>>
+>> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+>> ---
+>>   scripts/qemu.py | 10 +++++++---
+>>   1 file changed, 7 insertions(+), 3 deletions(-)
+>>
+>> diff --git a/scripts/qemu.py b/scripts/qemu.py
+>> index 9bfdf6d37d..8763335254 100644
+>> --- a/scripts/qemu.py
+>> +++ b/scripts/qemu.py
+>> @@ -291,7 +291,13 @@ class QEMUMachine(object):
+>>           branch processing on match's value None
+>>              {"foo": {"bar": 1}} matches {"foo": None}
+>>              {"foo": {"bar": 1}} does not matches {"foo": {"baz": None}}
+>> +
+>> +        @raise QMPTimeoutError: If timeout period elapses.
+>> +        @raise QMPConnectError: If some other error occurred.
+>>           '''
+>> +
+>> +        assert isinstance(timeout, float) or isinstance(timeout, int)
+>> +
+>>           def event_match(event, match=None):
+>>               if match is None:
+>>                   return True
+>> @@ -316,13 +322,11 @@ class QEMUMachine(object):
+>>   
+>>           # Poll for new events
+>>           while True:
+>> -            event = self._qmp.pull_event(wait=timeout)
+>> +            event = self._qmp.pull_event(wait=float(timeout))
+> Before this patch you *could* ask for no timeout, and this would block
+> waiting for an event. After, you can't.
+>
+> Are you making the argument that it is *never* correct to ask for no
+> timeout?
 
-  Hello Paolo,
+hm, you are right, I'll fix.
 
-  The best option is only trim one time after guest kernel bootup or VM bootup, and as for
-  hotplug/unhotplug operations during the VM running, the trim still can do for each batch
-  memory free because trim will not impact VM performance during VM running status.
-
-  So, the key point is qemu is hard to know when guest ernel bootup is over. If you have some 
-  suggestions, please let me know. thanks!
-
-  Regards,
-
-  Yang
+>
+>>               if (event['event'] == name) and event_match(event, match):
+>>                   return event
+>>               self._events.append(event)
+>>   
+>> -        return None
+>> -
+>>       def get_log(self):
+>>           '''
+>>           After self.shutdown or failed qemu execution, this returns the output
+>>
 
 
-> Thanks,
-> 
-> Paolo
+-- 
+Best regards,
+Vladimir
