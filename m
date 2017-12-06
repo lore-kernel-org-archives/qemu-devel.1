@@ -1,27 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56214)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33395)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mikhail.abakumov@ispras.ru>) id 1eMVYy-0005vx-2W
-	for qemu-devel@nongnu.org; Wed, 06 Dec 2017 04:00:24 -0500
+	(envelope-from <kwolf@redhat.com>) id 1eMVl4-0003dt-GN
+	for qemu-devel@nongnu.org; Wed, 06 Dec 2017 04:12:51 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mikhail.abakumov@ispras.ru>) id 1eMVYr-0006I9-Ry
-	for qemu-devel@nongnu.org; Wed, 06 Dec 2017 04:00:20 -0500
-Received: from mail.ispras.ru ([83.149.199.45]:60636)
-	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mikhail.abakumov@ispras.ru>) id 1eMVYr-0006Gr-Fp
-	for qemu-devel@nongnu.org; Wed, 06 Dec 2017 04:00:13 -0500
+	(envelope-from <kwolf@redhat.com>) id 1eMVl1-0005Ld-AG
+	for qemu-devel@nongnu.org; Wed, 06 Dec 2017 04:12:50 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:46158)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <kwolf@redhat.com>) id 1eMVl1-0005L4-4L
+	for qemu-devel@nongnu.org; Wed, 06 Dec 2017 04:12:47 -0500
+Date: Wed, 6 Dec 2017 10:12:43 +0100
+From: Kevin Wolf <kwolf@redhat.com>
+Message-ID: <20171206091243.GC4207@localhost.localdomain>
+References: <CAJqJJggWTki8i_U7xr2oRSFR4sZt4eK5hRO+B55iOYVMyfGwDg@mail.gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8;
- format=flowed
-Date: Wed, 06 Dec 2017 12:00:09 +0300
-From: Mihail Abakumov <mikhail.abakumov@ispras.ru>
-In-Reply-To: <CABdb736HfN5GK1QZX4vsDKSUr_fGHXX9SA-gd85PdA20Duys3Q@mail.gmail.com>
-References: <151127322955.6888.16198535123422076171.stgit@Misha-PC.lan02.inno>
-	<151127345586.6888.4109654104815822158.stgit@Misha-PC.lan02.inno>
-	<CABdb736HfN5GK1QZX4vsDKSUr_fGHXX9SA-gd85PdA20Duys3Q@mail.gmail.com>
-Message-ID: <60c91bd3021b2e98e2a6c24d28509476@ispras.ru>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v3 39/45] windbg: implemented
- kd_api_get_version
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CAJqJJggWTki8i_U7xr2oRSFR4sZt4eK5hRO+B55iOYVMyfGwDg@mail.gmail.com>
+Subject: Re: [Qemu-devel] About [PULL 20/25] block: Guard against NULL
+ bs->drv
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,96 +27,66 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Ladi Prosek <lprosek@redhat.com>
-Cc: qemu-devel <qemu-devel@nongnu.org>, sw@weilnetz.de, Pavel Dovgalyuk <dovgaluk@ispras.ru>, Roman Kagan <rkagan@virtuozzo.com>, Paolo Bonzini <pbonzini@redhat.com>, "Denis V. Lunev" <den@openvz.org>
+To: Kangjie Xi <imxikangjie@gmail.com>
+Cc: qemu-devel@nongnu.org, mreitz@redhat.com
 
-Ladi Prosek =D0=BF=D0=B8=D1=81=D0=B0=D0=BB 2017-11-29 11:14:
-> On Tue, Nov 21, 2017 at 3:10 PM, Mihail Abakumov
-> <mikhail.abakumov@ispras.ru> wrote:
->> Signed-off-by: Mihail Abakumov <mikhail.abakumov@ispras.ru>
->> Signed-off-by: Pavel Dovgalyuk <dovgaluk@ispras.ru>
->> Signed-off-by: Dmitriy Koltunov <koltunov@ispras.ru>
->> ---
->>  include/exec/windbgstub-utils.h |    1 +
->>  windbgstub-utils.c              |   22 ++++++++++++++++++++++
->>  windbgstub.c                    |    4 ++++
->>  3 files changed, 27 insertions(+)
->>=20
->> diff --git a/include/exec/windbgstub-utils.h=20
->> b/include/exec/windbgstub-utils.h
->> index be48f69f40..bc5b6a8468 100755
->> --- a/include/exec/windbgstub-utils.h
->> +++ b/include/exec/windbgstub-utils.h
->> @@ -99,6 +99,7 @@ void kd_api_read_io_space(CPUState *cpu, PacketData=20
->> *pd);
->>  void kd_api_write_io_space(CPUState *cpu, PacketData *pd);
->>  void kd_api_read_physical_memory(CPUState *cpu, PacketData *pd);
->>  void kd_api_write_physical_memory(CPUState *cpu, PacketData *pd);
->> +void kd_api_get_version(CPUState *cpu, PacketData *pd);
->>  void kd_api_unsupported(CPUState *cpu, PacketData *pd);
->>=20
->>  SizedBuf kd_gen_exception_sc(CPUState *cpu);
->> diff --git a/windbgstub-utils.c b/windbgstub-utils.c
->> index 6708e62798..7ef301bac7 100755
->> --- a/windbgstub-utils.c
->> +++ b/windbgstub-utils.c
->> @@ -239,6 +239,28 @@ void kd_api_write_physical_memory(CPUState *cpu,=20
->> PacketData *pd)
->>      stl_p(&mem->ActualBytesWritten, len);
->>  }
->>=20
->> +void kd_api_get_version(CPUState *cpu, PacketData *pd)
->> +{
->> +    DBGKD_GET_VERSION64 *kdver;
->> +    int err =3D cpu_memory_rw_debug(cpu, version.addr, PTR(pd->m64) +=
-=20
->> 0x10,
->> +                                  sizeof(DBGKD_MANIPULATE_STATE64) -=20
->> 0x10, 0);
->> +    if (!err) {
->> +        kdver =3D (DBGKD_GET_VERSION64 *) (PTR(pd->m64) + 0x10);
->> +
->> +        stw_p(&kdver->MajorVersion, kdver->MajorVersion);
->> +        stw_p(&kdver->MinorVersion, kdver->MinorVersion);
->> +        stw_p(&kdver->Flags, kdver->Flags);
->> +        stw_p(&kdver->MachineType, kdver->MachineType);
->> +        stw_p(&kdver->Unused[0], kdver->Unused[0]);
->> +        sttul_p(&kdver->KernBase, kdver->KernBase);
->> +        sttul_p(&kdver->PsLoadedModuleList,=20
->> kdver->PsLoadedModuleList);
->> +        sttul_p(&kdver->DebuggerDataList, kdver->DebuggerDataList);
->> +    } else {
->> +        pd->m64.ReturnStatus =3D STATUS_UNSUCCESSFUL;
->=20
-> The ReturnStatus field must be written using st* as well. You have
-> this direct write in many functions.
->=20
+Am 06.12.2017 um 08:28 hat Kangjie Xi geschrieben:
+> Hi,
+> 
+> I encountered a qemu-nbd segfault, finally I found it was caused by
+> NULL bs-drv,  which is located in block/io.c function bdrv_co_flush
+> line 2377:
+> 
+> https://git.qemu.org/?p=qemu.git;a=blob;f=block/io.c;h=4fdf93a0144fa4761a14b8cc6b2a9a6b6e5d5bec;hb=d470ad42acfc73c45d3e8ed5311a491160b4c100#l2377
+> 
+> It is before the patch at line 2402, so the patch needs to be updated
+> to fix NULL bs-drv at line 2337.
+> 
+> https://lists.gnu.org/archive/html/qemu-devel/2017-11/msg03425.html
 
-I'm doing stl_p for status before sending of packet in the=20
-'windbg_process_manipulate_packet',
-because this is a global field of structure. Is that bad?
+Can you please post a full backtrace? Do you see any error message
+on stderr before the process crashes?
 
->> +        WINDBG_ERROR("get_version: " FMT_ERR, err);
->> +    }
->> +}
->> +
->>  void kd_api_unsupported(CPUState *cpu, PacketData *pd)
->>  {
->>      WINDBG_ERROR("Caught unimplemented api %s",
->> diff --git a/windbgstub.c b/windbgstub.c
->> index 72324ae53d..ddca290694 100755
->> --- a/windbgstub.c
->> +++ b/windbgstub.c
->> @@ -197,6 +197,10 @@ static void=20
->> windbg_process_manipulate_packet(ParsingContext *ctx)
->>          kd_api_write_physical_memory(cpu, &ctx->data);
->>          break;
->>=20
->> +    case DbgKdGetVersionApi:
->> +        kd_api_get_version(cpu, &ctx->data);
->> +        break;
->> +
->>      case DbgKdClearAllInternalBreakpointsApi:
->>          return;
->>=20
->>=20
+I don't see at the moment how this can happen, except the case that Max
+mentioned where bs->drv = NULL is set when an image corruption is
+detected - this involves an error message, though.
+
+We check bdrv_is_inserted() as the first thing, which includes a NULL
+check for bs->drv. So it must have been non-NULL at the start of the
+function and then become NULL. I suppose this can theoretically happen
+in qemu_co_queue_wait() if another flush request detects image
+corruption.
+
+Max: I think bs->drv = NULL in the middle of a request was a stupid
+idea. In fact, it's already a stupid idea to have any BDS with
+bs->drv = NULL. Maybe it would be better to schedule a BH that replaces
+the qcow2 node with a dummy node (null-co?) and properly closes the
+qcow2 one.
+
+Kevin
+
+> > @@ -2373,6 +2399,12 @@ int coroutine_fn bdrv_co_flush(BlockDriverState *bs)
+> >      }
+> >
+> >      BLKDBG_EVENT(bs->file, BLKDBG_FLUSH_TO_DISK);
+> > +    if (!bs->drv) {
+> > +        /* bs->drv->bdrv_co_flush() might have ejected the BDS
+> > +         * (even in case of apparent success) */
+> > +        ret = -ENOMEDIUM;
+> > +        goto out;
+> > +    }
+> >      if (bs->drv->bdrv_co_flush_to_disk) {
+> >          ret = bs->drv->bdrv_co_flush_to_disk(bs);
+> >      } else if (bs->drv->bdrv_aio_flush) {
+> 
+> I have tested the latest qemu-2.11.0-rc2 and I am sure the qemu-nbd
+> segfault is caused by NULL bs-drv in block/io.c line 2337.
+> 
+> kernel: qemu-nbd[18768]: segfault at f8 ip 000055a24f7536a7 sp
+> 00007f59b1137a40 error 4 in qemu-nbd[55a24f6d1000+188000]
+> 
+> However I have no methods to reproduce the segfault manually, the
+> qemu-nbd segfaut just occurs in my server cluster every week.
+> 
+> Thanks
+> -Kangjie
