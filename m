@@ -1,23 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34642)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36786)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1eMWkr-0008FT-D6
-	for qemu-devel@nongnu.org; Wed, 06 Dec 2017 05:16:44 -0500
+	(envelope-from <batuzovk@ispras.ru>) id 1eMWpN-0002Er-IH
+	for qemu-devel@nongnu.org; Wed, 06 Dec 2017 05:21:22 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1eMWko-0007ZL-5O
-	for qemu-devel@nongnu.org; Wed, 06 Dec 2017 05:16:41 -0500
-Date: Wed, 6 Dec 2017 21:03:46 +1100
-From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20171206100346.GZ3057@umbus.fritz.box>
-References: <1512488477-209071-1-git-send-email-imammedo@redhat.com>
-	<20171206001406.GP3057@umbus.fritz.box>
-	<20171206105732.050435da@redhat.com>
+	(envelope-from <batuzovk@ispras.ru>) id 1eMWpK-0001xD-B7
+	for qemu-devel@nongnu.org; Wed, 06 Dec 2017 05:21:21 -0500
+Received: from bran.ispras.ru ([83.149.199.196]:55232 helo=smtp.ispras.ru)
+	by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <batuzovk@ispras.ru>) id 1eMWpJ-0001vk-NE
+	for qemu-devel@nongnu.org; Wed, 06 Dec 2017 05:21:18 -0500
+Date: Wed, 6 Dec 2017 13:21:16 +0300 (MSK)
+From: Kirill Batuzov <batuzovk@ispras.ru>
+In-Reply-To: <20171121212534.5177-6-richard.henderson@linaro.org>
+Message-ID: <alpine.DEB.2.20.1712061300570.7159@bulbul.intra.ispras.ru>
+References: <20171121212534.5177-1-richard.henderson@linaro.org>
+	<20171121212534.5177-6-richard.henderson@linaro.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="E9SPMlsjsjqOlA3h"
-Content-Disposition: inline
-In-Reply-To: <20171206105732.050435da@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH 2.12] spapr: replace numa_get_node() with
- lookup in pc-dimm list
+Content-Type: text/plain; charset=US-ASCII
+Subject: Re: [Qemu-devel] [PATCH v6 05/26] tcg: Add generic vector expanders
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,88 +26,204 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Igor Mammedov <imammedo@redhat.com>
-Cc: qemu-devel@nongnu.org, agraf@suse.de, ehabkost@redhat.com, qemu-ppc@nongnu.org
+To: Richard Henderson <richard.henderson@linaro.org>
+Cc: qemu-devel@nongnu.org
+
+On Tue, 21 Nov 2017, Richard Henderson wrote:
+
+> diff --git a/tcg/tcg-op-gvec.c b/tcg/tcg-op-gvec.c
+> new file mode 100644
+> index 0000000000..925c293f9c
+> --- /dev/null
+> +++ b/tcg/tcg-op-gvec.c
+
+<...>
+
+> +/* Set OPRSZ bytes at DOFS to replications of IN or IN_C.  */
+> +static void do_dup_i32(unsigned vece, uint32_t dofs, uint32_t oprsz,
+> +                       uint32_t maxsz, TCGv_i32 in, uint32_t in_c,
+> +                       void (*ool)(TCGv_ptr, TCGv_i32, TCGv_i32))
+> +{
+> +    TCGv_vec t_vec;
+> +    uint32_t i;
+> +
+> +    if (TCG_TARGET_HAS_v256 && check_size_impl(oprsz, 32)) {
+> +        t_vec = tcg_temp_new_vec(TCG_TYPE_V256);
+> +    } else if (TCG_TARGET_HAS_v128 && check_size_impl(oprsz, 16)) {
+> +        t_vec = tcg_temp_new_vec(TCG_TYPE_V128);
+> +    } else if (TCG_TARGET_HAS_v64 && check_size_impl(oprsz, 8)) {
+> +        t_vec = tcg_temp_new_vec(TCG_TYPE_V64);
+> +    } else  {
+> +        TCGv_i32 t_i32 = in ? in : tcg_const_i32(in_c);
+> +
+> +        if (check_size_impl(oprsz, 4)) {
+> +            for (i = 0; i < oprsz; i += 4) {
+> +                tcg_gen_st_i32(t_i32, cpu_env, dofs + i);
+> +            }
+
+You are ignoring VECE argument here and always duplicate a 32-bit value.
+For this to be correct for smaller VECE, you need to prepare this 32-bit
+value beforehand. The current code produces incorrect expansion:
+
+IN: 
+0x004005e8:  d2824682  movz     x2, #0x1234
+0x004005ec:  4e010c41  dup      v1.16b, w2
+
+OP:
+
+ ---- 00000000004005e8 0000000000000000 0000000000000000
+ movi_i64 x2,$0x1234
+
+ ---- 00000000004005ec 0000000000000000 0000000000000000
+ st_i32 x2,env,$0x8b0
+ st_i32 x2,env,$0x8b4
+ st_i32 x2,env,$0x8b8
+ st_i32 x2,env,$0x8bc
 
 
---E9SPMlsjsjqOlA3h
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
 
-On Wed, Dec 06, 2017 at 10:57:32AM +0100, Igor Mammedov wrote:
-> On Wed, 6 Dec 2017 11:14:06 +1100
-> David Gibson <david@gibson.dropbear.id.au> wrote:
->=20
-> > On Tue, Dec 05, 2017 at 04:41:17PM +0100, Igor Mammedov wrote:
-> > > SPAPR is the last user of numa_get_node() and a bunch of
-> > > supporting code to maintain numa_info[x].addr list.
-> > >=20
-> > > Get LMB node id from pc-dimm list, which allows to
-> > > remove ~80LOC maintaining dynamic address range
-> > > lookup list.
-> > >=20
-> > > It also removes pc-dimm dependency on numa_[un]set_mem_node_id()
-> > > and makes pc-dimms a sole source of information about which
-> > > node it belongs to and removes duplicate data from global
-> > > numa_info.
-> > >=20
-> > > Signed-off-by: Igor Mammedov <imammedo@redhat.com>
-> > > ---
-> > > Beside making code simpler, my interest in simplification
-> > > lies in allowing calling parse_numa_opts() multiple times,
-> > > without complex cleanups in case NUMA config is changed
-> > > since startup.
-> > >=20
-> > > PS:
-> > > build tested only
-> > > ---
-> > >  include/sysemu/numa.h | 10 ------
-> > >  hw/mem/pc-dimm.c      |  2 --
-> > >  hw/ppc/spapr.c        | 29 +++++++++++++++-
-> > >  numa.c                | 94 -----------------------------------------=
-----------
-> > >  4 files changed, 28 insertions(+), 107 deletions(-) =20
-> >=20
-> > Applied to ppc-for-2.12.
-> Thanks
->=20
-> >=20
-> > It definitely seems like an improvement over what we have.  Looking
-> > back at the DIMM list from QMP in the loop seems a little roundabout
-> > though.  Maybe we'd be better stepping through the DIMMs, then
-> > stepping through the LMBs within each DIMM, rather than just stepping
-> > through the LMBs directly.
-> Surely that would be better, maybe someone from ppc side would take care
-> of it.
+> +            if (in == NULL) {
+> +                tcg_temp_free_i32(t_i32);
+> +            }
+> +            goto done;
+> +        } else {
+> +            TCGv_ptr a0 = tcg_temp_new_ptr();
+> +            TCGv_i32 desc = tcg_const_i32(simd_desc(oprsz, maxsz, 0));
+> +
+> +            tcg_gen_addi_ptr(a0, cpu_env, dofs);
+> +            ool(a0, desc, t_i32);
+> +
+> +            tcg_temp_free_ptr(a0);
+> +            tcg_temp_free_i32(desc);
+> +            if (in == NULL) {
+> +                tcg_temp_free_i32(t_i32);
+> +            }
+> +            return;
+> +        }
+> +    }
+> +
+> +    if (in) {
+> +        tcg_gen_dup_i32_vec(vece, t_vec, in);
+> +    } else {
+> +        tcg_gen_dup32i_vec(t_vec, in_c);
 
-Well, it's now on my vast list of things to look at if I ever have
-time..
+May be it'll be better to call this function tcg_gen_dupi_i32_vec?
+This will go along with current naming conventions like tcg_gen_addi_i32.
 
---=20
-David Gibson			| I'll have my music baroque, and my code
-david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
-				| _way_ _around_!
-http://www.ozlabs.org/~dgibson
+> +    }
+> +
+> +    i = 0;
+> +    if (TCG_TARGET_HAS_v256) {
+> +        for (; i + 32 <= oprsz; i += 32) {
+> +            tcg_gen_stl_vec(t_vec, cpu_env, dofs + i, TCG_TYPE_V256);
+> +        }
+> +    }
+> +    if (TCG_TARGET_HAS_v128) {
+> +        for (; i + 16 <= oprsz; i += 16) {
+> +            tcg_gen_stl_vec(t_vec, cpu_env, dofs + i, TCG_TYPE_V128);
+> +        }
+> +    }
+> +    if (TCG_TARGET_HAS_v64) {
+> +        for (; i < oprsz; i += 8) {
+> +            tcg_gen_stl_vec(t_vec, cpu_env, dofs + i, TCG_TYPE_V64);
+> +        }
+> +    }
+> +
+> + done:
+> +    tcg_debug_assert(i == oprsz);
+> +    if (i < maxsz) {
+> +        expand_clr(dofs + i, maxsz - i);
+> +    }
+> +}
+> +
 
---E9SPMlsjsjqOlA3h
-Content-Type: application/pgp-signature; name="signature.asc"
+<...>
+(the following is context)
 
------BEGIN PGP SIGNATURE-----
+> +void tcg_gen_gvec_dup_i32(unsigned vece, uint32_t dofs, uint32_t oprsz,
+> +                          uint32_t maxsz, TCGv_i32 in)
+> +{
+> +    typedef void dup_fn(TCGv_ptr, TCGv_i32, TCGv_i32);
+> +    static dup_fn * const fns[3] = {
+> +        gen_helper_gvec_dup8,
+> +        gen_helper_gvec_dup16,
+> +        gen_helper_gvec_dup32
+> +    };
+> +
+> +    check_size_align(oprsz, maxsz, dofs);
+> +    tcg_debug_assert(vece <= MO_32);
+> +    do_dup_i32(vece, dofs, oprsz, maxsz, in, 0, fns[vece]);
+> +}
+> +
+> +void tcg_gen_gvec_dup_i64(unsigned vece, uint32_t dofs, uint32_t oprsz,
+> +                          uint32_t maxsz, TCGv_i64 in)
+> +{
+> +    check_size_align(oprsz, maxsz, dofs);
+> +    tcg_debug_assert(vece <= MO_64);
+> +    if (vece <= MO_32) {
+> +        /* This works for both host register sizes.  */
+> +        tcg_gen_gvec_dup_i32(vece, dofs, oprsz, maxsz, (TCGv_i32)in);
+> +    } else {
+> +        do_dup_i64(vece, dofs, oprsz, maxsz, in, 0);
+> +    }
+> +}
+> +
+> +void tcg_gen_gvec_dup_mem(unsigned vece, uint32_t dofs, uint32_t aofs,
+> +                          uint32_t oprsz, uint32_t maxsz)
+> +{
+> +    tcg_debug_assert(vece <= MO_64);
+> +    if (vece <= MO_32) {
+> +        TCGv_i32 in = tcg_temp_new_i32();
+> +        switch (vece) {
+> +        case MO_8:
+> +            tcg_gen_ld8u_i32(in, cpu_env, aofs);
+> +            break;
+> +        case MO_16:
+> +            tcg_gen_ld16u_i32(in, cpu_env, aofs);
+> +            break;
+> +        case MO_32:
+> +            tcg_gen_ld_i32(in, cpu_env, aofs);
+> +            break;
+> +        }
+> +        tcg_gen_gvec_dup_i32(vece, dofs, oprsz, maxsz, in);
+> +        tcg_temp_free_i32(in);
+> +    } else {
+> +        TCGv_i64 in = tcg_temp_new_i64();
+> +        tcg_gen_ld_i64(in, cpu_env, aofs);
+> +        tcg_gen_gvec_dup_i64(MO_64, dofs, oprsz, maxsz, in);
+> +        tcg_temp_free_i64(in);
+> +    }
+> +}
+> +
+> +void tcg_gen_gvec_dup64i(uint32_t dofs, uint32_t oprsz,
+> +                         uint32_t maxsz, uint64_t x)
+> +{
+> +    check_size_align(oprsz, maxsz, dofs);
+> +    do_dup_i64(MO_64, dofs, oprsz, maxsz, NULL, x);
+> +}
+> +
+> +void tcg_gen_gvec_dup32i(uint32_t dofs, uint32_t oprsz,
+> +                         uint32_t maxsz, uint32_t x)
+> +{
+> +    if (TCG_TARGET_REG_BITS == 64) {
+> +        do_dup_i64(MO_64, dofs, oprsz, maxsz, NULL, deposit64(x, 32, 32, x));
+> +    } else {
+> +        do_dup_i32(MO_32, dofs, oprsz, maxsz, NULL, x, gen_helper_gvec_dup32);
+> +    }
+> +}
+> +
+> +void tcg_gen_gvec_dup16i(uint32_t dofs, uint32_t oprsz,
+> +                         uint32_t maxsz, uint16_t x)
+> +{
+> +    tcg_gen_gvec_dup32i(dofs, oprsz, maxsz, 0x00010001 * x);
+> +}
+> +
+> +void tcg_gen_gvec_dup8i(uint32_t dofs, uint32_t oprsz,
+> +                         uint32_t maxsz, uint8_t x)
+> +{
+> +    tcg_gen_gvec_dup32i(dofs, oprsz, maxsz, 0x01010101 * x);
+> +}
+> +
 
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlonwIAACgkQbDjKyiDZ
-s5Lw2w/7B8RMODFvYw2stq/gyLRTBl3xoNofMPRKaoasaO5LP2rsQbybPp25brtE
-/xBFQZZHgkxf5Cx/ilpnkZSY/5+yEyRXhGEbN6jZasrcDDGQR+V7uC8sWBTxhH6S
-E6mta33yg/RpTEQjkTkvl0mraHb87Gx/45DlMopYFAsPZoZbs0vbmlbDNLHbUy0r
-aKeTrSFFdG+exia1A9/JcCeuazwwbo0cIvB+9V17dZjz1cN+scYBI9z3NQN2eDS5
-nhU+uEP4XSVFMvrCr3YVS8doj6Rmn3/yAXENpDSEUElyVXlC8LhNWg5NXZgqt6YP
-+wBWHJxh26cZ223tnuHrI7fwOUZJqoWWHGlIVgHBNj9B+xBzNaFzQJhxUdt0nvZJ
-I/5+v/jfiV0I7KKX0VNnFU7AmBDdpXrLFwYeRUEoUgRAiT9wKoUIex8//eQoD1Bm
-/FRbtr1Ru7w4uGIySBUpehgEb+s6DZgTxrR86EE1IBliXSkQZ2nIiwd4z3UKwixe
-IVRJmqfX4MrGcs/1XAjPc3G+4IwKsAHzZ/znieGOLofKH0ZGwmeyPB7Co9ScxQco
-WzeDMD9XRyzmzGspY1tby4PnrhfpIpGFw80dXaeRRqBKLZe7eP5MQwVWNZ2wtP0/
-6I3teIVQAbNPTtLQGDEKkEN4My8m+1trfr5tE9YR23vBTlBoiPY=
-=YVJy
------END PGP SIGNATURE-----
-
---E9SPMlsjsjqOlA3h--
+-- 
+Kirill
