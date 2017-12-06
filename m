@@ -1,27 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45623)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46625)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <aurelien@aurel32.net>) id 1eMhjS-0003CX-Jr
-	for qemu-devel@nongnu.org; Wed, 06 Dec 2017 16:59:59 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1eMhmr-0005la-DO
+	for qemu-devel@nongnu.org; Wed, 06 Dec 2017 17:03:30 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <aurelien@aurel32.net>) id 1eMhjR-0006fT-Me
-	for qemu-devel@nongnu.org; Wed, 06 Dec 2017 16:59:58 -0500
-Received: from hall.aurel32.net ([2001:bc8:30d7:100::1]:49216)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <aurelien@aurel32.net>)
-	id 1eMhjR-0006Kf-FJ
-	for qemu-devel@nongnu.org; Wed, 06 Dec 2017 16:59:57 -0500
-Date: Wed, 6 Dec 2017 22:59:44 +0100
-From: Aurelien Jarno <aurelien@aurel32.net>
-Message-ID: <20171206215944.GA16343@aurel32.net>
-References: <20171205170013.22337-1-f4bug@amsat.org>
-	<20171205170013.22337-2-f4bug@amsat.org>
+	(envelope-from <peter.maydell@linaro.org>) id 1eMhmq-0000qN-Ea
+	for qemu-devel@nongnu.org; Wed, 06 Dec 2017 17:03:29 -0500
+Received: from mail-oi0-x241.google.com ([2607:f8b0:4003:c06::241]:44163)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1eMhmq-0000pa-7r
+	for qemu-devel@nongnu.org; Wed, 06 Dec 2017 17:03:28 -0500
+Received: by mail-oi0-x241.google.com with SMTP id l6so3603447oih.11
+	for <qemu-devel@nongnu.org>; Wed, 06 Dec 2017 14:03:28 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-15
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
-In-Reply-To: <20171205170013.22337-2-f4bug@amsat.org>
-Subject: Re: [Qemu-devel] [PATCH 1/2] target/sh4: add missing
- tcg_temp_free() in gen_conditional_jump()
+In-Reply-To: <20171206200346.116537-2-brijesh.singh@amd.com>
+References: <20171206200346.116537-1-brijesh.singh@amd.com>
+	<20171206200346.116537-2-brijesh.singh@amd.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Wed, 6 Dec 2017 22:03:06 +0000
+Message-ID: <CAFEAcA8UvBopec1ammRML+fgh36YLfRyg2wsgmzesmAUFy8H3w@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH v5 01/23] memattrs: add debug attribute
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,44 +29,44 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Philippe =?iso-8859-15?Q?Mathieu-Daud=E9?= <f4bug@amsat.org>
-Cc: Alex =?iso-8859-15?Q?Benn=E9e?= <alex.bennee@linaro.org>, qemu-devel@nongnu.org, Richard Henderson <rth@twiddle.net>, Vladimir Prus <vladimir.prus@gmail.com>, "Edgar E . Iglesias" <edgar.iglesias@gmail.com>
+To: Brijesh Singh <brijesh.singh@amd.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, Alistair Francis <alistair.francis@xilinx.com>, Christian Borntraeger <borntraeger@de.ibm.com>, Cornelia Huck <cornelia.huck@de.ibm.com>, "Daniel P . Berrange" <berrange@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, "Edgar E . Iglesias" <edgar.iglesias@xilinx.com>, Eduardo Habkost <ehabkost@redhat.com>, Eric Blake <eblake@redhat.com>, kvm-devel <kvm@vger.kernel.org>, Marcel Apfelbaum <marcel@redhat.com>, Markus Armbruster <armbru@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Richard Henderson <richard.henderson@linaro.org>, Richard Henderson <rth@twiddle.net>, Stefan Hajnoczi <stefanha@gmail.com>, Thomas Lendacky <Thomas.Lendacky@amd.com>, Borislav Petkov <bp@suse.de>
 
-On 2017-12-05 14:00, Philippe Mathieu-Daud=E9 wrote:
-> missed in c55497ecb8c.
->=20
-> Signed-off-by: Philippe Mathieu-Daud=E9 <f4bug@amsat.org>
+On 6 December 2017 at 20:03, Brijesh Singh <brijesh.singh@amd.com> wrote:
+> The debug attribute will be set when qemu attempts to access the guest
+> memory for debug (e.g memory access from gdbstub, memory dump commands
+> etc).
+>
+> When guest memory is encrypted, the debug access will need to go through
+> the memory encryption APIs.
+>
+> Cc: Alistair Francis <alistair.francis@xilinx.com>
+> Cc: Peter Maydell <peter.maydell@linaro.org>
+> Cc: Edgar E. Iglesias" <edgar.iglesias@xilinx.com>
+> Cc: Richard Henderson <richard.henderson@linaro.org>
+> Cc: Paolo Bonzini <pbonzini@redhat.com>
+> Signed-off-by: Brijesh Singh <brijesh.singh@amd.com>
 > ---
->  target/sh4/translate.c | 5 ++++-
->  1 file changed, 4 insertions(+), 1 deletion(-)
->=20
-> diff --git a/target/sh4/translate.c b/target/sh4/translate.c
-> index 703020fe87..5aeaabdd8d 100644
-> --- a/target/sh4/translate.c
-> +++ b/target/sh4/translate.c
-> @@ -322,13 +322,16 @@ static void gen_delayed_conditional_jump(DisasConte=
-xt * ctx)
->          gen_jump(ctx);
-> =20
->          gen_set_label(l1);
-> -        return;
-> +        goto done;
->      }
-> =20
->      tcg_gen_brcondi_i32(TCG_COND_NE, ds, 0, l1);
->      gen_goto_tb(ctx, 1, ctx->pc + 2);
->      gen_set_label(l1);
->      gen_jump(ctx);
-> +
-> +done:
-> +    tcg_temp_free(ds);
->  }
-> =20
->  static inline void gen_load_fpr64(DisasContext *ctx, TCGv_i64 t, int reg)
+>  include/exec/memattrs.h | 4 ++++
+>  1 file changed, 4 insertions(+)
+>
+> diff --git a/include/exec/memattrs.h b/include/exec/memattrs.h
+> index d4a16420984b..721362e06292 100644
+> --- a/include/exec/memattrs.h
+> +++ b/include/exec/memattrs.h
+> @@ -37,6 +37,8 @@ typedef struct MemTxAttrs {
+>      unsigned int user:1;
+>      /* Requester ID (for MSI for example) */
+>      unsigned int requester_id:16;
+> +    /* Debug memory access for encrypted guest */
+> +    unsigned int debug:1;
+>  } MemTxAttrs;
 
-AFAIR, temps are not preserved across a branch (contrary to local
-temps), so I am not sure they need to be freed.
+Can we have some more detailed semantics for this please?
+For instance, if a device gets a debug=1 transaction
+should it refuse to do things like read-clears-bits
+semantics or other side-effects you wouldn't expect
+of debugger accesses?
 
---=20
-Aurelien Jarno                          GPG: 4096R/1DDD8C9B
-aurelien@aurel32.net                 http://www.aurel32.net
+thanks
+-- PMM
