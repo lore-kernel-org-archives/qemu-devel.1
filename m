@@ -1,26 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49649)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49674)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <brijesh.singh@amd.com>) id 1eMfvl-0005tg-6P
+	(envelope-from <brijesh.singh@amd.com>) id 1eMfvm-0005xJ-VE
 	for qemu-devel@nongnu.org; Wed, 06 Dec 2017 15:04:36 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <brijesh.singh@amd.com>) id 1eMfvi-0002TL-0B
-	for qemu-devel@nongnu.org; Wed, 06 Dec 2017 15:04:33 -0500
-Received: from mail-dm3nam03on0044.outbound.protection.outlook.com
-	([104.47.41.44]:26668
-	helo=NAM03-DM3-obe.outbound.protection.outlook.com)
+	(envelope-from <brijesh.singh@amd.com>) id 1eMfvj-0002U0-O9
+	for qemu-devel@nongnu.org; Wed, 06 Dec 2017 15:04:34 -0500
+Received: from mail-sn1nam01on0045.outbound.protection.outlook.com
+	([104.47.32.45]:39626
+	helo=NAM01-SN1-obe.outbound.protection.outlook.com)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <brijesh.singh@amd.com>)
-	id 1eMfvh-0002Ss-Pg
-	for qemu-devel@nongnu.org; Wed, 06 Dec 2017 15:04:29 -0500
+	id 1eMfvj-0002Tj-82
+	for qemu-devel@nongnu.org; Wed, 06 Dec 2017 15:04:31 -0500
 From: Brijesh Singh <brijesh.singh@amd.com>
-Date: Wed,  6 Dec 2017 14:03:30 -0600
-Message-Id: <20171206200346.116537-8-brijesh.singh@amd.com>
+Date: Wed,  6 Dec 2017 14:03:31 -0600
+Message-Id: <20171206200346.116537-9-brijesh.singh@amd.com>
 In-Reply-To: <20171206200346.116537-1-brijesh.singh@amd.com>
 References: <20171206200346.116537-1-brijesh.singh@amd.com>
 MIME-Version: 1.0
 Content-Type: text/plain
-Subject: [Qemu-devel] [PATCH v5 07/23] kvm: update kvm.h to include memory
- encryption ioctls
+Subject: [Qemu-devel] [PATCH v5 08/23] docs: add AMD Secure Encrypted
+ Virtualization (SEV)
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,116 +32,113 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Alistair Francis <alistair.francis@xilinx.com>, Christian Borntraeger <borntraeger@de.ibm.com>, Cornelia Huck <cornelia.huck@de.ibm.com>, "Daniel P . Berrange" <berrange@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, "Edgar E . Iglesias " <edgar.iglesias@xilinx.com>, Eduardo Habkost <ehabkost@redhat.com>, Eric Blake <eblake@redhat.com>, kvm@vger.kernel.org, Marcel Apfelbaum <marcel@redhat.com>, Markus Armbruster <armbru@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Peter Maydell <peter.maydell@linaro.org>, Richard Henderson <richard.henderson@linaro.org>, Richard Henderson <rth@twiddle.net>, Stefan Hajnoczi <stefanha@gmail.com>, Thomas Lendacky <Thomas.Lendacky@amd.com>, Borislav Petkov <bp@suse.de>, Brijesh Singh <brijesh.singh@amd.com>
 
-Updates kmv.h to include memory encryption ioctls and SEV commands.
+Create a documentation entry to describe the AMD Secure Encrypted
+Virtualization (SEV) feature.
 
-Cc: Christian Borntraeger <borntraeger@de.ibm.com>
-Cc: Cornelia Huck <cornelia.huck@de.ibm.com>
 Cc: Paolo Bonzini <pbonzini@redhat.com>
 Signed-off-by: Brijesh Singh <brijesh.singh@amd.com>
 ---
- linux-headers/linux/kvm.h | 90 +++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 90 insertions(+)
+ docs/amd-memory-encryption.txt | 92 ++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 92 insertions(+)
+ create mode 100644 docs/amd-memory-encryption.txt
 
-diff --git a/linux-headers/linux/kvm.h b/linux-headers/linux/kvm.h
-index dd8a91801e82..04b5801d0354 100644
---- a/linux-headers/linux/kvm.h
-+++ b/linux-headers/linux/kvm.h
-@@ -1356,6 +1356,96 @@ struct kvm_s390_ucas_mapping {
- /* Available with KVM_CAP_S390_CMMA_MIGRATION */
- #define KVM_S390_GET_CMMA_BITS      _IOWR(KVMIO, 0xb8, struct kvm_s390_cmma_log)
- #define KVM_S390_SET_CMMA_BITS      _IOW(KVMIO, 0xb9, struct kvm_s390_cmma_log)
-+/* Memory Encryption Commands */
-+#define KVM_MEMORY_ENCRYPT_OP      _IOWR(KVMIO, 0xba, unsigned long)
+diff --git a/docs/amd-memory-encryption.txt b/docs/amd-memory-encryption.txt
+new file mode 100644
+index 000000000000..72a92b6c6353
+--- /dev/null
++++ b/docs/amd-memory-encryption.txt
+@@ -0,0 +1,92 @@
++Secure Encrypted Virtualization (SEV) is a feature found on AMD processors.
 +
-+struct kvm_enc_region {
-+	__u64 addr;
-+	__u64 size;
-+};
++SEV is an extension to the AMD-V architecture which supports running encrypted
++virtual machine (VMs) under the control of KVM. Encrypted VMs have their pages
++(code and data) secured such that only the guest itself has access to the
++unencrypted version. Each encrypted VM is associated with a unique encryption
++key; if its data is accessed to a different entity using a different key the
++encrypted guests data will be incorrectly decrypted, leading to unintelligible
++data.
 +
-+#define KVM_MEMORY_ENCRYPT_REG_REGION    _IOR(KVMIO, 0xbb, struct kvm_enc_region)
-+#define KVM_MEMORY_ENCRYPT_UNREG_REGION  _IOR(KVMIO, 0xbc, struct kvm_enc_region)
++The key management of this feature is handled by separate processor known as
++AMD secure processor (AMD-SP) which is present in AMD SOCs. Firmware running
++inside the AMD-SP provide commands to support common VM lifecycle. This
++includes commands for launching, snapshotting, migrating and debugging the
++encrypted guest. Those SEV command can be issued via KVM_MEMORY_ENCRYPT_OP
++ioctls.
 +
-+/* Secure Encrypted Virtualization command */
-+enum sev_cmd_id {
-+	/* Guest initialization commands */
-+	KVM_SEV_INIT = 0,
-+	KVM_SEV_ES_INIT,
-+	/* Guest launch commands */
-+	KVM_SEV_LAUNCH_START,
-+	KVM_SEV_LAUNCH_UPDATE_DATA,
-+	KVM_SEV_LAUNCH_UPDATE_VMSA,
-+	KVM_SEV_LAUNCH_SECRET,
-+	KVM_SEV_LAUNCH_MEASURE,
-+	KVM_SEV_LAUNCH_FINISH,
-+	/* Guest migration commands (outgoing) */
-+	KVM_SEV_SEND_START,
-+	KVM_SEV_SEND_UPDATE_DATA,
-+	KVM_SEV_SEND_UPDATE_VMSA,
-+	KVM_SEV_SEND_FINISH,
-+	/* Guest migration commands (incoming) */
-+	KVM_SEV_RECEIVE_START,
-+	KVM_SEV_RECEIVE_UPDATE_DATA,
-+	KVM_SEV_RECEIVE_UPDATE_VMSA,
-+	KVM_SEV_RECEIVE_FINISH,
-+	/* Guest status and debug commands */
-+	KVM_SEV_GUEST_STATUS,
-+	KVM_SEV_DBG_DECRYPT,
-+	KVM_SEV_DBG_ENCRYPT,
-+	/* Guest certificates commands */
-+	KVM_SEV_CERT_EXPORT,
++Launching
++---------
++Boot images (such as bios) must be encrypted before guest can be booted.
++MEMORY_ENCRYPT_OP ioctl provides commands to encrypt the images :LAUNCH_START,
++LAUNCH_UPDATE_DATA, LAUNCH_MEASURE and LAUNCH_FINISH. These four commands
++together generate a fresh memory encryption key for the VM, encrypt the boot
++images and provide a measurement than can be used as an attestation of the
++successful launch.
 +
-+	KVM_SEV_NR_MAX,
-+};
++LAUNCH_START is called first to create a cryptographic launch context within
++the firmware. To create this context, guest owner must provides guest policy,
++its public Diffie-Hellman key (PDH) and session parameters. These inputs
++should be treated as binary blob and must be passed as-is to the SEV firmware.
 +
-+struct kvm_sev_cmd {
-+	__u32 id;
-+	__u64 data;
-+	__u32 error;
-+	__u32 sev_fd;
-+};
++The guest policy is passed as plaintext and hypervisor may able to read it
++but should not modify it (any modification of the policy bits will result
++in bad measurement). The guest policy is a 4-byte data structure containing
++several flags that restricts what can be done on running SEV guest.
++See KM Spec section 3 and 6.2 for more details.
 +
-+struct kvm_sev_launch_start {
-+	__u32 handle;
-+	__u32 policy;
-+	__u64 dh_uaddr;
-+	__u32 dh_len;
-+	__u64 session_uaddr;
-+	__u32 session_len;
-+};
++Guest owners provided DH certificate and session parameters will be used to
++establish a cryptographic session with the guest owner to negotiate keys used
++for the attestation.
 +
-+struct kvm_sev_launch_update_data {
-+	__u64 uaddr;
-+	__u32 len;
-+};
++LAUNCH_UPDATE_DATA encrypts the memory region using the cryptographic context
++created via LAUNCH_START command. If required, this command can be called
++multiple times to encrypt different memory regions. The command also calculates
++the measurement of the memory contents as it encrypts.
 +
++LAUNCH_MEASURE command can be used to retrieve the measurement of encrypted
++memory. This measurement is a signature of the memory contents that can be
++sent to the guest owner as an attestation that the memory was encrypted
++correctly by the firmware. The guest owner may wait to provide the guest
++confidential information until it can verify the attestation measurement.
++Since the guest owner knows the initial contents of the guest at boot, the
++attestation measurement can be verified by comparing it to what the guest owner
++expects.
 +
-+struct kvm_sev_launch_secret {
-+	__u64 hdr_uaddr;
-+	__u32 hdr_len;
-+	__u64 guest_uaddr;
-+	__u32 guest_len;
-+	__u64 trans_uaddr;
-+	__u32 trans_len;
-+};
++LAUNCH_FINISH command finalizes the guest launch and destroy's the cryptographic
++context.
 +
-+struct kvm_sev_launch_measure {
-+	__u64 uaddr;
-+	__u32 len;
-+};
++See SEV KM API Spec [1] 'Launching a guest' usage flow (Appendix A) for the
++complete flow chart.
 +
-+struct kvm_sev_guest_status {
-+	__u32 handle;
-+	__u32 policy;
-+	__u32 state;
-+};
++Debugging
++-----------
++Since memory contents of SEV guest is encrypted hence hypervisor access to the
++guest memory will get a cipher text. If guest policy allows debugging, then
++hypervisor can use DEBUG_DECRYPT and DEBUG_ENCRYPT commands access the guest
++memory region for debug purposes.
 +
-+struct kvm_sev_dbg {
-+	__u64 src_uaddr;
-+	__u64 dst_uaddr;
-+	__u32 len;
-+};
- 
- #define KVM_DEV_ASSIGN_ENABLE_IOMMU	(1 << 0)
- #define KVM_DEV_ASSIGN_PCI_2_3		(1 << 1)
++Snapshot/Restore
++-----------------
++TODO
++
++Live Migration
++----------------
++TODO
++
++References
++-----------------
++
++AMD Memory Encryption whitepaper:
++http://amd-dev.wpengine.netdna-cdn.com/wordpress/media/2013/12/AMD_Memory_Encryption_Whitepaper_v7-Public.pdf
++
++Secure Encrypted Virutualization Key Management:
++[1] http://support.amd.com/TechDocs/55766_SEV-KM API_Specification.pdf
++
++KVM Forum slides:
++http://www.linux-kvm.org/images/7/74/02x08A-Thomas_Lendacky-AMDs_Virtualizatoin_Memory_Encryption_Technology.pdf
++
++AMD64 Architecture Programmer's Manual:
++   http://support.amd.com/TechDocs/24593.pdf
++   SME is section 7.10
++   SEV is section 15.34
 -- 
 2.9.5
