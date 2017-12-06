@@ -1,26 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48787)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48862)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1eMceb-0004QH-Iv
-	for qemu-devel@nongnu.org; Wed, 06 Dec 2017 11:34:39 -0500
+	(envelope-from <mst@redhat.com>) id 1eMcen-0004YS-Az
+	for qemu-devel@nongnu.org; Wed, 06 Dec 2017 11:34:50 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1eMceY-0000gL-Uq
-	for qemu-devel@nongnu.org; Wed, 06 Dec 2017 11:34:37 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:34626)
+	(envelope-from <mst@redhat.com>) id 1eMcek-000132-Ow
+	for qemu-devel@nongnu.org; Wed, 06 Dec 2017 11:34:49 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:33942)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1eMceY-0000db-Mm
-	for qemu-devel@nongnu.org; Wed, 06 Dec 2017 11:34:34 -0500
-From: Markus Armbruster <armbru@redhat.com>
-References: <20170911110623.24981-1-marcandre.lureau@redhat.com>
-	<20170911110623.24981-6-marcandre.lureau@redhat.com>
-Date: Wed, 06 Dec 2017 17:34:27 +0100
-In-Reply-To: <20170911110623.24981-6-marcandre.lureau@redhat.com>
-	(=?utf-8?Q?=22Marc-Andr=C3=A9?=
-	Lureau"'s message of "Mon, 11 Sep 2017 13:05:38 +0200")
-Message-ID: <87lgifx1bg.fsf@dusky.pond.sub.org>
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1eMcek-00010L-JG
+	for qemu-devel@nongnu.org; Wed, 06 Dec 2017 11:34:46 -0500
+Date: Wed, 6 Dec 2017 18:34:38 +0200
+From: "Michael S. Tsirkin" <mst@redhat.com>
+Message-ID: <20171206183124-mutt-send-email-mst@kernel.org>
+References: <20171201055832.8392-1-fangying1@huawei.com>
+	<20171201163813-mutt-send-email-mst@kernel.org>
+	<0fe53172-70f2-56b5-5d25-b3c1769098d7@huawei.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v3 05/50] qapi: add tests for invalid 'if'
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <0fe53172-70f2-56b5-5d25-b3c1769098d7@huawei.com>
+Subject: Re: [Qemu-devel] [PATCH v4] vhost: Don't abort when vhost-user
+ connection is lost during migration
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,155 +29,41 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>
-Cc: qemu-devel@nongnu.org, Michael Roth <mdroth@linux.vnet.ibm.com>
+To: Ying Fang <fangying1@huawei.com>
+Cc: qemu-devel@nongnu.org, quintela@redhat.com, marcandre.lureau@redhat.com
 
-Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com> writes:
+On Wed, Dec 06, 2017 at 09:30:27PM +0800, Ying Fang wrote:
+> 
+> On 2017/12/1 22:39, Michael S. Tsirkin wrote:
+> > On Fri, Dec 01, 2017 at 01:58:32PM +0800, fangying wrote:
+> >> QEMU will abort when vhost-user process is restarted during migration
+> >> when vhost_log_global_start/stop is called. The reason is clear that
+> >> vhost_dev_set_log returns -1 because network connection is lost.
+> >>
+> >> To handle this situation, let's cancel migration by setting migrate
+> >> state to failure and report it to user.
+> > 
+> > In fact I don't see this as the right way to fix it. Backend is dead so why
+> > not just proceed with migration? We just need to make sure we re-send
+> > migration data on re-connect.
+> > This is where vhost start/stop migration dirty log. The original code aborts
+> qemu here beacuse vhost data stream may break down if we fail to start/stop
+> vhost dirty log during migration. Backend may be active after vhost_log_global_start.
+> 
+>              dirty log start ----------------- dirty log stop
+>                      ^           ^
+>                      |           |
+> ----- backend dead ----- backend active
 
-> Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+I'm sorry, I don't understand yet. Backend is active after logging started -
+why is this a problem?
 
-This tests error conditions added in the previous commit.  I recommend
-squashing the two together.
+> Currently we don't re-send migration data on re-connect in this situation.
+> May we should work it out.
 
-> ---
->  tests/Makefile.include                   | 3 +++
->  tests/qapi-schema/bad-if-empty-list.err  | 1 +
->  tests/qapi-schema/bad-if-empty-list.exit | 1 +
->  tests/qapi-schema/bad-if-empty-list.json | 3 +++
->  tests/qapi-schema/bad-if-empty-list.out  | 0
->  tests/qapi-schema/bad-if-empty.err       | 1 +
->  tests/qapi-schema/bad-if-empty.exit      | 1 +
->  tests/qapi-schema/bad-if-empty.json      | 3 +++
->  tests/qapi-schema/bad-if-empty.out       | 0
->  tests/qapi-schema/bad-if.err             | 1 +
->  tests/qapi-schema/bad-if.exit            | 1 +
->  tests/qapi-schema/bad-if.json            | 3 +++
->  tests/qapi-schema/bad-if.out             | 0
->  13 files changed, 18 insertions(+)
->  create mode 100644 tests/qapi-schema/bad-if-empty-list.err
->  create mode 100644 tests/qapi-schema/bad-if-empty-list.exit
->  create mode 100644 tests/qapi-schema/bad-if-empty-list.json
->  create mode 100644 tests/qapi-schema/bad-if-empty-list.out
->  create mode 100644 tests/qapi-schema/bad-if-empty.err
->  create mode 100644 tests/qapi-schema/bad-if-empty.exit
->  create mode 100644 tests/qapi-schema/bad-if-empty.json
->  create mode 100644 tests/qapi-schema/bad-if-empty.out
->  create mode 100644 tests/qapi-schema/bad-if.err
->  create mode 100644 tests/qapi-schema/bad-if.exit
->  create mode 100644 tests/qapi-schema/bad-if.json
->  create mode 100644 tests/qapi-schema/bad-if.out
->
-> diff --git a/tests/Makefile.include b/tests/Makefile.include
-> index fae5715e9c..8dac7c9083 100644
-> --- a/tests/Makefile.include
-> +++ b/tests/Makefile.include
-> @@ -402,6 +402,9 @@ qapi-schema +=3D args-unknown.json
->  qapi-schema +=3D bad-base.json
->  qapi-schema +=3D bad-data.json
->  qapi-schema +=3D bad-ident.json
-> +qapi-schema +=3D bad-if.json
-> +qapi-schema +=3D bad-if-empty.json
-> +qapi-schema +=3D bad-if-empty-list.json
->  qapi-schema +=3D bad-type-bool.json
->  qapi-schema +=3D bad-type-dict.json
->  qapi-schema +=3D bad-type-int.json
-> diff --git a/tests/qapi-schema/bad-if-empty-list.err b/tests/qapi-schema/=
-bad-if-empty-list.err
-> new file mode 100644
-> index 0000000000..75fe6497bc
-> --- /dev/null
-> +++ b/tests/qapi-schema/bad-if-empty-list.err
-> @@ -0,0 +1 @@
-> +tests/qapi-schema/bad-if-empty-list.json:2: 'if' condition [] is useless
-> diff --git a/tests/qapi-schema/bad-if-empty-list.exit b/tests/qapi-schema=
-/bad-if-empty-list.exit
-> new file mode 100644
-> index 0000000000..d00491fd7e
-> --- /dev/null
-> +++ b/tests/qapi-schema/bad-if-empty-list.exit
-> @@ -0,0 +1 @@
-> +1
-> diff --git a/tests/qapi-schema/bad-if-empty-list.json b/tests/qapi-schema=
-/bad-if-empty-list.json
-> new file mode 100644
-> index 0000000000..94f2eb8670
-> --- /dev/null
-> +++ b/tests/qapi-schema/bad-if-empty-list.json
-> @@ -0,0 +1,3 @@
-> +# check empty 'if' list
-> +{ 'struct': 'TestIfStruct', 'data': { 'foo': 'int' },
-> +  'if': [] }
-> diff --git a/tests/qapi-schema/bad-if-empty-list.out b/tests/qapi-schema/=
-bad-if-empty-list.out
-> new file mode 100644
-> index 0000000000..e69de29bb2
+So basically backend connects after logging started, and we
+do not tell it to start logging and where - is that the issue?
+I agree, that would be a bug then.
 
-This covers "'if' condition [] is useless".
-
-> diff --git a/tests/qapi-schema/bad-if-empty.err b/tests/qapi-schema/bad-i=
-f-empty.err
-> new file mode 100644
-> index 0000000000..358bdc3e51
-> --- /dev/null
-> +++ b/tests/qapi-schema/bad-if-empty.err
-> @@ -0,0 +1 @@
-> +tests/qapi-schema/bad-if-empty.json:2: 'if' condition '' makes no sense
-> diff --git a/tests/qapi-schema/bad-if-empty.exit b/tests/qapi-schema/bad-=
-if-empty.exit
-> new file mode 100644
-> index 0000000000..d00491fd7e
-> --- /dev/null
-> +++ b/tests/qapi-schema/bad-if-empty.exit
-> @@ -0,0 +1 @@
-> +1
-> diff --git a/tests/qapi-schema/bad-if-empty.json b/tests/qapi-schema/bad-=
-if-empty.json
-> new file mode 100644
-> index 0000000000..fe1dd4eca6
-> --- /dev/null
-> +++ b/tests/qapi-schema/bad-if-empty.json
-> @@ -0,0 +1,3 @@
-> +# check empty 'if'
-> +{ 'struct': 'TestIfStruct', 'data': { 'foo': 'int' },
-> +  'if': '' }
-> diff --git a/tests/qapi-schema/bad-if-empty.out b/tests/qapi-schema/bad-i=
-f-empty.out
-> new file mode 100644
-> index 0000000000..e69de29bb2
-
-This covers "'if' condition '' makes no sense", not wrapped in a list.
-
-> diff --git a/tests/qapi-schema/bad-if.err b/tests/qapi-schema/bad-if.err
-> new file mode 100644
-> index 0000000000..c2e3f5f44c
-> --- /dev/null
-> +++ b/tests/qapi-schema/bad-if.err
-> @@ -0,0 +1 @@
-> +tests/qapi-schema/bad-if.json:2: 'if' condition must be a string or a li=
-st of strings
-> diff --git a/tests/qapi-schema/bad-if.exit b/tests/qapi-schema/bad-if.exit
-> new file mode 100644
-> index 0000000000..d00491fd7e
-> --- /dev/null
-> +++ b/tests/qapi-schema/bad-if.exit
-> @@ -0,0 +1 @@
-> +1
-> diff --git a/tests/qapi-schema/bad-if.json b/tests/qapi-schema/bad-if.json
-> new file mode 100644
-> index 0000000000..3edd1a0bf2
-> --- /dev/null
-> +++ b/tests/qapi-schema/bad-if.json
-> @@ -0,0 +1,3 @@
-> +# check invalid 'if' type
-> +{ 'struct': 'TestIfStruct', 'data': { 'foo': 'int' },
-> +  'if': { 'value': 'defined(TEST_IF_STRUCT)' } }
-> diff --git a/tests/qapi-schema/bad-if.out b/tests/qapi-schema/bad-if.out
-> new file mode 100644
-> index 0000000000..e69de29bb2
-
-This covers "'if' condition must be a string or a list of strings", not
-wrapped in a list.
-
-Not covered: the two not wrapped in a list cases wrapped in a list.
-However, I figure this is good enough as is, thus
-Reviewed-by: Markus Armbruster <armbru@redhat.com>
+-- 
+MST
