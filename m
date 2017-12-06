@@ -1,22 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51138)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53461)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1eMWN1-0003NX-KI
-	for qemu-devel@nongnu.org; Wed, 06 Dec 2017 04:52:07 -0500
+	(envelope-from <imammedo@redhat.com>) id 1eMWSV-0006bS-B7
+	for qemu-devel@nongnu.org; Wed, 06 Dec 2017 04:57:45 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1eMWMx-0006Qr-0K
-	for qemu-devel@nongnu.org; Wed, 06 Dec 2017 04:52:00 -0500
-References: <20171128071409.21887-1-vsementsov@virtuozzo.com>
-	<20171128071409.21887-5-vsementsov@virtuozzo.com>
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Message-ID: <2ecd455b-4e33-e35b-6b17-9fe4ac47002b@virtuozzo.com>
-Date: Wed, 6 Dec 2017 12:51:46 +0300
+	(envelope-from <imammedo@redhat.com>) id 1eMWSR-0001DR-7n
+	for qemu-devel@nongnu.org; Wed, 06 Dec 2017 04:57:43 -0500
+Date: Wed, 6 Dec 2017 10:57:32 +0100
+From: Igor Mammedov <imammedo@redhat.com>
+Message-ID: <20171206105732.050435da@redhat.com>
+In-Reply-To: <20171206001406.GP3057@umbus.fritz.box>
+References: <1512488477-209071-1-git-send-email-imammedo@redhat.com>
+	<20171206001406.GP3057@umbus.fritz.box>
 MIME-Version: 1.0
-In-Reply-To: <20171128071409.21887-5-vsementsov@virtuozzo.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-Content-Language: en-US
-Subject: Re: [Qemu-devel] [PATCH 4/4] iotests: add dirty bitmap migration
- test
+Subject: Re: [Qemu-devel] [PATCH 2.12] spapr: replace numa_get_node() with
+ lookup in pc-dimm list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,177 +24,293 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org, qemu-block@nongnu.org
-Cc: crosa@redhat.com, ehabkost@redhat.com, mreitz@redhat.com, kwolf@redhat.com, den@openvz.org
+To: David Gibson <david@gibson.dropbear.id.au>
+Cc: qemu-devel@nongnu.org, agraf@suse.de, ehabkost@redhat.com, qemu-ppc@nongnu.org
 
-28.11.2017 10:14, Vladimir Sementsov-Ogievskiy wrote:
-> The test creates two vms (vm_a, vm_b), create dirty bitmap in
-> the first one, do several writes to corresponding device and
-> then migrate vm_a to vm_b with dirty bitmaps.
->
-> For now, only migration through shared storage for persistent
-> bitmaps is available, so it is tested here. Only offline variant
-> is tested for now (a kind of suspend-resume), as it is needed
-> to test that this case is successfully fixed by recent patch.
->
-> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-> ---
->   tests/qemu-iotests/169        | 82 +++++++++++++++++++++++++++++++++++++++++++
->   tests/qemu-iotests/169.out    |  5 +++
->   tests/qemu-iotests/group      |  1 +
->   tests/qemu-iotests/iotests.py |  7 +++-
->   4 files changed, 94 insertions(+), 1 deletion(-)
->   create mode 100755 tests/qemu-iotests/169
->   create mode 100644 tests/qemu-iotests/169.out
->
-> diff --git a/tests/qemu-iotests/169 b/tests/qemu-iotests/169
-> new file mode 100755
-> index 0000000000..a0f213b274
-> --- /dev/null
-> +++ b/tests/qemu-iotests/169
-> @@ -0,0 +1,82 @@
-> +#!/usr/bin/env python
-> +#
-> +# Tests for dirty bitmaps migration.
-> +#
-> +# Copyright (c) 2016-2017 Parallels International GmbH
-> +#
-> +# This program is free software; you can redistribute it and/or modify
-> +# it under the terms of the GNU General Public License as published by
-> +# the Free Software Foundation; either version 2 of the License, or
-> +# (at your option) any later version.
-> +#
-> +# This program is distributed in the hope that it will be useful,
-> +# but WITHOUT ANY WARRANTY; without even the implied warranty of
-> +# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-> +# GNU General Public License for more details.
-> +#
-> +# You should have received a copy of the GNU General Public License
-> +# along with this program.  If not, see <http://www.gnu.org/licenses/>.
-> +#
-> +
-> +import os
-> +import iotests
-> +import time
-> +from iotests import qemu_img
-> +
-> +disk = os.path.join(iotests.test_dir, 'disk')
-> +migfile = os.path.join(iotests.test_dir, 'migfile')
-> +
-> +class TestPersistentDirtyBitmapSuspendResume(iotests.QMPTestCase):
-> +
-> +    def tearDown(self):
-> +        self.vm_a.shutdown()
-> +        self.vm_b.shutdown()
-> +        os.remove(disk)
-> +        os.remove(migfile)
-> +
-> +    def setUp(self):
-> +        qemu_img('create', '-f', iotests.imgfmt, disk, '1M')
-> +
-> +        self.vm_a = iotests.VM(path_suffix='a').add_drive(disk)
-> +        self.vm_a.launch()
-> +
-> +        self.vm_b = iotests.VM(path_suffix='b').add_drive(disk)
-> +        self.vm_b.add_incoming("exec: cat '" + migfile + "'")
-> +
-> +    def test_migration_persistent_shared_offline(self):
-> +        """ A kind of suspend-resume """
-> +        granularity = 512
-> +        regions = [
-> +            { 'start': 0,           'count': 0x10000 },
-> +            { 'start': 0xf0000,     'count': 0x10000 },
-> +            { 'start': 0xa0201,     'count': 0x1000  }
-> +            ]
-> +
-> +        result = self.vm_a.qmp('block-dirty-bitmap-add', node='drive0',
-> +                               name='bitmap0', granularity=granularity,
-> +                               persistent=True, autoload=True)
-> +        self.assert_qmp(result, 'return', {});
-> +
-> +        for r in regions:
-> +            self.vm_a.hmp_qemu_io('drive0',
-> +                                  'write %d %d' % (r['start'], r['count']))
-> +
-> +        result = self.vm_a.qmp('x-debug-block-dirty-bitmap-sha256',
-> +                               node='drive0', name='bitmap0')
-> +        sha256 = result['return']['sha256']
-> +
-> +        result = self.vm_a.qmp('migrate', uri='exec:cat>' + migfile)
-> +        self.assert_qmp(result, 'return', {});
-> +        self.assertNotEqual(self.vm_a.event_wait("STOP"), None)
-> +        self.vm_a.shutdown()
-> +
-> +        self.vm_b.launch()
-> +        self.vm_b.event_wait("RESUME", timeout=10)
+On Wed, 6 Dec 2017 11:14:06 +1100
+David Gibson <david@gibson.dropbear.id.au> wrote:
 
-with previous patch dropped, please fix it to be 10.0
+> On Tue, Dec 05, 2017 at 04:41:17PM +0100, Igor Mammedov wrote:
+> > SPAPR is the last user of numa_get_node() and a bunch of
+> > supporting code to maintain numa_info[x].addr list.
+> > 
+> > Get LMB node id from pc-dimm list, which allows to
+> > remove ~80LOC maintaining dynamic address range
+> > lookup list.
+> > 
+> > It also removes pc-dimm dependency on numa_[un]set_mem_node_id()
+> > and makes pc-dimms a sole source of information about which
+> > node it belongs to and removes duplicate data from global
+> > numa_info.
+> > 
+> > Signed-off-by: Igor Mammedov <imammedo@redhat.com>
+> > ---
+> > Beside making code simpler, my interest in simplification
+> > lies in allowing calling parse_numa_opts() multiple times,
+> > without complex cleanups in case NUMA config is changed
+> > since startup.
+> > 
+> > PS:
+> > build tested only
+> > ---
+> >  include/sysemu/numa.h | 10 ------
+> >  hw/mem/pc-dimm.c      |  2 --
+> >  hw/ppc/spapr.c        | 29 +++++++++++++++-
+> >  numa.c                | 94 ---------------------------------------------------
+> >  4 files changed, 28 insertions(+), 107 deletions(-)  
+> 
+> Applied to ppc-for-2.12.
+Thanks
 
-> +
-> +        result = self.vm_b.qmp('x-debug-block-dirty-bitmap-sha256',
-> +                               node='drive0', name='bitmap0')
-> +        self.assert_qmp(result, 'return/sha256', sha256);
-> +
-> +
-> +if __name__ == '__main__':
-> +    iotests.main(supported_fmts=['qcow2'])
-> diff --git a/tests/qemu-iotests/169.out b/tests/qemu-iotests/169.out
-> new file mode 100644
-> index 0000000000..ae1213e6f8
-> --- /dev/null
-> +++ b/tests/qemu-iotests/169.out
-> @@ -0,0 +1,5 @@
-> +.
-> +----------------------------------------------------------------------
-> +Ran 1 tests
-> +
-> +OK
-> diff --git a/tests/qemu-iotests/group b/tests/qemu-iotests/group
-> index 3e688678dd..e879c7ebc7 100644
-> --- a/tests/qemu-iotests/group
-> +++ b/tests/qemu-iotests/group
-> @@ -169,6 +169,7 @@
->   162 auto quick
->   163 rw auto quick
->   165 rw auto quick
-> +169 rw auto quick
->   170 rw auto quick
->   171 rw auto quick
->   172 auto
-> diff --git a/tests/qemu-iotests/iotests.py b/tests/qemu-iotests/iotests.py
-> index 6f057904a9..ce029b51e2 100644
-> --- a/tests/qemu-iotests/iotests.py
-> +++ b/tests/qemu-iotests/iotests.py
-> @@ -430,6 +430,10 @@ def verify_platform(supported_oses=['linux']):
->       if True not in [sys.platform.startswith(x) for x in supported_oses]:
->           notrun('not suitable for this OS: %s' % sys.platform)
->   
-> +def verify_cache_mode(supported_cache_modes=[]):
-> +    if supported_cache_modes and (cachemode not in supported_cache_modes):
-> +        notrun('not suitable for this cache mode: %s' % cachemode)
-> +
->   def supports_quorum():
->       return 'quorum' in qemu_img_pipe('--help')
->   
-> @@ -438,7 +442,7 @@ def verify_quorum():
->       if not supports_quorum():
->           notrun('quorum support missing')
->   
-> -def main(supported_fmts=[], supported_oses=['linux']):
-> +def main(supported_fmts=[], supported_oses=['linux'], supported_cache_modes=[]):
->       '''Run tests'''
->   
->       global debug
-> @@ -455,6 +459,7 @@ def main(supported_fmts=[], supported_oses=['linux']):
->       verbosity = 1
->       verify_image_format(supported_fmts)
->       verify_platform(supported_oses)
-> +    verify_cache_mode(supported_cache_modes)
->   
->       # We need to filter out the time taken from the output so that qemu-iotest
->       # can reliably diff the results against master output.
+> 
+> It definitely seems like an improvement over what we have.  Looking
+> back at the DIMM list from QMP in the loop seems a little roundabout
+> though.  Maybe we'd be better stepping through the DIMMs, then
+> stepping through the LMBs within each DIMM, rather than just stepping
+> through the LMBs directly.
+Surely that would be better, maybe someone from ppc side would take care
+of it.
 
-
--- 
-Best regards,
-Vladimir
+> 
+> 
+> > 
+> > diff --git a/include/sysemu/numa.h b/include/sysemu/numa.h
+> > index 5c6df28..b354521 100644
+> > --- a/include/sysemu/numa.h
+> > +++ b/include/sysemu/numa.h
+> > @@ -10,17 +10,10 @@
+> >  extern int nb_numa_nodes;   /* Number of NUMA nodes */
+> >  extern bool have_numa_distance;
+> >  
+> > -struct numa_addr_range {
+> > -    ram_addr_t mem_start;
+> > -    ram_addr_t mem_end;
+> > -    QLIST_ENTRY(numa_addr_range) entry;
+> > -};
+> > -
+> >  struct node_info {
+> >      uint64_t node_mem;
+> >      struct HostMemoryBackend *node_memdev;
+> >      bool present;
+> > -    QLIST_HEAD(, numa_addr_range) addr; /* List to store address ranges */
+> >      uint8_t distance[MAX_NODES];
+> >  };
+> >  
+> > @@ -33,9 +26,6 @@ extern NodeInfo numa_info[MAX_NODES];
+> >  void parse_numa_opts(MachineState *ms);
+> >  void query_numa_node_mem(NumaNodeMem node_mem[]);
+> >  extern QemuOptsList qemu_numa_opts;
+> > -void numa_set_mem_node_id(ram_addr_t addr, uint64_t size, uint32_t node);
+> > -void numa_unset_mem_node_id(ram_addr_t addr, uint64_t size, uint32_t node);
+> > -uint32_t numa_get_node(ram_addr_t addr, Error **errp);
+> >  void numa_legacy_auto_assign_ram(MachineClass *mc, NodeInfo *nodes,
+> >                                   int nb_nodes, ram_addr_t size);
+> >  void numa_default_auto_assign_ram(MachineClass *mc, NodeInfo *nodes,
+> > diff --git a/hw/mem/pc-dimm.c b/hw/mem/pc-dimm.c
+> > index 66eace5..6e74b61 100644
+> > --- a/hw/mem/pc-dimm.c
+> > +++ b/hw/mem/pc-dimm.c
+> > @@ -109,7 +109,6 @@ void pc_dimm_memory_plug(DeviceState *dev, MemoryHotplugState *hpms,
+> >  
+> >      memory_region_add_subregion(&hpms->mr, addr - hpms->base, mr);
+> >      vmstate_register_ram(vmstate_mr, dev);
+> > -    numa_set_mem_node_id(addr, memory_region_size(mr), dimm->node);
+> >  
+> >  out:
+> >      error_propagate(errp, local_err);
+> > @@ -122,7 +121,6 @@ void pc_dimm_memory_unplug(DeviceState *dev, MemoryHotplugState *hpms,
+> >      PCDIMMDeviceClass *ddc = PC_DIMM_GET_CLASS(dimm);
+> >      MemoryRegion *vmstate_mr = ddc->get_vmstate_memory_region(dimm);
+> >  
+> > -    numa_unset_mem_node_id(dimm->addr, memory_region_size(mr), dimm->node);
+> >      memory_region_del_subregion(&hpms->mr, mr);
+> >      vmstate_unregister_ram(vmstate_mr, dev);
+> >  }
+> > diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
+> > index 9efddea..8de0b5b 100644
+> > --- a/hw/ppc/spapr.c
+> > +++ b/hw/ppc/spapr.c
+> > @@ -641,6 +641,26 @@ static void spapr_populate_cpus_dt_node(void *fdt, sPAPRMachineState *spapr)
+> >  
+> >  }
+> >  
+> > +static uint32_t spapr_pc_dimm_node(MemoryDeviceInfoList *list, ram_addr_t addr)
+> > +{
+> > +    MemoryDeviceInfoList *info;
+> > +
+> > +    for (info = list; info; info = info->next) {
+> > +        MemoryDeviceInfo *value = info->value;
+> > +
+> > +        if (value && value->type == MEMORY_DEVICE_INFO_KIND_DIMM) {
+> > +            PCDIMMDeviceInfo *pcdimm_info = value->u.dimm.data;
+> > +
+> > +            if (pcdimm_info->addr >= addr &&
+> > +                addr < (pcdimm_info->addr + pcdimm_info->size)) {
+> > +                return pcdimm_info->node;
+> > +            }
+> > +        }
+> > +    }
+> > +
+> > +    return -1;
+> > +}
+> > +
+> >  /*
+> >   * Adds ibm,dynamic-reconfiguration-memory node.
+> >   * Refer to docs/specs/ppc-spapr-hotplug.txt for the documentation
+> > @@ -658,6 +678,7 @@ static int spapr_populate_drconf_memory(sPAPRMachineState *spapr, void *fdt)
+> >                         lmb_size;
+> >      uint32_t *int_buf, *cur_index, buf_len;
+> >      int nr_nodes = nb_numa_nodes ? nb_numa_nodes : 1;
+> > +    MemoryDeviceInfoList *dimms = NULL;
+> >  
+> >      /*
+> >       * Don't create the node if there is no hotpluggable memory
+> > @@ -692,6 +713,11 @@ static int spapr_populate_drconf_memory(sPAPRMachineState *spapr, void *fdt)
+> >          goto out;
+> >      }
+> >  
+> > +    if (hotplug_lmb_start) {
+> > +        MemoryDeviceInfoList **prev = &dimms;
+> > +        qmp_pc_dimm_device_list(qdev_get_machine(), &prev);
+> > +    }
+> > +
+> >      /* ibm,dynamic-memory */
+> >      int_buf[0] = cpu_to_be32(nr_lmbs);
+> >      cur_index++;
+> > @@ -709,7 +735,7 @@ static int spapr_populate_drconf_memory(sPAPRMachineState *spapr, void *fdt)
+> >              dynamic_memory[1] = cpu_to_be32(addr & 0xffffffff);
+> >              dynamic_memory[2] = cpu_to_be32(spapr_drc_index(drc));
+> >              dynamic_memory[3] = cpu_to_be32(0); /* reserved */
+> > -            dynamic_memory[4] = cpu_to_be32(numa_get_node(addr, NULL));
+> > +            dynamic_memory[4] = cpu_to_be32(spapr_pc_dimm_node(dimms, addr));
+> >              if (memory_region_present(get_system_memory(), addr)) {
+> >                  dynamic_memory[5] = cpu_to_be32(SPAPR_LMB_FLAGS_ASSIGNED);
+> >              } else {
+> > @@ -732,6 +758,7 @@ static int spapr_populate_drconf_memory(sPAPRMachineState *spapr, void *fdt)
+> >  
+> >          cur_index += SPAPR_DR_LMB_LIST_ENTRY_SIZE;
+> >      }
+> > +    qapi_free_MemoryDeviceInfoList(dimms);
+> >      ret = fdt_setprop(fdt, offset, "ibm,dynamic-memory", int_buf, buf_len);
+> >      if (ret < 0) {
+> >          goto out;
+> > diff --git a/numa.c b/numa.c
+> > index 7151b24..98fa9a4 100644
+> > --- a/numa.c
+> > +++ b/numa.c
+> > @@ -55,92 +55,6 @@ int nb_numa_nodes;
+> >  bool have_numa_distance;
+> >  NodeInfo numa_info[MAX_NODES];
+> >  
+> > -void numa_set_mem_node_id(ram_addr_t addr, uint64_t size, uint32_t node)
+> > -{
+> > -    struct numa_addr_range *range;
+> > -
+> > -    /*
+> > -     * Memory-less nodes can come here with 0 size in which case,
+> > -     * there is nothing to do.
+> > -     */
+> > -    if (!size) {
+> > -        return;
+> > -    }
+> > -
+> > -    range = g_malloc0(sizeof(*range));
+> > -    range->mem_start = addr;
+> > -    range->mem_end = addr + size - 1;
+> > -    QLIST_INSERT_HEAD(&numa_info[node].addr, range, entry);
+> > -}
+> > -
+> > -void numa_unset_mem_node_id(ram_addr_t addr, uint64_t size, uint32_t node)
+> > -{
+> > -    struct numa_addr_range *range, *next;
+> > -
+> > -    QLIST_FOREACH_SAFE(range, &numa_info[node].addr, entry, next) {
+> > -        if (addr == range->mem_start && (addr + size - 1) == range->mem_end) {
+> > -            QLIST_REMOVE(range, entry);
+> > -            g_free(range);
+> > -            return;
+> > -        }
+> > -    }
+> > -}
+> > -
+> > -static void numa_set_mem_ranges(void)
+> > -{
+> > -    int i;
+> > -    ram_addr_t mem_start = 0;
+> > -
+> > -    /*
+> > -     * Deduce start address of each node and use it to store
+> > -     * the address range info in numa_info address range list
+> > -     */
+> > -    for (i = 0; i < nb_numa_nodes; i++) {
+> > -        numa_set_mem_node_id(mem_start, numa_info[i].node_mem, i);
+> > -        mem_start += numa_info[i].node_mem;
+> > -    }
+> > -}
+> > -
+> > -/*
+> > - * Check if @addr falls under NUMA @node.
+> > - */
+> > -static bool numa_addr_belongs_to_node(ram_addr_t addr, uint32_t node)
+> > -{
+> > -    struct numa_addr_range *range;
+> > -
+> > -    QLIST_FOREACH(range, &numa_info[node].addr, entry) {
+> > -        if (addr >= range->mem_start && addr <= range->mem_end) {
+> > -            return true;
+> > -        }
+> > -    }
+> > -    return false;
+> > -}
+> > -
+> > -/*
+> > - * Given an address, return the index of the NUMA node to which the
+> > - * address belongs to.
+> > - */
+> > -uint32_t numa_get_node(ram_addr_t addr, Error **errp)
+> > -{
+> > -    uint32_t i;
+> > -
+> > -    /* For non NUMA configurations, check if the addr falls under node 0 */
+> > -    if (!nb_numa_nodes) {
+> > -        if (numa_addr_belongs_to_node(addr, 0)) {
+> > -            return 0;
+> > -        }
+> > -    }
+> > -
+> > -    for (i = 0; i < nb_numa_nodes; i++) {
+> > -        if (numa_addr_belongs_to_node(addr, i)) {
+> > -            return i;
+> > -        }
+> > -    }
+> > -
+> > -    error_setg(errp, "Address 0x" RAM_ADDR_FMT " doesn't belong to any "
+> > -                "NUMA node", addr);
+> > -    return -1;
+> > -}
+> >  
+> >  static void parse_numa_node(MachineState *ms, NumaNodeOptions *node,
+> >                              Error **errp)
+> > @@ -497,12 +411,6 @@ void parse_numa_opts(MachineState *ms)
+> >              exit(1);
+> >          }
+> >  
+> > -        for (i = 0; i < nb_numa_nodes; i++) {
+> > -            QLIST_INIT(&numa_info[i].addr);
+> > -        }
+> > -
+> > -        numa_set_mem_ranges();
+> > -
+> >          /* QEMU needs at least all unique node pair distances to build
+> >           * the whole NUMA distance table. QEMU treats the distance table
+> >           * as symmetric by default, i.e. distance A->B == distance B->A.
+> > @@ -522,8 +430,6 @@ void parse_numa_opts(MachineState *ms)
+> >              /* Validation succeeded, now fill in any missing distances. */
+> >              complete_init_numa_distance();
+> >          }
+> > -    } else {
+> > -        numa_set_mem_node_id(0, ram_size, 0);
+> >      }
+> >  }
+> >    
+> 
