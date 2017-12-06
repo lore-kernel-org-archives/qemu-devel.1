@@ -1,35 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54965)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55415)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1eMWVv-0007Sm-Nv
-	for qemu-devel@nongnu.org; Wed, 06 Dec 2017 05:01:19 -0500
+	(envelope-from <maozy.fnst@cn.fujitsu.com>) id 1eMWWk-0007oV-WC
+	for qemu-devel@nongnu.org; Wed, 06 Dec 2017 05:02:13 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1eMWVp-0003Vw-Oo
-	for qemu-devel@nongnu.org; Wed, 06 Dec 2017 05:01:15 -0500
-Received: from indium.canonical.com ([91.189.90.7]:54378)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1eMWVp-0003Va-JK
-	for qemu-devel@nongnu.org; Wed, 06 Dec 2017 05:01:09 -0500
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1eMWVo-0005w0-Hv
-	for <qemu-devel@nongnu.org>; Wed, 06 Dec 2017 10:01:08 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 809772E80C3
-	for <qemu-devel@nongnu.org>; Wed,  6 Dec 2017 10:01:08 +0000 (UTC)
+	(envelope-from <maozy.fnst@cn.fujitsu.com>) id 1eMWWh-0004Cc-Sn
+	for qemu-devel@nongnu.org; Wed, 06 Dec 2017 05:02:06 -0500
+Received: from mail.cn.fujitsu.com ([183.91.158.132]:59003
+	helo=heian.cn.fujitsu.com) by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <maozy.fnst@cn.fujitsu.com>) id 1eMWWh-00046x-F6
+	for qemu-devel@nongnu.org; Wed, 06 Dec 2017 05:02:03 -0500
+From: Mao Zhongyi <maozy.fnst@cn.fujitsu.com>
+Date: Wed, 6 Dec 2017 17:57:28 +0800
+Message-ID: <03fd4ff1dd212e028f605e630551bce15e5d10a9.1512552817.git.maozy.fnst@cn.fujitsu.com>
+In-Reply-To: <cover.1512552817.git.maozy.fnst@cn.fujitsu.com>
+References: <cover.1512552817.git.maozy.fnst@cn.fujitsu.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Wed, 06 Dec 2017 09:45:46 -0000
-From: John Paul Adrian Glaubitz <glaubitz@physik.fu-berlin.de>
-Reply-To: Bug 1735384 <1735384@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <151203716694.2960.12305472500745415473.malonedeb@gac.canonical.com>
-	<20171206093050.25308-1-alex.bennee@linaro.org>
-Message-Id: <B490A0F0-1C40-4ADD-831E-4968FC73107C@physik.fu-berlin.de>
-Errors-To: bounces@canonical.com
-Subject: Re: [Qemu-devel] [Bug 1735384] [RFC PATCH] target/sh4/translate.c:
- fix TCG leak during gusa sequence
+Content-Type: text/plain
+Subject: [Qemu-devel] [PATCH v2 4/4] colo: add trace for the tcp packet
+ comparison
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -39,131 +27,96 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
+Cc: Zhang Chen <zhangckid@gmail.com>, Li Zhijian <lizhijian@cn.fujitsu.com>, Jason Wang <jasowang@redhat.com>
 
-Hi Alex!
+Cc: Zhang Chen <zhangckid@gmail.com>
+Cc: Li Zhijian <lizhijian@cn.fujitsu.com>
+Cc: Jason Wang <jasowang@redhat.com>
 
-Wow, thanks! I wanted to run your suggested test today as I ran out of
-time yesterday and now you already fixed it :-).
+Signed-off-by: Mao Zhongyi <maozy.fnst@cn.fujitsu.com>
+---
+ net/colo-compare.c | 16 ++++++++++++++++
+ net/colo.c         |  1 +
+ net/colo.h         |  1 +
+ net/trace-events   |  1 +
+ 4 files changed, 19 insertions(+)
 
-Thanks a lot!
-
-Adrian
-
-> On Dec 6, 2017, at 10:30 AM, Alex Benn=C3=A9e <alex.bennee@linaro.org> wr=
-ote:
-> =
-
-> This fixes bug #1735384 while running java under qemu-sh4. When debug
-> was enabled it showed a problem with TCG temps. Once fixed I was able
-> to run java -version normally.
-> =
-
-> Reported-by: John Paul Adrian Glaubitz <glaubitz@physik.fu-berlin.de>
-> Suggested-by: Richard Henderson <richard.henderson@linaro.org>
-> Signed-off-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
-> ---
-> target/sh4/translate.c | 2 +-
-> 1 file changed, 1 insertion(+), 1 deletion(-)
-> =
-
-> diff --git a/target/sh4/translate.c b/target/sh4/translate.c
-> index 703020fe87..b4b5c822d0 100644
-> --- a/target/sh4/translate.c
-> +++ b/target/sh4/translate.c
-> @@ -2189,7 +2189,7 @@ static int decode_gusa(DisasContext *ctx, CPUSH4Sta=
-te *env, int *pmax_insns)
->     }
-> =
-
->     /* If op_src is not a valid register, then op_arg was a constant.  */
-> -    if (op_src < 0) {
-> +    if (op_src < 0 && !TCGV_IS_UNUSED(op_arg)) {
->         tcg_temp_free_i32(op_arg);
->     }
-> =
-
-> -- =
-
-> 2.15.1
-> =
-
-> -- =
-
-> You received this bug notification because you are subscribed to the bug
-> report.
-> https://bugs.launchpad.net/bugs/1735384
-> =
-
-> Title:
->  OpenJDK JVM segfaults on qemu-sh4 (regression)
-> =
-
-> Status in QEMU:
->  New
-> =
-
-> Bug description:
->  Some of the recent changes introduced a regression which makes the
->  OpenJDK JVM crash on qemu-sh4:
-> =
-
->  (sid-sh4-sbuild)root@nofan:/# java -version
->  qemu: uncaught target signal 11 (Segmentation fault) - core dumped
->  Segmentation fault
->  (sid-sh4-sbuild)root@nofan:/#
-> =
-
->  An older version works fine:
-> =
-
->  (sid-sh4-sbuild)root@nofan:/# java -version
->  openjdk version "9.0.1"
->  OpenJDK Runtime Environment (build 9.0.1+11-Debian-1)
->  OpenJDK Zero VM (build 9.0.1+11-Debian-1, interpreted mode)
->  (sid-sh4-sbuild)root@nofan:/#
-> =
-
->  Haven't had time for bisecting this yet.
-> =
-
->  Adrian
-> =
-
-> To manage notifications about this bug go to:
-> https://bugs.launchpad.net/qemu/+bug/1735384/+subscriptions
-
--- =
-
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1735384
-
-Title:
-  OpenJDK JVM segfaults on qemu-sh4 (regression)
-
-Status in QEMU:
-  New
-
-Bug description:
-  Some of the recent changes introduced a regression which makes the
-  OpenJDK JVM crash on qemu-sh4:
-
-  (sid-sh4-sbuild)root@nofan:/# java -version
-  qemu: uncaught target signal 11 (Segmentation fault) - core dumped
-  Segmentation fault
-  (sid-sh4-sbuild)root@nofan:/#
-
-  An older version works fine:
-
-  (sid-sh4-sbuild)root@nofan:/# java -version
-  openjdk version "9.0.1"
-  OpenJDK Runtime Environment (build 9.0.1+11-Debian-1)
-  OpenJDK Zero VM (build 9.0.1+11-Debian-1, interpreted mode)
-  (sid-sh4-sbuild)root@nofan:/#
-
-  Haven't had time for bisecting this yet.
-
-  Adrian
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1735384/+subscriptions
+diff --git a/net/colo-compare.c b/net/colo-compare.c
+index 683ec4e..db1f586 100644
+--- a/net/colo-compare.c
++++ b/net/colo-compare.c
+@@ -129,6 +129,7 @@ static void fill_pkt_tcp_info(void *data, uint32_t *max_ack)
+                        + (tcphd->th_off << 2) - pkt->vnet_hdr_len;
+     pkt->payload_size = pkt->size - pkt->header_size;
+     pkt->seq_end = pkt->tcp_seq + pkt->payload_size;
++    pkt->flags = tcphd->th_flags;
+ }
+ 
+ /*
+@@ -369,6 +370,16 @@ sec:
+     }
+ 
+     if (colo_mark_tcp_pkt(ppkt, spkt, &mark, min_ack)) {
++        trace_colo_compare_tcp_info("pri",
++                                    ppkt->tcp_seq, ppkt->tcp_ack,
++                                    ppkt->header_size, ppkt->payload_size,
++                                    ppkt->offset, ppkt->flags);
++
++        trace_colo_compare_tcp_info("sec",
++                                    spkt->tcp_seq, spkt->tcp_ack,
++                                    spkt->header_size, spkt->payload_size,
++                                    spkt->offset, spkt->flags);
++
+         if (mark == COLO_COMPARE_FREE_PRIMARY) {
+             conn->compare_seq = ppkt->seq_end;
+             colo_release_primary_pkt(s, ppkt);
+@@ -387,6 +398,11 @@ sec:
+             goto pri;
+         }
+     } else {
++        qemu_hexdump((char *)ppkt->data, stderr,
++                     "colo-compare ppkt", ppkt->size);
++        qemu_hexdump((char *)spkt->data, stderr,
++                     "colo-compare spkt", spkt->size);
++
+         g_queue_push_head(&conn->primary_list, ppkt);
+         g_queue_push_head(&conn->secondary_list, spkt);
+ 
+diff --git a/net/colo.c b/net/colo.c
+index a7a7117..8426265 100644
+--- a/net/colo.c
++++ b/net/colo.c
+@@ -171,6 +171,7 @@ Packet *packet_new(const void *data, int size, int vnet_hdr_len)
+     pkt->header_size = 0;
+     pkt->payload_size = 0;
+     pkt->offset = 0;
++    pkt->flags = 0;
+ 
+     return pkt;
+ }
+diff --git a/net/colo.h b/net/colo.h
+index aa08374..da6c36d 100644
+--- a/net/colo.h
++++ b/net/colo.h
+@@ -53,6 +53,7 @@ typedef struct Packet {
+     uint16_t payload_size; /* the payload length */
+     /* record the payload offset(the length that has been compared) */
+     uint16_t offset;
++    uint8_t flags; /* Flags(aka Control bits) */
+ } Packet;
+ 
+ typedef struct ConnectionKey {
+diff --git a/net/trace-events b/net/trace-events
+index 7b7cae5..7b594cf 100644
+--- a/net/trace-events
++++ b/net/trace-events
+@@ -13,6 +13,7 @@ colo_compare_icmp_miscompare(const char *sta, int size) ": %s = %d"
+ colo_compare_ip_info(int psize, const char *sta, const char *stb, int ssize, const char *stc, const char *std) "ppkt size = %d, ip_src = %s, ip_dst = %s, spkt size = %d, ip_src = %s, ip_dst = %s"
+ colo_old_packet_check_found(int64_t old_time) "%" PRId64
+ colo_compare_miscompare(void) ""
++colo_compare_tcp_info(const char *pkt, uint32_t seq, uint32_t ack, int hdlen, int pdlen, int offset, int flags) "%s: seq/ack= %u/%u hdlen= %d pdlen= %d offset= %d flags=%d\n"
+ 
+ # net/filter-rewriter.c
+ colo_filter_rewriter_debug(void) ""
+-- 
+2.9.4
