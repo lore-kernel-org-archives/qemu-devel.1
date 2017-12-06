@@ -1,27 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49065)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49828)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcandre.lureau@gmail.com>) id 1eMWI6-0008S5-Fv
-	for qemu-devel@nongnu.org; Wed, 06 Dec 2017 04:46:59 -0500
+	(envelope-from <pbonzini@redhat.com>) id 1eMWK2-0001pN-S7
+	for qemu-devel@nongnu.org; Wed, 06 Dec 2017 04:48:59 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcandre.lureau@gmail.com>) id 1eMWI5-0003pE-Lj
-	for qemu-devel@nongnu.org; Wed, 06 Dec 2017 04:46:58 -0500
-Received: from mail-wm0-x243.google.com ([2a00:1450:400c:c09::243]:46375)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <marcandre.lureau@gmail.com>)
-	id 1eMWI5-0003nr-FR
-	for qemu-devel@nongnu.org; Wed, 06 Dec 2017 04:46:57 -0500
-Received: by mail-wm0-x243.google.com with SMTP id r78so6098729wme.5
-	for <qemu-devel@nongnu.org>; Wed, 06 Dec 2017 01:46:55 -0800 (PST)
+	(envelope-from <pbonzini@redhat.com>) id 1eMWJy-0004oD-1H
+	for qemu-devel@nongnu.org; Wed, 06 Dec 2017 04:48:58 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:56558)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1eMWJx-0004nn-Ra
+	for qemu-devel@nongnu.org; Wed, 06 Dec 2017 04:48:53 -0500
+References: <1511505030-3669-1-git-send-email-yang.zhong@intel.com>
+	<5A1A5C6E.9060409@huawei.com> <20171201105622.GB26237@yangzhon-Virtual>
+	<74cccd14-e485-90d4-82d9-03355c05faca@redhat.com>
+	<20171204120322.GA32151@yangzhon-Virtual> <5A253EF5.6040300@huawei.com>
+	<20171205060047.GA4102@yangzhon-Virtual>
+	<024fd897-a16a-f69e-94dc-07affb3ef724@redhat.com>
+	<20171206092625.GA19639@yangzhon-Virtual>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <6bfac215-b5ba-fd09-d17b-310a2c843a2b@redhat.com>
+Date: Wed, 6 Dec 2017 10:48:45 +0100
 MIME-Version: 1.0
-In-Reply-To: <CABkJTM4RL4cZ0euYX7d8xPd7ozrN76nr0rafut0LBJmZWFD+Vw@mail.gmail.com>
-References: <CABkJTM4RL4cZ0euYX7d8xPd7ozrN76nr0rafut0LBJmZWFD+Vw@mail.gmail.com>
-From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
-Date: Wed, 6 Dec 2017 10:46:54 +0100
-Message-ID: <CAJ+F1C+6Gt-STfZhsRsr-q9YeMOP5jyRiQ73OuhO9Uz+QE3fGQ@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
+In-Reply-To: <20171206092625.GA19639@yangzhon-Virtual>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH] input: free InputEvent when it can't be
- inserted into a full kdb queue
+Subject: Re: [Qemu-devel] [PATCH v3] rcu: reduce more than 7MB heap memory
+ by malloc_trim()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,59 +34,45 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?B?55Sw5q6/6Iej?= <dianchen.tdc@gmail.com>
-Cc: QEMU <qemu-devel@nongnu.org>, icymemo@gmail.com, quan.xu0@gmail.com
+To: Yang Zhong <yang.zhong@intel.com>, stefanha@redhat.com, berrange@redhat.com
+Cc: qemu-devel@nongnu.org, weidong.huang@huawei.com, arei.gonglei@huawei.com, liujunjie23@huawei.com, wangxinxin.wang@huawei.com, stone.xulei@huawei.com, zhaoshenglong@huawei.com
 
-Hi
+On 06/12/2017 10:26, Yang Zhong wrote:
+>   Hello Paolo,
+>=20
+>   The best option is only trim one time after guest kernel bootup or VM=
+ bootup, and as for
+>   hotplug/unhotplug operations during the VM running, the trim still ca=
+n do for each batch
+>   memory free because trim will not impact VM performance during VM run=
+ning status.
+>=20
+>   So, the key point is qemu is hard to know when guest ernel bootup is =
+over. If you have some=20
+>   suggestions, please let me know. thanks!
 
-On Wed, Dec 6, 2017 at 3:29 AM, =E7=94=B0=E6=AE=BF=E8=87=A3 <dianchen.tdc@g=
-mail.com> wrote:
-> From e8c03f405c2112428e79bb82064c7b7743d0cc86 Mon Sep 17 00:00:00 2001
-> From: Tian Dianchen <dianchen.tdc@gmail.com>
-> Date: Tue, 5 Dec 2017 14:03:53 +0800
-> Subject: [PATCH] input: free InputEvent when it can't be inserted into a
-> full
->  kdb queue
->
-> When the kdb queue is full, the evt can't be placed in it, so it should
-> be released to free the memory.
->
-> Impact: Without this limit vnc clients can exhaust host memory by keep
-> sending keyboard events when kdb queue is full.
+It shouldn't be hard.  Does QEMU's RCU thread actually get any
+significant activity after bootup?  Hence the suggestion of keeping
+malloc_trim in the RCU thread, but only do it if some time has passed
+since the last time.
 
-You may add "Leak introduced in commit fa18f36a461984eae50ab957e47ec78dae3c=
-14fc"
+Maybe something like this every time the RCU thread runs:
 
->
-> Reviewed-by: Zhang Chao <icymemo@gmail.com>
-> Reviewed-by: Quan Xu <quan.xu0@gmail.com>
-> Signed-off-by: Tian Dianchen <dianchen.tdc@gmail.com>
+ static uint64_t next_trim_time, last_trim_time;
+ if (current time < next_trim_time) {
+     next_trim_time -=3D last_trim_time / 2    /* or higher */
+     last_trim_time -=3D last_trim_time / 2    /* same as previous line *=
+/
+ } else {
+     trim_start_time =3D current time
+     malloc_trim(...)
+     last_trim_time =3D current time - trim_start_time
+     next_trim_time =3D current time + last_trim_time
+ }
 
-Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+Where the "2" factor should be tuned so that both your and Shannon's
+scenario work fine.
 
+Thanks,
 
-> ---
->  ui/input.c | 2 ++
->  1 file changed, 2 insertions(+)
->
-> diff --git a/ui/input.c b/ui/input.c
-> index 3e2d324..e5b78aa 100644
-> --- a/ui/input.c
-> +++ b/ui/input.c
-> @@ -421,6 +421,8 @@ void qemu_input_event_send_key(QemuConsole *src,
-> KeyValue *key, bool down)
->      } else if (queue_count < queue_limit) {
->          qemu_input_queue_event(&kbd_queue, src, evt);
->          qemu_input_queue_sync(&kbd_queue);
-> +    } else {
-> +        qapi_free_InputEvent(evt);
->      }
->  }
->
-> --
-> 1.8.3.1
-
-
-
---=20
-Marc-Andr=C3=A9 Lureau
+Paolo
