@@ -1,26 +1,14 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37067)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42859)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <benh@kernel.crashing.org>) id 1eMfaV-0000k1-Dx
-	for qemu-devel@nongnu.org; Wed, 06 Dec 2017 14:42:36 -0500
+	(envelope-from <mark.kanda@oracle.com>) id 1eMfju-0002xB-U2
+	for qemu-devel@nongnu.org; Wed, 06 Dec 2017 14:52:19 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <benh@kernel.crashing.org>) id 1eMfaR-0008QV-GU
-	for qemu-devel@nongnu.org; Wed, 06 Dec 2017 14:42:35 -0500
-Message-ID: <1512589309.2224.136.camel@kernel.crashing.org>
-From: Benjamin Herrenschmidt <benh@kernel.crashing.org>
-Date: Wed, 06 Dec 2017 13:41:49 -0600
-In-Reply-To: <20171206092035.GW3057@umbus.fritz.box>
-References: <20171123132955.1261-1-clg@kaod.org>
-	<20171123132955.1261-20-clg@kaod.org>
-	<20171201040115.GC30161@umbus.fritz.box>
-	<02120b7e-cd8b-af61-7d35-8289253828f6@kaod.org>
-	<20171205070004.GL3057@umbus.fritz.box>
-	<1512485426.2224.95.camel@kernel.crashing.org>
-	<20171206092035.GW3057@umbus.fritz.box>
-Content-Type: text/plain; charset="UTF-8"
-Mime-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 19/25] spapr: add hcalls support for the
- XIVE interrupt mode
+	(envelope-from <mark.kanda@oracle.com>) id 1eMfju-0001B2-7N
+	for qemu-devel@nongnu.org; Wed, 06 Dec 2017 14:52:18 -0500
+From: Mark Kanda <mark.kanda@oracle.com>
+Date: Wed,  6 Dec 2017 13:53:59 -0600
+Message-Id: <cover.1512589016.git.mark.kanda@oracle.com>
+Subject: [Qemu-devel] [PATCH 0/2] virtio-blk: miscellaneous changes
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,29 +17,22 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Gibson <david@gibson.dropbear.id.au>
-Cc: =?ISO-8859-1?Q?C=E9dric?= Le Goater <clg@kaod.org>, qemu-ppc@nongnu.org, qemu-devel@nongnu.org
+To: qemu-block@nongnu.org, qemu-devel@nongnu.org
+Cc: stefanha@redhat.com, konrad.wilk@oracle.com, martin.petersen@oracle.com, ameya.more@oracle.com, karl.heubaum@oracle.com, Mark Kanda <mark.kanda@oracle.com>
 
-On Wed, 2017-12-06 at 20:20 +1100, David Gibson wrote:
-> On Tue, Dec 05, 2017 at 08:50:26AM -0600, Benjamin Herrenschmidt wrote:
-> > On Tue, 2017-12-05 at 18:00 +1100, David Gibson wrote:
-> > > > The CPU revision. But we won't introduce XIVE exploitation mode on 
-> > > > anything else than DD2.0 which has full XIVE support. Even STORE_EOI 
-> > > > that we should be adding.
-> > > 
-> > > Hrm.  Host CPU?  That's a problem - if guest visible properties like
-> > > this vary with the host CPU, migration breaks.
-> > 
-> > I don't think this is going to be a problem in practice. The
-> > availability of trigger comes from OPAL but in practice, all virtual
-> > interrupts are going to support it always,
-> 
-> Ok.  It still makes me nervous to derive guest visible features from
-> the host.  I'd prefer to just hardwire the XIVE model to always/never
-> advertise it and simply fail if that isn't workable for the host kernel.
+This series is for two minor virtio-blk changes. The first patch
+makes the virtio-blk queue size user configurable. The second patch
+rejects logical block size > physical block configurations (similar
+to a recent change in virtio-scsi).
 
-We could fail loudly if we see an migratable interrupt that doesn't
-have the flag.
+Mark Kanda (2):
+  virtio-blk: make queue size configurable
+  virtio-blk: reject configs with logical block size > physical block
+    size
 
-Cheers,
-Ben.
+ hw/block/virtio-blk.c          | 14 +++++++++++++-
+ include/hw/virtio/virtio-blk.h |  1 +
+ 2 files changed, 14 insertions(+), 1 deletion(-)
+
+-- 
+1.8.3.1
