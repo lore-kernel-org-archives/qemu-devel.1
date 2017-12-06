@@ -1,33 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39185)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39822)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <shameerali.kolothum.thodi@huawei.com>)
-	id 1eMbUh-00059V-Ag
-	for qemu-devel@nongnu.org; Wed, 06 Dec 2017 10:20:21 -0500
+	(envelope-from <eblake@redhat.com>) id 1eMbVi-0005we-FE
+	for qemu-devel@nongnu.org; Wed, 06 Dec 2017 10:21:23 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <shameerali.kolothum.thodi@huawei.com>)
-	id 1eMbUb-0004MO-2v
-	for qemu-devel@nongnu.org; Wed, 06 Dec 2017 10:20:19 -0500
-From: Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>
-Date: Wed, 6 Dec 2017 15:19:44 +0000
-Message-ID: <5FC3163CFD30C246ABAA99954A238FA838622AF1@FRAEML521-MBX.china.huawei.com>
-References: <1510622154-17224-1-git-send-email-zhuyijun@huawei.com>
-	<1510622154-17224-2-git-send-email-zhuyijun@huawei.com>
-	<20171114084735.68e87546@t450s.home>
-	<5FC3163CFD30C246ABAA99954A238FA83845EDBF@FRAEML521-MBX.china.huawei.com>
-	<20171115112513.3c035023@t450s.home>
-	<5FC3163CFD30C246ABAA99954A238FA8384704C0@FRAEML521-MBX.china.huawei.com>
-	<20171120085745.0147df5c@t450s.home>
-	<5FC3163CFD30C246ABAA99954A238FA838622618@FRAEML521-MBX.china.huawei.com>
-	<e500dd54-04b6-5f19-316f-0598655751ea@redhat.com>
-	<5FC3163CFD30C246ABAA99954A238FA838622A1D@FRAEML521-MBX.china.huawei.com>
-	<3fcae1c1-6195-59ce-68f2-1a0b13a130c2@redhat.com>
-In-Reply-To: <3fcae1c1-6195-59ce-68f2-1a0b13a130c2@redhat.com>
-Content-Language: en-US
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+	(envelope-from <eblake@redhat.com>) id 1eMbVh-0005Ap-Br
+	for qemu-devel@nongnu.org; Wed, 06 Dec 2017 10:21:22 -0500
+References: <20171201014242.16877-1-eblake@redhat.com>
+	<20171201014242.16877-2-eblake@redhat.com>
+	<20171201144047.GE4147@localhost.localdomain>
+	<c2bde291-63d7-d94c-aac7-d894fa2a5218@redhat.com>
+	<20171201152443.GF4147@localhost.localdomain>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <a58f31d3-7252-e59b-8012-4a2a864275e0@redhat.com>
+Date: Wed, 6 Dec 2017 09:20:57 -0600
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [RFC 1/5] hw/vfio: Add function for getting
- reserved_region of device iommu group
+In-Reply-To: <20171201152443.GF4147@localhost.localdomain>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="9HFJKjWaAQSFJTIHDPu3bKUVRWGd8wULr"
+Subject: Re: [Qemu-devel] [PATCH v5 01/20] block: Add
+ .bdrv_co_block_status() callback
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,171 +28,94 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Auger Eric <eric.auger@redhat.com>, Alex Williamson <alex.williamson@redhat.com>
-Cc: "peter.maydell@linaro.org" <peter.maydell@linaro.org>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, Linuxarm <linuxarm@huawei.com>, "qemu-arm@nongnu.org" <qemu-arm@nongnu.org>, Zhaoshenglong <zhaoshenglong@huawei.com>, Zhuyijun <zhuyijun@huawei.com>
+To: Kevin Wolf <kwolf@redhat.com>
+Cc: qemu-devel@nongnu.org, jsnow@redhat.com, famz@redhat.com, qemu-block@nongnu.org, vsementsov@virtuozzo.com, Stefan Hajnoczi <stefanha@redhat.com>, Max Reitz <mreitz@redhat.com>
 
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--9HFJKjWaAQSFJTIHDPu3bKUVRWGd8wULr
+From: Eric Blake <eblake@redhat.com>
+To: Kevin Wolf <kwolf@redhat.com>
+Cc: qemu-devel@nongnu.org, jsnow@redhat.com, famz@redhat.com,
+ qemu-block@nongnu.org, vsementsov@virtuozzo.com,
+ Stefan Hajnoczi <stefanha@redhat.com>, Max Reitz <mreitz@redhat.com>
+Message-ID: <a58f31d3-7252-e59b-8012-4a2a864275e0@redhat.com>
+Subject: Re: [PATCH v5 01/20] block: Add .bdrv_co_block_status() callback
+References: <20171201014242.16877-1-eblake@redhat.com>
+ <20171201014242.16877-2-eblake@redhat.com>
+ <20171201144047.GE4147@localhost.localdomain>
+ <c2bde291-63d7-d94c-aac7-d894fa2a5218@redhat.com>
+ <20171201152443.GF4147@localhost.localdomain>
+In-Reply-To: <20171201152443.GF4147@localhost.localdomain>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
+On 12/01/2017 09:24 AM, Kevin Wolf wrote:
+> Am 01.12.2017 um 16:03 hat Eric Blake geschrieben:
+>> On 12/01/2017 08:40 AM, Kevin Wolf wrote:
+>>>> Note that most drivers give sector-aligned answers, except at
+>>>> end-of-file, even when request_alignment is smaller than a sector.
+>>>> However, bdrv_getlength() is sector-aligned (even though it gives a
+>>>> byte answer), often by exceeding the actual file size.  If we were t=
+o
+>>>> give back strict results, at least file-posix.c would report a
+>>>> transition from DATA to HOLE at the end of a file even in the middle=
 
-> -----Original Message-----
-> From: Auger Eric [mailto:eric.auger@redhat.com]
-> Sent: Wednesday, December 06, 2017 3:00 PM
-> To: Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>;
-> Alex Williamson <alex.williamson@redhat.com>
-> Cc: peter.maydell@linaro.org; qemu-devel@nongnu.org; Linuxarm
-> <linuxarm@huawei.com>; qemu-arm@nongnu.org; Zhaoshenglong
-> <zhaoshenglong@huawei.com>; Zhuyijun <zhuyijun@huawei.com>
-> Subject: Re: [Qemu-devel] [RFC 1/5] hw/vfio: Add function for getting
-> reserved_region of device iommu group
->=20
-> Hi Shameer,
->=20
-> On 06/12/17 15:38, Shameerali Kolothum Thodi wrote:
-> > Hi Eric,
-> >
-> >> -----Original Message-----
-> >> From: Auger Eric [mailto:eric.auger@redhat.com]
-> >> Sent: Wednesday, December 06, 2017 2:01 PM
-> >> To: Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>;
-> >> Alex Williamson <alex.williamson@redhat.com>
-> >> Cc: peter.maydell@linaro.org; qemu-devel@nongnu.org; Linuxarm
-> >> <linuxarm@huawei.com>; qemu-arm@nongnu.org; Zhaoshenglong
-> >> <zhaoshenglong@huawei.com>; Zhuyijun <zhuyijun@huawei.com>
-> >> Subject: Re: [Qemu-devel] [RFC 1/5] hw/vfio: Add function for getting
-> >> reserved_region of device iommu group
-> >>
-> >> Hi Shameer,
-> >>
-> >> On 06/12/17 11:30, Shameerali Kolothum Thodi wrote:
-> >>> Hi Alex,
-> >>>
-> >>>> -----Original Message-----
-> >>>> From: Shameerali Kolothum Thodi
-> >>>> Sent: Monday, November 20, 2017 4:31 PM
-> >>>> To: 'Alex Williamson' <alex.williamson@redhat.com>
-> >>>> Cc: eric.auger@redhat.com; Zhuyijun <zhuyijun@huawei.com>; qemu-
-> >>>> arm@nongnu.org; qemu-devel@nongnu.org; peter.maydell@linaro.org;
-> >>>> Zhaoshenglong <zhaoshenglong@huawei.com>; Linuxarm
-> >>>> <linuxarm@huawei.com>
-> >>>> Subject: RE: [Qemu-devel] [RFC 1/5] hw/vfio: Add function for gettin=
-g
-> >>>> reserved_region of device iommu group
-> >>> [...]
-> >>>>>>> And sysfs is a good interface if the user wants to use it to
-> >>>>>>> configure the VM in a way that's compatible with a device.  For
-> >>>>>>> instance, in your case, a user could evaluate these reserved
-> >>>>>>> regions across all devices in a system, or even across an entire
-> >>>>>>> cluster, and instantiate the VM with a memory map compatible with
-> >>>>>>> hotplugging any of those evaluated devices (QEMU implementation o=
-f
-> >>>> allowing the user to do this TBD).
-> >>>>>>> Having the vfio device evaluate these reserved regions only helps
-> >>>>>>> in the cold-plug case.  So the proposed solution is limited in
-> >>>>>>> scope and doesn't address similar needs on other platforms.  Ther=
+>>>> of a sector, which can throw off callers; so we intentionally lie an=
+d
+>>>> state that any partial sector at the end of a file has the same
+>>>> status for the entire sector.  Maybe at some future day we can
+>>>> report actual file size instead of rounding up, but not for this
+>>>> series.
+>>>
+>>> In what way does this throw off callers in practice?
+>>
+>> Several iotests failed if I didn't do that (it's been a few months, so=
+ the
+>> details are a bit fuzzy).  I think the biggest problem is that because=
+ we
+>> round the size up in bdrv_getlength(), but CANNOT access those rounded=
+
+>> bytes, then reporting the status of those bytes as a hole (which is th=
+e only
+>> sane thing that file-posix can do) can cause grief when the rest of th=
 e
-> >>>>>>> is value to verifying that a device's IOVA space is compatible
-> >>>>>>> with a VM memory map and modifying the memory map on cold-plug
-> or
-> >>>>>>> rejecting the device on hot-plug, but isn't that why we have an
-> >>>>>>> ioctl within vfio to expose information about the IOMMU?  Why tak=
-e
-> >>>>>>> the path of allowing QEMU to rummage through sysfs files outside
-> >>>>>>> of vfio, implying additional security and access concerns, rather
-> >>>>>>> than filling the gap within the vifo API?
-> >>>>>>
-> >>>>>> Thanks Alex for the explanation.
-> >>>>>>
-> >>>>>> I came across this patch[1] from Eric where he introduced the IOCT=
-L
-> >>>>> interface to
-> >>>>>> retrieve the reserved regions. It looks like this can be reworked =
-to
-> >>>>> accommodate
-> >>>>>> the above requirement.
-> >>>>>
-> >>>>> I don't think we need a new ioctl for this, nor do I think that
-> >>>>> describing the holes is the correct approach.  The existing
-> >>>>> VFIO_IOMMU_GET_INFO ioctl can be extended to support capability
-> >>>>> chains, as we've done for VFIO_DEVICE_GET_REGION_INFO.
-> >>>>
-> >>>> Right, as far as I can see the above mentioned patch is doing exactl=
-y the
-> >> same,
-> >>>> extending the VFIO_IOMMU_GET_INFO ioctl with capability chain.
-> >>>>
-> >>>>> IMO, we should try to
-> >>>>> describe the available fixed IOVA regions which are available for
-> >>>>> mapping rather than describing various holes within the address spa=
-ce
-> >>>>> which are unavailable.  The latter method always fails to describe =
-the
-> >>>>> end of the mappable IOVA space and gets bogged down in trying to
-> >>>>> classify the types of holes that might exist.  Thanks,
-> >>>>
-> >>>
-> >>> I was going through this and noticed that it is possible to have mult=
-iple
-> >>> iommu domains associated with a container. If that's true, is it safe=
- to
-> >>> make the assumption that all the domains will have the same iova
-> >>> geometry or not?
-> >> To me the answer is no.
-> >>
-> >> There are several iommu domains "underneath" a single container. You
-> >> attach vfio groups to a container. Each of them is associated to an
-> >> iommu group and an iommu domain. See
-> vfio_iommu_type1_attach_group().
-> >>
-> >> Besides, the reserved regions are per iommu group.
-> >>
-> >
-> > Thanks for your reply. Yes, container can have multiple groups(hence
-> multiple
-> > iommu domains) and reserved regions are per group. Hence while deciding
-> > the default supported iova geometry we have to go through all the domai=
-ns
-> > in the container and select smallest aperture as the supported default =
-iova
-> > range.
-> >
-> > Please find below snippet from a patch I am working on. Please
-> > let me know your thoughts on this.
-> >
-> > Thanks,
-> > Shameer
-> >
-> > -- >8 --
-> > +static int vfio_build_iommu_iova_caps(struct vfio_iommu *iommu,
-> > +                               struct vfio_info_cap *caps) {
-> > +       struct iommu_resv_region *resv, *resv_next;
-> > +       struct vfio_iommu_iova *iova, *iova_next;
-> > +       struct list_head group_resv_regions, vfio_iova_regions;
-> > +       struct vfio_domain *domain;
-> > +       struct vfio_group *g;
-> > +       phys_addr_t start, end;
-> > +       int ret =3D 0;
-> > +
-> > +       domain =3D list_first_entry(&iommu->domain_list,
-> > +                                 struct vfio_domain, next);
-> > +       /* Get the default iova range supported */
-> > +       start =3D domain->domain->geometry.aperture_start;
-> > +       end =3D domain->domain->geometry.aperture_end;
-> >
-> > This is where I am confused. I think instead I should go over
-> > the domain_list and select the smallest aperture as default
-> > iova range.
-> yes that's correct. I Just want to warn you Pierre is working on the
-> same topic. May be worth to sync together.
+>> sector (which we CAN access) is data.
 >=20
-> [PATCH] vfio/iommu_type1: report the IOMMU aperture info
-> (https://patchwork.kernel.org/patch/10084655/)
->=20
-> I think he plans to rework his series with capability chain too.
+> Does this indicate caller bugs? If they call byte-based
+> bdrv_co_block_status(), they should surely be able to handle this
+> situation in theory?
 
-Thanks Eric for the pointer. I will sent out my patch as an RFC then and ta=
-ke
-it from there (without the default iova aperture changes, as I can see ther=
-e are
-some discussions  in Pierre's patch to solve that)
+Hmm, the more I try to reproduce the failure, the more I'm coming to the
+conclusion that I needed this back when we returned a rounded offset via
+the return value (my tag nbd-byte-callback-v2), but now that we return
+the actual offset rather than a rounded offset via a secondary parameter
+(my tag nbd-byte-callback-v4), we don't need to compensate for
+end-of-file at all!  That means even less code in my upcoming v5 submissi=
+on.
 
-Thanks,
-Shameer
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
+
+
+--9HFJKjWaAQSFJTIHDPu3bKUVRWGd8wULr
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlooCtkACgkQp6FrSiUn
+Q2rZsAgAreGOvprIKUYd9ae+BvnCSPcSFUiFwYzS1g8TkMeisetoMmgmxJYP+az/
+8YryERQIsmCwID1r25R6SGxMGdhT1CQzxVlrokHyxkUKvKPwsqVg98us/IzQrA/i
+JGDgNDpH40CmZcPNOq49ie2u9M2BBqw2lJWVUzDjoo2fQDtFmFaUFvHCduHUZb9f
+XQyAnd9fnn6JlseN2SzanvmaWRb8rX5E40ryCuSZiHM7Ca+UInTfoFGEUAiJB7+b
+dRt0+BHk8483T/98HiJZN91yriIlCI81yNk8x0OLVVGOJIJN2YwUAYA5X7cIbEID
+ZK78bigb2Orl1rIawni4c3eDI9CSmA==
+=fIlU
+-----END PGP SIGNATURE-----
+
+--9HFJKjWaAQSFJTIHDPu3bKUVRWGd8wULr--
