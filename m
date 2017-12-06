@@ -1,31 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48533)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48534)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1eMP5m-0004I7-Na
+	(envelope-from <bounces@canonical.com>) id 1eMP5m-0004I8-Nl
 	for qemu-devel@nongnu.org; Tue, 05 Dec 2017 21:05:47 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1eMP5h-0008B1-V5
+	(envelope-from <bounces@canonical.com>) id 1eMP5h-0008Au-Oe
 	for qemu-devel@nongnu.org; Tue, 05 Dec 2017 21:05:46 -0500
-Received: from indium.canonical.com ([91.189.90.7]:48406)
+Received: from indium.canonical.com ([91.189.90.7]:48340)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1eMP5h-0008AM-Pi
+	id 1eMP5h-00089f-IZ
 	for qemu-devel@nongnu.org; Tue, 05 Dec 2017 21:05:41 -0500
 Received: from loganberry.canonical.com ([91.189.90.37])
 	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1eMP5g-0002dA-Fd
-	for <qemu-devel@nongnu.org>; Wed, 06 Dec 2017 02:05:40 +0000
+	id 1eMP5e-0002cp-Lu
+	for <qemu-devel@nongnu.org>; Wed, 06 Dec 2017 02:05:38 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 73F042E80CB
-	for <qemu-devel@nongnu.org>; Wed,  6 Dec 2017 02:05:40 +0000 (UTC)
+	by loganberry.canonical.com (Postfix) with ESMTP id 9EBD02E80C3
+	for <qemu-devel@nongnu.org>; Wed,  6 Dec 2017 02:05:38 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Wed, 06 Dec 2017 01:58:08 -0000
-From: Launchpad Bug Tracker <1670509@bugs.launchpad.net>
+Date: Wed, 06 Dec 2017 01:57:57 -0000
+From: Nathan Rennie-Waldock <1670509@bugs.launchpad.net>
 Reply-To: Bug 1670509 <1670509@bugs.launchpad.net>
 Sender: bounces@canonical.com
 References: <20170306224936.27687.97076.malonedeb@gac.canonical.com>
-Message-Id: <151252548925.10140.10105953954205001365.malone@wampee.canonical.com>
+Message-Id: <151252547814.3366.539152234273246245.malone@gac.canonical.com>
 Errors-To: bounces@canonical.com
 Subject: [Qemu-devel] [Bug 1670509] Re: sgabios outputs incorrect video modes
 List-Id: <qemu-devel.nongnu.org>
@@ -38,10 +38,21 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-Status changed to 'Confirmed' because the bug affects multiple users.
+Any chance of getting this patch included?
+I've deleted the incorrect patch and attached the correct one (taken from Q=
+EMU's sgabios repo).
 
-** Changed in: sgabios (Ubuntu)
-       Status: New =3D> Confirmed
+** Patch removed: "0001-SGABIOS-fix-wrong-video-attrs-for-int-10h-ah-13h.pa=
+tch"
+   https://bugs.launchpad.net/ubuntu/+source/sgabios/+bug/1670509/+attachme=
+nt/4834118/+files/0001-SGABIOS-fix-wrong-video-attrs-for-int-10h-ah-13h.pat=
+ch
+
+** Patch added: "0001-SGABIOS-fix-wrong-video-attrs-for-int-10h-ah-13h.patc=
+h"
+   https://bugs.launchpad.net/ubuntu/+source/sgabios/+bug/1670509/+attachme=
+nt/5019029/+files/0001-SGABIOS-fix-wrong-video-attrs-for-int-10h-ah-13h.pat=
+ch
 
 -- =
 
