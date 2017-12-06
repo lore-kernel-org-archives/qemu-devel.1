@@ -1,25 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43547)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49872)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1eMbdE-0004oJ-AU
-	for qemu-devel@nongnu.org; Wed, 06 Dec 2017 10:29:09 -0500
+	(envelope-from <thuth@redhat.com>) id 1eMboT-0001RV-EY
+	for qemu-devel@nongnu.org; Wed, 06 Dec 2017 10:40:46 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1eMbdB-0004dT-4L
-	for qemu-devel@nongnu.org; Wed, 06 Dec 2017 10:29:08 -0500
-Received: from mail-wr0-x241.google.com ([2a00:1450:400c:c0c::241]:35178)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1eMbdA-0004d3-Sz
-	for qemu-devel@nongnu.org; Wed, 06 Dec 2017 10:29:05 -0500
-Received: by mail-wr0-x241.google.com with SMTP id g53so4335555wra.2
-	for <qemu-devel@nongnu.org>; Wed, 06 Dec 2017 07:29:04 -0800 (PST)
-From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
-Date: Wed,  6 Dec 2017 15:28:45 +0000
-Message-Id: <20171206152845.8215-1-alex.bennee@linaro.org>
+	(envelope-from <thuth@redhat.com>) id 1eMboO-0006Vs-Fq
+	for qemu-devel@nongnu.org; Wed, 06 Dec 2017 10:40:45 -0500
+References: <20171204125505.29203-1-david@redhat.com>
+	<20171204125505.29203-6-david@redhat.com>
+From: Thomas Huth <thuth@redhat.com>
+Message-ID: <de5e7915-56eb-a5fb-0ef3-4b54c22052fe@redhat.com>
+Date: Wed, 6 Dec 2017 16:40:33 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH for 2.11] target/sh4/translate.c: fix TCG leak
- during gusa sequence
+In-Reply-To: <20171204125505.29203-6-david@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v1 for-2.12 5/5] s390x/tcg: wire up STORE
+ CHANNEL REPORT WORD
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,35 +25,20 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: peter.maydell@linaro.org
-Cc: qemu-devel@nongnu.org, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, qemu-stable@nongnu.org, Aurelien Jarno <aurelien@aurel32.net>
+To: David Hildenbrand <david@redhat.com>, qemu-s390x@nongnu.org, qemu-devel@nongnu.org
+Cc: Christian Borntraeger <borntraeger@de.ibm.com>, Cornelia Huck <cohuck@redhat.com>, Richard Henderson <rth@twiddle.net>, Alexander Graf <agraf@suse.de>
 
-This fixes bug #1735384 while running java under qemu-sh4. When debug
-was enabled it showed a problem with TCG temps. Once fixed I was able
-to run java -version normally.
+On 04.12.2017 13:55, David Hildenbrand wrote:
+> We somehow missed that, new kernels require it.
+> 
+> Signed-off-by: David Hildenbrand <david@redhat.com>
+> ---
+>  target/s390x/helper.h      | 1 +
+>  target/s390x/insn-data.def | 1 +
+>  target/s390x/misc_helper.c | 9 +++++++++
+>  target/s390x/translate.c   | 8 ++++++++
+>  4 files changed, 19 insertions(+)
 
-Reported-by: John Paul Adrian Glaubitz <glaubitz@physik.fu-berlin.de>
-Suggested-by: Richard Henderson <richard.henderson@linaro.org>
-Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
-Tested-by: John Paul Adrian Glaubitz <glaubitz@physik.fu-berlin.de>
-Cc: qemu-stable@nongnu.org
----
- target/sh4/translate.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+IANATE again, but the patch looks right to me, so:
 
-diff --git a/target/sh4/translate.c b/target/sh4/translate.c
-index 703020fe87..b4b5c822d0 100644
---- a/target/sh4/translate.c
-+++ b/target/sh4/translate.c
-@@ -2189,7 +2189,7 @@ static int decode_gusa(DisasContext *ctx, CPUSH4State *env, int *pmax_insns)
-     }
- 
-     /* If op_src is not a valid register, then op_arg was a constant.  */
--    if (op_src < 0) {
-+    if (op_src < 0 && !TCGV_IS_UNUSED(op_arg)) {
-         tcg_temp_free_i32(op_arg);
-     }
- 
--- 
-2.15.1
+Reviewed-by: Thomas Huth <thuth@redhat.com>
