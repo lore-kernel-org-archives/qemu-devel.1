@@ -1,27 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34182)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34642)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <wei.w.wang@intel.com>) id 1eMWjo-0007mk-Us
-	for qemu-devel@nongnu.org; Wed, 06 Dec 2017 05:15:37 -0500
+	(envelope-from <dgibson@ozlabs.org>) id 1eMWkr-0008FT-D6
+	for qemu-devel@nongnu.org; Wed, 06 Dec 2017 05:16:44 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <wei.w.wang@intel.com>) id 1eMWjk-0006a8-Ct
-	for qemu-devel@nongnu.org; Wed, 06 Dec 2017 05:15:36 -0500
-Received: from mga04.intel.com ([192.55.52.120]:41564)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <wei.w.wang@intel.com>)
-	id 1eMWjk-0006WS-4O
-	for qemu-devel@nongnu.org; Wed, 06 Dec 2017 05:15:32 -0500
-Message-ID: <5A27C3B7.7010109@intel.com>
-Date: Wed, 06 Dec 2017 18:17:27 +0800
-From: Wei Wang <wei.w.wang@intel.com>
+	(envelope-from <dgibson@ozlabs.org>) id 1eMWko-0007ZL-5O
+	for qemu-devel@nongnu.org; Wed, 06 Dec 2017 05:16:41 -0500
+Date: Wed, 6 Dec 2017 21:03:46 +1100
+From: David Gibson <david@gibson.dropbear.id.au>
+Message-ID: <20171206100346.GZ3057@umbus.fritz.box>
+References: <1512488477-209071-1-git-send-email-imammedo@redhat.com>
+	<20171206001406.GP3057@umbus.fritz.box>
+	<20171206105732.050435da@redhat.com>
 MIME-Version: 1.0
-References: <1512444796-30615-1-git-send-email-wei.w.wang@intel.com>
-	<1512444796-30615-3-git-send-email-wei.w.wang@intel.com>
-	<20171205145950.GF31150@stefanha-x1.localdomain>
-In-Reply-To: <20171205145950.GF31150@stefanha-x1.localdomain>
-Content-Type: text/plain; charset=windows-1252; format=flowed
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [virtio-dev] [PATCH v3 2/7] vhost-pci-net: add
- vhost-pci-net
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature"; boundary="E9SPMlsjsjqOlA3h"
+Content-Disposition: inline
+In-Reply-To: <20171206105732.050435da@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH 2.12] spapr: replace numa_get_node() with
+ lookup in pc-dimm list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,29 +26,88 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefan Hajnoczi <stefanha@redhat.com>
-Cc: virtio-dev@lists.oasis-open.org, qemu-devel@nongnu.org, mst@redhat.com, marcandre.lureau@redhat.com, jasowang@redhat.com, pbonzini@redhat.com, jan.kiszka@siemens.com, avi.cohen@huawei.com, zhiyong.yang@intel.com
+To: Igor Mammedov <imammedo@redhat.com>
+Cc: qemu-devel@nongnu.org, agraf@suse.de, ehabkost@redhat.com, qemu-ppc@nongnu.org
 
-On 12/05/2017 10:59 PM, Stefan Hajnoczi wrote:
-> On Tue, Dec 05, 2017 at 11:33:11AM +0800, Wei Wang wrote:
->> Add the vhost-pci-net device emulation. The device uses bar 2 to expose
->> the remote VM's memory to the guest. The first 4KB of the the bar area
->> stores the metadata which describes the remote memory and vring info.
-> This device looks like the beginning of a new "vhost-pci" virtio device
-> type.  There are layering violations:
->
-> 1. This has nothing to do with virtio-net or networking, it's purely
->     vhost-pci.  Why is it called vhost-pci-net instead of vhost-pci?
 
-Here are a few things that are specific to vhost-pci-net here:
+--E9SPMlsjsjqOlA3h
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-1) The device category here is set to NETWORK.
-2) vhost-pci-net related features (e.g. future MQ feature) will be added 
-to the property here.
+On Wed, Dec 06, 2017 at 10:57:32AM +0100, Igor Mammedov wrote:
+> On Wed, 6 Dec 2017 11:14:06 +1100
+> David Gibson <david@gibson.dropbear.id.au> wrote:
+>=20
+> > On Tue, Dec 05, 2017 at 04:41:17PM +0100, Igor Mammedov wrote:
+> > > SPAPR is the last user of numa_get_node() and a bunch of
+> > > supporting code to maintain numa_info[x].addr list.
+> > >=20
+> > > Get LMB node id from pc-dimm list, which allows to
+> > > remove ~80LOC maintaining dynamic address range
+> > > lookup list.
+> > >=20
+> > > It also removes pc-dimm dependency on numa_[un]set_mem_node_id()
+> > > and makes pc-dimms a sole source of information about which
+> > > node it belongs to and removes duplicate data from global
+> > > numa_info.
+> > >=20
+> > > Signed-off-by: Igor Mammedov <imammedo@redhat.com>
+> > > ---
+> > > Beside making code simpler, my interest in simplification
+> > > lies in allowing calling parse_numa_opts() multiple times,
+> > > without complex cleanups in case NUMA config is changed
+> > > since startup.
+> > >=20
+> > > PS:
+> > > build tested only
+> > > ---
+> > >  include/sysemu/numa.h | 10 ------
+> > >  hw/mem/pc-dimm.c      |  2 --
+> > >  hw/ppc/spapr.c        | 29 +++++++++++++++-
+> > >  numa.c                | 94 -----------------------------------------=
+----------
+> > >  4 files changed, 28 insertions(+), 107 deletions(-) =20
+> >=20
+> > Applied to ppc-for-2.12.
+> Thanks
+>=20
+> >=20
+> > It definitely seems like an improvement over what we have.  Looking
+> > back at the DIMM list from QMP in the loop seems a little roundabout
+> > though.  Maybe we'd be better stepping through the DIMMs, then
+> > stepping through the LMBs within each DIMM, rather than just stepping
+> > through the LMBs directly.
+> Surely that would be better, maybe someone from ppc side would take care
+> of it.
 
-Right now, we only have vhost-pci-net. How about all focusing on the 
-vhost-pci-net, and ignore vhost-pci for now? When future other types of 
-devices are addded, we can abstract out a common vhost-pci layer?
+Well, it's now on my vast list of things to look at if I ever have
+time..
 
-Best,
-Wei
+--=20
+David Gibson			| I'll have my music baroque, and my code
+david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
+				| _way_ _around_!
+http://www.ozlabs.org/~dgibson
+
+--E9SPMlsjsjqOlA3h
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlonwIAACgkQbDjKyiDZ
+s5Lw2w/7B8RMODFvYw2stq/gyLRTBl3xoNofMPRKaoasaO5LP2rsQbybPp25brtE
+/xBFQZZHgkxf5Cx/ilpnkZSY/5+yEyRXhGEbN6jZasrcDDGQR+V7uC8sWBTxhH6S
+E6mta33yg/RpTEQjkTkvl0mraHb87Gx/45DlMopYFAsPZoZbs0vbmlbDNLHbUy0r
+aKeTrSFFdG+exia1A9/JcCeuazwwbo0cIvB+9V17dZjz1cN+scYBI9z3NQN2eDS5
+nhU+uEP4XSVFMvrCr3YVS8doj6Rmn3/yAXENpDSEUElyVXlC8LhNWg5NXZgqt6YP
++wBWHJxh26cZ223tnuHrI7fwOUZJqoWWHGlIVgHBNj9B+xBzNaFzQJhxUdt0nvZJ
+I/5+v/jfiV0I7KKX0VNnFU7AmBDdpXrLFwYeRUEoUgRAiT9wKoUIex8//eQoD1Bm
+/FRbtr1Ru7w4uGIySBUpehgEb+s6DZgTxrR86EE1IBliXSkQZ2nIiwd4z3UKwixe
+IVRJmqfX4MrGcs/1XAjPc3G+4IwKsAHzZ/znieGOLofKH0ZGwmeyPB7Co9ScxQco
+WzeDMD9XRyzmzGspY1tby4PnrhfpIpGFw80dXaeRRqBKLZe7eP5MQwVWNZ2wtP0/
+6I3teIVQAbNPTtLQGDEKkEN4My8m+1trfr5tE9YR23vBTlBoiPY=
+=YVJy
+-----END PGP SIGNATURE-----
+
+--E9SPMlsjsjqOlA3h--
