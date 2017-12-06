@@ -1,34 +1,36 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39227)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39413)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1eMUwt-0007ha-KI
-	for qemu-devel@nongnu.org; Wed, 06 Dec 2017 03:21:00 -0500
+	(envelope-from <laurent@vivier.eu>) id 1eMUxA-0007p5-47
+	for qemu-devel@nongnu.org; Wed, 06 Dec 2017 03:21:17 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1eMUwq-0007qk-FC
-	for qemu-devel@nongnu.org; Wed, 06 Dec 2017 03:20:59 -0500
-Received: from indium.canonical.com ([91.189.90.7]:46528)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1eMUwq-0007qD-7s
-	for qemu-devel@nongnu.org; Wed, 06 Dec 2017 03:20:56 -0500
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1eMUwn-0002Fi-5u
-	for <qemu-devel@nongnu.org>; Wed, 06 Dec 2017 08:20:53 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 127682E80D7
-	for <qemu-devel@nongnu.org>; Wed,  6 Dec 2017 08:20:52 +0000 (UTC)
+	(envelope-from <laurent@vivier.eu>) id 1eMUx6-00080a-VH
+	for qemu-devel@nongnu.org; Wed, 06 Dec 2017 03:21:16 -0500
+Received: from mout.kundenserver.de ([212.227.17.24]:52166)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1eMUx6-0007zu-KV
+	for qemu-devel@nongnu.org; Wed, 06 Dec 2017 03:21:12 -0500
+References: <20171123163538.31411-1-laurent@vivier.eu>
+	<CAFEAcA9+f2cgUUS00DXzF9a96evPRnxY5MTUZpe+OA3Trv84WA@mail.gmail.com>
+	<e6dc192f-6fcd-f25d-d1db-983280c915f4@vivier.eu>
+	<CAFEAcA9uOJ5i-XbK5zbxgFBSvu=kQ6p99EA-CyhrSTKtx+CF9A@mail.gmail.com>
+	<e90eaeb0-19d4-659c-9007-5b0e18d87d9a@tuxfamily.org>
+	<629dc696-a5e7-4b94-f964-0e9fdd7cf511@vivier.eu>
+	<13637ee3-544f-11cc-4ee7-a27af2c91173@tuxfamily.org>
+	<CAGC02hQ1RhaHC2rhFecjvCK4oGF0qMQpr6558XiWMXaUSvTq9g@mail.gmail.com>
+	<1d262914-ffca-85c2-71da-2ef6184cd7e1@vivier.eu>
+	<713F2EE1-A420-4DAC-A4E3-ED7A0CC6C0E5@cable.vol.at>
+	<dc357e6c-ded2-63c3-6ca8-f13b25ce9e5c@vivier.eu>
+	<CAGC02hR9tgwb2ZWHgSZGo09zXc+pM-syC-jOAVk=K9k39ExX1g@mail.gmail.com>
+From: Laurent Vivier <laurent@vivier.eu>
+Message-ID: <94157a5d-4173-efaa-10eb-f47106431002@vivier.eu>
+Date: Wed, 6 Dec 2017 09:20:45 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Wed, 06 Dec 2017 08:13:11 -0000
-From: ChristianEhrhardt <1736655@bugs.launchpad.net>
-Reply-To: Bug 1736655 <1736655@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <151253983521.3178.4021889730911467554.malonedeb@gac.canonical.com>
-Message-Id: <151254799186.10171.4022481552142627458.malone@wampee.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1736655] Re: 2k3/xp guests w/virtio-net randomly
- DHCP fail on boot
+In-Reply-To: <CAGC02hR9tgwb2ZWHgSZGo09zXc+pM-syC-jOAVk=K9k39ExX1g@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH v2 0/5] target/m68k: implement 680x0 FPU
+ (part 3)
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,98 +39,96 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: william lin <wlsaidhi@gmail.com>
+Cc: Andreas Grabher <andreas.grabher@cable.vol.at>, Thomas Huth <huth@tuxfamily.org>, Peter Maydell <peter.maydell@linaro.org>, QEMU Developers <qemu-devel@nongnu.org>, Aurelien Jarno <aurelien@aurel32.net>, Richard Henderson <rth@twiddle.net>
 
-I wanted an XP guest testbed anyway for some time, so this was the perfect =
-reason to create one.
-# virtio drivers from [1] and otherwise a "normal" virt-manager setup of a =
-winxp sp3 (32bit) guest
+Le 05/12/2017 à 22:24, william lin a écrit :
+> 
+> 
+> On Tue, Dec 5, 2017 at 2:01 PM, Laurent Vivier <laurent@vivier.eu
+> <mailto:laurent@vivier.eu>> wrote:
+> 
+>     Le 05/12/2017 à 18:42, Andreas Grabher a écrit :
+>     >
+>     > Am 05.12.2017 um 10:46 schrieb Laurent Vivier <laurent@vivier.eu <mailto:laurent@vivier.eu>
+>     > <mailto:laurent@vivier.eu <mailto:laurent@vivier.eu>>>:
+>     >
+>     >> Le 05/12/2017 à 09:56, william lin a écrit :
+>     >>> On Wed, Nov 29, 2017 at 9:19 AM, Thomas Huth <huth@tuxfamily.org
+>     <mailto:huth@tuxfamily.org>
+>     >>> <mailto:huth@tuxfamily.org <mailto:huth@tuxfamily.org>>
+>     >>> <mailto:huth@tuxfamily.org <mailto:huth@tuxfamily.org>>> wrote:
+>     >>>
+>     >>>    On 29.11.2017 15:17, Laurent Vivier wrote:
+...
+>     >>>
+>     >>> So we can't use these C code directly as it uses helpers from 2b.
+>     >>> However, would it be 
+>     >>> ok to write our own set of C code along with the necessary
+>     helpers using
+>     >>> the C and asm 
+>     >>> code as reference? (would be part of 2a)
+>     >>
+>     >> I've ported all the functions written by Andreas to QEMU/softfloat 2a
+>     >> and it doesn't need any helpers from 2b.
+>     >>
+>     >> What we need to know is what is the license of his code and if it has
+>     >> been written based on the NetBSD code (BSD license) or from the
+>     libFPSP
+>     >> (proprietary code) [but I think the code is the same...]
+>     >>
+>     >> Thanks,
+>     >> Laurent
+> 
+> 
+> The functions we are looking for in particular are the transcendental
+> and trig functions
+> for floatx80. (sin, cos, twotox, etc..)
+> 
+> For some context:
+> We need and implementation of those  functions for x86 as it currently
+> converts floatx80 to
+> double before calling into glibc and then converting back to floatx80.
+> This results 
+> in inaccuracies for calculations that use x87 instructions for
+> intermediate operations.
+> (https://bugs.launchpad.net/qemu/+bug/645662)
+> 
+> 
+> I searched through the archive and found your code for this patch:
+> 
+> https://lists.gnu.org/archive/html/qemu-devel/2017-01/msg03766.html
+> 
+> ...
+> 
+> +void HELPER(sincos_FP0_FP1)(CPUM68KState *env)
+> +{
+> +    floatx80 res;
+> +    long double val, valsin, valcos;
+> +
+> +    val = floatx80_to_ldouble(FP0_to_floatx80(env));
+> +
+> +    sincosl(val, &valsin, &valcos);
+> +    res = ldouble_to_floatx80(valsin);
+> +    floatx80_to_FP0(env, res);
+> +    res = ldouble_to_floatx80(valcos);
+> +    floatx80_to_FP1(env, res);
+> +}
+> 
+> ...
+> 
+> In relation to the bug, this implementation would provide more accurate 
+> results, but not be consistent with actual x87 hardware.
+> 
+> If these are not the code you are referring to, then can you please
+> point to us the 
+> correct ones?
 
-- Modified to use virtio for net
-- Modified to have the virtio drivers as floppy
-- Installed virtio drivers for network afer base install
+The code ported from "previous" to QEMU can be found here:
 
-So after that I assume I'm at the same stage you are.
-- WinXP Guest
-- Virtio Driver for network
-- Host provides DHCP to a bridged network
+https://github.com/vivier/qemu-m68k/blob/m68k-dev/fpu/softfloat.c#L7422
 
-I set that to a rebot loop and checked the internet connection through
-the dhcp virtiop net after reboot. This worked through 10 reboots
-without an issue, but then IIRC with vhost ioeventfd was on all the
-time.
+but it needs some more polishing.
 
-I realized the change identified by you should only make a differenc on non=
--vhost virtio-net.
-But libvirt will make use of vhost automatically if available, so I set the=
- interface to use driver qemu explicitly.
-
-Another 10 reboots without issue - the virtio version is of 7/19/2017 versi=
-on 51.75.104.14100
-There must be something more to your case, so please if you have more info =
-how to trigger the case let us know.
-
-I really think I have the same case you were describing as affected by the =
-change you identified:
-$ virsh qemu-monitor-command --hmp winxp 'info network'
-net0: index=3D0,type=3Dnic,model=3Dvirtio-net-pci,macaddr=3D52:54:00:ce:ca:=
-72
- \ hostnet0: index=3D0,type=3Dtap,fd=3D26
-Here from qtree on the device [2] ioeventfd is on.
-
-Could you try and run it with vhost and see if this changes behavior it
-for you?
-
-[1]: https://fedorapeople.org/groups/virt/virtio-win/direct-downloads/stabl=
-e-virtio/virtio-win_amd64.vfd
-[2]: http://paste.ubuntu.com/26123654/
-
-** Changed in: qemu
-       Status: New =3D> Incomplete
-
--- =
-
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1736655
-
-Title:
-  2k3/xp guests w/virtio-net randomly DHCP fail on boot
-
-Status in QEMU:
-  Incomplete
-Status in qemu package in Ubuntu:
-  Incomplete
-
-Bug description:
-  Host:
-  Debian GNU/Linux 9 with Linux 4.13.0-0.bpo.1-amd64
-  QEMU 2.10.1
-
-  Guest:
-  Windows 2003 Standard SP2 (x64)
-  Windows XP SP3 (i386)
-
-  QEMU command line:
-  http://cfp.vim-cn.com/cbdF3
-
-  Description:
-  After upgrading from QEMU 2.8 to 2.10.1, my Windows 2003 x64 and Windows =
-XP guests with "virtio-net-pci" NIC would randomly fail to aquire DHCP addr=
-ess on boot. When it fails, cycle disable/enable the connection in Control =
-Panel could make it connect successfully. As an immediate workaround, I swi=
-tched to the RTL8139 NIC which works fine. Further investigation showed tha=
-t manually reverting commit '4a3f03ba8dbf53fce36d0c1dd5d0cc0f340fe5f3' on t=
-op of 2.10.1 "fixed" the problem.
-
-  Here are the bisect test results:
-  git branch 97cd965: 17 boots, 5 failures  (Feb 18)
-  git branch 77424a4: 27 boots, 0 failure   (Jan 09)
-  git branch c25d97c: 7 boots, 2 failures   (Feb 01)
-  git branch 4a3f03b: 25 boots, 8 failures  (Jan 19)
-  git branch 39f099e: 60 boots, 0 failure   (Jan 18)
-  2.10.1 with revert: 194 boots, 0 failure
-  2.10.1 without revert: 30 boots, 4 failures
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1736655/+subscriptions
+Thanks,
+Laurent
