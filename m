@@ -1,37 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60683)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33087)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <walling@linux.vnet.ibm.com>) id 1eN61i-0006tQ-HC
-	for qemu-devel@nongnu.org; Thu, 07 Dec 2017 18:56:27 -0500
+	(envelope-from <rth7680@gmail.com>) id 1eN63e-000076-J7
+	for qemu-devel@nongnu.org; Thu, 07 Dec 2017 18:58:27 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <walling@linux.vnet.ibm.com>) id 1eN61f-0006J4-DP
-	for qemu-devel@nongnu.org; Thu, 07 Dec 2017 18:56:26 -0500
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:46192
-	helo=mx0a-001b2d01.pphosted.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <walling@linux.vnet.ibm.com>)
-	id 1eN61f-0006It-7R
-	for qemu-devel@nongnu.org; Thu, 07 Dec 2017 18:56:23 -0500
-Received: from pps.filterd (m0098416.ppops.net [127.0.0.1])
-	by mx0b-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
-	vB7NrrBj029273
-	for <qemu-devel@nongnu.org>; Thu, 7 Dec 2017 18:56:21 -0500
-Received: from e33.co.us.ibm.com (e33.co.us.ibm.com [32.97.110.151])
-	by mx0b-001b2d01.pphosted.com with ESMTP id 2eqen4au9h-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Thu, 07 Dec 2017 18:56:20 -0500
-Received: from localhost
-	by e33.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
-	Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <walling@linux.vnet.ibm.com>;
-	Thu, 7 Dec 2017 16:56:19 -0700
-From: "Collin L. Walling" <walling@linux.vnet.ibm.com>
-Date: Thu, 7 Dec 2017 18:56:16 -0500
+	(envelope-from <rth7680@gmail.com>) id 1eN63b-0007nr-J6
+	for qemu-devel@nongnu.org; Thu, 07 Dec 2017 18:58:26 -0500
+Sender: Richard Henderson <rth7680@gmail.com>
+References: <20171207165355.7559-1-david@redhat.com>
+	<20171207165355.7559-11-david@redhat.com>
+From: Richard Henderson <rth@twiddle.net>
+Message-ID: <e3d4000b-3170-a79f-cd02-0335c2706d9f@twiddle.net>
+Date: Thu, 7 Dec 2017 15:58:20 -0800
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8; format=flowed
+In-Reply-To: <20171207165355.7559-11-david@redhat.com>
+Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Message-Id: <49485e7e-f950-58c5-af56-b336b4d4f0e3@linux.vnet.ibm.com>
-Content-Transfer-Encoding: base64
-Subject: [Qemu-devel] Interactive Boot Menu: New Fields in IPLB
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v2 for-2.12 10/10] s390x: change the QEMU
+ cpu model to a stripped down z12
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -40,76 +26,13 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel <qemu-devel@nongnu.org>, qemu-s390x@nongnu.org
-Cc: Christian Borntraeger <borntraeger@de.ibm.com>, Viktor Mihajlovski <mihajlov@linux.vnet.ibm.com>, Thomas Huth <thuth@redhat.com>, Cornelia Huck <cohuck@redhat.com>, David Hildenbrand <david@redhat.com>
+To: David Hildenbrand <david@redhat.com>, qemu-s390x@nongnu.org, qemu-devel@nongnu.org
+Cc: Christian Borntraeger <borntraeger@de.ibm.com>, Cornelia Huck <cohuck@redhat.com>, Alexander Graf <agraf@suse.de>
 
-SGVsbG8sDQoNCkknZCBsaWtlIHRvIGJyaW5nIHVwIGEgZm9ybWFsIGRpc2N1c3Npb24gcmVn
-YXJkaW5nIHRoZSB1dGlsaXphdGlvbiBvZiANCnJlc2VydmVkIHNwYWNlDQppbiB0aGUgSVBM
-IFBhcmFtZXRlciBCbG9ja3MgZm9yIHMzOTB4IGd1ZXN0cy4gUGFydGljdWxhcmx5IHRoZSBm
-b2xsb3dpbmc6DQoNCiAgKiBIb3cgc2hvdWxkIHdlIGFwcHJvYWNoICJjbGFpbWluZyIgYnl0
-ZXMgc28gdGhhdCB3ZSBkbyBub3Qgb2JzdHJ1Y3QNCiAgICBmdXR1cmUgZGV2ZWxvcG1lbnQ/
-DQogICogV2hhdCB3b3VsZCBiZSAidGhlIGJlc3QiIGxvY2F0aW9uIHRvIHN0b3JlIHRoZXNl
-IG5ldyBmaWVsZHM/DQoNCkkndmUgcG9zdGVkIHNvbWUgcmVsZXZhbnQgaW5mb3JtYXRpb24g
-cmVnYXJkaW5nIHRoaXMgZmVhdHVyZSBiZWxvdy4NCg0KDQogwqDCoMKgIMKgwqDCoCDCoMKg
-wqAgwqDCoMKgIMKgIMKgIMKgIC0tLSBUaGUgRmllbGRzIFdlIE5lZWQgVG8gU3RvcmUgLS0t
-DQoNCkN1cnJlbnRseSwgd2UncmUgdXRpbGl6aW5nIDMgYnl0ZXMgb3V0IG9mIGEgNzcgYnl0
-ZSByZXNlcnZlZCBmaWVsZCBpbiANCnRoZSBJUExCIGZvcg0KQ0NXIGFuZCBTQ1NJLiBXZSBk
-byB0aGlzIGJlY2F1c2UgbmVlZCBhIHdheSB0byBwYXNzIHRoZSBRZW11IGNvbW1hbmQgDQps
-aW5lIG9wdGlvbnMNCmZvciBhIGJvb3QgbWVudSAob24vb2ZmIGFuZCB0aW1lb3V0KSB0byB0
-aGUgczM5MC1jY3cgYmlvcy4gV2UgcmVxdWlyZSANCm9ubHkgdHdvDQpmaWVsZHMgaW4gdGhl
-IElQTEIsIHRvdGFsaW5nIDMgYnl0ZXM6DQoNCiDCoCogdWludDhfdCBib290X21lbnVfZmxh
-Zw0KIMKgwqDCoMKgIG8gZGV0ZXJtaW5lcyBpZiB3ZSBzaG91bGQgc2hvdyB0aGUgbWVudSBv
-ciBub3QNCg0KIMKgKiB1aW50MTZfdCBib290X21lbnVfdGltZW91dA0KIMKgwqDCoMKgIG8g
-c3RvcmVkIGFzIG1pbGxpc2Vjb25kcw0KIMKgwqDCoMKgIG8gQSBtYXggdmFsdWUgb2YgYXBw
-cm94IDY1LDAwMCBnaXZlcyB1cyA2NSBzZWNvbmRzIC0tIHNob3VsZCBiZSANCnBsZW50eQ0K
-IMKgwqDCoMKgIG8gY291bGQgcG90ZW50aWFsbHkgYmUgcmVkdWNlZCB0byBvbmUgYnl0ZSwg
-YW5kIHdlIHN0b3JlIHRoZSB2YWx1ZQ0KIMKgwqDCoMKgwqDCoCBhcyBzZWNvbmRzIGluc3Rl
-YWQNCg0KTm90ZTogdGhlc2UgZmllbGRzICpvbmx5KmhhdmUgdmFsdWUgaW4gYSBRRU1VIGVu
-dmlyb25tZW50Lg0KDQoNCiDCoMKgwqAgwqDCoMKgIMKgwqAgwqAgwqAgwqDCoCAtLS0gVGhl
-IERhdGEgV2UgSGF2ZSBJbiBQbGFjZSBBbHJlYWR5IC0tLQ0KDQpUaGUgZm9sbG93aW5nIGNh
-biBiZSBmb3VuZCBpbiBxZW11L2h3L3MzOTB4L2lwbC5oOiAoYSBzaW1pbGFyIHN0cnVjdHVy
-ZSANCmV4aXN0cw0KaW4gcWVtdS9wYy1iaW9zL3MzOTAtY2N3L2lwbGIuaCkNCg0Kc3RydWN0
-IElwbEJsb2NrQ2N3IHsNCiDCoMKgwqAgdWludDY0X3QgbmV0Ym9vdF9zdGFydF9hZGRyOw0K
-IMKgwqDCoCB1aW50OF90wqAgcmVzZXJ2ZWQwWzc0XTvCoMKgwqAgwqDCoMKgIC8vIDwtLS0g
-cHJldmlvdXNseSBhIDc3IHJlc2VydmVkIGZpZWxkDQogwqDCoMKgIHVpbnQxNl90IGJvb3Rf
-bWVudV90aW1lb3V0O8KgwqDCoCAvLyBuZXcNCiDCoMKgwqAgdWludDhfdMKgIGJvb3RfbWVu
-dV9mbGFnO8KgwqDCoCDCoMKgIC8vIG5ldw0KIMKgwqDCoCB1aW50OF90wqAgc3NpZDsNCiDC
-oMKgwqAgdWludDE2X3QgZGV2bm87DQogwqDCoMKgIHVpbnQ4X3TCoCB2bV9mbGFnczsNCiDC
-oMKgwqAgdWludDhfdMKgIHJlc2VydmVkM1szXTsNCiDCoMKgwqAgdWludDMyX3Qgdm1fcGFy
-bV9sZW47DQogwqDCoMKgIHVpbnQ4X3TCoCBuc3NfbmFtZVs4XTsNCiDCoMKgwqAgdWludDhf
-dMKgIHZtX3Bhcm1bNjRdOw0KIMKgwqDCoCB1aW50OF90wqAgcmVzZXJ2ZWQ0WzhdOw0KfSBR
-RU1VX1BBQ0tFRDsNCnR5cGVkZWYgc3RydWN0IElwbEJsb2NrQ2N3IElwbEJsb2NrQ2N3Ow0K
-DQpzdHJ1Y3QgSXBsQmxvY2tGY3Agew0KIMKgwqDCoCB1aW50OF90wqAgcmVzZXJ2ZWQxWzMw
-NSAtIDFdOw0KIMKgwqDCoCB1aW50OF90wqAgb3B0Ow0KIMKgwqDCoCB1aW50OF90wqAgcmVz
-ZXJ2ZWQyWzNdOw0KIMKgwqDCoCB1aW50MTZfdCByZXNlcnZlZDM7DQogwqDCoMKgIHVpbnQx
-Nl90IGRldm5vOw0KIMKgwqDCoCB1aW50OF90wqAgcmVzZXJ2ZWQ0WzRdOw0KIMKgwqDCoCB1
-aW50NjRfdCB3d3BuOw0KIMKgwqDCoCB1aW50NjRfdCBsdW47DQogwqDCoMKgIHVpbnQzMl90
-IGJvb3Rwcm9nOw0KIMKgwqDCoCB1aW50OF90wqAgcmVzZXJ2ZWQ1WzEyXTsNCiDCoMKgwqAg
-dWludDY0X3QgYnJfbGJhOw0KIMKgwqDCoCB1aW50MzJfdCBzY3BfZGF0YV9sZW47DQogwqDC
-oMKgIHVpbnQ4X3TCoCByZXNlcnZlZDZbMjYwXTsNCiDCoMKgwqAgdWludDhfdMKgIHNjcF9k
-YXRhW107DQp9IFFFTVVfUEFDS0VEOw0KdHlwZWRlZiBzdHJ1Y3QgSXBsQmxvY2tGY3AgSXBs
-QmxvY2tGY3A7DQoNCnN0cnVjdCBJcGxCbG9ja1FlbXVTY3NpIHsNCiDCoMKgwqAgdWludDMy
-X3QgbHVuOw0KIMKgwqDCoCB1aW50MTZfdCB0YXJnZXQ7DQogwqDCoMKgIHVpbnQxNl90IGNo
-YW5uZWw7DQogwqDCoMKgIHVpbnQ4X3TCoCByZXNlcnZlZDBbNzRdO8KgwqDCoCDCoMKgwqAg
-Ly8gPC0tLSBwcmV2aW91c2x5IGEgNzcgcmVzZXJ2ZWQgZmllbGQNCiDCoMKgwqAgdWludDE2
-X3QgYm9vdF9tZW51X3RpbWVvdXQ7wqDCoMKgIC8vIG5ldw0KIMKgwqDCoCB1aW50OF90wqAg
-Ym9vdF9tZW51X2ZsYWc7wqDCoMKgIMKgwqAgLy8gbmV3DQogwqDCoMKgIHVpbnQ4X3TCoCBz
-c2lkOw0KIMKgwqDCoCB1aW50MTZfdCBkZXZubzsNCn0gUUVNVV9QQUNLRUQ7DQp0eXBlZGVm
-IHN0cnVjdCBJcGxCbG9ja1FlbXVTY3NpIElwbEJsb2NrUWVtdVNjc2k7DQoNClsuLi5dDQoN
-CnVuaW9uIElwbFBhcmFtZXRlckJsb2NrIHsNCiDCoMKgwqAgc3RydWN0IHsNCiDCoMKgwqDC
-oMKgwqDCoCB1aW50MzJfdCBsZW47DQogwqDCoMKgwqDCoMKgwqAgdWludDhfdMKgIHJlc2Vy
-dmVkMFszXTsNCiDCoMKgwqDCoMKgwqDCoCB1aW50OF90wqAgdmVyc2lvbjsNCiDCoMKgwqDC
-oMKgwqDCoCB1aW50MzJfdCBibGswX2xlbjsNCiDCoMKgwqDCoMKgwqDCoCB1aW50OF90wqAg
-cGJ0Ow0KIMKgwqDCoMKgwqDCoMKgIHVpbnQ4X3TCoCBmbGFnczsNCiDCoMKgwqDCoMKgwqDC
-oCB1aW50MTZfdCByZXNlcnZlZDAxOw0KIMKgwqDCoMKgwqDCoMKgIHVpbnQ4X3TCoCBsb2Fk
-cGFybVs4XTsNCiDCoMKgwqDCoMKgwqDCoCB1bmlvbiB7DQogwqDCoMKgwqDCoMKgwqDCoMKg
-wqDCoCBJcGxCbG9ja0NjdyBjY3c7DQogwqDCoMKgwqDCoMKgwqDCoMKgwqDCoCBJcGxCbG9j
-a0ZjcCBmY3A7DQogwqDCoMKgwqDCoMKgwqDCoMKgwqDCoCBJcGxCbG9ja1FlbXVTY3NpIHNj
-c2k7DQogwqDCoMKgwqDCoMKgwqAgfTsNCiDCoMKgwqAgfSBRRU1VX1BBQ0tFRDsNCiDCoMKg
-wqAgc3RydWN0IHsNCiDCoMKgwqDCoMKgwqDCoCB1aW50OF90wqAgcmVzZXJ2ZWQxWzExMF07
-DQogwqDCoMKgwqDCoMKgwqAgdWludDE2X3QgZGV2bm87DQogwqDCoMKgwqDCoMKgwqAgdWlu
-dDhfdMKgIHJlc2VydmVkMls4OF07DQogwqDCoMKgwqDCoMKgwqAgdWludDhfdMKgIHJlc2Vy
-dmVkX2V4dFs0MDk2IC0gMjAwXTsNCiDCoMKgwqAgfSBRRU1VX1BBQ0tFRDsNCn0gUUVNVV9Q
-QUNLRUQ7DQp0eXBlZGVmIHVuaW9uIElwbFBhcmFtZXRlckJsb2NrIElwbFBhcmFtZXRlckJs
-b2NrOw0KDQotLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLQ0KDQpUaGFua3MgZm9yIHlv
-dXIgdGltZSwNCi0gQ29sbGluIEwgV2FsbGluZw0KDQo=
+On 12/07/2017 08:53 AM, David Hildenbrand wrote:
+> +    const S390FeatBitmap qemu_cpu_feat = { S390_FEAT_LIST_QEMU_V2_12 };
+
+static const?
+
+
+r~
