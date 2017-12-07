@@ -1,33 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59756)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59889)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1eN5zi-0005eh-Ez
-	for qemu-devel@nongnu.org; Thu, 07 Dec 2017 18:54:23 -0500
+	(envelope-from <rth7680@gmail.com>) id 1eN60B-0005u3-7k
+	for qemu-devel@nongnu.org; Thu, 07 Dec 2017 18:54:52 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1eN5zf-00054n-4v
-	for qemu-devel@nongnu.org; Thu, 07 Dec 2017 18:54:22 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:45700)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1eN5ze-00054T-Ro
-	for qemu-devel@nongnu.org; Thu, 07 Dec 2017 18:54:19 -0500
-Date: Fri, 8 Dec 2017 01:54:12 +0200
-From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <20171207213420-mutt-send-email-mst@kernel.org>
-References: <5A28BC2D.6000308@intel.com>
-	<CAJSP0QUxRv9LNb1+McYxV0KY4Ss3NkaSjwO6fXiJd+oU2+zJSQ@mail.gmail.com>
-	<5A290398.60508@intel.com>
-	<CAJSP0QURjdD8BnOmJo83fzJn_zCijSKQh==Pz+Xu4r6Q2i3SkQ@mail.gmail.com>
-	<20171207153454-mutt-send-email-mst@kernel.org>
-	<CAJSP0QVu4iwAu01Sth84VZshQde97x3FW1E1ua_YXVKs-65vhQ@mail.gmail.com>
-	<20171207183945-mutt-send-email-mst@kernel.org>
-	<CAJSP0QVnukGD3Afu9myv=v5OjqrPDpXu6JL3Tpf+Cdk=em9V3w@mail.gmail.com>
-	<20171207193003-mutt-send-email-mst@kernel.org>
-	<CAJSP0QX4V64OoU4-Dhb93MUZ9Rz0FPR-La5Xq4_yqGH7SG6PjQ@mail.gmail.com>
+	(envelope-from <rth7680@gmail.com>) id 1eN608-0005Es-6r
+	for qemu-devel@nongnu.org; Thu, 07 Dec 2017 18:54:51 -0500
+Sender: Richard Henderson <rth7680@gmail.com>
+References: <20171207165355.7559-1-david@redhat.com>
+	<20171207165355.7559-9-david@redhat.com>
+From: Richard Henderson <rth@twiddle.net>
+Message-ID: <a4725e2c-3b8c-eee7-1587-0a22d24aa5f2@twiddle.net>
+Date: Thu, 7 Dec 2017 15:54:44 -0800
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CAJSP0QX4V64OoU4-Dhb93MUZ9Rz0FPR-La5Xq4_yqGH7SG6PjQ@mail.gmail.com>
-Subject: Re: [Qemu-devel] [virtio-dev] [PATCH v3 0/7] Vhost-pci for inter-VM
- communication
+In-Reply-To: <20171207165355.7559-9-david@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v2 for-2.12 08/10] s390x/tcg: implement
+ extract-CPU-time facility
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,143 +26,86 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefan Hajnoczi <stefanha@gmail.com>
-Cc: Wei Wang <wei.w.wang@intel.com>, "virtio-dev@lists.oasis-open.org" <virtio-dev@lists.oasis-open.org>, "Yang, Zhiyong" <zhiyong.yang@intel.com>, "jan.kiszka@siemens.com" <jan.kiszka@siemens.com>, "jasowang@redhat.com" <jasowang@redhat.com>, "avi.cohen@huawei.com" <avi.cohen@huawei.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, Stefan Hajnoczi <stefanha@redhat.com>, "pbonzini@redhat.com" <pbonzini@redhat.com>, "marcandre.lureau@redhat.com" <marcandre.lureau@redhat.com>
+To: David Hildenbrand <david@redhat.com>, qemu-s390x@nongnu.org, qemu-devel@nongnu.org
+Cc: Christian Borntraeger <borntraeger@de.ibm.com>, Cornelia Huck <cohuck@redhat.com>, Alexander Graf <agraf@suse.de>
 
-On Thu, Dec 07, 2017 at 06:28:19PM +0000, Stefan Hajnoczi wrote:
-> On Thu, Dec 7, 2017 at 5:38 PM, Michael S. Tsirkin <mst@redhat.com> wrote:
-> > On Thu, Dec 07, 2017 at 05:29:14PM +0000, Stefan Hajnoczi wrote:
-> >> On Thu, Dec 7, 2017 at 4:47 PM, Michael S. Tsirkin <mst@redhat.com> wrote:
-> >> > On Thu, Dec 07, 2017 at 04:29:45PM +0000, Stefan Hajnoczi wrote:
-> >> >> On Thu, Dec 7, 2017 at 2:02 PM, Michael S. Tsirkin <mst@redhat.com> wrote:
-> >> >> > On Thu, Dec 07, 2017 at 01:08:04PM +0000, Stefan Hajnoczi wrote:
-> >> >> >> Instead of responding individually to these points, I hope this will
-> >> >> >> explain my perspective.  Let me know if you do want individual
-> >> >> >> responses, I'm happy to talk more about the points above but I think
-> >> >> >> the biggest difference is our perspective on this:
-> >> >> >>
-> >> >> >> Existing vhost-user slave code should be able to run on top of
-> >> >> >> vhost-pci.  For example, QEMU's
-> >> >> >> contrib/vhost-user-scsi/vhost-user-scsi.c should work inside the guest
-> >> >> >> with only minimal changes to the source file (i.e. today it explicitly
-> >> >> >> opens a UNIX domain socket and that should be done by libvhost-user
-> >> >> >> instead).  It shouldn't be hard to add vhost-pci vfio support to
-> >> >> >> contrib/libvhost-user/ alongside the existing UNIX domain socket code.
-> >> >> >>
-> >> >> >> This seems pretty easy to achieve with the vhost-pci PCI adapter that
-> >> >> >> I've described but I'm not sure how to implement libvhost-user on top
-> >> >> >> of vhost-pci vfio if the device doesn't expose the vhost-user
-> >> >> >> protocol.
-> >> >> >>
-> >> >> >> I think this is a really important goal.  Let's use a single
-> >> >> >> vhost-user software stack instead of creating a separate one for guest
-> >> >> >> code only.
-> >> >> >>
-> >> >> >> Do you agree that the vhost-user software stack should be shared
-> >> >> >> between host userspace and guest code as much as possible?
-> >> >> >
-> >> >> >
-> >> >> >
-> >> >> > The sharing you propose is not necessarily practical because the security goals
-> >> >> > of the two are different.
-> >> >> >
-> >> >> > It seems that the best motivation presentation is still the original rfc
-> >> >> >
-> >> >> > http://virtualization.linux-foundation.narkive.com/A7FkzAgp/rfc-vhost-user-enhancements-for-vm2vm-communication
-> >> >> >
-> >> >> > So comparing with vhost-user iotlb handling is different:
-> >> >> >
-> >> >> > With vhost-user guest trusts the vhost-user backend on the host.
-> >> >> >
-> >> >> > With vhost-pci we can strive to limit the trust to qemu only.
-> >> >> > The switch running within a VM does not have to be trusted.
-> >> >>
-> >> >> Can you give a concrete example?
-> >> >>
-> >> >> I have an idea about what you're saying but it may be wrong:
-> >> >>
-> >> >> Today the iotlb mechanism in vhost-user does not actually enforce
-> >> >> memory permissions.  The vhost-user slave has full access to mmapped
-> >> >> memory regions even when iotlb is enabled.  Currently the iotlb just
-> >> >> adds an indirection layer but no real security.  (Is this correct?)
-> >> >
-> >> > Not exactly. iotlb protects against malicious drivers within guest.
-> >> > But yes, not against a vhost-user driver on the host.
-> >> >
-> >> >> Are you saying the vhost-pci device code in QEMU should enforce iotlb
-> >> >> permissions so the vhost-user slave guest only has access to memory
-> >> >> regions that are allowed by the iotlb?
-> >> >
-> >> > Yes.
-> >>
-> >> Okay, thanks for confirming.
-> >>
-> >> This can be supported by the approach I've described.  The vhost-pci
-> >> QEMU code has control over the BAR memory so it can prevent the guest
-> >> from accessing regions that are not allowed by the iotlb.
-> >>
-> >> Inside the guest the vhost-user slave still has the memory region
-> >> descriptions and sends iotlb messages.  This is completely compatible
-> >> with the libvirt-user APIs and existing vhost-user slave code can run
-> >> fine.  The only unique thing is that guest accesses to memory regions
-> >> not allowed by the iotlb do not work because QEMU has prevented it.
-> >
-> > I don't think this can work since suddenly you need
-> > to map full IOMMU address space into BAR.
+On 12/07/2017 08:53 AM, David Hildenbrand wrote:
+> It only provides the EXTRACT CPU TIME instruction. We can reuse the stpt
+> helper, which calculates the CPU timer value.
 > 
-> The BAR covers all guest RAM
-> but QEMU can set up MemoryRegions that
-> hide parts from the guest (e.g. reads produce 0xff).  I'm not sure how
-> expensive that is but implementing a strict IOMMU is hard to do
-> without performance overhead.
-
-I'm worried about leaking PAs.
-fundamentally if you want proper protection you
-need your device driver to use VA for addressing,
-
-On the one hand BAR only needs to be as large as guest PA then.
-On the other hand it must cover all of guest PA,
-not just what is accessible to the device.
-
-
->
-> > Besides, this means implementing iotlb in both qemu and guest.
+> As the instruction is not privileged, but we don't have a CPU timer
+> value in case of linux user, we simply fake the CPU timer to be 0.
 > 
-> It's free in the guest, the libvhost-user stack already has it.
+> Signed-off-by: David Hildenbrand <david@redhat.com>
+> ---
+>  target/s390x/cpu_models.c  |  1 +
+>  target/s390x/insn-data.def |  2 ++
+>  target/s390x/translate.c   | 36 ++++++++++++++++++++++++++++++++++++
+>  3 files changed, 39 insertions(+)
+> 
+> diff --git a/target/s390x/cpu_models.c b/target/s390x/cpu_models.c
+> index 94d24e423d..0be037eac1 100644
+> --- a/target/s390x/cpu_models.c
+> +++ b/target/s390x/cpu_models.c
+> @@ -834,6 +834,7 @@ static void add_qemu_cpu_model_features(S390FeatBitmap fbm)
+>          S390_FEAT_STORE_CLOCK_FAST,
+>          S390_FEAT_MOVE_WITH_OPTIONAL_SPEC,
+>          S390_FEAT_ETF3_ENH,
+> +        S390_FEAT_EXTRACT_CPU_TIME,
+>          S390_FEAT_COMPARE_AND_SWAP_AND_STORE,
+>          S390_FEAT_COMPARE_AND_SWAP_AND_STORE_2,
+>          S390_FEAT_GENERAL_INSTRUCTIONS_EXT,
+> diff --git a/target/s390x/insn-data.def b/target/s390x/insn-data.def
+> index f7b66b0091..5e33bd27ff 100644
+> --- a/target/s390x/insn-data.def
+> +++ b/target/s390x/insn-data.def
+> @@ -369,6 +369,8 @@
+>      C(0xb24f, EAR,     RRE,   Z,   0, 0, new, r1_32, ear, 0)
+>  /* EXTRACT CPU ATTRIBUTE */
+>      C(0xeb4c, ECAG,    RSY_a, GIE, 0, a2, r1, 0, ecag, 0)
+> +/* EXTRACT CPU TIME */
+> +    C(0xc801, ECTG,    SSF,   ECT, 0, 0, 0, 0, ectg, 0)
+>  /* EXTRACT FPC */
+>      C(0xb38c, EFPC,    RRE,   Z,   0, 0, new, r1_32, efpc, 0)
+>  /* EXTRACT PSW */
+> diff --git a/target/s390x/translate.c b/target/s390x/translate.c
+> index 1e4079464a..e0f55fc8e9 100644
+> --- a/target/s390x/translate.c
+> +++ b/target/s390x/translate.c
+> @@ -3887,6 +3887,41 @@ static ExitStatus op_spm(DisasContext *s, DisasOps *o)
+>      return NO_EXIT;
+>  }
+>  
+> +static ExitStatus op_ectg(DisasContext *s, DisasOps *o)
+> +{
+> +    int b1 = get_field(s->fields, b1);
+> +    int d1 = get_field(s->fields, d1);
+> +    int b2 = get_field(s->fields, b2);
+> +    int d2 = get_field(s->fields, d2);
+> +    int r3 = get_field(s->fields, r3);
+> +    TCGv_i64 tmp = tcg_temp_new_i64();
+> +
+> +    /* fetch all operands first */
+> +    o->in1 = tcg_temp_new_i64();
+> +    tcg_gen_addi_i64(o->in1, regs[b1], d1);
+> +    o->in2 = tcg_temp_new_i64();
+> +    tcg_gen_addi_i64(o->in2, regs[b2], d2);
+> +    o->addr1 = get_address(s, 0, r3, 0);
+> +
+> +    /* load the third operand into r3 before modifying anything */
+> +    tcg_gen_qemu_ld64(regs[r3], o->addr1, get_mem_index(s));
+> +
+> +#ifndef CONFIG_USER_ONLY
+> +    /* subtract CPU timer from first operand and store in GR0 */
+> +    gen_helper_stpt(tmp, cpu_env);
+> +    tcg_gen_sub_i64(regs[0], o->in1, tmp);
+> +#else
+> +    /* we don't have a CPU timer, fake value 0 */
+> +    tcg_gen_mov_i64(regs[0], o->in1);
+> +#endif
 
-That library is designed to work with a unix domain socket
-though. We'll need extra kernel code to make a device
-pretend it's a socket.
+It's easy enough to pass along cpu_get_host_ticks() for user-only.  Possibly
+not quite right, but better than nothing.
 
-> >> If better performance is needed then it might be possible to optimize
-> >> this interface by handling most or even all of the iotlb stuff in QEMU
-> >> vhost-pci code and not exposing it to the vhost-user slave in the
-> >> guest.  But it doesn't change the fact that the vhost-user protocol
-> >> can be used and the same software stack works.
-> >
-> > For one, the iotlb part would be out of scope then.
-> > Instead you would have code to offset from BAR.
-> >
-> >> Do you have a concrete example of why sharing the same vhost-user
-> >> software stack inside the guest can't work?
-> >
-> > With enough dedication some code might be shared.  OTOH reusing virtio
-> > gains you a ready feature negotiation and discovery protocol.
-> >
-> > I'm not convinced which has more value, and the second proposal
-> > has been implemented already.
-> 
-> Thanks to you and Wei for the discussion.  I've learnt a lot about
-> vhost-user.  If you have questions about what I've posted, please let
-> me know and we can discuss further.
-> 
-> The decision is not up to me so I'll just summarize what the vhost-pci
-> PCI adapter approach achieves:
-> 1. Just one device and driver
-> 2. Support for all device types (net, scsi, blk, etc)
-> 3. Reuse of software stack so vhost-user slaves can run in both host
-> userspace and the guest
-> 4. Simpler to debug because the vhost-user protocol used by QEMU is
-> also used by the guest
-> 
-> Stefan
+
+r~
