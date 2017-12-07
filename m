@@ -1,30 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47559)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47963)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1eMumE-0005Tm-Qz
-	for qemu-devel@nongnu.org; Thu, 07 Dec 2017 06:55:43 -0500
+	(envelope-from <kchamart@redhat.com>) id 1eMuna-00067c-48
+	for qemu-devel@nongnu.org; Thu, 07 Dec 2017 06:57:07 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1eMum9-0003mW-TM
-	for qemu-devel@nongnu.org; Thu, 07 Dec 2017 06:55:42 -0500
-Received: from 20.mo6.mail-out.ovh.net ([178.32.124.17]:41673)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1eMum9-0003cY-MN
-	for qemu-devel@nongnu.org; Thu, 07 Dec 2017 06:55:37 -0500
-Received: from player735.ha.ovh.net (b9.ovh.net [213.186.33.59])
-	by mo6.mail-out.ovh.net (Postfix) with ESMTP id A6E851270F0
-	for <qemu-devel@nongnu.org>; Thu,  7 Dec 2017 12:55:27 +0100 (CET)
-References: <20171123132955.1261-1-clg@kaod.org>
-	<20171123132955.1261-16-clg@kaod.org>
-	<20171130050049.GD3023@umbus.fritz.box>
-From: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
-Message-ID: <07ba163b-6434-db2b-847c-3a8aac069439@kaod.org>
-Date: Thu, 7 Dec 2017 12:55:20 +0100
+	(envelope-from <kchamart@redhat.com>) id 1eMunZ-0005KR-9x
+	for qemu-devel@nongnu.org; Thu, 07 Dec 2017 06:57:06 -0500
+Date: Thu, 7 Dec 2017 12:56:48 +0100
+From: Kashyap Chamarthy <kchamart@redhat.com>
+Message-ID: <20171207115648.5mnvoyfnig7dhgbn@eukaryote>
+References: <20171113162053.58795-1-vsementsov@virtuozzo.com>
+	<01108daa-fed3-c142-bbd6-0ecc4c8b795d@redhat.com>
+	<cd0a2e5e-f788-0e5a-dec7-f428479f3b89@virtuozzo.com>
+	<8c61f43c-5f56-8c1b-a2fe-f954d34dc687@redhat.com>
+	<40392ab9-ec2a-30ed-ddab-a557682a4192@virtuozzo.com>
+	<4e4e28d7-aebc-4a86-e691-99afdcca27f5@redhat.com>
+	<20171121172324.GC11073@localhost.localdomain>
+	<1a8e9d48-5be1-e014-41ee-a1164f32dd17@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20171130050049.GD3023@umbus.fritz.box>
-Content-Type: text/plain; charset=windows-1252
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 15/25] spapr: notify the CPU when the XIVE
- interrupt priority is more privileged
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1a8e9d48-5be1-e014-41ee-a1164f32dd17@redhat.com>
+Subject: Re: [Qemu-devel] [Qemu-block] [PATCH for-2.12 0/4] qmp dirty bitmap
+ API
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,65 +30,74 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Gibson <david@gibson.dropbear.id.au>
-Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, Benjamin Herrenschmidt <benh@kernel.crashing.org>
+To: John Snow <jsnow@redhat.com>
+Cc: Kevin Wolf <kwolf@redhat.com>, Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, famz@redhat.com, qemu-block@nongnu.org, qemu-devel@nongnu.org, mnestratov@virtuozzo.com, armbru@redhat.com, nshirokovskiy@virtuozzo.com, stefanha@redhat.com, pbonzini@redhat.com, den@openvz.org, mreitz@redhat.com
 
->> +/* Convert a priority number to an Interrupt Pending Buffer (IPB)
->> + * register, which indicates a pending interrupt at the priority
->> + * corresponding to the bit number
->> + */
->> +static uint8_t priority_to_ipb(uint8_t priority)
->> +{
->> +    return priority > XIVE_PRIORITY_MAX ?
->> +        0 : 1 << (XIVE_PRIORITY_MAX - priority);
+On Tue, Nov 21, 2017 at 07:10:19PM -0500, John Snow wrote:
+> On 11/21/2017 12:23 PM, Kevin Wolf wrote:
+
+[...] # Snip lot of good discussion.
+
+> > On another note, I would double check before adding a new block job type
+> > that this is the right way to go. We have recently noticed that many, if
+> > not all, of the existing block jobs (at least mirror, commit and backup)
+> > are so similar that they implement the same things multiple times and
+> > are just lacking different options and have different bugs. I'm
+> > seriously considering merging all of them into a single job type
+> > internally that just provides options that effectively turn it into one
+> > of the existing job types.
+> > 
 > 
-> Does handling out of bounds values here make sense, or should you just
-> assert() they're not passed in?
-
-The priority can be above in the TM_SPC_SET_OS_PENDING command. 
-
->> +}
->> +
->> +/* Convert an Interrupt Pending Buffer (IPB) register to a Pending
->> + * Interrupt Priority Register (PIPR), which contains the priority of
->> + * the most favored pending notification.
->> + *
->> + * TODO:
->> + *
->> + *   PIPR is clamped to CPPR. So the value in the PIPR is:
->> + *
->> + *     v = leftmost_bit_of(ipb) (or 0xff);
->> + *     pipr = v < cppr ? v : cppr;
->> + *
->> + * Ben says: "which means it's never actually 0xff ... surprise !".
->> + * But, the CPPR can be set to 0xFF ... I am confused ...
+> I'm not particularly opposed. At the very, very least "backup" and
+> "mirror" are pretty much the same thing and "stream" and "commit" are
+> basically the same.
 > 
-> A resolution to this would be nice..
+> Forcing the backuppy-job and the consolidatey-job together seems like an
+> ever-so-slightly harder case to make, but I suppose the truth of the
+> matter in all cases is that we're copying data from one node to another...
 
-The 'accept' sequence does :
+So from the above interesting discussion, it seems like Kevin is leaning
+towards a single job type that offers 'stream', 'commit', 'backup', and
+'mirror' functionality as part of a single command / job type.  Based on
+an instinct, this sounds a bit too stuffy and complex to me.
 
-  - store the PIPR in the CPPR
-  - reset the pending buffer bit in the IPB
-  - recompute the PIPR value from the new IPB
-  - drop the exception bit for OS
+And John seems to be leaning towards two block device job types:
 
-Typical values are : 
+  - 'blockdev-foo' that offers both current 'stream' and 'commit'
+    functionality as two different options to the same QMP command; and
 
-  before  IBP=02 PIPR=06 CPPR=ff NSR=80
-   after  IBP=00 PIPR=ff CPPR=06 NSR=00
+  - 'blockdev-bar' will offer both 'mirror' and 'backup' functionality
+    as part of the same QMP command
 
-So today, if the IPB becomes zero, the PIPR is adjusted to 0xFF.
+FWIW, this seems a bit more palatable, as it is unifying
+similar-functionality-that-differ-slightly into two distinct commands.
 
-But, if the PIPR is clamped to the CPPR (6), there is a disconnect
-between the IBP and the PIPR values. Is that OK ? 
+(/me is still wrapping his head around the bitmaps and incremental
+backups infrastructure.)
 
-Then, the second effect is that as soon as the OS sets back the CPPR 
-to 0xFF, we notify the CPU again and enter a loop. 
+> > So even if we want to tie the bitmap management to a block job, we
+> > should consider adding it as an option to the existing backup job rather
+> > than adding a completely new fourth job type that again does almost the
+> > same except for some bitmap mangement stuff on completion.
+> > 
+> 
+> ...except here, where fleecing does not necessarily copy data in the
+> same way.
+> 
+> (It probably could re-use the copy-on-write notifiers that will be
+> replaced by filter nodes, but I don't see it reusing much else.)
+> 
+> We could try it before I naysay it, but where fleecing is concerned
+> we're not using QEMU to move any bits around. It does feel pretty
+> categorically different from the first four jobs.
+> 
+> I wouldn't want to see the franken-job be drowned in conditional
+> branches for 5,000 options, either. Eliminating some redundancy is good,
+> but asserting that all existing jobs (and this possible new one too)
+> should all be the same makes me worry that the resulting code would be
+> too complex to work with.
 
-I think this is because a test on the EO bit of the NSR is missing 
-in the routine setting the CPPR. this bit notifies the presence of 
-an exception for the O/S. I will add that. I misunderstood the specs 
-on the topic.
+[...]
 
-C. 
- 
+-- 
+/kashyap
