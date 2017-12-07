@@ -1,14 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46085)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46087)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1eN2Y2-0007Me-3B
-	for qemu-devel@nongnu.org; Thu, 07 Dec 2017 15:13:34 -0500
+	(envelope-from <stefanha@redhat.com>) id 1eN2Y2-0007Mn-8K
+	for qemu-devel@nongnu.org; Thu, 07 Dec 2017 15:13:35 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1eN2Y1-0006hA-AY
+	(envelope-from <stefanha@redhat.com>) id 1eN2Y1-0006hF-C7
 	for qemu-devel@nongnu.org; Thu, 07 Dec 2017 15:13:34 -0500
 From: Stefan Hajnoczi <stefanha@redhat.com>
-Date: Thu,  7 Dec 2017 20:13:14 +0000
-Message-Id: <20171207201320.19284-1-stefanha@redhat.com>
-Subject: [Qemu-devel] [PATCH v2 0/6] block: avoid recursive AioContext
+Date: Thu,  7 Dec 2017 20:13:15 +0000
+Message-Id: <20171207201320.19284-2-stefanha@redhat.com>
+In-Reply-To: <20171207201320.19284-1-stefanha@redhat.com>
+References: <20171207201320.19284-1-stefanha@redhat.com>
+Subject: [Qemu-devel] [PATCH v2 1/6] block: avoid recursive AioContext
  acquire in bdrv_inactivate_all()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
@@ -19,44 +21,69 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: qemu-block@nongnu.org, Eric Blake <eblake@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>
+Cc: qemu-block@nongnu.org, Eric Blake <eblake@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
 
-v2:
- * Added docs/devel/multiple-iothreads.txt doc update [Kevin]
- * Added qemu-iotests 203 test case [Kevin]
- * Added iothread_stop() race fix to make 203 reliable
+From: Paolo Bonzini <pbonzini@redhat.com>
 
-Patch 1 is Paolo's recursive locking removal in bdrv_inactivate_all().  This
-solve migration hangs and is the main point of the patch series.
+BDRV_POLL_WHILE() does not support recursive AioContext locking.  It
+only releases the AioContext lock once regardless of how many times the
+caller has acquired it.  This results in a hang since the IOThread does
+not make progress while the AioContext is still locked.
 
-Patches 2-6 add a qemu-iotests test case and update the multiple-iothreads.txt
-documentation to discourage recursive AioContext locking.
+The following steps trigger the hang:
 
-Based-on: <20171206144550.22295-1-stefanha@redhat.com>
+  $ qemu-system-x86_64 -M accel=kvm -m 1G -cpu host \
+                       -object iothread,id=iothread0 \
+                       -device virtio-scsi-pci,iothread=iothread0 \
+                       -drive if=none,id=drive0,file=test.img,format=raw \
+                       -device scsi-hd,drive=drive0 \
+                       -drive if=none,id=drive1,file=test.img,format=raw \
+                       -device scsi-hd,drive=drive1
+  $ qemu-system-x86_64 ...same options... \
+                       -incoming tcp::1234
+  (qemu) migrate tcp:127.0.0.1:1234
+  ...hang...
 
-Paolo Bonzini (1):
-  block: avoid recursive AioContext acquire in bdrv_inactivate_all()
+Tested-by: Stefan Hajnoczi <stefanha@redhat.com>
+Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+---
+ block.c | 14 +++++++++++---
+ 1 file changed, 11 insertions(+), 3 deletions(-)
 
-Stefan Hajnoczi (5):
-  docs: mark nested AioContext locking as a legacy API
-  blockdev: add x-blockdev-set-iothread force boolean
-  iotests: add VM.add_object()
-  iothread: fix iothread_stop() race condition
-  qemu-iotests: add 203 savevm with IOThreads test
-
- docs/devel/multiple-iothreads.txt |  7 +++--
- qapi/block-core.json              |  6 +++-
- include/sysemu/iothread.h         |  3 +-
- block.c                           | 14 ++++++++--
- blockdev.c                        | 11 ++++----
- iothread.c                        | 20 +++++++++----
- tests/qemu-iotests/203            | 59 +++++++++++++++++++++++++++++++++++++++
- tests/qemu-iotests/203.out        |  6 ++++
- tests/qemu-iotests/group          |  1 +
- tests/qemu-iotests/iotests.py     |  5 ++++
- 10 files changed, 114 insertions(+), 18 deletions(-)
- create mode 100755 tests/qemu-iotests/203
- create mode 100644 tests/qemu-iotests/203.out
-
+diff --git a/block.c b/block.c
+index 9a1a0d1e73..1c37ce4554 100644
+--- a/block.c
++++ b/block.c
+@@ -4320,9 +4320,15 @@ int bdrv_inactivate_all(void)
+     BdrvNextIterator it;
+     int ret = 0;
+     int pass;
++    GSList *aio_ctxs = NULL, *ctx;
+ 
+     for (bs = bdrv_first(&it); bs; bs = bdrv_next(&it)) {
+-        aio_context_acquire(bdrv_get_aio_context(bs));
++        AioContext *aio_context = bdrv_get_aio_context(bs);
++
++        if (!g_slist_find(aio_ctxs, aio_context)) {
++            aio_ctxs = g_slist_prepend(aio_ctxs, aio_context);
++            aio_context_acquire(aio_context);
++        }
+     }
+ 
+     /* We do two passes of inactivation. The first pass calls to drivers'
+@@ -4340,9 +4346,11 @@ int bdrv_inactivate_all(void)
+     }
+ 
+ out:
+-    for (bs = bdrv_first(&it); bs; bs = bdrv_next(&it)) {
+-        aio_context_release(bdrv_get_aio_context(bs));
++    for (ctx = aio_ctxs; ctx != NULL; ctx = ctx->next) {
++        AioContext *aio_context = ctx->data;
++        aio_context_release(aio_context);
+     }
++    g_slist_free(aio_ctxs);
+ 
+     return ret;
+ }
 -- 
 2.14.3
