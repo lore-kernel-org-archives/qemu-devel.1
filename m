@@ -1,40 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56977)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57549)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pasic@linux.vnet.ibm.com>) id 1eMvSQ-00072B-Gp
-	for qemu-devel@nongnu.org; Thu, 07 Dec 2017 07:39:21 -0500
+	(envelope-from <pm215@archaic.org.uk>) id 1eMvUa-000806-MD
+	for qemu-devel@nongnu.org; Thu, 07 Dec 2017 07:41:33 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pasic@linux.vnet.ibm.com>) id 1eMvSN-0001q5-EL
-	for qemu-devel@nongnu.org; Thu, 07 Dec 2017 07:39:18 -0500
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:50446)
+	(envelope-from <pm215@archaic.org.uk>) id 1eMvUZ-0002yr-Ro
+	for qemu-devel@nongnu.org; Thu, 07 Dec 2017 07:41:32 -0500
+Received: from orth.archaic.org.uk ([2001:8b0:1d0::2]:38872)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pasic@linux.vnet.ibm.com>)
-	id 1eMvSN-0001pI-5c
-	for qemu-devel@nongnu.org; Thu, 07 Dec 2017 07:39:15 -0500
-Received: from pps.filterd (m0098399.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
-	vB7CcpXl130239
-	for <qemu-devel@nongnu.org>; Thu, 7 Dec 2017 07:39:12 -0500
-Received: from e06smtp11.uk.ibm.com (e06smtp11.uk.ibm.com [195.75.94.107])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2eq3sqx6bt-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Thu, 07 Dec 2017 07:39:09 -0500
-Received: from localhost
-	by e06smtp11.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
-	Only! Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <pasic@linux.vnet.ibm.com>;
-	Thu, 7 Dec 2017 12:35:41 -0000
-References: <20171108165422.46267-1-pasic@linux.vnet.ibm.com>
-	<20171108165422.46267-2-pasic@linux.vnet.ibm.com>
-From: Halil Pasic <pasic@linux.vnet.ibm.com>
-Date: Thu, 7 Dec 2017 13:35:38 +0100
-MIME-Version: 1.0
-In-Reply-To: <20171108165422.46267-2-pasic@linux.vnet.ibm.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Message-Id: <b9819897-b51f-f920-20ba-a843b05e39b5@linux.vnet.ibm.com>
-Subject: Re: [Qemu-devel] [RFC PATCH v2 1/3] s390x/ccs: add ccw-testdev
- emulated device
+	(Exim 4.71) (envelope-from <pm215@archaic.org.uk>)
+	id 1eMvUZ-0002rw-LS
+	for qemu-devel@nongnu.org; Thu, 07 Dec 2017 07:41:31 -0500
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Thu,  7 Dec 2017 12:41:21 +0000
+Message-Id: <1512650481-1723-1-git-send-email-peter.maydell@linaro.org>
+Subject: [Qemu-devel] [PATCH] linux-user: wrap fork() in a start/end
+ exclusive section
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -43,37 +23,59 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Cornelia Huck <cohuck@redhat.com>, Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>
-Cc: qemu-s390x@nongnu.org, Thomas Huth <thuth@redhat.com>, Pierre Morel <pmorel@linux.vnet.ibm.com>, qemu-devel@nongnu.org
+To: qemu-devel@nongnu.org
+Cc: patches@linaro.org, Riku Voipio <riku.voipio@iki.fi>, Laurent Vivier <laurent@vivier.eu>, Paolo Bonzini <pbonzini@redhat.com>, Stuart Monteith <stuart.monteith@linaro.org>
 
+When we do a fork() in usermode emulation, we need to be in
+a start/end exclusive section, so that we can ensure that no
+other thread is in an RCU section. Otherwise you can get this
+deadlock:
 
+- fork thread: has mmap_lock, waits for rcu_sync_lock
+  (because rcu_init_lock() is registered as a pthread_atfork() hook)
+- RCU thread: has rcu_sync_lock, waits for rcu_read_(un)lock
+- another CPU thread: in RCU critical section, waits for mmap_lock
 
-On 11/08/2017 05:54 PM, Halil Pasic wrote:
-> +/* TODO This is the out-of-band variant. We may want to get rid of it */
-> +static int set_mode_diag(const uint64_t *args)
-> +{
-> +    uint64_t subch_id = args[0];
-> +    uint64_t op_mode = args[1];
-> +    SubchDev *sch;
-> +    CcwTestDevDevice *dev;
-> +    int cssid, ssid, schid, m;
-> +
-> +    if (ioinst_disassemble_sch_ident(subch_id, &m, &cssid, &ssid, &schid)) {
-> +        return -EINVAL;
-> +    }
-> +    sch = css_find_subch(m, cssid, ssid, schid);
-> +    if (!sch || !css_subch_visible(sch)) {
-> +        return -EINVAL;
-> +    }
-> +    dev = CCW_TESTDEV(sch->driver_data);
-> +    if (dev->op_mode_locked) {
-> +        return op_mode == dev->op_mode ? 0 : -EINVAL;
-> +    }
+This can show up if you have a heavily multithreaded guest program
+that does a fork().
 
-Should probably do validation on op_mode here.
+Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+Reported-by: Stuart Monteith <stuart.monteith@linaro.org>
+---
+Based-on: <1512397331-15238-1-git-send-email-peter.maydell@linaro.org>
+(this applies on top of 'linux-user: Fix locking order in fork_start()')
 
-> +    dev->op_mode = op_mode;
-> +    sch->ccw_cb = get_ccw_cb(dev->op_mode);
-> +    return 0;
-> +}
-> +
+I think this should fix the deadlock that Stuart reports, but I
+can't reproduce it, so testing welcome.
+
+ linux-user/main.c | 5 +++++
+ 1 file changed, 5 insertions(+)
+
+diff --git a/linux-user/main.c b/linux-user/main.c
+index 146ee3e..ff116fe 100644
+--- a/linux-user/main.c
++++ b/linux-user/main.c
+@@ -128,6 +128,7 @@ int cpu_get_pic_interrupt(CPUX86State *env)
+ /* Make sure everything is in a consistent state for calling fork().  */
+ void fork_start(void)
+ {
++    start_exclusive();
+     mmap_fork_start();
+     qemu_mutex_lock(&tb_ctx.tb_lock);
+     cpu_list_lock();
+@@ -148,9 +149,13 @@ void fork_end(int child)
+         qemu_mutex_init(&tb_ctx.tb_lock);
+         qemu_init_cpu_list();
+         gdbserver_fork(thread_cpu);
++        /* qemu_init_cpu_list() takes care of reinitializing the
++         * exclusive state, so we don't need to end_exclusive() here.
++         */
+     } else {
+         qemu_mutex_unlock(&tb_ctx.tb_lock);
+         cpu_list_unlock();
++        end_exclusive();
+     }
+ }
+ 
+-- 
+2.7.4
