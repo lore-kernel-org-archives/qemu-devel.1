@@ -1,22 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48397)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48505)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1eMupb-00077T-3k
-	for qemu-devel@nongnu.org; Thu, 07 Dec 2017 06:59:12 -0500
+	(envelope-from <wei.w.wang@intel.com>) id 1eMupz-0007Iy-WF
+	for qemu-devel@nongnu.org; Thu, 07 Dec 2017 06:59:36 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1eMupX-0007QM-6A
-	for qemu-devel@nongnu.org; Thu, 07 Dec 2017 06:59:11 -0500
-Date: Thu, 7 Dec 2017 12:59:01 +0100
-From: Cornelia Huck <cohuck@redhat.com>
-Message-ID: <20171207125901.47be0af1.cohuck@redhat.com>
-In-Reply-To: <e2e2ae84-e04a-df4f-50bb-328768a5464e@redhat.com>
-References: <20171108165422.46267-1-pasic@linux.vnet.ibm.com>
-	<20171108165422.46267-2-pasic@linux.vnet.ibm.com>
-	<e2e2ae84-e04a-df4f-50bb-328768a5464e@redhat.com>
+	(envelope-from <wei.w.wang@intel.com>) id 1eMupw-0007dQ-1X
+	for qemu-devel@nongnu.org; Thu, 07 Dec 2017 06:59:36 -0500
+Received: from mga07.intel.com ([134.134.136.100]:25893)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <wei.w.wang@intel.com>)
+	id 1eMupv-0007ZS-Ny
+	for qemu-devel@nongnu.org; Thu, 07 Dec 2017 06:59:31 -0500
+Message-ID: <5A292D94.5000700@intel.com>
+Date: Thu, 07 Dec 2017 20:01:24 +0800
+From: Wei Wang <wei.w.wang@intel.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+References: <201711301934.CDC21800.FSLtJFFOOVQHMO@I-love.SAKURA.ne.jp>	<5A210C96.8050208@intel.com>	<201712012202.BDE13557.MJFQLtOOHVOFSF@I-love.SAKURA.ne.jp>	<286AC319A985734F985F78AFA26841F739376DA1@shsmsx102.ccr.corp.intel.com>	<20171201172519.GA27192@bombadil.infradead.org>
+	<201712031050.IAC64520.QVLFFOOJOSFtHM@I-love.SAKURA.ne.jp>
+In-Reply-To: <201712031050.IAC64520.QVLFFOOJOSFtHM@I-love.SAKURA.ne.jp>
+Content-Type: text/plain; charset=windows-1252; format=flowed
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [RFC PATCH v2 1/3] s390x/ccs: add ccw-testdev
- emulated device
+Subject: Re: [Qemu-devel] [PATCH v18 05/10] xbitmap: add more operations
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,64 +28,37 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>
-Cc: Halil Pasic <pasic@linux.vnet.ibm.com>, Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>, qemu-s390x@nongnu.org, Pierre Morel <pmorel@linux.vnet.ibm.com>, qemu-devel@nongnu.org
+To: Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>, willy@infradead.org
+Cc: virtio-dev@lists.oasis-open.org, linux-kernel@vger.kernel.org, qemu-devel@nongnu.org, virtualization@lists.linux-foundation.org, kvm@vger.kernel.org, linux-mm@kvack.org, mst@redhat.com, mhocko@kernel.org, akpm@linux-foundation.org, mawilcox@microsoft.com, david@redhat.com, cornelia.huck@de.ibm.com, mgorman@techsingularity.net, aarcange@redhat.com, amit.shah@redhat.com, pbonzini@redhat.com, liliang.opensource@gmail.com, yang.zhang.wz@gmail.com, quan.xu@aliyun.com, nilal@redhat.com, riel@redhat.com
 
-On Thu, 7 Dec 2017 07:33:19 +0100
-Thomas Huth <thuth@redhat.com> wrote:
+On 12/03/2017 09:50 AM, Tetsuo Handa wrote:
+> Matthew Wilcox wrote:
+>> On Fri, Dec 01, 2017 at 03:09:08PM +0000, Wang, Wei W wrote:
+>>> On Friday, December 1, 2017 9:02 PM, Tetsuo Handa wrote:
+>>>> If start == end is legal,
+>>>>
+>>>>     for (; start < end; start = (start | (IDA_BITMAP_BITS - 1)) + 1) {
+>>>>
+>>>> makes this loop do nothing because 10 < 10 is false.
+>>> How about "start <= end "?
+>> Don't ask Tetsuo for his opinion, write some userspace code that uses it.
+>>
+> Please be sure to prepare for "end == -1UL" case, for "start < end" will become
+> true when "start = (start | (IDA_BITMAP_BITS - 1)) + 1" made "start == 0" due to
+> overflow.
 
-> On 08.11.2017 17:54, Halil Pasic wrote:
+I think there is one more corner case with this API: searching for bit 
+"1" from [0, ULONG_MAX] while no bit is set in the range, there appear 
+to be no possible value that we can return (returning "end + 1" will be 
+"ULONG_MAX + 1", which is 0)
+I plan to make the "end" be exclusive of the searching, that is, [start, 
+end), and return "end" if no such bit is found.
 
-> > +static ccw_cb_t get_ccw_cb(CcwTestDevOpMode op_mode)
-> > +{
-> > +    switch (op_mode) {
-> > +    case OP_MODE_FIB:
-> > +        return ccw_testdev_ccw_cb_mode_fib;
-> > +    case OP_MODE_NOP:
-> > +    default:
-> > +        return ccw_testdev_ccw_cb_mode_nop;  
-> 
-> Do we really want to use "nop" for unknown modes? Or should there rather
-> be a ccw_testdev_ccw_cb_mode_error instead, too?
+For cases like [16, 16), returning 16 doesn't mean bit 16 is 1 or 0, it 
+simply means there is no bits to search in the given range, since 16 is 
+exclusive.
 
-I like the idea of an error mode.
+Please let me know if you have a different thought.
 
-Related: Should the device have a mechanism to report the supported
-modes?
-
-> 
-> > +    }
-> > +}
-
-(...)
-
-> > +/* TODO This is the out-of-band variant. We may want to get rid of it */  
-> 
-> I agree, this should rather go away in the final version.
-
-I'm not sure that the in-band variant with its magic buffer value is
-superior to this version using a dedicated hypercall.
-
-> 
-> > +static int set_mode_diag(const uint64_t *args)
-> > +{
-> > +    uint64_t subch_id = args[0];
-> > +    uint64_t op_mode = args[1];
-> > +    SubchDev *sch;
-> > +    CcwTestDevDevice *dev;
-> > +    int cssid, ssid, schid, m;
-> > +
-> > +    if (ioinst_disassemble_sch_ident(subch_id, &m, &cssid, &ssid, &schid)) {
-> > +        return -EINVAL;
-> > +    }
-> > +    sch = css_find_subch(m, cssid, ssid, schid);
-> > +    if (!sch || !css_subch_visible(sch)) {
-> > +        return -EINVAL;
-> > +    }
-> > +    dev = CCW_TESTDEV(sch->driver_data);
-> > +    if (dev->op_mode_locked) {
-> > +        return op_mode == dev->op_mode ? 0 : -EINVAL;
-> > +    }
-> > +    dev->op_mode = op_mode;
-> > +    sch->ccw_cb = get_ccw_cb(dev->op_mode);
-> > +    return 0;
+Best,
+Wei
