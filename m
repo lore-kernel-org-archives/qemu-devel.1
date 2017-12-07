@@ -1,24 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39080)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38662)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ppandit@redhat.com>) id 1eMqHk-0002Kl-DI
-	for qemu-devel@nongnu.org; Thu, 07 Dec 2017 02:07:57 -0500
+	(envelope-from <rrazmkhah@ltpsn.org>) id 1eMqFU-0000ix-7Y
+	for qemu-devel@nongnu.org; Thu, 07 Dec 2017 02:05:36 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ppandit@redhat.com>) id 1eMqHh-0005XU-87
-	for qemu-devel@nongnu.org; Thu, 07 Dec 2017 02:07:56 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:35748)
+	(envelope-from <rrazmkhah@ltpsn.org>) id 1eMqFR-0003qw-1f
+	for qemu-devel@nongnu.org; Thu, 07 Dec 2017 02:05:36 -0500
+Received: from mail.ltpsn.org ([159.180.228.214]:45284)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ppandit@redhat.com>) id 1eMqHh-0005XK-25
-	for qemu-devel@nongnu.org; Thu, 07 Dec 2017 02:07:53 -0500
-Date: Thu, 7 Dec 2017 12:37:42 +0530 (IST)
-From: P J P <ppandit@redhat.com>
-In-Reply-To: <nycvar.YSQ.7.76.1711302341010.9413@wniryva>
-Message-ID: <nycvar.YSQ.7.76.1712071234520.16858@wniryva>
-References: <20171129174428.27548-1-ppandit@redhat.com>
-	<20171130145420.GB15942@stefanha-x1.localdomain>
-	<nycvar.YSQ.7.76.1711302341010.9413@wniryva>
+	(Exim 4.71) (envelope-from <rrazmkhah@ltpsn.org>) id 1eMqFQ-0003i9-Lt
+	for qemu-devel@nongnu.org; Thu, 07 Dec 2017 02:05:32 -0500
+Received: from [127.0.0.1] (localhost [127.0.0.1])
+	by mail.ltpsn.org (Postfix) with ESMTP id 7FBB91740082
+	for <qemu-devel@nongnu.org>; Thu,  7 Dec 2017 08:05:25 +0100 (CET)
+Received: from [127.0.0.1] (localhost [127.0.0.1])
+	(Authenticated sender: rrazmkhah@ltpsn.org)
+	by mail.ltpsn.org (Postfix) with ESMTPSA
+	for <qemu-devel@nongnu.org>; Thu,  7 Dec 2017 08:05:25 +0100 (CET)
+From: RR <rrazmkhah@ltpsn.org>
+Message-ID: <17ee9f61-1c3c-381c-6ddc-4f5773e7f549@ltpsn.org>
+Date: Thu, 7 Dec 2017 08:05:25 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Subject: Re: [Qemu-devel] [PATCH v4 0/2] check VirtiQueue Vring objects
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] .qcow file recovery
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,19 +32,30 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: Stefan Hajnoczi <stefanha@redhat.com>, Qemu Developers <qemu-devel@nongnu.org>, Cornelia Huck <cohuck@redhat.com>, zhangboxian <zhangboxian@huawei.com>, Paolo Bonzini <pbonzini@redhat.com>
+To: qemu-devel@nongnu.org
 
-+-- On Thu, 30 Nov 2017, P J P wrote --+
-| +-- On Thu, 30 Nov 2017, Stefan Hajnoczi wrote --+
-| | Michael is the virtio maintainer.  I have added him to this email
-| | thread so the patch series can be merged.
+Hi,
 
-  -> https://lists.gnu.org/archive/html/qemu-devel/2017-11/msg05473.html
+A .qcow file was deleted by mistake. No recovery or backup is available.=20
+Hard disk was plugged out from the NAS after half a hour to prevent=20
+Synology OS operations writing over desallocated stockage. The file=20
+system on the virtual disk was ntfs. Virtualisation OS is Proxmox.
 
-@mst: this qtest is not pulled in it seems.
+Ease Us Data Recovery didn't help much. We need to get the virtual disk=20
+file back and up.
 
-Thank you.
---
-Prasad J Pandit / Red Hat Product Security Team
-47AF CE69 3A90 54AA 9045 1053 DD13 3D32 FE5B 041F
+Do you know somebody who knows somebody who can deal with this issue ?
+
+Please contact me at rrazmkhah at ltpsn.org
+
+I look forward to receiving some cost estimates.
+
+Best regards,
+
+Remi Razmkhah
+
+--=20
++33 6 81 96 65 45
+Service Informatique
+Lyc=C3=A9e Technique Priv=C3=A9 Saint-Nicolas
+Paris 06
