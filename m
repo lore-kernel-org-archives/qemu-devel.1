@@ -1,33 +1,45 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:32790)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:32841)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <maxime.coquelin@redhat.com>) id 1eMz94-0001hZ-C3
-	for qemu-devel@nongnu.org; Thu, 07 Dec 2017 11:35:35 -0500
+	(envelope-from <pasic@linux.vnet.ibm.com>) id 1eMz99-0001jT-DM
+	for qemu-devel@nongnu.org; Thu, 07 Dec 2017 11:35:40 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <maxime.coquelin@redhat.com>) id 1eMz92-00070D-2N
-	for qemu-devel@nongnu.org; Thu, 07 Dec 2017 11:35:34 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:33530)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <maxime.coquelin@redhat.com>)
-	id 1eMz91-0006zj-Gp
-	for qemu-devel@nongnu.org; Thu, 07 Dec 2017 11:35:31 -0500
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
-	[10.5.11.16])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 5BB31C057EC9
-	for <qemu-devel@nongnu.org>; Thu,  7 Dec 2017 16:35:30 +0000 (UTC)
-References: <20171205174100.GD2405@work-vm>
-	<90cb3043-cf68-2635-2dd9-f47cf5e8c10e@redhat.com>
-	<20171207175544-mutt-send-email-mst@kernel.org>
-From: Maxime Coquelin <maxime.coquelin@redhat.com>
-Message-ID: <b4788fff-3b60-265b-7f61-af31fa8007b9@redhat.com>
-Date: Thu, 7 Dec 2017 17:35:13 +0100
+	(envelope-from <pasic@linux.vnet.ibm.com>) id 1eMz96-00072G-A8
+	for qemu-devel@nongnu.org; Thu, 07 Dec 2017 11:35:39 -0500
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:59512
+	helo=mx0a-001b2d01.pphosted.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pasic@linux.vnet.ibm.com>)
+	id 1eMz96-00071b-2k
+	for qemu-devel@nongnu.org; Thu, 07 Dec 2017 11:35:36 -0500
+Received: from pps.filterd (m0098421.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
+	vB7GYDT5084150
+	for <qemu-devel@nongnu.org>; Thu, 7 Dec 2017 11:35:33 -0500
+Received: from e06smtp14.uk.ibm.com (e06smtp14.uk.ibm.com [195.75.94.110])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2eq82uvctt-1
+	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Thu, 07 Dec 2017 11:35:33 -0500
+Received: from localhost
+	by e06smtp14.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	Only! Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <pasic@linux.vnet.ibm.com>;
+	Thu, 7 Dec 2017 16:35:29 -0000
+References: <20171108165422.46267-1-pasic@linux.vnet.ibm.com>
+	<20171108165422.46267-2-pasic@linux.vnet.ibm.com>
+	<e2e2ae84-e04a-df4f-50bb-328768a5464e@redhat.com>
+	<20171207125901.47be0af1.cohuck@redhat.com>
+	<87df13b9-c494-c8b4-49cf-b7ef4640d05a@linux.vnet.ibm.com>
+	<20171207135756.1f84ed41.cohuck@redhat.com>
+From: Halil Pasic <pasic@linux.vnet.ibm.com>
+Date: Thu, 7 Dec 2017 17:35:26 +0100
 MIME-Version: 1.0
-In-Reply-To: <20171207175544-mutt-send-email-mst@kernel.org>
-Content-Type: text/plain; charset=utf-8; format=flowed
+In-Reply-To: <20171207135756.1f84ed41.cohuck@redhat.com>
+Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] Hotplug ram and vhost-user
+Message-Id: <89a78374-25fe-76c5-3a96-deaa1ff6b391@linux.vnet.ibm.com>
+Subject: Re: [Qemu-devel] [RFC PATCH v2 1/3] s390x/ccs: add ccw-testdev
+ emulated device
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,84 +48,93 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: "Dr. David Alan Gilbert" <dgilbert@redhat.com>, marcandre.lureau@redhat.com, qemu-devel@nongnu.org
+To: Cornelia Huck <cohuck@redhat.com>
+Cc: Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>, Thomas Huth <thuth@redhat.com>, Pierre Morel <pmorel@linux.vnet.ibm.com>, qemu-s390x@nongnu.org, qemu-devel@nongnu.org
 
 
 
-On 12/07/2017 04:56 PM, Michael S. Tsirkin wrote:
-> On Thu, Dec 07, 2017 at 04:52:18PM +0100, Maxime Coquelin wrote:
->> Hi David,
->>
->> On 12/05/2017 06:41 PM, Dr. David Alan Gilbert wrote:
->>> Hi,
->>>     Since I'm reworking the memory map update code I've been
->>> trying to test it with hot adding RAM; but even on upstream
->>> I'm finding that hot adding RAM causes the guest to stop passing
->>> packets with vhost-user-bridge;  have either of you seen the same
->>> thing?
->>
->> No, I have never tried this.
->>
->>> I'm doing:
->>> ./tests/vhost-user-bridge -u /tmp/vubrsrc.sock
->>> $QEMU -enable-kvm -m 1G,maxmem=2G,slots=4 -smp 2 -object memory-backend-file,id=mem,size=1G,mem-path=/dev/shm,share=on -numa node,memdev=mem -mem-prealloc -trace events=vhost-trace-file -chardev socket,id=char0,path=/tmp/vubrsrc.sock -netdev type=vhost-user,id=mynet1,chardev=char0,vhostforce -device virtio-net-pci,netdev=mynet1 $IMAGE -net none
->>>
->>> (with a f27 guest) and then doing:
->>> (qemu) object_add memory-backend-file,id=mem1,size=256M,mem-path=/dev/shm
->>> (qemu) device_add pc-dimm,id=dimm1,memdev=mem1
->>>
->>> but then not getting any responses inside the guest.
->>>
->>> I can see the code sending another set-mem-table with the
->>> extra chunk of RAM and fd, and I think I can see the bridge
->>> mapping it.
->>
->> I think there are at least two problems.
->> The first one is that vhost-user-bridge does not support vhost-user
->> protocol's reply-ack feature. So when QEMU sends the requests, it cannot
->> know whether/when it has been handled by the backend.
->>
->> It had been fixed by sending a GET_FEATURE requests to be sure the
->> SET_MEM_TABLE was handled, as messages are processed in order. The problem
->> is that it caused some test failures when using TCG, so it got
->> reverted.
->>
->> The initial fix:
->>
->> commit 28ed5ef16384f12500abd3647973ee21b03cbe23
->> Author: Prerna Saxena <prerna.saxena@nutanix.com>
->> Date:   Fri Aug 5 03:53:51 2016 -0700
->>
->>      vhost-user: Attempt to fix a race with set_mem_table.
->>
->> The revert:
->>
->> commit 94c9cb31c04737f86be29afefbff401cd23bc24d
->> Author: Michael S. Tsirkin <mst@redhat.com>
->> Date:   Mon Aug 15 16:35:24 2016 +0300
->>
->>      Revert "vhost-user: Attempt to fix a race with set_mem_table."
+On 12/07/2017 01:57 PM, Cornelia Huck wrote:
+> On Thu, 7 Dec 2017 13:38:22 +0100
+> Halil Pasic <pasic@linux.vnet.ibm.com> wrote:
 > 
-> It's a question of stress-testing it and finding out why did
-> it cause tests fail esp when run within a container.
-
-Actually I did work on fixing it last year, and proposed below series:
-http://lists.gnu.org/archive/html/qemu-devel/2016-09/msg01704.html
-
-It felt through the cracks though. Maybe we could just revert your
-revert (patch 1 of my series) now that TCG is no more used by vhost-
-user-test?
-
-Maxime
->>
->> Another problem is that memory mmapped with previous call does not seems
->> to be unmapped, but that should not cause other problems than leaking
->> virtual memory.
->>
->> Maxime
->>> Dave
+>> On 12/07/2017 12:59 PM, Cornelia Huck wrote:
+>>> On Thu, 7 Dec 2017 07:33:19 +0100
+>>> Thomas Huth <thuth@redhat.com> wrote:
+>>>   
+>>>> On 08.11.2017 17:54, Halil Pasic wrote:  
+>>>   
+>>>>> +static ccw_cb_t get_ccw_cb(CcwTestDevOpMode op_mode)
+>>>>> +{
+>>>>> +    switch (op_mode) {
+>>>>> +    case OP_MODE_FIB:
+>>>>> +        return ccw_testdev_ccw_cb_mode_fib;
+>>>>> +    case OP_MODE_NOP:
+>>>>> +    default:
+>>>>> +        return ccw_testdev_ccw_cb_mode_nop;    
+>>>>
+>>>> Do we really want to use "nop" for unknown modes? Or should there rather
+>>>> be a ccw_testdev_ccw_cb_mode_error instead, too?  
 >>>
->>> --
->>> Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+>>> I like the idea of an error mode.  
+>>
+>> What would be the benefit of the error mode? The idea is that
+>> the tester in the guest has a certain set of tests implemented
+>> each requiring certain behavior from the device. This behavior
+>> is represented by the mode.
+>>
+>> If the device does not support the mode, the set of tests can't
+>> be executed meaningfully. The only option is either ignore them
+>> (and preferably report them as ignored), or fail them (not soo
+>> good in my opinion).
+> 
+> Failing it sounds superior to me: You really want to know if something
+> does not work as expected.
+> 
+
+When doing unit tests it's usual to differentiate between:
+* success, which ideally should give you guarantees about the unit
+not misbehaving in production if client code respects the contract
+* failure, which ideally should pretty much narrow down what
+went wrong
+* ignored, either due to user explicitly disabled a test, or
+a precondition for executing the was not met.
+
+If you think traffic light its green, red and yellow respectively.
+
+For instance qemu-iotests also skips tests where the environment
+does not provide a preconditions necessary to execute it.
+
+Of course a quality gate for a release should really be the suite
+executed successfully (green), and not some tests were skipped.
+
+A quality gate for let's day sending a series to the list could
+also be defined less rigorous. 
+
+>>
+>> The in guest tester should simply iterate over it test sets
+>> and try to select the mode the test set (or suite in other
+>> terminology) requires. If selecting the mode fails, than
+>> means you are working with an old ccw-testdev.
+>>
 >>>
+>>> Related: Should the device have a mechanism to report the supported
+>>> modes?
+>>>   
+>>
+>> I don't see the value. See above. I think the set mode operation
+>> reporting failure is sufficient.
+>>
+>> But if you have something in mind, please do tell. I'm open.
+> 
+> If we keep guest/host in lockstep, we probably don't need this. But if
+> not, self-reporting looks like a reasonable feature as it gives more
+> flexibility.
+> 
+I would prefer adding this should the need arise instead of
+speculatively. Would that be fine for you.
+
+BTW if interface stability is a concern maybe making the device
+experimental (at least for a while) is a good idea.
+
+Regards,
+Halil
