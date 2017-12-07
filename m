@@ -1,22 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40066)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40315)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1eN4oz-0002yC-3a
-	for qemu-devel@nongnu.org; Thu, 07 Dec 2017 17:39:14 -0500
+	(envelope-from <eblake@redhat.com>) id 1eN4ps-0003U8-5D
+	for qemu-devel@nongnu.org; Thu, 07 Dec 2017 17:40:11 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1eN4oy-00067Y-8N
-	for qemu-devel@nongnu.org; Thu, 07 Dec 2017 17:39:13 -0500
+	(envelope-from <eblake@redhat.com>) id 1eN4pr-0007B2-6f
+	for qemu-devel@nongnu.org; Thu, 07 Dec 2017 17:40:08 -0500
 References: <20171207201320.19284-1-stefanha@redhat.com>
-	<20171207201320.19284-4-stefanha@redhat.com>
+	<20171207201320.19284-5-stefanha@redhat.com>
 From: Eric Blake <eblake@redhat.com>
-Message-ID: <6b633a44-09ac-c4f8-b1f4-5e52afd0503f@redhat.com>
-Date: Thu, 7 Dec 2017 16:38:57 -0600
+Message-ID: <2ca3535a-34d8-a47d-c87d-d7cc36a53b2c@redhat.com>
+Date: Thu, 7 Dec 2017 16:39:59 -0600
 MIME-Version: 1.0
-In-Reply-To: <20171207201320.19284-4-stefanha@redhat.com>
+In-Reply-To: <20171207201320.19284-5-stefanha@redhat.com>
 Content-Type: multipart/signed; micalg=pgp-sha256;
 	protocol="application/pgp-signature";
-	boundary="4MSLX1gXW4OB1FaVuSi3FlqpB7E3ntRWf"
-Subject: Re: [Qemu-devel] [PATCH v2 3/6] blockdev: add
- x-blockdev-set-iothread force boolean
+	boundary="iIlETXN7DHMvPOkGIBgHvWDBB2QwfCSPt"
+Subject: Re: [Qemu-devel] [PATCH v2 4/6] iotests: add VM.add_object()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,35 +28,27 @@ To: Stefan Hajnoczi <stefanha@redhat.com>, qemu-devel@nongnu.org
 Cc: qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
 
 This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---4MSLX1gXW4OB1FaVuSi3FlqpB7E3ntRWf
+--iIlETXN7DHMvPOkGIBgHvWDBB2QwfCSPt
 From: Eric Blake <eblake@redhat.com>
 To: Stefan Hajnoczi <stefanha@redhat.com>, qemu-devel@nongnu.org
 Cc: qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>,
  Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <6b633a44-09ac-c4f8-b1f4-5e52afd0503f@redhat.com>
-Subject: Re: [PATCH v2 3/6] blockdev: add x-blockdev-set-iothread force
- boolean
+Message-ID: <2ca3535a-34d8-a47d-c87d-d7cc36a53b2c@redhat.com>
+Subject: Re: [PATCH v2 4/6] iotests: add VM.add_object()
 References: <20171207201320.19284-1-stefanha@redhat.com>
- <20171207201320.19284-4-stefanha@redhat.com>
-In-Reply-To: <20171207201320.19284-4-stefanha@redhat.com>
+ <20171207201320.19284-5-stefanha@redhat.com>
+In-Reply-To: <20171207201320.19284-5-stefanha@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
 
 On 12/07/2017 02:13 PM, Stefan Hajnoczi wrote:
-> When a node is already associated with a BlockBackend the
-> x-blockdev-set-iothread command refuses to set the IOThread.  This is t=
-o
-> prevent accidentally changing the IOThread when the nodes are in use.
->=20
-> When the nodes are created with -drive they automatically get a
-> BlockBackend.  In that case we know nothing is using them yet and it's
-> safe to set the IOThread.  Add a force boolean to override the check.
+> The VM.add_object() method can be used to add IOThreads or memory
+> backend objects.
 >=20
 > Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
 > ---
->  qapi/block-core.json |  6 +++++-
->  blockdev.c           | 11 ++++++-----
->  2 files changed, 11 insertions(+), 6 deletions(-)
+>  tests/qemu-iotests/iotests.py | 5 +++++
+>  1 file changed, 5 insertions(+)
 >=20
 
 Reviewed-by: Eric Blake <eblake@redhat.com>
@@ -68,7 +59,7 @@ Red Hat, Inc.           +1-919-301-3266
 Virtualization:  qemu.org | libvirt.org
 
 
---4MSLX1gXW4OB1FaVuSi3FlqpB7E3ntRWf
+--iIlETXN7DHMvPOkGIBgHvWDBB2QwfCSPt
 Content-Type: application/pgp-signature; name="signature.asc"
 Content-Description: OpenPGP digital signature
 Content-Disposition: attachment; filename="signature.asc"
@@ -77,14 +68,14 @@ Content-Disposition: attachment; filename="signature.asc"
 Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
 Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
 
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlopwwEACgkQp6FrSiUn
-Q2qePwf/Uc51n2AQ08oYyzFjDi3AZkx+tk6HWWqhLkcKWMQjQj7k+EyZ5LBdZLUZ
-qtwO2WLb0XmNbQvseLKb9kTjh/RWUEVSCL5vK02m5NSSCaFAAcuEA8usj+fqu120
-FJcQ06XC/QYyLyEu6JWtec9PyDAcNsl8pSqFppq0u+UH69EF9mCfJ0PJHr28kP+C
-JZsLBX9N/VdVDoNAds6l9hSuSc2TR1Zaa3ikPUXWgY9C1xU3BTmU4aDZn/6uRkje
-nNxY6zHNKO3C533yqg7dkgztTXLDRszqy+8MLTQw2mdo9XjxjtL20x9T1Bhx5LvS
-Ymwlbcysr6TO6WlQF4ZkgD0RnvINCA==
-=8AgK
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlopwz8ACgkQp6FrSiUn
+Q2oVaAf9GSpdbbtLU6TJd7B4BYA64XrunVMz+6N7+5NylbYy2KVrjDnSnbaTnQev
+6XZDjvM2990PyQxGjx2tqvKwTJBGmqTXuCMK70NIyk7F3pIW3qL+c3QQsRXNiYw7
+mWZUVmcAFAh2M1aqkgYx5h8/ymjWY3IWPFx/q0IHJdbDko5831xSu9/Ste15XLDz
+oeABTh5EWEqgMpTVlsjB54WvWI0LF22pXk8XJZYw0nfY+R6IhMFIX4dFnqWy6NGn
+RS5IDvjrQjRMCQLQYYDK1ONgmtdX+vb1YK4n4Jzpgw6S+OQ0UzBXUphU7dN/Mglu
+TgwMfQEqhO0UArxLlG5yvlrZaF2Lqg==
+=1Zi+
 -----END PGP SIGNATURE-----
 
---4MSLX1gXW4OB1FaVuSi3FlqpB7E3ntRWf--
+--iIlETXN7DHMvPOkGIBgHvWDBB2QwfCSPt--
