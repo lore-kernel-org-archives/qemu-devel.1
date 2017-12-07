@@ -1,24 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51418)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51298)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <tcminyard@gmail.com>) id 1eN404-00043l-0i
-	for qemu-devel@nongnu.org; Thu, 07 Dec 2017 16:46:37 -0500
+	(envelope-from <tcminyard@gmail.com>) id 1eN3zz-0003zq-H6
+	for qemu-devel@nongnu.org; Thu, 07 Dec 2017 16:46:32 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <tcminyard@gmail.com>) id 1eN403-0006Sa-1B
-	for qemu-devel@nongnu.org; Thu, 07 Dec 2017 16:46:36 -0500
-Received: from mail-pf0-x242.google.com ([2607:f8b0:400e:c00::242]:42325)
+	(envelope-from <tcminyard@gmail.com>) id 1eN3zy-0006L7-E9
+	for qemu-devel@nongnu.org; Thu, 07 Dec 2017 16:46:31 -0500
+Received: from mail-pg0-x242.google.com ([2607:f8b0:400e:c05::242]:32902)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <tcminyard@gmail.com>) id 1eN402-0006S6-RU
-	for qemu-devel@nongnu.org; Thu, 07 Dec 2017 16:46:34 -0500
-Received: by mail-pf0-x242.google.com with SMTP id d23so5669990pfe.9
-	for <qemu-devel@nongnu.org>; Thu, 07 Dec 2017 13:46:34 -0800 (PST)
+	(Exim 4.71) (envelope-from <tcminyard@gmail.com>) id 1eN3zy-0006KM-5D
+	for qemu-devel@nongnu.org; Thu, 07 Dec 2017 16:46:30 -0500
+Received: by mail-pg0-x242.google.com with SMTP id g7so5397961pgs.0
+	for <qemu-devel@nongnu.org>; Thu, 07 Dec 2017 13:46:30 -0800 (PST)
 Sender: Corey Minyard <tcminyard@gmail.com>
 From: minyard@acm.org
-Date: Thu,  7 Dec 2017 15:46:16 -0600
-Message-Id: <1512683181-8420-10-git-send-email-minyard@acm.org>
+Date: Thu,  7 Dec 2017 15:46:08 -0600
+Message-Id: <1512683181-8420-2-git-send-email-minyard@acm.org>
 In-Reply-To: <1512683181-8420-1-git-send-email-minyard@acm.org>
 References: <1512683181-8420-1-git-send-email-minyard@acm.org>
-Subject: [Qemu-devel] [PATCH 09/14] i2c: Add vmstate handling to the smbus
- eeprom
+Subject: [Qemu-devel] [PATCH 01/14] i2c:pm_smbus: Clean up some style issues
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,60 +27,152 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Corey Minyard <cminyard@mvista.com>
+Cc: Corey Minyard <cminyard@mvista.com>, "Michael S . Tsirkin" <mst@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
 
 From: Corey Minyard <cminyard@mvista.com>
 
-Signed-off-by: Corey Minyard <cminyard@mvista.com>
----
- hw/i2c/smbus_eeprom.c | 16 +++++++++++++++-
- 1 file changed, 15 insertions(+), 1 deletion(-)
+Fix some spacing issues, remove extraneous comments, add some
+defines instead of hard-coding numbers.
 
-diff --git a/hw/i2c/smbus_eeprom.c b/hw/i2c/smbus_eeprom.c
-index b13ec0f..089005d 100644
---- a/hw/i2c/smbus_eeprom.c
-+++ b/hw/i2c/smbus_eeprom.c
-@@ -29,6 +29,8 @@
+Signed-off-by: Corey Minyard <cminyard@mvista.com>
+Cc: Michael S. Tsirkin <mst@redhat.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>
+---
+ hw/i2c/pm_smbus.c | 58 ++++++++++++++++++++++++++++++++++++-------------------
+ 1 file changed, 38 insertions(+), 20 deletions(-)
+
+diff --git a/hw/i2c/pm_smbus.c b/hw/i2c/pm_smbus.c
+index 6fc3923..92c3aebd 100644
+--- a/hw/i2c/pm_smbus.c
++++ b/hw/i2c/pm_smbus.c
+@@ -23,8 +23,6 @@
+ #include "hw/i2c/pm_smbus.h"
+ #include "hw/i2c/smbus.h"
  
- //#define DEBUG
+-/* no save/load? */
+-
+ #define SMBHSTSTS       0x00
+ #define SMBHSTCNT       0x02
+ #define SMBHSTCMD       0x03
+@@ -33,19 +31,34 @@
+ #define SMBHSTDAT1      0x06
+ #define SMBBLKDAT       0x07
  
-+#define TYPE_SMBUS_EEPROM_DEVICE "smbus-eeprom"
+-#define STS_HOST_BUSY   (1)
+-#define STS_INTR        (1<<1)
+-#define STS_DEV_ERR     (1<<2)
+-#define STS_BUS_ERR     (1<<3)
+-#define STS_FAILED      (1<<4)
+-#define STS_SMBALERT    (1<<5)
+-#define STS_INUSE_STS   (1<<6)
+-#define STS_BYTE_DONE   (1<<7)
++#define STS_HOST_BUSY   (1 << 0)
++#define STS_INTR        (1 << 1)
++#define STS_DEV_ERR     (1 << 2)
++#define STS_BUS_ERR     (1 << 3)
++#define STS_FAILED      (1 << 4)
++#define STS_SMBALERT    (1 << 5)
++#define STS_INUSE_STS   (1 << 6)
++#define STS_BYTE_DONE   (1 << 7)
+ /* Signs of successfully transaction end :
+ *  ByteDoneStatus = 1 (STS_BYTE_DONE) and INTR = 1 (STS_INTR )
+ */
+ 
+-//#define DEBUG
++#define CTL_INTREN      (1 << 0)
++#define CTL_KILL        (1 << 1)
++#define CTL_LAST_BYTE   (1 << 5)
++#define CTL_START       (1 << 6)
++#define CTL_PEC_EN      (1 << 7)
++#define CTL_RETURN_MASK 0x1f
 +
- typedef struct SMBusEEPROMDevice {
-     SMBusDevice smbusdev;
-     void *data;
-@@ -97,6 +99,17 @@ static uint8_t eeprom_read_data(SMBusDevice *dev, uint8_t cmd, int n)
-     return eeprom_receive_byte(dev);
++#define PROT_QUICK          0
++#define PROT_BYTE           1
++#define PROT_BYTE_DATA      2
++#define PROT_WORD_DATA      3
++#define PROT_PROC_CALL      4
++#define PROT_BLOCK_DATA     5
++#define PROT_I2C_BLOCK_DATA 6
++
++/*#define DEBUG*/
+ 
+ #ifdef DEBUG
+ # define SMBUS_DPRINTF(format, ...)     printf(format, ## __VA_ARGS__)
+@@ -68,11 +81,12 @@ static void smb_transaction(PMSMBus *s)
+     if ((s->smb_stat & STS_DEV_ERR) != 0)  {
+         goto error;
+     }
++
+     switch(prot) {
+-    case 0x0:
++    case PROT_QUICK:
+         ret = smbus_quick_command(bus, addr, read);
+         goto done;
+-    case 0x1:
++    case PROT_BYTE:
+         if (read) {
+             ret = smbus_receive_byte(bus, addr);
+             goto data8;
+@@ -80,7 +94,7 @@ static void smb_transaction(PMSMBus *s)
+             ret = smbus_send_byte(bus, addr, cmd);
+             goto done;
+         }
+-    case 0x2:
++    case PROT_BYTE_DATA:
+         if (read) {
+             ret = smbus_read_byte(bus, addr, cmd);
+             goto data8;
+@@ -89,16 +103,17 @@ static void smb_transaction(PMSMBus *s)
+             goto done;
+         }
+         break;
+-    case 0x3:
++    case PROT_WORD_DATA:
+         if (read) {
+             ret = smbus_read_word(bus, addr, cmd);
+             goto data16;
+         } else {
+-            ret = smbus_write_word(bus, addr, cmd, (s->smb_data1 << 8) | s->smb_data0);
++            ret = smbus_write_word(bus, addr, cmd,
++                                   (s->smb_data1 << 8) | s->smb_data0);
+             goto done;
+         }
+         break;
+-    case 0x5:
++    case PROT_I2C_BLOCK_DATA:
+         if (read) {
+             ret = smbus_read_block(bus, addr, cmd, s->smb_data);
+             goto data8;
+@@ -149,8 +164,9 @@ static void smb_ioport_writeb(void *opaque, hwaddr addr, uint64_t val,
+         break;
+     case SMBHSTCNT:
+         s->smb_ctl = val;
+-        if (val & 0x40)
++        if (s->smb_ctl & CTL_START) {
+             smb_transaction(s);
++        }
+         break;
+     case SMBHSTCMD:
+         s->smb_cmd = val;
+@@ -185,7 +201,7 @@ static uint64_t smb_ioport_readb(void *opaque, hwaddr addr, unsigned width)
+         break;
+     case SMBHSTCNT:
+         s->smb_index = 0;
+-        val = s->smb_ctl & 0x1f;
++        val = s->smb_ctl & CTL_RETURN_MASK;
+         break;
+     case SMBHSTCMD:
+         val = s->smb_cmd;
+@@ -208,7 +224,9 @@ static uint64_t smb_ioport_readb(void *opaque, hwaddr addr, unsigned width)
+         val = 0;
+         break;
+     }
+-    SMBUS_DPRINTF("SMB readb port=0x%04" HWADDR_PRIx " val=0x%02x\n", addr, val);
++    SMBUS_DPRINTF("SMB readb port=0x%04" HWADDR_PRIx " val=0x%02x\n",
++                  addr, val);
++
+     return val;
  }
  
-+static const VMStateDescription vmstate_smbus_eeprom = {
-+    .name = TYPE_SMBUS_EEPROM_DEVICE,
-+    .version_id = 1,
-+    .minimum_version_id = 1,
-+    .fields      = (VMStateField[]) {
-+        VMSTATE_SMBUS_DEVICE(smbusdev, SMBusEEPROMDevice),
-+        VMSTATE_UINT8(offset, SMBusEEPROMDevice),
-+        VMSTATE_END_OF_LIST()
-+    }
-+};
-+
- static int smbus_eeprom_initfn(SMBusDevice *dev)
- {
-     SMBusEEPROMDevice *eeprom = (SMBusEEPROMDevice *)dev;
-@@ -122,12 +135,13 @@ static void smbus_eeprom_class_initfn(ObjectClass *klass, void *data)
-     sc->write_data = eeprom_write_data;
-     sc->read_data = eeprom_read_data;
-     dc->props = smbus_eeprom_properties;
-+    dc->vmsd = &vmstate_smbus_eeprom;
-     /* Reason: pointer property "data" */
-     dc->user_creatable = false;
- }
- 
- static const TypeInfo smbus_eeprom_info = {
--    .name          = "smbus-eeprom",
-+    .name          = TYPE_SMBUS_EEPROM_DEVICE,
-     .parent        = TYPE_SMBUS_DEVICE,
-     .instance_size = sizeof(SMBusEEPROMDevice),
-     .class_init    = smbus_eeprom_class_initfn,
 -- 
 2.7.4
