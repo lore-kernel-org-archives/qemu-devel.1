@@ -1,35 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43190)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43938)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1eN0uF-0002Pl-It
-	for qemu-devel@nongnu.org; Thu, 07 Dec 2017 13:28:25 -0500
+	(envelope-from <lprosek@redhat.com>) id 1eN0vz-0003TE-EG
+	for qemu-devel@nongnu.org; Thu, 07 Dec 2017 13:30:12 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1eN0uD-0000dy-Rx
-	for qemu-devel@nongnu.org; Thu, 07 Dec 2017 13:28:23 -0500
-Received: from mail-wr0-x231.google.com ([2a00:1450:400c:c0c::231]:46522)
+	(envelope-from <lprosek@redhat.com>) id 1eN0vv-0001TL-FP
+	for qemu-devel@nongnu.org; Thu, 07 Dec 2017 13:30:11 -0500
+Received: from mail-vk0-f43.google.com ([209.85.213.43]:40637)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1eN0uD-0000dJ-Ie
-	for qemu-devel@nongnu.org; Thu, 07 Dec 2017 13:28:21 -0500
-Received: by mail-wr0-x231.google.com with SMTP id x49so8447099wrb.13
-	for <qemu-devel@nongnu.org>; Thu, 07 Dec 2017 10:28:21 -0800 (PST)
+	(Exim 4.71) (envelope-from <lprosek@redhat.com>) id 1eN0vv-0001Rc-B0
+	for qemu-devel@nongnu.org; Thu, 07 Dec 2017 13:30:07 -0500
+Received: by mail-vk0-f43.google.com with SMTP id w190so5469522vkd.7
+	for <qemu-devel@nongnu.org>; Thu, 07 Dec 2017 10:30:06 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <20171207193003-mutt-send-email-mst@kernel.org>
-References: <286AC319A985734F985F78AFA26841F73937B57F@shsmsx102.ccr.corp.intel.com>
-	<CAJSP0QWugAKQy6hYEJfy_XHEg-Q2swAzZMNcWBqn-r9Yi7yiEg@mail.gmail.com>
-	<5A28BC2D.6000308@intel.com>
-	<CAJSP0QUxRv9LNb1+McYxV0KY4Ss3NkaSjwO6fXiJd+oU2+zJSQ@mail.gmail.com>
-	<5A290398.60508@intel.com>
-	<CAJSP0QURjdD8BnOmJo83fzJn_zCijSKQh==Pz+Xu4r6Q2i3SkQ@mail.gmail.com>
-	<20171207153454-mutt-send-email-mst@kernel.org>
-	<CAJSP0QVu4iwAu01Sth84VZshQde97x3FW1E1ua_YXVKs-65vhQ@mail.gmail.com>
-	<20171207183945-mutt-send-email-mst@kernel.org>
-	<CAJSP0QVnukGD3Afu9myv=v5OjqrPDpXu6JL3Tpf+Cdk=em9V3w@mail.gmail.com>
-	<20171207193003-mutt-send-email-mst@kernel.org>
-From: Stefan Hajnoczi <stefanha@gmail.com>
-Date: Thu, 7 Dec 2017 18:28:19 +0000
-Message-ID: <CAJSP0QX4V64OoU4-Dhb93MUZ9Rz0FPR-La5Xq4_yqGH7SG6PjQ@mail.gmail.com>
+In-Reply-To: <20171207202707-mutt-send-email-mst@kernel.org>
+References: <20171120142216.17832-1-lprosek@redhat.com>
+	<c3c2fa0d-1e93-7f17-f8d3-db8eee82bfd1@redhat.com>
+	<CABdb737Evdi0zKEFmkAg1qmp6MqtzX_Gxc=S5-vBbk_m8RNrMw@mail.gmail.com>
+	<bdef78d0-2e8a-ac43-dd69-ff9c0ded2712@redhat.com>
+	<20171207202707-mutt-send-email-mst@kernel.org>
+From: Ladi Prosek <lprosek@redhat.com>
+Date: Thu, 7 Dec 2017 19:30:05 +0100
+Message-ID: <CABdb7357fgsGWXJ4pU3tQ0=r1-bb_FUku3r8BtYcnT0=aG7v0A@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [virtio-dev] [PATCH v3 0/7] Vhost-pci for inter-VM
- communication
+Subject: Re: [Qemu-devel] [PATCH] msix: don't mask already masked vectors on
+ reset
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -39,126 +33,124 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: Wei Wang <wei.w.wang@intel.com>, "virtio-dev@lists.oasis-open.org" <virtio-dev@lists.oasis-open.org>, "Yang, Zhiyong" <zhiyong.yang@intel.com>, "jan.kiszka@siemens.com" <jan.kiszka@siemens.com>, "jasowang@redhat.com" <jasowang@redhat.com>, "avi.cohen@huawei.com" <avi.cohen@huawei.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, Stefan Hajnoczi <stefanha@redhat.com>, "pbonzini@redhat.com" <pbonzini@redhat.com>, "marcandre.lureau@redhat.com" <marcandre.lureau@redhat.com>
+Cc: Marcel Apfelbaum <marcel@redhat.com>, qemu-devel <qemu-devel@nongnu.org>, Geoffrey McRae <geoff@hostfission.com>, Alex Williamson <alex.williamson@redhat.com>
 
-On Thu, Dec 7, 2017 at 5:38 PM, Michael S. Tsirkin <mst@redhat.com> wrote:
-> On Thu, Dec 07, 2017 at 05:29:14PM +0000, Stefan Hajnoczi wrote:
->> On Thu, Dec 7, 2017 at 4:47 PM, Michael S. Tsirkin <mst@redhat.com> wrote:
->> > On Thu, Dec 07, 2017 at 04:29:45PM +0000, Stefan Hajnoczi wrote:
->> >> On Thu, Dec 7, 2017 at 2:02 PM, Michael S. Tsirkin <mst@redhat.com> wrote:
->> >> > On Thu, Dec 07, 2017 at 01:08:04PM +0000, Stefan Hajnoczi wrote:
->> >> >> Instead of responding individually to these points, I hope this will
->> >> >> explain my perspective.  Let me know if you do want individual
->> >> >> responses, I'm happy to talk more about the points above but I think
->> >> >> the biggest difference is our perspective on this:
->> >> >>
->> >> >> Existing vhost-user slave code should be able to run on top of
->> >> >> vhost-pci.  For example, QEMU's
->> >> >> contrib/vhost-user-scsi/vhost-user-scsi.c should work inside the guest
->> >> >> with only minimal changes to the source file (i.e. today it explicitly
->> >> >> opens a UNIX domain socket and that should be done by libvhost-user
->> >> >> instead).  It shouldn't be hard to add vhost-pci vfio support to
->> >> >> contrib/libvhost-user/ alongside the existing UNIX domain socket code.
->> >> >>
->> >> >> This seems pretty easy to achieve with the vhost-pci PCI adapter that
->> >> >> I've described but I'm not sure how to implement libvhost-user on top
->> >> >> of vhost-pci vfio if the device doesn't expose the vhost-user
->> >> >> protocol.
->> >> >>
->> >> >> I think this is a really important goal.  Let's use a single
->> >> >> vhost-user software stack instead of creating a separate one for guest
->> >> >> code only.
->> >> >>
->> >> >> Do you agree that the vhost-user software stack should be shared
->> >> >> between host userspace and guest code as much as possible?
->> >> >
->> >> >
->> >> >
->> >> > The sharing you propose is not necessarily practical because the security goals
->> >> > of the two are different.
->> >> >
->> >> > It seems that the best motivation presentation is still the original rfc
->> >> >
->> >> > http://virtualization.linux-foundation.narkive.com/A7FkzAgp/rfc-vhost-user-enhancements-for-vm2vm-communication
->> >> >
->> >> > So comparing with vhost-user iotlb handling is different:
->> >> >
->> >> > With vhost-user guest trusts the vhost-user backend on the host.
->> >> >
->> >> > With vhost-pci we can strive to limit the trust to qemu only.
->> >> > The switch running within a VM does not have to be trusted.
->> >>
->> >> Can you give a concrete example?
->> >>
->> >> I have an idea about what you're saying but it may be wrong:
->> >>
->> >> Today the iotlb mechanism in vhost-user does not actually enforce
->> >> memory permissions.  The vhost-user slave has full access to mmapped
->> >> memory regions even when iotlb is enabled.  Currently the iotlb just
->> >> adds an indirection layer but no real security.  (Is this correct?)
+On Thu, Dec 7, 2017 at 7:27 PM, Michael S. Tsirkin <mst@redhat.com> wrote:
+> On Wed, Nov 22, 2017 at 03:22:50PM +0200, Marcel Apfelbaum wrote:
+>> On 22/11/2017 14:32, Ladi Prosek wrote:
+>> > On Wed, Nov 22, 2017 at 11:46 AM, Marcel Apfelbaum <marcel@redhat.com> wrote:
+>> > > Hi Ladi,
+>> > >
+>> > > On 20/11/2017 16:22, Ladi Prosek wrote:
+>> > > >
+>> > > > msix_mask_all() is supposed to invoke the release vector notifier if the
+>> > > > state of the
+>> > > > respective vector changed from unmasked or masked.
+>> > >
+>> > >
+>> > > You mean from unmasked "to" masked right?
 >> >
->> > Not exactly. iotlb protects against malicious drivers within guest.
->> > But yes, not against a vhost-user driver on the host.
+>> > Yes, that's a typo.
 >> >
->> >> Are you saying the vhost-pci device code in QEMU should enforce iotlb
->> >> permissions so the vhost-user slave guest only has access to memory
->> >> regions that are allowed by the iotlb?
+>> > > The way it's currently called from
+>> > > >
+>> > > > msix_reset(), though, may result in calling the release notifier even if
+>> > > > the vector
+>> > > > is already masked.
+>> > > >
+>> > > > 1) msix_reset() clears out the msix_cap field and the msix_table.
+>> > > > 2) msix_mask_all() runs with was_masked=false for all vectors because of
+>> > > > 1), which
+>> > > >      results in calling the release notifier on all vectors.
+>> > > > 3) if msix_reset() is subsequently called again, it goes through the same
+>> > > > steps and
+>> > > >      calls the release notifier on all vectors again.
+>> > > >
+>> > >
+>> > > As far as I can see in the code you are right.(very reset will trigger the
+>> > > release notifiers
+>> > > again)
+>> > >
+>> > > > This commit moves msix_mask_all() up so it runs before the device state is
+>> > > > lost.
+>> > >
+>> > >
+>> > > OK
+>> > >
+>> > > > And
+>> > > > it adds a call to msix_update_function_masked() so that the device
+>> > > > remembers that
+>> > > > MSI-X is masked.
+>> > > >
+>> > >
+>> > > msix_update_function_masked checks the msix is enabled or masked-off.
+>> > > You are building on the fact the msix will not be enabled to set
+>> > > "msix_function_masked" to "true", right?
+>> > > (I just want to be sure I understand the patch)
 >> >
->> > Yes.
+>> > Correct. msix_enabled() will return false because we've just reset
+>> >
+>> >    dev->config[dev->msix_cap + MSIX_CONTROL_OFFSET]
+>> >
+>> > I guess we could also simply assign true to it:
+>> >
+>> >    dev->msix_function_masked = true;
+>> >
+>> > just like msix_init() does.
 >>
->> Okay, thanks for confirming.
+>> Yes, is preferable - I think.
+>> If you intend to send V2, please wait first for Alex's remarks if he has any.
 >>
->> This can be supported by the approach I've described.  The vhost-pci
->> QEMU code has control over the BAR memory so it can prevent the guest
->> from accessing regions that are not allowed by the iotlb.
+>> Thanks,
+>> Marcel
 >>
->> Inside the guest the vhost-user slave still has the memory region
->> descriptions and sends iotlb messages.  This is completely compatible
->> with the libvirt-user APIs and existing vhost-user slave code can run
->> fine.  The only unique thing is that guest accesses to memory regions
->> not allowed by the iotlb do not work because QEMU has prevented it.
+>> >
+>> > > > This is likely a low impact issue, found while debugging an already broken
+>> > > > device. It
+>> > > > is however easy to fix and the expectation that the use and release
+>> > > > notifier invocations
+>> > > > are always balanced is very natural.
+>> > > >
+>> > >
+>> > > I would leave it (maybe) out of 2.11 because it may expose other bugs
+>> > > and we are after rc2 already.
+>> > >
+>> > > Adding Alex Williamson to see it does not affect device assignment,
+>> > > other than that the patch looks OK to me.
+>> > >
+>> > >
+>> > > Thanks,
+>> > > Marcel
+>> > >
+>> > >
+>> > > > Signed-off-by: Ladi Prosek <lprosek@redhat.com>
+>> > > > ---
+>> > > >    hw/pci/msix.c | 3 ++-
+>> > > >    1 file changed, 2 insertions(+), 1 deletion(-)
+>> > > >
+>> > > > diff --git a/hw/pci/msix.c b/hw/pci/msix.c
+>> > > > index c944c02135..34656de9b0 100644
+>> > > > --- a/hw/pci/msix.c
+>> > > > +++ b/hw/pci/msix.c
+>> > > > @@ -500,11 +500,12 @@ void msix_reset(PCIDevice *dev)
+>> > > >            return;
+>> > > >        }
+>> > > >        msix_clear_all_vectors(dev);
+>> > > > +    msix_mask_all(dev, dev->msix_entries_nr);
+>> > > >        dev->config[dev->msix_cap + MSIX_CONTROL_OFFSET] &=
+>> > > >              ~dev->wmask[dev->msix_cap + MSIX_CONTROL_OFFSET];
+>> > > >        memset(dev->msix_table, 0, dev->msix_entries_nr *
+>> > > > PCI_MSIX_ENTRY_SIZE);
+>> > > >        memset(dev->msix_pba, 0, QEMU_ALIGN_UP(dev->msix_entries_nr, 64) /
+>> > > > 8);
+>> > > > -    msix_mask_all(dev, dev->msix_entries_nr);
+>> > > > +    msix_update_function_masked(dev);
+>> > > >    }
+>> > > >      /* PCI spec suggests that devices make it possible for software to
+>> > > > configure
+>> > > >
+>> > >
 >
-> I don't think this can work since suddenly you need
-> to map full IOMMU address space into BAR.
+> Do you intend to post v2 or need Marcel to?
 
-The BAR covers all guest RAM but QEMU can set up MemoryRegions that
-hide parts from the guest (e.g. reads produce 0xff).  I'm not sure how
-expensive that is but implementing a strict IOMMU is hard to do
-without performance overhead.
-
-> Besides, this means implementing iotlb in both qemu and guest.
-
-It's free in the guest, the libvhost-user stack already has it.
-
->> If better performance is needed then it might be possible to optimize
->> this interface by handling most or even all of the iotlb stuff in QEMU
->> vhost-pci code and not exposing it to the vhost-user slave in the
->> guest.  But it doesn't change the fact that the vhost-user protocol
->> can be used and the same software stack works.
->
-> For one, the iotlb part would be out of scope then.
-> Instead you would have code to offset from BAR.
->
->> Do you have a concrete example of why sharing the same vhost-user
->> software stack inside the guest can't work?
->
-> With enough dedication some code might be shared.  OTOH reusing virtio
-> gains you a ready feature negotiation and discovery protocol.
->
-> I'm not convinced which has more value, and the second proposal
-> has been implemented already.
-
-Thanks to you and Wei for the discussion.  I've learnt a lot about
-vhost-user.  If you have questions about what I've posted, please let
-me know and we can discuss further.
-
-The decision is not up to me so I'll just summarize what the vhost-pci
-PCI adapter approach achieves:
-1. Just one device and driver
-2. Support for all device types (net, scsi, blk, etc)
-3. Reuse of software stack so vhost-user slaves can run in both host
-userspace and the guest
-4. Simpler to debug because the vhost-user protocol used by QEMU is
-also used by the guest
-
-Stefan
+I'll post v2 tomorrow.
