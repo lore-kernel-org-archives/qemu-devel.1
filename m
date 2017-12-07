@@ -1,32 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41917)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42885)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1eN0q1-0007IG-Nw
-	for qemu-devel@nongnu.org; Thu, 07 Dec 2017 13:24:03 -0500
+	(envelope-from <mst@redhat.com>) id 1eN0ti-0001Sq-2S
+	for qemu-devel@nongnu.org; Thu, 07 Dec 2017 13:27:51 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1eN0q0-0006GJ-G6
-	for qemu-devel@nongnu.org; Thu, 07 Dec 2017 13:24:01 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:38030)
+	(envelope-from <mst@redhat.com>) id 1eN0td-0000IR-3Z
+	for qemu-devel@nongnu.org; Thu, 07 Dec 2017 13:27:50 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:43074)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1eN0q0-0006G4-7G
-	for qemu-devel@nongnu.org; Thu, 07 Dec 2017 13:24:00 -0500
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
-	[10.5.11.15])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 38ECD81127
-	for <qemu-devel@nongnu.org>; Thu,  7 Dec 2017 18:23:59 +0000 (UTC)
-Date: Thu, 7 Dec 2017 18:23:49 +0000
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20171207182348.GF2439@work-vm>
-References: <20171205174100.GD2405@work-vm>
-	<90cb3043-cf68-2635-2dd9-f47cf5e8c10e@redhat.com>
-	<20171207162547.GD2439@work-vm>
-	<ab90f1b2-a360-e89d-32ea-9aebd7a65db3@redhat.com>
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1eN0tc-0000I1-Q1
+	for qemu-devel@nongnu.org; Thu, 07 Dec 2017 13:27:45 -0500
+Date: Thu, 7 Dec 2017 20:27:38 +0200
+From: "Michael S. Tsirkin" <mst@redhat.com>
+Message-ID: <20171207202707-mutt-send-email-mst@kernel.org>
+References: <20171120142216.17832-1-lprosek@redhat.com>
+	<c3c2fa0d-1e93-7f17-f8d3-db8eee82bfd1@redhat.com>
+	<CABdb737Evdi0zKEFmkAg1qmp6MqtzX_Gxc=S5-vBbk_m8RNrMw@mail.gmail.com>
+	<bdef78d0-2e8a-ac43-dd69-ff9c0ded2712@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <ab90f1b2-a360-e89d-32ea-9aebd7a65db3@redhat.com>
-Subject: Re: [Qemu-devel] Hotplug ram and vhost-user
+In-Reply-To: <bdef78d0-2e8a-ac43-dd69-ff9c0ded2712@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH] msix: don't mask already masked vectors on
+ reset
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,116 +30,122 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Maxime Coquelin <maxime.coquelin@redhat.com>
-Cc: marcandre.lureau@redhat.com, qemu-devel@nongnu.org, "Michael S. Tsirkin" <mst@redhat.com>, Victor Kaplansky <vkaplans@redhat.com>
+To: Marcel Apfelbaum <marcel@redhat.com>
+Cc: Ladi Prosek <lprosek@redhat.com>, qemu-devel <qemu-devel@nongnu.org>, Geoffrey McRae <geoff@hostfission.com>, Alex Williamson <alex.williamson@redhat.com>
 
-* Maxime Coquelin (maxime.coquelin@redhat.com) wrote:
-> 
-> 
-> On 12/07/2017 05:25 PM, Dr. David Alan Gilbert wrote:
-> > * Maxime Coquelin (maxime.coquelin@redhat.com) wrote:
-> > > Hi David,
+On Wed, Nov 22, 2017 at 03:22:50PM +0200, Marcel Apfelbaum wrote:
+> On 22/11/2017 14:32, Ladi Prosek wrote:
+> > On Wed, Nov 22, 2017 at 11:46 AM, Marcel Apfelbaum <marcel@redhat.com> wrote:
+> > > Hi Ladi,
 > > > 
-> > > On 12/05/2017 06:41 PM, Dr. David Alan Gilbert wrote:
-> > > > Hi,
-> > > >     Since I'm reworking the memory map update code I've been
-> > > > trying to test it with hot adding RAM; but even on upstream
-> > > > I'm finding that hot adding RAM causes the guest to stop passing
-> > > > packets with vhost-user-bridge;  have either of you seen the same
-> > > > thing?
-> > > 
-> > > No, I have never tried this.
-> > 
-> > Would you know if it works on dpdk?
-> 
-> We have a known issue in DPDK, the PMD threads might be accessing the
-> guest memory while the vhost-user protocol thread is unmapping it.
-> 
-> We have a similar problem with dirty logging area, and Victor is working
-> on a patch that will fix both issues.
-> 
-> Once ready, I'll have a try and let you know.
-> 
-> > > > I'm doing:
-> > > > ./tests/vhost-user-bridge -u /tmp/vubrsrc.sock
-> > > > $QEMU -enable-kvm -m 1G,maxmem=2G,slots=4 -smp 2 -object memory-backend-file,id=mem,size=1G,mem-path=/dev/shm,share=on -numa node,memdev=mem -mem-prealloc -trace events=vhost-trace-file -chardev socket,id=char0,path=/tmp/vubrsrc.sock -netdev type=vhost-user,id=mynet1,chardev=char0,vhostforce -device virtio-net-pci,netdev=mynet1 $IMAGE -net none
+> > > On 20/11/2017 16:22, Ladi Prosek wrote:
 > > > > 
-> > > > (with a f27 guest) and then doing:
-> > > > (qemu) object_add memory-backend-file,id=mem1,size=256M,mem-path=/dev/shm
-> > > > (qemu) device_add pc-dimm,id=dimm1,memdev=mem1
-> > > > 
-> > > > but then not getting any responses inside the guest.
-> > > > 
-> > > > I can see the code sending another set-mem-table with the
-> > > > extra chunk of RAM and fd, and I think I can see the bridge
-> > > > mapping it.
+> > > > msix_mask_all() is supposed to invoke the release vector notifier if the
+> > > > state of the
+> > > > respective vector changed from unmasked or masked.
 > > > 
-> > > I think there are at least two problems.
-> > > The first one is that vhost-user-bridge does not support vhost-user
-> > > protocol's reply-ack feature. So when QEMU sends the requests, it cannot
-> > > know whether/when it has been handled by the backend.
+> > > 
+> > > You mean from unmasked "to" masked right?
 > > 
-> > Wouldn't you have to be unlucky to cause that a problem - i.e. the
-> > descriptors would have to get allocated in the new RAM?
-> 
-> Yes, you may be right. I think it is worth to debug it to understand
-> what is going on.
-> 
-> > > It had been fixed by sending a GET_FEATURE requests to be sure the
-> > > SET_MEM_TABLE was handled, as messages are processed in order. The problem
-> > > is that it caused some test failures when using TCG, so it got
-> > > reverted.
-> > > 
-> > > The initial fix:
-> > > 
-> > > commit 28ed5ef16384f12500abd3647973ee21b03cbe23
-> > > Author: Prerna Saxena <prerna.saxena@nutanix.com>
-> > > Date:   Fri Aug 5 03:53:51 2016 -0700
-> > > 
-> > >      vhost-user: Attempt to fix a race with set_mem_table.
-> > > 
-> > > The revert:
-> > > 
-> > > commit 94c9cb31c04737f86be29afefbff401cd23bc24d
-> > > Author: Michael S. Tsirkin <mst@redhat.com>
-> > > Date:   Mon Aug 15 16:35:24 2016 +0300
-> > > 
-> > >      Revert "vhost-user: Attempt to fix a race with set_mem_table."
-> > > 
+> > Yes, that's a typo.
 > > 
-> > Do we know which tests fail?
+> > > The way it's currently called from
+> > > > 
+> > > > msix_reset(), though, may result in calling the release notifier even if
+> > > > the vector
+> > > > is already masked.
+> > > > 
+> > > > 1) msix_reset() clears out the msix_cap field and the msix_table.
+> > > > 2) msix_mask_all() runs with was_masked=false for all vectors because of
+> > > > 1), which
+> > > >      results in calling the release notifier on all vectors.
+> > > > 3) if msix_reset() is subsequently called again, it goes through the same
+> > > > steps and
+> > > >      calls the release notifier on all vectors again.
+> > > > 
+> > > 
+> > > As far as I can see in the code you are right.(very reset will trigger the
+> > > release notifiers
+> > > again)
+> > > 
+> > > > This commit moves msix_mask_all() up so it runs before the device state is
+> > > > lost.
+> > > 
+> > > 
+> > > OK
+> > > 
+> > > > And
+> > > > it adds a call to msix_update_function_masked() so that the device
+> > > > remembers that
+> > > > MSI-X is masked.
+> > > > 
+> > > 
+> > > msix_update_function_masked checks the msix is enabled or masked-off.
+> > > You are building on the fact the msix will not be enabled to set
+> > > "msix_function_masked" to "true", right?
+> > > (I just want to be sure I understand the patch)
+> > 
+> > Correct. msix_enabled() will return false because we've just reset
+> > 
+> >    dev->config[dev->msix_cap + MSIX_CONTROL_OFFSET]
+> > 
+> > I guess we could also simply assign true to it:
+> > 
+> >    dev->msix_function_masked = true;
+> > 
+> > just like msix_init() does.
 > 
-> vhost-user-test, but it should no more be failing now that it no more
-> uses TCG.
+> Yes, is preferable - I think.
+> If you intend to send V2, please wait first for Alex's remarks if he has any.
 > 
-> I think we could consider reverting the revert. i.e. send get_features
-> in set_mem_table toi be sure it has been handled.
+> Thanks,
+> Marcel
+> 
+> > 
+> > > > This is likely a low impact issue, found while debugging an already broken
+> > > > device. It
+> > > > is however easy to fix and the expectation that the use and release
+> > > > notifier invocations
+> > > > are always balanced is very natural.
+> > > > 
+> > > 
+> > > I would leave it (maybe) out of 2.11 because it may expose other bugs
+> > > and we are after rc2 already.
+> > > 
+> > > Adding Alex Williamson to see it does not affect device assignment,
+> > > other than that the patch looks OK to me.
+> > > 
+> > > 
+> > > Thanks,
+> > > Marcel
+> > > 
+> > > 
+> > > > Signed-off-by: Ladi Prosek <lprosek@redhat.com>
+> > > > ---
+> > > >    hw/pci/msix.c | 3 ++-
+> > > >    1 file changed, 2 insertions(+), 1 deletion(-)
+> > > > 
+> > > > diff --git a/hw/pci/msix.c b/hw/pci/msix.c
+> > > > index c944c02135..34656de9b0 100644
+> > > > --- a/hw/pci/msix.c
+> > > > +++ b/hw/pci/msix.c
+> > > > @@ -500,11 +500,12 @@ void msix_reset(PCIDevice *dev)
+> > > >            return;
+> > > >        }
+> > > >        msix_clear_all_vectors(dev);
+> > > > +    msix_mask_all(dev, dev->msix_entries_nr);
+> > > >        dev->config[dev->msix_cap + MSIX_CONTROL_OFFSET] &=
+> > > >              ~dev->wmask[dev->msix_cap + MSIX_CONTROL_OFFSET];
+> > > >        memset(dev->msix_table, 0, dev->msix_entries_nr *
+> > > > PCI_MSIX_ENTRY_SIZE);
+> > > >        memset(dev->msix_pba, 0, QEMU_ALIGN_UP(dev->msix_entries_nr, 64) /
+> > > > 8);
+> > > > -    msix_mask_all(dev, dev->msix_entries_nr);
+> > > > +    msix_update_function_masked(dev);
+> > > >    }
+> > > >      /* PCI spec suggests that devices make it possible for software to
+> > > > configure
+> > > > 
+> > > 
 
-How does it fail? Does it fail every time or only some times?
-(The postcopy test in migration-test.c also fails under TCG under
-very heavy load and I've not figured out why yet).
-
-Dave
-
-> > > Another problem is that memory mmapped with previous call does not seems
-> > > to be unmapped, but that should not cause other problems than leaking
-> > > virtual memory.
-> > 
-> > Oh, leaks are the least of our problem there!
-> 
-> Sure.
-> 
-> Maxime
-> > Dave
-> > 
-> > > Maxime
-> > > > Dave
-> > > > 
-> > > > --
-> > > > Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
-> > > > 
-> > --
-> > Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
-> > 
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+Do you intend to post v2 or need Marcel to?
