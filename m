@@ -1,25 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48505)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49595)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <wei.w.wang@intel.com>) id 1eMupz-0007Iy-WF
-	for qemu-devel@nongnu.org; Thu, 07 Dec 2017 06:59:36 -0500
+	(envelope-from <rjones@redhat.com>) id 1eMuuF-00024Y-Bx
+	for qemu-devel@nongnu.org; Thu, 07 Dec 2017 07:04:03 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <wei.w.wang@intel.com>) id 1eMupw-0007dQ-1X
-	for qemu-devel@nongnu.org; Thu, 07 Dec 2017 06:59:36 -0500
-Received: from mga07.intel.com ([134.134.136.100]:25893)
+	(envelope-from <rjones@redhat.com>) id 1eMuuB-0002PC-Dn
+	for qemu-devel@nongnu.org; Thu, 07 Dec 2017 07:03:59 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:38878)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <wei.w.wang@intel.com>)
-	id 1eMupv-0007ZS-Ny
-	for qemu-devel@nongnu.org; Thu, 07 Dec 2017 06:59:31 -0500
-Message-ID: <5A292D94.5000700@intel.com>
-Date: Thu, 07 Dec 2017 20:01:24 +0800
-From: Wei Wang <wei.w.wang@intel.com>
+	(Exim 4.71) (envelope-from <rjones@redhat.com>) id 1eMuuB-0002Of-7F
+	for qemu-devel@nongnu.org; Thu, 07 Dec 2017 07:03:55 -0500
+Date: Thu, 7 Dec 2017 12:03:49 +0000
+From: "Richard W.M. Jones" <rjones@redhat.com>
+Message-ID: <20171207120349.GH2450@redhat.com>
+References: <20171205063313.GB4102@yangzhon-Virtual>
 MIME-Version: 1.0
-References: <201711301934.CDC21800.FSLtJFFOOVQHMO@I-love.SAKURA.ne.jp>	<5A210C96.8050208@intel.com>	<201712012202.BDE13557.MJFQLtOOHVOFSF@I-love.SAKURA.ne.jp>	<286AC319A985734F985F78AFA26841F739376DA1@shsmsx102.ccr.corp.intel.com>	<20171201172519.GA27192@bombadil.infradead.org>
-	<201712031050.IAC64520.QVLFFOOJOSFtHM@I-love.SAKURA.ne.jp>
-In-Reply-To: <201712031050.IAC64520.QVLFFOOJOSFtHM@I-love.SAKURA.ne.jp>
-Content-Type: text/plain; charset=windows-1252; format=flowed
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v18 05/10] xbitmap: add more operations
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20171205063313.GB4102@yangzhon-Virtual>
+Subject: Re: [Qemu-devel] About the light VM solution!
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,37 +26,68 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>, willy@infradead.org
-Cc: virtio-dev@lists.oasis-open.org, linux-kernel@vger.kernel.org, qemu-devel@nongnu.org, virtualization@lists.linux-foundation.org, kvm@vger.kernel.org, linux-mm@kvack.org, mst@redhat.com, mhocko@kernel.org, akpm@linux-foundation.org, mawilcox@microsoft.com, david@redhat.com, cornelia.huck@de.ibm.com, mgorman@techsingularity.net, aarcange@redhat.com, amit.shah@redhat.com, pbonzini@redhat.com, liliang.opensource@gmail.com, yang.zhang.wz@gmail.com, quan.xu@aliyun.com, nilal@redhat.com, riel@redhat.com
+To: Yang Zhong <yang.zhong@intel.com>
+Cc: pbonzini@redhat.com, stefanha@redhat.com, berrange@redhat.com, qemu-devel@nongnu.org
 
-On 12/03/2017 09:50 AM, Tetsuo Handa wrote:
-> Matthew Wilcox wrote:
->> On Fri, Dec 01, 2017 at 03:09:08PM +0000, Wang, Wei W wrote:
->>> On Friday, December 1, 2017 9:02 PM, Tetsuo Handa wrote:
->>>> If start == end is legal,
->>>>
->>>>     for (; start < end; start = (start | (IDA_BITMAP_BITS - 1)) + 1) {
->>>>
->>>> makes this loop do nothing because 10 < 10 is false.
->>> How about "start <= end "?
->> Don't ask Tetsuo for his opinion, write some userspace code that uses it.
->>
-> Please be sure to prepare for "end == -1UL" case, for "start < end" will become
-> true when "start = (start | (IDA_BITMAP_BITS - 1)) + 1" made "start == 0" due to
-> overflow.
+I did a bit of work on this back in early 2016 and wrote a paper which
+analyzes what Intel were doing with Clear Containers back then, and
+how it fitted with the more distribution-centric view of Fedora and
+Red Hat, ie that we ideally want a single qemu binary, a single
+kernel, a single SeaBIOS, etc.
 
-I think there is one more corner case with this API: searching for bit 
-"1" from [0, ULONG_MAX] while no bit is set in the range, there appear 
-to be no possible value that we can return (returning "end + 1" will be 
-"ULONG_MAX + 1", which is 0)
-I plan to make the "end" be exclusive of the searching, that is, [start, 
-end), and return "end" if no such bit is found.
+You can read the paper here:
 
-For cases like [16, 16), returning 16 doesn't mean bit 16 is 1 or 0, it 
-simply means there is no bits to search in the given range, since 16 is 
-exclusive.
+  http://oirase.annexia.org/tmp/paper.pdf
 
-Please let me know if you have a different thought.
+and the source is here:
 
-Best,
-Wei
+  http://git.annexia.org/?p=libguestfs-talks.git;a=tree;f=2016-eng-talk;h=5a0a29ceb1e9db39539669717ec06e4f94eba086;hb=HEAD
+
+To address a few points from this thread:
+
+* As Paolo mentioned one problem is we link qemu to so many libraries,
+  and glibc / ELF dynamic loading is very slow.  Modularizing qemu
+  could help here.  Reducing symbol interposition
+  (-fvisibility=hidden) in more libraries would help a bit.  Linker
+  security features enabled in downstream distros don't help.
+  Rewriting ELF to be less crazy would help a lot but good luck there :-)
+
+* As Stefan & Paolo mentioned, it would be nice if SeaBIOS was faster
+  in the default configuration.  I ended up compiling a special
+  minimal SeaBIOS which saved a load of time, mainly not probing PCI
+  unnecessarily IIRC.
+
+* Considerable time is taken in booting the kernel, and that's mostly
+  in running all the initcall functions.  We wanted to use a Fedora
+  distro kernel, but unfortunately many subsystems do loads of
+  initcall work which is run even when that subsystem is not used.
+  This is why compiling a custom kernel (compiling out these
+  subsystems) is enticing.  Parallelizing initialization could help
+  here (however at the moment using -smp slows things down), also
+  parallelizing was rejected upstream IIRC.
+
+* PCI config space probing is really slow.  Unfortunately accelerating
+  it in the kernel doesn't seem either very easy or very acceptable to
+  KVM upstream: the use case is rather narrow & the implementation
+  seems like it would be very complex.  I also write a parallelizing
+  PCI probe for Linux which helped a bit but wasn't upstream material.
+
+* udev is another huge problem.  It's slow, it's monolithic, it
+  resists modifications such as modularization or removing parts.
+
+* Debugging over the UART is slow.
+
+libguestfs also ships with benchmarking tools which can be very useful
+to actually measure boot time:
+
+  https://github.com/libguestfs/libguestfs/tree/master/utils
+
+HTH,
+
+Rich.
+
+-- 
+Richard Jones, Virtualization Group, Red Hat http://people.redhat.com/~rjones
+Read my programming and virtualization blog: http://rwmj.wordpress.com
+virt-builder quickly builds VMs from scratch
+http://libguestfs.org/virt-builder.1.html
