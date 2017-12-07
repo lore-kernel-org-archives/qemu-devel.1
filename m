@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51303)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51341)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <tcminyard@gmail.com>) id 1eN3zz-000406-Pp
-	for qemu-devel@nongnu.org; Thu, 07 Dec 2017 16:46:33 -0500
+	(envelope-from <tcminyard@gmail.com>) id 1eN401-000414-6Y
+	for qemu-devel@nongnu.org; Thu, 07 Dec 2017 16:46:34 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <tcminyard@gmail.com>) id 1eN3zx-0006K3-GV
-	for qemu-devel@nongnu.org; Thu, 07 Dec 2017 16:46:31 -0500
-Received: from mail-pg0-x242.google.com ([2607:f8b0:400e:c05::242]:45556)
+	(envelope-from <tcminyard@gmail.com>) id 1eN3zz-0006Mb-CL
+	for qemu-devel@nongnu.org; Thu, 07 Dec 2017 16:46:33 -0500
+Received: from mail-pg0-x244.google.com ([2607:f8b0:400e:c05::244]:39837)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <tcminyard@gmail.com>) id 1eN3zx-0006JR-97
-	for qemu-devel@nongnu.org; Thu, 07 Dec 2017 16:46:29 -0500
-Received: by mail-pg0-x242.google.com with SMTP id m25so5377697pgv.12
-	for <qemu-devel@nongnu.org>; Thu, 07 Dec 2017 13:46:29 -0800 (PST)
+	(Exim 4.71) (envelope-from <tcminyard@gmail.com>) id 1eN3zz-0006LV-3F
+	for qemu-devel@nongnu.org; Thu, 07 Dec 2017 16:46:31 -0500
+Received: by mail-pg0-x244.google.com with SMTP id w7so5384202pgv.6
+	for <qemu-devel@nongnu.org>; Thu, 07 Dec 2017 13:46:30 -0800 (PST)
 Sender: Corey Minyard <tcminyard@gmail.com>
 From: minyard@acm.org
-Date: Thu,  7 Dec 2017 15:46:09 -0600
-Message-Id: <1512683181-8420-3-git-send-email-minyard@acm.org>
+Date: Thu,  7 Dec 2017 15:46:11 -0600
+Message-Id: <1512683181-8420-5-git-send-email-minyard@acm.org>
 In-Reply-To: <1512683181-8420-1-git-send-email-minyard@acm.org>
 References: <1512683181-8420-1-git-send-email-minyard@acm.org>
-Subject: [Qemu-devel] [PATCH 02/14] i2c:pm_smbus: Fix the semantics of block
- I2C transfers
+Subject: [Qemu-devel] [PATCH 04/14] i2c:pm_smbus: Add block transfer
+ capability
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,145 +32,321 @@ Cc: Corey Minyard <cminyard@mvista.com>, "Michael S . Tsirkin" <mst@redhat.com>,
 
 From: Corey Minyard <cminyard@mvista.com>
 
-The I2C block transfer commands was not implemented correctly, it
-read a length byte and such like it was an smbus transfer.
+There was no block transfer code in pm_smbus.c, and it is needed
+for some devices.  So add it.
 
-So fix the smbus_read_block() and smbus_write_block() functions
-so they can properly handle I2C transfers, and normal SMBus
-transfers (for upcoming changes).  Pass in a transfer size and
-a bool to know whether to use the size byte (like SMBus) or use
-the length given (like I2C).
+This adds both byte-by-byte block transfers and buffered block
+transfers.
 
 Signed-off-by: Corey Minyard <cminyard@mvista.com>
 Cc: Michael S. Tsirkin <mst@redhat.com>
 Cc: Paolo Bonzini <pbonzini@redhat.com>
 ---
- hw/i2c/pm_smbus.c      | 10 ++++++++--
- hw/i2c/smbus.c         | 37 ++++++++++++++++++++++++-------------
- include/hw/i2c/smbus.h | 17 +++++++++++++++--
- 3 files changed, 47 insertions(+), 17 deletions(-)
+ hw/i2c/pm_smbus.c         | 151 ++++++++++++++++++++++++++++++++++++++++++----
+ hw/i2c/smbus_ich9.c       |   8 ++-
+ include/hw/i2c/pm_smbus.h |  20 +++++-
+ 3 files changed, 164 insertions(+), 15 deletions(-)
 
 diff --git a/hw/i2c/pm_smbus.c b/hw/i2c/pm_smbus.c
-index 92c3aebd..679edbc 100644
+index e7a8e92..686d411 100644
 --- a/hw/i2c/pm_smbus.c
 +++ b/hw/i2c/pm_smbus.c
-@@ -115,10 +115,16 @@ static void smb_transaction(PMSMBus *s)
-         break;
-     case PROT_I2C_BLOCK_DATA:
-         if (read) {
--            ret = smbus_read_block(bus, addr, cmd, s->smb_data);
-+            int xfersize = s->smb_data0;
-+            if (xfersize > sizeof(s->smb_data)) {
-+                xfersize = sizeof(s->smb_data);
-+            }
-+            ret = smbus_read_block(bus, addr, s->smb_data1, s->smb_data,
-+                                   xfersize, false, true);
-             goto data8;
-         } else {
--            ret = smbus_write_block(bus, addr, cmd, s->smb_data, s->smb_data0);
-+            ret = smbus_write_block(bus, addr, cmd, s->smb_data, s->smb_data0,
-+                                    false);
-             goto done;
+@@ -30,6 +30,7 @@
+ #define SMBHSTDAT0      0x05
+ #define SMBHSTDAT1      0x06
+ #define SMBBLKDAT       0x07
++#define SMBAUXCTL       0x0d
+ 
+ #define STS_HOST_BUSY   (1 << 0)
+ #define STS_INTR        (1 << 1)
+@@ -58,6 +59,10 @@
+ #define PROT_BLOCK_DATA     5
+ #define PROT_I2C_BLOCK_READ 6
+ 
++#define AUX_PEC       (1 << 0)
++#define AUX_BLK       (1 << 1)
++#define AUX_MASK      0x3
++
+ /*#define DEBUG*/
+ 
+ #ifdef DEBUG
+@@ -127,6 +132,51 @@ static void smb_transaction(PMSMBus *s)
+             goto error;
          }
          break;
-diff --git a/hw/i2c/smbus.c b/hw/i2c/smbus.c
-index 2d1b79a..4b0e264 100644
---- a/hw/i2c/smbus.c
-+++ b/hw/i2c/smbus.c
-@@ -301,33 +301,42 @@ int smbus_write_word(I2CBus *bus, uint8_t addr, uint8_t command, uint16_t data)
-     return 0;
++    case PROT_BLOCK_DATA:
++        if (read) {
++            ret = smbus_read_block(bus, addr, cmd, s->smb_data,
++                                   sizeof(s->smb_data), !s->i2c_enable,
++                                   !s->i2c_enable);
++            if (ret < 0) {
++                goto error;
++            }
++            s->smb_index = 0;
++            s->op_done = false;
++            if (s->smb_auxctl & AUX_BLK) {
++                s->smb_stat |= STS_INTR;
++            } else {
++                s->smb_blkdata = s->smb_data[0];
++                s->smb_stat |= STS_HOST_BUSY | STS_BYTE_DONE;
++            }
++            s->smb_data0 = ret;
++            goto out;
++        } else {
++            if (s->smb_auxctl & AUX_BLK) {
++                if (s->smb_index != s->smb_data0) {
++                    s->smb_index = 0;
++                    goto error;
++                }
++                /* Data is already all written to the queue, just do
++                   the operation. */
++                s->smb_index = 0;
++                ret = smbus_write_block(bus, addr, cmd, s->smb_data,
++                                        s->smb_data0, !s->i2c_enable);
++                if (ret < 0) {
++                    goto error;
++                }
++                s->op_done = true;
++                s->smb_stat |= STS_INTR;
++                s->smb_stat &= ~STS_HOST_BUSY;
++            } else {
++                s->op_done = false;
++                s->smb_stat |= STS_HOST_BUSY | STS_BYTE_DONE;
++                s->smb_data[0] = s->smb_blkdata;
++                s->smb_index = 0;
++                ret = 0;
++            }
++            goto out;
++        }
++        break;
+     default:
+         goto error;
+     }
+@@ -146,13 +196,13 @@ done:
+     if (ret < 0) {
+         goto error;
+     }
+-    s->smb_stat |= STS_BYTE_DONE | STS_INTR;
++    s->smb_stat |= STS_INTR;
++out:
+     return;
+ 
+ error:
+     s->smb_stat |= STS_DEV_ERR;
+     return;
+-
  }
  
--int smbus_read_block(I2CBus *bus, uint8_t addr, uint8_t command, uint8_t *data)
-+int smbus_read_block(I2CBus *bus, uint8_t addr, uint8_t command, uint8_t *data,
-+                     int len, bool recv_len, bool send_cmd)
- {
--    int len;
-+    int rlen;
-     int i;
- 
--    if (i2c_start_transfer(bus, addr, 0)) {
--        return -1;
-+    if (send_cmd) {
-+        if (i2c_start_transfer(bus, addr, 0)) {
-+            return -1;
+ static void smb_ioport_writeb(void *opaque, hwaddr addr, uint64_t val,
+@@ -164,14 +214,61 @@ static void smb_ioport_writeb(void *opaque, hwaddr addr, uint64_t val,
+                   " val=0x%02" PRIx64 "\n", addr, val);
+     switch(addr) {
+     case SMBHSTSTS:
+-        s->smb_stat = (~(val & 0xff)) & s->smb_stat;
+-        s->smb_index = 0;
++        s->smb_stat &= ~(val & ~STS_HOST_BUSY);
++        if (!s->op_done && !(s->smb_auxctl & AUX_BLK)) {
++            uint8_t read = s->smb_addr & 0x01;
++
++            s->smb_index++;
++            if (!read && s->smb_index == s->smb_data0) {
++                uint8_t prot = (s->smb_ctl >> 2) & 0x07;
++                uint8_t cmd = s->smb_cmd;
++                uint8_t addr = s->smb_addr >> 1;
++                int ret;
++
++                if (prot == PROT_I2C_BLOCK_READ) {
++                    s->smb_stat |= STS_DEV_ERR;
++                    goto out;
++                }
++
++                ret = smbus_write_block(s->smbus, addr, cmd, s->smb_data,
++                                        s->smb_data0, !s->i2c_enable);
++                if (ret < 0) {
++                    s->smb_stat |= STS_DEV_ERR;
++                    goto out;
++                }
++                s->op_done = true;
++                s->smb_stat |= STS_INTR;
++                s->smb_stat &= ~STS_HOST_BUSY;
++            } else if (!read) {
++                s->smb_data[s->smb_index] = s->smb_blkdata;
++                s->smb_stat |= STS_BYTE_DONE;
++            } else if (s->smb_ctl & CTL_LAST_BYTE) {
++                s->op_done = true;
++                s->smb_blkdata = s->smb_data[s->smb_index];
++                s->smb_index = 0;
++                s->smb_stat |= STS_INTR;
++                s->smb_stat &= ~STS_HOST_BUSY;
++            } else {
++                s->smb_blkdata = s->smb_data[s->smb_index];
++                s->smb_stat |= STS_BYTE_DONE;
++            }
 +        }
-+        i2c_send(bus, command);
-     }
--    i2c_send(bus, command);
-     if (i2c_start_transfer(bus, addr, 1)) {
--        i2c_end_transfer(bus);
-+        if (send_cmd) {
-+            i2c_end_transfer(bus);
+         break;
+     case SMBHSTCNT:
+-        s->smb_ctl = val;
+-        if (s->smb_ctl & CTL_START) {
++        s->smb_ctl = val & ~CTL_START; /* CTL_START always reads 0 */
++        if (val & CTL_START) {
++            if (!s->op_done) {
++                s->smb_index = 0;
++                s->op_done = true;
++            }
+             smb_transaction(s);
+         }
++        if (s->smb_ctl & CTL_KILL) {
++            s->op_done = true;
++            s->smb_index = 0;
++            s->smb_stat |= STS_FAILED;
++            s->smb_stat &= ~STS_HOST_BUSY;
 +        }
-         return -1;
+         break;
+     case SMBHSTCMD:
+         s->smb_cmd = val;
+@@ -186,13 +283,24 @@ static void smb_ioport_writeb(void *opaque, hwaddr addr, uint64_t val,
+         s->smb_data1 = val;
+         break;
+     case SMBBLKDAT:
+-        s->smb_data[s->smb_index++] = val;
+-        if (s->smb_index > 31)
++        if (s->smb_index >= PM_SMBUS_MAX_MSG_SIZE) {
+             s->smb_index = 0;
++        }
++        if (s->smb_auxctl & AUX_BLK) {
++            s->smb_data[s->smb_index++] = val;
++        } else {
++            s->smb_blkdata = val;
++        }
++        break;
++    case SMBAUXCTL:
++        s->smb_auxctl = val & AUX_MASK;
+         break;
+     default:
+         break;
      }
--    len = i2c_recv(bus);
--    if (len > 32) {
--        len = 0;
-+    if (recv_len) {
-+        rlen = i2c_recv(bus);
-+    } else {
-+        rlen = len;
-     }
--    for (i = 0; i < len; i++) {
-+    if (rlen > len) {
-+        rlen = 0;
-+    }
-+    for (i = 0; i < rlen; i++) {
-         data[i] = i2c_recv(bus);
-     }
-     i2c_nack(bus);
-     i2c_end_transfer(bus);
--    return len;
-+    return rlen;
++
++ out:
++    return;
  }
  
- int smbus_write_block(I2CBus *bus, uint8_t addr, uint8_t command, uint8_t *data,
--                      int len)
-+                      int len, bool send_len)
+ static uint64_t smb_ioport_readb(void *opaque, hwaddr addr, unsigned width)
+@@ -205,7 +313,6 @@ static uint64_t smb_ioport_readb(void *opaque, hwaddr addr, unsigned width)
+         val = s->smb_stat;
+         break;
+     case SMBHSTCNT:
+-        s->smb_index = 0;
+         val = s->smb_ctl & CTL_RETURN_MASK;
+         break;
+     case SMBHSTCMD:
+@@ -221,9 +328,22 @@ static uint64_t smb_ioport_readb(void *opaque, hwaddr addr, unsigned width)
+         val = s->smb_data1;
+         break;
+     case SMBBLKDAT:
+-        val = s->smb_data[s->smb_index++];
+-        if (s->smb_index > 31)
++        if (s->smb_index >= PM_SMBUS_MAX_MSG_SIZE) {
+             s->smb_index = 0;
++        }
++        if (s->smb_auxctl & AUX_BLK) {
++            val = s->smb_data[s->smb_index++];
++            if (!s->op_done && s->smb_index == s->smb_data0) {
++                s->op_done = true;
++                s->smb_index = 0;
++                s->smb_stat &= ~STS_HOST_BUSY;
++            }
++        } else {
++            val = s->smb_blkdata;
++        }
++        break;
++    case SMBAUXCTL:
++        val = s->smb_auxctl;
+         break;
+     default:
+         val = 0;
+@@ -235,6 +355,13 @@ static uint64_t smb_ioport_readb(void *opaque, hwaddr addr, unsigned width)
+     return val;
+ }
+ 
++static void pm_smbus_reset(PMSMBus *s)
++{
++    s->op_done = true;
++    s->smb_index = 0;
++    s->smb_stat = 0;
++}
++
+ static const MemoryRegionOps pm_smbus_ops = {
+     .read = smb_ioport_readb,
+     .write = smb_ioport_writeb,
+@@ -245,6 +372,8 @@ static const MemoryRegionOps pm_smbus_ops = {
+ 
+ void pm_smbus_init(DeviceState *parent, PMSMBus *smb)
  {
-     int i;
- 
-@@ -338,7 +347,9 @@ int smbus_write_block(I2CBus *bus, uint8_t addr, uint8_t command, uint8_t *data,
-         return -1;
++    smb->op_done = true;
++    smb->reset = pm_smbus_reset;
+     smb->smbus = i2c_init_bus(parent, "i2c");
+     memory_region_init_io(&smb->io, OBJECT(parent), &pm_smbus_ops, smb,
+                           "pm-smbus", 64);
+diff --git a/hw/i2c/smbus_ich9.c b/hw/i2c/smbus_ich9.c
+index e47556c..59e165a 100644
+--- a/hw/i2c/smbus_ich9.c
++++ b/hw/i2c/smbus_ich9.c
+@@ -62,12 +62,16 @@ static void ich9_smbus_write_config(PCIDevice *d, uint32_t address,
+     pci_default_write_config(d, address, val, len);
+     if (range_covers_byte(address, len, ICH9_SMB_HOSTC)) {
+         uint8_t hostc = s->dev.config[ICH9_SMB_HOSTC];
+-        if ((hostc & ICH9_SMB_HOSTC_HST_EN) &&
+-            !(hostc & ICH9_SMB_HOSTC_I2C_EN)) {
++        if (hostc & ICH9_SMB_HOSTC_HST_EN) {
+             memory_region_set_enabled(&s->smb.io, true);
+         } else {
+             memory_region_set_enabled(&s->smb.io, false);
+         }
++        s->smb.i2c_enable = (hostc & ICH9_SMB_HOSTC_I2C_EN) != 0;
++        if (hostc & ICH9_SMB_HOSTC_SSRESET) {
++            s->smb.reset(&s->smb);
++            s->dev.config[ICH9_SMB_HOSTC] &= ~ICH9_SMB_HOSTC_SSRESET;
++        }
      }
-     i2c_send(bus, command);
--    i2c_send(bus, len);
-+    if (send_len) {
-+        i2c_send(bus, len);
-+    }
-     for (i = 0; i < len; i++) {
-         i2c_send(bus, data[i]);
-     }
-diff --git a/include/hw/i2c/smbus.h b/include/hw/i2c/smbus.h
-index 544bbc1..f1b8078 100644
---- a/include/hw/i2c/smbus.h
-+++ b/include/hw/i2c/smbus.h
-@@ -73,9 +73,22 @@ int smbus_read_byte(I2CBus *bus, uint8_t addr, uint8_t command);
- int smbus_write_byte(I2CBus *bus, uint8_t addr, uint8_t command, uint8_t data);
- int smbus_read_word(I2CBus *bus, uint8_t addr, uint8_t command);
- int smbus_write_word(I2CBus *bus, uint8_t addr, uint8_t command, uint16_t data);
--int smbus_read_block(I2CBus *bus, uint8_t addr, uint8_t command, uint8_t *data);
-+
-+/*
-+ * Do a block transfer from an I2C device.  If recv_len is set, then the
-+ * first received byte is a length field and is used to know how much data
-+ * to receive.  Otherwise receive "len" bytes.  If send_cmd is set, send
-+ * the command byte first before receiving the data.
-+ */
-+int smbus_read_block(I2CBus *bus, uint8_t addr, uint8_t command, uint8_t *data,
-+                     int len, bool recv_len, bool send_cmd);
-+
-+/*
-+ * Do a block transfer to an I2C device.  If send_len is set, send the
-+ * "len" value before the data.
-+ */
- int smbus_write_block(I2CBus *bus, uint8_t addr, uint8_t command, uint8_t *data,
--                      int len);
-+                      int len, bool send_len);
+ }
  
- void smbus_eeprom_init(I2CBus *smbus, int nb_eeprom,
-                        const uint8_t *eeprom_spd, int size);
+diff --git a/include/hw/i2c/pm_smbus.h b/include/hw/i2c/pm_smbus.h
+index 2a837af..99d5489 100644
+--- a/include/hw/i2c/pm_smbus.h
++++ b/include/hw/i2c/pm_smbus.h
+@@ -1,6 +1,8 @@
+ #ifndef PM_SMBUS_H
+ #define PM_SMBUS_H
+ 
++#define PM_SMBUS_MAX_MSG_SIZE 32
++
+ typedef struct PMSMBus {
+     I2CBus *smbus;
+     MemoryRegion io;
+@@ -11,8 +13,22 @@ typedef struct PMSMBus {
+     uint8_t smb_addr;
+     uint8_t smb_data0;
+     uint8_t smb_data1;
+-    uint8_t smb_data[32];
+-    uint8_t smb_index;
++    uint8_t smb_data[PM_SMBUS_MAX_MSG_SIZE];
++    uint8_t smb_blkdata;
++    uint8_t smb_auxctl;
++    uint32_t smb_index;
++
++    /* Set by pm_smbus.c */
++    void (*reset)(struct PMSMBus *s);
++
++    /* Set by the user. */
++    bool i2c_enable;
++
++    /* Internally used by pm_smbus. */
++
++    /* Set on block transfers after the last byte has been read, so the
++       INTR bit can be set at the right time. */
++    bool op_done;
+ } PMSMBus;
+ 
+ void pm_smbus_init(DeviceState *parent, PMSMBus *smb);
 -- 
 2.7.4
