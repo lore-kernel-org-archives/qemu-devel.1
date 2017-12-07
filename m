@@ -1,14 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41224)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41288)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1eMy9S-00005m-TV
-	for qemu-devel@nongnu.org; Thu, 07 Dec 2017 10:31:55 -0500
+	(envelope-from <david@redhat.com>) id 1eMy9Y-00008o-S4
+	for qemu-devel@nongnu.org; Thu, 07 Dec 2017 10:32:01 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1eMy9L-000289-G6
-	for qemu-devel@nongnu.org; Thu, 07 Dec 2017 10:31:50 -0500
+	(envelope-from <david@redhat.com>) id 1eMy9U-0002F7-V2
+	for qemu-devel@nongnu.org; Thu, 07 Dec 2017 10:32:00 -0500
 From: David Hildenbrand <david@redhat.com>
-Date: Thu,  7 Dec 2017 16:31:36 +0100
-Message-Id: <20171207153141.15523-1-david@redhat.com>
-Subject: [Qemu-devel] [PATCH v2 for-2.12 0/5] s390x/tcg: CCW hotplug support
+Date: Thu,  7 Dec 2017 16:31:39 +0100
+Message-Id: <20171207153141.15523-4-david@redhat.com>
+In-Reply-To: <20171207153141.15523-1-david@redhat.com>
+References: <20171207153141.15523-1-david@redhat.com>
+Subject: [Qemu-devel] [PATCH v2 for-2.12 3/5] s390x/tcg: implement SET CLOCK
+ PROGRAMMABLE FIELD
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -18,38 +21,86 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-s390x@nongnu.org, qemu-devel@nongnu.org
-Cc: Christian Borntraeger <borntraeger@de.ibm.com>, Cornelia Huck <cohuck@redhat.com>, Richard Henderson <rth@twiddle.net>, Alexander Graf <agraf@suse.de>
+Cc: Christian Borntraeger <borntraeger@de.ibm.com>, Cornelia Huck <cohuck@redhat.com>, Richard Henderson <rth@twiddle.net>, Alexander Graf <agraf@suse.de>, David Hildenbrand <david@redhat.com>
 
-Hotplugging a ccw device currently fails due to different reasons.
+Needed for machine check handling inside Linux (when restoring registers).
 
-1. The stored machine check information is partially wrong.
-2. The TOD programmable field cannot be restored.
-3. STCRW cannot get executed.
+Except for SIGP and machine checks, we don't make use of the register
+yet. Sufficient for now.
 
-With these patches, I am able to sucessfully hotplug e.g. virtio-rng by
-issuing "device_add virtio-rng-ccw,id=rng0" to a Linux guest. Unplug
-also seems to work.
+Reviewed-by: Thomas Huth <thuth@redhat.com>
+Signed-off-by: David Hildenbrand <david@redhat.com>
+---
+ target/s390x/helper.h      |  1 +
+ target/s390x/insn-data.def |  2 ++
+ target/s390x/misc_helper.c | 11 +++++++++++
+ target/s390x/translate.c   |  7 +++++++
+ 4 files changed, 21 insertions(+)
 
-v1 -> v2:
-- avoid accessing unmapped lowcore
-- minor style issues, more/better comments and description fixes
-
-David Hildenbrand (5):
-  s390x/kvm: factor out build_channel_report_mcic() into cpu.h
-  s390x/tcg: fix and cleanup mcck injection
-  s390x/tcg: implement SET CLOCK PROGRAMMABLE FIELD
-  s390x/tcg: indicate value of TODPR in STCKE
-  s390x/tcg: wire up STORE CHANNEL REPORT WORD
-
- target/s390x/cpu.h         | 22 ++++++++++++++++++++++
- target/s390x/excp_helper.c | 12 ++++++------
- target/s390x/helper.h      |  2 ++
- target/s390x/insn-data.def |  3 +++
- target/s390x/internal.h    |  6 +++---
- target/s390x/kvm.c         | 25 ++-----------------------
- target/s390x/misc_helper.c | 20 ++++++++++++++++++++
- target/s390x/translate.c   | 20 ++++++++++++++++++++
- 8 files changed, 78 insertions(+), 32 deletions(-)
-
+diff --git a/target/s390x/helper.h b/target/s390x/helper.h
+index 9459b73c73..0281c286b8 100644
+--- a/target/s390x/helper.h
++++ b/target/s390x/helper.h
+@@ -127,6 +127,7 @@ DEF_HELPER_3(load_psw, noreturn, env, i64, i64)
+ DEF_HELPER_FLAGS_2(spx, TCG_CALL_NO_RWG, void, env, i64)
+ DEF_HELPER_FLAGS_1(stck, TCG_CALL_NO_RWG_SE, i64, env)
+ DEF_HELPER_FLAGS_2(sckc, TCG_CALL_NO_RWG, void, env, i64)
++DEF_HELPER_FLAGS_1(sckpf, TCG_CALL_NO_RWG, void, env)
+ DEF_HELPER_FLAGS_1(stckc, TCG_CALL_NO_RWG, i64, env)
+ DEF_HELPER_FLAGS_2(spt, TCG_CALL_NO_RWG, void, env, i64)
+ DEF_HELPER_FLAGS_1(stpt, TCG_CALL_NO_RWG, i64, env)
+diff --git a/target/s390x/insn-data.def b/target/s390x/insn-data.def
+index 16e27c8a35..8c2541f545 100644
+--- a/target/s390x/insn-data.def
++++ b/target/s390x/insn-data.def
+@@ -999,6 +999,8 @@
+     C(0xb204, SCK,     S,     Z,   0, 0, 0, 0, 0, 0)
+ /* SET CLOCK COMPARATOR */
+     C(0xb206, SCKC,    S,     Z,   0, m2_64, 0, 0, sckc, 0)
++/* SET CLOCK PROGRAMMABLE FIELD */
++    C(0x0107, SCKPF,   E,     Z,   0, 0, 0, 0, sckpf, 0)
+ /* SET CPU TIMER */
+     C(0xb208, SPT,     S,     Z,   0, m2_64, 0, 0, spt, 0)
+ /* SET PREFIX */
+diff --git a/target/s390x/misc_helper.c b/target/s390x/misc_helper.c
+index 6d766ce1e7..25b71f08ee 100644
+--- a/target/s390x/misc_helper.c
++++ b/target/s390x/misc_helper.c
+@@ -146,6 +146,17 @@ void HELPER(sckc)(CPUS390XState *env, uint64_t time)
+     timer_mod(env->tod_timer, env->tod_basetime + time);
+ }
+ 
++/* Set Tod Programmable Field */
++void HELPER(sckpf)(CPUS390XState *env)
++{
++    uint32_t val = env->regs[0];
++
++    if (val & 0xffff0000) {
++        s390_program_interrupt(env, PGM_SPECIFICATION, 2, GETPC());
++    }
++    env->todpr = val;
++}
++
+ /* Store Clock Comparator */
+ uint64_t HELPER(stckc)(CPUS390XState *env)
+ {
+diff --git a/target/s390x/translate.c b/target/s390x/translate.c
+index 26cf993405..48b031894a 100644
+--- a/target/s390x/translate.c
++++ b/target/s390x/translate.c
+@@ -3922,6 +3922,13 @@ static ExitStatus op_sckc(DisasContext *s, DisasOps *o)
+     return NO_EXIT;
+ }
+ 
++static ExitStatus op_sckpf(DisasContext *s, DisasOps *o)
++{
++    check_privileged(s);
++    gen_helper_sckpf(cpu_env);
++    return NO_EXIT;
++}
++
+ static ExitStatus op_stckc(DisasContext *s, DisasOps *o)
+ {
+     check_privileged(s);
 -- 
 2.14.3
