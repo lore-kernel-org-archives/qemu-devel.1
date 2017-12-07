@@ -1,21 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47064)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47559)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1eMuk5-0004il-94
-	for qemu-devel@nongnu.org; Thu, 07 Dec 2017 06:53:30 -0500
+	(envelope-from <clg@kaod.org>) id 1eMumE-0005Tm-Qz
+	for qemu-devel@nongnu.org; Thu, 07 Dec 2017 06:55:43 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1eMuk0-0001Vk-5C
-	for qemu-devel@nongnu.org; Thu, 07 Dec 2017 06:53:29 -0500
-Date: Thu, 7 Dec 2017 12:53:13 +0100
-From: Cornelia Huck <cohuck@redhat.com>
-Message-ID: <20171207125313.1a5d1c5e.cohuck@redhat.com>
-In-Reply-To: <e48d0ac7-4431-dcce-4eb4-0d6863006575@redhat.com>
-References: <20171108165422.46267-1-pasic@linux.vnet.ibm.com>
-	<2ada83cf-1eb6-87c0-7597-13dc11ab09c0@redhat.com>
-	<e48d0ac7-4431-dcce-4eb4-0d6863006575@redhat.com>
+	(envelope-from <clg@kaod.org>) id 1eMum9-0003mW-TM
+	for qemu-devel@nongnu.org; Thu, 07 Dec 2017 06:55:42 -0500
+Received: from 20.mo6.mail-out.ovh.net ([178.32.124.17]:41673)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1eMum9-0003cY-MN
+	for qemu-devel@nongnu.org; Thu, 07 Dec 2017 06:55:37 -0500
+Received: from player735.ha.ovh.net (b9.ovh.net [213.186.33.59])
+	by mo6.mail-out.ovh.net (Postfix) with ESMTP id A6E851270F0
+	for <qemu-devel@nongnu.org>; Thu,  7 Dec 2017 12:55:27 +0100 (CET)
+References: <20171123132955.1261-1-clg@kaod.org>
+	<20171123132955.1261-16-clg@kaod.org>
+	<20171130050049.GD3023@umbus.fritz.box>
+From: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
+Message-ID: <07ba163b-6434-db2b-847c-3a8aac069439@kaod.org>
+Date: Thu, 7 Dec 2017 12:55:20 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+In-Reply-To: <20171130050049.GD3023@umbus.fritz.box>
+Content-Type: text/plain; charset=windows-1252
+Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [qemu-s390x] [RFC PATCH v2 0/3] tests for CCW IDA
+Subject: Re: [Qemu-devel] [PATCH 15/25] spapr: notify the CPU when the XIVE
+ interrupt priority is more privileged
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,43 +33,65 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>
-Cc: Halil Pasic <pasic@linux.vnet.ibm.com>, Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>, qemu-s390x@nongnu.org, Pierre Morel <pmorel@linux.vnet.ibm.com>, qemu-devel@nongnu.org, David Hildenbrand <david@redhat.com>
+To: David Gibson <david@gibson.dropbear.id.au>
+Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, Benjamin Herrenschmidt <benh@kernel.crashing.org>
 
-On Thu, 7 Dec 2017 10:01:35 +0100
-Thomas Huth <thuth@redhat.com> wrote:
-
-> On 07.12.2017 07:38, Thomas Huth wrote:
-> > On 08.11.2017 17:54, Halil Pasic wrote:  
-> >> I've keept the title althogh the scope shifted a bit: it's
-> >> more about introducing ccw-testdev than about IDA. The goal
-> >> is to facilitate testing the virtual channel subsystem
-> >> implementation, and the ccw interpretation.
-> >>
-> >> The first patch is the interesting one. See it's cover letter
-> >> for details. The RFC is about discussing some technical issues
-> >> with this patch.
-> >>
-> >> The other two patches are an out of source kernel module which
-> >> is basically only there so you can try out the first patch. The
-> >> tests there should probably be ported to something else. I don't
-> >> know what: maybe kvm-unit-tests, maybe qtest+libqos, or maybe some
-> >> bios based test image. We still have to figure out that.   
-> > 
-> > I think both, kvm-unit-tests or qtest+libqos would be good candidates.
-> > Please don't invent a new bios base test image, since kvm-unit-tests
-> > should be very similar already and we really don't need to duplicate
-> > work here.
-> > 
-> > Anyway, you'd need to add some CSS infracture there first (in both
-> > kvm-unit-tests and the qtest environments), so it's likely a similar
-> > amount of work. qtest has the advantage that it gets checked
-> > automatically during "make check" each time, so I'd have a weak
-> > preference for that one.  
+>> +/* Convert a priority number to an Interrupt Pending Buffer (IPB)
+>> + * register, which indicates a pending interrupt at the priority
+>> + * corresponding to the bit number
+>> + */
+>> +static uint8_t priority_to_ipb(uint8_t priority)
+>> +{
+>> +    return priority > XIVE_PRIORITY_MAX ?
+>> +        0 : 1 << (XIVE_PRIORITY_MAX - priority);
 > 
-> Another thought: I'd also like to see the more complex virtio device
-> qtests enabled for virtio-ccw one day (e.g. tests/virtio-blk-test.c), so
-> I think we sooner or later should have some CSS infrastructure in the
-> qtests anyway ==> May I suggest that you have a try with the qtest approach?
+> Does handling out of bounds values here make sense, or should you just
+> assert() they're not passed in?
 
-Agreed, this would be helpful to get more ccw coverage in general.
+The priority can be above in the TM_SPC_SET_OS_PENDING command. 
+
+>> +}
+>> +
+>> +/* Convert an Interrupt Pending Buffer (IPB) register to a Pending
+>> + * Interrupt Priority Register (PIPR), which contains the priority of
+>> + * the most favored pending notification.
+>> + *
+>> + * TODO:
+>> + *
+>> + *   PIPR is clamped to CPPR. So the value in the PIPR is:
+>> + *
+>> + *     v = leftmost_bit_of(ipb) (or 0xff);
+>> + *     pipr = v < cppr ? v : cppr;
+>> + *
+>> + * Ben says: "which means it's never actually 0xff ... surprise !".
+>> + * But, the CPPR can be set to 0xFF ... I am confused ...
+> 
+> A resolution to this would be nice..
+
+The 'accept' sequence does :
+
+  - store the PIPR in the CPPR
+  - reset the pending buffer bit in the IPB
+  - recompute the PIPR value from the new IPB
+  - drop the exception bit for OS
+
+Typical values are : 
+
+  before  IBP=02 PIPR=06 CPPR=ff NSR=80
+   after  IBP=00 PIPR=ff CPPR=06 NSR=00
+
+So today, if the IPB becomes zero, the PIPR is adjusted to 0xFF.
+
+But, if the PIPR is clamped to the CPPR (6), there is a disconnect
+between the IBP and the PIPR values. Is that OK ? 
+
+Then, the second effect is that as soon as the OS sets back the CPPR 
+to 0xFF, we notify the CPU again and enter a loop. 
+
+I think this is because a test on the EO bit of the NSR is missing 
+in the routine setting the CPPR. this bit notifies the presence of 
+an exception for the O/S. I will add that. I misunderstood the specs 
+on the topic.
+
+C. 
+ 
