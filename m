@@ -1,27 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48645)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49450)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <arei.gonglei@huawei.com>) id 1eMr67-0003pq-DK
-	for qemu-devel@nongnu.org; Thu, 07 Dec 2017 03:00:00 -0500
+	(envelope-from <stefanha@gmail.com>) id 1eMrAM-0005s6-7Z
+	for qemu-devel@nongnu.org; Thu, 07 Dec 2017 03:04:23 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <arei.gonglei@huawei.com>) id 1eMr62-0007yj-Es
-	for qemu-devel@nongnu.org; Thu, 07 Dec 2017 02:59:59 -0500
-Received: from szxga02-in.huawei.com ([45.249.212.188]:4437)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_ARCFOUR_SHA1:16) (Exim 4.71)
-	(envelope-from <arei.gonglei@huawei.com>) id 1eMr61-0007yN-Rh
-	for qemu-devel@nongnu.org; Thu, 07 Dec 2017 02:59:54 -0500
-From: "Gonglei (Arei)" <arei.gonglei@huawei.com>
-Date: Thu, 7 Dec 2017 07:59:28 +0000
-Message-ID: <33183CC9F5247A488A2544077AF19020DA4CC4FC@DGGEMA505-MBS.china.huawei.com>
-References: <1512545840-10256-1-git-send-email-longpeng2@huawei.com>
-	<1512545840-10256-2-git-send-email-longpeng2@huawei.com>
-	<0209e49f-3d81-cbc9-eb07-13654a288a22@linux.vnet.ibm.com>
-In-Reply-To: <0209e49f-3d81-cbc9-eb07-13654a288a22@linux.vnet.ibm.com>
-Content-Language: zh-CN
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+	(envelope-from <stefanha@gmail.com>) id 1eMrAL-0002s6-3M
+	for qemu-devel@nongnu.org; Thu, 07 Dec 2017 03:04:22 -0500
+Received: from mail-wm0-x22e.google.com ([2a00:1450:400c:c09::22e]:39527)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1eMrAK-0002rr-SN
+	for qemu-devel@nongnu.org; Thu, 07 Dec 2017 03:04:21 -0500
+Received: by mail-wm0-x22e.google.com with SMTP id i11so11202235wmf.4
+	for <qemu-devel@nongnu.org>; Thu, 07 Dec 2017 00:04:20 -0800 (PST)
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [v22 1/2] virtio-crypto: Add virtio crypto device
- specification
+In-Reply-To: <B84047ECBD981D4B93EAE5A6245AA3610159323B@FRAEML521-MBX.china.huawei.com>
+References: <1512444796-30615-1-git-send-email-wei.w.wang@intel.com>
+	<20171206134957.GD12584@stefanha-x1.localdomain>
+	<286AC319A985734F985F78AFA26841F73937B57F@shsmsx102.ccr.corp.intel.com>
+	<CAJSP0QWugAKQy6hYEJfy_XHEg-Q2swAzZMNcWBqn-r9Yi7yiEg@mail.gmail.com>
+	<5A28BC2D.6000308@intel.com>
+	<CAJSP0QUxRv9LNb1+McYxV0KY4Ss3NkaSjwO6fXiJd+oU2+zJSQ@mail.gmail.com>
+	<B84047ECBD981D4B93EAE5A6245AA3610159323B@FRAEML521-MBX.china.huawei.com>
+From: Stefan Hajnoczi <stefanha@gmail.com>
+Date: Thu, 7 Dec 2017 08:04:18 +0000
+Message-ID: <CAJSP0QVSOsPXYTyjCsBbUmzivjtYbC7xKpU2m7dQbAPMhrcLnA@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [virtio-dev] [PATCH v3 0/7] Vhost-pci for inter-VM
+ communication
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,36 +34,18 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Halil Pasic <pasic@linux.vnet.ibm.com>, longpeng <longpeng2@huawei.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "virtio-dev@lists.oasis-open.org" <virtio-dev@lists.oasis-open.org>
-Cc: Luonengjun <luonengjun@huawei.com>, "mst@redhat.com" <mst@redhat.com>, "cornelia.huck@de.ibm.com" <cornelia.huck@de.ibm.com>, "stefanha@redhat.com" <stefanha@redhat.com>, "denglingli@chinamobile.com" <denglingli@chinamobile.com>, Jani Kokkonen <Jani.Kokkonen@huawei.com>, "Ola.Liljedahl@arm.com" <Ola.Liljedahl@arm.com>, "Varun.Sethi@freescale.com" <Varun.Sethi@freescale.com>, "xin.zeng@intel.com" <xin.zeng@intel.com>, "brian.a.keating@intel.com" <brian.a.keating@intel.com>, "liang.j.ma@intel.com" <liang.j.ma@intel.com>, "john.griffin@intel.com" <john.griffin@intel.com>, "Huangweidong (C)" <weidong.huang@huawei.com>, "agraf@suse.de" <agraf@suse.de>, "jasowang@redhat.com" <jasowang@redhat.com>, "vincent.jardin@6wind.com" <vincent.jardin@6wind.com>, "wangxin (U)" <wangxinxin.wang@huawei.com>, "Zhoujian (jay)" <jianjay.zhou@huawei.com>
+To: "Avi Cohen (A)" <avi.cohen@huawei.com>
+Cc: Wei Wang <wei.w.wang@intel.com>, Stefan Hajnoczi <stefanha@redhat.com>, "virtio-dev@lists.oasis-open.org" <virtio-dev@lists.oasis-open.org>, "mst@redhat.com" <mst@redhat.com>, "Yang, Zhiyong" <zhiyong.yang@intel.com>, "jan.kiszka@siemens.com" <jan.kiszka@siemens.com>, "jasowang@redhat.com" <jasowang@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "marcandre.lureau@redhat.com" <marcandre.lureau@redhat.com>, "pbonzini@redhat.com" <pbonzini@redhat.com>
 
-PiANCj4gT24gMTIvMDYvMjAxNyAwODozNyBBTSwgTG9uZ3BlbmcoTWlrZSkgd3JvdGU6DQo+ID4g
-K1xmaWVsZHtvdXRjb21lX2xlbn0gaXMgdGhlIHNpemUgb2Ygc3RydWN0IHZpcnRpb19jcnlwdG9f
-c2Vzc2lvbl9pbnB1dCBvcg0KPiA+ICtaRVJPIGZvciB0aGUgc2Vzc2lvbi1kZXN0cm95IG9wZXJh
-dGlvbi4NCj4gDQo+IFRoaXMgYWluJ3QgY29ycmVjdC4gSXQgc2hvdWxkIGhhdmUgYmVlbiBzb21l
-dGhpbmcgbGlrZQ0KPiB2aXJ0aW9fY3J5cHRvX2Rlc3Ryb3lfc2Vzc2lvbl9pbnB1dC4NCj4gDQpS
-aWdodCwgd2lsbCBmaXggaXQuDQoNCj4gPiArDQo+ID4gKw0KPiA+ICtccGFyYWdyYXBoe1Nlc3Np
-b24gb3BlcmF0aW9ufVxsYWJlbHtzZWM6RGV2aWNlIFR5cGVzIC8gQ3J5cHRvIERldmljZSAvDQo+
-IERldmljZQ0KPiA+ICtPcGVyYXRpb24gLyBDb250cm9sIFZpcnRxdWV1ZSAvIFNlc3Npb24gb3Bl
-cmF0aW9ufQ0KPiA+ICsNCj4gPiArVGhlIHNlc3Npb24gaXMgYSBoYW5kbGUgd2hpY2ggZGVzY3Jp
-YmVzIHRoZSBjcnlwdG9ncmFwaGljIHBhcmFtZXRlcnMgdG8gYmUNCj4gPiArYXBwbGllZCB0byBh
-IG51bWJlciBvZiBidWZmZXJzLg0KPiA+ICsNCj4gPiArVGhlIGZvbGxvd2luZyBzdHJ1Y3R1cmUg
-c3RvcmVzIHRoZSByZXN1bHQgb2Ygc2Vzc2lvbiBjcmVhdGlvbiBzZXQgYnkgdGhlDQo+IGRldmlj
-ZToNCj4gPiArDQo+ID4gK1xiZWdpbntsc3RsaXN0aW5nfQ0KPiA+ICtzdHJ1Y3QgdmlydGlvX2Ny
-eXB0b19zZXNzaW9uX2lucHV0IHsNCj4gPiArICAgIC8qIERldmljZSB3cml0ZSBvbmx5IHBvcnRp
-b24gKi8NCj4gPiArICAgIGxlNjQgc2Vzc2lvbl9pZDsNCj4gPiArICAgIGxlMzIgc3RhdHVzOw0K
-PiA+ICsgICAgbGUzMiBwYWRkaW5nOw0KPiA+ICt9Ow0KPiA+ICtcZW5ke2xzdGxpc3Rpbmd9DQo+
-ID4gKw0KPiA+ICtBIHJlcXVlc3QgdG8gZGVzdHJveSBhIHNlc3Npb24gaW5jbHVkZXMgdGhlIGZv
-bGxvd2luZyBpbmZvcm1hdGlvbjoNCj4gPiArDQo+ID4gK1xiZWdpbntsc3RsaXN0aW5nfQ0KPiA+
-ICtzdHJ1Y3QgdmlydGlvX2NyeXB0b19kZXN0cm95X3Nlc3Npb25fZmxmIHsNCj4gPiArICAgIC8q
-IERldmljZSByZWFkIG9ubHkgcG9ydGlvbiAqLw0KPiA+ICsgICAgbGU2NCAgc2Vzc2lvbl9pZDsN
-Cj4gPiArICAgIC8qIERldmljZSB3cml0ZSBvbmx5IHBvcnRpb24gKi8NCj4gDQo+IFRoaXMgaXMg
-dGhlIGRldmljZSB3cml0YWJsZSBwb3J0aW9uIGFuZCB0aHVzIHdoYXQgd2UgY2FsIG9wX291dGNv
-bWUgYWJvdmUuDQo+IFNvIGl0IHNob3VsZCBoYXZlIGJlZW4NCj4gfTsNCj4gDQo+IA0KPiBzdHJ1
-Y3QgdmlydGlvX2NyeXB0b19kZXN0cm95X3Nlc3Npb25faW5wdXQgew0KPiA+ICsgICAgbGUzMiAg
-c3RhdHVzOw0KPiA+ICsgICAgbGUzMiAgcGFkZGluZzsNCj4gPiArfTsNCj4gDQo+IElmIHdlIGFy
-ZW4ndCBjb25zaXN0ZW50IGFib3V0IGl0IHRoZSBkaXZpZGluZyBpbnRvIHBhcnRzIChsaWtlIG9w
-IHNwZWNpZmljDQo+IGZpeGVkIGFuZCB2YXJpYWJsZSBsZW5ndGggKG91dHB1dCkgZmllbGRzLCBv
-cGVyYXRpb24gb3V0Y29tZSAoaW5wdXQpKQ0KPiBpc24ndCByZWFsbHkgaGVscGZ1bC4NCj4gDQpJ
-dCdzIG9rIHRvIHVzLCB3ZSBjYW4gZG8gaXQuIEFueSBvdGhlciBjb21tZW50cz8NCg0KVGhhbmtz
-LA0KLUdvbmdsZWkNCg0K
+On Thu, Dec 7, 2017 at 7:54 AM, Avi Cohen (A) <avi.cohen@huawei.com> wrote:
+> There is already a  virtio mechanism in which 2 VMs assigned a virtio device , are communicating via a veth pair  in the host .
+> KVM just passes  a pointer of the page of the writer VM to the reader VM - resulting  in  excellent performance (no vSwitch in the middle)
+> **Question**:  What is the advantage of vhost-pci compared to this ?
+
+Which mechanism do you mean?
+
+vhost-pci will allow VM-to-VM communication without vmexits when
+polling mode is used.  Does the mechanism you are thinking about
+require vmexits?
+
+Stefan
