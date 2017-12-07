@@ -1,32 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40478)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42290)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1eMzTJ-0006V8-RX
-	for qemu-devel@nongnu.org; Thu, 07 Dec 2017 11:56:31 -0500
+	(envelope-from <marcandre.lureau@gmail.com>) id 1eMzYC-00036P-V5
+	for qemu-devel@nongnu.org; Thu, 07 Dec 2017 12:01:34 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1eMzTG-0000fj-Vp
-	for qemu-devel@nongnu.org; Thu, 07 Dec 2017 11:56:29 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:53802)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1eMzTG-0000eg-M1
-	for qemu-devel@nongnu.org; Thu, 07 Dec 2017 11:56:26 -0500
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
-	[10.5.11.14])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id B7ED261D1C
-	for <qemu-devel@nongnu.org>; Thu,  7 Dec 2017 16:56:25 +0000 (UTC)
-Date: Thu, 7 Dec 2017 18:56:19 +0200
-From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <20171207185558-mutt-send-email-mst@kernel.org>
-References: <20171205174100.GD2405@work-vm>
-	<90cb3043-cf68-2635-2dd9-f47cf5e8c10e@redhat.com>
-	<20171207175544-mutt-send-email-mst@kernel.org>
-	<b4788fff-3b60-265b-7f61-af31fa8007b9@redhat.com>
+	(envelope-from <marcandre.lureau@gmail.com>) id 1eMzYC-0003NR-1I
+	for qemu-devel@nongnu.org; Thu, 07 Dec 2017 12:01:33 -0500
+Received: from mail-wr0-x22e.google.com ([2a00:1450:400c:c0c::22e]:38151)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <marcandre.lureau@gmail.com>)
+	id 1eMzYB-0003N9-Pr
+	for qemu-devel@nongnu.org; Thu, 07 Dec 2017 12:01:31 -0500
+Received: by mail-wr0-x22e.google.com with SMTP id o2so8221509wro.5
+	for <qemu-devel@nongnu.org>; Thu, 07 Dec 2017 09:01:31 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <b4788fff-3b60-265b-7f61-af31fa8007b9@redhat.com>
-Subject: Re: [Qemu-devel] Hotplug ram and vhost-user
+In-Reply-To: <87d13qo6c6.fsf@dusky.pond.sub.org>
+References: <20170911110623.24981-1-marcandre.lureau@redhat.com>
+	<20170911110623.24981-18-marcandre.lureau@redhat.com>
+	<87d13qo6c6.fsf@dusky.pond.sub.org>
+From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
+Date: Thu, 7 Dec 2017 18:01:29 +0100
+Message-ID: <CAJ+F1CJt5U9y1O2coL0Lb7-cF9Oe69Wwn_94Jv4g8emJ5ArQdg@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v3 17/50] qapi: do not define enumeration
+ value explicitely
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,93 +32,86 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Maxime Coquelin <maxime.coquelin@redhat.com>
-Cc: "Dr. David Alan Gilbert" <dgilbert@redhat.com>, marcandre.lureau@redhat.com, qemu-devel@nongnu.org
+To: Markus Armbruster <armbru@redhat.com>
+Cc: QEMU <qemu-devel@nongnu.org>, Michael Roth <mdroth@linux.vnet.ibm.com>
 
-On Thu, Dec 07, 2017 at 05:35:13PM +0100, Maxime Coquelin wrote:
-> 
-> 
-> On 12/07/2017 04:56 PM, Michael S. Tsirkin wrote:
-> > On Thu, Dec 07, 2017 at 04:52:18PM +0100, Maxime Coquelin wrote:
-> > > Hi David,
-> > > 
-> > > On 12/05/2017 06:41 PM, Dr. David Alan Gilbert wrote:
-> > > > Hi,
-> > > >     Since I'm reworking the memory map update code I've been
-> > > > trying to test it with hot adding RAM; but even on upstream
-> > > > I'm finding that hot adding RAM causes the guest to stop passing
-> > > > packets with vhost-user-bridge;  have either of you seen the same
-> > > > thing?
-> > > 
-> > > No, I have never tried this.
-> > > 
-> > > > I'm doing:
-> > > > ./tests/vhost-user-bridge -u /tmp/vubrsrc.sock
-> > > > $QEMU -enable-kvm -m 1G,maxmem=2G,slots=4 -smp 2 -object memory-backend-file,id=mem,size=1G,mem-path=/dev/shm,share=on -numa node,memdev=mem -mem-prealloc -trace events=vhost-trace-file -chardev socket,id=char0,path=/tmp/vubrsrc.sock -netdev type=vhost-user,id=mynet1,chardev=char0,vhostforce -device virtio-net-pci,netdev=mynet1 $IMAGE -net none
-> > > > 
-> > > > (with a f27 guest) and then doing:
-> > > > (qemu) object_add memory-backend-file,id=mem1,size=256M,mem-path=/dev/shm
-> > > > (qemu) device_add pc-dimm,id=dimm1,memdev=mem1
-> > > > 
-> > > > but then not getting any responses inside the guest.
-> > > > 
-> > > > I can see the code sending another set-mem-table with the
-> > > > extra chunk of RAM and fd, and I think I can see the bridge
-> > > > mapping it.
-> > > 
-> > > I think there are at least two problems.
-> > > The first one is that vhost-user-bridge does not support vhost-user
-> > > protocol's reply-ack feature. So when QEMU sends the requests, it cannot
-> > > know whether/when it has been handled by the backend.
-> > > 
-> > > It had been fixed by sending a GET_FEATURE requests to be sure the
-> > > SET_MEM_TABLE was handled, as messages are processed in order. The problem
-> > > is that it caused some test failures when using TCG, so it got
-> > > reverted.
-> > > 
-> > > The initial fix:
-> > > 
-> > > commit 28ed5ef16384f12500abd3647973ee21b03cbe23
-> > > Author: Prerna Saxena <prerna.saxena@nutanix.com>
-> > > Date:   Fri Aug 5 03:53:51 2016 -0700
-> > > 
-> > >      vhost-user: Attempt to fix a race with set_mem_table.
-> > > 
-> > > The revert:
-> > > 
-> > > commit 94c9cb31c04737f86be29afefbff401cd23bc24d
-> > > Author: Michael S. Tsirkin <mst@redhat.com>
-> > > Date:   Mon Aug 15 16:35:24 2016 +0300
-> > > 
-> > >      Revert "vhost-user: Attempt to fix a race with set_mem_table."
-> > 
-> > It's a question of stress-testing it and finding out why did
-> > it cause tests fail esp when run within a container.
-> 
-> Actually I did work on fixing it last year, and proposed below series:
-> http://lists.gnu.org/archive/html/qemu-devel/2016-09/msg01704.html
-> 
-> It felt through the cracks though. Maybe we could just revert your
-> revert (patch 1 of my series) now that TCG is no more used by vhost-
-> user-test?
-> 
-> Maxime
+On Thu, Dec 7, 2017 at 5:23 PM, Markus Armbruster <armbru@redhat.com> wrote=
+:
+> Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com> writes:
+>
+>> The C standard has the initial value at 0 and the subsequent values
+>> incremented by 1. No need to set this explicitely.
+>>
+>> This will prevent from artificial "gaps" when compiling out some enum
+>> values and having unnecessarily large MAX values & enums arrays.
+>>
+>> Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+>> ---
+>>  scripts/qapi.py | 7 ++-----
+>>  1 file changed, 2 insertions(+), 5 deletions(-)
+>>
+>> diff --git a/scripts/qapi.py b/scripts/qapi.py
+>> index 94b735d8d6..074ee221a1 100644
+>> --- a/scripts/qapi.py
+>> +++ b/scripts/qapi.py
+>> @@ -1985,14 +1985,11 @@ typedef enum %(c_name)s {
+>>  ''',
+>>                  c_name=3Dc_name(name))
+>>
+>> -    i =3D 0
+>>      for value in enum_values:
+>>          ret +=3D mcgen('''
+>> -    %(c_enum)s =3D %(i)d,
+>> +    %(c_enum)s,
+>>  ''',
+>> -                     c_enum=3Dc_enum_const(name, value, prefix),
+>> -                     i=3Di)
+>> -        i +=3D 1
+>> +                     c_enum=3Dc_enum_const(name, value, prefix))
+>>
+>>      ret +=3D mcgen('''
+>>  } %(c_name)s;
+>
+> Recapitulate review of v2: this risks entertaining mishaps like
+> compiling this one
+>
+>     typedef enum Color {
+>         COLOR_WHITE,
+> #if defined(NEED_CPU_H)
+> #if defined(TARGET_S390X)
+>         COLOR_BLUE,
+> #endif /* defined(TARGET_S390X) */
+> #endif /* defined(NEED_CPU_H) */
+>         COLOR_BLACK,
+>     } Color;
+>
+> in s390x-code (COLOR_BLACK =3D 2) and in target-independent code
+> (COLOR_BLACK =3D 1), then linking the two together.
+>
+> Same issue for struct members and such (previous patch).
+>
+> What's our story on preventing disaster here?
+>
+> In the long run, we want to split the generated code so that
+> target-specific and target-independent code are separate, and each part
+> is always compiled with consistent preprocessor symbols.  But I'm afraid
+> that's not in the card right now.
 
-Canyou pls explain this:
+Eh, I need to refresh my memories about that series, but I think
+that's what I did in v3
 
-Analysis of the race shows that it would happen only when QEMU relies
-on TCG.
+It doesn't use the NEED_CPU_H trick. It has a seperate per-target target.js=
+on
 
-what is the reason it only happens with tcg?
 
-> > > 
-> > > Another problem is that memory mmapped with previous call does not seems
-> > > to be unmapped, but that should not cause other problems than leaking
-> > > virtual memory.
-> > > 
-> > > Maxime
-> > > > Dave
-> > > > 
-> > > > --
-> > > > Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
-> > > > 
+>
+> I therefore proposed the stupidest temporary stopgap that could possibly
+> work: apply conditionals *only* to qmp-introspect.c, leave everything
+> unconditional elsewhere.
+
+I don't like that idea much and I don't think we need that
+restriction, but I need to get back to that series on some point
+(probably after you finish the review).
+
+--=20
+Marc-Andr=C3=A9 Lureau
