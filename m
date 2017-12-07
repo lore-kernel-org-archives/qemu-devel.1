@@ -1,24 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35026)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36278)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1eMtyJ-0003AS-7w
-	for qemu-devel@nongnu.org; Thu, 07 Dec 2017 06:04:08 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1eMu2E-000584-GV
+	for qemu-devel@nongnu.org; Thu, 07 Dec 2017 06:08:11 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1eMtyB-00061G-73
-	for qemu-devel@nongnu.org; Thu, 07 Dec 2017 06:04:07 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:42744)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1eMtyB-00060Y-0B
-	for qemu-devel@nongnu.org; Thu, 07 Dec 2017 06:03:59 -0500
-Date: Thu, 7 Dec 2017 11:03:43 +0000
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20171207110342.GB2439@work-vm>
-References: <20171206200346.116537-1-brijesh.singh@amd.com>
-	<20171206200346.116537-24-brijesh.singh@amd.com>
+	(envelope-from <peter.maydell@linaro.org>) id 1eMu26-00005v-Rz
+	for qemu-devel@nongnu.org; Thu, 07 Dec 2017 06:08:10 -0500
+Received: from mail-ot0-x230.google.com ([2607:f8b0:4003:c0f::230]:37413)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1eMu26-000055-MB
+	for qemu-devel@nongnu.org; Thu, 07 Dec 2017 06:08:02 -0500
+Received: by mail-ot0-x230.google.com with SMTP id s4so6021226ote.4
+	for <qemu-devel@nongnu.org>; Thu, 07 Dec 2017 03:08:02 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20171206200346.116537-24-brijesh.singh@amd.com>
-Subject: Re: [Qemu-devel] [PATCH v5 23/23] sev: add migration blocker
+In-Reply-To: <ac246e55-a12d-6d9d-959a-47aa0334c17f@amsat.org>
+References: <1512153879-5291-1-git-send-email-peter.maydell@linaro.org>
+	<1512153879-5291-5-git-send-email-peter.maydell@linaro.org>
+	<ac246e55-a12d-6d9d-959a-47aa0334c17f@amsat.org>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Thu, 7 Dec 2017 11:07:41 +0000
+Message-ID: <CAFEAcA8zN1nd1pWE9SZGzE1AipO-Ss7Xz8kSXMEvFhX_C5LckA@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [Qemu-arm] [PATCH 4/7] target/arm: Split M profile
+ MNegPri mmu index into user and priv
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,78 +32,80 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Brijesh Singh <brijesh.singh@amd.com>
-Cc: qemu-devel@nongnu.org, Alistair Francis <alistair.francis@xilinx.com>, Christian Borntraeger <borntraeger@de.ibm.com>, Cornelia Huck <cornelia.huck@de.ibm.com>, "Daniel P . Berrange" <berrange@redhat.com>, "Edgar E . Iglesias " <edgar.iglesias@xilinx.com>, Eduardo Habkost <ehabkost@redhat.com>, Eric Blake <eblake@redhat.com>, kvm@vger.kernel.org, Marcel Apfelbaum <marcel@redhat.com>, Markus Armbruster <armbru@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Peter Maydell <peter.maydell@linaro.org>, Richard Henderson <richard.henderson@linaro.org>, Richard Henderson <rth@twiddle.net>, Stefan Hajnoczi <stefanha@gmail.com>, Thomas Lendacky <Thomas.Lendacky@amd.com>, Borislav Petkov <bp@suse.de>
+To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>
+Cc: qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>, Richard Henderson <rth@twiddle.net>
 
-* Brijesh Singh (brijesh.singh@amd.com) wrote:
-> SEV guest migration is not yet implemented yet.
-> 
-> Signed-off-by: Brijesh Singh <brijesh.singh@amd.com>
-> ---
->  accel/kvm/sev.c | 13 +++++++++++++
->  1 file changed, 13 insertions(+)
-> 
-> diff --git a/accel/kvm/sev.c b/accel/kvm/sev.c
-> index 3edfb5b08416..10647645eacd 100644
-> --- a/accel/kvm/sev.c
-> +++ b/accel/kvm/sev.c
-> @@ -19,6 +19,7 @@
->  #include "sysemu/sev.h"
->  #include "sysemu/sysemu.h"
->  #include "qapi-event.h"
-> +#include "migration/blocker.h"
->  
->  #define DEFAULT_GUEST_POLICY    0x1 /* disable debug */
->  #define DEFAULT_SEV_DEVICE      "/dev/sev"
-> @@ -36,6 +37,7 @@
->  static int sev_fd;
->  static SEVState *sev_state;
->  static MemoryRegionRAMReadWriteOps  sev_ops;
-> +static Error *sev_mig_blocker;
->  
->  #define SEV_FW_MAX_ERROR      0x17
->  
-> @@ -460,6 +462,7 @@ static void
->  sev_launch_finish(SEVState *s)
->  {
->      int ret, error;
-> +    Error *local_err = NULL;
->  
->      ret = sev_ioctl(KVM_SEV_LAUNCH_FINISH, 0, &error);
->      if (ret) {
-> @@ -470,6 +473,16 @@ sev_launch_finish(SEVState *s)
->  
->      s->cur_state = SEV_STATE_RUNNING;
->      DPRINTF("SEV: LAUNCH_FINISH\n");
+On 5 December 2017 at 21:23, Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org> =
+wrote:
+> The patch is correct, but I don't like having magic values.
 
-(from a previous patch)
-Please use the tracing facility rather than new DPRINTF's
-if possible - if you've not used it before, then
---enable-trace-backends=log   is the easy way to get going
-and you can turn on and off the stuff you're interested in
-tracing at run time without having to rebuild.
+Yeah, you're right this would be better. I've already put this
+patch into target-arm.next, so I'll just squash in this change:
 
-> +
-> +    /* add migration blocker */
-> +    error_setg(&sev_mig_blocker,
-> +               "SEV: Migration is not implemented");
-> +    ret = migrate_add_blocker(sev_mig_blocker, &local_err);
-> +    if (local_err) {
-> +        error_report_err(local_err);
-> +        error_free(sev_mig_blocker);
-> +        exit(1);
-> +    }
+--- a/target/arm/cpu.h
++++ b/target/arm/cpu.h
+@@ -2258,6 +2258,11 @@ static inline bool arm_excp_unmasked(CPUState
+*cs, unsigned int excp_idx,
+ #define ARM_MMU_IDX_NOTLB 0x20 /* does not have a TLB */
+ #define ARM_MMU_IDX_M 0x40 /* M profile */
 
-Yep, reasonable:
++/* meanings of the bits for M profile mmu idx values */
++#define ARM_MMU_IDX_M_PRIV 0x1
++#define ARM_MMU_IDX_M_NEGPRI 0x2
++#define ARM_MMU_IDX_M_S 0x4
++
+ #define ARM_MMU_IDX_TYPE_MASK (~0x7)
+ #define ARM_MMU_IDX_COREIDX_MASK 0x7
+
+@@ -2328,7 +2333,7 @@ static inline int arm_mmu_idx_to_el(ARMMMUIdx mmu_idx=
+)
+     case ARM_MMU_IDX_A:
+         return mmu_idx & 3;
+     case ARM_MMU_IDX_M:
+-        return mmu_idx & 1;
++        return mmu_idx & ARM_MMU_IDX_M_PRIV;
+     default:
+         g_assert_not_reached();
+     }
+@@ -2342,15 +2347,15 @@ static inline ARMMMUIdx
+arm_v7m_mmu_idx_for_secstate(CPUARMState *env,
+     ARMMMUIdx mmu_idx =3D ARM_MMU_IDX_M;
+
+     if (el !=3D 0) {
+-        mmu_idx |=3D 1;
++        mmu_idx |=3D ARM_MMU_IDX_M_PRIV;
+     }
+
+     if (armv7m_nvic_neg_prio_requested(env->nvic, secstate)) {
+-        mmu_idx |=3D 2;
++        mmu_idx |=3D ARM_MMU_IDX_M_NEGPRI;
+     }
+
+     if (secstate) {
+-        mmu_idx |=3D 4;
++        mmu_idx |=3D ARM_MMU_IDX_M_S;
+     }
+
+     return mmu_idx;
+diff --git a/target/arm/helper.c b/target/arm/helper.c
+index 14ab1f4..70cf313 100644
+--- a/target/arm/helper.c
++++ b/target/arm/helper.c
+@@ -7885,10 +7885,7 @@ static inline bool
+regime_translation_disabled(CPUARMState *env,
+                 (R_V7M_MPU_CTRL_ENABLE_MASK | R_V7M_MPU_CTRL_HFNMIENA_MASK=
+)) {
+         case R_V7M_MPU_CTRL_ENABLE_MASK:
+             /* Enabled, but not for HardFault and NMI */
+-            return mmu_idx =3D=3D ARMMMUIdx_MUserNegPri ||
+-                mmu_idx =3D=3D ARMMMUIdx_MPrivNegPri ||
+-                mmu_idx =3D=3D ARMMMUIdx_MSUserNegPri ||
+-                mmu_idx =3D=3D ARMMMUIdx_MSPrivNegPri;
++            return mmu_idx & ARM_MMU_IDX_M_NEGPRI;
+         case R_V7M_MPU_CTRL_ENABLE_MASK | R_V7M_MPU_CTRL_HFNMIENA_MASK:
+             /* Enabled for all cases */
+             return false;
 
 
-Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
-
->  }
->  
->  static void
-> -- 
-> 2.9.5
-> 
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+thanks
+-- PMM
