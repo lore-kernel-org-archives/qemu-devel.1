@@ -1,27 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47963)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48397)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kchamart@redhat.com>) id 1eMuna-00067c-48
-	for qemu-devel@nongnu.org; Thu, 07 Dec 2017 06:57:07 -0500
+	(envelope-from <cohuck@redhat.com>) id 1eMupb-00077T-3k
+	for qemu-devel@nongnu.org; Thu, 07 Dec 2017 06:59:12 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kchamart@redhat.com>) id 1eMunZ-0005KR-9x
-	for qemu-devel@nongnu.org; Thu, 07 Dec 2017 06:57:06 -0500
-Date: Thu, 7 Dec 2017 12:56:48 +0100
-From: Kashyap Chamarthy <kchamart@redhat.com>
-Message-ID: <20171207115648.5mnvoyfnig7dhgbn@eukaryote>
-References: <20171113162053.58795-1-vsementsov@virtuozzo.com>
-	<01108daa-fed3-c142-bbd6-0ecc4c8b795d@redhat.com>
-	<cd0a2e5e-f788-0e5a-dec7-f428479f3b89@virtuozzo.com>
-	<8c61f43c-5f56-8c1b-a2fe-f954d34dc687@redhat.com>
-	<40392ab9-ec2a-30ed-ddab-a557682a4192@virtuozzo.com>
-	<4e4e28d7-aebc-4a86-e691-99afdcca27f5@redhat.com>
-	<20171121172324.GC11073@localhost.localdomain>
-	<1a8e9d48-5be1-e014-41ee-a1164f32dd17@redhat.com>
+	(envelope-from <cohuck@redhat.com>) id 1eMupX-0007QM-6A
+	for qemu-devel@nongnu.org; Thu, 07 Dec 2017 06:59:11 -0500
+Date: Thu, 7 Dec 2017 12:59:01 +0100
+From: Cornelia Huck <cohuck@redhat.com>
+Message-ID: <20171207125901.47be0af1.cohuck@redhat.com>
+In-Reply-To: <e2e2ae84-e04a-df4f-50bb-328768a5464e@redhat.com>
+References: <20171108165422.46267-1-pasic@linux.vnet.ibm.com>
+	<20171108165422.46267-2-pasic@linux.vnet.ibm.com>
+	<e2e2ae84-e04a-df4f-50bb-328768a5464e@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1a8e9d48-5be1-e014-41ee-a1164f32dd17@redhat.com>
-Subject: Re: [Qemu-devel] [Qemu-block] [PATCH for-2.12 0/4] qmp dirty bitmap
- API
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [RFC PATCH v2 1/3] s390x/ccs: add ccw-testdev
+ emulated device
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,74 +25,64 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: John Snow <jsnow@redhat.com>
-Cc: Kevin Wolf <kwolf@redhat.com>, Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, famz@redhat.com, qemu-block@nongnu.org, qemu-devel@nongnu.org, mnestratov@virtuozzo.com, armbru@redhat.com, nshirokovskiy@virtuozzo.com, stefanha@redhat.com, pbonzini@redhat.com, den@openvz.org, mreitz@redhat.com
+To: Thomas Huth <thuth@redhat.com>
+Cc: Halil Pasic <pasic@linux.vnet.ibm.com>, Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>, qemu-s390x@nongnu.org, Pierre Morel <pmorel@linux.vnet.ibm.com>, qemu-devel@nongnu.org
 
-On Tue, Nov 21, 2017 at 07:10:19PM -0500, John Snow wrote:
-> On 11/21/2017 12:23 PM, Kevin Wolf wrote:
+On Thu, 7 Dec 2017 07:33:19 +0100
+Thomas Huth <thuth@redhat.com> wrote:
 
-[...] # Snip lot of good discussion.
+> On 08.11.2017 17:54, Halil Pasic wrote:
 
-> > On another note, I would double check before adding a new block job type
-> > that this is the right way to go. We have recently noticed that many, if
-> > not all, of the existing block jobs (at least mirror, commit and backup)
-> > are so similar that they implement the same things multiple times and
-> > are just lacking different options and have different bugs. I'm
-> > seriously considering merging all of them into a single job type
-> > internally that just provides options that effectively turn it into one
-> > of the existing job types.
-> > 
+> > +static ccw_cb_t get_ccw_cb(CcwTestDevOpMode op_mode)
+> > +{
+> > +    switch (op_mode) {
+> > +    case OP_MODE_FIB:
+> > +        return ccw_testdev_ccw_cb_mode_fib;
+> > +    case OP_MODE_NOP:
+> > +    default:
+> > +        return ccw_testdev_ccw_cb_mode_nop;  
 > 
-> I'm not particularly opposed. At the very, very least "backup" and
-> "mirror" are pretty much the same thing and "stream" and "commit" are
-> basically the same.
+> Do we really want to use "nop" for unknown modes? Or should there rather
+> be a ccw_testdev_ccw_cb_mode_error instead, too?
+
+I like the idea of an error mode.
+
+Related: Should the device have a mechanism to report the supported
+modes?
+
 > 
-> Forcing the backuppy-job and the consolidatey-job together seems like an
-> ever-so-slightly harder case to make, but I suppose the truth of the
-> matter in all cases is that we're copying data from one node to another...
+> > +    }
+> > +}
 
-So from the above interesting discussion, it seems like Kevin is leaning
-towards a single job type that offers 'stream', 'commit', 'backup', and
-'mirror' functionality as part of a single command / job type.  Based on
-an instinct, this sounds a bit too stuffy and complex to me.
+(...)
 
-And John seems to be leaning towards two block device job types:
-
-  - 'blockdev-foo' that offers both current 'stream' and 'commit'
-    functionality as two different options to the same QMP command; and
-
-  - 'blockdev-bar' will offer both 'mirror' and 'backup' functionality
-    as part of the same QMP command
-
-FWIW, this seems a bit more palatable, as it is unifying
-similar-functionality-that-differ-slightly into two distinct commands.
-
-(/me is still wrapping his head around the bitmaps and incremental
-backups infrastructure.)
-
-> > So even if we want to tie the bitmap management to a block job, we
-> > should consider adding it as an option to the existing backup job rather
-> > than adding a completely new fourth job type that again does almost the
-> > same except for some bitmap mangement stuff on completion.
-> > 
+> > +/* TODO This is the out-of-band variant. We may want to get rid of it */  
 > 
-> ...except here, where fleecing does not necessarily copy data in the
-> same way.
-> 
-> (It probably could re-use the copy-on-write notifiers that will be
-> replaced by filter nodes, but I don't see it reusing much else.)
-> 
-> We could try it before I naysay it, but where fleecing is concerned
-> we're not using QEMU to move any bits around. It does feel pretty
-> categorically different from the first four jobs.
-> 
-> I wouldn't want to see the franken-job be drowned in conditional
-> branches for 5,000 options, either. Eliminating some redundancy is good,
-> but asserting that all existing jobs (and this possible new one too)
-> should all be the same makes me worry that the resulting code would be
-> too complex to work with.
+> I agree, this should rather go away in the final version.
 
-[...]
+I'm not sure that the in-band variant with its magic buffer value is
+superior to this version using a dedicated hypercall.
 
--- 
-/kashyap
+> 
+> > +static int set_mode_diag(const uint64_t *args)
+> > +{
+> > +    uint64_t subch_id = args[0];
+> > +    uint64_t op_mode = args[1];
+> > +    SubchDev *sch;
+> > +    CcwTestDevDevice *dev;
+> > +    int cssid, ssid, schid, m;
+> > +
+> > +    if (ioinst_disassemble_sch_ident(subch_id, &m, &cssid, &ssid, &schid)) {
+> > +        return -EINVAL;
+> > +    }
+> > +    sch = css_find_subch(m, cssid, ssid, schid);
+> > +    if (!sch || !css_subch_visible(sch)) {
+> > +        return -EINVAL;
+> > +    }
+> > +    dev = CCW_TESTDEV(sch->driver_data);
+> > +    if (dev->op_mode_locked) {
+> > +        return op_mode == dev->op_mode ? 0 : -EINVAL;
+> > +    }
+> > +    dev->op_mode = op_mode;
+> > +    sch->ccw_cb = get_ccw_cb(dev->op_mode);
+> > +    return 0;
