@@ -1,15 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45923)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47451)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berto@igalia.com>) id 1eMzgR-0004K1-R2
-	for qemu-devel@nongnu.org; Thu, 07 Dec 2017 12:10:04 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1eMzjp-0008Gu-4u
+	for qemu-devel@nongnu.org; Thu, 07 Dec 2017 12:13:34 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berto@igalia.com>) id 1eMzgO-0000I5-Ly
-	for qemu-devel@nongnu.org; Thu, 07 Dec 2017 12:10:03 -0500
-From: Alberto Garcia <berto@igalia.com>
-Date: Thu,  7 Dec 2017 19:08:34 +0200
-Message-Id: <20171207170834.15843-1-berto@igalia.com>
-Subject: [Qemu-devel] [PATCH] iotests: Tweak 030 in order to trigger a race
- condition with parallel jobs
+	(envelope-from <peter.maydell@linaro.org>) id 1eMzjo-00052l-95
+	for qemu-devel@nongnu.org; Thu, 07 Dec 2017 12:13:33 -0500
+Received: from mail-oi0-x243.google.com ([2607:f8b0:4003:c06::243]:35562)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1eMzjo-00051c-2K
+	for qemu-devel@nongnu.org; Thu, 07 Dec 2017 12:13:32 -0500
+Received: by mail-oi0-x243.google.com with SMTP id 184so5407035oii.2
+	for <qemu-devel@nongnu.org>; Thu, 07 Dec 2017 09:13:32 -0800 (PST)
+MIME-Version: 1.0
+In-Reply-To: <20171207170719.GT3037@localhost.localdomain>
+References: <CAFEAcA-auykOKQbNcoQooNGk7Vb3wt7TH7AMA689xEj22_6KcQ@mail.gmail.com>
+	<20171207174832.42663bef@redhat.com>
+	<CAFEAcA9o-LyKZBZwSoz3SSPCY-sjo9e011UWy1=EwJ4U9rWYsg@mail.gmail.com>
+	<20171207170719.GT3037@localhost.localdomain>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Thu, 7 Dec 2017 17:13:10 +0000
+Message-ID: <CAFEAcA9fzkedj_VLeTaK-WOTLGk1RinyadRmR5FaJ44KOAQU3w@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] in a device or CPU instance init/realize,
+ can I rely on something having the BQL or equivalent?
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -18,65 +32,37 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Alberto Garcia <berto@igalia.com>, qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>
+To: Eduardo Habkost <ehabkost@redhat.com>
+Cc: Igor Mammedov <imammedo@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>
 
-This patch tweaks TestParallelOps in iotest 030 so it allocates data
-in smaller regions (256KB/512KB instead of 512KB/1MB) and the
-block-stream job in test_stream_commit() only needs to copy data that
-is at the very end of the image.
+On 7 December 2017 at 17:07, Eduardo Habkost <ehabkost@redhat.com> wrote:
+> On Thu, Dec 07, 2017 at 04:53:59PM +0000, Peter Maydell wrote:
+>> On 7 December 2017 at 16:48, Igor Mammedov <imammedo@redhat.com> wrote:
+>> > On Thu, 7 Dec 2017 16:05:50 +0000
+>> > Peter Maydell <peter.maydell@linaro.org> wrote:
+>> >
+>> >> Hi; I'm currently writing '-cpu max' support for ARM. For that I'd
+>> >> like to be able to do the "probe host kernel for its supported feature
+>> >> set" in the CPU object's instance-init function, but I'd like to do
+>
+> I don't think instance_init is appropriate for that, as
+> object_free(object_new(t)) must be always safe to call and free
+> of side-effects for all types.  Wouldn't it work if you do that
+> on realize?
 
-This way when the block-stream job is waken up it will finish right
-away without any chance of being stopped by block_job_sleep_ns(). This
-triggers the bug that was fixed by 3d5d319e1221082974711af1d09d82f07
-and is therefore a more useful test case for parallel block jobs.
+I think we need the information before realize, but I'll double
+check. In any case the probe is safe to call and free of side-effects.
+(If it fails we can stash a flag that we didn't manage to probe, which
+realize can check.)
 
-After this patch the aforementiond bug can also be reproduced with the
-test_stream_parallel() test case.
+>> Right, that was my question -- are we guaranteed that anything
+>> that calls object_new(cpu) does it with a lock?
+>
+> object_new() itself doesn't seem to be thread-safe (see
+> type_initialize()), so I'm pretty sure there shouldn't be any
+> object_new() calls in QEMU without the BQL being held.
 
-Signed-off-by: Alberto Garcia <berto@igalia.com>
----
- tests/qemu-iotests/030 | 12 ++++++------
- 1 file changed, 6 insertions(+), 6 deletions(-)
+Cool.
 
-diff --git a/tests/qemu-iotests/030 b/tests/qemu-iotests/030
-index 457984b8e9..230eb761dd 100755
---- a/tests/qemu-iotests/030
-+++ b/tests/qemu-iotests/030
-@@ -156,7 +156,7 @@ class TestSingleDrive(iotests.QMPTestCase):
- class TestParallelOps(iotests.QMPTestCase):
-     num_ops = 4 # Number of parallel block-stream operations
-     num_imgs = num_ops * 2 + 1
--    image_len = num_ops * 1024 * 1024
-+    image_len = num_ops * 512 * 1024
-     imgs = []
- 
-     def setUp(self):
-@@ -177,12 +177,12 @@ class TestParallelOps(iotests.QMPTestCase):
- 
-         # Put data into the images we are copying data from
-         for i in range(self.num_imgs / 2):
--            img_index = i * 2 + 1
--            # Alternate between 512k and 1M.
-+            img_index = self.num_imgs - i * 2 - 2
-+            # Alternate between 256KB and 512KB.
-             # This way jobs will not finish in the same order they were created
--            num_kb = 512 + 512 * (i % 2)
-+            num_kb = 256 + 256 * (i % 2)
-             qemu_io('-f', iotests.imgfmt,
--                    '-c', 'write -P %d %d %d' % (i, i*1024*1024, num_kb * 1024),
-+                    '-c', 'write -P 0xFF %dk %dk' % (i * 512, num_kb),
-                     self.imgs[img_index])
- 
-         # Attach the drive to the VM
-@@ -323,7 +323,7 @@ class TestParallelOps(iotests.QMPTestCase):
-         self.assert_no_active_block_jobs()
- 
-         # Stream from node0 into node2
--        result = self.vm.qmp('block-stream', device='node2', job_id='node2')
-+        result = self.vm.qmp('block-stream', device='node2', base_node='node0', job_id='node2')
-         self.assert_qmp(result, 'return', {})
- 
-         # Commit from the active layer into node3
--- 
-2.11.0
+thanks
+-- PMM
