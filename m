@@ -1,26 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40822)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47064)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1eMuLG-0003rX-Cj
-	for qemu-devel@nongnu.org; Thu, 07 Dec 2017 06:27:51 -0500
+	(envelope-from <cohuck@redhat.com>) id 1eMuk5-0004il-94
+	for qemu-devel@nongnu.org; Thu, 07 Dec 2017 06:53:30 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1eMuLD-0006xb-7h
-	for qemu-devel@nongnu.org; Thu, 07 Dec 2017 06:27:50 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:47362)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1eMuLD-0006xH-1f
-	for qemu-devel@nongnu.org; Thu, 07 Dec 2017 06:27:47 -0500
-Date: Thu, 7 Dec 2017 11:27:29 +0000
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20171207112729.GC2439@work-vm>
-References: <20171206200346.116537-1-brijesh.singh@amd.com>
-	<20171206200346.116537-24-brijesh.singh@amd.com>
-	<20171207110342.GB2439@work-vm>
-	<CAFEAcA9J35+cC1cZr2U1aJERP6=_DtoHZ-ukvQQ8Ngj37ZGARA@mail.gmail.com>
+	(envelope-from <cohuck@redhat.com>) id 1eMuk0-0001Vk-5C
+	for qemu-devel@nongnu.org; Thu, 07 Dec 2017 06:53:29 -0500
+Date: Thu, 7 Dec 2017 12:53:13 +0100
+From: Cornelia Huck <cohuck@redhat.com>
+Message-ID: <20171207125313.1a5d1c5e.cohuck@redhat.com>
+In-Reply-To: <e48d0ac7-4431-dcce-4eb4-0d6863006575@redhat.com>
+References: <20171108165422.46267-1-pasic@linux.vnet.ibm.com>
+	<2ada83cf-1eb6-87c0-7597-13dc11ab09c0@redhat.com>
+	<e48d0ac7-4431-dcce-4eb4-0d6863006575@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CAFEAcA9J35+cC1cZr2U1aJERP6=_DtoHZ-ukvQQ8Ngj37ZGARA@mail.gmail.com>
-Subject: Re: [Qemu-devel] [PATCH v5 23/23] sev: add migration blocker
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [qemu-s390x] [RFC PATCH v2 0/3] tests for CCW IDA
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,24 +24,43 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: Brijesh Singh <brijesh.singh@amd.com>, QEMU Developers <qemu-devel@nongnu.org>, Alistair Francis <alistair.francis@xilinx.com>, Christian Borntraeger <borntraeger@de.ibm.com>, Cornelia Huck <cornelia.huck@de.ibm.com>, "Daniel P . Berrange" <berrange@redhat.com>, "Edgar E . Iglesias" <edgar.iglesias@xilinx.com>, Eduardo Habkost <ehabkost@redhat.com>, Eric Blake <eblake@redhat.com>, kvm-devel <kvm@vger.kernel.org>, Marcel Apfelbaum <marcel@redhat.com>, Markus Armbruster <armbru@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Richard Henderson <richard.henderson@linaro.org>, Richard Henderson <rth@twiddle.net>, Stefan Hajnoczi <stefanha@gmail.com>, Thomas Lendacky <Thomas.Lendacky@amd.com>, Borislav Petkov <bp@suse.de>
+To: Thomas Huth <thuth@redhat.com>
+Cc: Halil Pasic <pasic@linux.vnet.ibm.com>, Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>, qemu-s390x@nongnu.org, Pierre Morel <pmorel@linux.vnet.ibm.com>, qemu-devel@nongnu.org, David Hildenbrand <david@redhat.com>
 
-* Peter Maydell (peter.maydell@linaro.org) wrote:
-> On 7 December 2017 at 11:03, Dr. David Alan Gilbert <dgilbert@redhat.com> wrote:
-> > * Brijesh Singh (brijesh.singh@amd.com) wrote:
-> >> SEV guest migration is not yet implemented yet.
+On Thu, 7 Dec 2017 10:01:35 +0100
+Thomas Huth <thuth@redhat.com> wrote:
+
+> On 07.12.2017 07:38, Thomas Huth wrote:
+> > On 08.11.2017 17:54, Halil Pasic wrote:  
+> >> I've keept the title althogh the scope shifted a bit: it's
+> >> more about introducing ccw-testdev than about IDA. The goal
+> >> is to facilitate testing the virtual channel subsystem
+> >> implementation, and the ccw interpretation.
+> >>
+> >> The first patch is the interesting one. See it's cover letter
+> >> for details. The RFC is about discussing some technical issues
+> >> with this patch.
+> >>
+> >> The other two patches are an out of source kernel module which
+> >> is basically only there so you can try out the first patch. The
+> >> tests there should probably be ported to something else. I don't
+> >> know what: maybe kvm-unit-tests, maybe qtest+libqos, or maybe some
+> >> bios based test image. We still have to figure out that.   
+> > 
+> > I think both, kvm-unit-tests or qtest+libqos would be good candidates.
+> > Please don't invent a new bios base test image, since kvm-unit-tests
+> > should be very similar already and we really don't need to duplicate
+> > work here.
+> > 
+> > Anyway, you'd need to add some CSS infracture there first (in both
+> > kvm-unit-tests and the qtest environments), so it's likely a similar
+> > amount of work. qtest has the advantage that it gets checked
+> > automatically during "make check" each time, so I'd have a weak
+> > preference for that one.  
 > 
-> Is there at least a plan for how migration of a guest with
-> encrypted memory would be implemented?
+> Another thought: I'd also like to see the more complex virtio device
+> qtests enabled for virtio-ccw one day (e.g. tests/virtio-blk-test.c), so
+> I think we sooner or later should have some CSS infrastructure in the
+> qtests anyway ==> May I suggest that you have a try with the qtest approach?
 
-It's something I've discussed with Brijesh and co and I've read
-through the spec and it does look doable; I understand wanting to
-get the basics of SEV going first though.
-
-Dave
-
-> thanks
-> -- PMM
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+Agreed, this would be helpful to get more ccw coverage in general.
