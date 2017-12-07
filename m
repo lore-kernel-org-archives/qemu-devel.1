@@ -1,33 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:32961)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40900)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <fziglio@redhat.com>) id 1eMs7N-0001X8-Pp
-	for qemu-devel@nongnu.org; Thu, 07 Dec 2017 04:05:27 -0500
+	(envelope-from <vsementsov@virtuozzo.com>) id 1eMseS-0006rs-2o
+	for qemu-devel@nongnu.org; Thu, 07 Dec 2017 04:39:33 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <fziglio@redhat.com>) id 1eMs7I-0003HN-Rh
-	for qemu-devel@nongnu.org; Thu, 07 Dec 2017 04:05:21 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:52602)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <fziglio@redhat.com>) id 1eMs7I-0003G1-Hn
-	for qemu-devel@nongnu.org; Thu, 07 Dec 2017 04:05:16 -0500
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
-	[10.5.11.13])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 1782BC05972A
-	for <qemu-devel@nongnu.org>; Thu,  7 Dec 2017 09:05:15 +0000 (UTC)
-Received: from colo-mx.corp.redhat.com
-	(colo-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.21])
-	by smtp.corp.redhat.com (Postfix) with ESMTPS id 0277118221
-	for <qemu-devel@nongnu.org>; Thu,  7 Dec 2017 09:05:15 +0000 (UTC)
-Date: Thu, 7 Dec 2017 04:05:14 -0500 (EST)
-From: Frediano Ziglio <fziglio@redhat.com>
-Message-ID: <2083994092.34289761.1512637514012.JavaMail.zimbra@redhat.com>
-In-Reply-To: <20171122135625.16625-1-fziglio@redhat.com>
-References: <20171122135625.16625-1-fziglio@redhat.com>
+	(envelope-from <vsementsov@virtuozzo.com>) id 1eMseQ-0004q8-Cm
+	for qemu-devel@nongnu.org; Thu, 07 Dec 2017 04:39:32 -0500
+References: <20171113162053.58795-1-vsementsov@virtuozzo.com>
+	<01108daa-fed3-c142-bbd6-0ecc4c8b795d@redhat.com>
+	<cd0a2e5e-f788-0e5a-dec7-f428479f3b89@virtuozzo.com>
+	<8c61f43c-5f56-8c1b-a2fe-f954d34dc687@redhat.com>
+	<40392ab9-ec2a-30ed-ddab-a557682a4192@virtuozzo.com>
+	<4e4e28d7-aebc-4a86-e691-99afdcca27f5@redhat.com>
+	<40da8b0d-8039-634c-f50e-1d6326d7fca5@virtuozzo.com>
+	<37d0e96a-d572-3290-61e7-87e59de2f59b@redhat.com>
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Message-ID: <2a255dee-97c6-5d6d-3152-df0b7fc2d4f0@virtuozzo.com>
+Date: Thu, 7 Dec 2017 12:39:16 +0300
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 1/4] spice: remove QXLWorker interface field
+In-Reply-To: <37d0e96a-d572-3290-61e7-87e59de2f59b@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: quoted-printable
+Content-Language: en-US
+Subject: Re: [Qemu-devel] [PATCH for-2.12 0/4] qmp dirty bitmap API
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,66 +30,211 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: kraxel@redhat.com
-Cc: qemu-devel@nongnu.org
+To: John Snow <jsnow@redhat.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org
+Cc: kwolf@redhat.com, famz@redhat.com, armbru@redhat.com, mnestratov@virtuozzo.com, mreitz@redhat.com, nshirokovskiy@virtuozzo.com, stefanha@redhat.com, den@openvz.org, pbonzini@redhat.com
 
-ping the series
+07.12.2017 03:38, John Snow wrote:
+>
+> On 11/30/2017 07:10 AM, Vladimir Sementsov-Ogievskiy wrote:
+>> 18.11.2017 00:35, John Snow wrote:
+>>> On 11/17/2017 03:22 AM, Vladimir Sementsov-Ogievskiy wrote:
+>>>> 17.11.2017 06:10, John Snow wrote:
+>>>>> On 11/16/2017 03:17 AM, Vladimir Sementsov-Ogievskiy wrote:
+>>>>>> 16.11.2017 00:20, John Snow wrote:
+>>>>>>> On 11/13/2017 11:20 AM, Vladimir Sementsov-Ogievskiy wrote:
+>>>>>>>> Hi all.
+>>>>>>>>
+>>>>>>>> There are three qmp commands, needed to implement external backup
+>>>>>>>> API.
+>>>>>>>>
+>>>>>>>> Using these three commands, client may do all needed bitmap
+>>>>>>>> management by
+>>>>>>>> hand:
+>>>>>>>>
+>>>>>>>> on backup start we need to do a transaction:
+>>>>>>>>  =C2=A0=C2=A0 {disable old bitmap, create new bitmap}
+>>>>>>>>
+>>>>>>>> on backup success:
+>>>>>>>>  =C2=A0=C2=A0 drop old bitmap
+>>>>>>>>
+>>>>>>>> on backup fail:
+>>>>>>>>  =C2=A0=C2=A0 enable old bitmap
+>>>>>>>>  =C2=A0=C2=A0 merge new bitmap to old bitmap
+>>>>>>>>  =C2=A0=C2=A0 drop new bitmap
+>>>>>>>>
+>>>>>>> Can you give me an example of how you expect these commands to be
+>>>>>>> used,
+>>>>>>> and why they're required?
+>>>>>>>
+>>>>>>> I'm a little weary about how error-prone these commands might be
+>>>>>>> and the
+>>>>>>> potential for incorrect usage seems... high. Why do we require them=
+?
+>>>>>> It is needed for incremental backup. It looks like bad idea to expor=
+t
+>>>>>> abdicate/reclaim functionality, it is simpler
+>>>>>> and clearer to allow user to merge/enable/disable bitmaps by hand.
+>>>>>>
+>>>>>> usage is like this:
+>>>>>>
+>>>>>> 1. we have dirty bitmap bitmap0 for incremental backup.
+>>>>>>
+>>>>>> 2. prepare image fleecing (create temporary image with
+>>>>>> backing=3Dour_disk)
+>>>>>> 3. in qmp transaction:
+>>>>>>  =C2=A0=C2=A0=C2=A0=C2=A0 - disable bitmap0
+>>>>>>  =C2=A0=C2=A0=C2=A0=C2=A0 - create bitmap1
+>>>>>>  =C2=A0=C2=A0=C2=A0=C2=A0 - start image fleecing (backup sync=3Dnone=
+ our_disk -> temp_disk)
+>>>>> This could probably just be its own command, though:
+>>>>>
+>>>>> block-job-fleece node=3Dfoobar bitmap=3Dbitmap0 etc=3Detera etc=3Dete=
+ra
+>>>>>
+>>>>> Could handle forking the bitmap. I'm not sure what the arguments woul=
+d
+>>>>> look like, but we could name the NBD export here, too. (Assuming the
+>>>>> server is already started and we just need to create the share.)
+>>>>>
+>>>>> Then, we can basically do what mirror does:
+>>>>>
+>>>>> (1) Cancel
+>>>>> (2) Complete
+>>>>>
+>>>>> Cancel would instruct QEMU to keep the bitmap changes (i.e. roll back=
+),
+>>>>> and Complete would instruct QEMU to discard the changes.
+>>>>>
+>>>>> This way we don't need to expose commands like split or merge that wi=
+ll
+>>>>> almost always be dangerous to use over QMP.
+>>>>>
+>>>>> In fact, a fleecing job would be really convenient even without a
+>>>>> bitmap, because it'd still be nice to have a convenience command for
+>>>>> it.
+>>>>> Using an existing infrastructure and understood paradigm is just a
+>>>>> bonus.
+>>>> 1. If I understand correctly, Kevin and Max said in their report in
+>>>> Prague about new block-job approach,
+>>>>  =C2=A0=C2=A0 using filter nodes, so I'm not sure that this is a good =
+Idea to
+>>>> introduce now new old-style block-job, where we can
+>>>>  =C2=A0=C2=A0 do without it.
+>>>>
+>>> We could do without it, but it might be a lot better to have everything
+>>> wrapped up in a command that's easy to digest instead of releasing 10
+>>> smaller commands that have to be executed in a very specific way in
+>>> order to work correctly.
+>>>
+>>> I'm thinking about the complexity of error checking here with all the
+>>> smaller commands, versus error checking on a larger workflow we
+>>> understand and can quality test better.
+>>>
+>>> I'm not sure that filter nodes becoming the new normal for block jobs
+>>> precludes our ability to use the job-management API as a handle for
+>>> managing the lifetime of a long-running task like fleecing, but I'll
+>>> check with Max and Kevin about this.
+>>>
+>>>> 2. there is the following scenario: customers needs a possibility to
+>>>> create a backup of data changed since some
+>>>> point in time. So, maintaining several static and one (or several) act=
+iv
+>>>> bitmaps with a possiblity of merge some of them
+>>>> and create a backup using this merged bitmap may be convenient.
+>>>>
+>>> I think the ability to copy bitmaps and issue differential backups woul=
+d
+>>> be sufficient in all cases I could think of...
+>> so, instead of keeping several static bitmaps with ability to merge them=
+,
+>> you propose to keep several active bitmaps and copy them to make a backu=
+p?
+>>
+>> so, instead of new qmp command for merge, add new qmp command for copy?
+>>
+>> in case of static bitmaps, we can implement saving/loading them to the
+>> image to free RAM space,
+>> so it is better.
+>>
+>> or what do you propose for=C2=A0 [2] ?
+>>
+>>
+>>
+>>
+> I'm sorry, I don't think I understand.
+>
+> "customers needs a possibility to create a backup of data changed since
+> some point in time."
+>
+> Is that not the existing case for a simple incremental backup? Granted,
+> the point in time was decided when we created the bitmap or when we made
+> the last backup, but it is "since some point in time."
+>
+> If you mean to say an arbitrary point in time after-the-fact, I don't
+> see how the API presented here helps enable that functionality.
+>
+> (by "arbitrary point in time after-the-fact I mean for example: Say a
+> user installs a malicious application in a VM on Thursday, but the
+> bitmap was created on Monday. The user wants to go back to Wednesday
+> evening, but we have no record of that point in time, so we cannot go
+> back to it.)
+>
+> Can you elaborate on what you're trying to accomplish so I make sure I'm
+> considering you carefully?
 
-> 
-> This fields points to an old interface that is no more
-> used in the current code.
-> 
-> Signed-off-by: Frediano Ziglio <fziglio@redhat.com>
-> ---
->  hw/display/qxl.c           | 1 -
->  include/ui/spice-display.h | 1 -
->  ui/spice-display.c         | 2 --
->  3 files changed, 4 deletions(-)
-> 
-> diff --git a/hw/display/qxl.c b/hw/display/qxl.c
-> index 99365c3e8f..b9fa067f6e 100644
-> --- a/hw/display/qxl.c
-> +++ b/hw/display/qxl.c
-> @@ -518,7 +518,6 @@ static void interface_attach_worker(QXLInstance *sin,
-> QXLWorker *qxl_worker)
->      PCIQXLDevice *qxl = container_of(sin, PCIQXLDevice, ssd.qxl);
->  
->      trace_qxl_interface_attach_worker(qxl->id);
-> -    qxl->ssd.worker = qxl_worker;
->  }
->  
->  static void interface_set_compression_level(QXLInstance *sin, int level)
-> diff --git a/include/ui/spice-display.h b/include/ui/spice-display.h
-> index aaf2019889..6b5c73b21c 100644
-> --- a/include/ui/spice-display.h
-> +++ b/include/ui/spice-display.h
-> @@ -86,7 +86,6 @@ struct SimpleSpiceDisplay {
->      DisplayChangeListener dcl;
->      void *buf;
->      int bufsize;
-> -    QXLWorker *worker;
->      QXLInstance qxl;
->      uint32_t unique;
->      pixman_image_t *surface;
-> diff --git a/ui/spice-display.c b/ui/spice-display.c
-> index ad1ceafb3f..85a72fe76a 100644
-> --- a/ui/spice-display.c
-> +++ b/ui/spice-display.c
-> @@ -519,7 +519,6 @@ static void interface_attach_worker(QXLInstance *sin,
-> QXLWorker *qxl_worker)
->      SimpleSpiceDisplay *ssd = container_of(sin, SimpleSpiceDisplay, qxl);
->  
->      dprint(1, "%s/%d:\n", __func__, ssd->qxl.id);
-> -    ssd->worker = qxl_worker;
->  }
->  
->  static void interface_set_compression_level(QXLInstance *sin, int level)
-> @@ -1028,7 +1027,6 @@ static void qemu_spice_display_init_one(QemuConsole
-> *con)
->  
->      ssd->qxl.base.sif = &dpy_interface.base;
->      qemu_spice_add_display_interface(&ssd->qxl, con);
-> -    assert(ssd->worker);
->      qemu_spice_create_host_memslot(ssd);
->  
->      register_displaychangelistener(&ssd->dcl);
+Yes, point in time is when we create a dirty bitmap. But we want to=20
+maintain several points in time.
+For example it may be last 10 incremental backups.
+User wants an ability to create incremental backup which will contain=20
+changes from selected point in
+time to current moment. It is needed for example if backup was deleted=20
+(to save disk space) and now user
+wants to recreate it.
+
+In current scheme for incremental backup, after successful backup we=20
+actually lose previous point in time,
+and have only the last one.
+
+With ability to merge bitmap we can do the following:
+
+1. create bitmap1
+2. disable bitmap1, do external backup by bitmap1, create bitmap2
+2.1 on backup fail: merge bitmap2 to bitmap1, enable bitmap1, delete bitmap=
+2
+2.2 on backup success: do nothing
+3. disable bitmap2, do external backup by bitmap2, create bitmap3
+3.1 on backup fail: merge bitmap3 to bitmap2, enable bitmap2, delete bitmap=
+3
+3.2 on backup success: do nothing
+...
+
+so, we have disabled bitmaps bitmap_i, corresponding to difference=20
+between points in time i and i+1
+and if user wants to get data, changed from point in time number j, he=20
+just merges bitmaps from
+bitmap_j to the last(active) one to the new bitmap bitmap_temp and=20
+create corresponding backup.
+
+
+instead of storing several disabled bitmaps we can store enabled=20
+bitmaps, in this case we will not need
+merge operation but instead we can implement copy operation. However=20
+maintaining disabled bitmaps
+is better, as we can then implement storing them to the qcow2 image, to=20
+save RAM space.
+
+I also have another idea:
+implement new object: point-in-time or checkpoint. The should have=20
+names, and the simple add/remove API.
+And they will be backed by dirty bitmaps. so checkpoint deletion is=20
+bitmap merge (and delete one of them),
+checkpoint creation is disabling of active-checkpoint-bitmap and=20
+starting new active-checkpoint-bitmap.
+
+Then we can implement merging of several bitmaps (from one of=20
+checkpoints to current moment) in
+NBD meta-context-query handling.
+
+--=20
+Best regards,
+Vladimir
