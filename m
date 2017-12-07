@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44087)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44088)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1eMzcp-0007NJ-T0
-	for qemu-devel@nongnu.org; Thu, 07 Dec 2017 12:06:23 -0500
+	(envelope-from <mst@redhat.com>) id 1eMzcp-0007NK-Tk
+	for qemu-devel@nongnu.org; Thu, 07 Dec 2017 12:06:26 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1eMzco-0006K8-HI
+	(envelope-from <mst@redhat.com>) id 1eMzcm-0006JZ-Nq
 	for qemu-devel@nongnu.org; Thu, 07 Dec 2017 12:06:19 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:42296)
+Received: from mx1.redhat.com ([209.132.183.28]:47406)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1eMzco-0006Jj-6c
-	for qemu-devel@nongnu.org; Thu, 07 Dec 2017 12:06:18 -0500
-References: <20171205044844.3597-1-richard.henderson@linaro.org>
-	<CAFEAcA-i7pFPwdTvW=4VeRXfJC6hYD=PY6J-Z9XZcWmAk7hwiw@mail.gmail.com>
-	<659ad21b-5c17-a194-6104-fe4f50e58009@twiddle.net>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <803c99d5-a4bc-4888-f20d-6840e7a75254@redhat.com>
-Date: Thu, 7 Dec 2017 11:06:15 -0600
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1eMzcm-0006JE-EM
+	for qemu-devel@nongnu.org; Thu, 07 Dec 2017 12:06:16 -0500
+Date: Thu, 7 Dec 2017 19:06:07 +0200
+From: "Michael S. Tsirkin" <mst@redhat.com>
+Message-ID: <20171207190218-mutt-send-email-mst@kernel.org>
+References: <CGME20171206130624eucas1p1f73fd4cf613eaf3ce4ce6918c807f8e1@eucas1p1.samsung.com>
+	<1512565578-12078-1-git-send-email-i.maximets@samsung.com>
+	<20171206184432-mutt-send-email-mst@kernel.org>
+	<249c9e25-0bdb-7a44-6821-59474d25baa5@samsung.com>
 MIME-Version: 1.0
-In-Reply-To: <659ad21b-5c17-a194-6104-fe4f50e58009@twiddle.net>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="tbGCDMoCbFGPDNUSIQF6HF0NLLW6rlxno"
-Subject: Re: [Qemu-devel] [PATCH v2] linux-user: Use *at functions instead
- of caching interp_prefix contents
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <249c9e25-0bdb-7a44-6821-59474d25baa5@samsung.com>
+Subject: Re: [Qemu-devel] [PATCH] vhost: fix crash on virtio_error while
+ device stop
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,85 +30,132 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Richard Henderson <rth@twiddle.net>, Peter Maydell <peter.maydell@linaro.org>, Richard Henderson <richard.henderson@linaro.org>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
+To: Ilya Maximets <i.maximets@samsung.com>
+Cc: qemu-devel@nongnu.org, Marc-Andre Lureau <marcandre.lureau@redhat.com>, Heetae Ahn <heetae82.ahn@samsung.com>, Maxime Coquelin <maxime.coquelin@redhat.com>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---tbGCDMoCbFGPDNUSIQF6HF0NLLW6rlxno
-From: Eric Blake <eblake@redhat.com>
-To: Richard Henderson <rth@twiddle.net>,
- Peter Maydell <peter.maydell@linaro.org>,
- Richard Henderson <richard.henderson@linaro.org>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
-Message-ID: <803c99d5-a4bc-4888-f20d-6840e7a75254@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v2] linux-user: Use *at functions instead of
- caching interp_prefix contents
-References: <20171205044844.3597-1-richard.henderson@linaro.org>
- <CAFEAcA-i7pFPwdTvW=4VeRXfJC6hYD=PY6J-Z9XZcWmAk7hwiw@mail.gmail.com>
- <659ad21b-5c17-a194-6104-fe4f50e58009@twiddle.net>
-In-Reply-To: <659ad21b-5c17-a194-6104-fe4f50e58009@twiddle.net>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+On Thu, Dec 07, 2017 at 09:39:36AM +0300, Ilya Maximets wrote:
+> On 06.12.2017 19:45, Michael S. Tsirkin wrote:
+> > On Wed, Dec 06, 2017 at 04:06:18PM +0300, Ilya Maximets wrote:
+> >> In case virtio error occured after vhost_dev_close(), qemu will crash
+> >> in nested cleanup while checking IOMMU flag because dev->vdev already
+> >> set to zero and resources are already freed.
+> >>
+> >> Example:
+> >>
+> >> Program received signal SIGSEGV, Segmentation fault.
+> >> vhost_virtqueue_stop at hw/virtio/vhost.c:1155
+> >>
+> >>     #0  vhost_virtqueue_stop at hw/virtio/vhost.c:1155
+> >>     #1  vhost_dev_stop at hw/virtio/vhost.c:1594
+> >>     #2  vhost_net_stop_one at hw/net/vhost_net.c:289
+> >>     #3  vhost_net_stop at hw/net/vhost_net.c:368
+> >>
+> >>             Nested call to vhost_net_stop(). First time was at #14.
+> >>
+> >>     #4  virtio_net_vhost_status at hw/net/virtio-net.c:180
+> >>     #5  virtio_net_set_status (status=79) at hw/net/virtio-net.c:254
+> >>     #6  virtio_set_status at hw/virtio/virtio.c:1146
+> >>     #7  virtio_error at hw/virtio/virtio.c:2455
+> >>
+> >>         virtqueue_get_head() failed here.
+> >>
+> >>     #8  virtqueue_get_head at hw/virtio/virtio.c:543
+> >>     #9  virtqueue_drop_all at hw/virtio/virtio.c:984
+> >>     #10 virtio_net_drop_tx_queue_data at hw/net/virtio-net.c:240
+> >>     #11 virtio_bus_set_host_notifier at hw/virtio/virtio-bus.c:297
+> >>     #12 vhost_dev_disable_notifiers at hw/virtio/vhost.c:1431
+> >>
+> >>         vhost_dev_stop() was executed here. dev->vdev == NULL now.
+> >>
+> >>     #13 vhost_net_stop_one at hw/net/vhost_net.c:290
+> >>     #14 vhost_net_stop at hw/net/vhost_net.c:368
+> >>     #15 virtio_net_vhost_status at hw/net/virtio-net.c:180
+> >>     #16 virtio_net_set_status (status=15) at hw/net/virtio-net.c:254
+> >>     #17 qmp_set_link ("hostnet0", up=false) at net/net.c:1430
+> >>     #18 chr_closed_bh at net/vhost-user.c:214
+> >>     #19 aio_bh_call at util/async.c:90
+> >>     #20 aio_bh_poll at util/async.c:118
+> >>     #21 aio_dispatch at util/aio-posix.c:429
+> >>     #22 aio_ctx_dispatch at util/async.c:261
+> >>     #23 g_main_context_dispatch
+> >>     #24 glib_pollfds_poll at util/main-loop.c:213
+> >>     #25 os_host_main_loop_wait at util/main-loop.c:261
+> >>     #26 main_loop_wait at util/main-loop.c:515
+> >>     #27 main_loop () at vl.c:1917
+> >>     #28 main at vl.c:4795
+> >>
+> >> Above backtrace captured from qemu crash on vhost disconnect while
+> >> virtio driver in guest was in failed state.
+> >>
+> >> We can just add checking for 'vdev' in 'vhost_dev_has_iommu()' but
+> >> it will assert further trying to free already freed ioeventfds. The
+> >> real problem is that we're allowing nested calls to 'vhost_net_stop'.
+> >>
+> >> This patch is aimed to forbid nested calls to 'vhost_net_stop' to avoid
+> >> any possible double frees and segmentation faults doue to using of
+> >> already freed resources by setting 'vhost_started' flag to zero prior
+> >> to 'vhost_net_stop' call.
+> >>
+> >> Signed-off-by: Ilya Maximets <i.maximets@samsung.com>
+> >> ---
+> >>
+> >> This issue was already addressed more than a year ago by the following
+> >> patch: https://lists.gnu.org/archive/html/qemu-devel/2016-03/msg06732.html
+> >> but it was dropped without review due to not yet implemented re-connection
+> >> of vhost-user. Re-connection implementation lately fixed most of the
+> >> nested calls, but few of them still exists. For example, above backtrace
+> >> captured after 'virtqueue_get_head()' failure on vhost-user disconnection.
+> >>
+> >>  hw/net/virtio-net.c | 2 +-
+> >>  1 file changed, 1 insertion(+), 1 deletion(-)
+> >>
+> >> diff --git a/hw/net/virtio-net.c b/hw/net/virtio-net.c
+> >> index 38674b0..4d95a18 100644
+> >> --- a/hw/net/virtio-net.c
+> >> +++ b/hw/net/virtio-net.c
+> >> @@ -177,8 +177,8 @@ static void virtio_net_vhost_status(VirtIONet *n, uint8_t status)
+> >>              n->vhost_started = 0;
+> >>          }
+> >>      } else {
+> >> -        vhost_net_stop(vdev, n->nic->ncs, queues);
+> >>          n->vhost_started = 0;
+> >> +        vhost_net_stop(vdev, n->nic->ncs, queues);
+> >>      }
+> >>  }
+> > 
+> > Well the wider context is
+> > 
+> > 
+> >         n->vhost_started = 1;
+> >         r = vhost_net_start(vdev, n->nic->ncs, queues);
+> >         if (r < 0) {
+> >             error_report("unable to start vhost net: %d: "
+> >                          "falling back on userspace virtio", -r);
+> >             n->vhost_started = 0;
+> >         }
+> >     } else {
+> >         vhost_net_stop(vdev, n->nic->ncs, queues);
+> >         n->vhost_started = 0;
+> > 
+> > So we set it to 1 before start, we should clear after stop.
+> 
+> OK. I agree that clearing after is a bit safer. But in this case we need
+> a separate flag or other way to detect that we're already inside the
+> 'vhost_net_stop()'.
+> 
+> What do you think about that old patch:
+> https://lists.gnu.org/archive/html/qemu-devel/2016-03/msg06732.html  ?
+> 
+> It implements the same thing but introduces additional flag. It even could
+> be still applicable.
 
-On 12/07/2017 08:43 AM, Richard Henderson wrote:
+I see. I think the issue is with how host set status works.
+It only sets the status afterwards.
 
->>> -    fd =3D open(path(filename), O_RDONLY);
->>> +    switch (interp_dirfd > 0 && filename[0] =3D=3D '/') {
->>> +    case true:
->>
->> gcc doesn't like this pattern:
->>
->> /home/petmay01/linaro/qemu-from-laptop/qemu/linux-user/syscall.c: In
->> function =E2=80=98do_name_to_handle_at=E2=80=99:
->> /home/petmay01/linaro/qemu-from-laptop/qemu/linux-user/syscall.c:7231:=
-13:
->> error: switch condition has boolean value [-Werror=3Dswitch-bool]
->>      switch (interp_dirfd > 0 && name[0] =3D=3D '/') {
->>              ^
->>
->> It seems like an odd way to write an if().
->=20
-> Huh.  My gcc likes it just fine.  What version are you using?
->=20
-> It's an IF with a /* fallthru */, so there are very few
-> less ugly ways to write it...
+So here's the plan:
+- set status to set the new status first, and
+  pass the old status as parameter
+- fix all callbacks
 
-Maybe:
-
-while (1) {
-    if (interp_dirfd > 0 && filename[0] =3D=3D '/') {
-        fd =3D openat(interp_dirfd, filename + 1, O_RDONLY);
-        if (fd >=3D 0 || errno !=3D ENOENT) {
-            break;
-        }
-    }
-    fd =3D open(filename, O_RDONLY);
-    break;
-}
-
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
-
-
---tbGCDMoCbFGPDNUSIQF6HF0NLLW6rlxno
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
-
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlopdQcACgkQp6FrSiUn
-Q2rbsAf/RHIDkzQhhCF5/BlBkxOJzfrRXSDqGQu7OvJDNu8SMUomYso+BCUE2VI9
-zF3oiEfqxlELeL4APDS9KY/c014jQkBh+pOAowzpv+zFoNsAmKdynPfIZfghTbo2
-2jFKp+P0HNtToFZx6rcZprqkXtN5BdmjqleepuhaQ+Gi7e4fA0jeSEO2vQAokd2z
-DWnfJSUhBoztBrFlljvWeu7dlR43o4Zuet4JhgxeDbTu0iPz/1HN072EAOUt8lCf
-DnNBn/xv74JOQkTcS/R8WQBnz43PVUz/QDyc660bB28SE0WjvkF99JmC9e9qmjDV
-TUX9aeBJyzV9dLSE8GJvnewvSorZaA==
-=rW/7
------END PGP SIGNATURE-----
-
---tbGCDMoCbFGPDNUSIQF6HF0NLLW6rlxno--
+-- 
+MST
