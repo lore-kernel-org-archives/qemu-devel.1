@@ -1,30 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49333)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49968)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1eMyXe-0000qC-7o
-	for qemu-devel@nongnu.org; Thu, 07 Dec 2017 10:56:55 -0500
+	(envelope-from <armbru@redhat.com>) id 1eMyYk-0002ww-Uu
+	for qemu-devel@nongnu.org; Thu, 07 Dec 2017 10:58:04 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1eMyXb-0004HX-5C
-	for qemu-devel@nongnu.org; Thu, 07 Dec 2017 10:56:54 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:37790)
+	(envelope-from <armbru@redhat.com>) id 1eMyYk-000509-0F
+	for qemu-devel@nongnu.org; Thu, 07 Dec 2017 10:58:03 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:9782)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1eMyXa-0004HG-U5
-	for qemu-devel@nongnu.org; Thu, 07 Dec 2017 10:56:51 -0500
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
-	[10.5.11.12])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 0123F5FD63
-	for <qemu-devel@nongnu.org>; Thu,  7 Dec 2017 15:56:50 +0000 (UTC)
-Date: Thu, 7 Dec 2017 17:56:39 +0200
-From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <20171207175544-mutt-send-email-mst@kernel.org>
-References: <20171205174100.GD2405@work-vm>
-	<90cb3043-cf68-2635-2dd9-f47cf5e8c10e@redhat.com>
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1eMyYj-0004zs-NT
+	for qemu-devel@nongnu.org; Thu, 07 Dec 2017 10:58:01 -0500
+From: Markus Armbruster <armbru@redhat.com>
+References: <20170911110623.24981-1-marcandre.lureau@redhat.com>
+	<20170911110623.24981-16-marcandre.lureau@redhat.com>
+Date: Thu, 07 Dec 2017 16:57:56 +0100
+In-Reply-To: <20170911110623.24981-16-marcandre.lureau@redhat.com>
+	(=?utf-8?Q?=22Marc-Andr=C3=A9?= Lureau"'s message of "Mon, 11 Sep 2017
+	13:05:48 +0200")
+Message-ID: <87h8t2o7i3.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <90cb3043-cf68-2635-2dd9-f47cf5e8c10e@redhat.com>
-Subject: Re: [Qemu-devel] Hotplug ram and vhost-user
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v3 15/50] qapi-types: refactor variants
+ handling
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,73 +30,109 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Maxime Coquelin <maxime.coquelin@redhat.com>
-Cc: "Dr. David Alan Gilbert" <dgilbert@redhat.com>, marcandre.lureau@redhat.com, qemu-devel@nongnu.org
+To: =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>
+Cc: qemu-devel@nongnu.org, Michael Roth <mdroth@linux.vnet.ibm.com>
 
-On Thu, Dec 07, 2017 at 04:52:18PM +0100, Maxime Coquelin wrote:
-> Hi David,
-> 
-> On 12/05/2017 06:41 PM, Dr. David Alan Gilbert wrote:
-> > Hi,
-> >    Since I'm reworking the memory map update code I've been
-> > trying to test it with hot adding RAM; but even on upstream
-> > I'm finding that hot adding RAM causes the guest to stop passing
-> > packets with vhost-user-bridge;  have either of you seen the same
-> > thing?
-> 
-> No, I have never tried this.
-> 
-> > I'm doing:
-> > ./tests/vhost-user-bridge -u /tmp/vubrsrc.sock
-> > $QEMU -enable-kvm -m 1G,maxmem=2G,slots=4 -smp 2 -object memory-backend-file,id=mem,size=1G,mem-path=/dev/shm,share=on -numa node,memdev=mem -mem-prealloc -trace events=vhost-trace-file -chardev socket,id=char0,path=/tmp/vubrsrc.sock -netdev type=vhost-user,id=mynet1,chardev=char0,vhostforce -device virtio-net-pci,netdev=mynet1 $IMAGE -net none
-> > 
-> > (with a f27 guest) and then doing:
-> > (qemu) object_add memory-backend-file,id=mem1,size=256M,mem-path=/dev/shm
-> > (qemu) device_add pc-dimm,id=dimm1,memdev=mem1
-> > 
-> > but then not getting any responses inside the guest.
-> > 
-> > I can see the code sending another set-mem-table with the
-> > extra chunk of RAM and fd, and I think I can see the bridge
-> > mapping it.
-> 
-> I think there are at least two problems.
-> The first one is that vhost-user-bridge does not support vhost-user
-> protocol's reply-ack feature. So when QEMU sends the requests, it cannot
-> know whether/when it has been handled by the backend.
-> 
-> It had been fixed by sending a GET_FEATURE requests to be sure the
-> SET_MEM_TABLE was handled, as messages are processed in order. The problem
-> is that it caused some test failures when using TCG, so it got
-> reverted.
-> 
-> The initial fix:
-> 
-> commit 28ed5ef16384f12500abd3647973ee21b03cbe23
-> Author: Prerna Saxena <prerna.saxena@nutanix.com>
-> Date:   Fri Aug 5 03:53:51 2016 -0700
-> 
->     vhost-user: Attempt to fix a race with set_mem_table.
-> 
-> The revert:
-> 
-> commit 94c9cb31c04737f86be29afefbff401cd23bc24d
-> Author: Michael S. Tsirkin <mst@redhat.com>
-> Date:   Mon Aug 15 16:35:24 2016 +0300
-> 
->     Revert "vhost-user: Attempt to fix a race with set_mem_table."
+Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com> writes:
 
-It's a question of stress-testing it and finding out why did
-it cause tests fail esp when run within a container.
+> Generate variants objects outside gen_object(). This will allow to
+> easily wrap gen_object() with ifcond_decorator in the following patch.
+>
+> Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+> ---
+>  scripts/qapi-types.py | 37 +++++++++++++++++++++++--------------
+>  1 file changed, 23 insertions(+), 14 deletions(-)
+>
+> diff --git a/scripts/qapi-types.py b/scripts/qapi-types.py
+> index 915786c463..2b3588267b 100644
+> --- a/scripts/qapi-types.py
+> +++ b/scripts/qapi-types.py
+> @@ -53,23 +53,27 @@ def gen_struct_members(members):
+>      return ret
+>=20=20
+>=20=20
+> -def gen_object(name, base, members, variants):
+> -    if name in objects_seen:
+> -        return ''
+> -    objects_seen.add(name)
+> -
+> +def gen_variants_objects(variants):
+>      ret =3D ''
+>      if variants:
+>          for v in variants.variants:
+>              if isinstance(v.type, QAPISchemaObjectType):
+> +                ret +=3D gen_variants_objects(v.type.variants)
+>                  ret +=3D gen_object(v.type.name, v.type.base,
+>                                    v.type.local_members, v.type.variants)
+> +    return ret
+>=20=20
+> -    ret +=3D mcgen('''
+> +
+> +def gen_object(name, base, members, variants):
+> +    if name in objects_seen:
+> +        return ''
+> +    objects_seen.add(name)
+> +
+> +    ret =3D mcgen('''
+>=20=20
+>  struct %(c_name)s {
+>  ''',
+> -                 c_name=3Dc_name(name))
+> +                c_name=3Dc_name(name))
+>=20=20
+>      if base:
+>          if not base.is_implicit():
+> @@ -218,11 +222,7 @@ class QAPISchemaGenTypeVisitor(QAPISchemaVisitor):
+>              self.decl +=3D gen_array(name, element_type)
+>              self._gen_type_cleanup(name)
+>=20=20
+> -    def visit_object_type(self, name, info, ifcond, base, members, varia=
+nts):
+> -        # Nothing to do for the special empty builtin
+> -        if name =3D=3D 'q_empty':
+> -            return
+> -        self._fwdecl +=3D gen_fwd_object_or_array(name)
+> +    def _gen_object(self, name, info, ifcond, base, members, variants):
+>          self.decl +=3D gen_object(name, base, members, variants)
+>          if base and not base.is_implicit():
+>              self.decl +=3D gen_upcast(name, base)
+> @@ -232,10 +232,19 @@ class QAPISchemaGenTypeVisitor(QAPISchemaVisitor):
+>              # implicit types won't be directly allocated/freed
+>              self._gen_type_cleanup(name)
+>=20=20
+> +    def visit_object_type(self, name, info, ifcond, base, members, varia=
+nts):
+> +        # Nothing to do for the special empty builtin
+> +        if name =3D=3D 'q_empty':
+> +            return
+> +        self._fwdecl +=3D gen_fwd_object_or_array(name)
+> +        self.decl +=3D gen_variants_objects(variants)
+> +        self._gen_object(name, info, None, base, members, variants)
+> +
+>      def visit_alternate_type(self, name, info, ifcond, variants):
+>          self._fwdecl +=3D gen_fwd_object_or_array(name)
+> -        self.decl +=3D gen_object(name, None, [variants.tag_member], var=
+iants)
+> -        self._gen_type_cleanup(name)
+> +        self.decl +=3D gen_variants_objects(variants)
+> +        self._gen_object(name, info, None, None,
+> +                         [variants.tag_member], variants)
 
-> 
-> Another problem is that memory mmapped with previous call does not seems
-> to be unmapped, but that should not cause other problems than leaking
-> virtual memory.
-> 
-> Maxime
-> > Dave
-> > 
-> > --
-> > Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
-> > 
+Where did self._gen_type_cleanup(name) go?  Hmm, I guess it's now in
+_gen_object().  Confusing.
+
+>=20=20
+>  # If you link code generated from multiple schemata, you want only one
+>  # instance of the code for built-in types.  Generate it only when
+
+If I read this patch correctly, you move code from the beginning of
+gen_object() to new gen_variants_objects(), then arrange to have
+gen_variants_objects() called right before gen_object().  Correct?
+
+In old gen_object(), the code is guarded by
+
+       if name in objects_seen:
+           return ''
+       objects_seen.add(name)
+
+In new gen_variants_objects(), it isn't.  Why?
