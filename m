@@ -1,20 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57549)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33506)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1eMvUa-000806-MD
-	for qemu-devel@nongnu.org; Thu, 07 Dec 2017 07:41:33 -0500
+	(envelope-from <cohuck@redhat.com>) id 1eMvkc-0006RS-0P
+	for qemu-devel@nongnu.org; Thu, 07 Dec 2017 07:58:06 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1eMvUZ-0002yr-Ro
-	for qemu-devel@nongnu.org; Thu, 07 Dec 2017 07:41:32 -0500
-Received: from orth.archaic.org.uk ([2001:8b0:1d0::2]:38872)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pm215@archaic.org.uk>)
-	id 1eMvUZ-0002rw-LS
-	for qemu-devel@nongnu.org; Thu, 07 Dec 2017 07:41:31 -0500
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Thu,  7 Dec 2017 12:41:21 +0000
-Message-Id: <1512650481-1723-1-git-send-email-peter.maydell@linaro.org>
-Subject: [Qemu-devel] [PATCH] linux-user: wrap fork() in a start/end
- exclusive section
+	(envelope-from <cohuck@redhat.com>) id 1eMvkY-00042B-52
+	for qemu-devel@nongnu.org; Thu, 07 Dec 2017 07:58:06 -0500
+Date: Thu, 7 Dec 2017 13:57:56 +0100
+From: Cornelia Huck <cohuck@redhat.com>
+Message-ID: <20171207135756.1f84ed41.cohuck@redhat.com>
+In-Reply-To: <87df13b9-c494-c8b4-49cf-b7ef4640d05a@linux.vnet.ibm.com>
+References: <20171108165422.46267-1-pasic@linux.vnet.ibm.com>
+	<20171108165422.46267-2-pasic@linux.vnet.ibm.com>
+	<e2e2ae84-e04a-df4f-50bb-328768a5464e@redhat.com>
+	<20171207125901.47be0af1.cohuck@redhat.com>
+	<87df13b9-c494-c8b4-49cf-b7ef4640d05a@linux.vnet.ibm.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [RFC PATCH v2 1/3] s390x/ccs: add ccw-testdev
+ emulated device
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,59 +27,61 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: patches@linaro.org, Riku Voipio <riku.voipio@iki.fi>, Laurent Vivier <laurent@vivier.eu>, Paolo Bonzini <pbonzini@redhat.com>, Stuart Monteith <stuart.monteith@linaro.org>
+To: Halil Pasic <pasic@linux.vnet.ibm.com>
+Cc: Thomas Huth <thuth@redhat.com>, qemu-s390x@nongnu.org, Pierre Morel <pmorel@linux.vnet.ibm.com>, Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>, qemu-devel@nongnu.org
 
-When we do a fork() in usermode emulation, we need to be in
-a start/end exclusive section, so that we can ensure that no
-other thread is in an RCU section. Otherwise you can get this
-deadlock:
+On Thu, 7 Dec 2017 13:38:22 +0100
+Halil Pasic <pasic@linux.vnet.ibm.com> wrote:
 
-- fork thread: has mmap_lock, waits for rcu_sync_lock
-  (because rcu_init_lock() is registered as a pthread_atfork() hook)
-- RCU thread: has rcu_sync_lock, waits for rcu_read_(un)lock
-- another CPU thread: in RCU critical section, waits for mmap_lock
+> On 12/07/2017 12:59 PM, Cornelia Huck wrote:
+> > On Thu, 7 Dec 2017 07:33:19 +0100
+> > Thomas Huth <thuth@redhat.com> wrote:
+> >   
+> >> On 08.11.2017 17:54, Halil Pasic wrote:  
+> >   
+> >>> +static ccw_cb_t get_ccw_cb(CcwTestDevOpMode op_mode)
+> >>> +{
+> >>> +    switch (op_mode) {
+> >>> +    case OP_MODE_FIB:
+> >>> +        return ccw_testdev_ccw_cb_mode_fib;
+> >>> +    case OP_MODE_NOP:
+> >>> +    default:
+> >>> +        return ccw_testdev_ccw_cb_mode_nop;    
+> >>
+> >> Do we really want to use "nop" for unknown modes? Or should there rather
+> >> be a ccw_testdev_ccw_cb_mode_error instead, too?  
+> > 
+> > I like the idea of an error mode.  
+> 
+> What would be the benefit of the error mode? The idea is that
+> the tester in the guest has a certain set of tests implemented
+> each requiring certain behavior from the device. This behavior
+> is represented by the mode.
+> 
+> If the device does not support the mode, the set of tests can't
+> be executed meaningfully. The only option is either ignore them
+> (and preferably report them as ignored), or fail them (not soo
+> good in my opinion).
 
-This can show up if you have a heavily multithreaded guest program
-that does a fork().
+Failing it sounds superior to me: You really want to know if something
+does not work as expected.
 
-Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
-Reported-by: Stuart Monteith <stuart.monteith@linaro.org>
----
-Based-on: <1512397331-15238-1-git-send-email-peter.maydell@linaro.org>
-(this applies on top of 'linux-user: Fix locking order in fork_start()')
+> 
+> The in guest tester should simply iterate over it test sets
+> and try to select the mode the test set (or suite in other
+> terminology) requires. If selecting the mode fails, than
+> means you are working with an old ccw-testdev.
+> 
+> > 
+> > Related: Should the device have a mechanism to report the supported
+> > modes?
+> >   
+> 
+> I don't see the value. See above. I think the set mode operation
+> reporting failure is sufficient.
+> 
+> But if you have something in mind, please do tell. I'm open.
 
-I think this should fix the deadlock that Stuart reports, but I
-can't reproduce it, so testing welcome.
-
- linux-user/main.c | 5 +++++
- 1 file changed, 5 insertions(+)
-
-diff --git a/linux-user/main.c b/linux-user/main.c
-index 146ee3e..ff116fe 100644
---- a/linux-user/main.c
-+++ b/linux-user/main.c
-@@ -128,6 +128,7 @@ int cpu_get_pic_interrupt(CPUX86State *env)
- /* Make sure everything is in a consistent state for calling fork().  */
- void fork_start(void)
- {
-+    start_exclusive();
-     mmap_fork_start();
-     qemu_mutex_lock(&tb_ctx.tb_lock);
-     cpu_list_lock();
-@@ -148,9 +149,13 @@ void fork_end(int child)
-         qemu_mutex_init(&tb_ctx.tb_lock);
-         qemu_init_cpu_list();
-         gdbserver_fork(thread_cpu);
-+        /* qemu_init_cpu_list() takes care of reinitializing the
-+         * exclusive state, so we don't need to end_exclusive() here.
-+         */
-     } else {
-         qemu_mutex_unlock(&tb_ctx.tb_lock);
-         cpu_list_unlock();
-+        end_exclusive();
-     }
- }
- 
--- 
-2.7.4
+If we keep guest/host in lockstep, we probably don't need this. But if
+not, self-reporting looks like a reasonable feature as it gives more
+flexibility.
