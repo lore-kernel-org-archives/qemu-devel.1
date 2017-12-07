@@ -1,27 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56930)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57619)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1eMyxB-0004EX-Gf
-	for qemu-devel@nongnu.org; Thu, 07 Dec 2017 11:23:18 -0500
+	(envelope-from <dgilbert@redhat.com>) id 1eMyzs-0004yo-8F
+	for qemu-devel@nongnu.org; Thu, 07 Dec 2017 11:26:05 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1eMyx5-0007aO-KZ
-	for qemu-devel@nongnu.org; Thu, 07 Dec 2017 11:23:17 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:48938)
+	(envelope-from <dgilbert@redhat.com>) id 1eMyzo-00010B-8s
+	for qemu-devel@nongnu.org; Thu, 07 Dec 2017 11:26:04 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:53388)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1eMyx5-0007a1-EH
-	for qemu-devel@nongnu.org; Thu, 07 Dec 2017 11:23:11 -0500
-From: Markus Armbruster <armbru@redhat.com>
-References: <20170911110623.24981-1-marcandre.lureau@redhat.com>
-	<20170911110623.24981-18-marcandre.lureau@redhat.com>
-Date: Thu, 07 Dec 2017 17:23:05 +0100
-In-Reply-To: <20170911110623.24981-18-marcandre.lureau@redhat.com>
-	(=?utf-8?Q?=22Marc-Andr=C3=A9?= Lureau"'s message of "Mon, 11 Sep 2017
-	13:05:50 +0200")
-Message-ID: <87d13qo6c6.fsf@dusky.pond.sub.org>
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1eMyzn-0000zO-Vk
+	for qemu-devel@nongnu.org; Thu, 07 Dec 2017 11:26:00 -0500
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+	[10.5.11.13])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 35FA261B8C
+	for <qemu-devel@nongnu.org>; Thu,  7 Dec 2017 16:25:59 +0000 (UTC)
+Date: Thu, 7 Dec 2017 16:25:47 +0000
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20171207162547.GD2439@work-vm>
+References: <20171205174100.GD2405@work-vm>
+	<90cb3043-cf68-2635-2dd9-f47cf5e8c10e@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v3 17/50] qapi: do not define enumeration
- value explicitely
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <90cb3043-cf68-2635-2dd9-f47cf5e8c10e@redhat.com>
+Subject: Re: [Qemu-devel] Hotplug ram and vhost-user
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,69 +33,83 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>
-Cc: qemu-devel@nongnu.org, Michael Roth <mdroth@linux.vnet.ibm.com>
+To: Maxime Coquelin <maxime.coquelin@redhat.com>
+Cc: marcandre.lureau@redhat.com, qemu-devel@nongnu.org, "Michael S. Tsirkin" <mst@redhat.com>
 
-Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com> writes:
+* Maxime Coquelin (maxime.coquelin@redhat.com) wrote:
+> Hi David,
+> 
+> On 12/05/2017 06:41 PM, Dr. David Alan Gilbert wrote:
+> > Hi,
+> >    Since I'm reworking the memory map update code I've been
+> > trying to test it with hot adding RAM; but even on upstream
+> > I'm finding that hot adding RAM causes the guest to stop passing
+> > packets with vhost-user-bridge;  have either of you seen the same
+> > thing?
+> 
+> No, I have never tried this.
 
-> The C standard has the initial value at 0 and the subsequent values
-> incremented by 1. No need to set this explicitely.
->
-> This will prevent from artificial "gaps" when compiling out some enum
-> values and having unnecessarily large MAX values & enums arrays.
->
-> Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
-> ---
->  scripts/qapi.py | 7 ++-----
->  1 file changed, 2 insertions(+), 5 deletions(-)
->
-> diff --git a/scripts/qapi.py b/scripts/qapi.py
-> index 94b735d8d6..074ee221a1 100644
-> --- a/scripts/qapi.py
-> +++ b/scripts/qapi.py
-> @@ -1985,14 +1985,11 @@ typedef enum %(c_name)s {
->  ''',
->                  c_name=3Dc_name(name))
->=20=20
-> -    i =3D 0
->      for value in enum_values:
->          ret +=3D mcgen('''
-> -    %(c_enum)s =3D %(i)d,
-> +    %(c_enum)s,
->  ''',
-> -                     c_enum=3Dc_enum_const(name, value, prefix),
-> -                     i=3Di)
-> -        i +=3D 1
-> +                     c_enum=3Dc_enum_const(name, value, prefix))
->=20=20
->      ret +=3D mcgen('''
->  } %(c_name)s;
+Would you know if it works on dpdk?
 
-Recapitulate review of v2: this risks entertaining mishaps like
-compiling this one
+> > I'm doing:
+> > ./tests/vhost-user-bridge -u /tmp/vubrsrc.sock
+> > $QEMU -enable-kvm -m 1G,maxmem=2G,slots=4 -smp 2 -object memory-backend-file,id=mem,size=1G,mem-path=/dev/shm,share=on -numa node,memdev=mem -mem-prealloc -trace events=vhost-trace-file -chardev socket,id=char0,path=/tmp/vubrsrc.sock -netdev type=vhost-user,id=mynet1,chardev=char0,vhostforce -device virtio-net-pci,netdev=mynet1 $IMAGE -net none
+> > 
+> > (with a f27 guest) and then doing:
+> > (qemu) object_add memory-backend-file,id=mem1,size=256M,mem-path=/dev/shm
+> > (qemu) device_add pc-dimm,id=dimm1,memdev=mem1
+> > 
+> > but then not getting any responses inside the guest.
+> > 
+> > I can see the code sending another set-mem-table with the
+> > extra chunk of RAM and fd, and I think I can see the bridge
+> > mapping it.
+> 
+> I think there are at least two problems.
+> The first one is that vhost-user-bridge does not support vhost-user
+> protocol's reply-ack feature. So when QEMU sends the requests, it cannot
+> know whether/when it has been handled by the backend.
 
-    typedef enum Color {
-        COLOR_WHITE,
-#if defined(NEED_CPU_H)
-#if defined(TARGET_S390X)
-        COLOR_BLUE,
-#endif /* defined(TARGET_S390X) */
-#endif /* defined(NEED_CPU_H) */
-        COLOR_BLACK,
-    } Color;
+Wouldn't you have to be unlucky to cause that a problem - i.e. the
+descriptors would have to get allocated in the new RAM?
 
-in s390x-code (COLOR_BLACK =3D 2) and in target-independent code
-(COLOR_BLACK =3D 1), then linking the two together.
+> It had been fixed by sending a GET_FEATURE requests to be sure the
+> SET_MEM_TABLE was handled, as messages are processed in order. The problem
+> is that it caused some test failures when using TCG, so it got
+> reverted.
+> 
+> The initial fix:
+> 
+> commit 28ed5ef16384f12500abd3647973ee21b03cbe23
+> Author: Prerna Saxena <prerna.saxena@nutanix.com>
+> Date:   Fri Aug 5 03:53:51 2016 -0700
+> 
+>     vhost-user: Attempt to fix a race with set_mem_table.
+> 
+> The revert:
+> 
+> commit 94c9cb31c04737f86be29afefbff401cd23bc24d
+> Author: Michael S. Tsirkin <mst@redhat.com>
+> Date:   Mon Aug 15 16:35:24 2016 +0300
+> 
+>     Revert "vhost-user: Attempt to fix a race with set_mem_table."
+> 
 
-Same issue for struct members and such (previous patch).
+Do we know which tests fail?
 
-What's our story on preventing disaster here?
+> Another problem is that memory mmapped with previous call does not seems
+> to be unmapped, but that should not cause other problems than leaking
+> virtual memory.
 
-In the long run, we want to split the generated code so that
-target-specific and target-independent code are separate, and each part
-is always compiled with consistent preprocessor symbols.  But I'm afraid
-that's not in the card right now.
+Oh, leaks are the least of our problem there!
 
-I therefore proposed the stupidest temporary stopgap that could possibly
-work: apply conditionals *only* to qmp-introspect.c, leave everything
-unconditional elsewhere.
+Dave
+
+> Maxime
+> > Dave
+> > 
+> > --
+> > Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+> > 
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
