@@ -1,34 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33601)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35862)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <borntraeger@de.ibm.com>) id 1eMxd6-0003Zt-NH
-	for qemu-devel@nongnu.org; Thu, 07 Dec 2017 09:58:29 -0500
+	(envelope-from <yang.zhong@intel.com>) id 1eMxle-00087t-6t
+	for qemu-devel@nongnu.org; Thu, 07 Dec 2017 10:07:24 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <borntraeger@de.ibm.com>) id 1eMxd3-0004f6-Hf
-	for qemu-devel@nongnu.org; Thu, 07 Dec 2017 09:58:28 -0500
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:43514
-	helo=mx0a-001b2d01.pphosted.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <borntraeger@de.ibm.com>)
-	id 1eMxd3-0004ec-Aj
-	for qemu-devel@nongnu.org; Thu, 07 Dec 2017 09:58:25 -0500
-Received: from pps.filterd (m0098419.ppops.net [127.0.0.1])
-	by mx0b-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
-	vB7EtBch066366
-	for <qemu-devel@nongnu.org>; Thu, 7 Dec 2017 09:58:22 -0500
-Received: from e06smtp11.uk.ibm.com (e06smtp11.uk.ibm.com [195.75.94.107])
-	by mx0b-001b2d01.pphosted.com with ESMTP id 2eq4b33wvq-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Thu, 07 Dec 2017 09:58:22 -0500
-Received: from localhost
-	by e06smtp11.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
-	Only! Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <borntraeger@de.ibm.com>;
-	Thu, 7 Dec 2017 14:58:20 -0000
-From: Christian Borntraeger <borntraeger@de.ibm.com>
-Date: Thu,  7 Dec 2017 15:58:16 +0100
-Message-Id: <20171207145816.87347-1-borntraeger@de.ibm.com>
-Subject: [Qemu-devel] [PATCH/RFC v2] s390x: start a new memory region if the
- old one exceeds KVM_MEM_MAX_NR_PAGES
+	(envelope-from <yang.zhong@intel.com>) id 1eMxla-00027p-49
+	for qemu-devel@nongnu.org; Thu, 07 Dec 2017 10:07:18 -0500
+Received: from mga18.intel.com ([134.134.136.126]:50050)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <yang.zhong@intel.com>)
+	id 1eMxlZ-00026b-M1
+	for qemu-devel@nongnu.org; Thu, 07 Dec 2017 10:07:14 -0500
+Date: Thu, 7 Dec 2017 23:06:29 +0800
+From: Yang Zhong <yang.zhong@intel.com>
+Message-ID: <20171207150629.GA7387@yangzhon-Virtual>
+References: <1511505030-3669-1-git-send-email-yang.zhong@intel.com>
+	<5A1A5C6E.9060409@huawei.com>
+	<20171201105622.GB26237@yangzhon-Virtual>
+	<74cccd14-e485-90d4-82d9-03355c05faca@redhat.com>
+	<20171204120322.GA32151@yangzhon-Virtual>
+	<5A253EF5.6040300@huawei.com>
+	<20171205060047.GA4102@yangzhon-Virtual>
+	<024fd897-a16a-f69e-94dc-07affb3ef724@redhat.com>
+	<20171206092625.GA19639@yangzhon-Virtual>
+	<6bfac215-b5ba-fd09-d17b-310a2c843a2b@redhat.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <6bfac215-b5ba-fd09-d17b-310a2c843a2b@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v3] rcu: reduce more than 7MB heap memory
+ by malloc_trim()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,69 +37,97 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Cornelia Huck <cohuck@redhat.com>
-Cc: qemu-devel <qemu-devel@nongnu.org>, qemu-s390x <qemu-s390x@nongnu.org>, Halil Pasic <pasic@linux.vnet.ibm.com>, Alexander Graf <agraf@suse.de>, Thomas Huth <thuth@redhat.com>, David Hildenbrand <david@redhat.com>, Richard Henderson <rth@twiddle.net>, Christian Borntraeger <borntraeger@de.ibm.com>
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: qemu-devel@nongnu.org, stefanha@redhat.com, berrange@redhat.com, weidong.huang@huawei.com, arei.gonglei@huawei.com, liujunjie23@huawei.com, wangxinxin.wang@huawei.com, stone.xulei@huawei.com, zhaoshenglong@huawei.com, yang.zhong@intel.com
 
-KVM does not allow memory regions > KVM_MEM_MAX_NR_PAGES, basically
-limiting the memory per slot to 8TB-4k. Lets start a new memory region
-if we cross that boundary.
+On Wed, Dec 06, 2017 at 10:48:45AM +0100, Paolo Bonzini wrote:
+> On 06/12/2017 10:26, Yang Zhong wrote:
+> >   Hello Paolo,
+> > 
+> >   The best option is only trim one time after guest kernel bootup or VM bootup, and as for
+> >   hotplug/unhotplug operations during the VM running, the trim still can do for each batch
+> >   memory free because trim will not impact VM performance during VM running status.
+> > 
+> >   So, the key point is qemu is hard to know when guest ernel bootup is over. If you have some 
+> >   suggestions, please let me know. thanks!
+> 
+> It shouldn't be hard.  Does QEMU's RCU thread actually get any
+> significant activity after bootup?  Hence the suggestion of keeping
+> malloc_trim in the RCU thread, but only do it if some time has passed
+> since the last time.
+> 
+> Maybe something like this every time the RCU thread runs:
+> 
+>  static uint64_t next_trim_time, last_trim_time;
+>  if (current time < next_trim_time) {
+>      next_trim_time -= last_trim_time / 2    /* or higher */
+>      last_trim_time -= last_trim_time / 2    /* same as previous line */
+>  } else {
+>      trim_start_time = current time
+>      malloc_trim(...)
+>      last_trim_time = current time - trim_start_time
+>      next_trim_time = current time + last_trim_time
+>  }
+> 
+> Where the "2" factor should be tuned so that both your and Shannon's
+> scenario work fine.
+> 
+  Hello Paolo,
 
-With that (and optimistic overcommitment in the kernel) I was able to
-start  a 24TB guest on a 1TB system.
+  Thanks for your help!
+  I changed the patch per your advice, and new TEMP patch as below:
 
-Signed-off-by: Christian Borntraeger <borntraeger@de.ibm.com>
----
- hw/s390x/s390-virtio-ccw.c | 33 ++++++++++++++++++++++++++++++---
- 1 file changed, 30 insertions(+), 3 deletions(-)
+  static void *call_rcu_thread(void *opaque)
+  {
+     struct rcu_head *node;
+ +    int num=1;
 
-diff --git a/hw/s390x/s390-virtio-ccw.c b/hw/s390x/s390-virtio-ccw.c
-index 8425534..3630f6a 100644
---- a/hw/s390x/s390-virtio-ccw.c
-+++ b/hw/s390x/s390-virtio-ccw.c
-@@ -154,14 +154,41 @@ static void virtio_ccw_register_hcalls(void)
-                                    virtio_ccw_hcall_early_printk);
- }
+     rcu_register_thread();
+
+  @@ -272,6 +273,21 @@ static void *call_rcu_thread(void *opaque)
+             node->func(node);
+         }
+         qemu_mutex_unlock_iothread();
+ +
+ +        static uint64_t next_trim_time, last_trim_time;
+ +        int delta=100;
+ +
+ +        if ( qemu_clock_get_ns(QEMU_CLOCK_HOST) < next_trim_time ) {
+ +            next_trim_time -= last_trim_time / delta;   /* or higher */
+ +            last_trim_time -= last_trim_time / delta;   /* same as previous line */
+ +        } else {
+ +            uint64_t trim_start_time = qemu_clock_get_ns(QEMU_CLOCK_HOST);
+ +            malloc_trim(4 * 1024 *1024);
+ +            last_trim_time = qemu_clock_get_ns(QEMU_CLOCK_HOST) - trim_start_time;
+ +            next_trim_time = qemu_clock_get_ns(QEMU_CLOCK_HOST) + last_trim_time;
+ +            printf("---------memory trim----------num=%d------last_trim_time=%ld next_trim_time=%ld --\n", num++,last_trim_time,next_trim_time);
+ +       }
+ +
  
-+/*
-+ * KVM does only support memory slots up to KVM_MEM_MAX_NR_PAGES pages
-+ * as the dirty bitmap must be managed by bitops that take an int as
-+ * position indicator. If we have a guest beyond that we will split off
-+ * new subregions.
-+ */
-+#define KVM_SLOT_MAX ((((1UL << 31) - 1) * 4096) & ~0xfffffUL )
-+
- static void s390_memory_init(ram_addr_t mem_size)
- {
-     MemoryRegion *sysmem = get_system_memory();
--    MemoryRegion *ram = g_new(MemoryRegion, 1);
-+    ram_addr_t chunk, offset;
-+    unsigned int number;
-+    gchar *name;
- 
-     /* allocate RAM for core */
--    memory_region_allocate_system_memory(ram, NULL, "s390.ram", mem_size);
--    memory_region_add_subregion(sysmem, 0, ram);
-+    offset = 0;
-+    number = 0;
-+    name = g_strdup_printf("s390.ram");
-+    while (mem_size) {
-+        MemoryRegion *ram = g_new(MemoryRegion, 1);
-+        chunk = mem_size;
-+        /* KVM does not allow memslots >= 8 TB */
-+        if (chunk > KVM_SLOT_MAX) {
-+            chunk = KVM_SLOT_MAX;
-+        }
-+        memory_region_allocate_system_memory(ram, NULL, name, chunk);
-+        memory_region_add_subregion(sysmem, offset, ram);
-+        mem_size -= chunk;
-+        offset += chunk;
-+	number++;
-+        g_free(name);
-+        name = g_strdup_printf("s390.ram.%u", number);
-+    }
-+    g_free(name);
- 
-     /* Initialize storage key device */
-     s390_skeys_init();
--- 
-2.9.4
+ The print log for your reference
+ ---------memory trim----------num=1------last_trim_time=165000 next_trim_time=1512658205270477000 --
+ ---------memory trim----------num=2------last_trim_time=656000 next_trim_time=1512658205278032000 --
+ ---------memory trim----------num=3------last_trim_time=620000 next_trim_time=1512658205298888000 --
+ ---------memory trim----------num=4------last_trim_time=635000 next_trim_time=1512658205339967000 --
+ ---------memory trim----------num=6------last_trim_time=526000 next_trim_time=1512658207659599000 --
+ ---------memory trim----------num=7------last_trim_time=744000 next_trim_time=1512658208121249000 --
+ ---------memory trim----------num=8------last_trim_time=872000 next_trim_time=1512658208132805000 --
+ ---------memory trim----------num=9------last_trim_time=380000 next_trim_time=1512658208376950000 --
+ ---------memory trim----------num=10------last_trim_time=521000 next_trim_time=1512658210648843000 --
+
+ Which show trim cost time less than 1ms and call_rcu_thread() do 10 times batch free, the trim also 10 times.
+
+ I also did below changes: 
+    delta=1000,  and 
+    next_trim_time = qemu_clock_get_ns(QEMU_CLOCK_HOST) + delta * last_trim_time
+
+ The whole VM bootup will trim 3 times.
+
+ Regards,
+
+ Yang
+
+
+> Thanks,
+> 
+> Paolo
