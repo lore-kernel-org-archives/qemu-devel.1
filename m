@@ -1,23 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51373)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51418)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <tcminyard@gmail.com>) id 1eN402-000426-7K
-	for qemu-devel@nongnu.org; Thu, 07 Dec 2017 16:46:35 -0500
+	(envelope-from <tcminyard@gmail.com>) id 1eN404-00043l-0i
+	for qemu-devel@nongnu.org; Thu, 07 Dec 2017 16:46:37 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <tcminyard@gmail.com>) id 1eN401-0006QJ-7M
-	for qemu-devel@nongnu.org; Thu, 07 Dec 2017 16:46:34 -0500
-Received: from mail-pf0-x244.google.com ([2607:f8b0:400e:c00::244]:38375)
+	(envelope-from <tcminyard@gmail.com>) id 1eN403-0006Sa-1B
+	for qemu-devel@nongnu.org; Thu, 07 Dec 2017 16:46:36 -0500
+Received: from mail-pf0-x242.google.com ([2607:f8b0:400e:c00::242]:42325)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <tcminyard@gmail.com>) id 1eN401-0006P2-0a
-	for qemu-devel@nongnu.org; Thu, 07 Dec 2017 16:46:33 -0500
-Received: by mail-pf0-x244.google.com with SMTP id u25so5674745pfg.5
-	for <qemu-devel@nongnu.org>; Thu, 07 Dec 2017 13:46:32 -0800 (PST)
+	(Exim 4.71) (envelope-from <tcminyard@gmail.com>) id 1eN402-0006S6-RU
+	for qemu-devel@nongnu.org; Thu, 07 Dec 2017 16:46:34 -0500
+Received: by mail-pf0-x242.google.com with SMTP id d23so5669990pfe.9
+	for <qemu-devel@nongnu.org>; Thu, 07 Dec 2017 13:46:34 -0800 (PST)
 Sender: Corey Minyard <tcminyard@gmail.com>
 From: minyard@acm.org
-Date: Thu,  7 Dec 2017 15:46:13 -0600
-Message-Id: <1512683181-8420-7-git-send-email-minyard@acm.org>
+Date: Thu,  7 Dec 2017 15:46:16 -0600
+Message-Id: <1512683181-8420-10-git-send-email-minyard@acm.org>
 In-Reply-To: <1512683181-8420-1-git-send-email-minyard@acm.org>
 References: <1512683181-8420-1-git-send-email-minyard@acm.org>
-Subject: [Qemu-devel] [PATCH 06/14] i2c:pm_smbus: Add interrupt handling
+Subject: [Qemu-devel] [PATCH 09/14] i2c: Add vmstate handling to the smbus
+ eeprom
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,120 +28,60 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Corey Minyard <cminyard@mvista.com>, "Michael S . Tsirkin" <mst@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
+Cc: Corey Minyard <cminyard@mvista.com>
 
 From: Corey Minyard <cminyard@mvista.com>
 
-Add the necessary code so that interrupts actually work from
-the pm_smbus device.
-
 Signed-off-by: Corey Minyard <cminyard@mvista.com>
-Cc: Michael S. Tsirkin <mst@redhat.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>
 ---
- hw/i2c/pm_smbus.c         | 14 +++++++++++++-
- hw/i2c/smbus_ich9.c       | 17 +++++++++++++++++
- include/hw/i2c/pm_smbus.h |  2 ++
- 3 files changed, 32 insertions(+), 1 deletion(-)
+ hw/i2c/smbus_eeprom.c | 16 +++++++++++++++-
+ 1 file changed, 15 insertions(+), 1 deletion(-)
 
-diff --git a/hw/i2c/pm_smbus.c b/hw/i2c/pm_smbus.c
-index eb2df4d..2fb00d0 100644
---- a/hw/i2c/pm_smbus.c
-+++ b/hw/i2c/pm_smbus.c
-@@ -205,6 +205,12 @@ error:
-     return;
+diff --git a/hw/i2c/smbus_eeprom.c b/hw/i2c/smbus_eeprom.c
+index b13ec0f..089005d 100644
+--- a/hw/i2c/smbus_eeprom.c
++++ b/hw/i2c/smbus_eeprom.c
+@@ -29,6 +29,8 @@
+ 
+ //#define DEBUG
+ 
++#define TYPE_SMBUS_EEPROM_DEVICE "smbus-eeprom"
++
+ typedef struct SMBusEEPROMDevice {
+     SMBusDevice smbusdev;
+     void *data;
+@@ -97,6 +99,17 @@ static uint8_t eeprom_read_data(SMBusDevice *dev, uint8_t cmd, int n)
+     return eeprom_receive_byte(dev);
  }
  
-+static bool
-+smb_irq_value(PMSMBus *s)
-+{
-+    return ((s->smb_stat & ~STS_HOST_BUSY) != 0) && (s->smb_ctl & CTL_INTREN);
-+}
++static const VMStateDescription vmstate_smbus_eeprom = {
++    .name = TYPE_SMBUS_EEPROM_DEVICE,
++    .version_id = 1,
++    .minimum_version_id = 1,
++    .fields      = (VMStateField[]) {
++        VMSTATE_SMBUS_DEVICE(smbusdev, SMBusEEPROMDevice),
++        VMSTATE_UINT8(offset, SMBusEEPROMDevice),
++        VMSTATE_END_OF_LIST()
++    }
++};
 +
- static void smb_ioport_writeb(void *opaque, hwaddr addr, uint64_t val,
-                               unsigned width)
+ static int smbus_eeprom_initfn(SMBusDevice *dev)
  {
-@@ -300,7 +306,9 @@ static void smb_ioport_writeb(void *opaque, hwaddr addr, uint64_t val,
-     }
- 
-  out:
--    return;
-+    if (s->set_irq) {
-+        s->set_irq(s, smb_irq_value(s));
-+    }
- }
- 
- static uint64_t smb_ioport_readb(void *opaque, hwaddr addr, unsigned width)
-@@ -352,6 +360,10 @@ static uint64_t smb_ioport_readb(void *opaque, hwaddr addr, unsigned width)
-     SMBUS_DPRINTF("SMB readb port=0x%04" HWADDR_PRIx " val=0x%02x\n",
-                   addr, val);
- 
-+    if (s->set_irq) {
-+        s->set_irq(s, smb_irq_value(s));
-+    }
-+
-     return val;
- }
- 
-diff --git a/hw/i2c/smbus_ich9.c b/hw/i2c/smbus_ich9.c
-index 706b9ec..d029816 100644
---- a/hw/i2c/smbus_ich9.c
-+++ b/hw/i2c/smbus_ich9.c
-@@ -41,6 +41,8 @@
- typedef struct ICH9SMBState {
-     PCIDevice dev;
- 
-+    bool irq_enabled;
-+
-     PMSMBus smb;
- } ICH9SMBState;
- 
-@@ -50,6 +52,7 @@ static const VMStateDescription vmstate_ich9_smbus = {
-     .minimum_version_id = 1,
-     .fields = (VMStateField[]) {
-         VMSTATE_PCI_DEVICE(dev, ICH9SMBState),
-+        VMSTATE_BOOL(irq_enabled, ICH9SMBState),
-         VMSTATE_STRUCT(smb, ICH9SMBState, 1, pmsmb_vmstate, PMSMBus),
-         VMSTATE_END_OF_LIST()
-     }
-@@ -111,11 +114,25 @@ static void ich9_smb_class_init(ObjectClass *klass, void *data)
+     SMBusEEPROMDevice *eeprom = (SMBusEEPROMDevice *)dev;
+@@ -122,12 +135,13 @@ static void smbus_eeprom_class_initfn(ObjectClass *klass, void *data)
+     sc->write_data = eeprom_write_data;
+     sc->read_data = eeprom_read_data;
+     dc->props = smbus_eeprom_properties;
++    dc->vmsd = &vmstate_smbus_eeprom;
+     /* Reason: pointer property "data" */
      dc->user_creatable = false;
  }
  
-+static void ich9_smb_set_irq(PMSMBus *pmsmb, bool enabled)
-+{
-+    ICH9SMBState *s = pmsmb->opaque;
-+
-+    if (enabled == s->irq_enabled) {
-+        return;
-+    }
-+
-+    s->irq_enabled = enabled;
-+    pci_set_irq(&s->dev, enabled);
-+}
-+
- I2CBus *ich9_smb_init(PCIBus *bus, int devfn, uint32_t smb_io_base)
- {
-     PCIDevice *d =
-         pci_create_simple_multifunction(bus, devfn, true, TYPE_ICH9_SMB_DEVICE);
-     ICH9SMBState *s = ICH9_SMB_DEVICE(d);
-+    s->smb.set_irq = ich9_smb_set_irq;
-+    s->smb.opaque = s;
-     return s->smb.smbus;
- }
- 
-diff --git a/include/hw/i2c/pm_smbus.h b/include/hw/i2c/pm_smbus.h
-index b1e1970..cfe596f 100644
---- a/include/hw/i2c/pm_smbus.h
-+++ b/include/hw/i2c/pm_smbus.h
-@@ -23,6 +23,8 @@ typedef struct PMSMBus {
- 
-     /* Set by the user. */
-     bool i2c_enable;
-+    void (*set_irq)(struct PMSMBus *s, bool enabled);
-+    void *opaque;
- 
-     /* Internally used by pm_smbus. */
- 
+ static const TypeInfo smbus_eeprom_info = {
+-    .name          = "smbus-eeprom",
++    .name          = TYPE_SMBUS_EEPROM_DEVICE,
+     .parent        = TYPE_SMBUS_DEVICE,
+     .instance_size = sizeof(SMBusEEPROMDevice),
+     .class_init    = smbus_eeprom_class_initfn,
 -- 
 2.7.4
