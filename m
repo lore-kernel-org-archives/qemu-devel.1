@@ -1,17 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52912)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55457)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1eN2qh-0002P3-ON
-	for qemu-devel@nongnu.org; Thu, 07 Dec 2017 15:32:52 -0500
+	(envelope-from <eblake@redhat.com>) id 1eN2vj-0007ak-43
+	for qemu-devel@nongnu.org; Thu, 07 Dec 2017 15:38:04 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1eN2qe-0005PJ-A0
-	for qemu-devel@nongnu.org; Thu, 07 Dec 2017 15:32:49 -0500
+	(envelope-from <eblake@redhat.com>) id 1eN2vi-00017E-0r
+	for qemu-devel@nongnu.org; Thu, 07 Dec 2017 15:38:03 -0500
+References: <20171206144550.22295-1-stefanha@redhat.com>
+	<20171206144550.22295-3-stefanha@redhat.com>
 From: Eric Blake <eblake@redhat.com>
-Date: Thu,  7 Dec 2017 14:30:36 -0600
-Message-Id: <20171207203036.14993-21-eblake@redhat.com>
-In-Reply-To: <20171207203036.14993-1-eblake@redhat.com>
-References: <20171207203036.14993-1-eblake@redhat.com>
-Subject: [Qemu-devel] [PATCH v6 20/20] block: Drop unused
- .bdrv_co_get_block_status()
+Message-ID: <85cde0a4-e523-be3c-17ca-0bf6010e41aa@redhat.com>
+Date: Thu, 7 Dec 2017 14:37:52 -0600
+MIME-Version: 1.0
+In-Reply-To: <20171206144550.22295-3-stefanha@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="iDrFnfljimCpp3aFO0gJ5S6PGKUBx7ICl"
+Subject: Re: [Qemu-devel] [PATCH v2 2/9] block: don't keep AioContext
+ acquired after external_snapshot_prepare()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -20,116 +25,95 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: kwolf@redhat.com, famz@redhat.com, qemu-block@nongnu.org, vsementsov@virtuozzo.com, Stefan Hajnoczi <stefanha@redhat.com>, Max Reitz <mreitz@redhat.com>
+To: Stefan Hajnoczi <stefanha@redhat.com>, qemu-devel@nongnu.org
+Cc: Kevin Wolf <kwolf@redhat.com>, John Snow <jsnow@redhat.com>, qemu-block@nongnu.org
 
-We are gradually moving away from sector-based interfaces, towards
-byte-based.  Now that all drivers have been updated to provide the
-byte-based .bdrv_co_block_status(), we can delete the sector-based
-interface.
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--iDrFnfljimCpp3aFO0gJ5S6PGKUBx7ICl
+From: Eric Blake <eblake@redhat.com>
+To: Stefan Hajnoczi <stefanha@redhat.com>, qemu-devel@nongnu.org
+Cc: Kevin Wolf <kwolf@redhat.com>, John Snow <jsnow@redhat.com>,
+ qemu-block@nongnu.org
+Message-ID: <85cde0a4-e523-be3c-17ca-0bf6010e41aa@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v2 2/9] block: don't keep AioContext acquired
+ after external_snapshot_prepare()
+References: <20171206144550.22295-1-stefanha@redhat.com>
+ <20171206144550.22295-3-stefanha@redhat.com>
+In-Reply-To: <20171206144550.22295-3-stefanha@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-Signed-off-by: Eric Blake <eblake@redhat.com>
+On 12/06/2017 08:45 AM, Stefan Hajnoczi wrote:
+> It is not necessary to hold AioContext across transactions anymore sinc=
+e
+> bdrv_drained_begin/end() is used to keep the nodes quiesced.  In fact,
+> using the AioContext lock for this purpose was always buggy.
+>=20
+> This patch reduces the scope of AioContext locked regions.  This is not=
 
----
-v6: rebase to changes in patch 1, drop R-b
-v5: rebase to master
-v4: rebase to interface tweak
-v3: no change
-v2: rebase to earlier changes
----
- include/block/block_int.h |  3 ---
- block/io.c                | 50 ++++++++++-------------------------------------
- 2 files changed, 10 insertions(+), 43 deletions(-)
+> just a cleanup but also fixes hangs that occur in BDRV_POLL_WHILE()
+> because it is unware of recursive locking and does not release the
 
-diff --git a/include/block/block_int.h b/include/block/block_int.h
-index 42e5c37a63..6f8df6a847 100644
---- a/include/block/block_int.h
-+++ b/include/block/block_int.h
-@@ -217,9 +217,6 @@ struct BlockDriver {
-      * as well as non-NULL pnum, map, and file; in turn, the driver
-      * must return an error or set pnum to an aligned non-zero value.
-      */
--    int64_t coroutine_fn (*bdrv_co_get_block_status)(BlockDriverState *bs,
--        int64_t sector_num, int nb_sectors, int *pnum,
--        BlockDriverState **file);
-     int coroutine_fn (*bdrv_co_block_status)(BlockDriverState *bs,
-         bool want_zero, int64_t offset, int64_t bytes, int64_t *pnum,
-         int64_t *map, BlockDriverState **file);
-diff --git a/block/io.c b/block/io.c
-index 109b3826cd..e0376c1d7c 100644
---- a/block/io.c
-+++ b/block/io.c
-@@ -1893,7 +1893,7 @@ static int coroutine_fn bdrv_co_block_status(BlockDriverState *bs,
+s/unware/unaware/
 
-     /* Must be non-NULL or bdrv_getlength() would have failed */
-     assert(bs->drv);
--    if (!bs->drv->bdrv_co_get_block_status && !bs->drv->bdrv_co_block_status) {
-+    if (!bs->drv->bdrv_co_block_status) {
-         *pnum = bytes;
-         ret = BDRV_BLOCK_DATA | BDRV_BLOCK_ALLOCATED;
-         if (offset + bytes == total_size) {
-@@ -1911,53 +1911,23 @@ static int coroutine_fn bdrv_co_block_status(BlockDriverState *bs,
+> AioContext the necessary number of times to allow progress to be made.
+>=20
+> Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
+> ---
+>  blockdev.c | 71 ++++++++++++++++++++++++++++++++++++++++++------------=
+--------
+>  1 file changed, 48 insertions(+), 23 deletions(-)
+>=20
 
-     /* Round out to request_alignment boundaries */
-     align = bs->bl.request_alignment;
--    if (bs->drv->bdrv_co_get_block_status && align < BDRV_SECTOR_SIZE) {
--        align = BDRV_SECTOR_SIZE;
--    }
-     aligned_offset = QEMU_ALIGN_DOWN(offset, align);
-     aligned_bytes = ROUND_UP(offset + bytes, align) - aligned_offset;
+> @@ -1662,31 +1662,32 @@ static void external_snapshot_prepare(BlkAction=
+State *common,
+>          return;
+>      }
+> =20
+> -    /* Acquire AioContext now so any threads operating on old_bs stop =
+*/
+> -    state->aio_context =3D bdrv_get_aio_context(state->old_bs);
+> -    aio_context_acquire(state->aio_context);
+> +    aio_context =3D bdrv_get_aio_context(state->old_bs);
+> +    aio_context_acquire(aio_context);
+> +
+> +    /* Paired with .clean() */
+>      bdrv_drained_begin(state->old_bs);
+> =20
+>      if (!bdrv_is_inserted(state->old_bs)) {
+>          error_setg(errp, QERR_DEVICE_HAS_NO_MEDIUM, device);
+> -        return;
+> +        goto out;
+>      }
 
--    if (bs->drv->bdrv_co_get_block_status) {
--        int count; /* sectors */
--        int64_t longret;
--
--        assert(QEMU_IS_ALIGNED(aligned_offset | aligned_bytes,
--                               BDRV_SECTOR_SIZE));
--        /*
--         * The contract allows us to return pnum smaller than bytes, even
--         * if the next query would see the same status; we truncate the
--         * request to avoid overflowing the driver's 32-bit interface.
--         */
--        longret = bs->drv->bdrv_co_get_block_status(
--            bs, aligned_offset >> BDRV_SECTOR_BITS,
--            MIN(INT_MAX, aligned_bytes) >> BDRV_SECTOR_BITS, &count,
--            &local_file);
--        if (longret < 0) {
--            assert(INT_MIN <= longret);
--            ret = longret;
--            goto out;
--        }
--        if (longret & BDRV_BLOCK_OFFSET_VALID) {
--            local_map = longret & BDRV_BLOCK_OFFSET_MASK;
--        }
--        ret = longret & ~BDRV_BLOCK_OFFSET_MASK;
--        *pnum = count * BDRV_SECTOR_SIZE;
--    } else {
--        ret = bs->drv->bdrv_co_block_status(bs, want_zero, aligned_offset,
--                                            aligned_bytes, pnum, &local_map,
--                                            &local_file);
--        if (ret < 0) {
--            *pnum = 0;
--            goto out;
--        }
--        assert(*pnum); /* The block driver must make progress */
-+    ret = bs->drv->bdrv_co_block_status(bs, want_zero, aligned_offset,
-+                                        aligned_bytes, pnum, &local_map,
-+                                        &local_file);
-+    if (ret < 0) {
-+        *pnum = 0;
-+        goto out;
-     }
+Using gcc/clang's __attribute__((cleanup)) would make this so much nicer =
+;)
 
-     /*
--     * The driver's result must be a multiple of request_alignment.
-+     * The driver's result must be a non-zero multiple of request_alignment.
-      * Clamp pnum and adjust map to original request.
-      */
--    assert(QEMU_IS_ALIGNED(*pnum, align) && align > offset - aligned_offset);
-+    assert(*pnum && QEMU_IS_ALIGNED(*pnum, align) &&
-+           align > offset - aligned_offset);
-     *pnum -= offset - aligned_offset;
-     if (*pnum > bytes) {
-         *pnum = bytes;
--- 
-2.14.3
+Reviewed-by: Eric Blake <eblake@redhat.com>
+
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
+
+
+--iDrFnfljimCpp3aFO0gJ5S6PGKUBx7ICl
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAloppqAACgkQp6FrSiUn
+Q2qAeggAiro2OoEWielxf4vviXgiWg06jktdIjamtPfu3+FVeLXok2wqKzXN264d
+BY+FAGCZILu/JE4+9TisMkJSI7ZUinQTnBZ9fsoES+0dyxvpT1nmtVSbHwRA8yGI
+nXdBFn5ZcL7eMbB3W7xfq7oDdvaZx3kHMNPq4ZxgWf3m2ksa4LP2xgX2YfUChYiK
+s2r7nIq7Rv4SK8jq6K9YELDE/49s/qqZ+GY/1h1f5RGBplUumjTSQTjZuUQ5qLmQ
+oFSP4O6pzUV0Rw/wix2qQXJGPpvTvguo7oj4M9vMXxkWZuExpFdzmTKBaKBdIfro
+CDF9pVx3LhlUXT8hGd9hONssVGz0JA==
+=PRHa
+-----END PGP SIGNATURE-----
+
+--iDrFnfljimCpp3aFO0gJ5S6PGKUBx7ICl--
