@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41300)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41280)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1eMy9Z-00009a-P1
-	for qemu-devel@nongnu.org; Thu, 07 Dec 2017 10:32:02 -0500
+	(envelope-from <david@redhat.com>) id 1eMy9Y-00008V-DC
+	for qemu-devel@nongnu.org; Thu, 07 Dec 2017 10:32:10 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1eMy9T-0002Dz-Vd
-	for qemu-devel@nongnu.org; Thu, 07 Dec 2017 10:32:01 -0500
+	(envelope-from <david@redhat.com>) id 1eMy9X-0002In-L8
+	for qemu-devel@nongnu.org; Thu, 07 Dec 2017 10:32:00 -0500
 From: David Hildenbrand <david@redhat.com>
-Date: Thu,  7 Dec 2017 16:31:38 +0100
-Message-Id: <20171207153141.15523-3-david@redhat.com>
+Date: Thu,  7 Dec 2017 16:31:40 +0100
+Message-Id: <20171207153141.15523-5-david@redhat.com>
 In-Reply-To: <20171207153141.15523-1-david@redhat.com>
 References: <20171207153141.15523-1-david@redhat.com>
-Subject: [Qemu-devel] [PATCH v2 for-2.12 2/5] s390x/tcg: fix and cleanup
- mcck injection
+Subject: [Qemu-devel] [PATCH v2 for-2.12 4/5] s390x/tcg: indicate value of
+ TODPR in STCKE
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,75 +23,42 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-s390x@nongnu.org, qemu-devel@nongnu.org
 Cc: Christian Borntraeger <borntraeger@de.ibm.com>, Cornelia Huck <cohuck@redhat.com>, Richard Henderson <rth@twiddle.net>, Alexander Graf <agraf@suse.de>, David Hildenbrand <david@redhat.com>
 
-The architecture mode indication wasn't stored. The split of certain
-64bit fields was unnecessary. Also, the complete clock comparator, not
-just bit 0-55 (starting at byte 1) was stored.
+We were not yet using the value of the TOD Programmable Register.
 
-We now generate a proper MCIC via the same helper we use for KVM.
-
-There is be more to clean up, but we will change the other parts later on
-either way.
-
+Reviewed-by: Thomas Huth <thuth@redhat.com>
 Signed-off-by: David Hildenbrand <david@redhat.com>
 ---
- target/s390x/excp_helper.c | 12 ++++++------
- target/s390x/internal.h    |  6 +++---
- 2 files changed, 9 insertions(+), 9 deletions(-)
+ target/s390x/translate.c | 5 +++++
+ 1 file changed, 5 insertions(+)
 
-diff --git a/target/s390x/excp_helper.c b/target/s390x/excp_helper.c
-index d831537544..f4697a884d 100644
---- a/target/s390x/excp_helper.c
-+++ b/target/s390x/excp_helper.c
-@@ -395,6 +395,9 @@ static void do_mchk_interrupt(CPUS390XState *env)
- 
-     lowcore = cpu_map_lowcore(env);
- 
-+    /* we are always in z/Architecture mode */
-+    lowcore->ar_access_id = 1;
-+
-     for (i = 0; i < 16; i++) {
-         lowcore->floating_pt_save_area[i] = cpu_to_be64(get_freg(env, i)->ll);
-         lowcore->gpregs_save_area[i] = cpu_to_be64(env->regs[i]);
-@@ -404,13 +407,10 @@ static void do_mchk_interrupt(CPUS390XState *env)
-     lowcore->prefixreg_save_area = cpu_to_be32(env->psa);
-     lowcore->fpt_creg_save_area = cpu_to_be32(env->fpc);
-     lowcore->tod_progreg_save_area = cpu_to_be32(env->todpr);
--    lowcore->cpu_timer_save_area[0] = cpu_to_be32(env->cputm >> 32);
--    lowcore->cpu_timer_save_area[1] = cpu_to_be32((uint32_t)env->cputm);
--    lowcore->clock_comp_save_area[0] = cpu_to_be32(env->ckc >> 32);
--    lowcore->clock_comp_save_area[1] = cpu_to_be32((uint32_t)env->ckc);
-+    lowcore->cpu_timer_save_area = cpu_to_be64(env->cputm);
-+    lowcore->clock_comp_save_area = cpu_to_be64(env->ckc >> 8);
- 
--    lowcore->mcck_interruption_code[0] = cpu_to_be32(0x00400f1d);
--    lowcore->mcck_interruption_code[1] = cpu_to_be32(0x40330000);
-+    lowcore->mcic = cpu_to_be64(s390_build_validity_mcic() | MCIC_SC_CP);
-     lowcore->mcck_old_psw.mask = cpu_to_be64(get_psw_mask(env));
-     lowcore->mcck_old_psw.addr = cpu_to_be64(env->psw.addr);
-     mask = be64_to_cpu(lowcore->mcck_new_psw.mask);
-diff --git a/target/s390x/internal.h b/target/s390x/internal.h
-index 6817b2c432..1a88e4beb4 100644
---- a/target/s390x/internal.h
-+++ b/target/s390x/internal.h
-@@ -43,7 +43,7 @@ typedef struct LowCore {
-     uint8_t         pad3[0xc8 - 0xc4];        /* 0x0c4 */
-     uint32_t        stfl_fac_list;            /* 0x0c8 */
-     uint8_t         pad4[0xe8 - 0xcc];        /* 0x0cc */
--    uint32_t        mcck_interruption_code[2]; /* 0x0e8 */
-+    uint64_t        mcic;                     /* 0x0e8 */
-     uint8_t         pad5[0xf4 - 0xf0];        /* 0x0f0 */
-     uint32_t        external_damage_code;     /* 0x0f4 */
-     uint64_t        failing_storage_address;  /* 0x0f8 */
-@@ -118,8 +118,8 @@ typedef struct LowCore {
-     uint32_t        fpt_creg_save_area;        /* 0x131c */
-     uint8_t         pad16[0x1324 - 0x1320];    /* 0x1320 */
-     uint32_t        tod_progreg_save_area;     /* 0x1324 */
--    uint32_t        cpu_timer_save_area[2];    /* 0x1328 */
--    uint32_t        clock_comp_save_area[2];   /* 0x1330 */
-+    uint64_t        cpu_timer_save_area;       /* 0x1328 */
-+    uint64_t        clock_comp_save_area;      /* 0x1330 */
-     uint8_t         pad17[0x1340 - 0x1338];    /* 0x1338 */
-     uint32_t        access_regs_save_area[16]; /* 0x1340 */
-     uint64_t        cregs_save_area[16];       /* 0x1380 */
+diff --git a/target/s390x/translate.c b/target/s390x/translate.c
+index 48b031894a..8da8610839 100644
+--- a/target/s390x/translate.c
++++ b/target/s390x/translate.c
+@@ -3897,7 +3897,10 @@ static ExitStatus op_stcke(DisasContext *s, DisasOps *o)
+ {
+     TCGv_i64 c1 = tcg_temp_new_i64();
+     TCGv_i64 c2 = tcg_temp_new_i64();
++    TCGv_i64 todpr = tcg_temp_new_i64();
+     gen_helper_stck(c1, cpu_env);
++    /* 16 bit value store in an uint32_t (only valid bits set) */
++    tcg_gen_ld32u_i64(todpr, cpu_env, offsetof(CPUS390XState, todpr));
+     /* Shift the 64-bit value into its place as a zero-extended
+        104-bit value.  Note that "bit positions 64-103 are always
+        non-zero so that they compare differently to STCK"; we set
+@@ -3905,11 +3908,13 @@ static ExitStatus op_stcke(DisasContext *s, DisasOps *o)
+     tcg_gen_shli_i64(c2, c1, 56);
+     tcg_gen_shri_i64(c1, c1, 8);
+     tcg_gen_ori_i64(c2, c2, 0x10000);
++    tcg_gen_or_i64(c2, c2, todpr);
+     tcg_gen_qemu_st64(c1, o->in2, get_mem_index(s));
+     tcg_gen_addi_i64(o->in2, o->in2, 8);
+     tcg_gen_qemu_st64(c2, o->in2, get_mem_index(s));
+     tcg_temp_free_i64(c1);
+     tcg_temp_free_i64(c2);
++    tcg_temp_free_i64(todpr);
+     /* ??? We don't implement clock states.  */
+     gen_op_movi_cc(s, 0);
+     return NO_EXIT;
 -- 
 2.14.3
