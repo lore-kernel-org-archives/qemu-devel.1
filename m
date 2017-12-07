@@ -1,34 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51027)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56377)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1eN1Md-0007ox-Un
-	for qemu-devel@nongnu.org; Thu, 07 Dec 2017 13:57:45 -0500
+	(envelope-from <eblake@redhat.com>) id 1eN1f8-0000LE-7y
+	for qemu-devel@nongnu.org; Thu, 07 Dec 2017 14:16:51 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1eN1Ma-0005QS-Q9
-	for qemu-devel@nongnu.org; Thu, 07 Dec 2017 13:57:44 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:47230)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1eN1Ma-0005Or-I9
-	for qemu-devel@nongnu.org; Thu, 07 Dec 2017 13:57:40 -0500
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
-	[10.5.11.13])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 671964900B
-	for <qemu-devel@nongnu.org>; Thu,  7 Dec 2017 18:57:39 +0000 (UTC)
-Date: Thu, 7 Dec 2017 18:57:29 +0000
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20171207185728.GG2439@work-vm>
-References: <20171205174100.GD2405@work-vm>
-	<90cb3043-cf68-2635-2dd9-f47cf5e8c10e@redhat.com>
-	<20171207162547.GD2439@work-vm>
-	<ab90f1b2-a360-e89d-32ea-9aebd7a65db3@redhat.com>
-	<20171207182348.GF2439@work-vm>
-	<7c88b2f7-45a3-a470-c458-7266c485befa@redhat.com>
+	(envelope-from <eblake@redhat.com>) id 1eN1f7-0005xE-7z
+	for qemu-devel@nongnu.org; Thu, 07 Dec 2017 14:16:50 -0500
+References: <20171207170834.15843-1-berto@igalia.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <83722fb4-2458-fc9c-ddfe-6b7e7b65ca46@redhat.com>
+Date: Thu, 7 Dec 2017 13:16:41 -0600
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <7c88b2f7-45a3-a470-c458-7266c485befa@redhat.com>
-Subject: Re: [Qemu-devel] Hotplug ram and vhost-user
+In-Reply-To: <20171207170834.15843-1-berto@igalia.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="xtJsthM05Hs1TdwBvKCJb0mvP5MkorvBH"
+Subject: Re: [Qemu-devel] [PATCH] iotests: Tweak 030 in order to trigger a
+ race condition with parallel jobs
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,174 +24,88 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Maxime Coquelin <maxime.coquelin@redhat.com>
-Cc: "Michael S. Tsirkin" <mst@redhat.com>, marcandre.lureau@redhat.com, qemu-devel@nongnu.org, Victor Kaplansky <vkaplans@redhat.com>
+To: Alberto Garcia <berto@igalia.com>, qemu-devel@nongnu.org
+Cc: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>
 
-* Maxime Coquelin (maxime.coquelin@redhat.com) wrote:
-> 
-> 
-> On 12/07/2017 07:23 PM, Dr. David Alan Gilbert wrote:
-> > * Maxime Coquelin (maxime.coquelin@redhat.com) wrote:
-> > > 
-> > > 
-> > > On 12/07/2017 05:25 PM, Dr. David Alan Gilbert wrote:
-> > > > * Maxime Coquelin (maxime.coquelin@redhat.com) wrote:
-> > > > > Hi David,
-> > > > > 
-> > > > > On 12/05/2017 06:41 PM, Dr. David Alan Gilbert wrote:
-> > > > > > Hi,
-> > > > > >      Since I'm reworking the memory map update code I've been
-> > > > > > trying to test it with hot adding RAM; but even on upstream
-> > > > > > I'm finding that hot adding RAM causes the guest to stop passing
-> > > > > > packets with vhost-user-bridge;  have either of you seen the same
-> > > > > > thing?
-> > > > > 
-> > > > > No, I have never tried this.
-> > > > 
-> > > > Would you know if it works on dpdk?
-> > > 
-> > > We have a known issue in DPDK, the PMD threads might be accessing the
-> > > guest memory while the vhost-user protocol thread is unmapping it.
-> > > 
-> > > We have a similar problem with dirty logging area, and Victor is working
-> > > on a patch that will fix both issues.
-> > > 
-> > > Once ready, I'll have a try and let you know.
-> > > 
-> > > > > > I'm doing:
-> > > > > > ./tests/vhost-user-bridge -u /tmp/vubrsrc.sock
-> > > > > > $QEMU -enable-kvm -m 1G,maxmem=2G,slots=4 -smp 2 -object memory-backend-file,id=mem,size=1G,mem-path=/dev/shm,share=on -numa node,memdev=mem -mem-prealloc -trace events=vhost-trace-file -chardev socket,id=char0,path=/tmp/vubrsrc.sock -netdev type=vhost-user,id=mynet1,chardev=char0,vhostforce -device virtio-net-pci,netdev=mynet1 $IMAGE -net none
-> > > > > > 
-> > > > > > (with a f27 guest) and then doing:
-> > > > > > (qemu) object_add memory-backend-file,id=mem1,size=256M,mem-path=/dev/shm
-> > > > > > (qemu) device_add pc-dimm,id=dimm1,memdev=mem1
-> > > > > > 
-> > > > > > but then not getting any responses inside the guest.
-> > > > > > 
-> > > > > > I can see the code sending another set-mem-table with the
-> > > > > > extra chunk of RAM and fd, and I think I can see the bridge
-> > > > > > mapping it.
-> > > > > 
-> > > > > I think there are at least two problems.
-> > > > > The first one is that vhost-user-bridge does not support vhost-user
-> > > > > protocol's reply-ack feature. So when QEMU sends the requests, it cannot
-> > > > > know whether/when it has been handled by the backend.
-> > > > 
-> > > > Wouldn't you have to be unlucky to cause that a problem - i.e. the
-> > > > descriptors would have to get allocated in the new RAM?
-> > > 
-> > > Yes, you may be right. I think it is worth to debug it to understand
-> > > what is going on.
-> > > 
-> > > > > It had been fixed by sending a GET_FEATURE requests to be sure the
-> > > > > SET_MEM_TABLE was handled, as messages are processed in order. The problem
-> > > > > is that it caused some test failures when using TCG, so it got
-> > > > > reverted.
-> > > > > 
-> > > > > The initial fix:
-> > > > > 
-> > > > > commit 28ed5ef16384f12500abd3647973ee21b03cbe23
-> > > > > Author: Prerna Saxena <prerna.saxena@nutanix.com>
-> > > > > Date:   Fri Aug 5 03:53:51 2016 -0700
-> > > > > 
-> > > > >       vhost-user: Attempt to fix a race with set_mem_table.
-> > > > > 
-> > > > > The revert:
-> > > > > 
-> > > > > commit 94c9cb31c04737f86be29afefbff401cd23bc24d
-> > > > > Author: Michael S. Tsirkin <mst@redhat.com>
-> > > > > Date:   Mon Aug 15 16:35:24 2016 +0300
-> > > > > 
-> > > > >       Revert "vhost-user: Attempt to fix a race with set_mem_table."
-> > > > > 
-> > > > 
-> > > > Do we know which tests fail?
-> > > 
-> > > vhost-user-test, but it should no more be failing now that it no more
-> > > uses TCG.
-> > > 
-> > > I think we could consider reverting the revert. i.e. send get_features
-> > > in set_mem_table toi be sure it has been handled.
-> > 
-> > How does it fail? Does it fail every time or only some times?
-> > (The postcopy test in migration-test.c also fails under TCG under
-> > very heavy load and I've not figured out why yet).
-> 
-> I'm trying to remember the analysis I did one year ago... I don't have
-> yet the full picture, but found some notes I took at that time:
-> 
-> "
-> I have managed to reproduce the hang by adding some debug prints into
-> vhost_user_get_features().
-> 
-> Doing this the issue is reproducible quite easily.
-> Another way to reproduce it in one shot is to strace (with following
-> forks) /vhost-user-test execution.
-> 
-> So, by adding debug prints at vhost_user_get_features() entry and exit,
-> we can see we never return from this function when hang happens.
-> Strace of Qemu instance shows that its thread keeps retrying to receive
-> GET_FEATURE reply:
-> 
-> write(1, "vhost_user_get_features IN: \n", 29) = 29
-> sendmsg(11, {msg_name=NULL, msg_namelen=0,
->         msg_iov=[{iov_base="\1\0\0\0\1\0\0\0\0\0\0\0", iov_len=12}],
->         msg_iovlen=1, msg_controllen=0, msg_flags=0}, 0) = 12
-> recvmsg(11, {msg_namelen=0}, MSG_CMSG_CLOEXEC) = -1 EAGAIN
-> nanosleep({0, 100000}, 0x7fff29f8dd70)  = 0
-> ...
-> recvmsg(11, {msg_namelen=0}, MSG_CMSG_CLOEXEC) = -1 EAGAIN
-> nanosleep({0, 100000}, 0x7fff29f8dd70)  = 0
-> 
-> The reason is that vhost-user-test never replies to Qemu,
-> because its thread handling the GET_FEATURES command is waiting for
-> the s->data_mutex lock.
-> This lock is held by the other vhost-user-test thread, executing
-> read_guest_mem().
-> 
-> The lock is never released because the thread is blocked in read
-> syscall, when read_guest_mem() is doing the readl().
-> 
-> This is because on Qemu side, the thread polling the qtest socket is
-> waiting for the qemu_global_mutex (in os_host_main_loop_wait()), but
-> the mutex is held by the thread trying to get the GET_FEATURE reply
-> (the TCG one).
-> "
-> 
-> It does not explain why it would only fail with TCG, I would need to
-> spend some time investigating the issue to find why I claimed this.
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--xtJsthM05Hs1TdwBvKCJb0mvP5MkorvBH
+From: Eric Blake <eblake@redhat.com>
+To: Alberto Garcia <berto@igalia.com>, qemu-devel@nongnu.org
+Cc: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org,
+ Max Reitz <mreitz@redhat.com>
+Message-ID: <83722fb4-2458-fc9c-ddfe-6b7e7b65ca46@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH] iotests: Tweak 030 in order to trigger a
+ race condition with parallel jobs
+References: <20171207170834.15843-1-berto@igalia.com>
+In-Reply-To: <20171207170834.15843-1-berto@igalia.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-That sounds like a very repeatable bug; much more so than my postcopy
-case;  is your case that it's just anything that slows it down - be it
-some debug, an strace or a slow tcg?
+On 12/07/2017 11:08 AM, Alberto Garcia wrote:
+> This patch tweaks TestParallelOps in iotest 030 so it allocates data
+> in smaller regions (256KB/512KB instead of 512KB/1MB) and the
+> block-stream job in test_stream_commit() only needs to copy data that
+> is at the very end of the image.
+>=20
+> This way when the block-stream job is waken up it will finish right
 
-Dave
+s/waken up/awakened/
 
-> Maxime
-> > Dave
-> > 
-> > > > > Another problem is that memory mmapped with previous call does not seems
-> > > > > to be unmapped, but that should not cause other problems than leaking
-> > > > > virtual memory.
-> > > > 
-> > > > Oh, leaks are the least of our problem there!
-> > > 
-> > > Sure.
-> > > 
-> > > Maxime
-> > > > Dave
-> > > > 
-> > > > > Maxime
-> > > > > > Dave
-> > > > > > 
-> > > > > > --
-> > > > > > Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
-> > > > > > 
-> > > > --
-> > > > Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
-> > > > 
-> > --
-> > Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
-> > 
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+> away without any chance of being stopped by block_job_sleep_ns(). This
+> triggers the bug that was fixed by 3d5d319e1221082974711af1d09d82f07
+> and is therefore a more useful test case for parallel block jobs.
+>=20
+> After this patch the aforementiond bug can also be reproduced with the
+> test_stream_parallel() test case.
+>=20
+> Signed-off-by: Alberto Garcia <berto@igalia.com>
+> ---
+>  tests/qemu-iotests/030 | 12 ++++++------
+>  1 file changed, 6 insertions(+), 6 deletions(-)
+>=20
+
+>          # Put data into the images we are copying data from
+>          for i in range(self.num_imgs / 2):
+> -            img_index =3D i * 2 + 1
+> -            # Alternate between 512k and 1M.
+> +            img_index =3D self.num_imgs - i * 2 - 2
+> +            # Alternate between 256KB and 512KB.
+>              # This way jobs will not finish in the same order they wer=
+e created
+> -            num_kb =3D 512 + 512 * (i % 2)
+> +            num_kb =3D 256 + 256 * (i % 2)
+>              qemu_io('-f', iotests.imgfmt,
+> -                    '-c', 'write -P %d %d %d' % (i, i*1024*1024, num_k=
+b * 1024),
+> +                    '-c', 'write -P 0xFF %dk %dk' % (i * 512, num_kb),=
+
+
+I guess changing from a variable to a fixed 0xff pattern doesn't make a
+difference?
+
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
+
+
+--xtJsthM05Hs1TdwBvKCJb0mvP5MkorvBH
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlopk5kACgkQp6FrSiUn
+Q2oZNQf/f3sZ008qIeFH3xTObGXoIg2V33UP4nmFyCzDrFiPCdk3f7zjdKy0tJJ+
+qVzLlFAexvBQIkRqfnCjTOyoQkQjxPR16BCH5YX03HkGowhhR2LEYKlEnB5Oe135
+VO5aaugQ+XaDHhqfuopOmcM7Uk+h42rDqfpwerQBfQzT2BtPfvCqH5wOcolK6fOB
+PKmW+hzINY7gLP6ip+3vqVMhipMM0rnAiW9KxjV0vk4WUXbQ3Ka5eQWD2DCd9sOI
+zeneJYrtR2bUQznqp29n5mzhwF2xYM+6jr+iguaRTqCa4ugsB3YdDOaafQc5gyEG
+I2b7m8WpZQlo29BLXXfB9tY0f+kRSA==
+=1q1O
+-----END PGP SIGNATURE-----
+
+--xtJsthM05Hs1TdwBvKCJb0mvP5MkorvBH--
