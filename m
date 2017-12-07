@@ -1,31 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43944)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44171)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <tcminyard@gmail.com>) id 1eN3h8-0002tC-Jk
-	for qemu-devel@nongnu.org; Thu, 07 Dec 2017 16:27:03 -0500
+	(envelope-from <eblake@redhat.com>) id 1eN3i8-0004jk-Gu
+	for qemu-devel@nongnu.org; Thu, 07 Dec 2017 16:28:05 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <tcminyard@gmail.com>) id 1eN3h5-0007mL-Ds
-	for qemu-devel@nongnu.org; Thu, 07 Dec 2017 16:27:02 -0500
-Received: from mail-pg0-x235.google.com ([2607:f8b0:400e:c05::235]:34058)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <tcminyard@gmail.com>) id 1eN3h5-0007m9-7D
-	for qemu-devel@nongnu.org; Thu, 07 Dec 2017 16:26:59 -0500
-Received: by mail-pg0-x235.google.com with SMTP id j4so5363499pgp.1
-	for <qemu-devel@nongnu.org>; Thu, 07 Dec 2017 13:26:59 -0800 (PST)
-Received: from [192.168.27.3] ([47.184.168.85])
-	by smtp.gmail.com with ESMTPSA id
-	w184sm8922158pgb.36.2017.12.07.13.26.55 for <qemu-devel@nongnu.org>
-	(version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-	Thu, 07 Dec 2017 13:26:56 -0800 (PST)
-Sender: Corey Minyard <tcminyard@gmail.com>
-Reply-To: minyard@acm.org
-From: Corey Minyard <minyard@acm.org>
-Message-ID: <8346e247-3512-e0c9-a5aa-5b3475f36d39@acm.org>
-Date: Thu, 7 Dec 2017 15:26:54 -0600
+	(envelope-from <eblake@redhat.com>) id 1eN3i7-0008NT-Fp
+	for qemu-devel@nongnu.org; Thu, 07 Dec 2017 16:28:04 -0500
+References: <20171206144550.22295-1-stefanha@redhat.com>
+	<20171206144550.22295-4-stefanha@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <7277043f-1b5f-4576-a2e5-c4e3d6950a62@redhat.com>
+Date: Thu, 7 Dec 2017 15:27:50 -0600
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 8bit
-Content-Language: en-GB
-Subject: [Qemu-devel] IPMI and I2C changes coming up
+In-Reply-To: <20171206144550.22295-4-stefanha@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="uKRxpd1qSFwtiiBtKHO82ufVm9W3EgCnV"
+Subject: Re: [Qemu-devel] [PATCH v2 3/9] block: don't keep AioContext
+ acquired after drive_backup_prepare()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,65 +25,87 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel <qemu-devel@nongnu.org>
+To: Stefan Hajnoczi <stefanha@redhat.com>, qemu-devel@nongnu.org
+Cc: Kevin Wolf <kwolf@redhat.com>, John Snow <jsnow@redhat.com>, qemu-block@nongnu.org
 
-I've been carrying around a lot of changes for IPMI and I2C for a while,
-and I'd like to get at least some of these into mainstream qemu in the
-release after the one about to release.
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--uKRxpd1qSFwtiiBtKHO82ufVm9W3EgCnV
+From: Eric Blake <eblake@redhat.com>
+To: Stefan Hajnoczi <stefanha@redhat.com>, qemu-devel@nongnu.org
+Cc: Kevin Wolf <kwolf@redhat.com>, John Snow <jsnow@redhat.com>,
+ qemu-block@nongnu.org
+Message-ID: <7277043f-1b5f-4576-a2e5-c4e3d6950a62@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v2 3/9] block: don't keep AioContext acquired
+ after drive_backup_prepare()
+References: <20171206144550.22295-1-stefanha@redhat.com>
+ <20171206144550.22295-4-stefanha@redhat.com>
+In-Reply-To: <20171206144550.22295-4-stefanha@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-For the SMBus changes, I've noticed that nobody is a maintainer for
-the I2C code.  I could take that job.  I'd be especially happy to do that
-if it came with an easier way to get patches into qemu.
+On 12/06/2017 08:45 AM, Stefan Hajnoczi wrote:
+> Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
+> ---
+>  blockdev.c | 42 ++++++++++++++++++++++++++++++++++--------
+>  1 file changed, 34 insertions(+), 8 deletions(-)
+>=20
 
-I use a lot of this for my testing, so I don't know if anyone will use
-much of this
+> @@ -1867,24 +1867,36 @@ static void drive_backup_prepare(BlkActionState=
+ *common, Error **errp)
+>          return;
+>      }
+> =20
+> -    /* AioContext is released in .clean() */
+> -    state->aio_context =3D bdrv_get_aio_context(bs);
+> -    aio_context_acquire(state->aio_context);
+> +    aio_context =3D bdrv_get_aio_context(bs);
+> +    aio_context_acquire(aio_context);
+> +
+> +    /* Paired with .clean() */
+>      bdrv_drained_begin(bs);
+> +
+>      state->bs =3D bs;
+> =20
+>      state->job =3D do_drive_backup(backup, common->block_job_txn, &loc=
+al_err);
+>      if (local_err) {
+>          error_propagate(errp, local_err);
+> -        return;
+> +        goto out;
+>      }
+> +
+> +out:
+> +    aio_context_release(aio_context);
 
-Anyway, I'm going to split this up into sets to make things easier, so
-you can ignore what you don't care about.  These are:
+Looks a bit funny to have a label with a single use that would fall
+through to the same location anyways.  But it's fine from the future
+maintenance point of view, so no need to change it.
 
-Small IPMI (and other) fixes
+Reviewed-by: Eric Blake <eblake@redhat.com>
 
-These are various small IPMI fixes.  It would be really nice to get at
-least some of these into the upcoming release.  Most of these have
-been submitted a few times, but I haven't been able to get someone
-to pick them up.
-
-
-Add PCI IPMI interfaces
-
-I had to do some testing, so I went ahead and did this.  Most of the
-changes are re-arranging and splitting up code to separate out the
-KCS/BT code from the ISA-specific code.
-
-There are also some migration fixes here.
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
 
 
-pm_smbus fixes and and IPMI SMBus device
+--uKRxpd1qSFwtiiBtKHO82ufVm9W3EgCnV
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
 
-the pm_smbus code has a few issues, and it's missing a lot of the
-device capabilities required by IPMI.  This has been submitted
-before, but it has some new things, like vmstate handling for the
-smbus devices.
+-----BEGIN PGP SIGNATURE-----
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
 
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlopslYACgkQp6FrSiUn
+Q2qK5Qf+J1zn1qtMs08x8kU+FHospPft94twLzeTpmB0cJ+H+rxk1uO8XWCaAqw5
+mQmf936GkAZIdjMgpwokCs8NumnDUUlHTqM60QXlDfHXwsPagH3KokxQugzpgWdF
+DJ48S/iNsL3uymbIhvXsXjf8KmCcAnepqpVAkAPyTmxjzJOOg9x3EnwzE3pSEFnl
+aU6pzZ69CH5bScYu4BKoD6GihswUBVdLJRHtgNyjooPTLt9E5HHkziB4xPNJVZVl
+T7qJjhguE/WihK+H8uRvr8XV0jZf/ErI7AvG3a0cSST0F4AdT6MyCtOWH2/F6dxg
+K2PTNUHtYn2QViRuECoWwsXu0X7iMQ==
+=jYge
+-----END PGP SIGNATURE-----
 
-I also have a few things that are probably not ready for mainstream,
-but people may be interested.  They are in my git tree:
-
-Support for an SMBus alert device.  Part of this adds an abstract
-interrupt device, which lets you advertise interrupts in a way that
-the user doesn't have to know anything about the interrupt.  So
-A device (like an SMBus alert device) could use an ISA interrupt,
-or a PCI interrupt, or a GPIO line.  I'm not sure about that the
-interrupt device, but without it you would have to create a separate
-SMBus alert device for every type of interrupt that used it.
-
-A PCA9540 bus bridge and PCI9541 multi-master bus controller.
-I needed to do some testing with these.  It requires some creative
-changes to the I2C code and the qdev bus code.  But if anyone
-wants a bus bridge, it's available.
-
-Sorry for the long email.
-
-Thanks,
-
--corey
+--uKRxpd1qSFwtiiBtKHO82ufVm9W3EgCnV--
