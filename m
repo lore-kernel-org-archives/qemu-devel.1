@@ -1,22 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54709)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56562)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1eN47l-0004Rz-LH
-	for qemu-devel@nongnu.org; Thu, 07 Dec 2017 16:54:34 -0500
+	(envelope-from <eblake@redhat.com>) id 1eN4Bl-0001Lw-Ko
+	for qemu-devel@nongnu.org; Thu, 07 Dec 2017 16:58:46 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1eN47k-0004Bh-QR
-	for qemu-devel@nongnu.org; Thu, 07 Dec 2017 16:54:33 -0500
+	(envelope-from <eblake@redhat.com>) id 1eN4Bh-0007ai-35
+	for qemu-devel@nongnu.org; Thu, 07 Dec 2017 16:58:41 -0500
 References: <20171206144550.22295-1-stefanha@redhat.com>
-	<20171206144550.22295-9-stefanha@redhat.com>
+	<20171206144550.22295-10-stefanha@redhat.com>
 From: Eric Blake <eblake@redhat.com>
-Message-ID: <ede7cdd7-74d9-da98-7484-8ae80379f862@redhat.com>
-Date: Thu, 7 Dec 2017 15:54:19 -0600
+Message-ID: <80a991ec-26ad-c65f-bd15-6a5fc82c6e57@redhat.com>
+Date: Thu, 7 Dec 2017 15:58:21 -0600
 MIME-Version: 1.0
-In-Reply-To: <20171206144550.22295-9-stefanha@redhat.com>
+In-Reply-To: <20171206144550.22295-10-stefanha@redhat.com>
 Content-Type: multipart/signed; micalg=pgp-sha256;
 	protocol="application/pgp-signature";
-	boundary="jA2ja0SJN91OU7XKfmGHRMaDeEquIfRs9"
-Subject: Re: [Qemu-devel] [PATCH v2 8/9] blockdev: add
- x-blockdev-set-iothread testing command
+	boundary="rdXfQhBpT68JnS4oEHtb9vugkADuGUOWi"
+Subject: Re: [Qemu-devel] [PATCH v2 9/9] qemu-iotests: add 202 external
+ snapshots IOThread test
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,64 +29,59 @@ To: Stefan Hajnoczi <stefanha@redhat.com>, qemu-devel@nongnu.org
 Cc: Kevin Wolf <kwolf@redhat.com>, John Snow <jsnow@redhat.com>, qemu-block@nongnu.org
 
 This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---jA2ja0SJN91OU7XKfmGHRMaDeEquIfRs9
+--rdXfQhBpT68JnS4oEHtb9vugkADuGUOWi
 From: Eric Blake <eblake@redhat.com>
 To: Stefan Hajnoczi <stefanha@redhat.com>, qemu-devel@nongnu.org
 Cc: Kevin Wolf <kwolf@redhat.com>, John Snow <jsnow@redhat.com>,
  qemu-block@nongnu.org
-Message-ID: <ede7cdd7-74d9-da98-7484-8ae80379f862@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v2 8/9] blockdev: add x-blockdev-set-iothread
- testing command
+Message-ID: <80a991ec-26ad-c65f-bd15-6a5fc82c6e57@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v2 9/9] qemu-iotests: add 202 external
+ snapshots IOThread test
 References: <20171206144550.22295-1-stefanha@redhat.com>
- <20171206144550.22295-9-stefanha@redhat.com>
-In-Reply-To: <20171206144550.22295-9-stefanha@redhat.com>
+ <20171206144550.22295-10-stefanha@redhat.com>
+In-Reply-To: <20171206144550.22295-10-stefanha@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
 
 On 12/06/2017 08:45 AM, Stefan Hajnoczi wrote:
-> Currently there is no easy way for iotests to ensure that a BDS is boun=
-d
-> to a particular IOThread.  Normally the virtio-blk device calls
-> blk_set_aio_context() when dataplane is enabled during guest driver
-> initialization.  This never happens in iotests since -machine
-> accel=3Dqtest means there is no guest activity (including device driver=
-
-> initialization).
->=20
-> This patch adds a QMP command to explicitly assign IOThreads in test
-> cases.  See qapi/block-core.json for a description of the command.
-
-The x- prefix is perfect for this.
-
+> QMP 'transaction' blockdev-snapshot-sync with multiple disks in an
+> IOThread is an untested code path.  Several bugs have been found in
+> connection with this command.  This patch adds a test case to prevent
+> future regressions.
 >=20
 > Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
 > ---
->  qapi/block-core.json | 36 ++++++++++++++++++++++++++++++++++++
->  blockdev.c           | 41 +++++++++++++++++++++++++++++++++++++++++
->  2 files changed, 77 insertions(+)
+>  tests/qemu-iotests/202     | 95 ++++++++++++++++++++++++++++++++++++++=
+++++++++
+>  tests/qemu-iotests/202.out | 11 ++++++
+>  tests/qemu-iotests/group   |  1 +
+>  3 files changed, 107 insertions(+)
+>  create mode 100755 tests/qemu-iotests/202
+>  create mode 100644 tests/qemu-iotests/202.out
 >=20
 
-> +##
-> +# @x-blockdev-set-iothread:
-> +#
-> +# Move @node and its children into the @iothread.  If @iothread is nul=
-l then
-> +# move @node and its children into the main loop.
-> +#
-> +# The node must not be attached to a BlockBackend.
-> +#
-> +# @node-name: the name of the block driver node
-> +#
-> +# @iothread: the name of the IOThread object or null for the main loop=
+> +# Creator/Owner: Stefan Hajnoczi <stefanha@redhat.com>
 
-> +#
-> +# Note: this command is experimental and intended for test cases that =
-need
-> +# control over IOThreads only.
+There's another cleanup series posted that drops these sorts of lines in
+favor of git history.
 
-I'd place 'only' sooner; it fits better as 'intended only for ...'.
+> +++ b/tests/qemu-iotests/202.out
+> @@ -0,0 +1,11 @@
+> +Launching VM...
+> +Adding IOThread...
+> +{u'return': {}}
+> +Adding blockdevs...
+> +{u'return': {}}
+> +{u'return': {}}
+> +Setting iothread...
+> +{u'return': {}}
+> +{u'return': {}}
+> +Creating external snapshots...
+> +{u'return': {}}
 
-As a wording tweak is minor,
+Yay - a python test with sane output - if I had to, I could actually
+debug this test without too much effort!
+
 Reviewed-by: Eric Blake <eblake@redhat.com>
 
 --=20
@@ -95,7 +90,7 @@ Red Hat, Inc.           +1-919-301-3266
 Virtualization:  qemu.org | libvirt.org
 
 
---jA2ja0SJN91OU7XKfmGHRMaDeEquIfRs9
+--rdXfQhBpT68JnS4oEHtb9vugkADuGUOWi
 Content-Type: application/pgp-signature; name="signature.asc"
 Content-Description: OpenPGP digital signature
 Content-Disposition: attachment; filename="signature.asc"
@@ -104,14 +99,14 @@ Content-Disposition: attachment; filename="signature.asc"
 Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
 Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
 
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlopuIsACgkQp6FrSiUn
-Q2o4uwgAgIGmO3CNLex35OXLBbZJzV7aR6AWiPAqpJHwbemOLG0yErPql2eBWnkl
-z+hvnRxk8F8xSo5HH9SwdzW2TzmOUCiy+CzICAYsKmsQHILl9l3gaoCQVucCxRnU
-zWbUgw0V2Mlq06f2mOkmnPupsve3JJTplEsKWZZM8SFlw9vN7HK4prpycY0MMYcI
-c2ptPgOrm3BWwLKlvPh9oiKLKb+q+paPd25aTUNSAJ+GlCae2CTdDJObyOd/PqLW
-Z7vt8g35V2IzuFK5aJeG2thdJWXqq1RCU8jS+uiajjPbQA9YloTZAw/x9ipbYDp5
-mIX+xIyCDBxINJc8ANoVMU5s5WEOQA==
-=00Zk
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlopuX0ACgkQp6FrSiUn
+Q2rZyQgAlz9vqucbuR0ndYZ9b+AUkaKsl2VZfXCriUwy3AK2T1o/LOhf1n2jTB5t
+ObhOj9SovHXYxpulOqxzAAJw6kWTBcKA8XrCKiWX9Z0/Q5GCL3r7yonIdCxxyat0
+7VsPFR98KZJNSKvGeKB8nic1ey2RdJK9RknOn2Bpio6usrBEGd1dFNxtqnU/37JY
+HJjV49U+5Wbs/sWL4Lo3UKWm5CS0LplmuePSSQplvh56sNSGw1SndVozBHl7k43E
+TLtHzDNMtyITPXx509UOoXCrT8giaRCe+Z3A0QQFzPJiyOV0lD8a9I2rjeqRCpIw
+gRv0oObHtl49BkhNPJHrdH3m1h/XcQ==
+=41bd
 -----END PGP SIGNATURE-----
 
---jA2ja0SJN91OU7XKfmGHRMaDeEquIfRs9--
+--rdXfQhBpT68JnS4oEHtb9vugkADuGUOWi--
