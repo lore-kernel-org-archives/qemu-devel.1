@@ -1,26 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34678)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34950)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1eMzFr-0004mv-I0
-	for qemu-devel@nongnu.org; Thu, 07 Dec 2017 11:42:36 -0500
+	(envelope-from <maxime.coquelin@redhat.com>) id 1eMzGO-000559-5A
+	for qemu-devel@nongnu.org; Thu, 07 Dec 2017 11:43:09 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1eMzFo-0004kt-Fl
-	for qemu-devel@nongnu.org; Thu, 07 Dec 2017 11:42:35 -0500
-Date: Thu, 7 Dec 2017 17:42:24 +0100
-From: Cornelia Huck <cohuck@redhat.com>
-Message-ID: <20171207174224.779baf34.cohuck@redhat.com>
-In-Reply-To: <89a78374-25fe-76c5-3a96-deaa1ff6b391@linux.vnet.ibm.com>
-References: <20171108165422.46267-1-pasic@linux.vnet.ibm.com>
-	<20171108165422.46267-2-pasic@linux.vnet.ibm.com>
-	<e2e2ae84-e04a-df4f-50bb-328768a5464e@redhat.com>
-	<20171207125901.47be0af1.cohuck@redhat.com>
-	<87df13b9-c494-c8b4-49cf-b7ef4640d05a@linux.vnet.ibm.com>
-	<20171207135756.1f84ed41.cohuck@redhat.com>
-	<89a78374-25fe-76c5-3a96-deaa1ff6b391@linux.vnet.ibm.com>
+	(envelope-from <maxime.coquelin@redhat.com>) id 1eMzGK-00055t-Nm
+	for qemu-devel@nongnu.org; Thu, 07 Dec 2017 11:43:08 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:40846)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <maxime.coquelin@redhat.com>)
+	id 1eMzGK-00054w-Dd
+	for qemu-devel@nongnu.org; Thu, 07 Dec 2017 11:43:04 -0500
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+	[10.5.11.13])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 76C6D83F47
+	for <qemu-devel@nongnu.org>; Thu,  7 Dec 2017 16:43:03 +0000 (UTC)
+References: <20171205174100.GD2405@work-vm>
+	<90cb3043-cf68-2635-2dd9-f47cf5e8c10e@redhat.com>
+	<20171207162547.GD2439@work-vm>
+From: Maxime Coquelin <maxime.coquelin@redhat.com>
+Message-ID: <ab90f1b2-a360-e89d-32ea-9aebd7a65db3@redhat.com>
+Date: Thu, 7 Dec 2017 17:42:46 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+In-Reply-To: <20171207162547.GD2439@work-vm>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [RFC PATCH v2 1/3] s390x/ccs: add ccw-testdev
- emulated device
+Subject: Re: [Qemu-devel] Hotplug ram and vhost-user
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,94 +36,107 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Halil Pasic <pasic@linux.vnet.ibm.com>
-Cc: Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>, Thomas Huth <thuth@redhat.com>, Pierre Morel <pmorel@linux.vnet.ibm.com>, qemu-s390x@nongnu.org, qemu-devel@nongnu.org
+To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Cc: marcandre.lureau@redhat.com, qemu-devel@nongnu.org, "Michael S. Tsirkin" <mst@redhat.com>, Victor Kaplansky <vkaplans@redhat.com>
 
-On Thu, 7 Dec 2017 17:35:26 +0100
-Halil Pasic <pasic@linux.vnet.ibm.com> wrote:
 
-> On 12/07/2017 01:57 PM, Cornelia Huck wrote:
-> > On Thu, 7 Dec 2017 13:38:22 +0100
-> > Halil Pasic <pasic@linux.vnet.ibm.com> wrote:
-> >   
-> >> On 12/07/2017 12:59 PM, Cornelia Huck wrote:  
-> >>> On Thu, 7 Dec 2017 07:33:19 +0100
-> >>> Thomas Huth <thuth@redhat.com> wrote:
-> >>>     
-> >>>> On 08.11.2017 17:54, Halil Pasic wrote:    
-> >>>     
-> >>>>> +static ccw_cb_t get_ccw_cb(CcwTestDevOpMode op_mode)
-> >>>>> +{
-> >>>>> +    switch (op_mode) {
-> >>>>> +    case OP_MODE_FIB:
-> >>>>> +        return ccw_testdev_ccw_cb_mode_fib;
-> >>>>> +    case OP_MODE_NOP:
-> >>>>> +    default:
-> >>>>> +        return ccw_testdev_ccw_cb_mode_nop;      
-> >>>>
-> >>>> Do we really want to use "nop" for unknown modes? Or should there rather
-> >>>> be a ccw_testdev_ccw_cb_mode_error instead, too?    
-> >>>
-> >>> I like the idea of an error mode.    
-> >>
-> >> What would be the benefit of the error mode? The idea is that
-> >> the tester in the guest has a certain set of tests implemented
-> >> each requiring certain behavior from the device. This behavior
-> >> is represented by the mode.
-> >>
-> >> If the device does not support the mode, the set of tests can't
-> >> be executed meaningfully. The only option is either ignore them
-> >> (and preferably report them as ignored), or fail them (not soo
-> >> good in my opinion).  
-> > 
-> > Failing it sounds superior to me: You really want to know if something
-> > does not work as expected.
-> >   
-> 
-> When doing unit tests it's usual to differentiate between:
-> * success, which ideally should give you guarantees about the unit
-> not misbehaving in production if client code respects the contract
-> * failure, which ideally should pretty much narrow down what
-> went wrong
-> * ignored, either due to user explicitly disabled a test, or
-> a precondition for executing the was not met.
-> 
-> If you think traffic light its green, red and yellow respectively.
-> 
-> For instance qemu-iotests also skips tests where the environment
-> does not provide a preconditions necessary to execute it.
-> 
-> Of course a quality gate for a release should really be the suite
-> executed successfully (green), and not some tests were skipped.
-> 
-> A quality gate for let's day sending a series to the list could
-> also be defined less rigorous. 
-> 
-> >>
-> >> The in guest tester should simply iterate over it test sets
-> >> and try to select the mode the test set (or suite in other
-> >> terminology) requires. If selecting the mode fails, than
-> >> means you are working with an old ccw-testdev.
-> >>  
-> >>>
-> >>> Related: Should the device have a mechanism to report the supported
-> >>> modes?
-> >>>     
-> >>
-> >> I don't see the value. See above. I think the set mode operation
-> >> reporting failure is sufficient.
-> >>
-> >> But if you have something in mind, please do tell. I'm open.  
-> > 
-> > If we keep guest/host in lockstep, we probably don't need this. But if
-> > not, self-reporting looks like a reasonable feature as it gives more
-> > flexibility.
-> >   
-> I would prefer adding this should the need arise instead of
-> speculatively. Would that be fine for you.
-> 
-> BTW if interface stability is a concern maybe making the device
-> experimental (at least for a while) is a good idea.
 
-Well, if we used qtests, we would be fine without an error state, as
-both sides have the same features.
+On 12/07/2017 05:25 PM, Dr. David Alan Gilbert wrote:
+> * Maxime Coquelin (maxime.coquelin@redhat.com) wrote:
+>> Hi David,
+>>
+>> On 12/05/2017 06:41 PM, Dr. David Alan Gilbert wrote:
+>>> Hi,
+>>>     Since I'm reworking the memory map update code I've been
+>>> trying to test it with hot adding RAM; but even on upstream
+>>> I'm finding that hot adding RAM causes the guest to stop passing
+>>> packets with vhost-user-bridge;  have either of you seen the same
+>>> thing?
+>>
+>> No, I have never tried this.
+> 
+> Would you know if it works on dpdk?
+
+We have a known issue in DPDK, the PMD threads might be accessing the
+guest memory while the vhost-user protocol thread is unmapping it.
+
+We have a similar problem with dirty logging area, and Victor is working
+on a patch that will fix both issues.
+
+Once ready, I'll have a try and let you know.
+
+>>> I'm doing:
+>>> ./tests/vhost-user-bridge -u /tmp/vubrsrc.sock
+>>> $QEMU -enable-kvm -m 1G,maxmem=2G,slots=4 -smp 2 -object memory-backend-file,id=mem,size=1G,mem-path=/dev/shm,share=on -numa node,memdev=mem -mem-prealloc -trace events=vhost-trace-file -chardev socket,id=char0,path=/tmp/vubrsrc.sock -netdev type=vhost-user,id=mynet1,chardev=char0,vhostforce -device virtio-net-pci,netdev=mynet1 $IMAGE -net none
+>>>
+>>> (with a f27 guest) and then doing:
+>>> (qemu) object_add memory-backend-file,id=mem1,size=256M,mem-path=/dev/shm
+>>> (qemu) device_add pc-dimm,id=dimm1,memdev=mem1
+>>>
+>>> but then not getting any responses inside the guest.
+>>>
+>>> I can see the code sending another set-mem-table with the
+>>> extra chunk of RAM and fd, and I think I can see the bridge
+>>> mapping it.
+>>
+>> I think there are at least two problems.
+>> The first one is that vhost-user-bridge does not support vhost-user
+>> protocol's reply-ack feature. So when QEMU sends the requests, it cannot
+>> know whether/when it has been handled by the backend.
+> 
+> Wouldn't you have to be unlucky to cause that a problem - i.e. the
+> descriptors would have to get allocated in the new RAM?
+
+Yes, you may be right. I think it is worth to debug it to understand
+what is going on.
+
+>> It had been fixed by sending a GET_FEATURE requests to be sure the
+>> SET_MEM_TABLE was handled, as messages are processed in order. The problem
+>> is that it caused some test failures when using TCG, so it got
+>> reverted.
+>>
+>> The initial fix:
+>>
+>> commit 28ed5ef16384f12500abd3647973ee21b03cbe23
+>> Author: Prerna Saxena <prerna.saxena@nutanix.com>
+>> Date:   Fri Aug 5 03:53:51 2016 -0700
+>>
+>>      vhost-user: Attempt to fix a race with set_mem_table.
+>>
+>> The revert:
+>>
+>> commit 94c9cb31c04737f86be29afefbff401cd23bc24d
+>> Author: Michael S. Tsirkin <mst@redhat.com>
+>> Date:   Mon Aug 15 16:35:24 2016 +0300
+>>
+>>      Revert "vhost-user: Attempt to fix a race with set_mem_table."
+>>
+> 
+> Do we know which tests fail?
+
+vhost-user-test, but it should no more be failing now that it no more
+uses TCG.
+
+I think we could consider reverting the revert. i.e. send get_features
+in set_mem_table toi be sure it has been handled.
+
+>> Another problem is that memory mmapped with previous call does not seems
+>> to be unmapped, but that should not cause other problems than leaking
+>> virtual memory.
+> 
+> Oh, leaks are the least of our problem there!
+
+Sure.
+
+Maxime
+> Dave
+> 
+>> Maxime
+>>> Dave
+>>>
+>>> --
+>>> Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+>>>
+> --
+> Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+> 
