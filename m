@@ -1,28 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51353)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36991)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dianchen.tdc@gmail.com>) id 1eMm4h-0002Pu-F5
-	for qemu-devel@nongnu.org; Wed, 06 Dec 2017 21:38:12 -0500
+	(envelope-from <wei.w.wang@intel.com>) id 1eMnHf-0001dY-O1
+	for qemu-devel@nongnu.org; Wed, 06 Dec 2017 22:55:41 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dianchen.tdc@gmail.com>) id 1eMm4g-0007wQ-Is
-	for qemu-devel@nongnu.org; Wed, 06 Dec 2017 21:38:11 -0500
-Received: from mail-ot0-x234.google.com ([2607:f8b0:4003:c0f::234]:36200)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <dianchen.tdc@gmail.com>)
-	id 1eMm4g-0007w8-Bf
-	for qemu-devel@nongnu.org; Wed, 06 Dec 2017 21:38:10 -0500
-Received: by mail-ot0-x234.google.com with SMTP id d5so5189618oti.3
-	for <qemu-devel@nongnu.org>; Wed, 06 Dec 2017 18:38:09 -0800 (PST)
+	(envelope-from <wei.w.wang@intel.com>) id 1eMnHc-0008So-Mn
+	for qemu-devel@nongnu.org; Wed, 06 Dec 2017 22:55:39 -0500
+Received: from mga04.intel.com ([192.55.52.120]:54163)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <wei.w.wang@intel.com>)
+	id 1eMnHc-0008Rw-9y
+	for qemu-devel@nongnu.org; Wed, 06 Dec 2017 22:55:36 -0500
+Message-ID: <5A28BC2D.6000308@intel.com>
+Date: Thu, 07 Dec 2017 11:57:33 +0800
+From: Wei Wang <wei.w.wang@intel.com>
 MIME-Version: 1.0
-In-Reply-To: <CAJ+F1C+6Gt-STfZhsRsr-q9YeMOP5jyRiQ73OuhO9Uz+QE3fGQ@mail.gmail.com>
-References: <CABkJTM4RL4cZ0euYX7d8xPd7ozrN76nr0rafut0LBJmZWFD+Vw@mail.gmail.com>
-	<CAJ+F1C+6Gt-STfZhsRsr-q9YeMOP5jyRiQ73OuhO9Uz+QE3fGQ@mail.gmail.com>
-From: Tian Dianchen <dianchen.tdc@gmail.com>
-Date: Thu, 7 Dec 2017 10:38:08 +0800
-Message-ID: <CABkJTM7RbX-Vt9w9eH3_unsf673uCpYf5L5OJj1S_Mx8E_=1XQ@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH] input: free InputEvent when it can't be
- inserted into a full kdb queue
+References: <1512444796-30615-1-git-send-email-wei.w.wang@intel.com>
+	<20171206134957.GD12584@stefanha-x1.localdomain>
+	<286AC319A985734F985F78AFA26841F73937B57F@shsmsx102.ccr.corp.intel.com>
+	<CAJSP0QWugAKQy6hYEJfy_XHEg-Q2swAzZMNcWBqn-r9Yi7yiEg@mail.gmail.com>
+In-Reply-To: <CAJSP0QWugAKQy6hYEJfy_XHEg-Q2swAzZMNcWBqn-r9Yi7yiEg@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [virtio-dev] [PATCH v3 0/7] Vhost-pci for inter-VM
+ communication
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,71 +31,112 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
-Cc: QEMU <qemu-devel@nongnu.org>, =?UTF-8?B?5byg6LaF?= <icymemo@gmail.com>, quan.xu0@gmail.com, kraxel@redhat.com
+To: Stefan Hajnoczi <stefanha@gmail.com>
+Cc: Stefan Hajnoczi <stefanha@redhat.com>, "virtio-dev@lists.oasis-open.org" <virtio-dev@lists.oasis-open.org>, "mst@redhat.com" <mst@redhat.com>, "Yang, Zhiyong" <zhiyong.yang@intel.com>, "jan.kiszka@siemens.com" <jan.kiszka@siemens.com>, "jasowang@redhat.com" <jasowang@redhat.com>, "avi.cohen@huawei.com" <avi.cohen@huawei.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "marcandre.lureau@redhat.com" <marcandre.lureau@redhat.com>, "pbonzini@redhat.com" <pbonzini@redhat.com>
 
-Hi, Marc-Andr=C3=A9 Lureau
-Thank you for your comments.
+On 12/07/2017 12:27 AM, Stefan Hajnoczi wrote:
+> On Wed, Dec 6, 2017 at 4:09 PM, Wang, Wei W <wei.w.wang@intel.com> wrote:
+>> On Wednesday, December 6, 2017 9:50 PM, Stefan Hajnoczi wrote:
+>>> On Tue, Dec 05, 2017 at 11:33:09AM +0800, Wei Wang wrote:
+>>>> Vhost-pci is a point-to-point based inter-VM communication solution.
+>>>> This patch series implements the vhost-pci-net device setup and
+>>>> emulation. The device is implemented as a virtio device, and it is set
+>>>> up via the vhost-user protocol to get the neessary info (e.g the
+>>>> memory info of the remote VM, vring info).
+>>>>
+>>>> Currently, only the fundamental functions are implemented. More
+>>>> features, such as MQ and live migration, will be updated in the future.
+>>>>
+>>>> The DPDK PMD of vhost-pci has been posted to the dpdk mailinglist here:
+>>>> http://dpdk.org/ml/archives/dev/2017-November/082615.html
+>>> I have asked questions about the scope of this feature.  In particular, I think
+>>> it's best to support all device types rather than just virtio-net.  Here is a
+>>> design document that shows how this can be achieved.
+>>>
+>>> What I'm proposing is different from the current approach:
+>>> 1. It's a PCI adapter (see below for justification) 2. The vhost-user protocol is
+>>> exposed by the device (not handled 100% in
+>>>     QEMU).  Ultimately I think your approach would also need to do this.
+>>>
+>>> I'm not implementing this and not asking you to implement it.  Let's just use
+>>> this for discussion so we can figure out what the final vhost-pci will look like.
+>>>
+>>> Please let me know what you think, Wei, Michael, and others.
+>>>
+>> Thanks for sharing the thoughts. If I understand it correctly, the key difference is that this approach tries to relay every vhost-user msg to the guest. I'm not sure about the benefits of doing this.
+>> To make data plane (i.e. driver to send/receive packets) work, I think, mostly, the memory info and vring info are enough. Other things like callfd, kickfd don't need to be sent to the guest, they are needed by QEMU only for the eventfd and irqfd setup.
+> Handling the vhost-user protocol inside QEMU and exposing a different
+> interface to the guest makes the interface device-specific.  This will
+> cause extra work to support new devices (vhost-user-scsi,
+> vhost-user-blk).  It also makes development harder because you might
+> have to learn 3 separate specifications to debug the system (virtio,
+> vhost-user, vhost-pci-net).
+>
+> If vhost-user is mapped to a PCI device then these issues are solved.
 
-Hi,Gerd Hoffmann,
-If there is no other comments,please join this note when merge this patch .
+I intend to have a different opinion about this:
+
+1) Even relaying the msgs to the guest, QEMU still need to handle the 
+msg first, for example, it needs to decode the msg to see if it is the 
+ones (e.g. SET_MEM_TABLE, SET_VRING_KICK, SET_VRING_CALL) that should be 
+used for the device setup (e.g. mmap the memory given via 
+SET_MEM_TABLE). In this case, we will be likely to have 2 slave handlers 
+- one in the guest, another in QEMU device.
+
+2) If people already understand the vhost-user protocol, it would be 
+natural for them to understand the vhost-pci metadata - just the 
+obtained memory and vring info are put to the metadata area (no new things).
 
 
-2017-12-06 17:46 GMT+08:00 Marc-Andr=C3=A9 Lureau <marcandre.lureau@gmail.c=
-om>:
+Inspired from your sharing, how about the following:
+we can actually factor out a common vhost-pci layer, which handles all 
+the features that are common to all the vhost-pci series of devices 
+(vhost-pci-net, vhost-pci-blk,...)
+Coming to the implementation, we can have a VhostpciDeviceClass (similar 
+to VirtioDeviceClass), the device realize sequence will be 
+virtio_device_realize()-->vhost_pci_device_realize()-->vhost_pci_net_device_realize()
 
-> Hi
+
+
 >
-> On Wed, Dec 6, 2017 at 3:29 AM, =E7=94=B0=E6=AE=BF=E8=87=A3 <dianchen.tdc=
-@gmail.com> wrote:
-> > From e8c03f405c2112428e79bb82064c7b7743d0cc86 Mon Sep 17 00:00:00 2001
-> > From: Tian Dianchen <dianchen.tdc@gmail.com>
-> > Date: Tue, 5 Dec 2017 14:03:53 +0800
-> > Subject: [PATCH] input: free InputEvent when it can't be inserted into =
-a
-> > full
-> >  kdb queue
-> >
-> > When the kdb queue is full, the evt can't be placed in it, so it should
-> > be released to free the memory.
-> >
-> > Impact: Without this limit vnc clients can exhaust host memory by keep
-> > sending keyboard events when kdb queue is full.
+>>> vhost-pci is a PCI adapter instead of a virtio device to allow doorbells and
+>>> interrupts to be connected to the virtio device in the master VM in the most
+>>> efficient way possible.  This means the Vring call doorbell can be an
+>>> ioeventfd that signals an irqfd inside the host kernel without host userspace
+>>> involvement.  The Vring kick interrupt can be an irqfd that is signalled by the
+>>> master VM's virtqueue ioeventfd.
+>>>
+>>
+>> This looks the same as the implementation of inter-VM notification in v2:
+>> https://www.mail-archive.com/qemu-devel@nongnu.org/msg450005.html
+>> which is fig. 4 here: https://github.com/wei-w-wang/vhost-pci-discussion/blob/master/vhost-pci-rfc2.0.pdf
+>>
+>> When the vhost-pci driver kicks its tx, the host signals the irqfd of virtio-net's rx. I think this has already bypassed the host userspace (thanks to the fast mmio implementation)
+> Yes, I think the irqfd <-> ioeventfd mapping is good.  Perhaps it even
+> makes sense to implement a special fused_irq_ioevent_fd in the host
+> kernel to bypass the need for a kernel thread to read the eventfd so
+> that an interrupt can be injected (i.e. to make the operation
+> synchronous).
 >
-> You may add "Leak introduced in commit fa18f36a461984eae50ab957e47ec7
-> 8dae3c14fc"
->
-> >
-> > Reviewed-by: Zhang Chao <icymemo@gmail.com>
-> > Reviewed-by: Quan Xu <quan.xu0@gmail.com>
-> > Signed-off-by: Tian Dianchen <dianchen.tdc@gmail.com>
->
-> Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
->
->
-> > ---
-> >  ui/input.c | 2 ++
-> >  1 file changed, 2 insertions(+)
-> >
-> > diff --git a/ui/input.c b/ui/input.c
-> > index 3e2d324..e5b78aa 100644
-> > --- a/ui/input.c
-> > +++ b/ui/input.c
-> > @@ -421,6 +421,8 @@ void qemu_input_event_send_key(QemuConsole *src,
-> > KeyValue *key, bool down)
-> >      } else if (queue_count < queue_limit) {
-> >          qemu_input_queue_event(&kbd_queue, src, evt);
-> >          qemu_input_queue_sync(&kbd_queue);
-> > +    } else {
-> > +        qapi_free_InputEvent(evt);
-> >      }
-> >  }
-> >
-> > --
-> > 1.8.3.1
->
->
->
-> --
-> Marc-Andr=C3=A9 Lureau
->
+> Is the tx virtqueue in your inter-VM notification v2 series a real
+> virtqueue that gets used?  Or is it just a dummy virtqueue that you're
+> using for the ioeventfd doorbell?  It looks like vpnet_handle_vq() is
+> empty so it's really just a dummy.  The actual virtqueue is in the
+> vhost-user master guest memory.
+
+
+Yes, that tx is a dummy actually, just created to use its doorbell. 
+Currently, with virtio_device, I think ioeventfd comes with virtqueue 
+only. Actually, I think we could have the issues solved by vhost-pci. 
+For example, reserve a piece of  the BAR area for ioeventfd. The bar 
+layout can be:
+BAR 2:
+0~4k: vhost-pci device specific usages (ioeventfd etc)
+4k~8k: metadata (memory info and vring info)
+8k~64GB: remote guest memory
+(we can make the bar size (64GB is the default value used) configurable 
+via qemu cmdline)
+
+
+Best,
+Wei
