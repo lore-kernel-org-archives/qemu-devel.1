@@ -1,33 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58854)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60392)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1eMz3V-0007KB-LK
-	for qemu-devel@nongnu.org; Thu, 07 Dec 2017 11:29:50 -0500
+	(envelope-from <cohuck@redhat.com>) id 1eMz7z-00010T-OJ
+	for qemu-devel@nongnu.org; Thu, 07 Dec 2017 11:34:28 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1eMz3U-0002yS-BF
-	for qemu-devel@nongnu.org; Thu, 07 Dec 2017 11:29:49 -0500
-Received: from mail-wm0-x244.google.com ([2a00:1450:400c:c09::244]:33100)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1eMz3U-0002xR-3B
-	for qemu-devel@nongnu.org; Thu, 07 Dec 2017 11:29:48 -0500
-Received: by mail-wm0-x244.google.com with SMTP id g130so1334833wme.0
-	for <qemu-devel@nongnu.org>; Thu, 07 Dec 2017 08:29:47 -0800 (PST)
+	(envelope-from <cohuck@redhat.com>) id 1eMz7w-0006AQ-M5
+	for qemu-devel@nongnu.org; Thu, 07 Dec 2017 11:34:27 -0500
+Date: Thu, 7 Dec 2017 17:34:18 +0100
+From: Cornelia Huck <cohuck@redhat.com>
+Message-ID: <20171207173418.7c70e5e9.cohuck@redhat.com>
+In-Reply-To: <20171205085906.GA3894@lagrange>
+References: <20171128134648.21530-1-cohuck@redhat.com>
+	<20171205085906.GA3894@lagrange>
 MIME-Version: 1.0
-In-Reply-To: <20171207153454-mutt-send-email-mst@kernel.org>
-References: <1512444796-30615-1-git-send-email-wei.w.wang@intel.com>
-	<20171206134957.GD12584@stefanha-x1.localdomain>
-	<286AC319A985734F985F78AFA26841F73937B57F@shsmsx102.ccr.corp.intel.com>
-	<CAJSP0QWugAKQy6hYEJfy_XHEg-Q2swAzZMNcWBqn-r9Yi7yiEg@mail.gmail.com>
-	<5A28BC2D.6000308@intel.com>
-	<CAJSP0QUxRv9LNb1+McYxV0KY4Ss3NkaSjwO6fXiJd+oU2+zJSQ@mail.gmail.com>
-	<5A290398.60508@intel.com>
-	<CAJSP0QURjdD8BnOmJo83fzJn_zCijSKQh==Pz+Xu4r6Q2i3SkQ@mail.gmail.com>
-	<20171207153454-mutt-send-email-mst@kernel.org>
-From: Stefan Hajnoczi <stefanha@gmail.com>
-Date: Thu, 7 Dec 2017 16:29:45 +0000
-Message-ID: <CAJSP0QVu4iwAu01Sth84VZshQde97x3FW1E1ua_YXVKs-65vhQ@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [virtio-dev] [PATCH v3 0/7] Vhost-pci for inter-VM
- communication
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH RFC 0/2] s390x: cut down on unattached
+ devices
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,75 +24,69 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: Wei Wang <wei.w.wang@intel.com>, "virtio-dev@lists.oasis-open.org" <virtio-dev@lists.oasis-open.org>, "Yang, Zhiyong" <zhiyong.yang@intel.com>, "jan.kiszka@siemens.com" <jan.kiszka@siemens.com>, "jasowang@redhat.com" <jasowang@redhat.com>, "avi.cohen@huawei.com" <avi.cohen@huawei.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, Stefan Hajnoczi <stefanha@redhat.com>, "pbonzini@redhat.com" <pbonzini@redhat.com>, "marcandre.lureau@redhat.com" <marcandre.lureau@redhat.com>
+To: Bjoern Walk <bwalk@linux.vnet.ibm.com>
+Cc: qemu-devel@nongnu.org, qemu-s390x@nongnu.org, borntraeger@de.ibm.com, pasic@linux.vnet.ibm.com, pmorel@linux.vnet.ibm.com
 
-On Thu, Dec 7, 2017 at 2:02 PM, Michael S. Tsirkin <mst@redhat.com> wrote:
-> On Thu, Dec 07, 2017 at 01:08:04PM +0000, Stefan Hajnoczi wrote:
->> Instead of responding individually to these points, I hope this will
->> explain my perspective.  Let me know if you do want individual
->> responses, I'm happy to talk more about the points above but I think
->> the biggest difference is our perspective on this:
->>
->> Existing vhost-user slave code should be able to run on top of
->> vhost-pci.  For example, QEMU's
->> contrib/vhost-user-scsi/vhost-user-scsi.c should work inside the guest
->> with only minimal changes to the source file (i.e. today it explicitly
->> opens a UNIX domain socket and that should be done by libvhost-user
->> instead).  It shouldn't be hard to add vhost-pci vfio support to
->> contrib/libvhost-user/ alongside the existing UNIX domain socket code.
->>
->> This seems pretty easy to achieve with the vhost-pci PCI adapter that
->> I've described but I'm not sure how to implement libvhost-user on top
->> of vhost-pci vfio if the device doesn't expose the vhost-user
->> protocol.
->>
->> I think this is a really important goal.  Let's use a single
->> vhost-user software stack instead of creating a separate one for guest
->> code only.
->>
->> Do you agree that the vhost-user software stack should be shared
->> between host userspace and guest code as much as possible?
->
->
->
-> The sharing you propose is not necessarily practical because the security goals
-> of the two are different.
->
-> It seems that the best motivation presentation is still the original rfc
->
-> http://virtualization.linux-foundation.narkive.com/A7FkzAgp/rfc-vhost-user-enhancements-for-vm2vm-communication
->
-> So comparing with vhost-user iotlb handling is different:
->
-> With vhost-user guest trusts the vhost-user backend on the host.
->
-> With vhost-pci we can strive to limit the trust to qemu only.
-> The switch running within a VM does not have to be trusted.
+On Tue, 5 Dec 2017 09:59:06 +0100
+Bjoern Walk <bwalk@linux.vnet.ibm.com> wrote:
 
-Can you give a concrete example?
+> Cornelia Huck <cohuck@redhat.com> [2017-11-28, 02:46PM +0100]:
+> > info qom-tree shows several devices under unattached that probably
+> > should go somewhere.
+> > 
+> > The css bridge should attach to the machine, as it has a similar
+> > purpose as e.g. a pci host bridge.
+> > 
+> > The autogenerated network devices should be in the same bucket as any
+> > other device; I'm just not sure about the way I went about it.
+> > 
+> > The zpci devices are still problematic: I don't have a good idea where
+> > they should show up.
+> > 
+> > Remaining in the unattached container are the sysbus, memory regions
+> > and cpus.
+> > 
+> > Cornelia Huck (2):
+> >   s390x/css: attach css bridge
+> >   s390x: attach autogenerated nics
+> > 
+> >  hw/s390x/css-bridge.c      | 2 ++
+> >  hw/s390x/s390-virtio-ccw.c | 2 ++
+> >  2 files changed, 4 insertions(+)
+> > 
+> > -- 
+> > 2.13.6
+> > 
+> >   
+> 
+> Regarding the discussion about whether the QOM tree is API and what
+> exploiters like libvirt should do, Halil asked me to chip in.
+> 
+> This patch is fine from libvirt perspective. I did a quick smoke test
+> and you can have a
+> 
+>     Tested-by: Bjoern Walk <bwalk@linux.vnet.ibm.com>
+> 
+> for what it's worth.
 
-I have an idea about what you're saying but it may be wrong:
+Thanks for checking.
 
-Today the iotlb mechanism in vhost-user does not actually enforce
-memory permissions.  The vhost-user slave has full access to mmapped
-memory regions even when iotlb is enabled.  Currently the iotlb just
-adds an indirection layer but no real security.  (Is this correct?)
+> 
+> In general, I kind of agree with Halil. Unless somewhere in QEMU it is
+> documented that the QOM tree is not guaranteed to be stable for
+> exploiters, I'd consider is part of the API. libvirt does use at least
+> some hardcoded paths, most of the time for CPUs in /machine/unattached,
+> so if that relation would change, things break. However, there is also
+> code to traverse the QOM tree recursively and find a path for a given
+> type(?) name. If this is the preferred way, we probably should change
+> this in libvirt to be safe.
 
-Are you saying the vhost-pci device code in QEMU should enforce iotlb
-permissions so the vhost-user slave guest only has access to memory
-regions that are allowed by the iotlb?
+OK, with that in mind and as we're now adding a property to check on
+the css bridge, I vote for including patch 1 now (having a fixed
+location under /machine looks saner that having to
+check /machine/unattached/device[<n>], which might not be stable).
 
-This is a weak way to enforce memory permissions.  If the guest is
-able to exploit a bug in QEMU then it has full memory access.  It's a
-security problem waiting to happen and QEMU generally doesn't
-implement things this way.
-
-A stronger solution is for the vhost-user master to control memory
-protection and to disallow the vhost-user slave from changing memory
-protection.  I think the kernel mechanism to support this does not
-exist today.  Such a mechanism would also make the vhost-user host
-userspace use case secure.  The kernel mechanism to do this would
-definitely be useful outside of virtualization too.
-
-Stefan
+Patch 2 needs more discussion, as I'm not sure whether what I'm doing
+is the correct way to go about this (and other machines are in the same
+situation). Not sure whether it is worth trying to attach the zpci
+devices somewhere.
