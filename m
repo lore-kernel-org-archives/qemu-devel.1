@@ -1,23 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40041)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40478)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1eMzSA-0005VJ-Qp
-	for qemu-devel@nongnu.org; Thu, 07 Dec 2017 11:55:20 -0500
+	(envelope-from <mst@redhat.com>) id 1eMzTJ-0006V8-RX
+	for qemu-devel@nongnu.org; Thu, 07 Dec 2017 11:56:31 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1eMzS9-0008N3-Jr
-	for qemu-devel@nongnu.org; Thu, 07 Dec 2017 11:55:18 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:38806)
+	(envelope-from <mst@redhat.com>) id 1eMzTG-0000fj-Vp
+	for qemu-devel@nongnu.org; Thu, 07 Dec 2017 11:56:29 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:53802)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1eMzS9-0008Lq-A6
-	for qemu-devel@nongnu.org; Thu, 07 Dec 2017 11:55:17 -0500
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
-	[10.5.11.13])
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1eMzTG-0000eg-M1
+	for qemu-devel@nongnu.org; Thu, 07 Dec 2017 11:56:26 -0500
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+	[10.5.11.14])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 56CB6C03BD6E
-	for <qemu-devel@nongnu.org>; Thu,  7 Dec 2017 16:55:16 +0000 (UTC)
-Date: Thu, 7 Dec 2017 18:55:10 +0200
+	by mx1.redhat.com (Postfix) with ESMTPS id B7ED261D1C
+	for <qemu-devel@nongnu.org>; Thu,  7 Dec 2017 16:56:25 +0000 (UTC)
+Date: Thu, 7 Dec 2017 18:56:19 +0200
 From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <20171207185415-mutt-send-email-mst@kernel.org>
+Message-ID: <20171207185558-mutt-send-email-mst@kernel.org>
 References: <20171205174100.GD2405@work-vm>
 	<90cb3043-cf68-2635-2dd9-f47cf5e8c10e@redhat.com>
 	<20171207175544-mutt-send-email-mst@kernel.org>
@@ -107,8 +107,12 @@ On Thu, Dec 07, 2017 at 05:35:13PM +0100, Maxime Coquelin wrote:
 > 
 > Maxime
 
-TCG just changed timing making races more obvious.
-And it's still used on many ci systems.
+Canyou pls explain this:
+
+Analysis of the race shows that it would happen only when QEMU relies
+on TCG.
+
+what is the reason it only happens with tcg?
 
 > > > 
 > > > Another problem is that memory mmapped with previous call does not seems
