@@ -1,24 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33506)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35808)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1eMvkc-0006RS-0P
-	for qemu-devel@nongnu.org; Thu, 07 Dec 2017 07:58:06 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1eMvsL-0000cN-GV
+	for qemu-devel@nongnu.org; Thu, 07 Dec 2017 08:06:09 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1eMvkY-00042B-52
-	for qemu-devel@nongnu.org; Thu, 07 Dec 2017 07:58:06 -0500
-Date: Thu, 7 Dec 2017 13:57:56 +0100
-From: Cornelia Huck <cohuck@redhat.com>
-Message-ID: <20171207135756.1f84ed41.cohuck@redhat.com>
-In-Reply-To: <87df13b9-c494-c8b4-49cf-b7ef4640d05a@linux.vnet.ibm.com>
-References: <20171108165422.46267-1-pasic@linux.vnet.ibm.com>
-	<20171108165422.46267-2-pasic@linux.vnet.ibm.com>
-	<e2e2ae84-e04a-df4f-50bb-328768a5464e@redhat.com>
-	<20171207125901.47be0af1.cohuck@redhat.com>
-	<87df13b9-c494-c8b4-49cf-b7ef4640d05a@linux.vnet.ibm.com>
+	(envelope-from <peter.maydell@linaro.org>) id 1eMvsK-0001qN-9y
+	for qemu-devel@nongnu.org; Thu, 07 Dec 2017 08:06:05 -0500
+Received: from mail-ot0-x243.google.com ([2607:f8b0:4003:c0f::243]:44180)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1eMvsK-0001q6-5D
+	for qemu-devel@nongnu.org; Thu, 07 Dec 2017 08:06:04 -0500
+Received: by mail-ot0-x243.google.com with SMTP id d27so6257646ote.11
+	for <qemu-devel@nongnu.org>; Thu, 07 Dec 2017 05:06:03 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [RFC PATCH v2 1/3] s390x/ccs: add ccw-testdev
- emulated device
+In-Reply-To: <20171205044844.3597-1-richard.henderson@linaro.org>
+References: <20171205044844.3597-1-richard.henderson@linaro.org>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Thu, 7 Dec 2017 13:05:42 +0000
+Message-ID: <CAFEAcA-i7pFPwdTvW=4VeRXfJC6hYD=PY6J-Z9XZcWmAk7hwiw@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v2] linux-user: Use *at functions instead
+ of caching interp_prefix contents
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,61 +30,68 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Halil Pasic <pasic@linux.vnet.ibm.com>
-Cc: Thomas Huth <thuth@redhat.com>, qemu-s390x@nongnu.org, Pierre Morel <pmorel@linux.vnet.ibm.com>, Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>, qemu-devel@nongnu.org
+To: Richard Henderson <richard.henderson@linaro.org>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, Richard Henderson <rth@twiddle.net>
 
-On Thu, 7 Dec 2017 13:38:22 +0100
-Halil Pasic <pasic@linux.vnet.ibm.com> wrote:
+On 5 December 2017 at 04:48, Richard Henderson
+<richard.henderson@linaro.org> wrote:
+> From: Richard Henderson <rth@twiddle.net>
+>
+> If the interp_prefix is a complete chroot, it may have a *lot* of files.
+> Setting up the cache for this is quite expensive.  Instead, use the *at
+> versions of various syscalls to attempt the operation in the prefix.
+>
+> Signed-off-by: Richard Henderson <rth@twiddle.net>
+> ---
+>
+> Changes since v1 (Nov 2016):
+>   * Require interp_dirfd set before trying the *at path.
+>
+>
+> r~
+> ---
+>  linux-user/qemu.h    |   1 +
+>  linux-user/elfload.c |  12 ++-
+>  linux-user/main.c    |   3 +-
+>  linux-user/syscall.c | 236 ++++++++++++++++++++++++++++++++++++++++++---=
+------
+>  4 files changed, 208 insertions(+), 44 deletions(-)
+>
+> diff --git a/linux-user/qemu.h b/linux-user/qemu.h
+> index 4edd7d0c08..d04924fd2e 100644
+> --- a/linux-user/qemu.h
+> +++ b/linux-user/qemu.h
+> @@ -437,6 +437,7 @@ void mmap_fork_start(void);
+>  void mmap_fork_end(int child);
+>
+>  /* main.c */
+> +extern int interp_dirfd;
+>  extern unsigned long guest_stack_size;
+>
+>  /* user access */
+> diff --git a/linux-user/elfload.c b/linux-user/elfload.c
+> index 20f3d8c2c3..5d3f7aa11d 100644
+> --- a/linux-user/elfload.c
+> +++ b/linux-user/elfload.c
+> @@ -2203,7 +2203,17 @@ static void load_elf_interp(const char *filename, =
+struct image_info *info,
+>  {
+>      int fd, retval;
+>
+> -    fd =3D open(path(filename), O_RDONLY);
+> +    switch (interp_dirfd > 0 && filename[0] =3D=3D '/') {
+> +    case true:
 
-> On 12/07/2017 12:59 PM, Cornelia Huck wrote:
-> > On Thu, 7 Dec 2017 07:33:19 +0100
-> > Thomas Huth <thuth@redhat.com> wrote:
-> >   
-> >> On 08.11.2017 17:54, Halil Pasic wrote:  
-> >   
-> >>> +static ccw_cb_t get_ccw_cb(CcwTestDevOpMode op_mode)
-> >>> +{
-> >>> +    switch (op_mode) {
-> >>> +    case OP_MODE_FIB:
-> >>> +        return ccw_testdev_ccw_cb_mode_fib;
-> >>> +    case OP_MODE_NOP:
-> >>> +    default:
-> >>> +        return ccw_testdev_ccw_cb_mode_nop;    
-> >>
-> >> Do we really want to use "nop" for unknown modes? Or should there rather
-> >> be a ccw_testdev_ccw_cb_mode_error instead, too?  
-> > 
-> > I like the idea of an error mode.  
-> 
-> What would be the benefit of the error mode? The idea is that
-> the tester in the guest has a certain set of tests implemented
-> each requiring certain behavior from the device. This behavior
-> is represented by the mode.
-> 
-> If the device does not support the mode, the set of tests can't
-> be executed meaningfully. The only option is either ignore them
-> (and preferably report them as ignored), or fail them (not soo
-> good in my opinion).
+gcc doesn't like this pattern:
 
-Failing it sounds superior to me: You really want to know if something
-does not work as expected.
+/home/petmay01/linaro/qemu-from-laptop/qemu/linux-user/syscall.c: In
+function =E2=80=98do_name_to_handle_at=E2=80=99:
+/home/petmay01/linaro/qemu-from-laptop/qemu/linux-user/syscall.c:7231:13:
+error: switch condition has boolean value [-Werror=3Dswitch-bool]
+     switch (interp_dirfd > 0 && name[0] =3D=3D '/') {
+             ^
 
-> 
-> The in guest tester should simply iterate over it test sets
-> and try to select the mode the test set (or suite in other
-> terminology) requires. If selecting the mode fails, than
-> means you are working with an old ccw-testdev.
-> 
-> > 
-> > Related: Should the device have a mechanism to report the supported
-> > modes?
-> >   
-> 
-> I don't see the value. See above. I think the set mode operation
-> reporting failure is sufficient.
-> 
-> But if you have something in mind, please do tell. I'm open.
+It seems like an odd way to write an if().
 
-If we keep guest/host in lockstep, we probably don't need this. But if
-not, self-reporting looks like a reasonable feature as it gives more
-flexibility.
+thanks
+-- PMM
