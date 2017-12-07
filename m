@@ -1,20 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33905)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34181)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1eMppb-0007Vv-V4
-	for qemu-devel@nongnu.org; Thu, 07 Dec 2017 01:38:52 -0500
+	(envelope-from <i.maximets@samsung.com>) id 1eMpqW-0007z5-5A
+	for qemu-devel@nongnu.org; Thu, 07 Dec 2017 01:39:49 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1eMppX-0000Uo-1c
-	for qemu-devel@nongnu.org; Thu, 07 Dec 2017 01:38:51 -0500
-References: <20171108165422.46267-1-pasic@linux.vnet.ibm.com>
-From: Thomas Huth <thuth@redhat.com>
-Message-ID: <2ada83cf-1eb6-87c0-7597-13dc11ab09c0@redhat.com>
-Date: Thu, 7 Dec 2017 07:38:39 +0100
-MIME-Version: 1.0
-In-Reply-To: <20171108165422.46267-1-pasic@linux.vnet.ibm.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [qemu-s390x] [RFC PATCH v2 0/3] tests for CCW IDA
+	(envelope-from <i.maximets@samsung.com>) id 1eMpqR-0001Zy-74
+	for qemu-devel@nongnu.org; Thu, 07 Dec 2017 01:39:48 -0500
+Received: from mailout1.w1.samsung.com ([210.118.77.11]:37817)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <i.maximets@samsung.com>)
+	id 1eMpqQ-0001XL-N2
+	for qemu-devel@nongnu.org; Thu, 07 Dec 2017 01:39:43 -0500
+From: Ilya Maximets <i.maximets@samsung.com>
+Message-id: <249c9e25-0bdb-7a44-6821-59474d25baa5@samsung.com>
+Date: Thu, 07 Dec 2017 09:39:36 +0300
+MIME-version: 1.0
+In-reply-to: <20171206184432-mutt-send-email-mst@kernel.org>
+Content-type: text/plain; charset="utf-8"
+Content-language: en-GB
+Content-transfer-encoding: 7bit
+References: <CGME20171206130624eucas1p1f73fd4cf613eaf3ce4ce6918c807f8e1@eucas1p1.samsung.com>
+	<1512565578-12078-1-git-send-email-i.maximets@samsung.com>
+	<20171206184432-mutt-send-email-mst@kernel.org>
+Subject: Re: [Qemu-devel] [PATCH] vhost: fix crash on virtio_error while
+ device stop
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,34 +31,120 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Halil Pasic <pasic@linux.vnet.ibm.com>, Cornelia Huck <cohuck@redhat.com>, Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>
-Cc: qemu-s390x@nongnu.org, Pierre Morel <pmorel@linux.vnet.ibm.com>, qemu-devel@nongnu.org, David Hildenbrand <david@redhat.com>
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: qemu-devel@nongnu.org, Marc-Andre Lureau <marcandre.lureau@redhat.com>, Heetae Ahn <heetae82.ahn@samsung.com>, Maxime Coquelin <maxime.coquelin@redhat.com>
 
-On 08.11.2017 17:54, Halil Pasic wrote:
-> I've keept the title althogh the scope shifted a bit: it's
-> more about introducing ccw-testdev than about IDA. The goal
-> is to facilitate testing the virtual channel subsystem
-> implementation, and the ccw interpretation.
+On 06.12.2017 19:45, Michael S. Tsirkin wrote:
+> On Wed, Dec 06, 2017 at 04:06:18PM +0300, Ilya Maximets wrote:
+>> In case virtio error occured after vhost_dev_close(), qemu will crash
+>> in nested cleanup while checking IOMMU flag because dev->vdev already
+>> set to zero and resources are already freed.
+>>
+>> Example:
+>>
+>> Program received signal SIGSEGV, Segmentation fault.
+>> vhost_virtqueue_stop at hw/virtio/vhost.c:1155
+>>
+>>     #0  vhost_virtqueue_stop at hw/virtio/vhost.c:1155
+>>     #1  vhost_dev_stop at hw/virtio/vhost.c:1594
+>>     #2  vhost_net_stop_one at hw/net/vhost_net.c:289
+>>     #3  vhost_net_stop at hw/net/vhost_net.c:368
+>>
+>>             Nested call to vhost_net_stop(). First time was at #14.
+>>
+>>     #4  virtio_net_vhost_status at hw/net/virtio-net.c:180
+>>     #5  virtio_net_set_status (status=79) at hw/net/virtio-net.c:254
+>>     #6  virtio_set_status at hw/virtio/virtio.c:1146
+>>     #7  virtio_error at hw/virtio/virtio.c:2455
+>>
+>>         virtqueue_get_head() failed here.
+>>
+>>     #8  virtqueue_get_head at hw/virtio/virtio.c:543
+>>     #9  virtqueue_drop_all at hw/virtio/virtio.c:984
+>>     #10 virtio_net_drop_tx_queue_data at hw/net/virtio-net.c:240
+>>     #11 virtio_bus_set_host_notifier at hw/virtio/virtio-bus.c:297
+>>     #12 vhost_dev_disable_notifiers at hw/virtio/vhost.c:1431
+>>
+>>         vhost_dev_stop() was executed here. dev->vdev == NULL now.
+>>
+>>     #13 vhost_net_stop_one at hw/net/vhost_net.c:290
+>>     #14 vhost_net_stop at hw/net/vhost_net.c:368
+>>     #15 virtio_net_vhost_status at hw/net/virtio-net.c:180
+>>     #16 virtio_net_set_status (status=15) at hw/net/virtio-net.c:254
+>>     #17 qmp_set_link ("hostnet0", up=false) at net/net.c:1430
+>>     #18 chr_closed_bh at net/vhost-user.c:214
+>>     #19 aio_bh_call at util/async.c:90
+>>     #20 aio_bh_poll at util/async.c:118
+>>     #21 aio_dispatch at util/aio-posix.c:429
+>>     #22 aio_ctx_dispatch at util/async.c:261
+>>     #23 g_main_context_dispatch
+>>     #24 glib_pollfds_poll at util/main-loop.c:213
+>>     #25 os_host_main_loop_wait at util/main-loop.c:261
+>>     #26 main_loop_wait at util/main-loop.c:515
+>>     #27 main_loop () at vl.c:1917
+>>     #28 main at vl.c:4795
+>>
+>> Above backtrace captured from qemu crash on vhost disconnect while
+>> virtio driver in guest was in failed state.
+>>
+>> We can just add checking for 'vdev' in 'vhost_dev_has_iommu()' but
+>> it will assert further trying to free already freed ioeventfds. The
+>> real problem is that we're allowing nested calls to 'vhost_net_stop'.
+>>
+>> This patch is aimed to forbid nested calls to 'vhost_net_stop' to avoid
+>> any possible double frees and segmentation faults doue to using of
+>> already freed resources by setting 'vhost_started' flag to zero prior
+>> to 'vhost_net_stop' call.
+>>
+>> Signed-off-by: Ilya Maximets <i.maximets@samsung.com>
+>> ---
+>>
+>> This issue was already addressed more than a year ago by the following
+>> patch: https://lists.gnu.org/archive/html/qemu-devel/2016-03/msg06732.html
+>> but it was dropped without review due to not yet implemented re-connection
+>> of vhost-user. Re-connection implementation lately fixed most of the
+>> nested calls, but few of them still exists. For example, above backtrace
+>> captured after 'virtqueue_get_head()' failure on vhost-user disconnection.
+>>
+>>  hw/net/virtio-net.c | 2 +-
+>>  1 file changed, 1 insertion(+), 1 deletion(-)
+>>
+>> diff --git a/hw/net/virtio-net.c b/hw/net/virtio-net.c
+>> index 38674b0..4d95a18 100644
+>> --- a/hw/net/virtio-net.c
+>> +++ b/hw/net/virtio-net.c
+>> @@ -177,8 +177,8 @@ static void virtio_net_vhost_status(VirtIONet *n, uint8_t status)
+>>              n->vhost_started = 0;
+>>          }
+>>      } else {
+>> -        vhost_net_stop(vdev, n->nic->ncs, queues);
+>>          n->vhost_started = 0;
+>> +        vhost_net_stop(vdev, n->nic->ncs, queues);
+>>      }
+>>  }
 > 
-> The first patch is the interesting one. See it's cover letter
-> for details. The RFC is about discussing some technical issues
-> with this patch.
+> Well the wider context is
 > 
-> The other two patches are an out of source kernel module which
-> is basically only there so you can try out the first patch. The
-> tests there should probably be ported to something else. I don't
-> know what: maybe kvm-unit-tests, maybe qtest+libqos, or maybe some
-> bios based test image. We still have to figure out that. 
+> 
+>         n->vhost_started = 1;
+>         r = vhost_net_start(vdev, n->nic->ncs, queues);
+>         if (r < 0) {
+>             error_report("unable to start vhost net: %d: "
+>                          "falling back on userspace virtio", -r);
+>             n->vhost_started = 0;
+>         }
+>     } else {
+>         vhost_net_stop(vdev, n->nic->ncs, queues);
+>         n->vhost_started = 0;
+> 
+> So we set it to 1 before start, we should clear after stop.
 
-I think both, kvm-unit-tests or qtest+libqos would be good candidates.
-Please don't invent a new bios base test image, since kvm-unit-tests
-should be very similar already and we really don't need to duplicate
-work here.
+OK. I agree that clearing after is a bit safer. But in this case we need
+a separate flag or other way to detect that we're already inside the
+'vhost_net_stop()'.
 
-Anyway, you'd need to add some CSS infracture there first (in both
-kvm-unit-tests and the qtest environments), so it's likely a similar
-amount of work. qtest has the advantage that it gets checked
-automatically during "make check" each time, so I'd have a weak
-preference for that one.
+What do you think about that old patch:
+https://lists.gnu.org/archive/html/qemu-devel/2016-03/msg06732.html  ?
 
- Thomas
+It implements the same thing but introduces additional flag. It even could
+be still applicable.
