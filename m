@@ -1,20 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33510)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35026)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kchamart@redhat.com>) id 1eMtt4-0000W8-6v
-	for qemu-devel@nongnu.org; Thu, 07 Dec 2017 05:58:43 -0500
+	(envelope-from <dgilbert@redhat.com>) id 1eMtyJ-0003AS-7w
+	for qemu-devel@nongnu.org; Thu, 07 Dec 2017 06:04:08 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kchamart@redhat.com>) id 1eMtt3-0002HW-9Q
-	for qemu-devel@nongnu.org; Thu, 07 Dec 2017 05:58:42 -0500
-Date: Thu, 7 Dec 2017 11:58:27 +0100
-From: Kashyap Chamarthy <kchamart@redhat.com>
-Message-ID: <20171207105827.5bqrsqbv7ljgmwc6@eukaryote>
-References: <20171207084453.23773-1-famz@redhat.com>
+	(envelope-from <dgilbert@redhat.com>) id 1eMtyB-00061G-73
+	for qemu-devel@nongnu.org; Thu, 07 Dec 2017 06:04:07 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:42744)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1eMtyB-00060Y-0B
+	for qemu-devel@nongnu.org; Thu, 07 Dec 2017 06:03:59 -0500
+Date: Thu, 7 Dec 2017 11:03:43 +0000
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20171207110342.GB2439@work-vm>
+References: <20171206200346.116537-1-brijesh.singh@amd.com>
+	<20171206200346.116537-24-brijesh.singh@amd.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20171207084453.23773-1-famz@redhat.com>
-Subject: Re: [Qemu-devel] [Qemu-block] [PATCH] qemu-img: Document
- --force-share / -U
+In-Reply-To: <20171206200346.116537-24-brijesh.singh@amd.com>
+Subject: Re: [Qemu-devel] [PATCH v5 23/23] sev: add migration blocker
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,45 +27,78 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Fam Zheng <famz@redhat.com>
-Cc: qemu-devel@nongnu.org, Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>
+To: Brijesh Singh <brijesh.singh@amd.com>
+Cc: qemu-devel@nongnu.org, Alistair Francis <alistair.francis@xilinx.com>, Christian Borntraeger <borntraeger@de.ibm.com>, Cornelia Huck <cornelia.huck@de.ibm.com>, "Daniel P . Berrange" <berrange@redhat.com>, "Edgar E . Iglesias " <edgar.iglesias@xilinx.com>, Eduardo Habkost <ehabkost@redhat.com>, Eric Blake <eblake@redhat.com>, kvm@vger.kernel.org, Marcel Apfelbaum <marcel@redhat.com>, Markus Armbruster <armbru@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Peter Maydell <peter.maydell@linaro.org>, Richard Henderson <richard.henderson@linaro.org>, Richard Henderson <rth@twiddle.net>, Stefan Hajnoczi <stefanha@gmail.com>, Thomas Lendacky <Thomas.Lendacky@amd.com>, Borislav Petkov <bp@suse.de>
 
-On Thu, Dec 07, 2017 at 04:44:53PM +0800, Fam Zheng wrote:
-> Signed-off-by: Fam Zheng <famz@redhat.com>
-> ---
->  qemu-img.texi | 8 ++++++++
->  1 file changed, 8 insertions(+)
+* Brijesh Singh (brijesh.singh@amd.com) wrote:
+> SEV guest migration is not yet implemented yet.
 > 
-> diff --git a/qemu-img.texi b/qemu-img.texi
-> index fdcf120f36..3aa63aad55 100644
-> --- a/qemu-img.texi
-> +++ b/qemu-img.texi
-> @@ -57,6 +57,14 @@ exclusive with the @var{-O} parameters. It is currently required to also use
->  the @var{-n} parameter to skip image creation. This restriction may be relaxed
->  in a future release.
+> Signed-off-by: Brijesh Singh <brijesh.singh@amd.com>
+> ---
+>  accel/kvm/sev.c | 13 +++++++++++++
+>  1 file changed, 13 insertions(+)
+> 
+> diff --git a/accel/kvm/sev.c b/accel/kvm/sev.c
+> index 3edfb5b08416..10647645eacd 100644
+> --- a/accel/kvm/sev.c
+> +++ b/accel/kvm/sev.c
+> @@ -19,6 +19,7 @@
+>  #include "sysemu/sev.h"
+>  #include "sysemu/sysemu.h"
+>  #include "qapi-event.h"
+> +#include "migration/blocker.h"
 >  
-> +@item --force-share (-U)
+>  #define DEFAULT_GUEST_POLICY    0x1 /* disable debug */
+>  #define DEFAULT_SEV_DEVICE      "/dev/sev"
+> @@ -36,6 +37,7 @@
+>  static int sev_fd;
+>  static SEVState *sev_state;
+>  static MemoryRegionRAMReadWriteOps  sev_ops;
+> +static Error *sev_mig_blocker;
+>  
+>  #define SEV_FW_MAX_ERROR      0x17
+>  
+> @@ -460,6 +462,7 @@ static void
+>  sev_launch_finish(SEVState *s)
+>  {
+>      int ret, error;
+> +    Error *local_err = NULL;
+>  
+>      ret = sev_ioctl(KVM_SEV_LAUNCH_FINISH, 0, &error);
+>      if (ret) {
+> @@ -470,6 +473,16 @@ sev_launch_finish(SEVState *s)
+>  
+>      s->cur_state = SEV_STATE_RUNNING;
+>      DPRINTF("SEV: LAUNCH_FINISH\n");
+
+(from a previous patch)
+Please use the tracing facility rather than new DPRINTF's
+if possible - if you've not used it before, then
+--enable-trace-backends=log   is the easy way to get going
+and you can turn on and off the stuff you're interested in
+tracing at run time without having to rebuild.
+
 > +
-> +If specified, qemu-img will open the image with shared permissions, which makes
+> +    /* add migration blocker */
+> +    error_setg(&sev_mig_blocker,
+> +               "SEV: Migration is not implemented");
+> +    ret = migrate_add_blocker(sev_mig_blocker, &local_err);
+> +    if (local_err) {
+> +        error_report_err(local_err);
+> +        error_free(sev_mig_blocker);
+> +        exit(1);
+> +    }
 
-Does 'texi' requires to quote tools like `qemu-img` (or single quotes),
-to highlight them in documentation?
+Yep, reasonable:
 
-> +it less likely to conflict with a running guest's permissions due to image
-> +locking. For example, this can be used to get the image information (with
-> +'info' subcommand) when the image is used by a running guest. Note that this
-> +could produce inconsistent result because of concurrent metadata changes, etc..
 
-Super nit-pick:  an ellipsis[*] is three dots :-), so, when applying you
-might want to: s/../.../
+Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
 
-[*] https://dictionary.cambridge.org/dictionary/english/ellipsis
-
-Regardless:
-
-Reviewed-by: Kashyap Chamarthy <kchamart@redhat.com>
-
-[...]
-
--- 
-/kashyap
+>  }
+>  
+>  static void
+> -- 
+> 2.9.5
+> 
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
