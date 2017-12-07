@@ -1,22 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51787)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52277)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1eN40U-0004Qz-Rt
-	for qemu-devel@nongnu.org; Thu, 07 Dec 2017 16:47:03 -0500
+	(envelope-from <eblake@redhat.com>) id 1eN41h-0005j9-Vx
+	for qemu-devel@nongnu.org; Thu, 07 Dec 2017 16:48:18 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1eN40U-00071C-10
-	for qemu-devel@nongnu.org; Thu, 07 Dec 2017 16:47:02 -0500
+	(envelope-from <eblake@redhat.com>) id 1eN41h-0008P6-5T
+	for qemu-devel@nongnu.org; Thu, 07 Dec 2017 16:48:18 -0500
 References: <20171206144550.22295-1-stefanha@redhat.com>
-	<20171206144550.22295-6-stefanha@redhat.com>
+	<20171206144550.22295-7-stefanha@redhat.com>
 From: Eric Blake <eblake@redhat.com>
-Message-ID: <48bfb298-4e7f-b9e8-4290-fa180943e651@redhat.com>
-Date: Thu, 7 Dec 2017 15:46:50 -0600
+Message-ID: <d65742f2-4974-31e5-46f0-04b9ebe5194c@redhat.com>
+Date: Thu, 7 Dec 2017 15:47:50 -0600
 MIME-Version: 1.0
-In-Reply-To: <20171206144550.22295-6-stefanha@redhat.com>
+In-Reply-To: <20171206144550.22295-7-stefanha@redhat.com>
 Content-Type: multipart/signed; micalg=pgp-sha256;
 	protocol="application/pgp-signature";
-	boundary="eMAqt36n5GNXlXV5XRN6nBn5dP0UuxCGc"
-Subject: Re: [Qemu-devel] [PATCH v2 5/9] block: don't keep AioContext
- acquired after internal_snapshot_prepare()
+	boundary="nQqUHTCUB6PoERWB6Wo3Uo62AVUbGBPUP"
+Subject: Re: [Qemu-devel] [PATCH v2 6/9] block: drop unused
+ BlockDirtyBitmapState->aio_context field
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,26 +29,30 @@ To: Stefan Hajnoczi <stefanha@redhat.com>, qemu-devel@nongnu.org
 Cc: Kevin Wolf <kwolf@redhat.com>, John Snow <jsnow@redhat.com>, qemu-block@nongnu.org
 
 This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---eMAqt36n5GNXlXV5XRN6nBn5dP0UuxCGc
+--nQqUHTCUB6PoERWB6Wo3Uo62AVUbGBPUP
 From: Eric Blake <eblake@redhat.com>
 To: Stefan Hajnoczi <stefanha@redhat.com>, qemu-devel@nongnu.org
 Cc: Kevin Wolf <kwolf@redhat.com>, John Snow <jsnow@redhat.com>,
  qemu-block@nongnu.org
-Message-ID: <48bfb298-4e7f-b9e8-4290-fa180943e651@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v2 5/9] block: don't keep AioContext acquired
- after internal_snapshot_prepare()
+Message-ID: <d65742f2-4974-31e5-46f0-04b9ebe5194c@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v2 6/9] block: drop unused
+ BlockDirtyBitmapState->aio_context field
 References: <20171206144550.22295-1-stefanha@redhat.com>
- <20171206144550.22295-6-stefanha@redhat.com>
-In-Reply-To: <20171206144550.22295-6-stefanha@redhat.com>
+ <20171206144550.22295-7-stefanha@redhat.com>
+In-Reply-To: <20171206144550.22295-7-stefanha@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
 
 On 12/06/2017 08:45 AM, Stefan Hajnoczi wrote:
+> The dirty bitmap actions in qmp_transaction have not used AioContext
+> since the dirty bitmap locking discipline was introduced in commit
+> 2119882c7eb7e2c612b24fc0c8d86f5887d6f1c3 ("block: introduce
+> dirty_bitmap_mutex").  Remove the unused field.
+>=20
 > Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
 > ---
->  blockdev.c | 47 +++++++++++++++++++++++++++++++----------------
->  1 file changed, 31 insertions(+), 16 deletions(-)
->=20
+>  blockdev.c | 13 -------------
+>  1 file changed, 13 deletions(-)
 
 Reviewed-by: Eric Blake <eblake@redhat.com>
 
@@ -58,7 +62,7 @@ Red Hat, Inc.           +1-919-301-3266
 Virtualization:  qemu.org | libvirt.org
 
 
---eMAqt36n5GNXlXV5XRN6nBn5dP0UuxCGc
+--nQqUHTCUB6PoERWB6Wo3Uo62AVUbGBPUP
 Content-Type: application/pgp-signature; name="signature.asc"
 Content-Description: OpenPGP digital signature
 Content-Disposition: attachment; filename="signature.asc"
@@ -67,14 +71,14 @@ Content-Disposition: attachment; filename="signature.asc"
 Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
 Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
 
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAloptsoACgkQp6FrSiUn
-Q2owVwf9EcCbJKWmAbKy+Er1QkoW1cghtVNywNQNJSu9NzlvATDXKFn/scMTf57y
-qBljQeW0w09V6yabsdo9lryNcGS7PXVZjWi378XsNhvWziNWpjzcTjb5d8dYUD9U
-DwAxmHsE+Bt6JYg4vyORLe8iQIt43UMpAiuVOJBH9t0BQKZ/YwrlthcppotBem2C
-g0PUzhIwUyalwcf/tiZz3MQptbnJM4dAUPbh76rtwf85zIni+5zc720u7fGJCWl6
-3FmqJblYLWsTG3t3sfu01U3ROKRMVGqhpbowEafzY1KiJJ9cTOxGCrv5MYh6P/ae
-3SU8DmF71FcVUQ95e30diN8VuHroOw==
-=pZoH
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAloptwYACgkQp6FrSiUn
+Q2pWDgf+O/DlkSDxdForh+tZEKqGIc0vNiMVtgFQYQSPjAzeFAKTgix3CbzKU3H1
+5R44CwtyWtlY2qjlZzbfEJ2C39qs5NIsWUG8Xy5s6xZJK+7zUGaVLb2PYtcJ6t3k
+PgFTGY0+vgqcRUG3bQaydLYabaIsBQdpAbtsHsAGE0RdJ94FvO2V4iy/+0hCPoHG
+2MZ0//SFfHmF5Goqzln0V2Kb00dTcdM2ewz+wMHB2bwjLsKWxH9pkhAVoP9vxHN1
+XzkdDMHYvYL/QrV8yWOQezAw/Ch90uVHsS/X3GJ+wTtGS405Rcc+6aotnyk7434u
+V7qZpA562cAZ+xvPm4JubTZ6ZrRugQ==
+=MKzl
 -----END PGP SIGNATURE-----
 
---eMAqt36n5GNXlXV5XRN6nBn5dP0UuxCGc--
+--nQqUHTCUB6PoERWB6Wo3Uo62AVUbGBPUP--
