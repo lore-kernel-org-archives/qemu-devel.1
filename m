@@ -1,31 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48086)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49804)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1eMwkv-00065T-RE
-	for qemu-devel@nongnu.org; Thu, 07 Dec 2017 09:02:34 -0500
+	(envelope-from <armbru@redhat.com>) id 1eMwse-000187-Vb
+	for qemu-devel@nongnu.org; Thu, 07 Dec 2017 09:10:32 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1eMwkm-0000Xe-D8
-	for qemu-devel@nongnu.org; Thu, 07 Dec 2017 09:02:29 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:58406)
+	(envelope-from <armbru@redhat.com>) id 1eMwsa-0007yI-8L
+	for qemu-devel@nongnu.org; Thu, 07 Dec 2017 09:10:28 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:49714)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1eMwkm-0000XJ-6H
-	for qemu-devel@nongnu.org; Thu, 07 Dec 2017 09:02:20 -0500
-Date: Thu, 7 Dec 2017 16:02:11 +0200
-From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <20171207153454-mutt-send-email-mst@kernel.org>
-References: <1512444796-30615-1-git-send-email-wei.w.wang@intel.com>
-	<20171206134957.GD12584@stefanha-x1.localdomain>
-	<286AC319A985734F985F78AFA26841F73937B57F@shsmsx102.ccr.corp.intel.com>
-	<CAJSP0QWugAKQy6hYEJfy_XHEg-Q2swAzZMNcWBqn-r9Yi7yiEg@mail.gmail.com>
-	<5A28BC2D.6000308@intel.com>
-	<CAJSP0QUxRv9LNb1+McYxV0KY4Ss3NkaSjwO6fXiJd+oU2+zJSQ@mail.gmail.com>
-	<5A290398.60508@intel.com>
-	<CAJSP0QURjdD8BnOmJo83fzJn_zCijSKQh==Pz+Xu4r6Q2i3SkQ@mail.gmail.com>
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1eMwsZ-0007wL-T3
+	for qemu-devel@nongnu.org; Thu, 07 Dec 2017 09:10:24 -0500
+From: Markus Armbruster <armbru@redhat.com>
+References: <20170911110623.24981-1-marcandre.lureau@redhat.com>
+	<20170911110623.24981-10-marcandre.lureau@redhat.com>
+Date: Thu, 07 Dec 2017 15:10:12 +0100
+In-Reply-To: <20170911110623.24981-10-marcandre.lureau@redhat.com>
+	(=?utf-8?Q?=22Marc-Andr=C3=A9?= Lureau"'s message of "Mon, 11 Sep 2017
+	13:05:42 +0200")
+Message-ID: <87zi6uochn.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CAJSP0QURjdD8BnOmJo83fzJn_zCijSKQh==Pz+Xu4r6Q2i3SkQ@mail.gmail.com>
-Subject: Re: [Qemu-devel] [virtio-dev] [PATCH v3 0/7] Vhost-pci for inter-VM
- communication
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v3 09/50] qapi: add #if/#endif helpers
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,50 +29,96 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefan Hajnoczi <stefanha@gmail.com>
-Cc: Wei Wang <wei.w.wang@intel.com>, "virtio-dev@lists.oasis-open.org" <virtio-dev@lists.oasis-open.org>, "Yang, Zhiyong" <zhiyong.yang@intel.com>, "jan.kiszka@siemens.com" <jan.kiszka@siemens.com>, "jasowang@redhat.com" <jasowang@redhat.com>, "avi.cohen@huawei.com" <avi.cohen@huawei.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, Stefan Hajnoczi <stefanha@redhat.com>, "pbonzini@redhat.com" <pbonzini@redhat.com>, "marcandre.lureau@redhat.com" <marcandre.lureau@redhat.com>
+To: =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>
+Cc: qemu-devel@nongnu.org, Michael Roth <mdroth@linux.vnet.ibm.com>
 
-On Thu, Dec 07, 2017 at 01:08:04PM +0000, Stefan Hajnoczi wrote:
-> Instead of responding individually to these points, I hope this will
-> explain my perspective.  Let me know if you do want individual
-> responses, I'm happy to talk more about the points above but I think
-> the biggest difference is our perspective on this:
-> 
-> Existing vhost-user slave code should be able to run on top of
-> vhost-pci.  For example, QEMU's
-> contrib/vhost-user-scsi/vhost-user-scsi.c should work inside the guest
-> with only minimal changes to the source file (i.e. today it explicitly
-> opens a UNIX domain socket and that should be done by libvhost-user
-> instead).  It shouldn't be hard to add vhost-pci vfio support to
-> contrib/libvhost-user/ alongside the existing UNIX domain socket code.
-> 
-> This seems pretty easy to achieve with the vhost-pci PCI adapter that
-> I've described but I'm not sure how to implement libvhost-user on top
-> of vhost-pci vfio if the device doesn't expose the vhost-user
-> protocol.
-> 
-> I think this is a really important goal.  Let's use a single
-> vhost-user software stack instead of creating a separate one for guest
-> code only.
-> 
-> Do you agree that the vhost-user software stack should be shared
-> between host userspace and guest code as much as possible?
+Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com> writes:
 
+> Add helpers to wrap generated code with #if/#endif lines.
+>
+> Add a function decorator that will be used to wrap visitor methods.
+> The decorator will check if code was generated before adding #if/#endif
+> lines. Used in the following patches.
+>
+> Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+> ---
+>  scripts/qapi.py | 55 +++++++++++++++++++++++++++++++++++++++++++++++++++=
+++++
+>  1 file changed, 55 insertions(+)
+>
+> diff --git a/scripts/qapi.py b/scripts/qapi.py
+> index 2a8e60e975..94b735d8d6 100644
+> --- a/scripts/qapi.py
+> +++ b/scripts/qapi.py
+> @@ -1897,6 +1897,61 @@ def guardend(name):
+>                   name=3Dguardname(name))
+>=20=20
+>=20=20
+> +def gen_if(ifcond):
+> +    if not ifcond:
+> +        return ''
+> +    if isinstance(ifcond, str):
+> +        ifcond =3D [ifcond]
 
+Perhaps we should take this normalization step in the QAPISchema
+constructors.
 
-The sharing you propose is not necessarily practical because the security goals
-of the two are different.
+> +    ret =3D ''
+> +    for ifc in ifcond:
+> +        ret +=3D mcgen('''
+> +#if %(cond)s
+> +''', cond=3Difc)
+> +    return ret
+> +
+> +
+> +def gen_endif(ifcond):
+> +    if not ifcond:
+> +        return ''
+> +    if isinstance(ifcond, str):
+> +        ifcond =3D [ifcond]
+> +    ret =3D ''
+> +    for ifc in reversed(ifcond):
+> +        ret +=3D mcgen('''
+> +#endif /* %(cond)s */
+> +''', cond=3Difc)
+> +    return ret
+> +
+> +
+> +# Wrap a method to add #if / #endif to generated code, only if some
+> +# code was generated. The method must have an 'ifcond' argument.
+> +# self must have 'if_members' listing the attributes to wrap.
+> +def ifcond_decorator(func):
+> +
+> +    def func_wrapper(self, *args, **kwargs):
+> +        import inspect
 
-It seems that the best motivation presentation is still the original rfc
+Is hiding imports in function a good idea?
 
-http://virtualization.linux-foundation.narkive.com/A7FkzAgp/rfc-vhost-user-enhancements-for-vm2vm-communication
+> +        idx =3D inspect.getargspec(func).args.index('ifcond')
+> +        ifcond =3D args[idx - 1]
+> +        save =3D {}
+> +        for mem in self.if_members:
+> +            save[mem] =3D getattr(self, mem)
+> +        func(self, *args, **kwargs)
+> +        for mem, val in save.items():
+> +            newval =3D getattr(self, mem)
+> +            if newval !=3D val:
+> +                assert newval.startswith(val)
+> +                newval =3D newval[len(val):]
+> +                if newval[0] =3D=3D '\n':
+> +                    val +=3D '\n'
+> +                    newval =3D newval[1:]
+> +                val +=3D gen_if(ifcond)
+> +                val +=3D newval
+> +                val +=3D gen_endif(ifcond)
+> +            setattr(self, mem, val)
+> +
+> +    return func_wrapper
+> +
+> +
+>  def gen_enum_lookup(name, values, prefix=3DNone):
+>      ret =3D mcgen('''
 
-So comparing with vhost-user iotlb handling is different:
-
-With vhost-user guest trusts the vhost-user backend on the host.
-
-With vhost-pci we can strive to limit the trust to qemu only.
-The switch running within a VM does not have to be trusted.
-
--- 
-MST
+My gut feeling is still "too clever by half", but i'm reserving
+judgement until after review of its use, and exploration of
+alternatives.
