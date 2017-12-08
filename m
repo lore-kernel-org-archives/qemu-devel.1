@@ -1,22 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40775)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43308)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1eNOgD-0004fA-PP
-	for qemu-devel@nongnu.org; Fri, 08 Dec 2017 14:51:30 -0500
+	(envelope-from <eblake@redhat.com>) id 1eNOr8-0001W2-95
+	for qemu-devel@nongnu.org; Fri, 08 Dec 2017 15:02:50 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1eNOgC-0007d5-Vp
-	for qemu-devel@nongnu.org; Fri, 08 Dec 2017 14:51:29 -0500
-References: <1512735034-35327-1-git-send-email-anton.nefedov@virtuozzo.com>
-	<1512735034-35327-4-git-send-email-anton.nefedov@virtuozzo.com>
-From: John Snow <jsnow@redhat.com>
-Message-ID: <7dfd884c-c938-cff1-a077-9e159609aad4@redhat.com>
-Date: Fri, 8 Dec 2017 14:51:22 -0500
+	(envelope-from <eblake@redhat.com>) id 1eNOr3-0006fN-O3
+	for qemu-devel@nongnu.org; Fri, 08 Dec 2017 15:02:46 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:32772)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1eNOr3-0006dF-E7
+	for qemu-devel@nongnu.org; Fri, 08 Dec 2017 15:02:41 -0500
+References: <20171208105553.12249-1-pbonzini@redhat.com>
+	<20171208105553.12249-6-pbonzini@redhat.com>
+	<20171208151306.GC8998@stefanha-x1.localdomain>
+	<9c90d2b3-242e-5ffc-3e48-cf05e6fe85c3@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <a53f2cc7-9da4-bd8e-4d0b-bb3c32c9d4a9@redhat.com>
+Date: Fri, 8 Dec 2017 14:02:32 -0600
 MIME-Version: 1.0
-In-Reply-To: <1512735034-35327-4-git-send-email-anton.nefedov@virtuozzo.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 3/3] ide: abort TRIM operation for invalid
- range
+In-Reply-To: <9c90d2b3-242e-5ffc-3e48-cf05e6fe85c3@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="cjLTpkqbJC29po50j3sdjR5pTiEdx0Jns"
+Subject: Re: [Qemu-devel] [PATCH 5/5] thread-pool: convert to use lock guards
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,93 +30,98 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Anton Nefedov <anton.nefedov@virtuozzo.com>, qemu-devel@nongnu.org
-Cc: qemu-block@nongnu.org
+To: Paolo Bonzini <pbonzini@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>
+Cc: "Emilio G . Cota" <cota@braap.org>, Fam Zheng <famz@redhat.com>, qemu-devel@nongnu.org
+
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--cjLTpkqbJC29po50j3sdjR5pTiEdx0Jns
+From: Eric Blake <eblake@redhat.com>
+To: Paolo Bonzini <pbonzini@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>
+Cc: "Emilio G . Cota" <cota@braap.org>, Fam Zheng <famz@redhat.com>,
+ qemu-devel@nongnu.org
+Message-ID: <a53f2cc7-9da4-bd8e-4d0b-bb3c32c9d4a9@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH 5/5] thread-pool: convert to use lock guards
+References: <20171208105553.12249-1-pbonzini@redhat.com>
+ <20171208105553.12249-6-pbonzini@redhat.com>
+ <20171208151306.GC8998@stefanha-x1.localdomain>
+ <9c90d2b3-242e-5ffc-3e48-cf05e6fe85c3@redhat.com>
+In-Reply-To: <9c90d2b3-242e-5ffc-3e48-cf05e6fe85c3@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+
+On 12/08/2017 12:12 PM, Paolo Bonzini wrote:
+> On 08/12/2017 16:13, Stefan Hajnoczi wrote:
+>>> -    qemu_mutex_lock(&pool->lock);
+>>> +    QEMU_LOCK_GUARD(QemuMutex, pool_guard, &pool->lock);
+>>>      if (pool->idle_threads =3D=3D 0 && pool->cur_threads < pool->max=
+_threads) {
+>>>          spawn_thread(pool);
+>>>      }
+>>>      QTAILQ_INSERT_TAIL(&pool->request_list, req, reqs);
+>>> -    qemu_mutex_unlock(&pool->lock);
+>>> +    qemu_lock_guard_unlock(&pool_guard);
+>> Why not QEMU_WITH_LOCK()?  Then you can get rid of the explicit unlock=
+=2E
+>=20
+> I agree that QEMU_WITH_LOCK_GUARD is better in this case. (IIRC I wrote=
+
+> this patch before coming up with the is_taken trick!).
+>=20
+> My main question for the series is what you think the balance should be=
+
+> between a more widely applicable API and a simpler one.
+
+If you require the user to provide the scope, this could be:
+
+@@ -258,12 +254,12 @@ BlockAIOCB *thread_pool_submit_aio(ThreadPool *pool=
+,
+
+     trace_thread_pool_submit(pool, req, arg);
+
+-    qemu_mutex_lock(&pool->lock);
+-    if (pool->idle_threads =3D=3D 0 && pool->cur_threads < pool->max_thr=
+eads) {
+-        spawn_thread(pool);
+-    QTAILQ_INSERT_TAIL(&pool->request_list, req, reqs);
++    {
++        QEMU_LOCK_GUARD(QemuMutex, pool_guard, &pool->lock);
++        if (pool->idle_threads =3D=3D 0 && pool->cur_threads <
+pool->max_threads) {
++            spawn_thread(pool);
++        }
++        QTAILQ_INSERT_TAIL(&pool->request_list, req, reqs);
+     }
+-    qemu_mutex_unlock(&pool->lock);
+     qemu_sem_post(&pool->sem);
+     return &req->common;
+ }
+
+In other words, I don't see what 'QEMU_WITH_LOCK_GUARD() {}' buys us
+over '{ QEMU_LOCK_GUARD() }'.
+
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
 
 
+--cjLTpkqbJC29po50j3sdjR5pTiEdx0Jns
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
 
-On 12/08/2017 07:10 AM, Anton Nefedov wrote:
-> ATA8-ACS3, 7.9 DATA SET MANAGEMENT - 06h, DMA
-> 
->     7.9.5 Error Outputs
->     If the Trim bit is set to one and:
->       a) the device detects an invalid LBA Range Entry; or
->       b) count is greater than IDENTIFY DEVICE data word 105
->          (see 7.16.7.55),
->     then the device shall return command aborted.
->     A device may trim one or more LBA Range Entries before it returns
->     command aborted. See table 209.
-> 
-> This check is not in the common ide_dma_cb() as the range for TRIM
-> is harder to reach: it is not in LBA/count registers and the buffer has
-> to be parsed first.
-> 
-> Signed-off-by: Anton Nefedov <anton.nefedov@virtuozzo.com>
-> ---
->  hw/ide/core.c | 15 +++++++++++++--
->  1 file changed, 13 insertions(+), 2 deletions(-)
-> 
-> diff --git a/hw/ide/core.c b/hw/ide/core.c
-> index 23c71fa..3d1494f 100644
-> --- a/hw/ide/core.c
-> +++ b/hw/ide/core.c
-> @@ -401,6 +401,7 @@ typedef struct TrimAIOCB {
->      QEMUIOVector *qiov;
->      BlockAIOCB *aiocb;
->      int i, j;
-> +    bool is_invalid;
->  } TrimAIOCB;
->  
->  static void trim_aio_cancel(BlockAIOCB *acb)
-> @@ -428,8 +429,11 @@ static void ide_trim_bh_cb(void *opaque)
->  {
->      TrimAIOCB *iocb = opaque;
->  
-> -    iocb->common.cb(iocb->common.opaque, iocb->ret);
-> -
-> +    if (iocb->is_invalid) {
-> +        ide_dma_error(iocb->s);
-> +    } else {
-> +        iocb->common.cb(iocb->common.opaque, iocb->ret);
-> +    }
->      qemu_bh_delete(iocb->bh);
->      iocb->bh = NULL;
->      qemu_aio_unref(iocb);
-> @@ -456,6 +460,11 @@ static void ide_issue_trim_cb(void *opaque, int ret)
->                      continue;
->                  }
->  
-> +                if (!ide_sect_range_ok(s, sector, count)) {
-> +                    iocb->is_invalid = true;
-> +                    goto done;
-> +                }
-> +
->                  /* Got an entry! Submit and exit.  */
->                  iocb->aiocb = blk_aio_pdiscard(s->blk,
->                                                 sector << BDRV_SECTOR_BITS,
-> @@ -471,6 +480,7 @@ static void ide_issue_trim_cb(void *opaque, int ret)
->          iocb->ret = ret;
->      }
->  
-> +done:
->      iocb->aiocb = NULL;
->      if (iocb->bh) {
->          qemu_bh_schedule(iocb->bh);
-> @@ -491,6 +501,7 @@ BlockAIOCB *ide_issue_trim(
->      iocb->qiov = qiov;
->      iocb->i = -1;
->      iocb->j = 0;
-> +    iocb->is_invalid = false;
->      ide_issue_trim_cb(iocb, 0);
->      return &iocb->common;
->  }>
+-----BEGIN PGP SIGNATURE-----
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
 
-Looks about right, just remember that this flow won't call
-block_acct_invalid because you're bypassing the return to ide_dma_cb. I
-assume you'll get to that in your next series.
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAloq79gACgkQp6FrSiUn
+Q2puRwf/ZML3ZA3pSPQZf79TR1rZeSmCvBOEfS1Hw2yAXLuJmwJvRdeq70IdwauA
+TFMp9CnPwqN3Ls8+qU9p1iaEC3t8IgYAZJcKgR796SiHjht7d5MAa1UJNk6Y1hMK
+oJzp9cOzC/bM1/kVS768YBa0jBszxrxvPGnmEjoVpACzpFUbif3YT7y0MpTeXsRC
+VFzElAQbUlksayahIO7vfx3yXLFdVp039k0Z/vv+loV2Pt04QaZjfqw3ZkKTTG/d
+4rujc6rc48vqAWGggRjBC/wc81URNE6MRFI1UJlyruHMbJPOC8Jeo2n1K23eJrq5
+Ibifuh5ptDOmtl/KikwCDyUfNTzlqQ==
+=3qJg
+-----END PGP SIGNATURE-----
 
-For now, this should properly reject bogus TRIM commands. When you send
-your next series, may I ask for a simple test case if possible?
-
-1-3:
-Reviewed-by: John Snow <jsnow@redhat.com>
+--cjLTpkqbJC29po50j3sdjR5pTiEdx0Jns--
