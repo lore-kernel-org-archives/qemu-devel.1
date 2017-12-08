@@ -1,30 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49513)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51244)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1eNGPo-0006SM-8c
-	for qemu-devel@nongnu.org; Fri, 08 Dec 2017 06:02:01 -0500
+	(envelope-from <yang.zhong@intel.com>) id 1eNGVO-0002TM-JN
+	for qemu-devel@nongnu.org; Fri, 08 Dec 2017 06:07:47 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1eNGPl-0006Yj-3q
-	for qemu-devel@nongnu.org; Fri, 08 Dec 2017 06:02:00 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:47988)
+	(envelope-from <yang.zhong@intel.com>) id 1eNGVL-0001x8-De
+	for qemu-devel@nongnu.org; Fri, 08 Dec 2017 06:07:46 -0500
+Received: from mga05.intel.com ([192.55.52.43]:1897)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1eNGPk-0006YO-T4
-	for qemu-devel@nongnu.org; Fri, 08 Dec 2017 06:01:57 -0500
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
-	[10.5.11.16])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id BDD82C0050D9
-	for <qemu-devel@nongnu.org>; Fri,  8 Dec 2017 11:01:55 +0000 (UTC)
-Date: Fri, 8 Dec 2017 11:01:49 +0000
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20171208110148.GH2403@work-vm>
-References: <20171201125813.1437-1-quintela@redhat.com>
-	<20171201125813.1437-4-quintela@redhat.com>
+	(Exim 4.71) (envelope-from <yang.zhong@intel.com>)
+	id 1eNGVL-0001tC-2w
+	for qemu-devel@nongnu.org; Fri, 08 Dec 2017 06:07:43 -0500
+Date: Fri, 8 Dec 2017 19:06:59 +0800
+From: Yang Zhong <yang.zhong@intel.com>
+Message-ID: <20171208110659.GB8672@yangzhon-Virtual>
+References: <1511505030-3669-1-git-send-email-yang.zhong@intel.com>
+	<5A1A5C6E.9060409@huawei.com>
+	<20171201105622.GB26237@yangzhon-Virtual>
+	<74cccd14-e485-90d4-82d9-03355c05faca@redhat.com>
+	<20171204120322.GA32151@yangzhon-Virtual>
+	<5A253EF5.6040300@huawei.com>
+	<20171205060047.GA4102@yangzhon-Virtual>
+	<024fd897-a16a-f69e-94dc-07affb3ef724@redhat.com>
+	<20171206092625.GA19639@yangzhon-Virtual>
+	<6bfac215-b5ba-fd09-d17b-310a2c843a2b@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20171201125813.1437-4-quintela@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v3 3/6] tests: Add migration precopy test
+In-Reply-To: <6bfac215-b5ba-fd09-d17b-310a2c843a2b@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v3] rcu: reduce more than 7MB heap memory
+ by malloc_trim()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,93 +37,84 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Juan Quintela <quintela@redhat.com>
-Cc: qemu-devel@nongnu.org, lvivier@redhat.com, peterx@redhat.com
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: qemu-devel@nongnu.org, stefanha@redhat.com, berrange@redhat.com, zhaoshenglong@huawei.com, weidong.huang@huawei.com, arei.gonglei@huawei.com, liujunjie23@huawei.com, wangxinxin.wang@huawei.com, stone.xulei@huawei.com, yang.zhong@intel.com
 
-* Juan Quintela (quintela@redhat.com) wrote:
-> Signed-off-by: Juan Quintela <quintela@redhat.com>
-
-OK, although you seem to have chosen a bandwidth 10x what I use
-in the postcopy test but for the same reason.
-
-
-Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
-
-> ---
->  tests/migration-test.c | 44 ++++++++++++++++++++++++++++++++++++++++++--
->  1 file changed, 42 insertions(+), 2 deletions(-)
+On Wed, Dec 06, 2017 at 10:48:45AM +0100, Paolo Bonzini wrote:
+> On 06/12/2017 10:26, Yang Zhong wrote:
+> >   Hello Paolo,
+> > 
+> >   The best option is only trim one time after guest kernel bootup or VM bootup, and as for
+> >   hotplug/unhotplug operations during the VM running, the trim still can do for each batch
+> >   memory free because trim will not impact VM performance during VM running status.
+> > 
+> >   So, the key point is qemu is hard to know when guest ernel bootup is over. If you have some 
+> >   suggestions, please let me know. thanks!
 > 
-> diff --git a/tests/migration-test.c b/tests/migration-test.c
-> index 51f49c74e9..3f3f056be6 100644
-> --- a/tests/migration-test.c
-> +++ b/tests/migration-test.c
-> @@ -539,7 +539,7 @@ static void test_migrate_end(QTestState *from, QTestState *to)
->      cleanup("dest_serial");
->  }
->  
-> -static void test_migrate(void)
-> +static void test_postcopy(void)
->  {
->      char *uri = g_strdup_printf("unix:%s/migsocket", tmpfs);
->      QTestState *from, *to;
-> @@ -582,6 +582,45 @@ static void test_migrate(void)
->      test_migrate_end(from, to);
->  }
->  
-> +static void test_precopy_unix(void)
-> +{
-> +    char *uri = g_strdup_printf("unix:%s/migsocket", tmpfs);
-> +    QTestState *from, *to;
-> +
-> +    test_migrate_start(&from, &to, uri);
-> +
-> +    /* We want to pick a speed slow enough that the test completes
-> +     * quickly, but that it doesn't complete precopy even on a slow
-> +     * machine, so also set the downtime.
-> +     */
-> +    /* 1 ms */
-> +    migrate_set_parameter(from, "downtime-limit", "1");
-> +    /* 1GB/s slow*/
-> +    migrate_set_parameter(from, "max-bandwidth", "1000000000");
-> +
-> +    /* Wait for the first serial output from the source */
-> +    wait_for_serial("src_serial");
-> +
-> +    migrate(from, uri);
-> +
-> +    wait_for_migration_pass(from);
-> +
-> +    /* 300 ms should converge */
-> +    migrate_set_parameter(from, "downtime-limit", "300");
-> +
-> +    if (!got_stop) {
-> +        qtest_qmp_eventwait(from, "STOP");
-> +    }
-> +
-> +    qtest_qmp_eventwait(to, "RESUME");
-> +
-> +    wait_for_serial("dest_serial");
-> +    wait_for_migration_complete(from);
-> +
-> +    test_migrate_end(from, to);
-> +    g_free(uri);
-> +}
-> +
->  int main(int argc, char **argv)
->  {
->      char template[] = "/tmp/migration-test-XXXXXX";
-> @@ -601,7 +640,8 @@ int main(int argc, char **argv)
->  
->      module_call_init(MODULE_INIT_QOM);
->  
-> -    qtest_add_func("/migration/postcopy/unix", test_migrate);
-> +    qtest_add_func("/migration/precopy/unix", test_precopy_unix);
-> +    qtest_add_func("/migration/postcopy/unix", test_postcopy);
->  
->      ret = g_test_run();
->  
-> -- 
-> 2.14.3
+> It shouldn't be hard.  Does QEMU's RCU thread actually get any
+> significant activity after bootup?  Hence the suggestion of keeping
+> malloc_trim in the RCU thread, but only do it if some time has passed
+> since the last time.
 > 
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+> Maybe something like this every time the RCU thread runs:
+> 
+>  static uint64_t next_trim_time, last_trim_time;
+>  if (current time < next_trim_time) {
+>      next_trim_time -= last_trim_time / 2    /* or higher */
+>      last_trim_time -= last_trim_time / 2    /* same as previous line */
+>  } else {
+>      trim_start_time = current time
+>      malloc_trim(...)
+>      last_trim_time = current time - trim_start_time
+>      next_trim_time = current time + last_trim_time
+>  }
+> 
+> Where the "2" factor should be tuned so that both your and Shannon's
+> scenario work fine.
+>
+  Hello Paolo,
+
+  As for your patch, i have commented on another mail.
+
+  Please help check below TEMP patch.
+
+  +++ b/util/rcu.c
+  @@ -32,7 +32,7 @@
+  #include "qemu/atomic.h"
+  #include "qemu/thread.h"
+  #include "qemu/main-loop.h"
+ -
++#if defined(CONFIG_MALLOC_TRIM)
++#include <malloc.h>
++#endif
+  /*
+   * Global grace period counter.  Bit 0 is always one in rcu_gp_ctr.
+   * Bits 1 and above are defined in synchronize_rcu.
+  @@ -246,6 +246,7 @@ static void *call_rcu_thread(void *opaque)
+                  qemu_event_reset(&rcu_call_ready_event);
+                  n = atomic_read(&rcu_call_count);
+                  if (n == 0) {
+ +                    #if defined(CONFIG_MALLOC_TRIM)
+ +                       malloc_trim(4 * 1024 * 1024);
+ +                    #endif
+                      qemu_event_wait(&rcu_call_ready_event);
+                  }
+              }
+
+  If there is no rcu_call(), the n=0 and call_rcu_thread() will trim memory 
+  and then enter sleep to wait for rcu_call() to wakeup this thread.
+
+  Once the VM bootup, if there is not any activity like hotplug, rcu thread
+  is always in sleep status.
+
+  As for the VM bootup, if the n!=0, the rcu thread will not call trim.
+
+  If use this method, the trim times will decrease to around 1/2 of previous. 
+
+  Regards,
+
+  Yang
+ 
+> Thanks,
+> 
+> Paolo
