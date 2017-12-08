@@ -1,21 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36957)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37453)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1eNMWk-0001p6-1C
-	for qemu-devel@nongnu.org; Fri, 08 Dec 2017 12:33:35 -0500
+	(envelope-from <lprosek@redhat.com>) id 1eNMXy-0002Xr-K3
+	for qemu-devel@nongnu.org; Fri, 08 Dec 2017 12:34:52 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1eNMWj-0007oV-1i
-	for qemu-devel@nongnu.org; Fri, 08 Dec 2017 12:33:34 -0500
-Date: Fri, 8 Dec 2017 17:33:21 +0000
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20171208173321.GR2403@work-vm>
-References: <20171207155102.66622-1-vsementsov@virtuozzo.com>
-	<20171207155102.66622-3-vsementsov@virtuozzo.com>
+	(envelope-from <lprosek@redhat.com>) id 1eNMXv-0000Gq-DG
+	for qemu-devel@nongnu.org; Fri, 08 Dec 2017 12:34:50 -0500
+Received: from mail-vk0-f67.google.com ([209.85.213.67]:35999)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <lprosek@redhat.com>) id 1eNMXv-0000Gc-8z
+	for qemu-devel@nongnu.org; Fri, 08 Dec 2017 12:34:47 -0500
+Received: by mail-vk0-f67.google.com with SMTP id f73so7354860vki.3
+	for <qemu-devel@nongnu.org>; Fri, 08 Dec 2017 09:34:47 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20171207155102.66622-3-vsementsov@virtuozzo.com>
-Subject: Re: [Qemu-devel] [PATCH v2 2/6] qapi: add name parameter to
- nbd-server-add
+In-Reply-To: <87vahh9ljm.fsf@dusky.pond.sub.org>
+References: <20171208074515.1553-1-lprosek@redhat.com>
+	<20171208074515.1553-5-lprosek@redhat.com>
+	<87y3mde3z1.fsf@dusky.pond.sub.org>
+	<CABdb737EUy_rRCunxeDUDdhhDiCU8eZBNoYmh+QGp39mqsDung@mail.gmail.com>
+	<87vahh9ljm.fsf@dusky.pond.sub.org>
+From: Ladi Prosek <lprosek@redhat.com>
+Date: Fri, 8 Dec 2017 18:34:45 +0100
+Message-ID: <CABdb737A3bOdxychRQAaEYmKPLt3SpUFU9UxHM9okmt2jURF2w@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH v3 4/4] ivshmem: Disable irqfd on device
+ reset
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,117 +32,96 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, armbru@redhat.com, pbonzini@redhat.com, eblake@redhat.com, mreitz@redhat.com, kwolf@redhat.com, den@openvz.org
+To: Markus Armbruster <armbru@redhat.com>
+Cc: Geoffrey McRae <geoff@hostfission.com>, Paolo Bonzini <pbonzini@redhat.com>, qemu-devel <qemu-devel@nongnu.org>, =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@redhat.com>
 
-* Vladimir Sementsov-Ogievskiy (vsementsov@virtuozzo.com) wrote:
-> Allow user to specify name for new export, to not reuse internal
-> node name and to not show it to clients.
-> 
-> This also allows creating several exports per device.
-> 
-> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-> ---
->  qapi/block.json |  9 +++++++--
->  blockdev-nbd.c  | 14 +++++++++-----
->  hmp.c           |  5 +++--
->  3 files changed, 19 insertions(+), 9 deletions(-)
-> 
-> diff --git a/qapi/block.json b/qapi/block.json
-> index f093fa3f27..503d4b287b 100644
-> --- a/qapi/block.json
-> +++ b/qapi/block.json
-> @@ -213,14 +213,19 @@
->  #
->  # @device: The device name or node name of the node to be exported
->  #
-> +# @name: Export name. If unspecified @device parameter used as export name.
-> +#        (Since 2.12)
-> +#
->  # @writable: Whether clients should be able to write to the device via the
->  #     NBD connection (default false).
->  #
-> -# Returns: error if the device is already marked for export.
-> +# Returns: error if the server is not running, or export with the same name
-> +#          already exists.
->  #
->  # Since: 1.3.0
->  ##
-> -{ 'command': 'nbd-server-add', 'data': {'device': 'str', '*writable': 'bool'} }
-> +{ 'command': 'nbd-server-add',
-> +  'data': {'device': 'str', '*name': 'str', '*writable': 'bool'} }
->  
->  ##
->  # @nbd-server-stop:
-> diff --git a/blockdev-nbd.c b/blockdev-nbd.c
-> index 28f551a7b0..46c885aa35 100644
-> --- a/blockdev-nbd.c
-> +++ b/blockdev-nbd.c
-> @@ -158,8 +158,8 @@ void qmp_nbd_server_start(SocketAddressLegacy *addr,
->      qapi_free_SocketAddress(addr_flat);
->  }
->  
-> -void qmp_nbd_server_add(const char *device, bool has_writable, bool writable,
-> -                        Error **errp)
-> +void qmp_nbd_server_add(const char *device, bool has_name, const char *name,
-> +                        bool has_writable, bool writable, Error **errp)
->  {
->      BlockDriverState *bs = NULL;
->      BlockBackend *on_eject_blk;
-> @@ -170,8 +170,12 @@ void qmp_nbd_server_add(const char *device, bool has_writable, bool writable,
->          return;
->      }
->  
-> -    if (nbd_export_find(device)) {
-> -        error_setg(errp, "NBD server already exporting device '%s'", device);
-> +    if (!has_name) {
-> +        name = device;
-> +    }
-> +
-> +    if (nbd_export_find(name)) {
-> +        error_setg(errp, "NBD server already has export named '%s'", name);
->          return;
->      }
->  
-> @@ -195,7 +199,7 @@ void qmp_nbd_server_add(const char *device, bool has_writable, bool writable,
->          return;
->      }
->  
-> -    nbd_export_set_name(exp, device);
-> +    nbd_export_set_name(exp, name);
->  
->      /* The list of named exports has a strong reference to this export now and
->       * our only way of accessing it is through nbd_export_find(), so we can drop
-> diff --git a/hmp.c b/hmp.c
-> index 35a7041824..0ea9c09b58 100644
-> --- a/hmp.c
-> +++ b/hmp.c
-> @@ -2203,7 +2203,8 @@ void hmp_nbd_server_start(Monitor *mon, const QDict *qdict)
->              continue;
->          }
->  
-> -        qmp_nbd_server_add(info->value->device, true, writable, &local_err);
-> +        qmp_nbd_server_add(info->value->device, false, NULL,
-> +                           true, writable, &local_err);
->  
->          if (local_err != NULL) {
->              qmp_nbd_server_stop(NULL);
-> @@ -2223,7 +2224,7 @@ void hmp_nbd_server_add(Monitor *mon, const QDict *qdict)
->      bool writable = qdict_get_try_bool(qdict, "writable", false);
->      Error *local_err = NULL;
->  
-> -    qmp_nbd_server_add(device, true, writable, &local_err);
-> +    qmp_nbd_server_add(device, false, NULL, true, writable, &local_err);
+On Fri, Dec 8, 2017 at 6:28 PM, Markus Armbruster <armbru@redhat.com> wrote:
+> Ladi Prosek <lprosek@redhat.com> writes:
+>
+>> On Fri, Dec 8, 2017 at 2:36 PM, Markus Armbruster <armbru@redhat.com> wrote:
+>>> Ladi Prosek <lprosek@redhat.com> writes:
+>>>
+>>>> The effects of ivshmem_enable_irqfd() was not undone on device reset.
+>>>>
+>>>> This manifested as:
+>>>> ivshmem_add_kvm_msi_virq: Assertion `!s->msi_vectors[vector].pdev' failed.
+>>>>
+>>>> when irqfd was enabled before reset and then enabled again after reset, making
+>>>> ivshmem_enable_irqfd() run for the second time.
+>>>>
+>>>> To reproduce, run:
+>>>>
+>>>>   ivshmem-server
+>>>>
+>>>> and QEMU with:
+>>>>
+>>>>   -device ivshmem-doorbell,chardev=iv
+>>>>   -chardev socket,path=/tmp/ivshmem_socket,id=iv
+>>>>
+>>>> then install the Windows driver, at the time of writing available at:
+>>>>
+>>>> https://github.com/virtio-win/kvm-guest-drivers-windows/tree/master/ivshmem
+>>>>
+>>>> and crash-reboot the guest by inducing a BSOD.
+>>>>
+>>>> Signed-off-by: Ladi Prosek <lprosek@redhat.com>
+>>>> ---
+>>>>  hw/misc/ivshmem.c | 24 +++++++++++++-----------
+>>>>  1 file changed, 13 insertions(+), 11 deletions(-)
+>>>>
+>>>> diff --git a/hw/misc/ivshmem.c b/hw/misc/ivshmem.c
+>>>> index d1bb246d12..4be0d2627b 100644
+>>>> --- a/hw/misc/ivshmem.c
+>>>> +++ b/hw/misc/ivshmem.c
+>>>> @@ -758,17 +758,6 @@ static void ivshmem_msix_vector_use(IVShmemState *s)
+>>>>      }
+>>>>  }
+>>>>
+>>>> -static void ivshmem_reset(DeviceState *d)
+>>>> -{
+>>>> -    IVShmemState *s = IVSHMEM_COMMON(d);
+>>>> -
+>>>> -    s->intrstatus = 0;
+>>>> -    s->intrmask = 0;
+>>>> -    if (ivshmem_has_feature(s, IVSHMEM_MSI)) {
+>>>> -        ivshmem_msix_vector_use(s);
+>>>> -    }
+>>>> -}
+>>>> -
+>>>>  static int ivshmem_setup_interrupts(IVShmemState *s, Error **errp)
+>>>>  {
+>>>>      /* allocate QEMU callback data for receiving interrupts */
+>>>> @@ -855,6 +844,19 @@ static void ivshmem_disable_irqfd(IVShmemState *s)
+>>>>
+>>>>  }
+>>>>
+>>>> +static void ivshmem_reset(DeviceState *d)
+>>>> +{
+>>>> +    IVShmemState *s = IVSHMEM_COMMON(d);
+>>>> +
+>>>> +    ivshmem_disable_irqfd(s);
+>>>> +
+>>>> +    s->intrstatus = 0;
+>>>> +    s->intrmask = 0;
+>>>> +    if (ivshmem_has_feature(s, IVSHMEM_MSI)) {
+>>>> +        ivshmem_msix_vector_use(s);
+>>>> +    }
+>>>> +}
+>>>> +
+>>>>  static void ivshmem_write_config(PCIDevice *pdev, uint32_t address,
+>>>>                                   uint32_t val, int len)
+>>>>  {
+>>>
+>>> Why are you moving ivshmem_reset()?  Makes the actual change harder to
+>>> see than necessary.
+>>
+>> ivshmem_disable_irqfd() is declared after ivshmem_reset() in the
+>> source file. I generally prefer to order static functions
+>> topologically if possible. If you'd prefer adding a forward decl
+>> instead (fewer lines touched, easier to bisect?) I can certainly do
+>> that. Thanks!
+>
+> Well, it compiles before your patch, your patch doesn't add any calls,
+> so I can't quite see why a forward declaration would be needed.
 
-I wont insist, but it would be nice if you wired up an optional
-parameter on HMP as well.
-
-Dave
-
->      if (local_err != NULL) {
->          hmp_handle_error(mon, &local_err);
-> -- 
-> 2.11.1
-> 
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+It adds a call to ivshmem_disable_irqfd().
