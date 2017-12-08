@@ -1,43 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34284)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36424)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanb@linux.vnet.ibm.com>) id 1eNQ1r-0007v7-1t
-	for qemu-devel@nongnu.org; Fri, 08 Dec 2017 16:17:55 -0500
+	(envelope-from <jsnow@redhat.com>) id 1eNQCq-0006At-5d
+	for qemu-devel@nongnu.org; Fri, 08 Dec 2017 16:29:18 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanb@linux.vnet.ibm.com>) id 1eNQ1m-000810-KL
-	for qemu-devel@nongnu.org; Fri, 08 Dec 2017 16:17:55 -0500
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:38636
-	helo=mx0a-001b2d01.pphosted.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <stefanb@linux.vnet.ibm.com>)
-	id 1eNQ1m-00080N-Eg
-	for qemu-devel@nongnu.org; Fri, 08 Dec 2017 16:17:50 -0500
-Received: from pps.filterd (m0098416.ppops.net [127.0.0.1])
-	by mx0b-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
-	vB8LEgpB100070
-	for <qemu-devel@nongnu.org>; Fri, 8 Dec 2017 16:17:49 -0500
-Received: from e11.ny.us.ibm.com (e11.ny.us.ibm.com [129.33.205.201])
-	by mx0b-001b2d01.pphosted.com with ESMTP id 2er19rmsy8-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Fri, 08 Dec 2017 16:17:44 -0500
-Received: from localhost
-	by e11.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
-	Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <stefanb@linux.vnet.ibm.com>;
-	Fri, 8 Dec 2017 16:17:42 -0500
-References: <1512506153-8011-1-git-send-email-stefanb@linux.vnet.ibm.com>
-	<1512506153-8011-2-git-send-email-stefanb@linux.vnet.ibm.com>
-	<d0eba370-dfa6-cb01-2137-2a2ec8d81158@kaod.org>
-	<63ec1612-5998-4303-e1d9-16a2c37ac17d@linux.vnet.ibm.com>
-	<157332b2-bfc2-a99d-0bf1-577a1dda775e@kaod.org>
-From: Stefan Berger <stefanb@linux.vnet.ibm.com>
-Date: Fri, 8 Dec 2017 16:17:39 -0500
+	(envelope-from <jsnow@redhat.com>) id 1eNQCm-00050v-VO
+	for qemu-devel@nongnu.org; Fri, 08 Dec 2017 16:29:16 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:58534)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <jsnow@redhat.com>) id 1eNQCm-00050S-Mk
+	for qemu-devel@nongnu.org; Fri, 08 Dec 2017 16:29:12 -0500
+References: <20171026064635.7179-1-aik@ozlabs.ru>
+	<13277057-669f-cd77-95f1-f0e54f7ae222@redhat.com>
+	<7e694888-43ce-6653-92a0-c0b4c235d4ca@ozlabs.ru>
+From: John Snow <jsnow@redhat.com>
+Message-ID: <e6a81bdc-a961-d55f-85c4-55149c878988@redhat.com>
+Date: Fri, 8 Dec 2017 16:29:09 -0500
 MIME-Version: 1.0
-In-Reply-To: <157332b2-bfc2-a99d-0bf1-577a1dda775e@kaod.org>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Message-Id: <242276bf-f147-f848-a2b7-777f646df367@linux.vnet.ibm.com>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 1/2] tpm_spapr: Support TPM for ppc64 using
- CRQ based interface
+In-Reply-To: <7e694888-43ce-6653-92a0-c0b4c235d4ca@ozlabs.ru>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH qemu] fdc: Exit if ISA controller does not
+ support DMA
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -46,28 +30,114 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>, qemu-devel@nongnu.org
-Cc: marcandre.lureau@redhat.com, qemu-ppc@nongnu.org, lo1@us.ibm.com, James.Bottomley@HansenPartnership.com, David Gibson <david@gibson.dropbear.id.au>
+To: Alexey Kardashevskiy <aik@ozlabs.ru>, qemu-devel@nongnu.org
+Cc: Eric Blake <eblake@redhat.com>, Markus Armbruster <armbru@redhat.com>, =?UTF-8?Q?Herv=c3=a9_Poussineau?= <hpoussin@reactos.org>
 
-On 12/08/2017 01:17 PM, C=C3=A9dric Le Goater wrote:
-> On 12/06/2017 12:53 PM, Stefan Berger wrote:
->> On 12/06/2017 02:26 AM, C=C3=A9dric Le Goater wrote:
->>> Hello Stefan,
+
+
+On 11/21/2017 09:48 PM, Alexey Kardashevskiy wrote:
+> On 07/11/17 11:58, John Snow wrote:
+>>
+>>
+>> On 10/26/2017 02:46 AM, Alexey Kardashevskiy wrote:
+>>> A "powernv" machine type defines an ISA bus but it does not add any DMA
+>>> controller to it so it is possible to hit assert(fdctrl->dma) by
+>>> adding "-machine powernv -device isa-fdc".
 >>>
->>> Some comments below. How do we populate the device tree ?
->> Patched SLOF.
->
-> Ah. Isn't that a problem ? I thought QEMU was in charge of populating
-> the device tree.
+>>> This replaces assert() with an error message.
+>>>
+>>> Signed-off-by: Alexey Kardashevskiy <aik@ozlabs.ru>
+>>> ---
+>>>
+>>> Is it a must for ISA to have DMA controllers?
+>>>
+>>>
+>>> ---
+>>>  hw/block/fdc.c | 5 ++++-
+>>>  1 file changed, 4 insertions(+), 1 deletion(-)
+>>>
+>>> diff --git a/hw/block/fdc.c b/hw/block/fdc.c
+>>> index 67f78ac702..ed8b367572 100644
+>>> --- a/hw/block/fdc.c
+>>> +++ b/hw/block/fdc.c
+>>> @@ -2700,7 +2700,10 @@ static void isabus_fdc_realize(DeviceState *dev, Error **errp)
+>>>      fdctrl->dma_chann = isa->dma;
+>>>      if (fdctrl->dma_chann != -1) {
+>>>          fdctrl->dma = isa_get_dma(isa_bus_from_device(isadev), isa->dma);
+>>> -        assert(fdctrl->dma);
+>>> +        if (!fdctrl->dma) {
+>>> +            error_setg(errp, "ISA controller does not support DMA, exiting");
+>>> +            return;
+>>> +        }
+>>>      }
+>>>  
+>>>      qdev_set_legacy_instance_id(dev, isa->iobase, 2);
+>>>
+>>
+>> I've been MIA for a little while, so I'm out of the loop -- but I am not
+>> sure this is entirely the right way to fix this problem. I think it is
+>> more the case that certain boards should not be able to ask for certain
+>> types of devices, and we should prohibit e.g. powernv from being able to
+>> ask for an ISA floppy disk controller.
+>>
+>> (It doesn't seem to have an ISA DMA controller by default, but I have no
+>> idea if that means it can't EVER have one...)
+>>
+>> Papering over this by making it a soft error when we fail to execute
+>> isa_get_dma and then assuming in retrospect it's because the machine
+>> type we're on cannot have an ISA DMA controller seems a little
+>> wrong-headed. It also leaves side-effects from isa_register_portio_list
+>> and isa_init_irq, so we can't just bail here -- it's only marginally
+>> better than the assert() it's doing.
+>>
+>> That said, I am not really sure what the right thing to do is ... I
+>> suspect the "right thing" is to express the dependency that isa-fdc
+>> requires an ISA DMA controller -- and maybe that check happens here when
+>> isa_get_dma fails and we have to unwind the realize function, but we
+>> need to do it gracefully.
+>>
+>> Give me a day to think about it, but I do want to make sure this is in
+>> the next release.
+> 
+> 
+> The day has passed, any news? :)
+> 
+> 
 
+*cough* It turns out that understanding the intricacies of FDC and ISA
+is nobody's favorite thing to do.
 
-I haven't seen this for ppc64 but it's true for ACPI on x86.
+OK, so ehabkost pointed me to this:
 
-> You should send the full patchset rebased on QEMU's head or
-> on David's 2.12 branch else this patch won't apply or compile.
+https://www.mail-archive.com/qemu-devel@nongnu.org/msg496460.html
 
+Where we declare that DMA devices generally can't be created by the user
+for the inverse of the reason we're seeing here: these devices need to
+be created precisely once: not zero times, not twice, exactly once.
 
-I am maintaining a tpm-next branch for 2.12 that includes the patches=20
-that this builds on top of.
+So we made the ISA DMA devices themselves not user-creatable, so you are
+indeed correct here that the absence of fdctrl->dma does more or less
+mean that the current configuration "doesn't support DMA." ... but maybe
+this won't always be true, and maybe some devices (TYPE_I82374?) are
+user creatable, so let's make a "softer" error message:
 
-    Stefan
+"No ISA DMA device present, can't create ISA FDC device."
+
+Then, on the other end, we need to unwind realize() gracefully, maybe we
+can just shuffle up isa_get_dma() earlier so we don't have to unwind
+anything if it comes back empty.
+
+Then I'll take the patch, because fixing this more properly I think will
+take more time or effort than I have to spend on the FDC device.
+
+Thanks to Eduardo for looking this over with me.
+
+--js
+
+As a post-script, ehabkost dug this up too:
+https://www.mail-archive.com/qemu-devel@nongnu.org/msg348764.html
+
+It looks like Herve was working on decoupling floppies from i8257, but
+perhaps didn't get all the way through -- I'm not actually clear on what
+work remains to be done here, maybe he can chime in if he's still
+interested in the project?
