@@ -1,14 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57622)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39530)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1eN7is-0005Xv-5t
-	for qemu-devel@nongnu.org; Thu, 07 Dec 2017 20:45:07 -0500
+	(envelope-from <linzhecheng@huawei.com>) id 1eN8ZM-0007ml-Kh
+	for qemu-devel@nongnu.org; Thu, 07 Dec 2017 21:39:22 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1eN7ir-0007eb-Dd
-	for qemu-devel@nongnu.org; Thu, 07 Dec 2017 20:45:06 -0500
-From: Fam Zheng <famz@redhat.com>
-Date: Fri,  8 Dec 2017 09:44:56 +0800
-Message-Id: <20171208014456.16635-1-famz@redhat.com>
-Subject: [Qemu-devel] [PATCH v2] qemu-img: Document --force-share / -U
+	(envelope-from <linzhecheng@huawei.com>) id 1eN8ZJ-0004ds-Hq
+	for qemu-devel@nongnu.org; Thu, 07 Dec 2017 21:39:20 -0500
+Received: from szxga02-in.huawei.com ([45.249.212.188]:2296 helo=huawei.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <linzhecheng@huawei.com>)
+	id 1eN8ZI-0004bf-TT
+	for qemu-devel@nongnu.org; Thu, 07 Dec 2017 21:39:17 -0500
+From: linzhecheng <linzhecheng@huawei.com>
+Date: Fri, 8 Dec 2017 02:39:02 +0000
+Message-ID: <D9DE8DBB19F2A24080482022C1DE758302C501AB@dggemm509-mbx.china.huawei.com>
+Content-Language: zh-CN
+MIME-Version: 1.0
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [BUG] vhost-user: hot-unplug vhost-user nic for
+ windows guest OS will fail with 100% reproduce rate
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -17,37 +27,34 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: eblake@redhat.com, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org, kchamart@redhat.com
+To: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+Cc: "wangxin (U)" <wangxinxin.wang@huawei.com>, "mst@redhat.com" <mst@redhat.com>
 
-Signed-off-by: Fam Zheng <famz@redhat.com>
+Hi, guys
 
----
-v2: - "code{qemu-img}". [Kashyap, Eric]
-    - "etc.." -> "etc.".
----
- qemu-img.texi | 9 +++++++++
- 1 file changed, 9 insertions(+)
+I met a problem when hot-unplug vhost-user nic for Windows 2008 rc2 sp1 64 =
+(Guest OS)
 
-diff --git a/qemu-img.texi b/qemu-img.texi
-index fdcf120f36..6b9f9adfc8 100644
---- a/qemu-img.texi
-+++ b/qemu-img.texi
-@@ -57,6 +57,15 @@ exclusive with the @var{-O} parameters. It is currently required to also use
- the @var{-n} parameter to skip image creation. This restriction may be relaxed
- in a future release.
- 
-+@item --force-share (-U)
-+
-+If specified, @code{qemu-img} will open the image with shared permissions,
-+which makes it less likely to conflict with a running guest's permissions due
-+to image locking. For example, this can be used to get the image information
-+(with 'info' subcommand) when the image is used by a running guest. Note that
-+this could produce inconsistent result because of concurrent metadata changes,
-+etc.
-+
- @item fmt
- is the disk image format. It is guessed automatically in most cases. See below
- for a description of the supported disk formats.
--- 
-2.14.3
+The xml of nic is as followed:
+<interface type=3D'vhostuser'>
+  <mac address=3D'52:54:00:3b:83:aa'/>
+  <source type=3D'unix' path=3D'/var/run/vhost-user/port1' mode=3D'client'/=
+>
+  <target dev=3D'port1'/>
+  <model type=3D'virtio'/>
+  <driver queues=3D'4'/>
+  <address type=3D'pci' domain=3D'0x0000' bus=3D'0x00' slot=3D'0x08' functi=
+on=3D'0x0'/>
+</interface>
+
+Firstly, I use virsh attach-device win2008 vif.xml to hot-plug a nic for Gu=
+est OS. This operation returns success.
+After guest OS discover nic successfully, I use virsh detach-device win2008=
+ vif.xml to hot-unplug it. This operation will fail with 100% reproduce rat=
+e.
+
+However, if I hot-plug and hot-unplug virtio-net nic , it will not fail.
+
+I have analysis the process of qmp_device_del , I found that qemu have inje=
+ct interrupt to acpi to let it notice guest OS to remove nic.
+I guess there is something wrong in Windows when handle the interrupt.
