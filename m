@@ -1,28 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47476)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48163)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1eNLSK-000504-JV
-	for qemu-devel@nongnu.org; Fri, 08 Dec 2017 11:24:57 -0500
+	(envelope-from <cohuck@redhat.com>) id 1eNLTc-0005qp-Vu
+	for qemu-devel@nongnu.org; Fri, 08 Dec 2017 11:26:18 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1eNLSH-0003LF-H0
-	for qemu-devel@nongnu.org; Fri, 08 Dec 2017 11:24:56 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:35918)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1eNLSH-0003Kj-8f
-	for qemu-devel@nongnu.org; Fri, 08 Dec 2017 11:24:53 -0500
-References: <20171208074515.1553-1-lprosek@redhat.com>
-	<20171208074515.1553-5-lprosek@redhat.com>
-	<87y3mde3z1.fsf@dusky.pond.sub.org>
-	<CABdb737EUy_rRCunxeDUDdhhDiCU8eZBNoYmh+QGp39mqsDung@mail.gmail.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <eca9af63-7c72-b3a6-d5b1-883d6e33eecd@redhat.com>
-Date: Fri, 8 Dec 2017 10:24:47 -0600
+	(envelope-from <cohuck@redhat.com>) id 1eNLTZ-0004J4-PX
+	for qemu-devel@nongnu.org; Fri, 08 Dec 2017 11:26:17 -0500
+Date: Fri, 8 Dec 2017 17:26:04 +0100
+From: Cornelia Huck <cohuck@redhat.com>
+Message-ID: <20171208172604.2bf84cee.cohuck@redhat.com>
+In-Reply-To: <20171208160207.26494-15-david@redhat.com>
+References: <20171208160207.26494-1-david@redhat.com>
+	<20171208160207.26494-15-david@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <CABdb737EUy_rRCunxeDUDdhhDiCU8eZBNoYmh+QGp39mqsDung@mail.gmail.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="lr5PSImvKKJsghev4VBNAujDXSMnTHD0j"
-Subject: Re: [Qemu-devel] [PATCH v3 4/4] ivshmem: Disable irqfd on device
- reset
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v3 for-2.12 14/14] s390x: change the QEMU
+ cpu model to a stripped down z12
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,69 +24,357 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Ladi Prosek <lprosek@redhat.com>, Markus Armbruster <armbru@redhat.com>
-Cc: Geoffrey McRae <geoff@hostfission.com>, Paolo Bonzini <pbonzini@redhat.com>, qemu-devel <qemu-devel@nongnu.org>, =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>
+To: David Hildenbrand <david@redhat.com>
+Cc: qemu-s390x@nongnu.org, qemu-devel@nongnu.org, Christian Borntraeger <borntraeger@de.ibm.com>, Richard Henderson <rth@twiddle.net>, Alexander Graf <agraf@suse.de>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---lr5PSImvKKJsghev4VBNAujDXSMnTHD0j
-From: Eric Blake <eblake@redhat.com>
-To: Ladi Prosek <lprosek@redhat.com>, Markus Armbruster <armbru@redhat.com>
-Cc: Geoffrey McRae <geoff@hostfission.com>,
- Paolo Bonzini <pbonzini@redhat.com>, qemu-devel <qemu-devel@nongnu.org>,
- =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>
-Message-ID: <eca9af63-7c72-b3a6-d5b1-883d6e33eecd@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v3 4/4] ivshmem: Disable irqfd on device
- reset
-References: <20171208074515.1553-1-lprosek@redhat.com>
- <20171208074515.1553-5-lprosek@redhat.com>
- <87y3mde3z1.fsf@dusky.pond.sub.org>
- <CABdb737EUy_rRCunxeDUDdhhDiCU8eZBNoYmh+QGp39mqsDung@mail.gmail.com>
-In-Reply-To: <CABdb737EUy_rRCunxeDUDdhhDiCU8eZBNoYmh+QGp39mqsDung@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+On Fri,  8 Dec 2017 17:02:07 +0100
+David Hildenbrand <david@redhat.com> wrote:
 
-On 12/08/2017 07:44 AM, Ladi Prosek wrote:
+> We are good enough to boot upstream Linux kernels / Fedora 26/27. That
+> should be sufficient for now.
+> 
+> As the QEMU CPU model is migration safe, let's add compatibility code.
+> Generate the feature list to reduce the chance of messing things up in the
+> future.
+> 
+> Signed-off-by: David Hildenbrand <david@redhat.com>
+> ---
+>  hw/s390x/s390-virtio-ccw.c  |   8 ++++
+>  target/s390x/cpu.h          |   3 ++
+>  target/s390x/cpu_models.c   | 100 ++++++++++++++++++--------------------------
+>  target/s390x/cpu_models.h   |   1 +
+>  target/s390x/gen-features.c |  87 ++++++++++++++++++++++++++++++++++++++
+>  5 files changed, 140 insertions(+), 59 deletions(-)
 
->>>  static void ivshmem_write_config(PCIDevice *pdev, uint32_t address,
->>>                                   uint32_t val, int len)
->>>  {
->>
->> Why are you moving ivshmem_reset()?  Makes the actual change harder to=
+Unfortunately, this patch makes mingw unhappy (x86_64-w64-mingw32 on my
+F26 laptop):
 
->> see than necessary.
->=20
-> ivshmem_disable_irqfd() is declared after ivshmem_reset() in the
-> source file. I generally prefer to order static functions
-> topologically if possible. If you'd prefer adding a forward decl
-> instead (fewer lines touched, easier to bisect?) I can certainly do
-> that. Thanks!
-
-That, or split it into two patches (one doing just the code motion, the
-other making the semantic change).
-
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
+In file included from /home/cohuck/git/qemu/target/s390x/cpu_models.h:17:0,
+                 from /home/cohuck/git/qemu/target/s390x/cpu.h:28,
+                 from /home/cohuck/git/qemu/hw/s390x/s390-virtio-ccw.c:16:
+/home/cohuck/git/qemu/hw/s390x/s390-virtio-ccw.c: In function 'ccw_machine_2_12_instance_options':
+./gen-features.h:96:35: error: large integer implicitly truncated to unsigned type [-Werror=overflow]
+ #define S390_FEAT_LIST_QEMU_V2_12 0x3000e918fd6de14fULL,0x000ffffff0000000ULL,0x0000000000000000ULL,0x0000000000000000ULL
+                                   ^
+/home/cohuck/git/qemu/hw/s390x/s390-virtio-ccw.c:728:51: note: in expansion of macro 'S390_FEAT_LIST_QEMU_V2_12'
+     static const S390FeatBitmap qemu_cpu_feat = { S390_FEAT_LIST_QEMU_V2_12 };
+                                                   ^~~~~~~~~~~~~~~~~~~~~~~~~
 
 
---lr5PSImvKKJsghev4VBNAujDXSMnTHD0j
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
-
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAloqvM8ACgkQp6FrSiUn
-Q2rN1Qf+KG+vXrg0SWJxbNB6pODTVtWqZIWcI0Dc/jZLNX8YNdFM9eAGSO+dZ0nK
-vpdSTCBBWkdrlJewrDYwBDJGu2udfvPDTU8O4saDTha73KTdpYkcNvKKPUO4aTvX
-EAli23E+MURs6YJZ+zSVLhHm37+XvWDJFBnMKw2QWx1n5Lt09LUqLdgLLXe+WnJa
-8ztWhIOA/cr8IOsJpOojXz33ocL12V5Vo/25zCQAm8qcg3pSQx25TF25yi6KVTIg
-lmRNV2SzZlI9mU1D3E30Q8OxOmFras2Td9OejzAjU4muwN5VWhChj9lK2JweROW1
-U64PFzusBJdx4NOq/IVF4OdVp7JTqw==
-=7nH6
------END PGP SIGNATURE-----
-
---lr5PSImvKKJsghev4VBNAujDXSMnTHD0j--
+> 
+> diff --git a/hw/s390x/s390-virtio-ccw.c b/hw/s390x/s390-virtio-ccw.c
+> index a23b8aec9f..9666fca04f 100644
+> --- a/hw/s390x/s390-virtio-ccw.c
+> +++ b/hw/s390x/s390-virtio-ccw.c
+> @@ -721,6 +721,10 @@ bool css_migration_enabled(void)
+>  
+>  static void ccw_machine_2_12_instance_options(MachineState *machine)
+>  {
+> +    static const S390FeatBitmap qemu_cpu_feat = { S390_FEAT_LIST_QEMU_V2_12 };
+> +
+> +    /* with 2.12 we emulated a stripped down zEC12 (GA 2) */
+> +    s390_set_qemu_cpu_model(0x2827, 12, 2, qemu_cpu_feat);
+>  }
+>  
+>  static void ccw_machine_2_12_class_options(MachineClass *mc)
+> @@ -730,7 +734,11 @@ DEFINE_CCW_MACHINE(2_12, "2.12", true);
+>  
+>  static void ccw_machine_2_11_instance_options(MachineState *machine)
+>  {
+> +    static const S390FeatBitmap qemu_cpu_feat = { S390_FEAT_LIST_QEMU_V2_11 };
+>      ccw_machine_2_12_instance_options(machine);
+> +
+> +    /* before 2.12 we emulated the very first z900 */
+> +    s390_set_qemu_cpu_model(0x2064, 7, 1, qemu_cpu_feat);
+>  }
+>  
+>  static void ccw_machine_2_11_class_options(MachineClass *mc)
+> diff --git a/target/s390x/cpu.h b/target/s390x/cpu.h
+> index f9d4d62c48..6a91739ece 100644
+> --- a/target/s390x/cpu.h
+> +++ b/target/s390x/cpu.h
+> @@ -722,6 +722,9 @@ static inline unsigned int s390_cpu_set_state(uint8_t cpu_state, S390CPU *cpu)
+>  /* cpu_models.c */
+>  void s390_cpu_list(FILE *f, fprintf_function cpu_fprintf);
+>  #define cpu_list s390_cpu_list
+> +void s390_set_qemu_cpu_model(uint16_t type, uint8_t gen, uint8_t ec_ga,
+> +                             const S390FeatBitmap features);
+> +
+>  
+>  /* helper.c */
+>  #define cpu_init(cpu_model) cpu_generic_init(TYPE_S390_CPU, cpu_model)
+> diff --git a/target/s390x/cpu_models.c b/target/s390x/cpu_models.c
+> index edac7fdecf..f0577f8155 100644
+> --- a/target/s390x/cpu_models.c
+> +++ b/target/s390x/cpu_models.c
+> @@ -15,7 +15,6 @@
+>  #include "internal.h"
+>  #include "kvm_s390x.h"
+>  #include "sysemu/kvm.h"
+> -#include "gen-features.h"
+>  #include "qapi/error.h"
+>  #include "qapi/visitor.h"
+>  #include "qemu/error-report.h"
+> @@ -81,6 +80,11 @@ static S390CPUDef s390_cpu_defs[] = {
+>      CPUDEF_INIT(0x3906, 14, 1, 47, 0x08000000U, "z14", "IBM z14 GA1"),
+>  };
+>  
+> +#define QEMU_MAX_CPU_TYPE 0x2827
+> +#define QEMU_MAX_CPU_GEN 12
+> +#define QEMU_MAX_CPU_EC_GA 2
+> +static const S390FeatBitmap qemu_max_cpu_feat = { S390_FEAT_LIST_QEMU_MAX };
+> +
+>  /* features part of a base model but not relevant for finding a base model */
+>  S390FeatBitmap ignored_base_feat;
+>  
+> @@ -812,51 +816,6 @@ static void check_compatibility(const S390CPUModel *max_model,
+>                    "available in the configuration: ");
+>  }
+>  
+> -/**
+> - * The base TCG CPU model "qemu" is based on the z900. However, we already
+> - * can also emulate some additional features of later CPU generations, so
+> - * we add these additional feature bits here.
+> - */
+> -static void add_qemu_cpu_model_features(S390FeatBitmap fbm)
+> -{
+> -    static const int feats[] = {
+> -        S390_FEAT_DAT_ENH,
+> -        S390_FEAT_IDTE_SEGMENT,
+> -        S390_FEAT_STFLE,
+> -        S390_FEAT_SENSE_RUNNING_STATUS,
+> -        S390_FEAT_EXTENDED_TRANSLATION_2,
+> -        S390_FEAT_MSA,
+> -        S390_FEAT_LONG_DISPLACEMENT,
+> -        S390_FEAT_LONG_DISPLACEMENT_FAST,
+> -        S390_FEAT_EXTENDED_IMMEDIATE,
+> -        S390_FEAT_EXTENDED_TRANSLATION_3,
+> -        S390_FEAT_ETF2_ENH,
+> -        S390_FEAT_STORE_CLOCK_FAST,
+> -        S390_FEAT_MOVE_WITH_OPTIONAL_SPEC,
+> -        S390_FEAT_ETF3_ENH,
+> -        S390_FEAT_EXTRACT_CPU_TIME,
+> -        S390_FEAT_COMPARE_AND_SWAP_AND_STORE,
+> -        S390_FEAT_COMPARE_AND_SWAP_AND_STORE_2,
+> -        S390_FEAT_GENERAL_INSTRUCTIONS_EXT,
+> -        S390_FEAT_EXECUTE_EXT,
+> -        S390_FEAT_SET_PROGRAM_PARAMETERS,
+> -        S390_FEAT_FLOATING_POINT_SUPPPORT_ENH,
+> -        S390_FEAT_STFLE_45,
+> -        S390_FEAT_STFLE_49,
+> -        S390_FEAT_LOCAL_TLB_CLEARING,
+> -        S390_FEAT_INTERLOCKED_ACCESS_2,
+> -        S390_FEAT_STFLE_53,
+> -        S390_FEAT_MSA_EXT_5,
+> -        S390_FEAT_MSA_EXT_3,
+> -        S390_FEAT_MSA_EXT_4,
+> -    };
+> -    int i;
+> -
+> -    for (i = 0; i < ARRAY_SIZE(feats); i++) {
+> -        set_bit(feats[i], fbm);
+> -    }
+> -}
+> -
+>  static S390CPUModel *get_max_cpu_model(Error **errp)
+>  {
+>      static S390CPUModel max_model;
+> @@ -869,12 +828,10 @@ static S390CPUModel *get_max_cpu_model(Error **errp)
+>      if (kvm_enabled()) {
+>          kvm_s390_get_host_cpu_model(&max_model, errp);
+>      } else {
+> -        /* TCG emulates a z900 (with some optional additional features) */
+> -        max_model.def = &s390_cpu_defs[0];
+> -        bitmap_copy(max_model.features, max_model.def->default_feat,
+> -                    S390_FEAT_MAX);
+> -        add_qemu_cpu_model_features(max_model.features);
+> -    }
+> +        max_model.def = s390_find_cpu_def(QEMU_MAX_CPU_TYPE, QEMU_MAX_CPU_GEN,
+> +                                          QEMU_MAX_CPU_EC_GA, NULL);
+> +        bitmap_copy(max_model.features, qemu_max_cpu_feat, S390_FEAT_MAX);
+> +   }
+>      if (!*errp) {
+>          cached = true;
+>          return &max_model;
+> @@ -1130,18 +1087,43 @@ static void s390_host_cpu_model_initfn(Object *obj)
+>  }
+>  #endif
+>  
+> +static S390CPUDef s390_qemu_cpu_def;
+> +static S390CPUModel s390_qemu_cpu_model;
+> +
+> +/* Set the qemu CPU model (on machine initialization). Must not be called
+> + * once CPUs have been created.
+> + */
+> +void s390_set_qemu_cpu_model(uint16_t type, uint8_t gen, uint8_t ec_ga,
+> +                             const S390FeatBitmap features)
+> +{
+> +    const S390CPUDef *def = s390_find_cpu_def(type, gen, ec_ga, NULL);
+> +
+> +    g_assert(def);
+> +    g_assert(QTAILQ_EMPTY(&cpus));
+> +
+> +    /* TCG emulates some features that can usually not be enabled with
+> +     * the emulated machine generation. Make sure they can be enabled
+> +     * when using the QEMU model by adding them to full_feat. We have
+> +     * to copy the definition to do that.
+> +     */
+> +    memcpy(&s390_qemu_cpu_def, def, sizeof(s390_qemu_cpu_def));
+> +    bitmap_or(s390_qemu_cpu_def.full_feat, s390_qemu_cpu_def.full_feat,
+> +              qemu_max_cpu_feat, S390_FEAT_MAX);
+> +
+> +    /* build the CPU model */
+> +    s390_qemu_cpu_model.def = &s390_qemu_cpu_def;
+> +    bitmap_copy(s390_qemu_cpu_model.features, features, S390_FEAT_MAX);
+> +}
+> +
+>  static void s390_qemu_cpu_model_initfn(Object *obj)
+>  {
+> -    static S390CPUDef s390_qemu_cpu_defs;
+>      S390CPU *cpu = S390_CPU(obj);
+>  
+>      cpu->model = g_malloc0(sizeof(*cpu->model));
+> -    /* TCG emulates a z900 (with some optional additional features) */
+> -    memcpy(&s390_qemu_cpu_defs, &s390_cpu_defs[0], sizeof(s390_qemu_cpu_defs));
+> -    add_qemu_cpu_model_features(s390_qemu_cpu_defs.full_feat);
+> -    cpu->model->def = &s390_qemu_cpu_defs;
+> -    bitmap_copy(cpu->model->features, cpu->model->def->default_feat,
+> -                S390_FEAT_MAX);
+> +    /* has to be initialized by now via s390_set_qemu_cpu_model() */
+> +    g_assert(s390_qemu_cpu_model.def);
+> +    /* copy the CPU model so we can modify it */
+> +    memcpy(cpu->model, &s390_qemu_cpu_model, sizeof(*cpu->model));
+>  }
+>  
+>  static void s390_cpu_model_finalize(Object *obj)
+> diff --git a/target/s390x/cpu_models.h b/target/s390x/cpu_models.h
+> index 4c6dee1871..11cf5386fb 100644
+> --- a/target/s390x/cpu_models.h
+> +++ b/target/s390x/cpu_models.h
+> @@ -14,6 +14,7 @@
+>  #define TARGET_S390X_CPU_MODELS_H
+>  
+>  #include "cpu_features.h"
+> +#include "gen-features.h"
+>  #include "qom/cpu.h"
+>  
+>  /* static CPU definition */
+> diff --git a/target/s390x/gen-features.c b/target/s390x/gen-features.c
+> index 68e6c31b4b..983f2dcd52 100644
+> --- a/target/s390x/gen-features.c
+> +++ b/target/s390x/gen-features.c
+> @@ -536,6 +536,51 @@ static uint16_t default_GEN14_GA1[] = {
+>      S390_FEAT_GROUP_MSA_EXT_8,
+>  };
+>  
+> +/* QEMU (CPU model) features */
+> +
+> +static uint16_t qemu_V2_11[] = {
+> +    S390_FEAT_GROUP_PLO,
+> +    S390_FEAT_ESAN3,
+> +    S390_FEAT_ZARCH,
+> +};
+> +
+> +static uint16_t qemu_V2_12[] = {
+> +    S390_FEAT_DAT_ENH,
+> +    S390_FEAT_IDTE_SEGMENT,
+> +    S390_FEAT_STFLE,
+> +    S390_FEAT_SENSE_RUNNING_STATUS,
+> +    S390_FEAT_EXTENDED_TRANSLATION_2,
+> +    S390_FEAT_MSA,
+> +    S390_FEAT_LONG_DISPLACEMENT,
+> +    S390_FEAT_LONG_DISPLACEMENT_FAST,
+> +    S390_FEAT_EXTENDED_IMMEDIATE,
+> +    S390_FEAT_EXTENDED_TRANSLATION_3,
+> +    S390_FEAT_ETF2_ENH,
+> +    S390_FEAT_STORE_CLOCK_FAST,
+> +    S390_FEAT_MOVE_WITH_OPTIONAL_SPEC,
+> +    S390_FEAT_ETF3_ENH,
+> +    S390_FEAT_EXTRACT_CPU_TIME,
+> +    S390_FEAT_COMPARE_AND_SWAP_AND_STORE,
+> +    S390_FEAT_COMPARE_AND_SWAP_AND_STORE_2,
+> +    S390_FEAT_GENERAL_INSTRUCTIONS_EXT,
+> +    S390_FEAT_EXECUTE_EXT,
+> +    S390_FEAT_SET_PROGRAM_PARAMETERS,
+> +    S390_FEAT_FLOATING_POINT_SUPPPORT_ENH,
+> +    S390_FEAT_STFLE_45,
+> +    S390_FEAT_STFLE_49,
+> +    S390_FEAT_LOCAL_TLB_CLEARING,
+> +    S390_FEAT_INTERLOCKED_ACCESS_2,
+> +    S390_FEAT_STFLE_53,
+> +    S390_FEAT_MSA_EXT_4,
+> +    S390_FEAT_MSA_EXT_3,
+> +};
+> +
+> +/* add all new definitions before this point */
+> +static uint16_t qemu_MAX[] = {
+> +    /* generates a dependency warning, leave it out for now */
+> +    S390_FEAT_MSA_EXT_5,
+> +};
+> +
+>  /****** END FEATURE DEFS ******/
+>  
+>  #define _YEARS  "2016"
+> @@ -627,6 +672,24 @@ static FeatGroupDefSpec FeatGroupDef[] = {
+>      FEAT_GROUP_INITIALIZER(MSA_EXT_8),
+>  };
+>  
+> +#define QEMU_FEAT_INITIALIZER(_name)                   \
+> +    {                                                  \
+> +        .name = "S390_FEAT_LIST_QEMU_" #_name,         \
+> +        .bits =                                        \
+> +            { .data = qemu_##_name,                    \
+> +              .len = ARRAY_SIZE(qemu_##_name) },       \
+> +    }
+> +
+> +/*******************************
+> + * QEMU (CPU model) features
+> + *******************************/
+> +static FeatGroupDefSpec QemuFeatDef[] = {
+> +    QEMU_FEAT_INITIALIZER(V2_11),
+> +    QEMU_FEAT_INITIALIZER(V2_12),
+> +    QEMU_FEAT_INITIALIZER(MAX),
+> +};
+> +
+> +
+>  static void set_bits(uint64_t list[], BitSpec bits)
+>  {
+>      uint32_t i;
+> @@ -684,6 +747,29 @@ static void print_feature_defs(void)
+>      }
+>  }
+>  
+> +static void print_qemu_feature_defs(void)
+> +{
+> +    uint64_t feat[S390_FEAT_MAX / 64 + 1] = {};
+> +    int i, j;
+> +
+> +    printf("\n/* QEMU (CPU model) feature list data */\n");
+> +
+> +    /* for now we assume that we only add new features */
+> +    for (i = 0; i < ARRAY_SIZE(QemuFeatDef); i++) {
+> +        set_bits(feat, QemuFeatDef[i].bits);
+> +
+> +        printf("#define %s\t", QemuFeatDef[i].name);
+> +        for (j = 0; j < ARRAY_SIZE(feat); j++) {
+> +            printf("0x%016"PRIx64"ULL", feat[j]);
+> +            if (j < ARRAY_SIZE(feat) - 1) {
+> +                printf(",");
+> +            } else {
+> +                printf("\n");
+> +            }
+> +        }
+> +    }
+> +}
+> +
+>  static void print_feature_group_defs(void)
+>  {
+>      int i, j;
+> @@ -721,6 +807,7 @@ int main(int argc, char *argv[])
+>             "#ifndef %s\n#define %s\n", __FILE__, _YEARS, _NAME_H, _NAME_H);
+>      print_feature_defs();
+>      print_feature_group_defs();
+> +    print_qemu_feature_defs();
+>      printf("\n#endif\n");
+>      return 0;
+>  }
