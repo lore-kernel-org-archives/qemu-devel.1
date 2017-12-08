@@ -1,31 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54137)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56138)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1eNGjO-0007PY-EV
-	for qemu-devel@nongnu.org; Fri, 08 Dec 2017 06:22:15 -0500
+	(envelope-from <yang.zhong@intel.com>) id 1eNGrX-00033b-Pi
+	for qemu-devel@nongnu.org; Fri, 08 Dec 2017 06:30:40 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1eNGjL-00036B-5j
-	for qemu-devel@nongnu.org; Fri, 08 Dec 2017 06:22:14 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:36239)
+	(envelope-from <yang.zhong@intel.com>) id 1eNGrU-0000ME-MS
+	for qemu-devel@nongnu.org; Fri, 08 Dec 2017 06:30:39 -0500
+Received: from mga09.intel.com ([134.134.136.24]:46639)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1eNGjK-00035f-TM
-	for qemu-devel@nongnu.org; Fri, 08 Dec 2017 06:22:11 -0500
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
-	[10.5.11.14])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id CBE9FC058ECA
-	for <qemu-devel@nongnu.org>; Fri,  8 Dec 2017 11:22:09 +0000 (UTC)
-Date: Fri, 8 Dec 2017 11:22:05 +0000
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20171208112205.GI2403@work-vm>
-References: <20171201125813.1437-1-quintela@redhat.com>
-	<20171201125813.1437-5-quintela@redhat.com>
+	(Exim 4.71) (envelope-from <yang.zhong@intel.com>)
+	id 1eNGrU-0000M0-5H
+	for qemu-devel@nongnu.org; Fri, 08 Dec 2017 06:30:36 -0500
+Date: Fri, 8 Dec 2017 19:29:55 +0800
+From: Yang Zhong <yang.zhong@intel.com>
+Message-ID: <20171208112955.GC8672@yangzhon-Virtual>
+References: <20171205063313.GB4102@yangzhon-Virtual>
+	<20171205120623.GB31150@stefanha-x1.localdomain>
+	<5f9f2835-5811-3ee0-9049-0d2cddc08958@redhat.com>
+	<20171206151155.GC22757@stefanha-x1.localdomain>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20171201125813.1437-5-quintela@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v3 4/6] tests: Add basic migration precopy
- tcp test
+In-Reply-To: <20171206151155.GC22757@stefanha-x1.localdomain>
+Subject: Re: [Qemu-devel] About the light VM solution!
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,116 +30,45 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Juan Quintela <quintela@redhat.com>
-Cc: qemu-devel@nongnu.org, lvivier@redhat.com, peterx@redhat.com
+To: Stefan Hajnoczi <stefanha@redhat.com>, pbonzini@redhat.com, rjones@redhat.com
+Cc: qemu-devel@nongnu.org, berrange@redhat.com, anthony.xu@intel.com, chao.p.peng@linux.intel.com
 
-* Juan Quintela (quintela@redhat.com) wrote:
-> Not sharing code from precopy/unix because we have to read back the
-> tcp parameter.
+On Wed, Dec 06, 2017 at 03:11:55PM +0000, Stefan Hajnoczi wrote:
+> On Tue, Dec 05, 2017 at 02:35:42PM +0100, Paolo Bonzini wrote:
+> > On 05/12/2017 13:06, Stefan Hajnoczi wrote:
+> > > On Tue, Dec 05, 2017 at 02:33:13PM +0800, Yang Zhong wrote:
+> > Referring to your slides, the remaining points for fast boot are:
+> > 
+> > * parallelize VCPU initialization: do you have patches? :)
+> > 
+> > * q35-lite: any other machine options that have not been merged yet?
+> > 
+> > * SeaBIOS+Option ROM: can you take new numbers with DMA-based option
+> > ROM, or with qboot?
+> > 
+> > * guest kernel: my proposal to make Linux a multiboot kernel has been
+> > nacked upstream, but Oracle is working on supporting Xen PVH binaries in
+> > QEMU.  These are very similar to multiboot and in particular they're
+> > uncompressed.
 > 
-> Signed-off-by: Juan Quintela <quintela@redhat.com>
+> By the way, sending a separate patch series for each optimization is
+> good.  That way patches requiring more discussion don't hold up patches
+> that could be applied immediately.  It also makes reviewing and
+> understanding performance results easier since there is only one change.
+> 
+> Stefan
 
-Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+  Hello Stefan,Paolo and Richard,
 
-> ---
->  tests/migration-test.c | 59 +++++++++++++++++++++++++++++++++++++++++++++++---
->  1 file changed, 56 insertions(+), 3 deletions(-)
-> 
-> diff --git a/tests/migration-test.c b/tests/migration-test.c
-> index 3f3f056be6..841c89e28a 100644
-> --- a/tests/migration-test.c
-> +++ b/tests/migration-test.c
-> @@ -354,8 +354,7 @@ static void cleanup(const char *filename)
->      g_free(path);
->  }
->  
-> -static void migrate_check_parameter(QTestState *who, const char *parameter,
-> -                                    const char *value)
-> +static char *migrate_get_parameter(QTestState *who, const char *parameter)
->  {
->      QDict *rsp, *rsp_return;
->      char *result;
-> @@ -364,9 +363,18 @@ static void migrate_check_parameter(QTestState *who, const char *parameter,
->      rsp_return = qdict_get_qdict(rsp, "return");
->      result = g_strdup_printf("%" PRId64,
->                               qdict_get_try_int(rsp_return,  parameter, -1));
-> +    QDECREF(rsp);
-> +    return result;
-> +}
-> +
-> +static void migrate_check_parameter(QTestState *who, const char *parameter,
-> +                                    const char *value)
-> +{
-> +    char *result;
-> +
-> +    result = migrate_get_parameter(who, parameter);
->      g_assert_cmpstr(result, ==, value);
->      g_free(result);
-> -    QDECREF(rsp);
->  }
->  
->  static void deprecated_set_downtime(QTestState *who, const double value)
-> @@ -621,6 +629,50 @@ static void test_precopy_unix(void)
->      g_free(uri);
->  }
->  
-> +static void test_precopy_tcp(void)
-> +{
-> +    char *uri;
-> +    char *port;
-> +    QTestState *from, *to;
-> +
-> +    test_migrate_start(&from, &to, "tcp:127.0.0.1:0");
-> +
-> +    /* We want to pick a speed slow enough that the test completes
-> +     * quickly, but that it doesn't complete precopy even on a slow
-> +     * machine, so also set the downtime.
-> +     */
-> +    /* 1 ms */
-> +    migrate_set_parameter(from, "downtime-limit", "1");
-> +    /* 1GB/s slow*/
-> +    migrate_set_parameter(from, "max-bandwidth", "1000000000");
-> +
-> +    /* Wait for the first serial output from the source */
-> +    wait_for_serial("src_serial");
-> +
-> +    port = migrate_get_parameter(to, "tcp-port");
-> +    uri = g_strdup_printf("tcp:127.0.0.1:%s", port);
-> +
-> +    migrate(from, uri);
-> +
-> +    wait_for_migration_pass(from);
-> +
-> +    /* 300 ms should converge */
-> +    migrate_set_parameter(from, "downtime-limit", "300");
-> +
-> +    if (!got_stop) {
-> +        qtest_qmp_eventwait(from, "STOP");
-> +    }
-> +
-> +    qtest_qmp_eventwait(to, "RESUME");
-> +
-> +    wait_for_serial("dest_serial");
-> +    wait_for_migration_complete(from);
-> +
-> +    test_migrate_end(from, to);
-> +    g_free(uri);
-> +    g_free(port);
-> +}
-> +
->  int main(int argc, char **argv)
->  {
->      char template[] = "/tmp/migration-test-XXXXXX";
-> @@ -641,6 +693,7 @@ int main(int argc, char **argv)
->      module_call_init(MODULE_INIT_QOM);
->  
->      qtest_add_func("/migration/precopy/unix", test_precopy_unix);
-> +    qtest_add_func("/migration/precopy/tcp", test_precopy_tcp);
->      qtest_add_func("/migration/postcopy/unix", test_postcopy);
->  
->      ret = g_test_run();
-> -- 
-> 2.14.3
-> 
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+  Many thanks for your detailed comments! Really thanks for your great help!
+
+  We are talking about light VM solution with our customers firstly and want
+  to know their concerns. Then we will continue to talk this on this thread.
+
+  Richard, your paper and test script will do great help for our further work.
+
+  I also CC PengChao and Anthony in this thread, they will join this talk.
+
+  Regards,
+
+  Yang 
