@@ -1,24 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39564)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40124)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mapfelba@redhat.com>) id 1eNJKy-0002Pc-SQ
-	for qemu-devel@nongnu.org; Fri, 08 Dec 2017 09:09:13 -0500
+	(envelope-from <mreitz@redhat.com>) id 1eNJOa-0004Yq-3s
+	for qemu-devel@nongnu.org; Fri, 08 Dec 2017 09:12:57 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mapfelba@redhat.com>) id 1eNJKu-0006zb-AN
-	for qemu-devel@nongnu.org; Fri, 08 Dec 2017 09:09:12 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:45534)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mapfelba@redhat.com>) id 1eNJKu-0006y3-1K
-	for qemu-devel@nongnu.org; Fri, 08 Dec 2017 09:09:08 -0500
-Date: Fri, 8 Dec 2017 09:09:06 -0500 (EST)
-From: Marcel Apfelbaum <marcel@redhat.com>
-Message-ID: <545999678.39861203.1512742146072.JavaMail.zimbra@redhat.com>
-In-Reply-To: <20171208063113.20383-1-lprosek@redhat.com>
-References: <20171208063113.20383-1-lprosek@redhat.com>
+	(envelope-from <mreitz@redhat.com>) id 1eNJOY-0001LA-Pz
+	for qemu-devel@nongnu.org; Fri, 08 Dec 2017 09:12:56 -0500
+References: <20171120201004.14999-1-mreitz@redhat.com>
+	<20171120201004.14999-25-mreitz@redhat.com>
+	<w51k1y2307y.fsf@maestria.local.igalia.com>
+	<bcbf0021-4fcd-26d0-e05c-cd3e35608988@redhat.com>
+	<w51h8t531ql.fsf@maestria.local.igalia.com>
+	<032b64ec-a161-ff2a-5505-06b91deb2682@redhat.com>
+	<20171208135329.GG11767@redhat.com>
+From: Max Reitz <mreitz@redhat.com>
+Message-ID: <6ae47d40-8934-99e5-7bc3-dc4d1585ca8f@redhat.com>
+Date: Fri, 8 Dec 2017 15:12:42 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v2] msix: don't mask already masked vectors
- on reset
+In-Reply-To: <20171208135329.GG11767@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="ROEKXpra3kX3bEDmswIBtVv7s6Mc8wfxD"
+Subject: Re: [Qemu-devel] [PATCH v7 for-2.12 24/25] block/curl: Implement
+ bdrv_refresh_filename()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,81 +30,121 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Ladi Prosek <lprosek@redhat.com>
-Cc: qemu-devel@nongnu.org, geoff@hostfission.com, mst@redhat.com, alex williamson <alex.williamson@redhat.com>
+To: "Daniel P. Berrange" <berrange@redhat.com>
+Cc: Alberto Garcia <berto@igalia.com>, qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>, John Snow <jsnow@redhat.com>, qemu-devel@nongnu.org
+
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--ROEKXpra3kX3bEDmswIBtVv7s6Mc8wfxD
+From: Max Reitz <mreitz@redhat.com>
+To: "Daniel P. Berrange" <berrange@redhat.com>
+Cc: Alberto Garcia <berto@igalia.com>, qemu-block@nongnu.org,
+ Kevin Wolf <kwolf@redhat.com>, John Snow <jsnow@redhat.com>,
+ qemu-devel@nongnu.org
+Message-ID: <6ae47d40-8934-99e5-7bc3-dc4d1585ca8f@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v7 for-2.12 24/25] block/curl: Implement
+ bdrv_refresh_filename()
+References: <20171120201004.14999-1-mreitz@redhat.com>
+ <20171120201004.14999-25-mreitz@redhat.com>
+ <w51k1y2307y.fsf@maestria.local.igalia.com>
+ <bcbf0021-4fcd-26d0-e05c-cd3e35608988@redhat.com>
+ <w51h8t531ql.fsf@maestria.local.igalia.com>
+ <032b64ec-a161-ff2a-5505-06b91deb2682@redhat.com>
+ <20171208135329.GG11767@redhat.com>
+In-Reply-To: <20171208135329.GG11767@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+
+On 2017-12-08 14:53, Daniel P. Berrange wrote:
+> On Fri, Dec 08, 2017 at 02:47:52PM +0100, Max Reitz wrote:
+>> On 2017-12-05 11:31, Alberto Garcia wrote:
+>>> On Mon 04 Dec 2017 07:26:02 PM CET, Max Reitz wrote:
+>>>>>> +static void curl_refresh_filename(BlockDriverState *bs)
+>>>>>> +{
+>>>>>> +    BDRVCURLState *s =3D bs->opaque;
+>>>>>> +
+>>>>>> +    if (!s->sslverify || s->cookie ||
+>>>>>> +        s->username || s->password || s->proxyusername || s->prox=
+ypassword)
+>>>>>> +    {
+>>>>>
+>>>>> Is !s->sslverify negative because that setting is true by default?
+>>>>
+>>>> Yes, exactly.  If it's false, you'd need to override it (and you can=
+'t
+>>>> do that through a plain filename).
+>>>
+>>> I think this is not the only case in this series, but I'm not very
+>>> comfortable with the idea that this condition and the default value o=
+f
+>>> the setting are implicity dependent on each other. If you change one =
+and
+>>> forget to change the other things will break.
+>>
+>> Well, yes, but...
+>>
+>>> I understand that the default value is never supposed to change so in=
+
+>>> practice I don't see this breaking,
+>>
+>> Yes.
+>>
+>>>                                     but is it perhaps worth adding te=
+sts
+>>> for all these cases?
+>>
+>> In theory, sure.  In practice, adding a curl test case seems hard.
+>>
+>> Well, I could connect to, I don't know, qemu.org or something and then=
+
+>> just test things there (with the index used as a raw image), but if I
+>> add one test for the curl protocol, nobody is ever going to run them..=
+=2E
+>> And in theory, that's not how a curl test should work.  In theory, you=
+'d
+>> expect the user to set up a localhost server with some known root
+>> directory and then _make_test_img etc. would set up images there.  But=
+
+>> that way, really nobody is ever going to run them.
+>=20
+> For qemu I/O tests I would suggest just having the iotest spin up a sim=
+ple
+> http server in Python - there's standard APIs in python that make this
+> pretty trivial
+>=20
+>   http://www.pythonforbeginners.com/modules-in-python/how-to-use-simple=
+httpserver/
+>=20
+> That way curl could be reliably tested without any special setup by the=
+
+> developer
+
+Good idea, thanks.  It might be an issue if we ever want to test HTTPS
+(putting a self-signed certificate into the iotests directory seems a
+bit over the top), but since the sslverify option works just fine with
+HTTP itself, that's not an issue for this case.
+
+Now I just have to discuss with myself whether I want to add curl
+testing infrastructure for testing whether the defaults are still the
+defaults or whether adding default value macros is enough...
+
+Max
 
 
+--ROEKXpra3kX3bEDmswIBtVv7s6Mc8wfxD
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
 
------ Original Message -----
-> From: "Ladi Prosek" <lprosek@redhat.com>
-> To: qemu-devel@nongnu.org
-> Cc: marcel@redhat.com, geoff@hostfission.com, mst@redhat.com, "alex williamson" <alex.williamson@redhat.com>
-> Sent: Friday, December 8, 2017 8:31:13 AM
-> Subject: [PATCH v2] msix: don't mask already masked vectors on reset
-> 
-> msix_mask_all() is supposed to invoke the release vector notifier if the
-> state of the
-> respective vector changed from unmasked to masked. The way it's currently
-> called from
-> msix_reset(), though, may result in calling the release notifier even if the
-> vector
-> is already masked.
-> 
-> 1) msix_reset() clears out the msix_cap field and the msix_table.
-> 2) msix_mask_all() runs with was_masked=false for all vectors because of 1),
-> which
->    results in calling the release notifier on all vectors.
-> 3) if msix_reset() is subsequently called again, it goes through the same
-> steps and
->    calls the release notifier on all vectors again.
-> 
-> This commit moves msix_mask_all() up so it runs before the device state is
-> lost. And
-> it adds an assignment to msix_function_masked so that the device remembers
-> that
-> MSI-X is masked.
-> 
-> This is likely a low impact issue, found while debugging an already broken
-> device. It
-> is however easy to fix and the expectation that the use and release notifier
-> invocations
-> are always balanced is very natural.
-> 
-> Signed-off-by: Ladi Prosek <lprosek@redhat.com>
-> ---
-> 
-> v1->v2:
-> * fixed typo in commit message "or" -> "to" (Marcel)
-> * directly set msix_function_masked to true instead of calling
->   msix_update_function_masked() (Marcel)
-> 
-> 
->  hw/pci/msix.c | 3 ++-
->  1 file changed, 2 insertions(+), 1 deletion(-)
-> 
-> diff --git a/hw/pci/msix.c b/hw/pci/msix.c
-> index c944c02135..d6a4dbdb6b 100644
-> --- a/hw/pci/msix.c
-> +++ b/hw/pci/msix.c
-> @@ -500,11 +500,12 @@ void msix_reset(PCIDevice *dev)
->          return;
->      }
->      msix_clear_all_vectors(dev);
-> +    msix_mask_all(dev, dev->msix_entries_nr);
->      dev->config[dev->msix_cap + MSIX_CONTROL_OFFSET] &=
->  	    ~dev->wmask[dev->msix_cap + MSIX_CONTROL_OFFSET];
->      memset(dev->msix_table, 0, dev->msix_entries_nr * PCI_MSIX_ENTRY_SIZE);
->      memset(dev->msix_pba, 0, QEMU_ALIGN_UP(dev->msix_entries_nr, 64) / 8);
-> -    msix_mask_all(dev, dev->msix_entries_nr);
-> +    dev->msix_function_masked = true;
->  }
->  
->  /* PCI spec suggests that devices make it possible for software to configure
-> --
-> 2.13.6
-> 
-> 
+-----BEGIN PGP SIGNATURE-----
 
-Thanks Ladi!
+iQFGBAEBCAAwFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAloqndoSHG1yZWl0ekBy
+ZWRoYXQuY29tAAoJEPQH2wBh1c9Ar2QH/1wputAofhzklN0a7OwcR3eLhEgo+xIa
+JyY7sZ8AW+gK9fNeYc5yXmpvOWoKs6q/h5WlIpSPEDidiqGM5jpWhfJAXU+Xz4Sv
+RWfPeiHvNdbCaq9EJat0awAxlHgT5Pae/jkgJz7Y2+LoZAOof616AsgnbYV0+Fvx
+JjX6eJCT0dOUn0nIciRyjvExy45AF8FBp2VrcN54JNSUmxo8taS0APsS4lwQQaUq
+9lq4kcLvnXp36Re+oenayL5lh3v2AI0BK5RtxfBsaNr9drwa1fiWnPJp6m29INJz
+8KA5fLir9L6ZrEk+fmkcmsYU1mvVF4JhDmr+WwXsIxMoRDs/hhEnOao=
+=u4rR
+-----END PGP SIGNATURE-----
 
-Reviewed-by: Marcel Apfelbaum <marcel@redhat.com>
+--ROEKXpra3kX3bEDmswIBtVv7s6Mc8wfxD--
