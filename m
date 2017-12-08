@@ -1,27 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36424)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38383)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1eNQCq-0006At-5d
-	for qemu-devel@nongnu.org; Fri, 08 Dec 2017 16:29:18 -0500
+	(envelope-from <richard.henderson@linaro.org>) id 1eNQIh-0000aE-QW
+	for qemu-devel@nongnu.org; Fri, 08 Dec 2017 16:35:20 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1eNQCm-00050v-VO
-	for qemu-devel@nongnu.org; Fri, 08 Dec 2017 16:29:16 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:58534)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <jsnow@redhat.com>) id 1eNQCm-00050S-Mk
-	for qemu-devel@nongnu.org; Fri, 08 Dec 2017 16:29:12 -0500
-References: <20171026064635.7179-1-aik@ozlabs.ru>
-	<13277057-669f-cd77-95f1-f0e54f7ae222@redhat.com>
-	<7e694888-43ce-6653-92a0-c0b4c235d4ca@ozlabs.ru>
-From: John Snow <jsnow@redhat.com>
-Message-ID: <e6a81bdc-a961-d55f-85c4-55149c878988@redhat.com>
-Date: Fri, 8 Dec 2017 16:29:09 -0500
+	(envelope-from <richard.henderson@linaro.org>) id 1eNQIe-0001xU-On
+	for qemu-devel@nongnu.org; Fri, 08 Dec 2017 16:35:19 -0500
+Received: from mail-pg0-x235.google.com ([2607:f8b0:400e:c05::235]:44479)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+	id 1eNQIe-0001x9-Hr
+	for qemu-devel@nongnu.org; Fri, 08 Dec 2017 16:35:16 -0500
+Received: by mail-pg0-x235.google.com with SMTP id j9so7660173pgc.11
+	for <qemu-devel@nongnu.org>; Fri, 08 Dec 2017 13:35:16 -0800 (PST)
+References: <20171121212534.5177-1-richard.henderson@linaro.org>
+	<20171121212534.5177-6-richard.henderson@linaro.org>
+	<alpine.DEB.2.20.1712061300570.7159@bulbul.intra.ispras.ru>
+From: Richard Henderson <richard.henderson@linaro.org>
+Message-ID: <d077883d-6a15-eb1b-391f-5e2de5e1103b@linaro.org>
+Date: Fri, 8 Dec 2017 13:35:11 -0800
 MIME-Version: 1.0
-In-Reply-To: <7e694888-43ce-6653-92a0-c0b4c235d4ca@ozlabs.ru>
+In-Reply-To: <alpine.DEB.2.20.1712061300570.7159@bulbul.intra.ispras.ru>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH qemu] fdc: Exit if ISA controller does not
- support DMA
+Subject: Re: [Qemu-devel] [PATCH v6 05/26] tcg: Add generic vector expanders
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,114 +32,38 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alexey Kardashevskiy <aik@ozlabs.ru>, qemu-devel@nongnu.org
-Cc: Eric Blake <eblake@redhat.com>, Markus Armbruster <armbru@redhat.com>, =?UTF-8?Q?Herv=c3=a9_Poussineau?= <hpoussin@reactos.org>
+To: Kirill Batuzov <batuzovk@ispras.ru>
+Cc: qemu-devel@nongnu.org
 
-
-
-On 11/21/2017 09:48 PM, Alexey Kardashevskiy wrote:
-> On 07/11/17 11:58, John Snow wrote:
->>
->>
->> On 10/26/2017 02:46 AM, Alexey Kardashevskiy wrote:
->>> A "powernv" machine type defines an ISA bus but it does not add any DMA
->>> controller to it so it is possible to hit assert(fdctrl->dma) by
->>> adding "-machine powernv -device isa-fdc".
->>>
->>> This replaces assert() with an error message.
->>>
->>> Signed-off-by: Alexey Kardashevskiy <aik@ozlabs.ru>
->>> ---
->>>
->>> Is it a must for ISA to have DMA controllers?
->>>
->>>
->>> ---
->>>  hw/block/fdc.c | 5 ++++-
->>>  1 file changed, 4 insertions(+), 1 deletion(-)
->>>
->>> diff --git a/hw/block/fdc.c b/hw/block/fdc.c
->>> index 67f78ac702..ed8b367572 100644
->>> --- a/hw/block/fdc.c
->>> +++ b/hw/block/fdc.c
->>> @@ -2700,7 +2700,10 @@ static void isabus_fdc_realize(DeviceState *dev, Error **errp)
->>>      fdctrl->dma_chann = isa->dma;
->>>      if (fdctrl->dma_chann != -1) {
->>>          fdctrl->dma = isa_get_dma(isa_bus_from_device(isadev), isa->dma);
->>> -        assert(fdctrl->dma);
->>> +        if (!fdctrl->dma) {
->>> +            error_setg(errp, "ISA controller does not support DMA, exiting");
->>> +            return;
->>> +        }
->>>      }
->>>  
->>>      qdev_set_legacy_instance_id(dev, isa->iobase, 2);
->>>
->>
->> I've been MIA for a little while, so I'm out of the loop -- but I am not
->> sure this is entirely the right way to fix this problem. I think it is
->> more the case that certain boards should not be able to ask for certain
->> types of devices, and we should prohibit e.g. powernv from being able to
->> ask for an ISA floppy disk controller.
->>
->> (It doesn't seem to have an ISA DMA controller by default, but I have no
->> idea if that means it can't EVER have one...)
->>
->> Papering over this by making it a soft error when we fail to execute
->> isa_get_dma and then assuming in retrospect it's because the machine
->> type we're on cannot have an ISA DMA controller seems a little
->> wrong-headed. It also leaves side-effects from isa_register_portio_list
->> and isa_init_irq, so we can't just bail here -- it's only marginally
->> better than the assert() it's doing.
->>
->> That said, I am not really sure what the right thing to do is ... I
->> suspect the "right thing" is to express the dependency that isa-fdc
->> requires an ISA DMA controller -- and maybe that check happens here when
->> isa_get_dma fails and we have to unwind the realize function, but we
->> need to do it gracefully.
->>
->> Give me a day to think about it, but I do want to make sure this is in
->> the next release.
+On 12/06/2017 02:21 AM, Kirill Batuzov wrote:
+> IN: 
+> 0x004005e8:  d2824682  movz     x2, #0x1234
+> 0x004005ec:  4e010c41  dup      v1.16b, w2
 > 
+> OP:
 > 
-> The day has passed, any news? :)
+>  ---- 00000000004005e8 0000000000000000 0000000000000000
+>  movi_i64 x2,$0x1234
 > 
-> 
+>  ---- 00000000004005ec 0000000000000000 0000000000000000
+>  st_i32 x2,env,$0x8b0
+>  st_i32 x2,env,$0x8b4
+>  st_i32 x2,env,$0x8b8
+>  st_i32 x2,env,$0x8bc
 
-*cough* It turns out that understanding the intricacies of FDC and ISA
-is nobody's favorite thing to do.
+Fixed.
 
-OK, so ehabkost pointed me to this:
+ ---- 0000000000400078 0000000000000000 0000000000000000
+ movi_i64 x2,$0x1234                              sync: 0  dead: 0
 
-https://www.mail-archive.com/qemu-devel@nongnu.org/msg496460.html
+ ---- 000000000040007c 0000000000000000 0000000000000000
+ movi_i32 tmp0,$0x34343434
+ st_i32 tmp0,env,$0x8b0
+ st_i32 tmp0,env,$0x8b4
+ st_i32 tmp0,env,$0x8b8
+ st_i32 tmp0,env,$0x8bc                           dead: 0
 
-Where we declare that DMA devices generally can't be created by the user
-for the inverse of the reason we're seeing here: these devices need to
-be created precisely once: not zero times, not twice, exactly once.
+Thanks,
 
-So we made the ISA DMA devices themselves not user-creatable, so you are
-indeed correct here that the absence of fdctrl->dma does more or less
-mean that the current configuration "doesn't support DMA." ... but maybe
-this won't always be true, and maybe some devices (TYPE_I82374?) are
-user creatable, so let's make a "softer" error message:
 
-"No ISA DMA device present, can't create ISA FDC device."
-
-Then, on the other end, we need to unwind realize() gracefully, maybe we
-can just shuffle up isa_get_dma() earlier so we don't have to unwind
-anything if it comes back empty.
-
-Then I'll take the patch, because fixing this more properly I think will
-take more time or effort than I have to spend on the FDC device.
-
-Thanks to Eduardo for looking this over with me.
-
---js
-
-As a post-script, ehabkost dug this up too:
-https://www.mail-archive.com/qemu-devel@nongnu.org/msg348764.html
-
-It looks like Herve was working on decoupling floppies from i8257, but
-perhaps didn't get all the way through -- I'm not actually clear on what
-work remains to be done here, maybe he can chime in if he's still
-interested in the project?
+r~
