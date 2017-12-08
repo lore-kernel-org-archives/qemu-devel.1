@@ -1,33 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36608)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36957)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1eNMVR-0000F2-6M
-	for qemu-devel@nongnu.org; Fri, 08 Dec 2017 12:32:14 -0500
+	(envelope-from <dgilbert@redhat.com>) id 1eNMWk-0001p6-1C
+	for qemu-devel@nongnu.org; Fri, 08 Dec 2017 12:33:35 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1eNMVM-0006iq-G7
-	for qemu-devel@nongnu.org; Fri, 08 Dec 2017 12:32:13 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:35384)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1eNMVM-0006iZ-A3
-	for qemu-devel@nongnu.org; Fri, 08 Dec 2017 12:32:08 -0500
-Date: Fri, 8 Dec 2017 18:32:03 +0100
-From: Igor Mammedov <imammedo@redhat.com>
-Message-ID: <20171208183203.2d11374b@redhat.com>
-In-Reply-To: <20171208161422.GW3037@localhost.localdomain>
-References: <CAFEAcA-auykOKQbNcoQooNGk7Vb3wt7TH7AMA689xEj22_6KcQ@mail.gmail.com>
-	<20171207174832.42663bef@redhat.com>
-	<CAFEAcA9o-LyKZBZwSoz3SSPCY-sjo9e011UWy1=EwJ4U9rWYsg@mail.gmail.com>
-	<20171207170719.GT3037@localhost.localdomain>
-	<CAFEAcA9fzkedj_VLeTaK-WOTLGk1RinyadRmR5FaJ44KOAQU3w@mail.gmail.com>
-	<CAFEAcA9Uh9f3UddCNiB3u6BD9Qg=sUMDmMYYn1+sryiJUMOFYg@mail.gmail.com>
-	<20171208141618.11e60846@redhat.com>
-	<CAFEAcA8Gc1XQVYR9+_uD7Be3WSDE5tzxVAuJNBTokb3HdJ6fHw@mail.gmail.com>
-	<20171208155050.1a6db1c2@redhat.com>
-	<20171208161422.GW3037@localhost.localdomain>
+	(envelope-from <dgilbert@redhat.com>) id 1eNMWj-0007oV-1i
+	for qemu-devel@nongnu.org; Fri, 08 Dec 2017 12:33:34 -0500
+Date: Fri, 8 Dec 2017 17:33:21 +0000
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20171208173321.GR2403@work-vm>
+References: <20171207155102.66622-1-vsementsov@virtuozzo.com>
+	<20171207155102.66622-3-vsementsov@virtuozzo.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] in a device or CPU instance init/realize,
- can I rely on something having the BQL or equivalent?
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20171207155102.66622-3-vsementsov@virtuozzo.com>
+Subject: Re: [Qemu-devel] [PATCH v2 2/6] qapi: add name parameter to
+ nbd-server-add
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,42 +24,117 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eduardo Habkost <ehabkost@redhat.com>
-Cc: Peter Maydell <peter.maydell@linaro.org>, QEMU Developers <qemu-devel@nongnu.org>, David Gibson <david@gibson.dropbear.id.au>
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, armbru@redhat.com, pbonzini@redhat.com, eblake@redhat.com, mreitz@redhat.com, kwolf@redhat.com, den@openvz.org
 
-On Fri, 8 Dec 2017 14:14:22 -0200
-Eduardo Habkost <ehabkost@redhat.com> wrote:
+* Vladimir Sementsov-Ogievskiy (vsementsov@virtuozzo.com) wrote:
+> Allow user to specify name for new export, to not reuse internal
+> node name and to not show it to clients.
+> 
+> This also allows creating several exports per device.
+> 
+> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+> ---
+>  qapi/block.json |  9 +++++++--
+>  blockdev-nbd.c  | 14 +++++++++-----
+>  hmp.c           |  5 +++--
+>  3 files changed, 19 insertions(+), 9 deletions(-)
+> 
+> diff --git a/qapi/block.json b/qapi/block.json
+> index f093fa3f27..503d4b287b 100644
+> --- a/qapi/block.json
+> +++ b/qapi/block.json
+> @@ -213,14 +213,19 @@
+>  #
+>  # @device: The device name or node name of the node to be exported
+>  #
+> +# @name: Export name. If unspecified @device parameter used as export name.
+> +#        (Since 2.12)
+> +#
+>  # @writable: Whether clients should be able to write to the device via the
+>  #     NBD connection (default false).
+>  #
+> -# Returns: error if the device is already marked for export.
+> +# Returns: error if the server is not running, or export with the same name
+> +#          already exists.
+>  #
+>  # Since: 1.3.0
+>  ##
+> -{ 'command': 'nbd-server-add', 'data': {'device': 'str', '*writable': 'bool'} }
+> +{ 'command': 'nbd-server-add',
+> +  'data': {'device': 'str', '*name': 'str', '*writable': 'bool'} }
+>  
+>  ##
+>  # @nbd-server-stop:
+> diff --git a/blockdev-nbd.c b/blockdev-nbd.c
+> index 28f551a7b0..46c885aa35 100644
+> --- a/blockdev-nbd.c
+> +++ b/blockdev-nbd.c
+> @@ -158,8 +158,8 @@ void qmp_nbd_server_start(SocketAddressLegacy *addr,
+>      qapi_free_SocketAddress(addr_flat);
+>  }
+>  
+> -void qmp_nbd_server_add(const char *device, bool has_writable, bool writable,
+> -                        Error **errp)
+> +void qmp_nbd_server_add(const char *device, bool has_name, const char *name,
+> +                        bool has_writable, bool writable, Error **errp)
+>  {
+>      BlockDriverState *bs = NULL;
+>      BlockBackend *on_eject_blk;
+> @@ -170,8 +170,12 @@ void qmp_nbd_server_add(const char *device, bool has_writable, bool writable,
+>          return;
+>      }
+>  
+> -    if (nbd_export_find(device)) {
+> -        error_setg(errp, "NBD server already exporting device '%s'", device);
+> +    if (!has_name) {
+> +        name = device;
+> +    }
+> +
+> +    if (nbd_export_find(name)) {
+> +        error_setg(errp, "NBD server already has export named '%s'", name);
+>          return;
+>      }
+>  
+> @@ -195,7 +199,7 @@ void qmp_nbd_server_add(const char *device, bool has_writable, bool writable,
+>          return;
+>      }
+>  
+> -    nbd_export_set_name(exp, device);
+> +    nbd_export_set_name(exp, name);
+>  
+>      /* The list of named exports has a strong reference to this export now and
+>       * our only way of accessing it is through nbd_export_find(), so we can drop
+> diff --git a/hmp.c b/hmp.c
+> index 35a7041824..0ea9c09b58 100644
+> --- a/hmp.c
+> +++ b/hmp.c
+> @@ -2203,7 +2203,8 @@ void hmp_nbd_server_start(Monitor *mon, const QDict *qdict)
+>              continue;
+>          }
+>  
+> -        qmp_nbd_server_add(info->value->device, true, writable, &local_err);
+> +        qmp_nbd_server_add(info->value->device, false, NULL,
+> +                           true, writable, &local_err);
+>  
+>          if (local_err != NULL) {
+>              qmp_nbd_server_stop(NULL);
+> @@ -2223,7 +2224,7 @@ void hmp_nbd_server_add(Monitor *mon, const QDict *qdict)
+>      bool writable = qdict_get_try_bool(qdict, "writable", false);
+>      Error *local_err = NULL;
+>  
+> -    qmp_nbd_server_add(device, true, writable, &local_err);
+> +    qmp_nbd_server_add(device, false, NULL, true, writable, &local_err);
 
-> On Fri, Dec 08, 2017 at 03:50:50PM +0100, Igor Mammedov wrote:
-> > On Fri, 8 Dec 2017 13:19:27 +0000
-> > Peter Maydell <peter.maydell@linaro.org> wrote:
-> >   
-> > > On 8 December 2017 at 13:16, Igor Mammedov <imammedo@redhat.com> wrote:  
-> > > > TBH:
-> > > >  I do not recall why we have x86 max/host cpu types do feature
-> > > >  loading at realize time instead of at class init like the rest
-> > > >  of static cpu types.    
-> > > 
-> > > class init is too early, IIRC -- it's before KVM has been set up at all.  
-> > 
-> > that shouldn't be an issue as kvm_ppc_register_host_cpu_type() demonstrates
-> > (i.e. an additional class init at kvm/tcg init time),  
+I wont insist, but it would be nice if you wired up an optional
+parameter on HMP as well.
+
+Dave
+
+>      if (local_err != NULL) {
+>          hmp_handle_error(mon, &local_err);
+> -- 
+> 2.11.1
 > 
-> It is possible, but IMO it's not a good idea.  We should be able
-> to enumerate all CPU types before the accelerator has been
-> initialized, so query-cpu-definitions and "-cpu help" will always
-> work.
-> 
-> 
-> > 
-> > so it might be some compat issue or just legacy approach why it
-> > havn't been rewritten to class_init for x86 the way PPC does.
-> > But Eduardo probably knows better if there is anything left that
-> > prevents using class init there.  
-> 
-> It's the opposite: x86 "host" CPU model used to work the same way
-> as PPC, but we changed it so all classes are registered at
-> type_init()-time.
-Is it for libvirt convenience, so that it would be able to cache
-all supported cpus regardless of whether they would actually work
-or not?
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
