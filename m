@@ -1,31 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51917)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54365)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <Jason@zx2c4.com>) id 1eNNYW-000636-N7
-	for qemu-devel@nongnu.org; Fri, 08 Dec 2017 13:39:29 -0500
+	(envelope-from <bounces@canonical.com>) id 1eNNjL-0002Km-H3
+	for qemu-devel@nongnu.org; Fri, 08 Dec 2017 13:50:40 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <Jason@zx2c4.com>) id 1eNNYV-00048n-Or
-	for qemu-devel@nongnu.org; Fri, 08 Dec 2017 13:39:28 -0500
+	(envelope-from <bounces@canonical.com>) id 1eNNjI-0003DA-Ef
+	for qemu-devel@nongnu.org; Fri, 08 Dec 2017 13:50:39 -0500
+Received: from indium.canonical.com ([91.189.90.7]:39908)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1eNNjI-0003CA-8W
+	for qemu-devel@nongnu.org; Fri, 08 Dec 2017 13:50:36 -0500
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1eNNjF-0005GN-FT
+	for <qemu-devel@nongnu.org>; Fri, 08 Dec 2017 18:50:33 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 70D832E80CB
+	for <qemu-devel@nongnu.org>; Fri,  8 Dec 2017 18:50:33 +0000 (UTC)
 MIME-Version: 1.0
-In-Reply-To: <CAFEAcA-5F2GMx9UNoH=LJAa-m1DXg2HW8PJZ47kurjx5x3NhWA@mail.gmail.com>
-References: <20171023122719.17199-1-Jason@zx2c4.com>
-	<CAFEAcA_PM5Fjx2Pk58h75p9vaZwFcusQdXuwy9tbDtc=EaoOJg@mail.gmail.com>
-	<10e16ca3-175b-9f34-65e7-031b883b7201@amsat.org>
-	<CAHmME9qtBiuAEnkCeuMd7EdeZveTVa4UOf+AQhMCFye0SYJY=Q@mail.gmail.com>
-	<20171026133445.kemzfgvpbmtcogsl@kamzik.brq.redhat.com>
-	<CAHmME9oyBvAV8FF9QMHyF46n8Ct6KZqThQVih2ipQmivD94Cag@mail.gmail.com>
-	<CAFEAcA8O6YyS1tSzaydckFpsqpb8HXgW5PJe-VTWud_5YGdW5A@mail.gmail.com>
-	<CAHmME9pE79krWx-zD=VGiScT4c=4TZ1wVxYFiF3m+8wsx9Fqeg@mail.gmail.com>
-	<CAFEAcA9XoeXDCQCmRBehntWSo0WGRBsaMDmC8QCqgU1K8jAF_A@mail.gmail.com>
-	<CAHmME9qSJSPjANce_cWN6nm=qJsncfczgk7PoPa0xkOHmZjLUA@mail.gmail.com>
-	<CAFEAcA-bKPNwJpcny=1azScO8bzHsi0Ou+m3rYPq-=v52Gf26g@mail.gmail.com>
-	<CAHmME9qNnqYEbW_m8LG0E0HBKUE38YjUodbBihnSi2k0FrZJtw@mail.gmail.com>
-	<CAFEAcA-5F2GMx9UNoH=LJAa-m1DXg2HW8PJZ47kurjx5x3NhWA@mail.gmail.com>
-From: "Jason A. Donenfeld" <Jason@zx2c4.com>
-Date: Fri, 8 Dec 2017 19:39:14 +0100
-Message-ID: <CAHmME9rSEtwg=n1gtqOVh=Et5yn45Yveh3LEFj357aqRZXwwcQ@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [Qemu-arm] [PATCH] hw/arm/virt: support 4 serial
- ports
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Fri, 08 Dec 2017 18:41:59 -0000
+From: John Snow <1737194@bugs.launchpad.net>
+Reply-To: Bug 1737194 <1737194@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <151274735709.11243.12332071284435970530.malonedeb@soybean.canonical.com>
+Message-Id: <151275851958.3366.9615429136508573832.malone@gac.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1737194] Re: Windows NT 4.0 fails to boot from
+ qcow2 installation
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,27 +37,72 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: Andrew Jones <drjones@redhat.com>, =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>, QEMU Trivial <qemu-trivial@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>
+To: qemu-devel@nongnu.org
 
-On Fri, Dec 8, 2017 at 12:49 PM, Peter Maydell <peter.maydell@linaro.org> wrote:
-> Now that the 2.11 release is mostly out of the way, I've been
-> working through some of my other todo list items so I've
-> come back to this thread.
->
-> My suggestion is that we should add a second non-secure UART
-> to the virt board, so if you're using secure=no then you
-> get serial 1 and 2, and for secure=yes serial 1 is the first
-> NS uart, serial 2 is the secure uart and serial 3 is the
-> 2nd NS uart. (I don't really want to add a 4th uart unless
-> there's some good reason to -- maybe we would turn out to
-> want it for the secure side, for instance.)
->
-> I'll probably write a patch for this next week, unless you
-> want to do it.
+If you do two identical installs with qcow2 and raw, do you see any
+differences with qemu-img compare afterwards that might indicate what
+could possibly have gone wrong?
 
-Sounds great to me. Thanks!
+-- =
 
-I'm curious why you don't want to add a 4th UART. It seems trivial to
-do, and the more the merrier? Or that's a silly attitude? Mostly just
-curious about that, as having two personally suits my needs.
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1737194
+
+Title:
+  Windows NT 4.0 fails to boot from qcow2 installation
+
+Status in QEMU:
+  New
+
+Bug description:
+  Windows NT 4.0 will not boot from an installation more than once if
+  installed in a qcow2 image file. A quick fix to this problem is to use
+  the qcow format instead.
+
+  Steps to reproduce this issue:
+
+  Create the image file:
+  qemu-img create -f qcow2 winnt4.qcow2 1G
+
+  Boot from a Windows NT 4.0 Workstation CD:
+  qemu-system-i386 -hda winnt4.qcow2 -cdrom /dev/cdrom -boot d -m 128 -cpu =
+pentium -vga cirrus
+
+  During the installation process you have the choise between FAT and
+  NTFS. You can pick anyone.
+
+  After finishing the installation the guest will reboot to install
+  additional items. Once this is done the guest will be bootable. Eject
+  any CD media from QEMU and reboot. You will then see Windows NT 4.0
+  booting up to the desktop. Go to "Start->Shut down" to shut down. Then
+  when Windows is ready quit QEMU.
+
+  Now try to boot using this command:
+  qemu-system-i386 -hda winnt4.qcow2 -boot c -m 128 -cpu pentium -vga cirru=
+s =
+
+   =
+
+  The BIOS screen will display an error message:
+
+  For NTFS: =
+
+  Booting from Hard Disk...
+  A disk read error occurred.
+  Insert a system diskette and restart
+  the system.
+
+  For FAT:
+  No bootable device.
+
+  Additional information:
+  qemu-system-i386 version: 2.10.1
+  qemu-img version: 2.10.92 (v2.11.0-rc4-dirty)
+
+  If you don't have a Windows NT 4.0 Workstation installation CD, you may d=
+ownload one from here:
+  https://winworldpc.com/product/windows-nt-40/40
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1737194/+subscriptions
