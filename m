@@ -1,28 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38368)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39330)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1eNJEs-0008GL-3C
-	for qemu-devel@nongnu.org; Fri, 08 Dec 2017 09:02:55 -0500
+	(envelope-from <armbru@redhat.com>) id 1eNJJU-0001MM-0c
+	for qemu-devel@nongnu.org; Fri, 08 Dec 2017 09:07:41 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1eNJEm-0003VW-GV
-	for qemu-devel@nongnu.org; Fri, 08 Dec 2017 09:02:54 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:34614)
+	(envelope-from <armbru@redhat.com>) id 1eNJJP-0006AI-1J
+	for qemu-devel@nongnu.org; Fri, 08 Dec 2017 09:07:39 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:38264)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mreitz@redhat.com>) id 1eNJEm-0003VQ-7A
-	for qemu-devel@nongnu.org; Fri, 08 Dec 2017 09:02:48 -0500
-References: <CAJqJJggWTki8i_U7xr2oRSFR4sZt4eK5hRO+B55iOYVMyfGwDg@mail.gmail.com>
-	<20171206091243.GC4207@localhost.localdomain>
-	<cd42e58f-4a00-de18-446f-7e2275421992@redhat.com>
-	<20171208135139.GC4217@localhost.localdomain>
-From: Max Reitz <mreitz@redhat.com>
-Message-ID: <b5011c59-f9aa-07d1-11e3-179c5f8e73a3@redhat.com>
-Date: Fri, 8 Dec 2017 15:02:42 +0100
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1eNJJO-00069t-Qm
+	for qemu-devel@nongnu.org; Fri, 08 Dec 2017 09:07:34 -0500
+From: Markus Armbruster <armbru@redhat.com>
+References: <20170911110623.24981-1-marcandre.lureau@redhat.com>
+	<20170911110623.24981-21-marcandre.lureau@redhat.com>
+	<87tvx1e2xz.fsf@dusky.pond.sub.org>
+Date: Fri, 08 Dec 2017 15:07:28 +0100
+In-Reply-To: <87tvx1e2xz.fsf@dusky.pond.sub.org> (Markus Armbruster's message
+	of "Fri, 08 Dec 2017 14:58:48 +0100")
+Message-ID: <87o9n9cnz3.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-In-Reply-To: <20171208135139.GC4217@localhost.localdomain>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="IcpPEaOVOnR2hlDoi0ci4iMJdlkg6025n"
-Subject: Re: [Qemu-devel] About [PULL 20/25] block: Guard against NULL
- bs->drv
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v3 20/50] qapi-event: add 'if' condition to
+ generated enum
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,99 +30,40 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Kevin Wolf <kwolf@redhat.com>
-Cc: Kangjie Xi <imxikangjie@gmail.com>, qemu-devel@nongnu.org, John Snow <jsnow@redhat.com>
+To: =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>
+Cc: qemu-devel@nongnu.org, Michael Roth <mdroth@linux.vnet.ibm.com>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---IcpPEaOVOnR2hlDoi0ci4iMJdlkg6025n
-From: Max Reitz <mreitz@redhat.com>
-To: Kevin Wolf <kwolf@redhat.com>
-Cc: Kangjie Xi <imxikangjie@gmail.com>, qemu-devel@nongnu.org,
- John Snow <jsnow@redhat.com>
-Message-ID: <b5011c59-f9aa-07d1-11e3-179c5f8e73a3@redhat.com>
-Subject: Re: About [PULL 20/25] block: Guard against NULL bs->drv
-References: <CAJqJJggWTki8i_U7xr2oRSFR4sZt4eK5hRO+B55iOYVMyfGwDg@mail.gmail.com>
- <20171206091243.GC4207@localhost.localdomain>
- <cd42e58f-4a00-de18-446f-7e2275421992@redhat.com>
- <20171208135139.GC4217@localhost.localdomain>
-In-Reply-To: <20171208135139.GC4217@localhost.localdomain>
-Content-Type: text/plain; charset=windows-1252
-Content-Transfer-Encoding: quoted-printable
+Markus Armbruster <armbru@redhat.com> writes:
 
-On 2017-12-08 14:51, Kevin Wolf wrote:
-> Am 08.12.2017 um 14:39 hat Max Reitz geschrieben:
->> On 2017-12-06 10:12, Kevin Wolf wrote:
->>> Am 06.12.2017 um 08:28 hat Kangjie Xi geschrieben:
->>>> Hi,
->>>>
->>>> I encountered a qemu-nbd segfault, finally I found it was caused by
->>>> NULL bs-drv,  which is located in block/io.c function bdrv_co_flush
->>>> line 2377:
->>>>
->>>> https://git.qemu.org/?p=3Dqemu.git;a=3Dblob;f=3Dblock/io.c;h=3D4fdf9=
-3a0144fa4761a14b8cc6b2a9a6b6e5d5bec;hb=3Dd470ad42acfc73c45d3e8ed5311a4911=
-60b4c100#l2377
->>>>
->>>> It is before the patch at line 2402, so the patch needs to be update=
-d
->>>> to fix NULL bs-drv at line 2337.
->>>>
->>>> https://lists.gnu.org/archive/html/qemu-devel/2017-11/msg03425.html
->>>
->>> Can you please post a full backtrace? Do you see any error message
->>> on stderr before the process crashes?
->>>
->>> I don't see at the moment how this can happen, except the case that M=
-ax
->>> mentioned where bs->drv =3D NULL is set when an image corruption is
->>> detected - this involves an error message, though.
->>>
->>> We check bdrv_is_inserted() as the first thing, which includes a NULL=
-
->>> check for bs->drv. So it must have been non-NULL at the start of the
->>> function and then become NULL. I suppose this can theoretically happe=
-n
->>> in qemu_co_queue_wait() if another flush request detects image
->>> corruption.
->>>
->>> Max: I think bs->drv =3D NULL in the middle of a request was a stupid=
-
->>> idea. In fact, it's already a stupid idea to have any BDS with
->>> bs->drv =3D NULL. Maybe it would be better to schedule a BH that repl=
-aces
->>> the qcow2 node with a dummy node (null-co?) and properly closes the
->>> qcow2 one.
+> Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com> writes:
+>
+>> Add condition to QAPIEvent enum members based on the event 'if'.
 >>
->> Yes, that is an idea John had, too.  It sounded good to me (we'd just
->> need to add a new flag to null-co so it would respond with -ENOMEDIUM =
-to
->> all requests or something)...  The only issue I had is how that would
->> work together with the GRAPH_MOD op blocker.
->=20
-> In order to answer this question, I'd first have to understand what
-> GRAPH_MOD is even supposed to mean and which operations it needs to
-> protect. There aren't currently any users of GRAPH_MOD.
+>> Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+>> ---
+>>  scripts/qapi-event.py | 2 +-
+>>  1 file changed, 1 insertion(+), 1 deletion(-)
+>>
+>> diff --git a/scripts/qapi-event.py b/scripts/qapi-event.py
+>> index 38f4264817..60c6f7030d 100644
+>> --- a/scripts/qapi-event.py
+>> +++ b/scripts/qapi-event.py
+>> @@ -168,7 +168,7 @@ class QAPISchemaGenEventVisitor(QAPISchemaVisitor):
+>>      def visit_event(self, name, info, ifcond, arg_type, boxed):
+>>          self.decl +=3D gen_event_send_decl(name, arg_type, boxed)
+>>          self.defn +=3D gen_event_send(name, arg_type, boxed)
+>> -        self._event_names.append(QAPISchemaMember(name))
+>> +        self._event_names.append(QAPISchemaMember(name, ifcond))
+>>=20=20
+>>=20=20
+>>  (input_file, output_dir, do_c, do_h, prefix, dummy) =3D parse_command_l=
+ine()
+>
+> No test coverage?
 
-That is exactly the reason why we could not come to a conclusion. :-)
+Wait!  This patch has no effect, because the it merely puts the ifcond
+argument into QAPISchemaMember.ifcond.  Only later patches put
+QAPISchemaMember.ifcond to use.  Correct?
 
-Max
-
-
---IcpPEaOVOnR2hlDoi0ci4iMJdlkg6025n
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQFGBAEBCAAwFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAloqm4ISHG1yZWl0ekBy
-ZWRoYXQuY29tAAoJEPQH2wBh1c9A4jMIAMAsdAwkGeDuxtCB6g9VkFuyOzCTNeql
-sYyq3geH7c3epTaIsxCHghI7Lxsnjj/L5gk4gCN1lNQAqUCVYOGbvdq3haOZKOUn
-Ad9SgZBBOP0p1nCuNBMi2CbFoDgr4qJh6lkV4RHjfXfk/aP3YKFwgpqyChUGQPRl
-XJJNEEoUdnjPgoMHu0SuVyWI6B5SPe73rGr+ptIoO2Bpy7qq5adfflN6y7AAlnUP
-uxMYhZrva7VhGI9LOK1ls4NqkIRJZzOVa8AYM+79Xg+ikybQhkAwvGCO8y9+0I48
-JywEB51WjxxnOSxN/R1FqxO4X1xKsu+vuphZ5jxchbMhkHdl8TZJAUI=
-=sQah
------END PGP SIGNATURE-----
-
---IcpPEaOVOnR2hlDoi0ci4iMJdlkg6025n--
+Aside: the ifcond_decorator could already be doing something with the
+argument, but I'll be hanged if I remember how that magic works.
