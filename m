@@ -1,23 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49140)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50043)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1eNLWx-00071Y-3Y
-	for qemu-devel@nongnu.org; Fri, 08 Dec 2017 11:29:44 -0500
+	(envelope-from <kwolf@redhat.com>) id 1eNLZ4-0007v1-N6
+	for qemu-devel@nongnu.org; Fri, 08 Dec 2017 11:31:55 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1eNLWu-00061u-15
-	for qemu-devel@nongnu.org; Fri, 08 Dec 2017 11:29:43 -0500
-References: <20171208160207.26494-1-david@redhat.com>
-	<20171208160207.26494-15-david@redhat.com>
-	<20171208172604.2bf84cee.cohuck@redhat.com>
-From: David Hildenbrand <david@redhat.com>
-Message-ID: <d6afc0f3-5c27-584b-125c-bb4f51cf523b@redhat.com>
-Date: Fri, 8 Dec 2017 17:29:36 +0100
+	(envelope-from <kwolf@redhat.com>) id 1eNLZ3-00081q-VD
+	for qemu-devel@nongnu.org; Fri, 08 Dec 2017 11:31:54 -0500
+Date: Fri, 8 Dec 2017 17:31:42 +0100
+From: Kevin Wolf <kwolf@redhat.com>
+Message-ID: <20171208163142.GG4217@localhost.localdomain>
+References: <20171206105309.3468-1-kwolf@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20171208172604.2bf84cee.cohuck@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v3 for-2.12 14/14] s390x: change the QEMU
- cpu model to a stripped down z12
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20171206105309.3468-1-kwolf@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v2 0/6] block: Fix BlockDriver callbacks in
+ bdrv_drain_all_begin()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,47 +23,22 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Cornelia Huck <cohuck@redhat.com>
-Cc: qemu-s390x@nongnu.org, qemu-devel@nongnu.org, Christian Borntraeger <borntraeger@de.ibm.com>, Richard Henderson <rth@twiddle.net>, Alexander Graf <agraf@suse.de>
+To: qemu-block@nongnu.org
+Cc: pbonzini@redhat.com, famz@redhat.com, qemu-devel@nongnu.org, qemu-stable@nongnu.org
 
-On 08.12.2017 17:26, Cornelia Huck wrote:
-> On Fri,  8 Dec 2017 17:02:07 +0100
-> David Hildenbrand <david@redhat.com> wrote:
+Am 06.12.2017 um 11:53 hat Kevin Wolf geschrieben:
+> I was looking into the drain functions in order to develop them a bit in
+> the direction that Fam suggested, to unify the code between bdrv_drain()
+> and bdrv_drain_all() a bit more, and maybe to find a place to take
+> coroutine locks for graph changes.
 > 
->> We are good enough to boot upstream Linux kernels / Fedora 26/27. That
->> should be sufficient for now.
->>
->> As the QEMU CPU model is migration safe, let's add compatibility code.
->> Generate the feature list to reduce the chance of messing things up in the
->> future.
->>
->> Signed-off-by: David Hildenbrand <david@redhat.com>
->> ---
->>  hw/s390x/s390-virtio-ccw.c  |   8 ++++
->>  target/s390x/cpu.h          |   3 ++
->>  target/s390x/cpu_models.c   | 100 ++++++++++++++++++--------------------------
->>  target/s390x/cpu_models.h   |   1 +
->>  target/s390x/gen-features.c |  87 ++++++++++++++++++++++++++++++++++++++
->>  5 files changed, 140 insertions(+), 59 deletions(-)
+> The first thing I found is a bug in bdrv_drain_all(), so I'm already
+> sending this part before I have made much progress with my actual plan.
 > 
-> Unfortunately, this patch makes mingw unhappy (x86_64-w64-mingw32 on my
-> F26 laptop):
-> 
-> In file included from /home/cohuck/git/qemu/target/s390x/cpu_models.h:17:0,
->                  from /home/cohuck/git/qemu/target/s390x/cpu.h:28,
->                  from /home/cohuck/git/qemu/hw/s390x/s390-virtio-ccw.c:16:
-> /home/cohuck/git/qemu/hw/s390x/s390-virtio-ccw.c: In function 'ccw_machine_2_12_instance_options':
-> ./gen-features.h:96:35: error: large integer implicitly truncated to unsigned type [-Werror=overflow]
->  #define S390_FEAT_LIST_QEMU_V2_12 0x3000e918fd6de14fULL,0x000ffffff0000000ULL,0x0000000000000000ULL,0x0000000000000000ULL
->                                    ^
-> /home/cohuck/git/qemu/hw/s390x/s390-virtio-ccw.c:728:51: note: in expansion of macro 'S390_FEAT_LIST_QEMU_V2_12'
->      static const S390FeatBitmap qemu_cpu_feat = { S390_FEAT_LIST_QEMU_V2_12 };
->                                                    ^~~~~~~~~~~~~~~~~~~~~~~~~
+> v2:
+> - Added patches 5 and 6 [Paolo]
+> - Fixed commit message of patch 1 [Eric]
 
-Huh? we have ULL added to all constants, this should not get reported.
+Applied to block-next.
 
--- 
-
-Thanks,
-
-David / dhildenb
+Kevin
