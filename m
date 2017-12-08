@@ -1,24 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43340)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43459)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1eNJbf-0006aG-OC
-	for qemu-devel@nongnu.org; Fri, 08 Dec 2017 09:26:28 -0500
+	(envelope-from <stefanha@redhat.com>) id 1eNJc8-0006pd-5v
+	for qemu-devel@nongnu.org; Fri, 08 Dec 2017 09:26:57 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1eNJbb-0002pL-RD
-	for qemu-devel@nongnu.org; Fri, 08 Dec 2017 09:26:27 -0500
-Received: from 3.mo173.mail-out.ovh.net ([46.105.34.1]:35100)
+	(envelope-from <stefanha@redhat.com>) id 1eNJc4-0003BY-7w
+	for qemu-devel@nongnu.org; Fri, 08 Dec 2017 09:26:56 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:60532)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1eNJbb-0002oP-Jb
-	for qemu-devel@nongnu.org; Fri, 08 Dec 2017 09:26:23 -0500
-Received: from player739.ha.ovh.net (b9.ovh.net [213.186.33.59])
-	by mo173.mail-out.ovh.net (Postfix) with ESMTP id 7B3AC92E0F
-	for <qemu-devel@nongnu.org>; Fri,  8 Dec 2017 15:26:17 +0100 (CET)
-From: Greg Kurz <groug@kaod.org>
-Date: Fri, 08 Dec 2017 15:26:13 +0100
-Message-ID: <151274317380.5376.485467933490492379.stgit@bahia.lan>
+	(Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1eNJc4-0003B2-18
+	for qemu-devel@nongnu.org; Fri, 08 Dec 2017 09:26:52 -0500
+Date: Fri, 8 Dec 2017 14:26:44 +0000
+From: Stefan Hajnoczi <stefanha@redhat.com>
+Message-ID: <20171208142644.GA8998@stefanha-x1.localdomain>
+References: <20171208105553.12249-1-pbonzini@redhat.com>
+	<20171208105553.12249-4-pbonzini@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Subject: [Qemu-devel] [PATCH] tests: virtio-9p: fix ISR dependence
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="Nq2Wo0NMKNjxTN9z"
+Content-Disposition: inline
+In-Reply-To: <20171208105553.12249-4-pbonzini@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH 3/5] qemu-timer: convert to use lock guards
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,88 +28,50 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Greg Kurz <groug@kaod.org>, Stefan Hajnoczi <stefanha@redhat.com>
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: qemu-devel@nongnu.org, "Emilio G . Cota" <cota@braap.org>, Fam Zheng <famz@redhat.com>
 
-Like other virtio tests, use the used ring APIs instead of assuming ISR
-being set means the request has completed.
 
-Signed-off-by: Greg Kurz <groug@kaod.org>
----
- tests/virtio-9p-test.c |   30 +++++++++++-------------------
- 1 file changed, 11 insertions(+), 19 deletions(-)
+--Nq2Wo0NMKNjxTN9z
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-diff --git a/tests/virtio-9p-test.c b/tests/virtio-9p-test.c
-index ad33d963876f..ebd24b20f657 100644
---- a/tests/virtio-9p-test.c
-+++ b/tests/virtio-9p-test.c
-@@ -18,6 +18,8 @@
- #include "standard-headers/linux/virtio_pci.h"
- #include "hw/9pfs/9p.h"
- 
-+#define QVIRTIO_9P_TIMEOUT_US (10 * 1000 * 1000)
-+
- static const char mount_tag[] = "qtest";
- 
- typedef struct {
-@@ -111,6 +113,7 @@ typedef struct {
-     /* No r_size, it is hardcoded to P9_MAX_SIZE */
-     size_t t_off;
-     size_t r_off;
-+    uint32_t free_head;
- } P9Req;
- 
- static void v9fs_memwrite(P9Req *req, const void *addr, size_t len)
-@@ -124,11 +127,6 @@ static void v9fs_memskip(P9Req *req, size_t len)
-     req->r_off += len;
- }
- 
--static void v9fs_memrewind(P9Req *req, size_t len)
--{
--    req->r_off -= len;
--}
--
- static void v9fs_memread(P9Req *req, void *addr, size_t len)
- {
-     memread(req->r_msg + req->r_off, addr, len);
-@@ -227,12 +225,12 @@ static P9Req *v9fs_req_init(QVirtIO9P *v9p, uint32_t size, uint8_t id,
- static void v9fs_req_send(P9Req *req)
- {
-     QVirtIO9P *v9p = req->v9p;
--    uint32_t free_head;
- 
-     req->r_msg = guest_alloc(v9p->qs->alloc, P9_MAX_SIZE);
--    free_head = qvirtqueue_add(v9p->vq, req->t_msg, req->t_size, false, true);
-+    req->free_head = qvirtqueue_add(v9p->vq, req->t_msg, req->t_size, false,
-+                                    true);
-     qvirtqueue_add(v9p->vq, req->r_msg, P9_MAX_SIZE, true, false);
--    qvirtqueue_kick(v9p->dev, v9p->vq, free_head);
-+    qvirtqueue_kick(v9p->dev, v9p->vq, req->free_head);
-     req->t_off = 0;
- }
- 
-@@ -250,19 +248,13 @@ static void v9fs_req_recv(P9Req *req, uint8_t id)
- {
-     QVirtIO9P *v9p = req->v9p;
-     P9Hdr hdr;
--    int i;
- 
--    for (i = 0; i < 10; i++) {
--        qvirtio_wait_queue_isr(v9p->dev, v9p->vq, 1000 * 1000);
-+    qvirtio_wait_used_elem(v9p->dev, v9p->vq, req->free_head,
-+                           QVIRTIO_9P_TIMEOUT_US);
- 
--        v9fs_memread(req, &hdr, 7);
--        hdr.size = ldl_le_p(&hdr.size);
--        hdr.tag = lduw_le_p(&hdr.tag);
--        if (hdr.size >= 7) {
--            break;
--        }
--        v9fs_memrewind(req, 7);
--    }
-+    v9fs_memread(req, &hdr, 7);
-+    hdr.size = ldl_le_p(&hdr.size);
-+    hdr.tag = lduw_le_p(&hdr.tag);
- 
-     g_assert_cmpint(hdr.size, >=, 7);
-     g_assert_cmpint(hdr.size, <=, P9_MAX_SIZE);
+On Fri, Dec 08, 2017 at 11:55:51AM +0100, Paolo Bonzini wrote:
+> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+> ---
+>  util/qemu-timer.c | 84 +++++++++++++++++++++++++++----------------------=
+------
+>  1 file changed, 42 insertions(+), 42 deletions(-)
+>=20
+> diff --git a/util/qemu-timer.c b/util/qemu-timer.c
+> index 82d56507a2..7a99e0e336 100644
+> --- a/util/qemu-timer.c
+> +++ b/util/qemu-timer.c
+> @@ -192,14 +192,11 @@ bool timerlist_expired(QEMUTimerList *timer_list)
+>          return false;
+>      }
+> =20
+> -    qemu_mutex_lock(&timer_list->active_timers_lock);
+> +    QEMU_LOCK_GUARD(QemuMutex, timers_guard, &timer_list->active_timers_=
+lock);
+
+It's not obvious to me that calling qemu_lock_get_ns() below with
+active_timers_lock held is a good idea.  Using QEMU_WITH_LOCK() seems
+like the clearer and safer option than QEMU_LOCK_GUARD().
+
+--Nq2Wo0NMKNjxTN9z
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEcBAEBAgAGBQJaKqEkAAoJEJykq7OBq3PI7DIIAL6CK1DA4ew9JQboRfQ8tK92
+GwmR8Nmsj3YoaGEyUG90S7BTC/fIXWmhKeFa28vaktoRmSJFXJzRSBH9GPbKctok
+WRAN0FSJhm5VHwDc/rCgvWnCS6Rq75BzW2VUKDUwCzeMjUdnwoX76x6uqiIGcps7
++l0bZJeVSJXT2D49W3+DNiWc3WNV3mA50OK0F8BoWj5/I/LyMCyFH2Xoe8OgeFoq
+nOgVYegQi7l1dhpKSFbS877SJUfPTV9HF7fxhmtXLRzldUeHeKnEzj6p7mrtkQ2+
+ivEfAKbP0lFNsiF804RVbKTKh/XqQBzIkOoxUPyqu+eCumvfRIwRFxdrXqHxTbc=
+=oPwW
+-----END PGP SIGNATURE-----
+
+--Nq2Wo0NMKNjxTN9z--
