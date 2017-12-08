@@ -1,26 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60041)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35645)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1eNM9i-0005hF-9w
-	for qemu-devel@nongnu.org; Fri, 08 Dec 2017 12:09:47 -0500
+	(envelope-from <armbru@redhat.com>) id 1eNMRj-0007Lp-3w
+	for qemu-devel@nongnu.org; Fri, 08 Dec 2017 12:28:24 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1eNM9h-0005gU-Cn
-	for qemu-devel@nongnu.org; Fri, 08 Dec 2017 12:09:46 -0500
-References: <20171109141631.25688-1-vsementsov@virtuozzo.com>
-	<8ade3dfe-ec27-a096-5d09-9e694f03935a@redhat.com>
-	<a254716c-2762-3a1c-d4c4-d3abb23f7207@redhat.com>
-	<a4757a98-0492-311a-2086-d2a95418d8ec@redhat.com>
-	<6372bf9a-b80b-f4c7-33fa-88f35e3062db@redhat.com>
-	<115a5939-fff8-8861-f02f-0204aea5b3e2@redhat.com>
-From: John Snow <jsnow@redhat.com>
-Message-ID: <5f704858-1983-f1bb-2281-f12f43c5f2b6@redhat.com>
-Date: Fri, 8 Dec 2017 12:09:35 -0500
+	(envelope-from <armbru@redhat.com>) id 1eNMRf-0003st-3d
+	for qemu-devel@nongnu.org; Fri, 08 Dec 2017 12:28:23 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:51162)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1eNMRe-0003sJ-Rh
+	for qemu-devel@nongnu.org; Fri, 08 Dec 2017 12:28:19 -0500
+From: Markus Armbruster <armbru@redhat.com>
+References: <20171208074515.1553-1-lprosek@redhat.com>
+	<20171208074515.1553-5-lprosek@redhat.com>
+	<87y3mde3z1.fsf@dusky.pond.sub.org>
+	<CABdb737EUy_rRCunxeDUDdhhDiCU8eZBNoYmh+QGp39mqsDung@mail.gmail.com>
+Date: Fri, 08 Dec 2017 18:28:13 +0100
+In-Reply-To: <CABdb737EUy_rRCunxeDUDdhhDiCU8eZBNoYmh+QGp39mqsDung@mail.gmail.com>
+	(Ladi Prosek's message of "Fri, 8 Dec 2017 14:44:03 +0100")
+Message-ID: <87vahh9ljm.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-In-Reply-To: <115a5939-fff8-8861-f02f-0204aea5b3e2@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [Qemu-block] [PATCH] blockdev-backup: enable
- non-root nodes for backup
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PATCH v3 4/4] ivshmem: Disable irqfd on device
+ reset
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,94 +30,93 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Max Reitz <mreitz@redhat.com>, Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org
-Cc: kwolf@redhat.com, den@openvz.org, armbru@redhat.com
+To: Ladi Prosek <lprosek@redhat.com>
+Cc: Geoffrey McRae <geoff@hostfission.com>, Paolo Bonzini <pbonzini@redhat.com>, qemu-devel <qemu-devel@nongnu.org>, =?utf-8?Q?Ma?= =?utf-8?Q?rc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>
 
+Ladi Prosek <lprosek@redhat.com> writes:
 
+> On Fri, Dec 8, 2017 at 2:36 PM, Markus Armbruster <armbru@redhat.com> wrote:
+>> Ladi Prosek <lprosek@redhat.com> writes:
+>>
+>>> The effects of ivshmem_enable_irqfd() was not undone on device reset.
+>>>
+>>> This manifested as:
+>>> ivshmem_add_kvm_msi_virq: Assertion `!s->msi_vectors[vector].pdev' failed.
+>>>
+>>> when irqfd was enabled before reset and then enabled again after reset, making
+>>> ivshmem_enable_irqfd() run for the second time.
+>>>
+>>> To reproduce, run:
+>>>
+>>>   ivshmem-server
+>>>
+>>> and QEMU with:
+>>>
+>>>   -device ivshmem-doorbell,chardev=iv
+>>>   -chardev socket,path=/tmp/ivshmem_socket,id=iv
+>>>
+>>> then install the Windows driver, at the time of writing available at:
+>>>
+>>> https://github.com/virtio-win/kvm-guest-drivers-windows/tree/master/ivshmem
+>>>
+>>> and crash-reboot the guest by inducing a BSOD.
+>>>
+>>> Signed-off-by: Ladi Prosek <lprosek@redhat.com>
+>>> ---
+>>>  hw/misc/ivshmem.c | 24 +++++++++++++-----------
+>>>  1 file changed, 13 insertions(+), 11 deletions(-)
+>>>
+>>> diff --git a/hw/misc/ivshmem.c b/hw/misc/ivshmem.c
+>>> index d1bb246d12..4be0d2627b 100644
+>>> --- a/hw/misc/ivshmem.c
+>>> +++ b/hw/misc/ivshmem.c
+>>> @@ -758,17 +758,6 @@ static void ivshmem_msix_vector_use(IVShmemState *s)
+>>>      }
+>>>  }
+>>>
+>>> -static void ivshmem_reset(DeviceState *d)
+>>> -{
+>>> -    IVShmemState *s = IVSHMEM_COMMON(d);
+>>> -
+>>> -    s->intrstatus = 0;
+>>> -    s->intrmask = 0;
+>>> -    if (ivshmem_has_feature(s, IVSHMEM_MSI)) {
+>>> -        ivshmem_msix_vector_use(s);
+>>> -    }
+>>> -}
+>>> -
+>>>  static int ivshmem_setup_interrupts(IVShmemState *s, Error **errp)
+>>>  {
+>>>      /* allocate QEMU callback data for receiving interrupts */
+>>> @@ -855,6 +844,19 @@ static void ivshmem_disable_irqfd(IVShmemState *s)
+>>>
+>>>  }
+>>>
+>>> +static void ivshmem_reset(DeviceState *d)
+>>> +{
+>>> +    IVShmemState *s = IVSHMEM_COMMON(d);
+>>> +
+>>> +    ivshmem_disable_irqfd(s);
+>>> +
+>>> +    s->intrstatus = 0;
+>>> +    s->intrmask = 0;
+>>> +    if (ivshmem_has_feature(s, IVSHMEM_MSI)) {
+>>> +        ivshmem_msix_vector_use(s);
+>>> +    }
+>>> +}
+>>> +
+>>>  static void ivshmem_write_config(PCIDevice *pdev, uint32_t address,
+>>>                                   uint32_t val, int len)
+>>>  {
+>>
+>> Why are you moving ivshmem_reset()?  Makes the actual change harder to
+>> see than necessary.
+>
+> ivshmem_disable_irqfd() is declared after ivshmem_reset() in the
+> source file. I generally prefer to order static functions
+> topologically if possible. If you'd prefer adding a forward decl
+> instead (fewer lines touched, easier to bisect?) I can certainly do
+> that. Thanks!
 
-On 12/08/2017 09:30 AM, Max Reitz wrote:
-> On 2017-12-05 01:48, John Snow wrote:
->>
->>
->> On 12/04/2017 05:21 PM, Max Reitz wrote:
->>> On 2017-12-04 23:15, John Snow wrote:
->>>>
->>>>
->>>> On 12/01/2017 02:41 PM, Max Reitz wrote:
->>>>> ((By the way, I don't suppose that's how it should work...  But I don't
->>>>> suppose that we want propagation of dirtying towards the BDS roots, do
->>>>> we? :-/))
->>>>
->>>> I have never really satisfactorily explained to myself what bitmaps on
->>>> intermediate notes truly represent or mean.
->>>>
->>>> The simple case is "This layer itself serviced a write request."
->>>>
->>>> If that information is not necessarily meaningful, I'm not sure that's a
->>>> problem except in configuration.
->>>>
->>>>
->>>> ...Now, if you wanted to talk about bitmaps that associate with a
->>>> Backend instead of a Node...
->>>
->>> But it's not about bitmaps on intermediate nodes, quite the opposite.
->>> It's about bitmaps on roots but write requests happening on intermediate
->>> nodes.
->>>
->>
->> Oh, I see what you're saying. It magically doesn't really change my
->> opinion, by coincidence!
->>
->>> Say you have a node I and two filter nodes A and B using it (and they
->>> are OK with shared writers).  There is a dirty bitmap on A.
->>>
->>> Now when a write request goes through B, I will obviously have changed,
->>> and because A and B are filters, so will A.  But the dirty bitmap on A
->>> will still be clean.
->>>
->>> My example was that when you run a mirror over A, you won't see dirtying
->>> from B.  So you can't e.g. add a throttle driver between a mirror job
->>> and the node you want to mirror, because the dirty bitmap on the
->>> throttle driver will not be affected by accesses to the actual node.
->>>
->>> Max
->>>
->>
->> Well, in this case I would say that a root BDS is not really any
->> different from an intermediate one and can't really know what's going on
->> in the world outside.
->>
->> At least, I think that's how we model it right now -- we pretend that we
->> can record the activity of an entire drive graph by putting the bitmap
->> on the root-most node we can get a hold of and assuming that all writes
->> are going to go through us.
-> 
-> Well, yeah, I know we do.  But I consider this counter-intuitive and if
-> something is counter-intuitive it's often a bug.
-> 
->> Clearly this is increasingly false the more we modularise the block graph.
->>
->>
->> *uhm*
->>
->>
->> I would say that a bitmap attached to a BlockBackend should behave in
->> the way you say: writes to any children should change the bitmap here.
->>
->> bitmaps attached to nodes shouldn't worry about such things.
-> 
-> Do we have bitmaps attached to BlockBackends?  I sure hope not.
-> 
-> We should not have any interface that requires the use of BlockBackends
-> by now.  If we do, that's something that has to be fixed.
-> 
-> Max
-> 
-
-I'm not sure what the right paradigm is anymore, then.
-
-A node is just a node, but something has to represent the "drive" as far
-as the device model sees it. I thought that *was* the BlockBackend, but
-is it not?
-
---js
+Well, it compiles before your patch, your patch doesn't add any calls,
+so I can't quite see why a forward declaration would be needed.
