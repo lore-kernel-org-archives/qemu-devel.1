@@ -1,23 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39530)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42653)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <linzhecheng@huawei.com>) id 1eN8ZM-0007ml-Kh
-	for qemu-devel@nongnu.org; Thu, 07 Dec 2017 21:39:22 -0500
+	(envelope-from <linzhecheng@huawei.com>) id 1eN8qS-0005Ih-IO
+	for qemu-devel@nongnu.org; Thu, 07 Dec 2017 21:57:01 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <linzhecheng@huawei.com>) id 1eN8ZJ-0004ds-Hq
-	for qemu-devel@nongnu.org; Thu, 07 Dec 2017 21:39:20 -0500
-Received: from szxga02-in.huawei.com ([45.249.212.188]:2296 helo=huawei.com)
+	(envelope-from <linzhecheng@huawei.com>) id 1eN8qP-0001Bm-HM
+	for qemu-devel@nongnu.org; Thu, 07 Dec 2017 21:57:00 -0500
+Received: from [45.249.212.255] (port=34340 helo=huawei.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <linzhecheng@huawei.com>)
-	id 1eN8ZI-0004bf-TT
-	for qemu-devel@nongnu.org; Thu, 07 Dec 2017 21:39:17 -0500
+	id 1eN8qO-00018M-Uc
+	for qemu-devel@nongnu.org; Thu, 07 Dec 2017 21:56:57 -0500
 From: linzhecheng <linzhecheng@huawei.com>
-Date: Fri, 8 Dec 2017 02:39:02 +0000
-Message-ID: <D9DE8DBB19F2A24080482022C1DE758302C501AB@dggemm509-mbx.china.huawei.com>
+Date: Fri, 8 Dec 2017 02:10:26 +0000
+Message-ID: <D9DE8DBB19F2A24080482022C1DE758302C50197@dggemm509-mbx.china.huawei.com>
 Content-Language: zh-CN
 MIME-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [BUG] vhost-user: hot-unplug vhost-user nic for
+Subject: [Qemu-devel] [Question] vhost-user: hot-unplug vhost-user nic for
  windows guest OS will fail with 100% reproduce rate
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
