@@ -1,23 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47763)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47895)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1eNI7w-0006Y7-9P
-	for qemu-devel@nongnu.org; Fri, 08 Dec 2017 07:51:41 -0500
+	(envelope-from <david@redhat.com>) id 1eNI8J-0006kT-Km
+	for qemu-devel@nongnu.org; Fri, 08 Dec 2017 07:52:04 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1eNI7t-0004hp-40
-	for qemu-devel@nongnu.org; Fri, 08 Dec 2017 07:51:40 -0500
+	(envelope-from <david@redhat.com>) id 1eNI8G-00056f-Eq
+	for qemu-devel@nongnu.org; Fri, 08 Dec 2017 07:52:03 -0500
 References: <20171207165355.7559-1-david@redhat.com>
-	<20171207165355.7559-2-david@redhat.com>
-	<c49db6d7-55fa-84df-ffd5-ca7fa46da698@twiddle.net>
+	<20171207165355.7559-3-david@redhat.com>
+	<155a4b3e-dea0-ff2f-5e04-43fdd4bcd473@twiddle.net>
 From: David Hildenbrand <david@redhat.com>
-Message-ID: <06f5967d-9aa4-5e43-013c-dd2232764d24@redhat.com>
-Date: Fri, 8 Dec 2017 13:51:32 +0100
+Message-ID: <2292ec5a-1fb8-58c0-3b3e-b749d17b039a@redhat.com>
+Date: Fri, 8 Dec 2017 13:51:57 +0100
 MIME-Version: 1.0
-In-Reply-To: <c49db6d7-55fa-84df-ffd5-ca7fa46da698@twiddle.net>
+In-Reply-To: <155a4b3e-dea0-ff2f-5e04-43fdd4bcd473@twiddle.net>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v2 for-2.12 01/10] s390x/tcg: ASI/ASGI are
- atomic with interlocked-acccess facility 1
+Subject: Re: [Qemu-devel] [PATCH v2 for-2.12 02/10] s390x/tcg: ALSI/ALSGI
+ are atomic with interlocked-acccess facility 1
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,25 +29,21 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: Richard Henderson <rth@twiddle.net>, qemu-s390x@nongnu.org, qemu-devel@nongnu.org
 Cc: Christian Borntraeger <borntraeger@de.ibm.com>, Cornelia Huck <cohuck@redhat.com>, Alexander Graf <agraf@suse.de>
 
-On 08.12.2017 00:41, Richard Henderson wrote:
+On 08.12.2017 00:43, Richard Henderson wrote:
 > On 12/07/2017 08:53 AM, David Hildenbrand wrote:
->> +static ExitStatus op_asi(DisasContext *s, DisasOps *o)
->> +{
->> +    o->in1 = tcg_temp_new_i64();
->> +    /* Perform the atomic addition in memory. */
->> +    tcg_gen_atomic_fetch_add_i64(o->in1, o->addr1, o->in2, get_mem_index(s),
->> +                                 s->insn->data);
->> +    /* However, we need to recompute the addition for setting CC.  */
->> +    tcg_gen_add_i64(o->out, o->in1, o->in2);
->> +    return NO_EXIT;
->> +}
+>> We can simply reuse our ASI implementation. Only the way CC is
+>> calculated differs.
+>>
+>> Signed-off-by: David Hildenbrand <david@redhat.com>
+>> ---
+>>  target/s390x/insn-data.def | 4 ++--
+>>  1 file changed, 2 insertions(+), 2 deletions(-)
 > 
-> Is it worth conditionalizing the atomic operation on having
-> interlocked-access-facility-1 enabled?
+> Squash with previous?
+
+Yes, can do that!
+
 > 
-
-Should be easily doable with a few LOC. Will give it a shot.
-
 > 
 > r~
 > 
