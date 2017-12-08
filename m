@@ -1,20 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50133)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50144)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1eNPKY-0002JS-Oy
-	for qemu-devel@nongnu.org; Fri, 08 Dec 2017 15:33:12 -0500
+	(envelope-from <dgilbert@redhat.com>) id 1eNPKa-0002Lc-63
+	for qemu-devel@nongnu.org; Fri, 08 Dec 2017 15:33:13 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1eNPKX-0001LG-Mv
-	for qemu-devel@nongnu.org; Fri, 08 Dec 2017 15:33:10 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:43000)
+	(envelope-from <dgilbert@redhat.com>) id 1eNPKZ-0001MD-3g
+	for qemu-devel@nongnu.org; Fri, 08 Dec 2017 15:33:12 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:49446)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1eNPKX-0001Kn-Du
-	for qemu-devel@nongnu.org; Fri, 08 Dec 2017 15:33:09 -0500
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1eNPKY-0001Le-Tv
+	for qemu-devel@nongnu.org; Fri, 08 Dec 2017 15:33:11 -0500
 From: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>
-Date: Fri,  8 Dec 2017 20:32:52 +0000
-Message-Id: <20171208203257.13102-4-dgilbert@redhat.com>
+Date: Fri,  8 Dec 2017 20:32:53 +0000
+Message-Id: <20171208203257.13102-5-dgilbert@redhat.com>
 In-Reply-To: <20171208203257.13102-1-dgilbert@redhat.com>
 References: <20171208203257.13102-1-dgilbert@redhat.com>
-Subject: [Qemu-devel] [RFC v2 3/8] vhost: Simplify ring verification checks
+Subject: [Qemu-devel] [RFC v2 4/8] vhost: New memory update functions
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,160 +28,102 @@ Cc: maxime.coquelin@redhat.com, mst@redhat.com, groug@kaod.org
 
 From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
 
-vhost_verify_ring_mappings() were used to verify that
-rings are still accessible and related memory hasn't
-been moved after flatview is updated.
+vhost_update_mem will replace the existing update mechanism.
+They make use of the Flatview we have now to make the update simpler.
+This commit just adds the basic structure.
 
-It were doing checks by mapping ring's GPA+len and
-checking that HVA hasn't changed with new memory map.
-To avoid maybe expensive mapping call, we were
-identifying address range that changed and were doing
-mapping only if ring were in changed range.
-
-However it's no neccessary to perform ringi's GPA
-mapping as we already have it's current HVA and all
-we need is to verify that ring's GPA translates to
-the same HVA in updated flatview.
-
-This will allow the following patches to simplify the range
-comparison that was previously needed to avoid expensive
-verify_ring_mapping calls.
-
-Signed-off-by: Igor Mammedov <imammedo@redhat.com>
-with modifications by:
 Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
 ---
- hw/virtio/vhost.c | 80 ++++++++++++++++++++++++++++++-------------------------
- 1 file changed, 44 insertions(+), 36 deletions(-)
+ hw/virtio/vhost.c | 51 ++++++++++++++++++++++++++++++++++++++++++++++++++-
+ 1 file changed, 50 insertions(+), 1 deletion(-)
 
 diff --git a/hw/virtio/vhost.c b/hw/virtio/vhost.c
-index 938253d1e8..8b2310a054 100644
+index 8b2310a054..d1b2d3441b 100644
 --- a/hw/virtio/vhost.c
 +++ b/hw/virtio/vhost.c
-@@ -450,35 +450,37 @@ static void vhost_memory_unmap(struct vhost_dev *dev, void *buffer,
-     }
+@@ -634,11 +634,51 @@ static void vhost_begin(MemoryListener *listener)
+     dev->mem_changed_start_addr = -1;
  }
  
--static int vhost_verify_ring_part_mapping(struct vhost_dev *dev,
--                                          void *part,
--                                          uint64_t part_addr,
--                                          uint64_t part_size,
--                                          uint64_t start_addr,
--                                          uint64_t size)
-+static int vhost_verify_ring_part_mapping(void *ring_hva,
-+                                          uint64_t ring_gpa,
-+                                          uint64_t ring_size,
-+                                          void *reg_hva,
-+                                          uint64_t reg_gpa,
-+                                          uint64_t reg_size)
- {
--    hwaddr l;
--    void *p;
--    int r = 0;
-+    uint64_t hva_ring_offset;
-+    uint64_t ring_last = range_get_last(ring_gpa, ring_size);
-+    uint64_t reg_last = range_get_last(reg_gpa, reg_size);
- 
--    if (!ranges_overlap(start_addr, size, part_addr, part_size)) {
-+    if (ring_last < reg_gpa || ring_gpa > reg_last) {
-         return 0;
-     }
--    l = part_size;
--    p = vhost_memory_map(dev, part_addr, &l, 1);
--    if (!p || l != part_size) {
--        r = -ENOMEM;
-+    /* check that whole ring's is mapped */
-+    if (ring_last > reg_last) {
-+        return -EBUSY;
-     }
--    if (p != part) {
--        r = -EBUSY;
-+    /* check that ring's MemoryRegion wasn't replaced */
-+    hva_ring_offset = ring_gpa - reg_gpa;
-+    if (ring_hva != reg_hva + hva_ring_offset) {
-+        return -ENOMEM;
-     }
--    vhost_memory_unmap(dev, p, l, 0, 0);
--    return r;
++struct vhost_update_mem_tmp {
++    struct vhost_dev   *dev;
++    uint32_t nregions;
++    struct vhost_memory_region *regions;
++};
 +
++/* Called for each MRS from vhost_update_mem */
++static int vhost_update_mem_cb(MemoryRegionSection *mrs, void *opaque)
++{
++    if (!vhost_section(mrs)) {
++        return 0;
++    }
++
++    /* TODO */
 +    return 0;
- }
- 
- static int vhost_verify_ring_mappings(struct vhost_dev *dev,
--                                      uint64_t start_addr,
--                                      uint64_t size)
-+                                      void *reg_hva,
-+                                      uint64_t reg_gpa,
-+                                      uint64_t reg_size)
- {
-     int i, j;
-     int r = 0;
-@@ -492,23 +494,26 @@ static int vhost_verify_ring_mappings(struct vhost_dev *dev,
-         struct vhost_virtqueue *vq = dev->vqs + i;
- 
-         j = 0;
--        r = vhost_verify_ring_part_mapping(dev, vq->desc, vq->desc_phys,
--                                           vq->desc_size, start_addr, size);
--        if (!r) {
-+        r = vhost_verify_ring_part_mapping(
-+                vq->desc, vq->desc_phys, vq->desc_size,
-+                reg_hva, reg_gpa, reg_size);
-+        if (r) {
-             break;
-         }
- 
-         j++;
--        r = vhost_verify_ring_part_mapping(dev, vq->avail, vq->avail_phys,
--                                           vq->avail_size, start_addr, size);
--        if (!r) {
-+        r = vhost_verify_ring_part_mapping(
-+                vq->desc, vq->desc_phys, vq->desc_size,
-+                reg_hva, reg_gpa, reg_size);
-+        if (r) {
-             break;
-         }
- 
-         j++;
--        r = vhost_verify_ring_part_mapping(dev, vq->used, vq->used_phys,
--                                           vq->used_size, start_addr, size);
--        if (!r) {
-+        r = vhost_verify_ring_part_mapping(
-+                vq->desc, vq->desc_phys, vq->desc_size,
-+                reg_hva, reg_gpa, reg_size);
-+        if (r) {
-             break;
-         }
-     }
-@@ -633,8 +638,6 @@ static void vhost_commit(MemoryListener *listener)
++}
++
++static int vhost_update_mem(struct vhost_dev *dev, bool *changed)
++{
++    int res;
++    struct vhost_update_mem_tmp vtmp;
++    vtmp.regions = 0;
++    vtmp.nregions = 0;
++    vtmp.dev = dev;
++
++    *changed = false;
++    res = address_space_iterate(&address_space_memory,
++                                vhost_update_mem_cb, &vtmp);
++    if (res) {
++        goto out;
++    }
++
++    /* TODO */
++    *changed = dev->mem_changed_start_addr > dev->mem_changed_end_addr;
++out:
++    g_free(vtmp.regions);
++    return res;
++}
++
+ static void vhost_commit(MemoryListener *listener)
  {
      struct vhost_dev *dev = container_of(listener, struct vhost_dev,
                                           memory_listener);
--    hwaddr start_addr = 0;
--    ram_addr_t size = 0;
      uint64_t log_size;
++    bool changed;
      int r;
  
-@@ -649,11 +652,16 @@ static void vhost_commit(MemoryListener *listener)
+     if (!dev->memory_changed) {
+@@ -647,7 +687,12 @@ static void vhost_commit(MemoryListener *listener)
+     if (!dev->started) {
+         return;
+     }
+-    if (dev->mem_changed_start_addr > dev->mem_changed_end_addr) {
++    if (vhost_update_mem(dev, &changed)) {
++        return;
++    }
++
++    if (!changed) {
++        /* None of the mappings we care about changed */
+         return;
      }
  
-     if (dev->started) {
--        start_addr = dev->mem_changed_start_addr;
--        size = dev->mem_changed_end_addr - dev->mem_changed_start_addr + 1;
--
--        r = vhost_verify_ring_mappings(dev, start_addr, size);
--        assert(r >= 0);
-+        int i;
-+        for (i = 0; i < dev->mem->nregions; i++) {
-+            if (vhost_verify_ring_mappings(dev,
-+                               (void *)dev->mem->regions[i].userspace_addr,
-+                               dev->mem->regions[i].guest_phys_addr,
-+                               dev->mem->regions[i].memory_size)) {
-+                error_report("Verify ring failure on region %d", i);
-+                abort();
-+            }
-+        }
+@@ -1519,6 +1564,7 @@ void vhost_ack_features(struct vhost_dev *hdev, const int *feature_bits,
+ int vhost_dev_start(struct vhost_dev *hdev, VirtIODevice *vdev)
+ {
+     int i, r;
++    bool changed;
+ 
+     /* should only be called after backend is connected */
+     assert(hdev->vhost_ops);
+@@ -1531,6 +1577,9 @@ int vhost_dev_start(struct vhost_dev *hdev, VirtIODevice *vdev)
+         goto fail_features;
      }
  
-     if (!dev->log_enabled) {
++    if (vhost_update_mem(hdev, &changed)) {
++        goto fail_mem;
++    }
+     if (vhost_dev_has_iommu(hdev)) {
+         memory_listener_register(&hdev->iommu_listener, vdev->dma_as);
+     }
 -- 
 2.14.3
