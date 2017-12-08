@@ -1,27 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35645)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36608)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1eNMRj-0007Lp-3w
-	for qemu-devel@nongnu.org; Fri, 08 Dec 2017 12:28:24 -0500
+	(envelope-from <imammedo@redhat.com>) id 1eNMVR-0000F2-6M
+	for qemu-devel@nongnu.org; Fri, 08 Dec 2017 12:32:14 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1eNMRf-0003st-3d
-	for qemu-devel@nongnu.org; Fri, 08 Dec 2017 12:28:23 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:51162)
+	(envelope-from <imammedo@redhat.com>) id 1eNMVM-0006iq-G7
+	for qemu-devel@nongnu.org; Fri, 08 Dec 2017 12:32:13 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:35384)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1eNMRe-0003sJ-Rh
-	for qemu-devel@nongnu.org; Fri, 08 Dec 2017 12:28:19 -0500
-From: Markus Armbruster <armbru@redhat.com>
-References: <20171208074515.1553-1-lprosek@redhat.com>
-	<20171208074515.1553-5-lprosek@redhat.com>
-	<87y3mde3z1.fsf@dusky.pond.sub.org>
-	<CABdb737EUy_rRCunxeDUDdhhDiCU8eZBNoYmh+QGp39mqsDung@mail.gmail.com>
-Date: Fri, 08 Dec 2017 18:28:13 +0100
-In-Reply-To: <CABdb737EUy_rRCunxeDUDdhhDiCU8eZBNoYmh+QGp39mqsDung@mail.gmail.com>
-	(Ladi Prosek's message of "Fri, 8 Dec 2017 14:44:03 +0100")
-Message-ID: <87vahh9ljm.fsf@dusky.pond.sub.org>
+	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1eNMVM-0006iZ-A3
+	for qemu-devel@nongnu.org; Fri, 08 Dec 2017 12:32:08 -0500
+Date: Fri, 8 Dec 2017 18:32:03 +0100
+From: Igor Mammedov <imammedo@redhat.com>
+Message-ID: <20171208183203.2d11374b@redhat.com>
+In-Reply-To: <20171208161422.GW3037@localhost.localdomain>
+References: <CAFEAcA-auykOKQbNcoQooNGk7Vb3wt7TH7AMA689xEj22_6KcQ@mail.gmail.com>
+	<20171207174832.42663bef@redhat.com>
+	<CAFEAcA9o-LyKZBZwSoz3SSPCY-sjo9e011UWy1=EwJ4U9rWYsg@mail.gmail.com>
+	<20171207170719.GT3037@localhost.localdomain>
+	<CAFEAcA9fzkedj_VLeTaK-WOTLGk1RinyadRmR5FaJ44KOAQU3w@mail.gmail.com>
+	<CAFEAcA9Uh9f3UddCNiB3u6BD9Qg=sUMDmMYYn1+sryiJUMOFYg@mail.gmail.com>
+	<20171208141618.11e60846@redhat.com>
+	<CAFEAcA8Gc1XQVYR9+_uD7Be3WSDE5tzxVAuJNBTokb3HdJ6fHw@mail.gmail.com>
+	<20171208155050.1a6db1c2@redhat.com>
+	<20171208161422.GW3037@localhost.localdomain>
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH v3 4/4] ivshmem: Disable irqfd on device
- reset
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] in a device or CPU instance init/realize,
+ can I rely on something having the BQL or equivalent?
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,93 +36,42 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Ladi Prosek <lprosek@redhat.com>
-Cc: Geoffrey McRae <geoff@hostfission.com>, Paolo Bonzini <pbonzini@redhat.com>, qemu-devel <qemu-devel@nongnu.org>, =?utf-8?Q?Ma?= =?utf-8?Q?rc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>
+To: Eduardo Habkost <ehabkost@redhat.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>, QEMU Developers <qemu-devel@nongnu.org>, David Gibson <david@gibson.dropbear.id.au>
 
-Ladi Prosek <lprosek@redhat.com> writes:
+On Fri, 8 Dec 2017 14:14:22 -0200
+Eduardo Habkost <ehabkost@redhat.com> wrote:
 
-> On Fri, Dec 8, 2017 at 2:36 PM, Markus Armbruster <armbru@redhat.com> wrote:
->> Ladi Prosek <lprosek@redhat.com> writes:
->>
->>> The effects of ivshmem_enable_irqfd() was not undone on device reset.
->>>
->>> This manifested as:
->>> ivshmem_add_kvm_msi_virq: Assertion `!s->msi_vectors[vector].pdev' failed.
->>>
->>> when irqfd was enabled before reset and then enabled again after reset, making
->>> ivshmem_enable_irqfd() run for the second time.
->>>
->>> To reproduce, run:
->>>
->>>   ivshmem-server
->>>
->>> and QEMU with:
->>>
->>>   -device ivshmem-doorbell,chardev=iv
->>>   -chardev socket,path=/tmp/ivshmem_socket,id=iv
->>>
->>> then install the Windows driver, at the time of writing available at:
->>>
->>> https://github.com/virtio-win/kvm-guest-drivers-windows/tree/master/ivshmem
->>>
->>> and crash-reboot the guest by inducing a BSOD.
->>>
->>> Signed-off-by: Ladi Prosek <lprosek@redhat.com>
->>> ---
->>>  hw/misc/ivshmem.c | 24 +++++++++++++-----------
->>>  1 file changed, 13 insertions(+), 11 deletions(-)
->>>
->>> diff --git a/hw/misc/ivshmem.c b/hw/misc/ivshmem.c
->>> index d1bb246d12..4be0d2627b 100644
->>> --- a/hw/misc/ivshmem.c
->>> +++ b/hw/misc/ivshmem.c
->>> @@ -758,17 +758,6 @@ static void ivshmem_msix_vector_use(IVShmemState *s)
->>>      }
->>>  }
->>>
->>> -static void ivshmem_reset(DeviceState *d)
->>> -{
->>> -    IVShmemState *s = IVSHMEM_COMMON(d);
->>> -
->>> -    s->intrstatus = 0;
->>> -    s->intrmask = 0;
->>> -    if (ivshmem_has_feature(s, IVSHMEM_MSI)) {
->>> -        ivshmem_msix_vector_use(s);
->>> -    }
->>> -}
->>> -
->>>  static int ivshmem_setup_interrupts(IVShmemState *s, Error **errp)
->>>  {
->>>      /* allocate QEMU callback data for receiving interrupts */
->>> @@ -855,6 +844,19 @@ static void ivshmem_disable_irqfd(IVShmemState *s)
->>>
->>>  }
->>>
->>> +static void ivshmem_reset(DeviceState *d)
->>> +{
->>> +    IVShmemState *s = IVSHMEM_COMMON(d);
->>> +
->>> +    ivshmem_disable_irqfd(s);
->>> +
->>> +    s->intrstatus = 0;
->>> +    s->intrmask = 0;
->>> +    if (ivshmem_has_feature(s, IVSHMEM_MSI)) {
->>> +        ivshmem_msix_vector_use(s);
->>> +    }
->>> +}
->>> +
->>>  static void ivshmem_write_config(PCIDevice *pdev, uint32_t address,
->>>                                   uint32_t val, int len)
->>>  {
->>
->> Why are you moving ivshmem_reset()?  Makes the actual change harder to
->> see than necessary.
->
-> ivshmem_disable_irqfd() is declared after ivshmem_reset() in the
-> source file. I generally prefer to order static functions
-> topologically if possible. If you'd prefer adding a forward decl
-> instead (fewer lines touched, easier to bisect?) I can certainly do
-> that. Thanks!
-
-Well, it compiles before your patch, your patch doesn't add any calls,
-so I can't quite see why a forward declaration would be needed.
+> On Fri, Dec 08, 2017 at 03:50:50PM +0100, Igor Mammedov wrote:
+> > On Fri, 8 Dec 2017 13:19:27 +0000
+> > Peter Maydell <peter.maydell@linaro.org> wrote:
+> >   
+> > > On 8 December 2017 at 13:16, Igor Mammedov <imammedo@redhat.com> wrote:  
+> > > > TBH:
+> > > >  I do not recall why we have x86 max/host cpu types do feature
+> > > >  loading at realize time instead of at class init like the rest
+> > > >  of static cpu types.    
+> > > 
+> > > class init is too early, IIRC -- it's before KVM has been set up at all.  
+> > 
+> > that shouldn't be an issue as kvm_ppc_register_host_cpu_type() demonstrates
+> > (i.e. an additional class init at kvm/tcg init time),  
+> 
+> It is possible, but IMO it's not a good idea.  We should be able
+> to enumerate all CPU types before the accelerator has been
+> initialized, so query-cpu-definitions and "-cpu help" will always
+> work.
+> 
+> 
+> > 
+> > so it might be some compat issue or just legacy approach why it
+> > havn't been rewritten to class_init for x86 the way PPC does.
+> > But Eduardo probably knows better if there is anything left that
+> > prevents using class init there.  
+> 
+> It's the opposite: x86 "host" CPU model used to work the same way
+> as PPC, but we changed it so all classes are registered at
+> type_init()-time.
+Is it for libvirt convenience, so that it would be able to cache
+all supported cpus regardless of whether they would actually work
+or not?
