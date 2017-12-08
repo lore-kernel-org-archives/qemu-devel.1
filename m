@@ -1,30 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43000)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43340)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1eNJaE-0005qQ-IK
-	for qemu-devel@nongnu.org; Fri, 08 Dec 2017 09:24:59 -0500
+	(envelope-from <groug@kaod.org>) id 1eNJbf-0006aG-OC
+	for qemu-devel@nongnu.org; Fri, 08 Dec 2017 09:26:28 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1eNJaD-0001YS-CF
-	for qemu-devel@nongnu.org; Fri, 08 Dec 2017 09:24:58 -0500
-References: <20171113162053.58795-1-vsementsov@virtuozzo.com>
-	<01108daa-fed3-c142-bbd6-0ecc4c8b795d@redhat.com>
-	<cd0a2e5e-f788-0e5a-dec7-f428479f3b89@virtuozzo.com>
-	<8c61f43c-5f56-8c1b-a2fe-f954d34dc687@redhat.com>
-	<40392ab9-ec2a-30ed-ddab-a557682a4192@virtuozzo.com>
-	<4e4e28d7-aebc-4a86-e691-99afdcca27f5@redhat.com>
-	<20171121172324.GC11073@localhost.localdomain>
-	<1a8e9d48-5be1-e014-41ee-a1164f32dd17@redhat.com>
-	<20171207115648.5mnvoyfnig7dhgbn@eukaryote>
-	<a172b331-77c7-f7bb-5bd1-2e59f0fdcde4@redhat.com>
-From: Max Reitz <mreitz@redhat.com>
-Message-ID: <ebc88d65-c44a-92dd-0a38-0d3016c8fd01@redhat.com>
-Date: Fri, 8 Dec 2017 15:24:34 +0100
+	(envelope-from <groug@kaod.org>) id 1eNJbb-0002pL-RD
+	for qemu-devel@nongnu.org; Fri, 08 Dec 2017 09:26:27 -0500
+Received: from 3.mo173.mail-out.ovh.net ([46.105.34.1]:35100)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1eNJbb-0002oP-Jb
+	for qemu-devel@nongnu.org; Fri, 08 Dec 2017 09:26:23 -0500
+Received: from player739.ha.ovh.net (b9.ovh.net [213.186.33.59])
+	by mo173.mail-out.ovh.net (Postfix) with ESMTP id 7B3AC92E0F
+	for <qemu-devel@nongnu.org>; Fri,  8 Dec 2017 15:26:17 +0100 (CET)
+From: Greg Kurz <groug@kaod.org>
+Date: Fri, 08 Dec 2017 15:26:13 +0100
+Message-ID: <151274317380.5376.485467933490492379.stgit@bahia.lan>
 MIME-Version: 1.0
-In-Reply-To: <a172b331-77c7-f7bb-5bd1-2e59f0fdcde4@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="eFgrd8JUwAU8L7f8tCU25xBLcmIPGiqRo"
-Subject: Re: [Qemu-devel] [Qemu-block] [PATCH for-2.12 0/4] qmp dirty bitmap
- API
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+Subject: [Qemu-devel] [PATCH] tests: virtio-9p: fix ISR dependence
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,150 +27,88 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: John Snow <jsnow@redhat.com>, Kashyap Chamarthy <kchamart@redhat.com>
-Cc: Kevin Wolf <kwolf@redhat.com>, Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, famz@redhat.com, qemu-block@nongnu.org, qemu-devel@nongnu.org, mnestratov@virtuozzo.com, armbru@redhat.com, nshirokovskiy@virtuozzo.com, stefanha@redhat.com, pbonzini@redhat.com, den@openvz.org
+To: qemu-devel@nongnu.org
+Cc: Greg Kurz <groug@kaod.org>, Stefan Hajnoczi <stefanha@redhat.com>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---eFgrd8JUwAU8L7f8tCU25xBLcmIPGiqRo
-From: Max Reitz <mreitz@redhat.com>
-To: John Snow <jsnow@redhat.com>, Kashyap Chamarthy <kchamart@redhat.com>
-Cc: Kevin Wolf <kwolf@redhat.com>,
- Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, famz@redhat.com,
- qemu-block@nongnu.org, qemu-devel@nongnu.org, mnestratov@virtuozzo.com,
- armbru@redhat.com, nshirokovskiy@virtuozzo.com, stefanha@redhat.com,
- pbonzini@redhat.com, den@openvz.org
-Message-ID: <ebc88d65-c44a-92dd-0a38-0d3016c8fd01@redhat.com>
-Subject: Re: [Qemu-block] [Qemu-devel] [PATCH for-2.12 0/4] qmp dirty bitmap
- API
-References: <20171113162053.58795-1-vsementsov@virtuozzo.com>
- <01108daa-fed3-c142-bbd6-0ecc4c8b795d@redhat.com>
- <cd0a2e5e-f788-0e5a-dec7-f428479f3b89@virtuozzo.com>
- <8c61f43c-5f56-8c1b-a2fe-f954d34dc687@redhat.com>
- <40392ab9-ec2a-30ed-ddab-a557682a4192@virtuozzo.com>
- <4e4e28d7-aebc-4a86-e691-99afdcca27f5@redhat.com>
- <20171121172324.GC11073@localhost.localdomain>
- <1a8e9d48-5be1-e014-41ee-a1164f32dd17@redhat.com>
- <20171207115648.5mnvoyfnig7dhgbn@eukaryote>
- <a172b331-77c7-f7bb-5bd1-2e59f0fdcde4@redhat.com>
-In-Reply-To: <a172b331-77c7-f7bb-5bd1-2e59f0fdcde4@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+Like other virtio tests, use the used ring APIs instead of assuming ISR
+being set means the request has completed.
 
-On 2017-12-07 23:47, John Snow wrote:
->=20
->=20
-> On 12/07/2017 06:56 AM, Kashyap Chamarthy wrote:
->> On Tue, Nov 21, 2017 at 07:10:19PM -0500, John Snow wrote:
->>> On 11/21/2017 12:23 PM, Kevin Wolf wrote:
->>
->> [...] # Snip lot of good discussion.
->>
->>>> On another note, I would double check before adding a new block job =
-type
->>>> that this is the right way to go. We have recently noticed that many=
-, if
->>>> not all, of the existing block jobs (at least mirror, commit and bac=
-kup)
->>>> are so similar that they implement the same things multiple times an=
-d
->>>> are just lacking different options and have different bugs. I'm
->>>> seriously considering merging all of them into a single job type
->>>> internally that just provides options that effectively turn it into =
-one
->>>> of the existing job types.
->>>>
->>>
->>> I'm not particularly opposed. At the very, very least "backup" and
->>> "mirror" are pretty much the same thing and "stream" and "commit" are=
+Signed-off-by: Greg Kurz <groug@kaod.org>
+---
+ tests/virtio-9p-test.c |   30 +++++++++++-------------------
+ 1 file changed, 11 insertions(+), 19 deletions(-)
 
->>> basically the same.
->>>
->>> Forcing the backuppy-job and the consolidatey-job together seems like=
- an
->>> ever-so-slightly harder case to make, but I suppose the truth of the
->>> matter in all cases is that we're copying data from one node to anoth=
-er...
->>
->> So from the above interesting discussion, it seems like Kevin is leani=
-ng
->> towards a single job type that offers 'stream', 'commit', 'backup', an=
-d
->> 'mirror' functionality as part of a single command / job type.  Based =
-on
->> an instinct, this sounds a bit too stuffy and complex to me.
->>
->> And John seems to be leaning towards two block device job types:
->>
->>   - 'blockdev-foo' that offers both current 'stream' and 'commit'
->>     functionality as two different options to the same QMP command; an=
-d
->>
->>   - 'blockdev-bar' will offer both 'mirror' and 'backup' functionality=
-
->>     as part of the same QMP command
->>
->> FWIW, this seems a bit more palatable, as it is unifying
->> similar-functionality-that-differ-slightly into two distinct commands.=
-
->>
->> (/me is still wrapping his head around the bitmaps and incremental
->> backups infrastructure.)
->>
->=20
-> The discussion you're honing in on is tangential to the one at the hear=
-t
-> of this topic, which is:
->=20
-> "What's the right API for pull model incremental backups?" which digs u=
-p
-> the question "What is the right API for our existing data copying comma=
-nds?"
->=20
-> Kevin is probably right in the end, though; he usually is. We do need t=
-o
-> unify our data moving logic to avoid fixing the same bugs in four
-> different but nearly identical jobs.
->=20
-> My only concern is that the special casing will grow too complex for
-> that one unified job and the job will become so complicated nobody know=
-s
-> how to work on it anymore without breaking other cases. Maybe this is a=
-
-> reasonable concern, maybe it isn't.
-
-The thing is that mirror is becoming more complicated anyway.  For one
-thing, we already do commits through it and I don't see why intermediate
-commits shouldn't just work the same way (the only thing is that we
-would have to automatically complete the job instead of emitting a ready
-event).
-
-The other lies in the active mirror thingy.  If we have active mirror,
-then we should be able to implement backup pretty easily, too.  We just
-need to copy the old data to the target instead of the new one (I think).=
-
-
-So the thing is that commit and backup are going to be pretty much
-included in mirror for free by accident.  There is no real reason to
-have own code for them, then.
-
-Max
-
-
---eFgrd8JUwAU8L7f8tCU25xBLcmIPGiqRo
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQFGBAEBCAAwFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAloqoKISHG1yZWl0ekBy
-ZWRoYXQuY29tAAoJEPQH2wBh1c9AnjAH/31I2VWVLLoiRmygYDtKQoEFQBJzm3dx
-wrsQA7lh4fnGKBsHjzCFguq3P21vREcpEnMxVhDT5d/StPkswozSU222lstLOYWr
-3qLYtZpuj+ywAE7h479oFhuEaW+vPLlzTuqcaVB2ZNddmgju2NTZQB69xh/2xOSy
-h5iJVHBMANyat0cp1qPjwEZBecRuPXlEzj8YB5ZT66i4AQu9XRa2c2vpos0k0f3S
-6pUguVyFcc3fbDiG/2dQQpGJNhEk23zyrWQoLK+PWCYJ1bHyEp7fw9EFWZF5euA3
-VKAtt0oVWPVZEJcvSXldmibcRcSAZqg4LYPPif9SuQsRVL2kZRcZbBI=
-=hCjo
------END PGP SIGNATURE-----
-
---eFgrd8JUwAU8L7f8tCU25xBLcmIPGiqRo--
+diff --git a/tests/virtio-9p-test.c b/tests/virtio-9p-test.c
+index ad33d963876f..ebd24b20f657 100644
+--- a/tests/virtio-9p-test.c
++++ b/tests/virtio-9p-test.c
+@@ -18,6 +18,8 @@
+ #include "standard-headers/linux/virtio_pci.h"
+ #include "hw/9pfs/9p.h"
+ 
++#define QVIRTIO_9P_TIMEOUT_US (10 * 1000 * 1000)
++
+ static const char mount_tag[] = "qtest";
+ 
+ typedef struct {
+@@ -111,6 +113,7 @@ typedef struct {
+     /* No r_size, it is hardcoded to P9_MAX_SIZE */
+     size_t t_off;
+     size_t r_off;
++    uint32_t free_head;
+ } P9Req;
+ 
+ static void v9fs_memwrite(P9Req *req, const void *addr, size_t len)
+@@ -124,11 +127,6 @@ static void v9fs_memskip(P9Req *req, size_t len)
+     req->r_off += len;
+ }
+ 
+-static void v9fs_memrewind(P9Req *req, size_t len)
+-{
+-    req->r_off -= len;
+-}
+-
+ static void v9fs_memread(P9Req *req, void *addr, size_t len)
+ {
+     memread(req->r_msg + req->r_off, addr, len);
+@@ -227,12 +225,12 @@ static P9Req *v9fs_req_init(QVirtIO9P *v9p, uint32_t size, uint8_t id,
+ static void v9fs_req_send(P9Req *req)
+ {
+     QVirtIO9P *v9p = req->v9p;
+-    uint32_t free_head;
+ 
+     req->r_msg = guest_alloc(v9p->qs->alloc, P9_MAX_SIZE);
+-    free_head = qvirtqueue_add(v9p->vq, req->t_msg, req->t_size, false, true);
++    req->free_head = qvirtqueue_add(v9p->vq, req->t_msg, req->t_size, false,
++                                    true);
+     qvirtqueue_add(v9p->vq, req->r_msg, P9_MAX_SIZE, true, false);
+-    qvirtqueue_kick(v9p->dev, v9p->vq, free_head);
++    qvirtqueue_kick(v9p->dev, v9p->vq, req->free_head);
+     req->t_off = 0;
+ }
+ 
+@@ -250,19 +248,13 @@ static void v9fs_req_recv(P9Req *req, uint8_t id)
+ {
+     QVirtIO9P *v9p = req->v9p;
+     P9Hdr hdr;
+-    int i;
+ 
+-    for (i = 0; i < 10; i++) {
+-        qvirtio_wait_queue_isr(v9p->dev, v9p->vq, 1000 * 1000);
++    qvirtio_wait_used_elem(v9p->dev, v9p->vq, req->free_head,
++                           QVIRTIO_9P_TIMEOUT_US);
+ 
+-        v9fs_memread(req, &hdr, 7);
+-        hdr.size = ldl_le_p(&hdr.size);
+-        hdr.tag = lduw_le_p(&hdr.tag);
+-        if (hdr.size >= 7) {
+-            break;
+-        }
+-        v9fs_memrewind(req, 7);
+-    }
++    v9fs_memread(req, &hdr, 7);
++    hdr.size = ldl_le_p(&hdr.size);
++    hdr.tag = lduw_le_p(&hdr.tag);
+ 
+     g_assert_cmpint(hdr.size, >=, 7);
+     g_assert_cmpint(hdr.size, <=, P9_MAX_SIZE);
