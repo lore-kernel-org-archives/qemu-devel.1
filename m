@@ -1,31 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59980)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33641)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1eNFPj-0000hy-F3
-	for qemu-devel@nongnu.org; Fri, 08 Dec 2017 04:57:52 -0500
+	(envelope-from <dgilbert@redhat.com>) id 1eNFX8-0004Gl-GG
+	for qemu-devel@nongnu.org; Fri, 08 Dec 2017 05:05:31 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1eNFPg-0004PE-Di
-	for qemu-devel@nongnu.org; Fri, 08 Dec 2017 04:57:51 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:60014)
+	(envelope-from <dgilbert@redhat.com>) id 1eNFX5-0000Kq-7u
+	for qemu-devel@nongnu.org; Fri, 08 Dec 2017 05:05:30 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:57852)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1eNFPg-0004Ok-7b
-	for qemu-devel@nongnu.org; Fri, 08 Dec 2017 04:57:48 -0500
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
-	[10.5.11.16])
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1eNFX4-0000KZ-Vz
+	for qemu-devel@nongnu.org; Fri, 08 Dec 2017 05:05:27 -0500
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+	[10.5.11.12])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 684065AFD9
-	for <qemu-devel@nongnu.org>; Fri,  8 Dec 2017 09:57:46 +0000 (UTC)
-Date: Fri, 8 Dec 2017 09:57:40 +0000
+	by mx1.redhat.com (Postfix) with ESMTPS id 267AF5FD63
+	for <qemu-devel@nongnu.org>; Fri,  8 Dec 2017 10:05:25 +0000 (UTC)
+Date: Fri, 8 Dec 2017 10:05:18 +0000
 From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20171208095739.GC2403@work-vm>
+Message-ID: <20171208100517.GD2403@work-vm>
 References: <20171208005825.14587-1-marcandre.lureau@redhat.com>
-	<20171208005825.14587-9-marcandre.lureau@redhat.com>
+	<20171208005825.14587-8-marcandre.lureau@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
-In-Reply-To: <20171208005825.14587-9-marcandre.lureau@redhat.com>
+In-Reply-To: <20171208005825.14587-8-marcandre.lureau@redhat.com>
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 08/12] tests: fix migration-test leak
+Subject: Re: [Qemu-devel] [PATCH 07/12] readline: add a free function
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,48 +35,116 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: =?iso-8859-1?Q?Marc-Andr=E9?= Lureau <marcandre.lureau@redhat.com>
-Cc: qemu-devel@nongnu.org, Juan Quintela <quintela@redhat.com>
+Cc: qemu-devel@nongnu.org, Markus Armbruster <armbru@redhat.com>
 
 * Marc-Andr=E9 Lureau (marcandre.lureau@redhat.com) wrote:
-> Direct leak of 12 byte(s) in 2 object(s) allocated from:
->     #0 0x7f50d403c850 in malloc (/lib64/libasan.so.4+0xde850)
->     #1 0x7f50d1ddf98f in vasprintf (/lib64/libc.so.6+0x8098f)
+> Fixes leaks such as:
+>=20
+> Direct leak of 2 byte(s) in 1 object(s) allocated from:
+>     #0 0x7eff58beb850 in malloc (/lib64/libasan.so.4+0xde850)
+>     #1 0x7eff57942f0c in g_malloc ../glib/gmem.c:94
+>     #2 0x7eff579431cf in g_malloc_n ../glib/gmem.c:331
+>     #3 0x7eff5795f6eb in g_strdup ../glib/gstrfuncs.c:363
+>     #4 0x55db720f1d46 in readline_hist_add /home/elmarco/src/qq/util/re=
+adline.c:258
+>     #5 0x55db720f2d34 in readline_handle_byte /home/elmarco/src/qq/util=
+/readline.c:387
+>     #6 0x55db71539d00 in monitor_read /home/elmarco/src/qq/monitor.c:38=
+96
+>     #7 0x55db71f9be35 in qemu_chr_be_write_impl /home/elmarco/src/qq/ch=
+ardev/char.c:167
+>     #8 0x55db71f9bed3 in qemu_chr_be_write /home/elmarco/src/qq/chardev=
+/char.c:179
+>     #9 0x55db71fa013c in fd_chr_read /home/elmarco/src/qq/chardev/char-=
+fd.c:66
+>     #10 0x55db71fe18a8 in qio_channel_fd_source_dispatch /home/elmarco/=
+src/qq/io/channel-watch.c:84
+>     #11 0x7eff5793a90b in g_main_dispatch ../glib/gmain.c:3182
+>     #12 0x7eff5793b7ac in g_main_context_dispatch ../glib/gmain.c:3847
+>     #13 0x55db720af3bd in glib_pollfds_poll /home/elmarco/src/qq/util/m=
+ain-loop.c:214
+>     #14 0x55db720af505 in os_host_main_loop_wait /home/elmarco/src/qq/u=
+til/main-loop.c:261
+>     #15 0x55db720af6d6 in main_loop_wait /home/elmarco/src/qq/util/main=
+-loop.c:515
+>     #16 0x55db7184e0de in main_loop /home/elmarco/src/qq/vl.c:1995
+>     #17 0x55db7185e956 in main /home/elmarco/src/qq/vl.c:4914
+>     #18 0x7eff4ea17039 in __libc_start_main (/lib64/libc.so.6+0x21039)
+>=20
+> (while at it, use g_new0(ReadLineState), it's a bit easier to read)
 >=20
 > Signed-off-by: Marc-Andr=E9 Lureau <marcandre.lureau@redhat.com>
-
-There's an identical patch on list from Juan from a week ago!
-Either way,
-
 
 Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
 
 > ---
->  tests/migration-test.c | 3 ++-
->  1 file changed, 2 insertions(+), 1 deletion(-)
+>  include/qemu/readline.h |  1 +
+>  monitor.c               |  2 +-
+>  util/readline.c         | 18 +++++++++++++++++-
+>  3 files changed, 19 insertions(+), 2 deletions(-)
 >=20
-> diff --git a/tests/migration-test.c b/tests/migration-test.c
-> index be598d3257..799e24ebc6 100644
-> --- a/tests/migration-test.c
-> +++ b/tests/migration-test.c
-> @@ -358,13 +358,14 @@ static void migrate_check_parameter(QTestState *w=
-ho, const char *parameter,
->                                      const char *value)
->  {
->      QDict *rsp, *rsp_return;
-> -    const char *result;
-> +    char *result;
+> diff --git a/include/qemu/readline.h b/include/qemu/readline.h
+> index c08cf7400e..e81258322b 100644
+> --- a/include/qemu/readline.h
+> +++ b/include/qemu/readline.h
+> @@ -59,5 +59,6 @@ ReadLineState *readline_init(ReadLinePrintfFunc *prin=
+tf_func,
+>                               ReadLineFlushFunc *flush_func,
+>                               void *opaque,
+>                               ReadLineCompletionFunc *completion_finder=
+);
+> +void readline_free(ReadLineState *rs);
 > =20
->      rsp =3D wait_command(who, "{ 'execute': 'query-migrate-parameters'=
- }");
->      rsp_return =3D qdict_get_qdict(rsp, "return");
->      result =3D g_strdup_printf("%" PRId64,
->                               qdict_get_try_int(rsp_return,  parameter,=
- -1));
->      g_assert_cmpstr(result, =3D=3D, value);
-> +    g_free(result);
->      QDECREF(rsp);
+>  #endif /* READLINE_H */
+> diff --git a/monitor.c b/monitor.c
+> index e36fb5308d..024dd3d515 100644
+> --- a/monitor.c
+> +++ b/monitor.c
+> @@ -584,7 +584,7 @@ static void monitor_data_destroy(Monitor *mon)
+>      if (monitor_is_qmp(mon)) {
+>          json_message_parser_destroy(&mon->qmp.parser);
+>      }
+> -    g_free(mon->rs);
+> +    readline_free(mon->rs);
+>      QDECREF(mon->outbuf);
+>      qemu_mutex_destroy(&mon->out_lock);
+>  }
+> diff --git a/util/readline.c b/util/readline.c
+> index bbdee790b0..24ec839854 100644
+> --- a/util/readline.c
+> +++ b/util/readline.c
+> @@ -500,12 +500,28 @@ const char *readline_get_history(ReadLineState *r=
+s, unsigned int index)
+>      return rs->history[index];
 >  }
 > =20
+> +void readline_free(ReadLineState *rs)
+> +{
+> +    int i;
+> +
+> +    if (!rs) {
+> +        return;
+> +    }
+> +    for (i =3D 0; i < READLINE_MAX_CMDS; i++) {
+> +        g_free(rs->history[i]);
+> +    }
+> +    for (i =3D 0; i < READLINE_MAX_COMPLETIONS; i++) {
+> +        g_free(rs->completions[i]);
+> +    }
+> +    g_free(rs);
+> +}
+> +
+>  ReadLineState *readline_init(ReadLinePrintfFunc *printf_func,
+>                               ReadLineFlushFunc *flush_func,
+>                               void *opaque,
+>                               ReadLineCompletionFunc *completion_finder=
+)
+>  {
+> -    ReadLineState *rs =3D g_malloc0(sizeof(*rs));
+> +    ReadLineState *rs =3D g_new0(ReadLineState, 1);
+> =20
+>      rs->hist_entry =3D -1;
+>      rs->opaque =3D opaque;
 > --=20
 > 2.15.1.355.g36791d7216
 >=20
