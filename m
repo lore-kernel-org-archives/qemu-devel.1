@@ -1,20 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59522)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60368)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1eNH3r-0007xV-To
-	for qemu-devel@nongnu.org; Fri, 08 Dec 2017 06:43:24 -0500
+	(envelope-from <dgilbert@redhat.com>) id 1eNH6c-0001QU-LP
+	for qemu-devel@nongnu.org; Fri, 08 Dec 2017 06:46:15 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1eNH3n-0000Zp-2c
-	for qemu-devel@nongnu.org; Fri, 08 Dec 2017 06:43:23 -0500
-Date: Fri, 8 Dec 2017 12:43:13 +0100
-From: Cornelia Huck <cohuck@redhat.com>
-Message-ID: <20171208124313.0ceb6465.cohuck@redhat.com>
-In-Reply-To: <20171128134648.21530-2-cohuck@redhat.com>
-References: <20171128134648.21530-1-cohuck@redhat.com>
-	<20171128134648.21530-2-cohuck@redhat.com>
+	(envelope-from <dgilbert@redhat.com>) id 1eNH6X-0002ev-QX
+	for qemu-devel@nongnu.org; Fri, 08 Dec 2017 06:46:14 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:47346)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1eNH6X-0002dy-K4
+	for qemu-devel@nongnu.org; Fri, 08 Dec 2017 06:46:09 -0500
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+	[10.5.11.15])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id B82F9BDF7
+	for <qemu-devel@nongnu.org>; Fri,  8 Dec 2017 11:46:08 +0000 (UTC)
+Date: Fri, 8 Dec 2017 11:46:01 +0000
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20171208114601.GK2403@work-vm>
+References: <20171201125813.1437-1-quintela@redhat.com>
+	<20171201125813.1437-7-quintela@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH RFC 1/2] s390x/css: attach css bridge
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20171201125813.1437-7-quintela@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v3 6/6] [RFH] tests: Add migration compress
+ threads tests
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,31 +34,96 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org, qemu-s390x@nongnu.org
-Cc: borntraeger@de.ibm.com, pmorel@linux.vnet.ibm.com, pasic@linux.vnet.ibm.com
+To: Juan Quintela <quintela@redhat.com>
+Cc: qemu-devel@nongnu.org, lvivier@redhat.com, peterx@redhat.com
 
-On Tue, 28 Nov 2017 14:46:47 +0100
-Cornelia Huck <cohuck@redhat.com> wrote:
-
-> Logically, the css bridge should be attached to the machine.
+* Juan Quintela (quintela@redhat.com) wrote:
+> Yeap, it is still not working. trying to learn how to debug threads
+> for guests running from the testt hardness.
 > 
-> Signed-off-by: Cornelia Huck <cohuck@redhat.com>
+> For some reason, compression is not working at the moment, test is
+> disabled until I found why.
+
+How does it fail?
+
+Dave
+
+> Signed-off-by: Juan Quintela <quintela@redhat.com>
 > ---
->  hw/s390x/css-bridge.c | 2 ++
->  1 file changed, 2 insertions(+)
+>  tests/migration-test.c | 51 ++++++++++++++++++++++++++++++++++++++++++++++++++
+>  1 file changed, 51 insertions(+)
 > 
-> diff --git a/hw/s390x/css-bridge.c b/hw/s390x/css-bridge.c
-> index c4a9735d71..84d33eafc2 100644
-> --- a/hw/s390x/css-bridge.c
-> +++ b/hw/s390x/css-bridge.c
-> @@ -99,6 +99,8 @@ VirtualCssBus *virtual_css_bus_init(void)
+> diff --git a/tests/migration-test.c b/tests/migration-test.c
+> index 41dee78a9a..eab3b146a4 100644
+> --- a/tests/migration-test.c
+> +++ b/tests/migration-test.c
+> @@ -739,6 +739,54 @@ static void test_xbzrle_unix(void)
+>      g_free(uri);
+>  }
 >  
->      /* Create bridge device */
->      dev = qdev_create(NULL, TYPE_VIRTUAL_CSS_BRIDGE);
-> +    object_property_add_child(qdev_get_machine(), TYPE_VIRTUAL_CSS_BRIDGE,
-> +                              OBJECT(dev), NULL);
->      qdev_init_nofail(dev);
+> +static void test_compress(const char *uri)
+> +{
+> +    QTestState *from, *to;
+> +
+> +    test_migrate_start(&from, &to, uri);
+> +
+> +    /* We want to pick a speed slow enough that the test completes
+> +     * quickly, but that it doesn't complete precopy even on a slow
+> +     * machine, so also set the downtime.
+> +     */
+> +    /* 100 ms */
+> +    migrate_set_parameter(from, "downtime-limit", "1");
+> +    /* 1MB/s slow*/
+> +    migrate_set_parameter(from, "max-bandwidth", "100000000");
+> +
+> +    migrate_set_parameter(from, "compress-threads", "4");
+> +    migrate_set_parameter(to, "decompress-threads", "3");
+> +
+> +    migrate_set_capability(from, "compress", "true");
+> +    migrate_set_capability(to, "compress", "true");
+> +    /* Wait for the first serial output from the source */
+> +    wait_for_serial("src_serial");
+> +
+> +    migrate(from, uri);
+> +
+> +    wait_for_migration_pass(from);
+> +
+> +    /* 300ms it should converge */
+> +    migrate_set_parameter(from, "downtime-limit", "300");
+> +
+> +    if (!got_stop) {
+> +        qtest_qmp_eventwait(from, "STOP");
+> +    }
+> +    qtest_qmp_eventwait(to, "RESUME");
+> +
+> +    wait_for_serial("dest_serial");
+> +    wait_for_migration_complete(from);
+> +
+> +    test_migrate_end(from, to);
+> +}
+> +
+> +static void test_compress_unix(void)
+> +{
+> +    char *uri = g_strdup_printf("unix:%s/migsocket", tmpfs);
+> +
+> +    test_compress(uri);
+> +    g_free(uri);
+> +}
 >  
->      /* Create bus on bridge device */
-
-Queued to s390-next.
+>  int main(int argc, char **argv)
+>  {
+> @@ -763,6 +811,9 @@ int main(int argc, char **argv)
+>      qtest_add_func("/migration/precopy/tcp", test_precopy_tcp);
+>      qtest_add_func("/migration/postcopy/unix", test_postcopy);
+>      qtest_add_func("/migration/xbzrle/unix", test_xbzrle_unix);
+> +    if (0) {
+> +        qtest_add_func("/migration/compress/unix", test_compress_unix);
+> +    }
+>  
+>      ret = g_test_run();
+>  
+> -- 
+> 2.14.3
+> 
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
