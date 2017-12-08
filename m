@@ -1,33 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43847)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44134)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1eNMvM-0004NW-68
-	for qemu-devel@nongnu.org; Fri, 08 Dec 2017 12:59:01 -0500
+	(envelope-from <armbru@redhat.com>) id 1eNMwH-0004yA-Di
+	for qemu-devel@nongnu.org; Fri, 08 Dec 2017 12:59:58 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1eNMvJ-0006ha-4l
-	for qemu-devel@nongnu.org; Fri, 08 Dec 2017 12:59:00 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:53688)
+	(envelope-from <armbru@redhat.com>) id 1eNMwG-0007KX-3m
+	for qemu-devel@nongnu.org; Fri, 08 Dec 2017 12:59:57 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:56714)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1eNMvI-0006gy-UW
-	for qemu-devel@nongnu.org; Fri, 08 Dec 2017 12:58:57 -0500
-Date: Fri, 8 Dec 2017 15:58:52 -0200
-From: Eduardo Habkost <ehabkost@redhat.com>
-Message-ID: <20171208175852.GX3037@localhost.localdomain>
-References: <20171207174832.42663bef@redhat.com>
-	<CAFEAcA9o-LyKZBZwSoz3SSPCY-sjo9e011UWy1=EwJ4U9rWYsg@mail.gmail.com>
-	<20171207170719.GT3037@localhost.localdomain>
-	<CAFEAcA9fzkedj_VLeTaK-WOTLGk1RinyadRmR5FaJ44KOAQU3w@mail.gmail.com>
-	<CAFEAcA9Uh9f3UddCNiB3u6BD9Qg=sUMDmMYYn1+sryiJUMOFYg@mail.gmail.com>
-	<20171208141618.11e60846@redhat.com>
-	<CAFEAcA8Gc1XQVYR9+_uD7Be3WSDE5tzxVAuJNBTokb3HdJ6fHw@mail.gmail.com>
-	<20171208155050.1a6db1c2@redhat.com>
-	<20171208161422.GW3037@localhost.localdomain>
-	<20171208183203.2d11374b@redhat.com>
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1eNMwF-0007K2-Um
+	for qemu-devel@nongnu.org; Fri, 08 Dec 2017 12:59:56 -0500
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+	[10.5.11.14])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 15A85C050904
+	for <qemu-devel@nongnu.org>; Fri,  8 Dec 2017 17:59:55 +0000 (UTC)
+From: Markus Armbruster <armbru@redhat.com>
+References: <20171208005825.14587-1-marcandre.lureau@redhat.com>
+	<20171208005825.14587-6-marcandre.lureau@redhat.com>
+Date: Fri, 08 Dec 2017 18:59:51 +0100
+In-Reply-To: <20171208005825.14587-6-marcandre.lureau@redhat.com>
+	(=?utf-8?Q?=22Marc-Andr=C3=A9?=
+	Lureau"'s message of "Fri, 8 Dec 2017 01:58:18 +0100")
+Message-ID: <87po7p9k2w.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20171208183203.2d11374b@redhat.com>
-Subject: Re: [Qemu-devel] in a device or CPU instance init/realize,
- can I rely on something having the BQL or equivalent?
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH 05/12] tests: fix check-qobject leak:
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,55 +35,54 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Igor Mammedov <imammedo@redhat.com>
-Cc: Peter Maydell <peter.maydell@linaro.org>, QEMU Developers <qemu-devel@nongnu.org>, David Gibson <david@gibson.dropbear.id.au>
+To: =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>
+Cc: qemu-devel@nongnu.org
 
-On Fri, Dec 08, 2017 at 06:32:03PM +0100, Igor Mammedov wrote:
-> On Fri, 8 Dec 2017 14:14:22 -0200
-> Eduardo Habkost <ehabkost@redhat.com> wrote:
-> 
-> > On Fri, Dec 08, 2017 at 03:50:50PM +0100, Igor Mammedov wrote:
-> > > On Fri, 8 Dec 2017 13:19:27 +0000
-> > > Peter Maydell <peter.maydell@linaro.org> wrote:
-> > >   
-> > > > On 8 December 2017 at 13:16, Igor Mammedov <imammedo@redhat.com> wrote:  
-> > > > > TBH:
-> > > > >  I do not recall why we have x86 max/host cpu types do feature
-> > > > >  loading at realize time instead of at class init like the rest
-> > > > >  of static cpu types.    
-> > > > 
-> > > > class init is too early, IIRC -- it's before KVM has been set up at all.  
-> > > 
-> > > that shouldn't be an issue as kvm_ppc_register_host_cpu_type() demonstrates
-> > > (i.e. an additional class init at kvm/tcg init time),  
-> > 
-> > It is possible, but IMO it's not a good idea.  We should be able
-> > to enumerate all CPU types before the accelerator has been
-> > initialized, so query-cpu-definitions and "-cpu help" will always
-> > work.
-> > 
-> > 
-> > > 
-> > > so it might be some compat issue or just legacy approach why it
-> > > havn't been rewritten to class_init for x86 the way PPC does.
-> > > But Eduardo probably knows better if there is anything left that
-> > > prevents using class init there.  
-> > 
-> > It's the opposite: x86 "host" CPU model used to work the same way
-> > as PPC, but we changed it so all classes are registered at
-> > type_init()-time.
-> Is it for libvirt convenience, so that it would be able to cache
-> all supported cpus regardless of whether they would actually work
-> or not?
+Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com> writes:
 
-I'd say it's for our own convenience, so that things won't break
-if we make QMP available before machine/accel initialization in
-the future, or if we reorder the code that handles "-cpu ?" in
-main().
+> /public/qobject_is_equal_conversion: OK
+>
+> =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+> =3D=3D14396=3D=3DERROR: LeakSanitizer: detected memory leaks
+>
+> Direct leak of 56 byte(s) in 1 object(s) allocated from:
+>     #0 0x7f07682c5850 in malloc (/lib64/libasan.so.4+0xde850)
+>     #1 0x7f0767d12f0c in g_malloc ../glib/gmem.c:94
+>     #2 0x7f0767d131cf in g_malloc_n ../glib/gmem.c:331
+>     #3 0x562bd767371f in do_test_equality /home/elmarco/src/qq/tests/chec=
+k-qobject.c:49
+>     #4 0x562bd7674a35 in qobject_is_equal_dict_test /home/elmarco/src/qq/=
+tests/check-qobject.c:267
+>     #5 0x7f0767d37b04 in test_case_run ../glib/gtestutils.c:2237
+>     #6 0x7f0767d37ec4 in g_test_run_suite_internal ../glib/gtestutils.c:2=
+321
+>     #7 0x7f0767d37f6d in g_test_run_suite_internal ../glib/gtestutils.c:2=
+333
+>     #8 0x7f0767d38184 in g_test_run_suite ../glib/gtestutils.c:2408
+>     #9 0x7f0767d36e0d in g_test_run ../glib/gtestutils.c:1674
+>     #10 0x562bd7674e75 in main /home/elmarco/src/qq/tests/check-qobject.c=
+:327
+>     #11 0x7f0766009039 in __libc_start_main (/lib64/libc.so.6+0x21039)
+>
+> Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+> ---
+>  tests/check-qobject.c | 2 ++
+>  1 file changed, 2 insertions(+)
+>
+> diff --git a/tests/check-qobject.c b/tests/check-qobject.c
+> index 03e9175113..710f9e6b0a 100644
+> --- a/tests/check-qobject.c
+> +++ b/tests/check-qobject.c
+> @@ -59,6 +59,8 @@ static void do_test_equality(bool expected, int _, ...)
+>              g_assert(qobject_is_equal(args[i], args[j]) =3D=3D expected);
+>          }
+>      }
+> +
+> +    g_free(args);
+>  }
+>=20=20
+>  #define check_equal(...) \
 
-Moving code around is simpler if we know that all QOM types are
-registered at the same point, so we can treat them as static data
-after module_call_init(MODULE_INIT_QOM) runs.
-
--- 
-Eduardo
+Reviewed-by: Markus Armbruster <armbru@redhat.com>
