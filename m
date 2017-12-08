@@ -1,20 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50102)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50110)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1eNPKW-0002JD-Sc
+	(envelope-from <dgilbert@redhat.com>) id 1eNPKX-0002JE-AV
 	for qemu-devel@nongnu.org; Fri, 08 Dec 2017 15:33:10 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1eNPKU-0001K8-PH
-	for qemu-devel@nongnu.org; Fri, 08 Dec 2017 15:33:08 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:49418)
+	(envelope-from <dgilbert@redhat.com>) id 1eNPKW-0001Ke-E0
+	for qemu-devel@nongnu.org; Fri, 08 Dec 2017 15:33:09 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:49426)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1eNPKU-0001Jq-IL
-	for qemu-devel@nongnu.org; Fri, 08 Dec 2017 15:33:06 -0500
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1eNPKW-0001KQ-7R
+	for qemu-devel@nongnu.org; Fri, 08 Dec 2017 15:33:08 -0500
 From: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>
-Date: Fri,  8 Dec 2017 20:32:50 +0000
-Message-Id: <20171208203257.13102-2-dgilbert@redhat.com>
+Date: Fri,  8 Dec 2017 20:32:51 +0000
+Message-Id: <20171208203257.13102-3-dgilbert@redhat.com>
 In-Reply-To: <20171208203257.13102-1-dgilbert@redhat.com>
 References: <20171208203257.13102-1-dgilbert@redhat.com>
-Subject: [Qemu-devel] [RFC v2 1/8] memory: address_space_iterate
+Subject: [Qemu-devel] [RFC v2 2/8] vhost: Move log_dirty check
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,81 +28,78 @@ Cc: maxime.coquelin@redhat.com, mst@redhat.com, groug@kaod.org
 
 From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
 
-Iterate through an address space calling a function for each
-section.  The iteration is done in order.
+Move the log_dirty check into vhost_section.
 
 Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
 ---
- include/exec/memory.h | 23 +++++++++++++++++++++++
- memory.c              | 22 ++++++++++++++++++++++
- 2 files changed, 45 insertions(+)
+ hw/virtio/trace-events |  3 +++
+ hw/virtio/vhost.c      | 20 +++++++++++++-------
+ 2 files changed, 16 insertions(+), 7 deletions(-)
 
-diff --git a/include/exec/memory.h b/include/exec/memory.h
-index 5ed4042f87..f5a9df642e 100644
---- a/include/exec/memory.h
-+++ b/include/exec/memory.h
-@@ -1987,6 +1987,29 @@ address_space_write_cached(MemoryRegionCache *cache, hwaddr addr,
-     address_space_write(cache->as, cache->xlat + addr, MEMTXATTRS_UNSPECIFIED, buf, len);
- }
+diff --git a/hw/virtio/trace-events b/hw/virtio/trace-events
+index 775461ae98..4a493bcd46 100644
+--- a/hw/virtio/trace-events
++++ b/hw/virtio/trace-events
+@@ -1,5 +1,8 @@
+ # See docs/devel/tracing.txt for syntax documentation.
  
-+/**
-+ * ASIterateCallback: Function type called by address_space_iterate
-+ *
-+ * Return 0 on success or a negative error code.
-+ *
-+ * @mrs: Memory region section for this range
-+ * @opaque: The opaque value passed in to the iterator.
-+ */
-+typedef int (*ASIterateCallback)(MemoryRegionSection *mrs, void *opaque);
++# hw/virtio/vhost.c
++vhost_section(const char *name, int r) "%s:%d"
 +
-+/**
-+ * address_space_iterate: Call the function for each address range in the
-+ *                        AddressSpace, in sorted order.
-+ *
-+ * Return 0 on success or a negative error code.
-+ *
-+ * @as: Address space to iterate over
-+ * @cb: Function to call.  If the function returns none-0 the iteration will
-+ *     stop.
-+ * @opaque: Value to pass to the function
-+ */
-+int
-+address_space_iterate(AddressSpace *as, ASIterateCallback cb, void *opaque);
- #endif
+ # hw/virtio/virtio.c
+ virtqueue_alloc_element(void *elem, size_t sz, unsigned in_num, unsigned out_num) "elem %p size %zd in_num %u out_num %u"
+ virtqueue_fill(void *vq, const void *elem, unsigned int len, unsigned int idx) "vq %p elem %p len %u idx %u"
+diff --git a/hw/virtio/vhost.c b/hw/virtio/vhost.c
+index ddc42f0f93..938253d1e8 100644
+--- a/hw/virtio/vhost.c
++++ b/hw/virtio/vhost.c
+@@ -27,6 +27,7 @@
+ #include "hw/virtio/virtio-access.h"
+ #include "migration/blocker.h"
+ #include "sysemu/dma.h"
++#include "trace.h"
  
- #endif
-diff --git a/memory.c b/memory.c
-index e26e5a3b1d..f45137f25e 100644
---- a/memory.c
-+++ b/memory.c
-@@ -2810,6 +2810,28 @@ void address_space_destroy(AddressSpace *as)
-     call_rcu(as, do_address_space_destroy, rcu);
- }
+ /* enabled until disconnected backend stabilizes */
+ #define _VHOST_DEBUG 1
+@@ -567,18 +568,12 @@ static void vhost_set_memory(MemoryListener *listener,
+                                          memory_listener);
+     hwaddr start_addr = section->offset_within_address_space;
+     ram_addr_t size = int128_get64(section->size);
+-    bool log_dirty =
+-        memory_region_get_dirty_log_mask(section->mr) & ~(1 << DIRTY_MEMORY_MIGRATION);
+     int s = offsetof(struct vhost_memory, regions) +
+         (dev->mem->nregions + 1) * sizeof dev->mem->regions[0];
+     void *ram;
  
-+int address_space_iterate(AddressSpace *as, ASIterateCallback cb,
-+                          void *opaque)
-+{
-+    int res = 0;
-+    FlatView *fv = address_space_to_flatview(as);
-+    FlatRange *range;
-+
-+    flatview_ref(fv);
-+
-+    FOR_EACH_FLAT_RANGE(range, fv) {
-+        MemoryRegionSection mrs = section_from_flat_range(range, fv);
-+        res = cb(&mrs, opaque);
-+        if (res) {
-+            break;
-+        }
-+    }
-+
-+    flatview_unref(fv);
-+
-+    return res;
-+}
-+
- static const char *memory_region_type(MemoryRegion *mr)
+     dev->mem = g_realloc(dev->mem, s);
+ 
+-    if (log_dirty) {
+-        add = false;
+-    }
+-
+     assert(size);
+ 
+     /* Optimize no-change case. At least cirrus_vga does this a lot at this time. */
+@@ -611,8 +606,19 @@ static void vhost_set_memory(MemoryListener *listener,
+ 
+ static bool vhost_section(MemoryRegionSection *section)
  {
-     if (memory_region_is_ram_device(mr)) {
+-    return memory_region_is_ram(section->mr) &&
++    bool result;
++    bool log_dirty = memory_region_get_dirty_log_mask(section->mr) &
++                     ~(1 << DIRTY_MEMORY_MIGRATION);
++    result = memory_region_is_ram(section->mr) &&
+         !memory_region_is_rom(section->mr);
++
++    /* Vhost doesn't handle any block which is doing dirty-tracking other
++     * than migration; this typically fires on VGA areas.
++     */
++    result &= !log_dirty;
++
++    trace_vhost_section(section->mr->name, result);
++    return result;
+ }
+ 
+ static void vhost_begin(MemoryListener *listener)
 -- 
 2.14.3
