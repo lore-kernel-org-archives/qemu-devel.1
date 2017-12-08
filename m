@@ -1,25 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59450)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59449)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1eNH3P-0007GT-Tu
+	(envelope-from <dgilbert@redhat.com>) id 1eNH3P-0007GS-TP
 	for qemu-devel@nongnu.org; Fri, 08 Dec 2017 06:42:56 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1eNH3L-0000F6-14
+	(envelope-from <dgilbert@redhat.com>) id 1eNH3O-0000H6-8w
 	for qemu-devel@nongnu.org; Fri, 08 Dec 2017 06:42:55 -0500
-Date: Fri, 8 Dec 2017 12:42:45 +0100
-From: Cornelia Huck <cohuck@redhat.com>
-Message-ID: <20171208124245.53eb5db6.cohuck@redhat.com>
-In-Reply-To: <95059339-fac0-ee39-2e68-4ff5bc793893@linux.vnet.ibm.com>
-References: <20171128134648.21530-1-cohuck@redhat.com>
-	<20171205085906.GA3894@lagrange>
-	<20171207173418.7c70e5e9.cohuck@redhat.com>
-	<786c5a2c-d61e-cfa1-c3b7-f36c69ec3a75@linux.vnet.ibm.com>
-	<20171207180650.68cc909e.cohuck@redhat.com>
-	<95059339-fac0-ee39-2e68-4ff5bc793893@linux.vnet.ibm.com>
+Received: from mx1.redhat.com ([209.132.183.28]:60990)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1eNH3O-0000GG-0I
+	for qemu-devel@nongnu.org; Fri, 08 Dec 2017 06:42:54 -0500
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+	[10.5.11.13])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id EF7057EA9C
+	for <qemu-devel@nongnu.org>; Fri,  8 Dec 2017 11:42:52 +0000 (UTC)
+Date: Fri, 8 Dec 2017 11:42:42 +0000
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20171208114241.GJ2403@work-vm>
+References: <20171201125813.1437-1-quintela@redhat.com>
+	<20171201125813.1437-6-quintela@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH RFC 0/2] s390x: cut down on unattached
- devices
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20171201125813.1437-6-quintela@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v3 5/6] tests: Add migration xbzrle test
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,68 +33,137 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Halil Pasic <pasic@linux.vnet.ibm.com>
-Cc: borntraeger@de.ibm.com, qemu-s390x@nongnu.org, pmorel@linux.vnet.ibm.com, Bjoern Walk <bwalk@linux.vnet.ibm.com>, qemu-devel@nongnu.org
+To: Juan Quintela <quintela@redhat.com>
+Cc: qemu-devel@nongnu.org, lvivier@redhat.com, peterx@redhat.com
 
-On Thu, 7 Dec 2017 18:15:57 +0100
-Halil Pasic <pasic@linux.vnet.ibm.com> wrote:
-
-> On 12/07/2017 06:06 PM, Cornelia Huck wrote:
-> > On Thu, 7 Dec 2017 18:01:46 +0100  
-> [..]
-> >>>> Regarding the discussion about whether the QOM tree is API and what
-> >>>> exploiters like libvirt should do, Halil asked me to chip in.
-> >>>>
-> >>>> This patch is fine from libvirt perspective. I did a quick smoke test
-> >>>> and you can have a
-> >>>>
-> >>>>     Tested-by: Bjoern Walk <bwalk@linux.vnet.ibm.com>
-> >>>>
-> >>>> for what it's worth.    
-> >>>
-> >>> Thanks for checking.
-> >>>     
-> >>>>
-> >>>> In general, I kind of agree with Halil. Unless somewhere in QEMU it is
-> >>>> documented that the QOM tree is not guaranteed to be stable for
-> >>>> exploiters, I'd consider is part of the API. libvirt does use at least
-> >>>> some hardcoded paths, most of the time for CPUs in /machine/unattached,
-> >>>> so if that relation would change, things break. However, there is also
-> >>>> code to traverse the QOM tree recursively and find a path for a given
-> >>>> type(?) name. If this is the preferred way, we probably should change
-> >>>> this in libvirt to be safe.    
-> >>>
-> >>> OK, with that in mind and as we're now adding a property to check on
-> >>> the css bridge, I vote for including patch 1 now (having a fixed
-> >>> location under /machine looks saner that having to
-> >>> check /machine/unattached/device[<n>], which might not be stable).
-> >>>
-> >>> Patch 2 needs more discussion, as I'm not sure whether what I'm doing
-> >>> is the correct way to go about this (and other machines are in the same
-> >>> situation). Not sure whether it is worth trying to attach the zpci
-> >>> devices somewhere.
-> >>>     
-> >>
-> >> I think, if it's kind of API, then fixing sooner is better than fixing
-> >> later.
-> >>
-> >> I also agree that patch 1 should be higher priority.
-> >>
-> >> Before we do patch 1 I would like having agreed and documented whether
-> >> this is API or not.
-> >>
-> >> If we decide it's an API, I think we should consider deprecating
-> >> the current interface, but keep it working for two releases or
-> >> so. I think nothing speaks against introducing a link form unattached
-> >> in patch 1 (but I have not tried yet).  
-> > 
-> > No, just no. That's completely overengineered.
-> >   
+* Juan Quintela (quintela@redhat.com) wrote:
+> Signed-off-by: Juan Quintela <quintela@redhat.com>
+> ---
+>  tests/migration-test.c | 68 ++++++++++++++++++++++++++++++++++++++++++++++++++
+>  1 file changed, 68 insertions(+)
 > 
-> Which part is totally overengineered? Having it clear what is API and
-> what not? Having this documented? Or caring about our deprecation
-> policy (if it's API)?
-> 
+> diff --git a/tests/migration-test.c b/tests/migration-test.c
+> index 841c89e28a..41dee78a9a 100644
+> --- a/tests/migration-test.c
+> +++ b/tests/migration-test.c
+> @@ -410,6 +410,20 @@ static void deprecated_set_speed(QTestState *who, const char *value)
+>      migrate_check_parameter(who, "max-bandwidth", value);
+>  }
+>  
+> +static void deprecated_set_cache_size(QTestState *who, const char *value)
+> +{
+> +    QDict *rsp;
+> +    gchar *cmd;
+> +
+> +    cmd = g_strdup_printf("{ 'execute': 'migrate-set-cache-size',"
+> +                          "'arguments': { 'value': %s } }", value);
+> +    rsp = qtest_qmp(who, cmd);
+> +    g_free(cmd);
+> +    g_assert(qdict_haskey(rsp, "return"));
+> +    QDECREF(rsp);
+> +    migrate_check_parameter(who, "xbzrle-cache-size", value);
+> +}
+> +
+>  static void migrate_set_parameter(QTestState *who, const char *parameter,
+>                                    const char *value)
+>  {
+> @@ -424,6 +438,10 @@ static void migrate_set_parameter(QTestState *who, const char *parameter,
+>          deprecated_set_speed(who, "12345");
+>      }
+>  
+> +    if (strcmp(parameter, "xbzrle-cache-size") == 0) {
+> +        deprecated_set_cache_size(who, "4096");
+> +    }
+> +
+>      cmd = g_strdup_printf("{ 'execute': 'migrate-set-parameters',"
+>                            "'arguments': { '%s': %s } }",
+>                            parameter, value);
+> @@ -673,6 +691,55 @@ static void test_precopy_tcp(void)
+>      g_free(port);
+>  }
+>  
+> +static void test_xbzrle(const char *uri)
+> +{
+> +    QTestState *from, *to;
+> +
+> +    test_migrate_start(&from, &to, uri);
+> +
+> +    /* We want to pick a speed slow enough that the test completes
+> +     * quickly, but that it doesn't complete precopy even on a slow
+> +     * machine, so also set the downtime.
+> +     */
+> +    /* 100 ms */
+> +    migrate_set_parameter(from, "downtime-limit", "1");
 
-You're building a monster to fix a non-existing problem. I will not go
-down that rabbit hole any further, and just apply patch 1.
+? That's 1 ms not 100ms as the comment says?
+
+> +    /* 1MB/s slow*/
+> +    migrate_set_parameter(from, "max-bandwidth", "1000000000");
+
+That's still 1GB/s isn't it?
+Don't you need to reduce that if xbzrle is actually working otherwise
+it'll complete?
+
+> +    migrate_set_parameter(from, "xbzrle-cache-size", "33554432");
+
+That's 32M - why?
+The test continually rewrites 100M of data; only changing one byte/page
+- so actually the fun way to do the xbzrle test is to leave this as 32M
+here.....
+
+> +    migrate_set_capability(from, "xbzrle", "true");
+> +    migrate_set_capability(to, "xbzrle", "true");
+> +    /* Wait for the first serial output from the source */
+> +    wait_for_serial("src_serial");
+> +
+> +    migrate(from, uri);
+> +
+> +    wait_for_migration_pass(from);
+> +
+> +    /* 300ms it should converge */
+> +    migrate_set_parameter(from, "downtime-limit", "300");
+
+but first increase the xvzrle cache to 120M and give it a couple of
+seconds delay; you might even find it completes without the downtime
+limit schange; but you should still do that after a few seconds.
+You can check the stats as well, you should get some xbzrle cache hits
+as long as you raised the cache size.
+
+Dave
+
+> +    if (!got_stop) {
+> +        qtest_qmp_eventwait(from, "STOP");
+> +    }
+> +    qtest_qmp_eventwait(to, "RESUME");
+> +
+> +    wait_for_serial("dest_serial");
+> +    wait_for_migration_complete(from);
+> +
+> +    test_migrate_end(from, to);
+> +}
+> +
+> +static void test_xbzrle_unix(void)
+> +{
+> +    char *uri = g_strdup_printf("unix:%s/migsocket", tmpfs);
+> +
+> +    test_xbzrle(uri);
+> +    g_free(uri);
+> +}
+> +
+> +
+>  int main(int argc, char **argv)
+>  {
+>      char template[] = "/tmp/migration-test-XXXXXX";
+> @@ -695,6 +762,7 @@ int main(int argc, char **argv)
+>      qtest_add_func("/migration/precopy/unix", test_precopy_unix);
+>      qtest_add_func("/migration/precopy/tcp", test_precopy_tcp);
+>      qtest_add_func("/migration/postcopy/unix", test_postcopy);
+> +    qtest_add_func("/migration/xbzrle/unix", test_xbzrle_unix);
+>  
+>      ret = g_test_run();
+>  
+> -- 
+> 2.14.3
+> 
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
