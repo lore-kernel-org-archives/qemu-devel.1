@@ -1,25 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33902)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35385)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1eNJ0W-0002Aa-I3
-	for qemu-devel@nongnu.org; Fri, 08 Dec 2017 08:48:05 -0500
+	(envelope-from <kwolf@redhat.com>) id 1eNJ4C-0003Ax-Hb
+	for qemu-devel@nongnu.org; Fri, 08 Dec 2017 08:51:53 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1eNJ0V-0007ql-PE
-	for qemu-devel@nongnu.org; Fri, 08 Dec 2017 08:48:04 -0500
-References: <20171120201004.14999-1-mreitz@redhat.com>
-	<20171120201004.14999-25-mreitz@redhat.com>
-	<w51k1y2307y.fsf@maestria.local.igalia.com>
-	<bcbf0021-4fcd-26d0-e05c-cd3e35608988@redhat.com>
-	<w51h8t531ql.fsf@maestria.local.igalia.com>
-From: Max Reitz <mreitz@redhat.com>
-Message-ID: <032b64ec-a161-ff2a-5505-06b91deb2682@redhat.com>
-Date: Fri, 8 Dec 2017 14:47:52 +0100
+	(envelope-from <kwolf@redhat.com>) id 1eNJ49-00031y-FC
+	for qemu-devel@nongnu.org; Fri, 08 Dec 2017 08:51:52 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:57644)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <kwolf@redhat.com>) id 1eNJ49-000301-5t
+	for qemu-devel@nongnu.org; Fri, 08 Dec 2017 08:51:49 -0500
+Date: Fri, 8 Dec 2017 14:51:39 +0100
+From: Kevin Wolf <kwolf@redhat.com>
+Message-ID: <20171208135139.GC4217@localhost.localdomain>
+References: <CAJqJJggWTki8i_U7xr2oRSFR4sZt4eK5hRO+B55iOYVMyfGwDg@mail.gmail.com>
+	<20171206091243.GC4207@localhost.localdomain>
+	<cd42e58f-4a00-de18-446f-7e2275421992@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <w51h8t531ql.fsf@maestria.local.igalia.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="xhqKR41j88a7E9kHs1F8cKri2P7U6sUej"
-Subject: Re: [Qemu-devel] [PATCH v7 for-2.12 24/25] block/curl: Implement
- bdrv_refresh_filename()
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="dc+cDN39EJAMEtIO"
+Content-Disposition: inline
+In-Reply-To: <cd42e58f-4a00-de18-446f-7e2275421992@redhat.com>
+Subject: Re: [Qemu-devel] About [PULL 20/25] block: Guard against NULL
+ bs->drv
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,95 +30,82 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alberto Garcia <berto@igalia.com>, qemu-block@nongnu.org
-Cc: qemu-devel@nongnu.org, Kevin Wolf <kwolf@redhat.com>, Eric Blake <eblake@redhat.com>, John Snow <jsnow@redhat.com>
+To: Max Reitz <mreitz@redhat.com>
+Cc: Kangjie Xi <imxikangjie@gmail.com>, qemu-devel@nongnu.org, John Snow <jsnow@redhat.com>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---xhqKR41j88a7E9kHs1F8cKri2P7U6sUej
-From: Max Reitz <mreitz@redhat.com>
-To: Alberto Garcia <berto@igalia.com>, qemu-block@nongnu.org
-Cc: qemu-devel@nongnu.org, Kevin Wolf <kwolf@redhat.com>,
- Eric Blake <eblake@redhat.com>, John Snow <jsnow@redhat.com>
-Message-ID: <032b64ec-a161-ff2a-5505-06b91deb2682@redhat.com>
-Subject: Re: [PATCH v7 for-2.12 24/25] block/curl: Implement
- bdrv_refresh_filename()
-References: <20171120201004.14999-1-mreitz@redhat.com>
- <20171120201004.14999-25-mreitz@redhat.com>
- <w51k1y2307y.fsf@maestria.local.igalia.com>
- <bcbf0021-4fcd-26d0-e05c-cd3e35608988@redhat.com>
- <w51h8t531ql.fsf@maestria.local.igalia.com>
-In-Reply-To: <w51h8t531ql.fsf@maestria.local.igalia.com>
-Content-Type: text/plain; charset=utf-8
+
+--dc+cDN39EJAMEtIO
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On 2017-12-05 11:31, Alberto Garcia wrote:
-> On Mon 04 Dec 2017 07:26:02 PM CET, Max Reitz wrote:
->>>> +static void curl_refresh_filename(BlockDriverState *bs)
->>>> +{
->>>> +    BDRVCURLState *s =3D bs->opaque;
->>>> +
->>>> +    if (!s->sslverify || s->cookie ||
->>>> +        s->username || s->password || s->proxyusername || s->proxyp=
-assword)
->>>> +    {
->>>
->>> Is !s->sslverify negative because that setting is true by default?
->>
->> Yes, exactly.  If it's false, you'd need to override it (and you can't=
-
->> do that through a plain filename).
+Am 08.12.2017 um 14:39 hat Max Reitz geschrieben:
+> On 2017-12-06 10:12, Kevin Wolf wrote:
+> > Am 06.12.2017 um 08:28 hat Kangjie Xi geschrieben:
+> >> Hi,
+> >>
+> >> I encountered a qemu-nbd segfault, finally I found it was caused by
+> >> NULL bs-drv,  which is located in block/io.c function bdrv_co_flush
+> >> line 2377:
+> >>
+> >> https://git.qemu.org/?p=3Dqemu.git;a=3Dblob;f=3Dblock/io.c;h=3D4fdf93a=
+0144fa4761a14b8cc6b2a9a6b6e5d5bec;hb=3Dd470ad42acfc73c45d3e8ed5311a491160b4=
+c100#l2377
+> >>
+> >> It is before the patch at line 2402, so the patch needs to be updated
+> >> to fix NULL bs-drv at line 2337.
+> >>
+> >> https://lists.gnu.org/archive/html/qemu-devel/2017-11/msg03425.html
+> >=20
+> > Can you please post a full backtrace? Do you see any error message
+> > on stderr before the process crashes?
+> >=20
+> > I don't see at the moment how this can happen, except the case that Max
+> > mentioned where bs->drv =3D NULL is set when an image corruption is
+> > detected - this involves an error message, though.
+> >=20
+> > We check bdrv_is_inserted() as the first thing, which includes a NULL
+> > check for bs->drv. So it must have been non-NULL at the start of the
+> > function and then become NULL. I suppose this can theoretically happen
+> > in qemu_co_queue_wait() if another flush request detects image
+> > corruption.
+> >=20
+> > Max: I think bs->drv =3D NULL in the middle of a request was a stupid
+> > idea. In fact, it's already a stupid idea to have any BDS with
+> > bs->drv =3D NULL. Maybe it would be better to schedule a BH that replac=
+es
+> > the qcow2 node with a dummy node (null-co?) and properly closes the
+> > qcow2 one.
 >=20
-> I think this is not the only case in this series, but I'm not very
-> comfortable with the idea that this condition and the default value of
-> the setting are implicity dependent on each other. If you change one an=
-d
-> forget to change the other things will break.
+> Yes, that is an idea John had, too.  It sounded good to me (we'd just
+> need to add a new flag to null-co so it would respond with -ENOMEDIUM to
+> all requests or something)...  The only issue I had is how that would
+> work together with the GRAPH_MOD op blocker.
 
-Well, yes, but...
+In order to answer this question, I'd first have to understand what
+GRAPH_MOD is even supposed to mean and which operations it needs to
+protect. There aren't currently any users of GRAPH_MOD.
 
-> I understand that the default value is never supposed to change so in
-> practice I don't see this breaking,
+Kevin
 
-Yes.
-
->                                     but is it perhaps worth adding test=
-s
-> for all these cases?
-
-In theory, sure.  In practice, adding a curl test case seems hard.
-
-Well, I could connect to, I don't know, qemu.org or something and then
-just test things there (with the index used as a raw image), but if I
-add one test for the curl protocol, nobody is ever going to run them...
-And in theory, that's not how a curl test should work.  In theory, you'd
-expect the user to set up a localhost server with some known root
-directory and then _make_test_img etc. would set up images there.  But
-that way, really nobody is ever going to run them.
-
-And just adding a test for all protocols that then accesses qemu.org
-feels somehow wrong, too...  Maybe if I add it to a network group, that
-wouldn't feel so bad.
-
-Also, adding macros for the default values could help, I think.
-
-Max
-
-
---xhqKR41j88a7E9kHs1F8cKri2P7U6sUej
+--dc+cDN39EJAMEtIO
 Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQFGBAEBCAAwFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAloqmAgSHG1yZWl0ekBy
-ZWRoYXQuY29tAAoJEPQH2wBh1c9ALmAH/iAItItL98aqvfBhqafv+0KaDfPOCRt7
-tRtklzHBM3Iopzte9GA5m/7CZSkxRrceAKrHxD2gSH8g3axg/6cFqZn63Tf1UIn2
-9P3VK5p0+E2aLUV0oFMhFnIHrzVfIdoKjc8iNwHI4+x+ElHTwEDImslR/NYPtu2+
-fhcJD7BAF2Z3sqrefBLE+cS/QLhfuKxZNDGRVkpBqD6ApO2NMIwebU1iR/veVKX0
-vDqXiD9c32M5Jifu5vm70Tu9Bfe7e9/n5zCoHo+ZBYF88S/9YTQ1x8qGCDc+TfNo
-BxFH2jSAcbfdUZu4xZ8LxgjNPj+xmsFt82JAas/tc8uCPxDnspFaze4=
-=AJfw
+iQIcBAEBAgAGBQJaKpjrAAoJEH8JsnLIjy/WjBcQAIp04GUUFmFZcn4/to187o7s
+wEA1UEjRwCnm4uuCKmZvyboF+yj+ZGQFFtMr0BUPjpa/VAOk1GVnRvjlbroWg5Mc
+7k/F42JjauFgJfVJk4DEhNNUitsoLcedeqCb2H16F9ul2uZGIebCsIreiznVzefA
+JR1mqgscX2aef025o7RWcvrZhsyIEb/XZFXQwzEM2kyeMbt5r1vRLF5sLuAdz3Yf
+srD9kmDIDhMHDHop4ndSissEFLn/uoQcSNiwEvQHco9gH87TmJpIgMBSjw/6zUl5
+4qKcXpW3L3yh/TMbItnXU4nksCGzd6uoHjlfbOK8cnrigzn12uLcewQkbkawwWuD
+VO5Ai1ylIBGekkKj0DX80ZGkl6CSmfWTg16B+t0HP4DcItmiQHHadsXqx6o42FSY
+wYVgNY/OGUzq0VE9pexNUs4i9Un8vb8/jBnRh2XqukpSAxlHC3QrpxY4DUstsoKq
+cN9AaNGH6AeRqKg/gSmtcRr8Y5pJj2QRNH8vP1a66pmwfU15hxYAoRHxUrkse//u
+PJ6DZYz+prArLneM1K0XAhhnl/7Y7OzNPduJsDZjhLoP4vJ8sz24jVL8f+nAKj9i
+IX6UQAkgKKhrJftqn9DuJyl0TbEs9iEo2LbClQl4EeS4Rwqdw3q5gPfIrD/Jo0/6
+e9GSHuTc6iNDbgThU8Al
+=ZN8c
 -----END PGP SIGNATURE-----
 
---xhqKR41j88a7E9kHs1F8cKri2P7U6sUej--
+--dc+cDN39EJAMEtIO--
