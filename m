@@ -1,21 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33798)
-	by lists.gnu.org with esmtp (Exim 4.71) (envelope-from <pl@kamp.de>)
-	id 1eNHBi-0003Ww-TT
-	for qemu-devel@nongnu.org; Fri, 08 Dec 2017 06:51:32 -0500
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34278)
+	by lists.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <dgilbert@redhat.com>) id 1eNHDX-0005VG-9i
+	for qemu-devel@nongnu.org; Fri, 08 Dec 2017 06:53:24 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pl@kamp.de>) id 1eNHBg-0006dC-Cr
-	for qemu-devel@nongnu.org; Fri, 08 Dec 2017 06:51:30 -0500
-Received: from mx-v6.kamp.de ([2a02:248:0:51::16]:47990 helo=mx01.kamp.de)
+	(envelope-from <dgilbert@redhat.com>) id 1eNHDT-0007mV-C9
+	for qemu-devel@nongnu.org; Fri, 08 Dec 2017 06:53:23 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:34252)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pl@kamp.de>) id 1eNHBg-0006bS-2Y
-	for qemu-devel@nongnu.org; Fri, 08 Dec 2017 06:51:28 -0500
-From: Peter Lieven <pl@kamp.de>
-Date: Fri,  8 Dec 2017 12:51:08 +0100
-Message-Id: <1512733868-9009-3-git-send-email-pl@kamp.de>
-In-Reply-To: <1512733868-9009-1-git-send-email-pl@kamp.de>
-References: <1512733868-9009-1-git-send-email-pl@kamp.de>
-Subject: [Qemu-devel] [PATCH 2/2] block/iscsi: only report an iSCSI Failure
- if we don't handle it gracefully
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1eNHDT-0007mD-2J
+	for qemu-devel@nongnu.org; Fri, 08 Dec 2017 06:53:19 -0500
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+	[10.5.11.11])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 13D7581DF5
+	for <qemu-devel@nongnu.org>; Fri,  8 Dec 2017 11:53:18 +0000 (UTC)
+Date: Fri, 8 Dec 2017 11:53:13 +0000
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20171208115312.GL2403@work-vm>
+References: <20171201125750.1372-1-quintela@redhat.com>
+	<20171201125750.1372-2-quintela@redhat.com>
+	<20171205080230.GD2925@xz-mi>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20171205080230.GD2925@xz-mi>
+Subject: Re: [Qemu-devel] [PATCH v3 1/2] migration: Create tcp_port parameter
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,192 +34,180 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org, qemu-block@nongnu.org
-Cc: mreitz@redhat.com, kwolf@redhat.com, ronniesahlberg@gmail.com, pbonzini@redhat.com, Peter Lieven <pl@kamp.de>
+To: Peter Xu <peterx@redhat.com>
+Cc: Juan Quintela <quintela@redhat.com>, qemu-devel@nongnu.org, lvivier@redhat.com
 
-we currently report an "iSCSI Failure" in iscsi_co_generic_cb if the task
-hasn't completed with SCSI_STATUS_GOOD. However, we expect a failure in
-some cases and handle it gracefully. This is the case for misaligned UNMAPs
-and WRITESAME10/16 calls without UNMAP. In this case a failure in the
-logs can be quite misleading.
+* Peter Xu (peterx@redhat.com) wrote:
+> On Fri, Dec 01, 2017 at 01:57:49PM +0100, Juan Quintela wrote:
+> > It will be used to store the uri tcp_port parameter.  This is the only
+> > parameter than can change and we can need to be able to connect to it.
+> > 
+> > Signed-off-by: Juan Quintela <quintela@redhat.com>
+> > 
+> > --
+> > 
+> > This used to be uri parameter, but it has so many troubles to
+> > reproduce that it don't just make sense.
+> > ---
+> >  hmp.c                 |  7 +++++++
+> >  migration/migration.c | 10 ++++++++++
+> >  qapi/migration.json   | 19 ++++++++++++++++---
+> >  3 files changed, 33 insertions(+), 3 deletions(-)
+> > 
+> > diff --git a/hmp.c b/hmp.c
+> > index 1727c9c003..6387d6d517 100644
+> > --- a/hmp.c
+> > +++ b/hmp.c
+> > @@ -345,6 +345,9 @@ void hmp_info_migrate_parameters(Monitor *mon, const QDict *qdict)
+> >          monitor_printf(mon, "%s: %" PRIu64 "\n",
+> >              MigrationParameter_str(MIGRATION_PARAMETER_XBZRLE_CACHE_SIZE),
+> >              params->xbzrle_cache_size);
+> > +        monitor_printf(mon, "%s: %d\n",
+> > +            MigrationParameter_str(MIGRATION_PARAMETER_TCP_PORT),
+> > +            params->tcp_port);
+> >      }
+> >  
+> >      qapi_free_MigrationParameters(params);
+> > @@ -1659,6 +1662,10 @@ void hmp_migrate_set_parameter(Monitor *mon, const QDict *qdict)
+> >          }
+> >          p->xbzrle_cache_size = cache_size;
+> >          break;
+> > +    case MIGRATION_PARAMETER_TCP_PORT:
+> > +        p->has_tcp_port = true;
+> > +        visit_type_uint16(v, param, &p->tcp_port, &err);
+> 
+> Should we allow user to set this parameter?  Or it's just used for
+> query, only?  (AFAIU from next patch, this is only used for query)
 
-While we are at it improve the logging to reveal which operation failed
-at what LBA.
+Same question; it makes me wonder if this field should actually go in
+MigrationStats; the problem with that is it's currently only shows the
+source side; even though at times people have suggested adding
+destination side data to it.
 
-Signed-off-by: Peter Lieven <pl@kamp.de>
----
- block/iscsi.c | 43 ++++++++++++++++++++++++++++++++-----------
- 1 file changed, 32 insertions(+), 11 deletions(-)
+Dave
 
-diff --git a/block/iscsi.c b/block/iscsi.c
-index c532ec7..5c0a9e5 100644
---- a/block/iscsi.c
-+++ b/block/iscsi.c
-@@ -104,6 +104,7 @@ typedef struct IscsiTask {
-     IscsiLun *iscsilun;
-     QEMUTimer retry_timer;
-     int err_code;
-+    char *err_str;
- } IscsiTask;
- 
- typedef struct IscsiAIOCB {
-@@ -265,7 +266,7 @@ iscsi_co_generic_cb(struct iscsi_context *iscsi, int status,
-             }
-         }
-         iTask->err_code = iscsi_translate_sense(&task->sense);
--        error_report("iSCSI Failure: %s", iscsi_get_error(iscsi));
-+        iTask->err_str = g_strdup(iscsi_get_error(iscsi));
-     }
- 
- out:
-@@ -629,6 +630,8 @@ retry:
- 
-     if (iTask.status != SCSI_STATUS_GOOD) {
-         iscsi_allocmap_set_invalid(iscsilun, sector_num, nb_sectors);
-+        error_report("iSCSI WRITE10/16 failed at lba %" PRIu64 ": %s", lba,
-+                     iTask.err_str);
-         r = iTask.err_code;
-         goto out_unlock;
-     }
-@@ -637,6 +640,7 @@ retry:
- 
- out_unlock:
-     qemu_mutex_unlock(&iscsilun->mutex);
-+    g_free(iTask.err_str);
-     return r;
- }
- 
-@@ -651,10 +655,9 @@ static int64_t coroutine_fn iscsi_co_get_block_status(BlockDriverState *bs,
-     struct scsi_get_lba_status *lbas = NULL;
-     struct scsi_lba_status_descriptor *lbasd = NULL;
-     struct IscsiTask iTask;
-+    uint64_t lba;
-     int64_t ret;
- 
--    iscsi_co_init_iscsitask(iscsilun, &iTask);
--
-     if (!is_sector_request_lun_aligned(sector_num, nb_sectors, iscsilun)) {
-         ret = -EINVAL;
-         goto out;
-@@ -670,11 +673,13 @@ static int64_t coroutine_fn iscsi_co_get_block_status(BlockDriverState *bs,
-         goto out;
-     }
- 
-+    lba = sector_qemu2lun(sector_num, iscsilun);
-+
-+    iscsi_co_init_iscsitask(iscsilun, &iTask);
-     qemu_mutex_lock(&iscsilun->mutex);
- retry:
-     if (iscsi_get_lba_status_task(iscsilun->iscsi, iscsilun->lun,
--                                  sector_qemu2lun(sector_num, iscsilun),
--                                  8 + 16, iscsi_co_generic_cb,
-+                                  lba, 8 + 16, iscsi_co_generic_cb,
-                                   &iTask) == NULL) {
-         ret = -ENOMEM;
-         goto out_unlock;
-@@ -701,6 +706,8 @@ retry:
-          * because the device is busy or the cmd is not
-          * supported) we pretend all blocks are allocated
-          * for backwards compatibility */
-+        error_report("iSCSI GET_LBA_STATUS failed at lba %" PRIu64 ": %s",
-+                     lba, iTask.err_str);
-         goto out_unlock;
-     }
- 
-@@ -738,6 +745,7 @@ retry:
-     }
- out_unlock:
-     qemu_mutex_unlock(&iscsilun->mutex);
-+    g_free(iTask.err_str);
- out:
-     if (iTask.task != NULL) {
-         scsi_free_scsi_task(iTask.task);
-@@ -756,6 +764,7 @@ static int coroutine_fn iscsi_co_readv(BlockDriverState *bs,
-     struct IscsiTask iTask;
-     uint64_t lba;
-     uint32_t num_sectors;
-+    int r = 0;
- 
-     if (!is_sector_request_lun_aligned(sector_num, nb_sectors, iscsilun)) {
-         return -EINVAL;
-@@ -853,19 +862,23 @@ retry:
-         iTask.complete = 0;
-         goto retry;
-     }
--    qemu_mutex_unlock(&iscsilun->mutex);
- 
-     if (iTask.status != SCSI_STATUS_GOOD) {
--        return iTask.err_code;
-+        error_report("iSCSI READ10/16 failed at lba %" PRIu64 ": %s",
-+                     lba, iTask.err_str);
-+        r = iTask.err_code;
-     }
- 
--    return 0;
-+    qemu_mutex_unlock(&iscsilun->mutex);
-+    g_free(iTask.err_str);
-+    return r;
- }
- 
- static int coroutine_fn iscsi_co_flush(BlockDriverState *bs)
- {
-     IscsiLun *iscsilun = bs->opaque;
-     struct IscsiTask iTask;
-+    int r = 0;
- 
-     iscsi_co_init_iscsitask(iscsilun, &iTask);
-     qemu_mutex_lock(&iscsilun->mutex);
-@@ -892,13 +905,15 @@ retry:
-         iTask.complete = 0;
-         goto retry;
-     }
--    qemu_mutex_unlock(&iscsilun->mutex);
- 
-     if (iTask.status != SCSI_STATUS_GOOD) {
--        return iTask.err_code;
-+        error_report("iSCSI SYNCHRONIZECACHE10 failed: %s", iTask.err_str);
-+        r = iTask.err_code;
-     }
- 
--    return 0;
-+    qemu_mutex_unlock(&iscsilun->mutex);
-+    g_free(iTask.err_str);
-+    return r;
- }
- 
- #ifdef __linux__
-@@ -1139,12 +1154,15 @@ retry:
-     }
- 
-     if (iTask.status != SCSI_STATUS_GOOD) {
-+        error_report("iSCSI UNMAP failed at lba %" PRIu64 ": %s",
-+                     list.lba, iTask.err_str);
-         r = iTask.err_code;
-         goto out_unlock;
-     }
- 
- out_unlock:
-     qemu_mutex_unlock(&iscsilun->mutex);
-+    g_free(iTask.err_str);
-     return r;
- }
- 
-@@ -1241,6 +1259,8 @@ retry:
-     if (iTask.status != SCSI_STATUS_GOOD) {
-         iscsi_allocmap_set_invalid(iscsilun, offset >> BDRV_SECTOR_BITS,
-                                    bytes >> BDRV_SECTOR_BITS);
-+        error_report("iSCSI WRITESAME10/16 failed at lba %" PRIu64 ": %s",
-+                     lba, iTask.err_str);
-         r = iTask.err_code;
-         goto out_unlock;
-     }
-@@ -1255,6 +1275,7 @@ retry:
- 
- out_unlock:
-     qemu_mutex_unlock(&iscsilun->mutex);
-+    g_free(iTask.err_str);
-     return r;
- }
- 
--- 
-1.9.1
+> > +        break;
+> >      default:
+> >          assert(0);
+> >      }
+> > diff --git a/migration/migration.c b/migration/migration.c
+> > index 19917a4b5b..abc02d4efd 100644
+> > --- a/migration/migration.c
+> > +++ b/migration/migration.c
+> > @@ -517,6 +517,8 @@ MigrationParameters *qmp_query_migrate_parameters(Error **errp)
+> >      params->x_multifd_page_count = s->parameters.x_multifd_page_count;
+> >      params->has_xbzrle_cache_size = true;
+> >      params->xbzrle_cache_size = s->parameters.xbzrle_cache_size;
+> > +    params->has_tcp_port = true;
+> > +    params->tcp_port = s->parameters.tcp_port;
+> >  
+> >      return params;
+> >  }
+> > @@ -884,6 +886,9 @@ static void migrate_params_test_apply(MigrateSetParameters *params,
+> >      if (params->has_xbzrle_cache_size) {
+> >          dest->xbzrle_cache_size = params->xbzrle_cache_size;
+> >      }
+> > +    if (params->has_tcp_port) {
+> > +        dest->tcp_port = params->tcp_port;
+> > +    }
+> >  }
+> >  
+> >  static void migrate_params_apply(MigrateSetParameters *params, Error **errp)
+> > @@ -956,6 +961,9 @@ static void migrate_params_apply(MigrateSetParameters *params, Error **errp)
+> >          s->parameters.xbzrle_cache_size = params->xbzrle_cache_size;
+> >          xbzrle_cache_resize(params->xbzrle_cache_size, errp);
+> >      }
+> > +    if (params->has_tcp_port) {
+> > +        s->parameters.tcp_port = params->tcp_port;
+> > +    }
+> >  }
+> >  
+> >  void qmp_migrate_set_parameters(MigrateSetParameters *params, Error **errp)
+> > @@ -2422,6 +2430,8 @@ static Property migration_properties[] = {
+> >      DEFINE_PROP_SIZE("xbzrle-cache-size", MigrationState,
+> >                        parameters.xbzrle_cache_size,
+> >                        DEFAULT_MIGRATE_XBZRLE_CACHE_SIZE),
+> > +    DEFINE_PROP_UINT16("x-tcp-port", MigrationState,
+> > +                       parameters.tcp_port, 0),
+> 
+> Same question here...  If it's only for querying, why allow user to
+> specify it?
+> 
+> Thanks,
+> 
+> >  
+> >      /* Migration capabilities */
+> >      DEFINE_PROP_MIG_CAP("x-xbzrle", MIGRATION_CAPABILITY_XBZRLE),
+> > diff --git a/qapi/migration.json b/qapi/migration.json
+> > index 4cd3d13158..e2a1d86216 100644
+> > --- a/qapi/migration.json
+> > +++ b/qapi/migration.json
+> > @@ -488,6 +488,9 @@
+> >  #                     and a power of 2
+> >  #                     (Since 2.11)
+> >  #
+> > +# @tcp-port: Only used for tcp, to know what is the real port
+> > +#                     (Since 2.12)
+> > +#
+> >  # Since: 2.4
+> >  ##
+> >  { 'enum': 'MigrationParameter',
+> > @@ -496,7 +499,7 @@
+> >             'tls-creds', 'tls-hostname', 'max-bandwidth',
+> >             'downtime-limit', 'x-checkpoint-delay', 'block-incremental',
+> >             'x-multifd-channels', 'x-multifd-page-count',
+> > -           'xbzrle-cache-size' ] }
+> > +           'xbzrle-cache-size', 'tcp-port' ] }
+> >  
+> >  ##
+> >  # @MigrateSetParameters:
+> > @@ -564,6 +567,10 @@
+> >  #                     needs to be a multiple of the target page size
+> >  #                     and a power of 2
+> >  #                     (Since 2.11)
+> > +#
+> > +# @tcp-port: Only used for tcp, to know what is the real port
+> > +#                     (Since 2.12)
+> > +#
+> >  # Since: 2.4
+> >  ##
+> >  # TODO either fuse back into MigrationParameters, or make
+> > @@ -582,7 +589,8 @@
+> >              '*block-incremental': 'bool',
+> >              '*x-multifd-channels': 'int',
+> >              '*x-multifd-page-count': 'int',
+> > -            '*xbzrle-cache-size': 'size' } }
+> > +            '*xbzrle-cache-size': 'size' ,
+> > +            '*tcp-port': 'uint16'} }
+> >  
+> >  ##
+> >  # @migrate-set-parameters:
+> > @@ -665,6 +673,10 @@
+> >  #                     needs to be a multiple of the target page size
+> >  #                     and a power of 2
+> >  #                     (Since 2.11)
+> > +#
+> > +# @tcp-port: Only used for tcp, to know what is the real port
+> > +#                     (Since 2.12)
+> > +#
+> >  # Since: 2.4
+> >  ##
+> >  { 'struct': 'MigrationParameters',
+> > @@ -681,7 +693,8 @@
+> >              '*block-incremental': 'bool' ,
+> >              '*x-multifd-channels': 'uint8',
+> >              '*x-multifd-page-count': 'uint32',
+> > -            '*xbzrle-cache-size': 'size' } }
+> > +            '*xbzrle-cache-size': 'size',
+> > +            '*tcp-port': 'uint16'} }
+> >  
+> >  ##
+> >  # @query-migrate-parameters:
+> > -- 
+> > 2.14.3
+> > 
+> 
+> -- 
+> Peter Xu
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
