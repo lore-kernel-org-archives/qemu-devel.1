@@ -1,27 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35385)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36074)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1eNJ4C-0003Ax-Hb
-	for qemu-devel@nongnu.org; Fri, 08 Dec 2017 08:51:53 -0500
+	(envelope-from <berrange@redhat.com>) id 1eNJ60-000460-Ev
+	for qemu-devel@nongnu.org; Fri, 08 Dec 2017 08:53:45 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1eNJ49-00031y-FC
-	for qemu-devel@nongnu.org; Fri, 08 Dec 2017 08:51:52 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:57644)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <kwolf@redhat.com>) id 1eNJ49-000301-5t
-	for qemu-devel@nongnu.org; Fri, 08 Dec 2017 08:51:49 -0500
-Date: Fri, 8 Dec 2017 14:51:39 +0100
-From: Kevin Wolf <kwolf@redhat.com>
-Message-ID: <20171208135139.GC4217@localhost.localdomain>
-References: <CAJqJJggWTki8i_U7xr2oRSFR4sZt4eK5hRO+B55iOYVMyfGwDg@mail.gmail.com>
-	<20171206091243.GC4207@localhost.localdomain>
-	<cd42e58f-4a00-de18-446f-7e2275421992@redhat.com>
+	(envelope-from <berrange@redhat.com>) id 1eNJ5z-0004ih-DP
+	for qemu-devel@nongnu.org; Fri, 08 Dec 2017 08:53:44 -0500
+Date: Fri, 8 Dec 2017 13:53:29 +0000
+From: "Daniel P. Berrange" <berrange@redhat.com>
+Message-ID: <20171208135329.GG11767@redhat.com>
+Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
+References: <20171120201004.14999-1-mreitz@redhat.com>
+	<20171120201004.14999-25-mreitz@redhat.com>
+	<w51k1y2307y.fsf@maestria.local.igalia.com>
+	<bcbf0021-4fcd-26d0-e05c-cd3e35608988@redhat.com>
+	<w51h8t531ql.fsf@maestria.local.igalia.com>
+	<032b64ec-a161-ff2a-5505-06b91deb2682@redhat.com>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="dc+cDN39EJAMEtIO"
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <cd42e58f-4a00-de18-446f-7e2275421992@redhat.com>
-Subject: Re: [Qemu-devel] About [PULL 20/25] block: Guard against NULL
- bs->drv
+In-Reply-To: <032b64ec-a161-ff2a-5505-06b91deb2682@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v7 for-2.12 24/25] block/curl: Implement
+ bdrv_refresh_filename()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,81 +30,61 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: Max Reitz <mreitz@redhat.com>
-Cc: Kangjie Xi <imxikangjie@gmail.com>, qemu-devel@nongnu.org, John Snow <jsnow@redhat.com>
+Cc: Alberto Garcia <berto@igalia.com>, qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>, John Snow <jsnow@redhat.com>, qemu-devel@nongnu.org
 
-
---dc+cDN39EJAMEtIO
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
-
-Am 08.12.2017 um 14:39 hat Max Reitz geschrieben:
-> On 2017-12-06 10:12, Kevin Wolf wrote:
-> > Am 06.12.2017 um 08:28 hat Kangjie Xi geschrieben:
-> >> Hi,
+On Fri, Dec 08, 2017 at 02:47:52PM +0100, Max Reitz wrote:
+> On 2017-12-05 11:31, Alberto Garcia wrote:
+> > On Mon 04 Dec 2017 07:26:02 PM CET, Max Reitz wrote:
+> >>>> +static void curl_refresh_filename(BlockDriverState *bs)
+> >>>> +{
+> >>>> +    BDRVCURLState *s = bs->opaque;
+> >>>> +
+> >>>> +    if (!s->sslverify || s->cookie ||
+> >>>> +        s->username || s->password || s->proxyusername || s->proxypassword)
+> >>>> +    {
+> >>>
+> >>> Is !s->sslverify negative because that setting is true by default?
 > >>
-> >> I encountered a qemu-nbd segfault, finally I found it was caused by
-> >> NULL bs-drv,  which is located in block/io.c function bdrv_co_flush
-> >> line 2377:
-> >>
-> >> https://git.qemu.org/?p=3Dqemu.git;a=3Dblob;f=3Dblock/io.c;h=3D4fdf93a=
-0144fa4761a14b8cc6b2a9a6b6e5d5bec;hb=3Dd470ad42acfc73c45d3e8ed5311a491160b4=
-c100#l2377
-> >>
-> >> It is before the patch at line 2402, so the patch needs to be updated
-> >> to fix NULL bs-drv at line 2337.
-> >>
-> >> https://lists.gnu.org/archive/html/qemu-devel/2017-11/msg03425.html
-> >=20
-> > Can you please post a full backtrace? Do you see any error message
-> > on stderr before the process crashes?
-> >=20
-> > I don't see at the moment how this can happen, except the case that Max
-> > mentioned where bs->drv =3D NULL is set when an image corruption is
-> > detected - this involves an error message, though.
-> >=20
-> > We check bdrv_is_inserted() as the first thing, which includes a NULL
-> > check for bs->drv. So it must have been non-NULL at the start of the
-> > function and then become NULL. I suppose this can theoretically happen
-> > in qemu_co_queue_wait() if another flush request detects image
-> > corruption.
-> >=20
-> > Max: I think bs->drv =3D NULL in the middle of a request was a stupid
-> > idea. In fact, it's already a stupid idea to have any BDS with
-> > bs->drv =3D NULL. Maybe it would be better to schedule a BH that replac=
-es
-> > the qcow2 node with a dummy node (null-co?) and properly closes the
-> > qcow2 one.
->=20
-> Yes, that is an idea John had, too.  It sounded good to me (we'd just
-> need to add a new flag to null-co so it would respond with -ENOMEDIUM to
-> all requests or something)...  The only issue I had is how that would
-> work together with the GRAPH_MOD op blocker.
+> >> Yes, exactly.  If it's false, you'd need to override it (and you can't
+> >> do that through a plain filename).
+> > 
+> > I think this is not the only case in this series, but I'm not very
+> > comfortable with the idea that this condition and the default value of
+> > the setting are implicity dependent on each other. If you change one and
+> > forget to change the other things will break.
+> 
+> Well, yes, but...
+> 
+> > I understand that the default value is never supposed to change so in
+> > practice I don't see this breaking,
+> 
+> Yes.
+> 
+> >                                     but is it perhaps worth adding tests
+> > for all these cases?
+> 
+> In theory, sure.  In practice, adding a curl test case seems hard.
+> 
+> Well, I could connect to, I don't know, qemu.org or something and then
+> just test things there (with the index used as a raw image), but if I
+> add one test for the curl protocol, nobody is ever going to run them...
+> And in theory, that's not how a curl test should work.  In theory, you'd
+> expect the user to set up a localhost server with some known root
+> directory and then _make_test_img etc. would set up images there.  But
+> that way, really nobody is ever going to run them.
 
-In order to answer this question, I'd first have to understand what
-GRAPH_MOD is even supposed to mean and which operations it needs to
-protect. There aren't currently any users of GRAPH_MOD.
+For qemu I/O tests I would suggest just having the iotest spin up a simple
+http server in Python - there's standard APIs in python that make this
+pretty trivial
 
-Kevin
+  http://www.pythonforbeginners.com/modules-in-python/how-to-use-simplehttpserver/
 
---dc+cDN39EJAMEtIO
-Content-Type: application/pgp-signature; name="signature.asc"
+That way curl could be reliably tested without any special setup by the
+developer
 
------BEGIN PGP SIGNATURE-----
-
-iQIcBAEBAgAGBQJaKpjrAAoJEH8JsnLIjy/WjBcQAIp04GUUFmFZcn4/to187o7s
-wEA1UEjRwCnm4uuCKmZvyboF+yj+ZGQFFtMr0BUPjpa/VAOk1GVnRvjlbroWg5Mc
-7k/F42JjauFgJfVJk4DEhNNUitsoLcedeqCb2H16F9ul2uZGIebCsIreiznVzefA
-JR1mqgscX2aef025o7RWcvrZhsyIEb/XZFXQwzEM2kyeMbt5r1vRLF5sLuAdz3Yf
-srD9kmDIDhMHDHop4ndSissEFLn/uoQcSNiwEvQHco9gH87TmJpIgMBSjw/6zUl5
-4qKcXpW3L3yh/TMbItnXU4nksCGzd6uoHjlfbOK8cnrigzn12uLcewQkbkawwWuD
-VO5Ai1ylIBGekkKj0DX80ZGkl6CSmfWTg16B+t0HP4DcItmiQHHadsXqx6o42FSY
-wYVgNY/OGUzq0VE9pexNUs4i9Un8vb8/jBnRh2XqukpSAxlHC3QrpxY4DUstsoKq
-cN9AaNGH6AeRqKg/gSmtcRr8Y5pJj2QRNH8vP1a66pmwfU15hxYAoRHxUrkse//u
-PJ6DZYz+prArLneM1K0XAhhnl/7Y7OzNPduJsDZjhLoP4vJ8sz24jVL8f+nAKj9i
-IX6UQAkgKKhrJftqn9DuJyl0TbEs9iEo2LbClQl4EeS4Rwqdw3q5gPfIrD/Jo0/6
-e9GSHuTc6iNDbgThU8Al
-=ZN8c
------END PGP SIGNATURE-----
-
---dc+cDN39EJAMEtIO--
+Regards,
+Daniel
+-- 
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
