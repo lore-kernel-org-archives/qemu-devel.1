@@ -1,20 +1,15 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56863)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58083)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1eNIis-0008FK-9P
-	for qemu-devel@nongnu.org; Fri, 08 Dec 2017 08:29:51 -0500
+	(envelope-from <berrange@redhat.com>) id 1eNInQ-0001UK-Jz
+	for qemu-devel@nongnu.org; Fri, 08 Dec 2017 08:34:33 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1eNIir-0007xz-H8
-	for qemu-devel@nongnu.org; Fri, 08 Dec 2017 08:29:50 -0500
-Date: Fri, 8 Dec 2017 14:29:36 +0100
-From: Kevin Wolf <kwolf@redhat.com>
-Message-ID: <20171208132936.GB4217@localhost.localdomain>
-References: <20171206144550.22295-1-stefanha@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20171206144550.22295-1-stefanha@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v2 0/9] blockdev: fix QMP 'transaction'
- with IOThreads
+	(envelope-from <berrange@redhat.com>) id 1eNInP-00024Y-Mu
+	for qemu-devel@nongnu.org; Fri, 08 Dec 2017 08:34:32 -0500
+From: "Daniel P. Berrange" <berrange@redhat.com>
+Date: Fri,  8 Dec 2017 13:34:16 +0000
+Message-Id: <20171208133416.28978-1-berrange@redhat.com>
+Subject: [Qemu-devel] [PATCH v2] qemu-io: fix EOF Ctrl-D handling in qemu-io
+ readline code
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,37 +18,88 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefan Hajnoczi <stefanha@redhat.com>
-Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, John Snow <jsnow@redhat.com>
+To: qemu-devel@nongnu.org
+Cc: qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>, Eric Blake <eblake@redhat.com>, Max Reitz <mreitz@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, "Daniel P. Berrange" <berrange@redhat.com>
 
-Am 06.12.2017 um 15:45 hat Stefan Hajnoczi geschrieben:
-> v2:
->  * Use StrOrNull for x-blockdev-set-iothread iothread argument [eblake]
-> 
-> (This is for QEMU 2.12 because this bug is not -rc4 critical)
-> 
-> Previously AioContext was held across QMP 'transaction' in an attempt to
-> achieve bdrv_drained_begin/end() semantics.  Nowadays we have
-> bdrv_drained_begin/end() and the AioContext lock just protects state.
-> Therefore there is no reason to hold AioContext across
-> .prepare/.commit/.abort/.clean() anymore.
-> 
-> Besides being cleanup-worthy, holding AioContext also exposes a bug:
-> BDRV_POLL_WHILE() doesn't support recursive AioContext locking and will hang if
-> depth > 1.  This is easy to trigger by submitting a transaction with 2 actions
-> that touch two drives assigned to an IOThread.  The IOThread's AioContext will
-> be locked twice and BDRV_POLL_WHILE() will hang.
-> 
-> BDRV_POLL_WHILE() is best fixed by eliminating the AioContext lock entirely in
-> favor of fine-grained locking.  I discussed some fixes for BDRV_POLL_WHILE()
-> with Paolo but we came to the conclusion that it will just add complexity when
-> we really want to stop using AioContext locking.
+qemu-io puts the TTY into non-canonical mode, which means no EOF processing is
+done and thus getchar() will never return the EOF constant. Instead we have to
+query the TTY attributes to determine the configured EOF character (usually
+Ctrl-D / 0x4), and then explicitly check for that value. This fixes the
+regression that prevented Ctrl-D from triggering an exit of qemu-io that has
+existed since readline was first added in
 
-Reviewed-by: Kevin Wolf <kwolf@redhat.com>
+  commit 0cf17e181798063c3824c8200ba46f25f54faa1a
+  Author: Stefan Hajnoczi <stefanha@redhat.com>
+  Date:   Thu Nov 14 11:54:17 2013 +0100
 
-The only thing that I see that could use some improvements is the test
-case, which tests only a small part of the bugs that are fixed by this
-series. This doesn't invalidate any of the review, but I think without
-full test coverage, it's incomplete.
+    qemu-io: use readline.c
 
-Kevin
+Signed-off-by: Daniel P. Berrange <berrange@redhat.com>
+---
+Changed in v2:
+
+  - Query termios settings for EOF character
+
+ qemu-io.c | 26 +++++++++++++++++++++++++-
+ 1 file changed, 25 insertions(+), 1 deletion(-)
+
+diff --git a/qemu-io.c b/qemu-io.c
+index c70bde3eb1..fa4972d734 100644
+--- a/qemu-io.c
++++ b/qemu-io.c
+@@ -10,6 +10,9 @@
+ #include "qemu/osdep.h"
+ #include <getopt.h>
+ #include <libgen.h>
++#ifndef _WIN32
++#include <termios.h>
++#endif
+ 
+ #include "qapi/error.h"
+ #include "qemu-io.h"
+@@ -41,6 +44,26 @@ static bool imageOpts;
+ 
+ static ReadLineState *readline_state;
+ 
++static int ttyEOF;
++
++static int get_eof_char(void)
++{
++#ifdef _WIN32
++    return 0x4; /* Ctrl-D */
++#else
++    struct termios tty;
++    if (tcgetattr(STDIN_FILENO, &tty) != 0) {
++        if (errno == ENOTTY) {
++            return 0x0; /* just expect read() == 0 */
++        } else {
++            return 0x4; /* Ctrl-D */
++        }
++    }
++
++    return tty.c_cc[VEOF];
++#endif
++}
++
+ static int close_f(BlockBackend *blk, int argc, char **argv)
+ {
+     blk_unref(qemuio_blk);
+@@ -322,7 +345,7 @@ static char *fetchline_readline(void)
+     readline_start(readline_state, get_prompt(), 0, readline_func, &line);
+     while (!line) {
+         int ch = getchar();
+-        if (ch == EOF) {
++        if (ttyEOF != 0x0 && ch == ttyEOF) {
+             break;
+         }
+         readline_handle_byte(readline_state, ch);
+@@ -592,6 +615,7 @@ int main(int argc, char **argv)
+     qemuio_add_command(&close_cmd);
+ 
+     if (isatty(STDIN_FILENO)) {
++        ttyEOF = get_eof_char();
+         readline_state = readline_init(readline_printf_func,
+                                        readline_flush_func,
+                                        NULL,
+-- 
+2.14.3
