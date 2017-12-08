@@ -1,42 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52560)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53982)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <borntraeger@de.ibm.com>) id 1eNIQ7-0007aR-JL
-	for qemu-devel@nongnu.org; Fri, 08 Dec 2017 08:10:28 -0500
+	(envelope-from <imammedo@redhat.com>) id 1eNIVv-0000gR-Ru
+	for qemu-devel@nongnu.org; Fri, 08 Dec 2017 08:16:28 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <borntraeger@de.ibm.com>) id 1eNIQ4-0002pg-Sz
-	for qemu-devel@nongnu.org; Fri, 08 Dec 2017 08:10:27 -0500
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:59730)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <borntraeger@de.ibm.com>)
-	id 1eNIQ4-0002o9-Gn
-	for qemu-devel@nongnu.org; Fri, 08 Dec 2017 08:10:24 -0500
-Received: from pps.filterd (m0098404.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
-	vB8D9kIU118881
-	for <qemu-devel@nongnu.org>; Fri, 8 Dec 2017 08:10:23 -0500
-Received: from e06smtp12.uk.ibm.com (e06smtp12.uk.ibm.com [195.75.94.108])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2equ7y8n5e-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Fri, 08 Dec 2017 08:10:19 -0500
-Received: from localhost
-	by e06smtp12.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
-	Only! Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <borntraeger@de.ibm.com>;
-	Fri, 8 Dec 2017 13:00:05 -0000
-References: <20171207153141.15523-1-david@redhat.com>
-	<20171207153141.15523-5-david@redhat.com>
-	<2e29bd7a-d0d2-bafd-0579-9c8235727c4c@twiddle.net>
-	<b17be673-28ab-98bb-1367-76f7f97157f1@redhat.com>
-From: Christian Borntraeger <borntraeger@de.ibm.com>
-Date: Fri, 8 Dec 2017 14:00:01 +0100
+	(envelope-from <imammedo@redhat.com>) id 1eNIVt-0007ZC-72
+	for qemu-devel@nongnu.org; Fri, 08 Dec 2017 08:16:27 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:48940)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1eNIVt-0007YS-0l
+	for qemu-devel@nongnu.org; Fri, 08 Dec 2017 08:16:25 -0500
+Date: Fri, 8 Dec 2017 14:16:18 +0100
+From: Igor Mammedov <imammedo@redhat.com>
+Message-ID: <20171208141618.11e60846@redhat.com>
+In-Reply-To: <CAFEAcA9Uh9f3UddCNiB3u6BD9Qg=sUMDmMYYn1+sryiJUMOFYg@mail.gmail.com>
+References: <CAFEAcA-auykOKQbNcoQooNGk7Vb3wt7TH7AMA689xEj22_6KcQ@mail.gmail.com>
+	<20171207174832.42663bef@redhat.com>
+	<CAFEAcA9o-LyKZBZwSoz3SSPCY-sjo9e011UWy1=EwJ4U9rWYsg@mail.gmail.com>
+	<20171207170719.GT3037@localhost.localdomain>
+	<CAFEAcA9fzkedj_VLeTaK-WOTLGk1RinyadRmR5FaJ44KOAQU3w@mail.gmail.com>
+	<CAFEAcA9Uh9f3UddCNiB3u6BD9Qg=sUMDmMYYn1+sryiJUMOFYg@mail.gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <b17be673-28ab-98bb-1367-76f7f97157f1@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-Message-Id: <aea6fca2-0c82-1edf-26fa-7c50ce3db4ea@de.ibm.com>
-Subject: Re: [Qemu-devel] [PATCH v2 for-2.12 4/5] s390x/tcg: indicate value
- of TODPR in STCKE
+Subject: Re: [Qemu-devel] in a device or CPU instance init/realize,
+ can I rely on something having the BQL or equivalent?
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -45,23 +32,50 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Hildenbrand <david@redhat.com>, Richard Henderson <rth@twiddle.net>, qemu-s390x@nongnu.org, qemu-devel@nongnu.org
-Cc: Cornelia Huck <cohuck@redhat.com>, Alexander Graf <agraf@suse.de>
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: Eduardo Habkost <ehabkost@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>
 
+On Thu, 7 Dec 2017 17:26:53 +0000
+Peter Maydell <peter.maydell@linaro.org> wrote:
 
-
-On 12/08/2017 01:45 PM, David Hildenbrand wrote:
-> On 08.12.2017 01:02, Richard Henderson wrote:
->> On 12/07/2017 07:31 AM, David Hildenbrand wrote:
->>> +    /* 16 bit value store in an uint32_t (only valid bits set) */
->>> +    tcg_gen_ld32u_i64(todpr, cpu_env, offsetof(CPUS390XState, todpr));
->>
->> Any reason not to use a uint16_t and use tcg_gen_ld16u_i64 here?
->>
+> On 7 December 2017 at 17:13, Peter Maydell <peter.maydell@linaro.org> wrote:
+> > On 7 December 2017 at 17:07, Eduardo Habkost <ehabkost@redhat.com> wrote:  
+> >> On Thu, Dec 07, 2017 at 04:53:59PM +0000, Peter Maydell wrote:  
+> >>> On 7 December 2017 at 16:48, Igor Mammedov <imammedo@redhat.com> wrote:  
+> >>> > On Thu, 7 Dec 2017 16:05:50 +0000
+> >>> > Peter Maydell <peter.maydell@linaro.org> wrote:
+> >>> >  
+> >>> >> Hi; I'm currently writing '-cpu max' support for ARM. For that I'd
+> >>> >> like to be able to do the "probe host kernel for its supported feature
+> >>> >> set" in the CPU object's instance-init function, but I'd like to do  
+> >>
+> >> I don't think instance_init is appropriate for that, as
+> >> object_free(object_new(t)) must be always safe to call and free
+> >> of side-effects for all types.  Wouldn't it work if you do that
+> >> on realize?  
+> >
+> > I think we need the information before realize, but I'll double
+> > check.  
 > 
-> Yes, KVM introduced and uses this field. As it is used for migration, we
-> cannot easily change it. (any maybe it was designed that way for future
-> changes)
+> We do need the information before realize, because the probe
+> is what tells us what feature bits we need to set, and the
+> ARM instance_post_init hook needs to look at those to determine
+> eg which other feature bits to set and which QOM properties to
+> expose as a result, and all that has to happen at init time,
+> not realize time.
+maybe it could be modeled after  kvm_ppc_register_host_cpu_type(),
+i.e. create type with necessary feature bits set at cpu's class
+init time (sort of combo of what ppc and x86 do).
 
-FWIW, if you look at the POP the TOD programmable register is 32bit (of which
-bits 0-15 in IBM speak) are 0.
+i.e. one caches host's feature bits at cpu_class_init time and
+then loads applies them to object instance at instance init time,
+like in x86_cpu_initfn()->x86_cpu_load_def().
+
+TBH:
+ I do not recall why we have x86 max/host cpu types do feature
+ loading at realize time instead of at class init like the rest
+ of static cpu types.
+
+
+> thanks
+> -- PMM
