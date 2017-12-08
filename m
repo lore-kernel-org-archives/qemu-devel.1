@@ -1,26 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55978)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35272)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1eNAFl-00088w-HQ
-	for qemu-devel@nongnu.org; Thu, 07 Dec 2017 23:27:14 -0500
+	(envelope-from <yang.zhong@intel.com>) id 1eNB0T-0000UB-Oy
+	for qemu-devel@nongnu.org; Fri, 08 Dec 2017 00:15:30 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1eNAFk-0005U1-PX
-	for qemu-devel@nongnu.org; Thu, 07 Dec 2017 23:27:13 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:44378)
+	(envelope-from <yang.zhong@intel.com>) id 1eNB0P-0002Qa-B7
+	for qemu-devel@nongnu.org; Fri, 08 Dec 2017 00:15:29 -0500
+Received: from mga17.intel.com ([192.55.52.151]:59335)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1eNAFk-0005Tr-JY
-	for qemu-devel@nongnu.org; Thu, 07 Dec 2017 23:27:12 -0500
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
-	[10.5.11.16])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id C65B57970A
-	for <qemu-devel@nongnu.org>; Fri,  8 Dec 2017 04:27:11 +0000 (UTC)
-From: Peter Xu <peterx@redhat.com>
-Date: Fri,  8 Dec 2017 12:26:54 +0800
-Message-Id: <20171208042654.10910-3-peterx@redhat.com>
-In-Reply-To: <20171208042654.10910-1-peterx@redhat.com>
-References: <20171208042654.10910-1-peterx@redhat.com>
-Subject: [Qemu-devel] [PATCH 2/2] intel_iommu: fix error param in string
+	(Exim 4.71) (envelope-from <yang.zhong@intel.com>)
+	id 1eNB0P-0002Pw-1S
+	for qemu-devel@nongnu.org; Fri, 08 Dec 2017 00:15:25 -0500
+Date: Fri, 8 Dec 2017 13:14:41 +0800
+From: Yang Zhong <yang.zhong@intel.com>
+Message-ID: <20171208051441.GA8672@yangzhon-Virtual>
+References: <1511419276-31212-1-git-send-email-yang.zhong@intel.com>
+	<CAJ+F1C+CHLLncN9uWS9wHQ7vAk26Y98TKJ38RZtrtbFEPdO57Q@mail.gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <CAJ+F1C+CHLLncN9uWS9wHQ7vAk26Y98TKJ38RZtrtbFEPdO57Q@mail.gmail.com>
+Subject: Re: [Qemu-devel] [PATCH v2] rcu: reduce more than 7MB heap memory
+ by malloc_trim()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,28 +30,65 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: "Michael S . Tsirkin" <mst@redhat.com>, peterx@redhat.com, Jason Wang <jasowang@redhat.com>
+To: =?iso-8859-1?Q?Marc-Andr=E9?= Lureau <marcandre.lureau@gmail.com>
+Cc: qemu-devel@nongnu.org, stefanha@redhat.com, pbonzini@redhat.com, berrange@redhat.com, weidong.huang@huawei.com, arei.gonglei@huawei.com, liujunjie23@huawei.com, wangxinxin.wang@huawei.com, stone.xulei@huawei.com, zhaoshenglong@huawei.com, yang.zhong@intel.com
 
-It should be caching-mode.  It may confuse people when it pops up.
+On Thu, Dec 07, 2017 at 04:33:10PM +0100, Marc-André Lureau wrote:
+> Hi
+> 
+> On Thu, Nov 23, 2017 at 7:41 AM, Yang Zhong <yang.zhong@intel.com> wrote:
+> > Since there are some issues in memory alloc/free machenism
+> > in glibc for little chunk memory, if Qemu frequently
+> > alloc/free little chunk memory, the glibc doesn't alloc
+> > little chunk memory from free list of glibc and still
+> > allocate from OS, which make the heap size bigger and bigger.
+> >
+> > This patch introduce malloc_trim(), which will free heap memory.
+> >
+> > Below are test results from smaps file.
+> > (1)without patch
+> > 55f0783e1000-55f07992a000 rw-p 00000000 00:00 0  [heap]
+> > Size:              21796 kB
+> > Rss:               14260 kB
+> > Pss:               14260 kB
+> >
+> > (2)with patch
+> > 55cc5fadf000-55cc61008000 rw-p 00000000 00:00 0  [heap]
+> > Size:              21668 kB
+> > Rss:                6940 kB
+> > Pss:                6940 kB
+> 
+> Have you opened a bug to glibc malloc (or discussed that issue with
+> the glibc malloc developpers) ?
+> 
+> Or is there a justification that qemu should have its own trim
+> heuristic on top of malloc?
 
-Signed-off-by: Peter Xu <peterx@redhat.com>
----
- hw/i386/intel_iommu.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/hw/i386/intel_iommu.c b/hw/i386/intel_iommu.c
-index c1fa08d205..fe15d3ba84 100644
---- a/hw/i386/intel_iommu.c
-+++ b/hw/i386/intel_iommu.c
-@@ -2327,7 +2327,7 @@ static void vtd_iommu_notify_flag_changed(IOMMUMemoryRegion *iommu,
-     IntelIOMMUNotifierNode *next_node = NULL;
+  Hello Marc-Andr,
  
-     if (!s->caching_mode && new & IOMMU_NOTIFIER_MAP) {
--        error_report("We need to set cache_mode=1 for intel-iommu to enable "
-+        error_report("We need to set caching-mode=1 for intel-iommu to enable "
-                      "device assignment with IOMMU protection.");
-         exit(1);
-     }
--- 
-2.14.3
+  Thanks for your comments!
+  I did not open a bug for glibc community, maybe this issue is not new
+  issue for them because there are lots of complains about malloc/free 
+  issues in the internet. If need, i can file this bug to them.
+
+  Qemu(v2.3) introduce the rcu mechanism for VM performance, but the side 
+  effect is heap memory never shrink like below case
+  http://lists.nongnu.org/archive/html/qemu-devel/2017-11/msg02748.html 
+  
+  Glibc let free memory in their free list for next malloc, but the fact 
+  is glibc still allocate memory from OS in Qemu. There are lots of memory 
+  hole in the heap, escepially the batch malloc and free with rcu mechanism,
+  which made heap memory bigger and bigger, and never shrink.
+
+  from the test by mallinfo() and malloc_trim(), i found malloc_trim() not
+  only trim heap top free memory, but also can free hole memory in the heap.
+  
+  This is V2 patch thread and we are talking in V3 patch thread now.
+  http://lists.nongnu.org/archive/html/qemu-devel/2017-11/msg04519.html
+
+  Regards,
+
+  Yang
+ 
+
+> Marc-André Lureau
