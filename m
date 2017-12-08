@@ -1,24 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44642)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46080)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <sstabellini@kernel.org>) id 1eNRWV-0005jU-QK
-	for qemu-devel@nongnu.org; Fri, 08 Dec 2017 17:53:41 -0500
+	(envelope-from <brijesh.singh@amd.com>) id 1eNRaD-0008NL-7t
+	for qemu-devel@nongnu.org; Fri, 08 Dec 2017 17:57:30 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <sstabellini@kernel.org>) id 1eNRWR-0004vu-R5
-	for qemu-devel@nongnu.org; Fri, 08 Dec 2017 17:53:39 -0500
-Received: from mail.kernel.org ([198.145.29.99]:40350)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <sstabellini@kernel.org>)
-	id 1eNRWR-0004v5-L1
-	for qemu-devel@nongnu.org; Fri, 08 Dec 2017 17:53:35 -0500
-Date: Fri, 8 Dec 2017 14:53:33 -0800 (PST)
-From: Stefano Stabellini <sstabellini@kernel.org>
-In-Reply-To: <20171028025315.13500-1-hw42@ipsumj.de>
-Message-ID: <alpine.DEB.2.10.1712081453230.8052@sstabellini-ThinkPad-X260>
-References: <20171028025315.13500-1-hw42@ipsumj.de>
+	(envelope-from <brijesh.singh@amd.com>) id 1eNRa9-0007ni-9R
+	for qemu-devel@nongnu.org; Fri, 08 Dec 2017 17:57:29 -0500
+Received: from mail-by2nam03on0071.outbound.protection.outlook.com
+	([104.47.42.71]:32000
+	helo=NAM03-BY2-obe.outbound.protection.outlook.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <brijesh.singh@amd.com>)
+	id 1eNRa8-0007mD-Ti
+	for qemu-devel@nongnu.org; Fri, 08 Dec 2017 17:57:25 -0500
+References: <20171206200346.116537-1-brijesh.singh@amd.com>
+	<20171206200346.116537-2-brijesh.singh@amd.com>
+	<CAFEAcA8UvBopec1ammRML+fgh36YLfRyg2wsgmzesmAUFy8H3w@mail.gmail.com>
+	<7e7b6c05-68de-c4f8-6163-53588a6d545e@amd.com>
+	<CAFEAcA_A9c3QMOJeHK+gyTpwkxo0hpkU9jhCdvQnpfbGBw+Wfg@mail.gmail.com>
+From: Brijesh Singh <brijesh.singh@amd.com>
+Message-ID: <053109e5-3b12-b76c-7d87-5f1e4941ebed@amd.com>
+Date: Fri, 8 Dec 2017 16:57:13 -0600
 MIME-Version: 1.0
-Content-Type: TEXT/PLAIN; charset=US-ASCII
-Subject: Re: [Qemu-devel] [PATCH] xen/pt: Set is_express to avoid
- out-of-bounds write
+In-Reply-To: <CAFEAcA_A9c3QMOJeHK+gyTpwkxo0hpkU9jhCdvQnpfbGBw+Wfg@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Content-Language: en-US
+Subject: Re: [Qemu-devel] [PATCH v5 01/23] memattrs: add debug attribute
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,65 +34,42 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Simon Gaiser <hw42@ipsumj.de>
-Cc: qemu-devel@nongnu.org, Anthony Perard <anthony.perard@citrix.com>, xen-devel@lists.xenproject.org, Stefano Stabellini <sstabellini@kernel.org>
-
-On Sat, 28 Oct 2017, Simon Gaiser wrote:
-> The passed-through device might be an express device. In this case the
-> old code allocated a too small emulated config space in
-> pci_config_alloc() since pci_config_size() returned the size for a
-> non-express device. This leads to an out-of-bound write in
-> xen_pt_config_reg_init(), which sometimes results in crashes. So set
-> is_express as already done for KVM in vfio-pci.
-> 
-> Shortened ASan report:
-> 
-> ==17512==ERROR: AddressSanitizer: heap-buffer-overflow on address 0x611000041648 at pc 0x55e0fdac51ff bp 0x7ffe4af07410 sp 0x7ffe4af07408
-> WRITE of size 2 at 0x611000041648 thread T0
->     #0 0x55e0fdac51fe in memcpy /usr/include/x86_64-linux-gnu/bits/string3.h:53
->     #1 0x55e0fdac51fe in stw_he_p include/qemu/bswap.h:330
->     #2 0x55e0fdac51fe in stw_le_p include/qemu/bswap.h:379
->     #3 0x55e0fdac51fe in pci_set_word include/hw/pci/pci.h:490
->     #4 0x55e0fdac51fe in xen_pt_config_reg_init hw/xen/xen_pt_config_init.c:1991
->     #5 0x55e0fdac51fe in xen_pt_config_init hw/xen/xen_pt_config_init.c:2067
->     #6 0x55e0fdabcf4d in xen_pt_realize hw/xen/xen_pt.c:830
->     #7 0x55e0fdf59666 in pci_qdev_realize hw/pci/pci.c:2034
->     #8 0x55e0fdda7d3d in device_set_realized hw/core/qdev.c:914
-> [...]
-> 
-> 0x611000041648 is located 8 bytes to the right of 256-byte region [0x611000041540,0x611000041640)
-> allocated by thread T0 here:
->     #0 0x7ff596a94bb8 in __interceptor_calloc (/usr/lib/x86_64-linux-gnu/libasan.so.4+0xd9bb8)
->     #1 0x7ff57da66580 in g_malloc0 (/lib/x86_64-linux-gnu/libglib-2.0.so.0+0x50580)
->     #2 0x55e0fdda7d3d in device_set_realized hw/core/qdev.c:914
-> [...]
-> 
-> Signed-off-by: Simon Gaiser <hw42@ipsumj.de>
-
-Acked-by: Stefano Stabellini <sstabellini@kernel.org>
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: brijesh.singh@amd.com, QEMU Developers <qemu-devel@nongnu.org>, Alistair Francis <alistair.francis@xilinx.com>, Christian Borntraeger <borntraeger@de.ibm.com>, Cornelia Huck <cornelia.huck@de.ibm.com>, "Daniel P . Berrange" <berrange@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, "Edgar E . Iglesias" <edgar.iglesias@xilinx.com>, Eduardo Habkost <ehabkost@redhat.com>, Eric Blake <eblake@redhat.com>, kvm-devel <kvm@vger.kernel.org>, Marcel Apfelbaum <marcel@redhat.com>, Markus Armbruster <armbru@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Richard Henderson <richard.henderson@linaro.org>, Richard Henderson <rth@twiddle.net>, Stefan Hajnoczi <stefanha@gmail.com>, Thomas Lendacky <Thomas.Lendacky@amd.com>, Borislav Petkov <bp@suse.de>
 
 
-> ---
-> 
-> I found this by debugging crashes and I'm not familiar with this code,
-> so I'm not sure if this has no unintended side effects.
-> 
->  hw/xen/xen_pt.c | 1 +
->  1 file changed, 1 insertion(+)
-> 
-> diff --git a/hw/xen/xen_pt.c b/hw/xen/xen_pt.c
-> index b6d71bb52a..90ffd45e7d 100644
-> --- a/hw/xen/xen_pt.c
-> +++ b/hw/xen/xen_pt.c
-> @@ -946,6 +946,7 @@ static void xen_pci_passthrough_class_init(ObjectClass *klass, void *data)
->      k->exit = xen_pt_unregister_device;
->      k->config_read = xen_pt_pci_read_config;
->      k->config_write = xen_pt_pci_write_config;
-> +    k->is_express = 1; /* We might be */
->      set_bit(DEVICE_CATEGORY_MISC, dc->categories);
->      dc->desc = "Assign an host PCI device with Xen";
->      dc->props = xen_pci_passthrough_properties;
-> -- 
-> 2.15.0.rc1
-> 
-> 
+
+On 12/8/17 3:55 AM, Peter Maydell wrote:
+>> If you give me example on how
+>> to trigger this type of request with debug=3D1 then I can look into the =
+code
+>> and see what we can do when memory encryption is enabled. The things lik=
+e
+>> read-clears-bits semantics will be tricky.
+> The question was really whether we want to make this a general
+> indicator of "this operation was triggered by a debugger" and
+> expand that to mean "don't do things that mess with the state
+> of the simulation unexpectedly", or if this is really a very
+> encrypted-memory specific thing.
+
+It can be used as a generic indicator that operation was triggered by a
+debugger. There is not anything encryption specific. Having said that,
+in the current patch series I have been only focused on making it work
+from the gdbstub and HMP point of view. The debug=3D1 from gdbstub and HMP
+is tested on both encrypted and non-encrypted guest. If we decide to
+extend to support other callers (device model etc) then we may need to
+update memory load/store functions defined in memory_ldst_inc.c to work
+with debug=3D1.
+
+> By the way, I don't think this:
+>
+>> /* Access the guest memory for debug purposes */
+>> #define MEMTXATTRS_DEBUG ((MemTxAttrs) { .debug =3D 1 })
+> is a great idea. Callers that care about the transaction
+> attributes should just specify them properly. MEMTXATTRS_UNSPECIFIED
+> is a fallback for the large set of places that don't care at all.
+
+OK, I will drop the macro and update the patches in the series to set
+MemTxAttr.debug =3D 1 when we do debugger request.=C2=A0 thanks
+
+--Brijesh
