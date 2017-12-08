@@ -1,31 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60368)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:32936)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1eNH6c-0001QU-LP
-	for qemu-devel@nongnu.org; Fri, 08 Dec 2017 06:46:15 -0500
+	(envelope-from <kwolf@redhat.com>) id 1eNH8L-00026B-IW
+	for qemu-devel@nongnu.org; Fri, 08 Dec 2017 06:48:02 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1eNH6X-0002ev-QX
-	for qemu-devel@nongnu.org; Fri, 08 Dec 2017 06:46:14 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:47346)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1eNH6X-0002dy-K4
-	for qemu-devel@nongnu.org; Fri, 08 Dec 2017 06:46:09 -0500
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
-	[10.5.11.15])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id B82F9BDF7
-	for <qemu-devel@nongnu.org>; Fri,  8 Dec 2017 11:46:08 +0000 (UTC)
-Date: Fri, 8 Dec 2017 11:46:01 +0000
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20171208114601.GK2403@work-vm>
-References: <20171201125813.1437-1-quintela@redhat.com>
-	<20171201125813.1437-7-quintela@redhat.com>
+	(envelope-from <kwolf@redhat.com>) id 1eNH8K-0004Ud-RW
+	for qemu-devel@nongnu.org; Fri, 08 Dec 2017 06:48:01 -0500
+Date: Fri, 8 Dec 2017 12:47:48 +0100
+From: Kevin Wolf <kwolf@redhat.com>
+Message-ID: <20171208114748.GA4217@localhost.localdomain>
+References: <20171208014456.16635-1-famz@redhat.com>
+	<20171208095412.GC23880@stefanha-x1.localdomain>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="n8g4imXOkfNTN/H1"
 Content-Disposition: inline
-In-Reply-To: <20171201125813.1437-7-quintela@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v3 6/6] [RFH] tests: Add migration compress
- threads tests
+In-Reply-To: <20171208095412.GC23880@stefanha-x1.localdomain>
+Subject: Re: [Qemu-devel] [Qemu-block] [PATCH v2] qemu-img: Document
+ --force-share / -U
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,96 +25,60 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Juan Quintela <quintela@redhat.com>
-Cc: qemu-devel@nongnu.org, lvivier@redhat.com, peterx@redhat.com
+To: Stefan Hajnoczi <stefanha@gmail.com>
+Cc: Fam Zheng <famz@redhat.com>, qemu-devel@nongnu.org, kchamart@redhat.com, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>
 
-* Juan Quintela (quintela@redhat.com) wrote:
-> Yeap, it is still not working. trying to learn how to debug threads
-> for guests running from the testt hardness.
-> 
-> For some reason, compression is not working at the moment, test is
-> disabled until I found why.
 
-How does it fail?
+--n8g4imXOkfNTN/H1
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-Dave
+Am 08.12.2017 um 10:54 hat Stefan Hajnoczi geschrieben:
+> On Fri, Dec 08, 2017 at 09:44:56AM +0800, Fam Zheng wrote:
+> > +@item --force-share (-U)
+> > +
+> > +If specified, @code{qemu-img} will open the image with shared permissi=
+ons,
+> > +which makes it less likely to conflict with a running guest's permissi=
+ons due
+> > +to image locking. For example, this can be used to get the image infor=
+mation
+> > +(with 'info' subcommand) when the image is used by a running guest. No=
+te that
+> > +this could produce inconsistent result because of concurrent metadata =
+changes,
+> > +etc.
+>=20
+> The documentation isn't clear on whether read-write is supported or just
+> read-only.
+>=20
+> Also, should it be declared a legacy option right away to discourage
+> use in new software?
 
-> Signed-off-by: Juan Quintela <quintela@redhat.com>
-> ---
->  tests/migration-test.c | 51 ++++++++++++++++++++++++++++++++++++++++++++++++++
->  1 file changed, 51 insertions(+)
-> 
-> diff --git a/tests/migration-test.c b/tests/migration-test.c
-> index 41dee78a9a..eab3b146a4 100644
-> --- a/tests/migration-test.c
-> +++ b/tests/migration-test.c
-> @@ -739,6 +739,54 @@ static void test_xbzrle_unix(void)
->      g_free(uri);
->  }
->  
-> +static void test_compress(const char *uri)
-> +{
-> +    QTestState *from, *to;
-> +
-> +    test_migrate_start(&from, &to, uri);
-> +
-> +    /* We want to pick a speed slow enough that the test completes
-> +     * quickly, but that it doesn't complete precopy even on a slow
-> +     * machine, so also set the downtime.
-> +     */
-> +    /* 100 ms */
-> +    migrate_set_parameter(from, "downtime-limit", "1");
-> +    /* 1MB/s slow*/
-> +    migrate_set_parameter(from, "max-bandwidth", "100000000");
-> +
-> +    migrate_set_parameter(from, "compress-threads", "4");
-> +    migrate_set_parameter(to, "decompress-threads", "3");
-> +
-> +    migrate_set_capability(from, "compress", "true");
-> +    migrate_set_capability(to, "compress", "true");
-> +    /* Wait for the first serial output from the source */
-> +    wait_for_serial("src_serial");
-> +
-> +    migrate(from, uri);
-> +
-> +    wait_for_migration_pass(from);
-> +
-> +    /* 300ms it should converge */
-> +    migrate_set_parameter(from, "downtime-limit", "300");
-> +
-> +    if (!got_stop) {
-> +        qtest_qmp_eventwait(from, "STOP");
-> +    }
-> +    qtest_qmp_eventwait(to, "RESUME");
-> +
-> +    wait_for_serial("dest_serial");
-> +    wait_for_migration_complete(from);
-> +
-> +    test_migrate_end(from, to);
-> +}
-> +
-> +static void test_compress_unix(void)
-> +{
-> +    char *uri = g_strdup_printf("unix:%s/migsocket", tmpfs);
-> +
-> +    test_compress(uri);
-> +    g_free(uri);
-> +}
->  
->  int main(int argc, char **argv)
->  {
-> @@ -763,6 +811,9 @@ int main(int argc, char **argv)
->      qtest_add_func("/migration/precopy/tcp", test_precopy_tcp);
->      qtest_add_func("/migration/postcopy/unix", test_postcopy);
->      qtest_add_func("/migration/xbzrle/unix", test_xbzrle_unix);
-> +    if (0) {
-> +        qtest_add_func("/migration/compress/unix", test_compress_unix);
-> +    }
->  
->      ret = g_test_run();
->  
-> -- 
-> 2.14.3
-> 
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+I don't think this is a legacy option. As long you know what you're
+doing, using it is fine.
+
+Kevin
+
+--n8g4imXOkfNTN/H1
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIcBAEBAgAGBQJaKnvkAAoJEH8JsnLIjy/WIwIQALYKNWbThfOseVUHZvhkB6qU
+2RhxMPIHCH2sM4pdVV7Ee/lJyaeYnxD0Gw+9EeZYinRpN9lfrPznB6P0dwP7LJcU
+2XxrQPc6BMuy4fGXxXnxLSgW9sk8edg9wrMgQkzR6zglw8j2d1/l4j1u7hBbTU7y
+JvL0kNBvH0aFyl3T+CAh+TKzIAM4WrcInYsNYSv3JuFMAVQkZfvWKNy35ibuBQaW
+LFXaaaLWcvQAw8TtgUVt4Z8cC3SqmlkqBbJuZAlPT4FqbbZDlU2DqSRLnXP0MvI6
+8kuqkMXKe4HltBEgo91UOcG4Uu45MawCtGnC0YdZQM/W9o7vjviz+9xcz2w26zRs
+N8+EpuU6SlhaAbvDawDeTy5R5llu5I+b3ol3bvshXqYZ5PYSp5cZ2wdatQ7Rk0Qx
+Fr1Pd8kaEeXGs1E1mllA/Az5VbKc2jwzpedQchZDpKud7AtEMmO7vgF/xYOIUQ3f
+OTX36l4eSV0Z6WMH/HY5ZfMx02bzUd/7r7YmJ6gc4b1pym7WBjeN555QnqwPip66
+O1/Cmw2+clxkcne4dE6bhRk6dCVrg+SmnQfsw5Sj0CeucxoWSblXL+l8B0DqiRNu
+5kM4Qr+6UiCIZlQGxsvlHlKdKoZ1GBsFtKDveGk99gnjMoEbBOEwwH9dqZgu7XmD
+XUlYUEfJ/UcFsIODNrPP
+=3QHL
+-----END PGP SIGNATURE-----
+
+--n8g4imXOkfNTN/H1--
