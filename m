@@ -1,22 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53785)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54471)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1eNKFb-0004kZ-7o
-	for qemu-devel@nongnu.org; Fri, 08 Dec 2017 10:07:44 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1eNKIS-0006Fc-8l
+	for qemu-devel@nongnu.org; Fri, 08 Dec 2017 10:10:41 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1eNKFa-00031g-9C
-	for qemu-devel@nongnu.org; Fri, 08 Dec 2017 10:07:43 -0500
-References: <1512733868-9009-1-git-send-email-pl@kamp.de>
-	<1512733868-9009-2-git-send-email-pl@kamp.de>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <08c489fc-84fa-93c6-022d-3e4d61b82ef2@redhat.com>
-Date: Fri, 8 Dec 2017 09:07:31 -0600
+	(envelope-from <peter.maydell@linaro.org>) id 1eNKIR-0005hy-Al
+	for qemu-devel@nongnu.org; Fri, 08 Dec 2017 10:10:40 -0500
+Received: from mail-ot0-x233.google.com ([2607:f8b0:4003:c0f::233]:40899)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1eNKIR-0005gc-6e
+	for qemu-devel@nongnu.org; Fri, 08 Dec 2017 10:10:39 -0500
+Received: by mail-ot0-x233.google.com with SMTP id e74so9395111ote.7
+	for <qemu-devel@nongnu.org>; Fri, 08 Dec 2017 07:10:39 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <1512733868-9009-2-git-send-email-pl@kamp.de>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="Pe3MHEONSkEtrcsGtbB6l2cdpOWCN9fWr"
-Subject: Re: [Qemu-devel] [PATCH 1/2] block/iscsi: dont leave allocmap in an
- invalid state on UNMAP failure
+In-Reply-To: <1512745328-5109-1-git-send-email-peter.maydell@linaro.org>
+References: <1512745328-5109-1-git-send-email-peter.maydell@linaro.org>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Fri, 8 Dec 2017 15:10:18 +0000
+Message-ID: <CAFEAcA9RmXV_Q4VML51422n2VGDewDqsi4BVe+Jb9YE9dCTf2A@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [Qemu-arm] [PATCH 0/3] hw/arm/virt: Add another
+ UART
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,72 +29,29 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Lieven <pl@kamp.de>, qemu-devel@nongnu.org, qemu-block@nongnu.org
-Cc: kwolf@redhat.com, qemu-stable@nongnu.org, mreitz@redhat.com, ronniesahlberg@gmail.com, pbonzini@redhat.com
+To: qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>
+Cc: "Jason A . Donenfeld" <Jason@zx2c4.com>, Shannon Zhao <zhaoshenglong@huawei.com>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---Pe3MHEONSkEtrcsGtbB6l2cdpOWCN9fWr
-From: Eric Blake <eblake@redhat.com>
-To: Peter Lieven <pl@kamp.de>, qemu-devel@nongnu.org, qemu-block@nongnu.org
-Cc: kwolf@redhat.com, qemu-stable@nongnu.org, mreitz@redhat.com,
- ronniesahlberg@gmail.com, pbonzini@redhat.com
-Message-ID: <08c489fc-84fa-93c6-022d-3e4d61b82ef2@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH 1/2] block/iscsi: dont leave allocmap in an
- invalid state on UNMAP failure
-References: <1512733868-9009-1-git-send-email-pl@kamp.de>
- <1512733868-9009-2-git-send-email-pl@kamp.de>
-In-Reply-To: <1512733868-9009-2-git-send-email-pl@kamp.de>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+On 8 December 2017 at 15:02, Peter Maydell <peter.maydell@linaro.org> wrote:
+> This patchset adds a second UART to the ARM virt board, which
+> can be useful in some cases where you'd like a second comms
+> channel but don't want have to deal with PCI to get it.
+>
+> Patch 3 attempts to add it to the ACPI tables, but this is
+> entirely untested and pure guesswork, since I don't really
+> know anything about ACPI. That patch needs review from
+> somebody who does know ACPI :-)
+>
+> thanks
+> -- PMM
+>
+> Peter Maydell (3):
+>   hw/arm/virt: Add virt-2.12 machine type
+>   hw/arm/virt: Add another UART to the virt board
+>   hw/arm/virt-acpi-build: Add second UART to ACPI tables
 
-On 12/08/2017 05:51 AM, Peter Lieven wrote:
-> we forgot to set the allocmap to invalid if an UNMAP call fails.
->=20
-> Cc: qemu-stable@nongnu.org
-> Signed-off-by: Peter Lieven <pl@kamp.de>
-> ---
->  block/iscsi.c | 8 ++++----
->  1 file changed, 4 insertions(+), 4 deletions(-)
->=20
+Oops, Shannon's linaro email in MAINTAINERS bounces; re-cc'ing
+with the huawei one.
 
-> @@ -1128,6 +1128,9 @@ retry:
->          goto retry;
->      }
-> =20
-> +    iscsi_allocmap_set_invalid(iscsilun, offset >> BDRV_SECTOR_BITS,
-> +                               bytes >> BDRV_SECTOR_BITS);
-> +
-
-Semantic conflict with my pending patches to convert the allocmap to
-byte-based:
-
-https://lists.gnu.org/archive/html/qemu-devel/2017-12/msg01253.html
-
-Reviewed-by: Eric Blake <eblake@redhat.com>
-
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
-
-
---Pe3MHEONSkEtrcsGtbB6l2cdpOWCN9fWr
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
-
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAloqqrMACgkQp6FrSiUn
-Q2qW8Qf+N90onrdGzZBCmoD2oGt06TEFgMHVocUF0DXGBnTKd8MlAsGl0j4D3NC7
-fwGr5ydwO8xRQdU3hO3TNJFPy0pFeftJ5vMXLFiigPtc+WJYwYI2XECAz6uZ6YtA
-HYiMoi2uGUNsOdhLvNfetV3H3NIBoIfKezrKEeb3bofyhQX78oIrxICwMVoZcFWu
-FEAvxxzur7IJuO/cI3C0NS1BJXQ7zDOzda8KNLcMQg83TGjmK9PioKpreKzU79kO
-eyzwydWFpvuFv00NiD41VA5f8x+m8nK1eZ1g2DSa0aOhQeO42czVsM3ikByuXwzr
-oCAcCIXFULYz1FpptsuDmhlifDjC7g==
-=t9iK
------END PGP SIGNATURE-----
-
---Pe3MHEONSkEtrcsGtbB6l2cdpOWCN9fWr--
+thanks
+-- PMM
