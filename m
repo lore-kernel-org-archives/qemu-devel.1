@@ -1,23 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57890)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58492)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1eNDIm-0008ND-8x
-	for qemu-devel@nongnu.org; Fri, 08 Dec 2017 02:42:33 -0500
+	(envelope-from <lprosek@redhat.com>) id 1eNDLg-00024x-5S
+	for qemu-devel@nongnu.org; Fri, 08 Dec 2017 02:45:33 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1eNDIl-0002iy-D7
-	for qemu-devel@nongnu.org; Fri, 08 Dec 2017 02:42:32 -0500
-From: Markus Armbruster <armbru@redhat.com>
-References: <20171207084453.23773-1-famz@redhat.com>
-	<20171207105827.5bqrsqbv7ljgmwc6@eukaryote>
-	<c49bb9b8-a314-88d2-841e-8748d32c6777@redhat.com>
-	<20171208014131.GA15798@lemon>
-Date: Fri, 08 Dec 2017 08:42:19 +0100
-In-Reply-To: <20171208014131.GA15798@lemon> (Fam Zheng's message of "Fri, 8
-	Dec 2017 09:41:31 +0800")
-Message-ID: <874lp1k6n8.fsf@dusky.pond.sub.org>
+	(envelope-from <lprosek@redhat.com>) id 1eNDLe-0005jI-Ba
+	for qemu-devel@nongnu.org; Fri, 08 Dec 2017 02:45:32 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:58784)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <lprosek@redhat.com>) id 1eNDLe-0005gs-4Z
+	for qemu-devel@nongnu.org; Fri, 08 Dec 2017 02:45:30 -0500
+From: Ladi Prosek <lprosek@redhat.com>
+Date: Fri,  8 Dec 2017 08:45:12 +0100
+Message-Id: <20171208074515.1553-2-lprosek@redhat.com>
+In-Reply-To: <20171208074515.1553-1-lprosek@redhat.com>
+References: <20171208074515.1553-1-lprosek@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [Qemu-block] [PATCH] qemu-img: Document
- --force-share / -U
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PATCH v3 1/4] ivshmem: Don't update non-existent MSI
+ routes
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,43 +27,91 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Fam Zheng <famz@redhat.com>
-Cc: Eric Blake <eblake@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org, Kashyap Chamarthy <kchamart@redhat.com>
+To: qemu-devel@nongnu.org
+Cc: pbonzini@redhat.com, geoff@hostfission.com, marcandre.lureau@redhat.com, armbru@redhat.com
 
-Fam Zheng <famz@redhat.com> writes:
+As of commit 660c97eef6f8 ("ivshmem: use kvm irqfd for msi notifications"=
+),
+QEMU crashes with:
 
-> On Thu, 12/07 10:53, Eric Blake wrote:
->> On 12/07/2017 04:58 AM, Kashyap Chamarthy wrote:
->> > On Thu, Dec 07, 2017 at 04:44:53PM +0800, Fam Zheng wrote:
-[...]
->> >> +it less likely to conflict with a running guest's permissions due to image
->> >> +locking. For example, this can be used to get the image information (with
->> >> +'info' subcommand) when the image is used by a running guest. Note that this
->> >> +could produce inconsistent result because of concurrent metadata changes, etc..
->> > 
->> > Super nit-pick:  an ellipsis[*] is three dots :-), so, when applying you
->> > might want to: s/../.../
->> > 
->> > [*] https://dictionary.cambridge.org/dictionary/english/ellipsis
->> 
->> Except that both "etc." and "..." independently convey a sense of
->> continuation, which means that using both at once is both redundant
->> (just one will do) and difficult to argue how to typeset (since 'etc.'
->> is often written with an explicit '.' to emphasize that is an
->> abbreviation, does that mean you have to write 'etc.''...' for a total
->> of 4 dots?).
->
-> I have the impression that "etc." is more correct than "etc"
+  kvm_irqchip_commit_routes: Assertion `ret =3D=3D 0' failed.
 
-It is.
+if the ivshmem device is configured with more vectors than what the serve=
+r
+supports. This is caused by the ivshmem_vector_unmask() being called on
+vectors that have not been initialized by ivshmem_add_kvm_msi_virq().
 
->                                                              so I used even at
-> the end of the sensence where there is another period '.', making it "etc..".
+This commit fixes it by adding a simple check to the mask and unmask
+callbacks.
 
-That's wrong all the same :)
+Note that the opposite mismatch, if the server supplies more vectors than
+what the device is configured for, is already handled and leads to output
+like:
 
-https://en.wikipedia.org/wiki/Period_(punctuation)#Abbreviations
+  Too many eventfd received, device has 1 vectors
 
-> If ending the paragraph with "etc." is enough, we can drop one ".".
+To reproduce the assert, run:
 
-Please do.
+  ivshmem-server -n 0
+
+and QEMU with:
+
+  -device ivshmem-doorbell,chardev=3Div
+  -chardev socket,path=3D/tmp/ivshmem_socket,id=3Div
+
+then load the Windows driver, at the time of writing available at:
+
+https://github.com/virtio-win/kvm-guest-drivers-windows/tree/master/ivshm=
+em
+
+The issue is believed to have been masked by other guest drivers, notably
+Linux ones, not enabling MSI-X on the device.
+
+Fixes: 660c97eef6f8 ("ivshmem: use kvm irqfd for msi notifications")
+Signed-off-by: Ladi Prosek <lprosek@redhat.com>
+Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+Reviewed-by: Markus Armbruster <armbru@redhat.com>
+---
+ hw/misc/ivshmem.c | 12 ++++++++++--
+ 1 file changed, 10 insertions(+), 2 deletions(-)
+
+diff --git a/hw/misc/ivshmem.c b/hw/misc/ivshmem.c
+index a5a46827fe..6e46669744 100644
+--- a/hw/misc/ivshmem.c
++++ b/hw/misc/ivshmem.c
+@@ -317,6 +317,10 @@ static int ivshmem_vector_unmask(PCIDevice *dev, uns=
+igned vector,
+     int ret;
+=20
+     IVSHMEM_DPRINTF("vector unmask %p %d\n", dev, vector);
++    if (!v->pdev) {
++        error_report("ivshmem: vector %d route does not exist", vector);
++        return -EINVAL;
++    }
+=20
+     ret =3D kvm_irqchip_update_msi_route(kvm_state, v->virq, msg, dev);
+     if (ret < 0) {
+@@ -331,12 +335,16 @@ static void ivshmem_vector_mask(PCIDevice *dev, uns=
+igned vector)
+ {
+     IVShmemState *s =3D IVSHMEM_COMMON(dev);
+     EventNotifier *n =3D &s->peers[s->vm_id].eventfds[vector];
++    MSIVector *v =3D &s->msi_vectors[vector];
+     int ret;
+=20
+     IVSHMEM_DPRINTF("vector mask %p %d\n", dev, vector);
++    if (!v->pdev) {
++        error_report("ivshmem: vector %d route does not exist", vector);
++        return;
++    }
+=20
+-    ret =3D kvm_irqchip_remove_irqfd_notifier_gsi(kvm_state, n,
+-                                                s->msi_vectors[vector].v=
+irq);
++    ret =3D kvm_irqchip_remove_irqfd_notifier_gsi(kvm_state, n, v->virq)=
+;
+     if (ret !=3D 0) {
+         error_report("remove_irqfd_notifier_gsi failed");
+     }
+--=20
+2.13.6
