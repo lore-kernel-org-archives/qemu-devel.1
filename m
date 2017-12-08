@@ -1,26 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55264)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57890)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <lichstor@gmail.com>) id 1eND4E-0005Dd-3k
-	for qemu-devel@nongnu.org; Fri, 08 Dec 2017 02:27:31 -0500
+	(envelope-from <armbru@redhat.com>) id 1eNDIm-0008ND-8x
+	for qemu-devel@nongnu.org; Fri, 08 Dec 2017 02:42:33 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <lichstor@gmail.com>) id 1eND4C-0006vA-Ih
-	for qemu-devel@nongnu.org; Fri, 08 Dec 2017 02:27:30 -0500
-Received: from mail-qt0-x244.google.com ([2607:f8b0:400d:c0d::244]:36332)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <lichstor@gmail.com>) id 1eND4C-0006uD-CE
-	for qemu-devel@nongnu.org; Fri, 08 Dec 2017 02:27:28 -0500
-Received: by mail-qt0-x244.google.com with SMTP id a16so24019532qtj.3
-	for <qemu-devel@nongnu.org>; Thu, 07 Dec 2017 23:27:28 -0800 (PST)
+	(envelope-from <armbru@redhat.com>) id 1eNDIl-0002iy-D7
+	for qemu-devel@nongnu.org; Fri, 08 Dec 2017 02:42:32 -0500
+From: Markus Armbruster <armbru@redhat.com>
+References: <20171207084453.23773-1-famz@redhat.com>
+	<20171207105827.5bqrsqbv7ljgmwc6@eukaryote>
+	<c49bb9b8-a314-88d2-841e-8748d32c6777@redhat.com>
+	<20171208014131.GA15798@lemon>
+Date: Fri, 08 Dec 2017 08:42:19 +0100
+In-Reply-To: <20171208014131.GA15798@lemon> (Fam Zheng's message of "Fri, 8
+	Dec 2017 09:41:31 +0800")
+Message-ID: <874lp1k6n8.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-In-Reply-To: <CAN05THQcpCXpckxAymH00G96XdJ30RsnGAgXOA+F98vaaKWgHA@mail.gmail.com>
-References: <CAO1xR-zb6Eni1LD0PB80hGRKU8PCqxjbfHtVM4aUt9i+3Utq3w@mail.gmail.com>
-	<20171207184104.GA2489@work-vm>
-	<CAN05THQcpCXpckxAymH00G96XdJ30RsnGAgXOA+F98vaaKWgHA@mail.gmail.com>
-From: Charles Kelimod <lichstor@gmail.com>
-Date: Fri, 8 Dec 2017 15:27:27 +0800
-Message-ID: <CAO1xR-yCeF9NBBLL_fr7D3CoSq924r+kP_DA+vmg41acUF0Ehw@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] iSER transport name is not good
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [Qemu-block] [PATCH] qemu-img: Document
+ --force-share / -U
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,85 +26,43 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: ronnie sahlberg <ronniesahlberg@gmail.com>
-Cc: "Dr. David Alan Gilbert" <dgilbert@redhat.com>, qemu-devel <qemu-devel@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>, Peter Lieven <pl@kamp.de>
+To: Fam Zheng <famz@redhat.com>
+Cc: Eric Blake <eblake@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org, Kashyap Chamarthy <kchamart@redhat.com>
 
-Hi Dave and Sahlberg,
+Fam Zheng <famz@redhat.com> writes:
 
-for this type of name:iser://<host>/<iqn>/<lun>, I completely agree with
-you.
-my issue is when I create an vm from libvirt, the qemu command line should
-be:
--drive
-file.driver=iser,file.portal=xx.xx.xx.xx:3260,file.target=iqn.xxx,file.lun=0,file.transport=iser
+> On Thu, 12/07 10:53, Eric Blake wrote:
+>> On 12/07/2017 04:58 AM, Kashyap Chamarthy wrote:
+>> > On Thu, Dec 07, 2017 at 04:44:53PM +0800, Fam Zheng wrote:
+[...]
+>> >> +it less likely to conflict with a running guest's permissions due to image
+>> >> +locking. For example, this can be used to get the image information (with
+>> >> +'info' subcommand) when the image is used by a running guest. Note that this
+>> >> +could produce inconsistent result because of concurrent metadata changes, etc..
+>> > 
+>> > Super nit-pick:  an ellipsis[*] is three dots :-), so, when applying you
+>> > might want to: s/../.../
+>> > 
+>> > [*] https://dictionary.cambridge.org/dictionary/english/ellipsis
+>> 
+>> Except that both "etc." and "..." independently convey a sense of
+>> continuation, which means that using both at once is both redundant
+>> (just one will do) and difficult to argue how to typeset (since 'etc.'
+>> is often written with an explicit '.' to emphasize that is an
+>> abbreviation, does that mean you have to write 'etc.''...' for a total
+>> of 4 dots?).
+>
+> I have the impression that "etc." is more correct than "etc"
 
-Actually "iser" is added by me in libvirt, which can work by a little
-modification. But I think file.transport=rdma would be better, as I think
-iser is protocol, and rdma is transport, and libvirt defined it, if I added
-a new transport name (iser) in libvirt, it will be confusable.
+It is.
 
-Best Regards,
-Charles.
+>                                                              so I used even at
+> the end of the sensence where there is another period '.', making it "etc..".
 
-On Fri, Dec 8, 2017 at 2:07 PM, ronnie sahlberg <ronniesahlberg@gmail.com>
-wrote:
+That's wrong all the same :)
 
-> David,
->
-> Yes, QEMU has supported iSER (iSCSI extensions for RDMA) via a
-> userspace library, libiscsi, since about a year.
-> Here is a nice presentation from the developer of iSER support :
-> https://www.google.com.au/url?sa=t&rct=j&q=&esrc=s&source=
-> web&cd=1&cad=rja&uact=8&ved=0ahUKEwjChpba3PnXAhXBKZQKHQa9D
-> EYQFggpMAA&url=https%3A%2F%2Fwww.snia.org%2Fsites%2Fdefault%2Ffiles%2FSDC%
-> 2F2016%2Fpresentations%2Fstorage_networking%2FShterman-Grimberg_Greenberg_
-> Performance%2520Implications%2520Libiscsi_%2520RDMA_V6.pdf&usg=
-> AOvVaw3xyvdIciRKVprboN6rClTA
->
-> In QEMU, you use it the same way as you would use the userspace iSCSI
-> support which has been in QEMU for quite a long time.
-> The only difference is that instead of providing a
-> iscsi://<host>/<iqn>/<lun> you select iSER by specifying an url of the
-> form
-> iser://<host>/<iqn>/<lun>
->
->
-> I.e. the only difference is the protocol part of the URL. When QEMU
-> passes this URL to libiscsi, it allows the library to decide on
-> whether to use normal iSCSI or whether it should use iSER.
->
-> I think RDMA would be a less good name for this as RDMA is not only
-> used to transport iSCSI but is also used for NFS as well as SMB.
->
->
->
-> regards
-> ronnie sahlberg
->
->
-> On Fri, Dec 8, 2017 at 4:41 AM, Dr. David Alan Gilbert
-> <dgilbert@redhat.com> wrote:
-> > * Charles Kelimod (lichstor@gmail.com) wrote:
-> >> Hello,
-> >>
-> >>
-> >> I'm on the road of modifying libvirt to add iSER support, and I found
-> qemu
-> >> is actually support that. But, the transport name is iSER, which should
-> be
-> >> RDMA and there libvirt already defined it.
-> >>
-> >> Best Regards,
-> >> Charles.
-> >
-> > Hi Charles,
-> >   So this is iSCSI extensions for RDMA?  I've cc'd in the qemu iSCSI
-> > maintainers.
-> >   Can you just explain what you're seeing libvirt do and what you think
-> > qemu is expecting it to do for iSER?
-> >
-> > Dave
-> >
-> > --
-> > Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
->
+https://en.wikipedia.org/wiki/Period_(punctuation)#Abbreviations
+
+> If ending the paragraph with "etc." is enough, we can drop one ".".
+
+Please do.
