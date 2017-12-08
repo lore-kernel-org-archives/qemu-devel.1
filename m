@@ -1,22 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35855)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36111)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1eNFf5-0007hf-7Y
-	for qemu-devel@nongnu.org; Fri, 08 Dec 2017 05:13:43 -0500
+	(envelope-from <cohuck@redhat.com>) id 1eNFfg-0000A8-76
+	for qemu-devel@nongnu.org; Fri, 08 Dec 2017 05:14:21 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1eNFf4-0006hL-7O
-	for qemu-devel@nongnu.org; Fri, 08 Dec 2017 05:13:43 -0500
-Date: Fri, 8 Dec 2017 10:13:33 +0000
-From: Stefan Hajnoczi <stefanha@gmail.com>
-Message-ID: <20171208101333.GE23880@stefanha-x1.localdomain>
-References: <cover.1512589016.git.mark.kanda@oracle.com>
-	<0a69463200d64d81dc27898ff92ecd10b126d968.1512589016.git.mark.kanda@oracle.com>
+	(envelope-from <cohuck@redhat.com>) id 1eNFfd-0006xc-2L
+	for qemu-devel@nongnu.org; Fri, 08 Dec 2017 05:14:20 -0500
+Date: Fri, 8 Dec 2017 11:14:09 +0100
+From: Cornelia Huck <cohuck@redhat.com>
+Message-ID: <20171208111409.2f75e054.cohuck@redhat.com>
+In-Reply-To: <49485e7e-f950-58c5-af56-b336b4d4f0e3@linux.vnet.ibm.com>
+References: <49485e7e-f950-58c5-af56-b336b4d4f0e3@linux.vnet.ibm.com>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="r7U+bLA8boMOj+mD"
-Content-Disposition: inline
-In-Reply-To: <0a69463200d64d81dc27898ff92ecd10b126d968.1512589016.git.mark.kanda@oracle.com>
-Subject: Re: [Qemu-devel] [PATCH 2/2] virtio-blk: reject configs with
- logical block size > physical block size
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] Interactive Boot Menu: New Fields in IPLB
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,48 +22,25 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Mark Kanda <mark.kanda@oracle.com>
-Cc: qemu-block@nongnu.org, qemu-devel@nongnu.org, martin.petersen@oracle.com, konrad.wilk@oracle.com, ameya.more@oracle.com, stefanha@redhat.com, karl.heubaum@oracle.com
+To: "Collin L. Walling" <walling@linux.vnet.ibm.com>
+Cc: qemu-devel <qemu-devel@nongnu.org>, qemu-s390x@nongnu.org, Christian Borntraeger <borntraeger@de.ibm.com>, Viktor Mihajlovski <mihajlov@linux.vnet.ibm.com>, Thomas Huth <thuth@redhat.com>, David Hildenbrand <david@redhat.com>
 
+On Thu, 7 Dec 2017 18:56:16 -0500
+"Collin L. Walling" <walling@linux.vnet.ibm.com> wrote:
 
---r7U+bLA8boMOj+mD
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+> Hello,
+> 
+> I'd like to bring up a formal discussion regarding the utilization of 
+> reserved space
+> in the IPL Parameter Blocks for s390x guests. Particularly the following:
+> 
+>   * How should we approach "claiming" bytes so that we do not obstruct
+>     future development?
+>   * What would be "the best" location to store these new fields?
 
-On Wed, Dec 06, 2017 at 01:54:01PM -0600, Mark Kanda wrote:
-> virtio-blk logical block size should never be larger than physical block
-> size because it doesn't make sense to have such configurations. QEMU does=
-n't
-> have a way to effectively express this condition; the best it can do is
-> report the physical block exponent as 0 - indicating the logical block si=
-ze
-> equals the physical block size.
->=20
-> This is identical to commit 3da023b5827543ee4c022986ea2ad9d1274410b2
-> but applied to virtio-blk (instead of virtio-scsi).
->=20
-> Signed-off-by: Mark Kanda <mark.kanda@oracle.com>
-> Reviewed-by: Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>
-> Reviewed-by: Ameya More <ameya.more@oracle.com>
-> ---
->  hw/block/virtio-blk.c | 7 +++++++
->  1 file changed, 7 insertions(+)
+As Christian said, you probably need to check with the architecture
+folks whether you can get some fields reserved for your use case.
 
-Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
-
---r7U+bLA8boMOj+mD
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEcBAEBAgAGBQJaKmXNAAoJEJykq7OBq3PI/40H/RT/Fng3Qk5U8LzC6suJunWW
-IQBtFfkHdVM64IeY6YEieMO81P3xL4imyXAFfZW3BoxdXVGGs5R9yEMD5YWG8o3G
-4mhiyYjaR1ohimSslupUGxGs7iGvCUe+Yw7kQK/Z7jInrASndU0EZFMu1dsfScWm
-PPvz3aw1ihmJZepklmyKMxO9vwziNj1AcX8utkI2zl7/8AR0jFYc6xVPw7j+RW83
-IMblxMOQt5U37AyLgglr3EFoyW4upnPvVzh0j6Mxq8coRQea8G9SoVGbeWgngm32
-kFJYPp9x7qmDOXp8nb/hW0I7ECEi+JKIECYx1viGIR1b6FCTaObxjnOSag8ASGI=
-=8cvX
------END PGP SIGNATURE-----
-
---r7U+bLA8boMOj+mD--
+In general, having this anywhere in the reserved areas of the iplb
+should probably be fine (we migrate the iplb in two mostly-opaque
+blobs).
