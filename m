@@ -1,23 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37544)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38368)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1eNJBt-00078C-LK
-	for qemu-devel@nongnu.org; Fri, 08 Dec 2017 08:59:50 -0500
+	(envelope-from <mreitz@redhat.com>) id 1eNJEs-0008GL-3C
+	for qemu-devel@nongnu.org; Fri, 08 Dec 2017 09:02:55 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1eNJBs-0000CY-Mg
-	for qemu-devel@nongnu.org; Fri, 08 Dec 2017 08:59:49 -0500
-References: <20171120201004.14999-1-mreitz@redhat.com>
-	<20171120201004.14999-6-mreitz@redhat.com>
-	<w51y3mh5mpz.fsf@maestria.local.igalia.com>
+	(envelope-from <mreitz@redhat.com>) id 1eNJEm-0003VW-GV
+	for qemu-devel@nongnu.org; Fri, 08 Dec 2017 09:02:54 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:34614)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <mreitz@redhat.com>) id 1eNJEm-0003VQ-7A
+	for qemu-devel@nongnu.org; Fri, 08 Dec 2017 09:02:48 -0500
+References: <CAJqJJggWTki8i_U7xr2oRSFR4sZt4eK5hRO+B55iOYVMyfGwDg@mail.gmail.com>
+	<20171206091243.GC4207@localhost.localdomain>
+	<cd42e58f-4a00-de18-446f-7e2275421992@redhat.com>
+	<20171208135139.GC4217@localhost.localdomain>
 From: Max Reitz <mreitz@redhat.com>
-Message-ID: <666b3e59-9c51-258d-eff4-71e540275c4e@redhat.com>
-Date: Fri, 8 Dec 2017 14:59:35 +0100
+Message-ID: <b5011c59-f9aa-07d1-11e3-179c5f8e73a3@redhat.com>
+Date: Fri, 8 Dec 2017 15:02:42 +0100
 MIME-Version: 1.0
-In-Reply-To: <w51y3mh5mpz.fsf@maestria.local.igalia.com>
+In-Reply-To: <20171208135139.GC4217@localhost.localdomain>
 Content-Type: multipart/signed; micalg=pgp-sha256;
 	protocol="application/pgp-signature";
-	boundary="cSBcqQXVLtDneaiV7epmXTJ3CIhpUNeW6"
-Subject: Re: [Qemu-devel] [PATCH v7 for-2.12 05/25] block: Respect backing
- bs in bdrv_refresh_filename
+	boundary="IcpPEaOVOnR2hlDoi0ci4iMJdlkg6025n"
+Subject: Re: [Qemu-devel] About [PULL 20/25] block: Guard against NULL
+ bs->drv
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,117 +31,99 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alberto Garcia <berto@igalia.com>, qemu-block@nongnu.org
-Cc: qemu-devel@nongnu.org, Kevin Wolf <kwolf@redhat.com>, Eric Blake <eblake@redhat.com>, John Snow <jsnow@redhat.com>
+To: Kevin Wolf <kwolf@redhat.com>
+Cc: Kangjie Xi <imxikangjie@gmail.com>, qemu-devel@nongnu.org, John Snow <jsnow@redhat.com>
 
 This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---cSBcqQXVLtDneaiV7epmXTJ3CIhpUNeW6
+--IcpPEaOVOnR2hlDoi0ci4iMJdlkg6025n
 From: Max Reitz <mreitz@redhat.com>
-To: Alberto Garcia <berto@igalia.com>, qemu-block@nongnu.org
-Cc: qemu-devel@nongnu.org, Kevin Wolf <kwolf@redhat.com>,
- Eric Blake <eblake@redhat.com>, John Snow <jsnow@redhat.com>
-Message-ID: <666b3e59-9c51-258d-eff4-71e540275c4e@redhat.com>
-Subject: Re: [PATCH v7 for-2.12 05/25] block: Respect backing bs in
- bdrv_refresh_filename
-References: <20171120201004.14999-1-mreitz@redhat.com>
- <20171120201004.14999-6-mreitz@redhat.com>
- <w51y3mh5mpz.fsf@maestria.local.igalia.com>
-In-Reply-To: <w51y3mh5mpz.fsf@maestria.local.igalia.com>
-Content-Type: text/plain; charset=utf-8
+To: Kevin Wolf <kwolf@redhat.com>
+Cc: Kangjie Xi <imxikangjie@gmail.com>, qemu-devel@nongnu.org,
+ John Snow <jsnow@redhat.com>
+Message-ID: <b5011c59-f9aa-07d1-11e3-179c5f8e73a3@redhat.com>
+Subject: Re: About [PULL 20/25] block: Guard against NULL bs->drv
+References: <CAJqJJggWTki8i_U7xr2oRSFR4sZt4eK5hRO+B55iOYVMyfGwDg@mail.gmail.com>
+ <20171206091243.GC4207@localhost.localdomain>
+ <cd42e58f-4a00-de18-446f-7e2275421992@redhat.com>
+ <20171208135139.GC4217@localhost.localdomain>
+In-Reply-To: <20171208135139.GC4217@localhost.localdomain>
+Content-Type: text/plain; charset=windows-1252
 Content-Transfer-Encoding: quoted-printable
 
-On 2017-12-05 14:27, Alberto Garcia wrote:
-> On Mon 20 Nov 2017 09:09:44 PM CET, Max Reitz wrote:
->> @@ -5016,6 +5016,7 @@ void bdrv_refresh_filename(BlockDriverState *bs)=
+On 2017-12-08 14:51, Kevin Wolf wrote:
+> Am 08.12.2017 um 14:39 hat Max Reitz geschrieben:
+>> On 2017-12-06 10:12, Kevin Wolf wrote:
+>>> Am 06.12.2017 um 08:28 hat Kangjie Xi geschrieben:
+>>>> Hi,
+>>>>
+>>>> I encountered a qemu-nbd segfault, finally I found it was caused by
+>>>> NULL bs-drv,  which is located in block/io.c function bdrv_co_flush
+>>>> line 2377:
+>>>>
+>>>> https://git.qemu.org/?p=3Dqemu.git;a=3Dblob;f=3Dblock/io.c;h=3D4fdf9=
+3a0144fa4761a14b8cc6b2a9a6b6e5d5bec;hb=3Dd470ad42acfc73c45d3e8ed5311a4911=
+60b4c100#l2377
+>>>>
+>>>> It is before the patch at line 2402, so the patch needs to be update=
+d
+>>>> to fix NULL bs-drv at line 2337.
+>>>>
+>>>> https://lists.gnu.org/archive/html/qemu-devel/2017-11/msg03425.html
+>>>
+>>> Can you please post a full backtrace? Do you see any error message
+>>> on stderr before the process crashes?
+>>>
+>>> I don't see at the moment how this can happen, except the case that M=
+ax
+>>> mentioned where bs->drv =3D NULL is set when an image corruption is
+>>> detected - this involves an error message, though.
+>>>
+>>> We check bdrv_is_inserted() as the first thing, which includes a NULL=
 
->> =20
->>          opts =3D qdict_new();
->>          has_open_options =3D append_open_options(opts, bs);
->> +        has_open_options |=3D bs->backing_overridden;
->> =20
->>          /* If no specific options have been given for this BDS, the f=
-ilename of
->>           * the underlying file should suffice for this one as well */=
+>>> check for bs->drv. So it must have been non-NULL at the start of the
+>>> function and then become NULL. I suppose this can theoretically happe=
+n
+>>> in qemu_co_queue_wait() if another flush request detects image
+>>> corruption.
+>>>
+>>> Max: I think bs->drv =3D NULL in the middle of a request was a stupid=
 
->> @@ -5027,11 +5028,20 @@ void bdrv_refresh_filename(BlockDriverState *b=
-s)
->>           * file BDS. The full options QDict of that file BDS should s=
-omehow
->>           * contain a representation of the filename, therefore the fo=
-llowing
->>           * suffices without querying the (exact_)filename of this BDS=
-=2E */
->> -        if (bs->file->bs->full_open_options) {
->> +        if (bs->file->bs->full_open_options &&
->> +            (!bs->backing || bs->backing->bs->full_open_options))
->> +        {
+>>> idea. In fact, it's already a stupid idea to have any BDS with
+>>> bs->drv =3D NULL. Maybe it would be better to schedule a BH that repl=
+aces
+>>> the qcow2 node with a dummy node (null-co?) and properly closes the
+>>> qcow2 one.
+>>
+>> Yes, that is an idea John had, too.  It sounded good to me (we'd just
+>> need to add a new flag to null-co so it would respond with -ENOMEDIUM =
+to
+>> all requests or something)...  The only issue I had is how that would
+>> work together with the GRAPH_MOD op blocker.
 >=20
-> Does this mean that both file. and backing. have to be overriden?
+> In order to answer this question, I'd first have to understand what
+> GRAPH_MOD is even supposed to mean and which operations it needs to
+> protect. There aren't currently any users of GRAPH_MOD.
 
-The bs->file->bs->full_open_options is not a check whether anything has
-been overridden but just whether we have a QDict of runtime options for
-file (and we should always have one).  After this series, that check
-therefore disappears.
-
-> Shouldn't that be a || instead of a && ??
-
-The block under this if condition automatically constructs
-bs->full_open_options -- but it can only do so if all of the relevant
-children's options are known (because their options need to be put into
-bs->full_open_options).
-
-Previously, that was only the file child.  This patch adds support for
-the backing child: Whenever there is a backing child node, we need to
-include its options under the "backing" key.
-
-So that's where the condition comes from: For all children that this
-node has, we need their full_open_options or we cannot construct this
-node's full_open_options.
-
-We do have bs->file (because that is the condition for the block this
-condition is in), so we need bs->file->bs->full_open_options.  And if we
-have bs->backing, we also need bs->backing->bs->full_open_options.
-
->>              qdict_put_str(opts, "driver", drv->format_name);
->>              QINCREF(bs->file->bs->full_open_options);
->>              qdict_put(opts, "file", bs->file->bs->full_open_options);=
-
->> =20
->> +            if (bs->backing) {
->> +                QINCREF(bs->backing->bs->full_open_options);
->> +                qdict_put(opts, "backing", bs->backing->bs->full_open=
-_options);
->> +            } else if (bs->backing_overridden && !bs->backing) {
->> +                qdict_put(opts, "backing", qstring_new());
->> +            }
->=20
-> You don't need the !bs->backing in the second if, it's implied from the=
-
-> previous one.
-
-Maybe that was intentional (to be more explicit, and because after this
-series only this branch remains), maybe it wasn't.  I don't know
-anymore, so I'll just drop it (even though I'll have to re-add it later,
-because as I said, only this else if branch will remain).
+That is exactly the reason why we could not come to a conclusion. :-)
 
 Max
 
 
---cSBcqQXVLtDneaiV7epmXTJ3CIhpUNeW6
+--IcpPEaOVOnR2hlDoi0ci4iMJdlkg6025n
 Content-Type: application/pgp-signature; name="signature.asc"
 Content-Description: OpenPGP digital signature
 Content-Disposition: attachment; filename="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQFGBAEBCAAwFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAloqmscSHG1yZWl0ekBy
-ZWRoYXQuY29tAAoJEPQH2wBh1c9AYzoH+wanG2MIvHuBSTkSINdcuFftAnSr22JW
-LyfeKDQgnEqQZ4dzQqC/6lwrB4VaBpu2IcZwrI0/kOz8SwhZ1PZrCpfO+VMTOamT
-tzR/H8jw4XyRz2qpEwZCbogAduc5Wf9rpt4iZZs/o0uNV/pccdGi0uFlkZKsaipN
-TKZIRQ0vPmRmd4kqIX7Xq6Y6AEPB06GUBpKKGdbul0cdc4yJZCxvEIRg05bAaNxg
-0BjH+b5kdv3Qkuem5FCnMbl1Q7Xkba0JJ/1f3CLRP5AHcwj3aAZI1OQln2K+MJSo
-ikk2fwSGbIEgLegEFwQWqsiTfbkSueP3mcX7YsiN6Ug9o+TKBvwbpb4=
-=Fzug
+iQFGBAEBCAAwFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAloqm4ISHG1yZWl0ekBy
+ZWRoYXQuY29tAAoJEPQH2wBh1c9A4jMIAMAsdAwkGeDuxtCB6g9VkFuyOzCTNeql
+sYyq3geH7c3epTaIsxCHghI7Lxsnjj/L5gk4gCN1lNQAqUCVYOGbvdq3haOZKOUn
+Ad9SgZBBOP0p1nCuNBMi2CbFoDgr4qJh6lkV4RHjfXfk/aP3YKFwgpqyChUGQPRl
+XJJNEEoUdnjPgoMHu0SuVyWI6B5SPe73rGr+ptIoO2Bpy7qq5adfflN6y7AAlnUP
+uxMYhZrva7VhGI9LOK1ls4NqkIRJZzOVa8AYM+79Xg+ikybQhkAwvGCO8y9+0I48
+JywEB51WjxxnOSxN/R1FqxO4X1xKsu+vuphZ5jxchbMhkHdl8TZJAUI=
+=sQah
 -----END PGP SIGNATURE-----
 
---cSBcqQXVLtDneaiV7epmXTJ3CIhpUNeW6--
+--IcpPEaOVOnR2hlDoi0ci4iMJdlkg6025n--
