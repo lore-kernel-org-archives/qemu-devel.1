@@ -1,35 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47422)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50275)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <wei.w.wang@intel.com>) id 1eNCLQ-0002UE-66
-	for qemu-devel@nongnu.org; Fri, 08 Dec 2017 01:41:13 -0500
+	(envelope-from <groug@kaod.org>) id 1eNCbY-0002SO-4A
+	for qemu-devel@nongnu.org; Fri, 08 Dec 2017 01:57:54 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <wei.w.wang@intel.com>) id 1eNCLN-0008MN-1t
-	for qemu-devel@nongnu.org; Fri, 08 Dec 2017 01:41:12 -0500
-Received: from mga01.intel.com ([192.55.52.88]:45174)
+	(envelope-from <groug@kaod.org>) id 1eNCbV-0002eL-01
+	for qemu-devel@nongnu.org; Fri, 08 Dec 2017 01:57:52 -0500
+Received: from 9.mo173.mail-out.ovh.net ([46.105.72.44]:49241)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <wei.w.wang@intel.com>)
-	id 1eNCLM-0008Lb-MY
-	for qemu-devel@nongnu.org; Fri, 08 Dec 2017 01:41:08 -0500
-Message-ID: <5A2A347B.9070006@intel.com>
-Date: Fri, 08 Dec 2017 14:43:07 +0800
-From: Wei Wang <wei.w.wang@intel.com>
+	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1eNCbU-0002dp-M4
+	for qemu-devel@nongnu.org; Fri, 08 Dec 2017 01:57:48 -0500
+Received: from player739.ha.ovh.net (b9.ovh.net [213.186.33.59])
+	by mo173.mail-out.ovh.net (Postfix) with ESMTP id C144E918D4
+	for <qemu-devel@nongnu.org>; Fri,  8 Dec 2017 07:57:45 +0100 (CET)
+Date: Fri, 8 Dec 2017 07:57:40 +0100
+From: Greg Kurz <groug@kaod.org>
+Message-ID: <20171208075740.7f87a491@bahia.lan>
+In-Reply-To: <20171207180424.4592e144@bahia.lan>
+References: <20171204203619.GA16349@juliacomputing.com>
+	<20171207180424.4592e144@bahia.lan>
 MIME-Version: 1.0
-References: <5A28BC2D.6000308@intel.com>
-	<CAJSP0QUxRv9LNb1+McYxV0KY4Ss3NkaSjwO6fXiJd+oU2+zJSQ@mail.gmail.com>
-	<5A290398.60508@intel.com>
-	<CAJSP0QURjdD8BnOmJo83fzJn_zCijSKQh==Pz+Xu4r6Q2i3SkQ@mail.gmail.com>
-	<20171207153454-mutt-send-email-mst@kernel.org>
-	<CAJSP0QVu4iwAu01Sth84VZshQde97x3FW1E1ua_YXVKs-65vhQ@mail.gmail.com>
-	<20171207183945-mutt-send-email-mst@kernel.org>
-	<CAJSP0QVnukGD3Afu9myv=v5OjqrPDpXu6JL3Tpf+Cdk=em9V3w@mail.gmail.com>
-	<20171207193003-mutt-send-email-mst@kernel.org>
-	<CAJSP0QX4V64OoU4-Dhb93MUZ9Rz0FPR-La5Xq4_yqGH7SG6PjQ@mail.gmail.com>
-	<20171207213420-mutt-send-email-mst@kernel.org>
-In-Reply-To: <20171207213420-mutt-send-email-mst@kernel.org>
-Content-Type: text/plain; charset=windows-1252; format=flowed
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [virtio-dev] [PATCH v3 0/7] Vhost-pci for inter-VM
- communication
+Subject: Re: [Qemu-devel] [PATCH v2] 9pfs: Correctly handle cancelled
+ requests
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -38,154 +31,252 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Michael S. Tsirkin" <mst@redhat.com>, Stefan Hajnoczi <stefanha@gmail.com>
-Cc: "virtio-dev@lists.oasis-open.org" <virtio-dev@lists.oasis-open.org>, "Yang, Zhiyong" <zhiyong.yang@intel.com>, "jan.kiszka@siemens.com" <jan.kiszka@siemens.com>, "jasowang@redhat.com" <jasowang@redhat.com>, "avi.cohen@huawei.com" <avi.cohen@huawei.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, Stefan Hajnoczi <stefanha@redhat.com>, "pbonzini@redhat.com" <pbonzini@redhat.com>, "marcandre.lureau@redhat.com" <marcandre.lureau@redhat.com>
+To: Keno Fischer <keno@juliacomputing.com>
+Cc: stefano@aporeto.com, qemu-devel@nongnu.org, aneesh.kumar@linux.vnet.ibm.com, Stefano Stabellini <sstabellini@kernel.org>
 
-On 12/08/2017 07:54 AM, Michael S. Tsirkin wrote:
-> On Thu, Dec 07, 2017 at 06:28:19PM +0000, Stefan Hajnoczi wrote:
->> On Thu, Dec 7, 2017 at 5:38 PM, Michael S. Tsirkin <mst@redhat.com> wrote:
->>> On Thu, Dec 07, 2017 at 05:29:14PM +0000, Stefan Hajnoczi wrote:
->>>> On Thu, Dec 7, 2017 at 4:47 PM, Michael S. Tsirkin <mst@redhat.com> wrote:
->>>>> On Thu, Dec 07, 2017 at 04:29:45PM +0000, Stefan Hajnoczi wrote:
->>>>>> On Thu, Dec 7, 2017 at 2:02 PM, Michael S. Tsirkin <mst@redhat.com> wrote:
->>>>>>> On Thu, Dec 07, 2017 at 01:08:04PM +0000, Stefan Hajnoczi wrote:
->>>>>>>> Instead of responding individually to these points, I hope this will
->>>>>>>> explain my perspective.  Let me know if you do want individual
->>>>>>>> responses, I'm happy to talk more about the points above but I think
->>>>>>>> the biggest difference is our perspective on this:
->>>>>>>>
->>>>>>>> Existing vhost-user slave code should be able to run on top of
->>>>>>>> vhost-pci.  For example, QEMU's
->>>>>>>> contrib/vhost-user-scsi/vhost-user-scsi.c should work inside the guest
->>>>>>>> with only minimal changes to the source file (i.e. today it explicitly
->>>>>>>> opens a UNIX domain socket and that should be done by libvhost-user
->>>>>>>> instead).  It shouldn't be hard to add vhost-pci vfio support to
->>>>>>>> contrib/libvhost-user/ alongside the existing UNIX domain socket code.
->>>>>>>>
->>>>>>>> This seems pretty easy to achieve with the vhost-pci PCI adapter that
->>>>>>>> I've described but I'm not sure how to implement libvhost-user on top
->>>>>>>> of vhost-pci vfio if the device doesn't expose the vhost-user
->>>>>>>> protocol.
->>>>>>>>
->>>>>>>> I think this is a really important goal.  Let's use a single
->>>>>>>> vhost-user software stack instead of creating a separate one for guest
->>>>>>>> code only.
->>>>>>>>
->>>>>>>> Do you agree that the vhost-user software stack should be shared
->>>>>>>> between host userspace and guest code as much as possible?
->>>>>>>
->>>>>>>
->>>>>>> The sharing you propose is not necessarily practical because the security goals
->>>>>>> of the two are different.
->>>>>>>
->>>>>>> It seems that the best motivation presentation is still the original rfc
->>>>>>>
->>>>>>> http://virtualization.linux-foundation.narkive.com/A7FkzAgp/rfc-vhost-user-enhancements-for-vm2vm-communication
->>>>>>>
->>>>>>> So comparing with vhost-user iotlb handling is different:
->>>>>>>
->>>>>>> With vhost-user guest trusts the vhost-user backend on the host.
->>>>>>>
->>>>>>> With vhost-pci we can strive to limit the trust to qemu only.
->>>>>>> The switch running within a VM does not have to be trusted.
->>>>>> Can you give a concrete example?
->>>>>>
->>>>>> I have an idea about what you're saying but it may be wrong:
->>>>>>
->>>>>> Today the iotlb mechanism in vhost-user does not actually enforce
->>>>>> memory permissions.  The vhost-user slave has full access to mmapped
->>>>>> memory regions even when iotlb is enabled.  Currently the iotlb just
->>>>>> adds an indirection layer but no real security.  (Is this correct?)
->>>>> Not exactly. iotlb protects against malicious drivers within guest.
->>>>> But yes, not against a vhost-user driver on the host.
->>>>>
->>>>>> Are you saying the vhost-pci device code in QEMU should enforce iotlb
->>>>>> permissions so the vhost-user slave guest only has access to memory
->>>>>> regions that are allowed by the iotlb?
->>>>> Yes.
->>>> Okay, thanks for confirming.
->>>>
->>>> This can be supported by the approach I've described.  The vhost-pci
->>>> QEMU code has control over the BAR memory so it can prevent the guest
->>>> from accessing regions that are not allowed by the iotlb.
->>>>
->>>> Inside the guest the vhost-user slave still has the memory region
->>>> descriptions and sends iotlb messages.  This is completely compatible
->>>> with the libvirt-user APIs and existing vhost-user slave code can run
->>>> fine.  The only unique thing is that guest accesses to memory regions
->>>> not allowed by the iotlb do not work because QEMU has prevented it.
->>> I don't think this can work since suddenly you need
->>> to map full IOMMU address space into BAR.
->> The BAR covers all guest RAM
->> but QEMU can set up MemoryRegions that
->> hide parts from the guest (e.g. reads produce 0xff).  I'm not sure how
->> expensive that is but implementing a strict IOMMU is hard to do
->> without performance overhead.
-> I'm worried about leaking PAs.
-> fundamentally if you want proper protection you
-> need your device driver to use VA for addressing,
->
-> On the one hand BAR only needs to be as large as guest PA then.
-> On the other hand it must cover all of guest PA,
-> not just what is accessible to the device.
->
->
->>> Besides, this means implementing iotlb in both qemu and guest.
->> It's free in the guest, the libvhost-user stack already has it.
-> That library is designed to work with a unix domain socket
-> though. We'll need extra kernel code to make a device
-> pretend it's a socket.
->
->>>> If better performance is needed then it might be possible to optimize
->>>> this interface by handling most or even all of the iotlb stuff in QEMU
->>>> vhost-pci code and not exposing it to the vhost-user slave in the
->>>> guest.  But it doesn't change the fact that the vhost-user protocol
->>>> can be used and the same software stack works.
->>> For one, the iotlb part would be out of scope then.
->>> Instead you would have code to offset from BAR.
->>>
->>>> Do you have a concrete example of why sharing the same vhost-user
->>>> software stack inside the guest can't work?
->>> With enough dedication some code might be shared.  OTOH reusing virtio
->>> gains you a ready feature negotiation and discovery protocol.
->>>
->>> I'm not convinced which has more value, and the second proposal
->>> has been implemented already.
->> Thanks to you and Wei for the discussion.  I've learnt a lot about
->> vhost-user.  If you have questions about what I've posted, please let
->> me know and we can discuss further.
->>
->> The decision is not up to me so I'll just summarize what the vhost-pci
->> PCI adapter approach achieves:
->> 1. Just one device and driver
->> 2. Support for all device types (net, scsi, blk, etc)
->> 3. Reuse of software stack so vhost-user slaves can run in both host
->> userspace and the guest
->> 4. Simpler to debug because the vhost-user protocol used by QEMU is
->> also used by the guest
->>
->> Stefan
+Cc'ing Stefano using a more appropriate address :)
 
-Thanks Stefan and Michael for the sharing and discussion. I think above 
-3 and 4 are debatable (e.g. whether it is simpler really depends). 1 and 
-2 are implementations, I think both approaches could implement the 
-device that way. We originally thought about one device and driver to 
-support all types (called it transformer sometimes :-) ), that would 
-look interesting from research point of view, but from real usage point 
-of view, I think it would be better to have them separated, because:
-- different device types have different driver logic, mixing them 
-together would cause the driver to look messy. Imagine that a networking 
-driver developer has to go over the block related code to debug, that 
-also increases the difficulty.
-- For the kernel driver (looks like some people from Huawei are 
-interested in that), I think users may want to see a standard network 
-device and driver. If we mix all the types together, not sure what type 
-of device will it be (misc?).
-Please let me know if you have a different viewpoint.
+On Thu, 7 Dec 2017 18:04:24 +0100
+Greg Kurz <groug@kaod.org> wrote:
 
-Btw, from your perspective, what would be the practical usage of 
-vhost-pci-blk?
-
-
-Best,
-Wei
+> On Mon, 4 Dec 2017 15:36:19 -0500
+> Keno Fischer <keno@juliacomputing.com> wrote:
+> 
+> >  # Background
+> > 
+> > I was investigating spurious non-deterministic EINTR returns from
+> > various 9p file system operations in a Linux guest served from the
+> > qemu 9p server.
+> > 
+> >  ## EINTR, ERESTARTSYS and the linux kernel
+> > 
+> > When a signal arrives that the Linux kernel needs to deliver to user-space
+> > while a given thread is blocked (in the 9p case waiting for a reply to its
+> > request in 9p_client_rpc -> wait_event_interruptible), it asks whatever
+> > driver is currently running to abort its current operation (in the 9p case
+> > causing the submission of a TFLUSH message) and return to user space.
+> > In these situations, the error message reported is generally ERESTARTSYS.
+> > If the userspace processes specified SA_RESTART, this means that the
+> > system call will get restarted upon completion of the signal handler
+> > delivery (assuming the signal handler doesn't modify the process state
+> > in complicated ways not relevant here). If SA_RESTART is not specified,
+> > ERESTARTSYS gets translated to EINTR and user space is expected to handle
+> > the restart itself.
+> > 
+> >  ## The 9p TFLISH command  
+>                ^^^
+> I'll fix this before pushing to my tree in case there's no v3.
+> 
+> > 
+> > The 9p TFLUSH commands requests that the server abort an ongoing operation.
+> > The man page [1] specifies:
+> > 
+> > ```
+> > If it recognizes oldtag as the tag of a pending transaction, it should abort any
+> > pending response and discard that tag.
+> > [...]
+> > When the client sends a Tflush, it must wait to receive the corresponding Rflush
+> > before reusing oldtag for subsequent messages. If a response to the flushed request
+> > is received before the Rflush, the client must honor the response as if it had not
+> > been flushed, since the completed request may signify a state change in the server
+> > ```
+> > 
+> > In particular, this means that the server must not send a reply with the orignal
+> > tag in response to the cancellation request, because the client is obligated
+> > to interpret such a reply as a coincidental reply to the original request.
+> > 
+> >  # The bug
+> > 
+> > When qemu receives a TFlush request, it sets the `cancelled` flag on the relevant
+> > pdu. This flag is periodically checked, e.g. in `v9fs_co_name_to_path`, and if
+> > set, the operation is aborted and the error is set to EINTR. However, the server
+> > then violates the spec, by returning to the client an Rerror response, rather
+> > than discarding the message entirely. As a result, the client is required
+> > to assume that said Rerror response is a result of the original request, not
+> > a result of the cancellation and thus passes the EINTR error back to user space.
+> > This is not the worst thing it could do, however as discussed above, the correct
+> > error code would have been ERESTARTSYS, such that user space programs with
+> > SA_RESTART set get correctly restarted upon completion of the signal handler.
+> > Instead, such programs get spurious EINTR results that they were not expecting
+> > to handle.
+> > 
+> > It should be noted that there are plenty of user space programs that do not
+> > set SA_RESTART and do not correctly handle EINTR either. However, that is then
+> > a userspace bug. It should also be noted that this bug has been mitigated by
+> > a recent commit to the Linux kernel [2], which essentially prevents the kernel
+> > from sending Tflush requests unless the process is about to die (in which case
+> > the process likely doesn't care about the response). Nevertheless, for older
+> > kernels and to comply with the spec, I believe this change is beneficial.
+> > 
+> >  # Implementation
+> > 
+> > The fix is fairly simple, just skipping notification of a reply if
+> > the pdu was previously cancelled. We do however, also notify the transport
+> > layer that we're doing this, so it can clean up any resources it may be
+> > holding. I also added a new trace event to distinguish
+> > operations that caused an error reply from those that were cancelled.
+> > 
+> > One complication is that we only omit sending the message on EINTR errors in
+> > order to avoid confusing the rest of the code (which may assume that a
+> > client knows about a fid if it sucessfully passed it off to pud_complete
+> > without checking for cancellation status). This does mean that if the server
+> > acts upon the cancellation flag, it always needs to set err to EINTR. I believe
+> > this is true of the current code.
+> > 
+> > [1] https://9fans.github.io/plan9port/man/man9/flush.html
+> > [2] https://github.com/torvalds/linux/commit/9523feac272ccad2ad8186ba4fcc89103754de52
+> > 
+> > Signed-off-by: Keno Fischer <keno@juliacomputing.com>
+> > ---
+> >   
+> 
+> It looks good. I could come up with a new qtest for TFLUSH and validate it
+> behaves as expected. I'll post that soon.
+> 
+> For the 9p and virtio parts.
+> 
+> Reviewed-by: Greg Kurz <groug@kaod.org>
+> 
+> Now I'd need an ack from Stefano for the xen bits before I push it to my tree.
+> 
+> Thanks,
+> 
+> --
+> Greg
+> 
+> > Changes from v1:
+> >  - In reponse to review by Greg Kurz, add a new transport
+> >    layer operation to discard the buffer. I also attempted
+> >    an implementation for xen, but I have done no verification
+> >    on that beyond making sure it compiles, since I don't know
+> >    how to use xen. Please review closely.
+> > 
+> >  hw/9pfs/9p.c               | 18 ++++++++++++++++++
+> >  hw/9pfs/9p.h               |  1 +
+> >  hw/9pfs/trace-events       |  1 +
+> >  hw/9pfs/virtio-9p-device.c | 14 ++++++++++++++
+> >  hw/9pfs/xen-9p-backend.c   | 11 +++++++++++
+> >  5 files changed, 45 insertions(+)
+> > 
+> > diff --git a/hw/9pfs/9p.c b/hw/9pfs/9p.c
+> > index 710cd91..daa8519 100644
+> > --- a/hw/9pfs/9p.c
+> > +++ b/hw/9pfs/9p.c
+> > @@ -648,6 +648,23 @@ static void coroutine_fn pdu_complete(V9fsPDU *pdu, ssize_t len)
+> >      V9fsState *s = pdu->s;
+> >      int ret;
+> >  
+> > +    /*
+> > +     * The 9p spec requires that successfully cancelled pdus receive no reply.
+> > +     * Sending a reply would confuse clients because they would
+> > +     * assume that any EINTR is the actual result of the operation,
+> > +     * rather than a consequence of the cancellation. However, if
+> > +     * the operation completed (succesfully or with an error other
+> > +     * than caused be cancellation), we do send out that reply, both
+> > +     * for efficiency and to avoid confusing the rest of the state machine
+> > +     * that assumes passing a non-error here will mean a successful
+> > +     * transmission of the reply.
+> > +     */
+> > +    if (pdu->cancelled && len == -EINTR) {
+> > +        trace_v9fs_rcancel(pdu->tag, pdu->id);
+> > +        pdu->s->transport->discard(pdu);
+> > +        goto out_wakeup;
+> > +    }
+> > +
+> >      if (len < 0) {
+> >          int err = -len;
+> >          len = 7;
+> > @@ -690,6 +707,7 @@ static void coroutine_fn pdu_complete(V9fsPDU *pdu, ssize_t len)
+> >  out_notify:
+> >      pdu->s->transport->push_and_notify(pdu);
+> >  
+> > +out_wakeup:
+> >      /* Now wakeup anybody waiting in flush for this request */
+> >      if (!qemu_co_queue_next(&pdu->complete)) {
+> >          pdu_free(pdu);
+> > diff --git a/hw/9pfs/9p.h b/hw/9pfs/9p.h
+> > index d1cfeaf..3c1b0b5 100644
+> > --- a/hw/9pfs/9p.h
+> > +++ b/hw/9pfs/9p.h
+> > @@ -365,6 +365,7 @@ struct V9fsTransport {
+> >      void        (*init_out_iov_from_pdu)(V9fsPDU *pdu, struct iovec **piov,
+> >                                           unsigned int *pniov, size_t size);
+> >      void        (*push_and_notify)(V9fsPDU *pdu);
+> > +    void        (*discard)(V9fsPDU *pdu);
+> >  };
+> >  
+> >  static inline int v9fs_register_transport(V9fsState *s,
+> > diff --git a/hw/9pfs/trace-events b/hw/9pfs/trace-events
+> > index 08a4abf..1aee350 100644
+> > --- a/hw/9pfs/trace-events
+> > +++ b/hw/9pfs/trace-events
+> > @@ -1,6 +1,7 @@
+> >  # See docs/devel/tracing.txt for syntax documentation.
+> >  
+> >  # hw/9pfs/virtio-9p.c
+> > +v9fs_rcancel(uint16_t tag, uint8_t id) "tag %d id %d"
+> >  v9fs_rerror(uint16_t tag, uint8_t id, int err) "tag %d id %d err %d"
+> >  v9fs_version(uint16_t tag, uint8_t id, int32_t msize, char* version) "tag %d id %d msize %d version %s"
+> >  v9fs_version_return(uint16_t tag, uint8_t id, int32_t msize, char* version) "tag %d id %d msize %d version %s"
+> > diff --git a/hw/9pfs/virtio-9p-device.c b/hw/9pfs/virtio-9p-device.c
+> > index 62650b0..2510329 100644
+> > --- a/hw/9pfs/virtio-9p-device.c
+> > +++ b/hw/9pfs/virtio-9p-device.c
+> > @@ -37,6 +37,19 @@ static void virtio_9p_push_and_notify(V9fsPDU *pdu)
+> >      virtio_notify(VIRTIO_DEVICE(v), v->vq);
+> >  }
+> >  
+> > +
+> > +static void virtio_pdu_discard(V9fsPDU *pdu)
+> > +{
+> > +    V9fsState *s = pdu->s;
+> > +    V9fsVirtioState *v = container_of(s, V9fsVirtioState, state);
+> > +    VirtQueueElement *elem = v->elems[pdu->idx];
+> > +
+> > +    /* discard element from the queue */
+> > +    virtqueue_detach_element(v->vq, elem, pdu->size);
+> > +    g_free(elem);
+> > +    v->elems[pdu->idx] = NULL;
+> > +}
+> > +
+> >  static void handle_9p_output(VirtIODevice *vdev, VirtQueue *vq)
+> >  {
+> >      V9fsVirtioState *v = (V9fsVirtioState *)vdev;
+> > @@ -221,6 +234,7 @@ static const struct V9fsTransport virtio_9p_transport = {
+> >      .init_in_iov_from_pdu = virtio_init_in_iov_from_pdu,
+> >      .init_out_iov_from_pdu = virtio_init_out_iov_from_pdu,
+> >      .push_and_notify = virtio_9p_push_and_notify,
+> > +    .discard = virtio_pdu_discard,
+> >  };
+> >  
+> >  /* virtio-9p device */
+> > diff --git a/hw/9pfs/xen-9p-backend.c b/hw/9pfs/xen-9p-backend.c
+> > index ee87f08..7208ce6 100644
+> > --- a/hw/9pfs/xen-9p-backend.c
+> > +++ b/hw/9pfs/xen-9p-backend.c
+> > @@ -233,12 +233,23 @@ static void xen_9pfs_push_and_notify(V9fsPDU *pdu)
+> >      qemu_bh_schedule(ring->bh);
+> >  }
+> >  
+> > +static void xen_9pfs_discard(V9fsPDU *pdu)
+> > +{
+> > +    Xen9pfsDev *priv = container_of(pdu->s, Xen9pfsDev, state);
+> > +    Xen9pfsRing *ring = &priv->rings[pdu->tag % priv->num_rings];
+> > +
+> > +    g_free(ring->sg);
+> > +    ring->sg = NULL;
+> > +    ring->inprogress = false;
+> > +}
+> > +
+> >  static const struct V9fsTransport xen_9p_transport = {
+> >      .pdu_vmarshal = xen_9pfs_pdu_vmarshal,
+> >      .pdu_vunmarshal = xen_9pfs_pdu_vunmarshal,
+> >      .init_in_iov_from_pdu = xen_9pfs_init_in_iov_from_pdu,
+> >      .init_out_iov_from_pdu = xen_9pfs_init_out_iov_from_pdu,
+> >      .push_and_notify = xen_9pfs_push_and_notify,
+> > +    .discard = xen_9pfs_discard,
+> >  };
+> >  
+> >  static int xen_9pfs_init(struct XenDevice *xendev)  
+> 
+> 
