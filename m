@@ -1,23 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40225)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41385)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1eNFvS-00023I-Fb
-	for qemu-devel@nongnu.org; Fri, 08 Dec 2017 05:30:39 -0500
+	(envelope-from <berrange@redhat.com>) id 1eNG0Y-0003eQ-Gm
+	for qemu-devel@nongnu.org; Fri, 08 Dec 2017 05:35:55 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1eNFvP-0001U9-Bi
-	for qemu-devel@nongnu.org; Fri, 08 Dec 2017 05:30:38 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:58200)
+	(envelope-from <berrange@redhat.com>) id 1eNG0U-0004al-Ix
+	for qemu-devel@nongnu.org; Fri, 08 Dec 2017 05:35:54 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:52264)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1eNFvP-0001SW-27
-	for qemu-devel@nongnu.org; Fri, 08 Dec 2017 05:30:35 -0500
-Date: Fri, 8 Dec 2017 10:30:29 +0000
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20171208103028.GE2403@work-vm>
+	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1eNG0U-0004Zz-CM
+	for qemu-devel@nongnu.org; Fri, 08 Dec 2017 05:35:50 -0500
+Date: Fri, 8 Dec 2017 10:35:45 +0000
+From: "Daniel P. Berrange" <berrange@redhat.com>
+Message-ID: <20171208103545.GE11767@redhat.com>
+Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
 References: <CAO1xR-zb6Eni1LD0PB80hGRKU8PCqxjbfHtVM4aUt9i+3Utq3w@mail.gmail.com>
 	<20171207184104.GA2489@work-vm>
 	<CAN05THQcpCXpckxAymH00G96XdJ30RsnGAgXOA+F98vaaKWgHA@mail.gmail.com>
 	<CAO1xR-yCeF9NBBLL_fr7D3CoSq924r+kP_DA+vmg41acUF0Ehw@mail.gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
 In-Reply-To: <CAO1xR-yCeF9NBBLL_fr7D3CoSq924r+kP_DA+vmg41acUF0Ehw@mail.gmail.com>
 Subject: Re: [Qemu-devel] iSER transport name is not good
@@ -30,9 +31,9 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: Charles Kelimod <lichstor@gmail.com>
-Cc: ronnie sahlberg <ronniesahlberg@gmail.com>, qemu-devel <qemu-devel@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>, Peter Lieven <pl@kamp.de>
+Cc: ronnie sahlberg <ronniesahlberg@gmail.com>, Paolo Bonzini <pbonzini@redhat.com>, Peter Lieven <pl@kamp.de>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, qemu-devel <qemu-devel@nongnu.org>
 
-* Charles Kelimod (lichstor@gmail.com) wrote:
+On Fri, Dec 08, 2017 at 03:27:27PM +0800, Charles Kelimod wrote:
 > Hi Dave and Sahlberg,
 > 
 > for this type of name:iser://<host>/<iqn>/<lun>, I completely agree with
@@ -47,81 +48,17 @@ Cc: ronnie sahlberg <ronniesahlberg@gmail.com>, qemu-devel <qemu-devel@nongnu.or
 > iser is protocol, and rdma is transport, and libvirt defined it, if I added
 > a new transport name (iser) in libvirt, it will be confusable.
 
-This isn't something I know much about, however:
-   a) The transport name is already defined as 'iser' in qemu, so that's
-what needs to be used; we can't change it because someone somewhere
-might alreadybe using it.
-   b) iSER is a standard name for this, so it won't be confusing to
-     people used to dealing with iSCSI over RDMA
-   c) You of course need to check on the libvirt lists how they want
-     to expose the setting.
+If libvirt already supports this, then we won't change it, as that just creates
+needless backcompatibility problems. There's many cases where we have wierd or
+undesirable names for things, but at a low level we just accept them and carry
+on, as wierd names don't have any negative functional impact. At the higher
+app user interface, it can be renamed as desired, since UI has no backcompat
+problems, as long as the low level stays the same.
 
-Dave
 
-> Best Regards,
-> Charles.
-> 
-> On Fri, Dec 8, 2017 at 2:07 PM, ronnie sahlberg <ronniesahlberg@gmail.com>
-> wrote:
-> 
-> > David,
-> >
-> > Yes, QEMU has supported iSER (iSCSI extensions for RDMA) via a
-> > userspace library, libiscsi, since about a year.
-> > Here is a nice presentation from the developer of iSER support :
-> > https://www.google.com.au/url?sa=t&rct=j&q=&esrc=s&source=
-> > web&cd=1&cad=rja&uact=8&ved=0ahUKEwjChpba3PnXAhXBKZQKHQa9D
-> > EYQFggpMAA&url=https%3A%2F%2Fwww.snia.org%2Fsites%2Fdefault%2Ffiles%2FSDC%
-> > 2F2016%2Fpresentations%2Fstorage_networking%2FShterman-Grimberg_Greenberg_
-> > Performance%2520Implications%2520Libiscsi_%2520RDMA_V6.pdf&usg=
-> > AOvVaw3xyvdIciRKVprboN6rClTA
-> >
-> > In QEMU, you use it the same way as you would use the userspace iSCSI
-> > support which has been in QEMU for quite a long time.
-> > The only difference is that instead of providing a
-> > iscsi://<host>/<iqn>/<lun> you select iSER by specifying an url of the
-> > form
-> > iser://<host>/<iqn>/<lun>
-> >
-> >
-> > I.e. the only difference is the protocol part of the URL. When QEMU
-> > passes this URL to libiscsi, it allows the library to decide on
-> > whether to use normal iSCSI or whether it should use iSER.
-> >
-> > I think RDMA would be a less good name for this as RDMA is not only
-> > used to transport iSCSI but is also used for NFS as well as SMB.
-> >
-> >
-> >
-> > regards
-> > ronnie sahlberg
-> >
-> >
-> > On Fri, Dec 8, 2017 at 4:41 AM, Dr. David Alan Gilbert
-> > <dgilbert@redhat.com> wrote:
-> > > * Charles Kelimod (lichstor@gmail.com) wrote:
-> > >> Hello,
-> > >>
-> > >>
-> > >> I'm on the road of modifying libvirt to add iSER support, and I found
-> > qemu
-> > >> is actually support that. But, the transport name is iSER, which should
-> > be
-> > >> RDMA and there libvirt already defined it.
-> > >>
-> > >> Best Regards,
-> > >> Charles.
-> > >
-> > > Hi Charles,
-> > >   So this is iSCSI extensions for RDMA?  I've cc'd in the qemu iSCSI
-> > > maintainers.
-> > >   Can you just explain what you're seeing libvirt do and what you think
-> > > qemu is expecting it to do for iSER?
-> > >
-> > > Dave
-> > >
-> > > --
-> > > Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
-> >
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+Regards,
+Daniel
+-- 
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
