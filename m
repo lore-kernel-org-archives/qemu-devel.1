@@ -1,20 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53166)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54148)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <tina.zhang@intel.com>) id 1eNF1g-0003QL-Tn
-	for qemu-devel@nongnu.org; Fri, 08 Dec 2017 04:33:03 -0500
+	(envelope-from <kchamart@redhat.com>) id 1eNF4F-0005qM-7T
+	for qemu-devel@nongnu.org; Fri, 08 Dec 2017 04:35:40 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <tina.zhang@intel.com>) id 1eNF1d-00042q-Ni
-	for qemu-devel@nongnu.org; Fri, 08 Dec 2017 04:33:00 -0500
-Received: from mga17.intel.com ([192.55.52.151]:9950)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <tina.zhang@intel.com>)
-	id 1eNF1d-00040t-E4
-	for qemu-devel@nongnu.org; Fri, 08 Dec 2017 04:32:57 -0500
-From: Tina Zhang <tina.zhang@intel.com>
-Date: Fri,  8 Dec 2017 17:32:37 +0800
-Message-Id: <1512725557-9729-1-git-send-email-tina.zhang@intel.com>
-Subject: [Qemu-devel] [Rfc PATCH] ui: Enable SDL to use dma-buf for direct
- guest framebuffer rendering
+	(envelope-from <kchamart@redhat.com>) id 1eNF4E-0005uz-As
+	for qemu-devel@nongnu.org; Fri, 08 Dec 2017 04:35:39 -0500
+Date: Fri, 8 Dec 2017 10:35:21 +0100
+From: Kashyap Chamarthy <kchamart@redhat.com>
+Message-ID: <20171208093521.ebdrrzorxn4tpyvo@eukaryote>
+References: <20171113162053.58795-1-vsementsov@virtuozzo.com>
+	<01108daa-fed3-c142-bbd6-0ecc4c8b795d@redhat.com>
+	<cd0a2e5e-f788-0e5a-dec7-f428479f3b89@virtuozzo.com>
+	<8c61f43c-5f56-8c1b-a2fe-f954d34dc687@redhat.com>
+	<40392ab9-ec2a-30ed-ddab-a557682a4192@virtuozzo.com>
+	<4e4e28d7-aebc-4a86-e691-99afdcca27f5@redhat.com>
+	<20171121172324.GC11073@localhost.localdomain>
+	<1a8e9d48-5be1-e014-41ee-a1164f32dd17@redhat.com>
+	<20171207115648.5mnvoyfnig7dhgbn@eukaryote>
+	<20171207173304.GB3881@localhost.localdomain>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20171207173304.GB3881@localhost.localdomain>
+Subject: Re: [Qemu-devel] [Qemu-block] [PATCH for-2.12 0/4] qmp dirty bitmap
+ API
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,229 +32,49 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org, kraxel@redhat.com
-Cc: Tina Zhang <tina.zhang@intel.com>, zhenyuw@linux.intel.com, intel-gvt-dev@lists.freedesktop.org, zhi.a.wang@intel.com, hang.yuan@intel.com, zhiyuan.lv@intel.com
+To: Kevin Wolf <kwolf@redhat.com>
+Cc: John Snow <jsnow@redhat.com>, Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, famz@redhat.com, qemu-block@nongnu.org, qemu-devel@nongnu.org, mnestratov@virtuozzo.com, armbru@redhat.com, nshirokovskiy@virtuozzo.com, stefanha@redhat.com, pbonzini@redhat.com, den@openvz.org, mreitz@redhat.com
 
-This RFC patch is based on Qemu UI on-going work of rendering guest
-framebuffer through dma-buf interface, to show a protype of SDL with
-dma-buf interface.
+On Thu, Dec 07, 2017 at 06:33:04PM +0100, Kevin Wolf wrote:
+> Am 07.12.2017 um 12:56 hat Kashyap Chamarthy geschrieben:
 
-Against branch: work/intel-vgpu
+[...]
 
-Signed-off-by: Tina Zhang <tina.zhang@intel.com>
----
- include/ui/sdl2.h | 11 ++++++++
- ui/sdl2-gl.c      | 84 ++++++++++++++++++++++++++++++++++++++++++++++---------
- ui/sdl2.c         |  6 ++--
- 3 files changed, 86 insertions(+), 15 deletions(-)
+> > So from the above interesting discussion, it seems like Kevin is leaning
+> > towards a single job type that offers 'stream', 'commit', 'backup', and
+> > 'mirror' functionality as part of a single command / job type.  Based on
+> > an instinct, this sounds a bit too stuffy and complex to me.
+> > 
+> > And John seems to be leaning towards two block device job types:
+> > 
+> >   - 'blockdev-foo' that offers both current 'stream' and 'commit'
+> >     functionality as two different options to the same QMP command; and
+> > 
+> >   - 'blockdev-bar' will offer both 'mirror' and 'backup' functionality
+> >     as part of the same QMP command
+> > 
+> > FWIW, this seems a bit more palatable, as it is unifying
+> > similar-functionality-that-differ-slightly into two distinct commands.
 
-diff --git a/include/ui/sdl2.h b/include/ui/sdl2.h
-index 7811d33..e6e334c 100644
---- a/include/ui/sdl2.h
-+++ b/include/ui/sdl2.h
-@@ -29,6 +29,9 @@ struct sdl2_console {
-     QemuGLShader *gls;
-     egl_fb guest_fb;
-     egl_fb win_fb;
-+    egl_fb cursor_fb;
-+    int cursor_x;
-+    int cursor_y;
-     bool y0_top;
-     bool scanout_mode;
- #endif
-@@ -76,6 +79,14 @@ void sdl2_gl_scanout_texture(DisplayChangeListener *dcl,
-                              uint32_t w, uint32_t h);
- void sdl2_gl_scanout_dmabuf(DisplayChangeListener *dcl,
-                             QemuDmaBuf *dmabuf);
-+void sdl2_gl_cursor_dmabuf(DisplayChangeListener *dcl,
-+                          QemuDmaBuf *dmabuf);
-+void sdl2_gl_cursor_position(DisplayChangeListener *dcl,
-+                            bool have_hot, bool have_pos,
-+                            uint32_t hot_x, uint32_t hot_y,
-+                            uint32_t pos_x, uint32_t pos_y);
-+void sdl2_gl_release_dmabuf(DisplayChangeListener *dcl,
-+                           QemuDmaBuf *dmabuf);
- void sdl2_gl_scanout_flush(DisplayChangeListener *dcl,
-                            uint32_t x, uint32_t y, uint32_t w, uint32_t h);
- 
-diff --git a/ui/sdl2-gl.c b/ui/sdl2-gl.c
-index ab31c5a..dbe7435 100644
---- a/ui/sdl2-gl.c
-+++ b/ui/sdl2-gl.c
-@@ -72,9 +72,12 @@ void sdl2_gl_update(DisplayChangeListener *dcl,
- 
-     assert(scon->opengl);
- 
--    SDL_GL_MakeCurrent(scon->real_window, scon->winctx);
--    surface_gl_update_texture(scon->gls, scon->surface, x, y, w, h);
--    scon->updates++;
-+    if (!scon->scanout_mode) {
-+    /* Fixme: unmarking these leads to flashing issue */
-+        //SDL_GL_MakeCurrent(scon->real_window, scon->winctx);
-+        surface_gl_update_texture(scon->gls, scon->surface, x, y, w, h);
-+        //scon->updates++;
-+    }
- }
- 
- void sdl2_gl_switch(DisplayChangeListener *dcl,
-@@ -116,7 +119,7 @@ void sdl2_gl_refresh(DisplayChangeListener *dcl)
-     assert(scon->opengl);
- 
-     graphic_hw_update(dcl->con);
--    if (scon->updates && scon->surface) {
-+    if (!scon->scanout_mode && scon->updates && scon->surface) {
-         scon->updates = 0;
-         sdl2_gl_render_surface(scon);
-     }
-@@ -127,8 +130,12 @@ void sdl2_gl_redraw(struct sdl2_console *scon)
- {
-     assert(scon->opengl);
- 
--    if (scon->surface) {
--        sdl2_gl_render_surface(scon);
-+    if (scon->scanout_mode) {
-+        sdl2_gl_scanout_flush(&scon->dcl, 0, 0 , 0, 0);
-+    } else {
-+        if (scon->surface) {
-+            sdl2_gl_render_surface(scon);
-+        }
-     }
- }
- 
-@@ -208,22 +215,64 @@ void sdl2_gl_scanout_texture(DisplayChangeListener *dcl,
-     SDL_GL_MakeCurrent(scon->real_window, scon->winctx);
- 
-     sdl2_set_scanout_mode(scon, true);
-+
-     egl_fb_setup_for_tex(&scon->guest_fb, backing_width, backing_height,
-                          backing_id, false);
- }
- 
-+
- void sdl2_gl_scanout_dmabuf(DisplayChangeListener *dcl,
-                             QemuDmaBuf *dmabuf)
- {
--    struct sdl2_console *scon = container_of(dcl, struct sdl2_console, dcl);
--    int tex_id = 0;
-+#ifdef CONFIG_OPENGL_DMABUF
-+
-+    egl_dmabuf_import_texture(dmabuf);
- 
--    /* TODO: import dmabuf */
-+    if (!dmabuf->texture) {
-+        return;
-+    }
- 
--    sdl2_gl_scanout_texture(dcl, tex_id,
-+    sdl2_gl_scanout_texture(dcl, dmabuf->texture,
-                             false, dmabuf->width, dmabuf->height,
-                             0, 0, dmabuf->width, dmabuf->height);
--    scon->guest_fb.delete_texture = true;
-+#endif    
-+}
-+
-+void sdl2_gl_cursor_dmabuf(DisplayChangeListener *dcl,
-+                          QemuDmaBuf *dmabuf)
-+{
-+#ifdef CONFIG_OPENGL_DMABUF
-+    struct sdl2_console *scon = container_of(dcl, struct sdl2_console, dcl);
-+
-+    egl_dmabuf_import_texture(dmabuf);
-+    if (!dmabuf->texture) {
-+        return;
-+    }
-+
-+    egl_fb_setup_for_tex(&scon->cursor_fb, dmabuf->width, dmabuf->height,
-+                         dmabuf->texture, false);
-+#endif
-+}
-+
-+void sdl2_gl_cursor_position(DisplayChangeListener *dcl,
-+                            bool have_hot, bool have_pos,
-+                            uint32_t hot_x, uint32_t hot_y,
-+                            uint32_t pos_x, uint32_t pos_y)
-+{
-+#ifdef CONFIG_OPENGL_DMABUF
-+    struct sdl2_console *scon = container_of(dcl, struct sdl2_console, dcl);
-+
-+    scon->cursor_x = pos_x;
-+    scon->cursor_y = pos_y;
-+#endif
-+}
-+
-+void sdl2_gl_release_dmabuf(DisplayChangeListener *dcl,
-+                           QemuDmaBuf *dmabuf)
-+{
-+#ifdef CONFIG_OPENGL_DMABUF
-+    egl_dmabuf_release_texture(dmabuf);
-+#endif
- }
- 
- void sdl2_gl_scanout_flush(DisplayChangeListener *dcl,
-@@ -236,15 +285,24 @@ void sdl2_gl_scanout_flush(DisplayChangeListener *dcl,
-     if (!scon->scanout_mode) {
-         return;
-     }
-+
-     if (!scon->guest_fb.framebuffer) {
-         return;
-     }
- 
-     SDL_GL_MakeCurrent(scon->real_window, scon->winctx);
--
-     SDL_GetWindowSize(scon->real_window, &ww, &wh);
-+
-     egl_fb_setup_default(&scon->win_fb, ww, wh);
--    egl_fb_blit(&scon->win_fb, &scon->guest_fb, !scon->y0_top);
- 
-+    if (scon->cursor_fb.texture) {
-+        egl_texture_blit(scon->gls, &scon->win_fb, &scon->guest_fb,
-+                         scon->y0_top);
-+	egl_texture_blend(scon->gls, &scon->win_fb, &scon->cursor_fb,
-+                              scon->y0_top,
-+                              scon->cursor_x, scon->cursor_y);
-+    } else {
-+        egl_fb_blit(&scon->win_fb, &scon->guest_fb, !scon->y0_top);
-+    }
-     SDL_GL_SwapWindow(scon->real_window);
- }
-diff --git a/ui/sdl2.c b/ui/sdl2.c
-index 71efd24..c865cba 100644
---- a/ui/sdl2.c
-+++ b/ui/sdl2.c
-@@ -84,7 +84,6 @@ void sdl2_window_create(struct sdl2_console *scon)
-     if (scon->hidden) {
-         flags |= SDL_WINDOW_HIDDEN;
-     }
--
-     scon->real_window = SDL_CreateWindow("", SDL_WINDOWPOS_UNDEFINED,
-                                          SDL_WINDOWPOS_UNDEFINED,
-                                          surface_width(scon->surface),
-@@ -118,7 +117,6 @@ void sdl2_window_resize(struct sdl2_console *scon)
-     if (!scon->real_window) {
-         return;
-     }
--
-     SDL_SetWindowSize(scon->real_window,
-                       surface_width(scon->surface),
-                       surface_height(scon->surface));
-@@ -740,6 +738,9 @@ static const DisplayChangeListenerOps dcl_gl_ops = {
-     .dpy_gl_scanout_disable  = sdl2_gl_scanout_disable,
-     .dpy_gl_scanout_texture  = sdl2_gl_scanout_texture,
-     .dpy_gl_scanout_dmabuf   = sdl2_gl_scanout_dmabuf,
-+    .dpy_gl_cursor_dmabuf    = sdl2_gl_cursor_dmabuf,
-+    .dpy_gl_cursor_position  = sdl2_gl_cursor_position,
-+    .dpy_gl_release_dmabuf   = sdl2_gl_release_dmabuf,
-     .dpy_gl_update           = sdl2_gl_scanout_flush,
- };
- #endif
-@@ -835,6 +836,7 @@ void sdl_display_init(DisplayState *ds, int full_screen, int no_frame)
- #endif
-     }
- 
-+    qemu_egl_init_dpy_x11(info.info.x11.display);
-     /* Load a 32x32x4 image. White pixels are transparent. */
-     filename = qemu_find_file(QEMU_FILE_TYPE_BIOS, "qemu-icon.bmp");
-     if (filename) {
+[...]
+
+> Commit of the active layer is _already_ a mirror job internally (and not
+> a stream job). 
+
+I see; didn't realize the above.  I learn that it is the case so for a
+long time, and came in via the commit 20a63d2 ("commit: Support commit
+active layer").  For my own education, I went looking into
+qemu/block/mirror.c, and noticed the variable 'commit_active_job_driver'
+(of type BlockJobDriver), which is used in the function:
+commit_active_start(). 
+
+Thanks for the pointer.
+
+> It's pretty clear to me that commit and mirror are almost
+> the same, backup is pretty similar. Stream is somewhat different and
+> might make more sense as a separate job type.
+
+Yep, understood.
+
 -- 
-2.7.4
+/kashyap
