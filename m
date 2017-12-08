@@ -1,29 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42729)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43744)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1eNMsp-0002wn-SR
-	for qemu-devel@nongnu.org; Fri, 08 Dec 2017 12:56:24 -0500
+	(envelope-from <armbru@redhat.com>) id 1eNMug-000426-LT
+	for qemu-devel@nongnu.org; Fri, 08 Dec 2017 12:58:19 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1eNMsm-0004vZ-Qr
-	for qemu-devel@nongnu.org; Fri, 08 Dec 2017 12:56:23 -0500
-Received: from mail-wr0-f195.google.com ([209.85.128.195]:45244)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1eNMsm-0004uX-Jq
-	for qemu-devel@nongnu.org; Fri, 08 Dec 2017 12:56:20 -0500
-Received: by mail-wr0-f195.google.com with SMTP id h1so11526608wre.12
-	for <qemu-devel@nongnu.org>; Fri, 08 Dec 2017 09:56:19 -0800 (PST)
-References: <20171208105553.12249-1-pbonzini@redhat.com>
-	<20171208105553.12249-3-pbonzini@redhat.com>
-	<20171208153010.GD8998@stefanha-x1.localdomain>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <43a3e41a-f6b2-dc43-f84d-53fa7efd0716@redhat.com>
-Date: Fri, 8 Dec 2017 18:56:12 +0100
+	(envelope-from <armbru@redhat.com>) id 1eNMud-0006Mb-IH
+	for qemu-devel@nongnu.org; Fri, 08 Dec 2017 12:58:18 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:44908)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1eNMud-0006MJ-8j
+	for qemu-devel@nongnu.org; Fri, 08 Dec 2017 12:58:15 -0500
+From: Markus Armbruster <armbru@redhat.com>
+References: <20170911110623.24981-1-marcandre.lureau@redhat.com>
+	<20170911110623.24981-23-marcandre.lureau@redhat.com>
+Date: Fri, 08 Dec 2017 18:58:09 +0100
+In-Reply-To: <20170911110623.24981-23-marcandre.lureau@redhat.com>
+	(=?utf-8?Q?=22Marc-Andr=C3=A9?= Lureau"'s message of "Mon, 11 Sep 2017
+	13:05:55 +0200")
+Message-ID: <87tvx19k5q.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-In-Reply-To: <20171208153010.GD8998@stefanha-x1.localdomain>
-Content-Type: text/plain; charset=windows-1252
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 2/5] lock-guard: add scoped lock
- implementation
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v3 22/50] tests: add some enum members tests
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,54 +29,148 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefan Hajnoczi <stefanha@redhat.com>
-Cc: "Emilio G . Cota" <cota@braap.org>, Fam Zheng <famz@redhat.com>, qemu-devel@nongnu.org
+To: =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>
+Cc: qemu-devel@nongnu.org, Michael Roth <mdroth@linux.vnet.ibm.com>
 
-On 08/12/2017 16:30, Stefan Hajnoczi wrote:
-> On Fri, Dec 08, 2017 at 11:55:50AM +0100, Paolo Bonzini wrote:
-> 
-> The implementation is somewhat complex.  Please structure the header
-> file so the public interfaces are clear and documented.  Move the
-> implementation out of the way and mark it private.  That will make it
-> easier for someone to figure out "how do I use lock-guard.h".
+Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com> writes:
 
-Right, unfortunately you pretty much have to place it in the header to
-guarantee that everything is inlined.
+> Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+> ---
+>  tests/Makefile.include                           | 3 +++
+>  tests/qapi-schema/enum-dict-member-invalid.err   | 1 +
+>  tests/qapi-schema/enum-dict-member-invalid.exit  | 1 +
+>  tests/qapi-schema/enum-dict-member-invalid.json  | 2 ++
+>  tests/qapi-schema/enum-dict-member-invalid.out   | 0
+>  tests/qapi-schema/enum-dict-member-invalid2.err  | 1 +
+>  tests/qapi-schema/enum-dict-member-invalid2.exit | 1 +
+>  tests/qapi-schema/enum-dict-member-invalid2.json | 2 ++
+>  tests/qapi-schema/enum-dict-member-invalid2.out  | 0
+>  tests/qapi-schema/enum-if-invalid.err            | 1 +
+>  tests/qapi-schema/enum-if-invalid.exit           | 1 +
+>  tests/qapi-schema/enum-if-invalid.json           | 3 +++
+>  tests/qapi-schema/enum-if-invalid.out            | 0
+>  13 files changed, 16 insertions(+)
+>  create mode 100644 tests/qapi-schema/enum-dict-member-invalid.err
+>  create mode 100644 tests/qapi-schema/enum-dict-member-invalid.exit
+>  create mode 100644 tests/qapi-schema/enum-dict-member-invalid.json
+>  create mode 100644 tests/qapi-schema/enum-dict-member-invalid.out
+>  create mode 100644 tests/qapi-schema/enum-dict-member-invalid2.err
+>  create mode 100644 tests/qapi-schema/enum-dict-member-invalid2.exit
+>  create mode 100644 tests/qapi-schema/enum-dict-member-invalid2.json
+>  create mode 100644 tests/qapi-schema/enum-dict-member-invalid2.out
+>  create mode 100644 tests/qapi-schema/enum-if-invalid.err
+>  create mode 100644 tests/qapi-schema/enum-if-invalid.exit
+>  create mode 100644 tests/qapi-schema/enum-if-invalid.json
+>  create mode 100644 tests/qapi-schema/enum-if-invalid.out
+>
+> diff --git a/tests/Makefile.include b/tests/Makefile.include
+> index a9f0ddbe01..0aa532f029 100644
+> --- a/tests/Makefile.include
+> +++ b/tests/Makefile.include
+> @@ -443,6 +443,9 @@ qapi-schema +=3D empty.json
+>  qapi-schema +=3D enum-bad-name.json
+>  qapi-schema +=3D enum-bad-prefix.json
+>  qapi-schema +=3D enum-clash-member.json
+> +qapi-schema +=3D enum-dict-member-invalid.json
+> +qapi-schema +=3D enum-dict-member-invalid2.json
+> +qapi-schema +=3D enum-if-invalid.json
+>  qapi-schema +=3D enum-int-member.json
+>  qapi-schema +=3D enum-member-case.json
+>  qapi-schema +=3D enum-missing-data.json
+> diff --git a/tests/qapi-schema/enum-dict-member-invalid.err b/tests/qapi-=
+schema/enum-dict-member-invalid.err
+> new file mode 100644
+> index 0000000000..d12cca0df3
+> --- /dev/null
+> +++ b/tests/qapi-schema/enum-dict-member-invalid.err
+> @@ -0,0 +1 @@
+> +tests/qapi-schema/enum-dict-member-invalid.json:2: Dictionary member of =
+enum 'MyEnum' must have a 'name' key
+> diff --git a/tests/qapi-schema/enum-dict-member-invalid.exit b/tests/qapi=
+-schema/enum-dict-member-invalid.exit
+> new file mode 100644
+> index 0000000000..d00491fd7e
+> --- /dev/null
+> +++ b/tests/qapi-schema/enum-dict-member-invalid.exit
+> @@ -0,0 +1 @@
+> +1
+> diff --git a/tests/qapi-schema/enum-dict-member-invalid.json b/tests/qapi=
+-schema/enum-dict-member-invalid.json
+> new file mode 100644
+> index 0000000000..9cf8406867
+> --- /dev/null
+> +++ b/tests/qapi-schema/enum-dict-member-invalid.json
+> @@ -0,0 +1,2 @@
+> +# we reject any enum member that is not a string or a dict with 'name'
+> +{ 'enum': 'MyEnum', 'data': [ { 'value': 'str' } ] }
+> diff --git a/tests/qapi-schema/enum-dict-member-invalid.out b/tests/qapi-=
+schema/enum-dict-member-invalid.out
+> new file mode 100644
+> index 0000000000..e69de29bb2
+> diff --git a/tests/qapi-schema/enum-dict-member-invalid2.err b/tests/qapi=
+-schema/enum-dict-member-invalid2.err
+> new file mode 100644
+> index 0000000000..f7dc1a2b33
+> --- /dev/null
+> +++ b/tests/qapi-schema/enum-dict-member-invalid2.err
+> @@ -0,0 +1 @@
+> +tests/qapi-schema/enum-dict-member-invalid2.json:2: Dictionnary has unkn=
+own keys: bad-key (allowed: name, if)
+> diff --git a/tests/qapi-schema/enum-dict-member-invalid2.exit b/tests/qap=
+i-schema/enum-dict-member-invalid2.exit
+> new file mode 100644
+> index 0000000000..d00491fd7e
+> --- /dev/null
+> +++ b/tests/qapi-schema/enum-dict-member-invalid2.exit
+> @@ -0,0 +1 @@
+> +1
+> diff --git a/tests/qapi-schema/enum-dict-member-invalid2.json b/tests/qap=
+i-schema/enum-dict-member-invalid2.json
+> new file mode 100644
+> index 0000000000..6664c59201
+> --- /dev/null
+> +++ b/tests/qapi-schema/enum-dict-member-invalid2.json
+> @@ -0,0 +1,2 @@
+> +# we reject any enum member that is not a string or a dict with 'name'
+> +{ 'enum': 'MyEnum', 'data': [ { 'name': 'foo', 'bad-key': 'str' } ] }
+> diff --git a/tests/qapi-schema/enum-dict-member-invalid2.out b/tests/qapi=
+-schema/enum-dict-member-invalid2.out
+> new file mode 100644
+> index 0000000000..e69de29bb2
+> diff --git a/tests/qapi-schema/enum-if-invalid.err b/tests/qapi-schema/en=
+um-if-invalid.err
+> new file mode 100644
+> index 0000000000..54c3cf887b
+> --- /dev/null
+> +++ b/tests/qapi-schema/enum-if-invalid.err
+> @@ -0,0 +1 @@
+> +tests/qapi-schema/enum-if-invalid.json:2: 'if' condition must be a strin=
+g or a list of strings
+> diff --git a/tests/qapi-schema/enum-if-invalid.exit b/tests/qapi-schema/e=
+num-if-invalid.exit
+> new file mode 100644
+> index 0000000000..d00491fd7e
+> --- /dev/null
+> +++ b/tests/qapi-schema/enum-if-invalid.exit
+> @@ -0,0 +1 @@
+> +1
+> diff --git a/tests/qapi-schema/enum-if-invalid.json b/tests/qapi-schema/e=
+num-if-invalid.json
+> new file mode 100644
+> index 0000000000..60bd0ef1d7
+> --- /dev/null
+> +++ b/tests/qapi-schema/enum-if-invalid.json
+> @@ -0,0 +1,3 @@
+> +# check invalid 'if' type
+> +{ 'enum': 'TestIfEnum', 'data':
+> +  [ 'foo', { 'name' : 'bar', 'if': { 'val': 'foo' } } ] }
+> diff --git a/tests/qapi-schema/enum-if-invalid.out b/tests/qapi-schema/en=
+um-if-invalid.out
+> new file mode 100644
+> index 0000000000..e69de29bb2
 
->> diff --git a/include/qemu/lock-guard.h b/include/qemu/lock-guard.h
->> new file mode 100644
->> index 0000000000..e6a83bf9ee
->> --- /dev/null
->> +++ b/include/qemu/lock-guard.h
->> @@ -0,0 +1,103 @@
->> +#ifndef QEMU_LOCK_GUARD_H
->> +#define QEMU_LOCK_GUARD_H 1
->> +
->> +typedef void QemuLockGuardFunc(void *);
->> +typedef struct QemuLockGuard {
->> +    QemuLockGuardFunc *p_lock_fn, *p_unlock_fn;
->> +    void *lock;
->> +    int locked;
-> 
-> bool?
+These tests are related to the coverage gap I mentioned in my review of
+PATCH 19.
 
-Yes.
-
->> +#define QEMU_WITH_LOCK(type, name, lock)                                   \
->> +    for (QEMU_LOCK_GUARD(type, name, lock);                                \
->> +         qemu_lock_guard_is_taken(&name);                                  \
->> +         qemu_lock_guard_unlock(&name))
-> 
-> I don't understand the need for the qemu_lock_guard_is_taken(&name)
-> condition, why not do the following?
-> 
->   for (QEMU_LOCK_GUARD(type, name, lock);
->        ;
->        qemu_lock_guard_unlock(&name))
-
-Because that would be an infinite loop. :)
-
-Paolo
-
-> Also, the for loop means that break statements do not work inside
-> QEMU_WITH_LOCK() { ... }.  This needs to be documented.
+I think it makes sense to add related new tests together, right when we
+add whatever they test.
