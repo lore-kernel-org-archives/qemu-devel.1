@@ -1,25 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37681)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40631)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1eNOVS-0000G4-Pg
-	for qemu-devel@nongnu.org; Fri, 08 Dec 2017 14:40:24 -0500
+	(envelope-from <eblake@redhat.com>) id 1eNOfp-0004WU-0I
+	for qemu-devel@nongnu.org; Fri, 08 Dec 2017 14:51:06 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1eNOVP-00079r-7L
-	for qemu-devel@nongnu.org; Fri, 08 Dec 2017 14:40:22 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:53606)
+	(envelope-from <eblake@redhat.com>) id 1eNOfl-00073E-Tn
+	for qemu-devel@nongnu.org; Fri, 08 Dec 2017 14:51:05 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:45070)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1eNOVO-00079C-TI
-	for qemu-devel@nongnu.org; Fri, 08 Dec 2017 14:40:19 -0500
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1eNOfl-00071y-JS
+	for qemu-devel@nongnu.org; Fri, 08 Dec 2017 14:51:01 -0500
 References: <20171208105553.12249-1-pbonzini@redhat.com>
+	<20171208105553.12249-6-pbonzini@redhat.com>
+	<20171208151306.GC8998@stefanha-x1.localdomain>
 From: Eric Blake <eblake@redhat.com>
-Message-ID: <32f8bbf4-1fb6-b974-f7ca-f5a91adf875e@redhat.com>
-Date: Fri, 8 Dec 2017 13:40:10 -0600
+Message-ID: <0764f51b-05d5-c842-7c1b-0e588be630c2@redhat.com>
+Date: Fri, 8 Dec 2017 13:50:52 -0600
 MIME-Version: 1.0
-In-Reply-To: <20171208105553.12249-1-pbonzini@redhat.com>
+In-Reply-To: <20171208151306.GC8998@stefanha-x1.localdomain>
 Content-Type: multipart/signed; micalg=pgp-sha256;
 	protocol="application/pgp-signature";
-	boundary="sKNPWNKQIPdTqEiHVgQmPX5Ne1k4hPgA9"
-Subject: Re: [Qemu-devel] [RFC PATCH 0/5] Scoped locks using
- attribute((cleanup))
+	boundary="ubGAMHXgO3ScnB0Sivur85ApVIMm7pP31"
+Subject: Re: [Qemu-devel] [PATCH 5/5] thread-pool: convert to use lock guards
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,109 +29,83 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org
-Cc: "Emilio G . Cota" <cota@braap.org>, Fam Zheng <famz@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>
+To: Stefan Hajnoczi <stefanha@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
+Cc: "Emilio G . Cota" <cota@braap.org>, Fam Zheng <famz@redhat.com>, qemu-devel@nongnu.org
 
 This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---sKNPWNKQIPdTqEiHVgQmPX5Ne1k4hPgA9
+--ubGAMHXgO3ScnB0Sivur85ApVIMm7pP31
 From: Eric Blake <eblake@redhat.com>
-To: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org
+To: Stefan Hajnoczi <stefanha@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
 Cc: "Emilio G . Cota" <cota@braap.org>, Fam Zheng <famz@redhat.com>,
- Stefan Hajnoczi <stefanha@redhat.com>
-Message-ID: <32f8bbf4-1fb6-b974-f7ca-f5a91adf875e@redhat.com>
-Subject: Re: [Qemu-devel] [RFC PATCH 0/5] Scoped locks using
- attribute((cleanup))
+ qemu-devel@nongnu.org
+Message-ID: <0764f51b-05d5-c842-7c1b-0e588be630c2@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH 5/5] thread-pool: convert to use lock guards
 References: <20171208105553.12249-1-pbonzini@redhat.com>
-In-Reply-To: <20171208105553.12249-1-pbonzini@redhat.com>
+ <20171208105553.12249-6-pbonzini@redhat.com>
+ <20171208151306.GC8998@stefanha-x1.localdomain>
+In-Reply-To: <20171208151306.GC8998@stefanha-x1.localdomain>
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
 
-On 12/08/2017 04:55 AM, Paolo Bonzini wrote:
-> This is an attempt to make a C API that resembles the C++
-> std::unique_lock (mostly untested).  The idea is that you can write
+On 12/08/2017 09:13 AM, Stefan Hajnoczi wrote:
+> On Fri, Dec 08, 2017 at 11:55:53AM +0100, Paolo Bonzini wrote:
+>> @@ -88,9 +88,9 @@ static void *worker_thread(void *opaque)
+>> =20
+>>          do {
+>>              pool->idle_threads++;
+>> -            qemu_mutex_unlock(&pool->lock);
+>> +            qemu_lock_guard_unlock(&pool_guard);
+>>              ret =3D qemu_sem_timedwait(&pool->sem, 10000);
+>> -            qemu_mutex_lock(&pool->lock);
+>> +            qemu_lock_guard_lock(&pool_guard);
 >=20
->     QEMU_LOCK_GUARD(QemuMutex, guard_name, &some_mutex);
+> Or:
 >=20
-> instead of
+>   QEMU_WITHOUT_LOCK_GUARD(pool_guard) {
+>       ret =3D qemu_sem_timedwait(&pool->sem, 10000);
+>   }
 >=20
->     qemu_mutex_lock(&some_mutex);
->     ...
-> out:
->     qemu_mutex_unlock(&some_mutex);
+> Seems funny but I like it. :)
 >=20
-> and the mutex will be unlocked on all exit paths.  In C++ that
-> would be "std::unique_lock<QemuMutex> guard_name(some_mutex);".
-> Likewise,
->=20
->     QEMU_WITH_LOCK(QemuMutex, guard_name, &some_mutex) {
->         ...
->     }
->=20
-> is the same as
->=20
->     qemu_mutex_lock(&some_mutex);
->     ...
->     qemu_mutex_unlock(&some_mutex);
->=20
-> except that any returns within the region will unlock the mutex.
+> Unfortunately it's tricky to come up with good semantics.  A 'return'
+> statement inside QEMU_WITHOUT_LOCK_GUARD() should leave the lock
+> unlocked.  But a 'break' statement may need to reacquire the lock...
 
-Not just returns, but ANY manner that you leave the scope, including a
-goto or just falling out of the end of the scope.
+But isn't that what happens already?
 
-(and, as Stefan pointed out, this poisons the use of 'break' when this
-is used inside a loop, as it now breaks the scope of the QEMU_WITH_LOCK
-instead of the outer loop).
+QEMU_WITH_LOCK_GUARD(guard) { // 1
+  do {
+    QEMU_WITHOUT_LOCK_GUARD(guard) {// 2
+      if (cond1) {
+        break;
+      } else if (cond2) {
+        goto endlock;
+      } else {
+        return;
+      }
+    } // 3
+  } while (cond3);
+} // 4
+endlock:
+  ; // 5
 
-> It's possible to use QemuLockGuard also with a spinlock or a
-> CoMutex.  However, it is _not_ possible to return a QemuLockGuard
-> since C doesn't have an equivalent of C++'s "move semantics", so
-> there are other "constructor" macros such as QEMU_ADOPT_LOCK
-> and QEMU_TAKEN_LOCK.
->=20
-> On the positive side, I checked that the entire abstraction
-> is removed by the compiler, the generated code is more or less
-> the same.  Also, it would let us for example change block/curl.c
-> to use a CoQueue instead of a home-grown list+QemuMutex.
->=20
-> However, I am still not sure about the readability, and it doesn't play=
+Point 2 introduces a new scope which says to unlock the guard at entry,
+and to relock the guard at all exits from the scope.  If cond1 is true,
+and we break, control flows to point 3, (because of we provided the
+scope via a for loop - so the break exits only the lock guard!), and
+relocks the guard, so the bulk of the do/while loop that is not
+sub-scoped by the WITHOUT_LOCK_GUARD remains locked.  If cond2 is true,
+then we leave the WITHOUT_LOCK_GUARD scope (and temporarily lock the
+guard), then immediately leave the WITH_LOCK_GUARD scope (and unlock the
+guard again) - the cleanup handlers ensure that unwinding out of
+multiple scopes performs all of the proper cleanups, as we skip to point
+5.  The same is true if cond2 is false and we return from the function -
+the lock is temporarily restored then released.
 
-> well with another common idiom in QEMU, which is to wrap global mutexes=
-
-> with function such as
->=20
->     static void block_job_lock(void)
->     {
->         qemu_mutex_lock(&block_job_mutex);
->     }
->=20
->     static void block_job_unlock(void)
->     {
->         qemu_mutex_unlock(&block_job_mutex);
->     }
->=20
-> So I'm a bit underwhelmed by this experiment.  Other opinions?
-
-The semantics you list here:
-
->     QEMU_WITH_LOCK(QemuMutex, guard_name, &some_mutex) {
->         ...
->     }
-
-are slightly different from the semantics in nbdkit:
-
-{
-  ACQUIRE_LOCK_FOR_CURRENT_SCOPE(&some_lock);
-  ...
-}
-
-In that your version requires the user to supply the scope after your
-macro, instead of using your macro within the scope.  But I guess that's
-because you added other helpers like QEMU_WITH_ADOPTED_LOCK,
-QEMU_RETURN_LOCK, and QEMU_TAKEN_LOCK, where you have multiple
-possibilities for which state the lock should be in.
-
-Is it worth playing around with the user providing the scope around your
-macros, instead of using your macro to introduce the scope?
+Or did you want semantics where you can return with the lock still
+locked in spite of the outer loop, and/or an optimization to avoid the
+contention on temporarily re-locking/unlocking a loop when jumping out
+of two nested scopes?
 
 --=20
 Eric Blake, Principal Software Engineer
@@ -138,7 +113,7 @@ Red Hat, Inc.           +1-919-301-3266
 Virtualization:  qemu.org | libvirt.org
 
 
---sKNPWNKQIPdTqEiHVgQmPX5Ne1k4hPgA9
+--ubGAMHXgO3ScnB0Sivur85ApVIMm7pP31
 Content-Type: application/pgp-signature; name="signature.asc"
 Content-Description: OpenPGP digital signature
 Content-Disposition: attachment; filename="signature.asc"
@@ -147,14 +122,14 @@ Content-Disposition: attachment; filename="signature.asc"
 Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
 Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
 
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAloq6poACgkQp6FrSiUn
-Q2oY2Qf+OrZ/OWfDgHyvH3s5Ug0VoIHmMd1AaMzVtx1IRA5b7YjK4SYKo/ERrR/z
-L02ZV0djO7Psw5oxv+tR75pOr5e/+m7IejtaCcZm9/mNlO4BliQeQm4jE108ljNT
-hWb5Zaxc4P/sf3lKhQSFXgW06TYVUkHPbnZIVefmdRJfGiC2EZyEjVRcUJj8iJZK
-O9+4TJA84yqlkGgo4XPR66/U/bz1zRRXmMtTSab8x3vAfRM56sgW6uTQcd0RJZAF
-KaXnXrzrXj/i8Yw/L5he1q/HsS5grPzt55uzgPZG4qt9yET6jtEu8Ev+jdO9FP0f
-jqsqpoHCUViSAtgpvljFVaiSDWcOAg==
-=GtuH
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAloq7RwACgkQp6FrSiUn
+Q2rrAAf+NAywGAkTEo3XTte5Q1+Bd75PsyUFtDn/xNdrgtddEoRrHCy+FmW2ls95
+84kfCUiHIakFiAZBxLjoGBk84oqyOoRc/ak6kXzcZanUsg9e1kgltL2AI+FuI2PX
+LTzIXMTlGP2Q0BRnYJm8OtKqA/6uQjWWhz9HlD2+6lfUoeYNAgIZ7kE974UCKppe
+ycCefywtAFHZodGArEPZF1ghozxL+pTqicmIzCB9cgs95zcBlv+FUu9mlKDlHZDD
+elPY+GcumB9ku6oUl/hGLHhEFstg3Hzy4C7hC/r0ofuCZewVXWBp2Ohvzb6u/pWX
+EqS8xIBHb1R4bbUTafSGVtMbAPpt8A==
+=I75g
 -----END PGP SIGNATURE-----
 
---sKNPWNKQIPdTqEiHVgQmPX5Ne1k4hPgA9--
+--ubGAMHXgO3ScnB0Sivur85ApVIMm7pP31--
