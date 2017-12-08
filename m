@@ -1,17 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51989)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52264)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1eNKAO-0000dk-38
-	for qemu-devel@nongnu.org; Fri, 08 Dec 2017 10:02:26 -0500
+	(envelope-from <david@redhat.com>) id 1eNKB8-00013w-30
+	for qemu-devel@nongnu.org; Fri, 08 Dec 2017 10:03:07 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1eNKAM-0007NM-UM
-	for qemu-devel@nongnu.org; Fri, 08 Dec 2017 10:02:20 -0500
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri,  8 Dec 2017 15:02:07 +0000
-Message-Id: <1512745328-5109-3-git-send-email-peter.maydell@linaro.org>
-In-Reply-To: <1512745328-5109-1-git-send-email-peter.maydell@linaro.org>
-References: <1512745328-5109-1-git-send-email-peter.maydell@linaro.org>
-Subject: [Qemu-devel] [PATCH 2/3] hw/arm/virt: Add another UART to the virt
- board
+	(envelope-from <david@redhat.com>) id 1eNKB2-0007yF-1V
+	for qemu-devel@nongnu.org; Fri, 08 Dec 2017 10:03:06 -0500
+References: <20171207165355.7559-1-david@redhat.com>
+	<20171207165355.7559-9-david@redhat.com>
+	<a4725e2c-3b8c-eee7-1587-0a22d24aa5f2@twiddle.net>
+From: David Hildenbrand <david@redhat.com>
+Message-ID: <be257229-3723-7144-fffb-2206cab23e79@redhat.com>
+Date: Fri, 8 Dec 2017 16:02:56 +0100
+MIME-Version: 1.0
+In-Reply-To: <a4725e2c-3b8c-eee7-1587-0a22d24aa5f2@twiddle.net>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v2 for-2.12 08/10] s390x/tcg: implement
+ extract-CPU-time facility
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -20,115 +26,114 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-arm@nongnu.org, qemu-devel@nongnu.org
-Cc: Shannon Zhao <shannon.zhao@linaro.org>, "Jason A . Donenfeld" <Jason@zx2c4.com>
+To: Richard Henderson <rth@twiddle.net>, qemu-s390x@nongnu.org, qemu-devel@nongnu.org
+Cc: Christian Borntraeger <borntraeger@de.ibm.com>, Cornelia Huck <cohuck@redhat.com>, Alexander Graf <agraf@suse.de>
 
-Currently we only provide one non-secure UART on the virt
-board. This is OK for most purposes, but there are some
-use cases where having a second UART would be useful (like
-bare-metal testing where you don't really want to have to
-probe and set up a PCI device just to have a second comms
-channel).
+On 08.12.2017 00:54, Richard Henderson wrote:
+> On 12/07/2017 08:53 AM, David Hildenbrand wrote:
+>> It only provides the EXTRACT CPU TIME instruction. We can reuse the stpt
+>> helper, which calculates the CPU timer value.
+>>
+>> As the instruction is not privileged, but we don't have a CPU timer
+>> value in case of linux user, we simply fake the CPU timer to be 0.
+>>
+>> Signed-off-by: David Hildenbrand <david@redhat.com>
+>> ---
+>>  target/s390x/cpu_models.c  |  1 +
+>>  target/s390x/insn-data.def |  2 ++
+>>  target/s390x/translate.c   | 36 ++++++++++++++++++++++++++++++++++++
+>>  3 files changed, 39 insertions(+)
+>>
+>> diff --git a/target/s390x/cpu_models.c b/target/s390x/cpu_models.c
+>> index 94d24e423d..0be037eac1 100644
+>> --- a/target/s390x/cpu_models.c
+>> +++ b/target/s390x/cpu_models.c
+>> @@ -834,6 +834,7 @@ static void add_qemu_cpu_model_features(S390FeatBitmap fbm)
+>>          S390_FEAT_STORE_CLOCK_FAST,
+>>          S390_FEAT_MOVE_WITH_OPTIONAL_SPEC,
+>>          S390_FEAT_ETF3_ENH,
+>> +        S390_FEAT_EXTRACT_CPU_TIME,
+>>          S390_FEAT_COMPARE_AND_SWAP_AND_STORE,
+>>          S390_FEAT_COMPARE_AND_SWAP_AND_STORE_2,
+>>          S390_FEAT_GENERAL_INSTRUCTIONS_EXT,
+>> diff --git a/target/s390x/insn-data.def b/target/s390x/insn-data.def
+>> index f7b66b0091..5e33bd27ff 100644
+>> --- a/target/s390x/insn-data.def
+>> +++ b/target/s390x/insn-data.def
+>> @@ -369,6 +369,8 @@
+>>      C(0xb24f, EAR,     RRE,   Z,   0, 0, new, r1_32, ear, 0)
+>>  /* EXTRACT CPU ATTRIBUTE */
+>>      C(0xeb4c, ECAG,    RSY_a, GIE, 0, a2, r1, 0, ecag, 0)
+>> +/* EXTRACT CPU TIME */
+>> +    C(0xc801, ECTG,    SSF,   ECT, 0, 0, 0, 0, ectg, 0)
+>>  /* EXTRACT FPC */
+>>      C(0xb38c, EFPC,    RRE,   Z,   0, 0, new, r1_32, efpc, 0)
+>>  /* EXTRACT PSW */
+>> diff --git a/target/s390x/translate.c b/target/s390x/translate.c
+>> index 1e4079464a..e0f55fc8e9 100644
+>> --- a/target/s390x/translate.c
+>> +++ b/target/s390x/translate.c
+>> @@ -3887,6 +3887,41 @@ static ExitStatus op_spm(DisasContext *s, DisasOps *o)
+>>      return NO_EXIT;
+>>  }
+>>  
+>> +static ExitStatus op_ectg(DisasContext *s, DisasOps *o)
+>> +{
+>> +    int b1 = get_field(s->fields, b1);
+>> +    int d1 = get_field(s->fields, d1);
+>> +    int b2 = get_field(s->fields, b2);
+>> +    int d2 = get_field(s->fields, d2);
+>> +    int r3 = get_field(s->fields, r3);
+>> +    TCGv_i64 tmp = tcg_temp_new_i64();
+>> +
+>> +    /* fetch all operands first */
+>> +    o->in1 = tcg_temp_new_i64();
+>> +    tcg_gen_addi_i64(o->in1, regs[b1], d1);
+>> +    o->in2 = tcg_temp_new_i64();
+>> +    tcg_gen_addi_i64(o->in2, regs[b2], d2);
+>> +    o->addr1 = get_address(s, 0, r3, 0);
+>> +
+>> +    /* load the third operand into r3 before modifying anything */
+>> +    tcg_gen_qemu_ld64(regs[r3], o->addr1, get_mem_index(s));
+>> +
+>> +#ifndef CONFIG_USER_ONLY
+>> +    /* subtract CPU timer from first operand and store in GR0 */
+>> +    gen_helper_stpt(tmp, cpu_env);
+>> +    tcg_gen_sub_i64(regs[0], o->in1, tmp);
+>> +#else
+>> +    /* we don't have a CPU timer, fake value 0 */
+>> +    tcg_gen_mov_i64(regs[0], o->in1);
+>> +#endif
+> 
+> It's easy enough to pass along cpu_get_host_ticks() for user-only.  Possibly
+> not quite right, but better than nothing.
+> 
+> 
+> r~
+> 
 
-Add a second NS UART to the virt board. This will be the
-second serial device if 'secure=no' (the default), and the
-third serial device if 'secure=yes'.
 
-Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
----
- include/hw/arm/virt.h |  2 ++
- hw/arm/virt.c         | 19 ++++++++++++++++---
- 2 files changed, 18 insertions(+), 3 deletions(-)
+What about this:
 
-diff --git a/include/hw/arm/virt.h b/include/hw/arm/virt.h
-index 33b0ff3..685009a 100644
---- a/include/hw/arm/virt.h
-+++ b/include/hw/arm/virt.h
-@@ -72,6 +72,7 @@ enum {
-     VIRT_GPIO,
-     VIRT_SECURE_UART,
-     VIRT_SECURE_MEM,
-+    VIRT_UART_2,
- };
- 
- typedef struct MemMapEntry {
-@@ -85,6 +86,7 @@ typedef struct {
-     bool no_its;
-     bool no_pmu;
-     bool claim_edge_triggered_timers;
-+    bool no_second_uart;
- } VirtMachineClass;
- 
- typedef struct {
-diff --git a/hw/arm/virt.c b/hw/arm/virt.c
-index 543f9bd..e234f55 100644
---- a/hw/arm/virt.c
-+++ b/hw/arm/virt.c
-@@ -139,6 +139,7 @@ static const MemMapEntry a15memmap[] = {
-     [VIRT_FW_CFG] =             { 0x09020000, 0x00000018 },
-     [VIRT_GPIO] =               { 0x09030000, 0x00001000 },
-     [VIRT_SECURE_UART] =        { 0x09040000, 0x00001000 },
-+    [VIRT_UART_2] =             { 0x09050000, 0x00001000 },
-     [VIRT_MMIO] =               { 0x0a000000, 0x00000200 },
-     /* ...repeating for a total of NUM_VIRTIO_TRANSPORTS, each of that size */
-     [VIRT_PLATFORM_BUS] =       { 0x0c000000, 0x02000000 },
-@@ -157,6 +158,7 @@ static const int a15irqmap[] = {
-     [VIRT_PCIE] = 3, /* ... to 6 */
-     [VIRT_GPIO] = 7,
-     [VIRT_SECURE_UART] = 8,
-+    [VIRT_UART_2] = 9,
-     [VIRT_MMIO] = 16, /* ...to 16 + NUM_VIRTIO_TRANSPORTS - 1 */
-     [VIRT_GIC_V2M] = 48, /* ...to 48 + NUM_GICV2M_SPIS - 1 */
-     [VIRT_PLATFORM_BUS] = 112, /* ...to 112 + PLATFORM_BUS_NUM_IRQS -1 */
-@@ -676,7 +678,7 @@ static void create_uart(const VirtMachineState *vms, qemu_irq *pic, int uart,
- 
-     if (uart == VIRT_UART) {
-         qemu_fdt_setprop_string(vms->fdt, "/chosen", "stdout-path", nodename);
--    } else {
-+    } else if (uart == VIRT_SECURE_UART) {
-         /* Mark as not usable by the normal world */
-         qemu_fdt_setprop_string(vms->fdt, nodename, "status", "disabled");
-         qemu_fdt_setprop_string(vms->fdt, nodename, "secure-status", "okay");
-@@ -1260,6 +1262,7 @@ static void machvirt_init(MachineState *machine)
-     int n, virt_max_cpus;
-     MemoryRegion *ram = g_new(MemoryRegion, 1);
-     bool firmware_loaded = bios_name || drive_get(IF_PFLASH, 0, 0);
-+    int uart_count = 0;
- 
-     /* We can probe only here because during property set
-      * KVM is not available yet
-@@ -1419,11 +1422,16 @@ static void machvirt_init(MachineState *machine)
- 
-     fdt_add_pmu_nodes(vms);
- 
--    create_uart(vms, pic, VIRT_UART, sysmem, serial_hds[0]);
-+    create_uart(vms, pic, VIRT_UART, sysmem, serial_hds[uart_count++]);
- 
-     if (vms->secure) {
-         create_secure_ram(vms, secure_sysmem);
--        create_uart(vms, pic, VIRT_SECURE_UART, secure_sysmem, serial_hds[1]);
-+        create_uart(vms, pic, VIRT_SECURE_UART, secure_sysmem,
-+                    serial_hds[uart_count++]);
-+    }
+
++/* Store CPU Timer (also used for EXTRACT CPU TIME) */
++uint64_t HELPER(stpt)(CPUS390XState *env)
++{
++#if defined(CONFIG_USER_ONLY)
++    /*
++     * Fake a descending CPU timer. We could get negative values here,
++     * but we don't care as it is up to the OS when to process that
++     * interrupt and reset to > 0.
++     */
++    return UINT64_MAX - (uint64_t)cpu_get_host_ticks();
++#else
++    return time2tod(env->cputm - qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL));
++#endif
++}
 +
-+    if (!vmc->no_second_uart) {
-+        create_uart(vms, pic, VIRT_UART_2, sysmem, serial_hds[uart_count++]);
-     }
- 
-     create_rtc(vms, pic);
-@@ -1693,8 +1701,13 @@ static void virt_2_11_instance_init(Object *obj)
- 
- static void virt_machine_2_11_options(MachineClass *mc)
- {
-+    VirtMachineClass *vmc = VIRT_MACHINE_CLASS(OBJECT_CLASS(mc));
-+
-     virt_machine_2_12_options(mc);
-     SET_MACHINE_COMPAT(mc, VIRT_COMPAT_2_11);
-+
-+    /* The second NS UART was added in 2.12 */
-+    vmc->no_second_uart = true;
- }
- DEFINE_VIRT_MACHINE(2, 11)
- 
+
 -- 
-2.7.4
+
+Thanks,
+
+David / dhildenb
