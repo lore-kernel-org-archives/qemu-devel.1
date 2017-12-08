@@ -1,31 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46080)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50954)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <brijesh.singh@amd.com>) id 1eNRaD-0008NL-7t
-	for qemu-devel@nongnu.org; Fri, 08 Dec 2017 17:57:30 -0500
+	(envelope-from <cota@braap.org>) id 1eNRlq-00062i-Bf
+	for qemu-devel@nongnu.org; Fri, 08 Dec 2017 18:09:31 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <brijesh.singh@amd.com>) id 1eNRa9-0007ni-9R
-	for qemu-devel@nongnu.org; Fri, 08 Dec 2017 17:57:29 -0500
-Received: from mail-by2nam03on0071.outbound.protection.outlook.com
-	([104.47.42.71]:32000
-	helo=NAM03-BY2-obe.outbound.protection.outlook.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <brijesh.singh@amd.com>)
-	id 1eNRa8-0007mD-Ti
-	for qemu-devel@nongnu.org; Fri, 08 Dec 2017 17:57:25 -0500
-References: <20171206200346.116537-1-brijesh.singh@amd.com>
-	<20171206200346.116537-2-brijesh.singh@amd.com>
-	<CAFEAcA8UvBopec1ammRML+fgh36YLfRyg2wsgmzesmAUFy8H3w@mail.gmail.com>
-	<7e7b6c05-68de-c4f8-6163-53588a6d545e@amd.com>
-	<CAFEAcA_A9c3QMOJeHK+gyTpwkxo0hpkU9jhCdvQnpfbGBw+Wfg@mail.gmail.com>
-From: Brijesh Singh <brijesh.singh@amd.com>
-Message-ID: <053109e5-3b12-b76c-7d87-5f1e4941ebed@amd.com>
-Date: Fri, 8 Dec 2017 16:57:13 -0600
+	(envelope-from <cota@braap.org>) id 1eNRlp-0001K1-0i
+	for qemu-devel@nongnu.org; Fri, 08 Dec 2017 18:09:30 -0500
+Date: Fri, 8 Dec 2017 18:09:20 -0500
+From: "Emilio G. Cota" <cota@braap.org>
+Message-ID: <20171208230920.GA11462@flamenco>
+References: <1507824216-29058-1-git-send-email-peter.maydell@linaro.org>
+	<1507824216-29058-9-git-send-email-peter.maydell@linaro.org>
 MIME-Version: 1.0
-In-Reply-To: <CAFEAcA_A9c3QMOJeHK+gyTpwkxo0hpkU9jhCdvQnpfbGBw+Wfg@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Content-Language: en-US
-Subject: Re: [Qemu-devel] [PATCH v5 01/23] memattrs: add debug attribute
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1507824216-29058-9-git-send-email-peter.maydell@linaro.org>
+Subject: Re: [Qemu-devel] [PULL 08/13] target/arm: Pull Thumb insn word
+ loads up to top level
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,41 +25,75 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: Peter Maydell <peter.maydell@linaro.org>
-Cc: brijesh.singh@amd.com, QEMU Developers <qemu-devel@nongnu.org>, Alistair Francis <alistair.francis@xilinx.com>, Christian Borntraeger <borntraeger@de.ibm.com>, Cornelia Huck <cornelia.huck@de.ibm.com>, "Daniel P . Berrange" <berrange@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, "Edgar E . Iglesias" <edgar.iglesias@xilinx.com>, Eduardo Habkost <ehabkost@redhat.com>, Eric Blake <eblake@redhat.com>, kvm-devel <kvm@vger.kernel.org>, Marcel Apfelbaum <marcel@redhat.com>, Markus Armbruster <armbru@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Richard Henderson <richard.henderson@linaro.org>, Richard Henderson <rth@twiddle.net>, Stefan Hajnoczi <stefanha@gmail.com>, Thomas Lendacky <Thomas.Lendacky@amd.com>, Borislav Petkov <bp@suse.de>
+Cc: qemu-devel@nongnu.org, Richard Henderson <richard.henderson@linaro.org>, qemu-arm@nongnu.org
 
+On Thu, Oct 12, 2017 at 17:03:31 +0100, Peter Maydell wrote:
+> Refactor the Thumb decode to do the loads of the instruction words at
+> the top level rather than only loading the second half of a 32-bit
+> Thumb insn in the middle of the decode.
+> 
+> This is simple apart from the awkward case of Thumb1, where the
+> BL/BLX prefix and suffix instructions live in what in Thumb2 is the
+> 32-bit insn space.  To handle these we decode enough to identify
+> whether we're looking at a prefix/suffix that we handle as a 16 bit
+> insn, or a prefix that we're going to merge with the following suffix
+> to consider as a 32 bit insn.  The translation of the 16 bit cases
+> then moves from disas_thumb2_insn() to disas_thumb_insn().
+> 
+> The refactoring has the benefit that we don't need to pass the
+> CPUARMState* down into the decoder code any more, but the major
+> reason for doing this is that some Thumb instructions must be always
+> unconditional regardless of the IT state bits, so we need to know the
+> whole insn before we emit the "skip this insn if the IT bits and cond
+> state tell us to" code.  (The always unconditional insns are BKPT,
+> HLT and SG; the last of these is 32 bits.)
+> 
+> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+> Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+> Message-id: 1507556919-24992-7-git-send-email-peter.maydell@linaro.org
 
+This commit breaks the debian-arm boot test (see [1]), boot dies at:
 
-On 12/8/17 3:55 AM, Peter Maydell wrote:
->> If you give me example on how
->> to trigger this type of request with debug=3D1 then I can look into the =
-code
->> and see what we can do when memory encryption is enabled. The things lik=
-e
->> read-clears-bits semantics will be tricky.
-> The question was really whether we want to make this a general
-> indicator of "this operation was triggered by a debugger" and
-> expand that to mean "don't do things that mess with the state
-> of the simulation unexpectedly", or if this is really a very
-> encrypted-memory specific thing.
+> random: systemd urandom read with 4 bits of entropy available
+> systemd[1]: Caught <SEGV>, core dump failed.
+> systemd[1]: Freezing execution.
 
-It can be used as a generic indicator that operation was triggered by a
-debugger. There is not anything encryption specific. Having said that,
-in the current patch series I have been only focused on making it work
-from the gdbstub and HMP point of view. The debug=3D1 from gdbstub and HMP
-is tested on both encrypted and non-encrypted guest. If we decide to
-extend to support other callers (device model etc) then we may need to
-update memory load/store functions defined in memory_ldst_inc.c to work
-with debug=3D1.
+Sorry I noticed this so late (-rc4), for a while I thought my development
+was causing this and didn't pay much attention to it. However, just realised
+the problem is present on master. Bisect log below.
 
-> By the way, I don't think this:
->
->> /* Access the guest memory for debug purposes */
->> #define MEMTXATTRS_DEBUG ((MemTxAttrs) { .debug =3D 1 })
-> is a great idea. Callers that care about the transaction
-> attributes should just specify them properly. MEMTXATTRS_UNSPECIFIED
-> is a fallback for the large set of places that don't care at all.
+Thanks,
 
-OK, I will drop the macro and update the patches in the series to set
-MemTxAttr.debug =3D 1 when we do debugger request.=C2=A0 thanks
+		Emilio
 
---Brijesh
+[1] https://lists.gnu.org/archive/html/qemu-devel/2017-06/msg04085.html
+
+$ git bisect log
+git bisect start
+# bad: [2babfe0c9241c239272a03fec785165a50e8288c] Update version for v2.11.0-rc4 release
+git bisect bad 2babfe0c9241c239272a03fec785165a50e8288c
+# good: [1ab5eb4efb91a3d4569b0df6e824cc08ab4bd8ec] Update version for v2.10.0 release
+git bisect good 1ab5eb4efb91a3d4569b0df6e824cc08ab4bd8ec
+# good: [62a2554ec2630896d1299e1a282a64c7f3b00da0] 390x/css: introduce maximum data address checking
+git bisect good 62a2554ec2630896d1299e1a282a64c7f3b00da0
+# bad: [f51f315a676ec913a55ac27be4ef857f9f7ddc5c] translate-all: use qemu_protect_rwx/none helpers
+git bisect bad f51f315a676ec913a55ac27be4ef857f9f7ddc5c
+# bad: [9f99c85c4a364f8de8134eb53b0cc1b84ded4b3f] Merge remote-tracking branch 'remotes/gkurz/tags/for-upstream' into staging
+git bisect bad 9f99c85c4a364f8de8134eb53b0cc1b84ded4b3f
+# good: [3637cf58f9441ad277fd70299a29d0e39b32c96c] util: move qemu_real_host_page_size/mask to osdep.h
+git bisect good 3637cf58f9441ad277fd70299a29d0e39b32c96c
+# bad: [b81b948ecc8659d78066f374c787ed12379d21dd] virtio/pci/migration: Convert to VMState
+git bisect bad b81b948ecc8659d78066f374c787ed12379d21dd
+# good: [43851b5bd48d952561610d0d6d6c314c97eff543] iotests: Set up Python logging
+git bisect good 43851b5bd48d952561610d0d6d6c314c97eff543
+# bad: [76eff04d166b8fe747adbe82de8b7e060e668ff9] target/arm: Implement SG instruction corner cases
+git bisect bad 76eff04d166b8fe747adbe82de8b7e060e668ff9
+# good: [b9f587d62cebed427206539750ebf59bde4df422] target/arm: Add M profile secure MMU index values to get_a32_user_mem_index()
+git bisect good b9f587d62cebed427206539750ebf59bde4df422
+# good: [6b8acf256df09c8a8dd7dcaa79b06eaff4ad63f7] target-arm: Don't check for "Thumb2 or M profile" for not-Thumb1
+git bisect good 6b8acf256df09c8a8dd7dcaa79b06eaff4ad63f7
+# bad: [5b8d7289e9e92a0d7bcecb93cd189e245fef10cd] target-arm: Simplify insn_crosses_page()
+git bisect bad 5b8d7289e9e92a0d7bcecb93cd189e245fef10cd
+# bad: [296e5a0a6c393553079a641c50521ae33ff89324] target/arm: Pull Thumb insn word loads up to top level
+git bisect bad 296e5a0a6c393553079a641c50521ae33ff89324
+# first bad commit: [296e5a0a6c393553079a641c50521ae33ff89324] target/arm: Pull Thumb insn word loads up to top level
