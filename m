@@ -1,19 +1,15 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37253)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38937)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mark.kanda@oracle.com>) id 1eNL02-0006VL-Cw
-	for qemu-devel@nongnu.org; Fri, 08 Dec 2017 10:55:43 -0500
+	(envelope-from <david@redhat.com>) id 1eNL6O-0001nh-6c
+	for qemu-devel@nongnu.org; Fri, 08 Dec 2017 11:02:17 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mark.kanda@oracle.com>) id 1eNL01-0000a6-BJ
-	for qemu-devel@nongnu.org; Fri, 08 Dec 2017 10:55:42 -0500
-From: Mark Kanda <mark.kanda@oracle.com>
-Date: Fri,  8 Dec 2017 09:57:26 -0600
-Message-Id: <69085bc5e9cc05d4dd04805e2321cac5928c4106.1512748083.git.mark.kanda@oracle.com>
-In-Reply-To: <cover.1512748083.git.mark.kanda@oracle.com>
-References: <cover.1512589016.git.mark.kanda@oracle.com>
-	<cover.1512748083.git.mark.kanda@oracle.com>
-In-Reply-To: <cover.1512748083.git.mark.kanda@oracle.com>
-References: <cover.1512748083.git.mark.kanda@oracle.com>
-Subject: [Qemu-devel] [PATCH v2 1/2] virtio-blk: make queue size configurable
+	(envelope-from <david@redhat.com>) id 1eNL6L-0005JE-5k
+	for qemu-devel@nongnu.org; Fri, 08 Dec 2017 11:02:16 -0500
+From: David Hildenbrand <david@redhat.com>
+Date: Fri,  8 Dec 2017 17:01:53 +0100
+Message-Id: <20171208160207.26494-1-david@redhat.com>
+Subject: [Qemu-devel] [PATCH v3 for-2.12 00/14] s390x/tcg: CCW hotplug,
+ facilities, instructions
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,68 +18,66 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-block@nongnu.org, qemu-devel@nongnu.org
-Cc: stefanha@redhat.com, konrad.wilk@oracle.com, martin.petersen@oracle.com, ameya.more@oracle.com, karl.heubaum@oracle.com, Mark Kanda <mark.kanda@oracle.com>
+To: qemu-s390x@nongnu.org, qemu-devel@nongnu.org
+Cc: Christian Borntraeger <borntraeger@de.ibm.com>, Cornelia Huck <cohuck@redhat.com>, Richard Henderson <rth@twiddle.net>, Alexander Graf <agraf@suse.de>
 
-Depending on the configuration, it can be beneficial to adjust the virtio-blk
-queue size to something other than the current default of 128. Add a new
-property to make the queue size configurable.
+Both series in one piece as (most probably) most reviewing is done.
 
-Signed-off-by: Mark Kanda <mark.kanda@oracle.com>
-Reviewed-by: Karl Heubaum <karl.heubaum@oracle.com>
-Reviewed-by: Martin K. Petersen <martin.petersen@oracle.com>
-Reviewed-by: Ameya More <ameya.more@oracle.com>
----
- hw/block/virtio-blk.c          | 10 +++++++++-
- include/hw/virtio/virtio-blk.h |  1 +
- 2 files changed, 10 insertions(+), 1 deletion(-)
+Wire up some io instructions and implement new facilitites. Make sure
+to take care of MTTCG when it comes to atomic operations. Make CCW
+hotplug work.
 
-diff --git a/hw/block/virtio-blk.c b/hw/block/virtio-blk.c
-index 05d1440..fb59f57 100644
---- a/hw/block/virtio-blk.c
-+++ b/hw/block/virtio-blk.c
-@@ -928,6 +928,13 @@ static void virtio_blk_device_realize(DeviceState *dev, Error **errp)
-         error_setg(errp, "num-queues property must be larger than 0");
-         return;
-     }
-+    if (!is_power_of_2(conf->queue_size) ||
-+        conf->queue_size > VIRTQUEUE_MAX_SIZE) {
-+        error_setg(errp, "invalid queue-size property (%" PRIu16 "), "
-+                   "must be a power of 2 (max %d)",
-+                   conf->queue_size, VIRTQUEUE_MAX_SIZE);
-+        return;
-+    }
- 
-     blkconf_serial(&conf->conf, &conf->serial);
-     blkconf_apply_backend_options(&conf->conf,
-@@ -953,7 +960,7 @@ static void virtio_blk_device_realize(DeviceState *dev, Error **errp)
-     s->sector_mask = (s->conf.conf.logical_block_size / BDRV_SECTOR_SIZE) - 1;
- 
-     for (i = 0; i < conf->num_queues; i++) {
--        virtio_add_queue(vdev, 128, virtio_blk_handle_output);
-+        virtio_add_queue(vdev, conf->queue_size, virtio_blk_handle_output);
-     }
-     virtio_blk_data_plane_create(vdev, conf, &s->dataplane, &err);
-     if (err != NULL) {
-@@ -1012,6 +1019,7 @@ static Property virtio_blk_properties[] = {
-     DEFINE_PROP_BIT("request-merging", VirtIOBlock, conf.request_merging, 0,
-                     true),
-     DEFINE_PROP_UINT16("num-queues", VirtIOBlock, conf.num_queues, 1),
-+    DEFINE_PROP_UINT16("queue-size", VirtIOBlock, conf.queue_size, 128),
-     DEFINE_PROP_LINK("iothread", VirtIOBlock, conf.iothread, TYPE_IOTHREAD,
-                      IOThread *),
-     DEFINE_PROP_END_OF_LIST(),
-diff --git a/include/hw/virtio/virtio-blk.h b/include/hw/virtio/virtio-blk.h
-index d3c8a6f..5117431 100644
---- a/include/hw/virtio/virtio-blk.h
-+++ b/include/hw/virtio/virtio-blk.h
-@@ -39,6 +39,7 @@ struct VirtIOBlkConf
-     uint32_t config_wce;
-     uint32_t request_merging;
-     uint16_t num_queues;
-+    uint16_t queue_size;
- };
- 
- struct VirtIOBlockDataPlane;
+As we are now able to install/boot a Fedora 26/27 as well as an upstream
+kernel compiled for z12, let's bump up the QEMU cpu model to a very
+stripped down version of a z12 (with missing base features). Take care
+of backwards compatibility (as we defined the QEMU model as
+migration-safe).
+
+Avilable at: https://github.com/davidhildenbrand/qemu.git s390x-queue
+
+v2 -> v3:
+- squashed the ASI/ASGI and ALSI/ALSGI patches.
+ - Both now emulate old behavior.
+- "s390x/tcg: implement Interlocked-Access Facility 2"
+ - now also emulates old behavior.
+- "s390x/tcg: implement SET CLOCK PROGRAMMABLE FIELD"
+ - now forwards r1 into the helper.
+- "s390x/tcg: implement extract-CPU-time facility"
+ - takes care of user-only
+- "s390x: change the QEMU cpu model to a stripped down z12"
+  - const -> static const for two feature bitmaps
+
+
+David Hildenbrand (14):
+  s390x/kvm: factor out build_channel_report_mcic() into cpu.h
+  s390x/tcg: fix and cleanup mcck injection
+  s390x/tcg: implement SET CLOCK PROGRAMMABLE FIELD
+  s390x/tcg: indicate value of TODPR in STCKE
+  s390x/tcg: wire up STORE CHANNEL REPORT WORD
+  s390x/tcg: ASI/ASGI/ALSI/ALSGI are atomic with Interlocked-acccess
+    facility 1
+  s390x/tcg: implement Interlocked-Access Facility 2
+  s390x/tcg: wire up SET ADDRESS LIMIT
+  s390x/tcg: wire up SET CHANNEL MONITOR
+  s390x/tcg: Implement STORE CHANNEL PATH STATUS
+  s390x/tcg: Implement SIGNAL ADAPTER instruction
+  s390x/tcg: implement extract-CPU-time facility
+  s390x/tcg: we already implement the Set-Program-Parameter facility
+  s390x: change the QEMU cpu model to a stripped down z12
+
+ hw/s390x/s390-virtio-ccw.c  |   8 +++
+ target/s390x/cpu.h          |  26 +++++++
+ target/s390x/cpu_models.c   |  97 +++++++++++---------------
+ target/s390x/cpu_models.h   |   1 +
+ target/s390x/excp_helper.c  |  12 ++--
+ target/s390x/gen-features.c |  87 +++++++++++++++++++++++
+ target/s390x/helper.h       |   6 +-
+ target/s390x/insn-data.def  |  29 +++++---
+ target/s390x/internal.h     |   6 +-
+ target/s390x/kvm.c          |  25 +------
+ target/s390x/misc_helper.c  |  59 ++++++++++++++--
+ target/s390x/translate.c    | 164 ++++++++++++++++++++++++++++++++++++++++++++
+ 12 files changed, 415 insertions(+), 105 deletions(-)
+
 -- 
-1.8.3.1
+2.14.3
