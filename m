@@ -1,23 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34118)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34430)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <rth7680@gmail.com>) id 1eN66c-0002Ev-0v
-	for qemu-devel@nongnu.org; Thu, 07 Dec 2017 19:01:30 -0500
+	(envelope-from <rth7680@gmail.com>) id 1eN67b-00036O-9D
+	for qemu-devel@nongnu.org; Thu, 07 Dec 2017 19:02:31 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <rth7680@gmail.com>) id 1eN66W-0003sO-UA
-	for qemu-devel@nongnu.org; Thu, 07 Dec 2017 19:01:30 -0500
+	(envelope-from <rth7680@gmail.com>) id 1eN67a-0005Jk-E4
+	for qemu-devel@nongnu.org; Thu, 07 Dec 2017 19:02:31 -0500
 Sender: Richard Henderson <rth7680@gmail.com>
 References: <20171207153141.15523-1-david@redhat.com>
-	<20171207153141.15523-4-david@redhat.com>
+	<20171207153141.15523-5-david@redhat.com>
 From: Richard Henderson <rth@twiddle.net>
-Message-ID: <4dd3b2a3-854d-303c-d407-f8625b738a3c@twiddle.net>
-Date: Thu, 7 Dec 2017 16:00:50 -0800
+Message-ID: <2e29bd7a-d0d2-bafd-0579-9c8235727c4c@twiddle.net>
+Date: Thu, 7 Dec 2017 16:02:26 -0800
 MIME-Version: 1.0
-In-Reply-To: <20171207153141.15523-4-david@redhat.com>
+In-Reply-To: <20171207153141.15523-5-david@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v2 for-2.12 3/5] s390x/tcg: implement SET
- CLOCK PROGRAMMABLE FIELD
+Subject: Re: [Qemu-devel] [PATCH v2 for-2.12 4/5] s390x/tcg: indicate value
+ of TODPR in STCKE
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,21 +30,10 @@ To: David Hildenbrand <david@redhat.com>, qemu-s390x@nongnu.org, qemu-devel@nong
 Cc: Christian Borntraeger <borntraeger@de.ibm.com>, Cornelia Huck <cohuck@redhat.com>, Alexander Graf <agraf@suse.de>
 
 On 12/07/2017 07:31 AM, David Hildenbrand wrote:
-> +DEF_HELPER_FLAGS_1(sckpf, TCG_CALL_NO_RWG, void, env)
-...
-> +/* Set Tod Programmable Field */
-> +void HELPER(sckpf)(CPUS390XState *env)
-> +{
-> +    uint32_t val = env->regs[0];
-> +
-> +    if (val & 0xffff0000) {
-> +        s390_program_interrupt(env, PGM_SPECIFICATION, 2, GETPC());
-> +    }
-> +    env->todpr = val;
-> +}
+> +    /* 16 bit value store in an uint32_t (only valid bits set) */
+> +    tcg_gen_ld32u_i64(todpr, cpu_env, offsetof(CPUS390XState, todpr));
 
-You do read a tcg global -- regs[0].  Either pass in r0 as a parameter or use
-TCG_CALL_NO_WG.
+Any reason not to use a uint16_t and use tcg_gen_ld16u_i64 here?
 
 
 r~
