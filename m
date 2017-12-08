@@ -1,26 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36074)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37312)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1eNJ60-000460-Ev
-	for qemu-devel@nongnu.org; Fri, 08 Dec 2017 08:53:45 -0500
+	(envelope-from <armbru@redhat.com>) id 1eNJB7-0006hZ-Oj
+	for qemu-devel@nongnu.org; Fri, 08 Dec 2017 08:59:02 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1eNJ5z-0004ih-DP
-	for qemu-devel@nongnu.org; Fri, 08 Dec 2017 08:53:44 -0500
-Date: Fri, 8 Dec 2017 13:53:29 +0000
-From: "Daniel P. Berrange" <berrange@redhat.com>
-Message-ID: <20171208135329.GG11767@redhat.com>
-Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
-References: <20171120201004.14999-1-mreitz@redhat.com>
-	<20171120201004.14999-25-mreitz@redhat.com>
-	<w51k1y2307y.fsf@maestria.local.igalia.com>
-	<bcbf0021-4fcd-26d0-e05c-cd3e35608988@redhat.com>
-	<w51h8t531ql.fsf@maestria.local.igalia.com>
-	<032b64ec-a161-ff2a-5505-06b91deb2682@redhat.com>
+	(envelope-from <armbru@redhat.com>) id 1eNJB4-0008Go-JT
+	for qemu-devel@nongnu.org; Fri, 08 Dec 2017 08:59:01 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:55892)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1eNJB4-0008G4-Cg
+	for qemu-devel@nongnu.org; Fri, 08 Dec 2017 08:58:58 -0500
+From: Markus Armbruster <armbru@redhat.com>
+References: <20170911110623.24981-1-marcandre.lureau@redhat.com>
+	<20170911110623.24981-21-marcandre.lureau@redhat.com>
+Date: Fri, 08 Dec 2017 14:58:48 +0100
+In-Reply-To: <20170911110623.24981-21-marcandre.lureau@redhat.com>
+	(=?utf-8?Q?=22Marc-Andr=C3=A9?= Lureau"'s message of "Mon, 11 Sep 2017
+	13:05:53 +0200")
+Message-ID: <87tvx1e2xz.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <032b64ec-a161-ff2a-5505-06b91deb2682@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v7 for-2.12 24/25] block/curl: Implement
- bdrv_refresh_filename()
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v3 20/50] qapi-event: add 'if' condition to
+ generated enum
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,62 +30,31 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Max Reitz <mreitz@redhat.com>
-Cc: Alberto Garcia <berto@igalia.com>, qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>, John Snow <jsnow@redhat.com>, qemu-devel@nongnu.org
+To: =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>
+Cc: qemu-devel@nongnu.org, Michael Roth <mdroth@linux.vnet.ibm.com>
 
-On Fri, Dec 08, 2017 at 02:47:52PM +0100, Max Reitz wrote:
-> On 2017-12-05 11:31, Alberto Garcia wrote:
-> > On Mon 04 Dec 2017 07:26:02 PM CET, Max Reitz wrote:
-> >>>> +static void curl_refresh_filename(BlockDriverState *bs)
-> >>>> +{
-> >>>> +    BDRVCURLState *s = bs->opaque;
-> >>>> +
-> >>>> +    if (!s->sslverify || s->cookie ||
-> >>>> +        s->username || s->password || s->proxyusername || s->proxypassword)
-> >>>> +    {
-> >>>
-> >>> Is !s->sslverify negative because that setting is true by default?
-> >>
-> >> Yes, exactly.  If it's false, you'd need to override it (and you can't
-> >> do that through a plain filename).
-> > 
-> > I think this is not the only case in this series, but I'm not very
-> > comfortable with the idea that this condition and the default value of
-> > the setting are implicity dependent on each other. If you change one and
-> > forget to change the other things will break.
-> 
-> Well, yes, but...
-> 
-> > I understand that the default value is never supposed to change so in
-> > practice I don't see this breaking,
-> 
-> Yes.
-> 
-> >                                     but is it perhaps worth adding tests
-> > for all these cases?
-> 
-> In theory, sure.  In practice, adding a curl test case seems hard.
-> 
-> Well, I could connect to, I don't know, qemu.org or something and then
-> just test things there (with the index used as a raw image), but if I
-> add one test for the curl protocol, nobody is ever going to run them...
-> And in theory, that's not how a curl test should work.  In theory, you'd
-> expect the user to set up a localhost server with some known root
-> directory and then _make_test_img etc. would set up images there.  But
-> that way, really nobody is ever going to run them.
+Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com> writes:
 
-For qemu I/O tests I would suggest just having the iotest spin up a simple
-http server in Python - there's standard APIs in python that make this
-pretty trivial
+> Add condition to QAPIEvent enum members based on the event 'if'.
+>
+> Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+> ---
+>  scripts/qapi-event.py | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+>
+> diff --git a/scripts/qapi-event.py b/scripts/qapi-event.py
+> index 38f4264817..60c6f7030d 100644
+> --- a/scripts/qapi-event.py
+> +++ b/scripts/qapi-event.py
+> @@ -168,7 +168,7 @@ class QAPISchemaGenEventVisitor(QAPISchemaVisitor):
+>      def visit_event(self, name, info, ifcond, arg_type, boxed):
+>          self.decl +=3D gen_event_send_decl(name, arg_type, boxed)
+>          self.defn +=3D gen_event_send(name, arg_type, boxed)
+> -        self._event_names.append(QAPISchemaMember(name))
+> +        self._event_names.append(QAPISchemaMember(name, ifcond))
+>=20=20
+>=20=20
+>  (input_file, output_dir, do_c, do_h, prefix, dummy) =3D parse_command_li=
+ne()
 
-  http://www.pythonforbeginners.com/modules-in-python/how-to-use-simplehttpserver/
-
-That way curl could be reliably tested without any special setup by the
-developer
-
-Regards,
-Daniel
--- 
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
+No test coverage?
