@@ -1,31 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44245)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46205)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1eNLKa-00072q-8g
-	for qemu-devel@nongnu.org; Fri, 08 Dec 2017 11:16:57 -0500
+	(envelope-from <eblake@redhat.com>) id 1eNLPD-0002xc-N4
+	for qemu-devel@nongnu.org; Fri, 08 Dec 2017 11:21:49 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1eNLKX-0006ZU-3m
-	for qemu-devel@nongnu.org; Fri, 08 Dec 2017 11:16:56 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:48990)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1eNLKW-0006ZN-PX
-	for qemu-devel@nongnu.org; Fri, 08 Dec 2017 11:16:53 -0500
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
-	[10.5.11.15])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 02CEEA63E0
-	for <qemu-devel@nongnu.org>; Fri,  8 Dec 2017 16:16:52 +0000 (UTC)
-References: <20171208115834.21577-1-berrange@redhat.com>
+	(envelope-from <eblake@redhat.com>) id 1eNLPC-0001QF-IB
+	for qemu-devel@nongnu.org; Fri, 08 Dec 2017 11:21:43 -0500
+References: <20171208133416.28978-1-berrange@redhat.com>
 From: Eric Blake <eblake@redhat.com>
-Message-ID: <8e85e5e6-01f6-9c01-f7fa-e33ec4f9d6c7@redhat.com>
-Date: Fri, 8 Dec 2017 10:16:50 -0600
+Message-ID: <73ad7473-67e5-0e2c-908e-9e3349ac87bb@redhat.com>
+Date: Fri, 8 Dec 2017 10:21:35 -0600
 MIME-Version: 1.0
-In-Reply-To: <20171208115834.21577-1-berrange@redhat.com>
+In-Reply-To: <20171208133416.28978-1-berrange@redhat.com>
 Content-Type: multipart/signed; micalg=pgp-sha256;
 	protocol="application/pgp-signature";
-	boundary="9p5E76FDXMIKX9h0sU2WVfDCHc201DRpe"
-Subject: Re: [Qemu-devel] [PATCH] docs: update information for TLS
- certificate management
+	boundary="w3G7exKaOoDcmARmrG8RH4PTswRrC9efv"
+Subject: Re: [Qemu-devel] [PATCH v2] qemu-io: fix EOF Ctrl-D handling in
+ qemu-io readline code
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,154 +25,76 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: "Daniel P. Berrange" <berrange@redhat.com>, qemu-devel@nongnu.org
-Cc: Thomas Huth <thuth@redhat.com>
+Cc: qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>
 
 This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---9p5E76FDXMIKX9h0sU2WVfDCHc201DRpe
+--w3G7exKaOoDcmARmrG8RH4PTswRrC9efv
 From: Eric Blake <eblake@redhat.com>
 To: "Daniel P. Berrange" <berrange@redhat.com>, qemu-devel@nongnu.org
-Cc: Thomas Huth <thuth@redhat.com>
-Message-ID: <8e85e5e6-01f6-9c01-f7fa-e33ec4f9d6c7@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH] docs: update information for TLS certificate
- management
-References: <20171208115834.21577-1-berrange@redhat.com>
-In-Reply-To: <20171208115834.21577-1-berrange@redhat.com>
+Cc: qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>,
+ Max Reitz <mreitz@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <73ad7473-67e5-0e2c-908e-9e3349ac87bb@redhat.com>
+Subject: Re: [PATCH v2] qemu-io: fix EOF Ctrl-D handling in qemu-io readline
+ code
+References: <20171208133416.28978-1-berrange@redhat.com>
+In-Reply-To: <20171208133416.28978-1-berrange@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
 
-On 12/08/2017 05:58 AM, Daniel P. Berrange wrote:
-> The current docs for TLS assume only VNC is using TLS. Some of the info=
-rmation
-> is also outdated (ie lacking subject alt name info for certs). Rewrite =
-it to
-> more accurately reflect the current situation.
+On 12/08/2017 07:34 AM, Daniel P. Berrange wrote:
+> qemu-io puts the TTY into non-canonical mode, which means no EOF proces=
+sing is
+> done and thus getchar() will never return the EOF constant. Instead we =
+have to
+> query the TTY attributes to determine the configured EOF character (usu=
+ally
+> Ctrl-D / 0x4), and then explicitly check for that value. This fixes the=
+
+> regression that prevented Ctrl-D from triggering an exit of qemu-io tha=
+t has
+> existed since readline was first added in
+>=20
+>   commit 0cf17e181798063c3824c8200ba46f25f54faa1a
+>   Author: Stefan Hajnoczi <stefanha@redhat.com>
+>   Date:   Thu Nov 14 11:54:17 2013 +0100
+>=20
+>     qemu-io: use readline.c
 >=20
 > Signed-off-by: Daniel P. Berrange <berrange@redhat.com>
 > ---
->  qemu-doc.texi | 368 +++++++++++++++++++++++++++++++++++++++++++-------=
---------
->  1 file changed, 275 insertions(+), 93 deletions(-)
->=20
+> Changed in v2:
 
-> +@subsection Configuring SASL mechanisms
-> +
-> +The following documentation assumes use of the Cyrus SASL implementati=
-on on a
-> +Linux host, but the principals should apply to any other SASL impl. Wh=
-en SASL
+> +++ b/qemu-io.c
+> @@ -10,6 +10,9 @@
+>  #include "qemu/osdep.h"
+>  #include <getopt.h>
+>  #include <libgen.h>
+> +#ifndef _WIN32
+> +#include <termios.h>
+> +#endif
 
-s/impl/implementation/
-
-> +is enabled, the mechanism configuration will be loaded from system def=
-ault
-> +SASL service config /etc/sasl2/qemu.conf. If running QEMU as an
-> +unprivileged user, an environment variable SASL_CONF_PATH can be used
-> +to make it search alternate locations for the service config.
-> +
-
-
-> +@node tls_generate_server
-> +@subsection Issuing server certificates
-> =20
->  Each server (or host) needs to be issued with a key and certificate. W=
-hen connecting
->  the certificate is sent to the client which validates it against the C=
-A certificate.
-> -The core piece of information for a server certificate is the hostname=
-=2E This should
-> -be the fully qualified hostname that the client will connect with, sin=
-ce the client
-> -will typically also verify the hostname in the certificate. On the hos=
-t holding the
-> -secure CA private key:
-> +The core pieces of information for a server certificate are the hostna=
-mes and/or IP
-> +addresses that will be used by clients when connecting. The hostname /=
- IP address
-> +that the client specifies when connecting will be validated aganist th=
-e hostname(s)
-
-s/aganist/against/
-
-> +and IP address(es) recorded in the server certificate, and if no match=
- is found
-> +the client will close the connection.
-> +
-> +Thus it is recommended that the server certificate include both the fu=
-lly qualfied
-
-s/qualfied/qualified/
-
-
-> +
-> +If a single host is going to be using TLS in both a client and server
-> +role, it is possible to create a single certificate to cover both role=
-s.
-> +This would be quite common for the migration and NBD services, where a=
-
-> +QEMU be start by accepting a TLS protected incoming migration, and lat=
-er
-
-s/QEMU be start/QEMU process will be started/
-
-> +itself be migrated out to another host. To generate a single certifica=
-te,
-> +simply include the template data from both the client and server
-> +instructions in one.
-> =20
+Wouldn't a configure probe for the existence of <termios.h> be more
+reliable than just hard-coding the list of platforms where it is
+currently not found?
 
 > =20
-> -When not using TLS the recommended configuration is
-> +When copying the PEM files to the target host, save them twice
-> +once as @code{server-cert.pem} and @code{server-key.pem}, and
-
-s/twice/twice,/
-
-> +against as @code{client-cert.pem} and @code{client-key.pem}.
-
-s/against/again/
-
+>  #include "qapi/error.h"
+>  #include "qemu-io.h"
+> @@ -41,6 +44,26 @@ static bool imageOpts;
+> =20
+>  static ReadLineState *readline_state;
+> =20
+> +static int ttyEOF;
 > +
-> +@node tls_creds_setup
-> +@subsection TLS x509 credential configuration
-> +
-> +QEMU has a standard mechanism for loading x509 credentials that will b=
-e
-> +used for network services and clients. It requires specifying the
-> +@code{tls-creds-x509} class name to the @code{-object} command line
-> +argument for the system emulators. This also works for the helper tool=
-s
-> +like @code{qemu-nbd} and @code{qemu-img}, but is named @code{--object}=
-=2E
+> +static int get_eof_char(void)
+> +{
+> +#ifdef _WIN32
 
-You can use '--object' with qemu as well (getopt_long_only() accepts
-double-dash form in addition to single dash).  If it makes it any easier
-to only document the double-dash form, then go for it.
+in which case this also should be #if HAVE_TERMIOS_H
 
-> +Each set of credentials loaded should be given a unique string identif=
-ier
-> +via the @code{id} parameter. A single set of TLS credentials can be us=
-ed
-> +for multiple network backends, so VNC, migration, NBD, character devic=
-es
-> +can all share the same credentials. Note, however, that credentials fo=
-r
-> +use in a client endpoint must be loaded separately from those used in
-> +a server endpoint.
-> +
-> +When specifying the object, the @code{dir} parameters specifies which
-> +directory contains the credential files. This directory is expected to=
-
-> +contain files with the names mentioned previously, @code{ca-cert.pem},=
-
-> +@code{server-key.pem}, @code{server-cert.pem}, @code{client-key.pem}
-> +and @code{client-cert.pem} as appropriate. It is also possible to
-> +include a set of pre-generated diffie-hellman parameters in a file
-> +@code{dh-params.pem}, which can be created using the
-> +@code{certtool --generate-dh-params} command. If omitted, QEMU will
-> +dynamically generated DH parameters when loading the credentials.
-
-s/generated/generate/
+But I guess unless someone complains, all other platforms that we care
+about have termios.h, so a weak:
+Reviewed-by: Eric Blake <eblake@redhat.com>
 
 --=20
 Eric Blake, Principal Software Engineer
@@ -190,7 +102,7 @@ Red Hat, Inc.           +1-919-301-3266
 Virtualization:  qemu.org | libvirt.org
 
 
---9p5E76FDXMIKX9h0sU2WVfDCHc201DRpe
+--w3G7exKaOoDcmARmrG8RH4PTswRrC9efv
 Content-Type: application/pgp-signature; name="signature.asc"
 Content-Description: OpenPGP digital signature
 Content-Disposition: attachment; filename="signature.asc"
@@ -199,14 +111,14 @@ Content-Disposition: attachment; filename="signature.asc"
 Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
 Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
 
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAloquvIACgkQp6FrSiUn
-Q2r+xgf/S90XOCytUC/mUX0F00Ksy1TYNlgByLxnPr0LihqDygBz7q4tjKLpjDLs
-GZ8bUSL6b2qABhglU1EamL9QY+u4XQMab1hyQd2JlBfyyfQKMeww79z3sNGO4lyc
-tEC/kNhxc1/gyp9kMKJMvbC3VccR/IplxFEqfohFMS7+28oiiR8ay6pYqFE2S6Eu
-4JSBtdYqZ4lRvDd0CAcnBSiUOJhtYWF7zcySpxjl0mWH87d0Hng8wpoR/SokUfab
-p57KMqxNUhauWnAD4QyGVqEZ8giN1RswMkQXpwjclFFhatSBu7tu/ztRnD8UGGw9
-bYZDPju/FsDoJf+pGk93kqjN3fXZ2w==
-=rxF1
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAloqvA8ACgkQp6FrSiUn
+Q2rlUgf8DFg8MFhmyCynNURuxXmfCyw+3JfZ0NYNtkrpHhvdRwhNAYWxxftyXznh
+ewxIy8sKwkhv2+4LjYRIQilsEDJpIQtgXlXlSukKythcwW4uVNV3XcaXM5e7hAY4
+5aUPFvAQdEPO5NU3DSPmtd3Tx/NAGTxd3NAJmyV1mjlI5EK27mZhpkMsvElW4Qxq
+7yRoWkKBy7sp9HLPbXWe16d6Pj8f9cf0sMeN5Wf5OQYmBPjqvou3aLUa8RnydLBQ
+h9RCFAjQ6u9YRlQm6FSiBu2O7IUn67B8csMC64gpkXg1ytAmgTMm3D08gsYm27d4
+s/XPJGRz4vHJtlHF8o20TkxCJE4A8Q==
+=ro23
 -----END PGP SIGNATURE-----
 
---9p5E76FDXMIKX9h0sU2WVfDCHc201DRpe--
+--w3G7exKaOoDcmARmrG8RH4PTswRrC9efv--
