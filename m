@@ -1,20 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40344)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46196)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1eNHZ0-0002wS-AI
-	for qemu-devel@nongnu.org; Fri, 08 Dec 2017 07:15:35 -0500
+	(envelope-from <david@redhat.com>) id 1eNI1F-0004k7-VN
+	for qemu-devel@nongnu.org; Fri, 08 Dec 2017 07:44:46 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1eNHYz-0006kJ-BY
-	for qemu-devel@nongnu.org; Fri, 08 Dec 2017 07:15:34 -0500
-Date: Fri, 8 Dec 2017 12:15:21 +0000
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20171208121521.GA2458@work-vm>
-References: <20171206115726.5237-1-berrange@redhat.com>
+	(envelope-from <david@redhat.com>) id 1eNI1B-0000Zb-VB
+	for qemu-devel@nongnu.org; Fri, 08 Dec 2017 07:44:46 -0500
+References: <20171207153141.15523-1-david@redhat.com>
+	<20171207153141.15523-4-david@redhat.com>
+	<4dd3b2a3-854d-303c-d407-f8625b738a3c@twiddle.net>
+From: David Hildenbrand <david@redhat.com>
+Message-ID: <7e1237a6-37e5-50ff-1e65-d12b8253c842@redhat.com>
+Date: Fri, 8 Dec 2017 13:44:37 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20171206115726.5237-1-berrange@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH] qemu-io: fix EOF Ctrl-D handling in
- qemu-io readline code
+In-Reply-To: <4dd3b2a3-854d-303c-d407-f8625b738a3c@twiddle.net>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v2 for-2.12 3/5] s390x/tcg: implement SET
+ CLOCK PROGRAMMABLE FIELD
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,54 +26,38 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Daniel P. Berrange" <berrange@redhat.com>
-Cc: qemu-devel@nongnu.org, Kevin Wolf <kwolf@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>
+To: Richard Henderson <rth@twiddle.net>, qemu-s390x@nongnu.org, qemu-devel@nongnu.org
+Cc: Christian Borntraeger <borntraeger@de.ibm.com>, Cornelia Huck <cohuck@redhat.com>, Alexander Graf <agraf@suse.de>
 
-* Daniel P. Berrange (berrange@redhat.com) wrote:
-> qemu-io puts the TTY into non-canonical mode, which means no EOF processing is
-> done and thus getchar() will never return the EOF constant. Instead we have to
-> check for an explicit Ctrl-D, aka  0x4, to detect EOF and exit the qemu-io
-> shell. This fixes the regression that prevented Ctrl-D from triggering an exit
-> of qemu-io that has existed since readline was first added in
+On 08.12.2017 01:00, Richard Henderson wrote:
+> On 12/07/2017 07:31 AM, David Hildenbrand wrote:
+>> +DEF_HELPER_FLAGS_1(sckpf, TCG_CALL_NO_RWG, void, env)
+> ...
+>> +/* Set Tod Programmable Field */
+>> +void HELPER(sckpf)(CPUS390XState *env)
+>> +{
+>> +    uint32_t val = env->regs[0];
+>> +
+>> +    if (val & 0xffff0000) {
+>> +        s390_program_interrupt(env, PGM_SPECIFICATION, 2, GETPC());
+>> +    }
+>> +    env->todpr = val;
+>> +}
 > 
->   commit 0cf17e181798063c3824c8200ba46f25f54faa1a
->   Author: Stefan Hajnoczi <stefanha@redhat.com>
->   Date:   Thu Nov 14 11:54:17 2013 +0100
+> You do read a tcg global -- regs[0].  Either pass in r0 as a parameter or use
+> TCG_CALL_NO_WG.
 > 
->     qemu-io: use readline.c
 > 
-> Signed-off-by: Daniel P. Berrange <berrange@redhat.com>
-> ---
->  qemu-io.c | 4 +++-
->  1 file changed, 3 insertions(+), 1 deletion(-)
-> 
-> diff --git a/qemu-io.c b/qemu-io.c
-> index c70bde3eb1..2ea0bfbaf8 100644
-> --- a/qemu-io.c
-> +++ b/qemu-io.c
-> @@ -322,7 +322,9 @@ static char *fetchline_readline(void)
->      readline_start(readline_state, get_prompt(), 0, readline_func, &line);
->      while (!line) {
->          int ch = getchar();
-> -        if (ch == EOF) {
-> +        /* In non-canon tty mode we get 0x4 (Ctrl-D), not the stdio "EOF"
-> +         * constant */
-> +        if (ch == 0x4) {
 
-Personally I'd have made that EOF or 0x4  - but that's fine
+Indeed, I finally understood what the term "global" in this context
+means. (global tcg vals defined in translate.c)
 
-(I don't see the point of reading the ioctl to figure out which EOF
-char we're using; it seems to turn a trivial check into something much
-more complex)
-
-Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
-
->              break;
->          }
->          readline_handle_byte(readline_state, ch);
-> -- 
-> 2.14.3
+> r~
 > 
-> 
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+
+
+-- 
+
+Thanks,
+
+David / dhildenb
