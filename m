@@ -1,26 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59858)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60782)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1eNKbY-0004fT-SA
-	for qemu-devel@nongnu.org; Fri, 08 Dec 2017 10:30:25 -0500
+	(envelope-from <stefanha@redhat.com>) id 1eNKeC-0006Cy-6b
+	for qemu-devel@nongnu.org; Fri, 08 Dec 2017 10:33:09 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1eNKbT-0004uq-Jg
-	for qemu-devel@nongnu.org; Fri, 08 Dec 2017 10:30:24 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:34946)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1eNKbT-0004ud-C9
-	for qemu-devel@nongnu.org; Fri, 08 Dec 2017 10:30:19 -0500
-Date: Fri, 8 Dec 2017 15:30:10 +0000
+	(envelope-from <stefanha@redhat.com>) id 1eNKeB-0006ux-3i
+	for qemu-devel@nongnu.org; Fri, 08 Dec 2017 10:33:08 -0500
+Date: Fri, 8 Dec 2017 15:32:55 +0000
 From: Stefan Hajnoczi <stefanha@redhat.com>
-Message-ID: <20171208153010.GD8998@stefanha-x1.localdomain>
-References: <20171208105553.12249-1-pbonzini@redhat.com>
-	<20171208105553.12249-3-pbonzini@redhat.com>
+Message-ID: <20171208153255.GE8998@stefanha-x1.localdomain>
+References: <20171206144550.22295-1-stefanha@redhat.com>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="at6+YcpfzWZg/htY"
+	protocol="application/pgp-signature"; boundary="pY3vCvL1qV+PayAL"
 Content-Disposition: inline
-In-Reply-To: <20171208105553.12249-3-pbonzini@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH 2/5] lock-guard: add scoped lock
- implementation
+In-Reply-To: <20171206144550.22295-1-stefanha@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v2 0/9] blockdev: fix QMP 'transaction'
+ with IOThreads
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,65 +24,101 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: qemu-devel@nongnu.org, "Emilio G . Cota" <cota@braap.org>, Fam Zheng <famz@redhat.com>
+To: qemu-devel@nongnu.org
+Cc: qemu-block@nongnu.org, John Snow <jsnow@redhat.com>, Kevin Wolf <kwolf@redhat.com>
 
 
---at6+YcpfzWZg/htY
+--pY3vCvL1qV+PayAL
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-On Fri, Dec 08, 2017 at 11:55:50AM +0100, Paolo Bonzini wrote:
+On Wed, Dec 06, 2017 at 02:45:41PM +0000, Stefan Hajnoczi wrote:
+> v2:
+>  * Use StrOrNull for x-blockdev-set-iothread iothread argument [eblake]
+>=20
+> (This is for QEMU 2.12 because this bug is not -rc4 critical)
+>=20
+> Previously AioContext was held across QMP 'transaction' in an attempt to
+> achieve bdrv_drained_begin/end() semantics.  Nowadays we have
+> bdrv_drained_begin/end() and the AioContext lock just protects state.
+> Therefore there is no reason to hold AioContext across
+> .prepare/.commit/.abort/.clean() anymore.
+>=20
+> Besides being cleanup-worthy, holding AioContext also exposes a bug:
+> BDRV_POLL_WHILE() doesn't support recursive AioContext locking and will h=
+ang if
+> depth > 1.  This is easy to trigger by submitting a transaction with 2 ac=
+tions
+> that touch two drives assigned to an IOThread.  The IOThread's AioContext=
+ will
+> be locked twice and BDRV_POLL_WHILE() will hang.
+>=20
+> BDRV_POLL_WHILE() is best fixed by eliminating the AioContext lock entire=
+ly in
+> favor of fine-grained locking.  I discussed some fixes for BDRV_POLL_WHIL=
+E()
+> with Paolo but we came to the conclusion that it will just add complexity=
+ when
+> we really want to stop using AioContext locking.
+>=20
+> Summary:
+>=20
+>  * Patch 1 fixes missing AioContext lock protection
+>=20
+>  * Patches 2-6 clean up excessive AioContext locked regions in QMP
+>    'transaction' to solve the hang
+>=20
+>  * Patches 7-9 add a qemu-iotests test case and the necessary infrastruct=
+ure
+>=20
+> Stefan Hajnoczi (9):
+>   blockdev: hold AioContext for bdrv_unref() in
+>     external_snapshot_clean()
+>   block: don't keep AioContext acquired after
+>     external_snapshot_prepare()
+>   block: don't keep AioContext acquired after drive_backup_prepare()
+>   block: don't keep AioContext acquired after blockdev_backup_prepare()
+>   block: don't keep AioContext acquired after
+>     internal_snapshot_prepare()
+>   block: drop unused BlockDirtyBitmapState->aio_context field
+>   iothread: add iothread_by_id() API
+>   blockdev: add x-blockdev-set-iothread testing command
+>   qemu-iotests: add 202 external snapshots IOThread test
+>=20
+>  qapi/block-core.json       |  36 +++++++
+>  include/sysemu/iothread.h  |   1 +
+>  blockdev.c                 | 258 +++++++++++++++++++++++++++++++++------=
+------
+>  iothread.c                 |   7 ++
+>  tests/qemu-iotests/202     |  95 +++++++++++++++++
+>  tests/qemu-iotests/202.out |  11 ++
+>  tests/qemu-iotests/group   |   1 +
+>  7 files changed, 339 insertions(+), 70 deletions(-)
+>  create mode 100755 tests/qemu-iotests/202
+>  create mode 100644 tests/qemu-iotests/202.out
+>=20
+> --=20
+> 2.14.3
+>=20
 
-The implementation is somewhat complex.  Please structure the header
-file so the public interfaces are clear and documented.  Move the
-implementation out of the way and mark it private.  That will make it
-easier for someone to figure out "how do I use lock-guard.h".
+Thanks, applied to my block-next tree:
+https://github.com/stefanha/qemu/commits/block-next
 
-> diff --git a/include/qemu/lock-guard.h b/include/qemu/lock-guard.h
-> new file mode 100644
-> index 0000000000..e6a83bf9ee
-> --- /dev/null
-> +++ b/include/qemu/lock-guard.h
-> @@ -0,0 +1,103 @@
-> +#ifndef QEMU_LOCK_GUARD_H
-> +#define QEMU_LOCK_GUARD_H 1
-> +
-> +typedef void QemuLockGuardFunc(void *);
-> +typedef struct QemuLockGuard {
-> +    QemuLockGuardFunc *p_lock_fn, *p_unlock_fn;
-> +    void *lock;
-> +    int locked;
+Stefan
 
-bool?
-
-> +#define QEMU_WITH_LOCK(type, name, lock)                                   \
-> +    for (QEMU_LOCK_GUARD(type, name, lock);                                \
-> +         qemu_lock_guard_is_taken(&name);                                  \
-> +         qemu_lock_guard_unlock(&name))
-
-I don't understand the need for the qemu_lock_guard_is_taken(&name)
-condition, why not do the following?
-
-  for (QEMU_LOCK_GUARD(type, name, lock);
-       ;
-       qemu_lock_guard_unlock(&name))
-
-Also, the for loop means that break statements do not work inside
-QEMU_WITH_LOCK() { ... }.  This needs to be documented.
-
---at6+YcpfzWZg/htY
+--pY3vCvL1qV+PayAL
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQEcBAEBAgAGBQJaKrABAAoJEJykq7OBq3PIXf8H/jJL83+GvTcaTNJ/sIxGaLG+
-hU8XBe9nYkYKXET14e9GphctMAw3YXfZshv3KCozmEebFkmSJDzYCvhBJrRkkiKq
-4zGklSp9bLe3s8u6guYgzp4TeEeh55F0GcpGtGkD9RfYhUskhRHo5m1iA3mEuF5J
-/MEgkGw+DL2YAvD/CG6p0fsRXODaJpNTkX5Q/mIq1BWWMGH/w4nKflHmeLCbYWDF
-gpZvlnO0YdBwZyW+VlTkGAOT4fLG4DP2QpgPGXPzqKwpWXcyfXOL4O4cumojXmuD
-XKwWuEVlzt/gwbfZbEhXwdYGFfJ/usfaJBeEhqB2jxZrc0iDm2gCHZO4SBucSUc=
-=7Ydr
+iQEcBAEBAgAGBQJaKrCnAAoJEJykq7OBq3PIEAgH/iJo2yKomjgVCHMTpkh7j3SF
+/wJL4QFTGfhAwuHa2e1CoMS0mDlAUa46xuFdezuSYyNCNhLU5G6a84FQYOo1kq5x
+iW5zsGWtXszBvTKu5d5qyxJdnUk7n7m5nRkF8pIBpqMN/80bMtXRDxjNqidZdI/3
+zSKkybvHM7mlAHzS6XY7y2NUmajIRh8yRctS/DegdXViDRjLPq/5W5H5FdnsA9Mm
+81rFU0+LHDWwhKLsYncfyuWztY0AFxt+QiCyvecSjcNhlxvYRZ2nclYygg1lsmzB
+SIpbpJWJAlZavW+eaAUMibBeIWXB7yz8sl09qVMRDqndAboFSkuo5OAo0IjWJIo=
+=gsw8
 -----END PGP SIGNATURE-----
 
---at6+YcpfzWZg/htY--
+--pY3vCvL1qV+PayAL--
