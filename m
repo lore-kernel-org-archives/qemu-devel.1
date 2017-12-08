@@ -1,28 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49472)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49513)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1eNGPf-0006Mt-NN
-	for qemu-devel@nongnu.org; Fri, 08 Dec 2017 06:01:52 -0500
+	(envelope-from <dgilbert@redhat.com>) id 1eNGPo-0006SM-8c
+	for qemu-devel@nongnu.org; Fri, 08 Dec 2017 06:02:01 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1eNGPc-0006MO-KQ
-	for qemu-devel@nongnu.org; Fri, 08 Dec 2017 06:01:51 -0500
-Received: from mail-wm0-x22c.google.com ([2a00:1450:400c:c09::22c]:43378)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1eNGPc-0006LF-Cz
-	for qemu-devel@nongnu.org; Fri, 08 Dec 2017 06:01:48 -0500
-Received: by mail-wm0-x22c.google.com with SMTP id n138so2671356wmg.2
-	for <qemu-devel@nongnu.org>; Fri, 08 Dec 2017 03:01:48 -0800 (PST)
-Date: Fri, 8 Dec 2017 11:01:44 +0000
-From: Stefan Hajnoczi <stefanha@gmail.com>
-Message-ID: <20171208110144.GI23880@stefanha-x1.localdomain>
-References: <alpine.BSF.2.21.1712041954200.69360@zero.eik.bme.hu>
-	<20171205135447.GA29422@stefanha-x1.localdomain>
-	<alpine.BSF.2.21.1712051856040.96903@zero.eik.bme.hu>
+	(envelope-from <dgilbert@redhat.com>) id 1eNGPl-0006Yj-3q
+	for qemu-devel@nongnu.org; Fri, 08 Dec 2017 06:02:00 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:47988)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1eNGPk-0006YO-T4
+	for qemu-devel@nongnu.org; Fri, 08 Dec 2017 06:01:57 -0500
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+	[10.5.11.16])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id BDD82C0050D9
+	for <qemu-devel@nongnu.org>; Fri,  8 Dec 2017 11:01:55 +0000 (UTC)
+Date: Fri, 8 Dec 2017 11:01:49 +0000
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20171208110148.GH2403@work-vm>
+References: <20171201125813.1437-1-quintela@redhat.com>
+	<20171201125813.1437-4-quintela@redhat.com>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="byLs0wutDcxFdwtm"
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <alpine.BSF.2.21.1712051856040.96903@zero.eik.bme.hu>
-Subject: Re: [Qemu-devel] Debugging io deadlock
+In-Reply-To: <20171201125813.1437-4-quintela@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v3 3/6] tests: Add migration precopy test
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,44 +33,93 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: BALATON Zoltan <balaton@eik.bme.hu>
-Cc: qemu-devel@nongnu.org
+To: Juan Quintela <quintela@redhat.com>
+Cc: qemu-devel@nongnu.org, lvivier@redhat.com, peterx@redhat.com
+
+* Juan Quintela (quintela@redhat.com) wrote:
+> Signed-off-by: Juan Quintela <quintela@redhat.com>
+
+OK, although you seem to have chosen a bandwidth 10x what I use
+in the postcopy test but for the same reason.
 
 
---byLs0wutDcxFdwtm
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
 
-On Tue, Dec 05, 2017 at 07:35:36PM +0100, BALATON Zoltan wrote:
-> On Tue, 5 Dec 2017, Stefan Hajnoczi wrote:
-> > On Mon, Dec 04, 2017 at 08:22:48PM +0100, BALATON Zoltan wrote:
-> I don't really know what to look for
-> so if anyone has any more ideas then please share.
-
-I don't have a specific idea, but two general techniques for debugging
-guest hangs:
-
-1. Enable tracing or add printfs to monitor hardware register writes and
-   interrupts.  This way you can figure out which devices were most
-   recently accessed.  They are probably involved in the hang.
-
-2. Peek at QEMU device state from GDB.  For example, look at virtio
-   device vrings to see which requests are currently in-flight.
-
-Stefan
-
---byLs0wutDcxFdwtm
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEcBAEBAgAGBQJaKnEYAAoJEJykq7OBq3PIPoMH/3DEqDFlkVTHDEBnqKXnkqHu
-iR0UVuEQx9T0iuTmQOMiXP4pPnoMagvIfjgkTNmpeWZNxiXWGJdxCXvogFaYZk+J
-2GdgBmCCQP5lbce0z3yXUVtQTQJYB+tYSKE2bQwtrNndlv6LFugwVCRxRYigBc78
-n/vBIVUOMcnftZu4mZNmfyUdgrCGOgA8jJW76TCMa5suIPltrZAQMOXhdRzl1xSq
-IvZbHNAVEMXE9hCI+1iMRjGxaJeZ+xRYY2ZY9Pfx+B8OJoB6H3CawpyoChLt0Veg
-5ig1bW3uwHsRF6sHhx39LLE+UKKsBkNohMzc4bMHWZLdpnGwkD7UjiNO5Wjg88M=
-=p5+f
------END PGP SIGNATURE-----
-
---byLs0wutDcxFdwtm--
+> ---
+>  tests/migration-test.c | 44 ++++++++++++++++++++++++++++++++++++++++++--
+>  1 file changed, 42 insertions(+), 2 deletions(-)
+> 
+> diff --git a/tests/migration-test.c b/tests/migration-test.c
+> index 51f49c74e9..3f3f056be6 100644
+> --- a/tests/migration-test.c
+> +++ b/tests/migration-test.c
+> @@ -539,7 +539,7 @@ static void test_migrate_end(QTestState *from, QTestState *to)
+>      cleanup("dest_serial");
+>  }
+>  
+> -static void test_migrate(void)
+> +static void test_postcopy(void)
+>  {
+>      char *uri = g_strdup_printf("unix:%s/migsocket", tmpfs);
+>      QTestState *from, *to;
+> @@ -582,6 +582,45 @@ static void test_migrate(void)
+>      test_migrate_end(from, to);
+>  }
+>  
+> +static void test_precopy_unix(void)
+> +{
+> +    char *uri = g_strdup_printf("unix:%s/migsocket", tmpfs);
+> +    QTestState *from, *to;
+> +
+> +    test_migrate_start(&from, &to, uri);
+> +
+> +    /* We want to pick a speed slow enough that the test completes
+> +     * quickly, but that it doesn't complete precopy even on a slow
+> +     * machine, so also set the downtime.
+> +     */
+> +    /* 1 ms */
+> +    migrate_set_parameter(from, "downtime-limit", "1");
+> +    /* 1GB/s slow*/
+> +    migrate_set_parameter(from, "max-bandwidth", "1000000000");
+> +
+> +    /* Wait for the first serial output from the source */
+> +    wait_for_serial("src_serial");
+> +
+> +    migrate(from, uri);
+> +
+> +    wait_for_migration_pass(from);
+> +
+> +    /* 300 ms should converge */
+> +    migrate_set_parameter(from, "downtime-limit", "300");
+> +
+> +    if (!got_stop) {
+> +        qtest_qmp_eventwait(from, "STOP");
+> +    }
+> +
+> +    qtest_qmp_eventwait(to, "RESUME");
+> +
+> +    wait_for_serial("dest_serial");
+> +    wait_for_migration_complete(from);
+> +
+> +    test_migrate_end(from, to);
+> +    g_free(uri);
+> +}
+> +
+>  int main(int argc, char **argv)
+>  {
+>      char template[] = "/tmp/migration-test-XXXXXX";
+> @@ -601,7 +640,8 @@ int main(int argc, char **argv)
+>  
+>      module_call_init(MODULE_INIT_QOM);
+>  
+> -    qtest_add_func("/migration/postcopy/unix", test_migrate);
+> +    qtest_add_func("/migration/precopy/unix", test_precopy_unix);
+> +    qtest_add_func("/migration/postcopy/unix", test_postcopy);
+>  
+>      ret = g_test_run();
+>  
+> -- 
+> 2.14.3
+> 
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
