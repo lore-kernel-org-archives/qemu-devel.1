@@ -1,19 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37510)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37557)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1eNFkh-00051W-U5
-	for qemu-devel@nongnu.org; Fri, 08 Dec 2017 05:19:32 -0500
+	(envelope-from <stefanha@gmail.com>) id 1eNFl1-0005C3-UE
+	for qemu-devel@nongnu.org; Fri, 08 Dec 2017 05:19:52 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1eNFke-00027p-Pq
-	for qemu-devel@nongnu.org; Fri, 08 Dec 2017 05:19:31 -0500
-Date: Fri, 8 Dec 2017 11:19:19 +0100
-From: Cornelia Huck <cohuck@redhat.com>
-Message-ID: <20171208111919.2d5322b9.cohuck@redhat.com>
-In-Reply-To: <49485e7e-f950-58c5-af56-b336b4d4f0e3@linux.vnet.ibm.com>
-References: <49485e7e-f950-58c5-af56-b336b4d4f0e3@linux.vnet.ibm.com>
+	(envelope-from <stefanha@gmail.com>) id 1eNFku-0002EU-Iv
+	for qemu-devel@nongnu.org; Fri, 08 Dec 2017 05:19:47 -0500
+Date: Fri, 8 Dec 2017 10:19:41 +0000
+From: Stefan Hajnoczi <stefanha@gmail.com>
+Message-ID: <20171208101941.GF23880@stefanha-x1.localdomain>
+References: <20171206144550.22295-1-stefanha@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] Interactive Boot Menu: New Fields in IPLB
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="uTRFFR9qmiCqR05s"
+Content-Disposition: inline
+In-Reply-To: <20171206144550.22295-1-stefanha@redhat.com>
+Subject: Re: [Qemu-devel] [Qemu-block] [PATCH v2 0/9] blockdev: fix QMP
+ 'transaction' with IOThreads
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,51 +24,37 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Collin L. Walling" <walling@linux.vnet.ibm.com>
-Cc: qemu-devel <qemu-devel@nongnu.org>, qemu-s390x@nongnu.org, Christian Borntraeger <borntraeger@de.ibm.com>, Viktor Mihajlovski <mihajlov@linux.vnet.ibm.com>, Thomas Huth <thuth@redhat.com>, David Hildenbrand <david@redhat.com>
-
-On Thu, 7 Dec 2017 18:56:16 -0500
-"Collin L. Walling" <walling@linux.vnet.ibm.com> wrote:
+To: Stefan Hajnoczi <stefanha@redhat.com>
+Cc: qemu-devel@nongnu.org, Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
 
 
->  =C2=A0=C2=A0=C2=A0 =C2=A0=C2=A0=C2=A0 =C2=A0=C2=A0=C2=A0 =C2=A0=C2=A0=C2=
-=A0 =C2=A0 =C2=A0 =C2=A0 --- The Fields We Need To Store ---
->=20
-> Currently, we're utilizing 3 bytes out of a 77 byte reserved field in=20
-> the IPLB for
-> CCW and SCSI. We do this because need a way to pass the Qemu command=20
-> line options
-> for a boot menu (on/off and timeout) to the s390-ccw bios. We require=20
-> only two
-> fields in the IPLB, totaling 3 bytes:
+--uTRFFR9qmiCqR05s
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 
-Hm, are we actually that constrained with space?
+On Wed, Dec 06, 2017 at 02:45:41PM +0000, Stefan Hajnoczi wrote:
+> v2:
+>  * Use StrOrNull for x-blockdev-set-iothread iothread argument [eblake]
 
->=20
->  =C2=A0* uint8_t boot_menu_flag
->  =C2=A0=C2=A0=C2=A0=C2=A0 o determines if we should show the menu or not
+Thanks for the reviews, Eric.
 
-Should be fine. I'd recommend something along the lines of
-- bit 0: show a boot menu
-- bit 1-7: reserved [for future use]
+I will wait for one more block layer person (Kevin, Paolo, or Fam?) to
+review before merging.
 
->=20
->  =C2=A0* uint16_t boot_menu_timeout
->  =C2=A0=C2=A0=C2=A0=C2=A0 o stored as milliseconds
->  =C2=A0=C2=A0=C2=A0=C2=A0 o A max value of approx 65,000 gives us 65 seco=
-nds -- should be=20
-> plenty
+Stefan
 
-65 seconds should be enough for everyone?
+--uTRFFR9qmiCqR05s
+Content-Type: application/pgp-signature; name="signature.asc"
 
-:)
+-----BEGIN PGP SIGNATURE-----
 
->  =C2=A0=C2=A0=C2=A0=C2=A0 o could potentially be reduced to one byte, and=
- we store the value
->  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 as seconds instead
+iQEcBAEBAgAGBQJaKmc9AAoJEJykq7OBq3PIcZwIAI3T+IJDfLtXAUyYZXpNvTXn
+BvXhCJbd8pvZvJflZXo0oOnbnl+tAVsYm0E1TqYsxYdfM8xG+N7yhZL+/C8+atBV
+poxmWaS98ny636PIOMsN6a/d5zGK2H/3wzKmryvhwY2n2D0tfLVcF1esOj/+IyYn
+iFPGf6oJJUVCnTVkKL3OEEIP3lr2tlRxMdBs0QTKWsOU+A/XkaknF3xHYf9RlzIs
+JMPbLv1QSkRR0stwsbddzVigV7dqKvz7Vu6KM8GQYPCMUI096gEGK8PfCylsr2Bs
+n16Yiml09MTwKdsCRKmXrSbYGAYpGOqa9VeA0ChJppnro/uXYjZaHM/3fVsCJvM=
+=AKaA
+-----END PGP SIGNATURE-----
 
-As said, do we really need to worry about the space this is using up
-here?
-
->=20
-> Note: these fields *only*have value in a QEMU environment.
+--uTRFFR9qmiCqR05s--
