@@ -1,19 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38489)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43227)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <sstabellini@kernel.org>) id 1eNRJb-0006kK-6X
-	for qemu-devel@nongnu.org; Fri, 08 Dec 2017 17:40:22 -0500
+	(envelope-from <bounces@canonical.com>) id 1eNRTm-0004Hw-K5
+	for qemu-devel@nongnu.org; Fri, 08 Dec 2017 17:50:51 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <sstabellini@kernel.org>) id 1eNRJZ-0002qK-PT
-	for qemu-devel@nongnu.org; Fri, 08 Dec 2017 17:40:19 -0500
-Date: Fri, 8 Dec 2017 14:40:07 -0800 (PST)
-From: Stefano Stabellini <sstabellini@kernel.org>
-In-Reply-To: <1512503192-2239-1-git-send-email-peter.maydell@linaro.org>
-Message-ID: <alpine.DEB.2.10.1712081439380.8052@sstabellini-ThinkPad-X260>
-References: <1512503192-2239-1-git-send-email-peter.maydell@linaro.org>
+	(envelope-from <bounces@canonical.com>) id 1eNRTi-0002w7-Lo
+	for qemu-devel@nongnu.org; Fri, 08 Dec 2017 17:50:50 -0500
+Received: from indium.canonical.com ([91.189.90.7]:37872)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1eNRTi-0002vS-FL
+	for qemu-devel@nongnu.org; Fri, 08 Dec 2017 17:50:46 -0500
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1eNRTg-0002jk-86
+	for <qemu-devel@nongnu.org>; Fri, 08 Dec 2017 22:50:44 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id A80942E80D1
+	for <qemu-devel@nongnu.org>; Fri,  8 Dec 2017 22:50:43 +0000 (UTC)
 MIME-Version: 1.0
-Content-Type: TEXT/PLAIN; charset=US-ASCII
-Subject: Re: [Qemu-devel] [PATCH 00/12] Refactor get_phys_addr() not to
- return FSR values
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Fri, 08 Dec 2017 22:42:08 -0000
+From: liang yan <lyan@suse.com>
+Reply-To: Bug 1736042 <1736042@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <151234883142.11175.15433643697954166633.malonedeb@soybean.canonical.com>
+Message-Id: <151277292887.10888.746614699257750091.malone@wampee.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1736042] Re: qemu-system-x86_64 does not boot
+ image reliably
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,105 +37,50 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: qemu-arm@nongnu.org, qemu-devel@nongnu.org, "Edgar E . Iglesias" <edgar.iglesias@xilinx.com>, Stefano Stabellini <sstabellini@kernel.org>, patches@linaro.org
+To: qemu-devel@nongnu.org
 
-On Tue, 5 Dec 2017, Peter Maydell wrote:
-> Currently get_phys_addr() and its various subfunctions return a
-> hard-coded fault status register value for translation failures. This
-> is awkward because FSR values these days may be either long-descriptor
-> format or short-descriptor format.  Worse, the right FSR type to use
-> doesn't depend only on the translation table being walked -- some
-> cases, like fault info reported to AArch32 EL2 for some kinds of ATS
-> operation, must be in long-descriptor format even if the translation
-> table being walked was short format. We can't get those cases right
-> with our current approach. (We put in a bodge fix so we could at
-> least run Xen, in commit 50cd71b0d347c7.)
->     
-> This series does a refactoring of get_phys_addr() so that instead
-> of returning FSR values it puts information in the existing
-> ARMMMUFaultInfo structure that is sufficient to construct an
-> FSR value, and the callers then do that using the right condition
-> for whatever they're doing. I've included Edgar's patch from back
-> in June that fixes the handling of ATS instructions, which is most
-> of the point of the refactoring.
-> 
-> Rather than doing it all in one massive unreviewable patch, the
-> series is structured as:
->  * patch 1: add fields to ARMMMUFaultInfo, and the utility functions
->    that return a long or short format FSR given a fault info struct
->  * patch 2: stop passing an fsr argument to arm_ld*_ptw(), since
->    nothing actually looks at the result. (This breaks a cycle
->    arm_ldq_ptw()->S1_ptw_translate()->get_phys_addr_lpae()->arm_ldq_ptw()
->    which would otherwise make a stepwise refactoring awkward.)
->  * patches 3 to 8: for each of the different subfunctions of
->    get_phys_addr(), make them fill in the fault info fields instead
->    of an fsr value. Temporarily we add calls to arm_fi_to_sfsc()
->    and arm_fi_to_lfsc() at the callsites in get_phys_addr(), since
->    the callers of get_phys_addr() still need the fsr values. These
->    will go away again in a later patch.
->  * patches 9 and 10: change the callers of get_phys_addr() to use
->    the info in the fault info struct and ignore the fsr value.
->  * patch 11: remove the now unused fsr argument (and the temporary
->    calls to arm_fi_to_sfsc()/arm_fi_to_lfsc())
->  * patch 12: Edgar's patch for ATS PAR format
-> 
-> Arguably it would be good to push the "create the FSR value"
-> logic further, into the point where the exception is taken.
-> (This would let us correct the oddity where for M profile we
-> get an A/R profile FSR value in arm_v7m_cpu_do_interrupt()
-> which we then have to convert into the appropriate M profile
-> fault status bits.) However, migration backcompat makes this
-> tricky, because at the moment we migrate env->exception.fsr,
-> and so we'd need to have code just to handle inbound migrations
-> from old QEMU with an FSR and reconstitute a fault info struct.
-> So I've stopped here, at least for now.
-> 
-> This whole series sits on top of my v8M TT patchset (which also
-> had to touch some of the get_phys_addr() code). I've pushed it
-> to this git branch if that's more convenient:
-> 
->  https://git.linaro.org/people/peter.maydell/qemu-arm.git fsr-in-faultinfo
-> 
-> I have tested a bit (including a Linux KVM EL2 setup), but more
-> testing would definitely be useful. Stefano: in particular it would
-> be good to check this hasn't broken Xen again :-)
+This looks not a QEMU bug to me. You may drop "-curses" first, and run
+again. Once get inside, change grub file(/etc/default/grub) by uncomment
+GRUB_TERMINAL=3Dconsole. It should work then. If still not, then blacklist
+vga16fb and add "fbcon=3Dmap:99 text" in grub command line. Remember to
+run update-grub after change configure file.
 
-Still works :-)
+-- =
 
-Tested-by: Stefano Stabellini <sstabellini@kernel.org>
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1736042
 
+Title:
+  qemu-system-x86_64 does not boot image reliably
 
-> Based-on: 1512153879-5291-1-git-send-email-peter.maydell@linaro.org
-> ([PATCH 0/7] armv8m: Implement TT, and other bugfixes)
-> 
-> thanks
-> -- PMM
-> 
-> 
-> Edgar E. Iglesias (1):
->   target/arm: Extend PAR format determination
-> 
-> Peter Maydell (11):
->   target/arm: Provide fault type enum and FSR conversion functions
->   target/arm: Remove fsr argument from arm_ld*_ptw()
->   target/arm: Convert get_phys_addr_v5() to not return FSC values
->   target/arm: Convert get_phys_addr_v6() to not return FSC values
->   target/arm: Convert get_phys_addr_lpae() to not return FSC values
->   target/arm: Convert get_phys_addr_pmsav5() to not return FSC values
->   target/arm: Convert get_phys_addr_pmsav7() to not return FSC values
->   target/arm: Convert get_phys_addr_pmsav8() to not return FSC values
->   target/arm: Use ARMMMUFaultInfo in deliver_fault()
->   target/arm: Ignore fsr from get_phys_addr() in do_ats_write()
->   target/arm: Remove fsr argument from get_phys_addr() and
->     arm_tlb_fill()
-> 
->  target/arm/internals.h | 187 +++++++++++++++++++++++++++++++++++++-
->  target/arm/helper.c    | 238 +++++++++++++++++++++++++++----------------------
->  target/arm/op_helper.c |  82 +++++------------
->  3 files changed, 342 insertions(+), 165 deletions(-)
-> 
-> -- 
-> 2.7.4
-> 
-> 
+Status in QEMU:
+  New
+
+Bug description:
+  Booting image as root user with following command works randomly.
+
+  ./qemu-system-x86_64 -enable-kvm -curses -smp cpus=3D4 -m 8192
+  /root/ructfe2917_g.qcow2
+
+  Most of the time it ends up on "800x600 Graphic mode"(been stuck there
+  even for 4 hours before killed), but 1 out of ~20 it boots image
+  correctly(and instantly).
+
+  This is visible in v2.5.0 build from sources, v2.5.0 from Ubuntu
+  Xenial and v2.1.2 from Debian Jessie.
+
+  The image in question was converted from vmdk using:
+
+  qemu-img convert -O qcow2 file.vmdk file.qcow2
+
+  The image contains Ubuntu with grub.
+
+  I can provide debug logs, but will need guidance how to enable
+  them(and what logs are necessary).
+
+  As a side note, it seems that booting is more certain after
+  connecting(or mounting) partition using qemu-nbd/mount.
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1736042/+subscriptions
