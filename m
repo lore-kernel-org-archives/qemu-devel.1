@@ -1,24 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43336)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43367)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berto@igalia.com>) id 1eNLIC-00057P-0P
-	for qemu-devel@nongnu.org; Fri, 08 Dec 2017 11:14:28 -0500
+	(envelope-from <ehabkost@redhat.com>) id 1eNLIE-0005AH-U5
+	for qemu-devel@nongnu.org; Fri, 08 Dec 2017 11:14:31 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berto@igalia.com>) id 1eNLIB-0004sn-5l
+	(envelope-from <ehabkost@redhat.com>) id 1eNLIB-0004tU-Oc
+	for qemu-devel@nongnu.org; Fri, 08 Dec 2017 11:14:30 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:56203)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1eNLIB-0004sa-IJ
 	for qemu-devel@nongnu.org; Fri, 08 Dec 2017 11:14:27 -0500
-From: Alberto Garcia <berto@igalia.com>
-In-Reply-To: <032b64ec-a161-ff2a-5505-06b91deb2682@redhat.com>
-References: <20171120201004.14999-1-mreitz@redhat.com>
-	<20171120201004.14999-25-mreitz@redhat.com>
-	<w51k1y2307y.fsf@maestria.local.igalia.com>
-	<bcbf0021-4fcd-26d0-e05c-cd3e35608988@redhat.com>
-	<w51h8t531ql.fsf@maestria.local.igalia.com>
-	<032b64ec-a161-ff2a-5505-06b91deb2682@redhat.com>
-Date: Fri, 08 Dec 2017 17:14:19 +0100
-Message-ID: <w51k1xxci3o.fsf@maestria.local.igalia.com>
+Date: Fri, 8 Dec 2017 14:14:22 -0200
+From: Eduardo Habkost <ehabkost@redhat.com>
+Message-ID: <20171208161422.GW3037@localhost.localdomain>
+References: <CAFEAcA-auykOKQbNcoQooNGk7Vb3wt7TH7AMA689xEj22_6KcQ@mail.gmail.com>
+	<20171207174832.42663bef@redhat.com>
+	<CAFEAcA9o-LyKZBZwSoz3SSPCY-sjo9e011UWy1=EwJ4U9rWYsg@mail.gmail.com>
+	<20171207170719.GT3037@localhost.localdomain>
+	<CAFEAcA9fzkedj_VLeTaK-WOTLGk1RinyadRmR5FaJ44KOAQU3w@mail.gmail.com>
+	<CAFEAcA9Uh9f3UddCNiB3u6BD9Qg=sUMDmMYYn1+sryiJUMOFYg@mail.gmail.com>
+	<20171208141618.11e60846@redhat.com>
+	<CAFEAcA8Gc1XQVYR9+_uD7Be3WSDE5tzxVAuJNBTokb3HdJ6fHw@mail.gmail.com>
+	<20171208155050.1a6db1c2@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH v7 for-2.12 24/25] block/curl: Implement
- bdrv_refresh_filename()
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20171208155050.1a6db1c2@redhat.com>
+Subject: Re: [Qemu-devel] in a device or CPU instance init/realize,
+ can I rely on something having the BQL or equivalent?
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,46 +35,39 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org
-Cc: qemu-devel@nongnu.org, Kevin Wolf <kwolf@redhat.com>, Eric Blake <eblake@redhat.com>, John Snow <jsnow@redhat.com>
+To: Igor Mammedov <imammedo@redhat.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>, QEMU Developers <qemu-devel@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>
 
-On Fri 08 Dec 2017 02:47:52 PM CET, Max Reitz <mreitz@redhat.com> wrote:
+On Fri, Dec 08, 2017 at 03:50:50PM +0100, Igor Mammedov wrote:
+> On Fri, 8 Dec 2017 13:19:27 +0000
+> Peter Maydell <peter.maydell@linaro.org> wrote:
+> 
+> > On 8 December 2017 at 13:16, Igor Mammedov <imammedo@redhat.com> wrote:
+> > > TBH:
+> > >  I do not recall why we have x86 max/host cpu types do feature
+> > >  loading at realize time instead of at class init like the rest
+> > >  of static cpu types.  
+> > 
+> > class init is too early, IIRC -- it's before KVM has been set up at all.
+> 
+> that shouldn't be an issue as kvm_ppc_register_host_cpu_type() demonstrates
+> (i.e. an additional class init at kvm/tcg init time),
 
->>>>> +static void curl_refresh_filename(BlockDriverState *bs)
->>>>> +{
->>>>> +    BDRVCURLState *s = bs->opaque;
->>>>> +
->>>>> +    if (!s->sslverify || s->cookie ||
->>>>> +        s->username || s->password || s->proxyusername || s->proxypassword)
->>>>> +    {
->>>>
->>>> Is !s->sslverify negative because that setting is true by default?
->>>
->>> Yes, exactly.  If it's false, you'd need to override it (and you can't
->>> do that through a plain filename).
->> 
->> I think this is not the only case in this series, but I'm not very
->> comfortable with the idea that this condition and the default value
->> of the setting are implicity dependent on each other. If you change
->> one and forget to change the other things will break.
->
-> Well, yes, but...
->
->> I understand that the default value is never supposed to change so in
->> practice I don't see this breaking,
->
-> Yes.
->
->> but is it perhaps worth adding tests for all these cases?
->
-> In theory, sure.  In practice, adding a curl test case seems hard.
+It is possible, but IMO it's not a good idea.  We should be able
+to enumerate all CPU types before the accelerator has been
+initialized, so query-cpu-definitions and "-cpu help" will always
+work.
 
-Indeed, I though it would perhaps be possible to create a curl BDS to
-this without having to perform an actual connection, but never mind if
-it's not possible / too complicated.
 
-> Also, adding macros for the default values could help, I think.
+> 
+> so it might be some compat issue or just legacy approach why it
+> havn't been rewritten to class_init for x86 the way PPC does.
+> But Eduardo probably knows better if there is anything left that
+> prevents using class init there.
 
-Yep.
+It's the opposite: x86 "host" CPU model used to work the same way
+as PPC, but we changed it so all classes are registered at
+type_init()-time.
 
-Berto
+-- 
+Eduardo
