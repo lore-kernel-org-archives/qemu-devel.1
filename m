@@ -1,19 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56708)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58294)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1eNLxt-0006K2-E2
-	for qemu-devel@nongnu.org; Fri, 08 Dec 2017 11:57:34 -0500
+	(envelope-from <eblake@redhat.com>) id 1eNM3X-000231-J1
+	for qemu-devel@nongnu.org; Fri, 08 Dec 2017 12:03:24 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1eNLxs-0000BX-I3
-	for qemu-devel@nongnu.org; Fri, 08 Dec 2017 11:57:33 -0500
-Received: from orth.archaic.org.uk ([2001:8b0:1d0::2]:38970)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pm215@archaic.org.uk>)
-	id 1eNLxs-0000An-B1
-	for qemu-devel@nongnu.org; Fri, 08 Dec 2017 11:57:32 -0500
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri,  8 Dec 2017 16:57:28 +0000
-Message-Id: <1512752248-17857-1-git-send-email-peter.maydell@linaro.org>
-Subject: [Qemu-devel] [PATCH] sparc: Make sure we mmap at SHMLBA alignment
+	(envelope-from <eblake@redhat.com>) id 1eNM3W-0002VE-Jr
+	for qemu-devel@nongnu.org; Fri, 08 Dec 2017 12:03:23 -0500
+References: <1512733868-9009-1-git-send-email-pl@kamp.de>
+	<1512733868-9009-3-git-send-email-pl@kamp.de>
+	<dd61b219-a965-3794-5155-1483227d5e62@redhat.com>
+	<4b0586ee-45cb-cfb1-288c-bcccf81c5212@kamp.de>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <295e577a-72e2-f397-ec44-ecdee248ff51@redhat.com>
+Date: Fri, 8 Dec 2017 11:03:12 -0600
+MIME-Version: 1.0
+In-Reply-To: <4b0586ee-45cb-cfb1-288c-bcccf81c5212@kamp.de>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="rvSn4Rb8S7cWO29DkR5qx6IjMfFjPh3JU"
+Subject: Re: [Qemu-devel] [PATCH 2/2] block/iscsi: only report an iSCSI
+ Failure if we don't handle it gracefully
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,70 +27,67 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: patches@linaro.org, John Paul Adrian Glaubitz <glaubitz@physik.fu-berlin.de>
+To: Peter Lieven <pl@kamp.de>, qemu-devel@nongnu.org, qemu-block@nongnu.org
+Cc: kwolf@redhat.com, pbonzini@redhat.com, ronniesahlberg@gmail.com, mreitz@redhat.com
 
-SPARC Linux has an oddity that it insists that mmap()
-of MAP_FIXED memory must be at an alignment defined by
-SHMLBA, which is more aligned than the page size
-(typically, SHMLBA alignment is to 16K, and pages are 8K).
-This is a relic of ancient hardware that had cache
-aliasing constraints, but even on modern hardware the
-kernel still insists on the alignment.
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--rvSn4Rb8S7cWO29DkR5qx6IjMfFjPh3JU
+From: Eric Blake <eblake@redhat.com>
+To: Peter Lieven <pl@kamp.de>, qemu-devel@nongnu.org, qemu-block@nongnu.org
+Cc: kwolf@redhat.com, pbonzini@redhat.com, ronniesahlberg@gmail.com,
+ mreitz@redhat.com
+Message-ID: <295e577a-72e2-f397-ec44-ecdee248ff51@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH 2/2] block/iscsi: only report an iSCSI
+ Failure if we don't handle it gracefully
+References: <1512733868-9009-1-git-send-email-pl@kamp.de>
+ <1512733868-9009-3-git-send-email-pl@kamp.de>
+ <dd61b219-a965-3794-5155-1483227d5e62@redhat.com>
+ <4b0586ee-45cb-cfb1-288c-bcccf81c5212@kamp.de>
+In-Reply-To: <4b0586ee-45cb-cfb1-288c-bcccf81c5212@kamp.de>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-To ensure that we get mmap() alignment sufficient to
-make the kernel happy, change QEMU_VMALLOC_ALIGN,
-qemu_fd_getpagesize() and qemu_mempath_getpagesize()
-to use the maximum of getpagesize() and SHMLBA.
+On 12/08/2017 10:14 AM, Peter Lieven wrote:
+> Am 08.12.2017 um 16:11 schrieb Eric Blake:
+>> On 12/08/2017 05:51 AM, Peter Lieven wrote:
+>>> we currently report an "iSCSI Failure" in iscsi_co_generic_cb if the =
+task
+>>> hasn't completed with SCSI_STATUS_GOOD. However, we expect a failure =
+in
+>>> some cases and handle it gracefully. This is the case for misaligned =
+UNMAPs
+>> Is the block layer still capable of producing a misaligned UNMAP?  If
+>> so, that's probably a bug in the block layer for not honoring the bloc=
+k
+>> limit geometries.
+>=20
+> In theory there should be none. I think we can drop this code.
 
-In particular, this allows 'make check' to pass on Sparc:
-we were previously failing the ivshmem tests.
+Or, better yet, replace the check with an assert.
 
-Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
----
- include/qemu/osdep.h | 3 +++
- util/mmap-alloc.c    | 8 ++++++++
- 2 files changed, 11 insertions(+)
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
 
-diff --git a/include/qemu/osdep.h b/include/qemu/osdep.h
-index e8568a0..adb3758 100644
---- a/include/qemu/osdep.h
-+++ b/include/qemu/osdep.h
-@@ -365,6 +365,9 @@ void qemu_anon_ram_free(void *ptr, size_t size);
- #elif defined(__linux__) && defined(__s390x__)
-    /* Use 1 MiB (segment size) alignment so gmap can be used by KVM. */
- #  define QEMU_VMALLOC_ALIGN (256 * 4096)
-+#elif defined(__linux__) && defined(__sparc__)
-+#include <sys/shm.h>
-+#  define QEMU_VMALLOC_ALIGN MAX(getpagesize(), SHMLBA)
- #else
- #  define QEMU_VMALLOC_ALIGN getpagesize()
- #endif
-diff --git a/util/mmap-alloc.c b/util/mmap-alloc.c
-index 3ec029a..2fd8cbc 100644
---- a/util/mmap-alloc.c
-+++ b/util/mmap-alloc.c
-@@ -35,6 +35,10 @@ size_t qemu_fd_getpagesize(int fd)
-             return fs.f_bsize;
-         }
-     }
-+#ifdef __sparc__
-+    /* SPARC Linux needs greater alignment than the pagesize */
-+    return QEMU_VMALLOC_ALIGN;
-+#endif
- #endif
- 
-     return getpagesize();
-@@ -60,6 +64,10 @@ size_t qemu_mempath_getpagesize(const char *mem_path)
-         /* It's hugepage, return the huge page size */
-         return fs.f_bsize;
-     }
-+#ifdef __sparc__
-+    /* SPARC Linux needs greater alignment than the pagesize */
-+    return QEMU_VMALLOC_ALIGN;
-+#endif
- #endif
- 
-     return getpagesize();
--- 
-2.7.4
+
+--rvSn4Rb8S7cWO29DkR5qx6IjMfFjPh3JU
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAloqxdAACgkQp6FrSiUn
+Q2pOBQf+LhHfIYlRd2+MKPw5szLQOZl/X1QXRK4GMK1maajwH7lOJk7sFifhZjZB
+RiXOQZOAeK4hrI1SNFXLDEOF0IeF+1sj8fkepdc4WQ2/EzoRwHwadiASWDVBeeWd
+MEFzm076RdnwLfukH0NMhRi28eZPMXaC96ixHdT9zYmDHMN2ZzOowSMgGDE4lPMQ
+VgKegz1h7aq6XdNHrYLFAmqAjfxreA/R2euEf73nG100kA/LKqSw4vmddfIWVPR9
+pPl+TTPyJVSsAxPKm9ecykLKyYfGGbuEnZoUSO4/6yUA2tnUgx1onPC3D5jOIkvQ
+2PbxRXknktOu0LAeKk1naImCQYV5aA==
+=Fq/f
+-----END PGP SIGNATURE-----
+
+--rvSn4Rb8S7cWO29DkR5qx6IjMfFjPh3JU--
