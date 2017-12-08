@@ -1,26 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55409)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57591)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <tina.zhang@intel.com>) id 1eNF9z-0008Uu-RO
-	for qemu-devel@nongnu.org; Fri, 08 Dec 2017 04:41:37 -0500
+	(envelope-from <berrange@redhat.com>) id 1eNFHe-0004Ka-B1
+	for qemu-devel@nongnu.org; Fri, 08 Dec 2017 04:49:31 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <tina.zhang@intel.com>) id 1eNF9w-0001ip-Jx
-	for qemu-devel@nongnu.org; Fri, 08 Dec 2017 04:41:35 -0500
-Received: from mga12.intel.com ([192.55.52.136]:58601)
+	(envelope-from <berrange@redhat.com>) id 1eNFHb-0007EF-7h
+	for qemu-devel@nongnu.org; Fri, 08 Dec 2017 04:49:30 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:52284)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <tina.zhang@intel.com>)
-	id 1eNF9w-0001id-7D
-	for qemu-devel@nongnu.org; Fri, 08 Dec 2017 04:41:32 -0500
-From: "Zhang, Tina" <tina.zhang@intel.com>
-Date: Fri, 8 Dec 2017 09:41:27 +0000
-Message-ID: <237F54289DF84E4997F34151298ABEBC7C64BA31@SHSMSX101.ccr.corp.intel.com>
-References: <1512725557-9729-1-git-send-email-tina.zhang@intel.com>
-In-Reply-To: <1512725557-9729-1-git-send-email-tina.zhang@intel.com>
-Content-Language: en-US
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1eNFHa-0007Dl-Tw
+	for qemu-devel@nongnu.org; Fri, 08 Dec 2017 04:49:27 -0500
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+	[10.5.11.16])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 287D4C04AC49
+	for <qemu-devel@nongnu.org>; Fri,  8 Dec 2017 09:49:25 +0000 (UTC)
+Date: Fri, 8 Dec 2017 09:49:18 +0000
+From: "Daniel P. Berrange" <berrange@redhat.com>
+Message-ID: <20171208094918.GB11767@redhat.com>
+Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
+References: <20171208005825.14587-1-marcandre.lureau@redhat.com>
+	<20171208005825.14587-10-marcandre.lureau@redhat.com>
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [Rfc PATCH] ui: Enable SDL to use dma-buf for
- direct guest framebuffer rendering
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20171208005825.14587-10-marcandre.lureau@redhat.com>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH 09/12] crypto: fix stack-buffer-overflow
+ error
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,258 +36,134 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "kraxel@redhat.com" <kraxel@redhat.com>
-Cc: "zhenyuw@linux.intel.com" <zhenyuw@linux.intel.com>, "intel-gvt-dev@lists.freedesktop.org" <intel-gvt-dev@lists.freedesktop.org>, "Wang, Zhi A" <zhi.a.wang@intel.com>, "Yuan, Hang" <hang.yuan@intel.com>, "Lv, Zhiyuan" <zhiyuan.lv@intel.com>
+To: =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>
+Cc: qemu-devel@nongnu.org
 
-This patch is using SDL_GL_GetCurrentContext() to get a context and meet an=
- issue with SDL_GL_CONTEXT_EGL which is deprecated since SDL 2.1.
-
-Before SDL 2.1, SDL_GL_CONTEXT_EGL can be used with SDL_GL_SetAttribute, so=
- that an EGLContext can be created with SDL_GL_GetCurrentContext().
-Since SDL_GL_CONTEXT_EGL is deprecated now, is there a way to let SDL_GL_Ge=
-tCurrentContext() return an EGLContext?
-Thanks.
-
-BR,
-Tina
-
-> -----Original Message-----
-> From: Zhang, Tina
-> Sent: Friday, December 8, 2017 5:33 PM
-> To: qemu-devel@nongnu.org; kraxel@redhat.com
-> Cc: Zhang, Tina <tina.zhang@intel.com>; zhenyuw@linux.intel.com; intel-gv=
-t-
-> dev@lists.freedesktop.org; Wang, Zhi A <zhi.a.wang@intel.com>; Yuan, Hang
-> <hang.yuan@intel.com>; Lv, Zhiyuan <zhiyuan.lv@intel.com>
-> Subject: [Rfc PATCH] ui: Enable SDL to use dma-buf for direct guest frame=
-buffer
-> rendering
+On Fri, Dec 08, 2017 at 01:58:22AM +0100, Marc-Andr=C3=A9 Lureau wrote:
+> ASAN complains about:
 >=20
-> This RFC patch is based on Qemu UI on-going work of rendering guest
-> framebuffer through dma-buf interface, to show a protype of SDL with dma-=
-buf
-> interface.
+> =3D=3D8856=3D=3DERROR: AddressSanitizer: stack-buffer-overflow on addre=
+ss 0x7ffd8a1fe168 at pc 0x561136cb4451 bp 0x7ffd8a1fe130 sp 0x7ffd8a1fd8e=
+0
+> READ of size 16 at 0x7ffd8a1fe168 thread T0
+>     #0 0x561136cb4450 in __asan_memcpy (/home/elmarco/src/qq/build/test=
+s/test-crypto-ivgen+0x110450)
+>     #1 0x561136d2a6a7 in qcrypto_ivgen_essiv_calculate /home/elmarco/sr=
+c/qq/crypto/ivgen-essiv.c:83:5
+>     #2 0x561136d29af8 in qcrypto_ivgen_calculate /home/elmarco/src/qq/c=
+rypto/ivgen.c:72:12
+>     #3 0x561136d07c8e in test_ivgen /home/elmarco/src/qq/tests/test-cry=
+pto-ivgen.c:148:5
+>     #4 0x7f77772c3b04 in test_case_run /home/elmarco/src/gnome/glib/bui=
+lddir/../glib/gtestutils.c:2237
+>     #5 0x7f77772c3ec4 in g_test_run_suite_internal /home/elmarco/src/gn=
+ome/glib/builddir/../glib/gtestutils.c:2321
+>     #6 0x7f77772c3f6d in g_test_run_suite_internal /home/elmarco/src/gn=
+ome/glib/builddir/../glib/gtestutils.c:2333
+>     #7 0x7f77772c3f6d in g_test_run_suite_internal /home/elmarco/src/gn=
+ome/glib/builddir/../glib/gtestutils.c:2333
+>     #8 0x7f77772c3f6d in g_test_run_suite_internal /home/elmarco/src/gn=
+ome/glib/builddir/../glib/gtestutils.c:2333
+>     #9 0x7f77772c4184 in g_test_run_suite /home/elmarco/src/gnome/glib/=
+builddir/../glib/gtestutils.c:2408
+>     #10 0x7f77772c2e0d in g_test_run /home/elmarco/src/gnome/glib/build=
+dir/../glib/gtestutils.c:1674
+>     #11 0x561136d0799b in main /home/elmarco/src/qq/tests/test-crypto-i=
+vgen.c:173:12
+>     #12 0x7f77756e6039 in __libc_start_main (/lib64/libc.so.6+0x21039)
+>     #13 0x561136c13d89 in _start (/home/elmarco/src/qq/build/tests/test=
+-crypto-ivgen+0x6fd89)
 >=20
-> Against branch: work/intel-vgpu
+> Address 0x7ffd8a1fe168 is located in stack of thread T0 at offset 40 in=
+ frame
+>     #0 0x561136d2a40f in qcrypto_ivgen_essiv_calculate /home/elmarco/sr=
+c/qq/crypto/ivgen-essiv.c:76
 >=20
-> Signed-off-by: Tina Zhang <tina.zhang@intel.com>
+>   This frame has 1 object(s):
+>     [32, 40) 'sector.addr' <=3D=3D Memory access at offset 40 overflows=
+ this variable
+> HINT: this may be a false positive if your program uses some custom sta=
+ck unwind mechanism or swapcontext
+>       (longjmp and C++ exceptions *are* supported)
+> SUMMARY: AddressSanitizer: stack-buffer-overflow (/home/elmarco/src/qq/=
+build/tests/test-crypto-ivgen+0x110450) in __asan_memcpy
+> Shadow bytes around the buggy address:
+>   0x100031437bd0: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+>   0x100031437be0: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+>   0x100031437bf0: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+>   0x100031437c00: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+>   0x100031437c10: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+> =3D>0x100031437c20: 00 00 00 00 00 00 00 00 f1 f1 f1 f1 00[f3]f3 f3
+>   0x100031437c30: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+>   0x100031437c40: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+>   0x100031437c50: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+>   0x100031437c60: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+>   0x100031437c70: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+> Shadow byte legend (one shadow byte represents 8 application bytes):
+>   Addressable:           00
+>   Partially addressable: 01 02 03 04 05 06 07
+>   Heap left redzone:       fa
+>   Freed heap region:       fd
+>   Stack left redzone:      f1
+>   Stack mid redzone:       f2
+>   Stack right redzone:     f3
+>   Stack after return:      f5
+>   Stack use after scope:   f8
+>   Global redzone:          f9
+>   Global init order:       f6
+>   Poisoned by user:        f7
+>   Container overflow:      fc
+>   Array cookie:            ac
+>   Intra object redzone:    bb
+>   ASan internal:           fe
+>   Left alloca redzone:     ca
+>   Right alloca redzone:    cb
+>=20
+> It looks like the rest of the code copes with ndata being larger than
+> sizeof(sector), so limit the memcpy() range.
+>=20
+> Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 > ---
->  include/ui/sdl2.h | 11 ++++++++
->  ui/sdl2-gl.c      | 84
-> ++++++++++++++++++++++++++++++++++++++++++++++---------
->  ui/sdl2.c         |  6 ++--
->  3 files changed, 86 insertions(+), 15 deletions(-)
+>  crypto/ivgen-essiv.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
 >=20
-> diff --git a/include/ui/sdl2.h b/include/ui/sdl2.h index 7811d33..e6e334c
-> 100644
-> --- a/include/ui/sdl2.h
-> +++ b/include/ui/sdl2.h
-> @@ -29,6 +29,9 @@ struct sdl2_console {
->      QemuGLShader *gls;
->      egl_fb guest_fb;
->      egl_fb win_fb;
-> +    egl_fb cursor_fb;
-> +    int cursor_x;
-> +    int cursor_y;
->      bool y0_top;
->      bool scanout_mode;
->  #endif
-> @@ -76,6 +79,14 @@ void sdl2_gl_scanout_texture(DisplayChangeListener
-> *dcl,
->                               uint32_t w, uint32_t h);  void
-> sdl2_gl_scanout_dmabuf(DisplayChangeListener *dcl,
->                              QemuDmaBuf *dmabuf);
-> +void sdl2_gl_cursor_dmabuf(DisplayChangeListener *dcl,
-> +                          QemuDmaBuf *dmabuf); void
-> +sdl2_gl_cursor_position(DisplayChangeListener *dcl,
-> +                            bool have_hot, bool have_pos,
-> +                            uint32_t hot_x, uint32_t hot_y,
-> +                            uint32_t pos_x, uint32_t pos_y); void
-> +sdl2_gl_release_dmabuf(DisplayChangeListener *dcl,
-> +                           QemuDmaBuf *dmabuf);
->  void sdl2_gl_scanout_flush(DisplayChangeListener *dcl,
->                             uint32_t x, uint32_t y, uint32_t w, uint32_t =
-h);
->=20
-> diff --git a/ui/sdl2-gl.c b/ui/sdl2-gl.c index ab31c5a..dbe7435 100644
-> --- a/ui/sdl2-gl.c
-> +++ b/ui/sdl2-gl.c
-> @@ -72,9 +72,12 @@ void sdl2_gl_update(DisplayChangeListener *dcl,
->=20
->      assert(scon->opengl);
->=20
-> -    SDL_GL_MakeCurrent(scon->real_window, scon->winctx);
-> -    surface_gl_update_texture(scon->gls, scon->surface, x, y, w, h);
-> -    scon->updates++;
-> +    if (!scon->scanout_mode) {
-> +    /* Fixme: unmarking these leads to flashing issue */
-> +        //SDL_GL_MakeCurrent(scon->real_window, scon->winctx);
-> +        surface_gl_update_texture(scon->gls, scon->surface, x, y, w, h);
-> +        //scon->updates++;
-> +    }
->  }
->=20
->  void sdl2_gl_switch(DisplayChangeListener *dcl, @@ -116,7 +119,7 @@ void
-> sdl2_gl_refresh(DisplayChangeListener *dcl)
->      assert(scon->opengl);
->=20
->      graphic_hw_update(dcl->con);
-> -    if (scon->updates && scon->surface) {
-> +    if (!scon->scanout_mode && scon->updates && scon->surface) {
->          scon->updates =3D 0;
->          sdl2_gl_render_surface(scon);
+> diff --git a/crypto/ivgen-essiv.c b/crypto/ivgen-essiv.c
+> index cba20bde6c..ad4d926c19 100644
+> --- a/crypto/ivgen-essiv.c
+> +++ b/crypto/ivgen-essiv.c
+> @@ -79,7 +79,7 @@ static int qcrypto_ivgen_essiv_calculate(QCryptoIVGen=
+ *ivgen,
+>      uint8_t *data =3D g_new(uint8_t, ndata);
+> =20
+>      sector =3D cpu_to_le64(sector);
+> -    memcpy(data, (uint8_t *)&sector, ndata);
+> +    memcpy(data, (uint8_t *)&sector, MIN(sizeof(sector), ndata));
+
+Ok, so typically sizeof(sector) will be 8, and ndata will be 16 for
+AES. So without this fix we're reading 8 extra bytes off the stack
+that were just after 'sector'. This is harmless, because these extra
+8 bytes will just be the '*iv' pointer, and the very next lines
+overwrite that bogus extra data. Also explains why valgrind didn't
+report it - the extra stack bytes are still valid memory region.
+So I don't think this would crash or be a security problem, which is
+good, as avoids any backport need.=20
+
+>      if (sizeof(sector) < ndata) {
+>          memset(data + sizeof(sector), 0, ndata - sizeof(sector));
 >      }
-> @@ -127,8 +130,12 @@ void sdl2_gl_redraw(struct sdl2_console *scon)  {
->      assert(scon->opengl);
->=20
-> -    if (scon->surface) {
-> -        sdl2_gl_render_surface(scon);
-> +    if (scon->scanout_mode) {
-> +        sdl2_gl_scanout_flush(&scon->dcl, 0, 0 , 0, 0);
-> +    } else {
-> +        if (scon->surface) {
-> +            sdl2_gl_render_surface(scon);
-> +        }
->      }
->  }
->=20
-> @@ -208,22 +215,64 @@ void
-> sdl2_gl_scanout_texture(DisplayChangeListener *dcl,
->      SDL_GL_MakeCurrent(scon->real_window, scon->winctx);
->=20
->      sdl2_set_scanout_mode(scon, true);
-> +
->      egl_fb_setup_for_tex(&scon->guest_fb, backing_width, backing_height,
->                           backing_id, false);  }
->=20
-> +
->  void sdl2_gl_scanout_dmabuf(DisplayChangeListener *dcl,
->                              QemuDmaBuf *dmabuf)  {
-> -    struct sdl2_console *scon =3D container_of(dcl, struct sdl2_console,=
- dcl);
-> -    int tex_id =3D 0;
-> +#ifdef CONFIG_OPENGL_DMABUF
-> +
-> +    egl_dmabuf_import_texture(dmabuf);
->=20
-> -    /* TODO: import dmabuf */
-> +    if (!dmabuf->texture) {
-> +        return;
-> +    }
->=20
-> -    sdl2_gl_scanout_texture(dcl, tex_id,
-> +    sdl2_gl_scanout_texture(dcl, dmabuf->texture,
->                              false, dmabuf->width, dmabuf->height,
->                              0, 0, dmabuf->width, dmabuf->height);
-> -    scon->guest_fb.delete_texture =3D true;
-> +#endif
-> +}
-> +
-> +void sdl2_gl_cursor_dmabuf(DisplayChangeListener *dcl,
-> +                          QemuDmaBuf *dmabuf) { #ifdef
-> +CONFIG_OPENGL_DMABUF
-> +    struct sdl2_console *scon =3D container_of(dcl, struct sdl2_console,
-> +dcl);
-> +
-> +    egl_dmabuf_import_texture(dmabuf);
-> +    if (!dmabuf->texture) {
-> +        return;
-> +    }
-> +
-> +    egl_fb_setup_for_tex(&scon->cursor_fb, dmabuf->width, dmabuf->height=
-,
-> +                         dmabuf->texture, false); #endif }
-> +
-> +void sdl2_gl_cursor_position(DisplayChangeListener *dcl,
-> +                            bool have_hot, bool have_pos,
-> +                            uint32_t hot_x, uint32_t hot_y,
-> +                            uint32_t pos_x, uint32_t pos_y) { #ifdef
-> +CONFIG_OPENGL_DMABUF
-> +    struct sdl2_console *scon =3D container_of(dcl, struct sdl2_console,
-> +dcl);
-> +
-> +    scon->cursor_x =3D pos_x;
-> +    scon->cursor_y =3D pos_y;
-> +#endif
-> +}
-> +
-> +void sdl2_gl_release_dmabuf(DisplayChangeListener *dcl,
-> +                           QemuDmaBuf *dmabuf) { #ifdef
-> +CONFIG_OPENGL_DMABUF
-> +    egl_dmabuf_release_texture(dmabuf);
-> +#endif
->  }
->=20
->  void sdl2_gl_scanout_flush(DisplayChangeListener *dcl, @@ -236,15 +285,2=
-4
-> @@ void sdl2_gl_scanout_flush(DisplayChangeListener *dcl,
->      if (!scon->scanout_mode) {
->          return;
->      }
-> +
->      if (!scon->guest_fb.framebuffer) {
->          return;
->      }
->=20
->      SDL_GL_MakeCurrent(scon->real_window, scon->winctx);
-> -
->      SDL_GetWindowSize(scon->real_window, &ww, &wh);
-> +
->      egl_fb_setup_default(&scon->win_fb, ww, wh);
-> -    egl_fb_blit(&scon->win_fb, &scon->guest_fb, !scon->y0_top);
->=20
-> +    if (scon->cursor_fb.texture) {
-> +        egl_texture_blit(scon->gls, &scon->win_fb, &scon->guest_fb,
-> +                         scon->y0_top);
-> +	egl_texture_blend(scon->gls, &scon->win_fb, &scon->cursor_fb,
-> +                              scon->y0_top,
-> +                              scon->cursor_x, scon->cursor_y);
-> +    } else {
-> +        egl_fb_blit(&scon->win_fb, &scon->guest_fb, !scon->y0_top);
-> +    }
->      SDL_GL_SwapWindow(scon->real_window);
->  }
-> diff --git a/ui/sdl2.c b/ui/sdl2.c
-> index 71efd24..c865cba 100644
-> --- a/ui/sdl2.c
-> +++ b/ui/sdl2.c
-> @@ -84,7 +84,6 @@ void sdl2_window_create(struct sdl2_console *scon)
->      if (scon->hidden) {
->          flags |=3D SDL_WINDOW_HIDDEN;
->      }
-> -
->      scon->real_window =3D SDL_CreateWindow("",
-> SDL_WINDOWPOS_UNDEFINED,
->                                           SDL_WINDOWPOS_UNDEFINED,
->                                           surface_width(scon->surface), @=
-@ -118,7 +117,6 @@
-> void sdl2_window_resize(struct sdl2_console *scon)
->      if (!scon->real_window) {
->          return;
->      }
-> -
->      SDL_SetWindowSize(scon->real_window,
->                        surface_width(scon->surface),
->                        surface_height(scon->surface)); @@ -740,6 +738,9 @=
-@ static
-> const DisplayChangeListenerOps dcl_gl_ops =3D {
->      .dpy_gl_scanout_disable  =3D sdl2_gl_scanout_disable,
->      .dpy_gl_scanout_texture  =3D sdl2_gl_scanout_texture,
->      .dpy_gl_scanout_dmabuf   =3D sdl2_gl_scanout_dmabuf,
-> +    .dpy_gl_cursor_dmabuf    =3D sdl2_gl_cursor_dmabuf,
-> +    .dpy_gl_cursor_position  =3D sdl2_gl_cursor_position,
-> +    .dpy_gl_release_dmabuf   =3D sdl2_gl_release_dmabuf,
->      .dpy_gl_update           =3D sdl2_gl_scanout_flush,
->  };
->  #endif
-> @@ -835,6 +836,7 @@ void sdl_display_init(DisplayState *ds, int full_scre=
-en,
-> int no_frame)  #endif
->      }
->=20
-> +    qemu_egl_init_dpy_x11(info.info.x11.display);
->      /* Load a 32x32x4 image. White pixels are transparent. */
->      filename =3D qemu_find_file(QEMU_FILE_TYPE_BIOS, "qemu-icon.bmp");
->      if (filename) {
-> --
-> 2.7.4
+
+Reviewed-by: Daniel P. Berrange <berrange@redhat.com>
+
+I'll add this to my qcrypto queue, but if feel free to include it in a pu=
+ll
+of your own if you submit this entire series at once.
+
+Regards,
+Daniel
+--=20
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberran=
+ge :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.c=
+om :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberran=
+ge :|
