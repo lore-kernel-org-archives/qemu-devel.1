@@ -1,15 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38937)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38946)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1eNL6O-0001nh-6c
+	(envelope-from <david@redhat.com>) id 1eNL6O-0001qk-SU
 	for qemu-devel@nongnu.org; Fri, 08 Dec 2017 11:02:17 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1eNL6L-0005JE-5k
+	(envelope-from <david@redhat.com>) id 1eNL6N-0005Jz-Ti
 	for qemu-devel@nongnu.org; Fri, 08 Dec 2017 11:02:16 -0500
 From: David Hildenbrand <david@redhat.com>
-Date: Fri,  8 Dec 2017 17:01:53 +0100
-Message-Id: <20171208160207.26494-1-david@redhat.com>
-Subject: [Qemu-devel] [PATCH v3 for-2.12 00/14] s390x/tcg: CCW hotplug,
- facilities, instructions
+Date: Fri,  8 Dec 2017 17:01:54 +0100
+Message-Id: <20171208160207.26494-2-david@redhat.com>
+In-Reply-To: <20171208160207.26494-1-david@redhat.com>
+References: <20171208160207.26494-1-david@redhat.com>
+Subject: [Qemu-devel] [PATCH v3 for-2.12 01/14] s390x/kvm: factor out
+ build_channel_report_mcic() into cpu.h
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -19,65 +21,98 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-s390x@nongnu.org, qemu-devel@nongnu.org
-Cc: Christian Borntraeger <borntraeger@de.ibm.com>, Cornelia Huck <cohuck@redhat.com>, Richard Henderson <rth@twiddle.net>, Alexander Graf <agraf@suse.de>
+Cc: Christian Borntraeger <borntraeger@de.ibm.com>, Cornelia Huck <cohuck@redhat.com>, Richard Henderson <rth@twiddle.net>, Alexander Graf <agraf@suse.de>, David Hildenbrand <david@redhat.com>
 
-Both series in one piece as (most probably) most reviewing is done.
+We'll need it later on in two places. Refactor it to just indicate the
+validity bits. While at it, introduce a define for the used CR14 bit (we'll
+also need later on).
 
-Wire up some io instructions and implement new facilitites. Make sure
-to take care of MTTCG when it comes to atomic operations. Make CCW
-hotplug work.
+Signed-off-by: David Hildenbrand <david@redhat.com>
+---
+ target/s390x/cpu.h | 23 +++++++++++++++++++++++
+ target/s390x/kvm.c | 25 ++-----------------------
+ 2 files changed, 25 insertions(+), 23 deletions(-)
 
-As we are now able to install/boot a Fedora 26/27 as well as an upstream
-kernel compiled for z12, let's bump up the QEMU cpu model to a very
-stripped down version of a z12 (with missing base features). Take care
-of backwards compatibility (as we defined the QEMU model as
-migration-safe).
-
-Avilable at: https://github.com/davidhildenbrand/qemu.git s390x-queue
-
-v2 -> v3:
-- squashed the ASI/ASGI and ALSI/ALSGI patches.
- - Both now emulate old behavior.
-- "s390x/tcg: implement Interlocked-Access Facility 2"
- - now also emulates old behavior.
-- "s390x/tcg: implement SET CLOCK PROGRAMMABLE FIELD"
- - now forwards r1 into the helper.
-- "s390x/tcg: implement extract-CPU-time facility"
- - takes care of user-only
-- "s390x: change the QEMU cpu model to a stripped down z12"
-  - const -> static const for two feature bitmaps
-
-
-David Hildenbrand (14):
-  s390x/kvm: factor out build_channel_report_mcic() into cpu.h
-  s390x/tcg: fix and cleanup mcck injection
-  s390x/tcg: implement SET CLOCK PROGRAMMABLE FIELD
-  s390x/tcg: indicate value of TODPR in STCKE
-  s390x/tcg: wire up STORE CHANNEL REPORT WORD
-  s390x/tcg: ASI/ASGI/ALSI/ALSGI are atomic with Interlocked-acccess
-    facility 1
-  s390x/tcg: implement Interlocked-Access Facility 2
-  s390x/tcg: wire up SET ADDRESS LIMIT
-  s390x/tcg: wire up SET CHANNEL MONITOR
-  s390x/tcg: Implement STORE CHANNEL PATH STATUS
-  s390x/tcg: Implement SIGNAL ADAPTER instruction
-  s390x/tcg: implement extract-CPU-time facility
-  s390x/tcg: we already implement the Set-Program-Parameter facility
-  s390x: change the QEMU cpu model to a stripped down z12
-
- hw/s390x/s390-virtio-ccw.c  |   8 +++
- target/s390x/cpu.h          |  26 +++++++
- target/s390x/cpu_models.c   |  97 +++++++++++---------------
- target/s390x/cpu_models.h   |   1 +
- target/s390x/excp_helper.c  |  12 ++--
- target/s390x/gen-features.c |  87 +++++++++++++++++++++++
- target/s390x/helper.h       |   6 +-
- target/s390x/insn-data.def  |  29 +++++---
- target/s390x/internal.h     |   6 +-
- target/s390x/kvm.c          |  25 +------
- target/s390x/misc_helper.c  |  59 ++++++++++++++--
- target/s390x/translate.c    | 164 ++++++++++++++++++++++++++++++++++++++++++++
- 12 files changed, 415 insertions(+), 105 deletions(-)
-
+diff --git a/target/s390x/cpu.h b/target/s390x/cpu.h
+index 9cfbbbac04..f9d4d62c48 100644
+--- a/target/s390x/cpu.h
++++ b/target/s390x/cpu.h
+@@ -351,6 +351,9 @@ extern const struct VMStateDescription vmstate_s390_cpu;
+ #define CR0_CPU_TIMER_SC        0x0000000000000400ULL
+ #define CR0_SERVICE_SC          0x0000000000000200ULL
+ 
++/* Control register 14 bits */
++#define CR14_CHANNEL_REPORT_SC  0x0000000010000000ULL
++
+ /* MMU */
+ #define MMU_PRIMARY_IDX         0
+ #define MMU_SECONDARY_IDX       1
+@@ -674,6 +677,26 @@ struct sysib_322 {
+ #define MCIC_VB_CT 0x0000000000020000ULL
+ #define MCIC_VB_CC 0x0000000000010000ULL
+ 
++static inline uint64_t s390_build_validity_mcic(void)
++{
++    uint64_t mcic;
++
++    /*
++     * Indicate all validity bits (no damage) only. Other bits have to be
++     * added by the caller. (storage errors, subclasses and subclass modifiers)
++     */
++    mcic = MCIC_VB_WP | MCIC_VB_MS | MCIC_VB_PM | MCIC_VB_IA | MCIC_VB_FP |
++           MCIC_VB_GR | MCIC_VB_CR | MCIC_VB_ST | MCIC_VB_AR | MCIC_VB_PR |
++           MCIC_VB_FC | MCIC_VB_CT | MCIC_VB_CC;
++    if (s390_has_feat(S390_FEAT_VECTOR)) {
++        mcic |= MCIC_VB_VR;
++    }
++    if (s390_has_feat(S390_FEAT_GUARDED_STORAGE)) {
++        mcic |= MCIC_VB_GS;
++    }
++    return mcic;
++}
++
+ 
+ /* cpu.c */
+ int s390_get_clock(uint8_t *tod_high, uint64_t *tod_low);
+diff --git a/target/s390x/kvm.c b/target/s390x/kvm.c
+index 97c45d5537..9b8b59f2a2 100644
+--- a/target/s390x/kvm.c
++++ b/target/s390x/kvm.c
+@@ -1852,33 +1852,12 @@ void kvm_s390_io_interrupt(uint16_t subchannel_id,
+     kvm_s390_floating_interrupt(&irq);
+ }
+ 
+-static uint64_t build_channel_report_mcic(void)
+-{
+-    uint64_t mcic;
+-
+-    /* subclass: indicate channel report pending */
+-    mcic = MCIC_SC_CP |
+-    /* subclass modifiers: none */
+-    /* storage errors: none */
+-    /* validity bits: no damage */
+-        MCIC_VB_WP | MCIC_VB_MS | MCIC_VB_PM | MCIC_VB_IA | MCIC_VB_FP |
+-        MCIC_VB_GR | MCIC_VB_CR | MCIC_VB_ST | MCIC_VB_AR | MCIC_VB_PR |
+-        MCIC_VB_FC | MCIC_VB_CT | MCIC_VB_CC;
+-    if (s390_has_feat(S390_FEAT_VECTOR)) {
+-        mcic |= MCIC_VB_VR;
+-    }
+-    if (s390_has_feat(S390_FEAT_GUARDED_STORAGE)) {
+-        mcic |= MCIC_VB_GS;
+-    }
+-    return mcic;
+-}
+-
+ void kvm_s390_crw_mchk(void)
+ {
+     struct kvm_s390_irq irq = {
+         .type = KVM_S390_MCHK,
+-        .u.mchk.cr14 = 1 << 28,
+-        .u.mchk.mcic = build_channel_report_mcic(),
++        .u.mchk.cr14 = CR14_CHANNEL_REPORT_SC,
++        .u.mchk.mcic = s390_build_validity_mcic() | MCIC_SC_CP,
+     };
+     kvm_s390_floating_interrupt(&irq);
+ }
 -- 
 2.14.3
