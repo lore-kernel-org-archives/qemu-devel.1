@@ -1,25 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54931)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55089)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <rth7680@gmail.com>) id 1eNKKF-0007gi-Sr
-	for qemu-devel@nongnu.org; Fri, 08 Dec 2017 10:12:32 -0500
+	(envelope-from <pm215@archaic.org.uk>) id 1eNKKt-0000GM-Fa
+	for qemu-devel@nongnu.org; Fri, 08 Dec 2017 10:13:15 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <rth7680@gmail.com>) id 1eNKKC-0007xR-My
-	for qemu-devel@nongnu.org; Fri, 08 Dec 2017 10:12:31 -0500
-Sender: Richard Henderson <rth7680@gmail.com>
-References: <20171207165355.7559-1-david@redhat.com>
-	<20171207165355.7559-9-david@redhat.com>
-	<a4725e2c-3b8c-eee7-1587-0a22d24aa5f2@twiddle.net>
-	<be257229-3723-7144-fffb-2206cab23e79@redhat.com>
-From: Richard Henderson <rth@twiddle.net>
-Message-ID: <d5f4cef3-f940-d376-2768-c13adc9b7288@twiddle.net>
-Date: Fri, 8 Dec 2017 07:12:23 -0800
-MIME-Version: 1.0
-In-Reply-To: <be257229-3723-7144-fffb-2206cab23e79@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v2 for-2.12 08/10] s390x/tcg: implement
- extract-CPU-time facility
+	(envelope-from <pm215@archaic.org.uk>) id 1eNKKs-0000I2-Fd
+	for qemu-devel@nongnu.org; Fri, 08 Dec 2017 10:13:11 -0500
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Fri,  8 Dec 2017 15:02:06 +0000
+Message-Id: <1512745328-5109-2-git-send-email-peter.maydell@linaro.org>
+In-Reply-To: <1512745328-5109-1-git-send-email-peter.maydell@linaro.org>
+References: <1512745328-5109-1-git-send-email-peter.maydell@linaro.org>
+Subject: [Qemu-devel] [PATCH 1/3] hw/arm/virt: Add virt-2.12 machine type
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,28 +19,70 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Hildenbrand <david@redhat.com>, qemu-s390x@nongnu.org, qemu-devel@nongnu.org
-Cc: Christian Borntraeger <borntraeger@de.ibm.com>, Cornelia Huck <cohuck@redhat.com>, Alexander Graf <agraf@suse.de>
+To: qemu-arm@nongnu.org, qemu-devel@nongnu.org
+Cc: Shannon Zhao <shannon.zhao@linaro.org>, "Jason A . Donenfeld" <Jason@zx2c4.com>
 
-On 12/08/2017 07:02 AM, David Hildenbrand wrote:
-> +/* Store CPU Timer (also used for EXTRACT CPU TIME) */
-> +uint64_t HELPER(stpt)(CPUS390XState *env)
-> +{
-> +#if defined(CONFIG_USER_ONLY)
-> +    /*
-> +     * Fake a descending CPU timer. We could get negative values here,
-> +     * but we don't care as it is up to the OS when to process that
-> +     * interrupt and reset to > 0.
-> +     */
-> +    return UINT64_MAX - (uint64_t)cpu_get_host_ticks();
-> +#else
-> +    return time2tod(env->cputm - qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL));
-> +#endif
-> +}
-> +
-> 
+Add virt-2.12 machine type.
 
-Looks good to me.
+Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+---
+ include/hw/compat.h |  3 +++
+ hw/arm/virt.c       | 19 +++++++++++++++++--
+ 2 files changed, 20 insertions(+), 2 deletions(-)
 
-
-r~
+diff --git a/include/hw/compat.h b/include/hw/compat.h
+index cf389b4..263de97 100644
+--- a/include/hw/compat.h
++++ b/include/hw/compat.h
+@@ -1,6 +1,9 @@
+ #ifndef HW_COMPAT_H
+ #define HW_COMPAT_H
+ 
++#define HW_COMPAT_2_11 \
++    /* empty */
++
+ #define HW_COMPAT_2_10 \
+     {\
+         .driver   = "virtio-mouse-device",\
+diff --git a/hw/arm/virt.c b/hw/arm/virt.c
+index 151592b..543f9bd 100644
+--- a/hw/arm/virt.c
++++ b/hw/arm/virt.c
+@@ -1618,7 +1618,7 @@ static void machvirt_machine_init(void)
+ }
+ type_init(machvirt_machine_init);
+ 
+-static void virt_2_11_instance_init(Object *obj)
++static void virt_2_12_instance_init(Object *obj)
+ {
+     VirtMachineState *vms = VIRT_MACHINE(obj);
+     VirtMachineClass *vmc = VIRT_MACHINE_GET_CLASS(vms);
+@@ -1678,10 +1678,25 @@ static void virt_2_11_instance_init(Object *obj)
+     vms->irqmap = a15irqmap;
+ }
+ 
++static void virt_machine_2_12_options(MachineClass *mc)
++{
++}
++DEFINE_VIRT_MACHINE_AS_LATEST(2, 12)
++
++#define VIRT_COMPAT_2_11 \
++    HW_COMPAT_2_11
++
++static void virt_2_11_instance_init(Object *obj)
++{
++    virt_2_12_instance_init(obj);
++}
++
+ static void virt_machine_2_11_options(MachineClass *mc)
+ {
++    virt_machine_2_12_options(mc);
++    SET_MACHINE_COMPAT(mc, VIRT_COMPAT_2_11);
+ }
+-DEFINE_VIRT_MACHINE_AS_LATEST(2, 11)
++DEFINE_VIRT_MACHINE(2, 11)
+ 
+ #define VIRT_COMPAT_2_10 \
+     HW_COMPAT_2_10
+-- 
+2.7.4
