@@ -1,30 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46684)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46711)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1eN708-0006rD-Pe
-	for qemu-devel@nongnu.org; Thu, 07 Dec 2017 19:58:58 -0500
+	(envelope-from <marcandre.lureau@redhat.com>) id 1eN70F-0006vX-43
+	for qemu-devel@nongnu.org; Thu, 07 Dec 2017 19:58:59 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1eN707-0007eM-Sq
-	for qemu-devel@nongnu.org; Thu, 07 Dec 2017 19:58:52 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:43384)
+	(envelope-from <marcandre.lureau@redhat.com>) id 1eN70E-0007jH-Ct
+	for qemu-devel@nongnu.org; Thu, 07 Dec 2017 19:58:59 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:45868)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <marcandre.lureau@redhat.com>)
-	id 1eN707-0007dn-MH
-	for qemu-devel@nongnu.org; Thu, 07 Dec 2017 19:58:51 -0500
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
-	[10.5.11.12])
+	id 1eN70E-0007iV-6G
+	for qemu-devel@nongnu.org; Thu, 07 Dec 2017 19:58:58 -0500
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+	[10.5.11.14])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 300D715561
-	for <qemu-devel@nongnu.org>; Fri,  8 Dec 2017 00:58:50 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id 505BA5D5F4
+	for <qemu-devel@nongnu.org>; Fri,  8 Dec 2017 00:58:57 +0000 (UTC)
 From: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
-Date: Fri,  8 Dec 2017 01:58:19 +0100
-Message-Id: <20171208005825.14587-7-marcandre.lureau@redhat.com>
+Date: Fri,  8 Dec 2017 01:58:21 +0100
+Message-Id: <20171208005825.14587-9-marcandre.lureau@redhat.com>
 In-Reply-To: <20171208005825.14587-1-marcandre.lureau@redhat.com>
 References: <20171208005825.14587-1-marcandre.lureau@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH 06/12] vl: fix direct firmware directories leak
+Subject: [Qemu-devel] [PATCH 08/12] tests: fix migration-test leak
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,59 +34,39 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
+Cc: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>, Juan Quintela <quintela@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>
 
-Note that data_dir[] will now point to allocated strings.
-
-Fixes:
-Direct leak of 16 byte(s) in 1 object(s) allocated from:
-    #0 0x7f1448181850 in malloc (/lib64/libasan.so.4+0xde850)
-    #1 0x7f1446ed8f0c in g_malloc ../glib/gmem.c:94
-    #2 0x7f1446ed91cf in g_malloc_n ../glib/gmem.c:331
-    #3 0x7f1446ef739a in g_strsplit ../glib/gstrfuncs.c:2364
-    #4 0x55cf276439d7 in main /home/elmarco/src/qq/vl.c:4311
-    #5 0x7f143dfad039 in __libc_start_main (/lib64/libc.so.6+0x21039)
+Direct leak of 12 byte(s) in 2 object(s) allocated from:
+    #0 0x7f50d403c850 in malloc (/lib64/libasan.so.4+0xde850)
+    #1 0x7f50d1ddf98f in vasprintf (/lib64/libc.so.6+0x8098f)
 
 Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 ---
- vl.c | 9 ++++++---
- 1 file changed, 6 insertions(+), 3 deletions(-)
+ tests/migration-test.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
-diff --git a/vl.c b/vl.c
-index 1ad1c04637..763c2bf6ae 100644
---- a/vl.c
-+++ b/vl.c
-@@ -2363,7 +2363,7 @@ static void qemu_add_data_dir(const char *path)
-             return; /* duplicate */
-         }
-     }
--    data_dir[data_dir_idx++] =3D path;
-+    data_dir[data_dir_idx++] =3D g_strdup(path);
+diff --git a/tests/migration-test.c b/tests/migration-test.c
+index be598d3257..799e24ebc6 100644
+--- a/tests/migration-test.c
++++ b/tests/migration-test.c
+@@ -358,13 +358,14 @@ static void migrate_check_parameter(QTestState *who=
+, const char *parameter,
+                                     const char *value)
+ {
+     QDict *rsp, *rsp_return;
+-    const char *result;
++    char *result;
+=20
+     rsp =3D wait_command(who, "{ 'execute': 'query-migrate-parameters' }=
+");
+     rsp_return =3D qdict_get_qdict(rsp, "return");
+     result =3D g_strdup_printf("%" PRId64,
+                              qdict_get_try_int(rsp_return,  parameter, -=
+1));
+     g_assert_cmpstr(result, =3D=3D, value);
++    g_free(result);
+     QDECREF(rsp);
  }
 =20
- static inline bool nonempty_str(const char *str)
-@@ -3124,7 +3124,7 @@ int main(int argc, char **argv, char **envp)
-     Error *main_loop_err =3D NULL;
-     Error *err =3D NULL;
-     bool list_data_dirs =3D false;
--    char **dirs;
-+    char *dir, **dirs;
-     typedef struct BlockdevOptions_queue {
-         BlockdevOptions *bdo;
-         Location loc;
-@@ -4312,9 +4312,12 @@ int main(int argc, char **argv, char **envp)
-     for (i =3D 0; dirs[i] !=3D NULL; i++) {
-         qemu_add_data_dir(dirs[i]);
-     }
-+    g_strfreev(dirs);
-=20
-     /* try to find datadir relative to the executable path */
--    qemu_add_data_dir(os_find_datadir());
-+    dir =3D os_find_datadir();
-+    qemu_add_data_dir(dir);
-+    g_free(dir);
-=20
-     /* add the datadir specified when building */
-     qemu_add_data_dir(CONFIG_QEMU_DATADIR);
 --=20
 2.15.1.355.g36791d7216
