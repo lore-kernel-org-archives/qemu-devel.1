@@ -1,18 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33799)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33798)
 	by lists.gnu.org with esmtp (Exim 4.71) (envelope-from <pl@kamp.de>)
-	id 1eNHBi-0003Wx-Tu
-	for qemu-devel@nongnu.org; Fri, 08 Dec 2017 06:51:31 -0500
+	id 1eNHBi-0003Ww-TT
+	for qemu-devel@nongnu.org; Fri, 08 Dec 2017 06:51:32 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pl@kamp.de>) id 1eNHBg-0006cy-2l
+	(envelope-from <pl@kamp.de>) id 1eNHBg-0006dC-Cr
 	for qemu-devel@nongnu.org; Fri, 08 Dec 2017 06:51:30 -0500
-Received: from mx-v6.kamp.de ([2a02:248:0:51::16]:48252 helo=mx01.kamp.de)
+Received: from mx-v6.kamp.de ([2a02:248:0:51::16]:47990 helo=mx01.kamp.de)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pl@kamp.de>) id 1eNHBf-0006bR-PO
+	(Exim 4.71) (envelope-from <pl@kamp.de>) id 1eNHBg-0006bS-2Y
 	for qemu-devel@nongnu.org; Fri, 08 Dec 2017 06:51:28 -0500
 From: Peter Lieven <pl@kamp.de>
-Date: Fri,  8 Dec 2017 12:51:06 +0100
-Message-Id: <1512733868-9009-1-git-send-email-pl@kamp.de>
-Subject: [Qemu-devel] [PATCH 0/2] iscsi fixes
+Date: Fri,  8 Dec 2017 12:51:08 +0100
+Message-Id: <1512733868-9009-3-git-send-email-pl@kamp.de>
+In-Reply-To: <1512733868-9009-1-git-send-email-pl@kamp.de>
+References: <1512733868-9009-1-git-send-email-pl@kamp.de>
+Subject: [Qemu-devel] [PATCH 2/2] block/iscsi: only report an iSCSI Failure
+ if we don't handle it gracefully
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,16 +27,189 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org, qemu-block@nongnu.org
 Cc: mreitz@redhat.com, kwolf@redhat.com, ronniesahlberg@gmail.com, pbonzini@redhat.com, Peter Lieven <pl@kamp.de>
 
-fix a bug leaving the allocmap in a wrong state if an UNMAP fails and
-improve the logging of iscsi failures.
+we currently report an "iSCSI Failure" in iscsi_co_generic_cb if the task
+hasn't completed with SCSI_STATUS_GOOD. However, we expect a failure in
+some cases and handle it gracefully. This is the case for misaligned UNMAPs
+and WRITESAME10/16 calls without UNMAP. In this case a failure in the
+logs can be quite misleading.
 
-Peter Lieven (2):
-  block/iscsi: dont leave allocmap in an invalid state on UNMAP failure
-  block/iscsi: only report an iSCSI Failure if we don't handle it
-    gracefully
+While we are at it improve the logging to reveal which operation failed
+at what LBA.
 
- block/iscsi.c | 51 ++++++++++++++++++++++++++++++++++++---------------
- 1 file changed, 36 insertions(+), 15 deletions(-)
+Signed-off-by: Peter Lieven <pl@kamp.de>
+---
+ block/iscsi.c | 43 ++++++++++++++++++++++++++++++++-----------
+ 1 file changed, 32 insertions(+), 11 deletions(-)
 
+diff --git a/block/iscsi.c b/block/iscsi.c
+index c532ec7..5c0a9e5 100644
+--- a/block/iscsi.c
++++ b/block/iscsi.c
+@@ -104,6 +104,7 @@ typedef struct IscsiTask {
+     IscsiLun *iscsilun;
+     QEMUTimer retry_timer;
+     int err_code;
++    char *err_str;
+ } IscsiTask;
+ 
+ typedef struct IscsiAIOCB {
+@@ -265,7 +266,7 @@ iscsi_co_generic_cb(struct iscsi_context *iscsi, int status,
+             }
+         }
+         iTask->err_code = iscsi_translate_sense(&task->sense);
+-        error_report("iSCSI Failure: %s", iscsi_get_error(iscsi));
++        iTask->err_str = g_strdup(iscsi_get_error(iscsi));
+     }
+ 
+ out:
+@@ -629,6 +630,8 @@ retry:
+ 
+     if (iTask.status != SCSI_STATUS_GOOD) {
+         iscsi_allocmap_set_invalid(iscsilun, sector_num, nb_sectors);
++        error_report("iSCSI WRITE10/16 failed at lba %" PRIu64 ": %s", lba,
++                     iTask.err_str);
+         r = iTask.err_code;
+         goto out_unlock;
+     }
+@@ -637,6 +640,7 @@ retry:
+ 
+ out_unlock:
+     qemu_mutex_unlock(&iscsilun->mutex);
++    g_free(iTask.err_str);
+     return r;
+ }
+ 
+@@ -651,10 +655,9 @@ static int64_t coroutine_fn iscsi_co_get_block_status(BlockDriverState *bs,
+     struct scsi_get_lba_status *lbas = NULL;
+     struct scsi_lba_status_descriptor *lbasd = NULL;
+     struct IscsiTask iTask;
++    uint64_t lba;
+     int64_t ret;
+ 
+-    iscsi_co_init_iscsitask(iscsilun, &iTask);
+-
+     if (!is_sector_request_lun_aligned(sector_num, nb_sectors, iscsilun)) {
+         ret = -EINVAL;
+         goto out;
+@@ -670,11 +673,13 @@ static int64_t coroutine_fn iscsi_co_get_block_status(BlockDriverState *bs,
+         goto out;
+     }
+ 
++    lba = sector_qemu2lun(sector_num, iscsilun);
++
++    iscsi_co_init_iscsitask(iscsilun, &iTask);
+     qemu_mutex_lock(&iscsilun->mutex);
+ retry:
+     if (iscsi_get_lba_status_task(iscsilun->iscsi, iscsilun->lun,
+-                                  sector_qemu2lun(sector_num, iscsilun),
+-                                  8 + 16, iscsi_co_generic_cb,
++                                  lba, 8 + 16, iscsi_co_generic_cb,
+                                   &iTask) == NULL) {
+         ret = -ENOMEM;
+         goto out_unlock;
+@@ -701,6 +706,8 @@ retry:
+          * because the device is busy or the cmd is not
+          * supported) we pretend all blocks are allocated
+          * for backwards compatibility */
++        error_report("iSCSI GET_LBA_STATUS failed at lba %" PRIu64 ": %s",
++                     lba, iTask.err_str);
+         goto out_unlock;
+     }
+ 
+@@ -738,6 +745,7 @@ retry:
+     }
+ out_unlock:
+     qemu_mutex_unlock(&iscsilun->mutex);
++    g_free(iTask.err_str);
+ out:
+     if (iTask.task != NULL) {
+         scsi_free_scsi_task(iTask.task);
+@@ -756,6 +764,7 @@ static int coroutine_fn iscsi_co_readv(BlockDriverState *bs,
+     struct IscsiTask iTask;
+     uint64_t lba;
+     uint32_t num_sectors;
++    int r = 0;
+ 
+     if (!is_sector_request_lun_aligned(sector_num, nb_sectors, iscsilun)) {
+         return -EINVAL;
+@@ -853,19 +862,23 @@ retry:
+         iTask.complete = 0;
+         goto retry;
+     }
+-    qemu_mutex_unlock(&iscsilun->mutex);
+ 
+     if (iTask.status != SCSI_STATUS_GOOD) {
+-        return iTask.err_code;
++        error_report("iSCSI READ10/16 failed at lba %" PRIu64 ": %s",
++                     lba, iTask.err_str);
++        r = iTask.err_code;
+     }
+ 
+-    return 0;
++    qemu_mutex_unlock(&iscsilun->mutex);
++    g_free(iTask.err_str);
++    return r;
+ }
+ 
+ static int coroutine_fn iscsi_co_flush(BlockDriverState *bs)
+ {
+     IscsiLun *iscsilun = bs->opaque;
+     struct IscsiTask iTask;
++    int r = 0;
+ 
+     iscsi_co_init_iscsitask(iscsilun, &iTask);
+     qemu_mutex_lock(&iscsilun->mutex);
+@@ -892,13 +905,15 @@ retry:
+         iTask.complete = 0;
+         goto retry;
+     }
+-    qemu_mutex_unlock(&iscsilun->mutex);
+ 
+     if (iTask.status != SCSI_STATUS_GOOD) {
+-        return iTask.err_code;
++        error_report("iSCSI SYNCHRONIZECACHE10 failed: %s", iTask.err_str);
++        r = iTask.err_code;
+     }
+ 
+-    return 0;
++    qemu_mutex_unlock(&iscsilun->mutex);
++    g_free(iTask.err_str);
++    return r;
+ }
+ 
+ #ifdef __linux__
+@@ -1139,12 +1154,15 @@ retry:
+     }
+ 
+     if (iTask.status != SCSI_STATUS_GOOD) {
++        error_report("iSCSI UNMAP failed at lba %" PRIu64 ": %s",
++                     list.lba, iTask.err_str);
+         r = iTask.err_code;
+         goto out_unlock;
+     }
+ 
+ out_unlock:
+     qemu_mutex_unlock(&iscsilun->mutex);
++    g_free(iTask.err_str);
+     return r;
+ }
+ 
+@@ -1241,6 +1259,8 @@ retry:
+     if (iTask.status != SCSI_STATUS_GOOD) {
+         iscsi_allocmap_set_invalid(iscsilun, offset >> BDRV_SECTOR_BITS,
+                                    bytes >> BDRV_SECTOR_BITS);
++        error_report("iSCSI WRITESAME10/16 failed at lba %" PRIu64 ": %s",
++                     lba, iTask.err_str);
+         r = iTask.err_code;
+         goto out_unlock;
+     }
+@@ -1255,6 +1275,7 @@ retry:
+ 
+ out_unlock:
+     qemu_mutex_unlock(&iscsilun->mutex);
++    g_free(iTask.err_str);
+     return r;
+ }
+ 
 -- 
 1.9.1
