@@ -1,38 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37346)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39786)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <wei.w.wang@intel.com>) id 1eNhuS-0001tX-8x
-	for qemu-devel@nongnu.org; Sat, 09 Dec 2017 11:23:29 -0500
+	(envelope-from <eblake@redhat.com>) id 1eNiAS-0002o8-TK
+	for qemu-devel@nongnu.org; Sat, 09 Dec 2017 11:40:01 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <wei.w.wang@intel.com>) id 1eNhuO-0005Vy-Vt
-	for qemu-devel@nongnu.org; Sat, 09 Dec 2017 11:23:28 -0500
-Received: from mga03.intel.com ([134.134.136.65]:31462)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <wei.w.wang@intel.com>)
-	id 1eNhuO-0005Uh-Kn
-	for qemu-devel@nongnu.org; Sat, 09 Dec 2017 11:23:24 -0500
-From: "Wang, Wei W" <wei.w.wang@intel.com>
-Date: Sat, 9 Dec 2017 16:23:17 +0000
-Message-ID: <286AC319A985734F985F78AFA26841F73937E001@shsmsx102.ccr.corp.intel.com>
-References: <5A28BC2D.6000308@intel.com>
-	<CAJSP0QUxRv9LNb1+McYxV0KY4Ss3NkaSjwO6fXiJd+oU2+zJSQ@mail.gmail.com>
-	<5A290398.60508@intel.com>
-	<CAJSP0QURjdD8BnOmJo83fzJn_zCijSKQh==Pz+Xu4r6Q2i3SkQ@mail.gmail.com>
-	<20171207153454-mutt-send-email-mst@kernel.org>
-	<CAJSP0QVu4iwAu01Sth84VZshQde97x3FW1E1ua_YXVKs-65vhQ@mail.gmail.com>
-	<20171207183945-mutt-send-email-mst@kernel.org>
-	<CAJSP0QVnukGD3Afu9myv=v5OjqrPDpXu6JL3Tpf+Cdk=em9V3w@mail.gmail.com>
-	<20171207193003-mutt-send-email-mst@kernel.org>
-	<CAJSP0QX4V64OoU4-Dhb93MUZ9Rz0FPR-La5Xq4_yqGH7SG6PjQ@mail.gmail.com>
-	<20171207213420-mutt-send-email-mst@kernel.org>
-	<5A2A347B.9070006@intel.com>
-	<CAJSP0QUAqCzFgVtM1cg_KybdyrZa_FRUHhDN7oLfRjZ2ZVkp4g@mail.gmail.com>
-In-Reply-To: <CAJSP0QUAqCzFgVtM1cg_KybdyrZa_FRUHhDN7oLfRjZ2ZVkp4g@mail.gmail.com>
-Content-Language: en-US
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+	(envelope-from <eblake@redhat.com>) id 1eNiAR-0003EU-TG
+	for qemu-devel@nongnu.org; Sat, 09 Dec 2017 11:40:00 -0500
+References: <20171207203036.14993-1-eblake@redhat.com>
+	<20171207203036.14993-10-eblake@redhat.com>
+	<c0b4ca07-0404-963a-bd1f-9d182eebf469@virtuozzo.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <bc667ec3-4107-4578-d236-5b914d1291a5@redhat.com>
+Date: Sat, 9 Dec 2017 10:39:45 -0600
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [virtio-dev] [PATCH v3 0/7] Vhost-pci for inter-VM
- communication
+In-Reply-To: <c0b4ca07-0404-963a-bd1f-9d182eebf469@virtuozzo.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="uQmaQ7mF5qNEcfTkgPgH4qE0JcaMjxWsf"
+Subject: Re: [Qemu-devel] [PATCH v6 09/20] parallels: Switch to
+ .bdrv_co_block_status()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -41,69 +26,113 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefan Hajnoczi <stefanha@gmail.com>
-Cc: "Michael S. Tsirkin" <mst@redhat.com>, "virtio-dev@lists.oasis-open.org" <virtio-dev@lists.oasis-open.org>, "Yang,
-	Zhiyong" <zhiyong.yang@intel.com>, "jan.kiszka@siemens.com" <jan.kiszka@siemens.com>, "jasowang@redhat.com" <jasowang@redhat.com>, "avi.cohen@huawei.com" <avi.cohen@huawei.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, Stefan Hajnoczi <stefanha@redhat.com>, "pbonzini@redhat.com" <pbonzini@redhat.com>, "marcandre.lureau@redhat.com" <marcandre.lureau@redhat.com>
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, qemu-devel@nongnu.org
+Cc: kwolf@redhat.com, famz@redhat.com, qemu-block@nongnu.org, Stefan Hajnoczi <stefanha@redhat.com>, "Denis V. Lunev" <den@openvz.org>, Max Reitz <mreitz@redhat.com>
 
-T24gRnJpZGF5LCBEZWNlbWJlciA4LCAyMDE3IDQ6MzQgUE0sIFN0ZWZhbiBIYWpub2N6aSB3cm90
-ZToNCj4gT24gRnJpLCBEZWMgOCwgMjAxNyBhdCA2OjQzIEFNLCBXZWkgV2FuZyA8d2VpLncud2Fu
-Z0BpbnRlbC5jb20+IHdyb3RlOg0KPiA+IE9uIDEyLzA4LzIwMTcgMDc6NTQgQU0sIE1pY2hhZWwg
-Uy4gVHNpcmtpbiB3cm90ZToNCj4gPj4NCj4gPj4gT24gVGh1LCBEZWMgMDcsIDIwMTcgYXQgMDY6
-Mjg6MTlQTSArMDAwMCwgU3RlZmFuIEhham5vY3ppIHdyb3RlOg0KPiA+Pj4NCj4gPj4+IE9uIFRo
-dSwgRGVjIDcsIDIwMTcgYXQgNTozOCBQTSwgTWljaGFlbCBTLiBUc2lya2luIDxtc3RAcmVkaGF0
-LmNvbT4NCj4gPiBUaGFua3MgU3RlZmFuIGFuZCBNaWNoYWVsIGZvciB0aGUgc2hhcmluZyBhbmQg
-ZGlzY3Vzc2lvbi4gSSB0aGluaw0KPiA+IGFib3ZlIDMgYW5kIDQgYXJlIGRlYmF0YWJsZSAoZS5n
-LiB3aGV0aGVyIGl0IGlzIHNpbXBsZXIgcmVhbGx5DQo+ID4gZGVwZW5kcykuIDEgYW5kIDIgYXJl
-IGltcGxlbWVudGF0aW9ucywgSSB0aGluayBib3RoIGFwcHJvYWNoZXMgY291bGQNCj4gPiBpbXBs
-ZW1lbnQgdGhlIGRldmljZSB0aGF0IHdheS4gV2Ugb3JpZ2luYWxseSB0aG91Z2h0IGFib3V0IG9u
-ZSBkZXZpY2UNCj4gPiBhbmQgZHJpdmVyIHRvIHN1cHBvcnQgYWxsIHR5cGVzIChjYWxsZWQgaXQg
-dHJhbnNmb3JtZXIgc29tZXRpbWVzIDotKQ0KPiA+ICksIHRoYXQgd291bGQgbG9vayBpbnRlcmVz
-dGluZyBmcm9tIHJlc2VhcmNoIHBvaW50IG9mIHZpZXcsIGJ1dCBmcm9tDQo+ID4gcmVhbCB1c2Fn
-ZSBwb2ludCBvZiB2aWV3LCBJIHRoaW5rIGl0IHdvdWxkIGJlIGJldHRlciB0byBoYXZlIHRoZW0g
-c2VwYXJhdGVkLA0KPiBiZWNhdXNlOg0KPiA+IC0gZGlmZmVyZW50IGRldmljZSB0eXBlcyBoYXZl
-IGRpZmZlcmVudCBkcml2ZXIgbG9naWMsIG1peGluZyB0aGVtDQo+ID4gdG9nZXRoZXIgd291bGQg
-Y2F1c2UgdGhlIGRyaXZlciB0byBsb29rIG1lc3N5LiBJbWFnaW5lIHRoYXQgYQ0KPiA+IG5ldHdv
-cmtpbmcgZHJpdmVyIGRldmVsb3BlciBoYXMgdG8gZ28gb3ZlciB0aGUgYmxvY2sgcmVsYXRlZCBj
-b2RlIHRvDQo+ID4gZGVidWcsIHRoYXQgYWxzbyBpbmNyZWFzZXMgdGhlIGRpZmZpY3VsdHkuDQo+
-IA0KPiBJJ20gbm90IHN1cmUgSSB1bmRlcnN0YW5kIHdoZXJlIHRoaW5ncyBnZXQgbWVzc3kgYmVj
-YXVzZToNCj4gMS4gVGhlIHZob3N0LXBjaSBkZXZpY2UgaW1wbGVtZW50YXRpb24gaW4gUUVNVSBy
-ZWxheXMgbWVzc2FnZXMgYnV0IGhhcyBubw0KPiBkZXZpY2UgbG9naWMsIHNvIGRldmljZS1zcGVj
-aWZpYyBtZXNzYWdlcyBsaWtlIFZIT1NUX1VTRVJfTkVUX1NFVF9NVFUgYXJlDQo+IHRyaXZpYWwg
-YXQgdGhpcyBsYXllci4NCj4gMi4gdmhvc3QtdXNlciBzbGF2ZXMgb25seSBoYW5kbGUgY2VydGFp
-biB2aG9zdC11c2VyIHByb3RvY29sIG1lc3NhZ2VzLg0KPiBUaGV5IGhhbmRsZSBkZXZpY2Utc3Bl
-Y2lmaWMgbWVzc2FnZXMgZm9yIHRoZWlyIGRldmljZSB0eXBlIG9ubHkuICBUaGlzIGlzIGxpa2UN
-Cj4gdmhvc3QgZHJpdmVycyB0b2RheSB3aGVyZSB0aGUgaW9jdGwoKSBmdW5jdGlvbiByZXR1cm5z
-IGFuIGVycm9yIGlmIHRoZSBpb2N0bCBpcw0KPiBub3Qgc3VwcG9ydGVkIGJ5IHRoZSBkZXZpY2Uu
-ICBJdCdzIG5vdCBtZXNzeS4NCj4gDQo+IFdoZXJlIGFyZSB5b3Ugd29ycmllZCBhYm91dCBtZXNz
-eSBkcml2ZXIgbG9naWM/DQoNClByb2JhYmx5IEkgZGlkbuKAmXQgZXhwbGFpbiB3ZWxsLCBwbGVh
-c2UgbGV0IG1lIHN1bW1hcml6ZSBteSB0aG91Z2h0IGEgbGl0dGxlIGJpdCwgZnJvbSB0aGUgcGVy
-c3BlY3RpdmUgb2YgdGhlIGNvbnRyb2wgcGF0aCBhbmQgZGF0YSBwYXRoLg0KDQpDb250cm9sIHBh
-dGg6IHRoZSB2aG9zdC11c2VyIG1lc3NhZ2VzIC0gSSB3b3VsZCBwcmVmZXIganVzdCBoYXZlIHRo
-ZSBpbnRlcmFjdGlvbiBiZXR3ZWVuIFFFTVVzLCBpbnN0ZWFkIG9mIHJlbGF5aW5nIHRvIHRoZSBH
-dWVzdFNsYXZlLCBiZWNhdXNlDQoxKSBJIHRoaW5rIHRoZSBjbGFpbWVkIGFkdmFudGFnZSAoZWFz
-aWVyIHRvIGRlYnVnIGFuZCBkZXZlbG9wKSBkb2VzbuKAmXQgc2VlbSB2ZXJ5IGNvbnZpbmNpbmcN
-CjIpIHNvbWUgbWVzc2FnZXMgY2FuIGJlIGRpcmVjdGx5IGFuc3dlcmVkIGJ5IFFlbXVTbGF2ZSAs
-IGFuZCBzb21lIG1lc3NhZ2VzIGFyZSBub3QgdXNlZnVsIHRvIGdpdmUgdG8gdGhlIEd1ZXN0U2xh
-dmUgKGluc2lkZSB0aGUgVk0pLCBlLmcuIGZkcywgVmhvc3RVc2VyTWVtb3J5UmVnaW9uIGZyb20g
-U0VUX01FTV9UQUJMRSBtc2cgKHRoZSBkZXZpY2UgZmlyc3QgbWFwcyB0aGUgbWFzdGVyIG1lbW9y
-eSBhbmQgZ2l2ZXMgdGhlIG9mZnNldCAoaW4gdGVybXMgb2YgdGhlIGJhciwgaS5lLiwgd2hlcmUg
-ZG9lcyBpdCBzaXQgaW4gdGhlIGJhcikgb2YgdGhlIG1hcHBlZCBncGEgdG8gdGhlIGd1ZXN0LiBp
-ZiB3ZSBnaXZlIHRoZSByYXcgVmhvc3RVc2VyTWVtb3J5UmVnaW9uIHRvIHRoZSBndWVzdCwgdGhh
-dCB3b3VsZG7igJl0IGJlIHVzYWJsZSkuDQoNCg0KRGF0YSBwYXRoOiB0aGF0J3MgdGhlIGRpc2N1
-c3Npb24gd2UgaGFkIGFib3V0IG9uZSBkcml2ZXIgb3Igc2VwYXJhdGUgZHJpdmVyIGZvciBkaWZm
-ZXJlbnQgZGV2aWNlIHR5cGVzLCBhbmQgdGhpcyBpcyBub3QgcmVsYXRlZCB0byB0aGUgY29udHJv
-bCBwYXRoLg0KSSBtZWFudCBpZiB3ZSBoYXZlIG9uZSBkcml2ZXIgZm9yIGFsbCB0aGUgdHlwZXMs
-IHRoYXQgZHJpdmVyIHdvdWxkIGxvb2sgbWVzc3ksIGJlY2F1c2UgZWFjaCB0eXBlIGhhcyBpdHMg
-b3duIGRhdGEgc2VuZGluZy9yZWNlaXZpbmcgbG9naWMuIEZvciBleGFtcGxlLCBuZXQgdHlwZSBk
-ZWFscyB3aXRoIGEgcGFpciBvZiB0eCBhbmQgcngsIGFuZCB0cmFuc21pc3Npb24gaXMgc2tiIGJh
-c2VkIChlLmcuIHhtaXRfc2tiKSwgd2hpbGUgYmxvY2sgdHlwZSBkZWFscyB3aXRoIGEgcmVxdWVz
-dCBxdWV1ZS4gSWYgd2UgaGF2ZSBvbmUgZHJpdmVyLCB0aGVuIHRoZSBkcml2ZXIgd2lsbCBpbmNs
-dWRlIGFsbCB0aGUgdGhpbmdzIHRvZ2V0aGVyLg0KDQoNClRoZSBsYXN0IHBhcnQgaXMgd2hldGhl
-ciB0byBtYWtlIGl0IGEgdmlydGlvIGRldmljZSBvciBhIHJlZ3VsYXIgcGNpIGRldmljZQ0KSSBk
-b27igJl0IGhhdmUgYSBzdHJvbmcgcHJlZmVyZW5jZS4gSSB0aGluayB2aXJ0aW8gZGV2aWNlIHdv
-cmtzIGZpbmUgKGUuZy4gdXNlIHNvbWUgYmFyIGFyZWEgdG8gY3JlYXRlIGlvZXZlbmZkcyB0byBz
-b2x2ZSB0aGUgIm5vIHZpcnRxdWV1ZSBubyBmZHMiIGlzc3VlIGlmIHlvdSBhbmQgTWljaGFlbCB0
-aGluayB0aGF0J3MgYWNjZXB0YWJsZSksICBhbmQgd2UgY2FuIHJldXNlIHNvbWUgb3RoZXIgdGhp
-bmdzIGxpa2UgZmVhdHVyZSBuZWdvdGlhdGlvbiBmcm9tIHZpcnRpby4gQnV0IGlmIE1pY2hhZWwg
-YW5kIHlvdSBoYXZlIGEgZGVjaXNpb24gdG8gbWFrZSBpdCBhIHJlZ3VsYXIgUENJIGRldmljZSwg
-SSB0aGluayB0aGF0IHdvdWxkIGFsc28gd29yayB0aG91Z2guDQoNCkJlc3QsDQpXZWkNCg==
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--uQmaQ7mF5qNEcfTkgPgH4qE0JcaMjxWsf
+From: Eric Blake <eblake@redhat.com>
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+ qemu-devel@nongnu.org
+Cc: kwolf@redhat.com, famz@redhat.com, qemu-block@nongnu.org,
+ Stefan Hajnoczi <stefanha@redhat.com>, "Denis V. Lunev" <den@openvz.org>,
+ Max Reitz <mreitz@redhat.com>
+Message-ID: <bc667ec3-4107-4578-d236-5b914d1291a5@redhat.com>
+Subject: Re: [PATCH v6 09/20] parallels: Switch to .bdrv_co_block_status()
+References: <20171207203036.14993-1-eblake@redhat.com>
+ <20171207203036.14993-10-eblake@redhat.com>
+ <c0b4ca07-0404-963a-bd1f-9d182eebf469@virtuozzo.com>
+In-Reply-To: <c0b4ca07-0404-963a-bd1f-9d182eebf469@virtuozzo.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+
+On 12/09/2017 06:31 AM, Vladimir Sementsov-Ogievskiy wrote:
+> 07.12.2017 23:30, Eric Blake wrote:
+>> We are gradually moving away from sector-based interfaces, towards
+>> byte-based.=C2=A0 Update the parallels driver accordingly.=C2=A0 Note =
+that
+>> the internal function block_status() is still sector-based, because
+>> it is still in use by other sector-based functions; but that's okay
+>> because request_alignment is 512 as a result of those functions.
+>> For now, no optimizations are added based on the mapping hint.
+>>
+>> Signed-off-by: Eric Blake <eblake@redhat.com>
+>>
+
+>> =C2=A0 {
+>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 BDRVParallelsState *s =3D bs->opaque;
+>> -=C2=A0=C2=A0=C2=A0 int64_t offset;
+>> +=C2=A0=C2=A0=C2=A0 int count;
+>>
+>> +=C2=A0=C2=A0=C2=A0 assert(QEMU_IS_ALIGNED(offset | bytes, BDRV_SECTOR=
+_SIZE));
+>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 qemu_co_mutex_lock(&s->lock);
+>> -=C2=A0=C2=A0=C2=A0 offset =3D block_status(s, sector_num, nb_sectors,=
+ pnum);
+>> +=C2=A0=C2=A0=C2=A0 offset =3D block_status(s, offset >> BDRV_SECTOR_B=
+ITS,
+>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0 bytes >> BDRV_SECTOR_BITS, &count);
+>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 qemu_co_mutex_unlock(&s->lock);
+>>
+>> +=C2=A0=C2=A0=C2=A0 *pnum =3D count * BDRV_SECTOR_SIZE;
+>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 if (offset < 0) {
+>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 return 0;
+>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 }
+>>
+>> +=C2=A0=C2=A0=C2=A0 *map =3D offset;
+>=20
+> oh, didn't notice previous time :(, should be
+>=20
+> *map =3D offset * BDRV_SECTOR_SIZE
+>
+
+Oh, right.
+
+> (also, if you already use ">> BDRV_SECTOR_BITS" in this function,
+> would not it be more consistent to use "<< BDRV_SECTOR_BITS"
+> for sector-to-byte conversion?)
+>=20
+> with that fixed (with "<<" or "*", up to you),
+
+'>> BDRV_SECTOR_BITS' always works.  You could also write '/
+BDRV_SECTOR_SIZE' (the compiler should figure out that you are dividing
+by a power of 2, and use the shift instruction under the hood), but I
+find that a bit harder to reason about.
+
+On the other hand, '<< BDRV_SECTOR_BITS' only produces the same size
+output as the input; if the left side is 32 bits, it risks overflowing.
+But '* BDRV_SECTOR_SIZE' always produces a 64-bit value.  So I've
+learned (from past mistakes in other byte-conversion series) that the
+multiply form is less likely to introduce unintended truncation bugs.
+
+> Reviewed-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+>=20
+
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
+
+
+--uQmaQ7mF5qNEcfTkgPgH4qE0JcaMjxWsf
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlosEdIACgkQp6FrSiUn
+Q2r/0wgAm30T+tLO7k1oaVQrgRSOJ9bqWLf9w4Xo4aNWcf86xW8SxOTWJCo8COUj
+bs4epmhECxtnoOsWwQX1+gz9ui9ZPunk2hdmJKJ7yK/GiXVS4eWUrpce9AQrHTUR
+otznar4tANX66L4VMot7gMQn3j+JUb+00NYdaX3wAM6ZwknsxatMFyl+i7M3PeIt
+kKRVVlr/AflzaIEdkxuWTeAcPZmmoHTr/Uw1fqgh4EoNxlk3SezwSrnSyrygAMIO
+Eh8I8xZJJAloRu8vXooBK4XO0gZLoFPGzwJxfioM/wkyL8+rAcfIQkL++r18Oqw4
+FAZIkPV2MiB/J7f3g+gihXWQ7ce57Q==
+=WWl6
+-----END PGP SIGNATURE-----
+
+--uQmaQ7mF5qNEcfTkgPgH4qE0JcaMjxWsf--
