@@ -1,23 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41465)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55668)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1eNiOA-0006Ex-Tn
-	for qemu-devel@nongnu.org; Sat, 09 Dec 2017 11:54:14 -0500
+	(envelope-from <bounces@canonical.com>) id 1eNkGa-0005Pw-LM
+	for qemu-devel@nongnu.org; Sat, 09 Dec 2017 13:54:30 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1eNiOA-0002XO-0q
-	for qemu-devel@nongnu.org; Sat, 09 Dec 2017 11:54:10 -0500
-References: <20171123020832.8165-1-mreitz@redhat.com>
-	<20171123020832.8165-10-mreitz@redhat.com>
-	<cda61c2a-1bfc-563a-2646-215da99df17f@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <11870f68-db17-cff2-b010-afd42e6c9a44@redhat.com>
-Date: Sat, 9 Dec 2017 10:53:57 -0600
+	(envelope-from <bounces@canonical.com>) id 1eNkGX-000773-Hi
+	for qemu-devel@nongnu.org; Sat, 09 Dec 2017 13:54:28 -0500
+Received: from indium.canonical.com ([91.189.90.7]:36866)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1eNkGX-00076k-BM
+	for qemu-devel@nongnu.org; Sat, 09 Dec 2017 13:54:25 -0500
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1eNkGU-0006rX-6U
+	for <qemu-devel@nongnu.org>; Sat, 09 Dec 2017 18:54:22 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 281642E80D2
+	for <qemu-devel@nongnu.org>; Sat,  9 Dec 2017 18:54:22 +0000 (UTC)
 MIME-Version: 1.0
-In-Reply-To: <cda61c2a-1bfc-563a-2646-215da99df17f@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="vTuq5duDw8e1FeHB77xuFKLSXJao83rH9"
-Subject: Re: [Qemu-devel] [PATCH 09/17] iotests: Disable some tests for
- compat=0.10
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Sat, 09 Dec 2017 18:44:46 -0000
+From: john doe <1580459@bugs.launchpad.net>
+Reply-To: Bug 1580459 <1580459@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <20160511061916.21125.98809.malonedeb@wampee.canonical.com>
+Message-Id: <151284508640.10343.18224292895948971981.malone@wampee.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1580459] Re: Windows (10?) guest freezes entire
+ host on shutdown if using PCI passthrough
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,85 +37,75 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: John Snow <jsnow@redhat.com>, Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org
-Cc: Kevin Wolf <kwolf@redhat.com>, Fam Zheng <famz@redhat.com>, qemu-devel@nongnu.org
+To: qemu-devel@nongnu.org
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---vTuq5duDw8e1FeHB77xuFKLSXJao83rH9
-From: Eric Blake <eblake@redhat.com>
-To: John Snow <jsnow@redhat.com>, Max Reitz <mreitz@redhat.com>,
- qemu-block@nongnu.org
-Cc: Kevin Wolf <kwolf@redhat.com>, Fam Zheng <famz@redhat.com>,
- qemu-devel@nongnu.org
-Message-ID: <11870f68-db17-cff2-b010-afd42e6c9a44@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH 09/17] iotests: Disable some tests for
- compat=0.10
-References: <20171123020832.8165-1-mreitz@redhat.com>
- <20171123020832.8165-10-mreitz@redhat.com>
- <cda61c2a-1bfc-563a-2646-215da99df17f@redhat.com>
-In-Reply-To: <cda61c2a-1bfc-563a-2646-215da99df17f@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+Enabling MSI interrupts works for me.  One note is that Windows updates
+will sometimes revert the changes so if this starts breaking after an
+update you may need to re-apply the registry changes.
 
-On 12/08/2017 07:46 PM, John Snow wrote:
->=20
->=20
-> On 11/22/2017 09:08 PM, Max Reitz wrote:
->> Tests 080, 130, 137, and 176 simply do not work with compat=3D0.10 for=
- the
->> reasons stated there.
->>
->> 177 is a bit more interesting:  Originally, it was actually very much
->> intended to work with compat=3D0.10 (it even had a special case for th=
-at).
->> However, it now prints the test image's map twice, and short of just n=
-ot
->> doing that, there is no solution I can imagine that is both simple and=
+-- =
 
->> would leave compat=3D0.10 support intact.
->>
->=20
-> So we lost that support in
-> f0a9c18f9e7
-> and
-> 81c219ac6ce
->=20
-> Eric, any input before we downscope your test?
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1580459
 
-Ouch, I broke my own test.
+Title:
+  Windows (10?) guest freezes entire host on shutdown if using PCI
+  passthrough
 
-Maybe the best thing would be to split 177 into two tests: the original
-test (as it was before f0a9c18) that works on both compats, and a new
-test that works on just compat=3D1.1 images for the things added in later=
+Status in libvirt:
+  New
+Status in QEMU:
+  New
+Status in Arch Linux:
+  New
+Status in Debian:
+  New
+Status in Fedora:
+  New
 
-commits.
+Bug description:
+  Problem: after leaving a Windows VM that uses PCI passthrough (as we
+  do for gaming graphics cards, sound cards, and in my case, a USB card)
+  running for some amount of time between 1 and 2 hours (it's not
+  consistent with exactly how long), and for any amount of time longer
+  than that, shutting down that guest will, right as it finishes
+  shutting down, freeze the host computer, making it require a hard
+  reboot. Unbinding (or in the other user's case, unbinding and THEN
+  binding) any PCI device in sysfs, even one that has nothing to do with
+  the VM, also has the same effect as shutting down the VM (if the VM
+  has been running long enough). So, it's probably an issue related to
+  unbinding and binding PCI devices.
 
-Since I'm the author for all commits (so far) to that file, I guess I
-can sign up for that work...
+  There's a lot of info on this problem over at https://bbs.archlinux.org/v=
+iewtopic.php?id=3D206050
+  Here's a better-organized list of main details:
+  -at least 2 confirmed victims of this bug; 2 (including me) have provided=
+ lots of info in the link
+  -I'm on Arch Linux and the other one is on Gentoo (distro-nonspecific)
+  -issue affects my Windows 10 guest and others' Windows guests, but not my=
+ Arch Linux guest (the others don't have non-Windows guests to test)
+  -I'm using libvirt but the other user is not, so it's not an issue with l=
+ibvirt
+  -It seems to be version non-specific, too. I first noticed it at, or when=
+ testing versions still had the issue at (whichever version is lower), Linu=
+x 4.1 and qemu 2.4.0. It still persists in all releases of both since, incl=
+uding the newest ones.
+  -I can't track down exactly what package downgrade can fix it, as downgra=
+ding further than Linux 4.1 and qemu 2.4.0 requires Herculean and system-de=
+stroying changes such as downgrading ncurses, meaning I don't know whether =
+it's a bug in QEMU, the Linux kernel, or some weird seemingly unrelated thi=
+ng.
+  -According to the other user, "graphics intensive gameplay (GTA V) can ca=
+use the crash to happen sooner," as soon as "15 minutes"
+  -Also, "bringing up a second passthrough VM with separate hardware will c=
+ause the same crash," and "bringing up another VM before the two-hour mark =
+will not result in a crash," further cementing that it's triggered by the u=
+n/binding of PCI devices.
+  -This is NOT related to the very similar bug that can be worked around by=
+ not passing through the HDMI device or sound card. Even when we removed al=
+l traces of any sort of sound card from the VM, it still had the same behav=
+ior.
 
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
-
-
---vTuq5duDw8e1FeHB77xuFKLSXJao83rH9
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
-
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlosFSYACgkQp6FrSiUn
-Q2qhXQf+JqQ6c7BKkzFFVn+I32FFSyLa2UjDPANhYEDBps5OjKsTr6GZ74u58A6t
-q7no7/9S++VvaDDdttgjEEnND0EalB6wJDFEiPpF3wfw7K1XiGayS7sIYeoR/373
-UfCAZPuaD+floZ3TwMRQVPUzzFJ+pCjCZjBWMGZ6we0k70BvXzoCHiD5be2+S1G3
-LLCoVjhlzLwKAEPB4hk8RS+EQ3koiZmAfWrxYEnvOnVDkyXnqzQzPo5KdklhZbaA
-Fwnv7CJQmQn28e8c16yLWe7MvXT6fFPvz1nIVPPIbUS+NxJVrc96t19jdKfwdzrD
-5YBz6qkQITo1h2ujOB7DFoDGEVqhJw==
-=O2ky
------END PGP SIGNATURE-----
-
---vTuq5duDw8e1FeHB77xuFKLSXJao83rH9--
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/libvirt/+bug/1580459/+subscriptions
