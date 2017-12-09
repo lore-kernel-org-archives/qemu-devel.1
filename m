@@ -1,26 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53425)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57522)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1eNb73-0006Qg-4D
-	for qemu-devel@nongnu.org; Sat, 09 Dec 2017 04:08:03 -0500
+	(envelope-from <vsementsov@virtuozzo.com>) id 1eNbRG-0003BO-AQ
+	for qemu-devel@nongnu.org; Sat, 09 Dec 2017 04:28:55 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1eNb6y-00079o-3J
-	for qemu-devel@nongnu.org; Sat, 09 Dec 2017 04:08:01 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:58780)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1eNb6x-000794-Qx
-	for qemu-devel@nongnu.org; Sat, 09 Dec 2017 04:07:56 -0500
-From: Markus Armbruster <armbru@redhat.com>
-References: <20170911110623.24981-1-marcandre.lureau@redhat.com>
-	<20170911110623.24981-25-marcandre.lureau@redhat.com>
-Date: Sat, 09 Dec 2017 10:07:50 +0100
-In-Reply-To: <20170911110623.24981-25-marcandre.lureau@redhat.com>
-	(=?utf-8?Q?=22Marc-Andr=C3=A9?= Lureau"'s message of "Mon, 11 Sep 2017
-	13:05:57 +0200")
-Message-ID: <87609g6zh5.fsf@dusky.pond.sub.org>
+	(envelope-from <vsementsov@virtuozzo.com>) id 1eNbRF-000834-6s
+	for qemu-devel@nongnu.org; Sat, 09 Dec 2017 04:28:54 -0500
+References: <20171207155102.66622-1-vsementsov@virtuozzo.com>
+	<20171207155102.66622-3-vsementsov@virtuozzo.com>
+	<20171208173321.GR2403@work-vm>
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Message-ID: <98eaefdc-222c-4a9e-847c-bed30dbfa626@virtuozzo.com>
+Date: Sat, 9 Dec 2017 12:28:40 +0300
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v3 24/50] qapi: add some struct member tests
+In-Reply-To: <20171208173321.GR2403@work-vm>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
+Content-Language: en-US
+Subject: Re: [Qemu-devel] [PATCH v2 2/6] qapi: add name parameter to
+ nbd-server-add
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,168 +26,125 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>
-Cc: qemu-devel@nongnu.org, Michael Roth <mdroth@linux.vnet.ibm.com>
+To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, armbru@redhat.com, pbonzini@redhat.com, eblake@redhat.com, mreitz@redhat.com, kwolf@redhat.com, den@openvz.org
 
-Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com> writes:
-
-> Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
-> ---
->  tests/Makefile.include                    |  2 ++
->  tests/qapi-schema/struct-if-invalid.err   |  1 +
->  tests/qapi-schema/struct-if-invalid.exit  |  1 +
->  tests/qapi-schema/struct-if-invalid.json  |  3 +++
->  tests/qapi-schema/struct-if-invalid.out   |  0
->  tests/qapi-schema/struct-member-type.err  |  0
->  tests/qapi-schema/struct-member-type.exit |  1 +
->  tests/qapi-schema/struct-member-type.json |  2 ++
->  tests/qapi-schema/struct-member-type.out  | 12 ++++++++++++
->  9 files changed, 22 insertions(+)
->  create mode 100644 tests/qapi-schema/struct-if-invalid.err
->  create mode 100644 tests/qapi-schema/struct-if-invalid.exit
->  create mode 100644 tests/qapi-schema/struct-if-invalid.json
->  create mode 100644 tests/qapi-schema/struct-if-invalid.out
->  create mode 100644 tests/qapi-schema/struct-member-type.err
->  create mode 100644 tests/qapi-schema/struct-member-type.exit
->  create mode 100644 tests/qapi-schema/struct-member-type.json
->  create mode 100644 tests/qapi-schema/struct-member-type.out
+08.12.2017 20:33, Dr. David Alan Gilbert wrote:
+> * Vladimir Sementsov-Ogievskiy (vsementsov@virtuozzo.com) wrote:
+>> Allow user to specify name for new export, to not reuse internal
+>> node name and to not show it to clients.
+>>
+>> This also allows creating several exports per device.
+>>
+>> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+>> ---
+>>   qapi/block.json |  9 +++++++--
+>>   blockdev-nbd.c  | 14 +++++++++-----
+>>   hmp.c           |  5 +++--
+>>   3 files changed, 19 insertions(+), 9 deletions(-)
+>>
+>> diff --git a/qapi/block.json b/qapi/block.json
+>> index f093fa3f27..503d4b287b 100644
+>> --- a/qapi/block.json
+>> +++ b/qapi/block.json
+>> @@ -213,14 +213,19 @@
+>>   #
+>>   # @device: The device name or node name of the node to be exported
+>>   #
+>> +# @name: Export name. If unspecified @device parameter used as export name.
+>> +#        (Since 2.12)
+>> +#
+>>   # @writable: Whether clients should be able to write to the device via the
+>>   #     NBD connection (default false).
+>>   #
+>> -# Returns: error if the device is already marked for export.
+>> +# Returns: error if the server is not running, or export with the same name
+>> +#          already exists.
+>>   #
+>>   # Since: 1.3.0
+>>   ##
+>> -{ 'command': 'nbd-server-add', 'data': {'device': 'str', '*writable': 'bool'} }
+>> +{ 'command': 'nbd-server-add',
+>> +  'data': {'device': 'str', '*name': 'str', '*writable': 'bool'} }
+>>   
+>>   ##
+>>   # @nbd-server-stop:
+>> diff --git a/blockdev-nbd.c b/blockdev-nbd.c
+>> index 28f551a7b0..46c885aa35 100644
+>> --- a/blockdev-nbd.c
+>> +++ b/blockdev-nbd.c
+>> @@ -158,8 +158,8 @@ void qmp_nbd_server_start(SocketAddressLegacy *addr,
+>>       qapi_free_SocketAddress(addr_flat);
+>>   }
+>>   
+>> -void qmp_nbd_server_add(const char *device, bool has_writable, bool writable,
+>> -                        Error **errp)
+>> +void qmp_nbd_server_add(const char *device, bool has_name, const char *name,
+>> +                        bool has_writable, bool writable, Error **errp)
+>>   {
+>>       BlockDriverState *bs = NULL;
+>>       BlockBackend *on_eject_blk;
+>> @@ -170,8 +170,12 @@ void qmp_nbd_server_add(const char *device, bool has_writable, bool writable,
+>>           return;
+>>       }
+>>   
+>> -    if (nbd_export_find(device)) {
+>> -        error_setg(errp, "NBD server already exporting device '%s'", device);
+>> +    if (!has_name) {
+>> +        name = device;
+>> +    }
+>> +
+>> +    if (nbd_export_find(name)) {
+>> +        error_setg(errp, "NBD server already has export named '%s'", name);
+>>           return;
+>>       }
+>>   
+>> @@ -195,7 +199,7 @@ void qmp_nbd_server_add(const char *device, bool has_writable, bool writable,
+>>           return;
+>>       }
+>>   
+>> -    nbd_export_set_name(exp, device);
+>> +    nbd_export_set_name(exp, name);
+>>   
+>>       /* The list of named exports has a strong reference to this export now and
+>>        * our only way of accessing it is through nbd_export_find(), so we can drop
+>> diff --git a/hmp.c b/hmp.c
+>> index 35a7041824..0ea9c09b58 100644
+>> --- a/hmp.c
+>> +++ b/hmp.c
+>> @@ -2203,7 +2203,8 @@ void hmp_nbd_server_start(Monitor *mon, const QDict *qdict)
+>>               continue;
+>>           }
+>>   
+>> -        qmp_nbd_server_add(info->value->device, true, writable, &local_err);
+>> +        qmp_nbd_server_add(info->value->device, false, NULL,
+>> +                           true, writable, &local_err);
+>>   
+>>           if (local_err != NULL) {
+>>               qmp_nbd_server_stop(NULL);
+>> @@ -2223,7 +2224,7 @@ void hmp_nbd_server_add(Monitor *mon, const QDict *qdict)
+>>       bool writable = qdict_get_try_bool(qdict, "writable", false);
+>>       Error *local_err = NULL;
+>>   
+>> -    qmp_nbd_server_add(device, true, writable, &local_err);
+>> +    qmp_nbd_server_add(device, false, NULL, true, writable, &local_err);
+> I wont insist, but it would be nice if you wired up an optional
+> parameter on HMP as well.
 >
-> diff --git a/tests/Makefile.include b/tests/Makefile.include
-> index 0aa532f029..44a3d8895e 100644
-> --- a/tests/Makefile.include
-> +++ b/tests/Makefile.include
-> @@ -520,7 +520,9 @@ qapi-schema +=3D returns-whitelist.json
->  qapi-schema +=3D struct-base-clash-deep.json
->  qapi-schema +=3D struct-base-clash.json
->  qapi-schema +=3D struct-data-invalid.json
-> +qapi-schema +=3D struct-if-invalid.json
->  qapi-schema +=3D struct-member-invalid.json
-> +qapi-schema +=3D struct-member-type.json
->  qapi-schema +=3D trailing-comma-list.json
->  qapi-schema +=3D trailing-comma-object.json
->  qapi-schema +=3D type-bypass-bad-gen.json
-> diff --git a/tests/qapi-schema/struct-if-invalid.err b/tests/qapi-schema/=
-struct-if-invalid.err
-> new file mode 100644
-> index 0000000000..42245262a9
-> --- /dev/null
-> +++ b/tests/qapi-schema/struct-if-invalid.err
-> @@ -0,0 +1 @@
-> +tests/qapi-schema/struct-if-invalid.json:2: Member 'bar' of 'data' for s=
-truct 'TestIfStruct' should be a type name
-> diff --git a/tests/qapi-schema/struct-if-invalid.exit b/tests/qapi-schema=
-/struct-if-invalid.exit
-> new file mode 100644
-> index 0000000000..d00491fd7e
-> --- /dev/null
-> +++ b/tests/qapi-schema/struct-if-invalid.exit
-> @@ -0,0 +1 @@
-> +1
-> diff --git a/tests/qapi-schema/struct-if-invalid.json b/tests/qapi-schema=
-/struct-if-invalid.json
-> new file mode 100644
-> index 0000000000..466cdb61e1
-> --- /dev/null
-> +++ b/tests/qapi-schema/struct-if-invalid.json
-> @@ -0,0 +1,3 @@
-> +# check missing 'type'
-> +{ 'struct': 'TestIfStruct', 'data':
-> +  { 'foo': 'int', 'bar': { 'if': 'defined(TEST_IF_STRUCT_BAR)' } } }
+> Dave
 
-Hmm.  This tests the previous patch's change to check_type().  It
-demonstrates that the "should be a type name" error message can be
-suboptimal: it gets triggered when
+Hmm.. Honestly, I don't see real usage of it.
 
-    not isinstance(value, str)
-    and not (isinstance(value, dict) and 'type' in value)
+>
+>>       if (local_err != NULL) {
+>>           hmp_handle_error(mon, &local_err);
+>> -- 
+>> 2.11.1
+>>
+> --
+> Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
 
-Fine when the value is neither str not dict.  Suboptimal when it's dict
-and 'type' is missing.  A more obvious example of suboptimality would be
 
-   'bar': { 'tvpe': 'int' }
-
-The previous patch's
-
-        if isinstance(value, dict) and 'type' in value:
-            check_type(info, source, value['type'], allow_array,
-                       allow_dict, allow_optional, allow_metas)
-            if 'if' in value:
-                check_if(value, info)
-            check_unknown_keys(info, value, {'type', 'if'})
-            return
-        else:
-            raise QAPISemError(info, "%s should be a type name" % source)
-
-should be improved to something like
-
-        if not isinstance(value, dict):
-            raise QAPISemError(
-                info, "%s should be a type name or dictionary" % source)
-        if 'type' not in value:
-            raise QAPISemError(
-                info, "%s must have a member 'type'" % source)
-        check_type(info, source, value['type'], allow_array,
-                   allow_dict, allow_optional, allow_metas)
-        if 'if' in value:
-            check_if(value, info)
-        check_unknown_keys(info, value, {'type', 'if'})
-        return
-
-producing
-
-    struct-if-invalid.json:2: Member 'bar' of 'data' for struct 'TestIfStru=
-ct' must have a member 'type'
-
-The fact that I missed this in review of the code, but noticed it in the
-tests is why I want tests added together with the code they test.
-
-Nitpick: the file name struct-if-invalid makes me expect an invalid if.
-Not the case.  It's a missing type.  Let's rename accordingly.
-
-> diff --git a/tests/qapi-schema/struct-if-invalid.out b/tests/qapi-schema/=
-struct-if-invalid.out
-> new file mode 100644
-> index 0000000000..e69de29bb2
-> diff --git a/tests/qapi-schema/struct-member-type.err b/tests/qapi-schema=
-/struct-member-type.err
-> new file mode 100644
-> index 0000000000..e69de29bb2
-> diff --git a/tests/qapi-schema/struct-member-type.exit b/tests/qapi-schem=
-a/struct-member-type.exit
-> new file mode 100644
-> index 0000000000..573541ac97
-> --- /dev/null
-> +++ b/tests/qapi-schema/struct-member-type.exit
-> @@ -0,0 +1 @@
-> +0
-> diff --git a/tests/qapi-schema/struct-member-type.json b/tests/qapi-schem=
-a/struct-member-type.json
-> new file mode 100644
-> index 0000000000..8b33027817
-> --- /dev/null
-> +++ b/tests/qapi-schema/struct-member-type.json
-> @@ -0,0 +1,2 @@
-> +# check member 'a' with 'type' key only
-> +{ 'struct': 'foo', 'data': { 'a': { 'type': 'str' } } }
-> diff --git a/tests/qapi-schema/struct-member-type.out b/tests/qapi-schema=
-/struct-member-type.out
-> new file mode 100644
-> index 0000000000..04b969d2e3
-> --- /dev/null
-> +++ b/tests/qapi-schema/struct-member-type.out
-> @@ -0,0 +1,12 @@
-> +enum QType
-> +    prefix QTYPE
-> +    member none:
-> +    member qnull:
-> +    member qnum:
-> +    member qstring:
-> +    member qdict:
-> +    member qlist:
-> +    member qbool:
-> +object foo
-> +    member a: str optional=3DFalse
-> +object q_empty
-
-This is a positive test, isn't it?  Positive tests go into
-qapi-schema-test.json.
+-- 
+Best regards,
+Vladimir
