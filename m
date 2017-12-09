@@ -1,21 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40344)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46843)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1eNTh2-0007Sy-5q
-	for qemu-devel@nongnu.org; Fri, 08 Dec 2017 20:12:40 -0500
+	(envelope-from <jsnow@redhat.com>) id 1eNTzO-0004zm-6w
+	for qemu-devel@nongnu.org; Fri, 08 Dec 2017 20:31:38 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1eNTgy-00062z-6N
-	for qemu-devel@nongnu.org; Fri, 08 Dec 2017 20:12:40 -0500
+	(envelope-from <jsnow@redhat.com>) id 1eNTzN-0000C4-GC
+	for qemu-devel@nongnu.org; Fri, 08 Dec 2017 20:31:38 -0500
 References: <20171123020832.8165-1-mreitz@redhat.com>
-	<20171123020832.8165-16-mreitz@redhat.com>
+	<20171123020832.8165-17-mreitz@redhat.com>
 From: John Snow <jsnow@redhat.com>
-Message-ID: <80cdc5e8-923f-acfe-08ad-e9731aae114d@redhat.com>
-Date: Fri, 8 Dec 2017 20:12:30 -0500
+Message-ID: <9efa3fc4-e9ce-4e08-c2c7-4db3eb81a026@redhat.com>
+Date: Fri, 8 Dec 2017 20:31:28 -0500
 MIME-Version: 1.0
-In-Reply-To: <20171123020832.8165-16-mreitz@redhat.com>
+In-Reply-To: <20171123020832.8165-17-mreitz@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 15/17] iotests: Make 184 image-less
+Subject: Re: [Qemu-devel] [PATCH 16/17] iotests: Make 191 work with qcow2
+ options
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,16 +31,20 @@ Cc: Kevin Wolf <kwolf@redhat.com>, Fam Zheng <famz@redhat.com>, qemu-devel@nongn
 
 
 On 11/22/2017 09:08 PM, Max Reitz wrote:
-> 184 does not need an image, so don't use one.
+> In order for 191 to work with an explicit refcount_bits or compat=0.10,
+> we should strip format-specific information from the output--and we can
+> do so by using _filter_img_info.
 > 
 > Signed-off-by: Max Reitz <mreitz@redhat.com>
+> ---
+>  tests/qemu-iotests/191     |   5 +-
 
-Seems sane.
+"Looks good!"
+
+>  tests/qemu-iotests/191.out | 313 +++++++++++++--------------------------------
+
+AAAAAAAA
+
+* just runs the test instead *
 
 Reviewed-by: John Snow <jsnow@redhat.com>
-
-> ---
->  tests/qemu-iotests/184     | 25 ++++--------------
->  tests/qemu-iotests/184.out | 63 +++++++---------------------------------------
->  2 files changed, 14 insertions(+), 74 deletions(-)
-> 
