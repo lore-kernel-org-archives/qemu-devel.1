@@ -1,23 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57522)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35891)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1eNbRG-0003BO-AQ
-	for qemu-devel@nongnu.org; Sat, 09 Dec 2017 04:28:55 -0500
+	(envelope-from <vsementsov@virtuozzo.com>) id 1eNcAs-0003LP-3F
+	for qemu-devel@nongnu.org; Sat, 09 Dec 2017 05:16:04 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1eNbRF-000834-6s
-	for qemu-devel@nongnu.org; Sat, 09 Dec 2017 04:28:54 -0500
-References: <20171207155102.66622-1-vsementsov@virtuozzo.com>
-	<20171207155102.66622-3-vsementsov@virtuozzo.com>
-	<20171208173321.GR2403@work-vm>
+	(envelope-from <vsementsov@virtuozzo.com>) id 1eNcAq-0007d7-7p
+	for qemu-devel@nongnu.org; Sat, 09 Dec 2017 05:16:02 -0500
+References: <20171207203036.14993-1-eblake@redhat.com>
+	<20171207203036.14993-2-eblake@redhat.com>
 From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Message-ID: <98eaefdc-222c-4a9e-847c-bed30dbfa626@virtuozzo.com>
-Date: Sat, 9 Dec 2017 12:28:40 +0300
+Message-ID: <3b932b93-eb2a-8d71-9d0e-8bfbe40b10bf@virtuozzo.com>
+Date: Sat, 9 Dec 2017 13:15:47 +0300
 MIME-Version: 1.0
-In-Reply-To: <20171208173321.GR2403@work-vm>
+In-Reply-To: <20171207203036.14993-2-eblake@redhat.com>
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: 7bit
 Content-Language: en-US
-Subject: Re: [Qemu-devel] [PATCH v2 2/6] qapi: add name parameter to
- nbd-server-add
+Subject: Re: [Qemu-devel] [PATCH v6 01/20] block: Add
+ .bdrv_co_block_status() callback
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,123 +25,188 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, armbru@redhat.com, pbonzini@redhat.com, eblake@redhat.com, mreitz@redhat.com, kwolf@redhat.com, den@openvz.org
+To: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org
+Cc: kwolf@redhat.com, famz@redhat.com, qemu-block@nongnu.org, Stefan Hajnoczi <stefanha@redhat.com>, Max Reitz <mreitz@redhat.com>
 
-08.12.2017 20:33, Dr. David Alan Gilbert wrote:
-> * Vladimir Sementsov-Ogievskiy (vsementsov@virtuozzo.com) wrote:
->> Allow user to specify name for new export, to not reuse internal
->> node name and to not show it to clients.
->>
->> This also allows creating several exports per device.
->>
->> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
->> ---
->>   qapi/block.json |  9 +++++++--
->>   blockdev-nbd.c  | 14 +++++++++-----
->>   hmp.c           |  5 +++--
->>   3 files changed, 19 insertions(+), 9 deletions(-)
->>
->> diff --git a/qapi/block.json b/qapi/block.json
->> index f093fa3f27..503d4b287b 100644
->> --- a/qapi/block.json
->> +++ b/qapi/block.json
->> @@ -213,14 +213,19 @@
->>   #
->>   # @device: The device name or node name of the node to be exported
->>   #
->> +# @name: Export name. If unspecified @device parameter used as export name.
->> +#        (Since 2.12)
->> +#
->>   # @writable: Whether clients should be able to write to the device via the
->>   #     NBD connection (default false).
->>   #
->> -# Returns: error if the device is already marked for export.
->> +# Returns: error if the server is not running, or export with the same name
->> +#          already exists.
->>   #
->>   # Since: 1.3.0
->>   ##
->> -{ 'command': 'nbd-server-add', 'data': {'device': 'str', '*writable': 'bool'} }
->> +{ 'command': 'nbd-server-add',
->> +  'data': {'device': 'str', '*name': 'str', '*writable': 'bool'} }
->>   
->>   ##
->>   # @nbd-server-stop:
->> diff --git a/blockdev-nbd.c b/blockdev-nbd.c
->> index 28f551a7b0..46c885aa35 100644
->> --- a/blockdev-nbd.c
->> +++ b/blockdev-nbd.c
->> @@ -158,8 +158,8 @@ void qmp_nbd_server_start(SocketAddressLegacy *addr,
->>       qapi_free_SocketAddress(addr_flat);
->>   }
->>   
->> -void qmp_nbd_server_add(const char *device, bool has_writable, bool writable,
->> -                        Error **errp)
->> +void qmp_nbd_server_add(const char *device, bool has_name, const char *name,
->> +                        bool has_writable, bool writable, Error **errp)
->>   {
->>       BlockDriverState *bs = NULL;
->>       BlockBackend *on_eject_blk;
->> @@ -170,8 +170,12 @@ void qmp_nbd_server_add(const char *device, bool has_writable, bool writable,
->>           return;
->>       }
->>   
->> -    if (nbd_export_find(device)) {
->> -        error_setg(errp, "NBD server already exporting device '%s'", device);
->> +    if (!has_name) {
->> +        name = device;
->> +    }
->> +
->> +    if (nbd_export_find(name)) {
->> +        error_setg(errp, "NBD server already has export named '%s'", name);
->>           return;
->>       }
->>   
->> @@ -195,7 +199,7 @@ void qmp_nbd_server_add(const char *device, bool has_writable, bool writable,
->>           return;
->>       }
->>   
->> -    nbd_export_set_name(exp, device);
->> +    nbd_export_set_name(exp, name);
->>   
->>       /* The list of named exports has a strong reference to this export now and
->>        * our only way of accessing it is through nbd_export_find(), so we can drop
->> diff --git a/hmp.c b/hmp.c
->> index 35a7041824..0ea9c09b58 100644
->> --- a/hmp.c
->> +++ b/hmp.c
->> @@ -2203,7 +2203,8 @@ void hmp_nbd_server_start(Monitor *mon, const QDict *qdict)
->>               continue;
->>           }
->>   
->> -        qmp_nbd_server_add(info->value->device, true, writable, &local_err);
->> +        qmp_nbd_server_add(info->value->device, false, NULL,
->> +                           true, writable, &local_err);
->>   
->>           if (local_err != NULL) {
->>               qmp_nbd_server_stop(NULL);
->> @@ -2223,7 +2224,7 @@ void hmp_nbd_server_add(Monitor *mon, const QDict *qdict)
->>       bool writable = qdict_get_try_bool(qdict, "writable", false);
->>       Error *local_err = NULL;
->>   
->> -    qmp_nbd_server_add(device, true, writable, &local_err);
->> +    qmp_nbd_server_add(device, false, NULL, true, writable, &local_err);
-> I wont insist, but it would be nice if you wired up an optional
-> parameter on HMP as well.
+07.12.2017 23:30, Eric Blake wrote:
+> We are gradually moving away from sector-based interfaces, towards
+> byte-based. Now that the block layer exposes byte-based allocation,
+> it's time to tackle the drivers.  Add a new callback that operates
+> on as small as byte boundaries. Subsequent patches will then update
+> individual drivers, then finally remove .bdrv_co_get_block_status().
 >
-> Dave
-
-Hmm.. Honestly, I don't see real usage of it.
-
+> The new code also passes through the 'want_zero' hint, which will
+> allow subsequent patches to further optimize callers that only care
+> about how much of the image is allocated (want_zero is false),
+> rather than full details about runs of zeroes and which offsets the
+> allocation actually maps to (want_zero is true).  As part of this
+> effort, fix another part of the documentation: the claim in commit
+> 4c41cb4 that BDRV_BLOCK_ALLOCATED is short for 'DATA || ZERO' is a
+> lie at the block layer (see commit e88ae2264), even though it is
+> how the bit is computed from the driver layer.  After all, there
+> are intentionally cases where we return ZERO but not ALLOCATED at
+> the block layer, when we know that a read sees zero because the
+> backing file is too short.  Note that the driver interface is thus
+> slightly different than the public interface with regards to which
+> bits will be set, and what guarantees are provided on input.
 >
->>       if (local_err != NULL) {
->>           hmp_handle_error(mon, &local_err);
->> -- 
->> 2.11.1
->>
-> --
-> Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+> We also add an assertion that any driver using the new callback will
+> make progress (the only time pnum will be 0 is if the block layer
+> already handled an out-of-bounds request, or if there is an error);
+> the old driver interface did not provide this guarantee, which
+> could lead to some inf-loops in drastic corner-case failures.
+>
+> Signed-off-by: Eric Blake <eblake@redhat.com>
+>
+> ---
+> v6: drop now-useless rounding of mid-sector end-of-file hole [Kevin],
+> better documentation of 'want_zero' [Kevin]
+> v5: rebase to master, typo fix, document more block layer guarantees
+> v4: rebase to master
+> v3: no change
+> v2: improve alignment handling, ensure all iotests still pass
+> ---
+>   include/block/block.h     | 14 +++++++-------
+>   include/block/block_int.h | 20 +++++++++++++++-----
+>   block/io.c                | 28 +++++++++++++++++++---------
+>   3 files changed, 41 insertions(+), 21 deletions(-)
+>
+> diff --git a/include/block/block.h b/include/block/block.h
+> index c05cac57e5..afc9ece4d6 100644
+> --- a/include/block/block.h
+> +++ b/include/block/block.h
+> @@ -128,19 +128,19 @@ typedef struct HDGeometry {
+>    * BDRV_BLOCK_ZERO: offset reads as zero
+>    * BDRV_BLOCK_OFFSET_VALID: an associated offset exists for accessing raw data
+>    * BDRV_BLOCK_ALLOCATED: the content of the block is determined by this
+> - *                       layer (short for DATA || ZERO), set by block layer
+> - * BDRV_BLOCK_EOF: the returned pnum covers through end of file for this layer
+> + *                       layer rather than any backing, set by block layer
+> + * BDRV_BLOCK_EOF: the returned pnum covers through end of file for this
+> + *                 layer, set by block layer
+>    *
+>    * Internal flag:
+>    * BDRV_BLOCK_RAW: for use by passthrough drivers, such as raw, to request
+>    *                 that the block layer recompute the answer from the returned
+>    *                 BDS; must be accompanied by just BDRV_BLOCK_OFFSET_VALID.
+>    *
+> - * If BDRV_BLOCK_OFFSET_VALID is set, bits 9-62 (BDRV_BLOCK_OFFSET_MASK) of
+> - * the return value (old interface) or the entire map parameter (new
+> - * interface) represent the offset in the returned BDS that is allocated for
+> - * the corresponding raw data.  However, whether that offset actually
+> - * contains data also depends on BDRV_BLOCK_DATA, as follows:
+> + * If BDRV_BLOCK_OFFSET_VALID is set, the map parameter represents the
+> + * host offset within the returned BDS that is allocated for the
+> + * corresponding raw guest data.  However, whether that offset
+> + * actually contains data also depends on BDRV_BLOCK_DATA, as follows:
+>    *
+>    * DATA ZERO OFFSET_VALID
+>    *  t    t        t       sectors read as zero, returned file is zero at offset
+> diff --git a/include/block/block_int.h b/include/block/block_int.h
+> index a5482775ec..614197f208 100644
+> --- a/include/block/block_int.h
+> +++ b/include/block/block_int.h
+> @@ -204,15 +204,25 @@ struct BlockDriver {
+>       /*
+>        * Building block for bdrv_block_status[_above] and
+>        * bdrv_is_allocated[_above].  The driver should answer only
+> -     * according to the current layer, and should not set
+> -     * BDRV_BLOCK_ALLOCATED, but may set BDRV_BLOCK_RAW.  See block.h
+> -     * for the meaning of _DATA, _ZERO, and _OFFSET_VALID.  The block
+> -     * layer guarantees input aligned to request_alignment, as well as
+> -     * non-NULL pnum and file.
+> +     * according to the current layer, and should only need to set
+> +     * BDRV_BLOCK_DATA, BDRV_BLOCK_ZERO, BDRV_BLOCK_OFFSET_VALID,
+> +     * and/or BDRV_BLOCK_RAW; if the current layer defers to a backing
+> +     * layer, the result should be 0 (and not BDRV_BLOCK_ZERO).  See
+> +     * block.h for the overall meaning of the bits.  As a hint, the
+> +     * flag want_zero is true if the caller cares more about precise
+> +     * mappings (favor accurate _OFFSET_VALID/_ZERO) or false for
+> +     * overall allocation (favor larger *pnum, perhaps by reporting
+> +     * _DATA instead of _ZERO).  The block layer guarantees input
+> +     * clamped to bdrv_getlength() and aligned to request_alignment,
+> +     * as well as non-NULL pnum, map, and file; in turn, the driver
+> +     * must return an error or set pnum to an aligned non-zero value.
+>        */
+>       int64_t coroutine_fn (*bdrv_co_get_block_status)(BlockDriverState *bs,
+>           int64_t sector_num, int nb_sectors, int *pnum,
+>           BlockDriverState **file);
+> +    int coroutine_fn (*bdrv_co_block_status)(BlockDriverState *bs,
+> +        bool want_zero, int64_t offset, int64_t bytes, int64_t *pnum,
+> +        int64_t *map, BlockDriverState **file);
+>
+>       /*
+>        * Invalidate any cached meta-data.
+> diff --git a/block/io.c b/block/io.c
+> index 6773926fc1..cbb6e6d073 100644
+> --- a/block/io.c
+> +++ b/block/io.c
+> @@ -1829,10 +1829,10 @@ int64_t coroutine_fn bdrv_co_get_block_status_from_backing(BlockDriverState *bs,
+>    * Drivers not implementing the functionality are assumed to not support
+>    * backing files, hence all their sectors are reported as allocated.
+>    *
+> - * If 'want_zero' is true, the caller is querying for mapping purposes,
+> - * and the result should include BDRV_BLOCK_OFFSET_VALID and
+> - * BDRV_BLOCK_ZERO where possible; otherwise, the result may omit those
+> - * bits particularly if it allows for a larger value in 'pnum'.
+> + * If 'want_zero' is true, the caller is querying for mapping
+> + * purposes, with a focus on valid BDRV_BLOCK_OFFSET_VALID, _DATA, and
+> + * _ZERO where possible; otherwise, the result favors larger 'pnum',
+> + * with a focus on accurate BDRV_BLOCK_ALLOCATED.
+>    *
+>    * If 'offset' is beyond the end of the disk image the return value is
+>    * BDRV_BLOCK_EOF and 'pnum' is set to 0.
+> @@ -1889,7 +1889,7 @@ static int coroutine_fn bdrv_co_block_status(BlockDriverState *bs,
+>
+>       /* Must be non-NULL or bdrv_getlength() would have failed */
+>       assert(bs->drv);
+> -    if (!bs->drv->bdrv_co_get_block_status) {
+> +    if (!bs->drv->bdrv_co_get_block_status && !bs->drv->bdrv_co_block_status) {
+>           *pnum = bytes;
+>           ret = BDRV_BLOCK_DATA | BDRV_BLOCK_ALLOCATED;
+>           if (offset + bytes == total_size) {
+> @@ -1906,13 +1906,14 @@ static int coroutine_fn bdrv_co_block_status(BlockDriverState *bs,
+>       bdrv_inc_in_flight(bs);
+>
+>       /* Round out to request_alignment boundaries */
+> -    /* TODO: until we have a byte-based driver callback, we also have to
+> -     * round out to sectors, even if that is bigger than request_alignment */
+> -    align = MAX(bs->bl.request_alignment, BDRV_SECTOR_SIZE);
+> +    align = bs->bl.request_alignment;
+> +    if (bs->drv->bdrv_co_get_block_status && align < BDRV_SECTOR_SIZE) {
+> +        align = BDRV_SECTOR_SIZE;
+> +    }
+>       aligned_offset = QEMU_ALIGN_DOWN(offset, align);
+>       aligned_bytes = ROUND_UP(offset + bytes, align) - aligned_offset;
+>
+> -    {
+> +    if (bs->drv->bdrv_co_get_block_status) {
+>           int count; /* sectors */
+>           int64_t longret;
+>
+> @@ -1937,6 +1938,15 @@ static int coroutine_fn bdrv_co_block_status(BlockDriverState *bs,
+>           }
+>           ret = longret & ~BDRV_BLOCK_OFFSET_MASK;
+>           *pnum = count * BDRV_SECTOR_SIZE;
+> +    } else {
+> +        ret = bs->drv->bdrv_co_block_status(bs, want_zero, aligned_offset,
+> +                                            aligned_bytes, pnum, &local_map,
+> +                                            &local_file);
+> +        if (ret < 0) {
+> +            *pnum = 0;
+> +            goto out;
+> +        }
+> +        assert(*pnum); /* The block driver must make progress */
+
+don't you want to assert alignment here too, to address your "or set 
+pnum to an aligned non-zero value"
+
+anyway,
+Reviewed-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+
+>       }
+>
+>       /*
 
 
 -- 
