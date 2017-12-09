@@ -1,21 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38389)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38520)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1eNTct-0004oL-67
-	for qemu-devel@nongnu.org; Fri, 08 Dec 2017 20:08:24 -0500
+	(envelope-from <ehabkost@redhat.com>) id 1eNTdB-0004yO-Dk
+	for qemu-devel@nongnu.org; Fri, 08 Dec 2017 20:08:42 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1eNTcs-0008Vk-70
-	for qemu-devel@nongnu.org; Fri, 08 Dec 2017 20:08:23 -0500
-Date: Fri, 8 Dec 2017 23:08:11 -0200
+	(envelope-from <ehabkost@redhat.com>) id 1eNTdA-0000bt-FH
+	for qemu-devel@nongnu.org; Fri, 08 Dec 2017 20:08:41 -0500
+Date: Fri, 8 Dec 2017 23:08:33 -0200
 From: Eduardo Habkost <ehabkost@redhat.com>
-Message-ID: <20171209010811.GJ3037@localhost.localdomain>
+Message-ID: <20171209010833.GK3037@localhost.localdomain>
 References: <1512670493-18114-1-git-send-email-peter.maydell@linaro.org>
-	<CAFEAcA-UO5Y_ACSZ2EEQEzgy30wdfEm3u8wUrBrXWaQaE_v+Kw@mail.gmail.com>
+	<1512670493-18114-2-git-send-email-peter.maydell@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <CAFEAcA-UO5Y_ACSZ2EEQEzgy30wdfEm3u8wUrBrXWaQaE_v+Kw@mail.gmail.com>
-Subject: Re: [Qemu-devel] [Qemu-arm] [PATCH 0/6] arm: support -cpu max (and
- gic-version=max)
+In-Reply-To: <1512670493-18114-2-git-send-email-peter.maydell@linaro.org>
+Subject: Re: [Qemu-devel] [PATCH 1/6] hw/arm/virt: Check that the CPU
+ realize method succeeded
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,27 +25,22 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: Peter Maydell <peter.maydell@linaro.org>
-Cc: qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>, "Richard W . M . Jones" <rjones@redhat.com>, "patches@linaro.org" <patches@linaro.org>
+Cc: qemu-arm@nongnu.org, qemu-devel@nongnu.org, patches@linaro.org, "Richard W . M . Jones" <rjones@redhat.com>
 
-On Thu, Dec 07, 2017 at 07:37:31PM +0000, Peter Maydell wrote:
-> On 7 December 2017 at 18:14, Peter Maydell <peter.maydell@linaro.org> wrote:
-> > This patchset adds support for '-cpu max' to Arm, along the lines
-> > of the existing support we have for x86 targets:
-> >
-> >  * under KVM, -cpu max is the same as -cpu host
-> >  * under TCG, -cpu max means "emulate with as many features as
-> >    possible"
+On Thu, Dec 07, 2017 at 06:14:48PM +0000, Peter Maydell wrote:
+> We were passing a NULL error pointer to the object_property_set_bool()
+> call that realizes the CPU object. This meant that we wouldn't detect
+> failure, and would plough blindly on to crash later trying to use a
+> NULL CPU object pointer. Detect errors and fail instead.
 > 
-> Forgot to mention: -cpu max for qemu-system-aarch64 will
-> be a 64-bit cpu, and for qemu-system-arm it will be a 32-bit
-> cpu. (This differs from all the other TCG CPU types, which
-> behave the same for the 32-bit and 64-bit binaries. I think
-> it is the same way that x86 -cpu max works, though.)
+> In particular, this will be necessary to detect the user error
+> of using "-cpu host" without "-enable-kvm" once we make the host
+> CPU type be registered unconditionally rather than only in
+> kvm_arch_init().
+> 
+> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 
-Are they going to be represented by two different QOM type names?
-
-(In the case of x86, all the CPU classes have different names on
-qemu-system-x86_64 and qemu-system-i386).
+Reviewed-by: Eduardo Habkost <ehabkost@redhat.com>
 
 -- 
 Eduardo
