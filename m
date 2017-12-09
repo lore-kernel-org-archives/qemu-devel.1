@@ -1,29 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57214)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39469)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1eNZGp-0000J8-Kr
-	for qemu-devel@nongnu.org; Sat, 09 Dec 2017 02:10:00 -0500
+	(envelope-from <armbru@redhat.com>) id 1eNaLR-0006oa-OI
+	for qemu-devel@nongnu.org; Sat, 09 Dec 2017 03:18:50 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1eNZGl-0006Oj-5A
-	for qemu-devel@nongnu.org; Sat, 09 Dec 2017 02:09:59 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:43372)
+	(envelope-from <armbru@redhat.com>) id 1eNaLO-0004kl-K4
+	for qemu-devel@nongnu.org; Sat, 09 Dec 2017 03:18:49 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:55650)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1eNZGk-0006NX-Ta
-	for qemu-devel@nongnu.org; Sat, 09 Dec 2017 02:09:55 -0500
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1eNaLO-0004ka-DP
+	for qemu-devel@nongnu.org; Sat, 09 Dec 2017 03:18:46 -0500
 From: Markus Armbruster <armbru@redhat.com>
-References: <20171208074515.1553-1-lprosek@redhat.com>
-	<20171208074515.1553-5-lprosek@redhat.com>
-	<87y3mde3z1.fsf@dusky.pond.sub.org>
-	<CABdb737EUy_rRCunxeDUDdhhDiCU8eZBNoYmh+QGp39mqsDung@mail.gmail.com>
-	<87vahh9ljm.fsf@dusky.pond.sub.org>
-	<CABdb737A3bOdxychRQAaEYmKPLt3SpUFU9UxHM9okmt2jURF2w@mail.gmail.com>
-Date: Sat, 09 Dec 2017 08:09:50 +0100
-In-Reply-To: <CABdb737A3bOdxychRQAaEYmKPLt3SpUFU9UxHM9okmt2jURF2w@mail.gmail.com>
-	(Ladi Prosek's message of "Fri, 8 Dec 2017 18:34:45 +0100")
-Message-ID: <87indg74xt.fsf@dusky.pond.sub.org>
+References: <20170911110623.24981-1-marcandre.lureau@redhat.com>
+	<20170911110623.24981-24-marcandre.lureau@redhat.com>
+Date: Sat, 09 Dec 2017 09:18:41 +0100
+In-Reply-To: <20170911110623.24981-24-marcandre.lureau@redhat.com>
+	(=?utf-8?Q?=22Marc-Andr=C3=A9?= Lureau"'s message of "Mon, 11 Sep 2017
+	13:05:56 +0200")
+Message-ID: <87d13o71r2.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH v3 4/4] ivshmem: Disable irqfd on device
- reset
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v3 23/50] qapi: add 'if' to struct members
+ and implicit objects members
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,102 +30,52 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Ladi Prosek <lprosek@redhat.com>
-Cc: Geoffrey McRae <geoff@hostfission.com>, Paolo Bonzini <pbonzini@redhat.com>, qemu-devel <qemu-devel@nongnu.org>, =?utf-8?Q?Ma?= =?utf-8?Q?rc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>
+To: =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>
+Cc: qemu-devel@nongnu.org, Michael Roth <mdroth@linux.vnet.ibm.com>
 
-Ladi Prosek <lprosek@redhat.com> writes:
+Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com> writes:
 
-> On Fri, Dec 8, 2017 at 6:28 PM, Markus Armbruster <armbru@redhat.com> wrote:
->> Ladi Prosek <lprosek@redhat.com> writes:
->>
->>> On Fri, Dec 8, 2017 at 2:36 PM, Markus Armbruster <armbru@redhat.com> wrote:
->>>> Ladi Prosek <lprosek@redhat.com> writes:
->>>>
->>>>> The effects of ivshmem_enable_irqfd() was not undone on device reset.
->>>>>
->>>>> This manifested as:
->>>>> ivshmem_add_kvm_msi_virq: Assertion `!s->msi_vectors[vector].pdev' failed.
->>>>>
->>>>> when irqfd was enabled before reset and then enabled again after reset, making
->>>>> ivshmem_enable_irqfd() run for the second time.
->>>>>
->>>>> To reproduce, run:
->>>>>
->>>>>   ivshmem-server
->>>>>
->>>>> and QEMU with:
->>>>>
->>>>>   -device ivshmem-doorbell,chardev=iv
->>>>>   -chardev socket,path=/tmp/ivshmem_socket,id=iv
->>>>>
->>>>> then install the Windows driver, at the time of writing available at:
->>>>>
->>>>> https://github.com/virtio-win/kvm-guest-drivers-windows/tree/master/ivshmem
->>>>>
->>>>> and crash-reboot the guest by inducing a BSOD.
->>>>>
->>>>> Signed-off-by: Ladi Prosek <lprosek@redhat.com>
->>>>> ---
->>>>>  hw/misc/ivshmem.c | 24 +++++++++++++-----------
->>>>>  1 file changed, 13 insertions(+), 11 deletions(-)
->>>>>
->>>>> diff --git a/hw/misc/ivshmem.c b/hw/misc/ivshmem.c
->>>>> index d1bb246d12..4be0d2627b 100644
->>>>> --- a/hw/misc/ivshmem.c
->>>>> +++ b/hw/misc/ivshmem.c
->>>>> @@ -758,17 +758,6 @@ static void ivshmem_msix_vector_use(IVShmemState *s)
->>>>>      }
->>>>>  }
->>>>>
->>>>> -static void ivshmem_reset(DeviceState *d)
->>>>> -{
->>>>> -    IVShmemState *s = IVSHMEM_COMMON(d);
->>>>> -
->>>>> -    s->intrstatus = 0;
->>>>> -    s->intrmask = 0;
->>>>> -    if (ivshmem_has_feature(s, IVSHMEM_MSI)) {
->>>>> -        ivshmem_msix_vector_use(s);
->>>>> -    }
->>>>> -}
->>>>> -
->>>>>  static int ivshmem_setup_interrupts(IVShmemState *s, Error **errp)
->>>>>  {
->>>>>      /* allocate QEMU callback data for receiving interrupts */
->>>>> @@ -855,6 +844,19 @@ static void ivshmem_disable_irqfd(IVShmemState *s)
->>>>>
->>>>>  }
->>>>>
->>>>> +static void ivshmem_reset(DeviceState *d)
->>>>> +{
->>>>> +    IVShmemState *s = IVSHMEM_COMMON(d);
->>>>> +
->>>>> +    ivshmem_disable_irqfd(s);
->>>>> +
->>>>> +    s->intrstatus = 0;
->>>>> +    s->intrmask = 0;
->>>>> +    if (ivshmem_has_feature(s, IVSHMEM_MSI)) {
->>>>> +        ivshmem_msix_vector_use(s);
->>>>> +    }
->>>>> +}
->>>>> +
->>>>>  static void ivshmem_write_config(PCIDevice *pdev, uint32_t address,
->>>>>                                   uint32_t val, int len)
->>>>>  {
->>>>
->>>> Why are you moving ivshmem_reset()?  Makes the actual change harder to
->>>> see than necessary.
->>>
->>> ivshmem_disable_irqfd() is declared after ivshmem_reset() in the
->>> source file. I generally prefer to order static functions
->>> topologically if possible. If you'd prefer adding a forward decl
->>> instead (fewer lines touched, easier to bisect?) I can certainly do
->>> that. Thanks!
->>
->> Well, it compiles before your patch, your patch doesn't add any calls,
->> so I can't quite see why a forward declaration would be needed.
+> check_type() will now accept a DICT { 'type': TYPENAME, 'if': ... }
+> instead of a TYPENAME. This is the case in various situations where
+> implicit object types are allowed such as commands/events arguments
+> and return type, base and branches of union & alternate.
+
+Uh, do you mean where implicit object type are *not* allowed?
+
+> Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+> ---
+>  scripts/qapi.py                         | 20 ++++++++++++++++----
+>  tests/qapi-schema/qapi-schema-test.json | 12 +++++++++---
+>  tests/qapi-schema/qapi-schema-test.out  |  4 +++-
+>  3 files changed, 28 insertions(+), 8 deletions(-)
 >
-> It adds a call to ivshmem_disable_irqfd().
+> diff --git a/scripts/qapi.py b/scripts/qapi.py
+> index df2a304e8f..15711f96fa 100644
+> --- a/scripts/qapi.py
+> +++ b/scripts/qapi.py
+> @@ -696,7 +696,15 @@ def check_type(info, source, value, allow_array=3DFa=
+lse,
+>          return
+>=20=20
+>      if not allow_dict:
+> -        raise QAPISemError(info, "%s should be a type name" % source)
+> +        if isinstance(value, dict) and 'type' in value:
+> +            check_type(info, source, value['type'], allow_array,
+> +                       allow_dict, allow_optional, allow_metas)
+> +            if 'if' in value:
+> +                check_if(value, info)
+> +            check_unknown_keys(info, value, {'type', 'if'})
+> +            return
+> +        else:
+> +            raise QAPISemError(info, "%s should be a type name" % source)
 
-Note to self: patch review on Friday late afternoon is a bad idea.
+@allow_dict becomes a misnomer: dictionaries are now always allowed, but
+they have different meaning (implicit type vs. named type with
+additional attributes).
 
-I'd prefer the forward declaration.  Thanks!
+Rename to @allow_implicit?
+
+>=20=20
+>      if not isinstance(value, OrderedDict):
+>          raise QAPISemError(info,
+[...]
