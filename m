@@ -1,31 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55668)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45180)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1eNkGa-0005Pw-LM
-	for qemu-devel@nongnu.org; Sat, 09 Dec 2017 13:54:30 -0500
+	(envelope-from <bounces@canonical.com>) id 1eNmNr-0005ho-Mg
+	for qemu-devel@nongnu.org; Sat, 09 Dec 2017 16:10:08 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1eNkGX-000773-Hi
-	for qemu-devel@nongnu.org; Sat, 09 Dec 2017 13:54:28 -0500
-Received: from indium.canonical.com ([91.189.90.7]:36866)
+	(envelope-from <bounces@canonical.com>) id 1eNmNo-00075m-HJ
+	for qemu-devel@nongnu.org; Sat, 09 Dec 2017 16:10:07 -0500
+Received: from indium.canonical.com ([91.189.90.7]:37712)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1eNkGX-00076k-BM
-	for qemu-devel@nongnu.org; Sat, 09 Dec 2017 13:54:25 -0500
+	id 1eNmNo-000754-Ar
+	for qemu-devel@nongnu.org; Sat, 09 Dec 2017 16:10:04 -0500
 Received: from loganberry.canonical.com ([91.189.90.37])
 	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1eNkGU-0006rX-6U
-	for <qemu-devel@nongnu.org>; Sat, 09 Dec 2017 18:54:22 +0000
+	id 1eNmNm-0006Ox-EQ
+	for <qemu-devel@nongnu.org>; Sat, 09 Dec 2017 21:10:02 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 281642E80D2
-	for <qemu-devel@nongnu.org>; Sat,  9 Dec 2017 18:54:22 +0000 (UTC)
+	by loganberry.canonical.com (Postfix) with ESMTP id 5EC232E80C3
+	for <qemu-devel@nongnu.org>; Sat,  9 Dec 2017 21:10:02 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Sat, 09 Dec 2017 18:44:46 -0000
-From: john doe <1580459@bugs.launchpad.net>
+Date: Sat, 09 Dec 2017 20:56:45 -0000
+From: Clif Houck <me@clifhouck.com>
 Reply-To: Bug 1580459 <1580459@bugs.launchpad.net>
 Sender: bounces@canonical.com
 References: <20160511061916.21125.98809.malonedeb@wampee.canonical.com>
-Message-Id: <151284508640.10343.18224292895948971981.malone@wampee.canonical.com>
+Message-Id: <151285300564.11401.9820489603910819291.malone@soybean.canonical.com>
 Errors-To: bounces@canonical.com
 Subject: [Qemu-devel] [Bug 1580459] Re: Windows (10?) guest freezes entire
  host on shutdown if using PCI passthrough
@@ -39,9 +39,8 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-Enabling MSI interrupts works for me.  One note is that Windows updates
-will sometimes revert the changes so if this starts breaking after an
-update you may need to re-apply the registry changes.
+Updating NVIDIA drivers in the guest also seems to disable MSI for some
+reason. Oddly enough I did not run into the host hard locking though.
 
 -- =
 
