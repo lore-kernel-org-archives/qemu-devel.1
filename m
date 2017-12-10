@@ -1,22 +1,39 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60028)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45197)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <hpoussin@reactos.org>) id 1eO5OL-0007Is-L5
-	for qemu-devel@nongnu.org; Sun, 10 Dec 2017 12:27:55 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1eO68X-00020e-FA
+	for qemu-devel@nongnu.org; Sun, 10 Dec 2017 13:15:38 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <hpoussin@reactos.org>) id 1eO5OI-0000kq-Dp
-	for qemu-devel@nongnu.org; Sun, 10 Dec 2017 12:27:53 -0500
-Received: from iserv.reactos.org ([2a01:4f8:221:4c5::3]:57511)
+	(envelope-from <peter.maydell@linaro.org>) id 1eO68W-0002HN-EG
+	for qemu-devel@nongnu.org; Sun, 10 Dec 2017 13:15:37 -0500
+Received: from mail-ot0-x244.google.com ([2607:f8b0:4003:c0f::244]:34480)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <hpoussin@reactos.org>)
-	id 1eO5OI-0000iL-3s
-	for qemu-devel@nongnu.org; Sun, 10 Dec 2017 12:27:50 -0500
-From: =?UTF-8?q?Herv=C3=A9=20Poussineau?= <hpoussin@reactos.org>
-Date: Sun, 10 Dec 2017 18:27:03 +0100
-Message-Id: <20171210172703.27866-1-hpoussin@reactos.org>
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1eO68W-0002Gl-8q
+	for qemu-devel@nongnu.org; Sun, 10 Dec 2017 13:15:36 -0500
+Received: by mail-ot0-x244.google.com with SMTP id o23so13024663otd.1
+	for <qemu-devel@nongnu.org>; Sun, 10 Dec 2017 10:15:35 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH] smbus: do not immediately complete commands
+In-Reply-To: <CAHmME9rSEtwg=n1gtqOVh=Et5yn45Yveh3LEFj357aqRZXwwcQ@mail.gmail.com>
+References: <20171023122719.17199-1-Jason@zx2c4.com>
+	<CAFEAcA_PM5Fjx2Pk58h75p9vaZwFcusQdXuwy9tbDtc=EaoOJg@mail.gmail.com>
+	<10e16ca3-175b-9f34-65e7-031b883b7201@amsat.org>
+	<CAHmME9qtBiuAEnkCeuMd7EdeZveTVa4UOf+AQhMCFye0SYJY=Q@mail.gmail.com>
+	<20171026133445.kemzfgvpbmtcogsl@kamzik.brq.redhat.com>
+	<CAHmME9oyBvAV8FF9QMHyF46n8Ct6KZqThQVih2ipQmivD94Cag@mail.gmail.com>
+	<CAFEAcA8O6YyS1tSzaydckFpsqpb8HXgW5PJe-VTWud_5YGdW5A@mail.gmail.com>
+	<CAHmME9pE79krWx-zD=VGiScT4c=4TZ1wVxYFiF3m+8wsx9Fqeg@mail.gmail.com>
+	<CAFEAcA9XoeXDCQCmRBehntWSo0WGRBsaMDmC8QCqgU1K8jAF_A@mail.gmail.com>
+	<CAHmME9qSJSPjANce_cWN6nm=qJsncfczgk7PoPa0xkOHmZjLUA@mail.gmail.com>
+	<CAFEAcA-bKPNwJpcny=1azScO8bzHsi0Ou+m3rYPq-=v52Gf26g@mail.gmail.com>
+	<CAHmME9qNnqYEbW_m8LG0E0HBKUE38YjUodbBihnSi2k0FrZJtw@mail.gmail.com>
+	<CAFEAcA-5F2GMx9UNoH=LJAa-m1DXg2HW8PJZ47kurjx5x3NhWA@mail.gmail.com>
+	<CAHmME9rSEtwg=n1gtqOVh=Et5yn45Yveh3LEFj357aqRZXwwcQ@mail.gmail.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Sun, 10 Dec 2017 18:15:14 +0000
+Message-ID: <CAFEAcA9R4=+aTuvrkkOBTTFnu5jnOKaVWLY9t+2Hj+dQrtdaHA@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [Qemu-arm] [PATCH] hw/arm/virt: support 4 serial
+ ports
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,75 +42,28 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: =?UTF-8?q?Herv=C3=A9=20Poussineau?= <hpoussin@reactos.org>, "Michael S. Tsirkin" <mst@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
+To: "Jason A. Donenfeld" <Jason@zx2c4.com>
+Cc: Andrew Jones <drjones@redhat.com>, =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>, QEMU Trivial <qemu-trivial@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>
 
-PIIX4 errata says that "immediate polling of the Host Status Register BUSY
-bit may indicate that the SMBus is NOT busy."
-Due to this, some code does the following steps:
-(a) set parameters
-(b) start command
-(c) check for smbus busy bit set (to know that command started)
-(d) check for smbus busy bit not set (to know that command finished)
+On 8 December 2017 at 18:39, Jason A. Donenfeld <Jason@zx2c4.com> wrote:
+> On Fri, Dec 8, 2017 at 12:49 PM, Peter Maydell <peter.maydell@linaro.org> wrote:
+>> My suggestion is that we should add a second non-secure UART
+>> to the virt board, so if you're using secure=no then you
+>> get serial 1 and 2, and for secure=yes serial 1 is the first
+>> NS uart, serial 2 is the secure uart and serial 3 is the
+>> 2nd NS uart. (I don't really want to add a 4th uart unless
+>> there's some good reason to -- maybe we would turn out to
+>> want it for the secure side, for instance.)
 
-Let (c) happen, by immediately setting the busy bit, and really executing
-the command when status register has been read once.
+> I'm curious why you don't want to add a 4th UART. It seems trivial to
+> do, and the more the merrier? Or that's a silly attitude? Mostly just
+> curious about that, as having two personally suits my needs.
 
-This fixes a problem with AMIBIOS, which can now properly initialize the PIIX4.
+As I say, if we add it for the non-secure world we can't
+make it a secure uart later if that turns out to be what we need.
+The "4 uarts max" limit is a compile time one.
+(Also it uses physical address space in a region which is
+relatively small and which we might want for a different device.)
 
-Signed-off-by: Hervé Poussineau <hpoussin@reactos.org>
-
----
- hw/i2c/pm_smbus.c | 16 +++++++++++++++-
- 1 file changed, 15 insertions(+), 1 deletion(-)
-
-diff --git a/hw/i2c/pm_smbus.c b/hw/i2c/pm_smbus.c
-index 6fc3923f56..ec060d58cc 100644
---- a/hw/i2c/pm_smbus.c
-+++ b/hw/i2c/pm_smbus.c
-@@ -63,6 +63,9 @@ static void smb_transaction(PMSMBus *s)
-     I2CBus *bus = s->smbus;
-     int ret;
- 
-+    assert(s->smb_stat & STS_HOST_BUSY);
-+    s->smb_stat &= ~STS_HOST_BUSY;
-+
-     SMBUS_DPRINTF("SMBus trans addr=0x%02x prot=0x%02x\n", addr, prot);
-     /* Transaction isn't exec if STS_DEV_ERR bit set */
-     if ((s->smb_stat & STS_DEV_ERR) != 0)  {
-@@ -135,6 +138,13 @@ error:
- 
- }
- 
-+static void smb_transaction_start(PMSMBus *s)
-+{
-+    /* Do not execute immediately the command ; it will be
-+     * executed when guest will read SMB_STAT register */
-+    s->smb_stat |= STS_HOST_BUSY;
-+}
-+
- static void smb_ioport_writeb(void *opaque, hwaddr addr, uint64_t val,
-                               unsigned width)
- {
-@@ -150,7 +160,7 @@ static void smb_ioport_writeb(void *opaque, hwaddr addr, uint64_t val,
-     case SMBHSTCNT:
-         s->smb_ctl = val;
-         if (val & 0x40)
--            smb_transaction(s);
-+            smb_transaction_start(s);
-         break;
-     case SMBHSTCMD:
-         s->smb_cmd = val;
-@@ -182,6 +192,10 @@ static uint64_t smb_ioport_readb(void *opaque, hwaddr addr, unsigned width)
-     switch(addr) {
-     case SMBHSTSTS:
-         val = s->smb_stat;
-+        if (s->smb_stat & STS_HOST_BUSY) {
-+            /* execute command now */
-+            smb_transaction(s);
-+        }
-         break;
-     case SMBHSTCNT:
-         s->smb_index = 0;
--- 
-2.11.0
+thanks
+-- PMM
