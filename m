@@ -1,27 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60329)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36151)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1eNvGH-0002Kb-CG
-	for qemu-devel@nongnu.org; Sun, 10 Dec 2017 01:38:54 -0500
+	(envelope-from <programmingkidx@gmail.com>) id 1eNvkr-0007yb-AC
+	for qemu-devel@nongnu.org; Sun, 10 Dec 2017 02:10:30 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1eNvGE-0006B1-8I
-	for qemu-devel@nongnu.org; Sun, 10 Dec 2017 01:38:53 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:44812)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1eNvGD-0006Ad-VT
-	for qemu-devel@nongnu.org; Sun, 10 Dec 2017 01:38:50 -0500
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
-	[10.5.11.14])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 0CCF3C047B75
-	for <qemu-devel@nongnu.org>; Sun, 10 Dec 2017 06:38:49 +0000 (UTC)
-From: Peter Xu <peterx@redhat.com>
-Date: Sun, 10 Dec 2017 14:38:19 +0800
-Message-Id: <20171210063819.14892-6-peterx@redhat.com>
-In-Reply-To: <20171210063819.14892-1-peterx@redhat.com>
-References: <20171210063819.14892-1-peterx@redhat.com>
-Subject: [Qemu-devel] [PATCH 5/5] i8259: move TYPE_INTERRUPT_STATS_PROVIDER
- upper
+	(envelope-from <programmingkidx@gmail.com>) id 1eNvkn-0006UB-CF
+	for qemu-devel@nongnu.org; Sun, 10 Dec 2017 02:10:29 -0500
+Received: from mail-it0-x22b.google.com ([2607:f8b0:4001:c0b::22b]:36603)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <programmingkidx@gmail.com>)
+	id 1eNvkn-0006Tk-3Z
+	for qemu-devel@nongnu.org; Sun, 10 Dec 2017 02:10:25 -0500
+Received: by mail-it0-x22b.google.com with SMTP id d16so9969162itj.1
+	for <qemu-devel@nongnu.org>; Sat, 09 Dec 2017 23:10:24 -0800 (PST)
+From: Programmingkid <programmingkidx@gmail.com>
+Content-Type: text/plain; charset=us-ascii
+Content-Transfer-Encoding: quoted-printable
+Mime-Version: 1.0 (Mac OS X Mail 10.3 \(3273\))
+Message-Id: <20B182CA-4FA6-444D-87B1-46B04FFC81AE@gmail.com>
+Date: Sun, 10 Dec 2017 02:10:41 -0500
+Subject: [Qemu-devel] Adding more function keys support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,110 +27,13 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: "Michael S . Tsirkin" <mst@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, peterx@redhat.com
+To: "Daniel P. Berrange" <berrange@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>
 
-Now both classes (i8259, i8259-kvm) support this.  Move this upper to
-the common class code.
+On Macintosh keyboards there is a key called fn that is used to give the =
+function keys more functionality. Does this key exist in the keyboard =
+keys database?=20
 
-Signed-off-by: Peter Xu <peterx@redhat.com>
----
- hw/i386/kvm/i8259.c    | 7 -------
- hw/intc/i8259.c        | 7 -------
- hw/intc/i8259_common.c | 7 +++++++
- 3 files changed, 7 insertions(+), 14 deletions(-)
+Also could keys F16 to F24 (Q_KEY_CODE_F16 to Q_KEY_CODE_F24) be added =
+to the database?=20
 
-diff --git a/hw/i386/kvm/i8259.c b/hw/i386/kvm/i8259.c
-index 57abe091b0..b91e98074e 100644
---- a/hw/i386/kvm/i8259.c
-+++ b/hw/i386/kvm/i8259.c
-@@ -140,15 +140,12 @@ static void kvm_i8259_class_init(ObjectClass *klass, void *data)
-     KVMPICClass *kpc = KVM_PIC_CLASS(klass);
-     PICCommonClass *k = PIC_COMMON_CLASS(klass);
-     DeviceClass *dc = DEVICE_CLASS(klass);
--    InterruptStatsProviderClass *ic = INTERRUPT_STATS_PROVIDER_CLASS(klass);
- 
-     dc->reset     = kvm_pic_reset;
-     kpc->parent_realize = dc->realize;
-     dc->realize   = kvm_pic_realize;
-     k->pre_save   = kvm_pic_get;
-     k->post_load  = kvm_pic_put;
--    ic->get_statistics = pic_get_statistics;
--    ic->print_info = pic_print_info;
- }
- 
- static const TypeInfo kvm_i8259_info = {
-@@ -157,10 +154,6 @@ static const TypeInfo kvm_i8259_info = {
-     .instance_size = sizeof(PICCommonState),
-     .class_init = kvm_i8259_class_init,
-     .class_size = sizeof(KVMPICClass),
--    .interfaces = (InterfaceInfo[]) {
--        { TYPE_INTERRUPT_STATS_PROVIDER },
--        { }
--    },
- };
- 
- static void kvm_pic_register_types(void)
-diff --git a/hw/intc/i8259.c b/hw/intc/i8259.c
-index d9b9666aff..1602255a87 100644
---- a/hw/intc/i8259.c
-+++ b/hw/intc/i8259.c
-@@ -442,13 +442,10 @@ static void i8259_class_init(ObjectClass *klass, void *data)
- {
-     PICClass *k = PIC_CLASS(klass);
-     DeviceClass *dc = DEVICE_CLASS(klass);
--    InterruptStatsProviderClass *ic = INTERRUPT_STATS_PROVIDER_CLASS(klass);
- 
-     k->parent_realize = dc->realize;
-     dc->realize = pic_realize;
-     dc->reset = pic_reset;
--    ic->get_statistics = pic_get_statistics;
--    ic->print_info = pic_print_info;
- }
- 
- static const TypeInfo i8259_info = {
-@@ -457,10 +454,6 @@ static const TypeInfo i8259_info = {
-     .parent     = TYPE_PIC_COMMON,
-     .class_init = i8259_class_init,
-     .class_size = sizeof(PICClass),
--    .interfaces = (InterfaceInfo[]) {
--        { TYPE_INTERRUPT_STATS_PROVIDER },
--        { }
--    },
- };
- 
- static void pic_register_types(void)
-diff --git a/hw/intc/i8259_common.c b/hw/intc/i8259_common.c
-index 7efd2e8012..c75c880157 100644
---- a/hw/intc/i8259_common.c
-+++ b/hw/intc/i8259_common.c
-@@ -178,6 +178,7 @@ static Property pic_properties_common[] = {
- static void pic_common_class_init(ObjectClass *klass, void *data)
- {
-     DeviceClass *dc = DEVICE_CLASS(klass);
-+    InterruptStatsProviderClass *ic = INTERRUPT_STATS_PROVIDER_CLASS(klass);
- 
-     dc->vmsd = &vmstate_pic_common;
-     dc->props = pic_properties_common;
-@@ -189,6 +190,8 @@ static void pic_common_class_init(ObjectClass *klass, void *data)
-      * code.
-      */
-     dc->user_creatable = false;
-+    ic->get_statistics = pic_get_statistics;
-+    ic->print_info = pic_print_info;
- }
- 
- static const TypeInfo pic_common_type = {
-@@ -198,6 +201,10 @@ static const TypeInfo pic_common_type = {
-     .class_size = sizeof(PICCommonClass),
-     .class_init = pic_common_class_init,
-     .abstract = true,
-+    .interfaces = (InterfaceInfo[]) {
-+        { TYPE_INTERRUPT_STATS_PROVIDER },
-+        { }
-+    },
- };
- 
- static void pic_common_register_types(void)
--- 
-2.14.3
+Thank you.=20=
