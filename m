@@ -1,26 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60243)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60254)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1eNvFx-00026Y-V7
+	(envelope-from <peterx@redhat.com>) id 1eNvFy-00026Z-MU
 	for qemu-devel@nongnu.org; Sun, 10 Dec 2017 01:38:35 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1eNvFw-0005zx-9R
-	for qemu-devel@nongnu.org; Sun, 10 Dec 2017 01:38:33 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:41858)
+	(envelope-from <peterx@redhat.com>) id 1eNvFu-0005yw-Q1
+	for qemu-devel@nongnu.org; Sun, 10 Dec 2017 01:38:34 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:34844)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1eNvFw-0005zW-1C
-	for qemu-devel@nongnu.org; Sun, 10 Dec 2017 01:38:32 -0500
+	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1eNvFu-0005xh-Kn
+	for qemu-devel@nongnu.org; Sun, 10 Dec 2017 01:38:30 -0500
 Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
 	[10.5.11.14])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 3852D81DFE
-	for <qemu-devel@nongnu.org>; Sun, 10 Dec 2017 06:38:31 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id A8E694DAFB
+	for <qemu-devel@nongnu.org>; Sun, 10 Dec 2017 06:38:28 +0000 (UTC)
 From: Peter Xu <peterx@redhat.com>
-Date: Sun, 10 Dec 2017 14:38:15 +0800
-Message-Id: <20171210063819.14892-2-peterx@redhat.com>
-In-Reply-To: <20171210063819.14892-1-peterx@redhat.com>
-References: <20171210063819.14892-1-peterx@redhat.com>
-Subject: [Qemu-devel] [PATCH 1/5] i8259: convert DPRINTFs into trace
+Date: Sun, 10 Dec 2017 14:38:14 +0800
+Message-Id: <20171210063819.14892-1-peterx@redhat.com>
+Subject: [Qemu-devel] [PATCH 0/5] i8259: cleanups and enhancements
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,118 +30,31 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: "Michael S . Tsirkin" <mst@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, peterx@redhat.com
 
-One thing to mention is that in pic_set_irq() I need to uncomment a few
-lines in the macros to make sure IRQ value calculation is correct.
+It's mostly a cleanup, but patch 4 allows kvm-i8259 to support "info
+pic" and "info irq" too.
 
-Signed-off-by: Peter Xu <peterx@redhat.com>
----
- hw/intc/i8259.c      | 26 +++++++++++---------------
- hw/intc/trace-events |  7 +++++++
- 2 files changed, 18 insertions(+), 15 deletions(-)
+I'm thinking whether it'll be good to move on this work to spread
+these commands to IOAPICs too, by removing "info ioapic" command and
+let "info pic" dump the things altogether (after all I think ioapic is
+also one type of PIC).  Also, we can let ioapic to have statistics
+too.  Let me know if anyone thinks this can be useful/cleaner and want
+me to continue (which won't need too much time for sure).
 
-diff --git a/hw/intc/i8259.c b/hw/intc/i8259.c
-index fe9ecd6bd4..f12e0b27f1 100644
---- a/hw/intc/i8259.c
-+++ b/hw/intc/i8259.c
-@@ -30,17 +30,11 @@
- #include "qemu/log.h"
- #include "hw/isa/i8259_internal.h"
- #include "hw/intc/intc.h"
-+#include "trace.h"
- 
- /* debug PIC */
- //#define DEBUG_PIC
- 
--#ifdef DEBUG_PIC
--#define DPRINTF(fmt, ...)                                       \
--    do { printf("pic: " fmt , ## __VA_ARGS__); } while (0)
--#else
--#define DPRINTF(fmt, ...)
--#endif
--
- //#define DEBUG_IRQ_LATENCY
- //#define DEBUG_IRQ_COUNT
- 
-@@ -122,8 +116,7 @@ static void pic_update_irq(PICCommonState *s)
- 
-     irq = pic_get_irq(s);
-     if (irq >= 0) {
--        DPRINTF("pic%d: imr=%x irr=%x padd=%d\n",
--                s->master ? 0 : 1, s->imr, s->irr, s->priority_add);
-+        trace_pic_update_irq(s->master, s->imr, s->irr, s->priority_add);
-         qemu_irq_raise(s->int_out[0]);
-     } else {
-         qemu_irq_lower(s->int_out[0]);
-@@ -140,9 +133,11 @@ static void pic_set_irq(void *opaque, int irq, int level)
-     defined(DEBUG_IRQ_LATENCY)
-     int irq_index = s->master ? irq : irq + 8;
- #endif
-+
-+    trace_pic_set_irq(s->master, irq, level);
-+
- #if defined(DEBUG_PIC) || defined(DEBUG_IRQ_COUNT)
-     if (level != irq_level[irq_index]) {
--        DPRINTF("pic_set_irq: irq=%d level=%d\n", irq_index, level);
-         irq_level[irq_index] = level;
- #ifdef DEBUG_IRQ_COUNT
-         if (level == 1) {
-@@ -223,18 +218,18 @@ int pic_read_irq(DeviceState *d)
-         intno = s->irq_base + irq;
-     }
- 
--#if defined(DEBUG_PIC) || defined(DEBUG_IRQ_LATENCY)
-     if (irq == 2) {
-         irq = irq2 + 8;
-     }
--#endif
-+
- #ifdef DEBUG_IRQ_LATENCY
-     printf("IRQ%d latency=%0.3fus\n",
-            irq,
-            (double)(qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL) -
-                     irq_time[irq]) * 1000000.0 / NANOSECONDS_PER_SECOND);
- #endif
--    DPRINTF("pic_interrupt: irq=%d\n", irq);
-+
-+    trace_pic_interrupt(irq, intno);
-     return intno;
- }
- 
-@@ -289,7 +284,8 @@ static void pic_ioport_write(void *opaque, hwaddr addr64,
-     uint32_t val = val64;
-     int priority, cmd, irq;
- 
--    DPRINTF("write: addr=0x%02x val=0x%02x\n", addr, val);
-+    trace_pic_ioport_write(s->master, addr, val);
-+
-     if (addr == 0) {
-         if (val & 0x10) {
-             pic_init_reset(s);
-@@ -402,7 +398,7 @@ static uint64_t pic_ioport_read(void *opaque, hwaddr addr,
-             ret = s->imr;
-         }
-     }
--    DPRINTF("read: addr=0x%02" HWADDR_PRIx " val=0x%02x\n", addr, ret);
-+    trace_pic_ioport_read(s->master, addr, ret);
-     return ret;
- }
- 
-diff --git a/hw/intc/trace-events b/hw/intc/trace-events
-index b298fac7c6..c72b37c5cf 100644
---- a/hw/intc/trace-events
-+++ b/hw/intc/trace-events
-@@ -1,5 +1,12 @@
- # See docs/devel/tracing.txt for syntax documentation.
- 
-+# hw/intc/i8259.c
-+pic_update_irq(bool master, uint8_t imr, uint8_t irr, uint8_t padd) "master %d imr %"PRIu8" irr %"PRIu8" padd %"PRIu8
-+pic_set_irq(bool master, int irq, int level) "master %d irq %d level %d"
-+pic_interrupt(int irq, int intno) "irq %d intno %d"
-+pic_ioport_write(bool master, uint64_t addr, uint64_t val) "master %d addr 0x%"PRIx64" val 0x%"PRIx64
-+pic_ioport_read(bool master, uint64_t addr, int val) "master %d addr 0x%"PRIx64" val 0x%x"
-+
- # hw/intc/apic_common.c
- cpu_set_apic_base(uint64_t val) "0x%016"PRIx64
- cpu_get_apic_base(uint64_t val) "0x%016"PRIx64
+Please review.  Thanks,
+
+Peter Xu (5):
+  i8259: convert DPRINTFs into trace
+  i8259: use DEBUG_IRQ_COUNT always
+  i8259: generalize statistics into common code
+  kvm-i8259: support "info pic" and "info irq"
+  i8259: move TYPE_INTERRUPT_STATS_PROVIDER upper
+
+ hw/i386/kvm/i8259.c             |  1 +
+ hw/intc/i8259.c                 | 86 ++++++-----------------------------------
+ hw/intc/i8259_common.c          | 49 +++++++++++++++++++++++
+ hw/intc/trace-events            |  7 ++++
+ include/hw/isa/i8259_internal.h |  7 +++-
+ 5 files changed, 74 insertions(+), 76 deletions(-)
+
 -- 
 2.14.3
