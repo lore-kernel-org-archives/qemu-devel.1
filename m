@@ -1,22 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40534)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42708)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <programmingkidx@gmail.com>) id 1eO7lR-0002s0-SY
-	for qemu-devel@nongnu.org; Sun, 10 Dec 2017 14:59:55 -0500
+	(envelope-from <no-reply@patchew.org>) id 1eO7sh-0007lY-Pm
+	for qemu-devel@nongnu.org; Sun, 10 Dec 2017 15:07:24 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <programmingkidx@gmail.com>) id 1eO7lN-00080h-HZ
-	for qemu-devel@nongnu.org; Sun, 10 Dec 2017 14:59:53 -0500
-Received: from mail-it0-x242.google.com ([2607:f8b0:4001:c0b::242]:42257)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <programmingkidx@gmail.com>)
-	id 1eO7lN-00080M-Ax
-	for qemu-devel@nongnu.org; Sun, 10 Dec 2017 14:59:49 -0500
-Received: by mail-it0-x242.google.com with SMTP id p139so11352129itb.1
-	for <qemu-devel@nongnu.org>; Sun, 10 Dec 2017 11:59:49 -0800 (PST)
-From: John Arbuckle <programmingkidx@gmail.com>
-Date: Sun, 10 Dec 2017 14:59:31 -0500
-Message-Id: <20171210195931.26042-1-programmingkidx@gmail.com>
-Subject: [Qemu-devel] [PATCH] Add ability for user to specify mouse ungrab
- key
+	(envelope-from <no-reply@patchew.org>) id 1eO7se-0007Zw-IA
+	for qemu-devel@nongnu.org; Sun, 10 Dec 2017 15:07:23 -0500
+Resent-Message-Id: <E1eO7se-0007Zw-IA@eggs.gnu.org>
+Received: from sender-of-o52.zoho.com ([135.84.80.217]:21436)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
+	id 1eO7se-0007Vd-8U
+	for qemu-devel@nongnu.org; Sun, 10 Dec 2017 15:07:20 -0500
+Reply-To: <qemu-devel@nongnu.org>
+Message-ID: <151293641170.23194.7682706265194007617@bfc911d3884a>
+In-Reply-To: <20171210195931.26042-1-programmingkidx@gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+From: no-reply@patchew.org
+Date: Sun, 10 Dec 2017 12:06:53 -0800 (PST)
+Subject: Re: [Qemu-devel] [PATCH] Add ability for user to specify mouse
+ ungrab key
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,192 +29,35 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>, Gerd Hoffmann <kraxel@redhat.com>, qemu-devel@nongnu.org
-Cc: John Arbuckle <programmingkidx@gmail.com>
+To: programmingkidx@gmail.com
+Cc: famz@redhat.com, peter.maydell@linaro.org, kraxel@redhat.com, qemu-devel@nongnu.org
 
-Currently the ungrab keys for the Cocoa and GTK interface are Control-Alt-g.
-This combination may not be very fun for the user to have to enter, so we
-now enable the user to specify their own key as the ungrab key. Since the 
-function keys are the keys that don't tend to be used that often and are
-usually available, they will be the ones the user can pick to be the ungrab
-key.
-
-Signed-off-by: John Arbuckle <programmingkidx@gmail.com>
----
- qemu-options.hx |  2 ++
- ui/cocoa.m      | 20 ++++++++++++--
- vl.c            | 85 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++-
- 3 files changed, 104 insertions(+), 3 deletions(-)
-
-diff --git a/qemu-options.hx b/qemu-options.hx
-index f11c4ac960..0a727ea50a 100644
---- a/qemu-options.hx
-+++ b/qemu-options.hx
-@@ -4472,6 +4472,8 @@ contents of @code{iv.b64} to the second secret
- 
- ETEXI
- 
-+DEF("ungrab", HAS_ARG, QEMU_OPTION_ungrab, \
-+    "-ungrab <key>", QEMU_ARCH_ALL)
- 
- HXCOMM This is the last statement. Insert new options before this line!
- STEXI
-diff --git a/ui/cocoa.m b/ui/cocoa.m
-index 330ccebf90..8dc603adf0 100644
---- a/ui/cocoa.m
-+++ b/ui/cocoa.m
-@@ -106,6 +106,9 @@
- NSTextField *pauseLabel;
- NSArray * supportedImageFileTypes;
- 
-+int get_ungrab_key_value(void);
-+const char * get_ungrab_key_name(void);
-+
- // Mac to QKeyCode conversion
- const int mac_to_qkeycode_map[] = {
-     [kVK_ANSI_A] = Q_KEY_CODE_A,
-@@ -678,6 +681,12 @@ - (void) handleEvent:(NSEvent *)event
-         case NSEventTypeKeyDown:
-             keycode = cocoa_keycode_to_qemu([event keyCode]);
- 
-+            // if the user wants to release the mouse grab
-+            if (keycode == get_ungrab_key_value()) {
-+                [self ungrabMouse];
-+                return;
-+            }
-+
-             // forward command key combos to the host UI unless the mouse is grabbed
-             if (!isMouseGrabbed && ([event modifierFlags] & NSEventModifierFlagCommand)) {
-                 [NSApp sendEvent:event];
-@@ -842,10 +851,17 @@ - (void) grabMouse
-     COCOA_DEBUG("QemuCocoaView: grabMouse\n");
- 
-     if (!isFullscreen) {
-+        NSString * message_string;
-+        if (get_ungrab_key_value() < 0) {
-+            message_string = [NSString stringWithFormat: @"- (Press ctrl + alt + g to release Mouse"];
-+        } else {
-+            message_string = [NSString stringWithFormat: @"- (Press ctrl + alt + g or %s to release Mouse", get_ungrab_key_name()];
-+        }
-+
-         if (qemu_name)
--            [normalWindow setTitle:[NSString stringWithFormat:@"QEMU %s - (Press ctrl + alt + g to release Mouse)", qemu_name]];
-+            [normalWindow setTitle:[NSString stringWithFormat: @"QEMU %s %@", qemu_name, message_string]];
-         else
--            [normalWindow setTitle:@"QEMU - (Press ctrl + alt + g to release Mouse)"];
-+            [normalWindow setTitle:[NSString stringWithFormat: @"QEMU %@", message_string]];
-     }
-     [self hideCursor];
-     if (!isAbsoluteEnabled) {
-diff --git a/vl.c b/vl.c
-index 1ad1c04637..58a606e8a3 100644
---- a/vl.c
-+++ b/vl.c
-@@ -185,7 +185,8 @@ bool boot_strict;
- uint8_t *boot_splash_filedata;
- size_t boot_splash_filedata_size;
- uint8_t qemu_extra_params_fw[2];
--
-+int ungrab_key_value = -1;
-+char *ungrab_key_name;
- int icount_align_option;
- 
- /* The bytes in qemu_uuid are in the order specified by RFC4122, _not_ in the
-@@ -3088,6 +3089,85 @@ static void register_global_properties(MachineState *ms)
-     user_register_global_props();
- }
- 
-+/* Sets the mouse ungrab key to what the user wants */
-+static void set_ungrab_key(const char *new_key)
-+{
-+    const char *keys[] = {
-+        [0 ... 0xff]    = "",
-+        [Q_KEY_CODE_F1] = "f1",
-+        [Q_KEY_CODE_F2] = "f2",
-+        [Q_KEY_CODE_F3] = "f3",
-+        [Q_KEY_CODE_F4] = "f4",
-+        [Q_KEY_CODE_F5] = "f5",
-+        [Q_KEY_CODE_F6] = "f6",
-+        [Q_KEY_CODE_F7] = "f7",
-+        [Q_KEY_CODE_F8] = "f8",
-+        [Q_KEY_CODE_F9] = "f9",
-+        [Q_KEY_CODE_F10] = "f10",
-+        [Q_KEY_CODE_F11] = "f11",
-+        [Q_KEY_CODE_F12] = "f12",
-+        [Q_KEY_CODE_PRINT] = "f13",
-+        [Q_KEY_CODE_SCROLL_LOCK] = "f14",
-+        [Q_KEY_CODE_PAUSE] = "f15",
-+
-+#if 0  /* remove this once these function keys are defined */
-+        [Q_KEY_CODE_F16] = "f16",
-+        [Q_KEY_CODE_F17] = "f17",
-+        [Q_KEY_CODE_F18] = "f18",
-+        [Q_KEY_CODE_F19] = "f19",
-+        [Q_KEY_CODE_F20] = "f20",
-+        [Q_KEY_CODE_F21] = "f21",
-+        [Q_KEY_CODE_F22] = "f22",
-+        [Q_KEY_CODE_F23] = "f23",
-+        [Q_KEY_CODE_F24] = "f24",
-+        [Q_KEY_CODE_FUNCTION] = "fn",
-+#endif
-+    };
-+
-+    int key_value = -1;
-+
-+    /* see if the user's key is recognized */
-+    for (int i = 0; i < ARRAY_SIZE(keys); i++) {
-+        if (strcmp(keys[i], new_key) == 0) {
-+            key_value = i;
-+            break;
-+        }
-+    }
-+
-+    /* if the user's key isn't recognized print the usable keys */
-+    if (key_value == -1) {
-+        printf("Unrecognized key: %s\n", new_key);
-+        printf("Usable ungrab keys: ");
-+        for (int i = 0; i < ARRAY_SIZE(keys); i++) {
-+            if (strlen(keys[i]) > 0) { /* filters out undefined values */
-+                printf("%s ", keys[i]);
-+            }
-+        }
-+        printf("\n\n");
-+        exit(1);
-+    }
-+
-+    ungrab_key_name = (char *) malloc(4 * sizeof(char));
-+    strncpy(ungrab_key_name, new_key, 3);
-+    ungrab_key_value = key_value;
-+}
-+
-+int get_ungrab_key_value(void);
-+
-+/* Returns the user specified ungrab key's value or -1 if not specified */
-+int get_ungrab_key_value(void)
-+{
-+    return ungrab_key_value;
-+}
-+
-+const char *get_ungrab_key_name(void);
-+
-+/* Returns the name of the user specified ungrab key */
-+const char *get_ungrab_key_name(void)
-+{
-+    return ungrab_key_name;
-+}
-+
- int main(int argc, char **argv, char **envp)
- {
-     int i;
-@@ -4204,6 +4284,9 @@ int main(int argc, char **argv, char **envp)
-                     exit(1);
-                 }
-                 break;
-+            case QEMU_OPTION_ungrab:
-+                set_ungrab_key(optarg);
-+                break;
-             default:
-                 os_parse_cmd_args(popt->index, optarg);
-             }
--- 
-2.14.3 (Apple Git-98)
+SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
+LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKTWVzc2FnZS1pZDogMjAx
+NzEyMTAxOTU5MzEuMjYwNDItMS1wcm9ncmFtbWluZ2tpZHhAZ21haWwuY29tClN1YmplY3Q6IFtR
+ZW11LWRldmVsXSBbUEFUQ0hdIEFkZCBhYmlsaXR5IGZvciB1c2VyIHRvIHNwZWNpZnkgbW91c2Ug
+dW5ncmFiIGtleQpUeXBlOiBzZXJpZXMKCj09PSBURVNUIFNDUklQVCBCRUdJTiA9PT0KIyEvYmlu
+L2Jhc2gKCkJBU0U9YmFzZQpuPTEKdG90YWw9JChnaXQgbG9nIC0tb25lbGluZSAkQkFTRS4uIHwg
+d2MgLWwpCmZhaWxlZD0wCgpnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVsaW1pdCAwCmdp
+dCBjb25maWcgLS1sb2NhbCBkaWZmLnJlbmFtZXMgVHJ1ZQoKY29tbWl0cz0iJChnaXQgbG9nIC0t
+Zm9ybWF0PSVIIC0tcmV2ZXJzZSAkQkFTRS4uKSIKZm9yIGMgaW4gJGNvbW1pdHM7IGRvCiAgICBl
+Y2hvICJDaGVja2luZyBQQVRDSCAkbi8kdG90YWw6ICQoZ2l0IGxvZyAtbiAxIC0tZm9ybWF0PSVz
+ICRjKS4uLiIKICAgIGlmICEgZ2l0IHNob3cgJGMgLS1mb3JtYXQ9ZW1haWwgfCAuL3NjcmlwdHMv
+Y2hlY2twYXRjaC5wbCAtLW1haWxiYWNrIC07IHRoZW4KICAgICAgICBmYWlsZWQ9MQogICAgICAg
+IGVjaG8KICAgIGZpCiAgICBuPSQoKG4rMSkpCmRvbmUKCmV4aXQgJGZhaWxlZAo9PT0gVEVTVCBT
+Q1JJUFQgRU5EID09PQoKVXBkYXRpbmcgM2M4Y2Y1YTljMjFmZjg3ODIxNjRkMWRlZjdmNDRiZDg4
+ODcxMzM4NApTd2l0Y2hlZCB0byBhIG5ldyBicmFuY2ggJ3Rlc3QnCjI3NzEyZDYyMDAgQWRkIGFi
+aWxpdHkgZm9yIHVzZXIgdG8gc3BlY2lmeSBtb3VzZSB1bmdyYWIga2V5Cgo9PT0gT1VUUFVUIEJF
+R0lOID09PQpDaGVja2luZyBQQVRDSCAxLzE6IEFkZCBhYmlsaXR5IGZvciB1c2VyIHRvIHNwZWNp
+ZnkgbW91c2UgdW5ncmFiIGtleS4uLgpFUlJPUjogaWYgdGhpcyBjb2RlIGlzIHJlZHVuZGFudCBj
+b25zaWRlciByZW1vdmluZyBpdAojMTE1OiBGSUxFOiB2bC5jOjMxMTM6CisjaWYgMCAgLyogcmVt
+b3ZlIHRoaXMgb25jZSB0aGVzZSBmdW5jdGlvbiBrZXlzIGFyZSBkZWZpbmVkICovCgpFUlJPUjog
+ZXh0ZXJucyBzaG91bGQgYmUgYXZvaWRlZCBpbiAuYyBmaWxlcwojMTU3OiBGSUxFOiB2bC5jOjMx
+NTU6CitpbnQgZ2V0X3VuZ3JhYl9rZXlfdmFsdWUodm9pZCk7Cgp0b3RhbDogMiBlcnJvcnMsIDAg
+d2FybmluZ3MsIDE1MSBsaW5lcyBjaGVja2VkCgpZb3VyIHBhdGNoIGhhcyBzdHlsZSBwcm9ibGVt
+cywgcGxlYXNlIHJldmlldy4gIElmIGFueSBvZiB0aGVzZSBlcnJvcnMKYXJlIGZhbHNlIHBvc2l0
+aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRhaW5lciwgc2VlCkNIRUNLUEFUQ0ggaW4gTUFJ
+TlRBSU5FUlMuCgo9PT0gT1VUUFVUIEVORCA9PT0KClRlc3QgY29tbWFuZCBleGl0ZWQgd2l0aCBj
+b2RlOiAxCgoKLS0tCkVtYWlsIGdlbmVyYXRlZCBhdXRvbWF0aWNhbGx5IGJ5IFBhdGNoZXcgW2h0
+dHA6Ly9wYXRjaGV3Lm9yZy9dLgpQbGVhc2Ugc2VuZCB5b3VyIGZlZWRiYWNrIHRvIHBhdGNoZXct
+ZGV2ZWxAZnJlZWxpc3RzLm9yZw==
