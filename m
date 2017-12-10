@@ -1,26 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42708)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58150)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1eO7sh-0007lY-Pm
-	for qemu-devel@nongnu.org; Sun, 10 Dec 2017 15:07:24 -0500
+	(envelope-from <bounces@canonical.com>) id 1eOAk7-0002nN-W6
+	for qemu-devel@nongnu.org; Sun, 10 Dec 2017 18:10:45 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1eO7se-0007Zw-IA
-	for qemu-devel@nongnu.org; Sun, 10 Dec 2017 15:07:23 -0500
-Resent-Message-Id: <E1eO7se-0007Zw-IA@eggs.gnu.org>
-Received: from sender-of-o52.zoho.com ([135.84.80.217]:21436)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
-	id 1eO7se-0007Vd-8U
-	for qemu-devel@nongnu.org; Sun, 10 Dec 2017 15:07:20 -0500
-Reply-To: <qemu-devel@nongnu.org>
-Message-ID: <151293641170.23194.7682706265194007617@bfc911d3884a>
-In-Reply-To: <20171210195931.26042-1-programmingkidx@gmail.com>
+	(envelope-from <bounces@canonical.com>) id 1eOAk4-0002p0-Ns
+	for qemu-devel@nongnu.org; Sun, 10 Dec 2017 18:10:43 -0500
+Received: from indium.canonical.com ([91.189.90.7]:56280)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1eOAk4-0002nu-D6
+	for qemu-devel@nongnu.org; Sun, 10 Dec 2017 18:10:40 -0500
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1eOAk3-0000Wk-AW
+	for <qemu-devel@nongnu.org>; Sun, 10 Dec 2017 23:10:39 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 47BA02E806B
+	for <qemu-devel@nongnu.org>; Sun, 10 Dec 2017 23:10:39 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Sun, 10 Dec 2017 12:06:53 -0800 (PST)
-Subject: Re: [Qemu-devel] [PATCH] Add ability for user to specify mouse
- ungrab key
+Content-Transfer-Encoding: quoted-printable
+Date: Sun, 10 Dec 2017 23:05:31 -0000
+From: John Paul Adrian Glaubitz <glaubitz@physik.fu-berlin.de>
+Reply-To: Bug 1737444 <1737444@bugs.launchpad.net>
+Sender: bounces@canonical.com
+Message-Id: <151294713207.10703.11276532235992679828.malonedeb@wampee.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1737444] [NEW] gccgo setcontext conftest crashes
+ qemu-sh4
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,35 +36,271 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: programmingkidx@gmail.com
-Cc: famz@redhat.com, peter.maydell@linaro.org, kraxel@redhat.com, qemu-devel@nongnu.org
+To: qemu-devel@nongnu.org
 
-SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
-LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKTWVzc2FnZS1pZDogMjAx
-NzEyMTAxOTU5MzEuMjYwNDItMS1wcm9ncmFtbWluZ2tpZHhAZ21haWwuY29tClN1YmplY3Q6IFtR
-ZW11LWRldmVsXSBbUEFUQ0hdIEFkZCBhYmlsaXR5IGZvciB1c2VyIHRvIHNwZWNpZnkgbW91c2Ug
-dW5ncmFiIGtleQpUeXBlOiBzZXJpZXMKCj09PSBURVNUIFNDUklQVCBCRUdJTiA9PT0KIyEvYmlu
-L2Jhc2gKCkJBU0U9YmFzZQpuPTEKdG90YWw9JChnaXQgbG9nIC0tb25lbGluZSAkQkFTRS4uIHwg
-d2MgLWwpCmZhaWxlZD0wCgpnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVsaW1pdCAwCmdp
-dCBjb25maWcgLS1sb2NhbCBkaWZmLnJlbmFtZXMgVHJ1ZQoKY29tbWl0cz0iJChnaXQgbG9nIC0t
-Zm9ybWF0PSVIIC0tcmV2ZXJzZSAkQkFTRS4uKSIKZm9yIGMgaW4gJGNvbW1pdHM7IGRvCiAgICBl
-Y2hvICJDaGVja2luZyBQQVRDSCAkbi8kdG90YWw6ICQoZ2l0IGxvZyAtbiAxIC0tZm9ybWF0PSVz
-ICRjKS4uLiIKICAgIGlmICEgZ2l0IHNob3cgJGMgLS1mb3JtYXQ9ZW1haWwgfCAuL3NjcmlwdHMv
-Y2hlY2twYXRjaC5wbCAtLW1haWxiYWNrIC07IHRoZW4KICAgICAgICBmYWlsZWQ9MQogICAgICAg
-IGVjaG8KICAgIGZpCiAgICBuPSQoKG4rMSkpCmRvbmUKCmV4aXQgJGZhaWxlZAo9PT0gVEVTVCBT
-Q1JJUFQgRU5EID09PQoKVXBkYXRpbmcgM2M4Y2Y1YTljMjFmZjg3ODIxNjRkMWRlZjdmNDRiZDg4
-ODcxMzM4NApTd2l0Y2hlZCB0byBhIG5ldyBicmFuY2ggJ3Rlc3QnCjI3NzEyZDYyMDAgQWRkIGFi
-aWxpdHkgZm9yIHVzZXIgdG8gc3BlY2lmeSBtb3VzZSB1bmdyYWIga2V5Cgo9PT0gT1VUUFVUIEJF
-R0lOID09PQpDaGVja2luZyBQQVRDSCAxLzE6IEFkZCBhYmlsaXR5IGZvciB1c2VyIHRvIHNwZWNp
-ZnkgbW91c2UgdW5ncmFiIGtleS4uLgpFUlJPUjogaWYgdGhpcyBjb2RlIGlzIHJlZHVuZGFudCBj
-b25zaWRlciByZW1vdmluZyBpdAojMTE1OiBGSUxFOiB2bC5jOjMxMTM6CisjaWYgMCAgLyogcmVt
-b3ZlIHRoaXMgb25jZSB0aGVzZSBmdW5jdGlvbiBrZXlzIGFyZSBkZWZpbmVkICovCgpFUlJPUjog
-ZXh0ZXJucyBzaG91bGQgYmUgYXZvaWRlZCBpbiAuYyBmaWxlcwojMTU3OiBGSUxFOiB2bC5jOjMx
-NTU6CitpbnQgZ2V0X3VuZ3JhYl9rZXlfdmFsdWUodm9pZCk7Cgp0b3RhbDogMiBlcnJvcnMsIDAg
-d2FybmluZ3MsIDE1MSBsaW5lcyBjaGVja2VkCgpZb3VyIHBhdGNoIGhhcyBzdHlsZSBwcm9ibGVt
-cywgcGxlYXNlIHJldmlldy4gIElmIGFueSBvZiB0aGVzZSBlcnJvcnMKYXJlIGZhbHNlIHBvc2l0
-aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRhaW5lciwgc2VlCkNIRUNLUEFUQ0ggaW4gTUFJ
-TlRBSU5FUlMuCgo9PT0gT1VUUFVUIEVORCA9PT0KClRlc3QgY29tbWFuZCBleGl0ZWQgd2l0aCBj
-b2RlOiAxCgoKLS0tCkVtYWlsIGdlbmVyYXRlZCBhdXRvbWF0aWNhbGx5IGJ5IFBhdGNoZXcgW2h0
-dHA6Ly9wYXRjaGV3Lm9yZy9dLgpQbGVhc2Ugc2VuZCB5b3VyIGZlZWRiYWNrIHRvIHBhdGNoZXct
-ZGV2ZWxAZnJlZWxpc3RzLm9yZw==
+Public bug reported:
+
+While testing gccgo on sh4 to add SH platform definitions to libgo, I
+discovered that the following conftest program which is part of the
+libgo configure script crashes on qemu-sh4:
+
+(sid-sh4-sbuild)root@z6:/# cat setcontext.c
+#include <pthread.h>                                                       =
+                                                                           =
+                                                                           =
+                                              =
+
+#include <stdlib.h>                                                        =
+                                                                           =
+                                                                           =
+                                              =
+
+#include <ucontext.h>                                                      =
+                                                                           =
+                                                                           =
+                                              =
+
+#include <unistd.h>                                                        =
+                                                                           =
+                                                                           =
+                                              =
+
+
+__thread int tls;
+
+static char stack[10 * 1024 * 1024];
+static ucontext_t c;
+
+/* Called via makecontext/setcontext.  */
+
+static void
+cfn (void)
+{
+  exit (tls);
+}
+
+/* Called via pthread_create.  */
+
+static void *
+tfn (void *dummy)
+{
+  /* The thread should still see this value after calling
+     setcontext.  */
+  tls =3D 0;
+
+  setcontext (&c);
+
+  /* The call to setcontext should not return.  */
+  abort ();
+}
+
+int
+main ()
+{
+  pthread_t tid;
+
+  /* The thread should not see this value.  */
+  tls =3D 1;
+
+  if (getcontext (&c) < 0)
+    abort ();
+
+  c.uc_stack.ss_sp =3D stack;
+#ifdef MAKECONTEXT_STACK_TOP                                               =
+                                                                           =
+                                                                           =
+                                              =
+
+  c.uc_stack.ss_sp +=3D sizeof stack;
+#endif                                                                     =
+                                                                           =
+                                                                           =
+                                              =
+
+  c.uc_stack.ss_flags =3D 0;
+  c.uc_stack.ss_size =3D sizeof stack;
+  c.uc_link =3D NULL;
+  makecontext (&c, cfn, 0);
+
+  if (pthread_create (&tid, NULL, tfn, NULL) !=3D 0)
+    abort ();
+
+  if (pthread_join (tid, NULL) !=3D 0)
+    abort ();
+
+  /* The thread should have called exit.  */
+  abort ();
+}
+
+(sid-sh4-sbuild)root@z6:/# gcc -o setcontext -lpthread setcontext.c
+(sid-sh4-sbuild)root@z6:/# ./setcontext =
+
+Unhandled trap: 0x180
+pc=3D0x7f69235e sr=3D0x00000000 pr=3D0x00400710 fpscr=3D0x00080000
+spc=3D0x00000000 ssr=3D0x00000000 gbr=3D0x7f658478 vbr=3D0x00000000
+sgr=3D0x00000000 dbr=3D0x00000000 delayed_pc=3D0x7f692320 fpul=3D0x00000000
+r0=3D0x00e11158 r1=3D0x00000000 r2=3D0x00000001 r3=3D0x7ffff2e0
+r4=3D0x00e11068 r5=3D0x7ffff314 r6=3D0x7ffff31c r7=3D0x00000000
+r8=3D0x004007b0 r9=3D0x00000000 r10=3D0x00000000 r11=3D0x00000000
+r12=3D0x7f79ac54 r13=3D0x00000000 r14=3D0x7ffff288 r15=3D0x7ffff288
+r16=3D0x00000000 r17=3D0x00000000 r18=3D0x00000000 r19=3D0x00000000
+r20=3D0x00000000 r21=3D0x00000000 r22=3D0x00000000 r23=3D0x00000000
+(sid-sh4-sbuild)root@z6:/#
+
+The same code works fine on my Renesas SH7785LCR evaluation board:
+
+root@tirpitz:~> uname -a
+Linux tirpitz 3.16.7-ckt7 #8 PREEMPT Fri Oct 21 18:47:41 CEST 2016 sh4a GNU=
+/Linux
+root@tirpitz:~> gcc -o setcontext setcontext.c  -lpthread
+root@tirpitz:~> ./setcontext =
+
+root@tirpitz:~> echo $?
+0
+root@tirpitz:~>
+
+Due to this bug, it is not possible to compile gcc-7 with the Go
+frontend enabled on qemu-sh4.
+
+** Affects: qemu
+     Importance: Undecided
+         Status: New
+
+-- =
+
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1737444
+
+Title:
+  gccgo setcontext conftest crashes qemu-sh4
+
+Status in QEMU:
+  New
+
+Bug description:
+  While testing gccgo on sh4 to add SH platform definitions to libgo, I
+  discovered that the following conftest program which is part of the
+  libgo configure script crashes on qemu-sh4:
+
+  (sid-sh4-sbuild)root@z6:/# cat setcontext.c
+  #include <pthread.h>                                                     =
+                                                                           =
+                                                                           =
+                                                =
+
+  #include <stdlib.h>                                                      =
+                                                                           =
+                                                                           =
+                                                =
+
+  #include <ucontext.h>                                                    =
+                                                                           =
+                                                                           =
+                                                =
+
+  #include <unistd.h>                                                      =
+                                                                           =
+                                                                           =
+                                                =
+
+
+  __thread int tls;
+
+  static char stack[10 * 1024 * 1024];
+  static ucontext_t c;
+
+  /* Called via makecontext/setcontext.  */
+
+  static void
+  cfn (void)
+  {
+    exit (tls);
+  }
+
+  /* Called via pthread_create.  */
+
+  static void *
+  tfn (void *dummy)
+  {
+    /* The thread should still see this value after calling
+       setcontext.  */
+    tls =3D 0;
+
+    setcontext (&c);
+
+    /* The call to setcontext should not return.  */
+    abort ();
+  }
+
+  int
+  main ()
+  {
+    pthread_t tid;
+
+    /* The thread should not see this value.  */
+    tls =3D 1;
+
+    if (getcontext (&c) < 0)
+      abort ();
+
+    c.uc_stack.ss_sp =3D stack;
+  #ifdef MAKECONTEXT_STACK_TOP                                             =
+                                                                           =
+                                                                           =
+                                                =
+
+    c.uc_stack.ss_sp +=3D sizeof stack;
+  #endif                                                                   =
+                                                                           =
+                                                                           =
+                                                =
+
+    c.uc_stack.ss_flags =3D 0;
+    c.uc_stack.ss_size =3D sizeof stack;
+    c.uc_link =3D NULL;
+    makecontext (&c, cfn, 0);
+
+    if (pthread_create (&tid, NULL, tfn, NULL) !=3D 0)
+      abort ();
+
+    if (pthread_join (tid, NULL) !=3D 0)
+      abort ();
+
+    /* The thread should have called exit.  */
+    abort ();
+  }
+
+  (sid-sh4-sbuild)root@z6:/# gcc -o setcontext -lpthread setcontext.c
+  (sid-sh4-sbuild)root@z6:/# ./setcontext =
+
+  Unhandled trap: 0x180
+  pc=3D0x7f69235e sr=3D0x00000000 pr=3D0x00400710 fpscr=3D0x00080000
+  spc=3D0x00000000 ssr=3D0x00000000 gbr=3D0x7f658478 vbr=3D0x00000000
+  sgr=3D0x00000000 dbr=3D0x00000000 delayed_pc=3D0x7f692320 fpul=3D0x000000=
+00
+  r0=3D0x00e11158 r1=3D0x00000000 r2=3D0x00000001 r3=3D0x7ffff2e0
+  r4=3D0x00e11068 r5=3D0x7ffff314 r6=3D0x7ffff31c r7=3D0x00000000
+  r8=3D0x004007b0 r9=3D0x00000000 r10=3D0x00000000 r11=3D0x00000000
+  r12=3D0x7f79ac54 r13=3D0x00000000 r14=3D0x7ffff288 r15=3D0x7ffff288
+  r16=3D0x00000000 r17=3D0x00000000 r18=3D0x00000000 r19=3D0x00000000
+  r20=3D0x00000000 r21=3D0x00000000 r22=3D0x00000000 r23=3D0x00000000
+  (sid-sh4-sbuild)root@z6:/#
+
+  The same code works fine on my Renesas SH7785LCR evaluation board:
+
+  root@tirpitz:~> uname -a
+  Linux tirpitz 3.16.7-ckt7 #8 PREEMPT Fri Oct 21 18:47:41 CEST 2016 sh4a G=
+NU/Linux
+  root@tirpitz:~> gcc -o setcontext setcontext.c  -lpthread
+  root@tirpitz:~> ./setcontext =
+
+  root@tirpitz:~> echo $?
+  0
+  root@tirpitz:~>
+
+  Due to this bug, it is not possible to compile gcc-7 with the Go
+  frontend enabled on qemu-sh4.
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1737444/+subscriptions
