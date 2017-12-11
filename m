@@ -1,34 +1,42 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54685)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45232)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <walling@linux.vnet.ibm.com>) id 1eOWQi-0001G4-8J
-	for qemu-devel@nongnu.org; Mon, 11 Dec 2017 17:20:11 -0500
+	(envelope-from <pasic@linux.vnet.ibm.com>) id 1eOXDe-0000uT-Jx
+	for qemu-devel@nongnu.org; Mon, 11 Dec 2017 18:10:43 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <walling@linux.vnet.ibm.com>) id 1eOWQd-0001bw-TU
-	for qemu-devel@nongnu.org; Mon, 11 Dec 2017 17:20:08 -0500
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:39784)
+	(envelope-from <pasic@linux.vnet.ibm.com>) id 1eOXDa-00031e-FU
+	for qemu-devel@nongnu.org; Mon, 11 Dec 2017 18:10:42 -0500
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:47250
+	helo=mx0a-001b2d01.pphosted.com)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <walling@linux.vnet.ibm.com>)
-	id 1eOWQd-0001b0-Ki
-	for qemu-devel@nongnu.org; Mon, 11 Dec 2017 17:20:03 -0500
-Received: from pps.filterd (m0098410.ppops.net [127.0.0.1])
+	(Exim 4.71) (envelope-from <pasic@linux.vnet.ibm.com>)
+	id 1eOXDa-000317-9H
+	for qemu-devel@nongnu.org; Mon, 11 Dec 2017 18:10:38 -0500
+Received: from pps.filterd (m0098421.ppops.net [127.0.0.1])
 	by mx0a-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
-	vBBMGIbb069561
-	for <qemu-devel@nongnu.org>; Mon, 11 Dec 2017 17:20:01 -0500
-Received: from e19.ny.us.ibm.com (e19.ny.us.ibm.com [129.33.205.209])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2eswubdggt-1
+	vBBN6ZLh043911
+	for <qemu-devel@nongnu.org>; Mon, 11 Dec 2017 18:10:35 -0500
+Received: from e06smtp11.uk.ibm.com (e06smtp11.uk.ibm.com [195.75.94.107])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2et0fmgvn1-1
 	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Mon, 11 Dec 2017 17:20:00 -0500
+	for <qemu-devel@nongnu.org>; Mon, 11 Dec 2017 18:10:35 -0500
 Received: from localhost
-	by e19.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
-	Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <walling@linux.vnet.ibm.com>;
-	Mon, 11 Dec 2017 17:19:59 -0500
-From: "Collin L. Walling" <walling@linux.vnet.ibm.com>
-Date: Mon, 11 Dec 2017 17:19:20 -0500
-In-Reply-To: <1513030760-26245-1-git-send-email-walling@linux.vnet.ibm.com>
-References: <1513030760-26245-1-git-send-email-walling@linux.vnet.ibm.com>
-Message-Id: <1513030760-26245-6-git-send-email-walling@linux.vnet.ibm.com>
-Subject: [Qemu-devel] [PATCH v2 5/5] s390-ccw: interactive boot menu for scsi
+	by e06smtp11.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	Only! Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <pasic@linux.vnet.ibm.com>;
+	Mon, 11 Dec 2017 23:10:33 -0000
+References: <20171108165422.46267-1-pasic@linux.vnet.ibm.com>
+	<2ada83cf-1eb6-87c0-7597-13dc11ab09c0@redhat.com>
+	<e48d0ac7-4431-dcce-4eb4-0d6863006575@redhat.com>
+	<20171207125313.1a5d1c5e.cohuck@redhat.com>
+From: Halil Pasic <pasic@linux.vnet.ibm.com>
+Date: Tue, 12 Dec 2017 00:10:29 +0100
+MIME-Version: 1.0
+In-Reply-To: <20171207125313.1a5d1c5e.cohuck@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Message-Id: <e5aa927d-72f6-3f74-c3c4-5d40308844a6@linux.vnet.ibm.com>
+Subject: Re: [Qemu-devel] [qemu-s390x] [RFC PATCH v2 0/3] tests for CCW IDA
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,100 +45,55 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-s390x@nongnu.org, qemu-devel@nongnu.org
-Cc: borntraeger@de.ibm.com, frankja@linux.vnet.ibm.com, cohuck@redhat.com, thuth@redhat.com, david@redhat.com
+To: Cornelia Huck <cohuck@redhat.com>, Thomas Huth <thuth@redhat.com>
+Cc: David Hildenbrand <david@redhat.com>, Pierre Morel <pmorel@linux.vnet.ibm.com>, qemu-devel@nongnu.org, qemu-s390x@nongnu.org, Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>
 
-Interactive boot menu for scsi. This follows the same procedure
-as the interactive menu for eckd dasd. An example follows:
 
-    s390x Enumerated Boot Menu.
 
-    3 entries detected. Select from index 0 to 2.
+On 12/07/2017 12:53 PM, Cornelia Huck wrote:
+> On Thu, 7 Dec 2017 10:01:35 +0100
+> Thomas Huth <thuth@redhat.com> wrote:
+> 
+>> On 07.12.2017 07:38, Thomas Huth wrote:
+>>> On 08.11.2017 17:54, Halil Pasic wrote:  
+>>>> I've keept the title althogh the scope shifted a bit: it's
+>>>> more about introducing ccw-testdev than about IDA. The goal
+>>>> is to facilitate testing the virtual channel subsystem
+>>>> implementation, and the ccw interpretation.
+>>>>
+>>>> The first patch is the interesting one. See it's cover letter
+>>>> for details. The RFC is about discussing some technical issues
+>>>> with this patch.
+>>>>
+>>>> The other two patches are an out of source kernel module which
+>>>> is basically only there so you can try out the first patch. The
+>>>> tests there should probably be ported to something else. I don't
+>>>> know what: maybe kvm-unit-tests, maybe qtest+libqos, or maybe some
+>>>> bios based test image. We still have to figure out that.   
+>>>
+>>> I think both, kvm-unit-tests or qtest+libqos would be good candidates.
+>>> Please don't invent a new bios base test image, since kvm-unit-tests
+>>> should be very similar already and we really don't need to duplicate
+>>> work here.
+>>>
+>>> Anyway, you'd need to add some CSS infracture there first (in both
+>>> kvm-unit-tests and the qtest environments), so it's likely a similar
+>>> amount of work. qtest has the advantage that it gets checked
+>>> automatically during "make check" each time, so I'd have a weak
+>>> preference for that one.  
+>>
+>> Another thought: I'd also like to see the more complex virtio device
+>> qtests enabled for virtio-ccw one day (e.g. tests/virtio-blk-test.c), so
+>> I think we sooner or later should have some CSS infrastructure in the
+>> qtests anyway ==> May I suggest that you have a try with the qtest approach?
+> 
+> Agreed, this would be helpful to get more ccw coverage in general.
+> 
 
-    Please choose:
+Yeah qtest+libqos does seem like the most likely candidate. We
+are likely to go down this path. I say we, because it seems likely
+that the guest counterpart with the unit test suite is going to
+be done by somebody having more time to invest into this.
 
-Signed-off-by: Collin L. Walling <walling@linux.vnet.ibm.com>
----
- pc-bios/s390-ccw/bootmap.c |  9 ++++++---
- pc-bios/s390-ccw/main.c    |  2 ++
- pc-bios/s390-ccw/menu.c    | 14 ++++++++++++++
- pc-bios/s390-ccw/menu.h    |  1 +
- 4 files changed, 23 insertions(+), 3 deletions(-)
-
-diff --git a/pc-bios/s390-ccw/bootmap.c b/pc-bios/s390-ccw/bootmap.c
-index c817cf8..78e41ab 100644
---- a/pc-bios/s390-ccw/bootmap.c
-+++ b/pc-bios/s390-ccw/bootmap.c
-@@ -552,15 +552,18 @@ static void ipl_scsi(void)
-         }
- 
-         program_table_entries++;
--        if (program_table_entries == loadparm + 1) {
--            break; /* selected entry found */
--        }
-     }
- 
-     debug_print_int("program table entries", program_table_entries);
- 
-     IPL_assert(program_table_entries != 0, "Empty Program Table");
- 
-+    if (menu_check_flags(BOOT_MENU_FLAG_BOOT_OPTS)) {
-+        loadparm = menu_get_enum_boot_index(program_table_entries);
-+    }
-+
-+    prog_table_entry = (ScsiBlockPtr *)(sec + pte_len * (loadparm + 1));
-+
-     zipl_run(prog_table_entry); /* no return */
- }
- 
-diff --git a/pc-bios/s390-ccw/main.c b/pc-bios/s390-ccw/main.c
-index fb0ef92..2a697a0 100644
---- a/pc-bios/s390-ccw/main.c
-+++ b/pc-bios/s390-ccw/main.c
-@@ -112,6 +112,8 @@ static void virtio_setup(void)
-             vdev->selected_scsi_device.lun = iplb.scsi.lun;
-             blk_schid.ssid = iplb.scsi.ssid & 0x3;
-             found = find_dev(&schib, iplb.scsi.devno);
-+            menu_set_parms(iplb.scsi.boot_menu_flags,
-+                            iplb.scsi.boot_menu_timeout);
-             break;
-         default:
-             panic("List-directed IPL not supported yet!\n");
-diff --git a/pc-bios/s390-ccw/menu.c b/pc-bios/s390-ccw/menu.c
-index d707afb..49876c1 100644
---- a/pc-bios/s390-ccw/menu.c
-+++ b/pc-bios/s390-ccw/menu.c
-@@ -211,6 +211,20 @@ int menu_get_zipl_boot_index(const void *stage2, ZiplParms zipl_parms)
-     return get_boot_index(ct - 1);
- }
- 
-+int menu_get_enum_boot_index(int entries)
-+{
-+    char tmp[4];
-+
-+    sclp_print("s390x Enumerated Boot Menu.\n\n");
-+
-+    sclp_print(itostr(entries, tmp, sizeof(tmp)));
-+    sclp_print(" entries detected. Select from boot index 0 to ");
-+    sclp_print(itostr(entries - 1, tmp, sizeof(tmp)));
-+    sclp_print(".\n\n");
-+
-+    return get_boot_index(entries);
-+}
-+
- void menu_set_parms(uint8_t boot_menu_flag, uint16_t boot_menu_timeout)
- {
-     flags = boot_menu_flag;
-diff --git a/pc-bios/s390-ccw/menu.h b/pc-bios/s390-ccw/menu.h
-index a8727fa..4373b0c 100644
---- a/pc-bios/s390-ccw/menu.h
-+++ b/pc-bios/s390-ccw/menu.h
-@@ -24,5 +24,6 @@ typedef struct ZiplParms {
- void menu_set_parms(uint8_t boot_menu_flags, uint16_t boot_menu_timeout);
- bool menu_check_flags(uint8_t check_flags);
- int menu_get_zipl_boot_index(const void *stage2, ZiplParms zipl_parms);
-+int menu_get_enum_boot_index(int entries);
- 
- #endif /* MENU_H */
--- 
-2.7.4
+Regards,
+Halil
