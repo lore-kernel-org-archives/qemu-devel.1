@@ -1,24 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42771)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43245)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1eORhk-0007sk-Bh
-	for qemu-devel@nongnu.org; Mon, 11 Dec 2017 12:17:25 -0500
+	(envelope-from <cohuck@redhat.com>) id 1eORiQ-0008Vu-LW
+	for qemu-devel@nongnu.org; Mon, 11 Dec 2017 12:18:09 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1eORhj-0005dy-F8
-	for qemu-devel@nongnu.org; Mon, 11 Dec 2017 12:17:24 -0500
-References: <20171123020832.8165-1-mreitz@redhat.com>
-	<20171123020832.8165-9-mreitz@redhat.com>
-	<20171130031803.GL16237@lemon>
-	<105361ec-21d2-e0dc-d480-ef3c9910dd12@redhat.com>
-	<a514dad6-3d29-4a45-025e-ecd2f940747d@redhat.com>
-From: Max Reitz <mreitz@redhat.com>
-Message-ID: <d9365491-7cb8-2349-f068-35da000ea0bd@redhat.com>
-Date: Mon, 11 Dec 2017 18:17:08 +0100
+	(envelope-from <cohuck@redhat.com>) id 1eORiM-0006Qh-Rn
+	for qemu-devel@nongnu.org; Mon, 11 Dec 2017 12:18:06 -0500
+Date: Mon, 11 Dec 2017 18:17:54 +0100
+From: Cornelia Huck <cohuck@redhat.com>
+Message-ID: <20171211181754.4a3b847d.cohuck@redhat.com>
+In-Reply-To: <20171211134740.8235-5-david@redhat.com>
+References: <20171211134740.8235-1-david@redhat.com>
+	<20171211134740.8235-5-david@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <a514dad6-3d29-4a45-025e-ecd2f940747d@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="Buggo3sHQDnCQWfXvg4TchPCCGqktDMi9"
-Subject: Re: [Qemu-devel] [PATCH 08/17] iotests: Skip 103 for refcount_bits=1
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v1 for-2-12 04/15] s390x/flic: simplify
+ flic initialization
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,83 +24,54 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: John Snow <jsnow@redhat.com>, Fam Zheng <famz@redhat.com>
-Cc: Kevin Wolf <kwolf@redhat.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org
+To: David Hildenbrand <david@redhat.com>
+Cc: qemu-s390x@nongnu.org, qemu-devel@nongnu.org, Christian Borntraeger <borntraeger@de.ibm.com>, Richard Henderson <rth@twiddle.net>, Alexander Graf <agraf@suse.de>, Paolo Bonzini <pbonzini@redhat.com>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Thomas Huth <thuth@redhat.com>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---Buggo3sHQDnCQWfXvg4TchPCCGqktDMi9
-From: Max Reitz <mreitz@redhat.com>
-To: John Snow <jsnow@redhat.com>, Fam Zheng <famz@redhat.com>
-Cc: Kevin Wolf <kwolf@redhat.com>, qemu-devel@nongnu.org,
- qemu-block@nongnu.org
-Message-ID: <d9365491-7cb8-2349-f068-35da000ea0bd@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH 08/17] iotests: Skip 103 for refcount_bits=1
-References: <20171123020832.8165-1-mreitz@redhat.com>
- <20171123020832.8165-9-mreitz@redhat.com> <20171130031803.GL16237@lemon>
- <105361ec-21d2-e0dc-d480-ef3c9910dd12@redhat.com>
- <a514dad6-3d29-4a45-025e-ecd2f940747d@redhat.com>
-In-Reply-To: <a514dad6-3d29-4a45-025e-ecd2f940747d@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+On Mon, 11 Dec 2017 14:47:29 +0100
+David Hildenbrand <david@redhat.com> wrote:
 
-On 2017-12-09 02:36, John Snow wrote:
->=20
->=20
-> On 11/30/2017 08:23 AM, Max Reitz wrote:
->> On 2017-11-30 04:18, Fam Zheng wrote:
->>> On Thu, 11/23 03:08, Max Reitz wrote:
->>>> Signed-off-by: Max Reitz <mreitz@redhat.com>
->>>> ---
->>>>  tests/qemu-iotests/103 | 2 ++
->>>>  1 file changed, 2 insertions(+)
->>>>
->>>> diff --git a/tests/qemu-iotests/103 b/tests/qemu-iotests/103
->>>> index ecbd8ebd71..d0cfab8844 100755
->>>> --- a/tests/qemu-iotests/103
->>>> +++ b/tests/qemu-iotests/103
->>>> @@ -40,6 +40,8 @@ trap "_cleanup; exit \$status" 0 1 2 3 15
->>>>  _supported_fmt qcow2
->>>>  _supported_proto file nfs
->>>>  _supported_os Linux
->>>> +# Internal snapshots are (currently) impossible with refcount_bits=3D=
-1
->>>> +_unsupported_imgopts 'refcount_bits=3D1[^0-9]'
->>>
->>> What is the "[^0-9]" part for?
->>
->> It's so you can specify refcount_bits=3D16, but not
->> refcount_bits=3D1,compat=3D0.10 or just refcount_bits=3D1.
->>
->> Max
->>
->=20
-> Worth a comment?
+> This makes it clearer, which device is used for which accelerator.
+> 
+> Signed-off-by: David Hildenbrand <david@redhat.com>
+> ---
+>  hw/intc/s390_flic.c          |  9 +++++++--
+>  hw/intc/s390_flic_kvm.c      | 12 ------------
+>  include/hw/s390x/s390_flic.h |  9 ---------
+>  3 files changed, 7 insertions(+), 23 deletions(-)
+> 
+> diff --git a/hw/intc/s390_flic.c b/hw/intc/s390_flic.c
+> index 6eaf178d79..a78bdf1d90 100644
+> --- a/hw/intc/s390_flic.c
+> +++ b/hw/intc/s390_flic.c
+> @@ -40,11 +40,16 @@ void s390_flic_init(void)
+>  {
+>      DeviceState *dev;
+>  
+> -    dev = s390_flic_kvm_create();
+> -    if (!dev) {
+> +    if (kvm_enabled()) {
+> +        dev = qdev_create(NULL, TYPE_KVM_S390_FLIC);
+> +        object_property_add_child(qdev_get_machine(), TYPE_KVM_S390_FLIC,
+> +                                  OBJECT(dev), NULL);
+> +    } else if (tcg_enabled()) {
+>          dev = qdev_create(NULL, TYPE_QEMU_S390_FLIC);
+>          object_property_add_child(qdev_get_machine(), TYPE_QEMU_S390_FLIC,
+>                                    OBJECT(dev), NULL);
 
-There is a comment above it that says that refcount_bits=3D1 is the
-disallowed option. :-)
+Can you use TYPE_S390_FLIC_COMMON for attaching the flic to the machine?
 
-I could add a "(refcount_bits=3D16 is OK, though)" if that would have bee=
-n
-enough for you (or any proposal of yours).
+> +    } else {
+> +        g_assert_not_reached();
 
-Max
+Checking for tcg_enabled() explicitly does not seem the common pattern,
+although it is fine with me (I doubt we'll support other accelerators
+for s390x in the foreseeable future).
 
+>      }
+>      qdev_init_nofail(dev);
+>  }
 
---Buggo3sHQDnCQWfXvg4TchPCCGqktDMi9
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
+Do we want to switch to the same pattern for the storage attribute
+device as well?
 
------BEGIN PGP SIGNATURE-----
-
-iQFGBAEBCAAwFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAlouvZQSHG1yZWl0ekBy
-ZWRoYXQuY29tAAoJEPQH2wBh1c9AdsgH/R2oab3ntLBHymcldnTRgsyv5VLIgZvl
-UkVfD/jx7XKAhEik64ogPtLhMI4+n9qFs88JrSpWTin0rjfQRYl3HPgpaJkThuEQ
-jic40m9Leu3WFk/YJNPbq0vsqwhXZ07hiFAAZmrF9/t3SKywG311REvZuOBvkmPV
-fs5c+C2PduRQEf6u1mfh4YwfHBjOXAtjEDhmdLAUiY+FKiPq6NdoHTbuicFebFSZ
-YEj3H4+QdBbSj40Adum/pyqhShEbKDkQ47i9U667B6nqV5JpeKjIHRyeMO0oF5f7
-+ksZrR62iqBOI7eL27nvs+KkP8UeSTtOq/HFbcJqby60895wCC8ylqA=
-=FDlF
------END PGP SIGNATURE-----
-
---Buggo3sHQDnCQWfXvg4TchPCCGqktDMi9--
+Change looks fine to me.
