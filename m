@@ -1,34 +1,44 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35694)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35821)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1eOQDQ-00048c-AT
-	for qemu-devel@nongnu.org; Mon, 11 Dec 2017 10:42:07 -0500
+	(envelope-from <pasic@linux.vnet.ibm.com>) id 1eOQDj-0004SN-65
+	for qemu-devel@nongnu.org; Mon, 11 Dec 2017 10:42:20 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1eOQDN-00089q-35
-	for qemu-devel@nongnu.org; Mon, 11 Dec 2017 10:42:00 -0500
-Received: from indium.canonical.com ([91.189.90.7]:59828)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1eOQDM-00087G-OT
-	for qemu-devel@nongnu.org; Mon, 11 Dec 2017 10:41:56 -0500
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1eOQDG-0008Jd-6i
-	for <qemu-devel@nongnu.org>; Mon, 11 Dec 2017 15:41:50 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id EF2EE2E81BC
-	for <qemu-devel@nongnu.org>; Mon, 11 Dec 2017 15:41:40 +0000 (UTC)
+	(envelope-from <pasic@linux.vnet.ibm.com>) id 1eOQDg-0008MW-1U
+	for qemu-devel@nongnu.org; Mon, 11 Dec 2017 10:42:19 -0500
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:46424)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pasic@linux.vnet.ibm.com>)
+	id 1eOQDf-0008LQ-OZ
+	for qemu-devel@nongnu.org; Mon, 11 Dec 2017 10:42:15 -0500
+Received: from pps.filterd (m0098393.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
+	vBBFg3IA049274
+	for <qemu-devel@nongnu.org>; Mon, 11 Dec 2017 10:42:12 -0500
+Received: from e06smtp10.uk.ibm.com (e06smtp10.uk.ibm.com [195.75.94.106])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2est05hpdv-1
+	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Mon, 11 Dec 2017 10:42:11 -0500
+Received: from localhost
+	by e06smtp10.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	Only! Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <pasic@linux.vnet.ibm.com>;
+	Mon, 11 Dec 2017 15:42:07 -0000
+References: <1512545840-10256-1-git-send-email-longpeng2@huawei.com>
+	<1512545840-10256-2-git-send-email-longpeng2@huawei.com>
+	<0209e49f-3d81-cbc9-eb07-13654a288a22@linux.vnet.ibm.com>
+	<5A2E8067.4050000@huawei.com>
+	<2b7048c1-e2f8-ab40-c4df-afe5efd8f95d@linux.vnet.ibm.com>
+	<20171211160903-mutt-send-email-mst@kernel.org>
+From: Halil Pasic <pasic@linux.vnet.ibm.com>
+Date: Mon, 11 Dec 2017 16:41:59 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Mon, 11 Dec 2017 15:33:52 -0000
-From: Corey Bryant <corey.bryant@canonical.com>
-Reply-To: Bug 1719196 <1719196@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <150626680089.6094.17724106932405637799.malonedeb@soybean.canonical.com>
-Message-Id: <151300643217.3023.8499299574863395883.malone@gac.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1719196] Re: [arm64 ocata] newly created
- instances are unable to raise network interfaces
+In-Reply-To: <20171211160903-mutt-send-email-mst@kernel.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Message-Id: <a4cec719-1fb5-37da-66d4-bf57b2c045e4@linux.vnet.ibm.com>
+Subject: Re: [Qemu-devel] [v22 1/2] virtio-crypto: Add virtio crypto device
+ specification
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,365 +47,52 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-
-Regression testing has passed successfully.
-
-zesty-ocata-proposed with stable charms:
-
-=3D=3D=3D=3D=3D=3D
-Totals
-=3D=3D=3D=3D=3D=3D
-Ran: 102 tests in 1897.0150 sec.
- - Passed: 93
- - Skipped: 9
- - Expected Fail: 0
- - Unexpected Success: 0
- - Failed: 0
-Sum of execute time for each test: 1011.5607 sec.
-
-zesty-ocata-proposed with dev charms:
-
-=3D=3D=3D=3D=3D=3D
-Totals
-=3D=3D=3D=3D=3D=3D
-Ran: 102 tests in 1933.5299 sec.
- - Passed: 93
- - Skipped: 9
- - Expected Fail: 0
- - Unexpected Success: 0
- - Failed: 0
-Sum of execute time for each test: 963.0546 sec.
-
-xenial-ocata-proposed with stable charms:
-
-=3D=3D=3D=3D=3D=3D
-Totals
-=3D=3D=3D=3D=3D=3D
-Ran: 102 tests in 1767.3787 sec.
- - Passed: 93
- - Skipped: 9
- - Expected Fail: 0
- - Unexpected Success: 0
- - Failed: 0
-Sum of execute time for each test: 906.2188 sec.
-
-xenial-ocata-proposed with dev charms:
-
-=3D=3D=3D=3D=3D=3D
-Totals
-=3D=3D=3D=3D=3D=3D
-Ran: 102 tests in 2051.1377 sec.
- - Passed: 93
- - Skipped: 9
- - Expected Fail: 0
- - Unexpected Success: 0
- - Failed: 0
-Sum of execute time for each test: 998.9001 sec.
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: virtio-dev@lists.oasis-open.org, Ola.Liljedahl@arm.com, brian.a.keating@intel.com, wangxinxin.wang@huawei.com, Jani.Kokkonen@huawei.com, xin.zeng@intel.com, jasowang@redhat.com, luonengjun@huawei.com, qemu-devel@nongnu.org, john.griffin@intel.com, agraf@suse.de, arei.gonglei@huawei.com, liang.j.ma@intel.com, stefanha@redhat.com, jianjay.zhou@huawei.com, cornelia.huck@de.ibm.com, Varun.Sethi@freescale.com, "Longpeng (Mike)" <longpeng2@huawei.com>, vincent.jardin@6wind.com, denglingli@chinamobile.com, weidong.huang@huawei.com
 
 
-** Tags removed: verification-ocata-needed
-** Tags added: verification-ocata-done
 
--- =
+On 12/11/2017 03:09 PM, Michael S. Tsirkin wrote:
+> On Mon, Dec 11, 2017 at 02:54:25PM +0100, Halil Pasic wrote:
+>> * I assume one request is supposed to correspond to one descriptor chain.
+>> Right? If yes, could you tell me, where is this expressed in the spec.
+>>
+>> Halil
+> 
+> That's always the default for all virtio devices, exceptions have to
+> be noted in spec.
+> 
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1719196
+Grew to think this myself. But I could not derive it form the virtio spec.
+Could you give me a pointer or a quote that _specifies_ that that's always
+the default, and that exceptions have to be noted in the spec (I guess
+in the corresponding device specific normative section)?
 
-Title:
-  [arm64 ocata] newly created instances are unable to raise network
-  interfaces
+What I've found (maybe) showing in this direction is:
 
-Status in Ubuntu Cloud Archive:
-  Fix Released
-Status in Ubuntu Cloud Archive ocata series:
-  Fix Committed
-Status in libvirt:
-  New
-Status in QEMU:
-  Fix Released
-Status in libvirt package in Ubuntu:
-  Invalid
-Status in qemu package in Ubuntu:
-  Fix Released
-Status in qemu source package in Zesty:
-  Fix Released
+"""
+2.4.4 Message Framing
 
-Bug description:
-  [Impact]
+The framing of messages with descriptors is independent of the contents of the buffers. For example, a network transmit buffer consists of a 12 byte header followed by the network packet. This could be most simply placed in the descriptor table as a 12 byte output descriptor followed by a 1514 byte output descriptor, but it could also consist of a single 1526 byte output descriptor in the case where the header and packet are adjacent, or even three or more descriptors (possibly with loss of efficiency in that case).
 
-   * A change in qemu 2.8 (83d768b virtio: set ISR on dataplane =
+Note that, some device implementations have large-but-reasonable restrictions on total descriptor size (such as based on IOV_MAX in the host OS). This has not been a problem in practice: little sympathy will be given to drivers which create unreasonably-sized descriptors such as by dividing a network packet into 1500 single-byte descriptors!
+"""
 
-     notifications) broke virtio handling on platforms without a =
+This however talks about buffers and messages which (seem to be used as
+synonyms here BTW), and about how no assumptions should be made about
+how many descriptors are used in the descriptor chain (to transfer
+the same in guest memory maximal buffer elements -- maximal in a sense
+that no guest physically contiguous piece of memory is represented by
+two adjacent elements).
 
-     controller. Those encounter flaky networking due to missed IRQs
+Most of the devices don't talk about messages (but rather specify
+requests). So it's hard to relate the requests/packets to messages
+which are framed as buffers.
 
-   * Fix is a backport of the upstream fix b4b9862b: virtio: Fix no =
+I find the whole terminology a bit hard to understand (and sometimes
+ambiguous).
 
-     interrupt when not creating msi controller
+Please help me understand this aspect of the specification.
 
-  [Test Case]
-
-   * On Arm with Zesty (or Ocata) run a guest without PCI based devices
-
-   * Example in e.g. c#23
-
-   * Without the fix the networking does not work reliably (as it losses =
-
-     IRQs), with the fix it works fine.
-
-  [Regression Potential]
-
-   * Changing the IRQ handling of virtio could affect virtio in general.
-     But when reviwing the patch you'll see that it is small and actually =
-
-     only changes to enable IRQ on one more place. That could cause more =
-
-     IRQs than needed in the worst case, but those are usually not =
-
-     breaking but only slowing things down. Also this fix is upstream =
-
-     quite a while, increasing confidence.
-
-  [Other Info]
-   =
-
-   * There is currently 1720397 in flight in the SRU queue, so acceptance =
-
-     of this upload has to wait until that completes.
-
-  ---
-
-  arm64 Ocata ,
-
-  I'm testing to see I can get Ocata running on arm64 and using the
-  openstack-base bundle to deploy it.  I have added the bundle to the
-  log file attached to this bug.
-
-  When I create a new instance via nova, the VM comes up and runs,
-  however fails to raise its eth0 interface. This occurs on both
-  internal and external networks.
-
-  ubuntu@openstackaw:~$ nova list
-  +--------------------------------------+---------+--------+------------+-=
-------------+--------------------+
-  | ID                                   | Name    | Status | Task State | =
-Power State | Networks           |
-  +--------------------------------------+---------+--------+------------+-=
-------------+--------------------+
-  | dcaf6d51-f81e-4cbd-ac77-0c5d21bde57c | sfeole1 | ACTIVE | -          | =
-Running     | internal=3D10.5.5.3  |
-  | aa0b8aee-5650-41f4-8fa0-aeccdc763425 | sfeole2 | ACTIVE | -          | =
-Running     | internal=3D10.5.5.13 |
-  +--------------------------------------+---------+--------+------------+-=
-------------+--------------------+
-  ubuntu@openstackaw:~$ nova show aa0b8aee-5650-41f4-8fa0-aeccdc763425
-  +--------------------------------------+---------------------------------=
--------------------------+
-  | Property                             | Value                           =
-                         |
-  +--------------------------------------+---------------------------------=
--------------------------+
-  | OS-DCF:diskConfig                    | MANUAL                          =
-                         |
-  | OS-EXT-AZ:availability_zone          | nova                            =
-                         |
-  | OS-EXT-SRV-ATTR:host                 | awrep3                          =
-                         |
-  | OS-EXT-SRV-ATTR:hypervisor_hostname  | awrep3.maas                     =
-                         |
-  | OS-EXT-SRV-ATTR:instance_name        | instance-00000003               =
-                         |
-  | OS-EXT-STS:power_state               | 1                               =
-                         |
-  | OS-EXT-STS:task_state                | -                               =
-                         |
-  | OS-EXT-STS:vm_state                  | active                          =
-                         |
-  | OS-SRV-USG:launched_at               | 2017-09-24T14:23:08.000000      =
-                         |
-  | OS-SRV-USG:terminated_at             | -                               =
-                         |
-  | accessIPv4                           |                                 =
-                         |
-  | accessIPv6                           |                                 =
-                         |
-  | config_drive                         |                                 =
-                         |
-  | created                              | 2017-09-24T14:22:41Z            =
-                         |
-  | flavor                               | m1.small (717660ae-0440-4b19-a76=
-2-ffeb32a0575c)          |
-  | hostId                               | 5612a00671c47255d2ebd6737a64ec9b=
-d3a5866d1233ecf3e988b025 |
-  | id                                   | aa0b8aee-5650-41f4-8fa0-aeccdc76=
-3425                     |
-  | image                                | zestynosplash (e88fd1bd-f040-44d=
-8-9e7c-c462ccf4b945)     |
-  | internal network                     | 10.5.5.13                       =
-                         |
-  | key_name                             | mykey                           =
-                         |
-  | metadata                             | {}                              =
-                         |
-  | name                                 | sfeole2                         =
-                         |
-  | os-extended-volumes:volumes_attached | []                              =
-                         |
-  | progress                             | 0                               =
-                         |
-  | security_groups                      | default                         =
-                         |
-  | status                               | ACTIVE                          =
-                         |
-  | tenant_id                            | 9f7a21c1ad264fec81abc09f3960ad1d=
-                         |
-  | updated                              | 2017-09-24T14:23:09Z            =
-                         |
-  | user_id                              | e6bb6f5178a248c1b5ae66ed388f9040=
-                         |
-  +--------------------------------------+---------------------------------=
--------------------------+
-
-  As seen above the instances boot an run.  Full Console output is
-  attached to this bug.
-
-  [  OK  ] Started Initial cloud-init job (pre-networking).
-  [  OK  ] Reached target Network (Pre).
-  [  OK  ] Started AppArmor initialization.
-  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0Starting Raise netw=
-ork interfaces...
-  [FAILED] Failed to start Raise network interfaces.
-  See 'systemctl status networking.service' for details.
-  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0Starting Initial cl=
-oud-init job (metadata service crawler)...
-  [  OK  ] Reached target Network.
-  [  315.051902] cloud-init[881]: Cloud-init v. 0.7.9 running 'init' at Fri=
-, 22 Sep 2017 18:29:15 +0000. Up 314.70 seconds.
-  [  315.057291] cloud-init[881]: ci-info: +++++++++++++++++++++++++++Net d=
-evice info+++++++++++++++++++++++++++
-  [  315.060338] cloud-init[881]: ci-info: +--------+------+-----------+---=
---------+-------+-------------------+
-  [  315.063308] cloud-init[881]: ci-info: | Device |  Up  |  Address  |   =
- Mask   | Scope |     Hw-Address    |
-  [  315.066304] cloud-init[881]: ci-info: +--------+------+-----------+---=
---------+-------+-------------------+
-  [  315.069303] cloud-init[881]: ci-info: | eth0:  | True |     .     |   =
-  .     |   .   | fa:16:3e:39:4c:48 |
-  [  315.072308] cloud-init[881]: ci-info: | eth0:  | True |     .     |   =
-  .     |   d   | fa:16:3e:39:4c:48 |
-  [  315.075260] cloud-init[881]: ci-info: |  lo:   | True | 127.0.0.1 | 25=
-5.0.0.0 |   .   |         .         |
-  [  315.078258] cloud-init[881]: ci-info: |  lo:   | True |     .     |   =
-  .     |   d   |         .         |
-  [  315.081249] cloud-init[881]: ci-info: +--------+------+-----------+---=
---------+-------+-------------------+
-  [  315.084240] cloud-init[881]: 2017-09-22 18:29:15,393 - url_helper.py[W=
-ARNING]: Calling 'http://169.254.169.254/2009-04-04/meta-data/instance-id' =
-failed [0/120s]: request error [HTTPConnectionPool(host=3D'169.254.169.254'=
-, port=3D80): Max retries exceeded with url: /2009-04-04/meta-data/instance=
--id (Caused by NewConnectionError('<requests.packages.urllib3.connection.HT=
-TPConnection object at 0xffffb10794e0>: Failed to establish a new connectio=
-n: [Errno 101] Network is unreachable',))]
-
-  ----------------
-
-  I have checked all services in neutron and made sure that they are
-  running and restarted in neutron-gateway
-
-  =C2=A0[ + ]  neutron-dhcp-agent
-  =C2=A0[ + ]  neutron-l3-agent
-  =C2=A0[ + ]  neutron-lbaasv2-agent
-  =C2=A0[ + ]  neutron-metadata-agent
-  =C2=A0[ + ]  neutron-metering-agent
-  =C2=A0[ + ]  neutron-openvswitch-agent
-  =C2=A0[ + ]  neutron-ovs-cleanup
-
-  and have also restarted and checked the nova-compute logs for their
-  neutron counterparts.
-
-  =C2=A0[ + ]  neutron-openvswitch-agent
-  =C2=A0[ + ]  neutron-ovs-cleanup
-
-  =C2=A0There are some warnings/errors in the neutron-gateway logs which I
-  have attached the full tarball in a separate attachment to this bug:
-
-  2017-09-24 14:39:33.152 10322 INFO ryu.base.app_manager [-] instantiating=
- app ryu.controller.ofp_handler of OFPHandler
-  2017-09-24 14:39:33.153 10322 INFO ryu.base.app_manager [-] instantiating=
- app ryu.app.ofctl.service of OfctlService
-  2017-09-24 14:39:39.577 10322 ERROR neutron.agent.ovsdb.impl_vsctl [req-2=
-f084ae8-13dc-47dc-b351-24c8f3c57067 - - - - -] Unable to execute ['ovs-vsct=
-l', '--timeout=3D10', '--oneline', '--format=3Djson', '--', '--id=3D@manage=
-r', 'create', 'Manager', 'target=3D"ptcp:6640:127.0.0.1"', '--', 'add', 'Op=
-en_vSwitch', '.', 'manager_options', '@manager']. Exception: Exit code: 1; =
-Stdin: ; Stdout: ; Stderr: ovs-vsctl: transaction error: {"details":"Transa=
-ction causes multiple rows in \"Manager\" table to have identical values (\=
-"ptcp:6640:127.0.0.1\") for index on column \"target\".  First row, with UU=
-ID e02a5f7f-bfd2-4a1d-ae3c-0321db4bd3fb, existed in the database before thi=
-s transaction and was not modified by the transaction.  Second row, with UU=
-ID 6e9aba3a-471a-4976-bffd-b7131bbe5377, was inserted by this transaction."=
-,"error":"constraint violation"}
-
-  These warnings/errors also occur on the nova-compute hosts in
-  /var/log/neutron/
-
-  2017-09-22 18:54:52.130 387556 INFO ryu.base.app_manager [-] instantiatin=
-g app ryu.app.ofctl.service of OfctlService
-  2017-09-22 18:54:56.124 387556 ERROR neutron.agent.ovsdb.impl_vsctl [req-=
-e291c2f9-a123-422c-be7c-fadaeb5decfa - - - - -] Unable to execute ['ovs-vsc=
-tl', '--timeout=3D10', '--oneline', '--format=3Djson', '--', '--id=3D@manag=
-er', 'create', 'Manager', 'target=3D"ptcp:6640:127.0.0.1"', '--', 'add', 'O=
-pen_vSwitch', '.', 'manager_options', '@manager']. Exception: Exit code: 1;=
- Stdin: ; Stdout: ; Stderr: ovs-vsctl: transaction error: {"details":"Trans=
-action causes multiple rows in \"Manager\" table to have identical values (=
-\"ptcp:6640:127.0.0.1\") for index on column \"target\".  First row, with U=
-UID 9f27ddee-9881-4cbc-9777-2f42fee735e9, was inserted by this transaction.=
-  Second row, with UUID ccf0e097-09d5-449c-b353-6b69781dc3f7, existed in th=
-e database before this transaction and was not modified by the transaction.=
-","error":"constraint violation"}
-
-  I'm not sure if the above error could be pertaining to the failure, I
-  have also attached those logs to this bug as well...
-
-  .
-  (neutron) agent-list
-  +--------------------------------------+----------------------+--------+-=
-------------------+-------+----------------+---------------------------+
-  | id                                   | agent_type           | host   | =
-availability_zone | alive | admin_state_up | binary                    |
-  +--------------------------------------+----------------------+--------+-=
-------------------+-------+----------------+---------------------------+
-  | 0cca03fb-abb2-4704-8b0b-e7d3e117d882 | DHCP agent           | awrep1 | =
-nova              | :-)   | True           | neutron-dhcp-agent        |
-  | 14a5fd52-fbc3-450c-96d5-4e9a65776dad | L3 agent             | awrep1 | =
-nova              | :-)   | True           | neutron-l3-agent          |
-  | 2ebc7238-5e61-41f8-bc60-df14ec6b226b | Loadbalancerv2 agent | awrep1 | =
-                  | :-)   | True           | neutron-lbaasv2-agent     |
-  | 4f6275be-fc8b-4994-bdac-13a4b76f6a83 | Metering agent       | awrep1 | =
-                  | :-)   | True           | neutron-metering-agent    |
-  | 86ecc6b0-c100-4298-b861-40c17516cc08 | Open vSwitch agent   | awrep1 | =
-                  | :-)   | True           | neutron-openvswitch-agent |
-  | 947ad3ab-650b-4b96-a520-00441ecb33e7 | Open vSwitch agent   | awrep4 | =
-                  | :-)   | True           | neutron-openvswitch-agent |
-  | 996b0692-7d19-4641-bec3-e057f4a856f6 | Open vSwitch agent   | awrep3 | =
-                  | :-)   | True           | neutron-openvswitch-agent |
-  | ab6b1065-0b98-4cf3-9f46-6bddba0c5e75 | Metadata agent       | awrep1 | =
-                  | :-)   | True           | neutron-metadata-agent    |
-  | fe24f622-b77c-4eed-ae22-18e4195cf763 | Open vSwitch agent   | awrep2 | =
-                  | :-)   | True           | neutron-openvswitch-agent |
-  +--------------------------------------+----------------------+--------+-=
-------------------+-------+----------------+---------------------------+
-
-  Should neutron-openvswitch be assigned to the 'nova' availability
-  zone?
-
-  I have also attached the ovs-vsctl show from a nova-compute host and
-  the neutron-gateway host to ensure that the open v switch routes are
-  correct.
-
-  I can supply more logs if required.
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/cloud-archive/+bug/1719196/+subscriptions
+Regards,
+Halil
