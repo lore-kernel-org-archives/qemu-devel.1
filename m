@@ -1,21 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39331)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40268)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1eOLMA-0001pC-Cp
-	for qemu-devel@nongnu.org; Mon, 11 Dec 2017 05:30:50 -0500
+	(envelope-from <imammedo@redhat.com>) id 1eOLON-0004Cx-Df
+	for qemu-devel@nongnu.org; Mon, 11 Dec 2017 05:33:00 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1eOLM6-0008Gp-G6
-	for qemu-devel@nongnu.org; Mon, 11 Dec 2017 05:30:42 -0500
-Date: Mon, 11 Dec 2017 10:30:25 +0000
-From: Stefan Hajnoczi <stefanha@redhat.com>
-Message-ID: <20171211103025.GD13593@stefanha-x1.localdomain>
-References: <cover.1512589016.git.mark.kanda@oracle.com>
-	<cover.1512748083.git.mark.kanda@oracle.com>
+	(envelope-from <imammedo@redhat.com>) id 1eOLOJ-0001gE-FM
+	for qemu-devel@nongnu.org; Mon, 11 Dec 2017 05:32:59 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:55380)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1eOLOJ-0001fZ-93
+	for qemu-devel@nongnu.org; Mon, 11 Dec 2017 05:32:55 -0500
+Date: Mon, 11 Dec 2017 11:32:41 +0100
+From: Igor Mammedov <imammedo@redhat.com>
+Message-ID: <20171211113241.6500f565@redhat.com>
+In-Reply-To: <20171208203257.13102-1-dgilbert@redhat.com>
+References: <20171208203257.13102-1-dgilbert@redhat.com>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="2iBwrppp/7QCDedR"
-Content-Disposition: inline
-In-Reply-To: <cover.1512748083.git.mark.kanda@oracle.com>
-Subject: Re: [Qemu-devel] [PATCH v2 0/2] virtio-blk: miscellaneous changes
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [RFC v2 0/8] Rework vhost memory region updates
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,57 +26,61 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Mark Kanda <mark.kanda@oracle.com>
-Cc: qemu-block@nongnu.org, qemu-devel@nongnu.org, konrad.wilk@oracle.com, martin.petersen@oracle.com, ameya.more@oracle.com, karl.heubaum@oracle.com
+To: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>
+Cc: qemu-devel@nongnu.org, maxime.coquelin@redhat.com, groug@kaod.org, mst@redhat.com
+
+On Fri,  8 Dec 2017 20:32:49 +0000
+"Dr. David Alan Gilbert (git)" <dgilbert@redhat.com> wrote:
+
+> From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+> 
+> Hi,
+>   This is an experimental set that reworks the way the vhost
+> code handles changes in physical address space layout that
+> came from a discussion with Igor.
+> 
+> It's intention is to simplify a lot of the update code,
+> and to make it easier for the postcopy+shared code to
+> do the hugepage alignments that are needed.
+> 
+> Instead of updating and trying to merge sections of address
+> space on each add/remove callback, we wait until the commit phase
+> and go through and rebuild a list by walking the Flatview of
+> memory and end up producing an ordered list.
+> We compare the list to the old list to trigger updates.
+> 
+> This is pretty lightly tested (not least because I can't
+> get vhost-user+hot-add memory to survive even upstream).
+vhost kernel + hot-add should works (well that's at ales what I'm
+usually testing).
+
+vhost-user was lately failing 'make check' on me even without
+memhotplug, so I've disabled it in my builds for now.
 
 
---2iBwrppp/7QCDedR
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
 
-On Fri, Dec 08, 2017 at 09:57:25AM -0600, Mark Kanda wrote:
-> v2: add check for maximum queue size [Stefan]
->=20
-> This series is for two minor virtio-blk changes. The first patch
-> makes the virtio-blk queue size user configurable. The second patch
-> rejects logical block size > physical block configurations (similar
-> to a recent change in virtio-scsi).
->=20
-> Mark Kanda (2):
->   virtio-blk: make queue size configurable
->   virtio-blk: reject configs with logical block size > physical block
->     size
->=20
->  hw/block/virtio-blk.c          | 17 ++++++++++++++++-
->  include/hw/virtio/virtio-blk.h |  1 +
->  2 files changed, 17 insertions(+), 1 deletion(-)
-
-Hi Mark,
-Please resend as a top level email thread so the continuous integration
-and patch management tools will detect your patch series.
-
-=46rom https://wiki.qemu.org/Contribute/SubmitAPatch:
-
-  "Send each new revision as a new top-level thread, rather than burying
-  it in-reply-to an earlier revision, as many reviewers are not looking
-  inside deep threads for new patches."
-
-Thanks,
-Stefan
-
---2iBwrppp/7QCDedR
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEcBAEBAgAGBQJaLl5BAAoJEJykq7OBq3PI3LMH/RdGzAfr/MEDYVGjAQ89/x7I
-2sK9HVT4VGWkr+S9KBbvFv8qml3aKjV93/iEwYdYRLL7s9caI2oFHW9hBNODfE1d
-8muOqUIHpTKQNBaPJ9FgsZ3RJDOpgD9RiCSRGa/qKq6Jl2sE18SvwTthD1JYxP0F
-sGylImyOsoi5HVwWvH+F/itTpDc9SCKwnT2qiMazekulbaifEmvSzlD0FFKCJsIm
-c0jQnYOnksDWs0K9OAmAIfXzHXB5VMwW5QA+neBkJg92C+2j9owxQ+FW9vWaOsWg
-v32w379rc+x0+HGHR6aDDKwwOWjU7mejuUSsw54ob+2j8gwyUYV926YX0A+exT8=
-=fN1A
------END PGP SIGNATURE-----
-
---2iBwrppp/7QCDedR--
+> v2
+>   Incorporate changes and code from Igor, in particular the simpler
+>   ring verification checks and thus the removal of the complex
+>   comparison code.
+> 
+> Dave
+> 
+> 
+> Dr. David Alan Gilbert (8):
+>   memory: address_space_iterate
+>   vhost: Move log_dirty check
+>   vhost: Simplify ring verification checks
+>   vhost: New memory update functions
+>   vhost: update_mem_cb implementation
+>   vhost: Compare and copy updated region data into device state
+>   vhost: Remove old vhost_set_memory etc
+>   vhost: Move mem_sections maintenance into commit/update routines
+> 
+>  hw/virtio/trace-events    |   7 +
+>  hw/virtio/vhost.c         | 504 ++++++++++++++++------------------------------
+>  include/exec/memory.h     |  23 +++
+>  include/hw/virtio/vhost.h |   3 -
+>  memory.c                  |  22 ++
+>  5 files changed, 229 insertions(+), 330 deletions(-)
+> 
