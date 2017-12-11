@@ -1,18 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33808)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33809)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1eOU1t-00084O-AP
+	(envelope-from <dgilbert@redhat.com>) id 1eOU1t-00084P-AT
 	for qemu-devel@nongnu.org; Mon, 11 Dec 2017 14:46:22 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1eOU1q-0006RA-7s
+	(envelope-from <dgilbert@redhat.com>) id 1eOU1r-0006Tu-Pj
 	for qemu-devel@nongnu.org; Mon, 11 Dec 2017 14:46:21 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:34414)
+Received: from mx1.redhat.com ([209.132.183.28]:34442)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1eOU1q-0006Pq-1h
-	for qemu-devel@nongnu.org; Mon, 11 Dec 2017 14:46:18 -0500
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1eOU1r-0006SU-JY
+	for qemu-devel@nongnu.org; Mon, 11 Dec 2017 14:46:19 -0500
 From: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>
-Date: Mon, 11 Dec 2017 19:46:02 +0000
-Message-Id: <20171211194610.3962-1-dgilbert@redhat.com>
-Subject: [Qemu-devel] [PATCH v3 0/8] Rework vhost memory region updates
+Date: Mon, 11 Dec 2017 19:46:03 +0000
+Message-Id: <20171211194610.3962-2-dgilbert@redhat.com>
+In-Reply-To: <20171211194610.3962-1-dgilbert@redhat.com>
+References: <20171211194610.3962-1-dgilbert@redhat.com>
+Subject: [Qemu-devel] [PATCH v3 1/8] memory: address_space_iterate
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,45 +28,81 @@ Cc: maxime.coquelin@redhat.com, mst@redhat.com, groug@kaod.org
 
 From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
 
-Hi,
-  This patch set reworks the way the vhost code handles changes in
-physical address space layout that came from a discussion with Igor.
+Iterate through an address space calling a function for each
+section.  The iteration is done in order.
 
-Its intention is to simplify a lot of the update code,
-and to make it easier for the postcopy+shared code to
-do the hugepage alignments that are needed.
+Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+---
+ include/exec/memory.h | 23 +++++++++++++++++++++++
+ memory.c              | 22 ++++++++++++++++++++++
+ 2 files changed, 45 insertions(+)
 
-Instead of updating and trying to merge sections of address
-space on each add/remove callback, we wait until the commit phase
-and go through and rebuild a list by walking the Flatview of
-memory and end up producing an ordered list.
-We compare the list to the old list to trigger updates.
-
-v3
-  Fix misordered comparison (that is removed later in the series)
-  A few spelling fixes
-  Now bisect builds, make checks and passes a test with hotlug
-  memory on real vhost.
-
-Dave
-
-
-Dr. David Alan Gilbert (8):
-  memory: address_space_iterate
-  vhost: Move log_dirty check
-  vhost: Simplify ring verification checks
-  vhost: New memory update functions
-  vhost: update_mem_cb implementation
-  vhost: Compare and copy updated region data into device state
-  vhost: Remove old vhost_set_memory etc
-  vhost: Move mem_sections maintenance into commit/update routines
-
- hw/virtio/trace-events    |   7 +
- hw/virtio/vhost.c         | 498 ++++++++++++++++------------------------------
- include/exec/memory.h     |  23 +++
- include/hw/virtio/vhost.h |   3 -
- memory.c                  |  22 ++
- 5 files changed, 226 insertions(+), 327 deletions(-)
-
+diff --git a/include/exec/memory.h b/include/exec/memory.h
+index 5ed4042f87..f5a9df642e 100644
+--- a/include/exec/memory.h
++++ b/include/exec/memory.h
+@@ -1987,6 +1987,29 @@ address_space_write_cached(MemoryRegionCache *cache, hwaddr addr,
+     address_space_write(cache->as, cache->xlat + addr, MEMTXATTRS_UNSPECIFIED, buf, len);
+ }
+ 
++/**
++ * ASIterateCallback: Function type called by address_space_iterate
++ *
++ * Return 0 on success or a negative error code.
++ *
++ * @mrs: Memory region section for this range
++ * @opaque: The opaque value passed in to the iterator.
++ */
++typedef int (*ASIterateCallback)(MemoryRegionSection *mrs, void *opaque);
++
++/**
++ * address_space_iterate: Call the function for each address range in the
++ *                        AddressSpace, in sorted order.
++ *
++ * Return 0 on success or a negative error code.
++ *
++ * @as: Address space to iterate over
++ * @cb: Function to call.  If the function returns none-0 the iteration will
++ *     stop.
++ * @opaque: Value to pass to the function
++ */
++int
++address_space_iterate(AddressSpace *as, ASIterateCallback cb, void *opaque);
+ #endif
+ 
+ #endif
+diff --git a/memory.c b/memory.c
+index e26e5a3b1d..f45137f25e 100644
+--- a/memory.c
++++ b/memory.c
+@@ -2810,6 +2810,28 @@ void address_space_destroy(AddressSpace *as)
+     call_rcu(as, do_address_space_destroy, rcu);
+ }
+ 
++int address_space_iterate(AddressSpace *as, ASIterateCallback cb,
++                          void *opaque)
++{
++    int res = 0;
++    FlatView *fv = address_space_to_flatview(as);
++    FlatRange *range;
++
++    flatview_ref(fv);
++
++    FOR_EACH_FLAT_RANGE(range, fv) {
++        MemoryRegionSection mrs = section_from_flat_range(range, fv);
++        res = cb(&mrs, opaque);
++        if (res) {
++            break;
++        }
++    }
++
++    flatview_unref(fv);
++
++    return res;
++}
++
+ static const char *memory_region_type(MemoryRegion *mr)
+ {
+     if (memory_region_is_ram_device(mr)) {
 -- 
 2.14.3
