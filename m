@@ -1,21 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33988)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48386)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1eOU2D-0008GR-3G
-	for qemu-devel@nongnu.org; Mon, 11 Dec 2017 14:46:42 -0500
+	(envelope-from <david@redhat.com>) id 1eOUl8-0008Bw-7A
+	for qemu-devel@nongnu.org; Mon, 11 Dec 2017 15:33:07 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1eOU2A-00074q-0C
-	for qemu-devel@nongnu.org; Mon, 11 Dec 2017 14:46:41 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:50882)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1eOU29-00072w-OJ
-	for qemu-devel@nongnu.org; Mon, 11 Dec 2017 14:46:37 -0500
-From: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>
-Date: Mon, 11 Dec 2017 19:46:10 +0000
-Message-Id: <20171211194610.3962-9-dgilbert@redhat.com>
-In-Reply-To: <20171211194610.3962-1-dgilbert@redhat.com>
-References: <20171211194610.3962-1-dgilbert@redhat.com>
-Subject: [Qemu-devel] [PATCH v3 8/8] vhost: Move mem_sections maintenance
- into commit/update routines
+	(envelope-from <david@redhat.com>) id 1eOUl4-0005aa-VA
+	for qemu-devel@nongnu.org; Mon, 11 Dec 2017 15:33:06 -0500
+References: <20171211134740.8235-1-david@redhat.com>
+	<20171211134740.8235-10-david@redhat.com>
+	<20171211190145.4f3e2be5.cohuck@redhat.com>
+From: David Hildenbrand <david@redhat.com>
+Message-ID: <208bf94f-6913-5f80-5df0-9859375e522d@redhat.com>
+Date: Mon, 11 Dec 2017 21:32:58 +0100
+MIME-Version: 1.0
+In-Reply-To: <20171211190145.4f3e2be5.cohuck@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v1 for-2-12 09/15] s390x/tcg: implement
+ TEST PENDING INTERRUPTION
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,118 +26,98 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org, imammedo@redhat.com
-Cc: maxime.coquelin@redhat.com, mst@redhat.com, groug@kaod.org
+To: Cornelia Huck <cohuck@redhat.com>
+Cc: qemu-s390x@nongnu.org, qemu-devel@nongnu.org, Christian Borntraeger <borntraeger@de.ibm.com>, Richard Henderson <rth@twiddle.net>, Alexander Graf <agraf@suse.de>, Paolo Bonzini <pbonzini@redhat.com>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Thomas Huth <thuth@redhat.com>
 
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+On 11.12.2017 19:01, Cornelia Huck wrote:
+> On Mon, 11 Dec 2017 14:47:34 +0100
+> David Hildenbrand <david@redhat.com> wrote:
+> 
+>> Use s390_cpu_virt_mem_write() so we can actually revert what we did
+>> (re-inject the dequeued IO interrupt).
+>>
+>> Signed-off-by: David Hildenbrand <david@redhat.com>
+>> ---
+>>  target/s390x/helper.h      |  1 +
+>>  target/s390x/insn-data.def |  1 +
+>>  target/s390x/misc_helper.c | 53 ++++++++++++++++++++++++++++++++++++++++++++++
+>>  target/s390x/translate.c   |  8 +++++++
+>>  4 files changed, 63 insertions(+)
+>>
+> 
+>> +uint32_t HELPER(tpi)(CPUS390XState *env, uint64_t addr)
+>> +{
+>> +    const uintptr_t ra = GETPC();
+>> +    S390CPU *cpu = s390_env_get_cpu(env);
+>> +    QEMUS390FLICState *flic = QEMU_S390_FLIC(s390_get_flic());
+>> +    QEMUS390FlicIO *io = NULL;
+>> +    LowCore *lowcore;
+>> +
+>> +    if (addr & 0x3) {
+>> +        s390_program_interrupt(env, PGM_SPECIFICATION, 4, ra);
+>> +    }
+>> +
+>> +    qemu_mutex_lock_iothread();
+>> +    io = qemu_s390_flic_dequeue_io(flic, env->cregs[6]);
+>> +    if (!io) {
+>> +        qemu_mutex_unlock_iothread();
+>> +        return 0;
+>> +    }
+>> +
+>> +    if (addr) {
+>> +        struct {
+>> +            uint16_t id;
+>> +            uint16_t nr;
+>> +            uint32_t parm;
+>> +        } tmp = {
+>> +            .id = cpu_to_be16(io->id),
+>> +            .nr = cpu_to_be16(io->nr),
+>> +            .parm = cpu_to_be32(io->parm),
+>> +        };
+> 
+> That's a two-word interruption code; can you call this something better
+> than 'tmp'?
 
-Move the maintenance of mem_sections into the vhost_update_mem routines,
-this removes the need for the vhost_region_add/del callbacks.
+IMHO from the context we have here it should be pretty clear what is
+happening. I mean we are defining and initializing the temporary data
+structure.
 
-Suggested-by: Igor Mammedov <imammedo@redhat.com>
-  (and mostly written by Igor!)
+But I can change the name if you can come up with a catchy variable name. :)
 
-Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
----
- hw/virtio/vhost.c | 58 +++++++++++++++----------------------------------------
- 1 file changed, 16 insertions(+), 42 deletions(-)
+Thanks!
 
-diff --git a/hw/virtio/vhost.c b/hw/virtio/vhost.c
-index 0bf6fb0577..5d3f921be5 100644
---- a/hw/virtio/vhost.c
-+++ b/hw/virtio/vhost.c
-@@ -408,6 +408,13 @@ static int vhost_update_mem_cb(MemoryRegionSection *mrs, void *opaque)
-     if (!vhost_section(mrs)) {
-         return 0;
-     }
-+    ++vtmp->dev->n_mem_sections;
-+    vtmp->dev->mem_sections = g_renew(MemoryRegionSection,
-+                                      vtmp->dev->mem_sections,
-+                                      vtmp->dev->n_mem_sections);
-+    vtmp->dev->mem_sections[vtmp->dev->n_mem_sections - 1] = *mrs;
-+    memory_region_ref(mrs->mr);
-+
-     mrs_size = int128_get64(mrs->size);
-     mrs_gpa  = mrs->offset_within_address_space;
-     mrs_host = (uintptr_t)memory_region_get_ram_ptr(mrs->mr) +
-@@ -461,6 +468,7 @@ static int vhost_update_mem_cb(MemoryRegionSection *mrs, void *opaque)
- static int vhost_update_mem(struct vhost_dev *dev, bool *changed)
- {
-     int res;
-+    unsigned i;
-     struct vhost_update_mem_tmp vtmp;
-     size_t mem_size;
-     vtmp.regions = 0;
-@@ -469,6 +477,14 @@ static int vhost_update_mem(struct vhost_dev *dev, bool *changed)
- 
-     trace_vhost_update_mem();
-     *changed = false;
-+    /* Clear out the section list, it'll get rebuilt */
-+    for (i = 0; i < dev->n_mem_sections; i++) {
-+        memory_region_unref(dev->mem_sections[i].mr);
-+    }
-+    g_free(dev->mem_sections);
-+    dev->mem_sections = NULL;
-+    dev->n_mem_sections = 0;
-+
-     res = address_space_iterate(&address_space_memory,
-                                 vhost_update_mem_cb, &vtmp);
-     if (res) {
-@@ -553,46 +569,6 @@ static void vhost_commit(MemoryListener *listener)
-     }
- }
- 
--static void vhost_region_add(MemoryListener *listener,
--                             MemoryRegionSection *section)
--{
--    struct vhost_dev *dev = container_of(listener, struct vhost_dev,
--                                         memory_listener);
--
--    if (!vhost_section(section)) {
--        return;
--    }
--
--    ++dev->n_mem_sections;
--    dev->mem_sections = g_renew(MemoryRegionSection, dev->mem_sections,
--                                dev->n_mem_sections);
--    dev->mem_sections[dev->n_mem_sections - 1] = *section;
--    memory_region_ref(section->mr);
--}
--
--static void vhost_region_del(MemoryListener *listener,
--                             MemoryRegionSection *section)
--{
--    struct vhost_dev *dev = container_of(listener, struct vhost_dev,
--                                         memory_listener);
--    int i;
--
--    if (!vhost_section(section)) {
--        return;
--    }
--
--    memory_region_unref(section->mr);
--    for (i = 0; i < dev->n_mem_sections; ++i) {
--        if (dev->mem_sections[i].offset_within_address_space
--            == section->offset_within_address_space) {
--            --dev->n_mem_sections;
--            memmove(&dev->mem_sections[i], &dev->mem_sections[i+1],
--                    (dev->n_mem_sections - i) * sizeof(*dev->mem_sections));
--            break;
--        }
--    }
--}
--
- static void vhost_iommu_unmap_notify(IOMMUNotifier *n, IOMMUTLBEntry *iotlb)
- {
-     struct vhost_iommu *iommu = container_of(n, struct vhost_iommu, n);
-@@ -1165,8 +1141,6 @@ int vhost_dev_init(struct vhost_dev *hdev, void *opaque,
- 
-     hdev->memory_listener = (MemoryListener) {
-         .commit = vhost_commit,
--        .region_add = vhost_region_add,
--        .region_del = vhost_region_del,
-         .region_nop = vhost_region_nop,
-         .log_start = vhost_log_start,
-         .log_stop = vhost_log_stop,
+> 
+>> +
+>> +        if (s390_cpu_virt_mem_write(cpu, addr, 0, &tmp, sizeof(tmp))) {
+>> +            /* writing failed, reinject and properly clean up */
+>> +            s390_io_interrupt(io->id, io->nr, io->parm, io->word);
+>> +            qemu_mutex_unlock_iothread();
+>> +            g_free(io);
+>> +            s390_cpu_virt_mem_handle_exc(cpu, ra);
+>> +            return 0;
+>> +        }
+>> +    } else {
+>> +        /* no protection applies */
+>> +        lowcore = cpu_map_lowcore(env);
+>> +        lowcore->subchannel_id = cpu_to_be16(io->id);
+>> +        lowcore->subchannel_nr = cpu_to_be16(io->nr);
+>> +        lowcore->io_int_parm = cpu_to_be32(io->parm);
+>> +        lowcore->io_int_word = cpu_to_be32(io->word);
+>> +        cpu_unmap_lowcore(lowcore);
+>> +    }
+>> +
+>> +    g_free(io);
+>> +    qemu_mutex_unlock_iothread();
+>> +    return 1;
+>> +}
+>> +
+>>  void HELPER(tsch)(CPUS390XState *env, uint64_t r1, uint64_t inst)
+>>  {
+>>      S390CPU *cpu = s390_env_get_cpu(env);
+
+
 -- 
-2.14.3
+
+Thanks,
+
+David / dhildenb
