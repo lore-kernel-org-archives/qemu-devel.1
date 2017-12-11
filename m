@@ -1,21 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57659)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59943)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1eOSOu-00080h-Uq
-	for qemu-devel@nongnu.org; Mon, 11 Dec 2017 13:02:01 -0500
+	(envelope-from <prvs=5116ce171=anthony.perard@citrix.com>)
+	id 1eOSUd-000497-Rd
+	for qemu-devel@nongnu.org; Mon, 11 Dec 2017 13:07:56 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1eOSOq-0007Cc-3J
-	for qemu-devel@nongnu.org; Mon, 11 Dec 2017 13:02:01 -0500
-Date: Mon, 11 Dec 2017 19:01:45 +0100
-From: Cornelia Huck <cohuck@redhat.com>
-Message-ID: <20171211190145.4f3e2be5.cohuck@redhat.com>
-In-Reply-To: <20171211134740.8235-10-david@redhat.com>
-References: <20171211134740.8235-1-david@redhat.com>
-	<20171211134740.8235-10-david@redhat.com>
+	(envelope-from <prvs=5116ce171=anthony.perard@citrix.com>)
+	id 1eOSUZ-00030D-R2
+	for qemu-devel@nongnu.org; Mon, 11 Dec 2017 13:07:55 -0500
+Received: from smtp.citrix.com ([66.165.176.89]:16260)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_ARCFOUR_SHA1:16) (Exim 4.71)
+	(envelope-from <prvs=5116ce171=anthony.perard@citrix.com>)
+	id 1eOSUZ-0002zj-KP
+	for qemu-devel@nongnu.org; Mon, 11 Dec 2017 13:07:51 -0500
+Date: Mon, 11 Dec 2017 18:07:48 +0000
+From: Anthony PERARD <anthony.perard@citrix.com>
+Message-ID: <20171211180748.GD2216@perard.uk.xensource.com>
+References: <1510899865-40323-1-git-send-email-chao.gao@intel.com>
+	<1510899865-40323-4-git-send-email-chao.gao@intel.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v1 for-2-12 09/15] s390x/tcg: implement
- TEST PENDING INTERRUPTION
+Content-Type: text/plain; charset="us-ascii"
+Content-Disposition: inline
+In-Reply-To: <1510899865-40323-4-git-send-email-chao.gao@intel.com>
+Subject: Re: [Qemu-devel] [PATCH v3 3/3] msi: Handle remappable format
+ interrupt request
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,81 +31,55 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Hildenbrand <david@redhat.com>
-Cc: qemu-s390x@nongnu.org, qemu-devel@nongnu.org, Christian Borntraeger <borntraeger@de.ibm.com>, Richard Henderson <rth@twiddle.net>, Alexander Graf <agraf@suse.de>, Paolo Bonzini <pbonzini@redhat.com>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Thomas Huth <thuth@redhat.com>
+To: Chao Gao <chao.gao@intel.com>
+Cc: qemu-devel@nongnu.org, xen-devel@lists.xenproject.org, Marcel Apfelbaum <marcel@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, Richard Henderson <rth@twiddle.net>, Paolo Bonzini <pbonzini@redhat.com>, "Michael S.
+	Tsirkin" <mst@redhat.com>, Stefano Stabellini <sstabellini@kernel.org>, Lan Tianyu <tianyu.lan@intel.com>
 
-On Mon, 11 Dec 2017 14:47:34 +0100
-David Hildenbrand <david@redhat.com> wrote:
-
-> Use s390_cpu_virt_mem_write() so we can actually revert what we did
-> (re-inject the dequeued IO interrupt).
+On Fri, Nov 17, 2017 at 02:24:25PM +0800, Chao Gao wrote:
+> According to VT-d spec Interrupt Remapping and Interrupt Posting ->
+> Interrupt Remapping -> Interrupt Request Formats On Intel 64
+> Platforms, fields of MSI data register have changed. This patch
+> avoids wrongly regarding a remappable format interrupt request as
+> an interrupt binded with a pirq.
 > 
-> Signed-off-by: David Hildenbrand <david@redhat.com>
+> Signed-off-by: Chao Gao <chao.gao@intel.com>
+> Signed-off-by: Lan Tianyu <tianyu.lan@intel.com>
 > ---
->  target/s390x/helper.h      |  1 +
->  target/s390x/insn-data.def |  1 +
->  target/s390x/misc_helper.c | 53 ++++++++++++++++++++++++++++++++++++++++++++++
->  target/s390x/translate.c   |  8 +++++++
->  4 files changed, 63 insertions(+)
+> v3:
+>  - clarify the interrupt format bit is Intel-specific, then it is
+>  improper to define MSI_ADDR_IF_MASK in a common header.
+> ---
+>  hw/i386/xen/xen-hvm.c | 10 +++++++++-
+>  hw/pci/msi.c          |  5 +++--
+>  hw/pci/msix.c         |  4 +++-
+>  hw/xen/xen_pt_msi.c   |  2 +-
+>  include/hw/xen/xen.h  |  2 +-
+>  stubs/xen-hvm.c       |  2 +-
+>  6 files changed, 18 insertions(+), 7 deletions(-)
 > 
-
-> +uint32_t HELPER(tpi)(CPUS390XState *env, uint64_t addr)
-> +{
-> +    const uintptr_t ra = GETPC();
-> +    S390CPU *cpu = s390_env_get_cpu(env);
-> +    QEMUS390FLICState *flic = QEMU_S390_FLIC(s390_get_flic());
-> +    QEMUS390FlicIO *io = NULL;
-> +    LowCore *lowcore;
-> +
-> +    if (addr & 0x3) {
-> +        s390_program_interrupt(env, PGM_SPECIFICATION, 4, ra);
-> +    }
-> +
-> +    qemu_mutex_lock_iothread();
-> +    io = qemu_s390_flic_dequeue_io(flic, env->cregs[6]);
-> +    if (!io) {
-> +        qemu_mutex_unlock_iothread();
-> +        return 0;
-> +    }
-> +
-> +    if (addr) {
-> +        struct {
-> +            uint16_t id;
-> +            uint16_t nr;
-> +            uint32_t parm;
-> +        } tmp = {
-> +            .id = cpu_to_be16(io->id),
-> +            .nr = cpu_to_be16(io->nr),
-> +            .parm = cpu_to_be32(io->parm),
-> +        };
-
-That's a two-word interruption code; can you call this something better
-than 'tmp'?
-
-> +
-> +        if (s390_cpu_virt_mem_write(cpu, addr, 0, &tmp, sizeof(tmp))) {
-> +            /* writing failed, reinject and properly clean up */
-> +            s390_io_interrupt(io->id, io->nr, io->parm, io->word);
-> +            qemu_mutex_unlock_iothread();
-> +            g_free(io);
-> +            s390_cpu_virt_mem_handle_exc(cpu, ra);
-> +            return 0;
-> +        }
-> +    } else {
-> +        /* no protection applies */
-> +        lowcore = cpu_map_lowcore(env);
-> +        lowcore->subchannel_id = cpu_to_be16(io->id);
-> +        lowcore->subchannel_nr = cpu_to_be16(io->nr);
-> +        lowcore->io_int_parm = cpu_to_be32(io->parm);
-> +        lowcore->io_int_word = cpu_to_be32(io->word);
-> +        cpu_unmap_lowcore(lowcore);
-> +    }
-> +
-> +    g_free(io);
-> +    qemu_mutex_unlock_iothread();
-> +    return 1;
-> +}
-> +
->  void HELPER(tsch)(CPUS390XState *env, uint64_t r1, uint64_t inst)
+> diff --git a/hw/i386/xen/xen-hvm.c b/hw/i386/xen/xen-hvm.c
+> index 8028bed..52dc8af 100644
+> --- a/hw/i386/xen/xen-hvm.c
+> +++ b/hw/i386/xen/xen-hvm.c
+> @@ -145,8 +145,16 @@ void xen_piix_pci_write_config_client(uint32_t address, uint32_t val, int len)
+>      }
+>  }
+>  
+> -int xen_is_pirq_msi(uint32_t msi_data)
+> +int xen_is_pirq_msi(uint32_t msi_addr_lo, uint32_t msi_data)
 >  {
->      S390CPU *cpu = s390_env_get_cpu(env);
+> +    /* If the MSI address is configured in remapping format, the MSI will not
+> +     * be remapped into a pirq. This 'if' test excludes Intel-specific
+> +     * remappable msi.
+> +     */
+> +#define MSI_ADDR_IF_MASK 0x00000010
+
+I don't think that is the right place for a define, they also exist
+outside of the context of the function.
+That define would be better at the top of this file, I think. (There is
+probably a better place in the common headers, but I'm not sure were.)
+
+Thanks,
+
+-- 
+Anthony PERARD
