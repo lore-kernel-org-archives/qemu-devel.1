@@ -1,24 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34910)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34942)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mikhail.abakumov@ispras.ru>) id 1eOO5J-0004V8-C3
-	for qemu-devel@nongnu.org; Mon, 11 Dec 2017 08:25:35 -0500
+	(envelope-from <mikhail.abakumov@ispras.ru>) id 1eOO5M-0004XX-4B
+	for qemu-devel@nongnu.org; Mon, 11 Dec 2017 08:25:36 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mikhail.abakumov@ispras.ru>) id 1eOO5D-0003vU-7r
-	for qemu-devel@nongnu.org; Mon, 11 Dec 2017 08:25:29 -0500
-Received: from mail.ispras.ru ([83.149.199.45]:44186)
+	(envelope-from <mikhail.abakumov@ispras.ru>) id 1eOO5J-0003ze-0z
+	for qemu-devel@nongnu.org; Mon, 11 Dec 2017 08:25:32 -0500
+Received: from mail.ispras.ru ([83.149.199.45]:44208)
 	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mikhail.abakumov@ispras.ru>) id 1eOO5C-0003vC-Tc
-	for qemu-devel@nongnu.org; Mon, 11 Dec 2017 08:25:23 -0500
+	(envelope-from <mikhail.abakumov@ispras.ru>) id 1eOO5I-0003yz-Ib
+	for qemu-devel@nongnu.org; Mon, 11 Dec 2017 08:25:28 -0500
 From: Mihail Abakumov <mikhail.abakumov@ispras.ru>
-Date: Mon, 11 Dec 2017 16:25:07 +0300
-Message-ID: <151299870749.4808.15323057710642491224.stgit@Misha-PC.lan02.inno>
+Date: Mon, 11 Dec 2017 16:25:13 +0300
+Message-ID: <151299871311.4808.11276175738665754697.stgit@Misha-PC.lan02.inno>
 In-Reply-To: <151299847127.4808.14646046517426494416.stgit@Misha-PC.lan02.inno>
 References: <151299847127.4808.14646046517426494416.stgit@Misha-PC.lan02.inno>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Subject: [Qemu-devel] [PATCH v4 40/46] windbg: implemented
- kd_api_search_memory
+Subject: [Qemu-devel] [PATCH v4 41/46] windbg: implemented kd_api_fill_memory
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,60 +34,66 @@ Signed-off-by: Pavel Dovgalyuk <dovgaluk@ispras.ru>
 Signed-off-by: Dmitriy Koltunov <koltunov@ispras.ru>
 ---
  include/exec/windbgstub-utils.h |    1 +
- windbgstub-utils.c              |   33 +++++++++++++++++++++++++++++++++
+ windbgstub-utils.c              |   39 +++++++++++++++++++++++++++++++++++++++
  windbgstub.c                    |    4 ++++
- 3 files changed, 38 insertions(+)
+ 3 files changed, 44 insertions(+)
 
 diff --git a/include/exec/windbgstub-utils.h b/include/exec/windbgstub-utils.h
-index 6e73ef973c..a58c47d359 100755
+index a58c47d359..f4adfe44dd 100755
 --- a/include/exec/windbgstub-utils.h
 +++ b/include/exec/windbgstub-utils.h
-@@ -90,6 +90,7 @@ void kd_api_write_physical_memory(CPUState *cpu, PacketData *pd);
- void kd_api_get_version(CPUState *cpu, PacketData *pd);
+@@ -91,6 +91,7 @@ void kd_api_get_version(CPUState *cpu, PacketData *pd);
  void kd_api_read_msr(CPUState *cpu, PacketData *pd);
  void kd_api_write_msr(CPUState *cpu, PacketData *pd);
-+void kd_api_search_memory(CPUState *cpu, PacketData *pd);
+ void kd_api_search_memory(CPUState *cpu, PacketData *pd);
++void kd_api_fill_memory(CPUState *cpu, PacketData *pd);
  void kd_api_unsupported(CPUState *cpu, PacketData *pd);
  
  SizedBuf kd_gen_exception_sc(CPUState *cpu);
 diff --git a/windbgstub-utils.c b/windbgstub-utils.c
-index 7ef301bac7..79899d3295 100755
+index 79899d3295..a34f5ae8bd 100755
 --- a/windbgstub-utils.c
 +++ b/windbgstub-utils.c
-@@ -261,6 +261,39 @@ void kd_api_get_version(CPUState *cpu, PacketData *pd)
+@@ -294,6 +294,45 @@ void kd_api_search_memory(CPUState *cpu, PacketData *pd)
      }
  }
  
-+void kd_api_search_memory(CPUState *cpu, PacketData *pd)
++void kd_api_fill_memory(CPUState *cpu, PacketData *pd)
 +{
-+    DBGKD_SEARCH_MEMORY *m64c = &pd->m64.u.SearchMemory;
-+    int s_len = MAX(ldq_p(&m64c->SearchLength), 1);
-+    int p_len = MIN(ldl_p(&m64c->PatternLength), pd->extra_size);
-+    target_ulong addr = ldq_p(&m64c->SearchAddress);
-+    int size = MIN(s_len, 1024);
-+    uint8_t mem[size + p_len];
-+    int i, err;
++    DBGKD_FILL_MEMORY *m64c = &pd->m64.u.FillMemory;
++    uint32_t len = ldl_p(&m64c->Length);
++    target_ulong addr = ldq_p(&m64c->Address);
++    uint16_t pattern = ldl_p(&m64c->PatternLength);
++    uint16_t flags = ldl_p(&m64c->Flags);
++    int err, offset = 0;
++
++    uint8_t mem[pattern];
++    memcpy(mem, pd->extra, pattern);
 +
 +    pd->extra_size = 0;
-+    pd->m64.ReturnStatus = STATUS_NO_MORE_ENTRIES;
 +
-+    while (s_len) {
-+        err = cpu_memory_rw_debug(cpu, addr, mem, size + p_len, 0);
-+        if (!err) {
-+            for (i = 0; i < size; ++i) {
-+                if (memcmp(mem + i, pd->extra, p_len) == 0) {
-+                    stl_p(&m64c->FoundAddress, addr + i);
-+                    pd->m64.ReturnStatus = STATUS_SUCCESS;
-+                    return;
-+                }
++    switch (flags) {
++    case DBGKD_FILL_MEMORY_VIRTUAL:
++        while (offset < len) {
++            err = cpu_memory_rw_debug(cpu, addr + offset, mem,
++                                      MIN(pattern, len - offset), 1);
++            offset += pattern;
++            if (err) {
++                WINDBG_DEBUG("fill_memory: No physical page mapped: " FMT_ADDR,
++                             addr);
 +            }
-+        } else {
-+            WINDBG_DEBUG("search_memory: No physical page mapped: " FMT_ADDR,
-+                         addr);
 +        }
-+        s_len -= size;
-+        addr += size;
-+        size = MIN(s_len, 1024);
++        break;
++
++    case DBGKD_FILL_MEMORY_PHYSICAL:
++        while (offset < len) {
++            cpu_physical_memory_rw(addr, mem, MIN(pattern, len - offset), 1);
++            offset += pattern;
++        }
++        break;
++
++    default:
++        break;
 +    }
 +}
 +
@@ -96,15 +101,15 @@ index 7ef301bac7..79899d3295 100755
  {
      WINDBG_ERROR("Caught unimplemented api %s",
 diff --git a/windbgstub.c b/windbgstub.c
-index 45f61917d9..3dcac03be1 100755
+index 3dcac03be1..f0b3ca3390 100755
 --- a/windbgstub.c
 +++ b/windbgstub.c
-@@ -212,6 +212,10 @@ static void windbg_process_manipulate_packet(ParsingContext *ctx)
-     case DbgKdClearAllInternalBreakpointsApi:
-         return;
+@@ -216,6 +216,10 @@ static void windbg_process_manipulate_packet(ParsingContext *ctx)
+         kd_api_search_memory(cpu, &ctx->data);
+         break;
  
-+    case DbgKdSearchMemoryApi:
-+        kd_api_search_memory(cpu, &ctx->data);
++    case DbgKdFillMemoryApi:
++        kd_api_fill_memory(cpu, &ctx->data);
 +        break;
 +
      default:
