@@ -1,27 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51575)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51620)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1eONe4-0002QN-Cv
-	for qemu-devel@nongnu.org; Mon, 11 Dec 2017 07:57:21 -0500
+	(envelope-from <alex.bennee@linaro.org>) id 1eONe7-0002SR-7V
+	for qemu-devel@nongnu.org; Mon, 11 Dec 2017 07:57:24 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1eONe3-0007jL-Bs
-	for qemu-devel@nongnu.org; Mon, 11 Dec 2017 07:57:20 -0500
-Received: from mail-wr0-x244.google.com ([2a00:1450:400c:c0c::244]:36469)
+	(envelope-from <alex.bennee@linaro.org>) id 1eONe5-0007ld-Ez
+	for qemu-devel@nongnu.org; Mon, 11 Dec 2017 07:57:23 -0500
+Received: from mail-wm0-x241.google.com ([2a00:1450:400c:c09::241]:35886)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1eONe3-0007iW-5f
-	for qemu-devel@nongnu.org; Mon, 11 Dec 2017 07:57:19 -0500
-Received: by mail-wr0-x244.google.com with SMTP id v105so17471258wrc.3
-	for <qemu-devel@nongnu.org>; Mon, 11 Dec 2017 04:57:18 -0800 (PST)
+	id 1eONe5-0007kF-5W
+	for qemu-devel@nongnu.org; Mon, 11 Dec 2017 07:57:21 -0500
+Received: by mail-wm0-x241.google.com with SMTP id b76so13998566wmg.1
+	for <qemu-devel@nongnu.org>; Mon, 11 Dec 2017 04:57:20 -0800 (PST)
 From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
-Date: Mon, 11 Dec 2017 12:56:55 +0000
-Message-Id: <20171211125705.16120-10-alex.bennee@linaro.org>
+Date: Mon, 11 Dec 2017 12:57:00 +0000
+Message-Id: <20171211125705.16120-15-alex.bennee@linaro.org>
 In-Reply-To: <20171211125705.16120-1-alex.bennee@linaro.org>
 References: <20171211125705.16120-1-alex.bennee@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v1 09/19] fpu/softfloat: define decompose
- structures
+Subject: [Qemu-devel] [PATCH v1 14/19] fpu/softfloat: re-factor round_to_int
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,103 +32,356 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: richard.henderson@linaro.org, peter.maydell@linaro.org, laurent@vivier.eu, bharata@linux.vnet.ibm.com, andrew@andrewdutcher.com, aleksandar.markovic@imgtec.com
 Cc: qemu-devel@nongnu.org, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, Aurelien Jarno <aurelien@aurel32.net>
 
-These structures pave the way for generic softfloat helper routines
-that will operate on fully decomposed numbers.
+We can now add float16_round_to_int and use the common round_decomposed and
+canonicalize functions to have a single implementation for
+float16/32/64 round_to_int functions.
 
 Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
 ---
- fpu/softfloat.c | 72 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++-
- 1 file changed, 71 insertions(+), 1 deletion(-)
+ fpu/softfloat.c         | 304 ++++++++++++++++++++----------------------------
+ include/fpu/softfloat.h |   1 +
+ 2 files changed, 130 insertions(+), 175 deletions(-)
 
 diff --git a/fpu/softfloat.c b/fpu/softfloat.c
-index 0850a78149..fe443ff234 100644
+index bf37f23f6a..9914ecb783 100644
 --- a/fpu/softfloat.c
 +++ b/fpu/softfloat.c
-@@ -83,7 +83,7 @@ this code that are retained.
-  * target-dependent and needs the TARGET_* macros.
-  */
- #include "qemu/osdep.h"
--
-+#include "qemu/bitops.h"
- #include "fpu/softfloat.h"
- 
- /* We only need stdlib for abort() */
-@@ -185,6 +185,76 @@ static inline flag extractFloat64Sign(float64 a)
- {
-     return float64_val(a) >> 63;
+@@ -1183,6 +1183,135 @@ float64 float64_div(float64 a, float64 b, float_status *status)
+     return float64_round_pack_canonical(pr, status);
  }
+ 
++/*
++ * Rounds the floating-point value `a' to an integer, and returns the
++ * result as a floating-point value. The operation is performed
++ * according to the IEC/IEEE Standard for Binary Floating-Point
++ * Arithmetic.
++ */
 +
-+/*----------------------------------------------------------------------------
-+| Classify a floating point number.
-+*----------------------------------------------------------------------------*/
++static decomposed_parts round_decomposed(decomposed_parts a, int rounding_mode,
++                                         float_status *s)
++{
 +
-+typedef enum {
-+    float_class_unclassified,
-+    float_class_zero,
-+    float_class_normal,
-+    float_class_inf,
-+    float_class_qnan,
-+    float_class_snan,
-+    float_class_dnan,
-+    float_class_msnan, /* maybe silenced */
-+} float_class;
++    switch (a.cls) {
++    case float_class_snan:
++        a.cls = s->default_nan_mode ? float_class_dnan : float_class_msnan;
++        s->float_exception_flags |= float_flag_invalid;
++        break;
++    case float_class_zero:
++    case float_class_inf:
++    case float_class_qnan:
++        /* already "integral" */
++        break;
++    case float_class_normal:
++        if (a.exp >= DECOMPOSED_BINARY_POINT) {
++            /* already integral */
++            break;
++        }
++        if (a.exp < 0) {
++            bool one;
++            /* all fractional */
++            s->float_exception_flags |= float_flag_inexact;
++            switch (rounding_mode) {
++            case float_round_nearest_even:
++                one = a.exp == -1 && a.frac > DECOMPOSED_IMPLICIT_BIT;
++                break;
++            case float_round_ties_away:
++                one = a.exp == -1 && a.frac >= DECOMPOSED_IMPLICIT_BIT;
++                break;
++            case float_round_to_zero:
++                one = false;
++                break;
++            case float_round_up:
++                one = !a.sign;
++                break;
++            case float_round_down:
++                one = a.sign;
++                break;
++            default:
++                g_assert_not_reached();
++            }
 +
-+/*----------------------------------------------------------------------------
-+| Structure holding all of the decomposed parts of a float.
-+| The exponent is unbiased and the fraction is normalized.
-+*----------------------------------------------------------------------------*/
++            if (one) {
++                a.frac = DECOMPOSED_IMPLICIT_BIT;
++                a.exp = 0;
++            } else {
++                a.cls = float_class_zero;
++            }
++        } else {
++            uint64_t frac_lsb, frac_lsbm1, round_mask, roundeven_mask, inc;
 +
-+typedef struct {
-+    uint64_t frac   : 64;
-+    int exp         : 32;
-+    float_class cls : 8;
-+    int             : 23;
-+    bool sign       : 1;
-+} decomposed_parts;
++            frac_lsb = DECOMPOSED_IMPLICIT_BIT >> a.exp;
++            frac_lsbm1 = frac_lsb >> 1;
++            roundeven_mask = (frac_lsb - 1) | frac_lsb;
++            round_mask = roundeven_mask >> 1;
 +
-+#define DECOMPOSED_BINARY_POINT    (64 - 2)
-+#define DECOMPOSED_IMPLICIT_BIT    (1ull << DECOMPOSED_BINARY_POINT)
-+#define DECOMPOSED_OVERFLOW_BIT    (DECOMPOSED_IMPLICIT_BIT << 1)
++            switch (rounding_mode) {
++            case float_round_nearest_even:
++                inc = ((a.frac & roundeven_mask) != frac_lsbm1 ? frac_lsbm1 : 0);
++                break;
++            case float_round_ties_away:
++                inc = frac_lsbm1;
++                break;
++            case float_round_to_zero:
++                inc = 0;
++                break;
++            case float_round_up:
++                inc = a.sign ? 0 : round_mask;
++                break;
++            case float_round_down:
++                inc = a.sign ? round_mask : 0;
++                break;
++            default:
++                g_assert_not_reached();
++            }
 +
-+/* Structure holding all of the relevant parameters for a format.  */
-+typedef struct {
-+    int exp_bias;
-+    int exp_max;
-+    int frac_shift;
-+    uint64_t frac_lsb;
-+    uint64_t frac_lsbm1;
-+    uint64_t round_mask;
-+    uint64_t roundeven_mask;
-+} decomposed_params;
++            if (a.frac & round_mask) {
++                s->float_exception_flags |= float_flag_inexact;
++                a.frac += inc;
++                a.frac &= ~round_mask;
++                if (a.frac & DECOMPOSED_OVERFLOW_BIT) {
++                    a.frac >>= 1;
++                    a.exp++;
++                }
++            }
++        }
++        break;
++    default:
++        g_assert_not_reached();
++    }
++    return a;
++}
 +
-+#define FRAC_PARAMS(F)                     \
-+    .frac_shift     = F,                   \
-+    .frac_lsb       = 1ull << (F),         \
-+    .frac_lsbm1     = 1ull << ((F) - 1),   \
-+    .round_mask     = (1ull << (F)) - 1,   \
-+    .roundeven_mask = (2ull << (F)) - 1
++float16 float16_round_to_int(float16 a, float_status *s)
++{
++    decomposed_parts pa = float16_unpack_canonical(a, s);
++    decomposed_parts pr = round_decomposed(pa, s->float_rounding_mode, s);
++    return float16_round_pack_canonical(pr, s);
++}
 +
-+static const decomposed_params float16_params = {
-+    .exp_bias       = 0x0f,
-+    .exp_max        = 0x1f,
-+    FRAC_PARAMS(DECOMPOSED_BINARY_POINT - 10)
-+};
++float32 float32_round_to_int(float32 a, float_status *s)
++{
++    decomposed_parts pa = float32_unpack_canonical(a, s);
++    decomposed_parts pr = round_decomposed(pa, s->float_rounding_mode, s);
++    return float32_round_pack_canonical(pr, s);
++}
 +
-+static const decomposed_params float32_params = {
-+    .exp_bias       = 0x7f,
-+    .exp_max        = 0xff,
-+    FRAC_PARAMS(DECOMPOSED_BINARY_POINT - 23)
-+};
++float64 float64_round_to_int(float64 a, float_status *s)
++{
++    decomposed_parts pa = float64_unpack_canonical(a, s);
++    decomposed_parts pr = round_decomposed(pa, s->float_rounding_mode, s);
++    return float64_round_pack_canonical(pr, s);
++}
 +
-+static const decomposed_params float64_params = {
-+    .exp_bias       = 0x3ff,
-+    .exp_max        = 0x7ff,
-+    FRAC_PARAMS(DECOMPOSED_BINARY_POINT - 52)
-+};
-+
++float64 float64_trunc_to_int(float64 a, float_status *s)
++{
++    decomposed_parts pa = float64_unpack_canonical(a, s);
++    decomposed_parts pr = round_decomposed(pa, float_round_to_zero, s);
++    return float64_round_pack_canonical(pr, s);
++}
 +
  /*----------------------------------------------------------------------------
  | Takes a 64-bit fixed-point value `absZ' with binary point between bits 6
  | and 7, and returns the properly rounded 32-bit integer corresponding to the
+@@ -2913,88 +3042,6 @@ float128 float32_to_float128(float32 a, float_status *status)
+ 
+ }
+ 
+-/*----------------------------------------------------------------------------
+-| Rounds the single-precision floating-point value `a' to an integer, and
+-| returns the result as a single-precision floating-point value.  The
+-| operation is performed according to the IEC/IEEE Standard for Binary
+-| Floating-Point Arithmetic.
+-*----------------------------------------------------------------------------*/
+-
+-float32 float32_round_to_int(float32 a, float_status *status)
+-{
+-    flag aSign;
+-    int aExp;
+-    uint32_t lastBitMask, roundBitsMask;
+-    uint32_t z;
+-    a = float32_squash_input_denormal(a, status);
+-
+-    aExp = extractFloat32Exp( a );
+-    if ( 0x96 <= aExp ) {
+-        if ( ( aExp == 0xFF ) && extractFloat32Frac( a ) ) {
+-            return propagateFloat32NaN(a, a, status);
+-        }
+-        return a;
+-    }
+-    if ( aExp <= 0x7E ) {
+-        if ( (uint32_t) ( float32_val(a)<<1 ) == 0 ) return a;
+-        status->float_exception_flags |= float_flag_inexact;
+-        aSign = extractFloat32Sign( a );
+-        switch (status->float_rounding_mode) {
+-         case float_round_nearest_even:
+-            if ( ( aExp == 0x7E ) && extractFloat32Frac( a ) ) {
+-                return packFloat32( aSign, 0x7F, 0 );
+-            }
+-            break;
+-        case float_round_ties_away:
+-            if (aExp == 0x7E) {
+-                return packFloat32(aSign, 0x7F, 0);
+-            }
+-            break;
+-         case float_round_down:
+-            return make_float32(aSign ? 0xBF800000 : 0);
+-         case float_round_up:
+-            return make_float32(aSign ? 0x80000000 : 0x3F800000);
+-        }
+-        return packFloat32( aSign, 0, 0 );
+-    }
+-    lastBitMask = 1;
+-    lastBitMask <<= 0x96 - aExp;
+-    roundBitsMask = lastBitMask - 1;
+-    z = float32_val(a);
+-    switch (status->float_rounding_mode) {
+-    case float_round_nearest_even:
+-        z += lastBitMask>>1;
+-        if ((z & roundBitsMask) == 0) {
+-            z &= ~lastBitMask;
+-        }
+-        break;
+-    case float_round_ties_away:
+-        z += lastBitMask >> 1;
+-        break;
+-    case float_round_to_zero:
+-        break;
+-    case float_round_up:
+-        if (!extractFloat32Sign(make_float32(z))) {
+-            z += roundBitsMask;
+-        }
+-        break;
+-    case float_round_down:
+-        if (extractFloat32Sign(make_float32(z))) {
+-            z += roundBitsMask;
+-        }
+-        break;
+-    default:
+-        abort();
+-    }
+-    z &= ~ roundBitsMask;
+-    if (z != float32_val(a)) {
+-        status->float_exception_flags |= float_flag_inexact;
+-    }
+-    return make_float32(z);
+-
+-}
+-
+-
+ 
+ 
+ /*----------------------------------------------------------------------------
+@@ -4140,99 +4187,6 @@ float128 float64_to_float128(float64 a, float_status *status)
+ 
+ }
+ 
+-/*----------------------------------------------------------------------------
+-| Rounds the double-precision floating-point value `a' to an integer, and
+-| returns the result as a double-precision floating-point value.  The
+-| operation is performed according to the IEC/IEEE Standard for Binary
+-| Floating-Point Arithmetic.
+-*----------------------------------------------------------------------------*/
+-
+-float64 float64_round_to_int(float64 a, float_status *status)
+-{
+-    flag aSign;
+-    int aExp;
+-    uint64_t lastBitMask, roundBitsMask;
+-    uint64_t z;
+-    a = float64_squash_input_denormal(a, status);
+-
+-    aExp = extractFloat64Exp( a );
+-    if ( 0x433 <= aExp ) {
+-        if ( ( aExp == 0x7FF ) && extractFloat64Frac( a ) ) {
+-            return propagateFloat64NaN(a, a, status);
+-        }
+-        return a;
+-    }
+-    if ( aExp < 0x3FF ) {
+-        if ( (uint64_t) ( float64_val(a)<<1 ) == 0 ) return a;
+-        status->float_exception_flags |= float_flag_inexact;
+-        aSign = extractFloat64Sign( a );
+-        switch (status->float_rounding_mode) {
+-         case float_round_nearest_even:
+-            if ( ( aExp == 0x3FE ) && extractFloat64Frac( a ) ) {
+-                return packFloat64( aSign, 0x3FF, 0 );
+-            }
+-            break;
+-        case float_round_ties_away:
+-            if (aExp == 0x3FE) {
+-                return packFloat64(aSign, 0x3ff, 0);
+-            }
+-            break;
+-         case float_round_down:
+-            return make_float64(aSign ? LIT64( 0xBFF0000000000000 ) : 0);
+-         case float_round_up:
+-            return make_float64(
+-            aSign ? LIT64( 0x8000000000000000 ) : LIT64( 0x3FF0000000000000 ));
+-        }
+-        return packFloat64( aSign, 0, 0 );
+-    }
+-    lastBitMask = 1;
+-    lastBitMask <<= 0x433 - aExp;
+-    roundBitsMask = lastBitMask - 1;
+-    z = float64_val(a);
+-    switch (status->float_rounding_mode) {
+-    case float_round_nearest_even:
+-        z += lastBitMask >> 1;
+-        if ((z & roundBitsMask) == 0) {
+-            z &= ~lastBitMask;
+-        }
+-        break;
+-    case float_round_ties_away:
+-        z += lastBitMask >> 1;
+-        break;
+-    case float_round_to_zero:
+-        break;
+-    case float_round_up:
+-        if (!extractFloat64Sign(make_float64(z))) {
+-            z += roundBitsMask;
+-        }
+-        break;
+-    case float_round_down:
+-        if (extractFloat64Sign(make_float64(z))) {
+-            z += roundBitsMask;
+-        }
+-        break;
+-    default:
+-        abort();
+-    }
+-    z &= ~ roundBitsMask;
+-    if (z != float64_val(a)) {
+-        status->float_exception_flags |= float_flag_inexact;
+-    }
+-    return make_float64(z);
+-
+-}
+-
+-float64 float64_trunc_to_int(float64 a, float_status *status)
+-{
+-    int oldmode;
+-    float64 res;
+-    oldmode = status->float_rounding_mode;
+-    status->float_rounding_mode = float_round_to_zero;
+-    res = float64_round_to_int(a, status);
+-    status->float_rounding_mode = oldmode;
+-    return res;
+-}
+-
+ 
+ /*----------------------------------------------------------------------------
+ | Returns the remainder of the double-precision floating-point value `a'
+diff --git a/include/fpu/softfloat.h b/include/fpu/softfloat.h
+index 102cf4b1e1..483803ff35 100644
+--- a/include/fpu/softfloat.h
++++ b/include/fpu/softfloat.h
+@@ -346,6 +346,7 @@ float64 float16_to_float64(float16 a, flag ieee, float_status *status);
+ | Software half-precision operations.
+ *----------------------------------------------------------------------------*/
+ 
++float16 float16_round_to_int(float16, float_status *status);
+ float16 float16_add(float16, float16, float_status *status);
+ float16 float16_sub(float16, float16, float_status *status);
+ float16 float16_mul(float16, float16, float_status *status);
 -- 
 2.15.1
