@@ -1,24 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34973)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35023)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mikhail.abakumov@ispras.ru>) id 1eOO5P-0004Xj-Bo
-	for qemu-devel@nongnu.org; Mon, 11 Dec 2017 08:25:36 -0500
+	(envelope-from <mikhail.abakumov@ispras.ru>) id 1eOO5X-0004dk-8r
+	for qemu-devel@nongnu.org; Mon, 11 Dec 2017 08:25:44 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mikhail.abakumov@ispras.ru>) id 1eOO5O-00043N-Cp
-	for qemu-devel@nongnu.org; Mon, 11 Dec 2017 08:25:35 -0500
-Received: from mail.ispras.ru ([83.149.199.45]:44228)
+	(envelope-from <mikhail.abakumov@ispras.ru>) id 1eOO5U-00047t-6F
+	for qemu-devel@nongnu.org; Mon, 11 Dec 2017 08:25:43 -0500
+Received: from mail.ispras.ru ([83.149.199.45]:44248)
 	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mikhail.abakumov@ispras.ru>) id 1eOO5O-000437-4W
-	for qemu-devel@nongnu.org; Mon, 11 Dec 2017 08:25:34 -0500
+	(envelope-from <mikhail.abakumov@ispras.ru>) id 1eOO5T-00047V-UN
+	for qemu-devel@nongnu.org; Mon, 11 Dec 2017 08:25:40 -0500
 From: Mihail Abakumov <mikhail.abakumov@ispras.ru>
-Date: Mon, 11 Dec 2017 16:25:18 +0300
-Message-ID: <151299871875.4808.12329119791884227277.stgit@Misha-PC.lan02.inno>
+Date: Mon, 11 Dec 2017 16:25:24 +0300
+Message-ID: <151299872436.4808.2880956635467564369.stgit@Misha-PC.lan02.inno>
 In-Reply-To: <151299847127.4808.14646046517426494416.stgit@Misha-PC.lan02.inno>
 References: <151299847127.4808.14646046517426494416.stgit@Misha-PC.lan02.inno>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Subject: [Qemu-devel] [PATCH v4 42/46] windbg: implemented
- kd_api_query_memory
+Subject: [Qemu-devel] [PATCH v4 43/46] windbg: added new api functions
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,59 +29,58 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: sw@weilnetz.de, lprosek@redhat.com, dovgaluk@ispras.ru, rkagan@virtuozzo.com, pbonzini@redhat.com, den@openvz.org
 
+Added some definitions for new windbg.
+
 Signed-off-by: Mihail Abakumov <mikhail.abakumov@ispras.ru>
 Signed-off-by: Pavel Dovgalyuk <dovgaluk@ispras.ru>
 Signed-off-by: Dmitriy Koltunov <koltunov@ispras.ru>
 ---
- include/exec/windbgstub-utils.h |    1 +
- windbgstub-utils.c              |    9 +++++++++
- windbgstub.c                    |    4 ++++
- 3 files changed, 14 insertions(+)
+ include/exec/windbgkd.h |   21 ++++++++++++++++++++-
+ 1 file changed, 20 insertions(+), 1 deletion(-)
 
-diff --git a/include/exec/windbgstub-utils.h b/include/exec/windbgstub-utils.h
-index f4adfe44dd..8d36354b7c 100755
---- a/include/exec/windbgstub-utils.h
-+++ b/include/exec/windbgstub-utils.h
-@@ -93,6 +93,7 @@ void kd_api_write_msr(CPUState *cpu, PacketData *pd);
- void kd_api_search_memory(CPUState *cpu, PacketData *pd);
- void kd_api_fill_memory(CPUState *cpu, PacketData *pd);
- void kd_api_unsupported(CPUState *cpu, PacketData *pd);
-+void kd_api_query_memory(CPUState *cpu, PacketData *pd);
+diff --git a/include/exec/windbgkd.h b/include/exec/windbgkd.h
+index 5008cbb729..aa2b4fdbd9 100755
+--- a/include/exec/windbgkd.h
++++ b/include/exec/windbgkd.h
+@@ -112,7 +112,10 @@
+ #define DbgKdFillMemoryApi                  0x0000315b
+ #define DbgKdQueryMemoryApi                 0x0000315c
+ #define DbgKdSwitchPartition                0x0000315d
+-#define DbgKdMaximumManipulate              0x0000315e
++#define DbgKdWriteCustomBreakpointApi       0x0000315e
++#define DbgKdGetContextExApi                0x0000315f
++#define DbgKdSetContextExApi                0x00003160
++#define DbgKdMaximumManipulate              0x00003161
  
- SizedBuf kd_gen_exception_sc(CPUState *cpu);
- SizedBuf kd_gen_load_symbols_sc(CPUState *cpu);
-diff --git a/windbgstub-utils.c b/windbgstub-utils.c
-index a34f5ae8bd..e3b1276dab 100755
---- a/windbgstub-utils.c
-+++ b/windbgstub-utils.c
-@@ -333,6 +333,15 @@ void kd_api_fill_memory(CPUState *cpu, PacketData *pd)
-     }
- }
+ /*
+  * Debug I/O Types
+@@ -723,6 +726,20 @@ typedef struct _DBGKD_SWITCH_PARTITION {
+     uint32_t Partition;
+ } DBGKD_SWITCH_PARTITION;
  
-+void kd_api_query_memory(CPUState *cpu, PacketData *pd)
-+{
-+    DBGKD_QUERY_MEMORY *mem = &pd->m64.u.QueryMemory;
++typedef struct _DBGKD_CONTEXT_EX {
++   uint32_t Offset;
++   uint32_t ByteCount;
++   uint32_t BytesCopied;
++} DBGKD_CONTEXT_EX, *PDBGKD_CONTEXT_EX;
 +
-+    stl_p(&mem->AddressSpace, DBGKD_QUERY_MEMORY_PROCESS);
-+    stl_p(&mem->Flags, DBGKD_QUERY_MEMORY_READ |
-+           DBGKD_QUERY_MEMORY_WRITE | DBGKD_QUERY_MEMORY_EXECUTE);
-+}
++typedef struct _DBGKD_WRITE_CUSTOM_BREAKPOINT {
++   uint64_t BreakPointAddress;
++   uint64_t BreakPointInstruction;
++   uint32_t BreakPointHandle;
++   uint16_t BreakPointInstructionSize;
++   uint16_t BreakPointInstructionAlignment;
++} DBGKD_WRITE_CUSTOM_BREAKPOINT, *PDBGKD_WRITE_CUSTOM_BREAKPOINT;
 +
- void kd_api_unsupported(CPUState *cpu, PacketData *pd)
- {
-     WINDBG_ERROR("Caught unimplemented api %s",
-diff --git a/windbgstub.c b/windbgstub.c
-index f0b3ca3390..f0930f20a8 100755
---- a/windbgstub.c
-+++ b/windbgstub.c
-@@ -220,6 +220,10 @@ static void windbg_process_manipulate_packet(ParsingContext *ctx)
-         kd_api_fill_memory(cpu, &ctx->data);
-         break;
+ /*
+  * DBGKD Structure for Manipulate
+  */
+@@ -787,6 +804,8 @@ typedef struct _DBGKD_MANIPULATE_STATE64 {
+         DBGKD_FILL_MEMORY FillMemory;
+         DBGKD_QUERY_MEMORY QueryMemory;
+         DBGKD_SWITCH_PARTITION SwitchPartition;
++        DBGKD_WRITE_CUSTOM_BREAKPOINT WriteCustomBreakpoint;
++        DBGKD_CONTEXT_EX ContextEx;
+     } u;
+ } DBGKD_MANIPULATE_STATE64, *PDBGKD_MANIPULATE_STATE64;
  
-+    case DbgKdQueryMemoryApi:
-+        kd_api_query_memory(cpu, &ctx->data);
-+        break;
-+
-     default:
-         kd_api_unsupported(cpu, &ctx->data);
-         break;
