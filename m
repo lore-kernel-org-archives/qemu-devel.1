@@ -1,30 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43588)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46778)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1eORjE-0000ky-5Y
-	for qemu-devel@nongnu.org; Mon, 11 Dec 2017 12:18:59 -0500
+	(envelope-from <alistair23@gmail.com>) id 1eORsV-0008Ne-Tn
+	for qemu-devel@nongnu.org; Mon, 11 Dec 2017 12:28:33 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1eORjC-0007RX-Sq
-	for qemu-devel@nongnu.org; Mon, 11 Dec 2017 12:18:56 -0500
-References: <20171109141631.25688-1-vsementsov@virtuozzo.com>
-	<8ade3dfe-ec27-a096-5d09-9e694f03935a@redhat.com>
-	<a254716c-2762-3a1c-d4c4-d3abb23f7207@redhat.com>
-	<a4757a98-0492-311a-2086-d2a95418d8ec@redhat.com>
-	<6372bf9a-b80b-f4c7-33fa-88f35e3062db@redhat.com>
-	<115a5939-fff8-8861-f02f-0204aea5b3e2@redhat.com>
-	<5f704858-1983-f1bb-2281-f12f43c5f2b6@redhat.com>
-	<09cebfbf-e95c-8f09-5a0a-9345e1e1804d@redhat.com>
-	<23523fec-96b1-f50b-6937-85daea8a832a@redhat.com>
-	<f3918f16-774b-4c73-7df4-8ec3e757ae3c@redhat.com>
-From: John Snow <jsnow@redhat.com>
-Message-ID: <2448d35a-69cc-e056-200a-b77f8cbb667c@redhat.com>
-Date: Mon, 11 Dec 2017 12:18:47 -0500
+	(envelope-from <alistair23@gmail.com>) id 1eORsU-00062M-G3
+	for qemu-devel@nongnu.org; Mon, 11 Dec 2017 12:28:31 -0500
+Received: from mail-wm0-x244.google.com ([2a00:1450:400c:c09::244]:39123)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <alistair23@gmail.com>)
+	id 1eORsU-00061V-6K
+	for qemu-devel@nongnu.org; Mon, 11 Dec 2017 12:28:30 -0500
+Received: by mail-wm0-x244.google.com with SMTP id i11so15579710wmf.4
+	for <qemu-devel@nongnu.org>; Mon, 11 Dec 2017 09:28:29 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <f3918f16-774b-4c73-7df4-8ec3e757ae3c@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [Qemu-block] [PATCH] blockdev-backup: enable
- non-root nodes for backup
+Sender: alistair23@gmail.com
+In-Reply-To: <CAAYMZQtBsYvYN=n-vNQ_xUZYzkT+mq7r6uUOsTtQSdR-egz0mw@mail.gmail.com>
+References: <cover.1512598866.git.alistair.francis@xilinx.com>
+	<c0b9bffacc4c248956e032c554787774d47edbf8.1512598866.git.alistair.francis@xilinx.com>
+	<CAAYMZQtBsYvYN=n-vNQ_xUZYzkT+mq7r6uUOsTtQSdR-egz0mw@mail.gmail.com>
+From: Alistair Francis <alistair.francis@xilinx.com>
+Date: Mon, 11 Dec 2017 09:27:58 -0800
+Message-ID: <CAKmqyKOqfoizc0eK2X4gQN+==Du95fd=WR+kpn9bgS13bJBBUQ@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH-2.12 v2 2/3] xilinx_spips: Set all of the
+ reset values
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,121 +32,148 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Max Reitz <mreitz@redhat.com>, Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org
-Cc: kwolf@redhat.com, den@openvz.org, armbru@redhat.com
+To: francisco iglesias <frasse.iglesias@gmail.com>
+Cc: Alistair Francis <alistair.francis@xilinx.com>, "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>, Edgar Iglesias <edgar.iglesias@xilinx.com>, Edde <edgar.iglesias@gmail.com>, KONRAD Frederic <frederic.konrad@adacore.com>
 
-
-
-On 12/11/2017 12:05 PM, Max Reitz wrote:
-> On 2017-12-11 17:47, John Snow wrote:
->> On 12/11/2017 11:31 AM, Max Reitz wrote:
->>> On 2017-12-08 18:09, John Snow wrote:
->>>> On 12/08/2017 09:30 AM, Max Reitz wrote:
->>>>> On 2017-12-05 01:48, John Snow wrote:
->>>>>>
->>>>>> I would say that a bitmap attached to a BlockBackend should behave in
->>>>>> the way you say: writes to any children should change the bitmap here.
->>>>>>
->>>>>> bitmaps attached to nodes shouldn't worry about such things.
->>>>>
->>>>> Do we have bitmaps attached to BlockBackends?  I sure hope not.
->>>>>
->>>>> We should not have any interface that requires the use of BlockBackends
->>>>> by now.  If we do, that's something that has to be fixed.
->>>>>
->>>>>
->>>>
->>>> I'm not sure what the right paradigm is anymore, then.
->>>>
->>>> A node is just a node, but something has to represent the "drive" as far
->>>> as the device model sees it. I thought that *was* the BlockBackend, but
->>>> is it not?
->>>
->>> Yes, and on the other side the BB represents the device model for the
->>> block layer.  But the thing is that the user should be blissfully
->>> unaware...  Or do you want to make bitmaps attachable to guest devices
->>> (through the QOM path or ID) instead?
->>>
+On Wed, Dec 6, 2017 at 3:39 PM, francisco iglesias
+<frasse.iglesias@gmail.com> wrote:
+> Hi Alistair,
+>
+> On 6 December 2017 at 23:22, Alistair Francis <alistair.francis@xilinx.com>
+> wrote:
 >>
->> OK, sure -- the user can specify a device model to attach it to instead
->> of a node. They don't have to be aware of the BB itself.
+>> Following the ZynqMP register spec let's ensure that all reset values
+>> are set.
 >>
->> The implementation though, I imagine it associates with that BB.
-> 
-> But that would be a whole new implementation...
-> 
-
-Yeah.
-
->>> (The block layer would then internally translate that to a BB.  But
->>> that's a bad internal interface because the bitmap is still attached to
->>> a BDS, and it's a bad external interface because currently you can
->>> attach bitmaps to nodes and only to nodes...)
+>> Signed-off-by: Alistair Francis <alistair.francis@xilinx.com>
+>> ---
+>> V2:
+>>  - Don't bother double setting registers
 >>
->> What if the type of bitmap we want to track trans-node changes was not
->> attached to a BDS? That'd be one way to obviously discriminate between
->> "This tracks tree-wide changes" and "This tracks node-local changes."
-> 
-> A new type of bitmap? :-/
-> 
-
-"type" may be too strong of a word, but... all the ones we use currently
-are node-local.
-
->> Implementation wise I don't have any actual thought as to how this could
->> possibly be efficient. Maybe a bitmap reference at each BDS that is a
->> child of that particular BB?
+>>  hw/ssi/xilinx_spips.c         | 35 ++++++++++++++++++++++++++++++-----
+>>  include/hw/ssi/xilinx_spips.h |  2 +-
+>>  2 files changed, 31 insertions(+), 6 deletions(-)
 >>
->> On attach, the BDS gets a set-only reference to that bitmap.
->> On detach, we remove the reference.
+>> diff --git a/hw/ssi/xilinx_spips.c b/hw/ssi/xilinx_spips.c
+>> index 899db814ee..b8182cfd74 100644
+>> --- a/hw/ssi/xilinx_spips.c
+>> +++ b/hw/ssi/xilinx_spips.c
+>> @@ -66,6 +66,7 @@
 >>
->> Then, any writes anywhere in the tree will coagulate in one place. It
->> may or may not be particularly true or correct, because a write down the
->> tree doesn't necessarily mean the visible data has changed at the top
->> layer, but I don't think we have anything institutionally set in place
->> to determine if we are changing visible data up-graph with a write
->> down-graph.
-> 
-> Hmmm...  The first thing to clarify is whether we want two types of
-> bitmaps.  I don't think there is much use to node-local bitmaps, all
-> bitmaps should track every dirtying of their associated node (wherever
-> it comes from).
-> 
+>>  /* interrupt mechanism */
+>>  #define R_INTR_STATUS       (0x04 / 4)
+>> +#define R_INTR_STATUS_RESET (0x104)
+>>  #define R_INTR_EN           (0x08 / 4)
+>>  #define R_INTR_DIS          (0x0C / 4)
+>>  #define R_INTR_MASK         (0x10 / 4)
+>> @@ -102,6 +103,9 @@
+>>  #define R_SLAVE_IDLE_COUNT  (0x24 / 4)
+>>  #define R_TX_THRES          (0x28 / 4)
+>>  #define R_RX_THRES          (0x2C / 4)
+>> +#define R_GPIO              (0x30 / 4)
+>> +#define R_LPBK_DLY_ADJ      (0x38 / 4)
+>> +#define R_LPBK_DLY_ADJ_RESET (0x33)
+>>  #define R_TXD1              (0x80 / 4)
+>>  #define R_TXD2              (0x84 / 4)
+>>  #define R_TXD3              (0x88 / 4)
+>> @@ -140,8 +144,12 @@
+>>  #define R_GQSPI_IER         (0x108 / 4)
+>>  #define R_GQSPI_IDR         (0x10c / 4)
+>>  #define R_GQSPI_IMR         (0x110 / 4)
+>> +#define R_GQSPI_IMR_RESET   (0xfbe)
+>>  #define R_GQSPI_TX_THRESH   (0x128 / 4)
+>>  #define R_GQSPI_RX_THRESH   (0x12c / 4)
+>> +#define R_GQSPI_GPIO_THRESH (0x130 / 4)
+>
+>
+> According to doc (mentioned in patch 0/3) the address above, 0x130, is
+> "GQSPI GPIO for Write Protect". Should we rename the define to R_GQSPI_GPIO?
+> (Based on doc and that the other WP is named R_GPIO).
 
-I don't disagree, but if that's the case then attaching bitmaps to
-non-root nodes should be prohibited and we ought to shore up the
-semantic idea that bitmaps must collect writes from their children.
+Hmmm... I auto generated these names, so somewhere internally we call
+it GQSPI_GPIO_THRESH, but apparently not in the documentation.
 
-I'm not sure that's any better inherently than expanding the idea to
-include obvious differences between node-local and tree-wide bitmaps.
-Currently, we just confuse the two concepts and do a poor job of either.
+All the other auto generated code (headers for standalone
+applications) will have a similar auto generated name, so I'm tempted
+to keep it as this. Otherwise the register is technically just called
+GQSPI_GPIO, according to the documentation. That doesn't seem to clash
+with anything else.
 
-> However, if that is too much of a performance penalty...  Then we
-> probably do have to distinguish between the two so that users only add
-> tree-wide bitmaps when they need them.
-> 
-> OTOH, I guess that in the common case it's not a performance penalty at
-> all, if done right.  Usually, a node you attach a bitmap to will not
-> have child nodes that are written to by other nodes.  So in the common
-> case your tree-wide bitmap is just a plain local bitmap and thus just as
-> efficient.
-> 
-> And if some child node is indeed written to by some other node...  I
-> think you always want a tree-wide bitmap anyway.
-> 
-> So I think all bitmaps should be tree-wide and the fact that they
-> currently are not is a bug.
-I could agree with this viewpoint, but that means we need to disallow
-bitmaps to be attached to any non-root BDS, and then implement an
-ability to give set-only references to children.
+I think changing it to GQSPI_GPIO makes the most sense then. That way
+it matches the documentation and is still searchably close to the auto
+generated string.
 
-That's a bit of an extreme tactic that might prevent us from ever using
-node-local bitmaps with anything resembling a sane API in the future.
-Maybe that's OK, but it is a commitment.
+Good catch!
 
-I'm not sure there are any good reasons to have node-local bitmaps, but
-the idea was one I more or less inherited when I started working in this
-area because specifying specific BDS nodes with "device=" was going out
-of vogue, but what exactly a BB was wasn't really defined yet, so I got
-stuck with a QMP interface named "node=" and an implementation that has
-an affinity for nodes.
+Alistair
+
+>
+> Best regards,
+> Francisco Iglesias
+>
+>>
+>> +#define R_GQSPI_LPBK_DLY_ADJ (0x138 / 4)
+>> +#define R_GQSPI_LPBK_DLY_ADJ_RESET (0x33)
+>>  #define R_GQSPI_CNFG        (0x100 / 4)
+>>      FIELD(GQSPI_CNFG, MODE_EN, 30, 2)
+>>      FIELD(GQSPI_CNFG, GEN_FIFO_START_MODE, 29, 1)
+>> @@ -177,8 +185,16 @@
+>>      FIELD(GQSPI_GF_SNAPSHOT, EXPONENT, 9, 1)
+>>      FIELD(GQSPI_GF_SNAPSHOT, DATA_XFER, 8, 1)
+>>      FIELD(GQSPI_GF_SNAPSHOT, IMMEDIATE_DATA, 0, 8)
+>> -#define R_GQSPI_MOD_ID        (0x168 / 4)
+>> -#define R_GQSPI_MOD_ID_VALUE  0x010A0000
+>> +#define R_GQSPI_MOD_ID        (0x1fc / 4)
+>> +#define R_GQSPI_MOD_ID_RESET  (0x10a0000)
+>> +
+>> +#define R_QSPIDMA_DST_CTRL         (0x80c / 4)
+>> +#define R_QSPIDMA_DST_CTRL_RESET   (0x803ffa00)
+>> +#define R_QSPIDMA_DST_I_MASK       (0x820 / 4)
+>> +#define R_QSPIDMA_DST_I_MASK_RESET (0xfe)
+>> +#define R_QSPIDMA_DST_CTRL2        (0x824 / 4)
+>> +#define R_QSPIDMA_DST_CTRL2_RESET  (0x081bfff8)
+>> +
+>>  /* size of TXRX FIFOs */
+>>  #define RXFF_A          (128)
+>>  #define TXFF_A          (128)
+>> @@ -351,11 +367,20 @@ static void xlnx_zynqmp_qspips_reset(DeviceState *d)
+>>      fifo8_reset(&s->rx_fifo_g);
+>>      fifo8_reset(&s->rx_fifo_g);
+>>      fifo32_reset(&s->fifo_g);
+>> +    s->regs[R_INTR_STATUS] = R_INTR_STATUS_RESET;
+>> +    s->regs[R_GPIO] = 1;
+>> +    s->regs[R_LPBK_DLY_ADJ] = R_LPBK_DLY_ADJ_RESET;
+>> +    s->regs[R_GQSPI_GFIFO_THRESH] = 0x10;
+>> +    s->regs[R_MOD_ID] = 0x01090101;
+>> +    s->regs[R_GQSPI_IMR] = R_GQSPI_IMR_RESET;
+>>      s->regs[R_GQSPI_TX_THRESH] = 1;
+>>      s->regs[R_GQSPI_RX_THRESH] = 1;
+>> -    s->regs[R_GQSPI_GFIFO_THRESH] = 1;
+>> -    s->regs[R_GQSPI_IMR] = GQSPI_IXR_MASK;
+>> -    s->regs[R_MOD_ID] = 0x01090101;
+>> +    s->regs[R_GQSPI_GPIO_THRESH] = 1;
+>> +    s->regs[R_GQSPI_LPBK_DLY_ADJ] = R_GQSPI_LPBK_DLY_ADJ_RESET;
+>> +    s->regs[R_GQSPI_MOD_ID] = R_GQSPI_MOD_ID_RESET;
+>> +    s->regs[R_QSPIDMA_DST_CTRL] = R_QSPIDMA_DST_CTRL_RESET;
+>> +    s->regs[R_QSPIDMA_DST_I_MASK] = R_QSPIDMA_DST_I_MASK_RESET;
+>> +    s->regs[R_QSPIDMA_DST_CTRL2] = R_QSPIDMA_DST_CTRL2_RESET;
+>>      s->man_start_com_g = false;
+>>      s->gqspi_irqline = 0;
+>>      xlnx_zynqmp_qspips_update_ixr(s);
+>> diff --git a/include/hw/ssi/xilinx_spips.h b/include/hw/ssi/xilinx_spips.h
+>> index 75fc94ce5d..d398a4e81c 100644
+>> --- a/include/hw/ssi/xilinx_spips.h
+>> +++ b/include/hw/ssi/xilinx_spips.h
+>> @@ -32,7 +32,7 @@
+>>  typedef struct XilinxSPIPS XilinxSPIPS;
+>>
+>>  #define XLNX_SPIPS_R_MAX        (0x100 / 4)
+>> -#define XLNX_ZYNQMP_SPIPS_R_MAX (0x200 / 4)
+>> +#define XLNX_ZYNQMP_SPIPS_R_MAX (0x830 / 4)
+>>
+>>  /* Bite off 4k chunks at a time */
+>>  #define LQSPI_CACHE_SIZE 1024
+>> --
+>> 2.14.1
+>>
+>
