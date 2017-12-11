@@ -1,28 +1,42 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46039)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46525)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1eOOX5-00039d-VR
-	for qemu-devel@nongnu.org; Mon, 11 Dec 2017 08:54:12 -0500
+	(envelope-from <pasic@linux.vnet.ibm.com>) id 1eOOYd-0004c4-Df
+	for qemu-devel@nongnu.org; Mon, 11 Dec 2017 08:55:48 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1eOOX2-0004QR-2o
-	for qemu-devel@nongnu.org; Mon, 11 Dec 2017 08:54:12 -0500
-Received: from mail-wm0-x22a.google.com ([2a00:1450:400c:c09::22a]:44893)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1eOOX1-0004Q0-SE
-	for qemu-devel@nongnu.org; Mon, 11 Dec 2017 08:54:08 -0500
-Received: by mail-wm0-x22a.google.com with SMTP id t8so14579211wmc.3
-	for <qemu-devel@nongnu.org>; Mon, 11 Dec 2017 05:54:07 -0800 (PST)
-Date: Mon, 11 Dec 2017 13:54:05 +0000
-From: Stefan Hajnoczi <stefanha@gmail.com>
-Message-ID: <20171211135405.GB5962@stefanha-x1.localdomain>
-References: <1512455239-8296-1-git-send-email-changpeng.liu@intel.com>
-	<1512455239-8296-3-git-send-email-changpeng.liu@intel.com>
+	(envelope-from <pasic@linux.vnet.ibm.com>) id 1eOOYZ-0005bX-Ey
+	for qemu-devel@nongnu.org; Mon, 11 Dec 2017 08:55:47 -0500
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:41644)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pasic@linux.vnet.ibm.com>)
+	id 1eOOYZ-0004lb-5P
+	for qemu-devel@nongnu.org; Mon, 11 Dec 2017 08:55:43 -0500
+Received: from pps.filterd (m0098393.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
+	vBBDosMA010457
+	for <qemu-devel@nongnu.org>; Mon, 11 Dec 2017 08:54:38 -0500
+Received: from e06smtp14.uk.ibm.com (e06smtp14.uk.ibm.com [195.75.94.110])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2est05c36u-1
+	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Mon, 11 Dec 2017 08:54:37 -0500
+Received: from localhost
+	by e06smtp14.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	Only! Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <pasic@linux.vnet.ibm.com>;
+	Mon, 11 Dec 2017 13:54:32 -0000
+References: <1512545840-10256-1-git-send-email-longpeng2@huawei.com>
+	<1512545840-10256-2-git-send-email-longpeng2@huawei.com>
+	<0209e49f-3d81-cbc9-eb07-13654a288a22@linux.vnet.ibm.com>
+	<5A2E8067.4050000@huawei.com>
+From: Halil Pasic <pasic@linux.vnet.ibm.com>
+Date: Mon, 11 Dec 2017 14:54:25 +0100
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="wq9mPyueHGvFACwf"
-Content-Disposition: inline
-In-Reply-To: <1512455239-8296-3-git-send-email-changpeng.liu@intel.com>
-Subject: Re: [Qemu-devel] [PATCH v6 2/4] vhost-user-blk: introduce a new
- vhost-user-blk host device
+In-Reply-To: <5A2E8067.4050000@huawei.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Message-Id: <2b7048c1-e2f8-ab40-c4df-afe5efd8f95d@linux.vnet.ibm.com>
+Subject: Re: [Qemu-devel] [v22 1/2] virtio-crypto: Add virtio crypto device
+ specification
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,62 +45,52 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Changpeng Liu <changpeng.liu@intel.com>
-Cc: qemu-devel@nongnu.org, pbonzini@redhat.com, mst@redhat.com, marcandre.lureau@redhat.com, felipe@nutanix.com, james.r.harris@intel.com
+To: "Longpeng (Mike)" <longpeng2@huawei.com>
+Cc: qemu-devel@nongnu.org, virtio-dev@lists.oasis-open.org, luonengjun@huawei.com, mst@redhat.com, cornelia.huck@de.ibm.com, stefanha@redhat.com, denglingli@chinamobile.com, Jani.Kokkonen@huawei.com, Ola.Liljedahl@arm.com, Varun.Sethi@freescale.com, xin.zeng@intel.com, brian.a.keating@intel.com, liang.j.ma@intel.com, john.griffin@intel.com, weidong.huang@huawei.com, agraf@suse.de, jasowang@redhat.com, vincent.jardin@6wind.com, arei.gonglei@huawei.com, wangxinxin.wang@huawei.com, jianjay.zhou@huawei.com
 
 
---wq9mPyueHGvFACwf
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
 
-On Tue, Dec 05, 2017 at 02:27:17PM +0800, Changpeng Liu wrote:
-> This commit introduces a new vhost-user device for block, it uses a
-> chardev to connect with the backend, same with Qemu virito-blk device,
-> Guest OS still uses the virtio-blk frontend driver.
->=20
-> To use it, start QEMU with command line like this:
->=20
-> qemu-system-x86_64 \
->     -chardev socket,id=3Dchar0,path=3D/path/vhost.socket \
->     -device vhost-user-blk-pci,chardev=3Dchar0,num-queues=3D2, \
->             bootindex=3D2... \
->=20
-> Users can use different parameters for `num-queues` and `bootindex`.
->=20
-> Different with exist Qemu virtio-blk host device, it makes more easy
-> for users to implement their own I/O processing logic, such as all
-> user space I/O stack against hardware block device. It uses the new
-> vhost messages(VHOST_USER_GET_CONFIG) to get block virtio config
-> information from backend process.
->=20
-> Signed-off-by: Changpeng Liu <changpeng.liu@intel.com>
-> ---
->  default-configs/pci.mak            |   1 +
->  hw/block/Makefile.objs             |   3 +
->  hw/block/vhost-user-blk.c          | 357 +++++++++++++++++++++++++++++++=
-++++++
->  hw/virtio/virtio-pci.c             |  55 ++++++
->  hw/virtio/virtio-pci.h             |  18 ++
->  include/hw/virtio/vhost-user-blk.h |  41 +++++
->  6 files changed, 475 insertions(+)
->  create mode 100644 hw/block/vhost-user-blk.c
->  create mode 100644 include/hw/virtio/vhost-user-blk.h
+On 12/11/2017 01:56 PM, Longpeng (Mike) wrote:
+> 
+> 
+> On 2017/12/6 19:01, Halil Pasic wrote:
+> 
+>>
+>>
+>> On 12/06/2017 08:37 AM, Longpeng(Mike) wrote:
+>>> +\field{outcome_len} is the size of struct virtio_crypto_session_input or
+>>> +ZERO for the session-destroy operation.
+>>
+>> This ain't correct. It should have been something like virtio_crypto_destroy_session_input.
+>>
+> 
+> Hi Halil,
+> 
+> I already fixed this just now.
+> Do you have any other comments on v22 ? I'll send v23 tomorrow if no. :)
+> 
 
-Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
+Did not read the rest of the document. I'm not in the middle of something,
+but I wanted to read the operation part these days. I guess, you prefer
+sending out v23 over waiting, so I guess I will wait for v23 then.
 
---wq9mPyueHGvFACwf
-Content-Type: application/pgp-signature; name="signature.asc"
+Some general questions/remarks before you spin v23:
 
------BEGIN PGP SIGNATURE-----
+* I'm not convinced about this 'header' and 'extra parameters' terminology.
+Please see https://en.wikipedia.org/wiki/Header_(computing) for header.
+I don't think it's fitting for the _flf structs. 
+Same about the 'extra'. Please see  https://www.merriam-webster.com/dictionary/extra
+(a : more than is due, usual, or necessary : additional) the things in
+_vlf aren't extra at all. Do you intend to stick with is terminology?
+If yes why? Please explain how should I read/understand it so that it makes
+sense!
 
-iQEcBAEBAgAGBQJaLo39AAoJEJykq7OBq3PIe+cH/36vndZrHP03DBwjCjuYniZE
-Jmij0cSlfkBbcn9Amv/7t/qr4OmSW4Yia9+h+0LsacVLDYuP6mlpr2zQA9mLM3Il
-h347GgG5Yu1IKsCl1f9XDaPYZ2zMZ4wS5t1kAHlEgLImH6S7V3n0OsGB7BDBU3mv
-ZJvRm5rBiBM1NMUfBt0UYDroAD3xyApWhTi94617nbosTeEgDTZEyGixdhoXAOFh
-0WNgNfvNtSvgoEw6gRo+89uvv1fVZQI7f2nlUetAtC/79XAtsBtRrxzfG9vFz0tf
-6Ya4fBchosnQv6KbTy2KcaqS8lRcvbnB3QbTpMAhfsw110BwV1AneJVzyooLbUE=
-=7DzT
------END PGP SIGNATURE-----
+* Do we want/need to specify any alignment requirement for the
+stuff in guest storage (for instance the _flf fields) or be explicit
+about no alignment should be assumed (e.g virtio_crypto_mac_create_session_flf.algo
+ain't necessarily aligned (in guest memory) as required by uint32_t)?
 
---wq9mPyueHGvFACwf--
+* I assume one request is supposed to correspond to one descriptor chain.
+Right? If yes, could you tell me, where is this expressed in the spec.
+
+Halil
