@@ -1,20 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35776)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35811)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <haozhong.zhang@intel.com>) id 1eOIVq-0006E8-Js
-	for qemu-devel@nongnu.org; Mon, 11 Dec 2017 02:28:31 -0500
+	(envelope-from <haozhong.zhang@intel.com>) id 1eOIVx-0006Gy-J0
+	for qemu-devel@nongnu.org; Mon, 11 Dec 2017 02:28:38 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <haozhong.zhang@intel.com>) id 1eOIVn-0001BX-CL
-	for qemu-devel@nongnu.org; Mon, 11 Dec 2017 02:28:30 -0500
-Received: from mga18.intel.com ([134.134.136.126]:40281)
+	(envelope-from <haozhong.zhang@intel.com>) id 1eOIVw-0001MI-Q5
+	for qemu-devel@nongnu.org; Mon, 11 Dec 2017 02:28:37 -0500
+Received: from mga06.intel.com ([134.134.136.31]:32758)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <haozhong.zhang@intel.com>)
-	id 1eOIVn-00019b-2d
-	for qemu-devel@nongnu.org; Mon, 11 Dec 2017 02:28:27 -0500
+	id 1eOIVw-0001HL-G1
+	for qemu-devel@nongnu.org; Mon, 11 Dec 2017 02:28:36 -0500
 From: Haozhong Zhang <haozhong.zhang@intel.com>
-Date: Mon, 11 Dec 2017 15:28:03 +0800
-Message-Id: <20171211072806.2812-1-haozhong.zhang@intel.com>
-Subject: [Qemu-devel] [PATCH for-2.12 v4 0/3] nvdimm: fixes for (non-)dax
- backends
+Date: Mon, 11 Dec 2017 15:28:05 +0800
+Message-Id: <20171211072806.2812-3-haozhong.zhang@intel.com>
+In-Reply-To: <20171211072806.2812-1-haozhong.zhang@intel.com>
+References: <20171211072806.2812-1-haozhong.zhang@intel.com>
+Subject: [Qemu-devel] [PATCH v4 2/3] nvdimm: add a macro for property
+ "label-size"
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,43 +26,41 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: mst@redhat.com, ehabkost@redhat.com, Xiao Guangrong <guangrong.xiao@gmail.com>, Stefan Hajnoczi <stefanha@gmail.com>, Dan Williams <dan.j.williams@intel.com>, Haozhong Zhang <haozhong.zhang@intel.com>, Igor Mammedov <imammedo@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Richard Henderson <rth@twiddle.net>, Xiao Guangrong <xiaoguangrong.eric@gmail.com>
+Cc: mst@redhat.com, ehabkost@redhat.com, Xiao Guangrong <guangrong.xiao@gmail.com>, Stefan Hajnoczi <stefanha@gmail.com>, Dan Williams <dan.j.williams@intel.com>, Haozhong Zhang <haozhong.zhang@intel.com>, Igor Mammedov <imammedo@redhat.com>, Xiao Guangrong <xiaoguangrong.eric@gmail.com>
 
-Previous versions can be found at
-  v3: https://lists.gnu.org/archive/html/qemu-devel/2017-11/msg04785.html
-  v2: https://lists.gnu.org/archive/html/qemu-devel/2017-06/msg01203.html
-  v1: https://lists.gnu.org/archive/html/qemu-devel/2017-05/msg05919.html
+Signed-off-by: Haozhong Zhang <haozhong.zhang@intel.com>
+Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
+---
+ hw/mem/nvdimm.c         | 2 +-
+ include/hw/mem/nvdimm.h | 3 +++
+ 2 files changed, 4 insertions(+), 1 deletion(-)
 
-Changes in v4:
- * Document new memory-backend-file option 'align' in qemu-options.hx. (Eduardo Habkost)
- * Add endian conversion when setting the unarmed flag in NFIT. (Stefan Hajnoczi)
-
-Changes in v3:
- * Add an option 'align' to 'memory-backend-file' to address the
-   failure when mmap device dax (patch 1).
- * Remove device dax check, which needs to access sysfs and may not
-   work with SELinux.
- * Add a boolean option 'unarmed' to '-device nvdimm', which allows
-   users to control the unarmed flag in guest ACPI NFIT. I don't make
-   it as OnOffAuto, because of the remove of device dax check.
- * Document new options added by this patch series.
-
-Haozhong Zhang (3):
-  hostmem-file: add "align" option
-  nvdimm: add a macro for property "label-size"
-  nvdimm: add 'unarmed' option
-
- backends/hostmem-file.c | 41 ++++++++++++++++++++++++++++++++++++++++-
- docs/nvdimm.txt         | 31 +++++++++++++++++++++++++++++++
- exec.c                  |  8 +++++++-
- hw/acpi/nvdimm.c        |  7 +++++++
- hw/mem/nvdimm.c         | 28 +++++++++++++++++++++++++++-
- include/exec/memory.h   |  3 +++
- include/hw/mem/nvdimm.h | 12 ++++++++++++
- memory.c                |  2 ++
- numa.c                  |  2 +-
- qemu-options.hx         |  9 ++++++++-
- 10 files changed, 138 insertions(+), 5 deletions(-)
-
+diff --git a/hw/mem/nvdimm.c b/hw/mem/nvdimm.c
+index 952fce5ec8..618c3d677b 100644
+--- a/hw/mem/nvdimm.c
++++ b/hw/mem/nvdimm.c
+@@ -66,7 +66,7 @@ out:
+ 
+ static void nvdimm_init(Object *obj)
+ {
+-    object_property_add(obj, "label-size", "int",
++    object_property_add(obj, NVDIMM_LABLE_SIZE_PROP, "int",
+                         nvdimm_get_label_size, nvdimm_set_label_size, NULL,
+                         NULL, NULL);
+ }
+diff --git a/include/hw/mem/nvdimm.h b/include/hw/mem/nvdimm.h
+index 03e1ff9558..28e68ddf59 100644
+--- a/include/hw/mem/nvdimm.h
++++ b/include/hw/mem/nvdimm.h
+@@ -47,6 +47,9 @@
+ #define NVDIMM_CLASS(oc) OBJECT_CLASS_CHECK(NVDIMMClass, (oc), TYPE_NVDIMM)
+ #define NVDIMM_GET_CLASS(obj) OBJECT_GET_CLASS(NVDIMMClass, (obj), \
+                                                TYPE_NVDIMM)
++
++#define NVDIMM_LABLE_SIZE_PROP "label-size"
++
+ struct NVDIMMDevice {
+     /* private */
+     PCDIMMDevice parent_obj;
 -- 
 2.14.1
