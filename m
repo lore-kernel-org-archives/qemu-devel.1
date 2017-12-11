@@ -1,20 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33873)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33886)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1eOU1y-00086R-28
-	for qemu-devel@nongnu.org; Mon, 11 Dec 2017 14:46:28 -0500
+	(envelope-from <dgilbert@redhat.com>) id 1eOU1z-00086T-TZ
+	for qemu-devel@nongnu.org; Mon, 11 Dec 2017 14:46:31 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1eOU1x-0006fX-A3
-	for qemu-devel@nongnu.org; Mon, 11 Dec 2017 14:46:26 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:49888)
+	(envelope-from <dgilbert@redhat.com>) id 1eOU1y-0006hl-SO
+	for qemu-devel@nongnu.org; Mon, 11 Dec 2017 14:46:27 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:40510)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1eOU1x-0006dv-49
-	for qemu-devel@nongnu.org; Mon, 11 Dec 2017 14:46:25 -0500
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1eOU1y-0006gU-J2
+	for qemu-devel@nongnu.org; Mon, 11 Dec 2017 14:46:26 -0500
 From: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>
-Date: Mon, 11 Dec 2017 19:46:06 +0000
-Message-Id: <20171211194610.3962-5-dgilbert@redhat.com>
+Date: Mon, 11 Dec 2017 19:46:07 +0000
+Message-Id: <20171211194610.3962-6-dgilbert@redhat.com>
 In-Reply-To: <20171211194610.3962-1-dgilbert@redhat.com>
 References: <20171211194610.3962-1-dgilbert@redhat.com>
-Subject: [Qemu-devel] [PATCH v3 4/8] vhost: New memory update functions
+Subject: [Qemu-devel] [PATCH v3 5/8] vhost: update_mem_cb implementation
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,102 +28,98 @@ Cc: maxime.coquelin@redhat.com, mst@redhat.com, groug@kaod.org
 
 From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
 
-vhost_update_mem will replace the existing update mechanism.
-They make use of the Flatview we have now to make the update simpler.
-This commit just adds the basic structure.
+Add the meat of update_mem_cb;  this is called for each region,
+to add a region to our temporary list.
+Our temporary list is in order we look to see if this
+region can be merged with the current head of list.
 
 Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
 ---
- hw/virtio/vhost.c | 51 ++++++++++++++++++++++++++++++++++++++++++++++++++-
- 1 file changed, 50 insertions(+), 1 deletion(-)
+ hw/virtio/trace-events |  2 ++
+ hw/virtio/vhost.c      | 54 +++++++++++++++++++++++++++++++++++++++++++++++++-
+ 2 files changed, 55 insertions(+), 1 deletion(-)
 
+diff --git a/hw/virtio/trace-events b/hw/virtio/trace-events
+index 4a493bcd46..92fadec192 100644
+--- a/hw/virtio/trace-events
++++ b/hw/virtio/trace-events
+@@ -2,6 +2,8 @@
+ 
+ # hw/virtio/vhost.c
+ vhost_section(const char *name, int r) "%s:%d"
++vhost_update_mem_cb(const char *name, uint64_t gpa, uint64_t size, uint64_t host) "%s: 0x%"PRIx64"+0x%"PRIx64" @ 0x%"PRIx64
++vhost_update_mem_cb_abut(const char *name, uint64_t new_size) "%s: 0x%"PRIx64
+ 
+ # hw/virtio/virtio.c
+ virtqueue_alloc_element(void *elem, size_t sz, unsigned in_num, unsigned out_num) "elem %p size %zd in_num %u out_num %u"
 diff --git a/hw/virtio/vhost.c b/hw/virtio/vhost.c
-index c7ce7baf9b..6d720036db 100644
+index 6d720036db..646a3480c1 100644
 --- a/hw/virtio/vhost.c
 +++ b/hw/virtio/vhost.c
-@@ -634,11 +634,51 @@ static void vhost_begin(MemoryListener *listener)
-     dev->mem_changed_start_addr = -1;
+@@ -643,11 +643,63 @@ struct vhost_update_mem_tmp {
+ /* Called for each MRS from vhost_update_mem */
+ static int vhost_update_mem_cb(MemoryRegionSection *mrs, void *opaque)
+ {
++    struct vhost_update_mem_tmp *vtmp = opaque;
++    struct vhost_memory_region *cur_vmr;
++    bool need_add = true;
++    uint64_t mrs_size;
++    uint64_t mrs_gpa;
++    uintptr_t mrs_host;
++
+     if (!vhost_section(mrs)) {
+         return 0;
+     }
++    mrs_size = int128_get64(mrs->size);
++    mrs_gpa  = mrs->offset_within_address_space;
++    mrs_host = (uintptr_t)memory_region_get_ram_ptr(mrs->mr) +
++                         mrs->offset_within_region;
++
++    trace_vhost_update_mem_cb(mrs->mr->name, mrs_gpa, mrs_size, mrs_host);
++
++    if (vtmp->nregions) {
++        /* Since we already have at least one region, lets see if
++         * this extends it; since we're scanning in order, we only
++         * have to look at the last one, and the FlatView that calls
++         * us shouldn't have overlaps.
++         */
++        struct vhost_memory_region *prev_vmr = vtmp->regions +
++                                               (vtmp->nregions - 1);
++        uint64_t prev_gpa_start = prev_vmr->guest_phys_addr;
++        uint64_t prev_gpa_end   = range_get_last(prev_gpa_start,
++                                                 prev_vmr->memory_size);
++        uint64_t prev_host_start = prev_vmr->userspace_addr;
++        uint64_t prev_host_end   = range_get_last(prev_host_start,
++                                                  prev_vmr->memory_size);
++
++        if (prev_gpa_end + 1 == mrs_gpa &&
++            prev_host_end + 1 == mrs_host &&
++            (!vtmp->dev->vhost_ops->vhost_backend_can_merge ||
++                vtmp->dev->vhost_ops->vhost_backend_can_merge(vtmp->dev,
++                    mrs_host, mrs_size,
++                    prev_host_start, prev_vmr->memory_size))) {
++            /* The two regions abut */
++            need_add = false;
++            mrs_size = mrs_size + prev_vmr->memory_size;
++            prev_vmr->memory_size = mrs_size;
++            trace_vhost_update_mem_cb_abut(mrs->mr->name, mrs_size);
++        }
++    }
++
++    if (need_add) {
++        vtmp->nregions++;
++        vtmp->regions = g_realloc_n(vtmp->regions, vtmp->nregions,
++                                    sizeof(vtmp->regions[0]));
++        cur_vmr = &vtmp->regions[vtmp->nregions - 1];
++        cur_vmr->guest_phys_addr = mrs_gpa;
++        cur_vmr->memory_size     = mrs_size;
++        cur_vmr->userspace_addr  = mrs_host;
++        cur_vmr->flags_padding = 0;
++    }
+ 
+-    /* TODO */
+     return 0;
  }
  
-+struct vhost_update_mem_tmp {
-+    struct vhost_dev   *dev;
-+    uint32_t nregions;
-+    struct vhost_memory_region *regions;
-+};
-+
-+/* Called for each MRS from vhost_update_mem */
-+static int vhost_update_mem_cb(MemoryRegionSection *mrs, void *opaque)
-+{
-+    if (!vhost_section(mrs)) {
-+        return 0;
-+    }
-+
-+    /* TODO */
-+    return 0;
-+}
-+
-+static int vhost_update_mem(struct vhost_dev *dev, bool *changed)
-+{
-+    int res;
-+    struct vhost_update_mem_tmp vtmp;
-+    vtmp.regions = 0;
-+    vtmp.nregions = 0;
-+    vtmp.dev = dev;
-+
-+    *changed = false;
-+    res = address_space_iterate(&address_space_memory,
-+                                vhost_update_mem_cb, &vtmp);
-+    if (res) {
-+        goto out;
-+    }
-+
-+    /* TODO */
-+    *changed = dev->mem_changed_start_addr < dev->mem_changed_end_addr;
-+out:
-+    g_free(vtmp.regions);
-+    return res;
-+}
-+
- static void vhost_commit(MemoryListener *listener)
- {
-     struct vhost_dev *dev = container_of(listener, struct vhost_dev,
-                                          memory_listener);
-     uint64_t log_size;
-+    bool changed;
-     int r;
- 
-     if (!dev->memory_changed) {
-@@ -647,7 +687,12 @@ static void vhost_commit(MemoryListener *listener)
-     if (!dev->started) {
-         return;
-     }
--    if (dev->mem_changed_start_addr > dev->mem_changed_end_addr) {
-+    if (vhost_update_mem(dev, &changed)) {
-+        return;
-+    }
-+
-+    if (!changed) {
-+        /* None of the mappings we care about changed */
-         return;
-     }
- 
-@@ -1523,6 +1568,7 @@ void vhost_ack_features(struct vhost_dev *hdev, const int *feature_bits,
- int vhost_dev_start(struct vhost_dev *hdev, VirtIODevice *vdev)
- {
-     int i, r;
-+    bool changed;
- 
-     /* should only be called after backend is connected */
-     assert(hdev->vhost_ops);
-@@ -1535,6 +1581,9 @@ int vhost_dev_start(struct vhost_dev *hdev, VirtIODevice *vdev)
-         goto fail_features;
-     }
- 
-+    if (vhost_update_mem(hdev, &changed)) {
-+        goto fail_mem;
-+    }
-     if (vhost_dev_has_iommu(hdev)) {
-         memory_listener_register(&hdev->iommu_listener, vdev->dma_as);
-     }
 -- 
 2.14.3
