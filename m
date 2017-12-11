@@ -1,29 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46778)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47945)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alistair23@gmail.com>) id 1eORsV-0008Ne-Tn
-	for qemu-devel@nongnu.org; Mon, 11 Dec 2017 12:28:33 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1eORx0-0001KU-KX
+	for qemu-devel@nongnu.org; Mon, 11 Dec 2017 12:33:11 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alistair23@gmail.com>) id 1eORsU-00062M-G3
-	for qemu-devel@nongnu.org; Mon, 11 Dec 2017 12:28:31 -0500
-Received: from mail-wm0-x244.google.com ([2a00:1450:400c:c09::244]:39123)
+	(envelope-from <peter.maydell@linaro.org>) id 1eORwz-00012N-Lq
+	for qemu-devel@nongnu.org; Mon, 11 Dec 2017 12:33:10 -0500
+Received: from mail-ot0-x243.google.com ([2607:f8b0:4003:c0f::243]:38970)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <alistair23@gmail.com>)
-	id 1eORsU-00061V-6K
-	for qemu-devel@nongnu.org; Mon, 11 Dec 2017 12:28:30 -0500
-Received: by mail-wm0-x244.google.com with SMTP id i11so15579710wmf.4
-	for <qemu-devel@nongnu.org>; Mon, 11 Dec 2017 09:28:29 -0800 (PST)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1eORwz-00011a-HU
+	for qemu-devel@nongnu.org; Mon, 11 Dec 2017 12:33:09 -0500
+Received: by mail-ot0-x243.google.com with SMTP id v21so15415127oth.6
+	for <qemu-devel@nongnu.org>; Mon, 11 Dec 2017 09:33:09 -0800 (PST)
 MIME-Version: 1.0
-Sender: alistair23@gmail.com
-In-Reply-To: <CAAYMZQtBsYvYN=n-vNQ_xUZYzkT+mq7r6uUOsTtQSdR-egz0mw@mail.gmail.com>
-References: <cover.1512598866.git.alistair.francis@xilinx.com>
-	<c0b9bffacc4c248956e032c554787774d47edbf8.1512598866.git.alistair.francis@xilinx.com>
-	<CAAYMZQtBsYvYN=n-vNQ_xUZYzkT+mq7r6uUOsTtQSdR-egz0mw@mail.gmail.com>
-From: Alistair Francis <alistair.francis@xilinx.com>
-Date: Mon, 11 Dec 2017 09:27:58 -0800
-Message-ID: <CAKmqyKOqfoizc0eK2X4gQN+==Du95fd=WR+kpn9bgS13bJBBUQ@mail.gmail.com>
+In-Reply-To: <db0d2fd0-ae95-b9f8-47a7-d273306a2432@twiddle.net>
+References: <1513006964-3371-1-git-send-email-peter.maydell@linaro.org>
+	<db0d2fd0-ae95-b9f8-47a7-d273306a2432@twiddle.net>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Mon, 11 Dec 2017 17:32:48 +0000
+Message-ID: <CAFEAcA_ezdp_ygjT2r9P7niSnOqRxAMUJ+vhaMk4HJTSrEjrJQ@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH-2.12 v2 2/3] xilinx_spips: Set all of the
- reset values
+Subject: Re: [Qemu-devel] [PATCH for-2.11?] target/arm: Generate UNDEF for
+ 32-bit Thumb2 insns
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,148 +30,37 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: francisco iglesias <frasse.iglesias@gmail.com>
-Cc: Alistair Francis <alistair.francis@xilinx.com>, "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>, Edgar Iglesias <edgar.iglesias@xilinx.com>, Edde <edgar.iglesias@gmail.com>, KONRAD Frederic <frederic.konrad@adacore.com>
+To: Richard Henderson <rth@twiddle.net>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, "patches@linaro.org" <patches@linaro.org>, "Emilio G . Cota" <cota@braap.org>, Michael Roth <mdroth@linux.vnet.ibm.com>
 
-On Wed, Dec 6, 2017 at 3:39 PM, francisco iglesias
-<frasse.iglesias@gmail.com> wrote:
-> Hi Alistair,
->
-> On 6 December 2017 at 23:22, Alistair Francis <alistair.francis@xilinx.com>
-> wrote:
+On 11 December 2017 at 17:00, Richard Henderson <rth@twiddle.net> wrote:
+> On 12/11/2017 07:42 AM, Peter Maydell wrote:
+>> The refactoring of commit 296e5a0a6c3935 has a nasty bug:
+>> it accidentally dropped the generation of code to raise
+>> the UNDEF exception when disas_thumb2_insn() returns nonzero.
+>> This means that 32-bit Thumb2 instruction patterns that
+>> ought to UNDEF just act like nops instead. This is likely
+>> to break any number of things, including the kernel's "disable
+>> the FPU and use the UNDEF exception to identify when to turn
+>> it back on again" trick.
 >>
->> Following the ZynqMP register spec let's ensure that all reset values
->> are set.
->>
->> Signed-off-by: Alistair Francis <alistair.francis@xilinx.com>
+>> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 >> ---
->> V2:
->>  - Don't bother double setting registers
+>> This is the smallest possible fix that will correct the
+>> bug, for possible inclusion in 2.11; for 2.12 we should
+>> fix the asymmetry where disas_thumb() generates its own
+>> exception-raising code but disas_thumb2() wants the caller
+>> to do it. (This asymmetry is why we didn't notice the
+>> problem in code review.)
 >>
->>  hw/ssi/xilinx_spips.c         | 35 ++++++++++++++++++++++++++++++-----
->>  include/hw/ssi/xilinx_spips.h |  2 +-
->>  2 files changed, 31 insertions(+), 6 deletions(-)
->>
->> diff --git a/hw/ssi/xilinx_spips.c b/hw/ssi/xilinx_spips.c
->> index 899db814ee..b8182cfd74 100644
->> --- a/hw/ssi/xilinx_spips.c
->> +++ b/hw/ssi/xilinx_spips.c
->> @@ -66,6 +66,7 @@
->>
->>  /* interrupt mechanism */
->>  #define R_INTR_STATUS       (0x04 / 4)
->> +#define R_INTR_STATUS_RESET (0x104)
->>  #define R_INTR_EN           (0x08 / 4)
->>  #define R_INTR_DIS          (0x0C / 4)
->>  #define R_INTR_MASK         (0x10 / 4)
->> @@ -102,6 +103,9 @@
->>  #define R_SLAVE_IDLE_COUNT  (0x24 / 4)
->>  #define R_TX_THRES          (0x28 / 4)
->>  #define R_RX_THRES          (0x2C / 4)
->> +#define R_GPIO              (0x30 / 4)
->> +#define R_LPBK_DLY_ADJ      (0x38 / 4)
->> +#define R_LPBK_DLY_ADJ_RESET (0x33)
->>  #define R_TXD1              (0x80 / 4)
->>  #define R_TXD2              (0x84 / 4)
->>  #define R_TXD3              (0x88 / 4)
->> @@ -140,8 +144,12 @@
->>  #define R_GQSPI_IER         (0x108 / 4)
->>  #define R_GQSPI_IDR         (0x10c / 4)
->>  #define R_GQSPI_IMR         (0x110 / 4)
->> +#define R_GQSPI_IMR_RESET   (0xfbe)
->>  #define R_GQSPI_TX_THRESH   (0x128 / 4)
->>  #define R_GQSPI_RX_THRESH   (0x12c / 4)
->> +#define R_GQSPI_GPIO_THRESH (0x130 / 4)
+>> I'm not sure whether this should go into 2.11 or not --
+>> this time last week it would have been an easy "yes".
 >
->
-> According to doc (mentioned in patch 0/3) the address above, 0x130, is
-> "GQSPI GPIO for Write Protect". Should we rename the define to R_GQSPI_GPIO?
-> (Based on doc and that the other WP is named R_GPIO).
+> Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 
-Hmmm... I auto generated these names, so somewhere internally we call
-it GQSPI_GPIO_THRESH, but apparently not in the documentation.
+Thanks. I think I have come down on the side of putting this into
+2.11, so rolling an rc5 today, and delaying the final release
+a day to Wednesday.
 
-All the other auto generated code (headers for standalone
-applications) will have a similar auto generated name, so I'm tempted
-to keep it as this. Otherwise the register is technically just called
-GQSPI_GPIO, according to the documentation. That doesn't seem to clash
-with anything else.
-
-I think changing it to GQSPI_GPIO makes the most sense then. That way
-it matches the documentation and is still searchably close to the auto
-generated string.
-
-Good catch!
-
-Alistair
-
->
-> Best regards,
-> Francisco Iglesias
->
->>
->> +#define R_GQSPI_LPBK_DLY_ADJ (0x138 / 4)
->> +#define R_GQSPI_LPBK_DLY_ADJ_RESET (0x33)
->>  #define R_GQSPI_CNFG        (0x100 / 4)
->>      FIELD(GQSPI_CNFG, MODE_EN, 30, 2)
->>      FIELD(GQSPI_CNFG, GEN_FIFO_START_MODE, 29, 1)
->> @@ -177,8 +185,16 @@
->>      FIELD(GQSPI_GF_SNAPSHOT, EXPONENT, 9, 1)
->>      FIELD(GQSPI_GF_SNAPSHOT, DATA_XFER, 8, 1)
->>      FIELD(GQSPI_GF_SNAPSHOT, IMMEDIATE_DATA, 0, 8)
->> -#define R_GQSPI_MOD_ID        (0x168 / 4)
->> -#define R_GQSPI_MOD_ID_VALUE  0x010A0000
->> +#define R_GQSPI_MOD_ID        (0x1fc / 4)
->> +#define R_GQSPI_MOD_ID_RESET  (0x10a0000)
->> +
->> +#define R_QSPIDMA_DST_CTRL         (0x80c / 4)
->> +#define R_QSPIDMA_DST_CTRL_RESET   (0x803ffa00)
->> +#define R_QSPIDMA_DST_I_MASK       (0x820 / 4)
->> +#define R_QSPIDMA_DST_I_MASK_RESET (0xfe)
->> +#define R_QSPIDMA_DST_CTRL2        (0x824 / 4)
->> +#define R_QSPIDMA_DST_CTRL2_RESET  (0x081bfff8)
->> +
->>  /* size of TXRX FIFOs */
->>  #define RXFF_A          (128)
->>  #define TXFF_A          (128)
->> @@ -351,11 +367,20 @@ static void xlnx_zynqmp_qspips_reset(DeviceState *d)
->>      fifo8_reset(&s->rx_fifo_g);
->>      fifo8_reset(&s->rx_fifo_g);
->>      fifo32_reset(&s->fifo_g);
->> +    s->regs[R_INTR_STATUS] = R_INTR_STATUS_RESET;
->> +    s->regs[R_GPIO] = 1;
->> +    s->regs[R_LPBK_DLY_ADJ] = R_LPBK_DLY_ADJ_RESET;
->> +    s->regs[R_GQSPI_GFIFO_THRESH] = 0x10;
->> +    s->regs[R_MOD_ID] = 0x01090101;
->> +    s->regs[R_GQSPI_IMR] = R_GQSPI_IMR_RESET;
->>      s->regs[R_GQSPI_TX_THRESH] = 1;
->>      s->regs[R_GQSPI_RX_THRESH] = 1;
->> -    s->regs[R_GQSPI_GFIFO_THRESH] = 1;
->> -    s->regs[R_GQSPI_IMR] = GQSPI_IXR_MASK;
->> -    s->regs[R_MOD_ID] = 0x01090101;
->> +    s->regs[R_GQSPI_GPIO_THRESH] = 1;
->> +    s->regs[R_GQSPI_LPBK_DLY_ADJ] = R_GQSPI_LPBK_DLY_ADJ_RESET;
->> +    s->regs[R_GQSPI_MOD_ID] = R_GQSPI_MOD_ID_RESET;
->> +    s->regs[R_QSPIDMA_DST_CTRL] = R_QSPIDMA_DST_CTRL_RESET;
->> +    s->regs[R_QSPIDMA_DST_I_MASK] = R_QSPIDMA_DST_I_MASK_RESET;
->> +    s->regs[R_QSPIDMA_DST_CTRL2] = R_QSPIDMA_DST_CTRL2_RESET;
->>      s->man_start_com_g = false;
->>      s->gqspi_irqline = 0;
->>      xlnx_zynqmp_qspips_update_ixr(s);
->> diff --git a/include/hw/ssi/xilinx_spips.h b/include/hw/ssi/xilinx_spips.h
->> index 75fc94ce5d..d398a4e81c 100644
->> --- a/include/hw/ssi/xilinx_spips.h
->> +++ b/include/hw/ssi/xilinx_spips.h
->> @@ -32,7 +32,7 @@
->>  typedef struct XilinxSPIPS XilinxSPIPS;
->>
->>  #define XLNX_SPIPS_R_MAX        (0x100 / 4)
->> -#define XLNX_ZYNQMP_SPIPS_R_MAX (0x200 / 4)
->> +#define XLNX_ZYNQMP_SPIPS_R_MAX (0x830 / 4)
->>
->>  /* Bite off 4k chunks at a time */
->>  #define LQSPI_CACHE_SIZE 1024
->> --
->> 2.14.1
->>
->
+thanks
+-- PMM
