@@ -1,33 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44078)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45587)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <borntraeger@de.ibm.com>) id 1eON7y-0007kH-8Y
-	for qemu-devel@nongnu.org; Mon, 11 Dec 2017 07:24:11 -0500
+	(envelope-from <dgilbert@redhat.com>) id 1eONDP-0000S4-GC
+	for qemu-devel@nongnu.org; Mon, 11 Dec 2017 07:29:48 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <borntraeger@de.ibm.com>) id 1eON7t-0004Ne-Aj
-	for qemu-devel@nongnu.org; Mon, 11 Dec 2017 07:24:10 -0500
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:39410)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <borntraeger@de.ibm.com>)
-	id 1eON7t-0004N2-1p
-	for qemu-devel@nongnu.org; Mon, 11 Dec 2017 07:24:05 -0500
-Received: from pps.filterd (m0098399.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
-	vBBCNoLq110911
-	for <qemu-devel@nongnu.org>; Mon, 11 Dec 2017 07:24:02 -0500
-Received: from e06smtp12.uk.ibm.com (e06smtp12.uk.ibm.com [195.75.94.108])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2essx1g5sf-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Mon, 11 Dec 2017 07:23:50 -0500
-Received: from localhost
-	by e06smtp12.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
-	Only! Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <borntraeger@de.ibm.com>;
-	Mon, 11 Dec 2017 12:21:50 -0000
-From: Christian Borntraeger <borntraeger@de.ibm.com>
-Date: Mon, 11 Dec 2017 13:21:46 +0100
-Message-Id: <20171211122146.162430-1-borntraeger@de.ibm.com>
-Subject: [Qemu-devel] [PATCH v3 1/1] s390-ccw-virtio: allow for systems
- larger that 7.999TB
+	(envelope-from <dgilbert@redhat.com>) id 1eONDL-0002Cp-5D
+	for qemu-devel@nongnu.org; Mon, 11 Dec 2017 07:29:47 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:35738)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1eONDK-00029t-Vk
+	for qemu-devel@nongnu.org; Mon, 11 Dec 2017 07:29:43 -0500
+Date: Mon, 11 Dec 2017 12:29:36 +0000
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20171211122936.GA2422@work-vm>
+References: <CANCZdfrJoF=4zbGW+dVC9rnPD0ip+ZxXw0mAO_=r4gxFqW0KKA@mail.gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CANCZdfrJoF=4zbGW+dVC9rnPD0ip+ZxXw0mAO_=r4gxFqW0KKA@mail.gmail.com>
+Subject: Re: [Qemu-devel] It told me to report this...
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,65 +26,29 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Cornelia Huck <cohuck@redhat.com>
-Cc: qemu-devel <qemu-devel@nongnu.org>, qemu-s390x <qemu-s390x@nongnu.org>, Halil Pasic <pasic@linux.vnet.ibm.com>, Alexander Graf <agraf@suse.de>, Thomas Huth <thuth@redhat.com>, David Hildenbrand <david@redhat.com>, Richard Henderson <rth@twiddle.net>, Christian Borntraeger <borntraeger@de.ibm.com>
+To: Warner Losh <imp@bsdimp.com>, kraxel@redhat.com, berrange@redhat.com
+Cc: qemu-devel@nongnu.org
 
-KVM does not allow memory regions > KVM_MEM_MAX_NR_PAGES, basically
-limiting the memory per slot to 8TB-4k. As memory slots on s390/kvm must
-be a multiple of 1MB we need start a new memory region if we cross
-8TB-1M.
+* Warner Losh (imp@bsdimp.com) wrote:
+> unknown keycodes `empty+aliases(qwerty)', please report to
+> qemu-devel@nongnu.org
+> 
+> My X server is Mac XQuartz 2.7.11. I saw this question raised several years
+> ago in the archives, with promises of patches, but couldn't find anything
+> relevant in the latest tree I grabbed from github (I saw this problem there
+> as well as 2.9.0 installed from FreeBSD ports).
+> 
+> What's my next step here?
 
-With that (and optimistic overcommitment in the kernel) I was able to
-start a 24TB guest on a 1TB system.
+I think that's one of Gerd's messages, so I've added him to the
+email and also Daniel since he's got an interest in key mappings.
 
-Signed-off-by: Christian Borntraeger <borntraeger@de.ibm.com>
----
- hw/s390x/s390-virtio-ccw.c | 28 +++++++++++++++++++++++++---
- 1 file changed, 25 insertions(+), 3 deletions(-)
+Have you any idea if it happened when you pressed a particular key?
 
-diff --git a/hw/s390x/s390-virtio-ccw.c b/hw/s390x/s390-virtio-ccw.c
-index 8425534..073f6ed 100644
---- a/hw/s390x/s390-virtio-ccw.c
-+++ b/hw/s390x/s390-virtio-ccw.c
-@@ -154,14 +154,36 @@ static void virtio_ccw_register_hcalls(void)
-                                    virtio_ccw_hcall_early_printk);
- }
- 
-+/*
-+ * KVM does only support memory slots up to KVM_MEM_MAX_NR_PAGES pages
-+ * as the dirty bitmap must be managed by bitops that take an int as
-+ * position indicator. If we have a guest beyond that we will split off
-+ * new subregions. The split must happen on a segment boundary (1MB).
-+ */
-+#define KVM_MEM_MAX_NR_PAGES ((1UL << 31) - 1)
-+#define SEG_MSK (~0xfffffULL)
-+#define KVM_SLOT_MAX_BYTES ((KVM_MEM_MAX_NR_PAGES * TARGET_PAGE_SIZE) & SEG_MSK)
- static void s390_memory_init(ram_addr_t mem_size)
- {
-     MemoryRegion *sysmem = get_system_memory();
--    MemoryRegion *ram = g_new(MemoryRegion, 1);
-+    ram_addr_t chunk, offset = 0;
-+    unsigned int number = 0;
-+    gchar *name;
- 
-     /* allocate RAM for core */
--    memory_region_allocate_system_memory(ram, NULL, "s390.ram", mem_size);
--    memory_region_add_subregion(sysmem, 0, ram);
-+    name = g_strdup_printf("s390.ram");
-+    while (mem_size) {
-+        MemoryRegion *ram = g_new(MemoryRegion, 1);
-+        /* KVM does not allow memslots >= 8 TB */
-+        chunk = MIN(mem_size, KVM_SLOT_MAX_BYTES);
-+        memory_region_allocate_system_memory(ram, NULL, name, chunk);
-+        memory_region_add_subregion(sysmem, offset, ram);
-+        mem_size -= chunk;
-+        offset += chunk;
-+        g_free(name);
-+        name = g_strdup_printf("s390.ram.%u", ++number);
-+    }
-+    g_free(name);
- 
-     /* Initialize storage key device */
-     s390_skeys_init();
--- 
-2.9.4
+
+Dave
+
+> 
+> Warner
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
