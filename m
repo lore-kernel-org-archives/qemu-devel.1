@@ -1,22 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60604)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60816)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1eORH9-00069L-12
-	for qemu-devel@nongnu.org; Mon, 11 Dec 2017 11:49:55 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1eORHn-0006gT-MN
+	for qemu-devel@nongnu.org; Mon, 11 Dec 2017 11:50:36 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1eORH4-0007CX-W1
-	for qemu-devel@nongnu.org; Mon, 11 Dec 2017 11:49:55 -0500
-References: <20171129191319.11483-1-david@redhat.com>
-	<f8e11154-00a7-745d-451b-38a3c6f42b6f@redhat.com>
-From: David Hildenbrand <david@redhat.com>
-Message-ID: <a05893de-ce48-a797-1a12-8acb18419887@redhat.com>
-Date: Mon, 11 Dec 2017 17:49:45 +0100
+	(envelope-from <peter.maydell@linaro.org>) id 1eORHm-0007uS-Js
+	for qemu-devel@nongnu.org; Mon, 11 Dec 2017 11:50:35 -0500
+Received: from mail-ot0-x242.google.com ([2607:f8b0:4003:c0f::242]:43668)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1eORHm-0007te-6n
+	for qemu-devel@nongnu.org; Mon, 11 Dec 2017 11:50:34 -0500
+Received: by mail-ot0-x242.google.com with SMTP id y10so15259139otg.10
+	for <qemu-devel@nongnu.org>; Mon, 11 Dec 2017 08:50:34 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <f8e11154-00a7-745d-451b-38a3c6f42b6f@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v1] cpu-exec: fix missed CPU kick during
- interrupt injection
+In-Reply-To: <20171126211356.GA46174@humpty.home.comstyle.com>
+References: <20171126211356.GA46174@humpty.home.comstyle.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Mon, 11 Dec 2017 16:50:12 +0000
+Message-ID: <CAFEAcA9K=eaQiVsQH6SfvzriKiwX6C6RT-GZZLFyK=RKS0dZXA@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH] configure: Fix curses probe for older
+ ncurses
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,39 +29,42 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>, qemu-s390x@nongnu.org, qemu-devel@nongnu.org
-Cc: Peter Crosthwaite <crosthwaite.peter@gmail.com>, Christian Borntraeger <borntraeger@de.ibm.com>, Cornelia Huck <cohuck@redhat.com>, Richard Henderson <rth@twiddle.net>, Alexander Graf <agraf@suse.de>
+To: Brad Smith <brad@comstyle.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 
+On 26 November 2017 at 21:13, Brad Smith <brad@comstyle.com> wrote:
+> Fix the curses probe with older ncurses (.e.g. 5.7, as used by OpenBSD).
+>
+> ncurses 5.7 requires _XOPEN_SOURCE_EXTENDED to be defined for WACS_* constants.
+>
+> Signed-off-by: Brad Smith <brad@comstyle.com>
+>
+>
+> diff --git a/configure b/configure
+> index 0c6e7572db..9715b9c2cc 100755
+> --- a/configure
+> +++ b/configure
+> @@ -3186,7 +3186,7 @@ EOF
+>    IFS=:
+>    for curses_inc in $curses_inc_list; do
+>      # Make sure we get the wide character prototypes
+> -    curses_inc="-DNCURSES_WIDECHAR $curses_inc"
+> +    curses_inc="-DNCURSES_WIDECHAR -D_XOPEN_SOURCE_EXTENDED $curses_inc"
+>      IFS=:
+>      for curses_lib in $curses_lib_list; do
+>        unset IFS
 
-> atomic_mb_set can be a little faster on x86, so:
-> 
-> diff --git a/accel/tcg/cpu-exec.c b/accel/tcg/cpu-exec.c
-> index dfba5ebd29..4452cd9856 100644
-> --- a/accel/tcg/cpu-exec.c
-> +++ b/accel/tcg/cpu-exec.c
-> @@ -528,12 +528,10 @@ static inline bool cpu_handle_interrupt(CPUState *cpu,
->  
->      /* Clear the interrupt flag now since we're processing
->       * cpu->interrupt_request and cpu->exit_request.
-> +     * Ensure zeroing happens before reading cpu->exit_request or
-> +     * cpu->interrupt_request (see also smp_wmb in cpu_exit())
->       */
-> -    atomic_set(&cpu->icount_decr.u16.high, 0);
-> -    /* Ensure zeroing happens before reading cpu->exit_request or
-> -     * cpu->interrupt_request. (also see cpu_exit())
-> -     */
-> -    smp_mb();
-> +    atomic_mb_set(&cpu->icount_decr.u16.high, 0);
->  
->      if (unlikely(atomic_read(&cpu->interrupt_request))) {
->          int interrupt_request;
-> 
+Having thought about this a bit more, I think I'm definitely not
+happy with defining _XOPEN_SOURCE_EXTENDED by default for every
+host OS. I think we should either:
+ (a) define it only for OpenBSD in the per-host case statement
+in configure, with a note that we're doing it to work around the
+supplied ncurses version being ancient
+ (b) just say that if you want this optional QEMU feature you need
+a version of ncurses that was released this decade
 
-Looks good to me! Thanks!
+To be honest I'd favour (b): there are limits to how much
+we need to support adventures in retrocomputing.
 
-
--- 
-
-Thanks,
-
-David / dhildenb
+thanks
+-- PMM
