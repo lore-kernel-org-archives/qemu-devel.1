@@ -1,36 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45854)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46039)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <wei.w.wang@intel.com>) id 1eOOWi-0002qr-HN
-	for qemu-devel@nongnu.org; Mon, 11 Dec 2017 08:53:49 -0500
+	(envelope-from <stefanha@gmail.com>) id 1eOOX5-00039d-VR
+	for qemu-devel@nongnu.org; Mon, 11 Dec 2017 08:54:12 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <wei.w.wang@intel.com>) id 1eOOWe-00049M-LC
-	for qemu-devel@nongnu.org; Mon, 11 Dec 2017 08:53:48 -0500
-Received: from mga12.intel.com ([192.55.52.136]:10953)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <wei.w.wang@intel.com>)
-	id 1eOOWe-00048c-Af
-	for qemu-devel@nongnu.org; Mon, 11 Dec 2017 08:53:44 -0500
-From: "Wang, Wei W" <wei.w.wang@intel.com>
-Date: Mon, 11 Dec 2017 13:53:40 +0000
-Message-ID: <286AC319A985734F985F78AFA26841F73937EEED@shsmsx102.ccr.corp.intel.com>
-References: <20171207153454-mutt-send-email-mst@kernel.org>
-	<CAJSP0QVu4iwAu01Sth84VZshQde97x3FW1E1ua_YXVKs-65vhQ@mail.gmail.com>
-	<20171207183945-mutt-send-email-mst@kernel.org>
-	<CAJSP0QVnukGD3Afu9myv=v5OjqrPDpXu6JL3Tpf+Cdk=em9V3w@mail.gmail.com>
-	<20171207193003-mutt-send-email-mst@kernel.org>
-	<CAJSP0QX4V64OoU4-Dhb93MUZ9Rz0FPR-La5Xq4_yqGH7SG6PjQ@mail.gmail.com>
-	<20171207213420-mutt-send-email-mst@kernel.org>
-	<5A2A347B.9070006@intel.com>
-	<CAJSP0QUAqCzFgVtM1cg_KybdyrZa_FRUHhDN7oLfRjZ2ZVkp4g@mail.gmail.com>
-	<286AC319A985734F985F78AFA26841F73937E001@shsmsx102.ccr.corp.intel.com>
-	<20171211111147.GF13593@stefanha-x1.localdomain>
-In-Reply-To: <20171211111147.GF13593@stefanha-x1.localdomain>
-Content-Language: en-US
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+	(envelope-from <stefanha@gmail.com>) id 1eOOX2-0004QR-2o
+	for qemu-devel@nongnu.org; Mon, 11 Dec 2017 08:54:12 -0500
+Received: from mail-wm0-x22a.google.com ([2a00:1450:400c:c09::22a]:44893)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1eOOX1-0004Q0-SE
+	for qemu-devel@nongnu.org; Mon, 11 Dec 2017 08:54:08 -0500
+Received: by mail-wm0-x22a.google.com with SMTP id t8so14579211wmc.3
+	for <qemu-devel@nongnu.org>; Mon, 11 Dec 2017 05:54:07 -0800 (PST)
+Date: Mon, 11 Dec 2017 13:54:05 +0000
+From: Stefan Hajnoczi <stefanha@gmail.com>
+Message-ID: <20171211135405.GB5962@stefanha-x1.localdomain>
+References: <1512455239-8296-1-git-send-email-changpeng.liu@intel.com>
+	<1512455239-8296-3-git-send-email-changpeng.liu@intel.com>
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [virtio-dev] [PATCH v3 0/7] Vhost-pci for inter-VM
- communication
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="wq9mPyueHGvFACwf"
+Content-Disposition: inline
+In-Reply-To: <1512455239-8296-3-git-send-email-changpeng.liu@intel.com>
+Subject: Re: [Qemu-devel] [PATCH v6 2/4] vhost-user-blk: introduce a new
+ vhost-user-blk host device
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -39,108 +31,62 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefan Hajnoczi <stefanha@redhat.com>
-Cc: Stefan Hajnoczi <stefanha@gmail.com>, "Michael S. Tsirkin" <mst@redhat.com>, "virtio-dev@lists.oasis-open.org" <virtio-dev@lists.oasis-open.org>, "Yang,
-	Zhiyong" <zhiyong.yang@intel.com>, "jan.kiszka@siemens.com" <jan.kiszka@siemens.com>, "jasowang@redhat.com" <jasowang@redhat.com>, "avi.cohen@huawei.com" <avi.cohen@huawei.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "pbonzini@redhat.com" <pbonzini@redhat.com>, "marcandre.lureau@redhat.com" <marcandre.lureau@redhat.com>
+To: Changpeng Liu <changpeng.liu@intel.com>
+Cc: qemu-devel@nongnu.org, pbonzini@redhat.com, mst@redhat.com, marcandre.lureau@redhat.com, felipe@nutanix.com, james.r.harris@intel.com
 
-T24gTW9uZGF5LCBEZWNlbWJlciAxMSwgMjAxNyA3OjEyIFBNLCBTdGVmYW4gSGFqbm9jemkgd3Jv
-dGU6DQo+IE9uIFNhdCwgRGVjIDA5LCAyMDE3IGF0IDA0OjIzOjE3UE0gKzAwMDAsIFdhbmcsIFdl
-aSBXIHdyb3RlOg0KPiA+IE9uIEZyaWRheSwgRGVjZW1iZXIgOCwgMjAxNyA0OjM0IFBNLCBTdGVm
-YW4gSGFqbm9jemkgd3JvdGU6DQo+ID4gPiBPbiBGcmksIERlYyA4LCAyMDE3IGF0IDY6NDMgQU0s
-IFdlaSBXYW5nIDx3ZWkudy53YW5nQGludGVsLmNvbT4NCj4gd3JvdGU6DQo+ID4gPiA+IE9uIDEy
-LzA4LzIwMTcgMDc6NTQgQU0sIE1pY2hhZWwgUy4gVHNpcmtpbiB3cm90ZToNCj4gPiA+ID4+DQo+
-ID4gPiA+PiBPbiBUaHUsIERlYyAwNywgMjAxNyBhdCAwNjoyODoxOVBNICswMDAwLCBTdGVmYW4g
-SGFqbm9jemkgd3JvdGU6DQo+ID4gPiA+Pj4NCj4gPiA+ID4+PiBPbiBUaHUsIERlYyA3LCAyMDE3
-IGF0IDU6MzggUE0sIE1pY2hhZWwgUy4gVHNpcmtpbiANCj4gPiA+ID4+PiA8bXN0QHJlZGhhdC5j
-b20+DQo+ID4gPiA+IFRoYW5rcyBTdGVmYW4gYW5kIE1pY2hhZWwgZm9yIHRoZSBzaGFyaW5nIGFu
-ZCBkaXNjdXNzaW9uLiBJIA0KPiA+ID4gPiB0aGluayBhYm92ZSAzIGFuZCA0IGFyZSBkZWJhdGFi
-bGUgKGUuZy4gd2hldGhlciBpdCBpcyBzaW1wbGVyIA0KPiA+ID4gPiByZWFsbHkgZGVwZW5kcyku
-IDEgYW5kIDIgYXJlIGltcGxlbWVudGF0aW9ucywgSSB0aGluayBib3RoIA0KPiA+ID4gPiBhcHBy
-b2FjaGVzIGNvdWxkIGltcGxlbWVudCB0aGUgZGV2aWNlIHRoYXQgd2F5LiBXZSBvcmlnaW5hbGx5
-IA0KPiA+ID4gPiB0aG91Z2h0IGFib3V0IG9uZSBkZXZpY2UgYW5kIGRyaXZlciB0byBzdXBwb3J0
-IGFsbCB0eXBlcyAoY2FsbGVkIA0KPiA+ID4gPiBpdCB0cmFuc2Zvcm1lciBzb21ldGltZXMgOi0p
-ICksIHRoYXQgd291bGQgbG9vayBpbnRlcmVzdGluZyBmcm9tIA0KPiA+ID4gPiByZXNlYXJjaCBw
-b2ludCBvZiB2aWV3LCBidXQgZnJvbSByZWFsIHVzYWdlIHBvaW50IG9mIHZpZXcsIEkgDQo+ID4g
-PiA+IHRoaW5rIGl0IHdvdWxkIGJlIGJldHRlciB0byBoYXZlIHRoZW0gc2VwYXJhdGVkLA0KPiA+
-ID4gYmVjYXVzZToNCj4gPiA+ID4gLSBkaWZmZXJlbnQgZGV2aWNlIHR5cGVzIGhhdmUgZGlmZmVy
-ZW50IGRyaXZlciBsb2dpYywgbWl4aW5nIA0KPiA+ID4gPiB0aGVtIHRvZ2V0aGVyIHdvdWxkIGNh
-dXNlIHRoZSBkcml2ZXIgdG8gbG9vayBtZXNzeS4gSW1hZ2luZSB0aGF0IA0KPiA+ID4gPiBhIG5l
-dHdvcmtpbmcgZHJpdmVyIGRldmVsb3BlciBoYXMgdG8gZ28gb3ZlciB0aGUgYmxvY2sgcmVsYXRl
-ZCANCj4gPiA+ID4gY29kZSB0byBkZWJ1ZywgdGhhdCBhbHNvIGluY3JlYXNlcyB0aGUgZGlmZmlj
-dWx0eS4NCj4gPiA+DQo+ID4gPiBJJ20gbm90IHN1cmUgSSB1bmRlcnN0YW5kIHdoZXJlIHRoaW5n
-cyBnZXQgbWVzc3kgYmVjYXVzZToNCj4gPiA+IDEuIFRoZSB2aG9zdC1wY2kgZGV2aWNlIGltcGxl
-bWVudGF0aW9uIGluIFFFTVUgcmVsYXlzIG1lc3NhZ2VzIGJ1dCANCj4gPiA+IGhhcyBubyBkZXZp
-Y2UgbG9naWMsIHNvIGRldmljZS1zcGVjaWZpYyBtZXNzYWdlcyBsaWtlIA0KPiA+ID4gVkhPU1Rf
-VVNFUl9ORVRfU0VUX01UVSBhcmUgdHJpdmlhbCBhdCB0aGlzIGxheWVyLg0KPiA+ID4gMi4gdmhv
-c3QtdXNlciBzbGF2ZXMgb25seSBoYW5kbGUgY2VydGFpbiB2aG9zdC11c2VyIHByb3RvY29sIG1l
-c3NhZ2VzLg0KPiA+ID4gVGhleSBoYW5kbGUgZGV2aWNlLXNwZWNpZmljIG1lc3NhZ2VzIGZvciB0
-aGVpciBkZXZpY2UgdHlwZSBvbmx5Lg0KPiA+ID4gVGhpcyBpcyBsaWtlIHZob3N0IGRyaXZlcnMg
-dG9kYXkgd2hlcmUgdGhlIGlvY3RsKCkgZnVuY3Rpb24gDQo+ID4gPiByZXR1cm5zIGFuIGVycm9y
-IGlmIHRoZSBpb2N0bCBpcyBub3Qgc3VwcG9ydGVkIGJ5IHRoZSBkZXZpY2UuICBJdCdzIG5vdCBt
-ZXNzeS4NCj4gPiA+DQo+ID4gPiBXaGVyZSBhcmUgeW91IHdvcnJpZWQgYWJvdXQgbWVzc3kgZHJp
-dmVyIGxvZ2ljPw0KPiA+DQo+ID4gUHJvYmFibHkgSSBkaWRu4oCZdCBleHBsYWluIHdlbGwsIHBs
-ZWFzZSBsZXQgbWUgc3VtbWFyaXplIG15IHRob3VnaHQgYSANCj4gPiBsaXR0bGUNCj4gYml0LCBm
-cm9tIHRoZSBwZXJzcGVjdGl2ZSBvZiB0aGUgY29udHJvbCBwYXRoIGFuZCBkYXRhIHBhdGguDQo+
-ID4NCj4gPiBDb250cm9sIHBhdGg6IHRoZSB2aG9zdC11c2VyIG1lc3NhZ2VzIC0gSSB3b3VsZCBw
-cmVmZXIganVzdCBoYXZlIHRoZSANCj4gPiBpbnRlcmFjdGlvbiBiZXR3ZWVuIFFFTVVzLCBpbnN0
-ZWFkIG9mIHJlbGF5aW5nIHRvIHRoZSBHdWVzdFNsYXZlLCANCj4gPiBiZWNhdXNlDQo+ID4gMSkg
-SSB0aGluayB0aGUgY2xhaW1lZCBhZHZhbnRhZ2UgKGVhc2llciB0byBkZWJ1ZyBhbmQgZGV2ZWxv
-cCkgDQo+ID4gZG9lc27igJl0IHNlZW0gdmVyeSBjb252aW5jaW5nDQo+IA0KPiBZb3UgYXJlIGRl
-ZmluaW5nIGEgbWFwcGluZyBmcm9tIHRoZSB2aG9zdC11c2VyIHByb3RvY29sIHRvIGEgY3VzdG9t
-IA0KPiB2aXJ0aW8gZGV2aWNlIGludGVyZmFjZS4gIEV2ZXJ5IHRpbWUgdGhlIHZob3N0LXVzZXIg
-cHJvdG9jb2wgKGZlYXR1cmUgDQo+IGJpdHMsIG1lc3NhZ2VzLA0KPiBldGMpIGlzIGV4dGVuZGVk
-IGl0IHdpbGwgYmUgbmVjZXNzYXJ5IHRvIG1hcCB0aGlzIG5ldyBleHRlbnNpb24gdG8gdGhlIA0K
-PiB2aXJ0aW8gZGV2aWNlIGludGVyZmFjZS4NCj4gDQo+IFRoYXQncyBub24tdHJpdmlhbC4gIE1p
-c3Rha2VzIGFyZSBwb3NzaWJsZSB3aGVuIGRlc2lnbmluZyB0aGUgbWFwcGluZy4NCj4gVXNpbmcg
-dGhlIHZob3N0LXVzZXIgcHJvdG9jb2wgYXMgdGhlIGRldmljZSBpbnRlcmZhY2UgbWluaW1pemVz
-IHRoZSANCj4gZWZmb3J0IGFuZCByaXNrIG9mIG1pc3Rha2VzIGJlY2F1c2UgbW9zdCBtZXNzYWdl
-cyBhcmUgcmVsYXllZCAxOjEuDQo+IA0KPiA+IDIpIHNvbWUgbWVzc2FnZXMgY2FuIGJlIGRpcmVj
-dGx5IGFuc3dlcmVkIGJ5IFFlbXVTbGF2ZSAsIGFuZCBzb21lDQo+IG1lc3NhZ2VzIGFyZSBub3Qg
-dXNlZnVsIHRvIGdpdmUgdG8gdGhlIEd1ZXN0U2xhdmUgKGluc2lkZSB0aGUgVk0pLCANCj4gZS5n
-LiBmZHMsIFZob3N0VXNlck1lbW9yeVJlZ2lvbiBmcm9tIFNFVF9NRU1fVEFCTEUgbXNnICh0aGUg
-ZGV2aWNlIA0KPiBmaXJzdCBtYXBzIHRoZSBtYXN0ZXIgbWVtb3J5IGFuZCBnaXZlcyB0aGUgb2Zm
-c2V0IChpbiB0ZXJtcyBvZiB0aGUgDQo+IGJhciwgaS5lLiwgd2hlcmUgZG9lcyBpdCBzaXQgaW4g
-dGhlIGJhcikgb2YgdGhlIG1hcHBlZCBncGEgdG8gdGhlIA0KPiBndWVzdC4gaWYgd2UgZ2l2ZSB0
-aGUgcmF3IFZob3N0VXNlck1lbW9yeVJlZ2lvbiB0byB0aGUgZ3Vlc3QsIHRoYXQgd291bGRu4oCZ
-dCBiZSB1c2FibGUpLg0KPiANCj4gSSBhZ3JlZSB0aGF0IFFFTVUgaGFzIHRvIGhhbmRsZSBzb21l
-IG9mIG1lc3NhZ2VzLCBidXQgaXQgc2hvdWxkIHN0aWxsIA0KPiByZWxheSBhbGwgKHBvc3NpYmx5
-IG1vZGlmaWVkKSBtZXNzYWdlcyB0byB0aGUgZ3Vlc3QuDQo+IA0KPiBUaGUgcG9pbnQgb2YgdXNp
-bmcgdGhlIHZob3N0LXVzZXIgcHJvdG9jb2wgaXMgbm90IGp1c3QgdG8gdXNlIGEgDQo+IGZhbWls
-aWFyIGJpbmFyeSBlbmNvZGluZywgaXQncyB0byBtYXRjaCB0aGUgc2VtYW50aWNzIG9mIHZob3N0
-LXVzZXIgDQo+IDEwMCUuICBUaGF0IHdheSB0aGUgdmhvc3QtdXNlciBzb2Z0d2FyZSBzdGFjayBj
-YW4gd29yayBlaXRoZXIgaW4gaG9zdCANCj4gdXNlcnNwYWNlIG9yIHdpdGggdmhvc3QtcGNpIHdp
-dGhvdXQgc2lnbmlmaWNhbnQgY2hhbmdlcy4NCj4gDQo+IFVzaW5nIHRoZSB2aG9zdC11c2VyIHBy
-b3RvY29sIGFzIHRoZSBkZXZpY2UgaW50ZXJmYWNlIGRvZXNuJ3Qgc2VlbSBhbnkgDQo+IGhhcmRl
-ciB0aGFuIGRlZmluaW5nIGEgY29tcGxldGVseSBuZXcgdmlydGlvIGRldmljZSBpbnRlcmZhY2Uu
-ICBJdCBoYXMgDQo+IHRoZSBhZHZhbnRhZ2VzIHRoYXQgSSd2ZSBwb2ludGVkIG91dDoNCj4gDQo+
-IDEuIFNpbXBsZSAxOjEgbWFwcGluZyBmb3IgbW9zdCB0aGF0IGlzIGVhc3kgdG8gbWFpbnRhaW4g
-YXMgdGhlDQo+ICAgIHZob3N0LXVzZXIgcHJvdG9jb2wgZ3Jvd3MuDQo+IA0KPiAyLiBDb21wYXRp
-YmxlIHdpdGggdmhvc3QtdXNlciBzbyBzbGF2ZXMgY2FuIHJ1biBpbiBob3N0IHVzZXJzcGFjZQ0K
-PiAgICBvciB0aGUgZ3Vlc3QuDQo+IA0KPiBJIGRvbid0IHNlZSB3aHkgaXQgbWFrZXMgc2Vuc2Ug
-dG8gZGVmaW5lIG5ldyBkZXZpY2UgaW50ZXJmYWNlcyBmb3IgDQo+IGVhY2ggZGV2aWNlIHR5cGUg
-YW5kIGNyZWF0ZSBhIHNvZnR3YXJlIHN0YWNrIHRoYXQgaXMgaW5jb21wYXRpYmxlIHdpdGggdmhv
-c3QtdXNlci4NCg0KDQpJIHRoaW5rIHRoaXMgMToxIG1hcHBpbmcgd291bGRuJ3QgYmUgZWFzeToN
-Cg0KMSkgV2Ugd2lsbCBoYXZlIDIgUWVtdSBzaWRlIHNsYXZlcyB0byBhY2hpZXZlIHRoaXMgYmlk
-aXJlY3Rpb25hbCByZWxheWluZywgdGhhdCBpcywgdGhlIHdvcmtpbmcgbW9kZWwgd2lsbCBiZSAN
-Ci0gbWFzdGVyIHRvIHNsYXZlOiBNYXN0ZXItPlFlbXVTbGF2ZTEtPkd1ZXN0U2xhdmU7IGFuZA0K
-LSBzbGF2ZSB0byBtYXN0ZXI6IEd1ZXN0U2xhdmUtPlFlbXVTbGF2ZTItPk1hc3Rlcg0KUWVtdVNs
-YXZlMSBhbmQgUWVtdVNsYXZlMiBjYW4ndCBiZSB0aGUgc2FtZSBwaWVjZSBvZiBjb2RlLCBiZWNh
-dXNlIFFlbXVTbGF2ZTEgbmVlZHMgdG8gZG8gc29tZSBzZXR1cCB3aXRoIHNvbWUgbWVzc2FnZXMs
-IGFuZCBRZW11U2xhdmUyIGlzIG1vcmUgbGlrZWx5IHRvIGJlIGEgdHJ1ZSAicmVsYXllciIgKHJl
-Y2VpdmUgYW5kIGRpcmVjdGx5IHBhc3Mgb24pDQoNCjIpIHBvb3IgcmUtdXNhYmlsaXR5IG9mIHRo
-ZSBRZW11U2xhdmUgYW5kIEd1ZXN0U2xhdmUNCldlIGNvdWxkbuKAmXQgcmV1c2UgbXVjaCBvZiB0
-aGUgUWVtdVNsYXZlIGhhbmRsaW5nIGNvZGUgZm9yIEd1ZXN0U2xhdmUuDQpGb3IgZXhhbXBsZSwg
-Zm9yIHRoZSBWSE9TVF9VU0VSX1NFVF9NRU1fVEFCTEUgbXNnLCBhbGwgdGhlIFFlbXVTbGF2ZSBo
-YW5kbGluZyBjb2RlIChwbGVhc2Ugc2VlIHRoZSB2cF9zbGF2ZV9zZXRfbWVtX3RhYmxlIGZ1bmN0
-aW9uKSwgd29uJ3QgYmUgdXNlZCBieSBHdWVzdFNsYXZlLiBPbiB0aGUgb3RoZXIgaGFuZCwgR3Vl
-c3RTbGF2ZSBuZWVkcyBhbiBpbXBsZW1lbnRhdGlvbiB0byByZXBseSBiYWNrIHRvIHRoZSBRRU1V
-IGRldmljZSwgYW5kIHRoaXMgaW1wbGVtZW50YXRpb24gaXNuJ3QgbmVlZGVkIGJ5IFFlbXVTbGF2
-ZS4NCiBJZiB3ZSB3YW50IHRvIHJ1biB0aGUgc2FtZSBwaWVjZSBvZiB0aGUgc2xhdmUgY29kZSBp
-biBib3RoIFFFTVUgYW5kIGd1ZXN0LCB0aGVuIHdlIG1heSBuZWVkICJpZiAoUWVtdVNsYXZlKSBl
-bHNlIiBpbiBlYWNoIG1zZyBoYW5kbGluZyBlbnRyeSB0byBjaG9vc2UgdGhlIGNvZGUgcGF0aCBm
-b3IgUWVtdVNsYXZlIGFuZCBHdWVzdFNsYXZlIHNlcGFyYXRlbHkuDQpTbywgaWRlYWxseSB3ZSB3
-aXNoIHRvIHJ1biAocmV1c2UpIG9uZSBzbGF2ZSBpbXBsZW1lbnRhdGlvbiBpbiBib3RoIFFFTVUg
-YW5kIGd1ZXN0LiBJbiBwcmFjdGljZSwgd2Ugd2lsbCBzdGlsbCBuZWVkIHRvIGhhbmRsZSB0aGVt
-IGVhY2ggY2FzZSBieSBjYXNlLCB3aGljaCBpcyBubyBkaWZmZXJlbnQgdGhhbiBtYWludGFpbmlu
-ZyB0d28gc2VwYXJhdGUgc2xhdmVzIGZvciBRRU1VIGFuZCBndWVzdCwgYW5kIEknbSBhZnJhaWQg
-dGhpcyB3b3VsZCBiZSBtdWNoIG1vcmUgY29tcGxleC4NCiANCkJlc3QsDQpXZWkNCg==
+
+--wq9mPyueHGvFACwf
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
+
+On Tue, Dec 05, 2017 at 02:27:17PM +0800, Changpeng Liu wrote:
+> This commit introduces a new vhost-user device for block, it uses a
+> chardev to connect with the backend, same with Qemu virito-blk device,
+> Guest OS still uses the virtio-blk frontend driver.
+>=20
+> To use it, start QEMU with command line like this:
+>=20
+> qemu-system-x86_64 \
+>     -chardev socket,id=3Dchar0,path=3D/path/vhost.socket \
+>     -device vhost-user-blk-pci,chardev=3Dchar0,num-queues=3D2, \
+>             bootindex=3D2... \
+>=20
+> Users can use different parameters for `num-queues` and `bootindex`.
+>=20
+> Different with exist Qemu virtio-blk host device, it makes more easy
+> for users to implement their own I/O processing logic, such as all
+> user space I/O stack against hardware block device. It uses the new
+> vhost messages(VHOST_USER_GET_CONFIG) to get block virtio config
+> information from backend process.
+>=20
+> Signed-off-by: Changpeng Liu <changpeng.liu@intel.com>
+> ---
+>  default-configs/pci.mak            |   1 +
+>  hw/block/Makefile.objs             |   3 +
+>  hw/block/vhost-user-blk.c          | 357 +++++++++++++++++++++++++++++++=
+++++++
+>  hw/virtio/virtio-pci.c             |  55 ++++++
+>  hw/virtio/virtio-pci.h             |  18 ++
+>  include/hw/virtio/vhost-user-blk.h |  41 +++++
+>  6 files changed, 475 insertions(+)
+>  create mode 100644 hw/block/vhost-user-blk.c
+>  create mode 100644 include/hw/virtio/vhost-user-blk.h
+
+Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
+
+--wq9mPyueHGvFACwf
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEcBAEBAgAGBQJaLo39AAoJEJykq7OBq3PIe+cH/36vndZrHP03DBwjCjuYniZE
+Jmij0cSlfkBbcn9Amv/7t/qr4OmSW4Yia9+h+0LsacVLDYuP6mlpr2zQA9mLM3Il
+h347GgG5Yu1IKsCl1f9XDaPYZ2zMZ4wS5t1kAHlEgLImH6S7V3n0OsGB7BDBU3mv
+ZJvRm5rBiBM1NMUfBt0UYDroAD3xyApWhTi94617nbosTeEgDTZEyGixdhoXAOFh
+0WNgNfvNtSvgoEw6gRo+89uvv1fVZQI7f2nlUetAtC/79XAtsBtRrxzfG9vFz0tf
+6Ya4fBchosnQv6KbTy2KcaqS8lRcvbnB3QbTpMAhfsw110BwV1AneJVzyooLbUE=
+=7DzT
+-----END PGP SIGNATURE-----
+
+--wq9mPyueHGvFACwf--
