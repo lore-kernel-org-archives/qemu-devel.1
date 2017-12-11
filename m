@@ -1,28 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36373)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47827)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1eOVgo-0002e5-Qo
-	for qemu-devel@nongnu.org; Mon, 11 Dec 2017 16:32:43 -0500
+	(envelope-from <samuel.thibault@ens-lyon.org>) id 1eOW0l-0004Vj-4B
+	for qemu-devel@nongnu.org; Mon, 11 Dec 2017 16:53:20 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1eOVgj-0000MS-MJ
-	for qemu-devel@nongnu.org; Mon, 11 Dec 2017 16:32:42 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:39780)
+	(envelope-from <samuel.thibault@ens-lyon.org>) id 1eOW0j-0000j4-UL
+	for qemu-devel@nongnu.org; Mon, 11 Dec 2017 16:53:19 -0500
+Received: from hera.aquilenet.fr ([2a0c:e300::1]:39086)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1eOVgj-0000JR-Dh
-	for qemu-devel@nongnu.org; Mon, 11 Dec 2017 16:32:37 -0500
-References: <20171208105553.12249-1-pbonzini@redhat.com>
-	<32f8bbf4-1fb6-b974-f7ca-f5a91adf875e@redhat.com>
-	<CAFEAcA8j_tGZr-i5LE+ZXAnk4v=pfrKadmgsf=ncMHRUsYK1zQ@mail.gmail.com>
-	<b5a01fb0-4f25-7cae-99d3-c9722912b6c1@redhat.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <cfe0f5b0-39e7-6bd1-3caf-4abb855275ec@redhat.com>
-Date: Mon, 11 Dec 2017 22:32:13 +0100
+	(Exim 4.71) (envelope-from <samuel.thibault@ens-lyon.org>)
+	id 1eOW0j-0000dw-Ht
+	for qemu-devel@nongnu.org; Mon, 11 Dec 2017 16:53:17 -0500
+Date: Mon, 11 Dec 2017 22:53:13 +0100
+From: Samuel Thibault <samuel.thibault@gnu.org>
+Message-ID: <20171211215313.vjjgnlxffp5oznmm@var.youpi.perso.aquilenet.fr>
+References: <1512669755-8409-1-git-send-email-thuth@redhat.com>
+	<1512669755-8409-2-git-send-email-thuth@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <b5a01fb0-4f25-7cae-99d3-c9722912b6c1@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="dWEGiTWx5NDPSdpB6dc4fD5J1ujVTSL9t"
-Subject: Re: [Qemu-devel] [RFC PATCH 0/5] Scoped locks using
- attribute((cleanup))
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <1512669755-8409-2-git-send-email-thuth@redhat.com>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH for-2.12 1/2] net: Remove the legacy "-net
+ channel" parameter
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,71 +30,128 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>, Peter Maydell <peter.maydell@linaro.org>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, "Emilio G . Cota" <cota@braap.org>, Fam Zheng <famz@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>
+To: Thomas Huth <thuth@redhat.com>
+Cc: qemu-devel@nongnu.org, Jason Wang <jasowang@redhat.com>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---dWEGiTWx5NDPSdpB6dc4fD5J1ujVTSL9t
-From: Paolo Bonzini <pbonzini@redhat.com>
-To: Eric Blake <eblake@redhat.com>, Peter Maydell <peter.maydell@linaro.org>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, "Emilio G . Cota"
- <cota@braap.org>, Fam Zheng <famz@redhat.com>,
- Stefan Hajnoczi <stefanha@redhat.com>
-Message-ID: <cfe0f5b0-39e7-6bd1-3caf-4abb855275ec@redhat.com>
-Subject: Re: [Qemu-devel] [RFC PATCH 0/5] Scoped locks using
- attribute((cleanup))
-References: <20171208105553.12249-1-pbonzini@redhat.com>
- <32f8bbf4-1fb6-b974-f7ca-f5a91adf875e@redhat.com>
- <CAFEAcA8j_tGZr-i5LE+ZXAnk4v=pfrKadmgsf=ncMHRUsYK1zQ@mail.gmail.com>
- <b5a01fb0-4f25-7cae-99d3-c9722912b6c1@redhat.com>
-In-Reply-To: <b5a01fb0-4f25-7cae-99d3-c9722912b6c1@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-
-On 11/12/2017 15:11, Eric Blake wrote:
-> I don't know if there is a way to make gcc insert stack-unwind
-> directives that are honored across longjmp (I know C++ does it for
-> exceptions; so there may be a way, and I just don't know it).
-
-Probably -fexceptions.
-
-Paolo
-
-> Conversely, I do know that pthread_cleanup_push/pop, which does
-> something similar, is permitted by POSIX to NOT work across longjmp:
+Thomas Huth, on jeu. 07 d=C3=A9c. 2017 19:02:34 +0100, wrote:
+> It has never been documented, so hardly anybody knows about this
+> parameter, and it is marked as deprecated since QEMU v2.6.
+> Time to let it go now.
 >=20
->        Calling longjmp(3) (siglongjmp(3)) produces undefined  results
-> if  any
->        call  has  been made to pthread_cleanup_push() or
-> pthread_cleanup_pop()
->        without the matching call of the pair since the jump buffer was
-> filled
->        by   setjmp(3)  (sigsetjmp(3)).   Likewise,  calling  longjmp(3)=
+> Signed-off-by: Thomas Huth <thuth@redhat.com>
 
-> (sig=E2=80=90
->        longjmp(3)) from inside a clean-up handler produces  undefined
-> results
->        unless  the  jump  buffer  was  also filled by setjmp(3)
-> (sigsetjmp(3))
->        inside the handler.
+Reviewed-by: Samuel Thibault <samuel.thibault@ens-lyon.org>
 
+> ---
+>  include/net/slirp.h |  2 --
+>  net/net.c           |  7 -------
+>  net/slirp.c         | 34 ----------------------------------
+>  qemu-doc.texi       |  5 -----
+>  4 files changed, 48 deletions(-)
+>=20
+> diff --git a/include/net/slirp.h b/include/net/slirp.h
+> index 64b795c..0c98e46 100644
+> --- a/include/net/slirp.h
+> +++ b/include/net/slirp.h
+> @@ -36,8 +36,6 @@ void hmp_hostfwd_remove(Monitor *mon, const QDict *qd=
+ict);
+> =20
+>  int net_slirp_redir(const char *redir_str);
+> =20
+> -int net_slirp_parse_legacy(QemuOptsList *opts_list, const char *optarg=
+, int *ret);
+> -
+>  int net_slirp_smb(const char *exported_dir);
+> =20
+>  void hmp_info_usernet(Monitor *mon, const QDict *qdict);
+> diff --git a/net/net.c b/net/net.c
+> index 39ef546..7425857 100644
+> --- a/net/net.c
+> +++ b/net/net.c
+> @@ -1565,13 +1565,6 @@ int net_init_clients(void)
+> =20
+>  int net_client_parse(QemuOptsList *opts_list, const char *optarg)
+>  {
+> -#if defined(CONFIG_SLIRP)
+> -    int ret;
+> -    if (net_slirp_parse_legacy(opts_list, optarg, &ret)) {
+> -        return ret;
+> -    }
+> -#endif
+> -
+>      if (!qemu_opts_parse_noisily(opts_list, optarg, true)) {
+>          return -1;
+>      }
+> diff --git a/net/slirp.c b/net/slirp.c
+> index 318a26e..cb8ca23 100644
+> --- a/net/slirp.c
+> +++ b/net/slirp.c
+> @@ -956,37 +956,3 @@ int net_init_slirp(const Netdev *netdev, const cha=
+r *name,
+> =20
+>      return ret;
+>  }
+> -
+> -int net_slirp_parse_legacy(QemuOptsList *opts_list, const char *optarg=
+, int *ret)
+> -{
+> -    if (strcmp(opts_list->name, "net") !=3D 0 ||
+> -        strncmp(optarg, "channel,", strlen("channel,")) !=3D 0) {
+> -        return 0;
+> -    }
+> -
+> -    error_report("The '-net channel' option is deprecated. "
+> -                 "Please use '-netdev user,guestfwd=3D...' instead.");
+> -
+> -    /* handle legacy -net channel,port:chr */
+> -    optarg +=3D strlen("channel,");
+> -
+> -    if (QTAILQ_EMPTY(&slirp_stacks)) {
+> -        struct slirp_config_str *config;
+> -
+> -        config =3D g_malloc(sizeof(*config));
+> -        pstrcpy(config->str, sizeof(config->str), optarg);
+> -        config->flags =3D SLIRP_CFG_LEGACY;
+> -        config->next =3D slirp_configs;
+> -        slirp_configs =3D config;
+> -        *ret =3D 0;
+> -    } else {
+> -        Error *err =3D NULL;
+> -        *ret =3D slirp_guestfwd(QTAILQ_FIRST(&slirp_stacks), optarg, 1=
+, &err);
+> -        if (*ret < 0) {
+> -            error_report_err(err);
+> -        }
+> -    }
+> -
+> -    return 1;
+> -}
+> -
+> diff --git a/qemu-doc.texi b/qemu-doc.texi
+> index db2351c..982cab5 100644
+> --- a/qemu-doc.texi
+> +++ b/qemu-doc.texi
+> @@ -2459,11 +2459,6 @@ The ``-smb /some/dir'' argument is now a synonym=
+ for setting
+>  the ``-netdev user,smb=3D/some/dir'' argument instead. The new
+>  syntax allows different settings to be provided per NIC.
+> =20
+> -@subsection -net channel (since 2.6.0)
+> -
+> -The ``--net channel,ARGS'' argument is now a synonym for setting
+> -the ``-netdev user,guestfwd=3DARGS'' argument instead.
+> -
+>  @subsection -net vlan (since 2.9.0)
+> =20
+>  The ``-net vlan=3DNN'' argument is partially replaced with the
+> --=20
+> 1.8.3.1
+>=20
 
-
---dWEGiTWx5NDPSdpB6dc4fD5J1ujVTSL9t
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEE8TM4V0tmI4mGbHaCv/vSX3jHroMFAlou+WMACgkQv/vSX3jH
-roOVLwf+LB58K9hpDmBU6r58r/2s+aqlOC8PT+YaUFCUkZL2ZSalc7BYkXY1Q1oA
-jSDmaBSp+HfUfDtka7p+k3D91XaOiD9Y646sL9rpIFPifZ225C/1gMTIf44l3/k/
-nk7k7InXJ11VASmEcTcaIv/gCwzft54gf/2VQX7u5TaOhHm5jug+K7r55Cwx+GLe
-gNhFkrUUp+cuESPZ1vVVQPgDAqs1udWBtcu4BSA6wVqP9snXRUVgHkOZAb9YcXqV
-OvvW3qcG6Ow0ncAfuNDqrK+Lo88lq7G2lXrVyzoIXOhS2AJYJkQsKetCs3YfuM2Q
-YDtjf0kwwoJuy0++1PJbg4gBJaNSTA==
-=REIL
------END PGP SIGNATURE-----
-
---dWEGiTWx5NDPSdpB6dc4fD5J1ujVTSL9t--
+--=20
+Samuel
+R: Parce que =C3=A7a renverse b=C3=AAtement l'ordre naturel de lecture!
+Q: Mais pourquoi citer en fin d'article est-il si effroyable?
+R: Citer en fin d'article
+Q: Quelle est la chose la plus d=C3=A9sagr=C3=A9able sur les groupes de n=
+ews?
