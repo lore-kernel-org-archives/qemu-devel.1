@@ -1,23 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33482)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33554)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mikhail.abakumov@ispras.ru>) id 1eOO2G-0000P6-GY
-	for qemu-devel@nongnu.org; Mon, 11 Dec 2017 08:22:21 -0500
+	(envelope-from <mikhail.abakumov@ispras.ru>) id 1eOO2O-0000cP-BV
+	for qemu-devel@nongnu.org; Mon, 11 Dec 2017 08:22:29 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mikhail.abakumov@ispras.ru>) id 1eOO2F-0001xd-HV
-	for qemu-devel@nongnu.org; Mon, 11 Dec 2017 08:22:20 -0500
-Received: from mail.ispras.ru ([83.149.199.45]:43398)
+	(envelope-from <mikhail.abakumov@ispras.ru>) id 1eOO2L-000223-5K
+	for qemu-devel@nongnu.org; Mon, 11 Dec 2017 08:22:28 -0500
+Received: from mail.ispras.ru ([83.149.199.45]:43422)
 	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mikhail.abakumov@ispras.ru>) id 1eOO2F-0001xE-5B
-	for qemu-devel@nongnu.org; Mon, 11 Dec 2017 08:22:19 -0500
+	(envelope-from <mikhail.abakumov@ispras.ru>) id 1eOO2K-00021N-Pg
+	for qemu-devel@nongnu.org; Mon, 11 Dec 2017 08:22:25 -0500
 From: Mihail Abakumov <mikhail.abakumov@ispras.ru>
-Date: Mon, 11 Dec 2017 16:22:03 +0300
-Message-ID: <151299852373.4808.1451782080986133047.stgit@Misha-PC.lan02.inno>
+Date: Mon, 11 Dec 2017 16:22:09 +0300
+Message-ID: <151299852937.4808.10432683992168626870.stgit@Misha-PC.lan02.inno>
 In-Reply-To: <151299847127.4808.14646046517426494416.stgit@Misha-PC.lan02.inno>
 References: <151299847127.4808.14646046517426494416.stgit@Misha-PC.lan02.inno>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Subject: [Qemu-devel] [PATCH v4 08/46] windbg: hook to wrmsr operation
+Subject: [Qemu-devel] [PATCH v4 09/46] windbg: handler of fs/gs register
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,131 +29,152 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: sw@weilnetz.de, lprosek@redhat.com, dovgaluk@ispras.ru, rkagan@virtuozzo.com, pbonzini@redhat.com, den@openvz.org
 
-Inserted hook to wrmsr operation. Windows Kernel put address on KPCR struct to fs/gs (x32/x64) register. Needs catch this moment and allow windbg server handle packets.
+Added handler of fs/gs register. It tries to find and check KPCR and version address.
 
 Signed-off-by: Mihail Abakumov <mikhail.abakumov@ispras.ru>
 Signed-off-by: Pavel Dovgalyuk <dovgaluk@ispras.ru>
 Signed-off-by: Dmitriy Koltunov <koltunov@ispras.ru>
 ---
- include/exec/windbgstub-utils.h |    2 ++
- include/exec/windbgstub.h       |    1 +
- stubs/windbgstub.c              |    3 +++
- target/i386/misc_helper.c       |    3 +++
- target/i386/windbgstub.c        |   10 ++++++++++
- windbgstub.c                    |   13 +++++++++++++
- 6 files changed, 32 insertions(+)
+ include/exec/windbgstub-utils.h |    8 ++++++
+ target/i386/windbgstub.c        |   49 ++++++++++++++++++++++++++++++++++++++-
+ windbgstub-utils.c              |   13 ++++++++++
+ windbgstub.c                    |   10 ++++++++
+ 4 files changed, 79 insertions(+), 1 deletion(-)
 
 diff --git a/include/exec/windbgstub-utils.h b/include/exec/windbgstub-utils.h
-index 4c747fa23e..a181e172e9 100755
+index a181e172e9..ced03b0663 100755
 --- a/include/exec/windbgstub-utils.h
 +++ b/include/exec/windbgstub-utils.h
-@@ -47,4 +47,6 @@ typedef struct SizedBuf {
+@@ -47,6 +47,14 @@ typedef struct SizedBuf {
      size_t size;
  } SizedBuf;
  
-+bool windbg_on_load(void);
++typedef struct InitedAddr {
++    target_ulong addr;
++    bool is_init;
++} InitedAddr;
 +
- #endif
-diff --git a/include/exec/windbgstub.h b/include/exec/windbgstub.h
-index 21bc552e58..309f692383 100755
---- a/include/exec/windbgstub.h
-+++ b/include/exec/windbgstub.h
-@@ -18,6 +18,7 @@
- #define WINDBG_DEBUG_ON false
- #endif
- 
-+void windbg_try_load(void);
- int windbg_server_start(const char *device);
++InitedAddr *windbg_get_KPCR(void);
++InitedAddr *windbg_get_version(void);
++
+ bool windbg_on_load(void);
  
  #endif
-diff --git a/stubs/windbgstub.c b/stubs/windbgstub.c
-index 4951f59203..bd7e2dccd1 100755
---- a/stubs/windbgstub.c
-+++ b/stubs/windbgstub.c
-@@ -12,6 +12,9 @@
- #include "qemu/osdep.h"
- #include "exec/windbgstub.h"
- 
-+void windbg_try_load(void)
-+{}
-+
- int windbg_server_start(const char *device)
- {
-     return 0;
-diff --git a/target/i386/misc_helper.c b/target/i386/misc_helper.c
-index 628f64aad5..ec1fcd2899 100644
---- a/target/i386/misc_helper.c
-+++ b/target/i386/misc_helper.c
-@@ -24,6 +24,7 @@
- #include "exec/exec-all.h"
- #include "exec/cpu_ldst.h"
- #include "exec/address-spaces.h"
-+#include "exec/windbgstub.h"
- 
- void helper_outb(CPUX86State *env, uint32_t port, uint32_t data)
- {
-@@ -385,6 +386,8 @@ void helper_wrmsr(CPUX86State *env)
-         /* XXX: exception? */
-         break;
-     }
-+
-+    windbg_try_load();
- }
- 
- void helper_rdmsr(CPUX86State *env)
 diff --git a/target/i386/windbgstub.c b/target/i386/windbgstub.c
-index df89e1edd8..0938f738e6 100755
+index 0938f738e6..47ee5840ef 100755
 --- a/target/i386/windbgstub.c
 +++ b/target/i386/windbgstub.c
-@@ -10,3 +10,13 @@
+@@ -14,9 +14,56 @@
+ #ifndef TARGET_X86_64
+ #include "exec/windbgstub-utils.h"
+ 
++#ifdef TARGET_X86_64
++# define OFFSET_SELF_PCR         0x18
++# define OFFSET_VERS             0x108
++#else
++# define OFFSET_SELF_PCR         0x1C
++# define OFFSET_VERS             0x34
++#endif
++
+ bool windbg_on_load(void)
+ {
+-    return false;
++    CPUState *cpu = qemu_get_cpu(0);
++    CPUArchState *env = cpu->env_ptr;
++    InitedAddr *KPCR = windbg_get_KPCR();
++    InitedAddr *version = windbg_get_version();
++
++    if (!KPCR->is_init) {
++
++ #ifdef TARGET_X86_64
++        KPCR->addr = env->segs[R_GS].base;
++ #else
++        KPCR->addr = env->segs[R_FS].base;
++ #endif
++
++        static target_ulong prev_KPCR;
++        if (!KPCR->addr || prev_KPCR == KPCR->addr) {
++            return false;
++        }
++        prev_KPCR = KPCR->addr;
++
++        if (KPCR->addr != READ_VMEM(cpu, KPCR->addr + OFFSET_SELF_PCR,
++                                    target_ulong)) {
++            return false;
++        }
++
++        KPCR->is_init = true;
++    }
++
++    if (!version->is_init && KPCR->is_init) {
++        version->addr = READ_VMEM(cpu, KPCR->addr + OFFSET_VERS,
++                                  target_ulong);
++        if (!version->addr) {
++            return false;
++        }
++        version->is_init = true;
++    }
++
++    WINDBG_DEBUG("windbg_on_load: KPCR " FMT_ADDR, KPCR->addr);
++    WINDBG_DEBUG("windbg_on_load: version " FMT_ADDR, version->addr);
++
++    return true;
+ }
+ 
+ #endif
+diff --git a/windbgstub-utils.c b/windbgstub-utils.c
+index dc5e505c63..347c61553a 100755
+--- a/windbgstub-utils.c
++++ b/windbgstub-utils.c
+@@ -10,3 +10,16 @@
   */
  
- #include "qemu/osdep.h"
+ #include "exec/windbgstub-utils.h"
 +
-+#ifndef TARGET_X86_64
-+#include "exec/windbgstub-utils.h"
++static InitedAddr KPCR;
++static InitedAddr version;
 +
-+bool windbg_on_load(void)
++InitedAddr *windbg_get_KPCR(void)
 +{
-+    return false;
++    return &KPCR;
 +}
 +
-+#endif
++InitedAddr *windbg_get_version(void)
++{
++    return &version;
++}
 diff --git a/windbgstub.c b/windbgstub.c
-index e30b8500e0..a2a6eb81b4 100755
+index a2a6eb81b4..e9aabd807b 100755
 --- a/windbgstub.c
 +++ b/windbgstub.c
-@@ -16,6 +16,7 @@
- #include "qemu/cutils.h"
+@@ -17,6 +17,7 @@
  #include "exec/windbgstub.h"
  #include "exec/windbgstub-utils.h"
-+#include "sysemu/kvm.h"
+ #include "sysemu/kvm.h"
++#include "sysemu/reset.h"
  
  typedef struct WindbgState {
      bool is_loaded;
-@@ -45,6 +46,13 @@ static void windbg_exit(void)
+@@ -46,6 +47,13 @@ static void windbg_exit(void)
      g_free(windbg_state);
  }
  
-+void windbg_try_load(void)
++static void windbg_handle_reset(void *opaque)
 +{
-+    if (windbg_state && !windbg_state->is_loaded) {
-+        windbg_state->is_loaded = windbg_on_load();
-+    }
++    windbg_state->is_loaded = false;
++    windbg_get_KPCR()->is_init = false;
++    windbg_get_version()->is_init = false;
 +}
 +
- int windbg_server_start(const char *device)
+ void windbg_try_load(void)
  {
-     Chardev *chr = NULL;
-@@ -54,6 +62,11 @@ int windbg_server_start(const char *device)
-         exit(1);
-     }
+     if (windbg_state && !windbg_state->is_loaded) {
+@@ -85,6 +93,8 @@ int windbg_server_start(const char *device)
+     qemu_chr_fe_set_handlers(&windbg_state->chr, windbg_chr_can_receive,
+                              windbg_chr_receive, NULL, NULL, NULL, NULL, true);
  
-+    if (kvm_enabled()) {
-+        WINDBG_ERROR("KVM is not supported.");
-+        exit(1);
-+    }
++    qemu_register_reset(windbg_handle_reset, NULL);
 +
-     if (!strstart(device, "pipe:", NULL)) {
-         WINDBG_ERROR("Unsupported device. Supported only pipe.");
-         exit(1);
+     atexit(windbg_exit);
+     return 0;
+ }
