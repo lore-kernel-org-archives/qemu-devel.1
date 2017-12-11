@@ -1,27 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35372)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36167)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <prvs=5116ce171=anthony.perard@citrix.com>)
-	id 1eORPo-0004Uc-C0
-	for qemu-devel@nongnu.org; Mon, 11 Dec 2017 11:58:53 -0500
+	(envelope-from <rth7680@gmail.com>) id 1eORRq-0005wX-TB
+	for qemu-devel@nongnu.org; Mon, 11 Dec 2017 12:01:00 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <prvs=5116ce171=anthony.perard@citrix.com>)
-	id 1eORPk-0008Ke-9P
-	for qemu-devel@nongnu.org; Mon, 11 Dec 2017 11:58:52 -0500
-Received: from smtp02.citrix.com ([66.165.176.63]:35016)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_ARCFOUR_SHA1:16) (Exim 4.71)
-	(envelope-from <prvs=5116ce171=anthony.perard@citrix.com>)
-	id 1eORPk-0008IA-2U
-	for qemu-devel@nongnu.org; Mon, 11 Dec 2017 11:58:48 -0500
-Date: Mon, 11 Dec 2017 16:58:44 +0000
-From: Anthony PERARD <anthony.perard@citrix.com>
-Message-ID: <20171211165844.GB2216@perard.uk.xensource.com>
-References: <20171103115631.15175-1-owen.smith@citrix.com>
+	(envelope-from <rth7680@gmail.com>) id 1eORRm-0001cq-R7
+	for qemu-devel@nongnu.org; Mon, 11 Dec 2017 12:00:58 -0500
+Received: from mail-pf0-x235.google.com ([2607:f8b0:400e:c00::235]:37555)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <rth7680@gmail.com>) id 1eORRm-0001cB-Kb
+	for qemu-devel@nongnu.org; Mon, 11 Dec 2017 12:00:54 -0500
+Received: by mail-pf0-x235.google.com with SMTP id n6so11985984pfa.4
+	for <qemu-devel@nongnu.org>; Mon, 11 Dec 2017 09:00:54 -0800 (PST)
+Sender: Richard Henderson <rth7680@gmail.com>
+References: <1513006964-3371-1-git-send-email-peter.maydell@linaro.org>
+From: Richard Henderson <rth@twiddle.net>
+Message-ID: <db0d2fd0-ae95-b9f8-47a7-d273306a2432@twiddle.net>
+Date: Mon, 11 Dec 2017 09:00:49 -0800
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Disposition: inline
-In-Reply-To: <20171103115631.15175-1-owen.smith@citrix.com>
-Subject: Re: [Qemu-devel] [PATCH v5 0/4] xenfb: Enablement for Windows PV
- HID frontend
+In-Reply-To: <1513006964-3371-1-git-send-email-peter.maydell@linaro.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH for-2.11?] target/arm: Generate UNDEF for
+ 32-bit Thumb2 insns
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,29 +31,32 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Owen Smith <owen.smith@citrix.com>
-Cc: sstabellini@kernel.org, kraxel@redhat.com, qemu-devel@nongnu.org, xen-devel@lists.xenproject.org
+To: Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org
+Cc: patches@linaro.org, "Emilio G . Cota" <cota@braap.org>
 
-On Fri, Nov 03, 2017 at 11:56:27AM +0000, Owen Smith wrote:
-> Improve the input device model in xenfb, by updating the
-> Qemu input handlers and adding a feature to allow for
-> raw (unscaled) absolute coordinates to be represented.
+On 12/11/2017 07:42 AM, Peter Maydell wrote:
+> The refactoring of commit 296e5a0a6c3935 has a nasty bug:
+> it accidentally dropped the generation of code to raise
+> the UNDEF exception when disas_thumb2_insn() returns nonzero.
+> This means that 32-bit Thumb2 instruction patterns that
+> ought to UNDEF just act like nops instead. This is likely
+> to break any number of things, including the kernel's "disable
+> the FPU and use the UNDEF exception to identify when to turn
+> it back on again" trick.
 > 
-> Changes:
->   * use keycodedb to generate qcode to linux input mapping
->   * move rescaling to the mouse_event handler
->   * add activate for raw_pointer devices
+> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+> ---
+> This is the smallest possible fix that will correct the
+> bug, for possible inclusion in 2.11; for 2.12 we should
+> fix the asymmetry where disas_thumb() generates its own
+> exception-raising code but disas_thumb2() wants the caller
+> to do it. (This asymmetry is why we didn't notice the
+> problem in code review.)
 > 
-> Owen Smith (3):
->   ui: generate qcode to linux mappings
->   xenfb: Use Input Handlers directly
->   xenfb: Add [feature|request]-raw-pointer
->   xenfb: activate input handlers for raw pointer devices
+> I'm not sure whether this should go into 2.11 or not --
+> this time last week it would have been an easy "yes".
 
-The patch series looks good to me:
-Reviewed-by: Anthony PERARD <anthony.perard@citrix.com>
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 
-Thanks,
 
--- 
-Anthony PERARD
+r~
