@@ -1,15 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43440)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43447)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1eOOQw-0003vA-Cc
+	(envelope-from <david@redhat.com>) id 1eOOQw-0003vt-UX
 	for qemu-devel@nongnu.org; Mon, 11 Dec 2017 08:47:51 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1eOOQs-0006aG-2k
-	for qemu-devel@nongnu.org; Mon, 11 Dec 2017 08:47:50 -0500
+	(envelope-from <david@redhat.com>) id 1eOOQw-0006hS-2x
+	for qemu-devel@nongnu.org; Mon, 11 Dec 2017 08:47:51 -0500
 From: David Hildenbrand <david@redhat.com>
-Date: Mon, 11 Dec 2017 14:47:25 +0100
-Message-Id: <20171211134740.8235-1-david@redhat.com>
-Subject: [Qemu-devel] [PATCH v1 for-2-12 00/15] s390x: flic rework,
- tcg flic support and tcg
+Date: Mon, 11 Dec 2017 14:47:26 +0100
+Message-Id: <20171211134740.8235-2-david@redhat.com>
+In-Reply-To: <20171211134740.8235-1-david@redhat.com>
+References: <20171211134740.8235-1-david@redhat.com>
+Subject: [Qemu-devel] [PATCH v1 for-2-12 01/15] cpus: make pause_all_cpus()
+ play with SMP on single threaded TCG
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -19,65 +21,84 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-s390x@nongnu.org, qemu-devel@nongnu.org
-Cc: Christian Borntraeger <borntraeger@de.ibm.com>, Cornelia Huck <cohuck@redhat.com>, Richard Henderson <rth@twiddle.net>, Alexander Graf <agraf@suse.de>, Paolo Bonzini <pbonzini@redhat.com>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Thomas Huth <thuth@redhat.com>
+Cc: Christian Borntraeger <borntraeger@de.ibm.com>, Cornelia Huck <cohuck@redhat.com>, Richard Henderson <rth@twiddle.net>, Alexander Graf <agraf@suse.de>, Paolo Bonzini <pbonzini@redhat.com>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Thomas Huth <thuth@redhat.com>, David Hildenbrand <david@redhat.com>
 
-This patch series implements floating interrupt support for TCG and fixes
-STSI so we can remove warnings related to s390x SMP and MTTCG.
+pause_all_cpus() is sometimes called from a VCPU thread (e.g. s390x
+during special reset). It cannot deal with multiple VCPUs per Thread
+(single threaded TCG) yet.
 
-KVM code has to be touched in order to factor out the injection routines
-into the flic ("s390x/flic: factor out injection of floating interrupts").
-Basic testing didn't reveal any problems so far.
+Booting an s390x guest with -smp 2 and single threaded TCG from disk
+currently fails. The DIAG 308 will issue a pause_all_cpus() and wait
+forever for the CPUs to actually stop. But it is waiting for itself.
 
-With this series I am now able to run fedora 26/27 and Ubuntu 17.10+ with
-16 VCPUs (MTTCG) on a 8CPU host, doing a make -j16 in the guest. I got
-nasty stalls in the guest beforehand.
+So let's stop all VCPUs belonging to the current thread. Factor out
+stopping of a VCPU.
 
-I already sent the patches
- - "cpus: make pause_all_cpus() play with SMP on single threaded TCG"
- - "cpu-exec: fix missed CPU kick during interrupt injection"
-separately, but as nobody commented so far (e.g. due to 2.11) I am including
-them here as they are required to make SMP work reliably.
+Signed-off-by: David Hildenbrand <david@redhat.com>
+---
+ cpus.c | 32 +++++++++++++++++++-------------
+ 1 file changed, 19 insertions(+), 13 deletions(-)
 
-Based on: https://github.com/cohuck/qemu.git s390x-next
-Available at: https://github.com/davidhildenbrand/qemu.git s390x-queue
-
-David Hildenbrand (15):
-  cpus: make pause_all_cpus() play with SMP on single threaded TCG
-  cpu-exec: fix missed CPU kick during interrupt injection
-  s390x/tcg: deliver multiple interrupts in a row
-  s390x/flic: simplify flic initialization
-  s390x/tcg: simplify machine check handling
-  s390x/flic: factor out injection of floating interrupts
-  s390x/tcg: tolerate wrong wakeups due to floating interrupts
-  s390x/flic: make floating interrupts on TCG actually floating
-  s390x/tcg: implement TEST PENDING INTERRUPTION
-  s390x/flic: implement qemu_s390_clear_io_flic()
-  s390x/flic: optimize CPU wakeup for TCG
-  s390x/tcg: fix size + content of STSI blocks
-  s390x/tcg: STSI overhaul
-  s390x/tcg: remove SMP warning
-  configure: s390x supports mttcg now
-
- accel/tcg/cpu-exec.c         |  12 +-
- configure                    |   1 +
- cpus.c                       |  32 +++---
- hw/intc/s390_flic.c          | 222 +++++++++++++++++++++++++++++++++++-
- hw/intc/s390_flic_kvm.c      |  75 +++++++++---
- hw/s390x/s390-virtio-ccw.c   |   4 -
- include/hw/s390x/s390_flic.h |  55 +++++++--
- target/s390x/cpu.c           |  10 --
- target/s390x/cpu.h           |  75 ++++++------
- target/s390x/excp_helper.c   | 147 +++++++++---------------
- target/s390x/helper.h        |   1 +
- target/s390x/insn-data.def   |   1 +
- target/s390x/internal.h      |   5 -
- target/s390x/interrupt.c     | 100 ++++------------
- target/s390x/kvm-stub.c      |  13 ---
- target/s390x/kvm.c           |  68 +----------
- target/s390x/kvm_s390x.h     |  10 +-
- target/s390x/misc_helper.c   | 266 +++++++++++++++++++++++++++----------------
- target/s390x/translate.c     |   8 ++
- 19 files changed, 644 insertions(+), 461 deletions(-)
-
+diff --git a/cpus.c b/cpus.c
+index 114c29b6a0..3740c4db62 100644
+--- a/cpus.c
++++ b/cpus.c
+@@ -1057,13 +1057,22 @@ static void qemu_tcg_destroy_vcpu(CPUState *cpu)
+ {
+ }
+ 
++static void qemu_cpu_stop(CPUState *cpu, bool exit)
++{
++    g_assert(qemu_cpu_is_self(cpu));
++    cpu->stop = false;
++    cpu->stopped = true;
++    if (exit) {
++        cpu_exit(cpu);
++    }
++    qemu_cond_broadcast(&qemu_pause_cond);
++}
++
+ static void qemu_wait_io_event_common(CPUState *cpu)
+ {
+     atomic_mb_set(&cpu->thread_kicked, false);
+     if (cpu->stop) {
+-        cpu->stop = false;
+-        cpu->stopped = true;
+-        qemu_cond_broadcast(&qemu_pause_cond);
++        qemu_cpu_stop(cpu, false);
+     }
+     process_queued_cpu_work(cpu);
+ }
+@@ -1610,12 +1619,12 @@ void pause_all_vcpus(void)
+ 
+     qemu_clock_enable(QEMU_CLOCK_VIRTUAL, false);
+     CPU_FOREACH(cpu) {
+-        cpu->stop = true;
+-        qemu_cpu_kick(cpu);
+-    }
+-
+-    if (qemu_in_vcpu_thread()) {
+-        cpu_stop_current();
++        if (qemu_cpu_is_self(cpu)) {
++            qemu_cpu_stop(cpu, true);
++        } else {
++            cpu->stop = true;
++            qemu_cpu_kick(cpu);
++        }
+     }
+ 
+     while (!all_vcpus_paused()) {
+@@ -1799,10 +1808,7 @@ void qemu_init_vcpu(CPUState *cpu)
+ void cpu_stop_current(void)
+ {
+     if (current_cpu) {
+-        current_cpu->stop = false;
+-        current_cpu->stopped = true;
+-        cpu_exit(current_cpu);
+-        qemu_cond_broadcast(&qemu_pause_cond);
++        qemu_cpu_stop(current_cpu, true);
+     }
+ }
+ 
 -- 
 2.14.3
