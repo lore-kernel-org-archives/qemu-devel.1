@@ -1,29 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60873)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35735)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <frasse.iglesias@gmail.com>) id 1eOVSV-0002fL-Un
-	for qemu-devel@nongnu.org; Mon, 11 Dec 2017 16:17:58 -0500
+	(envelope-from <andrew.smirnov@gmail.com>) id 1eOVf7-0000it-2m
+	for qemu-devel@nongnu.org; Mon, 11 Dec 2017 16:30:58 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <frasse.iglesias@gmail.com>) id 1eOVSU-0002OU-4F
-	for qemu-devel@nongnu.org; Mon, 11 Dec 2017 16:17:55 -0500
-Received: from mail-pg0-x244.google.com ([2607:f8b0:400e:c05::244]:36722)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <frasse.iglesias@gmail.com>)
-	id 1eOVST-0002LA-R4
-	for qemu-devel@nongnu.org; Mon, 11 Dec 2017 16:17:54 -0500
-Received: by mail-pg0-x244.google.com with SMTP id k134so11834993pga.3
-	for <qemu-devel@nongnu.org>; Mon, 11 Dec 2017 13:17:53 -0800 (PST)
+	(envelope-from <andrew.smirnov@gmail.com>) id 1eOVf6-00048s-0R
+	for qemu-devel@nongnu.org; Mon, 11 Dec 2017 16:30:57 -0500
+From: Andrey Smirnov <andrew.smirnov@gmail.com>
+Date: Mon, 11 Dec 2017 13:29:55 -0800
+Message-Id: <20171211213007.7353-2-andrew.smirnov@gmail.com>
+In-Reply-To: <20171211213007.7353-1-andrew.smirnov@gmail.com>
+References: <20171211213007.7353-1-andrew.smirnov@gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <CAKmqyKOqfoizc0eK2X4gQN+==Du95fd=WR+kpn9bgS13bJBBUQ@mail.gmail.com>
-References: <cover.1512598866.git.alistair.francis@xilinx.com>
-	<c0b9bffacc4c248956e032c554787774d47edbf8.1512598866.git.alistair.francis@xilinx.com>
-	<CAAYMZQtBsYvYN=n-vNQ_xUZYzkT+mq7r6uUOsTtQSdR-egz0mw@mail.gmail.com>
-	<CAKmqyKOqfoizc0eK2X4gQN+==Du95fd=WR+kpn9bgS13bJBBUQ@mail.gmail.com>
-From: francisco iglesias <frasse.iglesias@gmail.com>
-Date: Mon, 11 Dec 2017 22:17:51 +0100
-Message-ID: <CAAYMZQvW6LF5r+=WaTZpfE1gk5cLPEYv=FB9QDeuHPn5yp+X4w@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH-2.12 v2 2/3] xilinx_spips: Set all of the
- reset values
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Subject: [Qemu-devel] [PATCH 01/13] imx_fec: Do not link to netdev
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,176 +22,52 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alistair Francis <alistair.francis@xilinx.com>
-Cc: "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>, Edgar Iglesias <edgar.iglesias@xilinx.com>, Edde <edgar.iglesias@gmail.com>, KONRAD Frederic <frederic.konrad@adacore.com>
+To: qemu-arm@nongnu.org
+Cc: Andrey Smirnov <andrew.smirnov@gmail.com>, Peter Maydell <peter.maydell@linaro.org>, Jason Wang <jasowang@redhat.com>, =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, qemu-devel@nongnu.org, yurovsky@gmail.com
 
-On 11 December 2017 at 18:27, Alistair Francis <alistair.francis@xilinx.com>
-wrote:
+Binding to a particular netdev doesn't seem to belong to this layer
+and should probably be done as a part of board or SoC specific code.
 
-> On Wed, Dec 6, 2017 at 3:39 PM, francisco iglesias
-> <frasse.iglesias@gmail.com> wrote:
-> > Hi Alistair,
-> >
-> > On 6 December 2017 at 23:22, Alistair Francis <
-> alistair.francis@xilinx.com>
-> > wrote:
-> >>
-> >> Following the ZynqMP register spec let's ensure that all reset values
-> >> are set.
-> >>
-> >> Signed-off-by: Alistair Francis <alistair.francis@xilinx.com>
-> >> ---
-> >> V2:
-> >>  - Don't bother double setting registers
-> >>
-> >>  hw/ssi/xilinx_spips.c         | 35 ++++++++++++++++++++++++++++++-----
-> >>  include/hw/ssi/xilinx_spips.h |  2 +-
-> >>  2 files changed, 31 insertions(+), 6 deletions(-)
-> >>
-> >> diff --git a/hw/ssi/xilinx_spips.c b/hw/ssi/xilinx_spips.c
-> >> index 899db814ee..b8182cfd74 100644
-> >> --- a/hw/ssi/xilinx_spips.c
-> >> +++ b/hw/ssi/xilinx_spips.c
-> >> @@ -66,6 +66,7 @@
-> >>
-> >>  /* interrupt mechanism */
-> >>  #define R_INTR_STATUS       (0x04 / 4)
-> >> +#define R_INTR_STATUS_RESET (0x104)
-> >>  #define R_INTR_EN           (0x08 / 4)
-> >>  #define R_INTR_DIS          (0x0C / 4)
-> >>  #define R_INTR_MASK         (0x10 / 4)
-> >> @@ -102,6 +103,9 @@
-> >>  #define R_SLAVE_IDLE_COUNT  (0x24 / 4)
-> >>  #define R_TX_THRES          (0x28 / 4)
-> >>  #define R_RX_THRES          (0x2C / 4)
-> >> +#define R_GPIO              (0x30 / 4)
-> >> +#define R_LPBK_DLY_ADJ      (0x38 / 4)
-> >> +#define R_LPBK_DLY_ADJ_RESET (0x33)
-> >>  #define R_TXD1              (0x80 / 4)
-> >>  #define R_TXD2              (0x84 / 4)
-> >>  #define R_TXD3              (0x88 / 4)
-> >> @@ -140,8 +144,12 @@
-> >>  #define R_GQSPI_IER         (0x108 / 4)
-> >>  #define R_GQSPI_IDR         (0x10c / 4)
-> >>  #define R_GQSPI_IMR         (0x110 / 4)
-> >> +#define R_GQSPI_IMR_RESET   (0xfbe)
-> >>  #define R_GQSPI_TX_THRESH   (0x128 / 4)
-> >>  #define R_GQSPI_RX_THRESH   (0x12c / 4)
-> >> +#define R_GQSPI_GPIO_THRESH (0x130 / 4)
-> >
-> >
-> > According to doc (mentioned in patch 0/3) the address above, 0x130, is
-> > "GQSPI GPIO for Write Protect". Should we rename the define to
-> R_GQSPI_GPIO?
-> > (Based on doc and that the other WP is named R_GPIO).
->
-> Hmmm... I auto generated these names, so somewhere internally we call
-> it GQSPI_GPIO_THRESH, but apparently not in the documentation.
->
-> All the other auto generated code (headers for standalone
-> applications) will have a similar auto generated name, so I'm tempted
-> to keep it as this.
+Convert all of the users of this IP block to use
+qdev_set_nic_properties() instead.
 
+Cc: Peter Maydell <peter.maydell@linaro.org>
+Cc: Jason Wang <jasowang@redhat.com>
+Cc: Philippe Mathieu-Daudé <f4bug@amsat.org>
+Cc: qemu-devel@nongnu.org
+Cc: qemu-arm@nongnu.org
+Cc: yurovsky@gmail.com
+Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
+Signed-off-by: Andrey Smirnov <andrew.smirnov@gmail.com>
+---
+ hw/arm/fsl-imx6.c | 1 +
+ hw/net/imx_fec.c  | 2 --
+ 2 files changed, 1 insertion(+), 2 deletions(-)
 
-Hi Alistair,
-
-I see your point here and since autogenerated is less error prone and the
-rest of the patch is looking good:
-
-Reviewed-by: Francisco Iglesias <frasse.iglesias@gmail.com>
-
-(If you decide to go on and rename the define you can keep my reviewed-by
-tag).
-
-Best regards,
-Francisco Iglesias
-
-
-
-> Otherwise the register is technically just called
-> GQSPI_GPIO, according to the documentation. That doesn't seem to clash
-> with anything else.
->
->
-I think changing it to GQSPI_GPIO makes the most sense then. That way
-> it matches the documentation and is still searchably close to the auto
-> generated string.
->
->
-Good catch!
->
-> Alistair
->
-> >
-> > Best regards,
-> > Francisco Iglesias
-> >
-> >>
-> >> +#define R_GQSPI_LPBK_DLY_ADJ (0x138 / 4)
-> >> +#define R_GQSPI_LPBK_DLY_ADJ_RESET (0x33)
-> >>  #define R_GQSPI_CNFG        (0x100 / 4)
-> >>      FIELD(GQSPI_CNFG, MODE_EN, 30, 2)
-> >>      FIELD(GQSPI_CNFG, GEN_FIFO_START_MODE, 29, 1)
-> >> @@ -177,8 +185,16 @@
-> >>      FIELD(GQSPI_GF_SNAPSHOT, EXPONENT, 9, 1)
-> >>      FIELD(GQSPI_GF_SNAPSHOT, DATA_XFER, 8, 1)
-> >>      FIELD(GQSPI_GF_SNAPSHOT, IMMEDIATE_DATA, 0, 8)
-> >> -#define R_GQSPI_MOD_ID        (0x168 / 4)
-> >> -#define R_GQSPI_MOD_ID_VALUE  0x010A0000
-> >> +#define R_GQSPI_MOD_ID        (0x1fc / 4)
-> >> +#define R_GQSPI_MOD_ID_RESET  (0x10a0000)
-> >> +
-> >> +#define R_QSPIDMA_DST_CTRL         (0x80c / 4)
-> >> +#define R_QSPIDMA_DST_CTRL_RESET   (0x803ffa00)
-> >> +#define R_QSPIDMA_DST_I_MASK       (0x820 / 4)
-> >> +#define R_QSPIDMA_DST_I_MASK_RESET (0xfe)
-> >> +#define R_QSPIDMA_DST_CTRL2        (0x824 / 4)
-> >> +#define R_QSPIDMA_DST_CTRL2_RESET  (0x081bfff8)
-> >> +
-> >>  /* size of TXRX FIFOs */
-> >>  #define RXFF_A          (128)
-> >>  #define TXFF_A          (128)
-> >> @@ -351,11 +367,20 @@ static void xlnx_zynqmp_qspips_reset(DeviceState
-> *d)
-> >>      fifo8_reset(&s->rx_fifo_g);
-> >>      fifo8_reset(&s->rx_fifo_g);
-> >>      fifo32_reset(&s->fifo_g);
-> >> +    s->regs[R_INTR_STATUS] = R_INTR_STATUS_RESET;
-> >> +    s->regs[R_GPIO] = 1;
-> >> +    s->regs[R_LPBK_DLY_ADJ] = R_LPBK_DLY_ADJ_RESET;
-> >> +    s->regs[R_GQSPI_GFIFO_THRESH] = 0x10;
-> >> +    s->regs[R_MOD_ID] = 0x01090101;
-> >> +    s->regs[R_GQSPI_IMR] = R_GQSPI_IMR_RESET;
-> >>      s->regs[R_GQSPI_TX_THRESH] = 1;
-> >>      s->regs[R_GQSPI_RX_THRESH] = 1;
-> >> -    s->regs[R_GQSPI_GFIFO_THRESH] = 1;
-> >> -    s->regs[R_GQSPI_IMR] = GQSPI_IXR_MASK;
-> >> -    s->regs[R_MOD_ID] = 0x01090101;
-> >> +    s->regs[R_GQSPI_GPIO_THRESH] = 1;
-> >> +    s->regs[R_GQSPI_LPBK_DLY_ADJ] = R_GQSPI_LPBK_DLY_ADJ_RESET;
-> >> +    s->regs[R_GQSPI_MOD_ID] = R_GQSPI_MOD_ID_RESET;
-> >> +    s->regs[R_QSPIDMA_DST_CTRL] = R_QSPIDMA_DST_CTRL_RESET;
-> >> +    s->regs[R_QSPIDMA_DST_I_MASK] = R_QSPIDMA_DST_I_MASK_RESET;
-> >> +    s->regs[R_QSPIDMA_DST_CTRL2] = R_QSPIDMA_DST_CTRL2_RESET;
-> >>      s->man_start_com_g = false;
-> >>      s->gqspi_irqline = 0;
-> >>      xlnx_zynqmp_qspips_update_ixr(s);
-> >> diff --git a/include/hw/ssi/xilinx_spips.h
-> b/include/hw/ssi/xilinx_spips.h
-> >> index 75fc94ce5d..d398a4e81c 100644
-> >> --- a/include/hw/ssi/xilinx_spips.h
-> >> +++ b/include/hw/ssi/xilinx_spips.h
-> >> @@ -32,7 +32,7 @@
-> >>  typedef struct XilinxSPIPS XilinxSPIPS;
-> >>
-> >>  #define XLNX_SPIPS_R_MAX        (0x100 / 4)
-> >> -#define XLNX_ZYNQMP_SPIPS_R_MAX (0x200 / 4)
-> >> +#define XLNX_ZYNQMP_SPIPS_R_MAX (0x830 / 4)
-> >>
-> >>  /* Bite off 4k chunks at a time */
-> >>  #define LQSPI_CACHE_SIZE 1024
-> >> --
-> >> 2.14.1
-> >>
-> >
->
+diff --git a/hw/arm/fsl-imx6.c b/hw/arm/fsl-imx6.c
+index 26fd214004..2ed7146c52 100644
+--- a/hw/arm/fsl-imx6.c
++++ b/hw/arm/fsl-imx6.c
+@@ -385,6 +385,7 @@ static void fsl_imx6_realize(DeviceState *dev, Error **errp)
+                                             spi_table[i].irq));
+     }
+ 
++    qdev_set_nic_properties(DEVICE(&s->eth), &nd_table[0]);
+     object_property_set_bool(OBJECT(&s->eth), true, "realized", &err);
+     if (err) {
+         error_propagate(errp, err);
+diff --git a/hw/net/imx_fec.c b/hw/net/imx_fec.c
+index 90e6ee35ba..88b4b049d7 100644
+--- a/hw/net/imx_fec.c
++++ b/hw/net/imx_fec.c
+@@ -1171,8 +1171,6 @@ static void imx_eth_realize(DeviceState *dev, Error **errp)
+ 
+     qemu_macaddr_default_if_unset(&s->conf.macaddr);
+ 
+-    s->conf.peers.ncs[0] = nd_table[0].netdev;
+-
+     s->nic = qemu_new_nic(&imx_eth_net_info, &s->conf,
+                           object_get_typename(OBJECT(dev)),
+                           DEVICE(dev)->id, s);
+-- 
+2.14.3
