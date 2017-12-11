@@ -1,21 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33072)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33103)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <lprosek@redhat.com>) id 1eOIOw-0000Ba-Dl
-	for qemu-devel@nongnu.org; Mon, 11 Dec 2017 02:21:23 -0500
+	(envelope-from <lprosek@redhat.com>) id 1eOIOx-0000Cs-Qj
+	for qemu-devel@nongnu.org; Mon, 11 Dec 2017 02:21:24 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <lprosek@redhat.com>) id 1eOIOv-0003lY-CV
-	for qemu-devel@nongnu.org; Mon, 11 Dec 2017 02:21:22 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:56970)
+	(envelope-from <lprosek@redhat.com>) id 1eOIOw-0003mV-Vk
+	for qemu-devel@nongnu.org; Mon, 11 Dec 2017 02:21:23 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:34320)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <lprosek@redhat.com>) id 1eOIOv-0003kv-3f
-	for qemu-devel@nongnu.org; Mon, 11 Dec 2017 02:21:21 -0500
+	(Exim 4.71) (envelope-from <lprosek@redhat.com>) id 1eOIOw-0003ls-Pa
+	for qemu-devel@nongnu.org; Mon, 11 Dec 2017 02:21:22 -0500
 From: Ladi Prosek <lprosek@redhat.com>
-Date: Mon, 11 Dec 2017 08:21:09 +0100
-Message-Id: <20171211072110.9058-4-lprosek@redhat.com>
+Date: Mon, 11 Dec 2017 08:21:10 +0100
+Message-Id: <20171211072110.9058-5-lprosek@redhat.com>
 In-Reply-To: <20171211072110.9058-1-lprosek@redhat.com>
 References: <20171211072110.9058-1-lprosek@redhat.com>
-Subject: [Qemu-devel] [PATCH v4 3/4] ivshmem: Improve MSI irqfd error
- handling
+Subject: [Qemu-devel] [PATCH v4 4/4] ivshmem: Disable irqfd on device reset
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,103 +26,52 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: pbonzini@redhat.com, armbru@redhat.com, marcandre.lureau@redhat.com, geoff@hostfission.com, eblake@redhat.com
 
-Adds a rollback path to ivshmem_enable_irqfd() and fixes
-ivshmem_disable_irqfd() to bail if irqfd has not been enabled.
+The effects of ivshmem_enable_irqfd() was not undone on device reset.
+
+This manifested as:
+ivshmem_add_kvm_msi_virq: Assertion `!s->msi_vectors[vector].pdev' failed.
+
+when irqfd was enabled before reset and then enabled again after reset, making
+ivshmem_enable_irqfd() run for the second time.
 
 To reproduce, run:
 
-  ivshmem-server -n 0
+  ivshmem-server
 
 and QEMU with:
 
   -device ivshmem-doorbell,chardev=iv
   -chardev socket,path=/tmp/ivshmem_socket,id=iv
 
-then load, unload, and load again the Windows driver, at the time of writing
-available at:
+then install the Windows driver, at the time of writing available at:
 
 https://github.com/virtio-win/kvm-guest-drivers-windows/tree/master/ivshmem
 
-The issue is believed to have been masked by other guest drivers, notably
-Linux ones, not enabling MSI-X on the device.
+and crash-reboot the guest by inducing a BSOD.
 
 Signed-off-by: Ladi Prosek <lprosek@redhat.com>
-Reviewed-by: Markus Armbruster <armbru@redhat.com>
 ---
- hw/misc/ivshmem.c | 37 ++++++++++++++++++++++++-------------
- 1 file changed, 24 insertions(+), 13 deletions(-)
+ hw/misc/ivshmem.c | 4 ++++
+ 1 file changed, 4 insertions(+)
 
 diff --git a/hw/misc/ivshmem.c b/hw/misc/ivshmem.c
-index 91364d8364..d1bb246d12 100644
+index d1bb246d12..9c7e74ef12 100644
 --- a/hw/misc/ivshmem.c
 +++ b/hw/misc/ivshmem.c
-@@ -786,6 +786,20 @@ static int ivshmem_setup_interrupts(IVShmemState *s, Error **errp)
-     return 0;
+@@ -758,10 +758,14 @@ static void ivshmem_msix_vector_use(IVShmemState *s)
+     }
  }
  
-+static void ivshmem_remove_kvm_msi_virq(IVShmemState *s, int vector)
-+{
-+    IVSHMEM_DPRINTF("ivshmem_remove_kvm_msi_virq vector:%d\n", vector);
++static void ivshmem_disable_irqfd(IVShmemState *s);
 +
-+    if (s->msi_vectors[vector].pdev == NULL) {
-+        return;
-+    }
-+
-+    /* it was cleaned when masked in the frontend. */
-+    kvm_irqchip_release_virq(kvm_state, s->msi_vectors[vector].virq);
-+
-+    s->msi_vectors[vector].pdev = NULL;
-+}
-+
- static void ivshmem_enable_irqfd(IVShmemState *s)
+ static void ivshmem_reset(DeviceState *d)
  {
-     PCIDevice *pdev = PCI_DEVICE(s);
-@@ -797,7 +811,7 @@ static void ivshmem_enable_irqfd(IVShmemState *s)
-         ivshmem_add_kvm_msi_virq(s, i, &err);
-         if (err) {
-             error_report_err(err);
--            /* TODO do we need to handle the error? */
-+            goto undo;
-         }
-     }
+     IVShmemState *s = IVSHMEM_COMMON(d);
  
-@@ -806,21 +820,14 @@ static void ivshmem_enable_irqfd(IVShmemState *s)
-                                   ivshmem_vector_mask,
-                                   ivshmem_vector_poll)) {
-         error_report("ivshmem: msix_set_vector_notifiers failed");
-+        goto undo;
-     }
--}
-+    return;
- 
--static void ivshmem_remove_kvm_msi_virq(IVShmemState *s, int vector)
--{
--    IVSHMEM_DPRINTF("ivshmem_remove_kvm_msi_virq vector:%d\n", vector);
--
--    if (s->msi_vectors[vector].pdev == NULL) {
--        return;
-+undo:
-+    while (--i >= 0) {
-+        ivshmem_remove_kvm_msi_virq(s, i);
-     }
--
--    /* it was cleaned when masked in the frontend. */
--    kvm_irqchip_release_virq(kvm_state, s->msi_vectors[vector].virq);
--
--    s->msi_vectors[vector].pdev = NULL;
- }
- 
- static void ivshmem_disable_irqfd(IVShmemState *s)
-@@ -828,6 +835,10 @@ static void ivshmem_disable_irqfd(IVShmemState *s)
-     PCIDevice *pdev = PCI_DEVICE(s);
-     int i;
- 
-+    if (!pdev->msix_vector_use_notifier) {
-+        return;
-+    }
++    ivshmem_disable_irqfd(s);
 +
-     msix_unset_vector_notifiers(pdev);
- 
-     for (i = 0; i < s->peers[s->vm_id].nb_eventfds; i++) {
+     s->intrstatus = 0;
+     s->intrmask = 0;
+     if (ivshmem_has_feature(s, IVSHMEM_MSI)) {
 -- 
 2.13.6
