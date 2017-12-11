@@ -1,28 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40069)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41653)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1eOOIY-00031r-AT
-	for qemu-devel@nongnu.org; Mon, 11 Dec 2017 08:39:11 -0500
+	(envelope-from <casasfernando@hotmail.com>) id 1eOOM2-0006Fe-NH
+	for qemu-devel@nongnu.org; Mon, 11 Dec 2017 08:42:48 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1eOOIT-0005mf-EE
-	for qemu-devel@nongnu.org; Mon, 11 Dec 2017 08:39:10 -0500
-Received: from mail-wr0-x244.google.com ([2a00:1450:400c:c0c::244]:37956)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1eOOIT-0005lv-5p
-	for qemu-devel@nongnu.org; Mon, 11 Dec 2017 08:39:05 -0500
-Received: by mail-wr0-x244.google.com with SMTP id o2so17616858wro.5
-	for <qemu-devel@nongnu.org>; Mon, 11 Dec 2017 05:39:05 -0800 (PST)
-Date: Mon, 11 Dec 2017 13:39:01 +0000
-From: Stefan Hajnoczi <stefanha@gmail.com>
-Message-ID: <20171211133901.GA5962@stefanha-x1.localdomain>
-References: <1512455239-8296-1-git-send-email-changpeng.liu@intel.com>
-	<1512455239-8296-2-git-send-email-changpeng.liu@intel.com>
+	(envelope-from <casasfernando@hotmail.com>) id 1eOOLx-0008Of-O3
+	for qemu-devel@nongnu.org; Mon, 11 Dec 2017 08:42:46 -0500
+From: =?utf-8?B?RmVybmFuZG8gQ2FzYXMgU2Now7Zzc293?= <casasfernando@hotmail.com>
+Date: Mon, 11 Dec 2017 13:42:38 +0000
+Message-ID: <VI1PR10MB030143CAC84D8E8AA783C0B0B7370@VI1PR10MB0301.EURPRD10.PROD.OUTLOOK.COM>
+References: <VI1PR10MB0301515CFEEA940842FDF26FB7330@VI1PR10MB0301.EURPRD10.PROD.OUTLOOK.COM>,
+	<20171211115634.GI13593@stefanha-x1.localdomain>
+In-Reply-To: <20171211115634.GI13593@stefanha-x1.localdomain>
+Content-Language: en-US
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="bp/iNruPH9dso1Pn"
-Content-Disposition: inline
-In-Reply-To: <1512455239-8296-2-git-send-email-changpeng.liu@intel.com>
-Subject: Re: [Qemu-devel] [PATCH v6 1/4] vhost-user: add new vhost user
- messages to support virtio config space
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+Subject: Re: [Qemu-devel] qemu process crash: Assertion failed:
+ QLIST_EMPTY(&bs->tracked_requests)
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,118 +25,89 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Changpeng Liu <changpeng.liu@intel.com>
-Cc: qemu-devel@nongnu.org, pbonzini@redhat.com, mst@redhat.com, marcandre.lureau@redhat.com, felipe@nutanix.com, james.r.harris@intel.com
+To: Stefan Hajnoczi <stefanha@gmail.com>
+Cc: qemu-devel <qemu-devel@nongnu.org>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>, Jeff Cody <jcody@redhat.com>
 
-
---bp/iNruPH9dso1Pn
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
-
-On Tue, Dec 05, 2017 at 02:27:16PM +0800, Changpeng Liu wrote:
-> +* VHOST_USER_SET_CONFIG
-> +      Id: 25
-> +      Equivalent ioctl: N/A
-> +      Master payload: virtio device config space
-> +
-> +      Submitted by the vhost-user master when the Guest changes the virt=
-io
-> +      device configuration space and also can be used for live migration
-> +      on the destination host. The vhost-user slave must check the flags
-> +      filed, and slaves MUST NOT accept SET_CONFIG for read-only
-
-s/filed/field/
-
-> +static int vhost_user_set_config(struct vhost_dev *dev, const uint8_t *c=
-onfig,
-> +                                 uint32_t offset, uint32_t size, uint32_=
-t flags)
-> +{
-> +    uint8_t *p;
-> +    bool reply_supported =3D virtio_has_feature(dev->protocol_features,
-> +                                              VHOST_USER_PROTOCOL_F_REPL=
-Y_ACK);
-> +
-> +    VhostUserMsg msg =3D {
-> +        msg.request =3D VHOST_USER_SET_CONFIG,
-> +        msg.flags =3D VHOST_USER_VERSION,
-> +        msg.size =3D VHOST_USER_CONFIG_HDR_SIZE + size,
-> +    };
-> +
-> +    if (reply_supported) {
-> +        msg.flags |=3D VHOST_USER_NEED_REPLY_MASK;
-> +    }
-> +
-> +    msg.payload.config.offset =3D offset,
-> +    msg.payload.config.size =3D size,
-> +    msg.payload.config.flags =3D flags,
-> +    p =3D msg.payload.config.region;
-> +    memcpy(p, config + offset, size);
-
-This function can be made more general by changing the semantics of the
-config argument:
-
-  memcpy(p, config, size);
-
-Now the caller can pass just a single field instead of a whole 256-byte
-config buffer.  It might be clearer to name the argument "data" or
-"region" instead of "config" though.
-
-> @@ -1505,6 +1508,67 @@ void vhost_ack_features(struct vhost_dev *hdev, co=
-nst int *feature_bits,
->      }
->  }
-> =20
-> +int vhost_dev_get_config(struct vhost_dev *hdev, uint8_t *config,
-> +                         uint32_t config_len)
-> +{
-> +    assert(hdev->vhost_ops);
-> +
-> +    if (hdev->vhost_ops->vhost_get_config) {
-> +        return hdev->vhost_ops->vhost_get_config(hdev, config, config_le=
-n);
-> +    }
-> +
-> +    return 0;
-> +}
-> +
-> +int vhost_dev_set_config(struct vhost_dev *hdev, const uint8_t *config,
-> +                         uint32_t offset, uint32_t size, uint32_t flags)
-> +{
-> +    assert(hdev->vhost_ops);
-> +
-> +    if (hdev->vhost_ops->vhost_set_config) {
-> +        return hdev->vhost_ops->vhost_set_config(hdev, config, offset,
-> +                                                 size, flags);
-> +    }
-> +
-> +    return 0;
-> +}
-
-Both vhost_dev_get_config() and vhost_dev_set_config() cannot fail
-silently.  The device will not work properly if the configuration space
-feature is not supported.
-
-Please make these functions return an error if the callback is NULL.
-
-The vhost-blk code should also check that
-hdev->vhost_ops->vhost_set_config !=3D NULL during realize.  This way
-users see the error when adding the device instead of at runtime when
-the function gets called.
-
---bp/iNruPH9dso1Pn
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEcBAEBAgAGBQJaLop1AAoJEJykq7OBq3PI8U0H/3YRIbkyOWfEjdtSe1G5UhzV
-DlNRF0cPZBcZeK9Ey4hXn/MtCrpJ4V5D4usAf4VVJhRWlFpj4HmmfNhhyjdXczOF
-d+qLNnMA3GOPJaZK65l+SVgI4GhQGDnOMmTUgltDVoKygiI/BoUi50DvBGdaq6MX
-P8yWDA0S4mkY1fPwLKmDTmwtDY0KE/juKBn5HP9CB78QEJszK0v3u511vDEiWPgs
-yC5VU7IBWPqhneAGn4FDCEoORDFuFskQfSOjVQZjNL0msUHmTpFwcJzkq5O1rg6G
-R8PJDCXOC7aG4EQePOh+MGNhOv2cw5sdm1nfIYKch594q+LvHfqzIKE0XLjtCxs=
-=quPg
------END PGP SIGNATURE-----
-
---bp/iNruPH9dso1Pn--
+SGVsbG8gU3RlZmFuLA0KDQpUaGFua3MgZm9yIHlvdXIgcmVwbHkuDQpGb3J0dW5hdGVseSBJIGRp
+ZG7igJl0IGhhdmUgdGhlIHByb2JsZW0gYWdhaW4gYW5kIGl04oCZcyBub3QgY2xlYXIgaG93IGl0
+IGNhbiBiZSBjb25zaXN0ZW50bHkgcmVwcm9kdWNlZC4gRGFpbHkgYmFja3VwcyBhcmUgcnVubmlu
+ZyBhcyB1c3VhbCBhdCB0aGUgbW9tZW50Lg0KDQpJZiB0aGVyZSBpcyBhbnl0aGluZyBJIGNhbiBk
+byBmcm9tIG15IHNpZGUgb3IgaWYgeW91IGhhdmUgYW55IGlkZWFzIHRvIHRyeSB0byByZXByb2R1
+Y2UgaXQgbGV0IG1lIGtub3cuDQoNClRoYW5rcy4NCg0KRmVyDQoNClNlbnQgZnJvbSBteSBpUGhv
+bmUNCg0KT24gMTEgRGVjIDIwMTcsIGF0IDEyOjU2LCBTdGVmYW4gSGFqbm9jemkgPHN0ZWZhbmhh
+QGdtYWlsLmNvbTxtYWlsdG86c3RlZmFuaGFAZ21haWwuY29tPj4gd3JvdGU6DQoNCk9uIFRodSwg
+RGVjIDA3LCAyMDE3IGF0IDEwOjE4OjUyQU0gKzAwMDAsIEZlcm5hbmRvIENhc2FzIFNjaMO2c3Nv
+dyB3cm90ZToNCkhpIHRoZXJlLA0KDQoNCkxhc3QgbmlnaHQgd2hpbGUgZG9pbmcgYSBiYWNrdXAg
+b2YgYSBndWVzdCB1c2luZyB0aGUgbGl2ZSBzbmFwc2hvdCBtZWNoYW5pc20gdGhlIHFlbXUgcHJv
+Y2VzcyBmb3IgdGhlIGd1ZXN0IHNlZW0gdG8gaGFkIGNyYXNoZWQuDQoNClRoZSBzbmFwc2hvdCBz
+dWNjZWVkZWQgdGhlbiB0aGUgYmFja3VwIG9mIHRoZSBWTSBkaXNrIGhhZCBwbGFjZSBhbmQgYWxz
+byBzdWNjZWVkZWQgYnV0IHRoZSBjb21taXQgdG8gdGhlIG9yaWdpbmFsIGRpc2sgYWZ0ZXIgdGhl
+IGJhY2t1cCBzZWVtIHRvIGhhdmUgZmFpbGVkLg0KDQpUaGUgY29tbWFuZCBJIHVzZSBpbiB0aGUg
+c2NyaXB0IHRvIHRha2UgdGhlIHNuYXBzaG90IGlzOg0KDQoNCnZpcnNoIHNuYXBzaG90LWNyZWF0
+ZS1hcyAtLWRvbWFpbiAkVk0gYmFja3VwLWpvYi5xY293MiAtLWRpc2stb25seSAtLWF0b21pYyAt
+LXF1aWVzY2UgLS1uby1tZXRhZGF0YQ0KDQoNCkFuZCB0aGVuIHRvIGNvbW1pdCBiYWNrIGlzOg0K
+DQoNCnZpcnNoIGJsb2NrY29tbWl0ICRWTSAkVEFSR0VURElTSyAtLWJhc2UgJERJU0tGSUxFIC0t
+dG9wICRTTkFQRklMRSAtLWFjdGl2ZSAtLXBpdm90DQoNCg0KSW4gdGhlIHFlbXUgbG9nIGZvciB0
+aGUgZ3Vlc3QgSSBmb3VuZCB0aGUgZm9sbG93aW5nIHdoaWxlIHRoZSBjb21taXQgYmFjayB3YXMg
+aGF2aW5nIHBsYWNlOg0KDQoNCkFzc2VydGlvbiBmYWlsZWQ6IFFMSVNUX0VNUFRZKCZicy0+dHJh
+Y2tlZF9yZXF1ZXN0cykgKC9ob21lL2J1aWxkb3plci9hcG9ydHMvbWFpbi9xZW11L3NyYy9xZW11
+LTIuMTAuMS9ibG9jay9taXJyb3IuYzogbWlycm9yX3J1bjogODg0KQ0KDQpJJ20gcnVubmluZyBx
+ZW11IDIuMTAuMSB3aXRoIGxpYnZpcnQgMy45LjAgYW5kIGtlcm5lbCA0LjkuNjUgb24gQWxwaW5l
+IExpbnV4IDMuNy4NCg0KVGhpcyBpcyB0aGUgY29tcGxldGUgZ3Vlc3QgaW5mbyBmcm9tIHRoZSBs
+b2dzOg0KDQoNCkxDX0FMTD1DIFBBVEg9L2Jpbjovc2JpbjovYmluOi9zYmluOi91c3IvYmluOi91
+c3Ivc2JpbjovdXNyL2JpbjovdXNyL3NiaW46L3Vzci9sb2NhbC9iaW46L3Vzci9sb2NhbC9zYmlu
+IEhPTUU9L3Jvb3QgVVNFUj1yb290IFFFTVVfQVVESU9fRFJWPXNwaWNlIC91c3IvYmluL3FlbXUt
+c3lzdGVtLXg4Nl82NCAtbmFtZSBndWVzdD1ET0NLRVIwMSxkZWJ1Zy10aHJlYWRzPW9uIC1TIC1v
+YmplY3Qgc2VjcmV0LGlkPW1hc3RlcktleTAsZm9ybWF0PXJhdyxmaWxlPS92YXIvbGliL2xpYnZp
+cnQvcWVtdS9kb21haW4tNi1ET0NLRVIwMS9tYXN0ZXIta2V5LmFlcyAtbWFjaGluZSBwYy1pNDQw
+ZngtMi44LGFjY2VsPWt2bSx1c2I9b2ZmLGR1bXAtZ3Vlc3QtY29yZT1vZmYgLWNwdSBJdnlCcmlk
+Z2Usc3M9b24sdm14PW9uLHBjaWQ9b24saHlwZXJ2aXNvcj1vbixhcmF0PW9uLHRzY19hZGp1c3Q9
+b24seHNhdmVvcHQ9b24gLWRyaXZlIGZpbGU9L3Vzci9zaGFyZS9lZGsyLmdpdC9vdm1mLXg2NC9P
+Vk1GX0NPREUtcHVyZS1lZmkuZmQsaWY9cGZsYXNoLGZvcm1hdD1yYXcsdW5pdD0wLHJlYWRvbmx5
+PW9uIC1kcml2ZSBmaWxlPS92YXIvbGliL2xpYnZpcnQvcWVtdS9udnJhbS9ET0NLRVIwMV9WQVJT
+LmZkLGlmPXBmbGFzaCxmb3JtYXQ9cmF3LHVuaXQ9MSAtbSAyMDQ4IC1yZWFsdGltZSBtbG9jaz1v
+ZmYgLXNtcCAyLHNvY2tldHM9Mixjb3Jlcz0xLHRocmVhZHM9MSAtdXVpZCA0NzA1YjE0Ni0zYjE0
+LTRjMjAtOTIzYy00MjEwNWQ0N2U3ZmMgLW5vLXVzZXItY29uZmlnIC1ub2RlZmF1bHRzIC1jaGFy
+ZGV2IHNvY2tldCxpZD1jaGFybW9uaXRvcixwYXRoPS92YXIvbGliL2xpYnZpcnQvcWVtdS9kb21h
+aW4tNi1ET0NLRVIwMS9tb25pdG9yLnNvY2ssc2VydmVyLG5vd2FpdCAtbW9uIGNoYXJkZXY9Y2hh
+cm1vbml0b3IsaWQ9bW9uaXRvcixtb2RlPWNvbnRyb2wgLXJ0YyBiYXNlPXV0YyxkcmlmdGZpeD1z
+bGV3IC1nbG9iYWwga3ZtLXBpdC5sb3N0X3RpY2tfcG9saWN5PWRlbGF5IC1uby1ocGV0IC1uby1z
+aHV0ZG93biAtZ2xvYmFsIFBJSVg0X1BNLmRpc2FibGVfczM9MSAtZ2xvYmFsIFBJSVg0X1BNLmRp
+c2FibGVfczQ9MSAtYm9vdCBzdHJpY3Q9b24gLWRldmljZSBpY2g5LXVzYi1laGNpMSxpZD11c2Is
+YnVzPXBjaS4wLGFkZHI9MHg0LjB4NyAtZGV2aWNlIGljaDktdXNiLXVoY2kxLG1hc3RlcmJ1cz11
+c2IuMCxmaXJzdHBvcnQ9MCxidXM9cGNpLjAsbXVsdGlmdW5jdGlvbj1vbixhZGRyPTB4NCAtZGV2
+aWNlIGljaDktdXNiLXVoY2kyLG1hc3RlcmJ1cz11c2IuMCxmaXJzdHBvcnQ9MixidXM9cGNpLjAs
+YWRkcj0weDQuMHgxIC1kZXZpY2UgaWNoOS11c2ItdWhjaTMsbWFzdGVyYnVzPXVzYi4wLGZpcnN0
+cG9ydD00LGJ1cz1wY2kuMCxhZGRyPTB4NC4weDIgLWRldmljZSBhaGNpLGlkPXNhdGEwLGJ1cz1w
+Y2kuMCxhZGRyPTB4OSAtZGV2aWNlIHZpcnRpby1zZXJpYWwtcGNpLGlkPXZpcnRpby1zZXJpYWww
+LGJ1cz1wY2kuMCxhZGRyPTB4NSAtZHJpdmUgZmlsZT0vc3RvcmFnZS9zdG9yYWdlLXNzZC12bXMv
+dmlydHVhbF9tYWNoaW5lc19zc2QvZG9ja2VyMDEucWNvdzIsZm9ybWF0PXFjb3cyLGlmPW5vbmUs
+aWQ9ZHJpdmUtc2F0YTAtMC0wLGNhY2hlPW5vbmUsYWlvPXRocmVhZHMgLWRldmljZSBpZGUtaGQs
+YnVzPXNhdGEwLjAsZHJpdmU9ZHJpdmUtc2F0YTAtMC0wLGlkPXNhdGEwLTAtMCxib290aW5kZXg9
+MSAtbmV0ZGV2IHRhcCxmZD0zMyxpZD1ob3N0bmV0MCx2aG9zdD1vbix2aG9zdGZkPTM1IC1kZXZp
+Y2UgdmlydGlvLW5ldC1wY2ksbmV0ZGV2PWhvc3RuZXQwLGlkPW5ldDAsbWFjPTUyOjU0OjAwOjFj
+OmFmOmNlLGJ1cz1wY2kuMCxhZGRyPTB4MyAtY2hhcmRldiBwdHksaWQ9Y2hhcnNlcmlhbDAgLWRl
+dmljZSBpc2Etc2VyaWFsLGNoYXJkZXY9Y2hhcnNlcmlhbDAsaWQ9c2VyaWFsMCAtY2hhcmRldiBz
+b2NrZXQsaWQ9Y2hhcmNoYW5uZWwwLHBhdGg9L3Zhci9saWIvbGlidmlydC9xZW11L2NoYW5uZWwv
+dGFyZ2V0L2RvbWFpbi02LURPQ0tFUjAxL29yZy5xZW11Lmd1ZXN0X2FnZW50LjAsc2VydmVyLG5v
+d2FpdCAtZGV2aWNlIHZpcnRzZXJpYWxwb3J0LGJ1cz12aXJ0aW8tc2VyaWFsMC4wLG5yPTEsY2hh
+cmRldj1jaGFyY2hhbm5lbDAsaWQ9Y2hhbm5lbDAsbmFtZT1vcmcucWVtdS5ndWVzdF9hZ2VudC4w
+IC1jaGFyZGV2IHNwaWNldm1jLGlkPWNoYXJjaGFubmVsMSxuYW1lPXZkYWdlbnQgLWRldmljZSB2
+aXJ0c2VyaWFscG9ydCxidXM9dmlydGlvLXNlcmlhbDAuMCxucj0yLGNoYXJkZXY9Y2hhcmNoYW5u
+ZWwxLGlkPWNoYW5uZWwxLG5hbWU9Y29tLnJlZGhhdC5zcGljZS4wIC1zcGljZSBwb3J0PTU5MDUs
+YWRkcj0xMjcuMC4wLjEsZGlzYWJsZS10aWNrZXRpbmcsc2VhbWxlc3MtbWlncmF0aW9uPW9uIC1k
+ZXZpY2UgcXhsLXZnYSxpZD12aWRlbzAscmFtX3NpemU9NjcxMDg4NjQsdnJhbV9zaXplPTY3MTA4
+ODY0LHZyYW02NF9zaXplX21iPTAsdmdhbWVtX21iPTE2LG1heF9vdXRwdXRzPTEsYnVzPXBjaS4w
+LGFkZHI9MHgyIC1jaGFyZGV2IHNwaWNldm1jLGlkPWNoYXJyZWRpcjAsbmFtZT11c2JyZWRpciAt
+ZGV2aWNlIHVzYi1yZWRpcixjaGFyZGV2PWNoYXJyZWRpcjAsaWQ9cmVkaXIwLGJ1cz11c2IuMCxw
+b3J0PTIgLWNoYXJkZXYgc3BpY2V2bWMsaWQ9Y2hhcnJlZGlyMSxuYW1lPXVzYnJlZGlyIC1kZXZp
+Y2UgdXNiLXJlZGlyLGNoYXJkZXY9Y2hhcnJlZGlyMSxpZD1yZWRpcjEsYnVzPXVzYi4wLHBvcnQ9
+MyAtZGV2aWNlIHZpcnRpby1iYWxsb29uLXBjaSxpZD1iYWxsb29uMCxidXM9cGNpLjAsYWRkcj0w
+eDcgLW9iamVjdCBybmctcmFuZG9tLGlkPW9ianJuZzAsZmlsZW5hbWU9L2Rldi9yYW5kb20gLWRl
+dmljZSB2aXJ0aW8tcm5nLXBjaSxybmc9b2Jqcm5nMCxpZD1ybmcwLGJ1cz1wY2kuMCxhZGRyPTB4
+OCAtbXNnIHRpbWVzdGFtcD1vbg0KDQoNCg0KSSB3YXMgcnVubmluZyBvbiBxZW11IDIuOC4xIGZv
+ciBtb250aHMgYW5kIGRpZG4ndCBoYXZlIGFueSBwcm9ibGVtcyB3aXRoIHRoZSBiYWNrdXBzIGJ1
+dCB5ZXN0ZXJkYXkgSSB1cGRhdGVkIHRvIHFlbXUgMi4xMC4xIGFuZCBJIGhpdCB0aGlzIHByb2Js
+ZW0gbGFzdCBuaWdodC4NCg0KDQpJcyB0aGlzIGEgYnVnPyBBbnkgaWRlYXMgd2lsbCBiZSBhcHBy
+ZWNpYXRlZC4NCg0KVGhhbmtzIGZvciByZXBvcnRpbmcgdGhpcyBidWcuICBDYW4geW91IHJlcHJv
+ZHVjZSBpdCByZWxpYWJseT8NCg0KU3RlZmFuDQo=
