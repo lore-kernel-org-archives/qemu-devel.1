@@ -1,22 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41653)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42831)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <casasfernando@hotmail.com>) id 1eOOM2-0006Fe-NH
-	for qemu-devel@nongnu.org; Mon, 11 Dec 2017 08:42:48 -0500
+	(envelope-from <imammedo@redhat.com>) id 1eOOPF-0001Qh-VU
+	for qemu-devel@nongnu.org; Mon, 11 Dec 2017 08:46:07 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <casasfernando@hotmail.com>) id 1eOOLx-0008Of-O3
-	for qemu-devel@nongnu.org; Mon, 11 Dec 2017 08:42:46 -0500
-From: =?utf-8?B?RmVybmFuZG8gQ2FzYXMgU2Now7Zzc293?= <casasfernando@hotmail.com>
-Date: Mon, 11 Dec 2017 13:42:38 +0000
-Message-ID: <VI1PR10MB030143CAC84D8E8AA783C0B0B7370@VI1PR10MB0301.EURPRD10.PROD.OUTLOOK.COM>
-References: <VI1PR10MB0301515CFEEA940842FDF26FB7330@VI1PR10MB0301.EURPRD10.PROD.OUTLOOK.COM>,
-	<20171211115634.GI13593@stefanha-x1.localdomain>
-In-Reply-To: <20171211115634.GI13593@stefanha-x1.localdomain>
-Content-Language: en-US
+	(envelope-from <imammedo@redhat.com>) id 1eOOPB-0003aM-0r
+	for qemu-devel@nongnu.org; Mon, 11 Dec 2017 08:46:06 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:54043)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1eOOPA-0003Yg-OE
+	for qemu-devel@nongnu.org; Mon, 11 Dec 2017 08:46:00 -0500
+Date: Mon, 11 Dec 2017 14:45:54 +0100
+From: Igor Mammedov <imammedo@redhat.com>
+Message-ID: <20171211144554.45d45a83@redhat.com>
+In-Reply-To: <20171211110259.GB2424@work-vm>
+References: <20171129185026.23632-1-dgilbert@redhat.com>
+	<1512138175-185428-1-git-send-email-imammedo@redhat.com>
+	<20171207181750.GE2439@work-vm>
+	<20171208154209.7e01a88d@redhat.com>
+	<20171208175155.GS2403@work-vm>
+	<20171211103755.2c95f86a@redhat.com>
+	<20171211110259.GB2424@work-vm>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-Subject: Re: [Qemu-devel] qemu process crash: Assertion failed:
- QLIST_EMPTY(&bs->tracked_requests)
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [RFC] vhost: check if ring mapping is still valid
+ when building memmap
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,89 +33,212 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefan Hajnoczi <stefanha@gmail.com>
-Cc: qemu-devel <qemu-devel@nongnu.org>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>, Jeff Cody <jcody@redhat.com>
+To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Cc: qemu-devel@nongnu.org, mst@redhat.com, groug@kaod.org, stefanha@gmail.com
 
-SGVsbG8gU3RlZmFuLA0KDQpUaGFua3MgZm9yIHlvdXIgcmVwbHkuDQpGb3J0dW5hdGVseSBJIGRp
-ZG7igJl0IGhhdmUgdGhlIHByb2JsZW0gYWdhaW4gYW5kIGl04oCZcyBub3QgY2xlYXIgaG93IGl0
-IGNhbiBiZSBjb25zaXN0ZW50bHkgcmVwcm9kdWNlZC4gRGFpbHkgYmFja3VwcyBhcmUgcnVubmlu
-ZyBhcyB1c3VhbCBhdCB0aGUgbW9tZW50Lg0KDQpJZiB0aGVyZSBpcyBhbnl0aGluZyBJIGNhbiBk
-byBmcm9tIG15IHNpZGUgb3IgaWYgeW91IGhhdmUgYW55IGlkZWFzIHRvIHRyeSB0byByZXByb2R1
-Y2UgaXQgbGV0IG1lIGtub3cuDQoNClRoYW5rcy4NCg0KRmVyDQoNClNlbnQgZnJvbSBteSBpUGhv
-bmUNCg0KT24gMTEgRGVjIDIwMTcsIGF0IDEyOjU2LCBTdGVmYW4gSGFqbm9jemkgPHN0ZWZhbmhh
-QGdtYWlsLmNvbTxtYWlsdG86c3RlZmFuaGFAZ21haWwuY29tPj4gd3JvdGU6DQoNCk9uIFRodSwg
-RGVjIDA3LCAyMDE3IGF0IDEwOjE4OjUyQU0gKzAwMDAsIEZlcm5hbmRvIENhc2FzIFNjaMO2c3Nv
-dyB3cm90ZToNCkhpIHRoZXJlLA0KDQoNCkxhc3QgbmlnaHQgd2hpbGUgZG9pbmcgYSBiYWNrdXAg
-b2YgYSBndWVzdCB1c2luZyB0aGUgbGl2ZSBzbmFwc2hvdCBtZWNoYW5pc20gdGhlIHFlbXUgcHJv
-Y2VzcyBmb3IgdGhlIGd1ZXN0IHNlZW0gdG8gaGFkIGNyYXNoZWQuDQoNClRoZSBzbmFwc2hvdCBz
-dWNjZWVkZWQgdGhlbiB0aGUgYmFja3VwIG9mIHRoZSBWTSBkaXNrIGhhZCBwbGFjZSBhbmQgYWxz
-byBzdWNjZWVkZWQgYnV0IHRoZSBjb21taXQgdG8gdGhlIG9yaWdpbmFsIGRpc2sgYWZ0ZXIgdGhl
-IGJhY2t1cCBzZWVtIHRvIGhhdmUgZmFpbGVkLg0KDQpUaGUgY29tbWFuZCBJIHVzZSBpbiB0aGUg
-c2NyaXB0IHRvIHRha2UgdGhlIHNuYXBzaG90IGlzOg0KDQoNCnZpcnNoIHNuYXBzaG90LWNyZWF0
-ZS1hcyAtLWRvbWFpbiAkVk0gYmFja3VwLWpvYi5xY293MiAtLWRpc2stb25seSAtLWF0b21pYyAt
-LXF1aWVzY2UgLS1uby1tZXRhZGF0YQ0KDQoNCkFuZCB0aGVuIHRvIGNvbW1pdCBiYWNrIGlzOg0K
-DQoNCnZpcnNoIGJsb2NrY29tbWl0ICRWTSAkVEFSR0VURElTSyAtLWJhc2UgJERJU0tGSUxFIC0t
-dG9wICRTTkFQRklMRSAtLWFjdGl2ZSAtLXBpdm90DQoNCg0KSW4gdGhlIHFlbXUgbG9nIGZvciB0
-aGUgZ3Vlc3QgSSBmb3VuZCB0aGUgZm9sbG93aW5nIHdoaWxlIHRoZSBjb21taXQgYmFjayB3YXMg
-aGF2aW5nIHBsYWNlOg0KDQoNCkFzc2VydGlvbiBmYWlsZWQ6IFFMSVNUX0VNUFRZKCZicy0+dHJh
-Y2tlZF9yZXF1ZXN0cykgKC9ob21lL2J1aWxkb3plci9hcG9ydHMvbWFpbi9xZW11L3NyYy9xZW11
-LTIuMTAuMS9ibG9jay9taXJyb3IuYzogbWlycm9yX3J1bjogODg0KQ0KDQpJJ20gcnVubmluZyBx
-ZW11IDIuMTAuMSB3aXRoIGxpYnZpcnQgMy45LjAgYW5kIGtlcm5lbCA0LjkuNjUgb24gQWxwaW5l
-IExpbnV4IDMuNy4NCg0KVGhpcyBpcyB0aGUgY29tcGxldGUgZ3Vlc3QgaW5mbyBmcm9tIHRoZSBs
-b2dzOg0KDQoNCkxDX0FMTD1DIFBBVEg9L2Jpbjovc2JpbjovYmluOi9zYmluOi91c3IvYmluOi91
-c3Ivc2JpbjovdXNyL2JpbjovdXNyL3NiaW46L3Vzci9sb2NhbC9iaW46L3Vzci9sb2NhbC9zYmlu
-IEhPTUU9L3Jvb3QgVVNFUj1yb290IFFFTVVfQVVESU9fRFJWPXNwaWNlIC91c3IvYmluL3FlbXUt
-c3lzdGVtLXg4Nl82NCAtbmFtZSBndWVzdD1ET0NLRVIwMSxkZWJ1Zy10aHJlYWRzPW9uIC1TIC1v
-YmplY3Qgc2VjcmV0LGlkPW1hc3RlcktleTAsZm9ybWF0PXJhdyxmaWxlPS92YXIvbGliL2xpYnZp
-cnQvcWVtdS9kb21haW4tNi1ET0NLRVIwMS9tYXN0ZXIta2V5LmFlcyAtbWFjaGluZSBwYy1pNDQw
-ZngtMi44LGFjY2VsPWt2bSx1c2I9b2ZmLGR1bXAtZ3Vlc3QtY29yZT1vZmYgLWNwdSBJdnlCcmlk
-Z2Usc3M9b24sdm14PW9uLHBjaWQ9b24saHlwZXJ2aXNvcj1vbixhcmF0PW9uLHRzY19hZGp1c3Q9
-b24seHNhdmVvcHQ9b24gLWRyaXZlIGZpbGU9L3Vzci9zaGFyZS9lZGsyLmdpdC9vdm1mLXg2NC9P
-Vk1GX0NPREUtcHVyZS1lZmkuZmQsaWY9cGZsYXNoLGZvcm1hdD1yYXcsdW5pdD0wLHJlYWRvbmx5
-PW9uIC1kcml2ZSBmaWxlPS92YXIvbGliL2xpYnZpcnQvcWVtdS9udnJhbS9ET0NLRVIwMV9WQVJT
-LmZkLGlmPXBmbGFzaCxmb3JtYXQ9cmF3LHVuaXQ9MSAtbSAyMDQ4IC1yZWFsdGltZSBtbG9jaz1v
-ZmYgLXNtcCAyLHNvY2tldHM9Mixjb3Jlcz0xLHRocmVhZHM9MSAtdXVpZCA0NzA1YjE0Ni0zYjE0
-LTRjMjAtOTIzYy00MjEwNWQ0N2U3ZmMgLW5vLXVzZXItY29uZmlnIC1ub2RlZmF1bHRzIC1jaGFy
-ZGV2IHNvY2tldCxpZD1jaGFybW9uaXRvcixwYXRoPS92YXIvbGliL2xpYnZpcnQvcWVtdS9kb21h
-aW4tNi1ET0NLRVIwMS9tb25pdG9yLnNvY2ssc2VydmVyLG5vd2FpdCAtbW9uIGNoYXJkZXY9Y2hh
-cm1vbml0b3IsaWQ9bW9uaXRvcixtb2RlPWNvbnRyb2wgLXJ0YyBiYXNlPXV0YyxkcmlmdGZpeD1z
-bGV3IC1nbG9iYWwga3ZtLXBpdC5sb3N0X3RpY2tfcG9saWN5PWRlbGF5IC1uby1ocGV0IC1uby1z
-aHV0ZG93biAtZ2xvYmFsIFBJSVg0X1BNLmRpc2FibGVfczM9MSAtZ2xvYmFsIFBJSVg0X1BNLmRp
-c2FibGVfczQ9MSAtYm9vdCBzdHJpY3Q9b24gLWRldmljZSBpY2g5LXVzYi1laGNpMSxpZD11c2Is
-YnVzPXBjaS4wLGFkZHI9MHg0LjB4NyAtZGV2aWNlIGljaDktdXNiLXVoY2kxLG1hc3RlcmJ1cz11
-c2IuMCxmaXJzdHBvcnQ9MCxidXM9cGNpLjAsbXVsdGlmdW5jdGlvbj1vbixhZGRyPTB4NCAtZGV2
-aWNlIGljaDktdXNiLXVoY2kyLG1hc3RlcmJ1cz11c2IuMCxmaXJzdHBvcnQ9MixidXM9cGNpLjAs
-YWRkcj0weDQuMHgxIC1kZXZpY2UgaWNoOS11c2ItdWhjaTMsbWFzdGVyYnVzPXVzYi4wLGZpcnN0
-cG9ydD00LGJ1cz1wY2kuMCxhZGRyPTB4NC4weDIgLWRldmljZSBhaGNpLGlkPXNhdGEwLGJ1cz1w
-Y2kuMCxhZGRyPTB4OSAtZGV2aWNlIHZpcnRpby1zZXJpYWwtcGNpLGlkPXZpcnRpby1zZXJpYWww
-LGJ1cz1wY2kuMCxhZGRyPTB4NSAtZHJpdmUgZmlsZT0vc3RvcmFnZS9zdG9yYWdlLXNzZC12bXMv
-dmlydHVhbF9tYWNoaW5lc19zc2QvZG9ja2VyMDEucWNvdzIsZm9ybWF0PXFjb3cyLGlmPW5vbmUs
-aWQ9ZHJpdmUtc2F0YTAtMC0wLGNhY2hlPW5vbmUsYWlvPXRocmVhZHMgLWRldmljZSBpZGUtaGQs
-YnVzPXNhdGEwLjAsZHJpdmU9ZHJpdmUtc2F0YTAtMC0wLGlkPXNhdGEwLTAtMCxib290aW5kZXg9
-MSAtbmV0ZGV2IHRhcCxmZD0zMyxpZD1ob3N0bmV0MCx2aG9zdD1vbix2aG9zdGZkPTM1IC1kZXZp
-Y2UgdmlydGlvLW5ldC1wY2ksbmV0ZGV2PWhvc3RuZXQwLGlkPW5ldDAsbWFjPTUyOjU0OjAwOjFj
-OmFmOmNlLGJ1cz1wY2kuMCxhZGRyPTB4MyAtY2hhcmRldiBwdHksaWQ9Y2hhcnNlcmlhbDAgLWRl
-dmljZSBpc2Etc2VyaWFsLGNoYXJkZXY9Y2hhcnNlcmlhbDAsaWQ9c2VyaWFsMCAtY2hhcmRldiBz
-b2NrZXQsaWQ9Y2hhcmNoYW5uZWwwLHBhdGg9L3Zhci9saWIvbGlidmlydC9xZW11L2NoYW5uZWwv
-dGFyZ2V0L2RvbWFpbi02LURPQ0tFUjAxL29yZy5xZW11Lmd1ZXN0X2FnZW50LjAsc2VydmVyLG5v
-d2FpdCAtZGV2aWNlIHZpcnRzZXJpYWxwb3J0LGJ1cz12aXJ0aW8tc2VyaWFsMC4wLG5yPTEsY2hh
-cmRldj1jaGFyY2hhbm5lbDAsaWQ9Y2hhbm5lbDAsbmFtZT1vcmcucWVtdS5ndWVzdF9hZ2VudC4w
-IC1jaGFyZGV2IHNwaWNldm1jLGlkPWNoYXJjaGFubmVsMSxuYW1lPXZkYWdlbnQgLWRldmljZSB2
-aXJ0c2VyaWFscG9ydCxidXM9dmlydGlvLXNlcmlhbDAuMCxucj0yLGNoYXJkZXY9Y2hhcmNoYW5u
-ZWwxLGlkPWNoYW5uZWwxLG5hbWU9Y29tLnJlZGhhdC5zcGljZS4wIC1zcGljZSBwb3J0PTU5MDUs
-YWRkcj0xMjcuMC4wLjEsZGlzYWJsZS10aWNrZXRpbmcsc2VhbWxlc3MtbWlncmF0aW9uPW9uIC1k
-ZXZpY2UgcXhsLXZnYSxpZD12aWRlbzAscmFtX3NpemU9NjcxMDg4NjQsdnJhbV9zaXplPTY3MTA4
-ODY0LHZyYW02NF9zaXplX21iPTAsdmdhbWVtX21iPTE2LG1heF9vdXRwdXRzPTEsYnVzPXBjaS4w
-LGFkZHI9MHgyIC1jaGFyZGV2IHNwaWNldm1jLGlkPWNoYXJyZWRpcjAsbmFtZT11c2JyZWRpciAt
-ZGV2aWNlIHVzYi1yZWRpcixjaGFyZGV2PWNoYXJyZWRpcjAsaWQ9cmVkaXIwLGJ1cz11c2IuMCxw
-b3J0PTIgLWNoYXJkZXYgc3BpY2V2bWMsaWQ9Y2hhcnJlZGlyMSxuYW1lPXVzYnJlZGlyIC1kZXZp
-Y2UgdXNiLXJlZGlyLGNoYXJkZXY9Y2hhcnJlZGlyMSxpZD1yZWRpcjEsYnVzPXVzYi4wLHBvcnQ9
-MyAtZGV2aWNlIHZpcnRpby1iYWxsb29uLXBjaSxpZD1iYWxsb29uMCxidXM9cGNpLjAsYWRkcj0w
-eDcgLW9iamVjdCBybmctcmFuZG9tLGlkPW9ianJuZzAsZmlsZW5hbWU9L2Rldi9yYW5kb20gLWRl
-dmljZSB2aXJ0aW8tcm5nLXBjaSxybmc9b2Jqcm5nMCxpZD1ybmcwLGJ1cz1wY2kuMCxhZGRyPTB4
-OCAtbXNnIHRpbWVzdGFtcD1vbg0KDQoNCg0KSSB3YXMgcnVubmluZyBvbiBxZW11IDIuOC4xIGZv
-ciBtb250aHMgYW5kIGRpZG4ndCBoYXZlIGFueSBwcm9ibGVtcyB3aXRoIHRoZSBiYWNrdXBzIGJ1
-dCB5ZXN0ZXJkYXkgSSB1cGRhdGVkIHRvIHFlbXUgMi4xMC4xIGFuZCBJIGhpdCB0aGlzIHByb2Js
-ZW0gbGFzdCBuaWdodC4NCg0KDQpJcyB0aGlzIGEgYnVnPyBBbnkgaWRlYXMgd2lsbCBiZSBhcHBy
-ZWNpYXRlZC4NCg0KVGhhbmtzIGZvciByZXBvcnRpbmcgdGhpcyBidWcuICBDYW4geW91IHJlcHJv
-ZHVjZSBpdCByZWxpYWJseT8NCg0KU3RlZmFuDQo=
+On Mon, 11 Dec 2017 11:03:00 +0000
+"Dr. David Alan Gilbert" <dgilbert@redhat.com> wrote:
+
+> * Igor Mammedov (imammedo@redhat.com) wrote:
+> > On Fri, 8 Dec 2017 17:51:56 +0000
+> > "Dr. David Alan Gilbert" <dgilbert@redhat.com> wrote:
+> >   
+> > > * Igor Mammedov (imammedo@redhat.com) wrote:  
+> > > > On Thu, 7 Dec 2017 18:17:51 +0000
+> > > > "Dr. David Alan Gilbert" <dgilbert@redhat.com> wrote:
+> > > >     
+> > > > > * Igor Mammedov (imammedo@redhat.com) wrote:    
+> > > > > > vhost_verify_ring_mappings() were used to verify that
+> > > > > > rings are still accessible and related memory hasn't
+> > > > > > been moved after flatview is updated.
+> > > > > > 
+> > > > > > It were doing checks by mapping ring's GPA+len and
+> > > > > > checking that HVA hasn't changed with new memory map.
+> > > > > > To avoid maybe expensive mapping call, we were
+> > > > > > identifying address range that changed and were doing
+> > > > > > mapping only if ring were in changed range.
+> > > > > > 
+> > > > > > However it's no neccessary to perform ringi's GPA
+> > > > > > mapping as we already have it's current HVA and all
+> > > > > > we need is to verify that ring's GPA translates to
+> > > > > > the same HVA in updated flatview.
+> > > > > > 
+> > > > > > That could be done during time when we are building
+> > > > > > vhost memmap where vhost_update_mem_cb() already maps
+> > > > > > every RAM MemoryRegionSection to get section HVA. This
+> > > > > > fact can be used to check that ring belongs to the same
+> > > > > > MemoryRegion in the same place, like this:
+> > > > > > 
+> > > > > >   hva_ring_offset = GPA(ring) - GPA(MemoryRegionSection)
+> > > > > >   ring_hva == HVA(MemoryRegionSection) + hva_ring_offset
+> > > > > > 
+> > > > > > Doing this would allow us to drop ~100LOC of code which
+> > > > > > figures out changed memory range and avoid calling not
+> > > > > > needed reverse vhost_memory_map(is_write=true) which is
+> > > > > > overkill for the task at hand.      
+> > > > > 
+> > > > > There are a few things about this I don't understand; however if
+> > > > > it's right I agree that it means we can kill off my comparison
+> > > > > code.
+> > > > > 
+> > > > > 
+> > > > > First, can I check what constraints 'verify_ring' needs to check;
+> > > > > if I'm understanding the original code it's checking that :
+> > > > >     a) If a queue falls within a region, that the whole queue can
+> > > > >        be mapped    
+> > > >          see vhost_verify_ring_part_mapping():
+> > > > 
+> > > >              p = vhost_memory_map(dev, part_addr, &l, 1);                                 
+> > > >              if (!p || l != part_size) 
+> > > >                   error_out
+> > > >              
+> > > >          1st: (!p) requested part_addr must be mapped
+> > > >               i.e. be a part of MemorySection in flatview
+> > > >          AND
+> > > >          2nd: (l != part_size) mapped range size must match what we asked for
+> > > >               i.e. mapped as continuous range so that
+> > > >                  [GPA, GPA + part_size) could directly correspond to [HVA, HVA + part_size)
+> > > >               and that's is possible only withing 1 MemorySection && 1 MeoryRegion
+> > > >               if I read address_space_map() correctly
+> > > >                      flatview_translate() -> GPA's MemorySection
+> > > >                      flatview_extend_translation() -> 1:1 GPA->HVA range size
+> > > >               
+> > > >          So answer in case of RAM memory region that we are interested in, would be:
+> > > >          queue falls within a MemorySection and whole queue fits in to it    
+> > > 
+> > > Yes, OK.
+> > >   
+> > > > >     b) And the start of the queue corresponds to where we thought
+> > > > >        it used to be (in GPA?)    
+> > > >          that cached at vq->desc queue HVA hasn't changed after flatview change
+> > > >             if (p != part)
+> > > >                error_out    
+> > > 
+> > > OK, so it's the HVA that's not changed based on taking the part_addr
+> > > which is GPA and checking the map?  
+> > Yes, I think so.
+> >   
+> > > > >    so that doesn't have any constraint on the ordering of the regions
+> > > > >    or whether the region is the same size or anything.
+> > > > >   Also I don't think it would spot if there was a qeueue that had no
+> > > > >   region associated with it at all.
+> > > > > 
+> > > > > Now, comments on your code below:
+> > > > > 
+> > > > >     
+> > > > > > Signed-off-by: Igor Mammedov <imammedo@redhat.com>
+> > > > > > ---
+> > > > > > PS:
+> > > > > >    should be applied on top of David's series
+> > > > > > 
+> > > > > > ---
+> > > > > >  include/hw/virtio/vhost.h |   2 -
+> > > > > >  hw/virtio/vhost.c         | 195 ++++++++++++++--------------------------------
+> > > > > >  2 files changed, 57 insertions(+), 140 deletions(-)
+> > > > > > 
+> > > > > > diff --git a/include/hw/virtio/vhost.h b/include/hw/virtio/vhost.h
+> > > > > > index 467dc77..fc4af5c 100644
+> > > > > > --- a/include/hw/virtio/vhost.h
+> > > > > > +++ b/include/hw/virtio/vhost.h
+> > > > > > @@ -68,8 +68,6 @@ struct vhost_dev {
+> > > > > >      uint64_t log_size;
+> > > > > >      Error *migration_blocker;
+> > > > > >      bool memory_changed;
+> > > > > > -    hwaddr mem_changed_start_addr;
+> > > > > > -    hwaddr mem_changed_end_addr;
+> > > > > >      const VhostOps *vhost_ops;
+> > > > > >      void *opaque;
+> > > > > >      struct vhost_log *log;
+> > > > > > diff --git a/hw/virtio/vhost.c b/hw/virtio/vhost.c
+> > > > > > index 5b9a7d7..026bac3 100644
+> > > > > > --- a/hw/virtio/vhost.c
+> > > > > > +++ b/hw/virtio/vhost.c
+> > > > > > @@ -296,35 +296,43 @@ static void vhost_memory_unmap(struct vhost_dev *dev, void *buffer,
+> > > > > >      }
+> > > > > >  }
+> > > > > >  
+> > > > > > -static int vhost_verify_ring_part_mapping(struct vhost_dev *dev,
+> > > > > > -                                          void *part,
+> > > > > > -                                          uint64_t part_addr,
+> > > > > > -                                          uint64_t part_size,
+> > > > > > -                                          uint64_t start_addr,
+> > > > > > -                                          uint64_t size)
+> > > > > > +static int vhost_verify_ring_part_mapping(void *ring_hva,
+> > > > > > +                                          uint64_t ring_gpa,
+> > > > > > +                                          uint64_t ring_size,
+> > > > > > +                                          void *reg_hva,
+> > > > > > +                                          uint64_t reg_gpa,
+> > > > > > +                                          uint64_t reg_size)
+> > > > > >  {
+> > > > > > -    hwaddr l;
+> > > > > > -    void *p;
+> > > > > > -    int r = 0;
+> > > > > > +    uint64_t hva_ring_offset;
+> > > > > > +    uint64_t ring_last = range_get_last(ring_gpa, ring_size);
+> > > > > > +    uint64_t reg_last = range_get_last(reg_gpa, reg_size);
+> > > > > >  
+> > > > > > -    if (!ranges_overlap(start_addr, size, part_addr, part_size)) {
+> > > > > > +    /* start check from the end so that the rest of checks
+> > > > > > +     * are done when whole ring is in merged sections range
+> > > > > > +     */
+> > > > > > +    if (ring_last < reg_last || ring_gpa > reg_last) {
+> > > > > >          return 0;
+> > > > > >      }      
+> > > > > 
+> > > > >   so does that mean if our region never grows to be as big as the ring
+> > > > > we wont spot the problem?    
+> > > > I think there is mistake here it should be:
+> > > >    ring_last < reg_gpa || ring_gpa > reg_last
+> > > > 
+> > > > so if ring is out side of continuous region, we do not care => no change    
+> > > 
+> > > OK, I don't see how that corresponds to your 'start check from the end'
+> > > comment - I thought it was doing something smarter to deal with this
+> > > being called from the _cb routine potentially before another part of the
+> > > range had been joined onto it.
+> > > In that case, we can just use ranges_overlap like the original
+> > > routine did.  
+> > I suppose range check will do as well, the reason for check from the end
+> > was optimization to make less checks than ranges_overlap(),
+> > considering we are comparing against vhost_memory_region.  
+> 
+> Have a look at the RFC v2 I've posted; I've reworked it a bit so
+> we call this code aftwards rather than from the _cb.
+I'll skimmed through it already and it looks good to me on the first glance
+/it needs spelling fixes at least/
+I'll do line by line review and testing this week
+
+> 
+> > But it seems like a bit an overdoing, since by the commit time
+> > flatview would contain 1:1 mapping of MemorySection:vhost_memory_region
+> > (modulo sections we are not interested in). It should be unlikely to 
+> > get 2 MemoryRegions allocated one after another and merge in vhost_memory_region()
+> > into one vhost_memory_region. Maybe we would be better off with just
+> > copying MemorySections into vhost_memory_region in vhost_update_mem_cb()
+> > and drop merging altogether.  
+> 
+> Except I need the merging for the hugepage stuff that's coming in the
+> postcopy world.
+> 
+> > I'd even consider 'non deterministic' merging of 2 MemoryRegions harmful
+> > to migration, since vhost might see different memory map on target vs source.  
+> 
+> I think that's come up before and it was decided it's not a problem
+> as long as the regions are still mapped; the only consistency required
+> is between the qemu and the vhost (either the kernel or the vhost-user);
+> it shouldn't be a guest visibile issue if I understand it correctly.
+non consistent merging will cause change in number of memory regions
+in vhost memmap and even if it's not visible to guests it's still
+migration blocker in borderline cases where number of regions
+is around vhost_backend_memslots_limit(). i.e. it source QEMU starts
+fine by luck (merging happens) but target fails as it hits limit (merging fails).
+
+Anyways it's problem that exists in current code as well and
+not related to this series, so we can ponder on it later
+(perhaps we don't see the issue because merging doesn't happen
+in practice).
+
+ 
+> Dave
+> --
+> Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
