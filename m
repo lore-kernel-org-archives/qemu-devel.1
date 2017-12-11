@@ -1,20 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60263)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34440)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <haozhong.zhang@intel.com>) id 1eOJXA-00012e-NG
-	for qemu-devel@nongnu.org; Mon, 11 Dec 2017 03:33:57 -0500
+	(envelope-from <anton.nefedov@virtuozzo.com>) id 1eOJcF-00027l-T9
+	for qemu-devel@nongnu.org; Mon, 11 Dec 2017 03:39:12 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <haozhong.zhang@intel.com>) id 1eOJX6-0006Lj-0b
-	for qemu-devel@nongnu.org; Mon, 11 Dec 2017 03:33:56 -0500
-Received: from mga17.intel.com ([192.55.52.151]:14108)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <haozhong.zhang@intel.com>)
-	id 1eOJX5-0006Hp-OX
-	for qemu-devel@nongnu.org; Mon, 11 Dec 2017 03:33:51 -0500
-From: Haozhong Zhang <haozhong.zhang@intel.com>
-Date: Mon, 11 Dec 2017 16:33:40 +0800
-Message-Id: <20171211083340.12791-1-haozhong.zhang@intel.com>
-Subject: [Qemu-devel] [PATCH] target/i386: add CPU model
- "Skylake-Server-clflushopt"
+	(envelope-from <anton.nefedov@virtuozzo.com>) id 1eOJcF-0002ND-1K
+	for qemu-devel@nongnu.org; Mon, 11 Dec 2017 03:39:11 -0500
+References: <1512735034-35327-1-git-send-email-anton.nefedov@virtuozzo.com>
+	<1512735034-35327-4-git-send-email-anton.nefedov@virtuozzo.com>
+	<7dfd884c-c938-cff1-a077-9e159609aad4@redhat.com>
+From: Anton Nefedov <anton.nefedov@virtuozzo.com>
+Message-ID: <0eb17549-90b1-a190-007c-cd747b59d8b2@virtuozzo.com>
+Date: Mon, 11 Dec 2017 11:38:57 +0300
+MIME-Version: 1.0
+In-Reply-To: <7dfd884c-c938-cff1-a077-9e159609aad4@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH 3/3] ide: abort TRIM operation for invalid
+ range
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,76 +26,24 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Eduardo Habkost <ehabkost@redhat.com>, Haozhong Zhang <haozhong.zhang@intel.com>
+To: John Snow <jsnow@redhat.com>, qemu-devel@nongnu.org
+Cc: qemu-block@nongnu.org
 
-The only difference from the existing CPU model "Skylake-Server" is
-the add of CPUID_7_0_EBX_CLFLUSHOPT, which is missed in "Skylake-Server".
+On 8/12/2017 10:51 PM, John Snow wrote:
+> 
+> Looks about right, just remember that this flow won't call
+> block_acct_invalid because you're bypassing the return to ide_dma_cb. I
+> assume you'll get to that in your next series.
+> 
 
-Signed-off-by: Haozhong Zhang <haozhong.zhang@intel.com>
----
- target/i386/cpu.c | 49 +++++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 49 insertions(+)
+Yes; I meant to keep the trim accounting in ide_issue_trim_cb()
 
-diff --git a/target/i386/cpu.c b/target/i386/cpu.c
-index 045d66191f..a4370e6393 100644
---- a/target/i386/cpu.c
-+++ b/target/i386/cpu.c
-@@ -1391,6 +1391,55 @@ static X86CPUDefinition builtin_x86_defs[] = {
-         .xlevel = 0x80000008,
-         .model_id = "Intel Xeon Processor (Skylake)",
-     },
-+    {
-+        /* Add CLFLUSHOPT which is missed in CPU model "Skylake-Server". */
-+        .name = "Skylake-Server-clflushopt",
-+        .level = 0xd,
-+        .vendor = CPUID_VENDOR_INTEL,
-+        .family = 6,
-+        .model = 85,
-+        .stepping = 4,
-+        .features[FEAT_1_EDX] =
-+            CPUID_VME | CPUID_SSE2 | CPUID_SSE | CPUID_FXSR | CPUID_MMX |
-+            CPUID_CLFLUSH | CPUID_PSE36 | CPUID_PAT | CPUID_CMOV | CPUID_MCA |
-+            CPUID_PGE | CPUID_MTRR | CPUID_SEP | CPUID_APIC | CPUID_CX8 |
-+            CPUID_MCE | CPUID_PAE | CPUID_MSR | CPUID_TSC | CPUID_PSE |
-+            CPUID_DE | CPUID_FP87,
-+        .features[FEAT_1_ECX] =
-+            CPUID_EXT_AVX | CPUID_EXT_XSAVE | CPUID_EXT_AES |
-+            CPUID_EXT_POPCNT | CPUID_EXT_X2APIC | CPUID_EXT_SSE42 |
-+            CPUID_EXT_SSE41 | CPUID_EXT_CX16 | CPUID_EXT_SSSE3 |
-+            CPUID_EXT_PCLMULQDQ | CPUID_EXT_SSE3 |
-+            CPUID_EXT_TSC_DEADLINE_TIMER | CPUID_EXT_FMA | CPUID_EXT_MOVBE |
-+            CPUID_EXT_PCID | CPUID_EXT_F16C | CPUID_EXT_RDRAND,
-+        .features[FEAT_8000_0001_EDX] =
-+            CPUID_EXT2_LM | CPUID_EXT2_PDPE1GB | CPUID_EXT2_RDTSCP |
-+            CPUID_EXT2_NX | CPUID_EXT2_SYSCALL,
-+        .features[FEAT_8000_0001_ECX] =
-+            CPUID_EXT3_ABM | CPUID_EXT3_LAHF_LM | CPUID_EXT3_3DNOWPREFETCH,
-+        .features[FEAT_7_0_EBX] =
-+            CPUID_7_0_EBX_FSGSBASE | CPUID_7_0_EBX_BMI1 |
-+            CPUID_7_0_EBX_HLE | CPUID_7_0_EBX_AVX2 | CPUID_7_0_EBX_SMEP |
-+            CPUID_7_0_EBX_BMI2 | CPUID_7_0_EBX_ERMS | CPUID_7_0_EBX_INVPCID |
-+            CPUID_7_0_EBX_RTM | CPUID_7_0_EBX_RDSEED | CPUID_7_0_EBX_ADX |
-+            CPUID_7_0_EBX_SMAP | CPUID_7_0_EBX_MPX | CPUID_7_0_EBX_CLWB |
-+            CPUID_7_0_EBX_AVX512F | CPUID_7_0_EBX_AVX512DQ |
-+            CPUID_7_0_EBX_AVX512BW | CPUID_7_0_EBX_AVX512CD |
-+            CPUID_7_0_EBX_AVX512VL | CPUID_7_0_EBX_CLFLUSHOPT,
-+        /* Missing: XSAVES (not supported by some Linux versions,
-+         * including v4.1 to v4.12).
-+         * KVM doesn't yet expose any XSAVES state save component,
-+         * and the only one defined in Skylake (processor tracing)
-+         * probably will block migration anyway.
-+         */
-+        .features[FEAT_XSAVE] =
-+            CPUID_XSAVE_XSAVEOPT | CPUID_XSAVE_XSAVEC |
-+            CPUID_XSAVE_XGETBV1,
-+        .features[FEAT_6_EAX] =
-+            CPUID_6_EAX_ARAT,
-+        .xlevel = 0x80000008,
-+        .model_id = "Intel Xeon Processor (Skylake w/ clflushopt)",
-+    },
-     {
-         .name = "Opteron_G1",
-         .level = 5,
--- 
-2.14.1
+> For now, this should properly reject bogus TRIM commands. When you send
+> your next series, may I ask for a simple test case if possible?
+> 
+
+Sure, I'll look into it
+
+> 1-3:
+> Reviewed-by: John Snow <jsnow@redhat.com>
+> 
