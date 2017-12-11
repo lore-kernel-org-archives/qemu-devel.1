@@ -1,25 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46260)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51210)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1eONH3-0001HK-Uv
-	for qemu-devel@nongnu.org; Mon, 11 Dec 2017 07:33:35 -0500
+	(envelope-from <longpeng2@huawei.com>) id 1eONdN-00020o-20
+	for qemu-devel@nongnu.org; Mon, 11 Dec 2017 07:56:37 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1eONH0-0007Gl-9z
-	for qemu-devel@nongnu.org; Mon, 11 Dec 2017 07:33:33 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:48844)
+	(envelope-from <longpeng2@huawei.com>) id 1eONdK-0006w1-0g
+	for qemu-devel@nongnu.org; Mon, 11 Dec 2017 07:56:37 -0500
+Received: from [45.249.212.35] (port=43270 helo=huawei.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1eONH0-0007EI-3t
-	for qemu-devel@nongnu.org; Mon, 11 Dec 2017 07:33:30 -0500
-Date: Mon, 11 Dec 2017 12:33:17 +0000
-From: "Daniel P. Berrange" <berrange@redhat.com>
-Message-ID: <20171211123317.GB23622@redhat.com>
-Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
-References: <CANCZdfrJoF=4zbGW+dVC9rnPD0ip+ZxXw0mAO_=r4gxFqW0KKA@mail.gmail.com>
-	<20171211122936.GA2422@work-vm>
+	(Exim 4.71) (envelope-from <longpeng2@huawei.com>)
+	id 1eONdJ-0006pL-Ko
+	for qemu-devel@nongnu.org; Mon, 11 Dec 2017 07:56:33 -0500
+Message-ID: <5A2E8067.4050000@huawei.com>
+Date: Mon, 11 Dec 2017 20:56:07 +0800
+From: "Longpeng (Mike)" <longpeng2@huawei.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20171211122936.GA2422@work-vm>
-Subject: Re: [Qemu-devel] It told me to report this...
+References: <1512545840-10256-1-git-send-email-longpeng2@huawei.com>
+	<1512545840-10256-2-git-send-email-longpeng2@huawei.com>
+	<0209e49f-3d81-cbc9-eb07-13654a288a22@linux.vnet.ibm.com>
+In-Reply-To: <0209e49f-3d81-cbc9-eb07-13654a288a22@linux.vnet.ibm.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [v22 1/2] virtio-crypto: Add virtio crypto device
+ specification
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,39 +30,82 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Cc: Warner Losh <imp@bsdimp.com>, kraxel@redhat.com, qemu-devel@nongnu.org
+To: Halil Pasic <pasic@linux.vnet.ibm.com>
+Cc: qemu-devel@nongnu.org, virtio-dev@lists.oasis-open.org, luonengjun@huawei.com, mst@redhat.com, cornelia.huck@de.ibm.com, stefanha@redhat.com, denglingli@chinamobile.com, Jani.Kokkonen@huawei.com, Ola.Liljedahl@arm.com, Varun.Sethi@freescale.com, xin.zeng@intel.com, brian.a.keating@intel.com, liang.j.ma@intel.com, john.griffin@intel.com, weidong.huang@huawei.com, agraf@suse.de, jasowang@redhat.com, vincent.jardin@6wind.com, arei.gonglei@huawei.com, wangxinxin.wang@huawei.com, jianjay.zhou@huawei.com
 
-On Mon, Dec 11, 2017 at 12:29:36PM +0000, Dr. David Alan Gilbert wrote:
-> * Warner Losh (imp@bsdimp.com) wrote:
-> > unknown keycodes `empty+aliases(qwerty)', please report to
-> > qemu-devel@nongnu.org
-> > 
-> > My X server is Mac XQuartz 2.7.11. I saw this question raised several years
-> > ago in the archives, with promises of patches, but couldn't find anything
-> > relevant in the latest tree I grabbed from github (I saw this problem there
-> > as well as 2.9.0 installed from FreeBSD ports).
-> > 
-> > What's my next step here?
+
+
+On 2017/12/6 19:01, Halil Pasic wrote:
+
 > 
-> I think that's one of Gerd's messages, so I've added him to the
-> email and also Daniel since he's got an interest in key mappings.
 > 
-> Have you any idea if it happened when you pressed a particular key?
+> On 12/06/2017 08:37 AM, Longpeng(Mike) wrote:
+>> +\field{outcome_len} is the size of struct virtio_crypto_session_input or
+>> +ZERO for the session-destroy operation.
+> 
+> This ain't correct. It should have been something like virtio_crypto_destroy_session_input.
+> 
 
-Don't worry, this is a known limitation of the current X backend for QEMU.
+Hi Halil,
 
-It only knows how to work with Xorg on Linux with kbd or evdev. It can't
-cope with OS-X or Windows  X11 servers yet. I've got patches that will
-address this which i hope to finally put into 2.12 as part of the keycodemapdb
-work.
+I already fixed this just now.
+Do you have any other comments on v22 ? I'll send v23 tomorrow if no. :)
 
-In the meantime your best bet is to use the native OS-X cocoa frontend for
-QEMU, or VNC.
-
-Regards,
-Daniel
 -- 
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
+Regards,
+Longpeng(Mike)
+
+>> +
+>> +
+>> +\paragraph{Session operation}\label{sec:Device Types / Crypto Device / Device
+>> +Operation / Control Virtqueue / Session operation}
+>> +
+>> +The session is a handle which describes the cryptographic parameters to be
+>> +applied to a number of buffers.
+>> +
+>> +The following structure stores the result of session creation set by the device:
+>> +
+>> +\begin{lstlisting}
+>> +struct virtio_crypto_session_input {
+>> +    /* Device write only portion */
+>> +    le64 session_id;
+>> +    le32 status;
+>> +    le32 padding;
+>> +};
+>> +\end{lstlisting}
+>> +
+>> +A request to destroy a session includes the following information:
+>> +
+>> +\begin{lstlisting}
+>> +struct virtio_crypto_destroy_session_flf {
+>> +    /* Device read only portion */
+>> +    le64  session_id;
+>> +    /* Device write only portion */
+> 
+> This is the device writable portion and thus what we cal op_outcome above.
+> So it should have been
+> };
+> 
+> 
+> struct virtio_crypto_destroy_session_input {
+>> +    le32  status;
+>> +    le32  padding;
+>> +};
+> 
+> If we aren't consistent about it the dividing into parts (like op specific
+> fixed and variable length (output) fields, operation outcome (input))
+> isn't really helpful.
+> 
+> 
+> Regards,
+> Halil
+>> +\end{lstlisting}
+> 
+> 
+> .
+> 
+
+
+-- 
+Regards,
+Longpeng(Mike)
