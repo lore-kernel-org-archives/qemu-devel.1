@@ -1,19 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43063)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48838)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <samuel.thibault@ens-lyon.org>) id 1eOBp6-0006Y1-MP
-	for qemu-devel@nongnu.org; Sun, 10 Dec 2017 19:19:57 -0500
+	(envelope-from <wangziheng@outlook.com>) id 1eOCEg-0000DO-2c
+	for qemu-devel@nongnu.org; Sun, 10 Dec 2017 19:46:23 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <samuel.thibault@ens-lyon.org>) id 1eOBp5-00017R-RT
-	for qemu-devel@nongnu.org; Sun, 10 Dec 2017 19:19:56 -0500
-Received: from hera.aquilenet.fr ([2a0c:e300::1]:35903)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <samuel.thibault@ens-lyon.org>)
-	id 1eOBp5-00015w-KW
-	for qemu-devel@nongnu.org; Sun, 10 Dec 2017 19:19:55 -0500
-From: Samuel Thibault <samuel.thibault@ens-lyon.org>
-Date: Mon, 11 Dec 2017 01:19:50 +0100
-Message-Id: <20171211001950.27843-1-samuel.thibault@ens-lyon.org>
-Subject: [Qemu-devel] [PATCH] baum: Truncate braille device size to 84x1
+	(envelope-from <wangziheng@outlook.com>) id 1eOCEd-0000Dx-16
+	for qemu-devel@nongnu.org; Sun, 10 Dec 2017 19:46:22 -0500
+Received: from mail-oln040092004021.outbound.protection.outlook.com
+	([40.92.4.21]:46880
+	helo=NAM02-CY1-obe.outbound.protection.outlook.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <wangziheng@outlook.com>)
+	id 1eOCEc-0000CL-KD
+	for qemu-devel@nongnu.org; Sun, 10 Dec 2017 19:46:18 -0500
+From: microsoft gaofei <wangziheng@outlook.com>
+Date: Mon, 11 Dec 2017 00:46:16 +0000
+Message-ID: <MWHPR02MB24632F9FF42C04523C52E5F6D4370@MWHPR02MB2463.namprd02.prod.outlook.com>
+Content-Language: zh-CN
+MIME-Version: 1.0
+Content-Type: text/plain; charset="gb2312"
+Content-Transfer-Encoding: base64
+Subject: [Qemu-devel] BIOS and virus
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,42 +28,15 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org, pbonzini@redhat.com, marcandre.lureau@redhat.com
-Cc: Samuel Thibault <samuel.thibault@ens-lyon.org>
+To: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
 
-Baum device bigger than 84 do not actually exist, some guest drivers
-would be upset by such sizes.
-
-Signed-off-by: Samuel Thibault <samuel.thibault@ens-lyon.org>
----
- chardev/baum.c | 8 +++++++-
- 1 file changed, 7 insertions(+), 1 deletion(-)
-
-diff --git a/chardev/baum.c b/chardev/baum.c
-index 67fd783a59..78b0c87625 100644
---- a/chardev/baum.c
-+++ b/chardev/baum.c
-@@ -1,7 +1,7 @@
- /*
-  * QEMU Baum Braille Device
-  *
-- * Copyright (c) 2008, 2010-2011, 2016 Samuel Thibault
-+ * Copyright (c) 2008, 2010-2011, 2016-2017 Samuel Thibault
-  *
-  * Permission is hereby granted, free of charge, to any person obtaining a copy
-  * of this software and associated documentation files (the "Software"), to deal
-@@ -239,6 +239,12 @@ static int baum_deferred_init(BaumChardev *baum)
-         brlapi_perror("baum: brlapi__getDisplaySize");
-         return 0;
-     }
-+    if (baum->y > 1) {
-+        baum->y = 1;
-+    }
-+    if (baum->x > 84) {
-+        baum->x = 84;
-+    }
- 
-     con = qemu_console_lookup_by_index(0);
-     if (con && qemu_console_is_graphic(con)) {
--- 
-2.15.0
+UUVNVSBkZXBlbmRlZCBvbiBzZWFiaW9zIGJ5IGRlZmF1bHQgLiBzdWRvIHBhY21hbiAtUyBxZW11
+ICxzdWRvIGFwdCBpbnN0YWxsIHFlbXUgLCx0aGF0IHdpbGwgYXV0by1pbnN0YWxsIHNlYWJpb3Mg
+LiBTbyBzZWFiaW9zIGlzIGluc3RhbGxlZCBpbiBteSBzeXN0ZW0gLCBOT1QgYSBzaW5nbGUgZmls
+ZSAuDQoNCmh0dHBzOi8vdGhlaGFja2VybmV3cy5jb20vMjAxMS8wOS9iaW9zLWJhc2VkLXZpcnVz
+LWRpc2NvdmVyZWQtYnktY2hpbmVzZS5odG1sICAgICAgV2hhdCBpZiBJIHJ1biBCTVcgaW4gUUVN
+VSA/IFdpbGwgaXQgZGVzdHJveSBzZWFiaW9zIHRoZW4gYWZmZWN0IG90aGVyIHZpcnR1YWwgbWFj
+aGluZXMgPw0KDQpodHRwczovL3d3dy5jb3JlYm9vdC5vcmcvUUVNVSAgICAgRG8gSSBoYXZlIHRv
+IHByZXBhcmUgYSBzaW5nbGUgZmlsZSB0byBhdm9pZCB0aGUgdmlydXMgPyBTaW5jZSBzZWFiaW9z
+IGlzIGF1dG8taW5zdGFsbGVkIGJ5IGEgZGlzdHJpYnV0aW9uJ3MgcGFja2FnZSBtYW5hZ2VyICwg
+Tk9UIGEgc2luZ2xlIGZpbGUgLg0K
