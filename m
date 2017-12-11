@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34238)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34283)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mikhail.abakumov@ispras.ru>) id 1eOO3i-0002YH-Q1
-	for qemu-devel@nongnu.org; Mon, 11 Dec 2017 08:23:52 -0500
+	(envelope-from <mikhail.abakumov@ispras.ru>) id 1eOO3s-0002jA-F1
+	for qemu-devel@nongnu.org; Mon, 11 Dec 2017 08:24:01 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mikhail.abakumov@ispras.ru>) id 1eOO3h-0002xv-GC
-	for qemu-devel@nongnu.org; Mon, 11 Dec 2017 08:23:50 -0500
-Received: from mail.ispras.ru ([83.149.199.45]:43768)
+	(envelope-from <mikhail.abakumov@ispras.ru>) id 1eOO3o-00031X-Aa
+	for qemu-devel@nongnu.org; Mon, 11 Dec 2017 08:24:00 -0500
+Received: from mail.ispras.ru ([83.149.199.45]:43794)
 	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mikhail.abakumov@ispras.ru>) id 1eOO3h-0002xK-2j
-	for qemu-devel@nongnu.org; Mon, 11 Dec 2017 08:23:49 -0500
+	(envelope-from <mikhail.abakumov@ispras.ru>) id 1eOO3n-000310-TO
+	for qemu-devel@nongnu.org; Mon, 11 Dec 2017 08:23:56 -0500
 From: Mihail Abakumov <mikhail.abakumov@ispras.ru>
-Date: Mon, 11 Dec 2017 16:23:33 +0300
-Message-ID: <151299861368.4808.4153531778557546279.stgit@Misha-PC.lan02.inno>
+Date: Mon, 11 Dec 2017 16:23:39 +0300
+Message-ID: <151299861930.4808.752139561175998341.stgit@Misha-PC.lan02.inno>
 In-Reply-To: <151299847127.4808.14646046517426494416.stgit@Misha-PC.lan02.inno>
 References: <151299847127.4808.14646046517426494416.stgit@Misha-PC.lan02.inno>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Subject: [Qemu-devel] [PATCH v4 24/46] windbg: implemented
- kd_api_read_control_space and kd_api_write_control_space
+Subject: [Qemu-devel] [PATCH v4 25/46] windbg: implemented
+ windbg_read_context
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,147 +34,113 @@ Signed-off-by: Mihail Abakumov <mikhail.abakumov@ispras.ru>
 Signed-off-by: Pavel Dovgalyuk <dovgaluk@ispras.ru>
 Signed-off-by: Dmitriy Koltunov <koltunov@ispras.ru>
 ---
- include/exec/windbgstub-utils.h |    2 +
- target/i386/windbgstub.c        |   89 +++++++++++++++++++++++++++++++++++++++
- windbgstub.c                    |    8 ++++
- 3 files changed, 99 insertions(+)
+ target/i386/windbgstub.c |   96 ++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 96 insertions(+)
 
-diff --git a/include/exec/windbgstub-utils.h b/include/exec/windbgstub-utils.h
-index d4efabba0b..e04bd59d46 100755
---- a/include/exec/windbgstub-utils.h
-+++ b/include/exec/windbgstub-utils.h
-@@ -78,6 +78,8 @@ void kd_api_read_virtual_memory(CPUState *cpu, PacketData *pd);
- void kd_api_write_virtual_memory(CPUState *cpu, PacketData *pd);
- void kd_api_get_context(CPUState *cpu, PacketData *pd);
- void kd_api_set_context(CPUState *cpu, PacketData *pd);
-+void kd_api_read_control_space(CPUState *cpu, PacketData *pd);
-+void kd_api_write_control_space(CPUState *cpu, PacketData *pd);
- void kd_api_unsupported(CPUState *cpu, PacketData *pd);
- 
- SizedBuf kd_gen_exception_sc(CPUState *cpu);
 diff --git a/target/i386/windbgstub.c b/target/i386/windbgstub.c
-index 7558349469..f72d164bb5 100755
+index f72d164bb5..de3ffd78b0 100755
 --- a/target/i386/windbgstub.c
 +++ b/target/i386/windbgstub.c
-@@ -285,6 +285,18 @@ static int windbg_write_context(CPUState *cpu, uint8_t *buf, int buf_size,
+@@ -276,6 +276,102 @@ typedef struct _CPU_KPROCESSOR_STATE {
+ static int windbg_read_context(CPUState *cpu, uint8_t *buf, int buf_size,
+                                int offset, int len)
+ {
++    CPUArchState *env = cpu->env_ptr;
++    CPU_CONTEXT *cc;
++    bool new_mem;
++
++    if (len < 0 || len > buf_size) {
++        WINDBG_ERROR("windbg_read_context: incorrect length %d", len);
++        return 1;
++    }
++
++    if (offset < 0 || offset + len > sizeof(CPU_CONTEXT)) {
++        WINDBG_ERROR("windbg_read_context: incorrect offset %d", offset);
++        return 2;
++    }
++
++    new_mem = len != sizeof(CPU_CONTEXT) || offset != 0;
++    if (new_mem) {
++        cc = g_new0(CPU_CONTEXT, 1);
++    } else {
++        cc = (CPU_CONTEXT *) buf;
++        memset(cc, 0, sizeof(CPU_CONTEXT));
++    }
++
++    cc->ContextFlags = CPU_CONTEXT_ALL;
++
++    if (cc->ContextFlags & CPU_CONTEXT_SEGMENTS) {
++        stw_p(&cc->SegCs, env->segs[R_CS].selector);
++        stw_p(&cc->SegDs, env->segs[R_DS].selector);
++        stw_p(&cc->SegEs, env->segs[R_ES].selector);
++        stw_p(&cc->SegFs, env->segs[R_FS].selector);
++        stw_p(&cc->SegGs, env->segs[R_GS].selector);
++        stw_p(&cc->SegSs, env->segs[R_SS].selector);
++    }
++
++    if (cc->ContextFlags & CPU_CONTEXT_DEBUG_REGISTERS) {
++        sttul_p(&cc->Dr0, env->dr[0]);
++        sttul_p(&cc->Dr1, env->dr[1]);
++        sttul_p(&cc->Dr2, env->dr[2]);
++        sttul_p(&cc->Dr3, env->dr[3]);
++        sttul_p(&cc->Dr6, env->dr[6]);
++        sttul_p(&cc->Dr7, env->dr[7]);
++    }
++
++    if (cc->ContextFlags & CPU_CONTEXT_INTEGER) {
++        stl_p(&cc->Edi, env->regs[R_EDI]);
++        stl_p(&cc->Esi, env->regs[R_ESI]);
++        stl_p(&cc->Ebx, env->regs[R_EBX]);
++        stl_p(&cc->Edx, env->regs[R_EDX]);
++        stl_p(&cc->Ecx, env->regs[R_ECX]);
++        stl_p(&cc->Eax, env->regs[R_EAX]);
++        stl_p(&cc->Ebp, env->regs[R_EBP]);
++        stl_p(&cc->Esp, env->regs[R_ESP]);
++        stl_p(&cc->Eip, env->eip);
++        stl_p(&cc->EFlags, env->eflags);
++    }
++
++    if (cc->ContextFlags & CPU_CONTEXT_FLOATING_POINT) {
++        uint32_t swd = 0, twd = 0;
++        swd = env->fpus & ~(7 << 11);
++        swd |= (env->fpstt & 7) << 11;
++        int i;
++        for (i = 0; i < 8; ++i) {
++            twd |= (!env->fptags[i]) << i;
++        }
++
++        stl_p(&cc->FloatSave.ControlWord, env->fpuc);
++        stl_p(&cc->FloatSave.StatusWord, swd);
++        stl_p(&cc->FloatSave.TagWord, twd);
++        stl_p(&cc->FloatSave.ErrorOffset, env->fpip & 0xffffffff);
++        stl_p(&cc->FloatSave.ErrorSelector, (env->fpip >> 32) & 0xffffffff);
++        stl_p(&cc->FloatSave.DataOffset, env->fpdp & 0xffffffff);
++        stl_p(&cc->FloatSave.DataSelector, (env->fpdp >> 32) & 0xffffffff);
++        stl_p(&cc->FloatSave.Cr0NpxState, env->xcr0);
++
++        for (i = 0; i < 8; ++i) {
++            memcpy(PTR(cc->FloatSave.RegisterArea[i * 10]),
++                   PTR(env->fpregs[i]), 10);
++        }
++    }
++
++    if (cc->ContextFlags & CPU_CONTEXT_EXTENDED_REGISTERS) {
++        uint8_t *ptr = cc->ExtendedRegisters + 160;
++        int i;
++        for (i = 0; i < 8; ++i, ptr += 16) {
++            stq_p(ptr,     env->xmm_regs[i].ZMM_Q(0));
++            stq_p(ptr + 8, env->xmm_regs[i].ZMM_Q(1));
++        }
++
++        stl_p(cc->ExtendedRegisters + 24, env->mxcsr);
++    }
++
++    stl_p(&cc->ContextFlags, cc->ContextFlags);
++
++    if (new_mem) {
++        memcpy(buf, (uint8_t *) cc + offset, len);
++        g_free(cc);
++    }
      return 0;
  }
  
-+static int windbg_read_ks_regs(CPUState *cpu, uint8_t *buf, int buf_size,
-+                               int offset, int len)
-+{
-+    return 0;
-+}
-+
-+static int windbg_write_ks_regs(CPUState *cpu, uint8_t *buf, int buf_size,
-+                                int offset, int len)
-+{
-+    return 0;
-+}
-+
- void kd_api_get_context(CPUState *cpu, PacketData *pd)
- {
-     int err;
-@@ -312,6 +324,83 @@ void kd_api_set_context(CPUState *cpu, PacketData *pd)
-     }
- }
- 
-+void kd_api_read_control_space(CPUState *cpu, PacketData *pd)
-+{
-+    DBGKD_READ_MEMORY64 *mem = &pd->m64.u.ReadMemory;
-+    uint32_t len;
-+    uint32_t context_len;
-+    uint32_t ks_regs_len;
-+    target_ulong addr;
-+    int err = -1;
-+
-+    len = MIN(ldl_p(&mem->TransferCount),
-+              PACKET_MAX_SIZE - sizeof(DBGKD_MANIPULATE_STATE64));
-+    addr = ldtul_p(&mem->TargetBaseAddress);
-+
-+    if (addr < sizeof(CPU_KPROCESSOR_STATE)) {
-+        len = MIN(len, sizeof(CPU_KPROCESSOR_STATE) - addr);
-+
-+        context_len = MAX(0, (int) (sizeof(CPU_CONTEXT) - addr));
-+        ks_regs_len = len - context_len;
-+
-+        if (context_len > 0) {
-+            err = windbg_read_context(cpu, pd->extra, context_len, addr,
-+                                      context_len);
-+        }
-+        if (ks_regs_len > 0) {
-+            addr = addr - sizeof(CPU_CONTEXT) + context_len;
-+            err = windbg_read_ks_regs(cpu, pd->extra + context_len,
-+                                      ks_regs_len, addr, ks_regs_len);
-+        }
-+    }
-+
-+    if (err) {
-+        len = 0;
-+        pd->m64.ReturnStatus = STATUS_UNSUCCESSFUL;
-+    }
-+
-+    pd->extra_size = len;
-+    stl_p(&mem->ActualBytesRead, len);
-+}
-+
-+void kd_api_write_control_space(CPUState *cpu, PacketData *pd)
-+{
-+    DBGKD_WRITE_MEMORY64 *mem = &pd->m64.u.WriteMemory;
-+    uint32_t len;
-+    uint32_t context_len;
-+    uint32_t ks_regs_len;
-+    target_ulong addr;
-+    int err = -1;
-+
-+    len = MIN(ldl_p(&mem->TransferCount), pd->extra_size);
-+    addr = ldtul_p(&mem->TargetBaseAddress);
-+
-+    if (addr < sizeof(CPU_KPROCESSOR_STATE)) {
-+        len = MIN(len, sizeof(CPU_KPROCESSOR_STATE) - addr);
-+
-+        context_len = MAX(0, (int) (sizeof(CPU_CONTEXT) - addr));
-+        ks_regs_len = len - context_len;
-+
-+        if (context_len > 0) {
-+            err = windbg_write_context(cpu, pd->extra, context_len, addr,
-+                                       context_len);
-+        }
-+        if (ks_regs_len > 0) {
-+            addr = addr - sizeof(CPU_CONTEXT) + context_len;
-+            err = windbg_write_ks_regs(cpu, pd->extra + context_len,
-+                                       ks_regs_len, addr, ks_regs_len);
-+        }
-+    }
-+
-+    if (err) {
-+        mem->ActualBytesWritten = 0;
-+        pd->m64.ReturnStatus = STATUS_UNSUCCESSFUL;
-+    }
-+
-+    pd->extra_size = 0;
-+    stl_p(&mem->ActualBytesWritten, len);
-+}
-+
- bool windbg_on_load(void)
- {
-     CPUState *cpu = qemu_get_cpu(0);
-diff --git a/windbgstub.c b/windbgstub.c
-index be40e3e53b..53a7e75683 100755
---- a/windbgstub.c
-+++ b/windbgstub.c
-@@ -156,6 +156,14 @@ static void windbg_process_manipulate_packet(ParsingContext *ctx)
-         kd_api_set_context(cpu, &ctx->data);
-         break;
- 
-+    case DbgKdReadControlSpaceApi:
-+        kd_api_read_control_space(cpu, &ctx->data);
-+        break;
-+
-+    case DbgKdWriteControlSpaceApi:
-+        kd_api_write_control_space(cpu, &ctx->data);
-+        break;
-+
-     default:
-         kd_api_unsupported(cpu, &ctx->data);
-         break;
