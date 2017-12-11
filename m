@@ -1,28 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56708)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57659)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <prvs=5116ce171=anthony.perard@citrix.com>)
-	id 1eOSMG-00076V-1o
-	for qemu-devel@nongnu.org; Mon, 11 Dec 2017 12:59:17 -0500
+	(envelope-from <cohuck@redhat.com>) id 1eOSOu-00080h-Uq
+	for qemu-devel@nongnu.org; Mon, 11 Dec 2017 13:02:01 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <prvs=5116ce171=anthony.perard@citrix.com>)
-	id 1eOSMB-00051l-BS
-	for qemu-devel@nongnu.org; Mon, 11 Dec 2017 12:59:16 -0500
-Received: from smtp02.citrix.com ([66.165.176.63]:2692)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_ARCFOUR_SHA1:16) (Exim 4.71)
-	(envelope-from <prvs=5116ce171=anthony.perard@citrix.com>)
-	id 1eOSMB-00050s-3v
-	for qemu-devel@nongnu.org; Mon, 11 Dec 2017 12:59:11 -0500
-Date: Mon, 11 Dec 2017 17:59:08 +0000
-From: Anthony PERARD <anthony.perard@citrix.com>
-Message-ID: <20171211175908.GC2216@perard.uk.xensource.com>
-References: <1510899865-40323-1-git-send-email-chao.gao@intel.com>
-	<1510899865-40323-3-git-send-email-chao.gao@intel.com>
+	(envelope-from <cohuck@redhat.com>) id 1eOSOq-0007Cc-3J
+	for qemu-devel@nongnu.org; Mon, 11 Dec 2017 13:02:01 -0500
+Date: Mon, 11 Dec 2017 19:01:45 +0100
+From: Cornelia Huck <cohuck@redhat.com>
+Message-ID: <20171211190145.4f3e2be5.cohuck@redhat.com>
+In-Reply-To: <20171211134740.8235-10-david@redhat.com>
+References: <20171211134740.8235-1-david@redhat.com>
+	<20171211134740.8235-10-david@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Disposition: inline
-In-Reply-To: <1510899865-40323-3-git-send-email-chao.gao@intel.com>
-Subject: Re: [Qemu-devel] [PATCH v3 2/3] xen/pt: Pass the whole msi
- addr/data to Xen
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v1 for-2-12 09/15] s390x/tcg: implement
+ TEST PENDING INTERRUPTION
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,130 +24,81 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Chao Gao <chao.gao@intel.com>
-Cc: qemu-devel@nongnu.org, xen-devel@lists.xenproject.org, Stefano Stabellini <sstabellini@kernel.org>, Lan Tianyu <tianyu.lan@intel.com>
+To: David Hildenbrand <david@redhat.com>
+Cc: qemu-s390x@nongnu.org, qemu-devel@nongnu.org, Christian Borntraeger <borntraeger@de.ibm.com>, Richard Henderson <rth@twiddle.net>, Alexander Graf <agraf@suse.de>, Paolo Bonzini <pbonzini@redhat.com>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Thomas Huth <thuth@redhat.com>
 
-On Fri, Nov 17, 2017 at 02:24:24PM +0800, Chao Gao wrote:
-> Previously, some fields (reserved or unalterable) are filtered by
-> Qemu. This fields are useless for the legacy interrupt format.
-> However, these fields are may meaningful (for intel platform)
-> for the interrupt of remapping format. It is better to pass the whole
-> msi addr/data to Xen without any filtering.
+On Mon, 11 Dec 2017 14:47:34 +0100
+David Hildenbrand <david@redhat.com> wrote:
+
+> Use s390_cpu_virt_mem_write() so we can actually revert what we did
+> (re-inject the dequeued IO interrupt).
 > 
-> The main reason why we want this is QEMU doesn't have the knowledge
-> to decide the interrupt format after we introduce vIOMMU inside Xen.
-> Passing the whole msi message down and let arch-specific vIOMMU to
-> decide the interrupt format.
-> 
-> Signed-off-by: Chao Gao <chao.gao@intel.com>
-> Signed-off-by: Lan Tianyu <tianyu.lan@intel.com>
+> Signed-off-by: David Hildenbrand <david@redhat.com>
 > ---
-> v3:
->  - new
-> ---
->  hw/xen/xen_pt_msi.c | 47 ++++++++++++-----------------------------------
->  1 file changed, 12 insertions(+), 35 deletions(-)
+>  target/s390x/helper.h      |  1 +
+>  target/s390x/insn-data.def |  1 +
+>  target/s390x/misc_helper.c | 53 ++++++++++++++++++++++++++++++++++++++++++++++
+>  target/s390x/translate.c   |  8 +++++++
+>  4 files changed, 63 insertions(+)
 > 
-> diff --git a/hw/xen/xen_pt_msi.c b/hw/xen/xen_pt_msi.c
-> index 6d1e3bd..f7d6e76 100644
-> --- a/hw/xen/xen_pt_msi.c
-> +++ b/hw/xen/xen_pt_msi.c
-> @@ -47,25 +47,6 @@ static inline uint32_t msi_ext_dest_id(uint32_t addr_hi)
->      return addr_hi & 0xffffff00;
->  }
->  
-> -static uint32_t msi_gflags(uint32_t data, uint64_t addr)
-> -{
-> -    uint32_t result = 0;
-> -    int rh, dm, dest_id, deliv_mode, trig_mode;
-> -
-> -    rh = (addr >> MSI_ADDR_REDIRECTION_SHIFT) & 0x1;
-> -    dm = (addr >> MSI_ADDR_DEST_MODE_SHIFT) & 0x1;
-> -    dest_id = msi_dest_id(addr);
-> -    deliv_mode = (data >> MSI_DATA_DELIVERY_MODE_SHIFT) & 0x7;
-> -    trig_mode = (data >> MSI_DATA_TRIGGER_SHIFT) & 0x1;
-> -
-> -    result = dest_id | (rh << XEN_PT_GFLAGS_SHIFT_RH)
-> -        | (dm << XEN_PT_GFLAGS_SHIFT_DM)
-> -        | (deliv_mode << XEN_PT_GFLAGSSHIFT_DELIV_MODE)
-> -        | (trig_mode << XEN_PT_GFLAGSSHIFT_TRG_MODE);
-> -
-> -    return result;
-> -}
-> -
->  static inline uint64_t msi_addr64(XenPTMSI *msi)
+
+> +uint32_t HELPER(tpi)(CPUS390XState *env, uint64_t addr)
+> +{
+> +    const uintptr_t ra = GETPC();
+> +    S390CPU *cpu = s390_env_get_cpu(env);
+> +    QEMUS390FLICState *flic = QEMU_S390_FLIC(s390_get_flic());
+> +    QEMUS390FlicIO *io = NULL;
+> +    LowCore *lowcore;
+> +
+> +    if (addr & 0x3) {
+> +        s390_program_interrupt(env, PGM_SPECIFICATION, 4, ra);
+> +    }
+> +
+> +    qemu_mutex_lock_iothread();
+> +    io = qemu_s390_flic_dequeue_io(flic, env->cregs[6]);
+> +    if (!io) {
+> +        qemu_mutex_unlock_iothread();
+> +        return 0;
+> +    }
+> +
+> +    if (addr) {
+> +        struct {
+> +            uint16_t id;
+> +            uint16_t nr;
+> +            uint32_t parm;
+> +        } tmp = {
+> +            .id = cpu_to_be16(io->id),
+> +            .nr = cpu_to_be16(io->nr),
+> +            .parm = cpu_to_be32(io->parm),
+> +        };
+
+That's a two-word interruption code; can you call this something better
+than 'tmp'?
+
+> +
+> +        if (s390_cpu_virt_mem_write(cpu, addr, 0, &tmp, sizeof(tmp))) {
+> +            /* writing failed, reinject and properly clean up */
+> +            s390_io_interrupt(io->id, io->nr, io->parm, io->word);
+> +            qemu_mutex_unlock_iothread();
+> +            g_free(io);
+> +            s390_cpu_virt_mem_handle_exc(cpu, ra);
+> +            return 0;
+> +        }
+> +    } else {
+> +        /* no protection applies */
+> +        lowcore = cpu_map_lowcore(env);
+> +        lowcore->subchannel_id = cpu_to_be16(io->id);
+> +        lowcore->subchannel_nr = cpu_to_be16(io->nr);
+> +        lowcore->io_int_parm = cpu_to_be32(io->parm);
+> +        lowcore->io_int_word = cpu_to_be32(io->word);
+> +        cpu_unmap_lowcore(lowcore);
+> +    }
+> +
+> +    g_free(io);
+> +    qemu_mutex_unlock_iothread();
+> +    return 1;
+> +}
+> +
+>  void HELPER(tsch)(CPUS390XState *env, uint64_t r1, uint64_t inst)
 >  {
->      return (uint64_t)msi->addr_hi << 32 | msi->addr_lo;
-> @@ -160,23 +141,20 @@ static int msi_msix_update(XenPCIPassthroughState *s,
->                             bool masked)
->  {
->      PCIDevice *d = &s->dev;
-> -    uint8_t gvec = msi_vector(data);
-> -    uint32_t gflags = msi_gflags(data, addr);
-> +    uint32_t gflags = masked ? 0 : (1u << XEN_PT_GFLAGSSHIFT_UNMASKED);
->      int rc = 0;
->      uint64_t table_addr = 0;
->  
-> -    XEN_PT_LOG(d, "Updating MSI%s with pirq %d gvec %#x gflags %#x"
-> -               " (entry: %#x)\n",
-> -               is_msix ? "-X" : "", pirq, gvec, gflags, msix_entry);
-> +    XEN_PT_LOG(d, "Updating MSI%s with pirq %d gvec %#x addr %"PRIx64
-> +               " data %#x gflags %#x (entry: %#x)\n",
-> +               is_msix ? "-X" : "", pirq, addr, data, gflags, msix_entry);
->  
->      if (is_msix) {
->          table_addr = s->msix->mmio_base_addr;
->      }
->  
-> -    gflags |= masked ? 0 : (1u << XEN_PT_GFLAGSSHIFT_UNMASKED);
-> -
-> -    rc = xc_domain_update_msi_irq(xen_xc, xen_domid, gvec,
-> -                                  pirq, gflags, table_addr);
-> +    rc = xc_domain_update_msi_irq(xen_xc, xen_domid, pirq, addr,
-> +                                  data, gflags, table_addr);
-
-Are you trying to modifie an existing API? That is not going to work. We
-want to be able to build QEMU against older version of Xen, and it
-should work as well.
-
->  
->      if (rc) {
->          XEN_PT_ERR(d, "Updating of MSI%s failed. (err: %d)\n",
-> @@ -199,8 +177,6 @@ static int msi_msix_disable(XenPCIPassthroughState *s,
->                              bool is_binded)
->  {
->      PCIDevice *d = &s->dev;
-> -    uint8_t gvec = msi_vector(data);
-> -    uint32_t gflags = msi_gflags(data, addr);
->      int rc = 0;
->  
->      if (pirq == XEN_PT_UNASSIGNED_PIRQ) {
-> @@ -208,12 +184,13 @@ static int msi_msix_disable(XenPCIPassthroughState *s,
->      }
->  
->      if (is_binded) {
-> -        XEN_PT_LOG(d, "Unbind MSI%s with pirq %d, gvec %#x\n",
-> -                   is_msix ? "-X" : "", pirq, gvec);
-> -        rc = xc_domain_unbind_msi_irq(xen_xc, xen_domid, gvec, pirq, gflags);
-> +        XEN_PT_LOG(d, "Unbind MSI%s with pirq %d, addr %"PRIx64", data %#x\n",
-> +                   is_msix ? "-X" : "", pirq, addr, data);
-> +        rc = xc_domain_unbind_msi_irq(xen_xc, xen_domid, pirq, addr, data);
-
-Same here, this build against older version of Xen, but I don't think an
-older libxc (like from Xen 4.10) is going to correctly with this new
-arguments.
-
->          if (rc) {
-> -            XEN_PT_ERR(d, "Unbinding of MSI%s failed. (err: %d, pirq: %d, gvec: %#x)\n",
-> -                       is_msix ? "-X" : "", errno, pirq, gvec);
-> +            XEN_PT_ERR(d, "Unbinding of MSI%s failed. (err: %d, pirq: %d, "
-> +                       "addr: %"PRIx64", data: %#x)\n",
-> +                       is_msix ? "-X" : "", errno, pirq, addr, data);
->              return rc;
->          }
->      }
-
-Thanks,
-
--- 
-Anthony PERARD
+>      S390CPU *cpu = s390_env_get_cpu(env);
