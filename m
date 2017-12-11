@@ -1,30 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41350)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44078)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1eON2v-0004b2-2l
-	for qemu-devel@nongnu.org; Mon, 11 Dec 2017 07:18:59 -0500
+	(envelope-from <borntraeger@de.ibm.com>) id 1eON7y-0007kH-8Y
+	for qemu-devel@nongnu.org; Mon, 11 Dec 2017 07:24:11 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1eON2t-0008Rc-2L
-	for qemu-devel@nongnu.org; Mon, 11 Dec 2017 07:18:57 -0500
-References: <20171113162053.58795-1-vsementsov@virtuozzo.com>
-	<01108daa-fed3-c142-bbd6-0ecc4c8b795d@redhat.com>
-	<cd0a2e5e-f788-0e5a-dec7-f428479f3b89@virtuozzo.com>
-	<8c61f43c-5f56-8c1b-a2fe-f954d34dc687@redhat.com>
-	<40392ab9-ec2a-30ed-ddab-a557682a4192@virtuozzo.com>
-	<4e4e28d7-aebc-4a86-e691-99afdcca27f5@redhat.com>
-	<40da8b0d-8039-634c-f50e-1d6326d7fca5@virtuozzo.com>
-	<37d0e96a-d572-3290-61e7-87e59de2f59b@redhat.com>
-	<2a255dee-97c6-5d6d-3152-df0b7fc2d4f0@virtuozzo.com>
-	<0c66a77a-c95a-2071-9422-a2ce0622dbbe@redhat.com>
-	<20171211111529.GB7707@localhost.localdomain>
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Message-ID: <b0ff2336-6856-0f60-64eb-6b1a889b5085@virtuozzo.com>
-Date: Mon, 11 Dec 2017 15:18:36 +0300
-MIME-Version: 1.0
-In-Reply-To: <20171211111529.GB7707@localhost.localdomain>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: quoted-printable
-Content-Language: en-US
-Subject: Re: [Qemu-devel] [PATCH for-2.12 0/4] qmp dirty bitmap API
+	(envelope-from <borntraeger@de.ibm.com>) id 1eON7t-0004Ne-Aj
+	for qemu-devel@nongnu.org; Mon, 11 Dec 2017 07:24:10 -0500
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:39410)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <borntraeger@de.ibm.com>)
+	id 1eON7t-0004N2-1p
+	for qemu-devel@nongnu.org; Mon, 11 Dec 2017 07:24:05 -0500
+Received: from pps.filterd (m0098399.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
+	vBBCNoLq110911
+	for <qemu-devel@nongnu.org>; Mon, 11 Dec 2017 07:24:02 -0500
+Received: from e06smtp12.uk.ibm.com (e06smtp12.uk.ibm.com [195.75.94.108])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2essx1g5sf-1
+	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Mon, 11 Dec 2017 07:23:50 -0500
+Received: from localhost
+	by e06smtp12.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	Only! Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <borntraeger@de.ibm.com>;
+	Mon, 11 Dec 2017 12:21:50 -0000
+From: Christian Borntraeger <borntraeger@de.ibm.com>
+Date: Mon, 11 Dec 2017 13:21:46 +0100
+Message-Id: <20171211122146.162430-1-borntraeger@de.ibm.com>
+Subject: [Qemu-devel] [PATCH v3 1/1] s390-ccw-virtio: allow for systems
+ larger that 7.999TB
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,262 +36,65 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Kevin Wolf <kwolf@redhat.com>, John Snow <jsnow@redhat.com>
-Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, famz@redhat.com, armbru@redhat.com, mnestratov@virtuozzo.com, mreitz@redhat.com, nshirokovskiy@virtuozzo.com, stefanha@redhat.com, den@openvz.org, pbonzini@redhat.com, dev@acronis.com
+To: Cornelia Huck <cohuck@redhat.com>
+Cc: qemu-devel <qemu-devel@nongnu.org>, qemu-s390x <qemu-s390x@nongnu.org>, Halil Pasic <pasic@linux.vnet.ibm.com>, Alexander Graf <agraf@suse.de>, Thomas Huth <thuth@redhat.com>, David Hildenbrand <david@redhat.com>, Richard Henderson <rth@twiddle.net>, Christian Borntraeger <borntraeger@de.ibm.com>
 
-11.12.2017 14:15, Kevin Wolf wrote:
-> Am 09.12.2017 um 01:57 hat John Snow geschrieben:
->> Here's an idea of what this API might look like without revealing
->> explicit merge/split primitives.
->>
->> A new bitmap property that lets us set retention:
->>
->> :: block-dirty-bitmap-set-retention bitmap=3Dfoo slices=3D10
->>
->> Or something similar, where the default property for all bitmaps is
->> zero -- the current behavior: no copies retained.
->>
->> By setting it to a non-zero positive integer, the incremental backup
->> mode will automatically save a disabled copy when possible.
-> -EMAGIC
->
-> Operations that create or delete user-visible objects should be
-> explicit, not automatic. You're trying to implement management layer
-> functionality in qemu here, but incomplete enough that the artifacts of
-> it are still visible externally. (A complete solution within qemu
-> wouldn't expose low-level concepts such as bitmaps on an external
-> interface, but you would expose something like checkpoints.)
->
-> Usually it's not a good idea to have a design where qemu implements
-> enough to restrict management tools to whatever use case we had in mind,
-> but not enough to make the management tool's life substantially easier
-> (by not having to care about some low-level concepts).
->
->> "What happens if we exceed our retention?"
->>
->> (A) We push the last one out automatically, or
->> (B) We fail the operation immediately.
->>
->> A is more convenient, but potentially unsafe if the management tool or
->> user wasn't aware that was going to happen.
->> B is more annoying, but definitely more safe as it means we cannot lose
->> a bitmap accidentally.
-> Both mean that the management layer has not only to deal with the
-> deletion of bitmaps as it wants to have them, but also to keep the
-> retention counter somewhere and predict what qemu is going to do to the
-> bitmaps and whether any corrective action needs to be taken.
->
-> This is making things more complex rather than simpler.
->
->> I would argue for B with perhaps a force-cycle=3Dtrue|false that default=
-s
->> to false to let management tools say "Yes, go ahead, remove the old one"
->> with additionally some return to let us know it happened:
->>
->> {"return": {
->>    "dropped-slices": [ {"bitmap0": 0}, ...]
->> }}
->>
->> This would introduce some concept of bitmap slices into the mix as ID'd
->> children of a bitmap. I would propose that these slices are numbered and
->> monotonically increasing. "bitmap0" as an object starts with no slices,
->> but every incremental backup creates slice 0, slice 1, slice 2, and so
->> on. Even after we start deleting some, they stay ordered. These numbers
->> then stand in for points in time.
->>
->> The counter can (must?) be reset and all slices forgotten when
->> performing a full backup while providing a bitmap argument.
->>
->> "How can a user make use of the slices once they're made?"
->>
->> Let's consider something like mode=3Dpartial in contrast to
->> mode=3Dincremental, and an example where we have 6 prior slices:
->> 0,1,2,3,4,5, (and, unnamed, the 'active' slice.)
->>
->> mode=3Dpartial bitmap=3Dfoo slice=3D4
->>
->> This would create a backup from slice 4 to the current time =CE=B1. This
->> includes all clusters from 4, 5, and the active bitmap.
->>
->> I don't think it is meaningful to define any end point that isn't the
->> current time, so I've omitted that as a possibility.
-> John, what are you doing here? This adds option after option, and even
-> additional slice object, only complicating an easy thing more and more.
-> I'm not sure if that was your intention, but I feel I'm starting to
-> understand better how Linus's rants come about.
->
-> Let me summarise what this means for management layer:
->
-> * The management layer has to manage bitmaps. They have direct control
->    over creation and deletion of bitmaps. So far so good.
->
-> * It also has to manage slices in those bitmaps objects; and these
->    slices are what contains the actual bitmaps. In order to identify a
->    bitmap in qemu, you need:
->
->      a) the node name
->      b) the bitmap ID, and
->      c) the slice number
->
->    The slice number is assigned by qemu and libvirt has to wait until
->    qemu tells it about the slice number of a newly created slice. If
->    libvirt doesn't receive the reply to the command that started the
->    block job, it needs to be able to query this information from qemu,
->    e.g. in query-block-jobs.
->
-> * Slices are automatically created when you start a backup job with a
->    bitmap. It doesn't matter whether you even intend to do an incremental
->    backup against this point in time. qemu knows better.
->
-> * In order to delete a slice that you don't need any more, you have to
->    create more slices (by doing more backups), but you don't get to
->    decide which one is dropped. qemu helpfully just drops the oldest one.
->    It doesn't matter if you want to keep an older one so you can do an
->    incremental backup for a longer timespan. Don't worry about your
->    backup strategy, qemu knows better.
->
-> * Of course, just creating a new backup job doesn't mean that removing
->    the old slice works, even if you give the respective option. That's
->    what the 'dropped-slices' return is for. So once again wait for
->    whatever qemu did and reproduce it in the data structures of the
->    management tool. It's also more information that needs to be exposed
->    in query-block-jobs because libvirt might miss the return value.
->
-> * Hmm... What happens if you start n backup block jobs, with n > slices?
->    Sounds like a great way to introduce subtle bugs in both qemu and the
->    management layer.
->
-> Do you really think working with this API would be fun for libvirt?
->
->> "Does a partial backup create a new point in time?"
->>
->> If yes: This means that the next incremental backup must necessarily be
->> based off of the last partial backup that was made. This seems a little
->> inconvenient. This would mean that point in time =CE=B1 becomes "slice 6=
-."
-> Or based off any of the previous points in time, provided that qemu
-> didn't helpfully decide to delete it. Can't I still create a backup
-> starting from slice 4 then?
->
-> Also, a more general question about incremental backup: How does it play
-> with snapshots? Shouldn't we expect that people sometimes use both
-> snapshots and backups? Can we restrict the backup job to considering
-> bitmaps only from a single node or should we be able to reference
-> bitmaps of a backing file as well?
->
->> If no: This means that we lose the point in time when we made the
->> partial and we cannot chain off of the partial backup. It does mean that
->> the next incremental backup will work as normally expected, however.
->> This means that point in time =CE=B1 cannot again be referenced by the
->> management client.
->>
->> This mirrors the dynamic between "incremental" and "differential" backup=
-s.
->>
->> ..hmmm..
->>
->> You know, incremental backups are just a special case of "partial" here
->> where slice is the last recorded slice... Let's look at an API like this=
-:
->>
->> mode=3D<incremental|differential> bitmap=3D<name> [slice=3DN]
->>
->> Incremental: We create a new slice if the bitmap has room for one.
->> Differential: We don't create a new slice. The data in the active bitmap
->> =CE=B1 does not get cleared after the bitmap operation.
->>
->> Slice:
->> If not specified, assume we want only the active slice. This is the
->> current behavior in QEMU 2.11.
->> If specified, we create a temporary merge between bitmaps [N..=CE=B1] an=
-d use
->> that for the backup operation.
->>
->> "Can we delete slices?"
->>
->> Sure.
->>
->> :: block-dirty-bitmap-slice-delete bitmap=3Dfoo slice=3D4
->>
->> "Can we create a slice without making a bitmap?"
->>
->> It would be easy to do, but I'm not sure I see the utility. In using it,
->> it means if you don't specify the slice manually for the next backup
->> that you will necessarily be getting something not usable.
->>
->> but we COULD do it, it would just be banking the changes in the active
->> bitmap into a new slice.
-> Okay, with explicit management this is getting a little more reasonable
-> now. However, I don't understand what slices buy us then compared to
-> just separate bitmaps.
->
-> Essentially, bitmaps form a second kind of backing chain. Backup always
-> wants to use the combined bitmaps of some subchain. I see two easy ways
-> to do this: Either pass an array of bitmaps to consider to the job, or
-> store the "backing link" in the bitmap so that we can just specify a
-> "base bitmap" like we usually do with normal backing files.
->
-> The backup block job can optionally append a new bitmap to the chain
-> like external snapshots do for backing chains. Deleting a bitmap in the
-> chain is the merge operation, similar to a commit block job for backing
-> chains.
->
-> We know these mechanism very well because the block layer has been using
-> them for ages.
->
->>> I also have another idea:
->>> implement new object: point-in-time or checkpoint. The should have
->>> names, and the simple add/remove API.
->>> And they will be backed by dirty bitmaps. so checkpoint deletion is
->>> bitmap merge (and delete one of them),
->>> checkpoint creation is disabling of active-checkpoint-bitmap and
->>> starting new active-checkpoint-bitmap.
->> Yes, exactly! I think that's pretty similar to what I am thinking of
->> with slices.
->>
->> This sounds a little safer to me in that we can examine an operation to
->> see if it's sane or not.
-> Exposing checkpoints is a reasonable high-level API. The important part
-> then is that you don't expose bitmaps + slices, but only checkpoints
-> without bitmaps. The bitmaps are an implementation detail.
->
->>> Then we can implement merging of several bitmaps (from one of
->>> checkpoints to current moment) in
->>> NBD meta-context-query handling.
->>>
->> Note:
->>
->> I should say that I've had discussions with Stefan in the past over
->> things like differential mode and the feeling I got from him was that he
->> felt that data should be copied from QEMU precisely *once*, viewing any
->> subsequent copying of the same data as redundant and wasteful.
-> That's a management layer decision. Apparently there are users who want
-> to copy from qemu multiple times, otherwise we wouldn't be talking about
-> slices and retention.
->
-> Kevin
+KVM does not allow memory regions > KVM_MEM_MAX_NR_PAGES, basically
+limiting the memory per slot to 8TB-4k. As memory slots on s390/kvm must
+be a multiple of 1MB we need start a new memory region if we cross
+8TB-1M.
 
-You didn't touch storing-to-qcow2 and migration, which we will have to=20
-implement for
-these bitmap-like objects.
+With that (and optimistic overcommitment in the kernel) I was able to
+start a 24TB guest on a 1TB system.
 
-By exposing low level merge/disable/enable we solve all the problem by=20
-less code and
-without negotiation the architecture. We avoid:
- =C2=A0- implementing new job
- =C2=A0- implementing new objects (checkpoints) and new interface for them
- =C2=A0- saving these new objects to qcow2
- =C2=A0- migration of them
+Signed-off-by: Christian Borntraeger <borntraeger@de.ibm.com>
+---
+ hw/s390x/s390-virtio-ccw.c | 28 +++++++++++++++++++++++++---
+ 1 file changed, 25 insertions(+), 3 deletions(-)
 
-Also, even if we open merge/disable/enable interface, we can implement=20
-checkpoints or slices
-in future, if we will be _sure_ that we need them.
-
-Also, I don't see what is unsafe with implementing this simple low-level=20
-API.
-We already have bitmaps deletion. Is it safe?
-
-
---=20
-Best regards,
-Vladimir
+diff --git a/hw/s390x/s390-virtio-ccw.c b/hw/s390x/s390-virtio-ccw.c
+index 8425534..073f6ed 100644
+--- a/hw/s390x/s390-virtio-ccw.c
++++ b/hw/s390x/s390-virtio-ccw.c
+@@ -154,14 +154,36 @@ static void virtio_ccw_register_hcalls(void)
+                                    virtio_ccw_hcall_early_printk);
+ }
+ 
++/*
++ * KVM does only support memory slots up to KVM_MEM_MAX_NR_PAGES pages
++ * as the dirty bitmap must be managed by bitops that take an int as
++ * position indicator. If we have a guest beyond that we will split off
++ * new subregions. The split must happen on a segment boundary (1MB).
++ */
++#define KVM_MEM_MAX_NR_PAGES ((1UL << 31) - 1)
++#define SEG_MSK (~0xfffffULL)
++#define KVM_SLOT_MAX_BYTES ((KVM_MEM_MAX_NR_PAGES * TARGET_PAGE_SIZE) & SEG_MSK)
+ static void s390_memory_init(ram_addr_t mem_size)
+ {
+     MemoryRegion *sysmem = get_system_memory();
+-    MemoryRegion *ram = g_new(MemoryRegion, 1);
++    ram_addr_t chunk, offset = 0;
++    unsigned int number = 0;
++    gchar *name;
+ 
+     /* allocate RAM for core */
+-    memory_region_allocate_system_memory(ram, NULL, "s390.ram", mem_size);
+-    memory_region_add_subregion(sysmem, 0, ram);
++    name = g_strdup_printf("s390.ram");
++    while (mem_size) {
++        MemoryRegion *ram = g_new(MemoryRegion, 1);
++        /* KVM does not allow memslots >= 8 TB */
++        chunk = MIN(mem_size, KVM_SLOT_MAX_BYTES);
++        memory_region_allocate_system_memory(ram, NULL, name, chunk);
++        memory_region_add_subregion(sysmem, offset, ram);
++        mem_size -= chunk;
++        offset += chunk;
++        g_free(name);
++        name = g_strdup_printf("s390.ram.%u", ++number);
++    }
++    g_free(name);
+ 
+     /* Initialize storage key device */
+     s390_skeys_init();
+-- 
+2.9.4
