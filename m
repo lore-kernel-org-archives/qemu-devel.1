@@ -1,26 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47381)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48115)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1eOPj2-0003Dt-17
-	for qemu-devel@nongnu.org; Mon, 11 Dec 2017 10:10:37 -0500
+	(envelope-from <cohuck@redhat.com>) id 1eOPk7-0003pS-3T
+	for qemu-devel@nongnu.org; Mon, 11 Dec 2017 10:11:44 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1eOPiy-0005GS-8i
-	for qemu-devel@nongnu.org; Mon, 11 Dec 2017 10:10:36 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:39084)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1eOPiy-0005G0-1r
-	for qemu-devel@nongnu.org; Mon, 11 Dec 2017 10:10:32 -0500
-Date: Mon, 11 Dec 2017 15:10:20 +0000
-From: "Daniel P. Berrange" <berrange@redhat.com>
-Message-ID: <20171211151020.GF23622@redhat.com>
-Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
-References: <CANCZdfrJoF=4zbGW+dVC9rnPD0ip+ZxXw0mAO_=r4gxFqW0KKA@mail.gmail.com>
-	<20171211122936.GA2422@work-vm>
-	<CANCZdfovw_fX0wDf5-A4ibmFbK5H1iYEaw=U4Wa1V-9kMz2-aw@mail.gmail.com>
+	(envelope-from <cohuck@redhat.com>) id 1eOPk3-0006Lg-Fv
+	for qemu-devel@nongnu.org; Mon, 11 Dec 2017 10:11:43 -0500
+Date: Mon, 11 Dec 2017 16:11:29 +0100
+From: Cornelia Huck <cohuck@redhat.com>
+Message-ID: <20171211161129.5c0005f3.cohuck@redhat.com>
+In-Reply-To: <585800a9-cab8-a79a-048a-380de5a54f6c@de.ibm.com>
+References: <20171211122146.162430-1-borntraeger@de.ibm.com>
+	<a26d11cb-4ba6-3bd7-2b00-7fc698cc6cd9@redhat.com>
+	<585800a9-cab8-a79a-048a-380de5a54f6c@de.ibm.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <CANCZdfovw_fX0wDf5-A4ibmFbK5H1iYEaw=U4Wa1V-9kMz2-aw@mail.gmail.com>
-Subject: Re: [Qemu-devel] It told me to report this...
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [qemu-s390x] [PATCH v3 1/1] s390-ccw-virtio: allow
+ for systems larger that 7.999TB
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,43 +25,59 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Warner Losh <imp@bsdimp.com>
-Cc: "Dr. David Alan Gilbert" <dgilbert@redhat.com>, kraxel@redhat.com, qemu-devel@nongnu.org
+To: Christian Borntraeger <borntraeger@de.ibm.com>
+Cc: David Hildenbrand <david@redhat.com>, Alexander Graf <agraf@suse.de>, Thomas Huth <thuth@redhat.com>, Halil Pasic <pasic@linux.vnet.ibm.com>, qemu-devel <qemu-devel@nongnu.org>, qemu-s390x <qemu-s390x@nongnu.org>, Richard Henderson <rth@twiddle.net>
 
-On Mon, Dec 11, 2017 at 08:06:47AM -0700, Warner Losh wrote:
-> On Mon, Dec 11, 2017 at 5:29 AM, Dr. David Alan Gilbert <dgilbert@redhat.com
-> > wrote:
+On Mon, 11 Dec 2017 15:04:13 +0100
+Christian Borntraeger <borntraeger@de.ibm.com> wrote:
+
+> On 12/11/2017 02:55 PM, David Hildenbrand wrote:
+> > On 11.12.2017 13:21, Christian Borntraeger wrote:  
+> >> KVM does not allow memory regions > KVM_MEM_MAX_NR_PAGES, basically
+> >> limiting the memory per slot to 8TB-4k. As memory slots on s390/kvm must
+> >> be a multiple of 1MB we need start a new memory region if we cross
+> >> 8TB-1M.
+> >>
+> >> With that (and optimistic overcommitment in the kernel) I was able to
+> >> start a 24TB guest on a 1TB system.
+> >>
+> >> Signed-off-by: Christian Borntraeger <borntraeger@de.ibm.com>
+> >> ---
+> >>  hw/s390x/s390-virtio-ccw.c | 28 +++++++++++++++++++++++++---
+> >>  1 file changed, 25 insertions(+), 3 deletions(-)
+> >>
+> >> diff --git a/hw/s390x/s390-virtio-ccw.c b/hw/s390x/s390-virtio-ccw.c
+> >> index 8425534..073f6ed 100644
+> >> --- a/hw/s390x/s390-virtio-ccw.c
+> >> +++ b/hw/s390x/s390-virtio-ccw.c
+> >> @@ -154,14 +154,36 @@ static void virtio_ccw_register_hcalls(void)
+> >>                                     virtio_ccw_hcall_early_printk);
+> >>  }
+> >>  
+> >> +/*
+> >> + * KVM does only support memory slots up to KVM_MEM_MAX_NR_PAGES pages
+> >> + * as the dirty bitmap must be managed by bitops that take an int as
+> >> + * position indicator. If we have a guest beyond that we will split off
+> >> + * new subregions. The split must happen on a segment boundary (1MB).
+> >> + */
+> >> +#define KVM_MEM_MAX_NR_PAGES ((1UL << 31) - 1)
+> >> +#define SEG_MSK (~0xfffffULL)
+> >> +#define KVM_SLOT_MAX_BYTES ((KVM_MEM_MAX_NR_PAGES * TARGET_PAGE_SIZE) & SEG_MSK)  
+> > 
+> > Just wondering if we could get into trouble when calculating
+> > 
+> > KVM_MEM_MAX_NR_PAGES * TARGET_PAGE_SIZE  
 > 
-> > * Warner Losh (imp@bsdimp.com) wrote:
-> > > unknown keycodes `empty+aliases(qwerty)', please report to
-> > > qemu-devel@nongnu.org
-> > >
-> > > My X server is Mac XQuartz 2.7.11. I saw this question raised several
-> > years
-> > > ago in the archives, with promises of patches, but couldn't find anything
-> > > relevant in the latest tree I grabbed from github (I saw this problem
-> > there
-> > > as well as 2.9.0 installed from FreeBSD ports).
-> > >
-> > > What's my next step here?
-> >
-> > I think that's one of Gerd's messages, so I've added him to the
-> > email and also Daniel since he's got an interest in key mappings.
-> >
-> > Have you any idea if it happened when you pressed a particular key?
-> >
+> maybe just using 1ULL instead of 1UL?
+
+I vote for 1ULL, just to be on the safe side.
+
 > 
-> It's just once, on boot. Pressing keys, though, is an exercise in futility.
-> Nothing maps right at all.
+> 
+> > 
+> > on a host with sizeof(long) == 4
+> > 
+> > could it wrap? (e.g. crazy mingw stuff)
 
-Yep, QEMU tries to detect if Xorg is using evdev, and if not it assumes the
-legacy Linux  "kbd" driver mapping. This is unquestionably wrong for any
-non-Linux  X11 server, so you'll just get complete garbage, as you found
-out.
-
-Regards,
-Daniel
--- 
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
+FWIW, both the 1UL and 1ULL variants compile fine for me both when
+building natively and cross-building with mingw.
