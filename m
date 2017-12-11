@@ -1,26 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59684)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43452)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <chao.gao@intel.com>) id 1eOZWP-0008SS-HO
-	for qemu-devel@nongnu.org; Mon, 11 Dec 2017 20:38:14 -0500
+	(envelope-from <luwei.kang@intel.com>) id 1eOaDP-0000wf-Tk
+	for qemu-devel@nongnu.org; Mon, 11 Dec 2017 21:22:40 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <chao.gao@intel.com>) id 1eOZWL-0004IB-KE
-	for qemu-devel@nongnu.org; Mon, 11 Dec 2017 20:38:13 -0500
-Received: from mga06.intel.com ([134.134.136.31]:28783)
+	(envelope-from <luwei.kang@intel.com>) id 1eOaDL-0001D9-SE
+	for qemu-devel@nongnu.org; Mon, 11 Dec 2017 21:22:39 -0500
+Received: from mga01.intel.com ([192.55.52.88]:2651)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <chao.gao@intel.com>) id 1eOZWL-0004H9-As
-	for qemu-devel@nongnu.org; Mon, 11 Dec 2017 20:38:09 -0500
-Date: Tue, 12 Dec 2017 02:35:16 +0800
-From: Chao Gao <chao.gao@intel.com>
-Message-ID: <20171211183516.GB18476@op-computing>
-References: <1510899865-40323-1-git-send-email-chao.gao@intel.com>
-	<1510899865-40323-4-git-send-email-chao.gao@intel.com>
-	<20171211180748.GD2216@perard.uk.xensource.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20171211180748.GD2216@perard.uk.xensource.com>
-Subject: Re: [Qemu-devel] [PATCH v3 3/3] msi: Handle remappable format
- interrupt request
+	(Exim 4.71) (envelope-from <luwei.kang@intel.com>)
+	id 1eOaDL-0001BK-IZ
+	for qemu-devel@nongnu.org; Mon, 11 Dec 2017 21:22:35 -0500
+From: Luwei Kang <luwei.kang@intel.com>
+Date: Mon, 11 Dec 2017 20:37:53 +0800
+Message-Id: <1512995874-26326-1-git-send-email-luwei.kang@intel.com>
+Subject: [Qemu-devel] [PATCH v1 1/2] i386: Add Intel Processor Trace feature
+ support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,59 +23,103 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Anthony PERARD <anthony.perard@citrix.com>
-Cc: qemu-devel@nongnu.org, xen-devel@lists.xenproject.org, Marcel Apfelbaum <marcel@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, Richard Henderson <rth@twiddle.net>, Paolo Bonzini <pbonzini@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Stefano Stabellini <sstabellini@kernel.org>, Lan Tianyu <tianyu.lan@intel.com>
+To: qemu-devel@nongnu.org, kvm@vger.kernel.org
+Cc: pbonzini@redhat.com, rth@twiddle.net, ehabkost@redhat.com, mtosatti@redhat.com, Chao Peng <chao.p.peng@linux.intel.com>, Luwei Kang <luwei.kang@intel.com>
 
-On Mon, Dec 11, 2017 at 06:07:48PM +0000, Anthony PERARD wrote:
->On Fri, Nov 17, 2017 at 02:24:25PM +0800, Chao Gao wrote:
->> According to VT-d spec Interrupt Remapping and Interrupt Posting ->
->> Interrupt Remapping -> Interrupt Request Formats On Intel 64
->> Platforms, fields of MSI data register have changed. This patch
->> avoids wrongly regarding a remappable format interrupt request as
->> an interrupt binded with a pirq.
->> 
->> Signed-off-by: Chao Gao <chao.gao@intel.com>
->> Signed-off-by: Lan Tianyu <tianyu.lan@intel.com>
->> ---
->> v3:
->>  - clarify the interrupt format bit is Intel-specific, then it is
->>  improper to define MSI_ADDR_IF_MASK in a common header.
->> ---
->>  hw/i386/xen/xen-hvm.c | 10 +++++++++-
->>  hw/pci/msi.c          |  5 +++--
->>  hw/pci/msix.c         |  4 +++-
->>  hw/xen/xen_pt_msi.c   |  2 +-
->>  include/hw/xen/xen.h  |  2 +-
->>  stubs/xen-hvm.c       |  2 +-
->>  6 files changed, 18 insertions(+), 7 deletions(-)
->> 
->> diff --git a/hw/i386/xen/xen-hvm.c b/hw/i386/xen/xen-hvm.c
->> index 8028bed..52dc8af 100644
->> --- a/hw/i386/xen/xen-hvm.c
->> +++ b/hw/i386/xen/xen-hvm.c
->> @@ -145,8 +145,16 @@ void xen_piix_pci_write_config_client(uint32_t address, uint32_t val, int len)
->>      }
->>  }
->>  
->> -int xen_is_pirq_msi(uint32_t msi_data)
->> +int xen_is_pirq_msi(uint32_t msi_addr_lo, uint32_t msi_data)
->>  {
->> +    /* If the MSI address is configured in remapping format, the MSI will not
->> +     * be remapped into a pirq. This 'if' test excludes Intel-specific
->> +     * remappable msi.
->> +     */
->> +#define MSI_ADDR_IF_MASK 0x00000010
->
->I don't think that is the right place for a define, they also exist
->outside of the context of the function.
+From: Chao Peng <chao.p.peng@linux.intel.com>
 
-yes.
+Expose Intel Processor Trace feature to guest.
 
->That define would be better at the top of this file, I think.(There is
+Signed-off-by: Chao Peng <chao.p.peng@linux.intel.com>
+Signed-off-by: Luwei Kang <luwei.kang@intel.com>
+---
+ target/i386/cpu.c | 19 ++++++++++++++++++-
+ target/i386/cpu.h |  1 +
+ target/i386/kvm.c | 23 +++++++++++++++++++++++
+ 3 files changed, 42 insertions(+), 1 deletion(-)
 
-will do.
-
-Thanks
-Chao
-
->probably a better place in the common headers, but I'm not sure were.)
+diff --git a/target/i386/cpu.c b/target/i386/cpu.c
+index 045d661..1d34a6f 100644
+--- a/target/i386/cpu.c
++++ b/target/i386/cpu.c
+@@ -426,7 +426,7 @@ static FeatureWordInfo feature_word_info[FEATURE_WORDS] = {
+             NULL, NULL, "mpx", NULL,
+             "avx512f", "avx512dq", "rdseed", "adx",
+             "smap", "avx512ifma", "pcommit", "clflushopt",
+-            "clwb", NULL, "avx512pf", "avx512er",
++            "clwb", "intel-pt", "avx512pf", "avx512er",
+             "avx512cd", "sha-ni", "avx512bw", "avx512vl",
+         },
+         .cpuid_eax = 7,
+@@ -2973,6 +2973,23 @@ void cpu_x86_cpuid(CPUX86State *env, uint32_t index, uint32_t count,
+         }
+         break;
+     }
++    case 0x14: {
++        if ((env->features[FEAT_7_0_EBX] & CPUID_7_0_EBX_INTEL_PT) &&
++             kvm_enabled()) {
++            KVMState *s = cs->kvm_state;
++
++            *eax = kvm_arch_get_supported_cpuid(s, 0x14, count, R_EAX);
++            *ebx = kvm_arch_get_supported_cpuid(s, 0x14, count, R_EBX);
++            *ecx = kvm_arch_get_supported_cpuid(s, 0x14, count, R_ECX);
++            *edx = kvm_arch_get_supported_cpuid(s, 0x14, count, R_EDX);
++        } else {
++            *eax = 0;
++            *ebx = 0;
++            *ecx = 0;
++            *edx = 0;
++        }
++        break;
++    }
+     case 0x40000000:
+         /*
+          * CPUID code in kvm_arch_init_vcpu() ignores stuff
+diff --git a/target/i386/cpu.h b/target/i386/cpu.h
+index b086b15..4bdb7c6 100644
+--- a/target/i386/cpu.h
++++ b/target/i386/cpu.h
+@@ -624,6 +624,7 @@ typedef uint32_t FeatureWordArray[FEATURE_WORDS];
+ #define CPUID_7_0_EBX_PCOMMIT  (1U << 22) /* Persistent Commit */
+ #define CPUID_7_0_EBX_CLFLUSHOPT (1U << 23) /* Flush a Cache Line Optimized */
+ #define CPUID_7_0_EBX_CLWB     (1U << 24) /* Cache Line Write Back */
++#define CPUID_7_0_EBX_INTEL_PT (1U << 25) /* Intel Processor Trace */
+ #define CPUID_7_0_EBX_AVX512PF (1U << 26) /* AVX-512 Prefetch */
+ #define CPUID_7_0_EBX_AVX512ER (1U << 27) /* AVX-512 Exponential and Reciprocal */
+ #define CPUID_7_0_EBX_AVX512CD (1U << 28) /* AVX-512 Conflict Detection */
+diff --git a/target/i386/kvm.c b/target/i386/kvm.c
+index b1e32e9..31d20c8 100644
+--- a/target/i386/kvm.c
++++ b/target/i386/kvm.c
+@@ -869,6 +869,29 @@ int kvm_arch_init_vcpu(CPUState *cs)
+                 c = &cpuid_data.entries[cpuid_i++];
+             }
+             break;
++        case 0x14: {
++            uint32_t times;
++
++            c->function = i;
++            c->index = 0;
++            c->flags = KVM_CPUID_FLAG_SIGNIFCANT_INDEX;
++            cpu_x86_cpuid(env, i, 0, &c->eax, &c->ebx, &c->ecx, &c->edx);
++            times = c->eax;
++
++            for (j = 1; j <= times; ++j) {
++                if (cpuid_i == KVM_MAX_CPUID_ENTRIES) {
++                    fprintf(stderr, "cpuid_data is full, no space for "
++                                "cpuid(eax:0x14,ecx:0x%x)\n", j);
++                    abort();
++                }
++                c = &cpuid_data.entries[cpuid_i++];
++                c->function = i;
++                c->index = j;
++                c->flags = KVM_CPUID_FLAG_SIGNIFCANT_INDEX;
++                cpu_x86_cpuid(env, i, j, &c->eax, &c->ebx, &c->ecx, &c->edx);
++            }
++            break;
++        }
+         default:
+             c->function = i;
+             c->flags = 0;
+-- 
+1.8.3.1
