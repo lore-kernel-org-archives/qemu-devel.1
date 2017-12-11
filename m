@@ -1,23 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33695)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33749)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mikhail.abakumov@ispras.ru>) id 1eOO2d-0001DP-33
-	for qemu-devel@nongnu.org; Mon, 11 Dec 2017 08:22:44 -0500
+	(envelope-from <mikhail.abakumov@ispras.ru>) id 1eOO2i-0001Kb-H9
+	for qemu-devel@nongnu.org; Mon, 11 Dec 2017 08:22:49 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mikhail.abakumov@ispras.ru>) id 1eOO2c-0002EU-1T
-	for qemu-devel@nongnu.org; Mon, 11 Dec 2017 08:22:43 -0500
-Received: from mail.ispras.ru ([83.149.199.45]:43496)
+	(envelope-from <mikhail.abakumov@ispras.ru>) id 1eOO2h-0002JA-Ix
+	for qemu-devel@nongnu.org; Mon, 11 Dec 2017 08:22:48 -0500
+Received: from mail.ispras.ru ([83.149.199.45]:43518)
 	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mikhail.abakumov@ispras.ru>) id 1eOO2b-0002E7-LD
-	for qemu-devel@nongnu.org; Mon, 11 Dec 2017 08:22:41 -0500
+	(envelope-from <mikhail.abakumov@ispras.ru>) id 1eOO2h-0002In-AX
+	for qemu-devel@nongnu.org; Mon, 11 Dec 2017 08:22:47 -0500
 From: Mihail Abakumov <mikhail.abakumov@ispras.ru>
-Date: Mon, 11 Dec 2017 16:22:26 +0300
-Message-ID: <151299854627.4808.8985926737545500633.stgit@Misha-PC.lan02.inno>
+Date: Mon, 11 Dec 2017 16:22:32 +0300
+Message-ID: <151299855187.4808.1228328917340899630.stgit@Misha-PC.lan02.inno>
 In-Reply-To: <151299847127.4808.14646046517426494416.stgit@Misha-PC.lan02.inno>
 References: <151299847127.4808.14646046517426494416.stgit@Misha-PC.lan02.inno>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Subject: [Qemu-devel] [PATCH v4 12/46] windbg: send data and control packets
+Subject: [Qemu-devel] [PATCH v4 13/46] windbg: handler of parsing context
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,79 +29,75 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: sw@weilnetz.de, lprosek@redhat.com, dovgaluk@ispras.ru, rkagan@virtuozzo.com, pbonzini@redhat.com, den@openvz.org
 
-Added functions for send data and control packets to windbg.
+Implemented handler of parsing context.
 
 Signed-off-by: Mihail Abakumov <mikhail.abakumov@ispras.ru>
 Signed-off-by: Pavel Dovgalyuk <dovgaluk@ispras.ru>
 Signed-off-by: Dmitriy Koltunov <koltunov@ispras.ru>
 ---
- windbgstub.c |   56 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 56 insertions(+)
+ windbgstub.c |   36 ++++++++++++++++++++++++++++++++++--
+ 1 file changed, 34 insertions(+), 2 deletions(-)
 
 diff --git a/windbgstub.c b/windbgstub.c
-index ace992e2cb..8c33e0de0a 100755
+index 8c33e0de0a..b71449e369 100755
 --- a/windbgstub.c
 +++ b/windbgstub.c
-@@ -60,6 +60,62 @@ typedef struct WindbgState {
+@@ -11,6 +11,7 @@
  
- static WindbgState *windbg_state;
+ #include "qemu/osdep.h"
+ #include "qapi/error.h"
++#include "sysemu/sysemu.h"
+ #include "chardev/char.h"
+ #include "chardev/char-fe.h"
+ #include "qemu/cutils.h"
+@@ -97,7 +98,6 @@ static void windbg_send_data_packet(uint8_t *data, uint16_t byte_count,
+     windbg_state->data_packet_id ^= 1;
+ }
  
-+static uint32_t compute_checksum(uint8_t *data, uint16_t len)
-+{
-+    uint32_t checksum = 0;
-+    while (len) {
-+        --len;
-+        checksum += *data++;
-+    }
-+    return checksum;
-+}
-+
-+__attribute__ ((unused)) /* unused yet */
-+static void windbg_send_data_packet(uint8_t *data, uint16_t byte_count,
-+                                    uint16_t type)
-+{
-+    uint8_t trailing_byte = PACKET_TRAILING_BYTE;
-+
-+    KD_PACKET packet = {
-+        .PacketLeader = PACKET_LEADER,
-+        .PacketType = type,
-+        .ByteCount = byte_count,
-+        .PacketId = windbg_state->data_packet_id,
-+        .Checksum = compute_checksum(data, byte_count)
-+    };
-+
-+    stw_p(&packet.PacketType, packet.PacketType);
-+    stw_p(&packet.ByteCount, packet.ByteCount);
-+    stl_p(&packet.PacketId, packet.PacketId);
-+    stl_p(&packet.Checksum, packet.Checksum);
-+
-+    qemu_chr_fe_write(&windbg_state->chr, PTR(packet), sizeof(packet));
-+    qemu_chr_fe_write(&windbg_state->chr, data, byte_count);
-+    qemu_chr_fe_write(&windbg_state->chr, &trailing_byte,
-+                      sizeof(trailing_byte));
-+
-+    windbg_state->data_packet_id ^= 1;
-+}
-+
-+__attribute__ ((unused)) /* unused yet */
-+static void windbg_send_control_packet(uint16_t type)
-+{
-+    KD_PACKET packet = {
-+        .PacketLeader = CONTROL_PACKET_LEADER,
-+        .PacketType = type,
-+        .ByteCount = 0,
-+        .PacketId = windbg_state->ctrl_packet_id,
-+        .Checksum = 0
-+    };
-+
-+    stw_p(&packet.PacketType, packet.PacketType);
-+    stl_p(&packet.PacketId, packet.PacketId);
-+
-+    qemu_chr_fe_write(&windbg_state->chr, PTR(packet), sizeof(packet));
-+
-+    windbg_state->ctrl_packet_id ^= 1;
-+}
-+
- static void windbg_ctx_handler(ParsingContext *ctx)
+-__attribute__ ((unused)) /* unused yet */
+ static void windbg_send_control_packet(uint16_t type)
+ {
+     KD_PACKET packet = {
+@@ -116,9 +116,41 @@ static void windbg_send_control_packet(uint16_t type)
+     windbg_state->ctrl_packet_id ^= 1;
+ }
+ 
+-static void windbg_ctx_handler(ParsingContext *ctx)
++static void windbg_process_data_packet(ParsingContext *ctx)
  {}
  
++static void windbg_process_control_packet(ParsingContext *ctx)
++{}
++
++static void windbg_ctx_handler(ParsingContext *ctx)
++{
++    switch (ctx->result) {
++    case RESULT_NONE:
++        break;
++
++    case RESULT_BREAKIN_BYTE:
++        vm_stop(RUN_STATE_PAUSED);
++        break;
++
++    case RESULT_CONTROL_PACKET:
++        windbg_process_control_packet(ctx);
++        break;
++
++    case RESULT_DATA_PACKET:
++        windbg_process_data_packet(ctx);
++        break;
++
++    case RESULT_UNKNOWN_PACKET:
++    case RESULT_ERROR:
++        windbg_state->ctrl_packet_id = 0;
++        windbg_send_control_packet(PACKET_TYPE_KD_RESEND);
++        break;
++
++    default:
++        break;
++    }
++}
++
+ static void windbg_read_byte(ParsingContext *ctx, uint8_t byte)
+ {
+     switch (ctx->state) {
