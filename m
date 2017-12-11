@@ -1,26 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51667)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51644)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1eONe9-0002UQ-F1
-	for qemu-devel@nongnu.org; Mon, 11 Dec 2017 07:57:26 -0500
-Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1eONe8-0007ol-6T
+	(envelope-from <alex.bennee@linaro.org>) id 1eONe8-0002So-3i
 	for qemu-devel@nongnu.org; Mon, 11 Dec 2017 07:57:25 -0500
-Received: from mail-wr0-x244.google.com ([2a00:1450:400c:c0c::244]:41737)
+Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
+	(envelope-from <alex.bennee@linaro.org>) id 1eONe7-0007nb-1y
+	for qemu-devel@nongnu.org; Mon, 11 Dec 2017 07:57:24 -0500
+Received: from mail-wm0-x243.google.com ([2a00:1450:400c:c09::243]:46918)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1eONe7-0007o1-Tb
-	for qemu-devel@nongnu.org; Mon, 11 Dec 2017 07:57:24 -0500
-Received: by mail-wr0-x244.google.com with SMTP id z18so17479337wrb.8
-	for <qemu-devel@nongnu.org>; Mon, 11 Dec 2017 04:57:23 -0800 (PST)
+	id 1eONe6-0007mV-Oj
+	for qemu-devel@nongnu.org; Mon, 11 Dec 2017 07:57:22 -0500
+Received: by mail-wm0-x243.google.com with SMTP id r78so14298667wme.5
+	for <qemu-devel@nongnu.org>; Mon, 11 Dec 2017 04:57:22 -0800 (PST)
 From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
-Date: Mon, 11 Dec 2017 12:57:05 +0000
-Message-Id: <20171211125705.16120-20-alex.bennee@linaro.org>
+Date: Mon, 11 Dec 2017 12:57:03 +0000
+Message-Id: <20171211125705.16120-18-alex.bennee@linaro.org>
 In-Reply-To: <20171211125705.16120-1-alex.bennee@linaro.org>
 References: <20171211125705.16120-1-alex.bennee@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v1 19/19] fpu/softfloat: re-factor compare
+Subject: [Qemu-devel] [PATCH v1 17/19] fpu/softfloat: re-factor scalbn
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,175 +32,146 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: richard.henderson@linaro.org, peter.maydell@linaro.org, laurent@vivier.eu, bharata@linux.vnet.ibm.com, andrew@andrewdutcher.com, aleksandar.markovic@imgtec.com
 Cc: qemu-devel@nongnu.org, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, Aurelien Jarno <aurelien@aurel32.net>
 
+This is one of the simpler manipulations you could make to a floating
+point number.
+
 Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
 ---
- fpu/softfloat.c         | 135 +++++++++++++++++++++++++++++-------------------
- include/fpu/softfloat.h |   2 +
- 2 files changed, 83 insertions(+), 54 deletions(-)
+ fpu/softfloat.c         | 104 +++++++++++++++---------------------------------
+ include/fpu/softfloat.h |   1 +
+ 2 files changed, 32 insertions(+), 73 deletions(-)
 
 diff --git a/fpu/softfloat.c b/fpu/softfloat.c
-index 5eba996932..31b437e000 100644
+index 1a7f1cab10..b7ea56dfa5 100644
 --- a/fpu/softfloat.c
 +++ b/fpu/softfloat.c
-@@ -1793,6 +1793,87 @@ MINMAX(64, maxnummag, false, true, true)
- 
- #undef MINMAX
- 
-+/* Floating point compare */
-+static int compare_decomposed(decomposed_parts a, decomposed_parts b,
-+                              bool is_quiet, float_status *s)
-+{
-+    if (a.cls >= float_class_qnan
-+        ||
-+        b.cls >= float_class_qnan) {
-+        if (!is_quiet ||
-+            a.cls == float_class_snan ||
-+            b.cls == float_class_snan) {
-+            s->float_exception_flags |= float_flag_invalid;
-+        }
-+        return float_relation_unordered;
-+    }
-+
-+    if (a.cls == float_class_zero || b.cls == float_class_zero) {
-+        if (a.cls == float_class_normal) {
-+            return a.sign ? float_relation_less : float_relation_greater;
-+        } else if (b.cls == float_class_normal) {
-+            return b.sign ? float_relation_greater : float_relation_less;
-+        } else if (a.cls == b.cls) {
-+            return float_relation_equal;
-+        }
-+    }
-+
-+    /* The only infinity we need to explicitly worry about is
-+     * comparing two together, otherwise the max_exp/sign details are
-+     * enough to compare to normal numbers
-+     */
-+    if (a.cls == float_class_inf && b.cls == float_class_inf) {
-+        if (a.sign != b.sign) {
-+            return a.sign ? float_relation_less : float_relation_greater;
-+        } else {
-+            return float_relation_equal;
-+        }
-+    }
-+
-+    if (a.sign != b.sign) {
-+        return a.sign ? float_relation_less : float_relation_greater;
-+    }
-+
-+    if (a.exp == b.exp) {
-+        if (a.frac == b.frac) {
-+            return float_relation_equal;
-+        }
-+        if (a.sign) {
-+            return a.frac > b.frac ?
-+                float_relation_less : float_relation_greater;
-+        } else {
-+            return a.frac > b.frac ?
-+                float_relation_greater : float_relation_less;
-+        }
-+    } else {
-+        if (a.sign) {
-+            return a.exp > b.exp ? float_relation_less : float_relation_greater;
-+        } else {
-+            return a.exp > b.exp ? float_relation_greater : float_relation_less;
-+        }
-+    }
-+}
-+
-+#define COMPARE(sz)                                                     \
-+int float ## sz ## _compare(float ## sz a, float ## sz b, float_status *s) \
-+{                                                                       \
-+    decomposed_parts pa = float ## sz ## _unpack_canonical(a, s);       \
-+    decomposed_parts pb = float ## sz ## _unpack_canonical(b, s);       \
-+    return compare_decomposed(pa, pb, false, s);                        \
-+}                                                                       \
-+int float ## sz ## _compare_quiet(float ## sz a, float ## sz b, float_status *s) \
-+{                                                                       \
-+    decomposed_parts pa = float ## sz ## _unpack_canonical(a, s);       \
-+    decomposed_parts pb = float ## sz ## _unpack_canonical(b, s);       \
-+    return compare_decomposed(pa, pb, true, s);                         \
-+}
-+
-+COMPARE(16)
-+COMPARE(32)
-+COMPARE(64)
-+
-+#undef COMPARE
-+
- /* Multiply A by 2 raised to the power N.  */
- static decomposed_parts scalbn_decomposed(decomposed_parts a, int n,
-                                           float_status *s)
-@@ -6894,60 +6975,6 @@ int float128_unordered_quiet(float128 a, float128 b, float_status *status)
-     return 0;
+@@ -1662,6 +1662,37 @@ float64 uint16_to_float64(uint16_t a, float_status *status)
+     return uint64_to_float64((uint64_t) a, status);
  }
  
--#define COMPARE(s, nan_exp)                                                  \
--static inline int float ## s ## _compare_internal(float ## s a, float ## s b,\
--                                      int is_quiet, float_status *status)    \
--{                                                                            \
--    flag aSign, bSign;                                                       \
--    uint ## s ## _t av, bv;                                                  \
--    a = float ## s ## _squash_input_denormal(a, status);                     \
--    b = float ## s ## _squash_input_denormal(b, status);                     \
--                                                                             \
--    if (( ( extractFloat ## s ## Exp( a ) == nan_exp ) &&                    \
--         extractFloat ## s ## Frac( a ) ) ||                                 \
--        ( ( extractFloat ## s ## Exp( b ) == nan_exp ) &&                    \
--          extractFloat ## s ## Frac( b ) )) {                                \
--        if (!is_quiet ||                                                     \
--            float ## s ## _is_signaling_nan(a, status) ||                  \
--            float ## s ## _is_signaling_nan(b, status)) {                 \
--            float_raise(float_flag_invalid, status);                         \
--        }                                                                    \
--        return float_relation_unordered;                                     \
--    }                                                                        \
--    aSign = extractFloat ## s ## Sign( a );                                  \
--    bSign = extractFloat ## s ## Sign( b );                                  \
--    av = float ## s ## _val(a);                                              \
--    bv = float ## s ## _val(b);                                              \
--    if ( aSign != bSign ) {                                                  \
--        if ( (uint ## s ## _t) ( ( av | bv )<<1 ) == 0 ) {                   \
--            /* zero case */                                                  \
--            return float_relation_equal;                                     \
--        } else {                                                             \
--            return 1 - (2 * aSign);                                          \
--        }                                                                    \
--    } else {                                                                 \
--        if (av == bv) {                                                      \
--            return float_relation_equal;                                     \
--        } else {                                                             \
--            return 1 - 2 * (aSign ^ ( av < bv ));                            \
--        }                                                                    \
--    }                                                                        \
--}                                                                            \
--                                                                             \
--int float ## s ## _compare(float ## s a, float ## s b, float_status *status) \
--{                                                                            \
--    return float ## s ## _compare_internal(a, b, 0, status);                 \
--}                                                                            \
--                                                                             \
--int float ## s ## _compare_quiet(float ## s a, float ## s b,                 \
--                                 float_status *status)                       \
--{                                                                            \
--    return float ## s ## _compare_internal(a, b, 1, status);                 \
++/* Multiply A by 2 raised to the power N.  */
++static decomposed_parts scalbn_decomposed(decomposed_parts a, int n,
++                                          float_status *s)
++{
++    if (a.cls == float_class_normal) {
++        a.exp += n;
++    }
++    return a;
++}
++
++float16 float16_scalbn(float16 a, int n, float_status *status)
++{
++    decomposed_parts pa = float16_unpack_canonical(a, status);
++    decomposed_parts pr = scalbn_decomposed(pa, n, status);
++    return float16_round_pack_canonical(pr, status);
++}
++
++float32 float32_scalbn(float32 a, int n, float_status *status)
++{
++    decomposed_parts pa = float32_unpack_canonical(a, status);
++    decomposed_parts pr = scalbn_decomposed(pa, n, status);
++    return float32_round_pack_canonical(pr, status);
++}
++
++float64 float64_scalbn(float64 a, int n, float_status *status)
++{
++    decomposed_parts pa = float64_unpack_canonical(a, status);
++    decomposed_parts pr = scalbn_decomposed(pa, n, status);
++    return float64_round_pack_canonical(pr, status);
++}
++
+ /*----------------------------------------------------------------------------
+ | Takes a 64-bit fixed-point value `absZ' with binary point between bits 6
+ | and 7, and returns the properly rounded 32-bit integer corresponding to the
+@@ -6991,79 +7022,6 @@ MINMAX(32)
+ MINMAX(64)
+ 
+ 
+-/* Multiply A by 2 raised to the power N.  */
+-float32 float32_scalbn(float32 a, int n, float_status *status)
+-{
+-    flag aSign;
+-    int16_t aExp;
+-    uint32_t aSig;
+-
+-    a = float32_squash_input_denormal(a, status);
+-    aSig = extractFloat32Frac( a );
+-    aExp = extractFloat32Exp( a );
+-    aSign = extractFloat32Sign( a );
+-
+-    if ( aExp == 0xFF ) {
+-        if ( aSig ) {
+-            return propagateFloat32NaN(a, a, status);
+-        }
+-        return a;
+-    }
+-    if (aExp != 0) {
+-        aSig |= 0x00800000;
+-    } else if (aSig == 0) {
+-        return a;
+-    } else {
+-        aExp++;
+-    }
+-
+-    if (n > 0x200) {
+-        n = 0x200;
+-    } else if (n < -0x200) {
+-        n = -0x200;
+-    }
+-
+-    aExp += n - 1;
+-    aSig <<= 7;
+-    return normalizeRoundAndPackFloat32(aSign, aExp, aSig, status);
 -}
 -
--COMPARE(32, 0xff)
--COMPARE(64, 0x7ff)
+-float64 float64_scalbn(float64 a, int n, float_status *status)
+-{
+-    flag aSign;
+-    int16_t aExp;
+-    uint64_t aSig;
 -
- static inline int floatx80_compare_internal(floatx80 a, floatx80 b,
-                                             int is_quiet, float_status *status)
+-    a = float64_squash_input_denormal(a, status);
+-    aSig = extractFloat64Frac( a );
+-    aExp = extractFloat64Exp( a );
+-    aSign = extractFloat64Sign( a );
+-
+-    if ( aExp == 0x7FF ) {
+-        if ( aSig ) {
+-            return propagateFloat64NaN(a, a, status);
+-        }
+-        return a;
+-    }
+-    if (aExp != 0) {
+-        aSig |= LIT64( 0x0010000000000000 );
+-    } else if (aSig == 0) {
+-        return a;
+-    } else {
+-        aExp++;
+-    }
+-
+-    if (n > 0x1000) {
+-        n = 0x1000;
+-    } else if (n < -0x1000) {
+-        n = -0x1000;
+-    }
+-
+-    aExp += n - 1;
+-    aSig <<= 10;
+-    return normalizeRoundAndPackFloat64(aSign, aExp, aSig, status);
+-}
+-
+ floatx80 floatx80_scalbn(floatx80 a, int n, float_status *status)
  {
+     flag aSign;
 diff --git a/include/fpu/softfloat.h b/include/fpu/softfloat.h
-index ba248ffa39..a5232bcc87 100644
+index 8ebde83251..c1224aab8c 100644
 --- a/include/fpu/softfloat.h
 +++ b/include/fpu/softfloat.h
-@@ -360,6 +360,8 @@ float16 float16_minnum(float16, float16, float_status *status);
- float16 float16_maxnum(float16, float16, float_status *status);
- float16 float16_minnummag(float16, float16, float_status *status);
- float16 float16_maxnummag(float16, float16, float_status *status);
-+int float16_compare(float16, float16, float_status *status);
-+int float16_compare_quiet(float16, float16, float_status *status);
+@@ -353,6 +353,7 @@ float16 float16_sub(float16, float16, float_status *status);
+ float16 float16_mul(float16, float16, float_status *status);
+ float16 float16_muladd(float16, float16, float16, int, float_status *status);
+ float16 float16_div(float16, float16, float_status *status);
++float16 float16_scalbn(float16, int, float_status *status);
  
  int float16_is_quiet_nan(float16, float_status *status);
  int float16_is_signaling_nan(float16, float_status *status);
