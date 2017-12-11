@@ -1,42 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46525)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46580)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pasic@linux.vnet.ibm.com>) id 1eOOYd-0004c4-Df
-	for qemu-devel@nongnu.org; Mon, 11 Dec 2017 08:55:48 -0500
+	(envelope-from <david@redhat.com>) id 1eOOYj-0004hR-Ia
+	for qemu-devel@nongnu.org; Mon, 11 Dec 2017 08:55:54 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pasic@linux.vnet.ibm.com>) id 1eOOYZ-0005bX-Ey
-	for qemu-devel@nongnu.org; Mon, 11 Dec 2017 08:55:47 -0500
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:41644)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pasic@linux.vnet.ibm.com>)
-	id 1eOOYZ-0004lb-5P
-	for qemu-devel@nongnu.org; Mon, 11 Dec 2017 08:55:43 -0500
-Received: from pps.filterd (m0098393.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
-	vBBDosMA010457
-	for <qemu-devel@nongnu.org>; Mon, 11 Dec 2017 08:54:38 -0500
-Received: from e06smtp14.uk.ibm.com (e06smtp14.uk.ibm.com [195.75.94.110])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2est05c36u-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Mon, 11 Dec 2017 08:54:37 -0500
-Received: from localhost
-	by e06smtp14.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
-	Only! Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <pasic@linux.vnet.ibm.com>;
-	Mon, 11 Dec 2017 13:54:32 -0000
-References: <1512545840-10256-1-git-send-email-longpeng2@huawei.com>
-	<1512545840-10256-2-git-send-email-longpeng2@huawei.com>
-	<0209e49f-3d81-cbc9-eb07-13654a288a22@linux.vnet.ibm.com>
-	<5A2E8067.4050000@huawei.com>
-From: Halil Pasic <pasic@linux.vnet.ibm.com>
-Date: Mon, 11 Dec 2017 14:54:25 +0100
+	(envelope-from <david@redhat.com>) id 1eOOYd-0005fp-S9
+	for qemu-devel@nongnu.org; Mon, 11 Dec 2017 08:55:53 -0500
+References: <20171211122146.162430-1-borntraeger@de.ibm.com>
+From: David Hildenbrand <david@redhat.com>
+Message-ID: <a26d11cb-4ba6-3bd7-2b00-7fc698cc6cd9@redhat.com>
+Date: Mon, 11 Dec 2017 14:55:44 +0100
 MIME-Version: 1.0
-In-Reply-To: <5A2E8067.4050000@huawei.com>
+In-Reply-To: <20171211122146.162430-1-borntraeger@de.ibm.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Message-Id: <2b7048c1-e2f8-ab40-c4df-afe5efd8f95d@linux.vnet.ibm.com>
-Subject: Re: [Qemu-devel] [v22 1/2] virtio-crypto: Add virtio crypto device
- specification
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [qemu-s390x] [PATCH v3 1/1] s390-ccw-virtio: allow
+ for systems larger that 7.999TB
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -45,52 +24,90 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Longpeng (Mike)" <longpeng2@huawei.com>
-Cc: qemu-devel@nongnu.org, virtio-dev@lists.oasis-open.org, luonengjun@huawei.com, mst@redhat.com, cornelia.huck@de.ibm.com, stefanha@redhat.com, denglingli@chinamobile.com, Jani.Kokkonen@huawei.com, Ola.Liljedahl@arm.com, Varun.Sethi@freescale.com, xin.zeng@intel.com, brian.a.keating@intel.com, liang.j.ma@intel.com, john.griffin@intel.com, weidong.huang@huawei.com, agraf@suse.de, jasowang@redhat.com, vincent.jardin@6wind.com, arei.gonglei@huawei.com, wangxinxin.wang@huawei.com, jianjay.zhou@huawei.com
+To: Christian Borntraeger <borntraeger@de.ibm.com>, Cornelia Huck <cohuck@redhat.com>
+Cc: Alexander Graf <agraf@suse.de>, Thomas Huth <thuth@redhat.com>, Halil Pasic <pasic@linux.vnet.ibm.com>, qemu-devel <qemu-devel@nongnu.org>, qemu-s390x <qemu-s390x@nongnu.org>, Richard Henderson <rth@twiddle.net>
+
+On 11.12.2017 13:21, Christian Borntraeger wrote:
+> KVM does not allow memory regions > KVM_MEM_MAX_NR_PAGES, basically
+> limiting the memory per slot to 8TB-4k. As memory slots on s390/kvm mus=
+t
+> be a multiple of 1MB we need start a new memory region if we cross
+> 8TB-1M.
+>=20
+> With that (and optimistic overcommitment in the kernel) I was able to
+> start a 24TB guest on a 1TB system.
+>=20
+> Signed-off-by: Christian Borntraeger <borntraeger@de.ibm.com>
+> ---
+>  hw/s390x/s390-virtio-ccw.c | 28 +++++++++++++++++++++++++---
+>  1 file changed, 25 insertions(+), 3 deletions(-)
+>=20
+> diff --git a/hw/s390x/s390-virtio-ccw.c b/hw/s390x/s390-virtio-ccw.c
+> index 8425534..073f6ed 100644
+> --- a/hw/s390x/s390-virtio-ccw.c
+> +++ b/hw/s390x/s390-virtio-ccw.c
+> @@ -154,14 +154,36 @@ static void virtio_ccw_register_hcalls(void)
+>                                     virtio_ccw_hcall_early_printk);
+>  }
+> =20
+> +/*
+> + * KVM does only support memory slots up to KVM_MEM_MAX_NR_PAGES pages
+> + * as the dirty bitmap must be managed by bitops that take an int as
+> + * position indicator. If we have a guest beyond that we will split of=
+f
+> + * new subregions. The split must happen on a segment boundary (1MB).
+> + */
+> +#define KVM_MEM_MAX_NR_PAGES ((1UL << 31) - 1)
+> +#define SEG_MSK (~0xfffffULL)
+> +#define KVM_SLOT_MAX_BYTES ((KVM_MEM_MAX_NR_PAGES * TARGET_PAGE_SIZE) =
+& SEG_MSK)
+
+Just wondering if we could get into trouble when calculating
+
+KVM_MEM_MAX_NR_PAGES * TARGET_PAGE_SIZE
+
+on a host with sizeof(long) =3D=3D 4
+
+could it wrap? (e.g. crazy mingw stuff)
+
+>  static void s390_memory_init(ram_addr_t mem_size)
+>  {
+>      MemoryRegion *sysmem =3D get_system_memory();
+> -    MemoryRegion *ram =3D g_new(MemoryRegion, 1);
+> +    ram_addr_t chunk, offset =3D 0;
+> +    unsigned int number =3D 0;
+> +    gchar *name;
+> =20
+>      /* allocate RAM for core */
+> -    memory_region_allocate_system_memory(ram, NULL, "s390.ram", mem_si=
+ze);
+> -    memory_region_add_subregion(sysmem, 0, ram);
+> +    name =3D g_strdup_printf("s390.ram");
+> +    while (mem_size) {
+> +        MemoryRegion *ram =3D g_new(MemoryRegion, 1);
+
+I'd add an empty line here.
+
+Reviewed-by: David Hildenbrand <david@redhat.com>
+
+> +        /* KVM does not allow memslots >=3D 8 TB */
+> +        chunk =3D MIN(mem_size, KVM_SLOT_MAX_BYTES);
+> +        memory_region_allocate_system_memory(ram, NULL, name, chunk);
+> +        memory_region_add_subregion(sysmem, offset, ram);
+> +        mem_size -=3D chunk;
+> +        offset +=3D chunk;
+> +        g_free(name);
+> +        name =3D g_strdup_printf("s390.ram.%u", ++number);
+> +    }
+> +    g_free(name);
+> =20
+>      /* Initialize storage key device */
+>      s390_skeys_init();
+>=20
 
 
+--=20
 
-On 12/11/2017 01:56 PM, Longpeng (Mike) wrote:
-> 
-> 
-> On 2017/12/6 19:01, Halil Pasic wrote:
-> 
->>
->>
->> On 12/06/2017 08:37 AM, Longpeng(Mike) wrote:
->>> +\field{outcome_len} is the size of struct virtio_crypto_session_input or
->>> +ZERO for the session-destroy operation.
->>
->> This ain't correct. It should have been something like virtio_crypto_destroy_session_input.
->>
-> 
-> Hi Halil,
-> 
-> I already fixed this just now.
-> Do you have any other comments on v22 ? I'll send v23 tomorrow if no. :)
-> 
+Thanks,
 
-Did not read the rest of the document. I'm not in the middle of something,
-but I wanted to read the operation part these days. I guess, you prefer
-sending out v23 over waiting, so I guess I will wait for v23 then.
-
-Some general questions/remarks before you spin v23:
-
-* I'm not convinced about this 'header' and 'extra parameters' terminology.
-Please see https://en.wikipedia.org/wiki/Header_(computing) for header.
-I don't think it's fitting for the _flf structs. 
-Same about the 'extra'. Please see  https://www.merriam-webster.com/dictionary/extra
-(a : more than is due, usual, or necessary : additional) the things in
-_vlf aren't extra at all. Do you intend to stick with is terminology?
-If yes why? Please explain how should I read/understand it so that it makes
-sense!
-
-* Do we want/need to specify any alignment requirement for the
-stuff in guest storage (for instance the _flf fields) or be explicit
-about no alignment should be assumed (e.g virtio_crypto_mac_create_session_flf.algo
-ain't necessarily aligned (in guest memory) as required by uint32_t)?
-
-* I assume one request is supposed to correspond to one descriptor chain.
-Right? If yes, could you tell me, where is this expressed in the spec.
-
-Halil
+David / dhildenb
