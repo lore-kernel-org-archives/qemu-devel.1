@@ -1,26 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42111)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45763)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1eOQRO-0003tp-V4
-	for qemu-devel@nongnu.org; Mon, 11 Dec 2017 10:56:29 -0500
+	(envelope-from <pbonzini@redhat.com>) id 1eOQcW-0002ll-9E
+	for qemu-devel@nongnu.org; Mon, 11 Dec 2017 11:08:02 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1eOQRK-0003ia-Om
-	for qemu-devel@nongnu.org; Mon, 11 Dec 2017 10:56:27 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:36490)
+	(envelope-from <pbonzini@redhat.com>) id 1eOQcS-00060b-5x
+	for qemu-devel@nongnu.org; Mon, 11 Dec 2017 11:07:56 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:40988)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1eOQRK-0003hN-Fe
-	for qemu-devel@nongnu.org; Mon, 11 Dec 2017 10:56:22 -0500
-References: <20171206112116.29413-1-ppandit@redhat.com>
-	<20171206113442.fjcpuwdfwx6brdkb@starbug-vm.ie.oracle.com>
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1eOQcR-000608-TM
+	for qemu-devel@nongnu.org; Mon, 11 Dec 2017 11:07:52 -0500
+References: <20171211083340.12791-1-haozhong.zhang@intel.com>
 From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <71be3a5c-811c-f7e8-db53-13eb67e59893@redhat.com>
-Date: Mon, 11 Dec 2017 16:56:15 +0100
+Message-ID: <19ba9bf2-cd6b-6194-1d74-5e9c59d6de2c@redhat.com>
+Date: Mon, 11 Dec 2017 17:07:41 +0100
 MIME-Version: 1.0
-In-Reply-To: <20171206113442.fjcpuwdfwx6brdkb@starbug-vm.ie.oracle.com>
+In-Reply-To: <20171211083340.12791-1-haozhong.zhang@intel.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH] scsi: check current request object before
- use
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH] target/i386: add CPU model
+ "Skylake-Server-clflushopt"
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,96 +28,84 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: P J P <ppandit@redhat.com>, Qemu Developers <qemu-devel@nongnu.org>, Zhangboxian <zhangboxian@huawei.com>, Prasad J Pandit <pjp@fedoraproject.org>
+To: Haozhong Zhang <haozhong.zhang@intel.com>, qemu-devel@nongnu.org
+Cc: Richard Henderson <rth@twiddle.net>, Eduardo Habkost <ehabkost@redhat.com>
 
-On 06/12/2017 12:34, Darren Kenny wrote:
-> Are both tests for NULL necessary, the second one would seem to
-> suffice - but also the first check changes whether esp_dma_done()
-> would get called or not here:
->=20
-> =C2=A0276=C2=A0=C2=A0=C2=A0=C2=A0 if (s->async_len =3D=3D 0) {
-> =C2=A0277=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 scsi_req_cont=
-inue(s->current_req);
-> =C2=A0278=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 /* If there i=
-s still data to be read from the device then
-> =C2=A0279=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0 complete the DMA operation immediately.=C2=A0 Otherwise defer
-> =C2=A0280=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0 until the scsi layer has completed.=C2=A0 */
-> =C2=A0281=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 if (to_device=
- || s->dma_left !=3D 0 || s->ti_size =3D=3D 0) {
-> =C2=A0282=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0 return;
-> =C2=A0283=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 }
-> =C2=A0284=C2=A0=C2=A0=C2=A0=C2=A0 }
-> =C2=A0285 =C2=A0286=C2=A0=C2=A0=C2=A0=C2=A0 /* Partially filled a scsi =
-buffer. Complete immediately.=C2=A0 */
-> =C2=A0287=C2=A0=C2=A0=C2=A0=C2=A0 esp_dma_done(s);
->=20
-> I don't know the SCSI code well enough to know if it is correct to
-> change this, so just pointing it out in case someone else might.
+On 11/12/2017 09:33, Haozhong Zhang wrote:
+> The only difference from the existing CPU model "Skylake-Server" is
+> the add of CPUID_7_0_EBX_CLFLUSHOPT, which is missed in "Skylake-Server".
+> 
+> Signed-off-by: Haozhong Zhang <haozhong.zhang@intel.com>
 
-The second test should definitely not be necessary, it's only papering
-over a bug elsewhere.  But without a testcase it's not possible for me
-to judge if the first test is the right fix, or _also_ papering over a
-bug elsewhere.
+If all Skylake-Server CPUs have it, maybe we can remove it on old
+machine types via compatibility properties, and not add a new model?
 
 Thanks,
 
 Paolo
 
-> Thanks,
->=20
-> Darren.
->=20
-> On Wed, Dec 06, 2017 at 04:51:16PM +0530, P J P wrote:
->> From: Prasad J Pandit <pjp@fedoraproject.org>
->>
->> During a dma access, SCSIRequest object 'current_req' could be
->> null, leading to a null pointer dereference. Add check to avoid
->> it.
->>
->> Reported-by: Zhangboxian <zhangboxian@huawei.com>
->> Signed-off-by: Prasad J Pandit <pjp@fedoraproject.org>
->> ---
->> hw/scsi/esp.c=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 | 2 +-
->> hw/scsi/scsi-bus.c | 3 +++
->> 2 files changed, 4 insertions(+), 1 deletion(-)
->>
->> diff --git a/hw/scsi/esp.c b/hw/scsi/esp.c
->> index ee586e7d6c..0c6925a708 100644
->> --- a/hw/scsi/esp.c
->> +++ b/hw/scsi/esp.c
->> @@ -273,7 +273,7 @@ static void esp_do_dma(ESPState *s)
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 s->ti_size +=3D len;
->> =C2=A0=C2=A0=C2=A0 else
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 s->ti_size -=3D len;
->> -=C2=A0=C2=A0=C2=A0 if (s->async_len =3D=3D 0) {
->> +=C2=A0=C2=A0=C2=A0 if (s->current_req && s->async_len =3D=3D 0) {
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 scsi_req_continue(s->curren=
-t_req);
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 /* If there is still data t=
-o be read from the device then
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 complete =
-the DMA operation immediately.=C2=A0 Otherwise defer
->> diff --git a/hw/scsi/scsi-bus.c b/hw/scsi/scsi-bus.c
->> index 977f7bce1f..ac64a239e9 100644
->> --- a/hw/scsi/scsi-bus.c
->> +++ b/hw/scsi/scsi-bus.c
->> @@ -1338,6 +1338,9 @@ void scsi_req_unref(SCSIRequest *req)
->> =C2=A0=C2=A0 will start the next chunk or complete the command.=C2=A0 =
-*/
->> void scsi_req_continue(SCSIRequest *req)
->> {
->> +=C2=A0=C2=A0=C2=A0 if (!req) {
->> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 return;
->> +=C2=A0=C2=A0=C2=A0 }
->> =C2=A0=C2=A0=C2=A0 if (req->io_canceled) {
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 trace_scsi_req_continue_can=
-celed(req->dev->id, req->lun,
->> req->tag);
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 return;
->> --=C2=A0
->> 2.13.6
->>
->>
+> ---
+>  target/i386/cpu.c | 49 +++++++++++++++++++++++++++++++++++++++++++++++++
+>  1 file changed, 49 insertions(+)
+> 
+> diff --git a/target/i386/cpu.c b/target/i386/cpu.c
+> index 045d66191f..a4370e6393 100644
+> --- a/target/i386/cpu.c
+> +++ b/target/i386/cpu.c
+> @@ -1391,6 +1391,55 @@ static X86CPUDefinition builtin_x86_defs[] = {
+>          .xlevel = 0x80000008,
+>          .model_id = "Intel Xeon Processor (Skylake)",
+>      },
+> +    {
+> +        /* Add CLFLUSHOPT which is missed in CPU model "Skylake-Server". */
+> +        .name = "Skylake-Server-clflushopt",
+> +        .level = 0xd,
+> +        .vendor = CPUID_VENDOR_INTEL,
+> +        .family = 6,
+> +        .model = 85,
+> +        .stepping = 4,
+> +        .features[FEAT_1_EDX] =
+> +            CPUID_VME | CPUID_SSE2 | CPUID_SSE | CPUID_FXSR | CPUID_MMX |
+> +            CPUID_CLFLUSH | CPUID_PSE36 | CPUID_PAT | CPUID_CMOV | CPUID_MCA |
+> +            CPUID_PGE | CPUID_MTRR | CPUID_SEP | CPUID_APIC | CPUID_CX8 |
+> +            CPUID_MCE | CPUID_PAE | CPUID_MSR | CPUID_TSC | CPUID_PSE |
+> +            CPUID_DE | CPUID_FP87,
+> +        .features[FEAT_1_ECX] =
+> +            CPUID_EXT_AVX | CPUID_EXT_XSAVE | CPUID_EXT_AES |
+> +            CPUID_EXT_POPCNT | CPUID_EXT_X2APIC | CPUID_EXT_SSE42 |
+> +            CPUID_EXT_SSE41 | CPUID_EXT_CX16 | CPUID_EXT_SSSE3 |
+> +            CPUID_EXT_PCLMULQDQ | CPUID_EXT_SSE3 |
+> +            CPUID_EXT_TSC_DEADLINE_TIMER | CPUID_EXT_FMA | CPUID_EXT_MOVBE |
+> +            CPUID_EXT_PCID | CPUID_EXT_F16C | CPUID_EXT_RDRAND,
+> +        .features[FEAT_8000_0001_EDX] =
+> +            CPUID_EXT2_LM | CPUID_EXT2_PDPE1GB | CPUID_EXT2_RDTSCP |
+> +            CPUID_EXT2_NX | CPUID_EXT2_SYSCALL,
+> +        .features[FEAT_8000_0001_ECX] =
+> +            CPUID_EXT3_ABM | CPUID_EXT3_LAHF_LM | CPUID_EXT3_3DNOWPREFETCH,
+> +        .features[FEAT_7_0_EBX] =
+> +            CPUID_7_0_EBX_FSGSBASE | CPUID_7_0_EBX_BMI1 |
+> +            CPUID_7_0_EBX_HLE | CPUID_7_0_EBX_AVX2 | CPUID_7_0_EBX_SMEP |
+> +            CPUID_7_0_EBX_BMI2 | CPUID_7_0_EBX_ERMS | CPUID_7_0_EBX_INVPCID |
+> +            CPUID_7_0_EBX_RTM | CPUID_7_0_EBX_RDSEED | CPUID_7_0_EBX_ADX |
+> +            CPUID_7_0_EBX_SMAP | CPUID_7_0_EBX_MPX | CPUID_7_0_EBX_CLWB |
+> +            CPUID_7_0_EBX_AVX512F | CPUID_7_0_EBX_AVX512DQ |
+> +            CPUID_7_0_EBX_AVX512BW | CPUID_7_0_EBX_AVX512CD |
+> +            CPUID_7_0_EBX_AVX512VL | CPUID_7_0_EBX_CLFLUSHOPT,
+> +        /* Missing: XSAVES (not supported by some Linux versions,
+> +         * including v4.1 to v4.12).
+> +         * KVM doesn't yet expose any XSAVES state save component,
+> +         * and the only one defined in Skylake (processor tracing)
+> +         * probably will block migration anyway.
+> +         */
+> +        .features[FEAT_XSAVE] =
+> +            CPUID_XSAVE_XSAVEOPT | CPUID_XSAVE_XSAVEC |
+> +            CPUID_XSAVE_XGETBV1,
+> +        .features[FEAT_6_EAX] =
+> +            CPUID_6_EAX_ARAT,
+> +        .xlevel = 0x80000008,
+> +        .model_id = "Intel Xeon Processor (Skylake w/ clflushopt)",
+> +    },
+>      {
+>          .name = "Opteron_G1",
+>          .level = 5,
+> 
