@@ -1,25 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44964)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45307)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <lersek@redhat.com>) id 1eOiob-0004dJ-82
-	for qemu-devel@nongnu.org; Tue, 12 Dec 2017 06:33:38 -0500
+	(envelope-from <berrange@redhat.com>) id 1eOipo-0005HD-1b
+	for qemu-devel@nongnu.org; Tue, 12 Dec 2017 06:34:57 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <lersek@redhat.com>) id 1eOioa-0005dN-CC
-	for qemu-devel@nongnu.org; Tue, 12 Dec 2017 06:33:37 -0500
-References: <1512745328-5109-1-git-send-email-peter.maydell@linaro.org>
-	<1512745328-5109-4-git-send-email-peter.maydell@linaro.org>
-	<5A2F6ED9.5030605@huawei.com>
-	<ac182406-8011-9f19-38e7-37328434095b@redhat.com>
-	<CAFEAcA_9pee99KpL4zwVS5jJuiv2MCGp79crufpU1kH1Okg-Hg@mail.gmail.com>
-From: Laszlo Ersek <lersek@redhat.com>
-Message-ID: <6b4b6351-eeb4-a4d3-8ddf-5401516671ae@redhat.com>
-Date: Tue, 12 Dec 2017 12:33:26 +0100
-MIME-Version: 1.0
-In-Reply-To: <CAFEAcA_9pee99KpL4zwVS5jJuiv2MCGp79crufpU1kH1Okg-Hg@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 3/3] hw/arm/virt-acpi-build: Add second
- UART to ACPI tables
+	(envelope-from <berrange@redhat.com>) id 1eOipm-0006V3-LM
+	for qemu-devel@nongnu.org; Tue, 12 Dec 2017 06:34:52 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:10914)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1eOipm-0006UO-FF
+	for qemu-devel@nongnu.org; Tue, 12 Dec 2017 06:34:50 -0500
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+	[10.5.11.16])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 9EBC1356FF
+	for <qemu-devel@nongnu.org>; Tue, 12 Dec 2017 11:34:49 +0000 (UTC)
+From: "Daniel P. Berrange" <berrange@redhat.com>
+Date: Tue, 12 Dec 2017 11:34:40 +0000
+Message-Id: <20171212113440.16483-1-berrange@redhat.com>
+Subject: [Qemu-devel] [PATCH] ui: deprecate use of GTK 2.x in favour of 3.x
+ series
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,48 +28,79 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: Shannon Zhao <zhaoshenglong@huawei.com>, qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>, "Jason A . Donenfeld" <Jason@zx2c4.com>, Drew Jones <drjones@redhat.com>, Andrea Bolognani <abologna@redhat.com>, Ard Biesheuvel <ard.biesheuvel@linaro.org>
+To: qemu-devel@nongnu.org
+Cc: Gerd Hoffmann <kraxel@redhat.com>, "Daniel P. Berrange" <berrange@redhat.com>
 
-On 12/12/17 12:11, Peter Maydell wrote:
-> On 12 December 2017 at 11:06, Laszlo Ersek <lersek@redhat.com> wrote:
->> BTW, has anyone tested this with the ArmVirtQemu firmware? As far as I
->> can see from the firmware code, the firmware will use the PL011 whose
->> description comes first in the DTB (and ignore the other PL011), in an
->> fdt_next_node() traversal. Is that OK for the intended use case?
->> (Perhaps I should have asked this under the second patch, which updates
->> the DTB generator.)
-> 
-> I haven't tested, since I don't have a working setup for that to hand.
-> (Do you have instructions somewhere for getting it working?)
+The GTK 3.0 release was made in Feb, 2011:
 
-The Wiki page I most frequently refer to (for a libvirt-less description
-anyway) is Ard's:
+  https://blog.gtk.org/2011/02/10/gtk-3-0-released/
 
-  https://wiki.linaro.org/LEG/UEFIforQEMU
+That will soon be 7 years ago, which is enough time to consider
+the 3.x series widely supported.
 
-There's also:
+Thus we deprecate the GTK 2.x support, which will allow us to
+delete it in the last release of 2018. By this time, GTK 3.x
+will be almost 8 years old.
 
-  https://www.kraxel.org/repos/
-  https://fedoraproject.org/wiki/Architectures/AArch64/Install_with_QEMU
+Signed-off-by: Daniel P. Berrange <berrange@redhat.com>
+---
+ configure     | 6 ++++++
+ qemu-doc.texi | 9 +++++++++
+ ui/gtk.c      | 5 +++++
+ 3 files changed, 20 insertions(+)
 
-> The behaviour we would want would be for the firmware to keep using
-> the PL011 at 0x09000000.
-
-With these QEMU patches, I reckon that's going to happen, yes.
-
-> (In an ideal world the firmware would
-> prefer the UART marked in the 'stdout-path' in the DTB /chosen node,
-> as the kernel does, I guess.)
-
-Hmmm, I recall that we used to have some code related to the /chosen
-node... We have a helper function for locating that
-(GetOrInsertChosenNode), but we no longer use it, it seems? The last
-(only?) use was apparently removed in:
-
-https://github.com/tianocore/edk2/commit/29589acf1010
-
-I'll let Ard comment too.
-
-Thanks
-Laszlo
+diff --git a/configure b/configure
+index 0c6e7572db..1c5110dc5e 100755
+--- a/configure
++++ b/configure
+@@ -5560,6 +5560,12 @@ if test "$sdl_too_old" = "yes"; then
+ echo "-> Your SDL version is too old - please upgrade to have SDL support"
+ fi
+ 
++if test "$gtkabi" = "2.0"; then
++    echo
++    echo "WARNING: Use of GTK 2.0 is deprecated and will be removed in"
++    echo "WARNING: future releases. Please switch to using GTK 3.0"
++fi
++
+ if test "$supported_cpu" = "no"; then
+     echo
+     echo "WARNING: SUPPORT FOR THIS HOST CPU WILL GO AWAY IN FUTURE RELEASES!"
+diff --git a/qemu-doc.texi b/qemu-doc.texi
+index db2351c746..ab03031da3 100644
+--- a/qemu-doc.texi
++++ b/qemu-doc.texi
+@@ -2371,6 +2371,15 @@ they were first deprecated in the 2.10.0 release.
+ What follows is a list of all features currently marked as
+ deprecated.
+ 
++@section Build options
++
++@subsection GTK 2.x
++
++Previously QEMU has supported building against both GTK 2.x
++and 3.x series APIs. Support for the GTK 2.x builds will be
++discontinued, so maintainers should switch to using GTK 3.x,
++which is the default.
++
+ @section System emulator command line arguments
+ 
+ @subsection -drive boot=on|off (since 1.3.0)
+diff --git a/ui/gtk.c b/ui/gtk.c
+index 342e96fbe9..f3b7567984 100644
+--- a/ui/gtk.c
++++ b/ui/gtk.c
+@@ -2248,6 +2248,11 @@ void gtk_display_init(DisplayState *ds, bool full_screen, bool grab_on_hover)
+         exit(1);
+     }
+ 
++#if !GTK_CHECK_VERSION(3, 0, 0)
++    g_printerr("Running QEMU with GTK 2.x is deprecated, and will be removed\n"
++               "in a future release. Please switch to GTK 3.x instead\n");
++#endif
++
+     s->window = gtk_window_new(GTK_WINDOW_TOPLEVEL);
+ #if GTK_CHECK_VERSION(3, 2, 0)
+     s->vbox = gtk_box_new(GTK_ORIENTATION_VERTICAL, 0);
+-- 
+2.14.3
