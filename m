@@ -1,26 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36740)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40531)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1eOov2-0001zU-Uu
-	for qemu-devel@nongnu.org; Tue, 12 Dec 2017 13:04:42 -0500
+	(envelope-from <jsnow@redhat.com>) id 1eOpCS-0001DV-0I
+	for qemu-devel@nongnu.org; Tue, 12 Dec 2017 13:22:41 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1eOov1-0000zd-TU
-	for qemu-devel@nongnu.org; Tue, 12 Dec 2017 13:04:41 -0500
-Received: from mail-ot0-x242.google.com ([2607:f8b0:4003:c0f::242]:35397)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1eOov1-0000xp-OR
-	for qemu-devel@nongnu.org; Tue, 12 Dec 2017 13:04:39 -0500
-Received: by mail-ot0-x242.google.com with SMTP id q3so18554354oth.2
-	for <qemu-devel@nongnu.org>; Tue, 12 Dec 2017 10:04:37 -0800 (PST)
+	(envelope-from <jsnow@redhat.com>) id 1eOpCR-00074d-0D
+	for qemu-devel@nongnu.org; Tue, 12 Dec 2017 13:22:39 -0500
+References: <20171211234609.30497-1-jsnow@redhat.com>
+	<20171212000824.GE20604@localhost.localdomain>
+From: John Snow <jsnow@redhat.com>
+Message-ID: <75812f29-9d2e-9a68-8eee-5b020c0990f6@redhat.com>
+Date: Tue, 12 Dec 2017 13:22:28 -0500
 MIME-Version: 1.0
-In-Reply-To: <1513058845-9768-1-git-send-email-zhaoshenglong@huawei.com>
-References: <1513058845-9768-1-git-send-email-zhaoshenglong@huawei.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 12 Dec 2017 18:04:16 +0000
-Message-ID: <CAFEAcA8XxVAU-U0fDGUfHbYCDnGbWUgiQd7W29+bMzNdyBme2A@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [Qemu-arm] [PATCH] MAINTAINERS: replace the
- unavailable email address
+In-Reply-To: <20171212000824.GE20604@localhost.localdomain>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH] blockjob: kick jobs on set-speed
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,36 +24,74 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Shannon Zhao <zhaoshenglong@huawei.com>
-Cc: qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>
+To: Jeff Cody <jcody@redhat.com>
+Cc: kwolf@redhat.com, qemu-devel@nongnu.org, qemu-block@nongnu.org, mreitz@redhat.com
 
-On 12 December 2017 at 06:07, Shannon Zhao <zhaoshenglong@huawei.com> wrote:
-> From: Zhaoshenglong <zhaoshenglong@huawei.com>
->
-> Since I'm not working as an assignee in Linaro, replace the Linaro email
-> address with my personal one.
->
-> Signed-off-by: Zhaoshenglong <zhaoshenglong@huawei.com>
-> ---
->  MAINTAINERS | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
->
-> diff --git a/MAINTAINERS b/MAINTAINERS
-> index 0255113..45e2e20 100644
-> --- a/MAINTAINERS
-> +++ b/MAINTAINERS
-> @@ -543,7 +543,7 @@ F: include/hw/*/xlnx*.h
->
->  ARM ACPI Subsystem
->  M: Shannon Zhao <zhaoshenglong@huawei.com>
-> -M: Shannon Zhao <shannon.zhao@linaro.org>
-> +M: Shannon Zhao <shannon.zhaosl@gmail.com>
->  L: qemu-arm@nongnu.org
->  S: Maintained
->  F: hw/arm/virt-acpi-build.c
-> --
-> 2.0.4
 
-Thanks; applied to target-arm.next for 2.12.
 
--- PMM
+On 12/11/2017 07:08 PM, Jeff Cody wrote:
+> On Mon, Dec 11, 2017 at 06:46:09PM -0500, John Snow wrote:
+>> If users set an unreasonably low speed (like one byte per second), the
+>> calculated delay may exceed many hours. While we like to punish users
+>> for asking for stupid things, we do also like to allow users to correct
+>> their wicked ways.
+>>
+>> When a user provides a new speed, kick the job to allow it to recalculate
+>> its delay.
+>>
+>> Signed-off-by: John Snow <jsnow@redhat.com>
+>> ---
+>>  blockjob.c | 5 +++++
+>>  1 file changed, 5 insertions(+)
+>>
+>> diff --git a/blockjob.c b/blockjob.c
+>> index 715c2c2680..43f01ad190 100644
+>> --- a/blockjob.c
+>> +++ b/blockjob.c
+>> @@ -483,6 +483,7 @@ static void block_job_completed_txn_success(BlockJob *job)
+>>  void block_job_set_speed(BlockJob *job, int64_t speed, Error **errp)
+>>  {
+>>      Error *local_err = NULL;
+>> +    int64_t old_speed = job->speed;
+>>  
+>>      if (!job->driver->set_speed) {
+>>          error_setg(errp, QERR_UNSUPPORTED);
+>> @@ -495,6 +496,10 @@ void block_job_set_speed(BlockJob *job, int64_t speed, Error **errp)
+>>      }
+>>  
+>>      job->speed = speed;
+>> +    /* Kick the job to recompute its delay */
+>> +    if ((speed > old_speed) && timer_pending(&job->sleep_timer)) {
+> 
+> job->sleep_timer is protected by block_job_mutex (via
+> block_job_lock/unlock); is it safe for us to check it here outside the
+> mutex?
+> 
+
+My hunch is that in this specific case that it is; but only because of
+assumptions about holding the aio_context and the QEMU global mutex here.
+
+> But in any case, I think we could get rid of the timer_pending check, and
+> just always kick the job if we have a speed increase.  block_job_enter()
+> should do the right thing (mutex protected check on job->busy and
+> job->sleep_timer).
+> 
+
+I could lock it for inarguable correctness; I just didn't want to kick a
+job that didn't actually require any kicking to limit any potential
+problems from that interaction.
+
+(I'm fond of the extra conditional because I feel like it makes the
+intent of the kick explicit.)
+
+I can remove it.
+
+>> +        block_job_enter(job);
+>> +    }
+>>  }
+>>  
+>>  void block_job_complete(BlockJob *job, Error **errp)
+>> -- 
+>> 2.14.3
+>>
+> 
