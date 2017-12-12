@@ -1,29 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40746)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43568)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1eOiYX-0004Ig-LO
-	for qemu-devel@nongnu.org; Tue, 12 Dec 2017 06:17:08 -0500
+	(envelope-from <pbonzini@redhat.com>) id 1eOik0-00029E-65
+	for qemu-devel@nongnu.org; Tue, 12 Dec 2017 06:28:56 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1eOiYS-00038D-D0
-	for qemu-devel@nongnu.org; Tue, 12 Dec 2017 06:17:01 -0500
-Date: Tue, 12 Dec 2017 12:16:38 +0100
-From: Kevin Wolf <kwolf@redhat.com>
-Message-ID: <20171212111638.GD3879@localhost.localdomain>
-References: <cd0a2e5e-f788-0e5a-dec7-f428479f3b89@virtuozzo.com>
-	<8c61f43c-5f56-8c1b-a2fe-f954d34dc687@redhat.com>
-	<40392ab9-ec2a-30ed-ddab-a557682a4192@virtuozzo.com>
-	<4e4e28d7-aebc-4a86-e691-99afdcca27f5@redhat.com>
-	<40da8b0d-8039-634c-f50e-1d6326d7fca5@virtuozzo.com>
-	<37d0e96a-d572-3290-61e7-87e59de2f59b@redhat.com>
-	<2a255dee-97c6-5d6d-3152-df0b7fc2d4f0@virtuozzo.com>
-	<0c66a77a-c95a-2071-9422-a2ce0622dbbe@redhat.com>
-	<20171211111529.GB7707@localhost.localdomain>
-	<f916db57-e4a9-1903-9957-d1afb0fdd495@redhat.com>
+	(envelope-from <pbonzini@redhat.com>) id 1eOijv-0002YS-8r
+	for qemu-devel@nongnu.org; Tue, 12 Dec 2017 06:28:52 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:33794)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1eOijv-0002Y2-2a
+	for qemu-devel@nongnu.org; Tue, 12 Dec 2017 06:28:47 -0500
+References: <20171211194610.3962-1-dgilbert@redhat.com>
+	<20171211194610.3962-2-dgilbert@redhat.com>
+	<97feaaf8-b08e-2c49-6cdb-b1556f6326cd@redhat.com>
+	<20171212103138.GC2409@work-vm>
+	<7677f3f3-72b9-0f0c-13ca-ace1196ed45b@redhat.com>
+	<20171212110357.GD2409@work-vm>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <514f0650-ceb1-0658-a640-72e5336a8483@redhat.com>
+Date: Tue, 12 Dec 2017 12:28:34 +0100
 MIME-Version: 1.0
+In-Reply-To: <20171212110357.GD2409@work-vm>
 Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <f916db57-e4a9-1903-9957-d1afb0fdd495@redhat.com>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH for-2.12 0/4] qmp dirty bitmap API
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v3 1/8] memory: address_space_iterate
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,303 +32,24 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: John Snow <jsnow@redhat.com>
-Cc: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org, famz@redhat.com, armbru@redhat.com, mnestratov@virtuozzo.com, mreitz@redhat.com, nshirokovskiy@virtuozzo.com, stefanha@redhat.com, den@openvz.org, pbonzini@redhat.com
+To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Cc: qemu-devel@nongnu.org, imammedo@redhat.com, maxime.coquelin@redhat.com, groug@kaod.org, mst@redhat.com
 
-Am 11.12.2017 um 19:40 hat John Snow geschrieben:
->=20
->=20
-> On 12/11/2017 06:15 AM, Kevin Wolf wrote:
-> > Am 09.12.2017 um 01:57 hat John Snow geschrieben:
-> >> Here's an idea of what this API might look like without revealing
-> >> explicit merge/split primitives.
-> >>
-> >> A new bitmap property that lets us set retention:
-> >>
-> >> :: block-dirty-bitmap-set-retention bitmap=3Dfoo slices=3D10
-> >>
-> >> Or something similar, where the default property for all bitmaps is
-> >> zero -- the current behavior: no copies retained.
-> >>
-> >> By setting it to a non-zero positive integer, the incremental backup
-> >> mode will automatically save a disabled copy when possible.
-> >=20
-> > -EMAGIC
-> >=20
-> > Operations that create or delete user-visible objects should be
-> > explicit, not automatic. You're trying to implement management layer
-> > functionality in qemu here, but incomplete enough that the artifacts =
-of
-> > it are still visible externally. (A complete solution within qemu
-> > wouldn't expose low-level concepts such as bitmaps on an external
-> > interface, but you would expose something like checkpoints.)
-> >=20
-> > Usually it's not a good idea to have a design where qemu implements
-> > enough to restrict management tools to whatever use case we had in mi=
-nd,
-> > but not enough to make the management tool's life substantially easie=
-r
-> > (by not having to care about some low-level concepts).
-> >=20
-> >> "What happens if we exceed our retention?"
-> >>
-> >> (A) We push the last one out automatically, or
-> >> (B) We fail the operation immediately.
-> >>
-> >> A is more convenient, but potentially unsafe if the management tool =
-or
-> >> user wasn't aware that was going to happen.
-> >> B is more annoying, but definitely more safe as it means we cannot l=
-ose
-> >> a bitmap accidentally.
-> >=20
-> > Both mean that the management layer has not only to deal with the
-> > deletion of bitmaps as it wants to have them, but also to keep the
-> > retention counter somewhere and predict what qemu is going to do to t=
-he
-> > bitmaps and whether any corrective action needs to be taken.
-> >=20
-> > This is making things more complex rather than simpler.
-> >=20
-> >> I would argue for B with perhaps a force-cycle=3Dtrue|false that def=
-aults
-> >> to false to let management tools say "Yes, go ahead, remove the old =
-one"
-> >> with additionally some return to let us know it happened:
-> >>
-> >> {"return": {
-> >>   "dropped-slices": [ {"bitmap0": 0}, ...]
-> >> }}
-> >>
-> >> This would introduce some concept of bitmap slices into the mix as I=
-D'd
-> >> children of a bitmap. I would propose that these slices are numbered=
- and
-> >> monotonically increasing. "bitmap0" as an object starts with no slic=
-es,
-> >> but every incremental backup creates slice 0, slice 1, slice 2, and =
-so
-> >> on. Even after we start deleting some, they stay ordered. These numb=
-ers
-> >> then stand in for points in time.
-> >>
-> >> The counter can (must?) be reset and all slices forgotten when
-> >> performing a full backup while providing a bitmap argument.
-> >>
-> >> "How can a user make use of the slices once they're made?"
-> >>
-> >> Let's consider something like mode=3Dpartial in contrast to
-> >> mode=3Dincremental, and an example where we have 6 prior slices:
-> >> 0,1,2,3,4,5, (and, unnamed, the 'active' slice.)
-> >>
-> >> mode=3Dpartial bitmap=3Dfoo slice=3D4
-> >>
-> >> This would create a backup from slice 4 to the current time =CE=B1. =
-This
-> >> includes all clusters from 4, 5, and the active bitmap.
-> >>
-> >> I don't think it is meaningful to define any end point that isn't th=
-e
-> >> current time, so I've omitted that as a possibility.
-> >=20
-> > John, what are you doing here? This adds option after option, and eve=
-n
-> > additional slice object, only complicating an easy thing more and mor=
-e.
-> > I'm not sure if that was your intention, but I feel I'm starting to
-> > understand better how Linus's rants come about.
-> >=20
-> > Let me summarise what this means for management layer:
-> >=20
-> > * The management layer has to manage bitmaps. They have direct contro=
-l
-> >   over creation and deletion of bitmaps. So far so good.
-> >=20
-> > * It also has to manage slices in those bitmaps objects; and these
-> >   slices are what contains the actual bitmaps. In order to identify a
-> >   bitmap in qemu, you need:
-> >=20
-> >     a) the node name
-> >     b) the bitmap ID, and
-> >     c) the slice number
-> >=20
-> >   The slice number is assigned by qemu and libvirt has to wait until
-> >   qemu tells it about the slice number of a newly created slice. If
-> >   libvirt doesn't receive the reply to the command that started the
-> >   block job, it needs to be able to query this information from qemu,
-> >   e.g. in query-block-jobs.
-> >=20
-> > * Slices are automatically created when you start a backup job with a
-> >   bitmap. It doesn't matter whether you even intend to do an incremen=
-tal
-> >   backup against this point in time. qemu knows better.
-> >=20
-> > * In order to delete a slice that you don't need any more, you have t=
-o
-> >   create more slices (by doing more backups), but you don't get to
-> >   decide which one is dropped. qemu helpfully just drops the oldest o=
-ne.
-> >   It doesn't matter if you want to keep an older one so you can do an
-> >   incremental backup for a longer timespan. Don't worry about your
-> >   backup strategy, qemu knows better.
-> >=20
-> > * Of course, just creating a new backup job doesn't mean that removin=
-g
-> >   the old slice works, even if you give the respective option. That's
-> >   what the 'dropped-slices' return is for. So once again wait for
-> >   whatever qemu did and reproduce it in the data structures of the
-> >   management tool. It's also more information that needs to be expose=
-d
-> >   in query-block-jobs because libvirt might miss the return value.
-> >=20
-> > * Hmm... What happens if you start n backup block jobs, with n > slic=
-es?
-> >   Sounds like a great way to introduce subtle bugs in both qemu and t=
-he
-> >   management layer.
-> >=20
-> > Do you really think working with this API would be fun for libvirt?
-> >=20
-> >> "Does a partial backup create a new point in time?"
-> >>
-> >> If yes: This means that the next incremental backup must necessarily=
- be
-> >> based off of the last partial backup that was made. This seems a lit=
-tle
-> >> inconvenient. This would mean that point in time =CE=B1 becomes "sli=
-ce 6."
-> >=20
-> > Or based off any of the previous points in time, provided that qemu
-> > didn't helpfully decide to delete it. Can't I still create a backup
-> > starting from slice 4 then?
-> >=20
-> > Also, a more general question about incremental backup: How does it p=
-lay
-> > with snapshots? Shouldn't we expect that people sometimes use both
-> > snapshots and backups? Can we restrict the backup job to considering
-> > bitmaps only from a single node or should we be able to reference
-> > bitmaps of a backing file as well?
-> >=20
-> >> If no: This means that we lose the point in time when we made the
-> >> partial and we cannot chain off of the partial backup. It does mean =
-that
-> >> the next incremental backup will work as normally expected, however.
-> >> This means that point in time =CE=B1 cannot again be referenced by t=
-he
-> >> management client.
-> >>
-> >> This mirrors the dynamic between "incremental" and "differential" ba=
-ckups.
-> >>
-> >> ..hmmm..
-> >>
-> >> You know, incremental backups are just a special case of "partial" h=
-ere
-> >> where slice is the last recorded slice... Let's look at an API like =
-this:
-> >>
-> >> mode=3D<incremental|differential> bitmap=3D<name> [slice=3DN]
-> >>
-> >> Incremental: We create a new slice if the bitmap has room for one.
-> >> Differential: We don't create a new slice. The data in the active bi=
-tmap
-> >> =CE=B1 does not get cleared after the bitmap operation.
-> >>
-> >> Slice:
-> >> If not specified, assume we want only the active slice. This is the
-> >> current behavior in QEMU 2.11.
-> >> If specified, we create a temporary merge between bitmaps [N..=CE=B1=
-] and use
-> >> that for the backup operation.
-> >>
-> >> "Can we delete slices?"
-> >>
-> >> Sure.
-> >>
-> >> :: block-dirty-bitmap-slice-delete bitmap=3Dfoo slice=3D4
-> >>
-> >> "Can we create a slice without making a bitmap?"
-> >>
-> >> It would be easy to do, but I'm not sure I see the utility. In using=
- it,
-> >> it means if you don't specify the slice manually for the next backup
-> >> that you will necessarily be getting something not usable.
-> >>
-> >> but we COULD do it, it would just be banking the changes in the acti=
-ve
-> >> bitmap into a new slice.
-> >=20
-> > Okay, with explicit management this is getting a little more reasonab=
-le
-> > now. However, I don't understand what slices buy us then compared to
-> > just separate bitmaps.
-> >=20
-> > Essentially, bitmaps form a second kind of backing chain. Backup alwa=
-ys
-> > wants to use the combined bitmaps of some subchain. I see two easy wa=
-ys
-> > to do this: Either pass an array of bitmaps to consider to the job, o=
-r
-> > store the "backing link" in the bitmap so that we can just specify a
-> > "base bitmap" like we usually do with normal backing files.
-> >=20
-> > The backup block job can optionally append a new bitmap to the chain
-> > like external snapshots do for backing chains. Deleting a bitmap in t=
-he
-> > chain is the merge operation, similar to a commit block job for backi=
-ng
-> > chains.
-> >=20
-> > We know these mechanism very well because the block layer has been us=
-ing
-> > them for ages.
-> >=20
-> >>> I also have another idea:
-> >>> implement new object: point-in-time or checkpoint. The should have
-> >>> names, and the simple add/remove API.
-> >>> And they will be backed by dirty bitmaps. so checkpoint deletion is
-> >>> bitmap merge (and delete one of them),
-> >>> checkpoint creation is disabling of active-checkpoint-bitmap and
-> >>> starting new active-checkpoint-bitmap.
-> >>
-> >> Yes, exactly! I think that's pretty similar to what I am thinking of
-> >> with slices.
-> >>
-> >> This sounds a little safer to me in that we can examine an operation=
- to
-> >> see if it's sane or not.
-> >=20
-> > Exposing checkpoints is a reasonable high-level API. The important pa=
-rt
-> > then is that you don't expose bitmaps + slices, but only checkpoints
-> > without bitmaps. The bitmaps are an implementation detail.
-> >=20
-> >>> Then we can implement merging of several bitmaps (from one of
-> >>> checkpoints to current moment) in
-> >>> NBD meta-context-query handling.
-> >>>
-> >> Note:
-> >>
-> >> I should say that I've had discussions with Stefan in the past over
-> >> things like differential mode and the feeling I got from him was tha=
-t he
-> >> felt that data should be copied from QEMU precisely *once*, viewing =
-any
-> >> subsequent copying of the same data as redundant and wasteful.
-> >=20
-> > That's a management layer decision. Apparently there are users who wa=
-nt
-> > to copy from qemu multiple times, otherwise we wouldn't be talking ab=
-out
-> > slices and retention.
-> >=20
-> > Kevin
->=20
-> Sorry.
+On 12/12/2017 12:03, Dr. David Alan Gilbert wrote:
+>> nop means that attributes (readonly, romd_mode, mr+offset_in_region)
+>> haven't changed; nop is optionally followed by log_start or log_stop.
+>> If any of them changes, you get del+add (del is always before add).
+>>
+>>> Th nice thing we have here is we get a full walk of the physical memory
+>>> in order; keeping it in order makes our data structure easy for merging.
+>> That's the same that you get with region_del/add.
+> Hmm it would be good if that was documented somewhere.
+> I thought you'd only get an _add/_del and then a commit.
+> 
+> However, what do I do in vhost_dev_start?  At the moment I'm forcfully
+> regenerating it using the same code.
 
-*lol*
+When you add a listener, you get adds and a commit for the current state
+of the AddressSpace.
 
-Though I do hope that my rant was at least somewhat constructive, if
-only by making differently broken suggestions. ;-)
-
-Kevin
+Paolo
