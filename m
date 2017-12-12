@@ -1,30 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:32875)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34592)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <lersek@redhat.com>) id 1eOmGS-0004qQ-Ej
-	for qemu-devel@nongnu.org; Tue, 12 Dec 2017 10:14:37 -0500
+	(envelope-from <drjones@redhat.com>) id 1eOmIF-0005wj-Ep
+	for qemu-devel@nongnu.org; Tue, 12 Dec 2017 10:16:33 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <lersek@redhat.com>) id 1eOmGP-0007zI-RA
-	for qemu-devel@nongnu.org; Tue, 12 Dec 2017 10:14:36 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:57366)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <lersek@redhat.com>) id 1eOmGP-0007yu-Kq
-	for qemu-devel@nongnu.org; Tue, 12 Dec 2017 10:14:33 -0500
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
-	[10.5.11.15])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 8042861B37
-	for <qemu-devel@nongnu.org>; Tue, 12 Dec 2017 15:14:32 +0000 (UTC)
-References: <20171212150909.1831-1-marcandre.lureau@redhat.com>
-From: Laszlo Ersek <lersek@redhat.com>
-Message-ID: <aeb8709b-e774-5520-b0e4-a28493f4e94b@redhat.com>
-Date: Tue, 12 Dec 2017 16:14:27 +0100
+	(envelope-from <drjones@redhat.com>) id 1eOmI9-0001RC-Oe
+	for qemu-devel@nongnu.org; Tue, 12 Dec 2017 10:16:27 -0500
+Date: Tue, 12 Dec 2017 16:16:05 +0100
+From: Andrew Jones <drjones@redhat.com>
+Message-ID: <20171212151605.v2eoestysaogzymm@kamzik.brq.redhat.com>
+References: <1512745328-5109-1-git-send-email-peter.maydell@linaro.org>
+	<1512745328-5109-3-git-send-email-peter.maydell@linaro.org>
+	<20171212144513.sutjfenbjh33fm5n@kamzik.brq.redhat.com>
+	<CAFEAcA-DyuObZjx-g2k9SkofLZ_akadfGYZCMum=3hQQLEdN_w@mail.gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <20171212150909.1831-1-marcandre.lureau@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH] dump: fix note_name_equal()
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CAFEAcA-DyuObZjx-g2k9SkofLZ_akadfGYZCMum=3hQQLEdN_w@mail.gmail.com>
+Subject: Re: [Qemu-devel] [PATCH 2/3] hw/arm/virt: Add another UART to the
+ virt board
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,42 +26,42 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>, qemu-devel@nongnu.org
-Cc: drjones@redhat.com
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: "Jason A . Donenfeld" <Jason@zx2c4.com>, qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>, Shannon Zhao <shannon.zhao@linaro.org>
 
-On 12/12/17 16:09, Marc-Andr=C3=A9 Lureau wrote:
-> Use the function argument "name" instead of hardcoded
-> "VMCOREINFO". All callers use "VMCOREINFO" as argument, so this isn't
-> an exposed bug, thankfully.
->=20
-> Simplify a little bit the code while touching this.
->=20
-> Suggested-by: Andrew Jones <drjones@redhat.com>
-> Reported-by: Laszlo Ersek <lersek@redhat.com>
-> Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
-> ---
->  dump.c | 7 +------
->  1 file changed, 1 insertion(+), 6 deletions(-)
->=20
-> diff --git a/dump.c b/dump.c
-> index d4a8c942eb..e9dfed060a 100644
-> --- a/dump.c
-> +++ b/dump.c
-> @@ -788,12 +788,7 @@ static bool note_name_equal(DumpState *s,
->      get_note_sizes(s, note, &head_size, &name_size, NULL);
->      head_size =3D ROUND_UP(head_size, 4);
-> =20
-> -    if (name_size !=3D len ||
-> -        memcmp(note + head_size, "VMCOREINFO", len)) {
-> -        return false;
-> -    }
-> -
-> -    return true;
-> +    return name_size =3D=3D len && memcmp(note + head_size, name, len)=
- =3D=3D 0;
->  }
-> =20
->  /* write common header, sub header and elf note to vmcore */
->=20
+On Tue, Dec 12, 2017 at 02:50:50PM +0000, Peter Maydell wrote:
+> On 12 December 2017 at 14:45, Andrew Jones <drjones@redhat.com> wrote:
+> > Should this be
+> >
+> >     if (!vmc->no_second_uart && serial_hds[uart_count] != NULL) {
+> >
+> > A bit late now, but maybe the other UART resource allocations should have
+> > been conditional on actually being wired up too?
+> 
+> What does x86 do?
 
-Reviewed-by: Laszlo Ersek <lersek@redhat.com>
+Looks like they provide the io-ports unconditionally.
+
+> 
+> I think the conclusion we came to about UARTs in general was that
+> boards should always create the devices, and the UART models
+> should cope with being passed a NULL chardev backend. (This
+> is like real hardware, where the 2nd UART always exists even
+> if you haven't plugged a cable into the 2nd serial port on the
+> back of the box.)
+
+Yes, I guess the real hardware analogy provides the justification
+for doing it this way.
+
+OK, so this patch is fine, but it kills my suggestion for AAVMF to
+only output debug messages to a debug port when the debug port is
+actually useful. Now it won't be able to tell the difference unless
+we can inform it some other way.
+
+Thanks,
+drew
+
+> 
+> thanks
+> -- PMM
+> 
