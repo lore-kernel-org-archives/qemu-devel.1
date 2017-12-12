@@ -1,21 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34990)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35304)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <drjones@redhat.com>) id 1eOmIn-0006Fq-89
-	for qemu-devel@nongnu.org; Tue, 12 Dec 2017 10:17:07 -0500
+	(envelope-from <david@redhat.com>) id 1eOmJE-0006rC-M5
+	for qemu-devel@nongnu.org; Tue, 12 Dec 2017 10:17:31 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <drjones@redhat.com>) id 1eOmIm-0001uz-5F
-	for qemu-devel@nongnu.org; Tue, 12 Dec 2017 10:17:01 -0500
-Date: Tue, 12 Dec 2017 16:16:47 +0100
-From: Andrew Jones <drjones@redhat.com>
-Message-ID: <20171212151647.k4alvf7xbdky2whk@kamzik.brq.redhat.com>
-References: <1512745328-5109-1-git-send-email-peter.maydell@linaro.org>
-	<1512745328-5109-3-git-send-email-peter.maydell@linaro.org>
+	(envelope-from <david@redhat.com>) id 1eOmJ9-0002A0-19
+	for qemu-devel@nongnu.org; Tue, 12 Dec 2017 10:17:28 -0500
+References: <20171211134740.8235-1-david@redhat.com>
+	<20171211134740.8235-7-david@redhat.com>
+	<20171212144944.09860296.cohuck@redhat.com>
+	<0aa794ee-c781-0cc4-3c0a-5f49ae495c63@de.ibm.com>
+	<20171212152959.1ff2b7d5.cohuck@redhat.com>
+From: David Hildenbrand <david@redhat.com>
+Message-ID: <835bc109-bc80-5405-2c5c-2eb9142550ac@redhat.com>
+Date: Tue, 12 Dec 2017 16:17:17 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1512745328-5109-3-git-send-email-peter.maydell@linaro.org>
-Subject: Re: [Qemu-devel] [PATCH 2/3] hw/arm/virt: Add another UART to the
- virt board
+In-Reply-To: <20171212152959.1ff2b7d5.cohuck@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v1 for-2-12 06/15] s390x/flic: factor out
+ injection of floating interrupts
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,122 +28,42 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: qemu-arm@nongnu.org, qemu-devel@nongnu.org, "Jason A . Donenfeld" <Jason@zx2c4.com>, Shannon Zhao <shannon.zhao@linaro.org>
+To: Cornelia Huck <cohuck@redhat.com>, Christian Borntraeger <borntraeger@de.ibm.com>
+Cc: qemu-s390x@nongnu.org, qemu-devel@nongnu.org, Richard Henderson <rth@twiddle.net>, Alexander Graf <agraf@suse.de>, Paolo Bonzini <pbonzini@redhat.com>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Thomas Huth <thuth@redhat.com>
 
-On Fri, Dec 08, 2017 at 03:02:07PM +0000, Peter Maydell wrote:
-> Currently we only provide one non-secure UART on the virt
-> board. This is OK for most purposes, but there are some
-> use cases where having a second UART would be useful (like
-> bare-metal testing where you don't really want to have to
-> probe and set up a PCI device just to have a second comms
-> channel).
+On 12.12.2017 15:29, Cornelia Huck wrote:
+> On Tue, 12 Dec 2017 15:13:46 +0100
+> Christian Borntraeger <borntraeger@de.ibm.com> wrote:
 > 
-> Add a second NS UART to the virt board. This will be the
-> second serial device if 'secure=no' (the default), and the
-> third serial device if 'secure=yes'.
+>> On 12/12/2017 02:49 PM, Cornelia Huck wrote:
 > 
-> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
-> ---
->  include/hw/arm/virt.h |  2 ++
->  hw/arm/virt.c         | 19 ++++++++++++++++---
->  2 files changed, 18 insertions(+), 3 deletions(-)
+>>> One thing I noticed: You removed the caching of the flic (in the old
+>>> kvm inject routine), and you generally do more qom invocations (first,
+>>> to find the common flic; then, to translate to the qemu or kvm flic).
+>>> Not sure if this might be a problem (probably not).  
+>>
+>> Is any of these calls on a potential fast path (e.g. guest without adapter
+>> interrupts)? If yes, then QOM is a no-go since it is really slow.
+> 
+> At least the new airq interface was using QOM without caching before.
+> 
+> It's basically about any interrupt; but otoh we are (for kvm) in
+> userspace already. Caching the flic and just keeping the casting to the
+> specialized flic might be ok (I'd guess that the lookup is the slowest
+> path.)
+> 
 
+Please note that the lookup is already cached in s390_get_flic(); That
+should be sufficient, as it does the expensive lookup. One cache should
+be enough, no?
 
-Reviewed-by: Andrew Jones <drjones@redhat.com>
+The other conversions should be cheap (and already were in place in a
+couple of places before).
 
-> 
-> diff --git a/include/hw/arm/virt.h b/include/hw/arm/virt.h
-> index 33b0ff3..685009a 100644
-> --- a/include/hw/arm/virt.h
-> +++ b/include/hw/arm/virt.h
-> @@ -72,6 +72,7 @@ enum {
->      VIRT_GPIO,
->      VIRT_SECURE_UART,
->      VIRT_SECURE_MEM,
-> +    VIRT_UART_2,
->  };
->  
->  typedef struct MemMapEntry {
-> @@ -85,6 +86,7 @@ typedef struct {
->      bool no_its;
->      bool no_pmu;
->      bool claim_edge_triggered_timers;
-> +    bool no_second_uart;
->  } VirtMachineClass;
->  
->  typedef struct {
-> diff --git a/hw/arm/virt.c b/hw/arm/virt.c
-> index 543f9bd..e234f55 100644
-> --- a/hw/arm/virt.c
-> +++ b/hw/arm/virt.c
-> @@ -139,6 +139,7 @@ static const MemMapEntry a15memmap[] = {
->      [VIRT_FW_CFG] =             { 0x09020000, 0x00000018 },
->      [VIRT_GPIO] =               { 0x09030000, 0x00001000 },
->      [VIRT_SECURE_UART] =        { 0x09040000, 0x00001000 },
-> +    [VIRT_UART_2] =             { 0x09050000, 0x00001000 },
->      [VIRT_MMIO] =               { 0x0a000000, 0x00000200 },
->      /* ...repeating for a total of NUM_VIRTIO_TRANSPORTS, each of that size */
->      [VIRT_PLATFORM_BUS] =       { 0x0c000000, 0x02000000 },
-> @@ -157,6 +158,7 @@ static const int a15irqmap[] = {
->      [VIRT_PCIE] = 3, /* ... to 6 */
->      [VIRT_GPIO] = 7,
->      [VIRT_SECURE_UART] = 8,
-> +    [VIRT_UART_2] = 9,
->      [VIRT_MMIO] = 16, /* ...to 16 + NUM_VIRTIO_TRANSPORTS - 1 */
->      [VIRT_GIC_V2M] = 48, /* ...to 48 + NUM_GICV2M_SPIS - 1 */
->      [VIRT_PLATFORM_BUS] = 112, /* ...to 112 + PLATFORM_BUS_NUM_IRQS -1 */
-> @@ -676,7 +678,7 @@ static void create_uart(const VirtMachineState *vms, qemu_irq *pic, int uart,
->  
->      if (uart == VIRT_UART) {
->          qemu_fdt_setprop_string(vms->fdt, "/chosen", "stdout-path", nodename);
-> -    } else {
-> +    } else if (uart == VIRT_SECURE_UART) {
->          /* Mark as not usable by the normal world */
->          qemu_fdt_setprop_string(vms->fdt, nodename, "status", "disabled");
->          qemu_fdt_setprop_string(vms->fdt, nodename, "secure-status", "okay");
-> @@ -1260,6 +1262,7 @@ static void machvirt_init(MachineState *machine)
->      int n, virt_max_cpus;
->      MemoryRegion *ram = g_new(MemoryRegion, 1);
->      bool firmware_loaded = bios_name || drive_get(IF_PFLASH, 0, 0);
-> +    int uart_count = 0;
->  
->      /* We can probe only here because during property set
->       * KVM is not available yet
-> @@ -1419,11 +1422,16 @@ static void machvirt_init(MachineState *machine)
->  
->      fdt_add_pmu_nodes(vms);
->  
-> -    create_uart(vms, pic, VIRT_UART, sysmem, serial_hds[0]);
-> +    create_uart(vms, pic, VIRT_UART, sysmem, serial_hds[uart_count++]);
->  
->      if (vms->secure) {
->          create_secure_ram(vms, secure_sysmem);
-> -        create_uart(vms, pic, VIRT_SECURE_UART, secure_sysmem, serial_hds[1]);
-> +        create_uart(vms, pic, VIRT_SECURE_UART, secure_sysmem,
-> +                    serial_hds[uart_count++]);
-> +    }
-> +
-> +    if (!vmc->no_second_uart) {
-> +        create_uart(vms, pic, VIRT_UART_2, sysmem, serial_hds[uart_count++]);
->      }
->  
->      create_rtc(vms, pic);
-> @@ -1693,8 +1701,13 @@ static void virt_2_11_instance_init(Object *obj)
->  
->  static void virt_machine_2_11_options(MachineClass *mc)
->  {
-> +    VirtMachineClass *vmc = VIRT_MACHINE_CLASS(OBJECT_CLASS(mc));
-> +
->      virt_machine_2_12_options(mc);
->      SET_MACHINE_COMPAT(mc, VIRT_COMPAT_2_11);
-> +
-> +    /* The second NS UART was added in 2.12 */
-> +    vmc->no_second_uart = true;
->  }
->  DEFINE_VIRT_MACHINE(2, 11)
->  
-> -- 
-> 2.7.4
-> 
-> 
+Thanks!
+
+-- 
+
+Thanks,
+
+David / dhildenb
