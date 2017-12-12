@@ -1,34 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55018)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55763)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1eOddC-0001RF-5a
-	for qemu-devel@nongnu.org; Tue, 12 Dec 2017 01:01:31 -0500
+	(envelope-from <aik@ozlabs.ru>) id 1eOdiV-000419-Bz
+	for qemu-devel@nongnu.org; Tue, 12 Dec 2017 01:07:00 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1eOdd7-000133-A7
-	for qemu-devel@nongnu.org; Tue, 12 Dec 2017 01:01:30 -0500
-Received: from indium.canonical.com ([91.189.90.7]:53558)
+	(envelope-from <aik@ozlabs.ru>) id 1eOdiS-00043g-D5
+	for qemu-devel@nongnu.org; Tue, 12 Dec 2017 01:06:59 -0500
+Received: from mail-it0-x242.google.com ([2607:f8b0:4001:c0b::242]:36740)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1eOdd7-00011n-1R
-	for qemu-devel@nongnu.org; Tue, 12 Dec 2017 01:01:25 -0500
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1eOdd5-0005Tm-EY
-	for <qemu-devel@nongnu.org>; Tue, 12 Dec 2017 06:01:23 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 695162E80C7
-	for <qemu-devel@nongnu.org>; Tue, 12 Dec 2017 06:01:23 +0000 (UTC)
+	(Exim 4.71) (envelope-from <aik@ozlabs.ru>) id 1eOdiR-000438-4M
+	for qemu-devel@nongnu.org; Tue, 12 Dec 2017 01:06:56 -0500
+Received: by mail-it0-x242.google.com with SMTP id d16so21622687itj.1
+	for <qemu-devel@nongnu.org>; Mon, 11 Dec 2017 22:06:55 -0800 (PST)
+References: <20171212052131.24649-1-aik@ozlabs.ru>
+	<20171211225411.6fd08ff8@w520.home>
+From: Alexey Kardashevskiy <aik@ozlabs.ru>
+Message-ID: <60d96072-55c2-93fd-3cf7-011abf4926e1@ozlabs.ru>
+Date: Tue, 12 Dec 2017 17:06:49 +1100
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Tue, 12 Dec 2017 05:49:47 -0000
-From: =?utf-8?q?Juan_Melgarejo_Lude=C3=B1a?= <juan.melgarejo@gmail.com>
-Reply-To: Bug 902413 <902413@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <20111210020345.24327.32197.malonedeb@chaenomeles.canonical.com>
-Message-Id: <151305778754.20061.13367334433983272228.malone@chaenomeles.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 902413] Re: qemu-i386-user on ARM host: wine
- hangs/spins when trying to run anything
+In-Reply-To: <20171211225411.6fd08ff8@w520.home>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-AU
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH qemu] RFC: vfio-pci: Allow mmap of MSIX BAR
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,157 +30,196 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Alex Williamson <alex.williamson@redhat.com>
+Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org, David Gibson <david@gibson.dropbear.id.au>
 
-A year has passed since last update by Nathan Shearer, but status is
-labeled 'incomplete'. Please check if it's solved with wine 3.0
+On 12/12/17 16:54, Alex Williamson wrote:
+> On Tue, 12 Dec 2017 16:21:31 +1100
+> Alexey Kardashevskiy <aik@ozlabs.ru> wrote:
+> 
+>> This makes use of a new VFIO_REGION_INFO_CAP_MSIX_MAPPABLE capability
+>> which tells that a region with MSIX data can be mapped entirely, i.e.
+>> the VFIO PCI driver won't prevent MSIX vectors area from being mapped.
+>>
+>> This adds a "msix-no-mmap" property to the vfio-pci device, it is "true"
+>> by default and "false" for pseries-2.12+ machines.
+>>
+>> This requites kernel's "vfio-pci: Allow mapping MSIX BAR"
+>> https://www.spinics.net/lists/kvm/msg160282.html
+>>
+>> Signed-off-by: Alexey Kardashevskiy <aik@ozlabs.ru>
+>> ---
+>>
+>> This is an RFC as it requires kernel headers update which is not there yet.
+>>
+>> I'd like to make it "msix-mmap" (without "no") but could not find a way
+>> of enabling a device property for machine versions newer than some value.
+>>
+>> I changed 2.11 machine just for the demonstration purpose.
+>>
+>>
+>> ---
+>>  hw/vfio/pci.h                 |  1 +
+>>  include/hw/vfio/vfio-common.h |  1 +
+>>  linux-headers/linux/vfio.h    |  5 +++++
+>>  hw/ppc/spapr.c                | 10 +++++++++-
+>>  hw/vfio/common.c              | 15 +++++++++++++++
+>>  hw/vfio/pci.c                 | 11 +++++++++++
+>>  6 files changed, 42 insertions(+), 1 deletion(-)
+>>
+>> diff --git a/hw/vfio/pci.h b/hw/vfio/pci.h
+>> index a8fb3b3..53912ef 100644
+>> --- a/hw/vfio/pci.h
+>> +++ b/hw/vfio/pci.h
+>> @@ -142,6 +142,7 @@ typedef struct VFIOPCIDevice {
+>>      bool no_kvm_intx;
+>>      bool no_kvm_msi;
+>>      bool no_kvm_msix;
+>> +    bool msix_no_mmap;
+>>  } VFIOPCIDevice;
+>>  
+>>  uint32_t vfio_pci_read_config(PCIDevice *pdev, uint32_t addr, int len);
+>> diff --git a/include/hw/vfio/vfio-common.h b/include/hw/vfio/vfio-common.h
+>> index f3a2ac9..927d600 100644
+>> --- a/include/hw/vfio/vfio-common.h
+>> +++ b/include/hw/vfio/vfio-common.h
+>> @@ -171,6 +171,7 @@ int vfio_get_region_info(VFIODevice *vbasedev, int index,
+>>                           struct vfio_region_info **info);
+>>  int vfio_get_dev_region_info(VFIODevice *vbasedev, uint32_t type,
+>>                               uint32_t subtype, struct vfio_region_info **info);
+>> +bool vfio_is_cap_present(VFIODevice *vbasedev, uint16_t cap_type, int region);
+>>  #endif
+>>  extern const MemoryListener vfio_prereg_listener;
+>>  
+>> diff --git a/linux-headers/linux/vfio.h b/linux-headers/linux/vfio.h
+>> index 4e7ab4c..bce9baf 100644
+>> --- a/linux-headers/linux/vfio.h
+>> +++ b/linux-headers/linux/vfio.h
+>> @@ -300,6 +300,11 @@ struct vfio_region_info_cap_type {
+>>  #define VFIO_REGION_SUBTYPE_INTEL_IGD_HOST_CFG	(2)
+>>  #define VFIO_REGION_SUBTYPE_INTEL_IGD_LPC_CFG	(3)
+>>  
+>> +/*
+>> + * The MSIX mappable capability informs that MSIX data of a BAR can be mmapped.
+>> + */
+>> +#define VFIO_REGION_INFO_CAP_MSIX_MAPPABLE	3
+>> +
+>>  /**
+>>   * VFIO_DEVICE_GET_IRQ_INFO - _IOWR(VFIO_TYPE, VFIO_BASE + 9,
+>>   *				    struct vfio_irq_info)
+>> diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
+>> index 9de63f0..1dfc386 100644
+>> --- a/hw/ppc/spapr.c
+>> +++ b/hw/ppc/spapr.c
+>> @@ -3742,13 +3742,21 @@ static const TypeInfo spapr_machine_info = {
+>>  /*
+>>   * pseries-2.11
+>>   */
+>> +#define SPAPR_COMPAT_2_11                                             \
+>> +    HW_COMPAT_2_10                                                    \
+>> +    {                                                                 \
+>> +        .driver = "vfio-pci",                                         \
+>> +        .property = "msix-no-mmap",                                   \
+>> +        .value    = "on",                                             \
+>> +    },                                                                \
+>> +
+>>  static void spapr_machine_2_11_instance_options(MachineState *machine)
+>>  {
+>>  }
+>>  
+>>  static void spapr_machine_2_11_class_options(MachineClass *mc)
+>>  {
+>> -    /* Defaults for the latest behaviour inherited from the base class */
+>> +    SET_MACHINE_COMPAT(mc, SPAPR_COMPAT_2_11);
+>>  }
+>>  
+>>  DEFINE_SPAPR_MACHINE(2_11, "2.11", true);
+>> diff --git a/hw/vfio/common.c b/hw/vfio/common.c
+>> index ed7717d..593514c 100644
+>> --- a/hw/vfio/common.c
+>> +++ b/hw/vfio/common.c
+>> @@ -1408,6 +1408,21 @@ int vfio_get_dev_region_info(VFIODevice *vbasedev, uint32_t type,
+>>      return -ENODEV;
+>>  }
+>>  
+>> +bool vfio_is_cap_present(VFIODevice *vbasedev, uint16_t cap_type, int region)
+>> +{
+>> +        struct vfio_region_info *info = NULL;
+>> +        bool ret = false;
+>> +
+>> +        if (!vfio_get_region_info(vbasedev, region, &info)) {
+>> +            if (vfio_get_region_info_cap(info, cap_type)) {
+>> +                ret = true;
+>> +            }
+>> +            g_free(info);
+>> +        }
+>> +
+>> +        return ret;
+>> +}
+>> +
+>>  /*
+>>   * Interfaces for IBM EEH (Enhanced Error Handling)
+>>   */
+>> diff --git a/hw/vfio/pci.c b/hw/vfio/pci.c
+>> index c977ee3..d9aeae8 100644
+>> --- a/hw/vfio/pci.c
+>> +++ b/hw/vfio/pci.c
+>> @@ -1289,6 +1289,12 @@ static void vfio_pci_fixup_msix_region(VFIOPCIDevice *vdev)
+>>      off_t start, end;
+>>      VFIORegion *region = &vdev->bars[vdev->msix->table_bar].region;
+>>  
+>> +    if (!vdev->msix_no_mmap &&
+>> +        vfio_is_cap_present(&vdev->vbasedev, VFIO_REGION_INFO_CAP_MSIX_MAPPABLE,
+>> +                            vdev->msix->table_bar)) {
+>> +        return;
+>> +    }
+>> +
+>>      /*
+>>       * We expect to find a single mmap covering the whole BAR, anything else
+>>       * means it's either unsupported or already setup.
+>> @@ -1473,6 +1479,10 @@ static int vfio_msix_setup(VFIOPCIDevice *vdev, int pos, Error **errp)
+>>       */
+>>      memory_region_set_enabled(&vdev->pdev.msix_pba_mmio, false);
+>>  
+>> +    if (!vdev->msix_no_mmap) {
+>> +        memory_region_set_enabled(&vdev->pdev.msix_table_mmio, false);
+>> +    }
+> 
+> No, you're conflating issues.  There's (a) can we mmap over the MSI-X
+> vector table and (b) do we require QEMU emulation of the MSI-X vector
+> table.  (a) does NOT imply (b).  AFAICT, (a) should be enabled any time
+> the kernel supports it,
 
--- =
+This is the default setting, or you do not want it to be a property so the
+user cannot shoot himself in a foot?
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/902413
+> (b) should never be enabled on ppc, regardless
+> of (a).  Thanks,
 
-Title:
-  qemu-i386-user on ARM host: wine hangs/spins when trying to run
-  anything
 
-Status in QEMU:
-  Incomplete
-Status in wine package in Gentoo Linux:
-  New
+The intention is to have a property - msix_no_mmap=true, except a single
+case - ppc-pseries, I just do not know how to enforce it for a specific
+machine type. It could also be a machine property, like "kernel_irqchip".
 
-Bug description:
-  With qemu built from git from 217bfb445b54db618a30f3a39170bebd9fd9dbf2
-  and configured with './configure --target-list=3Di386-linux-user
-  --static --interp-prefix=3D/home/pgriffais/natty-i386/', trying to run
-  wine 1.3.15 from an Ubuntu 11.04 chroot results in hangs. If I run an
-  i386 emulated wineserver, wineserver hangs in:
 
-  0x600c7f8c in read () at ../sysdeps/unix/syscall-template.S:82
-  82	../sysdeps/unix/syscall-template.S: No such file or directory.
-  	in ../sysdeps/unix/syscall-template.S
-  (gdb) bt
-  #0  0x600c7f8c in read () at ../sysdeps/unix/syscall-template.S:82
-  #1  0x6004a316 in read (cpu_env=3D0x622c3ee8, num=3D3, arg1=3D6, arg2=3D1=
-121255519, =
 
-      arg3=3D1, arg4=3D134875664, arg5=3D1, arg6=3D1121255528, arg7=3D0, ar=
-g8=3D0)
-      at /usr/include/bits/unistd.h:45
-  #2  do_syscall (cpu_env=3D0x622c3ee8, num=3D3, arg1=3D6, arg2=3D112125551=
-9, arg3=3D1, =
+> 
+> Alex
+> 
+>> +
+>>      return 0;
+>>  }
+>>  
+>> @@ -2986,6 +2996,7 @@ static Property vfio_pci_dev_properties[] = {
+>>      DEFINE_PROP_BIT("x-igd-opregion", VFIOPCIDevice, features,
+>>                      VFIO_FEATURE_ENABLE_IGD_OPREGION_BIT, false),
+>>      DEFINE_PROP_BOOL("x-no-mmap", VFIOPCIDevice, vbasedev.no_mmap, false),
+>> +    DEFINE_PROP_BOOL("msix-no-mmap", VFIOPCIDevice, msix_no_mmap, true),
+>>      DEFINE_PROP_BOOL("x-no-kvm-intx", VFIOPCIDevice, no_kvm_intx, false),
+>>      DEFINE_PROP_BOOL("x-no-kvm-msi", VFIOPCIDevice, no_kvm_msi, false),
+>>      DEFINE_PROP_BOOL("x-no-kvm-msix", VFIOPCIDevice, no_kvm_msix, false),
+> 
 
-      arg4=3D134875664, arg5=3D1, arg6=3D1121255528, arg7=3D0, arg8=3D0)
-      at /home/ubuntu/src/qemu/linux-user/syscall.c:4691
-  #3  0x600262f0 in cpu_loop (env=3D0x622c3ee8)
-      at /home/ubuntu/src/qemu/linux-user/main.c:321
-  #4  0x60026bbc in main (argc=3D<value optimized out>, =
 
-      argv=3D<value optimized out>, envp=3D<value optimized out>)
-      at /home/ubuntu/src/qemu/linux-user/main.c:3817
-
-  While wine hangs in:
-
-  0x600c84ac in recvmsg () at ../sysdeps/unix/syscall-template.S:82
-  82	../sysdeps/unix/syscall-template.S: No such file or directory.
-  	in ../sysdeps/unix/syscall-template.S
-  (gdb) bt
-  #0  0x600c84ac in recvmsg () at ../sysdeps/unix/syscall-template.S:82
-  #1  0x60041c4e in do_sendrecvmsg (fd=3D4, target_msg=3D<value optimized o=
-ut>, =
-
-      flags=3D1073741824, send=3D0)
-      at /home/ubuntu/src/qemu/linux-user/syscall.c:1834
-  #2  0x600497ec in do_socketcall (cpu_env=3D<value optimized out>, num=3D1=
-02, =
-
-      arg1=3D17, arg2=3D1122504544, arg3=3D2076831732, arg4=3D1122504568, =
-
-      arg5=3D2076942688, arg6=3D1122504888, arg7=3D0, arg8=3D0)
-      at /home/ubuntu/src/qemu/linux-user/syscall.c:2235
-  #3  do_syscall (cpu_env=3D<value optimized out>, num=3D102, arg1=3D17, =
-
-      arg2=3D1122504544, arg3=3D2076831732, arg4=3D1122504568, arg5=3D20769=
-42688, =
-
-      arg6=3D1122504888, arg7=3D0, arg8=3D0)
-      at /home/ubuntu/src/qemu/linux-user/syscall.c:6085
-  #4  0x600262f0 in cpu_loop (env=3D0x622c3f08)
-      at /home/ubuntu/src/qemu/linux-user/main.c:321
-  #5  0x60026bbc in main (argc=3D<value optimized out>, =
-
-      argv=3D<value optimized out>, envp=3D<value optimized out>)
-      at /home/ubuntu/src/qemu/linux-user/main.c:3817
-
-  However if I build wineserver 1.3.15 natively for ARM and run it on
-  the host while wine is emulated, I get the following:
-
-  root@tiberiusstation:/home/ubuntu# ./natty-i386/usr/bin/wine notepad
-  Unsupported ancillary data: 1/2
-  Unsupported ancillary data: 1/2
-  Unsupported ancillary data: 1/2
-  err:process:__wine_kernel_init boot event wait timed out
-
-  I assume the last one is due to wineboot.exe hanging. The main wine
-  process hangs in there:
-
-  cg_temp_new_internal_i32 (temp_local=3D<value optimized out>)
-      at /home/ubuntu/src/qemu/tcg/tcg.c:483
-  483	}
-  (gdb) bt
-  #0  tcg_temp_new_internal_i32 (temp_local=3D<value optimized out>)
-      at /home/ubuntu/src/qemu/tcg/tcg.c:483
-  #1  0x60052ac6 in tcg_temp_new_i32 (val=3D6)
-      at /home/ubuntu/src/qemu/tcg/tcg.h:442
-  #2  tcg_const_i32 (val=3D6) at /home/ubuntu/src/qemu/tcg/tcg.c:530
-  #3  0x6005ef0c in tcg_gen_shri_i32 (ot=3D2, op1=3D2, op2=3D7, is_right=3D=
-1, =
-
-      is_arith=3D0, s=3D<value optimized out>)
-      at /home/ubuntu/src/qemu/tcg/tcg-op.h:605
-  #4  gen_shift_rm_im (ot=3D2, op1=3D2, op2=3D7, is_right=3D1, is_arith=3D0=
-, =
-
-      s=3D<value optimized out>)
-      at /home/ubuntu/src/qemu/target-i386/translate.c:1514
-  #5  0x6006df90 in gen_shifti (s=3D0xbefea970, pc_start=3D<value optimized=
- out>)
-      at /home/ubuntu/src/qemu/target-i386/translate.c:1946
-  #6  disas_insn (s=3D0xbefea970, pc_start=3D<value optimized out>)
-      at /home/ubuntu/src/qemu/target-i386/translate.c:5397
-  #7  0x60091758 in gen_intermediate_code_internal (env=3D0x625656f8, =
-
-      tb=3D0x402cdf48) at /home/ubuntu/src/qemu/target-i386/translate.c:7825
-  #8  gen_intermediate_code_pc (env=3D0x625656f8, tb=3D0x402cdf48)
-      at /home/ubuntu/src/qemu/target-i386/translate.c:7896
-  #9  0x60054bf2 in cpu_restore_state (tb=3D0x402cdf48, env=3D0x62565690, =
-
-      searched_pc=3D1617393812) at /home/ubuntu/src/qemu/translate-all.c:126
-  #10 0x60091d9e in handle_cpu_signal (host_signum=3D<value optimized out>, =
-
-      pinfo=3D<value optimized out>, puc=3D0xbefeab70)
-      at /home/ubuntu/src/qemu/user-exec.c:117
-  #11 cpu_x86_signal_handler (host_signum=3D<value optimized out>, =
-
-      pinfo=3D<value optimized out>, puc=3D0xbefeab70)
-      at /home/ubuntu/src/qemu/user-exec.c:458
-  #12 0x6003c764 in host_signal_handler (host_signum=3D11, info=3D0xbefeaaf=
-0, =
-
-      puc=3D<value optimized out>)
-      at /home/ubuntu/src/qemu/linux-user/signal.c:492
-  #13 <signal handler called>
-  #14 0x60677894 in static_code_gen_buffer ()
-  #15 0x6000a260 in cpu_x86_exec (env=3D0x0)
-      at /home/ubuntu/src/qemu/cpu-exec.c:566
-  #16 0x68953200 in ?? ()
-  #17 0x68953200 in ?? ()
-  Backtrace stopped: previous frame identical to this frame (corrupt stack?
-
-  Running the same version of wine through qemu-user-i386 running on an
-  i386 host works fine with both wineserver and wine being emulated;
-  that's the result I'm trying to achieve.
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/902413/+subscriptions
+-- 
+Alexey
