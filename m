@@ -1,31 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50678)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51153)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <lersek@redhat.com>) id 1eOkcL-0002te-4k
-	for qemu-devel@nongnu.org; Tue, 12 Dec 2017 08:29:08 -0500
+	(envelope-from <marcel@redhat.com>) id 1eOkdz-0003gA-Ox
+	for qemu-devel@nongnu.org; Tue, 12 Dec 2017 08:30:52 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <lersek@redhat.com>) id 1eOkcK-0004TK-4w
-	for qemu-devel@nongnu.org; Tue, 12 Dec 2017 08:29:05 -0500
-References: <1512745328-5109-1-git-send-email-peter.maydell@linaro.org>
-	<1512745328-5109-4-git-send-email-peter.maydell@linaro.org>
-	<5A2F6ED9.5030605@huawei.com>
-	<ac182406-8011-9f19-38e7-37328434095b@redhat.com>
-	<CAFEAcA_9pee99KpL4zwVS5jJuiv2MCGp79crufpU1kH1Okg-Hg@mail.gmail.com>
-	<6b4b6351-eeb4-a4d3-8ddf-5401516671ae@redhat.com>
-	<CAKv+Gu-Ugm1g8twoKwgXAPtDfETvXntk2h4WzMVuUTDF7GhMvA@mail.gmail.com>
-	<5e3798f7-e280-b6c3-1504-828283617c52@redhat.com>
-	<CAFEAcA_+NnpeP9Le7bp9yrYQDwtuP79pt8GpVzJ4RBDMx1iomA@mail.gmail.com>
-	<09e7b89f-27f2-1787-b371-7b0c0eff78b8@redhat.com>
-	<CAFEAcA-357eVt3s_7ULWxssQttvAV0DkUv_tGkyk8umVgfH1QA@mail.gmail.com>
-From: Laszlo Ersek <lersek@redhat.com>
-Message-ID: <d776710c-2255-947b-22c6-336e9491bb81@redhat.com>
-Date: Tue, 12 Dec 2017 14:28:51 +0100
+	(envelope-from <marcel@redhat.com>) id 1eOkdu-0006iJ-A4
+	for qemu-devel@nongnu.org; Tue, 12 Dec 2017 08:30:47 -0500
+References: <20171212053649.1109-1-ybettan@redhat.com>
+From: Marcel Apfelbaum <marcel@redhat.com>
+Message-ID: <a247dbde-b48d-2628-fff2-ade890f5bee1@redhat.com>
+Date: Tue, 12 Dec 2017 15:30:07 +0200
 MIME-Version: 1.0
-In-Reply-To: <CAFEAcA-357eVt3s_7ULWxssQttvAV0DkUv_tGkyk8umVgfH1QA@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
+In-Reply-To: <20171212053649.1109-1-ybettan@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 3/3] hw/arm/virt-acpi-build: Add second
- UART to ACPI tables
+Subject: Re: [Qemu-devel] [PATCH V4] pci: removed the is_express field since
+ a uniform interface was inserted
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,88 +24,275 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: Ard Biesheuvel <ard.biesheuvel@linaro.org>, Shannon Zhao <zhaoshenglong@huawei.com>, qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>, "Jason A . Donenfeld" <Jason@zx2c4.com>, Drew Jones <drjones@redhat.com>, Andrea Bolognani <abologna@redhat.com>
+To: Yoni Bettan <ybettan@redhat.com>, qemu-devel@nongnu.org
+Cc: "Michael S. Tsirkin" <mst@redhat.com>, Keith Busch <keith.busch@intel.com>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, Dmitry Fleytman <dmitry@daynix.com>, Jason Wang <jasowang@redhat.com>, Paul Burton <paul.burton@mips.com>, Paolo Bonzini <pbonzini@redhat.com>, Hannes Reinecke <hare@suse.com>, Gerd Hoffmann <kraxel@redhat.com>, Alex Williamson <alex.williamson@redhat.com>, "open list:nvme" <qemu-block@nongnu.org>
 
-On 12/12/17 13:47, Peter Maydell wrote:
-> On 12 December 2017 at 12:41, Laszlo Ersek <lersek@redhat.com> wrote:
->> I agree. There's one user-visible complication: while with one UART,
->> it's not possible to mix things up, with two UARTs, users will
->> inevitably want to assign inverse roles to them, relative to what QEMU /
->> the firmware assigns originally.
->>
->> E.g. if one PL011 is redirected to a regular file (debug messages) and
->> the other one to stdio (console), there will be complaints that "I
->> wanted it the other way around". The redirection happens on the backend
->> (chardev) level, but the firmware won't see the difference on the
->> frontend (PL011) level.
->>
->> Is it possible to add a new property to the UART nodes in the DTB, like
->> "purpose"?
+On 12/12/2017 7:36, Yoni Bettan wrote:
+>          * according to Eduardo Habkost's commit
+>            fd3b02c8896d597dd8b9e053dec579cf0386aee1
 > 
-> This is what the "chosen" stdout-path node in the DTB is for,
-> but you said you didn't want to look at that :-) (it means
-> "device to be used for boot console output".)
-
-:(
-
-Ard is right that we really shouldn't do that kind of parsing magic in
-very early UEFI stuff.
-
-
->> Or can we make a virt-arm policy that "first -serial is always ...,
->> second -serial is always ..."?
+>          * since all PCIEs now implement INTERFACE_PCIE_DEVICE we
+>            don't need this field anymore
 > 
-> Well, the first -serial will always be the 0x09000000 one
-> that we have today, and the second -serial will be the other
-> one (unless you have -machine secure=yes, in which case
-> second -serial is the secure-only UART and third -serial is
-> the second NS UART).
+>          * Devices that where only INTERFACE_PCIE_DEVICE (is_express == 1)
+>            or
+>            devices that where only INTERFACE_CONVENTIONAL_PCI_DEVICE (is_express == 0)
+>            where not affected by the change
 > 
-> Is this any different to the x86 case, where there are two
-> UARTs at different IO port/IRQ locations?
+>            The only devices that were affected are those that are hybrid and also
+>            had (is_express == 1) - therefor only:
+>              - hw/vfio/pci.c
+>              - hw/usb/hcd-xhci.c
+> 
+>            For both I made sure that QEMU_PCI_CAP_EXPRESS is on
+> 
+> Signed-off-by: Yoni Bettan <ybettan@redhat.com>
+> ---
+>   docs/pcie_pci_bridge.txt           | 2 +-
+>   hw/block/nvme.c                    | 1 -
+>   hw/net/e1000e.c                    | 1 -
+>   hw/pci-bridge/pcie_pci_bridge.c    | 1 -
+>   hw/pci-bridge/pcie_root_port.c     | 1 -
+>   hw/pci-bridge/xio3130_downstream.c | 1 -
+>   hw/pci-bridge/xio3130_upstream.c   | 1 -
+>   hw/pci-host/xilinx-pcie.c          | 1 -
+>   hw/pci/pci.c                       | 8 ++++++--
+>   hw/scsi/megasas.c                  | 4 ----
+>   hw/usb/hcd-xhci.c                  | 9 ++++++++-
+>   hw/vfio/pci.c                      | 5 ++++-
+>   include/hw/pci/pci.h               | 3 ---
+>   13 files changed, 19 insertions(+), 19 deletions(-)
+> 
+> diff --git a/docs/pcie_pci_bridge.txt b/docs/pcie_pci_bridge.txt
+> index 5a4203f97c..ab35ebf3ca 100644
+> --- a/docs/pcie_pci_bridge.txt
+> +++ b/docs/pcie_pci_bridge.txt
+> @@ -110,5 +110,5 @@ To enable device hot-plug into the bridge on Linux there're 3 ways:
+>   Implementation
+>   ==============
+>   The PCIE-PCI bridge is based on PCI-PCI bridge, but also accumulates PCI Express
+> -features as a PCI Express device (is_express=1).
+> +features as a PCI Express device.
+>   
+> diff --git a/hw/block/nvme.c b/hw/block/nvme.c
+> index 441e21ed1f..9325bc0911 100644
+> --- a/hw/block/nvme.c
+> +++ b/hw/block/nvme.c
+> @@ -1087,7 +1087,6 @@ static void nvme_class_init(ObjectClass *oc, void *data)
+>       pc->vendor_id = PCI_VENDOR_ID_INTEL;
+>       pc->device_id = 0x5845;
+>       pc->revision = 2;
+> -    pc->is_express = 1;
+>   
+>       set_bit(DEVICE_CATEGORY_STORAGE, dc->categories);
+>       dc->desc = "Non-Volatile Memory Express";
+> diff --git a/hw/net/e1000e.c b/hw/net/e1000e.c
+> index f1af279e8d..c360f0d8c9 100644
+> --- a/hw/net/e1000e.c
+> +++ b/hw/net/e1000e.c
+> @@ -675,7 +675,6 @@ static void e1000e_class_init(ObjectClass *class, void *data)
+>       c->revision = 0;
+>       c->romfile = "efi-e1000e.rom";
+>       c->class_id = PCI_CLASS_NETWORK_ETHERNET;
+> -    c->is_express = 1;
+>   
+>       dc->desc = "Intel 82574L GbE Controller";
+>       dc->reset = e1000e_qdev_reset;
+> diff --git a/hw/pci-bridge/pcie_pci_bridge.c b/hw/pci-bridge/pcie_pci_bridge.c
+> index a4d827c99d..b7d9ebbec2 100644
+> --- a/hw/pci-bridge/pcie_pci_bridge.c
+> +++ b/hw/pci-bridge/pcie_pci_bridge.c
+> @@ -169,7 +169,6 @@ static void pcie_pci_bridge_class_init(ObjectClass *klass, void *data)
+>       DeviceClass *dc = DEVICE_CLASS(klass);
+>       HotplugHandlerClass *hc = HOTPLUG_HANDLER_CLASS(klass);
+>   
+> -    k->is_express = 1;
+>       k->is_bridge = 1;
+>       k->vendor_id = PCI_VENDOR_ID_REDHAT;
+>       k->device_id = PCI_DEVICE_ID_REDHAT_PCIE_BRIDGE;
+> diff --git a/hw/pci-bridge/pcie_root_port.c b/hw/pci-bridge/pcie_root_port.c
+> index 9b6e4ce512..45f9e8cd4a 100644
+> --- a/hw/pci-bridge/pcie_root_port.c
+> +++ b/hw/pci-bridge/pcie_root_port.c
+> @@ -145,7 +145,6 @@ static void rp_class_init(ObjectClass *klass, void *data)
+>       DeviceClass *dc = DEVICE_CLASS(klass);
+>       PCIDeviceClass *k = PCI_DEVICE_CLASS(klass);
+>   
+> -    k->is_express = 1;
+>       k->is_bridge = 1;
+>       k->config_write = rp_write_config;
+>       k->realize = rp_realize;
+> diff --git a/hw/pci-bridge/xio3130_downstream.c b/hw/pci-bridge/xio3130_downstream.c
+> index 1e09d2afb7..613a0d6bb7 100644
+> --- a/hw/pci-bridge/xio3130_downstream.c
+> +++ b/hw/pci-bridge/xio3130_downstream.c
+> @@ -177,7 +177,6 @@ static void xio3130_downstream_class_init(ObjectClass *klass, void *data)
+>       DeviceClass *dc = DEVICE_CLASS(klass);
+>       PCIDeviceClass *k = PCI_DEVICE_CLASS(klass);
+>   
+> -    k->is_express = 1;
+>       k->is_bridge = 1;
+>       k->config_write = xio3130_downstream_write_config;
+>       k->realize = xio3130_downstream_realize;
+> diff --git a/hw/pci-bridge/xio3130_upstream.c b/hw/pci-bridge/xio3130_upstream.c
+> index 227997ce46..d4645bddee 100644
+> --- a/hw/pci-bridge/xio3130_upstream.c
+> +++ b/hw/pci-bridge/xio3130_upstream.c
+> @@ -148,7 +148,6 @@ static void xio3130_upstream_class_init(ObjectClass *klass, void *data)
+>       DeviceClass *dc = DEVICE_CLASS(klass);
+>       PCIDeviceClass *k = PCI_DEVICE_CLASS(klass);
+>   
+> -    k->is_express = 1;
+>       k->is_bridge = 1;
+>       k->config_write = xio3130_upstream_write_config;
+>       k->realize = xio3130_upstream_realize;
+> diff --git a/hw/pci-host/xilinx-pcie.c b/hw/pci-host/xilinx-pcie.c
+> index 7659253090..a4ca3ba30f 100644
+> --- a/hw/pci-host/xilinx-pcie.c
+> +++ b/hw/pci-host/xilinx-pcie.c
+> @@ -298,7 +298,6 @@ static void xilinx_pcie_root_class_init(ObjectClass *klass, void *data)
+>       k->device_id = 0x7021;
+>       k->revision = 0;
+>       k->class_id = PCI_CLASS_BRIDGE_HOST;
+> -    k->is_express = true;
+>       k->is_bridge = true;
+>       k->init = xilinx_pcie_root_init;
+>       k->exit = pci_bridge_exitfn;
+> diff --git a/hw/pci/pci.c b/hw/pci/pci.c
+> index b2d139bd9a..dc6faa46b9 100644
+> --- a/hw/pci/pci.c
+> +++ b/hw/pci/pci.c
+> @@ -2014,12 +2014,16 @@ static void pci_qdev_realize(DeviceState *qdev, Error **errp)
+>   {
+>       PCIDevice *pci_dev = (PCIDevice *)qdev;
+>       PCIDeviceClass *pc = PCI_DEVICE_GET_CLASS(pci_dev);
+> +    ObjectClass *klass = OBJECT_CLASS(pc);
+>       Error *local_err = NULL;
+>       PCIBus *bus;
+>       bool is_default_rom;
+>   
+> -    /* initialize cap_present for pci_is_express() and pci_config_size() */
+> -    if (pc->is_express) {
+> +    /* initialize cap_present for pci_is_express() and pci_config_size(),
+> +     * Note that hybrid PCIs are not set automatically and need to manage
+> +     * QEMU_PCI_CAP_EXPRESS manually */
+> +    if (object_class_dynamic_cast(klass, INTERFACE_PCIE_DEVICE) &&
+> +       !object_class_dynamic_cast(klass, INTERFACE_CONVENTIONAL_PCI_DEVICE)) {
+>           pci_dev->cap_present |= QEMU_PCI_CAP_EXPRESS;
+>       }
+>   
+> diff --git a/hw/scsi/megasas.c b/hw/scsi/megasas.c
+> index d5eae6239a..ee51feda59 100644
+> --- a/hw/scsi/megasas.c
+> +++ b/hw/scsi/megasas.c
+> @@ -2447,7 +2447,6 @@ typedef struct MegasasInfo {
+>       uint16_t subsystem_id;
+>       int ioport_bar;
+>       int mmio_bar;
+> -    bool is_express;
+>       int osts;
+>       const VMStateDescription *vmsd;
+>       Property *props;
+> @@ -2465,7 +2464,6 @@ static struct MegasasInfo megasas_devices[] = {
+>           .ioport_bar = 2,
+>           .mmio_bar = 0,
+>           .osts = MFI_1078_RM | 1,
+> -        .is_express = false,
+>           .vmsd = &vmstate_megasas_gen1,
+>           .props = megasas_properties_gen1,
+>           .interfaces = (InterfaceInfo[]) {
+> @@ -2482,7 +2480,6 @@ static struct MegasasInfo megasas_devices[] = {
+>           .ioport_bar = 0,
+>           .mmio_bar = 1,
+>           .osts = MFI_GEN2_RM,
+> -        .is_express = true,
+>           .vmsd = &vmstate_megasas_gen2,
+>           .props = megasas_properties_gen2,
+>           .interfaces = (InterfaceInfo[]) {
+> @@ -2506,7 +2503,6 @@ static void megasas_class_init(ObjectClass *oc, void *data)
+>       pc->subsystem_vendor_id = PCI_VENDOR_ID_LSI_LOGIC;
+>       pc->subsystem_id = info->subsystem_id;
+>       pc->class_id = PCI_CLASS_STORAGE_RAID;
+> -    pc->is_express = info->is_express;
+>       e->mmio_bar = info->mmio_bar;
+>       e->ioport_bar = info->ioport_bar;
+>       e->osts = info->osts;
+> diff --git a/hw/usb/hcd-xhci.c b/hw/usb/hcd-xhci.c
+> index af3a9d88de..50a409f0f5 100644
+> --- a/hw/usb/hcd-xhci.c
+> +++ b/hw/usb/hcd-xhci.c
+> @@ -3649,6 +3649,13 @@ static Property xhci_properties[] = {
+>       DEFINE_PROP_END_OF_LIST(),
+>   };
+>   
+> +static void xhci_instance_init(Object *obj)
+> +{
+> +    /* QEMU_PCI_CAP_EXPRESS initialization does not depend on QEMU command
+> +     * line, therefore, no need to wait to realize like other devices */
+> +    PCI_DEVICE(obj)->cap_present |= QEMU_PCI_CAP_EXPRESS;
+> +}
+> +
+>   static void xhci_class_init(ObjectClass *klass, void *data)
+>   {
+>       PCIDeviceClass *k = PCI_DEVICE_CLASS(klass);
+> @@ -3661,7 +3668,6 @@ static void xhci_class_init(ObjectClass *klass, void *data)
+>       k->realize      = usb_xhci_realize;
+>       k->exit         = usb_xhci_exit;
+>       k->class_id     = PCI_CLASS_SERIAL_USB;
+> -    k->is_express   = 1;
+>   }
+>   
+>   static const TypeInfo xhci_info = {
+> @@ -3669,6 +3675,7 @@ static const TypeInfo xhci_info = {
+>       .parent        = TYPE_PCI_DEVICE,
+>       .instance_size = sizeof(XHCIState),
+>       .class_init    = xhci_class_init,
+> +    .instance_init = xhci_instance_init,
+>       .abstract      = true,
+>       .interfaces = (InterfaceInfo[]) {
+>           { INTERFACE_PCIE_DEVICE },
+> diff --git a/hw/vfio/pci.c b/hw/vfio/pci.c
+> index c977ee327f..195732a000 100644
+> --- a/hw/vfio/pci.c
+> +++ b/hw/vfio/pci.c
+> @@ -2972,6 +2972,10 @@ static void vfio_instance_init(Object *obj)
+>       vdev->host.function = ~0U;
+>   
+>       vdev->nv_gpudirect_clique = 0xFF;
+> +
+> +    /* QEMU_PCI_CAP_EXPRESS initialization does not depend on QEMU command
+> +     * line, therefore, no need to wait to realize like other devices */
+> +    pci_dev->cap_present |= QEMU_PCI_CAP_EXPRESS;
+>   }
+>   
+>   static Property vfio_pci_dev_properties[] = {
+> @@ -3026,7 +3030,6 @@ static void vfio_pci_dev_class_init(ObjectClass *klass, void *data)
+>       pdc->exit = vfio_exitfn;
+>       pdc->config_read = vfio_pci_read_config;
+>       pdc->config_write = vfio_pci_write_config;
+> -    pdc->is_express = 1; /* We might be */
+>   }
+>   
+>   static const TypeInfo vfio_pci_dev_info = {
+> diff --git a/include/hw/pci/pci.h b/include/hw/pci/pci.h
+> index 8d02a0a383..a27be85111 100644
+> --- a/include/hw/pci/pci.h
+> +++ b/include/hw/pci/pci.h
+> @@ -236,9 +236,6 @@ typedef struct PCIDeviceClass {
+>        */
+>       int is_bridge;
+>   
+> -    /* pcie stuff */
+> -    int is_express;   /* is this device pci express? */
+> -
+>       /* rom bar */
+>       const char *romfile;
+>   } PCIDeviceClass;
+> 
 
-OVMF (x86) uses two distinct devices for the two purposes discussed.
+No changes in the code, my review stands.
 
-* It uses the "debug console device" for debug message output, at
-hard-coded IO port 0x402; so if you'd like to capture those messages,
-then you have to add:
+Reviewed-by: Marcel Apfelbaum <marcel@redhat.com>
 
-  -chardev file,id=debugfile,path=debug.log \
-  -device isa-debugcon,iobase=0x402,chardev=debugfile \
-
-(or the more traditional
-
-  -debugcon file:debug.log \
-  -global isa-debugcon.iobase=0x402 \
-)
-
-* For console I/O, it uses the first serial port. (I think I have once
-investigated what it takes to use other serial ports for console I/O --
-I'm no longer sure if "it happens to be impossible in OVMF", or just
-"nobody ever does that".)
-
-
-The important distinction (on the UEFI level anyway) is that the debug
-messages need to go to a super dumb device, while console I/O can use a
-much higher-level serial IO abstraction ("protocol").
-
-
-> I think the only thing users really expect is that if you're
-> using just the one serial port for anything then it's the
-> first one.
-
-You are right -- we've never had two (non-secure) UARTs on virt-arm, so
-we can invent whatever assignment, as long as:
-
-- the single UART case doesn't break (keeps receiving both debug output
-and console IO),
-
-- whatever we invent for the two UARTs case now, it remains consistent
-over time. I think this implies we can rely on the FDT node ordering in
-the firmware (if we want to use the 2nd UART at all, that is), and then
-QEMU shouldn't change the serial_hds[] <-> FDT node mapping in the
-future, in machvirt_init() and the callees thereof.
-
-Thanks!
-Laszlo
+Thanks,
+Marcel
