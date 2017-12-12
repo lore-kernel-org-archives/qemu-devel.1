@@ -1,27 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39998)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46143)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1eOr2p-0005jK-0c
-	for qemu-devel@nongnu.org; Tue, 12 Dec 2017 15:20:51 -0500
+	(envelope-from <eblake@redhat.com>) id 1eOrNM-0008Rl-M1
+	for qemu-devel@nongnu.org; Tue, 12 Dec 2017 15:42:05 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1eOr2l-0006lo-RD
-	for qemu-devel@nongnu.org; Tue, 12 Dec 2017 15:20:50 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:52568)
+	(envelope-from <eblake@redhat.com>) id 1eOrNI-0003FS-29
+	for qemu-devel@nongnu.org; Tue, 12 Dec 2017 15:42:04 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:55928)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1eOr2l-0006lP-Kq
-	for qemu-devel@nongnu.org; Tue, 12 Dec 2017 15:20:47 -0500
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
-	[10.5.11.16])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id C418E285D0
-	for <qemu-devel@nongnu.org>; Tue, 12 Dec 2017 20:20:46 +0000 (UTC)
-Date: Tue, 12 Dec 2017 20:20:41 +0000
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20171212202040.GA2458@work-vm>
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1eOrNH-0003FF-PE
+	for qemu-devel@nongnu.org; Tue, 12 Dec 2017 15:41:59 -0500
+References: <20171208105553.12249-1-pbonzini@redhat.com>
+	<32f8bbf4-1fb6-b974-f7ca-f5a91adf875e@redhat.com>
+	<CAFEAcA8j_tGZr-i5LE+ZXAnk4v=pfrKadmgsf=ncMHRUsYK1zQ@mail.gmail.com>
+	<b5a01fb0-4f25-7cae-99d3-c9722912b6c1@redhat.com>
+	<cfe0f5b0-39e7-6bd1-3caf-4abb855275ec@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <0895424e-ad82-be08-4232-0f46369a946b@redhat.com>
+Date: Tue, 12 Dec 2017 14:41:52 -0600
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Subject: [Qemu-devel] No uhd (3840x2160) guest res?
+In-Reply-To: <cfe0f5b0-39e7-6bd1-3caf-4abb855275ec@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="mg7iun0APHiwxAtEGVhkxmCT5e3uejbDT"
+Subject: Re: [Qemu-devel] [RFC PATCH 0/5] Scoped locks using
+ attribute((cleanup))
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,34 +32,81 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: kraxel@redhat.com
+To: Paolo Bonzini <pbonzini@redhat.com>, Peter Maydell <peter.maydell@linaro.org>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, "Emilio G . Cota" <cota@braap.org>, Fam Zheng <famz@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>
 
-My guests don't seem to offer the standard uhd resolution of 3840x2160
-- what should be providing that?
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--mg7iun0APHiwxAtEGVhkxmCT5e3uejbDT
+From: Eric Blake <eblake@redhat.com>
+To: Paolo Bonzini <pbonzini@redhat.com>,
+ Peter Maydell <peter.maydell@linaro.org>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, "Emilio G . Cota"
+ <cota@braap.org>, Fam Zheng <famz@redhat.com>,
+ Stefan Hajnoczi <stefanha@redhat.com>
+Message-ID: <0895424e-ad82-be08-4232-0f46369a946b@redhat.com>
+Subject: Re: [Qemu-devel] [RFC PATCH 0/5] Scoped locks using
+ attribute((cleanup))
+References: <20171208105553.12249-1-pbonzini@redhat.com>
+ <32f8bbf4-1fb6-b974-f7ca-f5a91adf875e@redhat.com>
+ <CAFEAcA8j_tGZr-i5LE+ZXAnk4v=pfrKadmgsf=ncMHRUsYK1zQ@mail.gmail.com>
+ <b5a01fb0-4f25-7cae-99d3-c9722912b6c1@redhat.com>
+ <cfe0f5b0-39e7-6bd1-3caf-4abb855275ec@redhat.com>
+In-Reply-To: <cfe0f5b0-39e7-6bd1-3caf-4abb855275ec@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-I'm running an f27 gnome (X or wayland) guest with:
+On 12/11/2017 03:32 PM, Paolo Bonzini wrote:
+> On 11/12/2017 15:11, Eric Blake wrote:
+>> I don't know if there is a way to make gcc insert stack-unwind
+>> directives that are honored across longjmp (I know C++ does it for
+>> exceptions; so there may be a way, and I just don't know it).
+>=20
+> Probably -fexceptions.
+>=20
 
-./x86_64-softmmu/qemu-system-x86_64 -device virtio-vga --enable-kvm -m 2G /home/vmimages/fedora27.qcow2
+Well, that's what 'info gcc' mentions:
 
-and the guest lists:
-4096x2160
-2480x1680
-2560x1600
-1920x1440
-1856x1392
-1792x1344
-2048x1152
-1920x1200
-1920x1080
-(and smaller)
+'cleanup (CLEANUP_FUNCTION)'
+     The 'cleanup' attribute runs a function when the variable goes out
+     of scope.  This attribute can only be applied to auto function
+     scope variables; it may not be applied to parameters or variables
+     with static storage duration.  The function must take one
+     parameter, a pointer to a type compatible with the variable.  The
+     return value of the function (if any) is ignored.
 
-given that it can offer 4096x2160, I assume it's not running out of RAM.
+     If '-fexceptions' is enabled, then CLEANUP_FUNCTION is run during
+     the stack unwinding that happens during the processing of the
+     exception.  Note that the 'cleanup' attribute does not allow the
+     exception to be caught, only to perform an action.  It is undefined
+     what happens if CLEANUP_FUNCTION does not return normally.
 
-I couldn't find anywhere with those higher resolutions listed
-in seabios to consider changing.
+but adding -fexceptions to my sample program does NOT make a difference
+(apparently, unwind cleanup triggered by C++ exceptions is NOT the same
+as unwinding done by longjmp()).
 
-Dave
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
 
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+
+--mg7iun0APHiwxAtEGVhkxmCT5e3uejbDT
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlowPxAACgkQp6FrSiUn
+Q2rQBwf/XLL26khWJN8kNXx+DyJ1x5KyxZD41wxoxZPc3TlY7IRpESqQ8EW6gOZq
+NcYYES5h3AAmHUKw9auhKuDAROupvpig6KdBFIU9xYKNrU1NuYDURhvmtPjZM6QD
+If6eKetLDbUI+eM4AbwJsZkCTxDYFbsHrZslHYf84QUgvpP898bmE9ReJGuZAO0z
+5puhyz+g9Z64JGLJPT8XaxqN0vt5cBwfcj/awANkpIuX1dITLqUInka2UqbRaMUh
+dL4ZFi9AOk+p144OAfcyWTHpzfEdsJaeyyrnT1IUymwF1j4uMxBCS0pXgf/fH95Z
+Hlrje47uuqgRd0EfICOo5cHHq9uqbA==
+=t/Dz
+-----END PGP SIGNATURE-----
+
+--mg7iun0APHiwxAtEGVhkxmCT5e3uejbDT--
