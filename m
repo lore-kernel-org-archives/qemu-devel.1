@@ -1,23 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37600)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37646)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1eOgcl-0001Pz-6w
-	for qemu-devel@nongnu.org; Tue, 12 Dec 2017 04:13:16 -0500
+	(envelope-from <stefanha@redhat.com>) id 1eOgcx-0001VL-4i
+	for qemu-devel@nongnu.org; Tue, 12 Dec 2017 04:13:31 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1eOgcg-0002TB-7x
-	for qemu-devel@nongnu.org; Tue, 12 Dec 2017 04:13:15 -0500
-Date: Tue, 12 Dec 2017 10:13:03 +0100
-From: Cornelia Huck <cohuck@redhat.com>
-Message-ID: <20171212101303.1ff7468a.cohuck@redhat.com>
-In-Reply-To: <208bf94f-6913-5f80-5df0-9859375e522d@redhat.com>
-References: <20171211134740.8235-1-david@redhat.com>
-	<20171211134740.8235-10-david@redhat.com>
-	<20171211190145.4f3e2be5.cohuck@redhat.com>
-	<208bf94f-6913-5f80-5df0-9859375e522d@redhat.com>
+	(envelope-from <stefanha@redhat.com>) id 1eOgcw-0002fM-4i
+	for qemu-devel@nongnu.org; Tue, 12 Dec 2017 04:13:27 -0500
+Date: Tue, 12 Dec 2017 09:13:14 +0000
+From: Stefan Hajnoczi <stefanha@redhat.com>
+Message-ID: <20171212091314.GD6089@stefanha-x1.localdomain>
+References: <cover.1513004957.git.mark.kanda@oracle.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v1 for-2-12 09/15] s390x/tcg: implement
- TEST PENDING INTERRUPTION
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="/3yNEOqWowh/8j+e"
+Content-Disposition: inline
+In-Reply-To: <cover.1513004957.git.mark.kanda@oracle.com>
+Subject: Re: [Qemu-devel] [PATCH v2 0/2] virtio-blk: miscellaneous changes
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,66 +23,53 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Hildenbrand <david@redhat.com>
-Cc: qemu-s390x@nongnu.org, qemu-devel@nongnu.org, Christian Borntraeger <borntraeger@de.ibm.com>, Richard Henderson <rth@twiddle.net>, Alexander Graf <agraf@suse.de>, Paolo Bonzini <pbonzini@redhat.com>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Thomas Huth <thuth@redhat.com>
+To: Mark Kanda <mark.kanda@oracle.com>
+Cc: qemu-block@nongnu.org, qemu-devel@nongnu.org, konrad.wilk@oracle.com, martin.petersen@oracle.com, ameya.more@oracle.com, karl.heubaum@oracle.com
 
-On Mon, 11 Dec 2017 21:32:58 +0100
-David Hildenbrand <david@redhat.com> wrote:
 
-> On 11.12.2017 19:01, Cornelia Huck wrote:
-> > On Mon, 11 Dec 2017 14:47:34 +0100
-> > David Hildenbrand <david@redhat.com> wrote:
-> >   
-> >> Use s390_cpu_virt_mem_write() so we can actually revert what we did
-> >> (re-inject the dequeued IO interrupt).
-> >>
-> >> Signed-off-by: David Hildenbrand <david@redhat.com>
-> >> ---
-> >>  target/s390x/helper.h      |  1 +
-> >>  target/s390x/insn-data.def |  1 +
-> >>  target/s390x/misc_helper.c | 53 ++++++++++++++++++++++++++++++++++++++++++++++
-> >>  target/s390x/translate.c   |  8 +++++++
-> >>  4 files changed, 63 insertions(+)
-> >>  
-> >   
-> >> +uint32_t HELPER(tpi)(CPUS390XState *env, uint64_t addr)
-> >> +{
-> >> +    const uintptr_t ra = GETPC();
-> >> +    S390CPU *cpu = s390_env_get_cpu(env);
-> >> +    QEMUS390FLICState *flic = QEMU_S390_FLIC(s390_get_flic());
-> >> +    QEMUS390FlicIO *io = NULL;
-> >> +    LowCore *lowcore;
-> >> +
-> >> +    if (addr & 0x3) {
-> >> +        s390_program_interrupt(env, PGM_SPECIFICATION, 4, ra);
-> >> +    }
-> >> +
-> >> +    qemu_mutex_lock_iothread();
-> >> +    io = qemu_s390_flic_dequeue_io(flic, env->cregs[6]);
-> >> +    if (!io) {
-> >> +        qemu_mutex_unlock_iothread();
-> >> +        return 0;
-> >> +    }
-> >> +
-> >> +    if (addr) {
-> >> +        struct {
-> >> +            uint16_t id;
-> >> +            uint16_t nr;
-> >> +            uint32_t parm;
-> >> +        } tmp = {
-> >> +            .id = cpu_to_be16(io->id),
-> >> +            .nr = cpu_to_be16(io->nr),
-> >> +            .parm = cpu_to_be32(io->parm),
-> >> +        };  
-> > 
-> > That's a two-word interruption code; can you call this something better
-> > than 'tmp'?  
-> 
-> IMHO from the context we have here it should be pretty clear what is
-> happening. I mean we are defining and initializing the temporary data
-> structure.
-> 
-> But I can change the name if you can come up with a catchy variable name. :)
-> 
+--/3yNEOqWowh/8j+e
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-int_code?
+On Mon, Dec 11, 2017 at 09:16:23AM -0600, Mark Kanda wrote:
+> v2: add check for maximum queue size [Stefan]
+>=20
+> This series is for two minor virtio-blk changes. The first patch
+> makes the virtio-blk queue size user configurable. The second patch
+> rejects logical block size > physical block configurations (similar
+> to a recent change in virtio-scsi).
+>=20
+> Mark Kanda (2):
+>   virtio-blk: make queue size configurable
+>   virtio-blk: reject configs with logical block size > physical block
+>     size
+>=20
+>  hw/block/virtio-blk.c          | 17 ++++++++++++++++-
+>  include/hw/virtio/virtio-blk.h |  1 +
+>  2 files changed, 17 insertions(+), 1 deletion(-)
+>=20
+> --=20
+> 1.8.3.1
+>=20
+
+Thanks, applied to my block-next tree:
+https://github.com/stefanha/qemu/commits/block-next
+
+Stefan
+
+--/3yNEOqWowh/8j+e
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEcBAEBAgAGBQJaL52qAAoJEJykq7OBq3PISjcIAJGLoNBniespZ+9namqXmWbB
+mkeDgQZoYchx4AhasYMvscH6hxD6Hbq47k/Vn9Fji0Y2h2d6Wii1dmQfthZPmsGp
+G0fgMuKdBQMWKmgRB/JylocjFqEgnGRt7NAWhkTWdwz77VHeSwdTqCZX4HvqoZM/
+VUJeBgIVnezU7DWfxkCIXvyjYDtVetV/pQHWd0hkOA4xrwcwR/LRN2yYI3biuIIj
++576JU0ztzpwsWHHkoUZoy0MdQ9HLzJOHjwIv/Q6YF42jbeyHSSbkO2O6UrAEbcC
+n0/3uURe2iLrIn4jc2xxN+3k+tKr6o62LoVYXmTOJxLDMCfUyyU47fLrgjls0Ow=
+=SVxf
+-----END PGP SIGNATURE-----
+
+--/3yNEOqWowh/8j+e--
