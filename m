@@ -1,25 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35583)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35616)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1eOnTo-0008OV-QA
-	for qemu-devel@nongnu.org; Tue, 12 Dec 2017 11:32:29 -0500
+	(envelope-from <eblake@redhat.com>) id 1eOnTq-0008RG-UG
+	for qemu-devel@nongnu.org; Tue, 12 Dec 2017 11:32:31 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1eOnTk-0006Ji-RY
-	for qemu-devel@nongnu.org; Tue, 12 Dec 2017 11:32:28 -0500
-References: <20171211134740.8235-1-david@redhat.com>
-	<20171211134740.8235-10-david@redhat.com>
-	<20171211190145.4f3e2be5.cohuck@redhat.com>
-	<208bf94f-6913-5f80-5df0-9859375e522d@redhat.com>
-	<20171212101303.1ff7468a.cohuck@redhat.com>
-From: David Hildenbrand <david@redhat.com>
-Message-ID: <8077ae6b-7787-6d71-90ba-d0008373fd73@redhat.com>
-Date: Tue, 12 Dec 2017 17:32:21 +0100
+	(envelope-from <eblake@redhat.com>) id 1eOnTp-0006Q5-UR
+	for qemu-devel@nongnu.org; Tue, 12 Dec 2017 11:32:30 -0500
+References: <20171207203036.14993-1-eblake@redhat.com>
+	<20171207203036.14993-10-eblake@redhat.com>
+	<c0b4ca07-0404-963a-bd1f-9d182eebf469@virtuozzo.com>
+	<bc667ec3-4107-4578-d236-5b914d1291a5@redhat.com>
+	<f0d2401d-95e5-75a3-6112-7ef3fc3f9113@virtuozzo.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <e7ac8195-d017-304f-06f1-544ceb7b1bf4@redhat.com>
+Date: Tue, 12 Dec 2017 10:32:18 -0600
 MIME-Version: 1.0
-In-Reply-To: <20171212101303.1ff7468a.cohuck@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v1 for-2-12 09/15] s390x/tcg: implement
- TEST PENDING INTERRUPTION
+In-Reply-To: <f0d2401d-95e5-75a3-6112-7ef3fc3f9113@virtuozzo.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="3iklPoOxp933MMFUHurhKdTavWAg5pFPT"
+Subject: Re: [Qemu-devel] [PATCH v6 09/20] parallels: Switch to
+ .bdrv_co_block_status()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,76 +28,85 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Cornelia Huck <cohuck@redhat.com>
-Cc: qemu-s390x@nongnu.org, qemu-devel@nongnu.org, Christian Borntraeger <borntraeger@de.ibm.com>, Richard Henderson <rth@twiddle.net>, Alexander Graf <agraf@suse.de>, Paolo Bonzini <pbonzini@redhat.com>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Thomas Huth <thuth@redhat.com>
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, qemu-devel@nongnu.org
+Cc: kwolf@redhat.com, famz@redhat.com, qemu-block@nongnu.org, Stefan Hajnoczi <stefanha@redhat.com>, "Denis V. Lunev" <den@openvz.org>, Max Reitz <mreitz@redhat.com>
 
-On 12.12.2017 10:13, Cornelia Huck wrote:
-> On Mon, 11 Dec 2017 21:32:58 +0100
-> David Hildenbrand <david@redhat.com> wrote:
-> 
->> On 11.12.2017 19:01, Cornelia Huck wrote:
->>> On Mon, 11 Dec 2017 14:47:34 +0100
->>> David Hildenbrand <david@redhat.com> wrote:
->>>   
->>>> Use s390_cpu_virt_mem_write() so we can actually revert what we did
->>>> (re-inject the dequeued IO interrupt).
->>>>
->>>> Signed-off-by: David Hildenbrand <david@redhat.com>
->>>> ---
->>>>  target/s390x/helper.h      |  1 +
->>>>  target/s390x/insn-data.def |  1 +
->>>>  target/s390x/misc_helper.c | 53 ++++++++++++++++++++++++++++++++++++++++++++++
->>>>  target/s390x/translate.c   |  8 +++++++
->>>>  4 files changed, 63 insertions(+)
->>>>  
->>>   
->>>> +uint32_t HELPER(tpi)(CPUS390XState *env, uint64_t addr)
->>>> +{
->>>> +    const uintptr_t ra = GETPC();
->>>> +    S390CPU *cpu = s390_env_get_cpu(env);
->>>> +    QEMUS390FLICState *flic = QEMU_S390_FLIC(s390_get_flic());
->>>> +    QEMUS390FlicIO *io = NULL;
->>>> +    LowCore *lowcore;
->>>> +
->>>> +    if (addr & 0x3) {
->>>> +        s390_program_interrupt(env, PGM_SPECIFICATION, 4, ra);
->>>> +    }
->>>> +
->>>> +    qemu_mutex_lock_iothread();
->>>> +    io = qemu_s390_flic_dequeue_io(flic, env->cregs[6]);
->>>> +    if (!io) {
->>>> +        qemu_mutex_unlock_iothread();
->>>> +        return 0;
->>>> +    }
->>>> +
->>>> +    if (addr) {
->>>> +        struct {
->>>> +            uint16_t id;
->>>> +            uint16_t nr;
->>>> +            uint32_t parm;
->>>> +        } tmp = {
->>>> +            .id = cpu_to_be16(io->id),
->>>> +            .nr = cpu_to_be16(io->nr),
->>>> +            .parm = cpu_to_be32(io->parm),
->>>> +        };  
->>>
->>> That's a two-word interruption code; can you call this something better
->>> than 'tmp'?  
->>
->> IMHO from the context we have here it should be pretty clear what is
->> happening. I mean we are defining and initializing the temporary data
->> structure.
->>
->> But I can change the name if you can come up with a catchy variable name. :)
->>
-> 
-> int_code?
-> 
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--3iklPoOxp933MMFUHurhKdTavWAg5pFPT
+From: Eric Blake <eblake@redhat.com>
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+ qemu-devel@nongnu.org
+Cc: kwolf@redhat.com, famz@redhat.com, qemu-block@nongnu.org,
+ Stefan Hajnoczi <stefanha@redhat.com>, "Denis V. Lunev" <den@openvz.org>,
+ Max Reitz <mreitz@redhat.com>
+Message-ID: <e7ac8195-d017-304f-06f1-544ceb7b1bf4@redhat.com>
+Subject: Re: [PATCH v6 09/20] parallels: Switch to .bdrv_co_block_status()
+References: <20171207203036.14993-1-eblake@redhat.com>
+ <20171207203036.14993-10-eblake@redhat.com>
+ <c0b4ca07-0404-963a-bd1f-9d182eebf469@virtuozzo.com>
+ <bc667ec3-4107-4578-d236-5b914d1291a5@redhat.com>
+ <f0d2401d-95e5-75a3-6112-7ef3fc3f9113@virtuozzo.com>
+In-Reply-To: <f0d2401d-95e5-75a3-6112-7ef3fc3f9113@virtuozzo.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-makes the line exceed 80c. I'll use intc. Thanks!
+On 12/11/2017 09:24 AM, Vladimir Sementsov-Ogievskiy wrote:
 
--- 
+>> On the other hand, '<< BDRV_SECTOR_BITS' only produces the same size
+>> output as the input; if the left side is 32 bits, it risks overflowing=
+=2E
+>> But '* BDRV_SECTOR_SIZE' always produces a 64-bit value.=C2=A0 So I've=
 
-Thanks,
+>> learned (from past mistakes in other byte-conversion series) that the
+>> multiply form is less likely to introduce unintended truncation bugs.
+>=20
+> hm, now I doubt. I've wrote tiny program:
+>=20
+> #include <stdint.h>
+> #include <stdio.h>
+>=20
+> int main() {
+> =C2=A0=C2=A0=C2=A0 uint32_t blocks =3D 1 << 20;
+> =C2=A0=C2=A0=C2=A0 int block_bits =3D 15;
+> =C2=A0=C2=A0=C2=A0 uint32_t block_size =3D 1 << block_bits;
+> =C2=A0=C2=A0=C2=A0 uint64_t a =3D blocks * block_size;
+> =C2=A0=C2=A0=C2=A0 uint64_t b =3D blocks << block_bits;
+> =C2=A0=C2=A0=C2=A0 uint64_t c =3D (uint64_t)blocks * block_size;
 
-David / dhildenb
+Not the same.  'block_size' in your code is 'uint32_t', so your
+multiplication is still 32-bit if you don't cast blocks; while qemu has::=
+
+
+include/block/block.h:#define BDRV_SECTOR_BITS   9
+include/block/block.h:#define BDRV_SECTOR_SIZE   (1ULL << BDRV_SECTOR_BIT=
+S)
+
+and the 1ULL in the qemu definition forces 'unsigned long long' results
+whether or not you cast.
+
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
+
+
+--3iklPoOxp933MMFUHurhKdTavWAg5pFPT
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlowBJIACgkQp6FrSiUn
+Q2pCIgf/ayXeTlq1wWPHESoHj3YlZsVYmTEOsvH7Lr6WS11uR9D/eMVSe/fVRiOh
+wBkpFyPs/eRNW26j//K/Z/MDkjStAM5mljWUdA7YpTvv8zJfiZbIejQYR3215zMF
+svZ9H3wZ7sn6kTzHEL1anNMtgbO+LYYkU6n7zXoGyET1zDmNW6i5Mb3cc5N6b3zW
+xKyQuThXEcYIcZ38DLgy13wSofZHcDe7ge6vGkTbDtaLaO/kjWV1ob0skmtaOBzh
+xzdEZicz9wN1LrrmvITtPx8SUCNhRvTS+D4bzF7k9Ifaii73QEBqfsLUgxHiIMyO
+u7R3eTQ9WjQiwUdVM1x7haNYSnW3XQ==
+=dKyU
+-----END PGP SIGNATURE-----
+
+--3iklPoOxp933MMFUHurhKdTavWAg5pFPT--
