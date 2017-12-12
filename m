@@ -1,25 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59310)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60729)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1eOoba-0008Nq-AG
-	for qemu-devel@nongnu.org; Tue, 12 Dec 2017 12:44:35 -0500
+	(envelope-from <david@redhat.com>) id 1eOofK-00024C-4o
+	for qemu-devel@nongnu.org; Tue, 12 Dec 2017 12:48:26 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1eOobX-0003YS-2d
-	for qemu-devel@nongnu.org; Tue, 12 Dec 2017 12:44:34 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:32788)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1eOobW-0003Y8-Sj
-	for qemu-devel@nongnu.org; Tue, 12 Dec 2017 12:44:31 -0500
-Date: Tue, 12 Dec 2017 17:44:17 +0000
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20171212174416.GJ2409@work-vm>
-References: <20171205055200.16305-1-peterx@redhat.com>
-	<20171205055200.16305-14-peterx@redhat.com>
+	(envelope-from <david@redhat.com>) id 1eOofH-0005nw-3X
+	for qemu-devel@nongnu.org; Tue, 12 Dec 2017 12:48:26 -0500
+References: <1513030760-26245-1-git-send-email-walling@linux.vnet.ibm.com>
+	<1513030760-26245-4-git-send-email-walling@linux.vnet.ibm.com>
+	<8f61fa61-9b27-ac88-e781-be2e8df3a6f4@redhat.com>
+	<046eae0b-e094-8d94-3fea-3390942930b1@linux.vnet.ibm.com>
+From: David Hildenbrand <david@redhat.com>
+Message-ID: <8f374b1d-3bbd-e10d-128a-8b1fa1840530@redhat.com>
+Date: Tue, 12 Dec 2017 18:48:19 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20171205055200.16305-14-peterx@redhat.com>
-Subject: Re: [Qemu-devel] [RFC v5 13/26] qmp: introduce some capability
- helpers
+In-Reply-To: <046eae0b-e094-8d94-3fea-3390942930b1@linux.vnet.ibm.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [qemu-s390x] [PATCH v2 3/5] s390-ccw: parse and
+ set boot menu options
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,43 +27,24 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Xu <peterx@redhat.com>
-Cc: qemu-devel@nongnu.org, Stefan Hajnoczi <shajnocz@redhat.com>, "Daniel P . Berrange" <berrange@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Fam Zheng <famz@redhat.com>, Juan Quintela <quintela@redhat.com>, mdroth@linux.vnet.ibm.com, Eric Blake <eblake@redhat.com>, Laurent Vivier <lvivier@redhat.com>, Markus Armbruster <armbru@redhat.com>, marcandre.lureau@redhat.com
+To: "Collin L. Walling" <walling@linux.vnet.ibm.com>, qemu-s390x@nongnu.org, qemu-devel@nongnu.org
+Cc: borntraeger@de.ibm.com, thuth@redhat.com, cohuck@redhat.com, frankja@linux.vnet.ibm.com
 
-* Peter Xu (peterx@redhat.com) wrote:
-> Introduce qmp_cap_enabled() and qmp_oob_enabled() helpers.
-> 
-> Signed-off-by: Peter Xu <peterx@redhat.com>
 
-Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+>>> +
+>>> +        /* Store timeout value as seconds */
+>>> +        timeout /= 1000;
+>> So we pass ms on the command line? Why?
+> 
+> 
+> The QEMU user documentation specifies the splash-time as milliseconds.
+> I figured it would be best to conform to that.
 
-> ---
->  monitor.c | 10 ++++++++++
->  1 file changed, 10 insertions(+)
-> 
-> diff --git a/monitor.c b/monitor.c
-> index 097312e65f..9666115259 100644
-> --- a/monitor.c
-> +++ b/monitor.c
-> @@ -1038,6 +1038,16 @@ static void monitor_init_qmp_commands(void)
->                           qmp_marshal_qmp_capabilities, QCO_NO_OPTIONS);
->  }
->  
-> +static bool qmp_cap_enabled(Monitor *mon, QMPCapability cap)
-> +{
-> +    return mon->qmp.qmp_caps[cap];
-> +}
-> +
-> +static bool qmp_oob_enabled(Monitor *mon)
-> +{
-> +    return qmp_cap_enabled(mon, QMP_CAPABILITY_OOB);
-> +}
-> +
->  static void qmp_caps_check(Monitor *mon, QMPCapabilityList *list,
->                             Error **errp)
->  {
-> -- 
-> 2.14.3
-> 
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+Makes sense then, maybe round up.
+
+
+-- 
+
+Thanks,
+
+David / dhildenb
