@@ -1,25 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60490)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60548)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1eOi46-0004n8-SG
-	for qemu-devel@nongnu.org; Tue, 12 Dec 2017 05:45:36 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1eOi4N-0004vx-RM
+	for qemu-devel@nongnu.org; Tue, 12 Dec 2017 05:45:57 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1eOi42-0008Nf-J6
-	for qemu-devel@nongnu.org; Tue, 12 Dec 2017 05:45:34 -0500
-References: <20171211134740.8235-1-david@redhat.com>
-	<20171211134740.8235-5-david@redhat.com>
-	<20171211181754.4a3b847d.cohuck@redhat.com>
-	<08154f0d-d526-d735-a952-853fcabe946b@redhat.com>
-	<20171212101545.3bbd19dc.cohuck@redhat.com>
-From: David Hildenbrand <david@redhat.com>
-Message-ID: <0df9176c-80d3-69b7-fcdc-2279ea8dbcea@redhat.com>
-Date: Tue, 12 Dec 2017 11:45:22 +0100
+	(envelope-from <peter.maydell@linaro.org>) id 1eOi4K-0008V2-5c
+	for qemu-devel@nongnu.org; Tue, 12 Dec 2017 05:45:51 -0500
+Received: from mail-ot0-x244.google.com ([2607:f8b0:4003:c0f::244]:44484)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1eOi4K-0008UZ-0F
+	for qemu-devel@nongnu.org; Tue, 12 Dec 2017 05:45:48 -0500
+Received: by mail-ot0-x244.google.com with SMTP id d27so17392316ote.11
+	for <qemu-devel@nongnu.org>; Tue, 12 Dec 2017 02:45:47 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <20171212101545.3bbd19dc.cohuck@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v1 for-2-12 04/15] s390x/flic: simplify
- flic initialization
+In-Reply-To: <5A2F6F44.8050602@huawei.com>
+References: <1512745328-5109-1-git-send-email-peter.maydell@linaro.org>
+	<1512745328-5109-3-git-send-email-peter.maydell@linaro.org>
+	<5A2F6F44.8050602@huawei.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Tue, 12 Dec 2017 10:45:26 +0000
+Message-ID: <CAFEAcA926yVWg6n+QE0mydU5v1DLBwtkfEM+Hs28H9bMVcgyMA@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH 2/3] hw/arm/virt: Add another UART to the
+ virt board
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,100 +31,28 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Cornelia Huck <cohuck@redhat.com>
-Cc: qemu-s390x@nongnu.org, qemu-devel@nongnu.org, Christian Borntraeger <borntraeger@de.ibm.com>, Richard Henderson <rth@twiddle.net>, Alexander Graf <agraf@suse.de>, Paolo Bonzini <pbonzini@redhat.com>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Thomas Huth <thuth@redhat.com>
+To: Shannon Zhao <zhaoshenglong@huawei.com>
+Cc: qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>, "Jason A . Donenfeld" <Jason@zx2c4.com>, Shannon Zhao <shannon.zhao@linaro.org>
 
-On 12.12.2017 10:15, Cornelia Huck wrote:
-> On Mon, 11 Dec 2017 21:34:20 +0100
-> David Hildenbrand <david@redhat.com> wrote:
-> 
->> On 11.12.2017 18:17, Cornelia Huck wrote:
->>> On Mon, 11 Dec 2017 14:47:29 +0100
->>> David Hildenbrand <david@redhat.com> wrote:
->>>   
->>>> This makes it clearer, which device is used for which accelerator.
->>>>
->>>> Signed-off-by: David Hildenbrand <david@redhat.com>
->>>> ---
->>>>  hw/intc/s390_flic.c          |  9 +++++++--
->>>>  hw/intc/s390_flic_kvm.c      | 12 ------------
->>>>  include/hw/s390x/s390_flic.h |  9 ---------
->>>>  3 files changed, 7 insertions(+), 23 deletions(-)
->>>>
->>>> diff --git a/hw/intc/s390_flic.c b/hw/intc/s390_flic.c
->>>> index 6eaf178d79..a78bdf1d90 100644
->>>> --- a/hw/intc/s390_flic.c
->>>> +++ b/hw/intc/s390_flic.c
->>>> @@ -40,11 +40,16 @@ void s390_flic_init(void)
->>>>  {
->>>>      DeviceState *dev;
->>>>  
->>>> -    dev = s390_flic_kvm_create();
->>>> -    if (!dev) {
->>>> +    if (kvm_enabled()) {
->>>> +        dev = qdev_create(NULL, TYPE_KVM_S390_FLIC);
->>>> +        object_property_add_child(qdev_get_machine(), TYPE_KVM_S390_FLIC,
->>>> +                                  OBJECT(dev), NULL);
->>>> +    } else if (tcg_enabled()) {
->>>>          dev = qdev_create(NULL, TYPE_QEMU_S390_FLIC);
->>>>          object_property_add_child(qdev_get_machine(), TYPE_QEMU_S390_FLIC,
->>>>                                    OBJECT(dev), NULL);  
->>>
->>> Can you use TYPE_S390_FLIC_COMMON for attaching the flic to the machine?  
->>
->> I suggest doing that in a separate patch. (I remember that changing the
->> name should not harm migration).
-> 
-> I don't think it harms migration, as we hook up the same device as
-> before (just via the common flic device).
-> 
-> Probably does not make sense as a separate patch, though, as you touch
-> this code anyway.
-> 
+On 12 December 2017 at 05:55, Shannon Zhao <zhaoshenglong@huawei.com> wrote:
+> On 2017/12/8 23:02, Peter Maydell wrote:
+>> Currently we only provide one non-secure UART on the virt
+>> board. This is OK for most purposes, but there are some
+>> use cases where having a second UART would be useful (like
+>> bare-metal testing where you don't really want to have to
+>> probe and set up a PCI device just to have a second comms
+>> channel).
 
-This is what it looks like now:
+> I'm wondering if it need to provide a machine option for user to choose
+> whether adding the second uart or not.
 
-commit dec1ff5cfc72fa0998e28a25dd23f0695ddfe21b
-Author: David Hildenbrand <david@redhat.com>
-Date:   Mon Nov 13 23:09:56 2017 +0100
+It seems harmless enough to me to provide it always.
+It doesn't increase the attack surface for security
+vulnerabilities because it's the same device as the
+first UART the guest already has access to.
 
-    s390x/flic: simplify flic initialization
-    
-    This makes it clearer, which device is used for which accelerator.
-    
-    We can directly attach both to /machine/s390-flic/ instead of two
-    different locations (/machine/s390x-flic[qemu|kvm]). Should not
-    harm migration.
-    
-    Reviewed-by: Christian Borntraeger <borntraeger@de.ibm.com>
-    Signed-off-by: David Hildenbrand <david@redhat.com>
+Do you have a scenario in mind where it would be bad
+to provide the second uart?
 
-diff --git a/hw/intc/s390_flic.c b/hw/intc/s390_flic.c
-index 6eaf178d79..dd5b157392 100644
---- a/hw/intc/s390_flic.c
-+++ b/hw/intc/s390_flic.c
-@@ -40,12 +40,13 @@ void s390_flic_init(void)
- {
-     DeviceState *dev;
- 
--    dev = s390_flic_kvm_create();
--    if (!dev) {
-+    if (kvm_enabled()) {
-+        dev = qdev_create(NULL, TYPE_KVM_S390_FLIC);
-+    } else {
-         dev = qdev_create(NULL, TYPE_QEMU_S390_FLIC);
--        object_property_add_child(qdev_get_machine(), TYPE_QEMU_S390_FLIC,
--                                  OBJECT(dev), NULL);
-     }
-+    object_property_add_child(qdev_get_machine(), TYPE_S390_FLIC_COMMON,
-+                              OBJECT(dev), NULL);
-     qdev_init_nofail(dev);
- }
- 
-...
-
--- 
-
-Thanks,
-
-David / dhildenb
+thanks
+-- PMM
