@@ -1,27 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54968)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55014)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1eOlu2-000094-AK
-	for qemu-devel@nongnu.org; Tue, 12 Dec 2017 09:51:27 -0500
+	(envelope-from <drjones@redhat.com>) id 1eOluR-0000Ow-KK
+	for qemu-devel@nongnu.org; Tue, 12 Dec 2017 09:51:53 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1eOlty-0002oC-9u
-	for qemu-devel@nongnu.org; Tue, 12 Dec 2017 09:51:26 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:42746)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1eOlty-0002ma-1F
-	for qemu-devel@nongnu.org; Tue, 12 Dec 2017 09:51:22 -0500
-From: Markus Armbruster <armbru@redhat.com>
-References: <20170911110623.24981-1-marcandre.lureau@redhat.com>
-	<20170911110623.24981-29-marcandre.lureau@redhat.com>
-Date: Tue, 12 Dec 2017 15:51:15 +0100
-In-Reply-To: <20170911110623.24981-29-marcandre.lureau@redhat.com>
-	(=?utf-8?Q?=22Marc-Andr=C3=A9?= Lureau"'s message of "Mon, 11 Sep 2017
-	13:06:01 +0200")
-Message-ID: <87d13kngnw.fsf@dusky.pond.sub.org>
+	(envelope-from <drjones@redhat.com>) id 1eOluQ-0002y1-NG
+	for qemu-devel@nongnu.org; Tue, 12 Dec 2017 09:51:51 -0500
+Date: Tue, 12 Dec 2017 15:51:38 +0100
+From: Andrew Jones <drjones@redhat.com>
+Message-ID: <20171212145138.dqw6op2orgynlykk@kamzik.brq.redhat.com>
+References: <09e7b89f-27f2-1787-b371-7b0c0eff78b8@redhat.com>
+	<CAFEAcA-357eVt3s_7ULWxssQttvAV0DkUv_tGkyk8umVgfH1QA@mail.gmail.com>
+	<d776710c-2255-947b-22c6-336e9491bb81@redhat.com>
+	<CAKv+Gu9e6qwJ4=t=UHHGsVs1XM26agh17Mgy0ckAvUsy+2xi2A@mail.gmail.com>
+	<CAFEAcA9JzK8sNF5TmENfXZ-NBJwfp03b2La4YQ=N2i1ZCzrNBw@mail.gmail.com>
+	<CAKv+Gu_mzynBKSBSdtUhKRgNd3KmuJTwiNZpmvPCfkRDo_QCgA@mail.gmail.com>
+	<CAFEAcA9HAcZTi6bT-FbsG9LtqO=4s7rpcz0niZbimG834t4uHA@mail.gmail.com>
+	<CAKv+Gu8gZ-Y4-zV2GRgbXPcignAg3vi8__XaFXqAhYOZOL7GcQ@mail.gmail.com>
+	<CAFEAcA8OY3PFk_bermKxQBuF_th7SudHgaRk8wf76EAGYnoCGw@mail.gmail.com>
+	<CAKv+Gu_939a=cui76H5FqCZwbWqDUYhegNe18T+tBpq7CW+TrA@mail.gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v3 28/50] qapi: add 'if' to alternate
- variant
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CAKv+Gu_939a=cui76H5FqCZwbWqDUYhegNe18T+tBpq7CW+TrA@mail.gmail.com>
+Subject: Re: [Qemu-devel] [PATCH 3/3] hw/arm/virt-acpi-build: Add second
+ UART to ACPI tables
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,120 +32,59 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>
-Cc: qemu-devel@nongnu.org, Michael Roth <mdroth@linux.vnet.ibm.com>
+To: Ard Biesheuvel <ard.biesheuvel@linaro.org>
+Cc: Peter Maydell <peter.maydell@linaro.org>, "Jason A . Donenfeld" <Jason@zx2c4.com>, QEMU Developers <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>, Andrea Bolognani <abologna@redhat.com>, Shannon Zhao <zhaoshenglong@huawei.com>, Laszlo Ersek <lersek@redhat.com>
 
-Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com> writes:
+On Tue, Dec 12, 2017 at 02:31:05PM +0000, Ard Biesheuvel wrote:
+> On 12 December 2017 at 14:17, Peter Maydell <peter.maydell@linaro.org> wrote:
+> > On 12 December 2017 at 14:16, Ard Biesheuvel <ard.biesheuvel@linaro.org> wrote:
+> >> On 12 December 2017 at 14:13, Peter Maydell <peter.maydell@linaro.org> wrote:
+> >>> On 12 December 2017 at 14:12, Ard Biesheuvel <ard.biesheuvel@linaro.org> wrote:
+> >>>> On 12 December 2017 at 14:10, Peter Maydell <peter.maydell@linaro.org> wrote:
+> >>>>> That doesn't actually usefully separate debug output from the
+> >>>>> console, though, because stdout-path is also going to point
+> >>>>> to the UART with the lowest physical address...
+> >>>>>
+> >>>>
+> >>>> By default, yes, just like is currently the case. But I would assume
+> >>>> this new serial port could be appointed 'console' and put into
+> >>>> stdout-path by QEMU, based on the command line options?
+> >>>
+> >>> We don't have any command line options for doing that, and I'm
+> >>> generally reluctant to introduce new command line UI, especially
+> >>> new command line UI that's specific to Arm and not also needed
+> >>> for x86.
+> >>>
+> >>
+> >> If stdout-path is always going to point to pl011@0x9000000, why would
+> >> we need to parse it?
+> >
+> > If you had always parsed stdout-path, we wouldn't need to worry
+> > about the order in which the UART nodes appear in the dtb...
+> >
+> 
+> That's a fair point. But it still does not justify introducing added
+> complexity in the firmware, if the conclusion is always going to be
+> that the console will be on pl011@9000000.
+> 
+> To Drew's point re DEBUG builds, I don't think we should generally
+> enable DEBUG and send the output to nowhereland if the user does not
+> wire it up. That's a MMIO trap and two world switches for each
+> character written, if I am not mistaken, and the DEBUG builds are very
+> noisy.
 
-> Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
-> ---
->  scripts/qapi.py                         | 9 ++++++++-
->  tests/qapi-schema/qapi-schema-test.json | 6 +++++-
->  tests/qapi-schema/qapi-schema-test.out  | 8 +++++++-
->  3 files changed, 20 insertions(+), 3 deletions(-)
->
-> diff --git a/scripts/qapi.py b/scripts/qapi.py
-> index 2f14edfa1f..19e48bd4d2 100644
-> --- a/scripts/qapi.py
-> +++ b/scripts/qapi.py
-> @@ -849,6 +849,9 @@ def check_alternate(expr, info):
-       for (key, value) in members.items():
-           check_name(info, "Member of alternate '%s'" % name, key)
+100% agree, which is why I said "If a user wires up a second UART...",
+but I guess my "Not wiring it up would lose the messages..." sentence
+was ambiguous. I didn't mean they'd output to no where, I meant those
+messages wouldn't be output. I.e. some sort of debug_printf() function
+would be written that only actually does a write when there's a debug
+UART on the other end to write to.
 
-           # Ensure alternates have no type conflicts.
->          check_type(info, "Member '%s' of alternate '%s'" % (key, name),
->                     value,
->                     allow_metas=3D['built-in', 'union', 'struct', 'enum'])
-> +        if isinstance(value, dict):
-> +            check_unknown_keys(info, value, {'type', 'if'})
-> +            value =3D value['type']
->          qtype =3D find_alternate_member_qtype(value)
->          if not qtype:
->              raise QAPISemError(info, "Alternate '%s' member '%s' cannot =
-use "
+I just commented on patch 2/3 of this series asking if we shouldn't
+just not allocate the second UART's MMIO region and IRQ, when the user
+doesn't provide a '-serial' option for it. If we didn't, then AAVMF
+would just not output debug messages when only one UART (the console)
+is found in the DT.
 
-I stared at this some because I couldn't see the check_if().  Looks like
-it's done in check_type().  I guess I'm hitting the limits of what I can
-do in *patch* review, and to do better, I'd have to go through the
-resulting code with a fine comb.
-
-You generalize the right hand side from "TYPE" to {"type": "TYPE", "if:
-"IFCOND"}, where "if" is optional.  The old "TYPE" becomes syntactic
-sugar for {"type": "TYPE"}.  Two remarks:
-
-* Since the right hand side is more than just a type, the name
-  check_type() is now inappropriate.  Since PATCH 23.
-
-* The sane way to do syntactic sugar is to desugar at the first
-  opportunity.  You do the opposite: you handle the new aspect of the
-  general form first, and then rewrite it to the sugared form for
-  further processing, most probably to reduce churn.  Reducing churn is
-  good, but I find the resulting code hard to follow, because @value
-  changes meaning halfway through.  May well apply to the other similar
-  patches, too.
-
-> @@ -1671,7 +1674,11 @@ class QAPISchema(object):
->                                                None))
->=20=20
->      def _make_variant(self, case, typ):
-> -        return QAPISchemaObjectTypeVariant(case, typ)
-> +        ifcond =3D None
-> +        if isinstance(typ, dict):
-> +            ifcond =3D typ.get('if')
-> +            typ =3D typ['type']
-> +        return QAPISchemaObjectTypeVariant(case, typ, ifcond)
->=20=20
->      def _make_simple_variant(self, case, typ, info):
->          ifcond =3D None
-> diff --git a/tests/qapi-schema/qapi-schema-test.json b/tests/qapi-schema/=
-qapi-schema-test.json
-> index 895e80a978..f7a62b24d1 100644
-> --- a/tests/qapi-schema/qapi-schema-test.json
-> +++ b/tests/qapi-schema/qapi-schema-test.json
-> @@ -208,9 +208,13 @@
->  { 'command': 'TestIfUnionCmd', 'data': { 'union_cmd_arg': 'TestIfUnion' =
-},
->    'if': 'defined(TEST_IF_UNION)' }
->=20=20
-> -{ 'alternate': 'TestIfAlternate', 'data': { 'foo': 'int', 'bar': 'TestSt=
-ruct' },
-> +{ 'alternate': 'TestIfAlternate', 'data':
-> +  { 'foo': 'int', 'alt_bar': { 'type': 'TestStruct', 'if': 'defined(TEST=
-_IF_ALT_BAR)'} },
->    'if': 'defined(TEST_IF_ALT) && defined(TEST_IF_STRUCT)' }
->=20=20
-> +{ 'command': 'TestIfAlternateCmd', 'data': { 'alt_cmd_arg': 'TestIfAlter=
-nate' },
-> +  'if': 'defined(TEST_IF_ALT)' }
-> +
->  { 'command': 'TestIfCmd', 'data':
->    { 'foo': 'TestIfStruct',
->      'bar': { 'type': 'TestIfEnum', 'if': 'defined(TEST_IF_CMD_BAR)' } },
-> diff --git a/tests/qapi-schema/qapi-schema-test.out b/tests/qapi-schema/q=
-api-schema-test.out
-> index ee009c5626..6887e49c9b 100644
-> --- a/tests/qapi-schema/qapi-schema-test.out
-> +++ b/tests/qapi-schema/qapi-schema-test.out
-> @@ -67,8 +67,11 @@ enum QType
->  alternate TestIfAlternate
->      tag type
->      case foo: int
-> -    case bar: TestStruct
-> +    case alt_bar: TestStruct if=3Ddefined(TEST_IF_ALT_BAR)
->      if defined(TEST_IF_ALT) && defined(TEST_IF_STRUCT)
-> +command TestIfAlternateCmd q_obj_TestIfAlternateCmd-arg -> None
-> +   gen=3DTrue success_response=3DTrue boxed=3DFalse
-> +    if defined(TEST_IF_ALT)
->  command TestIfCmd q_obj_TestIfCmd-arg -> None
->     gen=3DTrue success_response=3DTrue boxed=3DFalse
->      if defined(TEST_IF_CMD) && defined(TEST_IF_STRUCT)
-> @@ -232,6 +235,9 @@ object q_obj_EVENT_D-arg
->      member b: str optional=3DFalse
->      member c: str optional=3DTrue
->      member enum3: EnumOne optional=3DTrue
-> +object q_obj_TestIfAlternateCmd-arg
-> +    member alt_cmd_arg: TestIfAlternate optional=3DFalse
-> +    if defined(TEST_IF_ALT)
->  object q_obj_TestIfCmd-arg
->      member foo: TestIfStruct optional=3DFalse
->      member bar: TestIfEnum optional=3DFalse if=3Ddefined(TEST_IF_CMD_BAR)
+Thanks,
+drew
