@@ -1,20 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41261)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41511)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1eOlGz-0002lZ-Mt
-	for qemu-devel@nongnu.org; Tue, 12 Dec 2017 09:11:13 -0500
+	(envelope-from <berrange@redhat.com>) id 1eOlHE-0002y9-8r
+	for qemu-devel@nongnu.org; Tue, 12 Dec 2017 09:11:22 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1eOlGr-0001Mf-U2
-	for qemu-devel@nongnu.org; Tue, 12 Dec 2017 09:11:05 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:46038)
+	(envelope-from <berrange@redhat.com>) id 1eOlH8-0001n2-NZ
+	for qemu-devel@nongnu.org; Tue, 12 Dec 2017 09:11:20 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:33410)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1eOlGr-0001LN-Kh
-	for qemu-devel@nongnu.org; Tue, 12 Dec 2017 09:10:57 -0500
+	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1eOlH8-0001lv-Em
+	for qemu-devel@nongnu.org; Tue, 12 Dec 2017 09:11:14 -0500
 From: "Daniel P. Berrange" <berrange@redhat.com>
-Date: Tue, 12 Dec 2017 14:10:41 +0000
-Message-Id: <20171212141044.2582-2-berrange@redhat.com>
+Date: Tue, 12 Dec 2017 14:10:44 +0000
+Message-Id: <20171212141044.2582-5-berrange@redhat.com>
 In-Reply-To: <20171212141044.2582-1-berrange@redhat.com>
 References: <20171212141044.2582-1-berrange@redhat.com>
-Subject: [Qemu-devel] [PATCH v6 1/4] hw: convert virtio-input-hid device to
+Subject: [Qemu-devel] [PATCH v6 4/4] hw: convert XenInput keyboard to
  keycodemapdb
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
@@ -27,320 +27,215 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Gerd Hoffmann <kraxel@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Stefano Stabellini <sstabellini@kernel.org>, Anthony Perard <anthony.perard@citrix.com>, xen-devel@lists.xenproject.org, "Daniel P. Berrange" <berrange@redhat.com>
 
-Replace the keymap_qcode table with automatically generated
-tables.
-
-Missing entries in keymap_qcode now fixed:
-
-  Q_KEY_CODE_ASTERISK -> KEY_KPASTERISK
-  Q_KEY_CODE_KP_MULTIPLY -> KEY_KPASTERISK
-  Q_KEY_CODE_STOP -> KEY_STOP
-  Q_KEY_CODE_AGAIN -> KEY_AGAIN
-  Q_KEY_CODE_PROPS -> KEY_PROPS
-  Q_KEY_CODE_UNDO -> KEY_UNDO
-  Q_KEY_CODE_FRONT -> KEY_FRONT
-  Q_KEY_CODE_COPY -> KEY_COPY
-  Q_KEY_CODE_OPEN -> KEY_OPEN
-  Q_KEY_CODE_PASTE -> KEY_PASTE
-  Q_KEY_CODE_FIND -> KEY_FIND
-  Q_KEY_CODE_CUT -> KEY_CUT
-  Q_KEY_CODE_LF -> KEY_LINEFEED
-  Q_KEY_CODE_HELP -> KEY_HELP
-  Q_KEY_CODE_COMPOSE -> KEY_COMPOSE
-  Q_KEY_CODE_RO -> KEY_RO
-  Q_KEY_CODE_HIRAGANA -> KEY_HIRAGANA
-  Q_KEY_CODE_HENKAN -> KEY_HENKAN
-  Q_KEY_CODE_YEN -> KEY_YEN
-  Q_KEY_CODE_KP_COMMA -> KEY_KPCOMMA
-  Q_KEY_CODE_KP_EQUALS -> KEY_KPEQUAL
-  Q_KEY_CODE_POWER -> KEY_POWER
-  Q_KEY_CODE_SLEEP -> KEY_SLEEP
-  Q_KEY_CODE_WAKE -> KEY_WAKEUP
-  Q_KEY_CODE_AUDIONEXT -> KEY_NEXTSONG
-  Q_KEY_CODE_AUDIOPREV -> KEY_PREVIOUSSONG
-  Q_KEY_CODE_AUDIOSTOP -> KEY_STOPCD
-  Q_KEY_CODE_AUDIOPLAY -> KEY_PLAYPAUSE
-  Q_KEY_CODE_AUDIOMUTE -> KEY_MUTE
-  Q_KEY_CODE_VOLUMEUP -> KEY_VOLUMEUP
-  Q_KEY_CODE_VOLUMEDOWN -> KEY_VOLUMEDOWN
-  Q_KEY_CODE_MEDIASELECT -> KEY_MEDIA
-  Q_KEY_CODE_MAIL -> KEY_MAIL
-  Q_KEY_CODE_CALCULATOR -> KEY_CALC
-  Q_KEY_CODE_COMPUTER -> KEY_COMPUTER
-  Q_KEY_CODE_AC_HOME -> KEY_HOMEPAGE
-  Q_KEY_CODE_AC_BACK -> KEY_BACK
-  Q_KEY_CODE_AC_FORWARD -> KEY_FORWARD
-  Q_KEY_CODE_AC_REFRESH -> KEY_REFRESH
-  Q_KEY_CODE_AC_BOOKMARKS -> KEY_BOOKMARKS
-
-NB, the virtio-input device reports a bitmask to the guest driver that
-has a bit set for each Linux keycode that the host is able to send to
-the guest.
-
-Thus by adding these extra key mappings we are technically changing the
-host<->guest ABI. This would also happen any time we defined new mappings
-for QEMU keycodes in future.
-
-When a keycode is removed from the list of possible keycodes that host can
-send to the guest, it means that the guest OS will think it is possible
-to receive a key that in pratice can never be generated, which is harmless.
-
-When a keycode is added to the list of possible keycodes that the host can
-send to the guest, it means that the guest OS can see an unexpected event.
-The Linux virtio_input.c driver code simply forwards this event to the
-input_event() method in the Linux input subsystem. This in turn calls
-input_handle_event(), which then calls input_get_disposition(). This method
-checks if the input event is present in the permitted keys bitmap, and if
-not returns INPUT_IGNORE_EVENT. Thus the unexpected event will get dropped,
-which is harmless.
-
-If the guest OS reboots, or otherwise re-initializes the virt-input device,
-it will read the new keycode bitmap. No matter how many keys are defined,
-the config space has a fixed 128 byte bitmap. There is, however, a size
-field defiend which says how many bytes in the bitmap are used. So the guest
-OS reads the size of the bitmap, and then it reads the data from bitmap upto
-the designated size. So if the guest OS re-initializes at precisely the time
-that QEMU is migrated across versions, in the worst case, it could conceivably
-read the old size field, but then get the newly updated bitmap.  If a key were
-added this is harmless, since it simply means it may not process the newly
-added key. If a key were removed, then it could be readnig a byte from the
-bitmap that was not initialized. Fortunately QEMU always memsets() the entire
-bitmap to 0, prior to setting keybits. Thus the guest OS will simply read
-zeros, which is again harmless.
-
-Based on this analysis, it is believed that there is no need to preserve the
-virtio-input-hid keymaps across migration, as the host<->guest ABI change is
-harmless and self-resolving at time of guest reboot.
-
-NB, this behaviour should perhaps be formalized in the virtio-input spec
-to declare how guest OS drivers should be written to be robust in their
-handling of the potentially changable key bitmaps.
+Replace the scancode2linux table with an automatically
+generated table. In doing so, the XenFB keyboard
+handler is also converted to the modern InputEvent
+framework.
 
 Signed-off-by: Daniel P. Berrange <berrange@redhat.com>
 ---
- Makefile                    |   1 +
- hw/input/virtio-input-hid.c | 136 +++-----------------------------------------
- include/ui/input.h          |   3 +
- ui/input-keymap.c           |   1 +
- 4 files changed, 14 insertions(+), 127 deletions(-)
+ hw/display/xenfb.c | 138 +++++++++++++----------------------------------------
+ 1 file changed, 33 insertions(+), 105 deletions(-)
 
-diff --git a/Makefile b/Makefile
-index ab0354c153..5aaff5fe1e 100644
---- a/Makefile
-+++ b/Makefile
-@@ -227,6 +227,7 @@ KEYCODEMAP_CSV = $(SRC_PATH)/ui/keycodemapdb/data/keymaps.csv
+diff --git a/hw/display/xenfb.c b/hw/display/xenfb.c
+index 8e2547ac05..407b6d04e9 100644
+--- a/hw/display/xenfb.c
++++ b/hw/display/xenfb.c
+@@ -28,6 +28,7 @@
  
- KEYCODEMAP_FILES = \
- 		 ui/input-keymap-linux-to-qcode.c \
-+		 ui/input-keymap-qcode-to-linux.c \
- 		 ui/input-keymap-qcode-to-qnum.c \
- 		 ui/input-keymap-qnum-to-qcode.c \
- 		 $(NULL)
-diff --git a/hw/input/virtio-input-hid.c b/hw/input/virtio-input-hid.c
-index e78faec0b1..bd89c3e6ae 100644
---- a/hw/input/virtio-input-hid.c
-+++ b/hw/input/virtio-input-hid.c
-@@ -22,126 +22,7 @@
+ #include "hw/hw.h"
+ #include "ui/console.h"
++#include "ui/input.h"
+ #include "hw/xen/xen_backend.h"
  
- /* ----------------------------------------------------------------- */
+ #include <xen/event_channel.h>
+@@ -52,7 +53,7 @@ struct XenInput {
+     struct common c;
+     int abs_pointer_wanted; /* Whether guest supports absolute pointer */
+     int button_state;       /* Last seen pointer button state */
+-    int extended;
++    QemuInputHandlerState *qkbd;
+     QEMUPutMouseEntry *qmouse;
+ };
  
--static const unsigned int keymap_qcode[Q_KEY_CODE__MAX] = {
--    [Q_KEY_CODE_ESC]                 = KEY_ESC,
--    [Q_KEY_CODE_1]                   = KEY_1,
--    [Q_KEY_CODE_2]                   = KEY_2,
--    [Q_KEY_CODE_3]                   = KEY_3,
--    [Q_KEY_CODE_4]                   = KEY_4,
--    [Q_KEY_CODE_5]                   = KEY_5,
--    [Q_KEY_CODE_6]                   = KEY_6,
--    [Q_KEY_CODE_7]                   = KEY_7,
--    [Q_KEY_CODE_8]                   = KEY_8,
--    [Q_KEY_CODE_9]                   = KEY_9,
--    [Q_KEY_CODE_0]                   = KEY_0,
--    [Q_KEY_CODE_MINUS]               = KEY_MINUS,
--    [Q_KEY_CODE_EQUAL]               = KEY_EQUAL,
--    [Q_KEY_CODE_BACKSPACE]           = KEY_BACKSPACE,
+@@ -120,78 +121,6 @@ static void common_unbind(struct common *c)
+ 
+ /* -------------------------------------------------------------------- */
+ 
+-#if 0
+-/*
+- * These two tables are not needed any more, but left in here
+- * intentionally as documentation, to show how scancode2linux[]
+- * was generated.
+- *
+- * Tables to map from scancode to Linux input layer keycode.
+- * Scancodes are hardware-specific.  These maps assumes a
+- * standard AT or PS/2 keyboard which is what QEMU feeds us.
+- */
+-const unsigned char atkbd_set2_keycode[512] = {
 -
--    [Q_KEY_CODE_TAB]                 = KEY_TAB,
--    [Q_KEY_CODE_Q]                   = KEY_Q,
--    [Q_KEY_CODE_W]                   = KEY_W,
--    [Q_KEY_CODE_E]                   = KEY_E,
--    [Q_KEY_CODE_R]                   = KEY_R,
--    [Q_KEY_CODE_T]                   = KEY_T,
--    [Q_KEY_CODE_Y]                   = KEY_Y,
--    [Q_KEY_CODE_U]                   = KEY_U,
--    [Q_KEY_CODE_I]                   = KEY_I,
--    [Q_KEY_CODE_O]                   = KEY_O,
--    [Q_KEY_CODE_P]                   = KEY_P,
--    [Q_KEY_CODE_BRACKET_LEFT]        = KEY_LEFTBRACE,
--    [Q_KEY_CODE_BRACKET_RIGHT]       = KEY_RIGHTBRACE,
--    [Q_KEY_CODE_RET]                 = KEY_ENTER,
+-     0, 67, 65, 63, 61, 59, 60, 88,  0, 68, 66, 64, 62, 15, 41,117,
+-     0, 56, 42, 93, 29, 16,  2,  0,  0,  0, 44, 31, 30, 17,  3,  0,
+-     0, 46, 45, 32, 18,  5,  4, 95,  0, 57, 47, 33, 20, 19,  6,183,
+-     0, 49, 48, 35, 34, 21,  7,184,  0,  0, 50, 36, 22,  8,  9,185,
+-     0, 51, 37, 23, 24, 11, 10,  0,  0, 52, 53, 38, 39, 25, 12,  0,
+-     0, 89, 40,  0, 26, 13,  0,  0, 58, 54, 28, 27,  0, 43,  0, 85,
+-     0, 86, 91, 90, 92,  0, 14, 94,  0, 79,124, 75, 71,121,  0,  0,
+-    82, 83, 80, 76, 77, 72,  1, 69, 87, 78, 81, 74, 55, 73, 70, 99,
 -
--    [Q_KEY_CODE_CTRL]                = KEY_LEFTCTRL,
--    [Q_KEY_CODE_A]                   = KEY_A,
--    [Q_KEY_CODE_S]                   = KEY_S,
--    [Q_KEY_CODE_D]                   = KEY_D,
--    [Q_KEY_CODE_F]                   = KEY_F,
--    [Q_KEY_CODE_G]                   = KEY_G,
--    [Q_KEY_CODE_H]                   = KEY_H,
--    [Q_KEY_CODE_J]                   = KEY_J,
--    [Q_KEY_CODE_K]                   = KEY_K,
--    [Q_KEY_CODE_L]                   = KEY_L,
--    [Q_KEY_CODE_SEMICOLON]           = KEY_SEMICOLON,
--    [Q_KEY_CODE_APOSTROPHE]          = KEY_APOSTROPHE,
--    [Q_KEY_CODE_GRAVE_ACCENT]        = KEY_GRAVE,
+-      0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,
+-    217,100,255,  0, 97,165,  0,  0,156,  0,  0,  0,  0,  0,  0,125,
+-    173,114,  0,113,  0,  0,  0,126,128,  0,  0,140,  0,  0,  0,127,
+-    159,  0,115,  0,164,  0,  0,116,158,  0,150,166,  0,  0,  0,142,
+-    157,  0,  0,  0,  0,  0,  0,  0,155,  0, 98,  0,  0,163,  0,  0,
+-    226,  0,  0,  0,  0,  0,  0,  0,  0,255, 96,  0,  0,  0,143,  0,
+-      0,  0,  0,  0,  0,  0,  0,  0,  0,107,  0,105,102,  0,  0,112,
+-    110,111,108,112,106,103,  0,119,  0,118,109,  0, 99,104,119,  0,
 -
--    [Q_KEY_CODE_SHIFT]               = KEY_LEFTSHIFT,
--    [Q_KEY_CODE_BACKSLASH]           = KEY_BACKSLASH,
--    [Q_KEY_CODE_LESS]                = KEY_102ND,
--    [Q_KEY_CODE_Z]                   = KEY_Z,
--    [Q_KEY_CODE_X]                   = KEY_X,
--    [Q_KEY_CODE_C]                   = KEY_C,
--    [Q_KEY_CODE_V]                   = KEY_V,
--    [Q_KEY_CODE_B]                   = KEY_B,
--    [Q_KEY_CODE_N]                   = KEY_N,
--    [Q_KEY_CODE_M]                   = KEY_M,
--    [Q_KEY_CODE_COMMA]               = KEY_COMMA,
--    [Q_KEY_CODE_DOT]                 = KEY_DOT,
--    [Q_KEY_CODE_SLASH]               = KEY_SLASH,
--    [Q_KEY_CODE_SHIFT_R]             = KEY_RIGHTSHIFT,
--
--    [Q_KEY_CODE_ALT]                 = KEY_LEFTALT,
--    [Q_KEY_CODE_SPC]                 = KEY_SPACE,
--    [Q_KEY_CODE_CAPS_LOCK]           = KEY_CAPSLOCK,
--
--    [Q_KEY_CODE_F1]                  = KEY_F1,
--    [Q_KEY_CODE_F2]                  = KEY_F2,
--    [Q_KEY_CODE_F3]                  = KEY_F3,
--    [Q_KEY_CODE_F4]                  = KEY_F4,
--    [Q_KEY_CODE_F5]                  = KEY_F5,
--    [Q_KEY_CODE_F6]                  = KEY_F6,
--    [Q_KEY_CODE_F7]                  = KEY_F7,
--    [Q_KEY_CODE_F8]                  = KEY_F8,
--    [Q_KEY_CODE_F9]                  = KEY_F9,
--    [Q_KEY_CODE_F10]                 = KEY_F10,
--    [Q_KEY_CODE_NUM_LOCK]            = KEY_NUMLOCK,
--    [Q_KEY_CODE_SCROLL_LOCK]         = KEY_SCROLLLOCK,
--
--    [Q_KEY_CODE_KP_0]                = KEY_KP0,
--    [Q_KEY_CODE_KP_1]                = KEY_KP1,
--    [Q_KEY_CODE_KP_2]                = KEY_KP2,
--    [Q_KEY_CODE_KP_3]                = KEY_KP3,
--    [Q_KEY_CODE_KP_4]                = KEY_KP4,
--    [Q_KEY_CODE_KP_5]                = KEY_KP5,
--    [Q_KEY_CODE_KP_6]                = KEY_KP6,
--    [Q_KEY_CODE_KP_7]                = KEY_KP7,
--    [Q_KEY_CODE_KP_8]                = KEY_KP8,
--    [Q_KEY_CODE_KP_9]                = KEY_KP9,
--    [Q_KEY_CODE_KP_SUBTRACT]         = KEY_KPMINUS,
--    [Q_KEY_CODE_KP_ADD]              = KEY_KPPLUS,
--    [Q_KEY_CODE_KP_DECIMAL]          = KEY_KPDOT,
--    [Q_KEY_CODE_KP_ENTER]            = KEY_KPENTER,
--    [Q_KEY_CODE_KP_DIVIDE]           = KEY_KPSLASH,
--    [Q_KEY_CODE_KP_MULTIPLY]         = KEY_KPASTERISK,
--
--    [Q_KEY_CODE_F11]                 = KEY_F11,
--    [Q_KEY_CODE_F12]                 = KEY_F12,
--
--    [Q_KEY_CODE_CTRL_R]              = KEY_RIGHTCTRL,
--    [Q_KEY_CODE_SYSRQ]               = KEY_SYSRQ,
--    [Q_KEY_CODE_PRINT]               = KEY_SYSRQ,
--    [Q_KEY_CODE_PAUSE]               = KEY_PAUSE,
--    [Q_KEY_CODE_ALT_R]               = KEY_RIGHTALT,
--
--    [Q_KEY_CODE_HOME]                = KEY_HOME,
--    [Q_KEY_CODE_UP]                  = KEY_UP,
--    [Q_KEY_CODE_PGUP]                = KEY_PAGEUP,
--    [Q_KEY_CODE_LEFT]                = KEY_LEFT,
--    [Q_KEY_CODE_RIGHT]               = KEY_RIGHT,
--    [Q_KEY_CODE_END]                 = KEY_END,
--    [Q_KEY_CODE_DOWN]                = KEY_DOWN,
--    [Q_KEY_CODE_PGDN]                = KEY_PAGEDOWN,
--    [Q_KEY_CODE_INSERT]              = KEY_INSERT,
--    [Q_KEY_CODE_DELETE]              = KEY_DELETE,
--
--    [Q_KEY_CODE_META_L]              = KEY_LEFTMETA,
--    [Q_KEY_CODE_META_R]              = KEY_RIGHTMETA,
--    [Q_KEY_CODE_MENU]                = KEY_MENU,
 -};
 -
--static const unsigned int keymap_button[INPUT_BUTTON__MAX] = {
-+static const unsigned short keymap_button[INPUT_BUTTON__MAX] = {
-     [INPUT_BUTTON_LEFT]              = BTN_LEFT,
-     [INPUT_BUTTON_RIGHT]             = BTN_RIGHT,
-     [INPUT_BUTTON_MIDDLE]            = BTN_MIDDLE,
-@@ -149,12 +30,12 @@ static const unsigned int keymap_button[INPUT_BUTTON__MAX] = {
-     [INPUT_BUTTON_WHEEL_DOWN]        = BTN_GEAR_DOWN,
- };
- 
--static const unsigned int axismap_rel[INPUT_AXIS__MAX] = {
-+static const unsigned short axismap_rel[INPUT_AXIS__MAX] = {
-     [INPUT_AXIS_X]                   = REL_X,
-     [INPUT_AXIS_Y]                   = REL_Y,
- };
- 
--static const unsigned int axismap_abs[INPUT_AXIS__MAX] = {
-+static const unsigned short axismap_abs[INPUT_AXIS__MAX] = {
-     [INPUT_AXIS_X]                   = ABS_X,
-     [INPUT_AXIS_Y]                   = ABS_Y,
- };
-@@ -162,7 +43,7 @@ static const unsigned int axismap_abs[INPUT_AXIS__MAX] = {
- /* ----------------------------------------------------------------- */
- 
- static void virtio_input_key_config(VirtIOInput *vinput,
--                                    const unsigned int *keymap,
-+                                    const unsigned short *keymap,
-                                     size_t mapsize)
- {
-     virtio_input_config keys;
-@@ -202,9 +83,10 @@ static void virtio_input_handle_event(DeviceState *dev, QemuConsole *src,
-     case INPUT_EVENT_KIND_KEY:
-         key = evt->u.key.data;
-         qcode = qemu_input_key_value_to_qcode(key->key);
--        if (qcode && keymap_qcode[qcode]) {
-+        if (qcode < qemu_input_map_qcode_to_linux_len &&
-+            qemu_input_map_qcode_to_linux[qcode]) {
-             event.type  = cpu_to_le16(EV_KEY);
--            event.code  = cpu_to_le16(keymap_qcode[qcode]);
-+            event.code  = cpu_to_le16(qemu_input_map_qcode_to_linux[qcode]);
-             event.value = cpu_to_le32(key->down ? 1 : 0);
-             virtio_input_send(vinput, &event);
-         } else {
-@@ -395,8 +277,8 @@ static void virtio_keyboard_init(Object *obj)
- 
-     vhid->handler = &virtio_keyboard_handler;
-     virtio_input_init_config(vinput, virtio_keyboard_config);
--    virtio_input_key_config(vinput, keymap_qcode,
--                            ARRAY_SIZE(keymap_qcode));
-+    virtio_input_key_config(vinput, qemu_input_map_qcode_to_linux,
-+                            qemu_input_map_qcode_to_linux_len);
+-const unsigned char atkbd_unxlate_table[128] = {
+-
+-      0,118, 22, 30, 38, 37, 46, 54, 61, 62, 70, 69, 78, 85,102, 13,
+-     21, 29, 36, 45, 44, 53, 60, 67, 68, 77, 84, 91, 90, 20, 28, 27,
+-     35, 43, 52, 51, 59, 66, 75, 76, 82, 14, 18, 93, 26, 34, 33, 42,
+-     50, 49, 58, 65, 73, 74, 89,124, 17, 41, 88,  5,  6,  4, 12,  3,
+-     11,  2, 10,  1,  9,119,126,108,117,125,123,107,115,116,121,105,
+-    114,122,112,113,127, 96, 97,120,  7, 15, 23, 31, 39, 47, 55, 63,
+-     71, 79, 86, 94,  8, 16, 24, 32, 40, 48, 56, 64, 72, 80, 87,111,
+-     19, 25, 57, 81, 83, 92, 95, 98, 99,100,101,103,104,106,109,110
+-
+-};
+-#endif
+-
+-/*
+- * for (i = 0; i < 128; i++) {
+- *     scancode2linux[i] = atkbd_set2_keycode[atkbd_unxlate_table[i]];
+- *     scancode2linux[i | 0x80] = atkbd_set2_keycode[atkbd_unxlate_table[i] | 0x80];
+- * }
+- */
+-static const unsigned char scancode2linux[512] = {
+-      0,  1,  2,  3,  4,  5,  6,  7,  8,  9, 10, 11, 12, 13, 14, 15,
+-     16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31,
+-     32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47,
+-     48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63,
+-     64, 65, 66, 67, 68, 69, 70, 71, 72, 73, 74, 75, 76, 77, 78, 79,
+-     80, 81, 82, 83, 99,  0, 86, 87, 88,117,  0,  0, 95,183,184,185,
+-      0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,
+-     93,  0,  0, 89,  0,  0, 85, 91, 90, 92,  0, 94,  0,124,121,  0,
+-
+-      0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,
+-    165,  0,  0,  0,  0,  0,  0,  0,  0,163,  0,  0, 96, 97,  0,  0,
+-    113,140,164,  0,166,  0,  0,  0,  0,  0,255,  0,  0,  0,114,  0,
+-    115,  0,150,  0,  0, 98,255, 99,100,  0,  0,  0,  0,  0,  0,  0,
+-      0,  0,  0,  0,  0,119,119,102,103,104,  0,105,112,106,118,107,
+-    108,109,110,111,  0,  0,  0,  0,  0,  0,  0,125,126,127,116,142,
+-      0,  0,  0,143,  0,217,156,173,128,159,158,157,155,226,  0,112,
+-      0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,
+-};
+-
+ /* Send an event to the keyboard frontend driver */
+ static int xenfb_kbd_event(struct XenInput *xenfb,
+ 			   union xenkbd_in_event *event)
+@@ -260,38 +189,23 @@ static int xenfb_send_position(struct XenInput *xenfb,
+     return xenfb_kbd_event(xenfb, &event);
  }
  
- static const TypeInfo virtio_keyboard_info = {
-diff --git a/include/ui/input.h b/include/ui/input.h
-index f8cee43f65..6f56d868c7 100644
---- a/include/ui/input.h
-+++ b/include/ui/input.h
-@@ -71,6 +71,9 @@ void qemu_remove_mouse_mode_change_notifier(Notifier *notify);
- extern const guint qemu_input_map_linux_to_qcode_len;
- extern const guint16 qemu_input_map_linux_to_qcode[];
- 
-+extern const guint qemu_input_map_qcode_to_linux_len;
-+extern const guint16 qemu_input_map_qcode_to_linux[];
+-/*
+- * Send a key event from the client to the guest OS
+- * QEMU gives us a raw scancode from an AT / PS/2 style keyboard.
+- * We have to turn this into a Linux Input layer keycode.
+- *
+- * Extra complexity from the fact that with extended scancodes
+- * (like those produced by arrow keys) this method gets called
+- * twice, but we only want to send a single event. So we have to
+- * track the '0xe0' scancode state & collapse the extended keys
+- * as needed.
+- *
+- * Wish we could just send scancodes straight to the guest which
+- * already has code for dealing with this...
+- */
+-static void xenfb_key_event(void *opaque, int scancode)
++static void xenfb_key_event(DeviceState *dev, QemuConsole *src,
++                            InputEvent *evt)
+ {
+-    struct XenInput *xenfb = opaque;
+-    int down = 1;
+-
+-    if (scancode == 0xe0) {
+-	xenfb->extended = 1;
+-	return;
+-    } else if (scancode & 0x80) {
+-	scancode &= 0x7f;
+-	down = 0;
+-    }
+-    if (xenfb->extended) {
+-	scancode |= 0x80;
+-	xenfb->extended = 0;
++    struct XenInput *xenfb = container_of(dev, struct XenInput,
++                                          c.xendev.qdev);
++    InputKeyEvent *key = evt->u.key.data;
++    int qcode;
 +
- extern const guint qemu_input_map_qcode_to_qnum_len;
- extern const guint16 qemu_input_map_qcode_to_qnum[];
++    assert(evt->type == INPUT_EVENT_KIND_KEY);
++
++    qcode = qemu_input_key_value_to_qcode(key->key);
++    if (qcode < qemu_input_map_qcode_to_linux_len) {
++        trace_xenfb_key_event(xenfb, qemu_input_map_qcode_to_linux[qcode],
++                              key->down);
++        xenfb_send_key(xenfb, key->down,
++                       qemu_input_map_qcode_to_linux[qcode]);
+     }
+-    trace_xenfb_key_event(opaque, scancode2linux[scancode], down);
+-    xenfb_send_key(xenfb, down, scancode2linux[scancode]);
+ }
  
-diff --git a/ui/input-keymap.c b/ui/input-keymap.c
-index 3a19a169f5..6e543d651f 100644
---- a/ui/input-keymap.c
-+++ b/ui/input-keymap.c
-@@ -6,6 +6,7 @@
- #include "standard-headers/linux/input.h"
+ /*
+@@ -348,6 +262,12 @@ static int input_init(struct XenDevice *xendev)
+     return 0;
+ }
  
- #include "ui/input-keymap-linux-to-qcode.c"
-+#include "ui/input-keymap-qcode-to-linux.c"
- #include "ui/input-keymap-qcode-to-qnum.c"
- #include "ui/input-keymap-qnum-to-qcode.c"
++static QemuInputHandler xenfb_keyboard_handler = {
++    .name  = "Xen FB Keyboard",
++    .mask  = INPUT_EVENT_MASK_KEY,
++    .event = xenfb_key_event,
++};
++
+ static int input_initialise(struct XenDevice *xendev)
+ {
+     struct XenInput *in = container_of(xendev, struct XenInput, c.xendev);
+@@ -357,7 +277,6 @@ static int input_initialise(struct XenDevice *xendev)
+     if (rc != 0)
+ 	return rc;
+ 
+-    qemu_add_kbd_event_handler(xenfb_key_event, in);
+     return 0;
+ }
+ 
+@@ -377,6 +296,12 @@ static void input_connected(struct XenDevice *xendev)
+     in->qmouse = qemu_add_mouse_event_handler(xenfb_mouse_event, in,
+ 					      in->abs_pointer_wanted,
+ 					      "Xen PVFB Mouse");
++
++    if (in->qkbd) {
++        qemu_input_handler_unregister(in->qkbd);
++    }
++    in->qkbd = qemu_input_handler_register((DeviceState *)in,
++                                           &xenfb_keyboard_handler);
+ }
+ 
+ static void input_disconnect(struct XenDevice *xendev)
+@@ -387,7 +312,10 @@ static void input_disconnect(struct XenDevice *xendev)
+ 	qemu_remove_mouse_event_handler(in->qmouse);
+ 	in->qmouse = NULL;
+     }
+-    qemu_add_kbd_event_handler(NULL, NULL);
++    if (in->qkbd) {
++        qemu_input_handler_unregister(in->qkbd);
++        in->qkbd = NULL;
++    }
+     common_unbind(&in->c);
+ }
  
 -- 
 2.14.3
