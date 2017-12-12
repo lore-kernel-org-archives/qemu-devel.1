@@ -1,28 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54917)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54968)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1eOltr-0008WH-Qv
-	for qemu-devel@nongnu.org; Tue, 12 Dec 2017 09:51:16 -0500
+	(envelope-from <armbru@redhat.com>) id 1eOlu2-000094-AK
+	for qemu-devel@nongnu.org; Tue, 12 Dec 2017 09:51:27 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1eOltn-0002fS-SS
-	for qemu-devel@nongnu.org; Tue, 12 Dec 2017 09:51:15 -0500
-Received: from mail-oi0-x241.google.com ([2607:f8b0:4003:c06::241]:45094)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1eOltn-0002fF-MU
-	for qemu-devel@nongnu.org; Tue, 12 Dec 2017 09:51:11 -0500
-Received: by mail-oi0-x241.google.com with SMTP id x20so14133957oix.12
-	for <qemu-devel@nongnu.org>; Tue, 12 Dec 2017 06:51:11 -0800 (PST)
+	(envelope-from <armbru@redhat.com>) id 1eOlty-0002oC-9u
+	for qemu-devel@nongnu.org; Tue, 12 Dec 2017 09:51:26 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:42746)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1eOlty-0002ma-1F
+	for qemu-devel@nongnu.org; Tue, 12 Dec 2017 09:51:22 -0500
+From: Markus Armbruster <armbru@redhat.com>
+References: <20170911110623.24981-1-marcandre.lureau@redhat.com>
+	<20170911110623.24981-29-marcandre.lureau@redhat.com>
+Date: Tue, 12 Dec 2017 15:51:15 +0100
+In-Reply-To: <20170911110623.24981-29-marcandre.lureau@redhat.com>
+	(=?utf-8?Q?=22Marc-Andr=C3=A9?= Lureau"'s message of "Mon, 11 Sep 2017
+	13:06:01 +0200")
+Message-ID: <87d13kngnw.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-In-Reply-To: <20171212144513.sutjfenbjh33fm5n@kamzik.brq.redhat.com>
-References: <1512745328-5109-1-git-send-email-peter.maydell@linaro.org>
-	<1512745328-5109-3-git-send-email-peter.maydell@linaro.org>
-	<20171212144513.sutjfenbjh33fm5n@kamzik.brq.redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 12 Dec 2017 14:50:50 +0000
-Message-ID: <CAFEAcA-DyuObZjx-g2k9SkofLZ_akadfGYZCMum=3hQQLEdN_w@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH 2/3] hw/arm/virt: Add another UART to the
- virt board
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v3 28/50] qapi: add 'if' to alternate
+ variant
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,25 +30,120 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Andrew Jones <drjones@redhat.com>
-Cc: qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>, "Jason A . Donenfeld" <Jason@zx2c4.com>, Shannon Zhao <shannon.zhao@linaro.org>
+To: =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>
+Cc: qemu-devel@nongnu.org, Michael Roth <mdroth@linux.vnet.ibm.com>
 
-On 12 December 2017 at 14:45, Andrew Jones <drjones@redhat.com> wrote:
-> Should this be
+Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com> writes:
+
+> Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+> ---
+>  scripts/qapi.py                         | 9 ++++++++-
+>  tests/qapi-schema/qapi-schema-test.json | 6 +++++-
+>  tests/qapi-schema/qapi-schema-test.out  | 8 +++++++-
+>  3 files changed, 20 insertions(+), 3 deletions(-)
 >
->     if (!vmc->no_second_uart && serial_hds[uart_count] != NULL) {
->
-> A bit late now, but maybe the other UART resource allocations should have
-> been conditional on actually being wired up too?
+> diff --git a/scripts/qapi.py b/scripts/qapi.py
+> index 2f14edfa1f..19e48bd4d2 100644
+> --- a/scripts/qapi.py
+> +++ b/scripts/qapi.py
+> @@ -849,6 +849,9 @@ def check_alternate(expr, info):
+       for (key, value) in members.items():
+           check_name(info, "Member of alternate '%s'" % name, key)
 
-What does x86 do?
+           # Ensure alternates have no type conflicts.
+>          check_type(info, "Member '%s' of alternate '%s'" % (key, name),
+>                     value,
+>                     allow_metas=3D['built-in', 'union', 'struct', 'enum'])
+> +        if isinstance(value, dict):
+> +            check_unknown_keys(info, value, {'type', 'if'})
+> +            value =3D value['type']
+>          qtype =3D find_alternate_member_qtype(value)
+>          if not qtype:
+>              raise QAPISemError(info, "Alternate '%s' member '%s' cannot =
+use "
 
-I think the conclusion we came to about UARTs in general was that
-boards should always create the devices, and the UART models
-should cope with being passed a NULL chardev backend. (This
-is like real hardware, where the 2nd UART always exists even
-if you haven't plugged a cable into the 2nd serial port on the
-back of the box.)
+I stared at this some because I couldn't see the check_if().  Looks like
+it's done in check_type().  I guess I'm hitting the limits of what I can
+do in *patch* review, and to do better, I'd have to go through the
+resulting code with a fine comb.
 
-thanks
--- PMM
+You generalize the right hand side from "TYPE" to {"type": "TYPE", "if:
+"IFCOND"}, where "if" is optional.  The old "TYPE" becomes syntactic
+sugar for {"type": "TYPE"}.  Two remarks:
+
+* Since the right hand side is more than just a type, the name
+  check_type() is now inappropriate.  Since PATCH 23.
+
+* The sane way to do syntactic sugar is to desugar at the first
+  opportunity.  You do the opposite: you handle the new aspect of the
+  general form first, and then rewrite it to the sugared form for
+  further processing, most probably to reduce churn.  Reducing churn is
+  good, but I find the resulting code hard to follow, because @value
+  changes meaning halfway through.  May well apply to the other similar
+  patches, too.
+
+> @@ -1671,7 +1674,11 @@ class QAPISchema(object):
+>                                                None))
+>=20=20
+>      def _make_variant(self, case, typ):
+> -        return QAPISchemaObjectTypeVariant(case, typ)
+> +        ifcond =3D None
+> +        if isinstance(typ, dict):
+> +            ifcond =3D typ.get('if')
+> +            typ =3D typ['type']
+> +        return QAPISchemaObjectTypeVariant(case, typ, ifcond)
+>=20=20
+>      def _make_simple_variant(self, case, typ, info):
+>          ifcond =3D None
+> diff --git a/tests/qapi-schema/qapi-schema-test.json b/tests/qapi-schema/=
+qapi-schema-test.json
+> index 895e80a978..f7a62b24d1 100644
+> --- a/tests/qapi-schema/qapi-schema-test.json
+> +++ b/tests/qapi-schema/qapi-schema-test.json
+> @@ -208,9 +208,13 @@
+>  { 'command': 'TestIfUnionCmd', 'data': { 'union_cmd_arg': 'TestIfUnion' =
+},
+>    'if': 'defined(TEST_IF_UNION)' }
+>=20=20
+> -{ 'alternate': 'TestIfAlternate', 'data': { 'foo': 'int', 'bar': 'TestSt=
+ruct' },
+> +{ 'alternate': 'TestIfAlternate', 'data':
+> +  { 'foo': 'int', 'alt_bar': { 'type': 'TestStruct', 'if': 'defined(TEST=
+_IF_ALT_BAR)'} },
+>    'if': 'defined(TEST_IF_ALT) && defined(TEST_IF_STRUCT)' }
+>=20=20
+> +{ 'command': 'TestIfAlternateCmd', 'data': { 'alt_cmd_arg': 'TestIfAlter=
+nate' },
+> +  'if': 'defined(TEST_IF_ALT)' }
+> +
+>  { 'command': 'TestIfCmd', 'data':
+>    { 'foo': 'TestIfStruct',
+>      'bar': { 'type': 'TestIfEnum', 'if': 'defined(TEST_IF_CMD_BAR)' } },
+> diff --git a/tests/qapi-schema/qapi-schema-test.out b/tests/qapi-schema/q=
+api-schema-test.out
+> index ee009c5626..6887e49c9b 100644
+> --- a/tests/qapi-schema/qapi-schema-test.out
+> +++ b/tests/qapi-schema/qapi-schema-test.out
+> @@ -67,8 +67,11 @@ enum QType
+>  alternate TestIfAlternate
+>      tag type
+>      case foo: int
+> -    case bar: TestStruct
+> +    case alt_bar: TestStruct if=3Ddefined(TEST_IF_ALT_BAR)
+>      if defined(TEST_IF_ALT) && defined(TEST_IF_STRUCT)
+> +command TestIfAlternateCmd q_obj_TestIfAlternateCmd-arg -> None
+> +   gen=3DTrue success_response=3DTrue boxed=3DFalse
+> +    if defined(TEST_IF_ALT)
+>  command TestIfCmd q_obj_TestIfCmd-arg -> None
+>     gen=3DTrue success_response=3DTrue boxed=3DFalse
+>      if defined(TEST_IF_CMD) && defined(TEST_IF_STRUCT)
+> @@ -232,6 +235,9 @@ object q_obj_EVENT_D-arg
+>      member b: str optional=3DFalse
+>      member c: str optional=3DTrue
+>      member enum3: EnumOne optional=3DTrue
+> +object q_obj_TestIfAlternateCmd-arg
+> +    member alt_cmd_arg: TestIfAlternate optional=3DFalse
+> +    if defined(TEST_IF_ALT)
+>  object q_obj_TestIfCmd-arg
+>      member foo: TestIfStruct optional=3DFalse
+>      member bar: TestIfEnum optional=3DFalse if=3Ddefined(TEST_IF_CMD_BAR)
