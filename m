@@ -1,42 +1,40 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42926)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43142)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <borntraeger@de.ibm.com>) id 1eOlJn-0006gE-Qu
-	for qemu-devel@nongnu.org; Tue, 12 Dec 2017 09:14:00 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1eOlK8-0006yj-KQ
+	for qemu-devel@nongnu.org; Tue, 12 Dec 2017 09:14:21 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <borntraeger@de.ibm.com>) id 1eOlJk-00047t-KD
-	for qemu-devel@nongnu.org; Tue, 12 Dec 2017 09:13:59 -0500
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:59576
-	helo=mx0a-001b2d01.pphosted.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <borntraeger@de.ibm.com>)
-	id 1eOlJk-000472-E7
-	for qemu-devel@nongnu.org; Tue, 12 Dec 2017 09:13:56 -0500
-Received: from pps.filterd (m0098413.ppops.net [127.0.0.1])
-	by mx0b-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
-	vBCEAuCG023510
-	for <qemu-devel@nongnu.org>; Tue, 12 Dec 2017 09:13:53 -0500
-Received: from e06smtp10.uk.ibm.com (e06smtp10.uk.ibm.com [195.75.94.106])
-	by mx0b-001b2d01.pphosted.com with ESMTP id 2ete3tyrwe-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Tue, 12 Dec 2017 09:13:52 -0500
-Received: from localhost
-	by e06smtp10.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
-	Only! Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <borntraeger@de.ibm.com>;
-	Tue, 12 Dec 2017 14:13:49 -0000
-References: <20171211134740.8235-1-david@redhat.com>
-	<20171211134740.8235-7-david@redhat.com>
-	<20171212144944.09860296.cohuck@redhat.com>
-From: Christian Borntraeger <borntraeger@de.ibm.com>
-Date: Tue, 12 Dec 2017 15:13:46 +0100
+	(envelope-from <peter.maydell@linaro.org>) id 1eOlK4-0004VF-SJ
+	for qemu-devel@nongnu.org; Tue, 12 Dec 2017 09:14:20 -0500
+Received: from mail-ot0-x243.google.com ([2607:f8b0:4003:c0f::243]:32987)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1eOlK4-0004UM-NJ
+	for qemu-devel@nongnu.org; Tue, 12 Dec 2017 09:14:16 -0500
+Received: by mail-ot0-x243.google.com with SMTP id h9so17895792oti.0
+	for <qemu-devel@nongnu.org>; Tue, 12 Dec 2017 06:14:16 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <20171212144944.09860296.cohuck@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Message-Id: <0aa794ee-c781-0cc4-3c0a-5f49ae495c63@de.ibm.com>
-Subject: Re: [Qemu-devel] [PATCH v1 for-2-12 06/15] s390x/flic: factor out
- injection of floating interrupts
+In-Reply-To: <CAKv+Gu_mzynBKSBSdtUhKRgNd3KmuJTwiNZpmvPCfkRDo_QCgA@mail.gmail.com>
+References: <1512745328-5109-1-git-send-email-peter.maydell@linaro.org>
+	<1512745328-5109-4-git-send-email-peter.maydell@linaro.org>
+	<5A2F6ED9.5030605@huawei.com>
+	<ac182406-8011-9f19-38e7-37328434095b@redhat.com>
+	<CAFEAcA_9pee99KpL4zwVS5jJuiv2MCGp79crufpU1kH1Okg-Hg@mail.gmail.com>
+	<6b4b6351-eeb4-a4d3-8ddf-5401516671ae@redhat.com>
+	<CAKv+Gu-Ugm1g8twoKwgXAPtDfETvXntk2h4WzMVuUTDF7GhMvA@mail.gmail.com>
+	<5e3798f7-e280-b6c3-1504-828283617c52@redhat.com>
+	<CAFEAcA_+NnpeP9Le7bp9yrYQDwtuP79pt8GpVzJ4RBDMx1iomA@mail.gmail.com>
+	<09e7b89f-27f2-1787-b371-7b0c0eff78b8@redhat.com>
+	<CAFEAcA-357eVt3s_7ULWxssQttvAV0DkUv_tGkyk8umVgfH1QA@mail.gmail.com>
+	<d776710c-2255-947b-22c6-336e9491bb81@redhat.com>
+	<CAKv+Gu9e6qwJ4=t=UHHGsVs1XM26agh17Mgy0ckAvUsy+2xi2A@mail.gmail.com>
+	<CAFEAcA9JzK8sNF5TmENfXZ-NBJwfp03b2La4YQ=N2i1ZCzrNBw@mail.gmail.com>
+	<CAKv+Gu_mzynBKSBSdtUhKRgNd3KmuJTwiNZpmvPCfkRDo_QCgA@mail.gmail.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Tue, 12 Dec 2017 14:13:55 +0000
+Message-ID: <CAFEAcA9HAcZTi6bT-FbsG9LtqO=4s7rpcz0niZbimG834t4uHA@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH 3/3] hw/arm/virt-acpi-build: Add second
+ UART to ACPI tables
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -45,100 +43,24 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Cornelia Huck <cohuck@redhat.com>, David Hildenbrand <david@redhat.com>
-Cc: qemu-s390x@nongnu.org, qemu-devel@nongnu.org, Richard Henderson <rth@twiddle.net>, Alexander Graf <agraf@suse.de>, Paolo Bonzini <pbonzini@redhat.com>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Thomas Huth <thuth@redhat.com>
+To: Ard Biesheuvel <ard.biesheuvel@linaro.org>
+Cc: Laszlo Ersek <lersek@redhat.com>, Shannon Zhao <zhaoshenglong@huawei.com>, qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>, "Jason A . Donenfeld" <Jason@zx2c4.com>, Drew Jones <drjones@redhat.com>, Andrea Bolognani <abologna@redhat.com>
 
-
-
-On 12/12/2017 02:49 PM, Cornelia Huck wrote:
-> On Mon, 11 Dec 2017 14:47:31 +0100
-> David Hildenbrand <david@redhat.com> wrote:
-> 
->> Let the flic device handle it internally. This will allow us to later
->> on store floating interrupts in the flic for the TCG case.
+On 12 December 2017 at 14:12, Ard Biesheuvel <ard.biesheuvel@linaro.org> wrote:
+> On 12 December 2017 at 14:10, Peter Maydell <peter.maydell@linaro.org> wrote:
+>> That doesn't actually usefully separate debug output from the
+>> console, though, because stdout-path is also going to point
+>> to the UART with the lowest physical address...
 >>
->> This now also simplifies kvm.c. All that's left is the fallback
->> interface for floating interrupts, which is no triggered directly via
-> 
-> s/no/now/
-> 
->> the flic in case anything goes wrong.
->>
->> Signed-off-by: David Hildenbrand <david@redhat.com>
->> ---
->>  hw/intc/s390_flic.c          | 31 ++++++++++++++++++++
->>  hw/intc/s390_flic_kvm.c      | 63 ++++++++++++++++++++++++++++++++++++----
->>  include/hw/s390x/s390_flic.h |  5 ++++
->>  target/s390x/cpu.h           |  7 ++++-
->>  target/s390x/interrupt.c     | 42 +++++++++++----------------
->>  target/s390x/kvm-stub.c      | 13 ---------
->>  target/s390x/kvm.c           | 68 ++++----------------------------------------
->>  target/s390x/kvm_s390x.h     | 10 +------
->>  8 files changed, 123 insertions(+), 116 deletions(-)
->>
->> diff --git a/hw/intc/s390_flic.c b/hw/intc/s390_flic.c
->> index a78bdf1d90..8d521c415a 100644
->> --- a/hw/intc/s390_flic.c
->> +++ b/hw/intc/s390_flic.c
->> @@ -131,6 +131,34 @@ static int qemu_s390_inject_airq(S390FLICState *fs, uint8_t type,
->>      return 0;
->>  }
->>  
->> +static void qemu_s390_inject_service(S390FLICState *fs, uint32_t parm)
->> +{
->> +
->> +    S390CPU *dummy_cpu = s390_cpu_addr2state(0);
->> +
->> +    /* FIXME: don't inject into dummy CPU */
->> +    cpu_inject_service(dummy_cpu, parm);
->> +}
->> +
->> +static void qemu_s390_inject_io(S390FLICState *fs, uint16_t subchannel_id,
->> +                                uint16_t subchannel_nr, uint32_t io_int_parm,
->> +                                uint32_t io_int_word)
->> +{
->> +    S390CPU *dummy_cpu = s390_cpu_addr2state(0);
->> +
->> +    /* FIXME: don't inject into dummy CPU */
->> +    cpu_inject_io(dummy_cpu, subchannel_id, subchannel_nr, io_int_parm,
->> +                  io_int_word);
->> +}
->> +
->> +static void qemu_s390_inject_crw_mchk(S390FLICState *fs)
->> +{
->> +    S390CPU *dummy_cpu = s390_cpu_addr2state(0);
->> +
->> +    /* FIXME: don't inject into dummy CPU */
->> +    cpu_inject_crw_mchk(dummy_cpu);
->> +}
->> +
->>  static void qemu_s390_flic_reset(DeviceState *dev)
->>  {
->>      QEMUS390FLICState *flic = QEMU_S390_FLIC(dev);
->> @@ -172,6 +200,9 @@ static void qemu_s390_flic_class_init(ObjectClass *oc, void *data)
->>      fsc->clear_io_irq = qemu_s390_clear_io_flic;
->>      fsc->modify_ais_mode = qemu_s390_modify_ais_mode;
->>      fsc->inject_airq = qemu_s390_inject_airq;
->> +    fsc->inject_service = qemu_s390_inject_service;
->> +    fsc->inject_io = qemu_s390_inject_io;
->> +    fsc->inject_crw_mchk = qemu_s390_inject_crw_mchk;
->>  }
-> 
-> As you now have a callback for ->inject_io(), make
-> qemu_s390_inject_airq() invoke it directly instead of going the detour
-> through s390_io_interrupt()?
-> 
->>  
->>  static Property s390_flic_common_properties[] = {
-> 
-> (...)
-> 
-> Generally looks sane.
-> 
-> One thing I noticed: You removed the caching of the flic (in the old
-> kvm inject routine), and you generally do more qom invocations (first,
-> to find the common flic; then, to translate to the qemu or kvm flic).
-> Not sure if this might be a problem (probably not).
+>
+> By default, yes, just like is currently the case. But I would assume
+> this new serial port could be appointed 'console' and put into
+> stdout-path by QEMU, based on the command line options?
 
-Is any of these calls on a potential fast path (e.g. guest without adapter
-interrupts)? If yes, then QOM is a no-go since it is really slow.
+We don't have any command line options for doing that, and I'm
+generally reluctant to introduce new command line UI, especially
+new command line UI that's specific to Arm and not also needed
+for x86.
+
+thanks
+-- PMM
