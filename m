@@ -1,24 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57480)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57526)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1eOoWZ-0003Yi-W2
-	for qemu-devel@nongnu.org; Tue, 12 Dec 2017 12:39:25 -0500
+	(envelope-from <richard.henderson@linaro.org>) id 1eOoWj-0003fQ-6x
+	for qemu-devel@nongnu.org; Tue, 12 Dec 2017 12:39:34 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1eOoWW-0008RK-QY
-	for qemu-devel@nongnu.org; Tue, 12 Dec 2017 12:39:23 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:45566)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1eOoWW-0008Qo-Hl
-	for qemu-devel@nongnu.org; Tue, 12 Dec 2017 12:39:20 -0500
-Date: Tue, 12 Dec 2017 17:39:04 +0000
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20171212173904.GI2409@work-vm>
-References: <20171205055200.16305-1-peterx@redhat.com>
-	<20171205055200.16305-13-peterx@redhat.com>
+	(envelope-from <richard.henderson@linaro.org>) id 1eOoWg-000051-4x
+	for qemu-devel@nongnu.org; Tue, 12 Dec 2017 12:39:33 -0500
+Received: from mail-ua0-x244.google.com ([2607:f8b0:400c:c08::244]:34413)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+	id 1eOoWg-0008WI-03
+	for qemu-devel@nongnu.org; Tue, 12 Dec 2017 12:39:30 -0500
+Received: by mail-ua0-x244.google.com with SMTP id d26so14952705uak.1
+	for <qemu-devel@nongnu.org>; Tue, 12 Dec 2017 09:39:29 -0800 (PST)
+References: <1513080506-17703-1-git-send-email-peter.maydell@linaro.org>
+From: Richard Henderson <richard.henderson@linaro.org>
+Message-ID: <52515faf-f889-93ee-c0d0-4a895cfb6b13@linaro.org>
+Date: Tue, 12 Dec 2017 09:39:23 -0800
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20171205055200.16305-13-peterx@redhat.com>
-Subject: Re: [Qemu-devel] [RFC v5 12/26] qmp: negociate QMP capabilities
+In-Reply-To: <1513080506-17703-1-git-send-email-peter.maydell@linaro.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH] target/arm: Make disas_thumb2_insn()
+ generate its own UNDEF exceptions
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,181 +31,25 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Xu <peterx@redhat.com>
-Cc: qemu-devel@nongnu.org, Stefan Hajnoczi <shajnocz@redhat.com>, "Daniel P . Berrange" <berrange@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Fam Zheng <famz@redhat.com>, Juan Quintela <quintela@redhat.com>, mdroth@linux.vnet.ibm.com, Eric Blake <eblake@redhat.com>, Laurent Vivier <lvivier@redhat.com>, Markus Armbruster <armbru@redhat.com>, marcandre.lureau@redhat.com
+To: Peter Maydell <peter.maydell@linaro.org>, qemu-arm@nongnu.org, qemu-devel@nongnu.org
+Cc: patches@linaro.org
 
-* Peter Xu (peterx@redhat.com) wrote:
-> After this patch, we will allow QMP clients to enable QMP capabilities
-> when sending the first "qmp_capabilities" command.  Originally we are
-> starting QMP session with no arguments like:
+On 12/12/2017 04:08 AM, Peter Maydell wrote:
+> Refactor disas_thumb2_insn() so that it generates the code for raising
+> an UNDEF exception for invalid insns, rather than returning a flag
+> which the caller must check to see if it needs to generate the UNDEF
+> code. This brings the function in to line with the behaviour of
+> disas_thumb_insn() and disas_arm_insn().
 > 
->   { "execute": "qmp_capabilities" }
-> 
-> Now we can enable some QMP capabilities using (take OOB as example,
-> which is the only one capability that we support):
-> 
->   { "execute": "qmp_capabilities",
->     "argument": { "enable": [ "oob" ] } }
-> 
-> When the "argument" key is not provided, no capability is enabled.
-> 
-> For capability "oob", the monitor needs to be run on dedicated IO
-> thread, otherwise the command will fail.  For example, trying to enable
-> OOB on a MUXed typed QMP monitor will fail.
-> 
-> One thing to mention is that, QMP capabilities are per-monitor, and also
-> when the connection is closed due to some reason, the capabilities will
-> be reset.
-> 
-> Signed-off-by: Peter Xu <peterx@redhat.com>
-
-Typo in the title nego*t*iate, other than that.
-
-
-Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
-
+> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 > ---
->  monitor.c        | 57 +++++++++++++++++++++++++++++++++++++++++++++++++++++++-
->  qapi-schema.json | 15 ++++++++++++---
->  2 files changed, 68 insertions(+), 4 deletions(-)
-> 
-> diff --git a/monitor.c b/monitor.c
-> index bad6ee8dd1..097312e65f 100644
-> --- a/monitor.c
-> +++ b/monitor.c
-> @@ -167,6 +167,7 @@ typedef struct {
->       * mode.
->       */
->      QmpCommandList *commands;
-> +    bool qmp_caps[QMP_CAPABILITY__MAX];
->  } MonitorQMP;
->  
->  /*
-> @@ -1037,8 +1038,42 @@ static void monitor_init_qmp_commands(void)
->                           qmp_marshal_qmp_capabilities, QCO_NO_OPTIONS);
->  }
->  
-> -void qmp_qmp_capabilities(Error **errp)
-> +static void qmp_caps_check(Monitor *mon, QMPCapabilityList *list,
-> +                           Error **errp)
-> +{
-> +    for (; list; list = list->next) {
-> +        assert(list->value < QMP_CAPABILITY__MAX);
-> +        switch (list->value) {
-> +        case QMP_CAPABILITY_OOB:
-> +            if (!mon->use_io_thr) {
-> +                /*
-> +                 * Out-Of-Band only works with monitors that are
-> +                 * running on dedicated IOThread.
-> +                 */
-> +                error_setg(errp, "This monitor does not support "
-> +                           "Out-Of-Band (OOB)");
-> +                return;
-> +            }
-> +            break;
-> +        default:
-> +            break;
-> +        }
-> +    }
-> +}
-> +
-> +/* This function should only be called after capabilities are checked. */
-> +static void qmp_caps_apply(Monitor *mon, QMPCapabilityList *list)
-> +{
-> +    for (; list; list = list->next) {
-> +        mon->qmp.qmp_caps[list->value] = true;
-> +    }
-> +}
-> +
-> +void qmp_qmp_capabilities(bool has_enable, QMPCapabilityList *enable,
-> +                          Error **errp)
->  {
-> +    Error *local_err = NULL;
-> +
->      if (cur_mon->qmp.commands == &qmp_commands) {
->          error_set(errp, ERROR_CLASS_COMMAND_NOT_FOUND,
->                    "Capabilities negotiation is already complete, command "
-> @@ -1046,6 +1081,20 @@ void qmp_qmp_capabilities(Error **errp)
->          return;
->      }
->  
-> +    /* Enable QMP capabilities provided by the guest if applicable. */
-> +    if (has_enable) {
-> +        qmp_caps_check(cur_mon, enable, &local_err);
-> +        if (local_err) {
-> +            /*
-> +             * Failed check on either of the capabilities will fail
-> +             * the apply of all.
-> +             */
-> +            error_propagate(errp, local_err);
-> +            return;
-> +        }
-> +        qmp_caps_apply(cur_mon, enable);
-> +    }
-> +
->      cur_mon->qmp.commands = &qmp_commands;
->  }
->  
-> @@ -3963,6 +4012,11 @@ static QObject *get_qmp_greeting(void)
->      return QOBJECT(result);
->  }
->  
-> +static void monitor_qmp_caps_reset(Monitor *mon)
-> +{
-> +    memset(mon->qmp.qmp_caps, 0, sizeof(mon->qmp.qmp_caps));
-> +}
-> +
->  static void monitor_qmp_event(void *opaque, int event)
->  {
->      QObject *data;
-> @@ -3971,6 +4025,7 @@ static void monitor_qmp_event(void *opaque, int event)
->      switch (event) {
->      case CHR_EVENT_OPENED:
->          mon->qmp.commands = &qmp_cap_negotiation_commands;
-> +        monitor_qmp_caps_reset(mon);
->          data = get_qmp_greeting();
->          monitor_json_emitter(mon, data);
->          qobject_decref(data);
-> diff --git a/qapi-schema.json b/qapi-schema.json
-> index 03201578b4..531fd4c0db 100644
-> --- a/qapi-schema.json
-> +++ b/qapi-schema.json
-> @@ -102,21 +102,30 @@
->  #
->  # Enable QMP capabilities.
->  #
-> -# Arguments: None.
-> +# Arguments:
-> +#
-> +# @enable:    List of QMPCapabilities to enable, which is optional.
-> +#             If not provided, it means no QMP capabilities will be
-> +#             enabled.  (since 2.12)
->  #
->  # Example:
->  #
-> -# -> { "execute": "qmp_capabilities" }
-> +# -> { "execute": "qmp_capabilities",
-> +#      "arguments": { "enable": [ "oob" ] } }
->  # <- { "return": {} }
->  #
->  # Notes: This command is valid exactly when first connecting: it must be
->  # issued before any other command will be accepted, and will fail once the
->  # monitor is accepting other commands. (see qemu docs/interop/qmp-spec.txt)
->  #
-> +# QMP client needs to explicitly enable QMP capabilities, otherwise
-> +# all the QMP capabilities will be turned off by default.
-> +#
->  # Since: 0.13
->  #
->  ##
-> -{ 'command': 'qmp_capabilities' }
-> +{ 'command': 'qmp_capabilities',
-> +  'data': { '*enable': [ 'QMPCapability' ] } }
->  
->  ##
->  # @QMPCapability:
-> -- 
-> 2.14.3
-> 
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+> This fixes the odd asymmetry of API that caused the bug fixed
+> in commit 7472e2efb...
+> ---
+>  target/arm/translate.c | 23 ++++++++++-------------
+>  1 file changed, 10 insertions(+), 13 deletions(-)
+
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+
+
+r~
