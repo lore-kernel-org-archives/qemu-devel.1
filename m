@@ -1,26 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53261)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59498)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <yang.zhong@intel.com>) id 1eOb1B-0006Pk-Ih
-	for qemu-devel@nongnu.org; Mon, 11 Dec 2017 22:14:06 -0500
+	(envelope-from <haozhong.zhang@intel.com>) id 1eObKX-0006jZ-Ip
+	for qemu-devel@nongnu.org; Mon, 11 Dec 2017 22:34:06 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <yang.zhong@intel.com>) id 1eOb17-00047h-Cn
-	for qemu-devel@nongnu.org; Mon, 11 Dec 2017 22:14:05 -0500
-Received: from mga18.intel.com ([134.134.136.126]:44616)
+	(envelope-from <haozhong.zhang@intel.com>) id 1eObKU-0001WI-9L
+	for qemu-devel@nongnu.org; Mon, 11 Dec 2017 22:34:05 -0500
+Received: from mga09.intel.com ([134.134.136.24]:38062)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <yang.zhong@intel.com>)
-	id 1eOb17-00044D-49
-	for qemu-devel@nongnu.org; Mon, 11 Dec 2017 22:14:01 -0500
-Date: Tue, 12 Dec 2017 11:13:16 +0800
-From: Yang Zhong <yang.zhong@intel.com>
-Message-ID: <20171212031316.GA26607@yangzhon-Virtual>
-References: <1511335676-20797-1-git-send-email-yang.zhong@intel.com>
-	<662ee94d-6509-7e12-6503-a94fbd346a55@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <662ee94d-6509-7e12-6503-a94fbd346a55@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH] x86/cpu: Enable new SSE/AVX/AVX512 cpu
- features
+	(Exim 4.71) (envelope-from <haozhong.zhang@intel.com>)
+	id 1eObKT-0001T4-VS
+	for qemu-devel@nongnu.org; Mon, 11 Dec 2017 22:34:02 -0500
+From: Haozhong Zhang <haozhong.zhang@intel.com>
+Date: Tue, 12 Dec 2017 11:33:39 +0800
+Message-Id: <20171212033339.30317-1-haozhong.zhang@intel.com>
+Subject: [Qemu-devel] [PATCH v2] target/i386: add clflushopt to
+ "Skylake-Server" cpu model
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,74 +23,54 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: qemu-devel@nongnu.org, yang.zhong@intel.com
+To: qemu-devel@nongnu.org
+Cc: mst@redhat.com, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Eduardo Habkost <ehabkost@redhat.com>, Haozhong Zhang <haozhong.zhang@intel.com>
 
-On Mon, Dec 11, 2017 at 05:17:15PM +0100, Paolo Bonzini wrote:
-> On 22/11/2017 08:27, Yang Zhong wrote:
-> > Intel IceLake cpu has added new cpu features,AVX512_VBMI2/GFNI/
-> > VAES/VPCLMULQDQ/AVX512_VNNI/AVX512_BITALG. Those new cpu features
-> > need expose to guest VM.
-> > 
-> > The bit definition:
-> > CPUID.(EAX=7,ECX=0):ECX[bit 06] AVX512_VBMI2
-> > CPUID.(EAX=7,ECX=0):ECX[bit 08] GFNI
-> > CPUID.(EAX=7,ECX=0):ECX[bit 09] VAES
-> > CPUID.(EAX=7,ECX=0):ECX[bit 10] VPCLMULQDQ
-> > CPUID.(EAX=7,ECX=0):ECX[bit 11] AVX512_VNNI
-> > CPUID.(EAX=7,ECX=0):ECX[bit 12] AVX512_BITALG
-> > 
-> > The release document ref below link:
-> > https://software.intel.com/sites/default/files/managed/c5/15/\
-> > architecture-instruction-set-extensions-programming-reference.pdf
-> > 
-> > Signed-off-by: Yang Zhong <yang.zhong@intel.com>
-> > ---
-> >  target/i386/cpu.c | 6 +++---
-> >  target/i386/cpu.h | 6 ++++++
-> >  2 files changed, 9 insertions(+), 3 deletions(-)
-> > 
-> > diff --git a/target/i386/cpu.c b/target/i386/cpu.c
-> > index 045d661..a67ced2 100644
-> > --- a/target/i386/cpu.c
-> > +++ b/target/i386/cpu.c
-> > @@ -437,9 +437,9 @@ static FeatureWordInfo feature_word_info[FEATURE_WORDS] = {
-> >      [FEAT_7_0_ECX] = {
-> >          .feat_names = {
-> >              NULL, "avx512vbmi", "umip", "pku",
-> > -            "ospke", NULL, NULL, NULL,
-> > -            NULL, NULL, NULL, NULL,
-> > -            NULL, NULL, "avx512-vpopcntdq", NULL,
-> > +            "ospke", NULL, "avx512vbmi2", NULL,
-> > +            "gfni", "vaes", "vpclmulqdq", "avx512vnni",
-> > +            "avx512bitalg", NULL, "avx512-vpopcntdq", NULL,
-> >              "la57", NULL, NULL, NULL,
-> >              NULL, NULL, "rdpid", NULL,
-> >              NULL, NULL, NULL, NULL,
-> > diff --git a/target/i386/cpu.h b/target/i386/cpu.h
-> > index b086b15..cdbf8b0 100644
-> > --- a/target/i386/cpu.h
-> > +++ b/target/i386/cpu.h
-> > @@ -635,6 +635,12 @@ typedef uint32_t FeatureWordArray[FEATURE_WORDS];
-> >  #define CPUID_7_0_ECX_UMIP     (1U << 2)
-> >  #define CPUID_7_0_ECX_PKU      (1U << 3)
-> >  #define CPUID_7_0_ECX_OSPKE    (1U << 4)
-> > +#define CPUID_7_0_ECX_VBMI2    (1U << 6) /* Additional VBMI Instrs */
-> > +#define CPUID_7_0_ECX_GFNI     (1U << 8)
-> > +#define CPUID_7_0_ECX_VAES     (1U << 9)
-> > +#define CPUID_7_0_ECX_VPCLMULQDQ (1U << 10)
-> > +#define CPUID_7_0_ECX_AVX512VNNI (1U << 11)
-> > +#define CPUID_7_0_ECX_AVX512BITALG (1U << 12)
-> >  #define CPUID_7_0_ECX_AVX512_VPOPCNTDQ (1U << 14) /* POPCNT for vectors of DW/QW */
-> >  #define CPUID_7_0_ECX_LA57     (1U << 16)
-> >  #define CPUID_7_0_ECX_RDPID    (1U << 22)
-> > 
-> 
-> Queued, thanks.
-> 
-  Thanks Paolo!
+CPUID_7_0_EBX_CLFLUSHOPT is missed in current "Skylake-Server" cpu
+model. Add it to "Skylake-Server" cpu model on pc-i440fx-2.11 and
+pc-q35-2.11. Keep it disabled in "Skylake-Server" cpu model on older
+machine types.
 
-  Regards,
+Signed-off-by: Haozhong Zhang <haozhong.zhang@intel.com>
+---
+v1 can be found at 
+  https://lists.nongnu.org/archive/html/qemu-devel/2017-12/msg01659.html
 
-  Yang
-> Paolo
+I'm not sure whether this patch is too late for QEMU 2.11. If it is, I'll
+rebase and resend it after 2.12 window opens.
+---
+ include/hw/i386/pc.h | 5 +++++
+ target/i386/cpu.c    | 2 +-
+ 2 files changed, 6 insertions(+), 1 deletion(-)
+
+diff --git a/include/hw/i386/pc.h b/include/hw/i386/pc.h
+index ef438bd765..085a688b26 100644
+--- a/include/hw/i386/pc.h
++++ b/include/hw/i386/pc.h
+@@ -383,6 +383,11 @@ bool e820_get_entry(int, uint32_t, uint64_t *, uint64_t *);
+         .driver   = "q35-pcihost",\
+         .property = "x-pci-hole64-fix",\
+         .value    = "off",\
++    },\
++    {\
++        .driver   = "Skylake-Server" "-" TYPE_X86_CPU,\
++        .property = "clflushopt",\
++        .value    = "off",\
+     },
+ 
+ #define PC_COMPAT_2_9 \
+diff --git a/target/i386/cpu.c b/target/i386/cpu.c
+index 045d66191f..7d033b7d30 100644
+--- a/target/i386/cpu.c
++++ b/target/i386/cpu.c
+@@ -1376,7 +1376,7 @@ static X86CPUDefinition builtin_x86_defs[] = {
+             CPUID_7_0_EBX_SMAP | CPUID_7_0_EBX_MPX | CPUID_7_0_EBX_CLWB |
+             CPUID_7_0_EBX_AVX512F | CPUID_7_0_EBX_AVX512DQ |
+             CPUID_7_0_EBX_AVX512BW | CPUID_7_0_EBX_AVX512CD |
+-            CPUID_7_0_EBX_AVX512VL,
++            CPUID_7_0_EBX_AVX512VL | CPUID_7_0_EBX_CLFLUSHOPT,
+         /* Missing: XSAVES (not supported by some Linux versions,
+          * including v4.1 to v4.12).
+          * KVM doesn't yet expose any XSAVES state save component,
+-- 
+2.14.1
