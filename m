@@ -1,31 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55356)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55867)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <lersek@redhat.com>) id 1eOoOM-00064y-KN
-	for qemu-devel@nongnu.org; Tue, 12 Dec 2017 12:30:55 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1eOoQ9-000847-IS
+	for qemu-devel@nongnu.org; Tue, 12 Dec 2017 12:32:46 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <lersek@redhat.com>) id 1eOoOI-0001DM-QX
-	for qemu-devel@nongnu.org; Tue, 12 Dec 2017 12:30:54 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:47762)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <lersek@redhat.com>) id 1eOoOI-0001CN-Jh
-	for qemu-devel@nongnu.org; Tue, 12 Dec 2017 12:30:50 -0500
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
-	[10.5.11.11])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id C57D97EA8B
-	for <qemu-devel@nongnu.org>; Tue, 12 Dec 2017 17:30:49 +0000 (UTC)
-References: <151309960454.30.17116821935601659232@449822a21bf0>
-From: Laszlo Ersek <lersek@redhat.com>
-Message-ID: <1263b9ba-fdde-729d-db58-7ede4b0d9686@redhat.com>
-Date: Tue, 12 Dec 2017 18:30:40 +0100
+	(envelope-from <peter.maydell@linaro.org>) id 1eOoQ8-0002lW-Pu
+	for qemu-devel@nongnu.org; Tue, 12 Dec 2017 12:32:45 -0500
+Received: from mail-ot0-x243.google.com ([2607:f8b0:4003:c0f::243]:33463)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1eOoQ8-0002lK-KV
+	for qemu-devel@nongnu.org; Tue, 12 Dec 2017 12:32:44 -0500
+Received: by mail-ot0-x243.google.com with SMTP id h9so18483308oti.0
+	for <qemu-devel@nongnu.org>; Tue, 12 Dec 2017 09:32:44 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <151309960454.30.17116821935601659232@449822a21bf0>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v2] dump-guest-memory.py: fix "You can't do
- that without a process to debug"
+In-Reply-To: <20171211213007.7353-11-andrew.smirnov@gmail.com>
+References: <20171211213007.7353-1-andrew.smirnov@gmail.com>
+	<20171211213007.7353-11-andrew.smirnov@gmail.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Tue, 12 Dec 2017 17:32:23 +0000
+Message-ID: <CAFEAcA8CHzsFJ5kM8qZLA0NDqz_hv664+FF+_hMbjNPOmciKLg@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH 10/13] imx_fec: Fix a typo in
+ imx_enet_receive()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,71 +31,38 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org, marcandre.lureau@redhat.com
-Cc: famz@redhat.com, crosa@redhat.com, ehabkost@redhat.com, mst@redhat.com
+To: Andrey Smirnov <andrew.smirnov@gmail.com>
+Cc: qemu-arm <qemu-arm@nongnu.org>, Jason Wang <jasowang@redhat.com>, =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>, QEMU Developers <qemu-devel@nongnu.org>, Andrey Yurovsky <yurovsky@gmail.com>
 
-On 12/12/17 18:26, no-reply@patchew.org wrote:
-> Hi,
-> 
-> This series seems to have some coding style problems. See output below for
-> more information:
-> 
-> Message-id: 20171212172208.13588-1-marcandre.lureau@redhat.com
-> Subject: [Qemu-devel] [PATCH v2] dump-guest-memory.py: fix "You can't do that without a process to debug"
-> Type: series
-> 
-> === TEST SCRIPT BEGIN ===
-> #!/bin/bash
-> 
-> BASE=base
-> n=1
-> total=$(git log --oneline $BASE.. | wc -l)
-> failed=0
-> 
-> git config --local diff.renamelimit 0
-> git config --local diff.renames True
-> 
-> commits="$(git log --format=%H --reverse $BASE..)"
-> for c in $commits; do
->     echo "Checking PATCH $n/$total: $(git log -n 1 --format=%s $c)..."
->     if ! git show $c --format=email | ./scripts/checkpatch.pl --mailback -; then
->         failed=1
->         echo
->     fi
->     n=$((n+1))
-> done
-> 
-> exit $failed
-> === TEST SCRIPT END ===
-> 
-> Updating 3c8cf5a9c21ff8782164d1def7f44bd888713384
-> From https://github.com/patchew-project/qemu
->  t [tag update]            patchew/20171207203036.14993-1-eblake@redhat.com -> patchew/20171207203036.14993-1-eblake@redhat.com
->  * [new tag]               patchew/20171212172208.13588-1-marcandre.lureau@redhat.com -> patchew/20171212172208.13588-1-marcandre.lureau@redhat.com
-> Switched to a new branch 'test'
-> 7c0544b1a7 dump-guest-memory.py: fix "You can't do that without a process to debug"
-> 
-> === OUTPUT BEGIN ===
-> Checking PATCH 1/1: dump-guest-memory.py: fix "You can't do that without a process to debug"...
-> ERROR: Use of volatile is usually wrong: see Documentation/volatile-considered-harmful.txt
-> #46: FILE: hw/misc/vmcoreinfo.c:39:
-> +    static VMCoreInfoState * volatile vmcoreinfo_state G_GNUC_UNUSED;
-> 
-> total: 1 errors, 0 warnings, 24 lines checked
-> 
-> Your patch has style problems, please review.  If any of these errors
-> are false positives report them to the maintainer, see
-> CHECKPATCH in MAINTAINERS.
-> 
-> === OUTPUT END ===
-> 
-> Test command exited with code: 1
-> 
-> 
+On 11 December 2017 at 21:30, Andrey Smirnov <andrew.smirnov@gmail.com> wro=
+te:
+> Cc: Peter Maydell <peter.maydell@linaro.org>
+> Cc: Jason Wang <jasowang@redhat.com>
+> Cc: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
+> Cc: qemu-devel@nongnu.org
+> Cc: qemu-arm@nongnu.org
+> Cc: yurovsky@gmail.com
+> Signed-off-by: Andrey Smirnov <andrew.smirnov@gmail.com>
 > ---
-> Email generated automatically by Patchew [http://patchew.org/].
-> Please send your feedback to patchew-devel@freelists.org
-> 
+>  hw/net/imx_fec.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+>
+> diff --git a/hw/net/imx_fec.c b/hw/net/imx_fec.c
+> index 6cb9e2e20e..c1cf7f9c58 100644
+> --- a/hw/net/imx_fec.c
+> +++ b/hw/net/imx_fec.c
+> @@ -1150,7 +1150,7 @@ static ssize_t imx_enet_receive(NetClientState *nc,=
+ const uint8_t *buf,
+>          size +=3D 2;
+>      }
+>
+> -    /* Huge frames are truncted.  */
+> +    /* Huge frames are truncated. */
+>      if (size > s->regs[ENET_FTRL]) {
+>          size =3D s->regs[ENET_FTRL];
+>          flags |=3D ENET_BD_TR | ENET_BD_LG;
 
-"volatile" is required in this case; otherwise GCC would be entirely
-justified to eliminate the variable.
+Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
+
+thanks
+-- PMM
