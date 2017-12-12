@@ -1,31 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40751)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44652)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <lersek@redhat.com>) id 1eOnkA-0002I0-7S
-	for qemu-devel@nongnu.org; Tue, 12 Dec 2017 11:49:24 -0500
+	(envelope-from <david@redhat.com>) id 1eOnv2-0000vx-1o
+	for qemu-devel@nongnu.org; Tue, 12 Dec 2017 12:00:40 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <lersek@redhat.com>) id 1eOnk7-0001L8-19
-	for qemu-devel@nongnu.org; Tue, 12 Dec 2017 11:49:22 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:45316)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <lersek@redhat.com>) id 1eOnk6-0001KO-Ob
-	for qemu-devel@nongnu.org; Tue, 12 Dec 2017 11:49:18 -0500
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
-	[10.5.11.11])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 9AE145D68B
-	for <qemu-devel@nongnu.org>; Tue, 12 Dec 2017 16:49:17 +0000 (UTC)
-References: <20171212163556.2543-1-marcandre.lureau@redhat.com>
-From: Laszlo Ersek <lersek@redhat.com>
-Message-ID: <a4c61f7b-d090-fcc8-8b2f-beb4af12a852@redhat.com>
-Date: Tue, 12 Dec 2017 17:49:09 +0100
+	(envelope-from <david@redhat.com>) id 1eOnux-0000Lz-7V
+	for qemu-devel@nongnu.org; Tue, 12 Dec 2017 12:00:35 -0500
+References: <1513030760-26245-1-git-send-email-walling@linux.vnet.ibm.com>
+	<1513030760-26245-4-git-send-email-walling@linux.vnet.ibm.com>
+From: David Hildenbrand <david@redhat.com>
+Message-ID: <8f61fa61-9b27-ac88-e781-be2e8df3a6f4@redhat.com>
+Date: Tue, 12 Dec 2017 18:00:26 +0100
 MIME-Version: 1.0
-In-Reply-To: <20171212163556.2543-1-marcandre.lureau@redhat.com>
+In-Reply-To: <1513030760-26245-4-git-send-email-walling@linux.vnet.ibm.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH] dump-guest-memory.py: fix "You can't do
- that without a process to debug"
+Subject: Re: [Qemu-devel] [PATCH v2 3/5] s390-ccw: parse and set boot menu
+ options
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,103 +25,226 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>, qemu-devel@nongnu.org
-Cc: mst@redhat.com, Eduardo Habkost <ehabkost@redhat.com>, Cleber Rosa <crosa@redhat.com>
+To: "Collin L. Walling" <walling@linux.vnet.ibm.com>, qemu-s390x@nongnu.org, qemu-devel@nongnu.org
+Cc: borntraeger@de.ibm.com, frankja@linux.vnet.ibm.com, cohuck@redhat.com, thuth@redhat.com
 
-On 12/12/17 17:35, Marc-Andr=C3=A9 Lureau wrote:
-> If the script is run with a core (no running process), it produces an
-> error:
+On 11.12.2017 23:19, Collin L. Walling wrote:
+> Set boot menu options for an s390 guest and store them in
+> the iplb. These options are set via the QEMU command line
+> option:
 >=20
-> (gdb)  dump-guest-memory /tmp/vmcore X86_64
-> guest RAM blocks:
-> target_start     target_end       host_addr        message count
-> ---------------- ---------------- ---------------- ------- -----
-> 0000000000000000 00000000000a0000 00007f7935800000 added       1
-> 00000000000a0000 00000000000b0000 00007f7934200000 added       2
-> 00000000000c0000 00000000000ca000 00007f79358c0000 added       3
-> 00000000000ca000 00000000000cd000 00007f79358ca000 joined      3
-> 00000000000cd000 00000000000e8000 00007f79358cd000 joined      3
-> 00000000000e8000 00000000000f0000 00007f79358e8000 joined      3
-> 00000000000f0000 0000000000100000 00007f79358f0000 joined      3
-> 0000000000100000 0000000080000000 00007f7935900000 joined      3
-> 00000000fd000000 00000000fe000000 00007f7934200000 added       4
-> 00000000fffc0000 0000000100000000 00007f7935600000 added       5
-> Python Exception <class 'gdb.error'> You can't do that without a proces=
-s to debug.:
-> Error occurred in Python command: You can't do that without a process
-> to debug.
+>     -boot menu=3Don|off[,splash-time=3DX]
 >=20
-> Replace the function call with a variable.
-
-Can you state, "replace the object_resolve_path_type() function call
-with an extern variable"?
-
-> I tried to use static
-> function variables, as suggested by Laszlo in earlier reviews, but the
-> compiler always took the chance to optimize them away.
-
-Did you qualify them "volatile" too?
-
-E.g., in the vmcoreinfo_realize() function:
-
-  static VMCoreInfoState * volatile vmcoreinfo_state;
-  ...
-  vmcoreinfo_state =3D s;
-
-(Note: it's the pointer itself that has to be volatile, not the
-pointed-to object.)
-
-If you did try this, but GCC optimized it away, then that's a GCC bug.
-In that case I guess I can't object to the present approach any longer.
-Can you please confirm?
-
+> or via the libvirt domain xml:
 >=20
-> Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+>     <os>
+>       <bootmenu enable=3D'yes|no' timeout=3D'X'/>
+>     </os>
+>=20
+> Where X represents some positive integer representing
+> milliseconds.
+>=20
+> A loadparm other than 'prompt' will disable the menu and
+> just boot the specified entry.
+>=20
+> Signed-off-by: Collin L. Walling <walling@linux.vnet.ibm.com>
+> Reviewed-by: Janosch Frank <frankja@linux.vnet.ibm.com>
 > ---
->  scripts/dump-guest-memory.py | 3 +--
->  hw/misc/vmcoreinfo.c         | 4 ++++
->  2 files changed, 5 insertions(+), 2 deletions(-)
+>  hw/s390x/ipl.c          | 55 +++++++++++++++++++++++++++++++++++++++++=
+++++++++
+>  hw/s390x/ipl.h          |  8 +++++--
+>  pc-bios/s390-ccw/iplb.h |  8 +++++--
+>  3 files changed, 67 insertions(+), 4 deletions(-)
 >=20
-> diff --git a/scripts/dump-guest-memory.py b/scripts/dump-guest-memory.p=
-y
-> index 1af26c1a45..9dec796762 100644
-> --- a/scripts/dump-guest-memory.py
-> +++ b/scripts/dump-guest-memory.py
-> @@ -546,8 +546,7 @@ shape and this command should mostly work."""
->          return None
+> diff --git a/hw/s390x/ipl.c b/hw/s390x/ipl.c
+> index 0d06fc1..ed5e8d1 100644
+> --- a/hw/s390x/ipl.c
+> +++ b/hw/s390x/ipl.c
+> @@ -23,6 +23,8 @@
+>  #include "hw/s390x/ebcdic.h"
+>  #include "ipl.h"
+>  #include "qemu/error-report.h"
+> +#include "qemu/config-file.h"
+> +#include "qemu/cutils.h"
 > =20
->      def add_vmcoreinfo(self):
-> -        vmci =3D '(VMCoreInfoState *)' + \
-> -               'object_resolve_path_type("", "vmcoreinfo", 0)'
-> +        vmci =3D 'vmcoreinfo_state'
->          if not gdb.parse_and_eval("%s" % vmci) \
->             or not gdb.parse_and_eval("(%s)->has_vmcoreinfo" % vmci):
->              return
-> diff --git a/hw/misc/vmcoreinfo.c b/hw/misc/vmcoreinfo.c
-> index 31db57ab44..d429a4f7d6 100644
-> --- a/hw/misc/vmcoreinfo.c
-> +++ b/hw/misc/vmcoreinfo.c
-> @@ -31,6 +31,9 @@ static void vmcoreinfo_reset(void *dev)
->      s->vmcoreinfo.host_format =3D cpu_to_le16(VMCOREINFO_FORMAT_ELF);
->  }
+>  #define KERN_IMAGE_START                0x010000UL
+>  #define KERN_PARM_AREA                  0x010480UL
+> @@ -33,6 +35,9 @@
+>  #define ZIPL_IMAGE_START                0x009000UL
+>  #define IPL_PSW_MASK                    (PSW_MASK_32 | PSW_MASK_64)
 > =20
-> +/* this variable is exported for gdb script dump-guest-memory.py */
-> +VMCoreInfoState *vmcoreinfo_state;
+> +#define BOOT_MENU_FLAG_BOOT_OPTS 0x80
+> +#define BOOT_MENU_FLAG_ZIPL_OPTS 0x40
+
+these should go to ipl.h and maybe be renamed to something like
+
+IPL_BLOCK_... (not sure if even CCW/SCSI specific ones make sense)
+
 > +
->  static void vmcoreinfo_realize(DeviceState *dev, Error **errp)
+>  static bool iplb_extended_needed(void *opaque)
 >  {
->      VMCoreInfoState *s =3D VMCOREINFO(dev);
-> @@ -56,6 +59,7 @@ static void vmcoreinfo_realize(DeviceState *dev, Erro=
-r **errp)
->                               &s->vmcoreinfo, sizeof(s->vmcoreinfo), fa=
-lse);
+>      S390IPLState *ipl =3D S390_IPL(object_resolve_path(TYPE_S390_IPL, =
+NULL));
+> @@ -219,6 +224,51 @@ static Property s390_ipl_properties[] =3D {
+>      DEFINE_PROP_END_OF_LIST(),
+>  };
 > =20
->      qemu_register_reset(vmcoreinfo_reset, dev);
-> +    vmcoreinfo_state =3D s;
->  }
+> +static void s390_ipl_set_boot_menu(uint8_t *boot_menu_flags,
+> +                                   uint16_t *boot_menu_timeout)
+> +{
+> +    MachineState *machine =3D MACHINE(qdev_get_machine());
+> +    char *lp =3D object_property_get_str(OBJECT(machine), "loadparm", =
+NULL);
+> +    QemuOptsList *plist =3D qemu_find_opts("boot-opts");
+> +    QemuOpts *opts =3D QTAILQ_FIRST(&plist->head);
+> +    const char *p =3D qemu_opt_get(opts, "menu");
+> +    unsigned long timeout =3D 0;
+> +
+> +    if (memcmp(lp, "PROMPT  ", 8) =3D=3D 0) {
+> +        *boot_menu_flags =3D BOOT_MENU_FLAG_BOOT_OPTS;
+> +
+
+remove this empty line
+
+> +    } else if (*lp) {
+> +        /* If loadparm is set to any value, then discard boot menu */
+
+I find the connection between -boot and loadparm quite confusing.
+Shouldn't the s390-ccw bios handle this? You should just forward here
+what is given via -boot IMHO.
+
+> +        return;
+> +
+> +    } else if (!p) {
+> +        /* In the absence of -boot menu, use zipl loader parameters */
+> +        *boot_menu_flags =3D BOOT_MENU_FLAG_ZIPL_OPTS;
+> +
+> +    } else if (strncmp(p, "on", 2) =3D=3D 0) {
+> +        *boot_menu_flags =3D BOOT_MENU_FLAG_BOOT_OPTS;
+> +
+> +        p =3D qemu_opt_get(opts, "splash-time");
+> +
+> +        if (p && qemu_strtoul(p, NULL, 10, &timeout)) {
+> +            error_report("splash-time value is invalid, forcing it to =
+0.");
+> +            return;
+> +        }
+> +
+> +        /* Store timeout value as seconds */
+> +        timeout /=3D 1000;
+
+So we pass ms on the command line? Why?
+
+> +
+> +        if (timeout > 0xffff) {
+> +            error_report("splash-time value is greater than 65535000,"
+> +                         " forcing it to 65535000.");
+> +            *boot_menu_timeout =3D 0xffff;
+> +            return;
+> +        }
+> +
+> +        *boot_menu_timeout =3D timeout;
+> +    }
+> +}
+> +
+>  static bool s390_gen_initial_iplb(S390IPLState *ipl)
+>  {
+>      DeviceState *dev_st;
+> @@ -245,6 +295,8 @@ static bool s390_gen_initial_iplb(S390IPLState *ipl=
+)
+>              ipl->iplb.pbt =3D S390_IPL_TYPE_CCW;
+>              ipl->iplb.ccw.devno =3D cpu_to_be16(ccw_dev->sch->devno);
+>              ipl->iplb.ccw.ssid =3D ccw_dev->sch->ssid & 3;
+> +            s390_ipl_set_boot_menu(&ipl->iplb.ccw.boot_menu_flags,
+> +                                   &ipl->iplb.ccw.boot_menu_timeout);
+>          } else if (sd) {
+>              SCSIBus *bus =3D scsi_bus_from_device(sd);
+>              VirtIOSCSI *vdev =3D container_of(bus, VirtIOSCSI, bus);
+> @@ -266,6 +318,8 @@ static bool s390_gen_initial_iplb(S390IPLState *ipl=
+)
+>              ipl->iplb.scsi.channel =3D cpu_to_be16(sd->channel);
+>              ipl->iplb.scsi.devno =3D cpu_to_be16(ccw_dev->sch->devno);
+>              ipl->iplb.scsi.ssid =3D ccw_dev->sch->ssid & 3;
+> +            s390_ipl_set_boot_menu(&ipl->iplb.scsi.boot_menu_flags,
+> +                                   &ipl->iplb.scsi.boot_menu_timeout);
+
+can you call this only once for both cases below and only pass ipl? The
+function can figure out using ipl->iplb.pbt what to set.
+
+>          } else {
+>              return false; /* unknown device */
+>          }
+> @@ -273,6 +327,7 @@ static bool s390_gen_initial_iplb(S390IPLState *ipl=
+)
+>          if (!s390_ipl_set_loadparm(ipl->iplb.loadparm)) {
+>              ipl->iplb.flags |=3D DIAG308_FLAGS_LP_VALID;
+>          }
+> +
+
+unrelated change
+
+>          return true;
+>      }
 > =20
->  static const VMStateDescription vmstate_vmcoreinfo =3D {
+> diff --git a/hw/s390x/ipl.h b/hw/s390x/ipl.h
+> index 8a705e0..ff3b397 100644
+> --- a/hw/s390x/ipl.h
+> +++ b/hw/s390x/ipl.h
+> @@ -17,7 +17,9 @@
+> =20
+>  struct IplBlockCcw {
+>      uint64_t netboot_start_addr;
+> -    uint8_t  reserved0[77];
+> +    uint8_t  reserved0[74];
+> +    uint16_t boot_menu_timeout;
+> +    uint8_t  boot_menu_flags;
+>      uint8_t  ssid;
+>      uint16_t devno;
+>      uint8_t  vm_flags;
+> @@ -51,7 +53,9 @@ struct IplBlockQemuScsi {
+>      uint32_t lun;
+>      uint16_t target;
+>      uint16_t channel;
+> -    uint8_t  reserved0[77];
+> +    uint8_t  reserved0[74];
+> +    uint16_t boot_menu_timeout;
+> +    uint8_t  boot_menu_flags;
+>      uint8_t  ssid;
+>      uint16_t devno;
+>  } QEMU_PACKED;
+> diff --git a/pc-bios/s390-ccw/iplb.h b/pc-bios/s390-ccw/iplb.h
+> index 890aed9..fe909d2 100644
+> --- a/pc-bios/s390-ccw/iplb.h
+> +++ b/pc-bios/s390-ccw/iplb.h
+> @@ -14,7 +14,9 @@
+> =20
+>  struct IplBlockCcw {
+>      uint64_t netboot_start_addr;
+> -    uint8_t  reserved0[77];
+> +    uint8_t  reserved0[74];
+> +    uint16_t boot_menu_timeout;
+> +    uint8_t  boot_menu_flags;
+>      uint8_t  ssid;
+>      uint16_t devno;
+>      uint8_t  vm_flags;
+> @@ -48,7 +50,9 @@ struct IplBlockQemuScsi {
+>      uint32_t lun;
+>      uint16_t target;
+>      uint16_t channel;
+> -    uint8_t  reserved0[77];
+> +    uint8_t  reserved0[74];
+> +    uint16_t boot_menu_timeout;
+> +    uint8_t  boot_menu_flags;
+>      uint8_t  ssid;
+>      uint16_t devno;
+>  } __attribute__ ((packed));
 >=20
 
-Thanks!
-Laszlo
+These look good to me (but as discussed, I think HW folks have to agree
+on this).
+
+--=20
+
+Thanks,
+
+David / dhildenb
