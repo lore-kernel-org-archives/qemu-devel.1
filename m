@@ -1,28 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58392)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41019)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1eOmBa-00086F-D3
-	for qemu-devel@nongnu.org; Tue, 12 Dec 2017 10:09:35 -0500
+	(envelope-from <pombredanne@nexb.com>) id 1eOk4y-0004lC-W3
+	for qemu-devel@nongnu.org; Tue, 12 Dec 2017 07:54:42 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1eOmBX-00052z-SG
-	for qemu-devel@nongnu.org; Tue, 12 Dec 2017 10:09:34 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:56778)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <marcandre.lureau@redhat.com>)
-	id 1eOmBX-00052N-MA
-	for qemu-devel@nongnu.org; Tue, 12 Dec 2017 10:09:31 -0500
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
-	[10.5.11.13])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 3995C4DD7D
-	for <qemu-devel@nongnu.org>; Tue, 12 Dec 2017 15:09:29 +0000 (UTC)
-From: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
-Date: Tue, 12 Dec 2017 16:09:09 +0100
-Message-Id: <20171212150909.1831-1-marcandre.lureau@redhat.com>
+	(envelope-from <pombredanne@nexb.com>) id 1eOk4x-0005xT-TM
+	for qemu-devel@nongnu.org; Tue, 12 Dec 2017 07:54:37 -0500
+Received: from mail-wm0-x244.google.com ([2a00:1450:400c:c09::244]:46645)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <pombredanne@nexb.com>)
+	id 1eOk4x-0005vD-Le
+	for qemu-devel@nongnu.org; Tue, 12 Dec 2017 07:54:35 -0500
+Received: by mail-wm0-x244.google.com with SMTP id r78so20558895wme.5
+	for <qemu-devel@nongnu.org>; Tue, 12 Dec 2017 04:54:34 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH] dump: fix note_name_equal()
+In-Reply-To: <1513079759-14169-2-git-send-email-wei.w.wang@intel.com>
+References: <1513079759-14169-1-git-send-email-wei.w.wang@intel.com>
+	<1513079759-14169-2-git-send-email-wei.w.wang@intel.com>
+From: Philippe Ombredanne <pombredanne@nexb.com>
+Date: Tue, 12 Dec 2017 13:53:53 +0100
+Message-ID: <CAOFm3uH29ZQSo92c_JXcffsonwh3PscdRe1p6vZCwinfauiYBw@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH v19 1/7] xbitmap: Introduce xbitmap
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,40 +29,66 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: drjones@redhat.com, lersek@redhat.com, =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
+To: Wei Wang <wei.w.wang@intel.com>, mawilcox@microsoft.com
+Cc: virtio-dev@lists.oasis-open.org, LKML <linux-kernel@vger.kernel.org>, qemu-devel@nongnu.org, virtualization@lists.linux-foundation.org, kvm@vger.kernel.org, linux-mm@kvack.org, mst@redhat.com, mhocko@kernel.org, akpm@linux-foundation.org, david@redhat.com, penguin-kernel@i-love.sakura.ne.jp, cornelia.huck@de.ibm.com, mgorman@techsingularity.net, aarcange@redhat.com, amit.shah@redhat.com, Paolo Bonzini <pbonzini@redhat.com>, willy@infradead.org, liliang.opensource@gmail.com, yang.zhang.wz@gmail.com, quan.xu@aliyun.com, nilal@redhat.com, riel@redhat.com
 
-Use the function argument "name" instead of hardcoded
-"VMCOREINFO". All callers use "VMCOREINFO" as argument, so this isn't
-an exposed bug, thankfully.
+Matthew, Wei,
 
-Simplify a little bit the code while touching this.
+On Tue, Dec 12, 2017 at 12:55 PM, Wei Wang <wei.w.wang@intel.com> wrote:
+> From: Matthew Wilcox <mawilcox@microsoft.com>
+>
+> The eXtensible Bitmap is a sparse bitmap representation which is
+> efficient for set bits which tend to cluster.  It supports up to
+> 'unsigned long' worth of bits, and this commit adds the bare bones --
+> xb_set_bit(), xb_clear_bit() and xb_test_bit().
+>
+> Signed-off-by: Wei Wang <wei.w.wang@intel.com>
+> Cc: Matthew Wilcox <mawilcox@microsoft.com>
+> Cc: Andrew Morton <akpm@linux-foundation.org>
+> Cc: Michal Hocko <mhocko@kernel.org>
+> Cc: Michael S. Tsirkin <mst@redhat.com>
+> Cc: Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>
 
-Suggested-by: Andrew Jones <drjones@redhat.com>
-Reported-by: Laszlo Ersek <lersek@redhat.com>
-Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
----
- dump.c | 7 +------
- 1 file changed, 1 insertion(+), 6 deletions(-)
+[...]
 
-diff --git a/dump.c b/dump.c
-index d4a8c942eb..e9dfed060a 100644
---- a/dump.c
-+++ b/dump.c
-@@ -788,12 +788,7 @@ static bool note_name_equal(DumpState *s,
-     get_note_sizes(s, note, &head_size, &name_size, NULL);
-     head_size =3D ROUND_UP(head_size, 4);
-=20
--    if (name_size !=3D len ||
--        memcmp(note + head_size, "VMCOREINFO", len)) {
--        return false;
--    }
--
--    return true;
-+    return name_size =3D=3D len && memcmp(note + head_size, name, len) =3D=
-=3D 0;
- }
-=20
- /* write common header, sub header and elf note to vmcore */
---=20
-2.15.1.355.g36791d7216
+> --- /dev/null
+> +++ b/include/linux/xbitmap.h
+> @@ -0,0 +1,52 @@
+> +/*
+> + * eXtensible Bitmaps
+> + * Copyright (c) 2017 Microsoft Corporation <mawilcox@microsoft.com>
+> + *
+> + * This program is free software; you can redistribute it and/or
+> + * modify it under the terms of the GNU General Public License as
+> + * published by the Free Software Foundation; either version 2 of the
+> + * License, or (at your option) any later version.
+> + *
+> + * This program is distributed in the hope that it will be useful,
+> + * but WITHOUT ANY WARRANTY; without even the implied warranty of
+> + * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+> + * GNU General Public License for more details.
+> + *
+> + * eXtensible Bitmaps provide an unlimited-size sparse bitmap facility.
+> + * All bits are initially zero.
+> + */
+
+Have you considered using the new SPDX ids here instead? eg. this
+would come out as a top line this way:
+
+> +/* SPDX-License-Identifer: GPL-2.0+ */
+
+Overall you get less boilerplate comment and more code, so this is a
+win-win for everyone. This would nicely remove the legalese
+boilerplate with the same effect, unless you are a legalese lover of
+course. See Thomas doc patches for extra details.... and while you are
+it if you could spread the words in your team and use it for all past,
+present and future contributions, that would be much appreciated.
+
+And as a side benefit to me, it will help me save on paper and ink
+ribbons supplies for my dot matrix line printer each time I print the
+source code of the whole kernel. ;)
+
+Thanks for your consideration there.
+-- 
+Cordially
+Philippe Ombredanne
