@@ -1,26 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36553)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36740)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1eOouO-0001hY-Fg
-	for qemu-devel@nongnu.org; Tue, 12 Dec 2017 13:04:01 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1eOov2-0001zU-Uu
+	for qemu-devel@nongnu.org; Tue, 12 Dec 2017 13:04:42 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1eOouN-0000jD-7z
-	for qemu-devel@nongnu.org; Tue, 12 Dec 2017 13:04:00 -0500
-Received: from mail-oi0-x241.google.com ([2607:f8b0:4003:c06::241]:37561)
+	(envelope-from <peter.maydell@linaro.org>) id 1eOov1-0000zd-TU
+	for qemu-devel@nongnu.org; Tue, 12 Dec 2017 13:04:41 -0500
+Received: from mail-ot0-x242.google.com ([2607:f8b0:4003:c0f::242]:35397)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1eOouN-0000ix-2l
-	for qemu-devel@nongnu.org; Tue, 12 Dec 2017 13:03:59 -0500
-Received: by mail-oi0-x241.google.com with SMTP id y75so14594671oie.4
-	for <qemu-devel@nongnu.org>; Tue, 12 Dec 2017 10:03:58 -0800 (PST)
+	id 1eOov1-0000xp-OR
+	for qemu-devel@nongnu.org; Tue, 12 Dec 2017 13:04:39 -0500
+Received: by mail-ot0-x242.google.com with SMTP id q3so18554354oth.2
+	for <qemu-devel@nongnu.org>; Tue, 12 Dec 2017 10:04:37 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <20171212041539.25700-1-ppandit@redhat.com>
-References: <20171212041539.25700-1-ppandit@redhat.com>
+In-Reply-To: <1513058845-9768-1-git-send-email-zhaoshenglong@huawei.com>
+References: <1513058845-9768-1-git-send-email-zhaoshenglong@huawei.com>
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 12 Dec 2017 18:03:37 +0000
-Message-ID: <CAFEAcA8Vh=5mUi-0x0kdeKPed8so2GX+vCUm_hZoCDY5257DGA@mail.gmail.com>
+Date: Tue, 12 Dec 2017 18:04:16 +0000
+Message-ID: <CAFEAcA8XxVAU-U0fDGUfHbYCDnGbWUgiQd7W29+bMzNdyBme2A@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH v1] display: limit irq handler index to
- TC6393XB_GPIOS
+Subject: Re: [Qemu-devel] [Qemu-arm] [PATCH] MAINTAINERS: replace the
+ unavailable email address
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,37 +29,35 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: P J P <ppandit@redhat.com>
-Cc: Qemu Developers <qemu-devel@nongnu.org>, Moguofang <moguofang@huawei.com>, qemu-arm <qemu-arm@nongnu.org>, Prasad J Pandit <pjp@fedoraproject.org>
+To: Shannon Zhao <zhaoshenglong@huawei.com>
+Cc: qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>
 
-On 12 December 2017 at 04:15, P J P <ppandit@redhat.com> wrote:
-> From: Prasad J Pandit <pjp@fedoraproject.org>
+On 12 December 2017 at 06:07, Shannon Zhao <zhaoshenglong@huawei.com> wrote:
+> From: Zhaoshenglong <zhaoshenglong@huawei.com>
 >
-> The ctz32() routine could return value greater than
-> TC6393XB_GPIOS=16. This could lead to an OOB array access.
-> Mask 'level' to avoid it.
+> Since I'm not working as an assignee in Linaro, replace the Linaro email
+> address with my personal one.
 >
-> Reported-by: Moguofang <moguofang@huawei.com>
-> Signed-off-by: Prasad J Pandit <pjp@fedoraproject.org>
+> Signed-off-by: Zhaoshenglong <zhaoshenglong@huawei.com>
 > ---
->  hw/display/tc6393xb.c | 1 +
->  1 file changed, 1 insertion(+)
+>  MAINTAINERS | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
 >
-> Update: mask 'level' value to TC6393XB_GPIOS=16
->   -> https://lists.gnu.org/archive/html/qemu-devel/2017-12/msg01685.html
+> diff --git a/MAINTAINERS b/MAINTAINERS
+> index 0255113..45e2e20 100644
+> --- a/MAINTAINERS
+> +++ b/MAINTAINERS
+> @@ -543,7 +543,7 @@ F: include/hw/*/xlnx*.h
 >
-> diff --git a/hw/display/tc6393xb.c b/hw/display/tc6393xb.c
-> index 74d10af3d4..0ae63605f0 100644
-> --- a/hw/display/tc6393xb.c
-> +++ b/hw/display/tc6393xb.c
-> @@ -172,6 +172,7 @@ static void tc6393xb_gpio_handler_update(TC6393xbState *s)
->      int bit;
->
->      level = s->gpio_level & s->gpio_dir;
-> +    level &= MAKE_64BIT_MASK(0, TC6393XB_GPIOS);
->
->      for (diff = s->prev_level ^ level; diff; diff ^= 1 << bit) {
->          bit = ctz32(diff);
+>  ARM ACPI Subsystem
+>  M: Shannon Zhao <zhaoshenglong@huawei.com>
+> -M: Shannon Zhao <shannon.zhao@linaro.org>
+> +M: Shannon Zhao <shannon.zhaosl@gmail.com>
+>  L: qemu-arm@nongnu.org
+>  S: Maintained
+>  F: hw/arm/virt-acpi-build.c
+> --
+> 2.0.4
 
 Thanks; applied to target-arm.next for 2.12.
 
