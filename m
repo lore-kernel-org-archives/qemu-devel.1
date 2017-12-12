@@ -1,26 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49287)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50678)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <penguin-kernel@I-love.SAKURA.ne.jp>)
-	id 1eOkXv-0000Mn-Tf
-	for qemu-devel@nongnu.org; Tue, 12 Dec 2017 08:24:46 -0500
+	(envelope-from <lersek@redhat.com>) id 1eOkcL-0002te-4k
+	for qemu-devel@nongnu.org; Tue, 12 Dec 2017 08:29:08 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <penguin-kernel@I-love.SAKURA.ne.jp>)
-	id 1eOkXX-0006n2-PZ
-	for qemu-devel@nongnu.org; Tue, 12 Dec 2017 08:24:31 -0500
-Received: from www262.sakura.ne.jp ([2001:e42:101:1:202:181:97:72]:63131)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <penguin-kernel@I-love.SAKURA.ne.jp>)
-	id 1eOkXX-0005i3-6z
-	for qemu-devel@nongnu.org; Tue, 12 Dec 2017 08:24:07 -0500
-From: Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>
-References: <1513079759-14169-1-git-send-email-wei.w.wang@intel.com>
-	<1513079759-14169-4-git-send-email-wei.w.wang@intel.com>
-In-Reply-To: <1513079759-14169-4-git-send-email-wei.w.wang@intel.com>
-Message-Id: <201712122220.IFH05261.LtJOFFSFHVMQOO@I-love.SAKURA.ne.jp>
-Date: Tue, 12 Dec 2017 22:20:48 +0900
-Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Subject: Re: [Qemu-devel] [PATCH v19 3/7] xbitmap: add more operations
+	(envelope-from <lersek@redhat.com>) id 1eOkcK-0004TK-4w
+	for qemu-devel@nongnu.org; Tue, 12 Dec 2017 08:29:05 -0500
+References: <1512745328-5109-1-git-send-email-peter.maydell@linaro.org>
+	<1512745328-5109-4-git-send-email-peter.maydell@linaro.org>
+	<5A2F6ED9.5030605@huawei.com>
+	<ac182406-8011-9f19-38e7-37328434095b@redhat.com>
+	<CAFEAcA_9pee99KpL4zwVS5jJuiv2MCGp79crufpU1kH1Okg-Hg@mail.gmail.com>
+	<6b4b6351-eeb4-a4d3-8ddf-5401516671ae@redhat.com>
+	<CAKv+Gu-Ugm1g8twoKwgXAPtDfETvXntk2h4WzMVuUTDF7GhMvA@mail.gmail.com>
+	<5e3798f7-e280-b6c3-1504-828283617c52@redhat.com>
+	<CAFEAcA_+NnpeP9Le7bp9yrYQDwtuP79pt8GpVzJ4RBDMx1iomA@mail.gmail.com>
+	<09e7b89f-27f2-1787-b371-7b0c0eff78b8@redhat.com>
+	<CAFEAcA-357eVt3s_7ULWxssQttvAV0DkUv_tGkyk8umVgfH1QA@mail.gmail.com>
+From: Laszlo Ersek <lersek@redhat.com>
+Message-ID: <d776710c-2255-947b-22c6-336e9491bb81@redhat.com>
+Date: Tue, 12 Dec 2017 14:28:51 +0100
+MIME-Version: 1.0
+In-Reply-To: <CAFEAcA-357eVt3s_7ULWxssQttvAV0DkUv_tGkyk8umVgfH1QA@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH 3/3] hw/arm/virt-acpi-build: Add second
+ UART to ACPI tables
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,86 +34,88 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: wei.w.wang@intel.com, virtio-dev@lists.oasis-open.org, linux-kernel@vger.kernel.org, qemu-devel@nongnu.org, virtualization@lists.linux-foundation.org, kvm@vger.kernel.org, linux-mm@kvack.org, mst@redhat.com, mhocko@kernel.org, akpm@linux-foundation.org, mawilcox@microsoft.com
-Cc: david@redhat.com, cornelia.huck@de.ibm.com, mgorman@techsingularity.net, aarcange@redhat.com, amit.shah@redhat.com, pbonzini@redhat.com, willy@infradead.org, liliang.opensource@gmail.com, yang.zhang.wz@gmail.com, quan.xu@aliyun.com, nilal@redhat.com, riel@redhat.com
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: Ard Biesheuvel <ard.biesheuvel@linaro.org>, Shannon Zhao <zhaoshenglong@huawei.com>, qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>, "Jason A . Donenfeld" <Jason@zx2c4.com>, Drew Jones <drjones@redhat.com>, Andrea Bolognani <abologna@redhat.com>
 
-Wei Wang wrote:
-> +void xb_clear_bit_range(struct xb *xb, unsigned long start, unsigned long end)
-> +{
-> +	struct radix_tree_root *root = &xb->xbrt;
-> +	struct radix_tree_node *node;
-> +	void **slot;
-> +	struct ida_bitmap *bitmap;
-> +	unsigned int nbits;
-> +
-> +	for (; start < end; start = (start | (IDA_BITMAP_BITS - 1)) + 1) {
-> +		unsigned long index = start / IDA_BITMAP_BITS;
-> +		unsigned long bit = start % IDA_BITMAP_BITS;
-> +
-> +		bitmap = __radix_tree_lookup(root, index, &node, &slot);
-> +		if (radix_tree_exception(bitmap)) {
-> +			unsigned long ebit = bit + 2;
-> +			unsigned long tmp = (unsigned long)bitmap;
-> +
-> +			nbits = min(end - start + 1, BITS_PER_LONG - ebit);
-> +
-> +			if (ebit >= BITS_PER_LONG)
+On 12/12/17 13:47, Peter Maydell wrote:
+> On 12 December 2017 at 12:41, Laszlo Ersek <lersek@redhat.com> wrote:
+>> I agree. There's one user-visible complication: while with one UART,
+>> it's not possible to mix things up, with two UARTs, users will
+>> inevitably want to assign inverse roles to them, relative to what QEMU /
+>> the firmware assigns originally.
+>>
+>> E.g. if one PL011 is redirected to a regular file (debug messages) and
+>> the other one to stdio (console), there will be complaints that "I
+>> wanted it the other way around". The redirection happens on the backend
+>> (chardev) level, but the firmware won't see the difference on the
+>> frontend (PL011) level.
+>>
+>> Is it possible to add a new property to the UART nodes in the DTB, like
+>> "purpose"?
+> 
+> This is what the "chosen" stdout-path node in the DTB is for,
+> but you said you didn't want to look at that :-) (it means
+> "device to be used for boot console output".)
 
-What happens if we hit this "continue;" when "index == ULONG_MAX / IDA_BITMAP_BITS" ?
+:(
 
-Can you eliminate exception path and fold all xbitmap patches into one, and
-post only one xbitmap patch without virtio-baloon changes? If exception path
-is valuable, you can add exception path after minimum version is merged.
-This series is too difficult for me to close corner cases.
-
-> +				continue;
-> +			bitmap_clear(&tmp, ebit, nbits);
-> +			if (tmp == RADIX_TREE_EXCEPTIONAL_ENTRY)
-> +				__radix_tree_delete(root, node, slot);
-> +			else
-> +				rcu_assign_pointer(*slot, (void *)tmp);
-> +		} else if (bitmap) {
-> +			nbits = min(end - start + 1, IDA_BITMAP_BITS - bit);
-> +
-> +			if (nbits != IDA_BITMAP_BITS)
-> +				bitmap_clear(bitmap->bitmap, bit, nbits);
-> +
-> +			if (nbits == IDA_BITMAP_BITS ||
-> +			    bitmap_empty(bitmap->bitmap, IDA_BITMAP_BITS)) {
-> +				kfree(bitmap);
-> +				__radix_tree_delete(root, node, slot);
-> +			}
-> +		}
-> +
-> +		/*
-> +		 * Already reached the last usable ida bitmap, so just return,
-> +		 * otherwise overflow will happen.
-> +		 */
-> +		if (index == ULONG_MAX / IDA_BITMAP_BITS)
-> +			break;
-> +	}
-> +}
+Ard is right that we really shouldn't do that kind of parsing magic in
+very early UEFI stuff.
 
 
+>> Or can we make a virt-arm policy that "first -serial is always ...,
+>> second -serial is always ..."?
+> 
+> Well, the first -serial will always be the 0x09000000 one
+> that we have today, and the second -serial will be the other
+> one (unless you have -machine secure=yes, in which case
+> second -serial is the secure-only UART and third -serial is
+> the second NS UART).
+> 
+> Is this any different to the x86 case, where there are two
+> UARTs at different IO port/IRQ locations?
 
-> +/**
-> + * xb_find_next_set_bit - find the next set bit in a range
-> + * @xb: the xbitmap to search
-> + * @start: the start of the range, inclusive
-> + * @end: the end of the range, exclusive
-> + *
-> + * Returns: the index of the found bit, or @end + 1 if no such bit is found.
-> + */
-> +unsigned long xb_find_next_set_bit(struct xb *xb, unsigned long start,
-> +				   unsigned long end)
-> +{
-> +	return xb_find_next_bit(xb, start, end, 1);
-> +}
+OVMF (x86) uses two distinct devices for the two purposes discussed.
 
-Won't "exclusive" loose ability to handle ULONG_MAX ? Since this is a
-library module, missing ability to handle ULONG_MAX sounds like an omission.
-Shouldn't we pass (or return) whether "found or not" flag (e.g. strtoul() in
-C library function)?
+* It uses the "debug console device" for debug message output, at
+hard-coded IO port 0x402; so if you'd like to capture those messages,
+then you have to add:
 
-  bool xb_find_next_set_bit(struct xb *xb, unsigned long start, unsigned long end, unsigned long *result);
-  unsigned long xb_find_next_set_bit(struct xb *xb, unsigned long start, unsigned long end, bool *found);
+  -chardev file,id=debugfile,path=debug.log \
+  -device isa-debugcon,iobase=0x402,chardev=debugfile \
+
+(or the more traditional
+
+  -debugcon file:debug.log \
+  -global isa-debugcon.iobase=0x402 \
+)
+
+* For console I/O, it uses the first serial port. (I think I have once
+investigated what it takes to use other serial ports for console I/O --
+I'm no longer sure if "it happens to be impossible in OVMF", or just
+"nobody ever does that".)
+
+
+The important distinction (on the UEFI level anyway) is that the debug
+messages need to go to a super dumb device, while console I/O can use a
+much higher-level serial IO abstraction ("protocol").
+
+
+> I think the only thing users really expect is that if you're
+> using just the one serial port for anything then it's the
+> first one.
+
+You are right -- we've never had two (non-secure) UARTs on virt-arm, so
+we can invent whatever assignment, as long as:
+
+- the single UART case doesn't break (keeps receiving both debug output
+and console IO),
+
+- whatever we invent for the two UARTs case now, it remains consistent
+over time. I think this implies we can rely on the FDT node ordering in
+the firmware (if we want to use the 2nd UART at all, that is), and then
+QEMU shouldn't change the serial_hds[] <-> FDT node mapping in the
+future, in machvirt_init() and the callees thereof.
+
+Thanks!
+Laszlo
