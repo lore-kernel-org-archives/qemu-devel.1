@@ -1,29 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43568)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44964)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1eOik0-00029E-65
-	for qemu-devel@nongnu.org; Tue, 12 Dec 2017 06:28:56 -0500
+	(envelope-from <lersek@redhat.com>) id 1eOiob-0004dJ-82
+	for qemu-devel@nongnu.org; Tue, 12 Dec 2017 06:33:38 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1eOijv-0002YS-8r
-	for qemu-devel@nongnu.org; Tue, 12 Dec 2017 06:28:52 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:33794)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1eOijv-0002Y2-2a
-	for qemu-devel@nongnu.org; Tue, 12 Dec 2017 06:28:47 -0500
-References: <20171211194610.3962-1-dgilbert@redhat.com>
-	<20171211194610.3962-2-dgilbert@redhat.com>
-	<97feaaf8-b08e-2c49-6cdb-b1556f6326cd@redhat.com>
-	<20171212103138.GC2409@work-vm>
-	<7677f3f3-72b9-0f0c-13ca-ace1196ed45b@redhat.com>
-	<20171212110357.GD2409@work-vm>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <514f0650-ceb1-0658-a640-72e5336a8483@redhat.com>
-Date: Tue, 12 Dec 2017 12:28:34 +0100
+	(envelope-from <lersek@redhat.com>) id 1eOioa-0005dN-CC
+	for qemu-devel@nongnu.org; Tue, 12 Dec 2017 06:33:37 -0500
+References: <1512745328-5109-1-git-send-email-peter.maydell@linaro.org>
+	<1512745328-5109-4-git-send-email-peter.maydell@linaro.org>
+	<5A2F6ED9.5030605@huawei.com>
+	<ac182406-8011-9f19-38e7-37328434095b@redhat.com>
+	<CAFEAcA_9pee99KpL4zwVS5jJuiv2MCGp79crufpU1kH1Okg-Hg@mail.gmail.com>
+From: Laszlo Ersek <lersek@redhat.com>
+Message-ID: <6b4b6351-eeb4-a4d3-8ddf-5401516671ae@redhat.com>
+Date: Tue, 12 Dec 2017 12:33:26 +0100
 MIME-Version: 1.0
-In-Reply-To: <20171212110357.GD2409@work-vm>
+In-Reply-To: <CAFEAcA_9pee99KpL4zwVS5jJuiv2MCGp79crufpU1kH1Okg-Hg@mail.gmail.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v3 1/8] memory: address_space_iterate
+Subject: Re: [Qemu-devel] [PATCH 3/3] hw/arm/virt-acpi-build: Add second
+ UART to ACPI tables
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,24 +28,48 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Cc: qemu-devel@nongnu.org, imammedo@redhat.com, maxime.coquelin@redhat.com, groug@kaod.org, mst@redhat.com
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: Shannon Zhao <zhaoshenglong@huawei.com>, qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>, "Jason A . Donenfeld" <Jason@zx2c4.com>, Drew Jones <drjones@redhat.com>, Andrea Bolognani <abologna@redhat.com>, Ard Biesheuvel <ard.biesheuvel@linaro.org>
 
-On 12/12/2017 12:03, Dr. David Alan Gilbert wrote:
->> nop means that attributes (readonly, romd_mode, mr+offset_in_region)
->> haven't changed; nop is optionally followed by log_start or log_stop.
->> If any of them changes, you get del+add (del is always before add).
->>
->>> Th nice thing we have here is we get a full walk of the physical memory
->>> in order; keeping it in order makes our data structure easy for merging.
->> That's the same that you get with region_del/add.
-> Hmm it would be good if that was documented somewhere.
-> I thought you'd only get an _add/_del and then a commit.
+On 12/12/17 12:11, Peter Maydell wrote:
+> On 12 December 2017 at 11:06, Laszlo Ersek <lersek@redhat.com> wrote:
+>> BTW, has anyone tested this with the ArmVirtQemu firmware? As far as I
+>> can see from the firmware code, the firmware will use the PL011 whose
+>> description comes first in the DTB (and ignore the other PL011), in an
+>> fdt_next_node() traversal. Is that OK for the intended use case?
+>> (Perhaps I should have asked this under the second patch, which updates
+>> the DTB generator.)
 > 
-> However, what do I do in vhost_dev_start?  At the moment I'm forcfully
-> regenerating it using the same code.
+> I haven't tested, since I don't have a working setup for that to hand.
+> (Do you have instructions somewhere for getting it working?)
 
-When you add a listener, you get adds and a commit for the current state
-of the AddressSpace.
+The Wiki page I most frequently refer to (for a libvirt-less description
+anyway) is Ard's:
 
-Paolo
+  https://wiki.linaro.org/LEG/UEFIforQEMU
+
+There's also:
+
+  https://www.kraxel.org/repos/
+  https://fedoraproject.org/wiki/Architectures/AArch64/Install_with_QEMU
+
+> The behaviour we would want would be for the firmware to keep using
+> the PL011 at 0x09000000.
+
+With these QEMU patches, I reckon that's going to happen, yes.
+
+> (In an ideal world the firmware would
+> prefer the UART marked in the 'stdout-path' in the DTB /chosen node,
+> as the kernel does, I guess.)
+
+Hmmm, I recall that we used to have some code related to the /chosen
+node... We have a helper function for locating that
+(GetOrInsertChosenNode), but we no longer use it, it seems? The last
+(only?) use was apparently removed in:
+
+https://github.com/tianocore/edk2/commit/29589acf1010
+
+I'll let Ard comment too.
+
+Thanks
+Laszlo
