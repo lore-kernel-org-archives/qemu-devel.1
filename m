@@ -1,30 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54925)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55575)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1eOhg0-0008DQ-Bx
-	for qemu-devel@nongnu.org; Tue, 12 Dec 2017 05:20:41 -0500
+	(envelope-from <imammedo@redhat.com>) id 1eOhiV-0001UP-AO
+	for qemu-devel@nongnu.org; Tue, 12 Dec 2017 05:23:19 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1eOhfw-0002mJ-Kx
-	for qemu-devel@nongnu.org; Tue, 12 Dec 2017 05:20:39 -0500
-Received: from mail-wr0-x22f.google.com ([2a00:1450:400c:c0c::22f]:42109)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1eOhfw-0002ls-Dp
-	for qemu-devel@nongnu.org; Tue, 12 Dec 2017 05:20:36 -0500
-Received: by mail-wr0-x22f.google.com with SMTP id s66so20543766wrc.9
-	for <qemu-devel@nongnu.org>; Tue, 12 Dec 2017 02:20:36 -0800 (PST)
-Date: Tue, 12 Dec 2017 10:20:32 +0000
-From: Stefan Hajnoczi <stefanha@gmail.com>
-Message-ID: <20171212102032.GC6985@stefanha-x1.localdomain>
-References: <1512455239-8296-1-git-send-email-changpeng.liu@intel.com>
-	<1512455239-8296-2-git-send-email-changpeng.liu@intel.com>
-	<20171211133901.GA5962@stefanha-x1.localdomain>
-	<FF7FC980937D6342B9D289F5F3C7C2625B5E5373@SHSMSX103.ccr.corp.intel.com>
+	(envelope-from <imammedo@redhat.com>) id 1eOhiQ-0004QG-CJ
+	for qemu-devel@nongnu.org; Tue, 12 Dec 2017 05:23:15 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:45262)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1eOhiQ-0004PK-34
+	for qemu-devel@nongnu.org; Tue, 12 Dec 2017 05:23:10 -0500
+Date: Tue, 12 Dec 2017 11:23:02 +0100
+From: Igor Mammedov <imammedo@redhat.com>
+Message-ID: <20171212112302.7e6716da@redhat.com>
+In-Reply-To: <97feaaf8-b08e-2c49-6cdb-b1556f6326cd@redhat.com>
+References: <20171211194610.3962-1-dgilbert@redhat.com>
+	<20171211194610.3962-2-dgilbert@redhat.com>
+	<97feaaf8-b08e-2c49-6cdb-b1556f6326cd@redhat.com>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="KN5l+BnMqAQyZLvT"
-Content-Disposition: inline
-In-Reply-To: <FF7FC980937D6342B9D289F5F3C7C2625B5E5373@SHSMSX103.ccr.corp.intel.com>
-Subject: Re: [Qemu-devel] [PATCH v6 1/4] vhost-user: add new vhost user
- messages to support virtio config space
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v3 1/8] memory: address_space_iterate
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,40 +28,105 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Liu, Changpeng" <changpeng.liu@intel.com>
-Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "pbonzini@redhat.com" <pbonzini@redhat.com>, "mst@redhat.com" <mst@redhat.com>, "marcandre.lureau@redhat.com" <marcandre.lureau@redhat.com>, "felipe@nutanix.com" <felipe@nutanix.com>, "Harris, James R" <james.r.harris@intel.com>
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>, qemu-devel@nongnu.org, maxime.coquelin@redhat.com, groug@kaod.org, mst@redhat.com
 
+On Tue, 12 Dec 2017 00:50:51 +0100
+Paolo Bonzini <pbonzini@redhat.com> wrote:
 
---KN5l+BnMqAQyZLvT
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+> On 11/12/2017 20:46, Dr. David Alan Gilbert (git) wrote:
+> > From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+> > 
+> > Iterate through an address space calling a function for each
+> > section.  The iteration is done in order.
+> > 
+> > Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>  
+> 
+> It seems to me that you can achieve the same effect by implementing the
+> region_add and region_nop callbacks, and leaving out region_del.  Am I
+> missing something?
+region_del would also be need to track references correctly.
 
-On Tue, Dec 12, 2017 at 01:25:30AM +0000, Liu, Changpeng wrote:
-> > The vhost-blk code should also check that
-> > hdev->vhost_ops->vhost_set_config != NULL during realize.  This way
-> > users see the error when adding the device instead of at runtime when
-> > the function gets called.
-> For vhost-blk, get_config is mandatory, but for set_config, it should depend
-> on the feature bit: VIRTIO_BLK_F_CONFIG_WCE is enabled or not. Of course,
-> migration should be another case. So running time error process should be
-> okay.
+Initially I've also suggested to reuse region_add|del but
+compared to David's approach it will be multiple calls for
+a memory transaction vs a pass over flatview at commit time.
 
-Okay.
-
-Stefan
-
---KN5l+BnMqAQyZLvT
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEcBAEBAgAGBQJaL61wAAoJEJykq7OBq3PIC5sH+wcemmaRpvmMThNS1xbjHBZP
-u2AxyXUSZj9dxktWlxkC0vrjlek4QxrcmITIkduR1rnMb/5xq0a7Ai3fscHhWgFB
-zRHlYxpj2i9fbz28sRMVhk1fZEKnL7X8YtUS9KwSY7FpKQ+AVhzzPvu5Ea0ElwB1
-3PMvM7elvq92LA9jV3+WRQeIM37k9Yi+79mZ7E8Y3ojUmZjyE/3UpVxgBhCQ9DAT
-wI12RRahh7X2y1qYz8vTb36F70H37lZMDWQO5U13QdwCkExFYoyivvMgRllFtkL3
-/7Xsw/LM5hgcvHEP/h8up2qWB2pC4vDRYQOrwQxqfY2vkVaB7QLpLTGuyogvikU=
-=GQpV
------END PGP SIGNATURE-----
-
---KN5l+BnMqAQyZLvT--
+> 
+> Thanks,
+> 
+> Paolo
+> 
+> > ---
+> >  include/exec/memory.h | 23 +++++++++++++++++++++++
+> >  memory.c              | 22 ++++++++++++++++++++++
+> >  2 files changed, 45 insertions(+)
+> > 
+> > diff --git a/include/exec/memory.h b/include/exec/memory.h
+> > index 5ed4042f87..f5a9df642e 100644
+> > --- a/include/exec/memory.h
+> > +++ b/include/exec/memory.h
+> > @@ -1987,6 +1987,29 @@ address_space_write_cached(MemoryRegionCache *cache, hwaddr addr,
+> >      address_space_write(cache->as, cache->xlat + addr, MEMTXATTRS_UNSPECIFIED, buf, len);
+> >  }
+> >  
+> > +/**
+> > + * ASIterateCallback: Function type called by address_space_iterate
+> > + *
+> > + * Return 0 on success or a negative error code.
+> > + *
+> > + * @mrs: Memory region section for this range
+> > + * @opaque: The opaque value passed in to the iterator.
+> > + */
+> > +typedef int (*ASIterateCallback)(MemoryRegionSection *mrs, void *opaque);
+> > +
+> > +/**
+> > + * address_space_iterate: Call the function for each address range in the
+> > + *                        AddressSpace, in sorted order.
+> > + *
+> > + * Return 0 on success or a negative error code.
+> > + *
+> > + * @as: Address space to iterate over
+> > + * @cb: Function to call.  If the function returns none-0 the iteration will
+> > + *     stop.
+> > + * @opaque: Value to pass to the function
+> > + */
+> > +int
+> > +address_space_iterate(AddressSpace *as, ASIterateCallback cb, void *opaque);
+> >  #endif
+> >  
+> >  #endif
+> > diff --git a/memory.c b/memory.c
+> > index e26e5a3b1d..f45137f25e 100644
+> > --- a/memory.c
+> > +++ b/memory.c
+> > @@ -2810,6 +2810,28 @@ void address_space_destroy(AddressSpace *as)
+> >      call_rcu(as, do_address_space_destroy, rcu);
+> >  }
+> >  
+> > +int address_space_iterate(AddressSpace *as, ASIterateCallback cb,
+> > +                          void *opaque)
+> > +{
+> > +    int res = 0;
+> > +    FlatView *fv = address_space_to_flatview(as);
+> > +    FlatRange *range;
+> > +
+> > +    flatview_ref(fv);
+> > +
+> > +    FOR_EACH_FLAT_RANGE(range, fv) {
+> > +        MemoryRegionSection mrs = section_from_flat_range(range, fv);
+> > +        res = cb(&mrs, opaque);
+> > +        if (res) {
+> > +            break;
+> > +        }
+> > +    }
+> > +
+> > +    flatview_unref(fv);
+> > +
+> > +    return res;
+> > +}
+> > +
+> >  static const char *memory_region_type(MemoryRegion *mr)
+> >  {
+> >      if (memory_region_is_ram_device(mr)) {
+> >   
+> 
