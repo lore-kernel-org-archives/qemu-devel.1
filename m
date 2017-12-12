@@ -1,23 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38189)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38291)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1eOgfO-00038N-CY
-	for qemu-devel@nongnu.org; Tue, 12 Dec 2017 04:15:59 -0500
+	(envelope-from <stefanha@redhat.com>) id 1eOgg5-0003S7-0C
+	for qemu-devel@nongnu.org; Tue, 12 Dec 2017 04:16:42 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1eOgfJ-0004za-Dm
-	for qemu-devel@nongnu.org; Tue, 12 Dec 2017 04:15:58 -0500
-Date: Tue, 12 Dec 2017 10:15:45 +0100
-From: Cornelia Huck <cohuck@redhat.com>
-Message-ID: <20171212101545.3bbd19dc.cohuck@redhat.com>
-In-Reply-To: <08154f0d-d526-d735-a952-853fcabe946b@redhat.com>
-References: <20171211134740.8235-1-david@redhat.com>
-	<20171211134740.8235-5-david@redhat.com>
-	<20171211181754.4a3b847d.cohuck@redhat.com>
-	<08154f0d-d526-d735-a952-853fcabe946b@redhat.com>
+	(envelope-from <stefanha@redhat.com>) id 1eOgg0-0005L3-2X
+	for qemu-devel@nongnu.org; Tue, 12 Dec 2017 04:16:40 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:45712)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1eOgfz-0005Ke-Sm
+	for qemu-devel@nongnu.org; Tue, 12 Dec 2017 04:16:36 -0500
+Date: Tue, 12 Dec 2017 09:16:31 +0000
+From: Stefan Hajnoczi <stefanha@redhat.com>
+Message-ID: <20171212091631.GE6089@stefanha-x1.localdomain>
+References: <20171208105553.12249-1-pbonzini@redhat.com>
+	<20171208105553.12249-3-pbonzini@redhat.com>
+	<20171208153010.GD8998@stefanha-x1.localdomain>
+	<43a3e41a-f6b2-dc43-f84d-53fa7efd0716@redhat.com>
+	<20171211101620.GB13593@stefanha-x1.localdomain>
+	<e01b6be6-62b4-2123-ba30-09ca27fd5048@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v1 for-2-12 04/15] s390x/flic: simplify
- flic initialization
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="uCPdOCrL+PnN2Vxy"
+Content-Disposition: inline
+In-Reply-To: <e01b6be6-62b4-2123-ba30-09ca27fd5048@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH 2/5] lock-guard: add scoped lock
+ implementation
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,64 +33,55 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Hildenbrand <david@redhat.com>
-Cc: qemu-s390x@nongnu.org, qemu-devel@nongnu.org, Christian Borntraeger <borntraeger@de.ibm.com>, Richard Henderson <rth@twiddle.net>, Alexander Graf <agraf@suse.de>, Paolo Bonzini <pbonzini@redhat.com>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Thomas Huth <thuth@redhat.com>
+To: Eric Blake <eblake@redhat.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, "Emilio G . Cota" <cota@braap.org>, Fam Zheng <famz@redhat.com>, qemu-devel@nongnu.org
 
-On Mon, 11 Dec 2017 21:34:20 +0100
-David Hildenbrand <david@redhat.com> wrote:
 
-> On 11.12.2017 18:17, Cornelia Huck wrote:
-> > On Mon, 11 Dec 2017 14:47:29 +0100
-> > David Hildenbrand <david@redhat.com> wrote:
-> >   
-> >> This makes it clearer, which device is used for which accelerator.
+--uCPdOCrL+PnN2Vxy
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
+
+On Mon, Dec 11, 2017 at 07:51:43AM -0600, Eric Blake wrote:
+> On 12/11/2017 04:16 AM, Stefan Hajnoczi wrote:
+>=20
+> >>> I don't understand the need for the qemu_lock_guard_is_taken(&name)
+> >>> condition, why not do the following?
+> >>>
+> >>>   for (QEMU_LOCK_GUARD(type, name, lock);
+> >>>        ;
+> >>>        qemu_lock_guard_unlock(&name))
 > >>
-> >> Signed-off-by: David Hildenbrand <david@redhat.com>
-> >> ---
-> >>  hw/intc/s390_flic.c          |  9 +++++++--
-> >>  hw/intc/s390_flic_kvm.c      | 12 ------------
-> >>  include/hw/s390x/s390_flic.h |  9 ---------
-> >>  3 files changed, 7 insertions(+), 23 deletions(-)
-> >>
-> >> diff --git a/hw/intc/s390_flic.c b/hw/intc/s390_flic.c
-> >> index 6eaf178d79..a78bdf1d90 100644
-> >> --- a/hw/intc/s390_flic.c
-> >> +++ b/hw/intc/s390_flic.c
-> >> @@ -40,11 +40,16 @@ void s390_flic_init(void)
-> >>  {
-> >>      DeviceState *dev;
-> >>  
-> >> -    dev = s390_flic_kvm_create();
-> >> -    if (!dev) {
-> >> +    if (kvm_enabled()) {
-> >> +        dev = qdev_create(NULL, TYPE_KVM_S390_FLIC);
-> >> +        object_property_add_child(qdev_get_machine(), TYPE_KVM_S390_FLIC,
-> >> +                                  OBJECT(dev), NULL);
-> >> +    } else if (tcg_enabled()) {
-> >>          dev = qdev_create(NULL, TYPE_QEMU_S390_FLIC);
-> >>          object_property_add_child(qdev_get_machine(), TYPE_QEMU_S390_FLIC,
-> >>                                    OBJECT(dev), NULL);  
-> > 
-> > Can you use TYPE_S390_FLIC_COMMON for attaching the flic to the machine?  
-> 
-> I suggest doing that in a separate patch. (I remember that changing the
-> name should not harm migration).
+> >> Because that would be an infinite loop. :)
+> >=20
+> > Sorry, I mean for (...; false; ...).  Is there any reason to do
+> > qemu_lock_guard_is_taken(&name)?
+>=20
+> You need the loop to execute at least once ;)
+>=20
+> But I proposed an alternative that doesn't need is_taken, by:
+>=20
+> for (bool name##done =3D false, QEMU_LOCK_GUARD(type, name, lock);
+>      ! name##done; name##done =3D true)
+>=20
+> if we still like the form that declares a for-loop scope.
 
-I don't think it harms migration, as we hook up the same device as
-before (just via the common flic device).
+Okay guys, for loops are hard.  I give up programming.
 
-Probably does not make sense as a separate patch, though, as you touch
-this code anyway.
+Stefan
 
-> 
-> >   
-> >> +    } else {
-> >> +        g_assert_not_reached();  
-> > 
-> > Checking for tcg_enabled() explicitly does not seem the common pattern,
-> > although it is fine with me (I doubt we'll support other accelerators
-> > for s390x in the foreseeable future).  
-> 
-> Indeed, I can drop that.
+--uCPdOCrL+PnN2Vxy
+Content-Type: application/pgp-signature; name="signature.asc"
 
-Yup.
+-----BEGIN PGP SIGNATURE-----
+
+iQEcBAEBAgAGBQJaL55vAAoJEJykq7OBq3PIH5EIALoz3Fij02/iGKZJlMdZxMNh
+NpFSC/NG2LokpqE1zF/IW7YZyI77UMxew6KXYpGywH03UMj0VOmgcGVMzmzcALlQ
+qtIHU+edVr1p7mi+91g8CRhXaBHiZ2UE6Ig/QKSw0BrBPrNQMulUwulpyGu0Es9t
+R4APdlNZO6MkeS2e+lF7Vt/Ys8ewhs/JyZ2+cBk4RRdTQ34SyqLuGS1TESUuy523
+EK3i6fS6bOT2hGll519miGiWkfSS2oCBhWoqNOpIIAzRGcWeAoq7xmle4Q+/vljg
+mhBddlWJviERtBklvcUpSML2ApOapAXiouWdups7k5WwG1wt4tlUxuqxwkbdOJ8=
+=pz0U
+-----END PGP SIGNATURE-----
+
+--uCPdOCrL+PnN2Vxy--
