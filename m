@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55575)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57430)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1eOhiV-0001UP-AO
-	for qemu-devel@nongnu.org; Tue, 12 Dec 2017 05:23:19 -0500
+	(envelope-from <dgilbert@redhat.com>) id 1eOhqs-0005Zn-1i
+	for qemu-devel@nongnu.org; Tue, 12 Dec 2017 05:31:58 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1eOhiQ-0004QG-CJ
-	for qemu-devel@nongnu.org; Tue, 12 Dec 2017 05:23:15 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:45262)
+	(envelope-from <dgilbert@redhat.com>) id 1eOhqn-00014H-4o
+	for qemu-devel@nongnu.org; Tue, 12 Dec 2017 05:31:54 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:36552)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1eOhiQ-0004PK-34
-	for qemu-devel@nongnu.org; Tue, 12 Dec 2017 05:23:10 -0500
-Date: Tue, 12 Dec 2017 11:23:02 +0100
-From: Igor Mammedov <imammedo@redhat.com>
-Message-ID: <20171212112302.7e6716da@redhat.com>
-In-Reply-To: <97feaaf8-b08e-2c49-6cdb-b1556f6326cd@redhat.com>
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1eOhqm-00013c-SE
+	for qemu-devel@nongnu.org; Tue, 12 Dec 2017 05:31:49 -0500
+Date: Tue, 12 Dec 2017 10:31:38 +0000
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20171212103138.GC2409@work-vm>
 References: <20171211194610.3962-1-dgilbert@redhat.com>
 	<20171211194610.3962-2-dgilbert@redhat.com>
 	<97feaaf8-b08e-2c49-6cdb-b1556f6326cd@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <97feaaf8-b08e-2c49-6cdb-b1556f6326cd@redhat.com>
 Subject: Re: [Qemu-devel] [PATCH v3 1/8] memory: address_space_iterate
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
@@ -29,29 +29,28 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>, qemu-devel@nongnu.org, maxime.coquelin@redhat.com, groug@kaod.org, mst@redhat.com
+Cc: qemu-devel@nongnu.org, imammedo@redhat.com, maxime.coquelin@redhat.com, groug@kaod.org, mst@redhat.com
 
-On Tue, 12 Dec 2017 00:50:51 +0100
-Paolo Bonzini <pbonzini@redhat.com> wrote:
-
+* Paolo Bonzini (pbonzini@redhat.com) wrote:
 > On 11/12/2017 20:46, Dr. David Alan Gilbert (git) wrote:
 > > From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
 > > 
 > > Iterate through an address space calling a function for each
 > > section.  The iteration is done in order.
 > > 
-> > Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>  
+> > Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
 > 
 > It seems to me that you can achieve the same effect by implementing the
 > region_add and region_nop callbacks, and leaving out region_del.  Am I
 > missing something?
-region_del would also be need to track references correctly.
 
-Initially I've also suggested to reuse region_add|del but
-compared to David's approach it will be multiple calls for
-a memory transaction vs a pass over flatview at commit time.
+What's the semantics of region_nop (and for that matter region_add/del)?
+Th nice thing we have here is we get a full walk of the physical memory
+in order; keeping it in order makes our data structure easy for merging.
 
-> 
+Dave
+
+
 > Thanks,
 > 
 > Paolo
@@ -128,5 +127,7 @@ a memory transaction vs a pass over flatview at commit time.
 > >  static const char *memory_region_type(MemoryRegion *mr)
 > >  {
 > >      if (memory_region_is_ram_device(mr)) {
-> >   
+> > 
 > 
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
