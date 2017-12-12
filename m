@@ -1,34 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35026)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37916)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <yang.zhong@intel.com>) id 1eOeT2-0006ds-Jj
-	for qemu-devel@nongnu.org; Tue, 12 Dec 2017 01:55:09 -0500
+	(envelope-from <aik@ozlabs.ru>) id 1eOeZZ-0001dz-G1
+	for qemu-devel@nongnu.org; Tue, 12 Dec 2017 02:01:51 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <yang.zhong@intel.com>) id 1eOeSz-00050E-GA
-	for qemu-devel@nongnu.org; Tue, 12 Dec 2017 01:55:04 -0500
-Received: from mga01.intel.com ([192.55.52.88]:17720)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <yang.zhong@intel.com>)
-	id 1eOeSz-0004zc-76
-	for qemu-devel@nongnu.org; Tue, 12 Dec 2017 01:55:01 -0500
-Date: Tue, 12 Dec 2017 14:54:19 +0800
-From: Yang Zhong <yang.zhong@intel.com>
-Message-ID: <20171212065419.GB26607@yangzhon-Virtual>
-References: <20171201105622.GB26237@yangzhon-Virtual>
-	<74cccd14-e485-90d4-82d9-03355c05faca@redhat.com>
-	<20171204120322.GA32151@yangzhon-Virtual>
-	<5A253EF5.6040300@huawei.com>
-	<20171205060047.GA4102@yangzhon-Virtual>
-	<024fd897-a16a-f69e-94dc-07affb3ef724@redhat.com>
-	<20171206092625.GA19639@yangzhon-Virtual>
-	<6bfac215-b5ba-fd09-d17b-310a2c843a2b@redhat.com>
-	<20171207150629.GA7387@yangzhon-Virtual>
-	<af4a7e59-ac0a-1d5f-3cc5-458dd5fc6fc9@redhat.com>
+	(envelope-from <aik@ozlabs.ru>) id 1eOeZW-0001rj-Bv
+	for qemu-devel@nongnu.org; Tue, 12 Dec 2017 02:01:49 -0500
+Received: from mail-it0-x243.google.com ([2607:f8b0:4001:c0b::243]:34132)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <aik@ozlabs.ru>) id 1eOeZW-0001rV-2V
+	for qemu-devel@nongnu.org; Tue, 12 Dec 2017 02:01:46 -0500
+Received: by mail-it0-x243.google.com with SMTP id m11so16015247iti.1
+	for <qemu-devel@nongnu.org>; Mon, 11 Dec 2017 23:01:45 -0800 (PST)
+From: Alexey Kardashevskiy <aik@ozlabs.ru>
+References: <20171212052131.24649-1-aik@ozlabs.ru>
+	<20171211225411.6fd08ff8@w520.home>
+	<60d96072-55c2-93fd-3cf7-011abf4926e1@ozlabs.ru>
+Message-ID: <e31b3238-0fe0-1cfc-92b6-39e03170c669@ozlabs.ru>
+Date: Tue, 12 Dec 2017 18:01:40 +1100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <af4a7e59-ac0a-1d5f-3cc5-458dd5fc6fc9@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v3] rcu: reduce more than 7MB heap memory
- by malloc_trim()
+In-Reply-To: <60d96072-55c2-93fd-3cf7-011abf4926e1@ozlabs.ru>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-AU
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH qemu] RFC: vfio-pci: Allow mmap of MSIX BAR
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,120 +31,214 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>, zhaoshenglong@huawei.com
-Cc: qemu-devel@nongnu.org, stefanha@redhat.com, berrange@redhat.com, weidong.huang@huawei.com, arei.gonglei@huawei.com, liujunjie23@huawei.com, wangxinxin.wang@huawei.com, stone.xulei@huawei.com, yang.zhong@intel.com
+To: Alex Williamson <alex.williamson@redhat.com>
+Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org, David Gibson <david@gibson.dropbear.id.au>
 
-On Mon, Dec 11, 2017 at 05:31:43PM +0100, Paolo Bonzini wrote:
-> On 07/12/2017 16:06, Yang Zhong wrote:
-> >  Which show trim cost time less than 1ms and call_rcu_thread() do 10 times batch free, the trim also 10 times.
-> > 
-> >  I also did below changes: 
-> >     delta=1000,  and 
-> >     next_trim_time = qemu_clock_get_ns(QEMU_CLOCK_HOST) + delta * last_trim_time
-> > 
-> >  The whole VM bootup will trim 3 times.
+On 12/12/17 17:06, Alexey Kardashevskiy wrote:
+> On 12/12/17 16:54, Alex Williamson wrote:
+>> On Tue, 12 Dec 2017 16:21:31 +1100
+>> Alexey Kardashevskiy <aik@ozlabs.ru> wrote:
+>>
+>>> This makes use of a new VFIO_REGION_INFO_CAP_MSIX_MAPPABLE capability
+>>> which tells that a region with MSIX data can be mapped entirely, i.e.
+>>> the VFIO PCI driver won't prevent MSIX vectors area from being mapped.
+>>>
+>>> This adds a "msix-no-mmap" property to the vfio-pci device, it is "true"
+>>> by default and "false" for pseries-2.12+ machines.
+>>>
+>>> This requites kernel's "vfio-pci: Allow mapping MSIX BAR"
+>>> https://www.spinics.net/lists/kvm/msg160282.html
+>>>
+>>> Signed-off-by: Alexey Kardashevskiy <aik@ozlabs.ru>
+>>> ---
+>>>
+>>> This is an RFC as it requires kernel headers update which is not there yet.
+>>>
+>>> I'd like to make it "msix-mmap" (without "no") but could not find a way
+>>> of enabling a device property for machine versions newer than some value.
+>>>
+>>> I changed 2.11 machine just for the demonstration purpose.
+>>>
+>>>
+>>> ---
+>>>  hw/vfio/pci.h                 |  1 +
+>>>  include/hw/vfio/vfio-common.h |  1 +
+>>>  linux-headers/linux/vfio.h    |  5 +++++
+>>>  hw/ppc/spapr.c                | 10 +++++++++-
+>>>  hw/vfio/common.c              | 15 +++++++++++++++
+>>>  hw/vfio/pci.c                 | 11 +++++++++++
+>>>  6 files changed, 42 insertions(+), 1 deletion(-)
+>>>
+>>> diff --git a/hw/vfio/pci.h b/hw/vfio/pci.h
+>>> index a8fb3b3..53912ef 100644
+>>> --- a/hw/vfio/pci.h
+>>> +++ b/hw/vfio/pci.h
+>>> @@ -142,6 +142,7 @@ typedef struct VFIOPCIDevice {
+>>>      bool no_kvm_intx;
+>>>      bool no_kvm_msi;
+>>>      bool no_kvm_msix;
+>>> +    bool msix_no_mmap;
+>>>  } VFIOPCIDevice;
+>>>  
+>>>  uint32_t vfio_pci_read_config(PCIDevice *pdev, uint32_t addr, int len);
+>>> diff --git a/include/hw/vfio/vfio-common.h b/include/hw/vfio/vfio-common.h
+>>> index f3a2ac9..927d600 100644
+>>> --- a/include/hw/vfio/vfio-common.h
+>>> +++ b/include/hw/vfio/vfio-common.h
+>>> @@ -171,6 +171,7 @@ int vfio_get_region_info(VFIODevice *vbasedev, int index,
+>>>                           struct vfio_region_info **info);
+>>>  int vfio_get_dev_region_info(VFIODevice *vbasedev, uint32_t type,
+>>>                               uint32_t subtype, struct vfio_region_info **info);
+>>> +bool vfio_is_cap_present(VFIODevice *vbasedev, uint16_t cap_type, int region);
+>>>  #endif
+>>>  extern const MemoryListener vfio_prereg_listener;
+>>>  
+>>> diff --git a/linux-headers/linux/vfio.h b/linux-headers/linux/vfio.h
+>>> index 4e7ab4c..bce9baf 100644
+>>> --- a/linux-headers/linux/vfio.h
+>>> +++ b/linux-headers/linux/vfio.h
+>>> @@ -300,6 +300,11 @@ struct vfio_region_info_cap_type {
+>>>  #define VFIO_REGION_SUBTYPE_INTEL_IGD_HOST_CFG	(2)
+>>>  #define VFIO_REGION_SUBTYPE_INTEL_IGD_LPC_CFG	(3)
+>>>  
+>>> +/*
+>>> + * The MSIX mappable capability informs that MSIX data of a BAR can be mmapped.
+>>> + */
+>>> +#define VFIO_REGION_INFO_CAP_MSIX_MAPPABLE	3
+>>> +
+>>>  /**
+>>>   * VFIO_DEVICE_GET_IRQ_INFO - _IOWR(VFIO_TYPE, VFIO_BASE + 9,
+>>>   *				    struct vfio_irq_info)
+>>> diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
+>>> index 9de63f0..1dfc386 100644
+>>> --- a/hw/ppc/spapr.c
+>>> +++ b/hw/ppc/spapr.c
+>>> @@ -3742,13 +3742,21 @@ static const TypeInfo spapr_machine_info = {
+>>>  /*
+>>>   * pseries-2.11
+>>>   */
+>>> +#define SPAPR_COMPAT_2_11                                             \
+>>> +    HW_COMPAT_2_10                                                    \
+>>> +    {                                                                 \
+>>> +        .driver = "vfio-pci",                                         \
+>>> +        .property = "msix-no-mmap",                                   \
+>>> +        .value    = "on",                                             \
+>>> +    },                                                                \
+>>> +
+>>>  static void spapr_machine_2_11_instance_options(MachineState *machine)
+>>>  {
+>>>  }
+>>>  
+>>>  static void spapr_machine_2_11_class_options(MachineClass *mc)
+>>>  {
+>>> -    /* Defaults for the latest behaviour inherited from the base class */
+>>> +    SET_MACHINE_COMPAT(mc, SPAPR_COMPAT_2_11);
+>>>  }
+>>>  
+>>>  DEFINE_SPAPR_MACHINE(2_11, "2.11", true);
+>>> diff --git a/hw/vfio/common.c b/hw/vfio/common.c
+>>> index ed7717d..593514c 100644
+>>> --- a/hw/vfio/common.c
+>>> +++ b/hw/vfio/common.c
+>>> @@ -1408,6 +1408,21 @@ int vfio_get_dev_region_info(VFIODevice *vbasedev, uint32_t type,
+>>>      return -ENODEV;
+>>>  }
+>>>  
+>>> +bool vfio_is_cap_present(VFIODevice *vbasedev, uint16_t cap_type, int region)
+>>> +{
+>>> +        struct vfio_region_info *info = NULL;
+>>> +        bool ret = false;
+>>> +
+>>> +        if (!vfio_get_region_info(vbasedev, region, &info)) {
+>>> +            if (vfio_get_region_info_cap(info, cap_type)) {
+>>> +                ret = true;
+>>> +            }
+>>> +            g_free(info);
+>>> +        }
+>>> +
+>>> +        return ret;
+>>> +}
+>>> +
+>>>  /*
+>>>   * Interfaces for IBM EEH (Enhanced Error Handling)
+>>>   */
+>>> diff --git a/hw/vfio/pci.c b/hw/vfio/pci.c
+>>> index c977ee3..d9aeae8 100644
+>>> --- a/hw/vfio/pci.c
+>>> +++ b/hw/vfio/pci.c
+>>> @@ -1289,6 +1289,12 @@ static void vfio_pci_fixup_msix_region(VFIOPCIDevice *vdev)
+>>>      off_t start, end;
+>>>      VFIORegion *region = &vdev->bars[vdev->msix->table_bar].region;
+>>>  
+>>> +    if (!vdev->msix_no_mmap &&
+>>> +        vfio_is_cap_present(&vdev->vbasedev, VFIO_REGION_INFO_CAP_MSIX_MAPPABLE,
+>>> +                            vdev->msix->table_bar)) {
+>>> +        return;
+>>> +    }
+>>> +
+>>>      /*
+>>>       * We expect to find a single mmap covering the whole BAR, anything else
+>>>       * means it's either unsupported or already setup.
+>>> @@ -1473,6 +1479,10 @@ static int vfio_msix_setup(VFIOPCIDevice *vdev, int pos, Error **errp)
+>>>       */
+>>>      memory_region_set_enabled(&vdev->pdev.msix_pba_mmio, false);
+>>>  
+>>> +    if (!vdev->msix_no_mmap) {
+>>> +        memory_region_set_enabled(&vdev->pdev.msix_table_mmio, false);
+>>> +    }
+>>
+>> No, you're conflating issues.  There's (a) can we mmap over the MSI-X
+>> vector table and (b) do we require QEMU emulation of the MSI-X vector
+>> table.  (a) does NOT imply (b).  AFAICT, (a) should be enabled any time
+>> the kernel supports it,
 > 
-> For any adaptive mechanism (either this one or the simple "if (n == 0)"
-> one), the question is:
+> This is the default setting, or you do not want it to be a property so the
+> user cannot shoot himself in a foot?
 > 
-> 1) what effect it has on RSS in your case
-  Hello Paolo,
-
-  I list those two TEMP patch here,
-
-  (1). if (n==0) patch
-  /*
-   * Global grace period counter.  Bit 0 is always one in rcu_gp_ctr.
-   * Bits 1 and above are defined in synchronize_rcu.
-  @@ -246,6 +246,7 @@ static void *call_rcu_thread(void *opaque)
-                  qemu_event_reset(&rcu_call_ready_event);
-                  n = atomic_read(&rcu_call_count);
-                  if (n == 0) {
-  +                    malloc_trim(4 * 1024 * 1024);
-                      qemu_event_wait(&rcu_call_ready_event);
-                  }
-              }
-
-  (2). adaptive patch
-
-       rcu_register_thread();
-
-  @@ -272,6 +273,21 @@ static void *call_rcu_thread(void *opaque)
-             node->func(node);
-         }
-         qemu_mutex_unlock_iothread();
-  +
-  +        static uint64_t next_trim_time, last_trim_time;
-  +        int delta=1000;
-  +
-  +        if ( qemu_clock_get_ns(QEMU_CLOCK_HOST) < next_trim_time ) {
-  +            next_trim_time -= last_trim_time / delta;   /* or higher */
-  +            last_trim_time -= last_trim_time / delta;   /* same as previous line */
-  +        } else {
-  +            uint64_t trim_start_time = qemu_clock_get_ns(QEMU_CLOCK_HOST);
-  +            malloc_trim(4 * 1024 *1024);
-  +            last_trim_time = qemu_clock_get_ns(QEMU_CLOCK_HOST) - trim_start_time;
-  +            next_trim_time = qemu_clock_get_ns(QEMU_CLOCK_HOST) + delta * last_trim_time;
-  +       }
-  +
-
-
-   I used those two TEMP patch to test and results as below:
-
-   My test command
-   sudo ./qemu-system-x86_64 -enable-kvm -cpu host -m 2G -smp cpus=4,cores=4,threads=1,sockets=1 \
-    -drive format=raw,file=/home/yangzhon/icx/workspace/eywa.img,index=0,media=disk -nographic
-  
-  (1) if (n==0) patch
-    563015d84000-563016fd6000 rw-p 00000000 00:00 0                          [heap]
-    Size:              18760 kB
-    KernelPageSize:        4 kB
-    MMUPageSize:           4 kB
-    Rss:                3176 kB
-    Pss:                3176 kB
-
-  (2)adaptive patch
-    55bd5975a000-55bd5a9ac000 rw-p 00000000 00:00 0                          [heap]
-    Size:              18760 kB
-    KernelPageSize:        4 kB
-    MMUPageSize:           4 kB
-    Rss:                3196 kB
-    Pss:                3196 kB
-
-  if set delta=10, then get below result
-
-    56043a2e1000-56043b533000 rw-p 00000000 00:00 0                          [heap]
-    Size:              18760 kB
-    KernelPageSize:        4 kB
-    MMUPageSize:           4 kB
-    Rss:                3168 kB
-    Pss:                3168 kB
-
- 
-  With my test command, if used the n==0 patch, the trim times decresed to 1/2,
-  if delta=1000 in patch2, the trim time is 3. If delta=10, the trim time is 10.
-
-  Regards,
-
-  Yang 
-
-> 2) what effect it has on boot time in Shannon's case.
-  Hello Shannon,
-
-  It's hard for me to reproduce your commands in my x86 enviornment, as a compare test,
-  would you please help me use above two TEMP patches to verify VM bootup time again?
-
-  Those data can help Paolo to decide which patch will be used or how to adjust delta
-  parameter.  Many thanks!
-
-  Regards,
-
-  Yang
-
-
-> Either patch is okay if you can justify it with these two performance
-> indices.
+>> (b) should never be enabled on ppc, regardless
+>> of (a).  Thanks,
 > 
-> Thanks,
 > 
-> Paolo
+> The intention is to have a property - msix_no_mmap=true, except a single
+> case - ppc-pseries, I just do not know how to enforce it for a specific
+> machine type.
+
+
+I do know now. For example,
+
+static void spapr_machine_2_11_instance_options(MachineState *machine)
+{
+    register_compat_prop("vfio-pci", "msix-no-mmap", "off");
+}
+
+
+which is basically "-global vfio-pci.msix-no-mmap=off" but in the code.
+
+
+
+> It could also be a machine property, like "kernel_irqchip".
+> 
+> 
+> 
+>>
+>> Alex
+>>
+>>> +
+>>>      return 0;
+>>>  }
+>>>  
+>>> @@ -2986,6 +2996,7 @@ static Property vfio_pci_dev_properties[] = {
+>>>      DEFINE_PROP_BIT("x-igd-opregion", VFIOPCIDevice, features,
+>>>                      VFIO_FEATURE_ENABLE_IGD_OPREGION_BIT, false),
+>>>      DEFINE_PROP_BOOL("x-no-mmap", VFIOPCIDevice, vbasedev.no_mmap, false),
+>>> +    DEFINE_PROP_BOOL("msix-no-mmap", VFIOPCIDevice, msix_no_mmap, true),
+>>>      DEFINE_PROP_BOOL("x-no-kvm-intx", VFIOPCIDevice, no_kvm_intx, false),
+>>>      DEFINE_PROP_BOOL("x-no-kvm-msi", VFIOPCIDevice, no_kvm_msi, false),
+>>>      DEFINE_PROP_BOOL("x-no-kvm-msix", VFIOPCIDevice, no_kvm_msix, false),
+>>
+> 
+> 
+
+
+-- 
+Alexey
