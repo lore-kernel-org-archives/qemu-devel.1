@@ -1,26 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38357)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41984)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <zhangckid@gmail.com>) id 1eOmO0-00034M-5Z
-	for qemu-devel@nongnu.org; Tue, 12 Dec 2017 10:22:25 -0500
+	(envelope-from <cohuck@redhat.com>) id 1eOmUF-0005z4-0S
+	for qemu-devel@nongnu.org; Tue, 12 Dec 2017 10:28:51 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <zhangckid@gmail.com>) id 1eOmNu-000544-SA
-	for qemu-devel@nongnu.org; Tue, 12 Dec 2017 10:22:24 -0500
-Received: from mail-wm0-x22c.google.com ([2a00:1450:400c:c09::22c]:42952)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <zhangckid@gmail.com>) id 1eOmNu-00053b-GO
-	for qemu-devel@nongnu.org; Tue, 12 Dec 2017 10:22:18 -0500
-Received: by mail-wm0-x22c.google.com with SMTP id b199so17656791wme.1
-	for <qemu-devel@nongnu.org>; Tue, 12 Dec 2017 07:22:18 -0800 (PST)
+	(envelope-from <cohuck@redhat.com>) id 1eOmUA-0000UA-PC
+	for qemu-devel@nongnu.org; Tue, 12 Dec 2017 10:28:51 -0500
+Date: Tue, 12 Dec 2017 16:28:39 +0100
+From: Cornelia Huck <cohuck@redhat.com>
+Message-ID: <20171212162839.64ab2207.cohuck@redhat.com>
+In-Reply-To: <835bc109-bc80-5405-2c5c-2eb9142550ac@redhat.com>
+References: <20171211134740.8235-1-david@redhat.com>
+	<20171211134740.8235-7-david@redhat.com>
+	<20171212144944.09860296.cohuck@redhat.com>
+	<0aa794ee-c781-0cc4-3c0a-5f49ae495c63@de.ibm.com>
+	<20171212152959.1ff2b7d5.cohuck@redhat.com>
+	<835bc109-bc80-5405-2c5c-2eb9142550ac@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <03fd4ff1dd212e028f605e630551bce15e5d10a9.1512552817.git.maozy.fnst@cn.fujitsu.com>
-References: <cover.1512552817.git.maozy.fnst@cn.fujitsu.com>
-	<03fd4ff1dd212e028f605e630551bce15e5d10a9.1512552817.git.maozy.fnst@cn.fujitsu.com>
-From: Zhang Chen <zhangckid@gmail.com>
-Date: Tue, 12 Dec 2017 23:22:16 +0800
-Message-ID: <CAK3tnv+48kJTpuLkbf7pHH0W75m-=ov4jnhhdZiU-KNQR5+zYg@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH v2 4/4] colo: add trace for the tcp packet
- comparison
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v1 for-2-12 06/15] s390x/flic: factor out
+ injection of floating interrupts
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,122 +28,45 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Mao Zhongyi <maozy.fnst@cn.fujitsu.com>
-Cc: qemu-devel@nongnu.org, Li Zhijian <lizhijian@cn.fujitsu.com>, Jason Wang <jasowang@redhat.com>
+To: David Hildenbrand <david@redhat.com>
+Cc: Christian Borntraeger <borntraeger@de.ibm.com>, qemu-s390x@nongnu.org, qemu-devel@nongnu.org, Richard Henderson <rth@twiddle.net>, Alexander Graf <agraf@suse.de>, Paolo Bonzini <pbonzini@redhat.com>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Thomas Huth <thuth@redhat.com>
 
-On Wed, Dec 6, 2017 at 5:57 PM, Mao Zhongyi <maozy.fnst@cn.fujitsu.com>
-wrote:
+On Tue, 12 Dec 2017 16:17:17 +0100
+David Hildenbrand <david@redhat.com> wrote:
 
-> Cc: Zhang Chen <zhangckid@gmail.com>
-> Cc: Li Zhijian <lizhijian@cn.fujitsu.com>
-> Cc: Jason Wang <jasowang@redhat.com>
->
-> Signed-off-by: Mao Zhongyi <maozy.fnst@cn.fujitsu.com>
-> ---
->  net/colo-compare.c | 16 ++++++++++++++++
->  net/colo.c         |  1 +
->  net/colo.h         |  1 +
->  net/trace-events   |  1 +
->  4 files changed, 19 insertions(+)
->
-> diff --git a/net/colo-compare.c b/net/colo-compare.c
-> index 683ec4e..db1f586 100644
-> --- a/net/colo-compare.c
-> +++ b/net/colo-compare.c
-> @@ -129,6 +129,7 @@ static void fill_pkt_tcp_info(void *data, uint32_t
-> *max_ack)
->                         + (tcphd->th_off << 2) - pkt->vnet_hdr_len;
->      pkt->payload_size = pkt->size - pkt->header_size;
->      pkt->seq_end = pkt->tcp_seq + pkt->payload_size;
-> +    pkt->flags = tcphd->th_flags;
->  }
->
->  /*
-> @@ -369,6 +370,16 @@ sec:
->      }
->
->      if (colo_mark_tcp_pkt(ppkt, spkt, &mark, min_ack)) {
-> +        trace_colo_compare_tcp_info("pri",
-> +                                    ppkt->tcp_seq, ppkt->tcp_ack,
-> +                                    ppkt->header_size, ppkt->payload_size,
-> +                                    ppkt->offset, ppkt->flags);
-> +
-> +        trace_colo_compare_tcp_info("sec",
-> +                                    spkt->tcp_seq, spkt->tcp_ack,
-> +                                    spkt->header_size, spkt->payload_size,
-> +                                    spkt->offset, spkt->flags);
+> On 12.12.2017 15:29, Cornelia Huck wrote:
+> > On Tue, 12 Dec 2017 15:13:46 +0100
+> > Christian Borntraeger <borntraeger@de.ibm.com> wrote:
+> >   
+> >> On 12/12/2017 02:49 PM, Cornelia Huck wrote:  
+> >   
+> >>> One thing I noticed: You removed the caching of the flic (in the old
+> >>> kvm inject routine), and you generally do more qom invocations (first,
+> >>> to find the common flic; then, to translate to the qemu or kvm flic).
+> >>> Not sure if this might be a problem (probably not).    
+> >>
+> >> Is any of these calls on a potential fast path (e.g. guest without adapter
+> >> interrupts)? If yes, then QOM is a no-go since it is really slow.  
+> > 
+> > At least the new airq interface was using QOM without caching before.
+> > 
+> > It's basically about any interrupt; but otoh we are (for kvm) in
+> > userspace already. Caching the flic and just keeping the casting to the
+> > specialized flic might be ok (I'd guess that the lookup is the slowest
+> > path.)
+> >   
+> 
+> Please note that the lookup is already cached in s390_get_flic(); That
+> should be sufficient, as it does the expensive lookup. One cache should
+> be enough, no?
 
-+
->
+Ah, missed that. So the old code actually did double caching...
 
-In previous patch you remove this trace and here you add a new similar one,
-Move the trance event remove part to this patch is better to understand.
+> 
+> The other conversions should be cheap (and already were in place in a
+> couple of places before).
 
-Thanks
-Zhang Chen
+Yes, object_resolve_path() is probably the most expensive one.
 
-
-
->          if (mark == COLO_COMPARE_FREE_PRIMARY) {
->              conn->compare_seq = ppkt->seq_end;
->              colo_release_primary_pkt(s, ppkt);
-> @@ -387,6 +398,11 @@ sec:
->              goto pri;
->          }
->      } else {
-> +        qemu_hexdump((char *)ppkt->data, stderr,
-> +                     "colo-compare ppkt", ppkt->size);
-> +        qemu_hexdump((char *)spkt->data, stderr,
-> +                     "colo-compare spkt", spkt->size);
-> +
->          g_queue_push_head(&conn->primary_list, ppkt);
->          g_queue_push_head(&conn->secondary_list, spkt);
->
-> diff --git a/net/colo.c b/net/colo.c
-> index a7a7117..8426265 100644
-> --- a/net/colo.c
-> +++ b/net/colo.c
-> @@ -171,6 +171,7 @@ Packet *packet_new(const void *data, int size, int
-> vnet_hdr_len)
->      pkt->header_size = 0;
->      pkt->payload_size = 0;
->      pkt->offset = 0;
-> +    pkt->flags = 0;
->
->      return pkt;
->  }
-> diff --git a/net/colo.h b/net/colo.h
-> index aa08374..da6c36d 100644
-> --- a/net/colo.h
-> +++ b/net/colo.h
-> @@ -53,6 +53,7 @@ typedef struct Packet {
->      uint16_t payload_size; /* the payload length */
->      /* record the payload offset(the length that has been compared) */
->      uint16_t offset;
-> +    uint8_t flags; /* Flags(aka Control bits) */
->  } Packet;
->
->  typedef struct ConnectionKey {
-> diff --git a/net/trace-events b/net/trace-events
-> index 7b7cae5..7b594cf 100644
-> --- a/net/trace-events
-> +++ b/net/trace-events
-> @@ -13,6 +13,7 @@ colo_compare_icmp_miscompare(const char *sta, int size)
-> ": %s = %d"
->  colo_compare_ip_info(int psize, const char *sta, const char *stb, int
-> ssize, const char *stc, const char *std) "ppkt size = %d, ip_src = %s,
-> ip_dst = %s, spkt size = %d, ip_src = %s, ip_dst = %s"
->  colo_old_packet_check_found(int64_t old_time) "%" PRId64
->  colo_compare_miscompare(void) ""
-> +colo_compare_tcp_info(const char *pkt, uint32_t seq, uint32_t ack, int
-> hdlen, int pdlen, int offset, int flags) "%s: seq/ack= %u/%u hdlen= %d
-> pdlen= %d offset= %d flags=%d\n"
->
->  # net/filter-rewriter.c
->  colo_filter_rewriter_debug(void) ""
-> --
-> 2.9.4
->
->
->
->
+Did anyone ever check if the (existing) conversions are actually
+measurable?
