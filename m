@@ -1,28 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52687)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52861)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1eOoFd-0007qj-H5
-	for qemu-devel@nongnu.org; Tue, 12 Dec 2017 12:21:54 -0500
+	(envelope-from <marcandre.lureau@redhat.com>) id 1eOoG7-00084T-JL
+	for qemu-devel@nongnu.org; Tue, 12 Dec 2017 12:22:24 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1eOoFY-0002Ce-Il
-	for qemu-devel@nongnu.org; Tue, 12 Dec 2017 12:21:53 -0500
-Received: from mail-wr0-x22b.google.com ([2a00:1450:400c:c0c::22b]:36221)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1eOoFY-0002CD-B4
-	for qemu-devel@nongnu.org; Tue, 12 Dec 2017 12:21:48 -0500
-Received: by mail-wr0-x22b.google.com with SMTP id v105so21937757wrc.3
-	for <qemu-devel@nongnu.org>; Tue, 12 Dec 2017 09:21:48 -0800 (PST)
-References: <20171211125705.16120-1-alex.bennee@linaro.org>
-	<20171211125705.16120-17-alex.bennee@linaro.org>
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-In-reply-to: <20171211125705.16120-17-alex.bennee@linaro.org>
-Date: Tue, 12 Dec 2017 17:21:45 +0000
-Message-ID: <87h8sv980m.fsf@linaro.org>
+	(envelope-from <marcandre.lureau@redhat.com>) id 1eOoG2-0002NH-JW
+	for qemu-devel@nongnu.org; Tue, 12 Dec 2017 12:22:23 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:63485)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <marcandre.lureau@redhat.com>)
+	id 1eOoG2-0002Mk-Az
+	for qemu-devel@nongnu.org; Tue, 12 Dec 2017 12:22:18 -0500
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+	[10.5.11.13])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 7580F369BD
+	for <qemu-devel@nongnu.org>; Tue, 12 Dec 2017 17:22:17 +0000 (UTC)
+From: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
+Date: Tue, 12 Dec 2017 18:22:08 +0100
+Message-Id: <20171212172208.13588-1-marcandre.lureau@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v1 16/19] fpu/softfloat: re-factor int/uint
- to float
+Subject: [Qemu-devel] [PATCH v2] dump-guest-memory.py: fix "You can't do
+ that without a process to debug"
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,68 +32,83 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: richard.henderson@linaro.org, peter.maydell@linaro.org, laurent@vivier.eu, bharata@linux.vnet.ibm.com, andrew@andrewdutcher.com, aleksandar.markovic@imgtec.com
-Cc: qemu-devel@nongnu.org, Aurelien Jarno <aurelien@aurel32.net>
+To: qemu-devel@nongnu.org
+Cc: mst@redhat.com, lersek@redhat.com, =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, Cleber Rosa <crosa@redhat.com>
 
+If the script is run with a core (no running process), it produces an
+error:
 
-Alex Benn=C3=A9e <alex.bennee@linaro.org> writes:
+(gdb)  dump-guest-memory /tmp/vmcore X86_64
+guest RAM blocks:
+target_start     target_end       host_addr        message count
+---------------- ---------------- ---------------- ------- -----
+0000000000000000 00000000000a0000 00007f7935800000 added       1
+00000000000a0000 00000000000b0000 00007f7934200000 added       2
+00000000000c0000 00000000000ca000 00007f79358c0000 added       3
+00000000000ca000 00000000000cd000 00007f79358ca000 joined      3
+00000000000cd000 00000000000e8000 00007f79358cd000 joined      3
+00000000000e8000 00000000000f0000 00007f79358e8000 joined      3
+00000000000f0000 0000000000100000 00007f79358f0000 joined      3
+0000000000100000 0000000080000000 00007f7935900000 joined      3
+00000000fd000000 00000000fe000000 00007f7934200000 added       4
+00000000fffc0000 0000000100000000 00007f7935600000 added       5
+Python Exception <class 'gdb.error'> You can't do that without a process =
+to debug.:
+Error occurred in Python command: You can't do that without a process
+to debug.
 
-> These are considerably simpler as the lower order integers can just
-> use the higher order conversion function. As the decomposed fractional
-> part is a full 64 bit rounding and inexact handling comes from the
-> pack functions.
-<snip>
->
-> +/*
-> + * Integer to float conversions
-> + *
-> + * Returns the result of converting the two's complement integer `a'
-> + * to the floating-point format. The conversion is performed according
-> + * to the IEC/IEEE Standard for Binary Floating-Point Arithmetic.
-> + */
-> +
-> +static decomposed_parts int_to_float(int64_t a, float_status *status)
-> +{
-> +    decomposed_parts r;
-> +    if (a =3D=3D 0) {
-> +        r.cls =3D float_class_zero;
-> +    } else if (a =3D=3D (1ULL << 63)) {
+Replace the object_resolve_path_type() function call call with a
+local volatile variable.
 
-As the re-pack code can handle -0 we need to explicitly set it here as
-we are building decomposed_parts from scratch:
+Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+---
 
-    if (a =3D=3D 0) {
-        r.cls =3D float_class_zero;
-        r.sign =3D false;
-    } else if (a =3D=3D (1ULL << 63)) {
+v2:
+ - use a vmcoreinfo_realize() local volatile variable
+ - tweak commit message
 
-And also at:
-> +
-> +/*
-> + * Unsigned Integer to float conversions
-> + *
-> + * Returns the result of converting the unsigned integer `a' to the
-> + * floating-point format. The conversion is performed according to the
-> + * IEC/IEEE Standard for Binary Floating-Point Arithmetic.
-> + */
-> +
-> +static decomposed_parts uint_to_float(uint64_t a, float_status *status)
-> +{
-> +    decomposed_parts r;
-> +    if (a =3D=3D 0) {
-> +        r.cls =3D float_class_zero;
-> +    } else {
+scripts/dump-guest-memory.py | 3 +--
+ hw/misc/vmcoreinfo.c         | 3 +++
+ 2 files changed, 4 insertions(+), 2 deletions(-)
 
-Now reads:
-
-    decomposed_parts r =3D { .sign =3D false};
-
-    if (a =3D=3D 0) {
-        r.cls =3D float_class_zero;
-    } else {
-        int spare_bits =3D clz64(a) - 1;
-        r.cls =3D float_class_normal;
-
-
---
-Alex Benn=C3=A9e
+diff --git a/scripts/dump-guest-memory.py b/scripts/dump-guest-memory.py
+index 1af26c1a45..09bec92b50 100644
+--- a/scripts/dump-guest-memory.py
++++ b/scripts/dump-guest-memory.py
+@@ -546,8 +546,7 @@ shape and this command should mostly work."""
+         return None
+=20
+     def add_vmcoreinfo(self):
+-        vmci =3D '(VMCoreInfoState *)' + \
+-               'object_resolve_path_type("", "vmcoreinfo", 0)'
++        vmci =3D 'vmcoreinfo_realize::vmcoreinfo_state'
+         if not gdb.parse_and_eval("%s" % vmci) \
+            or not gdb.parse_and_eval("(%s)->has_vmcoreinfo" % vmci):
+             return
+diff --git a/hw/misc/vmcoreinfo.c b/hw/misc/vmcoreinfo.c
+index 31db57ab44..a2805527cb 100644
+--- a/hw/misc/vmcoreinfo.c
++++ b/hw/misc/vmcoreinfo.c
+@@ -35,6 +35,8 @@ static void vmcoreinfo_realize(DeviceState *dev, Error =
+**errp)
+ {
+     VMCoreInfoState *s =3D VMCOREINFO(dev);
+     FWCfgState *fw_cfg =3D fw_cfg_find();
++    /* for gdb script dump-guest-memory.py */
++    static VMCoreInfoState * volatile vmcoreinfo_state G_GNUC_UNUSED;
+=20
+     /* Given that this function is executing, there is at least one VMCO=
+REINFO
+      * device. Check if there are several.
+@@ -56,6 +58,7 @@ static void vmcoreinfo_realize(DeviceState *dev, Error =
+**errp)
+                              &s->vmcoreinfo, sizeof(s->vmcoreinfo), fals=
+e);
+=20
+     qemu_register_reset(vmcoreinfo_reset, dev);
++    vmcoreinfo_state =3D s;
+ }
+=20
+ static const VMStateDescription vmstate_vmcoreinfo =3D {
+--=20
+2.15.1.355.g36791d7216
