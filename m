@@ -1,22 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44652)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44785)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1eOnv2-0000vx-1o
-	for qemu-devel@nongnu.org; Tue, 12 Dec 2017 12:00:40 -0500
+	(envelope-from <bounces@canonical.com>) id 1eOnva-0001KS-KE
+	for qemu-devel@nongnu.org; Tue, 12 Dec 2017 12:01:15 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1eOnux-0000Lz-7V
-	for qemu-devel@nongnu.org; Tue, 12 Dec 2017 12:00:35 -0500
-References: <1513030760-26245-1-git-send-email-walling@linux.vnet.ibm.com>
-	<1513030760-26245-4-git-send-email-walling@linux.vnet.ibm.com>
-From: David Hildenbrand <david@redhat.com>
-Message-ID: <8f61fa61-9b27-ac88-e781-be2e8df3a6f4@redhat.com>
-Date: Tue, 12 Dec 2017 18:00:26 +0100
+	(envelope-from <bounces@canonical.com>) id 1eOnvW-0000ra-J8
+	for qemu-devel@nongnu.org; Tue, 12 Dec 2017 12:01:10 -0500
+Received: from indium.canonical.com ([91.189.90.7]:33686)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1eOnvW-0000qq-CN
+	for qemu-devel@nongnu.org; Tue, 12 Dec 2017 12:01:06 -0500
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1eOnvT-00081X-Ix
+	for <qemu-devel@nongnu.org>; Tue, 12 Dec 2017 17:01:03 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 7AFFD2E8075
+	for <qemu-devel@nongnu.org>; Tue, 12 Dec 2017 17:01:03 +0000 (UTC)
 MIME-Version: 1.0
-In-Reply-To: <1513030760-26245-4-git-send-email-walling@linux.vnet.ibm.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v2 3/5] s390-ccw: parse and set boot menu
- options
+Date: Tue, 12 Dec 2017 16:48:07 -0000
+From: Tobias-leupold <1307225@bugs.launchpad.net>
+Reply-To: Bug 1307225 <1307225@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <20140413204536.17279.23843.malonedeb@chaenomeles.canonical.com>
+Message-Id: <151309728750.11243.12686770384222059042.malone@soybean.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1307225] Re: Running a virtual machine on a
+ Haswell system produces machine check events
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,226 +37,57 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Collin L. Walling" <walling@linux.vnet.ibm.com>, qemu-s390x@nongnu.org, qemu-devel@nongnu.org
-Cc: borntraeger@de.ibm.com, frankja@linux.vnet.ibm.com, cohuck@redhat.com, thuth@redhat.com
+To: qemu-devel@nongnu.org
 
-On 11.12.2017 23:19, Collin L. Walling wrote:
-> Set boot menu options for an s390 guest and store them in
-> the iplb. These options are set via the QEMU command line
-> option:
->=20
->     -boot menu=3Don|off[,splash-time=3DX]
->=20
-> or via the libvirt domain xml:
->=20
->     <os>
->       <bootmenu enable=3D'yes|no' timeout=3D'X'/>
->     </os>
->=20
-> Where X represents some positive integer representing
-> milliseconds.
->=20
-> A loadparm other than 'prompt' will disable the menu and
-> just boot the specified entry.
->=20
-> Signed-off-by: Collin L. Walling <walling@linux.vnet.ibm.com>
-> Reviewed-by: Janosch Frank <frankja@linux.vnet.ibm.com>
-> ---
->  hw/s390x/ipl.c          | 55 +++++++++++++++++++++++++++++++++++++++++=
-++++++++
->  hw/s390x/ipl.h          |  8 +++++--
->  pc-bios/s390-ccw/iplb.h |  8 +++++--
->  3 files changed, 67 insertions(+), 4 deletions(-)
->=20
-> diff --git a/hw/s390x/ipl.c b/hw/s390x/ipl.c
-> index 0d06fc1..ed5e8d1 100644
-> --- a/hw/s390x/ipl.c
-> +++ b/hw/s390x/ipl.c
-> @@ -23,6 +23,8 @@
->  #include "hw/s390x/ebcdic.h"
->  #include "ipl.h"
->  #include "qemu/error-report.h"
-> +#include "qemu/config-file.h"
-> +#include "qemu/cutils.h"
-> =20
->  #define KERN_IMAGE_START                0x010000UL
->  #define KERN_PARM_AREA                  0x010480UL
-> @@ -33,6 +35,9 @@
->  #define ZIPL_IMAGE_START                0x009000UL
->  #define IPL_PSW_MASK                    (PSW_MASK_32 | PSW_MASK_64)
-> =20
-> +#define BOOT_MENU_FLAG_BOOT_OPTS 0x80
-> +#define BOOT_MENU_FLAG_ZIPL_OPTS 0x40
+The errors still keep appearing. The mcelog still shows the exact errors
+posted in the very fist comment.
 
-these should go to ipl.h and maybe be renamed to something like
+-- =
 
-IPL_BLOCK_... (not sure if even CCW/SCSI specific ones make sense)
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1307225
 
-> +
->  static bool iplb_extended_needed(void *opaque)
->  {
->      S390IPLState *ipl =3D S390_IPL(object_resolve_path(TYPE_S390_IPL, =
-NULL));
-> @@ -219,6 +224,51 @@ static Property s390_ipl_properties[] =3D {
->      DEFINE_PROP_END_OF_LIST(),
->  };
-> =20
-> +static void s390_ipl_set_boot_menu(uint8_t *boot_menu_flags,
-> +                                   uint16_t *boot_menu_timeout)
-> +{
-> +    MachineState *machine =3D MACHINE(qdev_get_machine());
-> +    char *lp =3D object_property_get_str(OBJECT(machine), "loadparm", =
-NULL);
-> +    QemuOptsList *plist =3D qemu_find_opts("boot-opts");
-> +    QemuOpts *opts =3D QTAILQ_FIRST(&plist->head);
-> +    const char *p =3D qemu_opt_get(opts, "menu");
-> +    unsigned long timeout =3D 0;
-> +
-> +    if (memcmp(lp, "PROMPT  ", 8) =3D=3D 0) {
-> +        *boot_menu_flags =3D BOOT_MENU_FLAG_BOOT_OPTS;
-> +
+Title:
+  Running a virtual machine on a Haswell system produces machine check
+  events
 
-remove this empty line
+Status in QEMU:
+  Incomplete
 
-> +    } else if (*lp) {
-> +        /* If loadparm is set to any value, then discard boot menu */
+Bug description:
+  I'm running a virtual Windows SBS 2003 installation on a Xeon E3
+  Haswell system running Gentoo Linux. First, I used Qemu 1.5.3 (the
+  latest stable version on Gentoo). I got a lot of machine check events
+  ("mce: [Hardware Error]: Machine check events logged") in dmesg that
+  always looked like (using mcelog):
 
-I find the connection between -boot and loadparm quite confusing.
-Shouldn't the s390-ccw bios handle this? You should just forward here
-what is given via -boot IMHO.
+  Hardware event. This is not a software error.
+  MCE 0
+  CPU 3 BANK 0
+  TIME 1397455091 Mon Apr 14 07:58:11 2014
+  MCG status:
+  MCi status:
+  Corrected error
+  Error enabled
+  MCA: Internal parity error
+  STATUS 90000040000f0005 MCGSTATUS 0
+  MCGCAP c09 APICID 6 SOCKETID 0
+  CPUID Vendor Intel Family 6 Model 60
 
-> +        return;
-> +
-> +    } else if (!p) {
-> +        /* In the absence of -boot menu, use zipl loader parameters */
-> +        *boot_menu_flags =3D BOOT_MENU_FLAG_ZIPL_OPTS;
-> +
-> +    } else if (strncmp(p, "on", 2) =3D=3D 0) {
-> +        *boot_menu_flags =3D BOOT_MENU_FLAG_BOOT_OPTS;
-> +
-> +        p =3D qemu_opt_get(opts, "splash-time");
-> +
-> +        if (p && qemu_strtoul(p, NULL, 10, &timeout)) {
-> +            error_report("splash-time value is invalid, forcing it to =
-0.");
-> +            return;
-> +        }
-> +
-> +        /* Store timeout value as seconds */
-> +        timeout /=3D 1000;
+  I found this discussion on the vmware community:
+  https://communities.vmware.com/thread/452344
 
-So we pass ms on the command line? Why?
+  It seems that this is (at least partly) caused by the Qemu machine. I
+  switched to Qemu 1.7.0, the first version to use "pc-i440fx-1.7". With
+  this version, the errors almost disappeared, but from time to time, I
+  still get machine check events. Anyways, they so not seem to affect
+  neither the vm, nor the host.
 
-> +
-> +        if (timeout > 0xffff) {
-> +            error_report("splash-time value is greater than 65535000,"
-> +                         " forcing it to 65535000.");
-> +            *boot_menu_timeout =3D 0xffff;
-> +            return;
-> +        }
-> +
-> +        *boot_menu_timeout =3D timeout;
-> +    }
-> +}
-> +
->  static bool s390_gen_initial_iplb(S390IPLState *ipl)
->  {
->      DeviceState *dev_st;
-> @@ -245,6 +295,8 @@ static bool s390_gen_initial_iplb(S390IPLState *ipl=
-)
->              ipl->iplb.pbt =3D S390_IPL_TYPE_CCW;
->              ipl->iplb.ccw.devno =3D cpu_to_be16(ccw_dev->sch->devno);
->              ipl->iplb.ccw.ssid =3D ccw_dev->sch->ssid & 3;
-> +            s390_ipl_set_boot_menu(&ipl->iplb.ccw.boot_menu_flags,
-> +                                   &ipl->iplb.ccw.boot_menu_timeout);
->          } else if (sd) {
->              SCSIBus *bus =3D scsi_bus_from_device(sd);
->              VirtIOSCSI *vdev =3D container_of(bus, VirtIOSCSI, bus);
-> @@ -266,6 +318,8 @@ static bool s390_gen_initial_iplb(S390IPLState *ipl=
-)
->              ipl->iplb.scsi.channel =3D cpu_to_be16(sd->channel);
->              ipl->iplb.scsi.devno =3D cpu_to_be16(ccw_dev->sch->devno);
->              ipl->iplb.scsi.ssid =3D ccw_dev->sch->ssid & 3;
-> +            s390_ipl_set_boot_menu(&ipl->iplb.scsi.boot_menu_flags,
-> +                                   &ipl->iplb.scsi.boot_menu_timeout);
+  The Haswell machine has been set up and running for several days
+  without a single error message. They only appear when the VM is
+  running. so I think this is actually some problem with the Haswell
+  architecture (and not a real hardware error).
 
-can you call this only once for both cases below and only pass ipl? The
-function can figure out using ipl->iplb.pbt what to set.
-
->          } else {
->              return false; /* unknown device */
->          }
-> @@ -273,6 +327,7 @@ static bool s390_gen_initial_iplb(S390IPLState *ipl=
-)
->          if (!s390_ipl_set_loadparm(ipl->iplb.loadparm)) {
->              ipl->iplb.flags |=3D DIAG308_FLAGS_LP_VALID;
->          }
-> +
-
-unrelated change
-
->          return true;
->      }
-> =20
-> diff --git a/hw/s390x/ipl.h b/hw/s390x/ipl.h
-> index 8a705e0..ff3b397 100644
-> --- a/hw/s390x/ipl.h
-> +++ b/hw/s390x/ipl.h
-> @@ -17,7 +17,9 @@
-> =20
->  struct IplBlockCcw {
->      uint64_t netboot_start_addr;
-> -    uint8_t  reserved0[77];
-> +    uint8_t  reserved0[74];
-> +    uint16_t boot_menu_timeout;
-> +    uint8_t  boot_menu_flags;
->      uint8_t  ssid;
->      uint16_t devno;
->      uint8_t  vm_flags;
-> @@ -51,7 +53,9 @@ struct IplBlockQemuScsi {
->      uint32_t lun;
->      uint16_t target;
->      uint16_t channel;
-> -    uint8_t  reserved0[77];
-> +    uint8_t  reserved0[74];
-> +    uint16_t boot_menu_timeout;
-> +    uint8_t  boot_menu_flags;
->      uint8_t  ssid;
->      uint16_t devno;
->  } QEMU_PACKED;
-> diff --git a/pc-bios/s390-ccw/iplb.h b/pc-bios/s390-ccw/iplb.h
-> index 890aed9..fe909d2 100644
-> --- a/pc-bios/s390-ccw/iplb.h
-> +++ b/pc-bios/s390-ccw/iplb.h
-> @@ -14,7 +14,9 @@
-> =20
->  struct IplBlockCcw {
->      uint64_t netboot_start_addr;
-> -    uint8_t  reserved0[77];
-> +    uint8_t  reserved0[74];
-> +    uint16_t boot_menu_timeout;
-> +    uint8_t  boot_menu_flags;
->      uint8_t  ssid;
->      uint16_t devno;
->      uint8_t  vm_flags;
-> @@ -48,7 +50,9 @@ struct IplBlockQemuScsi {
->      uint32_t lun;
->      uint16_t target;
->      uint16_t channel;
-> -    uint8_t  reserved0[77];
-> +    uint8_t  reserved0[74];
-> +    uint16_t boot_menu_timeout;
-> +    uint8_t  boot_menu_flags;
->      uint8_t  ssid;
->      uint16_t devno;
->  } __attribute__ ((packed));
->=20
-
-These look good to me (but as discussed, I think HW folks have to agree
-on this).
-
---=20
-
-Thanks,
-
-David / dhildenb
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1307225/+subscriptions
