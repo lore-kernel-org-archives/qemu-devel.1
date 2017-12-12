@@ -1,33 +1,15 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55178)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55243)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1eOjLx-0004dX-KC
-	for qemu-devel@nongnu.org; Tue, 12 Dec 2017 07:08:11 -0500
+	(envelope-from <pm215@archaic.org.uk>) id 1eOjMR-0004vB-27
+	for qemu-devel@nongnu.org; Tue, 12 Dec 2017 07:08:40 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1eOjLs-0003uM-0s
-	for qemu-devel@nongnu.org; Tue, 12 Dec 2017 07:08:05 -0500
-Received: from mail-oi0-x241.google.com ([2607:f8b0:4003:c06::241]:41141)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1eOjLr-0003tx-SA
-	for qemu-devel@nongnu.org; Tue, 12 Dec 2017 07:07:59 -0500
-Received: by mail-oi0-x241.google.com with SMTP id t78so13823734oie.8
-	for <qemu-devel@nongnu.org>; Tue, 12 Dec 2017 04:07:59 -0800 (PST)
-MIME-Version: 1.0
-In-Reply-To: <5e3798f7-e280-b6c3-1504-828283617c52@redhat.com>
-References: <1512745328-5109-1-git-send-email-peter.maydell@linaro.org>
-	<1512745328-5109-4-git-send-email-peter.maydell@linaro.org>
-	<5A2F6ED9.5030605@huawei.com>
-	<ac182406-8011-9f19-38e7-37328434095b@redhat.com>
-	<CAFEAcA_9pee99KpL4zwVS5jJuiv2MCGp79crufpU1kH1Okg-Hg@mail.gmail.com>
-	<6b4b6351-eeb4-a4d3-8ddf-5401516671ae@redhat.com>
-	<CAKv+Gu-Ugm1g8twoKwgXAPtDfETvXntk2h4WzMVuUTDF7GhMvA@mail.gmail.com>
-	<5e3798f7-e280-b6c3-1504-828283617c52@redhat.com>
+	(envelope-from <pm215@archaic.org.uk>) id 1eOjMP-0004CP-V3
+	for qemu-devel@nongnu.org; Tue, 12 Dec 2017 07:08:35 -0500
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 12 Dec 2017 12:07:38 +0000
-Message-ID: <CAFEAcA_+NnpeP9Le7bp9yrYQDwtuP79pt8GpVzJ4RBDMx1iomA@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH 3/3] hw/arm/virt-acpi-build: Add second
- UART to ACPI tables
+Date: Tue, 12 Dec 2017 12:08:26 +0000
+Message-Id: <1513080506-17703-1-git-send-email-peter.maydell@linaro.org>
+Subject: [Qemu-devel] [PATCH] target/arm: Make disas_thumb2_insn() generate
+ its own UNDEF exceptions
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,25 +18,84 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Laszlo Ersek <lersek@redhat.com>
-Cc: Ard Biesheuvel <ard.biesheuvel@linaro.org>, Shannon Zhao <zhaoshenglong@huawei.com>, qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>, "Jason A . Donenfeld" <Jason@zx2c4.com>, Drew Jones <drjones@redhat.com>, Andrea Bolognani <abologna@redhat.com>
+To: qemu-arm@nongnu.org, qemu-devel@nongnu.org
+Cc: patches@linaro.org, Richard Henderson <rth@twiddle.net>
 
-On 12 December 2017 at 11:59, Laszlo Ersek <lersek@redhat.com> wrote:
-> Peter, what is the intended use of the second UART?
+Refactor disas_thumb2_insn() so that it generates the code for raising
+an UNDEF exception for invalid insns, rather than returning a flag
+which the caller must check to see if it needs to generate the UNDEF
+code. This brings the function in to line with the behaviour of
+disas_thumb_insn() and disas_arm_insn().
 
-Per the commit message:
-# there are some
-# use cases where having a second UART would be useful (like
-# bare-metal testing where you don't really want to have to
-# probe and set up a PCI device just to have a second comms
-# channel).
+Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+---
+This fixes the odd asymmetry of API that caused the bug fixed
+in commit 7472e2efb...
+---
+ target/arm/translate.c | 23 ++++++++++-------------
+ 1 file changed, 10 insertions(+), 13 deletions(-)
 
->From QEMU's point of view this is just "some people would like
-more than one UART, x86 provides more than one UART, it's
-easy to provide an extra UART and it's up to the guest what
-it would like to do with it". If there's utility for the
-OVMF firmware in having 2 UARTs that's doubly good reason
-to have it.
-
-thanks
--- PMM
+diff --git a/target/arm/translate.c b/target/arm/translate.c
+index f120932..89ee353 100644
+--- a/target/arm/translate.c
++++ b/target/arm/translate.c
+@@ -9771,9 +9771,8 @@ gen_thumb2_data_op(DisasContext *s, int op, int conds, uint32_t shifter_out,
+     return 0;
+ }
+ 
+-/* Translate a 32-bit thumb instruction.  Returns nonzero if the instruction
+-   is not legal.  */
+-static int disas_thumb2_insn(DisasContext *s, uint32_t insn)
++/* Translate a 32-bit thumb instruction. */
++static void disas_thumb2_insn(DisasContext *s, uint32_t insn)
+ {
+     uint32_t imm, shift, offset;
+     uint32_t rd, rn, rm, rs;
+@@ -10985,16 +10984,16 @@ static int disas_thumb2_insn(DisasContext *s, uint32_t insn)
+                     /* UNPREDICTABLE, unallocated hint or
+                      * PLD/PLDW/PLI (literal)
+                      */
+-                    return 0;
++                    return;
+                 }
+                 if (op1 & 1) {
+-                    return 0; /* PLD/PLDW/PLI or unallocated hint */
++                    return; /* PLD/PLDW/PLI or unallocated hint */
+                 }
+                 if ((op2 == 0) || ((op2 & 0x3c) == 0x30)) {
+-                    return 0; /* PLD/PLDW/PLI or unallocated hint */
++                    return; /* PLD/PLDW/PLI or unallocated hint */
+                 }
+                 /* UNDEF space, or an UNPREDICTABLE */
+-                return 1;
++                goto illegal_op;
+             }
+         }
+         memidx = get_mem_index(s);
+@@ -11120,9 +11119,10 @@ static int disas_thumb2_insn(DisasContext *s, uint32_t insn)
+     default:
+         goto illegal_op;
+     }
+-    return 0;
++    return;
+ illegal_op:
+-    return 1;
++    gen_exception_insn(s, 4, EXCP_UDEF, syn_uncategorized(),
++                       default_exception_el(s));
+ }
+ 
+ static void disas_thumb_insn(DisasContext *s, uint32_t insn)
+@@ -12245,10 +12245,7 @@ static void thumb_tr_translate_insn(DisasContextBase *dcbase, CPUState *cpu)
+     if (is_16bit) {
+         disas_thumb_insn(dc, insn);
+     } else {
+-        if (disas_thumb2_insn(dc, insn)) {
+-            gen_exception_insn(dc, 4, EXCP_UDEF, syn_uncategorized(),
+-                               default_exception_el(dc));
+-        }
++        disas_thumb2_insn(dc, insn);
+     }
+ 
+     /* Advance the Thumb condexec condition.  */
+-- 
+2.7.4
