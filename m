@@ -1,23 +1,14 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45060)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45279)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1eOlNr-00031k-L4
-	for qemu-devel@nongnu.org; Tue, 12 Dec 2017 09:18:17 -0500
+	(envelope-from <drjones@redhat.com>) id 1eOlOa-0003WF-N1
+	for qemu-devel@nongnu.org; Tue, 12 Dec 2017 09:18:58 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1eOlNq-0007Rp-QA
-	for qemu-devel@nongnu.org; Tue, 12 Dec 2017 09:18:11 -0500
-Received: from mail-ot0-x241.google.com ([2607:f8b0:4003:c0f::241]:38365)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1eOlNq-0007R7-L4
-	for qemu-devel@nongnu.org; Tue, 12 Dec 2017 09:18:10 -0500
-Received: by mail-ot0-x241.google.com with SMTP id p3so17886579oti.5
-	for <qemu-devel@nongnu.org>; Tue, 12 Dec 2017 06:18:10 -0800 (PST)
-MIME-Version: 1.0
-In-Reply-To: <CAKv+Gu8gZ-Y4-zV2GRgbXPcignAg3vi8__XaFXqAhYOZOL7GcQ@mail.gmail.com>
-References: <1512745328-5109-1-git-send-email-peter.maydell@linaro.org>
-	<1512745328-5109-4-git-send-email-peter.maydell@linaro.org>
-	<5A2F6ED9.5030605@huawei.com>
-	<ac182406-8011-9f19-38e7-37328434095b@redhat.com>
+	(envelope-from <drjones@redhat.com>) id 1eOlOS-00081O-9q
+	for qemu-devel@nongnu.org; Tue, 12 Dec 2017 09:18:51 -0500
+Date: Tue, 12 Dec 2017 15:18:32 +0100
+From: Andrew Jones <drjones@redhat.com>
+Message-ID: <20171212141832.gsvlcm77cxg7zbhc@kamzik.brq.redhat.com>
+References: <ac182406-8011-9f19-38e7-37328434095b@redhat.com>
 	<CAFEAcA_9pee99KpL4zwVS5jJuiv2MCGp79crufpU1kH1Okg-Hg@mail.gmail.com>
 	<6b4b6351-eeb4-a4d3-8ddf-5401516671ae@redhat.com>
 	<CAKv+Gu-Ugm1g8twoKwgXAPtDfETvXntk2h4WzMVuUTDF7GhMvA@mail.gmail.com>
@@ -27,14 +18,10 @@ References: <1512745328-5109-1-git-send-email-peter.maydell@linaro.org>
 	<CAFEAcA-357eVt3s_7ULWxssQttvAV0DkUv_tGkyk8umVgfH1QA@mail.gmail.com>
 	<d776710c-2255-947b-22c6-336e9491bb81@redhat.com>
 	<CAKv+Gu9e6qwJ4=t=UHHGsVs1XM26agh17Mgy0ckAvUsy+2xi2A@mail.gmail.com>
-	<CAFEAcA9JzK8sNF5TmENfXZ-NBJwfp03b2La4YQ=N2i1ZCzrNBw@mail.gmail.com>
-	<CAKv+Gu_mzynBKSBSdtUhKRgNd3KmuJTwiNZpmvPCfkRDo_QCgA@mail.gmail.com>
-	<CAFEAcA9HAcZTi6bT-FbsG9LtqO=4s7rpcz0niZbimG834t4uHA@mail.gmail.com>
-	<CAKv+Gu8gZ-Y4-zV2GRgbXPcignAg3vi8__XaFXqAhYOZOL7GcQ@mail.gmail.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 12 Dec 2017 14:17:49 +0000
-Message-ID: <CAFEAcA8OY3PFk_bermKxQBuF_th7SudHgaRk8wf76EAGYnoCGw@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CAKv+Gu9e6qwJ4=t=UHHGsVs1XM26agh17Mgy0ckAvUsy+2xi2A@mail.gmail.com>
 Subject: Re: [Qemu-devel] [PATCH 3/3] hw/arm/virt-acpi-build: Add second
  UART to ACPI tables
 List-Id: <qemu-devel.nongnu.org>
@@ -46,32 +33,117 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: Ard Biesheuvel <ard.biesheuvel@linaro.org>
-Cc: Laszlo Ersek <lersek@redhat.com>, Shannon Zhao <zhaoshenglong@huawei.com>, qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>, "Jason A . Donenfeld" <Jason@zx2c4.com>, Drew Jones <drjones@redhat.com>, Andrea Bolognani <abologna@redhat.com>
+Cc: Laszlo Ersek <lersek@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, "Jason A . Donenfeld" <Jason@zx2c4.com>, QEMU Developers <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>, Andrea Bolognani <abologna@redhat.com>, Shannon Zhao <zhaoshenglong@huawei.com>
 
-On 12 December 2017 at 14:16, Ard Biesheuvel <ard.biesheuvel@linaro.org> wrote:
-> On 12 December 2017 at 14:13, Peter Maydell <peter.maydell@linaro.org> wrote:
->> On 12 December 2017 at 14:12, Ard Biesheuvel <ard.biesheuvel@linaro.org> wrote:
->>> On 12 December 2017 at 14:10, Peter Maydell <peter.maydell@linaro.org> wrote:
->>>> That doesn't actually usefully separate debug output from the
->>>> console, though, because stdout-path is also going to point
->>>> to the UART with the lowest physical address...
->>>>
->>>
->>> By default, yes, just like is currently the case. But I would assume
->>> this new serial port could be appointed 'console' and put into
->>> stdout-path by QEMU, based on the command line options?
->>
->> We don't have any command line options for doing that, and I'm
->> generally reluctant to introduce new command line UI, especially
->> new command line UI that's specific to Arm and not also needed
->> for x86.
->>
+On Tue, Dec 12, 2017 at 01:56:44PM +0000, Ard Biesheuvel wrote:
+> On 12 December 2017 at 13:28, Laszlo Ersek <lersek@redhat.com> wrote:
+> > On 12/12/17 13:47, Peter Maydell wrote:
+> >> On 12 December 2017 at 12:41, Laszlo Ersek <lersek@redhat.com> wrote:
+> >>> I agree. There's one user-visible complication: while with one UART,
+> >>> it's not possible to mix things up, with two UARTs, users will
+> >>> inevitably want to assign inverse roles to them, relative to what QEMU /
+> >>> the firmware assigns originally.
+> >>>
+> >>> E.g. if one PL011 is redirected to a regular file (debug messages) and
+> >>> the other one to stdio (console), there will be complaints that "I
+> >>> wanted it the other way around". The redirection happens on the backend
+> >>> (chardev) level, but the firmware won't see the difference on the
+> >>> frontend (PL011) level.
+> >>>
+> >>> Is it possible to add a new property to the UART nodes in the DTB, like
+> >>> "purpose"?
+> >>
+> >> This is what the "chosen" stdout-path node in the DTB is for,
+> >> but you said you didn't want to look at that :-) (it means
+> >> "device to be used for boot console output".)
+> >
+> > :(
+> >
+> > Ard is right that we really shouldn't do that kind of parsing magic in
+> > very early UEFI stuff.
+> >
+> >
+> >>> Or can we make a virt-arm policy that "first -serial is always ...,
+> >>> second -serial is always ..."?
+> >>
+> >> Well, the first -serial will always be the 0x09000000 one
+> >> that we have today, and the second -serial will be the other
+> >> one (unless you have -machine secure=yes, in which case
+> >> second -serial is the secure-only UART and third -serial is
+> >> the second NS UART).
+> >>
+> >> Is this any different to the x86 case, where there are two
+> >> UARTs at different IO port/IRQ locations?
+> >
+> > OVMF (x86) uses two distinct devices for the two purposes discussed.
+> >
+> > * It uses the "debug console device" for debug message output, at
+> > hard-coded IO port 0x402; so if you'd like to capture those messages,
+> > then you have to add:
+> >
+> >   -chardev file,id=debugfile,path=debug.log \
+> >   -device isa-debugcon,iobase=0x402,chardev=debugfile \
+> >
+> > (or the more traditional
+> >
+> >   -debugcon file:debug.log \
+> >   -global isa-debugcon.iobase=0x402 \
+> > )
+> >
+> > * For console I/O, it uses the first serial port. (I think I have once
+> > investigated what it takes to use other serial ports for console I/O --
+> > I'm no longer sure if "it happens to be impossible in OVMF", or just
+> > "nobody ever does that".)
+> >
+> >
+> > The important distinction (on the UEFI level anyway) is that the debug
+> > messages need to go to a super dumb device, while console I/O can use a
+> > much higher-level serial IO abstraction ("protocol").
+> >
+> >
+> >> I think the only thing users really expect is that if you're
+> >> using just the one serial port for anything then it's the
+> >> first one.
+> >
+> > You are right -- we've never had two (non-secure) UARTs on virt-arm, so
+> > we can invent whatever assignment, as long as:
+> >
+> > - the single UART case doesn't break (keeps receiving both debug output
+> > and console IO),
+> >
+> > - whatever we invent for the two UARTs case now, it remains consistent
+> > over time. I think this implies we can rely on the FDT node ordering in
+> > the firmware (if we want to use the 2nd UART at all, that is), and then
+> > QEMU shouldn't change the serial_hds[] <-> FDT node mapping in the
+> > future, in machvirt_init() and the callees thereof.
+> >
+> 
+> Given that the DEBUG output is only produced on DEBUG builds, couldn't
+> we simply stipulate that DEBUG output appears on the PL011 with the
+> lowest physical address? That keeps the current status quo, and is
+> probably sufficient for 99% of the use cases of people using the DEBUG
+> builds.
+
+I was thinking that if AAVMF learned to use a second UART for debug
+output, that the debug builds could go away, as they have for x86 (IIUC).
+If a user wires up a second UART, then AAVMF could unconditionally
+output debug messages to it. Not wiring it up would lose the messages,
+which is no different than the non-verbose build we have today. It
+would be nice if could tell AAVMF not to use a second UART for debug
+messages too, though, as the debug messages make AAVMF quite slow, and
+the user may want to provide the guest a second UART.
+
+> 
+> Then, we can introduce some code to decode stdout-path in FdtClientDxe
+> (a higher level DT parsing driver) so that the actual serial console
+> gets installed onto whichever UART is described as the system console.
+> Also, given that ArmVirtQemu is tightly coupled to QEMU/mach-virt, we
+> could decide to only use node names in stdout-path (as we do
+> currently) to simplify the parsing logic.
 >
-> If stdout-path is always going to point to pl011@0x9000000, why would
-> we need to parse it?
 
-If you had always parsed stdout-path, we wouldn't need to worry
-about the order in which the UART nodes appear in the dtb...
+That sounds reasonable and would only require adding a comment above
+the setting of stdout-path in the QEMU code to formalize it.
 
-thanks
--- PMM
+Thanks,
+drew
