@@ -1,26 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45866)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47179)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1eOlQN-0004vb-HR
-	for qemu-devel@nongnu.org; Tue, 12 Dec 2017 09:20:51 -0500
+	(envelope-from <berrange@redhat.com>) id 1eOlUg-0000KK-E0
+	for qemu-devel@nongnu.org; Tue, 12 Dec 2017 09:25:18 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1eOlQH-0000oy-I5
-	for qemu-devel@nongnu.org; Tue, 12 Dec 2017 09:20:47 -0500
-Date: Tue, 12 Dec 2017 15:20:36 +0100
-From: Cornelia Huck <cohuck@redhat.com>
-Message-ID: <20171212152036.0fcd66a8.cohuck@redhat.com>
-In-Reply-To: <20171212140523.GA7547@bjsdjshi@linux.vnet.ibm.com>
-References: <20171201143136.62497-1-pasic@linux.vnet.ibm.com>
-	<20171201143136.62497-4-pasic@linux.vnet.ibm.com>
-	<20171204122859.1a4fcd21.cohuck@redhat.com>
-	<1108d0e7-318b-354f-31da-95d5efb8193c@linux.vnet.ibm.com>
-	<20171204171124.4d877b22.cohuck@redhat.com>
-	<20171205074300.GZ5859@bjsdjshi@linux.vnet.ibm.com>
-	<20171212140523.GA7547@bjsdjshi@linux.vnet.ibm.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 3/3] s390x: deprecate s390-squash-mcss
- machine prop
+	(envelope-from <berrange@redhat.com>) id 1eOlUe-0003AN-Es
+	for qemu-devel@nongnu.org; Tue, 12 Dec 2017 09:25:14 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:53974)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1eOlUe-00039U-8F
+	for qemu-devel@nongnu.org; Tue, 12 Dec 2017 09:25:12 -0500
+From: "Daniel P. Berrange" <berrange@redhat.com>
+Date: Tue, 12 Dec 2017 14:24:58 +0000
+Message-Id: <20171212142500.3909-1-berrange@redhat.com>
+Subject: [Qemu-devel] [PATCH v6 0/2] Convert apple related code to
+ keycodemapdb
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,62 +22,43 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>
-Cc: Halil Pasic <pasic@linux.vnet.ibm.com>, Boris Fiuczynski <fiuczy@linux.vnet.ibm.com>, Christian Borntraeger <borntraeger@de.ibm.com>, Shalini Chellathurai Saroja <shalini@linux.vnet.ibm.com>, qemu-devel@nongnu.org, qemu-s390x@nongnu.org
+To: qemu-devel@nongnu.org
+Cc: "Peter Maydell ]" <peter.maydell@linaro.org>, Gerd Hoffmann <kraxel@redhat.com>, Programmingkid <programmingkidx@gmail.com>, "Daniel P. Berrange" <berrange@redhat.com>
 
-On Tue, 12 Dec 2017 22:05:24 +0800
-Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com> wrote:
+This is a followup to
 
-> * Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com> [2017-12-05 15:43:00 +0800]:
-> 
-> > * Cornelia Huck <cohuck@redhat.com> [2017-12-04 17:11:24 +0100]:
-> > 
-> > [...]
-> > 
-> > This one looks good to me too, so:
-> > Reviewed-by: Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>
-> >   
-> > > 
-> > > (...)
-> > >   
-> > > > > Looks sane. We should put a note into the 2.12 changelog as well.
-> > > > >     
-> > > > 
-> > > > I agree. Who would be responsible for updating the changelog. I'm not
-> > > > familiar with that process yet. To be honest, I wouldn't mind having
-> > > > the changelog notice in your writing style. Guess would be better for
-> > > > everyone ;).  
-> > > 
-> > > Just a one-liner once we have the 2.12 changelog page.
-> > >   
-> > > > 
-> > > > There are also other things we identified as TODOs:
-> > > > * Updating https://wiki.qemu.org/Features/Channel_I/O_Passthrough
-> > > > (@Dong Jia, could you take this one)  
-> > Ok. Will do soon.
-> >   
-> > > > * In tree and/or on wiki documentation which is up-to-date and
-> > > > more verbose than commit messages are supposed to be (and Dong
-> > > > Jia's write-up could be incorporated to). I see this one as
-> > > > lower prio though. Any volunteers?  
-> > > 
-> > > Long-ish things with links etc. should probably go into the wiki.
-> > > 
-> > > Anyway, feel free to go ahead (it's a wiki :) We can always change
-> > > things later on.
-> > >   
-> > Let me update the wiki based on my understanding (and style :) firstly,
-> > then you can login and improve it as you wish.  
-> The following wiki is just updated. Please feel free to make additional
-> correction:
-> https://wiki.qemu.org/Features/Channel_I/O_Passthrough
+  v1: https://lists.nongnu.org/archive/html/qemu-devel/2017-08/msg02047.html
+  v2: https://lists.nongnu.org/archive/html/qemu-devel/2017-08/msg02471.html
+  v3: https://lists.nongnu.org/archive/html/qemu-devel/2017-08/msg02517.html
+  v4: https://lists.nongnu.org/archive/html/qemu-devel/2017-08/msg02708.html
+  v5: https://lists.nongnu.org/archive/html/qemu-devel/2017-09/msg02950.html
 
-Looks good, fixed minor typos.
+This series contains only the apple related patches, the cocoa frontend
+and adb backend device.
 
-> 
-> BTW, Conny mentioned before that we should also update this one:
-> https://wiki.qemu.org/Features/LegacyRemoval
-> 
-> Should it be done now?
+I decided to separate them, as I'm fairly sure the keycodemapdb data for
+these has some problems in it. There is contradictory information on the
+right mappings to use for certain keys. Looking at darwin source code
+in fact I think that the low level hardware scancode -> keycode mappings
+on OS-X might even change based on user config options at the OS level,
+and I'm not sure how to deal with that yet.
 
-Already done :)
+So I need todo more investigation before I consider these two patches
+ready for merge. They're just posted to allow any feedback to be gathered
+
+
+Daniel P. Berrange (2):
+  hw: convert the adb device to keycodemapdb
+  ui: convert cocoa frontend to keycodemapdb
+
+ Makefile                    |   2 +
+ hw/input/adb.c              | 124 +-------------------------------------
+ include/hw/input/adb-keys.h | 141 --------------------------------------------
+ include/ui/input.h          |   5 ++
+ ui/cocoa.m                  | 129 +---------------------------------------
+ ui/input-keymap.c           |   2 +
+ 6 files changed, 13 insertions(+), 390 deletions(-)
+ delete mode 100644 include/hw/input/adb-keys.h
+
+-- 
+2.14.3
