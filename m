@@ -1,25 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57430)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58499)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1eOhqs-0005Zn-1i
-	for qemu-devel@nongnu.org; Tue, 12 Dec 2017 05:31:58 -0500
+	(envelope-from <cohuck@redhat.com>) id 1eOhwI-0007iZ-Kp
+	for qemu-devel@nongnu.org; Tue, 12 Dec 2017 05:37:31 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1eOhqn-00014H-4o
-	for qemu-devel@nongnu.org; Tue, 12 Dec 2017 05:31:54 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:36552)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1eOhqm-00013c-SE
-	for qemu-devel@nongnu.org; Tue, 12 Dec 2017 05:31:49 -0500
-Date: Tue, 12 Dec 2017 10:31:38 +0000
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20171212103138.GC2409@work-vm>
-References: <20171211194610.3962-1-dgilbert@redhat.com>
-	<20171211194610.3962-2-dgilbert@redhat.com>
-	<97feaaf8-b08e-2c49-6cdb-b1556f6326cd@redhat.com>
+	(envelope-from <cohuck@redhat.com>) id 1eOhwE-0004Fq-NU
+	for qemu-devel@nongnu.org; Tue, 12 Dec 2017 05:37:30 -0500
+Date: Tue, 12 Dec 2017 11:37:15 +0100
+From: Cornelia Huck <cohuck@redhat.com>
+Message-ID: <20171212113715.7d724302.cohuck@redhat.com>
+In-Reply-To: <2cad6e92-7370-d72c-ab59-909e5d15017a@redhat.com>
+References: <20171211134740.8235-1-david@redhat.com>
+	<20171211134740.8235-5-david@redhat.com>
+	<20171211181754.4a3b847d.cohuck@redhat.com>
+	<08154f0d-d526-d735-a952-853fcabe946b@redhat.com>
+	<20171212101545.3bbd19dc.cohuck@redhat.com>
+	<2cad6e92-7370-d72c-ab59-909e5d15017a@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <97feaaf8-b08e-2c49-6cdb-b1556f6326cd@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v3 1/8] memory: address_space_iterate
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v1 for-2-12 04/15] s390x/flic: simplify
+ flic initialization
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,106 +28,68 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: qemu-devel@nongnu.org, imammedo@redhat.com, maxime.coquelin@redhat.com, groug@kaod.org, mst@redhat.com
+To: David Hildenbrand <david@redhat.com>
+Cc: qemu-s390x@nongnu.org, qemu-devel@nongnu.org, Christian Borntraeger <borntraeger@de.ibm.com>, Richard Henderson <rth@twiddle.net>, Alexander Graf <agraf@suse.de>, Paolo Bonzini <pbonzini@redhat.com>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Thomas Huth <thuth@redhat.com>
 
-* Paolo Bonzini (pbonzini@redhat.com) wrote:
-> On 11/12/2017 20:46, Dr. David Alan Gilbert (git) wrote:
-> > From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+On Tue, 12 Dec 2017 10:58:12 +0100
+David Hildenbrand <david@redhat.com> wrote:
+
+> On 12.12.2017 10:15, Cornelia Huck wrote:
+> > On Mon, 11 Dec 2017 21:34:20 +0100
+> > David Hildenbrand <david@redhat.com> wrote:
+> >   
+> >> On 11.12.2017 18:17, Cornelia Huck wrote:  
+> >>> On Mon, 11 Dec 2017 14:47:29 +0100
+> >>> David Hildenbrand <david@redhat.com> wrote:
+> >>>     
+> >>>> This makes it clearer, which device is used for which accelerator.
+> >>>>
+> >>>> Signed-off-by: David Hildenbrand <david@redhat.com>
+> >>>> ---
+> >>>>  hw/intc/s390_flic.c          |  9 +++++++--
+> >>>>  hw/intc/s390_flic_kvm.c      | 12 ------------
+> >>>>  include/hw/s390x/s390_flic.h |  9 ---------
+> >>>>  3 files changed, 7 insertions(+), 23 deletions(-)
+> >>>>
+> >>>> diff --git a/hw/intc/s390_flic.c b/hw/intc/s390_flic.c
+> >>>> index 6eaf178d79..a78bdf1d90 100644
+> >>>> --- a/hw/intc/s390_flic.c
+> >>>> +++ b/hw/intc/s390_flic.c
+> >>>> @@ -40,11 +40,16 @@ void s390_flic_init(void)
+> >>>>  {
+> >>>>      DeviceState *dev;
+> >>>>  
+> >>>> -    dev = s390_flic_kvm_create();
+> >>>> -    if (!dev) {
+> >>>> +    if (kvm_enabled()) {
+> >>>> +        dev = qdev_create(NULL, TYPE_KVM_S390_FLIC);
+> >>>> +        object_property_add_child(qdev_get_machine(), TYPE_KVM_S390_FLIC,
+> >>>> +                                  OBJECT(dev), NULL);
+> >>>> +    } else if (tcg_enabled()) {
+> >>>>          dev = qdev_create(NULL, TYPE_QEMU_S390_FLIC);
+> >>>>          object_property_add_child(qdev_get_machine(), TYPE_QEMU_S390_FLIC,
+> >>>>                                    OBJECT(dev), NULL);    
+> >>>
+> >>> Can you use TYPE_S390_FLIC_COMMON for attaching the flic to the machine?    
+> >>
+> >> I suggest doing that in a separate patch. (I remember that changing the
+> >> name should not harm migration).  
 > > 
-> > Iterate through an address space calling a function for each
-> > section.  The iteration is done in order.
+> > I don't think it harms migration, as we hook up the same device as
+> > before (just via the common flic device).
 > > 
-> > Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+> > Probably does not make sense as a separate patch, though, as you touch
+> > this code anyway.  
 > 
-> It seems to me that you can achieve the same effect by implementing the
-> region_add and region_nop callbacks, and leaving out region_del.  Am I
-> missing something?
-
-What's the semantics of region_nop (and for that matter region_add/del)?
-Th nice thing we have here is we get a full walk of the physical memory
-in order; keeping it in order makes our data structure easy for merging.
-
-Dave
-
-
-> Thanks,
+> Please be aware that for object_property_add_child(), TYPE... is for our
+> example the name of the child
 > 
-> Paolo
+> /machine/s390-flic-qemu/
+> /machine/s390x-flic-kvm/
 > 
-> > ---
-> >  include/exec/memory.h | 23 +++++++++++++++++++++++
-> >  memory.c              | 22 ++++++++++++++++++++++
-> >  2 files changed, 45 insertions(+)
-> > 
-> > diff --git a/include/exec/memory.h b/include/exec/memory.h
-> > index 5ed4042f87..f5a9df642e 100644
-> > --- a/include/exec/memory.h
-> > +++ b/include/exec/memory.h
-> > @@ -1987,6 +1987,29 @@ address_space_write_cached(MemoryRegionCache *cache, hwaddr addr,
-> >      address_space_write(cache->as, cache->xlat + addr, MEMTXATTRS_UNSPECIFIED, buf, len);
-> >  }
-> >  
-> > +/**
-> > + * ASIterateCallback: Function type called by address_space_iterate
-> > + *
-> > + * Return 0 on success or a negative error code.
-> > + *
-> > + * @mrs: Memory region section for this range
-> > + * @opaque: The opaque value passed in to the iterator.
-> > + */
-> > +typedef int (*ASIterateCallback)(MemoryRegionSection *mrs, void *opaque);
-> > +
-> > +/**
-> > + * address_space_iterate: Call the function for each address range in the
-> > + *                        AddressSpace, in sorted order.
-> > + *
-> > + * Return 0 on success or a negative error code.
-> > + *
-> > + * @as: Address space to iterate over
-> > + * @cb: Function to call.  If the function returns none-0 the iteration will
-> > + *     stop.
-> > + * @opaque: Value to pass to the function
-> > + */
-> > +int
-> > +address_space_iterate(AddressSpace *as, ASIterateCallback cb, void *opaque);
-> >  #endif
-> >  
-> >  #endif
-> > diff --git a/memory.c b/memory.c
-> > index e26e5a3b1d..f45137f25e 100644
-> > --- a/memory.c
-> > +++ b/memory.c
-> > @@ -2810,6 +2810,28 @@ void address_space_destroy(AddressSpace *as)
-> >      call_rcu(as, do_address_space_destroy, rcu);
-> >  }
-> >  
-> > +int address_space_iterate(AddressSpace *as, ASIterateCallback cb,
-> > +                          void *opaque)
-> > +{
-> > +    int res = 0;
-> > +    FlatView *fv = address_space_to_flatview(as);
-> > +    FlatRange *range;
-> > +
-> > +    flatview_ref(fv);
-> > +
-> > +    FOR_EACH_FLAT_RANGE(range, fv) {
-> > +        MemoryRegionSection mrs = section_from_flat_range(range, fv);
-> > +        res = cb(&mrs, opaque);
-> > +        if (res) {
-> > +            break;
-> > +        }
-> > +    }
-> > +
-> > +    flatview_unref(fv);
-> > +
-> > +    return res;
-> > +}
-> > +
-> >  static const char *memory_region_type(MemoryRegion *mr)
-> >  {
-> >      if (memory_region_is_ram_device(mr)) {
-> > 
+> Not a type. And that would mean a change.
 > 
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+> 
+
+Ugh. Ok, let's keep it. The skeys device (for example) used the common
+name from the start.
