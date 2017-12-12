@@ -1,33 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39103)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39998)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1eOqyk-0003XY-CA
-	for qemu-devel@nongnu.org; Tue, 12 Dec 2017 15:16:39 -0500
+	(envelope-from <dgilbert@redhat.com>) id 1eOr2p-0005jK-0c
+	for qemu-devel@nongnu.org; Tue, 12 Dec 2017 15:20:51 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1eOqyh-0004Ck-5R
-	for qemu-devel@nongnu.org; Tue, 12 Dec 2017 15:16:38 -0500
-Received: from indium.canonical.com ([91.189.90.7]:42322)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1eOqyg-0004CK-Va
-	for qemu-devel@nongnu.org; Tue, 12 Dec 2017 15:16:35 -0500
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1eOqye-0002ZF-Ir
-	for <qemu-devel@nongnu.org>; Tue, 12 Dec 2017 20:16:32 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id C99FD2E81A0
-	for <qemu-devel@nongnu.org>; Tue, 12 Dec 2017 20:16:29 +0000 (UTC)
+	(envelope-from <dgilbert@redhat.com>) id 1eOr2l-0006lo-RD
+	for qemu-devel@nongnu.org; Tue, 12 Dec 2017 15:20:50 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:52568)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1eOr2l-0006lP-Kq
+	for qemu-devel@nongnu.org; Tue, 12 Dec 2017 15:20:47 -0500
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+	[10.5.11.16])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id C418E285D0
+	for <qemu-devel@nongnu.org>; Tue, 12 Dec 2017 20:20:46 +0000 (UTC)
+Date: Tue, 12 Dec 2017 20:20:41 +0000
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20171212202040.GA2458@work-vm>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Tue, 12 Dec 2017 20:10:09 -0000
-From: Nathan Rennie-Waldock <1670509@bugs.launchpad.net>
-Reply-To: Bug 1670509 <1670509@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <20170306224936.27687.97076.malonedeb@gac.canonical.com>
-Message-Id: <151310940909.10989.18091817669951735640.malone@soybean.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1670509] Re: sgabios outputs incorrect video modes
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Subject: [Qemu-devel] No uhd (3840x2160) guest res?
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,35 +31,33 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
+Cc: kraxel@redhat.com
 
-Fixed in qemu, yes. But not Ubuntu. Ubuntu strips prebuilt files from
-qemu and builds them from source. For sgabios, using the abandoned
-source from Google code.
+My guests don't seem to offer the standard uhd resolution of 3840x2160
+- what should be providing that?
 
--- =
+I'm running an f27 gnome (X or wayland) guest with:
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1670509
+./x86_64-softmmu/qemu-system-x86_64 -device virtio-vga --enable-kvm -m 2G /home/vmimages/fedora27.qcow2
 
-Title:
-  sgabios outputs incorrect video modes
+and the guest lists:
+4096x2160
+2480x1680
+2560x1600
+1920x1440
+1856x1392
+1792x1344
+2048x1152
+1920x1200
+1920x1080
+(and smaller)
 
-Status in QEMU:
-  Fix Released
-Status in sgabios package in Ubuntu:
-  Confirmed
+given that it can offer 4096x2160, I assume it's not running out of RAM.
 
-Bug description:
-  When run with a bootstrap loader that uses int 0x10 with 0x1301 in
-  %ax, incorrect video modes are output to the serial port.  I believe
-  the VGA image will be correct.  This might also affect the returned
-  values for some interrupts.
+I couldn't find anywhere with those higher resolutions listed
+in seabios to consider changing.
 
-  This is caused because the set_cursor_position routine fails to save
-  and restore %bx.
+Dave
 
-  I'm working on a fix for this.
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1670509/+subscriptions
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
