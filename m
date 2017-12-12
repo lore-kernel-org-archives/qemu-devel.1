@@ -1,28 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57526)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57860)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1eOoWj-0003fQ-6x
-	for qemu-devel@nongnu.org; Tue, 12 Dec 2017 12:39:34 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1eOoXj-0004we-Sd
+	for qemu-devel@nongnu.org; Tue, 12 Dec 2017 12:40:37 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1eOoWg-000051-4x
-	for qemu-devel@nongnu.org; Tue, 12 Dec 2017 12:39:33 -0500
-Received: from mail-ua0-x244.google.com ([2607:f8b0:400c:c08::244]:34413)
+	(envelope-from <peter.maydell@linaro.org>) id 1eOoXi-0000k4-V1
+	for qemu-devel@nongnu.org; Tue, 12 Dec 2017 12:40:35 -0500
+Received: from mail-oi0-x236.google.com ([2607:f8b0:4003:c06::236]:45368)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1eOoWg-0008WI-03
-	for qemu-devel@nongnu.org; Tue, 12 Dec 2017 12:39:30 -0500
-Received: by mail-ua0-x244.google.com with SMTP id d26so14952705uak.1
-	for <qemu-devel@nongnu.org>; Tue, 12 Dec 2017 09:39:29 -0800 (PST)
-References: <1513080506-17703-1-git-send-email-peter.maydell@linaro.org>
-From: Richard Henderson <richard.henderson@linaro.org>
-Message-ID: <52515faf-f889-93ee-c0d0-4a895cfb6b13@linaro.org>
-Date: Tue, 12 Dec 2017 09:39:23 -0800
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1eOoXi-0000jb-Q9
+	for qemu-devel@nongnu.org; Tue, 12 Dec 2017 12:40:34 -0500
+Received: by mail-oi0-x236.google.com with SMTP id x20so14534645oix.12
+	for <qemu-devel@nongnu.org>; Tue, 12 Dec 2017 09:40:34 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <1513080506-17703-1-git-send-email-peter.maydell@linaro.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] target/arm: Make disas_thumb2_insn()
- generate its own UNDEF exceptions
+In-Reply-To: <20171211213007.7353-1-andrew.smirnov@gmail.com>
+References: <20171211213007.7353-1-andrew.smirnov@gmail.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Tue, 12 Dec 2017 17:40:13 +0000
+Message-ID: <CAFEAcA-gEjU+rBWSL8V4d520DOVheZoJZ76p5=9hmkXk3NqeOw@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH 00/13] i.MX FEC and SD changes
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,25 +28,45 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>, qemu-arm@nongnu.org, qemu-devel@nongnu.org
-Cc: patches@linaro.org
+To: Andrey Smirnov <andrew.smirnov@gmail.com>
+Cc: qemu-arm <qemu-arm@nongnu.org>, Jason Wang <jasowang@redhat.com>, =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>, QEMU Developers <qemu-devel@nongnu.org>, Andrey Yurovsky <yurovsky@gmail.com>
 
-On 12/12/2017 04:08 AM, Peter Maydell wrote:
-> Refactor disas_thumb2_insn() so that it generates the code for raising
-> an UNDEF exception for invalid insns, rather than returning a flag
-> which the caller must check to see if it needs to generate the UNDEF
-> code. This brings the function in to line with the behaviour of
-> disas_thumb_insn() and disas_arm_insn().
-> 
-> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
-> ---
-> This fixes the odd asymmetry of API that caused the bug fixed
-> in commit 7472e2efb...
-> ---
->  target/arm/translate.c | 23 ++++++++++-------------
->  1 file changed, 10 insertions(+), 13 deletions(-)
+On 11 December 2017 at 21:29, Andrey Smirnov <andrew.smirnov@gmail.com> wrote:
+> Hi everyone,
+>
+> This patchset is a spin-off from original i.MX7 support submission
+> found here [1], containing all of the patchest that are more or less
+> agreed upon and are ready (hopefully!) for inclusion.
+>
+> Changes since [1]:
+>
+>         - Rx buffer in FEC was moved from stack to heap to allow
+>           worry-free expansion to 16K limit.
+>
+>         - Added more comments explaining rather convoluted bit-moving
+>           in eSHDC emuation code
+>
+>         - Triple Tx ring DMA "VMState" code was changed to follow
+>           Peter's recommendations (avoiding the need to incrememnt the
+>           version_id)
+>
+>         - FSL_IMX25_FEC_SIZE is used as a size of FEC's register file
+>
+>         - Removed leftover code from "imx_fec: Change queue flushing
+>           heuristics"
+>
+> [1] https://lists.gnu.org/archive/html/qemu-arm/2017-11/msg00045.html
 
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+Hi; thanks for sending this set separately. Patch 4 ("Move Tx frame buffer
+away from the stack") seems to have got lost -- it isn't in the mailing
+list archives or my mailbox. Could you try resending that one?
 
+Incidentally we should use the new i.MX SDHCI controller in the
+imx6: coincidentally somebody ran into this bug recently:
+https://stackoverflow.com/questions/47538951/qemu-freescale-i-mx6-duallite-sabre-root-filesystem-does-not-mount/47552596
 
-r~
+I'll retest that this patchset works with my imx6 image, and
+send a patch to sit on top of it to switch imx6 over to TYPE_IMX_USDHC.
+
+thanks
+-- PMM
