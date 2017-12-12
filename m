@@ -1,18 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59111)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35583)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <edgar.kaziakhmedov@virtuozzo.com>)
-	id 1eOmE5-0001aA-53
-	for qemu-devel@nongnu.org; Tue, 12 Dec 2017 10:12:10 -0500
+	(envelope-from <david@redhat.com>) id 1eOnTo-0008OV-QA
+	for qemu-devel@nongnu.org; Tue, 12 Dec 2017 11:32:29 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <edgar.kaziakhmedov@virtuozzo.com>)
-	id 1eOmE2-00061A-Im
-	for qemu-devel@nongnu.org; Tue, 12 Dec 2017 10:12:09 -0500
-From: Edgar Kaziakhmedov <edgar.kaziakhmedov@virtuozzo.com>
-Date: Tue, 12 Dec 2017 17:40:54 +0300
-Message-ID: <20171212144054.16955-1-edgar.kaziakhmedov@virtuozzo.com>
+	(envelope-from <david@redhat.com>) id 1eOnTk-0006Ji-RY
+	for qemu-devel@nongnu.org; Tue, 12 Dec 2017 11:32:28 -0500
+References: <20171211134740.8235-1-david@redhat.com>
+	<20171211134740.8235-10-david@redhat.com>
+	<20171211190145.4f3e2be5.cohuck@redhat.com>
+	<208bf94f-6913-5f80-5df0-9859375e522d@redhat.com>
+	<20171212101303.1ff7468a.cohuck@redhat.com>
+From: David Hildenbrand <david@redhat.com>
+Message-ID: <8077ae6b-7787-6d71-90ba-d0008373fd73@redhat.com>
+Date: Tue, 12 Dec 2017 17:32:21 +0100
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: [Qemu-devel] [PATCH] qcow2: get rid of qcow2_backing_read1 routine
+In-Reply-To: <20171212101303.1ff7468a.cohuck@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v1 for-2-12 09/15] s390x/tcg: implement
+ TEST PENDING INTERRUPTION
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -21,107 +28,76 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-block@nongnu.org, qemu-devel@nongnu.org
-Cc: mreitz@redhat.com, kwolf@redhat.com, vsementsov@virtuozzo.com, edgar.kaziakhmedov@virtuozzo.com, den@openvz.org, klim.kireev@virtuozzo.com
+To: Cornelia Huck <cohuck@redhat.com>
+Cc: qemu-s390x@nongnu.org, qemu-devel@nongnu.org, Christian Borntraeger <borntraeger@de.ibm.com>, Richard Henderson <rth@twiddle.net>, Alexander Graf <agraf@suse.de>, Paolo Bonzini <pbonzini@redhat.com>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Thomas Huth <thuth@redhat.com>
 
-Since bdrv_co_preadv does all neccessary checks including
-reading after the end of the backing file, avoid duplication
-of verification before bdrv_co_preadv call.
+On 12.12.2017 10:13, Cornelia Huck wrote:
+> On Mon, 11 Dec 2017 21:32:58 +0100
+> David Hildenbrand <david@redhat.com> wrote:
+> 
+>> On 11.12.2017 19:01, Cornelia Huck wrote:
+>>> On Mon, 11 Dec 2017 14:47:34 +0100
+>>> David Hildenbrand <david@redhat.com> wrote:
+>>>   
+>>>> Use s390_cpu_virt_mem_write() so we can actually revert what we did
+>>>> (re-inject the dequeued IO interrupt).
+>>>>
+>>>> Signed-off-by: David Hildenbrand <david@redhat.com>
+>>>> ---
+>>>>  target/s390x/helper.h      |  1 +
+>>>>  target/s390x/insn-data.def |  1 +
+>>>>  target/s390x/misc_helper.c | 53 ++++++++++++++++++++++++++++++++++++++++++++++
+>>>>  target/s390x/translate.c   |  8 +++++++
+>>>>  4 files changed, 63 insertions(+)
+>>>>  
+>>>   
+>>>> +uint32_t HELPER(tpi)(CPUS390XState *env, uint64_t addr)
+>>>> +{
+>>>> +    const uintptr_t ra = GETPC();
+>>>> +    S390CPU *cpu = s390_env_get_cpu(env);
+>>>> +    QEMUS390FLICState *flic = QEMU_S390_FLIC(s390_get_flic());
+>>>> +    QEMUS390FlicIO *io = NULL;
+>>>> +    LowCore *lowcore;
+>>>> +
+>>>> +    if (addr & 0x3) {
+>>>> +        s390_program_interrupt(env, PGM_SPECIFICATION, 4, ra);
+>>>> +    }
+>>>> +
+>>>> +    qemu_mutex_lock_iothread();
+>>>> +    io = qemu_s390_flic_dequeue_io(flic, env->cregs[6]);
+>>>> +    if (!io) {
+>>>> +        qemu_mutex_unlock_iothread();
+>>>> +        return 0;
+>>>> +    }
+>>>> +
+>>>> +    if (addr) {
+>>>> +        struct {
+>>>> +            uint16_t id;
+>>>> +            uint16_t nr;
+>>>> +            uint32_t parm;
+>>>> +        } tmp = {
+>>>> +            .id = cpu_to_be16(io->id),
+>>>> +            .nr = cpu_to_be16(io->nr),
+>>>> +            .parm = cpu_to_be32(io->parm),
+>>>> +        };  
+>>>
+>>> That's a two-word interruption code; can you call this something better
+>>> than 'tmp'?  
+>>
+>> IMHO from the context we have here it should be pretty clear what is
+>> happening. I mean we are defining and initializing the temporary data
+>> structure.
+>>
+>> But I can change the name if you can come up with a catchy variable name. :)
+>>
+> 
+> int_code?
+> 
 
-Signed-off-by: Edgar Kaziakhmedov <edgar.kaziakhmedov@virtuozzo.com>
-Reviewed-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
----
- block/qcow2.c | 51 ++++++++-------------------------------------------
- block/qcow2.h |  3 ---
- 2 files changed, 8 insertions(+), 46 deletions(-)
+makes the line exceed 80c. I'll use intc. Thanks!
 
-diff --git a/block/qcow2.c b/block/qcow2.c
-index 1914a940e5..4348b2c0c5 100644
---- a/block/qcow2.c
-+++ b/block/qcow2.c
-@@ -1672,34 +1672,12 @@ static int64_t coroutine_fn qcow2_co_get_block_status(BlockDriverState *bs,
-     return status;
- }
- 
--/* handle reading after the end of the backing file */
--int qcow2_backing_read1(BlockDriverState *bs, QEMUIOVector *qiov,
--                        int64_t offset, int bytes)
--{
--    uint64_t bs_size = bs->total_sectors * BDRV_SECTOR_SIZE;
--    int n1;
--
--    if ((offset + bytes) <= bs_size) {
--        return bytes;
--    }
--
--    if (offset >= bs_size) {
--        n1 = 0;
--    } else {
--        n1 = bs_size - offset;
--    }
--
--    qemu_iovec_memset(qiov, n1, 0, bytes - n1);
--
--    return n1;
--}
--
- static coroutine_fn int qcow2_co_preadv(BlockDriverState *bs, uint64_t offset,
-                                         uint64_t bytes, QEMUIOVector *qiov,
-                                         int flags)
- {
-     BDRVQcow2State *s = bs->opaque;
--    int offset_in_cluster, n1;
-+    int offset_in_cluster;
-     int ret;
-     unsigned int cur_bytes; /* number of bytes in current iteration */
-     uint64_t cluster_offset = 0;
-@@ -1734,26 +1712,13 @@ static coroutine_fn int qcow2_co_preadv(BlockDriverState *bs, uint64_t offset,
-         case QCOW2_CLUSTER_UNALLOCATED:
- 
-             if (bs->backing) {
--                /* read from the base image */
--                n1 = qcow2_backing_read1(bs->backing->bs, &hd_qiov,
--                                         offset, cur_bytes);
--                if (n1 > 0) {
--                    QEMUIOVector local_qiov;
--
--                    qemu_iovec_init(&local_qiov, hd_qiov.niov);
--                    qemu_iovec_concat(&local_qiov, &hd_qiov, 0, n1);
--
--                    BLKDBG_EVENT(bs->file, BLKDBG_READ_BACKING_AIO);
--                    qemu_co_mutex_unlock(&s->lock);
--                    ret = bdrv_co_preadv(bs->backing, offset, n1,
--                                         &local_qiov, 0);
--                    qemu_co_mutex_lock(&s->lock);
--
--                    qemu_iovec_destroy(&local_qiov);
--
--                    if (ret < 0) {
--                        goto fail;
--                    }
-+                BLKDBG_EVENT(bs->file, BLKDBG_READ_BACKING_AIO);
-+                qemu_co_mutex_unlock(&s->lock);
-+                ret = bdrv_co_preadv(bs->backing, offset, cur_bytes,
-+                                     &hd_qiov, 0);
-+                qemu_co_mutex_lock(&s->lock);
-+                if (ret < 0) {
-+                    goto fail;
-                 }
-             } else {
-                 /* Note: in this case, no need to wait */
-diff --git a/block/qcow2.h b/block/qcow2.h
-index 6f0ff15dd0..46c8cf44ec 100644
---- a/block/qcow2.h
-+++ b/block/qcow2.h
-@@ -528,9 +528,6 @@ uint32_t offset_to_reftable_index(BDRVQcow2State *s, uint64_t offset)
- }
- 
- /* qcow2.c functions */
--int qcow2_backing_read1(BlockDriverState *bs, QEMUIOVector *qiov,
--                  int64_t sector_num, int nb_sectors);
--
- int64_t qcow2_refcount_metadata_size(int64_t clusters, size_t cluster_size,
-                                      int refcount_order, bool generous_increase,
-                                      uint64_t *refblock_count);
 -- 
-2.11.0
+
+Thanks,
+
+David / dhildenb
