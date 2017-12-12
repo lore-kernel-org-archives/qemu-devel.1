@@ -1,22 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43462)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48171)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <luwei.kang@intel.com>) id 1eOaDR-0000wl-6y
-	for qemu-devel@nongnu.org; Mon, 11 Dec 2017 21:22:42 -0500
+	(envelope-from <peterx@redhat.com>) id 1eOacE-0004SV-3Y
+	for qemu-devel@nongnu.org; Mon, 11 Dec 2017 21:48:19 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <luwei.kang@intel.com>) id 1eOaDN-0001Dj-3F
-	for qemu-devel@nongnu.org; Mon, 11 Dec 2017 21:22:41 -0500
-Received: from mga11.intel.com ([192.55.52.93]:40199)
+	(envelope-from <peterx@redhat.com>) id 1eOacA-0004gC-TZ
+	for qemu-devel@nongnu.org; Mon, 11 Dec 2017 21:48:18 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:39558)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <luwei.kang@intel.com>)
-	id 1eOaDM-0001Cv-Mx
-	for qemu-devel@nongnu.org; Mon, 11 Dec 2017 21:22:37 -0500
-From: Luwei Kang <luwei.kang@intel.com>
-Date: Mon, 11 Dec 2017 20:37:54 +0800
-Message-Id: <1512995874-26326-2-git-send-email-luwei.kang@intel.com>
-In-Reply-To: <1512995874-26326-1-git-send-email-luwei.kang@intel.com>
-References: <1512995874-26326-1-git-send-email-luwei.kang@intel.com>
-Subject: [Qemu-devel] [PATCH v1 2/2] i386: Add support to get/set/migrate
- Intel Processor Trace feature
+	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1eOacA-0004eI-N2
+	for qemu-devel@nongnu.org; Mon, 11 Dec 2017 21:48:14 -0500
+Date: Tue, 12 Dec 2017 10:48:08 +0800
+From: Peter Xu <peterx@redhat.com>
+Message-ID: <20171212024808.GB2790@xz-mi>
+References: <1513006964-3371-1-git-send-email-peter.maydell@linaro.org>
+	<db0d2fd0-ae95-b9f8-47a7-d273306a2432@twiddle.net>
+	<CAFEAcA_ezdp_ygjT2r9P7niSnOqRxAMUJ+vhaMk4HJTSrEjrJQ@mail.gmail.com>
+	<20171211194213.GA4200@flamenco>
+	<CAFEAcA-=XHydnzmV7uEydfFR=fYzYsGSUfaR+L5V0mMTLcX+yw@mail.gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <CAFEAcA-=XHydnzmV7uEydfFR=fYzYsGSUfaR+L5V0mMTLcX+yw@mail.gmail.com>
+Subject: Re: [Qemu-devel] [PATCH for-2.11?] target/arm: Generate UNDEF for
+ 32-bit Thumb2 insns
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,192 +31,30 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org, kvm@vger.kernel.org
-Cc: pbonzini@redhat.com, rth@twiddle.net, ehabkost@redhat.com, mtosatti@redhat.com, Chao Peng <chao.p.peng@linux.intel.com>, Luwei Kang <luwei.kang@intel.com>
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: "Emilio G. Cota" <cota@braap.org>, Michael Roth <mdroth@linux.vnet.ibm.com>, "patches@linaro.org" <patches@linaro.org>, QEMU Developers <qemu-devel@nongnu.org>, Richard Henderson <rth@twiddle.net>
 
-From: Chao Peng <chao.p.peng@linux.intel.com>
+On Mon, Dec 11, 2017 at 08:55:56PM +0000, Peter Maydell wrote:
+> On 11 December 2017 at 19:42, Emilio G. Cota <cota@braap.org> wrote:
+> > On Mon, Dec 11, 2017 at 17:32:48 +0000, Peter Maydell wrote:
+> >> Thanks. I think I have come down on the side of putting this into
+> >> 2.11, so rolling an rc5 today, and delaying the final release
+> >> a day to Wednesday.
+> >
+> > Glad to see it's in -rc5 -- thanks for fixing this so quickly!
+> >
+> > Again, apologies for not having caught this earlier ;-(
+> 
+> It's my own fault really -- my extremely ad-hoc approach
+> to testing for Arm guests was bound to come back and
+> bite me sooner or later.
 
-Add Intel Processor Trace related definition. It also add
-corresponding part to kvm_get/set_msr and vmstate.
+Should we include the vfio fix in too for rc5?
 
-Signed-off-by: Chao Peng <chao.p.peng@linux.intel.com>
-Signed-off-by: Luwei Kang <luwei.kang@intel.com>
----
- target/i386/cpu.h     | 22 ++++++++++++++++++++++
- target/i386/kvm.c     | 51 +++++++++++++++++++++++++++++++++++++++++++++++++++
- target/i386/machine.c | 37 +++++++++++++++++++++++++++++++++++++
- 3 files changed, 110 insertions(+)
+  http://patchwork.ozlabs.org/patch/844940/
 
-diff --git a/target/i386/cpu.h b/target/i386/cpu.h
-index 4bdb7c6..0a9b8da 100644
---- a/target/i386/cpu.h
-+++ b/target/i386/cpu.h
-@@ -400,6 +400,21 @@
- #define MSR_MC0_ADDR                    0x402
- #define MSR_MC0_MISC                    0x403
- 
-+#define MSR_IA32_RTIT_OUTPUT_BASE       0x560
-+#define MSR_IA32_RTIT_OUTPUT_MASK       0x561
-+#define MSR_IA32_RTIT_CTL               0x570
-+#define MSR_IA32_RTIT_STATUS            0x571
-+#define MSR_IA32_RTIT_CR3_MATCH         0x572
-+#define MSR_IA32_RTIT_ADDR0_A           0x580
-+#define MSR_IA32_RTIT_ADDR0_B           0x581
-+#define MSR_IA32_RTIT_ADDR1_A           0x582
-+#define MSR_IA32_RTIT_ADDR1_B           0x583
-+#define MSR_IA32_RTIT_ADDR2_A           0x584
-+#define MSR_IA32_RTIT_ADDR2_B           0x585
-+#define MSR_IA32_RTIT_ADDR3_A           0x586
-+#define MSR_IA32_RTIT_ADDR3_B           0x587
-+#define MAX_RTIT_ADDRS                  8
-+
- #define MSR_EFER                        0xc0000080
- 
- #define MSR_EFER_SCE   (1 << 0)
-@@ -1106,6 +1121,13 @@ typedef struct CPUX86State {
-     uint64_t msr_hv_stimer_config[HV_STIMER_COUNT];
-     uint64_t msr_hv_stimer_count[HV_STIMER_COUNT];
- 
-+    uint64_t msr_rtit_ctrl;
-+    uint64_t msr_rtit_status;
-+    uint64_t msr_rtit_output_base;
-+    uint64_t msr_rtit_output_mask;
-+    uint64_t msr_rtit_cr3_match;
-+    uint64_t msr_rtit_addrs[MAX_RTIT_ADDRS];
-+
-     /* exception/interrupt handling */
-     int error_code;
-     int exception_is_int;
-diff --git a/target/i386/kvm.c b/target/i386/kvm.c
-index 31d20c8..655f860 100644
---- a/target/i386/kvm.c
-+++ b/target/i386/kvm.c
-@@ -1783,6 +1783,25 @@ static int kvm_put_msrs(X86CPU *cpu, int level)
-                 kvm_msr_entry_add(cpu, MSR_MTRRphysMask(i), mask);
-             }
-         }
-+        if (env->features[FEAT_7_0_EBX] & CPUID_7_0_EBX_INTEL_PT) {
-+            int addr_num = kvm_arch_get_supported_cpuid(kvm_state,
-+                                                    0x14, 1, R_EAX) & 0x7;
-+
-+            kvm_msr_entry_add(cpu, MSR_IA32_RTIT_CTL,
-+                            env->msr_rtit_ctrl);
-+            kvm_msr_entry_add(cpu, MSR_IA32_RTIT_STATUS,
-+                            env->msr_rtit_status);
-+            kvm_msr_entry_add(cpu, MSR_IA32_RTIT_OUTPUT_BASE,
-+                            env->msr_rtit_output_base);
-+            kvm_msr_entry_add(cpu, MSR_IA32_RTIT_OUTPUT_MASK,
-+                            env->msr_rtit_output_mask);
-+            kvm_msr_entry_add(cpu, MSR_IA32_RTIT_CR3_MATCH,
-+                            env->msr_rtit_cr3_match);
-+            for (i = 0; i < addr_num; i++) {
-+                kvm_msr_entry_add(cpu, MSR_IA32_RTIT_ADDR0_A + i,
-+                            env->msr_rtit_addrs[MSR_IA32_RTIT_ADDR0_A + i]);
-+            }
-+        }
- 
-         /* Note: MSR_IA32_FEATURE_CONTROL is written separately, see
-          *       kvm_put_msr_feature_control. */
-@@ -2130,6 +2149,20 @@ static int kvm_get_msrs(X86CPU *cpu)
-         }
-     }
- 
-+    if (env->features[FEAT_7_0_EBX] & CPUID_7_0_EBX_INTEL_PT) {
-+        int addr_num =
-+            kvm_arch_get_supported_cpuid(kvm_state, 0x14, 1, R_EAX) & 0x7;
-+
-+        kvm_msr_entry_add(cpu, MSR_IA32_RTIT_CTL, 0);
-+        kvm_msr_entry_add(cpu, MSR_IA32_RTIT_STATUS, 0);
-+        kvm_msr_entry_add(cpu, MSR_IA32_RTIT_OUTPUT_BASE, 0);
-+        kvm_msr_entry_add(cpu, MSR_IA32_RTIT_OUTPUT_MASK, 0);
-+        kvm_msr_entry_add(cpu, MSR_IA32_RTIT_CR3_MATCH, 0);
-+        for (i = 0; i < addr_num; i++) {
-+            kvm_msr_entry_add(cpu, MSR_IA32_RTIT_ADDR0_A + i, 0);
-+        }
-+    }
-+
-     ret = kvm_vcpu_ioctl(CPU(cpu), KVM_GET_MSRS, cpu->kvm_msr_buf);
-     if (ret < 0) {
-         return ret;
-@@ -2370,6 +2403,24 @@ static int kvm_get_msrs(X86CPU *cpu)
-                 env->mtrr_var[MSR_MTRRphysIndex(index)].base = msrs[i].data;
-             }
-             break;
-+        case MSR_IA32_RTIT_CTL:
-+            env->msr_rtit_ctrl = msrs[i].data;
-+            break;
-+        case MSR_IA32_RTIT_STATUS:
-+            env->msr_rtit_status = msrs[i].data;
-+            break;
-+        case MSR_IA32_RTIT_OUTPUT_BASE:
-+            env->msr_rtit_output_base = msrs[i].data;
-+            break;
-+        case MSR_IA32_RTIT_OUTPUT_MASK:
-+            env->msr_rtit_output_mask = msrs[i].data;
-+            break;
-+        case MSR_IA32_RTIT_CR3_MATCH:
-+            env->msr_rtit_cr3_match = msrs[i].data;
-+            break;
-+        case MSR_IA32_RTIT_ADDR0_A ... MSR_IA32_RTIT_ADDR3_B:
-+            env->msr_rtit_addrs[index - MSR_IA32_RTIT_ADDR0_A] = msrs[i].data;
-+            break;
-         }
-     }
- 
-diff --git a/target/i386/machine.c b/target/i386/machine.c
-index df5ec35..16cd556 100644
---- a/target/i386/machine.c
-+++ b/target/i386/machine.c
-@@ -818,6 +818,42 @@ static const VMStateDescription vmstate_mcg_ext_ctl = {
-     }
- };
- 
-+static bool intel_pt_enable_needed(void *opaque)
-+{
-+    X86CPU *cpu = opaque;
-+    CPUX86State *env = &cpu->env;
-+    int i;
-+
-+    if (env->msr_rtit_ctrl || env->msr_rtit_status ||
-+        env->msr_rtit_output_base || env->msr_rtit_output_mask ||
-+        env->msr_rtit_cr3_match) {
-+        return true;
-+    }
-+
-+    for (i = 0; i < MAX_RTIT_ADDRS; i++)
-+        if (env->msr_rtit_addrs[i]) {
-+            return true;
-+    }
-+
-+    return false;
-+}
-+
-+static const VMStateDescription vmstate_msr_intel_pt = {
-+    .name = "cpu/intel_pt",
-+    .version_id = 1,
-+    .minimum_version_id = 1,
-+    .needed = intel_pt_enable_needed,
-+    .fields = (VMStateField[]) {
-+        VMSTATE_UINT64(env.msr_rtit_ctrl, X86CPU),
-+        VMSTATE_UINT64(env.msr_rtit_status, X86CPU),
-+        VMSTATE_UINT64(env.msr_rtit_output_base, X86CPU),
-+        VMSTATE_UINT64(env.msr_rtit_output_mask, X86CPU),
-+        VMSTATE_UINT64(env.msr_rtit_cr3_match, X86CPU),
-+        VMSTATE_UINT64_ARRAY(env.msr_rtit_addrs, X86CPU, MAX_RTIT_ADDRS),
-+        VMSTATE_END_OF_LIST()
-+    }
-+};
-+
- VMStateDescription vmstate_x86_cpu = {
-     .name = "cpu",
-     .version_id = 12,
-@@ -937,6 +973,7 @@ VMStateDescription vmstate_x86_cpu = {
-         &vmstate_pkru,
- #endif
-         &vmstate_mcg_ext_ctl,
-+        &vmstate_msr_intel_pt,
-         NULL
-     }
- };
+I see that the tag is there already, not sure whether it means it
+missed the chance again...  Thanks,
+
 -- 
-1.8.3.1
+Peter Xu
