@@ -1,27 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33064)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34348)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <programmingkidx@gmail.com>) id 1eOogW-0002fL-6T
-	for qemu-devel@nongnu.org; Tue, 12 Dec 2017 12:49:41 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1eOoja-0005Cc-2Y
+	for qemu-devel@nongnu.org; Tue, 12 Dec 2017 12:52:51 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <programmingkidx@gmail.com>) id 1eOogT-0006pb-3G
-	for qemu-devel@nongnu.org; Tue, 12 Dec 2017 12:49:40 -0500
-Received: from mail-it0-x22e.google.com ([2607:f8b0:4001:c0b::22e]:37335)
+	(envelope-from <peter.maydell@linaro.org>) id 1eOojY-0000WD-Se
+	for qemu-devel@nongnu.org; Tue, 12 Dec 2017 12:52:50 -0500
+Received: from mail-oi0-x242.google.com ([2607:f8b0:4003:c06::242]:44926)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <programmingkidx@gmail.com>)
-	id 1eOogS-0006od-Sr
-	for qemu-devel@nongnu.org; Tue, 12 Dec 2017 12:49:36 -0500
-Received: by mail-it0-x22e.google.com with SMTP id d137so306750itc.2
-	for <qemu-devel@nongnu.org>; Tue, 12 Dec 2017 09:49:36 -0800 (PST)
-Content-Type: text/plain; charset=utf-8
-Mime-Version: 1.0 (Mac OS X Mail 10.3 \(3273\))
-From: Programmingkid <programmingkidx@gmail.com>
-In-Reply-To: <20171212143421.GD26971@redhat.com>
-Date: Tue, 12 Dec 2017 12:49:34 -0500
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1eOojY-0000Vn-LE
+	for qemu-devel@nongnu.org; Tue, 12 Dec 2017 12:52:48 -0500
+Received: by mail-oi0-x242.google.com with SMTP id l6so14564811oih.11
+	for <qemu-devel@nongnu.org>; Tue, 12 Dec 2017 09:52:48 -0800 (PST)
+MIME-Version: 1.0
+In-Reply-To: <20171211213007.7353-13-andrew.smirnov@gmail.com>
+References: <20171211213007.7353-1-andrew.smirnov@gmail.com>
+	<20171211213007.7353-13-andrew.smirnov@gmail.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Tue, 12 Dec 2017 17:52:27 +0000
+Message-ID: <CAFEAcA_6R61208pZ5rchSG0Oy4c_2eSGD+dO-LQs3Dncjnpf-Q@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-Message-Id: <11216FAC-3F62-43AF-ACD8-00F28B7AD886@gmail.com>
-References: <20B182CA-4FA6-444D-87B1-46B04FFC81AE@gmail.com>
-	<20171212143421.GD26971@redhat.com>
-Subject: Re: [Qemu-devel] Adding more function keys support
+Subject: Re: [Qemu-devel] [PATCH 12/13] sdhci: Add i.MX specific subtype of
+ SDHCI
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,80 +31,189 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Daniel P. Berrange" <berrange@redhat.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
+To: Andrey Smirnov <andrew.smirnov@gmail.com>
+Cc: qemu-arm <qemu-arm@nongnu.org>, Jason Wang <jasowang@redhat.com>, =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>, QEMU Developers <qemu-devel@nongnu.org>, Andrey Yurovsky <yurovsky@gmail.com>
 
+On 11 December 2017 at 21:30, Andrey Smirnov <andrew.smirnov@gmail.com> wro=
+te:
+> IP block found on several generations of i.MX family does not use
+> vanilla SDHCI implementation and it comes with a number of quirks.
+>
+> Introduce i.MX SDHCI subtype of SDHCI block to add code necessary to
+> support unmodified Linux guest driver.
+>
+> Cc: Peter Maydell <peter.maydell@linaro.org>
+> Cc: Jason Wang <jasowang@redhat.com>
+> Cc: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
+> Cc: qemu-devel@nongnu.org
+> Cc: qemu-arm@nongnu.org
+> Cc: yurovsky@gmail.com
+> Signed-off-by: Andrey Smirnov <andrew.smirnov@gmail.com>
+> ---
 
-> On Dec 12, 2017, at 9:34 AM, Daniel P. Berrange <berrange@redhat.com> =
-wrote:
->=20
-> On Sun, Dec 10, 2017 at 02:10:41AM -0500, Programmingkid wrote:
->> On Macintosh keyboards there is a key called fn that is used to give =
-the
->> function keys more functionality. Does this key exist in the keyboard =
-keys
->> database?
->=20
-> When you say "Macintosh keyboards" are you talking about the old style
-> keyboards with Apple's custom ADB connector, or simply Apple branded
-> USB keyboards ?=20
+> +    case ESDHC_DLL_CTRL:
+> +    case ESDHC_TUNE_CTRL_STATUS:
+> +    case 0x6c:
 
-USB keyboards.
+Isn't there a name we can give 0x6c ?
 
->=20
-> If its the latter (USB), then please plug it into a Linux machine, and
-> in a text console (ie not X11) run 'showkey' and press this 'fn' key =
-on
-> its own and tell me what (if any) hex code gets printed.
+> +    case ESDHC_TUNING_CTRL:
+> +    case ESDHC_VENDOR_SPEC:
+> +    case ESDHC_MIX_CTRL:
+> +    case ESDHC_WTMK_LVL:
+> +        ret =3D 0;
+> +        break;
+> +    }
+> +
+> +    return ret;
+> +}
+> +
+> +static void
+> +usdhc_write(void *opaque, hwaddr offset, uint64_t val, unsigned size)
+> +{
+> +    SDHCIState *s =3D SYSBUS_SDHCI(opaque);
+> +    uint8_t hostctl;
+> +    uint32_t value =3D (uint32_t)val;
+> +
+> +    switch (offset) {
+> +    case ESDHC_DLL_CTRL:
+> +    case ESDHC_TUNE_CTRL_STATUS:
+> +    case 0x6c:
+> +    case ESDHC_TUNING_CTRL:
+> +    case ESDHC_WTMK_LVL:
+> +    case ESDHC_VENDOR_SPEC:
+> +        break;
+> +
+> +    case SDHC_HOSTCTL:
+> +        /*
+> +         * Here's What ESDHCI has at offset 0x28 (SDHC_HOSTCTL)
+> +         *
+> +         *       7         6     5      4      3      2        1      0
+> +         * |-----------+--------+--------+-----------+----------+-------=
+--|
+> +         * | Card      | Card   | Endian | DATA3     | Data     | Led   =
+  |
+> +         * | Detect    | Detect | Mode   | as Card   | Transfer | Contro=
+l |
+> +         * | Signal    | Test   |        | Detection | Width    |       =
+  |
+> +         * | Selection | Level  |        | Pin       |          |       =
+  |
+> +         * |-----------+--------+--------+-----------+----------+-------=
+--|
+> +         *
+> +         * and 0x29
+> +         *
+> +         *  15      10 9    8
+> +         * |----------+------|
+> +         * | Reserved | DMA  |
+> +         * |          | Sel. |
+> +         * |          |      |
+> +         * |----------+------|
+> +         *
+> +         * and here's what SDCHI spec expects those offsets to be:
+> +         *
+> +         * 0x28 (Host Control Register)
+> +         *
+> +         *     7        6         5       4  3      2         1        0
+> +         * |--------+--------+----------+------+--------+----------+----=
+-----|
+> +         * | Card   | Card   | Extended | DMA  | High   | Data     | LED=
+     |
+> +         * | Detect | Detect | Data     | Sel. | Speed  | Transfer | Con=
+trol |
+> +         * | Signal | Test   | Transfer |      | Enable | Width    |    =
+     |
+> +         * | Sel.   | Level  | Width    |      |        |          |    =
+     |
+> +         * |--------+--------+----------+------+--------+----------+----=
+-----|
+> +         *
+> +         * and 0x29 (Power Control Register)
+> +         *
+> +         * |----------------------------------|
+> +         * | Power Control Register           |
+> +         * |                                  |
+> +         * | Description omitted,             |
+> +         * | since it has no analog in ESDHCI |
+> +         * |                                  |
+> +         * |----------------------------------|
+> +         *
+> +         * Since offsets 0x2A and 0x2B should be compatible between
+> +         * both IP specs we only need to reconcile least 16-bit of the
+> +         * word we've been given.
+> +         */
 
-There was no response to the fn key.
+Thanks for this explanation, it's very helpful in figuring out what's
+going on.
 
->=20
-> Also, under OS-X run this app:
->=20
->  https://manytricks.com/keycodes/
->=20
-> and again let me know what it reports when the fn key is pressed on =
-its
-> on.
+> +    case SDHC_BLKSIZE:
+> +        /*
+> +         * ESDHCI does not implement "Host SDMA Buffer Boundary", and
+> +         * Linux driver will try to zero this field out which will
+> +         * break the rest of SDHCI emulation.
+> +         *
+> +         * Linux defaults to maximum possible setting (512K boundary)
+> +         * and it seems to be the only option that i.MX IP implements,
+> +         * so we artificially set it to that value.
+> +         */
+> +        val |=3D 0x7 << 12;
+> +        /* FALLTHROUGH */
 
-Yes the Key Codes application does report the fn key being pressed.=20
+We generally write this lowercase: /* fallthrough */
 
-Modifier Change
-	Keys:	=09
-	Key Code:	65535 / 0xffff
-	Modifiers:	8388864 / 0x800100 =E2=93=98
+> +    default:
+> +        sdhci_write(opaque, offset, val, size);
+> +        break;
+> +    }
+> +}
 
-Modifier Change
-	Keys:	=09
-	Key Code:	65535 / 0xffff
-	Modifiers:	256 / 0x100 =E2=93=98
+> diff --git a/include/hw/sd/sdhci.h b/include/hw/sd/sdhci.h
+> index 0f0c3f1e64..dc1856a33d 100644
+> --- a/include/hw/sd/sdhci.h
+> +++ b/include/hw/sd/sdhci.h
+> @@ -39,6 +39,7 @@ typedef struct SDHCIState {
+>      };
+>      SDBus sdbus;
+>      MemoryRegion iomem;
+> +    const MemoryRegionOps *io_ops;
+>
+>      QEMUTimer *insert_timer;       /* timer for 'changing' sd card. */
+>      QEMUTimer *transfer_timer;
+> @@ -83,8 +84,13 @@ typedef struct SDHCIState {
+>      /* Force Event Auto CMD12 Error Interrupt Reg - write only */
+>      /* Force Event Error Interrupt Register- write only */
+>      /* RO Host Controller Version Register always reads as 0x2401 */
+> +
+> +    unsigned long quirks;
 
-> Then also do the same but press 'fn' in combination with another =
-function
-> key.
+I asked for this not to be unsigned long in the last round of review.
 
-The value did not change.
+>  } SDHCIState;
+>
+> +/* Controller does not provide transfer-complete interrupt when not busy=
+ */
+> +#define SDHCI_QUIRK_NO_BUSY_IRQ    BIT(14)
 
->=20
-> The key thing we need to understand is whether this magic behaviour of
-> the 'fn' key is actually changing what the main function keys send as
-> scancodes.
+I asked for a comment saying we're following the Linux kernel's
+quirk bit numbering in the last round of review.
 
-This is hard to figure out. If the function key is mapped to a function =
-like Volume Up, then no event is logged in the Key Codes application. So =
-this probably means the operating system catches the key and does not =
-share it with other applications.
+> +
+>  #define TYPE_PCI_SDHCI "sdhci-pci"
+>  #define PCI_SDHCI(obj) OBJECT_CHECK(SDHCIState, (obj), TYPE_PCI_SDHCI)
+>
+> @@ -92,4 +98,6 @@ typedef struct SDHCIState {
+>  #define SYSBUS_SDHCI(obj)                               \
+>       OBJECT_CHECK(SDHCIState, (obj), TYPE_SYSBUS_SDHCI)
+>
+> +#define TYPE_IMX_USDHC "imx-usdhc"
+> +
+>  #endif /* SDHCI_H */
+> --
+> 2.14.3
 
->=20
->> Also could keys F16 to F24 (Q_KEY_CODE_F16 to Q_KEY_CODE_F24) be =
-added to
->> the database?
->=20
-> Those are already defined in keycodemapdb, so we just need to give =
-them
-> names in the qapi schema, and then add the name mapping to =
-keycodemapdb.
+Otherwise
+Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
 
-I have a vague memory of doing something like this a long time ago. =
-Hopefully I can find the path if it exists.
+thanks
+-- PMM
