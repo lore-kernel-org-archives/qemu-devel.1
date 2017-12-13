@@ -1,27 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56491)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57513)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1ePD6d-0001FN-Mj
-	for qemu-devel@nongnu.org; Wed, 13 Dec 2017 14:54:16 -0500
+	(envelope-from <agraf@suse.de>) id 1ePDBS-0002ZS-T9
+	for qemu-devel@nongnu.org; Wed, 13 Dec 2017 14:59:15 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1ePD6a-0001lP-If
-	for qemu-devel@nongnu.org; Wed, 13 Dec 2017 14:54:15 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:57988)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1ePD6a-0001ka-9f
-	for qemu-devel@nongnu.org; Wed, 13 Dec 2017 14:54:12 -0500
-References: <20170911110623.24981-1-marcandre.lureau@redhat.com>
-	<20170911110623.24981-33-marcandre.lureau@redhat.com>
-	<87fu8eerg3.fsf@dusky.pond.sub.org>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <c7a5ba3b-9206-ed31-1273-a9e18b986bd3@redhat.com>
-Date: Wed, 13 Dec 2017 13:54:07 -0600
+	(envelope-from <agraf@suse.de>) id 1ePDBN-0005KR-Uk
+	for qemu-devel@nongnu.org; Wed, 13 Dec 2017 14:59:14 -0500
+References: <20170202051445.5735-1-david@gibson.dropbear.id.au>
+	<20170202051445.5735-96-david@gibson.dropbear.id.au>
+	<72cdaa82-8496-1d1d-e7bc-3f962f3853d1@suse.de>
+	<819a1e85-f50e-e1b0-55c0-696225b42606@redhat.com>
+From: Alexander Graf <agraf@suse.de>
+Message-ID: <e98bc5f2-3bbf-1915-feac-3e88182e28c7@suse.de>
+Date: Wed, 13 Dec 2017 20:59:05 +0100
 MIME-Version: 1.0
-In-Reply-To: <87fu8eerg3.fsf@dusky.pond.sub.org>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="N53aoMJxvxH3XMt1ro0frP6XFx0AQrFNc"
-Subject: Re: [Qemu-devel] [PATCH v3 32/50] qapi2texi: add 'If:' section to
- generated documentation
+In-Reply-To: <819a1e85-f50e-e1b0-55c0-696225b42606@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PULL 095/107] spapr: clock should count only if
+ vm is running
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,80 +27,68 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>, =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>
-Cc: qemu-devel@nongnu.org, Michael Roth <mdroth@linux.vnet.ibm.com>
-
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---N53aoMJxvxH3XMt1ro0frP6XFx0AQrFNc
-From: Eric Blake <eblake@redhat.com>
-To: Markus Armbruster <armbru@redhat.com>,
- =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>
-Cc: qemu-devel@nongnu.org, Michael Roth <mdroth@linux.vnet.ibm.com>
-Message-ID: <c7a5ba3b-9206-ed31-1273-a9e18b986bd3@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v3 32/50] qapi2texi: add 'If:' section to
- generated documentation
-References: <20170911110623.24981-1-marcandre.lureau@redhat.com>
- <20170911110623.24981-33-marcandre.lureau@redhat.com>
- <87fu8eerg3.fsf@dusky.pond.sub.org>
-In-Reply-To: <87fu8eerg3.fsf@dusky.pond.sub.org>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-
-On 12/13/2017 06:35 AM, Markus Armbruster wrote:
-> Cc: Eric for an additional pair of eyeballs.
->=20
-> Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com> writes:
->=20
->> The documentation is generated only once, and doesn't know C
->> pre-conditions. Add 'If:' sections for top-level entities.
->=20
-> Is this what we want?
->=20
-> QMP also exists only once.  Should the generated qemu-qmp-ref.* documen=
-t
-> that instance of QMP, or should it document all potential instances of
-> QMP?
->=20
-
-I can go either way; it's nice to know that the binary that this copy of
-documentation was bundled with only understands these terms (the binary
-was compiled without HAVE_FOO, so any code guarded by HAVE_FOO doesn't
-need to be documented); but that limits the usability of that
-documentation to just that binary.  It's also useful to have
-fully-generic documentation hosted on the website, where everything is
-documented (the documentation describes all possible builds of qemu
-2.12, not just the one you installed), while mentioning the conditional
-nature of the documented feature ("qemu in general knows about these
-things; but check your particular binary by doing XYZ to learn if that
-support was compiled in to your binary").
-
-So having typed that, I think I'm leaning slightly towards documenting
-everything, including conditionals, rather than trimming the document to
-match the current build conditions.
-
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
+To: Laurent Vivier <lvivier@redhat.com>, David Gibson <david@gibson.dropbear.id.au>, peter.maydell@linaro.org
+Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, thuth@redhat.com, mdroth@linux.vnet.ibm.com, aik@ozlabs.ru
 
 
---N53aoMJxvxH3XMt1ro0frP6XFx0AQrFNc
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
 
------BEGIN PGP SIGNATURE-----
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+On 13.12.17 20:29, Laurent Vivier wrote:
+> On 13/12/2017 20:19, Alexander Graf wrote:
+>>
+>>
+>> On 02.02.17 06:14, David Gibson wrote:
+>>> From: Laurent Vivier <lvivier@redhat.com>
+>>>
+>>> This is a port to ppc of the i386 commit:
+>>>     00f4d64 kvmclock: clock should count only if vm is running
+>>>
+>>> We remove timebase_post_load function, and use the VM state
+>>> change handler to save and restore the guest_timebase (on stop
+>>> and continue).
+>>>
+>>> We keep timebase_pre_save to reduce the clock difference on
+>>> migration like in:
+>>>     6053a86 kvmclock: reduce kvmclock difference on migration
+>>>
+>>> Time base offset has originally been introduced by commit
+>>>     98a8b52 spapr: Add support for time base offset migration
+>>>
+>>> So while VM is paused, the time is stopped. This allows to have
+>>> the same result with date (based on Time Base Register) and
+>>> hwclock (based on "get-time-of-day" RTAS call).
+>>>
+>>> Moreover in TCG mode, the Time Base is always paused, so this
+>>> patch also adjust the behavior between TCG and KVM.
+>>>
+>>> VM state field "time_of_the_day_ns" is now useless but we keep
+>>> it to be able to migrate to older version of the machine.
+>>>
+>>> As vmstate_ppc_timebase structure (with timebase_pre_save() and
+>>> timebase_post_load() functions) was only used by vmstate_spapr,
+>>> we register the VM state change handler only in ppc_spapr_init().
+>>>
+>>> Signed-off-by: Laurent Vivier <lvivier@redhat.com>
+>>> Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
+>>
+>> Just a small heads-up: I've been debugging an OpenQA regression lately
+>> where our automated testing regressed with QEMU 2.9. With stock 2.9.1, I
+>> get a failure rate of "weird" effects (probably TB divergence between
+>> vcpus) of ~30%. With this patch reverted it's back to 0%.
+>>
+>> I *think* something here causes the TB offset of multiple threads (I'm
+>> running -smp 2,threads=2) to diverge.
+>>
+>> I'll keep debugging things tomorrow, but I'll be happy to see anyone
+>> else beat me to analyze what is going wrong ;).
+> 
+> Don't know if it can be related, but for migration we need:
 
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAloxhV8ACgkQp6FrSiUn
-Q2qGxwf+LvIQSo0bCeKsa67HvzcxqMouxaXalA9MTSi5o1Qg+DSGUI1PAVxay4rs
-J+sMCjkMgimivwD2YLeWAaMcS6Jp3/1OOX65zHOx24i+pIWo5fdKV5pW+yt1AA4B
-5MsNT0GJq19zqP78/BMJnXOry51zRSy1pXs679pm6ygg+KAzD7z+E4U7ZoECiGe4
-IUGzvcKGUurVULaWJpxAT2SqWPp3tVMF6tsoX4NtbFkSBXxUhXQvQnwsdDnb/t7b
-x5qwRkM/qY4K76zfVzotTioCEW1AMccy2zcwUFocmAKzWrxPxQoYk9WR9HYybdH8
-K7JBbjrHcQ9Udc25C6LRSshXXbpKgg==
-=6KRB
------END PGP SIGNATURE-----
 
---N53aoMJxvxH3XMt1ro0frP6XFx0AQrFNc--
+As expected, this did not fix it. I'll keep digging.
+
+My hunch is that we now set VTB on different cores at different times,
+introducing tiny VTB offsets which can lead to negative TB differences
+inside the guest.
+
+
+Alex
