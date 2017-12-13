@@ -1,26 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54720)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39054)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <balaton@eik.bme.hu>) id 1ePBfu-0004dK-BD
-	for qemu-devel@nongnu.org; Wed, 13 Dec 2017 13:22:35 -0500
+	(envelope-from <stefanha@redhat.com>) id 1ePC0o-00062B-Kq
+	for qemu-devel@nongnu.org; Wed, 13 Dec 2017 13:44:11 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <balaton@eik.bme.hu>) id 1ePBfr-0006wh-4K
-	for qemu-devel@nongnu.org; Wed, 13 Dec 2017 13:22:34 -0500
-Received: from zero.eik.bme.hu ([2001:738:2001:2001::2001]:32541)
+	(envelope-from <stefanha@redhat.com>) id 1ePC0k-0003Lw-M2
+	for qemu-devel@nongnu.org; Wed, 13 Dec 2017 13:44:10 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:44156)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <balaton@eik.bme.hu>) id 1ePBfq-0006oa-TU
-	for qemu-devel@nongnu.org; Wed, 13 Dec 2017 13:22:31 -0500
-Date: Wed, 13 Dec 2017 19:22:15 +0100 (CET)
-From: BALATON Zoltan <balaton@eik.bme.hu>
-In-Reply-To: <7D487247-C5DA-4902-A21E-B16861F763C8@gmail.com>
-Message-ID: <alpine.BSF.2.21.1712131914560.26243@zero.eik.bme.hu>
-References: <20B182CA-4FA6-444D-87B1-46B04FFC81AE@gmail.com>
-	<20171212143421.GD26971@redhat.com>
-	<11216FAC-3F62-43AF-ACD8-00F28B7AD886@gmail.com>
-	<20171213091458.GA28379@redhat.com>
-	<7D487247-C5DA-4902-A21E-B16861F763C8@gmail.com>
+	(Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1ePC0k-0003LU-Et
+	for qemu-devel@nongnu.org; Wed, 13 Dec 2017 13:44:06 -0500
+Date: Wed, 13 Dec 2017 18:43:58 +0000
+From: Stefan Hajnoczi <stefanha@redhat.com>
+Message-ID: <20171213184358.GF8317@stefanha-x1.localdomain>
+References: <20171205055200.16305-1-peterx@redhat.com>
+	<20171205055200.16305-16-peterx@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII; format=flowed
-Subject: Re: [Qemu-devel] Adding more function keys support
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="z+pzSjdB7cqptWpS"
+Content-Disposition: inline
+In-Reply-To: <20171205055200.16305-16-peterx@redhat.com>
+Subject: Re: [Qemu-devel] [RFC v5 15/26] monitor: let suspend_cnt be thread
+ safe
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,44 +29,56 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Programmingkid <programmingkidx@gmail.com>
-Cc: "Daniel P. Berrange" <berrange@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>
+To: Peter Xu <peterx@redhat.com>
+Cc: qemu-devel@nongnu.org, Stefan Hajnoczi <shajnocz@redhat.com>, "Daniel P . Berrange" <berrange@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Fam Zheng <famz@redhat.com>, Juan Quintela <quintela@redhat.com>, mdroth@linux.vnet.ibm.com, Eric Blake <eblake@redhat.com>, Laurent Vivier <lvivier@redhat.com>, Markus Armbruster <armbru@redhat.com>, marcandre.lureau@redhat.com, "Dr . David Alan Gilbert" <dgilbert@redhat.com>
 
-On Wed, 13 Dec 2017, Programmingkid wrote:
->> On Dec 13, 2017, at 4:14 AM, Daniel P. Berrange <berrange@redhat.com> wrote:
->>
->> On Tue, Dec 12, 2017 at 12:49:34PM -0500, Programmingkid wrote:
->>>
->>>> On Dec 12, 2017, at 9:34 AM, Daniel P. Berrange <berrange@redhat.com> wrote:
->>>>
->>>> On Sun, Dec 10, 2017 at 02:10:41AM -0500, Programmingkid wrote:
->>>>> On Macintosh keyboards there is a key called fn that is used to give the
->>>>> function keys more functionality. Does this key exist in the keyboard keys
->>>>> database?
->>>>
->>>> When you say "Macintosh keyboards" are you talking about the old style
->>>> keyboards with Apple's custom ADB connector, or simply Apple branded
->>>> USB keyboards ?
->>>
->>> USB keyboards.
->>>
->>>>
->>>> If its the latter (USB), then please plug it into a Linux machine, and
->>>> in a text console (ie not X11) run 'showkey' and press this 'fn' key on
->>>> its own and tell me what (if any) hex code gets printed.
->>>
->>> There was no response to the fn key.
->>
->> Doh, I made a mistake - you need to run   'showkey -s'  to get raw scancodes.
->> Can you try this again, pressing 'fn' on its own, and also press 'fn' in
->> combination with some function keys.
->
-> Sorry but showkey still did not register the fn key being pushed.
 
-I don't know how the fn key is handled but the Linux driver knows about it 
-so maybe it could help to understand:
+--z+pzSjdB7cqptWpS
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-https://github.com/torvalds/linux/blob/master/drivers/hid/hid-apple.c
+On Tue, Dec 05, 2017 at 01:51:49PM +0800, Peter Xu wrote:
+> Monitor code now can be run in more than one thread.  Let it be thread
+> safe when accessing suspend_cnt counter.
 
-Regards,
-BALATON Zoltan
+Please add doc comments to the functions explaining which thread they
+may be called from (especially public functions).  Without this
+information other people will have a hard time keeping code thread-safe.
+
+> Signed-off-by: Peter Xu <peterx@redhat.com>
+> ---
+>  monitor.c | 13 +++++++------
+>  1 file changed, 7 insertions(+), 6 deletions(-)
+
+=46rom docs/devel/atomics.txt:
+
+  Macros defined by qemu/atomic.h fall in three camps:
+
+  - compiler barriers: barrier();
+
+  - weak atomic access and manual memory barriers: atomic_read(),
+    atomic_set(), smp_rmb(), smp_wmb(), smp_mb(), smp_mb_acquire(),
+    smp_mb_release(), smp_read_barrier_depends();
+
+  - sequentially consistent atomic access: everything else.
+
+The atomic_read() and atomic_set() calls in this patch aren't effective
+without memory barriers.  Please use atomic_mb_read() and
+atomic_mb_set() instead.
+
+--z+pzSjdB7cqptWpS
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEcBAEBAgAGBQJaMXTuAAoJEJykq7OBq3PIF4UIAMePx1ajYf1keMsql+Fqpeh4
+/IchuBI2WY1Y+kQyGxYnf7jFsdU+uOFnoE5N/5oFJeDlh/OZ23jZR0bZXeMQ+cyN
+SQL8u68spJU+09BHPC8uaiYSsjaPlbXqk+6Gn++UhsHVWdiB882w4DCSpyfh9pRa
+VCFtubvK8v7pg0VlAo+VLnfq5xj41iSnEdOaswNZlLF11GgeOcLVxeDgJcCO2XM5
+v/q746U77YyyrnjYlsNKMSiOFOgOmKEeMFMixQ1gKK8tW9BHM5NvcbAI4ZeLBoQ7
+oR6BI92ZCiyeFUTAXDWE6hdJqYRgMHnY7bVCCF8yTMA4lWCg7VALDiLQIJKNjZo=
+=AjPO
+-----END PGP SIGNATURE-----
+
+--z+pzSjdB7cqptWpS--
