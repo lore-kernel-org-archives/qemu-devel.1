@@ -1,26 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59080)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37180)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <maozy.fnst@cn.fujitsu.com>) id 1eOzmb-0001lu-FM
-	for qemu-devel@nongnu.org; Wed, 13 Dec 2017 00:40:42 -0500
+	(envelope-from <hpoussin@reactos.org>) id 1eP0Od-00074z-1t
+	for qemu-devel@nongnu.org; Wed, 13 Dec 2017 01:19:59 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <maozy.fnst@cn.fujitsu.com>) id 1eOzmY-0001PD-BA
-	for qemu-devel@nongnu.org; Wed, 13 Dec 2017 00:40:41 -0500
-Received: from mail.cn.fujitsu.com ([183.91.158.132]:32793
-	helo=heian.cn.fujitsu.com) by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <maozy.fnst@cn.fujitsu.com>) id 1eOzmX-0001Ot-EL
-	for qemu-devel@nongnu.org; Wed, 13 Dec 2017 00:40:38 -0500
-References: <cover.1512552817.git.maozy.fnst@cn.fujitsu.com>
-	<6991b2261016c48122aaf7d71e33cc1d74b620fd.1512552817.git.maozy.fnst@cn.fujitsu.com>
-	<CAK3tnv+2Eu_y_-eh901TANGEdi2RNjeU03MKRy0VgzdXkp02TA@mail.gmail.com>
-From: Mao Zhongyi <maozy.fnst@cn.fujitsu.com>
-Message-ID: <da82d562-ec65-88c4-a937-1a7296cbfa0d@cn.fujitsu.com>
-Date: Wed, 13 Dec 2017 13:35:59 +0800
+	(envelope-from <hpoussin@reactos.org>) id 1eP0OZ-0007vM-Sd
+	for qemu-devel@nongnu.org; Wed, 13 Dec 2017 01:19:58 -0500
+Received: from iserv.reactos.org ([2a01:4f8:221:4c5::3]:53351)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <hpoussin@reactos.org>)
+	id 1eP0OZ-0007p6-2X
+	for qemu-devel@nongnu.org; Wed, 13 Dec 2017 01:19:55 -0500
+References: <20171026064635.7179-1-aik@ozlabs.ru>
+	<13277057-669f-cd77-95f1-f0e54f7ae222@redhat.com>
+	<7e694888-43ce-6653-92a0-c0b4c235d4ca@ozlabs.ru>
+	<e6a81bdc-a961-d55f-85c4-55149c878988@redhat.com>
+From: =?UTF-8?Q?Herv=c3=a9_Poussineau?= <hpoussin@reactos.org>
+Message-ID: <df85e8f4-23ae-6404-26b8-b45cc7896bbc@reactos.org>
+Date: Wed, 13 Dec 2017 07:19:43 +0100
 MIME-Version: 1.0
-In-Reply-To: <CAK3tnv+2Eu_y_-eh901TANGEdi2RNjeU03MKRy0VgzdXkp02TA@mail.gmail.com>
-Content-Type: text/plain; charset="utf-8"; format=flowed
+In-Reply-To: <e6a81bdc-a961-d55f-85c4-55149c878988@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
 Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH v2 2/4] colo: modified the payload compare
- function
+Subject: Re: [Qemu-devel] [PATCH qemu] fdc: Exit if ISA controller does not
+ support DMA
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,209 +32,27 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Zhang Chen <zhangckid@gmail.com>
-Cc: qemu-devel@nongnu.org, Li Zhijian <lizhijian@cn.fujitsu.com>, Jason Wang <jasowang@redhat.com>
+To: John Snow <jsnow@redhat.com>, Alexey Kardashevskiy <aik@ozlabs.ru>, qemu-devel@nongnu.org
+Cc: Eric Blake <eblake@redhat.com>, Markus Armbruster <armbru@redhat.com>
 
+Le 08/12/2017 à 22:29, John Snow a écrit :
+[...]
+> 
+> It looks like Herve was working on decoupling floppies from i8257, but
+> perhaps didn't get all the way through -- I'm not actually clear on what
+> work remains to be done here, maybe he can chime in if he's still
+> interested in the project?
+> 
 
+Indeed, I worked on decoupling floppies (and other ISA devices) from i8257, for three reasons:
+1) having a working floppy on MIPS Magnum machine. fdc is PC-compatible, but DMA controller is not i8257-compatible.
+2) reimplement another ISA bus with a somewhat i8257-compatible DMA
+3) for fun, support multiple ISA buses on a same machine but on different PCI bridges.
 
-On 12/12/2017 11:19 PM, Zhang Chen wrote:
->
->
-> On Wed, Dec 6, 2017 at 5:57 PM, Mao Zhongyi <maozy.fnst@cn.fujitsu.com <mailto:maozy.fnst@cn.fujitsu.com>> wrote:
->
->     Modified the function colo_packet_compare_common to prepare for the
->     tcp packet comparison in the next patch.
->
->     Cc: Zhang Chen <zhangckid@gmail.com <mailto:zhangckid@gmail.com>>
->     Cc: Li Zhijian <lizhijian@cn.fujitsu.com <mailto:lizhijian@cn.fujitsu.com>>
->     Cc: Jason Wang <jasowang@redhat.com <mailto:jasowang@redhat.com>>
->
->     Signed-off-by: Mao Zhongyi <maozy.fnst@cn.fujitsu.com <mailto:maozy.fnst@cn.fujitsu.com>>
->     ---
->      net/colo-compare.c | 71 ++++++++++++++++++++++++++++++------------------------
->      1 file changed, 39 insertions(+), 32 deletions(-)
->
->     diff --git a/net/colo-compare.c b/net/colo-compare.c
->     index 0afb5f0..f833eba 100644
->     --- a/net/colo-compare.c
->     +++ b/net/colo-compare.c
->     @@ -191,10 +191,11 @@ static int packet_enqueue(CompareState *s, int mode, Connection **con)
->       * return:    0  means packet same
->       *            > 0 || < 0 means packet different
->       */
->     -static int colo_packet_compare_common(Packet *ppkt,
->     -                                      Packet *spkt,
->     -                                      int poffset,
->     -                                      int soffset)
->     +static int colo_compare_packet_payload(Packet *ppkt,
->     +                                       Packet *spkt,
->     +                                       uint16_t poffset,
->     +                                       uint16_t soffset,
->     +                                       uint16_t len)
->      {
->          if (trace_event_get_state_backends(TRACE_COLO_COMPARE_MISCOMPARE)) {
->              char pri_ip_src[20], pri_ip_dst[20], sec_ip_src[20], sec_ip_dst[20];
->     @@ -209,17 +210,7 @@ static int colo_packet_compare_common(Packet *ppkt,
->                                         sec_ip_src, sec_ip_dst);
->          }
->
->     -    poffset = ppkt->vnet_hdr_len + poffset;
->     -    soffset = ppkt->vnet_hdr_len + soffset;
->     -
->     -    if (ppkt->size - poffset == spkt->size - soffset) {
->     -        return memcmp(ppkt->data + poffset,
->     -                      spkt->data + soffset,
->     -                      spkt->size - soffset);
->     -    } else {
->     -        trace_colo_compare_main("Net packet size are not the same");
->     -        return -1;
->     -    }
->     +    return memcmp(ppkt->data + poffset, spkt->data + soffset, len);
->      }
->
->      /*
->     @@ -274,16 +265,23 @@ static int colo_packet_compare_tcp(Packet *spkt, Packet *ppkt)
->          ptrdiff_t ptcp_offset, stcp_offset;
->
->          ptcp_offset = ppkt->transport_header - (uint8_t *)ppkt->data
->     -                  + (ptcp->th_off * 4) - ppkt->vnet_hdr_len;
->     +                  + (ptcp->th_off << 2) - ppkt->vnet_hdr_len;
->          stcp_offset = spkt->transport_header - (uint8_t *)spkt->data
->     -                  + (stcp->th_off * 4) - spkt->vnet_hdr_len;
->     +                  + (stcp->th_off << 2) - spkt->vnet_hdr_len;
->          /*
->           * When network is busy, some tcp options(like sack) will unpredictable
->           * occur in primary side or secondary side. it will make packet size
->           * not same, but the two packet's payload is identical. colo just
->           * care about packet payload, so we skip the option field.
->           */
->
->
-> In the patch 1，you should remove this comments, it's out of date.
+I failed on point 1), mostly due to lack of documentation.
+I succeeded on point 2), by having locally some patches for a ISAPNP bus, where IO/IRQ/DMA addresses of ISA devices can change dynamically, and devices can be discovered by operating system.
+About point 3, most of the patches are ready, but some details are still to be fixed.
 
-Ah, I got it.
+Regards,
 
->
->
->
->     -    res = colo_packet_compare_common(ppkt, spkt, ptcp_offset, stcp_offset);
->     +    if (ppkt->size - ptcp_offset == spkt->size - stcp_offset) {
->     +        res = colo_compare_packet_payload(ppkt, spkt,
->     +                                          ptcp_offset, stcp_offset,
->     +                                          ppkt->size - ptcp_offset);
->     +    } else {
->     +        trace_colo_compare_main("TCP: the size of packets are different");
->
->
->
-> Should fix this comments to "TCP: payload size of packets are diffenrent!".
-
-OK,  I will.
-
-Thanks,
-Mao
-
->
-> Thanks
-> Zhang Chen
->
->
->
->     +        res = -1;
->     +    }
->
->          if (res != 0 &&
->              trace_event_get_state_backends(TRACE_COLO_COMPARE_MISCOMPARE)) {
->     @@ -325,8 +323,8 @@ static int colo_packet_compare_tcp(Packet *spkt, Packet *ppkt)
->       */
->      static int colo_packet_compare_udp(Packet *spkt, Packet *ppkt)
->      {
->     -    int ret;
->     -    int network_header_length = ppkt->ip->ip_hl * 4;
->     +    uint16_t network_header_length = ppkt->ip->ip_hl << 2;
->     +    uint16_t offset = network_header_length + ETH_HLEN + ppkt->vnet_hdr_len;
->
->          trace_colo_compare_main("compare udp");
->
->     @@ -340,11 +338,12 @@ static int colo_packet_compare_udp(Packet *spkt, Packet *ppkt)
->           * other field like TOS,TTL,IP Checksum. we only need to compare
->           * the ip payload here.
->           */
->     -    ret = colo_packet_compare_common(ppkt, spkt,
->     -                                     network_header_length + ETH_HLEN,
->     -                                     network_header_length + ETH_HLEN);
->     -
->     -    if (ret) {
->     +    if (ppkt->size != spkt->size) {
->     +        trace_colo_compare_main("UDP: the size of packets are different");
->     +        return -1;
->     +    }
->     +    if (colo_compare_packet_payload(ppkt, spkt, offset, offset,
->     +                                    ppkt->size - offset)) {
->              trace_colo_compare_udp_miscompare("primary pkt size", ppkt->size);
->              trace_colo_compare_udp_miscompare("Secondary pkt size", spkt->size);
->              if (trace_event_get_state_backends(TRACE_COLO_COMPARE_MISCOMPARE)) {
->     @@ -353,9 +352,10 @@ static int colo_packet_compare_udp(Packet *spkt, Packet *ppkt)
->                  qemu_hexdump((char *)spkt->data, stderr, "colo-compare sec pkt",
->                               spkt->size);
->              }
->     +        return -1;
->     +    } else {
->     +        return 0;
->          }
->     -
->     -    return ret;
->      }
->
->      /*
->     @@ -364,7 +364,8 @@ static int colo_packet_compare_udp(Packet *spkt, Packet *ppkt)
->       */
->      static int colo_packet_compare_icmp(Packet *spkt, Packet *ppkt)
->      {
->     -    int network_header_length = ppkt->ip->ip_hl * 4;
->     +    uint16_t network_header_length = ppkt->ip->ip_hl << 2;
->     +    uint16_t offset = network_header_length + ETH_HLEN + ppkt->vnet_hdr_len;
->
->          trace_colo_compare_main("compare icmp");
->
->     @@ -378,9 +379,12 @@ static int colo_packet_compare_icmp(Packet *spkt, Packet *ppkt)
->           * other field like TOS,TTL,IP Checksum. we only need to compare
->           * the ip payload here.
->           */
->     -    if (colo_packet_compare_common(ppkt, spkt,
->     -                                   network_header_length + ETH_HLEN,
->     -                                   network_header_length + ETH_HLEN)) {
->     +    if (ppkt->size != spkt->size) {
->     +        trace_colo_compare_main("ICMP: the size of packets are different");
->     +        return -1;
->     +    }
->     +    if (colo_compare_packet_payload(ppkt, spkt, offset, offset,
->     +                                    ppkt->size - offset)) {
->              trace_colo_compare_icmp_miscompare("primary pkt size",
->                                                 ppkt->size);
->              trace_colo_compare_icmp_miscompare("Secondary pkt size",
->     @@ -403,6 +407,8 @@ static int colo_packet_compare_icmp(Packet *spkt, Packet *ppkt)
->       */
->      static int colo_packet_compare_other(Packet *spkt, Packet *ppkt)
->      {
->     +    uint16_t offset = ppkt->vnet_hdr_len;
->     +
->          trace_colo_compare_main("compare other");
->          if (trace_event_get_state_backends(TRACE_COLO_COMPARE_MISCOMPARE)) {
->              char pri_ip_src[20], pri_ip_dst[20], sec_ip_src[20], sec_ip_dst[20];
->     @@ -417,7 +423,8 @@ static int colo_packet_compare_other(Packet *spkt, Packet *ppkt)
->                                         sec_ip_src, sec_ip_dst);
->          }
->
->     -    return colo_packet_compare_common(ppkt, spkt, 0, 0);
->     +    return colo_compare_packet_payload(ppkt, spkt, offset, offset,
->     +                                       ppkt->size - offset);
->      }
->
->      static int colo_old_packet_check_one(Packet *pkt, int64_t *check_time)
->     --
->     2.9.4
->
->
->
->
+Hervé
