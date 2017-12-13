@@ -1,31 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57753)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57780)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1ePDC3-00034p-OM
-	for qemu-devel@nongnu.org; Wed, 13 Dec 2017 14:59:52 -0500
+	id 1ePDC8-00038x-7s
+	for qemu-devel@nongnu.org; Wed, 13 Dec 2017 14:59:58 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1ePDBy-0005eq-Pk
-	for qemu-devel@nongnu.org; Wed, 13 Dec 2017 14:59:51 -0500
-Received: from mail-qt0-x242.google.com ([2607:f8b0:400d:c0d::242]:45715)
+	id 1ePDC6-0005iS-GS
+	for qemu-devel@nongnu.org; Wed, 13 Dec 2017 14:59:56 -0500
+Received: from mail-qk0-x243.google.com ([2607:f8b0:400d:c09::243]:45689)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1ePDBy-0005eb-LY
-	for qemu-devel@nongnu.org; Wed, 13 Dec 2017 14:59:46 -0500
-Received: by mail-qt0-x242.google.com with SMTP id g10so5180863qtj.12
-	for <qemu-devel@nongnu.org>; Wed, 13 Dec 2017 11:59:46 -0800 (PST)
+	id 1ePDC6-0005iI-AJ
+	for qemu-devel@nongnu.org; Wed, 13 Dec 2017 14:59:54 -0500
+Received: by mail-qk0-x243.google.com with SMTP id d141so3504946qkc.12
+	for <qemu-devel@nongnu.org>; Wed, 13 Dec 2017 11:59:54 -0800 (PST)
 Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
 	<philippe.mathieu.daude@gmail.com>
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
-Date: Wed, 13 Dec 2017 16:58:47 -0300
-Message-Id: <20171213195852.30439-10-f4bug@amsat.org>
+Date: Wed, 13 Dec 2017 16:58:49 -0300
+Message-Id: <20171213195852.30439-12-f4bug@amsat.org>
 In-Reply-To: <20171213195852.30439-1-f4bug@amsat.org>
 References: <20171213195852.30439-1-f4bug@amsat.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH 09/14] sdhci: refactor common sysbus/pci
- unrealize() into sdhci_unrealizefn()
+Subject: [Qemu-devel] [PATCH 11/14] sdhci: convert the DPRINT() calls into
+ trace events
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,76 +37,302 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: Alistair Francis <alistair.francis@xilinx.com>, "Edgar E . Iglesias" <edgar.iglesias@xilinx.com>, Prasad J Pandit <pjp@fedoraproject.org>, Peter Maydell <peter.maydell@linaro.org>, Andrew Baumann <Andrew.Baumann@microsoft.com>, Andrey Smirnov <andrew.smirnov@gmail.com>, Andrey Yurovsky <yurovsky@gmail.com>
 Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, qemu-devel@nongnu.org, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Sai Pavan Boddu <saipava@xilinx.com>
 
+zero-initialize ADMADescr 'dscr' in sdhci_do_adma() to avoid:
+
+  hw/sd/sdhci.c: In function ‘sdhci_do_adma’:
+  hw/sd/sdhci.c:714:29: error: ‘dscr.addr’ may be used uninitialized in this function [-Werror=maybe-uninitialized]
+             trace_sdhci_adma("link", s->admasysaddr);
+                             ^
+
 Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 ---
- hw/sd/sdhci.c | 21 ++++++++++++++++++---
- 1 file changed, 18 insertions(+), 3 deletions(-)
+ hw/sd/sdhci.c      | 89 ++++++++++++++++++------------------------------------
+ hw/sd/trace-events | 14 +++++++++
+ 2 files changed, 44 insertions(+), 59 deletions(-)
 
 diff --git a/hw/sd/sdhci.c b/hw/sd/sdhci.c
-index 893be0e606..044e3d62f1 100644
+index 8fcd48f849..aa2d2fa3d3 100644
 --- a/hw/sd/sdhci.c
 +++ b/hw/sd/sdhci.c
-@@ -31,6 +31,7 @@
- #include "hw/sd/sdhci.h"
- #include "sdhci-internal.h"
+@@ -33,30 +33,7 @@
  #include "sd-internal.h"
-+#include "qapi/error.h"
+ #include "qapi/error.h"
  #include "qemu/log.h"
- 
- /* host controller debug messages */
-@@ -1191,17 +1192,21 @@ static void sdhci_realizefn(SDHCIState *s, Error **errp)
-                           SDHC_REGISTERS_MAP_SIZE);
- }
- 
-+static void sdhci_unrealizefn(SDHCIState *s, Error **errp)
-+{
-+    g_free(s->fifo_buffer);
-+    s->fifo_buffer = NULL;
-+}
-+
- static void sdhci_uninitfn(SDHCIState *s)
- {
-     timer_del(s->insert_timer);
-     timer_free(s->insert_timer);
-     timer_del(s->transfer_timer);
-     timer_free(s->transfer_timer);
-+
-     qemu_free_irq(s->eject_cb);
-     qemu_free_irq(s->ro_cb);
 -
--    g_free(s->fifo_buffer);
--    s->fifo_buffer = NULL;
- }
+-/* host controller debug messages */
+-#ifndef SDHC_DEBUG
+-#define SDHC_DEBUG                        0
+-#endif
+-
+-#define DPRINT_L1(fmt, args...) \
+-    do { \
+-        if (SDHC_DEBUG) { \
+-            fprintf(stderr, "QEMU SDHC: " fmt, ## args); \
+-        } \
+-    } while (0)
+-#define DPRINT_L2(fmt, args...) \
+-    do { \
+-        if (SDHC_DEBUG > 1) { \
+-            fprintf(stderr, "QEMU SDHC: " fmt, ## args); \
+-        } \
+-    } while (0)
+-#define ERRPRINT(fmt, args...) \
+-    do { \
+-        if (SDHC_DEBUG) { \
+-            fprintf(stderr, "QEMU SDHC ERROR: " fmt, ## args); \
+-        } \
+-    } while (0)
++#include "trace.h"
  
- static bool sdhci_pending_insert_vmstate_needed(void *opaque)
-@@ -1302,6 +1307,8 @@ static void sdhci_pci_realize(PCIDevice *dev, Error **errp)
- static void sdhci_pci_exit(PCIDevice *dev)
+ #define TYPE_SDHCI_BUS "sdhci-bus"
+ #define SDHCI_BUS(obj) OBJECT_CHECK(SDBus, (obj), TYPE_SDHCI_BUS)
+@@ -154,8 +131,8 @@ static void sdhci_raise_insertion_irq(void *opaque)
+ static void sdhci_set_inserted(DeviceState *dev, bool level)
  {
-     SDHCIState *s = PCI_SDHCI(dev);
-+
-+    sdhci_unrealizefn(s, &error_abort);
-     sdhci_uninitfn(s);
- }
+     SDHCIState *s = (SDHCIState *)dev;
+-    DPRINT_L1("Card state changed: %s!\n", level ? "insert" : "eject");
  
-@@ -1355,11 +1362,19 @@ static void sdhci_sysbus_realize(DeviceState *dev, Error ** errp)
-     sysbus_init_mmio(sbd, &s->iomem);
- }
++    trace_sdhci_set_inserted(level ? "insert" : "eject");
+     if ((s->norintsts & SDHC_NIS_REMOVE) && level) {
+         /* Give target some time to notice card ejection */
+         timer_mod(s->insert_timer,
+@@ -237,7 +214,8 @@ static void sdhci_send_command(SDHCIState *s)
+     s->acmd12errsts = 0;
+     request.cmd = s->cmdreg >> 8;
+     request.arg = s->argument;
+-    DPRINT_L1("sending CMD%u ARG[0x%08x]\n", request.cmd, request.arg);
++
++    trace_sdhci_send_command(request.cmd, request.arg);
+     rlen = sdbus_do_command(&s->sdbus, &request, response);
  
-+static void sdhci_sysbus_unrealize(DeviceState *dev, Error **errp)
-+{
-+    SDHCIState *s = SYSBUS_SDHCI(dev);
-+
-+    sdhci_unrealizefn(s, errp);
-+}
-+
- static void sdhci_sysbus_class_init(ObjectClass *klass, void *data)
+     if (s->cmdreg & SDHC_CMD_RESPONSE) {
+@@ -245,7 +223,7 @@ static void sdhci_send_command(SDHCIState *s)
+             s->rspreg[0] = (response[0] << 24) | (response[1] << 16) |
+                            (response[2] << 8)  |  response[3];
+             s->rspreg[1] = s->rspreg[2] = s->rspreg[3] = 0;
+-            DPRINT_L1("Response: RSPREG[31..0]=0x%08x\n", s->rspreg[0]);
++            trace_sdhci_response4(s->rspreg[0]);
+         } else if (rlen == 16) {
+             s->rspreg[0] = (response[11] << 24) | (response[12] << 16) |
+                            (response[13] << 8) |  response[14];
+@@ -255,11 +233,10 @@ static void sdhci_send_command(SDHCIState *s)
+                            (response[5] << 8)  |  response[6];
+             s->rspreg[3] = (response[0] << 16) | (response[1] << 8) |
+                             response[2];
+-            DPRINT_L1("Response received:\n RSPREG[127..96]=0x%08x, RSPREG[95.."
+-                  "64]=0x%08x,\n RSPREG[63..32]=0x%08x, RSPREG[31..0]=0x%08x\n",
+-                  s->rspreg[3], s->rspreg[2], s->rspreg[1], s->rspreg[0]);
++            trace_sdhci_response16(s->rspreg[3], s->rspreg[2],
++                                   s->rspreg[1], s->rspreg[0]);
+         } else {
+-            ERRPRINT("Timeout waiting for command response\n");
++            trace_sdhci_error("timeout waiting for command response");
+             if (s->errintstsen & SDHC_EISEN_CMDTIMEOUT) {
+                 s->errintsts |= SDHC_EIS_CMDTIMEOUT;
+                 s->norintsts |= SDHC_NIS_ERR;
+@@ -293,7 +270,7 @@ static void sdhci_end_transfer(SDHCIState *s)
+ 
+         request.cmd = 0x0C;
+         request.arg = 0;
+-        DPRINT_L1("Automatically issue CMD%d %08x\n", request.cmd, request.arg);
++        trace_sdhci_end_transfer(request.cmd, request.arg);
+         sdbus_do_command(&s->sdbus, &request, response);
+         /* Auto CMD12 response goes to the upper Response register */
+         s->rspreg[3] = (response[0] << 24) | (response[1] << 16) |
+@@ -362,7 +339,7 @@ static uint32_t sdhci_read_dataport(SDHCIState *s, unsigned size)
+ 
+     /* first check that a valid data exists in host controller input buffer */
+     if ((s->prnsts & SDHC_DATA_AVAILABLE) == 0) {
+-        ERRPRINT("Trying to read from empty buffer\n");
++        trace_sdhci_error("read from empty buffer");
+         return 0;
+     }
+ 
+@@ -371,8 +348,7 @@ static uint32_t sdhci_read_dataport(SDHCIState *s, unsigned size)
+         s->data_count++;
+         /* check if we've read all valid data (blksize bytes) from buffer */
+         if ((s->data_count) >= (s->blksize & 0x0fff)) {
+-            DPRINT_L2("All %u bytes of data have been read from input buffer\n",
+-                    s->data_count);
++            trace_sdhci_read_dataport(s->data_count);
+             s->prnsts &= ~SDHC_DATA_AVAILABLE; /* no more data in a buffer */
+             s->data_count = 0;  /* next buff read must start at position [0] */
+ 
+@@ -455,7 +431,7 @@ static void sdhci_write_dataport(SDHCIState *s, uint32_t value, unsigned size)
+ 
+     /* Check that there is free space left in a buffer */
+     if (!(s->prnsts & SDHC_SPACE_AVAILABLE)) {
+-        ERRPRINT("Can't write to data buffer: buffer full\n");
++        trace_sdhci_error("Can't write to data buffer: buffer full");
+         return;
+     }
+ 
+@@ -464,8 +440,7 @@ static void sdhci_write_dataport(SDHCIState *s, uint32_t value, unsigned size)
+         s->data_count++;
+         value >>= 8;
+         if (s->data_count >= (s->blksize & 0x0fff)) {
+-            DPRINT_L2("write buffer filled with %u bytes of data\n",
+-                    s->data_count);
++            trace_sdhci_write_dataport(s->data_count);
+             s->data_count = 0;
+             s->prnsts &= ~SDHC_SPACE_AVAILABLE;
+             if (s->prnsts & SDHC_DOING_WRITE) {
+@@ -644,15 +619,14 @@ static void sdhci_do_adma(SDHCIState *s)
  {
-     DeviceClass *dc = DEVICE_CLASS(klass);
+     unsigned int n, begin, length;
+     const uint16_t block_size = s->blksize & 0x0fff;
+-    ADMADescr dscr;
++    ADMADescr dscr = {};
+     int i;
  
-     dc->realize = sdhci_sysbus_realize;
-+    dc->unrealize = sdhci_sysbus_unrealize;
+     for (i = 0; i < SDHC_ADMA_DESCS_PER_DELAY; ++i) {
+         s->admaerr &= ~SDHC_ADMAERR_LENGTH_MISMATCH;
  
-     sdhci_class_init(klass, data);
+         get_adma_description(s, &dscr);
+-        DPRINT_L2("ADMA loop: addr=" TARGET_FMT_plx ", len=%d, attr=%x\n",
+-                dscr.addr, dscr.length, dscr.attr);
++        trace_sdhci_adma_loop(dscr.addr, dscr.length, dscr.attr);
+ 
+         if ((dscr.attr & SDHC_ADMA_ATTR_VALID) == 0) {
+             /* Indicate that error occurred in ST_FDS state */
+@@ -735,8 +709,7 @@ static void sdhci_do_adma(SDHCIState *s)
+             break;
+         case SDHC_ADMA_ATTR_ACT_LINK:   /* link to next descriptor table */
+             s->admasysaddr = dscr.addr;
+-            DPRINT_L1("ADMA link: admasysaddr=0x%" PRIx64 "\n",
+-                      s->admasysaddr);
++            trace_sdhci_adma("link", s->admasysaddr);
+             break;
+         default:
+             s->admasysaddr += dscr.incr;
+@@ -744,8 +717,7 @@ static void sdhci_do_adma(SDHCIState *s)
+         }
+ 
+         if (dscr.attr & SDHC_ADMA_ATTR_INT) {
+-            DPRINT_L1("ADMA interrupt: admasysaddr=0x%" PRIx64 "\n",
+-                      s->admasysaddr);
++            trace_sdhci_adma("interrupt", s->admasysaddr);
+             if (s->norintstsen & SDHC_NISEN_DMA) {
+                 s->norintsts |= SDHC_NIS_DMA;
+             }
+@@ -756,15 +728,15 @@ static void sdhci_do_adma(SDHCIState *s)
+         /* ADMA transfer terminates if blkcnt == 0 or by END attribute */
+         if (((s->trnmod & SDHC_TRNS_BLK_CNT_EN) &&
+                     (s->blkcnt == 0)) || (dscr.attr & SDHC_ADMA_ATTR_END)) {
+-            DPRINT_L2("ADMA transfer completed\n");
++            trace_sdhci_adma_transfer_completed();
+             if (length || ((dscr.attr & SDHC_ADMA_ATTR_END) &&
+                 (s->trnmod & SDHC_TRNS_BLK_CNT_EN) &&
+                 s->blkcnt != 0)) {
+-                ERRPRINT("SD/MMC host ADMA length mismatch\n");
++                trace_sdhci_error("SD/MMC host ADMA length mismatch");
+                 s->admaerr |= SDHC_ADMAERR_LENGTH_MISMATCH |
+                         SDHC_ADMAERR_STATE_ST_TFR;
+                 if (s->errintstsen & SDHC_EISEN_ADMAERR) {
+-                    ERRPRINT("Set ADMA error flag\n");
++                    trace_sdhci_error("Set ADMA error flag");
+                     s->errintsts |= SDHC_EIS_ADMAERR;
+                     s->norintsts |= SDHC_NIS_ERR;
+                 }
+@@ -800,7 +772,7 @@ static void sdhci_data_transfer(void *opaque)
+             break;
+         case SDHC_CTRL_ADMA1_32:
+             if (!(s->capareg & SDHC_CAN_DO_ADMA1)) {
+-                ERRPRINT("ADMA1 not supported\n");
++                trace_sdhci_error("ADMA1 not supported");
+                 break;
+             }
+ 
+@@ -808,7 +780,7 @@ static void sdhci_data_transfer(void *opaque)
+             break;
+         case SDHC_CTRL_ADMA2_32:
+             if (!(s->capareg & SDHC_CAN_DO_ADMA2)) {
+-                ERRPRINT("ADMA2 not supported\n");
++                trace_sdhci_error("ADMA2 not supported");
+                 break;
+             }
+ 
+@@ -817,14 +789,14 @@ static void sdhci_data_transfer(void *opaque)
+         case SDHC_CTRL_ADMA2_64:
+             if (!(s->capareg & SDHC_CAN_DO_ADMA2) ||
+                     !(s->capareg & SDHC_64_BIT_BUS_SUPPORT)) {
+-                ERRPRINT("64 bit ADMA not supported\n");
++                trace_sdhci_error("64 bit ADMA not supported");
+                 break;
+             }
+ 
+             sdhci_do_adma(s);
+             break;
+         default:
+-            ERRPRINT("Unsupported DMA type\n");
++            trace_sdhci_error("Unsupported DMA type");
+             break;
+         }
+     } else {
+@@ -859,8 +831,8 @@ static inline bool
+ sdhci_buff_access_is_sequential(SDHCIState *s, unsigned byte_num)
+ {
+     if ((s->data_count & 0x3) != byte_num) {
+-        ERRPRINT("Non-sequential access to Buffer Data Port register"
+-                "is prohibited\n");
++        trace_sdhci_error("Non-sequential access to Buffer Data Port register"
++                          "is prohibited\n");
+         return false;
+     }
+     return true;
+@@ -890,8 +862,7 @@ static uint64_t sdhci_read(void *opaque, hwaddr offset, unsigned size)
+     case  SDHC_BDATA:
+         if (sdhci_buff_access_is_sequential(s, offset - SDHC_BDATA)) {
+             ret = sdhci_read_dataport(s, size);
+-            DPRINT_L2("read %ub: addr[0x%04x] -> %u(0x%x)\n", size, (int)offset,
+-                      ret, ret);
++            trace_sdhci_access("read", size, offset, "->", ret, ret);
+             return ret;
+         }
+         break;
+@@ -943,7 +914,7 @@ static uint64_t sdhci_read(void *opaque, hwaddr offset, unsigned size)
+ 
+     ret >>= (offset & 0x3) * 8;
+     ret &= (1ULL << (size * 8)) - 1;
+-    DPRINT_L2("read %ub: addr[0x%04x] -> %u(0x%x)\n", size, (int)offset, ret, ret);
++    trace_sdhci_access("read", size, offset, "->", ret, ret);
+     return ret;
  }
+ 
+@@ -1145,8 +1116,8 @@ sdhci_write(void *opaque, hwaddr offset, uint64_t val, unsigned size)
+                       "not implemented\n", size, offset, value >> shift);
+         break;
+     }
+-    DPRINT_L2("write %ub: addr[0x%04x] <- %u(0x%x)\n",
+-              size, (int)offset, value >> shift, value >> shift);
++    trace_sdhci_access("write", size, offset, "<-",
++                       value >> shift, value >> shift);
+ }
+ 
+ static const MemoryRegionOps sdhci_mmio_ops = {
+diff --git a/hw/sd/trace-events b/hw/sd/trace-events
+index 1fc0bcf44b..f7a85be53d 100644
+--- a/hw/sd/trace-events
++++ b/hw/sd/trace-events
+@@ -1,5 +1,19 @@
+ # See docs/devel/tracing.txt for syntax documentation.
+ 
++# hw/sd/sdhci.c
++sdhci_set_inserted(const char *level) "card state changed: %s"
++sdhci_send_command(uint8_t cmd, uint32_t arg) "sending CMD%02u ARG[0x%08x]"
++sdhci_error(const char *msg) "%s"
++sdhci_response4(uint32_t r0) "Response: RSPREG[31..0]=0x%08x"
++sdhci_response16(uint32_t r3, uint32_t r2, uint32_t r1, uint32_t r0) "Response received: RSPREG[127..96]=0x%08x, RSPREG[95..64]=0x%08x, RSPREG[63..32]=0x%08x, RSPREG[31..0]=0x%08x"
++sdhci_end_transfer(uint8_t cmd, uint32_t arg) "Automatically issue CMD%02u 0x%08x"
++sdhci_adma(const char *desc, uint32_t sysad) "ADMA %s: admasysaddr=0x%" PRIx32
++sdhci_adma_loop(uint64_t addr, uint16_t length, uint8_t attr) "ADMA loop: addr=0x%08" HWADDR_PRIx ", len=%d, attr=0x%x"
++sdhci_adma_transfer_completed(void) "ADMA transfer completed"
++sdhci_access(const char *access, unsigned int size, uint64_t offset, const char *dir, uint64_t val, uint64_t val2) "%s %ub: addr[0x%04" HWADDR_PRIx "] %s %" PRIu64 "(0x%" PRIx64 ")"
++sdhci_read_dataport(uint16_t data_count) "all %u bytes of data have been read from input buffer"
++sdhci_write_dataport(uint16_t data_count) "write buffer filled with %u bytes of data"
++
+ # hw/sd/milkymist-memcard.c
+ milkymist_memcard_memory_read(uint32_t addr, uint32_t value) "addr 0x%08x value 0x%08x"
+ milkymist_memcard_memory_write(uint32_t addr, uint32_t value) "addr 0x%08x value 0x%08x"
 -- 
 2.15.1
