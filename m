@@ -1,26 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50780)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51350)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1eP9lv-0007xn-Of
-	for qemu-devel@nongnu.org; Wed, 13 Dec 2017 11:20:40 -0500
+	(envelope-from <armbru@redhat.com>) id 1eP9oX-0001w2-JG
+	for qemu-devel@nongnu.org; Wed, 13 Dec 2017 11:23:22 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1eP9lq-0007Eb-MI
-	for qemu-devel@nongnu.org; Wed, 13 Dec 2017 11:20:39 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:60841)
+	(envelope-from <armbru@redhat.com>) id 1eP9oS-0000XF-GC
+	for qemu-devel@nongnu.org; Wed, 13 Dec 2017 11:23:21 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:53882)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1eP9lq-0007E5-Dj
-	for qemu-devel@nongnu.org; Wed, 13 Dec 2017 11:20:34 -0500
-Date: Wed, 13 Dec 2017 16:20:22 +0000
-From: Stefan Hajnoczi <stefanha@redhat.com>
-Message-ID: <20171213162022.GJ7173@stefanha-x1.localdomain>
-References: <20171205055200.16305-1-peterx@redhat.com>
-	<20171205055200.16305-10-peterx@redhat.com>
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1eP9oS-0000WQ-AH
+	for qemu-devel@nongnu.org; Wed, 13 Dec 2017 11:23:16 -0500
+From: Markus Armbruster <armbru@redhat.com>
+References: <20170911110623.24981-1-marcandre.lureau@redhat.com>
+	<20170911110623.24981-40-marcandre.lureau@redhat.com>
+Date: Wed, 13 Dec 2017 17:23:06 +0100
+In-Reply-To: <20170911110623.24981-40-marcandre.lureau@redhat.com>
+	(=?utf-8?Q?=22Marc-Andr=C3=A9?= Lureau"'s message of "Mon, 11 Sep 2017
+	13:06:12 +0200")
+Message-ID: <87o9n27g2d.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="CxDuMX1Cv2n9FQfo"
-Content-Disposition: inline
-In-Reply-To: <20171205055200.16305-10-peterx@redhat.com>
-Subject: Re: [Qemu-devel] [RFC v5 09/26] monitor: create monitor dedicate
- iothread
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v3 39/50] qapi-commands: don't initialize
+ command list in qmp_init_marshall()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,86 +30,71 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Xu <peterx@redhat.com>
-Cc: qemu-devel@nongnu.org, Stefan Hajnoczi <shajnocz@redhat.com>, "Daniel P . Berrange" <berrange@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Fam Zheng <famz@redhat.com>, Juan Quintela <quintela@redhat.com>, mdroth@linux.vnet.ibm.com, Eric Blake <eblake@redhat.com>, Laurent Vivier <lvivier@redhat.com>, Markus Armbruster <armbru@redhat.com>, marcandre.lureau@redhat.com, "Dr . David Alan Gilbert" <dgilbert@redhat.com>
+To: =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>
+Cc: qemu-devel@nongnu.org, Michael Roth <mdroth@linux.vnet.ibm.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>
 
+Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com> writes:
 
---CxDuMX1Cv2n9FQfo
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+> This will let the caller add several list of commands.
 
-On Tue, Dec 05, 2017 at 01:51:43PM +0800, Peter Xu wrote:
-> @@ -208,6 +209,12 @@ struct Monitor {
->      QTAILQ_ENTRY(Monitor) entry;
->  };
-> =20
-> +struct MonitorGlobal {
-> +    IOThread *mon_iothread;
-> +};
-> +
-> +static struct MonitorGlobal mon_global;
+What for?  I guess that'll become clear later in this series.
 
-structs can be anonymous.  That avoids the QEMU coding style violation
-(structs must be typedefed):
-
-  static struct {
-      IOThread *mon_iothread;
-  } mon_global;
-
-In general global variables are usually top-level variables in QEMU.
-I'm not sure why wrapping globals in a struct is useful.
-
-> @@ -4117,6 +4136,16 @@ void monitor_cleanup(void)
+> Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+> ---
+>  scripts/qapi-commands.py  | 2 --
+>  monitor.c                 | 1 +
+>  qga/main.c                | 1 +
+>  tests/test-qmp-commands.c | 1 +
+>  4 files changed, 3 insertions(+), 2 deletions(-)
+>
+> diff --git a/scripts/qapi-commands.py b/scripts/qapi-commands.py
+> index 8af8d913b9..7455d2b8bb 100644
+> --- a/scripts/qapi-commands.py
+> +++ b/scripts/qapi-commands.py
+> @@ -211,8 +211,6 @@ def gen_registry(registry):
+>=20=20
+>  void %(c_prefix)sqmp_init_marshal(QmpCommandList *cmds)
 >  {
->      Monitor *mon, *next;
-> =20
-> +    /*
-> +     * We need to explicitly stop the iothread (but not destroy it),
-> +     * cleanup the monitor resources, then destroy the iothread.  See
-> +     * again on the glib bug mentioned in 2b316774f6 for a reason.
-> +     *
-> +     * TODO: the bug is fixed in glib 2.28, so we can remove this hack
-> +     * as long as we won't support glib versions older than it.
-> +     */
+> -    QTAILQ_INIT(cmds);
+> -
+>  ''',
+>                  c_prefix=3Dc_name(prefix, protect=3DFalse))
+>      ret +=3D registry
 
-I find this comment confusing.  There is no GSource .finalize() in
-monitor.c so why does monitor_cleanup() need to work around the bug?
+Please update qapi-code-gen.txt, too.
 
-I see that monitor_data_destroy() is not thread-safe so the IOThread
-must be stopped first.  That is unrelated to glib.
-
-> +    iothread_stop(mon_global.mon_iothread);
-> +
->      qemu_mutex_lock(&monitor_lock);
->      QTAILQ_FOREACH_SAFE(mon, &mon_list, entry, next) {
->          QTAILQ_REMOVE(&mon_list, mon, entry);
-> @@ -4124,6 +4153,9 @@ void monitor_cleanup(void)
->          g_free(mon);
->      }
->      qemu_mutex_unlock(&monitor_lock);
-> +
-> +    iothread_destroy(mon_global.mon_iothread);
-> +    mon_global.mon_iothread =3D NULL;
->  }
-> =20
->  QemuOptsList qemu_mon_opts =3D {
-> --=20
-> 2.14.3
->=20
-
---CxDuMX1Cv2n9FQfo
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEcBAEBAgAGBQJaMVNGAAoJEJykq7OBq3PIBAEH/Ah/OFMGfWyDSv8VuYy9StxL
-MH2GEjoYYqQwMohFAueQPKQ76SFPjsuylunVOVICqPi78IV5o+l0gMITfdvJu4XZ
-yM4imLahKjL/fSRiAtPk4wYrMjMFoE8PRmN70RSYeZ1NqXPpSb1SMp+Y3EUB168q
-EriBh9Cin6uei7Q7NbYmoViNkx7EIwz2K9+meHd9S9CRaunbRirOpmvfAhp+pcN4
-eDrS89xczSCCnL6+TAY0YNn1w9efe/fpecUG9pN5Uq3kY7A8kZhHH0jScxmTlV3l
-zKlpmDMeeszmo+OkKfRrMcUiKt6zWgpHPeuFmYTFx961t6s9II3DDsd/CD0kCoU=
-=OMJH
------END PGP SIGNATURE-----
-
---CxDuMX1Cv2n9FQfo--
+> diff --git a/monitor.c b/monitor.c
+> index b5ddcf8c67..bf8a7685bf 100644
+> --- a/monitor.c
+> +++ b/monitor.c
+> @@ -1001,6 +1001,7 @@ void monitor_init_qmp_commands(void)
+>       *   "qmp_capabilities", to enforce capability negotiation
+>       */
+>=20=20
+> +    QTAILQ_INIT(&qmp_commands);
+>      qmp_init_marshal(&qmp_commands);
+>=20=20
+>      qmp_register_command(&qmp_commands, "query-qmp-schema",
+> diff --git a/qga/main.c b/qga/main.c
+> index 62a62755bd..b949b1ccb0 100644
+> --- a/qga/main.c
+> +++ b/qga/main.c
+> @@ -1360,6 +1360,7 @@ int main(int argc, char **argv)
+>=20=20
+>      config->log_level =3D G_LOG_LEVEL_ERROR | G_LOG_LEVEL_CRITICAL;
+>=20=20
+> +    QTAILQ_INIT(&ga_commands);
+>      qga_qmp_init_marshal(&ga_commands);
+>=20=20
+>      init_dfl_pathnames();
+> diff --git a/tests/test-qmp-commands.c b/tests/test-qmp-commands.c
+> index ad7b6e4e1d..28ce88e012 100644
+> --- a/tests/test-qmp-commands.c
+> +++ b/tests/test-qmp-commands.c
+> @@ -283,6 +283,7 @@ int main(int argc, char **argv)
+>      g_test_add_func("/0.15/dealloc_types", test_dealloc_types);
+>      g_test_add_func("/0.15/dealloc_partial", test_dealloc_partial);
+>=20=20
+> +    QTAILQ_INIT(&qmp_commands);
+>      test_qmp_init_marshal(&qmp_commands);
+>      g_test_run();
