@@ -1,21 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47944)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48322)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1ePERN-0000b6-TJ
-	for qemu-devel@nongnu.org; Wed, 13 Dec 2017 16:19:46 -0500
+	(envelope-from <paolo.bonzini@gmail.com>) id 1ePET4-0001Mh-Vd
+	for qemu-devel@nongnu.org; Wed, 13 Dec 2017 16:21:31 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1ePERJ-00026g-Up
-	for qemu-devel@nongnu.org; Wed, 13 Dec 2017 16:19:45 -0500
+	(envelope-from <paolo.bonzini@gmail.com>) id 1ePET4-00043K-05
+	for qemu-devel@nongnu.org; Wed, 13 Dec 2017 16:21:30 -0500
 Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
-References: <20171213204611.26276-1-jsnow@redhat.com>
+References: <b630fe8c-6905-6743-d29d-ded450d5d10b@redhat.com>
+	<20171211114129.GC3350@lemon>
+	<c57f063f-a95b-4a82-8b5e-a713ba61d734@redhat.com>
 From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <4ca12a05-2e7b-9c39-d32d-ec3e3febead1@redhat.com>
-Date: Wed, 13 Dec 2017 22:19:37 +0100
+Message-ID: <7ee9e2f2-9690-9f6d-6952-d96953501c0f@redhat.com>
+Date: Wed, 13 Dec 2017 22:21:13 +0100
 MIME-Version: 1.0
-In-Reply-To: <20171213204611.26276-1-jsnow@redhat.com>
+In-Reply-To: <c57f063f-a95b-4a82-8b5e-a713ba61d734@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v2] blockjob: kick jobs on set-speed
+Subject: Re: [Qemu-devel] QEMU not honouring bootorder
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,26 +26,27 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: John Snow <jsnow@redhat.com>, qemu-block@nongnu.org
-Cc: kwolf@redhat.com, qemu-devel@nongnu.org, mreitz@redhat.com, stefanha@redhat.com
+To: Michal Privoznik <mprivozn@redhat.com>, Fam Zheng <famz@redhat.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, qemu-block@nongnu.org
 
-On 13/12/2017 21:46, John Snow wrote:
-> 
-> When a user provides a new speed, kick the job to allow it to recalculate
-> its delay.
-> 
-> Signed-off-by: John Snow <jsnow@redhat.com>
-> ---
-> 
-> RFC: Why is block_job_mutex shared between all jobs,
->      instead of being per-job?
+On 11/12/2017 13:14, Michal Privoznik wrote:
+>>>   qemu-system-x86_64 \
+>>>   -boot menu=on,strict=on \
+>>>   -device lsi,id=scsi0,bus=pci.0 \
+>>>   -drive file=/var/lib/libvirt/images/fedora.qcow2,format=qcow2,if=none,id=drive-scsi0 \
+>>>   -device scsi-hd,bus=scsi0.0,drive=drive-scsi0,bootindex=1 \
+>>>   -drive file=/dev/sde,format=raw,if=none,id=drive-scsi1 \
+>>>   -device scsi-block,bus=scsi0.0,drive=drive-scsi1,bootindex=2
+>>>
+>>> It was found that if 'drive-scsi1' is scsi-hd instead of scsi-block
+>>> everything works as expected and I can boot my guest successfully.
+>> Does it help if you add SCSI level ordering with "lun={0,1},channel=0,scsi-id=0"
+>> for both devices?
+> Setting lun helps. On the other hand, I had to change from LSI
+> controller to virtio-scsi as LSI doesn't support more than 1 LUNs.
 
-Because that patch was partly extracted out of a bigger one, and I was
-both lazy and worried about breaking things close to the release.
+Does it help to use virtio-scsi and keep the default assignment?
 
-In other words more uses of the mutex are coming, and it will need to be
-shared between jobs to work fine with transactions and monitor commands
-(which don't know the job they're working on until they've looked it
-up).  Starting a paused block job is not a hot path. :)
+Thanks,
 
 Paolo
