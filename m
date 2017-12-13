@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54872)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54915)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1eOzRK-0008To-7J
-	for qemu-devel@nongnu.org; Wed, 13 Dec 2017 00:18:47 -0500
+	id 1eOzRU-000085-OM
+	for qemu-devel@nongnu.org; Wed, 13 Dec 2017 00:18:53 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1eOzRJ-0004Vv-BB
-	for qemu-devel@nongnu.org; Wed, 13 Dec 2017 00:18:42 -0500
+	id 1eOzRT-0004ac-Q5
+	for qemu-devel@nongnu.org; Wed, 13 Dec 2017 00:18:52 -0500
 Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
 	<philippe.mathieu.daude@gmail.com>
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
-Date: Wed, 13 Dec 2017 02:17:34 -0300
-Message-Id: <20171213051736.17755-3-f4bug@amsat.org>
+Date: Wed, 13 Dec 2017 02:17:35 -0300
+Message-Id: <20171213051736.17755-4-f4bug@amsat.org>
 In-Reply-To: <20171213051736.17755-1-f4bug@amsat.org>
 References: <20171213051736.17755-1-f4bug@amsat.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH 2/4] hw/registerfields: fix a typo in the
- FIELD() documentation
+Subject: [Qemu-devel] [PATCH 3/4] hw/registerfields: add 64-bit
+ extract/deposit macros
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,21 +32,37 @@ Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, qemu-devel@nong
 
 Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 ---
- include/hw/registerfields.h | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ include/hw/registerfields.h | 11 +++++++++++
+ 1 file changed, 11 insertions(+)
 
 diff --git a/include/hw/registerfields.h b/include/hw/registerfields.h
-index af101d5ae6..ad9d7a82a3 100644
+index ad9d7a82a3..f59e7f47bd 100644
 --- a/include/hw/registerfields.h
 +++ b/include/hw/registerfields.h
-@@ -22,7 +22,7 @@
+@@ -35,6 +35,9 @@
+ #define FIELD_EX32(storage, reg, field)                                   \
+     extract32((storage), R_ ## reg ## _ ## field ## _SHIFT,               \
+               R_ ## reg ## _ ## field ## _LENGTH)
++#define FIELD_EX64(storage, reg, field)                                   \
++    extract64((storage), R_ ## reg ## _ ## field ## _SHIFT,               \
++              R_ ## reg ## _ ## field ## _LENGTH)
  
- /* Define SHIFT, LENGTH and MASK constants for a field within a register */
+ /* Extract a field from an array of registers */
+ #define ARRAY_FIELD_EX32(regs, reg, field)                                \
+@@ -52,6 +55,14 @@
+     d = deposit32((storage), R_ ## reg ## _ ## field ## _SHIFT,           \
+                   R_ ## reg ## _ ## field ## _LENGTH, v.v);               \
+     d; })
++#define FIELD_DP64(storage, reg, field, val) ({                           \
++    struct {                                                              \
++        unsigned int v:R_ ## reg ## _ ## field ## _LENGTH;                \
++    } v = { .v = val };                                                   \
++    uint64_t d;                                                           \
++    d = deposit64((storage), R_ ## reg ## _ ## field ## _SHIFT,           \
++                  R_ ## reg ## _ ## field ## _LENGTH, v.v);               \
++    d; })
  
--/* This macro will define FOO_BAR_MASK, FOO_BAR_SHIFT and FOO_BAR_LENGTH 
-+/* This macro will define R_FOO_BAR_MASK, R_FOO_BAR_SHIFT and R_FOO_BAR_LENGTH
-  * constants for field BAR in register FOO.
-  */
- #define FIELD(reg, field, shift, length)                                  \
+ /* Deposit a field to array of registers.  */
+ #define ARRAY_FIELD_DP32(regs, reg, field, val)                           \
 -- 
 2.15.1
