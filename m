@@ -1,14 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39834)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43994)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1ePDv9-00055f-6k
-	for qemu-devel@nongnu.org; Wed, 13 Dec 2017 15:46:28 -0500
+	(envelope-from <mst@redhat.com>) id 1ePE7g-0006NF-BN
+	for qemu-devel@nongnu.org; Wed, 13 Dec 2017 15:59:25 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1ePDv8-0000Bn-6R
-	for qemu-devel@nongnu.org; Wed, 13 Dec 2017 15:46:27 -0500
-From: John Snow <jsnow@redhat.com>
-Date: Wed, 13 Dec 2017 15:46:11 -0500
-Message-Id: <20171213204611.26276-1-jsnow@redhat.com>
-Subject: [Qemu-devel] [PATCH v2] blockjob: kick jobs on set-speed
+	(envelope-from <mst@redhat.com>) id 1ePE7b-0002hA-FE
+	for qemu-devel@nongnu.org; Wed, 13 Dec 2017 15:59:24 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:59952)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1ePE7b-0002gR-91
+	for qemu-devel@nongnu.org; Wed, 13 Dec 2017 15:59:19 -0500
+Date: Wed, 13 Dec 2017 22:59:10 +0200
+From: "Michael S. Tsirkin" <mst@redhat.com>
+Message-ID: <20171213222102-mutt-send-email-mst@kernel.org>
+References: <5A2A347B.9070006@intel.com>
+	<CAJSP0QUAqCzFgVtM1cg_KybdyrZa_FRUHhDN7oLfRjZ2ZVkp4g@mail.gmail.com>
+	<286AC319A985734F985F78AFA26841F73937E001@shsmsx102.ccr.corp.intel.com>
+	<20171211111147.GF13593@stefanha-x1.localdomain>
+	<286AC319A985734F985F78AFA26841F73937EEED@shsmsx102.ccr.corp.intel.com>
+	<20171212101440.GB6985@stefanha-x1.localdomain>
+	<5A30E0C1.3070905@intel.com>
+	<20171213123521.GL16782@stefanha-x1.localdomain>
+	<20171213165142-mutt-send-email-mst@kernel.org>
+	<CAJSP0QWHJBL4APkeMt8-P8PFaPF=Vbi0NSnJtU7YX67fJrW=hw@mail.gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CAJSP0QWHJBL4APkeMt8-P8PFaPF=Vbi0NSnJtU7YX67fJrW=hw@mail.gmail.com>
+Subject: Re: [Qemu-devel] [virtio-dev] [PATCH v3 0/7] Vhost-pci for inter-VM
+ communication
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -17,104 +36,51 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-block@nongnu.org
-Cc: kwolf@redhat.com, jcody@redhat.com, qemu-devel@nongnu.org, stefanha@redhat.com, mreitz@redhat.com, John Snow <jsnow@redhat.com>
+To: Stefan Hajnoczi <stefanha@gmail.com>
+Cc: Wei Wang <wei.w.wang@intel.com>, Stefan Hajnoczi <stefanha@redhat.com>, "virtio-dev@lists.oasis-open.org" <virtio-dev@lists.oasis-open.org>, "Yang, Zhiyong" <zhiyong.yang@intel.com>, "jan.kiszka@siemens.com" <jan.kiszka@siemens.com>, "jasowang@redhat.com" <jasowang@redhat.com>, "avi.cohen@huawei.com" <avi.cohen@huawei.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "pbonzini@redhat.com" <pbonzini@redhat.com>, "marcandre.lureau@redhat.com" <marcandre.lureau@redhat.com>, Maxime Coquelin <maxime.coquelin@redhat.com>
 
-If users set an unreasonably low speed (like one byte per second), the
-calculated delay may exceed many hours. While we like to punish users
-for asking for stupid things, we do also like to allow users to correct
-their wicked ways.
+>  * VHOST_USER_SET_VRING_KICK
+> 
+>    Set up vring kick doorbell (unless bit 8 is set) before sending
+>    VHOST_USER_SET_VRING_KICK to the guest.
 
-When a user provides a new speed, kick the job to allow it to recalculate
-its delay.
+But guest can't use it, now can it?
 
-Signed-off-by: John Snow <jsnow@redhat.com>
+What guest needs is a mapping to interrupts.
+
+
+>  * VHOST_USER_SET_VRING_CALL
+> 
+>    Set up the vring call doorbell (unless bit 8 is set) before sending
+>    VHOST_USER_SET_VRING_CALL to the guest.
+
+Same here. what guest needs is mapping from io to notifications,
+right?
+
 ---
 
-RFC: Why is block_job_mutex shared between all jobs,
-     instead of being per-job?
+> > I took a quick look and I doubt we can do something that is both
+> > compatible with the existing vhost-user and will make it possible to
+> > extend the protocol without qemu changes. Let's assume I pass a new
+> > message over the vhost-user channel.  How do we know it's safe to pass
+> > it to the guest?
+> >
+> > That's why we gate any protocol change on a feature bit and must parse
+> > all messages.
+> 
+> QEMU must parse all messages and cannot pass through unknown messages.
+> Think of QEMU vhost-pci as both a vhost-user slave to the other VM and
+> a vhost-user master to the guest.
+> 
+> QEMU changes are necessary when the vhost protocol is extended.
+> Device interface changes are only necessary if doorbells or shared
+> memory regions are added, any other protocol changes do not change the
+> device interface.
+> 
+> Stefan
 
- blockjob.c | 30 +++++++++++++++++++++++++++++-
- 1 file changed, 29 insertions(+), 1 deletion(-)
+I guess you have a different definition of a device interface than
+myself - I consider it an interface change if a feature bit changes :)
 
-diff --git a/blockjob.c b/blockjob.c
-index 715c2c2680..6173e4728c 100644
---- a/blockjob.c
-+++ b/blockjob.c
-@@ -59,6 +59,7 @@ static void __attribute__((__constructor__)) block_job_init(void)
- 
- static void block_job_event_cancelled(BlockJob *job);
- static void block_job_event_completed(BlockJob *job, const char *msg);
-+static void block_job_enter_cond(BlockJob *job, bool(*fn)(BlockJob *job));
- 
- /* Transactional group of block jobs */
- struct BlockJobTxn {
-@@ -480,9 +481,16 @@ static void block_job_completed_txn_success(BlockJob *job)
-     }
- }
- 
-+/* Assumes the block_job_mutex is held */
-+static bool block_job_timer_pending(BlockJob *job)
-+{
-+    return timer_pending(&job->sleep_timer);
-+}
-+
- void block_job_set_speed(BlockJob *job, int64_t speed, Error **errp)
- {
-     Error *local_err = NULL;
-+    int64_t old_speed = job->speed;
- 
-     if (!job->driver->set_speed) {
-         error_setg(errp, QERR_UNSUPPORTED);
-@@ -495,6 +503,12 @@ void block_job_set_speed(BlockJob *job, int64_t speed, Error **errp)
-     }
- 
-     job->speed = speed;
-+    if (speed <= old_speed) {
-+        return;
-+    }
-+
-+    /* kick only if a timer is pending */
-+    block_job_enter_cond(job, block_job_timer_pending);
- }
- 
- void block_job_complete(BlockJob *job, Error **errp)
-@@ -821,7 +835,11 @@ void block_job_resume_all(void)
-     }
- }
- 
--void block_job_enter(BlockJob *job)
-+/*
-+ * Conditionally enter a block_job pending a call to fn() while
-+ * under the block_job_lock critical section.
-+ */
-+static void block_job_enter_cond(BlockJob *job, bool(*fn)(BlockJob *job))
- {
-     if (!block_job_started(job)) {
-         return;
-@@ -836,6 +854,11 @@ void block_job_enter(BlockJob *job)
-         return;
-     }
- 
-+    if (fn && !fn(job)) {
-+        block_job_unlock();
-+        return;
-+    }
-+
-     assert(!job->deferred_to_main_loop);
-     timer_del(&job->sleep_timer);
-     job->busy = true;
-@@ -843,6 +866,11 @@ void block_job_enter(BlockJob *job)
-     aio_co_wake(job->co);
- }
- 
-+void block_job_enter(BlockJob *job)
-+{
-+    block_job_enter_cond(job, NULL);
-+}
-+
- bool block_job_is_cancelled(BlockJob *job)
- {
-     return job->cancelled;
 -- 
-2.14.3
+MST
