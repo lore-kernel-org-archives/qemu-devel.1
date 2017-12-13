@@ -1,24 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51407)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51474)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1ePBWV-0004cV-9D
-	for qemu-devel@nongnu.org; Wed, 13 Dec 2017 13:12:52 -0500
+	(envelope-from <pm215@archaic.org.uk>) id 1ePBWY-0004fR-9R
+	for qemu-devel@nongnu.org; Wed, 13 Dec 2017 13:12:55 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1ePBWU-0007dz-61
-	for qemu-devel@nongnu.org; Wed, 13 Dec 2017 13:12:51 -0500
-Received: from orth.archaic.org.uk ([2001:8b0:1d0::2]:39116)
+	(envelope-from <pm215@archaic.org.uk>) id 1ePBWX-0007kh-Ha
+	for qemu-devel@nongnu.org; Wed, 13 Dec 2017 13:12:54 -0500
+Received: from orth.archaic.org.uk ([2001:8b0:1d0::2]:39126)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <pm215@archaic.org.uk>)
-	id 1ePBWT-0007aJ-Up
-	for qemu-devel@nongnu.org; Wed, 13 Dec 2017 13:12:50 -0500
+	id 1ePBWX-0007jE-AU
+	for qemu-devel@nongnu.org; Wed, 13 Dec 2017 13:12:53 -0500
 Received: from pm215 by orth.archaic.org.uk with local (Exim 4.89)
-	(envelope-from <pm215@archaic.org.uk>) id 1ePBWS-0007cJ-Kn
-	for qemu-devel@nongnu.org; Wed, 13 Dec 2017 18:12:48 +0000
+	(envelope-from <pm215@archaic.org.uk>) id 1ePBWW-0007en-B7
+	for qemu-devel@nongnu.org; Wed, 13 Dec 2017 18:12:52 +0000
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Wed, 13 Dec 2017 18:12:07 +0000
-Message-Id: <1513188761-20784-10-git-send-email-peter.maydell@linaro.org>
+Date: Wed, 13 Dec 2017 18:12:12 +0000
+Message-Id: <1513188761-20784-15-git-send-email-peter.maydell@linaro.org>
 In-Reply-To: <1513188761-20784-1-git-send-email-peter.maydell@linaro.org>
 References: <1513188761-20784-1-git-send-email-peter.maydell@linaro.org>
-Subject: [Qemu-devel] [PULL 09/43] xilinx_spips: Add support for zero pumping
+Subject: [Qemu-devel] [PULL 14/43] hw/intc/arm_gicv3_its: Don't call
+ post_load on reset
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,125 +30,50 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-From: Francisco Iglesias <frasse.iglesias@gmail.com>
+From: Eric Auger <eric.auger@redhat.com>
 
-Add support for zero pumping according to the transfer size register.
+>From the very beginning, post_load() was called from common
+reset. This is not standard and obliged to discriminate the
+reset case from the restore case using the iidr value.
 
-Signed-off-by: Francisco Iglesias <frasse.iglesias@gmail.com>
-Reviewed-by: Edgar E. Iglesias <edgar.iglesias@xilinx.com>
-Tested-by: Edgar E. Iglesias <edgar.iglesias@xilinx.com>
-Message-id: 20171126231634.9531-10-frasse.iglesias@gmail.com
+Let's get rid of that call.
+
+Signed-off-by: Eric Auger <eric.auger@redhat.com>
+Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
+Message-id: 1511883692-11511-2-git-send-email-eric.auger@redhat.com
 Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 ---
- include/hw/ssi/xilinx_spips.h |  2 ++
- hw/ssi/xilinx_spips.c         | 47 ++++++++++++++++++++++++++++++++++++-------
- 2 files changed, 42 insertions(+), 7 deletions(-)
+ hw/intc/arm_gicv3_its_common.c | 2 --
+ hw/intc/arm_gicv3_its_kvm.c    | 4 ----
+ 2 files changed, 6 deletions(-)
 
-diff --git a/include/hw/ssi/xilinx_spips.h b/include/hw/ssi/xilinx_spips.h
-index bac90a5..ad2175a 100644
---- a/include/hw/ssi/xilinx_spips.h
-+++ b/include/hw/ssi/xilinx_spips.h
-@@ -76,6 +76,8 @@ struct XilinxSPIPS {
-     uint32_t rx_discard;
- 
-     uint32_t regs[XLNX_SPIPS_R_MAX];
-+
-+    bool man_start_com;
- };
- 
- typedef struct {
-diff --git a/hw/ssi/xilinx_spips.c b/hw/ssi/xilinx_spips.c
-index 4621dbb..878b17e 100644
---- a/hw/ssi/xilinx_spips.c
-+++ b/hw/ssi/xilinx_spips.c
-@@ -109,6 +109,7 @@
-     FIELD(CMND, DUMMY_CYCLES, 2, 6)
- #define R_CMND_DMA_EN         (1 << 1)
- #define R_CMND_PUSH_WAIT      (1 << 0)
-+#define R_TRANSFER_SIZE     (0xc4 / 4)
- #define R_LQSPI_STS         (0xA4 / 4)
- #define LQSPI_STS_WR_RECVD      (1 << 1)
- 
-@@ -227,6 +228,7 @@ static void xilinx_spips_reset(DeviceState *d)
-     s->link_state_next_when = 0;
-     s->snoop_state = SNOOP_CHECKING;
-     s->cmd_dummies = 0;
-+    s->man_start_com = false;
-     xilinx_spips_update_ixr(s);
-     xilinx_spips_update_cs_lines(s);
- }
-@@ -464,6 +466,41 @@ static inline void tx_data_bytes(Fifo8 *fifo, uint32_t value, int num, bool be)
-     }
+diff --git a/hw/intc/arm_gicv3_its_common.c b/hw/intc/arm_gicv3_its_common.c
+index f2cce59..2bd2f0f 100644
+--- a/hw/intc/arm_gicv3_its_common.c
++++ b/hw/intc/arm_gicv3_its_common.c
+@@ -131,8 +131,6 @@ static void gicv3_its_common_reset(DeviceState *dev)
+     s->creadr = 0;
+     s->iidr = 0;
+     memset(&s->baser, 0, sizeof(s->baser));
+-
+-    gicv3_its_post_load(s, 0);
  }
  
-+static void xilinx_spips_check_zero_pump(XilinxSPIPS *s)
-+{
-+    if (!s->regs[R_TRANSFER_SIZE]) {
-+        return;
-+    }
-+    if (!fifo8_is_empty(&s->tx_fifo) && s->regs[R_CMND] & R_CMND_PUSH_WAIT) {
-+        return;
-+    }
-+    /*
-+     * The zero pump must never fill tx fifo such that rx overflow is
-+     * possible
-+     */
-+    while (s->regs[R_TRANSFER_SIZE] &&
-+           s->rx_fifo.num + s->tx_fifo.num < RXFF_A_Q - 3) {
-+        /* endianess just doesn't matter when zero pumping */
-+        tx_data_bytes(&s->tx_fifo, 0, 4, false);
-+        s->regs[R_TRANSFER_SIZE] &= ~0x03ull;
-+        s->regs[R_TRANSFER_SIZE] -= 4;
-+    }
-+}
-+
-+static void xilinx_spips_check_flush(XilinxSPIPS *s)
-+{
-+    if (s->man_start_com ||
-+        (!fifo8_is_empty(&s->tx_fifo) &&
-+         !(s->regs[R_CONFIG] & MAN_START_EN))) {
-+        xilinx_spips_check_zero_pump(s);
-+        xilinx_spips_flush_txfifo(s);
-+    }
-+    if (fifo8_is_empty(&s->tx_fifo) && !s->regs[R_TRANSFER_SIZE]) {
-+        s->man_start_com = false;
-+    }
-+    xilinx_spips_update_ixr(s);
-+}
-+
- static inline int rx_data_bytes(Fifo8 *fifo, uint8_t *value, int max)
+ static void gicv3_its_common_class_init(ObjectClass *klass, void *data)
+diff --git a/hw/intc/arm_gicv3_its_kvm.c b/hw/intc/arm_gicv3_its_kvm.c
+index 6fb45df..b1b322b 100644
+--- a/hw/intc/arm_gicv3_its_kvm.c
++++ b/hw/intc/arm_gicv3_its_kvm.c
+@@ -155,10 +155,6 @@ static void kvm_arm_its_post_load(GICv3ITSState *s)
  {
      int i;
-@@ -533,7 +570,6 @@ static void xilinx_spips_write(void *opaque, hwaddr addr,
-                                         uint64_t value, unsigned size)
- {
-     int mask = ~0;
--    int man_start_com = 0;
-     XilinxSPIPS *s = opaque;
  
-     DB_PRINT_L(0, "addr=" TARGET_FMT_plx " = %x\n", addr, (unsigned)value);
-@@ -541,8 +577,8 @@ static void xilinx_spips_write(void *opaque, hwaddr addr,
-     switch (addr) {
-     case R_CONFIG:
-         mask = ~(R_CONFIG_RSVD | MAN_START_COM);
--        if (value & MAN_START_COM) {
--            man_start_com = 1;
-+        if ((value & MAN_START_COM) && (s->regs[R_CONFIG] & MAN_START_EN)) {
-+            s->man_start_com = true;
-         }
-         break;
-     case R_INTR_STATUS:
-@@ -588,10 +624,7 @@ static void xilinx_spips_write(void *opaque, hwaddr addr,
-     s->regs[addr] = (s->regs[addr] & ~mask) | (value & mask);
- no_reg_update:
-     xilinx_spips_update_cs_lines(s);
--    if ((man_start_com && s->regs[R_CONFIG] & MAN_START_EN) ||
--            (fifo8_is_empty(&s->tx_fifo) && s->regs[R_CONFIG] & MAN_START_EN)) {
--        xilinx_spips_flush_txfifo(s);
+-    if (!s->iidr) {
+-        return;
 -    }
-+    xilinx_spips_check_flush(s);
-     xilinx_spips_update_cs_lines(s);
-     xilinx_spips_update_ixr(s);
- }
+-
+     kvm_device_access(s->dev_fd, KVM_DEV_ARM_VGIC_GRP_ITS_REGS,
+                       GITS_IIDR, &s->iidr, true, &error_abort);
+ 
 -- 
 2.7.4
