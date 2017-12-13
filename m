@@ -1,19 +1,18 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46102)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49678)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1ePBCv-00035m-VO
-	for qemu-devel@nongnu.org; Wed, 13 Dec 2017 12:52:38 -0500
+	(envelope-from <dgilbert@redhat.com>) id 1ePBS8-0000sg-24
+	for qemu-devel@nongnu.org; Wed, 13 Dec 2017 13:08:20 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1ePBCu-0004SX-Tv
-	for qemu-devel@nongnu.org; Wed, 13 Dec 2017 12:52:38 -0500
-Received: from orth.archaic.org.uk ([2001:8b0:1d0::2]:39092)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pm215@archaic.org.uk>)
-	id 1ePBCu-0004OR-Nb
-	for qemu-devel@nongnu.org; Wed, 13 Dec 2017 12:52:36 -0500
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Wed, 13 Dec 2017 17:52:27 +0000
-Message-Id: <1513187549-2435-1-git-send-email-peter.maydell@linaro.org>
-Subject: [Qemu-devel] [PATCH 0/2] Don't abort on writes to ROMs
+	(envelope-from <dgilbert@redhat.com>) id 1ePBS4-00048S-W9
+	for qemu-devel@nongnu.org; Wed, 13 Dec 2017 13:08:20 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:54462)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1ePBS4-00047B-Q4
+	for qemu-devel@nongnu.org; Wed, 13 Dec 2017 13:08:16 -0500
+From: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>
+Date: Wed, 13 Dec 2017 18:08:01 +0000
+Message-Id: <20171213180807.7066-1-dgilbert@redhat.com>
+Subject: [Qemu-devel] [PATCH v4 0/6] Rework vhost memory region updates
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,37 +21,42 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: patches@linaro.org, Paolo Bonzini <pbonzini@redhat.com>, Aurelien Jarno <aurelien@aurel32.net>, Yongbok Kim <yongbok.kim@mips.com>, Paul Burton <paul.burton@mips.com>
+To: qemu-devel@nongnu.org, pbonzini@redhat.com, imammedo@redhat.com
+Cc: maxime.coquelin@redhat.com, mst@redhat.com, groug@kaod.org
 
-Currently we set up the io_mem_rom special memory region using the
-unassigned_mem_ops structure; this is then used when a guest tries to
-write to ROM.  This is incorrect, because the behaviour of unassigned
-memory may be different from that of ROM for writes.  In particular,
-on some architectures writing to unassigned memory generates a guest
-exception, whereas writing to ROM is generally ignored.
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
 
-This patchset creates a separate readonly_mem_ops for handling the
-writes to readonly memory, which just ignores them.
+Hi,
+  This patch set reworks the way the vhost code handles changes in
+physical address space layout that came from a discussion with Igor.
+ 
+Its intention is to simplify a lot of the update code,
+and to make it easier for the postcopy+shared code to
+do the hugepage alignments that are needed.
+ 
+Instead of inserting/removing each section during the add/del
+callbacks of the listener, we start afresh and build a list
+from the add and nop callbacks, then at the end compare the list
+we've built with the exisiting list.
+ 
+v4
+  Rework based on comments from Paolo; now using add/nop rather
+  than doing another flatview walk.
+ 
+Dave
 
-Patch 2 removes a workaround in the MIPS boston board which
-is no longer needed once the core memory system is fixed.
+Dr. David Alan Gilbert (6):
+  vhost: Move log_dirty check
+  vhost: Simplify ring verification checks
+  vhost: Add temporary memory structure
+  vhost: add regions to temporary list
+  vhost: compare and flip in new memory region list
+  vhost: Clean out old vhost_set_memory and friends
 
-Disclaimer: I haven't tested the mips change beyond 'make check'
-(I tested the exec patch with a temporary hack to the Arm
-virt board), but I believe it to be correct...
-
-thanks
--- PMM
-
-
-Peter Maydell (2):
-  exec: Don't reuse unassigned_mem_ops for io_mem_rom
-  hw/mips/boston: Remove workaround for writes to ROM aborting
-
- exec.c           | 34 +++++++++++++++++++++++++++++++++-
- hw/mips/boston.c | 14 ++------------
- 2 files changed, 35 insertions(+), 13 deletions(-)
+ hw/virtio/trace-events    |   6 +
+ hw/virtio/vhost.c         | 426 +++++++++++++++-------------------------------
+ include/hw/virtio/vhost.h |   4 +-
+ 3 files changed, 146 insertions(+), 290 deletions(-)
 
 -- 
-2.7.4
+2.14.3
