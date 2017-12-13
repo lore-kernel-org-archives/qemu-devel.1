@@ -1,18 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49678)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49676)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1ePBS8-0000sg-24
-	for qemu-devel@nongnu.org; Wed, 13 Dec 2017 13:08:20 -0500
+	(envelope-from <dgilbert@redhat.com>) id 1ePBS8-0000se-1g
+	for qemu-devel@nongnu.org; Wed, 13 Dec 2017 13:08:21 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1ePBS4-00048S-W9
+	(envelope-from <dgilbert@redhat.com>) id 1ePBS7-00049y-11
 	for qemu-devel@nongnu.org; Wed, 13 Dec 2017 13:08:20 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:54462)
+Received: from mx1.redhat.com ([209.132.183.28]:53440)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1ePBS4-00047B-Q4
-	for qemu-devel@nongnu.org; Wed, 13 Dec 2017 13:08:16 -0500
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1ePBS6-00049I-Qv
+	for qemu-devel@nongnu.org; Wed, 13 Dec 2017 13:08:18 -0500
 From: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>
-Date: Wed, 13 Dec 2017 18:08:01 +0000
-Message-Id: <20171213180807.7066-1-dgilbert@redhat.com>
-Subject: [Qemu-devel] [PATCH v4 0/6] Rework vhost memory region updates
+Date: Wed, 13 Dec 2017 18:08:02 +0000
+Message-Id: <20171213180807.7066-2-dgilbert@redhat.com>
+In-Reply-To: <20171213180807.7066-1-dgilbert@redhat.com>
+References: <20171213180807.7066-1-dgilbert@redhat.com>
+Subject: [Qemu-devel] [PATCH v4 1/6] vhost: Move log_dirty check
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,37 +28,78 @@ Cc: maxime.coquelin@redhat.com, mst@redhat.com, groug@kaod.org
 
 From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
 
-Hi,
-  This patch set reworks the way the vhost code handles changes in
-physical address space layout that came from a discussion with Igor.
- 
-Its intention is to simplify a lot of the update code,
-and to make it easier for the postcopy+shared code to
-do the hugepage alignments that are needed.
- 
-Instead of inserting/removing each section during the add/del
-callbacks of the listener, we start afresh and build a list
-from the add and nop callbacks, then at the end compare the list
-we've built with the exisiting list.
- 
-v4
-  Rework based on comments from Paolo; now using add/nop rather
-  than doing another flatview walk.
- 
-Dave
+Move the log_dirty check into vhost_section.
 
-Dr. David Alan Gilbert (6):
-  vhost: Move log_dirty check
-  vhost: Simplify ring verification checks
-  vhost: Add temporary memory structure
-  vhost: add regions to temporary list
-  vhost: compare and flip in new memory region list
-  vhost: Clean out old vhost_set_memory and friends
+Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+---
+ hw/virtio/trace-events |  3 +++
+ hw/virtio/vhost.c      | 20 +++++++++++++-------
+ 2 files changed, 16 insertions(+), 7 deletions(-)
 
- hw/virtio/trace-events    |   6 +
- hw/virtio/vhost.c         | 426 +++++++++++++++-------------------------------
- include/hw/virtio/vhost.h |   4 +-
- 3 files changed, 146 insertions(+), 290 deletions(-)
-
+diff --git a/hw/virtio/trace-events b/hw/virtio/trace-events
+index 775461ae98..4a493bcd46 100644
+--- a/hw/virtio/trace-events
++++ b/hw/virtio/trace-events
+@@ -1,5 +1,8 @@
+ # See docs/devel/tracing.txt for syntax documentation.
+ 
++# hw/virtio/vhost.c
++vhost_section(const char *name, int r) "%s:%d"
++
+ # hw/virtio/virtio.c
+ virtqueue_alloc_element(void *elem, size_t sz, unsigned in_num, unsigned out_num) "elem %p size %zd in_num %u out_num %u"
+ virtqueue_fill(void *vq, const void *elem, unsigned int len, unsigned int idx) "vq %p elem %p len %u idx %u"
+diff --git a/hw/virtio/vhost.c b/hw/virtio/vhost.c
+index e4290ce93d..e923219e63 100644
+--- a/hw/virtio/vhost.c
++++ b/hw/virtio/vhost.c
+@@ -27,6 +27,7 @@
+ #include "hw/virtio/virtio-access.h"
+ #include "migration/blocker.h"
+ #include "sysemu/dma.h"
++#include "trace.h"
+ 
+ /* enabled until disconnected backend stabilizes */
+ #define _VHOST_DEBUG 1
+@@ -567,18 +568,12 @@ static void vhost_set_memory(MemoryListener *listener,
+                                          memory_listener);
+     hwaddr start_addr = section->offset_within_address_space;
+     ram_addr_t size = int128_get64(section->size);
+-    bool log_dirty =
+-        memory_region_get_dirty_log_mask(section->mr) & ~(1 << DIRTY_MEMORY_MIGRATION);
+     int s = offsetof(struct vhost_memory, regions) +
+         (dev->mem->nregions + 1) * sizeof dev->mem->regions[0];
+     void *ram;
+ 
+     dev->mem = g_realloc(dev->mem, s);
+ 
+-    if (log_dirty) {
+-        add = false;
+-    }
+-
+     assert(size);
+ 
+     /* Optimize no-change case. At least cirrus_vga does this a lot at this time. */
+@@ -611,8 +606,19 @@ static void vhost_set_memory(MemoryListener *listener,
+ 
+ static bool vhost_section(MemoryRegionSection *section)
+ {
+-    return memory_region_is_ram(section->mr) &&
++    bool result;
++    bool log_dirty = memory_region_get_dirty_log_mask(section->mr) &
++                     ~(1 << DIRTY_MEMORY_MIGRATION);
++    result = memory_region_is_ram(section->mr) &&
+         !memory_region_is_rom(section->mr);
++
++    /* Vhost doesn't handle any block which is doing dirty-tracking other
++     * than migration; this typically fires on VGA areas.
++     */
++    result &= !log_dirty;
++
++    trace_vhost_section(section->mr->name, result);
++    return result;
+ }
+ 
+ static void vhost_begin(MemoryListener *listener)
 -- 
 2.14.3
