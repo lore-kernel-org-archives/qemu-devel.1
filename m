@@ -1,23 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47775)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49437)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1eP58j-0005Wk-Fy
-	for qemu-devel@nongnu.org; Wed, 13 Dec 2017 06:23:54 -0500
+	(envelope-from <marcandre.lureau@gmail.com>) id 1eP5FM-0007FV-9J
+	for qemu-devel@nongnu.org; Wed, 13 Dec 2017 06:30:48 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1eP58f-0000LX-DM
-	for qemu-devel@nongnu.org; Wed, 13 Dec 2017 06:23:53 -0500
-Date: Wed, 13 Dec 2017 11:23:46 +0000
-From: Stefan Hajnoczi <stefanha@gmail.com>
-Message-ID: <20171213112345.GK16782@stefanha-x1.localdomain>
-References: <VI1PR10MB0301515CFEEA940842FDF26FB7330@VI1PR10MB0301.EURPRD10.PROD.OUTLOOK.COM>
-	<20171211115634.GI13593@stefanha-x1.localdomain>
-	<VI1PR10MB030143CAC84D8E8AA783C0B0B7370@VI1PR10MB0301.EURPRD10.PROD.OUTLOOK.COM>
+	(envelope-from <marcandre.lureau@gmail.com>) id 1eP5FL-0004cj-7i
+	for qemu-devel@nongnu.org; Wed, 13 Dec 2017 06:30:44 -0500
+Received: from mail-wr0-x232.google.com ([2a00:1450:400c:c0c::232]:37188)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <marcandre.lureau@gmail.com>)
+	id 1eP5FL-0004cQ-0c
+	for qemu-devel@nongnu.org; Wed, 13 Dec 2017 06:30:43 -0500
+Received: by mail-wr0-x232.google.com with SMTP id k61so1796073wrc.4
+	for <qemu-devel@nongnu.org>; Wed, 13 Dec 2017 03:30:42 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="zPXeIxDajdrcF2en"
-Content-Disposition: inline
-In-Reply-To: <VI1PR10MB030143CAC84D8E8AA783C0B0B7370@VI1PR10MB0301.EURPRD10.PROD.OUTLOOK.COM>
-Subject: Re: [Qemu-devel] qemu process crash: Assertion failed:
- QLIST_EMPTY(&bs->tracked_requests)
+In-Reply-To: <f632bd0e-66ad-2c90-3625-309cf99d5374@redhat.com>
+References: <20171208005825.14587-1-marcandre.lureau@redhat.com>
+	<20171208005825.14587-3-marcandre.lureau@redhat.com>
+	<f632bd0e-66ad-2c90-3625-309cf99d5374@redhat.com>
+From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
+Date: Wed, 13 Dec 2017 12:30:41 +0100
+Message-ID: <CAJ+F1CJ4np6yn8-LcGW8uQScdv=6ocLY1GF=3+vXRP6ciXRk9w@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH 02/12] build-sys: silence make by default
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,84 +31,106 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Fernando Casas =?iso-8859-1?Q?Sch=F6ssow?= <casasfernando@hotmail.com>
-Cc: qemu-devel <qemu-devel@nongnu.org>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>, Jeff Cody <jcody@redhat.com>
+To: Eric Blake <eblake@redhat.com>
+Cc: QEMU <qemu-devel@nongnu.org>
+
+Hi
+
+On Fri, Dec 8, 2017 at 8:19 PM, Eric Blake <eblake@redhat.com> wrote:
+> On 12/07/2017 06:58 PM, Marc-Andr=C3=A9 Lureau wrote:
+>> In particular, do not print anything when there is nothing to do, in
+>> particular, after a successful build:
+>
+> Do we need both 'in particular'?
+>
+
+nope
+
+>>
+>> $ make
+>> make[1]: '/home/elmarco/src/qemu/build/capstone/libcapstone.a' is up to =
+date.
+>>
+>> Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+>> ---
+>>  rules.mak | 5 +++++
+>>  1 file changed, 5 insertions(+)
+>
+> Yay!  I've been bothered by this.
+>
+> You may want to add that the noise is conditional on whether you have
+> capstone-devel installed.
+>
+> However,
+>
+>>
+>> diff --git a/rules.mak b/rules.mak
+>> index 6e943335f3..b760d54908 100644
+>> --- a/rules.mak
+>> +++ b/rules.mak
+>> @@ -131,6 +131,11 @@ modules:
+>>  # If called with only a single argument, will print nothing in quiet mo=
+de.
+>>  quiet-command =3D $(if $(V),$1,$(if $(2),@printf "  %-7s %s\n" $2 $3 &&=
+ $1, @$1))
+>>
+>> +makeflags_ =3D $(makeflags_0)
+>> +makeflags_0 =3D --no-print-directory -s
+>
+> Why the mix of long option and short option? Would it be more legible to
+> use two long options?
+>
+> In my testing of your patch, '-s' alone also silenced things
+> (admittedly, when libcapstone.a is up-to-date).  What is
+> --no-print-directory adding?
+>
+> /me goes digging
+>
+> Hmm, we already have this in Makefile:
+>
+> SUBDIR_MAKEFLAGS=3D$(if $(V),,--no-print-directory) BUILD_DIR=3D$(BUILD_D=
+IR)
+>
+
+Thanks I didn't notice.
+
+> So maybe our problem is that we are forgetting to feed SUBDIR_MAKEFLAGS
+> to our sub-make that builds libcapstone.a?
+
+We do.
+
+Now I wonder if this is really a good idea to merge "generic"
+makeflags (silence etc) with qemu build-sys specifics (BUILD_DIR=3D..).
+It seems we are lucky enough that capstone uses BUILDDIR and qemu
+BUILD_DIR, so we avoided the conflict...
+
+Perhaps it's a good time to switch and use thje genreic MAKEFLAGS in
+rules.mk for V=3D.
+
+> Next, why is -s silencing the "is up to date" message?  Per 'make
+> --help', -s controls whether recipes are echoed - but that doesn't seem
+> to be a recipe that was echoed.  Furthermore, the make manual mentions
+> that -s is automatically added to MAKEFLAGS if it was present in the
+> command line; are we accidentally silencing too much (if the user wants
+> to do 'make -s V=3D1' to get JUST command lines but not the make noise)?
+
+V=3D1 shouldn't add the flags, so I don't see the conflict in your example.
+
+>
+>> +makeflags_1 =3D
+>> +MAKEFLAGS +=3D $(makeflags_$(V))
+>> +
+>
+> So I'm not yet convinced that this is the right place, or if it is too
+> heavy of a hammer.
+>
+> --
+> Eric Blake, Principal Software Engineer
+> Red Hat, Inc.           +1-919-301-3266
+> Virtualization:  qemu.org | libvirt.org
+>
 
 
---zPXeIxDajdrcF2en
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
 
-On Mon, Dec 11, 2017 at 01:42:38PM +0000, Fernando Casas Sch=C3=B6ssow wrot=
-e:
-> Hello Stefan,
->=20
-> Thanks for your reply.
-> Fortunately I didn=E2=80=99t have the problem again and it=E2=80=99s not =
-clear how it can be consistently reproduced. Daily backups are running as u=
-sual at the moment.
->=20
-> If there is anything I can do from my side or if you have any ideas to tr=
-y to reproduce it let me know.
-
-Okay, thanks.
-
-In case it happens again, here is some information about the assertion
-failure.  It will probably be necessary to use GDB to inspect the failed
-process (core dump).  The starting point for debugging is mirror_run()
-in block/mirror.c:
-
-  if (cnt =3D=3D 0 && should_complete) {
-      /* The dirty bitmap is not updated while operations are pending.
-       * If we're about to exit, wait for pending operations before
-       * calling bdrv_get_dirty_count(bs), or we may exit while the
-       * source has dirty data to copy!
-       *
-       * Note that I/O can be submitted by the guest while
-       * mirror_populate runs, so pause it now.  Before deciding
-       * whether to switch to target check one last time if I/O has
-       * come in the meanwhile, and if not flush the data to disk.
-       */
-      trace_mirror_before_drain(s, cnt);
-
-      bdrv_drained_begin(bs);
-      cnt =3D bdrv_get_dirty_count(s->dirty_bitmap);
-      if (cnt > 0 || mirror_flush(s) < 0) {
-          bdrv_drained_end(bs);
-          continue;
-      }
-
-      /* The two disks are in sync.  Exit and report successful
-       * completion.
-       */
-      assert(QLIST_EMPTY(&bs->tracked_requests));
-
-The reason why this assertion makes sense is because
-bdrv_drained_begin(bs) starts a region where I/O is quiesced (all
-requests should have been completed).
-
-Either there is a bug with blockjobs vs bdrv_drained_debug(), or maybe
-mirror_flush() submitted new I/O requests.
-
-It would be interesting to print the bs->tracked_requests linked list
-in the GDB debugger.  Those requests might give a clue about the root
-cause.
-
-Stefan
-
---zPXeIxDajdrcF2en
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEcBAEBAgAGBQJaMQ3BAAoJEJykq7OBq3PIKtIH/jaVG0HeZ5GOg1f/M9cFIURe
-MZlca/rt1TDJ2noNMHLEqAwUyoIVVSgIrqyg8TqanaqeGpGwhxnNkVQr7DIm97wl
-4oMie7v6MWEnUe6kncCt2evruxbxsy7QAJWVL/GTgCNVTQiH9Ar3BkGC3hR9UFjU
-+F97F097BCOWdt9/ajV6ZvBvnxvjpRSuG1QJJCnEMTx0Q3fGl4J0U3+LyfZwlNNC
-2wQjQsQtToCwSdEhrBaEG26piWZxQzvRn2V/qSsueexuEyXsSQ1rNmJnYOdyAdv+
-mTLLjerljMcSr+xkCmK+T5HN/IWy4OGMbgRnnz3yZBhXXHjbSIaHhgrnbye6IlY=
-=VwdA
------END PGP SIGNATURE-----
-
---zPXeIxDajdrcF2en--
+--=20
+Marc-Andr=C3=A9 Lureau
