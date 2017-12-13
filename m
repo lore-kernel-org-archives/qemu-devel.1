@@ -1,24 +1,14 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39559)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39834)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1ePDuP-0004d2-7H
-	for qemu-devel@nongnu.org; Wed, 13 Dec 2017 15:45:42 -0500
+	(envelope-from <jsnow@redhat.com>) id 1ePDv9-00055f-6k
+	for qemu-devel@nongnu.org; Wed, 13 Dec 2017 15:46:28 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1ePDuN-0007Rz-3G
-	for qemu-devel@nongnu.org; Wed, 13 Dec 2017 15:45:41 -0500
-Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
-	<philippe.mathieu.daude@gmail.com>
-From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
-Date: Wed, 13 Dec 2017 17:44:36 -0300
-Message-Id: <20171213204436.5379-12-f4bug@amsat.org>
-In-Reply-To: <20171213204436.5379-1-f4bug@amsat.org>
-References: <20171213204436.5379-1-f4bug@amsat.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH 11/11] hw/arm/xilinx_zynq: use
- sdbus_create_slave() to name the different SD busses
+	(envelope-from <jsnow@redhat.com>) id 1ePDv8-0000Bn-6R
+	for qemu-devel@nongnu.org; Wed, 13 Dec 2017 15:46:27 -0500
+From: John Snow <jsnow@redhat.com>
+Date: Wed, 13 Dec 2017 15:46:11 -0500
+Message-Id: <20171213204611.26276-1-jsnow@redhat.com>
+Subject: [Qemu-devel] [PATCH v2] blockjob: kick jobs on set-speed
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,58 +17,104 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alistair Francis <alistair.francis@xilinx.com>, "Edgar E . Iglesias" <edgar.iglesias@xilinx.com>, Prasad J Pandit <pjp@fedoraproject.org>, Peter Maydell <peter.maydell@linaro.org>, Andrew Baumann <Andrew.Baumann@microsoft.com>, Andrey Smirnov <andrew.smirnov@gmail.com>, Andrey Yurovsky <yurovsky@gmail.com>, Clement Deschamps <clement.deschamps@antfield.fr>
-Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, qemu-devel@nongnu.org, qemu-arm@nongnu.org, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Sai Pavan Boddu <saipava@xilinx.com>, "Edgar E. Iglesias" <edgar.iglesias@gmail.com>
+To: qemu-block@nongnu.org
+Cc: kwolf@redhat.com, jcody@redhat.com, qemu-devel@nongnu.org, stefanha@redhat.com, mreitz@redhat.com, John Snow <jsnow@redhat.com>
 
-Using the "bus-name" property we can now address any bus.
+If users set an unreasonably low speed (like one byte per second), the
+calculated delay may exceed many hours. While we like to punish users
+for asking for stupid things, we do also like to allow users to correct
+their wicked ways.
 
-Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+When a user provides a new speed, kick the job to allow it to recalculate
+its delay.
+
+Signed-off-by: John Snow <jsnow@redhat.com>
 ---
- hw/arm/xilinx_zynq.c | 9 +++++++--
- 1 file changed, 7 insertions(+), 2 deletions(-)
 
-diff --git a/hw/arm/xilinx_zynq.c b/hw/arm/xilinx_zynq.c
-index 1836a4ed45..9275ae6daf 100644
---- a/hw/arm/xilinx_zynq.c
-+++ b/hw/arm/xilinx_zynq.c
-@@ -167,6 +167,7 @@ static void zynq_init(MachineState *machine)
-     MemoryRegion *ocm_ram = g_new(MemoryRegion, 1);
-     DeviceState *dev, *carddev;
-     SysBusDevice *busdev;
-+    SDBus *sdbus;
-     DriveInfo *di;
-     BlockBackend *blk;
-     qemu_irq pic[64];
-@@ -248,24 +249,28 @@ static void zynq_init(MachineState *machine)
-     gem_init(&nd_table[1], 0xE000C000, pic[77-IRQ_OFFSET]);
+RFC: Why is block_job_mutex shared between all jobs,
+     instead of being per-job?
+
+ blockjob.c | 30 +++++++++++++++++++++++++++++-
+ 1 file changed, 29 insertions(+), 1 deletion(-)
+
+diff --git a/blockjob.c b/blockjob.c
+index 715c2c2680..6173e4728c 100644
+--- a/blockjob.c
++++ b/blockjob.c
+@@ -59,6 +59,7 @@ static void __attribute__((__constructor__)) block_job_init(void)
  
-     dev = qdev_create(NULL, TYPE_SYSBUS_SDHCI);
-+    qdev_prop_set_string(dev, "sd-bus-name", "sd.0");
-     qdev_init_nofail(dev);
-     sysbus_mmio_map(SYS_BUS_DEVICE(dev), 0, 0xE0100000);
-     sysbus_connect_irq(SYS_BUS_DEVICE(dev), 0, pic[56-IRQ_OFFSET]);
+ static void block_job_event_cancelled(BlockJob *job);
+ static void block_job_event_completed(BlockJob *job, const char *msg);
++static void block_job_enter_cond(BlockJob *job, bool(*fn)(BlockJob *job));
  
-     di = drive_get_next(IF_SD);
-     blk = di ? blk_by_legacy_dinfo(di) : NULL;
--    carddev = qdev_create(qdev_get_child_bus(dev, "sd-bus"), TYPE_SD_CARD);
-+    sdbus = (SDBus *)qdev_get_child_bus(dev, "sd.0");
-+    carddev = sdbus_create_slave_no_init(sdbus, TYPE_SD_CARD);
-     qdev_prop_set_drive(carddev, "drive", blk, &error_fatal);
-     object_property_set_bool(OBJECT(carddev), true, "realized", &error_fatal);
+ /* Transactional group of block jobs */
+ struct BlockJobTxn {
+@@ -480,9 +481,16 @@ static void block_job_completed_txn_success(BlockJob *job)
+     }
+ }
  
-     dev = qdev_create(NULL, TYPE_SYSBUS_SDHCI);
-+    qdev_prop_set_string(dev, "sd-bus-name", "sd.1");
-     qdev_init_nofail(dev);
-     sysbus_mmio_map(SYS_BUS_DEVICE(dev), 0, 0xE0101000);
-     sysbus_connect_irq(SYS_BUS_DEVICE(dev), 0, pic[79-IRQ_OFFSET]);
++/* Assumes the block_job_mutex is held */
++static bool block_job_timer_pending(BlockJob *job)
++{
++    return timer_pending(&job->sleep_timer);
++}
++
+ void block_job_set_speed(BlockJob *job, int64_t speed, Error **errp)
+ {
+     Error *local_err = NULL;
++    int64_t old_speed = job->speed;
  
-     di = drive_get_next(IF_SD);
-     blk = di ? blk_by_legacy_dinfo(di) : NULL;
--    carddev = qdev_create(qdev_get_child_bus(dev, "sd-bus"), TYPE_SD_CARD);
-+    sdbus = (SDBus *)qdev_get_child_bus(dev, "sd.1");
-+    carddev = sdbus_create_slave_no_init(sdbus, TYPE_SD_CARD);
-     qdev_prop_set_drive(carddev, "drive", blk, &error_fatal);
-     object_property_set_bool(OBJECT(carddev), true, "realized", &error_fatal);
+     if (!job->driver->set_speed) {
+         error_setg(errp, QERR_UNSUPPORTED);
+@@ -495,6 +503,12 @@ void block_job_set_speed(BlockJob *job, int64_t speed, Error **errp)
+     }
  
+     job->speed = speed;
++    if (speed <= old_speed) {
++        return;
++    }
++
++    /* kick only if a timer is pending */
++    block_job_enter_cond(job, block_job_timer_pending);
+ }
+ 
+ void block_job_complete(BlockJob *job, Error **errp)
+@@ -821,7 +835,11 @@ void block_job_resume_all(void)
+     }
+ }
+ 
+-void block_job_enter(BlockJob *job)
++/*
++ * Conditionally enter a block_job pending a call to fn() while
++ * under the block_job_lock critical section.
++ */
++static void block_job_enter_cond(BlockJob *job, bool(*fn)(BlockJob *job))
+ {
+     if (!block_job_started(job)) {
+         return;
+@@ -836,6 +854,11 @@ void block_job_enter(BlockJob *job)
+         return;
+     }
+ 
++    if (fn && !fn(job)) {
++        block_job_unlock();
++        return;
++    }
++
+     assert(!job->deferred_to_main_loop);
+     timer_del(&job->sleep_timer);
+     job->busy = true;
+@@ -843,6 +866,11 @@ void block_job_enter(BlockJob *job)
+     aio_co_wake(job->co);
+ }
+ 
++void block_job_enter(BlockJob *job)
++{
++    block_job_enter_cond(job, NULL);
++}
++
+ bool block_job_is_cancelled(BlockJob *job)
+ {
+     return job->cancelled;
 -- 
-2.15.1
+2.14.3
