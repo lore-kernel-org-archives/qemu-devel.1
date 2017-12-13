@@ -1,24 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51614)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51705)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1ePBWg-0004oq-8Q
-	for qemu-devel@nongnu.org; Wed, 13 Dec 2017 13:13:06 -0500
+	(envelope-from <pm215@archaic.org.uk>) id 1ePBWk-0004ud-RF
+	for qemu-devel@nongnu.org; Wed, 13 Dec 2017 13:13:07 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1ePBWe-0007zg-SE
-	for qemu-devel@nongnu.org; Wed, 13 Dec 2017 13:13:02 -0500
-Received: from orth.archaic.org.uk ([2001:8b0:1d0::2]:39138)
+	(envelope-from <pm215@archaic.org.uk>) id 1ePBWj-00086z-Ul
+	for qemu-devel@nongnu.org; Wed, 13 Dec 2017 13:13:06 -0500
+Received: from orth.archaic.org.uk ([2001:8b0:1d0::2]:39144)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <pm215@archaic.org.uk>)
-	id 1ePBWe-0007y2-Hq
-	for qemu-devel@nongnu.org; Wed, 13 Dec 2017 13:13:00 -0500
+	id 1ePBWj-00084T-NI
+	for qemu-devel@nongnu.org; Wed, 13 Dec 2017 13:13:05 -0500
 Received: from pm215 by orth.archaic.org.uk with local (Exim 4.89)
-	(envelope-from <pm215@archaic.org.uk>) id 1ePBWd-0007jV-Iu
-	for qemu-devel@nongnu.org; Wed, 13 Dec 2017 18:12:59 +0000
+	(envelope-from <pm215@archaic.org.uk>) id 1ePBWi-0007mc-FF
+	for qemu-devel@nongnu.org; Wed, 13 Dec 2017 18:13:04 +0000
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Wed, 13 Dec 2017 18:12:22 +0000
-Message-Id: <1513188761-20784-25-git-send-email-peter.maydell@linaro.org>
+Date: Wed, 13 Dec 2017 18:12:29 +0000
+Message-Id: <1513188761-20784-32-git-send-email-peter.maydell@linaro.org>
 In-Reply-To: <1513188761-20784-1-git-send-email-peter.maydell@linaro.org>
 References: <1513188761-20784-1-git-send-email-peter.maydell@linaro.org>
-Subject: [Qemu-devel] [PULL 24/43] target/arm: Implement TT instruction
+Subject: [Qemu-devel] [PULL 31/43] target/arm: Convert
+ get_phys_addr_pmsav7() to not return FSC values
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,205 +30,60 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-Implement the TT instruction which queries the security
-state and access permissions of a memory location.
+Make get_phys_addr_pmsav7() return a fault type in the ARMMMUFaultInfo
+structure, which we convert to the FSC at the callsite.
 
 Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
-Message-id: 1512153879-5291-8-git-send-email-peter.maydell@linaro.org
+Reviewed-by: Edgar E. Iglesias <edgar.iglesias@xilinx.com>
+Tested-by: Stefano Stabellini <sstabellini@kernel.org>
+Message-id: 1512503192-2239-8-git-send-email-peter.maydell@linaro.org
 ---
- target/arm/helper.h    |   2 +
- target/arm/helper.c    | 108 +++++++++++++++++++++++++++++++++++++++++++++++++
- target/arm/translate.c |  29 ++++++++++++-
- 3 files changed, 138 insertions(+), 1 deletion(-)
+ target/arm/helper.c | 11 +++++++----
+ 1 file changed, 7 insertions(+), 4 deletions(-)
 
-diff --git a/target/arm/helper.h b/target/arm/helper.h
-index 439d228..066729e 100644
---- a/target/arm/helper.h
-+++ b/target/arm/helper.h
-@@ -66,6 +66,8 @@ DEF_HELPER_2(v7m_mrs, i32, env, i32)
- DEF_HELPER_2(v7m_bxns, void, env, i32)
- DEF_HELPER_2(v7m_blxns, void, env, i32)
- 
-+DEF_HELPER_3(v7m_tt, i32, env, i32, i32)
-+
- DEF_HELPER_4(access_check_cp_reg, void, env, ptr, i32, i32)
- DEF_HELPER_3(set_cp_reg, void, env, ptr, i32)
- DEF_HELPER_2(get_cp_reg, i32, env, ptr)
 diff --git a/target/arm/helper.c b/target/arm/helper.c
-index 9e7eaa1..6140e84 100644
+index b08910b..2752d9e 100644
 --- a/target/arm/helper.c
 +++ b/target/arm/helper.c
-@@ -5947,6 +5947,28 @@ void HELPER(v7m_blxns)(CPUARMState *env, uint32_t dest)
-     g_assert_not_reached();
- }
+@@ -9123,7 +9123,8 @@ static inline bool m_is_system_region(CPUARMState *env, uint32_t address)
  
-+uint32_t HELPER(v7m_tt)(CPUARMState *env, uint32_t addr, uint32_t op)
-+{
-+    /* The TT instructions can be used by unprivileged code, but in
-+     * user-only emulation we don't have the MPU.
-+     * Luckily since we know we are NonSecure unprivileged (and that in
-+     * turn means that the A flag wasn't specified), all the bits in the
-+     * register must be zero:
-+     *  IREGION: 0 because IRVALID is 0
-+     *  IRVALID: 0 because NS
-+     *  S: 0 because NS
-+     *  NSRW: 0 because NS
-+     *  NSR: 0 because NS
-+     *  RW: 0 because unpriv and A flag not set
-+     *  R: 0 because unpriv and A flag not set
-+     *  SRVALID: 0 because NS
-+     *  MRVALID: 0 because unpriv and A flag not set
-+     *  SREGION: 0 becaus SRVALID is 0
-+     *  MREGION: 0 because MRVALID is 0
-+     */
-+    return 0;
-+}
-+
- void switch_mode(CPUARMState *env, int mode)
+ static bool get_phys_addr_pmsav7(CPUARMState *env, uint32_t address,
+                                  MMUAccessType access_type, ARMMMUIdx mmu_idx,
+-                                 hwaddr *phys_ptr, int *prot, uint32_t *fsr)
++                                 hwaddr *phys_ptr, int *prot,
++                                 ARMMMUFaultInfo *fi)
  {
      ARMCPU *cpu = arm_env_get_cpu(env);
-@@ -10140,6 +10162,92 @@ void HELPER(v7m_msr)(CPUARMState *env, uint32_t maskreg, uint32_t val)
+     int n;
+@@ -9218,7 +9219,7 @@ static bool get_phys_addr_pmsav7(CPUARMState *env, uint32_t address,
+         if (n == -1) { /* no hits */
+             if (!pmsav7_use_background_region(cpu, mmu_idx, is_user)) {
+                 /* background fault */
+-                *fsr = 0;
++                fi->type = ARMFault_Background;
+                 return true;
+             }
+             get_phys_addr_pmsav7_default(env, mmu_idx, address, prot);
+@@ -9276,7 +9277,8 @@ static bool get_phys_addr_pmsav7(CPUARMState *env, uint32_t address,
+         }
      }
+ 
+-    *fsr = 0x00d; /* Permission fault */
++    fi->type = ARMFault_Permission;
++    fi->level = 1;
+     return !(*prot & (1 << access_type));
  }
  
-+uint32_t HELPER(v7m_tt)(CPUARMState *env, uint32_t addr, uint32_t op)
-+{
-+    /* Implement the TT instruction. op is bits [7:6] of the insn. */
-+    bool forceunpriv = op & 1;
-+    bool alt = op & 2;
-+    V8M_SAttributes sattrs = {};
-+    uint32_t tt_resp;
-+    bool r, rw, nsr, nsrw, mrvalid;
-+    int prot;
-+    MemTxAttrs attrs = {};
-+    hwaddr phys_addr;
-+    uint32_t fsr;
-+    ARMMMUIdx mmu_idx;
-+    uint32_t mregion;
-+    bool targetpriv;
-+    bool targetsec = env->v7m.secure;
-+
-+    /* Work out what the security state and privilege level we're
-+     * interested in is...
-+     */
-+    if (alt) {
-+        targetsec = !targetsec;
-+    }
-+
-+    if (forceunpriv) {
-+        targetpriv = false;
-+    } else {
-+        targetpriv = arm_v7m_is_handler_mode(env) ||
-+            !(env->v7m.control[targetsec] & R_V7M_CONTROL_NPRIV_MASK);
-+    }
-+
-+    /* ...and then figure out which MMU index this is */
-+    mmu_idx = arm_v7m_mmu_idx_for_secstate_and_priv(env, targetsec, targetpriv);
-+
-+    /* We know that the MPU and SAU don't care about the access type
-+     * for our purposes beyond that we don't want to claim to be
-+     * an insn fetch, so we arbitrarily call this a read.
-+     */
-+
-+    /* MPU region info only available for privileged or if
-+     * inspecting the other MPU state.
-+     */
-+    if (arm_current_el(env) != 0 || alt) {
-+        /* We can ignore the return value as prot is always set */
-+        pmsav8_mpu_lookup(env, addr, MMU_DATA_LOAD, mmu_idx,
-+                          &phys_addr, &attrs, &prot, &fsr, &mregion);
-+        if (mregion == -1) {
-+            mrvalid = false;
-+            mregion = 0;
-+        } else {
-+            mrvalid = true;
-+        }
-+        r = prot & PAGE_READ;
-+        rw = prot & PAGE_WRITE;
-+    } else {
-+        r = false;
-+        rw = false;
-+        mrvalid = false;
-+        mregion = 0;
-+    }
-+
-+    if (env->v7m.secure) {
-+        v8m_security_lookup(env, addr, MMU_DATA_LOAD, mmu_idx, &sattrs);
-+        nsr = sattrs.ns && r;
-+        nsrw = sattrs.ns && rw;
-+    } else {
-+        sattrs.ns = true;
-+        nsr = false;
-+        nsrw = false;
-+    }
-+
-+    tt_resp = (sattrs.iregion << 24) |
-+        (sattrs.irvalid << 23) |
-+        ((!sattrs.ns) << 22) |
-+        (nsrw << 21) |
-+        (nsr << 20) |
-+        (rw << 19) |
-+        (r << 18) |
-+        (sattrs.srvalid << 17) |
-+        (mrvalid << 16) |
-+        (sattrs.sregion << 8) |
-+        mregion;
-+
-+    return tt_resp;
-+}
-+
- #endif
- 
- void HELPER(dc_zva)(CPUARMState *env, uint64_t vaddr_in)
-diff --git a/target/arm/translate.c b/target/arm/translate.c
-index 50339e7..e15192d 100644
---- a/target/arm/translate.c
-+++ b/target/arm/translate.c
-@@ -9810,7 +9810,7 @@ static int disas_thumb2_insn(DisasContext *s, uint32_t insn)
-         if (insn & (1 << 22)) {
-             /* 0b1110_100x_x1xx_xxxx_xxxx_xxxx_xxxx_xxxx
-              * - load/store doubleword, load/store exclusive, ldacq/strel,
--             *   table branch.
-+             *   table branch, TT.
-              */
-             if (insn == 0xe97fe97f && arm_dc_feature(s, ARM_FEATURE_M) &&
-                 arm_dc_feature(s, ARM_FEATURE_V8)) {
-@@ -9887,8 +9887,35 @@ static int disas_thumb2_insn(DisasContext *s, uint32_t insn)
-             } else if ((insn & (1 << 23)) == 0) {
-                 /* 0b1110_1000_010x_xxxx_xxxx_xxxx_xxxx_xxxx
-                  * - load/store exclusive word
-+                 * - TT (v8M only)
-                  */
-                 if (rs == 15) {
-+                    if (!(insn & (1 << 20)) &&
-+                        arm_dc_feature(s, ARM_FEATURE_M) &&
-+                        arm_dc_feature(s, ARM_FEATURE_V8)) {
-+                        /* 0b1110_1000_0100_xxxx_1111_xxxx_xxxx_xxxx
-+                         *  - TT (v8M only)
-+                         */
-+                        bool alt = insn & (1 << 7);
-+                        TCGv_i32 addr, op, ttresp;
-+
-+                        if ((insn & 0x3f) || rd == 13 || rd == 15 || rn == 15) {
-+                            /* we UNDEF for these UNPREDICTABLE cases */
-+                            goto illegal_op;
-+                        }
-+
-+                        if (alt && !s->v8m_secure) {
-+                            goto illegal_op;
-+                        }
-+
-+                        addr = load_reg(s, rn);
-+                        op = tcg_const_i32(extract32(insn, 6, 2));
-+                        ttresp = tcg_temp_new_i32();
-+                        gen_helper_v7m_tt(ttresp, cpu_env, addr, op);
-+                        tcg_temp_free_i32(addr);
-+                        tcg_temp_free_i32(op);
-+                        store_reg(s, rd, ttresp);
-+                    }
-                     goto illegal_op;
-                 }
-                 addr = tcg_temp_local_new_i32();
+@@ -9821,7 +9823,8 @@ static bool get_phys_addr(CPUARMState *env, target_ulong address,
+         } else if (arm_feature(env, ARM_FEATURE_V7)) {
+             /* PMSAv7 */
+             ret = get_phys_addr_pmsav7(env, address, access_type, mmu_idx,
+-                                       phys_ptr, prot, fsr);
++                                       phys_ptr, prot, fi);
++            *fsr = arm_fi_to_sfsc(fi);
+         } else {
+             /* Pre-v7 MPU */
+             ret = get_phys_addr_pmsav5(env, address, access_type, mmu_idx,
 -- 
 2.7.4
