@@ -1,31 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57754)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57753)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1ePDC3-00034q-OF
+	id 1ePDC3-00034p-OM
 	for qemu-devel@nongnu.org; Wed, 13 Dec 2017 14:59:52 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1ePDC2-0005g8-Ba
+	id 1ePDBy-0005eq-Pk
 	for qemu-devel@nongnu.org; Wed, 13 Dec 2017 14:59:51 -0500
-Received: from mail-qt0-x244.google.com ([2607:f8b0:400d:c0d::244]:45718)
+Received: from mail-qt0-x242.google.com ([2607:f8b0:400d:c0d::242]:45715)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1ePDC2-0005g0-6s
-	for qemu-devel@nongnu.org; Wed, 13 Dec 2017 14:59:50 -0500
-Received: by mail-qt0-x244.google.com with SMTP id g10so5181071qtj.12
-	for <qemu-devel@nongnu.org>; Wed, 13 Dec 2017 11:59:50 -0800 (PST)
+	id 1ePDBy-0005eb-LY
+	for qemu-devel@nongnu.org; Wed, 13 Dec 2017 14:59:46 -0500
+Received: by mail-qt0-x242.google.com with SMTP id g10so5180863qtj.12
+	for <qemu-devel@nongnu.org>; Wed, 13 Dec 2017 11:59:46 -0800 (PST)
 Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
 	<philippe.mathieu.daude@gmail.com>
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
-Date: Wed, 13 Dec 2017 16:58:48 -0300
-Message-Id: <20171213195852.30439-11-f4bug@amsat.org>
+Date: Wed, 13 Dec 2017 16:58:47 -0300
+Message-Id: <20171213195852.30439-10-f4bug@amsat.org>
 In-Reply-To: <20171213195852.30439-1-f4bug@amsat.org>
 References: <20171213195852.30439-1-f4bug@amsat.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH 10/14] sdhci: use qemu_log_mask(UNIMP) instead
- of fprintf()
+Subject: [Qemu-devel] [PATCH 09/14] sdhci: refactor common sysbus/pci
+ unrealize() into sdhci_unrealizefn()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -39,33 +39,74 @@ Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, qemu-devel@nong
 
 Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 ---
- hw/sd/sdhci.c | 7 ++++---
- 1 file changed, 4 insertions(+), 3 deletions(-)
+ hw/sd/sdhci.c | 21 ++++++++++++++++++---
+ 1 file changed, 18 insertions(+), 3 deletions(-)
 
 diff --git a/hw/sd/sdhci.c b/hw/sd/sdhci.c
-index 044e3d62f1..8fcd48f849 100644
+index 893be0e606..044e3d62f1 100644
 --- a/hw/sd/sdhci.c
 +++ b/hw/sd/sdhci.c
-@@ -936,7 +936,8 @@ static uint64_t sdhci_read(void *opaque, hwaddr offset, unsigned size)
-         ret = (SD_HOST_SPECv2_VERS << 16) | sdhci_slotint(s);
-         break;
-     default:
--        ERRPRINT("bad %ub read: addr[0x%04x]\n", size, (int)offset);
-+        qemu_log_mask(LOG_UNIMP, "SDHC rd_%ub @0x%02" HWADDR_PRIx " "
-+                      "not implemented\n", size, offset);
-         break;
-     }
+@@ -31,6 +31,7 @@
+ #include "hw/sd/sdhci.h"
+ #include "sdhci-internal.h"
+ #include "sd-internal.h"
++#include "qapi/error.h"
+ #include "qemu/log.h"
  
-@@ -1140,8 +1141,8 @@ sdhci_write(void *opaque, hwaddr offset, uint64_t val, unsigned size)
-         sdhci_update_irq(s);
-         break;
-     default:
--        ERRPRINT("bad %ub write offset: addr[0x%04x] <- %u(0x%x)\n",
--                 size, (int)offset, value >> shift, value >> shift);
-+        qemu_log_mask(LOG_UNIMP, "SDHC wr_%ub @0x%02" HWADDR_PRIx " <- 0x%08x "
-+                      "not implemented\n", size, offset, value >> shift);
-         break;
-     }
-     DPRINT_L2("write %ub: addr[0x%04x] <- %u(0x%x)\n",
+ /* host controller debug messages */
+@@ -1191,17 +1192,21 @@ static void sdhci_realizefn(SDHCIState *s, Error **errp)
+                           SDHC_REGISTERS_MAP_SIZE);
+ }
+ 
++static void sdhci_unrealizefn(SDHCIState *s, Error **errp)
++{
++    g_free(s->fifo_buffer);
++    s->fifo_buffer = NULL;
++}
++
+ static void sdhci_uninitfn(SDHCIState *s)
+ {
+     timer_del(s->insert_timer);
+     timer_free(s->insert_timer);
+     timer_del(s->transfer_timer);
+     timer_free(s->transfer_timer);
++
+     qemu_free_irq(s->eject_cb);
+     qemu_free_irq(s->ro_cb);
+-
+-    g_free(s->fifo_buffer);
+-    s->fifo_buffer = NULL;
+ }
+ 
+ static bool sdhci_pending_insert_vmstate_needed(void *opaque)
+@@ -1302,6 +1307,8 @@ static void sdhci_pci_realize(PCIDevice *dev, Error **errp)
+ static void sdhci_pci_exit(PCIDevice *dev)
+ {
+     SDHCIState *s = PCI_SDHCI(dev);
++
++    sdhci_unrealizefn(s, &error_abort);
+     sdhci_uninitfn(s);
+ }
+ 
+@@ -1355,11 +1362,19 @@ static void sdhci_sysbus_realize(DeviceState *dev, Error ** errp)
+     sysbus_init_mmio(sbd, &s->iomem);
+ }
+ 
++static void sdhci_sysbus_unrealize(DeviceState *dev, Error **errp)
++{
++    SDHCIState *s = SYSBUS_SDHCI(dev);
++
++    sdhci_unrealizefn(s, errp);
++}
++
+ static void sdhci_sysbus_class_init(ObjectClass *klass, void *data)
+ {
+     DeviceClass *dc = DEVICE_CLASS(klass);
+ 
+     dc->realize = sdhci_sysbus_realize;
++    dc->unrealize = sdhci_sysbus_unrealize;
+ 
+     sdhci_class_init(klass, data);
+ }
 -- 
 2.15.1
