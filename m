@@ -1,28 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51553)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51378)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1ePBWc-0004kM-JR
-	for qemu-devel@nongnu.org; Wed, 13 Dec 2017 13:12:59 -0500
+	(envelope-from <pm215@archaic.org.uk>) id 1ePBWU-0004bN-IK
+	for qemu-devel@nongnu.org; Wed, 13 Dec 2017 13:12:52 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1ePBWb-0007u2-T2
-	for qemu-devel@nongnu.org; Wed, 13 Dec 2017 13:12:58 -0500
-Received: from orth.archaic.org.uk ([2001:8b0:1d0::2]:39134)
+	(envelope-from <pm215@archaic.org.uk>) id 1ePBWT-0007c7-6n
+	for qemu-devel@nongnu.org; Wed, 13 Dec 2017 13:12:50 -0500
+Received: from orth.archaic.org.uk ([2001:8b0:1d0::2]:39116)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <pm215@archaic.org.uk>)
-	id 1ePBWb-0007rv-MN
-	for qemu-devel@nongnu.org; Wed, 13 Dec 2017 13:12:57 -0500
+	id 1ePBWS-0007aJ-VP
+	for qemu-devel@nongnu.org; Wed, 13 Dec 2017 13:12:49 -0500
 Received: from pm215 by orth.archaic.org.uk with local (Exim 4.89)
-	(envelope-from <pm215@archaic.org.uk>) id 1ePBWa-0007hW-NB
-	for qemu-devel@nongnu.org; Wed, 13 Dec 2017 18:12:56 +0000
+	(envelope-from <pm215@archaic.org.uk>) id 1ePBWR-0007c1-U7
+	for qemu-devel@nongnu.org; Wed, 13 Dec 2017 18:12:47 +0000
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Wed, 13 Dec 2017 18:12:18 +0000
-Message-Id: <1513188761-20784-21-git-send-email-peter.maydell@linaro.org>
+Date: Wed, 13 Dec 2017 18:12:06 +0000
+Message-Id: <1513188761-20784-9-git-send-email-peter.maydell@linaro.org>
 In-Reply-To: <1513188761-20784-1-git-send-email-peter.maydell@linaro.org>
 References: <1513188761-20784-1-git-send-email-peter.maydell@linaro.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PULL 20/43] target/arm: Add missing M profile case to
- regime_is_user()
+Subject: [Qemu-devel] [PULL 08/43] xilinx_spips: Make tx/rx_data_bytes more
+ generic and reusable
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,30 +30,149 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-When we added the ARMMMUIdx_MSUser MMU index we forgot to
-add it to the case statement in regime_is_user(), so we
-weren't treating it as unprivileged when doing MPU lookups.
-Correct the omission.
+From: Francisco Iglesias <frasse.iglesias@gmail.com>
 
+Make tx/rx_data_bytes more generic so they can be reused (when adding
+support for the Zynqmp Generic QSPI).
+
+Signed-off-by: Francisco Iglesias <frasse.iglesias@gmail.com>
+Reviewed-by: Edgar E. Iglesias <edgar.iglesias@xilinx.com>
+Tested-by: Edgar E. Iglesias <edgar.iglesias@xilinx.com>
+Message-id: 20171126231634.9531-9-frasse.iglesias@gmail.com
 Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
-Message-id: 1512153879-5291-4-git-send-email-peter.maydell@linaro.org
-Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 ---
- target/arm/helper.c | 1 +
- 1 file changed, 1 insertion(+)
+ hw/ssi/xilinx_spips.c | 64 +++++++++++++++++++++++++++++----------------------
+ 1 file changed, 37 insertions(+), 27 deletions(-)
 
-diff --git a/target/arm/helper.c b/target/arm/helper.c
-index f21c142..c4c8d5a 100644
---- a/target/arm/helper.c
-+++ b/target/arm/helper.c
-@@ -8016,6 +8016,7 @@ static inline bool regime_is_user(CPUARMState *env, ARMMMUIdx mmu_idx)
-     case ARMMMUIdx_S1SE0:
-     case ARMMMUIdx_S1NSE0:
-     case ARMMMUIdx_MUser:
-+    case ARMMMUIdx_MSUser:
-         return true;
-     default:
-         return false;
+diff --git a/hw/ssi/xilinx_spips.c b/hw/ssi/xilinx_spips.c
+index 691d48d..4621dbb 100644
+--- a/hw/ssi/xilinx_spips.c
++++ b/hw/ssi/xilinx_spips.c
+@@ -47,7 +47,7 @@
+ /* config register */
+ #define R_CONFIG            (0x00 / 4)
+ #define IFMODE              (1U << 31)
+-#define ENDIAN              (1 << 26)
++#define R_CONFIG_ENDIAN     (1 << 26)
+ #define MODEFAIL_GEN_EN     (1 << 17)
+ #define MAN_START_COM       (1 << 16)
+ #define MAN_START_EN        (1 << 15)
+@@ -450,13 +450,28 @@ static void xilinx_spips_flush_txfifo(XilinxSPIPS *s)
+     }
+ }
+ 
+-static inline void rx_data_bytes(XilinxSPIPS *s, uint8_t *value, int max)
++static inline void tx_data_bytes(Fifo8 *fifo, uint32_t value, int num, bool be)
+ {
+     int i;
++    for (i = 0; i < num && !fifo8_is_full(fifo); ++i) {
++        if (be) {
++            fifo8_push(fifo, (uint8_t)(value >> 24));
++            value <<= 8;
++        } else {
++            fifo8_push(fifo, (uint8_t)value);
++            value >>= 8;
++        }
++    }
++}
+ 
+-    for (i = 0; i < max && !fifo8_is_empty(&s->rx_fifo); ++i) {
+-        value[i] = fifo8_pop(&s->rx_fifo);
++static inline int rx_data_bytes(Fifo8 *fifo, uint8_t *value, int max)
++{
++    int i;
++
++    for (i = 0; i < max && !fifo8_is_empty(fifo); ++i) {
++        value[i] = fifo8_pop(fifo);
+     }
++    return max - i;
+ }
+ 
+ static uint64_t xilinx_spips_read(void *opaque, hwaddr addr,
+@@ -466,6 +481,7 @@ static uint64_t xilinx_spips_read(void *opaque, hwaddr addr,
+     uint32_t mask = ~0;
+     uint32_t ret;
+     uint8_t rx_buf[4];
++    int shortfall;
+ 
+     addr >>= 2;
+     switch (addr) {
+@@ -496,9 +512,13 @@ static uint64_t xilinx_spips_read(void *opaque, hwaddr addr,
+         break;
+     case R_RX_DATA:
+         memset(rx_buf, 0, sizeof(rx_buf));
+-        rx_data_bytes(s, rx_buf, s->num_txrx_bytes);
+-        ret = s->regs[R_CONFIG] & ENDIAN ? cpu_to_be32(*(uint32_t *)rx_buf)
+-                        : cpu_to_le32(*(uint32_t *)rx_buf);
++        shortfall = rx_data_bytes(&s->rx_fifo, rx_buf, s->num_txrx_bytes);
++        ret = s->regs[R_CONFIG] & R_CONFIG_ENDIAN ?
++                        cpu_to_be32(*(uint32_t *)rx_buf) :
++                        cpu_to_le32(*(uint32_t *)rx_buf);
++        if (!(s->regs[R_CONFIG] & R_CONFIG_ENDIAN)) {
++            ret <<= 8 * shortfall;
++        }
+         DB_PRINT_L(0, "addr=" TARGET_FMT_plx " = %x\n", addr * 4, ret);
+         xilinx_spips_update_ixr(s);
+         return ret;
+@@ -509,20 +529,6 @@ static uint64_t xilinx_spips_read(void *opaque, hwaddr addr,
+ 
+ }
+ 
+-static inline void tx_data_bytes(XilinxSPIPS *s, uint32_t value, int num)
+-{
+-    int i;
+-    for (i = 0; i < num && !fifo8_is_full(&s->tx_fifo); ++i) {
+-        if (s->regs[R_CONFIG] & ENDIAN) {
+-            fifo8_push(&s->tx_fifo, (uint8_t)(value >> 24));
+-            value <<= 8;
+-        } else {
+-            fifo8_push(&s->tx_fifo, (uint8_t)value);
+-            value >>= 8;
+-        }
+-    }
+-}
+-
+ static void xilinx_spips_write(void *opaque, hwaddr addr,
+                                         uint64_t value, unsigned size)
+ {
+@@ -563,16 +569,20 @@ static void xilinx_spips_write(void *opaque, hwaddr addr,
+         mask = 0;
+         break;
+     case R_TX_DATA:
+-        tx_data_bytes(s, (uint32_t)value, s->num_txrx_bytes);
++        tx_data_bytes(&s->tx_fifo, (uint32_t)value, s->num_txrx_bytes,
++                      s->regs[R_CONFIG] & R_CONFIG_ENDIAN);
+         goto no_reg_update;
+     case R_TXD1:
+-        tx_data_bytes(s, (uint32_t)value, 1);
++        tx_data_bytes(&s->tx_fifo, (uint32_t)value, 1,
++                      s->regs[R_CONFIG] & R_CONFIG_ENDIAN);
+         goto no_reg_update;
+     case R_TXD2:
+-        tx_data_bytes(s, (uint32_t)value, 2);
++        tx_data_bytes(&s->tx_fifo, (uint32_t)value, 2,
++                      s->regs[R_CONFIG] & R_CONFIG_ENDIAN);
+         goto no_reg_update;
+     case R_TXD3:
+-        tx_data_bytes(s, (uint32_t)value, 3);
++        tx_data_bytes(&s->tx_fifo, (uint32_t)value, 3,
++                      s->regs[R_CONFIG] & R_CONFIG_ENDIAN);
+         goto no_reg_update;
+     }
+     s->regs[addr] = (s->regs[addr] & ~mask) | (value & mask);
+@@ -682,11 +692,11 @@ static void lqspi_load_cache(void *opaque, hwaddr addr)
+ 
+         while (cache_entry < LQSPI_CACHE_SIZE) {
+             for (i = 0; i < 64; ++i) {
+-                tx_data_bytes(s, 0, 1);
++                tx_data_bytes(&s->tx_fifo, 0, 1, false);
+             }
+             xilinx_spips_flush_txfifo(s);
+             for (i = 0; i < 64; ++i) {
+-                rx_data_bytes(s, &q->lqspi_buf[cache_entry++], 1);
++                rx_data_bytes(&s->rx_fifo, &q->lqspi_buf[cache_entry++], 1);
+             }
+         }
+ 
 -- 
 2.7.4
