@@ -1,24 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51893)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51910)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1ePBWs-00054N-BJ
-	for qemu-devel@nongnu.org; Wed, 13 Dec 2017 13:13:15 -0500
+	(envelope-from <alex.williamson@redhat.com>) id 1ePBWt-00055U-F4
+	for qemu-devel@nongnu.org; Wed, 13 Dec 2017 13:13:16 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1ePBWr-0008GD-C2
-	for qemu-devel@nongnu.org; Wed, 13 Dec 2017 13:13:14 -0500
-Received: from orth.archaic.org.uk ([2001:8b0:1d0::2]:39158)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pm215@archaic.org.uk>)
-	id 1ePBWr-0008FT-42
+	(envelope-from <alex.williamson@redhat.com>) id 1ePBWr-0008G3-3d
+	for qemu-devel@nongnu.org; Wed, 13 Dec 2017 13:13:15 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:39432)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <alex.williamson@redhat.com>)
+	id 1ePBWq-0008FG-U9
 	for qemu-devel@nongnu.org; Wed, 13 Dec 2017 13:13:13 -0500
-Received: from pm215 by orth.archaic.org.uk with local (Exim 4.89)
-	(envelope-from <pm215@archaic.org.uk>) id 1ePBWq-0007rl-7C
-	for qemu-devel@nongnu.org; Wed, 13 Dec 2017 18:13:12 +0000
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Wed, 13 Dec 2017 18:12:40 +0000
-Message-Id: <1513188761-20784-43-git-send-email-peter.maydell@linaro.org>
-In-Reply-To: <1513188761-20784-1-git-send-email-peter.maydell@linaro.org>
-References: <1513188761-20784-1-git-send-email-peter.maydell@linaro.org>
-Subject: [Qemu-devel] [PULL 42/43] xilinx_spips: Set all of the reset values
+From: Alex Williamson <alex.williamson@redhat.com>
+Date: Wed, 13 Dec 2017 11:13:09 -0700
+Message-ID: <20171213181301.10875.78618.stgit@gimli.home>
+In-Reply-To: <20171213180541.10386.38737.stgit@gimli.home>
+References: <20171213180541.10386.38737.stgit@gimli.home>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+Subject: [Qemu-devel] [PULL 3/4] vfio/spapr: Allow fallback to SPAPR TCE
+ IOMMU v1
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,111 +29,38 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
+Cc: aik@ozlabs.ru
 
-From: Alistair Francis <alistair.francis@xilinx.com>
+From: Alexey Kardashevskiy <aik@ozlabs.ru>
 
-Following the ZynqMP register spec let's ensure that all reset values
-are set.
+The vfio_iommu_spapr_tce driver advertises kernel's support for
+v1 and v2 IOMMU support, however it is not always possible to use
+the requested IOMMU type. For example, a pseries host platform does not
+support dynamic DMA windows so v2 cannot initialize and QEMU fails to
+start.
 
-Signed-off-by: Alistair Francis <alistair.francis@xilinx.com>
-Reviewed-by: Francisco Iglesias <frasse.iglesias@gmail.com>
-Message-id: 19836f3e0a298b13343c5a59c87425355e7fd8bd.1513104804.git.alistair.francis@xilinx.com
-Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+This adds a fallback to the v1 IOMMU if v2 cannot be used.
+
+Fixes: 318f67ce1371 ("vfio: spapr: Add DMA memory preregistering (SPAPR IOMMU v2)")
+Signed-off-by: Alexey Kardashevskiy <aik@ozlabs.ru>
+Signed-off-by: Alex Williamson <alex.williamson@redhat.com>
 ---
- include/hw/ssi/xilinx_spips.h |  2 +-
- hw/ssi/xilinx_spips.c         | 35 ++++++++++++++++++++++++++++++-----
- 2 files changed, 31 insertions(+), 6 deletions(-)
+ hw/vfio/common.c |    5 +++++
+ 1 file changed, 5 insertions(+)
 
-diff --git a/include/hw/ssi/xilinx_spips.h b/include/hw/ssi/xilinx_spips.h
-index 75fc94c..d398a4e 100644
---- a/include/hw/ssi/xilinx_spips.h
-+++ b/include/hw/ssi/xilinx_spips.h
-@@ -32,7 +32,7 @@
- typedef struct XilinxSPIPS XilinxSPIPS;
- 
- #define XLNX_SPIPS_R_MAX        (0x100 / 4)
--#define XLNX_ZYNQMP_SPIPS_R_MAX (0x200 / 4)
-+#define XLNX_ZYNQMP_SPIPS_R_MAX (0x830 / 4)
- 
- /* Bite off 4k chunks at a time */
- #define LQSPI_CACHE_SIZE 1024
-diff --git a/hw/ssi/xilinx_spips.c b/hw/ssi/xilinx_spips.c
-index 899db81..42d9b04 100644
---- a/hw/ssi/xilinx_spips.c
-+++ b/hw/ssi/xilinx_spips.c
-@@ -66,6 +66,7 @@
- 
- /* interrupt mechanism */
- #define R_INTR_STATUS       (0x04 / 4)
-+#define R_INTR_STATUS_RESET (0x104)
- #define R_INTR_EN           (0x08 / 4)
- #define R_INTR_DIS          (0x0C / 4)
- #define R_INTR_MASK         (0x10 / 4)
-@@ -102,6 +103,9 @@
- #define R_SLAVE_IDLE_COUNT  (0x24 / 4)
- #define R_TX_THRES          (0x28 / 4)
- #define R_RX_THRES          (0x2C / 4)
-+#define R_GPIO              (0x30 / 4)
-+#define R_LPBK_DLY_ADJ      (0x38 / 4)
-+#define R_LPBK_DLY_ADJ_RESET (0x33)
- #define R_TXD1              (0x80 / 4)
- #define R_TXD2              (0x84 / 4)
- #define R_TXD3              (0x88 / 4)
-@@ -140,8 +144,12 @@
- #define R_GQSPI_IER         (0x108 / 4)
- #define R_GQSPI_IDR         (0x10c / 4)
- #define R_GQSPI_IMR         (0x110 / 4)
-+#define R_GQSPI_IMR_RESET   (0xfbe)
- #define R_GQSPI_TX_THRESH   (0x128 / 4)
- #define R_GQSPI_RX_THRESH   (0x12c / 4)
-+#define R_GQSPI_GPIO (0x130 / 4)
-+#define R_GQSPI_LPBK_DLY_ADJ (0x138 / 4)
-+#define R_GQSPI_LPBK_DLY_ADJ_RESET (0x33)
- #define R_GQSPI_CNFG        (0x100 / 4)
-     FIELD(GQSPI_CNFG, MODE_EN, 30, 2)
-     FIELD(GQSPI_CNFG, GEN_FIFO_START_MODE, 29, 1)
-@@ -177,8 +185,16 @@
-     FIELD(GQSPI_GF_SNAPSHOT, EXPONENT, 9, 1)
-     FIELD(GQSPI_GF_SNAPSHOT, DATA_XFER, 8, 1)
-     FIELD(GQSPI_GF_SNAPSHOT, IMMEDIATE_DATA, 0, 8)
--#define R_GQSPI_MOD_ID        (0x168 / 4)
--#define R_GQSPI_MOD_ID_VALUE  0x010A0000
-+#define R_GQSPI_MOD_ID        (0x1fc / 4)
-+#define R_GQSPI_MOD_ID_RESET  (0x10a0000)
-+
-+#define R_QSPIDMA_DST_CTRL         (0x80c / 4)
-+#define R_QSPIDMA_DST_CTRL_RESET   (0x803ffa00)
-+#define R_QSPIDMA_DST_I_MASK       (0x820 / 4)
-+#define R_QSPIDMA_DST_I_MASK_RESET (0xfe)
-+#define R_QSPIDMA_DST_CTRL2        (0x824 / 4)
-+#define R_QSPIDMA_DST_CTRL2_RESET  (0x081bfff8)
-+
- /* size of TXRX FIFOs */
- #define RXFF_A          (128)
- #define TXFF_A          (128)
-@@ -351,11 +367,20 @@ static void xlnx_zynqmp_qspips_reset(DeviceState *d)
-     fifo8_reset(&s->rx_fifo_g);
-     fifo8_reset(&s->rx_fifo_g);
-     fifo32_reset(&s->fifo_g);
-+    s->regs[R_INTR_STATUS] = R_INTR_STATUS_RESET;
-+    s->regs[R_GPIO] = 1;
-+    s->regs[R_LPBK_DLY_ADJ] = R_LPBK_DLY_ADJ_RESET;
-+    s->regs[R_GQSPI_GFIFO_THRESH] = 0x10;
-+    s->regs[R_MOD_ID] = 0x01090101;
-+    s->regs[R_GQSPI_IMR] = R_GQSPI_IMR_RESET;
-     s->regs[R_GQSPI_TX_THRESH] = 1;
-     s->regs[R_GQSPI_RX_THRESH] = 1;
--    s->regs[R_GQSPI_GFIFO_THRESH] = 1;
--    s->regs[R_GQSPI_IMR] = GQSPI_IXR_MASK;
--    s->regs[R_MOD_ID] = 0x01090101;
-+    s->regs[R_GQSPI_GPIO] = 1;
-+    s->regs[R_GQSPI_LPBK_DLY_ADJ] = R_GQSPI_LPBK_DLY_ADJ_RESET;
-+    s->regs[R_GQSPI_MOD_ID] = R_GQSPI_MOD_ID_RESET;
-+    s->regs[R_QSPIDMA_DST_CTRL] = R_QSPIDMA_DST_CTRL_RESET;
-+    s->regs[R_QSPIDMA_DST_I_MASK] = R_QSPIDMA_DST_I_MASK_RESET;
-+    s->regs[R_QSPIDMA_DST_CTRL2] = R_QSPIDMA_DST_CTRL2_RESET;
-     s->man_start_com_g = false;
-     s->gqspi_irqline = 0;
-     xlnx_zynqmp_qspips_update_ixr(s);
--- 
-2.7.4
+diff --git a/hw/vfio/common.c b/hw/vfio/common.c
+index 216eec68ef68..b77be3a8b36b 100644
+--- a/hw/vfio/common.c
++++ b/hw/vfio/common.c
+@@ -1043,6 +1043,11 @@ static int vfio_connect_container(VFIOGroup *group, AddressSpace *as,
+             v2 ? VFIO_SPAPR_TCE_v2_IOMMU : VFIO_SPAPR_TCE_IOMMU;
+         ret = ioctl(fd, VFIO_SET_IOMMU, container->iommu_type);
+         if (ret) {
++            container->iommu_type = VFIO_SPAPR_TCE_IOMMU;
++            v2 = false;
++            ret = ioctl(fd, VFIO_SET_IOMMU, container->iommu_type);
++        }
++        if (ret) {
+             error_setg_errno(errp, errno, "failed to set iommu for container");
+             ret = -errno;
+             goto free_container_exit;
