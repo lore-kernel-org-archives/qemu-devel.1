@@ -1,29 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46049)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50780)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <programmingkidx@gmail.com>) id 1eP9V8-0007tA-DK
-	for qemu-devel@nongnu.org; Wed, 13 Dec 2017 11:03:24 -0500
+	(envelope-from <stefanha@redhat.com>) id 1eP9lv-0007xn-Of
+	for qemu-devel@nongnu.org; Wed, 13 Dec 2017 11:20:40 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <programmingkidx@gmail.com>) id 1eP9V5-0003bF-AI
-	for qemu-devel@nongnu.org; Wed, 13 Dec 2017 11:03:18 -0500
-Received: from mail-it0-x22e.google.com ([2607:f8b0:4001:c0b::22e]:39318)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <programmingkidx@gmail.com>)
-	id 1eP9V5-0003a8-4c
-	for qemu-devel@nongnu.org; Wed, 13 Dec 2017 11:03:15 -0500
-Received: by mail-it0-x22e.google.com with SMTP id 68so4160387ite.4
-	for <qemu-devel@nongnu.org>; Wed, 13 Dec 2017 08:03:14 -0800 (PST)
-Content-Type: text/plain; charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 10.3 \(3273\))
-From: Programmingkid <programmingkidx@gmail.com>
-In-Reply-To: <20171213091458.GA28379@redhat.com>
-Date: Wed, 13 Dec 2017 11:03:11 -0500
-Content-Transfer-Encoding: quoted-printable
-Message-Id: <7D487247-C5DA-4902-A21E-B16861F763C8@gmail.com>
-References: <20B182CA-4FA6-444D-87B1-46B04FFC81AE@gmail.com>
-	<20171212143421.GD26971@redhat.com>
-	<11216FAC-3F62-43AF-ACD8-00F28B7AD886@gmail.com>
-	<20171213091458.GA28379@redhat.com>
-Subject: Re: [Qemu-devel] Adding more function keys support
+	(envelope-from <stefanha@redhat.com>) id 1eP9lq-0007Eb-MI
+	for qemu-devel@nongnu.org; Wed, 13 Dec 2017 11:20:39 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:60841)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1eP9lq-0007E5-Dj
+	for qemu-devel@nongnu.org; Wed, 13 Dec 2017 11:20:34 -0500
+Date: Wed, 13 Dec 2017 16:20:22 +0000
+From: Stefan Hajnoczi <stefanha@redhat.com>
+Message-ID: <20171213162022.GJ7173@stefanha-x1.localdomain>
+References: <20171205055200.16305-1-peterx@redhat.com>
+	<20171205055200.16305-10-peterx@redhat.com>
+MIME-Version: 1.0
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="CxDuMX1Cv2n9FQfo"
+Content-Disposition: inline
+In-Reply-To: <20171205055200.16305-10-peterx@redhat.com>
+Subject: Re: [Qemu-devel] [RFC v5 09/26] monitor: create monitor dedicate
+ iothread
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,64 +29,86 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Daniel P. Berrange" <berrange@redhat.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
+To: Peter Xu <peterx@redhat.com>
+Cc: qemu-devel@nongnu.org, Stefan Hajnoczi <shajnocz@redhat.com>, "Daniel P . Berrange" <berrange@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Fam Zheng <famz@redhat.com>, Juan Quintela <quintela@redhat.com>, mdroth@linux.vnet.ibm.com, Eric Blake <eblake@redhat.com>, Laurent Vivier <lvivier@redhat.com>, Markus Armbruster <armbru@redhat.com>, marcandre.lureau@redhat.com, "Dr . David Alan Gilbert" <dgilbert@redhat.com>
 
 
-> On Dec 13, 2017, at 4:14 AM, Daniel P. Berrange <berrange@redhat.com> =
-wrote:
->=20
-> On Tue, Dec 12, 2017 at 12:49:34PM -0500, Programmingkid wrote:
->>=20
->>> On Dec 12, 2017, at 9:34 AM, Daniel P. Berrange =
-<berrange@redhat.com> wrote:
->>>=20
->>> On Sun, Dec 10, 2017 at 02:10:41AM -0500, Programmingkid wrote:
->>>> On Macintosh keyboards there is a key called fn that is used to =
-give the
->>>> function keys more functionality. Does this key exist in the =
-keyboard keys
->>>> database?
->>>=20
->>> When you say "Macintosh keyboards" are you talking about the old =
-style
->>> keyboards with Apple's custom ADB connector, or simply Apple branded
->>> USB keyboards ?=20
->>=20
->> USB keyboards.
->>=20
->>>=20
->>> If its the latter (USB), then please plug it into a Linux machine, =
-and
->>> in a text console (ie not X11) run 'showkey' and press this 'fn' key =
-on
->>> its own and tell me what (if any) hex code gets printed.
->>=20
->> There was no response to the fn key.
->=20
-> Doh, I made a mistake - you need to run   'showkey -s'  to get raw =
-scancodes.
-> Can you try this again, pressing 'fn' on its own, and also press 'fn' =
-in
-> combination with some function keys.
+--CxDuMX1Cv2n9FQfo
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-Sorry but showkey still did not register the fn key being pushed.
+On Tue, Dec 05, 2017 at 01:51:43PM +0800, Peter Xu wrote:
+> @@ -208,6 +209,12 @@ struct Monitor {
+>      QTAILQ_ENTRY(Monitor) entry;
+>  };
+> =20
+> +struct MonitorGlobal {
+> +    IOThread *mon_iothread;
+> +};
+> +
+> +static struct MonitorGlobal mon_global;
 
->=20
->=20
->>>> Also could keys F16 to F24 (Q_KEY_CODE_F16 to Q_KEY_CODE_F24) be =
-added to
->>>> the database?
->>>=20
->>> Those are already defined in keycodemapdb, so we just need to give =
-them
->>> names in the qapi schema, and then add the name mapping to =
-keycodemapdb.
->>=20
->> I have a vague memory of doing something like this a long time ago.
->> Hopefully I can find the path if it exists.
->=20
-> In qapi/ui.json you need to edit the enum 'QKeyCode' to define the
-> extra keys.
+structs can be anonymous.  That avoids the QEMU coding style violation
+(structs must be typedefed):
 
-Thank you. I will make a patch that adds these keys.=
+  static struct {
+      IOThread *mon_iothread;
+  } mon_global;
+
+In general global variables are usually top-level variables in QEMU.
+I'm not sure why wrapping globals in a struct is useful.
+
+> @@ -4117,6 +4136,16 @@ void monitor_cleanup(void)
+>  {
+>      Monitor *mon, *next;
+> =20
+> +    /*
+> +     * We need to explicitly stop the iothread (but not destroy it),
+> +     * cleanup the monitor resources, then destroy the iothread.  See
+> +     * again on the glib bug mentioned in 2b316774f6 for a reason.
+> +     *
+> +     * TODO: the bug is fixed in glib 2.28, so we can remove this hack
+> +     * as long as we won't support glib versions older than it.
+> +     */
+
+I find this comment confusing.  There is no GSource .finalize() in
+monitor.c so why does monitor_cleanup() need to work around the bug?
+
+I see that monitor_data_destroy() is not thread-safe so the IOThread
+must be stopped first.  That is unrelated to glib.
+
+> +    iothread_stop(mon_global.mon_iothread);
+> +
+>      qemu_mutex_lock(&monitor_lock);
+>      QTAILQ_FOREACH_SAFE(mon, &mon_list, entry, next) {
+>          QTAILQ_REMOVE(&mon_list, mon, entry);
+> @@ -4124,6 +4153,9 @@ void monitor_cleanup(void)
+>          g_free(mon);
+>      }
+>      qemu_mutex_unlock(&monitor_lock);
+> +
+> +    iothread_destroy(mon_global.mon_iothread);
+> +    mon_global.mon_iothread =3D NULL;
+>  }
+> =20
+>  QemuOptsList qemu_mon_opts =3D {
+> --=20
+> 2.14.3
+>=20
+
+--CxDuMX1Cv2n9FQfo
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEcBAEBAgAGBQJaMVNGAAoJEJykq7OBq3PIBAEH/Ah/OFMGfWyDSv8VuYy9StxL
+MH2GEjoYYqQwMohFAueQPKQ76SFPjsuylunVOVICqPi78IV5o+l0gMITfdvJu4XZ
+yM4imLahKjL/fSRiAtPk4wYrMjMFoE8PRmN70RSYeZ1NqXPpSb1SMp+Y3EUB168q
+EriBh9Cin6uei7Q7NbYmoViNkx7EIwz2K9+meHd9S9CRaunbRirOpmvfAhp+pcN4
+eDrS89xczSCCnL6+TAY0YNn1w9efe/fpecUG9pN5Uq3kY7A8kZhHH0jScxmTlV3l
+zKlpmDMeeszmo+OkKfRrMcUiKt6zWgpHPeuFmYTFx961t6s9II3DDsd/CD0kCoU=
+=OMJH
+-----END PGP SIGNATURE-----
+
+--CxDuMX1Cv2n9FQfo--
