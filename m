@@ -1,28 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51383)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51407)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1ePBWU-0004bd-MG
-	for qemu-devel@nongnu.org; Wed, 13 Dec 2017 13:12:51 -0500
+	(envelope-from <pm215@archaic.org.uk>) id 1ePBWV-0004cV-9D
+	for qemu-devel@nongnu.org; Wed, 13 Dec 2017 13:12:52 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1ePBWT-0007cx-N4
-	for qemu-devel@nongnu.org; Wed, 13 Dec 2017 13:12:50 -0500
-Received: from orth.archaic.org.uk ([2001:8b0:1d0::2]:39112)
+	(envelope-from <pm215@archaic.org.uk>) id 1ePBWU-0007dz-61
+	for qemu-devel@nongnu.org; Wed, 13 Dec 2017 13:12:51 -0500
+Received: from orth.archaic.org.uk ([2001:8b0:1d0::2]:39116)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <pm215@archaic.org.uk>)
-	id 1ePBWT-0007Ts-Fn
-	for qemu-devel@nongnu.org; Wed, 13 Dec 2017 13:12:49 -0500
+	id 1ePBWT-0007aJ-Up
+	for qemu-devel@nongnu.org; Wed, 13 Dec 2017 13:12:50 -0500
 Received: from pm215 by orth.archaic.org.uk with local (Exim 4.89)
-	(envelope-from <pm215@archaic.org.uk>) id 1ePBWN-0007Z1-Q7
-	for qemu-devel@nongnu.org; Wed, 13 Dec 2017 18:12:43 +0000
+	(envelope-from <pm215@archaic.org.uk>) id 1ePBWS-0007cJ-Kn
+	for qemu-devel@nongnu.org; Wed, 13 Dec 2017 18:12:48 +0000
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Wed, 13 Dec 2017 18:12:00 +0000
-Message-Id: <1513188761-20784-3-git-send-email-peter.maydell@linaro.org>
+Date: Wed, 13 Dec 2017 18:12:07 +0000
+Message-Id: <1513188761-20784-10-git-send-email-peter.maydell@linaro.org>
 In-Reply-To: <1513188761-20784-1-git-send-email-peter.maydell@linaro.org>
 References: <1513188761-20784-1-git-send-email-peter.maydell@linaro.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PULL 02/43] m25p80: Add support for SST READ ID
- 0x90/0xAB commands
+Subject: [Qemu-devel] [PULL 09/43] xilinx_spips: Add support for zero pumping
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,87 +31,123 @@ To: qemu-devel@nongnu.org
 
 From: Francisco Iglesias <frasse.iglesias@gmail.com>
 
-Add support for SST READ ID 0x90/0xAB commands for reading out the flash
-manufacturer ID and device ID.
+Add support for zero pumping according to the transfer size register.
 
 Signed-off-by: Francisco Iglesias <frasse.iglesias@gmail.com>
-Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
-Message-id: 20171126231634.9531-3-frasse.iglesias@gmail.com
+Reviewed-by: Edgar E. Iglesias <edgar.iglesias@xilinx.com>
+Tested-by: Edgar E. Iglesias <edgar.iglesias@xilinx.com>
+Message-id: 20171126231634.9531-10-frasse.iglesias@gmail.com
 Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 ---
- hw/block/m25p80.c | 32 ++++++++++++++++++++++++++++++++
- 1 file changed, 32 insertions(+)
+ include/hw/ssi/xilinx_spips.h |  2 ++
+ hw/ssi/xilinx_spips.c         | 47 ++++++++++++++++++++++++++++++++++++-------
+ 2 files changed, 42 insertions(+), 7 deletions(-)
 
-diff --git a/hw/block/m25p80.c b/hw/block/m25p80.c
-index d50acc1..092c0c6 100644
---- a/hw/block/m25p80.c
-+++ b/hw/block/m25p80.c
-@@ -355,6 +355,8 @@ typedef enum {
-     DPP = 0xa2,
-     QPP = 0x32,
-     QPP_4 = 0x34,
-+    RDID_90 = 0x90,
-+    RDID_AB = 0xab,
+diff --git a/include/hw/ssi/xilinx_spips.h b/include/hw/ssi/xilinx_spips.h
+index bac90a5..ad2175a 100644
+--- a/include/hw/ssi/xilinx_spips.h
++++ b/include/hw/ssi/xilinx_spips.h
+@@ -76,6 +76,8 @@ struct XilinxSPIPS {
+     uint32_t rx_discard;
  
-     ERASE_4K = 0x20,
-     ERASE4_4K = 0x21,
-@@ -405,6 +407,7 @@ typedef enum {
-     MAN_MACRONIX,
-     MAN_NUMONYX,
-     MAN_WINBOND,
-+    MAN_SST,
-     MAN_GENERIC,
- } Manufacturer;
+     uint32_t regs[XLNX_SPIPS_R_MAX];
++
++    bool man_start_com;
+ };
  
-@@ -476,6 +479,8 @@ static inline Manufacturer get_man(Flash *s)
-         return MAN_SPANSION;
-     case 0xC2:
-         return MAN_MACRONIX;
-+    case 0xBF:
-+        return MAN_SST;
-     default:
-         return MAN_GENERIC;
+ typedef struct {
+diff --git a/hw/ssi/xilinx_spips.c b/hw/ssi/xilinx_spips.c
+index 4621dbb..878b17e 100644
+--- a/hw/ssi/xilinx_spips.c
++++ b/hw/ssi/xilinx_spips.c
+@@ -109,6 +109,7 @@
+     FIELD(CMND, DUMMY_CYCLES, 2, 6)
+ #define R_CMND_DMA_EN         (1 << 1)
+ #define R_CMND_PUSH_WAIT      (1 << 0)
++#define R_TRANSFER_SIZE     (0xc4 / 4)
+ #define R_LQSPI_STS         (0xA4 / 4)
+ #define LQSPI_STS_WR_RECVD      (1 << 1)
+ 
+@@ -227,6 +228,7 @@ static void xilinx_spips_reset(DeviceState *d)
+     s->link_state_next_when = 0;
+     s->snoop_state = SNOOP_CHECKING;
+     s->cmd_dummies = 0;
++    s->man_start_com = false;
+     xilinx_spips_update_ixr(s);
+     xilinx_spips_update_cs_lines(s);
+ }
+@@ -464,6 +466,41 @@ static inline void tx_data_bytes(Fifo8 *fifo, uint32_t value, int num, bool be)
      }
-@@ -711,6 +716,31 @@ static void complete_collecting_data(Flash *s)
-     case WEVCR:
-         s->enh_volatile_cfg = s->data[0];
+ }
+ 
++static void xilinx_spips_check_zero_pump(XilinxSPIPS *s)
++{
++    if (!s->regs[R_TRANSFER_SIZE]) {
++        return;
++    }
++    if (!fifo8_is_empty(&s->tx_fifo) && s->regs[R_CMND] & R_CMND_PUSH_WAIT) {
++        return;
++    }
++    /*
++     * The zero pump must never fill tx fifo such that rx overflow is
++     * possible
++     */
++    while (s->regs[R_TRANSFER_SIZE] &&
++           s->rx_fifo.num + s->tx_fifo.num < RXFF_A_Q - 3) {
++        /* endianess just doesn't matter when zero pumping */
++        tx_data_bytes(&s->tx_fifo, 0, 4, false);
++        s->regs[R_TRANSFER_SIZE] &= ~0x03ull;
++        s->regs[R_TRANSFER_SIZE] -= 4;
++    }
++}
++
++static void xilinx_spips_check_flush(XilinxSPIPS *s)
++{
++    if (s->man_start_com ||
++        (!fifo8_is_empty(&s->tx_fifo) &&
++         !(s->regs[R_CONFIG] & MAN_START_EN))) {
++        xilinx_spips_check_zero_pump(s);
++        xilinx_spips_flush_txfifo(s);
++    }
++    if (fifo8_is_empty(&s->tx_fifo) && !s->regs[R_TRANSFER_SIZE]) {
++        s->man_start_com = false;
++    }
++    xilinx_spips_update_ixr(s);
++}
++
+ static inline int rx_data_bytes(Fifo8 *fifo, uint8_t *value, int max)
+ {
+     int i;
+@@ -533,7 +570,6 @@ static void xilinx_spips_write(void *opaque, hwaddr addr,
+                                         uint64_t value, unsigned size)
+ {
+     int mask = ~0;
+-    int man_start_com = 0;
+     XilinxSPIPS *s = opaque;
+ 
+     DB_PRINT_L(0, "addr=" TARGET_FMT_plx " = %x\n", addr, (unsigned)value);
+@@ -541,8 +577,8 @@ static void xilinx_spips_write(void *opaque, hwaddr addr,
+     switch (addr) {
+     case R_CONFIG:
+         mask = ~(R_CONFIG_RSVD | MAN_START_COM);
+-        if (value & MAN_START_COM) {
+-            man_start_com = 1;
++        if ((value & MAN_START_COM) && (s->regs[R_CONFIG] & MAN_START_EN)) {
++            s->man_start_com = true;
+         }
          break;
-+    case RDID_90:
-+    case RDID_AB:
-+        if (get_man(s) == MAN_SST) {
-+            if (s->cur_addr <= 1) {
-+                if (s->cur_addr) {
-+                    s->data[0] = s->pi->id[2];
-+                    s->data[1] = s->pi->id[0];
-+                } else {
-+                    s->data[0] = s->pi->id[0];
-+                    s->data[1] = s->pi->id[2];
-+                }
-+                s->pos = 0;
-+                s->len = 2;
-+                s->data_read_loop = true;
-+                s->state = STATE_READING_DATA;
-+            } else {
-+                qemu_log_mask(LOG_GUEST_ERROR,
-+                              "M25P80: Invalid read id address\n");
-+            }
-+        } else {
-+            qemu_log_mask(LOG_GUEST_ERROR,
-+                          "M25P80: Read id (command 0x90/0xAB) is not supported"
-+                          " by device\n");
-+        }
-+        break;
-     default:
-         break;
-     }
-@@ -926,6 +956,8 @@ static void decode_new_cmd(Flash *s, uint32_t value)
-     case PP4:
-     case PP4_4:
-     case DIE_ERASE:
-+    case RDID_90:
-+    case RDID_AB:
-         s->needed_bytes = get_addr_length(s);
-         s->pos = 0;
-         s->len = 0;
+     case R_INTR_STATUS:
+@@ -588,10 +624,7 @@ static void xilinx_spips_write(void *opaque, hwaddr addr,
+     s->regs[addr] = (s->regs[addr] & ~mask) | (value & mask);
+ no_reg_update:
+     xilinx_spips_update_cs_lines(s);
+-    if ((man_start_com && s->regs[R_CONFIG] & MAN_START_EN) ||
+-            (fifo8_is_empty(&s->tx_fifo) && s->regs[R_CONFIG] & MAN_START_EN)) {
+-        xilinx_spips_flush_txfifo(s);
+-    }
++    xilinx_spips_check_flush(s);
+     xilinx_spips_update_cs_lines(s);
+     xilinx_spips_update_ixr(s);
+ }
 -- 
 2.7.4
