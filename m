@@ -1,26 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39054)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41601)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1ePC0o-00062B-Kq
-	for qemu-devel@nongnu.org; Wed, 13 Dec 2017 13:44:11 -0500
+	(envelope-from <eblake@redhat.com>) id 1ePC86-0003nf-Tv
+	for qemu-devel@nongnu.org; Wed, 13 Dec 2017 13:51:44 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1ePC0k-0003Lw-M2
-	for qemu-devel@nongnu.org; Wed, 13 Dec 2017 13:44:10 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:44156)
+	(envelope-from <eblake@redhat.com>) id 1ePC83-0008CW-0n
+	for qemu-devel@nongnu.org; Wed, 13 Dec 2017 13:51:42 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:53228)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1ePC0k-0003LU-Et
-	for qemu-devel@nongnu.org; Wed, 13 Dec 2017 13:44:06 -0500
-Date: Wed, 13 Dec 2017 18:43:58 +0000
-From: Stefan Hajnoczi <stefanha@redhat.com>
-Message-ID: <20171213184358.GF8317@stefanha-x1.localdomain>
-References: <20171205055200.16305-1-peterx@redhat.com>
-	<20171205055200.16305-16-peterx@redhat.com>
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1ePC82-0008Bw-QN
+	for qemu-devel@nongnu.org; Wed, 13 Dec 2017 13:51:38 -0500
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+	[10.5.11.13])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 2A993916AB
+	for <qemu-devel@nongnu.org>; Wed, 13 Dec 2017 18:51:37 +0000 (UTC)
+References: <20171212141859.3761-1-berrange@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <7da517ca-5671-7832-18cd-8ecc7ea49544@redhat.com>
+Date: Wed, 13 Dec 2017 12:51:35 -0600
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="z+pzSjdB7cqptWpS"
-Content-Disposition: inline
-In-Reply-To: <20171205055200.16305-16-peterx@redhat.com>
-Subject: Re: [Qemu-devel] [RFC v5 15/26] monitor: let suspend_cnt be thread
- safe
+In-Reply-To: <20171212141859.3761-1-berrange@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="D4i3bPRphrlWuHoOrfagA80NeHn6MLP0G"
+Subject: Re: [Qemu-devel] [PATCH v2] docs: update information for TLS
+ certificate management
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,56 +34,65 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Xu <peterx@redhat.com>
-Cc: qemu-devel@nongnu.org, Stefan Hajnoczi <shajnocz@redhat.com>, "Daniel P . Berrange" <berrange@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Fam Zheng <famz@redhat.com>, Juan Quintela <quintela@redhat.com>, mdroth@linux.vnet.ibm.com, Eric Blake <eblake@redhat.com>, Laurent Vivier <lvivier@redhat.com>, Markus Armbruster <armbru@redhat.com>, marcandre.lureau@redhat.com, "Dr . David Alan Gilbert" <dgilbert@redhat.com>
+To: "Daniel P. Berrange" <berrange@redhat.com>, qemu-devel@nongnu.org
+Cc: Thomas Huth <thuth@redhat.com>
 
-
---z+pzSjdB7cqptWpS
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--D4i3bPRphrlWuHoOrfagA80NeHn6MLP0G
+From: Eric Blake <eblake@redhat.com>
+To: "Daniel P. Berrange" <berrange@redhat.com>, qemu-devel@nongnu.org
+Cc: Thomas Huth <thuth@redhat.com>
+Message-ID: <7da517ca-5671-7832-18cd-8ecc7ea49544@redhat.com>
+Subject: Re: [PATCH v2] docs: update information for TLS certificate
+ management
+References: <20171212141859.3761-1-berrange@redhat.com>
+In-Reply-To: <20171212141859.3761-1-berrange@redhat.com>
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
 
-On Tue, Dec 05, 2017 at 01:51:49PM +0800, Peter Xu wrote:
-> Monitor code now can be run in more than one thread.  Let it be thread
-> safe when accessing suspend_cnt counter.
-
-Please add doc comments to the functions explaining which thread they
-may be called from (especially public functions).  Without this
-information other people will have a hard time keeping code thread-safe.
-
-> Signed-off-by: Peter Xu <peterx@redhat.com>
+On 12/12/2017 08:18 AM, Daniel P. Berrange wrote:
+> The current docs for TLS assume only VNC is using TLS. Some of the info=
+rmation
+> is also outdated (ie lacking subject alt name info for certs). Rewrite =
+it to
+> more accurately reflect the current situation.
+>=20
+> Signed-off-by: Daniel P. Berrange <berrange@redhat.com>
 > ---
->  monitor.c | 13 +++++++------
->  1 file changed, 7 insertions(+), 6 deletions(-)
+>=20
+> Changed in v2:
+>=20
+>   - Misc typos (Eric)
+>=20
+>  qemu-doc.texi | 368 +++++++++++++++++++++++++++++++++++++++++++-------=
+--------
+>  1 file changed, 275 insertions(+), 93 deletions(-)
 
-=46rom docs/devel/atomics.txt:
+Reviewed-by: Eric Blake <eblake@redhat.com>
 
-  Macros defined by qemu/atomic.h fall in three camps:
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
 
-  - compiler barriers: barrier();
 
-  - weak atomic access and manual memory barriers: atomic_read(),
-    atomic_set(), smp_rmb(), smp_wmb(), smp_mb(), smp_mb_acquire(),
-    smp_mb_release(), smp_read_barrier_depends();
-
-  - sequentially consistent atomic access: everything else.
-
-The atomic_read() and atomic_set() calls in this patch aren't effective
-without memory barriers.  Please use atomic_mb_read() and
-atomic_mb_set() instead.
-
---z+pzSjdB7cqptWpS
+--D4i3bPRphrlWuHoOrfagA80NeHn6MLP0G
 Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
 
-iQEcBAEBAgAGBQJaMXTuAAoJEJykq7OBq3PIF4UIAMePx1ajYf1keMsql+Fqpeh4
-/IchuBI2WY1Y+kQyGxYnf7jFsdU+uOFnoE5N/5oFJeDlh/OZ23jZR0bZXeMQ+cyN
-SQL8u68spJU+09BHPC8uaiYSsjaPlbXqk+6Gn++UhsHVWdiB882w4DCSpyfh9pRa
-VCFtubvK8v7pg0VlAo+VLnfq5xj41iSnEdOaswNZlLF11GgeOcLVxeDgJcCO2XM5
-v/q746U77YyyrnjYlsNKMSiOFOgOmKEeMFMixQ1gKK8tW9BHM5NvcbAI4ZeLBoQ7
-oR6BI92ZCiyeFUTAXDWE6hdJqYRgMHnY7bVCCF8yTMA4lWCg7VALDiLQIJKNjZo=
-=AjPO
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAloxdrcACgkQp6FrSiUn
+Q2pyXAf/S51690/0LbkVkehhrN/oC/2wF2cVExdQ8OXtxiF0vhLpoVJoa2FTFuhS
+7dgbVY2MVyA465ahuGq5QFbwhHEMT3I2odwfg8vN9PZELo633D7BFb7mL7D2aCk6
+d2mRvZaTlgdCtpBVI4RWbKmUA/XzkY8iymyCThCBITn1f+zJsEZ9qabDgi0eSbxT
+8INJEoicBc0WWTB59PrGN0NwRdLjI7hUaCvfciuZAEatxCUKd3EZsqy4mulg1hvB
+3MQoJ58hgcpO2Ix60OZenBLdaVw6VKgUjrp0aHcXqG4xr/VY8hhTsw1GHcKTIwAn
+eM9RG4slIGZE42xJUPeo6x5Ta15A2Q==
+=Q94j
 -----END PGP SIGNATURE-----
 
---z+pzSjdB7cqptWpS--
+--D4i3bPRphrlWuHoOrfagA80NeHn6MLP0G--
