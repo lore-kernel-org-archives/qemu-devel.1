@@ -1,26 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58520)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59080)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <maozy.fnst@cn.fujitsu.com>) id 1eOziw-0000T2-FV
-	for qemu-devel@nongnu.org; Wed, 13 Dec 2017 00:36:55 -0500
+	(envelope-from <maozy.fnst@cn.fujitsu.com>) id 1eOzmb-0001lu-FM
+	for qemu-devel@nongnu.org; Wed, 13 Dec 2017 00:40:42 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <maozy.fnst@cn.fujitsu.com>) id 1eOzit-0007nt-C7
-	for qemu-devel@nongnu.org; Wed, 13 Dec 2017 00:36:54 -0500
-Received: from mail.cn.fujitsu.com ([183.91.158.132]:23035
+	(envelope-from <maozy.fnst@cn.fujitsu.com>) id 1eOzmY-0001PD-BA
+	for qemu-devel@nongnu.org; Wed, 13 Dec 2017 00:40:41 -0500
+Received: from mail.cn.fujitsu.com ([183.91.158.132]:32793
 	helo=heian.cn.fujitsu.com) by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <maozy.fnst@cn.fujitsu.com>) id 1eOzis-0007gc-Gh
-	for qemu-devel@nongnu.org; Wed, 13 Dec 2017 00:36:51 -0500
+	(envelope-from <maozy.fnst@cn.fujitsu.com>) id 1eOzmX-0001Ot-EL
+	for qemu-devel@nongnu.org; Wed, 13 Dec 2017 00:40:38 -0500
 References: <cover.1512552817.git.maozy.fnst@cn.fujitsu.com>
-	<b6d0276b6310888ce85e96277826e8e1ae1ba541.1512552817.git.maozy.fnst@cn.fujitsu.com>
-	<CAK3tnvJ-nFhdN8qdO1WqBxp5stX_Rrh1F5eM5_NC_7uOsGow4Q@mail.gmail.com>
+	<6991b2261016c48122aaf7d71e33cc1d74b620fd.1512552817.git.maozy.fnst@cn.fujitsu.com>
+	<CAK3tnv+2Eu_y_-eh901TANGEdi2RNjeU03MKRy0VgzdXkp02TA@mail.gmail.com>
 From: Mao Zhongyi <maozy.fnst@cn.fujitsu.com>
-Message-ID: <781f34e2-622c-858a-d6e8-77860ed3f36a@cn.fujitsu.com>
-Date: Wed, 13 Dec 2017 13:32:09 +0800
+Message-ID: <da82d562-ec65-88c4-a937-1a7296cbfa0d@cn.fujitsu.com>
+Date: Wed, 13 Dec 2017 13:35:59 +0800
 MIME-Version: 1.0
-In-Reply-To: <CAK3tnvJ-nFhdN8qdO1WqBxp5stX_Rrh1F5eM5_NC_7uOsGow4Q@mail.gmail.com>
+In-Reply-To: <CAK3tnv+2Eu_y_-eh901TANGEdi2RNjeU03MKRy0VgzdXkp02TA@mail.gmail.com>
 Content-Type: text/plain; charset="utf-8"; format=flowed
 Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH v2 1/4] colo: remove the incorrect if
- conditions in colo_compare_packet_tcp()
+Subject: Re: [Qemu-devel] [PATCH v2 2/4] colo: modified the payload compare
+ function
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,26 +32,101 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: Zhang Chen <zhangckid@gmail.com>
 Cc: qemu-devel@nongnu.org, Li Zhijian <lizhijian@cn.fujitsu.com>, Jason Wang <jasowang@redhat.com>
 
-Hi, Chen
+
 
 On 12/12/2017 11:19 PM, Zhang Chen wrote:
-> This patch should be moved behind the patch with payload comparition.
+>
+>
+> On Wed, Dec 6, 2017 at 5:57 PM, Mao Zhongyi <maozy.fnst@cn.fujitsu.com <mailto:maozy.fnst@cn.fujitsu.com>> wrote:
+>
+>     Modified the function colo_packet_compare_common to prepare for the
+>     tcp packet comparison in the next patch.
+>
+>     Cc: Zhang Chen <zhangckid@gmail.com <mailto:zhangckid@gmail.com>>
+>     Cc: Li Zhijian <lizhijian@cn.fujitsu.com <mailto:lizhijian@cn.fujitsu.com>>
+>     Cc: Jason Wang <jasowang@redhat.com <mailto:jasowang@redhat.com>>
+>
+>     Signed-off-by: Mao Zhongyi <maozy.fnst@cn.fujitsu.com <mailto:maozy.fnst@cn.fujitsu.com>>
+>     ---
+>      net/colo-compare.c | 71 ++++++++++++++++++++++++++++++------------------------
+>      1 file changed, 39 insertions(+), 32 deletions(-)
+>
+>     diff --git a/net/colo-compare.c b/net/colo-compare.c
+>     index 0afb5f0..f833eba 100644
+>     --- a/net/colo-compare.c
+>     +++ b/net/colo-compare.c
+>     @@ -191,10 +191,11 @@ static int packet_enqueue(CompareState *s, int mode, Connection **con)
+>       * return:    0  means packet same
+>       *            > 0 || < 0 means packet different
+>       */
+>     -static int colo_packet_compare_common(Packet *ppkt,
+>     -                                      Packet *spkt,
+>     -                                      int poffset,
+>     -                                      int soffset)
+>     +static int colo_compare_packet_payload(Packet *ppkt,
+>     +                                       Packet *spkt,
+>     +                                       uint16_t poffset,
+>     +                                       uint16_t soffset,
+>     +                                       uint16_t len)
+>      {
+>          if (trace_event_get_state_backends(TRACE_COLO_COMPARE_MISCOMPARE)) {
+>              char pri_ip_src[20], pri_ip_dst[20], sec_ip_src[20], sec_ip_dst[20];
+>     @@ -209,17 +210,7 @@ static int colo_packet_compare_common(Packet *ppkt,
+>                                         sec_ip_src, sec_ip_dst);
+>          }
+>
+>     -    poffset = ppkt->vnet_hdr_len + poffset;
+>     -    soffset = ppkt->vnet_hdr_len + soffset;
+>     -
+>     -    if (ppkt->size - poffset == spkt->size - soffset) {
+>     -        return memcmp(ppkt->data + poffset,
+>     -                      spkt->data + soffset,
+>     -                      spkt->size - soffset);
+>     -    } else {
+>     -        trace_colo_compare_main("Net packet size are not the same");
+>     -        return -1;
+>     -    }
+>     +    return memcmp(ppkt->data + poffset, spkt->data + soffset, len);
+>      }
+>
+>      /*
+>     @@ -274,16 +265,23 @@ static int colo_packet_compare_tcp(Packet *spkt, Packet *ppkt)
+>          ptrdiff_t ptcp_offset, stcp_offset;
+>
+>          ptcp_offset = ppkt->transport_header - (uint8_t *)ppkt->data
+>     -                  + (ptcp->th_off * 4) - ppkt->vnet_hdr_len;
+>     +                  + (ptcp->th_off << 2) - ppkt->vnet_hdr_len;
+>          stcp_offset = spkt->transport_header - (uint8_t *)spkt->data
+>     -                  + (stcp->th_off * 4) - spkt->vnet_hdr_len;
+>     +                  + (stcp->th_off << 2) - spkt->vnet_hdr_len;
+>          /*
+>           * When network is busy, some tcp options(like sack) will unpredictable
+>           * occur in primary side or secondary side. it will make packet size
+>           * not same, but the two packet's payload is identical. colo just
+>           * care about packet payload, so we skip the option field.
+>           */
+>
+>
+> In the patch 1，you should remove this comments, it's out of date.
 
-Well, it is not impossible, but I think it is better to be here. Because it is
-the correct logic to firstly ensure that there are no missing cases by fixing
-the small nits in the original tcp comparison then consider whether or not to
-rebuild it. It's two things. The payload comparison patch belongs to the latter,
-So this patch should be placed in front of it.
+Ah, I got it.
 
-> People needs look your changes to understand why we need this patch.
+>
+>
+>
+>     -    res = colo_packet_compare_common(ppkt, spkt, ptcp_offset, stcp_offset);
+>     +    if (ppkt->size - ptcp_offset == spkt->size - stcp_offset) {
+>     +        res = colo_compare_packet_payload(ppkt, spkt,
+>     +                                          ptcp_offset, stcp_offset,
+>     +                                          ppkt->size - ptcp_offset);
+>     +    } else {
+>     +        trace_colo_compare_main("TCP: the size of packets are different");
+>
+>
+>
+> Should fix this comments to "TCP: payload size of packets are diffenrent!".
 
-Actually, in colo_packet_compare_tcp() the if condition (ptcp->th_off > 5) is
-not reasonable, it make the packets with ‘ptcp->th_off == 5’ lose the chance of
-comparison even if the same payload.
-
-Since colo is focus on the payload we only need to get the length of packet header
-rather than care about whether the packet carries option fields. So this is the
-meaning of this patch.
+OK,  I will.
 
 Thanks,
 Mao
@@ -61,70 +136,99 @@ Mao
 > Zhang Chen
 >
 >
-> On Wed, Dec 6, 2017 at 9:57 AM, Mao Zhongyi <maozy.fnst@cn.fujitsu.com <mailto:maozy.fnst@cn.fujitsu.com>> wrote:
 >
->     The th_off field specifies the size of the TCP header, if th_off > 5,
->     it only means this tcp packet have options field. Regardless of whether
->     the packet carries option fields, it doesn't effect us to obtain the
->     length of the header use a general method. So there is no need to add
->     the limiting conditions(if (th_off > 5)). In addtion, here we just focus
->     on the payload, don't care about the option field. So removed the
->     'if (th_off > 5)' and 'if (ptcp->th_sum == stcp->th_sum)' conditions
->     together.
->
->     Cc: Zhang Chen <zhangckid@gmail.com <mailto:zhangckid@gmail.com>>
->     Cc: Li Zhijian <lizhijian@cn.fujitsu.com <mailto:lizhijian@cn.fujitsu.com>>
->     Cc: Jason Wang <jasowang@redhat.com <mailto:jasowang@redhat.com>>
->
->     Signed-off-by: Mao Zhongyi <maozy.fnst@cn.fujitsu.com <mailto:maozy.fnst@cn.fujitsu.com>>
->     Signed-off-by: Li Zhijian <lizhijian@cn.fujitsu.com <mailto:lizhijian@cn.fujitsu.com>>
->     ---
->      net/colo-compare.c | 31 ++++++++++++-------------------
->      1 file changed, 12 insertions(+), 19 deletions(-)
->
->     diff --git a/net/colo-compare.c b/net/colo-compare.c
->     index 1ce195f..0afb5f0 100644
->     --- a/net/colo-compare.c
->     +++ b/net/colo-compare.c
->     @@ -271,26 +271,19 @@ static int colo_packet_compare_tcp(Packet *spkt, Packet *ppkt)
->           * the secondary guest's timestamp. COLO just focus on payload,
->           * so we just need skip this field.
->           */
->     -    if (ptcp->th_off > 5) {
->     -        ptrdiff_t ptcp_offset, stcp_offset;
->     +    ptrdiff_t ptcp_offset, stcp_offset;
->
->     -        ptcp_offset = ppkt->transport_header - (uint8_t *)ppkt->data
->     -                      + (ptcp->th_off * 4) - ppkt->vnet_hdr_len;
->     -        stcp_offset = spkt->transport_header - (uint8_t *)spkt->data
->     -                      + (stcp->th_off * 4) - spkt->vnet_hdr_len;
->     -
->     -        /*
->     -         * When network is busy, some tcp options(like sack) will unpredictable
->     -         * occur in primary side or secondary side. it will make packet size
->     -         * not same, but the two packet's payload is identical. colo just
->     -         * care about packet payload, so we skip the option field.
->     -         */
->     -        res = colo_packet_compare_common(ppkt, spkt, ptcp_offset, stcp_offset);
->     -    } else if (ptcp->th_sum == stcp->th_sum) {
->     -        res = colo_packet_compare_common(ppkt, spkt, ETH_HLEN, ETH_HLEN);
->     -    } else {
->     -        res = -1;
->     -    }
->     +    ptcp_offset = ppkt->transport_header - (uint8_t *)ppkt->data
->     +                  + (ptcp->th_off * 4) - ppkt->vnet_hdr_len;
->     +    stcp_offset = spkt->transport_header - (uint8_t *)spkt->data
->     +                  + (stcp->th_off * 4) - spkt->vnet_hdr_len;
->     +    /*
->     +     * When network is busy, some tcp options(like sack) will unpredictable
->     +     * occur in primary side or secondary side. it will make packet size
->     +     * not same, but the two packet's payload is identical. colo just
->     +     * care about packet payload, so we skip the option field.
->     +     */
->     +    res = colo_packet_compare_common(ppkt, spkt, ptcp_offset, stcp_offset);
+>     +        res = -1;
+>     +    }
 >
 >          if (res != 0 &&
 >              trace_event_get_state_backends(TRACE_COLO_COMPARE_MISCOMPARE)) {
+>     @@ -325,8 +323,8 @@ static int colo_packet_compare_tcp(Packet *spkt, Packet *ppkt)
+>       */
+>      static int colo_packet_compare_udp(Packet *spkt, Packet *ppkt)
+>      {
+>     -    int ret;
+>     -    int network_header_length = ppkt->ip->ip_hl * 4;
+>     +    uint16_t network_header_length = ppkt->ip->ip_hl << 2;
+>     +    uint16_t offset = network_header_length + ETH_HLEN + ppkt->vnet_hdr_len;
+>
+>          trace_colo_compare_main("compare udp");
+>
+>     @@ -340,11 +338,12 @@ static int colo_packet_compare_udp(Packet *spkt, Packet *ppkt)
+>           * other field like TOS,TTL,IP Checksum. we only need to compare
+>           * the ip payload here.
+>           */
+>     -    ret = colo_packet_compare_common(ppkt, spkt,
+>     -                                     network_header_length + ETH_HLEN,
+>     -                                     network_header_length + ETH_HLEN);
+>     -
+>     -    if (ret) {
+>     +    if (ppkt->size != spkt->size) {
+>     +        trace_colo_compare_main("UDP: the size of packets are different");
+>     +        return -1;
+>     +    }
+>     +    if (colo_compare_packet_payload(ppkt, spkt, offset, offset,
+>     +                                    ppkt->size - offset)) {
+>              trace_colo_compare_udp_miscompare("primary pkt size", ppkt->size);
+>              trace_colo_compare_udp_miscompare("Secondary pkt size", spkt->size);
+>              if (trace_event_get_state_backends(TRACE_COLO_COMPARE_MISCOMPARE)) {
+>     @@ -353,9 +352,10 @@ static int colo_packet_compare_udp(Packet *spkt, Packet *ppkt)
+>                  qemu_hexdump((char *)spkt->data, stderr, "colo-compare sec pkt",
+>                               spkt->size);
+>              }
+>     +        return -1;
+>     +    } else {
+>     +        return 0;
+>          }
+>     -
+>     -    return ret;
+>      }
+>
+>      /*
+>     @@ -364,7 +364,8 @@ static int colo_packet_compare_udp(Packet *spkt, Packet *ppkt)
+>       */
+>      static int colo_packet_compare_icmp(Packet *spkt, Packet *ppkt)
+>      {
+>     -    int network_header_length = ppkt->ip->ip_hl * 4;
+>     +    uint16_t network_header_length = ppkt->ip->ip_hl << 2;
+>     +    uint16_t offset = network_header_length + ETH_HLEN + ppkt->vnet_hdr_len;
+>
+>          trace_colo_compare_main("compare icmp");
+>
+>     @@ -378,9 +379,12 @@ static int colo_packet_compare_icmp(Packet *spkt, Packet *ppkt)
+>           * other field like TOS,TTL,IP Checksum. we only need to compare
+>           * the ip payload here.
+>           */
+>     -    if (colo_packet_compare_common(ppkt, spkt,
+>     -                                   network_header_length + ETH_HLEN,
+>     -                                   network_header_length + ETH_HLEN)) {
+>     +    if (ppkt->size != spkt->size) {
+>     +        trace_colo_compare_main("ICMP: the size of packets are different");
+>     +        return -1;
+>     +    }
+>     +    if (colo_compare_packet_payload(ppkt, spkt, offset, offset,
+>     +                                    ppkt->size - offset)) {
+>              trace_colo_compare_icmp_miscompare("primary pkt size",
+>                                                 ppkt->size);
+>              trace_colo_compare_icmp_miscompare("Secondary pkt size",
+>     @@ -403,6 +407,8 @@ static int colo_packet_compare_icmp(Packet *spkt, Packet *ppkt)
+>       */
+>      static int colo_packet_compare_other(Packet *spkt, Packet *ppkt)
+>      {
+>     +    uint16_t offset = ppkt->vnet_hdr_len;
+>     +
+>          trace_colo_compare_main("compare other");
+>          if (trace_event_get_state_backends(TRACE_COLO_COMPARE_MISCOMPARE)) {
+>              char pri_ip_src[20], pri_ip_dst[20], sec_ip_src[20], sec_ip_dst[20];
+>     @@ -417,7 +423,8 @@ static int colo_packet_compare_other(Packet *spkt, Packet *ppkt)
+>                                         sec_ip_src, sec_ip_dst);
+>          }
+>
+>     -    return colo_packet_compare_common(ppkt, spkt, 0, 0);
+>     +    return colo_compare_packet_payload(ppkt, spkt, offset, offset,
+>     +                                       ppkt->size - offset);
+>      }
+>
+>      static int colo_old_packet_check_one(Packet *pkt, int64_t *check_time)
 >     --
 >     2.9.4
 >
