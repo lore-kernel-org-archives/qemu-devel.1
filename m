@@ -1,21 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34994)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35151)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1eP4F6-0000Na-E3
-	for qemu-devel@nongnu.org; Wed, 13 Dec 2017 05:26:25 -0500
+	(envelope-from <marcandre.lureau@gmail.com>) id 1eP4FG-0000XP-Oh
+	for qemu-devel@nongnu.org; Wed, 13 Dec 2017 05:26:35 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1eP4F5-00040O-HA
-	for qemu-devel@nongnu.org; Wed, 13 Dec 2017 05:26:24 -0500
-Date: Wed, 13 Dec 2017 10:26:14 +0000
-From: Stefan Hajnoczi <stefanha@gmail.com>
-Message-ID: <20171213102614.GF16782@stefanha-x1.localdomain>
-References: <20171212134800.21836-1-kwolf@redhat.com>
+	(envelope-from <marcandre.lureau@gmail.com>) id 1eP4FC-000468-W4
+	for qemu-devel@nongnu.org; Wed, 13 Dec 2017 05:26:34 -0500
+Received: from mail-wm0-x236.google.com ([2a00:1450:400c:c09::236]:42798)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <marcandre.lureau@gmail.com>)
+	id 1eP4FC-00045M-P9
+	for qemu-devel@nongnu.org; Wed, 13 Dec 2017 05:26:30 -0500
+Received: by mail-wm0-x236.google.com with SMTP id b199so3988499wme.1
+	for <qemu-devel@nongnu.org>; Wed, 13 Dec 2017 02:26:30 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="dgjlcl3Tl+kb3YDk"
-Content-Disposition: inline
-In-Reply-To: <20171212134800.21836-1-kwolf@redhat.com>
-Subject: Re: [Qemu-devel] [Qemu-block] [PATCH] block: Don't acquire
- AioContext in hmp_qemu_io()
+In-Reply-To: <1510371554-29833-3-git-send-email-stefanb@linux.vnet.ibm.com>
+References: <1510371554-29833-1-git-send-email-stefanb@linux.vnet.ibm.com>
+	<1510371554-29833-3-git-send-email-stefanb@linux.vnet.ibm.com>
+From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
+Date: Wed, 13 Dec 2017 11:26:29 +0100
+Message-ID: <CAJ+F1CJA_T0DiA5B5dLpV8QD6cqCEHxLeqkuXc6dWP_TC4PCdQ@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH 2/2] tpm_tis: Return 0 for every register
+ in case of failure mode
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,42 +31,48 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Kevin Wolf <kwolf@redhat.com>
-Cc: qemu-block@nongnu.org, qemu-devel@nongnu.org
+To: Stefan Berger <stefanb@linux.vnet.ibm.com>
+Cc: QEMU <qemu-devel@nongnu.org>, Amarnath Valluri <amarnath.valluri@intel.com>
 
+Hi Stefan
 
---dgjlcl3Tl+kb3YDk
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
-
-On Tue, Dec 12, 2017 at 02:48:00PM +0100, Kevin Wolf wrote:
-> Commit 15afd94a047 added code to acquire and release the AioContext in
-> qemuio_command(). This means that the lock is taken twice now in the
-> call path from hmp_qemu_io(). This causes BDRV_POLL_WHILE() to hang for
-> any requests issued to nodes in a non-mainloop AioContext.
->=20
-> Dropping the first locking from hmp_qemu_io() fixes the problem.
->=20
-> Signed-off-by: Kevin Wolf <kwolf@redhat.com>
+On Sat, Nov 11, 2017 at 4:39 AM, Stefan Berger
+<stefanb@linux.vnet.ibm.com> wrote:
+> Rather than returning ~0, return 0 for every register in case of
+> failure mode. The '0' is better to indicate that there's no device
+> there.
+>
+> Signed-off-by: Stefan Berger <stefanb@linux.vnet.ibm.com>
 > ---
->  hmp.c | 6 ------
->  1 file changed, 6 deletions(-)
+>  hw/tpm/tpm_tis.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+>
+> diff --git a/hw/tpm/tpm_tis.c b/hw/tpm/tpm_tis.c
+> index eca3374..d0bdd96 100644
+> --- a/hw/tpm/tpm_tis.c
+> +++ b/hw/tpm/tpm_tis.c
+> @@ -519,7 +519,7 @@ static uint64_t tpm_tis_mmio_read(void *opaque, hwadd=
+r addr,
+>      uint8_t v;
+>
+>      if (tpm_backend_had_startup_error(s->be_driver)) {
+> -        return val;
+> +        return 0;
+>      }
 
-Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
+it's not obvious to me why it's better. Could you detail a bit more the rea=
+son?
 
---dgjlcl3Tl+kb3YDk
-Content-Type: application/pgp-signature; name="signature.asc"
+why not change the initialization of val instead?
 
------BEGIN PGP SIGNATURE-----
+>
+>      switch (offset) {
+> --
+> 2.5.5
+>
+>
 
-iQEcBAEBAgAGBQJaMQBGAAoJEJykq7OBq3PIaTgH/ArXs4NSx8MtUnXf0uQqAPw5
-O1H1lJskdSfPaf6g6B+nmbGE/8dp75WYAPvy0hFHLmmrNFIcTbhU4ox3RzLuvb6Z
-1CuxjodHN3l9q4JJGBEr/S2Sm7u60a1qmPJvVuDKLnlYIWlZE7TxErZLE6VYr9nA
-Q8yRQjHvG6j8r/A1OHVHK4ibR7hcYvREy1AIg47yt8dYBCDdFQxXwPWxbAFqqZk9
-Szvz5Yfdi+TN/NDrqsnaYQ6MEComGBSV54L6Ci9VAimpfiTquRXvrri2UA2eMvPe
-vkAg4JyuxcGs0bKjtE4ENepTYi65b2cp2EAyrFuYR3gvp9gYHel0Pd1SKMwqFUA=
-=g8Gi
------END PGP SIGNATURE-----
 
---dgjlcl3Tl+kb3YDk--
+
+--=20
+Marc-Andr=C3=A9 Lureau
