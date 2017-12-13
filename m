@@ -1,31 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52123)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52421)
 	by lists.gnu.org with esmtp (Exim 4.71) (envelope-from <pl@kamp.de>)
-	id 1eP9s5-0003ED-KK
-	for qemu-devel@nongnu.org; Wed, 13 Dec 2017 11:27:02 -0500
+	id 1eP9t9-0004ZL-OX
+	for qemu-devel@nongnu.org; Wed, 13 Dec 2017 11:28:08 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pl@kamp.de>) id 1eP9s0-0002uh-JP
-	for qemu-devel@nongnu.org; Wed, 13 Dec 2017 11:27:01 -0500
-Received: from mx-v6.kamp.de ([2a02:248:0:51::16]:40626 helo=mx01.kamp.de)
+	(envelope-from <pl@kamp.de>) id 1eP9t8-0003Rj-Qh
+	for qemu-devel@nongnu.org; Wed, 13 Dec 2017 11:28:07 -0500
+Received: from mx-v6.kamp.de ([2a02:248:0:51::16]:56572 helo=mx01.kamp.de)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pl@kamp.de>) id 1eP9s0-0002tI-91
-	for qemu-devel@nongnu.org; Wed, 13 Dec 2017 11:26:56 -0500
-References: <6cc4a99c-0212-6b7b-4a12-3e898215bea9@kamp.de>
-	<20170919143829.GH2107@work-vm>
-	<48cdd8ff-4940-9aa1-9aba-1acf8ce74ebe@kamp.de>
-	<20170919144130.GI2107@work-vm>
-	<a271a2f8-173e-45c8-bd64-16f4963b3518@kamp.de>
-	<20170921123625.GE2717@work-vm>
-	<b7f1d6ec-9511-ef3d-80d1-c52cf8adfc24@kamp.de>
-	<20171212170533.GG2409@work-vm>
+	(Exim 4.71) (envelope-from <pl@kamp.de>) id 1eP9t8-0003Qm-7S
+	for qemu-devel@nongnu.org; Wed, 13 Dec 2017 11:28:06 -0500
+References: <1512733868-9009-1-git-send-email-pl@kamp.de>
+	<1512733868-9009-3-git-send-email-pl@kamp.de>
+	<dd61b219-a965-3794-5155-1483227d5e62@redhat.com>
+	<4b0586ee-45cb-cfb1-288c-bcccf81c5212@kamp.de>
+	<295e577a-72e2-f397-ec44-ecdee248ff51@redhat.com>
 From: Peter Lieven <pl@kamp.de>
-Message-ID: <edb57f45-6cbf-9bfd-226b-cb5933dc0222@kamp.de>
-Date: Wed, 13 Dec 2017 17:26:50 +0100
+Message-ID: <4375dd0c-42aa-56f4-f2f8-d644adba00aa@kamp.de>
+Date: Wed, 13 Dec 2017 17:28:03 +0100
 MIME-Version: 1.0
-In-Reply-To: <20171212170533.GG2409@work-vm>
+In-Reply-To: <295e577a-72e2-f397-ec44-ecdee248ff51@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: 7bit
 Content-Language: en-US
-Subject: Re: [Qemu-devel] Block Migration and CPU throttling
+Subject: Re: [Qemu-devel] [PATCH 2/2] block/iscsi: only report an iSCSI
+ Failure if we don't handle it gracefully
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,63 +32,25 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, Juan Quintela <quintela@redhat.com>, Fam Zheng <famz@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, qemu block <qemu-block@nongnu.org>, jjherne@linux.vnet.ibm.com
+To: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org
+Cc: kwolf@redhat.com, pbonzini@redhat.com, ronniesahlberg@gmail.com, mreitz@redhat.com
 
-Am 12.12.2017 um 18:05 schrieb Dr. David Alan Gilbert:
-> * Peter Lieven (pl@kamp.de) wrote:
->> Am 21.09.2017 um 14:36 schrieb Dr. David Alan Gilbert:
->>> * Peter Lieven (pl@kamp.de) wrote:
->>>> Am 19.09.2017 um 16:41 schrieb Dr. David Alan Gilbert:
->>>>> * Peter Lieven (pl@kamp.de) wrote:
->>>>>> Am 19.09.2017 um 16:38 schrieb Dr. David Alan Gilbert:
->>>>>>> * Peter Lieven (pl@kamp.de) wrote:
->>>>>>>> Hi,
->>>>>>>>
->>>>>>>> I just noticed that CPU throttling and Block Migration don't work together very well.
->>>>>>>> During block migration the throttling heuristic detects that we obviously make no progress
->>>>>>>> in ram transfer. But the reason is the running block migration and not a too high dirty pages rate.
->>>>>>>>
->>>>>>>> The result is that any VM is throttled by 99% during block migration.
->>>>>>> Hmm that's unfortunate; do you have a bandwidth set lower than your
->>>>>>> actual network connection? I'm just wondering if it's actually going
->>>>>>> between the block and RAM iterative sections or getting stuck in ne.
->>>>>> It happens also if source and dest are on the same machine and speed is set to 100G.
->>>>> But does it happen if they're not and the speed is set low?
->>>> Yes, it does. I noticed it in our test environment between different nodes with a 10G
->>>> link in between. But its totally clear why it happens. During block migration we transfer
->>>> all dirty memory pages in each round (if there is moderate memory load), but all dirty
->>>> pages are obviously more than 50% of the transferred ram in that round.
->>>> It is more exactly 100%. But the current logic triggers on this condition.
->>>>
->>>> I think I will go forward and send a patch which disables auto converge during
->>>> block migration bulk stage.
->>> Yes, that's fair;  it probably would also make sense to throttle the RAM
->>> migration during the block migration bulk stage, since the chances are
->>> it's not going to get far.  (I think in the nbd setup, the main
->>> migration process isn't started until the end of bulk).
->> Catching up with the idea of delaying ram migration until block bulk has completed.
->> What do you think is the easiest way to achieve this?
-> <excavates inbox, and notices I never replied>
->
-> I think the answer depends whether we think this is a 'special' or we
-> need a new general purpose mechanism.
->
-> If it was really general then we'd probably want to split the iterative
-> stage in two somehow, and only do RAM in the second half.
->
-> But I'm not sure it's worth it; I suspect the easiest way is:
->
->    a) Add a counter in migration/ram.c or in the RAM state somewhere
->    b) Make ram_save_inhibit increment the counter
->    c) Check the counter at the head of ram_save_iterate and just exit
->      if it's none 0
->    d) Call ram_save_inhibit from block_save_setup
->    e) Then release it when you've finished the bulk stage
->
-> Make sure you still count the RAM in the pending totals, otherwise
-> migration might think it's finished a bit early.
+Am 08.12.2017 um 18:03 schrieb Eric Blake:
+> On 12/08/2017 10:14 AM, Peter Lieven wrote:
+>> Am 08.12.2017 um 16:11 schrieb Eric Blake:
+>>> On 12/08/2017 05:51 AM, Peter Lieven wrote:
+>>>> we currently report an "iSCSI Failure" in iscsi_co_generic_cb if the task
+>>>> hasn't completed with SCSI_STATUS_GOOD. However, we expect a failure in
+>>>> some cases and handle it gracefully. This is the case for misaligned UNMAPs
+>>> Is the block layer still capable of producing a misaligned UNMAP?  If
+>>> so, that's probably a bug in the block layer for not honoring the block
+>>> limit geometries.
+>> In theory there should be none. I think we can drop this code.
+> Or, better yet, replace the check with an assert.
 
-I will look into this for 2.12. Thanks for the cookbook.
+I would not add an assert if the device returns a CHECK CONDITION because
+there might be other reasons for it. But I think its safe to remove the extra handling.
+If for any reason there is a request that the target does not like it will pop up on
+stderr.
 
 Peter
