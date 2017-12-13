@@ -1,27 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46442)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46974)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1eP51u-0008Bx-Pu
-	for qemu-devel@nongnu.org; Wed, 13 Dec 2017 06:16:54 -0500
+	(envelope-from <pm215@archaic.org.uk>) id 1eP54W-00020Q-Uo
+	for qemu-devel@nongnu.org; Wed, 13 Dec 2017 06:19:33 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1eP51q-00058S-NH
-	for qemu-devel@nongnu.org; Wed, 13 Dec 2017 06:16:50 -0500
-Received: from mail-wm0-x244.google.com ([2a00:1450:400c:c09::244]:38963)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1eP51q-00057y-GA
-	for qemu-devel@nongnu.org; Wed, 13 Dec 2017 06:16:46 -0500
-Received: by mail-wm0-x244.google.com with SMTP id i11so4297560wmf.4
-	for <qemu-devel@nongnu.org>; Wed, 13 Dec 2017 03:16:46 -0800 (PST)
-Date: Wed, 13 Dec 2017 11:16:43 +0000
-From: Stefan Hajnoczi <stefanha@gmail.com>
-Message-ID: <20171213111643.GJ16782@stefanha-x1.localdomain>
-References: <20171211072806.2812-1-haozhong.zhang@intel.com>
-MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="k1BdFSKqAqVdu8k/"
-Content-Disposition: inline
-In-Reply-To: <20171211072806.2812-1-haozhong.zhang@intel.com>
-Subject: Re: [Qemu-devel] [PATCH for-2.12 v4 0/3] nvdimm: fixes for
- (non-)dax backends
+	(envelope-from <pm215@archaic.org.uk>) id 1eP54V-0006SW-MX
+	for qemu-devel@nongnu.org; Wed, 13 Dec 2017 06:19:32 -0500
+Received: from orth.archaic.org.uk ([2001:8b0:1d0::2]:39042)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pm215@archaic.org.uk>)
+	id 1eP54V-0006PG-Et
+	for qemu-devel@nongnu.org; Wed, 13 Dec 2017 06:19:31 -0500
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Wed, 13 Dec 2017 11:19:19 +0000
+Message-Id: <1513163959-17545-1-git-send-email-peter.maydell@linaro.org>
+Subject: [Qemu-devel] [PATCH] target/i386: Fix handling of VEX prefixes
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,71 +22,55 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Haozhong Zhang <haozhong.zhang@intel.com>
-Cc: qemu-devel@nongnu.org, mst@redhat.com, ehabkost@redhat.com, Xiao Guangrong <guangrong.xiao@gmail.com>, Dan Williams <dan.j.williams@intel.com>, Igor Mammedov <imammedo@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Richard Henderson <rth@twiddle.net>, Xiao Guangrong <xiaoguangrong.eric@gmail.com>
+To: qemu-devel@nongnu.org
+Cc: patches@linaro.org, Alexandro Sanchez Bach <alexandro@phi.nz>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Eduardo Habkost <ehabkost@redhat.com>
 
+In commit e3af7c788b73a6495eb9d94992ef11f6ad6f3c56 we
+replaced direct calls to to cpu_ld*_code() with calls
+to the x86_ld*_code() wrappers which incorporate an
+advance of s->pc. Unfortunately we didn't notice that
+in one place the old code was deliberately not incrementing
+s->pc:
 
---k1BdFSKqAqVdu8k/
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+@@ -4501,7 +4528,7 @@ static target_ulong disas_insn(DisasContext *s, CPUState *cpu)
+             static const int pp_prefix[4] = {
+                 0, PREFIX_DATA, PREFIX_REPZ, PREFIX_REPNZ
+             };
+-            int vex3, vex2 = cpu_ldub_code(env, s->pc);
++            int vex3, vex2 = x86_ldub_code(env, s);
 
-On Mon, Dec 11, 2017 at 03:28:03PM +0800, Haozhong Zhang wrote:
-> Previous versions can be found at
->   v3: https://lists.gnu.org/archive/html/qemu-devel/2017-11/msg04785.html
->   v2: https://lists.gnu.org/archive/html/qemu-devel/2017-06/msg01203.html
->   v1: https://lists.gnu.org/archive/html/qemu-devel/2017-05/msg05919.html
->=20
-> Changes in v4:
->  * Document new memory-backend-file option 'align' in qemu-options.hx. (E=
-duardo Habkost)
->  * Add endian conversion when setting the unarmed flag in NFIT. (Stefan H=
-ajnoczi)
->=20
-> Changes in v3:
->  * Add an option 'align' to 'memory-backend-file' to address the
->    failure when mmap device dax (patch 1).
->  * Remove device dax check, which needs to access sysfs and may not
->    work with SELinux.
->  * Add a boolean option 'unarmed' to '-device nvdimm', which allows
->    users to control the unarmed flag in guest ACPI NFIT. I don't make
->    it as OnOffAuto, because of the remove of device dax check.
->  * Document new options added by this patch series.
->=20
-> Haozhong Zhang (3):
->   hostmem-file: add "align" option
->   nvdimm: add a macro for property "label-size"
->   nvdimm: add 'unarmed' option
->=20
->  backends/hostmem-file.c | 41 ++++++++++++++++++++++++++++++++++++++++-
->  docs/nvdimm.txt         | 31 +++++++++++++++++++++++++++++++
->  exec.c                  |  8 +++++++-
->  hw/acpi/nvdimm.c        |  7 +++++++
->  hw/mem/nvdimm.c         | 28 +++++++++++++++++++++++++++-
->  include/exec/memory.h   |  3 +++
->  include/hw/mem/nvdimm.h | 12 ++++++++++++
->  memory.c                |  2 ++
->  numa.c                  |  2 +-
->  qemu-options.hx         |  9 ++++++++-
->  10 files changed, 138 insertions(+), 5 deletions(-)
+             if (!CODE64(s) && (vex2 & 0xc0) != 0xc0) {
+                 /* 4.1.4.6: In 32-bit mode, bits [7:6] must be 11b,
 
-Looks good to me.  I suggest taking this through Eduardo/Igor's host
-memory backend tree.
+This meant we were mishandling this set of instructions.
+Remove the manual advance of s->pc for the "is VEX" case
+(which is now done by x86_ldub_code()) and instead rewind
+PC in the case where we decide that this isn't really VEX.
 
-Stefan
+Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+Cc: qemu-stable@nongnu.org
+Reported-by: Alexandro Sanchez Bach <alexandro@phi.nz>
+---
+I checked the rest of the changes in e3af7c788b73a and
+I don't think we made this mistake anywhere else.
+---
+ target/i386/translate.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
---k1BdFSKqAqVdu8k/
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEcBAEBAgAGBQJaMQwbAAoJEJykq7OBq3PIUY4H/0Vusa18lvB8pKxLWkRwo9//
-AhXFggRDHCdKk7M7AAo5Oebz6ztmclf4q6xG9FXIik7tpu4T7W4gHT98gsYq1PvZ
-ZTwOh4i3Azc0bWBpHXovzR7z3sRRutTLyfB5GPVz5w2RXOl3MrckUm//J9qf5XXy
-hEA0PDHtPsfWphowioTTezp5GDp7QUhnbzsEbstoAKFHZItzV1Sr68M528t5oly5
-DH5EOXFq3LMFRGY1DDDrj+pX1SWEhrA54DzREQ4+s1sSowr30TLOt6Sgsc+7OQVR
-o4UtmjM3pJSMjvOWgctvqt2wHKTufHzA+eZr+NdmLoZSsfPmXKiyxpAuuoddJqU=
-=Xz/8
------END PGP SIGNATURE-----
-
---k1BdFSKqAqVdu8k/--
+diff --git a/target/i386/translate.c b/target/i386/translate.c
+index 088a9d9..ed5b69d 100644
+--- a/target/i386/translate.c
++++ b/target/i386/translate.c
+@@ -4547,9 +4547,9 @@ static target_ulong disas_insn(DisasContext *s, CPUState *cpu)
+             if (!CODE64(s) && (vex2 & 0xc0) != 0xc0) {
+                 /* 4.1.4.6: In 32-bit mode, bits [7:6] must be 11b,
+                    otherwise the instruction is LES or LDS.  */
++                s->pc--; /* rewind the advance_pc() x86_ldub_code() did */
+                 break;
+             }
+-            s->pc++;
+ 
+             /* 4.1.1-4.1.3: No preceding lock, 66, f2, f3, or rex prefixes. */
+             if (prefixes & (PREFIX_REPZ | PREFIX_REPNZ
+-- 
+2.7.4
