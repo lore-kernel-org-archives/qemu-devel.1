@@ -1,28 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51477)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51591)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1ePBWY-0004fh-Hr
-	for qemu-devel@nongnu.org; Wed, 13 Dec 2017 13:13:00 -0500
+	(envelope-from <pm215@archaic.org.uk>) id 1ePBWe-0004mn-CS
+	for qemu-devel@nongnu.org; Wed, 13 Dec 2017 13:13:02 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1ePBWX-0007kD-7g
-	for qemu-devel@nongnu.org; Wed, 13 Dec 2017 13:12:54 -0500
-Received: from orth.archaic.org.uk ([2001:8b0:1d0::2]:39124)
+	(envelope-from <pm215@archaic.org.uk>) id 1ePBWc-0007vx-Sn
+	for qemu-devel@nongnu.org; Wed, 13 Dec 2017 13:13:00 -0500
+Received: from orth.archaic.org.uk ([2001:8b0:1d0::2]:39134)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <pm215@archaic.org.uk>)
-	id 1ePBWW-0007gC-VZ
-	for qemu-devel@nongnu.org; Wed, 13 Dec 2017 13:12:53 -0500
+	id 1ePBWc-0007rv-Jj
+	for qemu-devel@nongnu.org; Wed, 13 Dec 2017 13:12:58 -0500
 Received: from pm215 by orth.archaic.org.uk with local (Exim 4.89)
-	(envelope-from <pm215@archaic.org.uk>) id 1ePBWV-0007eA-E7
-	for qemu-devel@nongnu.org; Wed, 13 Dec 2017 18:12:51 +0000
+	(envelope-from <pm215@archaic.org.uk>) id 1ePBWb-0007hl-F3
+	for qemu-devel@nongnu.org; Wed, 13 Dec 2017 18:12:57 +0000
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Wed, 13 Dec 2017 18:12:11 +0000
-Message-Id: <1513188761-20784-14-git-send-email-peter.maydell@linaro.org>
+Date: Wed, 13 Dec 2017 18:12:19 +0000
+Message-Id: <1513188761-20784-22-git-send-email-peter.maydell@linaro.org>
 In-Reply-To: <1513188761-20784-1-git-send-email-peter.maydell@linaro.org>
 References: <1513188761-20784-1-git-send-email-peter.maydell@linaro.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PULL 13/43] xlnx-zcu102: Add support for the ZynqMP
- QSPI
+Subject: [Qemu-devel] [PULL 21/43] target/arm: Split M profile MNegPri mmu
+ index into user and priv
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,131 +30,240 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-From: Francisco Iglesias <frasse.iglesias@gmail.com>
+For M profile, we currently have an mmu index MNegPri for
+"requested execution priority negative". This fails to
+distinguish "requested execution priority negative, privileged"
+from "requested execution priority negative, usermode", but
+the two can return different results for MPU lookups. Fix this
+by splitting MNegPri into MNegPriPriv and MNegPriUser, and
+similarly for the Secure equivalent MSNegPri.
 
-Add support for the ZynqMP QSPI (consisting of the Generic QSPI and Legacy
-QSPI) and connect Numonyx n25q512a11 flashes to it.
+This takes us from 6 M profile MMU modes to 8, which means
+we need to bump NB_MMU_MODES; this is OK since the point
+where we are forced to reduce TLB sizes is 9 MMU modes.
 
-Signed-off-by: Francisco Iglesias <frasse.iglesias@gmail.com>
-Reviewed-by: Alistair Francis <alistair.francis@xilinx.com>
-Reviewed-by: Edgar E. Iglesias <edgar.iglesias@xilinx.com>
-Tested-by: Edgar E. Iglesias <edgar.iglesias@xilinx.com>
-Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
-Message-id: 20171126231634.9531-14-frasse.iglesias@gmail.com
+(It would in theory be possible to stick with 6 MMU indexes:
+{mpu-disabled,user,privileged} x {secure,nonsecure} since
+in the MPU-disabled case the result of an MPU lookup is
+always the same for both user and privileged code. However
+we would then need to rework the TB flags handling to put
+user/priv into the TB flags separately from the mmuidx.
+Adding an extra couple of mmu indexes is simpler.)
+
 Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+Message-id: 1512153879-5291-5-git-send-email-peter.maydell@linaro.org
 ---
- include/hw/arm/xlnx-zynqmp.h |  5 +++++
- hw/arm/xlnx-zcu102.c         | 23 +++++++++++++++++++++++
- hw/arm/xlnx-zynqmp.c         | 26 ++++++++++++++++++++++++++
- 3 files changed, 54 insertions(+)
+ target/arm/cpu.h       | 54 ++++++++++++++++++++++++++++++--------------------
+ target/arm/internals.h |  6 ++++--
+ target/arm/helper.c    | 11 ++++++----
+ target/arm/translate.c |  8 ++++++--
+ 4 files changed, 50 insertions(+), 29 deletions(-)
 
-diff --git a/include/hw/arm/xlnx-zynqmp.h b/include/hw/arm/xlnx-zynqmp.h
-index 6eff81a..3e6fb9b 100644
---- a/include/hw/arm/xlnx-zynqmp.h
-+++ b/include/hw/arm/xlnx-zynqmp.h
-@@ -40,6 +40,10 @@
- #define XLNX_ZYNQMP_NUM_SDHCI 2
- #define XLNX_ZYNQMP_NUM_SPIS 2
+diff --git a/target/arm/cpu.h b/target/arm/cpu.h
+index 89d49cd..c42d62d 100644
+--- a/target/arm/cpu.h
++++ b/target/arm/cpu.h
+@@ -112,7 +112,7 @@ enum {
+ #define ARM_CPU_VIRQ 2
+ #define ARM_CPU_VFIQ 3
  
-+#define XLNX_ZYNQMP_NUM_QSPI_BUS 2
-+#define XLNX_ZYNQMP_NUM_QSPI_BUS_CS 2
-+#define XLNX_ZYNQMP_NUM_QSPI_FLASH 4
+-#define NB_MMU_MODES 7
++#define NB_MMU_MODES 8
+ /* ARM-specific extra insn start words:
+  * 1: Conditional execution bits
+  * 2: Partial exception syndrome for data aborts
+@@ -2226,13 +2226,13 @@ static inline bool arm_excp_unmasked(CPUState *cs, unsigned int excp_idx,
+  * They have the following different MMU indexes:
+  *  User
+  *  Privileged
+- *  Execution priority negative (this is like privileged, but the
+- *  MPU HFNMIENA bit means that it may have different access permission
+- *  check results to normal privileged code, so can't share a TLB).
++ *  User, execution priority negative (ie the MPU HFNMIENA bit may apply)
++ *  Privileged, execution priority negative (ditto)
+  * If the CPU supports the v8M Security Extension then there are also:
+  *  Secure User
+  *  Secure Privileged
+- *  Secure, execution priority negative
++ *  Secure User, execution priority negative
++ *  Secure Privileged, execution priority negative
+  *
+  * The ARMMMUIdx and the mmu index value used by the core QEMU TLB code
+  * are not quite the same -- different CPU types (most notably M profile
+@@ -2251,11 +2251,18 @@ static inline bool arm_excp_unmasked(CPUState *cs, unsigned int excp_idx,
+  * The constant names here are patterned after the general style of the names
+  * of the AT/ATS operations.
+  * The values used are carefully arranged to make mmu_idx => EL lookup easy.
++ * For M profile we arrange them to have a bit for priv, a bit for negpri
++ * and a bit for secure.
+  */
+ #define ARM_MMU_IDX_A 0x10 /* A profile */
+ #define ARM_MMU_IDX_NOTLB 0x20 /* does not have a TLB */
+ #define ARM_MMU_IDX_M 0x40 /* M profile */
+ 
++/* meanings of the bits for M profile mmu idx values */
++#define ARM_MMU_IDX_M_PRIV 0x1
++#define ARM_MMU_IDX_M_NEGPRI 0x2
++#define ARM_MMU_IDX_M_S 0x4
 +
- #define XLNX_ZYNQMP_NUM_OCM_BANKS 4
- #define XLNX_ZYNQMP_OCM_RAM_0_ADDRESS 0xFFFC0000
- #define XLNX_ZYNQMP_OCM_RAM_SIZE 0x10000
-@@ -83,6 +87,7 @@ typedef struct XlnxZynqMPState {
-     SysbusAHCIState sata;
-     SDHCIState sdhci[XLNX_ZYNQMP_NUM_SDHCI];
-     XilinxSPIPS spi[XLNX_ZYNQMP_NUM_SPIS];
-+    XlnxZynqMPQSPIPS qspi;
-     XlnxDPState dp;
-     XlnxDPDMAState dpdma;
+ #define ARM_MMU_IDX_TYPE_MASK (~0x7)
+ #define ARM_MMU_IDX_COREIDX_MASK 0x7
  
-diff --git a/hw/arm/xlnx-zcu102.c b/hw/arm/xlnx-zcu102.c
-index bbe7d04..b126cf1 100644
---- a/hw/arm/xlnx-zcu102.c
-+++ b/hw/arm/xlnx-zcu102.c
-@@ -151,6 +151,29 @@ static void xlnx_zynqmp_init(XlnxZCU102 *s, MachineState *machine)
-         sysbus_connect_irq(SYS_BUS_DEVICE(&s->soc.spi[i]), 1, cs_line);
+@@ -2269,10 +2276,12 @@ typedef enum ARMMMUIdx {
+     ARMMMUIdx_S2NS = 6 | ARM_MMU_IDX_A,
+     ARMMMUIdx_MUser = 0 | ARM_MMU_IDX_M,
+     ARMMMUIdx_MPriv = 1 | ARM_MMU_IDX_M,
+-    ARMMMUIdx_MNegPri = 2 | ARM_MMU_IDX_M,
+-    ARMMMUIdx_MSUser = 3 | ARM_MMU_IDX_M,
+-    ARMMMUIdx_MSPriv = 4 | ARM_MMU_IDX_M,
+-    ARMMMUIdx_MSNegPri = 5 | ARM_MMU_IDX_M,
++    ARMMMUIdx_MUserNegPri = 2 | ARM_MMU_IDX_M,
++    ARMMMUIdx_MPrivNegPri = 3 | ARM_MMU_IDX_M,
++    ARMMMUIdx_MSUser = 4 | ARM_MMU_IDX_M,
++    ARMMMUIdx_MSPriv = 5 | ARM_MMU_IDX_M,
++    ARMMMUIdx_MSUserNegPri = 6 | ARM_MMU_IDX_M,
++    ARMMMUIdx_MSPrivNegPri = 7 | ARM_MMU_IDX_M,
+     /* Indexes below here don't have TLBs and are used only for AT system
+      * instructions or for the first stage of an S12 page table walk.
+      */
+@@ -2293,10 +2302,12 @@ typedef enum ARMMMUIdxBit {
+     ARMMMUIdxBit_S2NS = 1 << 6,
+     ARMMMUIdxBit_MUser = 1 << 0,
+     ARMMMUIdxBit_MPriv = 1 << 1,
+-    ARMMMUIdxBit_MNegPri = 1 << 2,
+-    ARMMMUIdxBit_MSUser = 1 << 3,
+-    ARMMMUIdxBit_MSPriv = 1 << 4,
+-    ARMMMUIdxBit_MSNegPri = 1 << 5,
++    ARMMMUIdxBit_MUserNegPri = 1 << 2,
++    ARMMMUIdxBit_MPrivNegPri = 1 << 3,
++    ARMMMUIdxBit_MSUser = 1 << 4,
++    ARMMMUIdxBit_MSPriv = 1 << 5,
++    ARMMMUIdxBit_MSUserNegPri = 1 << 6,
++    ARMMMUIdxBit_MSPrivNegPri = 1 << 7,
+ } ARMMMUIdxBit;
+ 
+ #define MMU_USER_IDX 0
+@@ -2322,8 +2333,7 @@ static inline int arm_mmu_idx_to_el(ARMMMUIdx mmu_idx)
+     case ARM_MMU_IDX_A:
+         return mmu_idx & 3;
+     case ARM_MMU_IDX_M:
+-        return (mmu_idx == ARMMMUIdx_MUser || mmu_idx == ARMMMUIdx_MSUser)
+-            ? 0 : 1;
++        return mmu_idx & ARM_MMU_IDX_M_PRIV;
+     default:
+         g_assert_not_reached();
+     }
+@@ -2334,16 +2344,18 @@ static inline ARMMMUIdx arm_v7m_mmu_idx_for_secstate(CPUARMState *env,
+                                                      bool secstate)
+ {
+     int el = arm_current_el(env);
+-    ARMMMUIdx mmu_idx;
++    ARMMMUIdx mmu_idx = ARM_MMU_IDX_M;
+ 
+-    if (el == 0) {
+-        mmu_idx = secstate ? ARMMMUIdx_MSUser : ARMMMUIdx_MUser;
+-    } else {
+-        mmu_idx = secstate ? ARMMMUIdx_MSPriv : ARMMMUIdx_MPriv;
++    if (el != 0) {
++        mmu_idx |= ARM_MMU_IDX_M_PRIV;
      }
  
-+    for (i = 0; i < XLNX_ZYNQMP_NUM_QSPI_FLASH; i++) {
-+        SSIBus *spi_bus;
-+        DeviceState *flash_dev;
-+        qemu_irq cs_line;
-+        DriveInfo *dinfo = drive_get_next(IF_MTD);
-+        int bus = i / XLNX_ZYNQMP_NUM_QSPI_BUS_CS;
-+        gchar *bus_name = g_strdup_printf("qspi%d", bus);
-+
-+        spi_bus = (SSIBus *)qdev_get_child_bus(DEVICE(&s->soc), bus_name);
-+        g_free(bus_name);
-+
-+        flash_dev = ssi_create_slave_no_init(spi_bus, "n25q512a11");
-+        if (dinfo) {
-+            qdev_prop_set_drive(flash_dev, "drive", blk_by_legacy_dinfo(dinfo),
-+                                &error_fatal);
-+        }
-+        qdev_init_nofail(flash_dev);
-+
-+        cs_line = qdev_get_gpio_in_named(flash_dev, SSI_GPIO_CS, 0);
-+
-+        sysbus_connect_irq(SYS_BUS_DEVICE(&s->soc.qspi), i + 1, cs_line);
+     if (armv7m_nvic_neg_prio_requested(env->nvic, secstate)) {
+-        mmu_idx = secstate ? ARMMMUIdx_MSNegPri : ARMMMUIdx_MNegPri;
++        mmu_idx |= ARM_MMU_IDX_M_NEGPRI;
 +    }
 +
-     /* TODO create and connect IDE devices for ide_drive_get() */
- 
-     xlnx_zcu102_binfo.ram_size = ram_size;
-diff --git a/hw/arm/xlnx-zynqmp.c b/hw/arm/xlnx-zynqmp.c
-index c707c66..3256420 100644
---- a/hw/arm/xlnx-zynqmp.c
-+++ b/hw/arm/xlnx-zynqmp.c
-@@ -40,6 +40,10 @@
- #define SATA_ADDR           0xFD0C0000
- #define SATA_NUM_PORTS      2
- 
-+#define QSPI_ADDR           0xff0f0000
-+#define LQSPI_ADDR          0xc0000000
-+#define QSPI_IRQ            15
-+
- #define DP_ADDR             0xfd4a0000
- #define DP_IRQ              113
- 
-@@ -171,6 +175,9 @@ static void xlnx_zynqmp_init(Object *obj)
-         qdev_set_parent_bus(DEVICE(&s->spi[i]), sysbus_get_default());
++    if (secstate) {
++        mmu_idx |= ARM_MMU_IDX_M_S;
      }
  
-+    object_initialize(&s->qspi, sizeof(s->qspi), TYPE_XLNX_ZYNQMP_QSPIPS);
-+    qdev_set_parent_bus(DEVICE(&s->qspi), sysbus_get_default());
-+
-     object_initialize(&s->dp, sizeof(s->dp), TYPE_XLNX_DP);
-     qdev_set_parent_bus(DEVICE(&s->dp), sysbus_get_default());
- 
-@@ -411,6 +418,25 @@ static void xlnx_zynqmp_realize(DeviceState *dev, Error **errp)
-         g_free(bus_name);
-     }
- 
-+    object_property_set_bool(OBJECT(&s->qspi), true, "realized", &err);
-+    sysbus_mmio_map(SYS_BUS_DEVICE(&s->qspi), 0, QSPI_ADDR);
-+    sysbus_mmio_map(SYS_BUS_DEVICE(&s->qspi), 1, LQSPI_ADDR);
-+    sysbus_connect_irq(SYS_BUS_DEVICE(&s->qspi), 0, gic_spi[QSPI_IRQ]);
-+
-+    for (i = 0; i < XLNX_ZYNQMP_NUM_QSPI_BUS; i++) {
-+        gchar *bus_name;
-+        gchar *target_bus;
-+
-+        /* Alias controller SPI bus to the SoC itself */
-+        bus_name = g_strdup_printf("qspi%d", i);
-+        target_bus = g_strdup_printf("spi%d", i);
-+        object_property_add_alias(OBJECT(s), bus_name,
-+                                  OBJECT(&s->qspi), target_bus,
-+                                  &error_abort);
-+        g_free(bus_name);
-+        g_free(target_bus);
-+    }
-+
-     object_property_set_bool(OBJECT(&s->dp), true, "realized", &err);
-     if (err) {
-         error_propagate(errp, err);
+     return mmu_idx;
+diff --git a/target/arm/internals.h b/target/arm/internals.h
+index d9cc75e..aa9c91b 100644
+--- a/target/arm/internals.h
++++ b/target/arm/internals.h
+@@ -544,15 +544,17 @@ static inline bool regime_is_secure(CPUARMState *env, ARMMMUIdx mmu_idx)
+     case ARMMMUIdx_S1NSE1:
+     case ARMMMUIdx_S1E2:
+     case ARMMMUIdx_S2NS:
++    case ARMMMUIdx_MPrivNegPri:
++    case ARMMMUIdx_MUserNegPri:
+     case ARMMMUIdx_MPriv:
+-    case ARMMMUIdx_MNegPri:
+     case ARMMMUIdx_MUser:
+         return false;
+     case ARMMMUIdx_S1E3:
+     case ARMMMUIdx_S1SE0:
+     case ARMMMUIdx_S1SE1:
++    case ARMMMUIdx_MSPrivNegPri:
++    case ARMMMUIdx_MSUserNegPri:
+     case ARMMMUIdx_MSPriv:
+-    case ARMMMUIdx_MSNegPri:
+     case ARMMMUIdx_MSUser:
+         return true;
+     default:
+diff --git a/target/arm/helper.c b/target/arm/helper.c
+index c4c8d5a..70cf313 100644
+--- a/target/arm/helper.c
++++ b/target/arm/helper.c
+@@ -7856,11 +7856,13 @@ static inline uint32_t regime_el(CPUARMState *env, ARMMMUIdx mmu_idx)
+     case ARMMMUIdx_S1SE1:
+     case ARMMMUIdx_S1NSE0:
+     case ARMMMUIdx_S1NSE1:
++    case ARMMMUIdx_MPrivNegPri:
++    case ARMMMUIdx_MUserNegPri:
+     case ARMMMUIdx_MPriv:
+-    case ARMMMUIdx_MNegPri:
+     case ARMMMUIdx_MUser:
++    case ARMMMUIdx_MSPrivNegPri:
++    case ARMMMUIdx_MSUserNegPri:
+     case ARMMMUIdx_MSPriv:
+-    case ARMMMUIdx_MSNegPri:
+     case ARMMMUIdx_MSUser:
+         return 1;
+     default:
+@@ -7883,8 +7885,7 @@ static inline bool regime_translation_disabled(CPUARMState *env,
+                 (R_V7M_MPU_CTRL_ENABLE_MASK | R_V7M_MPU_CTRL_HFNMIENA_MASK)) {
+         case R_V7M_MPU_CTRL_ENABLE_MASK:
+             /* Enabled, but not for HardFault and NMI */
+-            return mmu_idx == ARMMMUIdx_MNegPri ||
+-                mmu_idx == ARMMMUIdx_MSNegPri;
++            return mmu_idx & ARM_MMU_IDX_M_NEGPRI;
+         case R_V7M_MPU_CTRL_ENABLE_MASK | R_V7M_MPU_CTRL_HFNMIENA_MASK:
+             /* Enabled for all cases */
+             return false;
+@@ -8017,6 +8018,8 @@ static inline bool regime_is_user(CPUARMState *env, ARMMMUIdx mmu_idx)
+     case ARMMMUIdx_S1NSE0:
+     case ARMMMUIdx_MUser:
+     case ARMMMUIdx_MSUser:
++    case ARMMMUIdx_MUserNegPri:
++    case ARMMMUIdx_MSUserNegPri:
+         return true;
+     default:
+         return false;
+diff --git a/target/arm/translate.c b/target/arm/translate.c
+index f120932..50339e7 100644
+--- a/target/arm/translate.c
++++ b/target/arm/translate.c
+@@ -159,12 +159,16 @@ static inline int get_a32_user_mem_index(DisasContext *s)
+         return arm_to_core_mmu_idx(ARMMMUIdx_S1SE0);
+     case ARMMMUIdx_MUser:
+     case ARMMMUIdx_MPriv:
+-    case ARMMMUIdx_MNegPri:
+         return arm_to_core_mmu_idx(ARMMMUIdx_MUser);
++    case ARMMMUIdx_MUserNegPri:
++    case ARMMMUIdx_MPrivNegPri:
++        return arm_to_core_mmu_idx(ARMMMUIdx_MUserNegPri);
+     case ARMMMUIdx_MSUser:
+     case ARMMMUIdx_MSPriv:
+-    case ARMMMUIdx_MSNegPri:
+         return arm_to_core_mmu_idx(ARMMMUIdx_MSUser);
++    case ARMMMUIdx_MSUserNegPri:
++    case ARMMMUIdx_MSPrivNegPri:
++        return arm_to_core_mmu_idx(ARMMMUIdx_MSUserNegPri);
+     case ARMMMUIdx_S2NS:
+     default:
+         g_assert_not_reached();
 -- 
 2.7.4
