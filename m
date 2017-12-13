@@ -1,33 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53270)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60610)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1eP7tS-0003Jb-94
-	for qemu-devel@nongnu.org; Wed, 13 Dec 2017 09:20:19 -0500
+	(envelope-from <pbonzini@redhat.com>) id 1eP8VO-0005BO-Ff
+	for qemu-devel@nongnu.org; Wed, 13 Dec 2017 09:59:31 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1eP7tP-0005bG-0z
-	for qemu-devel@nongnu.org; Wed, 13 Dec 2017 09:20:18 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:6801)
+	(envelope-from <pbonzini@redhat.com>) id 1eP8VL-00024l-AV
+	for qemu-devel@nongnu.org; Wed, 13 Dec 2017 09:59:30 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:46568)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1eP7tO-0005Xp-Pv
-	for qemu-devel@nongnu.org; Wed, 13 Dec 2017 09:20:14 -0500
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
-	[10.5.11.15])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 663E06014F
-	for <qemu-devel@nongnu.org>; Wed, 13 Dec 2017 14:20:13 +0000 (UTC)
-Date: Wed, 13 Dec 2017 14:20:01 +0000
-From: "Daniel P. Berrange" <berrange@redhat.com>
-Message-ID: <20171213142001.GF28379@redhat.com>
-Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
-References: <20170911110623.24981-1-marcandre.lureau@redhat.com>
-	<20170911110623.24981-37-marcandre.lureau@redhat.com>
-	<87mv2maf91.fsf@dusky.pond.sub.org>
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1eP8VL-00023X-2Y
+	for qemu-devel@nongnu.org; Wed, 13 Dec 2017 09:59:27 -0500
+References: <1513163959-17545-1-git-send-email-peter.maydell@linaro.org>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <c160d24c-be5c-7f4b-2a72-de368f19f20d@redhat.com>
+Date: Wed, 13 Dec 2017 15:59:22 +0100
 MIME-Version: 1.0
+In-Reply-To: <1513163959-17545-1-git-send-email-peter.maydell@linaro.org>
 Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <87mv2maf91.fsf@dusky.pond.sub.org>
-Subject: Re: [Qemu-devel] [PATCH v3 36/50] qapi: add conditions to VNC
- type/commands/events on the schema
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH] target/i386: Fix handling of VEX prefixes
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,43 +27,59 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>
-Cc: =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>, qemu-devel@nongnu.org, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>
+To: Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org
+Cc: patches@linaro.org, Alexandro Sanchez Bach <alexandro@phi.nz>, Richard Henderson <rth@twiddle.net>, Eduardo Habkost <ehabkost@redhat.com>
 
-On Wed, Dec 13, 2017 at 03:12:26PM +0100, Markus Armbruster wrote:
-> Cc: Daniel for his opinion on QCryptoCipherAlgorithm member des-rfb.
-
-> > Enum made conditional:
+On 13/12/2017 12:19, Peter Maydell wrote:
+> In commit e3af7c788b73a6495eb9d94992ef11f6ad6f3c56 we
+> replaced direct calls to to cpu_ld*_code() with calls
+> to the x86_ld*_code() wrappers which incorporate an
+> advance of s->pc. Unfortunately we didn't notice that
+> in one place the old code was deliberately not incrementing
+> s->pc:
 > 
-> The enum isn't made conditional, only one of its values is.  Suggest "
-> Enumeration values made conditional:".
+> @@ -4501,7 +4528,7 @@ static target_ulong disas_insn(DisasContext *s, CPUState *cpu)
+>              static const int pp_prefix[4] = {
+>                  0, PREFIX_DATA, PREFIX_REPZ, PREFIX_REPNZ
+>              };
+> -            int vex3, vex2 = cpu_ldub_code(env, s->pc);
+> +            int vex3, vex2 = x86_ldub_code(env, s);
 > 
-> > * QCryptoCipherAlgorithm
-> >
-> >     # @des-rfb: RFB specific variant of single DES. Do not use except in VNC.
+>              if (!CODE64(s) && (vex2 & 0xc0) != 0xc0) {
+>                  /* 4.1.4.6: In 32-bit mode, bits [7:6] must be 11b,
 > 
-> Daniel, is this okay?
+> This meant we were mishandling this set of instructions.
+> Remove the manual advance of s->pc for the "is VEX" case
+> (which is now done by x86_ldub_code()) and instead rewind
+> PC in the case where we decide that this isn't really VEX.
+> 
+> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+> Cc: qemu-stable@nongnu.org
+> Reported-by: Alexandro Sanchez Bach <alexandro@phi.nz>
+> ---
+> I checked the rest of the changes in e3af7c788b73a and
+> I don't think we made this mistake anywhere else.
+> ---
+>  target/i386/translate.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/target/i386/translate.c b/target/i386/translate.c
+> index 088a9d9..ed5b69d 100644
+> --- a/target/i386/translate.c
+> +++ b/target/i386/translate.c
+> @@ -4547,9 +4547,9 @@ static target_ulong disas_insn(DisasContext *s, CPUState *cpu)
+>              if (!CODE64(s) && (vex2 & 0xc0) != 0xc0) {
+>                  /* 4.1.4.6: In 32-bit mode, bits [7:6] must be 11b,
+>                     otherwise the instruction is LES or LDS.  */
+> +                s->pc--; /* rewind the advance_pc() x86_ldub_code() did */
+>                  break;
+>              }
+> -            s->pc++;
+>  
+>              /* 4.1.1-4.1.3: No preceding lock, 66, f2, f3, or rex prefixes. */
+>              if (prefixes & (PREFIX_REPZ | PREFIX_REPNZ
+> 
 
-I don't think we should touch the crypto/ code at all here.
+Queued for 2.12, thanks.
 
-Although the VNC server is the only intended user of the des-rfb choice,
-I don't really think we should make this conditional on CONFIG_VNC. It
-isn't reducing the amount of code we build in any meaningful way and is
-littering the crypto code with '#ifdef CONFIG_VNC' conditionals, which
-harms readability and I think it is a code layering violation.
-
-So please drop the following changes:
-
-> >  qapi/crypto.json           |  3 ++-
-> >  crypto/cipher-builtin.c    |  9 +++++++++
-> >  crypto/cipher-gcrypt.c     | 10 ++++++++--
-> >  crypto/cipher-nettle.c     | 14 +++++++++++---
-> >  crypto/cipher.c            | 13 +++++++++++--
-> >  tests/test-crypto-cipher.c |  2 ++
-
-Regards,
-Daniel
--- 
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
+Paolo
