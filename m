@@ -1,26 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36865)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37793)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1eP8xh-000096-JU
-	for qemu-devel@nongnu.org; Wed, 13 Dec 2017 10:28:46 -0500
+	(envelope-from <casasfernando@hotmail.com>) id 1eP91z-0004qq-6R
+	for qemu-devel@nongnu.org; Wed, 13 Dec 2017 10:33:16 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1eP8xc-0001yf-1C
-	for qemu-devel@nongnu.org; Wed, 13 Dec 2017 10:28:45 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:35154)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1eP8xb-0001yN-Pv
-	for qemu-devel@nongnu.org; Wed, 13 Dec 2017 10:28:39 -0500
-Date: Wed, 13 Dec 2017 15:28:31 +0000
-From: Stefan Hajnoczi <stefanha@redhat.com>
-Message-ID: <20171213152831.GE7173@stefanha-x1.localdomain>
-References: <20171205055200.16305-1-peterx@redhat.com>
-	<20171205055200.16305-5-peterx@redhat.com>
+	(envelope-from <casasfernando@hotmail.com>) id 1eP91u-00043g-7i
+	for qemu-devel@nongnu.org; Wed, 13 Dec 2017 10:33:11 -0500
+From: =?utf-8?B?RmVybmFuZG8gQ2FzYXMgU2Now7Zzc293?= <casasfernando@hotmail.com>
+Date: Wed, 13 Dec 2017 15:33:01 +0000
+Message-ID: <VI1PR10MB0301BD1873225A06B658C988B7350@VI1PR10MB0301.EURPRD10.PROD.OUTLOOK.COM>
+References: <VI1PR10MB0301515CFEEA940842FDF26FB7330@VI1PR10MB0301.EURPRD10.PROD.OUTLOOK.COM>
+	<20171211115634.GI13593@stefanha-x1.localdomain>
+	<VI1PR10MB030143CAC84D8E8AA783C0B0B7370@VI1PR10MB0301.EURPRD10.PROD.OUTLOOK.COM>,
+	<20171213112345.GK16782@stefanha-x1.localdomain>
+In-Reply-To: <20171213112345.GK16782@stefanha-x1.localdomain>
+Content-Language: en-US
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="4Epv4kl9IRBfg3rk"
-Content-Disposition: inline
-In-Reply-To: <20171205055200.16305-5-peterx@redhat.com>
-Subject: Re: [Qemu-devel] [RFC v5 04/26] monitor: move skip_flush into
- monitor_data_init
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+Subject: Re: [Qemu-devel] qemu process crash: Assertion failed:
+ QLIST_EMPTY(&bs->tracked_requests)
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,39 +27,50 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Xu <peterx@redhat.com>
-Cc: qemu-devel@nongnu.org, Stefan Hajnoczi <shajnocz@redhat.com>, "Daniel P . Berrange" <berrange@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Fam Zheng <famz@redhat.com>, Juan Quintela <quintela@redhat.com>, mdroth@linux.vnet.ibm.com, Eric Blake <eblake@redhat.com>, Laurent Vivier <lvivier@redhat.com>, Markus Armbruster <armbru@redhat.com>, marcandre.lureau@redhat.com, "Dr . David Alan Gilbert" <dgilbert@redhat.com>
+To: Stefan Hajnoczi <stefanha@gmail.com>
+Cc: qemu-devel <qemu-devel@nongnu.org>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>, Jeff Cody <jcody@redhat.com>
 
-
---4Epv4kl9IRBfg3rk
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
-
-On Tue, Dec 05, 2017 at 01:51:38PM +0800, Peter Xu wrote:
-> It's part of the data init.  Collect it.
->=20
-> Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
-> Reviewed-by: Fam Zheng <famz@redhat.com>
-> Signed-off-by: Peter Xu <peterx@redhat.com>
-> ---
->  monitor.c | 8 ++++----
->  1 file changed, 4 insertions(+), 4 deletions(-)
-
-Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
-
---4Epv4kl9IRBfg3rk
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEcBAEBAgAGBQJaMUcfAAoJEJykq7OBq3PIxzkH/2Aa7beVkuJkmOCfd983DWF1
-6AKAK/DwIQWFqpUMhQp2mN1zGEE6DvORCjGFbsUAKbysv3AUrMAw/mBBZhx6NHFi
-DjJY5xU1MeMVEYwMbTYSAHx0TBF21LywC/3DoYJv/MH7r29RZtPiDvTiDe5MVM56
-G06vSWXGtrfHm8GDoBSU3zeRWR58GRsDWqm1/uCN17MBOqq/eAT0lniVCyzF3V5+
-6BYyGIdpyQhIJwSvkbvkI46zKmiQU23hdNWiKnsLj09LiZg2lnHjhlNj6W9fkx8I
-MkNO5U7O/N1mhUAspod8vaTBo4C2etMQA2KwS/bN73+8ZxrBgrE/bx4uCbS4PBc=
-=OqOL
------END PGP SIGNATURE-----
-
---4Epv4kl9IRBfg3rk--
+VGhhbmtzIGZvciB0aGUgZXhwbGFuYXRpb24gU3RlZmFuLg0KDQpNYXliZSBJ4oCZbSBtaXNzaW5n
+IHNvbWV0aGluZyBoZXJlIGJ1dCwgaWYgSSByZWNhbGwgY29ycmVjdGx5LCB0aGUgcWVtdSBwcm9j
+ZXNzIGZvciB0aGUgZ3Vlc3QgaXMgdGVybWluYXRlZCB3aGVuIHRoaXMgcHJvYmxlbSBoYXBwZW5z
+LiBTbyBob3cgYSBkZWJ1Z2dlciB3aWxsIGJlIGF0dGFjaGVkIHRvIGEgcHJvY2VzcyB0aGF0IGlz
+IGdvbmU/DQoNCkFsc28gSSBkb27igJl0IHRoaW5rIHRoZSBBbHBpbmUgcGFja2FnZXMgZm9yIHFl
+bXUgaW5jbHVkZSB0aGUgZGVidWcgaW5mby4gOigNCkJ1dCBJ4oCZbSBub3QgMTAwJSBzdXJlIGF0
+IHRoZSBtb21lbnQuDQoNClNlbnQgZnJvbSBteSBpUGhvbmUNCg0KT24gMTMgRGVjIDIwMTcsIGF0
+IDEyOjIzLCBTdGVmYW4gSGFqbm9jemkgPHN0ZWZhbmhhQGdtYWlsLmNvbTxtYWlsdG86c3RlZmFu
+aGFAZ21haWwuY29tPj4gd3JvdGU6DQoNCk9uIE1vbiwgRGVjIDExLCAyMDE3IGF0IDAxOjQyOjM4
+UE0gKzAwMDAsIEZlcm5hbmRvIENhc2FzIFNjaMO2c3NvdyB3cm90ZToNCkhlbGxvIFN0ZWZhbiwN
+Cg0KVGhhbmtzIGZvciB5b3VyIHJlcGx5Lg0KRm9ydHVuYXRlbHkgSSBkaWRu4oCZdCBoYXZlIHRo
+ZSBwcm9ibGVtIGFnYWluIGFuZCBpdOKAmXMgbm90IGNsZWFyIGhvdyBpdCBjYW4gYmUgY29uc2lz
+dGVudGx5IHJlcHJvZHVjZWQuIERhaWx5IGJhY2t1cHMgYXJlIHJ1bm5pbmcgYXMgdXN1YWwgYXQg
+dGhlIG1vbWVudC4NCg0KSWYgdGhlcmUgaXMgYW55dGhpbmcgSSBjYW4gZG8gZnJvbSBteSBzaWRl
+IG9yIGlmIHlvdSBoYXZlIGFueSBpZGVhcyB0byB0cnkgdG8gcmVwcm9kdWNlIGl0IGxldCBtZSBr
+bm93Lg0KDQpPa2F5LCB0aGFua3MuDQoNCkluIGNhc2UgaXQgaGFwcGVucyBhZ2FpbiwgaGVyZSBp
+cyBzb21lIGluZm9ybWF0aW9uIGFib3V0IHRoZSBhc3NlcnRpb24NCmZhaWx1cmUuICBJdCB3aWxs
+IHByb2JhYmx5IGJlIG5lY2Vzc2FyeSB0byB1c2UgR0RCIHRvIGluc3BlY3QgdGhlIGZhaWxlZA0K
+cHJvY2VzcyAoY29yZSBkdW1wKS4gIFRoZSBzdGFydGluZyBwb2ludCBmb3IgZGVidWdnaW5nIGlz
+IG1pcnJvcl9ydW4oKQ0KaW4gYmxvY2svbWlycm9yLmM6DQoNCiBpZiAoY250ID09IDAgJiYgc2hv
+dWxkX2NvbXBsZXRlKSB7DQogICAgIC8qIFRoZSBkaXJ0eSBiaXRtYXAgaXMgbm90IHVwZGF0ZWQg
+d2hpbGUgb3BlcmF0aW9ucyBhcmUgcGVuZGluZy4NCiAgICAgICogSWYgd2UncmUgYWJvdXQgdG8g
+ZXhpdCwgd2FpdCBmb3IgcGVuZGluZyBvcGVyYXRpb25zIGJlZm9yZQ0KICAgICAgKiBjYWxsaW5n
+IGJkcnZfZ2V0X2RpcnR5X2NvdW50KGJzKSwgb3Igd2UgbWF5IGV4aXQgd2hpbGUgdGhlDQogICAg
+ICAqIHNvdXJjZSBoYXMgZGlydHkgZGF0YSB0byBjb3B5IQ0KICAgICAgKg0KICAgICAgKiBOb3Rl
+IHRoYXQgSS9PIGNhbiBiZSBzdWJtaXR0ZWQgYnkgdGhlIGd1ZXN0IHdoaWxlDQogICAgICAqIG1p
+cnJvcl9wb3B1bGF0ZSBydW5zLCBzbyBwYXVzZSBpdCBub3cuICBCZWZvcmUgZGVjaWRpbmcNCiAg
+ICAgICogd2hldGhlciB0byBzd2l0Y2ggdG8gdGFyZ2V0IGNoZWNrIG9uZSBsYXN0IHRpbWUgaWYg
+SS9PIGhhcw0KICAgICAgKiBjb21lIGluIHRoZSBtZWFud2hpbGUsIGFuZCBpZiBub3QgZmx1c2gg
+dGhlIGRhdGEgdG8gZGlzay4NCiAgICAgICovDQogICAgIHRyYWNlX21pcnJvcl9iZWZvcmVfZHJh
+aW4ocywgY250KTsNCg0KICAgICBiZHJ2X2RyYWluZWRfYmVnaW4oYnMpOw0KICAgICBjbnQgPSBi
+ZHJ2X2dldF9kaXJ0eV9jb3VudChzLT5kaXJ0eV9iaXRtYXApOw0KICAgICBpZiAoY250ID4gMCB8
+fCBtaXJyb3JfZmx1c2gocykgPCAwKSB7DQogICAgICAgICBiZHJ2X2RyYWluZWRfZW5kKGJzKTsN
+CiAgICAgICAgIGNvbnRpbnVlOw0KICAgICB9DQoNCiAgICAgLyogVGhlIHR3byBkaXNrcyBhcmUg
+aW4gc3luYy4gIEV4aXQgYW5kIHJlcG9ydCBzdWNjZXNzZnVsDQogICAgICAqIGNvbXBsZXRpb24u
+DQogICAgICAqLw0KICAgICBhc3NlcnQoUUxJU1RfRU1QVFkoJmJzLT50cmFja2VkX3JlcXVlc3Rz
+KSk7DQoNClRoZSByZWFzb24gd2h5IHRoaXMgYXNzZXJ0aW9uIG1ha2VzIHNlbnNlIGlzIGJlY2F1
+c2UNCmJkcnZfZHJhaW5lZF9iZWdpbihicykgc3RhcnRzIGEgcmVnaW9uIHdoZXJlIEkvTyBpcyBx
+dWllc2NlZCAoYWxsDQpyZXF1ZXN0cyBzaG91bGQgaGF2ZSBiZWVuIGNvbXBsZXRlZCkuDQoNCkVp
+dGhlciB0aGVyZSBpcyBhIGJ1ZyB3aXRoIGJsb2Nram9icyB2cyBiZHJ2X2RyYWluZWRfZGVidWco
+KSwgb3IgbWF5YmUNCm1pcnJvcl9mbHVzaCgpIHN1Ym1pdHRlZCBuZXcgSS9PIHJlcXVlc3RzLg0K
+DQpJdCB3b3VsZCBiZSBpbnRlcmVzdGluZyB0byBwcmludCB0aGUgYnMtPnRyYWNrZWRfcmVxdWVz
+dHMgbGlua2VkIGxpc3QNCmluIHRoZSBHREIgZGVidWdnZXIuICBUaG9zZSByZXF1ZXN0cyBtaWdo
+dCBnaXZlIGEgY2x1ZSBhYm91dCB0aGUgcm9vdA0KY2F1c2UuDQoNClN0ZWZhbg0K
