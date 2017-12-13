@@ -1,19 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46974)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47775)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1eP54W-00020Q-Uo
-	for qemu-devel@nongnu.org; Wed, 13 Dec 2017 06:19:33 -0500
+	(envelope-from <stefanha@gmail.com>) id 1eP58j-0005Wk-Fy
+	for qemu-devel@nongnu.org; Wed, 13 Dec 2017 06:23:54 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1eP54V-0006SW-MX
-	for qemu-devel@nongnu.org; Wed, 13 Dec 2017 06:19:32 -0500
-Received: from orth.archaic.org.uk ([2001:8b0:1d0::2]:39042)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pm215@archaic.org.uk>)
-	id 1eP54V-0006PG-Et
-	for qemu-devel@nongnu.org; Wed, 13 Dec 2017 06:19:31 -0500
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Wed, 13 Dec 2017 11:19:19 +0000
-Message-Id: <1513163959-17545-1-git-send-email-peter.maydell@linaro.org>
-Subject: [Qemu-devel] [PATCH] target/i386: Fix handling of VEX prefixes
+	(envelope-from <stefanha@gmail.com>) id 1eP58f-0000LX-DM
+	for qemu-devel@nongnu.org; Wed, 13 Dec 2017 06:23:53 -0500
+Date: Wed, 13 Dec 2017 11:23:46 +0000
+From: Stefan Hajnoczi <stefanha@gmail.com>
+Message-ID: <20171213112345.GK16782@stefanha-x1.localdomain>
+References: <VI1PR10MB0301515CFEEA940842FDF26FB7330@VI1PR10MB0301.EURPRD10.PROD.OUTLOOK.COM>
+	<20171211115634.GI13593@stefanha-x1.localdomain>
+	<VI1PR10MB030143CAC84D8E8AA783C0B0B7370@VI1PR10MB0301.EURPRD10.PROD.OUTLOOK.COM>
+MIME-Version: 1.0
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="zPXeIxDajdrcF2en"
+Content-Disposition: inline
+In-Reply-To: <VI1PR10MB030143CAC84D8E8AA783C0B0B7370@VI1PR10MB0301.EURPRD10.PROD.OUTLOOK.COM>
+Subject: Re: [Qemu-devel] qemu process crash: Assertion failed:
+ QLIST_EMPTY(&bs->tracked_requests)
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,55 +26,84 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: patches@linaro.org, Alexandro Sanchez Bach <alexandro@phi.nz>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Eduardo Habkost <ehabkost@redhat.com>
+To: Fernando Casas =?iso-8859-1?Q?Sch=F6ssow?= <casasfernando@hotmail.com>
+Cc: qemu-devel <qemu-devel@nongnu.org>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>, Jeff Cody <jcody@redhat.com>
 
-In commit e3af7c788b73a6495eb9d94992ef11f6ad6f3c56 we
-replaced direct calls to to cpu_ld*_code() with calls
-to the x86_ld*_code() wrappers which incorporate an
-advance of s->pc. Unfortunately we didn't notice that
-in one place the old code was deliberately not incrementing
-s->pc:
 
-@@ -4501,7 +4528,7 @@ static target_ulong disas_insn(DisasContext *s, CPUState *cpu)
-             static const int pp_prefix[4] = {
-                 0, PREFIX_DATA, PREFIX_REPZ, PREFIX_REPNZ
-             };
--            int vex3, vex2 = cpu_ldub_code(env, s->pc);
-+            int vex3, vex2 = x86_ldub_code(env, s);
+--zPXeIxDajdrcF2en
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-             if (!CODE64(s) && (vex2 & 0xc0) != 0xc0) {
-                 /* 4.1.4.6: In 32-bit mode, bits [7:6] must be 11b,
+On Mon, Dec 11, 2017 at 01:42:38PM +0000, Fernando Casas Sch=C3=B6ssow wrot=
+e:
+> Hello Stefan,
+>=20
+> Thanks for your reply.
+> Fortunately I didn=E2=80=99t have the problem again and it=E2=80=99s not =
+clear how it can be consistently reproduced. Daily backups are running as u=
+sual at the moment.
+>=20
+> If there is anything I can do from my side or if you have any ideas to tr=
+y to reproduce it let me know.
 
-This meant we were mishandling this set of instructions.
-Remove the manual advance of s->pc for the "is VEX" case
-(which is now done by x86_ldub_code()) and instead rewind
-PC in the case where we decide that this isn't really VEX.
+Okay, thanks.
 
-Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
-Cc: qemu-stable@nongnu.org
-Reported-by: Alexandro Sanchez Bach <alexandro@phi.nz>
----
-I checked the rest of the changes in e3af7c788b73a and
-I don't think we made this mistake anywhere else.
----
- target/i386/translate.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+In case it happens again, here is some information about the assertion
+failure.  It will probably be necessary to use GDB to inspect the failed
+process (core dump).  The starting point for debugging is mirror_run()
+in block/mirror.c:
 
-diff --git a/target/i386/translate.c b/target/i386/translate.c
-index 088a9d9..ed5b69d 100644
---- a/target/i386/translate.c
-+++ b/target/i386/translate.c
-@@ -4547,9 +4547,9 @@ static target_ulong disas_insn(DisasContext *s, CPUState *cpu)
-             if (!CODE64(s) && (vex2 & 0xc0) != 0xc0) {
-                 /* 4.1.4.6: In 32-bit mode, bits [7:6] must be 11b,
-                    otherwise the instruction is LES or LDS.  */
-+                s->pc--; /* rewind the advance_pc() x86_ldub_code() did */
-                 break;
-             }
--            s->pc++;
- 
-             /* 4.1.1-4.1.3: No preceding lock, 66, f2, f3, or rex prefixes. */
-             if (prefixes & (PREFIX_REPZ | PREFIX_REPNZ
--- 
-2.7.4
+  if (cnt =3D=3D 0 && should_complete) {
+      /* The dirty bitmap is not updated while operations are pending.
+       * If we're about to exit, wait for pending operations before
+       * calling bdrv_get_dirty_count(bs), or we may exit while the
+       * source has dirty data to copy!
+       *
+       * Note that I/O can be submitted by the guest while
+       * mirror_populate runs, so pause it now.  Before deciding
+       * whether to switch to target check one last time if I/O has
+       * come in the meanwhile, and if not flush the data to disk.
+       */
+      trace_mirror_before_drain(s, cnt);
+
+      bdrv_drained_begin(bs);
+      cnt =3D bdrv_get_dirty_count(s->dirty_bitmap);
+      if (cnt > 0 || mirror_flush(s) < 0) {
+          bdrv_drained_end(bs);
+          continue;
+      }
+
+      /* The two disks are in sync.  Exit and report successful
+       * completion.
+       */
+      assert(QLIST_EMPTY(&bs->tracked_requests));
+
+The reason why this assertion makes sense is because
+bdrv_drained_begin(bs) starts a region where I/O is quiesced (all
+requests should have been completed).
+
+Either there is a bug with blockjobs vs bdrv_drained_debug(), or maybe
+mirror_flush() submitted new I/O requests.
+
+It would be interesting to print the bs->tracked_requests linked list
+in the GDB debugger.  Those requests might give a clue about the root
+cause.
+
+Stefan
+
+--zPXeIxDajdrcF2en
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEcBAEBAgAGBQJaMQ3BAAoJEJykq7OBq3PIKtIH/jaVG0HeZ5GOg1f/M9cFIURe
+MZlca/rt1TDJ2noNMHLEqAwUyoIVVSgIrqyg8TqanaqeGpGwhxnNkVQr7DIm97wl
+4oMie7v6MWEnUe6kncCt2evruxbxsy7QAJWVL/GTgCNVTQiH9Ar3BkGC3hR9UFjU
++F97F097BCOWdt9/ajV6ZvBvnxvjpRSuG1QJJCnEMTx0Q3fGl4J0U3+LyfZwlNNC
+2wQjQsQtToCwSdEhrBaEG26piWZxQzvRn2V/qSsueexuEyXsSQ1rNmJnYOdyAdv+
+mTLLjerljMcSr+xkCmK+T5HN/IWy4OGMbgRnnz3yZBhXXHjbSIaHhgrnbye6IlY=
+=VwdA
+-----END PGP SIGNATURE-----
+
+--zPXeIxDajdrcF2en--
