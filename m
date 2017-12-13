@@ -1,25 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51374)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51416)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1ePBWU-0004bB-Bg
-	for qemu-devel@nongnu.org; Wed, 13 Dec 2017 13:12:52 -0500
+	(envelope-from <pm215@archaic.org.uk>) id 1ePBWV-0004ck-G8
+	for qemu-devel@nongnu.org; Wed, 13 Dec 2017 13:12:57 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1ePBWS-0007bN-Qu
-	for qemu-devel@nongnu.org; Wed, 13 Dec 2017 13:12:50 -0500
-Received: from orth.archaic.org.uk ([2001:8b0:1d0::2]:39114)
+	(envelope-from <pm215@archaic.org.uk>) id 1ePBWU-0007ej-H9
+	for qemu-devel@nongnu.org; Wed, 13 Dec 2017 13:12:51 -0500
+Received: from orth.archaic.org.uk ([2001:8b0:1d0::2]:39118)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <pm215@archaic.org.uk>)
-	id 1ePBWS-0007XQ-Fq
-	for qemu-devel@nongnu.org; Wed, 13 Dec 2017 13:12:48 -0500
+	id 1ePBWU-0007cv-Aj
+	for qemu-devel@nongnu.org; Wed, 13 Dec 2017 13:12:50 -0500
 Received: from pm215 by orth.archaic.org.uk with local (Exim 4.89)
-	(envelope-from <pm215@archaic.org.uk>) id 1ePBWR-0007bS-6d
-	for qemu-devel@nongnu.org; Wed, 13 Dec 2017 18:12:47 +0000
+	(envelope-from <pm215@archaic.org.uk>) id 1ePBWT-0007cq-BO
+	for qemu-devel@nongnu.org; Wed, 13 Dec 2017 18:12:49 +0000
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Wed, 13 Dec 2017 18:12:05 +0000
-Message-Id: <1513188761-20784-8-git-send-email-peter.maydell@linaro.org>
+Date: Wed, 13 Dec 2017 18:12:08 +0000
+Message-Id: <1513188761-20784-11-git-send-email-peter.maydell@linaro.org>
 In-Reply-To: <1513188761-20784-1-git-send-email-peter.maydell@linaro.org>
 References: <1513188761-20784-1-git-send-email-peter.maydell@linaro.org>
-Subject: [Qemu-devel] [PULL 07/43] xilinx_spips: Add support for RX discard
- and RX drain
+Subject: [Qemu-devel] [PULL 10/43] xilinx_spips: Add support for 4 byte
+ addresses in the LQSPI
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,334 +32,42 @@ To: qemu-devel@nongnu.org
 
 From: Francisco Iglesias <frasse.iglesias@gmail.com>
 
-Add support for the RX discard and RX drain functionality. Also transmit
-one byte per dummy cycle (to the flash memories) with commands that require
-these.
+Add support for 4 byte addresses in the LQSPI and correct LQSPI_CFG_SEP_BUS.
 
 Signed-off-by: Francisco Iglesias <frasse.iglesias@gmail.com>
+Reviewed-by: Alistair Francis <alistair.francis@xilinx.com>
 Reviewed-by: Edgar E. Iglesias <edgar.iglesias@xilinx.com>
 Tested-by: Edgar E. Iglesias <edgar.iglesias@xilinx.com>
-Message-id: 20171126231634.9531-8-frasse.iglesias@gmail.com
+Message-id: 20171126231634.9531-11-frasse.iglesias@gmail.com
 Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 ---
- include/hw/ssi/xilinx_spips.h |   6 ++
- hw/ssi/xilinx_spips.c         | 167 +++++++++++++++++++++++++++++++++++++-----
- 2 files changed, 155 insertions(+), 18 deletions(-)
+ hw/ssi/xilinx_spips.c | 6 +++++-
+ 1 file changed, 5 insertions(+), 1 deletion(-)
 
-diff --git a/include/hw/ssi/xilinx_spips.h b/include/hw/ssi/xilinx_spips.h
-index 7f9e2fc..bac90a5 100644
---- a/include/hw/ssi/xilinx_spips.h
-+++ b/include/hw/ssi/xilinx_spips.h
-@@ -61,13 +61,19 @@ struct XilinxSPIPS {
-     uint8_t num_busses;
- 
-     uint8_t snoop_state;
-+    int cmd_dummies;
-+    uint8_t link_state;
-+    uint8_t link_state_next;
-+    uint8_t link_state_next_when;
-     qemu_irq *cs_lines;
-+    bool *cs_lines_state;
-     SSIBus **spi;
- 
-     Fifo8 rx_fifo;
-     Fifo8 tx_fifo;
- 
-     uint8_t num_txrx_bytes;
-+    uint32_t rx_discard;
- 
-     uint32_t regs[XLNX_SPIPS_R_MAX];
- };
 diff --git a/hw/ssi/xilinx_spips.c b/hw/ssi/xilinx_spips.c
-index 231aa5b..691d48d 100644
+index 878b17e..ab54da8 100644
 --- a/hw/ssi/xilinx_spips.c
 +++ b/hw/ssi/xilinx_spips.c
-@@ -30,6 +30,7 @@
- #include "qemu/bitops.h"
- #include "hw/ssi/xilinx_spips.h"
- #include "qapi/error.h"
-+#include "hw/register.h"
- #include "migration/blocker.h"
- 
- #ifndef XILINX_SPIPS_ERR_DEBUG
-@@ -100,6 +101,14 @@
- #define LQSPI_CFG_DUMMY_SHIFT   8
- #define LQSPI_CFG_INST_CODE     0xFF
- 
-+#define R_CMND        (0xc0 / 4)
-+    #define R_CMND_RXFIFO_DRAIN   (1 << 19)
-+    FIELD(CMND, PARTIAL_BYTE_LEN, 16, 3)
-+#define R_CMND_EXT_ADD        (1 << 15)
-+    FIELD(CMND, RX_DISCARD, 8, 7)
-+    FIELD(CMND, DUMMY_CYCLES, 2, 6)
-+#define R_CMND_DMA_EN         (1 << 1)
-+#define R_CMND_PUSH_WAIT      (1 << 0)
- #define R_LQSPI_STS         (0xA4 / 4)
- #define LQSPI_STS_WR_RECVD      (1 << 1)
- 
-@@ -116,7 +125,8 @@
- #define LQSPI_ADDRESS_BITS 24
- 
- #define SNOOP_CHECKING 0xFF
--#define SNOOP_NONE 0xFE
-+#define SNOOP_ADDR 0xF0
-+#define SNOOP_NONE 0xEE
- #define SNOOP_STRIPING 0
- 
- static inline int num_effective_busses(XilinxSPIPS *s)
-@@ -146,9 +156,14 @@ static void xilinx_spips_update_cs_lines(XilinxSPIPS *s)
-             if (xilinx_spips_cs_is_set(s, i, field) && !found) {
-                 DB_PRINT_L(0, "selecting slave %d\n", i);
-                 qemu_set_irq(s->cs_lines[cs_to_set], 0);
-+                if (s->cs_lines_state[cs_to_set]) {
-+                    s->cs_lines_state[cs_to_set] = false;
-+                    s->rx_discard = ARRAY_FIELD_EX32(s->regs, CMND, RX_DISCARD);
-+                }
-             } else {
-                 DB_PRINT_L(0, "deselecting slave %d\n", i);
-                 qemu_set_irq(s->cs_lines[cs_to_set], 1);
-+                s->cs_lines_state[cs_to_set] = true;
-             }
-         }
-         if (xilinx_spips_cs_is_set(s, i, field)) {
-@@ -157,6 +172,10 @@ static void xilinx_spips_update_cs_lines(XilinxSPIPS *s)
-     }
-     if (!found) {
-         s->snoop_state = SNOOP_CHECKING;
-+        s->cmd_dummies = 0;
-+        s->link_state = 1;
-+        s->link_state_next = 1;
-+        s->link_state_next_when = 0;
-         DB_PRINT_L(1, "moving to snoop check state\n");
-     }
- }
-@@ -203,7 +222,11 @@ static void xilinx_spips_reset(DeviceState *d)
-     /* FIXME: move magic number definition somewhere sensible */
-     s->regs[R_MOD_ID] = 0x01090106;
-     s->regs[R_LQSPI_CFG] = R_LQSPI_CFG_RESET;
-+    s->link_state = 1;
-+    s->link_state_next = 1;
-+    s->link_state_next_when = 0;
-     s->snoop_state = SNOOP_CHECKING;
-+    s->cmd_dummies = 0;
-     xilinx_spips_update_ixr(s);
-     xilinx_spips_update_cs_lines(s);
- }
-@@ -238,14 +261,69 @@ static inline void stripe8(uint8_t *x, int num, bool dir)
-     memcpy(x, r, sizeof(uint8_t) * num);
- }
- 
-+static int xilinx_spips_num_dummies(XilinxQSPIPS *qs, uint8_t command)
-+{
-+    if (!qs) {
-+        /* The SPI device is not a QSPI device */
-+        return -1;
-+    }
-+
-+    switch (command) { /* check for dummies */
-+    case READ: /* no dummy bytes/cycles */
-+    case PP:
-+    case DPP:
-+    case QPP:
-+    case READ_4:
-+    case PP_4:
-+    case QPP_4:
-+        return 0;
-+    case FAST_READ:
-+    case DOR:
-+    case QOR:
-+    case DOR_4:
-+    case QOR_4:
-+        return 1;
-+    case DIOR:
-+    case FAST_READ_4:
-+    case DIOR_4:
-+        return 2;
-+    case QIOR:
-+    case QIOR_4:
-+        return 5;
-+    default:
-+        return -1;
-+    }
-+}
-+
-+static inline uint8_t get_addr_length(XilinxSPIPS *s, uint8_t cmd)
-+{
-+   switch (cmd) {
-+   case PP_4:
-+   case QPP_4:
-+   case READ_4:
-+   case QIOR_4:
-+   case FAST_READ_4:
-+   case DOR_4:
-+   case QOR_4:
-+   case DIOR_4:
-+       return 4;
-+   default:
-+       return (s->regs[R_CMND] & R_CMND_EXT_ADD) ? 4 : 3;
-+   }
-+}
-+
- static void xilinx_spips_flush_txfifo(XilinxSPIPS *s)
- {
-     int debug_level = 0;
-+    XilinxQSPIPS *q = (XilinxQSPIPS *) object_dynamic_cast(OBJECT(s),
-+                                                           TYPE_XILINX_QSPIPS);
- 
-     for (;;) {
-         int i;
-         uint8_t tx = 0;
-         uint8_t tx_rx[num_effective_busses(s)];
-+        uint8_t dummy_cycles = 0;
-+        uint8_t addr_length;
- 
-         if (fifo8_is_empty(&s->tx_fifo)) {
-             if (!(s->regs[R_LQSPI_CFG] & LQSPI_CFG_LQ_MODE)) {
-@@ -258,54 +336,102 @@ static void xilinx_spips_flush_txfifo(XilinxSPIPS *s)
-                 tx_rx[i] = fifo8_pop(&s->tx_fifo);
-             }
-             stripe8(tx_rx, num_effective_busses(s), false);
--        } else {
-+        } else if (s->snoop_state >= SNOOP_ADDR) {
-             tx = fifo8_pop(&s->tx_fifo);
-             for (i = 0; i < num_effective_busses(s); ++i) {
-                 tx_rx[i] = tx;
-             }
-+        } else {
-+            /* Extract a dummy byte and generate dummy cycles according to the
-+             * link state */
-+            tx = fifo8_pop(&s->tx_fifo);
-+            dummy_cycles = 8 / s->link_state;
-         }
- 
-         for (i = 0; i < num_effective_busses(s); ++i) {
-             int bus = num_effective_busses(s) - 1 - i;
--            DB_PRINT_L(debug_level, "tx = %02x\n", tx_rx[i]);
--            tx_rx[i] = ssi_transfer(s->spi[bus], (uint32_t)tx_rx[i]);
--            DB_PRINT_L(debug_level, "rx = %02x\n", tx_rx[i]);
-+            if (dummy_cycles) {
-+                int d;
-+                for (d = 0; d < dummy_cycles; ++d) {
-+                    tx_rx[0] = ssi_transfer(s->spi[bus], (uint32_t)tx_rx[0]);
-+                }
-+            } else {
-+                DB_PRINT_L(debug_level, "tx = %02x\n", tx_rx[i]);
-+                tx_rx[i] = ssi_transfer(s->spi[bus], (uint32_t)tx_rx[i]);
-+                DB_PRINT_L(debug_level, "rx = %02x\n", tx_rx[i]);
-+            }
-         }
- 
--        if (fifo8_is_full(&s->rx_fifo)) {
-+        if (s->regs[R_CMND] & R_CMND_RXFIFO_DRAIN) {
-+            DB_PRINT_L(debug_level, "dircarding drained rx byte\n");
-+            /* Do nothing */
-+        } else if (s->rx_discard) {
-+            DB_PRINT_L(debug_level, "dircarding discarded rx byte\n");
-+            s->rx_discard -= 8 / s->link_state;
-+        } else if (fifo8_is_full(&s->rx_fifo)) {
-             s->regs[R_INTR_STATUS] |= IXR_RX_FIFO_OVERFLOW;
-             DB_PRINT_L(0, "rx FIFO overflow");
-         } else if (s->snoop_state == SNOOP_STRIPING) {
-             stripe8(tx_rx, num_effective_busses(s), true);
-             for (i = 0; i < num_effective_busses(s); ++i) {
-                 fifo8_push(&s->rx_fifo, (uint8_t)tx_rx[i]);
-+                DB_PRINT_L(debug_level, "pushing striped rx byte\n");
-             }
-         } else {
-+           DB_PRINT_L(debug_level, "pushing unstriped rx byte\n");
-            fifo8_push(&s->rx_fifo, (uint8_t)tx_rx[0]);
-         }
- 
-+        if (s->link_state_next_when) {
-+            s->link_state_next_when--;
-+            if (!s->link_state_next_when) {
-+                s->link_state = s->link_state_next;
-+            }
+@@ -92,8 +92,9 @@
+ #define R_LQSPI_CFG_RESET       0x03A002EB
+ #define LQSPI_CFG_LQ_MODE       (1U << 31)
+ #define LQSPI_CFG_TWO_MEM       (1 << 30)
+-#define LQSPI_CFG_SEP_BUS       (1 << 30)
++#define LQSPI_CFG_SEP_BUS       (1 << 29)
+ #define LQSPI_CFG_U_PAGE        (1 << 28)
++#define LQSPI_CFG_ADDR4         (1 << 27)
+ #define LQSPI_CFG_MODE_EN       (1 << 25)
+ #define LQSPI_CFG_MODE_WIDTH    8
+ #define LQSPI_CFG_MODE_SHIFT    16
+@@ -702,6 +703,9 @@ static void lqspi_load_cache(void *opaque, hwaddr addr)
+         fifo8_push(&s->tx_fifo, s->regs[R_LQSPI_CFG] & LQSPI_CFG_INST_CODE);
+         /* read address */
+         DB_PRINT_L(0, "pushing read address %06x\n", flash_addr);
++        if (s->regs[R_LQSPI_CFG] & LQSPI_CFG_ADDR4) {
++            fifo8_push(&s->tx_fifo, (uint8_t)(flash_addr >> 24));
 +        }
-+
-         DB_PRINT_L(debug_level, "initial snoop state: %x\n",
-                    (unsigned)s->snoop_state);
-         switch (s->snoop_state) {
-         case (SNOOP_CHECKING):
--            switch (tx) { /* new instruction code */
--            case READ: /* 3 address bytes, no dummy bytes/cycles */
--            case PP:
-+            /* Store the count of dummy bytes in the txfifo */
-+            s->cmd_dummies = xilinx_spips_num_dummies(q, tx);
-+            addr_length = get_addr_length(s, tx);
-+            if (s->cmd_dummies < 0) {
-+                s->snoop_state = SNOOP_NONE;
-+            } else {
-+                s->snoop_state = SNOOP_ADDR + addr_length - 1;
-+            }
-+            switch (tx) {
-             case DPP:
--            case QPP:
--                s->snoop_state = 3;
--                break;
--            case FAST_READ: /* 3 address bytes, 1 dummy byte */
-             case DOR:
-+            case DOR_4:
-+                s->link_state_next = 2;
-+                s->link_state_next_when = addr_length + s->cmd_dummies;
-+                break;
-+            case QPP:
-+            case QPP_4:
-             case QOR:
--            case DIOR: /* FIXME: these vary between vendor - set to spansion */
--                s->snoop_state = 4;
-+            case QOR_4:
-+                s->link_state_next = 4;
-+                s->link_state_next_when = addr_length + s->cmd_dummies;
-+                break;
-+            case DIOR:
-+            case DIOR_4:
-+                s->link_state = 2;
-                 break;
--            case QIOR: /* 3 address bytes, 2 dummy bytes */
--                s->snoop_state = 6;
-+            case QIOR:
-+            case QIOR_4:
-+                s->link_state = 4;
-                 break;
--            default:
-+            }
-+            break;
-+        case (SNOOP_ADDR):
-+            /* Address has been transmitted, transmit dummy cycles now if
-+             * needed */
-+            if (s->cmd_dummies < 0) {
-                 s->snoop_state = SNOOP_NONE;
-+            } else {
-+                s->snoop_state = s->cmd_dummies;
-             }
-             break;
-         case (SNOOP_STRIPING):
-@@ -483,6 +609,7 @@ static void xilinx_qspips_write(void *opaque, hwaddr addr,
-                                 uint64_t value, unsigned size)
- {
-     XilinxQSPIPS *q = XILINX_QSPIPS(opaque);
-+    XilinxSPIPS *s = XILINX_SPIPS(opaque);
- 
-     xilinx_spips_write(opaque, addr, value, size);
-     addr >>= 2;
-@@ -490,6 +617,9 @@ static void xilinx_qspips_write(void *opaque, hwaddr addr,
-     if (addr == R_LQSPI_CFG) {
-         xilinx_qspips_invalidate_mmio_ptr(q);
-     }
-+    if (s->regs[R_CMND] & R_CMND_RXFIFO_DRAIN) {
-+        fifo8_reset(&s->rx_fifo);
-+    }
- }
- 
- static const MemoryRegionOps qspips_ops = {
-@@ -632,6 +762,7 @@ static void xilinx_spips_realize(DeviceState *dev, Error **errp)
-     }
- 
-     s->cs_lines = g_new0(qemu_irq, s->num_cs * s->num_busses);
-+    s->cs_lines_state = g_new0(bool, s->num_cs * s->num_busses);
-     for (i = 0, cs = s->cs_lines; i < s->num_busses; ++i, cs += s->num_cs) {
-         ssi_auto_connect_slaves(DEVICE(s), cs, s->spi[i]);
-     }
+         fifo8_push(&s->tx_fifo, (uint8_t)(flash_addr >> 16));
+         fifo8_push(&s->tx_fifo, (uint8_t)(flash_addr >> 8));
+         fifo8_push(&s->tx_fifo, (uint8_t)flash_addr);
 -- 
 2.7.4
