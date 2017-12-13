@@ -1,35 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60621)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:32804)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1ePDKJ-0001c9-Ot
-	for qemu-devel@nongnu.org; Wed, 13 Dec 2017 15:08:24 -0500
+	(envelope-from <stefanha@redhat.com>) id 1ePDLk-0002xd-2e
+	for qemu-devel@nongnu.org; Wed, 13 Dec 2017 15:09:53 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1ePDKI-0002Il-Kz
-	for qemu-devel@nongnu.org; Wed, 13 Dec 2017 15:08:23 -0500
-Received: from mail-wr0-x241.google.com ([2a00:1450:400c:c0c::241]:36848)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1ePDKI-0002IQ-B9
-	for qemu-devel@nongnu.org; Wed, 13 Dec 2017 15:08:22 -0500
-Received: by mail-wr0-x241.google.com with SMTP id v105so3209862wrc.3
-	for <qemu-devel@nongnu.org>; Wed, 13 Dec 2017 12:08:22 -0800 (PST)
+	(envelope-from <stefanha@redhat.com>) id 1ePDLh-0003AE-AN
+	for qemu-devel@nongnu.org; Wed, 13 Dec 2017 15:09:52 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:42000)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1ePDLg-00039M-Ua
+	for qemu-devel@nongnu.org; Wed, 13 Dec 2017 15:09:49 -0500
+Date: Wed, 13 Dec 2017 20:09:38 +0000
+From: Stefan Hajnoczi <stefanha@redhat.com>
+Message-ID: <20171213200938.GG8317@stefanha-x1.localdomain>
+References: <20171205055200.16305-1-peterx@redhat.com>
+	<20171205055200.16305-17-peterx@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20171213165142-mutt-send-email-mst@kernel.org>
-References: <CAJSP0QX4V64OoU4-Dhb93MUZ9Rz0FPR-La5Xq4_yqGH7SG6PjQ@mail.gmail.com>
-	<20171207213420-mutt-send-email-mst@kernel.org>
-	<5A2A347B.9070006@intel.com>
-	<CAJSP0QUAqCzFgVtM1cg_KybdyrZa_FRUHhDN7oLfRjZ2ZVkp4g@mail.gmail.com>
-	<286AC319A985734F985F78AFA26841F73937E001@shsmsx102.ccr.corp.intel.com>
-	<20171211111147.GF13593@stefanha-x1.localdomain>
-	<286AC319A985734F985F78AFA26841F73937EEED@shsmsx102.ccr.corp.intel.com>
-	<20171212101440.GB6985@stefanha-x1.localdomain>
-	<5A30E0C1.3070905@intel.com>
-	<20171213123521.GL16782@stefanha-x1.localdomain>
-	<20171213165142-mutt-send-email-mst@kernel.org>
-From: Stefan Hajnoczi <stefanha@gmail.com>
-Date: Wed, 13 Dec 2017 20:08:19 +0000
-Message-ID: <CAJSP0QWHJBL4APkeMt8-P8PFaPF=Vbi0NSnJtU7YX67fJrW=hw@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [virtio-dev] [PATCH v3 0/7] Vhost-pci for inter-VM
- communication
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="TmwHKJoIRFM7Mu/A"
+Content-Disposition: inline
+In-Reply-To: <20171205055200.16305-17-peterx@redhat.com>
+Subject: Re: [Qemu-devel] [RFC v5 16/26] monitor: separate QMP parser and
+ dispatcher
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -38,152 +29,151 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: Wei Wang <wei.w.wang@intel.com>, Stefan Hajnoczi <stefanha@redhat.com>, "virtio-dev@lists.oasis-open.org" <virtio-dev@lists.oasis-open.org>, "Yang, Zhiyong" <zhiyong.yang@intel.com>, "jan.kiszka@siemens.com" <jan.kiszka@siemens.com>, "jasowang@redhat.com" <jasowang@redhat.com>, "avi.cohen@huawei.com" <avi.cohen@huawei.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "pbonzini@redhat.com" <pbonzini@redhat.com>, "marcandre.lureau@redhat.com" <marcandre.lureau@redhat.com>, Maxime Coquelin <maxime.coquelin@redhat.com>
+To: Peter Xu <peterx@redhat.com>
+Cc: qemu-devel@nongnu.org, Stefan Hajnoczi <shajnocz@redhat.com>, "Daniel P . Berrange" <berrange@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Fam Zheng <famz@redhat.com>, Juan Quintela <quintela@redhat.com>, mdroth@linux.vnet.ibm.com, Eric Blake <eblake@redhat.com>, Laurent Vivier <lvivier@redhat.com>, Markus Armbruster <armbru@redhat.com>, marcandre.lureau@redhat.com, "Dr . David Alan Gilbert" <dgilbert@redhat.com>
 
-On Wed, Dec 13, 2017 at 3:01 PM, Michael S. Tsirkin <mst@redhat.com> wrote:
-> On Wed, Dec 13, 2017 at 12:35:21PM +0000, Stefan Hajnoczi wrote:
->> I'm not saying that DPDK should use libvhost-user.  I'm saying that it's
->> easy to add vfio vhost-pci support (for the PCI adapter I described) to
->> DPDK.  This patch series would require writing a completely new slave
->> for vhost-pci because the device interface is so different from
->> vhost-user.
->
-> The main question is how appropriate is the vhost user protocol
-> for passing to guests. And I am not sure at this point.
->
-> Someone should go over vhost user messages and see whether they are safe
-> to pass to guest. If most are then we can try the transparent approach.
-> If most aren't then we can't and might as well use the proposed protocol
-> which at least has code behind it.
 
-I have done that:
+--TmwHKJoIRFM7Mu/A
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-Master message types
---------------------
+On Tue, Dec 05, 2017 at 01:51:50PM +0800, Peter Xu wrote:
+> @@ -3956,12 +3968,122 @@ static void handle_qmp_command(JSONMessageParser=
+ *parser, GQueue *tokens,
+>          }
+>      }
+> =20
+> -err_out:
+> -    monitor_qmp_respond(mon, rsp, err, id);
+> +    /* Respond if necessary */
+> +    monitor_qmp_respond(mon, rsp, NULL, id);
+> +
+> +    /* This pairs with the monitor_suspend() in handle_qmp_command(). */
+> +    if (!qmp_oob_enabled(mon)) {
+> +        monitor_resume(mon);
 
- * VHOST_USER_GET_FEATURES
+monitor_resume() does not work between threads: if the event loop is
+currently blocked in poll() it won't notice that the monitor fd should
+be watched again.
 
-   Safe to pass through.
+Please add aio_notify() to monitor_resume() and monitor_suspend().  That
+way the event loop is forced to check can_read() again.
 
- * VHOST_USER_SET_FEATURES
+> +    }
+> =20
+>      qobject_decref(req);
+>  }
+> =20
+> +/*
+> + * Pop one QMP request from monitor queues, return NULL if not found.
+> + * We are using round-robin fasion to pop the request, to avoid
+> + * processing command only on a very busy monitor.  To achieve that,
+> + * when we processed one request on specific monitor, we put that
+> + * monitor to the end of mon_list queue.
+> + */
+> +static QMPRequest *monitor_qmp_requests_pop_one(void)
+> +{
+> +    QMPRequest *req_obj =3D NULL;
+> +    Monitor *mon;
+> +
+> +    qemu_mutex_lock(&monitor_lock);
+> +
+> +    QTAILQ_FOREACH(mon, &mon_list, entry) {
+> +        qemu_mutex_lock(&mon->qmp.qmp_queue_lock);
 
-   Safe to pass through.
+Please add a doc comment about the monitor_lock < qmp_queue_lock lock
+ordering in the qmp_queue_lock field declaration so that deadlocks can
+be prevented.
 
- * VHOST_USER_GET_PROTOCOL_FEATURES
+> +        req_obj =3D g_queue_pop_head(mon->qmp.qmp_requests);
+> +        qemu_mutex_unlock(&mon->qmp.qmp_queue_lock);
+> +        if (req_obj) {
+> +            break;
+> +        }
+> +    }
+> +
+> +    if (req_obj) {
+> +        /*
+> +         * We found one request on the monitor. Degrade this monitor's
+> +         * priority to lowest by re-inserting it to end of queue.
+> +         */
+> +        QTAILQ_REMOVE(&mon_list, mon, entry);
+> +        QTAILQ_INSERT_TAIL(&mon_list, mon, entry);
+> +    }
+> +
+> +    qemu_mutex_unlock(&monitor_lock);
+> +
+> +    return req_obj;
+> +}
+> +
+> +static void monitor_qmp_bh_dispatcher(void *data)
+> +{
+> +    QMPRequest *req_obj;
+> +
+> +    while (true) {
 
-   QEMU must mask unsupported VHOST_USER_PROTOCOL_F_* bits that the guest set.
+Previously QEMU could only dispatch 1 QMP command per main loop
+iteration.  Now multiple requests can be processed in a single main loop
+iteration.
 
- * VHOST_USER_SET_PROTOCOL_FEATURES
+If a producer enqueues requests faster than the dispatcher can dequeue
+them then this is infinite loop will prevent the caller (i.e.  QEMU main
+loop) from making progress.
 
-   Safe to pass through.
+The following keeps 1 QMP command per main loop iteration and avoids the
+infinite loop:
 
- * VHOST_USER_SET_OWNER
+  static void monitor_qmp_bh_dispatcher(void *data)
+  {
+      QMPRequest *req_obj =3D monitor_qmp_requests_pop_one();
 
-   Safe to pass through.
+      if (req_obj) {
+          monitor_qmp_dispatch_one(req_obj);
 
- * VHOST_USER_RESET_OWNER
+	  /* Reschedule instead of looping so the main loop stays responsive */
+          qemu_bh_schedule(mon_global.qmp_dispatcher_bh);
+      }
+  }
 
-   Unused message, ignore and do not pass through.
+> +    /*
+> +     * Put the request to the end of queue so that requests will be
+> +     * handled in time order.  Ownership for req_obj, req, id,
+> +     * etc. will be delivered to the handler side.
+> +     */
+> +    qemu_mutex_lock(&mon->qmp.qmp_queue_lock);
+> +    g_queue_push_tail(mon->qmp.qmp_requests, req_obj);
+> +    qemu_mutex_unlock(&mon->qmp.qmp_queue_lock);
+> +
+> +    /* Kick the dispatcher routine */
+> +    qemu_bh_schedule(mon_global.qmp_dispatcher_bh);
+> +
+> +    /*
+> +     * If OOB is not enabled on current monitor, we'll emulate the old
+> +     * behavior that we won't process current monitor any more until
+> +     * it is responded.  This helps make sure that as long as OOB is
+> +     * not enabled, the server will never drop any command.
+> +     */
+> +    if (!qmp_oob_enabled(mon)) {
+> +        monitor_suspend(mon);
+> +    }
 
- * VHOST_USER_SET_MEM_TABLE
+monitor_suspend() must be called before g_queue_push_tail().  Otherwise
+the other thread might complete the request and call monitor_resume()
+before we call monitor_suspend().
 
-   Set up BARs before sending a VHOST_USER_SET_MEM_TABLE to the guest.
+--TmwHKJoIRFM7Mu/A
+Content-Type: application/pgp-signature; name="signature.asc"
 
- * VHOST_USER_SET_LOG_BASE
+-----BEGIN PGP SIGNATURE-----
 
-   Set up log shared memory region before sending VHOST_USER_SET_LOG_BASE to
-   the guest.
+iQEcBAEBAgAGBQJaMYkCAAoJEJykq7OBq3PI23cH/RSgkNz3AEmtThoLalE6mGJP
+4y5i8g/q2XWNgHCghs5m8Qez1pyX5n7r616wreWoKqwkkptzv4ayfwKAHWvF6YV3
+CTutONB6xsn7ER8olFlW+qZ2Gge3KTrIVybVd4+cbn5ikF1pgaJHx0TAru6XZIXV
+OGl8kN3ucnTiSBdEnTEkFLJ4CH8fWt5SrfYBV0nr4bRrx/gOAxVzzWrXV9SFhF+e
+KoS/2czUoTYb0dC/+jS2YmFKWqSvg/RdczZ0LIyvlHeraoy1vftyFpIkiSkEFIJM
+jOqkjTU5tiB44hV2M46ogT80/oa04BpPNXSjudUTdL3tp+GTOGkdjGDRx9t4+Tk=
+=23MO
+-----END PGP SIGNATURE-----
 
- * VHOST_USER_SET_LOG_FD
-
-   Set up log doorbell before sending VHOST_USER_SET_LOG_FD to the guest.
-
- * VHOST_USER_SET_VRING_NUM
-
-   Safe to pass through.
-
- * VHOST_USER_SET_VRING_ADDR
-
-   Passthrough if QEMU isn't doing IOMMU.  Otherwise remap the addresses before
-   passing them to the guest.
-
- * VHOST_USER_SET_VRING_BASE
-
-   Safe to pass through.
-
- * VHOST_USER_GET_VRING_BASE
-
-   Safe to pass through.
-
- * VHOST_USER_SET_VRING_KICK
-
-   Set up vring kick doorbell (unless bit 8 is set) before sending
-   VHOST_USER_SET_VRING_KICK to the guest.
-
- * VHOST_USER_SET_VRING_CALL
-
-   Set up the vring call doorbell (unless bit 8 is set) before sending
-   VHOST_USER_SET_VRING_CALL to the guest.
-
- * VHOST_USER_SET_VRING_ERR
-
-   Set up the vring err doorbell (unless bit 8 is set) before sending
-   VHOST_USER_SET_VRING_ERR to the guest.
-
- * VHOST_USER_GET_QUEUE_NUM
-
-   Safe to pass through.
-
- * VHOST_USER_SET_VRING_ENABLE
-
-   Safe to pass through.
-
- * VHOST_USER_SEND_RARP
-
-   Safe to pass through.
-
- * VHOST_USER_NET_SET_MTU
-
-   Safe to pass through.
-
- * VHOST_USER_SET_SLAVE_REQ_FD
-
-   Stash slave req fd so that Slave-to-Master queue messages can be relayed
-   before sending VHOST_USER_SET_SLAVE_REQ_FD to guest.
-
- * VHOST_USER_IOTLB_MSG
-
-   Translate addresses if QEMU implements IOMMU before sending
-   VHOST_USER_IOTLB_MSG to the guest.
-
- * VHOST_USER_SET_VRING_ENDIAN
-
-   Safe to pass through.
-
-Slave message types
--------------------
-
- * VHOST_USER_SLAVE_IOTLB_MSG
-
-   Handled by QEMU if it implements the IOMMU.
-
-> I took a quick look and I doubt we can do something that is both
-> compatible with the existing vhost-user and will make it possible to
-> extend the protocol without qemu changes. Let's assume I pass a new
-> message over the vhost-user channel.  How do we know it's safe to pass
-> it to the guest?
->
-> That's why we gate any protocol change on a feature bit and must parse
-> all messages.
-
-QEMU must parse all messages and cannot pass through unknown messages.
-Think of QEMU vhost-pci as both a vhost-user slave to the other VM and
-a vhost-user master to the guest.
-
-QEMU changes are necessary when the vhost protocol is extended.
-Device interface changes are only necessary if doorbells or shared
-memory regions are added, any other protocol changes do not change the
-device interface.
-
-Stefan
+--TmwHKJoIRFM7Mu/A--
