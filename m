@@ -1,30 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51160)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51259)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1ePBW6-0004Ex-4e
-	for qemu-devel@nongnu.org; Wed, 13 Dec 2017 13:12:27 -0500
+	(envelope-from <alex.williamson@redhat.com>) id 1ePBWN-0004Uv-Br
+	for qemu-devel@nongnu.org; Wed, 13 Dec 2017 13:12:44 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1ePBW5-0007A2-2e
-	for qemu-devel@nongnu.org; Wed, 13 Dec 2017 13:12:26 -0500
-Received: from mail-oi0-x244.google.com ([2607:f8b0:4003:c06::244]:33898)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1ePBW4-00079K-TT
-	for qemu-devel@nongnu.org; Wed, 13 Dec 2017 13:12:25 -0500
-Received: by mail-oi0-x244.google.com with SMTP id u193so2174197oie.1
-	for <qemu-devel@nongnu.org>; Wed, 13 Dec 2017 10:12:24 -0800 (PST)
+	(envelope-from <alex.williamson@redhat.com>) id 1ePBWK-0007Pr-9u
+	for qemu-devel@nongnu.org; Wed, 13 Dec 2017 13:12:43 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:35654)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <alex.williamson@redhat.com>)
+	id 1ePBWK-0007PA-3H
+	for qemu-devel@nongnu.org; Wed, 13 Dec 2017 13:12:40 -0500
+From: Alex Williamson <alex.williamson@redhat.com>
+Date: Wed, 13 Dec 2017 11:12:36 -0700
+Message-ID: <20171213181227.10809.9824.stgit@gimli.home>
+In-Reply-To: <20171213180541.10386.38737.stgit@gimli.home>
+References: <20171213180541.10386.38737.stgit@gimli.home>
 MIME-Version: 1.0
-In-Reply-To: <e36ec13c-e597-caae-4ae8-81b320e8f461@huawei.com>
-References: <1511807966-23936-1-git-send-email-gengdongjiu@huawei.com>
-	<470c9df5-f2e8-974b-b37f-eff84a6f3d71@huawei.com>
-	<18906953-f464-d9f4-23b4-fd7118d45e2f@huawei.com>
-	<20171211143220.7a359462@redhat.com>
-	<e36ec13c-e597-caae-4ae8-81b320e8f461@huawei.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Wed, 13 Dec 2017 18:12:03 +0000
-Message-ID: <CAFEAcA-JmbR3RUMWrH2j5OrSitczu+KskE-NJyhsWrHbJCH_ZA@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH v13 00/12] Add ARMv8 RAS virtualization
- support in QEMU
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+Subject: [Qemu-devel] [PULL 2/4] vfio/common: init giommu_list and
+ hostwin_list of vfio container
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,39 +28,30 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: gengdongjiu <gengdongjiu@huawei.com>
-Cc: Igor Mammedov <imammedo@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Shannon Zhao <zhaoshenglong@huawei.com>, James Morse <james.morse@arm.com>, Laszlo Ersek <lersek@redhat.com>, Marc Zyngier <marc.zyngier@arm.com>, Christoffer Dall <christoffer.dall@linaro.org>, Richard Henderson <rth@twiddle.net>, Eduardo Habkost <ehabkost@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>, Paolo Bonzini <pbonzini@redhat.com>, Linuxarm <linuxarm@huawei.com>, xuwei5@hisilicon.com
+To: qemu-devel@nongnu.org
+Cc: yi.l.liu@linux.intel.com
 
-On 13 December 2017 at 03:59, gengdongjiu <gengdongjiu@huawei.com> wrote:
-> Hi Peter,
->
-> On 2017/12/11 21:32, Igor Mammedov wrote:
->> On Mon, 11 Dec 2017 19:31:14 +0800
->> gengdongjiu <gengdongjiu@huawei.com> wrote:
->>
->>> Hi maintainer,
->>>
->>>   This patch set seems pending about one month, could you help review for them?  Thanks.
->> I'm going to look at ACPI side of it this week.
->
-> Hi Peter/shannon,
->    Igor will review the ACPI part code,
->    could you review below five patches? which does not depend on OS kernel patch and have received the agreement with others about the solution.
->    Thanks very much.
->
-> [v13,08/12] target-arm: kvm64: inject synchronous External Abort
-> [v13,09/12] Move related hwpoison page function to accel/kvm/ folder
-> [v13,10/12] ARM: ACPI: Add _E04 for hardware error device
-> [v13,11/12] hw/arm/virt: Add RAS platform version for migration
-> [v13,12/12] target-arm: kvm64: handle SIGBUS signal from kernel or KVM
+From: Liu, Yi L <yi.l.liu@linux.intel.com>
 
-Hi; unfortunately I only have one more working day this year, which
-isn't really enough to get up to speed sufficiently with RAS to
-review this patchset, so the earliest I'm likely to get to it is
-the week beginning 9th Jan.
+The init of giommu_list and hostwin_list is missed during container
+initialization.
 
-Hopefully somebody who understands RAS better than me will
-be able to review it before then.
+Signed-off-by: Liu, Yi L <yi.l.liu@linux.intel.com>
+Signed-off-by: Alex Williamson <alex.williamson@redhat.com>
+---
+ hw/vfio/common.c |    2 ++
+ 1 file changed, 2 insertions(+)
 
-thanks
--- PMM
+diff --git a/hw/vfio/common.c b/hw/vfio/common.c
+index 7007878e345e..216eec68ef68 100644
+--- a/hw/vfio/common.c
++++ b/hw/vfio/common.c
+@@ -991,6 +991,8 @@ static int vfio_connect_container(VFIOGroup *group, AddressSpace *as,
+     container = g_malloc0(sizeof(*container));
+     container->space = space;
+     container->fd = fd;
++    QLIST_INIT(&container->giommu_list);
++    QLIST_INIT(&container->hostwin_list);
+     if (ioctl(fd, VFIO_CHECK_EXTENSION, VFIO_TYPE1_IOMMU) ||
+         ioctl(fd, VFIO_CHECK_EXTENSION, VFIO_TYPE1v2_IOMMU)) {
+         bool v2 = !!ioctl(fd, VFIO_CHECK_EXTENSION, VFIO_TYPE1v2_IOMMU);
