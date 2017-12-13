@@ -1,30 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60849)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60931)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1ePGMO-0005vH-KK
-	for qemu-devel@nongnu.org; Wed, 13 Dec 2017 18:22:45 -0500
+	id 1ePGMX-00061M-Ja
+	for qemu-devel@nongnu.org; Wed, 13 Dec 2017 18:22:54 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1ePGMN-0008Ay-Ei
-	for qemu-devel@nongnu.org; Wed, 13 Dec 2017 18:22:44 -0500
-Received: from mail-qk0-x22e.google.com ([2607:f8b0:400d:c09::22e]:40608)
+	id 1ePGMS-0008G8-Iw
+	for qemu-devel@nongnu.org; Wed, 13 Dec 2017 18:22:53 -0500
+Received: from mail-qt0-x243.google.com ([2607:f8b0:400d:c0d::243]:33050)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1ePGMN-0008AC-AK
-	for qemu-devel@nongnu.org; Wed, 13 Dec 2017 18:22:43 -0500
-Received: by mail-qk0-x22e.google.com with SMTP id b123so4156126qkg.7
-	for <qemu-devel@nongnu.org>; Wed, 13 Dec 2017 15:22:43 -0800 (PST)
+	id 1ePGMS-0008Fm-F0
+	for qemu-devel@nongnu.org; Wed, 13 Dec 2017 18:22:48 -0500
+Received: by mail-qt0-x243.google.com with SMTP id e2so5921792qti.0
+	for <qemu-devel@nongnu.org>; Wed, 13 Dec 2017 15:22:48 -0800 (PST)
 Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
 	<philippe.mathieu.daude@gmail.com>
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
-Date: Wed, 13 Dec 2017 20:20:12 -0300
-Message-Id: <20171213232025.24503-14-f4bug@amsat.org>
+Date: Wed, 13 Dec 2017 20:20:13 -0300
+Message-Id: <20171213232025.24503-15-f4bug@amsat.org>
 In-Reply-To: <20171213232025.24503-1-f4bug@amsat.org>
 References: <20171213232025.24503-1-f4bug@amsat.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH 13/26] sdcard: add more trace events
+Subject: [Qemu-devel] [RFC PATCH 14/26] sdcard: use qemu_hexbuf_strdup() to
+ trace command response
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,94 +34,78 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alistair Francis <alistair.francis@xilinx.com>, "Edgar E . Iglesias" <edgar.iglesias@xilinx.com>, Peter Maydell <peter.maydell@linaro.org>, Andrew Baumann <Andrew.Baumann@microsoft.com>, Prasad J Pandit <pjp@fedoraproject.org>, Clement Deschamps <clement.deschamps@antfield.fr>
+To: Alistair Francis <alistair.francis@xilinx.com>, "Edgar E . Iglesias" <edgar.iglesias@xilinx.com>, Peter Maydell <peter.maydell@linaro.org>, Andrew Baumann <Andrew.Baumann@microsoft.com>, Prasad J Pandit <pjp@fedoraproject.org>, Clement Deschamps <clement.deschamps@antfield.fr>, Isaac Lozano <109lozanoi@gmail.com>, Thomas Huth <thuth@redhat.com>, Markus Armbruster <armbru@redhat.com>, =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>
 Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, qemu-devel@nongnu.org, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Sai Pavan Boddu <saipava@xilinx.com>
 
 Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 ---
- hw/sd/sd.c         | 12 ++++++++++++
- hw/sd/trace-events |  8 ++++++++
- 2 files changed, 20 insertions(+)
+ hw/sd/sd.c         | 26 +++++++-------------------
+ hw/sd/trace-events |  1 +
+ 2 files changed, 8 insertions(+), 19 deletions(-)
 
 diff --git a/hw/sd/sd.c b/hw/sd/sd.c
-index bd583be835..84e02745f1 100644
+index 84e02745f1..2a249b1612 100644
 --- a/hw/sd/sd.c
 +++ b/hw/sd/sd.c
-@@ -449,6 +449,7 @@ static void sd_reset(DeviceState *dev)
-     uint64_t size;
-     uint64_t sect;
+@@ -35,6 +35,7 @@
+ #include "hw/sd/sd.h"
+ #include "qapi/error.h"
+ #include "qemu/bitmap.h"
++#include "qemu/cutils.h"
+ #include "hw/qdev-properties.h"
+ #include "qemu/error-report.h"
+ #include "qemu/timer.h"
+@@ -42,15 +43,6 @@
+ #include "sd-internal.h"
+ #include "trace.h"
  
-+    trace_sdcard_reset();
-     if (sd->blk) {
-         blk_get_geometry(sd->blk, &sect);
-     } else {
-@@ -500,7 +501,10 @@ static void sd_cardchange(void *opaque, bool load, Error **errp)
-     bool readonly = sd_get_readonly(sd);
- 
-     if (inserted) {
-+        trace_sdcard_inserted(readonly);
-         sd_reset(dev);
-+    } else {
-+        trace_sdcard_ejected();
+-//#define DEBUG_SD 1
+-
+-#ifdef DEBUG_SD
+-#define DPRINTF(fmt, ...) \
+-do { fprintf(stderr, "SD: " fmt , ## __VA_ARGS__); } while (0)
+-#else
+-#define DPRINTF(fmt, ...) do {} while(0)
+-#endif
+-
+ #define ACMD41_ENQUIRY_MASK     0x00ffffff
+ #define OCR_POWER_UP            0x80000000
+ #define OCR_POWER_DELAY_NS      500000 /* 0.5ms */
+@@ -1595,17 +1587,13 @@ send_response:
+         sd->card_status &= ~CARD_STATUS_B;
      }
  
-     /* The IRQ notification is for legacy non-QOM SD controller devices;
-@@ -632,6 +636,7 @@ static void sd_erase(SDState *sd)
-     uint64_t erase_start = sd->erase_start;
-     uint64_t erase_end = sd->erase_end;
+-#ifdef DEBUG_SD
+-    if (rsplen) {
+-        int i;
+-        DPRINTF("Response:");
+-        for (i = 0; i < rsplen; i++)
+-            fprintf(stderr, " %02x", response[i]);
+-        fprintf(stderr, " state %d\n", sd->state);
+-    } else {
+-        DPRINTF("No response %d\n", sd->state);
++    if (trace_event_get_state_backends(TRACE_SDCARD_COMMAND_RESPONSE)) {
++        char *hexbuf;
++
++        hexbuf = qemu_hexbuf_strdup(response, rsplen, NULL, "(no response)");
++        trace_sdcard_command_response(hexbuf, sd_state_name(sd->state));
++        g_free(hexbuf);
+     }
+-#endif
  
-+    trace_sdcard_erase();
-     if (!sd->erase_start || !sd->erase_end) {
-         sd->card_status |= ERASE_SEQ_ERROR;
-         return;
-@@ -713,6 +718,11 @@ static void sd_lock_command(SDState *sd)
-     else
-         pwd_len = 0;
- 
-+    if (lock) {
-+        trace_sdcard_lock();
-+    } else {
-+        trace_sdcard_unlock();
-+    }
-     if (erase) {
-         if (!(sd->card_status & CARD_IS_LOCKED) || sd->blk_len > 1 ||
-                         set_pwd || clr_pwd || lock || sd->wp_switch ||
-@@ -1639,6 +1649,7 @@ void sd_write_data(SDState *sd, uint8_t value)
-     if (sd->card_status & (ADDRESS_ERROR | WP_VIOLATION))
-         return;
- 
-+    trace_sdcard_write_data(value);
-     switch (sd->current_cmd) {
-     case 24:	/* CMD24:  WRITE_SINGLE_BLOCK */
-         sd->data[sd->data_offset ++] = value;
-@@ -1776,6 +1787,7 @@ uint8_t sd_read_data(SDState *sd)
- 
-     io_len = (sd->ocr & (1 << 30)) ? 512 : sd->blk_len;
- 
-+    trace_sdcard_read_data(io_len);
-     switch (sd->current_cmd) {
-     case 6:	/* CMD6:   SWITCH_FUNCTION */
-         ret = sd->data[sd->data_offset ++];
+     return rsplen;
+ }
 diff --git a/hw/sd/trace-events b/hw/sd/trace-events
-index 117da83014..0e78f980de 100644
+index 0e78f980de..01f94c4b54 100644
 --- a/hw/sd/trace-events
 +++ b/hw/sd/trace-events
-@@ -26,8 +26,16 @@ sdcard_set_mode(const char *current_mode, const char *new_mode, const char *stat
+@@ -26,6 +26,7 @@ sdcard_set_mode(const char *current_mode, const char *new_mode, const char *stat
  sdcard_set_state(const char *current_state, const char *new_state, const char *mode) "%s -> %s (mode: %s)"
  sdcard_normal_command(uint8_t cmd, uint32_t arg, const char *state) "CMD%d arg 0x%08x (state %s)"
  sdcard_app_command(uint8_t acmd, uint32_t arg) "ACMD%d arg 0x%08x"
-+sdcard_reset(void) ""
-+sdcard_inserted(bool readonly) "read_only: %d"
-+sdcard_ejected(void) ""
-+sdcard_erase(void) ""
-+sdcard_lock(void) ""
-+sdcard_unlock(void) ""
- sdcard_read_block(uint64_t addr, uint32_t len) "addr 0x%08lx size 0x%x"
- sdcard_write_block(uint64_t addr, uint32_t len) "addr 0x%08lx size 0x%x"
-+sdcard_write_data(uint8_t value) "value 0x%02x"
-+sdcard_read_data(int length) "len %d"
- 
- # hw/sd/milkymist-memcard.c
- milkymist_memcard_memory_read(uint32_t addr, uint32_t value) "addr 0x%08x value 0x%08x"
++sdcard_command_response(const char *hexdump, const char *state) "%s (state %s)"
+ sdcard_reset(void) ""
+ sdcard_inserted(bool readonly) "read_only: %d"
+ sdcard_ejected(void) ""
 -- 
 2.15.1
