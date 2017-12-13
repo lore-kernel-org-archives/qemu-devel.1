@@ -1,27 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50443)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51226)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1ePEcg-0007TW-8g
-	for qemu-devel@nongnu.org; Wed, 13 Dec 2017 16:31:27 -0500
+	(envelope-from <jsnow@redhat.com>) id 1ePEh4-0000Yg-4q
+	for qemu-devel@nongnu.org; Wed, 13 Dec 2017 16:35:59 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1ePEcd-0006U0-4s
-	for qemu-devel@nongnu.org; Wed, 13 Dec 2017 16:31:26 -0500
-Received: from mail-wm0-f49.google.com ([74.125.82.49]:45826)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1ePEcc-0006Se-V9
-	for qemu-devel@nongnu.org; Wed, 13 Dec 2017 16:31:23 -0500
-Received: by mail-wm0-f49.google.com with SMTP id 9so7650093wme.4
-	for <qemu-devel@nongnu.org>; Wed, 13 Dec 2017 13:31:22 -0800 (PST)
-References: <20171213180807.7066-1-dgilbert@redhat.com>
-	<20171213180807.7066-5-dgilbert@redhat.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <dd448e34-6a23-17d2-3cce-580c08c6de9f@redhat.com>
-Date: Wed, 13 Dec 2017 22:31:10 +0100
+	(envelope-from <jsnow@redhat.com>) id 1ePEh3-0001dH-Bl
+	for qemu-devel@nongnu.org; Wed, 13 Dec 2017 16:35:58 -0500
+References: <20171213154432.18097-1-berto@igalia.com>
+From: John Snow <jsnow@redhat.com>
+Message-ID: <ecd7d06e-c399-270f-bf0c-87ad6d50e18b@redhat.com>
+Date: Wed, 13 Dec 2017 16:35:50 -0500
 MIME-Version: 1.0
-In-Reply-To: <20171213180807.7066-5-dgilbert@redhat.com>
+In-Reply-To: <20171213154432.18097-1-berto@igalia.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v4 4/6] vhost: add regions to temporary list
+Subject: Re: [Qemu-devel] [PATCH v2] iotests: Tweak 030 in order to trigger
+ a race condition with parallel jobs
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,39 +24,29 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>, qemu-devel@nongnu.org, imammedo@redhat.com
-Cc: maxime.coquelin@redhat.com, groug@kaod.org, mst@redhat.com
+To: Alberto Garcia <berto@igalia.com>, qemu-devel@nongnu.org
+Cc: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
 
-On 13/12/2017 19:08, Dr. David Alan Gilbert (git) wrote:
-> +    if (dev->tmp_mem->nregions) {
-> +        /* Since we already have at least one region, lets see if
-> +         * this extends it; since we're scanning in order, we only
-> +         * have to look at the last one, and the FlatView that calls
-> +         * us shouldn't have overlaps.
-> +         */
-> +        struct vhost_memory_region *prev_vmr = dev->tmp_mem->regions +
-> +                                               (dev->tmp_mem->nregions - 1);
-> +        uint64_t prev_gpa_start = prev_vmr->guest_phys_addr;
-> +        uint64_t prev_gpa_end   = range_get_last(prev_gpa_start,
-> +                                                 prev_vmr->memory_size);
-> +        uint64_t prev_host_start = prev_vmr->userspace_addr;
-> +        uint64_t prev_host_end   = range_get_last(prev_host_start,
-> +                                                  prev_vmr->memory_size);
-> +
-> +        if (prev_gpa_end + 1 == mrs_gpa &&
-> +            prev_host_end + 1 == mrs_host &&
-> +            (!dev->vhost_ops->vhost_backend_can_merge ||
-> +                dev->vhost_ops->vhost_backend_can_merge(dev,
-> +                    mrs_host, mrs_size,
-> +                    prev_host_start, prev_vmr->memory_size))) {
-> +            /* The two regions abut */
-> +            need_add = false;
-> +            mrs_size = mrs_size + prev_vmr->memory_size;
-> +            prev_vmr->memory_size = mrs_size;
-> +            trace_vhost_region_add_tmp_abut(section->mr->name, mrs_size);
-> +        }
-> +    }
 
-Interesting, in which cases does this actually trigger?
 
-Paolo
+On 12/13/2017 10:44 AM, Alberto Garcia wrote:
+> This patch tweaks TestParallelOps in iotest 030 so it allocates data
+> in smaller regions (256KB/512KB instead of 512KB/1MB) and the
+> block-stream job in test_stream_commit() only needs to copy data that
+> is at the very end of the image.
+> 
+> This way when the block-stream job is awakend it will finish right
+> away without any chance of being stopped by block_job_sleep_ns(). This
+> triggers the bug that was fixed by 3d5d319e1221082974711af1d09d82f07
+> and is therefore a more useful test case for parallel block jobs.
+> 
+> After this patch the aforementiond bug can also be reproduced with the
+> test_stream_parallel() test case.
+> 
+> Since with this change the stream job in test_stream_commit() finishes
+> early, this patch introduces a similar test case where both jobs are
+> slowed down so they can actually run in parallel.
+> 
+> Signed-off-by: Alberto Garcia <berto@igalia.com>
+
+Reviewed-by: John Snow <jsnow@redhat.com>
