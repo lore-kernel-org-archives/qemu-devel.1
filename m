@@ -1,28 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49677)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49716)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.williamson@redhat.com>) id 1ePBS8-0000sf-1s
-	for qemu-devel@nongnu.org; Wed, 13 Dec 2017 13:08:20 -0500
+	(envelope-from <dgilbert@redhat.com>) id 1ePBSC-0000uK-35
+	for qemu-devel@nongnu.org; Wed, 13 Dec 2017 13:08:25 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.williamson@redhat.com>) id 1ePBS6-00049O-Dx
-	for qemu-devel@nongnu.org; Wed, 13 Dec 2017 13:08:20 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:45262)
+	(envelope-from <dgilbert@redhat.com>) id 1ePBSB-0004Cn-15
+	for qemu-devel@nongnu.org; Wed, 13 Dec 2017 13:08:24 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:60980)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <alex.williamson@redhat.com>)
-	id 1ePBS6-00048W-7K
-	for qemu-devel@nongnu.org; Wed, 13 Dec 2017 13:08:18 -0500
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
-	[10.5.11.16])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id A4E016014F
-	for <qemu-devel@nongnu.org>; Wed, 13 Dec 2017 18:08:16 +0000 (UTC)
-From: Alex Williamson <alex.williamson@redhat.com>
-Date: Wed, 13 Dec 2017 11:08:11 -0700
-Message-ID: <20171213180541.10386.38737.stgit@gimli.home>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Subject: [Qemu-devel] [PULL 0/4] VFIO updates for v2.12
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1ePBSA-0004C5-OS
+	for qemu-devel@nongnu.org; Wed, 13 Dec 2017 13:08:22 -0500
+From: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>
+Date: Wed, 13 Dec 2017 18:08:03 +0000
+Message-Id: <20171213180807.7066-3-dgilbert@redhat.com>
+In-Reply-To: <20171213180807.7066-1-dgilbert@redhat.com>
+References: <20171213180807.7066-1-dgilbert@redhat.com>
+Subject: [Qemu-devel] [PATCH v4 2/6] vhost: Simplify ring verification checks
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,43 +23,161 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: qemu-devel@nongnu.org, pbonzini@redhat.com, imammedo@redhat.com
+Cc: maxime.coquelin@redhat.com, mst@redhat.com, groug@kaod.org
 
-The following changes since commit 0a0dc59d27527b78a195c2d838d28b7b49e5a639:
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
 
-  Update version for v2.11.0 release (2017-12-13 14:31:09 +0000)
+vhost_verify_ring_mappings() were used to verify that
+rings are still accessible and related memory hasn't
+been moved after flatview is updated.
 
-are available in the git repository at:
+It was doing checks by mapping ring's GPA+len and
+checking that HVA hadn't changed with new memory map.
+To avoid maybe expensive mapping call, we were
+identifying address range that changed and were doing
+mapping only if ring was in changed range.
 
-  git://github.com/awilliam/qemu-vfio.git tags/vfio-update-20171213.0
+However it's not neccessary to perform ring's GPA
+mapping as we already have its current HVA and all
+we need is to verify that ring's GPA translates to
+the same HVA in updated flatview.
 
-for you to fetch changes up to 2fb9636ebf24e695617bf407bf0a345aa223d1ac:
+This will allow the following patches to simplify the range
+comparison that was previously needed to avoid expensive
+verify_ring_mapping calls.
 
-  vfio-pci: Remove unused fields from VFIOMSIXInfo (2017-12-13 10:19:34 -0700)
+Signed-off-by: Igor Mammedov <imammedo@redhat.com>
+with modifications by:
+Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+---
+ hw/virtio/vhost.c | 74 ++++++++++++++++++++++++++++++-------------------------
+ 1 file changed, 41 insertions(+), 33 deletions(-)
 
-----------------------------------------------------------------
-VFIO updates for v2.12
-
- - Fix bug failing to register all but the first group attached to
-   a container with kvm-vfio device (Alex Williamson)
-
- - Explicit QLIST init (Yi Lui)
-
- - SPAPR IOMMU v1 fallback (Alexey Kardashevskiy)
-
- - Remove unused structure fields (Alexey Kardashevskiy)
-
-----------------------------------------------------------------
-Alex Williamson (1):
-      vfio: Fix vfio-kvm group registration
-
-Alexey Kardashevskiy (2):
-      vfio/spapr: Allow fallback to SPAPR TCE IOMMU v1
-      vfio-pci: Remove unused fields from VFIOMSIXInfo
-
-Liu, Yi L (1):
-      vfio/common: init giommu_list and hostwin_list of vfio container
-
- hw/vfio/common.c | 8 ++++++++
- hw/vfio/pci.h    | 2 --
- 2 files changed, 8 insertions(+), 2 deletions(-)
+diff --git a/hw/virtio/vhost.c b/hw/virtio/vhost.c
+index e923219e63..c7ce7baf9b 100644
+--- a/hw/virtio/vhost.c
++++ b/hw/virtio/vhost.c
+@@ -450,35 +450,37 @@ static void vhost_memory_unmap(struct vhost_dev *dev, void *buffer,
+     }
+ }
+ 
+-static int vhost_verify_ring_part_mapping(struct vhost_dev *dev,
+-                                          void *part,
+-                                          uint64_t part_addr,
+-                                          uint64_t part_size,
+-                                          uint64_t start_addr,
+-                                          uint64_t size)
++static int vhost_verify_ring_part_mapping(void *ring_hva,
++                                          uint64_t ring_gpa,
++                                          uint64_t ring_size,
++                                          void *reg_hva,
++                                          uint64_t reg_gpa,
++                                          uint64_t reg_size)
+ {
+-    hwaddr l;
+-    void *p;
+-    int r = 0;
++    uint64_t hva_ring_offset;
++    uint64_t ring_last = range_get_last(ring_gpa, ring_size);
++    uint64_t reg_last = range_get_last(reg_gpa, reg_size);
+ 
+-    if (!ranges_overlap(start_addr, size, part_addr, part_size)) {
++    if (ring_last < reg_gpa || ring_gpa > reg_last) {
+         return 0;
+     }
+-    l = part_size;
+-    p = vhost_memory_map(dev, part_addr, &l, 1);
+-    if (!p || l != part_size) {
+-        r = -ENOMEM;
++    /* check that whole ring's is mapped */
++    if (ring_last > reg_last) {
++        return -EBUSY;
+     }
+-    if (p != part) {
+-        r = -EBUSY;
++    /* check that ring's MemoryRegion wasn't replaced */
++    hva_ring_offset = ring_gpa - reg_gpa;
++    if (ring_hva != reg_hva + hva_ring_offset) {
++        return -ENOMEM;
+     }
+-    vhost_memory_unmap(dev, p, l, 0, 0);
+-    return r;
++
++    return 0;
+ }
+ 
+ static int vhost_verify_ring_mappings(struct vhost_dev *dev,
+-                                      uint64_t start_addr,
+-                                      uint64_t size)
++                                      void *reg_hva,
++                                      uint64_t reg_gpa,
++                                      uint64_t reg_size)
+ {
+     int i, j;
+     int r = 0;
+@@ -492,22 +494,25 @@ static int vhost_verify_ring_mappings(struct vhost_dev *dev,
+         struct vhost_virtqueue *vq = dev->vqs + i;
+ 
+         j = 0;
+-        r = vhost_verify_ring_part_mapping(dev, vq->desc, vq->desc_phys,
+-                                           vq->desc_size, start_addr, size);
++        r = vhost_verify_ring_part_mapping(
++                vq->desc, vq->desc_phys, vq->desc_size,
++                reg_hva, reg_gpa, reg_size);
+         if (r) {
+             break;
+         }
+ 
+         j++;
+-        r = vhost_verify_ring_part_mapping(dev, vq->avail, vq->avail_phys,
+-                                           vq->avail_size, start_addr, size);
++        r = vhost_verify_ring_part_mapping(
++                vq->desc, vq->desc_phys, vq->desc_size,
++                reg_hva, reg_gpa, reg_size);
+         if (r) {
+             break;
+         }
+ 
+         j++;
+-        r = vhost_verify_ring_part_mapping(dev, vq->used, vq->used_phys,
+-                                           vq->used_size, start_addr, size);
++        r = vhost_verify_ring_part_mapping(
++                vq->desc, vq->desc_phys, vq->desc_size,
++                reg_hva, reg_gpa, reg_size);
+         if (r) {
+             break;
+         }
+@@ -633,8 +638,6 @@ static void vhost_commit(MemoryListener *listener)
+ {
+     struct vhost_dev *dev = container_of(listener, struct vhost_dev,
+                                          memory_listener);
+-    hwaddr start_addr = 0;
+-    ram_addr_t size = 0;
+     uint64_t log_size;
+     int r;
+ 
+@@ -649,11 +652,16 @@ static void vhost_commit(MemoryListener *listener)
+     }
+ 
+     if (dev->started) {
+-        start_addr = dev->mem_changed_start_addr;
+-        size = dev->mem_changed_end_addr - dev->mem_changed_start_addr + 1;
+-
+-        r = vhost_verify_ring_mappings(dev, start_addr, size);
+-        assert(r >= 0);
++        int i;
++        for (i = 0; i < dev->mem->nregions; i++) {
++            if (vhost_verify_ring_mappings(dev,
++                               (void *)dev->mem->regions[i].userspace_addr,
++                               dev->mem->regions[i].guest_phys_addr,
++                               dev->mem->regions[i].memory_size)) {
++                error_report("Verify ring failure on region %d", i);
++                abort();
++            }
++        }
+     }
+ 
+     if (!dev->log_enabled) {
+-- 
+2.14.3
