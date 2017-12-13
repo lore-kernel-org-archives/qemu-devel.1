@@ -1,30 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60445)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60525)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1ePGLo-0005Nq-06
-	for qemu-devel@nongnu.org; Wed, 13 Dec 2017 18:22:10 -0500
+	id 1ePGLw-0005Si-4B
+	for qemu-devel@nongnu.org; Wed, 13 Dec 2017 18:22:17 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1ePGLn-0007XX-1s
-	for qemu-devel@nongnu.org; Wed, 13 Dec 2017 18:22:07 -0500
-Received: from mail-qk0-x241.google.com ([2607:f8b0:400d:c09::241]:37583)
+	id 1ePGLr-0007d6-3X
+	for qemu-devel@nongnu.org; Wed, 13 Dec 2017 18:22:16 -0500
+Received: from mail-qk0-x242.google.com ([2607:f8b0:400d:c09::242]:43003)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1ePGLm-0007X3-Ub
-	for qemu-devel@nongnu.org; Wed, 13 Dec 2017 18:22:07 -0500
-Received: by mail-qk0-x241.google.com with SMTP id i130so4146162qke.4
-	for <qemu-devel@nongnu.org>; Wed, 13 Dec 2017 15:22:06 -0800 (PST)
+	id 1ePGLq-0007ch-Vo
+	for qemu-devel@nongnu.org; Wed, 13 Dec 2017 18:22:11 -0500
+Received: by mail-qk0-x242.google.com with SMTP id a71so4148448qkc.9
+	for <qemu-devel@nongnu.org>; Wed, 13 Dec 2017 15:22:10 -0800 (PST)
 Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
 	<philippe.mathieu.daude@gmail.com>
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
-Date: Wed, 13 Dec 2017 20:20:05 -0300
-Message-Id: <20171213232025.24503-7-f4bug@amsat.org>
+Date: Wed, 13 Dec 2017 20:20:06 -0300
+Message-Id: <20171213232025.24503-8-f4bug@amsat.org>
 In-Reply-To: <20171213232025.24503-1-f4bug@amsat.org>
 References: <20171213232025.24503-1-f4bug@amsat.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH 06/26] sdcard: add sd_set_mode()
+Subject: [Qemu-devel] [PATCH 07/26] sdcard: add sdcard_set_mode() trace event
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,50 +36,63 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: Alistair Francis <alistair.francis@xilinx.com>, "Edgar E . Iglesias" <edgar.iglesias@xilinx.com>, Peter Maydell <peter.maydell@linaro.org>, Andrew Baumann <Andrew.Baumann@microsoft.com>, Prasad J Pandit <pjp@fedoraproject.org>, Clement Deschamps <clement.deschamps@antfield.fr>
 Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, qemu-devel@nongnu.org, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Sai Pavan Boddu <saipava@xilinx.com>
 
-This will ease to trace mode changes (in the following patch).
+Use sd_mode_name() to pretty-print the SDCardMode.
 
 Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 ---
- hw/sd/sd.c | 11 ++++++++---
- 1 file changed, 8 insertions(+), 3 deletions(-)
+ hw/sd/sd.c         | 16 +++++++++++++++-
+ hw/sd/trace-events |  3 +++
+ 2 files changed, 18 insertions(+), 1 deletion(-)
 
 diff --git a/hw/sd/sd.c b/hw/sd/sd.c
-index f63459d2c0..2c0f8a7dbd 100644
+index 2c0f8a7dbd..465d254f2e 100644
 --- a/hw/sd/sd.c
 +++ b/hw/sd/sd.c
-@@ -128,17 +128,22 @@ struct SDState {
+@@ -40,6 +40,7 @@
+ #include "qemu/timer.h"
+ #include "qemu/log.h"
+ #include "sd-internal.h"
++#include "trace.h"
+ 
+ //#define DEBUG_SD 1
+ 
+@@ -128,9 +129,22 @@ struct SDState {
      bool enable;
  };
  
-+static void sd_set_mode(SDState *sd, enum SDCardModes mode)
++static const char *sd_mode_name(enum SDCardModes mode)
 +{
-+    sd->mode = mode;
++    static const char *mode_name[] = {
++        [sd_inactive]                   = "inactive",
++        [sd_card_identification_mode]   = "card_identification",
++        [sd_data_transfer_mode]         = "data_transfer",
++    };
++    return mode_name[mode];
 +}
 +
- static void sd_update_mode(SDState *sd)
+ static void sd_set_mode(SDState *sd, enum SDCardModes mode)
  {
-     switch (sd->state) {
-     case sd_inactive_state:
--        sd->mode = sd_inactive;
-+        sd_set_mode(sd, sd_inactive);
-         break;
- 
-     case sd_idle_state:
-     case sd_ready_state:
-     case sd_identification_state:
--        sd->mode = sd_card_identification_mode;
-+        sd_set_mode(sd, sd_card_identification_mode);
-         break;
- 
-     case sd_standby_state:
-@@ -147,7 +152,7 @@ static void sd_update_mode(SDState *sd)
-     case sd_receivingdata_state:
-     case sd_programming_state:
-     case sd_disconnect_state:
--        sd->mode = sd_data_transfer_mode;
-+        sd_set_mode(sd, sd_data_transfer_mode);
-         break;
-     }
+-    sd->mode = mode;
++    if (sd->mode != mode) {
++        trace_sdcard_set_mode(sd_mode_name(sd->mode), sd_mode_name(mode));
++        sd->mode = mode;
++    }
  }
+ 
+ static void sd_update_mode(SDState *sd)
+diff --git a/hw/sd/trace-events b/hw/sd/trace-events
+index 6b1dc7380f..369d258d10 100644
+--- a/hw/sd/trace-events
++++ b/hw/sd/trace-events
+@@ -21,6 +21,9 @@ sdhci_read_dataport(uint16_t data_count) "all %u bytes of data have been read fr
+ sdhci_write_dataport(uint16_t data_count) "write buffer filled with %u bytes of data"
+ sdhci_led(bool state) "LED: %u"
+ 
++# hw/sd/sd.c
++sdcard_set_mode(const char *current_mode, const char *new_mode) "%s -> %s"
++
+ # hw/sd/milkymist-memcard.c
+ milkymist_memcard_memory_read(uint32_t addr, uint32_t value) "addr 0x%08x value 0x%08x"
+ milkymist_memcard_memory_write(uint32_t addr, uint32_t value) "addr 0x%08x value 0x%08x"
 -- 
 2.15.1
