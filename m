@@ -1,21 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59758)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60083)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1ePGKc-0004bF-Hz
-	for qemu-devel@nongnu.org; Wed, 13 Dec 2017 18:20:57 -0500
+	id 1ePGLI-0004za-Fl
+	for qemu-devel@nongnu.org; Wed, 13 Dec 2017 18:21:37 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1ePGKX-00062B-9o
-	for qemu-devel@nongnu.org; Wed, 13 Dec 2017 18:20:54 -0500
+	id 1ePGLD-0006bI-Dh
+	for qemu-devel@nongnu.org; Wed, 13 Dec 2017 18:21:36 -0500
+Received: from mail-qt0-x243.google.com ([2607:f8b0:400d:c0d::243]:41817)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1ePGLD-0006b1-85
+	for qemu-devel@nongnu.org; Wed, 13 Dec 2017 18:21:31 -0500
+Received: by mail-qt0-x243.google.com with SMTP id i40so5847400qti.8
+	for <qemu-devel@nongnu.org>; Wed, 13 Dec 2017 15:21:31 -0800 (PST)
 Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
 	<philippe.mathieu.daude@gmail.com>
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
-Date: Wed, 13 Dec 2017 20:19:59 -0300
-Message-Id: <20171213232025.24503-1-f4bug@amsat.org>
+Date: Wed, 13 Dec 2017 20:20:00 -0300
+Message-Id: <20171213232025.24503-2-f4bug@amsat.org>
+In-Reply-To: <20171213232025.24503-1-f4bug@amsat.org>
+References: <20171213232025.24503-1-f4bug@amsat.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH 00/26] SDCard housekeeping
+Subject: [Qemu-devel] [PATCH 01/26] sdbus: add a QMP command to access a
+ SDBus
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,131 +34,158 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alistair Francis <alistair.francis@xilinx.com>, "Edgar E . Iglesias" <edgar.iglesias@xilinx.com>, Peter Maydell <peter.maydell@linaro.org>, Andrew Baumann <Andrew.Baumann@microsoft.com>, Prasad J Pandit <pjp@fedoraproject.org>, Clement Deschamps <clement.deschamps@antfield.fr>
-Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, qemu-devel@nongnu.org, qemu-arm@nongnu.org, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Sai Pavan Boddu <saipava@xilinx.com>, Isaac Lozano <109lozanoi@gmail.com>, Andrzej Zaborowski <balrogg@gmail.com>, Andrey Smirnov <andrew.smirnov@gmail.com>, Andrey Yurovsky <yurovsky@gmail.com>, =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, Markus Armbruster <armbru@redhat.com>, Michael Roth <mdroth@linux.vnet.ibm.com>, "Daniel P . Berrange" <berrange@redhat.com>, Eric Blake <eblake@redhat.com>, Fam Zheng <famz@redhat.com>, Thomas Huth <thuth@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
+To: Alistair Francis <alistair.francis@xilinx.com>, "Edgar E . Iglesias" <edgar.iglesias@xilinx.com>, Peter Maydell <peter.maydell@linaro.org>, Markus Armbruster <armbru@redhat.com>, Michael Roth <mdroth@linux.vnet.ibm.com>, Andrey Smirnov <andrew.smirnov@gmail.com>, Andrey Yurovsky <yurovsky@gmail.com>, Eduardo Habkost <ehabkost@redhat.com>, "Daniel P . Berrange" <berrange@redhat.com>, Eric Blake <eblake@redhat.com>, Fam Zheng <famz@redhat.com>, Thomas Huth <thuth@redhat.com>, =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
+Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, qemu-devel@nongnu.org
 
-Now that we have a way to write qtest in Python, lets start with a simple test
-to perform basic card identification, covering many functions of the sd/sd.c
-file.
+Use Base64 to serialize the binary blobs in JSON.
+So far at most 512 bytes will be transfered, which result
+in a 684 bytes payload.
+Since this command is intented for qtesting, this is acceptable.
 
-[patch 1]
-When a device is not MMIO-connected but rather plugged into a Bus, it is easier
-to write tests using QMP.
-So we add a 'sdbus-command' entry to directly operate on a SD Bus.
-(Note this method should also work with all other QBus).
-
-[patch 2]
-We write a simple pyqtest, which
-  - resolve the SDBus QOM path in the test setup()
-  - verify default values for SD Spec v2.
-
-Since have a test, lets run after each patch, so we are sure we don't break things.
-
-[patch 4-14,20-23]
-Add a bunch of trace events
-[patch 3,11,15-18]
-Aesthetic changes mostly
-[other patches]
-Trivial changes
-
-Once this series applied, booting some Linux on a vexpress-a9 with few
-sd*command traces enabled result in this outputs (which result useful to
-understand/fix the different SD implementations):
-
-48.687227:sdcard_normal_command         IO_RW_DIRECT/ CMD52 arg 0x00000c00 (state idle)
-48.687233:sdcard_command_response (no response) (state idle)
-48.689237:sdcard_normal_command         IO_RW_DIRECT/ CMD52 arg 0x80000c08 (state idle)
-48.689244:sdcard_command_response (no response) (state idle)
-48.690877:sdcard_normal_command        GO_IDLE_STATE/ CMD00 arg 0x00000000 (state idle)
-48.690890:sdcard_command_response (no response) (state idle)
-48.723486:sdcard_normal_command         SEND_IF_COND/ CMD08 arg 0x000001aa (state idle)
-48.723507:sdcard_command_response 00 00 01 aa  (state idle)
-48.723886:sdcard_normal_command      IO_SEND_OP_COND/ CMD05 arg 0x00000000 (state idle)
-48.723892:sdcard_command_response (no response) (state idle)
-48.724019:sdcard_normal_command      IO_SEND_OP_COND/ CMD05 arg 0x00000000 (state idle)
-48.724023:sdcard_command_response (no response) (state idle)
-48.724110:sdcard_normal_command      IO_SEND_OP_COND/ CMD05 arg 0x00000000 (state idle)
-48.724115:sdcard_command_response (no response) (state idle)
-48.724178:sdcard_normal_command      IO_SEND_OP_COND/ CMD05 arg 0x00000000 (state idle)
-48.724181:sdcard_command_response (no response) (state idle)
-48.724999:sdcard_command_response 00 40 01 20  (state idle)
-48.725214:sdcard_app_command         SD_SEND_OP_COND/ACMD41 arg 0x00000000 (state idle)
-48.725225:sdcard_command_response 40 ff ff 00  (state idle)
-48.727113:sdcard_normal_command        GO_IDLE_STATE/ CMD00 arg 0x00000000 (state idle)
-48.727125:sdcard_command_response (no response) (state idle)
-48.729206:sdcard_normal_command         SEND_IF_COND/ CMD08 arg 0x000001aa (state idle)
-48.729213:sdcard_command_response 00 00 01 aa  (state idle)
-48.729339:sdcard_command_response 00 00 01 20  (state idle)
-48.729412:sdcard_app_command         SD_SEND_OP_COND/ACMD41 arg 0x40300000 (state idle)
-48.729419:sdcard_command_response c0 ff ff 00  (state ready)
-48.729786:sdcard_normal_command         ALL_SEND_CID/ CMD02 arg 0x00000000 (state ready)
-48.729797:sdcard_command_response aa 58 59 51 45 4d 55 21 01 de ad be ef 00 62 19  (state identification)
-48.730825:sdcard_normal_command   SEND_RELATIVE_ADDR/ CMD03 arg 0x00000000 (state identification)
-48.730835:sdcard_command_response 45 67 05 00  (state standby)
-48.731221:sdcard_normal_command             SEND_CSD/ CMD09 arg 0x45670000 (state standby)
-48.731228:sdcard_command_response 40 0e 00 32 5b 59 00 00 0d 47 7f 80 0a 40 00 00  (state standby)
-48.732012:sdcard_normal_command SELECT/DESELECT_CARD/ CMD07 arg 0x45670000 (state standby)
-48.732021:sdcard_command_response 00 00 07 00  (state transfer)
-48.732419:sdcard_command_response 00 00 09 20  (state transfer)
-48.764983:sdcard_app_command                SEND_SCR/ACMD51 arg 0x00000000 (state transfer)
-48.765000:sdcard_command_response 00 00 09 20  (state sendingdata)
-48.766951:sdcard_command_response 00 00 09 20  (state transfer)
-48.767159:sdcard_app_command               SD_STATUS/ACMD13 arg 0x00000000 (state transfer)
-48.767168:sdcard_command_response 00 00 09 20  (state sendingdata)
-48.966731:sdcard_normal_command  READ_MULTIPLE_BLOCK/ CMD18 arg 0x00000000 (state transfer)
-48.966763:sdcard_command_response 00 00 09 00  (state sendingdata)
-48.974869:sdcard_normal_command    STOP_TRANSMISSION/ CMD12 arg 0x00000000 (state sendingdata)
-48.974877:sdcard_command_response 00 00 0b 00  (state transfer)
-50.044308:sdcard_normal_command          SEND_STATUS/ CMD13 arg 0x45670000 (state transfer)
-50.044330:sdcard_command_response 00 00 09 00  (state transfer)
-[...]
-
-Regards,
-
-Phil.
-
-Based-on: 20171213213557.26561-7-f4bug@amsat.org
-          (QTests: use Python to run complex tests)
-
-Philippe Mathieu-Daudé (26):
-  sdbus: add a QMP command to access a SDBus
-  sdcard: add Python qtests
-  sdcard: use ldst API
-  sdcard: replace fprintf() -> qemu_log_mask()
-  sdcard: rename sd_set_mode() -> sd_update_mode()
-  sdcard: add sd_set_mode()
-  sdcard: add sdcard_set_mode() trace event
-  sdcard: add sd_set_state()
-  sdcard: add a sdcard_set_state() trace event
-  sdcard: use more detailled state/mode trace events
-  sdcard: use warn_report() instead of fprintf()
-  sdcard: replace DPRINTF() by trace events
-  sdcard: add more trace events
-  sdcard: use qemu_hexbuf_strdup() to trace command response
-  sdcard: use PW_LEN define instead of '16' magic
-  sdcard: let cmd_valid_while_locked() returns a bool
-  sdcard: rename sd_set_REG() functions called by sd_reset() as sd_reset_REG()
-  sdcard: move Memory Card registers together
-  sdcard: add DSR register
-  sdcard: add/use SD_CMD_MAX to check valid SD commands
-  sdcard: add sd_cmd_abbreviation() to resolve the SD command id
-  sdcard: reduce sd_cmd traces
-  sdcard: add ACMD trace events
-  sdcard: use a 16-bit type for the 16-bit RCA register
-  sdcard: add/use a SDCardCommandClass enum instead of magic numbers
-  sdcard: add/use a ccc_spi enum for the commands supported in SPI mode
-
- qapi-schema.json       |  41 ++++
- hw/sd/core.c           |  43 ++++
- hw/sd/sd.c             | 519 +++++++++++++++++++++++++++++++------------------
- stubs/qmp_sdbus.c      |  11 ++
- hw/sd/trace-events     |  17 ++
- stubs/Makefile.objs    |   1 +
- tests/Makefile.include |   2 +
- tests/sdcard_tests.py  | 172 ++++++++++++++++
- 8 files changed, 617 insertions(+), 189 deletions(-)
+Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+---
+ qapi-schema.json    | 41 +++++++++++++++++++++++++++++++++++++++++
+ hw/sd/core.c        | 43 +++++++++++++++++++++++++++++++++++++++++++
+ stubs/qmp_sdbus.c   | 11 +++++++++++
+ stubs/Makefile.objs |  1 +
+ 4 files changed, 96 insertions(+)
  create mode 100644 stubs/qmp_sdbus.c
- create mode 100755 tests/sdcard_tests.py
 
+diff --git a/qapi-schema.json b/qapi-schema.json
+index 18457954a8..9b0fd90fed 100644
+--- a/qapi-schema.json
++++ b/qapi-schema.json
+@@ -3200,3 +3200,44 @@
+ # Since: 2.11
+ ##
+ { 'command': 'watchdog-set-action', 'data' : {'action': 'WatchdogAction'} }
++
++##
++# @SDBusCommandResponse:
++#
++# SD Bus command response.
++#
++# @base64: the command response encoded as a Base64 string, if any (optional)
++#
++# Since: 2.11
++##
++{ 'struct': 'SDBusCommandResponse', 'data': {'*base64': 'str'} }
++
++##
++# @sdbus-command:
++#
++# Execute a command on a SD Bus return the response (if any).
++#
++# @qom-path: the SD Bus path
++# @command: the SD protocol command to execute in the bus
++# @arg: a 64-bit command argument (optional)
++# @crc: the command/argument CRC (optional)
++#
++# Returns: the response of the command encoded as a Base64 string
++#
++# Since: 2.11
++#
++# -> { "execute": "sdbus-command",
++#      "arguments": { "qom-path": "/machine/unattached/device[32]/sd.0",
++#                     "command": 0x01
++#      }
++#    }
++# <- { "return": {'base64': 'A='} }
++#
++##
++{ 'command': 'sdbus-command',
++  'data': { 'qom-path': 'str',
++            'command': 'uint8',
++            '*arg': 'uint64',
++            '*crc': 'uint16' },
++  'returns': 'SDBusCommandResponse'
++}
+diff --git a/hw/sd/core.c b/hw/sd/core.c
+index da3a7e0efa..c546db2b22 100644
+--- a/hw/sd/core.c
++++ b/hw/sd/core.c
+@@ -22,6 +22,7 @@
+ #include "qemu/osdep.h"
+ #include "hw/sd/sd.h"
+ #include "qemu/cutils.h"
++#include "qmp-commands.h"
+ #include "sd-internal.h"
+ #include "trace.h"
+ 
+@@ -220,3 +221,45 @@ SDBus *sdbus_create_bus(DeviceState *parent, const char *name)
+ {
+     return SD_BUS(qbus_create(TYPE_SD_BUS, parent, name));
+ }
++
++SDBusCommandResponse *qmp_sdbus_command(const char *qom_path,
++                                        uint8_t command,
++                                        bool has_arg, uint64_t arg,
++                                        bool has_crc, uint16_t crc,
++                                        Error **errp)
++{
++    uint8_t response[16 + 1];
++    SDBusCommandResponse *res;
++    bool ambiguous = false;
++    Object *obj;
++    SDBus *sdbus;
++    int sz;
++
++    obj = object_resolve_path(qom_path, &ambiguous);
++    if (obj == NULL) {
++        if (ambiguous) {
++            error_setg(errp, "Path '%s' is ambiguous", qom_path);
++        } else {
++            error_set(errp, ERROR_CLASS_DEVICE_NOT_FOUND,
++                      "Device '%s' not found", qom_path);
++        }
++        return NULL;
++    }
++    sdbus = (SDBus *)object_dynamic_cast(obj, TYPE_SD_BUS);
++    if (sdbus == NULL) {
++        error_set(errp, ERROR_CLASS_GENERIC_ERROR,
++                  "Device '%s' not a sd-bus", qom_path);
++        return NULL;
++    }
++
++    res = g_new0(SDBusCommandResponse, 1);
++    sz = sdbus_do_command(sdbus,
++                          &(SDRequest){ command, arg, has_crc ? crc : -1 },
++                          response);
++    if (sz > 0) {
++        res->has_base64 = true;
++        res->base64 = g_base64_encode(response, sz);
++    }
++
++    return res;
++}
+diff --git a/stubs/qmp_sdbus.c b/stubs/qmp_sdbus.c
+new file mode 100644
+index 0000000000..50f9f1410d
+--- /dev/null
++++ b/stubs/qmp_sdbus.c
+@@ -0,0 +1,11 @@
++#include "qemu/osdep.h"
++#include "qmp-commands.h"
++#include "hw/sd/sd.h"
++
++SDBusCommandResponse *qmp_sdbus_command(const char *qom_path, uint8_t command,
++                                        bool has_arg, uint64_t arg,
++                                        bool has_crc, uint16_t crc,
++                                        Error **errp)
++{
++    return NULL;
++}
+diff --git a/stubs/Makefile.objs b/stubs/Makefile.objs
+index 8cfe34328a..a46cb3b992 100644
+--- a/stubs/Makefile.objs
++++ b/stubs/Makefile.objs
+@@ -35,6 +35,7 @@ stub-obj-y += vm-stop.o
+ stub-obj-y += vmstate.o
+ stub-obj-$(CONFIG_WIN32) += fd-register.o
+ stub-obj-y += qmp_pc_dimm.o
++stub-obj-y += qmp_sdbus.o
+ stub-obj-y += target-monitor-defs.o
+ stub-obj-y += target-get-monitor-def.o
+ stub-obj-y += pc_madt_cpu_entry.o
 -- 
 2.15.1
