@@ -1,25 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51740)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51785)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1ePBWm-0004x3-LF
-	for qemu-devel@nongnu.org; Wed, 13 Dec 2017 13:13:10 -0500
+	(envelope-from <pm215@archaic.org.uk>) id 1ePBWo-0004z8-8s
+	for qemu-devel@nongnu.org; Wed, 13 Dec 2017 13:13:11 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1ePBWl-0008A6-BR
-	for qemu-devel@nongnu.org; Wed, 13 Dec 2017 13:13:08 -0500
-Received: from orth.archaic.org.uk ([2001:8b0:1d0::2]:39146)
+	(envelope-from <pm215@archaic.org.uk>) id 1ePBWn-0008Bw-7Q
+	for qemu-devel@nongnu.org; Wed, 13 Dec 2017 13:13:10 -0500
+Received: from orth.archaic.org.uk ([2001:8b0:1d0::2]:39152)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <pm215@archaic.org.uk>)
-	id 1ePBWl-00086L-3d
-	for qemu-devel@nongnu.org; Wed, 13 Dec 2017 13:13:07 -0500
+	id 1ePBWm-0008Ay-W9
+	for qemu-devel@nongnu.org; Wed, 13 Dec 2017 13:13:09 -0500
 Received: from pm215 by orth.archaic.org.uk with local (Exim 4.89)
-	(envelope-from <pm215@archaic.org.uk>) id 1ePBWj-0007nY-Rs
-	for qemu-devel@nongnu.org; Wed, 13 Dec 2017 18:13:05 +0000
+	(envelope-from <pm215@archaic.org.uk>) id 1ePBWl-0007p3-VC
+	for qemu-devel@nongnu.org; Wed, 13 Dec 2017 18:13:07 +0000
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Wed, 13 Dec 2017 18:12:31 +0000
-Message-Id: <1513188761-20784-34-git-send-email-peter.maydell@linaro.org>
+Date: Wed, 13 Dec 2017 18:12:34 +0000
+Message-Id: <1513188761-20784-37-git-send-email-peter.maydell@linaro.org>
 In-Reply-To: <1513188761-20784-1-git-send-email-peter.maydell@linaro.org>
 References: <1513188761-20784-1-git-send-email-peter.maydell@linaro.org>
-Subject: [Qemu-devel] [PULL 33/43] target/arm: Use ARMMMUFaultInfo in
- deliver_fault()
+Subject: [Qemu-devel] [PULL 36/43] target/arm: Extend PAR format
+ determination
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,167 +30,77 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-Now that ARMMMUFaultInfo is guaranteed to have enough information
-to construct a fault status code, we can pass it in to the
-deliver_fault() function and let it generate the correct type
-of FSR for the destination, rather than relying on the value
-provided by get_phys_addr().
+From: "Edgar E. Iglesias" <edgar.iglesias@xilinx.com>
 
-I don't think there are any cases the old code was getting
-wrong, but this is more obviously correct.
+Now that do_ats_write() is entirely in control of whether to
+generate a 32-bit PAR or a 64-bit PAR, we can make it use the
+correct (complicated) condition for doing so.
 
-Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+Signed-off-by: Edgar E. Iglesias <edgar.iglesias@xilinx.com>
 Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 Reviewed-by: Edgar E. Iglesias <edgar.iglesias@xilinx.com>
 Tested-by: Stefano Stabellini <sstabellini@kernel.org>
-Message-id: 1512503192-2239-10-git-send-email-peter.maydell@linaro.org
+Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+Message-id: 1512503192-2239-13-git-send-email-peter.maydell@linaro.org
+[PMM: Rebased Edgar's patch on top of get_phys_addr() refactoring;
+ use arm_s1_regime_using_lpae_format() rather than
+ regime_using_lpae_format() because the latter will assert
+ if passed ARMMMUIdx_S12NSE0 or ARMMMUIdx_S12NSE1;
+ updated commit message appropriately]
+Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 ---
- target/arm/op_helper.c | 79 ++++++++++++++------------------------------------
- 1 file changed, 22 insertions(+), 57 deletions(-)
+ target/arm/helper.c | 33 +++++++++++++++++++++++++++++----
+ 1 file changed, 29 insertions(+), 4 deletions(-)
 
-diff --git a/target/arm/op_helper.c b/target/arm/op_helper.c
-index a40a84a..38e6993 100644
---- a/target/arm/op_helper.c
-+++ b/target/arm/op_helper.c
-@@ -116,12 +116,13 @@ static inline uint32_t merge_syn_data_abort(uint32_t template_syn,
- }
+diff --git a/target/arm/helper.c b/target/arm/helper.c
+index c469e6a..d1395f9 100644
+--- a/target/arm/helper.c
++++ b/target/arm/helper.c
+@@ -2162,16 +2162,41 @@ static uint64_t do_ats_write(CPUARMState *env, uint64_t value,
+     int prot;
+     bool ret;
+     uint64_t par64;
++    bool format64 = false;
+     MemTxAttrs attrs = {};
+     ARMMMUFaultInfo fi = {};
+     ARMCacheAttrs cacheattrs = {};
  
- static void deliver_fault(ARMCPU *cpu, vaddr addr, MMUAccessType access_type,
--                          uint32_t fsr, uint32_t fsc, ARMMMUFaultInfo *fi)
-+                          int mmu_idx, ARMMMUFaultInfo *fi)
- {
-     CPUARMState *env = &cpu->env;
-     int target_el;
-     bool same_el;
--    uint32_t syn, exc;
-+    uint32_t syn, exc, fsr, fsc;
-+    ARMMMUIdx arm_mmu_idx = core_to_arm_mmu_idx(env, mmu_idx);
- 
-     target_el = exception_target_el(env);
-     if (fi->stage2) {
-@@ -130,14 +131,21 @@ static void deliver_fault(ARMCPU *cpu, vaddr addr, MMUAccessType access_type,
-     }
-     same_el = (arm_current_el(env) == target_el);
- 
--    if (fsc == 0x3f) {
--        /* Caller doesn't have a long-format fault status code. This
--         * should only happen if this fault will never actually be reported
--         * to an EL that uses a syndrome register. Check that here.
--         * 0x3f is a (currently) reserved FSC code, in case the constructed
--         * syndrome does leak into the guest somehow.
-+    if (target_el == 2 || arm_el_is_aa64(env, target_el) ||
-+        arm_s1_regime_using_lpae_format(env, arm_mmu_idx)) {
-+        /* LPAE format fault status register : bottom 6 bits are
-+         * status code in the same form as needed for syndrome
+     ret = get_phys_addr(env, value, access_type, mmu_idx, &phys_addr, &attrs,
+                         &prot, &page_size, &fi, &cacheattrs);
+-    /* TODO: this is not the correct condition to use to decide whether
+-     * to report a PAR in 64-bit or 32-bit format.
+-     */
+-    if (arm_s1_regime_using_lpae_format(env, mmu_idx)) {
++
++    if (is_a64(env)) {
++        format64 = true;
++    } else if (arm_feature(env, ARM_FEATURE_LPAE)) {
++        /*
++         * ATS1Cxx:
++         * * TTBCR.EAE determines whether the result is returned using the
++         *   32-bit or the 64-bit PAR format
++         * * Instructions executed in Hyp mode always use the 64bit format
++         *
++         * ATS1S2NSOxx uses the 64bit format if any of the following is true:
++         * * The Non-secure TTBCR.EAE bit is set to 1
++         * * The implementation includes EL2, and the value of HCR.VM is 1
++         *
++         * ATS1Hx always uses the 64bit format (not supported yet).
 +         */
-+        fsr = arm_fi_to_lfsc(fi);
-+        fsc = extract32(fsr, 0, 6);
-+    } else {
-+        fsr = arm_fi_to_sfsc(fi);
-+        /* Short format FSR : this fault will never actually be reported
-+         * to an EL that uses a syndrome register. Use a (currently)
-+         * reserved FSR code in case the constructed syndrome does leak
-+         * into the guest somehow.
-          */
--        assert(target_el != 2 && !arm_el_is_aa64(env, target_el));
-+        fsc = 0x3f;
-     }
- 
-     if (access_type == MMU_INST_FETCH) {
-@@ -174,29 +182,13 @@ void tlb_fill(CPUState *cs, target_ulong addr, MMUAccessType access_type,
-     ret = arm_tlb_fill(cs, addr, access_type, mmu_idx, &fsr, &fi);
-     if (unlikely(ret)) {
-         ARMCPU *cpu = ARM_CPU(cs);
--        uint32_t fsc;
- 
-         if (retaddr) {
-             /* now we have a real cpu fault */
-             cpu_restore_state(cs, retaddr);
-         }
- 
--        if (fsr & (1 << 9)) {
--            /* LPAE format fault status register : bottom 6 bits are
--             * status code in the same form as needed for syndrome
--             */
--            fsc = extract32(fsr, 0, 6);
--        } else {
--            /* Short format FSR : this fault will never actually be reported
--             * to an EL that uses a syndrome register. Use a (currently)
--             * reserved FSR code in case the constructed syndrome does leak
--             * into the guest somehow. deliver_fault will assert that
--             * we don't target an EL using the syndrome.
--             */
--            fsc = 0x3f;
--        }
--
--        deliver_fault(cpu, addr, access_type, fsr, fsc, &fi);
-+        deliver_fault(cpu, addr, access_type, mmu_idx, &fi);
-     }
- }
- 
-@@ -206,27 +198,15 @@ void arm_cpu_do_unaligned_access(CPUState *cs, vaddr vaddr,
-                                  int mmu_idx, uintptr_t retaddr)
- {
-     ARMCPU *cpu = ARM_CPU(cs);
--    CPUARMState *env = &cpu->env;
--    uint32_t fsr, fsc;
-     ARMMMUFaultInfo fi = {};
--    ARMMMUIdx arm_mmu_idx = core_to_arm_mmu_idx(env, mmu_idx);
- 
-     if (retaddr) {
-         /* now we have a real cpu fault */
-         cpu_restore_state(cs, retaddr);
-     }
- 
--    /* the DFSR for an alignment fault depends on whether we're using
--     * the LPAE long descriptor format, or the short descriptor format
--     */
--    if (arm_s1_regime_using_lpae_format(env, arm_mmu_idx)) {
--        fsr = (1 << 9) | 0x21;
--    } else {
--        fsr = 0x1;
--    }
--    fsc = 0x21;
--
--    deliver_fault(cpu, vaddr, access_type, fsr, fsc, &fi);
-+    fi.type = ARMFault_Alignment;
-+    deliver_fault(cpu, vaddr, access_type, mmu_idx, &fi);
- }
- 
- /* arm_cpu_do_transaction_failed: handle a memory system error response
-@@ -240,10 +220,7 @@ void arm_cpu_do_transaction_failed(CPUState *cs, hwaddr physaddr,
-                                    MemTxResult response, uintptr_t retaddr)
- {
-     ARMCPU *cpu = ARM_CPU(cs);
--    CPUARMState *env = &cpu->env;
--    uint32_t fsr, fsc;
-     ARMMMUFaultInfo fi = {};
--    ARMMMUIdx arm_mmu_idx = core_to_arm_mmu_idx(env, mmu_idx);
- 
-     if (retaddr) {
-         /* now we have a real cpu fault */
-@@ -256,20 +233,8 @@ void arm_cpu_do_transaction_failed(CPUState *cs, hwaddr physaddr,
-      * Slave error (1); in QEMU we follow that.
-      */
-     fi.ea = (response != MEMTX_DECODE_ERROR);
--
--    /* The fault status register format depends on whether we're using
--     * the LPAE long descriptor format, or the short descriptor format.
--     */
--    if (arm_s1_regime_using_lpae_format(env, arm_mmu_idx)) {
--        /* long descriptor form, STATUS 0b010000: synchronous ext abort */
--        fsr = (fi.ea << 12) | (1 << 9) | 0x10;
--    } else {
--        /* short descriptor form, FSR 0b01000 : synchronous ext abort */
--        fsr = (fi.ea << 12) | 0x8;
--    }
--    fsc = 0x10;
--
--    deliver_fault(cpu, addr, access_type, fsr, fsc, &fi);
-+    fi.type = ARMFault_SyncExternal;
-+    deliver_fault(cpu, addr, access_type, mmu_idx, &fi);
- }
- 
- #endif /* !defined(CONFIG_USER_ONLY) */
++        format64 = arm_s1_regime_using_lpae_format(env, mmu_idx);
++
++        if (arm_feature(env, ARM_FEATURE_EL2)) {
++            if (mmu_idx == ARMMMUIdx_S12NSE0 || mmu_idx == ARMMMUIdx_S12NSE1) {
++                format64 |= env->cp15.hcr_el2 & HCR_VM;
++            } else {
++                format64 |= arm_current_el(env) == 2;
++            }
++        }
++    }
++
++    if (format64) {
+         /* Create a 64-bit PAR */
+         par64 = (1 << 11); /* LPAE bit always set */
+         if (!ret) {
 -- 
 2.7.4
