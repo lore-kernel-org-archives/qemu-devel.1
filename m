@@ -1,31 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57724)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57754)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1ePDBv-0002xy-Ff
-	for qemu-devel@nongnu.org; Wed, 13 Dec 2017 14:59:44 -0500
+	id 1ePDC3-00034q-OF
+	for qemu-devel@nongnu.org; Wed, 13 Dec 2017 14:59:52 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1ePDBu-0005d1-PO
-	for qemu-devel@nongnu.org; Wed, 13 Dec 2017 14:59:43 -0500
-Received: from mail-qk0-x241.google.com ([2607:f8b0:400d:c09::241]:45685)
+	id 1ePDC2-0005g8-Ba
+	for qemu-devel@nongnu.org; Wed, 13 Dec 2017 14:59:51 -0500
+Received: from mail-qt0-x244.google.com ([2607:f8b0:400d:c0d::244]:45718)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1ePDBu-0005cp-KY
-	for qemu-devel@nongnu.org; Wed, 13 Dec 2017 14:59:42 -0500
-Received: by mail-qk0-x241.google.com with SMTP id d141so3504266qkc.12
-	for <qemu-devel@nongnu.org>; Wed, 13 Dec 2017 11:59:42 -0800 (PST)
+	id 1ePDC2-0005g0-6s
+	for qemu-devel@nongnu.org; Wed, 13 Dec 2017 14:59:50 -0500
+Received: by mail-qt0-x244.google.com with SMTP id g10so5181071qtj.12
+	for <qemu-devel@nongnu.org>; Wed, 13 Dec 2017 11:59:50 -0800 (PST)
 Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
 	<philippe.mathieu.daude@gmail.com>
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
-Date: Wed, 13 Dec 2017 16:58:46 -0300
-Message-Id: <20171213195852.30439-9-f4bug@amsat.org>
+Date: Wed, 13 Dec 2017 16:58:48 -0300
+Message-Id: <20171213195852.30439-11-f4bug@amsat.org>
 In-Reply-To: <20171213195852.30439-1-f4bug@amsat.org>
 References: <20171213195852.30439-1-f4bug@amsat.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH 08/14] sdhci: refactor common sysbus/pci
- class_init() into sdhci_class_init()
+Subject: [Qemu-devel] [PATCH 10/14] sdhci: use qemu_log_mask(UNIMP) instead
+ of fprintf()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -39,63 +39,33 @@ Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, qemu-devel@nong
 
 Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 ---
- hw/sd/sdhci.c | 22 ++++++++++++++--------
- 1 file changed, 14 insertions(+), 8 deletions(-)
+ hw/sd/sdhci.c | 7 ++++---
+ 1 file changed, 4 insertions(+), 3 deletions(-)
 
 diff --git a/hw/sd/sdhci.c b/hw/sd/sdhci.c
-index a96cd8a2df..893be0e606 100644
+index 044e3d62f1..8fcd48f849 100644
 --- a/hw/sd/sdhci.c
 +++ b/hw/sd/sdhci.c
-@@ -1274,6 +1274,16 @@ static Property sdhci_properties[] = {
-     DEFINE_PROP_END_OF_LIST(),
- };
+@@ -936,7 +936,8 @@ static uint64_t sdhci_read(void *opaque, hwaddr offset, unsigned size)
+         ret = (SD_HOST_SPECv2_VERS << 16) | sdhci_slotint(s);
+         break;
+     default:
+-        ERRPRINT("bad %ub read: addr[0x%04x]\n", size, (int)offset);
++        qemu_log_mask(LOG_UNIMP, "SDHC rd_%ub @0x%02" HWADDR_PRIx " "
++                      "not implemented\n", size, offset);
+         break;
+     }
  
-+static void sdhci_class_init(ObjectClass *klass, void *data)
-+{
-+    DeviceClass *dc = DEVICE_CLASS(klass);
-+
-+    set_bit(DEVICE_CATEGORY_STORAGE, dc->categories);
-+    dc->vmsd = &sdhci_vmstate;
-+    dc->props = sdhci_properties;
-+    dc->reset = sdhci_poweron_reset;
-+}
-+
- /* --- qdev PCI --- */
- 
- static void sdhci_pci_realize(PCIDevice *dev, Error **errp)
-@@ -1297,7 +1307,6 @@ static void sdhci_pci_exit(PCIDevice *dev)
- 
- static void sdhci_pci_class_init(ObjectClass *klass, void *data)
- {
--    DeviceClass *dc = DEVICE_CLASS(klass);
-     PCIDeviceClass *k = PCI_DEVICE_CLASS(klass);
- 
-     k->realize = sdhci_pci_realize;
-@@ -1305,10 +1314,8 @@ static void sdhci_pci_class_init(ObjectClass *klass, void *data)
-     k->vendor_id = PCI_VENDOR_ID_REDHAT;
-     k->device_id = PCI_DEVICE_ID_REDHAT_SDHCI;
-     k->class_id = PCI_CLASS_SYSTEM_SDHCI;
--    set_bit(DEVICE_CATEGORY_STORAGE, dc->categories);
--    dc->vmsd = &sdhci_vmstate;
--    dc->props = sdhci_properties;
--    dc->reset = sdhci_poweron_reset;
-+
-+    sdhci_class_init(klass, data);
- }
- 
- static const TypeInfo sdhci_pci_info = {
-@@ -1352,10 +1359,9 @@ static void sdhci_sysbus_class_init(ObjectClass *klass, void *data)
- {
-     DeviceClass *dc = DEVICE_CLASS(klass);
- 
--    dc->vmsd = &sdhci_vmstate;
--    dc->props = sdhci_properties;
-     dc->realize = sdhci_sysbus_realize;
--    dc->reset = sdhci_poweron_reset;
-+
-+    sdhci_class_init(klass, data);
- }
- 
- static const TypeInfo sdhci_sysbus_info = {
+@@ -1140,8 +1141,8 @@ sdhci_write(void *opaque, hwaddr offset, uint64_t val, unsigned size)
+         sdhci_update_irq(s);
+         break;
+     default:
+-        ERRPRINT("bad %ub write offset: addr[0x%04x] <- %u(0x%x)\n",
+-                 size, (int)offset, value >> shift, value >> shift);
++        qemu_log_mask(LOG_UNIMP, "SDHC wr_%ub @0x%02" HWADDR_PRIx " <- 0x%08x "
++                      "not implemented\n", size, offset, value >> shift);
+         break;
+     }
+     DPRINT_L2("write %ub: addr[0x%04x] <- %u(0x%x)\n",
 -- 
 2.15.1
