@@ -1,27 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51350)
-	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1eP9oX-0001w2-JG
-	for qemu-devel@nongnu.org; Wed, 13 Dec 2017 11:23:22 -0500
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52123)
+	by lists.gnu.org with esmtp (Exim 4.71) (envelope-from <pl@kamp.de>)
+	id 1eP9s5-0003ED-KK
+	for qemu-devel@nongnu.org; Wed, 13 Dec 2017 11:27:02 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1eP9oS-0000XF-GC
-	for qemu-devel@nongnu.org; Wed, 13 Dec 2017 11:23:21 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:53882)
+	(envelope-from <pl@kamp.de>) id 1eP9s0-0002uh-JP
+	for qemu-devel@nongnu.org; Wed, 13 Dec 2017 11:27:01 -0500
+Received: from mx-v6.kamp.de ([2a02:248:0:51::16]:40626 helo=mx01.kamp.de)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1eP9oS-0000WQ-AH
-	for qemu-devel@nongnu.org; Wed, 13 Dec 2017 11:23:16 -0500
-From: Markus Armbruster <armbru@redhat.com>
-References: <20170911110623.24981-1-marcandre.lureau@redhat.com>
-	<20170911110623.24981-40-marcandre.lureau@redhat.com>
-Date: Wed, 13 Dec 2017 17:23:06 +0100
-In-Reply-To: <20170911110623.24981-40-marcandre.lureau@redhat.com>
-	(=?utf-8?Q?=22Marc-Andr=C3=A9?= Lureau"'s message of "Mon, 11 Sep 2017
-	13:06:12 +0200")
-Message-ID: <87o9n27g2d.fsf@dusky.pond.sub.org>
+	(Exim 4.71) (envelope-from <pl@kamp.de>) id 1eP9s0-0002tI-91
+	for qemu-devel@nongnu.org; Wed, 13 Dec 2017 11:26:56 -0500
+References: <6cc4a99c-0212-6b7b-4a12-3e898215bea9@kamp.de>
+	<20170919143829.GH2107@work-vm>
+	<48cdd8ff-4940-9aa1-9aba-1acf8ce74ebe@kamp.de>
+	<20170919144130.GI2107@work-vm>
+	<a271a2f8-173e-45c8-bd64-16f4963b3518@kamp.de>
+	<20170921123625.GE2717@work-vm>
+	<b7f1d6ec-9511-ef3d-80d1-c52cf8adfc24@kamp.de>
+	<20171212170533.GG2409@work-vm>
+From: Peter Lieven <pl@kamp.de>
+Message-ID: <edb57f45-6cbf-9bfd-226b-cb5933dc0222@kamp.de>
+Date: Wed, 13 Dec 2017 17:26:50 +0100
 MIME-Version: 1.0
+In-Reply-To: <20171212170533.GG2409@work-vm>
 Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v3 39/50] qapi-commands: don't initialize
- command list in qmp_init_marshall()
+Content-Transfer-Encoding: 7bit
+Content-Language: en-US
+Subject: Re: [Qemu-devel] Block Migration and CPU throttling
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,71 +34,63 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>
-Cc: qemu-devel@nongnu.org, Michael Roth <mdroth@linux.vnet.ibm.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, Juan Quintela <quintela@redhat.com>, Fam Zheng <famz@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, qemu block <qemu-block@nongnu.org>, jjherne@linux.vnet.ibm.com
 
-Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com> writes:
-
-> This will let the caller add several list of commands.
-
-What for?  I guess that'll become clear later in this series.
-
-> Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
-> ---
->  scripts/qapi-commands.py  | 2 --
->  monitor.c                 | 1 +
->  qga/main.c                | 1 +
->  tests/test-qmp-commands.c | 1 +
->  4 files changed, 3 insertions(+), 2 deletions(-)
+Am 12.12.2017 um 18:05 schrieb Dr. David Alan Gilbert:
+> * Peter Lieven (pl@kamp.de) wrote:
+>> Am 21.09.2017 um 14:36 schrieb Dr. David Alan Gilbert:
+>>> * Peter Lieven (pl@kamp.de) wrote:
+>>>> Am 19.09.2017 um 16:41 schrieb Dr. David Alan Gilbert:
+>>>>> * Peter Lieven (pl@kamp.de) wrote:
+>>>>>> Am 19.09.2017 um 16:38 schrieb Dr. David Alan Gilbert:
+>>>>>>> * Peter Lieven (pl@kamp.de) wrote:
+>>>>>>>> Hi,
+>>>>>>>>
+>>>>>>>> I just noticed that CPU throttling and Block Migration don't work together very well.
+>>>>>>>> During block migration the throttling heuristic detects that we obviously make no progress
+>>>>>>>> in ram transfer. But the reason is the running block migration and not a too high dirty pages rate.
+>>>>>>>>
+>>>>>>>> The result is that any VM is throttled by 99% during block migration.
+>>>>>>> Hmm that's unfortunate; do you have a bandwidth set lower than your
+>>>>>>> actual network connection? I'm just wondering if it's actually going
+>>>>>>> between the block and RAM iterative sections or getting stuck in ne.
+>>>>>> It happens also if source and dest are on the same machine and speed is set to 100G.
+>>>>> But does it happen if they're not and the speed is set low?
+>>>> Yes, it does. I noticed it in our test environment between different nodes with a 10G
+>>>> link in between. But its totally clear why it happens. During block migration we transfer
+>>>> all dirty memory pages in each round (if there is moderate memory load), but all dirty
+>>>> pages are obviously more than 50% of the transferred ram in that round.
+>>>> It is more exactly 100%. But the current logic triggers on this condition.
+>>>>
+>>>> I think I will go forward and send a patch which disables auto converge during
+>>>> block migration bulk stage.
+>>> Yes, that's fair;  it probably would also make sense to throttle the RAM
+>>> migration during the block migration bulk stage, since the chances are
+>>> it's not going to get far.  (I think in the nbd setup, the main
+>>> migration process isn't started until the end of bulk).
+>> Catching up with the idea of delaying ram migration until block bulk has completed.
+>> What do you think is the easiest way to achieve this?
+> <excavates inbox, and notices I never replied>
 >
-> diff --git a/scripts/qapi-commands.py b/scripts/qapi-commands.py
-> index 8af8d913b9..7455d2b8bb 100644
-> --- a/scripts/qapi-commands.py
-> +++ b/scripts/qapi-commands.py
-> @@ -211,8 +211,6 @@ def gen_registry(registry):
->=20=20
->  void %(c_prefix)sqmp_init_marshal(QmpCommandList *cmds)
->  {
-> -    QTAILQ_INIT(cmds);
-> -
->  ''',
->                  c_prefix=3Dc_name(prefix, protect=3DFalse))
->      ret +=3D registry
+> I think the answer depends whether we think this is a 'special' or we
+> need a new general purpose mechanism.
+>
+> If it was really general then we'd probably want to split the iterative
+> stage in two somehow, and only do RAM in the second half.
+>
+> But I'm not sure it's worth it; I suspect the easiest way is:
+>
+>    a) Add a counter in migration/ram.c or in the RAM state somewhere
+>    b) Make ram_save_inhibit increment the counter
+>    c) Check the counter at the head of ram_save_iterate and just exit
+>      if it's none 0
+>    d) Call ram_save_inhibit from block_save_setup
+>    e) Then release it when you've finished the bulk stage
+>
+> Make sure you still count the RAM in the pending totals, otherwise
+> migration might think it's finished a bit early.
 
-Please update qapi-code-gen.txt, too.
+I will look into this for 2.12. Thanks for the cookbook.
 
-> diff --git a/monitor.c b/monitor.c
-> index b5ddcf8c67..bf8a7685bf 100644
-> --- a/monitor.c
-> +++ b/monitor.c
-> @@ -1001,6 +1001,7 @@ void monitor_init_qmp_commands(void)
->       *   "qmp_capabilities", to enforce capability negotiation
->       */
->=20=20
-> +    QTAILQ_INIT(&qmp_commands);
->      qmp_init_marshal(&qmp_commands);
->=20=20
->      qmp_register_command(&qmp_commands, "query-qmp-schema",
-> diff --git a/qga/main.c b/qga/main.c
-> index 62a62755bd..b949b1ccb0 100644
-> --- a/qga/main.c
-> +++ b/qga/main.c
-> @@ -1360,6 +1360,7 @@ int main(int argc, char **argv)
->=20=20
->      config->log_level =3D G_LOG_LEVEL_ERROR | G_LOG_LEVEL_CRITICAL;
->=20=20
-> +    QTAILQ_INIT(&ga_commands);
->      qga_qmp_init_marshal(&ga_commands);
->=20=20
->      init_dfl_pathnames();
-> diff --git a/tests/test-qmp-commands.c b/tests/test-qmp-commands.c
-> index ad7b6e4e1d..28ce88e012 100644
-> --- a/tests/test-qmp-commands.c
-> +++ b/tests/test-qmp-commands.c
-> @@ -283,6 +283,7 @@ int main(int argc, char **argv)
->      g_test_add_func("/0.15/dealloc_types", test_dealloc_types);
->      g_test_add_func("/0.15/dealloc_partial", test_dealloc_partial);
->=20=20
-> +    QTAILQ_INIT(&qmp_commands);
->      test_qmp_init_marshal(&qmp_commands);
->      g_test_run();
+Peter
