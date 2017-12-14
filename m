@@ -1,30 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53683)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56580)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1ePIpl-00064V-Cb
-	for qemu-devel@nongnu.org; Wed, 13 Dec 2017 21:01:14 -0500
+	id 1ePIxp-0003E4-TO
+	for qemu-devel@nongnu.org; Wed, 13 Dec 2017 21:09:34 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1ePIpk-0003kX-K7
-	for qemu-devel@nongnu.org; Wed, 13 Dec 2017 21:01:13 -0500
-Received: from mail-qt0-x244.google.com ([2607:f8b0:400d:c0d::244]:39976)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1ePIpk-0003kG-Fq
-	for qemu-devel@nongnu.org; Wed, 13 Dec 2017 21:01:12 -0500
-Received: by mail-qt0-x244.google.com with SMTP id u42so6208749qte.7
-	for <qemu-devel@nongnu.org>; Wed, 13 Dec 2017 18:01:12 -0800 (PST)
+	id 1ePIxm-0000oz-TH
+	for qemu-devel@nongnu.org; Wed, 13 Dec 2017 21:09:34 -0500
 Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
 	<philippe.mathieu.daude@gmail.com>
-From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
-Date: Wed, 13 Dec 2017 23:00:25 -0300
-Message-Id: <20171214020025.4004-9-f4bug@amsat.org>
-In-Reply-To: <20171214020025.4004-1-f4bug@amsat.org>
-References: <20171214020025.4004-1-f4bug@amsat.org>
+References: <20171211213007.7353-1-andrew.smirnov@gmail.com>
+	<CAFEAcA-gEjU+rBWSL8V4d520DOVheZoJZ76p5=9hmkXk3NqeOw@mail.gmail.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Message-ID: <af0b2841-feb6-cf3b-ac7f-4b681916ee10@amsat.org>
+Date: Wed, 13 Dec 2017 23:09:16 -0300
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH 8/8] sdhci: add a check_capab_v3() qtest
+In-Reply-To: <CAFEAcA-gEjU+rBWSL8V4d520DOVheZoJZ76p5=9hmkXk3NqeOw@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH 00/13] i.MX FEC and SD changes
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,56 +28,29 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alistair Francis <alistair.francis@xilinx.com>, "Edgar E . Iglesias" <edgar.iglesias@xilinx.com>, Peter Maydell <peter.maydell@linaro.org>
-Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, qemu-devel@nongnu.org, Prasad J Pandit <pjp@fedoraproject.org>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Sai Pavan Boddu <saipava@xilinx.com>
+To: Peter Maydell <peter.maydell@linaro.org>, Andrey Smirnov <andrew.smirnov@gmail.com>
+Cc: qemu-arm <qemu-arm@nongnu.org>, Jason Wang <jasowang@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>, Andrey Yurovsky <yurovsky@gmail.com>
 
-Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
----
- tests/sdhci-test.c | 18 ++++++++++++++++++
- 1 file changed, 18 insertions(+)
+Hi Andrey, Peter,
 
-diff --git a/tests/sdhci-test.c b/tests/sdhci-test.c
-index b7646bccc6..60b28f27b3 100644
---- a/tests/sdhci-test.c
-+++ b/tests/sdhci-test.c
-@@ -13,6 +13,8 @@
- #define SDHC_CAPAB                      0x40
- FIELD(SDHC_CAPAB, BASECLKFREQ,               8, 8); /* since v2 */
- FIELD(SDHC_CAPAB, SDMA,                     22, 1);
-+FIELD(SDHC_CAPAB, SDR,                      32, 3); /* since v3 */
-+FIELD(SDHC_CAPAB, DRIVER,                   36, 3); /* since v3 */
- #define SDHC_HCVER                      0xFE
- 
- static const struct sdhci_t {
-@@ -103,6 +105,21 @@ static void check_capab_sdma(uintptr_t addr, bool supported)
-     g_assert_cmpuint(capab_sdma, ==, supported);
- }
- 
-+static void check_capab_v3(uintptr_t addr, uint8_t version)
-+{
-+    uint64_t capab, capab_v3;
-+
-+    if (version >= 3) {
-+        return;
-+    }
-+    /* before v3 those fields are RESERVED */
-+    capab = sdhci_readq(addr, SDHC_CAPAB);
-+    capab_v3 = FIELD_EX64(capab, SDHC_CAPAB, SDR);
-+    g_assert_cmpuint(capab_v3, ==, 0);
-+    capab_v3 = FIELD_EX64(capab, SDHC_CAPAB, DRIVER);
-+    g_assert_cmpuint(capab_v3, ==, 0);
-+}
-+
- static void test_machine(const void *data)
- {
-     const struct sdhci_t *test = data;
-@@ -111,6 +128,7 @@ static void test_machine(const void *data)
- 
-     check_specs_version(test->sdhci.addr, test->sdhci.version);
-     check_capab_readonly(test->sdhci.addr);
-+    check_capab_v3(test->sdhci.addr, test->sdhci.version);
-     check_capab_sdma(test->sdhci.addr, test->sdhci.capab.sdma);
-     check_capab_baseclock(test->sdhci.addr, test->sdhci.baseclock);
- 
--- 
-2.15.1
+On 12/12/2017 02:40 PM, Peter Maydell wrote:
+> On 11 December 2017 at 21:29, Andrey Smirnov <andrew.smirnov@gmail.com> wrote:
+>> Hi everyone,
+>>
+>> This patchset is a spin-off from original i.MX7 support submission
+>> found here [1], containing all of the patchest that are more or less
+>> agreed upon and are ready (hopefully!) for inclusion.
+[...]
+> Incidentally we should use the new i.MX SDHCI controller in the
+> imx6: coincidentally somebody ran into this bug recently:
+> https://stackoverflow.com/questions/47538951/qemu-freescale-i-mx6-duallite-sabre-root-filesystem-does-not-mount/47552596
+> 
+> I'll retest that this patchset works with my imx6 image, and
+> send a patch to sit on top of it to switch imx6 over to TYPE_IMX_USDHC.
+
+If you don't mind, I'd like to take the patches 12/13 (SDHCI) and adapt
+them to the SDHCI series I'm working on, to avoid a big diverge/clash.
+
+Regards,
+
+Phil.
