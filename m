@@ -1,21 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53299)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53334)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1ePIpE-0005en-6g
-	for qemu-devel@nongnu.org; Wed, 13 Dec 2017 21:00:40 -0500
+	id 1ePIpG-0005gL-Mk
+	for qemu-devel@nongnu.org; Wed, 13 Dec 2017 21:00:43 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1ePIpB-0003Jx-5z
-	for qemu-devel@nongnu.org; Wed, 13 Dec 2017 21:00:40 -0500
+	id 1ePIpF-0003N6-El
+	for qemu-devel@nongnu.org; Wed, 13 Dec 2017 21:00:42 -0500
 Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
 	<philippe.mathieu.daude@gmail.com>
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
-Date: Wed, 13 Dec 2017 23:00:17 -0300
-Message-Id: <20171214020025.4004-1-f4bug@amsat.org>
+Date: Wed, 13 Dec 2017 23:00:18 -0300
+Message-Id: <20171214020025.4004-2-f4bug@amsat.org>
+In-Reply-To: <20171214020025.4004-1-f4bug@amsat.org>
+References: <20171214020025.4004-1-f4bug@amsat.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH 0/8] SDHCI: add a qtest and fix few issues
+Subject: [Qemu-devel] [PATCH 1/8] sdhci: add a "sd-spec-version" property
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,45 +26,84 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alistair Francis <alistair.francis@xilinx.com>, "Edgar E . Iglesias" <edgar.iglesias@xilinx.com>, Prasad J Pandit <pjp@fedoraproject.org>, Peter Maydell <peter.maydell@linaro.org>, =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>, Andrzej Zaborowski <balrogg@gmail.com>, Andrew Baumann <Andrew.Baumann@microsoft.com>, Andrey Smirnov <andrew.smirnov@gmail.com>, Andrey Yurovsky <yurovsky@gmail.com>, Clement Deschamps <clement.deschamps@antfield.fr>, Jean-Christophe Dubois <jcd@tribudubois.net>, =?UTF-8?q?Gr=C3=A9gory=20Estrade?= <gregory.estrade@gmail.com>, Igor Mitsyanko <i.mitsyanko@gmail.com>
+To: Alistair Francis <alistair.francis@xilinx.com>, "Edgar E . Iglesias" <edgar.iglesias@xilinx.com>, Prasad J Pandit <pjp@fedoraproject.org>, Peter Maydell <peter.maydell@linaro.org>, Andrzej Zaborowski <balrogg@gmail.com>, Andrew Baumann <Andrew.Baumann@microsoft.com>, Andrey Smirnov <andrew.smirnov@gmail.com>, Andrey Yurovsky <yurovsky@gmail.com>
 Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, qemu-devel@nongnu.org, qemu-arm@nongnu.org, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Sai Pavan Boddu <saipava@xilinx.com>
 
-This series adds a qtest for the SD Host Controller Interface.
+default to SDHCI v2
 
-To keep it simple, for each device using a SDHCI IP we ask the the capabilities
-it supports, and verify with the public datashits availables.
+Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+---
+I am not sure which real VENDOR is HCVER=0x24, we probably don't care.
 
-So far the QEMU devices only implement the v2 and v3 Specs.
+ hw/sd/sdhci-internal.h |  4 ++--
+ include/hw/sd/sdhci.h  | 10 ++++++++++
+ hw/sd/sdhci.c          |  5 ++++-
+ 3 files changed, 16 insertions(+), 3 deletions(-)
 
-This exposes few inconsistencies, we fix them.
-
-Regards,
-
-Phil.
-
-Based-on: 20171213232025.24503-27-f4bug@amsat.org
-          (SDCard housekeeping)
-
-Philippe Mathieu-Daudé (8):
-  sdhci: add a "sd-spec-version" property
-  sdhci: some ARM boards do support SD_HOST_SPECv3_VERS
-  sdhci: add qtest to check the SD Spec version
-  sdhci: fix CAPAB/MAXCURR registers, both are 64bit and read-only
-  sdhci: add check_capab_readonly() qtest
-  sdhci: add a check_capab_baseclock() qtest
-  sdhci: add a check_capab_sdma() qtest
-  sdhci: add a check_capab_v3() qtest
-
- include/hw/sd/sdhci.h        |  14 +++-
- hw/sd/sdhci-internal.h       |   4 +-
- hw/arm/bcm2835_peripherals.c |   7 ++
- hw/arm/fsl-imx6.c            |   6 ++
- hw/arm/xilinx_zynq.c         |   2 +
- hw/sd/sdhci.c                |  30 +++++++--
- tests/sdhci-test.c           | 152 +++++++++++++++++++++++++++++++++++++++++++
- tests/Makefile.include       |   1 +
- 8 files changed, 206 insertions(+), 10 deletions(-)
- create mode 100644 tests/sdhci-test.c
-
+diff --git a/hw/sd/sdhci-internal.h b/hw/sd/sdhci-internal.h
+index e941bc2386..7e4a9d79d1 100644
+--- a/hw/sd/sdhci-internal.h
++++ b/hw/sd/sdhci-internal.h
+@@ -210,9 +210,9 @@
+ /* Slot interrupt status */
+ #define SDHC_SLOT_INT_STATUS            0xFC
+ 
+-/* HWInit Host Controller Version Register 0x0401 */
++/* HWInit Host Controller Version Register */
+ #define SDHC_HCVER                      0xFE
+-#define SD_HOST_SPECv2_VERS             0x2401
++#define SDHC_HCVER_VENDOR               0x24
+ 
+ #define SDHC_REGISTERS_MAP_SIZE         0x100
+ #define SDHC_INSERTION_DELAY            (NANOSECONDS_PER_SECOND)
+diff --git a/include/hw/sd/sdhci.h b/include/hw/sd/sdhci.h
+index 579e0ea644..f8e91ce903 100644
+--- a/include/hw/sd/sdhci.h
++++ b/include/hw/sd/sdhci.h
+@@ -88,6 +88,9 @@ typedef struct SDHCIState {
+     /* Force Event Auto CMD12 Error Interrupt Reg - write only */
+     /* Force Event Error Interrupt Register- write only */
+     /* RO Host Controller Version Register always reads as 0x2401 */
++    struct {
++        uint8_t spec_version;
++    } capabilities;
+ } SDHCIState;
+ 
+ #define TYPE_PCI_SDHCI "sdhci-pci"
+@@ -97,4 +100,11 @@ typedef struct SDHCIState {
+ #define SYSBUS_SDHCI(obj)                               \
+      OBJECT_CHECK(SDHCIState, (obj), TYPE_SYSBUS_SDHCI)
+ 
++/* Host Controller Specification Version */
++enum sdhci_spec_version {
++    SD_HOST_SPECv1_VERS     = 0x00,
++    SD_HOST_SPECv2_VERS     = 0x01,
++    SD_HOST_SPECv3_VERS     = 0x02
++};
++
+ #endif /* SDHCI_H */
+diff --git a/hw/sd/sdhci.c b/hw/sd/sdhci.c
+index d8188fdc2a..d6145342fb 100644
+--- a/hw/sd/sdhci.c
++++ b/hw/sd/sdhci.c
+@@ -908,7 +908,8 @@ static uint64_t sdhci_read(void *opaque, hwaddr offset, unsigned size)
+         ret = (uint32_t)(s->admasysaddr >> 32);
+         break;
+     case SDHC_SLOT_INT_STATUS:
+-        ret = (SD_HOST_SPECv2_VERS << 16) | sdhci_slotint(s);
++        ret = (SDHC_HCVER_VENDOR << 24) | (s->capabilities.spec_version << 16);
++        ret |= sdhci_slotint(s);
+         break;
+     default:
+         qemu_log_mask(LOG_UNIMP, "SDHC rd_%ub @0x%02" HWADDR_PRIx " "
+@@ -1263,6 +1264,8 @@ const VMStateDescription sdhci_vmstate = {
+ /* Capabilities registers provide information on supported features of this
+  * specific host controller implementation */
+ static Property sdhci_properties[] = {
++    DEFINE_PROP_UINT8("sd-spec-version", SDHCIState,
++                      capabilities.spec_version, SD_HOST_SPECv2_VERS),
+     DEFINE_PROP_UINT32("capareg", SDHCIState, capareg, UINT32_MAX),
+     DEFINE_PROP_UINT32("maxcurr", SDHCIState, maxcurr, 0),
+     DEFINE_PROP_BOOL("pending-insert-quirk", SDHCIState, pending_insert_quirk,
 -- 
 2.15.1
