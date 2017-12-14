@@ -1,31 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36337)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36356)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1ePSw5-00055z-Lu
-	for qemu-devel@nongnu.org; Thu, 14 Dec 2017 07:48:26 -0500
+	(envelope-from <dgilbert@redhat.com>) id 1ePSw7-00056t-Hm
+	for qemu-devel@nongnu.org; Thu, 14 Dec 2017 07:48:30 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1ePSw2-0006GC-1U
-	for qemu-devel@nongnu.org; Thu, 14 Dec 2017 07:48:25 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:52504)
+	(envelope-from <dgilbert@redhat.com>) id 1ePSw1-0006FP-FZ
+	for qemu-devel@nongnu.org; Thu, 14 Dec 2017 07:48:27 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:4700)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1ePSw1-0006Ey-S2
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1ePSw1-0006EP-5b
 	for qemu-devel@nongnu.org; Thu, 14 Dec 2017 07:48:21 -0500
 Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
 	[10.5.11.12])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 112FB356D3
-	for <qemu-devel@nongnu.org>; Thu, 14 Dec 2017 12:48:21 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id 3A978883C5
+	for <qemu-devel@nongnu.org>; Thu, 14 Dec 2017 12:48:20 +0000 (UTC)
 Received: from dgilbert-t530.redhat.com (ovpn-117-51.ams2.redhat.com
 	[10.36.117.51])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id 83D7160C9F
-	for <qemu-devel@nongnu.org>; Thu, 14 Dec 2017 12:48:20 +0000 (UTC)
+	by smtp.corp.redhat.com (Postfix) with ESMTP id 8811A77D4F
+	for <qemu-devel@nongnu.org>; Thu, 14 Dec 2017 12:48:19 +0000 (UTC)
 From: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>
-Date: Thu, 14 Dec 2017 12:48:17 +0000
-Message-Id: <20171214124817.2567-3-dgilbert@redhat.com>
+Date: Thu, 14 Dec 2017 12:48:16 +0000
+Message-Id: <20171214124817.2567-2-dgilbert@redhat.com>
 In-Reply-To: <20171214124817.2567-1-dgilbert@redhat.com>
 References: <20171214124817.2567-1-dgilbert@redhat.com>
-Subject: [Qemu-devel] [PULL 2/2] tests: test-hmp: print command execution
- result
+Subject: [Qemu-devel] [PULL 1/2] hmp-commands: Remove the deprecated usb_add
+ and usb_del
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,52 +36,208 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-From: Vadim Galitsyn <vadim.galitsyn@profitbricks.com>
+From: Thomas Huth <thuth@redhat.com>
 
-Provide HMP monitor command execution result as it would be seen
-by user who established an HMP monitor session.
+It's easy to use device_add and device_del as replacement instead.
+The usb_add and usb_del commands are deprecated since QEMU 2.10,
+and nobody complained that they are still needed, so let's get rid
+of them now to make the HMP interface a little bit less overloaded.
 
-Currently many commands may silently fail without any sign of that.
-This patch let this info to be printed once test is running in
-verbose mode.
-
-For the future it might be useful to fail the test if command has
-failed, however it would require a bit of rework inside test
-engine itself.
-
-A simple example of silent failure without reporting it would to
-add some non-existent HMP command into 'hmp_cmds' list. In this case
-test will report it successfully passed without error.
-
-Signed-off-by: Vadim Galitsyn <vadim.galitsyn@profitbricks.com>
-Cc: Dr. David Alan Gilbert <dgilbert@redhat.com>
-Cc: qemu-devel@nongnu.org
-Message-Id: <20171023151310.6462-5-vadim.galitsyn@profitbricks.com>
 Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+Signed-off-by: Thomas Huth <thuth@redhat.com>
+Message-Id: <1512073140-17672-1-git-send-email-thuth@redhat.com>
 Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
 ---
- tests/test-hmp.c | 7 +++++--
- 1 file changed, 5 insertions(+), 2 deletions(-)
+ hmp-commands.hx         | 33 ---------------------------------
+ hw/usb/bus.c            | 22 ----------------------
+ include/hw/usb.h        |  1 -
+ include/sysemu/sysemu.h |  2 --
+ qemu-doc.texi           |  8 --------
+ vl.c                    | 44 --------------------------------------------
+ 6 files changed, 110 deletions(-)
 
-diff --git a/tests/test-hmp.c b/tests/test-hmp.c
-index 5677fbf775..5b7e447b6a 100644
---- a/tests/test-hmp.c
-+++ b/tests/test-hmp.c
-@@ -78,10 +78,13 @@ static void test_commands(void)
-     int i;
+diff --git a/hmp-commands.hx b/hmp-commands.hx
+index 4afd57cf5f..6d5ebdf6ab 100644
+--- a/hmp-commands.hx
++++ b/hmp-commands.hx
+@@ -663,39 +663,6 @@ STEXI
+ @item sum @var{addr} @var{size}
+ @findex sum
+ Compute the checksum of a memory region.
+-ETEXI
+-
+-    {
+-        .name       = "usb_add",
+-        .args_type  = "devname:s",
+-        .params     = "device",
+-        .help       = "add USB device (e.g. 'host:bus.addr' or 'host:vendor_id:product_id')",
+-        .cmd        = hmp_usb_add,
+-    },
+-
+-STEXI
+-@item usb_add @var{devname}
+-@findex usb_add
+-Add the USB device @var{devname}. This command is deprecated, please
+-use @code{device_add} instead. For details of available devices see
+-@ref{usb_devices}
+-ETEXI
+-
+-    {
+-        .name       = "usb_del",
+-        .args_type  = "devname:s",
+-        .params     = "device",
+-        .help       = "remove USB device 'bus.addr'",
+-        .cmd        = hmp_usb_del,
+-    },
+-
+-STEXI
+-@item usb_del @var{devname}
+-@findex usb_del
+-Remove the USB device @var{devname} from the QEMU virtual USB
+-hub. @var{devname} has the syntax @code{bus.addr}. Use the monitor
+-command @code{info usb} to see the devices you can remove. This
+-command is deprecated, please use @code{device_del} instead.
+ ETEXI
  
-     for (i = 0; hmp_cmds[i] != NULL; i++) {
-+        response = hmp("%s", hmp_cmds[i]);
-         if (verbose) {
--            fprintf(stderr, "\t%s\n", hmp_cmds[i]);
-+            fprintf(stderr,
-+                    "\texecute HMP command: %s\n"
-+                    "\tresult             : %s\n",
-+                    hmp_cmds[i], response);
-         }
--        response = hmp("%s", hmp_cmds[i]);
-         g_free(response);
-     }
+     {
+diff --git a/hw/usb/bus.c b/hw/usb/bus.c
+index e56dc3348a..11f7720d71 100644
+--- a/hw/usb/bus.c
++++ b/hw/usb/bus.c
+@@ -559,28 +559,6 @@ int usb_device_detach(USBDevice *dev)
+     return 0;
+ }
+ 
+-int usb_device_delete_addr(int busnr, int addr)
+-{
+-    USBBus *bus;
+-    USBPort *port;
+-    USBDevice *dev;
+-
+-    bus = usb_bus_find(busnr);
+-    if (!bus)
+-        return -1;
+-
+-    QTAILQ_FOREACH(port, &bus->used, next) {
+-        if (port->dev->addr == addr)
+-            break;
+-    }
+-    if (!port)
+-        return -1;
+-    dev = port->dev;
+-
+-    object_unparent(OBJECT(dev));
+-    return 0;
+-}
+-
+ static const char *usb_speed(unsigned int speed)
+ {
+     static const char *txt[] = {
+diff --git a/include/hw/usb.h b/include/hw/usb.h
+index eb28655270..9dd9c6f0d9 100644
+--- a/include/hw/usb.h
++++ b/include/hw/usb.h
+@@ -549,7 +549,6 @@ void usb_claim_port(USBDevice *dev, Error **errp);
+ void usb_release_port(USBDevice *dev);
+ void usb_device_attach(USBDevice *dev, Error **errp);
+ int usb_device_detach(USBDevice *dev);
+-int usb_device_delete_addr(int busnr, int addr);
+ void usb_check_attach(USBDevice *dev, Error **errp);
+ 
+ static inline USBBus *usb_bus_from_device(USBDevice *d)
+diff --git a/include/sysemu/sysemu.h b/include/sysemu/sysemu.h
+index c083869fcf..31612caf10 100644
+--- a/include/sysemu/sysemu.h
++++ b/include/sysemu/sysemu.h
+@@ -166,8 +166,6 @@ extern Chardev *serial_hds[MAX_SERIAL_PORTS];
+ 
+ extern Chardev *parallel_hds[MAX_PARALLEL_PORTS];
+ 
+-void hmp_usb_add(Monitor *mon, const QDict *qdict);
+-void hmp_usb_del(Monitor *mon, const QDict *qdict);
+ void hmp_info_usb(Monitor *mon, const QDict *qdict);
+ 
+ void add_boot_device_path(int32_t bootindex, DeviceState *dev,
+diff --git a/qemu-doc.texi b/qemu-doc.texi
+index db2351c746..ee206b8cba 100644
+--- a/qemu-doc.texi
++++ b/qemu-doc.texi
+@@ -2518,14 +2518,6 @@ The ``host_net_add'' command is replaced by the ``netdev_add'' command.
+ 
+ The ``host_net_remove'' command is replaced by the ``netdev_del'' command.
+ 
+-@subsection usb_add (since 2.10.0)
+-
+-The ``usb_add'' command is replaced by the ``device_add'' command.
+-
+-@subsection usb_del (since 2.10.0)
+-
+-The ``usb_del'' command is replaced by the ``device_del'' command.
+-
+ @section System emulator devices
+ 
+ @subsection ivshmem (since 2.6.0)
+diff --git a/vl.c b/vl.c
+index 1ad1c04637..fc8bd9372f 100644
+--- a/vl.c
++++ b/vl.c
+@@ -1479,28 +1479,6 @@ done:
+     return 0;
+ }
+ 
+-static int usb_device_del(const char *devname)
+-{
+-    int bus_num, addr;
+-    const char *p;
+-
+-    if (strstart(devname, "host:", &p)) {
+-        return -1;
+-    }
+-
+-    if (!machine_usb(current_machine)) {
+-        return -1;
+-    }
+-
+-    p = strchr(devname, '.');
+-    if (!p)
+-        return -1;
+-    bus_num = strtoul(devname, NULL, 0);
+-    addr = strtoul(p + 1, NULL, 0);
+-
+-    return usb_device_delete_addr(bus_num, addr);
+-}
+-
+ static int usb_parse(const char *cmdline)
+ {
+     int r;
+@@ -1511,28 +1489,6 @@ static int usb_parse(const char *cmdline)
+     return r;
+ }
+ 
+-void hmp_usb_add(Monitor *mon, const QDict *qdict)
+-{
+-    const char *devname = qdict_get_str(qdict, "devname");
+-
+-    error_report("usb_add is deprecated, please use device_add instead");
+-
+-    if (usb_device_add(devname) < 0) {
+-        error_report("could not add USB device '%s'", devname);
+-    }
+-}
+-
+-void hmp_usb_del(Monitor *mon, const QDict *qdict)
+-{
+-    const char *devname = qdict_get_str(qdict, "devname");
+-
+-    error_report("usb_del is deprecated, please use device_del instead");
+-
+-    if (usb_device_del(devname) < 0) {
+-        error_report("could not delete USB device '%s'", devname);
+-    }
+-}
+-
+ /***********************************************************/
+ /* machine registration */
  
 -- 
 2.14.3
