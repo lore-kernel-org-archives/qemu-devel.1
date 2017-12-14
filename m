@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56183)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56280)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1ePX3u-0001JF-9j
-	for qemu-devel@nongnu.org; Thu, 14 Dec 2017 12:12:47 -0500
+	(envelope-from <cohuck@redhat.com>) id 1ePX40-0001Ov-Cn
+	for qemu-devel@nongnu.org; Thu, 14 Dec 2017 12:12:53 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1ePX3t-0008Kz-DS
-	for qemu-devel@nongnu.org; Thu, 14 Dec 2017 12:12:46 -0500
+	(envelope-from <cohuck@redhat.com>) id 1ePX3z-0008Q0-BQ
+	for qemu-devel@nongnu.org; Thu, 14 Dec 2017 12:12:52 -0500
 From: Cornelia Huck <cohuck@redhat.com>
-Date: Thu, 14 Dec 2017 18:09:53 +0100
-Message-Id: <20171214171004.25058-36-cohuck@redhat.com>
+Date: Thu, 14 Dec 2017 18:09:54 +0100
+Message-Id: <20171214171004.25058-37-cohuck@redhat.com>
 In-Reply-To: <20171214171004.25058-1-cohuck@redhat.com>
 References: <20171214171004.25058-1-cohuck@redhat.com>
-Subject: [Qemu-devel] [PULL 35/46] s390x/tcg: indicate value of TODPR in
- STCKE
+Subject: [Qemu-devel] [PULL 36/46] s390x/tcg: wire up STORE CHANNEL REPORT
+ WORD
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,44 +25,82 @@ Cc: qemu-devel@nongnu.org, qemu-s390x@nongnu.org, rth@twiddle.net, agraf@suse.de
 
 From: David Hildenbrand <david@redhat.com>
 
-We were not yet using the value of the TOD Programmable Register.
+CRW machine check handling requires STCRW. So let's wire it up.
 
 Reviewed-by: Thomas Huth <thuth@redhat.com>
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 Signed-off-by: David Hildenbrand <david@redhat.com>
-Message-Id: <20171208160207.26494-5-david@redhat.com>
+Message-Id: <20171208160207.26494-6-david@redhat.com>
 Signed-off-by: Cornelia Huck <cohuck@redhat.com>
 ---
- target/s390x/translate.c | 5 +++++
- 1 file changed, 5 insertions(+)
+ target/s390x/helper.h      | 1 +
+ target/s390x/insn-data.def | 1 +
+ target/s390x/misc_helper.c | 9 +++++++++
+ target/s390x/translate.c   | 8 ++++++++
+ 4 files changed, 19 insertions(+)
 
+diff --git a/target/s390x/helper.h b/target/s390x/helper.h
+index 3eb7715e5b..ba11cfdc30 100644
+--- a/target/s390x/helper.h
++++ b/target/s390x/helper.h
+@@ -166,6 +166,7 @@ DEF_HELPER_3(msch, void, env, i64, i64)
+ DEF_HELPER_2(rchp, void, env, i64)
+ DEF_HELPER_2(rsch, void, env, i64)
+ DEF_HELPER_3(ssch, void, env, i64, i64)
++DEF_HELPER_2(stcrw, void, env, i64)
+ DEF_HELPER_3(stsch, void, env, i64, i64)
+ DEF_HELPER_3(tsch, void, env, i64, i64)
+ DEF_HELPER_2(chsc, void, env, i64)
+diff --git a/target/s390x/insn-data.def b/target/s390x/insn-data.def
+index 8c2541f545..43ab1963c8 100644
+--- a/target/s390x/insn-data.def
++++ b/target/s390x/insn-data.def
+@@ -1055,6 +1055,7 @@
+     C(0xb23b, RCHP,    S,     Z,   0, 0, 0, 0, rchp, 0)
+     C(0xb238, RSCH,    S,     Z,   0, 0, 0, 0, rsch, 0)
+     C(0xb233, SSCH,    S,     Z,   0, insn, 0, 0, ssch, 0)
++    C(0xb239, STCRW,   S,     Z,   0, insn, 0, 0, stcrw, 0)
+     C(0xb234, STSCH,   S,     Z,   0, insn, 0, 0, stsch, 0)
+     C(0xb235, TSCH,    S,     Z,   0, insn, 0, 0, tsch, 0)
+     /* ??? Not listed in PoO ninth edition, but there's a linux driver that
+diff --git a/target/s390x/misc_helper.c b/target/s390x/misc_helper.c
+index 769ec52e1d..04fb53d8a3 100644
+--- a/target/s390x/misc_helper.c
++++ b/target/s390x/misc_helper.c
+@@ -385,6 +385,15 @@ void HELPER(ssch)(CPUS390XState *env, uint64_t r1, uint64_t inst)
+     qemu_mutex_unlock_iothread();
+ }
+ 
++void HELPER(stcrw)(CPUS390XState *env, uint64_t inst)
++{
++    S390CPU *cpu = s390_env_get_cpu(env);
++
++    qemu_mutex_lock_iothread();
++    ioinst_handle_stcrw(cpu, inst >> 16, GETPC());
++    qemu_mutex_unlock_iothread();
++}
++
+ void HELPER(stsch)(CPUS390XState *env, uint64_t r1, uint64_t inst)
+ {
+     S390CPU *cpu = s390_env_get_cpu(env);
 diff --git a/target/s390x/translate.c b/target/s390x/translate.c
-index d13f531c5b..38e1770e5e 100644
+index 38e1770e5e..08c1ace0d8 100644
 --- a/target/s390x/translate.c
 +++ b/target/s390x/translate.c
-@@ -3897,7 +3897,10 @@ static ExitStatus op_stcke(DisasContext *s, DisasOps *o)
- {
-     TCGv_i64 c1 = tcg_temp_new_i64();
-     TCGv_i64 c2 = tcg_temp_new_i64();
-+    TCGv_i64 todpr = tcg_temp_new_i64();
-     gen_helper_stck(c1, cpu_env);
-+    /* 16 bit value store in an uint32_t (only valid bits set) */
-+    tcg_gen_ld32u_i64(todpr, cpu_env, offsetof(CPUS390XState, todpr));
-     /* Shift the 64-bit value into its place as a zero-extended
-        104-bit value.  Note that "bit positions 64-103 are always
-        non-zero so that they compare differently to STCK"; we set
-@@ -3905,11 +3908,13 @@ static ExitStatus op_stcke(DisasContext *s, DisasOps *o)
-     tcg_gen_shli_i64(c2, c1, 56);
-     tcg_gen_shri_i64(c1, c1, 8);
-     tcg_gen_ori_i64(c2, c2, 0x10000);
-+    tcg_gen_or_i64(c2, c2, todpr);
-     tcg_gen_qemu_st64(c1, o->in2, get_mem_index(s));
-     tcg_gen_addi_i64(o->in2, o->in2, 8);
-     tcg_gen_qemu_st64(c2, o->in2, get_mem_index(s));
-     tcg_temp_free_i64(c1);
-     tcg_temp_free_i64(c2);
-+    tcg_temp_free_i64(todpr);
-     /* ??? We don't implement clock states.  */
-     gen_op_movi_cc(s, 0);
+@@ -4071,6 +4071,14 @@ static ExitStatus op_stsch(DisasContext *s, DisasOps *o)
      return NO_EXIT;
+ }
+ 
++static ExitStatus op_stcrw(DisasContext *s, DisasOps *o)
++{
++    check_privileged(s);
++    gen_helper_stcrw(cpu_env, o->in2);
++    set_cc_static(s);
++    return NO_EXIT;
++}
++
+ static ExitStatus op_tsch(DisasContext *s, DisasOps *o)
+ {
+     check_privileged(s);
 -- 
 2.13.6
