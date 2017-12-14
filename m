@@ -1,36 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44546)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50018)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <maxime.coquelin@redhat.com>) id 1ePWiX-0008EL-Tm
-	for qemu-devel@nongnu.org; Thu, 14 Dec 2017 11:50:43 -0500
+	(envelope-from <eblake@redhat.com>) id 1ePWum-0004yp-Lr
+	for qemu-devel@nongnu.org; Thu, 14 Dec 2017 12:03:21 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <maxime.coquelin@redhat.com>) id 1ePWiS-00079M-VB
-	for qemu-devel@nongnu.org; Thu, 14 Dec 2017 11:50:41 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:48582)
+	(envelope-from <eblake@redhat.com>) id 1ePWui-0000HW-KJ
+	for qemu-devel@nongnu.org; Thu, 14 Dec 2017 12:03:20 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:33100)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <maxime.coquelin@redhat.com>)
-	id 1ePWiS-00078x-Mc
-	for qemu-devel@nongnu.org; Thu, 14 Dec 2017 11:50:36 -0500
-References: <286AC319A985734F985F78AFA26841F73937EEED@shsmsx102.ccr.corp.intel.com>
-	<20171212101440.GB6985@stefanha-x1.localdomain>
-	<5A30E0C1.3070905@intel.com>
-	<20171213123521.GL16782@stefanha-x1.localdomain>
-	<20171213165142-mutt-send-email-mst@kernel.org>
-	<CAJSP0QWHJBL4APkeMt8-P8PFaPF=Vbi0NSnJtU7YX67fJrW=hw@mail.gmail.com>
-	<825b8205-0b88-a198-b77d-63c8f2563c2e@redhat.com>
-	<20171214154656.GR14433@stefanha-x1.localdomain>
-	<20171214180830-mutt-send-email-mst@kernel.org>
-	<31609e8a-8446-cc8c-dc3b-a72d37086358@redhat.com>
-	<20171214184009-mutt-send-email-mst@kernel.org>
-From: Maxime Coquelin <maxime.coquelin@redhat.com>
-Message-ID: <f705f911-ec01-0ae2-1274-a2ffb9bf1015@redhat.com>
-Date: Thu, 14 Dec 2017 17:50:22 +0100
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1ePWui-0000H0-CC
+	for qemu-devel@nongnu.org; Thu, 14 Dec 2017 12:03:16 -0500
+References: <20171023151310.6462-1-vadim.galitsyn@profitbricks.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <d174413b-b6bf-2730-fdd5-3669751c588d@redhat.com>
+Date: Thu, 14 Dec 2017 11:03:12 -0600
 MIME-Version: 1.0
-In-Reply-To: <20171214184009-mutt-send-email-mst@kernel.org>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [virtio-dev] Re: [virtio-dev] [PATCH v3 0/7]
- Vhost-pci for inter-VM communication
+In-Reply-To: <20171023151310.6462-1-vadim.galitsyn@profitbricks.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="p39bTnfK34bpD0m7MI1MkWshAd09jfR3h"
+Subject: Re: [Qemu-devel] QMP, HMP: introduce 'writeconfig' command
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -39,81 +27,88 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: Stefan Hajnoczi <stefanha@redhat.com>, Stefan Hajnoczi <stefanha@gmail.com>, Wei Wang <wei.w.wang@intel.com>, "virtio-dev@lists.oasis-open.org" <virtio-dev@lists.oasis-open.org>, "Yang, Zhiyong" <zhiyong.yang@intel.com>, "jan.kiszka@siemens.com" <jan.kiszka@siemens.com>, "jasowang@redhat.com" <jasowang@redhat.com>, "avi.cohen@huawei.com" <avi.cohen@huawei.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "pbonzini@redhat.com" <pbonzini@redhat.com>, "marcandre.lureau@redhat.com" <marcandre.lureau@redhat.com>, snabb-devel@googlegroups.com, dgilbert@redhat.com
+To: Vadim Galitsyn <vadim.galitsyn@profitbricks.com>, Markus Armbruster <armbru@redhat.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>, qemu-devel@nongnu.org
+
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--p39bTnfK34bpD0m7MI1MkWshAd09jfR3h
+From: Eric Blake <eblake@redhat.com>
+To: Vadim Galitsyn <vadim.galitsyn@profitbricks.com>,
+ Markus Armbruster <armbru@redhat.com>,
+ "Dr . David Alan Gilbert" <dgilbert@redhat.com>, qemu-devel@nongnu.org
+Message-ID: <d174413b-b6bf-2730-fdd5-3669751c588d@redhat.com>
+Subject: Re: QMP, HMP: introduce 'writeconfig' command
+References: <20171023151310.6462-1-vadim.galitsyn@profitbricks.com>
+In-Reply-To: <20171023151310.6462-1-vadim.galitsyn@profitbricks.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+
+On 10/23/2017 10:13 AM, Vadim Galitsyn wrote:
+> Hi Guys,
+>=20
+> This thread is a continuation of discussion started in
+> http://lists.nongnu.org/archive/html/qemu-devel/2017-02/msg03182.html.
+>=20
+> This series introduces =E2=80=98writeconfig=E2=80=99 command support fo=
+r QMP and HMP monitors. This functionality might be useful for live migra=
+tion for cases when guest configuration was modified in runtime (for exam=
+ple as a result of hot- plug/unplug operations) and actual Qemu command l=
+ine no longer reflects setup exposed to guest.
+>=20
+> Original series has =E2=80=98qemu_opts=E2=80=99 patch as well (http://l=
+ists.nongnu.org/archive/html/qemu-devel/2017-02/msg03183.html) because HM=
+P=E2=80=99s =E2=80=98object_add=E2=80=99 result was not reflected in =E2=80=
+=98writeconfig=E2=80=99 output. Later I found that QMP=E2=80=99s =E2=80=98=
+object-add=E2=80=99 has the same issue. Anyway, I don=E2=80=99t include =E2=
+=80=98qemu_opts=E2=80=99 patches here because Markus mentioned (here http=
+://lists.nongnu.org/archive/html/qemu-devel/2017-02/msg03476.html) that t=
+his functionality is going to be reworked in some future and such patches=
+ might collide with the rework process.
+>=20
+> Markus, could you please post if you have an update on this topic? Curr=
+ent =E2=80=98master=E2=80=99 branch (9993c82dc2f5ce58b41d708b765e1a717ad4=
+281d) still has the issue.
+>=20
+> Also, Markus mentioned that once configuration was changed during live =
+migration -- it might be an issue because =E2=80=98writeconfig=E2=80=99 d=
+ata became outdated (and might be make sense to think about to embed this=
+ data into migration stream itself). In the same time David said that thi=
+s is another problem which is unrelated to this patch series. What is you=
+r current opinion on this topic? Can we consider these patches to be incl=
+uded into =E2=80=98master=E2=80=99 taking into account that not all confi=
+guration is dumped by =E2=80=98writeconfig=E2=80=99 (=E2=80=98object_add=E2=
+=80=99 problem), but this can be fixed later?
+
+I don't think we should expose 'writeconfig' via QMP as long as there is
+still the chance of inconsistent data being written.  And I think we
+have a lot more issues where existing code abuses QemuOpts in ways that
+current configuration does not match the original command line, but
+where you cannot easily expose the current configuration in a way that
+would be reparsed by the command line into the current state.
+Therefore, I'm not sure this series is worthwhile.
+
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
 
 
+--p39bTnfK34bpD0m7MI1MkWshAd09jfR3h
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
 
-On 12/14/2017 05:40 PM, Michael S. Tsirkin wrote:
-> On Thu, Dec 14, 2017 at 05:39:19PM +0100, Maxime Coquelin wrote:
->>
->>
->> On 12/14/2017 05:27 PM, Michael S. Tsirkin wrote:
->>> On Thu, Dec 14, 2017 at 03:46:56PM +0000, Stefan Hajnoczi wrote:
->>>> On Wed, Dec 13, 2017 at 10:50:11PM +0100, Maxime Coquelin wrote:
->>>>> On 12/13/2017 09:08 PM, Stefan Hajnoczi wrote:
->>>>>> On Wed, Dec 13, 2017 at 3:01 PM, Michael S. Tsirkin <mst@redhat.com> wrote:
->>>>>>> On Wed, Dec 13, 2017 at 12:35:21PM +0000, Stefan Hajnoczi wrote:
->>>>>>>> I'm not saying that DPDK should use libvhost-user.  I'm saying that it's
->>>>>>>> easy to add vfio vhost-pci support (for the PCI adapter I described) to
->>>>>>>> DPDK.  This patch series would require writing a completely new slave
->>>>>>>> for vhost-pci because the device interface is so different from
->>>>>>>> vhost-user.
->>>>>>>
->>>>>>> The main question is how appropriate is the vhost user protocol
->>>>>>> for passing to guests. And I am not sure at this point.
->>>>>>>
->>>>>>> Someone should go over vhost user messages and see whether they are safe
->>>>>>> to pass to guest. If most are then we can try the transparent approach.
->>>>>>> If most aren't then we can't and might as well use the proposed protocol
->>>>>>> which at least has code behind it.
->>>>>>
->>>>>> I have done that:
->>>>>>
->>>>> ...
->>>>>>     * VHOST_USER_SET_MEM_TABLE
->>>>>>
->>>>>>       Set up BARs before sending a VHOST_USER_SET_MEM_TABLE to the guest.
->>>>>
->>>>> It would require to filter out userspace_addr from the payload not to
->>>>> leak other QEMU process VAs to the guest.
->>>>
->>>> QEMU's vhost-user master implementation is insecure because it leaks
->>>> QEMU process VAs.  This also affects vhost-user host processes, not just
->>>> vhost-pci.
->>>>
->>>> The QEMU vhost-user master could send an post-IOMMU guest physical
->>>> addresses whereever the vhost-user protocol specification says "user
->>>> address".  That way no address space information is leaked although it
->>>> does leak IOMMU mappings.
->>>>
->>>> If we want to hide the IOMMU mappings too then we need another logical
->>>> address space (kind a randomized ramaddr_t).
->>>>
->>>> Anyway, my point is that the current vhost-user master implementation is
->>>> insecure and should be fixed.  vhost-pci doesn't need to worry about
->>>> this issue.
->>>>
->>>> Stefan
->>>
->>> I was going to make this point too.  It does not look like anyone uses
->>> userspace_addr. It might have been a mistake to put it there -
->>> maybe we should have reused it for map offset.
->>>
->>> It does not look like anyone uses this for anything.
->>>
->>> How about we put zero, or a copy of the GPA there?
->>>
->>>
->>
->> It is used when no iommu for the ring addresses, and when iommu is used
->> for the IOTLB update messages.
->>
->> Maxime
-> 
-> How do clients use it? Why won't GPA do just as well?
+-----BEGIN PGP SIGNATURE-----
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
 
-It is used to calculate the offset in the regions, so if we change all
-to use GPA, it may work without backend change.
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAloyrtEACgkQp6FrSiUn
+Q2oHNgf/Txofw1kLP5Okt9O6j3YiV3g1fzRXskAa8ig1lw7OvnKtqL6C420MhsN8
+wcVH0cnAjs8qtaiu/O6vi6dN2pZUazS8jcmFYAhkk8qH1sxAfHYoNfA6THQ9pC0P
+t0CVN48uXaZBVrqKrcbgxhrRowx2SMDsjc3vlZytSBnqUoakdxZ0S27lYGLBrAPS
+4m492UWEbz02cRAY3WeqcGrFasnzWggn3/unvuM4B5Vd0CyE2KjoevJNee9xDDLL
+lt+dVLlRFvVMHaQ8EZJ5WI+J3oJQywKuyXraQ6hnCUgiW5q74iWfMp/UFAT5GPd5
+TMXiz8NzAlRTOXj7xb3xuBqNx9lP7A==
+=m7NC
+-----END PGP SIGNATURE-----
 
-Maxime
+--p39bTnfK34bpD0m7MI1MkWshAd09jfR3h--
