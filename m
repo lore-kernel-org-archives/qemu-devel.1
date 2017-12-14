@@ -1,29 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54014)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36110)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jan.dakinevich@virtuozzo.com>) id 1ePagf-0001YU-Tv
-	for qemu-devel@nongnu.org; Thu, 14 Dec 2017 16:05:03 -0500
+	(envelope-from <lepton@google.com>) id 1ePb0O-0005Rv-Ol
+	for qemu-devel@nongnu.org; Thu, 14 Dec 2017 16:25:25 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jan.dakinevich@virtuozzo.com>) id 1ePagd-0005Av-5r
-	for qemu-devel@nongnu.org; Thu, 14 Dec 2017 16:05:01 -0500
-Received: from mail-ve1eur01on0102.outbound.protection.outlook.com
-	([104.47.1.102]:12675
-	helo=EUR01-VE1-obe.outbound.protection.outlook.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <jan.dakinevich@virtuozzo.com>)
-	id 1ePagc-00058B-LE
-	for qemu-devel@nongnu.org; Thu, 14 Dec 2017 16:04:59 -0500
-Date: Fri, 15 Dec 2017 00:06:06 +0300
-From: Jan Dakinevich <jan.dakinevich@virtuozzo.com>
-Message-ID: <20171215000606.382a3ce7@virtuozzo.com>
-In-Reply-To: <20171214120519.48edb873.cohuck@redhat.com>
-References: <1508867404-18046-1-git-send-email-jan.dakinevich@virtuozzo.com>
-	<20171212165450.6b6e823f@virtuozzo.com>
-	<20171214120519.48edb873.cohuck@redhat.com>
+	(envelope-from <lepton@google.com>) id 1ePb0N-0003te-VF
+	for qemu-devel@nongnu.org; Thu, 14 Dec 2017 16:25:24 -0500
+Received: from mail-wr0-x241.google.com ([2a00:1450:400c:c0c::241]:33143)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <lepton@google.com>) id 1ePb0N-0003qr-EK
+	for qemu-devel@nongnu.org; Thu, 14 Dec 2017 16:25:23 -0500
+Received: by mail-wr0-x241.google.com with SMTP id v34so433179wrb.0
+	for <qemu-devel@nongnu.org>; Thu, 14 Dec 2017 13:25:22 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [RFC v5 0/2] virtio: introduce `info virtio' hmp
- command
+In-Reply-To: <20171207065639.164900-1-lepton@google.com>
+References: <20171207065639.164900-1-lepton@google.com>
+From: =?UTF-8?B?VGFvIFd1KOWQtOa2m0BFbmcp?= <lepton@google.com>
+Date: Thu, 14 Dec 2017 13:25:19 -0800
+Message-ID: <CAOvqHj4P17JQ=bJqpZsA3n-sfw927Sad3-YD2FUHff1zhpanGA@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH] hw/input/hid: Add support for several keys.
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,139 +27,53 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Cornelia Huck <cohuck@redhat.com>
-Cc: qemu-devel@nongnu.org, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Eric Blake <eblake@redhat.com>, Markus Armbruster <armbru@redhat.com>, Kevin Wolf <kwolf@redhat.com>, "Denis V. Lunev" <den@virtuozzo.com>, Max Reitz <mreitz@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
+To: QEMU <qemu-devel@nongnu.org>
+Cc: qemu-trivial@nongnu.org, kraxel@redhat.com, mjt@tls.msk.ru, Laurent Vivier <laurent@vivier.eu>, Tao Wu <lepton@google.com>
 
-On Thu, 14 Dec 2017 12:05:19 +0100
-Cornelia Huck <cohuck@redhat.com> wrote:
+Anybody can merge this?
 
-> On Tue, 12 Dec 2017 16:54:50 +0300
-> Jan Dakinevich <jan.dakinevich@virtuozzo.com> wrote:
-> 
-> > I am going to reanimate works under this QMP/HMP. First of all, it
-> > could be meaningful to settle what output would provide the QMP. I
-> > would like to suggest the following description:
-> > 
-> > ##
-> > # @VirtioFeature:
-> > ##
-> > {
-> >     'struct': 'VirtioFeature',
-> >     'data': {
-> >         'name': 'str',
-> >         'acked': 'bool'
-> >     }
-> > }
-> > 
-> > ##
-> > # @VirtioInfo:
-> > ##
-> > {
-> >     'struct': 'VirtioInfo',
-> >     'data': {
-> >         'qom-path': 'str',
-> >         
-> >         'status': 'uint8',
-> >         'host-features': 'uint64',
-> >         'guest-features': 'uint64',
-> > 
-> >         'status-names': ['str'],
-> >         'common-features-names': ['VirtioFeature'],
-> >         'device-features-names': ['VirtioFeature']
-> >     }
-> > }
-> > 
-> > ##
-> > # @query-virtio:
-> > ##
-> > {
-> >     'command': 'query-virtio',
-> >     'data': {'*path': 'str'},
-> >     'returns': ['VirtioInfo']
-> > }
-> > 
-> > My final goal is to implement HMP which will print all exposed
-> > virtio features (both common and device-specific) with their
-> > acknowledgements, and virtio device configuration status. These are
-> > provided by last 3 fields in @VirtioInfo.
-> > 
-> > For these who are going make own decision on features and status
-> > bitmask, respective fields with raw values are preserved.
-> 
-> Looks sensible. What will you return an for the *-features-names
-> fields if the status field indicates that negotiation is not yet done?
-> (This has some fun interaction with the VERSION_1 feature bit...)
-> 
+It's a simple change:  actually it only changed 4 bytes in hid usage
+table to enable 4 keys: audiomute volumeup volumedown and power.
 
-Hmm... I was going to return current features and theirs
-acknowledgments regardless if they were negotiated. Thus,
-*-features-names would contain all exposed host features with `false'
-in `acked' field.
+It's easy to verify what the patch is doing:
 
-> > 
-> > So, I expect following data on the wire in response to
-> > `query-virtio' command:
-> > 
-> > {
-> >     "return": [
-> >         {
-> >             "qom-path":
-> > "/machine/peripheral-anon/device[0]/virtio-backend", "status": 15,
-> > "host-features": 6325010438, "guest-features": 5100273670,
-> >             "status-names": [
-> >                 "acknowledge", 
-> >                 "driver", 
-> >                 "driver-ok", 
-> >                 "features-ok"
-> >             ],
-> >             "common-features-names": [
-> >                 {"name": "notify-on-empty", "acked": false},
-> >                 {"name": "any-layout", "acked": false},
-> >                 {"name": "indirect-desc", "acked": true},
-> >                 {"name": "event-idx", "acked": true},
-> >                 {"name": "bad-feature", "acked": false},
-> >                 {"name": "version-1", "acked": true}
-> >             ],
-> >             "device-features-names": [
-> >                 {"name": "hotplug", "acked": true},
-> >                 {"name": "change", "acked": true}
-> 
-> I suggest to use the #defines as names, especially as they are also
-> used in the spec. Makes grepping easier.
-> 
+Boot some guest os with argument "-usbdevice keyboard"  and use qemu
+monitor console to do "sendkey audiomute", without this patch, nothing
+happend inside guest os. with this patch,  all these 4 keys work correctly.
 
-You mean, for example "VIRTIO_RING_F_EVENT_IDX" instead of "event-idx"
-should be used. Right?
-
-> >             ]
-> >         }
-> >     ]
-> > }
-> > 
-> > 
-> > Eric Blake, returning to your question which would probably appear
-> > again after this mail:
-> > 
-> > >> +##
-> > >> +# @query-virtio:
-> > >> ...
-> > >> +##
-> > >> +{
-> > >> +    'command': 'query-virtio',
-> > >> +    'data': { '*path': 'str' },    
-> > >
-> > > Do we need filterable queries, or is it better to just have the
-> > > command return info on all virtio devices at once and let the
-> > > client filter the results as desired?  
-> > 
-> > I think it would be better to do here. I suppose, the client which
-> > uses HMP will not be happy on filtering monitor output.
-> 
-> I think being able to optionally specify a path is the most flexible
-> solution.
-
-
-
--- 
-Best regards
-Jan Dakinevich
+On Wed, Dec 6, 2017 at 10:56 PM, Tao Wu <lepton@google.com> wrote:
+> Add support for these keys: audiomute volumedown volumeup power.
+> Tested with "sendkey" command in monitor and verify the behavior
+> in guest OS.
+>
+> Signed-off-by: Tao Wu <lepton@google.com>
+> ---
+>  hw/input/hid.c | 8 ++++----
+>  1 file changed, 4 insertions(+), 4 deletions(-)
+>
+> diff --git a/hw/input/hid.c b/hw/input/hid.c
+> index 0d049ff61c..aa4fb826fd 100644
+> --- a/hw/input/hid.c
+> +++ b/hw/input/hid.c
+> @@ -57,14 +57,14 @@ static const uint8_t hid_usage_keys[0x100] = {
+>      0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+>      0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+>      0x00, 0x00, 0x00, 0x00, 0x58, 0xe4, 0x00, 0x00,
+> -    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+> -    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+> -    0x00, 0x00, 0x00, 0x00, 0x00, 0x54, 0x00, 0x46,
+> +    0x7f, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+> +    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x81, 0x00,
+> +    0x80, 0x00, 0x00, 0x00, 0x00, 0x54, 0x00, 0x46,
+>      0xe6, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+>      0x00, 0x00, 0x00, 0x00, 0x00, 0x48, 0x48, 0x4a,
+>      0x52, 0x4b, 0x00, 0x50, 0x00, 0x4f, 0x00, 0x4d,
+>      0x51, 0x4e, 0x49, 0x4c, 0x00, 0x00, 0x00, 0x00,
+> -    0x00, 0x00, 0x00, 0xe3, 0xe7, 0x65, 0x00, 0x00,
+> +    0x00, 0x00, 0x00, 0xe3, 0xe7, 0x65, 0x66, 0x00,
+>      0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+>      0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+>      0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+> --
+> 2.15.1.424.g9478a66081-goog
+>
