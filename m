@@ -1,34 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33627)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34980)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1ePXsR-0003Uh-IO
-	for qemu-devel@nongnu.org; Thu, 14 Dec 2017 13:05:00 -0500
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1ePXuZ-000524-Vk
+	for qemu-devel@nongnu.org; Thu, 14 Dec 2017 13:07:12 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1ePXsO-0000wG-5s
-	for qemu-devel@nongnu.org; Thu, 14 Dec 2017 13:04:59 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:35164)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1ePXsN-0000vf-Vs
-	for qemu-devel@nongnu.org; Thu, 14 Dec 2017 13:04:56 -0500
-Date: Thu, 14 Dec 2017 18:04:49 +0000
-From: Stefan Hajnoczi <stefanha@redhat.com>
-Message-ID: <20171214180449.GU14433@stefanha-x1.localdomain>
-References: <20171207213420-mutt-send-email-mst@kernel.org>
-	<5A2A347B.9070006@intel.com>
-	<CAJSP0QUAqCzFgVtM1cg_KybdyrZa_FRUHhDN7oLfRjZ2ZVkp4g@mail.gmail.com>
-	<286AC319A985734F985F78AFA26841F73937E001@shsmsx102.ccr.corp.intel.com>
-	<20171211111147.GF13593@stefanha-x1.localdomain>
-	<286AC319A985734F985F78AFA26841F73937EEED@shsmsx102.ccr.corp.intel.com>
-	<20171212101440.GB6985@stefanha-x1.localdomain>
-	<5A30E0C1.3070905@intel.com>
-	<20171213123521.GL16782@stefanha-x1.localdomain>
-	<5A3211CC.60607@intel.com>
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1ePXuW-0003Ac-5z
+	for qemu-devel@nongnu.org; Thu, 14 Dec 2017 13:07:11 -0500
+Received: from mail-it0-x241.google.com ([2607:f8b0:4001:c0b::241]:36687)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1ePXuW-0003A0-26
+	for qemu-devel@nongnu.org; Thu, 14 Dec 2017 13:07:08 -0500
+Received: by mail-it0-x241.google.com with SMTP id d16so13150141itj.1
+	for <qemu-devel@nongnu.org>; Thu, 14 Dec 2017 10:07:08 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="czRehjsqUdpaVUeF"
-Content-Disposition: inline
-In-Reply-To: <5A3211CC.60607@intel.com>
-Subject: Re: [Qemu-devel] [virtio-dev] [PATCH v3 0/7] Vhost-pci for inter-VM
- communication
+Sender: philippe.mathieu.daude@gmail.com
+In-Reply-To: <CAKmqyKN5dk=sEpSqbnDzyUoSp01YdOaOGQQZBDjcQsaEVhZ-xQ@mail.gmail.com>
+References: <20171213195852.30439-1-f4bug@amsat.org>
+	<20171213195852.30439-10-f4bug@amsat.org>
+	<CAKmqyKN5dk=sEpSqbnDzyUoSp01YdOaOGQQZBDjcQsaEVhZ-xQ@mail.gmail.com>
+From: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>
+Date: Thu, 14 Dec 2017 15:07:06 -0300
+Message-ID: <CAAdtpL4A35MBm7-uRHzbz2eFkJnh6FQ-HpZS+wwu-Y=KT33Npw@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH 09/14] sdhci: refactor common sysbus/pci
+ unrealize() into sdhci_unrealizefn()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,42 +35,47 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Wei Wang <wei.w.wang@intel.com>
-Cc: Stefan Hajnoczi <stefanha@gmail.com>, "Michael S. Tsirkin" <mst@redhat.com>, "virtio-dev@lists.oasis-open.org" <virtio-dev@lists.oasis-open.org>, "Yang, Zhiyong" <zhiyong.yang@intel.com>, "jan.kiszka@siemens.com" <jan.kiszka@siemens.com>, "jasowang@redhat.com" <jasowang@redhat.com>, "avi.cohen@huawei.com" <avi.cohen@huawei.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "pbonzini@redhat.com" <pbonzini@redhat.com>, "marcandre.lureau@redhat.com" <marcandre.lureau@redhat.com>
+To: Alistair Francis <alistair.francis@xilinx.com>
+Cc: "Edgar E . Iglesias" <edgar.iglesias@xilinx.com>, Prasad J Pandit <pjp@fedoraproject.org>, Peter Maydell <peter.maydell@linaro.org>, Andrew Baumann <Andrew.Baumann@microsoft.com>, Andrey Smirnov <andrew.smirnov@gmail.com>, Andrey Yurovsky <yurovsky@gmail.com>, Sai Pavan Boddu <saipava@xilinx.com>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>
 
+On Thu, Dec 14, 2017 at 2:46 PM, Alistair Francis
+<alistair.francis@xilinx.com> wrote:
+> On Wed, Dec 13, 2017 at 11:58 AM, Philippe Mathieu-Daud=C3=A9
+> <f4bug@amsat.org> wrote:
+>> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
+>> ---
+>>  hw/sd/sdhci.c | 21 ++++++++++++++++++---
+>>  1 file changed, 18 insertions(+), 3 deletions(-)
+>>
+>> diff --git a/hw/sd/sdhci.c b/hw/sd/sdhci.c
+>> index 893be0e606..044e3d62f1 100644
+>> --- a/hw/sd/sdhci.c
+>> +++ b/hw/sd/sdhci.c
+>> @@ -31,6 +31,7 @@
+>>  #include "hw/sd/sdhci.h"
+>>  #include "sdhci-internal.h"
+>>  #include "sd-internal.h"
+>> +#include "qapi/error.h"
+>>  #include "qemu/log.h"
+>>
+>>  /* host controller debug messages */
+>> @@ -1191,17 +1192,21 @@ static void sdhci_realizefn(SDHCIState *s, Error=
+ **errp)
+>>                            SDHC_REGISTERS_MAP_SIZE);
+>>  }
+>>
+>> +static void sdhci_unrealizefn(SDHCIState *s, Error **errp)
+>> +{
+>> +    g_free(s->fifo_buffer);
+>> +    s->fifo_buffer =3D NULL;
+>
+> I don't think setting this to NULL is required. Shouldn't g_free() do
+> that for you?
 
---czRehjsqUdpaVUeF
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+You are right, good eye :) I didn't notice, this was just code
+movement from the current code.
 
-On Thu, Dec 14, 2017 at 01:53:16PM +0800, Wei Wang wrote:
-> 3rd one: I'm not able to solve this one, as discussed, there are too many
-> differences and it's too complex. I prefer the direction of simply gating
-> the vhost-user protocol and deliver to the guest what it should see (just
-> what this patch series shows). You would need to solve this issue to show
-> this direction is simpler :)
-
-At the moment the main issue deciding what to do seems to be that we
-have no patches for the approach I've described.  I'll begin working on
-a patch series.
-
-If there is something else you think I could help with, please let me
-know.  I'd like to contribute to vhost-pci.
-
-Stefan
-
---czRehjsqUdpaVUeF
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEcBAEBAgAGBQJaMr1AAAoJEJykq7OBq3PIFvQH/RAi3gBpD/q6kJYUVifaS3cE
-grZ6O7cv6GpElcI233as+iRFBp+majF/YLKkcfGphURRxONp5381LLZOgnqmXrE9
-Xaj/e36JTLCHnoa4NExoY9BKoYo30qkuMbToxEbIfraxDIlzPfJzAEohsBhzrY9e
-ev/T3xxATroFZqgrWNCMFiX7irT4pwgRVgPA/9HBz96YWYqmbsGwtbecOKvHXrQR
-oj79P8UAJW4AK8PqlcibSM7kRmw+4B5c+uvXVek4lQybnaxAi+nCbtYZK8fEE4tJ
-Nt7poKe/EyYryWJyNUWMu163yCUKYToI2qBsrZmrJuNHL0gcUOaba1SEqPKYDx4=
-=bn72
------END PGP SIGNATURE-----
-
---czRehjsqUdpaVUeF--
+Indeed g_free() doesn't free() if the pointer is NULL, however since
+it doesn't have access to the pointer address it can't set it to NULL.
+In some case it matters (RCU code maybe?) but I just checked and it
+this case it doesn't, so I'll drop this line.
