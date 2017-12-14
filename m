@@ -1,26 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52367)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53692)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1ePTNW-0003j1-Vo
-	for qemu-devel@nongnu.org; Thu, 14 Dec 2017 08:16:47 -0500
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1ePTPc-0004rO-5t
+	for qemu-devel@nongnu.org; Thu, 14 Dec 2017 08:18:57 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1ePTNT-0005iL-Lb
-	for qemu-devel@nongnu.org; Thu, 14 Dec 2017 08:16:46 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:39090)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1ePTNT-0005h1-F3
-	for qemu-devel@nongnu.org; Thu, 14 Dec 2017 08:16:43 -0500
-Date: Thu, 14 Dec 2017 13:16:32 +0000
-From: Stefan Hajnoczi <stefanha@redhat.com>
-Message-ID: <20171214131632.GI14433@stefanha-x1.localdomain>
-References: <20171205055200.16305-1-peterx@redhat.com>
-	<20171205055200.16305-21-peterx@redhat.com>
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1ePTPY-0000Sg-VM
+	for qemu-devel@nongnu.org; Thu, 14 Dec 2017 08:18:56 -0500
+Received: from mail-qk0-x232.google.com ([2607:f8b0:400d:c09::232]:33670)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1ePTPY-0000RL-OH
+	for qemu-devel@nongnu.org; Thu, 14 Dec 2017 08:18:52 -0500
+Received: by mail-qk0-x232.google.com with SMTP id 63so6146152qke.0
+	for <qemu-devel@nongnu.org>; Thu, 14 Dec 2017 05:18:52 -0800 (PST)
+Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
+	<philippe.mathieu.daude@gmail.com>
+References: <20171213232025.24503-1-f4bug@amsat.org>
+	<20171213232025.24503-2-f4bug@amsat.org>
+	<20171214090658.GA3731@dhcp-200-186.str.redhat.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Message-ID: <2b32e086-806f-1fc3-3415-358dd787543e@amsat.org>
+Date: Thu, 14 Dec 2017 10:18:44 -0300
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="OfrWf2Fun5Ae4m0Y"
-Content-Disposition: inline
-In-Reply-To: <20171205055200.16305-21-peterx@redhat.com>
-Subject: Re: [Qemu-devel] [RFC v5 20/26] qmp: support out-of-band (oob)
- execution
+In-Reply-To: <20171214090658.GA3731@dhcp-200-186.str.redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH 01/26] sdbus: add a QMP command to access a
+ SDBus
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,36 +37,56 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Xu <peterx@redhat.com>
-Cc: qemu-devel@nongnu.org, Stefan Hajnoczi <shajnocz@redhat.com>, "Daniel P . Berrange" <berrange@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Fam Zheng <famz@redhat.com>, Juan Quintela <quintela@redhat.com>, mdroth@linux.vnet.ibm.com, Eric Blake <eblake@redhat.com>, Laurent Vivier <lvivier@redhat.com>, Markus Armbruster <armbru@redhat.com>, marcandre.lureau@redhat.com, "Dr . David Alan Gilbert" <dgilbert@redhat.com>
+To: Kevin Wolf <kwolf@redhat.com>
+Cc: Alistair Francis <alistair.francis@xilinx.com>, "Edgar E . Iglesias" <edgar.iglesias@xilinx.com>, Peter Maydell <peter.maydell@linaro.org>, Markus Armbruster <armbru@redhat.com>, Michael Roth <mdroth@linux.vnet.ibm.com>, Andrey Smirnov <andrew.smirnov@gmail.com>, Andrey Yurovsky <yurovsky@gmail.com>, Eduardo Habkost <ehabkost@redhat.com>, "Daniel P . Berrange" <berrange@redhat.com>, Eric Blake <eblake@redhat.com>, Fam Zheng <famz@redhat.com>, Thomas Huth <thuth@redhat.com>, =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org
 
+Hi Kevin,
 
---OfrWf2Fun5Ae4m0Y
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+On 12/14/2017 06:06 AM, Kevin Wolf wrote:
+> Am 14.12.2017 um 00:20 hat Philippe Mathieu-Daudé geschrieben:
+>> Use Base64 to serialize the binary blobs in JSON.
+>> So far at most 512 bytes will be transfered, which result
+>> in a 684 bytes payload.
+>> Since this command is intented for qtesting, this is acceptable.
+>>
+>> Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+> 
+> Doing this kind of thing over QMP doesn't look right to me. qtests
+> should access hardware the same way as real guests access the hardware
+> (i.e. MMIO and I/O ports).
 
-On Tue, Dec 05, 2017 at 01:51:54PM +0800, Peter Xu wrote:
->      if (qdict) {
->          id = qdict_get(qdict, "id");
-> +        /* When OOB is enabled, the "id" field is mandatory. */
-> +        if (qmp_oob_enabled(mon) && !id) {
-> +            error_setg(&err, "Out-Of-Band capability requires that "
-> +                       "every command contains an 'id' field.");
+Yes, I agree with you, however this command does not implement a guest
+access behavior (MMIO and I/O ports) but a _bus_ access.
 
-Is this documented in docs/interop/qmp-spec.txt?
+Guests access buses via MMIO/IOP hardware frontend (bus master), bus
+slave devices might be considered as backend, like the BlockBackend.
 
---OfrWf2Fun5Ae4m0Y
-Content-Type: application/pgp-signature; name="signature.asc"
+As the current iotests are meant for backend testing, this command is
+meant for SDBus backend testing.
 
------BEGIN PGP SIGNATURE-----
+Actually with SDHCI I started to qtest the hardware frontend then
+realized the backend was incorrect, so I had to go this way to fix it.
+Later series do test the HCI using C qtests.
 
-iQEcBAEBAgAGBQJaMnmwAAoJEJykq7OBq3PI+dUIAKcqNtkveNbPrlD0pRQj5cCQ
-QgKWx1xiVNgiBsiENE02dNOy2d8vXcJ9wHvcwlm63GMMS/3Xufp658RtXggi2x58
-LcaDzUsC4EpbYTbRe+xj3h6CCEChQGJ5+l4HzutkNbv643Ny9E4MIysHVhA0NtYU
-8Sjj0423odKx7pjbaWesx9u5xniKB8dQvWPZUQe8VRLCsNTZEacCyd4U1uMECz5F
-yv32Rm1I2qisvmep5w7eQlhGbgdkKteFNoKKxyz2uWaH2O3ktzVH3o6pv8c+T7LD
-4OtdWgpMd5NGBRhAUD6b92PKgHaipZzX9hOr9xW8TNQPssZJKHYfZhLKNeeTMt0=
-=5IOh
------END PGP SIGNATURE-----
+This approach should works for any buses, and start to be quite
+interesting with:
+- hot-plug buses to unplug/plug slaves
+- multi-master buses like I2C to inject noise on the bus and see if the
+host can recover/continue
+- testing slave failures like a bricked SPI slave keeping some bus lines
+held and checking if the HCI expose this failure to the guest (or the
+guest checking the HCI for failures)
 
---OfrWf2Fun5Ae4m0Y--
+> But if for some reason the QMP maintainers were to think that this is
+> acceptable in QMP, I'd argue it should at least get an x-debug- prefix
+> to avoid making it a stable API that management tools may rely on.
+
+I'd rather have the qtests using this command always run (if they take
+too long they might be tagged as 'slow' tests), so I'd keep this stable.
+
+Maybe we can prefix the qtests related QMP commands as "x-qtest-"? Else
+your suggestion is fine.
+
+Regards,
+
+Phil.
