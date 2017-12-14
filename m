@@ -1,25 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41641)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44059)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1ePTpl-0006Is-Mk
-	for qemu-devel@nongnu.org; Thu, 14 Dec 2017 08:45:58 -0500
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1ePTtT-0007vb-V2
+	for qemu-devel@nongnu.org; Thu, 14 Dec 2017 08:49:48 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1ePTpg-0006EZ-L3
-	for qemu-devel@nongnu.org; Thu, 14 Dec 2017 08:45:57 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:39650)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1ePTpg-0006Cs-EV
-	for qemu-devel@nongnu.org; Thu, 14 Dec 2017 08:45:52 -0500
-Date: Thu, 14 Dec 2017 13:45:42 +0000
-From: Stefan Hajnoczi <stefanha@redhat.com>
-Message-ID: <20171214134542.GL14433@stefanha-x1.localdomain>
-References: <20171205055200.16305-1-peterx@redhat.com>
-	<20171205055200.16305-24-peterx@redhat.com>
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1ePTtQ-0001uz-0z
+	for qemu-devel@nongnu.org; Thu, 14 Dec 2017 08:49:47 -0500
+Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
+	<philippe.mathieu.daude@gmail.com>
+References: <20171213051736.17755-1-f4bug@amsat.org>
+	<20171213051736.17755-4-f4bug@amsat.org>
+	<CAAYMZQuQv-yQA2keiq=9p95jQCSz3c=Dzjaygh=co=Q25ZKdxw@mail.gmail.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Message-ID: <6568e8bf-0d20-0a4d-f799-684a2b89fc6d@amsat.org>
+Date: Thu, 14 Dec 2017 10:49:35 -0300
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="FxavXfDenm+F7xE/"
-Content-Disposition: inline
-In-Reply-To: <20171205055200.16305-24-peterx@redhat.com>
-Subject: Re: [Qemu-devel] [RFC v5 23/26] qmp: add command "x-oob-test"
+In-Reply-To: <CAAYMZQuQv-yQA2keiq=9p95jQCSz3c=Dzjaygh=co=Q25ZKdxw@mail.gmail.com>
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature";
+	boundary="lv9aTc2WDMkDP0hdIaqG5MTxWjlnNb0rw"
+Subject: Re: [Qemu-devel] [PATCH 3/4] hw/registerfields: add 64-bit
+ extract/deposit macros
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,39 +30,107 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Xu <peterx@redhat.com>
-Cc: qemu-devel@nongnu.org, Stefan Hajnoczi <shajnocz@redhat.com>, "Daniel P . Berrange" <berrange@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Fam Zheng <famz@redhat.com>, Juan Quintela <quintela@redhat.com>, mdroth@linux.vnet.ibm.com, Eric Blake <eblake@redhat.com>, Laurent Vivier <lvivier@redhat.com>, Markus Armbruster <armbru@redhat.com>, marcandre.lureau@redhat.com, "Dr . David Alan Gilbert" <dgilbert@redhat.com>
+To: francisco iglesias <frasse.iglesias@gmail.com>, Richard Henderson <richard.henderson@linaro.org>, Fam Zheng <famz@redhat.com>, =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, Peter Maydell <peter.maydell@linaro.org>
+Cc: Alistair Francis <alistair.francis@xilinx.com>, "Edgar E . Iglesias" <edgar.iglesias@xilinx.com>, qemu-trivial@nongnu.org, "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>
 
-
---FxavXfDenm+F7xE/
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--lv9aTc2WDMkDP0hdIaqG5MTxWjlnNb0rw
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+To: francisco iglesias <frasse.iglesias@gmail.com>,
+ Richard Henderson <richard.henderson@linaro.org>, Fam Zheng
+ <famz@redhat.com>, =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
+ Peter Maydell <peter.maydell@linaro.org>
+Cc: Alistair Francis <alistair.francis@xilinx.com>,
+ "Edgar E . Iglesias" <edgar.iglesias@xilinx.com>, qemu-trivial@nongnu.org,
+ "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>
+Message-ID: <6568e8bf-0d20-0a4d-f799-684a2b89fc6d@amsat.org>
+Subject: Re: [Qemu-devel] [PATCH 3/4] hw/registerfields: add 64-bit
+ extract/deposit macros
+References: <20171213051736.17755-1-f4bug@amsat.org>
+ <20171213051736.17755-4-f4bug@amsat.org>
+ <CAAYMZQuQv-yQA2keiq=9p95jQCSz3c=Dzjaygh=co=Q25ZKdxw@mail.gmail.com>
+In-Reply-To: <CAAYMZQuQv-yQA2keiq=9p95jQCSz3c=Dzjaygh=co=Q25ZKdxw@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
 
-On Tue, Dec 05, 2017 at 01:51:57PM +0800, Peter Xu wrote:
-> This command is only used to test OOB functionality.  It should not be
-> used for any other purposes.
+Hi Francisco,
+
+On 12/13/2017 06:37 PM, francisco iglesias wrote:
+> On 13 December 2017 at 06:17, Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.=
+org>
+> wrote:
+[...]
+>>  /* Extract a field from an array of registers */
+[...]
+>> +#define FIELD_DP64(storage, reg, field, val) ({
+>>  \
+>> +    struct {
+>> \
+>> +        unsigned int v:R_ ## reg ## _ ## field ## _LENGTH;
+>> \
+>>
 >=20
-> Signed-off-by: Peter Xu <peterx@redhat.com>
-> ---
->  qapi-schema.json | 18 ++++++++++++++++++
->  qmp.c            | 16 ++++++++++++++++
->  2 files changed, 34 insertions(+)
+> I'm just wondering if 'v' above maybe should be uint64_t? The size of
+> unsigned int seems to be 'implementation defined' but I would guess 32 =
+bits
+> is not unsual. Basically wouldn't a field length > 32 above be problema=
+tic?
 
-Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
+Good remark...
 
---FxavXfDenm+F7xE/
+As per the standard bitfields access must be per 'unsigned'.
+So with a LP64 data model we have sizeof(unsigned) =3D 32-bit, I wonder
+how the compiler behaves.
+
+I added the debian-win32 docker image to tests this kind of regressions,
+but it seems the current toolchain used (mingw-w64) is now only a LLP64
+model (I still need to verify).
+
+I remember I somewhere have a Linux/X32 docker suite to test this
+series. I'll give it a try (I doubt before this week-end).
+
+Regards,
+
+Phil.
+
+>> +    } v =3D { .v =3D val };
+>>  \
+>> +    uint64_t d;
+>>  \
+>> +    d =3D deposit64((storage), R_ ## reg ## _ ## field ## _SHIFT,
+>>  \
+>> +                  R_ ## reg ## _ ## field ## _LENGTH, v.v);
+>>  \
+>> +    d; })
+>>
+>>  /* Deposit a field to array of registers.  */
+>>  #define ARRAY_FIELD_DP32(regs, reg, field, val)
+>>  \
+>> --
+>> 2.15.1
+
+
+
+--lv9aTc2WDMkDP0hdIaqG5MTxWjlnNb0rw
 Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQEcBAEBAgAGBQJaMoCGAAoJEJykq7OBq3PIP2IH/j7hb/ZT9SBxylQ7RHEzys7R
-hTwLmTQlWIwcjV8OL/4IRjY88leaAgP4e2gU25ENo/TPQa5vW+d/X5YaaVZCVbGb
-Rdr6b4GGlqPMkuHHhQYDlwz71F7pJXcNOAk8H/D+vWqWFloLKhs3cbpNe2SZGCvI
-sTB0vvnuJb4/0g5bNhAbZkWqdUQRRfW0rIAOuCAoNSAPpxbjjDMVqvwXZO6grtkX
-piaArl/w9Tx/4ZI/O22Vx21NvrOW6/aaGY1xt1oRn1LVojI129B2Jym+FNXbgVMR
-mFoXF6k4pODGbCOXeoxQdzqSIoYEUEsC37HlQa18JBtpPa/xZWY5bi9Qu3nisc8=
-=GQyr
+iQIzBAEBCgAdFiEE+qvnXhKRciHc/Wuy4+MsLN6twN4FAloygW8ACgkQ4+MsLN6t
+wN4RQA//c339XM18QWIYerM/VwC9ckmYmqkSVSA66+U0fzjYziJw86G2QcCOw38T
+wU7Re9iu8bFVVaJQhLWj9XYRlcdPAT1r+TTrw4suJpWjJ2eSP2vaRDkTGnSj5sWc
+6D2LDnfLKPWWE7KjAqP89LomrFsmL7XhzuOx06Oh7faizRvhKimqkkwmlWSlHIWV
+HLMlgOnSGZT6wh218TDD7kunE0062cqPpn+CO9AdVRqBVl1xujp+vEUXIOuw3clO
+5ILw1/7wDz97MXZIfHI7XGB64BBi/xeu8hqYy4OCNFCs3AHSPTrh1ukXujdARu3p
+Fw5ZMjxl3I74K/9ELx18lklxeydaC+A6m/yp4YOj52U+fcI8Vw8YBZPzTgF+3tUg
+flK6Bh4I1hjK/hp7PZHXs1pda+DbmACfKrcIhmohIJOZ28R3T1x7CyS7ywjqsrzn
+qQ3KpnqQj2nsOZWqzi5vsrz79fM/eXkNUvzTbUZqOdOdz5kfbQuaTspyHsUrOgjt
+zY0s75VZvBeuRZUZ7RIoZmAeKT0vzF65l9Yb+zrASvLq4aahKZRmQFTAgUSJ8rML
+XpdDsGXi5Jx9wzpNqKNegUTOQVPR+WUWGGa87MSYI9cjAZiRAII0m3vV371gWhFJ
+X0H5f8Gv3344K+vxh0cb8RHtpxU7VCb4SKf4xl/XuuHsA2UD0vY=
+=o6T4
 -----END PGP SIGNATURE-----
 
---FxavXfDenm+F7xE/--
+--lv9aTc2WDMkDP0hdIaqG5MTxWjlnNb0rw--
