@@ -1,28 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43276)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45477)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1ePUZu-0001WD-JB
-	for qemu-devel@nongnu.org; Thu, 14 Dec 2017 09:33:47 -0500
+	(envelope-from <programmingkidx@gmail.com>) id 1ePUdd-0003Wv-EJ
+	for qemu-devel@nongnu.org; Thu, 14 Dec 2017 09:37:30 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1ePUZq-0005Xj-IA
-	for qemu-devel@nongnu.org; Thu, 14 Dec 2017 09:33:38 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:49017)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1ePUZq-0005TK-4x
-	for qemu-devel@nongnu.org; Thu, 14 Dec 2017 09:33:34 -0500
-From: Markus Armbruster <armbru@redhat.com>
-References: <20170911110623.24981-1-marcandre.lureau@redhat.com>
-	<20170911110623.24981-42-marcandre.lureau@redhat.com>
-	<87zi6lza7i.fsf@dusky.pond.sub.org>
-	<CAJ+F1CLe-=UOtVSN+Pnou1uOVF+sDqus3KUdJfNO5oa+VZt2=Q@mail.gmail.com>
-Date: Thu, 14 Dec 2017 15:33:30 +0100
-In-Reply-To: <CAJ+F1CLe-=UOtVSN+Pnou1uOVF+sDqus3KUdJfNO5oa+VZt2=Q@mail.gmail.com>
-	(=?utf-8?Q?=22Marc-Andr=C3=A9?= Lureau"'s message of "Thu, 14 Dec 2017
-	15:00:12 +0100")
-Message-ID: <87po7hxttx.fsf@dusky.pond.sub.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v3 41/50] qapi: add a 'unit' pragma
+	(envelope-from <programmingkidx@gmail.com>) id 1ePUdZ-00019m-Ct
+	for qemu-devel@nongnu.org; Thu, 14 Dec 2017 09:37:29 -0500
+Received: from mail-it0-x241.google.com ([2607:f8b0:4001:c0b::241]:40414)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <programmingkidx@gmail.com>)
+	id 1ePUdZ-000199-6Q
+	for qemu-devel@nongnu.org; Thu, 14 Dec 2017 09:37:25 -0500
+Received: by mail-it0-x241.google.com with SMTP id f190so11520730ita.5
+	for <qemu-devel@nongnu.org>; Thu, 14 Dec 2017 06:37:25 -0800 (PST)
+From: John Arbuckle <programmingkidx@gmail.com>
+Date: Thu, 14 Dec 2017 09:37:13 -0500
+Message-Id: <20171214143713.3795-1-programmingkidx@gmail.com>
+Subject: [Qemu-devel] [PATCH v2] Add ability for user to specify mouse
+ ungrab key
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,100 +25,183 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@gmail.com>
-Cc: QEMU <qemu-devel@nongnu.org>, Michael Roth <mdroth@linux.vnet.ibm.com>
+To: qemu-devel@nongnu.org, peter.maydell@linaro.org, kraxel@redhat.com
+Cc: John Arbuckle <programmingkidx@gmail.com>
 
-Marc-Andr=C3=A9 Lureau <marcandre.lureau@gmail.com> writes:
+Currently the ungrab keys for the Cocoa and GTK interface are Control-Alt-g.
+This combination may not be very fun for the user to have to enter, so we
+now enable the user to specify their own key as the ungrab key. Since the 
+function keys are the keys that don't tend to be used that often and are
+usually available, they will be the ones the user can pick to be the ungrab
+key.
 
-> Hi
->
-> On Thu, Dec 14, 2017 at 2:54 PM, Markus Armbruster <armbru@redhat.com> wr=
-ote:
->> Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com> writes:
->>
->>> Add a pragma that allows to tag the following expressions with a unit
->>> name. By default, an expression has no unit name.
->>
->> Please explain the unit name's intended purpose.
->>
->
-> It's syccintly explained in the doc.
+Signed-off-by: John Arbuckle <programmingkidx@gmail.com>
+---
+v2 changes:
+- Removed the "int i" code from the for loops. 
 
-The commit message should state the patch's purpose.  When the patch
-adds documentation, and you'd rather not duplicate it in the commit
-message, a short summary plus a pointer there may do.
+ qemu-options.hx |  2 ++
+ ui/cocoa.m      | 20 ++++++++++++++--
+ vl.c            | 73 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++-
+ 3 files changed, 92 insertions(+), 3 deletions(-)
 
->>> Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
->>> ---
->>>  scripts/qapi.py              | 9 ++++++++-
->>>  docs/devel/qapi-code-gen.txt | 3 +++
->>>  2 files changed, 11 insertions(+), 1 deletion(-)
->>>
->>> diff --git a/scripts/qapi.py b/scripts/qapi.py
->>> index eb4ffdc06d..1d0defd638 100644
->>> --- a/scripts/qapi.py
->>> +++ b/scripts/qapi.py
->>> @@ -279,10 +279,12 @@ class QAPISchemaParser(object):
->>>          self.docs =3D []
->>>          self.cur_doc =3D None
->>>          self.accept()
->>> +        self.unit =3D None
->>>
->>>          while self.tok is not None:
->>>              info =3D {'file': fname, 'line': self.line,
->>> -                    'parent': self.incl_info}
->>> +                    'parent': self.incl_info,
->>> +                    'unit': self.unit}
->>>              if self.tok =3D=3D '#':
->>>                  self.reject_expr_doc()
->>>                  self.cur_doc =3D self.get_doc(info)
->>> @@ -371,6 +373,11 @@ class QAPISchemaParser(object):
->>>                                     "Pragma name-case-whitelist must be"
->>>                                     " a list of strings")
->>>              name_case_whitelist =3D value
->>> +        elif name =3D=3D 'unit':
->>> +            if not isinstance(value, str):
->>> +                raise QAPISemError(info,
->>> +                                   "Pragma 'unit' must be string")
->>> +            self.unit =3D value
->>>          else:
->>>              raise QAPISemError(info, "Unknown pragma '%s'" % name)
->>>
->>> diff --git a/docs/devel/qapi-code-gen.txt b/docs/devel/qapi-code-gen.txt
->>> index 24fc6f74ee..37a27cd9d7 100644
->>> --- a/docs/devel/qapi-code-gen.txt
->>> +++ b/docs/devel/qapi-code-gen.txt
->>> @@ -326,6 +326,9 @@ violate the rules on permitted return types.  Defau=
-lt is none.
->>>  Pragma 'name-case-whitelist' takes a list of names that may violate
->>>  rules on use of upper- vs. lower-case letters.  Default is none.
->>>
->>> +Pragma 'unit' takes a string value. It will set the unit name for the
->>> +following expressions in the schema. Most code generator can filter
->>> +based on a unit name. Default is none.
->>
->> Do you mean "most code generators"?
->
-> The qapi code/doc generators.
-
-So plural is intended.  Easy enough to fix.
-
->>
->> What does "filtering" mean?
->
-> To be able to select a subset of expressions based on the unit name.
-
-Let's spell that out.
-
->>>
->>>  =3D=3D=3D Struct types =3D=3D=3D
->>
->> Humor me: put two spaces after a sentence-ending period.
->>
->
-> I don't get what you mean.
-
-This sentence ends with a period, which is followed by two spaces.  This
-sentence is followed by just one space. I prefer two.  A few
-inconsistencies have crept into this file over time, let's not add more.
-All clear now?
+diff --git a/qemu-options.hx b/qemu-options.hx
+index f11c4ac960..0a727ea50a 100644
+--- a/qemu-options.hx
++++ b/qemu-options.hx
+@@ -4472,6 +4472,8 @@ contents of @code{iv.b64} to the second secret
+ 
+ ETEXI
+ 
++DEF("ungrab", HAS_ARG, QEMU_OPTION_ungrab, \
++    "-ungrab <key>", QEMU_ARCH_ALL)
+ 
+ HXCOMM This is the last statement. Insert new options before this line!
+ STEXI
+diff --git a/ui/cocoa.m b/ui/cocoa.m
+index 330ccebf90..8dc603adf0 100644
+--- a/ui/cocoa.m
++++ b/ui/cocoa.m
+@@ -106,6 +106,9 @@
+ NSTextField *pauseLabel;
+ NSArray * supportedImageFileTypes;
+ 
++int get_ungrab_key_value(void);
++const char * get_ungrab_key_name(void);
++
+ // Mac to QKeyCode conversion
+ const int mac_to_qkeycode_map[] = {
+     [kVK_ANSI_A] = Q_KEY_CODE_A,
+@@ -678,6 +681,12 @@ - (void) handleEvent:(NSEvent *)event
+         case NSEventTypeKeyDown:
+             keycode = cocoa_keycode_to_qemu([event keyCode]);
+ 
++            // if the user wants to release the mouse grab
++            if (keycode == get_ungrab_key_value()) {
++                [self ungrabMouse];
++                return;
++            }
++
+             // forward command key combos to the host UI unless the mouse is grabbed
+             if (!isMouseGrabbed && ([event modifierFlags] & NSEventModifierFlagCommand)) {
+                 [NSApp sendEvent:event];
+@@ -842,10 +851,17 @@ - (void) grabMouse
+     COCOA_DEBUG("QemuCocoaView: grabMouse\n");
+ 
+     if (!isFullscreen) {
++        NSString * message_string;
++        if (get_ungrab_key_value() < 0) {
++            message_string = [NSString stringWithFormat: @"- (Press ctrl + alt + g to release Mouse"];
++        } else {
++            message_string = [NSString stringWithFormat: @"- (Press ctrl + alt + g or %s to release Mouse", get_ungrab_key_name()];
++        }
++
+         if (qemu_name)
+-            [normalWindow setTitle:[NSString stringWithFormat:@"QEMU %s - (Press ctrl + alt + g to release Mouse)", qemu_name]];
++            [normalWindow setTitle:[NSString stringWithFormat: @"QEMU %s %@", qemu_name, message_string]];
+         else
+-            [normalWindow setTitle:@"QEMU - (Press ctrl + alt + g to release Mouse)"];
++            [normalWindow setTitle:[NSString stringWithFormat: @"QEMU %@", message_string]];
+     }
+     [self hideCursor];
+     if (!isAbsoluteEnabled) {
+diff --git a/vl.c b/vl.c
+index 1ad1c04637..c2d848fabc 100644
+--- a/vl.c
++++ b/vl.c
+@@ -185,7 +185,8 @@ bool boot_strict;
+ uint8_t *boot_splash_filedata;
+ size_t boot_splash_filedata_size;
+ uint8_t qemu_extra_params_fw[2];
+-
++int ungrab_key_value = -1;
++char *ungrab_key_name;
+ int icount_align_option;
+ 
+ /* The bytes in qemu_uuid are in the order specified by RFC4122, _not_ in the
+@@ -3088,6 +3089,73 @@ static void register_global_properties(MachineState *ms)
+     user_register_global_props();
+ }
+ 
++/* Sets the mouse ungrab key to what the user wants */
++static void set_ungrab_key(const char *new_key)
++{
++    const char *keys[] = {
++        [0 ... 0xff]    = "",
++        [Q_KEY_CODE_F1] = "f1",
++        [Q_KEY_CODE_F2] = "f2",
++        [Q_KEY_CODE_F3] = "f3",
++        [Q_KEY_CODE_F4] = "f4",
++        [Q_KEY_CODE_F5] = "f5",
++        [Q_KEY_CODE_F6] = "f6",
++        [Q_KEY_CODE_F7] = "f7",
++        [Q_KEY_CODE_F8] = "f8",
++        [Q_KEY_CODE_F9] = "f9",
++        [Q_KEY_CODE_F10] = "f10",
++        [Q_KEY_CODE_F11] = "f11",
++        [Q_KEY_CODE_F12] = "f12",
++        [Q_KEY_CODE_PRINT] = "f13",
++        [Q_KEY_CODE_SCROLL_LOCK] = "f14",
++        [Q_KEY_CODE_PAUSE] = "f15",
++    };
++
++    int key_value = -1;
++    int i;
++
++    /* see if the user's key is recognized */
++    for (i = 0; i < ARRAY_SIZE(keys); i++) {
++        if (strcmp(keys[i], new_key) == 0) {
++            key_value = i;
++            break;
++        }
++    }
++
++    /* if the user's key isn't recognized print the usable keys */
++    if (key_value == -1) {
++        printf("Unrecognized key: %s\n", new_key);
++        printf("Usable ungrab keys: ");
++        for (i = 0; i < ARRAY_SIZE(keys); i++) {
++            if (strlen(keys[i]) > 0) { /* filters out undefined values */
++                printf("%s ", keys[i]);
++            }
++        }
++        printf("\n\n");
++        exit(1);
++    }
++
++    ungrab_key_name = (char *) malloc(4 * sizeof(char));
++    strncpy(ungrab_key_name, new_key, 3);
++    ungrab_key_value = key_value;
++}
++
++int get_ungrab_key_value(void);
++
++/* Returns the user specified ungrab key's value or -1 if not specified */
++int get_ungrab_key_value(void)
++{
++    return ungrab_key_value;
++}
++
++const char *get_ungrab_key_name(void);
++
++/* Returns the name of the user specified ungrab key */
++const char *get_ungrab_key_name(void)
++{
++    return ungrab_key_name;
++}
++
+ int main(int argc, char **argv, char **envp)
+ {
+     int i;
+@@ -4204,6 +4272,9 @@ int main(int argc, char **argv, char **envp)
+                     exit(1);
+                 }
+                 break;
++            case QEMU_OPTION_ungrab:
++                set_ungrab_key(optarg);
++                break;
+             default:
+                 os_parse_cmd_args(popt->index, optarg);
+             }
+-- 
+2.14.3 (Apple Git-98)
