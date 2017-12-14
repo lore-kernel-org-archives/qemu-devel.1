@@ -1,26 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36152)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38697)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1ePXEt-0002Sv-Lj
-	for qemu-devel@nongnu.org; Thu, 14 Dec 2017 12:24:08 -0500
+	(envelope-from <alistair23@gmail.com>) id 1ePXJk-0007Cy-Pa
+	for qemu-devel@nongnu.org; Thu, 14 Dec 2017 12:29:09 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1ePXEs-0003IG-W7
-	for qemu-devel@nongnu.org; Thu, 14 Dec 2017 12:24:07 -0500
-References: <20171214005953.8898-1-jsnow@redhat.com>
-	<20171214005953.8898-5-jsnow@redhat.com>
-	<0ac30feb-553b-cfa3-070a-0f703c4e0f10@redhat.com>
-	<1b7494a6-aca5-41e8-469b-e2b9d8aade67@redhat.com>
-	<b0969a32-fa45-a4f5-0768-959750622698@redhat.com>
-	<a0cb18cf-61b1-a18a-d2b0-4a536aca51e2@redhat.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <aa04852b-a05b-fbec-a69f-27d9e5d621a2@redhat.com>
-Date: Thu, 14 Dec 2017 18:23:50 +0100
+	(envelope-from <alistair23@gmail.com>) id 1ePXJj-0008KQ-Vl
+	for qemu-devel@nongnu.org; Thu, 14 Dec 2017 12:29:08 -0500
 MIME-Version: 1.0
-In-Reply-To: <a0cb18cf-61b1-a18a-d2b0-4a536aca51e2@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 4/7] blockjob: allow block_job_throttle to
- take delay_ns
+Sender: alistair23@gmail.com
+In-Reply-To: <20171213195852.30439-5-f4bug@amsat.org>
+References: <20171213195852.30439-1-f4bug@amsat.org>
+	<20171213195852.30439-5-f4bug@amsat.org>
+From: Alistair Francis <alistair.francis@xilinx.com>
+Date: Thu, 14 Dec 2017 09:28:34 -0800
+Message-ID: <CAKmqyKPvAL3+LAqMBtUOc=0igkSwg4Jmf+Q0ySL7C+oech7AMw@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH 04/14] sdhci: use deposit64()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,18 +24,51 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: John Snow <jsnow@redhat.com>, qemu-block@nongnu.org
-Cc: kwolf@redhat.com, qemu-devel@nongnu.org, stefanha@redhat.com, mreitz@redhat.com
+To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>
+Cc: Alistair Francis <alistair.francis@xilinx.com>, "Edgar E . Iglesias" <edgar.iglesias@xilinx.com>, Prasad J Pandit <pjp@fedoraproject.org>, Peter Maydell <peter.maydell@linaro.org>, Andrew Baumann <Andrew.Baumann@microsoft.com>, Andrey Smirnov <andrew.smirnov@gmail.com>, Andrey Yurovsky <yurovsky@gmail.com>, QEMU Trivial <qemu-trivial@nongnu.org>, Sai Pavan Boddu <saipava@xilinx.com>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>
 
-On 14/12/2017 18:22, John Snow wrote:
->> Ok, shall we wait for v2 where you look at that BZ as well?
+On Wed, Dec 13, 2017 at 11:58 AM, Philippe Mathieu-Daud=C3=A9
+<f4bug@amsat.org> wrote:
+> This makes the code slightly safer, also easier to review.
 >
-> Sure -- if the only feedback you have on this series is primarily style
-> and "maybe there are some more wins" I can spin a v2 to try to broaden
-> the scope if it looks good so far.
+> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
+> ---
+>  hw/sd/sdhci.c | 6 ++----
+>  1 file changed, 2 insertions(+), 4 deletions(-)
+>
+> diff --git a/hw/sd/sdhci.c b/hw/sd/sdhci.c
+> index e39623baba..295a89e5d3 100644
+> --- a/hw/sd/sdhci.c
+> +++ b/hw/sd/sdhci.c
+> @@ -1123,12 +1123,10 @@ sdhci_write(void *opaque, hwaddr offset, uint64_t=
+ val, unsigned size)
+>          MASKED_WRITE(s->admaerr, mask, value);
+>          break;
+>      case SDHC_ADMASYSADDR:
+> -        s->admasysaddr =3D (s->admasysaddr & (0xFFFFFFFF00000000ULL |
+> -                (uint64_t)mask)) | (uint64_t)value;
+> +        s->admasysaddr =3D deposit64(s->admasysaddr, 32, 0, value);
 
-Yeah, that's pretty much it (except that it isn't "maybe there are some
-more wins", but rather "going from two to three functions isn't exactly
-what I was hoping for" :)).
+This doesn't look right.
 
-Paolo
+Originally we were masking admasysaddr with (mask and
+0xFFFFFFFF00000000). Then ORing in the value.
+
+Now we are depositing value into a bit field that starts at bit 32 and
+has 0 length. I don't see how value will be deposited at all with a 0
+length.
+
+Alistair
+
+>          break;
+>      case SDHC_ADMASYSADDR + 4:
+> -        s->admasysaddr =3D (s->admasysaddr & (0x00000000FFFFFFFFULL |
+> -                ((uint64_t)mask << 32))) | ((uint64_t)value << 32);
+> +        s->admasysaddr =3D deposit64(s->admasysaddr, 0, 32, value);
+>          break;
+>      case SDHC_FEAER:
+>          s->acmd12errsts |=3D value;
+> --
+> 2.15.1
+>
+>
