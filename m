@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56280)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56332)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1ePX40-0001Ov-Cn
-	for qemu-devel@nongnu.org; Thu, 14 Dec 2017 12:12:53 -0500
+	(envelope-from <cohuck@redhat.com>) id 1ePX45-0001Ta-60
+	for qemu-devel@nongnu.org; Thu, 14 Dec 2017 12:13:01 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1ePX3z-0008Q0-BQ
-	for qemu-devel@nongnu.org; Thu, 14 Dec 2017 12:12:52 -0500
+	(envelope-from <cohuck@redhat.com>) id 1ePX43-0008Tt-Vf
+	for qemu-devel@nongnu.org; Thu, 14 Dec 2017 12:12:57 -0500
 From: Cornelia Huck <cohuck@redhat.com>
-Date: Thu, 14 Dec 2017 18:09:54 +0100
-Message-Id: <20171214171004.25058-37-cohuck@redhat.com>
+Date: Thu, 14 Dec 2017 18:09:55 +0100
+Message-Id: <20171214171004.25058-38-cohuck@redhat.com>
 In-Reply-To: <20171214171004.25058-1-cohuck@redhat.com>
 References: <20171214171004.25058-1-cohuck@redhat.com>
-Subject: [Qemu-devel] [PULL 36/46] s390x/tcg: wire up STORE CHANNEL REPORT
- WORD
+Subject: [Qemu-devel] [PULL 37/46] s390x/tcg: ASI/ASGI/ALSI/ALSGI are atomic
+ with Interlocked-acccess facility 1
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,82 +25,80 @@ Cc: qemu-devel@nongnu.org, qemu-s390x@nongnu.org, rth@twiddle.net, agraf@suse.de
 
 From: David Hildenbrand <david@redhat.com>
 
-CRW machine check handling requires STCRW. So let's wire it up.
+The semantics of ASI/ASGI/ALSI/ALSGI changed. Let's implement them just
+like LOAD AND ADD, so they are atomic. Emulate old behavior.
 
-Reviewed-by: Thomas Huth <thuth@redhat.com>
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+This fixes random crashes when booting a Linux kernel compiled for
+z196+ with SMP + MTTCG.
+
 Signed-off-by: David Hildenbrand <david@redhat.com>
-Message-Id: <20171208160207.26494-6-david@redhat.com>
+Message-Id: <20171208160207.26494-7-david@redhat.com>
 Signed-off-by: Cornelia Huck <cohuck@redhat.com>
 ---
- target/s390x/helper.h      | 1 +
- target/s390x/insn-data.def | 1 +
- target/s390x/misc_helper.c | 9 +++++++++
- target/s390x/translate.c   | 8 ++++++++
- 4 files changed, 19 insertions(+)
+ target/s390x/insn-data.def |  8 ++++----
+ target/s390x/translate.c   | 21 +++++++++++++++++++++
+ 2 files changed, 25 insertions(+), 4 deletions(-)
 
-diff --git a/target/s390x/helper.h b/target/s390x/helper.h
-index 3eb7715e5b..ba11cfdc30 100644
---- a/target/s390x/helper.h
-+++ b/target/s390x/helper.h
-@@ -166,6 +166,7 @@ DEF_HELPER_3(msch, void, env, i64, i64)
- DEF_HELPER_2(rchp, void, env, i64)
- DEF_HELPER_2(rsch, void, env, i64)
- DEF_HELPER_3(ssch, void, env, i64, i64)
-+DEF_HELPER_2(stcrw, void, env, i64)
- DEF_HELPER_3(stsch, void, env, i64, i64)
- DEF_HELPER_3(tsch, void, env, i64, i64)
- DEF_HELPER_2(chsc, void, env, i64)
 diff --git a/target/s390x/insn-data.def b/target/s390x/insn-data.def
-index 8c2541f545..43ab1963c8 100644
+index 43ab1963c8..166ee7c80b 100644
 --- a/target/s390x/insn-data.def
 +++ b/target/s390x/insn-data.def
-@@ -1055,6 +1055,7 @@
-     C(0xb23b, RCHP,    S,     Z,   0, 0, 0, 0, rchp, 0)
-     C(0xb238, RSCH,    S,     Z,   0, 0, 0, 0, rsch, 0)
-     C(0xb233, SSCH,    S,     Z,   0, insn, 0, 0, ssch, 0)
-+    C(0xb239, STCRW,   S,     Z,   0, insn, 0, 0, stcrw, 0)
-     C(0xb234, STSCH,   S,     Z,   0, insn, 0, 0, stsch, 0)
-     C(0xb235, TSCH,    S,     Z,   0, insn, 0, 0, tsch, 0)
-     /* ??? Not listed in PoO ninth edition, but there's a linux driver that
-diff --git a/target/s390x/misc_helper.c b/target/s390x/misc_helper.c
-index 769ec52e1d..04fb53d8a3 100644
---- a/target/s390x/misc_helper.c
-+++ b/target/s390x/misc_helper.c
-@@ -385,6 +385,15 @@ void HELPER(ssch)(CPUS390XState *env, uint64_t r1, uint64_t inst)
-     qemu_mutex_unlock_iothread();
- }
- 
-+void HELPER(stcrw)(CPUS390XState *env, uint64_t inst)
-+{
-+    S390CPU *cpu = s390_env_get_cpu(env);
-+
-+    qemu_mutex_lock_iothread();
-+    ioinst_handle_stcrw(cpu, inst >> 16, GETPC());
-+    qemu_mutex_unlock_iothread();
-+}
-+
- void HELPER(stsch)(CPUS390XState *env, uint64_t r1, uint64_t inst)
- {
-     S390CPU *cpu = s390_env_get_cpu(env);
+@@ -39,10 +39,10 @@
+     C(0xb9d8, AHHLR,   RRF_a, HW,  r2_sr32, r3, new, r1_32h, add, adds32)
+ /* ADD IMMEDIATE */
+     C(0xc209, AFI,     RIL_a, EI,  r1, i2, new, r1_32, add, adds32)
+-    C(0xeb6a, ASI,     SIY,   GIE, m1_32s, i2, new, m1_32, add, adds32)
++    D(0xeb6a, ASI,     SIY,   GIE, la1, i2, new, 0, asi, adds32, MO_TESL)
+     C(0xecd8, AHIK,    RIE_d, DO,  r3, i2, new, r1_32, add, adds32)
+     C(0xc208, AGFI,    RIL_a, EI,  r1, i2, r1, 0, add, adds64)
+-    C(0xeb7a, AGSI,    SIY,   GIE, m1_64, i2, new, m1_64, add, adds64)
++    D(0xeb7a, AGSI,    SIY,   GIE, la1, i2, new, 0, asi, adds64, MO_TEQ)
+     C(0xecd9, AGHIK,   RIE_d, DO,  r3, i2, r1, 0, add, adds64)
+ /* ADD IMMEDIATE HIGH */
+     C(0xcc08, AIH,     RIL_a, HW,  r1_sr32, i2, new, r1_32h, add, adds32)
+@@ -70,9 +70,9 @@
+     C(0xc20b, ALFI,    RIL_a, EI,  r1, i2_32u, new, r1_32, add, addu32)
+     C(0xc20a, ALGFI,   RIL_a, EI,  r1, i2_32u, r1, 0, add, addu64)
+ /* ADD LOGICAL WITH SIGNED IMMEDIATE */
+-    C(0xeb6e, ALSI,    SIY,   GIE, m1_32u, i2, new, m1_32, add, addu32)
++    D(0xeb6e, ALSI,    SIY,   GIE, la1, i2, new, 0, asi, addu32, MO_TEUL)
+     C(0xecda, ALHSIK,  RIE_d, DO,  r3, i2, new, r1_32, add, addu32)
+-    C(0xeb7e, ALGSI,   SIY,   GIE, m1_64, i2, new, m1_64, add, addu64)
++    D(0xeb7e, ALGSI,   SIY,   GIE, la1, i2, new, 0, asi, addu64, MO_TEQ)
+     C(0xecdb, ALGHSIK, RIE_d, DO,  r3, i2, r1, 0, add, addu64)
+ /* ADD LOGICAL WITH SIGNED IMMEDIATE HIGH */
+     C(0xcc0a, ALSIH,   RIL_a, HW,  r1_sr32, i2, new, r1_32h, add, addu32)
 diff --git a/target/s390x/translate.c b/target/s390x/translate.c
-index 38e1770e5e..08c1ace0d8 100644
+index 08c1ace0d8..7ab8e853ab 100644
 --- a/target/s390x/translate.c
 +++ b/target/s390x/translate.c
-@@ -4071,6 +4071,14 @@ static ExitStatus op_stsch(DisasContext *s, DisasOps *o)
+@@ -1364,6 +1364,27 @@ static ExitStatus op_addc(DisasContext *s, DisasOps *o)
      return NO_EXIT;
  }
  
-+static ExitStatus op_stcrw(DisasContext *s, DisasOps *o)
++static ExitStatus op_asi(DisasContext *s, DisasOps *o)
 +{
-+    check_privileged(s);
-+    gen_helper_stcrw(cpu_env, o->in2);
-+    set_cc_static(s);
++    o->in1 = tcg_temp_new_i64();
++
++    if (!s390_has_feat(S390_FEAT_STFLE_45)) {
++        tcg_gen_qemu_ld_tl(o->in1, o->addr1, get_mem_index(s), s->insn->data);
++    } else {
++        /* Perform the atomic addition in memory. */
++        tcg_gen_atomic_fetch_add_i64(o->in1, o->addr1, o->in2, get_mem_index(s),
++                                     s->insn->data);
++    }
++
++    /* Recompute also for atomic case: needed for setting CC. */
++    tcg_gen_add_i64(o->out, o->in1, o->in2);
++
++    if (!s390_has_feat(S390_FEAT_STFLE_45)) {
++        tcg_gen_qemu_st_tl(o->out, o->addr1, get_mem_index(s), s->insn->data);
++    }
 +    return NO_EXIT;
 +}
 +
- static ExitStatus op_tsch(DisasContext *s, DisasOps *o)
+ static ExitStatus op_aeb(DisasContext *s, DisasOps *o)
  {
-     check_privileged(s);
+     gen_helper_aeb(o->out, cpu_env, o->in1, o->in2);
 -- 
 2.13.6
