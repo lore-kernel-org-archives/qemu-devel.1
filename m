@@ -1,24 +1,14 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50018)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53828)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1ePWum-0004yp-Lr
-	for qemu-devel@nongnu.org; Thu, 14 Dec 2017 12:03:21 -0500
+	(envelope-from <cohuck@redhat.com>) id 1ePX1Z-0007Yn-BS
+	for qemu-devel@nongnu.org; Thu, 14 Dec 2017 12:10:22 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1ePWui-0000HW-KJ
-	for qemu-devel@nongnu.org; Thu, 14 Dec 2017 12:03:20 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:33100)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1ePWui-0000H0-CC
-	for qemu-devel@nongnu.org; Thu, 14 Dec 2017 12:03:16 -0500
-References: <20171023151310.6462-1-vadim.galitsyn@profitbricks.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <d174413b-b6bf-2730-fdd5-3669751c588d@redhat.com>
-Date: Thu, 14 Dec 2017 11:03:12 -0600
-MIME-Version: 1.0
-In-Reply-To: <20171023151310.6462-1-vadim.galitsyn@profitbricks.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="p39bTnfK34bpD0m7MI1MkWshAd09jfR3h"
-Subject: Re: [Qemu-devel] QMP, HMP: introduce 'writeconfig' command
+	(envelope-from <cohuck@redhat.com>) id 1ePX1V-0005zx-A1
+	for qemu-devel@nongnu.org; Thu, 14 Dec 2017 12:10:21 -0500
+From: Cornelia Huck <cohuck@redhat.com>
+Date: Thu, 14 Dec 2017 18:09:18 +0100
+Message-Id: <20171214171004.25058-1-cohuck@redhat.com>
+Subject: [Qemu-devel] [PULL 00/46] First batch of s390x patches for 2.12
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,88 +17,128 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Vadim Galitsyn <vadim.galitsyn@profitbricks.com>, Markus Armbruster <armbru@redhat.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>, qemu-devel@nongnu.org
+To: peter.maydell@linaro.org
+Cc: qemu-devel@nongnu.org, qemu-s390x@nongnu.org, rth@twiddle.net, agraf@suse.de, thuth@redhat.com, borntraeger@de.ibm.com, david@redhat.com, Cornelia Huck <cohuck@redhat.com>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---p39bTnfK34bpD0m7MI1MkWshAd09jfR3h
-From: Eric Blake <eblake@redhat.com>
-To: Vadim Galitsyn <vadim.galitsyn@profitbricks.com>,
- Markus Armbruster <armbru@redhat.com>,
- "Dr . David Alan Gilbert" <dgilbert@redhat.com>, qemu-devel@nongnu.org
-Message-ID: <d174413b-b6bf-2730-fdd5-3669751c588d@redhat.com>
-Subject: Re: QMP, HMP: introduce 'writeconfig' command
-References: <20171023151310.6462-1-vadim.galitsyn@profitbricks.com>
-In-Reply-To: <20171023151310.6462-1-vadim.galitsyn@profitbricks.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+The following changes since commit 0ef0583d5adceb9138bdb47494dabd1549ac5b6d:
 
-On 10/23/2017 10:13 AM, Vadim Galitsyn wrote:
-> Hi Guys,
->=20
-> This thread is a continuation of discussion started in
-> http://lists.nongnu.org/archive/html/qemu-devel/2017-02/msg03182.html.
->=20
-> This series introduces =E2=80=98writeconfig=E2=80=99 command support fo=
-r QMP and HMP monitors. This functionality might be useful for live migra=
-tion for cases when guest configuration was modified in runtime (for exam=
-ple as a result of hot- plug/unplug operations) and actual Qemu command l=
-ine no longer reflects setup exposed to guest.
->=20
-> Original series has =E2=80=98qemu_opts=E2=80=99 patch as well (http://l=
-ists.nongnu.org/archive/html/qemu-devel/2017-02/msg03183.html) because HM=
-P=E2=80=99s =E2=80=98object_add=E2=80=99 result was not reflected in =E2=80=
-=98writeconfig=E2=80=99 output. Later I found that QMP=E2=80=99s =E2=80=98=
-object-add=E2=80=99 has the same issue. Anyway, I don=E2=80=99t include =E2=
-=80=98qemu_opts=E2=80=99 patches here because Markus mentioned (here http=
-://lists.nongnu.org/archive/html/qemu-devel/2017-02/msg03476.html) that t=
-his functionality is going to be reworked in some future and such patches=
- might collide with the rework process.
->=20
-> Markus, could you please post if you have an update on this topic? Curr=
-ent =E2=80=98master=E2=80=99 branch (9993c82dc2f5ce58b41d708b765e1a717ad4=
-281d) still has the issue.
->=20
-> Also, Markus mentioned that once configuration was changed during live =
-migration -- it might be an issue because =E2=80=98writeconfig=E2=80=99 d=
-ata became outdated (and might be make sense to think about to embed this=
- data into migration stream itself). In the same time David said that thi=
-s is another problem which is unrelated to this patch series. What is you=
-r current opinion on this topic? Can we consider these patches to be incl=
-uded into =E2=80=98master=E2=80=99 taking into account that not all confi=
-guration is dumped by =E2=80=98writeconfig=E2=80=99 (=E2=80=98object_add=E2=
-=80=99 problem), but this can be fixed later?
+  Merge remote-tracking branch 'remotes/dgilbert/tags/pull-hmp-20171214' into staging (2017-12-14 15:32:32 +0000)
 
-I don't think we should expose 'writeconfig' via QMP as long as there is
-still the chance of inconsistent data being written.  And I think we
-have a lot more issues where existing code abuses QemuOpts in ways that
-current configuration does not match the original command line, but
-where you cannot easily expose the current configuration in a way that
-would be reparsed by the command line into the current state.
-Therefore, I'm not sure this series is worthwhile.
+are available in the git repository at:
 
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
+  git://github.com/cohuck/qemu tags/s390x-20171214
 
+for you to fetch changes up to a9e3065c6579df8652ce38502276ac0a13180d6f:
 
---p39bTnfK34bpD0m7MI1MkWshAd09jfR3h
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
+  s390-ccw-virtio: allow for systems larger that 7.999TB (2017-12-14 17:56:54 +0100)
 
------BEGIN PGP SIGNATURE-----
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+----------------------------------------------------------------
+s390x changes for 2.12:
+- Lots of tcg improvements: ccw hotplug is now working and we can run
+  a Linux kernel built for z12 under tcg
+- zPCI improvements to get virtio-pci working
+- get rid of the cssid restrictions for virtual and non-virtual channel
+  devices
+- we now support 8TB+ systems
+- 2.12 compat machine
+- fixes and cleanups
 
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAloyrtEACgkQp6FrSiUn
-Q2oHNgf/Txofw1kLP5Okt9O6j3YiV3g1fzRXskAa8ig1lw7OvnKtqL6C420MhsN8
-wcVH0cnAjs8qtaiu/O6vi6dN2pZUazS8jcmFYAhkk8qH1sxAfHYoNfA6THQ9pC0P
-t0CVN48uXaZBVrqKrcbgxhrRowx2SMDsjc3vlZytSBnqUoakdxZ0S27lYGLBrAPS
-4m492UWEbz02cRAY3WeqcGrFasnzWggn3/unvuM4B5Vd0CyE2KjoevJNee9xDDLL
-lt+dVLlRFvVMHaQ8EZJ5WI+J3oJQywKuyXraQ6hnCUgiW5q74iWfMp/UFAT5GPd5
-TMXiz8NzAlRTOXj7xb3xuBqNx9lP7A==
-=m7NC
------END PGP SIGNATURE-----
+----------------------------------------------------------------
 
---p39bTnfK34bpD0m7MI1MkWshAd09jfR3h--
+Christian Borntraeger (3):
+  s390x/migration: use zero flag parameter
+  pc-bios/s390-ccw: zero out bss section
+  s390-ccw-virtio: allow for systems larger that 7.999TB
+
+Cornelia Huck (4):
+  pc-bios/s390-ccw.img: update image
+  s390x: introduce 2.12 compat machine
+  target/s390x: nuke DPRINTF in helper.c
+  s390x/css: attach css bridge
+
+David Hildenbrand (30):
+  s390x/tcg: introduce and use s390_program_interrupt()
+  s390x/tcg: get rid of runtime_exception()
+  s390x/tcg: rip out dead tpi code
+  s390x/ioinst: pass the retaddr to all IO instructions
+  s390x/pci: pass the retaddr to all PCI instructions
+  s390x/diag: pass the retaddr into handle_diag_308()
+  s390x: handle exceptions during s390_cpu_virt_mem_rw() correctly (TCG)
+  s390x/tcg: don't exit the cpu loop in s390_cpu_virt_mem_rw()
+  s390x/tcg: io instructions don't need potential_page_fault()
+  s390x/tcg: use s390_program_interrupt() in SCLP Service Call
+  s390x/tcg: use s390_program_interrupt() in DIAG
+  s390x/tcg: use s390_program_interrupt() in per_check_exception()
+  s390x/tcg: use s390_program_interrupt() in SACF
+  s390x/tcg: use s390_program_interrupt() in STSI
+  s390x/tcg: drop program_interrupt()
+  s390x/tcg: drop potential_page_fault()
+  s390x/kvm: factor out build_channel_report_mcic() into cpu.h
+  s390x/tcg: fix and cleanup mcck injection
+  s390x/tcg: implement SET CLOCK PROGRAMMABLE FIELD
+  s390x/tcg: indicate value of TODPR in STCKE
+  s390x/tcg: wire up STORE CHANNEL REPORT WORD
+  s390x/tcg: ASI/ASGI/ALSI/ALSGI are atomic with Interlocked-acccess
+    facility 1
+  s390x/tcg: implement Interlocked-Access Facility 2
+  s390x/tcg: wire up SET ADDRESS LIMIT
+  s390x/tcg: wire up SET CHANNEL MONITOR
+  s390x/tcg: Implement STORE CHANNEL PATH STATUS
+  s390x/tcg: Implement SIGNAL ADAPTER instruction
+  s390x/tcg: implement extract-CPU-time facility
+  s390x/tcg: we already implement the Set-Program-Parameter facility
+  s390x: change the QEMU cpu model to a stripped down z12
+
+Halil Pasic (2):
+  s390x/css: unrestrict cssids
+  s390x: deprecate s390-squash-mcss machine prop
+
+Pierre Morel (7):
+  s390x/pci: factor out endianess conversion
+  s390x/pci: rework PCI STORE
+  s390x/pci: rework PCI LOAD
+  s390x/pci: rework PCI STORE BLOCK
+  s390x/pci: move the memory region read from pcilg
+  s390x/pci: move the memory region write from pcistg
+  s390x/pci: search for subregion inside the BARs
+
+ hw/s390x/3270-ccw.c          |   2 +-
+ hw/s390x/css-bridge.c        |  13 ++
+ hw/s390x/css.c               |  34 +----
+ hw/s390x/s390-ccw.c          |   2 +-
+ hw/s390x/s390-pci-bus.h      |   1 +
+ hw/s390x/s390-pci-inst.c     | 337 +++++++++++++++++++++++++------------------
+ hw/s390x/s390-pci-inst.h     |  22 ++-
+ hw/s390x/s390-virtio-ccw.c   |  58 +++++++-
+ hw/s390x/virtio-ccw.c        |   2 +-
+ include/hw/compat.h          |   3 +
+ include/hw/s390x/css.h       |  13 +-
+ pc-bios/s390-ccw.img         | Bin 26416 -> 26416 bytes
+ pc-bios/s390-ccw/start.S     |  30 +++-
+ qemu-doc.texi                |   8 +
+ qemu-options.hx              |   8 +-
+ target/s390x/cc_helper.c     |   2 +-
+ target/s390x/cpu.h           |  31 +++-
+ target/s390x/cpu_models.c    | 103 ++++++-------
+ target/s390x/cpu_models.h    |   1 +
+ target/s390x/crypto_helper.c |   7 +-
+ target/s390x/diag.c          |  14 +-
+ target/s390x/excp_helper.c   |  17 +--
+ target/s390x/fpu_helper.c    |   2 +-
+ target/s390x/gen-features.c  |  88 +++++++++++
+ target/s390x/helper.c        |  18 ---
+ target/s390x/helper.h        |   6 +-
+ target/s390x/insn-data.def   |  29 ++--
+ target/s390x/int_helper.c    |  14 +-
+ target/s390x/internal.h      |  41 +++---
+ target/s390x/interrupt.c     |   9 +-
+ target/s390x/ioinst.c        | 113 +++++++--------
+ target/s390x/kvm.c           |  84 ++++-------
+ target/s390x/mem_helper.c    |  35 ++---
+ target/s390x/misc_helper.c   | 111 ++++++++------
+ target/s390x/mmu_helper.c    |  23 ++-
+ target/s390x/translate.c     | 191 ++++++++++++++++++++----
+ 36 files changed, 927 insertions(+), 545 deletions(-)
+
+-- 
+2.13.6
