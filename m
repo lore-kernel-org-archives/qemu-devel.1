@@ -1,15 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43524)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43997)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <andrew.smirnov@gmail.com>) id 1ePVIb-0000qi-4b
-	for qemu-devel@nongnu.org; Thu, 14 Dec 2017 10:19:50 -0500
+	(envelope-from <dgilbert@redhat.com>) id 1ePVJC-0001Ex-Jo
+	for qemu-devel@nongnu.org; Thu, 14 Dec 2017 10:20:32 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <andrew.smirnov@gmail.com>) id 1ePVIW-0008HJ-Ja
-	for qemu-devel@nongnu.org; Thu, 14 Dec 2017 10:19:49 -0500
-From: Andrey Smirnov <andrew.smirnov@gmail.com>
-Date: Thu, 14 Dec 2017 07:19:34 -0800
-Message-Id: <20171214151934.3647-1-andrew.smirnov@gmail.com>
-Subject: [Qemu-devel] [PATCH] hw/misc: Add code to emulate Xilinx Slave
- Serial port
+	(envelope-from <dgilbert@redhat.com>) id 1ePVJ8-0000Ti-61
+	for qemu-devel@nongnu.org; Thu, 14 Dec 2017 10:20:26 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:50716)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1ePVJ7-0000RN-L4
+	for qemu-devel@nongnu.org; Thu, 14 Dec 2017 10:20:21 -0500
+Date: Thu, 14 Dec 2017 15:20:10 +0000
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20171214152010.GA4380@work-vm>
+References: <20171213180807.7066-1-dgilbert@redhat.com>
+	<20171213180807.7066-2-dgilbert@redhat.com>
+	<20171214153028.25c12b0e@redhat.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20171214153028.25c12b0e@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v4 1/6] vhost: Move log_dirty check
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -18,182 +28,103 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Andrey Smirnov <andrew.smirnov@gmail.com>, "Edgar E. Iglesias" <edgar.iglesias@gmail.com>, Alistair Francis <alistair.francis@xilinx.com>, qemu-arm@nongnu.org, yurovsky@gmail.com
+To: Igor Mammedov <imammedo@redhat.com>
+Cc: qemu-devel@nongnu.org, pbonzini@redhat.com, maxime.coquelin@redhat.com, mst@redhat.com, groug@kaod.org
 
-Add code to emulate Xilinx Slave Serial FPGA configuration port.
+* Igor Mammedov (imammedo@redhat.com) wrote:
+> On Wed, 13 Dec 2017 18:08:02 +0000
+> "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com> wrote:
+> 
+> > From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+> > 
+> > Move the log_dirty check into vhost_section.
+> > 
+> > Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+> > ---
+> >  hw/virtio/trace-events |  3 +++
+> >  hw/virtio/vhost.c      | 20 +++++++++++++-------
+> >  2 files changed, 16 insertions(+), 7 deletions(-)
+> > 
+> > diff --git a/hw/virtio/trace-events b/hw/virtio/trace-events
+> > index 775461ae98..4a493bcd46 100644
+> > --- a/hw/virtio/trace-events
+> > +++ b/hw/virtio/trace-events
+> > @@ -1,5 +1,8 @@
+> >  # See docs/devel/tracing.txt for syntax documentation.
+> >  
+> > +# hw/virtio/vhost.c
+> > +vhost_section(const char *name, int r) "%s:%d"
+> > +
+> >  # hw/virtio/virtio.c
+> >  virtqueue_alloc_element(void *elem, size_t sz, unsigned in_num, unsigned out_num) "elem %p size %zd in_num %u out_num %u"
+> >  virtqueue_fill(void *vq, const void *elem, unsigned int len, unsigned int idx) "vq %p elem %p len %u idx %u"
+> > diff --git a/hw/virtio/vhost.c b/hw/virtio/vhost.c
+> > index e4290ce93d..e923219e63 100644
+> > --- a/hw/virtio/vhost.c
+> > +++ b/hw/virtio/vhost.c
+> > @@ -27,6 +27,7 @@
+> >  #include "hw/virtio/virtio-access.h"
+> >  #include "migration/blocker.h"
+> >  #include "sysemu/dma.h"
+> > +#include "trace.h"
+> >  
+> >  /* enabled until disconnected backend stabilizes */
+> >  #define _VHOST_DEBUG 1
+> > @@ -567,18 +568,12 @@ static void vhost_set_memory(MemoryListener *listener,
+> >                                           memory_listener);
+> >      hwaddr start_addr = section->offset_within_address_space;
+> >      ram_addr_t size = int128_get64(section->size);
+> > -    bool log_dirty =
+> > -        memory_region_get_dirty_log_mask(section->mr) & ~(1 << DIRTY_MEMORY_MIGRATION);
+> >      int s = offsetof(struct vhost_memory, regions) +
+> >          (dev->mem->nregions + 1) * sizeof dev->mem->regions[0];
+> >      void *ram;
+> >  
+> >      dev->mem = g_realloc(dev->mem, s);
+> >  
+> > -    if (log_dirty) {
+> > -        add = false;
+> > -    }
+> > -
+> >      assert(size);
+> >  
+> >      /* Optimize no-change case. At least cirrus_vga does this a lot at this time. */
+> > @@ -611,8 +606,19 @@ static void vhost_set_memory(MemoryListener *listener,
+> >  
+> >  static bool vhost_section(MemoryRegionSection *section)
+> >  {
+> > -    return memory_region_is_ram(section->mr) &&
+> > +    bool result;
+> > +    bool log_dirty = memory_region_get_dirty_log_mask(section->mr) &
+> > +                     ~(1 << DIRTY_MEMORY_MIGRATION);
+> > +    result = memory_region_is_ram(section->mr) &&
+> >          !memory_region_is_rom(section->mr);
+> > +
+> > +    /* Vhost doesn't handle any block which is doing dirty-tracking other
+> > +     * than migration; this typically fires on VGA areas.
+> > +     */
+> > +    result &= !log_dirty;
+> before patch even if log_dirty, vhost_set_memory will still proceed
+> and may remove dirty section from memmap and set memory_changed = true
+> 
+> but with this patch it will just ignore such section,
+> I'm not sure it's right (it might be right with new approach add/nop
+> but then this patch should go after new code in place and old one
+> if gone).
 
-Cc: "Edgar E. Iglesias" <edgar.iglesias@gmail.com>
-Cc: Alistair Francis <alistair.francis@xilinx.com>
-Cc: qemu-devel@nongnu.org
-Cc: qemu-arm@nongnu.org
-Cc: yurovsky@gmail.com
-Signed-off-by: Andrey Smirnov <andrew.smirnov@gmail.com>
----
+I thought about that, but then I came to the conclusion that the whole
+idea is that we're supposed to be ignoring these regions - so why
+should they cause any change to the behaviour of vhost at all?
+Thus this way seems safer.
 
-Integrating this into a build system via "obj-y" might not be the best
-way. Does this code need a dedicated CONFIG_ symbol?
+Dave
 
-Thanks,
-Andrey Smirnov
-
-
- hw/misc/Makefile.objs                 |   1 +
- hw/misc/xilinx_slave_serial.c         | 105 ++++++++++++++++++++++++++++++++++
- include/hw/misc/xilinx_slave_serial.h |  21 +++++++
- 3 files changed, 127 insertions(+)
- create mode 100644 hw/misc/xilinx_slave_serial.c
- create mode 100644 include/hw/misc/xilinx_slave_serial.h
-
-diff --git a/hw/misc/Makefile.objs b/hw/misc/Makefile.objs
-index a68a201083..4599288e55 100644
---- a/hw/misc/Makefile.objs
-+++ b/hw/misc/Makefile.objs
-@@ -38,6 +38,7 @@ obj-$(CONFIG_IMX) += imx7_ccm.o
- obj-$(CONFIG_IMX) += imx2_wdt.o
- obj-$(CONFIG_IMX) += imx7_snvs.o
- obj-$(CONFIG_IMX) += imx7_gpr.o
-+obj-y += xilinx_slave_serial.o
- obj-$(CONFIG_MILKYMIST) += milkymist-hpdmc.o
- obj-$(CONFIG_MILKYMIST) += milkymist-pfpu.o
- obj-$(CONFIG_MAINSTONE) += mst_fpga.o
-diff --git a/hw/misc/xilinx_slave_serial.c b/hw/misc/xilinx_slave_serial.c
-new file mode 100644
-index 0000000000..607674fb60
---- /dev/null
-+++ b/hw/misc/xilinx_slave_serial.c
-@@ -0,0 +1,105 @@
-+/*
-+ * Copyright (c) 2017, Impinj, Inc.
-+ *
-+ * Code to emulate programming "port" of Xilinx FPGA in Slave Serial
-+ * configuration connected via SPI, for more deatils see (p. 27):
-+ *
-+ * See https://www.xilinx.com/support/documentation/user_guides/ug380.pdf
-+ *
-+ * Author: Andrey Smirnov <andrew.smirnov@gmail.com>
-+ *
-+ * This work is licensed under the terms of the GNU GPL, version 2 or later.
-+ * See the COPYING file in the top-level directory.
-+ */
-+
-+#include "qemu/osdep.h"
-+#include "hw/misc/xilinx_slave_serial.h"
-+#include "qemu/log.h"
-+
-+enum {
-+    XILINX_SLAVE_SERIAL_STATE_RESET,
-+    XILINX_SLAVE_SERIAL_STATE_RECONFIGURATION,
-+    XILINX_SLAVE_SERIAL_STATE_DONE,
-+};
-+
-+static void xilinx_slave_serial_update_outputs(XilinxSlaveSerialState *xlnxss)
-+{
-+    qemu_set_irq(xlnxss->done,
-+                 xlnxss->state == XILINX_SLAVE_SERIAL_STATE_DONE);
-+}
-+
-+static void xilinx_slave_serial_reset(DeviceState *dev)
-+{
-+    XilinxSlaveSerialState *xlnxss = XILINX_SLAVE_SERIAL(dev);
-+
-+    xlnxss->state = XILINX_SLAVE_SERIAL_STATE_RESET;
-+
-+    xilinx_slave_serial_update_outputs(xlnxss);
-+}
-+
-+static void xilinx_slave_serial_prog_b(void *opaque, int n, int level)
-+{
-+    XilinxSlaveSerialState *xlnxss = XILINX_SLAVE_SERIAL(opaque);
-+    assert(n == 0);
-+
-+    if (level) {
-+        xlnxss->state = XILINX_SLAVE_SERIAL_STATE_RECONFIGURATION;
-+    }
-+
-+    xilinx_slave_serial_update_outputs(xlnxss);
-+}
-+
-+static void xilinx_slave_serial_realize(SSISlave *ss, Error **errp)
-+{
-+    DeviceState *dev = DEVICE(ss);
-+    XilinxSlaveSerialState *xlnxss = XILINX_SLAVE_SERIAL(ss);
-+
-+    qdev_init_gpio_in_named(dev,
-+                            xilinx_slave_serial_prog_b,
-+                            XILINX_SLAVE_SERIAL_GPIO_PROG_B,
-+                            1);
-+    qdev_init_gpio_out_named(dev, &xlnxss->done,
-+                             XILINX_SLAVE_SERIAL_GPIO_DONE, 1);
-+}
-+
-+static uint32_t xilinx_slave_serial_transfer(SSISlave *ss, uint32_t tx)
-+{
-+    XilinxSlaveSerialState *xlnxss = XILINX_SLAVE_SERIAL(ss);
-+
-+    if (xlnxss->state == XILINX_SLAVE_SERIAL_STATE_RECONFIGURATION) {
-+        xlnxss->state = XILINX_SLAVE_SERIAL_STATE_DONE;
-+    }
-+
-+    xilinx_slave_serial_update_outputs(xlnxss);
-+    return 0;
-+}
-+
-+static void xilinx_slave_serial_class_init(ObjectClass *klass, void *data)
-+{
-+    DeviceClass   *dc = DEVICE_CLASS(klass);
-+    SSISlaveClass *k  = SSI_SLAVE_CLASS(klass);
-+
-+    dc->reset      = xilinx_slave_serial_reset;
-+    dc->desc       = "Xilinx Slave Serial";
-+    k->realize     = xilinx_slave_serial_realize;
-+    k->transfer    = xilinx_slave_serial_transfer;
-+    /*
-+     * Slave Serial configuration is not technically SPI and there's
-+     * no CS signal
-+     */
-+    k->set_cs      = NULL;
-+    k->cs_polarity = SSI_CS_NONE;
-+}
-+
-+static const TypeInfo xilinx_slave_serial_info = {
-+    .name          = TYPE_XILINX_SLAVE_SERIAL,
-+    .parent        = TYPE_SSI_SLAVE,
-+    .instance_size = sizeof(XilinxSlaveSerialState),
-+    .class_init    = xilinx_slave_serial_class_init,
-+};
-+
-+static void xilinx_slave_serial_register_type(void)
-+{
-+    type_register_static(&xilinx_slave_serial_info);
-+}
-+type_init(xilinx_slave_serial_register_type)
-diff --git a/include/hw/misc/xilinx_slave_serial.h b/include/hw/misc/xilinx_slave_serial.h
-new file mode 100644
-index 0000000000..f7b2e22be3
---- /dev/null
-+++ b/include/hw/misc/xilinx_slave_serial.h
-@@ -0,0 +1,21 @@
-+#ifndef XILINX_SLAVE_SERIAL_H
-+#define XILINX_SLAVE_SERIAL_H
-+
-+#include "hw/ssi/ssi.h"
-+
-+typedef struct XilinxSlaveSerialState {
-+    /*< private >*/
-+    SSISlave parent_obj;
-+
-+    qemu_irq done;
-+    int state;
-+} XilinxSlaveSerialState;
-+
-+#define TYPE_XILINX_SLAVE_SERIAL "xilinx:slave-serial"
-+#define XILINX_SLAVE_SERIAL(obj) \
-+    OBJECT_CHECK(XilinxSlaveSerialState, (obj), TYPE_XILINX_SLAVE_SERIAL)
-+
-+#define XILINX_SLAVE_SERIAL_GPIO_DONE   "xilinx:slave-serial:done"
-+#define XILINX_SLAVE_SERIAL_GPIO_PROG_B "xilinx:slave-serial:prog-b"
-+
-+#endif /* XILINX_SLAVE_SERIAL_H */
--- 
-2.14.3
+> > +
+> > +    trace_vhost_section(section->mr->name, result);
+> > +    return result;
+> >  }
+> >  
+> >  static void vhost_begin(MemoryListener *listener)
+> 
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
