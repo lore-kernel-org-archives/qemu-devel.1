@@ -1,31 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41198)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55721)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1ePYrw-0000os-I2
-	for qemu-devel@nongnu.org; Thu, 14 Dec 2017 14:08:33 -0500
+	(envelope-from <alistair23@gmail.com>) id 1ePZGt-00051U-VN
+	for qemu-devel@nongnu.org; Thu, 14 Dec 2017 14:34:20 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1ePYrv-0007iw-Sd
-	for qemu-devel@nongnu.org; Thu, 14 Dec 2017 14:08:32 -0500
-Received: from mail-ot0-x236.google.com ([2607:f8b0:4003:c0f::236]:37698)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1ePYrv-0007iU-O9
-	for qemu-devel@nongnu.org; Thu, 14 Dec 2017 14:08:31 -0500
-Received: by mail-ot0-x236.google.com with SMTP id s4so5835716ote.4
-	for <qemu-devel@nongnu.org>; Thu, 14 Dec 2017 11:08:31 -0800 (PST)
+	(envelope-from <alistair23@gmail.com>) id 1ePZGs-0005En-Uj
+	for qemu-devel@nongnu.org; Thu, 14 Dec 2017 14:34:19 -0500
 MIME-Version: 1.0
-In-Reply-To: <cfaa75b2-0da8-847d-0328-ec291ae81001@redhat.com>
-References: <20171213213557.26561-1-f4bug@amsat.org>
-	<20171214093907.GA14433@stefanha-x1.localdomain>
-	<d4d649fc-4bb2-9b61-7e48-46a6a51e7b01@redhat.com>
-	<CAMr-obuvJ4z54e0evM+J98jsdRayL-UeA_WDQVp0rx=sRoTVgw@mail.gmail.com>
-	<874lotwb0w.fsf@dusky.pond.sub.org>
-	<cfaa75b2-0da8-847d-0328-ec291ae81001@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Thu, 14 Dec 2017 19:08:10 +0000
-Message-ID: <CAFEAcA-13FJr=pscaLCtOZ0joG2Hm9m5iOuuK0xmLjSwG95U3w@mail.gmail.com>
+Sender: alistair23@gmail.com
+In-Reply-To: <CAAdtpL4gPTyMo-a0sNDN0F71wBca3gTfU0NBOr7ZHkmWDXwJow@mail.gmail.com>
+References: <20171213195852.30439-1-f4bug@amsat.org>
+	<20171213195852.30439-2-f4bug@amsat.org>
+	<CAKmqyKNSGCndaHmpGPOYGX7jrVbse-ahT=dEdY9XQVm43=AYZg@mail.gmail.com>
+	<CAAdtpL4gPTyMo-a0sNDN0F71wBca3gTfU0NBOr7ZHkmWDXwJow@mail.gmail.com>
+From: Alistair Francis <alistair.francis@xilinx.com>
+Date: Thu, 14 Dec 2017 11:33:47 -0800
+Message-ID: <CAKmqyKPPC4Q1+ccPKw0fYxpXTrT+ui5DE-bVxiRanRhLpYof9A@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [Qemu-block] [PATCH 0/6] QTests: use Python to run
- complex tests
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH 01/14] sd: split "sd-internal.h" of
+ "hw/sd/sd.h"
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,14 +27,37 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: Markus Armbruster <armbru@redhat.com>, Nir Soffer <nirsof@gmail.com>, "Edgar E . Iglesias" <edgar.iglesias@xilinx.com>, Kevin Wolf <kwolf@redhat.com>, Thomas Huth <thuth@redhat.com>, Fam Zheng <famz@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, Qemu-block <qemu-block@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>, =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>, Alistair Francis <alistair.francis@xilinx.com>, Max Reitz <mreitz@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Cleber Rosa <crosa@redhat.com>, =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@redhat.com>, =?UTF-8?B?THVrw6HFoSBEb2t0b3I=?= <ldoktor@redhat.com>
+To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>
+Cc: Alistair Francis <alistair.francis@xilinx.com>, "Edgar E . Iglesias" <edgar.iglesias@xilinx.com>, Peter Maydell <peter.maydell@linaro.org>, Prasad J Pandit <pjp@fedoraproject.org>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Andrey Smirnov <andrew.smirnov@gmail.com>, "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>, Andrew Baumann <Andrew.Baumann@microsoft.com>, Sai Pavan Boddu <saipava@xilinx.com>, Michael Walle <michael@walle.cc>, qemu-arm <qemu-arm@nongnu.org>, =?UTF-8?Q?C=C3=A9dric_Le_Goater?= <clg@kaod.org>, Andrey Yurovsky <yurovsky@gmail.com>
 
-On 14 December 2017 at 17:33, Paolo Bonzini <pbonzini@redhat.com> wrote:
-> And also in software collections.  For 2.12 (as part of the above "drop
-> Python 2.x support" plan)
+On Thu, Dec 14, 2017 at 9:59 AM, Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.o=
+rg> wrote:
+> On Thu, Dec 14, 2017 at 2:50 PM, Alistair Francis
+> <alistair.francis@xilinx.com> wrote:
+>> On Wed, Dec 13, 2017 at 11:58 AM, Philippe Mathieu-Daud=C3=A9
+>> <f4bug@amsat.org> wrote:
+>>> Now only SD 'producers' are able to use the "sd-internal.h" API,
+>>> while SD 'consumers' are restricted to the "hw/sd/sd.h" 'public' API.
+>>>
+>>> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
+>>
+>> I don't see what this gets us. Why bother moving this code into an
+>> internal header?
+>
+> This helped me to sort out the QOM design, however it is indeed not neces=
+sary.
 
-I'm reluctant to require a non-system python on OSX to build.
+If it makes development easier that is a good reason. I just don't see
+in this series how it helps.
 
-thanks
--- PMM
+>
+> I later use the registerfields API to add a bunch of other registers
+> and bitfields, so I prefer to still move the register #defines in
+> another internal header, else this API header get pretty unreadable.
+
+Ah, that makes some more sense.
+
+Alistair
+
+> I'll respin this series without this split.
+>
