@@ -1,36 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38015)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38602)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <maxime.coquelin@redhat.com>) id 1ePWXq-0002dR-MT
-	for qemu-devel@nongnu.org; Thu, 14 Dec 2017 11:39:39 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1ePWYT-00034j-Kr
+	for qemu-devel@nongnu.org; Thu, 14 Dec 2017 11:40:18 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <maxime.coquelin@redhat.com>) id 1ePWXk-0005Bf-Mr
-	for qemu-devel@nongnu.org; Thu, 14 Dec 2017 11:39:38 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:51118)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <maxime.coquelin@redhat.com>)
-	id 1ePWXk-0005Ae-Dp
-	for qemu-devel@nongnu.org; Thu, 14 Dec 2017 11:39:32 -0500
-References: <286AC319A985734F985F78AFA26841F73937E001@shsmsx102.ccr.corp.intel.com>
-	<20171211111147.GF13593@stefanha-x1.localdomain>
-	<286AC319A985734F985F78AFA26841F73937EEED@shsmsx102.ccr.corp.intel.com>
-	<20171212101440.GB6985@stefanha-x1.localdomain>
-	<5A30E0C1.3070905@intel.com>
-	<20171213123521.GL16782@stefanha-x1.localdomain>
-	<20171213165142-mutt-send-email-mst@kernel.org>
-	<CAJSP0QWHJBL4APkeMt8-P8PFaPF=Vbi0NSnJtU7YX67fJrW=hw@mail.gmail.com>
-	<825b8205-0b88-a198-b77d-63c8f2563c2e@redhat.com>
-	<20171214154656.GR14433@stefanha-x1.localdomain>
-	<20171214180830-mutt-send-email-mst@kernel.org>
-From: Maxime Coquelin <maxime.coquelin@redhat.com>
-Message-ID: <31609e8a-8446-cc8c-dc3b-a72d37086358@redhat.com>
-Date: Thu, 14 Dec 2017 17:39:19 +0100
+	(envelope-from <peter.maydell@linaro.org>) id 1ePWYS-0006Q0-Qm
+	for qemu-devel@nongnu.org; Thu, 14 Dec 2017 11:40:17 -0500
+Received: from mail-oi0-x235.google.com ([2607:f8b0:4003:c06::235]:45594)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1ePWYS-0006O0-GM
+	for qemu-devel@nongnu.org; Thu, 14 Dec 2017 11:40:16 -0500
+Received: by mail-oi0-x235.google.com with SMTP id x20so4285022oix.12
+	for <qemu-devel@nongnu.org>; Thu, 14 Dec 2017 08:40:16 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <20171214180830-mutt-send-email-mst@kernel.org>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [virtio-dev] Re: [virtio-dev] [PATCH v3 0/7]
- Vhost-pci for inter-VM communication
+In-Reply-To: <20171214124817.2567-1-dgilbert@redhat.com>
+References: <20171214124817.2567-1-dgilbert@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Thu, 14 Dec 2017 16:39:55 +0000
+Message-ID: <CAFEAcA_Ry6tpH-e+Nwz7vx6supfrwfrR3=EQTgx0W2R2+g45hA@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PULL 0/2] hmp queue
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -39,70 +28,35 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Michael S. Tsirkin" <mst@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>
-Cc: Stefan Hajnoczi <stefanha@gmail.com>, Wei Wang <wei.w.wang@intel.com>, "virtio-dev@lists.oasis-open.org" <virtio-dev@lists.oasis-open.org>, "Yang, Zhiyong" <zhiyong.yang@intel.com>, "jan.kiszka@siemens.com" <jan.kiszka@siemens.com>, "jasowang@redhat.com" <jasowang@redhat.com>, "avi.cohen@huawei.com" <avi.cohen@huawei.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "pbonzini@redhat.com" <pbonzini@redhat.com>, "marcandre.lureau@redhat.com" <marcandre.lureau@redhat.com>, snabb-devel@googlegroups.com, dgilbert@redhat.com
+To: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 
+On 14 December 2017 at 12:48, Dr. David Alan Gilbert (git)
+<dgilbert@redhat.com> wrote:
+> From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+>
+> The following changes since commit 0a0dc59d27527b78a195c2d838d28b7b49e5a639:
+>
+>   Update version for v2.11.0 release (2017-12-13 14:31:09 +0000)
+>
+> are available in the Git repository at:
+>
+>   git://github.com/dagrh/qemu.git tags/pull-hmp-20171214
+>
+> for you to fetch changes up to 0eaf3b824745cacebfc321aef6787528d33d58fe:
+>
+>   tests: test-hmp: print command execution result (2017-12-14 11:09:42 +0000)
+>
+> ----------------------------------------------------------------
+> HMP pull 2017-12-14
+>
+> ----------------------------------------------------------------
+> Thomas Huth (1):
+>       hmp-commands: Remove the deprecated usb_add and usb_del
+>
+> Vadim Galitsyn (1):
+>       tests: test-hmp: print command execution result
+>
+Applied, thanks.
 
-
-On 12/14/2017 05:27 PM, Michael S. Tsirkin wrote:
-> On Thu, Dec 14, 2017 at 03:46:56PM +0000, Stefan Hajnoczi wrote:
->> On Wed, Dec 13, 2017 at 10:50:11PM +0100, Maxime Coquelin wrote:
->>> On 12/13/2017 09:08 PM, Stefan Hajnoczi wrote:
->>>> On Wed, Dec 13, 2017 at 3:01 PM, Michael S. Tsirkin <mst@redhat.com> wrote:
->>>>> On Wed, Dec 13, 2017 at 12:35:21PM +0000, Stefan Hajnoczi wrote:
->>>>>> I'm not saying that DPDK should use libvhost-user.  I'm saying that it's
->>>>>> easy to add vfio vhost-pci support (for the PCI adapter I described) to
->>>>>> DPDK.  This patch series would require writing a completely new slave
->>>>>> for vhost-pci because the device interface is so different from
->>>>>> vhost-user.
->>>>>
->>>>> The main question is how appropriate is the vhost user protocol
->>>>> for passing to guests. And I am not sure at this point.
->>>>>
->>>>> Someone should go over vhost user messages and see whether they are safe
->>>>> to pass to guest. If most are then we can try the transparent approach.
->>>>> If most aren't then we can't and might as well use the proposed protocol
->>>>> which at least has code behind it.
->>>>
->>>> I have done that:
->>>>
->>> ...
->>>>    * VHOST_USER_SET_MEM_TABLE
->>>>
->>>>      Set up BARs before sending a VHOST_USER_SET_MEM_TABLE to the guest.
->>>
->>> It would require to filter out userspace_addr from the payload not to
->>> leak other QEMU process VAs to the guest.
->>
->> QEMU's vhost-user master implementation is insecure because it leaks
->> QEMU process VAs.  This also affects vhost-user host processes, not just
->> vhost-pci.
->>
->> The QEMU vhost-user master could send an post-IOMMU guest physical
->> addresses whereever the vhost-user protocol specification says "user
->> address".  That way no address space information is leaked although it
->> does leak IOMMU mappings.
->>
->> If we want to hide the IOMMU mappings too then we need another logical
->> address space (kind a randomized ramaddr_t).
->>
->> Anyway, my point is that the current vhost-user master implementation is
->> insecure and should be fixed.  vhost-pci doesn't need to worry about
->> this issue.
->>
->> Stefan
-> 
-> I was going to make this point too.  It does not look like anyone uses
-> userspace_addr. It might have been a mistake to put it there -
-> maybe we should have reused it for map offset.
-> 
-> It does not look like anyone uses this for anything.
-> 
-> How about we put zero, or a copy of the GPA there?
-> 
-> 
-
-It is used when no iommu for the ring addresses, and when iommu is used
-for the IOTLB update messages.
-
-Maxime
+-- PMM
