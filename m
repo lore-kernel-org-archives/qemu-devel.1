@@ -1,25 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41621)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41693)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1ePXNu-0002JT-Pn
-	for qemu-devel@nongnu.org; Thu, 14 Dec 2017 12:33:28 -0500
+	(envelope-from <alistair23@gmail.com>) id 1ePXO0-0002OP-Lv
+	for qemu-devel@nongnu.org; Thu, 14 Dec 2017 12:33:33 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1ePXNt-0003dy-Vh
-	for qemu-devel@nongnu.org; Thu, 14 Dec 2017 12:33:26 -0500
-References: <20171213213557.26561-1-f4bug@amsat.org>
-	<20171214093907.GA14433@stefanha-x1.localdomain>
-	<d4d649fc-4bb2-9b61-7e48-46a6a51e7b01@redhat.com>
-	<CAMr-obuvJ4z54e0evM+J98jsdRayL-UeA_WDQVp0rx=sRoTVgw@mail.gmail.com>
-	<874lotwb0w.fsf@dusky.pond.sub.org>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <cfaa75b2-0da8-847d-0328-ec291ae81001@redhat.com>
-Date: Thu, 14 Dec 2017 18:33:07 +0100
+	(envelope-from <alistair23@gmail.com>) id 1ePXNz-0003ie-MP
+	for qemu-devel@nongnu.org; Thu, 14 Dec 2017 12:33:32 -0500
+Received: from mail-wm0-x244.google.com ([2a00:1450:400c:c09::244]:33821)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <alistair23@gmail.com>)
+	id 1ePXNz-0003hk-GL
+	for qemu-devel@nongnu.org; Thu, 14 Dec 2017 12:33:31 -0500
+Received: by mail-wm0-x244.google.com with SMTP id y82so27221534wmg.1
+	for <qemu-devel@nongnu.org>; Thu, 14 Dec 2017 09:33:31 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <874lotwb0w.fsf@dusky.pond.sub.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
+Sender: alistair23@gmail.com
+In-Reply-To: <20171213195852.30439-7-f4bug@amsat.org>
+References: <20171213195852.30439-1-f4bug@amsat.org>
+	<20171213195852.30439-7-f4bug@amsat.org>
+From: Alistair Francis <alistair.francis@xilinx.com>
+Date: Thu, 14 Dec 2017 09:32:59 -0800
+Message-ID: <CAKmqyKOSn_iVVuqF=By8g2wFYG_PeiisepJhYMrK7imETGeE7A@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [Qemu-block] [PATCH 0/6] QTests: use Python to run
- complex tests
+Subject: Re: [Qemu-devel] [PATCH 06/14] sdhci: refactor same sysbus/pci
+ properties into a common one
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,68 +32,96 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>, Nir Soffer <nirsof@gmail.com>
-Cc: "Edgar E . Iglesias" <edgar.iglesias@xilinx.com>, Kevin Wolf <kwolf@redhat.com>, Thomas Huth <thuth@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, qemu-block@nongnu.org, Fam Zheng <famz@redhat.com>, Alistair Francis <alistair.francis@xilinx.com>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, qemu-devel@nongnu.org, Stefan Hajnoczi <stefanha@redhat.com>, Cleber Rosa <crosa@redhat.com>, =?UTF-8?B?THVrw6HFoSBEb2t0b3I=?= <ldoktor@redhat.com>, =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>, Max Reitz <mreitz@redhat.com>
+To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>
+Cc: Alistair Francis <alistair.francis@xilinx.com>, "Edgar E . Iglesias" <edgar.iglesias@xilinx.com>, Prasad J Pandit <pjp@fedoraproject.org>, Peter Maydell <peter.maydell@linaro.org>, Andrew Baumann <Andrew.Baumann@microsoft.com>, Andrey Smirnov <andrew.smirnov@gmail.com>, Andrey Yurovsky <yurovsky@gmail.com>, Sai Pavan Boddu <saipava@xilinx.com>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>
 
-On 14/12/2017 17:05, Markus Armbruster wrote:
-> Nir Soffer <nirsof@gmail.com> writes:
->=20
->> On Thu, Dec 14, 2017 at 1:36 PM Paolo Bonzini <pbonzini@redhat.com> wr=
-ote:
->>
->>> On 14/12/2017 10:39, Stefan Hajnoczi wrote:
->>>>>             # verify Card ID
->>>>>             data =3D self.bus.do_cmd(ALL_SEND_CID)
->>>>>             oid, pnm, psn =3D struct.unpack(">x2s5sxLxxx", data)
->>>>>             self.assertEqual(oid, "XY") # QEMU default
->>>>>             self.assertEqual(pnm, "QEMU!") # QEMU default
->>>>>             self.assertEqual(psn, 0xdeadbeef) # QEMU default
->>>> Device qtests are better done in C than Python.  Python is not good =
-at
->>>> binary I/O and porting this to Python 3 will be extra work later (Py=
-thon
->>>> 2 is set for End-of-Life in 2020, see https://pythonclock.org/).
->>>>
->>>> More importantly, we already have libqos in C with a guest memory
->>>> allocator, PCI, and virtio support.  Fragmenting the small amount ef=
-fort
->>>> that goes into device testing will delay libqos reaching critical ma=
-ss.
->>>> Critical mass is where libqos provides all the infrastructure you ne=
-ed
->>>> to set up a device and focus on your actual test instead of machine,
->>>> bus, or device initialization.  Starting a Python device testing eff=
-ort
->>>> will just lead to duplication and 2 underdeveloped device testing
->>>> frameworks.
->>>
->>> I agree that fragmentation is bad.  However, libqos is small (about 4=
-k
->>> lines of code, maybe 3k in Python).
->>>
->>> I also agree that any qtest written in Python should be written in
->>> Python 3 from the beginning (in fact we should consider dropping Pyth=
-on
->>> 2.x support in 2.12).  Doing so should not make binary I/O much
->>> different than C.
->>
->> Using python 3 will make it hard to develop and test qemu on RHEL/Cent=
-OS
->> which do not provide python 3 yet.
->=20
-> s/hard/slightly inconvenient/: Python 3 is available in EPEL. =20
+On Wed, Dec 13, 2017 at 11:58 AM, Philippe Mathieu-Daud=C3=A9
+<f4bug@amsat.org> wrote:
+> add sysbus/pci/sdbus separator comments to keep it clearer
+>
+> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
+> ---
+>  hw/sd/sdhci.c | 21 ++++++++++-----------
+>  1 file changed, 10 insertions(+), 11 deletions(-)
+>
+> diff --git a/hw/sd/sdhci.c b/hw/sd/sdhci.c
+> index a56c0c273e..c8b7b1ca4c 100644
+> --- a/hw/sd/sdhci.c
+> +++ b/hw/sd/sdhci.c
+> @@ -1256,13 +1256,17 @@ const VMStateDescription sdhci_vmstate =3D {
+>
+>  /* Capabilities registers provide information on supported features of t=
+his
+>   * specific host controller implementation */
+> -static Property sdhci_pci_properties[] =3D {
+> +static Property sdhci_properties[] =3D {
+>      DEFINE_PROP_UINT32("capareg", SDHCIState, capareg,
+>              SDHC_CAPAB_REG_DEFAULT),
+>      DEFINE_PROP_UINT32("maxcurr", SDHCIState, maxcurr, 0),
+> +    DEFINE_PROP_BOOL("pending-insert-quirk", SDHCIState, pending_insert_=
+quirk,
+> +                     false),
 
-And also in software collections.  For 2.12 (as part of the above "drop
-Python 2.x support" plan) my idea is to set up a virtual Python
-environment as part of configure, so that you can just do
+I like the reduction of code in this patch, but aren't we now going to
+have device properties that aren't actually connected to anything?
 
-	scl enable rh-python36 ./configure
-	make
+Alistair
 
-if you don't want to use EPEL.
-
-Paolo
-
->> Doing binary io in python 2 and 3 is the same, there is no need to use
->> python 3 for this. The only advantage is not having to backport code
->> later from 2 to 3.
+>      DEFINE_PROP_END_OF_LIST(),
+>  };
+>
+> +/* --- qdev PCI --- */
+> +
+>  static void sdhci_pci_realize(PCIDevice *dev, Error **errp)
+>  {
+>      SDHCIState *s =3D PCI_SDHCI(dev);
+> @@ -1295,7 +1299,7 @@ static void sdhci_pci_class_init(ObjectClass *klass=
+, void *data)
+>      k->class_id =3D PCI_CLASS_SYSTEM_SDHCI;
+>      set_bit(DEVICE_CATEGORY_STORAGE, dc->categories);
+>      dc->vmsd =3D &sdhci_vmstate;
+> -    dc->props =3D sdhci_pci_properties;
+> +    dc->props =3D sdhci_properties;
+>      dc->reset =3D sdhci_poweron_reset;
+>  }
+>
+> @@ -1310,14 +1314,7 @@ static const TypeInfo sdhci_pci_info =3D {
+>      },
+>  };
+>
+> -static Property sdhci_sysbus_properties[] =3D {
+> -    DEFINE_PROP_UINT32("capareg", SDHCIState, capareg,
+> -            SDHC_CAPAB_REG_DEFAULT),
+> -    DEFINE_PROP_UINT32("maxcurr", SDHCIState, maxcurr, 0),
+> -    DEFINE_PROP_BOOL("pending-insert-quirk", SDHCIState, pending_insert_=
+quirk,
+> -                     false),
+> -    DEFINE_PROP_END_OF_LIST(),
+> -};
+> +/* --- qdev SysBus --- */
+>
+>  static void sdhci_sysbus_init(Object *obj)
+>  {
+> @@ -1350,7 +1347,7 @@ static void sdhci_sysbus_class_init(ObjectClass *kl=
+ass, void *data)
+>      DeviceClass *dc =3D DEVICE_CLASS(klass);
+>
+>      dc->vmsd =3D &sdhci_vmstate;
+> -    dc->props =3D sdhci_sysbus_properties;
+> +    dc->props =3D sdhci_properties;
+>      dc->realize =3D sdhci_sysbus_realize;
+>      dc->reset =3D sdhci_poweron_reset;
+>  }
+> @@ -1364,6 +1361,8 @@ static const TypeInfo sdhci_sysbus_info =3D {
+>      .class_init =3D sdhci_sysbus_class_init,
+>  };
+>
+> +/* --- qdev bus master --- */
+> +
+>  static void sdhci_bus_class_init(ObjectClass *klass, void *data)
+>  {
+>      SDBusClass *sbc =3D SD_BUS_CLASS(klass);
+> --
+> 2.15.1
+>
+>
