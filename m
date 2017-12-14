@@ -1,19 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55074)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55095)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <andrew.smirnov@gmail.com>) id 1ePUt3-0001MK-TG
-	for qemu-devel@nongnu.org; Thu, 14 Dec 2017 09:53:26 -0500
+	(envelope-from <andrew.smirnov@gmail.com>) id 1ePUt4-0001N6-KI
+	for qemu-devel@nongnu.org; Thu, 14 Dec 2017 09:53:27 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <andrew.smirnov@gmail.com>) id 1ePUt3-0000K9-2r
-	for qemu-devel@nongnu.org; Thu, 14 Dec 2017 09:53:25 -0500
+	(envelope-from <andrew.smirnov@gmail.com>) id 1ePUt3-0000Lf-PA
+	for qemu-devel@nongnu.org; Thu, 14 Dec 2017 09:53:26 -0500
 From: Andrey Smirnov <andrew.smirnov@gmail.com>
-Date: Thu, 14 Dec 2017 06:52:42 -0800
-Message-Id: <20171214145255.31545-3-andrew.smirnov@gmail.com>
+Date: Thu, 14 Dec 2017 06:52:41 -0800
+Message-Id: <20171214145255.31545-2-andrew.smirnov@gmail.com>
 In-Reply-To: <20171214145255.31545-1-andrew.smirnov@gmail.com>
 References: <20171214145255.31545-1-andrew.smirnov@gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v2 02/15] imx_fec: Refactor imx_eth_enable_rx()
+Subject: [Qemu-devel] [PATCH v2 01/15] imx_fec: Do not link to netdev
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,8 +25,11 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-arm@nongnu.org
 Cc: Andrey Smirnov <andrew.smirnov@gmail.com>, Peter Maydell <peter.maydell@linaro.org>, Jason Wang <jasowang@redhat.com>, =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, qemu-devel@nongnu.org, yurovsky@gmail.com
 
-Refactor imx_eth_enable_rx() to have more meaningfull variable name
-than 'tmp' and to reduce number of logical negations done.
+Binding to a particular netdev doesn't seem to belong to this layer
+and should probably be done as a part of board or SoC specific code.
+
+Convert all of the users of this IP block to use
+qdev_set_nic_properties() instead.
 
 Cc: Peter Maydell <peter.maydell@linaro.org>
 Cc: Jason Wang <jasowang@redhat.com>
@@ -37,36 +40,34 @@ Cc: yurovsky@gmail.com
 Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
 Signed-off-by: Andrey Smirnov <andrew.smirnov@gmail.com>
 ---
- hw/net/imx_fec.c | 8 ++++----
- 1 file changed, 4 insertions(+), 4 deletions(-)
+ hw/arm/fsl-imx6.c | 1 +
+ hw/net/imx_fec.c  | 2 --
+ 2 files changed, 1 insertion(+), 2 deletions(-)
 
-diff --git a/hw/net/imx_fec.c b/hw/net/imx_fec.c
-index 88b4b049d7..8b2e4b8ffe 100644
---- a/hw/net/imx_fec.c
-+++ b/hw/net/imx_fec.c
-@@ -536,19 +536,19 @@ static void imx_eth_do_tx(IMXFECState *s)
- static void imx_eth_enable_rx(IMXFECState *s)
- {
-     IMXFECBufDesc bd;
--    bool tmp;
-+    bool rx_ring_full;
- 
-     imx_fec_read_bd(&bd, s->rx_descriptor);
- 
--    tmp = ((bd.flags & ENET_BD_E) != 0);
-+    rx_ring_full = !(bd.flags & ENET_BD_E);
- 
--    if (!tmp) {
-+    if (rx_ring_full) {
-         FEC_PRINTF("RX buffer full\n");
-     } else if (!s->regs[ENET_RDAR]) {
-         qemu_flush_queued_packets(qemu_get_queue(s->nic));
+diff --git a/hw/arm/fsl-imx6.c b/hw/arm/fsl-imx6.c
+index 26fd214004..2ed7146c52 100644
+--- a/hw/arm/fsl-imx6.c
++++ b/hw/arm/fsl-imx6.c
+@@ -385,6 +385,7 @@ static void fsl_imx6_realize(DeviceState *dev, Error **errp)
+                                             spi_table[i].irq));
      }
  
--    s->regs[ENET_RDAR] = tmp ? ENET_RDAR_RDAR : 0;
-+    s->regs[ENET_RDAR] = rx_ring_full ? 0 : ENET_RDAR_RDAR;
- }
++    qdev_set_nic_properties(DEVICE(&s->eth), &nd_table[0]);
+     object_property_set_bool(OBJECT(&s->eth), true, "realized", &err);
+     if (err) {
+         error_propagate(errp, err);
+diff --git a/hw/net/imx_fec.c b/hw/net/imx_fec.c
+index 90e6ee35ba..88b4b049d7 100644
+--- a/hw/net/imx_fec.c
++++ b/hw/net/imx_fec.c
+@@ -1171,8 +1171,6 @@ static void imx_eth_realize(DeviceState *dev, Error **errp)
  
- static void imx_eth_reset(DeviceState *d)
+     qemu_macaddr_default_if_unset(&s->conf.macaddr);
+ 
+-    s->conf.peers.ncs[0] = nd_table[0].netdev;
+-
+     s->nic = qemu_new_nic(&imx_eth_net_info, &s->conf,
+                           object_get_typename(OBJECT(dev)),
+                           DEVICE(dev)->id, s);
 -- 
 2.14.3
