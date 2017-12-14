@@ -1,29 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47133)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50180)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1ePVN1-00049d-TJ
-	for qemu-devel@nongnu.org; Thu, 14 Dec 2017 10:24:24 -0500
+	(envelope-from <imammedo@redhat.com>) id 1ePVQX-0006Lx-4h
+	for qemu-devel@nongnu.org; Thu, 14 Dec 2017 10:28:07 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1ePVMx-0004IG-O5
-	for qemu-devel@nongnu.org; Thu, 14 Dec 2017 10:24:23 -0500
-Received: from 13.mo7.mail-out.ovh.net ([87.98.150.175]:37676)
+	(envelope-from <imammedo@redhat.com>) id 1ePVQV-0007tL-VG
+	for qemu-devel@nongnu.org; Thu, 14 Dec 2017 10:28:01 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:38918)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1ePVMx-0004H8-GO
-	for qemu-devel@nongnu.org; Thu, 14 Dec 2017 10:24:19 -0500
-Received: from player762.ha.ovh.net (b6.ovh.net [213.186.33.56])
-	by mo7.mail-out.ovh.net (Postfix) with ESMTP id 2D2BD83CB8
-	for <qemu-devel@nongnu.org>; Thu, 14 Dec 2017 16:24:16 +0100 (CET)
-References: <20171209084338.29395-1-clg@kaod.org>
-	<20171209084338.29395-4-clg@kaod.org>
-From: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
-Message-ID: <0876c4bd-676f-276d-3cf6-aef4a2a562e5@kaod.org>
-Date: Thu, 14 Dec 2017 16:24:10 +0100
+	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1ePVQV-0007si-M4
+	for qemu-devel@nongnu.org; Thu, 14 Dec 2017 10:27:59 -0500
+Date: Thu, 14 Dec 2017 16:27:31 +0100
+From: Igor Mammedov <imammedo@redhat.com>
+Message-ID: <20171214162731.50a95633@redhat.com>
+In-Reply-To: <20171213180807.7066-5-dgilbert@redhat.com>
+References: <20171213180807.7066-1-dgilbert@redhat.com>
+	<20171213180807.7066-5-dgilbert@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20171209084338.29395-4-clg@kaod.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v2 03/19] spapr: introduce the XIVE
- interrupt sources
+Subject: Re: [Qemu-devel] [PATCH v4 4/6] vhost: add regions to temporary list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,82 +27,147 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, David Gibson <david@gibson.dropbear.id.au>, Benjamin Herrenschmidt <benh@kernel.crashing.org>, Greg Kurz <groug@kaod.org>
+To: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>
+Cc: qemu-devel@nongnu.org, pbonzini@redhat.com, maxime.coquelin@redhat.com, groug@kaod.org, mst@redhat.com
 
-> diff --git a/include/hw/ppc/spapr_xive.h b/include/hw/ppc/spapr_xive.h
-> index 5b1f78e06a1e..ecc15d889b74 100644
-> --- a/include/hw/ppc/spapr_xive.h
-> +++ b/include/hw/ppc/spapr_xive.h
-> @@ -24,8 +24,17 @@ struct sPAPRXive {
->      /* Properties */
->      uint32_t     nr_irqs;
->  
-> +    /* IRQ */
-> +    qemu_irq     *qirqs;
-> +
->      /* XIVE internal tables */
->      XiveIVE      *ivt;
-> +    uint8_t      *sbe;
-> +    uint32_t     sbe_size;
-> +
-> +    /* ESB memory region */
-> +    hwaddr       esb_base;
-> +    MemoryRegion esb_iomem;
->  };
->  
->  bool spapr_xive_irq_enable(sPAPRXive *xive, uint32_t lisn);
+On Wed, 13 Dec 2017 18:08:05 +0000
+"Dr. David Alan Gilbert (git)" <dgilbert@redhat.com> wrote:
+
+> From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
 > 
+> As regions are reported by the listener to the _nop and _add
+> methods, add them to our new temporary list.
+> Regions that abut can be merged if the backend allows.
+> 
+> Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+> ---
+>  hw/virtio/trace-events |  2 ++
+>  hw/virtio/vhost.c      | 70 ++++++++++++++++++++++++++++++++++++++++++++++++++
+>  2 files changed, 72 insertions(+)
+> 
+> diff --git a/hw/virtio/trace-events b/hw/virtio/trace-events
+> index 4a493bcd46..7de0663652 100644
+> --- a/hw/virtio/trace-events
+> +++ b/hw/virtio/trace-events
+> @@ -1,6 +1,8 @@
+>  # See docs/devel/tracing.txt for syntax documentation.
+>  
+>  # hw/virtio/vhost.c
+> +vhost_region_add_tmp(const char *name, uint64_t gpa, uint64_t size, uint64_t host) "%s: 0x%"PRIx64"+0x%"PRIx64" @ 0x%"PRIx64
+> +vhost_region_add_tmp_abut(const char *name, uint64_t new_size) "%s: 0x%"PRIx64
+>  vhost_section(const char *name, int r) "%s:%d"
+>  
+>  # hw/virtio/virtio.c
+> diff --git a/hw/virtio/vhost.c b/hw/virtio/vhost.c
+> index 4523f45587..2084888aa7 100644
+> --- a/hw/virtio/vhost.c
+> +++ b/hw/virtio/vhost.c
+> @@ -694,6 +694,67 @@ static void vhost_commit(MemoryListener *listener)
+>      dev->memory_changed = false;
+>  }
+>  
+> +/* Adds the section data to the tmp_mem structure.
+> + * It relies on the listener calling us in memory address order
+> + * and for each region (via the _add and _nop methods).
+> + */
+> +static void vhost_region_add_tmp(struct vhost_dev *dev,
+> +                                 MemoryRegionSection *section)
+> +{
+> +    bool need_add = true;
+> +    uint64_t mrs_size = int128_get64(section->size);
+> +    uint64_t mrs_gpa = section->offset_within_address_space;
+> +    uintptr_t mrs_host = (uintptr_t)memory_region_get_ram_ptr(section->mr) +
+> +                         section->offset_within_region;
+> +
+> +    trace_vhost_region_add_tmp(section->mr->name, mrs_gpa, mrs_size, mrs_host);
+> +
+> +    if (dev->tmp_mem->nregions) {
+> +        /* Since we already have at least one region, lets see if
+> +         * this extends it; since we're scanning in order, we only
+> +         * have to look at the last one, and the FlatView that calls
+> +         * us shouldn't have overlaps.
+> +         */
+> +        struct vhost_memory_region *prev_vmr = dev->tmp_mem->regions +
+> +                                               (dev->tmp_mem->nregions - 1);
+> +        uint64_t prev_gpa_start = prev_vmr->guest_phys_addr;
+> +        uint64_t prev_gpa_end   = range_get_last(prev_gpa_start,
+> +                                                 prev_vmr->memory_size);
+> +        uint64_t prev_host_start = prev_vmr->userspace_addr;
+> +        uint64_t prev_host_end   = range_get_last(prev_host_start,
+> +                                                  prev_vmr->memory_size);
+> +
+> +        if (prev_gpa_end + 1 == mrs_gpa &&
+> +            prev_host_end + 1 == mrs_host &&
+> +            (!dev->vhost_ops->vhost_backend_can_merge ||
+> +                dev->vhost_ops->vhost_backend_can_merge(dev,
+> +                    mrs_host, mrs_size,
+> +                    prev_host_start, prev_vmr->memory_size))) {
+> +            /* The two regions abut */
+> +            need_add = false;
+> +            mrs_size = mrs_size + prev_vmr->memory_size;
+> +            prev_vmr->memory_size = mrs_size;
+> +            trace_vhost_region_add_tmp_abut(section->mr->name, mrs_size);
+> +        }
+> +    }
+> +
+> +    if (need_add) {
+> +        uint32_t nregions = dev->tmp_mem->nregions;
+> +        size_t s = offsetof(struct vhost_memory, regions) +
+> +                            (nregions + 1) * sizeof dev->tmp_mem->regions[0];
+> +        dev->tmp_mem = g_realloc(dev->tmp_mem, s);
+> +        dev->tmp_mem->nregions++;
+> +        struct vhost_memory_region *cur_vmr = &dev->tmp_mem->regions[nregions];
+> +
+> +        cur_vmr->guest_phys_addr = mrs_gpa;
+> +        cur_vmr->memory_size     = mrs_size;
+> +        cur_vmr->userspace_addr  = mrs_host;
+> +        cur_vmr->flags_padding = 0;
+> +    }
+> +
+> +
+> +}
+> +
+>  static void vhost_region_add(MemoryListener *listener,
+>                               MemoryRegionSection *section)
+>  {
+> @@ -703,6 +764,7 @@ static void vhost_region_add(MemoryListener *listener,
+>      if (!vhost_section(section)) {
+>          return;
+>      }
+> +    vhost_region_add_tmp(dev, section);
+>  
+>      ++dev->n_mem_sections;
+>      dev->mem_sections = g_renew(MemoryRegionSection, dev->mem_sections,
+> @@ -800,9 +862,17 @@ static void vhost_iommu_region_del(MemoryListener *listener,
+>      }
+>  }
+>  
+> +/* Called on regions that have not changed */
+>  static void vhost_region_nop(MemoryListener *listener,
+>                               MemoryRegionSection *section)
+>  {
+move it close to add/del callbacks
 
-The addition of the XIVE source fields directly under the sPAPRXive 
-object is really a design choice. But I am starting to think that 
-having multiple XIVE source objects would be a good idea.
+> +    struct vhost_dev *dev = container_of(listener, struct vhost_dev,
+> +                                         memory_listener);
+> +    if (!vhost_section(section)) {
+> +        return;
+> +    }
+> +
+> +    vhost_region_add_tmp(dev, section);
+if you'd operate on temporary mem_sections,
+I'd add memory_region_ref() and get rid of region_del callback
+with its section lookup, by unreffing old sections at commit time.
 
-Roughly speaking, a XIVE source is a bunch of PQ bits plus a MMIO 
-region to manipulate them and, in the QEMU model, a set of associated 
-qemu_irqs to do the same from the handlers. 
-
-In real HW, the PSI host bridge controller on the P9 for instance, 
-a register holds all the P bits of the IRQs (no Q bits because the 
-IRQs are only LSIs) and there is a specific MMIO region for them. 
-PSIHB also has a register to store the assertion level of each IRQ.   
-So this is quite similar to what we are adding above and in the
-next patch for the LSI support. 
-
-The source triggering only depends on the PQ bits (plus the LSI 
-level) and the result is a simple forward of the event notification 
-to the central XIVE engine : the IVRE, doing the routing. The IVRE
-is really our sPAPRXive object. 
-
-The API between the source and the IVRE is extremely simple :
-
-  static void spapr_xive_irq(sPAPRXive *xive, int lisn)
-
-The IVRE then scans its IVT, finds the EQ, and moves on to the 
-presenter.
-
-So, we can keep the IVRE engine (sPAPRXive) attached directly to 
-the machine like we have today, this is good, and introduce multiple 
-XIVE source objects. The sPAPR machine would have : 
-
- - one for the IPIs [ 0 - nr_servers ]
- - one generic for the devices [ 4096 -  ]
- - one for each phb ? 
-
-The source address in the overall ESB MMIO region would be calculated 
-from the offset of the source IRQ numbers in the IRQ number space. 
-The offset could very well be hardcoded for each device. I don't see 
-any XICS compatibility problems as we are sharing correctly the IRQ 
-number space already.
+Also it seems that we have a race in current code where
+region_del() unrefs memory region first and then by the
+commit time memory region could be gone since old flatview
+is unreffed before commit callback is called, but guest still
+uses old memory map until vhost_set_mem_table() is complete.
+We probably should unref deleted(old) sections after
+guest gets new memmap.
 
 
-I am starting this discussion because the support for XIVE in the 
-QEMU PowerNV machine will need multiple sources, just like for 
-POWER8. PnvXive will be a bit different because the IVRE tables 
-(IVT and EQDT) are in the virtual machine memory. Most of the settings 
-are done in the VM. The QEMU PowerNV machine will still have to 
-implement the triggering and the routing logic using the guest tables. 
-
-
-Regards,
-
-C. 
+>  }
+>  
+>  static int vhost_virtqueue_set_addr(struct vhost_dev *dev,
