@@ -1,23 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40406)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42961)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1ePPQU-0003kV-Eh
-	for qemu-devel@nongnu.org; Thu, 14 Dec 2017 04:03:38 -0500
+	(envelope-from <kwolf@redhat.com>) id 1ePPTz-00054W-4X
+	for qemu-devel@nongnu.org; Thu, 14 Dec 2017 04:07:15 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1ePPQQ-00012E-Nv
-	for qemu-devel@nongnu.org; Thu, 14 Dec 2017 04:03:34 -0500
-References: <1501867249-1924-1-git-send-email-peter.maydell@linaro.org>
-	<1501867249-1924-4-git-send-email-peter.maydell@linaro.org>
-	<CAFEAcA-mOzfHhGt0jXtTVMe4_GGp6bg_SK1R4JBbQxpw2+gokg@mail.gmail.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <96e94933-7381-7448-5d3b-ae8ad14d2097@redhat.com>
-Date: Thu, 14 Dec 2017 10:03:18 +0100
+	(envelope-from <kwolf@redhat.com>) id 1ePPTv-0005Po-Ut
+	for qemu-devel@nongnu.org; Thu, 14 Dec 2017 04:07:11 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:60474)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <kwolf@redhat.com>) id 1ePPTv-0005Oq-OD
+	for qemu-devel@nongnu.org; Thu, 14 Dec 2017 04:07:07 -0500
+Date: Thu, 14 Dec 2017 10:06:58 +0100
+From: Kevin Wolf <kwolf@redhat.com>
+Message-ID: <20171214090658.GA3731@dhcp-200-186.str.redhat.com>
+References: <20171213232025.24503-1-f4bug@amsat.org>
+	<20171213232025.24503-2-f4bug@amsat.org>
 MIME-Version: 1.0
-In-Reply-To: <CAFEAcA-mOzfHhGt0jXtTVMe4_GGp6bg_SK1R4JBbQxpw2+gokg@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [Qemu-arm] [PATCH 3/8] cputlb: Support generating
- CPU exceptions on memory transaction failures
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+In-Reply-To: <20171213232025.24503-2-f4bug@amsat.org>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH 01/26] sdbus: add a QMP command to access a
+ SDBus
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,27 +29,23 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>, qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>
-Cc: Richard Henderson <rth@twiddle.net>, "patches@linaro.org" <patches@linaro.org>
+To: Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <f4bug@amsat.org>
+Cc: Alistair Francis <alistair.francis@xilinx.com>, "Edgar E . Iglesias" <edgar.iglesias@xilinx.com>, Peter Maydell <peter.maydell@linaro.org>, Markus Armbruster <armbru@redhat.com>, Michael Roth <mdroth@linux.vnet.ibm.com>, Andrey Smirnov <andrew.smirnov@gmail.com>, Andrey Yurovsky <yurovsky@gmail.com>, Eduardo Habkost <ehabkost@redhat.com>, "Daniel P . Berrange" <berrange@redhat.com>, Eric Blake <eblake@redhat.com>, Fam Zheng <famz@redhat.com>, Thomas Huth <thuth@redhat.com>, =?iso-8859-1?Q?Marc-Andr=E9?= Lureau <marcandre.lureau@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org
 
-On 13/12/2017 17:39, Peter Maydell wrote:
-> I was looking at a bug that involved stepping through this function,
-> and it turns out that the value in the variable "physaddr" here is
-> not in fact the physical address of the access. It's just the offset
-> into the memory region.
-> 
-> This doesn't matter for Arm or Alpha, which don't actually need the
-> physaddr for reporting the exceptions, and those are the only
-> current implementations of the transaction_failed hook.
-> But we should fix this so it doesn't bite us when we do eventually
-> have a cpu that needs the physaddr...
-> 
-> If we have a CPUIOTLBEntry how do we get back to the physaddr for it?
+Am 14.12.2017 um 00:20 hat Philippe Mathieu-Daud=E9 geschrieben:
+> Use Base64 to serialize the binary blobs in JSON.
+> So far at most 512 bytes will be transfered, which result
+> in a 684 bytes payload.
+> Since this command is intented for qtesting, this is acceptable.
+>=20
+> Signed-off-by: Philippe Mathieu-Daud=E9 <f4bug@amsat.org>
 
-iotlb_to_region only gets the MemoryRegion from the MemoryRegionSection,
-but you could actually make it return the whole MRS.  Then you can sum
-the MRS's offset_with_address_space.
+Doing this kind of thing over QMP doesn't look right to me. qtests
+should access hardware the same way as real guests access the hardware
+(i.e. MMIO and I/O ports).
 
-Thanks,
+But if for some reason the QMP maintainers were to think that this is
+acceptable in QMP, I'd argue it should at least get an x-debug- prefix
+to avoid making it a stable API that management tools may rely on.
 
-Paolo
+Kevin
