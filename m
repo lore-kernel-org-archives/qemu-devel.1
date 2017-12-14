@@ -1,25 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49215)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52194)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1ePTHR-0002YQ-OY
-	for qemu-devel@nongnu.org; Thu, 14 Dec 2017 08:10:31 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1ePTNF-0003ZE-9O
+	for qemu-devel@nongnu.org; Thu, 14 Dec 2017 08:16:30 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1ePTHL-0006Td-EX
-	for qemu-devel@nongnu.org; Thu, 14 Dec 2017 08:10:29 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:33076)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1ePTHL-0006Sn-0S
-	for qemu-devel@nongnu.org; Thu, 14 Dec 2017 08:10:23 -0500
-Date: Thu, 14 Dec 2017 13:10:15 +0000
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20171214131014.GA2542@work-vm>
-References: <20171205065307.21853-1-peterx@redhat.com>
-	<20171205065307.21853-7-peterx@redhat.com>
+	(envelope-from <peter.maydell@linaro.org>) id 1ePTN9-0005I8-Ed
+	for qemu-devel@nongnu.org; Thu, 14 Dec 2017 08:16:29 -0500
+Received: from mail-ot0-x242.google.com ([2607:f8b0:4003:c0f::242]:45874)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1ePTN9-0005Go-7M
+	for qemu-devel@nongnu.org; Thu, 14 Dec 2017 08:16:23 -0500
+Received: by mail-ot0-x242.google.com with SMTP id 103so4859939otj.12
+	for <qemu-devel@nongnu.org>; Thu, 14 Dec 2017 05:16:23 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20171205065307.21853-7-peterx@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v5 06/28] migration: allow dst vm pause on
- postcopy
+In-Reply-To: <3fb76985-d02d-262f-491c-384680a13f3b@redhat.com>
+References: <1512669755-8409-1-git-send-email-thuth@redhat.com>
+	<1512669755-8409-3-git-send-email-thuth@redhat.com>
+	<CAFEAcA9gz0cNkPvZhkLYfYQ+ST01POwuptfXkKixSu_x=s9C+g@mail.gmail.com>
+	<3fb76985-d02d-262f-491c-384680a13f3b@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Thu, 14 Dec 2017 13:16:01 +0000
+Message-ID: <CAFEAcA8D87rdcO6qVqfgS2G3N0fBzuj1uUsCRXcCv3m1KR6eyg@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH for-2.12 2/2] net: Remove the deprecated
+ -tftp, -bootp, -redir and -smb options
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,181 +32,74 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Xu <peterx@redhat.com>
-Cc: qemu-devel@nongnu.org, Andrea Arcangeli <aarcange@redhat.com>, "Daniel P . Berrange" <berrange@redhat.com>, Juan Quintela <quintela@redhat.com>, Alexey Perevalov <a.perevalov@samsung.com>
+To: Thomas Huth <thuth@redhat.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, Jason Wang <jasowang@redhat.com>, Samuel Thibault <samuel.thibault@ens-lyon.org>, Stefan Hajnoczi <stefanha@redhat.com>
 
-* Peter Xu (peterx@redhat.com) wrote:
-> When there is IO error on the incoming channel (e.g., network down),
-> instead of bailing out immediately, we allow the dst vm to switch to the
-> new POSTCOPY_PAUSE state. Currently it is still simple - it waits the
-> new semaphore, until someone poke it for another attempt.
-> 
-> One note is that here on ram loading thread we cannot detect the
-> POSTCOPY_ACTIVE state, but we need to detect the more specific
-> POSTCOPY_INCOMING_RUNNING state, to make sure we have already loaded all
-> the device states.
-> 
-> Signed-off-by: Peter Xu <peterx@redhat.com>
+On 14 December 2017 at 12:28, Thomas Huth <thuth@redhat.com> wrote:
+> On 11.12.2017 23:04, Peter Maydell wrote:
+>> The deprecation message says:
+>>                error_report("The -redir option is deprecated. "
+>>                             "Please use '-netdev user,hostfwd=...' instead.");
+>>
+>> How does this work for systems which have embedded ethernet
+>> devices and can't use -netdev ?
+>
+> Of course it should work the same way as you currently can configure all
+> embedded ethernet devices:
+>
+>  -net nic -net user,hostfwd=...
 
+Mmm, but the deprecation message doesn't say that.
 
-Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+> By the way, I think our documentation is really lacking some proper
+> description how to deal with on-board devices ...
+>
+>> This is one reason I haven't bothered to update my scripts yet
+>
+> -redir is likely not doing what you expect as soon as you are using two
+> or more (embedded or non-embedded) NICs on a machine, so you really
+> should not use that option anymore.
 
-> ---
->  migration/migration.c  |  1 +
->  migration/migration.h  |  3 +++
->  migration/savevm.c     | 63 ++++++++++++++++++++++++++++++++++++++++++++++++--
->  migration/trace-events |  2 ++
->  4 files changed, 67 insertions(+), 2 deletions(-)
-> 
-> diff --git a/migration/migration.c b/migration/migration.c
-> index f69a48ac63..6f0d48bbed 100644
-> --- a/migration/migration.c
-> +++ b/migration/migration.c
-> @@ -150,6 +150,7 @@ MigrationIncomingState *migration_incoming_get_current(void)
->          memset(&mis_current, 0, sizeof(MigrationIncomingState));
->          qemu_mutex_init(&mis_current.rp_mutex);
->          qemu_event_init(&mis_current.main_thread_load_event, false);
-> +        qemu_sem_init(&mis_current.postcopy_pause_sem_dst, 0);
->          once = true;
->      }
->      return &mis_current;
-> diff --git a/migration/migration.h b/migration/migration.h
-> index 36aaa13f50..55894ecb79 100644
-> --- a/migration/migration.h
-> +++ b/migration/migration.h
-> @@ -61,6 +61,9 @@ struct MigrationIncomingState {
->      /* The coroutine we should enter (back) after failover */
->      Coroutine *migration_incoming_co;
->      QemuSemaphore colo_incoming_sem;
-> +
-> +    /* notify PAUSED postcopy incoming migrations to try to continue */
-> +    QemuSemaphore postcopy_pause_sem_dst;
->  };
->  
->  MigrationIncomingState *migration_incoming_get_current(void);
-> diff --git a/migration/savevm.c b/migration/savevm.c
-> index 8814793255..1e5fc4f332 100644
-> --- a/migration/savevm.c
-> +++ b/migration/savevm.c
-> @@ -1529,8 +1529,8 @@ static int loadvm_postcopy_ram_handle_discard(MigrationIncomingState *mis,
->   */
->  static void *postcopy_ram_listen_thread(void *opaque)
->  {
-> -    QEMUFile *f = opaque;
->      MigrationIncomingState *mis = migration_incoming_get_current();
-> +    QEMUFile *f = mis->from_src_file;
->      int load_res;
->  
->      migrate_set_state(&mis->state, MIGRATION_STATUS_ACTIVE,
-> @@ -1544,6 +1544,14 @@ static void *postcopy_ram_listen_thread(void *opaque)
->       */
->      qemu_file_set_blocking(f, true);
->      load_res = qemu_loadvm_state_main(f, mis);
-> +
-> +    /*
-> +     * This is tricky, but, mis->from_src_file can change after it
-> +     * returns, when postcopy recovery happened. In the future, we may
-> +     * want a wrapper for the QEMUFile handle.
-> +     */
-> +    f = mis->from_src_file;
-> +
->      /* And non-blocking again so we don't block in any cleanup */
->      qemu_file_set_blocking(f, false);
->  
-> @@ -1626,7 +1634,7 @@ static int loadvm_postcopy_handle_listen(MigrationIncomingState *mis)
->      /* Start up the listening thread and wait for it to signal ready */
->      qemu_sem_init(&mis->listen_thread_sem, 0);
->      qemu_thread_create(&mis->listen_thread, "postcopy/listen",
-> -                       postcopy_ram_listen_thread, mis->from_src_file,
-> +                       postcopy_ram_listen_thread, NULL,
->                         QEMU_THREAD_DETACHED);
->      qemu_sem_wait(&mis->listen_thread_sem);
->      qemu_sem_destroy(&mis->listen_thread_sem);
-> @@ -2011,11 +2019,44 @@ void qemu_loadvm_state_cleanup(void)
->      }
->  }
->  
-> +/* Return true if we should continue the migration, or false. */
-> +static bool postcopy_pause_incoming(MigrationIncomingState *mis)
-> +{
-> +    trace_postcopy_pause_incoming();
-> +
-> +    migrate_set_state(&mis->state, MIGRATION_STATUS_POSTCOPY_ACTIVE,
-> +                      MIGRATION_STATUS_POSTCOPY_PAUSED);
-> +
-> +    assert(mis->from_src_file);
-> +    qemu_file_shutdown(mis->from_src_file);
-> +    qemu_fclose(mis->from_src_file);
-> +    mis->from_src_file = NULL;
-> +
-> +    assert(mis->to_src_file);
-> +    qemu_file_shutdown(mis->to_src_file);
-> +    qemu_mutex_lock(&mis->rp_mutex);
-> +    qemu_fclose(mis->to_src_file);
-> +    mis->to_src_file = NULL;
-> +    qemu_mutex_unlock(&mis->rp_mutex);
-> +
-> +    error_report("Detected IO failure for postcopy. "
-> +                 "Migration paused.");
-> +
-> +    while (mis->state == MIGRATION_STATUS_POSTCOPY_PAUSED) {
-> +        qemu_sem_wait(&mis->postcopy_pause_sem_dst);
-> +    }
-> +
-> +    trace_postcopy_pause_incoming_continued();
-> +
-> +    return true;
-> +}
-> +
->  static int qemu_loadvm_state_main(QEMUFile *f, MigrationIncomingState *mis)
->  {
->      uint8_t section_type;
->      int ret = 0;
->  
-> +retry:
->      while (true) {
->          section_type = qemu_get_byte(f);
->  
-> @@ -2060,6 +2101,24 @@ static int qemu_loadvm_state_main(QEMUFile *f, MigrationIncomingState *mis)
->  out:
->      if (ret < 0) {
->          qemu_file_set_error(f, ret);
-> +
-> +        /*
-> +         * Detect whether it is:
-> +         *
-> +         * 1. postcopy running (after receiving all device data, which
-> +         *    must be in POSTCOPY_INCOMING_RUNNING state.  Note that
-> +         *    POSTCOPY_INCOMING_LISTENING is still not enough, it's
-> +         *    still receiving device states).
-> +         * 2. network failure (-EIO)
-> +         *
-> +         * If so, we try to wait for a recovery.
-> +         */
-> +        if (postcopy_state_get() == POSTCOPY_INCOMING_RUNNING &&
-> +            ret == -EIO && postcopy_pause_incoming(mis)) {
-> +            /* Reset f to point to the newly created channel */
-> +            f = mis->from_src_file;
-> +            goto retry;
-> +        }
->      }
->      return ret;
->  }
-> diff --git a/migration/trace-events b/migration/trace-events
-> index da1c63a933..bed1646cd6 100644
-> --- a/migration/trace-events
-> +++ b/migration/trace-events
-> @@ -100,6 +100,8 @@ open_return_path_on_source(void) ""
->  open_return_path_on_source_continue(void) ""
->  postcopy_start(void) ""
->  postcopy_pause_continued(void) ""
-> +postcopy_pause_incoming(void) ""
-> +postcopy_pause_incoming_continued(void) ""
->  postcopy_start_set_run(void) ""
->  source_return_path_thread_bad_end(void) ""
->  source_return_path_thread_end(void) ""
-> -- 
-> 2.14.3
-> 
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+Two NICs on a machine is an obscure special case, though.
+Almost all setups will have just the one NIC.
+
+>> The message also doesn't point out that if you were previously
+>> using -net + -redir you need to switch to -device + -netdev,
+>> since -net + -netdev doesn't work AFAIK.
+>
+> I haven't tried, but I think you can also use:
+>
+>  -netdev user,id=u1,hostfwd=... -net nic,netdev=u1
+>
+> Or did you run into problems here?
+
+Nope. I just ignored the whole thing because the deprecation
+message didn't give me enough help and didn't actually stop
+anything working, and I knew that what the message did
+say was definitely wrong for my command line. I suspect I'm
+not an entirely atypical user here...
+
+I think what we need to do to be able to actually remove
+this code is:
+ (1) make sure our documentation is clear and simple about
+how to move from an old command line to a new one
+(with examples, and covering all the conditions, not
+just the "let's assume everything's a PC with a
+pluggable PCI network card" case)
+ (2) make the deprecation warning be specific, and
+cover all the cases, and probably refer to a documentation
+URL
+ (3) make -redir in versions where we've removed the
+functionality print a message that specifically says
+"this option has been removed and is replaced by $FOO;
+see $URL for how to update your command line" (ie not
+just "-redir: unknown option", but retain the deprecation
+warning text for a bit).
+
+(Sorry if this feels like unexpectedly raising the bar
+for deprecation&removal -- I should probably have
+raised the issue earlier, but it was only your
+patch doing the removal that reminded me.)
+
+thanks
+-- PMM
