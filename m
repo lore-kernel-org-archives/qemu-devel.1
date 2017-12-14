@@ -1,30 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43895)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47085)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alistair23@gmail.com>) id 1ePcst-0007v3-2i
-	for qemu-devel@nongnu.org; Thu, 14 Dec 2017 18:25:48 -0500
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1ePczT-0001MC-0q
+	for qemu-devel@nongnu.org; Thu, 14 Dec 2017 18:32:35 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alistair23@gmail.com>) id 1ePcss-0007aK-1e
-	for qemu-devel@nongnu.org; Thu, 14 Dec 2017 18:25:47 -0500
-Received: from mail-wm0-x241.google.com ([2a00:1450:400c:c09::241]:37145)
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1ePczS-0005ea-6U
+	for qemu-devel@nongnu.org; Thu, 14 Dec 2017 18:32:34 -0500
+Received: from mail-it0-x243.google.com ([2607:f8b0:4001:c0b::243]:34918)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <alistair23@gmail.com>)
-	id 1ePcsr-0007Zj-Om
-	for qemu-devel@nongnu.org; Thu, 14 Dec 2017 18:25:45 -0500
-Received: by mail-wm0-x241.google.com with SMTP id f140so14406390wmd.2
-	for <qemu-devel@nongnu.org>; Thu, 14 Dec 2017 15:25:45 -0800 (PST)
+	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1ePczS-0005eK-0K
+	for qemu-devel@nongnu.org; Thu, 14 Dec 2017 18:32:34 -0500
+Received: by mail-it0-x243.google.com with SMTP id f143so15028019itb.0
+	for <qemu-devel@nongnu.org>; Thu, 14 Dec 2017 15:32:33 -0800 (PST)
 MIME-Version: 1.0
-Sender: alistair23@gmail.com
-In-Reply-To: <CAAdtpL5izShurORQ1vpRQQxT6L2QGCwjeQqRhzb+_DYoGrrL3g@mail.gmail.com>
+Sender: philippe.mathieu.daude@gmail.com
+In-Reply-To: <CAKmqyKPCfjm9Z6VBNBTKHeXdp4KLpbPWZT3UHmJj08bYNdp04Q@mail.gmail.com>
 References: <20171213195852.30439-1-f4bug@amsat.org>
-	<20171213195852.30439-4-f4bug@amsat.org>
-	<CAKmqyKMSwraSQ1XBuWYi1A2zfcgCKEqRC_PvKkpcH=f=ynDnXA@mail.gmail.com>
-	<CAAdtpL5izShurORQ1vpRQQxT6L2QGCwjeQqRhzb+_DYoGrrL3g@mail.gmail.com>
-From: Alistair Francis <alistair.francis@xilinx.com>
-Date: Thu, 14 Dec 2017 15:25:13 -0800
-Message-ID: <CAKmqyKMAvNeSherLS=NT5TDxV0tJRkaPLAF3vkL+CixDTQ1Rfg@mail.gmail.com>
+	<20171213195852.30439-13-f4bug@amsat.org>
+	<CAKmqyKPCfjm9Z6VBNBTKHeXdp4KLpbPWZT3UHmJj08bYNdp04Q@mail.gmail.com>
+From: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>
+Date: Thu, 14 Dec 2017 20:32:32 -0300
+Message-ID: <CAAdtpL5Ta2_N0ZQZ-jN3gFpTtuy5p-MoCHXh_SA=r2VwEGwiMg@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 03/14] sdhci: use the ldst_le_dma() API
+Subject: Re: [Qemu-devel] [PATCH 12/14] sdhci: add a trace event for the LED
+ control
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,116 +35,27 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>
-Cc: Alistair Francis <alistair.francis@xilinx.com>, Peter Maydell <peter.maydell@linaro.org>, "Edgar E . Iglesias" <edgar.iglesias@xilinx.com>, Prasad J Pandit <pjp@fedoraproject.org>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Andrey Smirnov <andrew.smirnov@gmail.com>, "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>, Andrew Baumann <Andrew.Baumann@microsoft.com>, Sai Pavan Boddu <saipava@xilinx.com>, Andrey Yurovsky <yurovsky@gmail.com>
+To: Alistair Francis <alistair.francis@xilinx.com>
+Cc: "Edgar E . Iglesias" <edgar.iglesias@xilinx.com>, Prasad J Pandit <pjp@fedoraproject.org>, Peter Maydell <peter.maydell@linaro.org>, Andrew Baumann <Andrew.Baumann@microsoft.com>, Andrey Smirnov <andrew.smirnov@gmail.com>, Andrey Yurovsky <yurovsky@gmail.com>, Sai Pavan Boddu <saipava@xilinx.com>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>
 
-On Thu, Dec 14, 2017 at 3:21 PM, Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.o=
-rg> wrote:
-> On Thu, Dec 14, 2017 at 2:23 PM, Alistair Francis
-> <alistair.francis@xilinx.com> wrote:
->> On Wed, Dec 13, 2017 at 11:58 AM, Philippe Mathieu-Daud=C3=A9
->> <f4bug@amsat.org> wrote:
->>> This makes the code slightly safer, also easier to review.
->>>
->>> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
->>> ---
->>>  hw/sd/sdhci.c | 23 +++++++----------------
->>>  1 file changed, 7 insertions(+), 16 deletions(-)
->>>
->>> diff --git a/hw/sd/sdhci.c b/hw/sd/sdhci.c
->>> index 312b167bfa..e39623baba 100644
->>> --- a/hw/sd/sdhci.c
->>> +++ b/hw/sd/sdhci.c
->>> @@ -603,14 +603,12 @@ typedef struct ADMADescr {
->>>
->>>  static void get_adma_description(SDHCIState *s, ADMADescr *dscr)
->>>  {
->>> -    uint32_t adma1 =3D 0;
->>> -    uint64_t adma2 =3D 0;
->>> +    uint32_t adma1;
->>> +    uint64_t adma2;
->>>      hwaddr entry_addr =3D (hwaddr)s->admasysaddr;
->>>      switch (SDHC_DMA_TYPE(s->hostctl)) {
->>>      case SDHC_CTRL_ADMA2_32:
->>> -        dma_memory_read(&address_space_memory, entry_addr, (uint8_t *)=
-&adma2,
->>> -                        sizeof(adma2));
->>> -        adma2 =3D le64_to_cpu(adma2);
->>> +        adma2 =3D ldq_le_dma(&address_space_memory, entry_addr);
->>>          /* The spec does not specify endianness of descriptor table.
->>>           * We currently assume that it is LE.
->>>           */
->>> @@ -620,9 +618,7 @@ static void get_adma_description(SDHCIState *s, ADM=
-ADescr *dscr)
->>>          dscr->incr =3D 8;
->>>          break;
->>>      case SDHC_CTRL_ADMA1_32:
->>> -        dma_memory_read(&address_space_memory, entry_addr, (uint8_t *)=
-&adma1,
->>> -                        sizeof(adma1));
->>> -        adma1 =3D le32_to_cpu(adma1);
->>> +        adma1 =3D ldl_le_dma(&address_space_memory, entry_addr);
->>>          dscr->addr =3D (hwaddr)(adma1 & 0xFFFFF000);
->>>          dscr->attr =3D (uint8_t)extract32(adma1, 0, 7);
->>>          dscr->incr =3D 4;
->>> @@ -633,14 +629,9 @@ static void get_adma_description(SDHCIState *s, AD=
-MADescr *dscr)
->>>          }
->>>          break;
->>>      case SDHC_CTRL_ADMA2_64:
->>> -        dma_memory_read(&address_space_memory, entry_addr,
->>> -                        (uint8_t *)(&dscr->attr), 1);
->>> -        dma_memory_read(&address_space_memory, entry_addr + 2,
->>> -                        (uint8_t *)(&dscr->length), 2);
->>> -        dscr->length =3D le16_to_cpu(dscr->length);
->>> -        dma_memory_read(&address_space_memory, entry_addr + 4,
->>> -                        (uint8_t *)(&dscr->addr), 8);
->>> -        dscr->attr =3D le64_to_cpu(dscr->attr);
+On Thu, Dec 14, 2017 at 2:55 PM, Alistair Francis
+<alistair.francis@xilinx.com> wrote:
+> On Wed, Dec 13, 2017 at 11:58 AM, Philippe Mathieu-Daud=C3=A9
+> <f4bug@amsat.org> wrote:
+>> It blinks to caution the user not to remove the card while the SD card i=
+s
+>> being accessed.
 >>
->>> +        dscr->attr =3D ldub_dma(&address_space_memory, entry_addr);
->>> +        dscr->length =3D lduw_le_dma(&address_space_memory, entry_addr=
- + 2);
->>> +        dscr->attr =3D ldq_le_dma(&address_space_memory, entry_addr + =
-4);
->>
->> Why this is being overwritten?
+>> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
 >
-> Do you mean 'rewritten'?
+> If you turn this on does it just fill the trace log?
 >
->> It looks like you have dropped an addr as well.
->
-> Which addr? The diff is a bit compressed, if you separate it is more obvi=
-ous:
->
->  -        dma_memory_read(&address_space_memory, entry_addr,
->  -                        (uint8_t *)(&dscr->attr), 1);
->  +        dscr->attr =3D ldub_dma(&address_space_memory, entry_addr);
+> It seems like this will generate too much output if it happens on
+> every LED blink.
 
-This is rewritten later, why bother setting this here?
+You don't need to enable this trace event if you don't want it :)
+It is supposed to turn ON previous to start write access, and then turn OFF=
+.
 
->
->
->  -        dma_memory_read(&address_space_memory, entry_addr + 2,
->  -                        (uint8_t *)(&dscr->length), 2);
->  -        dscr->length =3D le16_to_cpu(dscr->length);
->  +        dscr->length =3D lduw_le_dma(&address_space_memory, entry_addr =
-+ 2);
->
->
->  -        dma_memory_read(&address_space_memory, entry_addr + 4,
->  -                        (uint8_t *)(&dscr->addr), 8);
-
-What about dscr->addr which is set here?
-
-Alistair
-
->  -        dscr->attr =3D le64_to_cpu(dscr->attr);
->  +        dscr->attr =3D ldq_le_dma(&address_space_memory, entry_addr + 4=
-);
->
-> The API is detailled in this file: docs/devel/loads-stores.rst
->
-> I decided to rewrite this code with this API because it looks easier
-> to understand (maybe once you read the API doc), so easier to review
-> :)
->
+Anyway you are right, I currently log it on each access while I should
+just log the ON/OFF state changes, I'll fix this.
