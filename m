@@ -1,26 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41466)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41470)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1ePUX8-00085u-4H
+	(envelope-from <imammedo@redhat.com>) id 1ePUX8-00085v-DL
 	for qemu-devel@nongnu.org; Thu, 14 Dec 2017 09:30:47 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1ePUX1-0001kB-Oe
+	(envelope-from <imammedo@redhat.com>) id 1ePUX3-0001mr-I1
 	for qemu-devel@nongnu.org; Thu, 14 Dec 2017 09:30:46 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:59312)
+Received: from mx1.redhat.com ([209.132.183.28]:35526)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1ePUX1-0001i9-GD
-	for qemu-devel@nongnu.org; Thu, 14 Dec 2017 09:30:39 -0500
-Date: Thu, 14 Dec 2017 14:30:19 +0000
-From: Stefan Hajnoczi <stefanha@redhat.com>
-Message-ID: <20171214143019.GM14433@stefanha-x1.localdomain>
-References: <20171205055200.16305-1-peterx@redhat.com>
-	<20171205055200.16305-25-peterx@redhat.com>
+	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1ePUX3-0001ls-8N
+	for qemu-devel@nongnu.org; Thu, 14 Dec 2017 09:30:41 -0500
+Date: Thu, 14 Dec 2017 15:30:28 +0100
+From: Igor Mammedov <imammedo@redhat.com>
+Message-ID: <20171214153028.25c12b0e@redhat.com>
+In-Reply-To: <20171213180807.7066-2-dgilbert@redhat.com>
+References: <20171213180807.7066-1-dgilbert@redhat.com>
+	<20171213180807.7066-2-dgilbert@redhat.com>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="0+35XlDF45POFHfm"
-Content-Disposition: inline
-In-Reply-To: <20171205055200.16305-25-peterx@redhat.com>
-Subject: Re: [Qemu-devel] [RFC v5 24/26] docs: update QMP documents for OOB
- commands
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v4 1/6] vhost: Move log_dirty check
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,171 +27,92 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Xu <peterx@redhat.com>
-Cc: qemu-devel@nongnu.org, Stefan Hajnoczi <shajnocz@redhat.com>, "Daniel P . Berrange" <berrange@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Fam Zheng <famz@redhat.com>, Juan Quintela <quintela@redhat.com>, mdroth@linux.vnet.ibm.com, Eric Blake <eblake@redhat.com>, Laurent Vivier <lvivier@redhat.com>, Markus Armbruster <armbru@redhat.com>, marcandre.lureau@redhat.com, "Dr . David Alan Gilbert" <dgilbert@redhat.com>
+To: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>
+Cc: qemu-devel@nongnu.org, pbonzini@redhat.com, maxime.coquelin@redhat.com, mst@redhat.com, groug@kaod.org
 
+On Wed, 13 Dec 2017 18:08:02 +0000
+"Dr. David Alan Gilbert (git)" <dgilbert@redhat.com> wrote:
 
---0+35XlDF45POFHfm
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
-
-On Tue, Dec 05, 2017 at 01:51:58PM +0800, Peter Xu wrote:
-> diff --git a/docs/devel/qapi-code-gen.txt b/docs/devel/qapi-code-gen.txt
-> index f04c63fe82..8597fdb087 100644
-> --- a/docs/devel/qapi-code-gen.txt
-> +++ b/docs/devel/qapi-code-gen.txt
-> @@ -556,7 +556,8 @@ following example objects:
-> =20
->  Usage: { 'command': STRING, '*data': COMPLEX-TYPE-NAME-OR-DICT,
->           '*returns': TYPE-NAME, '*boxed': true,
-> -         '*gen': false, '*success-response': false }
-> +         '*gen': false, '*success-response': false,
-> +         '*allow-oob': false }
-> =20
->  Commands are defined by using a dictionary containing several members,
->  where three members are most common.  The 'command' member is a
-> @@ -636,6 +637,44 @@ possible, the command expression should include the =
-optional key
->  'success-response' with boolean value false.  So far, only QGA makes
->  use of this member.
-> =20
-> +Most of the QMP commands are handled sequentially in such a order:
-> +Firstly, the JSON Parser parses the command request into some internal
-> +message, delivers the message to QMP dispatchers. Secondly, the QMP
-> +dispatchers will handle the commands one by one in time order, respond
-> +when necessary.
-
-The important points to cover about normal commands:
-1. They execute in order
-2. They run the main loop
-3. They run under the BQL
-
-The other stuff about parsing requests into internal messages,
-dispatchers, etc is not relevant.  It's better not to include it in
-documentation because it can change and could also confuse readers
-(since they don't need this info).
-
-> For some commands that always complete "quickly" can
-
-I've mentioned before that "quickly" is misleading and not what oob
-commands are about.  I suggest changing this to:
-
-  Certain urgent commands can
-
-I've made similar comments further down where I think the text focusses
-on words like "quickly" or "asynchronous" too much.
-
-> +instead be executed directly during parsing, at the QMP client's
-> +request.  This kind of commands that allow direct execution is called
-> +"out-of-band" ("oob" as shortcut) commands. The response can overtake
-> +prior in-band commands' responses.  By default, commands are always
-> +in-band.  We need to explicitly specify "allow-oob" to "True" to show
-
-s/"True"/true/  (JSON is case-sensitive)
-
-> +that one command can be run out-of-band.
+> From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+> 
+> Move the log_dirty check into vhost_section.
+> 
+> Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+> ---
+>  hw/virtio/trace-events |  3 +++
+>  hw/virtio/vhost.c      | 20 +++++++++++++-------
+>  2 files changed, 16 insertions(+), 7 deletions(-)
+> 
+> diff --git a/hw/virtio/trace-events b/hw/virtio/trace-events
+> index 775461ae98..4a493bcd46 100644
+> --- a/hw/virtio/trace-events
+> +++ b/hw/virtio/trace-events
+> @@ -1,5 +1,8 @@
+>  # See docs/devel/tracing.txt for syntax documentation.
+>  
+> +# hw/virtio/vhost.c
+> +vhost_section(const char *name, int r) "%s:%d"
 > +
-> +One thing to mention for developers is that, although out-of-band
-> +execution of commands benefit from quick and asynchronous execution,
-> +it need to satisfy at least the following:
-> +
-> +(1) It is extremely quick and never blocks, so that its execution will
-> +    not block parsing routine of any other monitors.
-> +
-> +(2) It does not need BQL, since the parser can be run without BQL,
-> +    while the dispatcher is always with BQL held.
-
-These conditions are not sufficient for postcopy recovery.  I suggest
-rephrasing this section as follows:
-
-  An out-of-band command must:
-
-  1. Complete extremely quickly
-  2. Not take locks
-  3. Not invoke blocking system calls
-  4. Not access guest RAM or memory that blocks when userfaultfd is
-     enabled for postcopy live migration
-
-We could make #2 less strict by saying "Not take locks except for
-spinlocks (or mutexes that could be spinlocks because the critical
-regions are tiny) or indirectly via g_malloc()".
-
-> Whether a command is
-> +allowed to run out-of-band can also be introspected using
-> +query-qmp-schema command.  Please see the section "Client JSON
-> +Protocol introspection" for more information.
-
-This is relevant to client authors, not QEMU developers learning about
-qapi.  I suggest dropping it.
-
-> +
-> +To execute a command in out-of-band way, we need to specify the
-> +"control" field in the request, with "run-oob" set to true. Example:
-> +
-> + =3D> { "execute": "command-support-oob",
-> +      "arguments": { ... },
-> +      "control": { "run-oob": true } }
-> + <=3D { "return": { } }
-> +
-> +Without it, even the commands that supports out-of-band execution will
-> +still be run in-band.
-
-This is relevant to client authors, not QEMU developers learning about
-qapi.  I suggest instead explaining how qmp functions need to test for
-qmp_is_oob() so that they know which mode they are executing in.
-
->  2.2.1 Capabilities
->  ------------------
-> =20
-> -As of the date this document was last revised, no server or client
-> -capability strings have been defined.
+>  # hw/virtio/virtio.c
+>  virtqueue_alloc_element(void *elem, size_t sz, unsigned in_num, unsigned out_num) "elem %p size %zd in_num %u out_num %u"
+>  virtqueue_fill(void *vq, const void *elem, unsigned int len, unsigned int idx) "vq %p elem %p len %u idx %u"
+> diff --git a/hw/virtio/vhost.c b/hw/virtio/vhost.c
+> index e4290ce93d..e923219e63 100644
+> --- a/hw/virtio/vhost.c
+> +++ b/hw/virtio/vhost.c
+> @@ -27,6 +27,7 @@
+>  #include "hw/virtio/virtio-access.h"
+>  #include "migration/blocker.h"
+>  #include "sysemu/dma.h"
+> +#include "trace.h"
+>  
+>  /* enabled until disconnected backend stabilizes */
+>  #define _VHOST_DEBUG 1
+> @@ -567,18 +568,12 @@ static void vhost_set_memory(MemoryListener *listener,
+>                                           memory_listener);
+>      hwaddr start_addr = section->offset_within_address_space;
+>      ram_addr_t size = int128_get64(section->size);
+> -    bool log_dirty =
+> -        memory_region_get_dirty_log_mask(section->mr) & ~(1 << DIRTY_MEMORY_MIGRATION);
+>      int s = offsetof(struct vhost_memory, regions) +
+>          (dev->mem->nregions + 1) * sizeof dev->mem->regions[0];
+>      void *ram;
+>  
+>      dev->mem = g_realloc(dev->mem, s);
+>  
+> -    if (log_dirty) {
+> -        add = false;
+> -    }
 > -
-> +Currently supported capabilities are:
+>      assert(size);
+>  
+>      /* Optimize no-change case. At least cirrus_vga does this a lot at this time. */
+> @@ -611,8 +606,19 @@ static void vhost_set_memory(MemoryListener *listener,
+>  
+>  static bool vhost_section(MemoryRegionSection *section)
+>  {
+> -    return memory_region_is_ram(section->mr) &&
+> +    bool result;
+> +    bool log_dirty = memory_region_get_dirty_log_mask(section->mr) &
+> +                     ~(1 << DIRTY_MEMORY_MIGRATION);
+> +    result = memory_region_is_ram(section->mr) &&
+>          !memory_region_is_rom(section->mr);
 > +
-> +- "oob": it means the QMP server supports "Out-Of-Band" command
-> +  execution.  For more detail, please see "run-oob" parameter in
-> +  "Issuing Commands" section below.  Not all commands allow this "oob"
-> +  execution.  One can know whether one command supports "oob" by
-> +  "query-qmp-schema" command.
+> +    /* Vhost doesn't handle any block which is doing dirty-tracking other
+> +     * than migration; this typically fires on VGA areas.
+> +     */
+> +    result &= !log_dirty;
+before patch even if log_dirty, vhost_set_memory will still proceed
+and may remove dirty section from memmap and set memory_changed = true
+
+but with this patch it will just ignore such section,
+I'm not sure it's right (it might be right with new approach add/nop
+but then this patch should go after new code in place and old one
+if gone).
+
 > +
-> +  NOTE: Converting an existing QMP command to be OOB-capable can be
-> +  either very easy or extremely hard.  The most important thing is
-> +  that OOB-capable command should never be blocked for a long time.
-> +  Some bad examples: (1) doing IOs, especially when the backend can be
-> +  an NFS storage; or (2) accessing guest memories, which can be simply
-> +  blocked for a very long time when it triggers a page fault, which
-> +  may not be handled immediately.  It's still legal to take a mutex in
-> +  an OOB-capable command handler, however, we need to make sure that
-> +  all the other code paths that are protected by the same lock won't
-> +  be blocked very long as well, otherwise the OOB handler might be
-> +  blocked too when it tries to take the lock.
-
-Please drop this paragraph, this is the qmp-spec.txt document so the
-implementation of QEMU's QMP commands shouldn't be discussed here.
-
-> For some commands that always complete
-> +  "quickly" can be executed directly during parsing at the QMP
-> +  client's request.
-
-Please drop this sentence.  "quickly" isn't the important quality, it's
-urgency.  Also the description of execution in the QMP parser isn't
-relevant for qmp-spec.txt, what matters is that oob commands can execute
-while a normal monitor command is still running (this is described next
-so this whole sentence can be dropped).
-
---0+35XlDF45POFHfm
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEcBAEBAgAGBQJaMor7AAoJEJykq7OBq3PILqIH/At9xBC3ugoIfZ+59K9Fij5A
-lN9QcGpv7s5ma68Nz3ZltDOr3Ti6mU/Rt28lXm0o3rU7/g7cZW3GXkTBX3wL4qwH
-99gmRLF2Hd7lRRRFywDyUoi8Y3+5lVPw7lD0sTxlkyGqUtjCfnZs/cqgictzIhwu
-S2/s26tF/Qw7/TDZ/FADQfOfdvMfArBWDeRgI5k2memUrRirQ03BmZsJQ7YdbpqF
-zhQTnTt8t+ZbofawGiVhku6S4RHk/Q8zDlR9H1B6D2ROmOxd9dCotZunIX5ad0Pm
-BVcOqRAdzUd1AAYILNHdXTwJGbQEK1I34asgRKKa5M6ZmH5qIfTY1umfbF8Y58c=
-=B9lf
------END PGP SIGNATURE-----
-
---0+35XlDF45POFHfm--
+> +    trace_vhost_section(section->mr->name, result);
+> +    return result;
+>  }
+>  
+>  static void vhost_begin(MemoryListener *listener)
