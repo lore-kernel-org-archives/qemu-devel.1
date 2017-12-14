@@ -1,22 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55851)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60328)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1ePP3H-0004j4-Ha
-	for qemu-devel@nongnu.org; Thu, 14 Dec 2017 03:39:36 -0500
+	(envelope-from <mprivozn@redhat.com>) id 1ePPBn-0006O5-0b
+	for qemu-devel@nongnu.org; Thu, 14 Dec 2017 03:48:23 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1ePP3E-0001ot-Vy
-	for qemu-devel@nongnu.org; Thu, 14 Dec 2017 03:39:35 -0500
-Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
-References: <20171214005953.8898-1-jsnow@redhat.com>
-	<20171214005953.8898-4-jsnow@redhat.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <7804bd5f-b3f7-aa13-9510-0bc6d54995aa@redhat.com>
-Date: Thu, 14 Dec 2017 09:39:29 +0100
+	(envelope-from <mprivozn@redhat.com>) id 1ePPBm-0002SX-84
+	for qemu-devel@nongnu.org; Thu, 14 Dec 2017 03:48:23 -0500
+References: <b630fe8c-6905-6743-d29d-ded450d5d10b@redhat.com>
+	<20171211114129.GC3350@lemon>
+	<c57f063f-a95b-4a82-8b5e-a713ba61d734@redhat.com>
+	<7ee9e2f2-9690-9f6d-6952-d96953501c0f@redhat.com>
+From: Michal Privoznik <mprivozn@redhat.com>
+Message-ID: <f63d71f0-4de1-354b-f45f-05c37580f3d7@redhat.com>
+Date: Thu, 14 Dec 2017 09:48:08 +0100
 MIME-Version: 1.0
-In-Reply-To: <20171214005953.8898-4-jsnow@redhat.com>
+In-Reply-To: <7ee9e2f2-9690-9f6d-6952-d96953501c0f@redhat.com>
 Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
+Content-Language: en-GB
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 3/7] blockjob: create block_job_throttle
+Subject: Re: [Qemu-devel] QEMU not honouring bootorder
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,15 +26,28 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: John Snow <jsnow@redhat.com>, qemu-block@nongnu.org
-Cc: kwolf@redhat.com, qemu-devel@nongnu.org, mreitz@redhat.com, stefanha@redhat.com
+To: Paolo Bonzini <pbonzini@redhat.com>, Fam Zheng <famz@redhat.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, qemu-block@nongnu.org
 
-On 14/12/2017 01:59, John Snow wrote:
-> + * Yield if it has been SLICE_TIME nanoseconds since the last yield.
-> + * Otherwise, check if we need to pause (and update the yield counter).
+On 12/13/2017 10:21 PM, Paolo Bonzini wrote:
+> On 11/12/2017 13:14, Michal Privoznik wrote:
+>>>>   qemu-system-x86_64 \
+>>>>   -boot menu=on,strict=on \
+>>>>   -device lsi,id=scsi0,bus=pci.0 \
+>>>>   -drive file=/var/lib/libvirt/images/fedora.qcow2,format=qcow2,if=none,id=drive-scsi0 \
+>>>>   -device scsi-hd,bus=scsi0.0,drive=drive-scsi0,bootindex=1 \
+>>>>   -drive file=/dev/sde,format=raw,if=none,id=drive-scsi1 \
+>>>>   -device scsi-block,bus=scsi0.0,drive=drive-scsi1,bootindex=2
+>>>>
+>>>> It was found that if 'drive-scsi1' is scsi-hd instead of scsi-block
+>>>> everything works as expected and I can boot my guest successfully.
+>>> Does it help if you add SCSI level ordering with "lun={0,1},channel=0,scsi-id=0"
+>>> for both devices?
+>> Setting lun helps. On the other hand, I had to change from LSI
+>> controller to virtio-scsi as LSI doesn't support more than 1 LUNs.
+> 
+> Does it help to use virtio-scsi and keep the default assignment?
 
-What is the yield counter?
+Yes. If I s/lsi/virtio-scsi-pci/ on the cmd line it does help too.
 
-Thanks,
-
-Paolo
+Michal
