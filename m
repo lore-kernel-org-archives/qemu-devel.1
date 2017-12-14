@@ -1,27 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42951)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43953)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ard.biesheuvel@linaro.org>) id 1ePT6q-0000C2-Eb
-	for qemu-devel@nongnu.org; Thu, 14 Dec 2017 07:59:33 -0500
+	(envelope-from <bounces@canonical.com>) id 1ePT8A-00011G-0N
+	for qemu-devel@nongnu.org; Thu, 14 Dec 2017 08:01:00 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ard.biesheuvel@linaro.org>) id 1ePT6p-00018g-Jg
-	for qemu-devel@nongnu.org; Thu, 14 Dec 2017 07:59:32 -0500
-Received: from mail-it0-x22a.google.com ([2607:f8b0:4001:c0b::22a]:46799)
+	(envelope-from <bounces@canonical.com>) id 1ePT80-0003Ew-Ea
+	for qemu-devel@nongnu.org; Thu, 14 Dec 2017 08:00:54 -0500
+Received: from indium.canonical.com ([91.189.90.7]:55772)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <ard.biesheuvel@linaro.org>)
-	id 1ePT6p-00017i-EE
-	for qemu-devel@nongnu.org; Thu, 14 Dec 2017 07:59:31 -0500
-Received: by mail-it0-x22a.google.com with SMTP id t1so11081934ite.5
-	for <qemu-devel@nongnu.org>; Thu, 14 Dec 2017 04:59:31 -0800 (PST)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1ePT80-0003DR-7d
+	for qemu-devel@nongnu.org; Thu, 14 Dec 2017 08:00:44 -0500
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1ePT7z-0004TH-8z
+	for <qemu-devel@nongnu.org>; Thu, 14 Dec 2017 13:00:43 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 407F82E80C7
+	for <qemu-devel@nongnu.org>; Thu, 14 Dec 2017 13:00:43 +0000 (UTC)
 MIME-Version: 1.0
-In-Reply-To: <CAFEAcA8HswEKDPpj=cM711rNU2zwPuDXW7886=Oa2HBDmZxdCg@mail.gmail.com>
-References: <1513183941-24300-1-git-send-email-peter.maydell@linaro.org>
-	<CAFEAcA8HswEKDPpj=cM711rNU2zwPuDXW7886=Oa2HBDmZxdCg@mail.gmail.com>
-From: Ard Biesheuvel <ard.biesheuvel@linaro.org>
-Date: Thu, 14 Dec 2017 13:59:30 +0100
-Message-ID: <CAKv+Gu970cDwifDV1kz=kBWTWzxJyuT+QUAVNkFawun5psgYVg@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [Qemu-arm] [PATCH 0/2] GICv2 & GICv3: RAZ/WI
- reserved addresses rather than aborting
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Thu, 14 Dec 2017 12:50:35 -0000
+From: Roman <romanzwi000@gmx.at>
+Reply-To: Bug 1738202 <1738202@bugs.launchpad.net>
+Sender: bounces@canonical.com
+Message-Id: <151325583524.11815.276669131575779398.malonedeb@gac.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1738202] [NEW] qemu 2.11 segfaults on elf file
+ that worked with qemu2.7
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,24 +36,105 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>, Laszlo Ersek <lersek@redhat.com>, "patches@linaro.org" <patches@linaro.org>, qemu-stable <qemu-stable@nongnu.org>
+To: qemu-devel@nongnu.org
 
-On 13 December 2017 at 16:54, Peter Maydell <peter.maydell@linaro.org> wrote:
-> On 13 December 2017 at 16:52, Peter Maydell <peter.maydell@linaro.org> wrote:
->> The GICv2 and GICv3 specifications say that reserved register
->> addresses should RAZ/WI.  This means we need to return MEMTX_OK, not
->> MEMTX_ERROR, because now that we support generating external aborts
->> the latter will cause an abort on new board models.
->>
->> In particular, at least some versions of UEFI try to
->> access a reserved address in the GICv3 redistributor
->> (at SGI_base + 0x184) and fail to boot on the virt board
->> without this.
->>
+Public bug reported:
 
-Could this commit
+running on cygwin in Windows 7
 
-https://github.com/tianocore/edk2/commit/28f8d28faabf50a82ef8d137308592c64ea9e2b6
+QEMU 2.10.93 segfaults:
+$ /opt/qemu2.11/qemu-system-arm -M integratorcp -cpu cortex-m4 -semihosting=
+ -nographic -monitor null -serial null -no-reboot -kernel MFWso_Cycle_f1uP2=
+_CUNIT_0.elf
+Segmentation fault
 
-have anything to do with that?
+where QEMU 2.7.0 worked:
+$ /opt/qemu2.7/qemu-system-arm -M integratorcp -cpu cortex-m4 -semihosting =
+-nographic -monitor null -serial null -no-reboot -kernel MFWso_Cycle_f1uP2_=
+CUNIT_0.elf
+------------ CUnit_MFWso_Cycle_f1 ------------
+
+
+     CUnit - A Unit testing framework for C - Version 2.1-0
+     http://cunit.sourceforge.net/
+
+
+Suite: Suite_MFWso_Cycle_f1
+  Test: MFWso_Cycle_f1() ... passed
+  Test: MFWso_GetPhysicalStateData() ... passed
+  Test: MFWso_GetOutputData() ... passed
+  Test: MFWso_GetSafeChannelOK() ... passed
+
+--Run Summary: Type      Total     Ran  Passed  Failed
+               suites        1       1     n/a       0
+               tests         4       4       4       0
+               asserts      54      54      54       0
+
+----------------------------------------
+
+Omitting the -cpu parameter results (for both versions) to hang of qemu
+(no output, no end, full cpu load).
+
+** Affects: qemu
+     Importance: Undecided
+         Status: New
+
+
+** Tags: qemu
+
+** Attachment added: "MFWso_Cycle_f1uP2_CUNIT_0.elf to reproduce"
+   https://bugs.launchpad.net/bugs/1738202/+attachment/5022612/+files/MFWso=
+_Cycle_f1uP2_CUNIT_0.elf
+
+-- =
+
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1738202
+
+Title:
+  qemu 2.11 segfaults on elf file that worked with qemu2.7
+
+Status in QEMU:
+  New
+
+Bug description:
+  running on cygwin in Windows 7
+
+  QEMU 2.10.93 segfaults:
+  $ /opt/qemu2.11/qemu-system-arm -M integratorcp -cpu cortex-m4 -semihosti=
+ng -nographic -monitor null -serial null -no-reboot -kernel MFWso_Cycle_f1u=
+P2_CUNIT_0.elf
+  Segmentation fault
+
+  where QEMU 2.7.0 worked:
+  $ /opt/qemu2.7/qemu-system-arm -M integratorcp -cpu cortex-m4 -semihostin=
+g -nographic -monitor null -serial null -no-reboot -kernel MFWso_Cycle_f1uP=
+2_CUNIT_0.elf
+  ------------ CUnit_MFWso_Cycle_f1 ------------
+
+  =
+
+       CUnit - A Unit testing framework for C - Version 2.1-0
+       http://cunit.sourceforge.net/
+
+  =
+
+  Suite: Suite_MFWso_Cycle_f1
+    Test: MFWso_Cycle_f1() ... passed
+    Test: MFWso_GetPhysicalStateData() ... passed
+    Test: MFWso_GetOutputData() ... passed
+    Test: MFWso_GetSafeChannelOK() ... passed
+
+  --Run Summary: Type      Total     Ran  Passed  Failed
+                 suites        1       1     n/a       0
+                 tests         4       4       4       0
+                 asserts      54      54      54       0
+
+  ----------------------------------------
+
+  Omitting the -cpu parameter results (for both versions) to hang of
+  qemu (no output, no end, full cpu load).
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1738202/+subscriptions
