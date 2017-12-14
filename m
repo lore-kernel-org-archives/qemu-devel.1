@@ -1,33 +1,15 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36729)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37042)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1ePXwo-0006pQ-Qk
-	for qemu-devel@nongnu.org; Thu, 14 Dec 2017 13:09:31 -0500
+	(envelope-from <lvivier@redhat.com>) id 1ePXxF-000798-6W
+	for qemu-devel@nongnu.org; Thu, 14 Dec 2017 13:09:58 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1ePXwl-0005VJ-El
-	for qemu-devel@nongnu.org; Thu, 14 Dec 2017 13:09:30 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:60980)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1ePXwl-0005Tu-7n
-	for qemu-devel@nongnu.org; Thu, 14 Dec 2017 13:09:27 -0500
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
-	[10.5.11.16])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id C198D4903D
-	for <qemu-devel@nongnu.org>; Thu, 14 Dec 2017 18:09:25 +0000 (UTC)
-Date: Thu, 14 Dec 2017 18:09:19 +0000
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20171214180918.GE4380@work-vm>
-References: <20171212135600.14965-1-dgilbert@redhat.com>
-	<20171212182353.hme665vsaohxdvzv@eukaryote>
-	<20171213201145.GB8501@work-vm>
-	<20171214112603.7gkt3dwgxoioybse@eukaryote>
-	<20171214171820.rmoeze7kizr6vq2s@eukaryote>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20171214171820.rmoeze7kizr6vq2s@eukaryote>
-Subject: Re: [Qemu-devel] [PATCH] docs: Convert migration.txt to rst
+	(envelope-from <lvivier@redhat.com>) id 1ePXxB-0005rS-PB
+	for qemu-devel@nongnu.org; Thu, 14 Dec 2017 13:09:57 -0500
+From: Laurent Vivier <lvivier@redhat.com>
+Date: Thu, 14 Dec 2017 19:09:48 +0100
+Message-Id: <20171214180948.981-1-lvivier@redhat.com>
+Subject: [Qemu-devel] [PATCH] spapr: don't initialize PATB entry if
+ max-cpu-compat < power9
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,51 +18,57 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Kashyap Chamarthy <kchamart@redhat.com>
-Cc: qemu-devel@nongnu.org, quintela@redhat.com, peterx@redhat.com
+To: qemu-devel@nongnu.org
+Cc: David Gibson <david@gibson.dropbear.id.au>, qemu-ppc@nongnu.org, Suraj Jitindar Singh <sjitindarsingh@gmail.com>, Laurent Vivier <lvivier@redhat.com>
 
-* Kashyap Chamarthy (kchamart@redhat.com) wrote:
-> On Thu, Dec 14, 2017 at 12:26:03PM +0100, Kashyap Chamarthy wrote:
-> > On Wed, Dec 13, 2017 at 08:11:46PM +0000, Dr. David Alan Gilbert wrote:
-> 
-> [...]
-> 
-> > > > > -   Command: 'postcopy listen'
-> > > > > -   The device state
-> > > > 
-> > > > In my local Sphinx-based HTML rendering, the above "The device state"
-> > > > ended up being bold somehow.
-> > > 
-> > > Any idea why? It's fine both in vim and rst2html-3's output.
-> > 
-> > Don't know yet.  You can see here in the Sphinx-rendered HTML version:
-> 
-> So it's due to the indentation below the line "The device state".  You
-> can either put an extra blank line before indenting the next line:
-> 
->    - The device state:
-> 
->        A series of sections, identical to the precopy streams device
->        state stream containing everything except postcopiable devices
->        (i.e. RAM)
+if KVM is enabled and KVM capabilities MMU radix is available,
+the partition table entry (patb_entry) for the radix mode is
+initialized by default in ppc_spapr_reset().
 
-I think the problem here is the 'A' - it's picking it up as the first
-item in a numbered list; if I change that to 'The' it also fixes it.
-I added the extra blank line, it's OK but doesn't look great.
+It's a problem if we want to migrate the guest to a POWER8 host
+while the kernel is not started to set the value to the one
+expected for a POWER8 CPU.
 
-> Or, just indent it to the same level:
-> 
->    - The device state: A series of sections, identical to the precopy
->      streams device state stream containing everything except
->      postcopiable devices (i.e.  RAM)
-> 
-> Same applies for other places where bold text came in at unwanted places.
+The "-machine max-cpu-compat=power8" should allow to migrate
+a POWER9 KVM host to a POWER8 KVM host, but because patb_entry
+is set, the destination QEMU tries to enable radix mode on the
+POWER8 host. This fails and cancels the migration:
 
-Dave
+    Process table config unsupported by the host
+    error while loading state for instance 0x0 of device 'spapr'
+    load of migration failed: Invalid argument
 
-> [...]
-> 
-> -- 
-> /kashyap
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+This patch doesn't set the PATB entry if the user provides
+a CPU compatibility mode that doesn't support radix mode.
+
+Signed-off-by: Laurent Vivier <lvivier@redhat.com>
+---
+ hw/ppc/spapr.c | 6 ++++--
+ 1 file changed, 4 insertions(+), 2 deletions(-)
+
+diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
+index 1ac7eb0f8c..66d0ed5256 100644
+--- a/hw/ppc/spapr.c
++++ b/hw/ppc/spapr.c
+@@ -1440,7 +1440,10 @@ static void ppc_spapr_reset(void)
+     /* Check for unknown sysbus devices */
+     foreach_dynamic_sysbus_device(find_unknown_sysbus_device, NULL);
+ 
+-    if (kvm_enabled() && kvmppc_has_cap_mmu_radix()) {
++    first_ppc_cpu = POWERPC_CPU(first_cpu);
++    if (kvm_enabled() && kvmppc_has_cap_mmu_radix() &&
++        ppc_check_compat(first_ppc_cpu, CPU_POWERPC_LOGICAL_3_00, 0,
++                         spapr->max_compat_pvr)) {
+         /* If using KVM with radix mode available, VCPUs can be started
+          * without a HPT because KVM will start them in radix mode.
+          * Set the GR bit in PATB so that we know there is no HPT. */
+@@ -1499,7 +1502,6 @@ static void ppc_spapr_reset(void)
+     g_free(fdt);
+ 
+     /* Set up the entry state */
+-    first_ppc_cpu = POWERPC_CPU(first_cpu);
+     first_ppc_cpu->env.gpr[3] = fdt_addr;
+     first_ppc_cpu->env.gpr[5] = 0;
+     first_cpu->halted = 0;
+-- 
+2.14.3
