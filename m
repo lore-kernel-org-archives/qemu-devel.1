@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56741)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56909)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1ePX4U-0001qD-1d
-	for qemu-devel@nongnu.org; Thu, 14 Dec 2017 12:13:22 -0500
+	(envelope-from <cohuck@redhat.com>) id 1ePX4e-00022H-G7
+	for qemu-devel@nongnu.org; Thu, 14 Dec 2017 12:13:33 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1ePX4S-0000UV-NX
-	for qemu-devel@nongnu.org; Thu, 14 Dec 2017 12:13:22 -0500
+	(envelope-from <cohuck@redhat.com>) id 1ePX4a-0000dQ-Eo
+	for qemu-devel@nongnu.org; Thu, 14 Dec 2017 12:13:32 -0500
 From: Cornelia Huck <cohuck@redhat.com>
-Date: Thu, 14 Dec 2017 18:10:02 +0100
-Message-Id: <20171214171004.25058-45-cohuck@redhat.com>
+Date: Thu, 14 Dec 2017 18:10:04 +0100
+Message-Id: <20171214171004.25058-47-cohuck@redhat.com>
 In-Reply-To: <20171214171004.25058-1-cohuck@redhat.com>
 References: <20171214171004.25058-1-cohuck@redhat.com>
-Subject: [Qemu-devel] [PULL 44/46] s390x/tcg: we already implement the
- Set-Program-Parameter facility
+Subject: [Qemu-devel] [PULL 46/46] s390-ccw-virtio: allow for systems larger
+ that 7.999TB
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,52 +23,69 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: peter.maydell@linaro.org
 Cc: qemu-devel@nongnu.org, qemu-s390x@nongnu.org, rth@twiddle.net, agraf@suse.de, thuth@redhat.com, borntraeger@de.ibm.com, david@redhat.com, Cornelia Huck <cohuck@redhat.com>
 
-From: David Hildenbrand <david@redhat.com>
+From: Christian Borntraeger <borntraeger@de.ibm.com>
 
-The Set-Program-Parameter facility (also known as Load-Program-Parameter
-facility) provides the LPP instruction used to load the program
-parameter. We already implement that instruction in TCG, so add it to our
-list.
+KVM does not allow memory regions > KVM_MEM_MAX_NR_PAGES, basically
+limiting the memory per slot to 8TB-4k. As memory slots on s390/kvm must
+be a multiple of 1MB we need start a new memory region if we cross
+8TB-1M.
 
-Note: Not documented in the PoP but in "The Load-Program-Parameter and
-CPU-Measurement Facilities) - SA23-2260-05 document.
+With that (and optimistic overcommitment in the kernel) I was able to
+start a 24TB guest on a 1TB system.
 
-While at it, make the whole list ordered (according to cpu_features_def.h).
-
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
-Signed-off-by: David Hildenbrand <david@redhat.com>
-Message-Id: <20171208160207.26494-14-david@redhat.com>
+Signed-off-by: Christian Borntraeger <borntraeger@de.ibm.com>
+Message-Id: <20171211122146.162430-1-borntraeger@de.ibm.com>
+Reviewed-by: David Hildenbrand <david@redhat.com>
+[CH: 1UL -> 1ULL in KVM_MEM_MAX_NR_PAGES]
 Signed-off-by: Cornelia Huck <cohuck@redhat.com>
 ---
- target/s390x/cpu_models.c | 5 +++--
- 1 file changed, 3 insertions(+), 2 deletions(-)
+ hw/s390x/s390-virtio-ccw.c | 29 ++++++++++++++++++++++++++---
+ 1 file changed, 26 insertions(+), 3 deletions(-)
 
-diff --git a/target/s390x/cpu_models.c b/target/s390x/cpu_models.c
-index 0be037eac1..edac7fdecf 100644
---- a/target/s390x/cpu_models.c
-+++ b/target/s390x/cpu_models.c
-@@ -824,12 +824,12 @@ static void add_qemu_cpu_model_features(S390FeatBitmap fbm)
-         S390_FEAT_IDTE_SEGMENT,
-         S390_FEAT_STFLE,
-         S390_FEAT_SENSE_RUNNING_STATUS,
--        S390_FEAT_EXTENDED_IMMEDIATE,
-         S390_FEAT_EXTENDED_TRANSLATION_2,
-         S390_FEAT_MSA,
--        S390_FEAT_EXTENDED_TRANSLATION_3,
-         S390_FEAT_LONG_DISPLACEMENT,
-         S390_FEAT_LONG_DISPLACEMENT_FAST,
-+        S390_FEAT_EXTENDED_IMMEDIATE,
-+        S390_FEAT_EXTENDED_TRANSLATION_3,
-         S390_FEAT_ETF2_ENH,
-         S390_FEAT_STORE_CLOCK_FAST,
-         S390_FEAT_MOVE_WITH_OPTIONAL_SPEC,
-@@ -839,6 +839,7 @@ static void add_qemu_cpu_model_features(S390FeatBitmap fbm)
-         S390_FEAT_COMPARE_AND_SWAP_AND_STORE_2,
-         S390_FEAT_GENERAL_INSTRUCTIONS_EXT,
-         S390_FEAT_EXECUTE_EXT,
-+        S390_FEAT_SET_PROGRAM_PARAMETERS,
-         S390_FEAT_FLOATING_POINT_SUPPPORT_ENH,
-         S390_FEAT_STFLE_45,
-         S390_FEAT_STFLE_49,
+diff --git a/hw/s390x/s390-virtio-ccw.c b/hw/s390x/s390-virtio-ccw.c
+index 466e45343c..80e753a5ef 100644
+--- a/hw/s390x/s390-virtio-ccw.c
++++ b/hw/s390x/s390-virtio-ccw.c
+@@ -152,14 +152,37 @@ static void virtio_ccw_register_hcalls(void)
+                                    virtio_ccw_hcall_early_printk);
+ }
+ 
++/*
++ * KVM does only support memory slots up to KVM_MEM_MAX_NR_PAGES pages
++ * as the dirty bitmap must be managed by bitops that take an int as
++ * position indicator. If we have a guest beyond that we will split off
++ * new subregions. The split must happen on a segment boundary (1MB).
++ */
++#define KVM_MEM_MAX_NR_PAGES ((1ULL << 31) - 1)
++#define SEG_MSK (~0xfffffULL)
++#define KVM_SLOT_MAX_BYTES ((KVM_MEM_MAX_NR_PAGES * TARGET_PAGE_SIZE) & SEG_MSK)
+ static void s390_memory_init(ram_addr_t mem_size)
+ {
+     MemoryRegion *sysmem = get_system_memory();
+-    MemoryRegion *ram = g_new(MemoryRegion, 1);
++    ram_addr_t chunk, offset = 0;
++    unsigned int number = 0;
++    gchar *name;
+ 
+     /* allocate RAM for core */
+-    memory_region_allocate_system_memory(ram, NULL, "s390.ram", mem_size);
+-    memory_region_add_subregion(sysmem, 0, ram);
++    name = g_strdup_printf("s390.ram");
++    while (mem_size) {
++        MemoryRegion *ram = g_new(MemoryRegion, 1);
++
++        /* KVM does not allow memslots >= 8 TB */
++        chunk = MIN(mem_size, KVM_SLOT_MAX_BYTES);
++        memory_region_allocate_system_memory(ram, NULL, name, chunk);
++        memory_region_add_subregion(sysmem, offset, ram);
++        mem_size -= chunk;
++        offset += chunk;
++        g_free(name);
++        name = g_strdup_printf("s390.ram.%u", ++number);
++    }
++    g_free(name);
+ 
+     /* Initialize storage key device */
+     s390_skeys_init();
 -- 
 2.13.6
