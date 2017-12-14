@@ -1,16 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54168)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54256)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1ePX1w-0007rn-4p
-	for qemu-devel@nongnu.org; Thu, 14 Dec 2017 12:10:46 -0500
+	(envelope-from <cohuck@redhat.com>) id 1ePX23-0007xC-RY
+	for qemu-devel@nongnu.org; Thu, 14 Dec 2017 12:10:53 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1ePX1u-0006QI-Ti
-	for qemu-devel@nongnu.org; Thu, 14 Dec 2017 12:10:44 -0500
+	(envelope-from <cohuck@redhat.com>) id 1ePX1z-0006UH-OI
+	for qemu-devel@nongnu.org; Thu, 14 Dec 2017 12:10:51 -0500
 From: Cornelia Huck <cohuck@redhat.com>
-Date: Thu, 14 Dec 2017 18:09:25 +0100
-Message-Id: <20171214171004.25058-8-cohuck@redhat.com>
+Date: Thu, 14 Dec 2017 18:09:26 +0100
+Message-Id: <20171214171004.25058-9-cohuck@redhat.com>
 In-Reply-To: <20171214171004.25058-1-cohuck@redhat.com>
 References: <20171214171004.25058-1-cohuck@redhat.com>
-Subject: [Qemu-devel] [PULL 07/46] s390x/tcg: get rid of runtime_exception()
+Subject: [Qemu-devel] [PULL 08/46] s390x/tcg: rip out dead tpi code
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,139 +24,98 @@ Cc: qemu-devel@nongnu.org, qemu-s390x@nongnu.org, rth@twiddle.net, agraf@suse.de
 
 From: David Hildenbrand <david@redhat.com>
 
-Let's use s390_program_interrupt() instead.
+It is broken and not even wired up. We'll add a new handler soon, but
+that will live somewhere else.
 
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 Reviewed-by: Thomas Huth <thuth@redhat.com>
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 Signed-off-by: David Hildenbrand <david@redhat.com>
-Message-Id: <20171130162744.25442-3-david@redhat.com>
+Message-Id: <20171130162744.25442-4-david@redhat.com>
 Signed-off-by: Cornelia Huck <cohuck@redhat.com>
 ---
- target/s390x/fpu_helper.c  |  2 +-
- target/s390x/int_helper.c  | 14 +++++++-------
- target/s390x/internal.h    |  2 --
- target/s390x/misc_helper.c | 16 ----------------
- 4 files changed, 8 insertions(+), 26 deletions(-)
+ hw/s390x/css.c          |  6 ------
+ include/hw/s390x/css.h  |  1 -
+ target/s390x/internal.h |  1 -
+ target/s390x/ioinst.c   | 26 --------------------------
+ 4 files changed, 34 deletions(-)
 
-diff --git a/target/s390x/fpu_helper.c b/target/s390x/fpu_helper.c
-index ffbeb3b2df..334159119f 100644
---- a/target/s390x/fpu_helper.c
-+++ b/target/s390x/fpu_helper.c
-@@ -44,7 +44,7 @@ static void ieee_exception(CPUS390XState *env, uint32_t dxc, uintptr_t retaddr)
-     /* Install the DXC code.  */
-     env->fpc = (env->fpc & ~0xff00) | (dxc << 8);
-     /* Trap.  */
--    runtime_exception(env, PGM_DATA, retaddr);
-+    s390_program_interrupt(env, PGM_DATA, ILEN_AUTO, retaddr);
+diff --git a/hw/s390x/css.c b/hw/s390x/css.c
+index f6b5c807cd..6bd0fedc78 100644
+--- a/hw/s390x/css.c
++++ b/hw/s390x/css.c
+@@ -1723,12 +1723,6 @@ void css_undo_stcrw(CRW *crw)
+     QTAILQ_INSERT_HEAD(&channel_subsys.pending_crws, crw_cont, sibling);
  }
  
- /* Should be called after any operation that may raise IEEE exceptions.  */
-diff --git a/target/s390x/int_helper.c b/target/s390x/int_helper.c
-index 0076bea047..abf77a94e6 100644
---- a/target/s390x/int_helper.c
-+++ b/target/s390x/int_helper.c
-@@ -39,7 +39,7 @@ int64_t HELPER(divs32)(CPUS390XState *env, int64_t a, int64_t b64)
-     int64_t q;
- 
-     if (b == 0) {
--        runtime_exception(env, PGM_FIXPT_DIVIDE, GETPC());
-+        s390_program_interrupt(env, PGM_FIXPT_DIVIDE, ILEN_AUTO, GETPC());
-     }
- 
-     ret = q = a / b;
-@@ -47,7 +47,7 @@ int64_t HELPER(divs32)(CPUS390XState *env, int64_t a, int64_t b64)
- 
-     /* Catch non-representable quotient.  */
-     if (ret != q) {
--        runtime_exception(env, PGM_FIXPT_DIVIDE, GETPC());
-+        s390_program_interrupt(env, PGM_FIXPT_DIVIDE, ILEN_AUTO, GETPC());
-     }
- 
-     return ret;
-@@ -60,7 +60,7 @@ uint64_t HELPER(divu32)(CPUS390XState *env, uint64_t a, uint64_t b64)
-     uint64_t q;
- 
-     if (b == 0) {
--        runtime_exception(env, PGM_FIXPT_DIVIDE, GETPC());
-+        s390_program_interrupt(env, PGM_FIXPT_DIVIDE, ILEN_AUTO, GETPC());
-     }
- 
-     ret = q = a / b;
-@@ -68,7 +68,7 @@ uint64_t HELPER(divu32)(CPUS390XState *env, uint64_t a, uint64_t b64)
- 
-     /* Catch non-representable quotient.  */
-     if (ret != q) {
--        runtime_exception(env, PGM_FIXPT_DIVIDE, GETPC());
-+        s390_program_interrupt(env, PGM_FIXPT_DIVIDE, ILEN_AUTO, GETPC());
-     }
- 
-     return ret;
-@@ -79,7 +79,7 @@ int64_t HELPER(divs64)(CPUS390XState *env, int64_t a, int64_t b)
+-int css_do_tpi(IOIntCode *int_code, int lowcore)
+-{
+-    /* No pending interrupts for !KVM. */
+-    return 0;
+- }
+-
+ int css_collect_chp_desc(int m, uint8_t cssid, uint8_t f_chpid, uint8_t l_chpid,
+                          int rfmt, void *buf)
  {
-     /* Catch divide by zero, and non-representable quotient (MIN / -1).  */
-     if (b == 0 || (b == -1 && a == (1ll << 63))) {
--        runtime_exception(env, PGM_FIXPT_DIVIDE, GETPC());
-+        s390_program_interrupt(env, PGM_FIXPT_DIVIDE, ILEN_AUTO, GETPC());
-     }
-     env->retxl = a % b;
-     return a / b;
-@@ -92,7 +92,7 @@ uint64_t HELPER(divu64)(CPUS390XState *env, uint64_t ah, uint64_t al,
-     uint64_t ret;
-     /* Signal divide by zero.  */
-     if (b == 0) {
--        runtime_exception(env, PGM_FIXPT_DIVIDE, GETPC());
-+        s390_program_interrupt(env, PGM_FIXPT_DIVIDE, ILEN_AUTO, GETPC());
-     }
-     if (ah == 0) {
-         /* 64 -> 64/64 case */
-@@ -106,7 +106,7 @@ uint64_t HELPER(divu64)(CPUS390XState *env, uint64_t ah, uint64_t al,
-         env->retxl = a % b;
-         ret = q;
-         if (ret != q) {
--            runtime_exception(env, PGM_FIXPT_DIVIDE, GETPC());
-+            s390_program_interrupt(env, PGM_FIXPT_DIVIDE, ILEN_AUTO, GETPC());
-         }
- #else
-         S390CPU *cpu = s390_env_get_cpu(env);
+diff --git a/include/hw/s390x/css.h b/include/hw/s390x/css.h
+index ab6ebe66b5..0a14f76fea 100644
+--- a/include/hw/s390x/css.h
++++ b/include/hw/s390x/css.h
+@@ -248,7 +248,6 @@ int css_do_tsch_get_irb(SubchDev *sch, IRB *irb, int *irb_len);
+ void css_do_tsch_update_subch(SubchDev *sch);
+ int css_do_stcrw(CRW *crw);
+ void css_undo_stcrw(CRW *crw);
+-int css_do_tpi(IOIntCode *int_code, int lowcore);
+ int css_collect_chp_desc(int m, uint8_t cssid, uint8_t f_chpid, uint8_t l_chpid,
+                          int rfmt, void *buf);
+ void css_do_schm(uint8_t mbk, int update, int dct, uint64_t mbo);
 diff --git a/target/s390x/internal.h b/target/s390x/internal.h
-index 3aff54ada4..db39d5bfac 100644
+index db39d5bfac..603b0d7a7c 100644
 --- a/target/s390x/internal.h
 +++ b/target/s390x/internal.h
-@@ -408,8 +408,6 @@ int mmu_translate_real(CPUS390XState *env, target_ulong raddr, int rw,
+@@ -388,7 +388,6 @@ void ioinst_handle_stcrw(S390CPU *cpu, uint32_t ipb);
+ void ioinst_handle_stsch(S390CPU *cpu, uint64_t reg1, uint32_t ipb);
+ int ioinst_handle_tsch(S390CPU *cpu, uint64_t reg1, uint32_t ipb);
+ void ioinst_handle_chsc(S390CPU *cpu, uint32_t ipb);
+-int ioinst_handle_tpi(S390CPU *cpu, uint32_t ipb);
+ void ioinst_handle_schm(S390CPU *cpu, uint64_t reg1, uint64_t reg2,
+                         uint32_t ipb);
+ void ioinst_handle_rsch(S390CPU *cpu, uint64_t reg1);
+diff --git a/target/s390x/ioinst.c b/target/s390x/ioinst.c
+index 23962fbebc..1d6857c14d 100644
+--- a/target/s390x/ioinst.c
++++ b/target/s390x/ioinst.c
+@@ -647,32 +647,6 @@ void ioinst_handle_chsc(S390CPU *cpu, uint32_t ipb)
+     }
+ }
  
- 
- /* misc_helper.c */
--void QEMU_NORETURN runtime_exception(CPUS390XState *env, int excp,
--                                     uintptr_t retaddr);
- int handle_diag_288(CPUS390XState *env, uint64_t r1, uint64_t r3);
- void handle_diag_308(CPUS390XState *env, uint64_t r1, uint64_t r3);
- 
-diff --git a/target/s390x/misc_helper.c b/target/s390x/misc_helper.c
-index 1ccbafbb7d..67628e690d 100644
---- a/target/s390x/misc_helper.c
-+++ b/target/s390x/misc_helper.c
-@@ -45,22 +45,6 @@
- #define HELPER_LOG(x...)
- #endif
- 
--/* Raise an exception dynamically from a helper function.  */
--void QEMU_NORETURN runtime_exception(CPUS390XState *env, int excp,
--                                     uintptr_t retaddr)
+-int ioinst_handle_tpi(S390CPU *cpu, uint32_t ipb)
 -{
--    CPUState *cs = CPU(s390_env_get_cpu(env));
+-    CPUS390XState *env = &cpu->env;
+-    uint64_t addr;
+-    int lowcore;
+-    IOIntCode int_code;
+-    hwaddr len;
+-    int ret;
+-    uint8_t ar;
 -
--    cs->exception_index = EXCP_PGM;
--    env->int_pgm_code = excp;
--    env->int_pgm_ilen = ILEN_AUTO;
+-    trace_ioinst("tpi");
+-    addr = decode_basedisp_s(env, ipb, &ar);
+-    if (addr & 3) {
+-        program_interrupt(env, PGM_SPECIFICATION, 4);
+-        return -EIO;
+-    }
 -
--    /* Use the (ultimate) callers address to find the insn that trapped.  */
--    cpu_restore_state(cs, retaddr);
--
--    cpu_loop_exit(cs);
+-    lowcore = addr ? 0 : 1;
+-    len = lowcore ? 8 /* two words */ : 12 /* three words */;
+-    ret = css_do_tpi(&int_code, lowcore);
+-    if (ret == 1) {
+-        s390_cpu_virt_mem_write(cpu, lowcore ? 184 : addr, ar, &int_code, len);
+-    }
+-    return ret;
 -}
 -
- /* Raise an exception statically from a TB.  */
- void HELPER(exception)(CPUS390XState *env, uint32_t excp)
- {
+ #define SCHM_REG1_RES(_reg) (_reg & 0x000000000ffffffc)
+ #define SCHM_REG1_MBK(_reg) ((_reg & 0x00000000f0000000) >> 28)
+ #define SCHM_REG1_UPD(_reg) ((_reg & 0x0000000000000002) >> 1)
 -- 
 2.13.6
