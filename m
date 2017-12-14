@@ -1,25 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53856)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55397)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1ePVV2-0000Yp-AJ
-	for qemu-devel@nongnu.org; Thu, 14 Dec 2017 10:32:42 -0500
+	(envelope-from <nirsof@gmail.com>) id 1ePVXi-0001z8-Rx
+	for qemu-devel@nongnu.org; Thu, 14 Dec 2017 10:35:28 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1ePVV1-0005Ml-EQ
-	for qemu-devel@nongnu.org; Thu, 14 Dec 2017 10:32:40 -0500
-Received: from mail-ot0-x229.google.com ([2607:f8b0:4003:c0f::229]:46866)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1ePVV1-0005MU-8M
-	for qemu-devel@nongnu.org; Thu, 14 Dec 2017 10:32:39 -0500
-Received: by mail-ot0-x229.google.com with SMTP id j2so5227628ota.13
-	for <qemu-devel@nongnu.org>; Thu, 14 Dec 2017 07:32:39 -0800 (PST)
+	(envelope-from <nirsof@gmail.com>) id 1ePVXh-00081z-BS
+	for qemu-devel@nongnu.org; Thu, 14 Dec 2017 10:35:26 -0500
 MIME-Version: 1.0
-In-Reply-To: <1513188761-20784-1-git-send-email-peter.maydell@linaro.org>
-References: <1513188761-20784-1-git-send-email-peter.maydell@linaro.org>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Thu, 14 Dec 2017 15:32:17 +0000
-Message-ID: <CAFEAcA8o4V4doXo1iCiROk98S03bqsi8P6jdX6uooRxUxRpwUA@mail.gmail.com>
+References: <20171213213557.26561-1-f4bug@amsat.org>
+	<20171214093907.GA14433@stefanha-x1.localdomain>
+In-Reply-To: <20171214093907.GA14433@stefanha-x1.localdomain>
+From: Nir Soffer <nirsof@gmail.com>
+Date: Thu, 14 Dec 2017 15:35:07 +0000
+Message-ID: <CAMr-obtBNF8eetFgz=s8vJGqnzGa8+9n4VnF40vZYy5yeFZ3wQ@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PULL 00/43] target-arm queue
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [Qemu-block] [PATCH 0/6] QTests: use Python to run
+ complex tests
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,30 +24,78 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: QEMU Developers <qemu-devel@nongnu.org>
+To: Stefan Hajnoczi <stefanha@redhat.com>
+Cc: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>, "Edgar E . Iglesias" <edgar.iglesias@xilinx.com>, Kevin Wolf <kwolf@redhat.com>, Thomas Huth <thuth@redhat.com>, "Daniel P . Berrange" <berrange@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>, =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Cleber Rosa <crosa@redhat.com>, =?UTF-8?B?THVrw6HFoSBEb2t0b3I=?= <ldoktor@redhat.com>, Fam Zheng <famz@redhat.com>, Alistair Francis <alistair.francis@xilinx.com>
 
-On 13 December 2017 at 18:11, Peter Maydell <peter.maydell@linaro.org> wrote:
-> First arm pullreq for the 2.12 cycle, with all the
-> things that queued up during the release phase.
-> 2.11 isn't quite released yet, but might as well put
-> the pullreq on the mailing list :-)
+On Thu, Dec 14, 2017 at 11:39 AM Stefan Hajnoczi <stefanha@redhat.com>
+wrote:
+
+> On Wed, Dec 13, 2017 at 06:35:51PM -0300, Philippe Mathieu-Daud=C3=A9 wro=
+te:
+> > Hi,
+> >
+> > With this series we can now write tests using Python rather than C.
+> > For complex tests this can reduce the test development time, we can
+> focus on
+> > the test purposes instead of his implementation details.
+> >
+> > - 1,2: we already have Python classes to run Block tests, move all the
+> >   non Block-related methods to qtest.py,
+> > - 3: default TEST_DIR to TMPDIR,
+> > - 4: add a method to restrict tests to a list of supported machines,
+> > - 5: since the Block tests are output sensitive, do not mess with their
+> >   current tuned iotests::main(unittest), add a more generic one in
+> qtest.py,
+> > - 6: finally modify the tests Makefile to run C/Python tests with the
+> same
+> >   rule.
 >
-> thanks
-> -- PMM
+> Python tests are great for functional tests of qemu-system-* that
+> interact via the command-line and QMP monitor.  From this perspective I
+> think the series is good.
 >
-> The following changes since commit 0a0dc59d27527b78a195c2d838d28b7b49e5a639:
+> > to have a better idea, here is a snippet from the next series:
+> >
+> >     class TestSdCardSpecV2(qtest.QMPTestCase):
+> >         [...]
+> >         def test_power_on_spec_v2(self):
+> >             self.bus.do_cmd(GO_IDLE_STATE)
+> >             [...]
+> >             # verify Card ID
+> >             data =3D self.bus.do_cmd(ALL_SEND_CID)
+> >             oid, pnm, psn =3D struct.unpack(">x2s5sxLxxx", data)
+> >             self.assertEqual(oid, "XY") # QEMU default
+> >             self.assertEqual(pnm, "QEMU!") # QEMU default
+> >             self.assertEqual(psn, 0xdeadbeef) # QEMU default
 >
->   Update version for v2.11.0 release (2017-12-13 14:31:09 +0000)
->
-> are available in the git repository at:
->
->   git://git.linaro.org/people/pmaydell/qemu-arm.git tags/pull-target-arm-20171213
->
-> for you to fetch changes up to d3c348b6e3af3598bfcb755d59f8f4de80a2228a:
->
->   xilinx_spips: Use memset instead of a for loop to zero registers (2017-12-13 17:59:26 +0000)
+> Device qtests are better done in C than Python.  Python is not good at
+> binary I/O
+
+
+Why do you think that? what is missing in python 2 for binary io?
+
+
+> and porting this to Python 3 will be extra work later (Python
+> 2 is set for End-of-Life in 2020, see https://pythonclock.org/).
 >
 
-Applied, thanks.
+You can write today code that work with both python 2 and 3. For binary
+io the key is using io.FileIO and io.BytesIO instead of open() and StringIO
+and CStringIO.
 
--- PMM
+Nir
+
+
+>
+> More importantly, we already have libqos in C with a guest memory
+> allocator, PCI, and virtio support.  Fragmenting the small amount effort
+> that goes into device testing will delay libqos reaching critical mass.
+> Critical mass is where libqos provides all the infrastructure you need
+> to set up a device and focus on your actual test instead of machine,
+> bus, or device initialization.  Starting a Python device testing effort
+> will just lead to duplication and 2 underdeveloped device testing
+> frameworks.
+>
+> Is there a specific reason why adding SD Card support to libqos is not
+> possible in C?
+>
