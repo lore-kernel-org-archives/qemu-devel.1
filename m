@@ -1,25 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50398)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56097)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1ePe67-0000LQ-Hc
-	for qemu-devel@nongnu.org; Thu, 14 Dec 2017 19:43:33 -0500
+	(envelope-from <jbaron@akamai.com>) id 1ePZHV-0005Lz-Qx
+	for qemu-devel@nongnu.org; Thu, 14 Dec 2017 14:34:59 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1ePe63-0000I2-UL
-	for qemu-devel@nongnu.org; Thu, 14 Dec 2017 19:43:31 -0500
-Resent-Message-Id: <E1ePe63-0000I2-UL@eggs.gnu.org>
-Received: from sender-of-o52.zoho.com ([135.84.80.217]:21321)
+	(envelope-from <jbaron@akamai.com>) id 1ePZHR-00063O-Gy
+	for qemu-devel@nongnu.org; Thu, 14 Dec 2017 14:34:57 -0500
+Received: from mx0a-00190b01.pphosted.com ([2620:100:9001:583::1]:49602)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
-	id 1ePe63-0000Gy-N5
-	for qemu-devel@nongnu.org; Thu, 14 Dec 2017 19:43:27 -0500
-In-Reply-To: <20171214124817.2567-1-dgilbert@redhat.com>
-Reply-To: <qemu-devel@nongnu.org>
-Message-ID: <151327059140.111.2743622838250247532@449822a21bf0>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Thu, 14 Dec 2017 08:56:31 -0800 (PST)
-Subject: Re: [Qemu-devel] [PULL 0/2] hmp queue
+	(Exim 4.71) (envelope-from <jbaron@akamai.com>) id 1ePZHR-000613-8D
+	for qemu-devel@nongnu.org; Thu, 14 Dec 2017 14:34:53 -0500
+From: Jason Baron <jbaron@akamai.com>
+Date: Thu, 14 Dec 2017 14:33:52 -0500
+Message-Id: <1513280073-27515-1-git-send-email-jbaron@akamai.com>
+In-Reply-To: <cover.1513278334.git.jbaron@akamai.com>
+References: <cover.1513278334.git.jbaron@akamai.com>
+In-Reply-To: <cover.1513278334.git.jbaron@akamai.com> 
+References: <cover.1513278334.git.jbaron@akamai.com> 
+Subject: [Qemu-devel] [PATCH 2/2] qemu: add linkspeed and duplex setting to
+ virtio-net
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,80 +26,131 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: dgilbert@redhat.com
-Cc: famz@redhat.com, qemu-devel@nongnu.org
+To: qemu-devel@nongnu.org, linux-kernel@vger.kernel.org
+Cc: mst@redhat.com, jasowang@redhat.com
 
-SGksCgpUaGlzIHNlcmllcyBmYWlsZWQgYnVpbGQgdGVzdCBvbiBwcGMgaG9zdC4gUGxlYXNlIGZp
-bmQgdGhlIGRldGFpbHMgYmVsb3cuCgpNZXNzYWdlLWlkOiAyMDE3MTIxNDEyNDgxNy4yNTY3LTEt
-ZGdpbGJlcnRAcmVkaGF0LmNvbQpTdWJqZWN0OiBbUWVtdS1kZXZlbF0gW1BVTEwgMC8yXSBobXAg
-cXVldWUKVHlwZTogc2VyaWVzCgo9PT0gVEVTVCBTQ1JJUFQgQkVHSU4gPT09CiMhL2Jpbi9iYXNo
-CiMgVGVzdGluZyBzY3JpcHQgd2lsbCBiZSBpbnZva2VkIHVuZGVyIHRoZSBnaXQgY2hlY2tvdXQg
-d2l0aAojIEhFQUQgcG9pbnRpbmcgdG8gYSBjb21taXQgdGhhdCBoYXMgdGhlIHBhdGNoZXMgYXBw
-bGllZCBvbiB0b3Agb2YgImJhc2UiCiMgYnJhbmNoCnNldCAtZQplY2hvICI9PT0gRU5WID09PSIK
-ZW52CmVjaG8gIj09PSBQQUNLQUdFUyA9PT0iCnJwbSAtcWEKZWNobyAiPT09IFRFU1QgQkVHSU4g
-PT09IgpJTlNUQUxMPSRQV0QvaW5zdGFsbApCVUlMRD0kUFdEL2J1aWxkCm1rZGlyIC1wICRCVUlM
-RCAkSU5TVEFMTApTUkM9JFBXRApjZCAkQlVJTEQKJFNSQy9jb25maWd1cmUgLS1wcmVmaXg9JElO
-U1RBTEwKbWFrZSAtajEwMAojIFhYWDogd2UgbmVlZCByZWxpYWJsZSBjbGVhbiB1cAojIG1ha2Ug
-Y2hlY2sgLWoxMDAgVj0xCm1ha2UgaW5zdGFsbAo9PT0gVEVTVCBTQ1JJUFQgRU5EID09PQoKVXBk
-YXRpbmcgM2M4Y2Y1YTljMjFmZjg3ODIxNjRkMWRlZjdmNDRiZDg4ODcxMzM4NApGcm9tIGh0dHBz
-Oi8vZ2l0aHViLmNvbS9wYXRjaGV3LXByb2plY3QvcWVtdQogKiBbbmV3IHRhZ10gICAgICAgICBw
-YXRjaGV3LzE1MTMyNjkzOTItMjMyMjQtMS1naXQtc2VuZC1lbWFpbC1qaWFuamF5Lnpob3VAaHVh
-d2VpLmNvbSAtPiBwYXRjaGV3LzE1MTMyNjkzOTItMjMyMjQtMS1naXQtc2VuZC1lbWFpbC1qaWFu
-amF5Lnpob3VAaHVhd2VpLmNvbQogLSBbdGFnIHVwZGF0ZV0gICAgICBwYXRjaGV3LzIwMTcxMjE0
-MTI0ODE3LjI1NjctMS1kZ2lsYmVydEByZWRoYXQuY29tIC0+IHBhdGNoZXcvMjAxNzEyMTQxMjQ4
-MTcuMjU2Ny0xLWRnaWxiZXJ0QHJlZGhhdC5jb20KU3VibW9kdWxlICdkdGMnIChnaXQ6Ly9naXQu
-cWVtdS1wcm9qZWN0Lm9yZy9kdGMuZ2l0KSByZWdpc3RlcmVkIGZvciBwYXRoICdkdGMnClN1Ym1v
-ZHVsZSAncGl4bWFuJyAoZ2l0Oi8vYW5vbmdpdC5mcmVlZGVza3RvcC5vcmcvcGl4bWFuKSByZWdp
-c3RlcmVkIGZvciBwYXRoICdwaXhtYW4nClN1Ym1vZHVsZSAncm9tcy9TTE9GJyAoZ2l0Oi8vZ2l0
-LnFlbXUtcHJvamVjdC5vcmcvU0xPRi5naXQpIHJlZ2lzdGVyZWQgZm9yIHBhdGggJ3JvbXMvU0xP
-RicKU3VibW9kdWxlICdyb21zL2lweGUnIChnaXQ6Ly9naXQucWVtdS1wcm9qZWN0Lm9yZy9pcHhl
-LmdpdCkgcmVnaXN0ZXJlZCBmb3IgcGF0aCAncm9tcy9pcHhlJwpTdWJtb2R1bGUgJ3JvbXMvb3Bl
-bmJpb3MnIChnaXQ6Ly9naXQucWVtdS1wcm9qZWN0Lm9yZy9vcGVuYmlvcy5naXQpIHJlZ2lzdGVy
-ZWQgZm9yIHBhdGggJ3JvbXMvb3BlbmJpb3MnClN1Ym1vZHVsZSAncm9tcy9vcGVuaGFja3dhcmUn
-IChnaXQ6Ly9naXQucWVtdS1wcm9qZWN0Lm9yZy9vcGVuaGFja3dhcmUuZ2l0KSByZWdpc3RlcmVk
-IGZvciBwYXRoICdyb21zL29wZW5oYWNrd2FyZScKU3VibW9kdWxlICdyb21zL3FlbXUtcGFsY29k
-ZScgKGdpdDovL2dpdGh1Yi5jb20vcnRoNzY4MC9xZW11LXBhbGNvZGUuZ2l0KSByZWdpc3RlcmVk
-IGZvciBwYXRoICdyb21zL3FlbXUtcGFsY29kZScKU3VibW9kdWxlICdyb21zL3NlYWJpb3MnIChn
-aXQ6Ly9naXQucWVtdS1wcm9qZWN0Lm9yZy9zZWFiaW9zLmdpdC8pIHJlZ2lzdGVyZWQgZm9yIHBh
-dGggJ3JvbXMvc2VhYmlvcycKU3VibW9kdWxlICdyb21zL3NnYWJpb3MnIChnaXQ6Ly9naXQucWVt
-dS1wcm9qZWN0Lm9yZy9zZ2FiaW9zLmdpdCkgcmVnaXN0ZXJlZCBmb3IgcGF0aCAncm9tcy9zZ2Fi
-aW9zJwpTdWJtb2R1bGUgJ3JvbXMvdS1ib290JyAoZ2l0Oi8vZ2l0LnFlbXUtcHJvamVjdC5vcmcv
-dS1ib290LmdpdCkgcmVnaXN0ZXJlZCBmb3IgcGF0aCAncm9tcy91LWJvb3QnClN1Ym1vZHVsZSAn
-cm9tcy92Z2FiaW9zJyAoZ2l0Oi8vZ2l0LnFlbXUtcHJvamVjdC5vcmcvdmdhYmlvcy5naXQvKSBy
-ZWdpc3RlcmVkIGZvciBwYXRoICdyb21zL3ZnYWJpb3MnCkNsb25pbmcgaW50byAnZHRjJy4uLgpT
-dWJtb2R1bGUgcGF0aCAnZHRjJzogY2hlY2tlZCBvdXQgJzY1Y2M0ZDI3NDhhMmMyZTZmMjdmMWNm
-MzllMDdhNWRiYWJkODBlYmYnCkNsb25pbmcgaW50byAncGl4bWFuJy4uLgpTdWJtb2R1bGUgcGF0
-aCAncGl4bWFuJzogY2hlY2tlZCBvdXQgJzg3ZWVhOTllNDQzYjM4OWM5NzhjZjM3ZWZjNTI3ODhi
-ZjAzYTBlZTAnCkNsb25pbmcgaW50byAncm9tcy9TTE9GJy4uLgpTdWJtb2R1bGUgcGF0aCAncm9t
-cy9TTE9GJzogY2hlY2tlZCBvdXQgJ2UzZDA1NzI3YTA3NDYxOWZjMTJkMGE2N2YwNWNmMmM0MmM4
-NzVjY2UnCkNsb25pbmcgaW50byAncm9tcy9pcHhlJy4uLgpTdWJtb2R1bGUgcGF0aCAncm9tcy9p
-cHhlJzogY2hlY2tlZCBvdXQgJzA0MTg2MzE5MTgxMjk4MDgzZWYyODY5NWE4MzA5MDI4YjI2ZmU4
-M2MnCkNsb25pbmcgaW50byAncm9tcy9vcGVuYmlvcycuLi4KU3VibW9kdWxlIHBhdGggJ3JvbXMv
-b3BlbmJpb3MnOiBjaGVja2VkIG91dCAnZTc5YmNhNjQ4MzhjOTZlYzQ0ZmQ3YWNkNTA4ODc5YzUy
-ODQyMzNkZCcKQ2xvbmluZyBpbnRvICdyb21zL29wZW5oYWNrd2FyZScuLi4KU3VibW9kdWxlIHBh
-dGggJ3JvbXMvb3BlbmhhY2t3YXJlJzogY2hlY2tlZCBvdXQgJ2M1NTlkYTdjOGVlYzVlNDVlZjFm
-Njc5Nzg4MjdhZjZmMGI5NTQ2ZjUnCkNsb25pbmcgaW50byAncm9tcy9xZW11LXBhbGNvZGUnLi4u
-ClN1Ym1vZHVsZSBwYXRoICdyb21zL3FlbXUtcGFsY29kZSc6IGNoZWNrZWQgb3V0ICdjODdhOTI2
-MzliMjhhYzQyYmM4ZjZjNjc0NDM1NDNiNDA1ZGM0NzliJwpDbG9uaW5nIGludG8gJ3JvbXMvc2Vh
-YmlvcycuLi4KU3VibW9kdWxlIHBhdGggJ3JvbXMvc2VhYmlvcyc6IGNoZWNrZWQgb3V0ICdlMmZj
-NDFlMjRlZTBhZGE2MGZjNTExZDYwYjE1YTQxYjI5NDUzOGJlJwpDbG9uaW5nIGludG8gJ3JvbXMv
-c2dhYmlvcycuLi4KU3VibW9kdWxlIHBhdGggJ3JvbXMvc2dhYmlvcyc6IGNoZWNrZWQgb3V0ICcy
-M2Q0NzQ5NDNkY2Q1NWQwNTUwYTNkMjBiM2QzMGU5MDQwYTRmMTViJwpDbG9uaW5nIGludG8gJ3Jv
-bXMvdS1ib290Jy4uLgpTdWJtb2R1bGUgcGF0aCAncm9tcy91LWJvb3QnOiBjaGVja2VkIG91dCAn
-MjA3MmU3MjYyOTY1YmI0OGQ3ZmZmYjFlMjgzMTAxZTZlZDhiMjFhOCcKQ2xvbmluZyBpbnRvICdy
-b21zL3ZnYWJpb3MnLi4uClN1Ym1vZHVsZSBwYXRoICdyb21zL3ZnYWJpb3MnOiBjaGVja2VkIG91
-dCAnMTllYTEyYzIzMGRlZDk1OTI4ZWNhZWYwZGI0N2E4MjIzMWMyZTQ4NScKd2FybmluZzogdW5h
-YmxlIHRvIHJtZGlyIHBpeG1hbjogRGlyZWN0b3J5IG5vdCBlbXB0eQpTd2l0Y2hlZCB0byBhIG5l
-dyBicmFuY2ggJ3Rlc3QnCk0JZHRjCk0Jcm9tcy9TTE9GCk0Jcm9tcy9pcHhlCk0Jcm9tcy9vcGVu
-YmlvcwpNCXJvbXMvcWVtdS1wYWxjb2RlCk0Jcm9tcy9zZWFiaW9zCk0Jcm9tcy9zZ2FiaW9zCk0J
-cm9tcy91LWJvb3QKZmF0YWw6IE5vdCBhIHZhbGlkIGJyYW5jaCBwb2ludDogJzBlZjA1ODNkNWFk
-Y2ViOTEzOGJkYjQ3NDk0ZGFiZDE1NDlhYzViNmQnLgpUcmFjZWJhY2sgKG1vc3QgcmVjZW50IGNh
-bGwgbGFzdCk6CiAgRmlsZSAiL2hvbWUvcGF0Y2hldy9wYXRjaGV3L3BhdGNoZXctY2xpIiwgbGlu
-ZSA1MDgsIGluIHRlc3Rfb25lCiAgICBjd2Q9Y2xvbmUsIHN0ZG91dD1sb2dmLCBzdGRlcnI9bG9n
-ZikKICBGaWxlICIvdXNyL2xpYjY0L3B5dGhvbjMuNC9zdWJwcm9jZXNzLnB5IiwgbGluZSA1NTgs
-IGluIGNoZWNrX2NhbGwKICAgIHJhaXNlIENhbGxlZFByb2Nlc3NFcnJvcihyZXRjb2RlLCBjbWQp
-CnN1YnByb2Nlc3MuQ2FsbGVkUHJvY2Vzc0Vycm9yOiBDb21tYW5kICdbJ2dpdCcsICdicmFuY2gn
-LCAnYmFzZScsICcwZWYwNTgzZDVhZGNlYjkxMzhiZGI0NzQ5NGRhYmQxNTQ5YWM1YjZkJ10nIHJl
-dHVybmVkIG5vbi16ZXJvIGV4aXQgc3RhdHVzIDEyOAoKCgotLS0KRW1haWwgZ2VuZXJhdGVkIGF1
-dG9tYXRpY2FsbHkgYnkgUGF0Y2hldyBbaHR0cDovL3BhdGNoZXcub3JnL10uClBsZWFzZSBzZW5k
-IHlvdXIgZmVlZGJhY2sgdG8gcGF0Y2hldy1kZXZlbEBmcmVlbGlzdHMub3Jn
+Although they can be currently set in linux via 'ethtool -s', this requires
+guest changes, and thus it would be nice to extend this functionality such
+that it can be configured automatically from the host (as other network
+do).
+
+Linkspeed and duplex settings can be set as:
+'-device virtio-net,speed=10000,duplex=full'
+
+where speed is [-1...INT_MAX], and duplex is ["half"|"full"].
+
+Signed-off-by: Jason Baron <jbaron@akamai.com>
+Cc: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: Jason Wang <jasowang@redhat.com>
+---
+ hw/net/virtio-net.c                         | 29 +++++++++++++++++++++++++++++
+ include/hw/virtio/virtio-net.h              |  3 +++
+ include/standard-headers/linux/virtio_net.h |  4 ++++
+ 3 files changed, 36 insertions(+)
+
+diff --git a/hw/net/virtio-net.c b/hw/net/virtio-net.c
+index 38674b0..d63e790 100644
+--- a/hw/net/virtio-net.c
++++ b/hw/net/virtio-net.c
+@@ -40,6 +40,12 @@
+ #define VIRTIO_NET_RX_QUEUE_MIN_SIZE VIRTIO_NET_RX_QUEUE_DEFAULT_SIZE
+ #define VIRTIO_NET_TX_QUEUE_MIN_SIZE VIRTIO_NET_TX_QUEUE_DEFAULT_SIZE
+ 
++/* duplex and speed defines */
++#define DUPLEX_UNKNOWN          0xff
++#define DUPLEX_HALF             0x00
++#define DUPLEX_FULL             0x01
++#define SPEED_UNKNOWN           -1
++
+ /*
+  * Calculate the number of bytes up to and including the given 'field' of
+  * 'container'.
+@@ -61,6 +67,8 @@ static VirtIOFeature feature_sizes[] = {
+      .end = endof(struct virtio_net_config, max_virtqueue_pairs)},
+     {.flags = 1 << VIRTIO_NET_F_MTU,
+      .end = endof(struct virtio_net_config, mtu)},
++    {.flags = 1 << VIRTIO_NET_F_SPEED_DUPLEX,
++     .end = endof(struct virtio_net_config, duplex)},
+     {}
+ };
+ 
+@@ -88,6 +96,8 @@ static void virtio_net_get_config(VirtIODevice *vdev, uint8_t *config)
+     virtio_stw_p(vdev, &netcfg.status, n->status);
+     virtio_stw_p(vdev, &netcfg.max_virtqueue_pairs, n->max_queues);
+     virtio_stw_p(vdev, &netcfg.mtu, n->net_conf.mtu);
++    virtio_stl_p(vdev, &netcfg.speed, n->net_conf.speed);
++    netcfg.duplex = n->net_conf.duplex;
+     memcpy(netcfg.mac, n->mac, ETH_ALEN);
+     memcpy(config, &netcfg, n->config_size);
+ }
+@@ -1941,6 +1951,23 @@ static void virtio_net_device_realize(DeviceState *dev, Error **errp)
+         n->host_features |= (0x1 << VIRTIO_NET_F_MTU);
+     }
+ 
++    n->host_features |= (0x1 << VIRTIO_NET_F_SPEED_DUPLEX);
++    if (n->net_conf.duplex_str) {
++        if (strncmp(n->net_conf.duplex_str, "half", 5) == 0) {
++            n->net_conf.duplex = DUPLEX_HALF;
++        } else if (strncmp(n->net_conf.duplex_str, "full", 5) == 0) {
++            n->net_conf.duplex = DUPLEX_FULL;
++        } else {
++            error_setg(errp, "'duplex' must be 'half' or 'full'");
++        }
++    } else {
++        n->net_conf.duplex = DUPLEX_UNKNOWN;
++    }
++    if (n->net_conf.speed < SPEED_UNKNOWN) {
++            error_setg(errp, "'speed' must be between -1 (SPEED_UNKOWN) and "
++                       "INT_MAX");
++    }
++
+     virtio_net_set_config_size(n, n->host_features);
+     virtio_init(vdev, "virtio-net", VIRTIO_ID_NET, n->config_size);
+ 
+@@ -2160,6 +2187,8 @@ static Property virtio_net_properties[] = {
+     DEFINE_PROP_UINT16("host_mtu", VirtIONet, net_conf.mtu, 0),
+     DEFINE_PROP_BOOL("x-mtu-bypass-backend", VirtIONet, mtu_bypass_backend,
+                      true),
++    DEFINE_PROP_INT32("speed", VirtIONet, net_conf.speed, SPEED_UNKNOWN),
++    DEFINE_PROP_STRING("duplex", VirtIONet, net_conf.duplex_str),
+     DEFINE_PROP_END_OF_LIST(),
+ };
+ 
+diff --git a/include/hw/virtio/virtio-net.h b/include/hw/virtio/virtio-net.h
+index b81b6a4..af74a94 100644
+--- a/include/hw/virtio/virtio-net.h
++++ b/include/hw/virtio/virtio-net.h
+@@ -38,6 +38,9 @@ typedef struct virtio_net_conf
+     uint16_t rx_queue_size;
+     uint16_t tx_queue_size;
+     uint16_t mtu;
++    int32_t speed;
++    char *duplex_str;
++    uint8_t duplex;
+ } virtio_net_conf;
+ 
+ /* Maximum packet size we can receive from tap device: header + 64k */
+diff --git a/include/standard-headers/linux/virtio_net.h b/include/standard-headers/linux/virtio_net.h
+index 30ff249..0ff1447 100644
+--- a/include/standard-headers/linux/virtio_net.h
++++ b/include/standard-headers/linux/virtio_net.h
+@@ -36,6 +36,7 @@
+ #define VIRTIO_NET_F_GUEST_CSUM	1	/* Guest handles pkts w/ partial csum */
+ #define VIRTIO_NET_F_CTRL_GUEST_OFFLOADS 2 /* Dynamic offload configuration. */
+ #define VIRTIO_NET_F_MTU	3	/* Initial MTU advice */
++#define VIRTIO_NET_F_SPEED_DUPLEX 4	/* Host set linkspeed and duplex */
+ #define VIRTIO_NET_F_MAC	5	/* Host has given MAC address. */
+ #define VIRTIO_NET_F_GUEST_TSO4	7	/* Guest can handle TSOv4 in. */
+ #define VIRTIO_NET_F_GUEST_TSO6	8	/* Guest can handle TSOv6 in. */
+@@ -76,6 +77,9 @@ struct virtio_net_config {
+ 	uint16_t max_virtqueue_pairs;
+ 	/* Default maximum transmit unit advice */
+ 	uint16_t mtu;
++	/* Host exported linkspeed and duplex */
++	uint32_t speed;
++	uint8_t duplex;
+ } QEMU_PACKED;
+ 
+ /*
+-- 
+2.6.1
