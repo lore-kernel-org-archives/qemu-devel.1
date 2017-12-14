@@ -1,31 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58443)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52496)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1ePVdM-0004bV-EH
-	for qemu-devel@nongnu.org; Thu, 14 Dec 2017 10:41:17 -0500
+	(envelope-from <bounces@canonical.com>) id 1ePVTP-0008Gn-5Y
+	for qemu-devel@nongnu.org; Thu, 14 Dec 2017 10:31:03 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1ePVdJ-0003ij-2m
-	for qemu-devel@nongnu.org; Thu, 14 Dec 2017 10:41:16 -0500
-Received: from indium.canonical.com ([91.189.90.7]:33936)
+	(envelope-from <bounces@canonical.com>) id 1ePVTL-0003Rh-1I
+	for qemu-devel@nongnu.org; Thu, 14 Dec 2017 10:30:59 -0500
+Received: from indium.canonical.com ([91.189.90.7]:51974)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1ePVdI-0003hk-Rw
-	for qemu-devel@nongnu.org; Thu, 14 Dec 2017 10:41:12 -0500
+	id 1ePVTK-0003PJ-S1
+	for qemu-devel@nongnu.org; Thu, 14 Dec 2017 10:30:54 -0500
 Received: from loganberry.canonical.com ([91.189.90.37])
 	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1ePVdG-0004CJ-3p
-	for <qemu-devel@nongnu.org>; Thu, 14 Dec 2017 15:41:10 +0000
+	id 1ePVTJ-0000Rp-0c
+	for <qemu-devel@nongnu.org>; Thu, 14 Dec 2017 15:30:53 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id CB27A2E8199
-	for <qemu-devel@nongnu.org>; Thu, 14 Dec 2017 15:41:07 +0000 (UTC)
+	by loganberry.canonical.com (Postfix) with ESMTP id CEECD2E80E4
+	for <qemu-devel@nongnu.org>; Thu, 14 Dec 2017 15:30:52 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Thu, 14 Dec 2017 15:31:25 -0000
+Date: Thu, 14 Dec 2017 15:24:16 -0000
 From: Scott Moser <ssmoser2+ubuntu@gmail.com>
 Reply-To: Bug 1716028 <1716028@bugs.launchpad.net>
 Sender: bounces@canonical.com
 References: <150489404292.23034.16812601554685741285.malonedeb@wampee.canonical.com>
-Message-Id: <151326548529.12416.2741661714934787814.malone@gac.canonical.com>
+Message-Id: <151326505767.13324.233007958375820516.launchpad@gac.canonical.com>
 Errors-To: bounces@canonical.com
 Subject: [Qemu-devel] [Bug 1716028] Re: qemu 2.10 locks images with no
  feature flag
@@ -39,18 +39,7 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-I've taked this qemu-file-locking just so we can group/easily find other bu=
-gs that have this tag.
-link to search for all bugs with that tag is: https://goo.gl/W2aT2T
-
-or the longer form:
-https://bugs.launchpad.net/bugs/+bugs?field.status%3Alist=3DNEW&field.statu=
-s%3Alist=3DOPINION&field.status%3Alist=3DINVALID&field.status%3Alist=3DWONT=
-FIX&field.status%3Alist=3DEXPIRED&field.status%3Alist=3DCONFIRMED&field.sta=
-tus%3Alist=3DTRIAGED&field.status%3Alist=3DINPROGRESS&field.status%3Alist=
-=3DFIXCOMMITTED&field.status%3Alist=3DFIXRELEASED&field.status%3Alist=3DINC=
-OMPLETE_WITH_RESPONSE&field.status%3Alist=3DINCOMPLETE_WITHOUT_RESPONSE&ass=
-ignee_option=3Dany&field.tag=3Dqemu-file-locking
+** Tags added: qemu-file-locking
 
 -- =
 
