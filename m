@@ -1,33 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39159)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41644)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1ePWZK-0003g5-M0
-	for qemu-devel@nongnu.org; Thu, 14 Dec 2017 11:41:11 -0500
+	(envelope-from <andrew.smirnov@gmail.com>) id 1ePWdS-0005wP-2W
+	for qemu-devel@nongnu.org; Thu, 14 Dec 2017 11:45:27 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1ePWZH-0008HO-HA
-	for qemu-devel@nongnu.org; Thu, 14 Dec 2017 11:41:10 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:38270)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1ePWZH-0008Fk-7Y
-	for qemu-devel@nongnu.org; Thu, 14 Dec 2017 11:41:07 -0500
-Date: Thu, 14 Dec 2017 18:40:56 +0200
-From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <20171214184009-mutt-send-email-mst@kernel.org>
-References: <286AC319A985734F985F78AFA26841F73937EEED@shsmsx102.ccr.corp.intel.com>
-	<20171212101440.GB6985@stefanha-x1.localdomain>
-	<5A30E0C1.3070905@intel.com>
-	<20171213123521.GL16782@stefanha-x1.localdomain>
-	<20171213165142-mutt-send-email-mst@kernel.org>
-	<CAJSP0QWHJBL4APkeMt8-P8PFaPF=Vbi0NSnJtU7YX67fJrW=hw@mail.gmail.com>
-	<825b8205-0b88-a198-b77d-63c8f2563c2e@redhat.com>
-	<20171214154656.GR14433@stefanha-x1.localdomain>
-	<20171214180830-mutt-send-email-mst@kernel.org>
-	<31609e8a-8446-cc8c-dc3b-a72d37086358@redhat.com>
+	(envelope-from <andrew.smirnov@gmail.com>) id 1ePWdM-0000Fg-4b
+	for qemu-devel@nongnu.org; Thu, 14 Dec 2017 11:45:26 -0500
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <31609e8a-8446-cc8c-dc3b-a72d37086358@redhat.com>
-Subject: Re: [Qemu-devel] [virtio-dev] Re: [virtio-dev] [PATCH v3 0/7]
- Vhost-pci for inter-VM communication
+In-Reply-To: <20171214145255.31545-15-andrew.smirnov@gmail.com>
+References: <20171214145255.31545-1-andrew.smirnov@gmail.com>
+	<20171214145255.31545-15-andrew.smirnov@gmail.com>
+From: Andrey Smirnov <andrew.smirnov@gmail.com>
+Date: Thu, 14 Dec 2017 08:45:14 -0800
+Message-ID: <CAHQ1cqHrCv8ENWDUzENRrLaBVMR0oVV_UDqwrGEeJ8Sko8bB4g@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v2 14/15] sd: Check for READ_MULTIPLE_BLOCK
+ size limit violation first
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,76 +24,94 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Maxime Coquelin <maxime.coquelin@redhat.com>
-Cc: Stefan Hajnoczi <stefanha@redhat.com>, Stefan Hajnoczi <stefanha@gmail.com>, Wei Wang <wei.w.wang@intel.com>, "virtio-dev@lists.oasis-open.org" <virtio-dev@lists.oasis-open.org>, "Yang, Zhiyong" <zhiyong.yang@intel.com>, "jan.kiszka@siemens.com" <jan.kiszka@siemens.com>, "jasowang@redhat.com" <jasowang@redhat.com>, "avi.cohen@huawei.com" <avi.cohen@huawei.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "pbonzini@redhat.com" <pbonzini@redhat.com>, "marcandre.lureau@redhat.com" <marcandre.lureau@redhat.com>, snabb-devel@googlegroups.com, dgilbert@redhat.com
+To: "open list:ARM" <qemu-arm@nongnu.org>
+Cc: Andrey Smirnov <andrew.smirnov@gmail.com>, Peter Maydell <peter.maydell@linaro.org>, Jason Wang <jasowang@redhat.com>, =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>, QEMU Developers <qemu-devel@nongnu.org>, Andrey Yurovsky <yurovsky@gmail.com>
 
-On Thu, Dec 14, 2017 at 05:39:19PM +0100, Maxime Coquelin wrote:
-> 
-> 
-> On 12/14/2017 05:27 PM, Michael S. Tsirkin wrote:
-> > On Thu, Dec 14, 2017 at 03:46:56PM +0000, Stefan Hajnoczi wrote:
-> > > On Wed, Dec 13, 2017 at 10:50:11PM +0100, Maxime Coquelin wrote:
-> > > > On 12/13/2017 09:08 PM, Stefan Hajnoczi wrote:
-> > > > > On Wed, Dec 13, 2017 at 3:01 PM, Michael S. Tsirkin <mst@redhat.com> wrote:
-> > > > > > On Wed, Dec 13, 2017 at 12:35:21PM +0000, Stefan Hajnoczi wrote:
-> > > > > > > I'm not saying that DPDK should use libvhost-user.  I'm saying that it's
-> > > > > > > easy to add vfio vhost-pci support (for the PCI adapter I described) to
-> > > > > > > DPDK.  This patch series would require writing a completely new slave
-> > > > > > > for vhost-pci because the device interface is so different from
-> > > > > > > vhost-user.
-> > > > > > 
-> > > > > > The main question is how appropriate is the vhost user protocol
-> > > > > > for passing to guests. And I am not sure at this point.
-> > > > > > 
-> > > > > > Someone should go over vhost user messages and see whether they are safe
-> > > > > > to pass to guest. If most are then we can try the transparent approach.
-> > > > > > If most aren't then we can't and might as well use the proposed protocol
-> > > > > > which at least has code behind it.
-> > > > > 
-> > > > > I have done that:
-> > > > > 
-> > > > ...
-> > > > >    * VHOST_USER_SET_MEM_TABLE
-> > > > > 
-> > > > >      Set up BARs before sending a VHOST_USER_SET_MEM_TABLE to the guest.
-> > > > 
-> > > > It would require to filter out userspace_addr from the payload not to
-> > > > leak other QEMU process VAs to the guest.
-> > > 
-> > > QEMU's vhost-user master implementation is insecure because it leaks
-> > > QEMU process VAs.  This also affects vhost-user host processes, not just
-> > > vhost-pci.
-> > > 
-> > > The QEMU vhost-user master could send an post-IOMMU guest physical
-> > > addresses whereever the vhost-user protocol specification says "user
-> > > address".  That way no address space information is leaked although it
-> > > does leak IOMMU mappings.
-> > > 
-> > > If we want to hide the IOMMU mappings too then we need another logical
-> > > address space (kind a randomized ramaddr_t).
-> > > 
-> > > Anyway, my point is that the current vhost-user master implementation is
-> > > insecure and should be fixed.  vhost-pci doesn't need to worry about
-> > > this issue.
-> > > 
-> > > Stefan
-> > 
-> > I was going to make this point too.  It does not look like anyone uses
-> > userspace_addr. It might have been a mistake to put it there -
-> > maybe we should have reused it for map offset.
-> > 
-> > It does not look like anyone uses this for anything.
-> > 
-> > How about we put zero, or a copy of the GPA there?
-> > 
-> > 
-> 
-> It is used when no iommu for the ring addresses, and when iommu is used
-> for the IOTLB update messages.
-> 
-> Maxime
+On Thu, Dec 14, 2017 at 6:52 AM, Andrey Smirnov
+<andrew.smirnov@gmail.com> wrote:
+> Check for READ_MULTIPLE_BLOCK size limit violation first as opposed to
+> doing at the end of the command handler. Consider the following
+> scenario:
+>
+> Emulated host driver is trying to read last byte of the last sector
+> via CMD18/ADMA, so what would happen is the following:
+>
+> 1. "ret" is filled with desired byte and "sd->data_offset" is
+>    incremented to 512 by
+>
+>             ret =3D sd->data[sd->data_offset ++];
+>
+> 2. sd->data_offset >=3D io_len becomes true, so
+>
+>             sd->data_start +=3D io_len;
+>
+>    moves "sd->data_start" past valid data boundaries.
+>
+> 3. as a result "sd->data_start + io_len > sd->size" check becomes true
+>    and sd->card_status is marked with ADDRESS_ERROR, telling emulated
+>    host that the last CMD18 read failed, despite nothing bad/illegal
+>    happening.
+>
+> To avoid having this false positive, move out-of-bounds check to
+> happen before BLK_READ_BLOCK(), so this way it will only trigger if
+> illegal read is truly about to happen.
+>
 
-How do clients use it? Why won't GPA do just as well?
+Disregard this patch, exactly this fix is already present in latest QEMU ma=
+ster.
 
--- 
-MST
+Sorry for the noise.
+
+Thanks,
+Andrey Smirnov
+
+> Cc: Peter Maydell <peter.maydell@linaro.org>
+> Cc: Jason Wang <jasowang@redhat.com>
+> Cc: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
+> Cc: qemu-devel@nongnu.org
+> Cc: qemu-arm@nongnu.org
+> Cc: yurovsky@gmail.com
+> Signed-off-by: Andrey Smirnov <andrew.smirnov@gmail.com>
+> ---
+>  hw/sd/sd.c | 16 ++++++++++------
+>  1 file changed, 10 insertions(+), 6 deletions(-)
+>
+> diff --git a/hw/sd/sd.c b/hw/sd/sd.c
+> index ba47bff4db..ce4ef17be3 100644
+> --- a/hw/sd/sd.c
+> +++ b/hw/sd/sd.c
+> @@ -1797,8 +1797,17 @@ uint8_t sd_read_data(SDState *sd)
+>          break;
+>
+>      case 18:   /* CMD18:  READ_MULTIPLE_BLOCK */
+> -        if (sd->data_offset =3D=3D 0)
+> +        if (sd->data_offset =3D=3D 0) {
+> +            if (sd->data_start + io_len > sd->size) {
+> +                qemu_log_mask(LOG_GUEST_ERROR,
+> +                              "%s: Trying to read past card's capacity\n=
+",
+> +                              __func__);
+> +                sd->card_status |=3D ADDRESS_ERROR;
+> +                return 0x00;
+> +            }
+> +
+>              BLK_READ_BLOCK(sd->data_start, io_len);
+> +        }
+>          ret =3D sd->data[sd->data_offset ++];
+>
+>          if (sd->data_offset >=3D io_len) {
+> @@ -1812,11 +1821,6 @@ uint8_t sd_read_data(SDState *sd)
+>                      break;
+>                  }
+>              }
+> -
+> -            if (sd->data_start + io_len > sd->size) {
+> -                sd->card_status |=3D ADDRESS_ERROR;
+> -                break;
+> -            }
+>          }
+>          break;
+>
+> --
+> 2.14.3
+>
