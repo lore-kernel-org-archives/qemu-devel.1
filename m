@@ -1,25 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43997)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45297)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1ePVJC-0001Ex-Jo
-	for qemu-devel@nongnu.org; Thu, 14 Dec 2017 10:20:32 -0500
+	(envelope-from <armbru@redhat.com>) id 1ePVKn-0002IT-4q
+	for qemu-devel@nongnu.org; Thu, 14 Dec 2017 10:22:06 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1ePVJ8-0000Ti-61
-	for qemu-devel@nongnu.org; Thu, 14 Dec 2017 10:20:26 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:50716)
+	(envelope-from <armbru@redhat.com>) id 1ePVKi-0002Ij-Vs
+	for qemu-devel@nongnu.org; Thu, 14 Dec 2017 10:22:05 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:58808)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1ePVJ7-0000RN-L4
-	for qemu-devel@nongnu.org; Thu, 14 Dec 2017 10:20:21 -0500
-Date: Thu, 14 Dec 2017 15:20:10 +0000
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20171214152010.GA4380@work-vm>
-References: <20171213180807.7066-1-dgilbert@redhat.com>
-	<20171213180807.7066-2-dgilbert@redhat.com>
-	<20171214153028.25c12b0e@redhat.com>
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1ePVKi-0002I5-NR
+	for qemu-devel@nongnu.org; Thu, 14 Dec 2017 10:22:00 -0500
+From: Markus Armbruster <armbru@redhat.com>
+References: <20171213181540.7949-1-danielhb@linux.vnet.ibm.com>
+	<20171213181540.7949-2-danielhb@linux.vnet.ibm.com>
+	<de0c5647-ca81-f5be-db52-9f0d3b173dac@redhat.com>
+Date: Thu, 14 Dec 2017 16:21:57 +0100
+In-Reply-To: <de0c5647-ca81-f5be-db52-9f0d3b173dac@redhat.com> (Eric Blake's
+	message of "Wed, 13 Dec 2017 20:18:43 -0600")
+Message-ID: <87ind9xrl6.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20171214153028.25c12b0e@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v4 1/6] vhost: Move log_dirty check
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PATCH v1 1/2] qmp.c: (re)implement qmp_cpu
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,103 +28,96 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Igor Mammedov <imammedo@redhat.com>
-Cc: qemu-devel@nongnu.org, pbonzini@redhat.com, maxime.coquelin@redhat.com, mst@redhat.com, groug@kaod.org
+To: Eric Blake <eblake@redhat.com>
+Cc: Daniel Henrique Barboza <danielhb@linux.vnet.ibm.com>, qemu-devel@nongnu.org, dgilbert@redhat.com
 
-* Igor Mammedov (imammedo@redhat.com) wrote:
-> On Wed, 13 Dec 2017 18:08:02 +0000
-> "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com> wrote:
-> 
-> > From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-> > 
-> > Move the log_dirty check into vhost_section.
-> > 
-> > Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
-> > ---
-> >  hw/virtio/trace-events |  3 +++
-> >  hw/virtio/vhost.c      | 20 +++++++++++++-------
-> >  2 files changed, 16 insertions(+), 7 deletions(-)
-> > 
-> > diff --git a/hw/virtio/trace-events b/hw/virtio/trace-events
-> > index 775461ae98..4a493bcd46 100644
-> > --- a/hw/virtio/trace-events
-> > +++ b/hw/virtio/trace-events
-> > @@ -1,5 +1,8 @@
-> >  # See docs/devel/tracing.txt for syntax documentation.
-> >  
-> > +# hw/virtio/vhost.c
-> > +vhost_section(const char *name, int r) "%s:%d"
-> > +
-> >  # hw/virtio/virtio.c
-> >  virtqueue_alloc_element(void *elem, size_t sz, unsigned in_num, unsigned out_num) "elem %p size %zd in_num %u out_num %u"
-> >  virtqueue_fill(void *vq, const void *elem, unsigned int len, unsigned int idx) "vq %p elem %p len %u idx %u"
-> > diff --git a/hw/virtio/vhost.c b/hw/virtio/vhost.c
-> > index e4290ce93d..e923219e63 100644
-> > --- a/hw/virtio/vhost.c
-> > +++ b/hw/virtio/vhost.c
-> > @@ -27,6 +27,7 @@
-> >  #include "hw/virtio/virtio-access.h"
-> >  #include "migration/blocker.h"
-> >  #include "sysemu/dma.h"
-> > +#include "trace.h"
-> >  
-> >  /* enabled until disconnected backend stabilizes */
-> >  #define _VHOST_DEBUG 1
-> > @@ -567,18 +568,12 @@ static void vhost_set_memory(MemoryListener *listener,
-> >                                           memory_listener);
-> >      hwaddr start_addr = section->offset_within_address_space;
-> >      ram_addr_t size = int128_get64(section->size);
-> > -    bool log_dirty =
-> > -        memory_region_get_dirty_log_mask(section->mr) & ~(1 << DIRTY_MEMORY_MIGRATION);
-> >      int s = offsetof(struct vhost_memory, regions) +
-> >          (dev->mem->nregions + 1) * sizeof dev->mem->regions[0];
-> >      void *ram;
-> >  
-> >      dev->mem = g_realloc(dev->mem, s);
-> >  
-> > -    if (log_dirty) {
-> > -        add = false;
-> > -    }
-> > -
-> >      assert(size);
-> >  
-> >      /* Optimize no-change case. At least cirrus_vga does this a lot at this time. */
-> > @@ -611,8 +606,19 @@ static void vhost_set_memory(MemoryListener *listener,
-> >  
-> >  static bool vhost_section(MemoryRegionSection *section)
-> >  {
-> > -    return memory_region_is_ram(section->mr) &&
-> > +    bool result;
-> > +    bool log_dirty = memory_region_get_dirty_log_mask(section->mr) &
-> > +                     ~(1 << DIRTY_MEMORY_MIGRATION);
-> > +    result = memory_region_is_ram(section->mr) &&
-> >          !memory_region_is_rom(section->mr);
-> > +
-> > +    /* Vhost doesn't handle any block which is doing dirty-tracking other
-> > +     * than migration; this typically fires on VGA areas.
-> > +     */
-> > +    result &= !log_dirty;
-> before patch even if log_dirty, vhost_set_memory will still proceed
-> and may remove dirty section from memmap and set memory_changed = true
-> 
-> but with this patch it will just ignore such section,
-> I'm not sure it's right (it might be right with new approach add/nop
-> but then this patch should go after new code in place and old one
-> if gone).
+Eric Blake <eblake@redhat.com> writes:
 
-I thought about that, but then I came to the conclusion that the whole
-idea is that we're supposed to be ignoring these regions - so why
-should they cause any change to the behaviour of vhost at all?
-Thus this way seems safer.
+> On 12/13/2017 12:15 PM, Daniel Henrique Barboza wrote:
+>> Commit 755f196898 ("qapi: Convert the cpu command") added the qmp_cpu
+>> function in qmp.c, leaving it blank. It the same commit, a working
+>> hmp_cpu was implemented. Since then, no further changes were made in
+>> qmp_cpu, resulting now in a working 'cpu' command that works in HMP
+>> and a 'cpu' command in QMP that does nothing.
+>> 
+>> Regardless of what constraints were involved that time in not implemeting
+>> qmp_cpu, at this moment it is possible to have both.
 
-Dave
+If I remember that part of history correctly, implementing the command
+in QMP was just as possible back then, but deemed a Bad Idea for the
+reason Eric explains below.
 
-> > +
-> > +    trace_vhost_section(section->mr->name, result);
-> > +    return result;
-> >  }
-> >  
-> >  static void vhost_begin(MemoryListener *listener)
-> 
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+What I don't quite remember is why we had to implement it in QMP as a
+no-op.  Might have been due to the way QMP and HMP were entangled back
+then.
+
+>>                                                      This patch brings
+>> the logic of hmp_cpu to qmp_cpu and converts the HMP function to use its
+>> QMP counterpart.
+>
+> I'm not sure I like this. HMP is stateful (you have to remember what
+> previous 'cpu' commands have been run to tell what the current command
+> will do).  That may be convenient (if not confusing) to humans, but is
+> lousy for machine interfaces.  QMP should be stateless as much as
+> possible - for any command that would behave differently according to
+> what CPU is selected, THAT command (and not a different 'cpu' command
+> executed previously) should have a cpu argument alongside all its other
+> parameters.
+>
+> So unless you have a really strong use case for this, I don't think we
+> want it.
+>
+>
+>> +++ b/qapi-schema.json
+>> @@ -1048,11 +1048,19 @@
+>>  ##
+>>  # @cpu:
+>>  #
+>> -# This command is a nop that is only provided for the purposes of compatibility.
+>> +# Set the default CPU.
+>>  #
+>> -# Since: 0.14.0
+>> +# @index: The index of the virtual CPU to be set as default
+>> +#
+>> +# Returns: Nothing on success
+>> +#
+>> +# Since: 2.12.0
+>> +#
+>> +# Example:
+>> +#
+>> +# -> { "execute": "cpu", "arguments": { "index": 2 } }
+>> +# <- { "return": {} }
+>>  #
+>> -# Notes: Do not use this command.
+>>  ##
+>>  { 'command': 'cpu', 'data': {'index': 'int'} }
+>>  
+>> diff --git a/qmp.c b/qmp.c
+>> index e8c303116a..c482225d5c 100644
+>> --- a/qmp.c
+>> +++ b/qmp.c
+>> @@ -115,7 +115,9 @@ void qmp_system_powerdown(Error **erp)
+>>  
+>>  void qmp_cpu(int64_t index, Error **errp)
+>>  {
+>> -    /* Just do nothing */
+>> +    if (monitor_set_cpu(index) < 0) {
+>> +        error_setg(errp, "Invalid CPU index");
+>> +    }
+>>  }
+>>  
+>>  void qmp_cpu_add(int64_t id, Error **errp)
+>> 
+>
+> Better yet, let's document that 'cpu' is deprecated, so that we can
+> remove it from QMP altogether in a couple of releases.
+
+Yes.
+
+The standard way to deprecate a feature is to add it to appendix
+"Deprecated features" in qemu-doc.texi, and make its use trigger
+suitable deprecation messages, pointing to a replacement if any.
+
+Unfortunately, we still lack means to signal "X is deprecated, use Y
+instead" to a QMP client.  Not important in this case, because the
+command has never worked.
