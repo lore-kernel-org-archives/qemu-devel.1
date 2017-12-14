@@ -1,32 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34980)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36729)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1ePXuZ-000524-Vk
-	for qemu-devel@nongnu.org; Thu, 14 Dec 2017 13:07:12 -0500
+	(envelope-from <dgilbert@redhat.com>) id 1ePXwo-0006pQ-Qk
+	for qemu-devel@nongnu.org; Thu, 14 Dec 2017 13:09:31 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1ePXuW-0003Ac-5z
-	for qemu-devel@nongnu.org; Thu, 14 Dec 2017 13:07:11 -0500
-Received: from mail-it0-x241.google.com ([2607:f8b0:4001:c0b::241]:36687)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1ePXuW-0003A0-26
-	for qemu-devel@nongnu.org; Thu, 14 Dec 2017 13:07:08 -0500
-Received: by mail-it0-x241.google.com with SMTP id d16so13150141itj.1
-	for <qemu-devel@nongnu.org>; Thu, 14 Dec 2017 10:07:08 -0800 (PST)
+	(envelope-from <dgilbert@redhat.com>) id 1ePXwl-0005VJ-El
+	for qemu-devel@nongnu.org; Thu, 14 Dec 2017 13:09:30 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:60980)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1ePXwl-0005Tu-7n
+	for qemu-devel@nongnu.org; Thu, 14 Dec 2017 13:09:27 -0500
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+	[10.5.11.16])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id C198D4903D
+	for <qemu-devel@nongnu.org>; Thu, 14 Dec 2017 18:09:25 +0000 (UTC)
+Date: Thu, 14 Dec 2017 18:09:19 +0000
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20171214180918.GE4380@work-vm>
+References: <20171212135600.14965-1-dgilbert@redhat.com>
+	<20171212182353.hme665vsaohxdvzv@eukaryote>
+	<20171213201145.GB8501@work-vm>
+	<20171214112603.7gkt3dwgxoioybse@eukaryote>
+	<20171214171820.rmoeze7kizr6vq2s@eukaryote>
 MIME-Version: 1.0
-Sender: philippe.mathieu.daude@gmail.com
-In-Reply-To: <CAKmqyKN5dk=sEpSqbnDzyUoSp01YdOaOGQQZBDjcQsaEVhZ-xQ@mail.gmail.com>
-References: <20171213195852.30439-1-f4bug@amsat.org>
-	<20171213195852.30439-10-f4bug@amsat.org>
-	<CAKmqyKN5dk=sEpSqbnDzyUoSp01YdOaOGQQZBDjcQsaEVhZ-xQ@mail.gmail.com>
-From: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>
-Date: Thu, 14 Dec 2017 15:07:06 -0300
-Message-ID: <CAAdtpL4A35MBm7-uRHzbz2eFkJnh6FQ-HpZS+wwu-Y=KT33Npw@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 09/14] sdhci: refactor common sysbus/pci
- unrealize() into sdhci_unrealizefn()
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20171214171820.rmoeze7kizr6vq2s@eukaryote>
+Subject: Re: [Qemu-devel] [PATCH] docs: Convert migration.txt to rst
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,47 +36,51 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alistair Francis <alistair.francis@xilinx.com>
-Cc: "Edgar E . Iglesias" <edgar.iglesias@xilinx.com>, Prasad J Pandit <pjp@fedoraproject.org>, Peter Maydell <peter.maydell@linaro.org>, Andrew Baumann <Andrew.Baumann@microsoft.com>, Andrey Smirnov <andrew.smirnov@gmail.com>, Andrey Yurovsky <yurovsky@gmail.com>, Sai Pavan Boddu <saipava@xilinx.com>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>
+To: Kashyap Chamarthy <kchamart@redhat.com>
+Cc: qemu-devel@nongnu.org, quintela@redhat.com, peterx@redhat.com
 
-On Thu, Dec 14, 2017 at 2:46 PM, Alistair Francis
-<alistair.francis@xilinx.com> wrote:
-> On Wed, Dec 13, 2017 at 11:58 AM, Philippe Mathieu-Daud=C3=A9
-> <f4bug@amsat.org> wrote:
->> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
->> ---
->>  hw/sd/sdhci.c | 21 ++++++++++++++++++---
->>  1 file changed, 18 insertions(+), 3 deletions(-)
->>
->> diff --git a/hw/sd/sdhci.c b/hw/sd/sdhci.c
->> index 893be0e606..044e3d62f1 100644
->> --- a/hw/sd/sdhci.c
->> +++ b/hw/sd/sdhci.c
->> @@ -31,6 +31,7 @@
->>  #include "hw/sd/sdhci.h"
->>  #include "sdhci-internal.h"
->>  #include "sd-internal.h"
->> +#include "qapi/error.h"
->>  #include "qemu/log.h"
->>
->>  /* host controller debug messages */
->> @@ -1191,17 +1192,21 @@ static void sdhci_realizefn(SDHCIState *s, Error=
- **errp)
->>                            SDHC_REGISTERS_MAP_SIZE);
->>  }
->>
->> +static void sdhci_unrealizefn(SDHCIState *s, Error **errp)
->> +{
->> +    g_free(s->fifo_buffer);
->> +    s->fifo_buffer =3D NULL;
->
-> I don't think setting this to NULL is required. Shouldn't g_free() do
-> that for you?
+* Kashyap Chamarthy (kchamart@redhat.com) wrote:
+> On Thu, Dec 14, 2017 at 12:26:03PM +0100, Kashyap Chamarthy wrote:
+> > On Wed, Dec 13, 2017 at 08:11:46PM +0000, Dr. David Alan Gilbert wrote:
+> 
+> [...]
+> 
+> > > > > -   Command: 'postcopy listen'
+> > > > > -   The device state
+> > > > 
+> > > > In my local Sphinx-based HTML rendering, the above "The device state"
+> > > > ended up being bold somehow.
+> > > 
+> > > Any idea why? It's fine both in vim and rst2html-3's output.
+> > 
+> > Don't know yet.  You can see here in the Sphinx-rendered HTML version:
+> 
+> So it's due to the indentation below the line "The device state".  You
+> can either put an extra blank line before indenting the next line:
+> 
+>    - The device state:
+> 
+>        A series of sections, identical to the precopy streams device
+>        state stream containing everything except postcopiable devices
+>        (i.e. RAM)
 
-You are right, good eye :) I didn't notice, this was just code
-movement from the current code.
+I think the problem here is the 'A' - it's picking it up as the first
+item in a numbered list; if I change that to 'The' it also fixes it.
+I added the extra blank line, it's OK but doesn't look great.
 
-Indeed g_free() doesn't free() if the pointer is NULL, however since
-it doesn't have access to the pointer address it can't set it to NULL.
-In some case it matters (RCU code maybe?) but I just checked and it
-this case it doesn't, so I'll drop this line.
+> Or, just indent it to the same level:
+> 
+>    - The device state: A series of sections, identical to the precopy
+>      streams device state stream containing everything except
+>      postcopiable devices (i.e.  RAM)
+> 
+> Same applies for other places where bold text came in at unwanted places.
+
+Dave
+
+> [...]
+> 
+> -- 
+> /kashyap
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
