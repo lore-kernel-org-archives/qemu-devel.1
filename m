@@ -1,33 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43953)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49215)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1ePT8A-00011G-0N
-	for qemu-devel@nongnu.org; Thu, 14 Dec 2017 08:01:00 -0500
+	(envelope-from <dgilbert@redhat.com>) id 1ePTHR-0002YQ-OY
+	for qemu-devel@nongnu.org; Thu, 14 Dec 2017 08:10:31 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1ePT80-0003Ew-Ea
-	for qemu-devel@nongnu.org; Thu, 14 Dec 2017 08:00:54 -0500
-Received: from indium.canonical.com ([91.189.90.7]:55772)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1ePT80-0003DR-7d
-	for qemu-devel@nongnu.org; Thu, 14 Dec 2017 08:00:44 -0500
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1ePT7z-0004TH-8z
-	for <qemu-devel@nongnu.org>; Thu, 14 Dec 2017 13:00:43 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 407F82E80C7
-	for <qemu-devel@nongnu.org>; Thu, 14 Dec 2017 13:00:43 +0000 (UTC)
+	(envelope-from <dgilbert@redhat.com>) id 1ePTHL-0006Td-EX
+	for qemu-devel@nongnu.org; Thu, 14 Dec 2017 08:10:29 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:33076)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1ePTHL-0006Sn-0S
+	for qemu-devel@nongnu.org; Thu, 14 Dec 2017 08:10:23 -0500
+Date: Thu, 14 Dec 2017 13:10:15 +0000
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20171214131014.GA2542@work-vm>
+References: <20171205065307.21853-1-peterx@redhat.com>
+	<20171205065307.21853-7-peterx@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Thu, 14 Dec 2017 12:50:35 -0000
-From: Roman <romanzwi000@gmx.at>
-Reply-To: Bug 1738202 <1738202@bugs.launchpad.net>
-Sender: bounces@canonical.com
-Message-Id: <151325583524.11815.276669131575779398.malonedeb@gac.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1738202] [NEW] qemu 2.11 segfaults on elf file
- that worked with qemu2.7
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20171205065307.21853-7-peterx@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v5 06/28] migration: allow dst vm pause on
+ postcopy
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,105 +28,181 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Peter Xu <peterx@redhat.com>
+Cc: qemu-devel@nongnu.org, Andrea Arcangeli <aarcange@redhat.com>, "Daniel P . Berrange" <berrange@redhat.com>, Juan Quintela <quintela@redhat.com>, Alexey Perevalov <a.perevalov@samsung.com>
 
-Public bug reported:
-
-running on cygwin in Windows 7
-
-QEMU 2.10.93 segfaults:
-$ /opt/qemu2.11/qemu-system-arm -M integratorcp -cpu cortex-m4 -semihosting=
- -nographic -monitor null -serial null -no-reboot -kernel MFWso_Cycle_f1uP2=
-_CUNIT_0.elf
-Segmentation fault
-
-where QEMU 2.7.0 worked:
-$ /opt/qemu2.7/qemu-system-arm -M integratorcp -cpu cortex-m4 -semihosting =
--nographic -monitor null -serial null -no-reboot -kernel MFWso_Cycle_f1uP2_=
-CUNIT_0.elf
------------- CUnit_MFWso_Cycle_f1 ------------
+* Peter Xu (peterx@redhat.com) wrote:
+> When there is IO error on the incoming channel (e.g., network down),
+> instead of bailing out immediately, we allow the dst vm to switch to the
+> new POSTCOPY_PAUSE state. Currently it is still simple - it waits the
+> new semaphore, until someone poke it for another attempt.
+> 
+> One note is that here on ram loading thread we cannot detect the
+> POSTCOPY_ACTIVE state, but we need to detect the more specific
+> POSTCOPY_INCOMING_RUNNING state, to make sure we have already loaded all
+> the device states.
+> 
+> Signed-off-by: Peter Xu <peterx@redhat.com>
 
 
-     CUnit - A Unit testing framework for C - Version 2.1-0
-     http://cunit.sourceforge.net/
+Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
 
-
-Suite: Suite_MFWso_Cycle_f1
-  Test: MFWso_Cycle_f1() ... passed
-  Test: MFWso_GetPhysicalStateData() ... passed
-  Test: MFWso_GetOutputData() ... passed
-  Test: MFWso_GetSafeChannelOK() ... passed
-
---Run Summary: Type      Total     Ran  Passed  Failed
-               suites        1       1     n/a       0
-               tests         4       4       4       0
-               asserts      54      54      54       0
-
-----------------------------------------
-
-Omitting the -cpu parameter results (for both versions) to hang of qemu
-(no output, no end, full cpu load).
-
-** Affects: qemu
-     Importance: Undecided
-         Status: New
-
-
-** Tags: qemu
-
-** Attachment added: "MFWso_Cycle_f1uP2_CUNIT_0.elf to reproduce"
-   https://bugs.launchpad.net/bugs/1738202/+attachment/5022612/+files/MFWso=
-_Cycle_f1uP2_CUNIT_0.elf
-
--- =
-
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1738202
-
-Title:
-  qemu 2.11 segfaults on elf file that worked with qemu2.7
-
-Status in QEMU:
-  New
-
-Bug description:
-  running on cygwin in Windows 7
-
-  QEMU 2.10.93 segfaults:
-  $ /opt/qemu2.11/qemu-system-arm -M integratorcp -cpu cortex-m4 -semihosti=
-ng -nographic -monitor null -serial null -no-reboot -kernel MFWso_Cycle_f1u=
-P2_CUNIT_0.elf
-  Segmentation fault
-
-  where QEMU 2.7.0 worked:
-  $ /opt/qemu2.7/qemu-system-arm -M integratorcp -cpu cortex-m4 -semihostin=
-g -nographic -monitor null -serial null -no-reboot -kernel MFWso_Cycle_f1uP=
-2_CUNIT_0.elf
-  ------------ CUnit_MFWso_Cycle_f1 ------------
-
-  =
-
-       CUnit - A Unit testing framework for C - Version 2.1-0
-       http://cunit.sourceforge.net/
-
-  =
-
-  Suite: Suite_MFWso_Cycle_f1
-    Test: MFWso_Cycle_f1() ... passed
-    Test: MFWso_GetPhysicalStateData() ... passed
-    Test: MFWso_GetOutputData() ... passed
-    Test: MFWso_GetSafeChannelOK() ... passed
-
-  --Run Summary: Type      Total     Ran  Passed  Failed
-                 suites        1       1     n/a       0
-                 tests         4       4       4       0
-                 asserts      54      54      54       0
-
-  ----------------------------------------
-
-  Omitting the -cpu parameter results (for both versions) to hang of
-  qemu (no output, no end, full cpu load).
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1738202/+subscriptions
+> ---
+>  migration/migration.c  |  1 +
+>  migration/migration.h  |  3 +++
+>  migration/savevm.c     | 63 ++++++++++++++++++++++++++++++++++++++++++++++++--
+>  migration/trace-events |  2 ++
+>  4 files changed, 67 insertions(+), 2 deletions(-)
+> 
+> diff --git a/migration/migration.c b/migration/migration.c
+> index f69a48ac63..6f0d48bbed 100644
+> --- a/migration/migration.c
+> +++ b/migration/migration.c
+> @@ -150,6 +150,7 @@ MigrationIncomingState *migration_incoming_get_current(void)
+>          memset(&mis_current, 0, sizeof(MigrationIncomingState));
+>          qemu_mutex_init(&mis_current.rp_mutex);
+>          qemu_event_init(&mis_current.main_thread_load_event, false);
+> +        qemu_sem_init(&mis_current.postcopy_pause_sem_dst, 0);
+>          once = true;
+>      }
+>      return &mis_current;
+> diff --git a/migration/migration.h b/migration/migration.h
+> index 36aaa13f50..55894ecb79 100644
+> --- a/migration/migration.h
+> +++ b/migration/migration.h
+> @@ -61,6 +61,9 @@ struct MigrationIncomingState {
+>      /* The coroutine we should enter (back) after failover */
+>      Coroutine *migration_incoming_co;
+>      QemuSemaphore colo_incoming_sem;
+> +
+> +    /* notify PAUSED postcopy incoming migrations to try to continue */
+> +    QemuSemaphore postcopy_pause_sem_dst;
+>  };
+>  
+>  MigrationIncomingState *migration_incoming_get_current(void);
+> diff --git a/migration/savevm.c b/migration/savevm.c
+> index 8814793255..1e5fc4f332 100644
+> --- a/migration/savevm.c
+> +++ b/migration/savevm.c
+> @@ -1529,8 +1529,8 @@ static int loadvm_postcopy_ram_handle_discard(MigrationIncomingState *mis,
+>   */
+>  static void *postcopy_ram_listen_thread(void *opaque)
+>  {
+> -    QEMUFile *f = opaque;
+>      MigrationIncomingState *mis = migration_incoming_get_current();
+> +    QEMUFile *f = mis->from_src_file;
+>      int load_res;
+>  
+>      migrate_set_state(&mis->state, MIGRATION_STATUS_ACTIVE,
+> @@ -1544,6 +1544,14 @@ static void *postcopy_ram_listen_thread(void *opaque)
+>       */
+>      qemu_file_set_blocking(f, true);
+>      load_res = qemu_loadvm_state_main(f, mis);
+> +
+> +    /*
+> +     * This is tricky, but, mis->from_src_file can change after it
+> +     * returns, when postcopy recovery happened. In the future, we may
+> +     * want a wrapper for the QEMUFile handle.
+> +     */
+> +    f = mis->from_src_file;
+> +
+>      /* And non-blocking again so we don't block in any cleanup */
+>      qemu_file_set_blocking(f, false);
+>  
+> @@ -1626,7 +1634,7 @@ static int loadvm_postcopy_handle_listen(MigrationIncomingState *mis)
+>      /* Start up the listening thread and wait for it to signal ready */
+>      qemu_sem_init(&mis->listen_thread_sem, 0);
+>      qemu_thread_create(&mis->listen_thread, "postcopy/listen",
+> -                       postcopy_ram_listen_thread, mis->from_src_file,
+> +                       postcopy_ram_listen_thread, NULL,
+>                         QEMU_THREAD_DETACHED);
+>      qemu_sem_wait(&mis->listen_thread_sem);
+>      qemu_sem_destroy(&mis->listen_thread_sem);
+> @@ -2011,11 +2019,44 @@ void qemu_loadvm_state_cleanup(void)
+>      }
+>  }
+>  
+> +/* Return true if we should continue the migration, or false. */
+> +static bool postcopy_pause_incoming(MigrationIncomingState *mis)
+> +{
+> +    trace_postcopy_pause_incoming();
+> +
+> +    migrate_set_state(&mis->state, MIGRATION_STATUS_POSTCOPY_ACTIVE,
+> +                      MIGRATION_STATUS_POSTCOPY_PAUSED);
+> +
+> +    assert(mis->from_src_file);
+> +    qemu_file_shutdown(mis->from_src_file);
+> +    qemu_fclose(mis->from_src_file);
+> +    mis->from_src_file = NULL;
+> +
+> +    assert(mis->to_src_file);
+> +    qemu_file_shutdown(mis->to_src_file);
+> +    qemu_mutex_lock(&mis->rp_mutex);
+> +    qemu_fclose(mis->to_src_file);
+> +    mis->to_src_file = NULL;
+> +    qemu_mutex_unlock(&mis->rp_mutex);
+> +
+> +    error_report("Detected IO failure for postcopy. "
+> +                 "Migration paused.");
+> +
+> +    while (mis->state == MIGRATION_STATUS_POSTCOPY_PAUSED) {
+> +        qemu_sem_wait(&mis->postcopy_pause_sem_dst);
+> +    }
+> +
+> +    trace_postcopy_pause_incoming_continued();
+> +
+> +    return true;
+> +}
+> +
+>  static int qemu_loadvm_state_main(QEMUFile *f, MigrationIncomingState *mis)
+>  {
+>      uint8_t section_type;
+>      int ret = 0;
+>  
+> +retry:
+>      while (true) {
+>          section_type = qemu_get_byte(f);
+>  
+> @@ -2060,6 +2101,24 @@ static int qemu_loadvm_state_main(QEMUFile *f, MigrationIncomingState *mis)
+>  out:
+>      if (ret < 0) {
+>          qemu_file_set_error(f, ret);
+> +
+> +        /*
+> +         * Detect whether it is:
+> +         *
+> +         * 1. postcopy running (after receiving all device data, which
+> +         *    must be in POSTCOPY_INCOMING_RUNNING state.  Note that
+> +         *    POSTCOPY_INCOMING_LISTENING is still not enough, it's
+> +         *    still receiving device states).
+> +         * 2. network failure (-EIO)
+> +         *
+> +         * If so, we try to wait for a recovery.
+> +         */
+> +        if (postcopy_state_get() == POSTCOPY_INCOMING_RUNNING &&
+> +            ret == -EIO && postcopy_pause_incoming(mis)) {
+> +            /* Reset f to point to the newly created channel */
+> +            f = mis->from_src_file;
+> +            goto retry;
+> +        }
+>      }
+>      return ret;
+>  }
+> diff --git a/migration/trace-events b/migration/trace-events
+> index da1c63a933..bed1646cd6 100644
+> --- a/migration/trace-events
+> +++ b/migration/trace-events
+> @@ -100,6 +100,8 @@ open_return_path_on_source(void) ""
+>  open_return_path_on_source_continue(void) ""
+>  postcopy_start(void) ""
+>  postcopy_pause_continued(void) ""
+> +postcopy_pause_incoming(void) ""
+> +postcopy_pause_incoming_continued(void) ""
+>  postcopy_start_set_run(void) ""
+>  source_return_path_thread_bad_end(void) ""
+>  source_return_path_thread_end(void) ""
+> -- 
+> 2.14.3
+> 
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
