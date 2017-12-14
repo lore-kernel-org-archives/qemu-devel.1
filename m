@@ -1,16 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53896)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53907)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1ePX1c-0007a3-Su
-	for qemu-devel@nongnu.org; Thu, 14 Dec 2017 12:10:25 -0500
+	(envelope-from <cohuck@redhat.com>) id 1ePX1d-0007aK-FG
+	for qemu-devel@nongnu.org; Thu, 14 Dec 2017 12:10:26 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1ePX1b-00068S-JA
-	for qemu-devel@nongnu.org; Thu, 14 Dec 2017 12:10:24 -0500
+	(envelope-from <cohuck@redhat.com>) id 1ePX1X-00062o-6y
+	for qemu-devel@nongnu.org; Thu, 14 Dec 2017 12:10:25 -0500
 From: Cornelia Huck <cohuck@redhat.com>
-Date: Thu, 14 Dec 2017 18:09:20 +0100
-Message-Id: <20171214171004.25058-3-cohuck@redhat.com>
+Date: Thu, 14 Dec 2017 18:09:19 +0100
+Message-Id: <20171214171004.25058-2-cohuck@redhat.com>
 In-Reply-To: <20171214171004.25058-1-cohuck@redhat.com>
 References: <20171214171004.25058-1-cohuck@redhat.com>
-Subject: [Qemu-devel] [PULL 02/46] pc-bios/s390-ccw: zero out bss section
+Subject: [Qemu-devel] [PULL 01/46] s390x/migration: use zero flag parameter
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,72 +24,69 @@ Cc: qemu-devel@nongnu.org, qemu-s390x@nongnu.org, rth@twiddle.net, agraf@suse.de
 
 From: Christian Borntraeger <borntraeger@de.ibm.com>
 
-The QEMU ELF loader does not zero the bss segment.
-This resulted in several bugs, e.g. see
+valgrind pointed out that we call KVM_S390_GET_IRQ_STATE with an
+undefined value for flags. Kernels prior to 4.15 did not use that
+field, and later kernels ignore it for compatibility reasons, but we
+better play safe.
 
-commit 5d739a4787a5 (s390-ccw.img: Fix sporadic errors with ccw boot image - initialize css)
-commit 6a40fa2669d3 (s390-ccw.img: Initialize next_idx)
-commit 8775d91a0f42 (pc-bios/s390-ccw: Fix problem with invalid virtio-scsi LUN when rebooting)
+The same is true for SET_IRQ_STATE. We should make sure to not use the
+flag field, either.
 
-Let's fix this once and forever by letting the BIOS zero the bss itself.
-
-Suggested-by: Alexander Graf <agraf@suse.de>
 Signed-off-by: Christian Borntraeger <borntraeger@de.ibm.com>
-Message-Id: <20171122142627.73170-3-borntraeger@de.ibm.com>
+Message-Id: <20171122142627.73170-2-borntraeger@de.ibm.com>
 Reviewed-by: Thomas Huth <thuth@redhat.com>
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 Signed-off-by: Cornelia Huck <cohuck@redhat.com>
 ---
- pc-bios/s390-ccw/start.S | 30 +++++++++++++++++++++++++++---
- 1 file changed, 27 insertions(+), 3 deletions(-)
+ target/s390x/kvm.c | 16 ++++++++--------
+ 1 file changed, 8 insertions(+), 8 deletions(-)
 
-diff --git a/pc-bios/s390-ccw/start.S b/pc-bios/s390-ccw/start.S
-index 43f9bd243e..eb8d024dbb 100644
---- a/pc-bios/s390-ccw/start.S
-+++ b/pc-bios/s390-ccw/start.S
-@@ -3,7 +3,7 @@
-  * into the pc-bios directory of qemu.
-  *
-  * Copyright (c) 2013 Alexander Graf <agraf@suse.de>
-- * Copyright 2013 IBM Corp.
-+ * Copyright IBM Corp. 2013, 2017
-  *
-  * This work is licensed under the terms of the GNU GPL, version 2 or (at
-  * your option) any later version. See the COPYING file in the top-level
-@@ -13,8 +13,32 @@
-         .globl _start
- _start:
+diff --git a/target/s390x/kvm.c b/target/s390x/kvm.c
+index b03f583032..f205e0a2ca 100644
+--- a/target/s390x/kvm.c
++++ b/target/s390x/kvm.c
+@@ -1979,7 +1979,10 @@ int kvm_s390_set_cpu_state(S390CPU *cpu, uint8_t cpu_state)
  
--larl	%r15, stack + 0x8000    /* Set up stack */
--j	main                    /* And call C */
-+	larl   %r15, stack + 0x8000	/* Set up stack */
-+
-+	/* clear bss */
-+	larl %r2, __bss_start
-+	larl %r3, _end
-+	slgr %r3, %r2		/* get sizeof bss */
-+	ltgr	%r3,%r3 	/* bss emtpy? */
-+	jz	done
-+	aghi	%r3,-1
-+	srlg	%r4,%r3,8	/* how many 256 byte chunks? */
-+	ltgr	%r4,%r4
-+	lgr	%r1,%r2
-+	jz	remainder
-+loop:
-+	xc	0(256,%r1),0(%r1)
-+	la	%r1,256(%r1)
-+	brctg	%r4,loop
-+remainder:
-+	larl	%r2,memsetxc
-+	ex	%r3,0(%r2)
-+done:
-+	j      main		/* And call C */
-+
-+memsetxc:
-+	xc	0(1,%r1),0(%r1)
-+
+ void kvm_s390_vcpu_interrupt_pre_save(S390CPU *cpu)
+ {
+-    struct kvm_s390_irq_state irq_state;
++    struct kvm_s390_irq_state irq_state = {
++        .buf = (uint64_t) cpu->irqstate,
++        .len = VCPU_IRQ_BUF_SIZE,
++    };
+     CPUState *cs = CPU(cpu);
+     int32_t bytes;
  
- /*
-  * void disabled_wait(void)
+@@ -1987,9 +1990,6 @@ void kvm_s390_vcpu_interrupt_pre_save(S390CPU *cpu)
+         return;
+     }
+ 
+-    irq_state.buf = (uint64_t) cpu->irqstate;
+-    irq_state.len = VCPU_IRQ_BUF_SIZE;
+-
+     bytes = kvm_vcpu_ioctl(cs, KVM_S390_GET_IRQ_STATE, &irq_state);
+     if (bytes < 0) {
+         cpu->irqstate_saved_size = 0;
+@@ -2003,7 +2003,10 @@ void kvm_s390_vcpu_interrupt_pre_save(S390CPU *cpu)
+ int kvm_s390_vcpu_interrupt_post_load(S390CPU *cpu)
+ {
+     CPUState *cs = CPU(cpu);
+-    struct kvm_s390_irq_state irq_state;
++    struct kvm_s390_irq_state irq_state = {
++        .buf = (uint64_t) cpu->irqstate,
++        .len = cpu->irqstate_saved_size,
++    };
+     int r;
+ 
+     if (cpu->irqstate_saved_size == 0) {
+@@ -2014,9 +2017,6 @@ int kvm_s390_vcpu_interrupt_post_load(S390CPU *cpu)
+         return -ENOSYS;
+     }
+ 
+-    irq_state.buf = (uint64_t) cpu->irqstate;
+-    irq_state.len = cpu->irqstate_saved_size;
+-
+     r = kvm_vcpu_ioctl(cs, KVM_S390_SET_IRQ_STATE, &irq_state);
+     if (r) {
+         error_report("Setting interrupt state failed %d", r);
 -- 
 2.13.6
