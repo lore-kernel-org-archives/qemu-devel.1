@@ -1,20 +1,37 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55511)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56377)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <andrew.smirnov@gmail.com>) id 1ePUtL-0001eR-PN
-	for qemu-devel@nongnu.org; Thu, 14 Dec 2017 09:53:45 -0500
+	(envelope-from <i.maximets@samsung.com>) id 1ePUuV-0002cq-WA
+	for qemu-devel@nongnu.org; Thu, 14 Dec 2017 09:54:57 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <andrew.smirnov@gmail.com>) id 1ePUtJ-0000qu-W6
-	for qemu-devel@nongnu.org; Thu, 14 Dec 2017 09:53:43 -0500
-From: Andrey Smirnov <andrew.smirnov@gmail.com>
-Date: Thu, 14 Dec 2017 06:52:52 -0800
-Message-Id: <20171214145255.31545-13-andrew.smirnov@gmail.com>
-In-Reply-To: <20171214145255.31545-1-andrew.smirnov@gmail.com>
-References: <20171214145255.31545-1-andrew.smirnov@gmail.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v2 12/15] sdhci: Add i.MX specific subtype of
- SDHCI
+	(envelope-from <i.maximets@samsung.com>) id 1ePUuS-0002VH-NM
+	for qemu-devel@nongnu.org; Thu, 14 Dec 2017 09:54:56 -0500
+Received: from mailout1.w1.samsung.com ([210.118.77.11]:55641)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <i.maximets@samsung.com>)
+	id 1ePUuS-0002SJ-7K
+	for qemu-devel@nongnu.org; Thu, 14 Dec 2017 09:54:52 -0500
+MIME-version: 1.0
+Content-type: text/plain; charset="utf-8"
+From: Ilya Maximets <i.maximets@samsung.com>
+Message-id: <77fe3f09-3b40-2ed1-6226-9909cd606d62@samsung.com>
+Date: Thu, 14 Dec 2017 17:54:44 +0300
+In-reply-to: <a3421d38-fbdc-f95d-8cfd-66dc5c32a3ac@samsung.com>
+Content-language: en-GB
+References: <CGME20171206130624eucas1p1f73fd4cf613eaf3ce4ce6918c807f8e1@eucas1p1.samsung.com>
+	<1512565578-12078-1-git-send-email-i.maximets@samsung.com>
+	<20171206184432-mutt-send-email-mst@kernel.org>
+	<249c9e25-0bdb-7a44-6821-59474d25baa5@samsung.com>
+	<20171207192456-mutt-send-email-mst@kernel.org>
+	<a725504a-957e-d18c-d495-bf4a7c5adc55@samsung.com>
+	<20171211062301-mutt-send-email-mst@kernel.org>
+	<4ac23512-210b-0543-7ce7-82c9639f321c@samsung.com>
+	<20171213214749-mutt-send-email-mst@kernel.org>
+	<0e3648df-6aa2-f3e1-5ae6-14fb01d7b476@samsung.com>
+	<cdf7bc7a-8ecd-73e7-1129-67c38ab6095d@redhat.com>
+	<a3421d38-fbdc-f95d-8cfd-66dc5c32a3ac@samsung.com>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH] vhost: fix crash on virtio_error while
+ device stop
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,373 +40,157 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-arm@nongnu.org
-Cc: Andrey Smirnov <andrew.smirnov@gmail.com>, Peter Maydell <peter.maydell@linaro.org>, Jason Wang <jasowang@redhat.com>, =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, qemu-devel@nongnu.org, yurovsky@gmail.com
+To: Maxime Coquelin <maxime.coquelin@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>
+Cc: qemu-devel@nongnu.org, Marc-Andre Lureau <marcandre.lureau@redhat.com>, Heetae Ahn <heetae82.ahn@samsung.com>
 
-IP block found on several generations of i.MX family does not use
-vanilla SDHCI implementation and it comes with a number of quirks.
 
-Introduce i.MX SDHCI subtype of SDHCI block to add code necessary to
-support unmodified Linux guest driver.
 
-Cc: Peter Maydell <peter.maydell@linaro.org>
-Cc: Jason Wang <jasowang@redhat.com>
-Cc: Philippe Mathieu-Daudé <f4bug@amsat.org>
-Cc: qemu-devel@nongnu.org
-Cc: qemu-arm@nongnu.org
-Cc: yurovsky@gmail.com
-Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
-Signed-off-by: Andrey Smirnov <andrew.smirnov@gmail.com>
----
- hw/sd/sdhci-internal.h |  19 +++++
- hw/sd/sdhci.c          | 228 ++++++++++++++++++++++++++++++++++++++++++++++++-
- include/hw/sd/sdhci.h  |  14 +++
- 3 files changed, 259 insertions(+), 2 deletions(-)
+On 14.12.2017 17:31, Ilya Maximets wrote:
+> One update for the testing scenario:
+>=20
+> No need to kill OVS. The issue reproducible with simple 'del-port'
+> and 'add-port'. virtio driver in guest could crash on both operations.
+> Most times it crashes in my case on 'add-port' after deletion.
+>=20
+> Hi Maxime,
+> I already saw below patches and original linux kernel virtio issue.
+> Just had no enough time to test them.
+> Now I tested below patches and they fixes virtio driver crash.
+> Thanks for suggestion.
+>=20
+> Michael,
+> I tested "[PATCH] virtio_error: don't invoke status callbacks "
+> and it fixes the QEMU crash in case of broken guest index.
+> Thanks.
+>=20
+> Best regards, Ilya Maximets.
+>=20
+> P.S. Previously I mentioned that I can not reproduce virtio driver
+>      crash with "[PATCH] virtio_error: don't invoke status callbacks"
 
-diff --git a/hw/sd/sdhci-internal.h b/hw/sd/sdhci-internal.h
-index 161177cf39..b86ac0791b 100644
---- a/hw/sd/sdhci-internal.h
-+++ b/hw/sd/sdhci-internal.h
-@@ -85,12 +85,18 @@
- 
- /* R/W Host control Register 0x0 */
- #define SDHC_HOSTCTL                   0x28
-+#define SDHC_CTRL_LED                  0x01
- #define SDHC_CTRL_DMA_CHECK_MASK       0x18
- #define SDHC_CTRL_SDMA                 0x00
- #define SDHC_CTRL_ADMA1_32             0x08
- #define SDHC_CTRL_ADMA2_32             0x10
- #define SDHC_CTRL_ADMA2_64             0x18
- #define SDHC_DMA_TYPE(x)               ((x) & SDHC_CTRL_DMA_CHECK_MASK)
-+#define SDHC_CTRL_4BITBUS              0x02
-+#define SDHC_CTRL_8BITBUS              0x20
-+#define SDHC_CTRL_CDTEST_INS           0x40
-+#define SDHC_CTRL_CDTEST_EN            0x80
-+
- 
- /* R/W Power Control Register 0x0 */
- #define SDHC_PWRCON                    0x29
-@@ -229,4 +235,17 @@ enum {
- 
- extern const VMStateDescription sdhci_vmstate;
- 
-+
-+#define ESDHC_MIX_CTRL                  0x48
-+#define ESDHC_VENDOR_SPEC               0xc0
-+#define ESDHC_DLL_CTRL                  0x60
-+
-+#define ESDHC_TUNING_CTRL               0xcc
-+#define ESDHC_TUNE_CTRL_STATUS          0x68
-+#define ESDHC_WTMK_LVL                  0x44
-+
-+#define ESDHC_CTRL_4BITBUS              (0x1 << 1)
-+#define ESDHC_CTRL_8BITBUS              (0x2 << 1)
-+
-+
- #endif
-diff --git a/hw/sd/sdhci.c b/hw/sd/sdhci.c
-index 6d6a791ee9..758af067f9 100644
---- a/hw/sd/sdhci.c
-+++ b/hw/sd/sdhci.c
-@@ -265,7 +265,8 @@ static void sdhci_send_command(SDHCIState *s)
-             }
-         }
- 
--        if ((s->norintstsen & SDHC_NISEN_TRSCMP) &&
-+        if (!(s->quirks & SDHCI_QUIRK_NO_BUSY_IRQ) &&
-+            (s->norintstsen & SDHC_NISEN_TRSCMP) &&
-             (s->cmdreg & SDHC_CMD_RESPONSE) == SDHC_CMD_RSP_WITH_BUSY) {
-             s->norintsts |= SDHC_NIS_TRSCMP;
-         }
-@@ -1191,6 +1192,8 @@ static void sdhci_initfn(SDHCIState *s)
- 
-     s->insert_timer = timer_new_ns(QEMU_CLOCK_VIRTUAL, sdhci_raise_insertion_irq, s);
-     s->transfer_timer = timer_new_ns(QEMU_CLOCK_VIRTUAL, sdhci_data_transfer, s);
-+
-+    s->io_ops = &sdhci_mmio_ops;
- }
- 
- static void sdhci_uninitfn(SDHCIState *s)
-@@ -1347,7 +1350,7 @@ static void sdhci_sysbus_realize(DeviceState *dev, Error ** errp)
-     s->buf_maxsz = sdhci_get_fifolen(s);
-     s->fifo_buffer = g_malloc0(s->buf_maxsz);
-     sysbus_init_irq(sbd, &s->irq);
--    memory_region_init_io(&s->iomem, OBJECT(s), &sdhci_mmio_ops, s, "sdhci",
-+    memory_region_init_io(&s->iomem, OBJECT(s), s->io_ops, s, "sdhci",
-             SDHC_REGISTERS_MAP_SIZE);
-     sysbus_init_mmio(sbd, &s->iomem);
- }
-@@ -1386,11 +1389,232 @@ static const TypeInfo sdhci_bus_info = {
-     .class_init = sdhci_bus_class_init,
- };
- 
-+static uint64_t usdhc_read(void *opaque, hwaddr offset, unsigned size)
-+{
-+    SDHCIState *s = SYSBUS_SDHCI(opaque);
-+    uint32_t ret;
-+    uint16_t hostctl;
-+
-+    switch (offset) {
-+    default:
-+        return sdhci_read(opaque, offset, size);
-+
-+    case SDHC_HOSTCTL:
-+        /*
-+         * For a detailed explanation on the following bit
-+         * manipulation code see comments in a similar part of
-+         * usdhc_write()
-+         */
-+        hostctl = SDHC_DMA_TYPE(s->hostctl) << (8 - 3);
-+
-+        if (s->hostctl & SDHC_CTRL_8BITBUS) {
-+            hostctl |= ESDHC_CTRL_8BITBUS;
-+        }
-+
-+        if (s->hostctl & SDHC_CTRL_4BITBUS) {
-+            hostctl |= ESDHC_CTRL_4BITBUS;
-+        }
-+
-+        ret  = hostctl;
-+        ret |= (uint32_t)s->blkgap << 16;
-+        ret |= (uint32_t)s->wakcon << 24;
-+
-+        break;
-+
-+    case ESDHC_DLL_CTRL:
-+    case ESDHC_TUNE_CTRL_STATUS:
-+    case 0x6c:
-+    case ESDHC_TUNING_CTRL:
-+    case ESDHC_VENDOR_SPEC:
-+    case ESDHC_MIX_CTRL:
-+    case ESDHC_WTMK_LVL:
-+        ret = 0;
-+        break;
-+    }
-+
-+    return ret;
-+}
-+
-+static void
-+usdhc_write(void *opaque, hwaddr offset, uint64_t val, unsigned size)
-+{
-+    SDHCIState *s = SYSBUS_SDHCI(opaque);
-+    uint8_t hostctl;
-+    uint32_t value = (uint32_t)val;
-+
-+    switch (offset) {
-+    case ESDHC_DLL_CTRL:
-+    case ESDHC_TUNE_CTRL_STATUS:
-+    case 0x6c:
-+    case ESDHC_TUNING_CTRL:
-+    case ESDHC_WTMK_LVL:
-+    case ESDHC_VENDOR_SPEC:
-+        break;
-+
-+    case SDHC_HOSTCTL:
-+        /*
-+         * Here's What ESDHCI has at offset 0x28 (SDHC_HOSTCTL)
-+         *
-+         *       7         6     5      4      3      2        1      0
-+         * |-----------+--------+--------+-----------+----------+---------|
-+         * | Card      | Card   | Endian | DATA3     | Data     | Led     |
-+         * | Detect    | Detect | Mode   | as Card   | Transfer | Control |
-+         * | Signal    | Test   |        | Detection | Width    |         |
-+         * | Selection | Level  |        | Pin       |          |         |
-+         * |-----------+--------+--------+-----------+----------+---------|
-+         *
-+         * and 0x29
-+         *
-+         *  15      10 9    8
-+         * |----------+------|
-+         * | Reserved | DMA  |
-+         * |          | Sel. |
-+         * |          |      |
-+         * |----------+------|
-+         *
-+         * and here's what SDCHI spec expects those offsets to be:
-+         *
-+         * 0x28 (Host Control Register)
-+         *
-+         *     7        6         5       4  3      2         1        0
-+         * |--------+--------+----------+------+--------+----------+---------|
-+         * | Card   | Card   | Extended | DMA  | High   | Data     | LED     |
-+         * | Detect | Detect | Data     | Sel. | Speed  | Transfer | Control |
-+         * | Signal | Test   | Transfer |      | Enable | Width    |         |
-+         * | Sel.   | Level  | Width    |      |        |          |         |
-+         * |--------+--------+----------+------+--------+----------+---------|
-+         *
-+         * and 0x29 (Power Control Register)
-+         *
-+         * |----------------------------------|
-+         * | Power Control Register           |
-+         * |                                  |
-+         * | Description omitted,             |
-+         * | since it has no analog in ESDHCI |
-+         * |                                  |
-+         * |----------------------------------|
-+         *
-+         * Since offsets 0x2A and 0x2B should be compatible between
-+         * both IP specs we only need to reconcile least 16-bit of the
-+         * word we've been given.
-+         */
-+
-+        /*
-+         * First, save bits 7 6 and 0 since they are identical
-+         */
-+        hostctl = value & (SDHC_CTRL_LED |
-+                           SDHC_CTRL_CDTEST_INS |
-+                           SDHC_CTRL_CDTEST_EN);
-+        /*
-+         * Second, split "Data Transfer Width" from bits 2 and 1 in to
-+         * bits 5 and 1
-+         */
-+        if (value & ESDHC_CTRL_8BITBUS) {
-+            hostctl |= SDHC_CTRL_8BITBUS;
-+        }
-+
-+        if (value & ESDHC_CTRL_4BITBUS) {
-+            hostctl |= ESDHC_CTRL_4BITBUS;
-+        }
-+
-+        /*
-+         * Third, move DMA select from bits 9 and 8 to bits 4 and 3
-+         */
-+        hostctl |= SDHC_DMA_TYPE(value >> (8 - 3));
-+
-+        /*
-+         * Now place the corrected value into low 16-bit of the value
-+         * we are going to give standard SDHCI write function
-+         *
-+         * NOTE: This transformation should be the inverse of what can
-+         * be found in drivers/mmc/host/sdhci-esdhc-imx.c in Linux
-+         * kernel
-+         */
-+        value &= ~UINT16_MAX;
-+        value |= hostctl;
-+        value |= (uint16_t)s->pwrcon << 8;
-+
-+        sdhci_write(opaque, offset, value, size);
-+        break;
-+
-+    case ESDHC_MIX_CTRL:
-+        /*
-+         * So, when SD/MMC stack in Linux tries to write to "Transfer
-+         * Mode Register", ESDHC i.MX quirk code will translate it
-+         * into a write to ESDHC_MIX_CTRL, so we do the opposite in
-+         * order to get where we started
-+         *
-+         * Note that Auto CMD23 Enable bit is located in a wrong place
-+         * on i.MX, but since it is not used by QEMU we do not care.
-+         *
-+         * We don't want to call sdhci_write(.., SDHC_TRNMOD, ...)
-+         * here becuase it will result in a call to
-+         * sdhci_send_command(s) which we don't want.
-+         *
-+         */
-+        s->trnmod = value & UINT16_MAX;
-+        break;
-+    case SDHC_TRNMOD:
-+        /*
-+         * Similar to above, but this time a write to "Command
-+         * Register" will be translated into a 4-byte write to
-+         * "Transfer Mode register" where lower 16-bit of value would
-+         * be set to zero. So what we do is fill those bits with
-+         * cached value from s->trnmod and let the SDHCI
-+         * infrastructure handle the rest
-+         */
-+        sdhci_write(opaque, offset, val | s->trnmod, size);
-+        break;
-+    case SDHC_BLKSIZE:
-+        /*
-+         * ESDHCI does not implement "Host SDMA Buffer Boundary", and
-+         * Linux driver will try to zero this field out which will
-+         * break the rest of SDHCI emulation.
-+         *
-+         * Linux defaults to maximum possible setting (512K boundary)
-+         * and it seems to be the only option that i.MX IP implements,
-+         * so we artificially set it to that value.
-+         */
-+        val |= 0x7 << 12;
-+        /* FALLTHROUGH */
-+    default:
-+        sdhci_write(opaque, offset, val, size);
-+        break;
-+    }
-+}
-+
-+
-+static const MemoryRegionOps usdhc_mmio_ops = {
-+    .read = usdhc_read,
-+    .write = usdhc_write,
-+    .valid = {
-+        .min_access_size = 1,
-+        .max_access_size = 4,
-+        .unaligned = false
-+    },
-+    .endianness = DEVICE_LITTLE_ENDIAN,
-+};
-+
-+static void imx_usdhc_init(Object *obj)
-+{
-+    SDHCIState *s = SYSBUS_SDHCI(obj);
-+
-+    s->io_ops = &usdhc_mmio_ops;
-+    s->quirks = SDHCI_QUIRK_NO_BUSY_IRQ;
-+}
-+
-+static const TypeInfo imx_usdhc_info = {
-+    .name = TYPE_IMX_USDHC,
-+    .parent = TYPE_SYSBUS_SDHCI,
-+    .instance_init = imx_usdhc_init,
-+};
-+
- static void sdhci_register_types(void)
- {
-     type_register_static(&sdhci_pci_info);
-     type_register_static(&sdhci_sysbus_info);
-     type_register_static(&sdhci_bus_info);
-+    type_register_static(&imx_usdhc_info);
- }
- 
- type_init(sdhci_register_types)
-diff --git a/include/hw/sd/sdhci.h b/include/hw/sd/sdhci.h
-index 0f0c3f1e64..b56836a2fc 100644
---- a/include/hw/sd/sdhci.h
-+++ b/include/hw/sd/sdhci.h
-@@ -39,6 +39,7 @@ typedef struct SDHCIState {
-     };
-     SDBus sdbus;
-     MemoryRegion iomem;
-+    const MemoryRegionOps *io_ops;
- 
-     QEMUTimer *insert_timer;       /* timer for 'changing' sd card. */
-     QEMUTimer *transfer_timer;
-@@ -83,8 +84,19 @@ typedef struct SDHCIState {
-     /* Force Event Auto CMD12 Error Interrupt Reg - write only */
-     /* Force Event Error Interrupt Register- write only */
-     /* RO Host Controller Version Register always reads as 0x2401 */
-+
-+    uint32_t quirks;
- } SDHCIState;
- 
-+/*
-+ * Controller does not provide transfer-complete interrupt when not
-+ * busy.
-+ *
-+ * NOTE: This definition is taken out of Linux kernel and so the
-+ * original bit number is preserved
-+ */
-+#define SDHCI_QUIRK_NO_BUSY_IRQ    BIT(14)
-+
- #define TYPE_PCI_SDHCI "sdhci-pci"
- #define PCI_SDHCI(obj) OBJECT_CHECK(SDHCIState, (obj), TYPE_PCI_SDHCI)
- 
-@@ -92,4 +104,6 @@ typedef struct SDHCIState {
- #define SYSBUS_SDHCI(obj)                               \
-      OBJECT_CHECK(SDHCIState, (obj), TYPE_SYSBUS_SDHCI)
- 
-+#define TYPE_IMX_USDHC "imx-usdhc"
-+
- #endif /* SDHCI_H */
--- 
-2.14.3
+It should be "[PATCH dontapply] virtio: rework set_status callbacks".
+Sorry again.
+
+>      applied. I was wrong. I can reproduce now. System was misconfigure=
+d.
+>      Sorry.
+>=20
+>=20
+> On 14.12.2017 12:01, Maxime Coquelin wrote:
+>> Hi Ilya,
+>>
+>> On 12/14/2017 08:06 AM, Ilya Maximets wrote:
+>>> On 13.12.2017 22:48, Michael S. Tsirkin wrote:
+>>>> On Wed, Dec 13, 2017 at 04:45:20PM +0300, Ilya Maximets wrote:
+>>>>>>> That
+>>>>>>> looks very strange. Some of the functions gets 'old_status', othe=
+rs
+>>>>>>> the 'new_status'. I'm a bit confused.
+>>>>>>
+>>>>>> OK, fair enough. Fixed - let's pass old status everywhere,
+>>>>>> users that need the new one can get it from the vdev.
+>>>>>>
+>>>>>>> And it's not functional in current state:
+>>>>>>>
+>>>>>>> hw/net/virtio-net.c:264:28: error: =E2=80=98status=E2=80=99 undec=
+lared
+>>>>>>
+>>>>>> Fixed too. new version below.
+>>>>>
+>>>>> This doesn't fix the segmentation fault.
+>>>>
+>>>> Hmm you are right. Looking into it.
+>>>>
+>>>>> I have exactly same crash stacktrace:
+>>>>>
+>>>>> #0=C2=A0 vhost_memory_unmap hw/virtio/vhost.c:446
+>>>>> #1=C2=A0 vhost_virtqueue_stop hw/virtio/vhost.c:1155
+>>>>> #2=C2=A0 vhost_dev_stop hw/virtio/vhost.c:1594
+>>>>> #3=C2=A0 vhost_net_stop_one hw/net/vhost_net.c:289
+>>>>> #4=C2=A0 vhost_net_stop hw/net/vhost_net.c:368
+>>>>> #5=C2=A0 virtio_net_vhost_status (old_status=3D15 '\017', n=3D0x562=
+5f3901100) at hw/net/virtio-net.c:180
+>>>>> #6=C2=A0 virtio_net_set_status (vdev=3D0x5625f3901100, old_status=3D=
+<optimized out>) at hw/net/virtio-net.c:254
+>>>>> #7=C2=A0 virtio_set_status (vdev=3Dvdev@entry=3D0x5625f3901100, val=
+=3D<optimized out>) at hw/virtio/virtio.c:1152
+>>>>> #8=C2=A0 virtio_error (vdev=3D0x5625f3901100, fmt=3Dfmt@entry=3D0x5=
+625f014f688 "Guest says index %u is available") at hw/virtio/virtio.c:246=
+0
+>>>>
+>>>> BTW what is causing this? Why is guest avail index corrupted?
+>>>
+>>> My testing environment for the issue:
+>>>
+>>> * QEMU 2.10.1
+>>
+>> Could you try to backport below patch and try again killing OVS?
+>>
+>> commit 2ae39a113af311cb56a0c35b7f212dafcef15303
+>> Author: Maxime Coquelin <maxime.coquelin@redhat.com>
+>> Date:=C2=A0=C2=A0 Thu Nov 16 19:48:35 2017 +0100
+>>
+>> =C2=A0=C2=A0=C2=A0 vhost: restore avail index from vring used index on=
+ disconnection
+>>
+>> =C2=A0=C2=A0=C2=A0 vhost_virtqueue_stop() gets avail index value from =
+the backend,
+>> =C2=A0=C2=A0=C2=A0 except if the backend is not responding.
+>>
+>> =C2=A0=C2=A0=C2=A0 It happens when the backend crashes, and in this ca=
+se, internal
+>> =C2=A0=C2=A0=C2=A0 state of the virtio queue is inconsistent, making p=
+ackets
+>> =C2=A0=C2=A0=C2=A0 to corrupt the vring state.
+>>
+>> =C2=A0=C2=A0=C2=A0 With a Linux guest, it results in following error m=
+essage on
+>> =C2=A0=C2=A0=C2=A0 backend reconnection:
+>>
+>> =C2=A0=C2=A0=C2=A0 [=C2=A0=C2=A0 22.444905] virtio_net virtio0: output=
+.0:id 0 is not a head!
+>> =C2=A0=C2=A0=C2=A0 [=C2=A0=C2=A0 22.446746] net enp0s3: Unexpected TXQ=
+ (0) queue failure: -5
+>> =C2=A0=C2=A0=C2=A0 [=C2=A0=C2=A0 22.476360] net enp0s3: Unexpected TXQ=
+ (0) queue failure: -5
+>>
+>> =C2=A0=C2=A0=C2=A0 Fixes: 283e2c2adcb8 ("net: virtio-net discards TX d=
+ata after link down")
+>> =C2=A0=C2=A0=C2=A0 Cc: qemu-stable@nongnu.org
+>> =C2=A0=C2=A0=C2=A0 Signed-off-by: Maxime Coquelin <maxime.coquelin@red=
+hat.com>
+>> =C2=A0=C2=A0=C2=A0 Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
+>> =C2=A0=C2=A0=C2=A0 Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
+>>
+>> commit 2d4ba6cc741df15df6fbb4feaa706a02e103083a
+>> Author: Maxime Coquelin <maxime.coquelin@redhat.com>
+>> Date:=C2=A0=C2=A0 Thu Nov 16 19:48:34 2017 +0100
+>>
+>> =C2=A0=C2=A0=C2=A0 virtio: Add queue interface to restore avail index =
+from vring used index
+>>
+>> =C2=A0=C2=A0=C2=A0 In case of backend crash, it is not possible to res=
+tore internal
+>> =C2=A0=C2=A0=C2=A0 avail index from the backend value as vhost_get_vri=
+ng_base
+>> =C2=A0=C2=A0=C2=A0 callback fails.
+>>
+>> =C2=A0=C2=A0=C2=A0 This patch provides a new interface to restore inte=
+rnal avail index
+>> =C2=A0=C2=A0=C2=A0 from the vring used index, as done by some vhost-us=
+er backend on
+>> =C2=A0=C2=A0=C2=A0 reconnection.
+>>
+>> =C2=A0=C2=A0=C2=A0 Signed-off-by: Maxime Coquelin <maxime.coquelin@red=
+hat.com>
+>> =C2=A0=C2=A0=C2=A0 Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
+>> =C2=A0=C2=A0=C2=A0 Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
+>>
+>>
+>> Cheers,
+>> Maxime
+>>
+>>
+>>
+>=20
+>=20
