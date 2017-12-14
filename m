@@ -1,25 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43237)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43276)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1ePUZr-0001TK-9C
-	for qemu-devel@nongnu.org; Thu, 14 Dec 2017 09:33:41 -0500
+	(envelope-from <armbru@redhat.com>) id 1ePUZu-0001WD-JB
+	for qemu-devel@nongnu.org; Thu, 14 Dec 2017 09:33:47 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1ePUZq-0005Wm-6Q
-	for qemu-devel@nongnu.org; Thu, 14 Dec 2017 09:33:35 -0500
-Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
-	<philippe.mathieu.daude@gmail.com>
-References: <20171213213557.26561-1-f4bug@amsat.org>
-	<20171214093907.GA14433@stefanha-x1.localdomain>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <7bc179c8-5699-98b0-8a5b-b4d8e6843b25@amsat.org>
-Date: Thu, 14 Dec 2017 11:33:03 -0300
+	(envelope-from <armbru@redhat.com>) id 1ePUZq-0005Xj-IA
+	for qemu-devel@nongnu.org; Thu, 14 Dec 2017 09:33:38 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:49017)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1ePUZq-0005TK-4x
+	for qemu-devel@nongnu.org; Thu, 14 Dec 2017 09:33:34 -0500
+From: Markus Armbruster <armbru@redhat.com>
+References: <20170911110623.24981-1-marcandre.lureau@redhat.com>
+	<20170911110623.24981-42-marcandre.lureau@redhat.com>
+	<87zi6lza7i.fsf@dusky.pond.sub.org>
+	<CAJ+F1CLe-=UOtVSN+Pnou1uOVF+sDqus3KUdJfNO5oa+VZt2=Q@mail.gmail.com>
+Date: Thu, 14 Dec 2017 15:33:30 +0100
+In-Reply-To: <CAJ+F1CLe-=UOtVSN+Pnou1uOVF+sDqus3KUdJfNO5oa+VZt2=Q@mail.gmail.com>
+	(=?utf-8?Q?=22Marc-Andr=C3=A9?= Lureau"'s message of "Thu, 14 Dec 2017
+	15:00:12 +0100")
+Message-ID: <87po7hxttx.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-In-Reply-To: <20171214093907.GA14433@stefanha-x1.localdomain>
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature";
-	boundary="BsSxMXTeUgfa6EfP64fxc4AwwE5nuswTI"
-Subject: Re: [Qemu-devel] [PATCH 0/6] QTests: use Python to run complex tests
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v3 41/50] qapi: add a 'unit' pragma
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,115 +31,100 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefan Hajnoczi <stefanha@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Andrey Smirnov <andrew.smirnov@gmail.com>, Peter Maydell <peter.maydell@linaro.org>
-Cc: Alistair Francis <alistair.francis@xilinx.com>, "Edgar E . Iglesias" <edgar.iglesias@xilinx.com>, Cleber Rosa <crosa@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, John Snow <jsnow@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, =?UTF-8?B?THVrw6HFoSBEb2t0b3I=?= <ldoktor@redhat.com>, "Daniel P . Berrange" <berrange@redhat.com>, Eric Blake <eblake@redhat.com>, Fam Zheng <famz@redhat.com>, Thomas Huth <thuth@redhat.com>, =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org, qemu-arm@nongnu.org
+To: =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@gmail.com>
+Cc: QEMU <qemu-devel@nongnu.org>, Michael Roth <mdroth@linux.vnet.ibm.com>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---BsSxMXTeUgfa6EfP64fxc4AwwE5nuswTI
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-To: Stefan Hajnoczi <stefanha@redhat.com>, Paolo Bonzini
- <pbonzini@redhat.com>, Andrey Smirnov <andrew.smirnov@gmail.com>,
- Peter Maydell <peter.maydell@linaro.org>
-Cc: Alistair Francis <alistair.francis@xilinx.com>,
- "Edgar E . Iglesias" <edgar.iglesias@xilinx.com>,
- Cleber Rosa <crosa@redhat.com>, Kevin Wolf <kwolf@redhat.com>,
- Max Reitz <mreitz@redhat.com>, John Snow <jsnow@redhat.com>,
- Eduardo Habkost <ehabkost@redhat.com>, =?UTF-8?B?THVrw6HFoSBEb2t0b3I=?=
- <ldoktor@redhat.com>, "Daniel P . Berrange" <berrange@redhat.com>,
- Eric Blake <eblake@redhat.com>, Fam Zheng <famz@redhat.com>,
- Thomas Huth <thuth@redhat.com>,
- =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>,
- qemu-devel@nongnu.org, qemu-block@nongnu.org, qemu-arm@nongnu.org
-Message-ID: <7bc179c8-5699-98b0-8a5b-b4d8e6843b25@amsat.org>
-Subject: Re: [PATCH 0/6] QTests: use Python to run complex tests
-References: <20171213213557.26561-1-f4bug@amsat.org>
- <20171214093907.GA14433@stefanha-x1.localdomain>
-In-Reply-To: <20171214093907.GA14433@stefanha-x1.localdomain>
-Content-Type: text/plain; charset=windows-1252
-Content-Transfer-Encoding: quoted-printable
+Marc-Andr=C3=A9 Lureau <marcandre.lureau@gmail.com> writes:
 
-Hi Stefan,
+> Hi
+>
+> On Thu, Dec 14, 2017 at 2:54 PM, Markus Armbruster <armbru@redhat.com> wr=
+ote:
+>> Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com> writes:
+>>
+>>> Add a pragma that allows to tag the following expressions with a unit
+>>> name. By default, an expression has no unit name.
+>>
+>> Please explain the unit name's intended purpose.
+>>
+>
+> It's syccintly explained in the doc.
 
-On 12/14/2017 06:39 AM, Stefan Hajnoczi wrote:
-[...]
-> Device qtests are better done in C than Python.  Python is not good at
-> binary I/O and porting this to Python 3 will be extra work later (Pytho=
-n
-> 2 is set for End-of-Life in 2020, see https://pythonclock.org/).
->=20
-> More importantly, we already have libqos in C with a guest memory
-> allocator, PCI, and virtio support.  Fragmenting the small amount effor=
-t
-> that goes into device testing will delay libqos reaching critical mass.=
+The commit message should state the patch's purpose.  When the patch
+adds documentation, and you'd rather not duplicate it in the commit
+message, a short summary plus a pointer there may do.
 
-> Critical mass is where libqos provides all the infrastructure you need
-> to set up a device and focus on your actual test instead of machine,
-> bus, or device initialization.  Starting a Python device testing effort=
+>>> Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+>>> ---
+>>>  scripts/qapi.py              | 9 ++++++++-
+>>>  docs/devel/qapi-code-gen.txt | 3 +++
+>>>  2 files changed, 11 insertions(+), 1 deletion(-)
+>>>
+>>> diff --git a/scripts/qapi.py b/scripts/qapi.py
+>>> index eb4ffdc06d..1d0defd638 100644
+>>> --- a/scripts/qapi.py
+>>> +++ b/scripts/qapi.py
+>>> @@ -279,10 +279,12 @@ class QAPISchemaParser(object):
+>>>          self.docs =3D []
+>>>          self.cur_doc =3D None
+>>>          self.accept()
+>>> +        self.unit =3D None
+>>>
+>>>          while self.tok is not None:
+>>>              info =3D {'file': fname, 'line': self.line,
+>>> -                    'parent': self.incl_info}
+>>> +                    'parent': self.incl_info,
+>>> +                    'unit': self.unit}
+>>>              if self.tok =3D=3D '#':
+>>>                  self.reject_expr_doc()
+>>>                  self.cur_doc =3D self.get_doc(info)
+>>> @@ -371,6 +373,11 @@ class QAPISchemaParser(object):
+>>>                                     "Pragma name-case-whitelist must be"
+>>>                                     " a list of strings")
+>>>              name_case_whitelist =3D value
+>>> +        elif name =3D=3D 'unit':
+>>> +            if not isinstance(value, str):
+>>> +                raise QAPISemError(info,
+>>> +                                   "Pragma 'unit' must be string")
+>>> +            self.unit =3D value
+>>>          else:
+>>>              raise QAPISemError(info, "Unknown pragma '%s'" % name)
+>>>
+>>> diff --git a/docs/devel/qapi-code-gen.txt b/docs/devel/qapi-code-gen.txt
+>>> index 24fc6f74ee..37a27cd9d7 100644
+>>> --- a/docs/devel/qapi-code-gen.txt
+>>> +++ b/docs/devel/qapi-code-gen.txt
+>>> @@ -326,6 +326,9 @@ violate the rules on permitted return types.  Defau=
+lt is none.
+>>>  Pragma 'name-case-whitelist' takes a list of names that may violate
+>>>  rules on use of upper- vs. lower-case letters.  Default is none.
+>>>
+>>> +Pragma 'unit' takes a string value. It will set the unit name for the
+>>> +following expressions in the schema. Most code generator can filter
+>>> +based on a unit name. Default is none.
+>>
+>> Do you mean "most code generators"?
+>
+> The qapi code/doc generators.
 
-> will just lead to duplication and 2 underdeveloped device testing
-> frameworks.
->=20
-> Is there a specific reason why adding SD Card support to libqos is not
-> possible in C?
+So plural is intended.  Easy enough to fix.
 
-Short (joking) answer: Would you write tests/qemu-iotests/041 in C? ;)
+>>
+>> What does "filtering" mean?
+>
+> To be able to select a subset of expressions based on the unit name.
 
-Now thinking about the specific reasons...
+Let's spell that out.
 
-What I intend to do is add qtests for the SDHCI implementation.
-There are different revisions of the standard specs.
+>>>
+>>>  =3D=3D=3D Struct types =3D=3D=3D
+>>
+>> Humor me: put two spaces after a sentence-ending period.
+>>
+>
+> I don't get what you mean.
 
-Currently QEMU implements a mixed subset of v1.10 and v2.00, while the
-real SDHCI hardware implemented is v2.00 or v3.01. I also saw 2 series
-adding SDHCI devices supporting the v4.00 (not yet in /master).
-
-With the current codebase we can plug SDSC/SDHC cards (up to 32 GB) but
-we can not plug a SDXC card, so:
-- plugging a 64GB card into the ZynqMP machine fails,
-- plugging a 64GB card into the SABRE Lite machine fails,
-- booting a Win10 guest on a exFAT formatted SD card also fails.
-
-A later test create different cards with [2GB, 16GB, 64GB] and test if
-the SDHCI correctly access them.
-Machines using the Exynos4210 SoC which only support the v2.00 spec are
-expected to fail with 64GB SDXC cards.
-
-The Zynq machine has 2 SD buses, another later test unplug/replug the
-same card between the buses. This test is expected to be useful to test
-the custom SDHOST controller from the BCM2835 SoC (Raspi2 machine).
-
-It is surely possible to write all those tests in C, but it resulted way
-faster to me to write them in Python...
-
-I could think of a bunch of I2C tests too, more generally I found using
-Python for bus backend testing is much easier, as with the Block backends=
-=2E
-
-Regards,
-
-Phil.
-
-
---BsSxMXTeUgfa6EfP64fxc4AwwE5nuswTI
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAEBCgAdFiEE+qvnXhKRciHc/Wuy4+MsLN6twN4FAloyi58ACgkQ4+MsLN6t
-wN6Hqw/8CSQ38r/TmjVE3yt0mq8F3LPJ3QWKRZS1GgxXx0+dE/KgzGgRtsOuY8Ww
-YguOLpmrh0j25f/wUyGbgTVArjYeGU09B8GuOFDmJ88cCoyUbClSVZZSyaBxLzc/
-cfN+U9/oLW/SzVKxBxNv9AQlPccm+LaWbkKrHszlo+6gWVPyZZOCchAT7I1tT0C/
-sVC5CwNAAwQ75Ji7bfdQeV16PV+9MAR6H0hLP8fImBO9qV5yrZcsMCL/q4Yll4TW
-5tjjnFsXRrUrSCkJQbcTFUCpdnL+TrJGK4bep7Y7bPnEBTUNFEJ4d/Asi+q0PVsw
-dT1z/npC5qoxlZfyA+wefCtu+apbRCn7olMVj6LNSIsDLueSADvBDn6Ztqxn0re+
-+sEYxnDmFrNMqA6Cd2FSs8BDQP7lA205KC/odUWZvajeUWwBGO3dSmPKyL0IpIdM
-QhWUV5dQ5va+FazHquLvBsVBrGSNoZR6G90LqoOxuJAAp0yfct06fFbVDz6HlHAU
-tErJDAuQ19q7DNU7EJwxign1uBfXJCmCQqR0Xi5Eyq1qZOmUYn0akOevl0I3JY/I
-Xj+lstQutPeVK6hFbqkYFYOTwMSUQlaXsEjzFNfVYA881a9jJDX4XYGe9JN3vj0s
-9QsmfrknZDvXttEcZHlDPy0reMb/q2V6KZ6hzBWkYjFice4iBqE=
-=/fH0
------END PGP SIGNATURE-----
-
---BsSxMXTeUgfa6EfP64fxc4AwwE5nuswTI--
+This sentence ends with a period, which is followed by two spaces.  This
+sentence is followed by just one space. I prefer two.  A few
+inconsistencies have crept into this file over time, let's not add more.
+All clear now?
