@@ -1,19 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47829)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54014)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jcody@redhat.com>) id 1ePaaW-0008Bz-P6
-	for qemu-devel@nongnu.org; Thu, 14 Dec 2017 15:58:41 -0500
+	(envelope-from <jan.dakinevich@virtuozzo.com>) id 1ePagf-0001YU-Tv
+	for qemu-devel@nongnu.org; Thu, 14 Dec 2017 16:05:03 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jcody@redhat.com>) id 1ePaaV-0004zJ-QJ
-	for qemu-devel@nongnu.org; Thu, 14 Dec 2017 15:58:40 -0500
-Date: Thu, 14 Dec 2017 15:58:28 -0500
-From: Jeff Cody <jcody@redhat.com>
-Message-ID: <20171214205828.GG20604@localhost.localdomain>
-References: <20171213204611.26276-1-jsnow@redhat.com>
+	(envelope-from <jan.dakinevich@virtuozzo.com>) id 1ePagd-0005Av-5r
+	for qemu-devel@nongnu.org; Thu, 14 Dec 2017 16:05:01 -0500
+Received: from mail-ve1eur01on0102.outbound.protection.outlook.com
+	([104.47.1.102]:12675
+	helo=EUR01-VE1-obe.outbound.protection.outlook.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <jan.dakinevich@virtuozzo.com>)
+	id 1ePagc-00058B-LE
+	for qemu-devel@nongnu.org; Thu, 14 Dec 2017 16:04:59 -0500
+Date: Fri, 15 Dec 2017 00:06:06 +0300
+From: Jan Dakinevich <jan.dakinevich@virtuozzo.com>
+Message-ID: <20171215000606.382a3ce7@virtuozzo.com>
+In-Reply-To: <20171214120519.48edb873.cohuck@redhat.com>
+References: <1508867404-18046-1-git-send-email-jan.dakinevich@virtuozzo.com>
+	<20171212165450.6b6e823f@virtuozzo.com>
+	<20171214120519.48edb873.cohuck@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20171213204611.26276-1-jsnow@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v2] blockjob: kick jobs on set-speed
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [RFC v5 0/2] virtio: introduce `info virtio' hmp
+ command
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,121 +32,139 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: John Snow <jsnow@redhat.com>
-Cc: qemu-block@nongnu.org, kwolf@redhat.com, qemu-devel@nongnu.org, stefanha@redhat.com, mreitz@redhat.com, pbonzini@redhat.com
+To: Cornelia Huck <cohuck@redhat.com>
+Cc: qemu-devel@nongnu.org, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Eric Blake <eblake@redhat.com>, Markus Armbruster <armbru@redhat.com>, Kevin Wolf <kwolf@redhat.com>, "Denis V. Lunev" <den@virtuozzo.com>, Max Reitz <mreitz@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
 
-On Wed, Dec 13, 2017 at 03:46:11PM -0500, John Snow wrote:
-> If users set an unreasonably low speed (like one byte per second), the
-> calculated delay may exceed many hours. While we like to punish users
-> for asking for stupid things, we do also like to allow users to correct
-> their wicked ways.
+On Thu, 14 Dec 2017 12:05:19 +0100
+Cornelia Huck <cohuck@redhat.com> wrote:
+
+> On Tue, 12 Dec 2017 16:54:50 +0300
+> Jan Dakinevich <jan.dakinevich@virtuozzo.com> wrote:
 > 
-> When a user provides a new speed, kick the job to allow it to recalculate
-> its delay.
+> > I am going to reanimate works under this QMP/HMP. First of all, it
+> > could be meaningful to settle what output would provide the QMP. I
+> > would like to suggest the following description:
+> > 
+> > ##
+> > # @VirtioFeature:
+> > ##
+> > {
+> >     'struct': 'VirtioFeature',
+> >     'data': {
+> >         'name': 'str',
+> >         'acked': 'bool'
+> >     }
+> > }
+> > 
+> > ##
+> > # @VirtioInfo:
+> > ##
+> > {
+> >     'struct': 'VirtioInfo',
+> >     'data': {
+> >         'qom-path': 'str',
+> >         
+> >         'status': 'uint8',
+> >         'host-features': 'uint64',
+> >         'guest-features': 'uint64',
+> > 
+> >         'status-names': ['str'],
+> >         'common-features-names': ['VirtioFeature'],
+> >         'device-features-names': ['VirtioFeature']
+> >     }
+> > }
+> > 
+> > ##
+> > # @query-virtio:
+> > ##
+> > {
+> >     'command': 'query-virtio',
+> >     'data': {'*path': 'str'},
+> >     'returns': ['VirtioInfo']
+> > }
+> > 
+> > My final goal is to implement HMP which will print all exposed
+> > virtio features (both common and device-specific) with their
+> > acknowledgements, and virtio device configuration status. These are
+> > provided by last 3 fields in @VirtioInfo.
+> > 
+> > For these who are going make own decision on features and status
+> > bitmask, respective fields with raw values are preserved.
 > 
-> Signed-off-by: John Snow <jsnow@redhat.com>
-> ---
+> Looks sensible. What will you return an for the *-features-names
+> fields if the status field indicates that negotiation is not yet done?
+> (This has some fun interaction with the VERSION_1 feature bit...)
 > 
-> RFC: Why is block_job_mutex shared between all jobs,
->      instead of being per-job?
->
 
-The mutex protects job-specific fields of job->busy and job->sleep_timer, so
-I think the mutex should be specific to job, not global across all jobs.
+Hmm... I was going to return current features and theirs
+acknowledgments regardless if they were negotiated. Thus,
+*-features-names would contain all exposed host features with `false'
+in `acked' field.
 
-
->  blockjob.c | 30 +++++++++++++++++++++++++++++-
->  1 file changed, 29 insertions(+), 1 deletion(-)
+> > 
+> > So, I expect following data on the wire in response to
+> > `query-virtio' command:
+> > 
+> > {
+> >     "return": [
+> >         {
+> >             "qom-path":
+> > "/machine/peripheral-anon/device[0]/virtio-backend", "status": 15,
+> > "host-features": 6325010438, "guest-features": 5100273670,
+> >             "status-names": [
+> >                 "acknowledge", 
+> >                 "driver", 
+> >                 "driver-ok", 
+> >                 "features-ok"
+> >             ],
+> >             "common-features-names": [
+> >                 {"name": "notify-on-empty", "acked": false},
+> >                 {"name": "any-layout", "acked": false},
+> >                 {"name": "indirect-desc", "acked": true},
+> >                 {"name": "event-idx", "acked": true},
+> >                 {"name": "bad-feature", "acked": false},
+> >                 {"name": "version-1", "acked": true}
+> >             ],
+> >             "device-features-names": [
+> >                 {"name": "hotplug", "acked": true},
+> >                 {"name": "change", "acked": true}
 > 
-> diff --git a/blockjob.c b/blockjob.c
-> index 715c2c2680..6173e4728c 100644
-> --- a/blockjob.c
-> +++ b/blockjob.c
-> @@ -59,6 +59,7 @@ static void __attribute__((__constructor__)) block_job_init(void)
->  
->  static void block_job_event_cancelled(BlockJob *job);
->  static void block_job_event_completed(BlockJob *job, const char *msg);
-> +static void block_job_enter_cond(BlockJob *job, bool(*fn)(BlockJob *job));
->  
->  /* Transactional group of block jobs */
->  struct BlockJobTxn {
-> @@ -480,9 +481,16 @@ static void block_job_completed_txn_success(BlockJob *job)
->      }
->  }
->  
-> +/* Assumes the block_job_mutex is held */
-> +static bool block_job_timer_pending(BlockJob *job)
-> +{
-> +    return timer_pending(&job->sleep_timer);
-> +}
-> +
->  void block_job_set_speed(BlockJob *job, int64_t speed, Error **errp)
->  {
->      Error *local_err = NULL;
-> +    int64_t old_speed = job->speed;
->  
->      if (!job->driver->set_speed) {
->          error_setg(errp, QERR_UNSUPPORTED);
-> @@ -495,6 +503,12 @@ void block_job_set_speed(BlockJob *job, int64_t speed, Error **errp)
->      }
->  
->      job->speed = speed;
-> +    if (speed <= old_speed) {
-> +        return;
-> +    }
-> +
-> +    /* kick only if a timer is pending */
-> +    block_job_enter_cond(job, block_job_timer_pending);
->  }
->  
->  void block_job_complete(BlockJob *job, Error **errp)
-> @@ -821,7 +835,11 @@ void block_job_resume_all(void)
->      }
->  }
->  
-> -void block_job_enter(BlockJob *job)
-> +/*
-> + * Conditionally enter a block_job pending a call to fn() while
-> + * under the block_job_lock critical section.
-> + */
-> +static void block_job_enter_cond(BlockJob *job, bool(*fn)(BlockJob *job))
->  {
->      if (!block_job_started(job)) {
->          return;
-> @@ -836,6 +854,11 @@ void block_job_enter(BlockJob *job)
->          return;
->      }
->  
-> +    if (fn && !fn(job)) {
-> +        block_job_unlock();
-> +        return;
-> +    }
-> +
->      assert(!job->deferred_to_main_loop);
->      timer_del(&job->sleep_timer);
->      job->busy = true;
-> @@ -843,6 +866,11 @@ void block_job_enter(BlockJob *job)
->      aio_co_wake(job->co);
->  }
->  
-> +void block_job_enter(BlockJob *job)
-> +{
-> +    block_job_enter_cond(job, NULL);
-> +}
-> +
->  bool block_job_is_cancelled(BlockJob *job)
->  {
->      return job->cancelled;
-> -- 
-> 2.14.3
->
+> I suggest to use the #defines as names, especially as they are also
+> used in the spec. Makes grepping easier.
+> 
+
+You mean, for example "VIRTIO_RING_F_EVENT_IDX" instead of "event-idx"
+should be used. Right?
+
+> >             ]
+> >         }
+> >     ]
+> > }
+> > 
+> > 
+> > Eric Blake, returning to your question which would probably appear
+> > again after this mail:
+> > 
+> > >> +##
+> > >> +# @query-virtio:
+> > >> ...
+> > >> +##
+> > >> +{
+> > >> +    'command': 'query-virtio',
+> > >> +    'data': { '*path': 'str' },    
+> > >
+> > > Do we need filterable queries, or is it better to just have the
+> > > command return info on all virtio devices at once and let the
+> > > client filter the results as desired?  
+> > 
+> > I think it would be better to do here. I suppose, the client which
+> > uses HMP will not be happy on filtering monitor output.
+> 
+> I think being able to optionally specify a path is the most flexible
+> solution.
 
 
 
-Thanks,
-
-Applied to my block branch:
-
-git://github.com/codyprime/qemu-kvm-jtc block
-
--Jeff
+-- 
+Best regards
+Jan Dakinevich
