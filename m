@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54596)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54555)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1ePX2O-0008Hn-7n
-	for qemu-devel@nongnu.org; Thu, 14 Dec 2017 12:11:13 -0500
-Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1ePX2N-0006oe-2U
+	(envelope-from <cohuck@redhat.com>) id 1ePX2N-0008Gl-6b
 	for qemu-devel@nongnu.org; Thu, 14 Dec 2017 12:11:12 -0500
+Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
+	(envelope-from <cohuck@redhat.com>) id 1ePX2J-0006lw-Sn
+	for qemu-devel@nongnu.org; Thu, 14 Dec 2017 12:11:11 -0500
 From: Cornelia Huck <cohuck@redhat.com>
-Date: Thu, 14 Dec 2017 18:09:32 +0100
-Message-Id: <20171214171004.25058-15-cohuck@redhat.com>
+Date: Thu, 14 Dec 2017 18:09:31 +0100
+Message-Id: <20171214171004.25058-14-cohuck@redhat.com>
 In-Reply-To: <20171214171004.25058-1-cohuck@redhat.com>
 References: <20171214171004.25058-1-cohuck@redhat.com>
-Subject: [Qemu-devel] [PULL 14/46] s390x/tcg: io instructions don't need
- potential_page_fault()
+Subject: [Qemu-devel] [PULL 13/46] s390x/tcg: don't exit the cpu loop in
+ s390_cpu_virt_mem_rw()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,100 +25,51 @@ Cc: qemu-devel@nongnu.org, qemu-s390x@nongnu.org, rth@twiddle.net, agraf@suse.de
 
 From: David Hildenbrand <david@redhat.com>
 
-As we handle the retaddr in all cases properly now, we can drop it.
+s390_cpu_virt_mem_rw() must always return, so callers can react on
+an exception (e.g. see ioinst_handle_stcrw()).
 
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
-Reviewed-by: Thomas Huth <thuth@redhat.com>
+Therefore, using program_interrupt() is wrong. Fix that up.
+
 Signed-off-by: David Hildenbrand <david@redhat.com>
-Message-Id: <20171130162744.25442-10-david@redhat.com>
+Message-Id: <20171130162744.25442-9-david@redhat.com>
 Signed-off-by: Cornelia Huck <cohuck@redhat.com>
 ---
- target/s390x/translate.c | 10 ----------
- 1 file changed, 10 deletions(-)
+ target/s390x/mmu_helper.c | 9 ++++++---
+ 1 file changed, 6 insertions(+), 3 deletions(-)
 
-diff --git a/target/s390x/translate.c b/target/s390x/translate.c
-index 85d0a6c3af..d0859c4bc7 100644
---- a/target/s390x/translate.c
-+++ b/target/s390x/translate.c
-@@ -4008,7 +4008,6 @@ static ExitStatus op_spx(DisasContext *s, DisasOps *o)
- static ExitStatus op_xsch(DisasContext *s, DisasOps *o)
- {
-     check_privileged(s);
--    potential_page_fault(s);
-     gen_helper_xsch(cpu_env, regs[1]);
-     set_cc_static(s);
-     return NO_EXIT;
-@@ -4017,7 +4016,6 @@ static ExitStatus op_xsch(DisasContext *s, DisasOps *o)
- static ExitStatus op_csch(DisasContext *s, DisasOps *o)
- {
-     check_privileged(s);
--    potential_page_fault(s);
-     gen_helper_csch(cpu_env, regs[1]);
-     set_cc_static(s);
-     return NO_EXIT;
-@@ -4026,7 +4024,6 @@ static ExitStatus op_csch(DisasContext *s, DisasOps *o)
- static ExitStatus op_hsch(DisasContext *s, DisasOps *o)
- {
-     check_privileged(s);
--    potential_page_fault(s);
-     gen_helper_hsch(cpu_env, regs[1]);
-     set_cc_static(s);
-     return NO_EXIT;
-@@ -4035,7 +4032,6 @@ static ExitStatus op_hsch(DisasContext *s, DisasOps *o)
- static ExitStatus op_msch(DisasContext *s, DisasOps *o)
- {
-     check_privileged(s);
--    potential_page_fault(s);
-     gen_helper_msch(cpu_env, regs[1], o->in2);
-     set_cc_static(s);
-     return NO_EXIT;
-@@ -4044,7 +4040,6 @@ static ExitStatus op_msch(DisasContext *s, DisasOps *o)
- static ExitStatus op_rchp(DisasContext *s, DisasOps *o)
- {
-     check_privileged(s);
--    potential_page_fault(s);
-     gen_helper_rchp(cpu_env, regs[1]);
-     set_cc_static(s);
-     return NO_EXIT;
-@@ -4053,7 +4048,6 @@ static ExitStatus op_rchp(DisasContext *s, DisasOps *o)
- static ExitStatus op_rsch(DisasContext *s, DisasOps *o)
- {
-     check_privileged(s);
--    potential_page_fault(s);
-     gen_helper_rsch(cpu_env, regs[1]);
-     set_cc_static(s);
-     return NO_EXIT;
-@@ -4062,7 +4056,6 @@ static ExitStatus op_rsch(DisasContext *s, DisasOps *o)
- static ExitStatus op_ssch(DisasContext *s, DisasOps *o)
- {
-     check_privileged(s);
--    potential_page_fault(s);
-     gen_helper_ssch(cpu_env, regs[1], o->in2);
-     set_cc_static(s);
-     return NO_EXIT;
-@@ -4071,7 +4064,6 @@ static ExitStatus op_ssch(DisasContext *s, DisasOps *o)
- static ExitStatus op_stsch(DisasContext *s, DisasOps *o)
- {
-     check_privileged(s);
--    potential_page_fault(s);
-     gen_helper_stsch(cpu_env, regs[1], o->in2);
-     set_cc_static(s);
-     return NO_EXIT;
-@@ -4080,7 +4072,6 @@ static ExitStatus op_stsch(DisasContext *s, DisasOps *o)
- static ExitStatus op_tsch(DisasContext *s, DisasOps *o)
- {
-     check_privileged(s);
--    potential_page_fault(s);
-     gen_helper_tsch(cpu_env, regs[1], o->in2);
-     set_cc_static(s);
-     return NO_EXIT;
-@@ -4089,7 +4080,6 @@ static ExitStatus op_tsch(DisasContext *s, DisasOps *o)
- static ExitStatus op_chsc(DisasContext *s, DisasOps *o)
- {
-     check_privileged(s);
--    potential_page_fault(s);
-     gen_helper_chsc(cpu_env, o->in2);
-     set_cc_static(s);
-     return NO_EXIT;
+diff --git a/target/s390x/mmu_helper.c b/target/s390x/mmu_helper.c
+index dbe2f511f8..f477cc006a 100644
+--- a/target/s390x/mmu_helper.c
++++ b/target/s390x/mmu_helper.c
+@@ -64,7 +64,9 @@ static void trigger_access_exception(CPUS390XState *env, uint32_t type,
+         kvm_s390_access_exception(cpu, type, tec);
+     } else {
+         CPUState *cs = CPU(cpu);
+-        stq_phys(cs->as, env->psa + offsetof(LowCore, trans_exc_code), tec);
++        if (type != PGM_ADDRESSING) {
++            stq_phys(cs->as, env->psa + offsetof(LowCore, trans_exc_code), tec);
++        }
+         trigger_pgm_exception(env, type, ilen);
+     }
+ }
+@@ -443,7 +445,8 @@ int mmu_translate(CPUS390XState *env, target_ulong vaddr, int rw, uint64_t asc,
+ 
+ /**
+  * translate_pages: Translate a set of consecutive logical page addresses
+- * to absolute addresses
++ * to absolute addresses. This function is used for TCG and old KVM without
++ * the MEMOP interface.
+  */
+ static int translate_pages(S390CPU *cpu, vaddr addr, int nr_pages,
+                            target_ulong *pages, bool is_write)
+@@ -459,7 +462,7 @@ static int translate_pages(S390CPU *cpu, vaddr addr, int nr_pages,
+         }
+         if (!address_space_access_valid(&address_space_memory, pages[i],
+                                         TARGET_PAGE_SIZE, is_write)) {
+-            program_interrupt(env, PGM_ADDRESSING, ILEN_AUTO);
++            trigger_access_exception(env, PGM_ADDRESSING, ILEN_AUTO, 0);
+             return -EFAULT;
+         }
+         addr += TARGET_PAGE_SIZE;
 -- 
 2.13.6
