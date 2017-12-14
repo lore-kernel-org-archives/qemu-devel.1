@@ -1,25 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55238)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56734)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1ePUAk-0007SO-87
-	for qemu-devel@nongnu.org; Thu, 14 Dec 2017 09:07:39 -0500
+	(envelope-from <andrew.smirnov@gmail.com>) id 1ePUCh-0000DV-VA
+	for qemu-devel@nongnu.org; Thu, 14 Dec 2017 09:09:41 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1ePUAe-0002Xu-D7
-	for qemu-devel@nongnu.org; Thu, 14 Dec 2017 09:07:38 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:20665)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1ePUAe-0002Qh-4h
-	for qemu-devel@nongnu.org; Thu, 14 Dec 2017 09:07:32 -0500
-Date: Thu, 14 Dec 2017 15:07:16 +0100
-From: Igor Mammedov <imammedo@redhat.com>
-Message-ID: <20171214150716.3ffc6b52@redhat.com>
-In-Reply-To: <20171213180807.7066-3-dgilbert@redhat.com>
-References: <20171213180807.7066-1-dgilbert@redhat.com>
-	<20171213180807.7066-3-dgilbert@redhat.com>
+	(envelope-from <andrew.smirnov@gmail.com>) id 1ePUCc-0005RE-9l
+	for qemu-devel@nongnu.org; Thu, 14 Dec 2017 09:09:40 -0500
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v4 2/6] vhost: Simplify ring verification
- checks
+In-Reply-To: <CAFEAcA-gEjU+rBWSL8V4d520DOVheZoJZ76p5=9hmkXk3NqeOw@mail.gmail.com>
+References: <20171211213007.7353-1-andrew.smirnov@gmail.com>
+	<CAFEAcA-gEjU+rBWSL8V4d520DOVheZoJZ76p5=9hmkXk3NqeOw@mail.gmail.com>
+From: Andrey Smirnov <andrew.smirnov@gmail.com>
+Date: Thu, 14 Dec 2017 06:09:25 -0800
+Message-ID: <CAHQ1cqHqhNKVW_vV5G8wU_d_Cu0+9ThpkKdXQ4-LqEXjL0sc9A@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH 00/13] i.MX FEC and SD changes
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,168 +22,56 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>
-Cc: qemu-devel@nongnu.org, pbonzini@redhat.com, maxime.coquelin@redhat.com, mst@redhat.com, groug@kaod.org
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: qemu-arm <qemu-arm@nongnu.org>, Jason Wang <jasowang@redhat.com>, =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>, QEMU Developers <qemu-devel@nongnu.org>, Andrey Yurovsky <yurovsky@gmail.com>
 
-On Wed, 13 Dec 2017 18:08:03 +0000
-"Dr. David Alan Gilbert (git)" <dgilbert@redhat.com> wrote:
+On Tue, Dec 12, 2017 at 9:40 AM, Peter Maydell <peter.maydell@linaro.org> wrote:
+> On 11 December 2017 at 21:29, Andrey Smirnov <andrew.smirnov@gmail.com> wrote:
+>> Hi everyone,
+>>
+>> This patchset is a spin-off from original i.MX7 support submission
+>> found here [1], containing all of the patchest that are more or less
+>> agreed upon and are ready (hopefully!) for inclusion.
+>>
+>> Changes since [1]:
+>>
+>>         - Rx buffer in FEC was moved from stack to heap to allow
+>>           worry-free expansion to 16K limit.
+>>
+>>         - Added more comments explaining rather convoluted bit-moving
+>>           in eSHDC emuation code
+>>
+>>         - Triple Tx ring DMA "VMState" code was changed to follow
+>>           Peter's recommendations (avoiding the need to incrememnt the
+>>           version_id)
+>>
+>>         - FSL_IMX25_FEC_SIZE is used as a size of FEC's register file
+>>
+>>         - Removed leftover code from "imx_fec: Change queue flushing
+>>           heuristics"
+>>
+>> [1] https://lists.gnu.org/archive/html/qemu-arm/2017-11/msg00045.html
+>
+> Hi; thanks for sending this set separately. Patch 4 ("Move Tx frame buffer
+> away from the stack") seems to have got lost -- it isn't in the mailing
+> list archives or my mailbox. Could you try resending that one?
+>
 
-> From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-> 
-> vhost_verify_ring_mappings() were used to verify that
-> rings are still accessible and related memory hasn't
-> been moved after flatview is updated.
-> 
-> It was doing checks by mapping ring's GPA+len and
-> checking that HVA hadn't changed with new memory map.
-> To avoid maybe expensive mapping call, we were
-> identifying address range that changed and were doing
-> mapping only if ring was in changed range.
-> 
-> However it's not neccessary to perform ring's GPA
-> mapping as we already have its current HVA and all
-> we need is to verify that ring's GPA translates to
-> the same HVA in updated flatview.
-> 
-> This will allow the following patches to simplify the range
-> comparison that was previously needed to avoid expensive
-> verify_ring_mapping calls.
-> 
-> Signed-off-by: Igor Mammedov <imammedo@redhat.com>
-> with modifications by:
-> Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
-> ---
->  hw/virtio/vhost.c | 74 ++++++++++++++++++++++++++++++-------------------------
->  1 file changed, 41 insertions(+), 33 deletions(-)
-> 
-> diff --git a/hw/virtio/vhost.c b/hw/virtio/vhost.c
-> index e923219e63..c7ce7baf9b 100644
-> --- a/hw/virtio/vhost.c
-> +++ b/hw/virtio/vhost.c
-> @@ -450,35 +450,37 @@ static void vhost_memory_unmap(struct vhost_dev *dev, void *buffer,
->      }
->  }
->  
-> -static int vhost_verify_ring_part_mapping(struct vhost_dev *dev,
-> -                                          void *part,
-> -                                          uint64_t part_addr,
-> -                                          uint64_t part_size,
-> -                                          uint64_t start_addr,
-> -                                          uint64_t size)
-> +static int vhost_verify_ring_part_mapping(void *ring_hva,
-> +                                          uint64_t ring_gpa,
-> +                                          uint64_t ring_size,
-> +                                          void *reg_hva,
-> +                                          uint64_t reg_gpa,
-> +                                          uint64_t reg_size)
->  {
-> -    hwaddr l;
-> -    void *p;
-> -    int r = 0;
-> +    uint64_t hva_ring_offset;
-> +    uint64_t ring_last = range_get_last(ring_gpa, ring_size);
-> +    uint64_t reg_last = range_get_last(reg_gpa, reg_size);
->  
-> -    if (!ranges_overlap(start_addr, size, part_addr, part_size)) {
-> +    if (ring_last < reg_gpa || ring_gpa > reg_last) {
->          return 0;
->      }
-> -    l = part_size;
-> -    p = vhost_memory_map(dev, part_addr, &l, 1);
-> -    if (!p || l != part_size) {
-> -        r = -ENOMEM;
-> +    /* check that whole ring's is mapped */
-> +    if (ring_last > reg_last) {
-> +        return -EBUSY;
-ENOMEM
+My bad, I forgot to add correct Cc tags to that one. I am a bit
+surprised it's not in the archive since it did have correct To: info,
+but it doesn't matter. I'll make sure this patch is sent out in v2.
 
->      }
-> -    if (p != part) {
-> -        r = -EBUSY;
-> +    /* check that ring's MemoryRegion wasn't replaced */
-> +    hva_ring_offset = ring_gpa - reg_gpa;
-> +    if (ring_hva != reg_hva + hva_ring_offset) {
-> +        return -ENOMEM;
-EBUSY
+> Incidentally we should use the new i.MX SDHCI controller in the
+> imx6: coincidentally somebody ran into this bug recently:
+> https://stackoverflow.com/questions/47538951/qemu-freescale-i-mx6-duallite-sabre-root-filesystem-does-not-mount/47552596
+>
+> I'll retest that this patchset works with my imx6 image, and
+> send a patch to sit on top of it to switch imx6 over to TYPE_IMX_USDHC.
+>
 
->      }
-> -    vhost_memory_unmap(dev, p, l, 0, 0);
-> -    return r;
-> +
-> +    return 0;
->  }
->  
->  static int vhost_verify_ring_mappings(struct vhost_dev *dev,
-> -                                      uint64_t start_addr,
-> -                                      uint64_t size)
-> +                                      void *reg_hva,
-> +                                      uint64_t reg_gpa,
-> +                                      uint64_t reg_size)
->  {
->      int i, j;
->      int r = 0;
-> @@ -492,22 +494,25 @@ static int vhost_verify_ring_mappings(struct vhost_dev *dev,
->          struct vhost_virtqueue *vq = dev->vqs + i;
->  
->          j = 0;
-> -        r = vhost_verify_ring_part_mapping(dev, vq->desc, vq->desc_phys,
-> -                                           vq->desc_size, start_addr, size);
-> +        r = vhost_verify_ring_part_mapping(
-> +                vq->desc, vq->desc_phys, vq->desc_size,
-> +                reg_hva, reg_gpa, reg_size);
->          if (r) {
->              break;
->          }
->  
->          j++;
-> -        r = vhost_verify_ring_part_mapping(dev, vq->avail, vq->avail_phys,
-> -                                           vq->avail_size, start_addr, size);
-> +        r = vhost_verify_ring_part_mapping(
-> +                vq->desc, vq->desc_phys, vq->desc_size,
-> +                reg_hva, reg_gpa, reg_size);
->          if (r) {
->              break;
->          }
->  
->          j++;
-> -        r = vhost_verify_ring_part_mapping(dev, vq->used, vq->used_phys,
-> -                                           vq->used_size, start_addr, size);
-> +        r = vhost_verify_ring_part_mapping(
-> +                vq->desc, vq->desc_phys, vq->desc_size,
-> +                reg_hva, reg_gpa, reg_size);
->          if (r) {
->              break;
->          }
-> @@ -633,8 +638,6 @@ static void vhost_commit(MemoryListener *listener)
->  {
->      struct vhost_dev *dev = container_of(listener, struct vhost_dev,
->                                           memory_listener);
-> -    hwaddr start_addr = 0;
-> -    ram_addr_t size = 0;
->      uint64_t log_size;
->      int r;
->  
-> @@ -649,11 +652,16 @@ static void vhost_commit(MemoryListener *listener)
->      }
->  
->      if (dev->started) {
-^^^ not needed as we bail out earlier if it's not true
+Out of curiosity, I gave emulating SD on i.MX6 a try and it mostly
+worked (there were other unrelated to SD problems).  I'll include what
+I came up with and we can go from there.
 
-> -        start_addr = dev->mem_changed_start_addr;
-> -        size = dev->mem_changed_end_addr - dev->mem_changed_start_addr + 1;
-> -
-> -        r = vhost_verify_ring_mappings(dev, start_addr, size);
-> -        assert(r >= 0);
-> +        int i;
-> +        for (i = 0; i < dev->mem->nregions; i++) {
-> +            if (vhost_verify_ring_mappings(dev,
-> +                               (void *)dev->mem->regions[i].userspace_addr,
-> +                               dev->mem->regions[i].guest_phys_addr,
-> +                               dev->mem->regions[i].memory_size)) {
-> +                error_report("Verify ring failure on region %d", i);
-> +                abort();
-> +            }
-> +        }
->      }
->  
->      if (!dev->log_enabled) {
+Thanks,
+Andrey Smirnov
