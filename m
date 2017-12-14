@@ -1,21 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57406)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33367)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <nirsof@gmail.com>) id 1ePVbh-0003QH-TB
-	for qemu-devel@nongnu.org; Thu, 14 Dec 2017 10:39:35 -0500
+	(envelope-from <stefanha@redhat.com>) id 1ePVj9-0006Ik-Ku
+	for qemu-devel@nongnu.org; Thu, 14 Dec 2017 10:47:16 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <nirsof@gmail.com>) id 1ePVbb-0002MY-J9
-	for qemu-devel@nongnu.org; Thu, 14 Dec 2017 10:39:33 -0500
+	(envelope-from <stefanha@redhat.com>) id 1ePVj6-0000AB-HG
+	for qemu-devel@nongnu.org; Thu, 14 Dec 2017 10:47:15 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:41436)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1ePVj6-00008V-8O
+	for qemu-devel@nongnu.org; Thu, 14 Dec 2017 10:47:12 -0500
+Date: Thu, 14 Dec 2017 15:46:56 +0000
+From: Stefan Hajnoczi <stefanha@redhat.com>
+Message-ID: <20171214154656.GR14433@stefanha-x1.localdomain>
+References: <CAJSP0QUAqCzFgVtM1cg_KybdyrZa_FRUHhDN7oLfRjZ2ZVkp4g@mail.gmail.com>
+	<286AC319A985734F985F78AFA26841F73937E001@shsmsx102.ccr.corp.intel.com>
+	<20171211111147.GF13593@stefanha-x1.localdomain>
+	<286AC319A985734F985F78AFA26841F73937EEED@shsmsx102.ccr.corp.intel.com>
+	<20171212101440.GB6985@stefanha-x1.localdomain>
+	<5A30E0C1.3070905@intel.com>
+	<20171213123521.GL16782@stefanha-x1.localdomain>
+	<20171213165142-mutt-send-email-mst@kernel.org>
+	<CAJSP0QWHJBL4APkeMt8-P8PFaPF=Vbi0NSnJtU7YX67fJrW=hw@mail.gmail.com>
+	<825b8205-0b88-a198-b77d-63c8f2563c2e@redhat.com>
 MIME-Version: 1.0
-References: <20171213213557.26561-1-f4bug@amsat.org>
-	<20171214093907.GA14433@stefanha-x1.localdomain>
-	<d4d649fc-4bb2-9b61-7e48-46a6a51e7b01@redhat.com>
-In-Reply-To: <d4d649fc-4bb2-9b61-7e48-46a6a51e7b01@redhat.com>
-From: Nir Soffer <nirsof@gmail.com>
-Date: Thu, 14 Dec 2017 15:39:12 +0000
-Message-ID: <CAMr-obuvJ4z54e0evM+J98jsdRayL-UeA_WDQVp0rx=sRoTVgw@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [Qemu-block] [PATCH 0/6] QTests: use Python to run
- complex tests
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="MRBOAUz+O/XNC2GI"
+Content-Disposition: inline
+In-Reply-To: <825b8205-0b88-a198-b77d-63c8f2563c2e@redhat.com>
+Subject: Re: [Qemu-devel] [virtio-dev] Re: [virtio-dev] [PATCH v3 0/7]
+ Vhost-pci for inter-VM communication
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,75 +37,80 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: Stefan Hajnoczi <stefanha@redhat.com>, =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>, "Edgar E . Iglesias" <edgar.iglesias@xilinx.com>, Kevin Wolf <kwolf@redhat.com>, Thomas Huth <thuth@redhat.com>, "Daniel P . Berrange" <berrange@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>, =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@redhat.com>, Cleber Rosa <crosa@redhat.com>, =?UTF-8?B?THVrw6HFoSBEb2t0b3I=?= <ldoktor@redhat.com>, Fam Zheng <famz@redhat.com>, Alistair Francis <alistair.francis@xilinx.com>
-
-On Thu, Dec 14, 2017 at 1:36 PM Paolo Bonzini <pbonzini@redhat.com> wrote:
-
-> On 14/12/2017 10:39, Stefan Hajnoczi wrote:
-> >>             # verify Card ID
-> >>             data = self.bus.do_cmd(ALL_SEND_CID)
-> >>             oid, pnm, psn = struct.unpack(">x2s5sxLxxx", data)
-> >>             self.assertEqual(oid, "XY") # QEMU default
-> >>             self.assertEqual(pnm, "QEMU!") # QEMU default
-> >>             self.assertEqual(psn, 0xdeadbeef) # QEMU default
-> > Device qtests are better done in C than Python.  Python is not good at
-> > binary I/O and porting this to Python 3 will be extra work later (Python
-> > 2 is set for End-of-Life in 2020, see https://pythonclock.org/).
-> >
-> > More importantly, we already have libqos in C with a guest memory
-> > allocator, PCI, and virtio support.  Fragmenting the small amount effort
-> > that goes into device testing will delay libqos reaching critical mass.
-> > Critical mass is where libqos provides all the infrastructure you need
-> > to set up a device and focus on your actual test instead of machine,
-> > bus, or device initialization.  Starting a Python device testing effort
-> > will just lead to duplication and 2 underdeveloped device testing
-> > frameworks.
->
-> I agree that fragmentation is bad.  However, libqos is small (about 4k
-> lines of code, maybe 3k in Python).
->
-> I also agree that any qtest written in Python should be written in
-> Python 3 from the beginning (in fact we should consider dropping Python
-> 2.x support in 2.12).  Doing so should not make binary I/O much
-> different than C.
->
-
-Using python 3 will make it hard to develop and test qemu on RHEL/CentOS
-which do not provide python 3 yet.
-
-Doing binary io in python 2 and 3 is the same, there is no need to use
-python 3 for this. The only advantage is not having to backport code
-later from 2 to 3.
-
-Nir
+To: Maxime Coquelin <maxime.coquelin@redhat.com>
+Cc: Stefan Hajnoczi <stefanha@gmail.com>, "Michael S. Tsirkin" <mst@redhat.com>, Wei Wang <wei.w.wang@intel.com>, "virtio-dev@lists.oasis-open.org" <virtio-dev@lists.oasis-open.org>, "Yang, Zhiyong" <zhiyong.yang@intel.com>, "jan.kiszka@siemens.com" <jan.kiszka@siemens.com>, "jasowang@redhat.com" <jasowang@redhat.com>, "avi.cohen@huawei.com" <avi.cohen@huawei.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "pbonzini@redhat.com" <pbonzini@redhat.com>, "marcandre.lureau@redhat.com" <marcandre.lureau@redhat.com>
 
 
->
-> From my point of view, the main advantage of Python is the reflection
-> mechanisms.  Those would make it possible to automatically discover the
-> set of runnable tests; for example, based on:
->
-> - two machine descriptions (including malloc) for ARM -M virt and x86 -M
-> q35
->
-> - a driver for the generic PCIe host bridge
->
-> - a driver for virtio-pci
->
-> - a driver for virtio-scsi
->
-> - a set of SCSI tests
->
-> ... it should be possible to run the same tests as either ARM or x86
-> qtests.  This would be a very different framework compared to the C libqos.
->
-> Thanks,
->
-> Paolo
->
-> > Is there a specific reason why adding SD Card support to libqos is not
-> > possible in C?
->
->
->
+--MRBOAUz+O/XNC2GI
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
+
+On Wed, Dec 13, 2017 at 10:50:11PM +0100, Maxime Coquelin wrote:
+> On 12/13/2017 09:08 PM, Stefan Hajnoczi wrote:
+> > On Wed, Dec 13, 2017 at 3:01 PM, Michael S. Tsirkin <mst@redhat.com> wr=
+ote:
+> > > On Wed, Dec 13, 2017 at 12:35:21PM +0000, Stefan Hajnoczi wrote:
+> > > > I'm not saying that DPDK should use libvhost-user.  I'm saying that=
+ it's
+> > > > easy to add vfio vhost-pci support (for the PCI adapter I described=
+) to
+> > > > DPDK.  This patch series would require writing a completely new sla=
+ve
+> > > > for vhost-pci because the device interface is so different from
+> > > > vhost-user.
+> > >=20
+> > > The main question is how appropriate is the vhost user protocol
+> > > for passing to guests. And I am not sure at this point.
+> > >=20
+> > > Someone should go over vhost user messages and see whether they are s=
+afe
+> > > to pass to guest. If most are then we can try the transparent approac=
+h.
+> > > If most aren't then we can't and might as well use the proposed proto=
+col
+> > > which at least has code behind it.
+> >=20
+> > I have done that:
+> >=20
+> ...
+> >   * VHOST_USER_SET_MEM_TABLE
+> >=20
+> >     Set up BARs before sending a VHOST_USER_SET_MEM_TABLE to the guest.
+>=20
+> It would require to filter out userspace_addr from the payload not to
+> leak other QEMU process VAs to the guest.
+
+QEMU's vhost-user master implementation is insecure because it leaks
+QEMU process VAs.  This also affects vhost-user host processes, not just
+vhost-pci.
+
+The QEMU vhost-user master could send an post-IOMMU guest physical
+addresses whereever the vhost-user protocol specification says "user
+address".  That way no address space information is leaked although it
+does leak IOMMU mappings.
+
+If we want to hide the IOMMU mappings too then we need another logical
+address space (kind a randomized ramaddr_t).
+
+Anyway, my point is that the current vhost-user master implementation is
+insecure and should be fixed.  vhost-pci doesn't need to worry about
+this issue.
+
+Stefan
+
+--MRBOAUz+O/XNC2GI
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEcBAEBAgAGBQJaMpzwAAoJEJykq7OBq3PIS34IAMaqFN+TNSd9mYxrYGxkSQOW
+qQ4mfGkto/oEUIuvt+mnt0ACBLq8oElAjlO8FJzonRJit1OGb5wC1udjdySWkkQN
+aeHrwwhkkwIQHLuK68C8zF/FSDqimRi6/H+pqPMjeEW7TADkFyIoQ9ins8YdtfyW
+1M2b0wS0dfZOzj4Vut81O4dMKi4mWVQ5M6w56gWrvEw0umC4CMlYjODaOs9Xjc9A
+9Oq5sXMj4RT9Z3wg5LQ0tD+UL5S5Bxj6gQHCUdENiJtuGKIWsZKZmwFWv/8D3qzU
+y/C2gpRRGAIuZAKGt5/m2hOE1K2CJAsg7jRlCVhupCruiLw/hiTq049GjeHIW2g=
+=IykU
+-----END PGP SIGNATURE-----
+
+--MRBOAUz+O/XNC2GI--
