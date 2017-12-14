@@ -1,24 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57598)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39445)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1ePYWu-0005XQ-OJ
-	for qemu-devel@nongnu.org; Thu, 14 Dec 2017 13:46:49 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1ePYpd-0008HP-6A
+	for qemu-devel@nongnu.org; Thu, 14 Dec 2017 14:06:12 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1ePYWt-0002Fx-Mb
-	for qemu-devel@nongnu.org; Thu, 14 Dec 2017 13:46:48 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1ePYpa-0005AQ-9L
+	for qemu-devel@nongnu.org; Thu, 14 Dec 2017 14:06:09 -0500
+Received: from mail-ot0-x244.google.com ([2607:f8b0:4003:c0f::244]:38674)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1ePYpa-00059Q-23
+	for qemu-devel@nongnu.org; Thu, 14 Dec 2017 14:06:06 -0500
+Received: by mail-ot0-x244.google.com with SMTP id p3so5814955oti.5
+	for <qemu-devel@nongnu.org>; Thu, 14 Dec 2017 11:06:05 -0800 (PST)
 MIME-Version: 1.0
-Sender: philippe.mathieu.daude@gmail.com
-In-Reply-To: <20171214171810.GA18098@stefanha-x1.localdomain>
-References: <20171213213557.26561-1-f4bug@amsat.org>
-	<20171214093907.GA14433@stefanha-x1.localdomain>
-	<7bc179c8-5699-98b0-8a5b-b4d8e6843b25@amsat.org>
-	<20171214171810.GA18098@stefanha-x1.localdomain>
-From: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>
-Date: Thu, 14 Dec 2017 15:46:46 -0300
-Message-ID: <CAAdtpL7_tHk3GUep8r-cFc6fVS8Pj42DYbZQuY_CkKGoiU6V4Q@mail.gmail.com>
+In-Reply-To: <20171214171004.25058-1-cohuck@redhat.com>
+References: <20171214171004.25058-1-cohuck@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Thu, 14 Dec 2017 19:05:44 +0000
+Message-ID: <CAFEAcA8tY9=jtsw-MtjWTceLizvpH8oui_+6xf7V6K5o5BLf-A@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH 0/6] QTests: use Python to run complex tests
+Subject: Re: [Qemu-devel] [PULL 00/46] First batch of s390x patches for 2.12
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,38 +28,57 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefan Hajnoczi <stefanha@redhat.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Andrey Smirnov <andrew.smirnov@gmail.com>, Peter Maydell <peter.maydell@linaro.org>, Alistair Francis <alistair.francis@xilinx.com>, "Edgar E . Iglesias" <edgar.iglesias@xilinx.com>, Cleber Rosa <crosa@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, John Snow <jsnow@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, =?UTF-8?B?THVrw6HFoSBEb2t0b3I=?= <ldoktor@redhat.com>, "Daniel P . Berrange" <berrange@redhat.com>, Eric Blake <eblake@redhat.com>, Fam Zheng <famz@redhat.com>, Thomas Huth <thuth@redhat.com>, =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@redhat.com>, "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>, "open list:Block layer core" <qemu-block@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>
+To: Cornelia Huck <cohuck@redhat.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, qemu-s390x@nongnu.org, Richard Henderson <rth@twiddle.net>, Alexander Graf <agraf@suse.de>, Thomas Huth <thuth@redhat.com>, Christian Borntraeger <borntraeger@de.ibm.com>, David Hildenbrand <david@redhat.com>
 
->> > Is there a specific reason why adding SD Card support to libqos is not
->> > possible in C?
->>
->> Short (joking) answer: Would you write tests/qemu-iotests/041 in C? ;)
+On 14 December 2017 at 17:09, Cornelia Huck <cohuck@redhat.com> wrote:
+> The following changes since commit 0ef0583d5adceb9138bdb47494dabd1549ac5b6d:
 >
-> 041 is not a device-level test.  It doesn't poke device registers, it's
-> a functional test.  In my email I said I support using Python for those
-> types of tests.
+>   Merge remote-tracking branch 'remotes/dgilbert/tags/pull-hmp-20171214' into staging (2017-12-14 15:32:32 +0000)
 >
->> Now thinking about the specific reasons...
->>
->> What I intend to do is add qtests for the SDHCI implementation.
->> There are different revisions of the standard specs.
+> are available in the git repository at:
 >
-> It would be great to have SDHCI support in libqos.  PCI and virtio are
-> covered today and support for more busses will help reach that critical
-> mass where tests can be written for most QEMU device models without
-> first writing a new device driver framework.
+>   git://github.com/cohuck/qemu tags/s390x-20171214
 >
-> Please post your SDHCI test code, so we can discuss the details and
-> consider whether it's more like 041 or more like tests/ide-test.c.
+> for you to fetch changes up to a9e3065c6579df8652ce38502276ac0a13180d6f:
+>
+>   s390-ccw-virtio: allow for systems larger that 7.999TB (2017-12-14 17:56:54 +0100)
+>
+> ----------------------------------------------------------------
+> s390x changes for 2.12:
+> - Lots of tcg improvements: ccw hotplug is now working and we can run
+>   a Linux kernel built for z12 under tcg
+> - zPCI improvements to get virtio-pci working
+> - get rid of the cssid restrictions for virtual and non-virtual channel
+>   devices
+> - we now support 8TB+ systems
+> - 2.12 compat machine
+> - fixes and cleanups
+>
+> ----------------------------------------------------------------
 
-The SDHCI test is like ide-test, poking register.
+Hi; I'm afraid this fails to build on 32-bit:
 
-Being not a 'generic' series but only SDHCI I didn't Cc'd you,
-you can find the test here:
+In file included from
+/usr/lib/arm-linux-gnueabihf/glib-2.0/include/glibconfig.h:9:0,
+                 from /usr/include/glib-2.0/glib/gtypes.h:32,
+                 from /usr/include/glib-2.0/glib/galloca.h:32,
+                 from /usr/include/glib-2.0/glib.h:30,
+                 from /home/peter.maydell/qemu/include/glib-compat.h:19,
+                 from /home/peter.maydell/qemu/include/qemu/osdep.h:107,
+                 from /home/peter.maydell/qemu/hw/s390x/s390-virtio-ccw.c:13:
+/home/peter.maydell/qemu/hw/s390x/s390-virtio-ccw.c: In function
+'s390_memory_init':
+/usr/include/glib-2.0/glib/gmacros.h:291:26: error: comparison is
+always true due to limited range of data type [-Werror=type-limits]
+ #define MIN(a, b)  (((a) < (b)) ? (a) : (b))
+                          ^
+/home/peter.maydell/qemu/hw/s390x/s390-virtio-ccw.c:177:17: note: in
+expansion of macro 'MIN'
+         chunk = MIN(mem_size, KVM_SLOT_MAX_BYTES);
+                 ^
 
-http://lists.nongnu.org/archive/html/qemu-devel/2017-12/msg02391.html
+(ram_addr_t can be a 32-bit type).
 
-and the SDCard python test here (you got this one):
-
-http://lists.nongnu.org/archive/html/qemu-devel/2017-12/msg02350.html
+thanks
+-- PMM
