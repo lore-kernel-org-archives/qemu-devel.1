@@ -1,25 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57695)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58130)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1ePJ6o-0004Zg-Q0
-	for qemu-devel@nongnu.org; Wed, 13 Dec 2017 21:18:52 -0500
+	(envelope-from <eblake@redhat.com>) id 1ePJ8k-0005GN-E8
+	for qemu-devel@nongnu.org; Wed, 13 Dec 2017 21:20:51 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1ePJ6k-0005XX-5d
-	for qemu-devel@nongnu.org; Wed, 13 Dec 2017 21:18:50 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:33350)
+	(envelope-from <eblake@redhat.com>) id 1ePJ8f-0006ei-P4
+	for qemu-devel@nongnu.org; Wed, 13 Dec 2017 21:20:50 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:54954)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1ePJ6j-0005WT-T7
-	for qemu-devel@nongnu.org; Wed, 13 Dec 2017 21:18:46 -0500
-References: <20171213181540.7949-1-danielhb@linux.vnet.ibm.com>
-	<20171213181540.7949-2-danielhb@linux.vnet.ibm.com>
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1ePJ8f-0006eP-G7
+	for qemu-devel@nongnu.org; Wed, 13 Dec 2017 21:20:45 -0500
+References: <20B182CA-4FA6-444D-87B1-46B04FFC81AE@gmail.com>
+	<20171212143421.GD26971@redhat.com>
+	<11216FAC-3F62-43AF-ACD8-00F28B7AD886@gmail.com>
+	<20171213091458.GA28379@redhat.com>
+	<7D487247-C5DA-4902-A21E-B16861F763C8@gmail.com>
+	<alpine.BSF.2.21.1712131914560.26243@zero.eik.bme.hu>
+	<99BD2069-929C-402A-B38A-778DAB427449@gmail.com>
 From: Eric Blake <eblake@redhat.com>
-Message-ID: <de0c5647-ca81-f5be-db52-9f0d3b173dac@redhat.com>
-Date: Wed, 13 Dec 2017 20:18:43 -0600
+Message-ID: <9dae1cb6-0ed1-ca51-42c7-e8d0bddf10d3@redhat.com>
+Date: Wed, 13 Dec 2017 20:20:43 -0600
 MIME-Version: 1.0
-In-Reply-To: <20171213181540.7949-2-danielhb@linux.vnet.ibm.com>
+In-Reply-To: <99BD2069-929C-402A-B38A-778DAB427449@gmail.com>
 Content-Type: multipart/signed; micalg=pgp-sha256;
 	protocol="application/pgp-signature";
-	boundary="kv9NPWPKcn3R0l1PFhXs3euFOhOp8gmSB"
-Subject: Re: [Qemu-devel] [PATCH v1 1/2] qmp.c: (re)implement qmp_cpu
+	boundary="B4Jlr5O4usd8807O1wEoB7qBMMDRGRRxW"
+Subject: Re: [Qemu-devel] Adding more function keys support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,94 +33,41 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Daniel Henrique Barboza <danielhb@linux.vnet.ibm.com>, qemu-devel@nongnu.org
-Cc: dgilbert@redhat.com, armbru@redhat.com
+To: Programmingkid <programmingkidx@gmail.com>, BALATON Zoltan <balaton@eik.bme.hu>
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 
 This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---kv9NPWPKcn3R0l1PFhXs3euFOhOp8gmSB
+--B4Jlr5O4usd8807O1wEoB7qBMMDRGRRxW
 From: Eric Blake <eblake@redhat.com>
-To: Daniel Henrique Barboza <danielhb@linux.vnet.ibm.com>,
- qemu-devel@nongnu.org
-Cc: dgilbert@redhat.com, armbru@redhat.com
-Message-ID: <de0c5647-ca81-f5be-db52-9f0d3b173dac@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v1 1/2] qmp.c: (re)implement qmp_cpu
-References: <20171213181540.7949-1-danielhb@linux.vnet.ibm.com>
- <20171213181540.7949-2-danielhb@linux.vnet.ibm.com>
-In-Reply-To: <20171213181540.7949-2-danielhb@linux.vnet.ibm.com>
+To: Programmingkid <programmingkidx@gmail.com>,
+ BALATON Zoltan <balaton@eik.bme.hu>
+Cc: QEMU Developers <qemu-devel@nongnu.org>
+Message-ID: <9dae1cb6-0ed1-ca51-42c7-e8d0bddf10d3@redhat.com>
+Subject: Re: [Qemu-devel] Adding more function keys support
+References: <20B182CA-4FA6-444D-87B1-46B04FFC81AE@gmail.com>
+ <20171212143421.GD26971@redhat.com>
+ <11216FAC-3F62-43AF-ACD8-00F28B7AD886@gmail.com>
+ <20171213091458.GA28379@redhat.com>
+ <7D487247-C5DA-4902-A21E-B16861F763C8@gmail.com>
+ <alpine.BSF.2.21.1712131914560.26243@zero.eik.bme.hu>
+ <99BD2069-929C-402A-B38A-778DAB427449@gmail.com>
+In-Reply-To: <99BD2069-929C-402A-B38A-778DAB427449@gmail.com>
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
 
-On 12/13/2017 12:15 PM, Daniel Henrique Barboza wrote:
-> Commit 755f196898 ("qapi: Convert the cpu command") added the qmp_cpu
-> function in qmp.c, leaving it blank. It the same commit, a working
-> hmp_cpu was implemented. Since then, no further changes were made in
-> qmp_cpu, resulting now in a working 'cpu' command that works in HMP
-> and a 'cpu' command in QMP that does nothing.
->=20
-> Regardless of what constraints were involved that time in not implemeti=
-ng
-> qmp_cpu, at this moment it is possible to have both. This patch brings
-> the logic of hmp_cpu to qmp_cpu and converts the HMP function to use it=
-s
-> QMP counterpart.
+On 12/13/2017 01:18 PM, Programmingkid wrote:
 
-I'm not sure I like this. HMP is stateful (you have to remember what
-previous 'cpu' commands have been run to tell what the current command
-will do).  That may be convenient (if not confusing) to humans, but is
-lousy for machine interfaces.  QMP should be stateless as much as
-possible - for any command that would behave differently according to
-what CPU is selected, THAT command (and not a different 'cpu' command
-executed previously) should have a cpu argument alongside all its other
-parameters.
-
-So unless you have a really strong use case for this, I don't think we
-want it.
-
-
-> +++ b/qapi-schema.json
-> @@ -1048,11 +1048,19 @@
->  ##
->  # @cpu:
->  #
-> -# This command is a nop that is only provided for the purposes of comp=
-atibility.
-> +# Set the default CPU.
->  #
-> -# Since: 0.14.0
-> +# @index: The index of the virtual CPU to be set as default
-> +#
-> +# Returns: Nothing on success
-> +#
-> +# Since: 2.12.0
-> +#
-> +# Example:
-> +#
-> +# -> { "execute": "cpu", "arguments": { "index": 2 } }
-> +# <- { "return": {} }
->  #
-> -# Notes: Do not use this command.
->  ##
->  { 'command': 'cpu', 'data': {'index': 'int'} }
-> =20
-> diff --git a/qmp.c b/qmp.c
-> index e8c303116a..c482225d5c 100644
-> --- a/qmp.c
-> +++ b/qmp.c
-> @@ -115,7 +115,9 @@ void qmp_system_powerdown(Error **erp)
-> =20
->  void qmp_cpu(int64_t index, Error **errp)
->  {
-> -    /* Just do nothing */
-> +    if (monitor_set_cpu(index) < 0) {
-> +        error_setg(errp, "Invalid CPU index");
-> +    }
->  }
-> =20
->  void qmp_cpu_add(int64_t id, Error **errp)
+> Thank you BALATON for the file. One thing that caught my eye in this fi=
+le is this:
 >=20
 
-Better yet, let's document that 'cpu' is deprecated, so that we can
-remove it from QMP altogether in a couple of releases.
+> 	if (usage->code =3D=3D KEY_FN) {
+> 		asc->fn_on =3D !!value;
+>=20
+> Why would they need the double !?=20
+
+Double '!!' is an idiomatic way to force a value to be converted to bool
+(squashing all non-zero values into 1).
 
 --=20
 Eric Blake, Principal Software Engineer
@@ -123,7 +75,7 @@ Red Hat, Inc.           +1-919-301-3266
 Virtualization:  qemu.org | libvirt.org
 
 
---kv9NPWPKcn3R0l1PFhXs3euFOhOp8gmSB
+--B4Jlr5O4usd8807O1wEoB7qBMMDRGRRxW
 Content-Type: application/pgp-signature; name="signature.asc"
 Content-Description: OpenPGP digital signature
 Content-Disposition: attachment; filename="signature.asc"
@@ -132,14 +84,14 @@ Content-Disposition: attachment; filename="signature.asc"
 Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
 Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
 
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlox34MACgkQp6FrSiUn
-Q2qEKAf/dYzQTt9ssWpxCrkK5p9T0FwLHop3weRpMV0DjwQI/XByZWJjChVGzwws
-vrfGcvvewQQJnfwnnJJ7x+C1T2qSR5pScm74Kp3jMhSyf5/4Wh0bryRdN/JXnlJZ
-reMT6lcxzKX2V9F7WOG1rstrh4RqZFQs+102JhyIvXe3LW+fRV5OhcLG1CYwSnWf
-GbbD0AHZW9zXa48Ttrz2HMemNp1a2RSzXu13MLxBg1By8Re3z4mLiMy25Dg7OUhR
-e9APiB/uSaisqCiw/5FLd3qfOnRQXkBcHdNWXxxDIkx8O2izWYSIPZlb3PU1N0Ik
-eJwxoMIgS8E0rJGcx33J9zYkjOFd8Q==
-=L9eJ
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlox3/sACgkQp6FrSiUn
+Q2rakAf+OvZTZ31TqHTi9MZoLFBtxoKpWT2Us+tqDy1JFF8X8PYvWJoZwrzOxbGi
+azZqDxVUpvur/Wh0oMFW8HhDLxom+u6FSga8QgBjRL3cxBsJJwgBsMquEH30Xh72
+2oouk1cp36XdYnZJ1VnSou97CScfJseubX2e4VjLM2ysZIvXudsXdg/Ksa/nP+RO
+7hWQOIL/qn9BUcZOIe43DY0kvzXkSe0Ox85C+5x6aJRYFSsUMbzwJYzpLcwSnZeY
+9IjdRYjbRUjZ0yAYd2qxv9aUx4Dcc+9sJ3El8TzxIWCFCty/gYpvITAdX2FBPCrA
+QCbJG+z0IG29iYbLVeEqB+HqHs5DCw==
+=u/8+
 -----END PGP SIGNATURE-----
 
---kv9NPWPKcn3R0l1PFhXs3euFOhOp8gmSB--
+--B4Jlr5O4usd8807O1wEoB7qBMMDRGRRxW--
