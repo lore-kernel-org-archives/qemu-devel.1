@@ -1,21 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41644)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43611)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <andrew.smirnov@gmail.com>) id 1ePWdS-0005wP-2W
-	for qemu-devel@nongnu.org; Thu, 14 Dec 2017 11:45:27 -0500
+	(envelope-from <eblake@redhat.com>) id 1ePWgt-0007SR-Dw
+	for qemu-devel@nongnu.org; Thu, 14 Dec 2017 11:49:00 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <andrew.smirnov@gmail.com>) id 1ePWdM-0000Fg-4b
-	for qemu-devel@nongnu.org; Thu, 14 Dec 2017 11:45:26 -0500
+	(envelope-from <eblake@redhat.com>) id 1ePWgo-0005RF-SW
+	for qemu-devel@nongnu.org; Thu, 14 Dec 2017 11:48:59 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:51848)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1ePWgo-0005Qi-Ie
+	for qemu-devel@nongnu.org; Thu, 14 Dec 2017 11:48:54 -0500
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+	[10.5.11.16])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 662F180F79
+	for <qemu-devel@nongnu.org>; Thu, 14 Dec 2017 16:48:53 +0000 (UTC)
+References: <20171208115834.21577-1-berrange@redhat.com>
+	<8e85e5e6-01f6-9c01-f7fa-e33ec4f9d6c7@redhat.com>
+	<20171212141749.GC26971@redhat.com>
+	<54f33ad4-4483-9f92-ff24-9e6d1f4daf2a@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <853f8f0b-453c-82c9-5e05-ccab21c41ad2@redhat.com>
+Date: Thu, 14 Dec 2017 10:48:51 -0600
 MIME-Version: 1.0
-In-Reply-To: <20171214145255.31545-15-andrew.smirnov@gmail.com>
-References: <20171214145255.31545-1-andrew.smirnov@gmail.com>
-	<20171214145255.31545-15-andrew.smirnov@gmail.com>
-From: Andrey Smirnov <andrew.smirnov@gmail.com>
-Date: Thu, 14 Dec 2017 08:45:14 -0800
-Message-ID: <CAHQ1cqHrCv8ENWDUzENRrLaBVMR0oVV_UDqwrGEeJ8Sko8bB4g@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v2 14/15] sd: Check for READ_MULTIPLE_BLOCK
- size limit violation first
+In-Reply-To: <54f33ad4-4483-9f92-ff24-9e6d1f4daf2a@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="abfkldxbXHG47Av81gBDOq9flWOhSI8lj"
+Subject: Re: [Qemu-devel] [PATCH] docs: update information for TLS
+ certificate management
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,94 +37,70 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "open list:ARM" <qemu-arm@nongnu.org>
-Cc: Andrey Smirnov <andrew.smirnov@gmail.com>, Peter Maydell <peter.maydell@linaro.org>, Jason Wang <jasowang@redhat.com>, =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>, QEMU Developers <qemu-devel@nongnu.org>, Andrey Yurovsky <yurovsky@gmail.com>
+To: Thomas Huth <thuth@redhat.com>, "Daniel P. Berrange" <berrange@redhat.com>
+Cc: qemu-devel@nongnu.org
 
-On Thu, Dec 14, 2017 at 6:52 AM, Andrey Smirnov
-<andrew.smirnov@gmail.com> wrote:
-> Check for READ_MULTIPLE_BLOCK size limit violation first as opposed to
-> doing at the end of the command handler. Consider the following
-> scenario:
->
-> Emulated host driver is trying to read last byte of the last sector
-> via CMD18/ADMA, so what would happen is the following:
->
-> 1. "ret" is filled with desired byte and "sd->data_offset" is
->    incremented to 512 by
->
->             ret =3D sd->data[sd->data_offset ++];
->
-> 2. sd->data_offset >=3D io_len becomes true, so
->
->             sd->data_start +=3D io_len;
->
->    moves "sd->data_start" past valid data boundaries.
->
-> 3. as a result "sd->data_start + io_len > sd->size" check becomes true
->    and sd->card_status is marked with ADDRESS_ERROR, telling emulated
->    host that the last CMD18 read failed, despite nothing bad/illegal
->    happening.
->
-> To avoid having this false positive, move out-of-bounds check to
-> happen before BLK_READ_BLOCK(), so this way it will only trigger if
-> illegal read is truly about to happen.
->
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--abfkldxbXHG47Av81gBDOq9flWOhSI8lj
+From: Eric Blake <eblake@redhat.com>
+To: Thomas Huth <thuth@redhat.com>, "Daniel P. Berrange" <berrange@redhat.com>
+Cc: qemu-devel@nongnu.org
+Message-ID: <853f8f0b-453c-82c9-5e05-ccab21c41ad2@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH] docs: update information for TLS certificate
+ management
+References: <20171208115834.21577-1-berrange@redhat.com>
+ <8e85e5e6-01f6-9c01-f7fa-e33ec4f9d6c7@redhat.com>
+ <20171212141749.GC26971@redhat.com>
+ <54f33ad4-4483-9f92-ff24-9e6d1f4daf2a@redhat.com>
+In-Reply-To: <54f33ad4-4483-9f92-ff24-9e6d1f4daf2a@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-Disregard this patch, exactly this fix is already present in latest QEMU ma=
-ster.
+On 12/14/2017 03:41 AM, Thomas Huth wrote:
 
-Sorry for the noise.
+>>> You can use '--object' with qemu as well (getopt_long_only() accepts
+>>> double-dash form in addition to single dash).  If it makes it any eas=
+ier
+>>> to only document the double-dash form, then go for it.
+>>
+>> Since the QEMU -help text only mentions the single dash format, I'll
+>> stick with that.
+>>
+>> Perhaps though, we should change the -help text (and all docs) to alwa=
+ys
+>> use double dash format so we're consistent across QEMU codebase, and m=
+ore
+>> normal CLI arg syntax for long options ?
+>=20
+> Good idea!
+>=20
 
-Thanks,
-Andrey Smirnov
+I've added it to
+https://wiki.qemu.org/Contribute/BiteSizedTasks#Consistent_option_usage_i=
+n_documentation
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
 
-> Cc: Peter Maydell <peter.maydell@linaro.org>
-> Cc: Jason Wang <jasowang@redhat.com>
-> Cc: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
-> Cc: qemu-devel@nongnu.org
-> Cc: qemu-arm@nongnu.org
-> Cc: yurovsky@gmail.com
-> Signed-off-by: Andrey Smirnov <andrew.smirnov@gmail.com>
-> ---
->  hw/sd/sd.c | 16 ++++++++++------
->  1 file changed, 10 insertions(+), 6 deletions(-)
->
-> diff --git a/hw/sd/sd.c b/hw/sd/sd.c
-> index ba47bff4db..ce4ef17be3 100644
-> --- a/hw/sd/sd.c
-> +++ b/hw/sd/sd.c
-> @@ -1797,8 +1797,17 @@ uint8_t sd_read_data(SDState *sd)
->          break;
->
->      case 18:   /* CMD18:  READ_MULTIPLE_BLOCK */
-> -        if (sd->data_offset =3D=3D 0)
-> +        if (sd->data_offset =3D=3D 0) {
-> +            if (sd->data_start + io_len > sd->size) {
-> +                qemu_log_mask(LOG_GUEST_ERROR,
-> +                              "%s: Trying to read past card's capacity\n=
-",
-> +                              __func__);
-> +                sd->card_status |=3D ADDRESS_ERROR;
-> +                return 0x00;
-> +            }
-> +
->              BLK_READ_BLOCK(sd->data_start, io_len);
-> +        }
->          ret =3D sd->data[sd->data_offset ++];
->
->          if (sd->data_offset >=3D io_len) {
-> @@ -1812,11 +1821,6 @@ uint8_t sd_read_data(SDState *sd)
->                      break;
->                  }
->              }
-> -
-> -            if (sd->data_start + io_len > sd->size) {
-> -                sd->card_status |=3D ADDRESS_ERROR;
-> -                break;
-> -            }
->          }
->          break;
->
-> --
-> 2.14.3
->
+
+--abfkldxbXHG47Av81gBDOq9flWOhSI8lj
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAloyq3MACgkQp6FrSiUn
+Q2qasggAmFSTrM5MBVgxPPpBazB/tM8AsJjvR3rNHoL6VCzrZir7lPoS9mk1E6Ky
+bsXygidqH53N1KIbs6XYdjAwGkvfZGESsUCcQKrX9l0UQ38ukxMvtWViY1TvRIcF
+5Dvsj7Abdfw5kIXrsZrTxn3oF+S9idZPndKEZC+vOJAuDvFzvtHHRwcIRdoqZgsS
+k1pCgGs9Am43pjltc9jzQUxHArHj/sPoiY43JW8tp1CmbHrVGHRV/vuP+pWuxB7V
+ebf3dnIqQJTvKyMoSG7Y/1v35+w5eWDn6wH67BEC+pQkeqUnmgq5WSr32U7lZ7eh
+iTzkPk7MKZtyK1IyV8D9hKfTDkO5Xw==
+=GjDl
+-----END PGP SIGNATURE-----
+
+--abfkldxbXHG47Av81gBDOq9flWOhSI8lj--
