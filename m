@@ -1,20 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45921)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47133)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <hare@suse.de>) id 1ePVLc-00031k-JY
-	for qemu-devel@nongnu.org; Thu, 14 Dec 2017 10:22:57 -0500
+	(envelope-from <clg@kaod.org>) id 1ePVN1-00049d-TJ
+	for qemu-devel@nongnu.org; Thu, 14 Dec 2017 10:24:24 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <hare@suse.de>) id 1ePVLY-00032W-Gu
-	for qemu-devel@nongnu.org; Thu, 14 Dec 2017 10:22:56 -0500
-Received: from mx2.suse.de ([195.135.220.15]:32861)
+	(envelope-from <clg@kaod.org>) id 1ePVMx-0004IG-O5
+	for qemu-devel@nongnu.org; Thu, 14 Dec 2017 10:24:23 -0500
+Received: from 13.mo7.mail-out.ovh.net ([87.98.150.175]:37676)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <hare@suse.de>) id 1ePVLY-000311-7t
-	for qemu-devel@nongnu.org; Thu, 14 Dec 2017 10:22:52 -0500
-From: Hannes Reinecke <hare@suse.de>
-Date: Thu, 14 Dec 2017 16:22:46 +0100
-Message-Id: <20171214152246.17503-3-hare@suse.de>
-In-Reply-To: <20171214152246.17503-1-hare@suse.de>
-References: <20171214152246.17503-1-hare@suse.de>
-Subject: [Qemu-devel] [PATCH 2/2] scsi: Implement multipath support
+	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1ePVMx-0004H8-GO
+	for qemu-devel@nongnu.org; Thu, 14 Dec 2017 10:24:19 -0500
+Received: from player762.ha.ovh.net (b6.ovh.net [213.186.33.56])
+	by mo7.mail-out.ovh.net (Postfix) with ESMTP id 2D2BD83CB8
+	for <qemu-devel@nongnu.org>; Thu, 14 Dec 2017 16:24:16 +0100 (CET)
+References: <20171209084338.29395-1-clg@kaod.org>
+	<20171209084338.29395-4-clg@kaod.org>
+From: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
+Message-ID: <0876c4bd-676f-276d-3cf6-aef4a2a562e5@kaod.org>
+Date: Thu, 14 Dec 2017 16:24:10 +0100
+MIME-Version: 1.0
+In-Reply-To: <20171209084338.29395-4-clg@kaod.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v2 03/19] spapr: introduce the XIVE
+ interrupt sources
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,172 +32,82 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: qemu-devel@nongnu.org, Hannes Reinecke <hare@suse.de>, Hannes Reinecke <hare@suse.com>
+To: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, David Gibson <david@gibson.dropbear.id.au>, Benjamin Herrenschmidt <benh@kernel.crashing.org>, Greg Kurz <groug@kaod.org>
 
-Implement simple multipath support based on the shared block device
-feature. Whenever a shared device is detected the scsi-disk driver
-will report a simple ALUA setup with all paths in active/optimized.
+> diff --git a/include/hw/ppc/spapr_xive.h b/include/hw/ppc/spapr_xive.h
+> index 5b1f78e06a1e..ecc15d889b74 100644
+> --- a/include/hw/ppc/spapr_xive.h
+> +++ b/include/hw/ppc/spapr_xive.h
+> @@ -24,8 +24,17 @@ struct sPAPRXive {
+>      /* Properties */
+>      uint32_t     nr_irqs;
+>  
+> +    /* IRQ */
+> +    qemu_irq     *qirqs;
+> +
+>      /* XIVE internal tables */
+>      XiveIVE      *ivt;
+> +    uint8_t      *sbe;
+> +    uint32_t     sbe_size;
+> +
+> +    /* ESB memory region */
+> +    hwaddr       esb_base;
+> +    MemoryRegion esb_iomem;
+>  };
+>  
+>  bool spapr_xive_irq_enable(sPAPRXive *xive, uint32_t lisn);
+> 
 
-Signed-off-by: Hannes Reinecke <hare@suse.com>
----
- block.c                  | 15 +++++++++++
- hw/scsi/scsi-disk.c      | 66 ++++++++++++++++++++++++++++++++++++++++++++++++
- include/block/block.h    |  1 +
- include/scsi/constants.h |  5 ++++
- 4 files changed, 87 insertions(+)
+The addition of the XIVE source fields directly under the sPAPRXive 
+object is really a design choice. But I am starting to think that 
+having multiple XIVE source objects would be a good idea.
 
-diff --git a/block.c b/block.c
-index cf8b94252c..e0643989e5 100644
---- a/block.c
-+++ b/block.c
-@@ -3837,6 +3837,21 @@ int bdrv_get_shared(BlockDriverState *bs)
-     return bs->shared_no;
- }
- 
-+void bdrv_shared_mask(BlockDriverState *bs, unsigned long *shared_mask)
-+{
-+    BlockDriverState *tmp_bs;
-+
-+    if (!bs->filename || !shared_mask)
-+        return;
-+    QTAILQ_FOREACH(tmp_bs, &graph_bdrv_states, node_list) {
-+        if (!strcmp(bs->filename, tmp_bs->filename)) {
-+            if (tmp_bs->shared_no > 0) {
-+                set_bit(tmp_bs->shared_no - 1, shared_mask);
-+            }
-+        }
-+    }
-+}
-+
- /* Put this QMP function here so it can access the static graph_bdrv_states. */
- BlockDeviceInfoList *bdrv_named_nodes_list(Error **errp)
- {
-diff --git a/hw/scsi/scsi-disk.c b/hw/scsi/scsi-disk.c
-index 32c1d656b1..b73fcafc29 100644
---- a/hw/scsi/scsi-disk.c
-+++ b/hw/scsi/scsi-disk.c
-@@ -676,6 +676,13 @@ static int scsi_disk_emulate_inquiry(SCSIRequest *req, uint8_t *outbuf)
-                 buflen += 8;
-             }
- 
-+            if (bdrv_get_shared(blk_bs(s->qdev.conf.blk))) {
-+                outbuf[buflen++] = 0x61; // SAS / Binary
-+                outbuf[buflen++] = 0x95; // PIV / Target port / target port group
-+                outbuf[buflen++] = 0; // reserved
-+                outbuf[buflen++] = 4;
-+                buflen += 4;
-+            }
-             if (s->port_index) {
-                 outbuf[buflen++] = 0x61; // SAS / Binary
-                 outbuf[buflen++] = 0x94; // PIV / Target port / relative target port
-@@ -819,6 +826,11 @@ static int scsi_disk_emulate_inquiry(SCSIRequest *req, uint8_t *outbuf)
-         outbuf[4] = 36 - 5;
-     }
- 
-+    /* Enable TGPS bit */
-+    if (bdrv_get_shared(blk_bs(s->qdev.conf.blk))) {
-+        outbuf[5] = 0x10;
-+    }
-+
-     /* Sync data transfer and TCQ.  */
-     outbuf[7] = 0x10 | (req->bus->info->tcq ? 0x02 : 0);
-     return buflen;
-@@ -1869,6 +1881,47 @@ static void scsi_disk_emulate_write_data(SCSIRequest *req)
-     }
- }
- 
-+static int scsi_emulate_report_target_port_groups(SCSIDiskState *s,
-+                                                  uint8_t *inbuf)
-+{
-+    uint8_t *p, *pg;
-+    int buflen = 0, i, count = 0;
-+    unsigned long shared_mask = 0;
-+
-+    if (!bdrv_get_shared(blk_bs(s->qdev.conf.blk))) {
-+        return -1;
-+    }
-+
-+    bdrv_shared_mask(blk_bs(s->qdev.conf.blk), &shared_mask);
-+    if (!shared_mask) {
-+        return -1;
-+    }
-+
-+    pg = &inbuf[4];
-+    pg[0] = 0; /* Active/Optimized */
-+    pg[1] = 0x1; /* Only Active/Optimized is supported */
-+
-+    p = &pg[8];
-+    buflen += 8;
-+    for (i = 0; i < 32; i++) {
-+        if (!test_bit(i, &shared_mask))
-+            continue;
-+        p[2] = (i + 1) >> 8;
-+        p[3] = (i + 1) & 0xFF;
-+        p += 4;
-+        buflen += 4;
-+        count++;
-+    }
-+    pg[7] = count;
-+
-+    inbuf[0] = (buflen >> 24) & 0xff;
-+    inbuf[1] = (buflen >> 16) & 0xff;
-+    inbuf[2] = (buflen >> 8) & 0xff;
-+    inbuf[3] = buflen & 0xff;
-+
-+    return buflen + 4;
-+}
-+
- static int32_t scsi_disk_emulate_command(SCSIRequest *req, uint8_t *buf)
- {
-     SCSIDiskReq *r = DO_UPCAST(SCSIDiskReq, req, req);
-@@ -2010,6 +2063,19 @@ static int32_t scsi_disk_emulate_command(SCSIRequest *req, uint8_t *buf)
-             goto illegal_request;
-         }
-         break;
-+    case MAINTENANCE_IN:
-+        if ((req->cmd.buf[1] & 31) == MI_REPORT_TARGET_PORT_GROUPS) {
-+            DPRINTF("MI REPORT TARGET PORT GROUPS\n");
-+            memset(outbuf, 0, req->cmd.xfer);
-+            buflen = scsi_emulate_report_target_port_groups(s, outbuf);
-+            if (buflen < 0) {
-+                goto illegal_request;
-+            }
-+            break;
-+        }
-+        DPRINTF("Unsupported Maintenance In\n");
-+        goto illegal_request;
-+        break;
-     case MECHANISM_STATUS:
-         buflen = scsi_emulate_mechanism_status(s, outbuf);
-         if (buflen < 0) {
-diff --git a/include/block/block.h b/include/block/block.h
-index 5c03c1acfa..b31e033702 100644
---- a/include/block/block.h
-+++ b/include/block/block.h
-@@ -445,6 +445,7 @@ const char *bdrv_get_format_name(BlockDriverState *bs);
- BlockDriverState *bdrv_find_node(const char *node_name);
- void bdrv_find_shared(BlockDriverState *bs);
- int bdrv_get_shared(BlockDriverState *bs);
-+void bdrv_shared_mask(BlockDriverState *bs, unsigned long *shared_mask);
- BlockDeviceInfoList *bdrv_named_nodes_list(Error **errp);
- BlockDriverState *bdrv_lookup_bs(const char *device,
-                                  const char *node_name,
-diff --git a/include/scsi/constants.h b/include/scsi/constants.h
-index a141dd71f8..38ed4b35e4 100644
---- a/include/scsi/constants.h
-+++ b/include/scsi/constants.h
-@@ -156,6 +156,11 @@
- #define SAI_READ_CAPACITY_16  0x10
- 
- /*
-+ * MAINTENANCE IN subcodes
-+ */
-+#define MI_REPORT_TARGET_PORT_GROUPS 0xa
-+
-+/*
-  * READ POSITION service action codes
-  */
- #define SHORT_FORM_BLOCK_ID  0x00
--- 
-2.12.3
+Roughly speaking, a XIVE source is a bunch of PQ bits plus a MMIO 
+region to manipulate them and, in the QEMU model, a set of associated 
+qemu_irqs to do the same from the handlers. 
+
+In real HW, the PSI host bridge controller on the P9 for instance, 
+a register holds all the P bits of the IRQs (no Q bits because the 
+IRQs are only LSIs) and there is a specific MMIO region for them. 
+PSIHB also has a register to store the assertion level of each IRQ.   
+So this is quite similar to what we are adding above and in the
+next patch for the LSI support. 
+
+The source triggering only depends on the PQ bits (plus the LSI 
+level) and the result is a simple forward of the event notification 
+to the central XIVE engine : the IVRE, doing the routing. The IVRE
+is really our sPAPRXive object. 
+
+The API between the source and the IVRE is extremely simple :
+
+  static void spapr_xive_irq(sPAPRXive *xive, int lisn)
+
+The IVRE then scans its IVT, finds the EQ, and moves on to the 
+presenter.
+
+So, we can keep the IVRE engine (sPAPRXive) attached directly to 
+the machine like we have today, this is good, and introduce multiple 
+XIVE source objects. The sPAPR machine would have : 
+
+ - one for the IPIs [ 0 - nr_servers ]
+ - one generic for the devices [ 4096 -  ]
+ - one for each phb ? 
+
+The source address in the overall ESB MMIO region would be calculated 
+from the offset of the source IRQ numbers in the IRQ number space. 
+The offset could very well be hardcoded for each device. I don't see 
+any XICS compatibility problems as we are sharing correctly the IRQ 
+number space already.
+
+
+I am starting this discussion because the support for XIVE in the 
+QEMU PowerNV machine will need multiple sources, just like for 
+POWER8. PnvXive will be a bit different because the IVRE tables 
+(IVT and EQDT) are in the virtual machine memory. Most of the settings 
+are done in the VM. The QEMU PowerNV machine will still have to 
+implement the triggering and the routing logic using the guest tables. 
+
+
+Regards,
+
+C. 
