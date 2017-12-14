@@ -1,28 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36328)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40332)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1ePSw5-00055e-1G
-	for qemu-devel@nongnu.org; Thu, 14 Dec 2017 07:48:30 -0500
+	(envelope-from <bounces@canonical.com>) id 1ePT2H-0007hL-1a
+	for qemu-devel@nongnu.org; Thu, 14 Dec 2017 07:54:50 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1ePSw0-0006EL-Hd
-	for qemu-devel@nongnu.org; Thu, 14 Dec 2017 07:48:25 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:18539)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1ePSw0-0006Cm-BJ
-	for qemu-devel@nongnu.org; Thu, 14 Dec 2017 07:48:20 -0500
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
-	[10.5.11.12])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 3DC3F883AC
-	for <qemu-devel@nongnu.org>; Thu, 14 Dec 2017 12:48:19 +0000 (UTC)
-Received: from dgilbert-t530.redhat.com (ovpn-117-51.ams2.redhat.com
-	[10.36.117.51])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id B49A560C9F
-	for <qemu-devel@nongnu.org>; Thu, 14 Dec 2017 12:48:18 +0000 (UTC)
-From: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>
-Date: Thu, 14 Dec 2017 12:48:15 +0000
-Message-Id: <20171214124817.2567-1-dgilbert@redhat.com>
-Subject: [Qemu-devel] [PULL 0/2] hmp queue
+	(envelope-from <bounces@canonical.com>) id 1ePT2B-0000F7-Nt
+	for qemu-devel@nongnu.org; Thu, 14 Dec 2017 07:54:49 -0500
+Received: from indium.canonical.com ([91.189.90.7]:52656)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1ePT2B-0000Cb-HR
+	for qemu-devel@nongnu.org; Thu, 14 Dec 2017 07:54:43 -0500
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1ePT2A-0003Ke-6Q
+	for <qemu-devel@nongnu.org>; Thu, 14 Dec 2017 12:54:42 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 1A1302E80CB
+	for <qemu-devel@nongnu.org>; Thu, 14 Dec 2017 12:54:42 +0000 (UTC)
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Thu, 14 Dec 2017 12:35:44 -0000
+From: Roman <romanzwi000@gmx.at>
+Reply-To: Bug 1429841 <1429841@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <20150309124810.20969.37090.malonedeb@gac.canonical.com>
+Message-Id: <151325494496.13079.6090111774560315688.malone@gac.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1429841] Re: error "rom: requested regions
+ overlap" for NOLOAD sections
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,35 +39,74 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Just tested with QEMU 2.10.93 in cygwin: problem does not occour
+anymore!
 
-The following changes since commit 0a0dc59d27527b78a195c2d838d28b7b49e5a639:
+Thanks a lot!
 
-  Update version for v2.11.0 release (2017-12-13 14:31:09 +0000)
+-- =
 
-are available in the Git repository at:
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1429841
 
-  git://github.com/dagrh/qemu.git tags/pull-hmp-20171214
+Title:
+  error "rom: requested regions overlap" for NOLOAD sections
 
-for you to fetch changes up to 0eaf3b824745cacebfc321aef6787528d33d58fe:
+Status in QEMU:
+  Fix Committed
 
-  tests: test-hmp: print command execution result (2017-12-14 11:09:42 +0000)
+Bug description:
+  command line:
+  qemu-system-arm -semihosting -nographic -monitor null -serial null -no-re=
+boot -kernel build/fw/0HNFcomSLuP1_CUNIT.elf
 
-----------------------------------------------------------------
-HMP pull 2017-12-14
+  output:
+  rom: requested regions overlap (rom phdr #6: build/fw/0HNFcomSLuP1_CUNIT.=
+elf. free=3D0x8001effc, addr=3D0x8001c000)
+  rom loading failed
 
-----------------------------------------------------------------
-Thomas Huth (1):
-      hmp-commands: Remove the deprecated usb_add and usb_del
+  I checked the sections of the .elf file with arm-none-eabi-objdump -h:
+  Sections:
+  Idx Name          Size      VMA       LMA       File off  Algn
+  ...
+   35 .marker_appli 00001000  801ae000  801ae000  00025000  2**0
+                    ALLOC
+   36 .safe_data    00000014  80200000  8001b000  00020000  2**2
+                    CONTENTS, ALLOC, LOAD, DATA
+   37 .safe_bss     00000488  80200020  8001b020  00020014  2**2
+                    ALLOC
+   38 .marker_safe_data 00001000  80201000  8001c000  00029000  2**0
+                    ALLOC
+   39 .data         000008cc  80202000  8001b600  00022000  2**3
+                    CONTENTS, ALLOC, LOAD, DATA
+   40 .bss          0000312c  802028d0  8001bed0  000228cc  2**3
+                    ALLOC
+   41 .marker_data  00001000  80206000  8001f600  00026000  2**0
+                    ALLOC
+   42 .cunit        00010000  80300000  80119600  00028000  2**0
+                    ALLOC
+   43 .marker_code  00001000  8001c000  8001c000  00024000  2**0
+                    ALLOC
+  ...
 
-Vadim Galitsyn (1):
-      tests: test-hmp: print command execution result
+  So I had a look where the values in  the error message could come from:
+  0x8001c000: is the "LMA" value of section .marker_safe_data
+  0x8001effc: is "Size" + "LMA" of the .bss section (0x0000312c + 0x8001bed=
+0)
 
- hmp-commands.hx         | 33 ---------------------------------
- hw/usb/bus.c            | 22 ----------------------
- include/hw/usb.h        |  1 -
- include/sysemu/sysemu.h |  2 --
- qemu-doc.texi           |  8 --------
- tests/test-hmp.c        |  7 +++++--
- vl.c                    | 44 --------------------------------------------
- 7 files changed, 5 insertions(+), 112 deletions(-)
+  So it is correct that (regarding the "LMA" value) the .marker_safe_data s=
+ection collides with .bss section.
+  But actually these sections have no "LOAD" attribute, so I would guess th=
+at their "LMA" should not be used anyway.
+  Those section should reside at their "VMA" addresses (0x802xxxxx) during =
+runtime but they have no data to load.
+
+  Or am I getting something completely wrong?
+  Should I give an additional option to qemu?
+
+  I got this error with 2.0.0+dfsg-2ubuntu1.10 and 1.0.50-2012.03-0ubuntu2.1
+  I didn't get this error (but others) with 0.10.2
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1429841/+subscriptions
