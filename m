@@ -1,25 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55967)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57598)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1ePYU1-0004ma-JA
-	for qemu-devel@nongnu.org; Thu, 14 Dec 2017 13:43:50 -0500
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1ePYWu-0005XQ-OJ
+	for qemu-devel@nongnu.org; Thu, 14 Dec 2017 13:46:49 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1ePYTy-0005eg-I2
-	for qemu-devel@nongnu.org; Thu, 14 Dec 2017 13:43:49 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:46791)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1ePYTy-0005dM-B7
-	for qemu-devel@nongnu.org; Thu, 14 Dec 2017 13:43:46 -0500
-Date: Thu, 14 Dec 2017 20:43:41 +0200
-From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <20171214204310-mutt-send-email-mst@kernel.org>
-References: <20171213180807.7066-1-dgilbert@redhat.com>
-	<20171213180807.7066-5-dgilbert@redhat.com>
-	<20171214162731.50a95633@redhat.com>
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1ePYWt-0002Fx-Mb
+	for qemu-devel@nongnu.org; Thu, 14 Dec 2017 13:46:48 -0500
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20171214162731.50a95633@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v4 4/6] vhost: add regions to temporary list
+Sender: philippe.mathieu.daude@gmail.com
+In-Reply-To: <20171214171810.GA18098@stefanha-x1.localdomain>
+References: <20171213213557.26561-1-f4bug@amsat.org>
+	<20171214093907.GA14433@stefanha-x1.localdomain>
+	<7bc179c8-5699-98b0-8a5b-b4d8e6843b25@amsat.org>
+	<20171214171810.GA18098@stefanha-x1.localdomain>
+From: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>
+Date: Thu, 14 Dec 2017 15:46:46 -0300
+Message-ID: <CAAdtpL7_tHk3GUep8r-cFc6fVS8Pj42DYbZQuY_CkKGoiU6V4Q@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH 0/6] QTests: use Python to run complex tests
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,22 +27,38 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Igor Mammedov <imammedo@redhat.com>
-Cc: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>, qemu-devel@nongnu.org, pbonzini@redhat.com, maxime.coquelin@redhat.com, groug@kaod.org
+To: Stefan Hajnoczi <stefanha@redhat.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Andrey Smirnov <andrew.smirnov@gmail.com>, Peter Maydell <peter.maydell@linaro.org>, Alistair Francis <alistair.francis@xilinx.com>, "Edgar E . Iglesias" <edgar.iglesias@xilinx.com>, Cleber Rosa <crosa@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, John Snow <jsnow@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, =?UTF-8?B?THVrw6HFoSBEb2t0b3I=?= <ldoktor@redhat.com>, "Daniel P . Berrange" <berrange@redhat.com>, Eric Blake <eblake@redhat.com>, Fam Zheng <famz@redhat.com>, Thomas Huth <thuth@redhat.com>, =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@redhat.com>, "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>, "open list:Block layer core" <qemu-block@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>
 
-On Thu, Dec 14, 2017 at 04:27:31PM +0100, Igor Mammedov wrote:
-> Also it seems that we have a race in current code where
-> region_del() unrefs memory region first and then by the
-> commit time memory region could be gone since old flatview
-> is unreffed before commit callback is called, but guest still
-> uses old memory map until vhost_set_mem_table() is complete.
-> We probably should unref deleted(old) sections after
-> guest gets new memmap.
+>> > Is there a specific reason why adding SD Card support to libqos is not
+>> > possible in C?
+>>
+>> Short (joking) answer: Would you write tests/qemu-iotests/041 in C? ;)
+>
+> 041 is not a device-level test.  It doesn't poke device registers, it's
+> a functional test.  In my email I said I support using Python for those
+> types of tests.
+>
+>> Now thinking about the specific reasons...
+>>
+>> What I intend to do is add qtests for the SDHCI implementation.
+>> There are different revisions of the standard specs.
+>
+> It would be great to have SDHCI support in libqos.  PCI and virtio are
+> covered today and support for more busses will help reach that critical
+> mass where tests can be written for most QEMU device models without
+> first writing a new device driver framework.
+>
+> Please post your SDHCI test code, so we can discuss the details and
+> consider whether it's more like 041 or more like tests/ide-test.c.
 
-Care trying to post a patch for stable? Might be a good idea
-to merge before this rework, for the sake of downstreams.
+The SDHCI test is like ide-test, poking register.
 
-> 
-> >  }
-> >  
-> >  static int vhost_virtqueue_set_addr(struct vhost_dev *dev,
+Being not a 'generic' series but only SDHCI I didn't Cc'd you,
+you can find the test here:
+
+http://lists.nongnu.org/archive/html/qemu-devel/2017-12/msg02391.html
+
+and the SDCard python test here (you got this one):
+
+http://lists.nongnu.org/archive/html/qemu-devel/2017-12/msg02350.html
