@@ -1,21 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35829)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41678)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1ePcZq-0004FI-S4
-	for qemu-devel@nongnu.org; Thu, 14 Dec 2017 18:06:07 -0500
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1ePcoQ-0006Xi-Sf
+	for qemu-devel@nongnu.org; Thu, 14 Dec 2017 18:21:12 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1ePcZm-0001cm-SU
-	for qemu-devel@nongnu.org; Thu, 14 Dec 2017 18:06:06 -0500
-Date: Fri, 15 Dec 2017 09:50:41 +1100
-From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20171214225041.GZ2226@umbus.fritz.box>
-References: <20171214180948.981-1-lvivier@redhat.com>
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1ePcoP-00038M-MW
+	for qemu-devel@nongnu.org; Thu, 14 Dec 2017 18:21:10 -0500
+Received: from mail-it0-x244.google.com ([2607:f8b0:4001:c0b::244]:39942)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1ePcoP-00037Y-Fe
+	for qemu-devel@nongnu.org; Thu, 14 Dec 2017 18:21:09 -0500
+Received: by mail-it0-x244.google.com with SMTP id f190so14910243ita.5
+	for <qemu-devel@nongnu.org>; Thu, 14 Dec 2017 15:21:09 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="1ar0NSVY9gjTGNA2"
-Content-Disposition: inline
-In-Reply-To: <20171214180948.981-1-lvivier@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH] spapr: don't initialize PATB entry if
- max-cpu-compat < power9
+Sender: philippe.mathieu.daude@gmail.com
+In-Reply-To: <CAKmqyKMSwraSQ1XBuWYi1A2zfcgCKEqRC_PvKkpcH=f=ynDnXA@mail.gmail.com>
+References: <20171213195852.30439-1-f4bug@amsat.org>
+	<20171213195852.30439-4-f4bug@amsat.org>
+	<CAKmqyKMSwraSQ1XBuWYi1A2zfcgCKEqRC_PvKkpcH=f=ynDnXA@mail.gmail.com>
+From: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>
+Date: Thu, 14 Dec 2017 20:21:07 -0300
+Message-ID: <CAAdtpL5izShurORQ1vpRQQxT6L2QGCwjeQqRhzb+_DYoGrrL3g@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH 03/14] sdhci: use the ldst_le_dma() API
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,93 +34,104 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Laurent Vivier <lvivier@redhat.com>
-Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org, Suraj Jitindar Singh <sjitindarsingh@gmail.com>
+To: Alistair Francis <alistair.francis@xilinx.com>, Peter Maydell <peter.maydell@linaro.org>
+Cc: "Edgar E . Iglesias" <edgar.iglesias@xilinx.com>, Prasad J Pandit <pjp@fedoraproject.org>, Andrew Baumann <Andrew.Baumann@microsoft.com>, Andrey Smirnov <andrew.smirnov@gmail.com>, Andrey Yurovsky <yurovsky@gmail.com>, Sai Pavan Boddu <saipava@xilinx.com>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>
+
+On Thu, Dec 14, 2017 at 2:23 PM, Alistair Francis
+<alistair.francis@xilinx.com> wrote:
+> On Wed, Dec 13, 2017 at 11:58 AM, Philippe Mathieu-Daud=C3=A9
+> <f4bug@amsat.org> wrote:
+>> This makes the code slightly safer, also easier to review.
+>>
+>> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
+>> ---
+>>  hw/sd/sdhci.c | 23 +++++++----------------
+>>  1 file changed, 7 insertions(+), 16 deletions(-)
+>>
+>> diff --git a/hw/sd/sdhci.c b/hw/sd/sdhci.c
+>> index 312b167bfa..e39623baba 100644
+>> --- a/hw/sd/sdhci.c
+>> +++ b/hw/sd/sdhci.c
+>> @@ -603,14 +603,12 @@ typedef struct ADMADescr {
+>>
+>>  static void get_adma_description(SDHCIState *s, ADMADescr *dscr)
+>>  {
+>> -    uint32_t adma1 =3D 0;
+>> -    uint64_t adma2 =3D 0;
+>> +    uint32_t adma1;
+>> +    uint64_t adma2;
+>>      hwaddr entry_addr =3D (hwaddr)s->admasysaddr;
+>>      switch (SDHC_DMA_TYPE(s->hostctl)) {
+>>      case SDHC_CTRL_ADMA2_32:
+>> -        dma_memory_read(&address_space_memory, entry_addr, (uint8_t *)&=
+adma2,
+>> -                        sizeof(adma2));
+>> -        adma2 =3D le64_to_cpu(adma2);
+>> +        adma2 =3D ldq_le_dma(&address_space_memory, entry_addr);
+>>          /* The spec does not specify endianness of descriptor table.
+>>           * We currently assume that it is LE.
+>>           */
+>> @@ -620,9 +618,7 @@ static void get_adma_description(SDHCIState *s, ADMA=
+Descr *dscr)
+>>          dscr->incr =3D 8;
+>>          break;
+>>      case SDHC_CTRL_ADMA1_32:
+>> -        dma_memory_read(&address_space_memory, entry_addr, (uint8_t *)&=
+adma1,
+>> -                        sizeof(adma1));
+>> -        adma1 =3D le32_to_cpu(adma1);
+>> +        adma1 =3D ldl_le_dma(&address_space_memory, entry_addr);
+>>          dscr->addr =3D (hwaddr)(adma1 & 0xFFFFF000);
+>>          dscr->attr =3D (uint8_t)extract32(adma1, 0, 7);
+>>          dscr->incr =3D 4;
+>> @@ -633,14 +629,9 @@ static void get_adma_description(SDHCIState *s, ADM=
+ADescr *dscr)
+>>          }
+>>          break;
+>>      case SDHC_CTRL_ADMA2_64:
+>> -        dma_memory_read(&address_space_memory, entry_addr,
+>> -                        (uint8_t *)(&dscr->attr), 1);
+>> -        dma_memory_read(&address_space_memory, entry_addr + 2,
+>> -                        (uint8_t *)(&dscr->length), 2);
+>> -        dscr->length =3D le16_to_cpu(dscr->length);
+>> -        dma_memory_read(&address_space_memory, entry_addr + 4,
+>> -                        (uint8_t *)(&dscr->addr), 8);
+>> -        dscr->attr =3D le64_to_cpu(dscr->attr);
+>
+>> +        dscr->attr =3D ldub_dma(&address_space_memory, entry_addr);
+>> +        dscr->length =3D lduw_le_dma(&address_space_memory, entry_addr =
++ 2);
+>> +        dscr->attr =3D ldq_le_dma(&address_space_memory, entry_addr + 4=
+);
+>
+> Why this is being overwritten?
+
+Do you mean 'rewritten'?
+
+> It looks like you have dropped an addr as well.
+
+Which addr? The diff is a bit compressed, if you separate it is more obviou=
+s:
+
+ -        dma_memory_read(&address_space_memory, entry_addr,
+ -                        (uint8_t *)(&dscr->attr), 1);
+ +        dscr->attr =3D ldub_dma(&address_space_memory, entry_addr);
 
 
---1ar0NSVY9gjTGNA2
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+ -        dma_memory_read(&address_space_memory, entry_addr + 2,
+ -                        (uint8_t *)(&dscr->length), 2);
+ -        dscr->length =3D le16_to_cpu(dscr->length);
+ +        dscr->length =3D lduw_le_dma(&address_space_memory, entry_addr + =
+2);
 
-On Thu, Dec 14, 2017 at 07:09:48PM +0100, Laurent Vivier wrote:
-> if KVM is enabled and KVM capabilities MMU radix is available,
-> the partition table entry (patb_entry) for the radix mode is
-> initialized by default in ppc_spapr_reset().
->=20
-> It's a problem if we want to migrate the guest to a POWER8 host
-> while the kernel is not started to set the value to the one
-> expected for a POWER8 CPU.
->=20
-> The "-machine max-cpu-compat=3Dpower8" should allow to migrate
-> a POWER9 KVM host to a POWER8 KVM host, but because patb_entry
-> is set, the destination QEMU tries to enable radix mode on the
-> POWER8 host. This fails and cancels the migration:
->=20
->     Process table config unsupported by the host
->     error while loading state for instance 0x0 of device 'spapr'
->     load of migration failed: Invalid argument
->=20
-> This patch doesn't set the PATB entry if the user provides
-> a CPU compatibility mode that doesn't support radix mode.
->=20
-> Signed-off-by: Laurent Vivier <lvivier@redhat.com>
 
-Applied to ppc-for-2.12.
+ -        dma_memory_read(&address_space_memory, entry_addr + 4,
+ -                        (uint8_t *)(&dscr->addr), 8);
+ -        dscr->attr =3D le64_to_cpu(dscr->attr);
+ +        dscr->attr =3D ldq_le_dma(&address_space_memory, entry_addr + 4);
 
-> ---
->  hw/ppc/spapr.c | 6 ++++--
->  1 file changed, 4 insertions(+), 2 deletions(-)
->=20
-> diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-> index 1ac7eb0f8c..66d0ed5256 100644
-> --- a/hw/ppc/spapr.c
-> +++ b/hw/ppc/spapr.c
-> @@ -1440,7 +1440,10 @@ static void ppc_spapr_reset(void)
->      /* Check for unknown sysbus devices */
->      foreach_dynamic_sysbus_device(find_unknown_sysbus_device, NULL);
-> =20
-> -    if (kvm_enabled() && kvmppc_has_cap_mmu_radix()) {
-> +    first_ppc_cpu =3D POWERPC_CPU(first_cpu);
-> +    if (kvm_enabled() && kvmppc_has_cap_mmu_radix() &&
-> +        ppc_check_compat(first_ppc_cpu, CPU_POWERPC_LOGICAL_3_00, 0,
-> +                         spapr->max_compat_pvr)) {
->          /* If using KVM with radix mode available, VCPUs can be started
->           * without a HPT because KVM will start them in radix mode.
->           * Set the GR bit in PATB so that we know there is no HPT. */
-> @@ -1499,7 +1502,6 @@ static void ppc_spapr_reset(void)
->      g_free(fdt);
-> =20
->      /* Set up the entry state */
-> -    first_ppc_cpu =3D POWERPC_CPU(first_cpu);
->      first_ppc_cpu->env.gpr[3] =3D fdt_addr;
->      first_ppc_cpu->env.gpr[5] =3D 0;
->      first_cpu->halted =3D 0;
+The API is detailled in this file: docs/devel/loads-stores.rst
 
---=20
-David Gibson			| I'll have my music baroque, and my code
-david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
-				| _way_ _around_!
-http://www.ozlabs.org/~dgibson
-
---1ar0NSVY9gjTGNA2
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlozAD4ACgkQbDjKyiDZ
-s5JfrRAAmk/xXCZWhrtCJGCoC7gbu76m7taeXTrf6+sBy06uRvMNrs+m+GIoV9Wb
-VX3ZExO3rw3JQK5EdbDoHFaL4woNoc986ZRDzaHiAkgnMvWgx1AxGeprLxJ8eGc8
-GbNZt8ANNO+3I8H8mKIcSXGx+cvgPkyQgV+2Ozyl0OuNijb69l0ZrQxmZuioC00e
-k78Vchha6XfEDCbDoqhsJoshV/nymZIeFTRrRPrOmqMfJkpvBUJDT/f9yZyDjCVW
-VVHXRK+9umPLgDkfOB6bbD3g8l99i3nl8+2qmis7xORISAFniOm0Q+/XI9KoydRo
-Xpr+BvBJ+I1LwFGBI2rGk8Xwu5079e2sSav8UsOpks5FiU898HfkLaUCKWlxeR0q
-zgz2G0lsHR5TgUUPW6EE6WBw1mW+/z/P82cq1+vdBk300tjHgSEh/aBnnEMzJJ7L
-YO1/IT8B7UcoURqnL0oAStsXJ6AVBnIB5ylr+eQUED7e7K8RXAJ1AuxM1VLpOQgD
-hHjSaphvNtNZiSkKXdtAQL9VRu/GbhlibiRO3GTIO342xyikr02OVjlzrAU7Gp4s
-kon/49oljHmYYccCJqVhbTi903be6HyZAAfuVcTy/jW1w0SWWpXkQIPwSCnpkvNs
-FZDnDdw2EemFlpucsyfDOhHI6xmH7ShU1+FqQ1j2b18WOnYwVEg=
-=Ecqr
------END PGP SIGNATURE-----
-
---1ar0NSVY9gjTGNA2--
+I decided to rewrite this code with this API because it looks easier
+to understand (maybe once you read the API doc), so easier to review
+:)
