@@ -1,17 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55141)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55375)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <andrew.smirnov@gmail.com>) id 1ePUt6-0001PC-IH
-	for qemu-devel@nongnu.org; Thu, 14 Dec 2017 09:53:30 -0500
+	(envelope-from <andrew.smirnov@gmail.com>) id 1ePUtH-0001Zb-Dl
+	for qemu-devel@nongnu.org; Thu, 14 Dec 2017 09:53:41 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <andrew.smirnov@gmail.com>) id 1ePUt5-0000Oi-Fa
-	for qemu-devel@nongnu.org; Thu, 14 Dec 2017 09:53:28 -0500
+	(envelope-from <andrew.smirnov@gmail.com>) id 1ePUtB-0000ZU-IE
+	for qemu-devel@nongnu.org; Thu, 14 Dec 2017 09:53:39 -0500
 From: Andrey Smirnov <andrew.smirnov@gmail.com>
-Date: Thu, 14 Dec 2017 06:52:40 -0800
-Message-Id: <20171214145255.31545-1-andrew.smirnov@gmail.com>
+Date: Thu, 14 Dec 2017 06:52:47 -0800
+Message-Id: <20171214145255.31545-8-andrew.smirnov@gmail.com>
+In-Reply-To: <20171214145255.31545-1-andrew.smirnov@gmail.com>
+References: <20171214145255.31545-1-andrew.smirnov@gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v2 00/15] i.MX FEC and SD changes
+Subject: [Qemu-devel] [PATCH v2 07/15] imx_fec: Emulate SHIFT16 in ENETx_RACC
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,75 +25,82 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-arm@nongnu.org
 Cc: Andrey Smirnov <andrew.smirnov@gmail.com>, Peter Maydell <peter.maydell@linaro.org>, Jason Wang <jasowang@redhat.com>, =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, qemu-devel@nongnu.org, yurovsky@gmail.com
 
-Hi everyone,
+Needed to support latest Linux kernel driver which relies on that
+functionality.
 
-This patchset is v2 of a spin-off from original i.MX7 support submission
-found here [1], containing all of the patchest that are more or less
-agreed upon and are ready (hopefully!) for inclusion.
+Cc: Peter Maydell <peter.maydell@linaro.org>
+Cc: Jason Wang <jasowang@redhat.com>
+Cc: Philippe Mathieu-Daudé <f4bug@amsat.org>
+Cc: qemu-devel@nongnu.org
+Cc: qemu-arm@nongnu.org
+Cc: yurovsky@gmail.com
+Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
+Signed-off-by: Andrey Smirnov <andrew.smirnov@gmail.com>
+---
+ hw/net/imx_fec.c         | 23 +++++++++++++++++++++++
+ include/hw/net/imx_fec.h |  2 ++
+ 2 files changed, 25 insertions(+)
 
-Changes since [v1]:
-
-	- Collected Reviewed-by tags from Peter
-
-	- Implemented forgotten feedback from Peter for
-	  "sdhci: Add i.MX specific subtype of SDHCI"
-
-	- "imx_fec: Move Tx frame buffer away from the stack" sent out
-          properly (fingers crossed)
-
-	- Added trivial patch to swith i.MX6 over to TYPE_IMX_USDHC
-
-	- Added "sd: Check for READ_MULTIPLE_BLOCK size limit
-          violation first" to address a small problem I was seeing
-          when tesiting SD against latest vanilla kernel
-
-Changes since [1]:
-
-	- Rx buffer in FEC was moved from stack to heap to allow
-          worry-free expansion to 16K limit.
-
- 	- Added more comments explaining rather convoluted bit-moving
-          in eSHDC emuation code
-
-	- Triple Tx ring DMA "VMState" code was changed to follow
-          Peter's recommendations (avoiding the need to incrememnt the
-          version_id)
-
-	- FSL_IMX25_FEC_SIZE is used as a size of FEC's register file
-
-	- Removed leftover code from "imx_fec: Change queue flushing
-          heuristics"
-
-[v1] https://lists.gnu.org/archive/html/qemu-arm/2017-12/msg00085.html
-[1]  https://lists.gnu.org/archive/html/qemu-arm/2017-11/msg00045.html
-
-
-Andrey Smirnov (15):
-  imx_fec: Do not link to netdev
-  imx_fec: Refactor imx_eth_enable_rx()
-  imx_fec: Change queue flushing heuristics
-  imx_fec: Move Tx frame buffer away from the stack
-  imx_fec: Use ENET_FTRL to determine truncation length
-  imx_fec: Use MIN instead of explicit ternary operator
-  imx_fec: Emulate SHIFT16 in ENETx_RACC
-  imx_fec: Add support for multiple Tx DMA rings
-  imx_fec: Use correct length for packet size
-  imx_fec: Fix a typo in imx_enet_receive()
-  imx_fec: Reserve full FSL_IMX25_FEC_SIZE page for the register file
-  sdhci: Add i.MX specific subtype of SDHCI
-  hw: i.MX: Convert i.MX6 to use TYPE_IMX_USDHC
-  sd: Check for READ_MULTIPLE_BLOCK size limit violation first
-  sdhci: Implement write method of ACMD12ERRSTS register
-
- hw/arm/fsl-imx6.c          |   3 +-
- hw/net/imx_fec.c           | 210 ++++++++++++++++++++++++++++++++---------
- hw/sd/sd.c                 |  16 ++--
- hw/sd/sdhci-internal.h     |  19 ++++
- hw/sd/sdhci.c              | 231 ++++++++++++++++++++++++++++++++++++++++++++-
- include/hw/arm/fsl-imx25.h |   1 -
- include/hw/net/imx_fec.h   |  27 +++++-
- include/hw/sd/sdhci.h      |  14 +++
- 8 files changed, 461 insertions(+), 60 deletions(-)
-
+diff --git a/hw/net/imx_fec.c b/hw/net/imx_fec.c
+index 6feda18742..825c879a28 100644
+--- a/hw/net/imx_fec.c
++++ b/hw/net/imx_fec.c
+@@ -1037,6 +1037,7 @@ static ssize_t imx_enet_receive(NetClientState *nc, const uint8_t *buf,
+     uint8_t *crc_ptr;
+     unsigned int buf_len;
+     size_t size = len;
++    bool shift16 = s->regs[ENET_RACC] & ENET_RACC_SHIFT16;
+ 
+     FEC_PRINTF("len %d\n", (int)size);
+ 
+@@ -1051,6 +1052,10 @@ static ssize_t imx_enet_receive(NetClientState *nc, const uint8_t *buf,
+     crc = cpu_to_be32(crc32(~0, buf, size));
+     crc_ptr = (uint8_t *) &crc;
+ 
++    if (shift16) {
++        size += 2;
++    }
++
+     /* Huge frames are truncted.  */
+     if (size > s->regs[ENET_FTRL]) {
+         size = s->regs[ENET_FTRL];
+@@ -1087,6 +1092,24 @@ static ssize_t imx_enet_receive(NetClientState *nc, const uint8_t *buf,
+             buf_len += size - 4;
+         }
+         buf_addr = bd.data;
++
++        if (shift16) {
++            /*
++             * If SHIFT16 bit of ENETx_RACC register is set we need to
++             * align the payload to 4-byte boundary.
++             */
++            const uint8_t zeros[2] = { 0 };
++
++            dma_memory_write(&address_space_memory, buf_addr,
++                             zeros, sizeof(zeros));
++
++            buf_addr += sizeof(zeros);
++            buf_len  -= sizeof(zeros);
++
++            /* We only do this once per Ethernet frame */
++            shift16 = false;
++        }
++
+         dma_memory_write(&address_space_memory, buf_addr, buf, buf_len);
+         buf += buf_len;
+         if (size < 4) {
+diff --git a/include/hw/net/imx_fec.h b/include/hw/net/imx_fec.h
+index a390d704a6..af0840a0fa 100644
+--- a/include/hw/net/imx_fec.h
++++ b/include/hw/net/imx_fec.h
+@@ -170,6 +170,8 @@
+ #define ENET_TWFR_TFWR_LENGTH  (6)
+ #define ENET_TWFR_STRFWD       (1 << 8)
+ 
++#define ENET_RACC_SHIFT16      BIT(7)
++
+ /* Buffer Descriptor.  */
+ typedef struct {
+     uint16_t length;
 -- 
 2.14.3
