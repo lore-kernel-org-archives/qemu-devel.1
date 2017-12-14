@@ -1,26 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46141)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47596)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1ePI6y-000889-3K
-	for qemu-devel@nongnu.org; Wed, 13 Dec 2017 20:14:57 -0500
+	(envelope-from <gengdongjiu@huawei.com>) id 1ePIGp-00017G-SA
+	for qemu-devel@nongnu.org; Wed, 13 Dec 2017 20:25:08 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1ePI6u-0006bh-Uw
-	for qemu-devel@nongnu.org; Wed, 13 Dec 2017 20:14:56 -0500
-Resent-Message-Id: <E1ePI6u-0006bh-Uw@eggs.gnu.org>
-Received: from sender-of-o52.zoho.com ([135.84.80.217]:21347)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
-	id 1ePI6u-0006b1-Mm
-	for qemu-devel@nongnu.org; Wed, 13 Dec 2017 20:14:52 -0500
-In-Reply-To: <20171212172208.13588-1-marcandre.lureau@redhat.com>
-Reply-To: <qemu-devel@nongnu.org>
-Message-ID: <151309960454.30.17116821935601659232@449822a21bf0>
+	(envelope-from <gengdongjiu@huawei.com>) id 1ePIGp-0004ll-3C
+	for qemu-devel@nongnu.org; Wed, 13 Dec 2017 20:25:07 -0500
+References: <1511807966-23936-1-git-send-email-gengdongjiu@huawei.com>
+	<470c9df5-f2e8-974b-b37f-eff84a6f3d71@huawei.com>
+	<18906953-f464-d9f4-23b4-fd7118d45e2f@huawei.com>
+	<20171211143220.7a359462@redhat.com>
+	<e36ec13c-e597-caae-4ae8-81b320e8f461@huawei.com>
+	<CAFEAcA-JmbR3RUMWrH2j5OrSitczu+KskE-NJyhsWrHbJCH_ZA@mail.gmail.com>
+From: gengdongjiu <gengdongjiu@huawei.com>
+Message-ID: <500fe8d6-b154-30db-d14b-781f32875dd6@huawei.com>
+Date: Thu, 14 Dec 2017 09:24:36 +0800
 MIME-Version: 1.0
+In-Reply-To: <CAFEAcA-JmbR3RUMWrH2j5OrSitczu+KskE-NJyhsWrHbJCH_ZA@mail.gmail.com>
 Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Tue, 12 Dec 2017 09:26:46 -0800 (PST)
-Subject: Re: [Qemu-devel] [PATCH v2] dump-guest-memory.py: fix "You can't do
- that without a process to debug"
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v13 00/12] Add ARMv8 RAS virtualization
+ support in QEMU
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,41 +29,25 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: marcandre.lureau@redhat.com
-Cc: famz@redhat.com, qemu-devel@nongnu.org, crosa@redhat.com, lersek@redhat.com, ehabkost@redhat.com, mst@redhat.com
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: Eduardo Habkost <ehabkost@redhat.com>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>, "Michael S. Tsirkin" <mst@redhat.com>, Marc Zyngier <marc.zyngier@arm.com>, Linuxarm <linuxarm@huawei.com>, QEMU Developers <qemu-devel@nongnu.org>, xuwei5@hisilicon.com, Paolo Bonzini <pbonzini@redhat.com>, qemu-arm <qemu-arm@nongnu.org>, James Morse <james.morse@arm.com>, Shannon Zhao <zhaoshenglong@huawei.com>, Igor Mammedov <imammedo@redhat.com>, Laszlo Ersek <lersek@redhat.com>, Christoffer Dall <christoffer.dall@linaro.org>, Richard Henderson <rth@twiddle.net>
 
-SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
-LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKTWVzc2FnZS1pZDogMjAx
-NzEyMTIxNzIyMDguMTM1ODgtMS1tYXJjYW5kcmUubHVyZWF1QHJlZGhhdC5jb20KU3ViamVjdDog
-W1FlbXUtZGV2ZWxdIFtQQVRDSCB2Ml0gZHVtcC1ndWVzdC1tZW1vcnkucHk6IGZpeCAiWW91IGNh
-bid0IGRvIHRoYXQgd2l0aG91dCBhIHByb2Nlc3MgdG8gZGVidWciClR5cGU6IHNlcmllcwoKPT09
-IFRFU1QgU0NSSVBUIEJFR0lOID09PQojIS9iaW4vYmFzaAoKQkFTRT1iYXNlCm49MQp0b3RhbD0k
-KGdpdCBsb2cgLS1vbmVsaW5lICRCQVNFLi4gfCB3YyAtbCkKZmFpbGVkPTAKCmdpdCBjb25maWcg
-LS1sb2NhbCBkaWZmLnJlbmFtZWxpbWl0IDAKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVuYW1l
-cyBUcnVlCgpjb21taXRzPSIkKGdpdCBsb2cgLS1mb3JtYXQ9JUggLS1yZXZlcnNlICRCQVNFLi4p
-Igpmb3IgYyBpbiAkY29tbWl0czsgZG8KICAgIGVjaG8gIkNoZWNraW5nIFBBVENIICRuLyR0b3Rh
-bDogJChnaXQgbG9nIC1uIDEgLS1mb3JtYXQ9JXMgJGMpLi4uIgogICAgaWYgISBnaXQgc2hvdyAk
-YyAtLWZvcm1hdD1lbWFpbCB8IC4vc2NyaXB0cy9jaGVja3BhdGNoLnBsIC0tbWFpbGJhY2sgLTsg
-dGhlbgogICAgICAgIGZhaWxlZD0xCiAgICAgICAgZWNobwogICAgZmkKICAgIG49JCgobisxKSkK
-ZG9uZQoKZXhpdCAkZmFpbGVkCj09PSBURVNUIFNDUklQVCBFTkQgPT09CgpVcGRhdGluZyAzYzhj
-ZjVhOWMyMWZmODc4MjE2NGQxZGVmN2Y0NGJkODg4NzEzMzg0CkZyb20gaHR0cHM6Ly9naXRodWIu
-Y29tL3BhdGNoZXctcHJvamVjdC9xZW11CiB0IFt0YWcgdXBkYXRlXSAgICAgICAgICAgIHBhdGNo
-ZXcvMjAxNzEyMDcyMDMwMzYuMTQ5OTMtMS1lYmxha2VAcmVkaGF0LmNvbSAtPiBwYXRjaGV3LzIw
-MTcxMjA3MjAzMDM2LjE0OTkzLTEtZWJsYWtlQHJlZGhhdC5jb20KICogW25ldyB0YWddICAgICAg
-ICAgICAgICAgcGF0Y2hldy8yMDE3MTIxMjE3MjIwOC4xMzU4OC0xLW1hcmNhbmRyZS5sdXJlYXVA
-cmVkaGF0LmNvbSAtPiBwYXRjaGV3LzIwMTcxMjEyMTcyMjA4LjEzNTg4LTEtbWFyY2FuZHJlLmx1
-cmVhdUByZWRoYXQuY29tClN3aXRjaGVkIHRvIGEgbmV3IGJyYW5jaCAndGVzdCcKN2MwNTQ0YjFh
-NyBkdW1wLWd1ZXN0LW1lbW9yeS5weTogZml4ICJZb3UgY2FuJ3QgZG8gdGhhdCB3aXRob3V0IGEg
-cHJvY2VzcyB0byBkZWJ1ZyIKCj09PSBPVVRQVVQgQkVHSU4gPT09CkNoZWNraW5nIFBBVENIIDEv
-MTogZHVtcC1ndWVzdC1tZW1vcnkucHk6IGZpeCAiWW91IGNhbid0IGRvIHRoYXQgd2l0aG91dCBh
-IHByb2Nlc3MgdG8gZGVidWciLi4uCkVSUk9SOiBVc2Ugb2Ygdm9sYXRpbGUgaXMgdXN1YWxseSB3
-cm9uZzogc2VlIERvY3VtZW50YXRpb24vdm9sYXRpbGUtY29uc2lkZXJlZC1oYXJtZnVsLnR4dAoj
-NDY6IEZJTEU6IGh3L21pc2Mvdm1jb3JlaW5mby5jOjM5OgorICAgIHN0YXRpYyBWTUNvcmVJbmZv
-U3RhdGUgKiB2b2xhdGlsZSB2bWNvcmVpbmZvX3N0YXRlIEdfR05VQ19VTlVTRUQ7Cgp0b3RhbDog
-MSBlcnJvcnMsIDAgd2FybmluZ3MsIDI0IGxpbmVzIGNoZWNrZWQKCllvdXIgcGF0Y2ggaGFzIHN0
-eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVycm9ycwphcmUg
-ZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQ
-QVRDSCBpbiBNQUlOVEFJTkVSUy4KCj09PSBPVVRQVVQgRU5EID09PQoKVGVzdCBjb21tYW5kIGV4
-aXRlZCB3aXRoIGNvZGU6IDEKCgotLS0KRW1haWwgZ2VuZXJhdGVkIGF1dG9tYXRpY2FsbHkgYnkg
-UGF0Y2hldyBbaHR0cDovL3BhdGNoZXcub3JnL10uClBsZWFzZSBzZW5kIHlvdXIgZmVlZGJhY2sg
-dG8gcGF0Y2hldy1kZXZlbEBmcmVlbGlzdHMub3Jn
+Hi peter,
+
+On 2017/12/14 2:12, Peter Maydell wrote:
+>> [v13,11/12] hw/arm/virt: Add RAS platform version for migration
+>> [v13,12/12] target-arm: kvm64: handle SIGBUS signal from kernel or KVM
+> Hi; unfortunately I only have one more working day this year, which
+> isn't really enough to get up to speed sufficiently with RAS to
+> review this patchset, so the earliest I'm likely to get to it is
+> the week beginning 9th Jan.
+Ok, thanks.
+
+> 
+> Hopefully somebody who understands RAS better than me will
+> be able to review it before then.
+I also hope somebody can review it before then.
+
+> 
+> thanks
+> -- PMM
