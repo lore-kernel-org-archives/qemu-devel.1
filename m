@@ -1,31 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41678)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43860)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1ePcoQ-0006Xi-Sf
-	for qemu-devel@nongnu.org; Thu, 14 Dec 2017 18:21:12 -0500
+	id 1ePcso-0007rs-Dl
+	for qemu-devel@nongnu.org; Thu, 14 Dec 2017 18:25:43 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1ePcoP-00038M-MW
-	for qemu-devel@nongnu.org; Thu, 14 Dec 2017 18:21:10 -0500
-Received: from mail-it0-x244.google.com ([2607:f8b0:4001:c0b::244]:39942)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1ePcoP-00037Y-Fe
-	for qemu-devel@nongnu.org; Thu, 14 Dec 2017 18:21:09 -0500
-Received: by mail-it0-x244.google.com with SMTP id f190so14910243ita.5
-	for <qemu-devel@nongnu.org>; Thu, 14 Dec 2017 15:21:09 -0800 (PST)
+	id 1ePcsn-0007X6-L5
+	for qemu-devel@nongnu.org; Thu, 14 Dec 2017 18:25:42 -0500
 MIME-Version: 1.0
 Sender: philippe.mathieu.daude@gmail.com
-In-Reply-To: <CAKmqyKMSwraSQ1XBuWYi1A2zfcgCKEqRC_PvKkpcH=f=ynDnXA@mail.gmail.com>
+In-Reply-To: <CAKmqyKPvAL3+LAqMBtUOc=0igkSwg4Jmf+Q0ySL7C+oech7AMw@mail.gmail.com>
 References: <20171213195852.30439-1-f4bug@amsat.org>
-	<20171213195852.30439-4-f4bug@amsat.org>
-	<CAKmqyKMSwraSQ1XBuWYi1A2zfcgCKEqRC_PvKkpcH=f=ynDnXA@mail.gmail.com>
+	<20171213195852.30439-5-f4bug@amsat.org>
+	<CAKmqyKPvAL3+LAqMBtUOc=0igkSwg4Jmf+Q0ySL7C+oech7AMw@mail.gmail.com>
 From: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>
-Date: Thu, 14 Dec 2017 20:21:07 -0300
-Message-ID: <CAAdtpL5izShurORQ1vpRQQxT6L2QGCwjeQqRhzb+_DYoGrrL3g@mail.gmail.com>
+Date: Thu, 14 Dec 2017 20:25:38 -0300
+Message-ID: <CAAdtpL6pT0GD+xkV5P+-J=SGr8_kTrNVBxc207g4mRuojrGe3w@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 03/14] sdhci: use the ldst_le_dma() API
+Subject: Re: [Qemu-devel] [PATCH 04/14] sdhci: use deposit64()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,104 +26,40 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alistair Francis <alistair.francis@xilinx.com>, Peter Maydell <peter.maydell@linaro.org>
-Cc: "Edgar E . Iglesias" <edgar.iglesias@xilinx.com>, Prasad J Pandit <pjp@fedoraproject.org>, Andrew Baumann <Andrew.Baumann@microsoft.com>, Andrey Smirnov <andrew.smirnov@gmail.com>, Andrey Yurovsky <yurovsky@gmail.com>, Sai Pavan Boddu <saipava@xilinx.com>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>
+To: Alistair Francis <alistair.francis@xilinx.com>
+Cc: "Edgar E . Iglesias" <edgar.iglesias@xilinx.com>, Prasad J Pandit <pjp@fedoraproject.org>, Peter Maydell <peter.maydell@linaro.org>, Andrew Baumann <Andrew.Baumann@microsoft.com>, Andrey Smirnov <andrew.smirnov@gmail.com>, Andrey Yurovsky <yurovsky@gmail.com>, QEMU Trivial <qemu-trivial@nongnu.org>, Sai Pavan Boddu <saipava@xilinx.com>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>
 
-On Thu, Dec 14, 2017 at 2:23 PM, Alistair Francis
-<alistair.francis@xilinx.com> wrote:
-> On Wed, Dec 13, 2017 at 11:58 AM, Philippe Mathieu-Daud=C3=A9
-> <f4bug@amsat.org> wrote:
->> This makes the code slightly safer, also easier to review.
->>
->> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
->> ---
->>  hw/sd/sdhci.c | 23 +++++++----------------
->>  1 file changed, 7 insertions(+), 16 deletions(-)
->>
->> diff --git a/hw/sd/sdhci.c b/hw/sd/sdhci.c
->> index 312b167bfa..e39623baba 100644
->> --- a/hw/sd/sdhci.c
->> +++ b/hw/sd/sdhci.c
->> @@ -603,14 +603,12 @@ typedef struct ADMADescr {
->>
->>  static void get_adma_description(SDHCIState *s, ADMADescr *dscr)
->>  {
->> -    uint32_t adma1 =3D 0;
->> -    uint64_t adma2 =3D 0;
->> +    uint32_t adma1;
->> +    uint64_t adma2;
->>      hwaddr entry_addr =3D (hwaddr)s->admasysaddr;
->>      switch (SDHC_DMA_TYPE(s->hostctl)) {
->>      case SDHC_CTRL_ADMA2_32:
->> -        dma_memory_read(&address_space_memory, entry_addr, (uint8_t *)&=
-adma2,
->> -                        sizeof(adma2));
->> -        adma2 =3D le64_to_cpu(adma2);
->> +        adma2 =3D ldq_le_dma(&address_space_memory, entry_addr);
->>          /* The spec does not specify endianness of descriptor table.
->>           * We currently assume that it is LE.
->>           */
->> @@ -620,9 +618,7 @@ static void get_adma_description(SDHCIState *s, ADMA=
-Descr *dscr)
->>          dscr->incr =3D 8;
+>> @@ -1123,12 +1123,10 @@ sdhci_write(void *opaque, hwaddr offset, uint64_t val, unsigned size)
+>>          MASKED_WRITE(s->admaerr, mask, value);
 >>          break;
->>      case SDHC_CTRL_ADMA1_32:
->> -        dma_memory_read(&address_space_memory, entry_addr, (uint8_t *)&=
-adma1,
->> -                        sizeof(adma1));
->> -        adma1 =3D le32_to_cpu(adma1);
->> +        adma1 =3D ldl_le_dma(&address_space_memory, entry_addr);
->>          dscr->addr =3D (hwaddr)(adma1 & 0xFFFFF000);
->>          dscr->attr =3D (uint8_t)extract32(adma1, 0, 7);
->>          dscr->incr =3D 4;
->> @@ -633,14 +629,9 @@ static void get_adma_description(SDHCIState *s, ADM=
-ADescr *dscr)
->>          }
+>>      case SDHC_ADMASYSADDR:
+>> -        s->admasysaddr = (s->admasysaddr & (0xFFFFFFFF00000000ULL |
+>> -                (uint64_t)mask)) | (uint64_t)value;
+>> +        s->admasysaddr = deposit64(s->admasysaddr, 32, 0, value);
+>
+> This doesn't look right.
+>
+> Originally we were masking admasysaddr with (mask and
+> 0xFFFFFFFF00000000). Then ORing in the value.
+>
+> Now we are depositing value into a bit field that starts at bit 32 and
+> has 0 length. I don't see how value will be deposited at all with a 0
+> length.
+
+good catch :) I'll respin with:
+
+    case SDHC_ADMASYSADDR:
+        s->admasysaddr = deposit64(s->admasysaddr, 0, 32, value)
+        break;
+    case SDHC_ADMASYSADDR + 4:
+        s->admasysaddr = deposit64(s->admasysaddr, 32, 32, value);
+        break;
+
 >>          break;
->>      case SDHC_CTRL_ADMA2_64:
->> -        dma_memory_read(&address_space_memory, entry_addr,
->> -                        (uint8_t *)(&dscr->attr), 1);
->> -        dma_memory_read(&address_space_memory, entry_addr + 2,
->> -                        (uint8_t *)(&dscr->length), 2);
->> -        dscr->length =3D le16_to_cpu(dscr->length);
->> -        dma_memory_read(&address_space_memory, entry_addr + 4,
->> -                        (uint8_t *)(&dscr->addr), 8);
->> -        dscr->attr =3D le64_to_cpu(dscr->attr);
->
->> +        dscr->attr =3D ldub_dma(&address_space_memory, entry_addr);
->> +        dscr->length =3D lduw_le_dma(&address_space_memory, entry_addr =
-+ 2);
->> +        dscr->attr =3D ldq_le_dma(&address_space_memory, entry_addr + 4=
-);
->
-> Why this is being overwritten?
-
-Do you mean 'rewritten'?
-
-> It looks like you have dropped an addr as well.
-
-Which addr? The diff is a bit compressed, if you separate it is more obviou=
-s:
-
- -        dma_memory_read(&address_space_memory, entry_addr,
- -                        (uint8_t *)(&dscr->attr), 1);
- +        dscr->attr =3D ldub_dma(&address_space_memory, entry_addr);
-
-
- -        dma_memory_read(&address_space_memory, entry_addr + 2,
- -                        (uint8_t *)(&dscr->length), 2);
- -        dscr->length =3D le16_to_cpu(dscr->length);
- +        dscr->length =3D lduw_le_dma(&address_space_memory, entry_addr + =
-2);
-
-
- -        dma_memory_read(&address_space_memory, entry_addr + 4,
- -                        (uint8_t *)(&dscr->addr), 8);
- -        dscr->attr =3D le64_to_cpu(dscr->attr);
- +        dscr->attr =3D ldq_le_dma(&address_space_memory, entry_addr + 4);
-
-The API is detailled in this file: docs/devel/loads-stores.rst
-
-I decided to rewrite this code with this API because it looks easier
-to understand (maybe once you read the API doc), so easier to review
-:)
+>>      case SDHC_ADMASYSADDR + 4:
+>> -        s->admasysaddr = (s->admasysaddr & (0x00000000FFFFFFFFULL |
+>> -                ((uint64_t)mask << 32))) | ((uint64_t)value << 32);
+>> +        s->admasysaddr = deposit64(s->admasysaddr, 0, 32, value);
+>>          break;
+>>      case SDHC_FEAER:
+>>          s->acmd12errsts |= value;
