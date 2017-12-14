@@ -1,34 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40332)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42951)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1ePT2H-0007hL-1a
-	for qemu-devel@nongnu.org; Thu, 14 Dec 2017 07:54:50 -0500
+	(envelope-from <ard.biesheuvel@linaro.org>) id 1ePT6q-0000C2-Eb
+	for qemu-devel@nongnu.org; Thu, 14 Dec 2017 07:59:33 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1ePT2B-0000F7-Nt
-	for qemu-devel@nongnu.org; Thu, 14 Dec 2017 07:54:49 -0500
-Received: from indium.canonical.com ([91.189.90.7]:52656)
+	(envelope-from <ard.biesheuvel@linaro.org>) id 1ePT6p-00018g-Jg
+	for qemu-devel@nongnu.org; Thu, 14 Dec 2017 07:59:32 -0500
+Received: from mail-it0-x22a.google.com ([2607:f8b0:4001:c0b::22a]:46799)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1ePT2B-0000Cb-HR
-	for qemu-devel@nongnu.org; Thu, 14 Dec 2017 07:54:43 -0500
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1ePT2A-0003Ke-6Q
-	for <qemu-devel@nongnu.org>; Thu, 14 Dec 2017 12:54:42 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 1A1302E80CB
-	for <qemu-devel@nongnu.org>; Thu, 14 Dec 2017 12:54:42 +0000 (UTC)
+	(Exim 4.71) (envelope-from <ard.biesheuvel@linaro.org>)
+	id 1ePT6p-00017i-EE
+	for qemu-devel@nongnu.org; Thu, 14 Dec 2017 07:59:31 -0500
+Received: by mail-it0-x22a.google.com with SMTP id t1so11081934ite.5
+	for <qemu-devel@nongnu.org>; Thu, 14 Dec 2017 04:59:31 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Thu, 14 Dec 2017 12:35:44 -0000
-From: Roman <romanzwi000@gmx.at>
-Reply-To: Bug 1429841 <1429841@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <20150309124810.20969.37090.malonedeb@gac.canonical.com>
-Message-Id: <151325494496.13079.6090111774560315688.malone@gac.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1429841] Re: error "rom: requested regions
- overlap" for NOLOAD sections
+In-Reply-To: <CAFEAcA8HswEKDPpj=cM711rNU2zwPuDXW7886=Oa2HBDmZxdCg@mail.gmail.com>
+References: <1513183941-24300-1-git-send-email-peter.maydell@linaro.org>
+	<CAFEAcA8HswEKDPpj=cM711rNU2zwPuDXW7886=Oa2HBDmZxdCg@mail.gmail.com>
+From: Ard Biesheuvel <ard.biesheuvel@linaro.org>
+Date: Thu, 14 Dec 2017 13:59:30 +0100
+Message-ID: <CAKv+Gu970cDwifDV1kz=kBWTWzxJyuT+QUAVNkFawun5psgYVg@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [Qemu-arm] [PATCH 0/2] GICv2 & GICv3: RAZ/WI
+ reserved addresses rather than aborting
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,76 +30,24 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>, Laszlo Ersek <lersek@redhat.com>, "patches@linaro.org" <patches@linaro.org>, qemu-stable <qemu-stable@nongnu.org>
 
-Just tested with QEMU 2.10.93 in cygwin: problem does not occour
-anymore!
+On 13 December 2017 at 16:54, Peter Maydell <peter.maydell@linaro.org> wrote:
+> On 13 December 2017 at 16:52, Peter Maydell <peter.maydell@linaro.org> wrote:
+>> The GICv2 and GICv3 specifications say that reserved register
+>> addresses should RAZ/WI.  This means we need to return MEMTX_OK, not
+>> MEMTX_ERROR, because now that we support generating external aborts
+>> the latter will cause an abort on new board models.
+>>
+>> In particular, at least some versions of UEFI try to
+>> access a reserved address in the GICv3 redistributor
+>> (at SGI_base + 0x184) and fail to boot on the virt board
+>> without this.
+>>
 
-Thanks a lot!
+Could this commit
 
--- =
+https://github.com/tianocore/edk2/commit/28f8d28faabf50a82ef8d137308592c64ea9e2b6
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1429841
-
-Title:
-  error "rom: requested regions overlap" for NOLOAD sections
-
-Status in QEMU:
-  Fix Committed
-
-Bug description:
-  command line:
-  qemu-system-arm -semihosting -nographic -monitor null -serial null -no-re=
-boot -kernel build/fw/0HNFcomSLuP1_CUNIT.elf
-
-  output:
-  rom: requested regions overlap (rom phdr #6: build/fw/0HNFcomSLuP1_CUNIT.=
-elf. free=3D0x8001effc, addr=3D0x8001c000)
-  rom loading failed
-
-  I checked the sections of the .elf file with arm-none-eabi-objdump -h:
-  Sections:
-  Idx Name          Size      VMA       LMA       File off  Algn
-  ...
-   35 .marker_appli 00001000  801ae000  801ae000  00025000  2**0
-                    ALLOC
-   36 .safe_data    00000014  80200000  8001b000  00020000  2**2
-                    CONTENTS, ALLOC, LOAD, DATA
-   37 .safe_bss     00000488  80200020  8001b020  00020014  2**2
-                    ALLOC
-   38 .marker_safe_data 00001000  80201000  8001c000  00029000  2**0
-                    ALLOC
-   39 .data         000008cc  80202000  8001b600  00022000  2**3
-                    CONTENTS, ALLOC, LOAD, DATA
-   40 .bss          0000312c  802028d0  8001bed0  000228cc  2**3
-                    ALLOC
-   41 .marker_data  00001000  80206000  8001f600  00026000  2**0
-                    ALLOC
-   42 .cunit        00010000  80300000  80119600  00028000  2**0
-                    ALLOC
-   43 .marker_code  00001000  8001c000  8001c000  00024000  2**0
-                    ALLOC
-  ...
-
-  So I had a look where the values in  the error message could come from:
-  0x8001c000: is the "LMA" value of section .marker_safe_data
-  0x8001effc: is "Size" + "LMA" of the .bss section (0x0000312c + 0x8001bed=
-0)
-
-  So it is correct that (regarding the "LMA" value) the .marker_safe_data s=
-ection collides with .bss section.
-  But actually these sections have no "LOAD" attribute, so I would guess th=
-at their "LMA" should not be used anyway.
-  Those section should reside at their "VMA" addresses (0x802xxxxx) during =
-runtime but they have no data to load.
-
-  Or am I getting something completely wrong?
-  Should I give an additional option to qemu?
-
-  I got this error with 2.0.0+dfsg-2ubuntu1.10 and 1.0.50-2012.03-0ubuntu2.1
-  I didn't get this error (but others) with 0.10.2
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1429841/+subscriptions
+have anything to do with that?
