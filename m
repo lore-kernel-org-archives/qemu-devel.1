@@ -1,23 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44700)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44763)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1ePW0v-0005SA-Al
-	for qemu-devel@nongnu.org; Thu, 14 Dec 2017 11:05:38 -0500
+	(envelope-from <andrew.smirnov@gmail.com>) id 1ePW0x-0005Tb-PG
+	for qemu-devel@nongnu.org; Thu, 14 Dec 2017 11:05:40 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1ePW0p-0007kh-8F
-	for qemu-devel@nongnu.org; Thu, 14 Dec 2017 11:05:37 -0500
-From: Markus Armbruster <armbru@redhat.com>
-References: <20171213213557.26561-1-f4bug@amsat.org>
-	<20171214093907.GA14433@stefanha-x1.localdomain>
-	<d4d649fc-4bb2-9b61-7e48-46a6a51e7b01@redhat.com>
-	<CAMr-obuvJ4z54e0evM+J98jsdRayL-UeA_WDQVp0rx=sRoTVgw@mail.gmail.com>
-Date: Thu, 14 Dec 2017 17:05:03 +0100
-In-Reply-To: <CAMr-obuvJ4z54e0evM+J98jsdRayL-UeA_WDQVp0rx=sRoTVgw@mail.gmail.com>
-	(Nir Soffer's message of "Thu, 14 Dec 2017 15:39:12 +0000")
-Message-ID: <874lotwb0w.fsf@dusky.pond.sub.org>
+	(envelope-from <andrew.smirnov@gmail.com>) id 1ePW0w-0007vb-7o
+	for qemu-devel@nongnu.org; Thu, 14 Dec 2017 11:05:39 -0500
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [Qemu-block] [PATCH 0/6] QTests: use Python to run
- complex tests
+In-Reply-To: <d56f5ba0-29d9-d5b4-7137-28e312e15a02@amsat.org>
+References: <20171211213007.7353-1-andrew.smirnov@gmail.com>
+	<20171211213007.7353-13-andrew.smirnov@gmail.com>
+	<CAFEAcA_6R61208pZ5rchSG0Oy4c_2eSGD+dO-LQs3Dncjnpf-Q@mail.gmail.com>
+	<CAHQ1cqHhN=hLun2mzqvg0N3NkxEbPpBU1iEf5-mAdnHqEs3KYg@mail.gmail.com>
+	<d56f5ba0-29d9-d5b4-7137-28e312e15a02@amsat.org>
+From: Andrey Smirnov <andrew.smirnov@gmail.com>
+Date: Thu, 14 Dec 2017 08:05:18 -0800
+Message-ID: <CAHQ1cqEA1_OP4+Y4Y1B25UsmWU9EoR6uFvJTKmAj494q7HskoQ@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH 12/13] sdhci: Add i.MX specific subtype of
+ SDHCI
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,47 +27,46 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Nir Soffer <nirsof@gmail.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, "Edgar E . Iglesias" <edgar.iglesias@xilinx.com>, Kevin Wolf <kwolf@redhat.com>, Thomas Huth <thuth@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, qemu-block@nongnu.org, Fam Zheng <famz@redhat.com>, Alistair Francis <alistair.francis@xilinx.com>, Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, qemu-devel@nongnu.org, Stefan Hajnoczi <stefanha@redhat.com>, Cleber Rosa <crosa@redhat.com>, =?utf-8?B?THVr?= =?utf-8?B?w6HFoQ==?= Doktor <ldoktor@redhat.com>, =?utf-8?Q?Marc-Andr?= =?utf-8?Q?=C3=A9?= Lureau <marcandre.lureau@redhat.com>, Max Reitz <mreitz@redhat.com>
+To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>
+Cc: Peter Maydell <peter.maydell@linaro.org>, qemu-arm <qemu-arm@nongnu.org>, Jason Wang <jasowang@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>, Andrey Yurovsky <yurovsky@gmail.com>
 
-Nir Soffer <nirsof@gmail.com> writes:
-
-> On Thu, Dec 14, 2017 at 1:36 PM Paolo Bonzini <pbonzini@redhat.com> wrote:
+On Thu, Dec 14, 2017 at 7:32 AM, Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.o=
+rg> wrote:
+> Hi Andrey,
 >
->> On 14/12/2017 10:39, Stefan Hajnoczi wrote:
->> >>             # verify Card ID
->> >>             data = self.bus.do_cmd(ALL_SEND_CID)
->> >>             oid, pnm, psn = struct.unpack(">x2s5sxLxxx", data)
->> >>             self.assertEqual(oid, "XY") # QEMU default
->> >>             self.assertEqual(pnm, "QEMU!") # QEMU default
->> >>             self.assertEqual(psn, 0xdeadbeef) # QEMU default
->> > Device qtests are better done in C than Python.  Python is not good at
->> > binary I/O and porting this to Python 3 will be extra work later (Python
->> > 2 is set for End-of-Life in 2020, see https://pythonclock.org/).
->> >
->> > More importantly, we already have libqos in C with a guest memory
->> > allocator, PCI, and virtio support.  Fragmenting the small amount effort
->> > that goes into device testing will delay libqos reaching critical mass.
->> > Critical mass is where libqos provides all the infrastructure you need
->> > to set up a device and focus on your actual test instead of machine,
->> > bus, or device initialization.  Starting a Python device testing effort
->> > will just lead to duplication and 2 underdeveloped device testing
->> > frameworks.
+> On 12/14/2017 11:03 AM, Andrey Smirnov wrote:
+>> On Tue, Dec 12, 2017 at 9:52 AM, Peter Maydell <peter.maydell@linaro.org=
+> wrote:
+>>> On 11 December 2017 at 21:30, Andrey Smirnov <andrew.smirnov@gmail.com>=
+ wrote:
+> [...]
+>>>> +    case ESDHC_DLL_CTRL:
+>>>> +    case ESDHC_TUNE_CTRL_STATUS:
+>>>> +    case 0x6c:
+>>>
+>>> Isn't there a name we can give 0x6c ?
+>>>
 >>
->> I agree that fragmentation is bad.  However, libqos is small (about 4k
->> lines of code, maybe 3k in Python).
->>
->> I also agree that any qtest written in Python should be written in
->> Python 3 from the beginning (in fact we should consider dropping Python
->> 2.x support in 2.12).  Doing so should not make binary I/O much
->> different than C.
->>
+>> Unfortunately, not that I know of. It's a mystery register not listed
+>> in RM and the only place I can found it being mentioned is in Linux
+>> driver as a part of errata ESDHC_FLAG_ERR004536 fix, where it is used
+>> nameless as well.
 >
-> Using python 3 will make it hard to develop and test qemu on RHEL/CentOS
-> which do not provide python 3 yet.
+> This sets the SD CLK/RCLK frequency (10-bit) for the 104MB/sec bus speed
+> (UHS-I mode).
+>
+> The "Sampling Clock Tuning Procedure" figure in the Spec v3 is helpful.
+>
 
-s/hard/slightly inconvenient/: Python 3 is available in EPEL.  
+I am a bit hesitant to agree that this is indeed the case. ERR004536
+errata's title is "uSDHC: ADMA Length Mismatch Error may occur for
+longer read latencies" and recommented workaround is "Use SDMA (or
+ADMA1) in case the AHB latency is larger than the =E2=80=9Cminimal time for
+one block=E2=80=9D. On top of that corresponding code in Linux
+(https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/tree/dr=
+ivers/mmc/host/sdhci-esdhc-imx.c?h=3Dv4.15-rc3#n1061)
+doesn't seem to use it as a 10-bit frequency field, treating it more
+like a single-bit flag.
 
-> Doing binary io in python 2 and 3 is the same, there is no need to use
-> python 3 for this. The only advantage is not having to backport code
-> later from 2 to 3.
+Thanks,
+Andrey Smirnov
