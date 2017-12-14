@@ -1,16 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40075)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40169)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1ePHsp-0001Vv-MA
-	for qemu-devel@nongnu.org; Wed, 13 Dec 2017 20:00:20 -0500
+	(envelope-from <jsnow@redhat.com>) id 1ePHsv-0001Yl-At
+	for qemu-devel@nongnu.org; Wed, 13 Dec 2017 20:00:28 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1ePHsm-00030x-Ke
-	for qemu-devel@nongnu.org; Wed, 13 Dec 2017 20:00:19 -0500
+	(envelope-from <jsnow@redhat.com>) id 1ePHsu-00035X-Bn
+	for qemu-devel@nongnu.org; Wed, 13 Dec 2017 20:00:25 -0500
 From: John Snow <jsnow@redhat.com>
-Date: Wed, 13 Dec 2017 19:59:48 -0500
-Message-Id: <20171214005953.8898-3-jsnow@redhat.com>
+Date: Wed, 13 Dec 2017 19:59:49 -0500
+Message-Id: <20171214005953.8898-4-jsnow@redhat.com>
 In-Reply-To: <20171214005953.8898-1-jsnow@redhat.com>
 References: <20171214005953.8898-1-jsnow@redhat.com>
-Subject: [Qemu-devel] [PATCH 2/7] blockjob: consolidate SLICE_TIME definition
+Subject: [Qemu-devel] [PATCH 3/7] blockjob: create block_job_throttle
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,80 +22,96 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org
 Cc: kwolf@redhat.com, jcody@redhat.com, qemu-devel@nongnu.org, stefanha@redhat.com, mreitz@redhat.com, John Snow <jsnow@redhat.com>
 
-They're all the same. If it actually becomes important to configure it,
-it can become a job or driver property.
+This will replace mirror_throttle, for reuse in other jobs.
 
 Signed-off-by: John Snow <jsnow@redhat.com>
 ---
- block/backup.c               | 1 -
- block/commit.c               | 2 --
- block/mirror.c               | 1 -
- block/stream.c               | 2 --
- include/block/blockjob_int.h | 2 ++
- 5 files changed, 2 insertions(+), 6 deletions(-)
+ block/mirror.c               | 15 ++-------------
+ blockjob.c                   | 11 +++++++++++
+ include/block/blockjob_int.h |  9 +++++++++
+ 3 files changed, 22 insertions(+), 13 deletions(-)
 
-diff --git a/block/backup.c b/block/backup.c
-index 99e6bcc748..d71b25c017 100644
---- a/block/backup.c
-+++ b/block/backup.c
-@@ -27,7 +27,6 @@
- #include "qemu/error-report.h"
- 
- #define BACKUP_CLUSTER_SIZE_DEFAULT (1 << 16)
--#define SLICE_TIME 100000000ULL /* ns */
- 
- typedef struct BackupBlockJob {
-     BlockJob common;
-diff --git a/block/commit.c b/block/commit.c
-index c5327551ce..873e749d50 100644
---- a/block/commit.c
-+++ b/block/commit.c
-@@ -31,8 +31,6 @@ enum {
-     COMMIT_BUFFER_SIZE = 512 * 1024, /* in bytes */
- };
- 
--#define SLICE_TIME 100000000ULL /* ns */
--
- typedef struct CommitBlockJob {
-     BlockJob common;
-     RateLimit limit;
 diff --git a/block/mirror.c b/block/mirror.c
-index d35c688faa..eef5b598f5 100644
+index eef5b598f5..60b52cfb19 100644
 --- a/block/mirror.c
 +++ b/block/mirror.c
-@@ -22,7 +22,6 @@
- #include "qemu/ratelimit.h"
- #include "qemu/bitmap.h"
+@@ -590,17 +590,6 @@ static void mirror_exit(BlockJob *job, void *opaque)
+     bdrv_unref(src);
+ }
  
--#define SLICE_TIME    100000000ULL /* ns */
- #define MAX_IN_FLIGHT 16
- #define MAX_IO_BYTES (1 << 20) /* 1 Mb */
- #define DEFAULT_MIRROR_BUF_SIZE (MAX_IN_FLIGHT * MAX_IO_BYTES)
-diff --git a/block/stream.c b/block/stream.c
-index 499cdacdb0..e85af18c54 100644
---- a/block/stream.c
-+++ b/block/stream.c
-@@ -29,8 +29,6 @@ enum {
-     STREAM_BUFFER_SIZE = 512 * 1024, /* in bytes */
- };
- 
--#define SLICE_TIME 100000000ULL /* ns */
+-static void mirror_throttle(MirrorBlockJob *s)
+-{
+-    int64_t now = qemu_clock_get_ns(QEMU_CLOCK_REALTIME);
 -
- typedef struct StreamBlockJob {
-     BlockJob common;
-     RateLimit limit;
+-    if (now - s->common.last_yield_ns > SLICE_TIME) {
+-        block_job_sleep_ns(&s->common, 0);
+-    } else {
+-        block_job_pause_point(&s->common);
+-    }
+-}
+-
+ static int coroutine_fn mirror_dirty_init(MirrorBlockJob *s)
+ {
+     int64_t offset;
+@@ -621,7 +610,7 @@ static int coroutine_fn mirror_dirty_init(MirrorBlockJob *s)
+             int bytes = MIN(s->bdev_length - offset,
+                             QEMU_ALIGN_DOWN(INT_MAX, s->granularity));
+ 
+-            mirror_throttle(s);
++            block_job_throttle(&s->common);
+ 
+             if (block_job_is_cancelled(&s->common)) {
+                 s->initial_zeroing_ongoing = false;
+@@ -649,7 +638,7 @@ static int coroutine_fn mirror_dirty_init(MirrorBlockJob *s)
+         int bytes = MIN(s->bdev_length - offset,
+                         QEMU_ALIGN_DOWN(INT_MAX, s->granularity));
+ 
+-        mirror_throttle(s);
++        block_job_throttle(&s->common);
+ 
+         if (block_job_is_cancelled(&s->common)) {
+             return 0;
+diff --git a/blockjob.c b/blockjob.c
+index 8cbc142f57..8d0c89a813 100644
+--- a/blockjob.c
++++ b/blockjob.c
+@@ -882,6 +882,17 @@ void block_job_yield(BlockJob *job)
+     block_job_pause_point(job);
+ }
+ 
++void block_job_throttle(BlockJob *job)
++{
++    int64_t now = qemu_clock_get_ns(QEMU_CLOCK_REALTIME);
++
++    if (now - job->last_yield_ns > SLICE_TIME) {
++        block_job_sleep_ns(job, 0);
++    } else {
++        block_job_pause_point(job);
++    }
++}
++
+ void block_job_iostatus_reset(BlockJob *job)
+ {
+     if (job->iostatus == BLOCK_DEVICE_IO_STATUS_OK) {
 diff --git a/include/block/blockjob_int.h b/include/block/blockjob_int.h
-index c9b23b0cc9..209fa1bb3e 100644
+index 209fa1bb3e..1a771b1e2e 100644
 --- a/include/block/blockjob_int.h
 +++ b/include/block/blockjob_int.h
-@@ -29,6 +29,8 @@
- #include "block/blockjob.h"
- #include "block/block.h"
+@@ -157,6 +157,15 @@ void block_job_sleep_ns(BlockJob *job, int64_t ns);
+  */
+ void block_job_yield(BlockJob *job);
  
-+#define SLICE_TIME 100000000ULL /* ns */
++/**
++ * block_job_throttle:
++ * @job: The job that calls the function.
++ *
++ * Yield if it has been SLICE_TIME nanoseconds since the last yield.
++ * Otherwise, check if we need to pause (and update the yield counter).
++ */
++void block_job_throttle(BlockJob *job);
 +
  /**
-  * BlockJobDriver:
+  * block_job_pause_all:
   *
 -- 
 2.14.3
