@@ -1,21 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58185)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36614)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <andrew.smirnov@gmail.com>) id 1ePUEb-0001Ya-SU
-	for qemu-devel@nongnu.org; Thu, 14 Dec 2017 09:11:39 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1ePUOo-0005pX-PQ
+	for qemu-devel@nongnu.org; Thu, 14 Dec 2017 09:22:11 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <andrew.smirnov@gmail.com>) id 1ePUEa-0007df-UF
-	for qemu-devel@nongnu.org; Thu, 14 Dec 2017 09:11:37 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1ePUOo-0001F2-1x
+	for qemu-devel@nongnu.org; Thu, 14 Dec 2017 09:22:10 -0500
+Received: from mail-ot0-x230.google.com ([2607:f8b0:4003:c0f::230]:37394)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1ePUOn-0001EY-RZ
+	for qemu-devel@nongnu.org; Thu, 14 Dec 2017 09:22:09 -0500
+Received: by mail-ot0-x230.google.com with SMTP id s4so5041626ote.4
+	for <qemu-devel@nongnu.org>; Thu, 14 Dec 2017 06:22:09 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <af0b2841-feb6-cf3b-ac7f-4b681916ee10@amsat.org>
-References: <20171211213007.7353-1-andrew.smirnov@gmail.com>
-	<CAFEAcA-gEjU+rBWSL8V4d520DOVheZoJZ76p5=9hmkXk3NqeOw@mail.gmail.com>
-	<af0b2841-feb6-cf3b-ac7f-4b681916ee10@amsat.org>
-From: Andrey Smirnov <andrew.smirnov@gmail.com>
-Date: Thu, 14 Dec 2017 06:11:33 -0800
-Message-ID: <CAHQ1cqE+4igRM3mtPP+SkwfCpa7kiw0qwqdkkzQBtf+SV4a_Wg@mail.gmail.com>
+In-Reply-To: <20171213180541.10386.38737.stgit@gimli.home>
+References: <20171213180541.10386.38737.stgit@gimli.home>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Thu, 14 Dec 2017 14:21:48 +0000
+Message-ID: <CAFEAcA-Pt7NqzXr4YsavAwvSdvA-nYFKterbKWRXsz+yMaCUHw@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 00/13] i.MX FEC and SD changes
+Subject: Re: [Qemu-devel] [PULL 0/4] VFIO updates for v2.12
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,37 +28,37 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>
-Cc: Peter Maydell <peter.maydell@linaro.org>, qemu-arm <qemu-arm@nongnu.org>, Jason Wang <jasowang@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>, Andrey Yurovsky <yurovsky@gmail.com>
+To: Alex Williamson <alex.williamson@redhat.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 
-On Wed, Dec 13, 2017 at 6:09 PM, Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.o=
-rg> wrote:
-> Hi Andrey, Peter,
+On 13 December 2017 at 18:08, Alex Williamson
+<alex.williamson@redhat.com> wrote:
+> The following changes since commit 0a0dc59d27527b78a195c2d838d28b7b49e5a639:
 >
-> On 12/12/2017 02:40 PM, Peter Maydell wrote:
->> On 11 December 2017 at 21:29, Andrey Smirnov <andrew.smirnov@gmail.com> =
-wrote:
->>> Hi everyone,
->>>
->>> This patchset is a spin-off from original i.MX7 support submission
->>> found here [1], containing all of the patchest that are more or less
->>> agreed upon and are ready (hopefully!) for inclusion.
-> [...]
->> Incidentally we should use the new i.MX SDHCI controller in the
->> imx6: coincidentally somebody ran into this bug recently:
->> https://stackoverflow.com/questions/47538951/qemu-freescale-i-mx6-dualli=
-te-sabre-root-filesystem-does-not-mount/47552596
->>
->> I'll retest that this patchset works with my imx6 image, and
->> send a patch to sit on top of it to switch imx6 over to TYPE_IMX_USDHC.
+>   Update version for v2.11.0 release (2017-12-13 14:31:09 +0000)
 >
-> If you don't mind, I'd like to take the patches 12/13 (SDHCI) and adapt
-> them to the SDHCI series I'm working on, to avoid a big diverge/clash.
+> are available in the git repository at:
 >
+>   git://github.com/awilliam/qemu-vfio.git tags/vfio-update-20171213.0
+>
+> for you to fetch changes up to 2fb9636ebf24e695617bf407bf0a345aa223d1ac:
+>
+>   vfio-pci: Remove unused fields from VFIOMSIXInfo (2017-12-13 10:19:34 -0700)
+>
+> ----------------------------------------------------------------
+> VFIO updates for v2.12
+>
+>  - Fix bug failing to register all but the first group attached to
+>    a container with kvm-vfio device (Alex Williamson)
+>
+>  - Explicit QLIST init (Yi Lui)
+>
+>  - SPAPR IOMMU v1 fallback (Alexey Kardashevskiy)
+>
+>  - Remove unused structure fields (Alexey Kardashevskiy)
+>
+> ----------------------------------------------------------------
 
-I am fine with patches going in either way. I'll submit a v2 of my
-patchset and if we decide to push SD portion of it as a part of your
-work, then you can just pick those from there.
+Applied, thanks.
 
-Thanks,
-Andrey Smirnov
+-- PMM
