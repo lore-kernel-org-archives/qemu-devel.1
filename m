@@ -1,25 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39483)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39990)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1ePY0a-0001L4-AM
-	for qemu-devel@nongnu.org; Thu, 14 Dec 2017 13:13:25 -0500
+	(envelope-from <den@virtuozzo.com>) id 1ePY1O-0001zW-1O
+	for qemu-devel@nongnu.org; Thu, 14 Dec 2017 13:14:15 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1ePY0W-0000lv-Uj
-	for qemu-devel@nongnu.org; Thu, 14 Dec 2017 13:13:24 -0500
-Resent-Message-Id: <E1ePY0W-0000lv-Uj@eggs.gnu.org>
-Received: from sender-of-o52.zoho.com ([135.84.80.217]:21347)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
-	id 1ePY0W-0000lI-Mg
-	for qemu-devel@nongnu.org; Thu, 14 Dec 2017 13:13:20 -0500
-In-Reply-To: <20171214101435.26265-1-hare@suse.de>
-Reply-To: <qemu-devel@nongnu.org>
-Message-ID: <151324715733.84.17039554599968086373@449822a21bf0>
+	(envelope-from <den@virtuozzo.com>) id 1ePY1K-0001Ez-Jo
+	for qemu-devel@nongnu.org; Thu, 14 Dec 2017 13:14:13 -0500
+References: <1513260561-28130-1-git-send-email-den@openvz.org>
+	<54f7c1da-211e-fbb9-76a7-2893f015c2f4@redhat.com>
+From: "Denis V. Lunev" <den@openvz.org>
+Message-ID: <80bf4587-a90b-39be-de04-0477a8977bad@openvz.org>
+Date: Thu, 14 Dec 2017 21:13:59 +0300
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Thu, 14 Dec 2017 02:25:57 -0800 (PST)
-Subject: Re: [Qemu-devel] [PATCH 0/4] virtio-vfc implementation
+In-Reply-To: <54f7c1da-211e-fbb9-76a7-2893f015c2f4@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
+Content-Language: en-US
+Subject: Re: [Qemu-devel] [PATCH v2 1/1] virtio: fix IO request length in
+ virtio SCSI/block
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,76 +25,51 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: hare@suse.de
-Cc: famz@redhat.com, pbonzini@redhat.com, qemu-devel@nongnu.org
+To: Paolo Bonzini <pbonzini@redhat.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org
+Cc: "Michael S. Tsirkin" <mst@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>
 
-SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
-LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKTWVzc2FnZS1pZDogMjAx
-NzEyMTQxMDE0MzUuMjYyNjUtMS1oYXJlQHN1c2UuZGUKU3ViamVjdDogW1FlbXUtZGV2ZWxdIFtQ
-QVRDSCAwLzRdIHZpcnRpby12ZmMgaW1wbGVtZW50YXRpb24KVHlwZTogc2VyaWVzCgo9PT0gVEVT
-VCBTQ1JJUFQgQkVHSU4gPT09CiMhL2Jpbi9iYXNoCgpCQVNFPWJhc2UKbj0xCnRvdGFsPSQoZ2l0
-IGxvZyAtLW9uZWxpbmUgJEJBU0UuLiB8IHdjIC1sKQpmYWlsZWQ9MAoKZ2l0IGNvbmZpZyAtLWxv
-Y2FsIGRpZmYucmVuYW1lbGltaXQgMApnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVzIFRy
-dWUKCmNvbW1pdHM9IiQoZ2l0IGxvZyAtLWZvcm1hdD0lSCAtLXJldmVyc2UgJEJBU0UuLikiCmZv
-ciBjIGluICRjb21taXRzOyBkbwogICAgZWNobyAiQ2hlY2tpbmcgUEFUQ0ggJG4vJHRvdGFsOiAk
-KGdpdCBsb2cgLW4gMSAtLWZvcm1hdD0lcyAkYykuLi4iCiAgICBpZiAhIGdpdCBzaG93ICRjIC0t
-Zm9ybWF0PWVtYWlsIHwgLi9zY3JpcHRzL2NoZWNrcGF0Y2gucGwgLS1tYWlsYmFjayAtOyB0aGVu
-CiAgICAgICAgZmFpbGVkPTEKICAgICAgICBlY2hvCiAgICBmaQogICAgbj0kKChuKzEpKQpkb25l
-CgpleGl0ICRmYWlsZWQKPT09IFRFU1QgU0NSSVBUIEVORCA9PT0KClVwZGF0aW5nIDNjOGNmNWE5
-YzIxZmY4NzgyMTY0ZDFkZWY3ZjQ0YmQ4ODg3MTMzODQKRnJvbSBodHRwczovL2dpdGh1Yi5jb20v
-cGF0Y2hldy1wcm9qZWN0L3FlbXUKICogW25ldyB0YWddICAgICAgICAgICAgICAgcGF0Y2hldy8y
-MDE3MTIxNDEwMTQzNS4yNjI2NS0xLWhhcmVAc3VzZS5kZSAtPiBwYXRjaGV3LzIwMTcxMjE0MTAx
-NDM1LjI2MjY1LTEtaGFyZUBzdXNlLmRlClN3aXRjaGVkIHRvIGEgbmV3IGJyYW5jaCAndGVzdCcK
-ZDhkZDMzMzEyMyBzY3NpOiBzdXBwb3J0IFJFUE9SVF9MVU5TIGZvciBMVU5zICE9IDAKYTBiNTY1
-MzZjYSB2aXJ0aW8tc2NzaTogSW1wbGVtZW50ICduYXRpdmUgTFVOJyBmZWF0dXJlCjMzYjI4OTYz
-NjggdmlydGlvLXNjc2k6IGltcGxlbWVudCB0YXJnZXQgcmVzY2FuCjA1ZGRiMDg1Y2Qgc2NzaTog
-dXNlIDY0LWJpdCBMVU4KCj09PSBPVVRQVVQgQkVHSU4gPT09CkNoZWNraW5nIFBBVENIIDEvNDog
-c2NzaTogdXNlIDY0LWJpdCBMVU4uLi4KV0FSTklORzogbGluZSBvdmVyIDgwIGNoYXJhY3RlcnMK
-IzExMDogRklMRTogaHcvc2NzaS9tZWdhc2FzLmM6MTMzOToKKyAgICAgICAgdWludDE2X3Qgc2Rl
-dl9pZCA9ICgoc2Rldi0+aWQgJiAweEZGKSA8PCA4KSB8IHNjc2lfbHVuX3RvX2ludChzZGV2LT5s
-dW4pOwoKV0FSTklORzogbGluZSBvdmVyIDgwIGNoYXJhY3RlcnMKIzIyNzogRklMRTogaHcvc2Nz
-aS9zY3NpLWJ1cy5jOjcxOgorc3RhdGljIFNDU0lSZXF1ZXN0ICpzY3NpX2RldmljZV9hbGxvY19y
-ZXEoU0NTSURldmljZSAqcywgdWludDMyX3QgdGFnLCB1aW50NjRfdCBsdW4sCgpXQVJOSU5HOiBs
-aW5lIG92ZXIgODAgY2hhcmFjdGVycwojMzAxOiBGSUxFOiBody9zY3NpL3Njc2ktYnVzLmM6MjI1
-OgorICAgICAgICBpZiAoc2NzaV9kZXZpY2VfY291bnQoYnVzLCBkZXYtPmNoYW5uZWwsIGRldi0+
-aWQpID49IGJ1cy0+aW5mby0+bWF4X2x1bikgewoKV0FSTklORzogbGluZSBvdmVyIDgwIGNoYXJh
-Y3RlcnMKIzUwNDogRklMRTogaHcvc2NzaS9zY3NpLWJ1cy5jOjE2MjY6CisgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgcWRldl9md19uYW1lKGRldiksIGQtPmlkLCBzY3NpX2x1bl90b19p
-bnQoZC0+bHVuKSk7CgpXQVJOSU5HOiBsaW5lIG92ZXIgODAgY2hhcmFjdGVycwojNTk3OiBGSUxF
-OiBody9zY3NpL3NwYXByX3ZzY3NpLmM6MTM5Ogorc3RhdGljIFNDU0lEZXZpY2UgKnZzY3NpX2Rl
-dmljZV9maW5kKFNDU0lCdXMgKmJ1cywgdWludDY0X3Qgc3JwX2x1biwgdWludDY0X3QgKmx1bikK
-CkVSUk9SOiBzcGFjZXMgcmVxdWlyZWQgYXJvdW5kIHRoYXQgJysnIChjdHg6VnhWKQojNjM4OiBG
-SUxFOiBody9zY3NpL3NwYXByX3ZzY3NpLmM6NzU1OgorICAgICAgICByZXNwX2RhdGFbaSsxXSB8
-PSBzY3NpX2x1bl90b19pbnQoZGV2LT5sdW4pOwogICAgICAgICAgICAgICAgICAgIF4KCldBUk5J
-Tkc6IGxpbmUgb3ZlciA4MCBjaGFyYWN0ZXJzCiM3NDk6IEZJTEU6IGh3L3Njc2kvdm13X3B2c2Nz
-aS5jOjgzMzoKKyAgICB0cmFjZV9wdnNjc2lfb25fY21kX3Jlc2V0X2RldihjbWQtPnRhcmdldCwg
-c2NzaV9sdW5fdG9faW50KHRhcmdldF9sdW4pLCBzZGV2KTsKCkVSUk9SOiBzcGFjZXMgcmVxdWly
-ZWQgYXJvdW5kIHRoYXQgJysnIChjdHg6VnhWKQojNzYzOiBGSUxFOiBody91c2IvZGV2LXN0b3Jh
-Z2UuYzozNzU6CisgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgc2NzaV9s
-dW5fZnJvbV9pbnQobWF4bHVuKzEpKTsKICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBeCgpFUlJPUjogc3BhY2VzIHJlcXVpcmVk
-IGFyb3VuZCB0aGF0ICcrJyAoY3R4OlZ4VikKIzc2ODogRklMRTogaHcvdXNiL2Rldi1zdG9yYWdl
-LmM6Mzc5OgorICAgICAgICAgICAgaWYgKHNjc2lfbHVuX3RvX2ludChzY3NpX2Rldi0+bHVuKSAh
-PSBtYXhsdW4rMSkgewogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICBeCgpXQVJOSU5HOiBsaW5lIG92ZXIgODAgY2hhcmFjdGVycwojOTY0OiBG
-SUxFOiBpbmNsdWRlL2h3L3Njc2kvc2NzaS5oOjIyODoKK1NDU0lEZXZpY2UgKnNjc2lfZGV2aWNl
-X2ZpbmQoU0NTSUJ1cyAqYnVzLCBpbnQgY2hhbm5lbCwgaW50IHRhcmdldCwgdWludDY0X3QgbHVu
-KTsKCnRvdGFsOiAzIGVycm9ycywgNyB3YXJuaW5ncywgODI5IGxpbmVzIGNoZWNrZWQKCllvdXIg
-cGF0Y2ggaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRoZXNl
-IGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFpbmVy
-LCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KCkNoZWNraW5nIFBBVENIIDIvNDogdmly
-dGlvLXNjc2k6IGltcGxlbWVudCB0YXJnZXQgcmVzY2FuLi4uCkVSUk9SOiBkbyBub3QgdXNlIEM5
-OSAvLyBjb21tZW50cwojNTI6IEZJTEU6IGh3L3Njc2kvc2NzaS1kaXNrLmM6NjcxOgorICAgICAg
-ICAgICAgICAgIG91dGJ1ZltidWZsZW4rK10gPSBzLT5xZGV2LnByb3RvY29sIDw8IDggfCAweDE7
-IC8vIEJpbmFyeQoKRVJST1I6IGRvIG5vdCB1c2UgQzk5IC8vIGNvbW1lbnRzCiM2MTogRklMRTog
-aHcvc2NzaS9zY3NpLWRpc2suYzo2ODA6CisgICAgICAgICAgICAgICAgb3V0YnVmW2J1Zmxlbisr
-XSA9IHMtPnFkZXYucHJvdG9jb2wgPDwgOCB8IDB4MTsgLy8gQmluYXJ5Cgp0b3RhbDogMiBlcnJv
-cnMsIDAgd2FybmluZ3MsIDI0MiBsaW5lcyBjaGVja2VkCgpZb3VyIHBhdGNoIGhhcyBzdHlsZSBw
-cm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFueSBvZiB0aGVzZSBlcnJvcnMKYXJlIGZhbHNl
-IHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRhaW5lciwgc2VlCkNIRUNLUEFUQ0gg
-aW4gTUFJTlRBSU5FUlMuCgpDaGVja2luZyBQQVRDSCAzLzQ6IHZpcnRpby1zY3NpOiBJbXBsZW1l
-bnQgJ25hdGl2ZSBMVU4nIGZlYXR1cmUuLi4KQ2hlY2tpbmcgUEFUQ0ggNC80OiBzY3NpOiBzdXBw
-b3J0IFJFUE9SVF9MVU5TIGZvciBMVU5zICE9IDAuLi4KPT09IE9VVFBVVCBFTkQgPT09CgpUZXN0
-IGNvbW1hbmQgZXhpdGVkIHdpdGggY29kZTogMQoKCi0tLQpFbWFpbCBnZW5lcmF0ZWQgYXV0b21h
-dGljYWxseSBieSBQYXRjaGV3IFtodHRwOi8vcGF0Y2hldy5vcmcvXS4KUGxlYXNlIHNlbmQgeW91
-ciBmZWVkYmFjayB0byBwYXRjaGV3LWRldmVsQGZyZWVsaXN0cy5vcmc=
+On 12/14/2017 08:52 PM, Paolo Bonzini wrote:
+> On 14/12/2017 15:09, Denis V. Lunev wrote:
+>> Linux guests submit IO requests no longer than PAGE_SIZE * max_seg
+>> field reported by SCSI controler. Thus typical sequential read with
+>> 1 MB size results in the following pattern of the IO from the guest:
+>>   8,16   1    15754     2.766095122  2071  D   R 2095104 + 1008 [dd]
+>>   8,16   1    15755     2.766108785  2071  D   R 2096112 + 1008 [dd]
+>>   8,16   1    15756     2.766113486  2071  D   R 2097120 + 32 [dd]
+>>   8,16   1    15757     2.767668961     0  C   R 2095104 + 1008 [0]
+>>   8,16   1    15758     2.768534315     0  C   R 2096112 + 1008 [0]
+>>   8,16   1    15759     2.768539782     0  C   R 2097120 + 32 [0]
+>> The IO was generated by
+>>   dd if=/dev/sda of=/dev/null bs=1024 iflag=direct
+>>
+>> This effectively means that on rotational disks we will observe 3 IOPS
+>> for each 2 MBs processed. This definitely negatively affects both
+>> guest and host IO performance.
+>>
+>> The cure is relatively simple - we should report lengthy scatter-gather
+>> ability of the SCSI controller. Fortunately the situation here is very
+>> good. VirtIO transport layer can accomodate 1024 items in one request
+>> while we are using only 128. This situation is present since almost
+>> very beginning. 2 items are dedicated for request metadata thus we
+>> should publish VIRTQUEUE_MAX_SIZE - 2 as max_seg.
+>>
+>> The following pattern is observed after the patch:
+>>   8,16   1     9921     2.662721340  2063  D   R 2095104 + 1024 [dd]
+>>   8,16   1     9922     2.662737585  2063  D   R 2096128 + 1024 [dd]
+>>   8,16   1     9923     2.665188167     0  C   R 2095104 + 1024 [0]
+>>   8,16   1     9924     2.665198777     0  C   R 2096128 + 1024 [0]
+>> which is much better.
+>>
+>> The dark side of this patch is that we are tweaking guest visible
+>> parameter, though this should be relatively safe as above transport
+>> layer support is present in QEMU/host Linux for a very long time.
+>> The patch adds configurable property for VirtIO SCSI with a new default
+>> and hardcode option for VirtBlock which does not provide good
+>> configurable framework.
+> The patch is still missing compat properties (and 2.12 machine types).
+> If you don't want to add the machine types, feel free to wait until
+> someone else does it. :)
+>
+> Paolo
+
+sorry :( my fault. Will re-spin tomorrow.
