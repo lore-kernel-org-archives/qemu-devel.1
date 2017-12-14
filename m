@@ -1,21 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52455)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56245)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1ePRoR-0006G3-N0
-	for qemu-devel@nongnu.org; Thu, 14 Dec 2017 06:36:31 -0500
+	(envelope-from <stefanha@redhat.com>) id 1ePRth-0007Kx-Sy
+	for qemu-devel@nongnu.org; Thu, 14 Dec 2017 06:41:54 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1ePRoO-0002tD-IK
-	for qemu-devel@nongnu.org; Thu, 14 Dec 2017 06:36:27 -0500
-References: <20171213213557.26561-1-f4bug@amsat.org>
-	<20171214093907.GA14433@stefanha-x1.localdomain>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <d4d649fc-4bb2-9b61-7e48-46a6a51e7b01@redhat.com>
-Date: Thu, 14 Dec 2017 12:35:46 +0100
+	(envelope-from <stefanha@redhat.com>) id 1ePRte-0007sQ-OS
+	for qemu-devel@nongnu.org; Thu, 14 Dec 2017 06:41:53 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:49616)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1ePRte-0007rb-FN
+	for qemu-devel@nongnu.org; Thu, 14 Dec 2017 06:41:50 -0500
+Date: Thu, 14 Dec 2017 11:41:36 +0000
+From: Stefan Hajnoczi <stefanha@redhat.com>
+Message-ID: <20171214114136.GG14433@stefanha-x1.localdomain>
+References: <20171205055200.16305-1-peterx@redhat.com>
+	<20171205055200.16305-19-peterx@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20171214093907.GA14433@stefanha-x1.localdomain>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="x1NLimutSg6NrOdXeCB0xCqX7bkncvU1o"
-Subject: Re: [Qemu-devel] [PATCH 0/6] QTests: use Python to run complex tests
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="iJXiJc/TAIT2rh2r"
+Content-Disposition: inline
+In-Reply-To: <20171205055200.16305-19-peterx@redhat.com>
+Subject: Re: [Qemu-devel] [RFC v5 18/26] monitor: send event when request
+ queue full
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,107 +29,85 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefan Hajnoczi <stefanha@redhat.com>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Cc: Alistair Francis <alistair.francis@xilinx.com>, "Edgar E . Iglesias" <edgar.iglesias@xilinx.com>, Cleber Rosa <crosa@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, John Snow <jsnow@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, =?UTF-8?B?THVrw6HFoSBEb2t0b3I=?= <ldoktor@redhat.com>, "Daniel P . Berrange" <berrange@redhat.com>, Eric Blake <eblake@redhat.com>, Fam Zheng <famz@redhat.com>, Thomas Huth <thuth@redhat.com>, =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org
+To: Peter Xu <peterx@redhat.com>
+Cc: qemu-devel@nongnu.org, Stefan Hajnoczi <shajnocz@redhat.com>, "Daniel P . Berrange" <berrange@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Fam Zheng <famz@redhat.com>, Juan Quintela <quintela@redhat.com>, mdroth@linux.vnet.ibm.com, Eric Blake <eblake@redhat.com>, Laurent Vivier <lvivier@redhat.com>, Markus Armbruster <armbru@redhat.com>, marcandre.lureau@redhat.com, "Dr . David Alan Gilbert" <dgilbert@redhat.com>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---x1NLimutSg6NrOdXeCB0xCqX7bkncvU1o
-From: Paolo Bonzini <pbonzini@redhat.com>
-To: Stefan Hajnoczi <stefanha@redhat.com>,
- =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Cc: Alistair Francis <alistair.francis@xilinx.com>,
- "Edgar E . Iglesias" <edgar.iglesias@xilinx.com>,
- Cleber Rosa <crosa@redhat.com>, Kevin Wolf <kwolf@redhat.com>,
- Max Reitz <mreitz@redhat.com>, John Snow <jsnow@redhat.com>,
- Eduardo Habkost <ehabkost@redhat.com>, =?UTF-8?B?THVrw6HFoSBEb2t0b3I=?=
- <ldoktor@redhat.com>, "Daniel P . Berrange" <berrange@redhat.com>,
- Eric Blake <eblake@redhat.com>, Fam Zheng <famz@redhat.com>,
- Thomas Huth <thuth@redhat.com>,
- =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>,
- qemu-devel@nongnu.org, qemu-block@nongnu.org
-Message-ID: <d4d649fc-4bb2-9b61-7e48-46a6a51e7b01@redhat.com>
-Subject: Re: [PATCH 0/6] QTests: use Python to run complex tests
-References: <20171213213557.26561-1-f4bug@amsat.org>
- <20171214093907.GA14433@stefanha-x1.localdomain>
-In-Reply-To: <20171214093907.GA14433@stefanha-x1.localdomain>
-Content-Type: text/plain; charset=windows-1252
+
+--iJXiJc/TAIT2rh2r
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On 14/12/2017 10:39, Stefan Hajnoczi wrote:
->>             # verify Card ID
->>             data =3D self.bus.do_cmd(ALL_SEND_CID)
->>             oid, pnm, psn =3D struct.unpack(">x2s5sxLxxx", data)
->>             self.assertEqual(oid, "XY") # QEMU default
->>             self.assertEqual(pnm, "QEMU!") # QEMU default
->>             self.assertEqual(psn, 0xdeadbeef) # QEMU default
-> Device qtests are better done in C than Python.  Python is not good at
-> binary I/O and porting this to Python 3 will be extra work later (Pytho=
-n
-> 2 is set for End-of-Life in 2020, see https://pythonclock.org/).
+On Tue, Dec 05, 2017 at 01:51:52PM +0800, Peter Xu wrote:
+> Set maximum QMP request queue length to 8.  If queue full, instead of
+> queue the command, we directly return a "request-dropped" event, telling
+> client that specific command is dropped.
 >=20
-> More importantly, we already have libqos in C with a guest memory
-> allocator, PCI, and virtio support.  Fragmenting the small amount effor=
-t
-> that goes into device testing will delay libqos reaching critical mass.=
+> Note that this flow control mechanism is only valid if OOB is enabled.
+> If it's not, the effective queue length will always be 1, which strictly
+> follows original behavior of QMP command handling (which never drop
+> messages).
+>=20
+> Signed-off-by: Peter Xu <peterx@redhat.com>
+> ---
+>  monitor.c | 15 +++++++++++++++
+>  1 file changed, 15 insertions(+)
+>=20
+> diff --git a/monitor.c b/monitor.c
+> index c20e659740..f7923c4590 100644
+> --- a/monitor.c
+> +++ b/monitor.c
+> @@ -4029,6 +4029,8 @@ static void monitor_qmp_bh_dispatcher(void *data)
+>      }
+>  }
+> =20
+> +#define  QMP_REQ_QUEUE_LEN_MAX  (8)
+> +
+>  static void handle_qmp_command(JSONMessageParser *parser, GQueue *tokens,
+>                                 void *opaque)
+>  {
+> @@ -4061,6 +4063,19 @@ static void handle_qmp_command(JSONMessageParser *=
+parser, GQueue *tokens,
+>      req_obj->id =3D id;
+>      req_obj->req =3D req;
+> =20
+> +    if (qmp_oob_enabled(mon)) {
+> +        /* Drop the request if queue is full. */
+> +        if (mon->qmp.qmp_requests->length >=3D QMP_REQ_QUEUE_LEN_MAX) {
 
-> Critical mass is where libqos provides all the infrastructure you need
-> to set up a device and focus on your actual test instead of machine,
-> bus, or device initialization.  Starting a Python device testing effort=
+qmp_queue_lock must be held.  Perhaps it's simplest to move this check
+into the qmp_queue_lock critical section below and unlock before calling
+qapi_event_send_request_dropped()...
 
-> will just lead to duplication and 2 underdeveloped device testing
-> frameworks.
+> +            qapi_event_send_request_dropped(id,
+> +                                            REQUEST_DROP_REASON_QUEUE_FU=
+LL,
+> +                                            NULL);
+> +            qobject_decref(id);
+> +            qobject_decref(req);
+> +            g_free(req_obj);
+> +            return;
+> +        }
+> +    }
+> +
+>      /*
+>       * Put the request to the end of queue so that requests will be
+>       * handled in time order.  Ownership for req_obj, req, id,
 
-I agree that fragmentation is bad.  However, libqos is small (about 4k
-lines of code, maybe 3k in Python).
+=2E.. down here.
 
-I also agree that any qtest written in Python should be written in
-Python 3 from the beginning (in fact we should consider dropping Python
-2.x support in 2.12).  Doing so should not make binary I/O much
-different than C.
-
-=46rom my point of view, the main advantage of Python is the reflection
-mechanisms.  Those would make it possible to automatically discover the
-set of runnable tests; for example, based on:
-
-- two machine descriptions (including malloc) for ARM -M virt and x86 -M =
-q35
-
-- a driver for the generic PCIe host bridge
-
-- a driver for virtio-pci
-
-- a driver for virtio-scsi
-
-- a set of SCSI tests
-
-=2E.. it should be possible to run the same tests as either ARM or x86
-qtests.  This would be a very different framework compared to the C libqo=
-s.
-
-Thanks,
-
-Paolo
-
-> Is there a specific reason why adding SD Card support to libqos is not
-> possible in C?
-
-
-
---x1NLimutSg6NrOdXeCB0xCqX7bkncvU1o
+--iJXiJc/TAIT2rh2r
 Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQEzBAEBCAAdFiEE8TM4V0tmI4mGbHaCv/vSX3jHroMFAloyYhIACgkQv/vSX3jH
-roNUxwf+LvjVvv78MurxA9phFQsDpKUylGtjVXc0MX9Vx+PjJUAWUm2BfdpGVPwL
-0/f8U2hno14Q9+oASTVnjtsPyulwOJ+M5rqwUrv0K5bgCJS7HbRLo5InpUgs5qB8
-RdiE3fRh7QbcLMCB+T72eQBgylHhBQwaMv88k3bmzuaUIgow7djbyp9O0bPrJwhH
-UQ+dZPdax2DxZUPQgbPDst9tWyBWOgNrr3Midli8S/esOOr5GBSq/d0bgyihPEVA
-Y6tVhsqfi69eP2Hg4bHOG0cth5ZKh89p2bWGrGs3SgLqQAB0PVtXxvdjtO0Rwkqm
-3GTkehGzjJYBBfvxkpfsSelDYETLrA==
-=jUjb
+iQEcBAEBAgAGBQJaMmNwAAoJEJykq7OBq3PI3KwIALgcGJNhDnUrjeNNifOw3HOo
+yD5PYQt3vxz5U4sIkSrZqlb8ZBaqzbNycp5W/C0bbO/z0pZPnJ8BwPrs+LDFV2MG
+bAPVAFmiTUY9FxRctRayFAwkDmqlCvoNv95mZ6HNl7kXTfsXz+hnc8P0DCLkYjgh
+axZG8rLNED8n5COVI/dUTbE6GHre9+SHga8q8cgwyOmPvhfuBUHBHr7R7NGTLI5w
+olpgwEz3VUhSVQ2DYrgbbgrnepMDrrYnI7qvH/ylQShlEqfCQfShmU01MacEn1Ja
+yciUMFxIwXqXwK+An3XPAEZeIMulAox654tTE0VUw3km4etHWb5L8y1VlHUmm6k=
+=z2IX
 -----END PGP SIGNATURE-----
 
---x1NLimutSg6NrOdXeCB0xCqX7bkncvU1o--
+--iJXiJc/TAIT2rh2r--
