@@ -1,34 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:61000)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40300)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1ePTb8-00022K-Id
-	for qemu-devel@nongnu.org; Thu, 14 Dec 2017 08:30:56 -0500
+	(envelope-from <stefanha@redhat.com>) id 1ePTo7-0005Fm-0V
+	for qemu-devel@nongnu.org; Thu, 14 Dec 2017 08:44:15 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1ePTb3-0005zk-Ku
-	for qemu-devel@nongnu.org; Thu, 14 Dec 2017 08:30:50 -0500
-Received: from indium.canonical.com ([91.189.90.7]:38382)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1ePTb3-0005yV-F4
-	for qemu-devel@nongnu.org; Thu, 14 Dec 2017 08:30:45 -0500
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1ePTb1-0001ZN-E6
-	for <qemu-devel@nongnu.org>; Thu, 14 Dec 2017 13:30:43 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 389FC2E80CC
-	for <qemu-devel@nongnu.org>; Thu, 14 Dec 2017 13:30:43 +0000 (UTC)
+	(envelope-from <stefanha@redhat.com>) id 1ePTo1-0004By-3l
+	for qemu-devel@nongnu.org; Thu, 14 Dec 2017 08:44:15 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:38346)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1ePTo0-0004BC-So
+	for qemu-devel@nongnu.org; Thu, 14 Dec 2017 08:44:09 -0500
+Date: Thu, 14 Dec 2017 13:43:59 +0000
+From: Stefan Hajnoczi <stefanha@redhat.com>
+Message-ID: <20171214134359.GJ14433@stefanha-x1.localdomain>
+References: <20171205055200.16305-1-peterx@redhat.com>
+	<20171205055200.16305-22-peterx@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Thu, 14 Dec 2017 13:24:29 -0000
-From: Peter Maydell <peter.maydell@linaro.org>
-Reply-To: Bug 1738202 <1738202@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <151325583524.11815.276669131575779398.malonedeb@gac.canonical.com>
-Message-Id: <151325786968.12570.17570329704927233099.malone@gac.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1738202] Re: qemu 2.11 segfaults on elf file that
- worked with qemu2.7
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="J2uG6jHjFLimDtBY"
+Content-Disposition: inline
+In-Reply-To: <20171205055200.16305-22-peterx@redhat.com>
+Subject: Re: [Qemu-devel] [RFC v5 21/26] qmp: isolate responses into io
+ thread
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,78 +29,56 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Peter Xu <peterx@redhat.com>
+Cc: qemu-devel@nongnu.org, Stefan Hajnoczi <shajnocz@redhat.com>, "Daniel P . Berrange" <berrange@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Fam Zheng <famz@redhat.com>, Juan Quintela <quintela@redhat.com>, mdroth@linux.vnet.ibm.com, Eric Blake <eblake@redhat.com>, Laurent Vivier <lvivier@redhat.com>, Markus Armbruster <armbru@redhat.com>, marcandre.lureau@redhat.com, "Dr . David Alan Gilbert" <dgilbert@redhat.com>
 
-Your command line is badly broken: "-M integratorcp" requests a model of
-an integratorcp board, but "-cpu cortex-m4" tries to put an M-profile
-CPU in it, which is not something that board can support. In particular
-the resulting system model will have no NVIC in it. This only worked by
-accident in previous versions of QEMU.
 
-Ideally we should have better cpu-model compatibility checking in the
-board models, in which case we could print a message saying "CPU type
-cortex-m4 is not compatible with the integratorcp board" rather than
-crashing.
+--J2uG6jHjFLimDtBY
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-If you omit -cpu you'll get the default CPU type for the board, which is
-an arm926. That's a sensible board+cpu combination but presumably your
-guest code is not built to run on that hardware, which will be why it
-just falls over. ("QEMU prints no output" often means "guest code has
-crashed or gone into an infinite loop", rather than a QEMU bug.)
+On Tue, Dec 05, 2017 at 01:51:55PM +0800, Peter Xu wrote:
+> @@ -4429,6 +4515,13 @@ void monitor_cleanup(void)
+>       */
+>      iothread_stop(mon_global.mon_iothread);
+> =20
+> +    /*
+> +     * After we have IOThread to send responses, it's possible that
+> +     * when we stop the IOThread there are still replies queued in the
+> +     * responder queue.  Flush all of them.
+> +     */
+> +    monitor_qmp_bh_responder(NULL);
 
-If your code needs to run on an M-profile CPU then you'll need to pick
-one of the M-profile board models. As of 2.11 those are lm3s6965evb,
-lm3s811evb, mps2-an385, mps2-an511, netduino2.
+This doesn't work because monitor_qmp_bh_responder() does not guarantee
+that the full response has been written when it returns.
 
--- =
+When qemu_chr_fe_write() returns EAGAIN then qemu_chr_fe_add_watch() is
+used to register an event loop callback when the chardev becomes
+writable again.  But you stopped the event loop using iothread_stop() so
+we will never complete the write.
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1738202
+I suggest draining the monitor while the IOThread is still running
+(that way the AioContext and GMainContext are still operational).  You
+can:
+1. Suspend the monitor so new commands will not be read.
+2. Wait until all responses and outbuf are empty.
 
-Title:
-  qemu 2.11 segfaults on elf file that worked with qemu2.7
+Another option is moving the chardev back to the main loop but I'm not
+sure if the chardev subsystem supports that.
 
-Status in QEMU:
-  New
+--J2uG6jHjFLimDtBY
+Content-Type: application/pgp-signature; name="signature.asc"
 
-Bug description:
-  running on cygwin in Windows 7
+-----BEGIN PGP SIGNATURE-----
 
-  QEMU 2.10.93 segfaults:
-  $ /opt/qemu2.11/qemu-system-arm -M integratorcp -cpu cortex-m4 -semihosti=
-ng -nographic -monitor null -serial null -no-reboot -kernel MFWso_Cycle_f1u=
-P2_CUNIT_0.elf
-  Segmentation fault
+iQEcBAEBAgAGBQJaMoAfAAoJEJykq7OBq3PIVW4H/A+4VuFlZ6Uc7HLirap39E9W
+2qoS3AKVOrL1l2sHA5O6ByN9U0QwEBiLJU6RimcjlHUzg7z0BG4rKc0U/N8I/LpC
+VQzA5P+5DgJBwKs0vCPeowpo5z1ovKK1WthAVH7boQ/7hfcyMRp2+7f31WI3vLim
+eyVHRi84ahES1wPSUiIhIqxZGRbG5SeXadPLdbWYR3u/myY7tVHG1rENHhRrmy3b
+165b7mgfc9DrYTZxFxllp7NjDQZa5pCuSDhfveBXEzbrWe/wBMBqYHDIPHfKOzBv
+HJRbFNkq7WXCo+krAozZxNJ9+VV1bwqbPb51A5y9cnoJtvSMWs7m0fHQpjTavnA=
+=+pvI
+-----END PGP SIGNATURE-----
 
-  where QEMU 2.7.0 worked:
-  $ /opt/qemu2.7/qemu-system-arm -M integratorcp -cpu cortex-m4 -semihostin=
-g -nographic -monitor null -serial null -no-reboot -kernel MFWso_Cycle_f1uP=
-2_CUNIT_0.elf
-  ------------ CUnit_MFWso_Cycle_f1 ------------
-
-  =
-
-       CUnit - A Unit testing framework for C - Version 2.1-0
-       http://cunit.sourceforge.net/
-
-  =
-
-  Suite: Suite_MFWso_Cycle_f1
-    Test: MFWso_Cycle_f1() ... passed
-    Test: MFWso_GetPhysicalStateData() ... passed
-    Test: MFWso_GetOutputData() ... passed
-    Test: MFWso_GetSafeChannelOK() ... passed
-
-  --Run Summary: Type      Total     Ran  Passed  Failed
-                 suites        1       1     n/a       0
-                 tests         4       4       4       0
-                 asserts      54      54      54       0
-
-  ----------------------------------------
-
-  Omitting the -cpu parameter results (for both versions) to hang of
-  qemu (no output, no end, full cpu load).
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1738202/+subscriptions
+--J2uG6jHjFLimDtBY--
