@@ -1,24 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53548)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53588)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1ePIpX-0005vu-Ue
-	for qemu-devel@nongnu.org; Wed, 13 Dec 2017 21:01:01 -0500
+	id 1ePIpb-0005zC-C5
+	for qemu-devel@nongnu.org; Wed, 13 Dec 2017 21:01:04 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1ePIpW-0003bG-Mh
-	for qemu-devel@nongnu.org; Wed, 13 Dec 2017 21:01:00 -0500
+	id 1ePIpa-0003dZ-Dn
+	for qemu-devel@nongnu.org; Wed, 13 Dec 2017 21:01:03 -0500
+Received: from mail-qk0-x241.google.com ([2607:f8b0:400d:c09::241]:41052)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1ePIpa-0003dL-9W
+	for qemu-devel@nongnu.org; Wed, 13 Dec 2017 21:01:02 -0500
+Received: by mail-qk0-x241.google.com with SMTP id 84so4505365qks.8
+	for <qemu-devel@nongnu.org>; Wed, 13 Dec 2017 18:01:02 -0800 (PST)
 Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
 	<philippe.mathieu.daude@gmail.com>
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
-Date: Wed, 13 Dec 2017 23:00:21 -0300
-Message-Id: <20171214020025.4004-5-f4bug@amsat.org>
+Date: Wed, 13 Dec 2017 23:00:22 -0300
+Message-Id: <20171214020025.4004-6-f4bug@amsat.org>
 In-Reply-To: <20171214020025.4004-1-f4bug@amsat.org>
 References: <20171214020025.4004-1-f4bug@amsat.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH 4/8] sdhci: fix CAPAB/MAXCURR registers,
- both are 64bit and read-only
+Subject: [Qemu-devel] [PATCH 5/8] sdhci: add check_capab_readonly() qtest
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,96 +33,77 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alistair Francis <alistair.francis@xilinx.com>, "Edgar E . Iglesias" <edgar.iglesias@xilinx.com>, Prasad J Pandit <pjp@fedoraproject.org>, Peter Maydell <peter.maydell@linaro.org>, =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>, Andrzej Zaborowski <balrogg@gmail.com>, Andrew Baumann <Andrew.Baumann@microsoft.com>, Andrey Smirnov <andrew.smirnov@gmail.com>, Andrey Yurovsky <yurovsky@gmail.com>, Clement Deschamps <clement.deschamps@antfield.fr>, =?UTF-8?q?Gr=C3=A9gory=20Estrade?= <gregory.estrade@gmail.com>
-Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, qemu-devel@nongnu.org, qemu-arm@nongnu.org, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Sai Pavan Boddu <saipava@xilinx.com>
+To: Alistair Francis <alistair.francis@xilinx.com>, "Edgar E . Iglesias" <edgar.iglesias@xilinx.com>, Peter Maydell <peter.maydell@linaro.org>
+Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, qemu-devel@nongnu.org, Prasad J Pandit <pjp@fedoraproject.org>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Sai Pavan Boddu <saipava@xilinx.com>
 
-running qtests:
-
-  $ make check-qtest-arm
-    GTESTER check-qtest-arm
-  SDHC rd_4b @0x44 not implemented
-  SDHC wr_4b @0x40 <- 0x89abcdef not implemented
-  SDHC wr_4b @0x44 <- 0x01234567 not implemented
+read the CAPAB register.
 
 Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 ---
- include/hw/sd/sdhci.h |  4 ++--
- hw/sd/sdhci.c         | 25 ++++++++++++++++++++-----
- 2 files changed, 22 insertions(+), 7 deletions(-)
+ tests/sdhci-test.c | 30 ++++++++++++++++++++++++++++++
+ 1 file changed, 30 insertions(+)
 
-diff --git a/include/hw/sd/sdhci.h b/include/hw/sd/sdhci.h
-index f8e91ce903..d5093fe3fd 100644
---- a/include/hw/sd/sdhci.h
-+++ b/include/hw/sd/sdhci.h
-@@ -75,8 +75,8 @@ typedef struct SDHCIState {
-     uint16_t acmd12errsts; /* Auto CMD12 error status register */
-     uint64_t admasysaddr;  /* ADMA System Address Register */
+diff --git a/tests/sdhci-test.c b/tests/sdhci-test.c
+index 4ebe1e349b..01373a69df 100644
+--- a/tests/sdhci-test.c
++++ b/tests/sdhci-test.c
+@@ -9,6 +9,7 @@
+ #include "qemu/osdep.h"
+ #include "libqtest.h"
  
--    uint32_t capareg;      /* Capabilities Register */
--    uint32_t maxcurr;      /* Maximum Current Capabilities Register */
-+    uint64_t capareg;      /* Capabilities Register */
-+    uint64_t maxcurr;      /* Maximum Current Capabilities Register */
-     uint8_t  *fifo_buffer; /* SD host i/o FIFO buffer */
-     uint32_t buf_maxsz;
-     uint16_t data_count;   /* current element in FIFO buffer */
-diff --git a/hw/sd/sdhci.c b/hw/sd/sdhci.c
-index d6145342fb..4d269c7ac4 100644
---- a/hw/sd/sdhci.c
-+++ b/hw/sd/sdhci.c
-@@ -99,7 +99,7 @@
++#define SDHC_CAPAB                      0x40
+ #define SDHC_HCVER                      0xFE
  
- static void sdhci_init_capareg(SDHCIState *s, Error **errp)
- {
--    if (s->capareg == UINT32_MAX) {
-+    if (s->capareg == UINT64_MAX) {
-         s->capareg = SDHC_CAPAB_REG_DEFAULT;
-     }
+ static const struct sdhci_t {
+@@ -36,6 +37,20 @@ static uint32_t sdhci_readl(uintptr_t base, uint32_t reg_addr)
+     return qtest_readl(qtest, base + reg_addr);
  }
-@@ -893,10 +893,16 @@ static uint64_t sdhci_read(void *opaque, hwaddr offset, unsigned size)
-         ret = s->acmd12errsts;
-         break;
-     case SDHC_CAPAREG:
--        ret = s->capareg;
-+        ret = (uint32_t)s->capareg;
-+        break;
-+    case SDHC_CAPAREG + 4:
-+        ret = (uint32_t)(s->capareg >> 32);
-         break;
-     case SDHC_MAXCURR:
--        ret = s->maxcurr;
-+        ret = (uint32_t)s->maxcurr;
-+        break;
-+    case SDHC_MAXCURR + 4:
-+        ret = (uint32_t)(s->maxcurr >> 32);
-         break;
-     case SDHC_ADMAERR:
-         ret =  s->admaerr;
-@@ -1117,6 +1123,15 @@ sdhci_write(void *opaque, hwaddr offset, uint64_t val, unsigned size)
-         }
-         sdhci_update_irq(s);
-         break;
+ 
++static uint64_t sdhci_readq(uintptr_t base, uint32_t reg_addr)
++{
++    QTestState *qtest = global_qtest;
 +
-+    case SDHC_CAPAREG:
-+    case SDHC_CAPAREG + 4:
-+    case SDHC_MAXCURR:
-+    case SDHC_MAXCURR + 4:
-+        qemu_log_mask(LOG_GUEST_ERROR, "SDHC wr_%ub @0x%02" HWADDR_PRIx
-+                      " <- 0x%08x read-only\n", size, offset, value >> shift);
-+        break;
++    return qtest_readq(qtest, base + reg_addr);
++}
 +
-     default:
-         qemu_log_mask(LOG_UNIMP, "SDHC wr_%ub @0x%02" HWADDR_PRIx " <- 0x%08x "
-                       "not implemented\n", size, offset, value >> shift);
-@@ -1266,8 +1281,8 @@ const VMStateDescription sdhci_vmstate = {
- static Property sdhci_properties[] = {
-     DEFINE_PROP_UINT8("sd-spec-version", SDHCIState,
-                       capabilities.spec_version, SD_HOST_SPECv2_VERS),
--    DEFINE_PROP_UINT32("capareg", SDHCIState, capareg, UINT32_MAX),
--    DEFINE_PROP_UINT32("maxcurr", SDHCIState, maxcurr, 0),
-+    DEFINE_PROP_UINT64("capareg", SDHCIState, capareg, UINT64_MAX),
-+    DEFINE_PROP_UINT64("maxcurr", SDHCIState, maxcurr, 0),
-     DEFINE_PROP_BOOL("pending-insert-quirk", SDHCIState, pending_insert_quirk,
-                      false),
-     DEFINE_PROP_LINK("dma-memory", SDHCIState, dma_mr,
++static void sdhci_writeq(uintptr_t base, uint32_t reg_addr, uint64_t value)
++{
++    QTestState *qtest = global_qtest;
++
++    qtest_writeq(qtest, base + reg_addr, value);
++}
++
+ static void check_specs_version(uintptr_t addr, uint8_t version)
+ {
+     uint32_t v;
+@@ -46,6 +61,20 @@ static void check_specs_version(uintptr_t addr, uint8_t version)
+     g_assert_cmpuint(v, ==, version);
+ }
+ 
++static void check_capab_readonly(uintptr_t addr)
++{
++    const uint64_t vrand = 0x123456789abcdef;
++    uint64_t capab0, capab1;
++
++    capab0 = sdhci_readq(addr, SDHC_CAPAB);
++    g_assert_cmpuint(capab0, !=, vrand);
++
++    sdhci_writeq(addr, SDHC_CAPAB, vrand);
++    capab1 = sdhci_readq(addr, SDHC_CAPAB);
++    g_assert_cmpuint(capab1, !=, vrand);
++    g_assert_cmpuint(capab1, ==, capab0);
++}
++
+ static void test_machine(const void *data)
+ {
+     const struct sdhci_t *test = data;
+@@ -53,6 +82,7 @@ static void test_machine(const void *data)
+     global_qtest = qtest_startf("-machine %s -d unimp", test->machine);
+ 
+     check_specs_version(test->sdhci.addr, test->sdhci.version);
++    check_capab_readonly(test->sdhci.addr);
+ 
+     qtest_quit(global_qtest);
+ }
 -- 
 2.15.1
