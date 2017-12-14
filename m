@@ -1,22 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53109)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55238)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <andrew.smirnov@gmail.com>) id 1ePU7E-0006a0-Cl
-	for qemu-devel@nongnu.org; Thu, 14 Dec 2017 09:04:10 -0500
+	(envelope-from <imammedo@redhat.com>) id 1ePUAk-0007SO-87
+	for qemu-devel@nongnu.org; Thu, 14 Dec 2017 09:07:39 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <andrew.smirnov@gmail.com>) id 1ePU79-0006eW-Ue
-	for qemu-devel@nongnu.org; Thu, 14 Dec 2017 09:04:00 -0500
+	(envelope-from <imammedo@redhat.com>) id 1ePUAe-0002Xu-D7
+	for qemu-devel@nongnu.org; Thu, 14 Dec 2017 09:07:38 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:20665)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1ePUAe-0002Qh-4h
+	for qemu-devel@nongnu.org; Thu, 14 Dec 2017 09:07:32 -0500
+Date: Thu, 14 Dec 2017 15:07:16 +0100
+From: Igor Mammedov <imammedo@redhat.com>
+Message-ID: <20171214150716.3ffc6b52@redhat.com>
+In-Reply-To: <20171213180807.7066-3-dgilbert@redhat.com>
+References: <20171213180807.7066-1-dgilbert@redhat.com>
+	<20171213180807.7066-3-dgilbert@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <CAFEAcA_6R61208pZ5rchSG0Oy4c_2eSGD+dO-LQs3Dncjnpf-Q@mail.gmail.com>
-References: <20171211213007.7353-1-andrew.smirnov@gmail.com>
-	<20171211213007.7353-13-andrew.smirnov@gmail.com>
-	<CAFEAcA_6R61208pZ5rchSG0Oy4c_2eSGD+dO-LQs3Dncjnpf-Q@mail.gmail.com>
-From: Andrey Smirnov <andrew.smirnov@gmail.com>
-Date: Thu, 14 Dec 2017 06:03:39 -0800
-Message-ID: <CAHQ1cqHhN=hLun2mzqvg0N3NkxEbPpBU1iEf5-mAdnHqEs3KYg@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 12/13] sdhci: Add i.MX specific subtype of
- SDHCI
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v4 2/6] vhost: Simplify ring verification
+ checks
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,190 +28,168 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: qemu-arm <qemu-arm@nongnu.org>, Jason Wang <jasowang@redhat.com>, =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>, QEMU Developers <qemu-devel@nongnu.org>, Andrey Yurovsky <yurovsky@gmail.com>
+To: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>
+Cc: qemu-devel@nongnu.org, pbonzini@redhat.com, maxime.coquelin@redhat.com, mst@redhat.com, groug@kaod.org
 
-On Tue, Dec 12, 2017 at 9:52 AM, Peter Maydell <peter.maydell@linaro.org> w=
-rote:
-> On 11 December 2017 at 21:30, Andrey Smirnov <andrew.smirnov@gmail.com> w=
-rote:
->> IP block found on several generations of i.MX family does not use
->> vanilla SDHCI implementation and it comes with a number of quirks.
->>
->> Introduce i.MX SDHCI subtype of SDHCI block to add code necessary to
->> support unmodified Linux guest driver.
->>
->> Cc: Peter Maydell <peter.maydell@linaro.org>
->> Cc: Jason Wang <jasowang@redhat.com>
->> Cc: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
->> Cc: qemu-devel@nongnu.org
->> Cc: qemu-arm@nongnu.org
->> Cc: yurovsky@gmail.com
->> Signed-off-by: Andrey Smirnov <andrew.smirnov@gmail.com>
->> ---
->
->> +    case ESDHC_DLL_CTRL:
->> +    case ESDHC_TUNE_CTRL_STATUS:
->> +    case 0x6c:
->
-> Isn't there a name we can give 0x6c ?
->
+On Wed, 13 Dec 2017 18:08:03 +0000
+"Dr. David Alan Gilbert (git)" <dgilbert@redhat.com> wrote:
 
-Unfortunately, not that I know of. It's a mystery register not listed
-in RM and the only place I can found it being mentioned is in Linux
-driver as a part of errata ESDHC_FLAG_ERR004536 fix, where it is used
-nameless as well.
+> From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+> 
+> vhost_verify_ring_mappings() were used to verify that
+> rings are still accessible and related memory hasn't
+> been moved after flatview is updated.
+> 
+> It was doing checks by mapping ring's GPA+len and
+> checking that HVA hadn't changed with new memory map.
+> To avoid maybe expensive mapping call, we were
+> identifying address range that changed and were doing
+> mapping only if ring was in changed range.
+> 
+> However it's not neccessary to perform ring's GPA
+> mapping as we already have its current HVA and all
+> we need is to verify that ring's GPA translates to
+> the same HVA in updated flatview.
+> 
+> This will allow the following patches to simplify the range
+> comparison that was previously needed to avoid expensive
+> verify_ring_mapping calls.
+> 
+> Signed-off-by: Igor Mammedov <imammedo@redhat.com>
+> with modifications by:
+> Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+> ---
+>  hw/virtio/vhost.c | 74 ++++++++++++++++++++++++++++++-------------------------
+>  1 file changed, 41 insertions(+), 33 deletions(-)
+> 
+> diff --git a/hw/virtio/vhost.c b/hw/virtio/vhost.c
+> index e923219e63..c7ce7baf9b 100644
+> --- a/hw/virtio/vhost.c
+> +++ b/hw/virtio/vhost.c
+> @@ -450,35 +450,37 @@ static void vhost_memory_unmap(struct vhost_dev *dev, void *buffer,
+>      }
+>  }
+>  
+> -static int vhost_verify_ring_part_mapping(struct vhost_dev *dev,
+> -                                          void *part,
+> -                                          uint64_t part_addr,
+> -                                          uint64_t part_size,
+> -                                          uint64_t start_addr,
+> -                                          uint64_t size)
+> +static int vhost_verify_ring_part_mapping(void *ring_hva,
+> +                                          uint64_t ring_gpa,
+> +                                          uint64_t ring_size,
+> +                                          void *reg_hva,
+> +                                          uint64_t reg_gpa,
+> +                                          uint64_t reg_size)
+>  {
+> -    hwaddr l;
+> -    void *p;
+> -    int r = 0;
+> +    uint64_t hva_ring_offset;
+> +    uint64_t ring_last = range_get_last(ring_gpa, ring_size);
+> +    uint64_t reg_last = range_get_last(reg_gpa, reg_size);
+>  
+> -    if (!ranges_overlap(start_addr, size, part_addr, part_size)) {
+> +    if (ring_last < reg_gpa || ring_gpa > reg_last) {
+>          return 0;
+>      }
+> -    l = part_size;
+> -    p = vhost_memory_map(dev, part_addr, &l, 1);
+> -    if (!p || l != part_size) {
+> -        r = -ENOMEM;
+> +    /* check that whole ring's is mapped */
+> +    if (ring_last > reg_last) {
+> +        return -EBUSY;
+ENOMEM
 
->> +    case ESDHC_TUNING_CTRL:
->> +    case ESDHC_VENDOR_SPEC:
->> +    case ESDHC_MIX_CTRL:
->> +    case ESDHC_WTMK_LVL:
->> +        ret =3D 0;
->> +        break;
->> +    }
->> +
->> +    return ret;
->> +}
->> +
->> +static void
->> +usdhc_write(void *opaque, hwaddr offset, uint64_t val, unsigned size)
->> +{
->> +    SDHCIState *s =3D SYSBUS_SDHCI(opaque);
->> +    uint8_t hostctl;
->> +    uint32_t value =3D (uint32_t)val;
->> +
->> +    switch (offset) {
->> +    case ESDHC_DLL_CTRL:
->> +    case ESDHC_TUNE_CTRL_STATUS:
->> +    case 0x6c:
->> +    case ESDHC_TUNING_CTRL:
->> +    case ESDHC_WTMK_LVL:
->> +    case ESDHC_VENDOR_SPEC:
->> +        break;
->> +
->> +    case SDHC_HOSTCTL:
->> +        /*
->> +         * Here's What ESDHCI has at offset 0x28 (SDHC_HOSTCTL)
->> +         *
->> +         *       7         6     5      4      3      2        1      0
->> +         * |-----------+--------+--------+-----------+----------+------=
----|
->> +         * | Card      | Card   | Endian | DATA3     | Data     | Led  =
-   |
->> +         * | Detect    | Detect | Mode   | as Card   | Transfer | Contr=
-ol |
->> +         * | Signal    | Test   |        | Detection | Width    |      =
-   |
->> +         * | Selection | Level  |        | Pin       |          |      =
-   |
->> +         * |-----------+--------+--------+-----------+----------+------=
----|
->> +         *
->> +         * and 0x29
->> +         *
->> +         *  15      10 9    8
->> +         * |----------+------|
->> +         * | Reserved | DMA  |
->> +         * |          | Sel. |
->> +         * |          |      |
->> +         * |----------+------|
->> +         *
->> +         * and here's what SDCHI spec expects those offsets to be:
->> +         *
->> +         * 0x28 (Host Control Register)
->> +         *
->> +         *     7        6         5       4  3      2         1        =
-0
->> +         * |--------+--------+----------+------+--------+----------+---=
-------|
->> +         * | Card   | Card   | Extended | DMA  | High   | Data     | LE=
-D     |
->> +         * | Detect | Detect | Data     | Sel. | Speed  | Transfer | Co=
-ntrol |
->> +         * | Signal | Test   | Transfer |      | Enable | Width    |   =
-      |
->> +         * | Sel.   | Level  | Width    |      |        |          |   =
-      |
->> +         * |--------+--------+----------+------+--------+----------+---=
-------|
->> +         *
->> +         * and 0x29 (Power Control Register)
->> +         *
->> +         * |----------------------------------|
->> +         * | Power Control Register           |
->> +         * |                                  |
->> +         * | Description omitted,             |
->> +         * | since it has no analog in ESDHCI |
->> +         * |                                  |
->> +         * |----------------------------------|
->> +         *
->> +         * Since offsets 0x2A and 0x2B should be compatible between
->> +         * both IP specs we only need to reconcile least 16-bit of the
->> +         * word we've been given.
->> +         */
->
-> Thanks for this explanation, it's very helpful in figuring out what's
-> going on.
->
->> +    case SDHC_BLKSIZE:
->> +        /*
->> +         * ESDHCI does not implement "Host SDMA Buffer Boundary", and
->> +         * Linux driver will try to zero this field out which will
->> +         * break the rest of SDHCI emulation.
->> +         *
->> +         * Linux defaults to maximum possible setting (512K boundary)
->> +         * and it seems to be the only option that i.MX IP implements,
->> +         * so we artificially set it to that value.
->> +         */
->> +        val |=3D 0x7 << 12;
->> +        /* FALLTHROUGH */
->
-> We generally write this lowercase: /* fallthrough */
->
+>      }
+> -    if (p != part) {
+> -        r = -EBUSY;
+> +    /* check that ring's MemoryRegion wasn't replaced */
+> +    hva_ring_offset = ring_gpa - reg_gpa;
+> +    if (ring_hva != reg_hva + hva_ring_offset) {
+> +        return -ENOMEM;
+EBUSY
 
-OK, will fix in v2.
+>      }
+> -    vhost_memory_unmap(dev, p, l, 0, 0);
+> -    return r;
+> +
+> +    return 0;
+>  }
+>  
+>  static int vhost_verify_ring_mappings(struct vhost_dev *dev,
+> -                                      uint64_t start_addr,
+> -                                      uint64_t size)
+> +                                      void *reg_hva,
+> +                                      uint64_t reg_gpa,
+> +                                      uint64_t reg_size)
+>  {
+>      int i, j;
+>      int r = 0;
+> @@ -492,22 +494,25 @@ static int vhost_verify_ring_mappings(struct vhost_dev *dev,
+>          struct vhost_virtqueue *vq = dev->vqs + i;
+>  
+>          j = 0;
+> -        r = vhost_verify_ring_part_mapping(dev, vq->desc, vq->desc_phys,
+> -                                           vq->desc_size, start_addr, size);
+> +        r = vhost_verify_ring_part_mapping(
+> +                vq->desc, vq->desc_phys, vq->desc_size,
+> +                reg_hva, reg_gpa, reg_size);
+>          if (r) {
+>              break;
+>          }
+>  
+>          j++;
+> -        r = vhost_verify_ring_part_mapping(dev, vq->avail, vq->avail_phys,
+> -                                           vq->avail_size, start_addr, size);
+> +        r = vhost_verify_ring_part_mapping(
+> +                vq->desc, vq->desc_phys, vq->desc_size,
+> +                reg_hva, reg_gpa, reg_size);
+>          if (r) {
+>              break;
+>          }
+>  
+>          j++;
+> -        r = vhost_verify_ring_part_mapping(dev, vq->used, vq->used_phys,
+> -                                           vq->used_size, start_addr, size);
+> +        r = vhost_verify_ring_part_mapping(
+> +                vq->desc, vq->desc_phys, vq->desc_size,
+> +                reg_hva, reg_gpa, reg_size);
+>          if (r) {
+>              break;
+>          }
+> @@ -633,8 +638,6 @@ static void vhost_commit(MemoryListener *listener)
+>  {
+>      struct vhost_dev *dev = container_of(listener, struct vhost_dev,
+>                                           memory_listener);
+> -    hwaddr start_addr = 0;
+> -    ram_addr_t size = 0;
+>      uint64_t log_size;
+>      int r;
+>  
+> @@ -649,11 +652,16 @@ static void vhost_commit(MemoryListener *listener)
+>      }
+>  
+>      if (dev->started) {
+^^^ not needed as we bail out earlier if it's not true
 
->> +    default:
->> +        sdhci_write(opaque, offset, val, size);
->> +        break;
->> +    }
->> +}
->
->> diff --git a/include/hw/sd/sdhci.h b/include/hw/sd/sdhci.h
->> index 0f0c3f1e64..dc1856a33d 100644
->> --- a/include/hw/sd/sdhci.h
->> +++ b/include/hw/sd/sdhci.h
->> @@ -39,6 +39,7 @@ typedef struct SDHCIState {
->>      };
->>      SDBus sdbus;
->>      MemoryRegion iomem;
->> +    const MemoryRegionOps *io_ops;
->>
->>      QEMUTimer *insert_timer;       /* timer for 'changing' sd card. */
->>      QEMUTimer *transfer_timer;
->> @@ -83,8 +84,13 @@ typedef struct SDHCIState {
->>      /* Force Event Auto CMD12 Error Interrupt Reg - write only */
->>      /* Force Event Error Interrupt Register- write only */
->>      /* RO Host Controller Version Register always reads as 0x2401 */
->> +
->> +    unsigned long quirks;
->
-> I asked for this not to be unsigned long in the last round of review.
->
-
-Ugh, missed this one, sorry about that. Will fix in v2.
-
->>  } SDHCIState;
->>
->> +/* Controller does not provide transfer-complete interrupt when not bus=
-y */
->> +#define SDHCI_QUIRK_NO_BUSY_IRQ    BIT(14)
->
-> I asked for a comment saying we're following the Linux kernel's
-> quirk bit numbering in the last round of review.
->
-
-My bad, will fix in v 2.
-
-Thanks,
-Andrey Smirnov
+> -        start_addr = dev->mem_changed_start_addr;
+> -        size = dev->mem_changed_end_addr - dev->mem_changed_start_addr + 1;
+> -
+> -        r = vhost_verify_ring_mappings(dev, start_addr, size);
+> -        assert(r >= 0);
+> +        int i;
+> +        for (i = 0; i < dev->mem->nregions; i++) {
+> +            if (vhost_verify_ring_mappings(dev,
+> +                               (void *)dev->mem->regions[i].userspace_addr,
+> +                               dev->mem->regions[i].guest_phys_addr,
+> +                               dev->mem->regions[i].memory_size)) {
+> +                error_report("Verify ring failure on region %d", i);
+> +                abort();
+> +            }
+> +        }
+>      }
+>  
+>      if (!dev->log_enabled) {
