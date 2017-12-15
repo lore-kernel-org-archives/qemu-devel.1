@@ -1,31 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35340)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38146)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1ePl88-00036R-JZ
-	for qemu-devel@nongnu.org; Fri, 15 Dec 2017 03:14:06 -0500
+	(envelope-from <pbonzini@redhat.com>) id 1ePlGF-0004ti-5E
+	for qemu-devel@nongnu.org; Fri, 15 Dec 2017 03:22:28 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1ePl84-00076m-Ok
-	for qemu-devel@nongnu.org; Fri, 15 Dec 2017 03:14:04 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:37204)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <famz@redhat.com>) id 1ePl84-00076J-JF
-	for qemu-devel@nongnu.org; Fri, 15 Dec 2017 03:14:00 -0500
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
-	[10.5.11.12])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id C98816264D
-	for <qemu-devel@nongnu.org>; Fri, 15 Dec 2017 08:13:59 +0000 (UTC)
-Date: Fri, 15 Dec 2017 16:13:26 +0800
-From: Fam Zheng <famz@redhat.com>
-Message-ID: <20171215081326.GC23896@lemon>
-References: <151309960454.30.17116821935601659232@449822a21bf0>
-	<1263b9ba-fdde-729d-db58-7ede4b0d9686@redhat.com>
+	(envelope-from <pbonzini@redhat.com>) id 1ePlGB-0007Gp-Uw
+	for qemu-devel@nongnu.org; Fri, 15 Dec 2017 03:22:27 -0500
+References: <20171215034356.4449-1-f4bug@amsat.org>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <9670cc80-9de2-9838-a011-c9b2656e20fb@redhat.com>
+Date: Fri, 15 Dec 2017 09:22:14 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1263b9ba-fdde-729d-db58-7ede4b0d9686@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v2] dump-guest-memory.py: fix "You can't do
- that without a process to debug"
+In-Reply-To: <20171215034356.4449-1-f4bug@amsat.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v5 0/2] remove i386/pc dependency from
+ non-PC world (part 1) fix
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,77 +24,38 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Laszlo Ersek <lersek@redhat.com>
-Cc: qemu-devel@nongnu.org, marcandre.lureau@redhat.com, crosa@redhat.com, ehabkost@redhat.com, mst@redhat.com
+To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, "Michael S. Tsirkin" <mst@redhat.com>, Michael Tokarev <mjt@tls.msk.ru>
+Cc: qemu-devel@nongnu.org, Peter Maydell <peter.maydell@linaro.org>, Thomas Huth <thuth@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, qemu-trivial@nongnu.org
 
-On Tue, 12/12 18:30, Laszlo Ersek wrote:
-> On 12/12/17 18:26, no-reply@patchew.org wrote:
-> > Hi,
-> > 
-> > This series seems to have some coding style problems. See output below for
-> > more information:
-> > 
-> > Message-id: 20171212172208.13588-1-marcandre.lureau@redhat.com
-> > Subject: [Qemu-devel] [PATCH v2] dump-guest-memory.py: fix "You can't do that without a process to debug"
-> > Type: series
-> > 
-> > === TEST SCRIPT BEGIN ===
-> > #!/bin/bash
-> > 
-> > BASE=base
-> > n=1
-> > total=$(git log --oneline $BASE.. | wc -l)
-> > failed=0
-> > 
-> > git config --local diff.renamelimit 0
-> > git config --local diff.renames True
-> > 
-> > commits="$(git log --format=%H --reverse $BASE..)"
-> > for c in $commits; do
-> >     echo "Checking PATCH $n/$total: $(git log -n 1 --format=%s $c)..."
-> >     if ! git show $c --format=email | ./scripts/checkpatch.pl --mailback -; then
-> >         failed=1
-> >         echo
-> >     fi
-> >     n=$((n+1))
-> > done
-> > 
-> > exit $failed
-> > === TEST SCRIPT END ===
-> > 
-> > Updating 3c8cf5a9c21ff8782164d1def7f44bd888713384
-> > From https://github.com/patchew-project/qemu
-> >  t [tag update]            patchew/20171207203036.14993-1-eblake@redhat.com -> patchew/20171207203036.14993-1-eblake@redhat.com
-> >  * [new tag]               patchew/20171212172208.13588-1-marcandre.lureau@redhat.com -> patchew/20171212172208.13588-1-marcandre.lureau@redhat.com
-> > Switched to a new branch 'test'
-> > 7c0544b1a7 dump-guest-memory.py: fix "You can't do that without a process to debug"
-> > 
-> > === OUTPUT BEGIN ===
-> > Checking PATCH 1/1: dump-guest-memory.py: fix "You can't do that without a process to debug"...
-> > ERROR: Use of volatile is usually wrong: see Documentation/volatile-considered-harmful.txt
-> > #46: FILE: hw/misc/vmcoreinfo.c:39:
-> > +    static VMCoreInfoState * volatile vmcoreinfo_state G_GNUC_UNUSED;
-> > 
-> > total: 1 errors, 0 warnings, 24 lines checked
-> > 
-> > Your patch has style problems, please review.  If any of these errors
-> > are false positives report them to the maintainer, see
-> > CHECKPATCH in MAINTAINERS.
-> > 
-> > === OUTPUT END ===
-> > 
-> > Test command exited with code: 1
-> > 
-> > 
-> > ---
-> > Email generated automatically by Patchew [http://patchew.org/].
-> > Please send your feedback to patchew-devel@freelists.org
-> > 
-> 
-> "volatile" is required in this case; otherwise GCC would be entirely
-> justified to eliminate the variable.
+On 15/12/2017 04:43, Philippe Mathieu-Daud=C3=A9 wrote:
+> Fix patch 42 from previous series (v4) so patchew can build, and if a m=
+aintainer
+> is willing to take the previous series with the last 2 patches, I don't=
+ need to
+> respam a v6.
+>=20
+> Regards,
+>=20
+> Phil.
 
-OK, maybe we should relax it to warning instead of error for `volatile` usages,
-as long as it follows a comment?
+I tweaked a bit patch 1 to use LOG_UNIMP instead, and queued these two
+patches.
 
-Fam
+Paolo
+
+> Based-on: 20171215033015.738-42-f4bug@amsat.org
+>           (remove i386/pc dependency from non-PC world v4)
+>=20
+> Philippe Mathieu-Daud=C3=A9 (2):
+>   hw/i386/vmport: replace fprintf() by trace events
+>   misc: drop old i386 dependency
+>=20
+>  hw/char/debugcon.c      | 1 -
+>  hw/i386/vmport.c        | 8 +++-----
+>  hw/intc/lm32_pic.c      | 1 -
+>  hw/moxie/moxiesim.c     | 1 -
+>  hw/sparc/sun4m.c        | 1 -
+>  hw/watchdog/wdt_ib700.c | 1 -
+>  hw/i386/trace-events    | 4 ++++
+>  7 files changed, 7 insertions(+), 10 deletions(-)
+>=20
