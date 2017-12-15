@@ -1,26 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55331)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56183)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1ePmt1-0006Lm-9T
-	for qemu-devel@nongnu.org; Fri, 15 Dec 2017 05:06:40 -0500
+	(envelope-from <david@redhat.com>) id 1ePmvN-0007I1-Dk
+	for qemu-devel@nongnu.org; Fri, 15 Dec 2017 05:09:05 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1ePmsx-0002Zg-9T
-	for qemu-devel@nongnu.org; Fri, 15 Dec 2017 05:06:35 -0500
-Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
-	<philippe.mathieu.daude@gmail.com>
-References: <20171214145255.31545-1-andrew.smirnov@gmail.com>
-	<20171214145255.31545-3-andrew.smirnov@gmail.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <0f0bb800-af8b-d36e-c8da-10b0f2bd1e09@amsat.org>
-Date: Fri, 15 Dec 2017 07:06:25 -0300
+	(envelope-from <david@redhat.com>) id 1ePmvJ-0004WP-DU
+	for qemu-devel@nongnu.org; Fri, 15 Dec 2017 05:09:01 -0500
+References: <20171214171004.25058-1-cohuck@redhat.com>
+	<CAFEAcA8tY9=jtsw-MtjWTceLizvpH8oui_+6xf7V6K5o5BLf-A@mail.gmail.com>
+	<cf44ca76-d581-8d96-3e2b-78c698dda446@de.ibm.com>
+	<1a45723d-3731-17e9-98af-8d52312915e2@redhat.com>
+	<e5f8d9d6-82e2-a59f-eedd-dc93526195d2@de.ibm.com>
+From: David Hildenbrand <david@redhat.com>
+Message-ID: <dedd222b-be78-8b6d-1f68-e2e463e07bdf@redhat.com>
+Date: Fri, 15 Dec 2017 11:08:53 +0100
 MIME-Version: 1.0
-In-Reply-To: <20171214145255.31545-3-andrew.smirnov@gmail.com>
+In-Reply-To: <e5f8d9d6-82e2-a59f-eedd-dc93526195d2@de.ibm.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH v2 02/15] imx_fec: Refactor
- imx_eth_enable_rx()
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [qemu-s390x] [PULL 00/46] First batch of s390x
+ patches for 2.12
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,54 +28,36 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Andrey Smirnov <andrew.smirnov@gmail.com>, qemu-arm@nongnu.org
-Cc: Peter Maydell <peter.maydell@linaro.org>, Jason Wang <jasowang@redhat.com>, qemu-devel@nongnu.org, yurovsky@gmail.com
+To: Christian Borntraeger <borntraeger@de.ibm.com>, Peter Maydell <peter.maydell@linaro.org>, Cornelia Huck <cohuck@redhat.com>
+Cc: Thomas Huth <thuth@redhat.com>, Alexander Graf <agraf@suse.de>, QEMU Developers <qemu-devel@nongnu.org>, qemu-s390x@nongnu.org, Richard Henderson <rth@twiddle.net>
 
-On 12/14/2017 11:52 AM, Andrey Smirnov wrote:
-> Refactor imx_eth_enable_rx() to have more meaningfull variable name
-> than 'tmp' and to reduce number of logical negations done.
+On 15.12.2017 10:53, Christian Borntraeger wrote:
 > 
-> Cc: Peter Maydell <peter.maydell@linaro.org>
-> Cc: Jason Wang <jasowang@redhat.com>
-> Cc: Philippe Mathieu-Daudé <f4bug@amsat.org>
-> Cc: qemu-devel@nongnu.org
-> Cc: qemu-arm@nongnu.org
-> Cc: yurovsky@gmail.com
-> Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
-> Signed-off-by: Andrey Smirnov <andrew.smirnov@gmail.com>
+> 
+> On 12/15/2017 10:53 AM, David Hildenbrand wrote:
+>>
+>>> diff --git a/hw/s390x/s390-virtio-ccw.c b/hw/s390x/s390-virtio-ccw.c
+>>> index 80e753a5ef..9abb8de9f9 100644
+>>> --- a/hw/s390x/s390-virtio-ccw.c
+>>> +++ b/hw/s390x/s390-virtio-ccw.c
+>>> @@ -172,9 +172,10 @@ static void s390_memory_init(ram_addr_t mem_size)
+>>>      name = g_strdup_printf("s390.ram");
+>>>      while (mem_size) {
+>>>          MemoryRegion *ram = g_new(MemoryRegion, 1);
+>>> +       unsigned long long size = mem_size;
+>>>  
+>>>          /* KVM does not allow memslots >= 8 TB */
+>>> -        chunk = MIN(mem_size, KVM_SLOT_MAX_BYTES);
+>>> +        chunk = MIN(size, KVM_SLOT_MAX_BYTES);
+>>
+>> directly cast inline?
+> As I said, this still triggers the warning. gcc 7 is too clever.
 
-Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+Whoops missed that.
 
-> ---
->  hw/net/imx_fec.c | 8 ++++----
->  1 file changed, 4 insertions(+), 4 deletions(-)
-> 
-> diff --git a/hw/net/imx_fec.c b/hw/net/imx_fec.c
-> index 88b4b049d7..8b2e4b8ffe 100644
-> --- a/hw/net/imx_fec.c
-> +++ b/hw/net/imx_fec.c
-> @@ -536,19 +536,19 @@ static void imx_eth_do_tx(IMXFECState *s)
->  static void imx_eth_enable_rx(IMXFECState *s)
->  {
->      IMXFECBufDesc bd;
-> -    bool tmp;
-> +    bool rx_ring_full;
->  
->      imx_fec_read_bd(&bd, s->rx_descriptor);
->  
-> -    tmp = ((bd.flags & ENET_BD_E) != 0);
-> +    rx_ring_full = !(bd.flags & ENET_BD_E);
->  
-> -    if (!tmp) {
-> +    if (rx_ring_full) {
->          FEC_PRINTF("RX buffer full\n");
->      } else if (!s->regs[ENET_RDAR]) {
->          qemu_flush_queued_packets(qemu_get_queue(s->nic));
->      }
->  
-> -    s->regs[ENET_RDAR] = tmp ? ENET_RDAR_RDAR : 0;
-> +    s->regs[ENET_RDAR] = rx_ring_full ? 0 : ENET_RDAR_RDAR;
->  }
->  
->  static void imx_eth_reset(DeviceState *d)
-> 
+
+-- 
+
+Thanks,
+
+David / dhildenb
