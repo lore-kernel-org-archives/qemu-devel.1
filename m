@@ -1,19 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55503)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55567)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berto@igalia.com>) id 1ePpVH-0000Wp-1N
-	for qemu-devel@nongnu.org; Fri, 15 Dec 2017 07:54:19 -0500
+	(envelope-from <berto@igalia.com>) id 1ePpVI-0000X8-4u
+	for qemu-devel@nongnu.org; Fri, 15 Dec 2017 07:54:21 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berto@igalia.com>) id 1ePpVC-0003J5-SV
-	for qemu-devel@nongnu.org; Fri, 15 Dec 2017 07:54:15 -0500
+	(envelope-from <berto@igalia.com>) id 1ePpVC-0003Hm-BI
+	for qemu-devel@nongnu.org; Fri, 15 Dec 2017 07:54:16 -0500
 From: Alberto Garcia <berto@igalia.com>
-Date: Fri, 15 Dec 2017 13:53:52 +0100
-Message-Id: <192f0a4a1888e7e18cb7cec9fdbeadad5417b4ef.1513342045.git.berto@igalia.com>
+Date: Fri, 15 Dec 2017 13:53:59 +0100
+Message-Id: <8525e16caa2fecac537aa62a449ea8626f5c7e36.1513342045.git.berto@igalia.com>
 In-Reply-To: <cover.1513342045.git.berto@igalia.com>
 References: <cover.1513342045.git.berto@igalia.com>
 In-Reply-To: <cover.1513342045.git.berto@igalia.com>
 References: <cover.1513342045.git.berto@igalia.com>
-Subject: [Qemu-devel] [PATCH v2 24/32] qcow2: Update
- qcow2_update_snapshot_refcount() to support L2 slices
+Subject: [Qemu-devel] [PATCH v2 31/32] qcow2: Allow configuring the L2 slice
+ size
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,223 +25,164 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Alberto Garcia <berto@igalia.com>, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>, Kevin Wolf <kwolf@redhat.com>, "Denis V . Lunev" <den@openvz.org>
 
-qcow2_update_snapshot_refcount() increases the refcount of all
-clusters of a given snapshot. In order to do that it needs to load all
-its L2 tables and iterate over their entries. Since we'll be loading
-L2 slices instead of full tables we need to add an extra loop that
-iterates over all slices of each L2 table.
+Now that the code is ready to handle L2 slices we can finally add an
+option to allow configuring their size.
 
-This function doesn't need any additional changes so apart from that
-this patch simply updates the variable name from l2_table to l2_slice.
+An L2 slice is the portion of an L2 table that is read by the qcow2
+cache. Until now the cache was always reading full L2 tables, and
+since the L2 table size is equal to the cluster size this was not very
+efficient with large clusters. Here's a more detailed explanation of
+why it makes sense to have smaller cache entries in order to load L2
+data:
+
+   https://lists.gnu.org/archive/html/qemu-block/2017-09/msg00635.html
+
+This patch introduces a new command-line option to the qcow2 driver
+named l2-cache-entry-size (cf. l2-cache-size). The cache entry size
+has the same restrictions as the cluster size: it must be a power of
+two and it has the same range of allowed values, with the additional
+requirement that it must not be larger than the cluster size.
+
+The L2 cache entry size (L2 slice size) remains equal to the cluster
+size for now by default, so this feature must be explicitly enabled.
+Although my tests show that 4KB slices consistently improve
+performance and give the best results, let's wait and make more tests
+with different cluster sizes before deciding on an optimal default.
 
 Signed-off-by: Alberto Garcia <berto@igalia.com>
 ---
- block/qcow2-refcount.c | 150 ++++++++++++++++++++++++++-----------------------
- 1 file changed, 80 insertions(+), 70 deletions(-)
+ block/qcow2-cache.c | 10 ++++++++--
+ block/qcow2.c       | 33 +++++++++++++++++++++++++++------
+ block/qcow2.h       |  4 +++-
+ 3 files changed, 38 insertions(+), 9 deletions(-)
 
-diff --git a/block/qcow2-refcount.c b/block/qcow2-refcount.c
-index 51094fbcfb..45c7bb0ff6 100644
---- a/block/qcow2-refcount.c
-+++ b/block/qcow2-refcount.c
-@@ -1183,18 +1183,22 @@ int qcow2_update_snapshot_refcount(BlockDriverState *bs,
-     int64_t l1_table_offset, int l1_size, int addend)
+diff --git a/block/qcow2-cache.c b/block/qcow2-cache.c
+index 2fcecbd7a8..fe58d1ec70 100644
+--- a/block/qcow2-cache.c
++++ b/block/qcow2-cache.c
+@@ -120,14 +120,20 @@ void qcow2_cache_clean_unused(Qcow2Cache *c)
+     c->cache_clean_lru_counter = c->lru_counter;
+ }
+ 
+-Qcow2Cache *qcow2_cache_create(BlockDriverState *bs, int num_tables)
++Qcow2Cache *qcow2_cache_create(BlockDriverState *bs, int num_tables,
++                               unsigned table_size)
  {
      BDRVQcow2State *s = bs->opaque;
--    uint64_t *l1_table, *l2_table, l2_offset, entry, l1_size2, refcount;
-+    uint64_t *l1_table, *l2_slice, l2_offset, entry, l1_size2, refcount;
-     bool l1_allocated = false;
-     int64_t old_entry, old_l2_offset;
-+    unsigned slice, slice_size, n_slices;
-     int i, j, l1_modified = 0, nb_csectors;
-     int ret;
+     Qcow2Cache *c;
  
-     assert(addend >= -1 && addend <= 1);
- 
--    l2_table = NULL;
-+    l2_slice = NULL;
-     l1_table = NULL;
-     l1_size2 = l1_size * sizeof(uint64_t);
- 
-+    slice_size = s->l2_slice_size * sizeof(uint64_t);
-+    n_slices = s->cluster_size / slice_size;
++    assert(num_tables > 0);
++    assert(is_power_of_2(table_size));
++    assert(table_size >= (1 << MIN_CLUSTER_BITS));
++    assert(table_size <= s->cluster_size);
 +
-     s->cache_discards = true;
+     c = g_new0(Qcow2Cache, 1);
+     c->size = num_tables;
+-    c->table_size = s->cluster_size;
++    c->table_size = table_size;
+     c->entries = g_try_new0(Qcow2CachedTable, num_tables);
+     c->table_array = qemu_try_blockalign(bs->file->bs,
+                                          (size_t) num_tables * c->table_size);
+diff --git a/block/qcow2.c b/block/qcow2.c
+index 38c2ccf210..fb6b352c66 100644
+--- a/block/qcow2.c
++++ b/block/qcow2.c
+@@ -666,6 +666,11 @@ static QemuOptsList qcow2_runtime_opts = {
+             .help = "Maximum L2 table cache size",
+         },
+         {
++            .name = QCOW2_OPT_L2_CACHE_ENTRY_SIZE,
++            .type = QEMU_OPT_SIZE,
++            .help = "Size of each entry in the L2 cache",
++        },
++        {
+             .name = QCOW2_OPT_REFCOUNT_CACHE_SIZE,
+             .type = QEMU_OPT_SIZE,
+             .help = "Maximum refcount block cache size",
+@@ -737,6 +742,7 @@ static void qcow2_attach_aio_context(BlockDriverState *bs,
  
-     /* WARNING: qcow2_snapshot_goto relies on this function not using the
-@@ -1236,91 +1240,97 @@ int qcow2_update_snapshot_refcount(BlockDriverState *bs,
-                 goto fail;
-             }
- 
--            ret = qcow2_cache_get(bs, s->l2_table_cache, l2_offset,
--                (void**) &l2_table);
--            if (ret < 0) {
--                goto fail;
--            }
-+            for (slice = 0; slice < n_slices; slice++) {
-+                ret = qcow2_cache_get(bs, s->l2_table_cache,
-+                                      l2_offset + slice * slice_size,
-+                                      (void **) &l2_slice);
-+                if (ret < 0) {
-+                    goto fail;
-+                }
- 
--            for (j = 0; j < s->l2_size; j++) {
--                uint64_t cluster_index;
--                uint64_t offset;
-+                for (j = 0; j < s->l2_slice_size; j++) {
-+                    uint64_t cluster_index;
-+                    uint64_t offset;
- 
--                entry = be64_to_cpu(l2_table[j]);
--                old_entry = entry;
--                entry &= ~QCOW_OFLAG_COPIED;
--                offset = entry & L2E_OFFSET_MASK;
-+                    entry = be64_to_cpu(l2_slice[j]);
-+                    old_entry = entry;
-+                    entry &= ~QCOW_OFLAG_COPIED;
-+                    offset = entry & L2E_OFFSET_MASK;
- 
--                switch (qcow2_get_cluster_type(entry)) {
--                case QCOW2_CLUSTER_COMPRESSED:
--                    nb_csectors = ((entry >> s->csize_shift) &
--                                   s->csize_mask) + 1;
--                    if (addend != 0) {
--                        ret = update_refcount(bs,
--                                (entry & s->cluster_offset_mask) & ~511,
-+                    switch (qcow2_get_cluster_type(entry)) {
-+                    case QCOW2_CLUSTER_COMPRESSED:
-+                        nb_csectors = ((entry >> s->csize_shift) &
-+                                       s->csize_mask) + 1;
-+                        if (addend != 0) {
-+                            ret = update_refcount(
-+                                bs, (entry & s->cluster_offset_mask) & ~511,
-                                 nb_csectors * 512, abs(addend), addend < 0,
-                                 QCOW2_DISCARD_SNAPSHOT);
--                        if (ret < 0) {
-+                            if (ret < 0) {
-+                                goto fail;
-+                            }
-+                        }
-+                        /* compressed clusters are never modified */
-+                        refcount = 2;
-+                        break;
+ static void read_cache_sizes(BlockDriverState *bs, QemuOpts *opts,
+                              uint64_t *l2_cache_size,
++                             uint64_t *l2_cache_entry_size,
+                              uint64_t *refcount_cache_size, Error **errp)
+ {
+     BDRVQcow2State *s = bs->opaque;
+@@ -792,6 +798,17 @@ static void read_cache_sizes(BlockDriverState *bs, QemuOpts *opts,
+                                  / DEFAULT_L2_REFCOUNT_SIZE_RATIO;
+         }
+     }
 +
-+                    case QCOW2_CLUSTER_NORMAL:
-+                    case QCOW2_CLUSTER_ZERO_ALLOC:
-+                        if (offset_into_cluster(s, offset)) {
-+                            int l2_index = slice * s->l2_slice_size + j;
-+                            qcow2_signal_corruption(
-+                                bs, true, -1, -1, "Cluster "
-+                                "allocation offset %#" PRIx64
-+                                " unaligned (L2 offset: %#"
-+                                PRIx64 ", L2 index: %#x)",
-+                                offset, l2_offset, l2_index);
-+                            ret = -EIO;
-                             goto fail;
-                         }
--                    }
--                    /* compressed clusters are never modified */
--                    refcount = 2;
--                    break;
++    *l2_cache_entry_size = qemu_opt_get_size(
++        opts, QCOW2_OPT_L2_CACHE_ENTRY_SIZE, s->cluster_size);
++    if (*l2_cache_entry_size < (1 << MIN_CLUSTER_BITS) ||
++        *l2_cache_entry_size > s->cluster_size ||
++        !is_power_of_2(*l2_cache_entry_size)) {
++        error_setg(errp, "L2 cache entry size must be a power of two "
++                   "between %d and the cluster size (%d)",
++                   1 << MIN_CLUSTER_BITS, s->cluster_size);
++        return;
++    }
+ }
  
--                case QCOW2_CLUSTER_NORMAL:
--                case QCOW2_CLUSTER_ZERO_ALLOC:
--                    if (offset_into_cluster(s, offset)) {
--                        qcow2_signal_corruption(bs, true, -1, -1, "Cluster "
--                                                "allocation offset %#" PRIx64
--                                                " unaligned (L2 offset: %#"
--                                                PRIx64 ", L2 index: %#x)",
--                                                offset, l2_offset, j);
--                        ret = -EIO;
--                        goto fail;
--                    }
-+                        cluster_index = offset >> s->cluster_bits;
-+                        assert(cluster_index);
-+                        if (addend != 0) {
-+                            ret = qcow2_update_cluster_refcount(
-+                                bs, cluster_index, abs(addend), addend < 0,
-+                                QCOW2_DISCARD_SNAPSHOT);
-+                            if (ret < 0) {
-+                                goto fail;
-+                            }
-+                        }
- 
--                    cluster_index = offset >> s->cluster_bits;
--                    assert(cluster_index);
--                    if (addend != 0) {
--                        ret = qcow2_update_cluster_refcount(bs,
--                                    cluster_index, abs(addend), addend < 0,
--                                    QCOW2_DISCARD_SNAPSHOT);
-+                        ret = qcow2_get_refcount(bs, cluster_index, &refcount);
-                         if (ret < 0) {
-                             goto fail;
-                         }
--                    }
-+                        break;
- 
--                    ret = qcow2_get_refcount(bs, cluster_index, &refcount);
--                    if (ret < 0) {
--                        goto fail;
--                    }
--                    break;
-+                    case QCOW2_CLUSTER_ZERO_PLAIN:
-+                    case QCOW2_CLUSTER_UNALLOCATED:
-+                        refcount = 0;
-+                        break;
- 
--                case QCOW2_CLUSTER_ZERO_PLAIN:
--                case QCOW2_CLUSTER_UNALLOCATED:
--                    refcount = 0;
--                    break;
--
--                default:
--                    abort();
--                }
-+                    default:
-+                        abort();
-+                    }
- 
--                if (refcount == 1) {
--                    entry |= QCOW_OFLAG_COPIED;
--                }
--                if (entry != old_entry) {
--                    if (addend > 0) {
--                        qcow2_cache_set_dependency(bs, s->l2_table_cache,
--                            s->refcount_block_cache);
-+                    if (refcount == 1) {
-+                        entry |= QCOW_OFLAG_COPIED;
-+                    }
-+                    if (entry != old_entry) {
-+                        if (addend > 0) {
-+                            qcow2_cache_set_dependency(bs, s->l2_table_cache,
-+                                                       s->refcount_block_cache);
-+                        }
-+                        l2_slice[j] = cpu_to_be64(entry);
-+                        qcow2_cache_entry_mark_dirty(s->l2_table_cache,
-+                                                     l2_slice);
-                     }
--                    l2_table[j] = cpu_to_be64(entry);
--                    qcow2_cache_entry_mark_dirty(s->l2_table_cache, l2_table);
-                 }
-+
-+                qcow2_cache_put(s->l2_table_cache, (void **) &l2_slice);
-             }
- 
--            qcow2_cache_put(s->l2_table_cache, (void **) &l2_table);
--
-             if (addend != 0) {
-                 ret = qcow2_update_cluster_refcount(bs, l2_offset >>
-                                                         s->cluster_bits,
-@@ -1346,8 +1356,8 @@ int qcow2_update_snapshot_refcount(BlockDriverState *bs,
- 
-     ret = bdrv_flush(bs);
- fail:
--    if (l2_table) {
--        qcow2_cache_put(s->l2_table_cache, (void **) &l2_table);
-+    if (l2_slice) {
-+        qcow2_cache_put(s->l2_table_cache, (void **) &l2_slice);
+ typedef struct Qcow2ReopenState {
+@@ -814,7 +831,7 @@ static int qcow2_update_options_prepare(BlockDriverState *bs,
+     QemuOpts *opts = NULL;
+     const char *opt_overlap_check, *opt_overlap_check_template;
+     int overlap_check_template = 0;
+-    uint64_t l2_cache_size, refcount_cache_size;
++    uint64_t l2_cache_size, l2_cache_entry_size, refcount_cache_size;
+     int i;
+     const char *encryptfmt;
+     QDict *encryptopts = NULL;
+@@ -833,8 +850,8 @@ static int qcow2_update_options_prepare(BlockDriverState *bs,
      }
  
-     s->cache_discards = false;
+     /* get L2 table/refcount block cache size from command line options */
+-    read_cache_sizes(bs, opts, &l2_cache_size, &refcount_cache_size,
+-                     &local_err);
++    read_cache_sizes(bs, opts, &l2_cache_size, &l2_cache_entry_size,
++                     &refcount_cache_size, &local_err);
+     if (local_err) {
+         error_propagate(errp, local_err);
+         ret = -EINVAL;
+@@ -879,9 +896,13 @@ static int qcow2_update_options_prepare(BlockDriverState *bs,
+         }
+     }
+ 
+-    r->l2_slice_size = s->cluster_size / sizeof(uint64_t);
+-    r->l2_table_cache = qcow2_cache_create(bs, l2_cache_size);
+-    r->refcount_block_cache = qcow2_cache_create(bs, refcount_cache_size);
++    l2_cache_size *= s->cluster_size / l2_cache_entry_size;
++
++    r->l2_slice_size = l2_cache_entry_size / sizeof(uint64_t);
++    r->l2_table_cache = qcow2_cache_create(bs, l2_cache_size,
++                                           l2_cache_entry_size);
++    r->refcount_block_cache = qcow2_cache_create(bs, refcount_cache_size,
++                                                 s->cluster_size);
+     if (r->l2_table_cache == NULL || r->refcount_block_cache == NULL) {
+         error_setg(errp, "Could not allocate metadata caches");
+         ret = -ENOMEM;
+diff --git a/block/qcow2.h b/block/qcow2.h
+index 1894d1d028..1f5f0d56a6 100644
+--- a/block/qcow2.h
++++ b/block/qcow2.h
+@@ -100,6 +100,7 @@
+ #define QCOW2_OPT_OVERLAP_INACTIVE_L2 "overlap-check.inactive-l2"
+ #define QCOW2_OPT_CACHE_SIZE "cache-size"
+ #define QCOW2_OPT_L2_CACHE_SIZE "l2-cache-size"
++#define QCOW2_OPT_L2_CACHE_ENTRY_SIZE "l2-cache-entry-size"
+ #define QCOW2_OPT_REFCOUNT_CACHE_SIZE "refcount-cache-size"
+ #define QCOW2_OPT_CACHE_CLEAN_INTERVAL "cache-clean-interval"
+ 
+@@ -650,7 +651,8 @@ void qcow2_free_snapshots(BlockDriverState *bs);
+ int qcow2_read_snapshots(BlockDriverState *bs);
+ 
+ /* qcow2-cache.c functions */
+-Qcow2Cache *qcow2_cache_create(BlockDriverState *bs, int num_tables);
++Qcow2Cache *qcow2_cache_create(BlockDriverState *bs, int num_tables,
++                               unsigned table_size);
+ int qcow2_cache_destroy(Qcow2Cache *c);
+ 
+ void qcow2_cache_entry_mark_dirty(Qcow2Cache *c, void *table);
 -- 
 2.11.0
