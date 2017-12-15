@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59563)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59617)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1ePkzN-0007Dv-6P
-	for qemu-devel@nongnu.org; Fri, 15 Dec 2017 03:05:02 -0500
+	(envelope-from <famz@redhat.com>) id 1ePkzU-0007L7-Hr
+	for qemu-devel@nongnu.org; Fri, 15 Dec 2017 03:05:12 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1ePkzJ-0001IN-EU
-	for qemu-devel@nongnu.org; Fri, 15 Dec 2017 03:05:01 -0500
+	(envelope-from <famz@redhat.com>) id 1ePkzO-0001L8-S9
+	for qemu-devel@nongnu.org; Fri, 15 Dec 2017 03:05:08 -0500
 From: Fam Zheng <famz@redhat.com>
-Date: Fri, 15 Dec 2017 16:04:45 +0800
-Message-Id: <20171215080446.10671-2-famz@redhat.com>
+Date: Fri, 15 Dec 2017 16:04:46 +0800
+Message-Id: <20171215080446.10671-3-famz@redhat.com>
 In-Reply-To: <20171215080446.10671-1-famz@redhat.com>
 References: <20171215080446.10671-1-famz@redhat.com>
-Subject: [Qemu-devel] [PATCH 1/2] block: Open backing image in force share
- mode for size probe
+Subject: [Qemu-devel] [PATCH 2/2] iotests: Test creating overlay when guest
+ running
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,39 +23,47 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org
 
-Management tools create overlays of running guests with qemu-img:
-
-  $ qemu-img create -b /image/in/use.qcow2 -f qcow2 /overlay/image.qcow2
-
-but this doesn't work anymore due to image locking:
-
-    qemu-img: /overlay/image.qcow2: Failed to get shared "write" lock
-    Is another process using the image?
-    Could not open backing image to determine size.
-Use the force share option to allow this use case again.
-
-Cc: qemu-stable@nongnu.org
 Signed-off-by: Fam Zheng <famz@redhat.com>
 ---
- block.c | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+ tests/qemu-iotests/153     | 4 ++++
+ tests/qemu-iotests/153.out | 3 +++
+ 2 files changed, 7 insertions(+)
 
-diff --git a/block.c b/block.c
-index 9a1a0d1e73..f236431da1 100644
---- a/block.c
-+++ b/block.c
-@@ -4593,10 +4593,11 @@ void bdrv_img_create(const char *filename, const char *fmt,
-         back_flags = flags;
-         back_flags &= ~(BDRV_O_RDWR | BDRV_O_SNAPSHOT | BDRV_O_NO_BACKING);
+diff --git a/tests/qemu-iotests/153 b/tests/qemu-iotests/153
+index fa25eb24bd..22cb9c69a7 100755
+--- a/tests/qemu-iotests/153
++++ b/tests/qemu-iotests/153
+@@ -32,6 +32,7 @@ _cleanup()
+ {
+     _cleanup_test_img
+     rm -f "${TEST_IMG}.base"
++    rm -f "${TEST_IMG}.overlay"
+     rm -f "${TEST_IMG}.convert"
+     rm -f "${TEST_IMG}.a"
+     rm -f "${TEST_IMG}.b"
+@@ -218,6 +219,9 @@ _send_qemu_cmd $QEMU_HANDLE \
  
-+        backing_options = qdict_new();
-         if (backing_fmt) {
--            backing_options = qdict_new();
-             qdict_put_str(backing_options, "driver", backing_fmt);
-         }
-+        qdict_put_bool(backing_options, BDRV_OPT_FORCE_SHARE, true);
+ _run_cmd $QEMU_IO "${TEST_IMG}" -c 'write 0 512'
  
-         bs = bdrv_open(full_backing, NULL, backing_options, back_flags,
-                        &local_err);
++echo "Creating overlay with qemu-img when the guest is running should be allowed"
++_run_cmd $QEMU_IMG create -f $IMGFMT -b "${TEST_IMG}" "${TEST_IMG}.overlay"
++
+ echo "Closing the other"
+ _send_qemu_cmd $QEMU_HANDLE \
+     "{ 'execute': 'human-monitor-command',
+diff --git a/tests/qemu-iotests/153.out b/tests/qemu-iotests/153.out
+index 5b917b177c..8131180c49 100644
+--- a/tests/qemu-iotests/153.out
++++ b/tests/qemu-iotests/153.out
+@@ -390,6 +390,9 @@ _qemu_img_wrapper info TEST_DIR/t.qcow2
+ _qemu_io_wrapper TEST_DIR/t.qcow2 -c write 0 512
+ can't open device TEST_DIR/t.qcow2: Failed to get "write" lock
+ Is another process using the image?
++Creating overlay with qemu-img when the guest is running should be allowed
++
++_qemu_img_wrapper create -f qcow2 -b TEST_DIR/t.qcow2 TEST_DIR/t.qcow2.overlay
+ Closing the other
+ 
+ _qemu_io_wrapper TEST_DIR/t.qcow2 -c write 0 512
 -- 
 2.14.3
