@@ -1,27 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35847)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35879)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1ePtbd-0000bi-JD
-	for qemu-devel@nongnu.org; Fri, 15 Dec 2017 12:17:06 -0500
+	(envelope-from <dgilbert@redhat.com>) id 1ePtbg-0000dQ-3E
+	for qemu-devel@nongnu.org; Fri, 15 Dec 2017 12:17:09 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1ePtbb-0001oM-RF
-	for qemu-devel@nongnu.org; Fri, 15 Dec 2017 12:17:05 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:41674)
+	(envelope-from <dgilbert@redhat.com>) id 1ePtba-0001ir-FC
+	for qemu-devel@nongnu.org; Fri, 15 Dec 2017 12:17:08 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:42606)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1ePtbb-0001lR-Ko
-	for qemu-devel@nongnu.org; Fri, 15 Dec 2017 12:17:03 -0500
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1ePtba-0001f1-9c
+	for qemu-devel@nongnu.org; Fri, 15 Dec 2017 12:17:02 -0500
 Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
 	[10.5.11.12])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id E04202CE95C
-	for <qemu-devel@nongnu.org>; Fri, 15 Dec 2017 17:17:02 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id 4CB68820F2
+	for <qemu-devel@nongnu.org>; Fri, 15 Dec 2017 17:17:01 +0000 (UTC)
 From: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>
-Date: Fri, 15 Dec 2017 17:16:54 +0000
-Message-Id: <20171215171655.7818-2-dgilbert@redhat.com>
-In-Reply-To: <20171215171655.7818-1-dgilbert@redhat.com>
-References: <20171215171655.7818-1-dgilbert@redhat.com>
-Subject: [Qemu-devel] [PATCH 1/2] migration: Allow migrate_fd_connect to
- take an Error *
+Date: Fri, 15 Dec 2017 17:16:53 +0000
+Message-Id: <20171215171655.7818-1-dgilbert@redhat.com>
+Subject: [Qemu-devel] [PATCH 0/2] migration/channel errors and cancelling
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,78 +32,39 @@ Cc: quintela@redhat.com, peterx@redhat.com
 
 From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
 
-Allow whatever is performing the connection to pass migrate_fd_connect
-an error to indicate there was a problem during connection, an allow
-us to clean up.
+Hi,
+  Where a channel fails asynchronously during connect, call
+back through the migration code so it can clean up.
+  In particular this causes the transition of a 'cancelling' state
+to 'cancelled' in the case of:
 
-The caller must free the error.
+    migrate -d tcp:deadhost:port
+     <host tries to connect>
+    migrate_cancel
 
-Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
----
- migration/channel.c   | 2 +-
- migration/migration.c | 7 ++++++-
- migration/migration.h | 2 +-
- migration/rdma.c      | 2 +-
- 4 files changed, 9 insertions(+), 4 deletions(-)
+previously the status would get stuck in cancelling because
+the final cleanup didn't happen.
 
-diff --git a/migration/channel.c b/migration/channel.c
-index 70ec7ea3b7..fdb7ddbd17 100644
---- a/migration/channel.c
-+++ b/migration/channel.c
-@@ -78,6 +78,6 @@ void migration_channel_connect(MigrationState *s,
- 
-         s->to_dst_file = f;
- 
--        migrate_fd_connect(s);
-+        migrate_fd_connect(s, NULL);
-     }
- }
-diff --git a/migration/migration.c b/migration/migration.c
-index 4de3b551fe..10a4260f27 100644
---- a/migration/migration.c
-+++ b/migration/migration.c
-@@ -2333,10 +2333,15 @@ static void *migration_thread(void *opaque)
-     return NULL;
- }
- 
--void migrate_fd_connect(MigrationState *s)
-+void migrate_fd_connect(MigrationState *s, Error *error_in)
- {
-     s->expected_downtime = s->parameters.downtime_limit;
-     s->cleanup_bh = qemu_bh_new(migrate_fd_cleanup, s);
-+    if (error_in) {
-+        migrate_fd_error(s, error_in);
-+        migrate_fd_cleanup(s);
-+        return;
-+    }
- 
-     qemu_file_set_blocking(s->to_dst_file, true);
-     qemu_file_set_rate_limit(s->to_dst_file,
-diff --git a/migration/migration.h b/migration/migration.h
-index 663415fe48..e67e5e87c2 100644
---- a/migration/migration.h
-+++ b/migration/migration.h
-@@ -168,7 +168,7 @@ uint64_t migrate_max_downtime(void);
- void migrate_set_error(MigrationState *s, const Error *error);
- void migrate_fd_error(MigrationState *s, const Error *error);
- 
--void migrate_fd_connect(MigrationState *s);
-+void migrate_fd_connect(MigrationState *s, Error *error_in);
- 
- MigrationState *migrate_init(void);
- bool migration_is_blocked(Error **errp);
-diff --git a/migration/rdma.c b/migration/rdma.c
-index ca56594328..cc7049c594 100644
---- a/migration/rdma.c
-+++ b/migration/rdma.c
-@@ -3758,7 +3758,7 @@ void rdma_start_outgoing_migration(void *opaque,
-     trace_rdma_start_outgoing_migration_after_rdma_connect();
- 
-     s->to_dst_file = qemu_fopen_rdma(rdma, "wb");
--    migrate_fd_connect(s);
-+    migrate_fd_connect(s, NULL);
-     return;
- err:
-     g_free(rdma);
+  This is the second part of the fix for:
+https://bugzilla.redhat.com/show_bug.cgi?id=1525899
+
+Dave
+
+Dr. David Alan Gilbert (2):
+  migration: Allow migrate_fd_connect to take an Error *
+  migration: Route errors down  through migration_channel_connect
+
+ migration/channel.c    | 32 ++++++++++++++++----------------
+ migration/channel.h    |  3 ++-
+ migration/exec.c       |  2 +-
+ migration/fd.c         |  2 +-
+ migration/migration.c  |  7 ++++++-
+ migration/migration.h  |  2 +-
+ migration/rdma.c       |  2 +-
+ migration/socket.c     |  4 +---
+ migration/tls.c        |  3 +--
+ migration/trace-events |  2 +-
+ 10 files changed, 31 insertions(+), 28 deletions(-)
+
 -- 
 2.14.3
