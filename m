@@ -1,33 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34157)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35021)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1ePvw5-0000f3-AH
-	for qemu-devel@nongnu.org; Fri, 15 Dec 2017 14:46:23 -0500
+	(envelope-from <eblake@redhat.com>) id 1ePvz2-0001YP-Ld
+	for qemu-devel@nongnu.org; Fri, 15 Dec 2017 14:49:25 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1ePvw4-0003mx-HK
-	for qemu-devel@nongnu.org; Fri, 15 Dec 2017 14:46:21 -0500
-Received: from mail-qt0-x243.google.com ([2607:f8b0:400d:c0d::243]:47073)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1ePvw4-0003mp-Cw
-	for qemu-devel@nongnu.org; Fri, 15 Dec 2017 14:46:20 -0500
-Received: by mail-qt0-x243.google.com with SMTP id r39so13413036qtr.13
-	for <qemu-devel@nongnu.org>; Fri, 15 Dec 2017 11:46:20 -0800 (PST)
-Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
-	<philippe.mathieu.daude@gmail.com>
-References: <20171215184155.2543-1-mark.cave-ayland@ilande.co.uk>
-	<20171215184155.2543-7-mark.cave-ayland@ilande.co.uk>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <88252cc8-2afa-db11-0a06-1a86c9c93ff0@amsat.org>
-Date: Fri, 15 Dec 2017 16:46:17 -0300
+	(envelope-from <eblake@redhat.com>) id 1ePvz1-0006ph-UI
+	for qemu-devel@nongnu.org; Fri, 15 Dec 2017 14:49:24 -0500
+References: <20171215080446.10671-1-famz@redhat.com>
+	<20171215080446.10671-3-famz@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <77427d85-f950-069b-938f-7f67ba66a906@redhat.com>
+Date: Fri, 15 Dec 2017 13:49:14 -0600
 MIME-Version: 1.0
-In-Reply-To: <20171215184155.2543-7-mark.cave-ayland@ilande.co.uk>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCHv3 06/13] sungem: fix multicast filter CRC
- calculation
+In-Reply-To: <20171215080446.10671-3-famz@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="K2OUW6gp7wl21Inafff99DjXBadUvhtjR"
+Subject: Re: [Qemu-devel] [PATCH 2/2] iotests: Test creating overlay when
+ guest running
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,49 +25,68 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, qemu-devel@nongnu.org, jasowang@redhat.com, sw@weilnetz.de
+To: Fam Zheng <famz@redhat.com>, qemu-devel@nongnu.org
+Cc: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>
 
-On 12/15/2017 03:41 PM, Mark Cave-Ayland wrote:
-> From the Linux sungem driver, we know that the multicast filter CRC is
-> implemented using ether_crc_le() which isn't the same as calling zlib's
-> crc32() function (the zlib implementation requires a complemented initial value
-> and also returns the complemented result).
-> 
-> Fix the multicast filter by simply using the new net_crc32_le() function.
-> 
-> Signed-off-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--K2OUW6gp7wl21Inafff99DjXBadUvhtjR
+From: Eric Blake <eblake@redhat.com>
+To: Fam Zheng <famz@redhat.com>, qemu-devel@nongnu.org
+Cc: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org,
+ Max Reitz <mreitz@redhat.com>
+Message-ID: <77427d85-f950-069b-938f-7f67ba66a906@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH 2/2] iotests: Test creating overlay when
+ guest running
+References: <20171215080446.10671-1-famz@redhat.com>
+ <20171215080446.10671-3-famz@redhat.com>
+In-Reply-To: <20171215080446.10671-3-famz@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
-
+On 12/15/2017 02:04 AM, Fam Zheng wrote:
+> Signed-off-by: Fam Zheng <famz@redhat.com>
 > ---
->  hw/net/sungem.c | 5 ++---
->  1 file changed, 2 insertions(+), 3 deletions(-)
-> 
-> diff --git a/hw/net/sungem.c b/hw/net/sungem.c
-> index 6aa8d1117b..60f1e479f3 100644
-> --- a/hw/net/sungem.c
-> +++ b/hw/net/sungem.c
-> @@ -11,12 +11,11 @@
->  #include "hw/pci/pci.h"
->  #include "qemu/log.h"
->  #include "net/net.h"
-> +#include "net/eth.h"
->  #include "net/checksum.h"
->  #include "hw/net/mii.h"
->  #include "sysemu/sysemu.h"
->  #include "trace.h"
-> -/* For crc32 */
-> -#include <zlib.h>
->  
->  #define TYPE_SUNGEM "sungem"
->  
-> @@ -595,7 +594,7 @@ static ssize_t sungem_receive(NetClientState *nc, const uint8_t *buf,
->      }
->  
->      /* Get MAC crc */
-> -    mac_crc = crc32(~0, buf, 6);
-> +    mac_crc = net_crc32_le(buf, ETH_ALEN);
->  
->      /* Packet isn't for me ? */
->      rx_cond = sungem_check_rx_mac(s, buf, mac_crc);
-> 
+>  tests/qemu-iotests/153     | 4 ++++
+>  tests/qemu-iotests/153.out | 3 +++
+>  2 files changed, 7 insertions(+)
+>=20
+> diff --git a/tests/qemu-iotests/153 b/tests/qemu-iotests/153
+> index fa25eb24bd..22cb9c69a7 100755
+> --- a/tests/qemu-iotests/153
+> +++ b/tests/qemu-iotests/153
+> @@ -32,6 +32,7 @@ _cleanup()
+>  {
+>      _cleanup_test_img
+>      rm -f "${TEST_IMG}.base"
+> +    rm -f "${TEST_IMG}.overlay"
+>      rm -f "${TEST_IMG}.convert"
+
+Conflicts with the series to clean up iotests to run in a per-test
+directory with automatic cleanup, but the resolution is obvious.
+
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
+
+
+--K2OUW6gp7wl21Inafff99DjXBadUvhtjR
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlo0JzoACgkQp6FrSiUn
+Q2qVHAgAg2GWrEQ8a0i39MT3AtBQ0dV9DgMAej5cmZa5vCEAwKgBKliGw8aaX/O3
+wIqWUMDf6G/Nbv2aVS8/uLXz3FrzMtrO8mfbGlzwLCK++sLH+RpcDislW3amBen5
++DtEBCfFP9Njt1IdylS+/4SzRwBlpj5O9WAn8dAd7fgPfkdofl3lMl0iu0OpQI4C
+A5SgtlhhDiyDWSn2qJOr7hg9ZPEndG6hs7U+TsGxUXJopdMOEPinrMMdQuADQhOh
+xc6p7u/+tE+v29kCzsMeUnRhb0pVLpL9yBgVOTaQl80YZxgipIA6PVeJoOQT8u70
+F9y0wzHejlDJjxjCfJeu0xG61DCF2g==
+=mZUw
+-----END PGP SIGNATURE-----
+
+--K2OUW6gp7wl21Inafff99DjXBadUvhtjR--
