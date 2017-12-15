@@ -1,25 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39208)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41989)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <miika9764@gmail.com>) id 1ePwCk-0005Co-Jw
-	for qemu-devel@nongnu.org; Fri, 15 Dec 2017 15:03:36 -0500
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1ePwOo-0007FA-Bz
+	for qemu-devel@nongnu.org; Fri, 15 Dec 2017 15:16:04 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <miika9764@gmail.com>) id 1ePwCj-0005m6-75
-	for qemu-devel@nongnu.org; Fri, 15 Dec 2017 15:03:34 -0500
-Received: from mail-qt0-x22d.google.com ([2607:f8b0:400d:c0d::22d]:38277)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <miika9764@gmail.com>) id 1ePwCj-0005la-32
-	for qemu-devel@nongnu.org; Fri, 15 Dec 2017 15:03:33 -0500
-Received: by mail-qt0-x22d.google.com with SMTP id d4so13523766qtj.5
-	for <qemu-devel@nongnu.org>; Fri, 15 Dec 2017 12:03:32 -0800 (PST)
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1ePwOj-0002G2-St
+	for qemu-devel@nongnu.org; Fri, 15 Dec 2017 15:16:02 -0500
+Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
+	<philippe.mathieu.daude@gmail.com>
+References: <20171214145255.31545-1-andrew.smirnov@gmail.com>
+	<20171214145255.31545-13-andrew.smirnov@gmail.com>
+	<c0810d46-60df-2239-fab6-6c1c11f1c274@amsat.org>
+	<CAHQ1cqFAzRSXGsLJOiqiyBHDAwNBuLkFNLocydWii7QEdkdP7Q@mail.gmail.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Message-ID: <a9f41d6e-3334-9a41-5aca-1254efd67219@amsat.org>
+Date: Fri, 15 Dec 2017 17:15:53 -0300
 MIME-Version: 1.0
-In-Reply-To: <20171215135738.GF11724@redhat.com>
-References: <CABMrAhLV6LLwBR70-P4EnekWHKD4AkaatzxQwuxtOnNYQ3MEqQ@mail.gmail.com>
-	<20171215135738.GF11724@redhat.com>
-From: Miika S <miika9764@gmail.com>
-Date: Fri, 15 Dec 2017 22:03:31 +0200
-Message-ID: <CABMrAhLGAm60AgMjbaKSd3k=oX7J6DVO-DwwW04RE75mEWqhCQ@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] Key code conflict in keycodemapdb
+In-Reply-To: <CAHQ1cqFAzRSXGsLJOiqiyBHDAwNBuLkFNLocydWii7QEdkdP7Q@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH v2 12/15] sdhci: Add i.MX specific subtype
+ of SDHCI
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,89 +31,396 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Daniel P. Berrange" <berrange@redhat.com>
-Cc: qemu-devel@nongnu.org, kraxel@redhat.com
+To: Andrey Smirnov <andrew.smirnov@gmail.com>
+Cc: "open list:ARM" <qemu-arm@nongnu.org>, Peter Maydell <peter.maydell@linaro.org>, Jason Wang <jasowang@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>, Andrey Yurovsky <yurovsky@gmail.com>
 
-Ok, I don't know if there is a separate place where to send patches
-for keycodemapdb but I will put it in this reply. I will send a new
-set of patches for the QEMU changes that were in the first mail
-(hopefully in a better format than this one) and also a fix for mouse
-wheel event being sent twice.
-------------------------------------------------------------------------------
->From 506f0bf52b9743e19a65be83be8adf4782edd21b Mon Sep 17 00:00:00 2001
-From: Miika S <miika9764@gmail.com>
-Date: Fri, 15 Dec 2017 21:50:23 +0200
-Subject: [PATCH 1/1] Add missing QKeyCode values for JIS keyboards
+Hi Andrey,
 
-The AT set1 code for KEY_ISO is removed because it conflicts with
-KEY_KATAKANAHIRAGANA.
-
-Signed-off-by: Miika S <miika9764@gmail.com>
----
- data/keymaps.csv | 8 ++++----
- 1 file changed, 4 insertions(+), 4 deletions(-)
-
-diff --git a/data/keymaps.csv b/data/keymaps.csv
-index 0ef2ec1..bc2376c 100644
---- a/data/keymaps.csv
-+++ b/data/keymaps.csv
-@@ -154,9 +154,9 @@
-KEY_KATAKANA,90,JIS_Kana,0x68,0x78,0x63,,146,VK_KANA,0x15,,,,,Lang3,KATA,,,
- KEY_HIRAGANA,91,,,0x77,0x62,0x87,147,,,,,,,Hiragana,HIRA,hiragana,,
- KEY_HIRAGANA,91,,,0x77,0x62,0x87,147,,,,,,,Lang4,HIRA,hiragana,,
- KEY_HENKAN,92,,,0x79,0x64,0x86,138,,,,,,,Convert,HENK,henkan,,
--KEY_KATAKANAHIRAGANA,93,,,0x70,0x13,0x87,136,,,0xc8,0xc8,,,KanaMode,HKTG,,,
--KEY_MUHENKAN,94,,,0x7b,0x67,0x85,139,,,,,,,NonConvert,NFER,,,
--KEY_MUHENKAN,94,,,0x7b,0x67,0x85,139,,,,,,,NonConvert,MUHE,,,
-+KEY_KATAKANAHIRAGANA,93,,,0x70,0x13,0x87,136,,,0xc8,0xc8,,,KanaMode,HKTG,katakanahiragana,,
-+KEY_MUHENKAN,94,,,0x7b,0x67,0x85,139,,,,,,,NonConvert,NFER,muhenkan,,
-+KEY_MUHENKAN,94,,,0x7b,0x67,0x85,139,,,,,,,NonConvert,MUHE,muhenkan,,
- KEY_KPJPCOMMA,95,JIS_KeypadComma,0x5f,0x5c,0x27,,140,,,,,XK_KP_Separator,0xffac,,KPSP,,,
- KEY_KPJPCOMMA,95,JIS_KeypadComma,0x5f,0x5c,0x27,,140,,,,,XK_KP_Separator,0xffac,,JPCM,,,
- KEY_KPENTER,96,ANSI_KeypadEnter,0x4c,0xe01c,0xe05a,0x79,88,,,0x64,0x64,XK_KP_Enter,0xff8d,NumpadEnter,KPEN,kp_enter,0x5a,0x4c
-@@ -246,7 +246,7 @@
-KEY_STOPCD,166,,,0xe024,0xe03b,0x98,233,VK_MEDIA_STOP,0xb2,,,,,MediaStop,I174,au
- KEY_RECORD,167,,,0xe031,,0x9e,,,,,,,,,I175,,,
- KEY_REWIND,168,,,0xe018,,0x9f,,,,,,,,,I176,,,
- KEY_PHONE,169,,,0x63,,,,,,,,,,,I177,,,
--KEY_ISO,170,ISO_Section,0xa,0x70,,,,,,,,,,,I178,,,
-+KEY_ISO,170,ISO_Section,0xa,,,,,,,,,,,,I178,,,
- KEY_CONFIG,171,,,0xe001,,,,,,,,,,,I179,,,
- KEY_HOMEPAGE,172,,,0xe032,0xe03a,0x97,,VK_BROWSER_HOME,0xac,,,,,BrowserHome,I180,ac_home,,
- KEY_REFRESH,173,,,0xe067,0xe020,,250,VK_BROWSER_REFRESH,0xa8,,,,,BrowserRefresh,I181,ac_refresh,,
--- 
-2.15.1
-
-
-On Fri, Dec 15, 2017 at 3:57 PM, Daniel P. Berrange <berrange@redhat.com> wrote:
-> On Fri, Dec 15, 2017 at 03:51:19PM +0200, Miika S wrote:
->> Hi
+>> I rather disagree with this patch, however I applied it on top of my
+>> current tree and plan to refactor it. But if it is applied before, I can
+>> survive :) Not a strong NACK.
 >>
->> I tried to add JIS keyboard support to virtio-input-hid but ran
->> into a problem with keys that have the "Linux Name" KEY_ISO and
->> KEY_KATAKANAHIRAGANA. The problem appears to be that they have
->> the same "AT set1 keycode" 0x70. I worked around it by removing
->> KEY_ISO from keycodemapdb and got the keys working, but that
->> doesn't work for the rest of QEMU. Is it intended that the keys
->> have the same "AT set1 keycode"?
->
-> It is probably a misake
->
->
->> @@ -246,7 +246,6 @@
->> KEY_STOPCD,166,,,0xe024,0xe03b,0x98,233,VK_MEDIA_STOP,0xb2,,,,,MediaStop,I174,au
->>  KEY_RECORD,167,,,0xe031,,0x9e,,,,,,,,,I175,,,
->>  KEY_REWIND,168,,,0xe018,,0x9f,,,,,,,,,I176,,,
->>  KEY_PHONE,169,,,0x63,,,,,,,,,,,I177,,,
->> -KEY_ISO,170,ISO_Section,0xa,0x70,,,,,,,,,,,I178,,,
->
-> Instead of deleteing this line entirely, the right fix is probably to just
-> blank out the 0x70 value here.
->
->
-> Regards,
-> Daniel
-> --
-> |: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
-> |: https://libvirt.org         -o-            https://fstop138.berrange.com :|
-> |: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
+> 
+> Umm, Philippe, I didn't really ask you to refactor my code and I'd
+> really appreciate if you'd engage into a proper review process with me
+> on this patch, instead of just telling me "I don't like the code, but,
+> worry not, I'll bulldoze it away later anyway".
+
+Hey I'm sorry I didn't meant to be rude... reading my comment back I
+don't find it offensive, so we might have english-proxy misunderstanding.
+
+I posted a few series doing quite a lot of modifications in the SDHCI
+code, and instead of having a race "the first merged, the second has
+figure out himself" I offered to rework this patch on top of my series
+and send it to you so you can test it.
+
+I don't plan to 'bulldoze' it, there is no sens because I don't have all
+your setups to test it, I just suggested to 'refactor' it to avoid merge
+conflicts and head-aches.
+
+By "But if it is applied before, I can survive" I meant:
+"if it is applied before [my series get merged], I can survive [to adapt
+my series to fix the resulting merge conflicts]"
+
+>> On 12/14/2017 11:52 AM, Andrey Smirnov wrote:
+>>> IP block found on several generations of i.MX family does not use
+>>> vanilla SDHCI implementation and it comes with a number of quirks.
+>>>
+>>> Introduce i.MX SDHCI subtype of SDHCI block to add code necessary to
+>>> support unmodified Linux guest driver.
+>>>
+>>> Cc: Peter Maydell <peter.maydell@linaro.org>
+>>> Cc: Jason Wang <jasowang@redhat.com>
+>>> Cc: Philippe Mathieu-Daudé <f4bug@amsat.org>
+>>> Cc: qemu-devel@nongnu.org
+>>> Cc: qemu-arm@nongnu.org
+>>> Cc: yurovsky@gmail.com
+>>> Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
+>>> Signed-off-by: Andrey Smirnov <andrew.smirnov@gmail.com>
+>>> ---
+>>>  hw/sd/sdhci-internal.h |  19 +++++
+>>>  hw/sd/sdhci.c          | 228 ++++++++++++++++++++++++++++++++++++++++++++++++-
+>>>  include/hw/sd/sdhci.h  |  14 +++
+>>>  3 files changed, 259 insertions(+), 2 deletions(-)
+>>>
+>>> diff --git a/hw/sd/sdhci-internal.h b/hw/sd/sdhci-internal.h
+>>> index 161177cf39..b86ac0791b 100644
+>>> --- a/hw/sd/sdhci-internal.h
+>>> +++ b/hw/sd/sdhci-internal.h
+>>> @@ -85,12 +85,18 @@
+>>>
+>>>  /* R/W Host control Register 0x0 */
+>>>  #define SDHC_HOSTCTL                   0x28
+>>> +#define SDHC_CTRL_LED                  0x01
+>>>  #define SDHC_CTRL_DMA_CHECK_MASK       0x18
+>>>  #define SDHC_CTRL_SDMA                 0x00
+>>>  #define SDHC_CTRL_ADMA1_32             0x08
+>>>  #define SDHC_CTRL_ADMA2_32             0x10
+>>>  #define SDHC_CTRL_ADMA2_64             0x18
+>>>  #define SDHC_DMA_TYPE(x)               ((x) & SDHC_CTRL_DMA_CHECK_MASK)
+>>> +#define SDHC_CTRL_4BITBUS              0x02
+>>> +#define SDHC_CTRL_8BITBUS              0x20
+>>> +#define SDHC_CTRL_CDTEST_INS           0x40
+>>> +#define SDHC_CTRL_CDTEST_EN            0x80
+>>> +
+>>>
+>>>  /* R/W Power Control Register 0x0 */
+>>>  #define SDHC_PWRCON                    0x29
+>>> @@ -229,4 +235,17 @@ enum {
+>>>
+>>>  extern const VMStateDescription sdhci_vmstate;
+>>>
+>>> +
+>>> +#define ESDHC_MIX_CTRL                  0x48
+>>> +#define ESDHC_VENDOR_SPEC               0xc0
+>>> +#define ESDHC_DLL_CTRL                  0x60
+>>> +
+>>> +#define ESDHC_TUNING_CTRL               0xcc
+>>> +#define ESDHC_TUNE_CTRL_STATUS          0x68
+>>> +#define ESDHC_WTMK_LVL                  0x44
+>>> +
+>>> +#define ESDHC_CTRL_4BITBUS              (0x1 << 1)
+>>> +#define ESDHC_CTRL_8BITBUS              (0x2 << 1)
+>>> +
+>>> +
+>>>  #endif
+>>> diff --git a/hw/sd/sdhci.c b/hw/sd/sdhci.c
+>>> index 6d6a791ee9..758af067f9 100644
+>>> --- a/hw/sd/sdhci.c
+>>> +++ b/hw/sd/sdhci.c
+>>> @@ -265,7 +265,8 @@ static void sdhci_send_command(SDHCIState *s)
+>>>              }
+>>>          }
+>>>
+>>> -        if ((s->norintstsen & SDHC_NISEN_TRSCMP) &&
+>>> +        if (!(s->quirks & SDHCI_QUIRK_NO_BUSY_IRQ) &&
+>>> +            (s->norintstsen & SDHC_NISEN_TRSCMP) &&
+>>>              (s->cmdreg & SDHC_CMD_RESPONSE) == SDHC_CMD_RSP_WITH_BUSY) {
+>>>              s->norintsts |= SDHC_NIS_TRSCMP;
+>>>          }
+>>> @@ -1191,6 +1192,8 @@ static void sdhci_initfn(SDHCIState *s)
+>>>
+>>>      s->insert_timer = timer_new_ns(QEMU_CLOCK_VIRTUAL, sdhci_raise_insertion_irq, s);
+>>>      s->transfer_timer = timer_new_ns(QEMU_CLOCK_VIRTUAL, sdhci_data_transfer, s);
+>>> +
+>>> +    s->io_ops = &sdhci_mmio_ops;
+>>>  }
+>>>
+>>>  static void sdhci_uninitfn(SDHCIState *s)
+>>> @@ -1347,7 +1350,7 @@ static void sdhci_sysbus_realize(DeviceState *dev, Error ** errp)
+>>>      s->buf_maxsz = sdhci_get_fifolen(s);
+>>>      s->fifo_buffer = g_malloc0(s->buf_maxsz);
+>>>      sysbus_init_irq(sbd, &s->irq);
+>>> -    memory_region_init_io(&s->iomem, OBJECT(s), &sdhci_mmio_ops, s, "sdhci",
+>>> +    memory_region_init_io(&s->iomem, OBJECT(s), s->io_ops, s, "sdhci",
+>>>              SDHC_REGISTERS_MAP_SIZE);
+>>>      sysbus_init_mmio(sbd, &s->iomem);
+>>>  }
+>>> @@ -1386,11 +1389,232 @@ static const TypeInfo sdhci_bus_info = {
+>>>      .class_init = sdhci_bus_class_init,
+>>>  };
+>>>
+>>> +static uint64_t usdhc_read(void *opaque, hwaddr offset, unsigned size)
+>>> +{
+>>> +    SDHCIState *s = SYSBUS_SDHCI(opaque);
+>>> +    uint32_t ret;
+>>> +    uint16_t hostctl;
+>>> +
+>>> +    switch (offset) {
+>>> +    default:
+>>> +        return sdhci_read(opaque, offset, size);
+>>> +
+>>> +    case SDHC_HOSTCTL:
+>>> +        /*
+>>> +         * For a detailed explanation on the following bit
+>>> +         * manipulation code see comments in a similar part of
+>>> +         * usdhc_write()
+>>> +         */
+>>> +        hostctl = SDHC_DMA_TYPE(s->hostctl) << (8 - 3);
+>>> +
+>>> +        if (s->hostctl & SDHC_CTRL_8BITBUS) {
+>>> +            hostctl |= ESDHC_CTRL_8BITBUS;
+>>> +        }
+>>> +
+>>> +        if (s->hostctl & SDHC_CTRL_4BITBUS) {
+>>> +            hostctl |= ESDHC_CTRL_4BITBUS;
+>>> +        }
+>>> +
+>>> +        ret  = hostctl;
+>>> +        ret |= (uint32_t)s->blkgap << 16;
+>>> +        ret |= (uint32_t)s->wakcon << 24;
+>>> +
+>>> +        break;
+>>> +
+>>> +    case ESDHC_DLL_CTRL:
+>>> +    case ESDHC_TUNE_CTRL_STATUS:
+>>> +    case 0x6c:
+>>> +    case ESDHC_TUNING_CTRL:
+>>> +    case ESDHC_VENDOR_SPEC:
+>>> +    case ESDHC_MIX_CTRL:
+>>> +    case ESDHC_WTMK_LVL:
+>>> +        ret = 0;
+>>> +        break;
+>>> +    }
+>>> +
+>>> +    return ret;
+>>> +}
+>>> +
+>>> +static void
+>>> +usdhc_write(void *opaque, hwaddr offset, uint64_t val, unsigned size)
+>>> +{
+>>> +    SDHCIState *s = SYSBUS_SDHCI(opaque);
+>>> +    uint8_t hostctl;
+>>> +    uint32_t value = (uint32_t)val;
+>>> +
+>>> +    switch (offset) {
+>>> +    case ESDHC_DLL_CTRL:
+>>> +    case ESDHC_TUNE_CTRL_STATUS:
+>>> +    case 0x6c:
+>>> +    case ESDHC_TUNING_CTRL:
+>>> +    case ESDHC_WTMK_LVL:
+>>> +    case ESDHC_VENDOR_SPEC:
+>>> +        break;
+>>> +
+>>> +    case SDHC_HOSTCTL:
+>>> +        /*
+>>> +         * Here's What ESDHCI has at offset 0x28 (SDHC_HOSTCTL)
+>>> +         *
+>>> +         *       7         6     5      4      3      2        1      0
+>>> +         * |-----------+--------+--------+-----------+----------+---------|
+>>> +         * | Card      | Card   | Endian | DATA3     | Data     | Led     |
+>>> +         * | Detect    | Detect | Mode   | as Card   | Transfer | Control |
+>>> +         * | Signal    | Test   |        | Detection | Width    |         |
+>>> +         * | Selection | Level  |        | Pin       |          |         |
+>>> +         * |-----------+--------+--------+-----------+----------+---------|
+>>> +         *
+>>> +         * and 0x29
+>>> +         *
+>>> +         *  15      10 9    8
+>>> +         * |----------+------|
+>>> +         * | Reserved | DMA  |
+>>> +         * |          | Sel. |
+>>> +         * |          |      |
+>>> +         * |----------+------|
+>>> +         *
+>>> +         * and here's what SDCHI spec expects those offsets to be:
+>>> +         *
+>>> +         * 0x28 (Host Control Register)
+>>> +         *
+>>> +         *     7        6         5       4  3      2         1        0
+>>> +         * |--------+--------+----------+------+--------+----------+---------|
+>>> +         * | Card   | Card   | Extended | DMA  | High   | Data     | LED     |
+>>> +         * | Detect | Detect | Data     | Sel. | Speed  | Transfer | Control |
+>>> +         * | Signal | Test   | Transfer |      | Enable | Width    |         |
+>>> +         * | Sel.   | Level  | Width    |      |        |          |         |
+>>> +         * |--------+--------+----------+------+--------+----------+---------|
+>>> +         *
+>>> +         * and 0x29 (Power Control Register)
+>>> +         *
+>>> +         * |----------------------------------|
+>>> +         * | Power Control Register           |
+>>> +         * |                                  |
+>>> +         * | Description omitted,             |
+>>> +         * | since it has no analog in ESDHCI |
+>>> +         * |                                  |
+>>> +         * |----------------------------------|
+>>> +         *
+>>> +         * Since offsets 0x2A and 0x2B should be compatible between
+>>> +         * both IP specs we only need to reconcile least 16-bit of the
+>>> +         * word we've been given.
+>>> +         */
+>>> +
+>>> +        /*
+>>> +         * First, save bits 7 6 and 0 since they are identical
+>>> +         */
+>>> +        hostctl = value & (SDHC_CTRL_LED |
+>>> +                           SDHC_CTRL_CDTEST_INS |
+>>> +                           SDHC_CTRL_CDTEST_EN);
+>>> +        /*
+>>> +         * Second, split "Data Transfer Width" from bits 2 and 1 in to
+>>> +         * bits 5 and 1
+>>> +         */
+>>> +        if (value & ESDHC_CTRL_8BITBUS) {
+>>> +            hostctl |= SDHC_CTRL_8BITBUS;
+>>> +        }
+>>> +
+>>> +        if (value & ESDHC_CTRL_4BITBUS) {
+>>> +            hostctl |= ESDHC_CTRL_4BITBUS;
+>>> +        }
+>>> +
+>>> +        /*
+>>> +         * Third, move DMA select from bits 9 and 8 to bits 4 and 3
+>>> +         */
+>>> +        hostctl |= SDHC_DMA_TYPE(value >> (8 - 3));
+>>> +
+>>> +        /*
+>>> +         * Now place the corrected value into low 16-bit of the value
+>>> +         * we are going to give standard SDHCI write function
+>>> +         *
+>>> +         * NOTE: This transformation should be the inverse of what can
+>>> +         * be found in drivers/mmc/host/sdhci-esdhc-imx.c in Linux
+>>> +         * kernel
+>>> +         */
+>>> +        value &= ~UINT16_MAX;
+>>> +        value |= hostctl;
+>>> +        value |= (uint16_t)s->pwrcon << 8;
+>>> +
+>>> +        sdhci_write(opaque, offset, value, size);
+>>> +        break;
+>>> +
+>>> +    case ESDHC_MIX_CTRL:
+>>> +        /*
+>>> +         * So, when SD/MMC stack in Linux tries to write to "Transfer
+>>> +         * Mode Register", ESDHC i.MX quirk code will translate it
+>>> +         * into a write to ESDHC_MIX_CTRL, so we do the opposite in
+>>> +         * order to get where we started
+>>> +         *
+>>> +         * Note that Auto CMD23 Enable bit is located in a wrong place
+>>> +         * on i.MX, but since it is not used by QEMU we do not care.
+>>> +         *
+>>> +         * We don't want to call sdhci_write(.., SDHC_TRNMOD, ...)
+>>> +         * here becuase it will result in a call to
+>>> +         * sdhci_send_command(s) which we don't want.
+>>> +         *
+>>> +         */
+>>> +        s->trnmod = value & UINT16_MAX;
+>>> +        break;
+>>> +    case SDHC_TRNMOD:
+>>> +        /*
+>>> +         * Similar to above, but this time a write to "Command
+>>> +         * Register" will be translated into a 4-byte write to
+>>> +         * "Transfer Mode register" where lower 16-bit of value would
+>>> +         * be set to zero. So what we do is fill those bits with
+>>> +         * cached value from s->trnmod and let the SDHCI
+>>> +         * infrastructure handle the rest
+>>> +         */
+>>> +        sdhci_write(opaque, offset, val | s->trnmod, size);
+>>> +        break;
+>>> +    case SDHC_BLKSIZE:
+>>> +        /*
+>>> +         * ESDHCI does not implement "Host SDMA Buffer Boundary", and
+>>> +         * Linux driver will try to zero this field out which will
+>>> +         * break the rest of SDHCI emulation.
+>>> +         *
+>>> +         * Linux defaults to maximum possible setting (512K boundary)
+>>> +         * and it seems to be the only option that i.MX IP implements,
+>>> +         * so we artificially set it to that value.
+>>> +         */
+>>> +        val |= 0x7 << 12;
+>>> +        /* FALLTHROUGH */
+>>> +    default:
+>>> +        sdhci_write(opaque, offset, val, size);
+>>> +        break;
+>>> +    }
+>>> +}
+>>> +
+>>> +
+>>> +static const MemoryRegionOps usdhc_mmio_ops = {
+>>> +    .read = usdhc_read,
+>>> +    .write = usdhc_write,
+>>> +    .valid = {
+>>> +        .min_access_size = 1,
+>>> +        .max_access_size = 4,
+>>> +        .unaligned = false
+>>> +    },
+>>> +    .endianness = DEVICE_LITTLE_ENDIAN,
+>>> +};
+>>
+>> I think the usdhc_mmio_ops can be avoided.
+>>
+> 
+> OK, care to actually elaborate on this?
+
+We can avoid to keep it in this Arasan SDHCI IP file, see below.
+
+>>> +
+>>> +static void imx_usdhc_init(Object *obj)
+>>> +{
+>>> +    SDHCIState *s = SYSBUS_SDHCI(obj);
+>>> +
+>>> +    s->io_ops = &usdhc_mmio_ops;
+>>> +    s->quirks = SDHCI_QUIRK_NO_BUSY_IRQ;
+>>> +}
+>>> +
+>>> +static const TypeInfo imx_usdhc_info = {
+>>> +    .name = TYPE_IMX_USDHC,
+>>> +    .parent = TYPE_SYSBUS_SDHCI,
+>>> +    .instance_init = imx_usdhc_init,
+>>> +};
+>>
+>> there is no need to add yet another device. You can achieve the same
+>> using a property bit (like the "pending-insert-quirk" one).
+>>
+>> I think the correct way is to add a DEFINE_PROP_BIT64("quirks*").
+>>
+> 
+> And how's that better? Now, every i.MX user instead of instantiating a
+> uSDCH IP block, which matches what i.MX RM say, would have to instead
+> create SDHCI (confusing) as well as to set an quirk, which means they
+> have to know what SDHCI_QUIRK_NO_BUSY_IRQ means. What's the point of
+> spilling those internal implementation guts all of the place just to
+> avoid re-defining "yet another device"?
+
+I see your point, you are correct, this is easier to model it this way.
+I was more thinking move the uSDCH core in his own file (i.e.
+imx_usdch.c), and keep this file with the Arasan IP implementation only.
+
+So the imx_usdch.c only contains the specific USDHC registers/defines
+and the TYPE_IMX_USDHC device would keep the SDHCI link hidden from the
+user.
+Using other words, the IMX_USDHC device would 'contains' a SDHCI block
+instanciated with the SDHCI_QUIRK_NO_BUSY_IRQ property bit set.
+
+
+Again, I appreciate the quality of the patches you send, and did not
+intend to annoy you this way. I'll try to make some efforts to improve
+my english communication. Please accept my apology.
+
+Regards,
+
+Phil.
+
+> 
+> Thanks,
+> Andrey Smirnov
+> 
