@@ -1,16 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58784)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58759)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1ePn3A-0000pz-39
-	for qemu-devel@nongnu.org; Fri, 15 Dec 2017 05:17:04 -0500
+	(envelope-from <dgibson@ozlabs.org>) id 1ePn37-0000pO-VQ
+	for qemu-devel@nongnu.org; Fri, 15 Dec 2017 05:17:05 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1ePn34-0007C3-6D
-	for qemu-devel@nongnu.org; Fri, 15 Dec 2017 05:17:04 -0500
+	(envelope-from <dgibson@ozlabs.org>) id 1ePn34-0007Bg-17
+	for qemu-devel@nongnu.org; Fri, 15 Dec 2017 05:17:01 -0500
 From: David Gibson <david@gibson.dropbear.id.au>
-Date: Fri, 15 Dec 2017 21:16:51 +1100
-Message-Id: <20171215101651.13911-5-david@gibson.dropbear.id.au>
+Date: Fri, 15 Dec 2017 21:16:48 +1100
+Message-Id: <20171215101651.13911-2-david@gibson.dropbear.id.au>
 In-Reply-To: <20171215101651.13911-1-david@gibson.dropbear.id.au>
 References: <20171215101651.13911-1-david@gibson.dropbear.id.au>
-Subject: [Qemu-devel] [PATCH 4/4] tests/pxe-test: Add some extra tests
+Subject: [Qemu-devel] [PATCH 1/4] tests/pxe-test: Remove unnecessary special
+ case test functions
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,45 +23,61 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: mst@redhat.com
 Cc: thuth@redhat.com, qemu-ppc@nongnu.org, qemu-devel@nongnu.org, David Gibson <david@gibson.dropbear.id.au>
 
-Previously virtio-net was only tested for ppc64 in "slow" mode.  That
-doesn't make much sense since virtio-net is used much more often in
-practice than the spapr-vlan device which was tested always.  So, move
-virtio-net to always be tested on ppc64.
+All of the x86 and some of the other test cases here use a common test
+function, test_pxe_ipv4(), but one ppc and one s390 test use different
+functions.
 
-We had no tests at all for the q35 machine, which doesn't seem wise given
-it's increasing prominence.  Add a couple of tests for it, including
-testing the newer e1000e adapter.
+In the s390 case, this is completely pointless, the right parameter to
+test_pxe_ipv4() will already do exactly the right thing.  For the
+spapr-vlan case there's a slight difference - it will use IPv6 instead of
+IPv4.
+
+But testing just one case with IPv6 (and NOT IPv4) is rather haphazard.
+Change everything to use the common test function, until we have a better
+way of testing IPv6 across the board.
 
 Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
 ---
- tests/pxe-test.c | 4 +++-
- 1 file changed, 3 insertions(+), 1 deletion(-)
+ tests/pxe-test.c | 15 +++------------
+ 1 file changed, 3 insertions(+), 12 deletions(-)
 
 diff --git a/tests/pxe-test.c b/tests/pxe-test.c
-index e7a0610070..16e2520940 100644
+index 937f29e631..eb70aa2bc6 100644
 --- a/tests/pxe-test.c
 +++ b/tests/pxe-test.c
-@@ -31,6 +31,8 @@ typedef struct testdef {
- static testdef_t x86_tests[] = {
-     { "pc", "e1000" },
-     { "pc", "virtio", "-device virtio-net-pci,netdev=" NETNAME },
-+    { "q35", "e1000e" },
-+    { "q35", "virtio", "-device virtio-net-pci,netdev=" NETNAME },
-     { NULL },
- };
+@@ -47,16 +47,6 @@ static void test_pxe_ipv4(gconstpointer data)
+     g_free(dev_arg);
+ }
  
-@@ -44,11 +46,11 @@ static testdef_t x86_tests_slow[] = {
- 
- static testdef_t ppc64_tests[] = {
-     { "pseries", "spapr-vlan" },
-+    { "pseries", "virtio", "-device virtio-net-pci,netdev=" NETNAME },
-     { NULL },
- };
- 
- static testdef_t ppc64_tests_slow[] = {
--    { "pseries", "virtio", "-device virtio-net-pci,netdev=" NETNAME },
-     { "pseries", "e1000" },
-     { NULL },
- };
+-static void test_pxe_spapr_vlan(void)
+-{
+-    test_pxe_one("-device spapr-vlan,netdev=" NETNAME, true);
+-}
+-
+-static void test_pxe_virtio_ccw(void)
+-{
+-    test_pxe_one("-device virtio-net-ccw,bootindex=1,netdev=" NETNAME, false);
+-}
+-
+ int main(int argc, char *argv[])
+ {
+     int ret;
+@@ -79,13 +69,14 @@ int main(int argc, char *argv[])
+             qtest_add_data_func("pxe/vmxnet3", "vmxnet3", test_pxe_ipv4);
+         }
+     } else if (strcmp(arch, "ppc64") == 0) {
+-        qtest_add_func("pxe/spapr-vlan", test_pxe_spapr_vlan);
++        qtest_add_data_func("pxe/spapr-vlan", "spapr-vlan", test_pxe_ipv4);
+         if (g_test_slow()) {
+             qtest_add_data_func("pxe/virtio", "virtio-net-pci", test_pxe_ipv4);
+             qtest_add_data_func("pxe/e1000", "e1000", test_pxe_ipv4);
+         }
+     } else if (g_str_equal(arch, "s390x")) {
+-        qtest_add_func("pxe/virtio-ccw", test_pxe_virtio_ccw);
++        qtest_add_data_func("pxe/virtio-ccw",
++                            "virtio-net-ccw,bootindex=1", test_pxe_ipv4);
+     }
+     ret = g_test_run();
+     boot_sector_cleanup(disk);
 -- 
 2.14.3
