@@ -1,24 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47164)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47165)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jianjay.zhou@huawei.com>) id 1ePldQ-0003iP-7T
+	(envelope-from <jianjay.zhou@huawei.com>) id 1ePldQ-0003iR-7r
 	for qemu-devel@nongnu.org; Fri, 15 Dec 2017 03:46:25 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jianjay.zhou@huawei.com>) id 1ePldN-0003JD-Bo
+	(envelope-from <jianjay.zhou@huawei.com>) id 1ePldN-0003IR-4v
 	for qemu-devel@nongnu.org; Fri, 15 Dec 2017 03:46:24 -0500
-Received: from szxga04-in.huawei.com ([45.249.212.190]:2122 helo=huawei.com)
+Received: from szxga04-in.huawei.com ([45.249.212.190]:2121 helo=huawei.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <jianjay.zhou@huawei.com>)
-	id 1ePldM-0003CF-P9
+	id 1ePldM-00039x-PI
 	for qemu-devel@nongnu.org; Fri, 15 Dec 2017 03:46:21 -0500
 From: Jay Zhou <jianjay.zhou@huawei.com>
-Date: Fri, 15 Dec 2017 16:45:54 +0800
-Message-ID: <1513327555-17520-2-git-send-email-jianjay.zhou@huawei.com>
+Date: Fri, 15 Dec 2017 16:45:55 +0800
+Message-ID: <1513327555-17520-3-git-send-email-jianjay.zhou@huawei.com>
 In-Reply-To: <1513327555-17520-1-git-send-email-jianjay.zhou@huawei.com>
 References: <1513327555-17520-1-git-send-email-jianjay.zhou@huawei.com>
 MIME-Version: 1.0
 Content-Type: text/plain
-Subject: [Qemu-devel] [PATCH v2 1/2] vhost: add used memslot number for
- vhost-user and vhost-kernel separately
+Subject: [Qemu-devel] [PATCH v2 2/2] vhost: double check used memslots number
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,188 +29,68 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org, mst@redhat.com
 Cc: weidong.huang@huawei.com, arei.gonglei@huawei.com, wangxinxin.wang@huawei.com, jianjay.zhou@huawei.com, gary.liuzhe@huawei.com, dgilbert@redhat.com, imammedo@redhat.com
 
-Used_memslots is equal to dev->mem->nregions now, it is true for
-vhost kernel, but not for vhost user, which uses the memory regions
-that have file descriptor. In fact, not all of the memory regions
-have file descriptor.
-It is usefully in some scenarios, e.g. used_memslots is 8, and only
-5 memory slots can be used by vhost user, it is failed to hot plug
-a new memory RAM because vhost_has_free_slot just returned false,
-but we can hot plug it safely in fact.
+If the VM already has N(N>8) available memory slots for vhost user,
+the VM will be crashed in vhost_user_set_mem_table if we try to
+hotplug the first vhost user NIC.
+This patch checks if memslots number exceeded or not after updating
+vhost_user_used_memslots.
 
 Signed-off-by: Jay Zhou <jianjay.zhou@huawei.com>
-Signed-off-by: Zhe Liu <gary.liuzhe@huawei.com>
 ---
- hw/virtio/vhost-backend.c         | 14 ++++++++++++++
- hw/virtio/vhost-user.c            | 31 +++++++++++++++++++++++++++++++
- hw/virtio/vhost.c                 | 16 +++++++++-------
- include/hw/virtio/vhost-backend.h |  4 ++++
- 4 files changed, 58 insertions(+), 7 deletions(-)
+ hw/virtio/vhost.c | 27 +++++++++++++++++++++++----
+ 1 file changed, 23 insertions(+), 4 deletions(-)
 
-diff --git a/hw/virtio/vhost-backend.c b/hw/virtio/vhost-backend.c
-index 7f09efa..866718c 100644
---- a/hw/virtio/vhost-backend.c
-+++ b/hw/virtio/vhost-backend.c
-@@ -15,6 +15,8 @@
- #include "hw/virtio/vhost-backend.h"
- #include "qemu/error-report.h"
- 
-+static unsigned int vhost_kernel_used_memslots;
-+
- static int vhost_kernel_call(struct vhost_dev *dev, unsigned long int request,
-                              void *arg)
- {
-@@ -233,6 +235,16 @@ static void vhost_kernel_set_iotlb_callback(struct vhost_dev *dev,
-         qemu_set_fd_handler((uintptr_t)dev->opaque, NULL, NULL, NULL);
- }
- 
-+static void vhost_kernel_set_used_memslots(struct vhost_dev *dev)
-+{
-+    vhost_kernel_used_memslots = dev->mem->nregions;
-+}
-+
-+static unsigned int vhost_kernel_get_used_memslots(void)
-+{
-+    return vhost_kernel_used_memslots;
-+}
-+
- static const VhostOps kernel_ops = {
-         .backend_type = VHOST_BACKEND_TYPE_KERNEL,
-         .vhost_backend_init = vhost_kernel_init,
-@@ -264,6 +276,8 @@ static const VhostOps kernel_ops = {
- #endif /* CONFIG_VHOST_VSOCK */
-         .vhost_set_iotlb_callback = vhost_kernel_set_iotlb_callback,
-         .vhost_send_device_iotlb_msg = vhost_kernel_send_device_iotlb_msg,
-+        .vhost_set_used_memslots = vhost_kernel_set_used_memslots,
-+        .vhost_get_used_memslots = vhost_kernel_get_used_memslots,
- };
- 
- int vhost_set_backend_type(struct vhost_dev *dev, VhostBackendType backend_type)
-diff --git a/hw/virtio/vhost-user.c b/hw/virtio/vhost-user.c
-index 093675e..58a4cec 100644
---- a/hw/virtio/vhost-user.c
-+++ b/hw/virtio/vhost-user.c
-@@ -122,6 +122,8 @@ static VhostUserMsg m __attribute__ ((unused));
- /* The version of the protocol we support */
- #define VHOST_USER_VERSION    (0x1)
- 
-+static unsigned int vhost_user_used_memslots;
-+
- struct vhost_user {
-     CharBackend *chr;
-     int slave_fd;
-@@ -922,6 +924,33 @@ static void vhost_user_set_iotlb_callback(struct vhost_dev *dev, int enabled)
-     /* No-op as the receive channel is not dedicated to IOTLB messages. */
- }
- 
-+static void vhost_user_set_used_memslots(struct vhost_dev *dev)
-+{
-+    int counter = 0;
-+    int i;
-+
-+    for (i = 0; i < dev->mem->nregions; ++i) {
-+        struct vhost_memory_region *reg = dev->mem->regions + i;
-+        ram_addr_t offset;
-+        MemoryRegion *mr;
-+        int fd;
-+
-+        assert((uintptr_t)reg->userspace_addr == reg->userspace_addr);
-+        mr = memory_region_from_host((void *)(uintptr_t)reg->userspace_addr,
-+                                    &offset);
-+        fd = memory_region_get_fd(mr);
-+        if (fd > 0) {
-+            counter++;
-+        }
-+    }
-+    vhost_user_used_memslots = counter;
-+}
-+
-+static unsigned int vhost_user_get_used_memslots(void)
-+{
-+    return vhost_user_used_memslots;
-+}
-+
- const VhostOps user_ops = {
-         .backend_type = VHOST_BACKEND_TYPE_USER,
-         .vhost_backend_init = vhost_user_init,
-@@ -948,4 +977,6 @@ const VhostOps user_ops = {
-         .vhost_net_set_mtu = vhost_user_net_set_mtu,
-         .vhost_set_iotlb_callback = vhost_user_set_iotlb_callback,
-         .vhost_send_device_iotlb_msg = vhost_user_send_device_iotlb_msg,
-+        .vhost_set_used_memslots = vhost_user_set_used_memslots,
-+        .vhost_get_used_memslots = vhost_user_get_used_memslots,
- };
 diff --git a/hw/virtio/vhost.c b/hw/virtio/vhost.c
-index e4290ce..59a32e9 100644
+index 59a32e9..e45f5e2 100644
 --- a/hw/virtio/vhost.c
 +++ b/hw/virtio/vhost.c
-@@ -43,20 +43,21 @@
- static struct vhost_log *vhost_log;
- static struct vhost_log *vhost_log_shm;
+@@ -1234,6 +1234,18 @@ static void vhost_virtqueue_cleanup(struct vhost_virtqueue *vq)
+     event_notifier_cleanup(&vq->masked_notifier);
+ }
  
--static unsigned int used_memslots;
- static QLIST_HEAD(, vhost_dev) vhost_devices =
-     QLIST_HEAD_INITIALIZER(vhost_devices);
- 
- bool vhost_has_free_slot(void)
- {
--    unsigned int slots_limit = ~0U;
-     struct vhost_dev *hdev;
- 
-     QLIST_FOREACH(hdev, &vhost_devices, entry) {
--        unsigned int r = hdev->vhost_ops->vhost_backend_memslots_limit(hdev);
--        slots_limit = MIN(slots_limit, r);
-+        if (hdev->vhost_ops->vhost_get_used_memslots() >=
-+            hdev->vhost_ops->vhost_backend_memslots_limit(hdev)) {
-+            return false;
-+        }
-     }
--    return slots_limit > used_memslots;
++static bool vhost_dev_used_memslots_is_exceeded(struct vhost_dev *hdev)
++{
++    if (hdev->vhost_ops->vhost_get_used_memslots() >
++        hdev->vhost_ops->vhost_backend_memslots_limit(hdev)) {
++        error_report("vhost backend memory slots limit is less"
++                " than current number of present memory slots");
++        return true;
++    }
 +
-+    return true;
- }
- 
- static void vhost_dev_sync_region(struct vhost_dev *dev,
-@@ -606,7 +607,7 @@ static void vhost_set_memory(MemoryListener *listener,
-     dev->mem_changed_start_addr = MIN(dev->mem_changed_start_addr, start_addr);
-     dev->mem_changed_end_addr = MAX(dev->mem_changed_end_addr, start_addr + size - 1);
-     dev->memory_changed = true;
--    used_memslots = dev->mem->nregions;
-+    dev->vhost_ops->vhost_set_used_memslots(dev);
- }
- 
- static bool vhost_section(MemoryRegionSection *section)
-@@ -1251,7 +1252,8 @@ int vhost_dev_init(struct vhost_dev *hdev, void *opaque,
++    return false;
++}
++
+ int vhost_dev_init(struct vhost_dev *hdev, void *opaque,
+                    VhostBackendType backend_type, uint32_t busyloop_timeout)
+ {
+@@ -1252,10 +1264,7 @@ int vhost_dev_init(struct vhost_dev *hdev, void *opaque,
          goto fail;
      }
  
--    if (used_memslots > hdev->vhost_ops->vhost_backend_memslots_limit(hdev)) {
-+    if (hdev->vhost_ops->vhost_get_used_memslots() >
-+        hdev->vhost_ops->vhost_backend_memslots_limit(hdev)) {
-         error_report("vhost backend memory slots limit is less"
-                 " than current number of present memory slots");
+-    if (hdev->vhost_ops->vhost_get_used_memslots() >
+-        hdev->vhost_ops->vhost_backend_memslots_limit(hdev)) {
+-        error_report("vhost backend memory slots limit is less"
+-                " than current number of present memory slots");
++    if (vhost_dev_used_memslots_is_exceeded(hdev)) {
          r = -1;
-diff --git a/include/hw/virtio/vhost-backend.h b/include/hw/virtio/vhost-backend.h
-index a7a5f22..19961b5 100644
---- a/include/hw/virtio/vhost-backend.h
-+++ b/include/hw/virtio/vhost-backend.h
-@@ -84,6 +84,8 @@ typedef void (*vhost_set_iotlb_callback_op)(struct vhost_dev *dev,
-                                            int enabled);
- typedef int (*vhost_send_device_iotlb_msg_op)(struct vhost_dev *dev,
-                                               struct vhost_iotlb_msg *imsg);
-+typedef void (*vhost_set_used_memslots_op)(struct vhost_dev *dev);
-+typedef unsigned int (*vhost_get_used_memslots_op)(void);
+         goto fail;
+     }
+@@ -1341,6 +1350,16 @@ int vhost_dev_init(struct vhost_dev *hdev, void *opaque,
+     hdev->memory_changed = false;
+     memory_listener_register(&hdev->memory_listener, &address_space_memory);
+     QLIST_INSERT_HEAD(&vhost_devices, hdev, entry);
++
++    if (vhost_dev_used_memslots_is_exceeded(hdev)) {
++        r = -1;
++        if (busyloop_timeout) {
++            goto fail_busyloop;
++        } else {
++            goto fail;
++        }
++    }
++
+     return 0;
  
- typedef struct VhostOps {
-     VhostBackendType backend_type;
-@@ -118,6 +120,8 @@ typedef struct VhostOps {
-     vhost_vsock_set_running_op vhost_vsock_set_running;
-     vhost_set_iotlb_callback_op vhost_set_iotlb_callback;
-     vhost_send_device_iotlb_msg_op vhost_send_device_iotlb_msg;
-+    vhost_set_used_memslots_op vhost_set_used_memslots;
-+    vhost_get_used_memslots_op vhost_get_used_memslots;
- } VhostOps;
- 
- extern const VhostOps user_ops;
+ fail_busyloop:
 -- 
 1.8.3.1
