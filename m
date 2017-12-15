@@ -1,28 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33114)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36984)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <aik@ozlabs.ru>) id 1ePj9G-0006TG-VE
-	for qemu-devel@nongnu.org; Fri, 15 Dec 2017 01:07:08 -0500
+	(envelope-from <maozy.fnst@cn.fujitsu.com>) id 1ePjGV-0004Sf-03
+	for qemu-devel@nongnu.org; Fri, 15 Dec 2017 01:14:36 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <aik@ozlabs.ru>) id 1ePj9D-0005Ai-3T
-	for qemu-devel@nongnu.org; Fri, 15 Dec 2017 01:07:06 -0500
-Received: from mail-it0-x243.google.com ([2607:f8b0:4001:c0b::243]:34745)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <aik@ozlabs.ru>) id 1ePj9C-00058n-V1
-	for qemu-devel@nongnu.org; Fri, 15 Dec 2017 01:07:03 -0500
-Received: by mail-it0-x243.google.com with SMTP id m11so28216345iti.1
-	for <qemu-devel@nongnu.org>; Thu, 14 Dec 2017 22:07:02 -0800 (PST)
-References: <20171212051619.24456-1-aik@ozlabs.ru>
-	<20171215060126.GG7753@umbus.fritz.box>
-From: Alexey Kardashevskiy <aik@ozlabs.ru>
-Message-ID: <d9039c99-aa83-5d2f-dd12-5b52a7cf8fc0@ozlabs.ru>
-Date: Fri, 15 Dec 2017 17:06:55 +1100
+	(envelope-from <maozy.fnst@cn.fujitsu.com>) id 1ePjGP-000445-Vl
+	for qemu-devel@nongnu.org; Fri, 15 Dec 2017 01:14:34 -0500
+Received: from mail.cn.fujitsu.com ([183.91.158.132]:61887
+	helo=heian.cn.fujitsu.com) by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <maozy.fnst@cn.fujitsu.com>) id 1ePjGP-0003yV-38
+	for qemu-devel@nongnu.org; Fri, 15 Dec 2017 01:14:29 -0500
+References: <cover.1512552817.git.maozy.fnst@cn.fujitsu.com>
+	<9b6c4156006f0c440f11849aa9e70f19d610a29e.1512552817.git.maozy.fnst@cn.fujitsu.com>
+	<CAK3tnvLsmgPw=cB-6PGQ_e3PzoNe5jJtrysf2gHDNaq7DMkgdg@mail.gmail.com>
+	<ab1dae9f-6bea-7157-7617-b3b72e1582cf@cn.fujitsu.com>
+	<CAK3tnvLuwr+Ng0SJiAMpFkuGXT2AGjZ0qqFFup6TDMq4UKPi1g@mail.gmail.com>
+From: Mao Zhongyi <maozy.fnst@cn.fujitsu.com>
+Message-ID: <4b5dcf61-a19d-55cb-d2a3-ff08c673cb61@cn.fujitsu.com>
+Date: Fri, 15 Dec 2017 14:09:42 +0800
 MIME-Version: 1.0
-In-Reply-To: <20171215060126.GG7753@umbus.fritz.box>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="PP2osckN1DWBMieX6UENGQtS61gpqNVFj"
-Subject: Re: [Qemu-devel] [PATCH qemu v2] vfio/spapr: Allow fallback to
- SPAPR TCE IOMMU v1
+In-Reply-To: <CAK3tnvLuwr+Ng0SJiAMpFkuGXT2AGjZ0qqFFup6TDMq4UKPi1g@mail.gmail.com>
+Content-Type: text/plain; charset="utf-8"; format=flowed
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH v2 3/4] colo: compare the packet based on
+ the tcp sequence number
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,103 +31,188 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Gibson <david@gibson.dropbear.id.au>
-Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org, Alex Williamson <alex.williamson@redhat.com>
+To: Zhang Chen <zhangckid@gmail.com>
+Cc: qemu-devel@nongnu.org, Li Zhijian <lizhijian@cn.fujitsu.com>, Jason Wang <jasowang@redhat.com>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---PP2osckN1DWBMieX6UENGQtS61gpqNVFj
-From: Alexey Kardashevskiy <aik@ozlabs.ru>
-To: David Gibson <david@gibson.dropbear.id.au>
-Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org,
- Alex Williamson <alex.williamson@redhat.com>
-Message-ID: <d9039c99-aa83-5d2f-dd12-5b52a7cf8fc0@ozlabs.ru>
-Subject: Re: [PATCH qemu v2] vfio/spapr: Allow fallback to SPAPR TCE IOMMU v1
-References: <20171212051619.24456-1-aik@ozlabs.ru>
- <20171215060126.GG7753@umbus.fritz.box>
-In-Reply-To: <20171215060126.GG7753@umbus.fritz.box>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-
-On 15/12/17 17:01, David Gibson wrote:
-> On Tue, Dec 12, 2017 at 04:16:19PM +1100, Alexey Kardashevskiy wrote:
->> The vfio_iommu_spapr_tce driver advertises kernel's support for
->> v1 and v2 IOMMU support, however it is not always possible to use
->> the requested IOMMU type. For example, a pseries host platform does no=
-t
->> support dynamic DMA windows so v2 cannot initialize and QEMU fails to
->> start.
->>
->> This adds a fallback to the v1 IOMMU if v2 cannot be used.
->>
->> Fixes: 318f67ce1371 "vfio: spapr: Add DMA memory preregistering (SPAPR=
- IOMMU v2)"
->> Signed-off-by: Alexey Kardashevskiy <aik@ozlabs.ru>
->=20
-> Reviewed-by: David Gibson <david@gibson.dropbear.id.au>
->=20
-> Alex, will you take this through your tree, or should I take it
-> through mine?
-
-
-It is already in upstream.
-
->=20
->> ---
->> Changes:
->> v2:
->> * updated commit log
->>
->> ---
->>  hw/vfio/common.c | 5 +++++
->>  1 file changed, 5 insertions(+)
->>
->> diff --git a/hw/vfio/common.c b/hw/vfio/common.c
->> index 7b2924c..cd81cc9 100644
->> --- a/hw/vfio/common.c
->> +++ b/hw/vfio/common.c
->> @@ -1040,6 +1040,11 @@ static int vfio_connect_container(VFIOGroup *gr=
-oup, AddressSpace *as,
->>              v2 ? VFIO_SPAPR_TCE_v2_IOMMU : VFIO_SPAPR_TCE_IOMMU;
->>          ret =3D ioctl(fd, VFIO_SET_IOMMU, container->iommu_type);
->>          if (ret) {
->> +            container->iommu_type =3D VFIO_SPAPR_TCE_IOMMU;
->> +            v2 =3D false;
->> +            ret =3D ioctl(fd, VFIO_SET_IOMMU, container->iommu_type);=
-
->> +        }
->> +        if (ret) {
->>              error_setg_errno(errp, errno, "failed to set iommu for co=
-ntainer");
->>              ret =3D -errno;
->>              goto free_container_exit;
->=20
+[...]
+>             +
+>             +    /* It doesn't look very sociable, in theory they should in a
+>             +     * common loop, fix old loop make it suit the tcp comparison
+>             +     * is the best way. But, given the performence of tcp comparison,
+>             +     * the method of tcp comparison is completely different to the
+>             +     * queue processing with others, so there is no way they can merge
+>             +     * into a loop. Then split tcp in a single route. If possible, in
+>             +     * the future, icmp and udp should be implemented use the same
+>             +     * way to keep the code processing process consistent.
+>             +     */
+>
+>
+>         Why no way can merge all comparison function in one loop?
+>
+>         I think you can try this way :
+>
+>          static void colo_compare_connection(void *opaque, void *user_data)
+>         {
+>             ....
+>             pri:
+>             if (g_queue_is_empty(&conn->primary_list)) {
+>                 return;
+>             }
+>             ppkt = g_queue_pop_head(&conn->primary_list);
+>
+>             sec:
+>              if (g_queue_is_empty(&conn->secondary_list)) {
+>                  g_queue_push_head(&conn->primary_list, ppkt);
+>                  return;
+>              }
+>
+>              switch (conn->ip_proto) {
+>                     case IPPROTO_TCP:
+>                          if (colo_compare_tcp(s, conn)) {
+>                                 goto pri;
+>                          } else {
+>                                 goto sec;
+>                          }
+>                     case IPPROTO_UDP:
+>                          if (colo_packet_compare_udp()) {
+>                                goto pri;
+>                          } else {
+>                                goto sec;
+>                          }
+>                     case ........
+>                      ....
+>               }
+>          }
+>
+>
+>     Thanks for the clarification.
+>
+>     In this way, it will reduce the performance of udp & icmp in my
+>     multiple test if we implement the udp & icmp comparison method
+>     with the same way of tcp.
+>
+>     I have had a similar implementation locally:
+>
 
 
---=20
-Alexey
+Hi, Chen
 
+> I don't think it will sensible reduce the performance of udp & icmp
 
---PP2osckN1DWBMieX6UENGQtS61gpqNVFj
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
+Actually, from the beginning to implement the tcp pkt comparison based
+on the seq I basically determined if the same method to implement udp &
+icmp, which performance certainly not as good as the original. Later test
+confirmed my idea.
 
------BEGIN PGP SIGNATURE-----
+The reason is simple: udp & icmp pkt comparison are based on size, in the
+secondary queue to find a packet same as one from primary queue can use
+the-off-shelf g_queue_find_custom() directly. However, if you want to use
+the same method as tcp to implement it, when a pkt from primary side is
+compared with secondary side, the extra pop & push of secondary queue is
+costed in each one comparsion, and the extra maintenance is required to
+record what position currently compared.
 
-iQJCBAEBCAAsFiEEZSrPibrORRTHQ99dhhM92CvBILkFAlozZn8OHGFpa0Bvemxh
-YnMucnUACgkQhhM92CvBILkZbQ/+Pvp8ZG5C97xTFMzc5jsnJ3pl/bX4pC9xAVKV
-9529V+MWdmyjeuJKkOJQyIQnko30L9TeIW1w3P6f2vSDmr5APHxNcZHXLiPzK+/y
-+SObnfF+xMG/BsInV0yJGmcnh5q8iZ1OZgYlMyPv1764Uy/bgJ61tij5asYI+YYX
-dBz5NZwcC+aH5lYU5tN6GD66jCMh8QSVgiMg8Sq42xwT+fBnBVNPcFEEcmYXPQ5Y
-w6ENYfLScHCZVH+hBEIpM6UymSR671HcaVVcfBgKvnBM7SeF9Mr3KjZjMjAuF/ZQ
-kzALggHtKLokoGIIq0/PbDaJtNaP0WhACurdj5vWYRXjtYpIXuMHnzQoHpRwqpkr
-l3rA+5gqme4r4MdR9+/jxfZT493F28yRQY7bDhF7PCdVBC1whqJlDq/2pnrBg3VK
-GEX0lzTv5pZY8pCHEsKGVVjOiy//rsHCxBKXrfuXN7Y73SMf1fll0VcDWFYVWfT7
-A1fLHwMUBIv+l9PPBdrktw6Yu3ZQhhEhWB3WagdISG90TqV+fX2KPIRUBkAzSGZj
-8d1LY3+yu3Ndpu8HhbyKT+p1VrLVSi3LGSrI0llNV49w4mUDqPp9GysxP/xvHrUb
-5pvGFyUI3K5KJcWGUJrzyBPI+68QYoPWW9zcJi5y+/45bKDJzXqUNfa4FXDLf3wa
-iWxEF7Q=
-=iUKM
------END PGP SIGNATURE-----
+Especially when the pkt of secondary queue same as primary side, it will
+be deleted, and when the packet from the head of secondary queue is not
+same, it will be pushed to the tail of queue so that to get a new pkt to
+continue the next comparison. These factors lead to the secondary queue
+constantly changing, increasing the complexity of location records and
+reducing the efficiency of icmp & udp.
 
---PP2osckN1DWBMieX6UENGQtS61gpqNVFj--
+But, using the original method does not exist this problem. It has good
+performance and code readability. Perhaps the code process flow of current
+implementation looks a little inconsistent, but it's not worth if over-pursuing
+code consistency and to ignore efficiency and readability.
+
+> Do you have already test the new loop?
+
+Yes， I did it in local before the v1 patch was sent.
+
+Thanks,
+Mao
+
+>
+> But in my mind, your similar implementation is OK for this job.
+> So don't easy to say " there is no way.....".
+>
+> Thanks
+> Zhang Chen
+>
+>
+>
+>
+>     colo_compare_comnon(arg1, arg2, callback)
+>     {
+>     pri:
+>          if (g_queue_is_empty(&conn->primary_list)) {
+>              return;
+>          }
+>          ppkt = g_queue_pop_head(&conn->primary_list);
+>
+>     sec:
+>           if (g_queue_is_empty(&conn->secondary_list)) {
+>               g_queue_push_head(&conn->primary_list, ppkt);
+>               return;
+>           }
+>         ....
+>     }
+>
+>     colo_compare_connection(void *opaque, void *user_data)
+>     {
+>           switch (conn->ip_proto) {
+>                  case IPPROTO_TCP:
+>                       colo_compare_common(s, conn, colo_comapre_tcp)
+>                  case IPPROTO_UDP:
+>                       colo_compare_common(s, conn, colo_comapre_udp)
+>                  case IPPROTO_ICMP:
+>                       colo_compare_common(s, conn, colo_comapre_icmp)
+>
+>                  case ........
+>                   ....
+>           }
+>     }
+>
+>
+>         Thanks
+>         Zhang Chen
+>
+>
+>
+>
+>
+>             +    if (conn->ip_proto == IPPROTO_TCP) {
+>             +        colo_compare_tcp(s, conn);
+>             +        return;
+>             +    }
+>
+>                  while (!g_queue_is_empty(&conn->primary_list) &&
+>                         !g_queue_is_empty(&conn->secondary_list)) {
+>                      pkt = g_queue_pop_head(&conn->primary_list);
+>                      switch (conn->ip_proto) {
+>             -        case IPPROTO_TCP:
+>             -            result = g_queue_find_custom(&conn->secondary_list,
+>             -                     pkt, (GCompareFunc)colo_packet_compare_tcp);
+>             -            break;
+>                      case IPPROTO_UDP:
+>                          result = g_queue_find_custom(&conn->secondary_list,
+>                                   pkt, (GCompareFunc)colo_packet_compare_udp);
+>             @@ -515,16 +604,8 @@ static void colo_compare_connection(void *opaque, void *user_data)
+>                      }
+>
+>                      if (result) {
+>             -            ret = compare_chr_send(s,
+>             -                                   pkt->data,
+>             -                                   pkt->size,
+>             -                                   pkt->vnet_hdr_len);
+>             -            if (ret < 0) {
+>             -                error_report("colo_send_primary_packet failed");
+>             -            }
+>             -            trace_colo_compare_main("packet same and release packet");
+>             +            colo_release_primary_pkt(s, pkt);
+>                          g_queue_remove(&conn->secondary_list, result->data);
+>             -            packet_destroy(pkt, NULL);
+>                      } else {
+>                          /*
+>                           * If one packet arrive late, the secondary_list or
+
+[...]
