@@ -1,28 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48479)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48776)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1ePp2W-0006nz-0B
-	for qemu-devel@nongnu.org; Fri, 15 Dec 2017 07:24:32 -0500
+	(envelope-from <kraxel@redhat.com>) id 1ePp3P-0007Z2-0d
+	for qemu-devel@nongnu.org; Fri, 15 Dec 2017 07:25:27 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1ePp2R-0002Cw-UL
-	for qemu-devel@nongnu.org; Fri, 15 Dec 2017 07:24:31 -0500
-Received: from mail-wm0-x242.google.com ([2a00:1450:400c:c09::242]:37412)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1ePp2R-0002Ag-N8
-	for qemu-devel@nongnu.org; Fri, 15 Dec 2017 07:24:27 -0500
-Received: by mail-wm0-x242.google.com with SMTP id f140so17199365wmd.2
-	for <qemu-devel@nongnu.org>; Fri, 15 Dec 2017 04:24:27 -0800 (PST)
-References: <20171211125705.16120-1-alex.bennee@linaro.org>
-	<20171211125705.16120-6-alex.bennee@linaro.org>
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-In-reply-to: <20171211125705.16120-6-alex.bennee@linaro.org>
-Date: Fri, 15 Dec 2017 12:24:24 +0000
-Message-ID: <87bmj089hj.fsf@linaro.org>
+	(envelope-from <kraxel@redhat.com>) id 1ePp3L-0004Vl-0N
+	for qemu-devel@nongnu.org; Fri, 15 Dec 2017 07:25:27 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:34238)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1ePp3K-0004Tu-IJ
+	for qemu-devel@nongnu.org; Fri, 15 Dec 2017 07:25:22 -0500
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+	[10.5.11.15])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 1CC7AC070E31
+	for <qemu-devel@nongnu.org>; Fri, 15 Dec 2017 12:25:21 +0000 (UTC)
+Date: Fri, 15 Dec 2017 13:25:19 +0100
+From: Gerd Hoffmann <kraxel@redhat.com>
+Message-ID: <20171215122519.ov4alinnlqrlvio7@sirius.home.kraxel.org>
+References: <20171212202040.GA2458@work-vm>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v1 05/19] include/fpu/softfloat: add some
- float16 contants
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20171212202040.GA2458@work-vm>
+Subject: Re: [Qemu-devel] No uhd (3840x2160) guest res?
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,48 +32,39 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: richard.henderson@linaro.org, peter.maydell@linaro.org, laurent@vivier.eu, bharata@linux.vnet.ibm.com, andrew@andrewdutcher.com, aleksandar.markovic@imgtec.com
-Cc: qemu-devel@nongnu.org, Aurelien Jarno <aurelien@aurel32.net>
+To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Cc: qemu-devel@nongnu.org
 
+On Tue, Dec 12, 2017 at 08:20:41PM +0000, Dr. David Alan Gilbert wrote:
+> My guests don't seem to offer the standard uhd resolution of 3840x2160
+> - what should be providing that?
+> 
+> I'm running an f27 gnome (X or wayland) guest with:
+> 
+> ./x86_64-softmmu/qemu-system-x86_64 -device virtio-vga --enable-kvm -m 2G /home/vmimages/fedora27.qcow2
+> 
+> and the guest lists:
+> 4096x2160
+> 2480x1680
+> 2560x1600
+> 1920x1440
+> 1856x1392
+> 1792x1344
+> 2048x1152
+> 1920x1200
+> 1920x1080
+> (and smaller)
+> 
+> given that it can offer 4096x2160, I assume it's not running out of RAM.
+> 
+> I couldn't find anywhere with those higher resolutions listed
+> in seabios to consider changing.
 
-Alex Benn=C3=A9e <alex.bennee@linaro.org> writes:
+linux kernel has a list of standard vesa resolutions in drm somewhere,
+iirc all virt drm drivers just use that for the mode list.
 
-> This defines the same set of common constants for float 16 as defined
-> for 32 and 64 bit floats. These are often used by target helper
-> functions.
->
-> Signed-off-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
-> ---
->  include/fpu/softfloat.h | 7 +++++++
->  1 file changed, 7 insertions(+)
->
-> diff --git a/include/fpu/softfloat.h b/include/fpu/softfloat.h
-> index 17dfe60dbd..5a9258c57c 100644
-> --- a/include/fpu/softfloat.h
-> +++ b/include/fpu/softfloat.h
-> @@ -395,6 +395,13 @@ static inline float16 float16_set_sign(float16 a, in=
-t sign)
->      return make_float16((float16_val(a) & 0x7fff) | (sign << 15));
->  }
->
-> +#define float16_zero make_float16(0)
-> +#define float16_one make_float16(0x3a00)
-> +#define float16_ln2 make_float16(0x34d1)
-> +#define float16_pi make_float16(0x4448)
-> +#define float16_half make_float16(0x3800)
-> +#define float16_infinity make_float16(0x7a00)
-
-And:
-#define float16_infinity make_float16(0x7c00)
-
-
-> +
->  /*----------------------------------------------------------------------=
-------
->  | The pattern for a default generated half-precision NaN.
->  *-----------------------------------------------------------------------=
------*/
-
-
---
-Alex Benn=C3=A9e
+> 
+> Dave
+> 
+> --
+> Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
