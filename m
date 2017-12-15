@@ -1,17 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53463)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53413)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1ePixT-0003l8-NV
-	for qemu-devel@nongnu.org; Fri, 15 Dec 2017 00:54:58 -0500
-Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1ePixP-0004mW-MA
+	(envelope-from <dgibson@ozlabs.org>) id 1ePixS-0003iB-0M
 	for qemu-devel@nongnu.org; Fri, 15 Dec 2017 00:54:55 -0500
+Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
+	(envelope-from <dgibson@ozlabs.org>) id 1ePixQ-0004n7-2U
+	for qemu-devel@nongnu.org; Fri, 15 Dec 2017 00:54:54 -0500
 From: David Gibson <david@gibson.dropbear.id.au>
-Date: Fri, 15 Dec 2017 16:54:29 +1100
-Message-Id: <20171215055435.24204-19-david@gibson.dropbear.id.au>
+Date: Fri, 15 Dec 2017 16:54:33 +1100
+Message-Id: <20171215055435.24204-23-david@gibson.dropbear.id.au>
 In-Reply-To: <20171215055435.24204-1-david@gibson.dropbear.id.au>
 References: <20171215055435.24204-1-david@gibson.dropbear.id.au>
-Subject: [Qemu-devel] [PULL 18/24] spapr: replace numa_get_node() with
- lookup in pc-dimm list
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PULL 22/24] spapr: Rename machine init functions for
+ clarity
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -21,269 +24,84 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: peter.maydell@linaro.org
-Cc: agraf@suse.de, groug@kaod.org, mdroth@linux.vnet.ibm.com, lvivier@redhat.com, qemu-ppc@nongnu.org, qemu-devel@nongnu.org, Igor Mammedov <imammedo@redhat.com>, David Gibson <david@gibson.dropbear.id.au>
+Cc: agraf@suse.de, groug@kaod.org, mdroth@linux.vnet.ibm.com, lvivier@redhat.com, qemu-ppc@nongnu.org, qemu-devel@nongnu.org, David Gibson <david@gibson.dropbear.id.au>
 
-From: Igor Mammedov <imammedo@redhat.com>
+Machine objects have two init functions - the generic QOM level
+instance_init which should only do static object initialization, and
+the Machine specific MachineClass::init which does the actual
+construction of the machine.
 
-SPAPR is the last user of numa_get_node() and a bunch of
-supporting code to maintain numa_info[x].addr list.
+In spapr the functions implementing these two have names -
+ppc_machine_initfn() and ppc_spapr_init() - which don't correspond closel=
+y
+to either of those.  To prevent people (read, me) from confusing which is
+which, rename them spapr_instance_init() and spapr_machine_init() to
+make it clearer which is which.
 
-Get LMB node id from pc-dimm list, which allows to
-remove ~80LOC maintaining dynamic address range
-lookup list.
+While we're there rename ppc_spapr_reset() to spapr_machine_reset() to
+match.
 
-It also removes pc-dimm dependency on numa_[un]set_mem_node_id()
-and makes pc-dimms a sole source of information about which
-node it belongs to and removes duplicate data from global
-numa_info.
-
-Signed-off-by: Igor Mammedov <imammedo@redhat.com>
 Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
+Reviewed-by: C=C3=A9dric Le Goater <clg@kaod.org>
+Reviewed-by: Greg Kurz <groug@kaod.org>
+Reviewed-by: Suraj Jitindar Singh <sjitindarsingh@gmail.com>
 ---
- hw/mem/pc-dimm.c      |  2 --
- hw/ppc/spapr.c        | 29 +++++++++++++++-
- include/sysemu/numa.h | 10 ------
- numa.c                | 94 ---------------------------------------------------
- 4 files changed, 28 insertions(+), 107 deletions(-)
+ hw/ppc/spapr.c | 12 ++++++------
+ 1 file changed, 6 insertions(+), 6 deletions(-)
 
-diff --git a/hw/mem/pc-dimm.c b/hw/mem/pc-dimm.c
-index 66eace5a5c..6e74b61cb6 100644
---- a/hw/mem/pc-dimm.c
-+++ b/hw/mem/pc-dimm.c
-@@ -109,7 +109,6 @@ void pc_dimm_memory_plug(DeviceState *dev, MemoryHotplugState *hpms,
- 
-     memory_region_add_subregion(&hpms->mr, addr - hpms->base, mr);
-     vmstate_register_ram(vmstate_mr, dev);
--    numa_set_mem_node_id(addr, memory_region_size(mr), dimm->node);
- 
- out:
-     error_propagate(errp, local_err);
-@@ -122,7 +121,6 @@ void pc_dimm_memory_unplug(DeviceState *dev, MemoryHotplugState *hpms,
-     PCDIMMDeviceClass *ddc = PC_DIMM_GET_CLASS(dimm);
-     MemoryRegion *vmstate_mr = ddc->get_vmstate_memory_region(dimm);
- 
--    numa_unset_mem_node_id(dimm->addr, memory_region_size(mr), dimm->node);
-     memory_region_del_subregion(&hpms->mr, mr);
-     vmstate_unregister_ram(vmstate_mr, dev);
- }
 diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-index 8a6a59f098..306875e123 100644
+index 306875e123..42d6a2302a 100644
 --- a/hw/ppc/spapr.c
 +++ b/hw/ppc/spapr.c
-@@ -641,6 +641,26 @@ static void spapr_populate_cpus_dt_node(void *fdt, sPAPRMachineState *spapr)
- 
+@@ -1454,7 +1454,7 @@ static int spapr_reset_drcs(Object *child, void *op=
+aque)
+     return 0;
  }
- 
-+static uint32_t spapr_pc_dimm_node(MemoryDeviceInfoList *list, ram_addr_t addr)
-+{
-+    MemoryDeviceInfoList *info;
-+
-+    for (info = list; info; info = info->next) {
-+        MemoryDeviceInfo *value = info->value;
-+
-+        if (value && value->type == MEMORY_DEVICE_INFO_KIND_DIMM) {
-+            PCDIMMDeviceInfo *pcdimm_info = value->u.dimm.data;
-+
-+            if (pcdimm_info->addr >= addr &&
-+                addr < (pcdimm_info->addr + pcdimm_info->size)) {
-+                return pcdimm_info->node;
-+            }
-+        }
-+    }
-+
-+    return -1;
-+}
-+
- /*
-  * Adds ibm,dynamic-reconfiguration-memory node.
-  * Refer to docs/specs/ppc-spapr-hotplug.txt for the documentation
-@@ -658,6 +678,7 @@ static int spapr_populate_drconf_memory(sPAPRMachineState *spapr, void *fdt)
-                        lmb_size;
-     uint32_t *int_buf, *cur_index, buf_len;
-     int nr_nodes = nb_numa_nodes ? nb_numa_nodes : 1;
-+    MemoryDeviceInfoList *dimms = NULL;
- 
-     /*
-      * Don't create the node if there is no hotpluggable memory
-@@ -692,6 +713,11 @@ static int spapr_populate_drconf_memory(sPAPRMachineState *spapr, void *fdt)
-         goto out;
-     }
- 
-+    if (hotplug_lmb_start) {
-+        MemoryDeviceInfoList **prev = &dimms;
-+        qmp_pc_dimm_device_list(qdev_get_machine(), &prev);
-+    }
-+
-     /* ibm,dynamic-memory */
-     int_buf[0] = cpu_to_be32(nr_lmbs);
-     cur_index++;
-@@ -709,7 +735,7 @@ static int spapr_populate_drconf_memory(sPAPRMachineState *spapr, void *fdt)
-             dynamic_memory[1] = cpu_to_be32(addr & 0xffffffff);
-             dynamic_memory[2] = cpu_to_be32(spapr_drc_index(drc));
-             dynamic_memory[3] = cpu_to_be32(0); /* reserved */
--            dynamic_memory[4] = cpu_to_be32(numa_get_node(addr, NULL));
-+            dynamic_memory[4] = cpu_to_be32(spapr_pc_dimm_node(dimms, addr));
-             if (memory_region_present(get_system_memory(), addr)) {
-                 dynamic_memory[5] = cpu_to_be32(SPAPR_LMB_FLAGS_ASSIGNED);
-             } else {
-@@ -732,6 +758,7 @@ static int spapr_populate_drconf_memory(sPAPRMachineState *spapr, void *fdt)
- 
-         cur_index += SPAPR_DR_LMB_LIST_ENTRY_SIZE;
-     }
-+    qapi_free_MemoryDeviceInfoList(dimms);
-     ret = fdt_setprop(fdt, offset, "ibm,dynamic-memory", int_buf, buf_len);
-     if (ret < 0) {
-         goto out;
-diff --git a/include/sysemu/numa.h b/include/sysemu/numa.h
-index 5c6df2820b..b3545215f6 100644
---- a/include/sysemu/numa.h
-+++ b/include/sysemu/numa.h
-@@ -10,17 +10,10 @@
- extern int nb_numa_nodes;   /* Number of NUMA nodes */
- extern bool have_numa_distance;
- 
--struct numa_addr_range {
--    ram_addr_t mem_start;
--    ram_addr_t mem_end;
--    QLIST_ENTRY(numa_addr_range) entry;
--};
--
- struct node_info {
-     uint64_t node_mem;
-     struct HostMemoryBackend *node_memdev;
-     bool present;
--    QLIST_HEAD(, numa_addr_range) addr; /* List to store address ranges */
-     uint8_t distance[MAX_NODES];
- };
- 
-@@ -33,9 +26,6 @@ extern NodeInfo numa_info[MAX_NODES];
- void parse_numa_opts(MachineState *ms);
- void query_numa_node_mem(NumaNodeMem node_mem[]);
- extern QemuOptsList qemu_numa_opts;
--void numa_set_mem_node_id(ram_addr_t addr, uint64_t size, uint32_t node);
--void numa_unset_mem_node_id(ram_addr_t addr, uint64_t size, uint32_t node);
--uint32_t numa_get_node(ram_addr_t addr, Error **errp);
- void numa_legacy_auto_assign_ram(MachineClass *mc, NodeInfo *nodes,
-                                  int nb_nodes, ram_addr_t size);
- void numa_default_auto_assign_ram(MachineClass *mc, NodeInfo *nodes,
-diff --git a/numa.c b/numa.c
-index 7151b24d1c..98fa9a4bcf 100644
---- a/numa.c
-+++ b/numa.c
-@@ -55,92 +55,6 @@ int nb_numa_nodes;
- bool have_numa_distance;
- NodeInfo numa_info[MAX_NODES];
- 
--void numa_set_mem_node_id(ram_addr_t addr, uint64_t size, uint32_t node)
--{
--    struct numa_addr_range *range;
--
--    /*
--     * Memory-less nodes can come here with 0 size in which case,
--     * there is nothing to do.
--     */
--    if (!size) {
--        return;
--    }
--
--    range = g_malloc0(sizeof(*range));
--    range->mem_start = addr;
--    range->mem_end = addr + size - 1;
--    QLIST_INSERT_HEAD(&numa_info[node].addr, range, entry);
--}
--
--void numa_unset_mem_node_id(ram_addr_t addr, uint64_t size, uint32_t node)
--{
--    struct numa_addr_range *range, *next;
--
--    QLIST_FOREACH_SAFE(range, &numa_info[node].addr, entry, next) {
--        if (addr == range->mem_start && (addr + size - 1) == range->mem_end) {
--            QLIST_REMOVE(range, entry);
--            g_free(range);
--            return;
--        }
--    }
--}
--
--static void numa_set_mem_ranges(void)
--{
--    int i;
--    ram_addr_t mem_start = 0;
--
--    /*
--     * Deduce start address of each node and use it to store
--     * the address range info in numa_info address range list
--     */
--    for (i = 0; i < nb_numa_nodes; i++) {
--        numa_set_mem_node_id(mem_start, numa_info[i].node_mem, i);
--        mem_start += numa_info[i].node_mem;
--    }
--}
--
--/*
-- * Check if @addr falls under NUMA @node.
-- */
--static bool numa_addr_belongs_to_node(ram_addr_t addr, uint32_t node)
--{
--    struct numa_addr_range *range;
--
--    QLIST_FOREACH(range, &numa_info[node].addr, entry) {
--        if (addr >= range->mem_start && addr <= range->mem_end) {
--            return true;
--        }
--    }
--    return false;
--}
--
--/*
-- * Given an address, return the index of the NUMA node to which the
-- * address belongs to.
-- */
--uint32_t numa_get_node(ram_addr_t addr, Error **errp)
--{
--    uint32_t i;
--
--    /* For non NUMA configurations, check if the addr falls under node 0 */
--    if (!nb_numa_nodes) {
--        if (numa_addr_belongs_to_node(addr, 0)) {
--            return 0;
--        }
--    }
--
--    for (i = 0; i < nb_numa_nodes; i++) {
--        if (numa_addr_belongs_to_node(addr, i)) {
--            return i;
--        }
--    }
--
--    error_setg(errp, "Address 0x" RAM_ADDR_FMT " doesn't belong to any "
--                "NUMA node", addr);
--    return -1;
--}
- 
- static void parse_numa_node(MachineState *ms, NumaNodeOptions *node,
-                             Error **errp)
-@@ -497,12 +411,6 @@ void parse_numa_opts(MachineState *ms)
-             exit(1);
-         }
- 
--        for (i = 0; i < nb_numa_nodes; i++) {
--            QLIST_INIT(&numa_info[i].addr);
--        }
--
--        numa_set_mem_ranges();
--
-         /* QEMU needs at least all unique node pair distances to build
-          * the whole NUMA distance table. QEMU treats the distance table
-          * as symmetric by default, i.e. distance A->B == distance B->A.
-@@ -522,8 +430,6 @@ void parse_numa_opts(MachineState *ms)
-             /* Validation succeeded, now fill in any missing distances. */
-             complete_init_numa_distance();
-         }
--    } else {
--        numa_set_mem_node_id(0, ram_size, 0);
-     }
+=20
+-static void ppc_spapr_reset(void)
++static void spapr_machine_reset(void)
+ {
+     MachineState *machine =3D MACHINE(qdev_get_machine());
+     sPAPRMachineState *spapr =3D SPAPR_MACHINE(machine);
+@@ -2292,7 +2292,7 @@ out:
  }
- 
--- 
+=20
+ /* pSeries LPAR / sPAPR hardware init */
+-static void ppc_spapr_init(MachineState *machine)
++static void spapr_machine_init(MachineState *machine)
+ {
+     sPAPRMachineState *spapr =3D SPAPR_MACHINE(machine);
+     sPAPRMachineClass *smc =3D SPAPR_MACHINE_GET_CLASS(machine);
+@@ -2820,7 +2820,7 @@ static void spapr_set_vsmt(Object *obj, Visitor *v,=
+ const char *name,
+     visit_type_uint32(v, name, (uint32_t *)opaque, errp);
+ }
+=20
+-static void spapr_machine_initfn(Object *obj)
++static void spapr_instance_init(Object *obj)
+ {
+     sPAPRMachineState *spapr =3D SPAPR_MACHINE(obj);
+=20
+@@ -3777,8 +3777,8 @@ static void spapr_machine_class_init(ObjectClass *o=
+c, void *data)
+      * functions for the specific versioned machine types can override
+      * these details for backwards compatibility
+      */
+-    mc->init =3D ppc_spapr_init;
+-    mc->reset =3D ppc_spapr_reset;
++    mc->init =3D spapr_machine_init;
++    mc->reset =3D spapr_machine_reset;
+     mc->block_default_type =3D IF_SCSI;
+     mc->max_cpus =3D 1024;
+     mc->no_parallel =3D 1;
+@@ -3825,7 +3825,7 @@ static const TypeInfo spapr_machine_info =3D {
+     .parent        =3D TYPE_MACHINE,
+     .abstract      =3D true,
+     .instance_size =3D sizeof(sPAPRMachineState),
+-    .instance_init =3D spapr_machine_initfn,
++    .instance_init =3D spapr_instance_init,
+     .instance_finalize =3D spapr_machine_finalizefn,
+     .class_size    =3D sizeof(sPAPRMachineClass),
+     .class_init    =3D spapr_machine_class_init,
+--=20
 2.14.3
