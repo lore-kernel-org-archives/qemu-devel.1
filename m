@@ -1,19 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55460)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55479)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berto@igalia.com>) id 1ePpVG-0000We-5E
+	(envelope-from <berto@igalia.com>) id 1ePpVG-0000Wg-GT
 	for qemu-devel@nongnu.org; Fri, 15 Dec 2017 07:54:17 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berto@igalia.com>) id 1ePpVC-0003Ig-St
+	(envelope-from <berto@igalia.com>) id 1ePpVC-0003JJ-TJ
 	for qemu-devel@nongnu.org; Fri, 15 Dec 2017 07:54:14 -0500
 From: Alberto Garcia <berto@igalia.com>
-Date: Fri, 15 Dec 2017 13:53:57 +0100
-Message-Id: <8149f6ab70fda930585b8ee38a583a006343730c.1513342045.git.berto@igalia.com>
+Date: Fri, 15 Dec 2017 13:53:56 +0100
+Message-Id: <93ac7be373e194f4dfcc73c0bea96bd1c00209da.1513342045.git.berto@igalia.com>
 In-Reply-To: <cover.1513342045.git.berto@igalia.com>
 References: <cover.1513342045.git.berto@igalia.com>
 In-Reply-To: <cover.1513342045.git.berto@igalia.com>
 References: <cover.1513342045.git.berto@igalia.com>
-Subject: [Qemu-devel] [PATCH v2 29/32] qcow2: Rename l2_table in
- count_contiguous_clusters_unallocated()
+Subject: [Qemu-devel] [PATCH v2 28/32] qcow2: Rename l2_table in
+ count_contiguous_clusters()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,34 +31,44 @@ variable is renamed for clarity.
 
 Signed-off-by: Alberto Garcia <berto@igalia.com>
 ---
- block/qcow2-cluster.c | 6 +++---
- 1 file changed, 3 insertions(+), 3 deletions(-)
+ block/qcow2-cluster.c | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
 
 diff --git a/block/qcow2-cluster.c b/block/qcow2-cluster.c
-index 3deb132fa4..b40a2e32e0 100644
+index 0afe4eda13..3deb132fa4 100644
 --- a/block/qcow2-cluster.c
 +++ b/block/qcow2-cluster.c
-@@ -407,10 +407,10 @@ static int count_contiguous_clusters(int nb_clusters, int cluster_size,
+@@ -371,19 +371,19 @@ fail:
+ }
  
  /*
-  * Checks how many consecutive unallocated clusters in a given L2
-- * table have the same cluster type.
-+ * slice have the same cluster type.
+- * Checks how many clusters in a given L2 table are contiguous in the image
++ * Checks how many clusters in a given L2 slice are contiguous in the image
+  * file. As soon as one of the flags in the bitmask stop_flags changes compared
+  * to the first cluster, the search is stopped and the cluster is not counted
+  * as contiguous. (This allows it, for example, to stop at the first compressed
+  * cluster which may require a different handling)
   */
- static int count_contiguous_clusters_unallocated(int nb_clusters,
--                                                 uint64_t *l2_table,
-+                                                 uint64_t *l2_slice,
-                                                  QCow2ClusterType wanted_type)
+ static int count_contiguous_clusters(int nb_clusters, int cluster_size,
+-        uint64_t *l2_table, uint64_t stop_flags)
++        uint64_t *l2_slice, uint64_t stop_flags)
  {
      int i;
-@@ -418,7 +418,7 @@ static int count_contiguous_clusters_unallocated(int nb_clusters,
-     assert(wanted_type == QCOW2_CLUSTER_ZERO_PLAIN ||
-            wanted_type == QCOW2_CLUSTER_UNALLOCATED);
-     for (i = 0; i < nb_clusters; i++) {
--        uint64_t entry = be64_to_cpu(l2_table[i]);
-+        uint64_t entry = be64_to_cpu(l2_slice[i]);
-         QCow2ClusterType type = qcow2_get_cluster_type(entry);
+     QCow2ClusterType first_cluster_type;
+     uint64_t mask = stop_flags | L2E_OFFSET_MASK | QCOW_OFLAG_COMPRESSED;
+-    uint64_t first_entry = be64_to_cpu(l2_table[0]);
++    uint64_t first_entry = be64_to_cpu(l2_slice[0]);
+     uint64_t offset = first_entry & mask;
  
-         if (type != wanted_type) {
+     if (!offset) {
+@@ -396,7 +396,7 @@ static int count_contiguous_clusters(int nb_clusters, int cluster_size,
+            first_cluster_type == QCOW2_CLUSTER_ZERO_ALLOC);
+ 
+     for (i = 0; i < nb_clusters; i++) {
+-        uint64_t l2_entry = be64_to_cpu(l2_table[i]) & mask;
++        uint64_t l2_entry = be64_to_cpu(l2_slice[i]) & mask;
+         if (offset + (uint64_t) i * cluster_size != l2_entry) {
+             break;
+         }
 -- 
 2.11.0
