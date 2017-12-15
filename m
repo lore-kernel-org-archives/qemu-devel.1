@@ -1,23 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42480)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36819)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1ePgv0-0005ue-Ft
-	for qemu-devel@nongnu.org; Thu, 14 Dec 2017 22:44:15 -0500
+	(envelope-from <bounces@canonical.com>) id 1ePhUL-0001eJ-Cz
+	for qemu-devel@nongnu.org; Thu, 14 Dec 2017 23:20:46 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1ePguz-0005Yc-JV
-	for qemu-devel@nongnu.org; Thu, 14 Dec 2017 22:44:14 -0500
-Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
-	<philippe.mathieu.daude@gmail.com>
-From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
-Date: Fri, 15 Dec 2017 00:43:56 -0300
-Message-Id: <20171215034356.4449-3-f4bug@amsat.org>
-In-Reply-To: <20171215034356.4449-1-f4bug@amsat.org>
-References: <20171215034356.4449-1-f4bug@amsat.org>
+	(envelope-from <bounces@canonical.com>) id 1ePhUI-0000F4-9D
+	for qemu-devel@nongnu.org; Thu, 14 Dec 2017 23:20:45 -0500
+Received: from indium.canonical.com ([91.189.90.7]:36276)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1ePhUI-0000Cf-2x
+	for qemu-devel@nongnu.org; Thu, 14 Dec 2017 23:20:42 -0500
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1ePhUF-0000L6-EZ
+	for <qemu-devel@nongnu.org>; Fri, 15 Dec 2017 04:20:39 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id C80272E8137
+	for <qemu-devel@nongnu.org>; Fri, 15 Dec 2017 04:20:37 +0000 (UTC)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v5 2/2] misc: drop old i386 dependency
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Fri, 15 Dec 2017 04:13:36 -0000
+From: Bruno Haible <bruno@clisp.org>
+Reply-To: Bug 1701808 <1701808@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <149891130681.24932.1838110700653893581.malonedeb@soybean.canonical.com>
+Message-Id: <151331121639.19433.10519708710189449837.malone@chaenomeles.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1701808] Re: stack smashing in or after recvmsg
+ system call in aarch64 user mode
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,78 +37,45 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Michael S. Tsirkin" <mst@redhat.com>, Michael Tokarev <mjt@tls.msk.ru>
-Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, qemu-devel@nongnu.org, Peter Maydell <peter.maydell@linaro.org>, Thomas Huth <thuth@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, qemu-trivial@nongnu.org, Michael Walle <michael@walle.cc>, Anthony Green <green@moxielogic.com>, Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, Artyom Tarasenko <atar4qemu@gmail.com>
+To: qemu-devel@nongnu.org
 
-Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
-Reviewed-by: Thomas Huth <thuth@redhat.com>
----
- hw/char/debugcon.c      | 1 -
- hw/intc/lm32_pic.c      | 1 -
- hw/moxie/moxiesim.c     | 1 -
- hw/sparc/sun4m.c        | 1 -
- hw/watchdog/wdt_ib700.c | 1 -
- 5 files changed, 5 deletions(-)
+The behaviour in qemu-2.11 is the same as in qemu-2.9.
 
-diff --git a/hw/char/debugcon.c b/hw/char/debugcon.c
-index 95ccec6f8b..e2abc61b04 100644
---- a/hw/char/debugcon.c
-+++ b/hw/char/debugcon.c
-@@ -29,7 +29,6 @@
- #include "hw/hw.h"
- #include "chardev/char-fe.h"
- #include "hw/isa/isa.h"
--#include "hw/i386/pc.h"
- 
- #define TYPE_ISA_DEBUGCON_DEVICE "isa-debugcon"
- #define ISA_DEBUGCON_DEVICE(obj) \
-diff --git a/hw/intc/lm32_pic.c b/hw/intc/lm32_pic.c
-index 09e15115fb..db6c7afc2f 100644
---- a/hw/intc/lm32_pic.c
-+++ b/hw/intc/lm32_pic.c
-@@ -20,7 +20,6 @@
- #include "qemu/osdep.h"
- 
- #include "hw/hw.h"
--#include "hw/i386/pc.h"
- #include "monitor/monitor.h"
- #include "hw/sysbus.h"
- #include "trace.h"
-diff --git a/hw/moxie/moxiesim.c b/hw/moxie/moxiesim.c
-index 3ba58481d0..3c3ba9d8c5 100644
---- a/hw/moxie/moxiesim.c
-+++ b/hw/moxie/moxiesim.c
-@@ -30,7 +30,6 @@
- #include "cpu.h"
- #include "hw/sysbus.h"
- #include "hw/hw.h"
--#include "hw/i386/pc.h"
- #include "hw/isa/isa.h"
- #include "net/net.h"
- #include "sysemu/sysemu.h"
-diff --git a/hw/sparc/sun4m.c b/hw/sparc/sun4m.c
-index 24c2b8a555..e71648404c 100644
---- a/hw/sparc/sun4m.c
-+++ b/hw/sparc/sun4m.c
-@@ -36,7 +36,6 @@
- #include "net/net.h"
- #include "hw/boards.h"
- #include "hw/scsi/esp.h"
--#include "hw/i386/pc.h"
- #include "hw/isa/isa.h"
- #include "hw/nvram/sun_nvram.h"
- #include "hw/nvram/chrp_nvram.h"
-diff --git a/hw/watchdog/wdt_ib700.c b/hw/watchdog/wdt_ib700.c
-index 532afe89e7..d045032bf4 100644
---- a/hw/watchdog/wdt_ib700.c
-+++ b/hw/watchdog/wdt_ib700.c
-@@ -25,7 +25,6 @@
- #include "sysemu/watchdog.h"
- #include "hw/hw.h"
- #include "hw/isa/isa.h"
--#include "hw/i386/pc.h"
- 
- /*#define IB700_DEBUG 1*/
- 
--- 
-2.15.1
+-- =
+
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1701808
+
+Title:
+  stack smashing in or after recvmsg system call in aarch64 user mode
+
+Status in QEMU:
+  New
+
+Bug description:
+  A program that invokes recvmsg aborts with "*** stack smashing
+  detected ***" when run in qemu-aarch64 (user mode), but works fine
+  when running on native aarch64 hardware.
+
+  How to reproduce:
+  $ aarch64-linux-gnu-gcc-5 -O -Wall /media/develdata/devel/qemu-bug/testpa=
+ssfd.c -static -DEXTRA_SPACE=3D0
+  $ QEMU_LD_PREFIX=3D/usr/aarch64-linux-gnu ~/inst-qemu/2.9.0/bin/qemu-aarc=
+h64 ./a.out
+  *** stack smashing detected ***: ./a.out terminated
+  qemu: uncaught target signal 6 (Aborted) - core dumped
+
+  On native aarch64 hardware:
+  $ ./a.out =
+
+  $ echo $?
+  0
+
+  The parameter EXTRA_SPACE can be used to add additional space to the
+  array that receives the recvmsg data. With -DEXTRA_SPACE=3D9 (or
+  larger), the program runs fine. Which suggests that recvmsg is storing
+  up to 9 bytes more than allowed in memory.
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1701808/+subscriptions
