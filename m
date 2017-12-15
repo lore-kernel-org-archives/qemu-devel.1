@@ -1,26 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47781)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48896)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1ePqLx-0007W0-6a
-	for qemu-devel@nongnu.org; Fri, 15 Dec 2017 08:48:46 -0500
+	(envelope-from <pm215@archaic.org.uk>) id 1ePqQF-0001ZQ-H5
+	for qemu-devel@nongnu.org; Fri, 15 Dec 2017 08:53:08 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1ePqLw-00066K-Dw
-	for qemu-devel@nongnu.org; Fri, 15 Dec 2017 08:48:41 -0500
-Received: from mail-ot0-x231.google.com ([2607:f8b0:4003:c0f::231]:34093)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1ePqLw-00065q-8T
-	for qemu-devel@nongnu.org; Fri, 15 Dec 2017 08:48:40 -0500
-Received: by mail-ot0-x231.google.com with SMTP id o23so7828028otd.1
-	for <qemu-devel@nongnu.org>; Fri, 15 Dec 2017 05:48:39 -0800 (PST)
-MIME-Version: 1.0
-In-Reply-To: <20171215110323.16400-1-cohuck@redhat.com>
-References: <20171215110323.16400-1-cohuck@redhat.com>
+	(envelope-from <pm215@archaic.org.uk>) id 1ePqQE-0002Qt-Of
+	for qemu-devel@nongnu.org; Fri, 15 Dec 2017 08:53:07 -0500
+Received: from orth.archaic.org.uk ([2001:8b0:1d0::2]:39184)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pm215@archaic.org.uk>)
+	id 1ePqQE-0002MG-IP
+	for qemu-devel@nongnu.org; Fri, 15 Dec 2017 08:53:06 -0500
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri, 15 Dec 2017 13:48:18 +0000
-Message-ID: <CAFEAcA_2yP1swG0pWLYt+tsObAdTk2G7zitGoMLPAdcy3_kBQA@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PULL v2 00/46] First batch of s390x patches for
- 2.12
+Date: Fri, 15 Dec 2017 13:52:54 +0000
+Message-Id: <1513345976-22958-1-git-send-email-peter.maydell@linaro.org>
+Subject: [Qemu-devel] [PATCH 0/2] linux-user: Fix length calculations in
+ host_to_target_cmsg()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,33 +23,31 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Cornelia Huck <cohuck@redhat.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, qemu-s390x@nongnu.org, Richard Henderson <rth@twiddle.net>, Alexander Graf <agraf@suse.de>, Thomas Huth <thuth@redhat.com>, Christian Borntraeger <borntraeger@de.ibm.com>, David Hildenbrand <david@redhat.com>
+To: qemu-devel@nongnu.org
+Cc: patches@linaro.org, Riku Voipio <riku.voipio@iki.fi>, Laurent Vivier <laurent@vivier.eu>, Bruno Haible <bruno@clisp.org>
 
-On 15 December 2017 at 11:03, Cornelia Huck <cohuck@redhat.com> wrote:
-> The following changes since commit 0ef0583d5adceb9138bdb47494dabd1549ac5b6d:
->
->   Merge remote-tracking branch 'remotes/dgilbert/tags/pull-hmp-20171214' into staging (2017-12-14 15:32:32 +0000)
->
-> are available in the git repository at:
->
->   git://github.com/cohuck/qemu tags/s390x-20171215-v2
->
-> for you to fetch changes up to bb223055b9b327ec66e1f6d2fbaebaee0b8f3dbe:
->
->   s390-ccw-virtio: allow for systems larger that 7.999TB (2017-12-15 11:54:52 +0100)
->
-> ----------------------------------------------------------------
-> s390x changes for 2.12:
-> - Lots of tcg improvements: ccw hotplug is now working and we can run
->   a Linux kernel built for z12 under tcg
-> - zPCI improvements to get virtio-pci working
-> - get rid of the cssid restrictions for virtual and non-virtual channel
->   devices
-> - we now support 8TB+ systems
-> - 2.12 compat machine
-> - fixes and cleanups
+This patchset fixes this bug:
+https://bugs.launchpad.net/qemu/+bug/1701808
 
-Applied, thanks.
+where we were getting our message length calculations in
+host_to_target_cmsg() wrong and could thus overwrite the end of the
+guest buffer when we tried to fill it with the results of a
+recvmsg().
 
+Patch 1 is the bugfix; patch 2 is a minor cleanup which removes some
+unnecessary and confusing alignment arithmetic and brings us into
+alignment with what the kernel currently does.
+
+thanks
 -- PMM
+
+Peter Maydell (2):
+  linux-user: Fix length calculations in host_to_target_cmsg()
+  linux-user: Don't use CMSG_ALIGN(sizeof struct cmsghdr)
+
+ linux-user/syscall_defs.h |  6 +++---
+ linux-user/syscall.c      | 33 ++++++++++++++++++++++++---------
+ 2 files changed, 27 insertions(+), 12 deletions(-)
+
+-- 
+2.7.4
