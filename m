@@ -1,25 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58094)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59807)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1ePfWA-0002lL-2i
-	for qemu-devel@nongnu.org; Thu, 14 Dec 2017 21:14:31 -0500
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1ePfaQ-0004J0-Hd
+	for qemu-devel@nongnu.org; Thu, 14 Dec 2017 21:18:55 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1ePfW5-0007Xp-7T
-	for qemu-devel@nongnu.org; Thu, 14 Dec 2017 21:14:30 -0500
-Resent-Message-Id: <E1ePfW5-0007Xp-7T@eggs.gnu.org>
-Received: from sender-of-o52.zoho.com ([135.84.80.217]:21327)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
-	id 1ePfW4-0007Wj-W3
-	for qemu-devel@nongnu.org; Thu, 14 Dec 2017 21:14:25 -0500
-Reply-To: <qemu-devel@nongnu.org>
-Message-ID: <151300215762.23197.8621636832845452958@bfc911d3884a>
-In-Reply-To: <151299847127.4808.14646046517426494416.stgit@Misha-PC.lan02.inno>
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1ePfaM-0001vF-Hi
+	for qemu-devel@nongnu.org; Thu, 14 Dec 2017 21:18:54 -0500
+Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
+	<philippe.mathieu.daude@gmail.com>
+References: <20171214145255.31545-1-andrew.smirnov@gmail.com>
+	<20171214145255.31545-16-andrew.smirnov@gmail.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Message-ID: <c8081a26-929f-4c9c-d1cd-09501bd83274@amsat.org>
+Date: Thu, 14 Dec 2017 23:18:40 -0300
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Mon, 11 Dec 2017 06:22:40 -0800 (PST)
-Subject: Re: [Qemu-devel] [PATCH v4 00/46] Windbg supporting
+In-Reply-To: <20171214145255.31545-16-andrew.smirnov@gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH v2 15/15] sdhci: Implement write method of
+ ACMD12ERRSTS register
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,141 +29,43 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: mikhail.abakumov@ispras.ru
-Cc: famz@redhat.com, qemu-devel@nongnu.org, sw@weilnetz.de, lprosek@redhat.com, dovgaluk@ispras.ru, rkagan@virtuozzo.com, pbonzini@redhat.com, den@openvz.org
+To: Andrey Smirnov <andrew.smirnov@gmail.com>, qemu-arm@nongnu.org
+Cc: Peter Maydell <peter.maydell@linaro.org>, Jason Wang <jasowang@redhat.com>, qemu-devel@nongnu.org, yurovsky@gmail.com
 
-SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
-LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKTWVzc2FnZS1pZDogMTUx
-Mjk5ODQ3MTI3LjQ4MDguMTQ2NDYwNDY1MTc0MjY0OTQ0MTYuc3RnaXRATWlzaGEtUEMubGFuMDIu
-aW5ubwpTdWJqZWN0OiBbUWVtdS1kZXZlbF0gW1BBVENIIHY0IDAwLzQ2XSBXaW5kYmcgc3VwcG9y
-dGluZwpUeXBlOiBzZXJpZXMKCj09PSBURVNUIFNDUklQVCBCRUdJTiA9PT0KIyEvYmluL2Jhc2gK
-CkJBU0U9YmFzZQpuPTEKdG90YWw9JChnaXQgbG9nIC0tb25lbGluZSAkQkFTRS4uIHwgd2MgLWwp
-CmZhaWxlZD0wCgpnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVsaW1pdCAwCmdpdCBjb25m
-aWcgLS1sb2NhbCBkaWZmLnJlbmFtZXMgVHJ1ZQoKY29tbWl0cz0iJChnaXQgbG9nIC0tZm9ybWF0
-PSVIIC0tcmV2ZXJzZSAkQkFTRS4uKSIKZm9yIGMgaW4gJGNvbW1pdHM7IGRvCiAgICBlY2hvICJD
-aGVja2luZyBQQVRDSCAkbi8kdG90YWw6ICQoZ2l0IGxvZyAtbiAxIC0tZm9ybWF0PSVzICRjKS4u
-LiIKICAgIGlmICEgZ2l0IHNob3cgJGMgLS1mb3JtYXQ9ZW1haWwgfCAuL3NjcmlwdHMvY2hlY2tw
-YXRjaC5wbCAtLW1haWxiYWNrIC07IHRoZW4KICAgICAgICBmYWlsZWQ9MQogICAgICAgIGVjaG8K
-ICAgIGZpCiAgICBuPSQoKG4rMSkpCmRvbmUKCmV4aXQgJGZhaWxlZAo9PT0gVEVTVCBTQ1JJUFQg
-RU5EID09PQoKVXBkYXRpbmcgM2M4Y2Y1YTljMjFmZjg3ODIxNjRkMWRlZjdmNDRiZDg4ODcxMzM4
-NApTd2l0Y2hlZCB0byBhIG5ldyBicmFuY2ggJ3Rlc3QnCjU4NDMxZDk5MDQgd2luZGJnOiBtYWlu
-dGFpbmVycwo3OGQ5OWY3YWU0IHdpbmRiZzogY2hhbmdlZCBrZF9hcGlfcmVhZF9tc3IgYW5kIGtk
-X2FwaV93cml0ZV9tc3IKNWJiMGE3MDAzYSB3aW5kYmc6IGltcGxlbWVudGVkIGtkX2FwaV9nZXRf
-Y29udGV4dF9leCBhbmQga2RfYXBpX3NldF9jb250ZXh0X2V4CjhmYzMyNjA0M2Ugd2luZGJnOiBh
-ZGRlZCBuZXcgYXBpIGZ1bmN0aW9ucwo2NjUwYTk1MTQ5IHdpbmRiZzogaW1wbGVtZW50ZWQga2Rf
-YXBpX3F1ZXJ5X21lbW9yeQo4NDAwYjY4ZGNmIHdpbmRiZzogaW1wbGVtZW50ZWQga2RfYXBpX2Zp
-bGxfbWVtb3J5CmYyNWQ2MjI2MmMgd2luZGJnOiBpbXBsZW1lbnRlZCBrZF9hcGlfc2VhcmNoX21l
-bW9yeQplYmY3Y2Y2NzkzIHdpbmRiZzogaW1wbGVtZW50ZWQga2RfYXBpX3JlYWRfbXNyIGFuZCBr
-ZF9hcGlfd3JpdGVfbXNyCjhhNDI1MWZmMWUgd2luZGJnOiBpbXBsZW1lbnRlZCBrZF9hcGlfZ2V0
-X3ZlcnNpb24KZjczNDIwNTU5NiB3aW5kYmc6IGltcGxlbWVudGVkIGtkX2FwaV9yZWFkX3BoeXNp
-Y2FsX21lbW9yeSBhbmQga2RfYXBpX3dyaXRlX3BoeXNpY2FsX21lbW9yeQoxZDEyNjg0ZGYzIHdp
-bmRiZzogaW1wbGVtZW50ZWQga2RfYXBpX3JlYWRfaW9fc3BhY2UgYW5kIGtkX2FwaV93cml0ZV9p
-b19zcGFjZQpiNWE2ZTVmZWRiIHdpbmRiZzogaW1wbGVtZW50ZWQga2RfYXBpX2NvbnRpbnVlCjU3
-Y2YwNzJkMjYgd2luZGJnOiBkZWJ1ZyBleGNlcHRpb24gc3Vic2NyaWJpbmcKMDU3YjY1ZmM1MSB3
-aW5kYmc6IGltcGxlbWVudGVkIGtkX2FwaV93cml0ZV9icmVha3BvaW50IGFuZCBrZF9hcGlfcmVz
-dG9yZV9icmVha3BvaW50CmE4N2Q4NjZmOGQgd2luZGJnOiBpbXBsZW1lbnRlZCB3aW5kYmdfaHdf
-YnJlYWtwb2ludF9pbnNlcnQgYW5kIHdpbmRiZ19od19icmVha3BvaW50X3JlbW92ZQo3MGM1MDRk
-MjI4IHdpbmRiZzogaW1wbGVtZW50ZWQgd2luZGJnX3NldF9kcjcKZjY0YjBlOWZjMyB3aW5kYmc6
-IGltcGxlbWVudGVkIHdpbmRiZ19zZXRfZHIKNzE2ZDU0MmViZiB3aW5kYmc6IGltcGxlbWVudGVk
-IHdpbmRiZ19zZXRfc3IKODM0ZWFjN2VhNiB3aW5kYmc6IGltcGxlbWVudGVkIHdpbmRiZ193cml0
-ZV9rc19yZWdzCmRmMmMzZWJmMDMgd2luZGJnOiBpbXBsZW1lbnRlZCB3aW5kYmdfcmVhZF9rc19y
-ZWdzCjlhNTI1MDMzODggd2luZGJnOiBpbXBsZW1lbnRlZCB3aW5kYmdfd3JpdGVfY29udGV4dAo0
-NTJlZmEwZGY0IHdpbmRiZzogaW1wbGVtZW50ZWQgd2luZGJnX3JlYWRfY29udGV4dAowMWU0Yzlj
-OGY3IHdpbmRiZzogaW1wbGVtZW50ZWQga2RfYXBpX3JlYWRfY29udHJvbF9zcGFjZSBhbmQga2Rf
-YXBpX3dyaXRlX2NvbnRyb2xfc3BhY2UKN2M2ZDIxZjAwYiB3aW5kYmc6IGltcGxlbWVudGVkIGtk
-X2FwaV9nZXRfY29udGV4dCBhbmQga2RfYXBpX3NldF9jb250ZXh0CjdjNGRiOWJhN2Egd2luZGJn
-OiBrZXJuZWwncyBzdHJ1Y3R1cmVzCjZmNTNhODYwMmYgd2luZGJnOiBpbXBsZW1lbnRlZCBrZF9h
-cGlfcmVhZF92aXJ0dWFsX21lbW9yeSBhbmQga2RfYXBpX3dyaXRlX3ZpcnR1YWxfbWVtb3J5CmQ0
-NTRiM2Q5MGQgd2luZGJnOiBpbXBsZW1lbnRlZCB3aW5kYmdfcHJvY2Vzc19tYW5pcHVsYXRlX3Bh
-Y2tldAphZmE5OWZkNTdmIHdpbmRiZzogaW1wbGVtZW50ZWQgd2luZGJnX3Byb2Nlc3NfZGF0YV9w
-YWNrZXQKNmI5YTVhMWNhNSB3aW5kYmc6IGltcGxlbWVudGVkIHdpbmRiZ19wcm9jZXNzX2NvbnRy
-b2xfcGFja2V0CjAxZWJhYmM2N2Mgd2luZGJnOiB3aW5kYmdfdm1fc3RvcApkMGFhYTFlOWU5IHdp
-bmRiZzogZ2VuZXJhdGUgTG9hZFN5bWJvbHNTdGF0ZUNoYW5nZQo3ZTU3N2M5NDAzIHdpbmRiZzog
-Z2VuZXJhdGUgRXhjZXB0aW9uU3RhdGVDaGFuZ2UKZjgxMmY0NmZkOSB3aW5kYmc6IGluaXQgREJH
-S0RfQU5ZX1dBSVRfU1RBVEVfQ0hBTkdFCjRkNDU5MTQ5MzQgd2luZGJnOiBoYW5kbGVyIG9mIHBh
-cnNpbmcgY29udGV4dAozYTBiYWE3ZDk0IHdpbmRiZzogc2VuZCBkYXRhIGFuZCBjb250cm9sIHBh
-Y2tldHMKMGM1MGU2MGEwMiB3aW5kYmc6IHBhcnNpbmcgZGF0YSBzdHJlYW0KMjlhOGFiOTk2OSB3
-aW5kYmc6IHN0cnVjdHVyZXMgZm9yIHBhcnNpbmcgZGF0YSBzdHJlYW0KM2M0ZDdmMTg2ZSB3aW5k
-Ymc6IGhhbmRsZXIgb2YgZnMvZ3MgcmVnaXN0ZXIKMGQwMDNjNzBjMCB3aW5kYmc6IGhvb2sgdG8g
-d3Jtc3Igb3BlcmF0aW9uCjA2OGM4MDc5ZGMgd2luZGJnOiBhZGRlZCBjaGFyZGV2Cjk4MmQ2OTlh
-ZWEgd2luZGJnOiBhZGRlZCBXaW5kYmdTdGF0ZQoxYTQ4YjVlYzkxIHdpbmRiZzogYWRkZWQgaGVs
-cGVyIGZlYXR1cmVzCjYxZGJlYzZmZjQgd2luZGJnOiBhZGRlZCAnLXdpbmRiZycgb3B0aW9uCmEz
-YzM4MjIwYTcgd2luZGJnOiBtb2RpZmllZCB3aW5kYmdrZC5oCjRiNTA3MmE1Njggd2luZGJnOiBh
-ZGRlZCB3aW5kYmcncyBLRCBoZWFkZXIgZmlsZQplMjEyZmJhYjM0IHdpbmRiZzogYWRkZWQgZW1w
-dHkgd2luZGJnc3R1YiBmaWxlcwoKPT09IE9VVFBVVCBCRUdJTiA9PT0KQ2hlY2tpbmcgUEFUQ0gg
-MS80Njogd2luZGJnOiBhZGRlZCBlbXB0eSB3aW5kYmdzdHViIGZpbGVzLi4uCkVSUk9SOiBkbyBu
-b3Qgc2V0IGV4ZWN1dGUgcGVybWlzc2lvbnMgZm9yIHNvdXJjZSBmaWxlcwojMjg6IEZJTEU6IGlu
-Y2x1ZGUvZXhlYy93aW5kYmdzdHViLXV0aWxzLmgKCkVSUk9SOiBkbyBub3Qgc2V0IGV4ZWN1dGUg
-cGVybWlzc2lvbnMgZm9yIHNvdXJjZSBmaWxlcwojNTI6IEZJTEU6IGluY2x1ZGUvZXhlYy93aW5k
-YmdzdHViLmgKCkVSUk9SOiBkbyBub3Qgc2V0IGV4ZWN1dGUgcGVybWlzc2lvbnMgZm9yIHNvdXJj
-ZSBmaWxlcwojODc6IEZJTEU6IHN0dWJzL3dpbmRiZ3N0dWIuYwoKRVJST1I6IGRvIG5vdCBzZXQg
-ZXhlY3V0ZSBwZXJtaXNzaW9ucyBmb3Igc291cmNlIGZpbGVzCiMxMjE6IEZJTEU6IHRhcmdldC9p
-Mzg2L3dpbmRiZ3N0dWIuYwoKRVJST1I6IGRvIG5vdCBzZXQgZXhlY3V0ZSBwZXJtaXNzaW9ucyBm
-b3Igc291cmNlIGZpbGVzCiMxMzk6IEZJTEU6IHdpbmRiZ3N0dWItdXRpbHMuYwoKRVJST1I6IGRv
-IG5vdCBzZXQgZXhlY3V0ZSBwZXJtaXNzaW9ucyBmb3Igc291cmNlIGZpbGVzCiMxNTc6IEZJTEU6
-IHdpbmRiZ3N0dWIuYwoKdG90YWw6IDYgZXJyb3JzLCAwIHdhcm5pbmdzLCAxMTkgbGluZXMgY2hl
-Y2tlZAoKWW91ciBwYXRjaCBoYXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcuICBJZiBh
-bnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhl
-IG1haW50YWluZXIsIHNlZQpDSEVDS1BBVENIIGluIE1BSU5UQUlORVJTLgoKQ2hlY2tpbmcgUEFU
-Q0ggMi80Njogd2luZGJnOiBhZGRlZCB3aW5kYmcncyBLRCBoZWFkZXIgZmlsZS4uLgpFUlJPUjog
-ZG8gbm90IHNldCBleGVjdXRlIHBlcm1pc3Npb25zIGZvciBzb3VyY2UgZmlsZXMKIzE0OiBGSUxF
-OiBpbmNsdWRlL2V4ZWMvd2luZGJna2QuaAoKdG90YWw6IDEgZXJyb3JzLCAwIHdhcm5pbmdzLCA4
-NzkgbGluZXMgY2hlY2tlZAoKWW91ciBwYXRjaCBoYXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFzZSBy
-ZXZpZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0
-IHRoZW0gdG8gdGhlIG1haW50YWluZXIsIHNlZQpDSEVDS1BBVENIIGluIE1BSU5UQUlORVJTLgoK
-Q2hlY2tpbmcgUEFUQ0ggMy80Njogd2luZGJnOiBtb2RpZmllZCB3aW5kYmdrZC5oLi4uCkNoZWNr
-aW5nIFBBVENIIDQvNDY6IHdpbmRiZzogYWRkZWQgJy13aW5kYmcnIG9wdGlvbi4uLgpDaGVja2lu
-ZyBQQVRDSCA1LzQ2OiB3aW5kYmc6IGFkZGVkIGhlbHBlciBmZWF0dXJlcy4uLgpDaGVja2luZyBQ
-QVRDSCA2LzQ2OiB3aW5kYmc6IGFkZGVkIFdpbmRiZ1N0YXRlLi4uCkNoZWNraW5nIFBBVENIIDcv
-NDY6IHdpbmRiZzogYWRkZWQgY2hhcmRldi4uLgpDaGVja2luZyBQQVRDSCA4LzQ2OiB3aW5kYmc6
-IGhvb2sgdG8gd3Jtc3Igb3BlcmF0aW9uLi4uCkNoZWNraW5nIFBBVENIIDkvNDY6IHdpbmRiZzog
-aGFuZGxlciBvZiBmcy9ncyByZWdpc3Rlci4uLgpDaGVja2luZyBQQVRDSCAxMC80Njogd2luZGJn
-OiBzdHJ1Y3R1cmVzIGZvciBwYXJzaW5nIGRhdGEgc3RyZWFtLi4uCkNoZWNraW5nIFBBVENIIDEx
-LzQ2OiB3aW5kYmc6IHBhcnNpbmcgZGF0YSBzdHJlYW0uLi4KQ2hlY2tpbmcgUEFUQ0ggMTIvNDY6
-IHdpbmRiZzogc2VuZCBkYXRhIGFuZCBjb250cm9sIHBhY2tldHMuLi4KQ2hlY2tpbmcgUEFUQ0gg
-MTMvNDY6IHdpbmRiZzogaGFuZGxlciBvZiBwYXJzaW5nIGNvbnRleHQuLi4KQ2hlY2tpbmcgUEFU
-Q0ggMTQvNDY6IHdpbmRiZzogaW5pdCBEQkdLRF9BTllfV0FJVF9TVEFURV9DSEFOR0UuLi4KQ2hl
-Y2tpbmcgUEFUQ0ggMTUvNDY6IHdpbmRiZzogZ2VuZXJhdGUgRXhjZXB0aW9uU3RhdGVDaGFuZ2Uu
-Li4KQ2hlY2tpbmcgUEFUQ0ggMTYvNDY6IHdpbmRiZzogZ2VuZXJhdGUgTG9hZFN5bWJvbHNTdGF0
-ZUNoYW5nZS4uLgpDaGVja2luZyBQQVRDSCAxNy80Njogd2luZGJnOiB3aW5kYmdfdm1fc3RvcC4u
-LgpDaGVja2luZyBQQVRDSCAxOC80Njogd2luZGJnOiBpbXBsZW1lbnRlZCB3aW5kYmdfcHJvY2Vz
-c19jb250cm9sX3BhY2tldC4uLgpDaGVja2luZyBQQVRDSCAxOS80Njogd2luZGJnOiBpbXBsZW1l
-bnRlZCB3aW5kYmdfcHJvY2Vzc19kYXRhX3BhY2tldC4uLgpDaGVja2luZyBQQVRDSCAyMC80Njog
-d2luZGJnOiBpbXBsZW1lbnRlZCB3aW5kYmdfcHJvY2Vzc19tYW5pcHVsYXRlX3BhY2tldC4uLgpD
-aGVja2luZyBQQVRDSCAyMS80Njogd2luZGJnOiBpbXBsZW1lbnRlZCBrZF9hcGlfcmVhZF92aXJ0
-dWFsX21lbW9yeSBhbmQga2RfYXBpX3dyaXRlX3ZpcnR1YWxfbWVtb3J5Li4uCkNoZWNraW5nIFBB
-VENIIDIyLzQ2OiB3aW5kYmc6IGtlcm5lbCdzIHN0cnVjdHVyZXMuLi4KQ2hlY2tpbmcgUEFUQ0gg
-MjMvNDY6IHdpbmRiZzogaW1wbGVtZW50ZWQga2RfYXBpX2dldF9jb250ZXh0IGFuZCBrZF9hcGlf
-c2V0X2NvbnRleHQuLi4KQ2hlY2tpbmcgUEFUQ0ggMjQvNDY6IHdpbmRiZzogaW1wbGVtZW50ZWQg
-a2RfYXBpX3JlYWRfY29udHJvbF9zcGFjZSBhbmQga2RfYXBpX3dyaXRlX2NvbnRyb2xfc3BhY2Uu
-Li4KQ2hlY2tpbmcgUEFUQ0ggMjUvNDY6IHdpbmRiZzogaW1wbGVtZW50ZWQgd2luZGJnX3JlYWRf
-Y29udGV4dC4uLgpDaGVja2luZyBQQVRDSCAyNi80Njogd2luZGJnOiBpbXBsZW1lbnRlZCB3aW5k
-Ymdfd3JpdGVfY29udGV4dC4uLgpDaGVja2luZyBQQVRDSCAyNy80Njogd2luZGJnOiBpbXBsZW1l
-bnRlZCB3aW5kYmdfcmVhZF9rc19yZWdzLi4uCkNoZWNraW5nIFBBVENIIDI4LzQ2OiB3aW5kYmc6
-IGltcGxlbWVudGVkIHdpbmRiZ193cml0ZV9rc19yZWdzLi4uCkNoZWNraW5nIFBBVENIIDI5LzQ2
-OiB3aW5kYmc6IGltcGxlbWVudGVkIHdpbmRiZ19zZXRfc3IuLi4KQ2hlY2tpbmcgUEFUQ0ggMzAv
-NDY6IHdpbmRiZzogaW1wbGVtZW50ZWQgd2luZGJnX3NldF9kci4uLgpDaGVja2luZyBQQVRDSCAz
-MS80Njogd2luZGJnOiBpbXBsZW1lbnRlZCB3aW5kYmdfc2V0X2RyNy4uLgpDaGVja2luZyBQQVRD
-SCAzMi80Njogd2luZGJnOiBpbXBsZW1lbnRlZCB3aW5kYmdfaHdfYnJlYWtwb2ludF9pbnNlcnQg
-YW5kIHdpbmRiZ19od19icmVha3BvaW50X3JlbW92ZS4uLgpDaGVja2luZyBQQVRDSCAzMy80Njog
-d2luZGJnOiBpbXBsZW1lbnRlZCBrZF9hcGlfd3JpdGVfYnJlYWtwb2ludCBhbmQga2RfYXBpX3Jl
-c3RvcmVfYnJlYWtwb2ludC4uLgpDaGVja2luZyBQQVRDSCAzNC80Njogd2luZGJnOiBkZWJ1ZyBl
-eGNlcHRpb24gc3Vic2NyaWJpbmcuLi4KQ2hlY2tpbmcgUEFUQ0ggMzUvNDY6IHdpbmRiZzogaW1w
-bGVtZW50ZWQga2RfYXBpX2NvbnRpbnVlLi4uCkNoZWNraW5nIFBBVENIIDM2LzQ2OiB3aW5kYmc6
-IGltcGxlbWVudGVkIGtkX2FwaV9yZWFkX2lvX3NwYWNlIGFuZCBrZF9hcGlfd3JpdGVfaW9fc3Bh
-Y2UuLi4KQ2hlY2tpbmcgUEFUQ0ggMzcvNDY6IHdpbmRiZzogaW1wbGVtZW50ZWQga2RfYXBpX3Jl
-YWRfcGh5c2ljYWxfbWVtb3J5IGFuZCBrZF9hcGlfd3JpdGVfcGh5c2ljYWxfbWVtb3J5Li4uCkNo
-ZWNraW5nIFBBVENIIDM4LzQ2OiB3aW5kYmc6IGltcGxlbWVudGVkIGtkX2FwaV9nZXRfdmVyc2lv
-bi4uLgpDaGVja2luZyBQQVRDSCAzOS80Njogd2luZGJnOiBpbXBsZW1lbnRlZCBrZF9hcGlfcmVh
-ZF9tc3IgYW5kIGtkX2FwaV93cml0ZV9tc3IuLi4KQ2hlY2tpbmcgUEFUQ0ggNDAvNDY6IHdpbmRi
-ZzogaW1wbGVtZW50ZWQga2RfYXBpX3NlYXJjaF9tZW1vcnkuLi4KQ2hlY2tpbmcgUEFUQ0ggNDEv
-NDY6IHdpbmRiZzogaW1wbGVtZW50ZWQga2RfYXBpX2ZpbGxfbWVtb3J5Li4uCkNoZWNraW5nIFBB
-VENIIDQyLzQ2OiB3aW5kYmc6IGltcGxlbWVudGVkIGtkX2FwaV9xdWVyeV9tZW1vcnkuLi4KQ2hl
-Y2tpbmcgUEFUQ0ggNDMvNDY6IHdpbmRiZzogYWRkZWQgbmV3IGFwaSBmdW5jdGlvbnMuLi4KQ2hl
-Y2tpbmcgUEFUQ0ggNDQvNDY6IHdpbmRiZzogaW1wbGVtZW50ZWQga2RfYXBpX2dldF9jb250ZXh0
-X2V4IGFuZCBrZF9hcGlfc2V0X2NvbnRleHRfZXguLi4KQ2hlY2tpbmcgUEFUQ0ggNDUvNDY6IHdp
-bmRiZzogY2hhbmdlZCBrZF9hcGlfcmVhZF9tc3IgYW5kIGtkX2FwaV93cml0ZV9tc3IuLi4KQ2hl
-Y2tpbmcgUEFUQ0ggNDYvNDY6IHdpbmRiZzogbWFpbnRhaW5lcnMuLi4KPT09IE9VVFBVVCBFTkQg
-PT09CgpUZXN0IGNvbW1hbmQgZXhpdGVkIHdpdGggY29kZTogMQoKCi0tLQpFbWFpbCBnZW5lcmF0
-ZWQgYXV0b21hdGljYWxseSBieSBQYXRjaGV3IFtodHRwOi8vcGF0Y2hldy5vcmcvXS4KUGxlYXNl
-IHNlbmQgeW91ciBmZWVkYmFjayB0byBwYXRjaGV3LWRldmVsQGZyZWVsaXN0cy5vcmc=
+Hi Andrey,
+
+On 12/14/2017 11:52 AM, Andrey Smirnov wrote:
+> Cc: Peter Maydell <peter.maydell@linaro.org>
+> Cc: Jason Wang <jasowang@redhat.com>
+> Cc: Philippe Mathieu-Daudé <f4bug@amsat.org>
+> Cc: qemu-devel@nongnu.org
+> Cc: qemu-arm@nongnu.org
+> Cc: yurovsky@gmail.com
+> Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
+> Signed-off-by: Andrey Smirnov <andrew.smirnov@gmail.com>
+
+I have a more complete patch coming implementing the
+CTRL2_VOLTAGE_SWITCH (LSB part of the ACMD12ERRSTS register) but in the
+meaning time your patch is fine.
+
+Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+
+> ---
+>  hw/sd/sdhci.c | 3 +++
+>  1 file changed, 3 insertions(+)
+> 
+> diff --git a/hw/sd/sdhci.c b/hw/sd/sdhci.c
+> index 758af067f9..cb9e0db9fb 100644
+> --- a/hw/sd/sdhci.c
+> +++ b/hw/sd/sdhci.c
+> @@ -1139,6 +1139,9 @@ sdhci_write(void *opaque, hwaddr offset, uint64_t val, unsigned size)
+>          s->admasysaddr = (s->admasysaddr & (0x00000000FFFFFFFFULL |
+>                  ((uint64_t)mask << 32))) | ((uint64_t)value << 32);
+>          break;
+> +    case SDHC_ACMD12ERRSTS:
+> +        MASKED_WRITE(s->acmd12errsts, mask, value);
+> +        break;
+>      case SDHC_FEAER:
+>          s->acmd12errsts |= value;
+>          s->errintsts |= (value >> 16) & s->errintstsen;
+> 
