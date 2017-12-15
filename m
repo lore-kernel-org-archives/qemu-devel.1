@@ -1,27 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51440)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55623)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1ePt6m-00012j-GP
-	for qemu-devel@nongnu.org; Fri, 15 Dec 2017 11:45:13 -0500
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1ePtJ5-0003mw-MF
+	for qemu-devel@nongnu.org; Fri, 15 Dec 2017 11:57:57 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1ePt6l-0000lH-KX
-	for qemu-devel@nongnu.org; Fri, 15 Dec 2017 11:45:12 -0500
-Received: from mail-oi0-x244.google.com ([2607:f8b0:4003:c06::244]:38299)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1ePt6l-0000k2-Ef
-	for qemu-devel@nongnu.org; Fri, 15 Dec 2017 11:45:11 -0500
-Received: by mail-oi0-x244.google.com with SMTP id s9so6560820oie.5
-	for <qemu-devel@nongnu.org>; Fri, 15 Dec 2017 08:45:11 -0800 (PST)
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1ePtJ2-0008Ji-Ic
+	for qemu-devel@nongnu.org; Fri, 15 Dec 2017 11:57:55 -0500
+Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
+	<philippe.mathieu.daude@gmail.com>
+References: <1513355076-5075-1-git-send-email-peter.maydell@linaro.org>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Message-ID: <b72822ee-168c-818e-41af-5fcebac44ef2@amsat.org>
+Date: Fri, 15 Dec 2017 13:57:43 -0300
 MIME-Version: 1.0
-In-Reply-To: <089717fa-9e7e-fe79-3315-ccc13c01de8d@linaro.org>
-References: <1512752248-17857-1-git-send-email-peter.maydell@linaro.org>
-	<089717fa-9e7e-fe79-3315-ccc13c01de8d@linaro.org>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri, 15 Dec 2017 16:44:50 +0000
-Message-ID: <CAFEAcA9+99eeKOxpLwnLBXwH5jr8thFgFNjgRwezqHN2_JeBzg@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH] sparc: Make sure we mmap at SHMLBA
- alignment
+In-Reply-To: <1513355076-5075-1-git-send-email-peter.maydell@linaro.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH] target/arm: Handle page table walk load
+ failures correctly
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,35 +28,190 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Richard Henderson <richard.henderson@linaro.org>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, John Paul Adrian Glaubitz <glaubitz@physik.fu-berlin.de>, "patches@linaro.org" <patches@linaro.org>
+To: Peter Maydell <peter.maydell@linaro.org>, qemu-arm@nongnu.org, qemu-devel@nongnu.org
+Cc: patches@linaro.org
 
-On 12 December 2017 at 05:53, Richard Henderson
-<richard.henderson@linaro.org> wrote:
-> On 12/08/2017 08:57 AM, Peter Maydell wrote:
->> SPARC Linux has an oddity that it insists that mmap()
->> of MAP_FIXED memory must be at an alignment defined by
->> SHMLBA, which is more aligned than the page size
->> (typically, SHMLBA alignment is to 16K, and pages are 8K).
->> This is a relic of ancient hardware that had cache
->> aliasing constraints, but even on modern hardware the
->> kernel still insists on the alignment.
->>
->> To ensure that we get mmap() alignment sufficient to
->> make the kernel happy, change QEMU_VMALLOC_ALIGN,
->> qemu_fd_getpagesize() and qemu_mempath_getpagesize()
->> to use the maximum of getpagesize() and SHMLBA.
->>
->> In particular, this allows 'make check' to pass on Sparc:
->> we were previously failing the ivshmem tests.
->>
->> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
->> ---
->
-> Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+On 12/15/2017 01:24 PM, Peter Maydell wrote:
+> Instead of ignoring the response from address_space_ld*()
+> (indicating an attempt to read a page table descriptor from
+> an invalid physical address), use it to report the failure
+> correctly.
+> 
+> Since this is another couple of locations where we need to
+> decide the value of the ARMMMUFaultInfo ea bit based on a
+> MemTxResult, we factor out that operation into a helper
+> function.
+> 
+> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 
-Thanks; I have applied this to master and added a sparc64
-host to my set of build systems. (Thanks to John for providing
-access to that host.)
+Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 
--- PMM
+> ---
+> Now we've fixed the get-phys-addr functions to always report
+> errors via the ARMMMUFaultInfo struct, it's pretty easy to
+> detect and report external aborts on translation table walks.
+> 
+>  target/arm/internals.h | 10 ++++++++++
+>  target/arm/helper.c    | 39 ++++++++++++++++++++++++++++++++++-----
+>  target/arm/op_helper.c |  7 +------
+>  3 files changed, 45 insertions(+), 11 deletions(-)
+> 
+> diff --git a/target/arm/internals.h b/target/arm/internals.h
+> index 876854d..89f5d2f 100644
+> --- a/target/arm/internals.h
+> +++ b/target/arm/internals.h
+> @@ -687,6 +687,16 @@ static inline uint32_t arm_fi_to_lfsc(ARMMMUFaultInfo *fi)
+>      return fsc;
+>  }
+>  
+> +static inline bool arm_extabort_type(MemTxResult result)
+> +{
+> +    /* The EA bit in syndromes and fault status registers is an
+> +     * IMPDEF classification of external aborts. ARM implementations
+> +     * usually use this to indicate AXI bus Decode error (0) or
+> +     * Slave error (1); in QEMU we follow that.
+> +     */
+> +    return result != MEMTX_DECODE_ERROR;
+> +}
+> +
+>  /* Do a page table walk and add page to TLB if possible */
+>  bool arm_tlb_fill(CPUState *cpu, vaddr address,
+>                    MMUAccessType access_type, int mmu_idx,
+> diff --git a/target/arm/helper.c b/target/arm/helper.c
+> index d1395f9..2575a83 100644
+> --- a/target/arm/helper.c
+> +++ b/target/arm/helper.c
+> @@ -8305,6 +8305,7 @@ static hwaddr S1_ptw_translate(CPUARMState *env, ARMMMUIdx mmu_idx,
+>          ret = get_phys_addr_lpae(env, addr, 0, ARMMMUIdx_S2NS, &s2pa,
+>                                   &txattrs, &s2prot, &s2size, fi, NULL);
+>          if (ret) {
+> +            assert(fi->type != ARMFault_None);
+>              fi->s2addr = addr;
+>              fi->stage2 = true;
+>              fi->s1ptw = true;
+> @@ -8328,7 +8329,9 @@ static uint32_t arm_ldl_ptw(CPUState *cs, hwaddr addr, bool is_secure,
+>      ARMCPU *cpu = ARM_CPU(cs);
+>      CPUARMState *env = &cpu->env;
+>      MemTxAttrs attrs = {};
+> +    MemTxResult result = MEMTX_OK;
+>      AddressSpace *as;
+> +    uint32_t data;
+>  
+>      attrs.secure = is_secure;
+>      as = arm_addressspace(cs, attrs);
+> @@ -8337,10 +8340,16 @@ static uint32_t arm_ldl_ptw(CPUState *cs, hwaddr addr, bool is_secure,
+>          return 0;
+>      }
+>      if (regime_translation_big_endian(env, mmu_idx)) {
+> -        return address_space_ldl_be(as, addr, attrs, NULL);
+> +        data = address_space_ldl_be(as, addr, attrs, &result);
+>      } else {
+> -        return address_space_ldl_le(as, addr, attrs, NULL);
+> +        data = address_space_ldl_le(as, addr, attrs, &result);
+>      }
+> +    if (result == MEMTX_OK) {
+> +        return data;
+> +    }
+> +    fi->type = ARMFault_SyncExternalOnWalk;
+> +    fi->ea = arm_extabort_type(result);
+> +    return 0;
+>  }
+>  
+>  static uint64_t arm_ldq_ptw(CPUState *cs, hwaddr addr, bool is_secure,
+> @@ -8349,7 +8358,9 @@ static uint64_t arm_ldq_ptw(CPUState *cs, hwaddr addr, bool is_secure,
+>      ARMCPU *cpu = ARM_CPU(cs);
+>      CPUARMState *env = &cpu->env;
+>      MemTxAttrs attrs = {};
+> +    MemTxResult result = MEMTX_OK;
+>      AddressSpace *as;
+> +    uint32_t data;
+>  
+>      attrs.secure = is_secure;
+>      as = arm_addressspace(cs, attrs);
+> @@ -8358,10 +8369,16 @@ static uint64_t arm_ldq_ptw(CPUState *cs, hwaddr addr, bool is_secure,
+>          return 0;
+>      }
+>      if (regime_translation_big_endian(env, mmu_idx)) {
+> -        return address_space_ldq_be(as, addr, attrs, NULL);
+> +        data = address_space_ldq_be(as, addr, attrs, &result);
+>      } else {
+> -        return address_space_ldq_le(as, addr, attrs, NULL);
+> +        data = address_space_ldq_le(as, addr, attrs, &result);
+> +    }
+> +    if (result == MEMTX_OK) {
+> +        return data;
+>      }
+> +    fi->type = ARMFault_SyncExternalOnWalk;
+> +    fi->ea = arm_extabort_type(result);
+> +    return 0;
+>  }
+>  
+>  static bool get_phys_addr_v5(CPUARMState *env, uint32_t address,
+> @@ -8390,6 +8407,9 @@ static bool get_phys_addr_v5(CPUARMState *env, uint32_t address,
+>      }
+>      desc = arm_ldl_ptw(cs, table, regime_is_secure(env, mmu_idx),
+>                         mmu_idx, fi);
+> +    if (fi->type != ARMFault_None) {
+> +        goto do_fault;
+> +    }
+>      type = (desc & 3);
+>      domain = (desc >> 5) & 0x0f;
+>      if (regime_el(env, mmu_idx) == 1) {
+> @@ -8426,6 +8446,9 @@ static bool get_phys_addr_v5(CPUARMState *env, uint32_t address,
+>          }
+>          desc = arm_ldl_ptw(cs, table, regime_is_secure(env, mmu_idx),
+>                             mmu_idx, fi);
+> +        if (fi->type != ARMFault_None) {
+> +            goto do_fault;
+> +        }
+>          switch (desc & 3) {
+>          case 0: /* Page translation fault.  */
+>              fi->type = ARMFault_Translation;
+> @@ -8508,6 +8531,9 @@ static bool get_phys_addr_v6(CPUARMState *env, uint32_t address,
+>      }
+>      desc = arm_ldl_ptw(cs, table, regime_is_secure(env, mmu_idx),
+>                         mmu_idx, fi);
+> +    if (fi->type != ARMFault_None) {
+> +        goto do_fault;
+> +    }
+>      type = (desc & 3);
+>      if (type == 0 || (type == 3 && !arm_feature(env, ARM_FEATURE_PXN))) {
+>          /* Section translation fault, or attempt to use the encoding
+> @@ -8559,6 +8585,9 @@ static bool get_phys_addr_v6(CPUARMState *env, uint32_t address,
+>          table = (desc & 0xfffffc00) | ((address >> 10) & 0x3fc);
+>          desc = arm_ldl_ptw(cs, table, regime_is_secure(env, mmu_idx),
+>                             mmu_idx, fi);
+> +        if (fi->type != ARMFault_None) {
+> +            goto do_fault;
+> +        }
+>          ap = ((desc >> 4) & 3) | ((desc >> 7) & 4);
+>          switch (desc & 3) {
+>          case 0: /* Page translation fault.  */
+> @@ -8964,7 +8993,7 @@ static bool get_phys_addr_lpae(CPUARMState *env, target_ulong address,
+>          descaddr &= ~7ULL;
+>          nstable = extract32(tableattrs, 4, 1);
+>          descriptor = arm_ldq_ptw(cs, descaddr, !nstable, mmu_idx, fi);
+> -        if (fi->s1ptw) {
+> +        if (fi->type != ARMFault_None) {
+>              goto do_fault;
+>          }
+>  
+> diff --git a/target/arm/op_helper.c b/target/arm/op_helper.c
+> index c2bb4f3..2f35ff7 100644
+> --- a/target/arm/op_helper.c
+> +++ b/target/arm/op_helper.c
+> @@ -226,12 +226,7 @@ void arm_cpu_do_transaction_failed(CPUState *cs, hwaddr physaddr,
+>          cpu_restore_state(cs, retaddr);
+>      }
+>  
+> -    /* The EA bit in syndromes and fault status registers is an
+> -     * IMPDEF classification of external aborts. ARM implementations
+> -     * usually use this to indicate AXI bus Decode error (0) or
+> -     * Slave error (1); in QEMU we follow that.
+> -     */
+> -    fi.ea = (response != MEMTX_DECODE_ERROR);
+> +    fi.ea = arm_extabort_type(response);
+>      fi.type = ARMFault_SyncExternal;
+>      deliver_fault(cpu, addr, access_type, mmu_idx, &fi);
+>  }
+> 
