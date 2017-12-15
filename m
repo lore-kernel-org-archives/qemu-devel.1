@@ -1,29 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38474)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39038)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1ePsca-0007uO-35
-	for qemu-devel@nongnu.org; Fri, 15 Dec 2017 11:14:01 -0500
+	(envelope-from <bounces@canonical.com>) id 1ePseO-0000t7-Kh
+	for qemu-devel@nongnu.org; Fri, 15 Dec 2017 11:15:53 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1ePscW-0000xl-SV
-	for qemu-devel@nongnu.org; Fri, 15 Dec 2017 11:14:00 -0500
-Received: from mail-he1eur01on0097.outbound.protection.outlook.com
-	([104.47.0.97]:45366
-	helo=EUR01-HE1-obe.outbound.protection.outlook.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
-	id 1ePscW-0000td-3D
-	for qemu-devel@nongnu.org; Fri, 15 Dec 2017 11:13:56 -0500
-References: <3c1d9325-56a9-225d-4ff8-230f8ed52fed@virtuozzo.com>
-	<76f5ec24-112f-455a-4ad4-5c97d7182f36@redhat.com>
-	<20171130143306.GC4039@localhost.localdomain>
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Message-ID: <328818d5-8d63-8aec-aba2-40404e03503c@virtuozzo.com>
-Date: Fri, 15 Dec 2017 19:13:37 +0300
+	(envelope-from <bounces@canonical.com>) id 1ePseM-00036j-7v
+	for qemu-devel@nongnu.org; Fri, 15 Dec 2017 11:15:52 -0500
+Received: from indium.canonical.com ([91.189.90.7]:53364)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1ePseM-00035q-0U
+	for qemu-devel@nongnu.org; Fri, 15 Dec 2017 11:15:50 -0500
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1ePseJ-0003i6-OE
+	for <qemu-devel@nongnu.org>; Fri, 15 Dec 2017 16:15:47 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 4AEBE2E80EB
+	for <qemu-devel@nongnu.org>; Fri, 15 Dec 2017 16:15:47 +0000 (UTC)
 MIME-Version: 1.0
-In-Reply-To: <20171130143306.GC4039@localhost.localdomain>
-Content-Type: text/plain; charset=windows-1252; format=flowed
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Content-Language: en-US
-Subject: Re: [Qemu-devel] export root node for write through NBD
+Date: Fri, 15 Dec 2017 16:06:42 -0000
+From: Thomas Huth <1677492@bugs.launchpad.net>
+Reply-To: Bug 1677492 <1677492@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <20170330071437.1125.65090.malonedeb@gac.canonical.com>
+Message-Id: <151335400351.19497.6035412627573684203.launchpad@chaenomeles.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1677492] Re: block_set_io_throttle complaints
+ Need exactly one of 'device' and 'id'
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,70 +37,34 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>
-Cc: qemu-devel <qemu-devel@nongnu.org>, Eric Blake <eblake@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, "Denis V. Lunev" <den@openvz.org>, Nikolay Shirokovskiy <nshirokovskiy@virtuozzo.com>
+To: qemu-devel@nongnu.org
 
-30.11.2017 17:33, Kevin Wolf wrote:
-> Am 30.11.2017 um 15:21 hat Max Reitz geschrieben:
->> On 2017-11-30 08:47, Vladimir Sementsov-Ogievskiy wrote:
->>> Hi all.
->>>
->>> We need the following option: start vm in stopped mode (-S) and write
->>> it's disk before start through NBD.
->>> It should be absolutely safe, but unfortunately it is disallowed by roo=
-t
->>> role of the disk.
->>> Is there any workaround or if not, what is a true way to implement this
->>> possibility?
->>>
->>> ----
->>> error message:
->>>  =A0=A0=A0 unable to execute QEMU command 'nbd-server-add': Conflicts w=
-ith use
->>> by drive0 as 'root', which does not allow 'write' on #block100
->> One thing that comes to mind is adding the guest device only after you
->> are done with NBD.
->>
->> The other of course is to set share-rw=3Don for the device.
-> We already allow this with incoming migration, in that case the
-> BlockBackend for the guest device stays inactive and doesn't request
-> permissions yet.
->
-> I've been thinking for a while that it would be nice to unify the
-> startup of "normal" VMs and incoming migration, so that images are
-> always opened inactive first and then get activated.
->
-> The interesting point for you could be that opening the image happens
-> immediately when the process starts, but activation would only happen
-> when the VM actually starts running (i.e. on 'cont').
->
-> Kevin
+** Changed in: qemu
+       Status: Fix Committed =3D> Fix Released
 
-Could it be as simple as:
+-- =
 
-diff --git a/block/block-backend.c b/block/block-backend.c
-index 3064cb888f..b8cbb43f02 100644
---- a/block/block-backend.c
-+++ b/block/block-backend.c
-@@ -709,7 +709,9 @@ static int blk_do_attach_dev(BlockBackend *blk, void=20
-*dev)
- =A0=A0=A0=A0 /* While migration is still incoming, we don't need to apply =
-the
- =A0=A0=A0=A0=A0 * permissions of guest device BlockBackends. We might stil=
-l have=20
-a block
- =A0=A0=A0=A0=A0 * job or NBD server writing to the image for storage migra=
-tion. */
--=A0=A0=A0 if (runstate_check(RUN_STATE_INMIGRATE)) {
-+=A0=A0=A0 if (runstate_check(RUN_STATE_INMIGRATE) ||
-+=A0=A0=A0=A0=A0=A0=A0 runstate_check(RUN_STATE_PRELAUNCH))
-+=A0=A0=A0 {
- =A0=A0=A0=A0=A0=A0=A0=A0 blk->disable_perm =3D true;
- =A0=A0=A0=A0 }
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1677492
 
+Title:
+  block_set_io_throttle complaints Need exactly one of 'device' and 'id'
 
-(at least it fixes my case)
+Status in QEMU:
+  Fix Released
 
---=20
-Best regards,
-Vladimir
+Bug description:
+  All of sudden, after a qemu update, block_set_io_throttle does not
+  work anymore.
+
+  Full command to QEMU monitor --
+
+  (qemu) block_set_io_throttle db 0 0 0 0 0 0
+  Need exactly one of 'device' and 'id'
+
+  The help text still point to the same old syntax, which no longer
+  works.
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1677492/+subscriptions
