@@ -1,34 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36976)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37002)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1ePsZj-0005Dt-0c
-	for qemu-devel@nongnu.org; Fri, 15 Dec 2017 11:11:04 -0500
+	(envelope-from <bounces@canonical.com>) id 1ePsZk-0005Er-7Z
+	for qemu-devel@nongnu.org; Fri, 15 Dec 2017 11:11:05 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1ePsZi-0006EB-0a
-	for qemu-devel@nongnu.org; Fri, 15 Dec 2017 11:11:02 -0500
-Received: from indium.canonical.com ([91.189.90.7]:50918)
+	(envelope-from <bounces@canonical.com>) id 1ePsZj-0006FM-4Y
+	for qemu-devel@nongnu.org; Fri, 15 Dec 2017 11:11:04 -0500
+Received: from indium.canonical.com ([91.189.90.7]:51026)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1ePsZh-0006Bo-QX
-	for qemu-devel@nongnu.org; Fri, 15 Dec 2017 11:11:01 -0500
+	id 1ePsZi-0006De-Um
+	for qemu-devel@nongnu.org; Fri, 15 Dec 2017 11:11:03 -0500
 Received: from loganberry.canonical.com ([91.189.90.37])
 	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1ePsZf-00028x-2z
-	for <qemu-devel@nongnu.org>; Fri, 15 Dec 2017 16:10:59 +0000
+	id 1ePsZf-00020E-V4
+	for <qemu-devel@nongnu.org>; Fri, 15 Dec 2017 16:11:00 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id B09E22E80DC
-	for <qemu-devel@nongnu.org>; Fri, 15 Dec 2017 16:10:58 +0000 (UTC)
+	by loganberry.canonical.com (Postfix) with ESMTP id 611D92E80E6
+	for <qemu-devel@nongnu.org>; Fri, 15 Dec 2017 16:10:59 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Fri, 15 Dec 2017 15:57:48 -0000
-From: Thomas Huth <1716767@bugs.launchpad.net>
-Reply-To: Bug 1716767 <1716767@bugs.launchpad.net>
+Date: Fri, 15 Dec 2017 15:59:00 -0000
+From: Thomas Huth <1713066@bugs.launchpad.net>
+Reply-To: Bug 1713066 <1713066@bugs.launchpad.net>
 Sender: bounces@canonical.com
-References: <150524995294.5903.8871661765030368900.malonedeb@wampee.canonical.com>
-Message-Id: <151335346884.10677.1201205754450891808.malone@gac.canonical.com>
+References: <150366905912.16996.8020711454083281212.malonedeb@gac.canonical.com>
+Message-Id: <151335354169.16034.2029741953738847586.launchpad@soybean.canonical.com>
 Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1716767] Re: file(1) fails with "Invalid
- argument" on qemu-sh4-user
+Subject: [Qemu-devel] [Bug 1713066] Re: Incorrect handling of aarch64 ldp in
+ some cases
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -39,68 +39,51 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-Fix has been released with QEMU 2.11:
-https://git.qemu.org/?p=3Dqemu.git;a=3Dcommitdiff;h=3D8bf8e9df4a7d82c7a47cc9
-
 ** Changed in: qemu
-       Status: New =3D> Fix Released
+       Status: Fix Committed =3D> Fix Released
 
 -- =
 
 You received this bug notification because you are a member of qemu-
 devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1716767
+https://bugs.launchpad.net/bugs/1713066
 
 Title:
-  file(1) fails with "Invalid argument" on qemu-sh4-user
+  Incorrect handling of aarch64 ldp in some cases
 
 Status in QEMU:
   Fix Released
 
 Bug description:
-  We recently discovered that file(1) fails on qemu-sh4-user when
-  running on an ELF file:
+  In some cases the ldp instruction (and presumably other multi-register
+  loads and stores) can behave incorrectly.
 
-  (sid_sh4)root@vs94:/# file /bin/bash
-  /bin/bash: ERROR: ELF 32-bit LSB executable, Renesas SH, version 1 (SYSV)=
- error reading (Invalid argument)
-  (sid_sh4)root@vs94:/#
+  Given the following instruction:
+  ldp x0, x1, [x0]
 
-  Running with "-d" yields more output:
+  This will load two 64 bit values from memory, however if each location
+  to load is on a different page and the second page is unmapped this
+  will raise an exception. When this happens x0 has already been updated
+  so after the exception handler has run the operating system will try
+  to rerun the instruction. QEMU will now try to perform an invalid load
+  and raise a new exception.
 
-  (sid_sh4)root@vs94:/# file -d /bin/bash 2>&1 | tail
-  322: >> 7 byte&,=3D97,"(ARM)"]
-  0 =3D=3D 97 =3D 0
-  mget(type=3D1, flag=3D0, offset=3D7, o=3D0, nbytes=3D863324, il=3D0, nc=
-=3D1)
-  mget/96 @7: \000\000\000\000\000\000\000\000\000\002\000*\000\001\000\000=
-\000\250\317A\0004\000\000\000L(\r\000\027\000\000\0004\000 \000\n\000(\000=
-\032\000\031\000\006\000\000\0004\000\000\0004\000@\0004\000@\000@\001\000\=
-000@\001\000\000\005\000\000\000\004\000\000\000\003\000\000\000t\001\000\0=
-00t\001@\000t\001@\000\023\000\000
+  I believe this is incorrect as section D.1.14.5 of the ARMv8 reference
+  manual B.a states that, on taking an exception, registers used in the
+  generation of addresses are restored to their initial value, so x0
+  shouldn't be changed, where x1 can be un an unknown state.
 
-  323: >> 7 byte&,=3D-1,"(embedded)"]
-  0 =3D=3D 18446744073709551615 =3D 0
-  [try softmagic 1]
-  [try elf -1]
-  /bin/bash: ERROR: ELF 32-bit LSB executable, Renesas SH, version 1 (SYSV)=
- error reading (Invalid argument)
-  (sid_sh4)root@vs94:/#
+  I found the issue running FreeBSD with the cortex-strings
+  implementation of memcpy. This uses a similar instruction when copying
+  between 64 and 96 bytes.
 
-  It seems that the comparison above has a bogus (overflown?) value.
+  I've observed this on:
+  QEMU emulator version 2.5.0 (Debian 1:2.5+dfsg-5ubuntu10.14), Copyright (=
+c) 2003-2008 Fabrice Bellard
 
-  On actual hardware, it works:
-
-  root@tirpitz:~> file /bin/bash
-  /bin/bash: ELF 32-bit LSB executable, Renesas SH, version 1 (SYSV), dynam=
-ically linked, interpreter /lib/ld-linux.so.2, BuildID[sha1]=3D4dd0e4281755=
-827d8bb6686fd481f8c80ea73e9a, for GNU/Linux 3.2.0, stripped
-  root@tirpitz:~>
-
-  I have uploaded a chroot with Debian unstable which allows to
-  reproduce the issue:
-
-  > https://people.debian.org/~glaubitz/sid-sh4-sbuild.tar.gz
+  And checked I still get the same behaviour on:
+  QEMU emulator version 2.9.94 (v2.10.0-rc4-dirty)
+  Git revision: 248b23735645f7cbb503d9be6f5bf825f2a603ab
 
 To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1716767/+subscriptions
+https://bugs.launchpad.net/qemu/+bug/1713066/+subscriptions
