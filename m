@@ -1,24 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33550)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34100)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1ePgi3-0001kC-FK
-	for qemu-devel@nongnu.org; Thu, 14 Dec 2017 22:30:52 -0500
+	id 1ePgiY-0002Cf-SY
+	for qemu-devel@nongnu.org; Thu, 14 Dec 2017 22:31:23 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1ePgi2-0003eo-GE
-	for qemu-devel@nongnu.org; Thu, 14 Dec 2017 22:30:51 -0500
+	id 1ePgiV-0004Sz-OS
+	for qemu-devel@nongnu.org; Thu, 14 Dec 2017 22:31:22 -0500
 Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
 	<philippe.mathieu.daude@gmail.com>
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
-Date: Fri, 15 Dec 2017 00:29:40 -0300
-Message-Id: <20171215033015.738-9-f4bug@amsat.org>
+Date: Fri, 15 Dec 2017 00:29:46 -0300
+Message-Id: <20171215033015.738-15-f4bug@amsat.org>
 In-Reply-To: <20171215033015.738-1-f4bug@amsat.org>
 References: <20171215033015.738-1-f4bug@amsat.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v4 08/43] MAINTAINERS: add missing entry for
- include/hw/net/
+Subject: [Qemu-devel] [PATCH v4 14/43] ppc: remove duplicated includes
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,25 +27,45 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: "Michael S. Tsirkin" <mst@redhat.com>, Michael Tokarev <mjt@tls.msk.ru>
-Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, qemu-devel@nongnu.org, Peter Maydell <peter.maydell@linaro.org>, Thomas Huth <thuth@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, qemu-trivial@nongnu.org
+Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, qemu-devel@nongnu.org, Peter Maydell <peter.maydell@linaro.org>, Thomas Huth <thuth@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, qemu-trivial@nongnu.org, David Gibson <david@gibson.dropbear.id.au>, Alexander Graf <agraf@suse.de>, "open list:sPAPR" <qemu-ppc@nongnu.org>
+
+applied using ./scripts/clean-includes
+
+not needed since 7ebaf795560
 
 Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
-Reviewed-by: Hervé Poussineau <hpoussin@reactos.org>
+Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
+Acked-by: David Gibson <david@gibson.dropbear.id.au>
 ---
- MAINTAINERS | 1 +
- 1 file changed, 1 insertion(+)
+ hw/ppc/spapr_hcall.c | 1 -
+ target/ppc/kvm.c     | 3 ---
+ 2 files changed, 4 deletions(-)
 
-diff --git a/MAINTAINERS b/MAINTAINERS
-index 9505c3f90a..f299dc2c19 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -1004,6 +1004,7 @@ Network devices
- M: Jason Wang <jasowang@redhat.com>
- S: Odd Fixes
- F: hw/net/
-+F: include/hw/net/
- F: tests/virtio-net-test.c
- T: git git://github.com/jasowang/qemu.git net
+diff --git a/hw/ppc/spapr_hcall.c b/hw/ppc/spapr_hcall.c
+index be22a6b289..51eba52e86 100644
+--- a/hw/ppc/spapr_hcall.c
++++ b/hw/ppc/spapr_hcall.c
+@@ -13,7 +13,6 @@
+ #include "trace.h"
+ #include "kvm_ppc.h"
+ #include "hw/ppc/spapr_ovec.h"
+-#include "qemu/error-report.h"
+ #include "mmu-book3s-v3.h"
+ 
+ struct SPRSyncState {
+diff --git a/target/ppc/kvm.c b/target/ppc/kvm.c
+index 9d57debf0e..4664a3ce9d 100644
+--- a/target/ppc/kvm.c
++++ b/target/ppc/kvm.c
+@@ -47,9 +47,6 @@
+ #include "sysemu/hostmem.h"
+ #include "qemu/cutils.h"
+ #include "qemu/mmap-alloc.h"
+-#if defined(TARGET_PPC64)
+-#include "hw/ppc/spapr_cpu_core.h"
+-#endif
+ #include "elf.h"
+ #include "sysemu/kvm_int.h"
  
 -- 
 2.15.1
