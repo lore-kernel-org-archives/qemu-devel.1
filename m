@@ -1,34 +1,14 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42609)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44155)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1ePjSA-0000jH-5V
-	for qemu-devel@nongnu.org; Fri, 15 Dec 2017 01:26:42 -0500
+	(envelope-from <aik@ozlabs.ru>) id 1ePjUq-00026U-E9
+	for qemu-devel@nongnu.org; Fri, 15 Dec 2017 01:29:26 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1ePjS6-0002Gr-9q
-	for qemu-devel@nongnu.org; Fri, 15 Dec 2017 01:26:38 -0500
-Received: from indium.canonical.com ([91.189.90.7]:37782)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1ePjS6-0002E2-0M
-	for qemu-devel@nongnu.org; Fri, 15 Dec 2017 01:26:34 -0500
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1ePjS2-0000q4-6K
-	for <qemu-devel@nongnu.org>; Fri, 15 Dec 2017 06:26:30 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 29ABB2E80C3
-	for <qemu-devel@nongnu.org>; Fri, 15 Dec 2017 06:26:30 +0000 (UTC)
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Fri, 15 Dec 2017 06:14:12 -0000
-From: Bruno Haible <bruno@clisp.org>
-Reply-To: Bug 1701835 <1701835@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <149893001258.15852.11258418521313176097.malonedeb@wampee.canonical.com>
-Message-Id: <151331845272.25331.16223605889267636867.malone@wampee.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1701835] Re: floating-point operation bugs in
- qemu-alpha
+	(envelope-from <aik@ozlabs.ru>) id 1ePjUm-0006DV-59
+	for qemu-devel@nongnu.org; Fri, 15 Dec 2017 01:29:24 -0500
+From: Alexey Kardashevskiy <aik@ozlabs.ru>
+Date: Fri, 15 Dec 2017 17:29:14 +1100
+Message-Id: <20171215062914.27927-1-aik@ozlabs.ru>
+Subject: [Qemu-devel] [PATCH qemu v2] RFC: vfio-pci: Allow mmap of MSIX BAR
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -38,213 +18,254 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
+Cc: Alexey Kardashevskiy <aik@ozlabs.ru>, qemu-ppc@nongnu.org, David Gibson <david@gibson.dropbear.id.au>, Alex Williamson <alex.williamson@redhat.com>
 
-The behaviour in qemu-2.11 is the same as in qemu-2.9.
+This makes use of a new VFIO_REGION_INFO_CAP_MSIX_MAPPABLE capability
+which tells that a region with MSIX data can be mapped entirely, i.e.
+the VFIO PCI driver won't prevent MSIX vectors area from being mapped.
 
--- =
+With this change, all BARs are mapped in a single chunk and MSIX vectors
+are emulated on top unless the machine requests not to by defining and
+enabling a new "vfio-no-msix-emulation" property. At the moment only
+sPAPR machine does so - it prohibits MSIX emulation and does not allow
+enabling it as it does not define the "set" callback for the new property;
+the new property also does not appear in "-machine pseries,help".
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1701835
+If the new capability is present, this puts MSIX IO memory region under
+mapped memory region. If the capability is not there, it falls back to
+the old behaviour with the sparse capability.
 
-Title:
-  floating-point operation bugs in qemu-alpha
+In MSIX vectors section is not aligned to the page size, the KVM memory
+listener does not register it with the KVM as a memory slot and MSIX is
+emulated by QEMU as before.
 
-Status in QEMU:
-  New
+This requires the kernel change - "vfio-pci: Allow mapping MSIX BAR" -
+for the new capability: https://www.spinics.net/lists/kvm/msg160282.html
 
-Bug description:
-  When running the gnulib testsuite, I'm seeing test failures in the tests =
-for libm functions
-    cbrt
-    cbrtf
-    ceil
-    ceilf
-    coshf
-    exp2
-    exp2f
-    floor
-    floorf
-    fma
-    fmaf
-    fmal
-    frexp
-    frexpf
-    hypot
-    hypotf
-    hypotl
-    ilogb
-    ilogbf
-    isfinite
-    isinf
-    isnan
-    isnand
-    isnanf
-    ldexp
-    ldexpf
-    ldexpl
-    log1p
-    log1pf
-    log2
-    log2f
-    logb
-    logbf
-    logbl
-    rint
-    rintf
-    rintl
-    signbit
-    sqrt
-    sqrtf
-    strtod
-  that I don't see when running the same (statically linked) executables in=
- a VM, through qemu-system-alpha.
+Signed-off-by: Alexey Kardashevskiy <aik@ozlabs.ru>
+---
 
-  How to reproduce:
-  - Using gnulib, run ./gnulib-tool --create-testdir --dir=3D../testdir-mat=
-h --single-configure cbrt cbrtf ceil ceilf coshf exp2 exp2f float floor flo=
-orf fma fmaf fmal frexp frexpf hypot hypotf hypotl ilogb ilogbf isfinite is=
-inf isnan isnand isnanf ldexp ldexpf ldexpl log1p log1pf log2 log2f logb lo=
-gbf logbl math printf-frexp rint rintf rintl round roundf signbit sqrt sqrt=
-f strtod trunc truncf
-  - Copy the resulting directory to a VM running Linux 2.6.26 with qemu-sys=
-tem-alpha.
-  - There, configure and build the package:
-    mkdir build-native-static; cd build-native-static; ../configure CPPFLAG=
-S=3D"-Wall" LDFLAGS=3D"-static"; make; make check
-    Only 4 tests fail.
-  - Copy the resulting binaries back to the original x86_64 machine.
-  - Set environment variables for using qemu-alpha.
-  - Here, 50 tests fail that did not fail originally:
+This is mtree and flatview BEFORE this patch:
 
-  $ ~/inst-qemu/2.9.0/bin/qemu-alpha test-cbrt
-  ../../gltests/test-cbrt.h:39: assertion 'err > - L_(4.0) * L_(16.0) / TWO=
-_MANT_DIG && err < L_(4.0) * L_(16.0) / TWO_MANT_DIG' failed
-  Aborted (core dumped)
-  $ ~/inst-qemu/2.9.0/bin/qemu-alpha test-ceil1
-  Floating point exception (core dumped)
-  $ ~/inst-qemu/2.9.0/bin/qemu-alpha test-ceil2
-  Floating point exception (core dumped)
-  $ ~/inst-qemu/2.9.0/bin/qemu-alpha test-ceilf1
-  Floating point exception (core dumped)
-  $ ~/inst-qemu/2.9.0/bin/qemu-alpha test-ceilf2
-  Floating point exception (core dumped)
-  $ ~/inst-qemu/2.9.0/bin/qemu-alpha test-coshf =
+"info mtree":
+memory-region: pci@800000020000000.mmio
+  0000000000000000-ffffffffffffffff (prio 0, i/o): pci@800000020000000.mmio
+    0000210000000000-000021000000ffff (prio 1, i/o): 0001:03:00.0 BAR 1
+      000021000000e000-000021000000e5ff (prio 0, i/o): msix-table
+      000021000000f000-000021000000f00f (prio 0, i/o): msix-pba [disabled]
+    0000210000040000-000021000007ffff (prio 1, i/o): 0001:03:00.0 BAR 3
+      0000210000040000-000021000007ffff (prio 0, ramd): 0001:03:00.0 BAR 3 mmaps[0]
 
-  ../../gltests/test-coshf.c:37: assertion 'y >=3D 1.1854652f && y <=3D 1.1=
-854653f' failed
-  Aborted (core dumped)
-  $ ~/inst-qemu/2.9.0/bin/qemu-alpha test-float
-  Floating point exception (core dumped)
-  $ ~/inst-qemu/2.9.0/bin/qemu-alpha test-floor1
-  Floating point exception (core dumped)
-  $ ~/inst-qemu/2.9.0/bin/qemu-alpha test-floor2
-  Floating point exception (core dumped)
-  $ ~/inst-qemu/2.9.0/bin/qemu-alpha test-floorf1
-  Floating point exception (core dumped)
-  $ ~/inst-qemu/2.9.0/bin/qemu-alpha test-floorf2
-  Floating point exception (core dumped)
-  $ ~/inst-qemu/2.9.0/bin/qemu-alpha test-fma1   =
+"info mtree -f":
+FlatView #0
+ AS "memory", root: system
+ AS "cpu-memory", root: system
+ Root memory region: system
+  0000000000000000-000000007fffffff (prio 0, ram): ppc_spapr.ram
+  0000210000000000-000021000000dfff (prio 1, i/o): 0001:03:00.0 BAR 1
+  000021000000e000-000021000000e5ff (prio 0, i/o): msix-table
+  000021000000e600-000021000000ffff (prio 1, i/o): 0001:03:00.0 BAR 1 @000000000000e600
+  0000210000040000-000021000007ffff (prio 0, ramd): 0001:03:00.0 BAR 3 mmaps[0]
 
-  Floating point exception (core dumped)
-  $ ~/inst-qemu/2.9.0/bin/qemu-alpha test-fma2
-  ../../gltests/test-fma2.h:116: assertion 'result =3D=3D expected' failed
-  Aborted (core dumped)
-  $ ~/inst-qemu/2.9.0/bin/qemu-alpha test-fmaf1
-  Floating point exception (core dumped)
-  $ ~/inst-qemu/2.9.0/bin/qemu-alpha test-fmaf2
-  ../../gltests/test-fma2.h:116: assertion 'result =3D=3D expected' failed
-  Aborted (core dumped)
-  $ ~/inst-qemu/2.9.0/bin/qemu-alpha test-fmal2
-  ../../gltests/test-fma2.h:116: assertion 'result =3D=3D expected' failed
-  Aborted (core dumped)
-  $ ~/inst-qemu/2.9.0/bin/qemu-alpha test-frexp
-  Floating point exception (core dumped)
-  $ ~/inst-qemu/2.9.0/bin/qemu-alpha test-frexpf
-  Floating point exception (core dumped)
-  $ ~/inst-qemu/2.9.0/bin/qemu-alpha test-hypot =
 
-  Floating point exception (core dumped)
-  $ ~/inst-qemu/2.9.0/bin/qemu-alpha test-hypotf
-  Floating point exception (core dumped)
-  $ ~/inst-qemu/2.9.0/bin/qemu-alpha test-hypotl
-  ../../gltests/test-hypot.h:41: assertion 'z =3D=3D HUGEVAL' failed
-  Aborted (core dumped)
-  $ ~/inst-qemu/2.9.0/bin/qemu-alpha test-ilogb =
 
-  Floating point exception (core dumped)
-  $ ~/inst-qemu/2.9.0/bin/qemu-alpha test-ilogbf
-  Floating point exception (core dumped)
-  $ ~/inst-qemu/2.9.0/bin/qemu-alpha test-isfinite
-  Floating point exception (core dumped)
-  $ ~/inst-qemu/2.9.0/bin/qemu-alpha test-isinf   =
+This is AFTER this patch applied:
 
-  Floating point exception (core dumped)
-  $ ~/inst-qemu/2.9.0/bin/qemu-alpha test-isnan
-  Floating point exception (core dumped)
-  $ ~/inst-qemu/2.9.0/bin/qemu-alpha test-isnand-nolibm
-  Floating point exception (core dumped)
-  $ ~/inst-qemu/2.9.0/bin/qemu-alpha test-isnand       =
+"info mtree":
+memory-region: pci@800000020000000.mmio
+  0000000000000000-ffffffffffffffff (prio 0, i/o): pci@800000020000000.mmio
+    0000210000000000-000021000000ffff (prio 1, i/o): 0001:03:00.0 BAR 1
+      0000210000000000-000021000000ffff (prio 0, ramd): 0001:03:00.0 BAR 1 mmaps[0]
+        000021000000e000-000021000000e5ff (prio 0, i/o): msix-table [disabled]
+        000021000000f000-000021000000f00f (prio 0, i/o): msix-pba [disabled]
+    0000210000040000-000021000007ffff (prio 1, i/o): 0001:03:00.0 BAR 3
+      0000210000040000-000021000007ffff (prio 0, ramd): 0001:03:00.0 BAR 3 mmaps[0]
 
-  Floating point exception (core dumped)
-  $ ~/inst-qemu/2.9.0/bin/qemu-alpha test-isnanf-nolibm
-  Floating point exception (core dumped)
-  $ ~/inst-qemu/2.9.0/bin/qemu-alpha test-isnanf       =
 
-  Floating point exception (core dumped)
-  $ ~/inst-qemu/2.9.0/bin/qemu-alpha test-ldexp =
+"info mtree -f":
+FlatView #2
+ AS "memory", root: system
+ AS "cpu-memory", root: system
+ Root memory region: system
+  0000000000000000-000000007fffffff (prio 0, ram): ppc_spapr.ram
+  0000210000000000-000021000000ffff (prio 0, ramd): 0001:03:00.0 BAR 1 mmaps[0]
+  0000210000040000-000021000007ffff (prio 0, ramd): 0001:03:00.0 BAR 3 mmaps[0]
 
-  Floating point exception (core dumped)
-  $ ~/inst-qemu/2.9.0/bin/qemu-alpha test-ldexpf
-  Floating point exception (core dumped)
-  $ ~/inst-qemu/2.9.0/bin/qemu-alpha test-ldexpl
-  ../../gltests/test-ldexp.h:99: assertion 'y =3D=3D expected' failed
-  Aborted (core dumped)
-  $ ~/inst-qemu/2.9.0/bin/qemu-alpha test-log1p =
 
-  Floating point exception (core dumped)
-  $ ~/inst-qemu/2.9.0/bin/qemu-alpha test-log1pf
-  Floating point exception (core dumped)
-  $ ~/inst-qemu/2.9.0/bin/qemu-alpha test-log2  =
 
-  Floating point exception (core dumped)
-  $ ~/inst-qemu/2.9.0/bin/qemu-alpha test-log2f
-  Floating point exception (core dumped)
-  $ ~/inst-qemu/2.9.0/bin/qemu-alpha test-logb =
+This is AFTER this patch applied AND spapr_get_msix_emulation() patched
+to enable emulation:
 
-  Floating point exception (core dumped)
-  $ ~/inst-qemu/2.9.0/bin/qemu-alpha test-logbf
-  Floating point exception (core dumped)
-  $ ~/inst-qemu/2.9.0/bin/qemu-alpha test-math =
+"info mtree":
+memory-region: pci@800000020000000.mmio
+  0000000000000000-ffffffffffffffff (prio 0, i/o): pci@800000020000000.mmio
+    0000210000000000-000021000000ffff (prio 1, i/o): 0001:03:00.0 BAR 1
+      0000210000000000-000021000000ffff (prio 0, ramd): 0001:03:00.0 BAR 1 mmaps[0]
+        000021000000e000-000021000000e5ff (prio 0, i/o): msix-table
+        000021000000f000-000021000000f00f (prio 0, i/o): msix-pba [disabled]
+    0000210000040000-000021000007ffff (prio 1, i/o): 0001:03:00.0 BAR 3
+      0000210000040000-000021000007ffff (prio 0, ramd): 0001:03:00.0 BAR 3 mmaps[0]
 
-  Floating point exception (core dumped)
-  $ ~/inst-qemu/2.9.0/bin/qemu-alpha test-printf-frexp
-  Floating point exception (core dumped)
-  $ ~/inst-qemu/2.9.0/bin/qemu-alpha test-rint        =
+"info mtree -f":
+FlatView #1
+ AS "memory", root: system
+ AS "cpu-memory", root: system
+ Root memory region: system
+  0000000000000000-000000007fffffff (prio 0, ram): ppc_spapr.ram
+  0000210000000000-000021000000dfff (prio 0, ramd): 0001:03:00.0 BAR 1 mmaps[0]
+  000021000000e000-000021000000e5ff (prio 0, i/o): msix-table
+  000021000000e600-000021000000ffff (prio 0, ramd): 0001:03:00.0 BAR 1 mmaps[0] @000000000000e600
+  0000210000040000-000021000007ffff (prio 0, ramd): 0001:03:00.0 BAR 3 mmaps[0]
+---
+ include/hw/vfio/vfio-common.h |  1 +
+ linux-headers/linux/vfio.h    |  5 +++++
+ hw/ppc/spapr.c                |  8 ++++++++
+ hw/vfio/common.c              | 15 +++++++++++++++
+ hw/vfio/pci.c                 | 23 +++++++++++++++++++++--
+ 5 files changed, 50 insertions(+), 2 deletions(-)
 
-  ../../gltests/test-rint.c:63: assertion 'rint (0.7) =3D=3D 1.0' failed
-  Aborted (core dumped)
-  $ ~/inst-qemu/2.9.0/bin/qemu-alpha test-rintf
-  ../../gltests/test-rintf.c:63: assertion 'rintf (0.7f) =3D=3D 1.0f' failed
-  Aborted (core dumped)
-  $ ~/inst-qemu/2.9.0/bin/qemu-alpha test-rintl
-  ../../gltests/test-rintl.c:68: assertion 'rintl (0.7L) =3D=3D 1.0L' failed
-  Aborted (core dumped)
-  $ ~/inst-qemu/2.9.0/bin/qemu-alpha test-round1
-  Floating point exception (core dumped)
-  $ ~/inst-qemu/2.9.0/bin/qemu-alpha test-roundf1
-  Floating point exception (core dumped)
-  $ ~/inst-qemu/2.9.0/bin/qemu-alpha test-signbit
-  Floating point exception (core dumped)
-  $ ~/inst-qemu/2.9.0/bin/qemu-alpha test-sqrt   =
-
-  ../../gltests/test-sqrt.h:40: assertion 'err > - L_(16.0) / TWO_MANT_DIG =
-&& err < L_(16.0) / TWO_MANT_DIG' failed
-  Aborted (core dumped)
-  $ ~/inst-qemu/2.9.0/bin/qemu-alpha test-trunc1
-  Floating point exception (core dumped)
-  $ ~/inst-qemu/2.9.0/bin/qemu-alpha test-truncf1
-  Floating point exception (core dumped)
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1701835/+subscriptions
+diff --git a/include/hw/vfio/vfio-common.h b/include/hw/vfio/vfio-common.h
+index f3a2ac9..927d600 100644
+--- a/include/hw/vfio/vfio-common.h
++++ b/include/hw/vfio/vfio-common.h
+@@ -171,6 +171,7 @@ int vfio_get_region_info(VFIODevice *vbasedev, int index,
+                          struct vfio_region_info **info);
+ int vfio_get_dev_region_info(VFIODevice *vbasedev, uint32_t type,
+                              uint32_t subtype, struct vfio_region_info **info);
++bool vfio_is_cap_present(VFIODevice *vbasedev, uint16_t cap_type, int region);
+ #endif
+ extern const MemoryListener vfio_prereg_listener;
+ 
+diff --git a/linux-headers/linux/vfio.h b/linux-headers/linux/vfio.h
+index 4312e96..b45182e 100644
+--- a/linux-headers/linux/vfio.h
++++ b/linux-headers/linux/vfio.h
+@@ -301,6 +301,11 @@ struct vfio_region_info_cap_type {
+ #define VFIO_REGION_SUBTYPE_INTEL_IGD_HOST_CFG	(2)
+ #define VFIO_REGION_SUBTYPE_INTEL_IGD_LPC_CFG	(3)
+ 
++/*
++ * The MSIX mappable capability informs that MSIX data of a BAR can be mmapped.
++ */
++#define VFIO_REGION_INFO_CAP_MSIX_MAPPABLE	3
++
+ /**
+  * VFIO_DEVICE_GET_IRQ_INFO - _IOWR(VFIO_TYPE, VFIO_BASE + 9,
+  *				    struct vfio_irq_info)
+diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
+index 9de63f0..693394a 100644
+--- a/hw/ppc/spapr.c
++++ b/hw/ppc/spapr.c
+@@ -2772,6 +2772,11 @@ static void spapr_set_modern_hotplug_events(Object *obj, bool value,
+     spapr->use_hotplug_event_source = value;
+ }
+ 
++static bool spapr_get_msix_emulation(Object *obj, Error **errp)
++{
++    return true;
++}
++
+ static char *spapr_get_resize_hpt(Object *obj, Error **errp)
+ {
+     sPAPRMachineState *spapr = SPAPR_MACHINE(obj);
+@@ -2853,6 +2858,8 @@ static void spapr_machine_initfn(Object *obj)
+     object_property_set_description(obj, "vsmt",
+                                     "Virtual SMT: KVM behaves as if this were"
+                                     " the host's SMT mode", &error_abort);
++    object_property_add_bool(obj, "vfio-no-msix-emulation",
++                             spapr_get_msix_emulation, NULL, NULL);
+ }
+ 
+ static void spapr_machine_finalizefn(Object *obj)
+@@ -3742,6 +3749,7 @@ static const TypeInfo spapr_machine_info = {
+ /*
+  * pseries-2.11
+  */
++
+ static void spapr_machine_2_11_instance_options(MachineState *machine)
+ {
+ }
+diff --git a/hw/vfio/common.c b/hw/vfio/common.c
+index 1fb8a8e..da5f182 100644
+--- a/hw/vfio/common.c
++++ b/hw/vfio/common.c
+@@ -1411,6 +1411,21 @@ int vfio_get_dev_region_info(VFIODevice *vbasedev, uint32_t type,
+     return -ENODEV;
+ }
+ 
++bool vfio_is_cap_present(VFIODevice *vbasedev, uint16_t cap_type, int region)
++{
++    struct vfio_region_info *info = NULL;
++    bool ret = false;
++
++    if (!vfio_get_region_info(vbasedev, region, &info)) {
++        if (vfio_get_region_info_cap(info, cap_type)) {
++            ret = true;
++        }
++        g_free(info);
++    }
++
++    return ret;
++}
++
+ /*
+  * Interfaces for IBM EEH (Enhanced Error Handling)
+  */
+diff --git a/hw/vfio/pci.c b/hw/vfio/pci.c
+index c977ee3..27a3706 100644
+--- a/hw/vfio/pci.c
++++ b/hw/vfio/pci.c
+@@ -1289,6 +1289,11 @@ static void vfio_pci_fixup_msix_region(VFIOPCIDevice *vdev)
+     off_t start, end;
+     VFIORegion *region = &vdev->bars[vdev->msix->table_bar].region;
+ 
++    if (vfio_is_cap_present(&vdev->vbasedev, VFIO_REGION_INFO_CAP_MSIX_MAPPABLE,
++                            vdev->msix->table_bar)) {
++        return;
++    }
++
+     /*
+      * We expect to find a single mmap covering the whole BAR, anything else
+      * means it's either unsupported or already setup.
+@@ -1432,6 +1437,15 @@ static void vfio_msix_early_setup(VFIOPCIDevice *vdev, Error **errp)
+     vfio_pci_fixup_msix_region(vdev);
+ }
+ 
++static MemoryRegion *vfio_msix_parent(VFIORegion *region)
++{
++    if (region->nr_mmaps == 1 && region->mmaps[0].size == region->size) {
++        return &region->mmaps[0].mem;
++    }
++
++    return region->mem;
++}
++
+ static int vfio_msix_setup(VFIOPCIDevice *vdev, int pos, Error **errp)
+ {
+     int ret;
+@@ -1440,9 +1454,9 @@ static int vfio_msix_setup(VFIOPCIDevice *vdev, int pos, Error **errp)
+     vdev->msix->pending = g_malloc0(BITS_TO_LONGS(vdev->msix->entries) *
+                                     sizeof(unsigned long));
+     ret = msix_init(&vdev->pdev, vdev->msix->entries,
+-                    vdev->bars[vdev->msix->table_bar].region.mem,
++                    vfio_msix_parent(&vdev->bars[vdev->msix->table_bar].region),
+                     vdev->msix->table_bar, vdev->msix->table_offset,
+-                    vdev->bars[vdev->msix->pba_bar].region.mem,
++                    vfio_msix_parent(&vdev->bars[vdev->msix->pba_bar].region),
+                     vdev->msix->pba_bar, vdev->msix->pba_offset, pos,
+                     &err);
+     if (ret < 0) {
+@@ -1473,6 +1487,11 @@ static int vfio_msix_setup(VFIOPCIDevice *vdev, int pos, Error **errp)
+      */
+     memory_region_set_enabled(&vdev->pdev.msix_pba_mmio, false);
+ 
++    if (object_property_get_bool(OBJECT(qdev_get_machine()),
++                                 "vfio-no-msix-emulation", NULL)) {
++        memory_region_set_enabled(&vdev->pdev.msix_table_mmio, false);
++    }
++
+     return 0;
+ }
+ 
+-- 
+2.11.0
