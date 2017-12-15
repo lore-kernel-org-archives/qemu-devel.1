@@ -1,19 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55469)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55494)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berto@igalia.com>) id 1ePpVG-0000Wf-CS
-	for qemu-devel@nongnu.org; Fri, 15 Dec 2017 07:54:17 -0500
+	(envelope-from <berto@igalia.com>) id 1ePpVG-0000Wl-Qa
+	for qemu-devel@nongnu.org; Fri, 15 Dec 2017 07:54:18 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berto@igalia.com>) id 1ePpVC-0003IU-Q6
+	(envelope-from <berto@igalia.com>) id 1ePpVC-0003Hb-9y
 	for qemu-devel@nongnu.org; Fri, 15 Dec 2017 07:54:14 -0500
 From: Alberto Garcia <berto@igalia.com>
-Date: Fri, 15 Dec 2017 13:53:33 +0100
-Message-Id: <dd49ca34767c46886ef775739c3a3611b7d5a65b.1513342045.git.berto@igalia.com>
+Date: Fri, 15 Dec 2017 13:53:49 +0100
+Message-Id: <976f6bac137cdbdf45e5aafe140aad5833db087f.1513342045.git.berto@igalia.com>
 In-Reply-To: <cover.1513342045.git.berto@igalia.com>
 References: <cover.1513342045.git.berto@igalia.com>
 In-Reply-To: <cover.1513342045.git.berto@igalia.com>
 References: <cover.1513342045.git.berto@igalia.com>
-Subject: [Qemu-devel] [PATCH v2 05/32] qcow2: Remove BDS parameter from
- qcow2_cache_table_release()
+Subject: [Qemu-devel] [PATCH v2 21/32] qcow2: Update handle_alloc() to
+ support L2 slices
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,53 +25,84 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Alberto Garcia <berto@igalia.com>, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>, Kevin Wolf <kwolf@redhat.com>, "Denis V . Lunev" <den@openvz.org>
 
-This function was only using the BlockDriverState parameter to get the
-cache table size (since it was equal to the cluster size). This is no
-longer necessary so this parameter can be removed.
+handle_alloc() loads an L2 table and limits the number of checked
+clusters to the amount that fits inside that table. Since we'll be
+loading L2 slices instead of full tables we need to update that limit.
+
+Apart from that, this function doesn't need any additional changes, so
+this patch simply updates the variable name from l2_table to l2_slice.
 
 Signed-off-by: Alberto Garcia <berto@igalia.com>
 ---
- block/qcow2-cache.c | 9 ++++-----
- 1 file changed, 4 insertions(+), 5 deletions(-)
+ block/qcow2-cluster.c | 18 +++++++++---------
+ 1 file changed, 9 insertions(+), 9 deletions(-)
 
-diff --git a/block/qcow2-cache.c b/block/qcow2-cache.c
-index c2a85b80b8..3deded348c 100644
---- a/block/qcow2-cache.c
-+++ b/block/qcow2-cache.c
-@@ -71,8 +71,7 @@ static inline const char *qcow2_cache_get_name(BDRVQcow2State *s, Qcow2Cache *c)
-     }
- }
- 
--static void qcow2_cache_table_release(BlockDriverState *bs, Qcow2Cache *c,
--                                      int i, int num_tables)
-+static void qcow2_cache_table_release(Qcow2Cache *c, int i, int num_tables)
+diff --git a/block/qcow2-cluster.c b/block/qcow2-cluster.c
+index 09b6dc984f..0d126581bd 100644
+--- a/block/qcow2-cluster.c
++++ b/block/qcow2-cluster.c
+@@ -1283,7 +1283,7 @@ static int handle_alloc(BlockDriverState *bs, uint64_t guest_offset,
  {
- /* Using MADV_DONTNEED to discard memory is a Linux-specific feature */
- #ifdef CONFIG_LINUX
-@@ -114,7 +113,7 @@ void qcow2_cache_clean_unused(BlockDriverState *bs, Qcow2Cache *c)
-         }
+     BDRVQcow2State *s = bs->opaque;
+     int l2_index;
+-    uint64_t *l2_table;
++    uint64_t *l2_slice;
+     uint64_t entry;
+     uint64_t nb_clusters;
+     int ret;
+@@ -1296,29 +1296,29 @@ static int handle_alloc(BlockDriverState *bs, uint64_t guest_offset,
+     assert(*bytes > 0);
  
-         if (to_clean > 0) {
--            qcow2_cache_table_release(bs, c, i - to_clean, to_clean);
-+            qcow2_cache_table_release(c, i - to_clean, to_clean);
-         }
+     /*
+-     * Calculate the number of clusters to look for. We stop at L2 table
++     * Calculate the number of clusters to look for. We stop at L2 slice
+      * boundaries to keep things simple.
+      */
+     nb_clusters =
+         size_to_clusters(s, offset_into_cluster(s, guest_offset) + *bytes);
+ 
+-    l2_index = offset_to_l2_index(s, guest_offset);
+-    nb_clusters = MIN(nb_clusters, s->l2_size - l2_index);
++    l2_index = offset_to_l2_slice_index(s, guest_offset);
++    nb_clusters = MIN(nb_clusters, s->l2_slice_size - l2_index);
+     assert(nb_clusters <= INT_MAX);
+ 
+     /* Find L2 entry for the first involved cluster */
+-    ret = get_cluster_table(bs, guest_offset, &l2_table, &l2_index);
++    ret = get_cluster_table(bs, guest_offset, &l2_slice, &l2_index);
+     if (ret < 0) {
+         return ret;
      }
  
-@@ -306,7 +305,7 @@ int qcow2_cache_empty(BlockDriverState *bs, Qcow2Cache *c)
-         c->entries[i].lru_counter = 0;
+-    entry = be64_to_cpu(l2_table[l2_index]);
++    entry = be64_to_cpu(l2_slice[l2_index]);
+ 
+     /* For the moment, overwrite compressed clusters one by one */
+     if (entry & QCOW_OFLAG_COMPRESSED) {
+         nb_clusters = 1;
+     } else {
+-        nb_clusters = count_cow_clusters(s, nb_clusters, l2_table, l2_index);
++        nb_clusters = count_cow_clusters(s, nb_clusters, l2_slice, l2_index);
      }
  
--    qcow2_cache_table_release(bs, c, 0, c->size);
-+    qcow2_cache_table_release(c, 0, c->size);
+     /* This function is only called when there were no non-COW clusters, so if
+@@ -1347,7 +1347,7 @@ static int handle_alloc(BlockDriverState *bs, uint64_t guest_offset,
+          * nb_clusters already to a range of COW clusters */
+         preallocated_nb_clusters =
+             count_contiguous_clusters(nb_clusters, s->cluster_size,
+-                                      &l2_table[l2_index], QCOW_OFLAG_COPIED);
++                                      &l2_slice[l2_index], QCOW_OFLAG_COPIED);
+         assert(preallocated_nb_clusters > 0);
  
-     c->lru_counter = 0;
+         nb_clusters = preallocated_nb_clusters;
+@@ -1358,7 +1358,7 @@ static int handle_alloc(BlockDriverState *bs, uint64_t guest_offset,
+         keep_old_clusters = true;
+     }
  
-@@ -453,5 +452,5 @@ void qcow2_cache_discard(BlockDriverState *bs, Qcow2Cache *c, void *table)
-     c->entries[i].lru_counter = 0;
-     c->entries[i].dirty = false;
+-    qcow2_cache_put(s->l2_table_cache, (void **) &l2_table);
++    qcow2_cache_put(s->l2_table_cache, (void **) &l2_slice);
  
--    qcow2_cache_table_release(bs, c, i, 1);
-+    qcow2_cache_table_release(c, i, 1);
- }
+     if (!alloc_cluster_offset) {
+         /* Allocate, if necessary at a given offset in the image file */
 -- 
 2.11.0
