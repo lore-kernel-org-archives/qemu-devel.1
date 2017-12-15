@@ -1,34 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43035)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43037)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1ePsnz-0000Mv-5C
+	(envelope-from <bounces@canonical.com>) id 1ePsnz-0000Mx-5c
 	for qemu-devel@nongnu.org; Fri, 15 Dec 2017 11:25:48 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1ePsnv-0008Ch-3c
+	(envelope-from <bounces@canonical.com>) id 1ePsnx-0008IE-1B
 	for qemu-devel@nongnu.org; Fri, 15 Dec 2017 11:25:47 -0500
-Received: from indium.canonical.com ([91.189.90.7]:55944)
+Received: from indium.canonical.com ([91.189.90.7]:56096)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1ePsnu-0008B2-Ta
-	for qemu-devel@nongnu.org; Fri, 15 Dec 2017 11:25:43 -0500
+	id 1ePsnw-0008Ff-Qm
+	for qemu-devel@nongnu.org; Fri, 15 Dec 2017 11:25:44 -0500
 Received: from loganberry.canonical.com ([91.189.90.37])
 	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1ePsns-0005YH-TJ
-	for <qemu-devel@nongnu.org>; Fri, 15 Dec 2017 16:25:41 +0000
+	id 1ePsnu-0005YD-Mg
+	for <qemu-devel@nongnu.org>; Fri, 15 Dec 2017 16:25:42 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 5D3D92E80DD
-	for <qemu-devel@nongnu.org>; Fri, 15 Dec 2017 16:25:40 +0000 (UTC)
+	by loganberry.canonical.com (Postfix) with ESMTP id C5F312E80DE
+	for <qemu-devel@nongnu.org>; Fri, 15 Dec 2017 16:25:41 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Fri, 15 Dec 2017 16:19:46 -0000
-From: Thomas Huth <1724477@bugs.launchpad.net>
-Reply-To: Bug 1724477 <1724477@bugs.launchpad.net>
+Date: Fri, 15 Dec 2017 16:19:32 -0000
+From: Thomas Huth <1715186@bugs.launchpad.net>
+Reply-To: Bug 1715186 <1715186@bugs.launchpad.net>
 Sender: bounces@canonical.com
-References: <150831284620.1599.14269987525342877867.malonedeb@soybean.canonical.com>
-Message-Id: <151335478719.19201.3993071609671878026.launchpad@chaenomeles.canonical.com>
+References: <150462661769.17099.11925025088141121020.malonedeb@gac.canonical.com>
+Message-Id: <151335477286.19363.6920133410740611234.launchpad@chaenomeles.canonical.com>
 Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1724477] Re: Build-in websocket broken since
- v2.9.0-rc0
+Subject: [Qemu-devel] [Bug 1715186] Re: websockets: Improve error messages
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -46,33 +45,29 @@ To: qemu-devel@nongnu.org
 
 You received this bug notification because you are a member of qemu-
 devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1724477
+https://bugs.launchpad.net/bugs/1715186
 
 Title:
-  Build-in websocket broken since v2.9.0-rc0
+  websockets: Improve error messages
 
 Status in QEMU:
   Fix Released
 
 Bug description:
-  Since upgrading to 2.9.0, the qemu's build-in websocket was no longer
-  available.
+  Since 2.9 / 07e95cd529af345fdeea230913f68eff5b925bb6 , whenever the
+  VNC websocket server finds an error with the incoming connection
+  request, it just closes the socket with no further information.
 
-  Host: Ubuntu 16.04 LTS
-  Command-line: /bin/qemu-system-x86_64 -enable-kvm -vnc 0.0.0.0:8,websocket
+  This makes figuring out what's wrong with the request nearly
+  impossible.
 
-  I have tested the following qemu versions:
+  I would be nice if:
 
-  master      Fail
-  2.10.1      Fail
-  2.9.1       Fail
-  2.9.0       Fail
-  2.9.0-rc3   Fail
-  2.9.0-rc0   Fail
+  * HTTP 400 were returned to the client, with an appropriate error message
+  * Maybe something written to the log as well?
 
-  2.8.1.1     Pass
-  2.7.1       Pass
-  2.6.2       Pass
+  Currently, I'm resorting to looking at my request and the websocket
+  source and hoping I can figure out what's wrong.
 
 To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1724477/+subscriptions
+https://bugs.launchpad.net/qemu/+bug/1715186/+subscriptions
