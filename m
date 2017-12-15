@@ -1,30 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60202)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35398)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1ePpfR-0001fa-BO
-	for qemu-devel@nongnu.org; Fri, 15 Dec 2017 08:04:46 -0500
+	(envelope-from <mreitz@redhat.com>) id 1ePpni-00017C-7W
+	for qemu-devel@nongnu.org; Fri, 15 Dec 2017 08:13:19 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1ePpfL-0000VY-9S
-	for qemu-devel@nongnu.org; Fri, 15 Dec 2017 08:04:45 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:56936)
+	(envelope-from <mreitz@redhat.com>) id 1ePpnd-0004tA-9F
+	for qemu-devel@nongnu.org; Fri, 15 Dec 2017 08:13:18 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:46230)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1ePpfL-0000UL-3M
-	for qemu-devel@nongnu.org; Fri, 15 Dec 2017 08:04:39 -0500
+	(Exim 4.71) (envelope-from <mreitz@redhat.com>) id 1ePpnc-0004rq-Vj
+	for qemu-devel@nongnu.org; Fri, 15 Dec 2017 08:13:13 -0500
 Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
 	[10.5.11.11])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 496F5C01CB9B
-	for <qemu-devel@nongnu.org>; Fri, 15 Dec 2017 13:04:38 +0000 (UTC)
-Date: Fri, 15 Dec 2017 13:04:14 +0000
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20171215130414.GB14126@work-vm>
-References: <20171212202040.GA2458@work-vm>
-	<20171215122519.ov4alinnlqrlvio7@sirius.home.kraxel.org>
+	by mx1.redhat.com (Postfix) with ESMTPS id 37B37369C9
+	for <qemu-devel@nongnu.org>; Fri, 15 Dec 2017 13:13:12 +0000 (UTC)
+References: <1501249552-788-1-git-send-email-armbru@redhat.com>
+	<1501249552-788-4-git-send-email-armbru@redhat.com>
+	<17d849ae-e99c-0f8a-5f38-374e8938cbe5@redhat.com>
+From: Max Reitz <mreitz@redhat.com>
+Message-ID: <3fb23e35-cdb7-8eb7-cd21-e8c5da9e320b@redhat.com>
+Date: Fri, 15 Dec 2017 14:13:09 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20171215122519.ov4alinnlqrlvio7@sirius.home.kraxel.org>
-Subject: Re: [Qemu-devel] No uhd (3840x2160) guest res?
+In-Reply-To: <17d849ae-e99c-0f8a-5f38-374e8938cbe5@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="ORvH5GERowDUV9nvwEWvG91pMhgxRJxkN"
+Subject: Re: [Qemu-devel] [PATCH 3/3] block: Remove unused
+ BlockDeviceMapEntry
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,56 +36,74 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Gerd Hoffmann <kraxel@redhat.com>
-Cc: qemu-devel@nongnu.org
+To: Eric Blake <eblake@redhat.com>, Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
+Cc: Paolo Bonzini <pbonzini@redhat.com>
 
-* Gerd Hoffmann (kraxel@redhat.com) wrote:
-> On Tue, Dec 12, 2017 at 08:20:41PM +0000, Dr. David Alan Gilbert wrote:
-> > My guests don't seem to offer the standard uhd resolution of 3840x2160
-> > - what should be providing that?
-> > 
-> > I'm running an f27 gnome (X or wayland) guest with:
-> > 
-> > ./x86_64-softmmu/qemu-system-x86_64 -device virtio-vga --enable-kvm -m 2G /home/vmimages/fedora27.qcow2
-> > 
-> > and the guest lists:
-> > 4096x2160
-> > 2480x1680
-> > 2560x1600
-> > 1920x1440
-> > 1856x1392
-> > 1792x1344
-> > 2048x1152
-> > 1920x1200
-> > 1920x1080
-> > (and smaller)
-> > 
-> > given that it can offer 4096x2160, I assume it's not running out of RAM.
-> > 
-> > I couldn't find anywhere with those higher resolutions listed
-> > in seabios to consider changing.
-> 
-> linux kernel has a list of standard vesa resolutions in drm somewhere,
-> iirc all virt drm drivers just use that for the mode list.
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--ORvH5GERowDUV9nvwEWvG91pMhgxRJxkN
+From: Max Reitz <mreitz@redhat.com>
+To: Eric Blake <eblake@redhat.com>, Markus Armbruster <armbru@redhat.com>,
+ qemu-devel@nongnu.org
+Cc: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <3fb23e35-cdb7-8eb7-cd21-e8c5da9e320b@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH 3/3] block: Remove unused BlockDeviceMapEntry
+References: <1501249552-788-1-git-send-email-armbru@redhat.com>
+ <1501249552-788-4-git-send-email-armbru@redhat.com>
+ <17d849ae-e99c-0f8a-5f38-374e8938cbe5@redhat.com>
+In-Reply-To: <17d849ae-e99c-0f8a-5f38-374e8938cbe5@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-I see drivers/video/fbdev/core/modedb.c, but there are modes that I see
-in the guest that aren't in there; e.g. I see a 4096x2160 listed in the
-guest (the 2480x1680 seems to have gone?!).  I don't see it in SeaBIOS
-either.
+On 2017-07-28 20:10, Eric Blake wrote:
+> On 07/28/2017 08:45 AM, Markus Armbruster wrote:
+>> BlockDeviceMapEntry has never been used.  It was added in commit
+>> facd6e2 "so that it is published through the introspection mechanism."=
 
-Looking at the VESA CVT 1.2 standard I don't see a UHD def (it's got
-some that are similar but not quite the right res).
+>> What exactly introspecting types that aren't used for anything could
+>> accomplish isn't clear.  What "introspection mechanism" to use is also=
 
-(I do see a UHD mode defined in qxl, but qxl is unusable and qemu aborts
-with newer guest kernels).
+>> nebulous.  To the best of my knowledge, there has never been one that
+>> covered this type.  Certainly not query-qmp-schema, which includes
+>> only types that are actually used in QMP.
+>>
+>> Not being able to introspect BlockDeviceMapEntry hasn't bothered
+>> anyone enough to complain in almost four years.  Get rid of it.
+>=20
+> This type is the schema for 'qemu-img map --output=3Djson'.  And I had =
+a
+> patch once (that I need to revive) that added a JSON Output visitor; at=
 
-Dave
+> which point I fixed qemu-img to convert from QAPI to JSON instead of
+> open-coding its construction of its output string, at which point the
+> QAPI generated code for this type is useful.
+(Very late reply, I know, I just stumbled over *MapEntry when looking
+over block-core.json what we might want to deprecate in 3.0)
+
+We already use MapEntry there -- why don't we output just that instead?
+The only difference seems to be an additional @filename parameter which
+would probably be actually nice to include in the output.
+
+Except that BlockDeviceMapEntry's documentation is better, so we should
+merge that into MapEntry before removing the former.
+
+Max
 
 
-> > 
-> > Dave
-> > 
-> > --
-> > Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+--ORvH5GERowDUV9nvwEWvG91pMhgxRJxkN
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQFGBAEBCAAwFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAlozymUSHG1yZWl0ekBy
+ZWRoYXQuY29tAAoJEPQH2wBh1c9ALAwIAMPFcwcQmwKN/NOgRjqM2WtEFkvRMeST
+3udKGlcoGQ0FoBsVMLevfkYxJaf8ndGhZm/Jk5YpxzarRvSRXs4E4RhHdex4vbYA
+OVlPnHp7oY3SVpfLfppv5IQDlV6GoCpnpwoVIh0D2D5JocpY9jrLqUPA8MjSeB0K
+d11mo7V++0WIdjAW/WAWFSNQ16dkGN6h1DyyPdUAuOwktN9+LXI2ZSYNa/d5uIt0
+UVwKzWECSY1WiDnyRjZhvRd60oH0HH5bx3lLikU+LoZw7J/5CNQ4grPnpjm8NvqO
+gcRp1xuDutYdHU4Ha72eC/OJ5utRqMnZkdg3UyQbiLURYXft2+YaDOc=
+=MLer
+-----END PGP SIGNATURE-----
+
+--ORvH5GERowDUV9nvwEWvG91pMhgxRJxkN--
