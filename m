@@ -1,34 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36819)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45341)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1ePhUL-0001eJ-Cz
-	for qemu-devel@nongnu.org; Thu, 14 Dec 2017 23:20:46 -0500
+	(envelope-from <mst@redhat.com>) id 1ePhjZ-0004wo-MB
+	for qemu-devel@nongnu.org; Thu, 14 Dec 2017 23:36:30 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1ePhUI-0000F4-9D
-	for qemu-devel@nongnu.org; Thu, 14 Dec 2017 23:20:45 -0500
-Received: from indium.canonical.com ([91.189.90.7]:36276)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1ePhUI-0000Cf-2x
-	for qemu-devel@nongnu.org; Thu, 14 Dec 2017 23:20:42 -0500
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1ePhUF-0000L6-EZ
-	for <qemu-devel@nongnu.org>; Fri, 15 Dec 2017 04:20:39 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id C80272E8137
-	for <qemu-devel@nongnu.org>; Fri, 15 Dec 2017 04:20:37 +0000 (UTC)
+	(envelope-from <mst@redhat.com>) id 1ePhjV-0003C0-Ch
+	for qemu-devel@nongnu.org; Thu, 14 Dec 2017 23:36:29 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:56386)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1ePhjV-00039p-6I
+	for qemu-devel@nongnu.org; Thu, 14 Dec 2017 23:36:25 -0500
+Date: Fri, 15 Dec 2017 06:36:21 +0200
+From: "Michael S. Tsirkin" <mst@redhat.com>
+Message-ID: <20171215063550-mutt-send-email-mst@kernel.org>
+References: <1513269392-23224-1-git-send-email-jianjay.zhou@huawei.com>
+	<20171214202619-mutt-send-email-mst@kernel.org>
+	<20171214194920.GH4380@work-vm>
+	<B2D15215269B544CADD246097EACE7473AB03F26@DGGEMM505-MBS.china.huawei.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Fri, 15 Dec 2017 04:13:36 -0000
-From: Bruno Haible <bruno@clisp.org>
-Reply-To: Bug 1701808 <1701808@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <149891130681.24932.1838110700653893581.malonedeb@soybean.canonical.com>
-Message-Id: <151331121639.19433.10519708710189449837.malone@chaenomeles.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1701808] Re: stack smashing in or after recvmsg
- system call in aarch64 user mode
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <B2D15215269B544CADD246097EACE7473AB03F26@DGGEMM505-MBS.china.huawei.com>
+Subject: Re: [Qemu-devel] [PATCH 0/2] vhost: two fixes
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,45 +29,59 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: "Zhoujian (jay)" <jianjay.zhou@huawei.com>
+Cc: "Dr. David Alan Gilbert" <dgilbert@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "Huangweidong (C)" <weidong.huang@huawei.com>, "Gonglei (Arei)" <arei.gonglei@huawei.com>, "wangxin (U)" <wangxinxin.wang@huawei.com>, "Liuzhe (Cloud Open Labs, NFV)" <gary.liuzhe@huawei.com>, Igor Mammedov <imammedo@redhat.com>
 
-The behaviour in qemu-2.11 is the same as in qemu-2.9.
+On Fri, Dec 15, 2017 at 02:38:35AM +0000, Zhoujian (jay) wrote:
+> Hi Dave,
+> 
+> > -----Original Message-----
+> > From: Dr. David Alan Gilbert [mailto:dgilbert@redhat.com]
+> > Sent: Friday, December 15, 2017 3:49 AM
+> > To: Michael S. Tsirkin <mst@redhat.com>
+> > Cc: Zhoujian (jay) <jianjay.zhou@huawei.com>; qemu-devel@nongnu.org;
+> > Huangweidong (C) <weidong.huang@huawei.com>; Gonglei (Arei)
+> > <arei.gonglei@huawei.com>; wangxin (U) <wangxinxin.wang@huawei.com>;
+> > Liuzhe (Cloud Open Labs, NFV) <gary.liuzhe@huawei.com>; Igor Mammedov
+> > <imammedo@redhat.com>
+> > Subject: Re: [PATCH 0/2] vhost: two fixes
+> > 
+> > * Michael S. Tsirkin (mst@redhat.com) wrote:
+> > > On Fri, Dec 15, 2017 at 12:36:30AM +0800, Jay Zhou wrote:
+> > > > Jay Zhou (2):
+> > > >   vhost: add used memslot number for vhost-user
+> > > >   vhost: double check memslot number
+> > > >
+> > > >  hw/virtio/vhost-user.c            | 31 +++++++++++++++++++++++++
+> > > >  hw/virtio/vhost.c                 | 49
+> > ++++++++++++++++++++++++++++++++++-----
+> > > >  include/hw/virtio/vhost-backend.h |  4 ++++
+> > > >  3 files changed, 78 insertions(+), 6 deletions(-)
+> > >
+> > > Cc two developers working on these files right now.
+> > 
+> > I have to admit to not understanding the 'used_memslots' variable.
+> > 
+> > * It's a global in vhost.c
+> > * but set by vhost_set_memory that's called from the listener associated
+> >   with each individual vhost
+> > * While they're probably always the same, the merging code calls
+> >   the vhost_backend_can_merge method for each device, so the number
+> >   of regions can be different.
+> > 
+> 
+> Your mean for some devices the new added MemoryRegionSection can be merged,
+> but for others it can not be merged? IIUC the vhost_mem for each vhost_dev
+> is the same.
+> 
+> Meanwhile, I think it is more reasonable to add globals in vhost-backend.c
+> and vhost-user.c respectively instead of 'used_memslots'. The reason
+> is explained in patch 1. What do you think?
+> 
+> Regards,
+> Jay
 
--- =
+I'd rather avoid globals completely if possible.
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1701808
-
-Title:
-  stack smashing in or after recvmsg system call in aarch64 user mode
-
-Status in QEMU:
-  New
-
-Bug description:
-  A program that invokes recvmsg aborts with "*** stack smashing
-  detected ***" when run in qemu-aarch64 (user mode), but works fine
-  when running on native aarch64 hardware.
-
-  How to reproduce:
-  $ aarch64-linux-gnu-gcc-5 -O -Wall /media/develdata/devel/qemu-bug/testpa=
-ssfd.c -static -DEXTRA_SPACE=3D0
-  $ QEMU_LD_PREFIX=3D/usr/aarch64-linux-gnu ~/inst-qemu/2.9.0/bin/qemu-aarc=
-h64 ./a.out
-  *** stack smashing detected ***: ./a.out terminated
-  qemu: uncaught target signal 6 (Aborted) - core dumped
-
-  On native aarch64 hardware:
-  $ ./a.out =
-
-  $ echo $?
-  0
-
-  The parameter EXTRA_SPACE can be used to add additional space to the
-  array that receives the recvmsg data. With -DEXTRA_SPACE=3D9 (or
-  larger), the program runs fine. Which suggests that recvmsg is storing
-  up to 9 bytes more than allowed in memory.
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1701808/+subscriptions
+-- 
+MST
